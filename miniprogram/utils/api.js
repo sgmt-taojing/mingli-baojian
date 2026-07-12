@@ -2,6 +2,8 @@
 
 const app = getApp();
 
+// 开发环境用 localhost，真机调试时改为局域网 IP 或域名
+// 例如: 'http://192.168.1.18:8920' 或 'https://your-domain.com'
 const BASE_URL = 'http://127.0.0.1:8920';
 
 function request(path, options = {}) {

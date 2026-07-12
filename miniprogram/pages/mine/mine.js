@@ -1,5 +1,5 @@
 // pages/mine/mine.js
-const API_BASE = 'http://127.0.0.1:8920'
+const api = require('../../utils/api.js')
 
 Page({
   data: {
@@ -62,112 +62,91 @@ Page({
     this.setData({ phoneInput: e.detail.value })
   },
 
-  doLogin() {
+  async doLogin() {
     const phone = this.data.phoneInput.trim()
     if (!/^1\d{10}$/.test(phone)) {
       wx.showToast({ title: '请输入正确手机号', icon: 'none' })
       return
     }
     this.setData({ loading: true })
-    wx.request({
-      url: API_BASE + '/api/user/login',
-      method: 'POST',
-      data: { phone },
-      header: { 'Content-Type': 'application/json' },
-      success: (res) => {
-        if (res.statusCode === 200 && res.data.token) {
-          wx.setStorageSync('token', res.data.token)
-          wx.setStorageSync('userInfo', res.data.user || {})
-          // 设置同步客户端token，触发自动同步
-          const app = getApp()
-          if (app.globalData.syncClient) {
-            app.globalData.syncClient.setToken(res.data.token)
-            app.globalData.syncClient.autoSync().catch(() => {})
-            app.globalData.syncClient.startAutoSync()
-          }
-          this.setData({
-            isLoggedIn: true,
-            showLogin: false,
-            userInfo: res.data.user || null
-          })
-          wx.showToast({ title: '登录成功', icon: 'success' })
-          this.loadProfile()
-          this.loadHistory()
-          this.loadPoints()
-        } else {
-          wx.showToast({ title: '登录失败，请重试', icon: 'none' })
+    try {
+      const res = await api.login(phone)
+      if (res && res.token) {
+        wx.setStorageSync('token', res.token)
+        wx.setStorageSync('userInfo', res.user || {})
+        // 设置同步客户端token，触发自动同步
+        const app = getApp()
+        if (app.globalData.syncClient) {
+          app.globalData.syncClient.setToken(res.token)
+          app.globalData.syncClient.autoSync().catch(() => {})
+          app.globalData.syncClient.startAutoSync()
         }
-      },
-      fail: () => {
-        wx.showToast({ title: '网络错误', icon: 'none' })
-      },
-      complete: () => {
-        this.setData({ loading: false })
+        this.setData({
+          isLoggedIn: true,
+          showLogin: false,
+          userInfo: res.user || null
+        })
+        wx.showToast({ title: '登录成功', icon: 'success' })
+        this.loadProfile()
+        this.loadHistory()
+        this.loadPoints()
+      } else {
+        wx.showToast({ title: '登录失败，请重试', icon: 'none' })
       }
-    })
+    } catch (e) {
+      wx.showToast({ title: e.message || '网络错误', icon: 'none' })
+    } finally {
+      this.setData({ loading: false })
+    }
   },
 
   // ---- 加载用户信息 ----
-  loadProfile() {
-    const token = wx.getStorageSync('token')
-    wx.request({
-      url: API_BASE + '/api/user/profile',
-      method: 'GET',
-      header: { 'Authorization': 'Bearer ' + token },
-      success: (res) => {
-        if (res.statusCode === 200 && res.data) {
-          const d = res.data
-          this.setData({
-            userInfo: d,
-            birthInfo: {
-              birthDate: d.birthDate || '未填写',
-              birthHour: d.birthHour || '未填写',
-              birthplace: d.birthplace || '未填写'
-            },
-            editForm: {
-              name: d.name || '',
-              sex: d.sex || '',
-              birthDate: d.birthDate || '',
-              birthHour: d.birthHour || '',
-              birthplace: d.birthplace || '',
-              residence: d.residence || '',
-              occupation: d.occupation || '',
-              faith: d.faith || ''
-            }
-          })
-        }
+  async loadProfile() {
+    try {
+      const d = await api.getProfile()
+      if (d) {
+        this.setData({
+          userInfo: d,
+          birthInfo: {
+            birthDate: d.birthDate || '未填写',
+            birthHour: d.birthHour || '未填写',
+            birthplace: d.birthplace || '未填写'
+          },
+          editForm: {
+            name: d.name || '',
+            sex: d.sex || '',
+            birthDate: d.birthDate || '',
+            birthHour: d.birthHour || '',
+            birthplace: d.birthplace || '',
+            residence: d.residence || '',
+            occupation: d.occupation || '',
+            faith: d.faith || ''
+          }
+        })
       }
-    })
+    } catch (e) { /* 静默失败 */ }
   },
 
   // ---- 排盘历史 ----
-  loadHistory() {
-    const token = wx.getStorageSync('token')
-    wx.request({
-      url: API_BASE + '/api/paipan/history',
-      method: 'GET',
-      header: { 'Authorization': 'Bearer ' + token },
-      success: (res) => {
-        if (res.statusCode === 200 && Array.isArray(res.data)) {
-          this.setData({ history: res.data.slice(0, 5) })
-        }
+  async loadHistory() {
+    try {
+      const res = await api.getPaipanHistory()
+      if (Array.isArray(res)) {
+        this.setData({ history: res.slice(0, 5) })
+      } else if (res && Array.isArray(res.data)) {
+        this.setData({ history: res.data.slice(0, 5) })
       }
-    })
+    } catch (e) { /* 静默失败 */ }
   },
 
   // ---- 积分 ----
-  loadPoints() {
-    const token = wx.getStorageSync('token')
-    wx.request({
-      url: API_BASE + '/api/feedback/points',
-      method: 'GET',
-      header: { 'Authorization': 'Bearer ' + token },
-      success: (res) => {
-        if (res.statusCode === 200 && res.data) {
-          this.setData({ points: res.data.points || 0 })
-        }
+  async loadPoints() {
+    try {
+      const res = await api.getPoints()
+      if (res) {
+        this.setData({ points: res.points || 0 })
       }
-    })
+    } catch (e) { /* 静默失败 */ }
   },
 
   // ---- 脱敏手机号 ----
@@ -194,34 +173,20 @@ Page({
     this.setData({ 'editForm.sex': e.detail.value })
   },
 
-  saveBirthInfo() {
-    const token = wx.getStorageSync('token')
+  async saveBirthInfo() {
     const form = this.data.editForm
     if (!form.birthDate) {
       wx.showToast({ title: '请填写出生日期', icon: 'none' })
       return
     }
-    wx.request({
-      url: API_BASE + '/api/user/profile',
-      method: 'POST',
-      data: form,
-      header: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json'
-      },
-      success: (res) => {
-        if (res.statusCode === 200) {
-          wx.showToast({ title: '保存成功', icon: 'success' })
-          this.setData({ editingBirth: false })
-          this.loadProfile()
-        } else {
-          wx.showToast({ title: '保存失败', icon: 'none' })
-        }
-      },
-      fail: () => {
-        wx.showToast({ title: '网络错误', icon: 'none' })
-      }
-    })
+    try {
+      await api.updateProfile(form)
+      wx.showToast({ title: '保存成功', icon: 'success' })
+      this.setData({ editingBirth: false })
+      this.loadProfile()
+    } catch (e) {
+      wx.showToast({ title: '保存失败', icon: 'none' })
+    }
   },
 
   // ---- 历史记录跳转 ----

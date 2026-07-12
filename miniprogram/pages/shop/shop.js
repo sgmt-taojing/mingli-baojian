@@ -65,10 +65,17 @@ Page({
     const token = wx.getStorageSync('token');
     const app = getApp();
     if (!token && !app.globalData?.isLogin) {
-      wx.showToast({ title: '请先登录', icon: 'none' });
-      setTimeout(() => {
-        wx.navigateTo({ url: '/pages/login/login?redirect=/pages/shop/shop' });
-      }, 600);
+      wx.showModal({
+        title: '需要登录',
+        content: '查看商品详情需要先登录，是否前往登录？',
+        confirmText: '去登录',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            wx.switchTab({ url: '/pages/mine/mine' });
+          }
+        }
+      });
       return;
     }
     wx.showToast({ title: '商品详情开发中', icon: 'none' });

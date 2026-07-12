@@ -129,6 +129,27 @@ Page({
     const basePath = path.split('?')[0];
     const hasParams = path.includes('?');
 
+    // VIP 功能检查登录态
+    const item = e.currentTarget.dataset;
+    if (item.vip) {
+      const token = wx.getStorageSync('token');
+      const app = getApp();
+      if (!token && !app.globalData?.isLogin) {
+        wx.showModal({
+          title: '需要登录',
+          content: '该功能需要登录后使用，是否前往登录？',
+          confirmText: '去登录',
+          cancelText: '取消',
+          success: (res) => {
+            if (res.confirm) {
+              wx.switchTab({ url: '/pages/mine/mine' });
+            }
+          }
+        });
+        return;
+      }
+    }
+
     // 未实现的页面 → 跳转到"功能开发中"提示页
     if (!EXISTING_PAGES.includes(basePath)) {
       wx.navigateTo({
