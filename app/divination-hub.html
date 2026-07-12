@@ -3262,6 +3262,18 @@ body:not(.wechat) .wechat-disclaimer{display:none!important}
 .ask-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;overflow-y:auto;padding:40px 20px}
 .ask-modal.active{display:flex;align-items:center;justify-content:center}
 .ask-modal-content{max-width:680px;width:100%;margin:auto;background:var(--ink2);border:1px solid rgba(201,168,76,.2);border-radius:16px;padding:32px;position:relative}
+/* 移动端提问弹窗适配：减小 padding，避免被 bottom-nav 遮挡 */
+@media(max-width:768px){
+  .ask-modal{padding:20px 12px;padding-bottom:calc(80px + env(safe-area-inset-bottom))}
+  .ask-modal-content{padding:20px 16px;border-radius:12px}
+  .ask-modal-close{top:10px;right:10px;padding:4px 10px;font-size:14px}
+}
+@media(max-width:480px){
+  .ask-modal{padding:16px 8px;padding-bottom:calc(80px + env(safe-area-inset-bottom))}
+  .ask-modal-content{padding:16px 12px}
+  .ask-input{min-height:100px;font-size:16px !important}
+  .ask-master-select{font-size:16px !important;padding:10px 12px}
+}
 .ask-modal-close{position:absolute;top:16px;right:16px;background:none;border:1px solid rgba(201,168,76,.3);color:var(--gold);padding:6px 14px;cursor:pointer;font-size:16px;border-radius:4px}
 .ask-master-select{width:100%;padding:12px 16px;background:var(--ink3);border:1px solid var(--border);border-radius:8px;color:var(--paper);font-size:14px;font-family:'Noto Serif SC',serif;margin-bottom:16px}
 .ask-master-select option{background:var(--ink2);color:var(--paper)}
@@ -16764,6 +16776,29 @@ function computeBazi() {
 
   document.getElementById('baziResult').classList.add('visible');
   document.getElementById('baziResult').scrollIntoView({ behavior: 'smooth' });
+
+  // === 首次排盘推送老黄历 ===
+  // 用户首次完成排盘后，自动推送今日老黄历内容
+  if (!localStorage.getItem('_firstAlmanacPushed')) {
+    localStorage.setItem('_firstAlmanacPushed', '1');
+    setTimeout(function() {
+      try {
+        if (typeof initAlmanac === 'function') {
+          showSection('more');
+          // 激活黄历面板并初始化
+          document.querySelectorAll('.more-panel').forEach(function(p){ p.classList.remove('active'); });
+          document.querySelectorAll('.jinang-tab').forEach(function(t){ t.classList.remove('active'); });
+          var panel = document.getElementById('morePanel-almanac');
+          if (panel) panel.classList.add('active');
+          var tab = document.getElementById('moreTab-almanac');
+          if (tab) tab.classList.add('active');
+          initAlmanac();
+          showToast('首次排盘完成，为您推送今日老黄历');
+        }
+      } catch(e) { console.warn('[首次推送] 黄历推送失败:', e); }
+    }, 1500);
+  }
+
   } catch(err) {
     console.error('八字计算错误:', err);
     document.getElementById('loadingOverlay').classList.remove('visible');
@@ -22510,7 +22545,9 @@ function getShensha(pillars, dayStemIdx, dayBranchIdx) {
   const result = [];
 
   // 天乙贵人（以日干查，检查年日时支）
-  const tianyiMap = {0:[1,7],1:[0,2],2:[9,11],3:[9,11],4:[3,5],5:[3,5],6:[1,7],7:[1,7],8:[9,11],9:[0,2]};
+  const // 天乙贵人（以日干查）— 歌诀：甲戊庚牛羊(丑未), 乙己鼠猴乡(子申), 丙丁猪鸡位(亥酉), 辛遇虎马乡(寅午), 壬癸兔蛇藏(卯巳)
+  // 注意：此表已同步 core.js 修复版，两处保持一致
+  tianyiMap = {0:[1,7],1:[0,8],2:[9,11],3:[9,11],4:[1,7],5:[0,8],6:[9,11],7:[6,2],8:[5,3],9:[5,3]};
   const tianyiBranches = (tianyiMap[dayStemIdx] || []).map(function(b){return BRANCHES[b];});
   var hasTianyi = false;
   for (var i = 0; i < allBranches.length; i++) {
