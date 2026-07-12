@@ -11,13 +11,22 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="易道智鉴">
 <meta name="mobile-web-app-capable" content="yes">
+<style>
+#appLoadingOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#080808;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+#appLoadingOverlay .loading-title{color:#c9a84c;font-size:28px;font-weight:700;margin-bottom:16px;letter-spacing:4px;}
+#appLoadingOverlay .loading-spinner{width:40px;height:40px;border:3px solid rgba(201,168,76,0.2);border-top-color:#c9a84c;border-radius:50%;animation:appSpin 0.8s linear infinite;margin-bottom:16px;}
+#appLoadingOverlay .loading-text{color:#a09080;font-size:13px;}
+#appLoadingOverlay .loading-progress{width:200px;height:4px;background:rgba(201,168,76,0.1);border-radius:2px;margin-top:12px;overflow:hidden;}
+#appLoadingOverlay .loading-progress-bar{height:100%;background:#c9a84c;width:0%;transition:width 0.3s ease;}
+@keyframes appSpin{to{transform:rotate(360deg)}}
+</style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='36' fill='%23080808'/><text x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-size='100' font-family='serif'>☰</text></svg>">
 <title>易道智鉴 · 先进AI推演</title>
 <link rel="stylesheet" href="css/divination-hub.css?t=1783071892">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet"></noscript>
 <style>
 :root{
   --ink:#080808;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;
@@ -3397,6 +3406,65 @@ window.addEventListener('load',function(){
     <script src="knowledge/koujue-database-full.js"></script>
 </head>
 <body>
+<div id="appLoadingOverlay">
+  <div class="loading-title">命理宝鉴</div>
+  <div class="loading-spinner"></div>
+  <div class="loading-text">正在加载命理引擎...</div>
+  <div class="loading-progress"><div class="loading-progress-bar" id="loadingProgressBar"></div></div>
+</div>
+<script>
+// 加载进度跟踪
+(function(){
+  var totalScripts = 0;
+  var loadedScripts = 0;
+  function updateProgress(){
+    var pct = totalScripts > 0 ? Math.round(loadedScripts / totalScripts * 100) : 0;
+    var bar = document.getElementById('loadingProgressBar');
+    if(bar) bar.style.width = pct + '%';
+    if(pct >= 100){
+      setTimeout(function(){
+        var overlay = document.getElementById('appLoadingOverlay');
+        if(overlay){
+          overlay.style.opacity = '0';
+          overlay.style.transition = 'opacity 0.5s';
+          setTimeout(function(){ overlay.style.display = 'none'; }, 500);
+        }
+      }, 300);
+    }
+  }
+  // 计数所有 script 标签
+  document.addEventListener('DOMContentLoaded', function(){
+    var scripts = document.querySelectorAll('script[src]');
+    totalScripts = scripts.length;
+    scripts.forEach(function(s){
+      s.addEventListener('load', function(){ loadedScripts++; updateProgress(); });
+      s.addEventListener('error', function(){ loadedScripts++; updateProgress(); });
+    });
+    // 如果没有外部脚本，直接隐藏
+    if(totalScripts === 0) updateProgress();
+    // 超时保护：15秒后强制隐藏
+    setTimeout(function(){
+      var overlay = document.getElementById('appLoadingOverlay');
+      if(overlay && overlay.style.display !== 'none'){
+        overlay.style.opacity = '0';
+        overlay.style.transition = 'opacity 0.5s';
+        setTimeout(function(){ overlay.style.display = 'none'; }, 500);
+      }
+    }, 15000);
+  });
+  // 超快超时：如果5秒内加载完也隐藏
+  window.addEventListener('load', function(){
+    setTimeout(function(){
+      var overlay = document.getElementById('appLoadingOverlay');
+      if(overlay){
+        overlay.style.opacity = '0';
+        overlay.style.transition = 'opacity 0.5s';
+        setTimeout(function(){ overlay.style.display = 'none'; }, 500);
+      }
+    }, 500);
+  });
+})();
+</script>
 
 <!-- LOADING OVERLAY -->
 <div id="loading-overlay" style="position:fixed;inset:0;background:#1a1a2e;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s">
