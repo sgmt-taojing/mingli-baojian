@@ -1861,13 +1861,13 @@ function _getLuckAdvice(level, scores)  {
       advice.summary = '运势偏弱，阻力较多，宜低调保守行事';
       advice.yi = ['保守行事内修为主', '处理简单事务', '养生休息'];
       advice.ji = ['不宜决策大事', '避免冲突与争论', '不宜远行投资'];
-      advice.huajie = '佩戴护身吉祥物(黑曜石/本命佛)，面向喜用神方位深呼吸，穿幸运色衣物增强气场';
+      advice.huajie = '佩戴护身吉祥物(黑曜石戴右手辟煞/本命佛戴脖子护身)，面向喜用神方位深呼吸，穿幸运色衣物增强气场';
       break;
     case '凶':
       advice.summary = '运势低迷，诸事不顺，需化解化解后再行大事';
       advice.yi = ['静心休养不外求', '诵经持咒修心', '化解煞气后再行动'];
       advice.ji = ['切勿决策重大事项', '避免签约合作', '不宜远行搬迁'];
-      advice.huajie = '佩戴护身符(黑曜石/本命佛)，面向喜用神方位冥想，诵金光神咒7遍，穿幸运色衣物，避免去煞气重的地方';
+      advice.huajie = '佩戴护身符(黑曜石戴右手辟煞/本命佛戴脖子护身)，面向喜用神方位冥想，诵金光神咒7遍，穿幸运色衣物，避免去煞气重的地方';
       break;
   }
   return advice;
@@ -2170,6 +2170,34 @@ function generatePersonalized(bazi, dayStem, dayBranch, dayNum)  {
   var jewelryMap = {木:'檀木·菩提·翡翠(绿)',火:'红宝石·石榴石·红玛瑙',土:'黄水晶·琥珀·蜜蜡·和田玉',金:'黄金·白金·银饰·钻石',水:'黑曜石·海蓝宝·蓝水晶'};
   var luckyJewelry = jewelryMap[luckyEle] || jewelryMap[xiEle] || '黄水晶·蜜蜡';
 
+  // 佩戴位置：左为阳主纳进（纳福聚气），右为阴主泄出（辟邪泄煞），颈近心主护身
+  // 按饰品用途分，非按五行分：招财/催旺/招桃花→左手；挡灾/化煞→右手；本命佛/平安扣→脖子
+  var _crystalPurpose = {
+    '翡翠':'纳福','绿幽灵':'招财','檀木':'纳气','红玛瑙':'催旺','紫水晶':'催旺','石榴石':'催旺',
+    '黄水晶':'招财','和田玉':'纳福','虎眼石':'辟煞','黄金':'纳福','白金':'纳福','银饰':'辟煞','钻石':'纳福',
+    '黑曜石':'辟煞','海蓝宝':'纳气','蓝水晶':'纳气','粉水晶':'招桃花','琥珀':'纳福','蜜蜡':'纳福',
+    '白水晶':'辟煞','金发晶':'招财','貔貅':'招财','五帝钱':'辟煞','本命佛':'护身','平安扣':'护身','太岁符':'护身'
+  };
+  function getWearSide(itemName) {
+    if (!itemName) return '左手';
+    for (var k in _crystalPurpose) {
+      if (itemName.indexOf(k) >= 0) {
+        var p = _crystalPurpose[k];
+        if (p === '辟煞') return '右手';
+        if (p === '护身') return '脖子';
+        return '左手';
+      }
+    }
+    return '左手'; // 默认左手纳气
+  }
+  function getWearSideText(itemName) {
+    var side = getWearSide(itemName);
+    if (side === '左手') return '左手（纳福聚气）';
+    if (side === '右手') return '右手（辟邪泄煞）';
+    return '脖子（近心护身）';
+  }
+  var luckyWearSide = getWearSideText(luckyPeishi.split('·')[0]);
+
   var dirMap = {木:'东方',火:'南方',土:'中央',金:'西方',水:'北方'};
   var luckyDir = dirMap[xiEle] || dirMap[userDayEle] || '南方';
 
@@ -2214,6 +2242,7 @@ function generatePersonalized(bazi, dayStem, dayBranch, dayNum)  {
   if (zodiac) text += '🐾 生肖：' + zodiac + '\n';
   text += '👕 穿衣配色：' + luckyCloth + '(' + luckyFabric + ') 色彩:' + luckyColor + '\n';
   text += '💎 幸运饰：' + luckyPeishi + ' | 💍 首饰材：' + luckyJewelry + '\n';
+  text += '📿 佩戴位：' + luckyWearSide + ' | 本命佛/平安扣戴脖子\n';
   text += '🧭 幸运方：' + luckyDir + '\n';
 
   // 正念训练(基于命理匹配) 
@@ -2239,7 +2268,7 @@ function generatePersonalized(bazi, dayStem, dayBranch, dayNum)  {
     winter: '冬季宜深色保暖，厚重面料为佳'
   };
   text += '\n👔 常年穿搭建议(用神' + (xiEle||'金') + ')：';
-  text += '主色调:' + (_xiColors[xiEle] || _xiColors['金']) + ' | 辅色:' + (colorMap[dayEle] || '') + ' | 首饰:' + (_xiJewelry[xiEle] || _xiJewelry['金']) + ' | ' + (_seasonTip[_season] || '');
+  text += '主色调:' + (_xiColors[xiEle] || _xiColors['金']) + ' | 辅色:' + (colorMap[dayEle] || '') + ' | 首饰:' + (_xiJewelry[xiEle] || _xiJewelry['金']) + ' | ' + (_seasonTip[_season] || '') + '\n  · 佩戴位置：手串/手链戴' + luckyWearSide + '，吊坠/本命佛/平安扣戴脖子';
   if (xiEle) {
     var _xiDir = {木:'东方/东南',火:'南方',土:'中央/东北/西南',金:'西方/西北',水:'北方'};
     text += '\n  · 旺运方位：' + (_xiDir[xiEle] || '西方');
@@ -2249,7 +2278,7 @@ function generatePersonalized(bazi, dayStem, dayBranch, dayNum)  {
   var imText = '👤 缘主(' + userDayStem + stemEleName + ') ' + total + '/100 ' + luckInfo.stars + ' ' + luckInfo.level;
   imText += '\n📊 ' + advice.summary;
   imText += '\n🎨 ' + luckyColor + ' | 👔 ' + luckyCloth;
-  imText += '\n💎 ' + luckyPeishi + ' | 💍 ' + luckyJewelry;
+  imText += '\n💎 ' + luckyPeishi + ' | 💍 ' + luckyJewelry + '\n📿 ' + luckyWearSide + ' | 本命佛戴脖子';
 
   return {
     full: text,

@@ -6106,7 +6106,7 @@ function showZodiacDetail(zodiac) {
   } else {
     html += '<div style="background:rgba(201,168,76,0.08);padding:16px;border-radius:12px;margin-bottom:16px">';
     html += '<h4 style="color:var(--gold);margin:0 0 10px 0">📿 本命佛守护</h4>';
-    html += '<p style="margin:0;color:var(--paper2);line-height:1.8">佩戴专属本命佛吊坠，诚心供奉，可消灾解难、增福延寿。</p>';
+    html += '<p style="margin:0;color:var(--paper2);line-height:1.8">佩戴专属本命佛吊坠（戴脖子，近心护身），诚心供奉，可消灾解难、增福延寿。</p>';
     html += '</div>';
   }
   

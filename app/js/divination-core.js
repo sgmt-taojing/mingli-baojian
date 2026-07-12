@@ -4241,10 +4241,10 @@ function generateInterpretation(data) {
 
   // ═══════ 捌·五行化解 ═══════
   var huajieMap = {
-    '木':{action:'①办公桌/家中东侧放绿植（文竹/发财树） ②每周户外运动1-2次 ③佩戴木质手串 ④用青绿色系的手机壳/钱包/笔 ⑤社交账号名加木偏旁字', color:'青绿色、翠绿色', num:'3、8', dir:'东方、东南方', season:'春季（农历1-3月）'},
+    '木':{action:'①办公桌/家中东侧放绿植（文竹/发财树） ②每周户外运动1-2次 ③佩戴木质手串（左手纳气） ④用青绿色系的手机壳/钱包/笔 ⑤社交账号名加木偏旁字', color:'青绿色、翠绿色', num:'3、8', dir:'东方、东南方', season:'春季（农历1-3月）'},
     '火':{action:'①每天晒朝阳10-15分钟 ②家中南侧保持明亮 ③用红色/紫色系物品 ④多参加聚会社交活动 ⑤练书法/绘画培养静气', color:'红色、紫色、橙色', num:'2、7', dir:'南方', season:'夏季（农历4-6月）'},
     '土':{action:'①多走土路赤脚接地气 ②家中摆放陶瓷器 ③穿黄/棕色系衣物 ④种花种草接触土 ⑤每天练习站桩15分钟', color:'黄色、棕色、咖啡色', num:'5、10', dir:'中央、西南方', season:'长夏（农历6月末）'},
-    '金':{action:'①佩戴金银饰品 ②桌面保持整洁有序 ③听钢琴/编钟等金属乐器 ④挂圆形金属装饰物 ⑤每天练习深呼吸30次', color:'白色、金色、银色', num:'4、9', dir:'西方、西北方', season:'秋季（农历7-9月）'},
+    '金':{action:'①佩戴金银饰品（左手纳福） ②桌面保持整洁有序 ③听钢琴/编钟等金属乐器 ④挂圆形金属装饰物 ⑤每天练习深呼吸30次', color:'白色、金色、银色', num:'4、9', dir:'西方、西北方', season:'秋季（农历7-9月）'},
     '水':{action:'①家里设小鱼缸/加湿器 ②多去水边散步 ③穿黑/蓝/深色衣服 ④每天喝8杯水 ⑤睡前泡脚15分钟', color:'黑色、蓝色、深灰色', num:'1、6', dir:'北方', season:'冬季（农历10-12月）'}
   };
 
@@ -20752,7 +20752,7 @@ function getAgeBasedHuajie(hj) {
     items: [
       '日主' + hj.dayStem + '(' + dayEle + ')，需注意' + (dayEle === '木' ? '肝胆系统，忌熬夜动怒' : dayEle === '火' ? '心血管眼睛，忌过劳激动' : dayEle === '土' ? '脾胃消化，忌暴饮饮食' : dayEle === '金' ? '呼吸系统，忌抽烟雾霾' : '肾膀胱，忌久坐憋尿'),
       '居家风水：卧室选在' + (xiEle === '木' ? '东' : xiEle === '火' ? '南' : xiEle === '土' ? '西南' : xiEle === '金' ? '西' : '北') + '方位房间，床头朝吉方',
-      '佩戴' + (dayEle === '木' ? '翡翠、绿幽灵养肝' : dayEle === '火' ? '红玛瑙、石榴石养心' : dayEle === '土' ? '黄水晶、和田玉养胃' : dayEle === '金' ? '白水晶、银饰养肺' : '海蓝宝、黑曜石养肾'),
+      '佩戴' + (dayEle === '木' ? '翡翠、绿幽灵养肝（左手纳福）' : dayEle === '火' ? '红玛瑙、石榴石养心（左手催旺）' : dayEle === '土' ? '黄水晶、和田玉养胃（左手招财纳福）' : dayEle === '金' ? '白水晶、银饰养肺（白水晶右手辟煞/银饰左手纳福）' : '海蓝宝、黑曜石养肾（海蓝宝左手纳气/黑曜石右手辟煞）'),
       '每年立春后去寺庙祈福消灾，化解流年不利',
       '适度运动：' + (dayEle === '木' ? '散步、太极' : dayEle === '火' ? '游泳、瑜伽' : dayEle === '土' ? ' gardening、慢走' : dayEle === '金' ? '登山、快走' : '游泳、内家拳')
     ],
@@ -20793,7 +20793,7 @@ function getTenGodMissingHuajie(hj) {
     '正财': {
       icon: '💰', desc: '正财代表正当收入、工薪财运，男命也代表妻子',
       missing: '缺正财者工薪收入型财运弱，男命姻缘较迟或妻子缘分薄',
-      remedy: '在居家东南方财位放黄水晶聚宝盆；选择稳定职业+技能副业双线发展；每月初九焚香向东南方祈福；佩戴黄虎眼石手链',
+      remedy: '在居家东南方财位放黄水晶聚宝盆；选择稳定职业+技能副业双线发展；每月初九焚香向东南方祈福；佩戴黄虎眼石手链（右手辟煞锁财）',
       food: '黄色食物（玉米、南瓜、小米）',
       direction: '东南方',
       color: '黄色、金色'
@@ -20801,7 +20801,7 @@ function getTenGodMissingHuajie(hj) {
     '偏财': {
       icon: '🎰', desc: '偏财代表意外之财、投资收益、横财，也代表父亲',
       missing: '缺偏财者横财运弱，不宜投机赌博，投资宜稳健型',
-      remedy: '在正南方放三足金蟾（头朝内）；多做善事积偏财福报；佩戴黄水晶或金发晶；逢偏财月（农历五、十一月）可小额尝试投资',
+      remedy: '在正南方放三足金蟾（头朝内）；多做善事积偏财福报；佩戴黄水晶或金发晶（左手招财）；逢偏财月（农历五、十一月）可小额尝试投资',
       food: '红色食物（红枣、枸杞、红豆）',
       direction: '正南方',
       color: '红色、紫色'
@@ -20809,7 +20809,7 @@ function getTenGodMissingHuajie(hj) {
     '正官': {
       icon: '⚖️', desc: '正官代表事业职位、权力地位，女命代表丈夫',
       missing: '缺正官者事业升迁动力不足，女命姻缘较迟或夫缘薄',
-      remedy: '在办公室正北方放黑色水晶柱增强事业星；穿深色正装增加威信气场；多参加体制内考试或资质认证；佩戴黑曜石吊坠',
+      remedy: '在办公室正北方放黑色水晶柱增强事业星；穿深色正装增加威信气场；多参加体制内考试或资质认证；佩戴黑曜石吊坠（脖子护身）',
       food: '黑色食物（黑豆、黑芝麻、海带）',
       direction: '正北方',
       color: '黑色、深蓝'
@@ -20817,7 +20817,7 @@ function getTenGodMissingHuajie(hj) {
     '七杀': {
       icon: '⚔️', desc: '七杀代表魄力、竞争、权威，也代表压力和挑战',
       missing: '缺七杀者性格温和少竞争意识，做事容易安于现状',
-      remedy: '在办公桌西方放铜制宝剑（装饰用）增强决断力；多参与竞争性活动锻炼魄力；佩戴白水晶柱；选择有挑战性的工作',
+      remedy: '在办公桌西方放铜制宝剑（装饰用）增强决断力；多参与竞争性活动锻炼魄力；佩戴白水晶柱（右手辟煞）；选择有挑战性的工作',
       food: '白色食物（银耳、百合、白萝卜）',
       direction: '西方',
       color: '白色、银色'
@@ -20825,7 +20825,7 @@ function getTenGodMissingHuajie(hj) {
     '正印': {
       icon: '📖', desc: '正印代表学历、记忆、保护、母亲缘分',
       missing: '缺正印者记忆力偏弱，学历助力少，与母亲缘分薄',
-      remedy: '在书桌东南方放文昌塔或四支毛笔；多读书学习补印星；佩戴白水晶柱增强专注力；床头朝喜用神方位',
+      remedy: '在书桌东南方放文昌塔或四支毛笔；多读书学习补印星；佩戴白水晶柱增强专注力（右手辟煞净念）；床头朝喜用神方位',
       food: '绿色食物（绿叶蔬菜、绿茶）',
       direction: '东南方',
       color: '绿色、青色'
@@ -20833,7 +20833,7 @@ function getTenGodMissingHuajie(hj) {
     '偏印': {
       icon: '🔮', desc: '偏印代表直觉、技艺、副业才能、玄学缘分',
       missing: '缺偏印者直觉力弱，对玄学技艺类兴趣少，副业发展难',
-      remedy: '在卧室西北方放紫水晶簇开发直觉；多接触易学、玄学、艺术；佩戴紫水晶手链；学习一门手艺或技能',
+      remedy: '在卧室西北方放紫水晶簇开发直觉；多接触易学、玄学、艺术；佩戴紫水晶手链（左手催旺）；学习一门手艺或技能',
       food: '紫色食物（紫薯、葡萄、紫甘蓝）',
       direction: '西北方',
       color: '紫色'
@@ -20841,7 +20841,7 @@ function getTenGodMissingHuajie(hj) {
     '食神': {
       icon: '🍚', desc: '食神代表才华、口福、子息、财源（食神生财）',
       missing: '缺食神者财源少不善表达，口福薄，子女缘弱',
-      remedy: '在办公室东面放绿色植物助生财；多学习沟通表达技巧；佩戴绿幽灵水晶开发食伤；多做美食享口福',
+      remedy: '在办公室东面放绿色植物助生财；多学习沟通表达技巧；佩戴绿幽灵水晶开发食伤（左手招财）；多做美食享口福',
       food: '绿色蔬菜、酸味水果',
       direction: '正东方',
       color: '绿色'
@@ -20849,7 +20849,7 @@ function getTenGodMissingHuajie(hj) {
     '伤官': {
       icon: '🎤', desc: '伤官代表才华横溢、口才、艺术、创新',
       missing: '缺伤官者表达能力一般，创新力弱，不善推销自己',
-      remedy: '在卧室东南方放紫水晶洞开发才华；多参加演讲培训；佩戴紫水晶或蓝纹玛瑙；学习一门艺术',
+      remedy: '在卧室东南方放紫水晶洞开发才华；多参加演讲培训；佩戴紫水晶或蓝纹玛瑙（左手催旺）；学习一门艺术',
       food: '紫色食物、酸味食物',
       direction: '东南方',
       color: '紫色、蓝色'
@@ -20857,7 +20857,7 @@ function getTenGodMissingHuajie(hj) {
     '比肩': {
       icon: '🤝', desc: '比肩代表兄弟姐妹、朋友同事、竞争伙伴',
       missing: '缺比肩者独立性强但缺少助力，兄弟姐妹缘分薄',
-      remedy: '在客厅东方放绿植增强人际运；多参加社交活动拓展人脉；佩戴绿幽灵或翡翠手链；主动结交志同道合的朋友',
+      remedy: '在客厅东方放绿植增强人际运；多参加社交活动拓展人脉；佩戴绿幽灵或翡翠手链（左手纳福）；主动结交志同道合的朋友',
       food: '绿色食物、酸味食物',
       direction: '东方',
       color: '绿色'
@@ -20865,7 +20865,7 @@ function getTenGodMissingHuajie(hj) {
     '劫财': {
       icon: '🤜', desc: '劫财代表竞争、争财、合作伙伴、冲动消费',
       missing: '缺劫财者花钱理性但缺少竞争搭档，合伙运弱',
-      remedy: '在办公桌南方放红玛瑙增强行动力；适当参与竞争性活动；佩戴红玛瑙手链；选择互补型合作伙伴而非竞争型',
+      remedy: '在办公桌南方放红玛瑙增强行动力；适当参与竞争性活动；佩戴红玛瑙手链（左手催旺）；选择互补型合作伙伴而非竞争型',
       food: '红色食物、苦味食物',
       direction: '南方',
       color: '红色'
@@ -20961,7 +20961,7 @@ function getLoucaiHuajie(hj) {
       severity: biCount >= 3 ? '严重' : '中度',
       desc: '命中比肩劫财多（' + biCount + '个），正偏财少（' + caiCount + '个），钱财易被他人分夺，借钱给朋友难收回，合伙生意易亏损',
       signs: ['朋友亲戚常来借钱且不还', '合伙生意总被占便宜', '冲动消费多，左手进右手出', '钱财易因面子/义气流失'],
-      remedy: '佩戴黄虎眼石手链锁财；居家大门对角线财位放聚宝盆+五帝钱；借钱给他人前在手上画"锁"字；钱包选棕色/黄色系；忌与兄弟姐妹合伙生意；每月固定存一笔定期不可动',
+      remedy: '佩戴黄虎眼石手链锁财（右手辟煞锁财）；居家大门对角线财位放聚宝盆+五帝钱；借钱给他人前在手上画"锁"字；钱包选棕色/黄色系；忌与兄弟姐妹合伙生意；每月固定存一笔定期不可动',
       direction: '财位放大门对角线位置，保持整洁明亮'
     });
   }
@@ -21003,7 +21003,7 @@ function getLoucaiHuajie(hj) {
       severity: shaCount >= 2 ? '严重' : '中度',
       desc: '命中七杀克身又无印星化解，因压力/疾病/官非破财，钱财易因突发事件流失',
       signs: ['赚钱后突发意外花钱（生病、事故、纠纷）', '工作中压力大易因失误扣钱', '容易被罚款、赔偿、诉讼耗财', '钱财来得紧张去得突然'],
-      remedy: '佩戴本命佛+黑曜石挡灾；在卧室北方放黑色水晶柱化杀；多做善事积德化灾；家中供奉观音或关帝；逢七杀年（流年七杀）提前买保险化解',
+      remedy: '佩戴本命佛+黑曜石挡灾（本命佛戴脖子护身/黑曜石戴右手辟煞）；在卧室北方放黑色水晶柱化杀；多做善事积德化灾；家中供奉观音或关帝；逢七杀年（流年七杀）提前买保险化解',
       direction: '卧室北方放黑色水晶柱化杀'
     });
   }
@@ -21029,7 +21029,7 @@ function getLoucaiHuajie(hj) {
       severity: '中度',
       desc: '命中劫财有但无正财，花钱冲动，容易被忽悠消费，收入不稳',
       signs: ['网购冲动消费多', '容易被推销洗脑', '钱在手里留不住，总想花', '经常买回不实用的东西'],
-      remedy: '钱包内放五帝钱锁财；设置自动转存每月强制储蓄；购物前冷静3天原则；佩戴黄虎眼石手链增强理性；忌带多张信用卡',
+      remedy: '钱包内放五帝钱锁财；设置自动转存每月强制储蓄；购物前冷静3天原则；佩戴黄虎眼石手链增强理性（右手辟煞）；忌带多张信用卡',
       direction: '钱包内放五帝钱；居家财位放聚宝盆'
     });
   }
@@ -21074,7 +21074,7 @@ function getLoucaiHuajie(hj) {
   html += '<li>大门对阳台为穿堂煞，宜设玄关或屏风挡气不漏财</li>';
   html += '<li>钱包选棕色/黄色系，忌黑色（水冲财）或破旧钱包</li>';
   html += '<li>每月固定日期存一笔定期，强制储蓄堵漏</li>';
-  html += '<li>佩戴貔貅手链（头朝外）或五帝钱锁财</li>';
+  html += '<li>佩戴貔貅手链（头朝外，左手招财）或五帝钱锁财（右手辟煞）</li>';
   html += '<li>厨房灶台保持干净（灶为财库，脏则漏财）</li>';
   html += '</ul></div>';
 
@@ -37535,13 +37535,38 @@ function computeHealthForecast(baziData, pillars) {
     prevention.lifestyle.push({target: '年龄提醒', advice: '已过50岁，进入' + (csHealth.currentStage ? csHealth.currentStage.stage : '衰退') + '阶段，每年至少一次全面体检，重点关注' + organMap[dayEle].system});
   }
 
-  // 佩戴: 对应五行饰品
+  // 佩戴: 左为阳主纳进，右为阴主泄出，颈近心主护身
+  // 按饰品用途分位置：招财/催旺/纳福→左手，挡灾/辟煞→右手，本命佛/平安扣→脖子
+  var _crystalPurposeDC = {
+    '翡翠':'纳福','绿幽灵':'招财','檀木':'纳气','红玛瑙':'催旺','紫水晶':'催旺','石榴石':'催旺',
+    '黄水晶':'招财','和田玉':'纳福','虎眼石':'辟煞','黄金':'纳福','白金':'纳福','银饰':'辟煞','钻石':'纳福',
+    '黑曜石':'辟煞','海蓝宝':'纳气','蓝水晶':'纳气','粉水晶':'招桃花','琥珀':'纳福','蜜蜡':'纳福',
+    '白水晶':'辟煞','金发晶':'招财','貔貅':'招财','五帝钱':'辟煞','本命佛':'护身','平安扣':'护身','太岁符':'护身'
+  };
+  function _getWearSide(itemName) {
+    if (!itemName) return '左手';
+    for (var k in _crystalPurposeDC) {
+      if (itemName.indexOf(k) >= 0) {
+        var p = _crystalPurposeDC[k];
+        if (p === '辟煞') return '右手';
+        if (p === '护身') return '脖子';
+        return '左手';
+      }
+    }
+    return '左手';
+  }
+  function _getWearSideText(itemName) {
+    var side = _getWearSide(itemName);
+    if (side === '左手') return '左手（纳福聚气）';
+    if (side === '右手') return '右手（辟邪泄煞）';
+    return '脖子（近心护身）';
+  }
   if (wxInfo[xiEle]) {
     prevention.accessories.push({
       wuxing: xiEle,
       items: wxInfo[xiEle].晶石,
       color: wxInfo[xiEle].颜色,
-      reason: '佩戴' + xiEle + '(喜用神)饰品补益命局'
+      reason: '佩戴' + xiEle + '(喜用神)饰品补益命局，' + _getWearSideText(wxInfo[xiEle].晶石)
     });
   }
   if (missingEles.length > 0 && wxInfo[missingEles[0]]) {
@@ -37551,7 +37576,7 @@ function computeHealthForecast(baziData, pillars) {
         wuxing: me4,
         items: wxInfo[me4].晶石,
         color: wxInfo[me4].颜色,
-        reason: '佩戴' + me4 + '饰品弥补五行缺失'
+        reason: '佩戴' + me4 + '饰品弥补五行缺失，' + _getWearSideText(wxInfo[me4] ? wxInfo[me4].晶石 : me4)
       });
     }
   }
@@ -37862,7 +37887,7 @@ function renderHealthForecast(result, containerId) {
   html += '</div>';
 
   // 佩戴
-  html += '<div style="margin-bottom:12px"><b style="color:#f1c40f;font-size:13px">💎 佩戴建议</b>';
+  html += '<div style="margin-bottom:12px"><b style="color:#f1c40f;font-size:13px">💎 佩戴建议</b><div style="font-size:11px;opacity:.5;margin-top:2px">左为阳主纳进（纳福聚气） · 右为阴主泄出（辟邪泄煞） · 颈近心主护身（本命佛/平安扣/吊坠）</div>';
   for (var ac2 = 0; ac2 < pv.accessories.length; ac2++) {
     html += '<div style="padding:6px 8px;background:rgba(241,196,15,.04);border-radius:4px;margin-top:4px;font-size:12px;line-height:1.6">';
     html += '<b>' + pv.accessories[ac2].wuxing + '：</b>' + pv.accessories[ac2].items + ' (颜色：' + pv.accessories[ac2].color + ') - ' + pv.accessories[ac2].reason;
