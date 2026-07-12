@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const { DatabaseSync } = require('node:sqlite');
 const sec = require('./security.js');
+const syncRoutes = require('./sync-api');
 
 const app = express();
 const PORT = 8920;
@@ -343,6 +344,9 @@ app.get('/api/admin/stats', adminAuth, (req, res) => {
     pushes: pushCount
   });
 });
+
+// === 数据同步路由 ===
+app.use('/api/sync', syncRoutes);
 
 // === 启动服务 ===
 app.listen(PORT, () => {

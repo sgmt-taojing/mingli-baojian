@@ -74,6 +74,13 @@ Page({
         if (res.statusCode === 200 && res.data.token) {
           wx.setStorageSync('token', res.data.token)
           wx.setStorageSync('userInfo', res.data.user || {})
+          // 设置同步客户端token，触发自动同步
+          const app = getApp()
+          if (app.globalData.syncClient) {
+            app.globalData.syncClient.setToken(res.data.token)
+            app.globalData.syncClient.autoSync().catch(() => {})
+            app.globalData.syncClient.startAutoSync()
+          }
           this.setData({
             isLoggedIn: true,
             showLogin: false,

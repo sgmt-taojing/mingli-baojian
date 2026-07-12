@@ -1,10 +1,13 @@
 // app.js — 命理宝鉴小程序
+const SyncClient = require('./utils/sync-client');
+
 App({
   globalData: {
     apiBase: 'http://127.0.0.1:8920',
     userInfo: null,
     token: null,
-    isLogin: false
+    isLogin: false,
+    syncClient: null
   },
 
   onLaunch() {
@@ -13,6 +16,16 @@ App({
     if (token) {
       this.globalData.token = token;
       this.globalData.isLogin = true;
+    }
+
+    // 初始化同步客户端
+    this.globalData.syncClient = SyncClient;
+    SyncClient.init({ apiBase: this.globalData.apiBase });
+    if (token) {
+      SyncClient.setToken(token);
+      // 登录用户自动同步
+      SyncClient.autoSync().catch(() => {});
+      SyncClient.startAutoSync();
     }
 
     // 检查更新
