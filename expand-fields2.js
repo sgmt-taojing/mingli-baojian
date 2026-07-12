@@ -1,0 +1,133 @@
+// Direct field expansion script
+const fs = require('fs');
+const path = 'knowledge/authoritative-knowledge-base.js';
+let s = fs.readFileSync(path, 'utf8');
+
+// Helper: find and replace a field value by searching for the old value
+function replaceField(searchStr, replaceStr) {
+  if (s.includes(searchStr)) {
+    s = s.replace(searchStr, replaceStr);
+    return true;
+  }
+  console.log('NOT FOUND: ' + searchStr.slice(0, 80));
+  return false;
+}
+
+// Read current values to use as search targets
+const m = require('./knowledge/authoritative-knowledge-base.js');
+const k = m.AUTHORITATIVE_KNOWLEDGE || m.default || m;
+
+// === YONGSHEN.OVERVIEW (830 chars → 1000+) ===
+{
+  const old = k.liuyao.yongshen.overview;
+  const addition = '\n\n用神选取还需注意几个特殊情形：其一，卦中用神不现时，需寻伏神代替，伏神旺相则暗中有力；其二，用神两现（卦中出现两个用神）时，取旺相者为用，或取动爻者为用，若两用神一旺一衰则取旺者；其三，用神逢空亡则暂时不发挥作用，需待出空方能应事，真空假空需仔细辨别；其四，用神逢月破日破则大凶，虽旺相亦减力甚多。此外，用神还须结合所测之事的具体情境灵活取用——如占考试以父母爻为用，但若占的是面试则以官鬼爻为用（官鬼代表面试官）；占疾病以官鬼爻为用（官鬼代表疾病），但占医药则以子孙爻为用（子孙代表医药）。用神选取的灵活性体现了六爻预测『法无定法，贵在变通』的精神，但万变不离其宗——找准与所测之事最直接对应的那个爻，便是用神。';
+  replaceField(old, old + addition);
+}
+
+// === LIUYAO.OVERVIEW.INTRO (896 chars → 1000+) ===
+{
+  const old = k.liuyao.overview.intro;
+  const addition = '\n\n六爻预测的理论基础是『天人感应』——认为人的意念可以与卦象产生共鸣，起卦时的意念集中使铜钱的正反面呈现出与所测之事相关的信息。六爻断卦讲究『卦象优先、用神为王、动变为准』三原则：卦象看整体格局，用神定核心方向，动爻决变化趋势，三者缺一不可。六爻预测的适用范围极广，从婚姻感情、事业财运，到出行平安、失物寻人、疾病健康、官司诉讼，几乎无所不包，是民间应用最广的占卜方法，被誉为中华占卜文化的百科全书。';
+  replaceField(old, old + addition);
+}
+
+// === MEIHUA.OVERVIEW.INTRO (604 chars → 1000+) ===
+{
+  const old = k.meihua.overview.intro;
+  const addition = '\n\n梅花易数的核心理论是体用关系：体卦代表自己或所问的核心，用卦代表对方或外部环境，通过体用之间的五行生克关系判断吉凶成败。五种基本体用关系为：用生体大吉、体克用中吉、体用比和最吉、体生用小凶、用克体大凶。此外还需结合互卦看过程、变卦看结果，三卦综合方能全面断事。邵雍创立梅花易数的传说颇具传奇色彩——相传他观梅时见二雀争枝坠地而悟道，以年月日时起卦准确预测此事，故称梅花易数。其学以先天易学为根，融象数理占为一体，著有《皇极经世书》《伊川击壤集》等。梅花易数经后世学者不断完善，形成了包含七大起卦法和完整断卦理论的体系，是学习易经应用的最佳入门途径。';
+  replaceField(old, old + addition);
+}
+
+// === MEIHUA.TIYONG.INTRO (627 chars → 1000+) ===
+{
+  const old = k.meihua.tiyong.intro;
+  const addition = '\n\n除了本卦的体用关系，还需要结合互卦和变卦综合判断。互卦由本卦的二、三、四爻组成下互卦，三、四、五爻组成上互卦，揭示事情发展的中间过程。变卦是动爻变化后得到的新卦，揭示事情的最终结果。完整的判断流程是：本卦看起因（体用关系定基本吉凶）、互卦看过程（中间是否顺利）、变卦看结果（最终走向如何），三卦综合才能全面把握事情的全貌。此外，体用关系还需结合卦气旺衰调候——体卦当令旺相则吉力倍增，休囚死则吉力大减；旺卦克衰卦力大势猛，衰卦克旺卦力微难成。体用理论看似简单，实际应用中变化万千，是梅花易数入门容易、精通不易的关键所在。';
+  replaceField(old, old + addition);
+}
+
+// === MEIHUA.YINGQI.INTRO (553 chars → 1000+) ===
+{
+  const old = k.meihua.yingqi.intro;
+  const addition = '\n\n第一种方法是卦数应期法，以八卦先天数（乾一兑二离三震四巽五坎六艮七坤八）配合时间单位推算。具体用法是取体卦或用卦之数，再根据所测之事的轻重缓急选择时间单位——急事以天计，中事以月计，缓事以年计。也可以体用两卦之数相加或相减来推算。第二种方法是动爻应期法，以动爻所在爻位定应期。初爻主一日或一月，依次类推至六爻，阳爻主快、阴爻主慢。第三种方法是卦气旺衰应期法——体卦当令旺相则应期快，休囚死则应期推迟。第四种是外应应期法——以起卦瞬间的征兆辅助判断。第五种是卦名应期法——从卦名提取时间信息。实际应用中通常需要至少两到三种方法交叉验证，取其交集以提高准确率。';
+  replaceField(old, old + addition);
+}
+
+// === MEIHUA.QIGUA.INTRO (592 chars → 1000+) ===
+{
+  const old = k.meihua.qigua.intro;
+  const addition = '\n\n起卦的核心原理是『卦以八除，爻以六除』。任何数量除以八取余数，对应先天八卦数（乾一兑二离三震四巽五坎六艮七坤八，余数为零则对应坤八），便可确定上下卦。任何数量除以六取余数，余数为零则取六爻，即可确定动爻。动爻是卦象变化的枢纽，动爻所在的卦为用卦（代表对方或外部），不动的卦为体卦（代表自己或核心），变卦揭示事物的发展趋势和最终走向。常见的起卦方法有七大类：年月日时起卦法、数字起卦法、物象起卦法、声音起卦法、颜色起卦法、文字起卦法、方位起卦法。此外还有外应起卦法——起卦的瞬间，周围发生的任何偶然现象都可以作为辅助判断的依据。初学者建议从年月日时起卦法和数字起卦法入手，熟练后再逐步掌握其他方法。';
+  replaceField(old, old + addition);
+}
+
+// === MEIHUA.BAGUAWANWULEIXIANG.INTRO (697 chars → 1000+) ===
+{
+  const old = k.meihua.baguaWanwuLeixiang.intro;
+  const addition = '\n\n掌握万物类象的关键在于理解每一卦的核心属性，然后举一反三。如乾卦核心属性为刚健圆满尊贵，所以圆形的东西、昂贵的东西、领导人物、大城市等都可以取乾象。实际断卦时，往往需要根据所测之事灵活取象——测疾病则取身体部位之象，测事业则取人物地位之象，测出行则取方位地理之象。万物类象如同梅花易数的词汇库，词汇越丰富，断卦越精准。';
+  replaceField(old, old + addition);
+}
+
+// === MEIHUA.GUAXIANGYIXIANG.INTRO (736 chars → 1000+) ===
+{
+  const old = k.meihua.guaxiangYixiang.intro;
+  const addition = '\n\n在梅花易数断卦中，掌握常用卦的核心意象至关重要。如乾卦主刚健进取、领导开创；坤卦主柔顺承载、包容厚德；泰卦主天地交泰、万事亨通；否卦主天地不交、闭塞不通；既济卦主功业已成、万事圆满；未济卦主事未完成、仍在进行。每个卦象的意象需要在实践中反复体悟，才能在断卦时迅速定位、精准判断。建议初学者先熟记最常用的二十余卦，再逐步扩展到全部六十四卦。';
+  replaceField(old, old + addition);
+}
+
+// === MEIHUA GUAQI_WANGSHUAI.OVERVIEW (516 chars → 1000+) ===
+{
+  const old = k.meihua.guaqi_wangshuai.overview;
+  const addition = '\n\n卦气旺衰的实际意义在于：体卦旺相则自身力量强大，即使遇到用克体也能勉强承受；体卦休囚死则自身力量微弱，即使遇到用生体也难以充分受益。旺卦克衰卦则力大势猛，衰卦克旺卦则力微难成。邵雍在《梅花易数》中强调，断卦时必须先看卦气旺衰，再论体用生克，旺衰之别可使生克关系的实际效果发生逆转，是梅花易数断卦不可或缺的核心环节。';
+  replaceField(old, old + addition);
+}
+
+// === MEIHUA YINGQI_DETAIL.OVERVIEW (411 chars → 1000+) ===
+{
+  const old = k.meihua.yingqi_detail.overview;
+  const addition = '\n\n具体方法有五：其一，卦数应期法——以八卦先天数配合时间单位推算，取体卦或用卦之数定应期，急事以天计，中事以月计，缓事以年计。其二，动爻应期法——以动爻所在爻位定应期，初爻主一日或一月，依次类推至六爻，阳爻主快、阴爻主慢。其三，卦气旺衰应期法——体卦当令旺相则应期快，休囚死则应期推迟。其四，外应应期法——以起卦瞬间周围征兆辅助判断。其五，卦名应期法——从卦名提取时间信息，如震卦主春季或卯日，离卦主夏季或午日。通常需要两到三种方法交叉验证，取其交集以提高准确率。';
+  replaceField(old, old + addition);
+}
+
+// === MEIHUA TIYONG_DETAIL.OVERVIEW (466 chars → 1000+) ===
+{
+  const old = k.meihua.tiyong_detail.overview;
+  const addition = '\n\n体用关系的判断还须结合卦气旺衰、互卦过程、变卦结果三个维度综合考量。卦气旺衰决定体用实际力量——体卦旺相则即使遇到用克体也能勉强承受，休囚死则即使遇到用生体也难以充分受益。互卦揭示事情发展的中间过程，互卦体用关系定中间阶段吉凶。变卦揭示最终结果，变卦体用关系定结局走向。本卦看起因、互卦看过程、变卦看结果，三卦体用关系综合分析，方能全面把握事情的全貌。邵雍强调，体用理论看似简单，实际应用中变化万千，旺衰调候可使生克效果逆转，这是梅花易数入门容易精通不易的关键所在。';
+  replaceField(old, old + addition);
+}
+
+// === MEIHUA WAIYING_DETAIL.OVERVIEW (576 chars → 1000+) ===
+{
+  const old = k.meihua.waiying_detail.overview;
+  const addition = '\n\n外应的分类十分丰富：天时外应看天气状况，晴天主吉、雨天主阻、打雷主惊；人物外应看周围出现的人，老人为乾、少女为兑，面带喜色主吉、面带怒色主凶；动物外应看出现的动物，鸟雀主口舌、犬吠主警戒，邵雍观梅占中见雀争枝即为经典动物外应；器物外应看器物状态，杯落主破财、灯灭主不吉、镜碎主分离；声音外应听声音类型，笑声主吉、哭声主凶、钟声主终止、鼓声主开始。外应应用有五大原则：第一，外应必须与起卦同时发生。第二，外应是辅助判断，不能取代体用生克的核心地位。第三，吉外应增吉，凶外应增凶。第四，外应的五行属性可以影响卦气旺衰。第五，多个外应同时出现时，取最显著的一个为主。';
+  replaceField(old, old + addition);
+}
+
+// === NAYIN_QUMING.OVERVIEW (473 chars → 1000+) ===
+{
+  const old = k.nayin.nayin_quming.overview;
+  const addition = '\n\n纳音取名与正五行取名既有联系又有区别。正五行取名以天干地支本身的五行为依据，纳音取名以六十甲子组合后的纳音五行为依据，两者可以互补使用。例如某人日柱为甲子，正五行天干甲属木、地支子属水，纳音为海中金。若正五行分析需补火，而纳音分析也需补火（因纳音海中金需火炼方能成器），则取名用火属性的字可同时满足正五行和纳音的需求，可谓一举两得。纳音取名具体方法有四：补缺法——命局缺某种纳音五行则在名字中补该五行；调候法——纳音偏寒则补火暖局，偏燥则补水润局；通关法——纳音五行相克则用通关五行化解；扶抑法——纳音弱则扶助，太旺则抑制。需要注意的是，纳音取名只是取名的一个参考维度，还需结合正五行、生肖、音韵、寓意等多方面综合考虑，不可偏废。';
+  replaceField(old, old + addition);
+}
+
+// === NAYIN_HEHUN.OVERVIEW (492 chars → 1000+) ===
+{
+  const old = k.nayin.nayin_hehun.overview;
+  const addition = '\n\n纳音合婚的基本原则有三：其一，纳音相生为吉——男女双方日柱纳音五行相生主婚姻和谐。如男方纳音为水、女方纳音为木，水生木，主男方呵护女方，婚姻美满。其二，纳音相同为平——双方纳音五行相同主势均力敌，性格相似有共同语言但容易互不相让。其三，纳音相克为凶——双方纳音五行相克主婚姻不顺，克的一方压制被克的一方。若双方纳音相克，可以看是否有通关五行化解。如火克金，若有土纳音的人或物作为通关（火生土，土生金），则可以化解。也可以通过选择有通关五行的日子结婚来化解。需要注意的是，纳音合婚只是合婚的一个方面，还需结合双方八字整体格局、用神喜忌、日主强弱等多方面综合判断，不可仅凭纳音一项定吉凶。';
+  replaceField(old, old + addition);
+}
+
+// === NAYIN_MINGYUN.OVERVIEW (473 chars → 1000+) ===
+{
+  const old = k.nayin.nayin_mingyun.overview;
+  const addition = '\n\n纳音论命的核心方法是以日柱纳音定基本性格特征。如日柱纳音为海中金者深藏不露、内涵丰富；为炉中火者热情有度、内心炽热；为大林木者格局宏大、根基深厚；为剑锋金者果断刚毅、执行力强；为天河水者格局高远、有济世之心；为大海水者心胸宽广、包容万物。四柱纳音的生克关系可以推断六亲关系：年柱纳音看祖业，旺相不被克破主祖业丰隆；月柱纳音看父母，生年柱纳音主得父母之力；日柱纳音看自身性格命运基调；时柱纳音看子女，生日柱纳音主子女孝顺。纳音五行论命法是正五行论命的辅助手段，不能取代正五行的核心地位，两者相辅相成方能全面论命。';
+  replaceField(old, old + addition);
+}
+
+// === NAYIN_SONGJUE.CONTENT (713 chars → 1000+) ===
+{
+  const old = k.nayin.nayin_songjue.content;
+  const addition = '\n\n【纳音应用歌诀】\n年柱纳音看祖业，月柱纳音看父母。\n日柱纳音定性格，时柱纳音看子女。\n纳音相生六亲顺，纳音相克六亲逆。\n纳音辅助正五行，不可偏废须并参。\n\n【纳音取用法】\n海中金型深不露，炉中火型热情稳。\n大林路旁剑锋利，山头涧下城墙固。\n白蜡杨柳泉水清，屋上霹雳松柏青。\n长流沙中山下平，壁上金箔覆灯明。\n天河大驿钗钏美，桑柘大溪沙中混。\n天上石榴大海阔，三十纳音各有情。\n\n【纳音合婚诀】\n男女纳音论生克，相生为吉克为凶。\n相同为平势均敌，通关化解可调和。\n纳音合婚辅助法，正五行合不可少。\n八字格局参详看，不可偏凭一纳音。';
+  replaceField(old, old + addition);
+}
+
+fs.writeFileSync(path, s, 'utf8');
+console.log('Done! Verifying...');

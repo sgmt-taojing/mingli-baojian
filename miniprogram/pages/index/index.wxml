@@ -1,0 +1,38 @@
+<!-- pages/index/index.wxml — 命理宝鉴首页 -->
+<view class="page-index">
+  <!-- 顶部横幅 -->
+  <view class="hero">
+    <view class="hero-title">命理宝鉴</view>
+    <view class="hero-subtitle">知命改运 · 趋吉避凶 · 服务生活</view>
+    <view class="hero-date">{{today}}</view>
+  </view>
+
+  <!-- 每日智慧 -->
+  <view class="card wisdom-card">
+    <view class="wisdom-label">每日箴言</view>
+    <view class="wisdom-text">{{dailyWisdom}}</view>
+  </view>
+
+  <!-- 用户状态 -->
+  <view class="user-bar" wx:if="{{!isLogin}}" bindtap="onLoginTap">
+    <view class="user-bar-text">点击登录，获取专属命理服务</view>
+    <view class="user-bar-arrow">›</view>
+  </view>
+
+  <!-- 功能菜单网格 -->
+  <view class="menu-grid">
+    <view class="menu-item" wx:for="{{menuItems}}" wx:key="id" data-path="{{item.path}}" bindtap="onMenuTap">
+      <view class="menu-icon">{{item.icon}}</view>
+      <view class="menu-info">
+        <view class="menu-title">{{item.title}}</view>
+        <view class="menu-desc">{{item.desc}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部声明 -->
+  <view class="footer">
+    <view class="footer-text">命理宝鉴 · 传统文化智慧传承</view>
+    <view class="footer-disclaimer">本平台内容仅供参考，不构成任何决策建议</view>
+  </view>
+</view>

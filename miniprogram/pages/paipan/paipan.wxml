@@ -1,0 +1,186 @@
+<!-- pages/paipan/paipan.wxml -->
+<view class="container">
+
+  <!-- 标题 -->
+  <view class="page-title">
+    <text class="title-main">命理排盘</text>
+    <text class="title-sub">八字四柱 · 推演天命</text>
+  </view>
+
+  <!-- ===== 表单区 ===== -->
+  <view class="card form-card">
+    <view class="card-header">
+      <text class="card-icon">☰</text>
+      <text class="card-title">基本信息</text>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">姓名</text>
+      <input class="form-input" type="text" placeholder="请输入姓名"
+             value="{{name}}" bindinput="onNameInput" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">性别</text>
+      <picker mode="selector" range="{{sexOptions}}" value="{{sexIndex}}" bindchange="onSexChange">
+        <view class="form-picker">
+          <text>{{sexOptions[sexIndex]}}</text>
+          <text class="picker-arrow">▾</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">出生日期</text>
+      <picker mode="date" value="{{birthDate}}" start="1900-01-01" end="2099-12-31" bindchange="onDateChange">
+        <view class="form-picker">
+          <text>{{birthDate}}</text>
+          <text class="picker-arrow">▾</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">出生时辰</text>
+      <picker mode="selector" range="{{birthHourOptions}}" value="{{birthHourIndex}}" bindchange="onHourChange">
+        <view class="form-picker">
+          <text>{{birthHourOptions[birthHourIndex]}}</text>
+          <text class="picker-arrow">▾</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">出生地</text>
+      <input class="form-input" type="text" placeholder="选填，如：北京"
+             value="{{birthplace}}" bindinput="onBirthplaceInput" />
+    </view>
+
+    <button class="btn-paipan" bindtap="onStartPaipan" loading="{{loading}}" disabled="{{loading}}">
+      <text wx:if="{{!loading}}">⚡ 开始排盘</text>
+      <text wx:else>正在排盘...</text>
+    </button>
+  </view>
+
+  <!-- ===== 排盘结果 ===== -->
+  <block wx:if="{{hasResult && paipanResult}}">
+    <view class="card result-card">
+      <view class="card-header">
+        <text class="card-icon">☷</text>
+        <text class="card-title">排盘结果</text>
+      </view>
+
+      <!-- 基本信息摘要 -->
+      <view class="result-summary">
+        <text class="summary-item">{{name}}</text>
+        <text class="summary-divider">|</text>
+        <text class="summary-item">{{sex}}</text>
+        <text class="summary-divider">|</text>
+        <text class="summary-item">{{birthDate}}</text>
+        <text class="summary-divider">|</text>
+        <text class="summary-item">{{birthHourOptions[birthHourIndex]}}</text>
+      </view>
+
+      <!-- 四柱 -->
+      <view class="section-title">四柱八字</view>
+      <view class="sizhu-grid">
+        <view class="sizhu-col" wx:for="{{['年柱','月柱','日柱','时柱']}}" wx:key="*this" wx:for-index="colIdx">
+          <view class="sizhu-col-title">{{item}}</view>
+          <!-- 天干 -->
+          <view class="sizhu-cell sizhu-gan">
+            <text class="sizhu-char">{{paipanResult.sizhu[colIdx].tiangan.char || '—'}}</text>
+            <text class="sizhu-sub">{{paipanResult.sizhu[colIdx].tiangan.wuxing || ''}}</text>
+          </view>
+          <!-- 地支 -->
+          <view class="sizhu-cell sizhu-zhi">
+            <text class="sizhu-char">{{paipanResult.sizhu[colIdx].dizhi.char || '—'}}</text>
+            <text class="sizhu-sub">{{paipanResult.sizhu[colIdx].dizhi.wuxing || ''}}</text>
+          </view>
+          <!-- 藏干 -->
+          <view class="sizhu-cell sizhu-cang">
+            <text class="sizhu-label">藏干</text>
+            <text class="sizhu-cang-text">{{paipanResult.sizhu[colIdx].canggan || '—'}}</text>
+          </view>
+          <!-- 十神 -->
+          <view class="sizhu-cell sizhu-shishen">
+            <text class="sizhu-label">十神</text>
+            <text class="sizhu-cang-text">{{paipanResult.sizhu[colIdx].shishen || '—'}}</text>
+          </view>
+          <!-- 纳音 -->
+          <view class="sizhu-cell sizhu-nayin">
+            <text class="sizhu-label">纳音</text>
+            <text class="sizhu-cang-text">{{paipanResult.sizhu[colIdx].nayin || '—'}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 五行力量 -->
+      <view class="section-title" wx:if="{{paipanResult.wuxing}}">五行力量</view>
+      <view class="wuxing-bar" wx:if="{{paipanResult.wuxing}}">
+        <view class="wuxing-item" wx:for="{{paipanResult.wuxing}}" wx:key="name">
+          <view class="wuxing-name">{{item.name}}</view>
+          <view class="wuxing-progress-bg">
+            <view class="wuxing-progress-fill" style="width: {{item.percent}}%; background: {{item.color}};"></view>
+          </view>
+          <view class="wuxing-percent">{{item.percent}}%</view>
+        </view>
+      </view>
+
+      <!-- 神煞 -->
+      <view class="section-title" wx:if="{{paipanResult.shensha}}">神煞</view>
+      <view class="shensha-list" wx:if="{{paipanResult.shensha}}">
+        <view class="shensha-tag" wx:for="{{paipanResult.shensha}}" wx:key="*this">
+          {{item}}
+        </view>
+      </view>
+
+      <!-- 大运 -->
+      <view class="section-title" wx:if="{{paipanResult.dayun}}">大运</view>
+      <view class="dayun-table" wx:if="{{paipanResult.dayun}}">
+        <view class="dayun-row dayun-header">
+          <text class="dayun-cell">序号</text>
+          <text class="dayun-cell">起运</text>
+          <text class="dayun-cell">年龄</text>
+          <text class="dayun-cell">干支</text>
+          <text class="dayun-cell">十神</text>
+        </view>
+        <view class="dayun-row" wx:for="{{paipanResult.dayun}}" wx:key="index">
+          <text class="dayun-cell">{{index + 1}}</text>
+          <text class="dayun-cell">{{item.startYear || '—'}}</text>
+          <text class="dayun-cell">{{item.startAge || '—'}}</text>
+          <text class="dayun-cell dayun-ganzhi">{{item.gz || '—'}}</text>
+          <text class="dayun-cell">{{item.shishen || '—'}}</text>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- Loading 提示 -->
+  <view class="loading-area" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">正在推演八字命盘...</text>
+  </view>
+
+  <!-- ===== 历史记录 ===== -->
+  <view class="card history-card" wx:if="{{history.length > 0}}">
+    <view class="card-header" bindtap="toggleHistory">
+      <text class="card-icon">📜</text>
+      <text class="card-title">历史排盘 ({{history.length}})</text>
+      <text class="toggle-arrow">{{showHistory ? '▲' : '▼'}}</text>
+    </view>
+
+    <view class="history-list" wx:if="{{showHistory}}">
+      <view class="history-item" wx:for="{{history}}" wx:key="_id" wx:for-index="idx"
+            data-index="{{idx}}" bindtap="onHistoryItemTap">
+        <view class="history-item-left">
+          <text class="history-name">{{item.name}}</text>
+          <text class="history-info">{{item.sex}} · {{item.birthDate}} · {{birthHourOptions[item.birthHour]}}</text>
+        </view>
+        <text class="history-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部留白 -->
+  <view class="bottom-spacer"></view>
+</view>

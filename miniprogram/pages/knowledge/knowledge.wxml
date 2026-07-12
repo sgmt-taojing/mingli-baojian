@@ -1,0 +1,110 @@
+<!--pages/knowledge/knowledge.wxml-->
+<view class="page">
+
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <view class="search-input-wrap">
+      <icon type="search" size="14" color="#64748b" />
+      <input
+        class="search-input"
+        placeholder="搜索命理知识…"
+        placeholder-class="search-placeholder"
+        value="{{keyword}}"
+        bindinput="onSearchInput"
+        bindconfirm="onSearchConfirm"
+        confirm-type="search"
+      />
+      <view wx:if="{{keyword}}" class="search-clear" bindtap="onSearchClear">
+        <icon type="clear" size="14" color="#64748b" />
+      </view>
+    </view>
+  </view>
+
+  <!-- 分类标签栏 -->
+  <scroll-view
+    class="category-bar"
+    scroll-x
+    scroll-into-view="{{scrollIntoView}}"
+    scroll-with-animation
+    enhanced
+    show-scrollbar="{{false}}"
+  >
+    <view class="category-list">
+      <view
+        wx:for="{{categories}}"
+        wx:key="key"
+        id="cat-{{item.key}}"
+        class="category-item {{currentCategory === item.key ? 'active' : ''}}"
+        data-key="{{item.key}}"
+        bindtap="onCategoryTap"
+      >
+        <text class="category-name">{{item.name}}</text>
+        <view wx:if="{{currentCategory === item.key}}" class="category-underline"></view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 热门推荐（仅无搜索关键词时显示） -->
+  <view wx:if="{{!keyword && hotArticles.length}}" class="hot-section">
+    <view class="section-header">
+      <text class="section-title">🔥 热门推荐</text>
+    </view>
+    <scroll-view class="hot-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="hot-list">
+        <view
+          wx:for="{{hotArticles}}"
+          wx:key="id"
+          class="hot-card"
+          data-category="{{item.categoryKey}}"
+          data-id="{{item.id}}"
+          bindtap="onHotTap"
+        >
+          <view class="hot-rank">{{index + 1}}</view>
+          <view class="hot-info">
+            <text class="hot-title">{{item.title}}</text>
+            <text class="hot-reads">{{item.reads}} 阅读</text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 文章列表 -->
+  <view class="article-list">
+    <view
+      wx:for="{{articles}}"
+      wx:key="id"
+      class="article-card"
+      data-id="{{item.id}}"
+      bindtap="onArticleTap"
+    >
+      <view class="article-header">
+        <text class="article-title">{{item.title}}</text>
+        <text class="article-arrow {{expandedId === item.id ? 'expanded' : ''}}">›</text>
+      </view>
+      <text class="article-summary">{{item.summary}}</text>
+      <view class="article-footer">
+        <text class="article-reads">{{item.reads}} 阅读</text>
+      </view>
+
+      <!-- 展开内容 -->
+      <view wx:if="{{expandedId === item.id}}" class="article-detail">
+        <view class="article-detail-inner">
+          <text class="article-content">{{item.content}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view wx:if="{{!loading && articles.length === 0}}" class="empty-state">
+      <text class="empty-icon">📜</text>
+      <text class="empty-text">暂无相关知识文章</text>
+    </view>
+
+    <!-- 加载中 -->
+    <view wx:if="{{loading}}" class="loading-state">
+      <text class="loading-text">加载中…</text>
+    </view>
+  </view>
+
+</view>

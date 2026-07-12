@@ -1,0 +1,336 @@
+/* pages/almanac/almanac.wxss */
+
+.almanac-page {
+  min-height: 100vh;
+  background: #1a1a2e;
+  padding: 24rpx 24rpx 0;
+  box-sizing: border-box;
+}
+
+/* ===== 卡片通用 ===== */
+.card {
+  background: #16213e;
+  border-radius: 20rpx;
+  padding: 32rpx 28rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.15);
+}
+
+.card-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #e6c86e;
+  margin-bottom: 24rpx;
+  padding-left: 16rpx;
+  border-left: 6rpx solid #e6c86e;
+  line-height: 1.2;
+}
+
+/* ===== 日期卡片 ===== */
+.date-card {
+  text-align: center;
+  padding: 40rpx 28rpx 36rpx;
+}
+
+.date-gregorian {
+  font-size: 52rpx;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 2rpx;
+}
+
+.date-lunar {
+  font-size: 30rpx;
+  color: #e6c86e;
+  margin-top: 12rpx;
+}
+
+.date-weekday {
+  font-size: 26rpx;
+  color: #8892b0;
+  margin-top: 8rpx;
+}
+
+/* ===== 干支卡片 ===== */
+.ganzhi-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.ganzhi-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.ganzhi-label {
+  font-size: 24rpx;
+  color: #8892b0;
+  margin-bottom: 10rpx;
+}
+
+.ganzhi-value {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 2rpx;
+}
+
+.ganzhi-divider {
+  width: 1rpx;
+  height: 60rpx;
+  background: rgba(230, 200, 110, 0.2);
+}
+
+/* ===== 宜忌卡片 ===== */
+.yiji-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.yiji-row {
+  display: flex;
+  align-items: flex-start;
+}
+
+.yiji-icon {
+  width: 56rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  text-align: center;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.yi-icon {
+  background: rgba(74, 222, 128, 0.15);
+  color: #4ade80;
+}
+
+.ji-icon {
+  background: rgba(248, 113, 113, 0.15);
+  color: #f87171;
+}
+
+.yiji-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  padding-top: 6rpx;
+  flex: 1;
+}
+
+.tag {
+  display: inline-block;
+  padding: 8rpx 20rpx;
+  border-radius: 10rpx;
+  font-size: 24rpx;
+  line-height: 1.4;
+}
+
+.tag-yi {
+  background: rgba(74, 222, 128, 0.12);
+  color: #4ade80;
+  border: 1rpx solid rgba(74, 222, 128, 0.3);
+}
+
+.tag-ji {
+  background: rgba(248, 113, 113, 0.12);
+  color: #f87171;
+  border: 1rpx solid rgba(248, 113, 113, 0.3);
+}
+
+/* ===== 方位卡片 ===== */
+.direction-row {
+  display: flex;
+  justify-content: space-around;
+}
+
+.direction-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.direction-label {
+  font-size: 24rpx;
+  color: #8892b0;
+  margin-bottom: 12rpx;
+}
+
+.direction-value {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #e6c86e;
+  letter-spacing: 1rpx;
+}
+
+/* ===== 吉时凶时卡片 ===== */
+.hours-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.hours-row {
+  display: flex;
+  align-items: flex-start;
+}
+
+.hours-label {
+  width: 56rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  text-align: center;
+  border-radius: 12rpx;
+  font-size: 24rpx;
+  font-weight: 700;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.good-label {
+  background: rgba(74, 222, 128, 0.15);
+  color: #4ade80;
+}
+
+.bad-label {
+  background: rgba(248, 113, 113, 0.15);
+  color: #f87171;
+}
+
+.hours-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  padding-top: 6rpx;
+  flex: 1;
+}
+
+.tag-good-hour {
+  background: rgba(74, 222, 128, 0.1);
+  color: #4ade80;
+  border: 1rpx solid rgba(74, 222, 128, 0.25);
+}
+
+.tag-bad-hour {
+  background: rgba(248, 113, 113, 0.1);
+  color: #f87171;
+  border: 1rpx solid rgba(248, 113, 113, 0.25);
+}
+
+/* ===== 冲煞五行卡片 ===== */
+.misc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.05);
+}
+
+.misc-row:last-child {
+  border-bottom: none;
+}
+
+.misc-label {
+  font-size: 26rpx;
+  color: #8892b0;
+  flex-shrink: 0;
+}
+
+.misc-value {
+  font-size: 28rpx;
+  color: #ffffff;
+  text-align: right;
+}
+
+.wuxing-value {
+  color: #e6c86e;
+  font-weight: 600;
+}
+
+.zhishen-huang {
+  color: #4ade80;
+}
+
+.zhishen-hei {
+  color: #f87171;
+}
+
+/* ===== 每日一句 ===== */
+.quote-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.quote-card::before {
+  content: '';
+  position: absolute;
+  top: -20rpx;
+  right: -20rpx;
+  width: 120rpx;
+  height: 120rpx;
+  background: radial-gradient(circle, rgba(230, 200, 110, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.quote-text {
+  font-size: 28rpx;
+  line-height: 1.8;
+  color: #b8c4d8;
+  font-style: italic;
+  padding: 8rpx 0;
+}
+
+/* ===== 底部按钮 ===== */
+.bottom-btn-wrap {
+  padding: 16rpx 0 32rpx;
+}
+
+.tomorrow-btn {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  background: linear-gradient(135deg, #e6c86e 0%, #d4a843 100%);
+  color: #1a1a2e;
+  font-size: 30rpx;
+  font-weight: 700;
+  border-radius: 44rpx;
+  border: none;
+  letter-spacing: 2rpx;
+}
+
+.btn-hover {
+  opacity: 0.85;
+  transform: scale(0.98);
+}
+
+.bottom-spacer {
+  height: 40rpx;
+}
+
+/* ===== 加载态 ===== */
+.loading-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #1a1a2e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.loading-text {
+  color: #e6c86e;
+  font-size: 28rpx;
+}

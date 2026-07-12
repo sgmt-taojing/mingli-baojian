@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>名师课堂 · 易道智鉴</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--gold:#c9a84c;--gold2:#e8cc7a;--ink:#0a0a12;--ink2:#141428;--paper:#f0e8d8;--paper3:#8a8070;--font:'Noto Serif SC',serif}
+body{font-family:var(--font);background:var(--ink);color:var(--paper);line-height:1.8;max-width:800px;margin:0 auto;padding:16px}
+h1{color:var(--gold);font-size:22px;letter-spacing:4px;text-align:center;margin-bottom:6px}
+.sub{text-align:center;font-size:12px;color:var(--paper3);margin-bottom:20px}
+.master-card{background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.12);border-radius:12px;padding:16px;margin-bottom:14px;cursor:pointer;transition:all .2s}
+.master-card:hover{border-color:var(--gold);background:rgba(201,168,76,0.08)}
+.master-header{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.master-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#a08030);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.master-name{font-size:16px;color:var(--gold);font-weight:bold}
+.master-title{font-size:11px;color:var(--paper3)}
+.master-desc{font-size:12px;color:var(--paper3);line-height:1.8;margin-bottom:8px}
+.master-tags{display:flex;gap:6px;flex-wrap:wrap}
+.master-tag{font-size:10px;padding:2px 8px;border-radius:6px;background:rgba(201,168,76,0.1);color:var(--gold)}
+.lesson-list{display:none;margin-top:12px}
+.lesson-item{padding:10px;background:rgba(255,255,255,0.02);border-radius:8px;margin-bottom:6px;cursor:pointer;transition:all .2s}
+.lesson-item:hover{background:rgba(201,168,76,0.06)}
+.lesson-title{font-size:13px;color:var(--paper)}
+.lesson-meta{font-size:10px;color:var(--paper3);margin-top:4px}
+.lesson-type{display:inline-block;font-size:9px;padding:1px 5px;border-radius:4px;margin-right:6px}
+.type-video{background:rgba(231,76,60,0.15);color:#e74c3c}
+.type-audio{background:rgba(52,152,219,0.15);color:#3498db}
+.type-text{background:rgba(39,174,96,0.15);color:#27ae60}
+.player-box{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);z-index:9999;padding:20px;align-items:center;justify-content:center;flex-direction:column}
+.player-box.show{display:flex}
+.player-close{position:absolute;top:16px;right:16px;font-size:28px;color:var(--paper3);cursor:pointer}
+.player-title{color:var(--gold);font-size:16px;margin-bottom:12px;text-align:center}
+video,audio{max-width:100%;max-height:70vh}
+.player-notes{margin-top:12px;padding:12px;background:rgba(201,168,76,0.06);border-radius:8px;font-size:12px;color:var(--paper2);max-width:600px;max-height:200px;overflow-y:auto;white-space:pre-wrap;line-height:1.8}
+.nav-back{text-align:center;margin-top:20px}
+.nav-back a{color:var(--gold);font-size:13px;text-decoration:none}
+</style>
+</head>
+<body>
+<h1>🎓 名师课堂</h1>
+<p class="sub">舒晗老师 · 倪海厦老师 | 传承经典 · 学以致用</p>
+
+<div style="margin-bottom:16px"><input type="text" id="searchInput" placeholder="🔍 搜索课程..." oninput="searchLessons(this.value)" style="width:100%;padding:10px 14px;background:var(--ink2);border:1px solid rgba(201,168,76,0.15);border-radius:10px;color:var(--paper);font-size:13px;font-family:inherit;outline:none"></div><div id="searchResults"></div><div id="masterList">
+  <div class="master-card" onclick="toggleMaster('shuhan')">
+    <div class="master-header">
+      <div class="master-avatar">舒</div>
+      <div>
+        <div class="master-name">舒晗老师</div>
+        <div class="master-title">八字实战 · 风水布局</div>
+      </div>
+    </div>
+    <div class="master-desc">资深命理实战专家，擅长八字命理推演、风水布局调理。以实战案例为主线，将传统命理智慧与现代生活结合。</div>
+    <div class="master-tags">
+      <span class="master-tag">八字实战</span>
+      <span class="master-tag">风水布局</span>
+      <span class="master-tag">案例解析</span>
+    </div>
+    <div class="lesson-list" id="lessons-shuhan">
+      <div class="lesson-item" onclick="playLesson('shuhan','待补充','video','')">
+        <div class="lesson-title">📚 课程准备中</div>
+        <div class="lesson-meta"><span class="lesson-type type-text">待更新</span>资料整理中</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="master-card" onclick="toggleMaster('nihaisha')">
+    <div class="master-header">
+      <div class="master-avatar">倪</div>
+      <div>
+        <div class="master-name">倪海厦老师</div>
+        <div class="master-title">中医经方 · 命理推演 · 紫微斗数</div>
+      </div>
+    </div>
+    <div class="master-desc">中医经方大师，精通命理推演、紫微斗数、黄帝内经。融汇医易同源之理，以中医经方结合命理指导养生治病。</div>
+    <div class="master-tags">
+      <span class="master-tag">中医经方</span>
+      <span class="master-tag">命理推演</span>
+      <span class="master-tag">紫微斗数</span>
+      <span class="master-tag">黄帝内经</span>
+    </div>
+    <div class="lesson-list" id="lessons-nihaisha">
+      <div class="lesson-item" onclick="playLesson('nihaisha','待补充','video','')">
+        <div class="lesson-title">📚 课程准备中</div>
+        <div class="lesson-meta"><span class="lesson-type type-text">待更新</span>资料整理中</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="player-box" id="playerBox">
+  <div class="player-close" onclick="closePlayer()">×</div>
+  <div class="player-title" id="playerTitle"></div>
+  <div id="playerContent"></div>
+  <div class="player-notes" id="playerNotes"></div>
+</div>
+
+<div class="nav-back">
+  <a href="divination-hub.html">← 返回主页</a>
+</div>
+
+<script>
+function toggleMaster(id){
+  var el=document.getElementById('lessons-'+id);
+  el.style.display=el.style.display==='block'?'none':'block';
+}
+function playLesson(master,title,type,url){
+  var box=document.getElementById('playerBox');
+  var content=document.getElementById('playerContent');
+  var titleEl=document.getElementById('playerTitle');
+  titleEl.textContent=title;
+  if(type==='video'&&url){
+    content.innerHTML='<video src="'+url+'" controls autoplay style="width:100%"></video>';
+  }else if(type==='audio'&&url){
+    content.innerHTML='<audio src="'+url+'" controls autoplay style="width:100%"></audio>';
+  }else if(type==='text'&&url){
+    content.innerHTML='<div style="color:var(--paper);font-size:14px;max-width:600px;line-height:2;white-space:pre-wrap">'+url+'</div>';
+  }else{
+    content.innerHTML='<div style="color:var(--paper3);text-align:center;padding:40px">📚 课程资料整理中，敬请期待</div>';
+  }
+  box.classList.add('show');
+}
+function closePlayer(){
+  var box=document.getElementById('playerBox');
+  box.classList.remove('show');
+  document.getElementById('playerContent').innerHTML='';
+}
+
+// 课程数据将动态加载
+var MASTER_LESSONS={
+  shuhan:[],
+  nihaisha:[]
+};
+
+// 添加课程函数（供后台调用）
+function addLesson(master,lesson){
+  MASTER_LESSONS[master]=MASTER_LESSONS[master]||[];
+  MASTER_LESSONS[master].push(lesson);
+  renderLessons(master);
+}
+
+function renderLessons(master){
+  var list=document.getElementById('lessons-'+master);
+  var lessons=MASTER_LESSONS[master]||[];
+  if(lessons.length===0){
+    list.innerHTML='<div class="lesson-item"><div class="lesson-title">📚 课程准备中</div><div class="lesson-meta">资料整理中</div></div>';
+    return;
+  }
+  var html='';
+  lessons.forEach(function(l,i){
+    var typeClass=l.type==='video'?'type-video':l.type==='audio'?'type-audio':'type-text';
+    var typeLabel=l.type==='video'?'视频':l.type==='audio'?'音频':'文字';
+    html+='<div class="lesson-item" onclick="playLesson(\''+master+'\',\''+l.title.replace(/'/g,"\\'")+'\',\''+l.type+'\',\''+(l.url||'')+'\')">';
+    html+='<div class="lesson-title">'+(i+1)+'. '+l.title+'</div>';
+    html+='<div class="lesson-meta"><span class="lesson-type '+typeClass+'">'+typeLabel+'</span>'+(l.duration||'')+' · '+(l.category||'')+'</div>';
+    if(l.summary) html+='<div style="font-size:11px;color:var(--paper3);margin-top:4px">'+l.summary+'</div>';
+    html+='</div>';
+  });
+  list.innerHTML=html;
+}
+
+// 学习进度记录
+function saveProgress(master, lessonIdx) {
+  var progress = JSON.parse(localStorage.getItem('masterClassProgress') || '{}');
+  progress[master + '_' + lessonIdx] = { date: new Date().toISOString(), completed: true };
+  localStorage.setItem('masterClassProgress', JSON.stringify(progress));
+  showToast('✅ 学习进度已记录');
+}
+
+// 获取学习进度
+function getProgress(master) {
+  var progress = JSON.parse(localStorage.getItem('masterClassProgress') || '{}');
+  var count = 0;
+  for (var k in progress) {
+    if (k.startsWith(master + '_')) count++;
+  }
+  return count;
+}
+
+// 搜索课程
+function searchLessons(keyword) {
+  if (!keyword) { renderAllLessons(); return; }
+  var results = [];
+  ['shuhan','nihaisha'].forEach(function(master) {
+    (MASTER_LESSONS[master]||[]).forEach(function(l, i) {
+      if (l.title.indexOf(keyword) >= 0 || (l.summary||'').indexOf(keyword) >= 0 || (l.category||'').indexOf(keyword) >= 0) {
+        results.push({master: master, lesson: l, idx: i});
+      }
+    });
+  });
+  var list = document.getElementById('searchResults');
+  if (!list) return;
+  if (results.length === 0) {
+    list.innerHTML = '<div style="text-align:center;color:var(--paper3);padding:20px">未找到相关课程</div>';
+  } else {
+    var html = '';
+    results.forEach(function(r) {
+      var masterName = r.master === 'shuhan' ? '舒晗老师' : '倪海厦老师';
+      var typeClass = r.lesson.type === 'video' ? 'type-video' : r.lesson.type === 'audio' ? 'type-audio' : 'type-text';
+      var typeLabel = r.lesson.type === 'video' ? '视频' : r.lesson.type === 'audio' ? '音频' : '文字';
+      html += '<div class="lesson-item" onclick="playLesson(''+r.master+'',''+r.lesson.title.replace(/'/g,"\'")+'',''+r.lesson.type+'',''+(r.lesson.url||'')+'')">';
+      html += '<div class="lesson-title">' + masterName + '：' + r.lesson.title + '</div>';
+      html += '<div class="lesson-meta"><span class="lesson-type '+typeClass+'">'+typeLabel+'</span>' + (r.lesson.category||'') + '</div>';
+      html += '</div>';
+    });
+    list.innerHTML = html;
+  }
+}
+
+function renderAllLessons() {
+  var list = document.getElementById('searchResults');
+  if (list) list.innerHTML = '';
+  ['shuhan','nihaisha'].forEach(function(m) { renderLessons(m); });
+}
+
+// 知识要点提取（从文字课程中提取要点）
+function extractKeyPoints(text) {
+  if (!text) return [];
+  var points = [];
+  var lines = text.split('\n');
+  lines.forEach(function(line) {
+    if (line.match(/^[0-9]+[.、）/]/) || line.match(/^[①②③④⑤⑥⑦⑧⑨⑩]/)) {
+      points.push(line.trim());
+    }
+    if (line.match(/关键|要点|注意|重要|核心|总结/)) {
+      points.push(line.trim());
+    }
+  });
+  return points;
+}
+
+// 笔记功能
+function saveNote(master, lessonTitle, note) {
+  var notes = JSON.parse(localStorage.getItem('masterClassNotes') || '{}');
+  notes[master + '_' + lessonTitle] = { note: note, date: new Date().toISOString() };
+  localStorage.setItem('masterClassNotes', JSON.stringify(notes));
+}
+
+function getNote(master, lessonTitle) {
+  var notes = JSON.parse(localStorage.getItem('masterClassNotes') || '{}');
+  return notes[master + '_' + lessonTitle] || null;
+}
+
+// 显示Toast
+function showToast(msg) {
+  var t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:var(--gold2);padding:10px 20px;border-radius:20px;z-index:10000;font-size:13px';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function(){ t.remove(); }, 2000);
+}
+
+// 统计学习数据
+function getStudyStats() {
+  var progress = JSON.parse(localStorage.getItem('masterClassProgress') || '{}');
+  var notes = JSON.parse(localStorage.getItem('masterClassNotes') || '{}');
+  var totalLessons = 0;
+  ['shuhan','nihaisha'].forEach(function(m) { totalLessons += (MASTER_LESSONS[m]||[]).length; });
+  return {
+    totalLessons: totalLessons,
+    completed: Object.keys(progress).length,
+    notes: Object.keys(notes).length
+  };
+}
+</script>
+<script src="js/master-class-data.js"></script>
+</body>
+</html>

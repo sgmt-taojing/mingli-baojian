@@ -1,0 +1,127 @@
+<!-- pages/almanac/almanac.wxml -->
+<view class="almanac-page">
+
+  <!-- 顶部日期卡片 -->
+  <view class="card date-card">
+    <view class="date-gregorian">{{gregorianDate}}</view>
+    <view class="date-lunar">{{lunarDateText}}</view>
+    <view class="date-weekday">{{weekdayText}}</view>
+  </view>
+
+  <!-- 干支卡片 -->
+  <view class="card ganzhi-card" wx:if="{{ganzhi}}">
+    <view class="card-title">当日干支</view>
+    <view class="ganzhi-row">
+      <view class="ganzhi-item">
+        <text class="ganzhi-label">年柱</text>
+        <text class="ganzhi-value">{{ganzhi.year}}</text>
+      </view>
+      <view class="ganzhi-divider"></view>
+      <view class="ganzhi-item">
+        <text class="ganzhi-label">月柱</text>
+        <text class="ganzhi-value">{{ganzhi.month}}</text>
+      </view>
+      <view class="ganzhi-divider"></view>
+      <view class="ganzhi-item">
+        <text class="ganzhi-label">日柱</text>
+        <text class="ganzhi-value">{{ganzhi.day}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 宜忌卡片 -->
+  <view class="card yiji-card" wx:if="{{yiList.length || jiList.length}}">
+    <view class="card-title">宜忌</view>
+    <view class="yiji-section">
+      <view class="yiji-row">
+        <text class="yiji-icon yi-icon">宜</text>
+        <view class="yiji-tags">
+          <text class="tag tag-yi" wx:for="{{yiList}}" wx:key="*this">{{item}}</text>
+        </view>
+      </view>
+      <view class="yiji-row">
+        <text class="yiji-icon ji-icon">忌</text>
+        <view class="yiji-tags">
+          <text class="tag tag-ji" wx:for="{{jiList}}" wx:key="*this">{{item}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 吉神方位卡片 -->
+  <view class="card direction-card" wx:if="{{directions}}">
+    <view class="card-title">吉神方位</view>
+    <view class="direction-row">
+      <view class="direction-item">
+        <text class="direction-label">财神</text>
+        <text class="direction-value">{{directions.caishen}}</text>
+      </view>
+      <view class="direction-item">
+        <text class="direction-label">喜神</text>
+        <text class="direction-value">{{directions.xishen}}</text>
+      </view>
+      <view class="direction-item">
+        <text class="direction-label">福神</text>
+        <text class="direction-value">{{directions.fushen}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 吉时凶时卡片 -->
+  <view class="card hours-card" wx:if="{{goodHours.length || badHours.length}}">
+    <view class="card-title">吉时凶时</view>
+    <view class="hours-section">
+      <view class="hours-row">
+        <text class="hours-label good-label">吉时</text>
+        <view class="hours-tags">
+          <text class="tag tag-good-hour" wx:for="{{goodHours}}" wx:key="*this">{{item}}</text>
+        </view>
+      </view>
+      <view class="hours-row">
+        <text class="hours-label bad-label">凶时</text>
+        <view class="hours-tags">
+          <text class="tag tag-bad-hour" wx:for="{{badHours}}" wx:key="*this">{{item}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 生肖冲煞 & 五行卡片 -->
+  <view class="card misc-card" wx:if="{{chongsha || wuxing}}">
+    <view class="card-title">冲煞·五行</view>
+    <view class="misc-row" wx:if="{{chongsha}}">
+      <text class="misc-label">生肖冲煞</text>
+      <text class="misc-value">冲{{chongsha.chong}} 煞{{chongsha.sha}}</text>
+    </view>
+    <view class="misc-row" wx:if="{{wuxing}}">
+      <text class="misc-label">五行</text>
+      <text class="misc-value wuxing-value">{{wuxing}}</text>
+    </view>
+    <view class="misc-row" wx:if="{{jianchu}}">
+      <text class="misc-label">建除</text>
+      <text class="misc-value">{{jianchu}}</text>
+    </view>
+    <view class="misc-row" wx:if="{{xingxiu}}">
+      <text class="misc-label">星宿</text>
+      <text class="misc-value">{{xingxiu}}</text>
+    </view>
+    <view class="misc-row" wx:if="{{zhishen}}">
+      <text class="misc-label">值神</text>
+      <text class="misc-value {{zhishenType ? 'zhishen-huang' : 'zhishen-hei'}}">{{zhishen}}{{zhishenType ? '(黄道)' : '(黑道)'}}</text>
+    </view>
+  </view>
+
+  <!-- 每日一句 -->
+  <view class="card quote-card" wx:if="{{dailyQuote}}">
+    <view class="card-title">每日一句</view>
+    <view class="quote-text">{{dailyQuote}}</view>
+  </view>
+
+  <!-- 查看明日黄历 -->
+  <view class="bottom-btn-wrap">
+    <button class="tomorrow-btn" bindtap="goTomorrow" hover-class="btn-hover">查看明日黄历 →</button>
+  </view>
+
+  <!-- 底部留白 -->
+  <view class="bottom-spacer"></view>
+</view>

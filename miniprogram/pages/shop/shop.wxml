@@ -1,0 +1,21 @@
+<!-- pages/shop/shop.wxml -->
+<view class="page-shop">
+  <view class="category-bar">
+    <view class="cat-item {{currentCategory === item.id ? 'active' : ''}}" wx:for="{{categories}}" wx:key="id" data-id="{{item.id}}" bindtap="onCategoryTap">{{item.name}}</view>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+
+  <view class="product-grid" wx:if="{{!loading}}">
+    <view class="product-card" wx:for="{{products}}" wx:key="id" data-id="{{item.id}}" bindtap="onProductTap" wx:if="{{currentCategory === 'all' || item.category === currentCategory}}">
+      <view class="product-img-placeholder">🛍️</view>
+      <view class="product-info">
+        <view class="product-name">{{item.name}}</view>
+        <view class="product-desc">{{item.desc}}</view>
+        <view class="product-price">¥{{item.price}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{!loading && products.length === 0}}">暂无商品</view>
+</view>

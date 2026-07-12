@@ -1,0 +1,172 @@
+<!-- pages/mine/mine.wxml -->
+<view class="page">
+
+  <!-- ========== 未登录状态 ========== -->
+  <block wx:if="{{!isLoggedIn}}">
+    <view class="login-hero">
+      <view class="avatar-placeholder" bindtap="showLoginPopup">
+        <text class="avatar-icon">👤</text>
+      </view>
+      <text class="login-hint" bindtap="showLoginPopup">点击登录</text>
+      <text class="login-sub">登录后享受更多服务</text>
+    </view>
+  </block>
+
+  <!-- ========== 已登录：用户信息卡片 ========== -->
+  <block wx:if="{{isLoggedIn && userInfo}}">
+    <view class="user-card">
+      <view class="avatar-wrap">
+        <image class="avatar" src="{{userInfo.avatar || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+      </view>
+      <view class="user-meta">
+        <view class="user-name-row">
+          <text class="user-name">{{userInfo.name || '未设置昵称'}}</text>
+          <view class="vip-badge" wx:if="{{userInfo.vipLevel}}">
+            <text class="vip-text">VIP {{userInfo.vipLevel}}</text>
+          </view>
+        </view>
+        <text class="user-phone">{{userInfo.phone ? userInfo.phone.slice(0,3) + '****' + userInfo.phone.slice(7) : '未绑定'}}</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- ========== 我的生辰信息 ========== -->
+  <view class="section" wx:if="{{isLoggedIn}}">
+    <view class="section-header">
+      <text class="section-title">我的生辰</text>
+      <text class="section-edit" bindtap="startEditBirth" wx:if="{{!editingBirth}}">编辑</text>
+    </view>
+
+    <!-- 展示模式 -->
+    <view class="birth-info" wx:if="{{!editingBirth}}">
+      <view class="birth-row">
+        <text class="birth-label">出生日期</text>
+        <text class="birth-value">{{birthInfo.birthDate || '未填写'}}</text>
+      </view>
+      <view class="birth-row">
+        <text class="birth-label">出生时辰</text>
+        <text class="birth-value">{{birthInfo.birthHour || '未填写'}}</text>
+      </view>
+      <view class="birth-row">
+        <text class="birth-label">出生地点</text>
+        <text class="birth-value">{{birthInfo.birthplace || '未填写'}}</text>
+      </view>
+    </view>
+
+    <!-- 编辑模式 -->
+    <view class="birth-edit" wx:if="{{editingBirth}}">
+      <view class="edit-row">
+        <text class="edit-label">姓名</text>
+        <input class="edit-input" value="{{editForm.name}}" data-field="name" bindinput="onEditInput" placeholder="请输入姓名" />
+      </view>
+      <view class="edit-row">
+        <text class="edit-label">性别</text>
+        <radio-group class="edit-radio-group" bindchange="onSexChange">
+          <label class="radio-label"><radio value="男" checked="{{editForm.sex === '男'}}" color="#e6c86e" />男</label>
+          <label class="radio-label"><radio value="女" checked="{{editForm.sex === '女'}}" color="#e6c86e" />女</label>
+        </radio-group>
+      </view>
+      <view class="edit-row">
+        <text class="edit-label">出生日期</text>
+        <input class="edit-input" value="{{editForm.birthDate}}" data-field="birthDate" bindinput="onEditInput" placeholder="如：1990-01-15" />
+      </view>
+      <view class="edit-row">
+        <text class="edit-label">出生时辰</text>
+        <input class="edit-input" value="{{editForm.birthHour}}" data-field="birthHour" bindinput="onEditInput" placeholder="如：子时 / 23:00" />
+      </view>
+      <view class="edit-row">
+        <text class="edit-label">出生地</text>
+        <input class="edit-input" value="{{editForm.birthplace}}" data-field="birthplace" bindinput="onEditInput" placeholder="如：北京" />
+      </view>
+      <view class="edit-row">
+        <text class="edit-label">现居地</text>
+        <input class="edit-input" value="{{editForm.residence}}" data-field="residence" bindinput="onEditInput" placeholder="如：上海" />
+      </view>
+      <view class="edit-row">
+        <text class="edit-label">职业</text>
+        <input class="edit-input" value="{{editForm.occupation}}" data-field="occupation" bindinput="onEditInput" placeholder="如：工程师" />
+      </view>
+      <view class="edit-row">
+        <text class="edit-label">信仰</text>
+        <input class="edit-input" value="{{editForm.faith}}" data-field="faith" bindinput="onEditInput" placeholder="如：佛教 / 无" />
+      </view>
+      <view class="edit-btns">
+        <button class="btn-cancel" bindtap="cancelEditBirth">取消</button>
+        <button class="btn-save" bindtap="saveBirthInfo">保存</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- ========== 排盘历史 ========== -->
+  <view class="section" wx:if="{{isLoggedIn}}">
+    <view class="section-header">
+      <text class="section-title">排盘历史</text>
+    </view>
+    <view class="history-list" wx:if="{{history.length > 0}}">
+      <view class="history-item" wx:for="{{history}}" wx:key="_id" data-id="{{item._id || item.id}}" bindtap="onTapHistory">
+        <view class="history-left">
+          <text class="history-name">{{item.name || '排盘'}}</text>
+          <text class="history-date">{{item.createdAt || item.date || ''}}</text>
+        </view>
+        <text class="history-arrow">›</text>
+      </view>
+    </view>
+    <view class="empty-tip" wx:else>
+      <text>暂无排盘记录</text>
+    </view>
+  </view>
+
+  <!-- ========== 我的积分 ========== -->
+  <view class="section points-section" wx:if="{{isLoggedIn}}">
+    <view class="points-row">
+      <text class="points-label">我的积分</text>
+      <text class="points-value">{{points}}</text>
+    </view>
+  </view>
+
+  <!-- ========== 功能入口列表 ========== -->
+  <view class="section menu-section" wx:if="{{isLoggedIn}}">
+    <view class="menu-item" data-key="orders" bindtap="onTapMenu">
+      <text class="menu-icon">📋</text>
+      <text class="menu-text">我的订单</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" data-key="favorites" bindtap="onTapMenu">
+      <text class="menu-icon">⭐</text>
+      <text class="menu-text">我的收藏</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" data-key="fortune" bindtap="onTapMenu">
+      <text class="menu-icon">🔮</text>
+      <text class="menu-text">每日运势</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" data-key="settings" bindtap="onTapMenu">
+      <text class="menu-icon">⚙️</text>
+      <text class="menu-text">设置</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" data-key="about" bindtap="onTapMenu">
+      <text class="menu-icon">ℹ️</text>
+      <text class="menu-text">关于我们</text>
+      <text class="menu-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- ========== 退出登录 ========== -->
+  <view class="logout-section" wx:if="{{isLoggedIn}}">
+    <button class="logout-btn" bindtap="logout">退出登录</button>
+  </view>
+
+  <!-- ========== 登录弹窗 ========== -->
+  <view class="login-mask" wx:if="{{showLogin}}" bindtap="hideLoginPopup"></view>
+  <view class="login-popup" wx:if="{{showLogin}}">
+    <view class="popup-title">手机号登录</view>
+    <input class="phone-input" type="number" maxlength="11" value="{{phoneInput}}" bindinput="onPhoneInput" placeholder="请输入手机号" />
+    <button class="login-btn {{loading ? 'loading' : ''}}" bindtap="doLogin" disabled="{{loading}}">
+      {{loading ? '登录中...' : '登 录'}}
+    </button>
+    <text class="popup-cancel" bindtap="hideLoginPopup">取消</text>
+  </view>
+
+</view>

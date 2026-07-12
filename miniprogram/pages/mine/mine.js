@@ -1,0 +1,273 @@
+// pages/mine/mine.js
+const API_BASE = 'http://127.0.0.1:8920'
+
+Page({
+  data: {
+    isLoggedIn: false,
+    userInfo: null,
+    birthInfo: null,
+    history: [],
+    points: 0,
+    showLogin: false,
+    phoneInput: '',
+    loading: false,
+    editingBirth: false,
+    editForm: {
+      name: '',
+      sex: '',
+      birthDate: '',
+      birthHour: '',
+      birthplace: '',
+      residence: '',
+      occupation: '',
+      faith: ''
+    }
+  },
+
+  onLoad() {
+    this.checkLogin()
+  },
+
+  onShow() {
+    this.checkLogin()
+  },
+
+  // ---- 登录态检查 ----
+  checkLogin() {
+    const token = wx.getStorageSync('token')
+    if (token) {
+      this.setData({ isLoggedIn: true })
+      this.loadProfile()
+      this.loadHistory()
+      this.loadPoints()
+    } else {
+      this.setData({ isLoggedIn: false, userInfo: null, history: [], points: 0 })
+    }
+  },
+
+  // ---- 登录流程 ----
+  showLoginPopup() {
+    this.setData({ showLogin: true, phoneInput: '' })
+  },
+
+  hideLoginPopup() {
+    this.setData({ showLogin: false })
+  },
+
+  onPhoneInput(e) {
+    this.setData({ phoneInput: e.detail.value })
+  },
+
+  doLogin() {
+    const phone = this.data.phoneInput.trim()
+    if (!/^1\d{10}$/.test(phone)) {
+      wx.showToast({ title: '请输入正确手机号', icon: 'none' })
+      return
+    }
+    this.setData({ loading: true })
+    wx.request({
+      url: API_BASE + '/api/user/login',
+      method: 'POST',
+      data: { phone },
+      header: { 'Content-Type': 'application/json' },
+      success: (res) => {
+        if (res.statusCode === 200 && res.data.token) {
+          wx.setStorageSync('token', res.data.token)
+          wx.setStorageSync('userInfo', res.data.user || {})
+          this.setData({
+            isLoggedIn: true,
+            showLogin: false,
+            userInfo: res.data.user || null
+          })
+          wx.showToast({ title: '登录成功', icon: 'success' })
+          this.loadProfile()
+          this.loadHistory()
+          this.loadPoints()
+        } else {
+          wx.showToast({ title: '登录失败，请重试', icon: 'none' })
+        }
+      },
+      fail: () => {
+        wx.showToast({ title: '网络错误', icon: 'none' })
+      },
+      complete: () => {
+        this.setData({ loading: false })
+      }
+    })
+  },
+
+  // ---- 加载用户信息 ----
+  loadProfile() {
+    const token = wx.getStorageSync('token')
+    wx.request({
+      url: API_BASE + '/api/user/profile',
+      method: 'GET',
+      header: { 'Authorization': 'Bearer ' + token },
+      success: (res) => {
+        if (res.statusCode === 200 && res.data) {
+          const d = res.data
+          this.setData({
+            userInfo: d,
+            birthInfo: {
+              birthDate: d.birthDate || '未填写',
+              birthHour: d.birthHour || '未填写',
+              birthplace: d.birthplace || '未填写'
+            },
+            editForm: {
+              name: d.name || '',
+              sex: d.sex || '',
+              birthDate: d.birthDate || '',
+              birthHour: d.birthHour || '',
+              birthplace: d.birthplace || '',
+              residence: d.residence || '',
+              occupation: d.occupation || '',
+              faith: d.faith || ''
+            }
+          })
+        }
+      }
+    })
+  },
+
+  // ---- 排盘历史 ----
+  loadHistory() {
+    const token = wx.getStorageSync('token')
+    wx.request({
+      url: API_BASE + '/api/paipan/history',
+      method: 'GET',
+      header: { 'Authorization': 'Bearer ' + token },
+      success: (res) => {
+        if (res.statusCode === 200 && Array.isArray(res.data)) {
+          this.setData({ history: res.data.slice(0, 5) })
+        }
+      }
+    })
+  },
+
+  // ---- 积分 ----
+  loadPoints() {
+    const token = wx.getStorageSync('token')
+    wx.request({
+      url: API_BASE + '/api/feedback/points',
+      method: 'GET',
+      header: { 'Authorization': 'Bearer ' + token },
+      success: (res) => {
+        if (res.statusCode === 200 && res.data) {
+          this.setData({ points: res.data.points || 0 })
+        }
+      }
+    })
+  },
+
+  // ---- 脱敏手机号 ----
+  maskPhone(phone) {
+    if (!phone || phone.length < 11) return phone || '未绑定'
+    return phone.slice(0, 3) + '****' + phone.slice(7)
+  },
+
+  // ---- 编辑生辰信息 ----
+  startEditBirth() {
+    this.setData({ editingBirth: true })
+  },
+
+  cancelEditBirth() {
+    this.setData({ editingBirth: false })
+  },
+
+  onEditInput(e) {
+    const field = e.currentTarget.dataset.field
+    this.setData({ ['editForm.' + field]: e.detail.value })
+  },
+
+  onSexChange(e) {
+    this.setData({ 'editForm.sex': e.detail.value })
+  },
+
+  saveBirthInfo() {
+    const token = wx.getStorageSync('token')
+    const form = this.data.editForm
+    if (!form.birthDate) {
+      wx.showToast({ title: '请填写出生日期', icon: 'none' })
+      return
+    }
+    wx.request({
+      url: API_BASE + '/api/user/profile',
+      method: 'POST',
+      data: form,
+      header: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      },
+      success: (res) => {
+        if (res.statusCode === 200) {
+          wx.showToast({ title: '保存成功', icon: 'success' })
+          this.setData({ editingBirth: false })
+          this.loadProfile()
+        } else {
+          wx.showToast({ title: '保存失败', icon: 'none' })
+        }
+      },
+      fail: () => {
+        wx.showToast({ title: '网络错误', icon: 'none' })
+      }
+    })
+  },
+
+  // ---- 历史记录跳转 ----
+  onTapHistory(e) {
+    const id = e.currentTarget.dataset.id
+    wx.navigateTo({
+      url: '/pages/paipan/paipan?id=' + id,
+      fail: () => {
+        wx.showToast({ title: '排盘页未就绪', icon: 'none' })
+      }
+    })
+  },
+
+  // ---- 功能入口 ----
+  onTapMenu(e) {
+    if (!this.data.isLoggedIn) {
+      this.showLoginPopup()
+      return
+    }
+    const key = e.currentTarget.dataset.key
+    const routes = {
+      orders: '/pages/shop/orders/orders',
+      favorites: '/pages/mine/favorites/favorites',
+      fortune: '/pages/mine/fortune/fortune',
+      settings: '/pages/mine/settings/settings',
+      about: '/pages/mine/about/about'
+    }
+    const url = routes[key]
+    if (url) {
+      wx.navigateTo({
+        url: url,
+        fail: () => {
+          wx.showToast({ title: '页面开发中', icon: 'none' })
+        }
+      })
+    }
+  },
+
+  // ---- 退出登录 ----
+  logout() {
+    wx.showModal({
+      title: '确认退出',
+      content: '确定要退出登录吗？',
+      success: (res) => {
+        if (res.confirm) {
+          wx.removeStorageSync('token')
+          wx.removeStorageSync('userInfo')
+          this.setData({
+            isLoggedIn: false,
+            userInfo: null,
+            history: [],
+            points: 0,
+            birthInfo: null
+          })
+          wx.showToast({ title: '已退出登录', icon: 'success' })
+        }
+      }
+    })
+  }
+})

@@ -1,0 +1,270 @@
+/* pages/knowledge/knowledge.wxss */
+
+.page {
+  min-height: 100vh;
+  background: #1a1a2e;
+  padding-bottom: 40rpx;
+}
+
+/* ========== 搜索栏 ========== */
+.search-bar {
+  padding: 20rpx 32rpx 16rpx;
+}
+
+.search-input-wrap {
+  display: flex;
+  align-items: center;
+  height: 72rpx;
+  background: #0f3460;
+  border-radius: 36rpx;
+  padding: 0 24rpx;
+  border: 1rpx solid rgba(230, 200, 110, 0.1);
+}
+
+.search-input {
+  flex: 1;
+  height: 72rpx;
+  font-size: 28rpx;
+  color: #e2e8f0;
+  margin-left: 16rpx;
+}
+
+.search-placeholder {
+  color: #64748b;
+  font-size: 28rpx;
+}
+
+.search-clear {
+  padding: 8rpx;
+  display: flex;
+  align-items: center;
+}
+
+/* ========== 分类标签栏 ========== */
+.category-bar {
+  white-space: nowrap;
+  padding: 8rpx 0 16rpx;
+}
+
+.category-list {
+  display: inline-flex;
+  align-items: flex-start;
+  padding: 0 24rpx;
+}
+
+.category-item {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16rpx 24rpx 12rpx;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.category-name {
+  font-size: 28rpx;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+.category-item.active .category-name {
+  color: #e6c86e;
+  font-weight: 600;
+}
+
+.category-underline {
+  width: 40rpx;
+  height: 4rpx;
+  background: #e6c86e;
+  border-radius: 2rpx;
+  margin-top: 8rpx;
+}
+
+/* ========== 热门推荐 ========== */
+.hot-section {
+  padding: 8rpx 32rpx 24rpx;
+}
+
+.section-header {
+  margin-bottom: 16rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  color: #e6c86e;
+  font-weight: 600;
+}
+
+.hot-scroll {
+  white-space: nowrap;
+}
+
+.hot-list {
+  display: inline-flex;
+  gap: 20rpx;
+  padding: 4rpx 0 8rpx;
+}
+
+.hot-card {
+  display: inline-flex;
+  align-items: center;
+  width: 380rpx;
+  background: #16213e;
+  border-radius: 16rpx;
+  padding: 20rpx 24rpx;
+  flex-shrink: 0;
+  border: 1rpx solid rgba(230, 200, 110, 0.08);
+}
+
+.hot-rank {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #e6c86e;
+  margin-right: 20rpx;
+  min-width: 40rpx;
+}
+
+.hot-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.hot-title {
+  font-size: 26rpx;
+  color: #f1f5f9;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.5;
+}
+
+.hot-reads {
+  font-size: 22rpx;
+  color: #64748b;
+  margin-top: 6rpx;
+}
+
+/* ========== 文章列表 ========== */
+.article-list {
+  padding: 0 32rpx;
+}
+
+.article-card {
+  background: #16213e;
+  border-radius: 20rpx;
+  padding: 28rpx;
+  margin-bottom: 20rpx;
+  border: 1rpx solid rgba(230, 200, 110, 0.06);
+}
+
+.article-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
+.article-title {
+  font-size: 32rpx;
+  color: #ffffff;
+  font-weight: 600;
+  flex: 1;
+  line-height: 1.5;
+}
+
+.article-arrow {
+  font-size: 36rpx;
+  color: #64748b;
+  transition: transform 0.3s ease;
+  margin-left: 16rpx;
+  transform: rotate(0deg);
+}
+
+.article-arrow.expanded {
+  transform: rotate(90deg);
+  color: #e6c86e;
+}
+
+.article-summary {
+  font-size: 26rpx;
+  color: #94a3b8;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.article-footer {
+  margin-top: 16rpx;
+  display: flex;
+  align-items: center;
+}
+
+.article-reads {
+  font-size: 22rpx;
+  color: #64748b;
+}
+
+/* ========== 展开详情 ========== */
+.article-detail {
+  margin-top: 24rpx;
+  border-top: 1rpx solid rgba(230, 200, 110, 0.12);
+  padding-top: 24rpx;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.article-detail-inner {
+  background: #0f3460;
+  border-radius: 16rpx;
+  padding: 24rpx;
+}
+
+.article-content {
+  font-size: 28rpx;
+  color: #cbd5e1;
+  line-height: 1.9;
+  white-space: pre-wrap;
+}
+
+/* ========== 空状态 ========== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx 0;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #64748b;
+}
+
+/* ========== 加载状态 ========== */
+.loading-state {
+  display: flex;
+  justify-content: center;
+  padding: 40rpx 0;
+}
+
+.loading-text {
+  font-size: 26rpx;
+  color: #64748b;
+}
