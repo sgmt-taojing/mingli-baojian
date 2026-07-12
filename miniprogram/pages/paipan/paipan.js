@@ -242,7 +242,7 @@ Page({
 
     // 六爻 — 本卦/变卦
     if (this.data.currentType === 'liuyao') {
-      const num = parseInt(f.meihuaNum) || Math.floor(Math.random() * 100) + 1
+      const num = parseInt(f.meihuaNum) || ((Date.now() % 99) + 1)
       const gua = (num % 64) + 1
       this.setData({
         loading: false,
@@ -258,7 +258,7 @@ Page({
 
     // 梅花易数 — 体卦用卦
     if (this.data.currentType === 'meihua') {
-      const num = parseInt(f.meihuaNum) || Math.floor(Math.random() * 100) + 1
+      const num = parseInt(f.meihuaNum) || ((Date.now() % 99) + 1)
       this.setData({
         loading: false,
         result: {

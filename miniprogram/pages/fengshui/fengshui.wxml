@@ -1,16 +1,68 @@
 <view class="page-func">
   <view class="func-header">
-    <view class="func-icon">{{icon}}</view>
-    <view class="func-title">{{title}}</view>
-    <view class="func-desc">{{desc}}</view>
+    <view class="func-icon">🏯</view>
+    <view class="func-title">阳宅风水</view>
+    <view class="func-desc">户型分析 · 方位吉凶 · 化解建议</view>
   </view>
+
   <view class="func-form card">
-    <view class="form-hint">请输入相关信息进行测算</view>
-    <button class="btn-primary" bindtap="onCalculate" loading="{{loading}}">开始测算</button>
+    <view class="form-row">
+      <text class="form-label">户型</text>
+      <picker mode="selector" range="{{houseTypeOptions}}" value="{{houseTypeIndex}}" bindchange="onHouseTypeChange">
+        <text class="picker-text">{{houseTypeOptions[houseTypeIndex]}}</text>
+      </picker>
+    </view>
+    <view class="form-row">
+      <text class="form-label">朝向</text>
+      <picker mode="selector" range="{{directionOptions}}" value="{{directionIndex}}" bindchange="onDirectionChange">
+        <text class="picker-text">{{directionOptions[directionIndex]}}</text>
+      </picker>
+    </view>
+    <button class="btn-primary" bindtap="onAnalyze" loading="{{loading}}">开始分析</button>
   </view>
-  <view class="func-result card" wx:if="{{result}}">
-    <view class="card-title">测算结果</view>
-    <view class="result-text">{{result.text}}</view>
-  </view>
-  <view class="loading" wx:if="{{loading}}">正在为您测算中...</view>
+
+  <block wx:if="{{result}}">
+    <view class="card">
+      <view class="card-title">户型信息</view>
+      <view class="info-row"><text class="info-label">户型</text><text class="info-value">{{result.houseType.name}}</text></view>
+      <view class="info-row"><text class="info-label">说明</text><text class="info-value">{{result.houseType.desc}}</text></view>
+      <view class="info-row"><text class="info-label">朝向</text><text class="info-value">{{result.direction.name}}</text></view>
+      <view class="info-row"><text class="info-label">朝向说明</text><text class="info-value">{{result.direction.desc}}</text></view>
+    </view>
+
+    <view class="card" wx:if="{{result.quejiaoList.length}}">
+      <view class="card-title">缺角影响 ⚠️</view>
+      <view class="quejiao-list">
+        <view class="quejiao-item" wx:for="{{result.quejiaoList}}" wx:key="dir">
+          <text class="quejiao-impact">{{item.impact}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="card-title">八方位分析</view>
+      <view class="fangwei-list">
+        <view class="fangwei-item" wx:for="{{result.fangweiAnalysis}}" wx:key="dir">
+          <view class="fw-header">
+            <text class="fw-dir">{{item.dir}}</text>
+            <text class="fw-level {{item.level === '吉' ? 'lv-good' : item.level === '凶' ? 'lv-bad' : 'lv-mid'}}">{{item.level}}</text>
+          </view>
+          <view class="fw-detail">
+            <text class="fw-info">五行：{{item.element}} | 对应：{{item.body}}</text>
+            <text class="fw-topic">主管：{{item.topic}}</text>
+            <text class="fw-reason">{{item.reason}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="card-title">化解建议 🛠️</view>
+      <view class="remedy-list">
+        <text class="remedy-item" wx:for="{{result.remedies}}" wx:key="*this">• {{item}}</text>
+      </view>
+    </view>
+  </block>
+
+  <view class="loading" wx:if="{{loading}}">正在分析中...</view>
 </view>
