@@ -332,7 +332,7 @@ function tzGeneratePlan(){
   prompt+='4. 起居调摄（作息/穴位/注意事项）\n\n';
   prompt+='用JSON格式回复：{"食疗":[{"名称":"...","食材":"...","做法":"...","功效":"..."}],"功法":[{"名称":"...","理由":"...","时长":"..."}],"正念":[{"方法":"...","步骤":"...","益处":"..."}],"起居":[{"方面":"...","建议":"..."}],"总结":"..."}';
 
-  fetch('http://127.0.0.1:8900/v1/chat/completions',{
+  fetch((location.hostname === '127.0.0.1' || location.hostname === 'localhost' ? 'http://127.0.0.1:8900' : '') + '/v1/chat/completions',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({model:'openclaw',messages:[{role:'user',content:prompt}],max_tokens:2000,temperature:0.4})

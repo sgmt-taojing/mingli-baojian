@@ -45,7 +45,7 @@ const KnowledgeIndex = (function() {
   ];
   
   // === API配置 ===
-  const API_BASE = 'http://127.0.0.1:8901/api';
+  const API_BASE = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? 'http://127.0.0.1:8901/api' : '';
   let apiAvailable = null; // null=未检测, true/false
   
   // === 缓存 ===

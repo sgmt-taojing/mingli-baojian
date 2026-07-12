@@ -4,7 +4,7 @@
 // 方法论：排盘→旺衰→用神→格局→岁运→十神六亲→分维度断语→调候趋避
 // ═══════════════════════════════════════════════════════════════
 
-var HEIGE_API = 'http://127.0.0.1:8911';
+var HEIGE_API = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? 'http://127.0.0.1:8911' : '';
 
 // HeiGe 方法论 11 步流程标签
 var HEIGE_STEPS = [
