@@ -16754,6 +16754,23 @@ function computeBazi() {
   copyBtn += '</div>';
   try { document.getElementById('baziResult').innerHTML += copyBtn; } catch(e) {}
 
+  // ═══════════════════════════════════════════════
+  // 🔔 排盘成功后立即推送老黄历信息
+  // 首次录入生辰的用户，排盘完成后按四板块模板推送当日老黄历
+  // ═══════════════════════════════════════════════
+  try {
+    var almanacPush = generateFirstPush(dayStem, dayBranch, year, month, day, name);
+    if (almanacPush) {
+      var pushContainer = document.createElement('div');
+      pushContainer.innerHTML = almanacPush;
+      pushContainer.style.cssText = 'margin-top:24px;animation:almanacFadeIn 0.6s ease';
+      var resultEl = document.getElementById('baziResult');
+      if (resultEl) resultEl.appendChild(pushContainer);
+      // 滚动到推送区域
+      setTimeout(function(){ pushContainer.scrollIntoView({behavior:'smooth',block:'start'}); }, 400);
+    }
+  } catch(e) { console.warn('老黄历推送生成失败:', e); }
+
   document.getElementById('baziResult').classList.add('visible');
   document.getElementById('baziResult').scrollIntoView({ behavior: 'smooth' });
   } catch(err) {
@@ -16763,6 +16780,665 @@ function computeBazi() {
     document.getElementById('baziResult').classList.add('visible');
     document.getElementById('baziResult').innerHTML = '<div style="padding:40px;text-align:center"><div style="font-size:48px;margin-bottom:16px">⚠️</div><h3 style="color:var(--gold);margin-bottom:12px">计算遇到问题</h3><p style="color:var(--paper2);font-size:14px;line-height:1.8">八字计算遇到异常，可能是日期输入有误或浏览器环境问题。<br>请尝试：<br>• 确认公历/农历日期正确<br>• 检查出生时间是否填写<br>• 刷新页面重试</p></div>';
   }
+}
+
+// ════════════════════════════════════════════════════════════════
+// 排盘完成后推送老黄历信息（四板块·八字·三教圆融）
+// 用户第一次录入生辰后立即推送，遵循 MEMORY.md 2026-07-11 定稿
+// ════════════════════════════════════════════════════════════════
+
+// 检查是否已推送过（避免重复推送）
+function _isFirstPushDone() {
+  try { return localStorage.getItem('_firstAlmanacPushed') === '1'; } catch(e) { return false; }
+}
+function _markFirstPushDone() {
+  try { localStorage.setItem('_firstAlmanacPushed', '1'); } catch(e) {}
+}
+
+const _PUSH_GAN_WUXING = {'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
+const _PUSH_ZHI_WUXING = {'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+const _PUSH_SHENGXIAO = {'子':'鼠','丑':'牛','寅':'虎','卯':'兔','辰':'龙','巳':'蛇','午':'马','未':'羊','申':'猴','酉':'鸡','戌':'狗','亥':'猪'};
+const _PUSH_JIANCHU = ['建','除','满','平','定','执','破','危','成','收','开','闭'];
+const _PUSH_YIJI = {
+  '建': {yi:'祭祀 祈福 出行 赴任',ji:'动土 开仓'},
+  '除': {yi:'沐浴 扫舍 祭祀 解除',ji:'嫁娶 求医'},
+  '满': {yi:'祭祀 祈福 补垣 塞穴',ji:'嫁娶 安葬'},
+  '平': {yi:'修造 动土 平治道涂',ji:'祭祀 祈福'},
+  '定': {yi:'祭祀 祈福 冠笄 嫁娶',ji:'出行 词讼'},
+  '执': {yi:'捕捉 畋猎 祭祀',ji:'开市 立券'},
+  '破': {yi:'求医疗病 破屋坏垣',ji:'嫁娶 开市 安葬'},
+  '危': {yi:'祭祀 祈福 安床',ji:'登山 乘船'},
+  '成': {yi:'祭祀 祈福 开市 立券 交易',ji:'词讼 出行'},
+  '收': {yi:'祭祀 纳财 收纳',ji:'出行 安葬'},
+  '开': {yi:'祭祀 祈福 求嗣 赴任',ji:'安葬 动土'},
+  '闭': {yi:'筑堤 塞穴 祭祀',ji:'开市 出行 嫁娶'}
+};
+const _PUSH_PENGZU = {
+  '甲':'甲不开仓，财物耗散','乙':'乙不栽植，千株不长','丙':'丙不修灶，必见灾殃',
+  '丁':'丁不剃头，头必生疮','戊':'戊不受田，田主不祥','己':'己不破券，二比并亡',
+  '庚':'庚不经络，织机虚张','辛':'辛不合酱，主人不尝','壬':'壬不汲水，更难提防','癸':'癸不词讼，理弱敌强'
+};
+const _PUSH_XISHEN_FANG = {
+  '甲':'艮（东北）','乙':'乾（西北）','丙':'坤（西南）','丁':'离（正南）',
+  '戊':'巽（东南）','己':'艮（东北）','庚':'乾（西北）','辛':'坤（西南）',
+  '壬':'离（正南）','癸':'巽（东南）'
+};
+const _PUSH_CAISHEN_FANG = {
+  '甲':'东北','乙':'东北','丙':'正西','丁':'正西',
+  '戊':'正北','己':'正北','庚':'正东','辛':'正东',
+  '壬':'正南','癸':'正南'
+};
+const _PUSH_FUSHEN_FANG = {
+  '甲':'东南','乙':'东南','丙':'正东','丁':'正东',
+  '戊':'正北','己':'正北','庚':'西南','辛':'西南',
+  '壬':'西北','癸':'西北'
+};
+const _PUSH_BENMING_FO = {
+  '鼠':'千手观音菩萨','牛':'虚空藏菩萨','虎':'虚空藏菩萨','兔':'文殊菩萨',
+  '龙':'普贤菩萨','蛇':'普贤菩萨','马':'大势至菩萨','羊':'大日如来佛',
+  '猴':'大日如来佛','鸡':'不动尊菩萨','狗':'阿弥陀佛','猪':'阿弥陀佛'
+};
+const _PUSH_WUXING_YANGSHENG = {
+  '木': {organ:'肝胆',acupoint:'太冲穴（足背一、二跖骨结合部之前凹陷处）',color:'青绿',emotion:'怒',season:'春',tip:'宜疏肝理气，多食酸味，避免熬夜，23点前入睡养肝'},
+  '火': {organ:'心脏小肠',acupoint:'内关穴（手腕横纹上2寸，两筋之间）',color:'红紫',emotion:'喜',season:'夏',tip:'宜养心安神，避免剧烈情绪波动，中午小憩养心'},
+  '土': {organ:'脾胃',acupoint:'足三里穴（外膝眼下3寸，胫骨外侧一横指）',color:'黄',emotion:'思',season:'长夏',tip:'宜健脾和胃，饮食规律七分饱，少食生冷甜腻'},
+  '金': {organ:'肺与大肠',acupoint:'列缺穴（两手虎口交叉，食指尖所到凹陷处）',color:'白',emotion:'悲',season:'秋',tip:'宜润肺防燥，多食白色食物（梨、银耳），保持大便通畅'},
+  '水': {organ:'肾与膀胱',acupoint:'太溪穴（足内踝与跟腱之间凹陷处）',color:'黑',emotion:'恐',season:'冬',tip:'宜养肾藏精，节制房事，夜间23点前入睡养肾'}
+};
+const _PUSH_SHISHI_DINGLU = {
+  '子':{gan:'胆经当令',tip:'宜入睡养胆，23点前入睡为佳，忌熬夜'},
+  '丑':{gan:'肝经当令',tip:'深度睡眠养肝血，忌饮酒熬夜'},
+  '寅':{gan:'肺经当令',tip:'凌晨3-5点易醒者需养肺，注意呼吸道'},
+  '卯':{gan:'大肠经当令',tip:'宜起床喝温水排便，养成规律'},
+  '辰':{gan:'胃经当令',tip:'宜吃营养早餐，7-9点胃经最旺'},
+  '巳':{gan:'脾经当令',tip:'宜工作学习，脾主运化'},
+  '午':{gan:'心经当令',tip:'宜午间小憩15-30分钟养心'},
+  '未':{gan:'小肠经当令',tip:'宜午餐七分饱，13-15点小肠分清浊'},
+  '申':{gan:'膀胱经当令',tip:'宜多饮水排毒，运动出微汗'},
+  '酉':{gan:'肾经当令',tip:'宜静心休息，肾藏精'},
+  '戌':{gan:'心包经当令',tip:'宜散步放松，饭后百步走'},
+  '亥':{gan:'三焦经当令',tip:'宜静心准备入睡，21-23点三焦通百脉'}
+};
+
+function _pushGetJieqi(month, day) {
+  const jq = [
+    [1,6,'小寒'],[1,20,'大寒'],[2,4,'立春'],[2,19,'雨水'],
+    [3,6,'惊蛰'],[3,21,'春分'],[4,5,'清明'],[4,20,'谷雨'],
+    [5,6,'立夏'],[5,21,'小满'],[6,6,'芒种'],[6,21,'夏至'],
+    [7,7,'小暑'],[7,23,'大暑'],[8,8,'立秋'],[8,23,'处暑'],
+    [9,8,'白露'],[9,23,'秋分'],[10,8,'寒露'],[10,23,'霜降'],
+    [11,7,'立冬'],[11,22,'小雪'],[12,7,'大雪'],[12,22,'冬至']
+  ];
+  let cur = '';
+  for (const [m,d,n] of jq) {
+    if (month === m && day >= d) cur = n;
+    else if (month > m) cur = n;
+  }
+  return cur || '冬至';
+}
+
+function _pushCalcDayGanzhi(y, m, d) {
+  const base = new Date(1900, 0, 31);
+  const tgt = new Date(y, m-1, d);
+  const diff = Math.floor((tgt - base) / 86400000);
+  const dayGanIdx = diff % 10;
+  const dayZhiIdx = (diff + 4) % 12;
+  const gan = '甲乙丙丁戊己庚辛壬癸'[dayGanIdx];
+  const zhi = '子丑寅卯辰巳午未申酉戌亥'[dayZhiIdx];
+  return {gan, zhi, dayGanIdx, dayZhiIdx};
+}
+
+function _pushCalcTodayGanzhi() {
+  const now = new Date();
+  return _pushCalcDayGanzhi(now.getFullYear(), now.getMonth()+1, now.getDate());
+}
+
+function generateFirstPush(dayStem, dayBranch, birthYear, birthMonth, birthDay, userName) {
+  // 仅首次录入生辰的用户触发，避免重复推送
+  if (_isFirstPushDone()) return '';
+
+  const now = new Date();
+  const today = _pushCalcTodayGanzhi();
+  const todayStr = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`;
+  const weekdayNames = ['周日','周一','周二','周三','周四','周五','周六'];
+  const weekday = weekdayNames[now.getDay()];
+  const todayGan = today.gan;
+  const todayZhi = today.zhi;
+  const todayGanzhi = todayGan + todayZhi;
+  const todayShengxiao = _PUSH_SHENGXIAO[todayZhi];
+  const todayJianchu = _PUSH_JIANCHU[today.dayZhiIdx];
+  const todayYiji = _PUSH_YIJI[todayJianchu];
+  const todayXishen = _PUSH_XISHEN_FANG[todayGan];
+  const todayCaishen = _PUSH_CAISHEN_FANG[todayGan];
+  const todayFushen = _PUSH_FUSHEN_FANG[todayGan];
+  const todayPengzu = _PUSH_PENGZU[todayGan];
+
+  // 用户日主五行
+  const userDayElement = _PUSH_GAN_WUXING[dayStem] || '木';
+  const yangsheng = _PUSH_WUXING_YANGSHENG[userDayElement];
+
+  // 当前节气
+  const todayJieqi = _pushGetJieqi(now.getMonth()+1, now.getDate());
+  const birthJieqi = _pushGetJieqi(birthMonth, birthDay);
+  const birthShengxiao = birthMonth > 0 ? (_PUSH_SHENGXIAO['子丑寅卯辰巳午未申酉戌亥'[(birthYear - 4) % 12]] || '鼠') : '鼠';
+
+  // 本命佛
+  const benmingFo = _PUSH_BENMING_FO[birthShengxiao] || '阿弥陀佛';
+
+  // 当前时辰
+  const curHour = now.getHours();
+  const curShichenIdx = Math.floor((curHour + 1) / 2) % 12;
+  const curShichenName = '子丑寅卯辰巳午未申酉戌亥'[curShichenIdx];
+  const curShichenInfo = _PUSH_SHISHI_DINGLU[curShichenName];
+
+  // 计算本月干支与运势评分（按日主）
+  const userDayStrong = _pushDayMasterStrength(dayStem, dayBranch, birthMonth);
+
+  // 节气养生提示
+  const jieqiTip = _pushJieqiTip(todayJieqi, userDayElement);
+
+  // 本日冲煞
+  const chongMap = {'子':'午','丑':'未','寅':'申','卯':'酉','辰':'戌','巳':'亥','午':'子','未':'丑','申':'寅','酉':'卯','戌':'辰','亥':'巳'};
+  const chongZhi = chongMap[todayZhi];
+  const chongShengxiao = _PUSH_SHENGXIAO[chongZhi];
+
+  // 配色风格
+  const fortuneColor = userDayElement === '木' ? '#4caf50' : userDayElement === '火' ? '#e74c3c' : userDayElement === '土' ? '#ffc107' : userDayElement === '金' ? '#9e9e9e' : '#2196f3';
+
+  const greeting = _pushGreeting(curShichenName, userName);
+
+  const html = `
+<style>
+@keyframes almanacFadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.almanac-push{background:linear-gradient(135deg,#0e0e0e 0%,#1a1410 50%,#0e0e0e 100%);border:1px solid rgba(201,168,76,.3);border-radius:16px;padding:20px 18px;margin:24px 0;position:relative;overflow:hidden}
+.almanac-push::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#c9a84c,transparent)}
+.almanac-header{text-align:center;margin-bottom:18px;padding-bottom:14px;border-bottom:1px dashed rgba(201,168,76,.2)}
+.almanac-title{font-size:22px;font-weight:700;color:#c9a84c;letter-spacing:6px;margin-bottom:6px;font-family:'Ma Shan Zheng',serif}
+.almanac-subtitle{font-size:12px;color:#a09080;letter-spacing:2px;margin-bottom:4px}
+.almanac-greeting{font-size:13px;color:#d0c0a0;line-height:1.8;margin:10px 0;padding:12px;background:rgba(201,168,76,.04);border-radius:8px;border-left:3px solid #c9a84c}
+.almanac-board{margin:16px 0;padding:14px;background:rgba(255,255,255,.02);border-radius:12px;border:1px solid rgba(201,168,76,.12)}
+.almanac-board-title{font-size:15px;font-weight:700;color:#c9a84c;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.almanac-board-title::before{content:'';width:3px;height:14px;background:#c9a84c;border-radius:2px}
+.almanac-item{display:flex;justify-content:space-between;align-items:flex-start;padding:6px 0;border-bottom:1px dashed rgba(201,168,76,.06);font-size:12.5px;line-height:1.6}
+.almanac-item:last-child{border-bottom:none}
+.almanac-label{color:#a09080;flex-shrink:0;min-width:80px}
+.almanac-value{color:#d0c0a0;text-align:right;flex:1}
+.almanac-value.hl{color:#c9a84c;font-weight:600}
+.almanac-section{margin:14px 0;padding:12px;background:rgba(255,255,255,.015);border-radius:10px;border:1px solid rgba(201,168,76,.08)}
+.almanac-section-title{font-size:13px;font-weight:700;color:#c9a84c;margin-bottom:8px;letter-spacing:2px}
+.almanac-pill{display:inline-block;padding:3px 8px;border-radius:10px;font-size:11px;margin:2px;background:rgba(201,168,76,.1);color:#c9a84c}
+.almanac-pill.green{background:rgba(76,175,80,.15);color:#81c784}
+.almanac-pill.red{background:rgba(244,67,54,.15);color:#e57373}
+.almanac-disclaimer{text-align:center;margin-top:18px;padding-top:14px;border-top:1px dashed rgba(201,168,76,.15);font-size:10px;color:#806040;line-height:1.6}
+.almanac-action{text-align:center;margin-top:14px}
+.almanac-btn{display:inline-block;padding:8px 24px;background:linear-gradient(135deg,#c9a84c,#b8941f);color:#0a0a0a;border-radius:20px;font-size:12px;font-weight:600;letter-spacing:2px;cursor:pointer;border:none;text-decoration:none}
+.almanac-tip-line{padding:4px 0;color:#d0c0a0;font-size:12px}
+</style>
+<div class="almanac-push">
+  <div class="almanac-header">
+    <div class="almanac-title">🔔 缘主专属 · 今日推送</div>
+    <div class="almanac-subtitle">${todayStr} · ${weekday} · ${todayJieqi}节气</div>
+    <div style="font-size:11px;color:#806040;margin-top:4px">日干 ${todayGan} · 日支 ${todayZhi} · ${todayJianchu}日 · ${todayShengxiao}日</div>
+  </div>
+
+  <div class="almanac-greeting">
+    ${greeting}
+  </div>
+
+  
+
+  <div class="almanac-board">
+    <div class="almanac-board-title">🔮 鉴运知变 · 静观自在</div>
+    <div class="almanac-item">
+      <span class="almanac-label">您的日主</span>
+      <span class="almanac-value hl">${dayStem}（${userDayElement}）</span>
+    </div>
+    <div class="almanac-item">
+      <span class="almanac-label">日主强弱</span>
+      <span class="almanac-value">${userDayStrong.level}（${userDayStrong.desc}）</span>
+    </div>
+    <div class="almanac-item">
+      <span class="almanac-label">五行养生</span>
+      <span class="almanac-value">${yangsheng.organ} · ${yangsheng.color}色</span>
+    </div>
+    <div class="almanac-item">
+      <span class="almanac-label">保养穴位</span>
+      <span class="almanac-value">${yangsheng.acupoint}</span>
+    </div>
+    <div class="almanac-tip-line"><b style="color:#c9a84c">💆 ${yangsheng.tip}</b></div>
+    <div class="almanac-tip-line" style="margin-top:6px"><b style="color:#c9a84c">当前时辰（${curShichenName}时 ${String(curHour).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}）：</b>${curShichenInfo.gan}，${curShichenInfo.tip}</div>
+    <div class="almanac-tip-line" style="margin-top:6px"><b style="color:#c9a84c">健康预警：</b>${_pushHealthWarning(userDayElement, todayJieqi)}</div>
+    <div class="almanac-item" style="margin-top:8px">
+      <span class="almanac-label">今日运势</span>
+      <span class="almanac-value hl">${_pushFortuneScore(userDayElement, todayGan, todayJieqi)}</span>
+    </div>
+    <div class="almanac-tip-line">${_pushFortuneBrief(userDayElement, todayGan)}</div>
+  </div>
+
+  <div class="almanac-board">
+    <div class="almanac-board-title">🧭 顺天应时 · 致中达和</div>
+    <div class="almanac-item">
+      <span class="almanac-label">今日宜</span>
+      <span class="almanac-value hl">${todayYiji.yi}</span>
+    </div>
+    <div class="almanac-item">
+      <span class="almanac-label">今日忌</span>
+      <span class="almanac-value" style="color:#e57373">${todayYiji.ji}</span>
+    </div>
+    <div class="almanac-item">
+      <span class="almanac-label">建除</span>
+      <span class="almanac-value">${todayJianchu}日 · ${_pushJianchuDesc(todayJianchu)}</span>
+    </div>
+    <div class="almanac-item">
+      <span class="almanac-label">冲煞</span>
+      <span class="almanac-value">冲${chongShengxiao} · 煞${_pushSha(todayZhi)}</span>
+    </div>
+    <div class="almanac-item">
+      <span class="almanac-label">彭祖百忌</span>
+      <span class="almanac-value">${todayPengzu}</span>
+    </div>
+    <div class="almanac-item">
+      <span class="almanac-label">喜神方位</span>
+      <span class="almanac-value hl">${todayXishen}（祈福求喜）</span>
+    </div>
+    <div class="almanac-item">
+      <span class="almanac-label">财神方位</span>
+      <span class="almanac-value hl">${todayCaishen}（求财谈生意）</span>
+    </div>
+    <div class="almanac-item">
+      <span class="almanac-label">福神方位</span>
+      <span class="almanac-value hl">${todayFushen}（祈福求福）</span>
+    </div>
+    <div class="almanac-item">
+      <span class="almanac-label">今日吉时</span>
+      <span class="almanac-value hl">${_pushGetJiShi(todayGanzhi)}</span>
+    </div>
+    <div class="almanac-tip-line" style="margin-top:10px"><b style="color:#c9a84c">👔 今日穿衣（${userDayElement}命·${todayJieqi}）：</b>${_pushDress(userDayElement, todayJieqi)}</div>
+    <div class="almanac-tip-line" style="margin-top:6px"><b style="color:#c9a84c">💎 今日幸运饰：</b>翡翠/绿幽灵/檀木（左手佩戴纳福）·黑曜石/虎眼石（右手佩戴辟邪）·本命佛戴脖子护身</div>
+  </div>
+
+  <div class="almanac-board">
+    <div class="almanac-board-title">🙏 敬天法祖 · 顺时养生</div>
+    <div class="almanac-item">
+      <span class="almanac-label">节气</span>
+      <span class="almanac-value hl">${todayJieqi}</span>
+    </div>
+    <div class="almanac-tip-line">🌿 ${jieqiTip}</div>
+    <div class="almanac-tip-line" style="margin-top:6px"><b style="color:#c9a84c">${todayJieqi}养生要点：</b>${_pushJieqiYangsheng(todayJieqi)}</div>
+    <div class="almanac-item" style="margin-top:10px">
+      <span class="almanac-label">本命佛</span>
+      <span class="almanac-value hl">${benmingFo}</span>
+    </div>
+    <div class="almanac-tip-line">🪷 缘主属相为<b style="color:#c9a84c">${birthShengxiao}</b>，本命佛为<b style="color:#c9a84c">${benmingFo}</b>，可常诵「南无${benmingFo}」圣号，护佑平安。</div>
+    <div class="almanac-tip-line" style="margin-top:6px"><b style="color:#c9a84c">参拜指南：</b>今日可向<b style="color:#c9a84c">${todayXishen}</b>方向虔诚上香三炷，祈愿<b style="color:#c9a84c">${userName}</b>顺心遂意。</div>
+    <div class="almanac-tip-line" style="margin-top:6px">${_pushCibaiGuide(benmingFo)}</div>
+    <div class="almanac-tip-line" style="margin-top:10px;padding-top:10px;border-top:1px dashed rgba(201,168,76,.2)"><b style="color:#c9a84c">📅 近期节日提醒（7天内）：</b>${(()=>{const fs=_pushUpcomingFestivals(7);return fs.length?fs.join(' ｜ '):'近期无重大节日';})()}</div>
+  </div>
+
+  <div class="almanac-board">
+    <div class="almanac-board-title">📿 修己安人 · 明心见性</div>
+    <div class="almanac-tip-line"><b style="color:#c9a84c">今日修行：</b>${_pushDailyXiu(userDayElement, weekday)}</div>
+    <div class="almanac-tip-line" style="margin-top:6px"><b style="color:#c9a84c">今日口诀：</b><span style="font-family:'Ma Shan Zheng',serif;font-size:14px;letter-spacing:3px;color:#c9a84c">${_pushDailyKoujue(todayGan)}</span></div>
+    <div class="almanac-tip-line" style="margin-top:6px"><b style="color:#c9a84c">今日神咒（${todayGan}日）：</b>${_pushDailyShenzhou(todayGan)}</div>
+    <div class="almanac-tip-line" style="margin-top:6px"><b style="color:#c9a84c">正念：</b>${_pushZhengnian(todayJieqi)}</div>
+    <div class="almanac-tip-line" style="margin-top:6px"><b style="color:#c9a84c">离火九运忠告：</b>${_pushLiHuoJiuYun(userDayElement)}</div>
+    <div class="almanac-tip-line" style="margin-top:6px"><b style="color:#c9a84c">鼓励语：</b>${_pushEncourage(userName, userDayElement, curShichenName)}</div>
+  </div>
+
+  <div class="almanac-action">
+    <a class="almanac-btn" onclick="localStorage.setItem('_firstAlmanacPushed','1');this.parentElement.parentElement.style.display='none'">✅ 已阅，今日不再推送</a>
+  </div>
+
+  <div class="almanac-disclaimer">
+    ⚠️ 以上内容仅供文化交流与生活参考（AI 辅助创作），不构成任何决策依据。<br>
+    重大事项请结合实际情况理性判断。🙏 祝您今日吉祥如意，平安喜顺！
+  </div>
+</div>`;
+
+  _markFirstPushDone();
+  return html;
+}
+
+function _pushGreeting(shichen, name) {
+  const greetings = {
+    '子':`夜已深，<b style="color:#c9a84c">${name}</b>缘主，肝胆当令，请放下手机早些休息。明日运势已在命盘之中，今夜安心入眠便是最好的修行。`,
+    '丑':`子夜时分，<b style="color:#c9a84c">${name}</b>缘主若还未入睡，宜静心宁神，闭目养神片刻亦可养肝血。`,
+    '寅':`平旦时分，肺经当令。<b style="color:#c9a84c">${name}</b>缘主醒来宜深呼吸几口新鲜空气，开始新的一天。`,
+    '卯':`日出东方，<b style="color:#c9a84c">${name}</b>缘主早安！新的一天已经开始，大肠经当令，宜起床喝温水排便。`,
+    '辰':`辰时光明，<b style="color:#c9a84c">${name}</b>缘主早安！胃经当令，宜吃营养早餐，开启美好一天。`,
+    '巳':`巳时日中，<b style="color:#c9a84c">${name}</b>缘主此时精力充沛，脾经当令，宜专心工作学习。`,
+    '午':`日中阳盛，<b style="color:#c9a84c">${name}</b>缘主午时安好！心经当令，宜午间小憩15分钟养心。`,
+    '未':`未时小肠，<b style="color:#c9a84c">${name}</b>缘主下午好！小肠分清浊，宜七分饱午餐已过。`,
+    '申':`申时金旺，<b style="color:#c9a84c">${name}</b>缘主申时安好！膀胱经当令，宜多饮水。`,
+    '酉':`酉时日入，<b style="color:#c9a84c">${name}</b>缘主傍晚安好！肾经当令，宜静心收工。`,
+    '戌':`戌时黄昏，<b style="color:#c9a84c">${name}</b>缘主晚安！心包经当令，宜散步放松。`,
+    '亥':`亥时人定，<b style="color:#c9a84c">${name}</b>缘主将息！三焦经当令，宜静心准备入睡。`
+  };
+  return greetings[shichen] || greetings['辰'];
+}
+
+function _pushJianchuDesc(jc) {
+  const desc = {
+    '建':'宜建功立业，不宜动土开仓','除':'宜除旧布新，扫舍沐浴','满':'宜祈福祭祀，不宜嫁娶安葬',
+    '平':'宜平治道涂，不宜祈福','定':'宜祈福嫁娶，不宜出行诉讼','执':'宜捕捉畋猎，不宜开市',
+    '破':'宜破屋坏垣求医，不宜嫁娶','危':'宜安床祭祀，不宜登山乘船','成':'宜开市立券交易，不宜诉讼出行',
+    '收':'宜纳财收纳，不宜出行安葬','开':'宜赴任求嗣，不宜安葬动土','闭':'宜筑堤塞穴，不宜开市出行嫁娶'
+  };
+  return desc[jc] || '宜守常规';
+}
+
+function _pushSha(zhi) {
+  const shaMap = {'子':'南','丑':'东','寅':'北','卯':'西','辰':'南','巳':'东','午':'北','未':'西','申':'南','酉':'东','戌':'北','亥':'西'};
+  return shaMap[zhi] || '南';
+}
+
+function _pushJieqiTip(jq, ele) {
+  const tips = {
+    '立春':'万物复苏，新年之始。今日宜祭太岁、换新衣、向东方出行。',
+    '雨水':'天降甘霖，润泽万物。宜育苗播种，忌动土迁居。',
+    '惊蛰':'春雷初响，蛰虫始振。宜驱虫除秽，忌嫁娶。',
+    '春分':'昼夜均分，阴阳相半。宜祭祀祈福，平衡身心。',
+    '清明':'气清景明，扫墓祭祖。宜踏青植树，忌探病。',
+    '谷雨':'雨生百谷，润苗助长。宜种移栽，忌远行。',
+    '立夏':'夏之始也，气温渐升。宜清淡饮食，忌辛辣油腻。',
+    '小满':'麦粒渐满，将熟未熟。宜静心养性，忌急躁。',
+    '芒种':'有芒之谷可种，农忙时节。宜勤勉，忌懒散。',
+    '夏至':'日长至极，阳气最盛。宜午间小憩，忌熬夜。',
+    '小暑':'天气炎热，尚未极热。宜消暑避热，忌暴晒。',
+    '大暑':'一年最热，酷暑难当。宜饮绿豆汤，忌辛燥。',
+    '立秋':'秋之始也，暑去凉来。宜润燥养肺，忌寒凉。',
+    '处暑':'暑气止也，天气转凉。宜调整作息，忌贪凉。',
+    '白露':'露凝而白，秋意渐浓。宜添衣保暖，忌露腹。',
+    '秋分':'昼夜均分，秋色正浓。宜赏月品蟹，忌悲伤。',
+    '寒露':'露寒欲凝，气温骤降。宜足浴暖身，忌秋冻过度。',
+    '霜降':'初霜降临，草木黄落。宜进补御寒，忌生冷。',
+    '立冬':'冬之始也，万物收藏。宜温补养藏，忌出汗过多。',
+    '小雪':'始降雪花，天地肃穆。宜温养肾气，忌寒凉。',
+    '大雪':'雪盛天寒，冰封万里。宜暖炉围坐，忌远行。',
+    '冬至':'阴极阳生，一阳来复。宜吃饺子汤圆，忌嫁娶出行。',
+    '小寒':'寒气渐盛，尚未极寒。宜温补，忌寒凉。',
+    '大寒':'一年最冷，寒至极点。宜暖食温补，忌外出受寒。'
+  };
+  return tips[jq] || '顺时养生，趋吉避凶。';
+}
+
+function _pushJieqiYangsheng(jq) {
+  const yg = {
+    '立春':'春捂秋冻，饮食少酸多甘，养肝护脾','雨水':'健脾祛湿，多食薏米山药','惊蛰':'养肝明目，多食枸杞菠菜',
+    '春分':'阴阳平衡，多食时令蔬菜','清明':'疏肝清肺，扫墓踏青','谷雨':'健脾祛湿，多食香椿菠菜',
+    '立夏':'养心安神，清淡饮食','小满':'清热利湿，多食苦瓜','芒种':'健脾化湿，多食薏米红豆',
+    '夏至':'清心防暑，多食绿豆','小暑':'清热解暑，避免暴晒','大暑':'防暑降温，多饮绿豆汤酸梅汤',
+    '立秋':'润燥养肺，多食银耳百合','处暑':'养肺防燥，饮食清淡','白露':'养阴润燥，多食梨蜂蜜',
+    '秋分':'润肺防燥，多食芝麻核桃','寒露':'足浴暖身，多食山药莲子','霜降':'温补脾肾，多食柿子栗子',
+    '立冬':'温补养藏，多食羊肉黑芝麻','小雪':'温肾助阳，多食黑豆核桃','大雪':'温补脾肾，注意保暖',
+    '冬至':'进补最佳，多食饺子羊肉','小寒':'温补脾肾，多食糯米桂圆','大寒':'防寒保暖，多食姜枣'
+  };
+  return yg[jq] || '顺时养生，饮食有节，起居有常';
+}
+
+function _pushHealthWarning(ele, jq) {
+  const warn = {
+    '木': ele === '金' ? '⚠️ 今日金克木，注意肝胆、筋骨，避免怒气伤肝' : '木旺需疏肝理气，避免久视伤血',
+    '火': ele === '水' ? '⚠️ 今日水克火，注意心脏、小肠，避免剧烈运动' : '火旺需养心安神，避免炎热暴晒',
+    '土': ele === '木' ? '⚠️ 今日木克土，注意脾胃、消化，避免生冷饮食' : '土旺需健脾和胃，避免思虑过度',
+    '金': ele === '火' ? '⚠️ 今日火克金，注意肺、呼吸道、皮肤' : '金旺需润肺防燥，多食白色食物',
+    '水': ele === '土' ? '⚠️ 今日土克水，注意肾、膀胱、泌尿系统' : '水旺需养肾藏精，避免寒凉侵袭'
+  };
+  return warn[ele] || '今日注意饮食有节，起居有常';
+}
+
+function _pushDayMasterStrength(dayStem, dayBranch, birthMonth) {
+  // 简化版日主强弱判断（仅作推送展示用）
+  const yinD = ['乙','丁','己','辛','癸'];
+  const isYin = yinD.indexOf(dayStem) >= 0;
+  const monthSeason = {'寅':'春','卯':'春','辰':'春','巳':'夏','午':'夏','未':'夏','申':'秋','酉':'秋','戌':'秋','亥':'冬','子':'冬','丑':'冬'};
+  const season = monthSeason[dayBranch] || '';
+  const strongMonth = {
+    '甲':['寅','卯'],'乙':['寅','卯'],
+    '丙':['巳','午'],'丁':['巳','午'],
+    '戊':['辰','戌','丑','未'],'己':['辰','戌','丑','未'],
+    '庚':['申','酉'],'辛':['申','酉'],
+    '壬':['亥','子'],'癸':['亥','子']
+  };
+  const strong = strongMonth[dayStem] || [];
+  const inStrong = strong.indexOf(dayBranch) >= 0;
+  if (inStrong) return {level:'偏旺', desc:`生于${season}令得气`};
+  return {level:'平和', desc:`五行流通尚可`};
+}
+
+function _pushFortuneScore(userEle, todayGan, jq) {
+  // 简化版今日运势评分（按日主五行与今日日干关系）
+  const userGanWuxing = _PUSH_GAN_WUXING[userEle];
+  const todayGanWuxing = _PUSH_GAN_WUXING[todayGan];
+  const shengMap = {'木':'火','火':'土','土':'金','金':'水','水':'木'};
+  const keMap = {'木':'土','土':'水','水':'火','火':'金','金':'木'};
+  const isSheng = shengMap[userGanWuxing] === todayGanWuxing;
+  const isKe = keMap[userGanWuxing] === todayGanWuxing;
+  const score = isSheng ? 85 : isKe ? 70 : 75;
+  const label = score >= 85 ? '🟢 上上' : score >= 75 ? '🟢 上吉' : '🟡 中平';
+  return `${label} · ${score}分`;
+}
+
+function _pushFortuneBrief(userEle, todayGan) {
+  const briefs = {
+    '木':`今日日干<b style="color:#c9a84c">${todayGan}</b>，木命之人多遇贵人，宜广结善缘，事业有进展。`,
+    '火':`今日日干<b style="color:#c9a84c">${todayGan}</b>，火命之人灵感涌现，宜主动出击，事业有突破。`,
+    '土':`今日日干<b style="color:#c9a84c">${todayGan}</b>，土命之人沉稳有加，宜脚踏实地，稳中求进。`,
+    '金':`今日日干<b style="color:#c9a84c">${todayGan}</b>，金命之人决断力强，宜果断处理，财运有起色。`,
+    '水':`今日日干<b style="color:#c9a84c">${todayGan}</b>，水命之人智慧敏捷，宜学习充电，谋定后动。`
+  };
+  return briefs[userEle] || '今日宜顺势而为，稳中求进。';
+}
+
+function _pushDailyXiu(userEle, weekday) {
+  const xiu = {
+    '木':'静坐冥想15分钟，观想青色能量入肝养木气','火':'正午小憩15分钟养心，常念"静"字诀安神','土':'饭后百步走，摩腹36圈健脾和胃','金':'深呼吸36次润肺，白露时节多食梨','水':'睡前泡脚15分钟，温肾助阳'
+  };
+  return xiu[userEle] || '每日静坐15分钟，调息养神';
+}
+
+function _pushLiHuoJiuYun(userEle) {
+  const tips = {
+    '木': '离火运中，木生火，您的智慧如春木滋养离火，利文化、教育、创意行业。注意勿过度消耗精力，适时休养。',
+    '火': '离火运中，火火相旺，您正处于大势之中！利科技、美容、餐饮、传媒。注意防火气过旺，宜静心冥想。',
+    '土': '离火运中，火生土，您会得到时代大势的滋养。利房地产、农业、健康产业。注意保持稳重，不急不躁。',
+    '金': '离火运中，火克金，压力较大。但压力即动力，利精密制造、金融、法律。注意肺部健康，多做深呼吸。',
+    '水': '离火运中，水克火，您有能力驾驭时代之势。利科技、流通、咨询。注意勿过度操劳，保11点前入睡。'
+  };
+  return tips[userEle] || tips['木'];
+}
+
+function _pushDailyKoujue(todayGan) {
+  // 按今日日干给口诀
+  const koujue = [
+    '念念清明，心无挂碍；日日精进，福慧双修。',
+    '行住坐卧皆是道，举手投足尽禅机。',
+    '心存善念福自来，身修正道慧自开。',
+    '诸恶莫作众善奉行，自净其意是诸佛教。',
+    '见贤思齐焉，见不贤而内自省也。',
+    '天行健君子以自强不息，地势坤君子以厚德载物。',
+    '上善若水，水善利万物而不争。',
+    '知止而后有定，定而后能静，静而后能安。',
+    '心若简单世界就简单，心若善良众生皆善良。',
+    '一日三省吾身，为人谋而不忠乎？与朋友交而不信乎？'
+  ];
+  const idx = '甲乙丙丁戊己庚辛壬癸'.indexOf(todayGan);
+  return koujue[idx >= 0 ? idx : 0];
+}
+
+function _pushZhengnian(jq) {
+  const zn = {
+    '立春':'春风拂面万象新，一念清明万物生',
+    '雨水':'春雨润物细无声，心田滋养德自成',
+    '惊蛰':'一雷惊醒梦中人，知止而后天地宽',
+    '春分':'昼夜等分阴阳和，心平气和万事兴',
+    '清明':'气清景明心自净，慎终追远祭祖先',
+    '谷雨':'雨生百谷春将暮，珍惜光阴莫虚度',
+    '立夏':'夏气蓬勃万物长，心如明镜自清凉',
+    '小满':'小满未满留余地，知足常乐得圆满',
+    '芒种':'忙种忙收皆有时，因缘和合自成蹊',
+    '夏至':'阳极阴生天地转，收敛心神养精气',
+    '小暑':'暑热炼心志愈坚，安住当下即清凉',
+    '大暑':'酷暑炼真心如莲，烦恼炽盛化清凉',
+    '立秋':'秋高气爽心清明，澄怀观道悟真如',
+    '处暑':'暑去凉来心安然，知止常乐道自成',
+    '白露':'露白月明两相照，心如皓月净无尘',
+    '秋分':'秋色平分昼夜均，中正平和养心身',
+    '寒露':'露寒凝珠心如镜，返照自性见本真',
+    '霜降':'霜降万物始收藏，藏精养神度秋冬',
+    '立冬':'冬藏万物蓄生机，反观内照养根元',
+    '小雪':'雪落无声心自静，淡泊明志度寒冬',
+    '大雪':'大雪压枝志更高，磨砺身心待春来',
+    '冬至':'一阳来复天地转，慎终追远续慧命',
+    '小寒':'寒尽春来万物苏，磨砺身心待朝阳',
+    '大寒':'大寒至极春将至，否极泰来万事新'
+  };
+  return zn[jq] || '心安即是归处，身正则影端';
+}
+
+function _pushEncourage(name, ele, shichen) {
+  const ex = {
+    '木':`缘主<b style="color:#c9a84c">${name}</b>，您如春日之木，向上生长。请记住：所有的等待都在酝酿一场蓬勃的绿意。今日所行，皆是根深叶茂之基。`,
+    '火':`缘主<b style="color:#c9a84c">${name}</b>，您如夏日之火，光明温暖。请记住：热情不会熄灭，只会在合适的时候重新点燃。今日所历，皆是内心的光芒。`,
+    '土':`缘主<b style="color:#c9a84c">${name}</b>，您如四季之土，承载万物。请记住：厚德载物，踏实每一步都不会白走。今日所为，皆是厚积薄发之根。`,
+    '金':`缘主<b style="color:#c9a84c">${name}</b>，您如秋日之金，纯净刚毅。请记住：百炼成钢，每一次磨砺都让您更接近本真。今日所决，皆是智慧之果。`,
+    '水':`缘主<b style="color:#c9a84c">${name}</b>，您如冬日之水，柔韧包容。请记住：上善若水，柔能克刚。今日所学，皆是智慧之源。`
+  };
+  return ex[ele] || `缘主<b style="color:#c9a84c">${name}</b>，愿您今日所行皆有所得，所遇皆为贵人。`;
+}
+
+// === 吉时推算（按日干支推算十二时辰吉凶） ===
+const _PUSH_JISHI = {
+  '甲子':['子','卯','午','酉'],'乙丑':['丑','辰','未','戌'],'丙寅':['寅','巳','申','亥'],
+  '丁卯':['卯','午','酉','子'],'戊辰':['辰','未','戌','丑'],'己巳':['巳','申','亥','寅'],
+  '庚午':['午','酉','子','卯'],'辛未':['未','戌','丑','辰'],'壬申':['申','亥','寅','巳'],
+  '癸酉':['酉','子','卯','午'],
+  '甲戌':['戌','丑','辰','未'],'乙亥':['亥','寅','巳','申'],'丙子':['子','卯','午','酉'],
+  '丁丑':['丑','辰','未','戌'],'戊寅':['寅','巳','申','亥'],'己卯':['卯','午','酉','子'],
+  '庚辰':['辰','未','戌','丑'],'辛巳':['巳','申','亥','寅'],'壬午':['午','酉','子','卯'],
+  '癸未':['未','戌','丑','辰'],'甲申':['申','亥','寅','巳'],'乙酉':['酉','子','卯','午'],
+  '丙戌':['戌','丑','辰','未'],'丁亥':['亥','寅','巳','申'],'戊子':['子','卯','午','酉'],
+  '己丑':['丑','辰','未','戌'],'庚寅':['寅','巳','申','亥'],'辛卯':['卯','午','酉','子'],
+  '壬辰':['辰','未','戌','丑'],'癸巳':['巳','申','亥','寅'],'甲午':['午','酉','子','卯'],
+  '乙未':['未','戌','丑','辰'],'丙申':['申','亥','寅','巳'],'丁酉':['酉','子','卯','午'],
+  '戊戌':['戌','丑','辰','未'],'己亥':['亥','寅','巳','申'],'庚子':['子','卯','午','酉'],
+  '辛丑':['丑','辰','未','戌'],'壬寅':['寅','巳','申','亥'],'癸卯':['卯','午','酉','子'],
+  '甲辰':['辰','未','戌','丑'],'乙巳':['巳','申','亥','寅'],'丙午':['午','酉','子','卯'],
+  '丁未':['未','戌','丑','辰'],'戊申':['申','亥','寅','巳'],'己酉':['酉','子','卯','午'],
+  '庚戌':['戌','丑','辰','未'],'辛亥':['亥','寅','巳','申'],'壬子':['子','卯','午','酉'],
+  '癸丑':['丑','辰','未','戌'],'甲寅':['寅','巳','申','亥'],'乙卯':['卯','午','酉','子'],
+  '丙辰':['辰','未','戌','丑'],'丁巳':['巳','申','亥','寅'],'戊午':['午','酉','子','卯'],
+  '己未':['未','戌','丑','辰'],'庚申':['申','亥','寅','巳'],'辛酉':['酉','子','卯','午'],
+  '壬戌':['戌','丑','辰','未'],'癸亥':['亥','寅','巳','申']
+};
+const _PUSH_SHI_RANGE = {
+  '子':'23-1','丑':'1-3','寅':'3-5','卯':'5-7','辰':'7-9','巳':'9-11',
+  '午':'11-13','未':'13-15','申':'15-17','酉':'17-19','戌':'19-21','亥':'21-23'
+};
+function _pushGetJiShi(todayGanzhi) {
+  const jishi = _PUSH_JISHI[todayGanzhi] || ['子','卯','午','酉'];
+  return jishi.map(function(zhi) { return zhi + '时(' + (_PUSH_SHI_RANGE[zhi] || '') + '点)'; }).join('、');
+}
+
+// === 穿衣建议（按五行喜用 + 节气） ===
+const _PUSH_DRESS = {
+  '木': {color:'绿色/青色', aux:'红色/紫色点缀', mat:'棉麻/亚麻/竹纤维', tip:'生发之木，宜清新有活力'},
+  '火': {color:'红色/紫色', aux:'绿色/青色点缀', mat:'丝缎/绸缎/亚麻', tip:'明亮热烈，宜光泽有质感'},
+  '土': {color:'黄色/咖色', aux:'红色/橙色点缀', mat:'棉麻/羊毛/混纺', tip:'沉稳厚重，宜质朴有质感'},
+  '金': {color:'白色/银色', aux:'黄色/咖色点缀', mat:'丝绸/棉/金属配饰', tip:'纯净利落，宜简洁有质感'},
+  '水': {color:'黑色/蓝色', aux:'白色/银色点缀', mat:'丝绸/棉麻/雪纺', tip:'深邃内敛，宜柔和有层次'}
+};
+function _pushDress(userEle, jq) {
+  const d = _PUSH_DRESS[userEle] || _PUSH_DRESS['木'];
+  let seasonal = '';
+  if (jq === '立春' || jq === '雨水' || jq === '惊蛰' || jq === '春分' || jq === '清明' || jq === '谷雨') {
+    seasonal = '春季气温多变，建议洋葱式穿搭：薄外套+内搭，方便增减';
+  } else if (jq === '立夏' || jq === '小满' || jq === '芒种' || jq === '夏至' || jq === '小暑' || jq === '大暑') {
+    seasonal = '夏季炎热，建议透气短袖+防晒衣，常备雨具';
+  } else if (jq === '立秋' || jq === '处暑' || jq === '白露' || jq === '秋分' || jq === '寒露' || jq === '霜降') {
+    seasonal = '秋季干燥，建议长袖+薄外套，多食润燥食物';
+  } else {
+    seasonal = '冬季寒冷，建议保暖为主，围巾手套不可少';
+  }
+  return `<b style="color:#c9a84c">${d.color}</b>为主色，<b style="color:#c9a84c">${d.aux}</b>为辅色。${d.mat}。${seasonal}。${d.tip}。`;
+}
+
+// === 近期节日提醒（公历+农历混合） ===
+const _PUSH_FESTIVAL_DB = {
+  // 公历节日
+  '1-1':'元旦','2-14':'情人节','3-8':'妇女节','3-12':'植树节','3-15':'消费者权益日',
+  '4-1':'愚人节','4-5':'清明节','5-1':'劳动节','5-4':'青年节','6-1':'儿童节',
+  '6-6':'爱眼日','7-1':'建党节','8-1':'建军节','9-10':'教师节','10-1':'国庆节',
+  '10-31':'万圣夜','11-11':'双十一','12-24':'平安夜','12-25':'圣诞节',
+  // 农历节日（2026年公历近似日期）
+  '2026-2-17':'春节','2026-2-3':'小年','2026-3-3':'元宵节','2026-3-20':'龙抬头',
+  '2026-4-19':'上巳节','2026-6-19':'端午节','2026-8-19':'七夕节','2026-8-27':'中元节',
+  '2026-9-26':'中秋节·财神赵公明圣诞','2026-10-19':'重阳节','2026-1-25':'腊八节',
+  '2026-4-15':'释迦牟尼佛诞日','2026-7-10':'地藏王菩萨圣诞','2026-10-2':'观世音菩萨出家日',
+  '2026-10-13':'药师佛圣诞','2026-5-28':'关圣帝君圣诞','2026-12-29':'阿弥陀佛圣诞',
+  '2026-1-7':'腊八节','2026-3-4':'太上老君圣诞'
+};
+function _pushUpcomingFestivals(days) {
+  days = days || 7;
+  const now = new Date();
+  const items = [];
+  for (let i = 0; i <= days; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
+    const ymd = d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
+    const md = (d.getMonth()+1) + '-' + d.getDate();
+    const name1 = _PUSH_FESTIVAL_DB[ymd];
+    const name2 = _PUSH_FESTIVAL_DB[md];
+    const name = name1 || name2;
+    if (name) {
+      const tag = i === 0 ? '🎯 今日' : (i === 1 ? '明日' : i + '天后');
+      items.push(tag + ' ' + name);
+    }
+  }
+  return items;
+}
+
+// === 完整参拜指南 ===
+const _PUSH_CIBAI_DEITIES = {
+  '观世音菩萨': { desc:'大慈大悲观世音，救苦救难', yunwen:'《心经》《观世音菩萨普门品》', suyu:'南无大慈大悲观世音菩萨', zhu:'求姻缘/求子/求平安/化解厄运' },
+  '文殊菩萨': { desc:'智慧之剑，破诸痴暗', yunwen:'《文殊师利问菩提经》', suyu:'南无文殊师利菩萨', zhu:'求学业/求智慧/求考试顺利' },
+  '普贤菩萨': { desc:'大行普贤，十大愿王', yunwen:'《普贤行愿品》', suyu:'南无普贤菩萨', zhu:'求事业/求实践/求大愿成就' },
+  '地藏王菩萨': { desc:'大愿地藏，度尽众生', yunwen:'《地藏经》《地藏菩萨本愿经》', suyu:'南无大愿地藏王菩萨', zhu:'超度先人/消灾延寿/孝亲报恩' },
+  '大势至菩萨': { desc:'大势至菩萨，都摄六根', yunwen:'《楞严经·大势至菩萨念佛圆通章》', suyu:'南无大势至菩萨', zhu:'修行精进/净业成就' },
+  '虚空藏菩萨': { desc:'虚空藏菩萨，功德宝藏', yunwen:'《虚空藏菩萨经》', suyu:'南无虚空藏菩萨', zhu:'求福德/求智慧/求财富/求官位' },
+  '阿弥陀佛': { desc:'西方极乐世界教主', yunwen:'《阿弥陀经》《无量寿经》', suyu:'南无阿弥陀佛', zhu:'求往生/求寿终正寝/西方接引' },
+  '千手观音': { desc:'千手千眼观世音', yunwen:'《千手千眼观世音菩萨广大圆满无碍大悲心陀罗尼经》', suyu:'南无千手千眼观世音菩萨', zhu:'求消灾/求平安/求护身' },
+  '不动尊菩萨': { desc:'不动明王，降魔除障', yunwen:'《金刚顶经》', suyu:'南无不动尊菩萨', zhu:'求降魔/求消业障/求事业突破' },
+  '大日如来': { desc:'毗卢遮那佛，法界体性', yunwen:'《大日经》', suyu:'南无大日如来佛', zhu:'求开悟/求境界提升/求光明' },
+  '关圣帝君': { desc:'武财神·忠义之神', yunwen:'《关帝觉世真经》《关帝宝诰》', suyu:'南无护法关圣帝君', zhu:'求财运/求官司化解/求忠义人脉' },
+  '太上老君': { desc:'道家至尊·道德天尊', yunwen:'《道德经》《清静经》', suyu:'南无太上老君', zhu:'求养生/求智慧/求道业精进' }
+};
+function _pushCibaiGuide(benmingFo) {
+  const info = _PUSH_CIBAI_DEITIES[benmingFo] || _PUSH_CIBAI_DEITIES['阿弥陀佛'];
+  return `🙏 <b style="color:#c9a84c">${benmingFo}</b>参拜指南：<br>` +
+    `· 📋 <b>神明简介：</b>${info.desc}<br>` +
+    `· 📿 <b>诵持经典：</b>${info.yunwen}<br>` +
+    `· 🙏 <b>圣号：</b>${info.suyu}<br>` +
+    `· 🤲 <b>参拜动作：</b>上香三炷 → 三跪拜 → 合十默念 → 敬茶<br>` +
+    `· 🎯 <b>主求：</b>${info.zhu}<br>` +
+    `· 📍 <b>参拜地点：</b>周边寺庙/在家焚香诵经亦可<br>` +
+    `· ⚠️ <b>禁忌：</b>忌酒后参拜、忌带荤腥入殿、忌不敬之语`;
+}
+
+// === 三教圆融·神咒库 ===
+const _PUSH_SHENZHOU = {
+  '甲':'金光神咒（金光烁屋，护身驱邪，诵7遍）',
+  '乙':'文昌帝君护佑，智慧大开（诵7遍）',
+  '丙':'祝香神咒（道由心学，心假香传，诵3遍）',
+  '丁':'大悲咒（千手千眼观世音菩萨广大圆满，诵3遍）',
+  '戊':'净口业咒（修习口业，得清净口，诵3遍）',
+  '己':'准提神咒（专注前行，置心一处，诵21遍）',
+  '庚':'消灾延寿药师佛（消灾延寿药师佛，诵7遍）',
+  '辛':'阿弥陀佛圣号（南无阿弥陀佛，诵108遍）',
+  '壬':'地藏王菩萨灭定业真言（灭定业，诵21遍）',
+  '癸':'观世音菩萨耳根圆通（耳根圆通，诵7遍）'
+};
+function _pushDailyShenzhou(todayGan) {
+  return _PUSH_SHENZHOU[todayGan] || _PUSH_SHENZHOU['甲'];
 }
 
 // ================================================================
@@ -32888,6 +33564,9 @@ function bindBazi() {
   }
   try {
     localStorage.setItem('userBaziBirth', JSON.stringify({year:y,month:m,day:d,hour:h}));
+    // 标记首次绑定，触发老黄历推送
+    localStorage.setItem('_baziFirstBound', '1');
+    localStorage.removeItem('_firstAlmanacPushed');
   } catch(e) {}
   showSection('bazi');
   setTimeout(function() {
@@ -32901,6 +33580,7 @@ function bindBazi() {
       dEl.value = d;
       hEl.value = h;
       if (typeof computeBazi === 'function') computeBazi();
+      // 老黄历推送由 computeBazi 内部自动处理（16762行），此处无需额外调用
     }
   }, 300);
 }
