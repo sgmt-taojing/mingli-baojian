@@ -17,7 +17,21 @@ Page({
   },
 
   onLoad() {
+    this.checkLogin();
     this.loadProducts();
+  },
+
+  onShow() {
+    this.checkLogin();
+  },
+
+  checkLogin() {
+    const app = getApp();
+    const token = wx.getStorageSync('token');
+    if (!token && !app.globalData?.isLogin) {
+      app.globalData = app.globalData || {};
+      app.globalData.needLoginRedirect = '/pages/shop/shop';
+    }
   },
 
   async loadProducts() {
@@ -48,6 +62,15 @@ Page({
 
   onProductTap(e) {
     const id = e.currentTarget.dataset.id;
+    const token = wx.getStorageSync('token');
+    const app = getApp();
+    if (!token && !app.globalData?.isLogin) {
+      wx.showToast({ title: '请先登录', icon: 'none' });
+      setTimeout(() => {
+        wx.navigateTo({ url: '/pages/login/login?redirect=/pages/shop/shop' });
+      }, 600);
+      return;
+    }
     wx.showToast({ title: '商品详情开发中', icon: 'none' });
   },
 

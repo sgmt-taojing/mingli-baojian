@@ -24,7 +24,11 @@ Page({
     }
   },
 
-  onLoad() {
+  onLoad(options) {
+    if (options && options.type === 'vip') {
+      // 从首页"会员中心"入口进入，标记 VIP 视图模式
+      this.setData({ showVipPanel: true })
+    }
     this.checkLogin()
   },
 
@@ -238,22 +242,25 @@ Page({
       return
     }
     const key = e.currentTarget.dataset.key
-    const routes = {
-      orders: '/pages/shop/orders/orders',
-      favorites: '/pages/mine/favorites/favorites',
-      fortune: '/pages/mine/fortune/fortune',
-      settings: '/pages/mine/settings/settings',
-      about: '/pages/mine/about/about'
+    const labels = {
+      orders: '订单查看功能规划中，预计下版本上线',
+      favorites: '我的收藏功能规划中，预计下版本上线',
+      fortune: '每日运势详情规划中，预计下版本上线',
+      settings: '账户设置规划中，预计下版本上线',
+      about: '关于我们规划中，预计下版本上线'
     }
-    const url = routes[key]
-    if (url) {
-      wx.navigateTo({
-        url: url,
-        fail: () => {
-          wx.showToast({ title: '页面开发中', icon: 'none' })
+    const msg = labels[key] || '功能规划中，预计下版本上线'
+    wx.showModal({
+      title: '提示',
+      content: msg + '。\n您可先使用 H5 版体验完整功能：\nhttps://sgmt-taojing.github.io/mingli-baojian/',
+      confirmText: '去 H5',
+      cancelText: '知道了',
+      success: (res) => {
+        if (res.confirm) {
+          wx.setClipboardData({ data: 'https://sgmt-taojing.github.io/mingli-baojian/' })
         }
-      })
-    }
+      }
+    })
   },
 
   // ---- 退出登录 ----

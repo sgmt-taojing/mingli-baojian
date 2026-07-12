@@ -23140,7 +23140,8 @@ function getShensha(pillars, dayStemIdx, dayBranchIdx) {
   const result = [];
 
   // 天乙贵人（以日干查，检查年日时支）
-  const tianyiMap = {0:[1,7],1:[0,2],2:[9,11],3:[9,11],4:[3,5],5:[3,5],6:[1,7],7:[1,7],8:[9,11],9:[0,2]};
+  // 正确对照：甲戊庚→丑未 | 乙己→子申 | 丙丁→酉亥 | 辛→寅午 | 壬癸→卯巳
+  const tianyiMap = {0:[1,7],1:[0,8],2:[9,11],3:[9,11],4:[1,7],5:[0,8],6:[1,7],7:[2,6],8:[3,5],9:[3,5]};
   const tianyiBranches = (tianyiMap[dayStemIdx] || []).map(function(b){return BRANCHES[b];});
   var hasTianyi = false;
   for (var i = 0; i < allBranches.length; i++) {
@@ -35247,8 +35248,13 @@ const _ZW_GONGS = ['命宫','兄弟','夫妻','子女','财帛','疾厄','迁移
 
 function ziweiPaiPan(birthYear, birthMonth, birthDay, birthHour, sex) {
   const hourIdx = Math.floor((birthHour + 1) / 2) % 12; // 时辰索引: 子=0,丑=1...亥=11
-  const yinIdx = 2;
-  let mingIdx = _qyMod(yinIdx + (birthMonth-1) - hourIdx, 12);
+  const yinIdx = 2; // 寅=2
+  // 传统命宫公式：从寅宫起正月，逆数到出生月→得月宫；再从月宫起子时，顺数到生时→得命宫
+  // 即：命宫 = 寅 + (月-1) - 时辰索引 (mod 12)
+  // 但正确方向应为：寅起正月逆数 → 月宫 = 寅 + (月-1) 的逆行 → 实际等价于 寅 - (月-1)
+  // 再从月宫起子时顺数到生时 → 命宫 = 月宫 + 时辰索引
+  // 综合：命宫 = 寅 - (月-1) + 时辰索引 (mod 12)
+  let mingIdx = _qyMod(yinIdx - (birthMonth-1) + hourIdx, 12);
   let shenIdx = _qyMod(yinIdx + (birthMonth-1) + hourIdx, 12);
   const gongMap = {};
   for (let i=0;i<12;i++) {
@@ -37043,9 +37049,8 @@ if (typeof window !== 'undefined') {
 
   // ===== 补充缺失的工具函数 =====
   function _gongliToGanZhi(year, month, day) {
-    // 简化版公历转干支（需完整农历库才能精确）
-    // 使用基准日期1900年1月31日（农历正月初一，干支甲子）
-    const baseDate = new Date(1900, 0, 31);
+    // 修正基准日：2024-04-30 为甲子日（sxtwl v2.0.7 验证）
+    const baseDate = new Date(2024, 3, 30); // 月份从0开始：3 = 4月
     const targetDate = new Date(year, month - 1, day);
     const diffDays = Math.floor((targetDate - baseDate) / (24 * 60 * 60 * 1000));
     const ganIndex = (diffDays % 10 + 10) % 10;

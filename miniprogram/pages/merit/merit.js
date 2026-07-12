@@ -1,22 +1,28 @@
 // pages/merit/merit.js — 功德系统
+const H5_URL = 'https://sgmt-taojing.github.io/mingli-baojian/#section-faith'
+
 Page({
   data: {
     title: '功德系统',
     icon: '🙏',
-    desc: '行善积德 · 每日打卡',
-    result: null,
-    loading: false
+    desc: '日行一善 · 积德改运',
+    h5Url: H5_URL,
+    tips: [
+      '完整版功能请在 H5 网页版体验',
+      '网页版支持完整输入参数与详细报告',
+      '可随时复制链接发给亲友',
+    ],
   },
   onLoad() {
-    wx.setNavigationBarTitle({ title: '功德系统' });
+    wx.setNavigationBarTitle({ title: '功德系统' })
   },
-  onCalculate() {
-    this.setData({ loading: true });
-    setTimeout(() => {
-      this.setData({ loading: false, result: { text: '分析结果生成中，请稍后体验完整功能' } });
-    }, 1500);
+  copyH5Url() {
+    wx.setClipboardData({
+      data: H5_URL,
+      success: () => wx.showToast({ title: '链接已复制', icon: 'success' })
+    })
   },
   onShareAppMessage() {
-    return { title: '命理宝鉴 · 功德系统', path: '/pages/merit/merit' };
-  }
-});
+    return { title: '命理宝鉴 · 功德系统', path: '/pages/merit/merit' }
+  },
+})

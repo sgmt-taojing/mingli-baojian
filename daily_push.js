@@ -327,19 +327,44 @@ function getFestivalAdvice(name)  {
 // === 基于命理的正念匹配 ===
 // === 生僻字自动注音函数 ===
 var RARE_PINYIN = {
-  '炁':'(qì)','覆':'(fù)','煞':'(shà)','祟':'(suì)','箓':'(lù)','醮':'(jiào) ','谶':'(chèn) ',
-  '禳':'(ráng) ','馘':'(guó)','魇':'(yǎn)','魑':'(chī)','魅':'(mèi)','魍':'(wǎng) ','魉':'(liǎng) ',
+  '炁':'(qì)','覆':'(fù)','煞':'(shà)','祟':'(suì)','箓':'(lù)','醮':'(jiào)','谶':'(chèn)',
+  '禳':'(ráng)','馘':'(guó)','魇':'(yǎn)','魑':'(chī)','魅':'(mèi)','魍':'(wǎng)','魉':'(liǎng)',
   '厄':'(è)','祓':'(fú)','禊':'(xì)','魄':'(pò)','缚':'(fù)','腭':'(è)',
-  '唵':'(ōng)','嘛':'(má)','呢':'(ní)','叭':'(bēi)','咪':'(mēi)','吽':'(hōng) ',
-  '稽':'(qǐ)','皈':'(guī)','悉':'(xī)','胝':'(zhī)','顶':'(dǐng) ','准':'(zhǔn) ',
-  '唯':'(wéi)','慈':'(cí)','悲':'(bēi)','垂':'(chuí) ','护':'(hù)',
-  '驱':'(qū)','邪':'(xié)','亿':'(yì)','劫':'(jié)','证':'(zhèng) ',
+  '唵':'(ōng)','嘛':'(má)','呢':'(ní)','叭':'(bēi)','咪':'(mēi)','吽':'(hōng)',
+  '稽':'(qǐ)','皈':'(guī)','悉':'(xī)','胝':'(zhī)','顶':'(dǐng)','准':'(zhǔn)',
+  '唯':'(wéi)','慈':'(cí)','悲':'(bēi)','垂':'(chuí)','护':'(hù)',
+  '驱':'(qū)','邪':'(xié)','亿':'(yì)','劫':'(jié)','证':'(zhèng)',
   '般':'(bō)','若':'(rě)','菩':'(pú)','提':'(tí)','萨':'(sà)','埵':'(duǒ)',
   '诃':'(hē)','莎':'(suō)','嚩':'(pó)','惹':'(rě)','啰':'(luō)','涅':'(niè)','槃':'(pán)',
   '爇':'(ruò)','旆':'(pèi)','迨':'(dài)','祇':'(qí)','渎':'(dú)','笃':'(dǔ)',
-  '塌':'(tā)','兮':'(xī)','倚':'(yǐ)','妄':'(wàng) ','癸':'(guǐ)',
-  '箴':'(zhēn) ','筌':'(quán) ','蓄':'(xù)','锐':'(ruì)',
-  '藏':'(zàng) ','扎':'(zhā)','耶':'(yē)'
+  '塌':'(tā)','兮':'(xī)','倚':'(yǐ)','妄':'(wàng)','癸':'(guǐ)',
+  '箴':'(zhēn)','筌':'(quán)','蓄':'(xù)','锐':'(ruì)',
+  '藏':'(zàng)','扎':'(zhā)','耶':'(yē)',
+  // === 扩展：佛道咒语/神煞/五行常用字 ===
+  '唵':'(ǒng)','嘛呢':'(ma ní)','叭咪':'(bēi mī)','吽':'(hōng)',
+  '嗡':'(wēng)','噶':'(gā)','咧':'(liě)','怛':'(dá)','耶':'(yē)','梭哈':'(suō hā)',
+  '雠':'(chóu)','雒':'(luò)','雩':'(yú)','雰':'(fēn)','雰':'(fēn)',
+  '黾':'(mǐn)','黿':'(yuán)','鼍':'(tuó)','鼙':'(pí)','鼗':'(táo)',
+  '簪':'(zān)','箍':'(gū)','箴':'(zhēn)','箸':'(zhù)','篁':'(huáng)','篆':'(zhuàn)',
+  '纛':'(dào)','纟':'(sī)','绔':'(kù)','绱':'(shàng)','缍':'(duǒ)','缛':'(rù)','缜':'(zhěn)',
+  '瓘':'(guàn)','瓞':'(dié)','瓠':'(hù)','瓣':'(bàn)','瓤':'(ráng)',
+  '庚':'(gēng)','辛':'(xīn)','壬':'(rén)','癸':'(guǐ)','戊':'(wù)','己':'(jǐ)','甲':'(jiǎ)','乙':'(yǐ)','丙':'(bǐng)','丁':'(dīng)',
+  '子':'(zǐ)','丑':'(chǒu)','寅':'(yín)','卯':'(mǎo)','辰':'(chén)','巳':'(sì)','午':'(wǔ)','未':'(wèi)','申':'(shēn)','酉':'(yǒu)','戌':'(xū)','亥':'(hài)',
+  '魇':'(yǎn)','魁':'(kuí)','罡':'(gāng)','魉':'(liǎng)','魍':'(wǎng)','鬲':'(gé)','鬻':'(yù)',
+  '魁':'(kuí)','罡':'(gāng)','煞':'(shà)','祸':'(huò)','殃':'(yāng)','咎':'(jiù)','愆':'(qiān)',
+  '忤':'(wǔ)','怼':'(duì)','恣':'(zì)','恚':'(huì)','恧':'(nǜ)','恂':'(xún)','悚':'(sǒng)',
+  '恣':'(zì)','恙':'(yàng)','恿':'(yǒng)','悛':'(quān)','悝':'(kuī)','悻':'(xìng)','悼':'(dào)',
+  '禊':'(xì)','禚':'(zhuó)','禤':'(xuān)','禺':'(yú)','秉':'(bǐng)','祗':'(zhī)','祛':'(qū)',
+  '祜':'(hù)','祟':'(suì)','祚':'(zuò)','祲':'(jìn)','祢':'(ní)','祤':'(yǔ)',
+  '皤':'(pó)','皭':'(jiào)','皴':'(cūn)','皲':'(jūn)','皹':'(jūn)','盍':'(hé)','盎':'(àng)',
+  '眚':'(shěng)','眢':'(yuān)','眭':'(suī)','眦':'(zì)','眩':'(xuàn)','眬':'(lóng)',
+  '钊':'(zhāo)','钋':'(pō)','钌':'(liǎo)','钍':'(tǔ)','钏':'(chuàn)','钐':'(shǎn)',
+  '镕':'(róng)','镚':'(bèng)','镛':'(yōng)','镝':'(dī)','镞':'(zú)','镟':'(xuàn)',
+  '闾':'(lǘ)','闿':'(kǎi)','阇':'(shē)','阏':'(è)','阚':'(kàn)','阙':'(què)',
+  '鞲':'(gōu)','鞴':'(bèi)','鞣':'(róu)','鞯':'(jiān)','鞴':'(bèi)','韫':'(yùn)',
+  '頞':'(è)','颐':'(yí)','颓':'(tuí)','颔':'(hàn)','颚':'(è)','颞':'(niè)','颧':'(quán)',
+  '飨':'(xiǎng)','餍':'(yàn)','餮':'(tiè)','饔':'(yōng)','饕':'(tāo)','馗':'(kuí)',
+  '麾':'(huī)','麈':'(zhǔ)','麤':'(cū)','麾':'(huī)','麴':'(qū)','麸':'(fū)'
 };
 function annotateRare(text)  {
   if (!text)  return text;
@@ -1033,21 +1058,21 @@ function generateFestivalAdvice(festival, baziData)  {
   var adviceMap = {
     '财运': {
       direction: '💰 财神方位:' + caishenDir,
-      method: '催财方法:面向财神方位,摆放招财物(黄水晶/金蟾) ,穿幸运色衣物',
+      method: '催财方法:面向财神方位,摆放招财物(黄水晶/金蟾)',
       incantationB: '诵《药师琉璃光如来本愿功德经》求财运',
       incantationD: '诵《财神经》/黄财神心咒:嗡藏巴拉扎连札耶梭哈(21遍)',
       traditional: '民俗催财:贴财神像,摆放招财植物(发财树/金钱树) ,面向财神方位纳气'
     },
     '姻缘': {
       direction: '🌸 桃花方位:' + taohuaDir,
-      method: '催姻缘方法:面向桃花方位,摆放鲜花(粉玫瑰/百合) ,穿粉色/红色衣物',
+      method: '催姻缘方法:面向桃花方位,摆放鲜花(粉玫瑰/百合)',
       incantationB: '诵《普门品》求姻缘,持诵六字大明咒:唵嘛呢叭咪吽(21遍)',
       incantationD: '诵月老咒:月老仙翁牵红线,千里姻缘一线牵,弟子诚心求姻缘,早结良缘成眷属(7遍)',
       traditional: '民俗催姻缘:七夕拜织女,摆放桃花枝,佩戴粉水晶'
     },
     '事业': {
       direction: '🌟 贵人方位:' + guirenDir,
-      method: '催事业方法:面向贵人方位办公,摆放文昌塔/麒麟,穿幸运色衣物',
+      method: '催事业方法:面向贵人方位办公,摆放文昌塔/麒麟',
       incantationB: '诵《金刚经》求事业顺利',
       incantationD: '诵文昌咒:文昌帝君护佑,事业亨通,贵人相助,步步高升(7遍)',
       traditional: '民俗催事业:拜关公求义气人脉,摆放麒麟/龙龟,面向贵人方纳气'
@@ -1837,7 +1862,7 @@ function _getLuckAdvice(level, scores)  {
       advice.summary = '运势极佳，天时地利人和俱全，宜把握良机大展宏图';
       advice.yi = ['推进重要计划与决策', '谈合作签合同', '求婚表白面试求职'];
       advice.ji = ['勿过于自负忘形', '勿冒不必要的风险'];
-      advice.cuiwang = '穿幸运色衣物，佩戴吉祥配饰，面向财神方位纳气，乘势精进';
+      advice.cuiwang = '佩戴吉祥配饰，面向财神方位纳气，乘势精进';
       break;
     case '吉':
       advice.summary = '运势顺畅，贵人助力明显，适合推进计划和处理要事';
@@ -1849,7 +1874,7 @@ function _getLuckAdvice(level, scores)  {
       advice.summary = '运势平稳向好，按部就班可有所获，宜稳扎稳打';
       advice.yi = ['按计划推进日常事务', '学习充电提升自我', '维护人际关系'];
       advice.ji = ['不宜冒进或做重大改变', '避免冲动消费'];
-      advice.cuiwang = '穿幸运色衣物，保持正念，稳步前行';
+      advice.cuiwang = '保持正念，稳步前行';
       break;
     case '平':
       advice.summary = '运势平淡，无大吉大凶，宜守成不宜冒进';
@@ -1861,13 +1886,13 @@ function _getLuckAdvice(level, scores)  {
       advice.summary = '运势偏弱，阻力较多，宜低调保守行事';
       advice.yi = ['保守行事内修为主', '处理简单事务', '养生休息'];
       advice.ji = ['不宜决策大事', '避免冲突与争论', '不宜远行投资'];
-      advice.huajie = '佩戴护身吉祥物(黑曜石戴右手辟煞/本命佛戴脖子护身)，面向喜用神方位深呼吸，穿幸运色衣物增强气场';
+      advice.huajie = '佩戴护身吉祥物(黑曜石戴右手辟煞/本命佛戴脖子护身)，面向喜用神方位深呼吸，增强气场';
       break;
     case '凶':
       advice.summary = '运势低迷，诸事不顺，需化解化解后再行大事';
       advice.yi = ['静心休养不外求', '诵经持咒修心', '化解煞气后再行动'];
       advice.ji = ['切勿决策重大事项', '避免签约合作', '不宜远行搬迁'];
-      advice.huajie = '佩戴护身符(黑曜石戴右手辟煞/本命佛戴脖子护身)，面向喜用神方位冥想，诵金光神咒7遍，穿幸运色衣物，避免去煞气重的地方';
+      advice.huajie = '佩戴护身符(黑曜石戴右手辟煞/本命佛戴脖子护身)，面向喜用神方位冥想，诵金光神咒7遍，避免去煞气重的地方';
       break;
   }
   return advice;
@@ -2210,7 +2235,7 @@ function generatePersonalized(bazi, dayStem, dayBranch, dayNum)  {
   text += '\n';
 
   // 10维度评分明细
-  text += '━━━ 📊 十维度命理评分 ━━━\n';
+  text += '━━━ 【📊 十维度命理评分】 ━━━\n';
   var dimNames = {
     wangshuai: '日主旺衰', ganRel: '天干生克', zhiRel: '地支关系',
     yongshen: '用神状态', dayun: '大运走势', changsheng: '十二长生',
@@ -2219,10 +2244,7 @@ function generatePersonalized(bazi, dayStem, dayBranch, dayNum)  {
   for (var dk in dimNames) {
     if (scores[dk]) {
       var sc = scores[dk].score;
-      var bar = '';
-      var barCount = Math.round(sc);
-      for (var bi = 0; bi < 10; bi++) { bar += (bi < barCount ? '█' : '░'); }
-      text += '  ' + dimNames[dk] + ' ' + bar + ' ' + sc + '/10 ' + scores[dk].detail + '\n';
+      text += '  ' + dimNames[dk] + ' ' + sc + '/10 ' + scores[dk].detail + '\n';
     }
   }
   text += '\n';
@@ -2423,11 +2445,16 @@ function generate() {
   }
 
   // ===== 构建输出：分析→解决→学习 =====
-  let text = '🦞 易道智鉴·每日宜忌\n';
+  let text = '🪷 易道智鉴·每日宜忌\n';
   var _lunarStrTop = solarToLunarStr(Y, M, D);
+  // 推送时间放最上面，阳历农历同时显示
+  var _pushTime = new Date();
+  var _hh = String(_pushTime.getHours()).padStart(2,'0');
+  var _mm = String(_pushTime.getMinutes()).padStart(2,'0');
+  text += '⏰ 推送时间：' + _hh + ':' + _mm + '\n';
   text += '📅 ' + Y + '年' + M + '月' + D + '日(' + WEEKDAYS[now.getDay()] + ') | 🌙 ' + (_lunarStrTop || '') + '\n';
   text += '🔮 ' + dayGanZhi + '日·' + monthGan + monthZhi + '月·' + yearGan + yearZhi + '年(' + yearZodiac + ')\n';
-  text += '━━━ 🔮 鉴运知变·静观自在 ━━━\n';
+  text += '━━━ 【🔮 鉴运知变·静观自在】 ━━━\n';
 
   // --- 分析板块 ---
   // 人生阶段(十二长生) 
@@ -2458,7 +2485,7 @@ function generate() {
   }
 
   // --- 趋吉避凶板块 ---
-  text += '━━━ 🧭 顺天应时·致中达和 ━━━\n';
+  text += '━━━ 【🧭 顺天应时·致中达和】 ━━━\n';
 
   // 黄历宜忌
   text += '📅 宜：' + (yiList.length ? yiBaihua : '诸事皆宜') + '\n';
@@ -2502,7 +2529,7 @@ function generate() {
   text += '👕 穿衣：' + (cloth || CLOTHING[M] || CLOTHING[6]) + '\n';
 
   // --- 学习板块 ---
-  text += '━━━ 📿 修己安人·明心见性 ━━━\n';
+  text += '━━━ 【📿 修己安人·明心见性】 ━━━\n';
 
   // 智慧语录
   text += '💡 「' + wisdom.quote + '」\n';
@@ -2578,7 +2605,7 @@ function generate() {
 
   // 尾部
   text += '\n⚠️ AI辅助创作｜国学感悟仅供修身闲聊交流，非专业定论\n';
-  text += '—— 易道智鉴 🦞';
+  text += '—— 🪷 易道智鉴 ——\n📚 知命改运 · 趋吉避凶 · 明心正性 · 修身养性';
 
   return text;
 }
@@ -2826,11 +2853,11 @@ function generateIM() {
   // ===== 构建输出：分析→解决→学习 =====
   var _title = (typeof isTomorrow !== 'undefined' && isTomorrow) ? '明日预告' : '每日宜忌';
   var text = '';
-  text += '🦞 易道智鉴·' + _title + '\n';
+  text += '🪷 易道智鉴·' + _title + '\n';
   var _lunarStrIM2 = solarToLunarStr(Y, M, D);
   text += '📅 ' + Y + '年' + M + '月' + D + '日(' + WEEKDAYS[now.getDay()] + ') | 🌙 ' + (_lunarStrIM2 || '') + '\n';
   text += '🔮 ' + dayGanZhi + '日·' + (monthGan||'') + (monthZhi||'') + '月·' + (yearGan||'') + (yearZhi||'') + '年(' + yearZodiac + ')\n';
-  text += '━━━ 🔮 鉴运知变·静观自在 ━━━\n';
+  text += '━━━ 【🔮 鉴运知变·静观自在】 ━━━\n';
 
   // --- 解读板块 ---
   // 人生阶段(十二长生) 
@@ -2883,7 +2910,7 @@ function generateIM() {
   }
 
   // --- 趋吉避凶板块 ---
-  text += '━━━ 🧭 顺天应时·致中达和 ━━━\n';
+  text += '━━━ 【🧭 顺天应时·致中达和】 ━━━\n';
 
   // 黄历宜忌
   text += '📅 宜：' + (yiList.length ? yiBaihua : '诸事皆宜') + '\n';
@@ -2936,7 +2963,7 @@ function generateIM() {
   }
   var _hasLegal = _legalFest !== '';
   if (_hasFest || _hasUpcoming || jieqi || _hasTmrPrep || _hasWorship || _hasJieqiHealth || _hasLegal) {
-    text += '━━━ 🙏 敬天法祖·顺时养生 ━━━\n';
+    text += '━━━ 【🙏 敬天法祖·顺时养生】 ━━━\n';
   }
   // 当天节日
   if (_hasFest) {
@@ -2982,10 +3009,8 @@ function generateIM() {
         text += '   📋 ' + _festRole + '\n';
       }
       if (_worshipFull) {
-        var _devoteeName = '善信';
-        if (_userBazi && _userBazi.name) {
-          _devoteeName = _userBazi.name + '居士';
-        }
+        var _devoteeName = '缘主';
+        // 推送正文中不出现真实姓名，统一用「缘主」
         var _vowText = _worshipFull.vow.replace('（姓名）', _devoteeName);
         text += '   尊称：' + _worshipFull.title + '\n';
         text += '   🙏 发愿：' + _vowText + '\n';
@@ -3073,7 +3098,7 @@ function generateIM() {
   text += '⚠️ 养护要点：' + (_organCare[_xiEleFood]||'') + ' | ' + (_organCare[_jiEleFood||'土']||'') + '\n';
 
   // --- 学习板块 ---
-  text += '━━━ 📿 修己安人·明心见性 ━━━\n';
+  text += '━━━ 【📿 修己安人·明心见性】 ━━━\n';
 
   // 每日修行口诀(基于日期+命理状态选择) 
   var _practiceList = [
@@ -3227,7 +3252,7 @@ function generateIM() {
     if (_vipGuide[_stemRelEnc]) text += _vipGuide[_stemRelEnc] + '\n';
   }
   text += '\n⚠️ AI辅助创作｜国学感悟仅供修身闲聊交流\n';
-  text += '—— 易道智鉴 🦞';
+  text += '—— 🪷 易道智鉴 ——\n📚 知命改运 · 趋吉避凶 · 明心正性 · 修身养性';
   return text;
 }
 
@@ -3360,7 +3385,7 @@ function generatePublic() {
   }
 
   // ① 今日总览
-  essay += '━━━ 🔮 鉴运知变·静观自在 ━━━\n';
+  essay += '━━━ 【🔮 鉴运知变·静观自在】 ━━━\n';
   essay += '📋 今日总览\n';
   essay += (JIANCHU_BAIHUA[jianchu] || jianchu) + '·' + (isHuangdao ? '黄道吉日✅' : '黑道日') + '\n';
   essay += '冲' + chongZodiac + '(属' + chongZodiac + '者慎行)\n';
@@ -3472,7 +3497,7 @@ function generatePublic() {
   essay += '\n';
 
   // ④ 宜忌
-  essay += '\n━━━ 🧭 顺天应时·致中达和 ━━━\n';
+  essay += '\n━━━ 【🧭 顺天应时·致中达和】 ━━━\n';
   essay += '⚖️ 今日宜忌\n';
   essay += '宜：' + yiList.join('、') + '\n';
   essay += '忌：' + jiList.join('、') + '\n\n';
@@ -3511,7 +3536,7 @@ function generatePublic() {
   }
   var _hasLegalP = _legalFestP !== '';
   if (festName || _pubUpcoming.length > 0 || jieqi || _hasTmrPrepP || _hasWorshipP || _hasJieqiHealthP || _hasLegalP)  {
-    essay += '\n━━━ 🙏 敬天法祖·顺时养生 ━━━\n';
+    essay += '\n━━━ 【🙏 敬天法祖·顺时养生】 ━━━\n';
   }
   if (festName) essay += '🎉 ' + festName + '\n';
   if (_pubUpcoming.length > 0)  {
@@ -3584,7 +3609,7 @@ function generatePublic() {
     essay += '   🧳 出游: ' + _holAdvP.travel + '\n';
   }
 
-  essay += '\n━━━ 📿 修己安人·明心见性 ━━━\n';
+  essay += '\n━━━ 【📿 修己安人·明心见性】 ━━━\n';
   essay += '🌟 今日寄语\n';
   essay += '「' + annotateRare(quote.text) + '」\n';
   essay += '——' + quote.src + '\n\n';
@@ -3603,7 +3628,7 @@ function generatePublic() {
   essay += '静坐片刻，放空杂念。心无挂碍，自然自在。\n';
   essay += '愿今日顺遂，身心安泰。🙏\n\n';
   essay += '⚠️ 国学感悟仅供修身闲聊交流\n';
-  essay += '🦞 易道智鉴';
+  essay += '—— 🌱 易道智鉴 ——\n📚 播种善念 · 传播智慧 · 知命改运 · 修身养性';
 
   return essay;
 }
@@ -3755,7 +3780,7 @@ function generateGzh() {
   body += '👉 点击下方菜单,开始排盘解读\n';
   body += '了解更多排盘→\n\n';
   body += '⚠️ AI辅助创作｜国学感悟仅供修身闲聊交流，非专业定论，无法律及实操指导效力，读者凡事自辨自省，所有个人抉择后果自行负责\n';
-  body += '\n-- 易道智鉴 🦞';
+  body += '\n—— 🌱 易道智鉴 ——\n📚 播种善念 · 传播智慧 · 知命改运 · 修身养性';
 
   return {
     title: title,
@@ -3844,7 +3869,7 @@ function generateTomorrow() {
   var isMajorTomorrow = tomorrowFestival && majorFestivals.indexOf(tomorrowFestival.name) >= 0;
   
   // 开始构建推送文本
-  var text = '🦞 易道智鉴 · 明日指南\n';
+  var text = '🪷 易道智鉴 · 明日指南\n';
   text += '━━━━━━━━━━━\n';
   text += '\n🌍 明日环境\n';
   text += M + '月' + D + '日 ' + WEEKDAYS[tomorrow.getDay()] + '\n';
@@ -3992,7 +4017,7 @@ function generateTomorrow() {
   
   text += '\n━━━━━━━━━━━\n';
   text += '⚠️ AI辅助创作｜国学感悟仅供修身闲聊交流\n';
-  text += '🦞 知命改运·修心持善守静';
+  text += '🪷 知命改运·修身养性';
   return text;
 }
 

@@ -67,10 +67,26 @@ Page({
     expandedId: '',
     loading: false,
     // 分类标签栏滚动位置
-    scrollIntoView: ''
+    scrollIntoView: '',
+    // 来自首页 wiki 参数的初始分类
+    initialCategory: ''
   },
 
-  onLoad() {
+  onLoad(options) {
+    // 支持首页 wiki / category / knowledge 跳转：?wiki=bazi?type=bazi?category=bazi
+    if (options) {
+      const key = options.wiki || options.type || options.category
+      if (key && key !== 'history' && key !== 'wiki') {
+        // 实际分类如 bazi/ziwei/qimen
+        const exists = CATEGORIES.some(c => c.key === key)
+        if (exists) {
+          this.setData({ currentCategory: key, initialCategory: key, scrollIntoView: 'cat-' + key })
+        }
+      } else if (key === 'wiki') {
+        // 仅表示进入百科页面，保留默认分类
+        console.log('进入命理百科')
+      }
+    }
     this.loadArticles()
     this.loadHotArticles()
   },

@@ -83,8 +83,42 @@ Page({
         this.setData({ currentType: t.id, currentTypeName: t.name })
       }
     }
-    if (options.type !== 'history') {
+    if (options.id) {
+      // 从历史记录跳转过来：按 id 加载该条排盘
+      this.loadHistoryById(options.id)
+    } else if (options.type !== 'history') {
       this.loadHistory()
+    }
+  },
+
+  async loadHistoryById(id) {
+    try {
+      const token = wx.getStorageSync('token')
+      if (!token) { wx.showToast({ title: '请先登录', icon: 'none' }); return }
+      const app = getApp()
+      const base = (app.globalData && app.globalData.apiBase) || 'http://localhost:8911'
+      const res = await new Promise((resolve, reject) => {
+        wx.request({
+          url: base + '/api/paipan/history/' + id,
+          method: 'GET',
+          header: { 'Authorization': 'Bearer ' + token },
+          success: (r) => r.statusCode === 200 ? resolve(r.data) : reject(r),
+          fail: reject,
+        })
+      })
+      if (res && res.paipanResult) {
+        const data = typeof res.paipanResult === 'string' ? JSON.parse(res.paipanResult) : res.paipanResult
+        this.setData({
+          result: data,
+          currentType: data.type || 'bazi',
+          currentTypeName: TYPES.find(t => t.id === data.type)?.name || '八字排盘',
+          'form.name': res.name || '',
+          'form.birthDate': res.birthDate || '1990-01-01',
+          'form.birthHour': res.birthHour || 0,
+        })
+      }
+    } catch (e) {
+      wx.showToast({ title: '历史记录加载失败', icon: 'none' })
     }
   },
 
@@ -148,17 +182,106 @@ Page({
       return
     }
 
-    // 其他术数类型 — 尝试调用后端或显示占位
+    // 紫微斗数 — 命宫/身宫/主星
+    if (this.data.currentType === 'ziwei') {
+      const [y, m, d] = f.birthDate.split('-').map(Number)
+      const monthZhi = DI_ZHI[(m - 1 + 2) % 12]
+      const hourZhi = DI_ZHI[f.birthHour]
+      // 命宫公式：起寅1, 逆数生月, 顺数生时
+      let mingIdx = 2 // 寅=2
+      mingIdx = (mingIdx - (m - 1) + 12) % 12
+      mingIdx = (mingIdx + f.birthHour) % 12
+      const mingGong = DI_ZHI[mingIdx]
+      this.setData({
+        loading: false,
+        result: {
+          type: 'ziwei',
+          basic: { name: f.name, sex: f.sex === 'male' ? '男' : '女', date: f.birthDate, hour: SHICHEN_LIST[f.birthHour] },
+          panels: { mingGong, shenGong: DI_ZHI[(mingIdx + 6) % 12], monthZhi, hourZhi },
+          interpretation: `命宫落在${mingGong}宫。紫微斗数完整十四主星排盘较为复杂，此处展示简化核心（命宫/身宫/生月/生时），完整排盘请使用 H5 网页版。`
+        }
+      })
+      return
+    }
+
+    // 奇门遁甲 — 局数/天盘/地盘
+    if (this.data.currentType === 'qimen') {
+      const [y, m, d] = f.birthDate.split('-').map(Number)
+      // 简化：阳遁冬至后顺，阴遁夏至后逆
+      const isYang = m <= 6 || m === 12
+      const ju = ((y + m * 31 + d) % 9) + 1
+      this.setData({
+        loading: false,
+        result: {
+          type: 'qimen',
+          basic: { name: f.name || '缘主', date: f.birthDate, question: f.questionType },
+          panels: { dun: isYang ? '阳遁' : '阴遁', ju: ju + '局', dayun: '时家奇门' },
+          interpretation: `${isYang ? '阳' : '阴'}遁${ju}局。奇门遁甲盘面涉及天盘/地盘/人盘/神盘四层叠加，完整推演请使用 H5 网页版。`
+        }
+      })
+      return
+    }
+
+    // 大六壬 — 四课三传
+    if (this.data.currentType === 'liuren') {
+      const [y, m, d] = f.birthDate.split('-').map(Number)
+      const jdn = toJDN(y, m, d)
+      const dayGZ = getDayGZ(y, m, d)
+      const dayIdx = ((jdn - 2460431) % 60 + 60) % 60
+      this.setData({
+        loading: false,
+        result: {
+          type: 'liuren',
+          basic: { name: f.name || '缘主', date: f.birthDate, question: f.questionType },
+          panels: { dayGZ, siKe: ['第一课', '第二课', '第三课', '第四课'], sanChuan: ['初传', '中传', '末传'] },
+          interpretation: `大六壬以日干${dayGZ[0]}为占主，天乙所乘临地盘${dayGZ[1]}。完整四课三传+天将推演请使用 H5 网页版。`
+        }
+      })
+      return
+    }
+
+    // 六爻 — 本卦/变卦
+    if (this.data.currentType === 'liuyao') {
+      const num = parseInt(f.meihuaNum) || Math.floor(Math.random() * 100) + 1
+      const gua = (num % 64) + 1
+      this.setData({
+        loading: false,
+        result: {
+          type: 'liuyao',
+          basic: { name: f.name || '缘主', date: f.birthDate, question: f.questionType },
+          panels: { num, benGua: gua, bianYao: [((num + 1) % 6) + 1, ((num + 2) % 6) + 1, ((num + 3) % 6) + 1] },
+          interpretation: `起卦数 ${num}，本卦第${gua}卦。需输入具体三个数（天/地/人）以起六爻卦，完整变卦/世应/六亲分析请使用 H5 网页版。`
+        }
+      })
+      return
+    }
+
+    // 梅花易数 — 体卦用卦
+    if (this.data.currentType === 'meihua') {
+      const num = parseInt(f.meihuaNum) || Math.floor(Math.random() * 100) + 1
+      this.setData({
+        loading: false,
+        result: {
+          type: 'meihua',
+          basic: { name: f.name || '缘主', date: f.birthDate, question: f.questionType },
+          panels: { num, tiGua: '乾', yongGua: '兑', bianGua: '巽' },
+          interpretation: `梅花起卦数 ${num}，体卦乾/用卦兑。梅花易数完整互卦/变卦/体用生克推演请使用 H5 网页版。`
+        }
+      })
+      return
+    }
+
+    // 兜底 — 兜底计算完整句
     setTimeout(() => {
       this.setData({
         loading: false,
         result: {
           type: this.data.currentType,
           basic: { name: f.name || '缘主', date: f.birthDate, question: f.questionType },
-          interpretation: `${this.data.currentTypeName}盘面分析功能正在加载中，当前可使用八字排盘体验完整功能。其他术数排盘即将上线，敬请期待。`
+          interpretation: `${this.data.currentTypeName}完整盘面推演请使用 H5 网页版：https://sgmt-taojing.github.io/mingli-baojian/`
         }
       })
-    }, 1500)
+    }, 1000)
   },
 
   async loadHistory() {

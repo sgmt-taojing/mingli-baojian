@@ -1,22 +1,28 @@
 // pages/hehun/hehun.js — 合婚匹配
+const H5_URL = 'https://sgmt-taojing.github.io/mingli-baojian/#section-bazi'
+
 Page({
   data: {
     title: '合婚匹配',
     icon: '💑',
-    desc: '夫妻八字匹配度分析',
-    result: null,
-    loading: false
+    desc: '八字合婚 · 神煞互补',
+    h5Url: H5_URL,
+    tips: [
+      '完整版功能请在 H5 网页版体验',
+      '网页版支持完整输入参数与详细报告',
+      '可随时复制链接发给亲友',
+    ],
   },
   onLoad() {
-    wx.setNavigationBarTitle({ title: '合婚匹配' });
+    wx.setNavigationBarTitle({ title: '合婚匹配' })
   },
-  onCalculate() {
-    this.setData({ loading: true });
-    setTimeout(() => {
-      this.setData({ loading: false, result: { text: '分析结果生成中，请稍后体验完整功能' } });
-    }, 1500);
+  copyH5Url() {
+    wx.setClipboardData({
+      data: H5_URL,
+      success: () => wx.showToast({ title: '链接已复制', icon: 'success' })
+    })
   },
   onShareAppMessage() {
-    return { title: '命理宝鉴 · 合婚匹配', path: '/pages/hehun/hehun' };
-  }
-});
+    return { title: '命理宝鉴 · 合婚匹配', path: '/pages/hehun/hehun' }
+  },
+})
