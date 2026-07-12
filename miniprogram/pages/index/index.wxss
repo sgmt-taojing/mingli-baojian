@@ -1,23 +1,40 @@
-/* pages/index/index.wxss */
-.page-index { padding: 0 0 40rpx; }
+/* pages/index/index.wxss — 命理宝鉴·功能大厅 */
 
+.page-index {
+  min-height: 100vh;
+  background: #1a1a2e;
+  padding-bottom: 40rpx;
+}
+
+/* ========== 顶部横幅 ========== */
 .hero {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  padding: 60rpx 40rpx 50rpx;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+  padding: 50rpx 40rpx 44rpx;
   text-align: center;
 }
 
+.hero-badge {
+  display: inline-block;
+  background: linear-gradient(90deg, #e6c86e, #f0d896);
+  color: #1a1a2e;
+  font-size: 22rpx;
+  font-weight: 600;
+  padding: 6rpx 28rpx;
+  border-radius: 24rpx;
+  margin-bottom: 24rpx;
+}
+
 .hero-title {
-  font-size: 52rpx;
+  font-size: 56rpx;
   font-weight: 700;
   color: #e6c86e;
-  letter-spacing: 8rpx;
+  letter-spacing: 12rpx;
 }
 
 .hero-subtitle {
   font-size: 26rpx;
   color: #94a3b8;
-  margin-top: 12rpx;
+  margin-top: 14rpx;
   letter-spacing: 4rpx;
 }
 
@@ -27,82 +44,108 @@
   margin-top: 16rpx;
 }
 
-.wisdom-card {
-  margin: 30rpx;
-  text-align: center;
-}
-
-.wisdom-label {
-  font-size: 24rpx;
-  color: #e6c86e;
-  margin-bottom: 12rpx;
-}
-
-.wisdom-text {
-  font-size: 30rpx;
+.hero-wisdom {
+  font-size: 28rpx;
   color: #f0f0f0;
-  line-height: 1.8;
+  margin-top: 24rpx;
+  line-height: 1.7;
+  opacity: 0.9;
 }
 
-.user-bar {
-  margin: 0 30rpx 20rpx;
-  background: rgba(230, 200, 110, 0.1);
-  border: 2rpx solid rgba(230, 200, 110, 0.3);
-  border-radius: 12rpx;
-  padding: 24rpx 30rpx;
+/* ========== 功能板块 ========== */
+.sections {
+  padding: 0 24rpx;
+}
+
+.section {
+  margin-top: 36rpx;
+}
+
+.section-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  padding: 0 8rpx 16rpx;
 }
 
-.user-bar-text { font-size: 28rpx; color: #e6c86e; }
-.user-bar-arrow { font-size: 36rpx; color: #e6c86e; }
+.section-icon {
+  font-size: 36rpx;
+  margin-right: 12rpx;
+}
 
-.menu-grid {
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #e6c86e;
+  letter-spacing: 2rpx;
+}
+
+/* ========== 功能网格 ========== */
+.section-grid {
   display: flex;
   flex-wrap: wrap;
-  padding: 0 20rpx;
+  align-items: stretch;
 }
 
-.menu-item {
-  width: 50%;
+.grid-item {
+  width: 33.33%;
   box-sizing: border-box;
-  padding: 10rpx;
+  padding: 8rpx;
+  position: relative;
 }
 
-.menu-item {
-  display: flex;
-  align-items: center;
+.grid-item-hover {
+  opacity: 0.7;
+}
+
+.grid-card {
   background: #16213e;
+  border: 1rpx solid rgba(230, 200, 110, 0.08);
   border-radius: 16rpx;
-  padding: 24rpx 20rpx;
-  margin: 6rpx;
-}
-
-.menu-icon {
-  font-size: 48rpx;
-  margin-right: 20rpx;
-  width: 80rpx;
+  padding: 28rpx 12rpx 20rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
+  height: 100%;
+  box-sizing: border-box;
 }
 
-.menu-info { flex: 1; }
-
-.menu-title {
-  font-size: 30rpx;
+.item-vip {
+  position: absolute;
+  top: 10rpx;
+  right: 14rpx;
+  background: linear-gradient(135deg, #e6c86e, #d4a017);
+  color: #1a1a2e;
+  font-size: 18rpx;
   font-weight: 600;
+  padding: 2rpx 10rpx;
+  border-radius: 6rpx;
+  line-height: 1.4;
+  z-index: 1;
+}
+
+.item-icon {
+  font-size: 48rpx;
+  margin-bottom: 10rpx;
+}
+
+.item-name {
+  font-size: 26rpx;
+  font-weight: 500;
   color: #f0f0f0;
+  margin-bottom: 4rpx;
 }
 
-.menu-desc {
-  font-size: 22rpx;
+.item-desc {
+  font-size: 20rpx;
   color: #64748b;
-  margin-top: 4rpx;
+  line-height: 1.4;
 }
 
+/* ========== 底部声明 ========== */
 .footer {
   text-align: center;
-  padding: 40rpx 30rpx 20rpx;
+  padding: 48rpx 30rpx 20rpx;
 }
 
 .footer-text {

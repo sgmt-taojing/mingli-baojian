@@ -1,0 +1,16 @@
+<view class="page-func">
+  <view class="func-header">
+    <view class="func-icon">{{icon}}</view>
+    <view class="func-title">{{title}}</view>
+    <view class="func-desc">{{desc}}</view>
+  </view>
+  <view class="func-form card">
+    <view class="form-hint">请输入相关信息进行测算</view>
+    <button class="btn-primary" bindtap="onCalculate" loading="{{loading}}">开始测算</button>
+  </view>
+  <view class="func-result card" wx:if="{{result}}">
+    <view class="card-title">测算结果</view>
+    <view class="result-text">{{result.text}}</view>
+  </view>
+  <view class="loading" wx:if="{{loading}}">正在为您测算中...</view>
+</view>
