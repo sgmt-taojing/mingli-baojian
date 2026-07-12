@@ -107,7 +107,8 @@ const DAILY_QUOTES = [
 // ====== 农历转换工具 ======
 
 // 农历数据表 (1900-2100)，每年用 hex 编码
-// 每位含义：第1-4位为闰月月份(0表示无闰月)，第5-16位为1-12月大小月(1大30天,0小29天)，闰月大小月在第17位
+// 注意：此表仅用于公历→农历月日转换，干支推算不依赖此表（干支通过六十甲子轮换独立计算）
+// 超出 1900-2100 范围时，农历月日显示为"--"，但不影响干支计算
 const LUNAR_INFO = [
   0x04bd8,0x04ae0,0x0a570,0x054d5,0x0d260,0x0d950,0x16554,0x056a0,0x09ad0,0x055d2,
   0x04ae0,0x0a5b6,0x0a4d0,0x0d250,0x1d255,0x0b540,0x0d6a0,0x0ada2,0x095b0,0x14977,
@@ -157,6 +158,10 @@ function monthDays(year, month) {
 }
 
 function solarToLunar(year, month, day) {
+  // 边界保护：超出 1900-2100 范围时返回占位值，不影响干支计算
+  if (year < 1900 || year > 2100) {
+    return { year: year, month: 0, day: 0, isLeap: false, monthStr: '--', dayStr: '--' };
+  }
   const baseDate = new Date(1900, 0, 31); // 1900-01-31 = 农历正月初一
   const objDate = new Date(year, month - 1, day);
   let offset = Math.floor((objDate - baseDate) / 86400000);
