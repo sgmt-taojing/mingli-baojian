@@ -1,16 +1,49 @@
 <view class="page-func">
   <view class="func-header">
-    <view class="func-icon">{{icon}}</view>
-    <view class="func-title">{{title}}</view>
-    <view class="func-desc">{{desc}}</view>
+    <view class="func-icon">🍀</view>
+    <view class="func-title">每日运势</view>
+    <view class="func-desc">十二生肖 · 今日运程 · 四维评分</view>
   </view>
-  <view class="func-form card">
-    <view class="form-hint">请输入相关信息进行测算</view>
-    <button class="btn-primary" bindtap="onCalculate" loading="{{loading}}">开始测算</button>
+
+  <view class="card date-card">
+    <text class="date-text">{{today}}</text>
+    <text class="date-gz">干支：{{dayGanZhi}}</text>
   </view>
-  <view class="func-result card" wx:if="{{result}}">
-    <view class="card-title">测算结果</view>
-    <view class="result-text">{{result.text}}</view>
+
+  <view class="fortune-list">
+    <view class="card fortune-item" wx:for="{{allFortunes}}" wx:key="zodiac">
+      <view class="fort-header">
+        <text class="fort-zodiac">{{item.zodiac}}</text>
+        <text class="fort-star">{{item.star}}</text>
+        <text class="fort-level" style="color:{{item.color}}">{{item.level}}</text>
+        <text class="fort-score" style="color:{{item.color}}">{{item.score}}</text>
+      </view>
+      <view class="fort-dims">
+        <view class="dim-item">
+          <text class="dim-label">事业</text>
+          <text class="dim-score">{{item.career}}</text>
+        </view>
+        <view class="dim-item">
+          <text class="dim-label">财运</text>
+          <text class="dim-score">{{item.wealth}}</text>
+        </view>
+        <view class="dim-item">
+          <text class="dim-label">感情</text>
+          <text class="dim-score">{{item.love}}</text>
+        </view>
+        <view class="dim-item">
+          <text class="dim-label">健康</text>
+          <text class="dim-score">{{item.health}}</text>
+        </view>
+      </view>
+      <view class="fort-advice">
+        <text class="advice-line">💼 {{item.careerAdvice}}</text>
+        <text class="advice-line">💰 {{item.wealthAdvice}}</text>
+        <text class="advice-line">❤️ {{item.loveAdvice}}</text>
+        <text class="advice-line">🏥 {{item.healthAdvice}}</text>
+      </view>
+    </view>
   </view>
+
   <view class="loading" wx:if="{{loading}}">正在为您测算中...</view>
 </view>

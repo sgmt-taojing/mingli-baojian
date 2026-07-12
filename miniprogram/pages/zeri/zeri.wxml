@@ -1,16 +1,44 @@
 <view class="page-func">
   <view class="func-header">
-    <view class="func-icon">{{icon}}</view>
-    <view class="func-title">{{title}}</view>
-    <view class="func-desc">{{desc}}</view>
+    <view class="func-icon">🗓️</view>
+    <view class="func-title">择日服务</view>
+    <view class="func-desc">近30天吉日 · 宜忌冲煞 · 择吉行事</view>
   </view>
+
   <view class="func-form card">
-    <view class="form-hint">请输入相关信息进行测算</view>
-    <button class="btn-primary" bindtap="onCalculate" loading="{{loading}}">开始测算</button>
+    <view class="form-row">
+      <text class="form-label">事项类型</text>
+      <picker mode="selector" range="{{eventOptions}}" value="{{eventIndex}}" bindchange="onEventChange">
+        <text class="picker-text">{{eventType}}</text>
+      </picker>
+    </view>
+    <button class="btn-primary" bindtap="onCalculate" loading="{{loading}}">重新计算</button>
   </view>
-  <view class="func-result card" wx:if="{{result}}">
-    <view class="card-title">测算结果</view>
-    <view class="result-text">{{result.text}}</view>
+
+  <view class="card" wx:if="{{luckyDays.length}}">
+    <view class="card-title">推荐吉日（{{eventType}}）</view>
+    <view class="day-list">
+      <view class="day-item" wx:for="{{luckyDays}}" wx:key="date">
+        <view class="day-header">
+          <text class="day-date">{{item.dateLabel}} 周{{item.weekDay}}</text>
+          <text class="day-score">{{item.score}}分</text>
+        </view>
+        <view class="day-ganzi">
+          <text class="day-gz">{{item.ganzhi}}</text>
+          <text class="day-jc">建除：{{item.jianchu}}</text>
+          <text class="day-chong">{{item.chong}}</text>
+        </view>
+        <view class="day-yiji">
+          <text class="yi-label">宜：{{item.yi}}</text>
+          <text class="ji-label">忌：{{item.ji}}</text>
+        </view>
+      </view>
+    </view>
   </view>
+
+  <view class="card" wx:if="{{!loading && !luckyDays.length}}">
+    <text class="empty-text">近30天暂无高度匹配的吉日，请尝试其他事项</text>
+  </view>
+
   <view class="loading" wx:if="{{loading}}">正在为您测算中...</view>
 </view>

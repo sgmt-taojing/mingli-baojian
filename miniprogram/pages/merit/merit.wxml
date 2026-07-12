@@ -1,16 +1,51 @@
 <view class="page-func">
   <view class="func-header">
-    <view class="func-icon">{{icon}}</view>
-    <view class="func-title">{{title}}</view>
-    <view class="func-desc">{{desc}}</view>
+    <view class="func-icon">🙏</view>
+    <view class="func-title">功德系统</view>
+    <view class="func-desc">日行一善 · 积德改运</view>
   </view>
-  <view class="func-form card">
-    <view class="form-hint">请输入相关信息进行测算</view>
-    <button class="btn-primary" bindtap="onCalculate" loading="{{loading}}">开始测算</button>
+
+  <view class="card merit-summary">
+    <view class="summary-item">
+      <text class="summary-num">{{totalPoints}}</text>
+      <text class="summary-label">总功德</text>
+    </view>
+    <view class="summary-divider"></view>
+    <view class="summary-item">
+      <text class="summary-num">{{continuousDays}}</text>
+      <text class="summary-label">连续天数</text>
+    </view>
+    <view class="summary-divider"></view>
+    <view class="summary-item">
+      <text class="summary-num">{{todayDate}}</text>
+      <text class="summary-label small-date">今日</text>
+    </view>
   </view>
-  <view class="func-result card" wx:if="{{result}}">
-    <view class="card-title">测算结果</view>
-    <view class="result-text">{{result.text}}</view>
+
+  <view class="card">
+    <view class="card-title">今日打卡</view>
+    <view class="checkin-list">
+      <view class="checkin-item {{todayDone[item.key] ? 'done' : ''}}" wx:for="{{meritItems}}" wx:key="key" data-key="{{item.key}}" bindtap="onCheckIn">
+        <view class="checkin-icon">{{item.icon}}</view>
+        <view class="checkin-info">
+          <text class="checkin-name">{{item.name}}</text>
+          <text class="checkin-desc">{{item.desc}}</text>
+          <text class="checkin-points">+{{item.points}}功德</text>
+        </view>
+        <view class="checkin-status">
+          <text class="status-text">{{todayDone[item.key] ? '✓' : ''}}</text>
+        </view>
+      </view>
+    </view>
   </view>
-  <view class="loading" wx:if="{{loading}}">正在为您测算中...</view>
+
+  <view class="card">
+    <view class="card-title">本周记录</view>
+    <view class="week-grid">
+      <view class="week-item {{item.isToday ? 'week-today' : ''}}" wx:for="{{weekRecords}}" wx:key="date">
+        <text class="week-date">{{item.label}}</text>
+        <text class="week-count">{{item.count > 0 ? item.count + '项' : '—'}}</text>
+      </view>
+    </view>
+  </view>
 </view>

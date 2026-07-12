@@ -1,16 +1,52 @@
 <view class="page-func">
   <view class="func-header">
-    <view class="func-icon">{{icon}}</view>
-    <view class="func-title">{{title}}</view>
-    <view class="func-desc">{{desc}}</view>
+    <view class="func-icon">💑</view>
+    <view class="func-title">合婚匹配</view>
+    <view class="func-desc">生肖合冲 · 六合三合 · 匹配分析</view>
   </view>
+
   <view class="func-form card">
-    <view class="form-hint">请输入相关信息进行测算</view>
-    <button class="btn-primary" bindtap="onCalculate" loading="{{loading}}">开始测算</button>
+    <view class="form-row">
+      <text class="form-label">甲方生日</text>
+      <picker mode="date" value="{{date1}}" bindchange="onDate1Change">
+        <text class="picker-text">{{date1}}</text>
+      </picker>
+    </view>
+    <view class="form-row">
+      <text class="form-label">乙方生日</text>
+      <picker mode="date" value="{{date2}}" bindchange="onDate2Change">
+        <text class="picker-text">{{date2}}</text>
+      </picker>
+    </view>
+    <button class="btn-primary" bindtap="onCalculate" loading="{{loading}}">开始匹配</button>
   </view>
-  <view class="func-result card" wx:if="{{result}}">
-    <view class="card-title">测算结果</view>
-    <view class="result-text">{{result.text}}</view>
-  </view>
+
+  <block wx:if="{{result}}">
+    <view class="card result-score">
+      <view class="zodiac-pair">
+        <text class="zodiac">{{result.z1}}</text>
+        <text class="zodiac-vs">配</text>
+        <text class="zodiac">{{result.z2}}</text>
+      </view>
+      <view class="score-num {{result.score >= 65 ? 'score-good' : 'score-bad'}}">{{result.score}}</view>
+      <view class="score-level">{{result.level}}</view>
+    </view>
+
+    <view class="card">
+      <view class="card-title">详细分析</view>
+      <view class="relation-list">
+        <view class="relation-item" wx:for="{{result.relations}}" wx:key="type">
+          <text class="relation-type {{item.good ? 'tag-good' : 'tag-bad'}}">{{item.type}}</text>
+          <text class="relation-desc">{{item.desc}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="card-title">综合建议</view>
+      <text class="advice-text">{{result.advice}}</text>
+    </view>
+  </block>
+
   <view class="loading" wx:if="{{loading}}">正在为您测算中...</view>
 </view>

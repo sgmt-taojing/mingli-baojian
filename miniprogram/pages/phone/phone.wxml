@@ -1,16 +1,57 @@
 <view class="page-func">
   <view class="func-header">
-    <view class="func-icon">{{icon}}</view>
-    <view class="func-title">{{title}}</view>
-    <view class="func-desc">{{desc}}</view>
+    <view class="func-icon">📱</view>
+    <view class="func-title">手机号测评</view>
+    <view class="func-desc">数字五行 · 八星组合 · 吉凶分析</view>
   </view>
+
   <view class="func-form card">
-    <view class="form-hint">请输入相关信息进行测算</view>
-    <button class="btn-primary" bindtap="onCalculate" loading="{{loading}}">开始测算</button>
+    <view class="form-hint">请输入手机号码（7-11位）</view>
+    <input class="input-phone" type="number" maxlength="11" placeholder="输入手机号" value="{{phoneInput}}" bindinput="onInput" />
+    <button class="btn-primary" bindtap="onCalculate" loading="{{loading}}">开始测评</button>
   </view>
-  <view class="func-result card" wx:if="{{result}}">
-    <view class="card-title">测算结果</view>
-    <view class="result-text">{{result.text}}</view>
-  </view>
+
+  <block wx:if="{{result}}">
+    <view class="card result-score">
+      <view class="score-num {{result.lucky ? 'score-good' : 'score-bad'}}">{{result.score}}</view>
+      <view class="score-level {{result.lucky ? 'level-good' : 'level-bad'}}">{{result.level}}</view>
+      <view class="score-desc">{{result.lucky ? '此号码整体吉利，数字能量正向' : '此号码有改进空间，建议咨询专业人士'}}</view>
+    </view>
+
+    <view class="card">
+      <view class="card-title">五行分布</view>
+      <view class="wuxing-grid">
+        <view class="wuxing-item" wx:for="{{result.wxCount}}" wx:key="name">
+          <text class="wuxing-name">{{item.name}}</text>
+          <text class="wuxing-count">{{item.count}}次</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="card-title">各位置五行</view>
+      <view class="digit-list">
+        <view class="digit-item" wx:for="{{result.wuxingList}}" wx:key="pos">
+          <text class="digit-pos">{{item.pos}}</text>
+          <text class="digit-num" style="color:{{item.color}}">{{item.digit}}</text>
+          <text class="digit-wx" style="color:{{item.color}}">{{item.wuxing}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="card" wx:if="{{result.baxingResults.length}}">
+      <view class="card-title">八星组合</view>
+      <view class="baxing-list">
+        <view class="baxing-item" wx:for="{{result.baxingResults}}" wx:key="pos">
+          <view class="baxing-header">
+            <text class="baxing-pos">第{{item.pos}}位</text>
+            <text class="baxing-name {{item.good ? 'tag-good' : 'tag-bad'}}">{{item.name}}</text>
+          </view>
+          <text class="baxing-desc">{{item.desc}}</text>
+        </view>
+      </view>
+    </view>
+  </block>
+
   <view class="loading" wx:if="{{loading}}">正在为您测算中...</view>
 </view>

@@ -1,16 +1,67 @@
 <view class="page-func">
   <view class="func-header">
-    <view class="func-icon">{{icon}}</view>
-    <view class="func-title">{{title}}</view>
-    <view class="func-desc">{{desc}}</view>
+    <view class="func-icon">🩺</view>
+    <view class="func-title">体质辨识</view>
+    <view class="func-desc">五行体质 · 养生建议 · 穴位调理</view>
   </view>
+
   <view class="func-form card">
-    <view class="form-hint">请输入相关信息进行测算</view>
-    <button class="btn-primary" bindtap="onCalculate" loading="{{loading}}">开始测算</button>
+    <view class="form-row">
+      <text class="form-label">出生日期</text>
+      <picker mode="date" value="{{birthDate}}" bindchange="onDateChange">
+        <text class="picker-text">{{birthDate}}</text>
+      </picker>
+    </view>
+    <button class="btn-primary" bindtap="onCalculate" loading="{{loading}}">开始分析</button>
   </view>
-  <view class="func-result card" wx:if="{{result}}">
-    <view class="card-title">测算结果</view>
-    <view class="result-text">{{result.text}}</view>
-  </view>
+
+  <block wx:if="{{result}}">
+    <view class="card result-score">
+      <view class="tizhi-name">{{result.tizhiName}}</view>
+      <view class="tizhi-desc">{{result.desc}}</view>
+    </view>
+
+    <view class="card">
+      <view class="card-title">五行分布</view>
+      <view class="wx-bar-list">
+        <view class="wx-bar-item" wx:for="{{result.wxCount}}" wx:key="name">
+          <text class="wx-bar-name">{{item.name}}</text>
+          <view class="wx-bar-bg">
+            <view class="wx-bar-fill wx-{{item.name}}" style="width:{{item.count * 50}}rpx"></view>
+          </view>
+          <text class="wx-bar-count">{{item.count}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="card-title">体质特征</view>
+      <view class="feature-list">
+        <text class="feature-item" wx:for="{{result.features}}" wx:key="*this">• {{item}}</text>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="card-title">饮食建议 🍵</view>
+      <view class="advice-list">
+        <text class="advice-item" wx:for="{{result.diet}}" wx:key="*this">• {{item}}</text>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="card-title">运动建议 🏃</view>
+      <view class="advice-list">
+        <text class="advice-item" wx:for="{{result.exercise}}" wx:key="*this">• {{item}}</text>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="card-title">穴位调理 💆</view>
+      <view class="advice-list">
+        <text class="advice-item" wx:for="{{result.acupoints}}" wx:key="*this">• {{item}}</text>
+      </view>
+    </view>
+  </block>
+
   <view class="loading" wx:if="{{loading}}">正在为您测算中...</view>
 </view>

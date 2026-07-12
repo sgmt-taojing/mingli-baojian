@@ -1,16 +1,53 @@
 <view class="page-func">
   <view class="func-header">
-    <view class="func-icon">{{icon}}</view>
-    <view class="func-title">{{title}}</view>
-    <view class="func-desc">{{desc}}</view>
+    <view class="func-icon">📜</view>
+    <view class="func-title">周易占卜</view>
+    <view class="func-desc">六爻起卦 · 卦象解读</view>
   </view>
+
   <view class="func-form card">
-    <view class="form-hint">请输入相关信息进行测算</view>
-    <button class="btn-primary" bindtap="onCalculate" loading="{{loading}}">开始测算</button>
+    <view class="form-row">
+      <text class="form-label">占卜方式</text>
+      <picker mode="selector" range="{{typeOptions}}" value="{{typeIndex}}" bindchange="onTypeChange">
+        <text class="picker-text">{{typeOptions[typeIndex]}}</text>
+      </picker>
+    </view>
+    <view class="form-row">
+      <text class="form-label">您要问的事</text>
+      <input class="form-input" placeholder="如：近期事业如何？" value="{{question}}" bindinput="onQuestionInput" maxlength="30" />
+    </view>
+    <button class="btn-primary" bindtap="onDivine" loading="{{loading}}">起卦</button>
   </view>
-  <view class="func-result card" wx:if="{{result}}">
-    <view class="card-title">测算结果</view>
-    <view class="result-text">{{result.text}}</view>
-  </view>
-  <view class="loading" wx:if="{{loading}}">正在为您测算中...</view>
+
+  <block wx:if="{{result}}">
+    <view class="card gua-card">
+      <view class="gua-symbol">{{result.guaSymbol}}</view>
+      <view class="gua-name">{{result.guaName}}</view>
+      <view class="gua-ci">卦辞：{{result.guaCi}}</view>
+    </view>
+
+    <view class="card">
+      <view class="card-title">卦象</view>
+      <view class="yao-list">
+        <view class="yao-item" wx:for="{{result.yaoDisplay}}" wx:key="pos">
+          <text class="yao-pos">第{{item.pos}}爻</text>
+          <text class="yao-symbol {{item.isBian ? 'yao-bian' : ''}}">{{item.symbol}}</text>
+          <text class="yao-type">{{item.type}}{{item.bian}}</text>
+        </view>
+      </view>
+      <view class="bian-info">{{result.bianYao}}</view>
+    </view>
+
+    <view class="card">
+      <view class="card-title">卦象解析</view>
+      <text class="gua-desc">{{result.guaDesc}}</text>
+    </view>
+
+    <view class="card">
+      <view class="card-title">占卜建议</view>
+      <text class="gua-advice">{{result.advice}}</text>
+    </view>
+  </block>
+
+  <view class="loading" wx:if="{{loading}}">正在起卦中...</view>
 </view>

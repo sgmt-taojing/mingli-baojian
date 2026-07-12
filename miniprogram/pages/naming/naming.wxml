@@ -1,16 +1,52 @@
 <view class="page-func">
   <view class="func-header">
-    <view class="func-icon">{{icon}}</view>
-    <view class="func-title">{{title}}</view>
-    <view class="func-desc">{{desc}}</view>
+    <view class="func-icon">✏️</view>
+    <view class="func-title">起名改名</view>
+    <view class="func-desc">五格数理 · 吉凶分析 · 推荐用字</view>
   </view>
+
   <view class="func-form card">
-    <view class="form-hint">请输入相关信息进行测算</view>
-    <button class="btn-primary" bindtap="onCalculate" loading="{{loading}}">开始测算</button>
+    <view class="form-row">
+      <text class="form-label">姓氏</text>
+      <input class="form-input" placeholder="如 李" value="{{surname}}" bindinput="onSurnameInput" maxlength="2" />
+    </view>
+    <view class="form-row">
+      <text class="form-label">性别</text>
+      <picker mode="selector" range="{{genderOptions}}" value="{{genderIndex}}" bindchange="onGenderChange">
+        <text class="picker-text">{{genderOptions[genderIndex]}}</text>
+      </picker>
+    </view>
+    <view class="form-row">
+      <text class="form-label">待测名字</text>
+      <input class="form-input" placeholder="如 明轩" value="{{nameChars}}" bindinput="onNameInput" maxlength="4" />
+    </view>
+    <button class="btn-primary" bindtap="onCalculate" loading="{{loading}}">开始分析</button>
   </view>
-  <view class="func-result card" wx:if="{{result}}">
-    <view class="card-title">测算结果</view>
-    <view class="result-text">{{result.text}}</view>
-  </view>
+
+  <block wx:if="{{result}}">
+    <view class="card result-score">
+      <view class="score-num {{result.score >= 70 ? 'score-good' : 'score-bad'}}">{{result.score}}</view>
+      <view class="score-desc">综合评分</view>
+    </view>
+
+    <view class="card">
+      <view class="card-title">五格数理</view>
+      <view class="gege-list">
+        <view class="gege-item" wx:for="{{result.gegeList}}" wx:key="name">
+          <text class="gege-name">{{item.name}}{{item.main ? '★' : ''}}</text>
+          <text class="gege-value">{{item.value}}</text>
+          <text class="gege-jx {{item.lucky ? 'tag-good' : 'tag-bad'}}">{{item.desc}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="card-title">推荐用字（{{result.needWx}}行）</view>
+      <view class="word-cloud">
+        <text class="word-item" wx:for="{{result.recommend}}" wx:key="*this">{{item}}</text>
+      </view>
+    </view>
+  </block>
+
   <view class="loading" wx:if="{{loading}}">正在为您测算中...</view>
 </view>

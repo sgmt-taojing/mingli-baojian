@@ -1,16 +1,54 @@
 <view class="page-func">
   <view class="func-header">
-    <view class="func-icon">{{icon}}</view>
-    <view class="func-title">{{title}}</view>
-    <view class="func-desc">{{desc}}</view>
+    <view class="func-icon">🏢</view>
+    <view class="func-title">楼层推荐</view>
+    <view class="func-desc">命卦五行 · 河图数 · 楼层吉凶</view>
   </view>
+
   <view class="func-form card">
-    <view class="form-hint">请输入相关信息进行测算</view>
+    <view class="form-row">
+      <text class="form-label">出生年份</text>
+      <input class="form-input" type="number" placeholder="如 1990" value="{{birthYear}}" bindinput="onYearChange" />
+    </view>
+    <view class="form-row">
+      <text class="form-label">性别</text>
+      <picker mode="selector" range="{{genderOptions}}" value="{{genderIndex}}" bindchange="onGenderChange">
+        <text class="picker-text">{{genderOptions[genderIndex]}}</text>
+      </picker>
+    </view>
     <button class="btn-primary" bindtap="onCalculate" loading="{{loading}}">开始测算</button>
   </view>
-  <view class="func-result card" wx:if="{{result}}">
-    <view class="card-title">测算结果</view>
-    <view class="result-text">{{result.text}}</view>
-  </view>
+
+  <block wx:if="{{result}}">
+    <view class="card">
+      <view class="card-title">命卦信息</view>
+      <view class="info-row"><text class="info-label">命卦</text><text class="info-value">{{result.gua.name}}卦 ({{result.gua.num}})</text></view>
+      <view class="info-row"><text class="info-label">命组</text><text class="info-value">{{result.gua.group}}</text></view>
+      <view class="info-row"><text class="info-label">五行</text><text class="info-value">{{result.myWx}}</text></view>
+    </view>
+
+    <view class="card">
+      <view class="card-title">推荐楼层 ✅</view>
+      <view class="floor-list">
+        <view class="floor-item floor-good" wx:for="{{result.recommend}}" wx:key="floor">
+          <text class="floor-num">{{item.floor}}层</text>
+          <text class="floor-wx">{{item.wuxing}}</text>
+          <text class="floor-reason">{{item.reason}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="card-title">不推荐楼层 ⚠️</view>
+      <view class="floor-list">
+        <view class="floor-item floor-bad" wx:for="{{result.notRecommend}}" wx:key="floor">
+          <text class="floor-num">{{item.floor}}层</text>
+          <text class="floor-wx">{{item.wuxing}}</text>
+          <text class="floor-reason">{{item.reason}}</text>
+        </view>
+      </view>
+    </view>
+  </block>
+
   <view class="loading" wx:if="{{loading}}">正在为您测算中...</view>
 </view>

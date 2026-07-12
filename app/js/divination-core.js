@@ -14952,7 +14952,8 @@ function getShensha(pillars, dayStemIdx, dayBranchIdx) {
   const result = [];
 
   // 天乙贵人（以日干查，检查年日时支）
-  const tianyiMap = {0:[1,7],1:[0,2],2:[9,11],3:[9,11],4:[3,5],5:[3,5],6:[1,7],7:[1,7],8:[9,11],9:[0,2]};
+  // 歌诀：甲戊庚牛羊（丑未）, 乙己鼠猴乡（子申）, 丙丁猪鸡位（亥酉）, 辛遇虎马乡（寅午）, 壬癸兔蛇藏（卯巳）
+  const tianyiMap = {0:[1,7],1:[0,8],2:[9,11],3:[9,11],4:[1,7],5:[0,8],6:[9,11],7:[6,2],8:[5,3],9:[5,3]};
   const tianyiBranches = (tianyiMap[dayStemIdx] || []).map(function(b){return BRANCHES[b];});
   var hasTianyi = false;
   for (var i = 0; i < allBranches.length; i++) {

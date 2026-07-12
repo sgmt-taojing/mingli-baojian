@@ -1,16 +1,30 @@
 <view class="page-func">
   <view class="func-header">
-    <view class="func-icon">{{icon}}</view>
-    <view class="func-title">{{title}}</view>
-    <view class="func-desc">{{desc}}</view>
+    <view class="func-icon">🎓</view>
+    <view class="func-title">大师课堂</view>
+    <view class="func-desc">系统学习命理风水知识</view>
   </view>
-  <view class="func-form card">
-    <view class="form-hint">请输入相关信息进行测算</view>
-    <button class="btn-primary" bindtap="onCalculate" loading="{{loading}}">开始测算</button>
+
+  <scroll-view scroll-x class="category-bar">
+    <view class="cat-item {{activeCategory === item ? 'cat-active' : ''}}" wx:for="{{categories}}" wx:key="*this" data-cat="{{item}}" bindtap="onCategoryTap">{{item}}</view>
+  </scroll-view>
+
+  <view class="course-list">
+    <view class="card course-card" wx:for="{{courses}}" wx:key="id" data-course="{{item}}" bindtap="onCourseTap">
+      <view class="course-cover">{{item.cover}}</view>
+      <view class="course-info">
+        <view class="course-title">{{item.title}}</view>
+        <view class="course-meta">
+          <text class="meta-text">{{item.teacher}}</text>
+          <text class="meta-text">{{item.duration}}</text>
+          <text class="meta-text">{{item.lessons}}课时</text>
+        </view>
+        <view class="course-desc">{{item.desc}}</view>
+        <view class="course-tag">
+          <text class="tag {{item.free ? 'tag-free' : 'tag-vip'}}">{{item.free ? '免费试看' : 'VIP专享'}}</text>
+          <text class="price" wx:if="{{!item.free}}">¥{{item.price}}</text>
+        </view>
+      </view>
+    </view>
   </view>
-  <view class="func-result card" wx:if="{{result}}">
-    <view class="card-title">测算结果</view>
-    <view class="result-text">{{result.text}}</view>
-  </view>
-  <view class="loading" wx:if="{{loading}}">正在为您测算中...</view>
 </view>

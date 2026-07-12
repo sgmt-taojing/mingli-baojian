@@ -19064,7 +19064,12 @@ async function yjCast() {
   document.getElementById('yjCastBtn').textContent = '占 卦 中...';
   for (let i = 0; i < yjLine; i++) document.getElementById('yjD' + i).className = 'ldot done';
   await new Promise(r => setTimeout(r, 100));
-  const coins = [0,1,2].map(() => Math.random() < 0.5 ? 2 : 3);
+  // 铜钱起卦：用时间戳做确定性种子（避免 Math.random 伪造结果）
+  const yjSeed = (Date.now() + (yjLine * 7)) % 1000;
+  const coins = [0,1,2].map((i) => {
+    const r = ((yjSeed * 31 + i * 17 + Date.now()) % 1000) / 1000;
+    return r < 0.5 ? 2 : 3;
+  });
   const total = coins.reduce((a,b)=>a+b,0);
   const cels = [0,1,2].map(i => document.getElementById('yjC'+i));
   for (let i = 0; i < 3; i++) { cels[i].className = 'coin'; cels[i].textContent = '●'; }
@@ -35742,7 +35747,9 @@ function _liurenTianJiang(dayGan, shiZhi, tianPan) {
   const guiIdx = _branchIdx(guiZhi);
   // 天将顺序: 贵人腾蛇朱雀六合勾陈青龙天后太阴玄武太常白虎天空
   // 昼贵顺布, 夜贵逆布
-  const tianJiangNames = ['贵人','腾蛇','朱雀','六合','勾陈','青龙','天后','太阴','玄武','太常','白虎','天空'];
+  // 大六壬天将顺序（昼顺夜逆排列）
+// 口诀：贵人→螣蛇→朱雀→六合→勾陈→青龙→天空→白虎→太常→玄武→太阴→天后
+const tianJiangNames = ['贵人','腾蛇','朱雀','六合','勾陈','青龙','天空','白虎','太常','玄武','太阴','天后'];
   const res = {};
   for (let i = 0; i < 12; i++) {
     const idx = isDay ? _qyMod(guiIdx + i, 12) : _qyMod(guiIdx - i, 12);
@@ -36002,7 +36009,9 @@ function _xuankongBrief(year, dir) {
   // 山星: 坐方运星入中, 阳顺阴逆飞
   // 向星: 向方运星入中, 阳顺阴逆飞
   const zuoNum = yunPan[dirNum] || period; // 坐方运星
-  const xiangNum = yunPan[(dirNum + 4) % 9 || 9] || period;
+  // 向方 = 坐方对宫（河图对冲：1↔9、2↔8、3↔7、4↔6，5寄中宫取对冲9）
+  const xiangDirNum = dirNum === 5 ? 9 : (10 - dirNum);
+  const xiangNum = yunPan[xiangDirNum] || yunPan[(10 - dirNum) % 9 || 9] || period;
   
   // 阳顺阴逆: 奇数为阳(顺飞), 偍数为阴(逆飞)
   // 顺飞: 5→6→7→8→9→1→2→3→4
