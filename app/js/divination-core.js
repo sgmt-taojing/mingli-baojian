@@ -15093,6 +15093,28 @@ function getShensha(pillars, dayStemIdx, dayBranchIdx) {
     }
   }
 
+  // 三奇贵人（以日干查，检查四柱天干是否含三奇组合）
+  // 《珞琭子三命消息赋》云："甲戊庚为天上三奇，乙丙丁为地下三奇，壬癸辛为人中三奇"
+  // 天上三奇：甲、戊、庚全见；地下三奇：乙、丙、丁全见；人中三奇：壬、癸、辛全见
+  var allStemsForQi = pillars.map(function(p){return p.stem;});
+  var hasSanqi = false;
+  var sanqiType = '';
+  // 天上三奇：甲戊庚
+  if (allStemsForQi.indexOf('甲') >= 0 && allStemsForQi.indexOf('戊') >= 0 && allStemsForQi.indexOf('庚') >= 0) {
+    hasSanqi = true; sanqiType = '天上三奇';
+  }
+  // 地下三奇：乙丙丁
+  if (!hasSanqi && allStemsForQi.indexOf('乙') >= 0 && allStemsForQi.indexOf('丙') >= 0 && allStemsForQi.indexOf('丁') >= 0) {
+    hasSanqi = true; sanqiType = '地下三奇';
+  }
+  // 人中三奇：壬癸辛
+  if (!hasSanqi && allStemsForQi.indexOf('壬') >= 0 && allStemsForQi.indexOf('癸') >= 0 && allStemsForQi.indexOf('辛') >= 0) {
+    hasSanqi = true; sanqiType = '人中三奇';
+  }
+  if (hasSanqi) {
+    result.push({name:'三奇贵人（' + sanqiType + '）', desc:'三奇贵人入命，精神卓绝，博学多能，为奇人异士之命。主才华横溢，逢凶化吉，福泽深厚。'});
+  }
+
   // 魁罡（日柱为庚辰/庚戌/壬辰/戊戌）
   var kgDays = ['庚辰','庚戌','壬辰','戊戌'];
   var dayPillar = dayStem + dBranch;
@@ -15100,7 +15122,7 @@ function getShensha(pillars, dayStemIdx, dayBranchIdx) {
     result.push({name:'魁罡', desc:'性格刚烈果断，聪敏果断，有领导才能。慎防婚姻不顺。'});
   }
 
-  return result.slice(0, 12);
+  return result.slice(0, 15);
 }
 
 // 十神详解

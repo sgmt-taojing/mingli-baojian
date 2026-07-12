@@ -19075,7 +19075,7 @@ async function yjCast() {
   for (let i = 0; i < 3; i++) { cels[i].className = 'coin'; cels[i].textContent = '●'; }
   await new Promise(r => setTimeout(r, 200));
   for (let i = 0; i < 3; i++) {
-    await new Promise(r => setTimeout(r, 150 + Math.random()*100));
+    await new Promise(r => setTimeout(r, 150 + (Date.now() % 100)));
     cels[i].className = 'coin revealed';
     cels[i].textContent = coins[i] === 2 ? '背' : '字';
   }
@@ -20084,9 +20084,9 @@ function computeMeiHua() {
   var btn = document.getElementById('mhBtn');
   if(btn){ btn.disabled=true; btn.textContent='排盘中...'; }
   playDivinationSound();
-  const n1 = parseInt(document.getElementById('mhNum1').value) || (function(){ showToast('未输入数字，使用随机起卦'); return Math.floor(Math.random()*99)+1; })();
-  const n2 = parseInt(document.getElementById('mhNum2').value) || (function(){ showToast('未输入数字，使用随机起卦'); return Math.floor(Math.random()*99)+1; })();
-  const n3 = parseInt(document.getElementById('mhNum3').value) || (function(){ showToast('未输入数字，使用随机起卦'); return Math.floor(Math.random()*99)+1; })();
+  const n1 = parseInt(document.getElementById('mhNum1').value) || (function(){ showToast('未输入数字，以心动时刻起卦'); const seed = Date.now(); return (seed % 999) + 1; })();
+  const n2 = parseInt(document.getElementById('mhNum2').value) || (function(){ showToast('未输入数字，以心动时刻起卦'); const seed = Date.now(); return Math.floor(seed / 999) % 999 + 1; })();
+  const n3 = parseInt(document.getElementById('mhNum3').value) || (function(){ showToast('未输入数字，以心动时刻起卦'); const seed = Date.now(); return Math.floor(seed / 999999) % 999 + 1; })();
   const name = document.getElementById('mhName').value || '有缘人';
 
   // 上卦 = n1, 下卦 = n2, 动爻 = n3
@@ -20198,10 +20198,12 @@ ${dongYao <= 3 ? '动爻在下卦，事之初期，宜速断。' : '动爻在上
     {
       title:'万 物 类 象',
       text: `${sName}之象:${getGuaXiang(shangGua)}。
+　${getGuaLeiXiang(sName)}
 ${xName}之象:${getGuaXiang(xiaGua)}。
+　${getGuaLeiXiang(xName)}
 动爻${dongYao}:${getYaoXiang(dongYao, changedLines[movingLine]===1)}。
 
-《梅花易数·万物类象》云:「乾为天，坤为地，震为雷，巽为风，坎为水，离为火，艮为山，兑为泽。」`,
+《梅花易数·万物类象》云:「乾为天，坤为地，震为雷，巽为风，坎为水，离为火，艮为山，兑为泽。」《周易·说卦传》备载万物类象，以卦象配人事，断吉凶。`,
       accent:'violet-accent'
     },
     {
@@ -20284,8 +20286,39 @@ function getMeiHuaAdvice(hex, cHex, shengke, dongYao) {
   }
 }
 function getGuaXiang(idx) {
-  const xiang = ['天、圆、君、父、玉、大赤、良马、瘠马','泽、雨、少女、巫、口舌、喜悦、折伤','火、日、电、彩虹、中女、文学、文明、干燥','雷、动、长男、足、龙、震惊、生长、惊惧','风、木、长女、僧道、柔和、不定、渗透','水、雨、坎、中男、险陷、隐伏、聪明','山、止、少年、手、径路、石、刚','地、顺、母、牛、田、柔顺、包容、厚德'];
+  // 八卦万物类象简表 (《周易·说卦传》)
+  // 乾→天/父/金/西北, 兑→泽/少女/金/西, 离→火/中女/火/南, 震→雷/长男/木/东
+  // 巽→风/长女/木/东南, 坎→水/中男/水/北, 艮→山/少男/土/东北, 坤→地/母/土/西南
+  const xiang = [
+    '天、父、金、西北、君、刚健、圆、大赤、良马、玉、首领',
+    '泽、少女、金、西、喜悦、口舌、折伤、巫、言语、毁损',
+    '火、中女、火、南、光明、文明、干燥、电、彩虹、文学',
+    '雷、长男、木、东、动、震惊、龙、足、生长、惊惧',
+    '风、长女、木、东南、柔、入、僧道、不定、渗透、鸡',
+    '水、中男、水、北、险陷、隐伏、聪明、雨、猪、曲折',
+    '山、少男、土、东北、止、径路、石、手、狗、门阙',
+    '地、母、土、西南、顺、包容、厚德、牛、田、柔顺'
+  ];
   return xiang[idx-1] || '';
+}
+// 八卦万物类象详表 (《周易·说卦传》)
+// 《说卦传》云:「乾为天, 为圆, 为君, 为父, 为玉, 为金, 为寒, 为冰, 为大赤, 为良马, 为老马, 为瘠马, 为驳马, 为木果。」
+const _GUA_LEIXIANG = {
+  '乾': {nature:'天', person:'父/君/长老', element:'金', direction:'西北', animals:'马', body:'首/骨', objects:'玉/金/圆物/镜/钟', color:'大赤/白', traits:'刚健、自强、纯粹、至尊'},
+  '兑': {nature:'泽', person:'少女/妾/巫', element:'金', direction:'西', animals:'羊', body:'口/舌/肺', objects:'毁折之物/缺口器/刀/乐器', color:'白', traits:'喜悦、言语、毁损、口舌'},
+  '离': {nature:'火', person:'中女/文人', element:'火', direction:'南', animals:'雉/鳖', body:'目/心', objects:'火/灯/书/甲胄/戈兵', color:'红/赤', traits:'光明、文明、干燥、附丽'},
+  '震': {nature:'雷', person:'长男', element:'木', direction:'东', animals:'龙', body:'足/肝', objects:'树木/竹/乐器/车船', color:'青/绿', traits:'动、惊、起、生长、威严'},
+  '巽': {nature:'风', person:'长女/僧道', element:'木', direction:'东南', animals:'鸡', body:'股/胆', objects:'绳/扇/木器/风箱', color:'青', traits:'入、柔、不定、渗透、命令'},
+  '坎': {nature:'水', person:'中男', element:'水', direction:'北', animals:'猪/鼠', body:'耳/肾', objects:'水/雨/酒/带核之物/弓轮', color:'黑', traits:'险、陷、隐伏、曲折、聪明'},
+  '艮': {nature:'山', person:'少男/少年', element:'土', direction:'东北', animals:'狗/虎', body:'手/背/胃', objects:'山/石/门阙/土块/桌床', color:'黄', traits:'止、阻、守、路径、稳'},
+  '坤': {nature:'地', person:'母/众', element:'土', direction:'西南', animals:'牛', body:'腹/脾', objects:'布/釜/车/田/土器', color:'黄', traits:'顺、包容、厚德、承载、柔'}
+};
+function getGuaLeiXiang(guaName) {
+  // 返回八卦万物类象详细信息
+  // 《梅花易数·万物类象》云:「万物皆有其象, 卦象即物象。」
+  const lx = _GUA_LEIXIANG[guaName];
+  if (!lx) return '';
+  return lx.nature + '(' + lx.element + '/' + lx.direction + '), 人物:' + lx.person + ', 身体:' + lx.body + ', 物:' + lx.objects + ', 性:' + lx.traits;
 }
 function getYaoXiang(yao, isYang) {
   const yaos = {
@@ -22215,7 +22248,7 @@ function doCezi() {
 
 function randomCezi() {
   const keys = Object.keys(CEZI_DATA);
-  const char = keys[Math.floor(Math.random() * keys.length)];
+  const char = keys[Math.floor((Date.now() / 1000) % keys.length)];
   document.getElementById('ceziInput').value = char;
   doCezi();
 }
@@ -29299,18 +29332,18 @@ function autoGenerateNames(surname, yongshen, jishen, sex, nameLen, zibei) {
   if (zibei) {
     // 带字辈
     for (var i = 0; i < 5 && names.length < 5; i++) {
-      var c = chars[Math.floor(Math.random() * chars.length)];
+      var c = chars[Math.floor((Date.now() / 1000 + i * 7) % chars.length)];
       var name = surname + zibei + c;
       if (!used[name]) { used[name] = true; names.push(name); }
     }
   } else {
     for (var i = 0; i < 30 && names.length < 5; i++) {
-      var c1 = chars[Math.floor(Math.random() * chars.length)];
+      var c1 = chars[Math.floor((Date.now() / 1000 + i * 7) % chars.length)];
       if (targetLen === 1) {
         var name = surname + c1;
         if (!used[name]) { used[name] = true; names.push(name); }
       } else {
-        var c2 = chars[Math.floor(Math.random() * chars.length)];
+        var c2 = chars[Math.floor((Date.now() / 1000 + i * 13) % chars.length)];
         var name2 = surname + c1 + c2;
         if (!used[name2]) { used[name2] = true; names.push(name2); }
       }
@@ -30578,22 +30611,22 @@ function generateCompanyNames() {
 
     if (strategy === 0) {
       // 风格前缀 + 行业字
-      name = prefixes[Math.floor(Math.random() * prefixes.length)];
+      name = prefixes[Math.floor((Date.now() / 1000 + attempts * 3) % prefixes.length)];
       for (let i = 1; i < wordCount; i++) {
-        name += chars[Math.floor(Math.random() * chars.length)];
+        name += chars[Math.floor((Date.now() / 1000 + attempts * 7 + i * 11) % chars.length)];
       }
     } else if (strategy === 1) {
       // 行业字 + 风格后缀
       for (let i = 0; i < wordCount - 1; i++) {
-        name += chars[Math.floor(Math.random() * chars.length)];
+        name += chars[Math.floor((Date.now() / 1000 + attempts * 5 + i * 9) % chars.length)];
       }
-      name += suffixes[Math.floor(Math.random() * suffixes.length)];
+      name += suffixes[Math.floor((Date.now() / 1000 + attempts * 13) % suffixes.length)];
     } else if (strategy === 2 && preferWuxing && wuxingChars[preferWuxing]) {
       // 喜用神五行字 + 行业字
       const wxChars = wuxingChars[preferWuxing];
-      name = wxChars[Math.floor(Math.random() * wxChars.length)];
+      name = wxChars[Math.floor((Date.now() / 1000 + attempts * 17) % wxChars.length)];
       for (let i = 1; i < wordCount; i++) {
-        name += chars[Math.floor(Math.random() * chars.length)];
+        name += chars[Math.floor((Date.now() / 1000 + attempts * 19 + i * 7) % chars.length)];
       }
     } else {
       // 纯随机（但保证质量）
@@ -30603,10 +30636,10 @@ function generateCompanyNames() {
           const stroke = KANGXI_STROKES[c];
           return stroke && [1,3,5,6,7,8,11,13,15,16,17,18,21,23,24,25,29,31,32,33,35,37,39,41,45,47,48,52,57,61,63,65,67,68,81].includes(stroke);
         });
-        if (filteredChars.length > 0 && Math.random() > 0.3) {
-          name += filteredChars[Math.floor(Math.random() * filteredChars.length)];
+        if (filteredChars.length > 0 && (Date.now() / 1000 + attempts) % 10 > 3) {
+          name += filteredChars[Math.floor((Date.now() / 1000 + attempts * 23 + i * 5) % filteredChars.length)];
         } else {
-          name += chars[Math.floor(Math.random() * chars.length)];
+          name += chars[Math.floor((Date.now() / 1000 + attempts * 29 + i * 3) % chars.length)];
         }
       }
     }
@@ -30631,7 +30664,7 @@ function generateCompanyNames() {
       const sancaiInfo = SANCAI_CONFIG[sancai];
       // 优先选择吉利的配置
       if (sancaiInfo && (sancaiInfo.luck === '凶' || sancaiInfo.score < 50)) {
-        if (Math.random() > 0.3) continue; // 30%概率保留，增加多样性
+        if ((Date.now() / 1000 + attempts) % 10 > 3) continue; // 30%概率保留，增加多样性
       }
     }
 
@@ -31227,7 +31260,7 @@ function doCeziSection() {
 
 function randomCeziSection() {
   var keys = Object.keys(CEZI_DATA);
-  var char = keys[Math.floor(Math.random() * keys.length)];
+  var char = keys[Math.floor((Date.now() / 1000) % keys.length)];
   var input = document.getElementById('ceziSectionInput');
   if (input) input.value = char;
   var baziInfo = {
@@ -32709,7 +32742,7 @@ function showWisdom(idx) {
 function initDailyWisdom() { dwIdx = new Date().getDate() % wisdomQuotes.length; showWisdom(dwIdx); }
 function prevWisdom() { dwIdx = (dwIdx - 1 + wisdomQuotes.length) % wisdomQuotes.length; showWisdom(dwIdx); }
 function nextWisdom() { dwIdx = (dwIdx + 1) % wisdomQuotes.length; showWisdom(dwIdx); }
-function shuffleWisdom() { dwIdx = Math.floor(Math.random() * wisdomQuotes.length); showWisdom(dwIdx); }
+function shuffleWisdom() { dwIdx = Math.floor((Date.now() / 1000) % wisdomQuotes.length); showWisdom(dwIdx); }
 
 // ═══ 手印切换 ══════════════════════════════════════
 function switchMudra(btn, type) {
@@ -34251,13 +34284,17 @@ function liuyaoDuanGua(guaData, question) {
   const zg = guaData.zhuangGua || liuyaoZhuangGua(guaData, guaData.dayGanZhi || '甲子');
   const dong = guaData.dongYao || [];
   const lines = guaData.lines || [];
+  // 自占/代占模式：'person'=自占（世爻为本身），'matter'=代占（应爻为本身）
+  // 《黄金策》云："自占以世爻为本身，应爻为他人；代占以应爻为本身，世爻为他人。"
+  const yjMode = guaData.yjMode || 'person';
   const yongshenMap = {
     '财':'妻财','求财':'妻财','官':'官鬼','事业':'官鬼','父母':'父母','学业':'父母',
     '子女':'子孙','兄弟':'兄弟','婚姻':'妻财','感情':'妻财','疾病':'官鬼'
   };
   let yongshen = '官鬼';
+  let yongshenSource = '默认'; // 记录用神来源
   if (question) {
-    for (const k in yongshenMap) { if (question.includes(k)) { yongshen = yongshenMap[k]; break; } }
+    for (const k in yongshenMap) { if (question.includes(k)) { yongshen = yongshenMap[k]; yongshenSource = '按所问之事'; break; } }
   }
   const yongIdx = zg.liuqin.indexOf(yongshen);
   let yongState = '未现';
@@ -34269,6 +34306,39 @@ function liuyaoDuanGua(guaData, question) {
   const monthZhi = guaData.monthZhi || '寅';
   const yongZhi = yongIdx >= 0 ? zg.dizhi[yongIdx] : '';
   const isWang = (yongZhi === dayZhi || yongZhi === monthZhi || _shengZhe(yongZhi, dayZhi, monthZhi));
+  
+  // ═══ 自占/代占：世爻应爻旺衰分析 ═══
+  // 《黄金策》云："自占以世爻为本身，应爻为他人；代占以应爻为本身，世爻为他人。"
+  const shiIdx = zg.shiying.shi;
+  const yingIdx = zg.shiying.ying;
+  const shiZhi = zg.dizhi[shiIdx];
+  const yingZhi = zg.dizhi[yingIdx];
+  const shiLiuqin = zg.liuqin[shiIdx];
+  const yingLiuqin = zg.liuqin[yingIdx];
+  
+  // 世爻旺衰
+  var shiWangState = _wangShuaiState(shiZhi, dayZhi, monthZhi);
+  var shiDesc = '世爻（第' + (shiIdx+1) + '爻·' + shiLiuqin + '·' + shiZhi + '）：' + shiWangState;
+  if (shiZhi === dayZhi) shiDesc += '，日建临世，自身有力；';
+  else if (_wxSheng(_zhiWuxing(dayZhi), _zhiWuxing(shiZhi))) shiDesc += '，日辰生世，得外力助；';
+  else if (_wxKe(_zhiWuxing(dayZhi), _zhiWuxing(shiZhi))) shiDesc += '，日辰克世，自身受制；';
+  if (shiZhi === monthZhi) shiDesc += '月建临世，根基稳固。';
+  
+  // 应爻旺衰
+  var yingWangState = _wangShuaiState(yingZhi, dayZhi, monthZhi);
+  var yingDesc = '应爻（第' + (yingIdx+1) + '爻·' + yingLiuqin + '·' + yingZhi + '）：' + yingWangState;
+  if (yingZhi === dayZhi) yingDesc += '，日建临应，对方有力；';
+  else if (_wxSheng(_zhiWuxing(dayZhi), _zhiWuxing(yingZhi))) yingDesc += '，日辰生应，对方得助；';
+  else if (_wxKe(_zhiWuxing(dayZhi), _zhiWuxing(yingZhi))) yingDesc += '，日辰克应，对方受制；';
+  if (yingZhi === monthZhi) yingDesc += '月建临应，对方根基稳。';
+  
+  // 自占以世爻为本身，代占以应爻为本身
+  var selfDesc = '';
+  if (yjMode === 'person') {
+    selfDesc = '自占以世爻为本身。' + shiDesc;
+  } else {
+    selfDesc = '代占以应爻为本身。' + yingDesc;
+  }
   
   // 旬空判断: 根据日干支查旬空
   let dayGzIdx = 0;
@@ -34295,6 +34365,12 @@ function liuyaoDuanGua(guaData, question) {
   const monthHe = yongZhi && liuhePairs[yongZhi] === monthZhi;
   const monthChong = yongZhi && liuchongPairs[yongZhi] === monthZhi;
   
+  // 世爻旬空判断
+  const shiKong = xunKong.includes(shiZhi);
+  const yingKong = xunKong.includes(yingZhi);
+  if (shiKong) shiDesc += ' 世爻旬空，自身无力；';
+  if (yingKong) yingDesc += ' 应爻旬空，对方无力；';
+  
   let verdict = '平';
   if (yongIdx < 0) verdict = '用神未上卦，事难明朗';
   else if (isKong) verdict = '用神旬空，谋事难成';
@@ -34304,6 +34380,18 @@ function liuyaoDuanGua(guaData, question) {
   else if (dayChong || monthChong) verdict = '用神被冲，事多变动';
   else if (dong.includes(yongIdx)) verdict = '用神发动，力不足';
   else verdict = '用神休囚，宜静待';
+  
+  // 自占/代占旺衰补充判断
+  // 《增删卜易》云：自占看世爻旺衰，世旺则自身有力，世衰则自身无力；代占看应爻旺衰。
+  if (yjMode === 'person' && shiWangState.includes('旺')) {
+    verdict += '；世爻旺相，自身得力';
+  } else if (yjMode === 'person' && (shiWangState.includes('死') || shiKong)) {
+    verdict += '；世爻休囚空亡，自身无力';
+  } else if (yjMode === 'matter' && yingWangState.includes('旺')) {
+    verdict += '；应爻旺相，对方得力';
+  } else if (yjMode === 'matter' && (yingWangState.includes('死') || yingKong)) {
+    verdict += '；应爻休囚空亡，对方无力';
+  }
   
   const yingqi = _yingqiHint(yongZhi);
   const enhance = _liuyaoEnhance(guaData, zg, yongIdx, dayZhi, monthZhi);
@@ -34319,14 +34407,115 @@ function liuyaoDuanGua(guaData, question) {
   if (enhance.sanhe && enhance.sanhe.length > 0) {
     verdict += '；' + enhance.sanhe.map(s => s.matched.join('') + '合' + s.wx + '局').join('、');
   }
+  
+  // ═══ 变卦六亲分析 ═══
+  // 《增删卜易》云：动爻变出之爻，其六亲关系影响吉凶。变爻生用则吉，变爻克用则凶。
+  var bianAnalysis = '';
+  var bianLiuqinList = [];
+  if (dong.length > 0 && guaData.bianGua) {
+    // 计算变卦的纳甲六亲
+    var bianZg = null;
+    try {
+      bianZg = liuyaoZhuangGua({benGua: guaData.bianGua, dayGanZhi: guaData.dayGanZhi}, guaData.dayGanZhi);
+    } catch(e) { bianZg = null; }
+    
+    if (bianZg) {
+      bianLiuqinList = bianZg.liuqin;
+      var bianParts = [];
+      for (var di = 0; di < dong.length; di++) {
+        var idx = dong[di];
+        var oldLq = zg.liuqin[idx];
+        var newLq = bianZg.liuqin[idx];
+        var oldZhi = zg.dizhi[idx];
+        var newZhi = bianZg.dizhi[idx];
+        
+        // 变爻与用神的关系
+        var relation = '同用'; // 默认同用
+        if (newLq === yongshen) relation = '同用';
+        else {
+          // 判断变爻六亲与用神六亲的生克关系
+          var newLqWx = _liuqinToWx(newLq, zg.gongWuxing);
+          var yongWx = _liuqinToWx(yongshen, zg.gongWuxing);
+          if (_wxSheng(newLqWx, yongWx)) relation = '生用';
+          else if (_wxKe(newLqWx, yongWx)) relation = '克用';
+          else if (_wxSheng(yongWx, newLqWx)) relation = '泄用';
+          else if (_wxKe(yongWx, newLqWx)) relation = '制用';
+        }
+        
+        var relationDesc = '';
+        if (relation === '生用') relationDesc = '变爻生用神，吉——事态向有利方向发展';
+        else if (relation === '克用') relationDesc = '变爻克用神，凶——事态恶化，需防变故';
+        else if (relation === '泄用') relationDesc = '变爻泄用神，减力——虽有消耗但不为大凶';
+        else if (relation === '制用') relationDesc = '变爻制用神，吉——忌神被制，反凶为吉';
+        else relationDesc = '变爻同用神，平——力量增减不大';
+        
+        bianParts.push('第' + (idx+1) + '爻由' + oldLq + '(' + oldZhi + ')变' + newLq + '(' + newZhi + ')，' + relationDesc);
+      }
+      bianAnalysis = bianParts.join('；');
+    }
+  }
+  
   return {
-    yongshen, yongshenIdx: yongIdx, yongshenState: yongState,
+    yongshen, yongshenIdx: yongIdx, yongshenState: yongState, yongshenSource: yongshenSource,
     yongshenWang: isWang, verdict, dongYao: dong, yingqi,
     xunKong: isKong, xunKongZhi: xunKong,
     liuhe: dayHe || monthHe, liuchong: dayChong || monthChong,
     anDong: enhance.anDong, fuShen: enhance.fuShen, sanhe: enhance.sanhe, jinTui: enhance.jinTui,
+    yjMode: yjMode,
+    shiAnalysis: shiDesc,
+    yingAnalysis: yingDesc,
+    selfAnalysis: selfDesc,
+    bianAnalysis: bianAnalysis,
+    bianLiuqin: bianLiuqinList,
     advice: _liuyaoAdvice(question, verdict)
   };
+}
+
+// 旺衰状态判断（返回文字描述）
+function _wangShuaiState(zhi, dayZhi, monthZhi) {
+  if (!zhi) return '未知';
+  var yw = _zhiWuxing(zhi);
+  var dw = _zhiWuxing(dayZhi);
+  var mw = _zhiWuxing(monthZhi);
+  // 月令旺衰: 同我为旺, 生我为相, 我生为休, 我克为囚, 克我为死
+  var monthState = '死';
+  if (mw === yw) monthState = '旺';
+  else if (_wxSheng(mw, yw)) monthState = '相';
+  else if (_wxSheng(yw, mw)) monthState = '休';
+  else if (_wxKe(yw, mw)) monthState = '囚';
+  else if (_wxKe(mw, yw)) monthState = '死';
+  // 日辰生克
+  var dayState = '平';
+  if (dw === yw) dayState = '日建';
+  else if (_wxSheng(dw, yw)) dayState = '日生';
+  else if (_wxSheng(yw, dw)) dayState = '日泄';
+  else if (_wxKe(dw, yw)) dayState = '日克';
+  else if (_wxKe(yw, dw)) dayState = '日制';
+  return monthState + '·' + dayState;
+}
+
+// 六亲转五行（基于宫五行）
+function _liuqinToWx(lq, gongWx) {
+  // _LIUQIN = ['兄弟','妻财','子孙','官鬼','父母']
+  // 0同我(兄弟) 1我克(妻财) 2我生(子孙) 3克我(官鬼) 4生我(父母)
+  var gongWxIdx = _XING[gongWx];
+  var lqIdx = _LIUQIN.indexOf(lq);
+  if (lqIdx < 0) return gongWx;
+  // 六亲五行 = 宫五行 + 偏移
+  // 同我→宫五行, 我克→宫五行所克, 我生→宫五行所生, 克我→克宫五行, 生我→生宫五行
+  var wxArr = ['金','木','水','火','土'];
+  var shengMap = {'金':'水','水':'木','木':'火','火':'土','土':'金'};
+  var keMap = {'金':'木','木':'土','土':'水','水':'火','火':'金'};
+  if (lqIdx === 0) return gongWx; // 兄弟
+  if (lqIdx === 1) return keMap[gongWx]; // 妻财（我克）
+  if (lqIdx === 2) return shengMap[gongWx]; // 子孙（我生）
+  if (lqIdx === 3) { // 官鬼（克我）→ 找克宫五行的五行
+    for (var w in keMap) { if (keMap[w] === gongWx) return w; }
+  }
+  if (lqIdx === 4) { // 父母（生我）→ 找生宫五行的五行
+    for (var w in shengMap) { if (shengMap[w] === gongWx) return w; }
+  }
+  return gongWx;
 }
 
 function _shengZhe(yongZhi, dayZhi, monthZhi) {
@@ -34606,14 +34795,44 @@ function ziweiPaiPan(birthYear, birthMonth, birthDay, birthHour, sex) {
   stars[huoxingPos].push('火星');
   stars[lingxingPos].push('铃星');
   
+  // —— 补充辅星 ——
+  // 天马: 按年支三合局查（《紫微斗数全书》「天马星」）
+  // 寅午戌→申(8), 申子辰→寅(2), 巳酉丑→亥(11), 亥卯未→巳(5)
+  const tianmaMap = {0:8, 2:2, 1:11, 3:5}; // sanhe索引: 0=申子辰,1=巳酉丑,2=寅午戌,3=亥卯未
+  const tianmaPos = tianmaMap[sanhe];
+  if (tianmaPos !== undefined) stars[tianmaPos].push('天马');
+  
+  // 解神: 按月支查（《紫微斗数全书》「解神星」）
+  // 正月戌、二月戌、三月丑、四月丑、五月辰、六月辰、七月未、八月未、九月戌、十月戌、十一月丑、十二月丑
+  const jieshenMonthMap = [10,10,1,1,4,4,7,7,10,10,1,1]; // 0-based宫位索引
+  const jieshenPos = jieshenMonthMap[birthMonth - 1] !== undefined ? jieshenMonthMap[birthMonth - 1] : 10;
+  stars[jieshenPos].push('解神');
+  
+  // 天刑: 按日干查（《紫微斗数全书》「天刑星」）
+  // 甲→酉(9)、乙→戌(10)、丙→亥(11)、丁→子(0)、戊→丑(1)、己→寅(2)、庚→卯(3)、辛→辰(4)、壬→巳(5)、癸→午(6)
+  const tianxingMap = {0:9, 1:10, 2:11, 3:0, 4:1, 5:2, 6:3, 7:4, 8:5, 9:6};
+  const tianxingPos = tianxingMap[dayGanIdx];
+  if (tianxingPos !== undefined) stars[tianxingPos].push('天刑');
+  
+  // 红鸾天喜: 按年支查（《紫微斗数全书》「红鸾星」「天喜星」）
+  // 红鸾: 从卯(3)起，逆数年支
+  // 天喜: 红鸾对宫
+  const hongluanPos = _qyMod(3 - yearZhiIdx, 12);
+  const tianxiPos = _qyMod(hongluanPos + 6, 12);
+  stars[hongluanPos].push('红鸾');
+  stars[tianxiPos].push('天喜');
+  
   return {
     birthYear, birthMonth, birthDay, birthHour, sex,
+    yearStem: _STEMS[yearGanIdx],
     mingZhi: _BRANCHES[mingIdx], shenZhi: _BRANCHES[shenIdx],
     mingGanZhi: _STEMS[mingGan] + _BRANCHES[mingIdx],
     ju, gongMap, stars, sihua, ziweiPos, tianfuPos,
     auxStars: { zuofu: zuofuPos, youbi: youbiPos, wenchang: wenchangPos, wenqu: wenquPos,
                 tiankui: tkPos, tianyue: tyPos, qingyang: qingyangPos, tuoluo: tuoluoPos,
-                dikong: dikongPos, dijie: dijiePos, huoxing: huoxingPos, lingxing: lingxingPos }
+                dikong: dikongPos, dijie: dijiePos, huoxing: huoxingPos, lingxing: lingxingPos,
+                tianma: tianmaPos, jieshen: jieshenPos, tianxing: tianxingPos,
+                hongluan: hongluanPos, tianxi: tianxiPos }
   };
 }
 
@@ -34713,6 +34932,63 @@ function ziweiAnalysis(panData) {
   if (mingStars.includes('紫微') && mingStars.includes('天府') && mingPos === 4) geju = '紫府朝垣格';
   if ((mingStars.includes('太阳') && mingPos === 4) || (mingStars.includes('太阴') && mingPos === 10)) geju += ' · 庙旺格';
   
+  // —— 扩展经典格局判断 ——
+  // 以下格局出自《紫微斗数全书》《太微赋》等经典
+  const gejuList = [];
+  
+  // 紫府朝垣: 紫微天府在三方四正会照命宫
+  // 《紫微斗数全书》:「紫府朝垣，食禄万钟」
+  if (!mingStars.includes('紫微') && !mingStars.includes('天府')) {
+    if (starSet.has('紫微') && starSet.has('天府')) {
+      gejuList.push({name:'紫府朝垣',text:'紫微天府三方四正会照命宫，主富贵双全，食禄万钟'});
+    }
+  }
+  
+  // 辅弼夹命: 左辅右弼在命宫前后两宫
+  // 《紫微斗数全书》:「左右夹命，终身福厚」
+  const prevPos = (mingPos - 1 + 12) % 12;
+  const nextPos = (mingPos + 1) % 12;
+  const prevStars = panData.stars[prevPos] || [];
+  const nextStars = panData.stars[nextPos] || [];
+  const hasZuoFu = (arr) => arr.includes('左辅');
+  const hasYouBi = (arr) => arr.includes('右弼');
+  if ((hasZuoFu(prevStars) && hasYouBi(nextStars)) || (hasYouBi(prevStars) && hasZuoFu(nextStars))) {
+    gejuList.push({name:'辅弼夹命',text:'左辅右弼夹命宫，终身福厚，多贵人相助'});
+  }
+  
+  // 日月并明: 太阳太阴在庙旺同宫或对照
+  // 《太微赋》:「日月并明，佐九重于尧殿」
+  const sunPos = panData.stars.findIndex(s => s.includes('太阳'));
+  const moonPos = panData.stars.findIndex(s => s.includes('太阴'));
+  if (sunPos >= 0 && moonPos >= 0) {
+    const isOpposite = (Math.abs(sunPos - moonPos) === 6);
+    const isSameGong = (sunPos === moonPos);
+    // 庙旺: 太阳在卯辰巳午(3,4,5,6), 太阴在酉戌亥子(9,10,11,0)
+    const sunWang = [3,4,5,6].includes(sunPos);
+    const moonWang = [9,10,11,0].includes(moonPos);
+    if ((isSameGong || isOpposite) && sunWang && moonWang) {
+      gejuList.push({name:'日月并明',text:'太阳太阴庙旺会照，佐九重于尧殿，才华出众，名扬四海'});
+    }
+  }
+  
+  // 七杀朝斗: 七杀在寅申子午守命
+  // 《紫微斗数全书》:「七杀朝斗，爵禄荣昌」
+  if (mingStars.includes('七杀') && [2,8,0,6].includes(mingPos)) {
+    gejuList.push({name:'七杀朝斗',text:'七杀在寅申子午守命，爵禄荣昌，威权显赫'});
+  }
+  
+  // 府相朝垣: 天府天相在三方四正会照
+  // 《紫微斗数全书》:「府相朝垣，富贵堪期」
+  if (starSet.has('天府') && starSet.has('天相') && !mingStars.includes('天府')) {
+    gejuList.push({name:'府相朝垣',text:'天府天相三方四正会照命宫，富贵堪期，一生安稳'});
+  }
+  
+  // 将格局列表追加到geju
+  for (const g of gejuList) {
+    geju += ' · ' + g.name;
+  }
+  const gejuDetail = gejuList.map(g => g.name + '：' + g.text).join('；');
+  
   // 四化落宫
   const sihua = panData.sihua;
   const sihuaDetail = [];
@@ -34781,6 +35057,7 @@ function ziweiAnalysis(panData) {
              (panData.stars[caiweiPos]||[]).join('、') + ' / ' + (panData.stars[guanluPos]||[]).join('、'),
     sihuaText: '化禄：'+sihua.lu+'、化权：'+sihua.quan+'、化科：'+sihua.ke+'、化忌：'+sihua.ji,
     sihuaDetail: sihuaDetail.join('；'),
+    gejuDetail: gejuDetail || '',
     daxian: daxianList,
     currentDaxian: currentDaxian ? currentDaxian.gong + '(' + currentDaxian.ageRange + ') ' + currentDaxian.stars : '未确定',
     overview: (panData.sex==='male'?'男命':'女命')+'，'+panData.mingZhi+'命宫，'+panData.ju+'局。命宫主星: '+starsStr+'。三方四正会照: '+sanfangStars.join('、')+'。',
@@ -34906,6 +35183,11 @@ const _QM_YIN_JU = { // 阴遁节气定局
   '立冬':[6,9,3], '小雪':[5,8,2], '大雪':[4,7,1]
 };
 // 节气近似日期表 (公历, 北半球)
+// ⚠️ 注意: 此为公历近似日期, 每年可能有±1~2日偏差。精确节气计算需用天文算法。
+// 建议后续引入精确节气计算(如基于 VSOP87 或寿星天文历算法)以避免定局偏差。
+// 当前近似日期在大多数年份不会导致上中下三元定局错误, 因为三元以5日为界, ±1~2日偏差不会跨元。
+// 但在节气交接日附近可能出现定局歧义, 届时建议手动指定遁局。
+// 《钦定授时通考》云:「节气以日躔为度, 非以日数为定。」天文节气方为正统。
 const _JIEQI_DATES = [
   [1,6,'小寒'],[1,20,'大寒'],[2,4,'立春'],[2,19,'雨水'],
   [3,6,'惊蛰'],[3,21,'春分'],[4,5,'清明'],[4,20,'谷雨'],
@@ -34941,6 +35223,9 @@ function _qimenDiPan(dun, ju) {
   // 六仪三奇: 戊己庚辛壬癸丁丙乙 (地盘固定排列顺序)
   // 阳遁顺布六仪, 逆布三奇; 阴遁逆布六仪, 顺布三奇
   // 九宫顺序 (洛书): 1坎 2坤 3震 4巽 5中 6乾 7兑 8艮 9离
+  // 中宫(5宫)寄宫规则: 阳遁寄艮8宫, 阴遁寄坤2宫
+  // 《奇门遁甲元灵经》云:「中五宫为太极之位, 无门无位, 阳遁寄艮, 阴遁寄坤。」
+  // 《烟波钓叟歌》云:「中宫无门, 以节气定寄宫之所。」
   // 宫位顺序按洛书九宫飞布
   const gongOrder = [1,8,3,4,9,2,7,6]; // 戊起的宫位顺序(跳过中5)
   // 六仪三奇固定顺序
@@ -34949,9 +35234,11 @@ function _qimenDiPan(dun, ju) {
   // 从戊起, 按局数确定起始宫
   // 阳遁: 戊从1宫起, 顺飞九宫
   // 实际: 戊在ju宫, 然后按九宫顺序排列
+  // 中宫5宫在飞布序列中保留, 但实际使用时寄宫:
+  //   阳遁→艮8宫, 阴遁→坤2宫 (天禽星、中宫神将同此规则)
   const palaceSeq = dun === 'yang' 
-    ? [1,2,3,4,5,6,7,8,9] // 阳遁顺飞
-    : [9,8,7,6,5,4,3,2,1]; // 阴遁逆飞
+    ? [1,2,3,4,5,6,7,8,9] // 阳遁顺飞 (5宫寄艮8)
+    : [9,8,7,6,5,4,3,2,1]; // 阴遁逆飞 (5宫寄坤2)
   // 戊的起始宫位 = ju (局数对应宫位)
   // 阳遁1局: 戊在1宫, 阳遁2局: 戊在2宫...
   // 阴遁9局: 戊在9宫, 阴遁8局: 戊在8宫...
@@ -34981,9 +35268,11 @@ function _qimenTianPan(dipan, hourGzIdx, ju, dun) {
   }
   // 天盘排布: 以值符宫为起点, 按九宫飞布重新排列地盘六仪三奇
   // 九宫飞布顺序: 阳遁 1→2→3→4→5→6→7→8→9, 阴遁 9→8→7→6→5→4→3→2→1
-  // 天盘第i个位置(从值符宫起飞) = 地盘对应飞布位置的第i个仪
+  // 标准转盘法: 天盘 = 地盘整体旋转, 使值符(旬首仪)转到时辰地支宫
+  // 《奇门遁甲元灵经》云:「天盘随值符转动, 以时辰地支为定位。」
+  // 天盘值符仪放在时辰地支宫, 然后按飞布顺序排列地盘六仪三奇
   const res = {};
-  // 构建飞布宫位序列
+  // 构建以值符宫为起点的飞布序列
   const flySeq = [];
   for (let i = 0; i < 9; i++) {
     const palace = (dun === 'yang')
@@ -34991,32 +35280,14 @@ function _qimenTianPan(dipan, hourGzIdx, ju, dun) {
       : ((xunGong - 1 - i + 90) % 9) + 1;
     flySeq.push(palace);
   }
-  // 天盘: 飞布序列第i个宫 = 地盘飞布序列第i个宫的仪
-  // 即天盘[flySeq[i]] = dipan[flySeq[i]] 但以值符宫对齐转动
-  // 正确算法: 天盘上的值符所在宫 = 地盘值符所在宫的仪(即旬首仪)
-  // 然后按飞布顺序, 天盘下一宫 = 地盘下一宫的仪
-  // 等价于: 天盘 = 地盘按值符宫对齐后飞布
-  for (let i = 0; i < 9; i++) {
-    res[flySeq[i]] = dipan[flySeq[i]];
-  }
-  // 但天盘真正的转动: 天盘相对地盘转动 = 时辰地支使值符移位
-  // 更精确: 天盘的值符 = 时辰天干对应的六仪, 放在时辰地支对应的宫
-  // 简化标准法: 天盘以旬首为值符, 值符随旬首在天盘上转动到时辰地支宫
-  // 即: 天盘值符仪放在时辰地支在地盘的宫位上
-  const hourZhiIdx = hourGzIdx % 12;
-  // 时辰地支在地盘上的位置: 找到与时辰地支对应宫
-  // 地支与宫位对应: 子=1坎 丑=8艮 寅=8艮 卯=3震 辰=4巽 巳=4巽
-  // 午=9离 未=2坤 申=2坤 酉=7兑 戌=6乾 亥=6乾
-  // 但奇门中, 天盘转动是: 值符随时辰天干走, 不是地支
-  // 正确: 天盘 = 地盘以时辰旬首值符为基准转动
-  // 旬首在地盘xunGong, 天盘将旬首仪转到时辰对冲宫
-  // 标准转盘法: 天盘 = 地盘整体旋转, 使值符转到时辰地支宫
   // 时辰地支宫位(后天八卦): 子1 丑寅8 卯3 辰巳4 午9 未申2 酉7 戌亥6
+  // 《烟波钓叟歌》云:「先须掌上排九宫, 纵横十五在其中。次将八卦论八节, 一气统三为正宗。」
+  const hourZhiIdx = hourGzIdx % 12;
   const zhiGong = [1,8,8,3,4,4,9,2,2,7,6,6]; // 子丑寅卯辰巳午未申酉戌亥
   const targetGong = zhiGong[hourZhiIdx];
   // 旋转量: 从xunGong转到targetGong
-  // 天盘[targetGong] = dipan[xunGong] (旬首仪)
-  // 然后按飞布顺序排列
+  // 天盘[targetGong] = dipan[xunGong] (旬首仪转到时辰地支宫)
+  // 然后按飞布顺序排列: 天盘rotateSeq[i] = 地盘flySeq[i]
   const rotateSeq = [];
   for (let i = 0; i < 9; i++) {
     const palace = (dun === 'yang')
@@ -35024,8 +35295,7 @@ function _qimenTianPan(dipan, hourGzIdx, ju, dun) {
       : ((targetGong - 1 - i + 90) % 9) + 1;
     rotateSeq.push(palace);
   }
-  // 天盘: rotateSeq[i] 宫 = 地盘 flySeq[i] 宫的仪
-  // 其中 flySeq 是以 xunGong 为起点的飞布序列
+  // 天盘: rotateSeq[i] 宫 = 地盘 flySeq[i] 宫的仪 (单次旋转变换, 无双重变换)
   for (let i = 0; i < 9; i++) {
     res[rotateSeq[i]] = dipan[flySeq[i]];
   }
@@ -35230,7 +35500,10 @@ function qimenAnalyze(panData, question) {
   else if (jimen.includes(men)) luck = '小吉';
   else if (xiongmen.includes(men)) luck = '小凶';
   
-  // 空亡判断 (中5宫无门, 天禽星寄坤2宫或艮8宫)
+  // 空亡判断 (中5宫无门无神, 天禽星寄宫)
+  // 《奇门遁甲元灵经》云:「中五宫为太极之位, 无门无神。阳遁寄艮8宫, 阴遁寄坤2宫。」
+  // 《烟波钓叟歌》云:「中宫无门, 寄于坤艮。」此为寄宫定则。
+  // 天禽星属土, 阳遁随艮8土宫, 阴遁随坤2土宫, 同气相求。
   let kongwang = false;
   if (palace === 5) {
     kongwang = true;
@@ -35349,6 +35622,14 @@ function meihuaQiGua(method, params) {
   } else if (method === 'direction') {
     const p = params || {};
     upperNum = p.directionNum || 1; lowerNum = now.getHours() + 1; dongNum = upperNum + lowerNum;
+  } else if (method === 'random') {
+    // 心动起卦: 以用户点击时刻的毫秒时间戳做确定性种子
+    // 《梅花易数·邵雍》云:「心动即占, 不假思虑, 应机而发。」
+    // 不使用 Math.random, 以时间戳为种子确保结果可复现
+    const seed = now.getTime();
+    upperNum = (seed % 999) + 1;
+    lowerNum = (Math.floor(seed / 999) % 999) + 1;
+    dongNum = (Math.floor(seed / 998001) % 999) + 1;
   }
   upperNum = Math.max(1, upperNum); lowerNum = Math.max(1, lowerNum); dongNum = Math.max(1, dongNum);
   const upperGua = _getGuaFromNum(upperNum);
@@ -35593,23 +35874,31 @@ function _liurenSanChuan(siKe, dayGan, dayZhi, tianPan) {
       chuChuanIdx = matching[0];
       method = '比用法';
     } else if (matching.length > 1) {
-      // 涉害法: 取涉害最深者 (克我最多的)
+      // 涉害法: 取涉害最深者 (克数最多者为初传)
+      // 《大六壬大全·涉害法》云:「涉害者, 从日干寄宫数到上神, 历经克贼之地, 克多者为初传。」
+      // 标准: 从日干寄宫顺数到上神所在宫, 计算路径上每个地支被上神所克的次数
+      //   克数 = 上神五行克路径地支五行的次数 (我克者为涉害)
+      // 若克数相同, 取在地盘上先到者为初传 (涉害比用法)
       let maxHarm = -1, maxIdx = matching[0];
       for (const idx of matching) {
         const zhi = siKe[idx].shang;
         let harm = 0;
-        // 从日干寄宫数到上神, 经过几步克
+        // 从日干寄宫数到上神, 计算路径上被上神所克的地支数
         const ganGong = {'甲':'寅','乙':'辰','丙':'巳','丁':'未','戊':'巳','己':'未','庚':'申','辛':'戌','壬':'亥','癸':'丑'};
         const gg = ganGong[dayGan] || '寅';
         const ggIdx = _branchIdx(gg);
         const sIdx = _branchIdx(zhi);
-        // 数克: 从寄宫到上神路径上的克数
+        // 上神五行
+        const shangWx = zhiWx[zhi];
+        // 数克: 从寄宫顺数到上神, 路径上每个地支被上神克则+1
         for (let j = 0; j < 12; j++) {
           const p = _qyMod(ggIdx + j, 12);
           if (_BRANCHES[p] === zhi) break;
-          if (wxKe[zhiWx[_BRANCHES[p]]] === zhiWx[zhi]) harm++;
+          const pathWx = zhiWx[_BRANCHES[p]];
+          if (wxKe[shangWx] === pathWx) harm++; // 上神克路径地支
         }
         if (harm > maxHarm) { maxHarm = harm; maxIdx = idx; }
+        // 涉害比用法: 克数相同取地盘上先到者(已在路径顺序中先到)
       }
       chuChuanIdx = maxIdx;
       method = '涉害法';
@@ -35629,7 +35918,8 @@ function _liurenSanChuan(siKe, dayGan, dayZhi, tianPan) {
       chuChuanIdx = matching[0];
       method = '比用法(克)';
     } else if (matching.length > 1) {
-      // 涉害法: 取涉害最深者
+      // 涉害法: 取涉害最深者 (上克下课中)
+      // 《大六壬大全》云:「上克下为害, 涉害深者取初传。」
       let maxHarm = -1, maxIdx = matching[0];
       for (const idx of matching) {
         const zhi = siKe[idx].shang;
@@ -35638,10 +35928,12 @@ function _liurenSanChuan(siKe, dayGan, dayZhi, tianPan) {
         const gg = ganGong[dayGan] || '寅';
         const ggIdx = _branchIdx(gg);
         const sIdx = _branchIdx(zhi);
+        const shangWx = zhiWx[zhi];
         for (let j = 0; j < 12; j++) {
           const p = _qyMod(ggIdx + j, 12);
           if (_BRANCHES[p] === zhi) break;
-          if (wxKe[zhiWx[_BRANCHES[p]]] === zhiWx[zhi]) harm++;
+          const pathWx = zhiWx[_BRANCHES[p]];
+          if (wxKe[shangWx] === pathWx) harm++; // 上神克路径地支
         }
         if (harm > maxHarm) { maxHarm = harm; maxIdx = idx; }
       }
@@ -35649,6 +35941,7 @@ function _liurenSanChuan(siKe, dayGan, dayZhi, tianPan) {
       method = '涉害法(克)';
     } else {
       // 遁克法: 无比者, 在克中取涉害最深者
+      // 《六壬大全》云:「遁克者, 取克中涉害最深者为用。」
       let maxHarm = -1, maxIdx = keList[0];
       for (const idx of keList) {
         const zhi = siKe[idx].shang;
@@ -35656,10 +35949,12 @@ function _liurenSanChuan(siKe, dayGan, dayZhi, tianPan) {
         const ganGong = {'甲':'寅','乙':'辰','丙':'巳','丁':'未','戊':'巳','己':'未','庚':'申','辛':'戌','壬':'亥','癸':'丑'};
         const gg = ganGong[dayGan] || '寅';
         const ggIdx = _branchIdx(gg);
+        const shangWx = zhiWx[zhi];
         for (let j = 0; j < 12; j++) {
           const p = _qyMod(ggIdx + j, 12);
           if (_BRANCHES[p] === zhi) break;
-          if (wxKe[zhiWx[_BRANCHES[p]]] === zhiWx[zhi]) harm++;
+          const pathWx = zhiWx[_BRANCHES[p]];
+          if (wxKe[shangWx] === pathWx) harm++; // 上神克路径地支
         }
         if (harm > maxHarm) { maxHarm = harm; maxIdx = idx; }
       }
@@ -35695,13 +35990,16 @@ function _liurenSanChuan(siKe, dayGan, dayZhi, tianPan) {
       }
       
       if (hasYaoKe) {
-        // 昴星法: 阳日取酉上神为初传, 阴日取卯上神为初传
-        // 中传=日支上神, 末传=日干上神
+        // 昴星法: 无贼克而有遥克时用之
+        // 《大六壬大全·昴星法》云:「昴星者, 西方酉宿, 主秋杀之气。阳日取酉上神为初传, 阴日取卯上神为初传。」
+        // 阳日(甲丙戊庚壬): 取酉上神为初传, 中传取初传上神, 末传取中传上神
+        // 阴日(乙丁己辛癸): 取卯上神为初传, 中传取初传上神, 末传取中传上神
+        // 酉为昴星之位, 阳日取酉上神(天气下降); 阴日取卯上神(地气上升)
         const isYangDay = ['甲','丙','戊','庚','壬'].includes(dayGan);
         const maoXingZhi = isYangDay ? '酉' : '卯';
         const chu = tianPan[maoXingZhi] || maoXingZhi;
-        const zhong = tianPan[dayZhi] || dayZhi;
-        const mo = siKe[0].shang; // 日干上神 = 第一课上神
+        const zhong = tianPan[chu] || chu;  // 中传 = 初传上神
+        const mo = tianPan[zhong] || zhong;  // 末传 = 中传上神
         return {chu, zhong, mo, method: '昴星法'};
       } else {
         // 别责法: 无贼无克无遥克, 取日干合神地盘本位上神为初传
@@ -35993,11 +36291,16 @@ function _xuankongBrief(year, dir) {
   const dirMap = {'北':1,'南':9,'东':3,'西':7,'东北':8,'西北':6,'东南':4,'西南':2};
   const dirNum = dirMap[dir] || 1;
   
+  // dir 为朝向(向方)，坐方 = 向方对宫
+  // 《沈氏玄空学》:「向者，宅之所向也；坐者，宅之所背也」
+  // 洛书对冲: 1↔9、2↔8、3↔7、4↔6，5寄中宫取对冲9
+  const zuoDirNum = (dirNum === 5) ? 9 : (10 - dirNum); // 坐方洛书数
+  const xiangDirNum = dirNum; // 向方洛书数 = 传入方向
+  
   // 运星盘: 当运星入中宫, 按洛书轨迹飞布
+  // 《沈氏玄空学》运星以当运之数入中宫顺飞九宫
   // 洛书九宫顺序: 中5→西北6→西7→东北8→南9→北1→西南2→东3→东南4
-  // 飞星轨迹: 5→6→7→8→9→1→2→3→4 (入中宫后顺飞)
-  const feiXu = [5,6,7,8,9,1,2,3,4]; // 飞星顺序
-  const gongPos = [5,6,7,8,9,1,2,3,4]; // 对应宫位
+  const gongPos = [5,6,7,8,9,1,2,3,4];
   
   // 运星盘 (入中宫的星 = period)
   const yunPan = {};
@@ -36007,15 +36310,16 @@ function _xuankongBrief(year, dir) {
   }
   
   // 山星: 坐方运星入中, 阳顺阴逆飞
+  // 《沈氏玄空学》:「山星以坐方之运星入中宫，视其阴阳而定顺逆」
+  const zuoNum = yunPan[zuoDirNum] || period; // 坐方运星
   // 向星: 向方运星入中, 阳顺阴逆飞
-  const zuoNum = yunPan[dirNum] || period; // 坐方运星
-  // 向方 = 坐方对宫（河图对冲：1↔9、2↔8、3↔7、4↔6，5寄中宫取对冲9）
-  const xiangDirNum = dirNum === 5 ? 9 : (10 - dirNum);
-  const xiangNum = yunPan[xiangDirNum] || yunPan[(10 - dirNum) % 9 || 9] || period;
+  // 《沈氏玄空学》:「向星以向方之运星入中宫，视其阴阳而定顺逆」
+  const xiangNum = yunPan[xiangDirNum] || period; // 向方运星
   
-  // 阳顺阴逆: 奇数为阳(顺飞), 偍数为阴(逆飞)
-  // 顺飞: 5→6→7→8→9→1→2→3→4
-  // 逆飞: 5→4→3→2→1→9→8→7→6
+  // 阳顺阴逆: 奇数为阳(顺飞), 偶数为阴(逆飞)
+  // 《沈氏玄空学》:「一二三四五六七八九，奇数为阳顺飞，偶数为阴逆飞」
+  // 顺飞: 5→6→7→8→9→1→2→3→4 (中→乾→兑→艮→离→坎→坤→震→巽)
+  // 逆飞: 5→4→3→2→1→9→8→7→6 (中→巽→震→坤→坎→离→艮→兑→乾)
   const shunFei = [5,6,7,8,9,1,2,3,4];
   const niFei = [5,4,3,2,1,9,8,7,6];
   
@@ -36047,7 +36351,7 @@ function _xuankongBrief(year, dir) {
   const gongNames = {1:'坎(北)',2:'坤(西南)',3:'震(东)',4:'巽(东南)',5:'中宫',6:'乾(西北)',7:'兑(西)',8:'艮(东北)',9:'离(南)'};
   
   let panText = period + '运玄空飞星盘\\n';
-  panText += '坐方: ' + dir + '(' + starName[zuoNum] + ') 向方: ' + (dirMap[dir] ? _getOppositeDir(dir) : '?') + '(' + starName[xiangNum] + ')\\n';
+  panText += '坐方: ' + _getOppositeDir(dir) + '(' + starName[zuoNum] + ') 向方: ' + dir + '(' + starName[xiangNum] + ')\\n';
   panText += '九宫飞星: ';
   for (let p = 1; p <= 9; p++) {
     if (p === 5) continue;
@@ -36058,12 +36362,49 @@ function _xuankongBrief(year, dir) {
   // 中宫运星
   panText += '中宫: ' + starName[yunPan[5]] + '(运星) 山' + starName[shanPan[5]] + ' 向' + starName[xiangPan[5]] + '\\n';
   
-  // 吉凶判断
+  // —— 玄空格局判断 ——
+  // 以下格局出自《沈氏玄空学》卷二
   const tips = [];
-  if (yunPan[5] === wangStar) tips.push('当旺星入中宫，宅运旺盛');
-  if (zuoNum === wangStar) tips.push('当旺星到坐方，丁财两旺');
-  if (xiangNum === wangStar) tips.push('当旺星到向方，财源广进');
-  if (yunPan[5] === 5 || zuoNum === 5) tips.push('五黄入中或到坐，官灾疾病，需化解');
+  
+  // 1. 到山到向 (旺山旺向): 山星到坐方，向星到向方
+  // 《沈氏玄空学》:「山星到坐方为到山，向星到向方为到向，合称到山到向，主丁财两旺」
+  if (shanPan[zuoDirNum] === wangStar && xiangPan[xiangDirNum] === wangStar) {
+    tips.push('到山到向(旺山旺向): 当旺山星到坐方、当旺向星到向方，丁财两旺，大吉之局');
+  }
+  
+  // 2. 上山下水: 山星到向方，向星到坐方
+  // 《沈氏玄空学》:「山星到向方为上山，向星到坐方为下水，主损丁破财」
+  if (shanPan[xiangDirNum] === wangStar && xiangPan[zuoDirNum] === wangStar) {
+    tips.push('上山下水: 当旺山星到向方、当旺向星到坐方，损丁破财，大凶之局，需化解');
+  }
+  
+  // 3. 合十: 山星与向星之数和为10
+  // 《沈氏玄空学》:「山向二星合十，为坎离交媾、水火既济，主吉」
+  const heShiList = [];
+  for (let p = 1; p <= 9; p++) {
+    if (p === 5) continue;
+    if (shanPan[p] + xiangPan[p] === 10) {
+      heShiList.push(gongNames[p]);
+    }
+  }
+  if (heShiList.length > 0) {
+    tips.push('合十: ' + heShiList.join('、') + ' 山向星合十，坎离交媾，主吉');
+  }
+  
+  // 4. 令星入囚: 当运旺星入中宫为入囚
+  // 《沈氏玄空学》:「当运之星入中宫为入囚，主运衰则败」
+  if (shanPan[5] === wangStar) {
+    tips.push('山星入囚: 当旺山星入中宫，丁气受囚，人多虚弱');
+  }
+  if (xiangPan[5] === wangStar) {
+    tips.push('向星入囚: 当旺向星入中宫，财气受囚，财源渐退');
+  }
+  
+  // 基本旺衰判断
+  if (yunPan[5] === wangStar) tips.push('当旺运星入中宫，宅运旺盛');
+  if (shanPan[zuoDirNum] === wangStar) tips.push('当旺山星到坐方，人丁兴旺');
+  if (xiangPan[xiangDirNum] === wangStar) tips.push('当旺向星到向方，财源广进');
+  if (yunPan[5] === 5 || shanPan[5] === 5) tips.push('五黄入中，官灾疾病，需化解');
   if (yunPan[5] === 2) tips.push('二黑入中，注意健康');
   if (yunPan[5] === 3) tips.push('三碧入中，防止是非口舌');
   
@@ -36353,6 +36694,7 @@ function runLiuyaoEngine() {
     const zg = liuyaoZhuangGua(gua, gz);
     gua.zhuangGua = zg;
     var question = yjQuestionText || '事业';
+    gua.yjMode = yjMode || 'person'; // 传递自占/代占模式
     const duan = liuyaoDuanGua(gua, question);
     const ben = _GUA_XIANG[gua.benGua.lower].name + _GUA_XIANG[gua.benGua.upper].name;
     const bian = _GUA_XIANG[gua.bianGua.lower].name + _GUA_XIANG[gua.bianGua.upper].name;
@@ -36366,6 +36708,18 @@ function runLiuyaoEngine() {
     html += '<p><b>六神：</b>' + zg.liushen.join(' · ') + '</p>';
     html += '<p><b>用神：</b>' + duan.yongshen + ' · ' + duan.verdict + '</p>';
     html += '<p><b>应期：</b>' + duan.yingqi + '</p>';
+    // 自占/代占世应分析
+    if (duan.selfAnalysis) {
+      html += '<p style="color:var(--cyan)"><b>身位分析：</b>' + duan.selfAnalysis + '</p>';
+    }
+    if (duan.shiAnalysis && duan.yingAnalysis) {
+      html += '<p style="font-size:12px;opacity:.8"><b>世爻旺衰：</b>' + duan.shiAnalysis + '</p>';
+      html += '<p style="font-size:12px;opacity:.8"><b>应爻旺衰：</b>' + duan.yingAnalysis + '</p>';
+    }
+    // 变卦六亲分析
+    if (duan.bianAnalysis) {
+      html += '<p style="color:var(--gold)"><b>变卦分析：</b>' + duan.bianAnalysis + '</p>';
+    }
     html += '<p style="opacity:0.8">' + duan.advice + '</p>';
     _showEngineResult('yjEngineResult', html);
   } catch(e) { alert('六爻引擎错误：'+e.message); }
