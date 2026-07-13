@@ -27868,7 +27868,8 @@ function tzSelectWuxing(key){
         if(!r.ok) throw new Error(r.status);
         return r.text();
       }).then(function(html){
-        var m = html.match(/<section[^>]*id="section-['" + key + '"][\s\S]*?<\/section>/);
+        var secRe = new RegExp('<section[^>]*id="section-' + key + '"[\\s\\S]*?<\\/section>');
+        var m = html.match(secRe);
         // 更稳健：提取第一个 section
         var secMatch = html.match(/<section[\s\S]*?<\/section>/);
         if(secMatch){
@@ -27895,32 +27896,6 @@ function tzSelectWuxing(key){
   };
 })();
 
-  // 懒加载 section-fengshui
-  var fengshuiLoaded = false;
-  var origShow2 = window.showSection;
-  window.showSection = function(name){
-    if(name === 'fengshui' && !fengshuiLoaded){
-      fengshuiLoaded = true;
-      var container = document.getElementById('section-fengshui');
-      var ph = document.getElementById('section-fengshui-placeholder');
-      if(ph) ph.innerHTML = '正在加载...';
-      fetch('fengshui.html').then(function(r){return r.text()}).then(function(html){
-        var m = html.match(/<section id="section-fengshui"[sS]*?</section>/);
-        if(m){
-          container.innerHTML = m[0];
-          var scripts = html.match(/<script[sS]*?</script>/g);
-          if(scripts){
-            scripts.forEach(function(s){
-              try{ eval(s.replace(/<script[^>]*>/,'').replace(/<\/script>/,'')) }catch(e){console.warn(e)}
-            });
-          }
-        }
-      }).catch(function(e){
-        if(ph) ph.innerHTML = '加载失败：'+e.message;
-      });
-    }
-    return origShow2.apply(this,arguments);
-  };
 
 </script>
 </body>
