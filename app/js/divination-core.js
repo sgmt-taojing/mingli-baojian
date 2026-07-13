@@ -7182,46 +7182,8 @@ const YJ_INTERP = {
 
 let yjVals = [], yjLine = 0, yjTossing = false, yjMode = 'person', yjQixinTime = '';
 
-function yjStart(mode) {
- try {
-  return _yjStartImpl(mode);
- } catch(e) {
-  console.error('[六爻占卜错误]', e.message, e.stack);
-  var _eb = document.getElementById('yjDivArea') || document.getElementById('yjResult');
-  if(_eb) _eb.innerHTML = '<div style="padding:20px;margin:16px 0;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px"><h5 style="color:#e74c3c">❌ 六爻占卜出错</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p><p style="font-size:11px;opacity:.5;margin-top:4px">'+(e.stack||'').split("\n").slice(0,3).join("<br>")+'</p></div>';
-  var _r = document.getElementById('yjResult'); if(_r){_r.classList.add('visible');_r.scrollIntoView({behavior:'smooth'});}
- }
-}
-function _yjStartImpl(mode) {
-  yjMode = mode; yjVals = []; yjLine = 0; yjTossing = false;
-  // 显示/隐藏起心动念时辰输入框
-  var qixinRow=document.getElementById('yjQixinRow');
-  if(qixinRow) qixinRow.style.display=(mode==='matter')?'flex':'none';
-  // 记录起心动念时辰
-  const qxTimeEl = document.getElementById('yjQixinTime');
-  const qxTime = qxTimeEl ? qxTimeEl.value : '';
-  if(mode === 'matter' && !qxTime){
-    alert('⚠️ 事盘占卜需填写「起心动念时辰」\n\n正宗易经占卜讲究"心诚则灵，时到则应"。\n请填写您心中升起疑问的那一刻，系统将结合此时辰综合判卦。\n\n（若不确定精确时间，可填写大致时辰）');
-    document.getElementById('yjQixinTime').focus();
-    return;
-  }
-  yjQixinTime = qxTime; // 存储到全局变量
-  document.getElementById('yjDivArea').style.display = 'block';
-  document.getElementById('yjResult').classList.remove('visible');
-  document.getElementById('yjCastBtn').disabled = false;
-  document.getElementById('yjCastBtn').textContent = '掷 钱 问 卦';
-  document.getElementById('yjCount').textContent = '第 1 / 6 爻';
-  for (let i = 0; i < 6; i++) {
-    document.getElementById('yjD' + i).className = 'ldot';
-  }
-  for (let i = 0; i < 3; i++) {
-    const c = document.getElementById('yjC' + i);
-    if (c) { c.className = 'coin'; c.textContent = '背'; }
-  }
-  // 播放起卦音效
-  playDivinationSound();
-  document.getElementById('yjDivArea').scrollIntoView({ behavior: 'smooth' });
-}
+
+
 
 async function yjCast() {
   playDivinationSound();
