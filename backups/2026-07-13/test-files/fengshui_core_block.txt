@@ -1,0 +1,1040 @@
+
+// ═══ START FENGSHUI ENGINE CORE ═══
+//
+// 风水引擎核心重写 (v2.0 — 2026-07-13)
+// 古籍依据：《八宅明镜》《阳宅三要》《地理五诀》《沈氏玄空学》《天玉经》《青囊序》《青乌经》
+// 覆盖：八宅法、玄空飞星（三元九运）、二十四山、阳宅三要（门/主/灶）、户型分析（缺角/方位）
+//
+// 使用说明：
+//   - 所有函数挂载在 window.FENGSHUI 命名空间下，避免与旧版冲突
+//   - 旧版 getMingGua / getBaZhaiData / _getYearFlyingStar 等函数保留不动
+//   - 旧版 computeFengshuiPro 中调用的 _computeBazhai / _xuankongBrief 在本块中实现
+//   - 提供统一入口 fengshuiAnalyze() 进行完整分析
+
+(function (global) {
+  'use strict';
+
+  // ───────────────────────── 1. 常量与基础表 ─────────────────────────
+
+  // 九宫顺序（洛书轨迹）：中 → 西北(乾) → 西(兑) → 东北(艮) → 南(离) → 北(坎) → 西南(坤) → 东(震) → 东南(巽)
+  const LUOSHU_TRAVEL = ['中', '西北', '西', '东北', '南', '北', '西南', '东', '东南'];
+
+  // 九宫所属方位（按洛书数 1-9）
+  const PALACE_DIR = {
+    1: '北',    // 坎
+    2: '西南',  // 坤
+    3: '东',    // 震
+    4: '东南',  // 巽
+    5: '中',    // 中宫
+    6: '西北',  // 乾
+    7: '西',    // 兑
+    8: '东北',  // 艮
+    9: '南'     // 离
+  };
+
+  // 方位 → 洛书数（后天八卦）
+  const DIR_TO_GUA = {
+    '北': 1, '西南': 2, '东': 3, '东南': 4,
+    '中': 5, '西北': 6, '西': 7, '东北': 8, '南': 9
+  };
+
+  // 卦名（后天八卦）
+  const GUA_NAMES = { 1:'坎', 2:'坤', 3:'震', 4:'巽', 5:'中', 6:'乾', 7:'兑', 8:'艮', 9:'离' };
+
+  // 八宫（卦宫）
+  const BAGUA = ['坎','坤','震','巽','乾','兑','艮','离'];
+
+  // 八宫 → 八方位（后天八卦配八方，每卦对应一个方位）
+  const GUA_TO_DIR = {
+    '坎': '北', '离': '南', '震': '东', '巽': '东南',
+    '乾': '西北', '兑': '西', '艮': '东北', '坤': '西南'
+  };
+  // 反向：方位 → 卦
+  const DIR_TO_GUA_BGUA = {
+    '北': '坎', '南': '离', '东': '震', '东南': '巽',
+    '西北': '乾', '西': '兑', '东北': '艮', '西南': '坤'
+  };
+
+  // 二十四山（标准排列，从壬起始按北→东北→东→东南→南→西南→西→西北循环）
+  const TWENTY_FOUR_SHAN_LIST = [
+    '壬','子','癸','  ','丑','艮','寅','  ','甲','卯','乙','  ',
+    '辰','巽','巳','  ','丙','午','丁','  ','未','坤','申','  ',
+    '庚','酉','辛','  ','戌','乾','亥','  '
+  ];
+
+  // 24 山中心角度（正北=0° 顺时针）
+  // 标准：壬7.5°西，子0°正北，癸7.5°东；丑15°东，艮22.5°东，寅30°东...
+  // 这里采用壬=北偏西7.5°，子=正北，癸=北偏东7.5° 的中心角排列
+  // 顺序按后天八卦方位，每个宫3山，间隔=15°
+  const SHAN_LIST = ['壬','子','癸','丑','艮','寅','甲','卯','乙','辰','巽','巳','丙','午','丁','未','坤','申','庚','酉','辛','戌','乾','亥'];
+  // 24 山中心角度（度，0=正北，顺时针）
+  // 壬=-7.5°=352.5°(西北偏北)；子=0°(正北)；癸=7.5°；
+  // 丑=15°（东北偏北）；艮=22.5°(东北)；寅=30°；
+  // 甲=37.5°(东偏北)；卯=45°(正东)；乙=52.5°；
+  // 辰=60°(东南偏东)；巽=67.5°(东南)；巳=75°；
+  // 丙=82.5°(南偏东)；午=90°(正南)；丁=97.5°；
+  // 未=105°(南偏西)；坤=112.5°(西南)；申=120°；
+  // 庚=127.5°(西偏南)；酉=135°(正西)；辛=142.5°；
+  // 戌=150°(西北偏西)；乾=157.5°(西北)；亥=165°；
+  // 壬=172.5°(北偏西，但与起始壬172.5°不同, 实际壬中心应为 352.5°)
+  // 实际环形：从壬开始，每15°，共24个
+  // 壬中心角 = 0°处对称，即 壬 = (172.5 + 360) % 360 = 172.5 OR 另一标准是 壬 = 0°
+  // 用最简单：index 0=壬 在 0°位置，但这样子=15°，丑=37.5°...这种排法0°=壬,与"正北=子"不符。
+  // 解决方案：保持简单环形排法（每15°），但允许偏差——0°附近是壬/子/癸区
+  // 为正确反映"正北0°=子"，调整：
+  // 壬=-7.5°=352.5° → index 0；子=7.5° → index 1；癸=22.5° → index 2；
+  // 这意味着 index 0 是 (360-7.5)=352.5°。简单做法：
+
+  function _get24Shan(angle) {
+    // 找到最近的山
+    angle = ((angle % 360) + 360) % 360;
+    var bestIdx = 0;
+    var minDiff = 360;
+    // 24 山中心角度（以子为中心 0°=正北，顺时针）
+    var centers = [
+      337.5, // 壬 (北偏西22.5°，即子偏西22.5°)
+      0,     // 子 (正北=0°)
+      22.5,  // 癸 (北偏东22.5°)
+      45,    // 丑 (东北偏北，即子偏东45°)
+      67.5,  // 艮 (东北67.5°)
+      90,    // 寅 (东偏北22.5° = 90°)
+      112.5, // 甲 (东偏南22.5°)
+      135,   // 卯 (东南偏东=135°但实际应为正东)
+      157.5, // 乙 (东南偏南)
+      180,   // 辰 (正南=180°)
+      202.5, // 巽 (南偏西22.5°)
+      225,   // 巳 (西南偏南=225°)
+      247.5, // 丙 (西南偏西=247.5°)
+      270,   // 午 (正西=270°)
+      292.5, // 丁 (西北偏西=292.5°)
+      315,   // 未 (西北偏北=315°)
+      337.5, // 坤 (正北偏西) -- 24个中心点重新设计：
+      22.5,  // 申
+      67.5,  // 庚
+      112.5, // 酉 — 重新规划，实际上应严格按 15° 间隔
+    ];
+    // 真实 24 山按 15° 间隔循环：以子=正北(0°)开始
+    // 壬(-15°)=345°, 子(0°), 癸(15°), 丑(30°), 艮(45°), 寅(60°)
+    // 甲(75°), 卯(90°), 乙(105°), 辰(120°), 巽(135°), 巳(150°)
+    // 丙(165°), 午(180°), 丁(195°), 未(210°), 坤(225°), 申(240°)
+    // 庚(255°), 酉(270°), 辛(285°), 戌(300°), 乾(315°), 亥(330°)
+    centers = [
+      345, 0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150,
+      165, 180, 195, 210, 225, 240, 255, 270, 285, 300, 315, 330
+    ];
+    for (var i = 0; i < 24; i++) {
+      var c = centers[i];
+      // 计算最短角度差
+      var diff = Math.abs(angle - c);
+      if (diff > 180) diff = 360 - diff;
+      if (diff < minDiff) {
+        minDiff = diff;
+        bestIdx = i;
+      }
+    }
+    return { shan: SHAN_LIST[bestIdx], angle: angle, offsetDeg: minDiff.toFixed(2), gua: _shanToGua(SHAN_LIST[bestIdx]) };
+  }
+
+  function _shanToGua(shan) {
+    if (shan === '壬' || shan === '子' || shan === '癸') return '坎';
+    if (shan === '艮' || shan === '丑' || shan === '寅') return '艮';
+    if (shan === '甲' || shan === '卯' || shan === '乙') return '震';
+    if (shan === '巽' || shan === '辰' || shan === '巳') return '巽';
+    if (shan === '丙' || shan === '午' || shan === '丁') return '离';
+    if (shan === '坤' || shan === '未' || shan === '申') return '坤';
+    if (shan === '庚' || shan === '酉' || shan === '辛') return '兑';
+    if (shan === '乾' || shan === '戌' || shan === '亥') return '乾';
+    return '中';
+  }
+
+  // ───────────────────────── 2. 三元九运 ─────────────────────────
+
+  // 三元九运（沈氏玄空学）
+  // 上元：1运(1864-1883) 2运(1884-1903) 3运(1904-1923)
+  // 中元：4运(1924-1943) 5运(1944-1963) 6运(1964-1983)
+  // 下元：7运(1984-2003) 8运(2004-2023) 9运(2024-2043)
+  function getYuanYun(year) {
+    if (year >= 1864 && year <= 1923) return '上元';
+    if (year >= 1924 && year <= 1983) return '中元';
+    if (year >= 1984 && year <= 2043) return '下元';
+    // 出下元后按九循环推算
+    if (year < 1864) return '上元之前的古代';
+    return '下元（末）';
+  }
+
+  // 公元年 → 当元运星（每运20年）
+  function getYunStarForYear(year) {
+    // 1884 年=2, 1984年=7, 2024年=9, 2044年=1
+    // 算法：((year - 1864) / 20) + 1, mod 9, 但 0 → 9
+    var baseYun = 1; // 1864=1
+    var yunIndex = (year - 1864) / 20; // 0=1运, 1=2运, 2=3运...
+    // 1884-1864 = 20 → 1运（=baseYun+1）
+    var n = Math.floor(yunIndex);
+    var yun = ((baseYun - 1 + n) % 9) + 1;
+    if (yun === 0) yun = 9;
+    return yun;
+  }
+
+  // 飞星入中后顺飞九宫（洛书轨迹：1-9 顺时针 " → 6 → 7 → 8 → 9 → 1 →..."）
+  function getFlyingStars(centerStar) {
+    var map = {};
+    for (var i = 0; i < 9; i++) {
+      var star = ((centerStar + i - 1) % 9) + 1;
+      if (star === 0) star = 9;
+      map[LUOSHU_TRAVEL[i]] = star;
+    }
+    return map;
+  }
+
+  // 月飞星（按月令飞布）
+  function getMonthlyFlyingStars(year, month) {
+    var yearBranchIdx = ((year - 4) % 12 + 12) % 12; // 计算支
+    var startStar;
+    if ([0,6,3,9].indexOf(yearBranchIdx) >= 0) {
+      startStar = 8;
+    } else if ([2,8,5,11].indexOf(yearBranchIdx) >= 0) {
+      startStar = 2;
+    } else {
+      startStar = 5;
+    }
+    var monthOffset = month - 1;
+    var centerStar = ((startStar - 1 + monthOffset) % 9) + 1;
+    if (centerStar === 0) centerStar = 9;
+    return getFlyingStars(centerStar);
+  }
+
+  // 日飞星
+  function getDailyFlyingStars(day) {
+    var centerStar = ((day - 1) % 9) + 1;
+    if (centerStar === 0) centerStar = 9;
+    return getFlyingStars(centerStar);
+  }
+
+  // ───────────────────────── 3. 八宅法（八宫）─────────────────────────
+
+  /**
+   * 《八宅明镜》大游年歌诀（八宫八星——伏位/天医/生气/延年/绝命/五鬼/六煞/祸害）
+   *
+   * 乾兑离震巽坎艮坤 八宫大游年顺序：中→乾→兑→艮→离→坎→坤→震→巽
+   *   乾 ：乾六天五祸绝延生
+   *   坎 ：坎五天生延绝祸六
+   *   艮 ：艮六绝祸生延天五
+   *   震 ：震延生祸绝五天六
+   *   巽 ：巽天五六祸生绝延
+   *   离 ：离六五绝延祸生天
+   *   坤 ：坤天延生祸五绝六
+   *   兑 ：兑生祸延绝六五天
+   */
+  // 大游年歌诀（《八宅明镜》）：
+  //   乾 ：乾六天五祸绝延生（伏位+7星）—乾=伏，坎=六，艮=天，震=五，巽=祸，离=绝，坤=延，兑=生
+  //   坎 ：坎五生延绝天祸六—坎=伏，艮=五，震=生，巽=延，离=绝，坤=天，兑=祸，乾=六
+  //   艮 ：艮六绝祸生延天五—艮=伏，震=六，巽=绝，离=祸，坤=生，兑=延，乾=天，坎=五
+  //   震 ：震延生祸绝五天六—震=伏，巽=延，离=生，坤=祸，兑=绝，乾=五，坎=天，艮=六
+  //   巽 ：巽天五六祸生绝延—巽=伏，离=天，坤=五，兑=六，乾=祸，坎=生，艮=绝，震=延
+  //   离 ：离六五绝延祸生天—离=伏，坤=六，兑=五，乾=绝，坎=延，艮=祸，震=生，巽=天
+  //   坤 ：坤天延生祸五绝六—坤=伏，兑=天，乾=延，坎=生，艮=祸，震=五，巽=绝，离=六
+  //   兑 ：兑生祸延绝六五天—兑=伏，乾=生，坎=祸，艮=延，震=绝，巽=六，离=五，坤=天
+  // 后天八卦顺行顺序：坎→艮→震→巽→离→坤→兑→乾
+  // 本卦起按此顺序，从本卦起（第一位配"伏位"），其后7位按歌诀字数配7星
+  const DAYOUGAN_GONGE = {
+    '乾': ['伏位', '六煞', '天医', '五鬼', '祸害', '绝命', '延年', '生气'], // 乾坎艮震巽离坤兑
+    '坎': ['伏位', '五鬼', '生气', '延年', '绝命', '天医', '祸害', '六煞'], // 坎艮震巽离坤兑乾
+    '艮': ['伏位', '六煞', '绝命', '祸害', '生气', '延年', '天医', '五鬼'], // 艮震巽离坤兑乾坎
+    '震': ['伏位', '延年', '生气', '祸害', '绝命', '五鬼', '天医', '六煞'], // 震巽离坤兑乾坎艮
+    '巽': ['伏位', '天医', '五鬼', '六煞', '祸害', '生气', '绝命', '延年'], // 巽离坤兑乾坎艮震
+    '离': ['伏位', '六煞', '五鬼', '绝命', '延年', '祸害', '生气', '天医'], // 离坤兑乾坎艮震巽
+    '坤': ['伏位', '天医', '延年', '生气', '祸害', '五鬼', '绝命', '六煞'], // 坤兑乾坎艮震巽离
+    '兑': ['伏位', '生气', '祸害', '延年', '绝命', '六煞', '五鬼', '天医']  // 兑乾坎艮震巽离坤
+  };
+
+  // 后天八卦顺行顺序（本卦起顺时针下一卦为次位）
+  // 乾宅：乾→坎→艮→震→巽→离→坤→兑 （乾坎顺时针紧朋—实际是 270°→0°→45°顺序）
+  // 坎宅：坎→艮→震→巽→离→坤→兑→乾 （北→东北→东...）
+  // 根据大游年歌诀的实际方位：乾宅六在坎(北)，所以乾起坎打头位是六
+  // 若坎起坎打头位是伏。所以各宅“本卦→ 衍生”的顺序为 后天八卦序：
+  // 坎→艮→震→巽→离→坤→兑→乾
+  // 但乾宅起位是乾乾，所以乾的下一位是坎，乾起坎后后丈位坎。再起坎位陆→坎为六慊
+  const GUA_ORDER_HOUTIAN = ['坎','艮','震','巽','离','坤','兑','乾'];
+  // 八卦→方位
+  const GUA_TO_DIR_BAGUA = {
+    '坎':'北','艮':'东北','震':'东','巽':'东南','离':'南','坤':'西南','兑':'西','乾':'西北'
+  };
+
+  // 从本卦起，按后天八卦顺序取所有卦
+  function _getGuasFromThis(gua) {
+    var idx = GUA_ORDER_HOUTIAN.indexOf(gua);
+    if (idx < 0) return GUA_ORDER_HOUTIAN.slice();
+    var result = [];
+    for (var i = 0; i < 8; i++) {
+      result.push(GUA_ORDER_HOUTIAN[(idx + i) % 8]);
+    }
+    return result;
+  }
+
+  /**
+   * 起命卦（《八宅明镜》年命起法简化版）
+   *
+   * 男命：(100 - 出生尾数) % 9, 若为0取9，若为5则取2（寄坤）
+   * 女命：(出生尾数 + 5) % 9, 若为0取9，若为5则取8（寄艮）
+   */
+  function getMingGuaClassic(year, sex) {
+    var last2 = year % 100;
+    var gua;
+    var isMale = sex === 'male' || sex === '男' || sex === 'M';
+    if (isMale) {
+      gua = (100 - last2) % 9;
+      if (gua === 0) gua = 9;
+      if (gua === 5) gua = 2; // 男命得5寄坤
+    } else {
+      gua = (last2 + 5) % 9;
+      if (gua === 0) gua = 9;
+      if (gua === 5) gua = 8; // 女命得5寄艮
+    }
+    var guaNameMap = { 1:'坎', 2:'坤', 3:'震', 4:'巽', 6:'乾', 7:'兑', 8:'艮', 9:'离' };
+    var isDongSi = [1, 9, 3, 4].indexOf(gua) >= 0;
+    return {
+      gua: gua,
+      guaName: guaNameMap[gua],
+      type: isDongSi ? '东四命' : '西四命',
+      isDong: isDongSi
+    };
+  }
+
+  function getZhaiGua(chaoxiang) {
+    var gua = DIR_TO_GUA_BGUA[chaoxiang];
+    if (!gua) gua = '坎';
+    var isDongSi = ['坎','离','震','巽'].indexOf(gua) >= 0;
+    return {
+      gua: DIR_TO_GUA[chaoxiang],
+      guaName: gua,
+      type: isDongSi ? '东四宅' : '西四宅',
+      isDong: isDongSi
+    };
+  }
+
+  function _getBaZhaiStarInfo(star) {
+    var map = {
+      '生气': { rank: '上吉', desc: '生气位，旺丁旺财，事业顺利，阴阳和合', wuxing: '木' },
+      '天医': { rank: '次吉', desc: '天医位，健康疗愈，贵人相助，利求医问药', wuxing: '土' },
+      '延年': { rank: '中吉', desc: '延年位，姻缘和谐，利婚姻、感情、长寿', wuxing: '金' },
+      '伏位': { rank: '小吉', desc: '伏位，稳定安泰，利守成、潜心、静养', wuxing: '木' },
+      '绝命': { rank: '大凶', desc: '绝命位，破财破丁，诸事不顺，最凶之位', wuxing: '金' },
+      '五鬼': { rank: '次凶', desc: '五鬼位，是非口舌，灾祸连连，贼盗邪祟', wuxing: '火' },
+      '六煞': { rank: '中凶', desc: '六煞位，桃花劫、烦恼纠纷，忧愁不安', wuxing: '水' },
+      '祸害': { rank: '小凶', desc: '祸害位，病灾破财，阻碍重重，口舌是非', wuxing: '土' }
+    };
+    return map[star] || { rank: '中', desc: '', wuxing: '' };
+  }
+
+  function getBazhaiDirectionTable(zhaiGuaName) {
+    var geju = DAYOUGAN_GONGE[zhaiGuaName];
+    var guasInOrder = _getGuasFromThis(zhaiGuaName); // 本卦→坎→艮→震→巽→离→坤→兑顺序
+    var table = {};
+    // 中宫永远为伏位
+    table['中'] = { star: '伏位', jiXiong: '小吉', wuxing: '木', desc: '伏位，稳定安泰' };
+    for (var i = 0; i < 8; i++) {
+      var dir = GUA_TO_DIR_BAGUA[guasInOrder[i]];
+      var star = (geju && geju[i]) || '伏位';
+      var info = _getBaZhaiStarInfo(star);
+      table[dir] = {
+        star: star,
+        jiXiong: info.rank,
+        wuxing: info.wuxing,
+        desc: info.desc
+      };
+    }
+    return table;
+  }
+
+  function isMingZhaiMatch(mingGua, zhaiGua) {
+    return (mingGua.isDong && zhaiGua.isDong) || (!mingGua.isDong && !zhaiGua.isDong);
+  }
+
+  function bazhaiAnalyze(year, sex, chaoxiang) {
+    var mingGua = getMingGuaClassic(year, sex);
+    var zhaiGua = getZhaiGua(chaoxiang);
+    var directionTable = getBazhaiDirectionTable(zhaiGua.guaName);
+    var match = isMingZhaiMatch(mingGua, zhaiGua);
+    return {
+      mingGua: mingGua,
+      zhaiGua: zhaiGua,
+      directionTable: directionTable,
+      match: match,
+      message: match ? '宅命相配，大格大局' : '宅命不配，需以布局调化',
+      auspicious: _filterByRank(directionTable, ['上吉','次吉','中吉']),
+      inauspicious: _filterByRank(directionTable, ['大凶','次凶','中凶','小凶'])
+    };
+  }
+
+  function _filterByRank(table, ranks) {
+    var out = [];
+    Object.keys(table).forEach(function (dir) {
+      if (ranks.indexOf(table[dir].jiXiong) >= 0) {
+        out.push({ dir: dir, star: table[dir].star, rank: table[dir].jiXiong, wuxing: table[dir].wuxing });
+      }
+    });
+    return out;
+  }
+
+  // ───────────────────────── 4. 阳宅三要（门主灶）─────────────────────────
+
+  function _scoreBaZhaiPosition(rank) {
+    if (rank === '上吉') return 5;
+    if (rank === '次吉') return 4;
+    if (rank === '中吉') return 3;
+    if (rank === '小吉') return 2;
+    if (rank === '小凶') return -1;
+    if (rank === '中凶') return -2;
+    if (rank === '次凶') return -3;
+    if (rank === '大凶') return -4;
+    return 0;
+  }
+
+  function analyzeYangZhaiSanYao(year, sex, menhuDir, zhuWoDir, zaoFangDir) {
+    var bazhai = bazhaiAnalyze(year, sex, menhuDir);
+    var table = bazhai.directionTable;
+    var menhu = table[menhuDir];
+    var zhuWo = table[zhuWoDir];
+    var zaoFang = table[zaoFangDir];
+
+    var scores = {
+      menhu: _scoreBaZhaiPosition(menhu && menhu.jiXiong),
+      zhuWo: _scoreBaZhaiPosition(zhuWo && zhuWo.jiXiong),
+      zaoFang: _scoreBaZhaiPosition(zaoFang && zaoFang.jiXiong)
+    };
+    var totalScore = scores.menhu + scores.zhuWo + scores.zaoFang;
+    var remark = [];
+    if (scores.menhu >= 4) remark.push('门得生气(纳财)');
+    if (scores.zhuWo >= 4) remark.push('主得生气(旺丁)');
+    if (scores.zaoFang >= 4) remark.push('灶得天医(健康)');
+
+    return {
+      totalScore: totalScore,
+      remark: remark.length ? remark.join('，') : '三要需化解',
+      menhu: { dir: menhuDir, star: menhu && menhu.star, rank: menhu && menhu.jiXiong, score: scores.menhu },
+      zhuWo: { dir: zhuWoDir, star: zhuWo && zhuWo.star, rank: zhuWo && zhuWo.jiXiong, score: scores.zhuWo },
+      zaoFang: { dir: zaoFangDir, star: zaoFang && zaoFang.star, rank: zaoFang && zaoFang.jiXiong, score: scores.zaoFang },
+      advice: _yangZhaiAdvice(scores, menhu, zhuWo, zaoFang)
+    };
+  }
+
+  function _yangZhaiAdvice(scores, menhu, zhuWo, zaoFang) {
+    var tips = [];
+    if (scores.menhu < 0) {
+      tips.push('入户门位于' + (menhu && menhu.star || '凶位') + '，宜设玄关、挂门帘或设屏风缓冲，或改门向');
+    } else if (scores.menhu < 3) {
+      tips.push('入户门位于' + (menhu && menhu.star || '小吉位') + '，可加门槛或门垫催旺');
+    }
+    if (scores.zhuWo < 0) {
+      tips.push('主卧位于' + (zhuWo && zhuWo.star || '凶位') + '，建议调整主卧位置或换主卧，方位对人最重');
+    }
+    if (scores.zaoFang < 0) {
+      tips.push('厨房灶位位于' + (zaoFang && zaoFang.star || '凶位') + '，建议改灶位置或加铜器化解');
+    } else if (scores.zaoFang >= 4) {
+      tips.push('灶位得天医之气，主健康长寿');
+    }
+    return tips;
+  }
+
+  // ───────────────────────── 5. 玄空飞星 ─────────────────────────
+
+  // 九星吉凶表（玄空飞星）
+  const NINE_STARS_JIXIONG = {
+    1: { name:'一白贪狼', wuxing:'水', jiXiong:'吉', desc:'文昌、桃花、人缘，主名利' },
+    2: { name:'二黑巨门', wuxing:'土', jiXiong:'凶', desc:'病符，主疾病伤痛' },
+    3: { name:'三碧禄存', wuxing:'木', jiXiong:'凶', desc:'是非、官非、口舌' },
+    4: { name:'四绿文曲', wuxing:'木', jiXiong:'吉', desc:'文昌、学业、功名' },
+    5: { name:'五黄廉贞', wuxing:'土', jiXiong:'大凶', desc:'五黄大煞，主灾祸、意外' },
+    6: { name:'六白武曲', wuxing:'金', jiXiong:'吉', desc:'权力、偏财、武贵' },
+    7: { name:'七赤破军', wuxing:'金', jiXiong:'凶', desc:'破财、口舌、贼盗' },
+    8: { name:'八白左辅', wuxing:'土', jiXiong:'吉', desc:'正财、置业、升职' },
+    9: { name:'九紫右弼', wuxing:'火', jiXiong:'吉', desc:'喜庆、姻缘、贵人' }
+  };
+
+  function _oppositeDir(dir) {
+    var map = {
+      '北': '南', '南': '北', '东': '西', '西': '东',
+      '东南': '西北', '西北': '东南',
+      '东北': '西南', '西南': '东北'
+    };
+    return map[dir] || '北';
+  }
+
+  // 山盘：以坐山方位起一飞
+  function xuankongShan(buildYear, chaoxiang) {
+    var zhanShan = _oppositeDir(chaoxiang);
+    var zhanShanNum = DIR_TO_GUA[zhanShan];
+    return getFlyingStars(zhanShanNum);
+  }
+
+  // 向盘：以朝向方位起一飞
+  function xuankongXiang(buildYear, chaoxiang) {
+    var xiangNum = DIR_TO_GUA[chaoxiang];
+    return getFlyingStars(xiangNum);
+  }
+
+  /**
+   * 旺山旺向判断：山盘当旺之星所在方位 = 坐山方；向盘当旺之星所在方位 = 向方
+   * 当元最旺之星 = 运星
+   */
+  function isWangShanWangXiang(chaoxiang, yunStar) {
+    var yun = getFlyingStars(yunStar);
+    var zhanShan = _oppositeDir(chaoxiang);
+    var shanStar = yun[zhanShan];
+    var xiangStar = yun[chaoxiang];
+    return shanStar === yunStar || xiangStar === yunStar;
+  }
+
+  /**
+   * 山星向星合于方位（如一六共宗、二七同道、三八为朋、四九为友）
+   */
+  function checkShanXiangJie(shanPan, xiangPan) {
+    var relations = [];
+    Object.keys(shanPan).forEach(function(dir) {
+      var s = shanPan[dir];
+      var x = xiangPan[dir];
+      var pair = [Math.min(s, x), Math.max(s, x)];
+      if (pair[0] === 1 && pair[1] === 6) relations.push({ dir: dir, stars: '一六', meaning: '一六共宗（水）— 文昌、利学业' });
+      if (pair[0] === 2 && pair[1] === 7) relations.push({ dir: dir, stars: '二七', meaning: '二七同道（火）— 病符、口舌' });
+      if (pair[0] === 3 && pair[1] === 8) relations.push({ dir: dir, stars: '三八', meaning: '三八为朋（木）— 助旺丁财' });
+      if (pair[0] === 4 && pair[1] === 9) relations.push({ dir: dir, stars: '四九', meaning: '四九为友（金）— 喜庆、丁财' });
+    });
+    return relations;
+  }
+
+  function getXuankongAdvice(yunStar, wangShan, shanXiangJie) {
+    var tips = [];
+    var shenStar = NINE_STARS_JIXIONG[yunStar];
+    if (shenStar) {
+      tips.push('当元运星：' + shenStar.name + '（' + shenStar.wuxing + '，' + shenStar.jiXiong + '），' + shenStar.desc);
+    }
+    if (wangShan) {
+      tips.push('卦得旺山旺向，丁财两旺，主事顺遂');
+    } else {
+      tips.push('目前非旺山旺向，须借重流年飞星催旺');
+    }
+    if (shanXiangJie.length > 0) {
+      var good = shanXiangJie.filter(function(r) { return r.stars === '一六' || r.stars === '四九'; });
+      var bad = shanXiangJie.filter(function(r) { return r.stars === '二七' || r.stars === '三八'; });
+      if (good.length > 0) tips.push('山星向星会于' + good[0].dir + '：' + good[0].meaning);
+      if (bad.length > 0) tips.push('山星向星会于' + bad[0].dir + '：' + bad[0].meaning + '，需化解');
+    }
+    return tips;
+  }
+
+  /**
+   * 玄空飞星完整分析
+   */
+  function xuankongAnalyze(buildYear, chaoxiang) {
+    var currentYear = new Date().getFullYear();
+    var yunStar = getYunStarForYear(buildYear);
+    var currentYun = getYunStarForYear(currentYear);
+    var yuanYunBuild = getYuanYun(buildYear);
+    var yuanYunNow = getYuanYun(currentYear);
+
+    var yun = getFlyingStars(yunStar);
+    var nianBuild = getFlyingStars(getYunStarForYear(buildYear));
+    var nianNow = getFlyingStars(getYunStarForYear(currentYear));
+
+    var now = new Date();
+    var yue = getMonthlyFlyingStars(now.getFullYear(), now.getMonth() + 1);
+
+    var shanPan = xuankongShan(buildYear, chaoxiang);
+    var xiangPan = xuankongXiang(buildYear, chaoxiang);
+    var wangShanWangXiang = isWangShanWangXiang(chaoxiang, yunStar);
+    var shanXiangJie = checkShanXiangJie(shanPan, xiangPan);
+
+    return {
+      yuanYunBuild: yuanYunBuild,
+      yuanYunNow: yuanYunNow,
+      yunStar: yunStar,
+      currentYun: currentYun,
+      yunPan: yun,
+      nianBuild: nianBuild,
+      nianNow: nianNow,
+      yue: yue,
+      shanPan: shanPan,
+      xiangPan: xiangPan,
+      wangShanWangXiang: wangShanWangXiang,
+      shanXiangJie: shanXiangJie,
+      advice: getXuankongAdvice(yunStar, wangShanWangXiang, shanXiangJie)
+    };
+  }
+
+  // ───────────────────────── 6. 二十四山 ─────────────────────────
+
+  /**
+   * 24 山分析：根据朝向（精确角度）定位所在山
+   * @param {number} angle 朝向角（0-360度，正北0度顺时针）
+   */
+  function getTwentyFourShan(angle) {
+    if (typeof angle !== 'number' || isNaN(angle)) {
+      return { shan: '子', angle: 0, offsetDeg: 0, gua: '坎' };
+    }
+    return _get24Shan(angle);
+  }
+
+  /**
+   * 24 山五行（双山五行）
+   */
+  function shanWuxing(shan) {
+    var wuxingMap = {
+      '壬':'水','子':'水','癸':'水',
+      '艮':'土','丑':'土','寅':'土',
+      '甲':'木','卯':'木','乙':'木',
+      '巽':'木','辰':'木','巳':'火',
+      '丙':'火','午':'火','丁':'火',
+      '坤':'土','未':'土','申':'金',
+      '庚':'金','酉':'金','辛':'金',
+      '乾':'金','戌':'金','亥':'水'
+    };
+    return wuxingMap[shan] || '土';
+  }
+
+  // ───────────────────────── 7. 户型分析 ─────────────────────────
+
+  function _getFloorWuxing(floor) {
+    var rem = floor % 10;
+    if (rem === 1 || rem === 6) return '水';
+    if (rem === 2 || rem === 7) return '火';
+    if (rem === 3 || rem === 8) return '木';
+    if (rem === 4 || rem === 9) return '金';
+    return '土';
+  }
+
+  function _estimateHuxingAreas(huxing, total) {
+    var variance = {
+      '两室一厅': [0.9, 0.9, 1.1, 1.1, 1.1, 1.0, 0.9, 1.0],
+      '三室一厅': [1.0, 0.9, 1.0, 1.2, 1.1, 0.9, 0.9, 1.0],
+      '三室两厅': [1.0, 1.0, 1.0, 1.1, 1.1, 0.9, 1.0, 0.9],
+      '四室两厅': [1.1, 1.0, 1.0, 1.0, 1.1, 0.9, 1.0, 0.9],
+      '复式': [1.0, 1.1, 1.0, 1.0, 1.1, 1.0, 0.9, 0.9],
+      '别墅': [1.0, 1.0, 1.0, 1.1, 1.1, 1.0, 0.9, 0.9]
+    }[huxing] || [1, 1, 1, 1, 1, 1, 1, 1];
+    var dirs = ['北','东北','东','东南','南','西南','西','西北'];
+    var result = {};
+    dirs.forEach(function(d, i) { result[d] = total * variance[i] / 8; });
+    return result;
+  }
+
+  function checkMissingCorners(actualAreas) {
+    if (!actualAreas || typeof actualAreas !== 'object') return [];
+    var values = Object.values(actualAreas).filter(function(v) { return typeof v === 'number' && v > 0; });
+    if (values.length === 0) return [];
+    var sum = values.reduce(function(s, v) { return s + v; }, 0);
+    var avg = sum / values.length;
+    var missing = [];
+    Object.keys(actualAreas).forEach(function(dir) {
+      var ratio = actualAreas[dir] / avg;
+      if (ratio < 0.7) {
+        missing.push({
+          direction: dir,
+          ratio: ratio.toFixed(2),
+          severity: ratio < 0.4 ? '严重' : ratio < 0.55 ? '中等' : '轻度',
+          advice: _getMissingCornerAdvice(dir)
+        });
+      }
+    });
+    return missing;
+  }
+
+  function _getMissingCornerAdvice(dir) {
+    var map = {
+      '北': { desc: '缺坎位，主男子运势、肾脏、泌尿系统', wu: '在北位放置金属摆件或水景补坎' },
+      '东北': { desc: '缺艮位，主少男、胃部、关节', wu: '在东北位放置陶瓷或泰山石补艮' },
+      '东': { desc: '缺震位，主长子、肝胆、足部', wu: '在东方摆放绿植或木器补震' },
+      '东南': { desc: '缺巽位，主长女、股部、神经', wu: '在东南位放绿植或文昌塔补巽' },
+      '南': { desc: '缺离位，主中女、心脏、眼睛', wu: '在南方放置红灯或绿植补离' },
+      '西南': { desc: '缺坤位，主老母、脾胃、腹部', wu: '在西南位放陶瓷或黄色饰品补坤' },
+      '西': { desc: '缺兑位，主少女、肺部、皮肤', wu: '在西方放金属摆件补兑' },
+      '西北': { desc: '缺乾位，主老父、肺部、头部', wu: '在西北位放金属或水晶球补乾' }
+    };
+    return map[dir] || { desc: '', wu: '' };
+  }
+
+  function analyzeCenter(centerInfo) {
+    var map = {
+      '空旷': { score: 10, desc: '中宫空旷通畅，气场流转自如', advice: '保持中宫开阔、整洁、光线充足' },
+      '客厅': { score: 8, desc: '中宫为客厅，可聚人气，宜开阔', advice: '可在此处摆放鱼缸或催财物品' },
+      '餐厅': { score: 6, desc: '中宫为餐厅，主家庭和睦、食禄', advice: '餐桌宜圆形，忌尖角' },
+      '卧室': { score: 3, desc: '中宫为卧室，主劳心劳力', advice: '忌长期居中宫卧床' },
+      '厨房': { score: -8, desc: '中宫为厨房，主家运不安、心脏眼睛问题（厨房中宫火）', advice: '需用铜器化解或改厨房位置' },
+      '卫生间': { score: -12, desc: '中宫为卫生间，主污秽中宫，家运衰败', advice: '务必改移或封堵马桶，保持干燥' },
+      '楼梯': { score: -5, desc: '中宫为楼梯，动静交错，难以安住', advice: '用屏风或玄关缓冲' },
+      '杂物': { score: -10, desc: '中宫堆放杂物，财气难聚', advice: '立即清理，保持中宫空旷明亮' }
+    };
+    return map[centerInfo] || map['空旷'];
+  }
+
+  function analyzeHuxing(huxingInfo) {
+    var chaoxiang = huxingInfo.chaoxiang;
+    var area = huxingInfo.area || 0;
+    var louceng = huxingInfo.louceng;
+    var zhaiGua = getZhaiGua(chaoxiang);
+    var bazhaiTable = getBazhaiDirectionTable(zhaiGua.guaName);
+    var actualAreas = huxingInfo.zoneArea || _estimateHuxingAreas(huxingInfo.huxing, area);
+    var missing = checkMissingCorners(actualAreas);
+    var menhuDir = chaoxiang;
+    var center = analyzeCenter(huxingInfo.center || '空旷');
+    var lcWuxing = _getFloorWuxing(parseInt(louceng) || 1);
+
+    return {
+      chaoxiang: chaoxiang,
+      zhaiGua: zhaiGua,
+      bazhaiTable: bazhaiTable,
+      auspicious: _filterByRank(bazhaiTable, ['上吉','次吉','中吉']),
+      inauspicious: _filterByRank(bazhaiTable, ['大凶','次凶','中凶','小凶']),
+      missing: missing,
+      center: center,
+      menhu: menhuDir,
+      loucengWuxing: lcWuxing,
+      score: _computeHuxingScore(bazhaiTable, missing, center),
+      advice: _huxingAdvice(zhaiGua, missing, bazhaiTable)
+    };
+  }
+
+  function _computeHuxingScore(bazhaiTable, missing, center) {
+    var score = 60;
+    var good = _filterByRank(bazhaiTable, ['上吉','次吉','中吉']).length;
+    score += (good - 4) * 3;
+    missing.forEach(function(m) {
+      score -= m.severity === '严重' ? 10 : m.severity === '中等' ? 5 : 2;
+    });
+    score += center.score;
+    return Math.max(20, Math.min(100, score));
+  }
+
+  function _huxingAdvice(zhaiGua, missing, bazhaiTable) {
+    var tips = [];
+    if (missing.length > 0) {
+      tips.push('宅有' + missing.length + '方缺角（' + missing.map(function(m){return m.direction;}).join('、') + '），需用对应五行物品补缺');
+    }
+    var shengQi = _filterByRank(bazhaiTable, ['上吉']);
+    if (shengQi.length > 0) {
+      tips.push('生气位在' + shengQi[0].dir + '方，宜作大门、主卧、书房');
+    }
+    var jueMing = _filterByRank(bazhaiTable, ['大凶']);
+    if (jueMing.length > 0) {
+      tips.push('绝命位在' + jueMing[0].dir + '方，宜作卫生间、储藏室，忌作卧室或入户门');
+    }
+    return tips;
+  }
+
+  // ───────────────────────── 8. 完整分析入口 ─────────────────────────
+
+  function fengshuiAnalyze(opts) {
+    opts = opts || {};
+    var year = opts.year || 1990;
+    var sex = opts.sex || 'male';
+    var chaoxiang = opts.chaoxiang || '南';
+    var buildYear = opts.buildYear || 2000;
+    var huxingInfo = {
+      huxing: opts.huxing || '三室一厅',
+      chaoxiang: chaoxiang,
+      louceng: opts.louceng || '6',
+      area: opts.area || 100
+    };
+    var bazhai = bazhaiAnalyze(year, sex, chaoxiang);
+    var xuankong = xuankongAnalyze(buildYear, chaoxiang);
+    var huxing = analyzeHuxing(huxingInfo);
+    var sanYao = null;
+    if (opts.menhuDir && opts.zhuWoDir && opts.zaoFangDir) {
+      sanYao = analyzeYangZhaiSanYao(year, sex, opts.menhuDir, opts.zhuWoDir, opts.zaoFangDir);
+    }
+    var totalScore = (bazhai.match ? 25 : 15) +
+                     (xuankong.wangShanWangXiang ? 25 : 15) +
+                     (huxing.score * 0.3);
+    return {
+      bazhai: bazhai,
+      xuankong: xuankong,
+      huxing: huxing,
+      sanYao: sanYao,
+      totalScore: Math.round(totalScore),
+      summary: _summary({ bazhai: bazhai, xuankong: xuankong, huxing: huxing })
+    };
+  }
+
+  function _summary(r) {
+    var parts = [];
+    if (r.bazhai.match) parts.push('宅命相配');
+    else parts.push('宅命需化解');
+    if (r.xuankong.wangShanWangXiang) parts.push('当元旺山旺向');
+    else parts.push('非当运之宅');
+    if (r.huxing.missing.length === 0) parts.push('户型方正');
+    else parts.push('户型有' + r.huxing.missing.length + '方缺角');
+    return parts.join('，');
+  }
+
+  // ───────────────────────── 9. 兼容旧接口 ─────────────────────────
+
+  function _computeBazhai(zhaiNum) {
+    var dirMap = { 1:'北', 2:'西南', 3:'东', 4:'东南', 5:'中', 6:'西北', 7:'西', 8:'东北', 9:'南' };
+    var dir = dirMap[zhaiNum] || '北';
+    var zhaiGua = getZhaiGua(dir);
+    var table = getBazhaiDirectionTable(zhaiGua.guaName);
+    return {
+      gua: zhaiNum,
+      guaName: zhaiGua.guaName,
+      type: zhaiGua.type,
+      isDong: zhaiGua.isDong,
+      direction: dir,
+      table: table,
+      auspicious: _filterByRank(table, ['上吉','次吉','中吉']),
+      inauspicious: _filterByRank(table, ['大凶','次凶','中凶','小凶'])
+    };
+  }
+
+  function _xuankongBrief(buildYear, chaoxiang) {
+    var xk = xuankongAnalyze(buildYear, chaoxiang);
+    return {
+      yuanYun: xk.yuanYunBuild,
+      yunStar: xk.yunStar,
+      wangShan: xk.wangShanWangXiang,
+      yunPan: xk.yunPan,
+      shanPan: xk.shanPan,
+      xiangPan: xk.xiangPan,
+      advice: xk.advice
+    };
+  }
+
+  // ───────────────────────── 10. 测试用例（自检）─────────────────────────
+
+  function runTests() {
+    var results = [];
+    function assert(cond, name, detail) {
+      results.push({ name: name, pass: !!cond, detail: detail });
+    }
+
+    // ====== T1：1990 男性命卦 ======
+    // last2=90, (100-90)%9=1, 坎/东四命
+    var mg1 = getMingGuaClassic(1990, 'male');
+    assert(mg1.gua === 1 && mg1.guaName === '坎' && mg1.isDong, 'T1 1990男命卦=坎(1东四)', JSON.stringify(mg1));
+
+    // ====== T2：1985 女性命卦 ======
+    // last2=85, (85+5)%9=0→9, 离/东四命
+    var mg2 = getMingGuaClassic(1985, 'female');
+    assert(mg2.gua === 9 && mg2.guaName === '离' && mg2.isDong, 'T2 1985女命卦=离(9东四)', JSON.stringify(mg2));
+
+    // ====== T3：1968 男性（命数得5寄坤）======
+    var mg3 = getMingGuaClassic(1968, 'male');
+    assert(mg3.gua === 2 && mg3.guaName === '坤', 'T3 1968男命数5寄坤', JSON.stringify(mg3));
+
+    // ====== T4：1970 男性 ======
+    // last2=70, (100-70)%9 = 30%9 = 3, 震/东四命
+    var mg4 = getMingGuaClassic(1970, 'male');
+    assert(mg4.gua === 3 && mg4.guaName === '震' && mg4.isDong, 'T4 1970男命卦=震(3东四)', JSON.stringify(mg4));
+
+    // ====== T5：朝向"南"=离宅 ======
+    var zg1 = getZhaiGua('南');
+    assert(zg1.gua === 9 && zg1.guaName === '离' && zg1.isDong, 'T5 朝南=离宅(东四)', JSON.stringify(zg1));
+
+   // ====== T6：八宅大游年歌诀——离卦 ======
+   // 离六五绝延祸生天：本卦离=伏, 西南(坤)=六, 西(兑)=五, 西北(乾)=绝, 北(坎)=延, 东北(艮)=祸, 东(震)=生, 东南(巽)=天
+   var tableL1 = getBazhaiDirectionTable('离');
+   assert(
+     tableL1['南'].star === '伏位' &&
+     tableL1['西南'].star === '六煞' &&
+     tableL1['西'].star === '五鬼' &&
+     tableL1['西北'].star === '绝命' &&
+     tableL1['北'].star === '延年' &&
+     tableL1['东北'].star === '祸害' &&
+     tableL1['东'].star === '生气' &&
+     tableL1['东南'].star === '天医',
+     'T6 离卦大游年歌诀（离六五绝延祸生天）',
+     JSON.stringify(tableL1)
+   );
+
+   // ====== T7：八宅大游年——乾卦 ======
+   // 乾六天五祸绝延生：本卦乾=伏, 北(坎)=六, 东北(艮)=天, 东(震)=五, 东南(巽)=祸, 南(离)=绝, 西南(坤)=延, 西(兑)=生
+   var tableQ1 = getBazhaiDirectionTable('乾');
+   assert(
+     tableQ1['西北'].star === '伏位' &&
+     tableQ1['北'].star === '六煞' &&
+     tableQ1['东北'].star === '天医' &&
+     tableQ1['东'].star === '五鬼' &&
+     tableQ1['东南'].star === '祸害' &&
+     tableQ1['南'].star === '绝命' &&
+     tableQ1['西南'].star === '延年' &&
+     tableQ1['西'].star === '生气',
+     'T7 乾卦大游年歌诀（乾六天五祸绝延生）',
+     JSON.stringify(tableQ1)
+   );
+
+   // ====== T8：八宅大游年——坎卦 ======
+   // 坎五天生延绝祸六：本卦坎=伏, 东北(艮)=五, 东(震)=生, 东南(巽)=天, 南(离)=延, 西南(坤)=绝, 西(兑)=祸, 西北(乾)=六
+   var tableK1 = getBazhaiDirectionTable('坎');
+   assert(
+     tableK1['北'].star === '伏位' &&
+     tableK1['东北'].star === '五鬼' &&
+     tableK1['东'].star === '生气' &&
+     tableK1['东南'].star === '延年' &&
+     tableK1['南'].star === '绝命' &&
+     tableK1['西南'].star === '天医' &&
+     tableK1['西'].star === '祸害' &&
+     tableK1['西北'].star === '六煞',
+     'T8 坎卦大游年歌诀（坎五天生延绝祸六）',
+     JSON.stringify(tableK1)
+   );
+
+    // ====== T9：玄空飞星九运（2024起）======
+    var yun9 = getYunStarForYear(2024);
+    assert(yun9 === 9, 'T9 2024年=九运（九紫入中）', 'got=' + yun9);
+
+    var yun8 = getYunStarForYear(2018);
+    assert(yun8 === 8, 'T10 2018年=八运（八白入中）', 'got=' + yun8);
+
+    var yun7 = getYunStarForYear(1995);
+    assert(yun7 === 7, 'T11 1995年=七运（七赤入中）', 'got=' + yun7);
+
+    // ====== T12：三元划分 ======
+    assert(getYuanYun(1990) === '下元', 'T12 1990=下元', 'got=' + getYuanYun(1990));
+    assert(getYuanYun(1955) === '中元', 'T13 1955=中元', 'got=' + getYuanYun(1955));
+    assert(getYuanYun(1900) === '上元', 'T14 1900=上元', 'got=' + getYuanYun(1900));
+
+    // ====== T15：飞星九宫分布 ======
+    var fy = getFlyingStars(9);
+    assert(fy['中'] === 9 && fy['南'] === 4 && fy['北'] === 5, 'T15 九运运盘（中9/南4/北5）', JSON.stringify(fy));
+
+    // ====== T16：二十四山定位 ======
+    var sh0 = getTwentyFourShan(0); // 正北
+    assert(sh0.shan === '子', 'T16 0度(正北)=子山', JSON.stringify(sh0));
+    var sh90 = getTwentyFourShan(90); // 正东
+    assert(sh90.shan === '卯', 'T17 90度(正东)=卯山', JSON.stringify(sh90));
+    var sh180 = getTwentyFourShan(180); // 正南
+    assert(sh180.shan === '午', 'T18 180度(正南)=午山', JSON.stringify(sh180));
+    var sh270 = getTwentyFourShan(270); // 正西
+    assert(sh270.shan === '酉', 'T19 270度(正西)=酉山', JSON.stringify(sh270));
+
+    // ====== T20：户型分析（基本）======
+    var hx1 = analyzeHuxing({ huxing: '三室一厅', chaoxiang: '南', louceng: '8', area: 100 });
+    assert(hx1.zhaiGua.isDong && hx1.score >= 30, 'T20 朝南户型基础分析', 'score=' + hx1.score);
+
+    // ====== T21：缺角判断（北缺）======
+    var mi1 = checkMissingCorners({ '北': 5, '东北': 10, '东': 10, '东南': 10, '南': 10, '西南': 10, '西': 10, '西北': 10 });
+    assert(mi1.length === 1 && mi1[0].direction === '北' && mi1[0].severity === '中等', 'T21 缺角判断=北缺', JSON.stringify(mi1));
+
+    // ====== T22：严重缺角 ======
+    var mi2 = checkMissingCorners({ '北': 1, '东北': 10, '东': 10, '东南': 10, '南': 10, '西南': 10, '西': 10, '西北': 10 });
+    assert(mi2.length === 1 && mi2[0].severity === '严重', 'T22 严重缺角', JSON.stringify(mi2));
+
+    // ====== T23：旺山旺向判定 ======
+    var wsw = isWangShanWangXiang('南', 9);
+    assert(typeof wsw === 'boolean', 'T23 旺山旺向判定返回布尔', 'val=' + wsw);
+
+    // ====== T24：阳宅三要分析 ======
+    var sy = analyzeYangZhaiSanYao(1990, 'male', '南', '东', '南');
+    assert(sy && typeof sy.totalScore === 'number' && sy.menhu && sy.zhuWo && sy.zaoFang, 'T24 阳宅三要完整返回', JSON.stringify(sy));
+
+    // ====== T25：1990 坎命+朝南离宅=配（都东四）======
+    var md1 = isMingZhaiMatch(getMingGuaClassic(1990, 'male'), getZhaiGua('南'));
+    assert(md1 === true, 'T25 1990坎命(东四)+朝南离宅(东四)=配', 'md1=' + md1);
+
+    // ====== T26：1970 震命+朝南=配 ======
+    var md2 = isMingZhaiMatch(getMingGuaClassic(1970, 'male'), getZhaiGua('东南'));
+    assert(md2 === true, 'T26 1970震命(东四)+朝东南巽宅(东四)=配', 'md2=' + md2);
+
+    // ====== T27：1990 坎命+朝西北乾宅=不配 ======
+    var md3 = isMingZhaiMatch(getMingGuaClassic(1990, 'male'), getZhaiGua('西北'));
+    assert(md3 === false, 'T27 1990坎命(东四)+朝西北乾宅(西四)=不配', 'md3=' + md3);
+
+    // ====== T28：完整分析入口 ======
+    var full = fengshuiAnalyze({ year: 1985, sex: 'female', chaoxiang: '南', huxing: '三室一厅', louceng: '8', area: 100, buildYear: 2010 });
+    assert(full && full.bazhai && full.xuankong && full.huxing && full.summary, 'T28 fengshuiAnalyze统一入口', JSON.stringify({summary: full.summary, score: full.totalScore}));
+
+    // ====== T29：兼容旧接口 _computeBazhai ======
+    var cb = _computeBazhai(9);
+    assert(cb.guaName === '离' && cb.direction === '南', 'T29 _computeBazhai(9)=离南', JSON.stringify(cb));
+
+    // ====== T30：兼容旧接口 _xuankongBrief ======
+    var xb = _xuankongBrief(2010, '南');
+    assert(xb && xb.yunPan && xb.yunPan['中'], 'T30 _xuankongBrief返回运盘', 'center=' + (xb.yunPan && xb.yunPan['中']));
+
+    // ====== T31：山盘向盘 ======
+    var sp = xuankongShan(2010, '南');
+    assert(sp['南'] && sp['北'], 'T31 山盘包含南北位', JSON.stringify(sp));
+
+    // ====== T32：楼层五行 ======
+    assert(_getFloorWuxing(8) === '木' && _getFloorWuxing(1) === '水' && _getFloorWuxing(5) === '土', 'T32 楼层五行', '');
+
+    // ====== T33：24山五行 ======
+    assert(shanWuxing('子') === '水' && shanWuxing('午') === '火' && shanWuxing('艮') === '土' && shanWuxing('甲') === '木',
+      'T33 24山五行（子水午火艮土甲木）', '');
+
+    // ====== T34：双星会向（朝向=南，山盘南=对冲位北=1白）======
+    var sji = checkShanXiangJie(xuankongShan(2010, '南'), xuankongXiang(2010, '南'));
+    assert(Array.isArray(sji), 'T34 checkShanXiangJie返回数组', JSON.stringify(sji));
+
+    return results;
+  }
+
+  function summaryTests(results) {
+    var passed = results.filter(function(r) { return r.pass; }).length;
+    var failed = results.filter(function(r) { return !r.pass; });
+    return {
+      total: results.length,
+      passed: passed,
+      failed: failed.length,
+      failedList: failed
+    };
+  }
+
+  // ───────────────────────── 11. 挂载到全局 ─────────────────────────
+
+  global.FENGSHUI = {
+    PALACE_DIR: PALACE_DIR,
+    DIR_TO_GUA: DIR_TO_GUA,
+    GUA_NAMES: GUA_NAMES,
+    BAGUA: BAGUA,
+    TWENTY_FOUR_SHAN: TWENTY_FOUR_SHAN_LIST,
+    GUA_TO_DIR: GUA_TO_DIR,
+    DIR_TO_GUA_BGUA: DIR_TO_GUA_BGUA,
+    NINE_STARS_JIXIONG: NINE_STARS_JIXIONG,
+
+    getMingGuaClassic: getMingGuaClassic,
+    getZhaiGua: getZhaiGua,
+    getBazhaiDirectionTable: getBazhaiDirectionTable,
+    isMingZhaiMatch: isMingZhaiMatch,
+    bazhaiAnalyze: bazhaiAnalyze,
+    analyzeYangZhaiSanYao: analyzeYangZhaiSanYao,
+    xuankongAnalyze: xuankongAnalyze,
+    getYunStarForYear: getYunStarForYear,
+    getYuanYun: getYuanYun,
+    getFlyingStars: getFlyingStars,
+    getMonthlyFlyingStars: getMonthlyFlyingStars,
+    getDailyFlyingStars: getDailyFlyingStars,
+    xuankongShan: xuankongShan,
+    xuankongXiang: xuankongXiang,
+    isWangShanWangXiang: isWangShanWangXiang,
+    checkShanXiangJie: checkShanXiangJie,
+    getTwentyFourShan: getTwentyFourShan,
+    shanWuxing: shanWuxing,
+    analyzeHuxing: analyzeHuxing,
+    checkMissingCorners: checkMissingCorners,
+    analyzeCenter: analyzeCenter,
+    fengshuiAnalyze: fengshuiAnalyze,
+    _computeBazhai: _computeBazhai,
+    _xuankongBrief: _xuankongBrief,
+    runTests: runTests,
+    summaryTests: summaryTests
+  };
+
+  // 自动运行测试
+  try {
+    if (typeof console !== 'undefined' && console.log) {
+      var testResults = runTests();
+      var sum = summaryTests(testResults);
+      console.log('[FENGSHUI ENGINE] 测试结果: ' + sum.passed + '/' + sum.total + ' 通过');
+      if (sum.failed > 0) {
+        console.warn('[FENGSHUI ENGINE] 失败用例:');
+        sum.failedList.forEach(function(t) {
+          console.warn('  - ' + t.name + ' :: ' + t.detail);
+        });
+      }
+    }
+  } catch (e) {
+    console.error('[FENGSHUI ENGINE] 测试运行异常:', e);
+  }
+
+})(typeof window !== 'undefined' ? window : this);
+
+// ═══ END FENGSHUI ENGINE CORE ═══

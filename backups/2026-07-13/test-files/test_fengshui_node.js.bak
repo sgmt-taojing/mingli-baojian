@@ -1,0 +1,35 @@
+const fs = require('fs');
+const vm = require('vm');
+
+let code = fs.readFileSync('.openclaw/tmp/fengshui_core_block.txt', 'utf-8');
+code = code.replace("(typeof window !== 'undefined' ? window : this)", "({})");
+
+const ctx = {
+  console: console
+};
+ctx.window = ctx;
+ctx.global = ctx;
+vm.createContext(ctx);
+
+try {
+  vm.runInContext(code, ctx, { displayErrors: true });
+  
+  console.log('=== FENGSHUI ENGINE TEST ===');
+  // 重新调用测试（避免 IIFE 自带调用冲突）
+  const results = ctx.FENGSHUI.runTests();
+  results.forEach(r => {
+    console.log((r.pass ? '✓ PASS' : '✗ FAIL') + ' :: ' + r.name);
+    if (!r.pass) console.log('  detail: ' + r.detail);
+  });
+  const sum = ctx.FENGSHUI.summaryTests(results);
+  console.log('\n=== TOTAL: ' + sum.passed + '/' + sum.total + ' passed ===');
+  if (sum.failed > 0) {
+    console.error('FAILED CASES:');
+    sum.failedList.forEach(t => console.error('  - ' + t.name));
+    process.exit(1);
+  }
+} catch (e) {
+  console.error('ERROR:', e.message);
+  console.error(e.stack);
+  process.exit(1);
+}
