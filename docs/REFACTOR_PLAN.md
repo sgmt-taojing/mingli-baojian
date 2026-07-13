@@ -98,3 +98,22 @@
 ### 低优先级
 - [ ] 紫微斗数准确度提升至 8/10（需更多实测案例）
 - [ ] 奇门遁甲准确度提升至 8/10（需更多实测案例）
+
+---
+
+## 六、清理记录（2026-07-14）
+
+| 清理项 | 数量 | 备份位置 |
+|--------|------|---------|
+| app/js/*.bak* | 10 个 | backups/2026-07-13/js-baks/ |
+| docs/js/*.bak* | 10 个 | backups/2026-07-13/docs-js-baks/ |
+| 测试文件 | 2 个 | backups/2026-07-13/test-files/ |
+| 临时文件 | 4 个 | backups/2026-07-13/test-files/ |
+| liuren-upgrade.js.bak | 2 个 | 已包含在上述备份中 |
+| **合计** | **28 个** | **backups/2026-07-13/** |
+
+### CDN 状态
+- divination-hub.html: ✅ 200（2MB，最新版已上线）
+- more-functions.html: ⏳ GitHub Pages CDN 缓存延迟（git 仓库已确认正确，raw 200）
+- fengshui.html: ✅ 200（241KB，古书引用正常）
+- 两个分支（main + gh-pages）均已同步最新文件
