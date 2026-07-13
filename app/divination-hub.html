@@ -3739,7 +3739,7 @@ setTimeout(removeLoadingOverlay,5000);
         <span class="mobile-quick-icon">📅</span>
         <div class="mobile-quick-text"><div class="mobile-quick-name">每日黄历</div><div class="mobile-quick-desc">宜忌方位</div></div>
       </div>
-      <div class="mobile-quick-item" onclick="showSection('more');showMoreModule('tizhi',this)">
+      <div class="mobile-quick-item" onclick="showSection('tizhi')">
         <span class="mobile-quick-icon">🧬</span>
         <div class="mobile-quick-text"><div class="mobile-quick-name">体质辨识</div><div class="mobile-quick-desc">五行养生</div></div>
       </div>
@@ -3751,6 +3751,199 @@ setTimeout(removeLoadingOverlay,5000);
 <section class="section" id="section-more" data-lazy="more-functions.html">
   <div class="section-header"><h2>更多功能</h2><p class="section-sub">知识库 · 黄历 · 体质 · 信众 · 排行 · 商城</p></div>
   <div id="section-more-placeholder" style="text-align:center;padding:40px 20px;color:#999">加载中...</div>
+</section>
+
+<!-- ===== TIZHI (体质辨识) SECTION ===== -->
+<section class="section" id="section-tizhi">
+  <div class="section-header">
+    <span class="sh-symbol" style="color:var(--gold)">🧬</span>
+    <h2 class="sh-title">体质辨识 · 中医养生</h2>
+    <p class="section-sub">九种体质 · 辨证施养 · 古法调摄</p>
+  </div>
+  <div class="back-row"><button class="back-btn" onclick="showSection('hero')">返回首页</button></div>
+
+  <!-- Tab 按钮 -->
+  <div class="tz-tabs" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:16px;justify-content:center">
+    <button id="tzTab-report" onclick="tzSwitchTab('report')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--title);color:#fff;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">📋 报告分析</button>
+    <button id="tzTab-selftest" onclick="tzSwitchTab('selftest')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">📝 体质自测</button>
+    <button id="tzTab-plan" onclick="tzSwitchTab('plan')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">🎯 养生方案</button>
+    <button id="tzTab-food" onclick="tzSwitchTab('food')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">🥗 食疗推荐</button>
+    <button id="tzTab-qigong" onclick="tzSwitchTab('qigong')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">🧘 功法养生</button>
+    <button id="tzTab-prescription" onclick="tzSwitchTab('prescription')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">💊 名医名方</button>
+    <button id="tzTab-bazi" onclick="tzSwitchTab('bazi')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">🔮 八字体质</button>
+    <button id="tzTab-checkin" onclick="tzSwitchTab('checkin')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">✅ 打卡记录</button>
+    <button id="tzTab-wuxing" onclick="tzSwitchTab('wuxing')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">☯️ 五行养生</button>
+  </div>
+
+  <!-- ===== Tab: 报告分析 ===== -->
+  <div id="tz-tab-report" class="tz-panel" style="display:block">
+    <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+      <h4 style="font-size:16px;color:var(--gold);margin-bottom:12px">📋 体检报告AI分析</h4>
+      <p style="font-size:13px;color:var(--paper2);line-height:1.7;margin-bottom:16px">上传体检报告图片/PDF，或手动输入指标，AI将为您分析体质并给出理疗建议。</p>
+      <div style="margin-bottom:16px">
+        <label style="display:block;margin-bottom:8px;font-size:14px;color:var(--gold)">📤 上传体检报告</label>
+        <input type="file" accept="image/*,.pdf" onchange="handleTizhiUpload(this)" style="width:100%;padding:10px;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px">
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:16px;margin-bottom:16px">
+        <label style="display:block;margin-bottom:8px;font-size:14px;color:var(--gold)">✍️ 手动输入指标</label>
+        <div id="tzManualFields"></div>
+        <button onclick="tzAddMetricField()" style="margin-top:8px;padding:8px 16px;background:rgba(201,168,76,0.1);border:1px solid var(--border);border-radius:6px;color:var(--gold);cursor:pointer;font-size:13px;font-family:inherit">➕ 添加指标</button>
+        <button onclick="tzAnalyzeManualMetrics()" style="margin-top:8px;margin-left:8px;padding:8px 16px;background:var(--gold);border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:13px;font-family:inherit">🔍 开始分析</button>
+      </div>
+      <div id="tizhiResult" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- ===== Tab: 体质自测 ===== -->
+  <div id="tz-tab-selftest" class="tz-panel" style="display:none">
+    <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+      <h4 style="font-size:16px;color:var(--gold);margin-bottom:8px">📝 中医体质自测问卷</h4>
+      <p style="font-size:13px;color:var(--paper2);line-height:1.7;margin-bottom:16px">请根据近一个月的身体状况，如实回答以下问题。系统将根据您的回答判断体质类型。</p>
+      <div id="tzQuestionnaire"></div>
+      <div style="text-align:center;margin-top:20px">
+        <button class="compute-btn" style="padding:12px 36px;font-size:14px" onclick="tzCalculateResult()">📊 查看体质结果</button>
+      </div>
+      <div id="tzResult" style="display:none;margin-top:20px"></div>
+    </div>
+  </div>
+
+  <!-- ===== Tab: 养生方案 ===== -->
+  <div id="tz-tab-plan" class="tz-panel" style="display:none">
+    <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+      <h4 style="font-size:16px;color:var(--gold);margin-bottom:12px">🎯 综合养生方案</h4>
+      <p style="font-size:13px;color:var(--paper2);line-height:1.7;margin-bottom:16px">选择您的体质类型，AI将为您生成包含食疗、功法、正念、起居的个性化养生方案。</p>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+        <label style="font-size:14px;color:var(--gold)">选择体质：</label>
+        <select id="tzPlanTizhi" style="padding:8px 12px;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;min-width:160px">
+          <option value="">请选择体质类型</option>
+        </select>
+        <button onclick="tzGeneratePlan()" style="padding:8px 20px;background:var(--gold);border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:13px;font-family:inherit">🎯 生成方案</button>
+      </div>
+      <div id="tzPlanResult" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- ===== Tab: 食疗推荐 ===== -->
+  <div id="tz-tab-food" class="tz-panel" style="display:none">
+    <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+      <h4 style="font-size:16px;color:var(--gold);margin-bottom:12px">🥗 食疗推荐</h4>
+      <p style="font-size:13px;color:var(--paper2);line-height:1.7;margin-bottom:16px">按体质筛选食疗方案，每道食谱均标注适用体质类型。</p>
+      <div id="tzFoodFilters" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px"></div>
+      <div id="tzFoodList" style="display:grid;gap:12px"></div>
+    </div>
+  </div>
+
+  <!-- ===== Tab: 功法养生 ===== -->
+  <div id="tz-tab-qigong" class="tz-panel" style="display:none">
+    <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+      <h4 style="font-size:16px;color:var(--gold);margin-bottom:12px">🧘 功法养生</h4>
+      <p style="font-size:13px;color:var(--paper2);line-height:1.7;margin-bottom:16px">传统功法强身健体，按体质选择适合的功法练习。</p>
+      <div id="tzQigongList" style="display:grid;gap:12px;margin-bottom:20px"></div>
+      <h5 style="font-size:15px;color:var(--gold);margin-bottom:12px">🤸 运动建议</h5>
+      <div id="tzExFilters" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px"></div>
+      <div id="tzExerciseList" style="display:grid;gap:12px"></div>
+    </div>
+  </div>
+
+  <!-- ===== Tab: 名医名方 ===== -->
+  <div id="tz-tab-prescription" class="tz-panel" style="display:none">
+    <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+      <h4 style="font-size:16px;color:var(--gold);margin-bottom:12px">💊 名医名方</h4>
+      <p style="font-size:13px;color:var(--paper2);line-height:1.7;margin-bottom:16px">经典中医方剂，按体质分类，源自历代名医。</p>
+      <div id="tzPrescriptionList" style="display:grid;gap:12px"></div>
+    </div>
+  </div>
+
+  <!-- ===== Tab: 八字体质 ===== -->
+  <div id="tz-tab-bazi" class="tz-panel" style="display:none">
+    <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+      <h4 style="font-size:16px;color:var(--gold);margin-bottom:12px">🔮 八字体质分析</h4>
+      <p style="font-size:13px;color:var(--paper2);line-height:1.7;margin-bottom:16px">根据出生日期推算日主五行，分析先天体质倾向。</p>
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+        <div>
+          <label style="display:block;font-size:12px;color:var(--gold);margin-bottom:4px">出生日期</label>
+          <input type="date" id="tzBaziDate" style="padding:8px;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px">
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;color:var(--gold);margin-bottom:4px">出生时辰</label>
+          <select id="tzBaziHour" style="padding:8px;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px">
+            <option value="0">子时 23-01</option>
+            <option value="1">丑时 01-03</option>
+            <option value="2">寅时 03-05</option>
+            <option value="3">卯时 05-07</option>
+            <option value="4">辰时 07-09</option>
+            <option value="5">巳时 09-11</option>
+            <option value="6">午时 11-13</option>
+            <option value="7">未时 13-15</option>
+            <option value="8">申时 15-17</option>
+            <option value="9">酉时 17-19</option>
+            <option value="10">戌时 19-21</option>
+            <option value="11">亥时 21-23</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;color:var(--gold);margin-bottom:4px">性别</label>
+          <select id="tzBaziGender" style="padding:8px;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px">
+            <option value="male">男</option>
+            <option value="female">女</option>
+          </select>
+        </div>
+        <button onclick="tzAnalyzeBazi()" style="padding:8px 20px;background:var(--gold);border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:13px;font-family:inherit;margin-top:20px">🔍 分析体质</button>
+      </div>
+      <div id="tzBaziResult" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- ===== Tab: 打卡记录 ===== -->
+  <div id="tz-tab-checkin" class="tz-panel" style="display:none">
+    <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+      <h4 style="font-size:16px;color:var(--gold);margin-bottom:12px">✅ 日常养生打卡</h4>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:16px">
+        <div style="background:rgba(201,168,76,0.06);border-radius:10px;padding:16px;text-align:center">
+          <div style="font-size:32px;color:var(--gold);font-weight:bold" id="tzStreakDays">0</div>
+          <div style="font-size:12px;color:var(--paper2);margin-top:4px">连续打卡(天)</div>
+        </div>
+        <div style="background:rgba(45,106,79,0.06);border-radius:10px;padding:16px;text-align:center">
+          <div style="font-size:32px;color:var(--success);font-weight:bold" id="tzTotalDays">0</div>
+          <div style="font-size:12px;color:var(--paper2);margin-top:4px">累计打卡(天)</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:16px;text-align:center">
+          <div style="font-size:18px;color:var(--gold);font-weight:bold;padding-top:8px" id="tzTodayStatus">未打卡</div>
+          <div style="font-size:12px;color:var(--paper2);margin-top:4px">今日状态</div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:16px;margin-bottom:16px">
+        <div style="font-size:14px;color:var(--gold);margin-bottom:12px">今日打卡项目</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">
+          <label style="display:flex;align-items:center;gap:6px;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:6px;cursor:pointer;font-size:13px;color:var(--text)"><input type="checkbox" id="tzCheckDiet"> 🍵 饮食调理</label>
+          <label style="display:flex;align-items:center;gap:6px;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:6px;cursor:pointer;font-size:13px;color:var(--text)"><input type="checkbox" id="tzCheckExercise"> 🧘 功法锻炼</label>
+          <label style="display:flex;align-items:center;gap:6px;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:6px;cursor:pointer;font-size:13px;color:var(--text)"><input type="checkbox" id="tzCheckSleep"> 😴 早睡早起</label>
+          <label style="display:flex;align-items:center;gap:6px;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:6px;cursor:pointer;font-size:13px;color:var(--text)"><input type="checkbox" id="tzCheckEmotion"> 😊 情志调节</label>
+          <label style="display:flex;align-items:center;gap:6px;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:6px;cursor:pointer;font-size:13px;color:var(--text)"><input type="checkbox" id="tzCheckAcupoint"> 💆 穴位按摩</label>
+          <label style="display:flex;align-items:center;gap:6px;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:6px;cursor:pointer;font-size:13px;color:var(--text)"><input type="checkbox" id="tzCheckTea"> 🫖 药膳茶饮</label>
+          <label style="display:flex;align-items:center;gap:6px;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:6px;cursor:pointer;font-size:13px;color:var(--text)"><input type="checkbox" id="tzCheckMeditation"> 🧠 正念冥想</label>
+          <label style="display:flex;align-items:center;gap:6px;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:6px;cursor:pointer;font-size:13px;color:var(--text)"><input type="checkbox" id="tzCheckReading"> 📖 经典诵读</label>
+        </div>
+        <div style="margin-top:12px">
+          <textarea id="tzCheckNote" placeholder="今日心得..." style="width:100%;padding:10px;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:inherit;resize:vertical;min-height:60px"></textarea>
+        </div>
+        <div style="text-align:center;margin-top:12px">
+          <button onclick="tzSubmitCheckin()" style="padding:10px 30px;background:var(--gold);border:none;border-radius:8px;color:#fff;cursor:pointer;font-size:14px;font-family:inherit">✅ 今日打卡</button>
+        </div>
+      </div>
+      <div id="tzCheckinHistory"></div>
+    </div>
+  </div>
+
+  <!-- ===== Tab: 五行养生 ===== -->
+  <div id="tz-tab-wuxing" class="tz-panel" style="display:none">
+    <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+      <h4 style="font-size:16px;color:var(--gold);margin-bottom:12px">☯️ 五行养生</h4>
+      <p style="font-size:13px;color:var(--paper2);line-height:1.7;margin-bottom:16px">木火土金水，五行对应五脏，点击查看各五行养生方案。</p>
+      <div id="tzWxBtns" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;justify-content:center"></div>
+      <div id="tzWuxingDetail"></div>
+    </div>
+  </div>
 </section>
 
 <!-- ===== BAZI SECTION ===== -->
@@ -20944,7 +21137,7 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
   <div class="more-grid">
     <button class="more-item" onclick="showSection('yanzhi'); closeMore();">💬 <span>言值</span></button>
     <button class="more-item" onclick="showSection('more'); showMoreModule('knowledge',this); closeMore();">📚 <span>知识库</span></button>
-    <button class="more-item" onclick="showSection('more'); showMoreModule('tizhi',this); closeMore();">🧬 <span>体质</span></button>
+    <button class="more-item" onclick="showSection('tizhi'); closeMore();">🧬 <span>体质</span></button>
     <button class="more-item" onclick="showSection('more'); showMoreModule('faith',this); closeMore();">🙏 <span>信众</span></button>
     <button class="more-item" onclick="showSection('user'); closeMore();">🙏 <span>信众中心</span></button>
     <button class="more-item" onclick="showSection('more'); showMoreModule('koujue',this); closeMore();">📿 <span>口诀</span></button>
@@ -28382,6 +28575,7 @@ if (typeof window.SHOP_DATA !== 'undefined') {
 <!-- 外部JS引擎 -->
 <script src="js/calc-engine-lib.js?v=20260703p1"></script>
 <script src="js/divination-core.js?v=20260706a"></script>
+<script src="js/engine-v3-bundle.js?v=20260714"></script>
 <script src="js/guide-features.js?t=1783048068"></script>
 <script src="js/shop-module.js?t=1783048068"></script>
 <script src="js/shop-category.js?t=1783048068"></script>
