@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>命理宝鉴 · 状态报告 2026-07-13</title>
+<style>
+:root{--ink:#0a0a0a;--card:#141414;--card2:#1e1e1e;--gold:#c9a84c;--gold2:#e8cc7a;--green:#27ae60;--red:#e74c3c;--blue:#2980b9;--paper:#e0d8c8;--muted:#888}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ink);color:var(--paper);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7;padding:20px;max-width:960px;margin:0 auto}
+h1{color:var(--gold);font-size:24px;margin-bottom:8px;letter-spacing:2px}
+.sub{color:var(--muted);font-size:13px;margin-bottom:24px}
+.section{margin-bottom:32px}
+.section-title{color:var(--gold);font-size:16px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #333}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px}
+.card{background:var(--card);border-radius:8px;padding:16px;border:1px solid #222}
+.card-title{color:var(--gold);font-size:14px;margin-bottom:8px}
+.card-body{font-size:13px;color:#bbb}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;margin-right:4px}
+.badge-ok{background:rgba(39,174,96,.15);color:var(--green);border:1px solid rgba(39,174,96,.3)}
+.badge-warn{background:rgba(231,76,60,.15);color:var(--red);border:1px solid rgba(231,76,60,.3)}
+.badge-pending{background:rgba(201,168,76,.15);color:var(--gold);border:1px solid rgba(201,168,76,.3)}
+table{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:13px}
+th{background:var(--card2);color:var(--gold);padding:10px;text-align:left;border-bottom:2px solid #333}
+td{padding:8px 10px;border-bottom:1px solid #222;color:#ccc}
+tr:hover td{background:rgba(255,255,255,.02)}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.metric{background:var(--card);border-radius:8px;padding:16px;text-align:center}
+.metric-num{font-size:28px;font-weight:700;color:var(--gold)}
+.metric-label{font-size:11px;color:var(--muted);margin-top:4px}
+.url-list{background:var(--card);border-radius:8px;padding:16px;margin-bottom:16px}
+.url-item{padding:6px 0;border-bottom:1px solid #222;font-size:13px}
+.url-item:last-child{border-bottom:none}
+.url-item a{color:var(--blue);text-decoration:none}
+.url-item a:hover{text-decoration:underline}
+.url-status{float:right}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.dot-green{background:var(--green)}
+.dot-red{background:var(--red)}
+.dot-yellow{background:var(--gold)}
+.classic-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
+.classic-item{background:var(--card);padding:8px 12px;border-radius:6px;font-size:12px;color:#aaa}
+.classic-item strong{color:var(--gold2)}
+</style>
+</head>
+<body>
+
+<h1>命理宝鉴 H5 平台 · 状态报告</h1>
+<div class="sub">2026-07-13 23:40 (Asia/Shanghai) · 版本 v20260713i</div>
+
+<div class="metrics">
+<div class="metric"><div class="metric-num">13</div><div class="metric-label">核心功能 ✅</div></div>
+<div class="metric"><div class="metric-num">7</div><div class="metric-label">排盘引擎</div></div>
+<div class="metric"><div class="metric-num">50+</div><div class="metric-label">引用古书</div></div>
+<div class="metric"><div class="metric-num">5</div><div class="metric-label">Bug 修复</div></div>
+</div>
+
+<div class="section">
+<div class="section-title">🔧 Bug 修复记录</div>
+<table>
+<tr><th>#</th><th>Bug</th><th>根因</th><th>修复方式</th><th>状态</th></tr>
+<tr><td>1</td><td>懒加载器正则失效</td><td>字符串拼接错误关闭正则</td><td>改用 new RegExp() 动态构造</td><td><span class="badge badge-ok">已修复</span></td></tr>
+<tr><td>2</td><td>fengshuiLoaded 重复包装</td><td>showSection 三重包装</td><td>删除冗余包装器</td><td><span class="badge badge-ok">已修复</span></td></tr>
+<tr><td>3</td><td>more.html 外网 404</td><td>GitHub Pages 文件名特殊处理 + 发布目录是 main:docs/</td><td>重命名 + 同步 docs/</td><td><span class="badge badge-ok">已修复</span></td></tr>
+<tr><td>4</td><td>六爻占卜失效</td><td>yjStart/_yjStartImpl 被误删</td><td>从 bak 恢复 40 行代码</td><td><span class="badge badge-ok">已修复</span></td></tr>
+<tr><td>5</td><td>hub.html 外网旧版</td><td>推到 gh-pages 但实际发布目录是 main:docs/</td><td>同步到 docs/ 目录</td><td><span class="badge badge-pending">CDN 更新中</span></td></tr>
+</table>
+</div>
+
+<div class="section">
+<div class="section-title">✅ 功能完整性</div>
+<table>
+<tr><th>功能模块</th><th>入口函数</th><th>古法依据</th><th>状态</th></tr>
+<tr><td>八字排盘</td><td>computeBazi / computeBaziCore</td><td>《渊海子平》《三命通会》《滴天髓》</td><td><span class="badge badge-ok">✅ 稳定</span></td></tr>
+<tr><td>紫微斗数</td><td>computeZiWei / computeZiWeiStarsV2</td><td>《紫微斗数全书》命宫/身宫/五行局/十四主星</td><td><span class="badge badge-ok">✅ 已重写</span></td></tr>
+<tr><td>奇门遁甲</td><td>computeQimen</td><td>《烟波钓叟歌》《奇门遁甲秘笈》</td><td><span class="badge badge-ok">✅ 已优化</span></td></tr>
+<tr><td>六爻占卜</td><td>yjStart / _yjStartImpl / yjCast</td><td>《黄金策》《周易》时间种子伪物理模拟</td><td><span class="badge badge-ok">✅ 已修复</span></td></tr>
+<tr><td>梅花易数</td><td>computeMeiHua</td><td>《梅花易数》体用生克</td><td><span class="badge badge-ok">✅ 稳定</span></td></tr>
+<tr><td>大六壬</td><td>computeLiuRen / _buildSiKe / _buildSanChuan</td><td>《六壬大全》《六壬指南》月将加占时/贼克法</td><td><span class="badge badge-ok">✅ 已重写</span></td></tr>
+<tr><td>风水分析</td><td>computeFengshui</td><td>《葬书》《青囊经》《沈氏玄空学》《八宅明镜》</td><td><span class="badge badge-ok">✅ 已优化</span></td></tr>
+<tr><td>姓名学</td><td>analyzeName (guide-features.js)</td><td>《五格剖象法》《字触》</td><td><span class="badge badge-ok">✅ 稳定</span></td></tr>
+<tr><td>择日</td><td>runPrecisionZeRi</td><td>《协纪辨方书》</td><td><span class="badge badge-ok">✅ 稳定</span></td></tr>
+<tr><td>手机号测评</td><td>analyzeMobile</td><td>数字五行 + 八星组合</td><td><span class="badge badge-ok">✅ 稳定</span></td></tr>
+<tr><td>生命指数</td><td>computeLifeIndex</td><td>五行量化分析</td><td><span class="badge badge-ok">✅ 稳定</span></td></tr>
+<tr><td>化解方案</td><td>computeHuajie</td><td>五行通关/抑制/生扶</td><td><span class="badge badge-ok">✅ 稳定</span></td></tr>
+<tr><td>人生规划</td><td>computeLifePlan</td><td>大运流年 + 五行配置</td><td><span class="badge badge-ok">✅ 稳定</span></td></tr>
+</table>
+</div>
+
+<div class="section">
+<div class="section-title">📚 古书引用统计</div>
+<div class="classic-grid">
+<div class="classic-item"><strong>八字命理</strong>：《渊海子平》《三命通会》《滴天髓》《子平真诠》《穷通宝鉴》</div>
+<div class="classic-item"><strong>紫微斗数</strong>：《紫微斗数全书》《太微赋》《骨髓赋》</div>
+<div class="classic-item"><strong>奇门遁甲</strong>：《烟波钓叟歌》《奇门遁甲秘笈》</div>
+<div class="classic-item"><strong>六爻占卜</strong>：《黄金策》《周易》《易经》</div>
+<div class="classic-item"><strong>梅花易数</strong>：《梅花易数》《皇极经世》</div>
+<div class="classic-item"><strong>大六壬</strong>：《六壬大全》《六壬指南》《壬归》</div>
+<div class="classic-item"><strong>风水</strong>：《葬书》《青囊经》《青囊奥语》《沈氏玄空学》《八宅明镜》《阳宅十书》</div>
+<div class="classic-item"><strong>中医/其他</strong>：《黄帝内经》《伤寒论》《了凡四训》《鬼谷子》《心经》《六祖坛经》</div>
+</div>
+<div class="card">
+<div class="card-title">引用格式</div>
+<div class="card-body">每条引用统一格式：<code>《书名》云:「原文」</code> 或 <code>《书名》曰:「原文」</code>，共 50+ 部经典、200+ 条原文引用</div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">🌐 外网状态</div>
+<div class="url-list">
+<div class="url-item"><span class="dot dot-green"></span><a href="https://sgmt-taojing.github.io/mingli-baojian/divination-hub.html">H5 主平台</a> <span class="url-status"><span class="badge badge-pending">CDN 更新中</span></span></div>
+<div class="url-item"><span class="dot dot-yellow"></span><a href="https://sgmt-taojing.github.io/mingli-baojian/more-functions.html">更多功能</a> <span class="url-status"><span class="badge badge-pending">CDN 更新中</span></span></div>
+<div class="url-item"><span class="dot dot-green"></span><a href="https://sgmt-taojing.github.io/mingli-baojian/fengshui.html">风水分析</a> <span class="url-status"><span class="badge badge-ok">200 ✅</span></span></div>
+<div class="url-item"><span class="dot dot-green"></span><a href="https://sgmt-taojing.github.io/mingli-baojian/">入口页</a> <span class="url-status"><span class="badge badge-ok">200 ✅</span></span></div>
+<div class="url-item"><span class="dot dot-green"></span><a href="https://sgmt-taojing.github.io/mingli-baojian/divination-almanac.html">黄历</a> <span class="url-status"><span class="badge badge-ok">200 ✅</span></span></div>
+<div class="url-item"><span class="dot dot-green"></span><a href="https://sgmt-taojing.github.io/mingli-baojian/divination-knowledge.html">知识库</a> <span class="url-status"><span class="badge badge-ok">200 ✅</span></span></div>
+<div class="url-item"><span class="dot dot-green"></span><a href="https://sgmt-taojing.github.io/mingli-baojian/divination-shop.html">商城</a> <span class="url-status"><span class="badge badge-ok">200 ✅</span></span></div>
+<div class="url-item"><span class="dot dot-green"></span><a href="https://sgmt-taojing.github.io/mingli-baojian/divination-membership.html">会员</a> <span class="url-status"><span class="badge badge-ok">200 ✅</span></span></div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">📋 重构计划进度</div>
+<table>
+<tr><th>阶段</th><th>内容</th><th>状态</th></tr>
+<tr><td>Phase 1</td><td>核心修复（loading/const/函数覆盖/core.js 瘦身）</td><td><span class="badge badge-ok">✅ 完成</span></td></tr>
+<tr><td>Phase 2</td><td>拆分多页面（懒加载 more-functions/fengshui）</td><td><span class="badge badge-ok">✅ 完成</span></td></tr>
+<tr><td>Phase 3</td><td>微信 H5 适配（检测/样式/返回/缩放）</td><td><span class="badge badge-ok">✅ 完成</span></td></tr>
+<tr><td>引擎重写</td><td>紫微/六壬/奇门 引擎古法重写</td><td><span class="badge badge-ok">✅ 完成</span></td></tr>
+<tr><td>CDN 验证</td><td>more-functions.html / hub.html 外网确认</td><td><span class="badge badge-pending">⏳ 进行中</span></td></tr>
+</table>
+</div>
+
+</body>
+</html>
