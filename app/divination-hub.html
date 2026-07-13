@@ -3298,11 +3298,49 @@ function detectWechat(){
   var ua=navigator.userAgent.toLowerCase();
   if(ua.indexOf('micromessenger')>-1){
     document.body.classList.add('wechat');
+    // 微信返回按钮：优先 history.back，无历史则关闭
     var btn=document.createElement('div');
     btn.className='wechat-back-btn';
     btn.innerHTML='←';
-    btn.onclick=function(){if(document.referrer){history.back()}else{window.close()}};
+    btn.onclick=function(){
+      if(window.history.length>1){history.back()}
+      else if(document.referrer){location.href=document.referrer}
+      else{try{WeixinJSBridge.call('closeWindow')}catch(e){window.close()}}
+    };
     document.body.appendChild(btn);
+    // 微信内嵌：禁止 iOS 双击缩放
+    document.addEventListener('gesturestart',function(e){e.preventDefault()});
+    // 微信内嵌：监听 popstate 处理返回
+    window.addEventListener('popstate',function(){
+      // 如果当前在非首页 section，返回到首页而不是退出
+      var active=document.querySelector('.section.active');
+      if(active&&active.id!=='section-hero'){
+        showSection('hero');
+        history.pushState(null,'',location.href);
+      }
+    });
+    // 初始化时 push 一个状态，防止直接退出
+    history.pushState(null,'',location.href);
+    // 微信分享配置（需后端签名，此处用默认分享）
+    try{
+      if(typeof WeixinJSBridge!=='undefined'){
+        WeixinJSBridge.on('menu:share:appmessage',function(){
+          WeixinJSBridge.invoke('sendAppMessage',{
+            title:'命理宝鉴 · AI命理服务智能体',
+            desc:'知命改运·趋吉避凶·八字六爻奇门紫微梅花六壬',
+            link:location.href.split('#')[0],
+            img_url:'https://sgmt-taojing.github.io/mingli-baojian/logo.png'
+          });
+        });
+        WeixinJSBridge.on('menu:share:timeline',function(){
+          WeixinJSBridge.invoke('shareTimeline',{
+            title:'命理宝鉴 · 知命改运·趋吉避凶',
+            link:location.href.split('#')[0],
+            img_url:'https://sgmt-taojing.github.io/mingli-baojian/logo.png'
+          });
+        });
+      }
+    }catch(e){console.warn('[微信分享] 初始化失败:',e)}
     return true;
   }
   return false;
