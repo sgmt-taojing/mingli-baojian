@@ -3381,14 +3381,19 @@ document.addEventListener('click',function(e){
 });
 
 // 页面加载进度指示
+// 页面加载进度指示 — 移除 loading 遮罩层
+// 双重保底：window.load + 5秒超时强制移除（防止JS加载失败导致遮罩层永久存在）
+function removeLoadingOverlay(){
+  var ov=document.getElementById('loading-overlay');
+  if(ov){ov.style.opacity='0';setTimeout(function(){ov.remove()},500)}
+}
 window.addEventListener('load',function(){
   var bar=document.getElementById('load-bar');
   if(bar) bar.style.width='100%';
-  setTimeout(function(){
-    var ov=document.getElementById('loading-overlay');
-    if(ov){ov.style.opacity='0';setTimeout(function(){ov.remove()},500)}
-  },300);
+  setTimeout(removeLoadingOverlay,300);
 });
+// 超时保底：5秒后强制移除遮罩层，防止外部JS加载失败阻塞所有点击
+setTimeout(removeLoadingOverlay,5000);
 
 // 强制刷新样式缓存
 (function(){
@@ -3411,7 +3416,7 @@ window.addEventListener('load',function(){
 <body>
 
 <!-- LOADING OVERLAY -->
-<div id="loading-overlay" style="position:fixed;inset:0;background:#1a1a2e;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s">
+<div id="loading-overlay" style="position:fixed;inset:0;background:#1a1a2e;z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s">
   <div class="loading-logo" style="font-size:36px;margin-bottom:16px;animation:pulseGlow 2s infinite">☯</div>
   <div class="loading-brand" style="font-size:14px;color:var(--gold);letter-spacing:6px">易道智鉴</div>
   <div class="load-bar-wrap" style="width:120px;height:2px;background:rgba(201,168,76,.1);margin-top:20px;border-radius:1px;overflow:hidden">
