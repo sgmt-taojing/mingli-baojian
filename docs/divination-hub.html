@@ -3287,6 +3287,121 @@ body:not(.wechat) .wechat-disclaimer{display:none!important}
 .ask-result-content{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:24px;font-size:14px;line-height:2;color:var(--paper);white-space:pre-wrap}
 .ask-result-content .master-quote{color:var(--gold2);font-style:italic;margin-bottom:12px}
 .ask-disclaimer{margin-top:16px;padding:12px 16px;background:rgba(192,57,43,.06);border:1px solid rgba(192,57,43,.15);border-radius:8px;font-size:12px;color:var(--paper3);line-height:1.7;text-align:center}
+
+/* ===== 推送计划矩阵 (section-push-plan) ===== */
+.pp-hero{text-align:center;padding:40px 20px 28px;margin-bottom:24px;border-bottom:1px solid rgba(201,168,76,.08)}
+.pp-hero-icon{font-size:48px;margin-bottom:12px}
+.pp-hero-title{font-family:'Ma Shan Zheng',serif;font-size:clamp(26px,5vw,38px);letter-spacing:6px;color:var(--gold);margin-bottom:8px}
+.pp-hero-sub{font-size:13px;color:var(--gold);opacity:.6;letter-spacing:3px;margin-bottom:12px}
+.pp-hero-desc{font-size:13px;opacity:.4;letter-spacing:2px;line-height:1.8}
+.pp-section{margin-bottom:40px}
+.pp-section-title{font-family:'Ma Shan Zheng',serif;font-size:22px;letter-spacing:4px;color:var(--gold);margin-bottom:16px;display:flex;align-items:center;gap:10px;padding-bottom:12px;border-bottom:1px solid rgba(201,168,76,.06)}
+.pp-section-icon{font-size:24px}
+.pp-section-desc{font-size:13px;opacity:.4;letter-spacing:2px;margin-bottom:20px;margin-top:-8px}
+.pp-source{font-size:11px;opacity:.3;letter-spacing:1px;margin-top:10px;padding-top:8px;border-top:1px solid rgba(201,168,76,.04);font-style:italic}
+.pp-disclaimer{text-align:center;padding:24px 16px;font-size:11px;opacity:.3;letter-spacing:1px;line-height:1.8;color:var(--paper3);border-top:1px solid rgba(201,168,76,.06);margin-top:40px}
+/* 会员等级卡片 */
+.pp-tier-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.pp-tier-card{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);border-radius:8px;padding:24px 20px;position:relative;transition:all .3s}
+.pp-tier-card:hover{transform:translateY(-2px);box-shadow:0 4px 24px rgba(0,0,0,.2)}
+.pp-tier-badge{display:inline-block;padding:3px 12px;border-radius:20px;font-size:11px;letter-spacing:2px;margin-bottom:14px}
+.pp-tier-name{font-family:'Ma Shan Zheng',serif;font-size:24px;letter-spacing:4px;margin-bottom:16px}
+.pp-tier-features .pp-features-label{font-size:11px;opacity:.4;letter-spacing:2px;margin-bottom:10px;text-transform:uppercase}
+.pp-tier-features ul{list-style:none;padding:0;margin:0 0 20px}
+.pp-tier-features li{font-size:12px;line-height:1.8;padding:4px 0;opacity:.7}
+.pp-tier-features li.pp-disabled{opacity:.35}
+.pp-upgrade-btn{width:100%;padding:10px;background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:'Noto Serif SC',serif;font-size:13px;letter-spacing:3px;cursor:pointer;border-radius:4px;transition:all .3s}
+.pp-upgrade-btn:hover{background:rgba(201,168,76,.1)}
+/* 每日推送卡片 */
+.pp-schedule-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:16px}
+.pp-schedule-card{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);border-radius:8px;padding:24px}
+.pp-schedule-header{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.pp-schedule-icon{font-size:32px}
+.pp-schedule-time{font-family:'Ma Shan Zheng',serif;font-size:20px;color:var(--gold);letter-spacing:3px}
+.pp-schedule-title{font-size:13px;opacity:.5;letter-spacing:2px}
+.pp-schedule-tiers{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.pp-tier-tag{padding:3px 10px;border-radius:12px;font-size:11px;letter-spacing:1px}
+.pp-schedule-content,.pp-content-block{margin-top:12px}
+.pp-content-block{padding:14px;background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.05);border-radius:6px;margin-bottom:10px}
+.pp-content-tier{font-size:12px;letter-spacing:2px;margin-bottom:8px;font-weight:600}
+.pp-content-headline{font-size:13px;opacity:.7;margin-bottom:8px;line-height:1.7}
+.pp-content-list{list-style:none;padding:0;margin:0}
+.pp-content-list li{font-size:12px;line-height:1.9;padding:3px 0;opacity:.65}
+.pp-content-list li.pp-upgrade-hint{color:var(--gold);opacity:.8;border-top:1px solid rgba(201,168,76,.1);margin-top:6px;padding-top:8px}
+/* 节气卡片 */
+.pp-terms-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.pp-term-card{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);border-radius:8px;padding:24px;transition:all .3s}
+.pp-term-card:hover{border-color:rgba(201,168,76,.2)}
+.pp-term-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.pp-term-icon{font-size:28px}
+.pp-term-name{font-family:'Ma Shan Zheng',serif;font-size:20px;color:var(--gold);letter-spacing:3px}
+.pp-term-date{font-size:11px;opacity:.4;letter-spacing:2px}
+.pp-term-title{font-size:13px;opacity:.6;line-height:1.7;margin-bottom:14px}
+.pp-term-body .pp-term-sub{font-size:12px;color:var(--gold);letter-spacing:2px;margin-top:12px;margin-bottom:4px}
+.pp-term-body p{font-size:12px;opacity:.6;line-height:1.8;letter-spacing:1px}
+.pp-term-body .pp-member-only{color:var(--cinn2);opacity:.7}
+.pp-term-body .pp-member-text{color:var(--gold);opacity:.5;font-style:italic}
+/* 节日卡片 */
+.pp-festival-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px}
+.pp-festival-card{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);border-radius:8px;overflow:hidden;transition:all .3s}
+.pp-festival-card:hover{border-color:rgba(201,168,76,.2)}
+.pp-festival-header{display:flex;align-items:center;gap:12px;padding:18px 20px}
+.pp-festival-icon{font-size:28px}
+.pp-festival-name{font-family:'Ma Shan Zheng',serif;font-size:20px;color:var(--gold);letter-spacing:3px}
+.pp-festival-date{font-size:11px;opacity:.4;letter-spacing:2px}
+.pp-festival-title{font-size:13px;opacity:.6;padding:0 20px;margin-bottom:8px;line-height:1.7}
+.pp-festival-greeting{font-size:13px;color:var(--gold);padding:0 20px;margin-bottom:14px;opacity:.8}
+.pp-festival-blocks{padding:0 20px;margin-bottom:12px}
+.pp-festival-block{font-size:12px;opacity:.65;line-height:1.8;padding:4px 0}
+.pp-festival-upgrade{margin:0 20px 12px;padding:10px 14px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.15);border-radius:6px;font-size:12px;color:var(--gold);opacity:.8}
+.pp-festival-member{margin:0 20px 8px;padding:8px 14px;background:rgba(255,255,255,.02);border-radius:6px;font-size:12px;opacity:.6;line-height:1.7}
+.pp-member-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;letter-spacing:1px;margin-right:6px}
+/* 月运卡片 */
+.pp-monthly-grid{display:grid;grid-template-columns:1fr;gap:16px}
+.pp-monthly-card{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);border-radius:8px;padding:24px}
+.pp-monthly-header{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.pp-monthly-icon{font-size:32px}
+.pp-monthly-title{font-family:'Ma Shan Zheng',serif;font-size:20px;color:var(--gold);letter-spacing:3px}
+.pp-monthly-source{font-size:11px;opacity:.3;margin-top:4px}
+.pp-monthly-tiers{display:flex;gap:6px;margin-bottom:16px}
+/* 跨年时间线 */
+.pp-timeline{position:relative;padding-left:28px}
+.pp-timeline-item{position:relative;padding-bottom:28px}
+.pp-timeline-dot{position:absolute;left:-28px;top:4px;width:14px;height:14px;border-radius:50%;border:2px solid var(--gold);background:var(--ink);z-index:1}
+.pp-dot-lifetime{border-color:var(--cinn2)}
+.pp-timeline-line{position:absolute;left:-22px;top:18px;bottom:0;width:2px;background:rgba(201,168,76,.1)}
+.pp-timeline-card{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);border-radius:8px;padding:20px}
+.pp-timeline-date{font-size:12px;color:var(--gold);letter-spacing:3px;margin-bottom:6px}
+.pp-timeline-title{font-family:'Ma Shan Zheng',serif;font-size:18px;color:var(--paper2);letter-spacing:3px;margin-bottom:10px}
+.pp-timeline-tiers{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.pp-timeline-content{margin-top:10px}
+/* 引流转化 */
+.pp-conversion-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin-bottom:28px}
+.pp-conv-sub-title{font-size:15px;color:var(--gold);letter-spacing:3px;margin-bottom:14px}
+.pp-conv-card{display:flex;gap:12px;align-items:center;padding:16px;background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.1);border-radius:8px;transition:all .3s}
+.pp-conv-card:hover{border-color:rgba(201,168,76,.2);transform:translateY(-1px)}
+.pp-conv-highlight{background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.02));border-color:rgba(201,168,76,.2)}
+.pp-conv-icon{font-size:24px;flex-shrink:0}
+.pp-conv-body{flex:1}
+.pp-conv-text{font-size:12px;opacity:.7;line-height:1.7;margin-bottom:8px}
+.pp-conv-cta{padding:6px 16px;background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:'Noto Serif SC',serif;font-size:12px;letter-spacing:2px;cursor:pointer;border-radius:16px;transition:all .3s;white-space:nowrap}
+.pp-conv-cta:hover{background:rgba(201,168,76,.15)}
+.pp-conversion-section{margin-bottom:28px}
+.pp-renewal-card{display:flex;align-items:center;gap:16px;padding:20px;background:linear-gradient(135deg,rgba(231,76,60,.06),rgba(201,168,76,.04));border:1px solid rgba(231,76,60,.15);border-radius:8px}
+.pp-renewal-icon{font-size:28px;flex-shrink:0}
+.pp-renewal-content{flex:1}
+.pp-renewal-title{font-size:14px;color:var(--gold);letter-spacing:2px;margin-bottom:6px}
+.pp-renewal-text{font-size:12px;opacity:.6;line-height:1.7}
+.pp-renewal-discount{font-size:12px;color:var(--cinn2);margin-top:6px}
+.pp-renewal-cta{flex-shrink:0}
+.pp-teaser-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.06);border-radius:6px;margin-bottom:8px}
+.pp-teaser-context{font-size:11px;padding:3px 10px;background:rgba(201,168,76,.1);color:var(--gold);border-radius:10px;letter-spacing:1px;flex-shrink:0}
+.pp-teaser-text{flex:1;font-size:12px;opacity:.6;line-height:1.6}
+.pp-copy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.pp-copy-card{padding:16px;background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);border-radius:8px}
+.pp-copy-label{display:inline-block;padding:3px 10px;background:rgba(201,168,76,.1);color:var(--gold);font-size:11px;letter-spacing:2px;border-radius:10px;margin-bottom:8px}
+.pp-copy-text{font-size:13px;opacity:.65;line-height:1.8;letter-spacing:1px}
+@media(max-width:768px){.pp-tier-grid,.pp-schedule-grid,.pp-terms-grid,.pp-festival-grid,.pp-conversion-grid,.pp-copy-grid{grid-template-columns:1fr}.pp-renewal-card{flex-direction:column;text-align:center}.pp-timeline{padding-left:20px}.pp-timeline-dot{left:-20px}}
 </style>
 
 
@@ -3489,6 +3604,10 @@ setTimeout(removeLoadingOverlay,5000);
         <span class="tab-emoji">🏡</span>
         <span class="tab-name">风水</span>
       </button>
+      <button class="nav-tab" onclick="showSection('fengshuipro')" id="tab-fengshuipro">
+        <span class="tab-emoji">🏔️</span>
+        <span class="tab-name">风水进阶</span>
+      </button>
       <button class="nav-tab" onclick="showSection('xingming')" id="tab-xingming">
         <span class="tab-emoji">🔤</span>
         <span class="tab-name">姓名</span>
@@ -3509,6 +3628,10 @@ setTimeout(removeLoadingOverlay,5000);
         <span class="tab-emoji">🌟</span>
         <span class="tab-name">命理全鉴</span>
       </button>
+      <button class="nav-tab" onclick="showSection('push-plan')" id="tab-push-plan">
+        <span class="tab-emoji">📡</span>
+        <span class="tab-name">推送计划</span>
+      </button>
 
     </div>
     <div class="nav-user">古 老 预 测 术</div>
@@ -3523,6 +3646,7 @@ setTimeout(removeLoadingOverlay,5000);
   <a href="divination-knowledge.html" class="file-nav-btn">📚 知识库</a>
   <a href="divination-shop.html" class="file-nav-btn">🛍️ 商城</a>
   <a href="divination-membership.html" class="file-nav-btn">👑 会员</a>
+  <a href="javascript:void(0)" class="file-nav-btn" onclick="showSection('push-plan')">📡 推送计划</a>
 </div>
 
 
@@ -3623,6 +3747,15 @@ setTimeout(removeLoadingOverlay,5000);
         <div class="cc-action" onclick="event.stopPropagation();showSection('fengshui')">开始使用 →</div>
       </div>
 
+      <div class="cat-card" onclick="showSection('fengshuipro')" style="border-color:rgba(39,174,96,.12)">
+        <span class="cc-symbol" style="color:var(--jade)">🏔️</span>
+        <span class="cc-name" style="color:var(--jade)">风水进阶</span>
+        <span class="cc-en">Feng Shui Pro</span>
+        <p class="cc-desc">每日方位 · 布局诊断 · 化煞大全 · 流年飞星 · 风水择日，七大功能全面覆盖</p>
+        <div class="cc-tags"><span class="cat-tag" style="border-color:rgba(39,174,96,.15);color:var(--jade)">每日</span><span class="cat-tag" style="border-color:rgba(39,174,96,.15);color:var(--jade)">化煞</span><span class="cat-tag" style="border-color:rgba(39,174,96,.15);color:var(--jade)">择日</span></div>
+        <div class="cc-action" onclick="event.stopPropagation();showSection('fengshuipro')">开始使用 →</div>
+      </div>
+
       <div class="cat-card" onclick="showSection('yanzhi')" style="border-color:rgba(230,126,34,.12)">
         <span class="cc-symbol" style="color:#e67e22">💬</span>
         <span class="cc-name" style="color:#e67e22">言值</span>
@@ -3666,6 +3799,14 @@ setTimeout(removeLoadingOverlay,5000);
         <p class="cc-desc">全家八字合盘分析，五行生克关系，综合化解方案，布局方位配色择日</p>
         <div class="cc-tags"><span class="cat-tag">合盘</span><span class="cat-tag">化解</span><span class="cat-tag">布局</span><span class="cat-tag">终身会员</span></div>
         <div class="cc-action" onclick="event.stopPropagation();showSection('family')">开始使用 →</div>
+      </div>
+      <div class="cat-card" onclick="showSection('push-plan')" style="border-color:rgba(41,128,185,.15)">
+        <span class="cc-symbol" style="color:#2980b9">📡</span>
+        <span class="cc-name" style="color:#2980b9">推送计划</span>
+        <span class="cc-en">Push Plan Matrix</span>
+        <p class="cc-desc">会员分级推送体系，每日宜忌到年度化解，跨年流年切换全流程，引流转化设计</p>
+        <div class="cc-tags"><span class="cat-tag">分级推送</span><span class="cat-tag">跨年化解</span><span class="cat-tag">节气</span><span class="cat-tag">引流</span></div>
+        <div class="cc-action" onclick="event.stopPropagation();showSection('push-plan')">查看计划 →</div>
       </div>
     </div>
 
@@ -4877,6 +5018,124 @@ setTimeout(removeLoadingOverlay,5000);
 <section class="section" id="section-fengshui" data-lazy="fengshui.html">
   <div class="section-header"><h2>风水分析</h2><p class="section-sub">户型 · 朝向 · 方位 · 罗盘</p></div>
   <div id="section-fengshui-placeholder" style="text-align:center;padding:40px 20px;color:#999">加载中...</div>
+</section>
+
+<!-- ===== FENGSHUI PRO SECTION ===== -->
+<section class="section" id="section-fengshui-pro">
+  <div class="section-header">
+    <span class="sh-symbol" style="color:var(--jade)">🏔️</span>
+    <h2 class="sh-title">风 水 进 阶</h2>
+    <p class="sh-en">Feng Shui Pro · Daily Guide · Layout · Business · Sha Qi · Flying Stars · Annual Cure · Ze Ri</p>
+    <p class="sh-desc">每日方位 · 布局诊断 · 商铺风水 · 化煞大全 · 流年飞星 · 家庭化解 · 风水择日</p>
+  </div>
+
+  <!-- 子导航 -->
+  <div class="zhanbu-subnav" style="display:flex;gap:0;margin-bottom:20px;border-bottom:1px solid rgba(201,168,76,0.1);overflow-x:auto;scrollbar-width:none">
+    <button class="zhanbu-subtab fs-pro-subtab active" onclick="showFengshuiProSub('fengshui-daily-content',this)" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid var(--gold);color:var(--gold)">🧭 每日方位</button>
+    <button class="zhanbu-subtab fs-pro-subtab" onclick="showFengshuiProSub('fengshui-layout-content',this)" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent">🏠 布局诊断</button>
+    <button class="zhanbu-subtab fs-pro-subtab" onclick="showFengshuiProSub('fengshui-business-content',this)" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent">🏢 商铺风水</button>
+    <button class="zhanbu-subtab fs-pro-subtab" onclick="showFengshuiProSub('fengshui-shaqi-content',this)" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent">⚔️ 化煞大全</button>
+    <button class="zhanbu-subtab fs-pro-subtab" onclick="showFengshuiProSub('fengshui-stars-content',this)" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent">⭐ 流年飞星</button>
+    <button class="zhanbu-subtab fs-pro-subtab" onclick="showFengshuiProSub('fengshui-cure-content',this)" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent">💊 家庭化解</button>
+    <button class="zhanbu-subtab fs-pro-subtab" onclick="showFengshuiProSub('fengshui-zeri-content',this)" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent">📅 风水择日</button>
+  </div>
+
+  <!-- 1. 每日风水方位指南 -->
+  <div id="fengshui-daily-content" class="fengshui-pro-sub">
+    <div class="input-card">
+      <h3>🧭 每日风水方位指南</h3>
+      <p style="text-align:center;font-size:12px;opacity:.4;margin-bottom:16px">依据日干支、流月飞星推算当日吉凶方位</p>
+      <p style="text-align:center;font-size:11px;opacity:.3;margin-bottom:12px">参考：《钦定协纪辨方书》《玉匣记》《紫白诀》</p>
+      <button class="compute-btn" onclick="fsProCompute('daily')">查 询 今 日 方 位</button>
+    </div>
+    <div id="fs-pro-output-daily" style="display:none"></div>
+  </div>
+
+  <!-- 2. 家居布局诊断 -->
+  <div id="fengshui-layout-content" class="fengshui-pro-sub" style="display:none">
+    <div class="input-card">
+      <h3>🏠 家居布局诊断</h3>
+      <p style="text-align:center;font-size:12px;opacity:.4;margin-bottom:16px">输入各房间方位，根据八宅法+玄空飞星综合诊断</p>
+      <p style="text-align:center;font-size:11px;opacity:.3;margin-bottom:16px">参考：《八宅明镜》《阳宅三要》《沈氏玄空学》</p>
+      <div class="input-row"><select class="input-field" id="fs-pro-door-dir"><option value="">大门方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
+      <div class="input-row"><select class="input-field" id="fs-pro-bedroom-dir"><option value="">主卧方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
+      <div class="input-row"><select class="input-field" id="fs-pro-kitchen-dir"><option value="">厨房方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
+      <div class="input-row"><select class="input-field" id="fs-pro-bathroom-dir"><option value="">卫生间方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
+      <div class="input-row"><select class="input-field" id="fs-pro-study-dir"><option value="">书房方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
+      <div class="input-row"><select class="input-field" id="fs-pro-living-dir"><option value="">客厅方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
+      <div class="input-row"><input class="input-field" type="number" id="fs-pro-build-year" placeholder="建造年份" min="1900" max="2025" value="2000"></div>
+      <button class="compute-btn" onclick="fsProCompute('layout')">开 始 诊 断</button>
+    </div>
+    <div id="fs-pro-output-layout" style="display:none"></div>
+  </div>
+
+  <!-- 3. 商铺/办公室风水 -->
+  <div id="fengshui-business-content" class="fengshui-pro-sub" style="display:none">
+    <div class="input-card">
+      <h3>🏢 商铺/办公室风水分析</h3>
+      <p style="text-align:center;font-size:12px;opacity:.4;margin-bottom:16px">输入商铺各区域方位，分析风水吉凶</p>
+      <p style="text-align:center;font-size:11px;opacity:.3;margin-bottom:16px">参考：《八宅明镜》《阳宅三要》</p>
+      <div class="input-row"><select class="input-field" id="fs-pro-shop-type"><option value="retail">零售商铺</option><option value="restaurant">餐饮店铺</option><option value="office">办公场所</option><option value="beauty">美容美发</option><option value="clinic">诊所药房</option></select></div>
+      <div class="input-row"><select class="input-field" id="fs-pro-shop-door"><option value="">大门/入口方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
+      <div class="input-row"><select class="input-field" id="fs-pro-cashier"><option value="">收银台方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
+      <div class="input-row"><select class="input-field" id="fs-pro-boss-office"><option value="">老板办公室方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
+      <div class="input-row"><select class="input-field" id="fs-pro-staff-area"><option value="">员工工位区方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
+      <div class="input-row"><select class="input-field" id="fs-pro-counter"><option value="">展示柜台方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
+      <button class="compute-btn" onclick="fsProCompute('business')">开 始 分 析</button>
+    </div>
+    <div id="fs-pro-output-business" style="display:none"></div>
+  </div>
+
+  <!-- 4. 风水化煞大全 -->
+  <div id="fengshui-shaqi-content" class="fengshui-pro-sub" style="display:none">
+    <div class="input-card">
+      <h3>⚔️ 风水化煞大全</h3>
+      <p style="text-align:center;font-size:12px;opacity:.4;margin-bottom:16px">收录12种常见煞气及对应化解方案</p>
+      <p style="text-align:center;font-size:11px;opacity:.3;margin-bottom:16px">参考：《阳宅大全》《风水化煞全书记》《沈氏玄空学》</p>
+      <button class="compute-btn" onclick="fsProCompute('shaqi')">查 看 化 煞 大 全</button>
+    </div>
+    <div id="fs-pro-output-shaqi" style="display:none"></div>
+  </div>
+
+  <!-- 5. 流年飞星盘 -->
+  <div id="fengshui-stars-content" class="fengshui-pro-sub" style="display:none">
+    <div class="input-card">
+      <h3>⭐ 流年飞星盘</h3>
+      <p style="text-align:center;font-size:12px;opacity:.4;margin-bottom:16px">九宫飞星可视化 · 大凶预警 · 大吉催旺</p>
+      <p style="text-align:center;font-size:11px;opacity:.3;margin-bottom:16px">参考：《沈氏玄空学》《紫白诀》</p>
+      <div class="input-row"><input class="input-field" type="number" id="fs-pro-fx-year" placeholder="年份" min="2000" max="2050" value="2026"></div>
+      <button class="compute-btn" onclick="fsProCompute('stars')">排 列 飞 星 盘</button>
+    </div>
+    <div id="fs-pro-output-stars" style="display:none"></div>
+  </div>
+
+  <!-- 6. 家庭年度化解方案 -->
+  <div id="fengshui-cure-content" class="fengshui-pro-sub" style="display:none">
+    <div class="input-card">
+      <h3>💊 家庭年度化解方案</h3>
+      <p style="text-align:center;font-size:12px;opacity:.4;margin-bottom:16px">结合流年飞星，为每位成员生成个性化化解方案</p>
+      <p style="text-align:center;font-size:11px;opacity:.3;margin-bottom:16px">参考：《沈氏玄空学》《紫白诀》《八宅明镜》</p>
+      <div id="fs-pro-family-members" style="margin-bottom:12px"></div>
+      <div class="input-row"><button onclick="addFamilyMemberRow()" style="padding:8px 20px;background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.3);color:#2ecc71;border-radius:6px;cursor:pointer;font-size:12px;letter-spacing:2px">+ 添加成员</button></div>
+      <button class="compute-btn" onclick="fsProCompute('cure')">生 成 化 解 方 案</button>
+    </div>
+    <div id="fs-pro-output-cure" style="display:none"></div>
+  </div>
+
+  <!-- 7. 风水择日 -->
+  <div id="fengshui-zeri-content" class="fengshui-pro-sub" style="display:none">
+    <div class="input-card">
+      <h3>📅 风水择日</h3>
+      <p style="text-align:center;font-size:12px;opacity:.4;margin-bottom:16px">搬家入宅 · 动土装修 · 开业 · 结婚 · 安葬</p>
+      <p style="text-align:center;font-size:11px;opacity:.3;margin-bottom:16px">参考：《钦定协纪辨方书》《玉匣记》《象吉通书》</p>
+      <div class="input-row"><select class="input-field" id="fs-pro-zeri-type"><option value="move">搬家入宅</option><option value="construction">动土装修</option><option value="business">开业</option><option value="wedding">结婚</option><option value="burial">安葬</option></select></div>
+      <div class="input-row"><input class="input-field" type="date" id="fs-pro-zeri-start" placeholder="开始日期"></div>
+      <div class="input-row"><input class="input-field" type="date" id="fs-pro-zeri-end" placeholder="结束日期"></div>
+      <button class="compute-btn" onclick="fsProCompute('zeri')">查 询 吉 日</button>
+    </div>
+    <div id="fs-pro-output-zeri" style="display:none"></div>
+  </div>
+
 </section>
 
 <!-- ===== YANZHI (言值·沟通技巧) SECTION ===== -->
@@ -7023,6 +7282,18 @@ setTimeout(removeLoadingOverlay,5000);
   <div class="back-row" style="margin-top:32px">
     <button class="back-btn" onclick="showSection('hero')">返 回 首 页</button>
   </div>
+</section>
+
+<!-- ===== 推送计划矩阵 ===== -->
+<section class="section" id="section-push-plan">
+  <div class="section-header" style="text-align:center;padding:28px 16px 20px">
+    <span class="sh-symbol" style="font-size:36px;display:block;margin-bottom:8px">📡</span>
+    <h2 class="sh-title" style="font-family:'Ma Shan Zheng',serif;font-size:32px;letter-spacing:8px;color:var(--gold);margin:0 0 6px">推 送 计 划</h2>
+    <p class="sh-en" style="font-size:12px;color:var(--gold);opacity:.5;letter-spacing:3px;margin:0 0 8px">Push Plan Matrix · Tiered Content Delivery</p>
+    <p class="sh-desc" style="font-size:13px;color:var(--paper2);opacity:.6;letter-spacing:1px;line-height:1.8;max-width:600px;margin:0 auto">会员分级推送体系 · 每日宜忌到年度化解 · 跨年流年切换全流程 · 引流转化设计</p>
+  </div>
+  <div id="push-plan-container"></div>
+  <div class="back-row"><button class="back-btn" onclick="showSection('hero')">返 回 首 页</button></div>
 </section>
 
 <!-- ===== 命理全鉴综合评价 ===== -->
@@ -9382,6 +9653,8 @@ function showSection(name) {
 
   // 更多板块：关闭移动端下拉菜单，确保页面内容可见
   if (name === 'more') closeMore();
+  // 风水进阶：映射到 section-fengshui-pro
+  if (name === 'fengshuipro') name = 'fengshui-pro';
 
   const el = document.getElementById('section-' + name);
   if (el) el.classList.add('active');
@@ -9397,6 +9670,10 @@ function showSection(name) {
     }, 100);
   });
   closeMore();
+  // 推送计划渲染
+  if (name === 'push-plan') {
+    try { renderPushPlan('push-plan-container'); } catch(e) { console.error('push-plan render error:', e); }
+  }
   } catch(err) { console.error('showSection error:', err); try { el && el.classList.add('active'); } catch(e2) {} }
 }
 
@@ -21149,6 +21426,7 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
     <button class="more-item" onclick="showSection('youth'); closeMore();">🧒 <span>青少年规划</span></button>
     <button class="more-item" onclick="showSection('family'); closeMore();">👨‍👩‍👧‍👦 <span>家庭排盘</span></button>
     <button class="more-item" onclick="showSection('lifeindex'); closeMore();">🌟 <span>命理全鉴</span></button>
+    <button class="more-item" onclick="showSection('push-plan'); closeMore();">📡 <span>推送计划</span></button>
   </div>
 </div>
 
@@ -28587,6 +28865,7 @@ if (typeof window.SHOP_DATA !== 'undefined') {
 <script src="js/heige-integration.js?t=1783048068"></script>
 <script src="js/ai-interpreter.js?t=1783048068"></script>
 <script src="js/feedback.js?t=1783048068"></script>
+<script src="js/fengshui-pro.js?v=20260714"></script>
 <script src="js/master-class-data.js?t=1783048068"></script>
 <!-- 额外知识库 -->
 <script src="knowledge/faith-guide.js?t=1783048068"></script>
@@ -28595,6 +28874,7 @@ if (typeof window.SHOP_DATA !== 'undefined') {
 <script src="knowledge/zodiac-complete.js?t=1783048068"></script>
 <script src="knowledge/wisdom-quotes.js?t=1783048068"></script>
 <script src="knowledge/gzh-collect-system.js?t=1783048068"></script>
+<script src="js/push-plan.js?t=1783048068"></script>
 
 
 <!-- 页脚 -->
