@@ -9069,7 +9069,7 @@ function getLiurenReadingHTML(dayStem) {
   html += '</div>';
   return html;
 }
-var GAN_HIDE = {
+var GAN_HIDE = typeof GAN_HIDE !== 'undefined' ? GAN_HIDE : {
   甲:['戊','庚','辛'],乙:['丙','丁','庚'],丙:['戊','庚','壬'],丁:['戊','辛','癸'],
   戊:['庚','壬'],己:['辛','癸'],庚:['壬','甲'],辛:['癸','乙'],壬:['甲','丙'],癸:['乙','丁']
 };
@@ -22771,7 +22771,7 @@ function toggleKnowledge() {
 // 行业用字库
 // ==================== 公司取名专业字库（全量知识）====================
 // 源自《易经》《尚书》《诗经》《楚辞》等经典，结合现代商业命名规律
-const INDUSTRY_CHARS = {
+var INDUSTRY_CHARS = INDUSTRY_CHARS || {
   tech: [
     // 科技行业：智慧、创新、未来、通达
     // 易经取字：乾(天行健)、兑(悦言)、离(明)、震(动)
@@ -29636,9 +29636,9 @@ if (typeof window.SHOP_DATA !== 'undefined') {
 // ========== 工具函数 ==========
 function _qyMod(n, m) { return ((n % m) + m) % m; }
 
-const _STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-const _BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-const _GUA_XIANG = {
+var _STEMS = typeof _STEMS !== 'undefined' ? _STEMS : ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+var _BRANCHES = typeof _BRANCHES !== 'undefined' ? _BRANCHES : ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+var _GUA_XIANG = typeof _GUA_XIANG !== 'undefined' ? _GUA_XIANG : {
   0:{name:'乾',sym:'☰',code:'111',wuxing:'金',family:'父'},
   1:{name:'兑',sym:'☱',code:'110',wuxing:'金',family:'少女'},
   2:{name:'离',sym:'☲',code:'101',wuxing:'火',family:'中女'},
@@ -29648,10 +29648,10 @@ const _GUA_XIANG = {
   6:{name:'艮',sym:'☶',code:'001',wuxing:'土',family:'少男'},
   7:{name:'坤',sym:'☷',code:'000',wuxing:'土',family:'母'}
 };
-const _GUA_ORDER = [0,1,2,3,4,5,6,7]; // 先天八卦数：乾1兑2离3震4巽5坎6艮7坤8
-const _XING = {金:0,木:1,水:2,火:3,土:4};
-const _SHICHEN = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-const _NAYIN = [
+var _GUA_ORDER = typeof _GUA_ORDER !== 'undefined' ? _GUA_ORDER : [0,1,2,3,4,5,6,7]; // 先天八卦数
+var _XING = typeof _XING !== 'undefined' ? _XING : {金:0,木:1,水:2,火:3,土:4};
+var _SHICHEN = typeof _SHICHEN !== 'undefined' ? _SHICHEN : ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+var _NAYIN = typeof _NAYIN !== 'undefined' ? _NAYIN : [
   '海中金','海中金','炉中火','炉中火','大林木','大林木','路旁土','路旁土','剑锋金','剑锋金',
   '山头火','山头火','涧下水','涧下水','城头土','城头土','白蜡金','白蜡金','杨柳木','杨柳木',
   '泉中水','泉中水','屋上土','屋上土','霹雳火','霹雳火','松柏木','松柏木','长流水','长流水',
@@ -30618,7 +30618,7 @@ function ziweiAnalysis(panData) {
   }) || daxianList[0];
   
   // 庙旺平陷评估
-  const starStrength = _evalStarStrength(stars, mingPos);
+  const starStrength = _evalStarStrength(panData.stars[mingPos] || [], mingPos);
   
   return {
     geju, 
