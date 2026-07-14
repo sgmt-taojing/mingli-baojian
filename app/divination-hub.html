@@ -2103,11 +2103,11 @@ input, textarea, select {
 .lyc-jiri-title { color: var(--gold); }
 .lyc-risk-text, .lyc-huajie-text, .lyc-jiri-text { opacity: .75; }
 
-/* 流年总览列表 */
+/* 流年总览列表 - 60甲子网格 */
 .liu-nian-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 6px;
   padding: 14px;
   background: rgba(255,255,255,.015);
   border: 1px solid rgba(201,168,76,.1);
@@ -2115,48 +2115,58 @@ input, textarea, select {
 
 .liu-nian-row {
   display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 12px 16px;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
   background: rgba(255,255,255,.02);
   border: 1px solid rgba(201,168,76,.07);
   border-radius: 6px;
   transition: all .2s;
+  cursor: default;
 }
 
 .liu-nian-row:hover {
-  border-color: rgba(201,168,76,.2);
-  background: rgba(201,168,76,.04);
+  border-color: rgba(201,168,76,.25);
+  background: rgba(201,168,76,.05);
+  transform: translateY(-1px);
 }
 
 .liu-nian-row.is-current {
-  border-color: rgba(201,168,76,.3);
-  background: rgba(201,168,76,.06);
+  border-color: var(--gold);
+  background: rgba(201,168,76,.1);
+  box-shadow: 0 0 8px rgba(201,168,76,.15);
+}
+
+.liu-nian-row.ln-benming {
+  border-color: rgba(231,76,60,.3);
+}
+
+.liu-nian-row.ln-benming.is-current {
+  border-color: var(--gold);
 }
 
 .ln-year {
   font-family: 'Ma Shan Zheng', serif;
-  font-size: 18px;
-  letter-spacing: 2px;
-  min-width: 50px;
+  font-size: 14px;
+  letter-spacing: 1px;
   color: var(--paper2);
 }
 
 .ln-gz {
   font-family: 'Ma Shan Zheng', serif;
-  font-size: 16px;
+  font-size: 15px;
   letter-spacing: 2px;
   color: var(--gold);
-  min-width: 60px;
 }
 
 .ln-grade {
-  font-size: 12px;
-  padding: 3px 12px;
-  border-radius: 12px;
-  letter-spacing: 2px;
-  min-width: 50px;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  letter-spacing: 1px;
   text-align: center;
+  display: inline-block;
+  width: fit-content;
 }
 
 .ln-grade.daji { background: rgba(39,174,96,.15); border: 1px solid rgba(39,174,96,.3); color: #2ecc71; }
@@ -2164,14 +2174,36 @@ input, textarea, select {
 .ln-grade.ping { background: rgba(201,168,76,.1); border: 1px solid rgba(201,168,76,.2); color: var(--gold); }
 .ln-grade.xiaoxiong { background: rgba(230,126,34,.1); border: 1px solid rgba(230,126,34,.2); color: #e67e22; }
 .ln-grade.xiong { background: rgba(231,76,60,.1); border: 1px solid rgba(231,76,60,.2); color: #e74c3c; }
+.ln-grade.benming { background: rgba(231,76,60,.12); border: 1px solid rgba(231,76,60,.25); color: #e74c3c; }
 
 .ln-tip {
-  font-size: 12px;
-  opacity: .6;
-  flex: 1;
-  letter-spacing: 1px;
-  line-height: 1.5;
+  font-size: 10px;
+  opacity: .5;
+  letter-spacing: .5px;
+  line-height: 1.4;
 }
+
+/* 60甲子导航按钮 */
+.ln-nav-bar {
+  display: flex;
+  gap: 6px;
+  padding: 8px 14px;
+  border-bottom: 1px solid rgba(201,168,76,.08);
+  flex-wrap: wrap;
+}
+.ln-nav-btn {
+  padding: 4px 10px;
+  font-size: 11px;
+  border: 1px solid rgba(201,168,76,.1);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--paper2);
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all .15s;
+}
+.ln-nav-btn:hover { border-color: rgba(201,168,76,.3); color: var(--gold); }
+.ln-nav-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,.08); }
 
 /* 全方位化解方案 */
 .huajie-full-content {
@@ -4351,11 +4383,15 @@ setTimeout(removeLoadingOverlay,5000);
       </div>
     </div>
 
-    <!-- 10. 2025-2030流年总览 (折叠) -->
+    <!-- 10. 60甲子流年纵览 (折叠) -->
     <div class="bazi-new-module" id="liuNianOverviewModule">
-      <div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">📆 2025-2030 流年总览 <span class="toggle-icon">▼</span></div>
+      <div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">📆 60甲子流年纵览 <span class="toggle-icon">▼</span></div>
       <div class="bazi-module-body collapsed">
+        <div class="ln-nav-bar" id="lnNavBar"></div>
         <div class="liu-nian-list" id="liuNianList"></div>
+        <div style="padding:8px 14px;font-size:11px;opacity:.4;letter-spacing:1px;border-top:1px solid rgba(201,168,76,.06)">
+          📌 60年一甲子循环，天干地支周而复始。本命年（虚岁12/24/36/48/60）标注红色，当前年份高亮金色。点击上方按钮可跳跃定位。
+        </div>
       </div>
     </div>
 
@@ -12116,7 +12152,7 @@ function renderNewBaziModules(data) {
   // === A. 流年逐月运势 ===
   renderLiuYueModule({ pillars, dayStem, dayStemIdx, dayBranchIdx, year, month, day, xiEle, weakestEle, currentYear, currentMonth });
 
-  // === B. 2025-2030 流年总览 ===
+  // === B. 60甲子流年纵览 ===
   renderLiuNianOverview({ dayStemIdx, xiEle, weakestEle, currentYear, birthYear: year });
 
   // === C. 全方位化解方案 ===
@@ -12307,7 +12343,7 @@ function renderLiuYueModule(params) {
 }
 
 // ================================================================
-//  B. 2025-2030 流年总览
+//  B. 60甲子流年纵览
 // ================================================================
 
 function renderLiuNianOverview(params) {
@@ -12315,9 +12351,36 @@ function renderLiuNianOverview(params) {
   const list = document.getElementById('liuNianList');
   if (!list) return;
 
-  // 使用 getLiunian 函数获取流年数据
-  var liunianData = getLiunian(birthYear || currentYear - 30, 1, 1, 6, dayStemIdx);
+  // 60甲子模式: 从出生年开始输出完整60年
+  var liunianData = getLiunian(birthYear || currentYear - 30, 1, 1, 60, dayStemIdx);
   list.innerHTML = '';
+
+  // 导航栏: 10年一跳
+  var navBar = document.getElementById('lnNavBar');
+  if (navBar) {
+    navBar.innerHTML = '';
+    var baseYear = birthYear || (currentYear - 30);
+    for (var d = 0; d < 6; d++) {
+      var decStart = baseYear + d * 10;
+      var decEnd = decStart + 9;
+      var btn = document.createElement('button');
+      btn.className = 'ln-nav-btn';
+      btn.textContent = decStart + '-' + decEnd;
+      btn.onclick = (function(id) {
+        return function() {
+          var rows = list.querySelectorAll('.liu-nian-row');
+          if (rows[id]) rows[id].scrollIntoView({behavior:'smooth', block:'center'});
+          navBar.querySelectorAll('.ln-nav-btn').forEach(function(b){ b.classList.remove('active'); });
+          this.classList.add('active');
+        };
+      })(d * 10);
+      navBar.appendChild(btn);
+    }
+  }
+
+  // 五行生克关系表
+  var muKeMap = {木:{金:'克',火:'泄',水:'生',木:'助',土:'耗'},火:{木:'生',土:'克',金:'泄',火:'助',水:'耗'},土:{火:'生',金:'泄',木:'克',土:'助',水:'耗'},金:{土:'生',火:'泄',木:'克',金:'助',水:'耗'},水:{金:'生',木:'泄',火:'克',水:'助',土:'耗'}};
+  var dayGanEle = ELE[STEMS[dayStemIdx]];
 
   liunianData.forEach(function(ln) {
     var yr = ln.year;
@@ -12326,21 +12389,25 @@ function renderLiuNianOverview(params) {
     var yrEle = ln.ganEle;
     var yrZhiEle = ln.zhiEle;
 
-    // 与日主关系
-    var muKeMap = {木:{金:'克',火:'泄',水:'生',木:'助',土:'耗'},火:{木:'生',土:'克',金:'泄',火:'助',水:'耗'},土:{火:'生',金:'泄',木:'克',土:'助',水:'耗'},金:{土:'生',火:'泄',木:'克',金:'助',水:'耗'},水:{金:'生',木:'泄',火:'克',水:'助',土:'耗'}};
-    var dayGanEle = ELE[STEMS[dayStemIdx]];
     var rel = (muKeMap[dayGanEle] && muKeMap[dayGanEle][yrEle]) || '';
     var isCurrent = ln.isCurrent;
+    var isBenming = ln.isBenming;
     var xiGood = yrEle === xiEle || yrZhiEle === xiEle;
     var xiBad = yrEle === weakestEle;
     var grade = '平', gradeClass = 'ping';
-    if (xiGood && !xiBad) { grade = '吉'; gradeClass = 'ji'; }
-    if (xiBad) { grade = '小凶'; gradeClass = 'xiaoxiong'; }
+    if (isBenming) { grade = '本命'; gradeClass = 'benming'; }
+    else if (xiGood && !xiBad) { grade = '吉'; gradeClass = 'ji'; }
+    else if (xiBad) { grade = '小凶'; gradeClass = 'xiaoxiong'; }
     if (isCurrent) { grade = '今年'; gradeClass = 'ping'; }
 
     var row = document.createElement('div');
-    row.className = 'liu-nian-row' + (isCurrent ? ' is-current' : '');
-    row.innerHTML = '\n      <div class="ln-year">' + yr + (ln.xusui ? ' <span style="font-size:10px;opacity:.4">' + ln.xusui + '岁</span>' : '') + '</div>\n      <div class="ln-gz">' + yrStem + yrZhi + '</div>\n      <div class="ln-grade ' + gradeClass + '">' + grade + '</div>\n      <div class="ln-tip">' + ln.ganShen + '·' + (ln.dishi || '') + '·' + rel + yrEle + '年</div>\n    ';
+    row.className = 'liu-nian-row' + (isCurrent ? ' is-current' : '') + (isBenming ? ' ln-benming' : '');
+    var tipText = ln.ganShen + '·' + (ln.dishi || '') + '·' + rel + yrEle;
+    if (isBenming) tipText = '⚠️本命年 ' + tipText;
+    row.innerHTML = '<div class="ln-year">' + yr + '<span style="font-size:9px;opacity:.4;margin-left:4px">' + ln.xusui + '岁</span></div>' +
+      '<div class="ln-gz">' + yrStem + yrZhi + '</div>' +
+      '<div class="ln-grade ' + gradeClass + '">' + grade + '</div>' +
+      '<div class="ln-tip">' + tipText + '</div>';
     list.appendChild(row);
   });
 }
@@ -13399,46 +13466,68 @@ function getDayunDesc(gan, zhi, dayStemIdx) {
 function getLiunian(birthYear, birthMonth, birthDay, span, dayStemIdx) {
   var result = [];
   var currentYear = new Date().getFullYear();
-  var startYear = currentYear - Math.floor(span / 2);
-  var endYear = currentYear + Math.ceil(span / 2);
-  
-  for (var yr = startYear; yr <= endYear; yr++) {
-    // 流年干支按立春分界
-    var lichun = getJieDate(yr, '立春');
-    var stemIdx = ((yr - 4) % 10 + 10) % 10;
-    var zhiIdx = ((yr - 4) % 12 + 12) % 12;
-    var stem = STEMS[stemIdx];
-    var zhi = BRANCHES[zhiIdx];
-    
-    // 天干十神
-    var ganShen = getTenGod(stem, null, STEMS[dayStemIdx]);
-    
-    // 地支藏干十神
-    var canggan = ZHI_CANGGAN[zhi] || [];
-    var zhiShenList = canggan.map(function(cg) { return getTenGod(cg, null, STEMS[dayStemIdx]); });
-    var zhiShen = zhiShenList.join('/');
-    
-    // 长生十二宫
-    var dishi = getDishi(STEMS[dayStemIdx], zhi);
-    
-    // 虚岁 (出生年=1虚岁)
-    var xusui = yr - birthYear + 1;
-    
-    // 五行
-    var ganEle = ELE[stem];
-    var zhiEle = ZHI_ELE[zhi];
-    
+  // 60甲子模式: span>=60 时输出完整甲子循环
+  if (span >= 60) {
+    // 从出生年开始，输出60年
+    var startYear = birthYear;
+    var endYear = birthYear + 59;
+    for (var yr = startYear; yr <= endYear; yr++) {
+      var stemIdx = ((yr - 4) % 10 + 10) % 10;
+      var zhiIdx = ((yr - 4) % 12 + 12) % 12;
+      var stem = STEMS[stemIdx];
+      var zhi = BRANCHES[zhiIdx];
+      var ganShen = getTenGod(stem, null, STEMS[dayStemIdx]);
+      var canggan = ZHI_CANGGAN[zhi] || [];
+      var zhiShenList = canggan.map(function(cg) { return getTenGod(cg, null, STEMS[dayStemIdx]); });
+      var zhiShen = zhiShenList.join('/');
+      var dishi = getDishi(STEMS[dayStemIdx], zhi);
+      var xusui = yr - birthYear + 1;
+      var ganEle = ELE[stem];
+      var zhiEle = ZHI_ELE[zhi];
+      // 本命年: 虚岁12/24/36/48/60
+      var isBenming = (xusui % 12 === 0);
+      // 年柱与日主天干地支关系
+      var isChong = false;
+      // 本命年地支与出生年地支相同
+      var birthZhiIdx = ((birthYear - 4) % 12 + 12) % 12;
+      if (zhiIdx === birthZhiIdx) isChong = true;
+      result.push({
+        year: yr,
+        stem: stem,
+        zhi: zhi,
+        ganEle: ganEle,
+        zhiEle: zhiEle,
+        ganShen: ganShen,
+        zhiShen: zhiShen,
+        dishi: dishi,
+        xusui: xusui,
+        isCurrent: yr === currentYear,
+        isBenming: isChong,
+        stemIdx: stemIdx,
+        zhiIdx: zhiIdx
+      });
+    }
+    return result;
+  }
+  // 原有模式: 当前年前后各展span/2年
+  var startYear2 = currentYear - Math.floor(span / 2);
+  var endYear2 = currentYear + Math.ceil(span / 2);
+  for (var yr2 = startYear2; yr2 <= endYear2; yr2++) {
+    var sIdx = ((yr2 - 4) % 10 + 10) % 10;
+    var zIdx = ((yr2 - 4) % 12 + 12) % 12;
+    var s = STEMS[sIdx];
+    var z = BRANCHES[zIdx];
+    var gs = getTenGod(s, null, STEMS[dayStemIdx]);
+    var cg = ZHI_CANGGAN[z] || [];
+    var zs = cg.map(function(c) { return getTenGod(c, null, STEMS[dayStemIdx]); }).join('/');
+    var ds = getDishi(STEMS[dayStemIdx], z);
+    var xs = yr2 - birthYear + 1;
     result.push({
-      year: yr,
-      stem: stem,
-      zhi: zhi,
-      ganEle: ganEle,
-      zhiEle: zhiEle,
-      ganShen: ganShen,
-      zhiShen: zhiShen,
-      dishi: dishi,
-      xusui: xusui,
-      isCurrent: yr === currentYear
+      year: yr2, stem: s, zhi: z,
+      ganEle: ELE[s], zhiEle: ZHI_ELE[z],
+      ganShen: gs, zhiShen: zs, dishi: ds,
+      xusui: xs, isCurrent: yr2 === currentYear,
+      isBenming: false, stemIdx: sIdx, zhiIdx: zIdx
     });
   }
   return result;
