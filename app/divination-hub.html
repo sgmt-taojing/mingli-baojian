@@ -11713,6 +11713,35 @@ function computeBazi() {
     try { document.getElementById('baziResult').innerHTML += _baziNotice; } catch(e2) {}
   } catch(_bne) { console.warn('八字缘主须知渲染错误:', _bne); }
 
+  // === 📖 术语解释 ===
+  try {
+    var _baziGlossary = '<div style="margin:12px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(201,168,76,0.04),rgba(201,168,76,0.01));border:1px solid rgba(201,168,76,0.12);border-radius:12px">';
+    _baziGlossary += '<div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==\'none\'?\'\':\'none\'" style="font-size:14px;font-weight:700;color:var(--gold);cursor:pointer;letter-spacing:2px;display:flex;align-items:center;gap:6px">';
+    _baziGlossary += '<span style="transition:transform .2s;display:inline-block">▶</span>📖 命理术语解读';
+    _baziGlossary += '</div>';
+    _baziGlossary += '<div style="display:none;margin-top:10px;font-size:12px;color:var(--paper2);line-height:2;opacity:.85">';
+    _baziGlossary += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">天干地支：</strong>天干为甲乙丙丁戊己庚辛壬癸，地支为子丑寅卯辰巳午未申酉戌亥，合称干支，用以纪年月日时</div>';
+    _baziGlossary += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">四柱：</strong>年柱、月柱、日柱、时柱，每柱由一个天干和一个地支组成，共八字</div>';
+    _baziGlossary += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">日主：</strong>日柱天干，代表命主本人，是命理分析的核心</div>';
+    _baziGlossary += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">藏干：</strong>地支中暗藏的天干，分本气、中气、余气，影响五行力量计算</div>';
+    _baziGlossary += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">十神：</strong>以日主为基准，其他干支与日主的生克关系——比肩、劫财、食神、伤官、偏财、正财、七杀、正官、偏印、正印</div>';
+    _baziGlossary += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">纳音：</strong>六十甲子中每对干支对应的五行属性，如海中金、炉中火等，用于辅助论命</div>';
+    _baziGlossary += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">神煞：</strong>命局中的特殊星曜，如天乙贵人、文昌、桃花、驿马等，影响特定运势</div>';
+    _baziGlossary += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">长生十二宫：</strong>日干对地支的十二种状态——长生、沐浴、冠带、临官、帝旺、衰、病、死、墓、绝、胎、养，反映五行旺衰程度</div>';
+    _baziGlossary += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">五行：</strong>金、木、水、火、土，相生（金生水、水生木、木生火、火生土、土生金）相克（金克木、木克土、土克水、水克火、火克金）</div>';
+    _baziGlossary += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">用神/忌神：</strong>用神是命局中最需要的五行，忌神是最不需要的五行。大运流年逢用神则吉，逢忌神则凶</div>';
+    _baziGlossary += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">旺衰：</strong>日主力量的强弱判断，以身旺、身弱为基础，决定用神取向（扶抑、调候、通关、从格）</div>';
+    _baziGlossary += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">大运：</strong>以月令为基准推排，每十年一步，阳年男命阴年女命顺行，阴年男命阳年女命逆行，管十年运程</div>';
+    _baziGlossary += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">流年：</strong>每年的天干地支，与命局和大运发生生克关系，影响当年运势</div>';
+    _baziGlossary += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">胎元：</strong>受孕之月的干支，为先天根基，影响体质与先天禀赋</div>';
+    _baziGlossary += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">命宫：</strong>出生时太阳所在宫位，为主命之所，与日主同参论命</div>';
+    _baziGlossary += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">旬空：</strong>六十甲子分六旬，每旬空两个地支，空亡之地力量减损</div>';
+    _baziGlossary += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">合冲刑害：</strong>地支间的特殊关系——六合、三合为和，六冲为冲，三刑为刑，相害为害，影响命局互动</div>';
+    _baziGlossary += '<div><strong style="color:var(--gold)">格局：</strong>命局中五行十神的特殊组合，如正官格、偏财格、食神格等，决定命局层次与取向</div>';
+    _baziGlossary += '</div></div>';
+    try { document.getElementById('baziResult').innerHTML += _baziGlossary; } catch(_ge) {}
+  } catch(_ge2) { console.warn('八字术语解释渲染错误:', _ge2); }
+
   // === 复制结果按钮 ===
   var copyBtn = '<div style="margin-top:16px;text-align:center">';
   copyBtn += '<button onclick="copyResultText(this)" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px">📋 复制结果</button>';
@@ -32503,6 +32532,46 @@ function runLiuyaoEngine() {
       html += '</div>';
       html += '</div>';
     } catch(_yve) { console.warn('六爻卦象可视化错误:', _yve); }
+    // === 📖 64卦辞详解 ===
+    try {
+      var _benHexName = ben;
+      var _bianHexName = bian;
+      var _benHexData = _YJ_HEX_DATA[_benHexName];
+      var _bianHexData = _YJ_HEX_DATA[_bianHexName];
+      html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">📖 卦辞详解</div>';
+      html += '<div style="padding:12px 16px;font-size:12px;line-height:2">';
+      if (_benHexData) {
+        html += '<div style="margin-bottom:10px;padding:10px;background:rgba(201,168,76,0.04);border-radius:8px">';
+        html += '<div style="font-weight:700;color:var(--gold);margin-bottom:4px">本卦 · ' + _benHexName + '卦</div>';
+        html += '<div style="color:var(--gold2)"><b>卦辞：</b>' + (_benHexData.summary || '') + '</div>';
+        html += '<div style="opacity:.7;margin-top:2px"><b>释义：</b>' + (_benHexData.meaning || '') + '</div>';
+        html += '</div>';
+      }
+      if (_bianHexData && _bianHexName !== _benHexName) {
+        html += '<div style="margin-bottom:10px;padding:10px;background:rgba(231,76,60,0.04);border-radius:8px">';
+        html += '<div style="font-weight:700;color:var(--fire2);margin-bottom:4px">变卦 · ' + _bianHexName + '卦</div>';
+        html += '<div style="color:var(--gold2)"><b>卦辞：</b>' + (_bianHexData.summary || '') + '</div>';
+        html += '<div style="opacity:.7;margin-top:2px"><b>释义：</b>' + (_bianHexData.meaning || '') + '</div>';
+        html += '</div>';
+      }
+      html += '</div></div>';
+    } catch(_gce) { console.warn('卦辞详解渲染错误:', _gce); }
+    // === 📝 术语注释 ===
+    try {
+      html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">📝 术语注释</div>';
+      html += '<div style="padding:12px 16px;font-size:11px;line-height:2;opacity:.85">';
+      html += '<div><b style="color:var(--gold2)">纳甲：</b>将天干地支配入六爻，干支所属五行与卦宫五行论生克，为六爻核心排盘法。</div>';
+      html += '<div><b style="color:var(--gold2)">六亲：</b>父母、兄弟、子孙、妻财、官鬼，以卦宫五行为主，按五行生克关系确定各爻六亲，代表所测事物类别。</div>';
+      html += '<div><b style="color:var(--gold2)">六神：</b>青龙、朱雀、勾陈、螣蛇、白虎、玄武，按日干遁排，主吉凶氛围与事象特征。</div>';
+      html += '<div><b style="color:var(--gold2)">世应：</b>世爻代表求测者自身，应爻代表对方或所测之事。世应相生则吉，相克则凶。</div>';
+      html += '<div><b style="color:var(--gold2)">用神：</b>根据所测事项选取的六亲爻位。如测财取妻财，测官取官鬼，测父母取父母。</div>';
+      html += '<div><b style="color:var(--gold2)">旬空：</b>甲子旬中戌亥空，甲戌旬中申酉空等。用神逢空则事尚不明，填实之日方有定论。</div>';
+      html += '<div><b style="color:var(--gold2)">旺衰：</b>以月令为标准，与月令同行为旺，月令生之为相，生月令为休，克月令为囚，月令克之为死。旺相有力，休囚死无力。</div>';
+      html += '<div><b style="color:var(--gold2)">动爻：</b>阳动变阴（○），阴动变阳（×）。动爻代表变化所在，动则有变，变则事情有转折。</div>';
+      html += '</div></div>';
+    } catch(_gte) { console.warn('术语注释渲染错误:', _gte); }
     // === 化解方案与开运建议 ===
     try {
       var _cureHtml = getLiuyaoResolution(gua, duan);
@@ -32828,6 +32897,19 @@ function runMeihuaEngine() {
       html += '</div>';
       html += '</div>';
     } catch(_mce) { console.warn('梅花圆图可视化错误:', _mce); }
+    // === 📝 术语注释 ===
+    try {
+      html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">📝 术语注释</div>';
+      html += '<div style="padding:12px 16px;font-size:11px;line-height:2;opacity:.85">';
+      html += '<div><b style="color:var(--gold2)">体卦：</b>不动之卦，代表自己。动爻所在卦为用卦，另一卦即为体卦。</div>';
+      html += '<div><b style="color:var(--gold2)">用卦：</b>动爻所在之卦，代表所测之事。用卦生体卦则吉，克体卦则凶。</div>';
+      html += '<div><b style="color:var(--gold2)">互卦：</b>取本卦二三四爻为下互，三四五爻为上互，反映事物发展过程中的内在因素。</div>';
+      html += '<div><b style="color:var(--gold2)">变卦：</b>动爻阴阳互变后的卦象，代表事物最终结局。</div>';
+      html += '<div><b style="color:var(--gold2)">体用生克：</b>体卦五行与用卦五行的生克关系。用生体吉，体生用耗，用克体凶，体克用可成，体用比和顺。</div>';
+      html += '<div><b style="color:var(--gold2)">时令旺衰：</b>卦象五行在当前季节的强弱。春季木旺、夏季火旺、秋季金旺、冬季水旺。旺相有力，休囚死无力。</div>';
+      html += '</div></div>';
+    } catch(_mte) { console.warn('梅花术语注释渲染错误:', _mte); }
     // === 化解方案与开运建议 ===
     try {
       var _cureHtml = getMeihuaResolution(gua, analyze);
@@ -33037,6 +33119,27 @@ function runQimenEngine() {
     if (analyze.strategy) html += '<div>3. 策略：' + analyze.strategy + '</div>';
     if (analyze.huajie) html += '<div>4. 化解：' + analyze.huajie + '</div>';
     html += '<div>5. 奇门遁甲为时空方位之学，参考而行，切勿迷信。择吉而行，趋吉避凶。</div>';
+    html += '</div></div>';
+    // === 📖 术语解释 ===
+    html += '<div style="margin:12px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(138,92,246,0.04),rgba(138,92,246,0.01));border:1px solid rgba(138,92,246,0.12);border-radius:12px">';
+    html += '<div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==\'none\'?\'\':\'none\'" style="font-size:14px;font-weight:700;color:var(--violet2);cursor:pointer;letter-spacing:2px;display:flex;align-items:center;gap:6px">';
+    html += '<span style="transition:transform .2s;display:inline-block">▶</span>📖 奇门术语解读';
+    html += '</div>';
+    html += '<div style="display:none;margin-top:10px;font-size:12px;color:var(--paper2);line-height:2;opacity:.85">';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">遁局：</strong>奇门遁甲分阳遁九局、阴遁九局共十八局，以节气定遁，冬至阳遁、夏至阴遁</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">值符：</strong>九星之首，为当班之神，主导全局走向。值符所落之宫为用神参考</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">值使：</strong>八门当班之门，为值符所掌之門，管事之出入</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">六仪三奇：</strong>六仪为戊己庚辛壬癸，三奇为乙丙丁。乙为日奇、丙为月奇、丁为星奇，三奇得使为吉</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">天盘干/地盘干：</strong>天盘干为流动之干，代表外在条件；地盘干为固定之干，代表内在基础。天地盘组合断吉凶</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">八门：</strong>休、生、伤、杜、景、死、惊、开。开门、休门、生门为三吉门；死门、惊门、伤门为三凶门</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">九星：</strong>天蓬、天任、天冲、天辅、天英、天芮、天柱、天心、天禽。天心、天任、天辅、天禽为吉星；天蓬、天芮为凶星</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">八神：</strong>值符、腾蛇、太阴、六合、白虎、玄武、九地、九天。值符最吉，白虎玄武主凶</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">用神：</strong>奇门断事取用之天干，如问事业取时干为用神，问婚姻取乙为女、庚为男</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">空亡：</strong>旬空之地，力量减损。用神落空亡则事难成，需出空之日方应</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">马星：</strong>驿马之星，主动态、出行、变化。马星临宫主事有变动、宜行动</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">五不遇时：</strong>时干克日干，为奇门大忌，百事不宜，须改日再谋</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">后天八卦排列：</strong>坎一（北）、坤二（西南）、震三（东）、巽四（东南）、中五、乾六（西北）、兑七（西）、艮八（东北）、离九（南）</div>';
+    html += '<div><strong style="color:var(--gold)">应期：</strong>预测事情发生的时间，以用神所落宫位的地支当令之月为应期</div>';
     html += '</div></div>';
     // 化解方案
     try {
@@ -33402,6 +33505,69 @@ function runLiurenEngine() {
     html += '<div>3. ' + analyze.advice + '</div>';
     html += '<div>4. 大六壬为古法占卜，重在参考而非定论。君子谋道不谋食，行正道自有天佑。</div>';
     html += '</div></div>';
+    // === 🔧 三传推演方法（九宗门）===
+    try {
+      var _scMethod = pan.sanChuan.method || '贼克法';
+      var _nineGates = {
+        '贼克法':'四课中取下贼上（上克下为贼）者为初传，中传取初传上神，末传取中传上神。适用于四课中有克者。',
+        '重审法':'与贼克法同，取上克下者为初传。上克下为贼，下克上为审。',
+        '比用法':'当有多课同克时，取与日干阴阳属性相同者为用。即干阳取阳支，干阴取阴支。',
+        '涉害法':'当比用法仍有多课，则以涉害深浅论。计算各课经历克数，取涉害最深者为初传。',
+        '遁克法':'四课无克，取遁干之克为用。取日干遁干与四课上神论克，取克者为初传。',
+        '昴星法':'四课无克且无遁克，阳日取酉宫上神为初传，阴日取从魁（酉）为初传。事出意外。',
+        '别责法':'四课不全（有重复）且无克，取日干合神为初传。借力之意。',
+        '八专法':'干支同位（如甲寅日），两课相同，取有克者为用，无克取刚柔日分别处理。事由内起。',
+        '伏吟法':'天地盘伏吟（天盘与地盘相同），取日干寄宫为初传。事当静守。',
+        '返吟法':'天地盘返吟（天盘与地盘对冲），取冲支为初传。事多动荡。'
+      };
+      var _methodDesc = _nineGates[_scMethod] || '根据四课生克关系，按九宗门规则取三传。';
+      html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🔧 三传推演方法 — ' + _scMethod + '</div>';
+      html += '<div style="padding:12px 16px;font-size:12px;line-height:2">';
+      html += '<div style="margin-bottom:8px"><b style="color:var(--gold2)">取法：</b>' + _scMethod + '</div>';
+      html += '<div style="margin-bottom:8px;opacity:.85"><b style="color:var(--gold2)">原理：</b>' + _methodDesc + '</div>';
+      html += '<div style="padding:8px 10px;background:rgba(201,168,76,0.04);border-radius:8px;margin-bottom:8px"><b style="color:var(--gold2)">九宗门一览：</b>贼克法、比用法、涉害法、遁克法、昴星法、别责法、八专法、伏吟法、返吟法。本次排盘采用<b style="color:var(--gold)">' + _scMethod + '</b>。</div>';
+      // 推演过程
+      html += '<div style="padding:8px 10px;background:rgba(46,204,113,0.04);border-radius:8px">';
+      html += '<div style="font-weight:600;color:var(--jade2);margin-bottom:4px">推演过程：</div>';
+      var _dgGong2 = {'甲':'寅','乙':'辰','丙':'巳','丁':'未','戊':'巳','己':'未','庚':'申','辛':'戌','壬':'亥','癸':'丑'};
+      var _ganGongZhi2 = _dgGong2[pan.dayGan] || '寅';
+      html += '<div style="font-size:11px;line-height:1.8;opacity:.8">';
+      html += '① 日干' + pan.dayGan + '寄宫于' + _ganGongZhi2 + '，天盘' + _ganGongZhi2 + '上为' + (pan.tianPan[_ganGongZhi2]||_ganGongZhi2) + '（第一课上神）<br>';
+      html += '② 天盘' + (pan.tianPan[_ganGongZhi2]||_ganGongZhi2) + '上为' + (pan.tianPan[pan.tianPan[_ganGongZhi2]||_ganGongZhi2]||pan.tianPan[_ganGongZhi2]||_ganGongZhi2) + '（第二课阴神）<br>';
+      html += '③ 日支' + pan.dayZhi + '，天盘' + pan.dayZhi + '上为' + (pan.tianPan[pan.dayZhi]||pan.dayZhi) + '（第三课上神）<br>';
+      html += '④ 天盘' + (pan.tianPan[pan.dayZhi]||pan.dayZhi) + '上为' + (pan.tianPan[pan.tianPan[pan.dayZhi]||pan.dayZhi]||pan.tianPan[pan.dayZhi]||pan.dayZhi) + '（第四课阴神）<br>';
+      html += '⑤ 四课排定后，按<b>' + _scMethod + '</b>规则取初传<b style="color:var(--gold)">' + pan.sanChuan.chu + '</b>，中传<b style="color:var(--gold2)">' + pan.sanChuan.zhong + '</b>，末传<b style="color:var(--jade2)">' + pan.sanChuan.mo + '</b>';
+      html += '</div></div>';
+      html += '</div></div>';
+    } catch(_nme) { console.warn('三传推演方法渲染错误:', _nme); }
+    // === 🌙 月将加占时推演过程 ===
+    try {
+      html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🌙 月将加占时推演</div>';
+      html += '<div style="padding:12px 16px;font-size:12px;line-height:2;opacity:.85">';
+      html += '<div style="margin-bottom:6px"><b style="color:var(--gold2)">月将：</b>' + pan.yueJiang + '（根据中气确定，月将太阳所在宫位）</div>';
+      html += '<div style="margin-bottom:6px"><b style="color:var(--gold2)">占时：</b>' + pan.shiZhi + '（起卦时辰）</div>';
+      html += '<div style="margin-bottom:6px"><b style="color:var(--gold2)">布盘方法：</b>将月将' + pan.yueJiang + '加临占时' + pan.shiZhi + '之上，其余地支按顺序排列，形成天盘叠加地盘之式。</div>';
+      html += '<div style="padding:8px 10px;background:rgba(201,168,76,0.04);border-radius:8px;margin-bottom:6px">';
+      html += '<b style="color:var(--gold2)">天盘布列：</b>地盘' + pan.shiZhi + '位→天盘' + pan.yueJiang + '，依次顺布十二支。如地盘子位天盘为' + (pan.tianPan['子']||'子') + '，地盘丑位天盘为' + (pan.tianPan['丑']||'丑') + '，以此类推。';
+      html += '</div>';
+      html += '<div style="opacity:.7">月将加时为六壬起手第一步，天盘既布，四课三传皆由此推演而来。</div>';
+      html += '</div></div>';
+    } catch(_mje) { console.warn('月将加占时推演渲染错误:', _mje); }
+    // === 📝 术语注释 ===
+    try {
+      html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">📝 术语注释</div>';
+      html += '<div style="padding:12px 16px;font-size:11px;line-height:2;opacity:.85">';
+      html += '<div><b style="color:var(--gold2)">四课：</b>以日干、日支为主，各取阳神、阴神，共四课。第一课日干阳神，第二课日干阴神，第三课日支阳神，第四课日支阴神。</div>';
+      html += '<div><b style="color:var(--gold2)">三传：</b>初传（起因）、中传（过程）、末传（结局）。由四课按九宗门规则推演而得。</div>';
+      html += '<div><b style="color:var(--gold2)">天将：</b>贵人、螣蛇、朱雀、六合、勾陈、青龙、天空、白虎、太常、玄武、太阴、天后。随天盘分布，主不同事象。</div>';
+      html += '<div><b style="color:var(--gold2)">月将：</b>太阳所在宫位，按中气确定。月将加占时为六壬布天盘之根本方法。</div>';
+      html += '<div><b style="color:var(--gold2)">课体：</b>根据四课三传结构判定，如重审、比用、涉害等，共九大宗门，决定断课方向。</div>';
+      html += '<div><b style="color:var(--gold2)">六亲：</b>以日干五行为主，与三传地支五行论生克。同行为比肩，生我为父母，我生为子孙，克我为官鬼，我克为妻财。</div>';
+      html += '</div></div>';
+    } catch(_lrte) { console.warn('六壬术语注释渲染错误:', _lrte); }
     // === 化解方案与开运建议 ===
     try {
       var _cureHtml = getLiurenResolution(pan, analyze);
@@ -33864,6 +34030,27 @@ function runZiweiEngine() {
     html += '<div>4. ' + (analyze.advice || '紫微斗数为命理参考，切勿迷信。') + '</div>';
     html += '<div>5. 命由天定，运由己造。行善积德，自然趋吉避凶。</div>';
     html += '</div></div>';
+    // === 📖 术语解释 ===
+    html += '<div style="margin:12px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(231,76,60,0.04),rgba(231,76,60,0.01));border:1px solid rgba(231,76,60,0.12);border-radius:12px">';
+    html += '<div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==\'none\'?\'\':\'none\'" style="font-size:14px;font-weight:700;color:var(--fire2);cursor:pointer;letter-spacing:2px;display:flex;align-items:center;gap:6px">';
+    html += '<span style="transition:transform .2s;display:inline-block">▶</span>📖 紫微术语解读';
+    html += '</div>';
+    html += '<div style="display:none;margin-top:10px;font-size:12px;color:var(--paper2);line-height:2;opacity:.85">';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">紫微斗数：</strong>以紫微星为北斗之尊，统御十四正曜，配十二宫垣，推演人生吉凶祸福</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">十二宫：</strong>命宫、兄弟、夫妻、子女、财帛、疾厄、迁移、奴仆（交友）、官禄、田宅、福德、父母。各管人生一方面</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">命宫：</strong>先天格局之所在，决定性格、天赋与人生基调</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">身宫：</strong>后天造化之所，代表35岁后的发展方向与人生追求</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">十四正曜：</strong>紫微、天机、太阳、武曲、天同、廉贞、天府、太阴、贪狼、巨门、天相、天梁、七杀、破军，为紫微主星</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">辅星：</strong>左辅、右弼、文昌、文曲、天魁、天钺等，辅助主星增减力量</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">煞星：</strong>擎羊、陀罗、火星、铃星、地空、地劫，主破坏、阻滞、波折</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">四化：</strong>化禄（增财顺遂）、化权（增权主导）、化科（增名贵人）、化忌（阻滞执念），为紫微断盘关键</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">庙旺利陷：</strong>星曜在不同宫位的强弱状态——庙（最强）、旺（强）、平（中）、陷（弱），影响星曜发挥</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">三方四正：</strong>本宫、对宫（迁移）、三合宫（财帛、官禄）共四个宫位，互相影响，同参论断</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">大限：</strong>紫微的大运，每十年一转，以命宫为起点逆时针排列，管十年运程</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">五行局：</strong>命宫所在宫位的纳音五行，决定大限起运年龄（水二局6岁起、木三局3岁起、金四局5岁起、土五局5岁起、火六局6岁起）</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">经典格局：</strong>如紫府朝垣、府相朝垣、杀破狼等特殊星曜组合，决定命局层次</div>';
+    html += '<div><strong style="color:var(--gold)">天地盘：</strong>天盘为动态排盘结果（命宫实际位置），地盘为固定顺序（命宫=子位），对照参考</div>';
+    html += '</div></div>';
     // 化解方案
     try {
       var _cureHtml = getZiweiResolution(pan, analyze);
@@ -34146,6 +34333,19 @@ function runFengshuiEngine() {
       html += '<div style="padding:4px 16px 12px;font-size:11px;opacity:.5;text-align:center">绿色边框=吉方（宜卧室/客厅/大门） · 红色边框=凶方（宜厨房/卫生间压之） · 中宫为宅卦太极点</div>';
       html += '</div>';
     } catch(_bzErr) { console.warn('八宅方位圆图渲染错误:', _bzErr); }
+    // === 📝 术语注释 ===
+    try {
+      html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">📝 术语注释</div>';
+      html += '<div style="padding:12px 16px;font-size:11px;line-height:2;opacity:.85">';
+      html += '<div><b style="color:var(--gold2)">九宫飞星：</b>以当运之星入中宫顺飞九宫，得一至九星分布八方。一白水、二黑土、三碧木、四绿木、五黄土、六白金、七赤金、八白土、九紫火。当旺之星所在方位为吉。</div>';
+      html += '<div><b style="color:var(--gold2)">八宅：</b>以宅卦为起点，按大游年歌诀推算八方吉凶。生气（大吉）、天医（中吉）、延年（上吉）、伏位（小吉）为四吉方；绝命、五鬼、六煞、祸害为四凶方。</div>';
+      html += '<div><b style="color:var(--gold2)">宅命：</b>宅卦分东四宅（坎离震巽）与西四宅（乾坤艮兑）。命卦亦分东四命与西四命。宅命相配则吉，不配则需布局化解。</div>';
+      html += '<div><b style="color:var(--gold2)">元运：</b>三元九运，每20年一运，共180年。2024-2043年为九紫离运。当运之星入中宫，其方位为旺方。</div>';
+      html += '<div><b style="color:var(--gold2)">二十四山：</b>罗盘360°分为二十四山，每卦管三山。如坎宫管壬子癸，离宫管丙午丁。用于精确方位定位。</div>';
+      html += '<div><b style="color:var(--gold2)">山向：</b>坐山为房屋背靠方位，朝向为房屋正面朝向。如坐北朝南即子山午向。山管人丁水管财。</div>';
+      html += '</div></div>';
+    } catch(_fste) { console.warn('风水术语注释渲染错误:', _fste); }
 
     // === 化解方案与开运建议 ===
     try {
