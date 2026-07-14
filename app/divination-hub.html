@@ -11470,8 +11470,8 @@ function computeBazi() {
   const total5 = Object.values(eleCount).reduce((a,b)=>a+b,0);
   if (eleCount[dayEle] < 2) warnings.push({level:'warn', text:'🔴 日主偏弱：易受大运流年影响逢凶，需重点补强日主五行（'+dayEle+'）'});
   if (isStrong && eleCount[getKe(dayEle)] >= 3) warnings.push({level:'danger', text:'🔴 身旺克泄重重：忌神强旺之年易有重大挫折，需特别留意金水/木火/土金等克冲流年'});
-  if (eleCount[strongest] >= 5) warnings.push({level:'warn', text:'🟡 五行偏枯：'+strongest+'过旺（'+eleCount[strongest]+'个），其余不足，易引发对应脏腑或运势问题'});
-  if (strongest === getKe(dayEle) || weakest === dayEle) warnings.push({level:'warn', text:'🟡 用神受克：命局喜'+dayEle+'但'+strongest+'过旺攻身，喜神难以为用'});
+  if (eleCount[strongestEle] >= 5) warnings.push({level:'warn', text:'🟡 五行偏枯：'+strongestEle+'过旺（'+eleCount[strongestEle]+'个），其余不足，易引发对应脏腑或运势问题'});
+  if (strongestEle === getKe(dayEle) || weakestEle === dayEle) warnings.push({level:'warn', text:'🟡 用神受克：命局喜'+dayEle+'但'+strongestEle+'过旺攻身，喜神难以为用'});
   if (warnings.length === 0) warnings.push({level:'good', text:'✅ 命局较平衡，无重大隐患，大运流年顺势而为即可'});
 
   // --- Dayun risk scan ---
@@ -11530,8 +11530,8 @@ function computeBazi() {
     { title:'四、事业财运', icon:'💰', content: mingType.career, accent:'jade-accent', cls:'card-main' },
     { title:'五、情感婚姻', icon:'💕', content: mingType.love, accent:'cinn-accent', cls:'card-main' },
     { title:'六、健康寿元', icon:'🏥', content: mingType.health, accent:'red-accent', cls:'card-main' },
-    { title:'七、一生概要', icon:'📖', content: mingType.lifeSummary || getLifeSummary(pillars, dayStem, isStrong, strongest, weakest), accent:'gold-accent', cls:'card-main' },
-    { title:'八、岁运趋避', icon:'🗓️', content: mingType.timingAdvice || getTimingAdvice(isStrong, dayEle, strongest, weakest), accent:'violet-accent', cls:'card-side' },
+    { title:'七、一生概要', icon:'📖', content: mingType.lifeSummary || getLifeSummary(pillars, dayStem, isStrong, strongestEle, weakestEle), accent:'gold-accent', cls:'card-main' },
+    { title:'八、岁运趋避', icon:'🗓️', content: mingType.timingAdvice || getTimingAdvice(isStrong, dayEle, strongestEle, weakestEle), accent:'violet-accent', cls:'card-side' },
   ];
 
   for (const c of cards) {
@@ -11558,8 +11558,8 @@ function computeBazi() {
     '<span class="ref-tag">格局<span>'+geju+'</span></span>'+
     (mingType.yongshenEle ? '<span class="ref-tag">用神<span>'+mingType.yongshenEle+'</span></span>' : '')+
     (mingType.jishenEle ? '<span class="ref-tag">忌神<span>'+mingType.jishenEle+'</span></span>' : '')+
-    '<span class="ref-tag">最旺<span>'+strongest+'</span></span>'+
-    '<span class="ref-tag">最弱<span>'+weakest+'</span></span>'+
+    '<span class="ref-tag">最旺<span>'+strongestEle+'</span></span>'+
+    '<span class="ref-tag">最弱<span>'+weakestEle+'</span></span>'+
     '</div>'+
     '<div class="ref-nayin">'+naYinArr.join(' &nbsp;|&nbsp; ')+'</div>';
   // 新增：胎元/命宫/身宫/旬空/长生十二宫
@@ -11705,7 +11705,7 @@ function computeBazi() {
     _baziNotice += '<div style="font-size:12px;line-height:2;opacity:.9">';
     _baziNotice += '<div>1. 日主' + dayStem + '（' + dayEle + '），' + (isStrong ? '身旺，宜泄耗克（食伤、财星、官杀）' : '身弱，宜生扶（印星、比劫）') + '。</div>';
     _baziNotice += '<div>2. 用神为<b style="color:var(--gold)">' + (mingType.yongshenEle || '待取') + '</b>，忌神为<b style="color:var(--fire)">' + (mingType.jishenEle || '待定') + '</b>，大运流年逢用神则吉，逢忌神则凶。</div>';
-    _baziNotice += '<div>3. 五行偏旺：<b>' + strongest + '</b>（' + eleCount[strongest] + '个），偏弱：<b>' + weakest + '</b>（' + eleCount[weakest] + '个），可在日常生活中多补最弱五行。</div>';
+    _baziNotice += '<div>3. 五行偏旺：<b>' + strongestEle + '</b>（' + eleCount[strongestEle] + '个），偏弱：<b>' + weakestEle + '</b>（' + eleCount[weakestEle] + '个），可在日常生活中多补最弱五行。</div>';
     _baziNotice += '<div>4. 大运每十年一转，流年每年一变。逢用神大运流年宜积极进取，逢忌神则宜守不宜进。</div>';
     _baziNotice += '<div>5. 补五行方法：穿戴对应颜色衣物、食用对应味道食物、选择对应方位居住或办公。</div>';
     _baziNotice += '<div>6. 命理为先天参考，后天努力更重要。行善积德、修身养性可改善运势。</div>';
