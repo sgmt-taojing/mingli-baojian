@@ -31983,6 +31983,94 @@ function runLiuyaoEngine() {
       html += '<p style="color:var(--gold)"><b>变卦分析：</b>' + duan.bianAnalysis + '</p>';
     }
     html += '<p style="opacity:0.8">' + duan.advice + '</p>';
+    // === 六爻排盘表 ===
+    try {
+      var _yaoNames = ['初', '二', '三', '四', '五', '上'];
+      var _dongSym = {1:'老阳\\u25cb', 0:'少阳—'};
+      // 本卦排盘
+      html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">☰ 六爻排盘 · 本卦 — ' + ben + '</div>';
+      html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
+      html += '<tr style="background:rgba(201,168,76,0.08);color:var(--gold2)"><th style="padding:5px 8px">爻位</th><th>阴阳</th><th>纳甲</th><th>六亲</th><th>六神</th><th>世应</th><th>动</th></tr>';
+      // 计算变卦纳甲用于对照
+      var _bianZg = null;
+      try { _bianZg = liuyaoZhuangGua({benGua: gua.bianGua, dayGanZhi: gz}, gz); } catch(_be) {}
+      for (var yi = 5; yi >= 0; yi--) {
+        var _isDong = gua.dongYao.indexOf(yi) >= 0;
+        var _isShi = (zg.shiying.shi === yi);
+        var _isYing = (zg.shiying.ying === yi);
+        var _yinYang = gua.lines[yi].line;
+        var _najia = zg.tiangan[yi] + zg.dizhi[yi];
+        var _lq = zg.liuqin[yi];
+        var _ls = zg.liushen[yi];
+        var _bg = _isDong ? 'rgba(231,76,60,0.06)' : (yi % 2 === 0 ? 'rgba(255,255,255,0.01)' : 'transparent');
+        html += '<tr style="background:' + _bg + ';border-bottom:1px solid rgba(255,255,255,0.03)">';
+        html += '<td style="padding:5px 8px;text-align:center;color:var(--gold2)">' + _yaoNames[yi] + '爻</td>';
+        html += '<td style="text-align:center">' + (_yinYang === '阳' ? '—— 阳' : '— — 阴') + (_isDong ? ' ○' : '') + '</td>';
+        html += '<td style="text-align:center">' + _najia + '</td>';
+        html += '<td style="text-align:center">' + _lq + '</td>';
+        html += '<td style="text-align:center">' + _ls + '</td>';
+        html += '<td style="text-align:center">' + (_isShi ? '<span style=\"color:var(--gold);font-weight:600\">世</span>' : _isYing ? '<span style=\"color:var(--jade2)\">应</span>' : '') + '</td>';
+        html += '<td style="text-align:center">' + (_isDong ? '<span style=\"color:#e74c3c\">⚡动</span>' : '') + '</td>';
+        html += '</tr>';
+      }
+      html += '</table></div>';
+      // 宫位/日辰信息
+      html += '<div style="padding:8px 16px;font-size:11px;opacity:.7;border-top:1px solid var(--border)">';
+      html += '宫：' + zg.gongName + ' · ' + zg.gongWuxing + ' | 日干支：' + (gz.gan || '') + (gz.zhi || '') + ' | 月令：' + (gua.monthZhi || '');
+      html += '</div></div>';
+      // 本卦变卦对照
+      if (_bianZg && gua.dongYao.length > 0) {
+        html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+        html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">☰ 本卦 ↔ 变卦对照 — ' + bian + '</div>';
+        html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
+        html += '<tr style="background:rgba(201,168,76,0.08);color:var(--gold2)"><th style="padding:5px 8px">爻位</th><th>本卦纳甲</th><th>本卦六亲</th><th>→</th><th>变卦纳甲</th><th>变卦六亲</th><th>变化</th></tr>';
+        for (var yi2 = 5; yi2 >= 0; yi2--) {
+          var _isDong2 = gua.dongYao.indexOf(yi2) >= 0;
+          var _benNJ = zg.tiangan[yi2] + zg.dizhi[yi2];
+          var _bianNJ = _bianZg.tiangan[yi2] + _bianZg.dizhi[yi2];
+          var _benLQ = zg.liuqin[yi2];
+          var _bianLQ = _bianZg.liuqin[yi2];
+          var _chg = _isDong2 ? (_benLQ === _bianLQ ? '同' : _benLQ + '→' + _bianLQ) : '—';
+          html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.03)">';
+          html += '<td style="padding:5px 8px;text-align:center;color:var(--gold2)">' + _yaoNames[yi2] + '爻</td>';
+          html += '<td style="text-align:center">' + _benNJ + '</td>';
+          html += '<td style="text-align:center">' + _benLQ + '</td>';
+          html += '<td style="text-align:center;color:var(--gold);opacity:.5">→</td>';
+          html += '<td style="text-align:center">' + (_isDong2 ? _bianNJ : '—') + '</td>';
+          html += '<td style="text-align:center">' + (_isDong2 ? _bianLQ : '—') + '</td>';
+          html += '<td style="text-align:center;color:' + (_isDong2 ? '#e74c3c' : 'var(--muted)') + '">' + _chg + '</td>';
+          html += '</tr>';
+        }
+        html += '</table></div></div>';
+      }
+      // 用神分析详情
+      if (duan.yongshenIdx >= 0) {
+        var _ysIdx = duan.yongshenIdx;
+        var _ysZhi = zg.dizhi[_ysIdx];
+        var _ysWx = _zhiWuxing(_ysZhi);
+        var _ysLq = zg.liuqin[_ysIdx];
+        var _ysLs = zg.liushen[_ysIdx];
+        var _ysShiYing = (zg.shiying.shi === _ysIdx) ? '世位' : (zg.shiying.ying === _ysIdx) ? '应位' : '闲位';
+        var _ysDong = gua.dongYao.indexOf(_ysIdx) >= 0;
+        html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+        html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🎯 用神分析详情</div>';
+        html += '<div style="padding:12px 16px;font-size:12px;line-height:2">';
+        html += '<div><span style="color:var(--gold2);font-weight:600">用神：</span>' + duan.yongshen + '（' + _ysLq + '·' + _ysZhi + '·' + _ysWx + '）</div>';
+        html += '<div><span style="color:var(--gold2);font-weight:600">所在：</span>' + _yaoNames[_ysIdx] + '爻 · ' + _ysShiYing + ' · ' + (_ysDong ? '发动' : '安静') + '</div>';
+        html += '<div><span style="color:var(--gold2);font-weight:600">六神：</span>' + _ysLs + '</div>';
+        html += '<div><span style="color:var(--gold2);font-weight:600">旺衰：</span>' + (duan.yongshenWang ? '旺相' : '休囚') + (duan.xunKong ? ' · ⚠️旬空' : '') + '</div>';
+        html += '<div><span style="color:var(--gold2);font-weight:600">状态：</span>' + duan.yongshenState + '</div>';
+        if (duan.liuhe) html += '<div><span style="color:var(--gold2)">合：</span>用神逢合（日辰或月建合用神）</div>';
+        if (duan.liuchong) html += '<div><span style="color:#e74c3c">冲：</span>用神被冲，事多变动</div>';
+        if (duan.anDong && duan.anDong.length > 0) html += '<div><span style="color:var(--gold2)">暗动：</span>用神被日辰冲暗动</div>';
+        if (duan.fuShen) html += '<div><span style="color:var(--gold2)">伏神：</span>伏藏于' + duan.fuShen.fuZhi + '</div>';
+        if (duan.sanhe && duan.sanhe.length > 0) html += '<div><span style="color:var(--gold2)">三合：</span>' + duan.sanhe.map(function(s){return s.matched.join('')+'合'+s.wx+'局';}).join('、') + '</div>';
+        html += '<div style="margin-top:6px;padding:8px 12px;background:rgba(46,204,113,0.04);border-radius:8px;color:var(--gold2)"><b>断语：</b>' + duan.verdict + '</div>';
+        html += '<div style="margin-top:4px"><b>应期：</b>' + duan.yingqi + '</div>';
+        html += '</div></div>';
+      }
+    } catch(_pe) { console.warn('六爻排盘渲染错误:', _pe); }
     // === 化解方案与开运建议 ===
     try {
       var _cureHtml = getLiuyaoResolution(gua, duan);
@@ -32076,6 +32164,86 @@ function runMeihuaEngine() {
     html += '<p><b>终局：</b>' + analyze.endRelation + '</p>';
     html += '<p><b>综合：</b>' + analyze.verdict + '</p>';
     html += '<p style="opacity:0.8">' + analyze.advice + '</p>';
+    // === 梅花卦象图示 ===
+    try {
+      var _mhYaoNames = ['初', '二', '三', '四', '五', '上'];
+      var _benLines = gua.lines || [];
+      var _bianLines = gua.bianLines || [];
+      var _dongIdx = gua.dongYao;
+      // 卦象阴阳图示
+      html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🌸 卦象图示</div>';
+      html += '<div style="padding:16px;display:flex;justify-content:center;gap:32px;flex-wrap:wrap">';
+      // 本卦
+      html += '<div style="text-align:center">';
+      html += '<div style="font-size:13px;color:var(--jade2);margin-bottom:8px;font-weight:600">本卦 ' + ben + '</div>';
+      for (var mi = 5; mi >= 0; mi--) {
+        var _isYang = _benLines[mi] && _benLines[mi].line === '阳';
+        var _isDong = (mi === _dongIdx);
+        html += '<div style="font-size:18px;letter-spacing:2px;padding:2px 0;color:' + (_isDong ? '#e74c3c' : 'var(--paper)') + '">' + (_isYang ? '▬▬▬' : '▬ ▬') + (_isDong ? ' ○' : '') + '</div>';
+      }
+      html += '<div style="font-size:11px;opacity:.6;margin-top:6px">动爻：第' + (_dongIdx+1) + '爻</div>';
+      html += '</div>';
+      // 箭头
+      html += '<div style="display:flex;align-items:center;color:var(--gold);font-size:20px">→</div>';
+      // 变卦
+      html += '<div style="text-align:center">';
+      html += '<div style="font-size:13px;color:var(--gold2);margin-bottom:8px;font-weight:600">变卦 ' + bian + '</div>';
+      for (var mi2 = 5; mi2 >= 0; mi2--) {
+        var _bIsYang = _bianLines[mi2] && _bianLines[mi2].line === '阳';
+        var _bWasDong = (mi2 === _dongIdx);
+        html += '<div style="font-size:18px;letter-spacing:2px;padding:2px 0;color:' + (_bWasDong ? '#e74c3c' : 'var(--paper)') + '">' + (_bIsYang ? '▬▬▬' : '▬ ▬') + (_bWasDong ? ' ✕' : '') + '</div>';
+      }
+      html += '<div style="font-size:11px;opacity:.6;margin-top:6px">变第' + (_dongIdx+1) + '爻</div>';
+      html += '</div>';
+      html += '</div></div>';
+      // 体用分析表
+      var _tiIdx = (_dongIdx >= 3) ? gua.benGua.upper : gua.benGua.lower;
+      var _yongIdx = (_dongIdx >= 3) ? gua.benGua.lower : gua.benGua.upper;
+      var _tiWx = _GUA_XIANG[_tiIdx] ? _GUA_XIANG[_tiIdx].wuxing : '';
+      var _yongWx = _GUA_XIANG[_yongIdx] ? _GUA_XIANG[_yongIdx].wuxing : '';
+      var _huTi = (_dongIdx >= 3) ? gua.huGua.upper : gua.huGua.lower;
+      var _huYong = (_dongIdx >= 3) ? gua.huGua.lower : gua.huGua.upper;
+      var _huTiWx = _GUA_XIANG[_huTi] ? _GUA_XIANG[_huTi].wuxing : _tiWx;
+      var _huYongWx = _GUA_XIANG[_huYong] ? _GUA_XIANG[_huYong].wuxing : _yongWx;
+      var _bianYongIdx = (_dongIdx >= 3) ? gua.bianGua.lower : gua.bianGua.upper;
+      var _bianYongWx = _GUA_XIANG[_bianYongIdx] ? _GUA_XIANG[_bianYongIdx].wuxing : _yongWx;
+      html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">📊 体用分析表</div>';
+      html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
+      html += '<tr style="background:rgba(201,168,76,0.08);color:var(--gold2)"><th style="padding:5px 8px">类别</th><th>卦名</th><th>五行</th><th>与体卦关系</th><th>吉凶</th></tr>';
+      // 体卦
+      var _tiRel = '本身';
+      var _tiLuck = '—';
+      html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.03)"><td style="padding:5px 8px;text-align:center;color:var(--gold2)">体卦</td><td style="text-align:center">' + analyze.tiGua + '</td><td style="text-align:center">' + _tiWx + '</td><td style="text-align:center">' + _tiRel + '</td><td style="text-align:center">' + _tiLuck + '</td></tr>';
+      // 用卦
+      var _yongRel = analyze.relation;
+      var _yongLuck = (_yongRel === '生我' || _yongRel === '比和') ? '吉' : (_yongRel === '克我' ? '凶' : '耗');
+      html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.03)"><td style="padding:5px 8px;text-align:center;color:var(--gold2)">用卦</td><td style="text-align:center">' + analyze.yongGua + '</td><td style="text-align:center">' + _yongWx + '</td><td style="text-align:center">' + _yongRel + '</td><td style="text-align:center;color:' + (_yongLuck === '吉' ? 'var(--jade2)' : _yongLuck === '凶' ? '#e74c3c' : 'var(--orange)') + '">' + _yongLuck + '</td></tr>';
+      // 互卦
+      if (gua.huGua) {
+        var _huRel = _wuxingRelation(_tiWx, _huYongWx);
+        var _huLuck = (_huRel === '生我' || _huRel === '比和') ? '吉' : (_huRel === '克我' ? '凶' : '耗');
+        var _huName = (_GUA_XIANG[gua.huGua.lower] ? _GUA_XIANG[gua.huGua.lower].name : '?') + (_GUA_XIANG[gua.huGua.upper] ? _GUA_XIANG[gua.huGua.upper].name : '?');
+        html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.03)"><td style="padding:5px 8px;text-align:center;color:var(--gold2)">互卦</td><td style="text-align:center">' + _huName + '</td><td style="text-align:center">' + _huYongWx + '</td><td style="text-align:center">' + _huRel + '</td><td style="text-align:center;color:' + (_huLuck === '吉' ? 'var(--jade2)' : _huLuck === '凶' ? '#e74c3c' : 'var(--orange)') + '">' + _huLuck + '</td></tr>';
+      }
+      // 变卦
+      var _bianRel = analyze.endRelation;
+      var _bianLuck = (_bianRel === '生我' || _bianRel === '比和') ? '吉' : (_bianRel === '克我' ? '凶' : '耗');
+      html += '<tr><td style="padding:5px 8px;text-align:center;color:var(--gold2)">变卦</td><td style="text-align:center">' + bian + '</td><td style="text-align:center">' + _bianYongWx + '</td><td style="text-align:center">' + _bianRel + '</td><td style="text-align:center;color:' + (_bianLuck === '吉' ? 'var(--jade2)' : _bianLuck === '凶' ? '#e74c3c' : 'var(--orange)') + '">' + _bianLuck + '</td></tr>';
+      html += '</table></div></div>';
+      // 断卦逻辑链
+      html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🔗 断卦逻辑链</div>';
+      html += '<div style="padding:12px 16px;font-size:12px;line-height:2.2">';
+      html += '<div style="padding:6px 10px;background:rgba(46,204,113,0.04);border-radius:8px;margin-bottom:6px"><span style="color:var(--jade2);font-weight:600">① 体用生克：</span>' + analyze.relation + ' — ' + analyze.initial + '</div>';
+      if (analyze.huAnalysis) {
+        html += '<div style="padding:6px 10px;background:rgba(201,168,76,0.04);border-radius:8px;margin-bottom:6px"><span style="color:var(--gold2);font-weight:600">② 互卦影响：</span>' + analyze.huAnalysis + '</div>';
+      }
+      html += '<div style="padding:6px 10px;background:rgba(142,68,173,0.04);border-radius:8px;margin-bottom:6px"><span style="color:var(--violet2);font-weight:600">③ 变卦结果：</span>' + analyze.endRelation + ' — ' + (analyze.endResult || '') + '</div>';
+      html += '<div style="padding:6px 10px;background:rgba(231,76,60,0.04);border-radius:8px"><span style="color:#e74c3c;font-weight:600">④ 综合判断：</span><span style="color:var(--gold);font-weight:600">' + analyze.verdict + '</span> — ' + analyze.advice + '</div>';
+      html += '</div></div>';
+    } catch(_mpe) { console.warn('梅花排盘渲染错误:', _mpe); }
     // === 化解方案与开运建议 ===
     try {
       var _cureHtml = getMeihuaResolution(gua, analyze);
@@ -32152,6 +32320,112 @@ function runQimenEngine() {
     if (analyze.huajie) html += '<p style="opacity:0.7"><b>化解建议：</b>' + analyze.huajie + '</p>';
     if (analyze.mascot) html += '<p style="opacity:0.7"><b>吉祥物：</b>' + analyze.mascot + '</p>';
     html += '<p style="opacity:0.8">' + analyze.advice + '</p>';
+
+    // === 九宫格可视化盘面 ===
+    html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+    html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🔮 九宫遁甲盘面</div>';
+    html += '<div style="padding:12px;display:flex;justify-content:center">';
+    html += '<div style="display:grid;grid-template-columns:repeat(3,86px);gap:2px;background:var(--border);padding:2px;border-radius:8px">';
+    var _qmGongOrder = [4,9,2,3,5,7,8,1,6];
+    var _qmGongNames = ['','坎','坤','震','巽','中','乾','兑','艮','离'];
+    var _qmFullMen = {'休':'休门','生':'生门','伤':'伤门','杜':'杜门','景':'景门','死':'死门','惊':'惊门','开':'开门'};
+    var _qmFullStars = {'蓬':'天蓬','任':'天任','冲':'天冲','辅':'天辅','英':'天英','芮':'天芮','柱':'天柱','心':'天心','禽':'天禽'};
+    for (var _qi = 0; _qi < 9; _qi++) {
+      var _gp = _qmGongOrder[_qi];
+      var _gName = _qmGongNames[_gp] || '';
+      var _diQi = pan.dipan[_gp] || '—';
+      var _tiQi = pan.tianpan[_gp] || '—';
+      var _men = pan.men[_gp] || '';
+      var _star = pan.stars[_gp] || '';
+      var _shen = pan.shen[_gp] || '';
+      var _isZhong = (_gp === 5);
+      var _bg = _isZhong ? 'rgba(138,92,246,0.06)' : 'var(--card)';
+      var _tags = [];
+      if (analyze.kongWangGongs && analyze.kongWangGongs.indexOf(_gp) >= 0) _tags.push('空');
+      if (analyze.maXing === _gp) _tags.push('马');
+      html += '<div style="background:' + _bg + ';padding:6px;text-align:center;font-size:10px;min-height:80px;display:flex;flex-direction:column;justify-content:center">';
+      html += '<div style="color:var(--gold);font-weight:600;font-size:11px">' + _gName + '(' + _gp + ')</div>';
+      html += '<div style="margin:2px 0">天:<b style="color:var(--fire2)">' + _tiQi + '</b></div>';
+      html += '<div style="margin:1px 0">地:<b style="color:var(--gold)">' + _diQi + '</b></div>';
+      if (_men) html += '<div style="color:var(--jade2);font-size:10px">' + (_qmFullMen[_men] || _men) + '</div>';
+      if (_star) html += '<div style="color:var(--violet);font-size:10px">' + (_qmFullStars[_star] || _star) + '</div>';
+      if (_shen) html += '<div style="opacity:.7;font-size:10px">' + _shen + '</div>';
+      if (_tags.length > 0) html += '<div style="color:var(--fire);font-size:9px;font-weight:700">' + _tags.join(' ') + '</div>';
+      html += '</div>';
+    }
+    html += '</div></div>';
+    // 盘面图例
+    html += '<div style="padding:6px 12px;font-size:10px;opacity:.6;text-align:center">后天八卦排列 · 天=天盘干 · 地=地盘干 · 空=空亡 · 马=马星</div>';
+    html += '</div>';
+
+    // === 用神分析详情 ===
+    html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+    html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🎯 用神分析</div>';
+    html += '<div style="padding:12px;font-size:13px;line-height:1.8">';
+    html += '<div style="margin-bottom:6px"><b style="color:var(--gold)">用神：</b>' + analyze.yongShen + ' · 落<b style="color:var(--fire2)">' + analyze.palace + '</b>宫</div>';
+    html += '<div style="margin-bottom:6px"><b style="color:var(--gold)">天盘干：</b>' + analyze.qi + ' · <b style="color:var(--gold)">门：</b>' + (_qmFullMen[analyze.men] || analyze.men) + ' · <b style="color:var(--gold)">星：</b>' + (_qmFullStars[analyze.star] || analyze.star) + ' · <b style="color:var(--gold)">神：</b>' + analyze.shen + '</div>';
+    html += '<div style="margin-bottom:6px"><b style="color:var(--gold)">吉凶判定：</b><span style="color:' + (analyze.luck==='吉'?'var(--jade2)':analyze.luck==='凶'?'var(--fire)':'var(--orange)') + ';font-weight:700">' + analyze.luck + '</span>';
+    if (analyze.wuBuYu) html += ' <span style="color:var(--fire)">⚠️ 五不遇时</span>';
+    if (analyze.isMaXing) html += ' <span style="color:var(--jade2)">🐎 马星临宫</span>';
+    if (analyze.kongwang) html += ' <span style="color:var(--fire)">⬚ 落空亡</span>';
+    html += '</div>';
+    if (analyze.dayGanPalace) {
+      html += '<div style="margin-bottom:6px;padding:6px 8px;border-left:2px solid var(--gold);background:rgba(201,168,76,0.03)"><b>命主(日干)：</b>落' + analyze.dayGanPalace + '宫' + (analyze.dayGanQi ? ' · 天盘' + analyze.dayGanQi : '') + '</div>';
+    }
+    if (analyze.hourGanPalace) {
+      html += '<div style="margin-bottom:6px;padding:6px 8px;border-left:2px solid var(--violet);background:rgba(138,92,246,0.03)"><b>事体(时干)：</b>落' + analyze.hourGanPalace + '宫' + (analyze.hourGanQi ? ' · 天盘' + analyze.hourGanQi : '') + '</div>';
+    }
+    html += '</div></div>';
+
+    // === 天盘地盘对照表 ===
+    html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+    html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">📋 天盘地盘对照</div>';
+    html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
+    html += '<tr style="background:rgba(201,168,76,0.08)"><th style="padding:5px 6px;border:1px solid var(--border);text-align:left">宫位</th><th style="padding:5px 6px;border:1px solid var(--border);text-align:left">地盘</th><th style="padding:5px 6px;border:1px solid var(--border);text-align:left">天盘</th><th style="padding:5px 6px;border:1px solid var(--border);text-align:left">八门</th><th style="padding:5px 6px;border:1px solid var(--border);text-align:left">九星</th><th style="padding:5px 6px;border:1px solid var(--border);text-align:left">八神</th><th style="padding:5px 6px;border:1px solid var(--border);text-align:left">备注</th></tr>';
+    var _qmGongDisplay = [1,2,3,4,6,7,8,9];
+    for (var _gdi = 0; _gdi < _qmGongDisplay.length; _gdi++) {
+      var _dp = _qmGongDisplay[_gdi];
+      var _dn = _qmGongNames[_dp] || '';
+      var _ddi = pan.dipan[_dp] || '—';
+      var _dti = pan.tianpan[_dp] || '—';
+      var _dmen = pan.men[_dp] || '—';
+      var _dstar = pan.stars[_dp] || '—';
+      var _dshen = pan.shen[_dp] || '—';
+      var _dnote = '';
+      if (analyze.kongWangGongs && analyze.kongWangGongs.indexOf(_dp) >= 0) _dnote += '空亡 ';
+      if (analyze.maXing === _dp) _dnote += '马星 ';
+      if (_dp === analyze.palace) _dnote += '★用神';
+      html += '<tr><td style="padding:4px 6px;border:1px solid var(--border);font-weight:600">' + _dn + '(' + _dp + ')</td>';
+      html += '<td style="padding:4px 6px;border:1px solid var(--border);color:var(--gold)">' + _ddi + '</td>';
+      html += '<td style="padding:4px 6px;border:1px solid var(--border);color:var(--fire2)">' + _dti + '</td>';
+      html += '<td style="padding:4px 6px;border:1px solid var(--border);color:var(--jade2)">' + (_qmFullMen[_dmen] || _dmen) + '</td>';
+      html += '<td style="padding:4px 6px;border:1px solid var(--border);color:var(--violet)">' + (_qmFullStars[_dstar] || _dstar) + '</td>';
+      html += '<td style="padding:4px 6px;border:1px solid var(--border);opacity:.8">' + _dshen + '</td>';
+      html += '<td style="padding:4px 6px;border:1px solid var(--border);font-size:11px;color:var(--fire)">' + (_dnote || '—') + '</td></tr>';
+    }
+    html += '</table></div></div>';
+
+    // === 格局判断详情 ===
+    if (analyze.geju && analyze.geju.length > 0) {
+      html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">⚖️ 格局判断</div>';
+      html += '<div style="padding:12px;font-size:12px;line-height:1.8">';
+      var _jiGeju = ['青龙返首','飞鸟跌穴','玉女守门','真诈格','假诈格','重诈格','天假格','地假格','人假格','神假格','鬼假格'];
+      var _xiongGeju = ['太白入荧','荧入太白','青龙折足','腾蛇夭矫','朱雀投江','五不遇时','伏吟'];
+      for (var _ggi = 0; _ggi < analyze.geju.length; _ggi++) {
+        var _gItem = analyze.geju[_ggi];
+        var _isJi = false, _isXiong = false;
+        for (var _jgi = 0; _jgi < _jiGeju.length; _jgi++) { if (_gItem.indexOf(_jiGeju[_jgi]) >= 0) { _isJi = true; break; } }
+        for (var _xgi = 0; _xgi < _xiongGeju.length; _xgi++) { if (_gItem.indexOf(_xiongGeju[_xgi]) >= 0) { _isXiong = true; break; } }
+        var _gColor = _isJi ? 'var(--jade2)' : _isXiong ? 'var(--fire)' : 'var(--gold)';
+        var _gIcon = _isJi ? '✅' : _isXiong ? '❌' : '⚖️';
+        html += '<div style="margin-bottom:4px;padding:4px 8px;border-left:2px solid ' + _gColor + ';background:rgba(201,168,76,0.03)">';
+        html += _gIcon + ' <span style="color:' + _gColor + ';font-weight:600">' + _gItem + '</span>';
+        html += '</div>';
+      }
+      html += '</div></div>';
+    }
+
     // 化解方案
     try {
       var _cureHtml = getQimenResolution(pan, analyze);
@@ -32264,10 +32538,125 @@ function runLiurenEngine() {
     let html = '<h4 style="color:var(--orange)">⬡ 六壬引擎演算结果</h4>';
     html += '<p><b>日干支：</b>' + pan.dayGan + pan.dayZhi + ' · 占时：' + pan.shiZhi + '</p>';
     html += '<p><b>月将：</b>' + pan.yueJiang + '</p>';
-    html += '<p><b>三传：</b>' + pan.sanChuan.join(' → ') + '</p>';
+    html += '<p><b>三传：</b>' + pan.sanChuan.chu + ' → ' + pan.sanChuan.zhong + ' → ' + pan.sanChuan.mo + '</p>';
+    html += '<p><b>取法：</b>' + (pan.sanChuan.method || '贼克法') + '</p>';
     html += '<p><b>三传神将：</b>' + analyze.chuanShen.join(' → ') + '</p>';
     html += '<p><b>吉凶：</b>' + analyze.luck + '</p>';
     html += '<p style="opacity:0.8">' + analyze.advice + '</p>';
+    // === 大六壬四课三传排盘 ===
+    try {
+      // 四课表
+      html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">⬡ 四课</div>';
+      html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
+      html += '<tr style="background:rgba(201,168,76,0.08);color:var(--gold2)"><th style="padding:5px 8px">课序</th><th>上神</th><th>下神</th><th>天将</th><th>说明</th></tr>';
+      var _keLabels = ['第一课', '第二课', '第三课', '第四课'];
+      for (var ki = 0; ki < pan.siKe.length; ki++) {
+        var _ke = pan.siKe[ki];
+        var _keJiang = pan.tianJiang[_ke.shang] || '—';
+        html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.03)">';
+        html += '<td style="padding:5px 8px;text-align:center;color:var(--gold2)">' + _keLabels[ki] + '</td>';
+        html += '<td style="text-align:center;font-weight:600;color:var(--gold2)">' + _ke.shang + '</td>';
+        html += '<td style="text-align:center">' + _ke.xia + '</td>';
+        html += '<td style="text-align:center">' + _keJiang + '</td>';
+        html += '<td style="text-align:center;font-size:11px;opacity:.7">' + _ke.label + '</td>';
+        html += '</tr>';
+      }
+      html += '</table></div>';
+      // 日干寄宫信息
+      var _ganGongMap = {'甲':'寅','乙':'辰','丙':'巳','丁':'未','戊':'巳','己':'未','庚':'申','辛':'戌','壬':'亥','癸':'丑'};
+      var _dgGong = _ganGongMap[pan.dayGan] || '寅';
+      html += '<div style="padding:8px 16px;font-size:11px;opacity:.7;border-top:1px solid var(--border)">日干' + pan.dayGan + '寄宫于' + _dgGong + ' | 日支' + pan.dayZhi + '</div>';
+      html += '</div>';
+      // 三传详情表
+      var _chuan = pan.sanChuan;
+      var _chuanNames = ['初传', '中传', '末传'];
+      var _chuanZhi = [_chuan.chu, _chuan.zhong, _chuan.mo];
+      var _zhiWxMap = {'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+      html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">⬡ 三传详情 — ' + (_chuan.method || '贼克法') + '</div>';
+      html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
+      html += '<tr style="background:rgba(201,168,76,0.08);color:var(--gold2)"><th style="padding:5px 8px">传序</th><th>天盘</th><th>地盘</th><th>神将</th><th>五行</th><th>六亲</th></tr>';
+      for (var ci = 0; ci < 3; ci++) {
+        var _cz = _chuanZhi[ci];
+        var _cJiang = pan.tianJiang[_cz] || '—';
+        var _cWx = _zhiWxMap[_cz] || '—';
+        // 六亲: 以日干为主与初传论六亲
+        var _ganWx = {'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
+        var _gWx = _ganWx[pan.dayGan] || '木';
+        var _cLq = '—';
+        if (_gWx === _cWx) _cLq = '比肩';
+        else if ((_gWx === '金' && _cWx === '水') || (_gWx === '水' && _cWx === '木') || (_gWx === '木' && _cWx === '火') || (_gWx === '火' && _cWx === '土') || (_gWx === '土' && _cWx === '金')) _cLq = '子孙';
+        else if ((_gWx === '金' && _cWx === '木') || (_gWx === '水' && _cWx === '火') || (_gWx === '木' && _cWx === '土') || (_gWx === '火' && _cWx === '金') || (_gWx === '土' && _cWx === '水')) _cLq = '妻财';
+        else if ((_gWx === '金' && _cWx === '火') || (_gWx === '水' && _cWx === '土') || (_gWx === '木' && _cWx === '金') || (_gWx === '火' && _cWx === '水') || (_gWx === '土' && _cWx === '木')) _cLq = '官鬼';
+        else if ((_gWx === '金' && _cWx === '土') || (_gWx === '水' && _cWx === '金') || (_gWx === '木' && _cWx === '水') || (_gWx === '火' && _cWx === '木') || (_gWx === '土' && _cWx === '火')) _cLq = '父母';
+        // 地盘 = 天盘所临地盘
+        var _dpan = _cz; // 简化: 天盘支即在地盘上
+        html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.03)">';
+        html += '<td style="padding:5px 8px;text-align:center;color:var(--gold2);font-weight:600">' + _chuanNames[ci] + '</td>';
+        html += '<td style="text-align:center;font-weight:600;color:var(--gold2)">' + _cz + '</td>';
+        html += '<td style="text-align:center">' + _dpan + '</td>';
+        html += '<td style="text-align:center">' + _cJiang + '</td>';
+        html += '<td style="text-align:center">' + _cWx + '</td>';
+        html += '<td style="text-align:center">' + _cLq + '</td>';
+        html += '</tr>';
+      }
+      html += '</table></div>';
+      // 课体格局
+      if (analyze.keti) {
+        html += '<div style="padding:8px 16px;font-size:11px;opacity:.7;border-top:1px solid var(--border)">课体格局：' + analyze.keti + '</div>';
+      }
+      html += '</div>';
+      // 天盘地盘对照表
+      html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">⬡ 天盘 ↔ 地盘对照</div>';
+      html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">';
+      html += '<tr style="background:rgba(201,168,76,0.08);color:var(--gold2)"><th style="padding:4px 6px">地盘</th><th>天盘</th><th>天将</th><th>地盘</th><th>天盘</th><th>天将</th><th>地盘</th><th>天盘</th><th>天将</th><th>地盘</th><th>天盘</th><th>天将</th></tr>';
+      var _brArr = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+      for (var bi = 0; bi < 3; bi++) {
+        html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.03)">';
+        for (var bj = 0; bj < 4; bj++) {
+          var _bIdx = bi * 4 + bj;
+          var _bZhi = _brArr[_bIdx];
+          var _tZhi = pan.tianPan[_bZhi] || _bZhi;
+          var _tJiang = pan.tianJiang[_tZhi] || '—';
+          html += '<td style="padding:4px 6px;text-align:center;color:var(--gold2)">' + _bZhi + '</td>';
+          html += '<td style="text-align:center;font-weight:600">' + _tZhi + '</td>';
+          html += '<td style="text-align:center;font-size:10px;opacity:.8">' + _tJiang + '</td>';
+        }
+        html += '</tr>';
+      }
+      html += '</table></div>';
+      // 月将与时辰信息
+      html += '<div style="padding:8px 16px;font-size:11px;opacity:.7;border-top:1px solid var(--border)">月将：' + pan.yueJiang + ' | 占时：' + pan.shiZhi + ' | 日干支：' + pan.dayGan + pan.dayZhi + '</div>';
+      html += '</div>';
+      // 课体格局详解
+      if (analyze.keti) {
+        var _ketiParts = analyze.keti.split('、');
+        html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+        html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">📋 课体格局判断</div>';
+        html += '<div style="padding:12px 16px;font-size:12px;line-height:2">';
+        var _ketiDescMap = {
+          '重审课': '重审课——上克下，事多反复，宜再审而后行',
+          '审理课': '审理课——下克上，事有冤抑，宜昭雪',
+          '比用课': '比用课——同类相比，事因朋友而起',
+          '涉害课': '涉害课——历经艰难，事多波折',
+          '遁克课': '遁克课——暗中有克，事有隐忧',
+          '昴星课': '昴星课——无贼无克，取昴星为用，事出意外',
+          '别责课': '别责课——别取合神为用，事须借力',
+          '八专课': '八专课——干支同位，事由内起',
+          '伏吟课': '伏吟课——天地伏匿，事当静守',
+          '返吟课': '返吟课——天地反复，事多动荡',
+          '三传三合': '三传三合局，力量凝聚，事可成就'
+        };
+        for (var _ki = 0; _ki < _ketiParts.length; _ki++) {
+          var _kName = _ketiParts[_ki].trim();
+          var _kDesc = _ketiDescMap[_kName] || _kName;
+          html += '<div style="padding:4px 0"><span style="color:var(--gold2);font-weight:600">' + _kName + '</span>：' + _kDesc + '</div>';
+        }
+        html += '</div></div>';
+      }
+    } catch(_lpe) { console.warn('六壬排盘渲染错误:', _lpe); }
     // === 化解方案与开运建议 ===
     try {
       var _cureHtml = getLiurenResolution(pan, analyze);
@@ -32355,6 +32744,167 @@ function runZiweiEngine() {
     html += '<p><b>四化：</b>' + analyze.sihuaText + '</p>';
     html += '<p><b>概述：</b>' + analyze.overview + '</p>';
     html += '<p style="opacity:0.8">' + analyze.advice + '</p>';
+
+    // === 十二宫星曜分布表 ===
+    html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+    html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🌃 十二宫星曜分布</div>';
+    html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
+    html += '<tr style="background:rgba(201,168,76,0.08)"><th style="padding:6px;border:1px solid var(--border);text-align:left">宫位</th><th style="padding:6px;border:1px solid var(--border);text-align:left">宫支</th><th style="padding:6px;border:1px solid var(--border);text-align:left">主星</th><th style="padding:6px;border:1px solid var(--border);text-align:left">辅星</th><th style="padding:6px;border:1px solid var(--border);text-align:left">煞星</th><th style="padding:6px;border:1px solid var(--border);text-align:left">庙旺</th></tr>';
+    var _zwMainStars = ['紫微','天机','太阳','武曲','天同','廉贞','天府','太阴','贪狼','巨门','天相','天梁','七杀','破军'];
+    var _zwAuxStars = ['左辅','右弼','文昌','文曲','天魁','天钺','解神','天刑','红鸾','天喜'];
+    var _zwShaStars = ['擎羊','陀罗','火星','铃星','地空','地劫','天马'];
+    var _zwStrengthTable = {
+      '紫微': [2,2,3,2,1,1,2,2,3,2,1,1], '天机': [1,1,2,3,2,1,1,1,2,3,2,1],
+      '太阳': [0,1,1,2,3,3,2,1,1,2,3,3], '武曲': [2,1,1,1,2,3,2,1,1,1,2,3],
+      '天同': [3,2,1,1,1,2,3,2,1,1,1,2], '廉贞': [1,1,1,2,3,2,1,1,1,2,3,2],
+      '天府': [3,3,2,1,1,1,2,3,3,2,1,1], '太阴': [3,2,1,1,1,0,1,2,3,2,1,1],
+      '贪狼': [1,2,3,2,1,1,1,2,3,2,1,1], '巨门': [1,1,1,2,3,2,1,1,1,2,3,2],
+      '天相': [2,3,2,1,1,1,2,3,2,1,1,1], '天梁': [1,1,2,3,2,1,1,1,2,3,2,1],
+      '七杀': [2,1,1,1,2,3,2,1,1,1,2,3], '破军': [1,1,1,2,3,2,1,1,1,2,3,2]
+    };
+    var _zwStrengthLabels = ['庙','旺','平','陷'];
+    for (var _gi = 0; _gi < 12; _gi++) {
+      var _gName = _ZW_GONGS[_gi];
+      var _gPos = pan.gongMap[_gName];
+      var _gZhi = _BRANCHES[_gPos];
+      var _gStars = pan.stars[_gPos] || [];
+      var _gMain = _gStars.filter(function(s){ return _zwMainStars.indexOf(s) >= 0; });
+      var _gAux = _gStars.filter(function(s){ return _zwAuxStars.indexOf(s) >= 0; });
+      var _gSha = _gStars.filter(function(s){ return _zwShaStars.indexOf(s) >= 0; });
+      var _gStr = _gMain.map(function(s){
+        var _tbl = _zwStrengthTable[s];
+        if (!_tbl) return s;
+        var _v = _tbl[_gPos] || 1;
+        return s + '(' + _zwStrengthLabels[3 - _v] + ')';
+      }).join('、') || '—';
+      var _isMing = (_gName === '命宫');
+      html += '<tr' + (_isMing ? ' style="background:rgba(231,76,60,0.06)"' : '') + '>';
+      html += '<td style="padding:5px 6px;border:1px solid var(--border);font-weight:' + (_isMing ? '700' : '400') + '">' + _gName + '</td>';
+      html += '<td style="padding:5px 6px;border:1px solid var(--border)">' + _gZhi + '</td>';
+      html += '<td style="padding:5px 6px;border:1px solid var(--border);color:var(--fire2)">' + (_gMain.join('、') || '—') + '</td>';
+      html += '<td style="padding:5px 6px;border:1px solid var(--border);color:var(--gold)">' + (_gAux.join('、') || '—') + '</td>';
+      html += '<td style="padding:5px 6px;border:1px solid var(--border);color:var(--fire)">' + (_gSha.join('、') || '—') + '</td>';
+      html += '<td style="padding:5px 6px;border:1px solid var(--border);font-size:11px">' + _gStr + '</td>';
+      html += '</tr>';
+    }
+    html += '</table></div></div>';
+
+    // === 四化落宫详情 ===
+    html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+    html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">✨ 四化落宫详情</div>';
+    html += '<div style="padding:12px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-size:13px">';
+    var _sihuaNames = [['lu','化禄','禄'],['quan','化权','权'],['ke','化科','科'],['ji','化忌','忌']];
+    var _sihuaColors = { '禄':'var(--jade2)', '权':'var(--fire2)', '科':'var(--gold)', '忌':'var(--fire)' };
+    for (var _si = 0; _si < 4; _si++) {
+      var _sh = _sihuaNames[_si];
+      var _starName = pan.sihua[_sh[0]];
+      var _gongP = -1;
+      for (var _pi = 0; _pi < 12; _pi++) {
+        if ((pan.stars[_pi] || []).indexOf(_starName) >= 0) { _gongP = _pi; break; }
+      }
+      var _gongLabel = _gongP >= 0 ? _getGongName(_gongP, pan.gongMap) + '(' + _BRANCHES[_gongP] + ')' : '未定位';
+      html += '<div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:rgba(201,168,76,0.03)">';
+      html += '<span style="color:' + _sihuaColors[_sh[2]] + ';font-weight:700">' + _sh[1] + '</span> ';
+      html += '<span style="color:var(--gold)">' + _starName + '</span> ';
+      html += '<span style="opacity:.7">→</span> ';
+      html += '<span style="font-weight:600">' + _gongLabel + '</span>';
+      html += '</div>';
+    }
+    html += '</div></div>';
+
+    // === 三方四正分析 ===
+    var _mingPos = pan.gongMap['命宫'];
+    var _opp = {0:6,1:7,2:8,3:9,4:10,5:11,6:0,7:1,8:2,9:3,10:4,11:5};
+    var _qianPos = (_mingPos + 4) % 12;
+    var _guanPos = (_mingPos + 5) % 12;
+    var _migPos = _opp[_mingPos];
+    html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+    html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">📐 三方四正分析</div>';
+    html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
+    html += '<tr style="background:rgba(201,168,76,0.08)"><th style="padding:6px;border:1px solid var(--border);text-align:left">宫位</th><th style="padding:6px;border:1px solid var(--border);text-align:left">宫支</th><th style="padding:6px;border:1px solid var(--border);text-align:left">星曜</th><th style="padding:6px;border:1px solid var(--border);text-align:left">关系</th></tr>';
+    var _sfpData = [
+      ['命宫', _mingPos, _BRANCHES[_mingPos], pan.stars[_mingPos] || [], '本宫'],
+      ['迁移', _migPos, _BRANCHES[_migPos], pan.stars[_migPos] || [], '对宫'],
+      ['财帛', _qianPos, _BRANCHES[_qianPos], pan.stars[_qianPos] || [], '三合'],
+      ['官禄', _guanPos, _BRANCHES[_guanPos], pan.stars[_guanPos] || [], '三合']
+    ];
+    for (var _si2 = 0; _si2 < _sfpData.length; _si2++) {
+      var _d = _sfpData[_si2];
+      html += '<tr><td style="padding:5px 6px;border:1px solid var(--border);font-weight:600">' + _d[0] + '</td>';
+      html += '<td style="padding:5px 6px;border:1px solid var(--border)">' + _d[2] + '</td>';
+      html += '<td style="padding:5px 6px;border:1px solid var(--border);color:var(--gold)">' + (_d[3].join('、') || '无主星') + '</td>';
+      html += '<td style="padding:5px 6px;border:1px solid var(--border);opacity:.7">' + _d[4] + '</td></tr>';
+    }
+    html += '</table></div></div>';
+
+    // === 大运排布表 ===
+    html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+    html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🕐 大运排布</div>';
+    if (analyze.daxian && analyze.daxian.length > 0) {
+      html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
+      html += '<tr style="background:rgba(201,168,76,0.08)"><th style="padding:6px;border:1px solid var(--border);text-align:left">大限</th><th style="padding:6px;border:1px solid var(--border);text-align:left">宫位</th><th style="padding:6px;border:1px solid var(--border);text-align:left">宫支</th><th style="padding:6px;border:1px solid var(--border);text-align:left">年龄</th><th style="padding:6px;border:1px solid var(--border);text-align:left">主星</th><th style="padding:6px;border:1px solid var(--border);text-align:left">四化</th></tr>';
+      for (var _di = 0; _di < analyze.daxian.length; _di++) {
+        var _dy = analyze.daxian[_di];
+        var _dyZhi = _BRANCHES[_dy.pos] || '';
+        var _dyHua = (_dy.sihua && _dy.sihua.length > 0) ? _dy.sihua.join('、') : '—';
+        var _isCurrent = analyze.currentDaxian && analyze.currentDaxian.indexOf(_dy.gong + '(' + _dy.ageRange) >= 0;
+        html += '<tr' + (_isCurrent ? ' style="background:rgba(46,204,113,0.06)"' : '') + '>';
+        html += '<td style="padding:5px 6px;border:1px solid var(--border)">' + (_di + 1) + '</td>';
+        html += '<td style="padding:5px 6px;border:1px solid var(--border);font-weight:' + (_isCurrent ? '700' : '400') + '">' + _dy.gong + (_isCurrent ? ' ★' : '') + '</td>';
+        html += '<td style="padding:5px 6px;border:1px solid var(--border)">' + _dyZhi + '</td>';
+        html += '<td style="padding:5px 6px;border:1px solid var(--border)">' + _dy.ageRange + '</td>';
+        html += '<td style="padding:5px 6px;border:1px solid var(--border);color:var(--gold)">' + _dy.stars + '</td>';
+        html += '<td style="padding:5px 6px;border:1px solid var(--border)">' + _dyHua + '</td>';
+        html += '</tr>';
+      }
+      html += '</table></div>';
+      if (analyze.currentDaxian) {
+        html += '<div style="padding:8px 12px;font-size:12px;color:var(--jade2)">📍 当前大限：' + analyze.currentDaxian + '</div>';
+      }
+    } else {
+      html += '<div style="padding:12px;font-size:12px;opacity:.6">大运数据不可用</div>';
+    }
+    html += '</div>';
+
+    // === 经典格局详情 ===
+    if (analyze.gejuDetail && analyze.gejuDetail.length > 0) {
+      html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">📜 经典格局</div>';
+      html += '<div style="padding:12px;font-size:12px;line-height:1.8">';
+      var _gejuItems = analyze.gejuDetail.split('；');
+      for (var _gei = 0; _gei < _gejuItems.length; _gei++) {
+        if (_gejuItems[_gei].trim()) {
+          html += '<div style="margin-bottom:4px;padding:4px 8px;border-left:2px solid var(--gold);background:rgba(201,168,76,0.03)">' + _gejuItems[_gei] + '</div>';
+        }
+      }
+      html += '</div></div>';
+    }
+
+    // === 庙旺利陷表 ===
+    html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+    html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🌟 命宫星曜庙旺</div>';
+    html += '<div style="padding:12px;font-size:12px">';
+    var _mingStars2 = pan.stars[pan.gongMap['命宫']] || [];
+    var _mainInMing = _mingStars2.filter(function(s){ return _zwMainStars.indexOf(s) >= 0; });
+    if (_mainInMing.length > 0) {
+      html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px">';
+      for (var _msi = 0; _msi < _mainInMing.length; _msi++) {
+        var _ms = _mainInMing[_msi];
+        var _msTbl = _zwStrengthTable[_ms];
+        var _msV = _msTbl ? (_msTbl[pan.gongMap['命宫']] || 1) : 1;
+        var _msLabel = _zwStrengthLabels[3 - _msV];
+        var _msColor = _msV === 3 ? 'var(--jade2)' : _msV === 2 ? 'var(--gold)' : _msV === 1 ? 'var(--orange)' : 'var(--fire)';
+        html += '<div style="padding:6px 8px;border:1px solid var(--border);border-radius:6px;text-align:center">';
+        html += '<div style="font-weight:600">' + _ms + '</div>';
+        html += '<div style="color:' + _msColor + ';font-size:14px;font-weight:700">' + _msLabel + '</div>';
+        html += '</div>';
+      }
+      html += '</div>';
+    } else {
+      html += '<div style="opacity:.6">命宫无主星，需借星安宫。</div>';
+    }
+    html += '</div></div>';
+
     // 化解方案
     try {
       var _cureHtml = getZiweiResolution(pan, analyze);
@@ -32462,7 +33012,115 @@ function runFengshuiEngine() {
     html += '<p><b>玄空：</b>' + res.xuankong + '</p>';
     html += '<p><b>评分：</b>' + res.score + '/100</p>';
     html += '<p><b>建议：</b>' + res.advice + '</p>';
-    html += '<ul style="padding-left:18px;opacity:0.8"><li>' + res.layoutTips.join('</li><li>') + '</li></ul>';
+
+    // === 🌟 九宫飞星图 ===
+    var _fsPeriod = res.period || 9;
+    // 运星入中宫顺飞: 中5→西北6→西7→东北8→南9→北1→西南2→东3→东南4
+    var _feiOrder = [5,6,7,8,9,1,2,3,4];
+    var _gongName = {1:'坎·北',2:'坤·西南',3:'震·东',4:'巽·东南',5:'中宫',6:'乾·西北',7:'兑·西',8:'艮·东北',9:'离·南'};
+    var _starName = {1:'一白',2:'二黑',3:'三碧',4:'四绿',5:'五黄',6:'六白',7:'七赤',8:'八白',9:'九紫'};
+    var _starNature = {1:'水·吉',2:'土·凶',3:'木·凶',4:'木·吉',5:'土·大凶',6:'金·吉',7:'金·凶',8:'土·吉',9:'火·吉'};
+    var _starColor = {1:'#2980b9',2:'#e74c3c',3:'#27ae60',4:'#27ae60',5:'#e74c3c',6:'#95a5a6',7:'#e74c3c',8:'#e67e22',9:'#e74c3c'};
+    html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+    html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🌟 九宫飞星图（' + _fsPeriod + '运）</div>';
+    html += '<div style="padding:12px;display:flex;justify-content:center">';
+    html += '<div style="display:grid;grid-template-columns:repeat(3,100px);gap:2px;background:var(--border);padding:2px;border-radius:8px">';
+    // 显示顺序: 东南4→南9→西南2 / 东3→中5→西7 / 东北8→北1→西北6
+    var _displayOrder = [4,9,2,3,5,7,8,1,6];
+    for (var fi = 0; fi < 9; fi++) {
+      var _gongNum = _displayOrder[fi];
+      var _star = ((_fsPeriod - 1 + _feiOrder.indexOf(_gongNum)) % 9) + 1;
+      var _isWang = (_star === _fsPeriod);
+      var _bg = _isWang ? 'rgba(201,168,76,0.12)' : 'var(--card)';
+      html += '<div style="background:' + _bg + ';padding:8px 6px;text-align:center;min-height:68px;display:flex;flex-direction:column;justify-content:center">';
+      html += '<div style="font-size:16px;font-weight:700;color:' + (_isWang ? 'var(--gold)' : _starColor[_star]) + '">' + _star + '</div>';
+      html += '<div style="font-size:10px;opacity:.5;margin-top:2px">' + _starName[_star] + '</div>';
+      html += '<div style="font-size:9px;opacity:.4">' + _starNature[_star] + '</div>';
+      html += '<div style="font-size:9px;color:var(--gold);opacity:.6;margin-top:2px">' + _gongName[_gongNum] + '</div>';
+      if (_isWang) html += '<div style="font-size:8px;color:var(--gold);font-weight:600">★当旺</div>';
+      html += '</div>';
+    }
+    html += '</div></div>';
+    html += '<div style="padding:6px 16px 12px;font-size:11px;opacity:.5;text-align:center">运星' + _starName[_fsPeriod] + '入中宫顺飞九宫 · 金色标为当旺之星</div>';
+    html += '</div>';
+
+    // === 🏠 八宅吉凶分布 ===
+    var _bazhai = res.bazhai || {};
+    var _jixiongMap = {'生气':'大吉','天医':'中吉','延年':'上吉','伏位':'小吉','绝命':'大凶','五鬼':'大凶','六煞':'中凶','祸害':'小凶'};
+    var _bazhaiDesc = {
+      '生气':'财运大旺，生机勃勃','天医':'健康贵人，祛病延年','延年':'人缘和谐，延年益寿','伏位':'平稳安泰，守成为宜',
+      '绝命':'破财损丁，凡事不顺','五鬼':'官非火灾，五鬼闹宅','六煞':'桃花口舌，财运反复','祸害':'疾病口舌，诸事波折'
+    };
+    html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+    html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🏠 八宅吉凶分布</div>';
+    html += '<div style="padding:12px"><table style="width:100%;border-collapse:collapse;font-size:12px">';
+    html += '<tr style="background:rgba(201,168,76,0.08)"><th style="padding:6px;text-align:left">方位</th><th style="padding:6px;text-align:left">八宅</th><th style="padding:6px;text-align:left">吉凶</th><th style="padding:6px;text-align:left">说明</th></tr>';
+    var _dirOrder = ['北','东北','东','东南','南','西南','西','西北'];
+    for (var di = 0; di < _dirOrder.length; di++) {
+      var _dir = _dirOrder[di];
+      var _pos = _bazhai[_dir];
+      if (!_pos) continue;
+      var _luck = _jixiongMap[_pos] || '平';
+      var _desc = _bazhaiDesc[_pos] || '';
+      var _luckColor = _luck.includes('吉') ? '#27ae60' : (_luck.includes('凶') ? '#e74c3c' : 'var(--text-light)');
+      html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.04)">';
+      html += '<td style="padding:6px">' + _dir + '</td>';
+      html += '<td style="padding:6px;color:var(--gold);font-weight:600">' + _pos + '</td>';
+      html += '<td style="padding:6px;color:' + _luckColor + ';font-weight:600">' + _luck + '</td>';
+      html += '<td style="padding:6px;opacity:.7">' + _desc + '</td>';
+      html += '</tr>';
+    }
+    html += '</table></div></div>';
+
+    // === 📊 宅命分析表 ===
+    html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+    html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">📊 宅命分析</div>';
+    html += '<div style="padding:12px"><table style="width:100%;border-collapse:collapse;font-size:12px">';
+    html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.04)"><td style="padding:6px;width:30%;opacity:.6">宅卦</td><td style="padding:6px">' + res.zhaiMing + '（' + res.direction + '向）</td></tr>';
+    html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.04)"><td style="padding:6px;opacity:.6">宅主命卦</td><td style="padding:6px">' + (res.yaoMing || '未提供出生年') + (res.mingGuaNum ? '（命卦' + res.mingGuaNum + '）' : '') + '</td></tr>';
+    html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.04)"><td style="padding:6px;opacity:.6">宅命配合</td><td style="padding:6px;color:' + (res.matching ? '#27ae60' : '#e74c3c') + ';font-weight:600">' + (res.matching ? '✓ 相配 — 家宅安宁，事业顺遂' : '✗ 不配 — 易有阻滞，需布局化解') + '</td></tr>';
+    html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.04)"><td style="padding:6px;opacity:.6">元运</td><td style="padding:6px">' + res.period + '运 · ' + (res.wangShan ? '<span style="color:#27ae60">当运</span>' : '<span style="color:#e74c3c">非当运</span>') + '</td></tr>';
+    html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.04)"><td style="padding:6px;opacity:.6">二十四山</td><td style="padding:6px">' + (res.mountains || '-') + '</td></tr>';
+    html += '<tr><td style="padding:6px;opacity:.6">综合评分</td><td style="padding:6px;color:var(--gold);font-weight:700">' + res.score + '/100</td></tr>';
+    html += '</table></div></div>';
+
+    // === 🧭 方位吉凶与布局建议 ===
+    var _areaAdvice = {
+      '大门': '宜开在生气、天医、延年吉方，忌对电梯/楼梯/尖角。门前后宜宽敞明亮。',
+      '客厅': '宜设于吉方，明亮方正。财位在进门对角线，宜摆放招财物或绿植。',
+      '主卧': '床头宜靠实墙，位于天医或延年方。忌横梁压顶、镜子对床。',
+      '厨房': '宜坐凶方向吉方，灶口忌对门窗。火气重，宜在凶位以镇之。',
+      '卫生间': '宜压凶方，忌在吉方或中宫。保持通风干燥，门常闭。'
+    };
+    html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+    html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🧭 分区域布局建议</div>';
+    html += '<div style="padding:12px">';
+    for (var _area in _areaAdvice) {
+      // 根据八宅为该区域推荐方位
+      var _recommend = [];
+      for (var _d in _bazhai) {
+        var _p = _bazhai[_d];
+        if (_area === '大门' && ['生气','天医','延年','伏位'].includes(_p)) _recommend.push(_d + '(' + _p + ')');
+        if (_area === '主卧' && ['天医','延年','伏位'].includes(_p)) _recommend.push(_d + '(' + _p + ')');
+        if (_area === '厨房' && ['绝命','五鬼','六煞','祸害'].includes(_p)) _recommend.push(_d + '(' + _p + ')');
+        if (_area === '卫生间' && ['绝命','五鬼','六煞','祸害'].includes(_p)) _recommend.push(_d + '(' + _p + ')');
+        if (_area === '客厅' && ['生气','天医','延年'].includes(_p)) _recommend.push(_d + '(' + _p + ')');
+      }
+      var _recText = _recommend.length > 0 ? _recommend.join('、') : '依宅卦而定';
+      html += '<div style="margin-bottom:12px;padding:10px;background:rgba(201,168,76,0.03);border-radius:8px;border:1px solid rgba(201,168,76,0.08)">';
+      html += '<div style="font-size:13px;font-weight:600;color:var(--gold);margin-bottom:4px">' + _area + '</div>';
+      html += '<div style="font-size:11px;opacity:.7;margin-bottom:4px">' + _areaAdvice[_area] + '</div>';
+      html += '<div style="font-size:11px"><span style="opacity:.5">推荐方位：</span><span style="color:#27ae60">' + _recText + '</span></div>';
+      html += '</div>';
+    }
+    html += '</div></div>';
+
+    // === 原有布局提示 ===
+    html += '<div style="margin:12px 0;padding:12px;background:rgba(201,168,76,0.03);border-radius:8px;border:1px solid rgba(201,168,76,0.08)">';
+    html += '<div style="font-size:13px;font-weight:600;color:var(--gold);margin-bottom:8px">💡 综合布局提示</div>';
+    html += '<ul style="padding-left:18px;opacity:0.8;margin:0"><li>' + res.layoutTips.join('</li><li>') + '</li></ul>';
+    html += '</div>';
+
     // === 化解方案与开运建议 ===
     try {
       var _cureHtml = getFengshuiResolution(res);
