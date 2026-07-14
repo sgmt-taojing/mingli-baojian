@@ -29463,7 +29463,7 @@ if (typeof window.SHOP_DATA !== 'undefined') {
 <!-- 外部JS引擎 -->
 <script src="js/calc-engine-lib.js?v=20260703p1"></script>
 <script src="js/divination-core.js?v=20260706a"></script>
-<script src="js/engine-v3-bundle.js?v=20260714"></script>
+<script src="js/engine-v3-bundle.js?v=20260714b"></script>
 <script src="js/guide-features.js?t=1783048068"></script>
 <script src="js/shop-module.js?t=1783048068"></script>
 <script src="js/shop-category.js?t=1783048068"></script>
@@ -32335,6 +32335,85 @@ function runQimenEngine() {
         html += '</div>';
       }
     } catch(_ce) { console.warn('奇门化解引擎错误:', _ce); }
+    // === V3引擎校准 ===
+    try {
+      if (window.QimenV3) {
+        var v3QmResult = QimenV3.qimenCalcV3(now.getFullYear(), now.getMonth()+1, now.getDate(), hour, 'auto');
+        var v3QmAnalysis = QimenV3.analyzeQimenFull(v3QmResult);
+        var v3QmHtml = '<div class="bazi-new-module">';
+        v3QmHtml += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">🔬 V3校准版排盘 <span class="toggle-icon">▼</span></div>';
+        v3QmHtml += '<div class="bazi-module-body collapsed">';
+        // 遁局信息
+        v3QmHtml += '<div style="margin-bottom:12px;padding:10px;background:rgba(138,92,246,0.04);border-radius:8px">';
+        v3QmHtml += '<div style="font-size:12px;color:var(--violet2);margin-bottom:6px">遁局（V3 天文节气校准）</div>';
+        v3QmHtml += '<div style="font-size:13px;line-height:1.8"><strong>' + v3QmResult.juName + '</strong> | ';
+        v3QmHtml += v3QmResult.jieqi + v3QmResult.yuan + ' | 太阳黄经 ' + v3QmResult.jieqiLongitude.toFixed(2) + '°</div>';
+        v3QmHtml += '<div style="font-size:12px;opacity:.7">日干支: ' + v3QmResult.dayGzName + ' | 时干支: ' + v3QmResult.hourGzName + '</div>';
+        v3QmHtml += '<div style="font-size:12px;opacity:.7">值符: ' + (QimenV3.STARS_FULL[v3QmResult.zhiFuStar]||v3QmResult.zhiFuStar) + '落' + v3QmResult.zhiFuGong + '宫 | 值使: ' + (QimenV3.MEN_FULL[v3QmResult.zhiShiMen]||v3QmResult.zhiShiMen) + '</div>';
+        v3QmHtml += '</div>';
+        // 天地盘
+        v3QmHtml += '<div style="margin-bottom:12px;padding:10px;background:rgba(138,92,246,0.04);border-radius:8px">';
+        v3QmHtml += '<div style="font-size:12px;color:var(--violet2);margin-bottom:6px">九宫天地盘</div>';
+        v3QmHtml += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;font-size:11px">';
+        var _gongOrder = [4,9,2,3,5,7,8,1,6]; // 后天八卦排列
+        for (var gi = 0; gi < _gongOrder.length; gi++) {
+          var gp = _gongOrder[gi];
+          var gName = QimenV3.JIU_GONG_NAME[gp] || '';
+          var gDi = v3QmResult.dipan[gp] || '—';
+          var gTi = v3QmResult.tianpan[gp] || '—';
+          var gMen = v3QmResult.men[gp] || '';
+          var gStar = v3QmResult.stars[gp] || '';
+          var gShen = v3QmResult.shen[gp] || '';
+          var gBg = gp === 5 ? 'rgba(0,0,0,0.05)' : 'rgba(138,92,246,0.03)';
+          v3QmHtml += '<div style="padding:6px;border:1px solid rgba(138,92,246,0.15);border-radius:6px;background:' + gBg + ';text-align:center">';
+          v3QmHtml += '<div style="font-weight:bold;font-size:10px;color:var(--violet2)">' + gName + '(' + gp + ')</div>';
+          if (gp === 5) {
+            v3QmHtml += '<div style="font-size:10px;opacity:.5">中宫寄宫</div>';
+            v3QmHtml += '<div style="font-size:10px">天' + gTi + '地' + gDi + '</div>';
+            if (gStar) v3QmHtml += '<div style="font-size:10px">' + (QimenV3.STARS_FULL[gStar]||gStar) + '</div>';
+          } else {
+            v3QmHtml += '<div style="font-size:11px">天<strong>' + gTi + '</strong>地<strong>' + gDi + '</strong></div>';
+            if (gMen) v3QmHtml += '<div style="font-size:10px;color:var(--gold)">' + (QimenV3.MEN_FULL[gMen]||gMen) + '</div>';
+            if (gStar) v3QmHtml += '<div style="font-size:10px;color:var(--violet)">' + (QimenV3.STARS_FULL[gStar]||gStar) + '</div>';
+            if (gShen) v3QmHtml += '<div style="font-size:10px;opacity:.7">' + gShen + '</div>';
+          }
+          // 标注空亡/马星
+          var tags = [];
+          if (v3QmResult.kongWang && v3QmResult.kongWang.indexOf(gp) >= 0) tags.push('空');
+          if (v3QmResult.maXing === gp) tags.push('马');
+          if (tags.length > 0) v3QmHtml += '<div style="font-size:9px;color:var(--fire)">' + tags.join(' ') + '</div>';
+          v3QmHtml += '</div>';
+        }
+        v3QmHtml += '</div></div>';
+        // 格局判断
+        if (v3QmAnalysis && v3QmAnalysis.gejuText) {
+          v3QmHtml += '<div style="margin-bottom:12px;padding:10px;background:rgba(138,92,246,0.04);border-radius:8px">';
+          v3QmHtml += '<div style="font-size:12px;color:var(--violet2);margin-bottom:6px">格局判断（V3校准）</div>';
+          v3QmHtml += '<div style="font-size:12px;line-height:1.8">' + v3QmAnalysis.gejuText + '</div>';
+          if (v3QmResult.wuBuYu && v3QmResult.wuBuYu.isWuBuYu) {
+            v3QmHtml += '<div style="font-size:12px;color:var(--fire);margin-top:4px">⚠️ ' + v3QmResult.wuBuYu.desc + '</div>';
+          }
+          v3QmHtml += '</div>';
+        }
+        // 断语
+        if (v3QmAnalysis && v3QmAnalysis.advice) {
+          v3QmHtml += '<div style="margin-bottom:12px;padding:10px;background:rgba(46,204,113,0.04);border-radius:8px">';
+          v3QmHtml += '<div style="font-size:12px;color:var(--gold);margin-bottom:6px">断语（V3校准）</div>';
+          v3QmHtml += '<div style="font-size:12px;line-height:1.8"><strong>吉凶: ' + v3QmAnalysis.luck + '</strong> — ' + v3QmAnalysis.advice + '</div>';
+          // 详细信息
+          if (v3QmAnalysis.details && v3QmAnalysis.details.length > 0) {
+            for (var di = 0; di < v3QmAnalysis.details.length; di++) {
+              var d = v3QmAnalysis.details[di];
+              v3QmHtml += '<div style="font-size:11px;margin-top:4px;opacity:.8"><strong>' + d.label + ':</strong> ' + d.content + '</div>';
+            }
+          }
+          v3QmHtml += '</div>';
+        }
+        v3QmHtml += '<div style="text-align:center;font-size:10px;opacity:.3;letter-spacing:2px;margin-top:8px">⚡ Powered by QimenV3 Engine</div>';
+        v3QmHtml += '</div></div>';
+        html += v3QmHtml;
+      }
+    } catch(e6) { console.warn('QimenV3 error:', e6); }
     var dims = analyze.dimensions || {};
     if (Object.keys(dims).length > 0) {
       html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:12px;font-size:12px">';
@@ -32459,6 +32538,64 @@ function runZiweiEngine() {
         html += '</div>';
       }
     } catch(_ce) { console.warn('紫微化解引擎错误:', _ce); }
+    // === V3引擎校准 ===
+    try {
+      if (window.ZiweiV3) {
+        var v3Zw = ZiweiV3.ziweiCalcV3(year, month, day, hour, sex);
+        var v3Za = ZiweiV3.analyzeZiweiFull(v3Zw);
+        var v3Html = '<div class="bazi-new-module">';
+        v3Html += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">🔬 V3校准版排盘 <span class="toggle-icon">▼</span></div>';
+        v3Html += '<div class="bazi-module-body collapsed"><div id="ziweiV3Result" style="padding:8px 0">';
+        // 基本信息对比
+        v3Html += '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:10px">';
+        v3Html += '<tr style="background:rgba(201,168,76,0.08)"><th style="padding:6px;text-align:left">项目</th><th style="padding:6px;text-align:left">原引擎</th><th style="padding:6px;text-align:left">V3校准</th></tr>';
+        v3Html += '<tr><td style="padding:4px 6px">命宫</td><td style="padding:4px 6px">' + pan.mingZhi + '</td><td style="padding:4px 6px">' + v3Zw.mingGanZhi + '</td></tr>';
+        v3Html += '<tr><td style="padding:4px 6px">身宫</td><td style="padding:4px 6px">' + pan.shenZhi + '</td><td style="padding:4px 6px">' + v3Zw.shenGanZhi + '</td></tr>';
+        v3Html += '<tr><td style="padding:4px 6px">五行局</td><td style="padding:4px 6px">' + pan.ju + '</td><td style="padding:4px 6px">' + v3Zw.juName + '</td></tr>';
+        v3Html += '<tr><td style="padding:4px 6px">命宫主星</td><td style="padding:4px 6px">' + (analyze.mingStars || '—') + '</td><td style="padding:4px 6px">' + v3Za.mingStars + '</td></tr>';
+        v3Html += '<tr><td style="padding:4px 6px">格局</td><td style="padding:4px 6px" colspan="2">' + v3Za.geju + '</td></tr>';
+        v3Html += '<tr><td style="padding:4px 6px">庙旺</td><td style="padding:4px 6px" colspan="2">' + v3Za.starStrength + '</td></tr>';
+        v3Html += '</table>';
+        // 四化落宫
+        v3Html += '<div style="margin-bottom:10px"><b style="color:var(--fire2)">四化落宫：</b><br>';
+        if (v3Za.sihuaDetail && v3Za.sihuaDetail.length) {
+          v3Html += v3Za.sihuaDetail.join('；');
+        } else {
+          v3Html += v3Za.sihuaText;
+        }
+        v3Html += '</div>';
+        // 三方四正
+        v3Html += '<div style="margin-bottom:10px"><b style="color:var(--fire2)">三方四正：</b><br>';
+        var sf = v3Za.sanfangDetail || {};
+        v3Html += '命宫: ' + (sf['命宫']||'无主星') + ' | 迁移: ' + (sf['迁移']||'无主星') + ' | 财帛: ' + (sf['财帛']||'无主星') + ' | 官禄: ' + (sf['官禄']||'无主星');
+        v3Html += '</div>';
+        // 经典格局
+        if (v3Za.gejuList && v3Za.gejuList.length) {
+          v3Html += '<div style="margin-bottom:10px"><b style="color:var(--fire2)">经典格局：</b><ul style="margin:4px 0;padding-left:18px">';
+          for (var gi = 0; gi < v3Za.gejuList.length; gi++) {
+            v3Html += '<li style="margin:2px 0"><b>' + v3Za.gejuList[gi].name + '</b>：' + v3Za.gejuList[gi].text + '</li>';
+          }
+          v3Html += '</ul></div>';
+        }
+        // 大运
+        v3Html += '<div style="margin-bottom:10px"><b style="color:var(--fire2)">大运排布：</b>';
+        if (v3Za.currentDayun) {
+          v3Html += '<br>当前大限：' + v3Za.currentDayun;
+        }
+        v3Html += '<table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:6px">';
+        v3Html += '<tr style="background:rgba(201,168,76,0.06)"><th style="padding:4px;text-align:left">宫位</th><th style="padding:4px;text-align:left">年龄</th><th style="padding:4px;text-align:left">主星</th></tr>';
+        for (var di = 0; di < (v3Za.dayun||[]).length; di++) {
+          var dy = v3Za.dayun[di];
+          v3Html += '<tr><td style="padding:3px 4px">' + dy.gong + '(' + dy.gongZhi + ')</td><td style="padding:3px 4px">' + dy.ageRange + '</td><td style="padding:3px 4px">' + dy.stars + '</td></tr>';
+        }
+        v3Html += '</table></div>';
+        // V3概述与建议
+        v3Html += '<div style="margin-bottom:8px;padding:8px;background:rgba(201,168,76,0.04);border-radius:6px"><b>V3概述：</b>' + v3Za.overview + '</div>';
+        v3Html += '<div style="opacity:0.8"><b>V3建议：</b>' + v3Za.advice + '</div>';
+        v3Html += '</div></div></div>';
+        html += v3Html;
+      }
+    } catch(e3) { console.warn('ZiweiV3 error:', e3); }
     _showEngineResult('zwEngineResult', html);
   } catch(e) { alert('紫微引擎错误：'+e.message); }
 }
