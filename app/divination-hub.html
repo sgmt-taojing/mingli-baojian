@@ -3632,6 +3632,10 @@ setTimeout(removeLoadingOverlay,5000);
         <span class="tab-emoji">📡</span>
         <span class="tab-name">推送计划</span>
       </button>
+      <button class="nav-tab" onclick="showSection('annual-fortune')" id="tab-annual-fortune">
+        <span class="tab-emoji">🎊</span>
+        <span class="tab-name">年度运势</span>
+      </button>
 
     </div>
     <div class="nav-user">古 老 预 测 术</div>
@@ -5032,6 +5036,101 @@ setTimeout(removeLoadingOverlay,5000);
         }
       }, 200);
     })();
+  </script>
+</section>
+
+<!-- ===== ANNUAL FORTUNE SECTION ===== -->
+<section class="section" id="section-annual-fortune">
+  <div class="section-header">
+    <span class="sh-symbol" style="color:var(--gold)">🎊</span>
+    <h2 class="sh-title">年 度 运 势</h2>
+    <p class="sh-en">Annual Fortune · Worship Guide · Yearly Guidance</p>
+    <p class="sh-desc">跨年祈福参拜指南 · 年度运势指导 · 太岁化解 · 流年吉位 · 祈福吉日</p>
+  </div>
+  <div style="max-width:900px;margin:0 auto;padding:0 16px">
+    <!-- 输入区 -->
+    <div id="annualFortuneInput" style="background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:12px;padding:20px;margin-bottom:20px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:12px">
+        <div>
+          <label style="font-size:11px;letter-spacing:1px;opacity:.5;display:block;margin-bottom:4px">出生年</label>
+          <input type="number" id="af-year" placeholder="如 1990" min="1900" max="2099" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:rgba(0,0,0,0.2);color:var(--paper);font-size:13px">
+        </div>
+        <div>
+          <label style="font-size:11px;letter-spacing:1px;opacity:.5;display:block;margin-bottom:4px">出生月</label>
+          <input type="number" id="af-month" placeholder="1-12" min="1" max="12" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:rgba(0,0,0,0.2);color:var(--paper);font-size:13px">
+        </div>
+        <div>
+          <label style="font-size:11px;letter-spacing:1px;opacity:.5;display:block;margin-bottom:4px">出生日</label>
+          <input type="number" id="af-day" placeholder="1-31" min="1" max="31" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:rgba(0,0,0,0.2);color:var(--paper);font-size:13px">
+        </div>
+        <div>
+          <label style="font-size:11px;letter-spacing:1px;opacity:.5;display:block;margin-bottom:4px">出生时</label>
+          <input type="number" id="af-hour" placeholder="0-23" min="0" max="23" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:rgba(0,0,0,0.2);color:var(--paper);font-size:13px">
+        </div>
+        <div>
+          <label style="font-size:11px;letter-spacing:1px;opacity:.5;display:block;margin-bottom:4px">性别</label>
+          <select id="af-sex" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:rgba(0,0,0,0.2);color:var(--paper);font-size:13px">
+            <option value="male">男</option>
+            <option value="female">女</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;letter-spacing:1px;opacity:.5;display:block;margin-bottom:4px">目标年份</label>
+          <input type="number" id="af-target" placeholder="如 2026" min="2024" max="2099" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:rgba(0,0,0,0.2);color:var(--paper);font-size:13px">
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button onclick="runAnnualFortune()" style="padding:10px 24px;border:1px solid var(--gold);border-radius:8px;background:rgba(201,168,76,0.1);color:var(--gold);cursor:pointer;font-family:inherit;font-size:13px;letter-spacing:2px">🎊 生成年度运势</button>
+        <button onclick="runWorshipGuide()" style="padding:10px 24px;border:1px solid var(--jade);border-radius:8px;background:rgba(39,174,96,0.08);color:var(--jade);cursor:pointer;font-family:inherit;font-size:13px;letter-spacing:2px">🙏 生成祈福参拜指南</button>
+      </div>
+    </div>
+    <!-- 结果区 -->
+    <div id="annualFortuneOutput"></div>
+  </div>
+  <script>
+    (function(){
+      // 自动填充当前年份
+      var now = new Date();
+      var targetInput = document.getElementById('af-target');
+      if (targetInput && !targetInput.value) targetInput.value = now.getFullYear();
+      // 如果是跨年期，自动提示
+      if (typeof AnnualFortune !== 'undefined' && AnnualFortune.isYearTransitionPeriod && AnnualFortune.isYearTransitionPeriod()) {
+        var out = document.getElementById('annualFortuneOutput');
+        if (out) {
+          out.innerHTML = '<div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);border-radius:12px;padding:16px;text-align:center"><p style="color:var(--gold);font-size:14px;letter-spacing:2px;margin:0">🎊 当前正值跨年祈福期，建议生成次年度祈福参拜指南</p></div>';
+        }
+      }
+    })();
+    function runAnnualFortune() {
+      var y = parseInt(document.getElementById('af-year').value);
+      var m = parseInt(document.getElementById('af-month').value);
+      var d = parseInt(document.getElementById('af-day').value);
+      var h = parseInt(document.getElementById('af-hour').value);
+      var s = document.getElementById('af-sex').value;
+      var t = parseInt(document.getElementById('af-target').value) || new Date().getFullYear();
+      if (!y || !m || !d) { showToast('请填写出生年月日'); return; }
+      try {
+        var report = AnnualFortune.generateAnnualReport({year:y, month:m, day:d, hour:h||12, sex:s}, t);
+        document.getElementById('annualFortuneOutput').innerHTML = report;
+      } catch(e) {
+        document.getElementById('annualFortuneOutput').innerHTML = '<div style="color:var(--cinn2);padding:16px">生成失败：' + e.message + '</div>';
+      }
+    }
+    function runWorshipGuide() {
+      var y = parseInt(document.getElementById('af-year').value);
+      var m = parseInt(document.getElementById('af-month').value);
+      var d = parseInt(document.getElementById('af-day').value);
+      var h = parseInt(document.getElementById('af-hour').value);
+      var s = document.getElementById('af-sex').value;
+      var t = parseInt(document.getElementById('af-target').value) || new Date().getFullYear();
+      if (!y || !m || !d) { showToast('请填写出生年月日'); return; }
+      try {
+        var guide = AnnualFortune.generateWorshipGuide({year:y, month:m, day:d, hour:h||12, sex:s}, t);
+        document.getElementById('annualFortuneOutput').innerHTML = guide;
+      } catch(e) {
+        document.getElementById('annualFortuneOutput').innerHTML = '<div style="color:var(--cinn2);padding:16px">生成失败：' + e.message + '</div>';
+      }
+    }
   </script>
 </section>
 
@@ -11563,6 +11662,21 @@ function computeBazi() {
   for (var _ti=0; _ti<4; _ti++) { if (_ti!==2) baziData.tenGods.push(getTenGod(pillars[_ti].stem, pillars[_ti].branch, dayStem)); }
   try { document.getElementById('baziResult').innerHTML += generateInterpretation(baziData); } catch(e) {}
 
+  // === 📋 缘主须知 ===
+  try {
+    var _baziNotice = '<div style="margin:16px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(201,168,76,0.01));border:1px solid rgba(201,168,76,0.15);border-radius:12px">';
+    _baziNotice += '<div style="font-size:14px;font-weight:700;color:var(--gold);margin-bottom:8px;letter-spacing:2px">📋 缘主须知</div>';
+    _baziNotice += '<div style="font-size:12px;line-height:2;opacity:.9">';
+    _baziNotice += '<div>1. 日主' + dayStem + '（' + dayEle + '），' + (isStrong ? '身旺，宜泄耗克（食伤、财星、官杀）' : '身弱，宜生扶（印星、比劫）') + '。</div>';
+    _baziNotice += '<div>2. 用神为<b style="color:var(--gold)">' + (mingType.yongshenEle || '待取') + '</b>，忌神为<b style="color:var(--fire)">' + (mingType.jishenEle || '待定') + '</b>，大运流年逢用神则吉，逢忌神则凶。</div>';
+    _baziNotice += '<div>3. 五行偏旺：<b>' + strongest + '</b>（' + eleCount[strongest] + '个），偏弱：<b>' + weakest + '</b>（' + eleCount[weakest] + '个），可在日常生活中多补最弱五行。</div>';
+    _baziNotice += '<div>4. 大运每十年一转，流年每年一变。逢用神大运流年宜积极进取，逢忌神则宜守不宜进。</div>';
+    _baziNotice += '<div>5. 补五行方法：穿戴对应颜色衣物、食用对应味道食物、选择对应方位居住或办公。</div>';
+    _baziNotice += '<div>6. 命理为先天参考，后天努力更重要。行善积德、修身养性可改善运势。</div>';
+    _baziNotice += '</div></div>';
+    try { document.getElementById('baziResult').innerHTML += _baziNotice; } catch(e2) {}
+  } catch(_bne) { console.warn('八字缘主须知渲染错误:', _bne); }
+
   // === 复制结果按钮 ===
   var copyBtn = '<div style="margin-top:16px;text-align:center">';
   copyBtn += '<button onclick="copyResultText(this)" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px">📋 复制结果</button>';
@@ -11698,6 +11812,13 @@ function computeBazi() {
       document.getElementById('baziResult').innerHTML += _curePanel;
     }
   } catch(_ce) { console.warn('八字化解方案生成错误:', _ce); }
+
+  // === 年度运势 ===
+  try {
+    var _afYear = year, _afMonth = month, _afDay = day, _afHour = hour, _afSex = sex;
+    var _afPanel = _buildAnnualFortunePanel(_afYear, _afMonth, _afDay, _afHour, _afSex);
+    if (_afPanel) document.getElementById('baziResult').innerHTML += _afPanel;
+  } catch(_afe) { console.warn('八字年度运势生成错误:', _afe); }
 
   // === 首次排盘推送老黄历 ===
   // 用户首次完成排盘后，自动推送今日老黄历内容
@@ -29313,6 +29434,7 @@ if (typeof window.SHOP_DATA !== 'undefined') {
 <script src="knowledge/gzh-collect-system.js?t=1783048068"></script>
 <script src="js/push-plan.js?t=1783048068"></script>
 <script src="js/cure-engine.js?v=20260714"></script>
+<script src="js/annual-fortune.js?v=20260714"></script>
 
 
 <!-- 页脚 -->
@@ -31923,6 +32045,23 @@ if (typeof window !== 'undefined') {
 
 // ========== UI 绑定函数 ==========
 
+// 通用年度运势折叠面板生成器
+function _buildAnnualFortunePanel(birthYear, birthMonth, birthDay, birthHour, sex) {
+  if (typeof AnnualFortune === 'undefined' || !birthYear) return '';
+  try {
+    var isTransition = AnnualFortune.isYearTransitionPeriod();
+    var targetYear = new Date().getFullYear();
+    if (isTransition) targetYear += 1; // 跨年期生成次年
+    var report = AnnualFortune.generateAnnualReport({year:birthYear, month:birthMonth||1, day:birthDay||1, hour:birthHour||12, sex:sex||'male'}, targetYear);
+    var title = isTransition ? (targetYear + '年度祈福参拜与运势指南') : (targetYear + '年度运势指导');
+    var html = '<div class="bazi-new-module">';
+    html += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">🎊 ' + title + ' <span class="toggle-icon">▼</span></div>';
+    html += '<div class="bazi-module-body collapsed">' + report + '</div>';
+    html += '</div>';
+    return html;
+  } catch(e) { console.warn('AnnualFortune panel error:', e); return ''; }
+}
+
 function _showEngineResult(containerId, html) {
   let el = document.getElementById(containerId);
   if (!el) {
@@ -31960,14 +32099,25 @@ function runLiuyaoEngine() {
     const duan = liuyaoDuanGua(gua, question);
     const ben = _GUA_XIANG[gua.benGua.lower].name + _GUA_XIANG[gua.benGua.upper].name;
     const bian = _GUA_XIANG[gua.bianGua.lower].name + _GUA_XIANG[gua.bianGua.upper].name;
+    // 🎯 断卦结论总览
+    var _summaryCard = '<div style="margin:12px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.02));border:1px solid rgba(201,168,76,0.2);border-radius:12px">';
+    _summaryCard += '<div style="font-size:14px;font-weight:700;color:var(--gold);margin-bottom:8px;letter-spacing:2px">🎯 断卦结论总览</div>';
+    _summaryCard += '<div style="font-size:13px;line-height:1.8;margin-bottom:6px"><b>所问：</b>' + question + ' &nbsp;|&nbsp; <b>本卦：</b>' + ben + ' &nbsp;|&nbsp; <b>变卦：</b>' + bian + '</div>';
+    _summaryCard += '<div style="font-size:13px;line-height:1.8;margin-bottom:6px"><b>用神：</b>' + duan.yongshen + ' &nbsp;|&nbsp; <b>旺衰：</b>' + (duan.yongshenWang ? '旺相（有利）' : '休囚（偏弱）') + (duan.xunKong ? ' · ⚠️旬空' : '') + '</div>';
+    _summaryCard += '<div style="font-size:13px;line-height:1.8;margin-bottom:6px"><b>断语：</b><span style="color:var(--gold);font-weight:600">' + duan.verdict + '</span></div>';
+    _summaryCard += '<div style="font-size:12px;line-height:1.8;opacity:.8;margin-bottom:6px"><b>应期：</b>' + duan.yingqi + '</div>';
+    _summaryCard += '<div style="font-size:12px;line-height:1.8;opacity:.8"><b>建议：</b>' + duan.advice + '</div>';
+    _summaryCard += '</div>';
+    
     let html = '<h4 style="color:var(--gold)">☰ 六爻引擎演算结果</h4>';
+    html += _summaryCard;
     html += '<p><b>本卦：</b>' + ben + '（' + gua.benGua.idx + '）</p>';
     html += '<p><b>变卦：</b>' + bian + '</p>';
     html += '<p><b>动爻：</b>' + (gua.dongYao.map(function(x){return '第'+(x+1)+'爻';}).join('、') || '无') + '</p>';
-    html += '<p><b>宫：</b>' + zg.gongName + ' · ' + zg.gongWuxing + '</p>';
-    html += '<p><b>世应：</b>世' + (zg.shiying.shi+1) + '爻 · 应' + (zg.shiying.ying+1) + '爻</p>';
+    html += '<p><b>宫：</b>' + zg.gongName + ' · ' + zg.gongWuxing + '（' + zg.gongName + '宫五行属' + zg.gongWuxing + '，影响卦象强弱）</p>';
+    html += '<p><b>世应：</b>世' + (zg.shiying.shi+1) + '爻（代表自己）· 应' + (zg.shiying.ying+1) + '爻（代表对方/事体）</p>';
     html += '<p><b>六亲：</b>' + zg.liuqin.join(' · ') + '</p>';
-    html += '<p><b>六神：</b>' + zg.liushen.join(' · ') + '</p>';
+    html += '<p><b>六神：</b>' + zg.liushen.join(' · ') + '（六神主吉凶氛围，青龙吉、白虎凶）</p>';
     html += '<p><b>用神：</b>' + duan.yongshen + ' · ' + duan.verdict + '</p>';
     html += '<p><b>应期：</b>' + duan.yingqi + '</p>';
     // 自占/代占世应分析
@@ -31991,7 +32141,7 @@ function runLiuyaoEngine() {
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
       html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">☰ 六爻排盘 · 本卦 — ' + ben + '</div>';
       html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
-      html += '<tr style="background:rgba(201,168,76,0.08);color:var(--gold2)"><th style="padding:5px 8px">爻位</th><th>阴阳</th><th>纳甲</th><th>六亲</th><th>六神</th><th>世应</th><th>动</th></tr>';
+      html += '<tr style="background:rgba(201,168,76,0.08);color:var(--gold2)"><th style="padding:5px 8px">爻位</th><th>阴阳</th><th>纳甲</th><th>六亲</th><th>六神</th><th>世应</th><th>旺衰</th><th>动</th></tr>';
       // 计算变卦纳甲用于对照
       var _bianZg = null;
       try { _bianZg = liuyaoZhuangGua({benGua: gua.bianGua, dayGanZhi: gz}, gz); } catch(_be) {}
@@ -32004,6 +32154,20 @@ function runLiuyaoEngine() {
         var _lq = zg.liuqin[yi];
         var _ls = zg.liushen[yi];
         var _bg = _isDong ? 'rgba(231,76,60,0.06)' : (yi % 2 === 0 ? 'rgba(255,255,255,0.01)' : 'transparent');
+        var _yaoZhi = zg.dizhi[yi];
+        var _yaoWx = _zhiWuxing(_yaoZhi);
+        var _monthWx = _zhiWuxing(gua.monthZhi || '子');
+        var _yaoWS = '—';
+        try {
+          var _rel = _wuxingRelation(_monthWx, _yaoWx);
+          var _rel2 = _wuxingRelation(_yaoWx, _monthWx);
+          if (_yaoWx === _monthWx) _yaoWS = '旺';
+          else if (_rel === '生') _yaoWS = '相';
+          else if (_rel === '克') _yaoWS = '死';
+          else if (_rel2 === '克') _yaoWS = '囚';
+          else _yaoWS = '休';
+        } catch(_we) { _yaoWS = '—'; }
+        var _wsColor = _yaoWS === '旺' ? 'var(--jade2)' : _yaoWS === '相' ? 'var(--gold)' : _yaoWS === '死' ? 'var(--fire)' : _yaoWS === '囚' ? 'var(--orange)' : 'var(--muted)';
         html += '<tr style="background:' + _bg + ';border-bottom:1px solid rgba(255,255,255,0.03)">';
         html += '<td style="padding:5px 8px;text-align:center;color:var(--gold2)">' + _yaoNames[yi] + '爻</td>';
         html += '<td style="text-align:center">' + (_yinYang === '阳' ? '—— 阳' : '— — 阴') + (_isDong ? ' ○' : '') + '</td>';
@@ -32011,6 +32175,7 @@ function runLiuyaoEngine() {
         html += '<td style="text-align:center">' + _lq + '</td>';
         html += '<td style="text-align:center">' + _ls + '</td>';
         html += '<td style="text-align:center">' + (_isShi ? '<span style=\"color:var(--gold);font-weight:600\">世</span>' : _isYing ? '<span style=\"color:var(--jade2)\">应</span>' : '') + '</td>';
+        html += '<td style="text-align:center;font-size:11px;color:' + _wsColor + '">' + _yaoWS + '</td>';
         html += '<td style="text-align:center">' + (_isDong ? '<span style=\"color:#e74c3c\">⚡动</span>' : '') + '</td>';
         html += '</tr>';
       }
@@ -32068,6 +32233,37 @@ function runLiuyaoEngine() {
         if (duan.sanhe && duan.sanhe.length > 0) html += '<div><span style="color:var(--gold2)">三合：</span>' + duan.sanhe.map(function(s){return s.matched.join('')+'合'+s.wx+'局';}).join('、') + '</div>';
         html += '<div style="margin-top:6px;padding:8px 12px;background:rgba(46,204,113,0.04);border-radius:8px;color:var(--gold2)"><b>断语：</b>' + duan.verdict + '</div>';
         html += '<div style="margin-top:4px"><b>应期：</b>' + duan.yingqi + '</div>';
+        html += '</div></div>';
+        // 生克链路
+        try {
+          var _chainHtm = '<div style="margin-top:8px;padding:8px 12px;background:rgba(52,152,219,0.04);border-radius:8px;font-size:11px;line-height:1.8"><b style="color:var(--gold2)">生克链路：</b>';
+          var _ysZhi2 = zg.dizhi[duan.yongshenIdx];
+          var _ysWx2 = _zhiWuxing(_ysZhi2);
+          var _shiZhi = zg.dizhi[zg.shiying.shi];
+          var _shiWx = _zhiWuxing(_shiZhi);
+          var _relShi = _wuxingRelation(_ysWx2, _shiWx);
+          _chainHtm += '用神(' + _ysWx2 + ')→世爻(' + _shiWx + '): ' + (_relShi === '生' ? '生世（有益于我）' : _relShi === '克' ? '克世（压制我）' : _relShi === '同' ? '比和（同类相助）' : '无直接关系') + '；';
+          if (gua.dongYao && gua.dongYao.length > 0) {
+            for (var _di2 = 0; _di2 < gua.dongYao.length; _di2++) {
+              var _dzhi = zg.dizhi[gua.dongYao[_di2]];
+              var _dwx = _zhiWuxing(_dzhi);
+              var _drel = _wuxingRelation(_dwx, _ysWx2);
+              _chainHtm += '动爻(' + _dwx + ')→用神(' + _ysWx2 + '): ' + (_drel === '生' ? '生用神（有力）' : _drel === '克' ? '克用神（减力）' : _drel === '同' ? '比和（助用）' : '无直接关系') + '；';
+            }
+          }
+          _chainHtm += '</div>';
+          html += _chainHtm;
+        } catch(_ce2) {}
+        // 📋 缘主须知
+        html += '<div style="margin:12px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(46,204,113,0.06),rgba(46,204,113,0.01));border:1px solid rgba(46,204,113,0.15);border-radius:12px">';
+        html += '<div style="font-size:14px;font-weight:700;color:var(--jade2);margin-bottom:8px;letter-spacing:2px">📋 缘主须知</div>';
+        html += '<div style="font-size:12px;line-height:2;opacity:.9">';
+        html += '<div>1. 用神' + (duan.yongshenWang ? '旺相，所问之事可成，顺势而为即可' : '休囚，所问之事多有阻碍，需等待时机或借助外力') + '。</div>';
+        html += '<div>2. 应期在<b>' + duan.yingqi + '</b>前后，届时可重点关注事态变化。</div>';
+        if (duan.xunKong) html += '<div>3. ⚠️ 用神旬空，当前事态尚不明朗，需填实之日方可定论。</div>';
+        if (duan.liuchong) html += '<div>3. ⚠️ 用神被冲，事多变动，不宜急于求成。</div>';
+        html += '<div>4. ' + duan.advice + '</div>';
+        html += '<div>5. 心诚则灵，卦象为参考，切勿迷信盲从。行善积德自有福报。</div>';
         html += '</div></div>';
       }
     } catch(_pe) { console.warn('六爻排盘渲染错误:', _pe); }
@@ -32144,6 +32340,22 @@ function runLiuyaoEngine() {
   } catch(e) { showToast('六爻引擎错误：'+e.message); }
 }
 
+function _getSeasonStrength(wx) {
+  var month = new Date().getMonth();
+  var season;
+  if (month >= 2 && month <= 4) season = '木';
+  else if (month >= 5 && month <= 7) season = '火';
+  else if (month >= 8 && month <= 10) season = '金';
+  else season = '水';
+  if (wx === season) return '旺';
+  var sheng = {'水':'木','木':'火','火':'土','土':'金','金':'水'};
+  if (sheng[season] === wx) return '相';
+  if (sheng[wx] === season) return '休';
+  var ke = {'水':'火','火':'金','金':'木','木':'土','土':'水'};
+  if (ke[season] === wx) return '死';
+  if (ke[wx] === season) return '囚';
+  return '平';
+}
 function runMeihuaEngine() {
   try {
     var mhResult = document.getElementById('mhResult');
@@ -32176,13 +32388,14 @@ function runMeihuaEngine() {
       html += '<div style="padding:16px;display:flex;justify-content:center;gap:32px;flex-wrap:wrap">';
       // 本卦
       html += '<div style="text-align:center">';
-      html += '<div style="font-size:13px;color:var(--jade2);margin-bottom:8px;font-weight:600">本卦 ' + ben + '</div>';
+      var _tiLabel = (_dongIdx >= 3) ? '（上卦=体）' : '（下卦=体）';
+      html += '<div style="font-size:13px;color:var(--jade2);margin-bottom:8px;font-weight:600">本卦 ' + ben + ' <span style="font-size:11px;color:var(--gold)">' + _tiLabel + '</span></div>';
       for (var mi = 5; mi >= 0; mi--) {
         var _isYang = _benLines[mi] && _benLines[mi].line === '阳';
         var _isDong = (mi === _dongIdx);
         html += '<div style="font-size:18px;letter-spacing:2px;padding:2px 0;color:' + (_isDong ? '#e74c3c' : 'var(--paper)') + '">' + (_isYang ? '▬▬▬' : '▬ ▬') + (_isDong ? ' ○' : '') + '</div>';
       }
-      html += '<div style="font-size:11px;opacity:.6;margin-top:6px">动爻：第' + (_dongIdx+1) + '爻</div>';
+      html += '<div style="font-size:11px;opacity:.6;margin-top:6px">动爻：第' + (_dongIdx+1) + '爻（动爻所在卦为用卦）</div>';
       html += '</div>';
       // 箭头
       html += '<div style="display:flex;align-items:center;color:var(--gold);font-size:20px">→</div>';
@@ -32211,15 +32424,17 @@ function runMeihuaEngine() {
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
       html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">📊 体用分析表</div>';
       html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
-      html += '<tr style="background:rgba(201,168,76,0.08);color:var(--gold2)"><th style="padding:5px 8px">类别</th><th>卦名</th><th>五行</th><th>与体卦关系</th><th>吉凶</th></tr>';
+      html += '<tr style="background:rgba(201,168,76,0.08);color:var(--gold2)"><th style="padding:5px 8px">类别</th><th>卦名</th><th>五行</th><th>与体卦关系</th><th>吉凶</th><th>时令旺衰</th></tr>';
       // 体卦
       var _tiRel = '本身';
       var _tiLuck = '—';
-      html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.03)"><td style="padding:5px 8px;text-align:center;color:var(--gold2)">体卦</td><td style="text-align:center">' + analyze.tiGua + '</td><td style="text-align:center">' + _tiWx + '</td><td style="text-align:center">' + _tiRel + '</td><td style="text-align:center">' + _tiLuck + '</td></tr>';
+      var _tiSeason = _getSeasonStrength(_tiWx);
+      html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.03)"><td style="padding:5px 8px;text-align:center;color:var(--gold2)">体卦</td><td style="text-align:center">' + analyze.tiGua + '</td><td style="text-align:center">' + _tiWx + '</td><td style="text-align:center">' + _tiRel + '</td><td style="text-align:center">' + _tiLuck + '</td><td style="text-align:center;font-size:11px">' + _tiSeason + '</td></tr>';
       // 用卦
       var _yongRel = analyze.relation;
       var _yongLuck = (_yongRel === '生我' || _yongRel === '比和') ? '吉' : (_yongRel === '克我' ? '凶' : '耗');
-      html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.03)"><td style="padding:5px 8px;text-align:center;color:var(--gold2)">用卦</td><td style="text-align:center">' + analyze.yongGua + '</td><td style="text-align:center">' + _yongWx + '</td><td style="text-align:center">' + _yongRel + '</td><td style="text-align:center;color:' + (_yongLuck === '吉' ? 'var(--jade2)' : _yongLuck === '凶' ? '#e74c3c' : 'var(--orange)') + '">' + _yongLuck + '</td></tr>';
+      var _yongSeason = _getSeasonStrength(_yongWx);
+      html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.03)"><td style="padding:5px 8px;text-align:center;color:var(--gold2)">用卦</td><td style="text-align:center">' + analyze.yongGua + '</td><td style="text-align:center">' + _yongWx + '</td><td style="text-align:center">' + _yongRel + '</td><td style="text-align:center;color:' + (_yongLuck === '吉' ? 'var(--jade2)' : _yongLuck === '凶' ? '#e74c3c' : 'var(--orange)') + '">' + _yongLuck + '</td><td style="text-align:center;font-size:11px">' + _yongSeason + '</td></tr>';
       // 互卦
       if (gua.huGua) {
         var _huRel = _wuxingRelation(_tiWx, _huYongWx);
@@ -32244,6 +32459,32 @@ function runMeihuaEngine() {
       html += '<div style="padding:6px 10px;background:rgba(231,76,60,0.04);border-radius:8px"><span style="color:#e74c3c;font-weight:600">④ 综合判断：</span><span style="color:var(--gold);font-weight:600">' + analyze.verdict + '</span> — ' + analyze.advice + '</div>';
       html += '</div></div>';
     } catch(_mpe) { console.warn('梅花排盘渲染错误:', _mpe); }
+    // === 应期判断 ===
+    try {
+      var _yingqi = '动爻之数或冲合之日';
+      var _dongWx = _GUA_XIANG[_dongIdx >= 3 ? gua.benGua.upper : gua.benGua.lower] ? _GUA_XIANG[_dongIdx >= 3 ? gua.benGua.upper : gua.benGua.lower].wuxing : '';
+      var _seasonHint = '';
+      var _nowMonth = new Date().getMonth();
+      if (_dongWx === '木') _seasonHint = '（春季寅卯月应）';
+      else if (_dongWx === '火') _seasonHint = '（夏季巳午月应）';
+      else if (_dongWx === '金') _seasonHint = '（秋季申酉月应）';
+      else if (_dongWx === '水') _seasonHint = '（冬季亥子月应）';
+      else if (_dongWx === '土') _seasonHint = '（辰戌丑未月应）';
+      html += '<div style="margin:12px 0;padding:10px 14px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.1);border-radius:8px">';
+      html += '<div style="font-size:13px;font-weight:600;color:var(--gold);margin-bottom:4px">📅 应期参考</div>';
+      html += '<div style="font-size:12px;line-height:1.8;opacity:.8">动爻五行属' + _dongWx + _seasonHint + '，应期多在该五行当令之月。具体应期以动爻地支冲合之日为准。</div>';
+      html += '</div>';
+    } catch(_ye) { console.warn('梅花应期计算错误:', _ye); }
+    // === 📋 缘主须知 ===
+    html += '<div style="margin:12px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(46,204,113,0.06),rgba(46,204,113,0.01));border:1px solid rgba(46,204,113,0.15);border-radius:12px">';
+    html += '<div style="font-size:14px;font-weight:700;color:var(--jade2);margin-bottom:8px;letter-spacing:2px">📋 缘主须知</div>';
+    html += '<div style="font-size:12px;line-height:2;opacity:.9">';
+    html += '<div>1. 体卦代表自己，用卦代表所问之事。' + analyze.relation + '，' + analyze.initial + '。</div>';
+    html += '<div>2. 最终变卦' + analyze.endRelation + '，' + (analyze.endResult || '') + '。</div>';
+    html += '<div>3. 综合判断：<b style="color:var(--gold)">' + analyze.verdict + '</b></div>';
+    html += '<div>4. ' + analyze.advice + '</div>';
+    html += '<div>5. 卦象仅供参考，切勿执着。心正则卦灵，行善自有天佑。</div>';
+    html += '</div></div>';
     // === 化解方案与开运建议 ===
     try {
       var _cureHtml = getMeihuaResolution(gua, analyze);
@@ -32351,6 +32592,7 @@ function runQimenEngine() {
       if (_star) html += '<div style="color:var(--violet);font-size:10px">' + (_qmFullStars[_star] || _star) + '</div>';
       if (_shen) html += '<div style="opacity:.7;font-size:10px">' + _shen + '</div>';
       if (_tags.length > 0) html += '<div style="color:var(--fire);font-size:9px;font-weight:700">' + _tags.join(' ') + '</div>';
+      if (analyze.palace === _gp) html += '<div style="color:var(--gold);font-size:9px;font-weight:700;background:rgba(201,168,76,0.15);border-radius:3px;padding:1px 4px;margin-top:2px">★用神</div>';
       html += '</div>';
     }
     html += '</div></div>';
@@ -32420,12 +32662,39 @@ function runQimenEngine() {
         var _gColor = _isJi ? 'var(--jade2)' : _isXiong ? 'var(--fire)' : 'var(--gold)';
         var _gIcon = _isJi ? '✅' : _isXiong ? '❌' : '⚖️';
         html += '<div style="margin-bottom:4px;padding:4px 8px;border-left:2px solid ' + _gColor + ';background:rgba(201,168,76,0.03)">';
+        var _gejuMeaning = '';
+        var _gejuMap = {'青龙返首':'百事皆吉，大成就之象','飞鸟跌穴':'谋为皆成，贵人相助','玉女守门':'阴私和合，婚姻吉','真诈格':'真假难辨，宜防被骗','假诈格':'虚多实少，不宜大兴','重诈格':'反复不定，需谨慎','天假格':'天意成全，事有转机','地假格':'借地生财，宜谋略','人假格':'人情助力，宜交际','神假格':'神明庇佑，逢凶化吉','鬼假格':'暗中作祟，宜祭化解','太白入荧':'贼来客欺，防破财','荧入太白':'贼去客胜，宜进攻','青龙折足':'根基不稳，谋为难成','腾蛇夭矫':'惊恐虚诈，多波折','朱雀投江':'口舌是非，文书不利','五不遇时':'时干克日干，百事不宜','伏吟':'伏匿不动，宜守不宜进','反吟':'反复动荡，事多逆转'};
+        for (var _gmKey in _gejuMap) { if (_gItem.indexOf(_gmKey) >= 0) { _gejuMeaning = _gejuMap[_gmKey]; break; } }
         html += _gIcon + ' <span style="color:' + _gColor + ';font-weight:600">' + _gItem + '</span>';
+        if (_gejuMeaning) html += '<div style="font-size:10px;opacity:.7;margin-left:20px">→ ' + _gejuMeaning + '</div>';
         html += '</div>';
       }
       html += '</div></div>';
     }
 
+    // === 应期判断 ===
+    try {
+      var _qmYingqi = '';
+      if (analyze.palace) {
+        var _palaceZhi = {1:'子/壬',2:'未/坤',3:'卯/乙',4:'辰/巽',6:'戌/乾',7:'酉/辛',8:'丑/艮',9:'午/丙'};
+        _qmYingqi = '用神落' + analyze.palace + '宫（' + (_palaceZhi[analyze.palace] || '') + '），应期在该宫地支当令之月';
+        if (analyze.kongwang) _qmYingqi += '。⚠️ 用神落空亡，出空之日方应';
+      }
+      html += '<div style="margin:12px 0;padding:10px 14px;background:rgba(138,92,246,0.04);border:1px solid rgba(138,92,246,0.1);border-radius:8px">';
+      html += '<div style="font-size:13px;font-weight:600;color:var(--violet2);margin-bottom:4px">📅 应期参考</div>';
+      html += '<div style="font-size:12px;line-height:1.8;opacity:.8">' + _qmYingqi + '</div>';
+      html += '</div>';
+    } catch(_qe) { console.warn('奇门应期计算错误:', _qe); }
+    // === 📋 缘主须知 ===
+    html += '<div style="margin:12px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(138,92,246,0.06),rgba(138,92,246,0.01));border:1px solid rgba(138,92,246,0.15);border-radius:12px">';
+    html += '<div style="font-size:14px;font-weight:700;color:var(--violet2);margin-bottom:8px;letter-spacing:2px">📋 缘主须知</div>';
+    html += '<div style="font-size:12px;line-height:2;opacity:.9">';
+    html += '<div>1. 本局' + (pan.dun === 'yang' ? '阳遁' : '阴遁') + pan.ju + '局，' + (analyze.luck === '吉' ? '总体吉利，可以行动' : analyze.luck === '凶' ? '总体凶险，宜守不宜进' : '吉凶参半，需权衡利弊') + '。</div>';
+    html += '<div>2. 用神' + analyze.yongShen + '落' + analyze.palace + '宫，' + (analyze.wuBuYu ? '⚠️ 五不遇时，时辰不利，改日再谋' : '时辰可用') + '。</div>';
+    if (analyze.strategy) html += '<div>3. 策略：' + analyze.strategy + '</div>';
+    if (analyze.huajie) html += '<div>4. 化解：' + analyze.huajie + '</div>';
+    html += '<div>5. 奇门遁甲为时空方位之学，参考而行，切勿迷信。择吉而行，趋吉避凶。</div>';
+    html += '</div></div>';
     // 化解方案
     try {
       var _cureHtml = getQimenResolution(pan, analyze);
@@ -32549,7 +32818,7 @@ function runLiurenEngine() {
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
       html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">⬡ 四课</div>';
       html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
-      html += '<tr style="background:rgba(201,168,76,0.08);color:var(--gold2)"><th style="padding:5px 8px">课序</th><th>上神</th><th>下神</th><th>天将</th><th>说明</th></tr>';
+      html += '<tr style="background:rgba(201,168,76,0.08);color:var(--gold2)"><th style="padding:5px 8px">课序</th><th>上神</th><th>下神</th><th>天将</th><th>神将含义</th><th>说明</th></tr>';
       var _keLabels = ['第一课', '第二课', '第三课', '第四课'];
       for (var ki = 0; ki < pan.siKe.length; ki++) {
         var _ke = pan.siKe[ki];
@@ -32558,7 +32827,11 @@ function runLiurenEngine() {
         html += '<td style="padding:5px 8px;text-align:center;color:var(--gold2)">' + _keLabels[ki] + '</td>';
         html += '<td style="text-align:center;font-weight:600;color:var(--gold2)">' + _ke.shang + '</td>';
         html += '<td style="text-align:center">' + _ke.xia + '</td>';
+        var _jiangMeaning = '';
+        var _jiangMap = {'贵人':'主贵人提携','螣蛇':'主虚惊怪异','朱雀':'主口舌文书','六合':'主和合婚姻','勾陈':'主拖延争讼','青龙':'主财喜吉庆','天空':'主空虚诈伪','白虎':'主血光丧服','太常':'主衣食宴饮','玄武':'主盗贼暗昧','太阴':'主阴私暗助','天后':'主妇女姻缘'};
+        _jiangMeaning = _jiangMap[_keJiang] || '';
         html += '<td style="text-align:center">' + _keJiang + '</td>';
+        html += '<td style="text-align:center;font-size:11px;opacity:.6">' + _jiangMeaning + '</td>';
         html += '<td style="text-align:center;font-size:11px;opacity:.7">' + _ke.label + '</td>';
         html += '</tr>';
       }
@@ -32576,7 +32849,7 @@ function runLiurenEngine() {
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
       html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">⬡ 三传详情 — ' + (_chuan.method || '贼克法') + '</div>';
       html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
-      html += '<tr style="background:rgba(201,168,76,0.08);color:var(--gold2)"><th style="padding:5px 8px">传序</th><th>天盘</th><th>地盘</th><th>神将</th><th>五行</th><th>六亲</th></tr>';
+      html += '<tr style="background:rgba(201,168,76,0.08);color:var(--gold2)"><th style="padding:5px 8px">传序</th><th>天盘</th><th>地盘</th><th>神将</th><th>神将含义</th><th>五行</th><th>六亲</th></tr>';
       for (var ci = 0; ci < 3; ci++) {
         var _cz = _chuanZhi[ci];
         var _cJiang = pan.tianJiang[_cz] || '—';
@@ -32596,7 +32869,11 @@ function runLiurenEngine() {
         html += '<td style="padding:5px 8px;text-align:center;color:var(--gold2);font-weight:600">' + _chuanNames[ci] + '</td>';
         html += '<td style="text-align:center;font-weight:600;color:var(--gold2)">' + _cz + '</td>';
         html += '<td style="text-align:center">' + _dpan + '</td>';
+        var _cJiangMeaning = '';
+        var _cJiangMap = {'贵人':'贵人提携','螣蛇':'虚惊怪异','朱雀':'口舌文书','六合':'和合婚姻','勾陈':'拖延争讼','青龙':'财喜吉庆','天空':'空虚诈伪','白虎':'血光丧服','太常':'衣食宴饮','玄武':'盗贼暗昧','太阴':'阴私暗助','天后':'妇女姻缘'};
+        _cJiangMeaning = _cJiangMap[_cJiang] || '';
         html += '<td style="text-align:center">' + _cJiang + '</td>';
+        html += '<td style="text-align:center;font-size:11px;opacity:.6">' + _cJiangMeaning + '</td>';
         html += '<td style="text-align:center">' + _cWx + '</td>';
         html += '<td style="text-align:center">' + _cLq + '</td>';
         html += '</tr>';
@@ -32609,7 +32886,9 @@ function runLiurenEngine() {
       html += '</div>';
       // 天盘地盘对照表
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">⬡ 天盘 ↔ 地盘对照</div>';
+      var _lrYongshenZhi = '';
+      try { if (analyze.yongshen) _lrYongshenZhi = analyze.yongshen; } catch(_e) {}
+      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">⬡ 天盘 ↔ 地盘对照' + (_lrYongshenZhi ? ' · 用神：' + _lrYongshenZhi : '') + '</div>';
       html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">';
       html += '<tr style="background:rgba(201,168,76,0.08);color:var(--gold2)"><th style="padding:4px 6px">地盘</th><th>天盘</th><th>天将</th><th>地盘</th><th>天盘</th><th>天将</th><th>地盘</th><th>天盘</th><th>天将</th><th>地盘</th><th>天盘</th><th>天将</th></tr>';
       var _brArr = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
@@ -32652,11 +32931,33 @@ function runLiurenEngine() {
         for (var _ki = 0; _ki < _ketiParts.length; _ki++) {
           var _kName = _ketiParts[_ki].trim();
           var _kDesc = _ketiDescMap[_kName] || _kName;
-          html += '<div style="padding:4px 0"><span style="color:var(--gold2);font-weight:600">' + _kName + '</span>：' + _kDesc + '</div>';
+          var _ketiLuck = '';
+        var _ketiLuckMap = {'重审课':'凶','审理课':'凶','比用课':'平','涉害课':'凶','遁克课':'凶','昴星课':'平','别责课':'平','八专课':'平','伏吟课':'凶','返吟课':'凶','三传三合':'吉'};
+        _ketiLuck = _ketiLuckMap[_kName] || '平';
+        var _ketiLuckColor = _ketiLuck === '吉' ? 'var(--jade2)' : _ketiLuck === '凶' ? 'var(--fire)' : 'var(--gold)';
+        html += '<div style="padding:4px 0"><span style="color:var(--gold2);font-weight:600">' + _kName + '</span> <span style="color:' + _ketiLuckColor + ';font-size:11px;font-weight:600">[' + _ketiLuck + ']</span>：' + _kDesc + '</div>';
         }
         html += '</div></div>';
       }
     } catch(_lpe) { console.warn('六壬排盘渲染错误:', _lpe); }
+    // === 🎯 断课结论总览 ===
+    html += '<div style="margin:12px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(230,126,34,0.08),rgba(230,126,34,0.02));border:1px solid rgba(230,126,34,0.2);border-radius:12px">';
+    html += '<div style="font-size:14px;font-weight:700;color:var(--orange);margin-bottom:8px;letter-spacing:2px">🎯 断课结论总览</div>';
+    html += '<div style="font-size:13px;line-height:1.8;margin-bottom:6px"><b>日干支：</b>' + pan.dayGan + pan.dayZhi + ' · <b>占时：</b>' + pan.shiZhi + ' · <b>月将：</b>' + pan.yueJiang + '</div>';
+    html += '<div style="font-size:13px;line-height:1.8;margin-bottom:6px"><b>三传：</b>' + pan.sanChuan.chu + ' → ' + pan.sanChuan.zhong + ' → ' + pan.sanChuan.mo + '（' + (pan.sanChuan.method || '贼克法') + '）</div>';
+    html += '<div style="font-size:13px;line-height:1.8;margin-bottom:6px"><b>吉凶：</b><span style="color:' + (analyze.luck === '吉' ? 'var(--jade2)' : analyze.luck === '凶' ? 'var(--fire)' : 'var(--gold)') + ';font-weight:600">' + analyze.luck + '</span></div>';
+    if (analyze.keti) html += '<div style="font-size:12px;line-height:1.8;margin-bottom:6px;opacity:.8"><b>课体：</b>' + analyze.keti + '</div>';
+    html += '<div style="font-size:12px;line-height:1.8;opacity:.8"><b>断语：</b>' + analyze.advice + '</div>';
+    html += '</div>';
+    // === 📋 缘主须知 ===
+    html += '<div style="margin:12px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(46,204,113,0.06),rgba(46,204,113,0.01));border:1px solid rgba(46,204,113,0.15);border-radius:12px">';
+    html += '<div style="font-size:14px;font-weight:700;color:var(--jade2);margin-bottom:8px;letter-spacing:2px">📋 缘主须知</div>';
+    html += '<div style="font-size:12px;line-height:2;opacity:.9">';
+    html += '<div>1. 三传代表事态发展脉络：初传为起因，中传为过程，末传为结局。</div>';
+    html += '<div>2. 吉凶判定为<b style="color:' + (analyze.luck === '吉' ? 'var(--jade2)' : analyze.luck === '凶' ? 'var(--fire)' : 'var(--gold)') + '">' + analyze.luck + '</b>，' + (analyze.luck === '吉' ? '宜积极行动' : analyze.luck === '凶' ? '宜守不宜进，待时而动' : '吉凶参半，需权衡利弊') + '。</div>';
+    html += '<div>3. ' + analyze.advice + '</div>';
+    html += '<div>4. 大六壬为古法占卜，重在参考而非定论。君子谋道不谋食，行正道自有天佑。</div>';
+    html += '</div></div>';
     // === 化解方案与开运建议 ===
     try {
       var _cureHtml = getLiurenResolution(pan, analyze);
@@ -32749,7 +33050,7 @@ function runZiweiEngine() {
     html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
     html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🌃 十二宫星曜分布</div>';
     html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
-    html += '<tr style="background:rgba(201,168,76,0.08)"><th style="padding:6px;border:1px solid var(--border);text-align:left">宫位</th><th style="padding:6px;border:1px solid var(--border);text-align:left">宫支</th><th style="padding:6px;border:1px solid var(--border);text-align:left">主星</th><th style="padding:6px;border:1px solid var(--border);text-align:left">辅星</th><th style="padding:6px;border:1px solid var(--border);text-align:left">煞星</th><th style="padding:6px;border:1px solid var(--border);text-align:left">庙旺</th></tr>';
+    html += '<tr style="background:rgba(201,168,76,0.08)"><th style="padding:6px;border:1px solid var(--border);text-align:left">宫位</th><th style="padding:6px;border:1px solid var(--border);text-align:left">宫支</th><th style="padding:6px;border:1px solid var(--border);text-align:left">主星</th><th style="padding:6px;border:1px solid var(--border);text-align:left">星曜含义</th><th style="padding:6px;border:1px solid var(--border);text-align:left">辅星</th><th style="padding:6px;border:1px solid var(--border);text-align:left">煞星</th><th style="padding:6px;border:1px solid var(--border);text-align:left">庙旺</th></tr>';
     var _zwMainStars = ['紫微','天机','太阳','武曲','天同','廉贞','天府','太阴','贪狼','巨门','天相','天梁','七杀','破军'];
     var _zwAuxStars = ['左辅','右弼','文昌','文曲','天魁','天钺','解神','天刑','红鸾','天喜'];
     var _zwShaStars = ['擎羊','陀罗','火星','铃星','地空','地劫','天马'];
@@ -32781,7 +33082,10 @@ function runZiweiEngine() {
       html += '<tr' + (_isMing ? ' style="background:rgba(231,76,60,0.06)"' : '') + '>';
       html += '<td style="padding:5px 6px;border:1px solid var(--border);font-weight:' + (_isMing ? '700' : '400') + '">' + _gName + '</td>';
       html += '<td style="padding:5px 6px;border:1px solid var(--border)">' + _gZhi + '</td>';
-      html += '<td style="padding:5px 6px;border:1px solid var(--border);color:var(--fire2)">' + (_gMain.join('、') || '—') + '</td>';
+      var _starMeaningMap = {'紫微':'帝星，主尊贵领导','天机':'智慧，主谋略思辨','太阳':'光明，主热情贵气','武曲':'财星，主刚毅果断','天同':'福星，主安逸享受','廉贞':'囚星，主桃花是非','天府':'库星，主稳重保守','太阴':'月星，主阴柔细腻','贪狼':'桃花，主欲望才艺','巨门':'暗星，主口舌是非','天相':'印星，主辅佐服务','天梁':'荫星，主清高庇荫','七杀':'将星，主肃杀开创','破军':'耗星，主破旧立新'};
+        var _gMainMeaning = _gMain.map(function(s){ var n = s.replace(/\(.*?\)/,''); return _starMeaningMap[n] || ''; }).filter(function(s){return s;}).join('、');
+        html += '<td style="padding:5px 6px;border:1px solid var(--border);color:var(--fire2)">' + (_gMain.join('、') || '—') + '</td>';
+        html += '<td style="padding:5px 6px;border:1px solid var(--border);font-size:11px;opacity:.6">' + (_gMainMeaning || '—') + '</td>';
       html += '<td style="padding:5px 6px;border:1px solid var(--border);color:var(--gold)">' + (_gAux.join('、') || '—') + '</td>';
       html += '<td style="padding:5px 6px;border:1px solid var(--border);color:var(--fire)">' + (_gSha.join('、') || '—') + '</td>';
       html += '<td style="padding:5px 6px;border:1px solid var(--border);font-size:11px">' + _gStr + '</td>';
@@ -32808,6 +33112,10 @@ function runZiweiEngine() {
       html += '<span style="color:var(--gold)">' + _starName + '</span> ';
       html += '<span style="opacity:.7">→</span> ';
       html += '<span style="font-weight:600">' + _gongLabel + '</span>';
+      var _sihuaImpact = {'禄':'财运亨通，机缘增多，该宫位事物顺遂','权':'权力提升，掌控增强，该宫位事物有主导权','科':'名声显达，贵人相助，该宫位事物受肯定','忌':'阻碍不顺，执念纠结，该宫位事物多波折'};
+      var _sihuaAction = {'禄':'顺势而为，把握机遇','权':'勇于担当，主动出击','科':'提升自我，广结善缘','忌':'保守为宜，化解执念'};
+      html += '<div style="font-size:11px;opacity:.7;margin-top:4px">' + (_sihuaImpact[_sh[2]] || '') + '</div>';
+      html += '<div style="font-size:11px;color:var(--gold);margin-top:2px">→ ' + (_sihuaAction[_sh[2]] || '') + '</div>';
       html += '</div>';
     }
     html += '</div></div>';
@@ -32860,6 +33168,23 @@ function runZiweiEngine() {
       html += '</table></div>';
       if (analyze.currentDaxian) {
         html += '<div style="padding:8px 12px;font-size:12px;color:var(--jade2)">📍 当前大限：' + analyze.currentDaxian + '</div>';
+        // 当前大运详细分析
+        try {
+          var _curDyIdx = -1;
+          for (var _cdi = 0; _cdi < analyze.daxian.length; _cdi++) {
+            if (analyze.currentDaxian.indexOf(analyze.daxian[_cdi].gong) >= 0 && analyze.currentDaxian.indexOf(analyze.daxian[_cdi].ageRange) >= 0) { _curDyIdx = _cdi; break; }
+          }
+          if (_curDyIdx >= 0) {
+            var _curDy = analyze.daxian[_curDyIdx];
+            html += '<div style="padding:10px 14px;margin:8px 12px;background:rgba(46,204,113,0.04);border:1px solid rgba(46,204,113,0.12);border-radius:8px;font-size:12px;line-height:1.8">';
+            html += '<div style="font-weight:600;color:var(--jade2);margin-bottom:4px">🔍 当前大运详解</div>';
+            html += '<div>宫位：' + _curDy.gong + '（' + (_BRANCHES[_curDy.pos] || '') + '）| 年龄：' + _curDy.ageRange + '岁</div>';
+            html += '<div>主星：' + _curDy.stars + '</div>';
+            if (_curDy.sihua && _curDy.sihua.length > 0) html += '<div>四化：' + _curDy.sihua.join('、') + '</div>';
+            html += '<div style="opacity:.7;margin-top:4px">此大运期间，命主受' + _curDy.gong + '宫星曜影响，' + (_curDy.stars.indexOf('紫微') >= 0 || _curDy.stars.indexOf('天府') >= 0 ? '事业有成的机会较大' : _curDy.stars.indexOf('七杀') >= 0 || _curDy.stars.indexOf('破军') >= 0 ? '变动较多，宜守不宜进' : '需根据星曜庙旺综合判断') + '。</div>';
+            html += '</div>';
+          }
+        } catch(_de) { console.warn('当前大运详解渲染错误:', _de); }
       }
     } else {
       html += '<div style="padding:12px;font-size:12px;opacity:.6">大运数据不可用</div>';
@@ -32905,6 +33230,36 @@ function runZiweiEngine() {
     }
     html += '</div></div>';
 
+    // === 命宫详细解读 ===
+    try {
+      var _mingPos2 = pan.gongMap['命宫'];
+      var _mingStars3 = pan.stars[_mingPos2] || [];
+      var _mingMain3 = _mingStars3.filter(function(s){ return _zwMainStars.indexOf(s) >= 0; });
+      var _mingDescMap = {'紫微':'紫微星入命，为人尊贵，有领导力，但易孤高。适合管理岗位，需注意人际关系。','天机':'天机星入命，聪明好学，善于谋略，但多思多虑。适合策划、研究类工作。','太阳':'太阳星入命，热情大方，乐于助人，有贵气。适合公职、传媒，注意别太操劳。','武曲':'武曲星入命，性格刚毅，做事果断，财星入命善理财。适合金融、军警。','天同':'天同星入命，性格温和，福星入命主安逸。适合文职、服务业，注意别太懒散。','廉贞':'廉贞星入命，能干有才华，但易招桃花是非。适合艺术、公关，注意感情纠纷。','天府':'天府星入命，稳重保守，库星入命善积蓄。适合金融、管理，注意别太保守。','太阴':'太阴星入命，温柔细腻，母性光辉。适合艺术、教育，注意情绪管理。','贪狼':'贪狼星入命，多才多艺，欲望强。适合演艺、商业，注意节制欲望。','巨门':'巨门星入命，口才好但易招是非。适合律师、讲师，注意口舌之争。','天相':'天相星入命，辅佐之才，为人正直。适合公务、管理，注意别太依赖他人。','天梁':'天梁星入命，清高正直，荫星入命主庇荫。适合医疗、教育，注意别太清高。','七杀':'七杀星入命，性格刚强，开创力强。适合创业、军警，注意冲动行事。','破军':'破军星入命，破旧立新，变化多端。适合创新行业，注意感情稳定。'};
+      var _mingDesc = _mingMain3.map(function(s){ return _mingDescMap[s] || ''; }).join(' ');
+      if (_mingDesc) {
+        html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+        html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🌟 命宫详细解读</div>';
+        html += '<div style="padding:12px 16px;font-size:12px;line-height:1.8">' + _mingDesc;
+        // 身宫补充
+        var _shenPos = pan.gongMap['身宫'];
+        if (_shenPos !== undefined && _shenPos !== _mingPos2) {
+          var _shenGong = _getGongName(_shenPos, pan.gongMap);
+          html += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(201,168,76,0.1)"><b>身宫在' + _shenGong + '：</b>身宫代表后天造化，' + (_shenGong === '财帛' ? '重视财运' : _shenGong === '官禄' ? '重视事业' : _shenGong === '迁移' ? '重视外出发展' : _shenGong === '福德' ? '重视精神生活' : _shenGong === '夫妻' ? '重视感情家庭' : '后天发展在该领域') + '。</div>';
+        }
+        html += '</div></div>';
+      }
+    } catch(_mde) { console.warn('命宫详细解读错误:', _mde); }
+    // === 📋 缘主须知 ===
+    html += '<div style="margin:12px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(231,76,60,0.06),rgba(231,76,60,0.01));border:1px solid rgba(231,76,60,0.15);border-radius:12px">';
+    html += '<div style="font-size:14px;font-weight:700;color:var(--fire2);margin-bottom:8px;letter-spacing:2px">📋 缘主须知</div>';
+    html += '<div style="font-size:12px;line-height:2;opacity:.9">';
+    html += '<div>1. 命宫主星决定先天格局，' + (analyze.overview || '需综合十二宫判断') + '。</div>';
+    html += '<div>2. 四化影响各宫位运势，化禄增财、化权增势、化科增名、化忌增阻。</div>';
+    html += '<div>3. 大运每十年一转，当前大运对人生影响重大，需把握机遇。</div>';
+    html += '<div>4. ' + (analyze.advice || '紫微斗数为命理参考，切勿迷信。') + '</div>';
+    html += '<div>5. 命由天定，运由己造。行善积德，自然趋吉避凶。</div>';
+    html += '</div></div>';
     // 化解方案
     try {
       var _cureHtml = getZiweiResolution(pan, analyze);
@@ -32973,6 +33328,11 @@ function runZiweiEngine() {
         html += v3Html;
       }
     } catch(e3) { console.warn('ZiweiV3 error:', e3); }
+    // === 年度运势 ===
+    try {
+      var _afPanel = _buildAnnualFortunePanel(year, month, day, hour, sex);
+      if (_afPanel) html += _afPanel;
+    } catch(_afe) { console.warn('Ziwei annual fortune error:', _afe); }
     _showEngineResult('zwEngineResult', html);
   } catch(e) { showToast('紫微引擎错误：'+e.message); }
 }
@@ -33054,7 +33414,7 @@ function runFengshuiEngine() {
     html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
     html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🏠 八宅吉凶分布</div>';
     html += '<div style="padding:12px"><table style="width:100%;border-collapse:collapse;font-size:12px">';
-    html += '<tr style="background:rgba(201,168,76,0.08)"><th style="padding:6px;text-align:left">方位</th><th style="padding:6px;text-align:left">八宅</th><th style="padding:6px;text-align:left">吉凶</th><th style="padding:6px;text-align:left">说明</th></tr>';
+    html += '<tr style="background:rgba(201,168,76,0.08)"><th style="padding:6px;text-align:left">方位</th><th style="padding:6px;text-align:left">八宅</th><th style="padding:6px;text-align:left">吉凶</th><th style="padding:6px;text-align:left">说明</th><th style="padding:6px;text-align:left">布局建议</th></tr>';
     var _dirOrder = ['北','东北','东','东南','南','西南','西','西北'];
     for (var di = 0; di < _dirOrder.length; di++) {
       var _dir = _dirOrder[di];
@@ -33063,11 +33423,16 @@ function runFengshuiEngine() {
       var _luck = _jixiongMap[_pos] || '平';
       var _desc = _bazhaiDesc[_pos] || '';
       var _luckColor = _luck.includes('吉') ? '#27ae60' : (_luck.includes('凶') ? '#e74c3c' : 'var(--text-light)');
+      var _dirAdvice = '';
+      if (_luck.includes('吉')) _dirAdvice = '宜设卧室、客厅、书房等常用区域；可摆放绿植、水晶、鱼缸等催旺';
+      else if (_luck.includes('凶')) _dirAdvice = '宜设厨房（以火镇之）、卫生间（以凶压凶）、储物间；避免长期停留';
+      else _dirAdvice = '平稳之位，可作一般用途';
       html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.04)">';
       html += '<td style="padding:6px">' + _dir + '</td>';
       html += '<td style="padding:6px;color:var(--gold);font-weight:600">' + _pos + '</td>';
       html += '<td style="padding:6px;color:' + _luckColor + ';font-weight:600">' + _luck + '</td>';
       html += '<td style="padding:6px;opacity:.7">' + _desc + '</td>';
+      html += '<td style="padding:6px;font-size:11px;opacity:.6">' + _dirAdvice + '</td>';
       html += '</tr>';
     }
     html += '</table></div></div>';
@@ -33107,10 +33472,13 @@ function runFengshuiEngine() {
         if (_area === '客厅' && ['生气','天医','延年'].includes(_p)) _recommend.push(_d + '(' + _p + ')');
       }
       var _recText = _recommend.length > 0 ? _recommend.join('、') : '依宅卦而定';
+      var _areaItems = {'大门':'门垫（红色/金色招财）、门铃、玄关屏风','客厅':'貔貅摆件、发财树、黄水晶球（财位摆放）','主卧':'粉晶（旺姻缘）、葫芦（化病）、床头柜灯','厨房':'陶瓷葫芦（化火煞）、五帝钱（挂灶台上方）','卫生间':'盐灯（化浊）、黑曜石（吸煞）、常闭门'};
+      var _areaItemText = _areaItems[_area] || '';
       html += '<div style="margin-bottom:12px;padding:10px;background:rgba(201,168,76,0.03);border-radius:8px;border:1px solid rgba(201,168,76,0.08)">';
       html += '<div style="font-size:13px;font-weight:600;color:var(--gold);margin-bottom:4px">' + _area + '</div>';
       html += '<div style="font-size:11px;opacity:.7;margin-bottom:4px">' + _areaAdvice[_area] + '</div>';
       html += '<div style="font-size:11px"><span style="opacity:.5">推荐方位：</span><span style="color:#27ae60">' + _recText + '</span></div>';
+      if (_areaItemText) html += '<div style="font-size:11px;margin-top:4px"><span style="opacity:.5">推荐物品：</span><span style="color:var(--gold)">' + _areaItemText + '</span></div>';
       html += '</div>';
     }
     html += '</div></div>';
@@ -33121,6 +33489,16 @@ function runFengshuiEngine() {
     html += '<ul style="padding-left:18px;opacity:0.8;margin:0"><li>' + res.layoutTips.join('</li><li>') + '</li></ul>';
     html += '</div>';
 
+    // === 📋 缘主须知 ===
+    html += '<div style="margin:12px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(138,92,246,0.06),rgba(138,92,246,0.01));border:1px solid rgba(138,92,246,0.15);border-radius:12px">';
+    html += '<div style="font-size:14px;font-weight:700;color:var(--violet2);margin-bottom:8px;letter-spacing:2px">📋 缘主须知</div>';
+    html += '<div style="font-size:12px;line-height:2;opacity:.9">';
+    html += '<div>1. 本宅为<b>' + res.zhaiMing + '</b>（' + res.direction + '向），' + (res.matching ? '宅命相配，家宅安宁' : '宅命不配，需布局化解') + '。</div>';
+    html += '<div>2. 当前为<b>' + res.period + '运</b>，' + (res.wangShan ? '当运旺山旺向，财运亨通' : '非当运，需通过布局催旺') + '。</div>';
+    html += '<div>3. 吉方宜多停留，凶方宜以厨房/卫生间压之。大门、主卧、灶位为阳宅三要，务必在吉方。</div>';
+    html += '<div>4. 九宫飞星每年飞临方位不同，建议每年年底查看流年飞星布局。</div>';
+    html += '<div>5. 风水布局为辅助，人心向善才是根本。家和万事兴，和气自生财。</div>';
+    html += '</div></div>';
     // === 化解方案与开运建议 ===
     try {
       var _cureHtml = getFengshuiResolution(res);
