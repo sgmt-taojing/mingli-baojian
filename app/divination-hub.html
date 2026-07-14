@@ -7715,7 +7715,7 @@ function showMedicineDetail(item) {
   var content = document.getElementById('medicineDetailContent');
   
   if (!modal || !title || !content) {
-    alert(item.name + '\n\n' + item.desc + '\n\n价格: ¥' + item.price + '\n\n' + item.master + ' | ' + item.origin);
+    showToast(item.name + '\n\n' + item.desc + '\n\n价格: ¥' + item.price + '\n\n' + item.master + ' | ' + item.origin);
     return;
   }
   
@@ -22965,18 +22965,18 @@ let savedCompanyNames = [];
 
 function saveCompanyName(name) {
   if (savedCompanyNames.includes(name)) {
-    alert('已收藏此名称');
+    showToast('已收藏此名称');
     return;
   }
 
   savedCompanyNames.push(name);
-  alert(`"${name}" 已加入收藏列表`);
+  showToast(`"${name}" 已加入收藏列表`);
 }
 
 // 显示收藏列表
 function showSavedList() {
   if (savedCompanyNames.length === 0) {
-    alert('收藏列表为空');
+    showToast('收藏列表为空');
     return;
   }
 
@@ -23013,7 +23013,7 @@ function clearSavedList() {
 // 导出收藏列表
 function exportSavedList() {
   if (savedCompanyNames.length === 0) {
-    alert('收藏列表为空');
+    showToast('收藏列表为空');
     return;
   }
 
@@ -23236,7 +23236,7 @@ function analyzeMobileBaziMatchCore(mobileNumber, baziAnalysis) {
 // 显示八字匹配结果
 function displayBaziMatchResult(result) {
   if (!result) {
-    alert('无法分析匹配度');
+    showToast('无法分析匹配度');
     return;
   }
 
@@ -24373,18 +24373,18 @@ function computeRename() {
   const liveCity = document.getElementById('renameLiveCity')?.value || '';
 
   if (!currentName) {
-    alert('请输入当前姓名');
+    showToast('请输入当前姓名');
     return;
   }
 
   if (!newNames) {
-    alert('请输入想改的名字');
+    showToast('请输入想改的名字');
     return;
   }
 
   const nameList = newNames.split('\n').filter(n => n.trim());
   if (nameList.length === 0) {
-    alert('请输入想改的名字');
+    showToast('请输入想改的名字');
     return;
   }
 
@@ -24996,7 +24996,7 @@ function analyzeName(currentName, newName, sex, birthDate) {
 
 function displayRenameResult(analysis) {
   if (!analysis.success) {
-    alert(analysis.message);
+    showToast(analysis.message);
     return;
   }
 
@@ -25576,7 +25576,7 @@ document.addEventListener('DOMContentLoaded', function() {
         computeBazi();
       } else {
         console.error('computeBazi 函数未定义');
-        alert('排盘函数未加载完成，请刷新页面重试');
+        showToast('排盘函数未加载完成，请刷新页面重试');
       }
     });
   }
@@ -28152,7 +28152,7 @@ function showScreenshotPreview(file) {
 function analyzeScreenshot() {
   var img = document.getElementById('screenshotImage');
   if (!img || !img.src || img.src === '') {
-    alert('请先上传截图');
+    showToast('请先上传截图');
     return;
   }
   var resultEl = document.getElementById('screenshotAnalysisResult');
@@ -28185,12 +28185,12 @@ function bindBazi() {
   var day = document.getElementById('bindDay');
   var hour = document.getElementById('bindHour');
   if (!year || !month || !day || !hour) {
-    alert('表单加载异常');
+    showToast('表单加载异常');
     return;
   }
   var y = year.value, m = month.value, d = day.value, h = hour.value;
   if (!y || !m || !d) {
-    alert('请填写完整的出生日期');
+    showToast('请填写完整的出生日期');
     return;
   }
   try {
@@ -28214,181 +28214,8 @@ function bindBazi() {
 </script>
 
 <script>
-// === 体质调理模块 ===
-// New TZ_DATA for tizhi module - comprehensive health management
-var TZ_DATA = {
-  constitutions: [
-    {key:'pinghe',name:'平和质',icon:'🌱',color:'#4CAF50',desc:'体型匀称、面色润泽、精力充沛',yangsheng:'均衡饮食，规律作息，适度运动。保持当前状态，避免偏嗜。'},
-    {key:'qixu',name:'气虚质',icon:'🌪️',color:'#9C27B0',desc:'容易疲乏、气短懒言、易出汗',yangsheng:'补气健脾，多食黄芪、党参、山药、大枣。避免过度劳累。'},
-    {key:'yangxu',name:'阳虚质',icon:'🌊',color:'#009688',desc:'畏寒怕冷、手脚冰凉、喜热饮',yangsheng:'温补阳气，多食羊肉、生姜、桂圆、韭菜。注意保暖，避免生冷。'},
-    {key:'yinxu',name:'阴虚质',icon:'🔥',color:'#FF9800',desc:'口干咽燥、手足心热、盗汗',yangsheng:'滋阴润燥，多食银耳、百合、枸杞、麦冬。避免辛辣燥热。'},
-    {key:'xueyu',name:'血虚质',icon:'🩸',color:'#F44336',desc:'面色苍白、头晕眼花、心悸失眠',yangsheng:'补血养血，多食红枣、当归、桂圆、黑芝麻。避免过度用眼。'},
-    {key:'tanshi',name:'痰湿质',icon:'💧',color:'#2196F3',desc:'体型肥胖、腹部松软、口中黏腻',yangsheng:'化痰祛湿，多食薏仁、冬瓜、陈皮、白萝卜。加强运动，少食肥甘。'},
-    {key:'shire',name:'湿热质',icon:'🌿',color:'#4CAF50',desc:'面部油光、口苦口臭、大便黏滞',yangsheng:'清热利湿，多食绿豆、苦瓜、冬瓜、薏仁。忌辛辣油腻烟酒。'},
-    {key:'xueyu2',name:'血瘀质',icon:'🟣',color:'#795548',desc:'肤色偏暗、易有瘀斑、唇色紫暗',yangsheng:'活血化瘀，多食山楂、桃仁、红花、黑木耳。加强运动促进气血运行。'},
-    {key:'qiyu',name:'气郁质',icon:'🔵',color:'#3F51B5',desc:'情绪低落、多愁善感、胸闷叹气',yangsheng:'疏肝理气，多食玫瑰、佛手、柑橘、薄荷。保持心情舒畅，多社交。'},
-    {key:'tebing',name:'特禀质',icon:'🧬',color:'#795548',desc:'易过敏、鼻敏感、对药物/食物敏感',yangsheng:'益气固表，避免过敏原。多食益气食物如黄芪、防风、白术。'}
-  ],
-  questions: [
-    {q:'您是否容易疲乏，精力不足？',scores:{qixu:2,yangxu:1}},
-    {q:'您是否容易气短，说话无力？',scores:{qixu:2}},
-    {q:'您是否容易手脚发凉，畏寒怕冷？',scores:{yangxu:2}},
-    {q:'您是否口干咽燥，总想喝水？',scores:{yinxu:2,shire:1}},
-    {q:'您是否容易出汗（白天自汗或夜间盗汗）？',scores:{qixu:1,yinxu:1}},
-    {q:'您是否容易情绪低落、叹气或胸闷？',scores:{qiyu:2}},
-    {q:'您是否皮肤或嘴唇颜色偏暗、有瘀斑？',scores:{xueyu2:2}},
-    {q:'您是否容易长痘或面部油腻？',scores:{shire:2,tanshi:1}},
-    {q:'您是否容易过敏（食物/药物/花粉）？',scores:{tebing:2}},
-    {q:'您是否睡眠良好，精力充沛，适应力强？',scores:{pinghe:2}},
-    {q:'您是否头晕眼花，面色偏白？',scores:{xueyu:2,qixu:1}},
-    {q:'您是否体型偏胖，腹部松软，口中黏腻？',scores:{tanshi:2}},
-    {q:'您是否口苦口臭，大便黏滞不爽？',scores:{shire:2}},
-    {q:'您是否腰膝酸软，耳鸣脱发？',scores:{yangxu:1,yinxu:1}},
-    {q:'您是否食欲不振，腹胀便溏？',scores:{qixu:1,tanshi:1}}
-  ],
-  // 名医名方库
-  famousPrescriptions: [
-    {name:'四君子汤',source:'《太平惠民和剂局方》',constitutions:['气虚'],composition:'人参、白术、茯苓、甘草',effect:'益气健脾',usage:'适用于脾胃气虚证，食少便溏、四肢乏力',category:'补益剂'},
-    {name:'补中益气汤',source:'《脾胃论》李东垣',constitutions:['气虚'],composition:'黄芪、人参、白术、炙甘草、当归、陈皮、升麻、柴胡',effect:'补中益气，升阳举陷',usage:'适用于脾胃气虚下陷证，内脏下垂、久泻',category:'补益剂'},
-    {name:'四物汤',source:'《仙授理伤续断秘方》',constitutions:['血虚'],composition:'熟地黄、白芍、当归、川芎',effect:'补血调血',usage:'适用于营血虚滞证，面色无华、月经不调',category:'补血剂'},
-    {name:'八珍汤',source:'《正体类要》',constitutions:['气虚','血虚'],composition:'人参、白术、茯苓、甘草、熟地、白芍、当归、川芎',effect:'气血双补',usage:'适用于气血两虚证，面色苍白、气短懒言',category:'气血双补'},
-    {name:'十全大补汤',source:'《太平惠民和剂局方》',constitutions:['气虚','血虚','阳虚'],composition:'八珍汤加黄芪、肉桂',effect:'温补气血',usage:'适用于气血两虚兼阳虚证',category:'气血双补'},
-    {name:'六味地黄丸',source:'《小儿药证直诀》钱乙',constitutions:['阴虚'],composition:'熟地黄、山茱萸、山药、泽泻、茯苓、牡丹皮',effect:'滋阴补肾',usage:'适用于肾阴虚证，腰膝酸软、头晕耳鸣',category:'补阴剂'},
-    {name:'金匮肾气丸',source:'《金匮要略》张仲景',constitutions:['阳虚'],composition:'干地黄、山茱萸、山药、泽泻、茯苓、牡丹皮、桂枝、附子',effect:'温补肾阳',usage:'适用于肾阳不足证，畏寒肢冷、小便不利',category:'补阳剂'},
-    {name:'逍遥散',source:'《太平惠民和剂局方》',constitutions:['气郁'],composition:'柴胡、当归、白芍、白术、茯苓、甘草、薄荷、生姜',effect:'疏肝解郁，健脾养血',usage:'适用于肝郁脾虚证，胸胁胀痛、情绪抑郁',category:'和解剂'},
-    {name:'二陈汤',source:'《太平惠民和剂局方》',constitutions:['痰湿'],composition:'半夏、橘红、茯苓、甘草',effect:'燥湿化痰，理气和中',usage:'适用于湿痰证，咳嗽痰多、胸膈痞闷',category:'祛痰剂'},
-    {name:'龙胆泻肝汤',source:'《医方集解》',constitutions:['湿热'],composition:'龙胆草、黄芩、栀子、泽泻、木通、车前子、当归、生地、柴胡、甘草',effect:'泻肝胆实火，清下焦湿热',usage:'适用于肝胆湿热证，口苦目赤、尿赤涩痛',category:'清热剂'},
-    {name:'血府逐瘀汤',source:'《医林改错》王清任',constitutions:['血瘀'],composition:'桃仁、红花、当归、生地、川芎、赤芍、牛膝、桔梗、柴胡、枳壳、甘草',effect:'活血化瘀，行气止痛',usage:'适用于胸中血瘀证，胸痛头痛、失眠多梦',category:'理血剂'},
-    {name:'玉屏风散',source:'《医方类聚》',constitutions:['气虚','特禀'],composition:'黄芪、白术、防风',effect:'益气固表止汗',usage:'适用于表虚不固证，易感冒、自汗',category:'固涩剂'},
-    {name:'酸枣仁汤',source:'《金匮要略》张仲景',constitutions:['阴虚','气郁'],composition:'酸枣仁、甘草、知母、茯苓、川芎',effect:'养血安神，清热除烦',usage:'适用于虚劳虚烦不得眠',category:'安神剂'},
-    {name:'桂枝汤',source:'《伤寒论》张仲景',constitutions:['平和','阳虚'],composition:'桂枝、芍药、生姜、大枣、炙甘草',effect:'解肌发表，调和营卫',usage:'适用于外感风寒表虚证',category:'解表剂'},
-    {name:'理中丸',source:'《伤寒论》张仲景',constitutions:['阳虚'],composition:'人参、干姜、白术、炙甘草',effect:'温中祛寒，补气健脾',usage:'适用于脾胃虚寒证，腹痛便溏、不欲饮食',category:'温里剂'},
-    {name:'归脾汤',source:'《济生方》严用和',constitutions:['气虚','血虚'],composition:'人参、黄芪、白术、茯神、酸枣仁、龙眼肉、木香、炙甘草、当归、远志',effect:'益气补血，健脾养心',usage:'适用于心脾两虚证，心悸失眠、食少体倦',category:'补血剂'}
-  ],
-  // 功法库
-  qigongMethods: [
-    {name:'八段锦',type:'导引功法',difficulty:'入门',duration:'15-20分钟',constitutions:['气虚','气郁','血瘀'],
-     desc:'八段锦由八节动作组成，柔和缓慢、圆活连贯，适合各年龄段练习',
-     steps:'1.两手托天理三焦 2.左右开弓似射雕 3.调理脾胃须单举 4.五劳七伤往后瞧 5.摇头摆尾去心火 6.两手攀足固肾腰 7.攒拳怒目增气力 8.背后七颠百病消',
-     benefit:'调理脏腑、疏通经络、强身健体',
-     caution:'饭后一小时内不宜练习，动作宜柔和'},
-    {name:'太极拳',type:'内家拳法',difficulty:'进阶',duration:'20-40分钟',constitutions:['气虚','阴虚','气郁'],
-     desc:'太极拳以柔克刚、以静制动，动作如行云流水，注重意气形合一',
-     steps:'起势→野马分鬃→白鹤亮翅→搂膝拗步→手挥琵琶→倒卷肱→左右穿梭→海底针→闪通臂→收势',
-     benefit:'增强心肺功能、改善平衡、调节神经系统',
-     caution:'膝盖有损伤者注意动作幅度，避免低架'},
-    {name:'六字诀',type:'呼吸吐纳',difficulty:'入门',duration:'10-15分钟',constitutions:['气郁','湿热','痰湿'],
-     desc:'通过六种不同口型呼气，对应五脏六腑，吐故纳新',
-     steps:'嘘（肝）→呵（心）→呼（脾）→呬（肺）→吹（肾）→嘻（三焦）',
-     benefit:'调理五脏、泻腑实、补脏虚',
-     caution:'空腹或饭后一小时内不宜练习'},
-    {name:'五禽戏',type:'导引功法',difficulty:'入门',duration:'15-25分钟',constitutions:['气虚','阳虚','血瘀'],
-     desc:'模仿虎、鹿、熊、猿、鸟五种动物姿态，华佗所创',
-     steps:'虎戏（虎举、虎扑）→鹿戏（鹿抵、鹿奔）→熊戏（熊运、熊晃）→猿戏（猿提、猿摘）→鸟戏（鸟伸、鸟飞）',
-     benefit:'强筋健骨、疏通经络、灵活关节',
-     caution:'关节炎症急性期慎练'},
-    {name:'易筋经',type:'导引功法',difficulty:'进阶',duration:'20-30分钟',constitutions:['气虚','阳虚','血瘀'],
-     desc:'十二势易筋经，以形体屈伸俯仰为特点，强壮筋骨',
-     steps:'韦驮献杵三势→摘星换斗→倒拽九牛尾→出爪亮翅→九鬼拔马刀→三盘落地→青龙探爪→卧虎扑食→打躬击鼓→掉尾势',
-     benefit:'伸筋拔骨、强健肌肉、畅通气血',
-     caution:'高血压患者动作宜缓慢，避免屏气'},
-    {name:'站桩',type:'静功',difficulty:'入门',duration:'10-30分钟',constitutions:['气虚','阳虚','阴虚'],
-     desc:'以静站为主，外形不动而内气运行，是内功基本功',
-     steps:'自然站立，两脚与肩同宽，微屈膝，双手抱球于胸前，舌抵上腭，自然呼吸',
-     benefit:'培养内气、增强体质、安定心神',
-     caution:'初次练习不宜超过15分钟，循序渐进'},
-    {name:'正念冥想',type:'静心修习',difficulty:'入门',duration:'10-20分钟',constitutions:['气郁','阴虚','血虚'],
-     desc:'源自佛教禅修，以觉知当下为核心，不评判不执着',
-     steps:'1.选择安静环境盘坐或椅坐 2.闭目或微闭 3.觉知呼吸进出 4.观察念头来去不追随 5.身体扫描从头到脚 6.慈心祝愿',
-     benefit:'减轻焦虑抑郁、改善睡眠、增强专注力、降低血压',
-     caution:'精神疾病急性期不宜单独练习'},
-    {name:'腹式呼吸',type:'呼吸训练',difficulty:'入门',duration:'5-10分钟',constitutions:['气虚','气郁','特禀'],
-     desc:'以腹部起伏为主的深呼吸法，激活副交感神经',
-     steps:'仰卧或端坐，一手放胸一手放腹，鼻吸气时腹部隆起，口呼气时腹部凹陷，呼吸比约1:2',
-     benefit:'缓解压力、改善睡眠、增强肺活量、按摩内脏',
-     caution:'头晕时恢复正常呼吸，不要过度换气'}
-  ],
-  recipes: [
-    {name:'莲子百合红枣粥',organ:'Huo',constitutions:['阴虚','血虚'],ingredients:'莲子30g、百合15g、红枣5颗、粳米100g',method:'莲子、百合提前浸泡1小时，与红枣、粳米同煮成粥',effect:'养心安神，滋阴润燥'},
-    {name:'酸枣仁茯苓茶',organ:'Huo',constitutions:['阴虚','气虚'],ingredients:'酸枣仁15g、茯苓10g、知母6g',method:'水煎服，睡前2小时服用',effect:'养心安神，改善失眠'},
-    {name:'桂圆红枣茶',organ:'Huo',constitutions:['血虚','阳虚'],ingredients:'桂圆10g、红枣5颗、枸杞5g',method:'沸水冲泡，焖10分钟',effect:'补益心血，安神定悸'},
-    {name:'苦瓜莲心茶',organ:'Huo',constitutions:['阴虚','湿热'],ingredients:'苦瓜干片10g、莲子心3g',method:'沸水冲泡，凉后饮用',effect:'清心泻火'},
-    {name:'枸杞菊花明目茶',organ:'Mu',constitutions:['阴虚','血虚'],ingredients:'枸杞10g、菊花5g、决明子5g',method:'沸水冲泡，每日1-2杯',effect:'清肝明目，滋补肝肾'},
-    {name:'芹菜绿豆汤',organ:'Mu',constitutions:['湿热','阳虚'],ingredients:'鲜芹菜200g、绿豆30g',method:'绿豆半熟加芹菜煮20分钟',effect:'清肝泻火，平肝降压'},
-    {name:'玫瑰佛手茶',organ:'Mu',constitutions:['气郁','痰湿'],ingredients:'玫瑰花6g、佛手6g、陈皮3g',method:'沸水冲泡代茶饮',effect:'疏肝理气，解郁安神'},
-    {name:'柴胡白芍疏肝茶',organ:'Mu',constitutions:['气郁','阴虚'],ingredients:'柴胡5g、白芍10g、甘草3g',method:'水煎服',effect:'疏肝解郁，调和肝脾'},
-    {name:'小米山药莲子粥',organ:'Tu',constitutions:['气虚','阳虚'],ingredients:'小米100g、山药50g、莲子15g',method:'同煮成粥，早晨空腹',effect:'健脾益气，和胃止泻'},
-    {name:'四神汤',organ:'Tu',constitutions:['痰湿','气虚'],ingredients:'茯苓15g、山药30g、莲子15g、芡实15g',method:'炖汤或煮粥',effect:'健脾祛湿，固涩止泻'},
-    {name:'陈皮生姜红茶',organ:'Tu',constitutions:['阳虚','痰湿'],ingredients:'陈皮5g、生姜3片、红茶3g',method:'沸水冲泡，晨起饮用',effect:'温中健脾，理气化湿'},
-    {name:'黄芪党参鸡汤',organ:'Tu',constitutions:['气虚','阳虚'],ingredients:'黄芪20g、党参15g、鸡肉200g',method:'炖汤2小时',effect:'补中益气，健脾养胃'},
-    {name:'川贝母蒸梨',organ:'Jin',constitutions:['阴虚','痰湿'],ingredients:'雪梨1个、川贝粉3g、冰糖少许',method:'梨去核填料蒸30分钟',effect:'润肺止咳，清热化痰'},
-    {name:'百合银耳莲子羹',organ:'Jin',constitutions:['阴虚','血虚'],ingredients:'百合15g、银耳10g、莲子10g',method:'银耳泡发同煮成羹',effect:'滋阴润肺，养心安神'},
-    {name:'白萝卜蜂蜜饮',organ:'Jin',constitutions:['痰湿','湿热'],ingredients:'白萝卜200g、蜂蜜30ml',method:'萝卜榨汁加蜂蜜',effect:'顺气化痰，润肠通便'},
-    {name:'黄芪百合粥',organ:'Jin',constitutions:['气虚','阳虚'],ingredients:'黄芪20g、百合15g、粳米100g',method:'黄芪煎汁煮粥',effect:'益气固表，润肺止咳'},
-    {name:'黑豆核桃枸杞粥',organ:'Shui',constitutions:['阴虚','血虚'],ingredients:'黑豆30g、核桃仁15g、枸杞10g',method:'黑豆泡发同煮',effect:'补肾益精，填髓乌发'},
-    {name:'杜仲桑寄生茶',organ:'Shui',constitutions:['阳虚','气虚'],ingredients:'杜仲15g、桑寄生15g、红枣5颗',method:'水煎服',effect:'补肾强腰，祛风除湿'},
-    {name:'肉桂红糖姜茶',organ:'Shui',constitutions:['阳虚','气虚'],ingredients:'肉桂3g、红糖15g、生姜3片',method:'沸水冲泡，晨起温服',effect:'温肾助阳，散寒止痛'},
-    {name:'枸杞桑葚茶',organ:'Shui',constitutions:['阴虚','血虚'],ingredients:'枸杞10g、桑葚干15g',method:'沸水冲泡反复饮用',effect:'滋补肝肾，益精明目'}
-  ],
-  exercises: [
-    {name:'快走',type:'有氧运动',duration:30,intensity:'低',calories:150,notes:'适合大多数人群'},
-    {name:'慢跑',type:'有氧运动',duration:30,intensity:'中',calories:250,notes:'膝盖不适者改快走'},
-    {name:'游泳',type:'有氧运动',duration:30,intensity:'中',calories:300,notes:'对关节友好'},
-    {name:'骑车',type:'有氧运动',duration:40,intensity:'中',calories:280,notes:'户外或动感单车'},
-    {name:'跳绳',type:'有氧运动',duration:15,intensity:'高',calories:200,notes:'注意膝盖保护'},
-    {name:'深蹲',type:'力量训练',duration:10,intensity:'中',calories:80,notes:'膝盖不超过脚尖'},
-    {name:'俯卧撑',type:'力量训练',duration:10,intensity:'中',calories:60,notes:'初学者可跪姿'},
-    {name:'平板支撑',type:'力量训练',duration:5,intensity:'中',calories:40,notes:'保持身体一条线'},
-    {name:'哑铃训练',type:'力量训练',duration:20,intensity:'中',calories:120,notes:'注意动作规范'},
-    {name:'八段锦',type:'柔韧训练',duration:20,intensity:'低',calories:80,notes:'传统养生功法'},
-    {name:'太极拳',type:'柔韧训练',duration:30,intensity:'低',calories:100,notes:'缓慢柔和，调节身心'},
-    {name:'瑜伽',type:'柔韧训练',duration:30,intensity:'低',calories:120,notes:'注意呼吸配合'},
-    {name:'拉伸',type:'柔韧训练',duration:15,intensity:'低',calories:30,notes:'运动前后均应进行'},
-    {name:'腹式呼吸',type:'呼吸训练',duration:10,intensity:'低',calories:10,notes:'放松身心，改善焦虑'},
-    {name:'六字诀',type:'呼吸训练',duration:15,intensity:'低',calories:20,notes:'对应五脏六腑'},
-    {name:'冥想',type:'呼吸训练',duration:15,intensity:'低',calories:15,notes:'减轻压力，改善睡眠'}
-  ],
-  wuxing: {
-    Mu:{name:'木',icon:'🌳',color:'#27ae60',season:'春',direction:'东',taste:'酸',organs:['肝','胆'],sense:'目',tissue:'筋',emotion:'怒',
-      symptoms:['头痛眩晕','眼睛干涩','易怒烦躁','两肋胀痛','指甲脆弱','高血压'],
-      foods:['芹菜','韭菜','绿豆','菠菜','猕猴桃','柠檬','山楂','菊花','枸杞叶'],
-      herbs:['柴胡','白芍','当归','川芎','枸杞','决明子','天麻','钩藤','薄荷','茵陈'],
-      regimen:'春季养肝，早睡早起，少生气。肝经当令丑时(1-3点)务必入睡。青色入肝，酸味收敛肝气。',
-      avoid:'忌过度饮酒、熬夜、暴怒、油腻'},
-    Huo:{name:'火',icon:'🔥',color:'#e74c3c',season:'夏',direction:'南',taste:'苦',organs:['心','小肠'],sense:'舌',tissue:'脉',emotion:'喜',
-      symptoms:['心悸失眠','口腔溃疡','舌尖红赤','多汗','胸闷','面色潮红'],
-      foods:['苦瓜','莲子','百合','西瓜','红豆','番茄','红枣','桂圆','菊花'],
-      herbs:['丹参','黄连','莲子心','酸枣仁','麦冬','五味子','柏子仁','生地','竹叶'],
-      regimen:'夏季养心，午睡半小时。心经当令午时(11-13点)宜小憩。红色入心，苦味降心火。',
-      avoid:'忌过量咖啡浓茶、剧烈运动出汗过多、大悲大喜'},
-    Tu:{name:'土',icon:'⛰️',color:'#f39c12',season:'长夏',direction:'中',taste:'甘',organs:['脾','胃'],sense:'口',tissue:'肉',emotion:'思',
-      symptoms:['食欲不振','腹胀腹泻','面色萎黄','四肢乏力','水肿','大便稀溏'],
-      foods:['小米','山药','薏仁','红枣','南瓜','土豆','扁豆','莲子','茯苓','陈皮'],
-      herbs:['党参','白术','茯苓','甘草','陈皮','砂仁','苍术','黄芪','薏苡仁'],
-      regimen:'长夏养脾，饮食定时定量，少吃生冷。脾经当令巳时(9-11点)进食早餐最佳。黄色入脾。',
-      avoid:'忌生冷寒凉、暴饮暴食、思虑过度、久坐'},
-    Jin:{name:'金',icon:'🪙',color:'#90a4ae',season:'秋',direction:'西',taste:'辛',organs:['肺','大肠'],sense:'鼻',tissue:'皮毛',emotion:'悲',
-      symptoms:['咳嗽痰多','鼻塞流涕','皮肤干燥','咽喉肿痛','便秘','易感冒'],
-      foods:['白萝卜','梨','百合','银耳','山药','杏仁','莲藕','枇杷','蜂蜜'],
-      herbs:['川贝母','百合','麦冬','沙参','杏仁','桔梗','枇杷叶','桑白皮','玉竹'],
-      regimen:'秋季养肺，早卧早起，多做深呼吸。肺经当令寅时(3-5点)宜深度睡眠。白色入肺。',
-      avoid:'忌吸烟、辛辣过量、悲伤忧郁、空调直吹'},
-    Shui:{name:'水',icon:'💧',color:'#3498db',season:'冬',direction:'北',taste:'咸',organs:['肾','膀胱'],sense:'耳',tissue:'骨',emotion:'恐',
-      symptoms:['腰膝酸软','耳鸣耳聋','畏寒肢冷','夜尿频多','脱发白发','记忆力减退'],
-      foods:['黑豆','黑芝麻','核桃','海参','紫菜','桑葚','板栗','羊肉','韭菜','山药'],
-      herbs:['熟地黄','山药','山茱萸','枸杞子','杜仲','肉桂','淫羊藿','补骨脂','菟丝子'],
-      regimen:'冬季养肾，早卧晚起，必待日光。肾经当令酉时(17-19点)宜按摩腰部。黑色入肾。',
-      avoid:'忌过度劳累、房事不节、长时间站立、恐惧惊吓、高盐饮食'}
-  },
-  baziMap: {
-    '甲乙木':{wuxing:'木',tizhi:'气郁质倾向',desc:'日主属木，肝气偏旺，易情绪波动。宜疏肝理气，多食绿色食物。'},
-    '丙丁火':{wuxing:'火',tizhi:'阴虚质倾向',desc:'日主属火，心火易亢，口干心烦。宜滋阴降火，多食苦味清心。'},
-    '戊己土':{wuxing:'土',tizhi:'痰湿质倾向',desc:'日主属土，脾胃关键，易生痰湿。宜健脾祛湿，多食黄色食物。'},
-    '庚辛金':{wuxing:'金',tizhi:'气虚质倾向',desc:'日主属金，肺气不足，易感冒乏力。宜益气固表，多食白色食物。'},
-    '壬癸水':{wuxing:'水',tizhi:'阳虚质倾向',desc:'日主属水，肾阳偏弱，畏寒怕冷。宜温补肾阳，多食黑色食物。'}
-  }
-};
-;
+// TZ_DATA 已由 tizhi-module.js 统一定义，此处不再重复
+// 保留体质模块函数（tizhi-module.js 可能尚未加载时的 fallback）
 
 function tzSwitchTab(name){
   var allTabs = ['report','selftest','plan','food','qigong','prescription','bazi','checkin','wuxing'];
@@ -29339,7 +29166,7 @@ function checkout() {
   if (shopCart.length === 0) return;
   var totalQty = shopCart.reduce(function(s,c){ return s+c.qty; }, 0);
   var totalAmount = shopCart.reduce(function(s,c){ return s + parsePrice(c.price)*c.qty; }, 0);
-  alert('✅ 订单提交成功！\n\n商品数量：'+totalQty+' 件\n合计金额：¥'+totalAmount.toLocaleString()+'\n\n（模拟结算，无需真实支付）\n感谢您的惠顾，祝您修身增慧、福慧双修！');
+  showToast('✅ 订单提交成功！\n\n商品数量：'+totalQty+' 件\n合计金额：¥'+totalAmount.toLocaleString()+'\n\n（模拟结算，无需真实支付）\n感谢您的惠顾，祝您修身增慧、福慧双修！');
   shopCart = [];
   updateCartUI();
   toggleCartModal();
@@ -32226,7 +32053,7 @@ function runLiuyaoEngine() {
         if (yjResultEl) yjResultEl.innerHTML += v3LiuHtml;
       }
     } catch(e4) { console.warn('LiuyaoV3 error:', e4); }
-  } catch(e) { alert('六爻引擎错误：'+e.message); }
+  } catch(e) { showToast('六爻引擎错误：'+e.message); }
 }
 
 function runMeihuaEngine() {
@@ -32298,7 +32125,7 @@ function runMeihuaEngine() {
         if (mhResultEl) mhResultEl.innerHTML += v3MhHtml;
       }
     } catch(e5) { console.warn('MeihuaV3 error:', e5); }
-  } catch(e) { alert('梅花引擎错误：'+e.message); }
+  } catch(e) { showToast('梅花引擎错误：'+e.message); }
 }
 
 function runQimenEngine() {
@@ -32421,7 +32248,7 @@ function runQimenEngine() {
       html += '</div>';
     }
     _showEngineResult('qmEngineResult', html);
-  } catch(e) { alert('奇门引擎错误：'+e.message); }
+  } catch(e) { showToast('奇门引擎错误：'+e.message); }
 }
 
 function runLiurenEngine() {
@@ -32507,7 +32334,7 @@ function runLiurenEngine() {
         if (lrResultEl) lrResultEl.innerHTML += v3LrHtml;
       }
     } catch(e6) { console.warn('LiurenV3 error:', e6); }
-  } catch(e) { alert('六壬引擎错误：'+e.message); }
+  } catch(e) { showToast('六壬引擎错误：'+e.message); }
 }
 
 function runZiweiEngine() {
@@ -32597,7 +32424,7 @@ function runZiweiEngine() {
       }
     } catch(e3) { console.warn('ZiweiV3 error:', e3); }
     _showEngineResult('zwEngineResult', html);
-  } catch(e) { alert('紫微引擎错误：'+e.message); }
+  } catch(e) { showToast('紫微引擎错误：'+e.message); }
 }
 
 function runXingmingEngine() {
@@ -32616,7 +32443,7 @@ function runXingmingEngine() {
       html += '<p style="opacity:0.8">' + res.advice + '</p>';
     }
     _showEngineResult('xmEngineResult', html);
-  } catch(e) { alert('姓名学引擎错误：'+e.message); }
+  } catch(e) { showToast('姓名学引擎错误：'+e.message); }
 }
 
 function runFengshuiEngine() {
@@ -32647,7 +32474,7 @@ function runFengshuiEngine() {
       }
     } catch(_ce) { console.warn('风水化解引擎错误:', _ce); }
     _showEngineResult('fsEngineResult', html);
-  } catch(e) { alert('风水引擎错误：'+e.message); }
+  } catch(e) { showToast('风水引擎错误：'+e.message); }
 }
 
 function runZeriEngine() {
@@ -32671,7 +32498,7 @@ function runZeriEngine() {
     html += '<p><b>评分：</b>' + res.score + '/100</p>';
     html += '<p style="opacity:0.8">' + res.summary + '</p>';
     _showEngineResult('zrEngineResult', html);
-  } catch(e) { alert('择日引擎错误：'+e.message); }
+  } catch(e) { showToast('择日引擎错误：'+e.message); }
 }
 
 // 全局注册绑定函数
@@ -32704,7 +32531,7 @@ if (typeof window !== 'undefined') {
       html += '<p><b>策略：</b>' + analyze.strategy + '</p>';
       const el = document.getElementById('qimenResult');
       if (el) { el.innerHTML = html; el.style.display = 'block'; }
-    } catch(e) { alert('奇门引擎错误：'+e.message); }
+    } catch(e) { showToast('奇门引擎错误：'+e.message); }
   }
   window.runQimen = runQimen;
 
@@ -32726,7 +32553,7 @@ if (typeof window !== 'undefined') {
       html += '<p><b>概述：</b>' + analyze.overview + '</p>';
       const el = document.getElementById('ziweiResult');
       if (el) { el.innerHTML = html; el.style.display = 'block'; }
-    } catch(e) { alert('紫微引擎错误：'+e.message); }
+    } catch(e) { showToast('紫微引擎错误：'+e.message); }
   }
   window.runZiwei = runZiwei;
 
@@ -32749,7 +32576,7 @@ if (typeof window !== 'undefined') {
       html += '<p style="opacity:0.8">' + analyze.advice + '</p>';
       const el = document.getElementById('meihuaResult');
       if (el) { el.innerHTML = html; el.style.display = 'block'; }
-    } catch(e) { alert('梅花引擎错误：'+e.message); }
+    } catch(e) { showToast('梅花引擎错误：'+e.message); }
   }
   window.runMeihua = runMeihua;
 
@@ -32771,7 +32598,7 @@ if (typeof window !== 'undefined') {
       html += '<p style="opacity:0.8">' + analyze.advice + '</p>';
       const el = document.getElementById('liurenResult');
       if (el) { el.innerHTML = html; el.style.display = 'block'; }
-    } catch(e) { alert('六壬引擎错误：'+e.message); }
+    } catch(e) { showToast('六壬引擎错误：'+e.message); }
   }
   window.runLiuren = runLiuren;
 }
@@ -32845,11 +32672,11 @@ function submitAsk() {
   var resultContent = document.getElementById('askResultContent');
 
   if (!select || !select.value) {
-    alert('请先选择一位大师');
+    showToast('请先选择一位大师');
     return;
   }
   if (!input || !input.value.trim()) {
-    alert('请输入您的问题');
+    showToast('请输入您的问题');
     return;
   }
 
