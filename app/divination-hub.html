@@ -10497,6 +10497,90 @@ function tzCallAIForReportAnalysis(content, base64Data, type) {
   tzStep1Analyze('手动输入', content, type === 'image' || type === 'pdf' ? type : 'text');
 }
 
+// ===== 本地体质分析引擎 (离线降级) =====
+function tzLocalAnalysis(content, type) {
+  // 如果是图片或PDF,无法本地解析,返回null
+  if (type === 'image' || type === 'pdf') return null;
+  if (typeof content !== 'string' || content.length < 10) return null;
+
+  // 尝试从文本中提取指标
+  var lines = content.split('\n');
+  var items = [];
+  var categories = {};
+  var abnormalCount = 0;
+
+  // 常见指标关键词
+  var knownMetrics = {
+    '白细胞': {ref: '3.5-9.5', unit: '10^9/L', cat: '血常规'},
+    '红细胞': {ref: '4.0-5.5', unit: '10^12/L', cat: '血常规'},
+    '血红蛋白': {ref: '120-160', unit: 'g/L', cat: '血常规'},
+    '血小板': {ref: '125-350', unit: '10^9/L', cat: '血常规'},
+    '谷丙转氨酶': {ref: '0-40', unit: 'U/L', cat: '肝功能'},
+    '谷草转氨酶': {ref: '0-40', unit: 'U/L', cat: '肝功能'},
+    '总胆红素': {ref: '3.4-17.1', unit: 'μmol/L', cat: '肝功能'},
+    '肌酐': {ref: '44-133', unit: 'μmol/L', cat: '肾功能'},
+    '尿素氮': {ref: '2.9-7.5', unit: 'mmol/L', cat: '肾功能'},
+    '尿酸': {ref: '149-416', unit: 'μmol/L', cat: '肾功能'},
+    '血糖': {ref: '3.9-6.1', unit: 'mmol/L', cat: '血糖'},
+    '总胆固醇': {ref: '3.1-5.2', unit: 'mmol/L', cat: '血脂'},
+    '甘油三酯': {ref: '0.4-1.7', unit: 'mmol/L', cat: '血脂'},
+    '高密度脂蛋白': {ref: '0.9-1.8', unit: 'mmol/L', cat: '血脂'},
+    '低密度脂蛋白': {ref: '0-3.4', unit: 'mmol/L', cat: '血脂'}
+  };
+
+  lines.forEach(function(line) {
+    line = line.trim();
+    if (!line) return;
+    for (var metricName in knownMetrics) {
+      if (line.indexOf(metricName) >= 0) {
+        var info = knownMetrics[metricName];
+        // 提取数值
+        var numMatch = line.match(/([\d.]+)\s*([a-zA-Z^\d\/μμ]+)?/);
+        if (numMatch) {
+          var value = numMatch[1];
+          var status = '正常';
+          // 简单范围检查
+          var rangeMatch = info.ref.match(/([\d.]+)-([\d.]+)/);
+          if (rangeMatch) {
+            var low = parseFloat(rangeMatch[1]);
+            var high = parseFloat(rangeMatch[2]);
+            var val = parseFloat(value);
+            if (val > high) status = '偏高↑';
+            else if (val < low) status = '偏低↓';
+          }
+          if (status !== '正常') abnormalCount++;
+          if (!categories[info.cat]) categories[info.cat] = [];
+          categories[info.cat].push({
+            name: metricName,
+            value: value,
+            unit: info.unit,
+            ref: info.ref,
+            status: status,
+            note: status === '正常' ? '指标在正常范围内' : (status.indexOf('偏高') >= 0 ? '指标偏高，建议复查并咨询医生' : '指标偏低，建议复查并咨询医生')
+          });
+        }
+        break;
+      }
+    }
+  });
+
+  // 如果没提取到任何指标，返回null
+  var totalItems = Object.values(categories).reduce(function(a, b) { return a + b.length; }, 0);
+  if (totalItems === 0) return null;
+
+  // 构造与API一致的结果格式
+  var catList = [];
+  for (var catName in categories) {
+    catList.push({name: catName, items: categories[catName]});
+  }
+
+  return {
+    categories: catList,
+    summary: '共识别' + totalItems + '项指标，其中异常' + abnormalCount + '项。' + (abnormalCount > 0 ? '建议对异常指标进行复查，并咨询专业医师。' : '各项指标均在正常范围内，继续保持良好的生活习惯。'),
+    abnormalCount: abnormalCount
+  };
+}
+
 // ===== 第一步：指标分析 =====
 function tzStep1Analyze(fileName, content, type) {
   var result = document.getElementById('tizhiResult');
@@ -10566,8 +10650,15 @@ function tzStep1Analyze(fileName, content, type) {
     tzLastAnalysis = obj;
     tzRenderStep1Results(obj);
   }).catch(function(err) {
-    console.error('指标分析API错误:', err);
-    result.innerHTML = '<div style="padding:20px;text-align:center"><div style="font-size:14px;color:#e74c3c;margin-bottom:12px">⚠️ 分析服务暂时不可用</div><div style="font-size:12px;color:var(--paper2);margin-bottom:16px">请确认API代理服务（端口8900）正在运行，或稍后重试</div><div style="font-size:11px;color:#666">错误信息: ' + (err.message || err) + '</div></div>';
+    console.error('指标分析API错误,切换到本地分析:', err);
+    // 离线降级:调用本地分析引擎
+    var localResult = tzLocalAnalysis(content, type);
+    if (localResult) {
+      tzLastAnalysis = localResult;
+      tzRenderStep1Results(localResult);
+    } else {
+      result.innerHTML = '<div style="padding:20px;text-align:center"><div style="font-size:14px;color:#e74c3c;margin-bottom:12px">⚠️ 分析服务暂时不可用</div><div style="font-size:12px;color:var(--paper2);margin-bottom:16px">请确认API代理服务（端口8900）正在运行，或稍后重试</div><div style="font-size:11px;color:#666">错误信息: ' + (err.message || err) + '</div></div>';
+    }
   });
 }
 
@@ -10738,8 +10829,39 @@ function tzStep2Suggestions() {
     step2Div.innerHTML = html;
     step2Div.scrollIntoView({behavior:'smooth',block:'nearest'});
   }).catch(function(err) {
-    console.error('理疗建议API错误:', err);
-    step2Div.innerHTML = '<div style="padding:20px;text-align:center;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px"><div style="font-size:14px;color:#e74c3c;margin-bottom:8px">⚠️ 理疗建议生成失败</div><div style="font-size:12px;color:var(--paper2)">请确认API代理服务正在运行，或稍后重试</div></div>';
+    console.error('理疗建议API错误,切换本地引擎:', err);
+    // 离线降级:用本地体质数据生成理疗建议
+    var html = '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:24px">';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><span style="background:var(--violet2);color:#fff;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600">第二步</span><span style="font-size:14px;color:var(--violet2);font-weight:600">理疗建议（本地生成）</span></div>';
+    html += '<div style="background:rgba(155,89,182,0.06);border:1px solid rgba(155,89,182,0.25);border-radius:10px;padding:16px;margin-bottom:16px"><div style="font-size:14px;color:#9b59b6;font-weight:bold;margin-bottom:6px">🧬 体质判断</div><div style="font-size:14px;color:var(--text);line-height:1.7">根据指标分析结果，建议参考以下养生方案。如有异常指标，请及时就医复查。</div></div>';
+    // 食疗
+    var allRecipes = (TZ_DATA.recipes || []).slice(0, 4);
+    html += '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:16px;margin-bottom:12px"><div style="font-size:14px;color:var(--success);font-weight:bold;margin-bottom:10px">🍵 食疗建议</div>';
+    allRecipes.forEach(function(r) {
+      html += '<div style="padding:8px 12px;background:rgba(255,255,255,0.02);border-radius:8px;margin-bottom:8px"><div style="font-size:13px;color:var(--text);line-height:1.7">' + r.name + '：' + r.effect + '</div><div style="margin-top:4px;font-size:11px;color:var(--paper2)">食材：' + r.ingredients + '</div></div>';
+    });
+    html += '</div>';
+    // 功法
+    var allQigong = (TZ_DATA.qigongMethods || []).slice(0, 3);
+    html += '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:16px;margin-bottom:12px"><div style="font-size:14px;color:var(--gold);font-weight:bold;margin-bottom:10px">🤸 功法建议</div>';
+    allQigong.forEach(function(q) {
+      html += '<div style="padding:8px 12px;background:rgba(255,255,255,0.02);border-radius:8px;margin-bottom:8px"><div style="font-size:13px;color:var(--text);line-height:1.7">' + q.name + '（' + q.duration + '）</div><div style="margin-top:4px;font-size:11px;color:var(--paper2)">' + q.benefit + '</div></div>';
+    });
+    html += '</div>';
+    // 正念
+    html += '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:16px;margin-bottom:12px"><div style="font-size:14px;color:#9b59b6;font-weight:bold;margin-bottom:10px">🧘 正念调心</div>';
+    html += '<div style="padding:8px 12px;background:rgba(255,255,255,0.02);border-radius:8px;margin-bottom:8px"><div style="font-size:13px;color:var(--text);line-height:1.7">正念冥想：每日10-20分钟，觉知呼吸，不评判念头，有助于减轻压力、改善睡眠。</div></div>';
+    html += '<div style="padding:8px 12px;background:rgba(255,255,255,0.02);border-radius:8px;margin-bottom:8px"><div style="font-size:13px;color:var(--text);line-height:1.7">腹式呼吸：每日5-10分钟，鼻吸口呼，呼吸比1:2，有助于缓解焦虑、增强肺活量。</div></div>';
+    html += '</div>';
+    // 起居
+    html += '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:16px;margin-bottom:12px"><div style="font-size:14px;color:#3498db;font-weight:bold;margin-bottom:10px">🏠 起居调理</div>';
+    html += '<div style="padding:8px 12px;background:rgba(255,255,255,0.02);border-radius:8px;margin-bottom:8px"><div style="font-size:13px;color:var(--text);line-height:1.7">建议早睡早起（22:00前入睡），保证7-8小时睡眠。饮食有节，起居有常，适量运动。</div></div>';
+    html += '</div>';
+    // Disclaimer
+    html += '<div style="background:rgba(231,76,60,0.04);border:1px solid rgba(231,76,60,0.15);border-radius:8px;padding:12px 16px;margin-top:16px"><div style="font-size:12px;color:#e74c3c;line-height:1.6">⚠️ <b>免责声明：</b>以上理疗建议由本地引擎根据指标分析结果生成，仅供养生保健参考。具体诊疗请咨询专业中医师。如有异常指标，请及时就医复查。</div></div>';
+    html += '</div>';
+    step2Div.innerHTML = html;
+    step2Div.scrollIntoView({behavior:'smooth',block:'nearest'});
   });
 }
 
@@ -11021,24 +11143,29 @@ function computeBazi() {
   const sex = document.getElementById('baziSex').value;
   const calMode = document.querySelector('input[name="calendarMode"]:checked')?.value || 'solar';
 
+  // Safe loading overlay helper
+  var loadingEl = document.getElementById('loadingOverlay');
+  function showLoading() { if (loadingEl) loadingEl.classList.add('visible'); }
+  function hideLoading() { if (loadingEl) loadingEl.classList.remove('visible'); }
+
   let year, month, day;
   if (calMode === 'lunar') {
     const ly = parseInt(document.getElementById('lunarYear').value);
     const lm = parseInt(document.getElementById('lunarMonth').value);
     const ld = parseInt(document.getElementById('lunarDay').value);
     const isLeap = document.getElementById('lunarLeapMonth').checked;
-    if (!ly || !lm || !ld) { showToast('请输入完整的农历出生日期'); document.getElementById('loadingOverlay').classList.remove('visible'); return; }
+    if (!ly || !lm || !ld) { showToast('请输入完整的农历出生日期'); hideLoading(); if(btn){btn.disabled=false;btn.textContent='排 盘 演 命';} return; }
     const solar = lunarToSolar(ly, lm, ld, isLeap);
-    if (!solar) { showToast('农历日期无效，请检查'); document.getElementById('loadingOverlay').classList.remove('visible'); return; }
+    if (!solar) { showToast('农历日期无效，请检查'); hideLoading(); if(btn){btn.disabled=false;btn.textContent='排 盘 演 命';} return; }
     year = solar.year; month = solar.month; day = solar.day;
   } else {
     const dateStr = document.getElementById('baziDate').value;
-    if (!dateStr) { showToast('请输入出生日期'); document.getElementById('loadingOverlay').classList.remove('visible'); return; }
+    if (!dateStr) { showToast('请输入出生日期'); hideLoading(); if(btn){btn.disabled=false;btn.textContent='排 盘 演 命';} return; }
     [year, month, day] = dateStr.split('-').map(Number);
   }
 
   // Show loading
-  document.getElementById('loadingOverlay').classList.add('visible');
+  showLoading();
 
   try {
 
@@ -11394,9 +11521,9 @@ function computeBazi() {
   if (baziDimBox) baziDimBox.innerHTML = getBaziDimensionHTML(dayStem, dayEle);
 
   // Hide loading
-  document.getElementById('loadingOverlay').classList.remove('visible');
+  hideLoading();
 
-  // === RENDER NEW BAZI MODULES ===
+  // === RENDER NEW BAZI MODULES ====
   renderNewBaziModules({
     pillars, dayStem, dayBranch, dayStemIdx, dayBranchIdx,
     year, month, day, hour, sex, name, calMode
@@ -11469,10 +11596,15 @@ function computeBazi() {
 
   } catch(err) {
     console.error('八字计算错误:', err);
-    document.getElementById('loadingOverlay').classList.remove('visible');
-    showToast('计算出错，请检查输入信息是否正确');
-    document.getElementById('baziResult').classList.add('visible');
-    document.getElementById('baziResult').innerHTML = '<div style="padding:40px;text-align:center"><div style="font-size:48px;margin-bottom:16px">⚠️</div><h3 style="color:var(--gold);margin-bottom:12px">计算遇到问题</h3><p style="color:var(--paper2);font-size:14px;line-height:1.8">八字计算遇到异常，可能是日期输入有误或浏览器环境问题。<br>请尝试：<br>• 确认公历/农历日期正确<br>• 检查出生时间是否填写<br>• 刷新页面重试</p></div>';
+    hideLoading();
+    showToast('计算出错: ' + (err.message || err));
+    var resultEl = document.getElementById('baziResult');
+    if (resultEl) {
+      resultEl.classList.add('visible');
+      resultEl.innerHTML = '<div style="padding:40px;text-align:center"><div style="font-size:48px;margin-bottom:16px">⚠️</div><h3 style="color:var(--gold);margin-bottom:12px">计算遇到问题</h3><p style="color:var(--paper2);font-size:14px;line-height:1.8">八字计算遇到异常，可能是日期输入有误或浏览器环境问题。<br>错误详情: ' + (err.message || String(err)) + '<br><br>请尝试：<br>• 确认公历/农历日期正确<br>• 检查出生时间是否填写<br>• 刷新页面重试</p></div>';
+    }
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '排 盘 演 命'; }
   }
 }
 
@@ -11629,13 +11761,80 @@ function lunarToSolar(lunarYear, lunarMonth, lunarDay, isLeapMonth) {
   const cnySolarDay = cny > 20 ? cny : cny;
 
   // Actually simpler: construct date from CNY
-  let solarDate = new Date(lunarYear + 1900, 0, cny);
+  // lunarYear is full year (e.g. 1990), not offset
+  let solarDate = new Date(lunarYear, 0, cny);
   solarDate.setDate(solarDate.getDate() + daysFromNewYear);
 
   return {
     year: solarDate.getFullYear(),
     month: solarDate.getMonth() + 1,
     day: solarDate.getDate()
+  };
+}
+
+// ================================================================
+//  SOLAR TO LUNAR CONVERSION (逆向换算)
+// ================================================================
+
+function solarToLunar(solarYear, solarMonth, solarDay) {
+  // Convert solar date to lunar date by searching lunar calendar
+  var lunarYear = solarYear;
+  // Adjust for the possibility that solar Jan/Feb belongs to previous lunar year
+  var cny = LUNAR_NEW_YEAR[lunarYear];
+  if (cny === undefined) return null;
+
+  // If before CNY of this year, it belongs to previous lunar year
+  var cnyDate = new Date(lunarYear, 0, cny);
+  var solarDate = new Date(solarYear, solarMonth - 1, solarDay);
+  if (solarDate < cnyDate) {
+    lunarYear--;
+    cny = LUNAR_NEW_YEAR[lunarYear];
+    if (cny === undefined) return null;
+    cnyDate = new Date(lunarYear, 0, cny);
+  }
+
+  // Count days from CNY to solar date
+  var daysDiff = Math.round((solarDate - cnyDate) / 86400000);
+  if (daysDiff < 0) return null;
+
+  var monthDays = LUNAR_MONTH_DAYS[lunarYear] || [1,0,1,0,1,0,1,0,1,0,1,0];
+  var leapMonth = LUNAR_LEAP_MONTHS[lunarYear];
+
+  var lunarMonth = 1;
+  var lunarDay = 1;
+  var isLeap = false;
+  var remaining = daysDiff;
+
+  // Iterate through months
+  for (var m = 1; m <= 12; m++) {
+    var days = monthDays[m - 1] ? 30 : 29;
+    if (remaining < days) {
+      lunarMonth = m;
+      lunarDay = remaining + 1;
+      break;
+    }
+    remaining -= days;
+
+    // Check if leap month comes after this month
+    if (leapMonth !== null && leapMonth === m) {
+      // Leap month has same number of days as the regular month
+      if (remaining < days) {
+        lunarMonth = m;
+        lunarDay = remaining + 1;
+        isLeap = true;
+        break;
+      }
+      remaining -= days;
+    }
+  }
+
+  if (lunarMonth > 12) return null;
+
+  return {
+    year: lunarYear,
+    month: lunarMonth,
+    day: lunarDay,
+    isLeap: isLeap
   };
 }
 
@@ -16486,8 +16685,8 @@ function computeDaysUntilLunarEvent(dateStr, currentYear) {
     if (!ld && lunarDayStr.match(/^\d+$/)) ld = parseInt(lunarDayStr);
     if (!ld) return null;
 
-    // 用 lunarToSolar 转换 (lunarYear 参数是 1900-based offset)
-    var lunarYearOffset = currentYear - 1900;
+    // 用 lunarToSolar 转换 (lunarYear 参数是完整年份)
+    var lunarYearOffset = currentYear;
     var solar = lunarToSolar(lunarYearOffset, lm, ld, false);
     if (!solar) return null;
 
@@ -18020,10 +18219,44 @@ function _analyzeFloorPlanAI(imageData, context) {
   }).catch(function(err) {
     var fsAiResult = document.getElementById('fsAiStatus');
     if (fsAiResult) {
-      fsAiResult.innerHTML = '<div class="huajie-alert" style="margin-top:16px;background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.2)">' +
-        '<div class="alert-title" style="color:#e74c3c">AI分析失败</div>' +
-        '<p style="font-size:13px">请确保API代理(端口8900)已启动</p>' +
-        '<p style="font-size:12px;opacity:.6">错误：' + err.message + '</p></div>';
+      // 离线降级:用本地风水引擎生成分析
+      var localHtml = '<div class="huajie-alert" style="margin-top:16px;background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.2)">';
+      localHtml += '<div class="alert-title" style="color:#2ecc71">🔮 本地风水分析报告</div>';
+      localHtml += '<div style="margin-top:12px;font-size:13px;line-height:1.8">';
+      if (context.bazhai) {
+        localHtml += '<b>【八宅吉凶位】</b><br>';
+        for (var pos in context.bazhai) {
+          var star = context.bazhai[pos];
+          var isGood = star.indexOf('生气') >= 0 || star.indexOf('天医') >= 0 || star.indexOf('延年') >= 0 || star.indexOf('伏位') >= 0;
+          localHtml += pos + ': ' + star + (isGood ? ' ✅' : ' ⚠️') + '<br>';
+        }
+      }
+      if (context.mingGua) {
+        localHtml += '<br><b>【命卦信息】</b><br>';
+        localHtml += '命卦: ' + context.mingGua.type + '（' + context.mingGua.number + '卦）<br>';
+      }
+      localHtml += '<br><b>【房屋信息】</b><br>';
+      localHtml += '户型: ' + (context.huxing || '未提供') + '<br>';
+      localHtml += '朝向: ' + (context.chaoxiang || '未提供') + '<br>';
+      localHtml += '建造年份: ' + (context.buildYear || '未提供') + '<br>';
+      localHtml += '<br><b>【风水建议】</b><br>';
+      localHtml += '1. 保持房屋整洁明亮，避免杂物堆积<br>';
+      localHtml += '2. 大门不宜正对镜子、厕所或厨房<br>';
+      localHtml += '3. 卧室避免横梁压顶，床不靠窗<br>';
+      localHtml += '4. 厨房（火）与卫生间（水）不宜相邻<br>';
+      localHtml += '5. 客厅宜在房屋前部，采光充足<br>';
+      if (context.chaoxiang) {
+        localHtml += '6. ' + context.chaoxiang + '朝向的房屋，宜根据命卦方位布置吉位为卧室、书房<br>';
+      }
+      localHtml += '<br><b>【化解建议】</b><br>';
+      localHtml += '• 若有缺角：可用泰山石或八卦镜化解<br>';
+      localHtml += '• 若有门冲：可用屏风、珠帘遮挡<br>';
+      localHtml += '• 若有穿堂煞：可在中间放置玄关或绿植<br>';
+      localHtml += '• 若卫生间在吉位：可放铜葫芦化解煞气<br>';
+      localHtml += '</div>';
+      localHtml += '<div style="margin-top:10px;font-size:11px;opacity:.6">（本地分析引擎生成，如需更详细的户型图AI识别，请启动API代理服务）</div>';
+      localHtml += '</div>';
+      fsAiResult.innerHTML = localHtml;
     }
   });
 }
@@ -20389,11 +20622,42 @@ function onCalendarModeChange() {
   const hint = document.getElementById('calendarHint');
   const solarDateInput = document.getElementById('baziDate');
   const lunarArea = document.getElementById('lunarInputArea');
+
   if (mode === 'lunar') {
+    // Switching to lunar: try to convert existing solar date
+    if (solarDateInput && solarDateInput.value) {
+      var parts = solarDateInput.value.split('-');
+      var sy = parseInt(parts[0]), sm = parseInt(parts[1]), sd = parseInt(parts[2]);
+      var lunar = solarToLunar(sy, sm, sd);
+      if (lunar) {
+        var lyEl = document.getElementById('lunarYear');
+        var lmEl = document.getElementById('lunarMonth');
+        var ldEl = document.getElementById('lunarDay');
+        var lpEl = document.getElementById('lunarLeapMonth');
+        if (lyEl) lyEl.value = lunar.year;
+        if (lmEl) lmEl.value = lunar.month;
+        if (ldEl) ldEl.value = lunar.day;
+        if (lpEl) lpEl.checked = lunar.isLeap;
+        if (typeof onLunarInput === 'function') onLunarInput();
+      }
+    }
     if (solarDateInput) solarDateInput.style.display = 'none';
     if (lunarArea) lunarArea.style.display = 'flex';
     if (hint) hint.textContent = '当前:农历输入(农历以子时23:00为一日之始)';
   } else {
+    // Switching to solar: try to convert existing lunar date
+    var lyEl2 = document.getElementById('lunarYear');
+    var lmEl2 = document.getElementById('lunarMonth');
+    var ldEl2 = document.getElementById('lunarDay');
+    var lpEl2 = document.getElementById('lunarLeapMonth');
+    if (lyEl2 && lyEl2.value && lmEl2 && lmEl2.value && ldEl2 && ldEl2.value) {
+      var solar = lunarToSolar(parseInt(lyEl2.value), parseInt(lmEl2.value), parseInt(ldEl2.value), lpEl2 ? lpEl2.checked : false);
+      if (solar && solarDateInput) {
+        var mm = String(solar.month).padStart(2, '0');
+        var dd = String(solar.day).padStart(2, '0');
+        solarDateInput.value = solar.year + '-' + mm + '-' + dd;
+      }
+    }
     if (solarDateInput) solarDateInput.style.display = '';
     if (lunarArea) lunarArea.style.display = 'none';
     if (hint) hint.textContent = '当前:公历输入';
@@ -20409,10 +20673,38 @@ function onLpCalModeChange() {
   var solarInput = document.getElementById('lpSolarInput');
   var lunarInput = document.getElementById('lpLunarInput');
   if (mode === 'lunar') {
+    // Convert solar to lunar
+    var dateEl = document.getElementById('lifeplanDate');
+    if (dateEl && dateEl.value) {
+      var parts = dateEl.value.split('-');
+      var lunar = solarToLunar(parseInt(parts[0]), parseInt(parts[1]), parseInt(parts[2]));
+      if (lunar) {
+        var ly = document.getElementById('lpLunarYear');
+        var lm = document.getElementById('lpLunarMonth');
+        var ld = document.getElementById('lpLunarDay');
+        var lp = document.getElementById('lpLunarLeap');
+        if (ly) ly.value = lunar.year;
+        if (lm) lm.value = lunar.month;
+        if (ld) ld.value = lunar.day;
+        if (lp) lp.checked = lunar.isLeap;
+      }
+    }
     if (solarInput) solarInput.style.display = 'none';
     if (lunarInput) lunarInput.style.display = 'flex';
     if (hint) hint.textContent = '当前:农历输入';
   } else {
+    // Convert lunar to solar
+    var ly2 = document.getElementById('lpLunarYear');
+    var lm2 = document.getElementById('lpLunarMonth');
+    var ld2 = document.getElementById('lpLunarDay');
+    var lp2 = document.getElementById('lpLunarLeap');
+    if (ly2 && ly2.value && lm2 && lm2.value && ld2 && ld2.value) {
+      var solar = lunarToSolar(parseInt(ly2.value), parseInt(lm2.value), parseInt(ld2.value), lp2 ? lp2.checked : false);
+      if (solar) {
+        var dateEl2 = document.getElementById('lifeplanDate');
+        if (dateEl2) dateEl2.value = solar.year + '-' + String(solar.month).padStart(2,'0') + '-' + String(solar.day).padStart(2,'0');
+      }
+    }
     if (solarInput) solarInput.style.display = '';
     if (lunarInput) lunarInput.style.display = 'none';
     if (hint) hint.textContent = '当前:公历输入';
@@ -20427,10 +20719,36 @@ function onYouthCalModeChange() {
   var solarInput = document.getElementById('youthSolarInput');
   var lunarInput = document.getElementById('youthLunarInput');
   if (mode === 'lunar') {
+    var dateEl = document.getElementById('youthDate');
+    if (dateEl && dateEl.value) {
+      var parts = dateEl.value.split('-');
+      var lunar = solarToLunar(parseInt(parts[0]), parseInt(parts[1]), parseInt(parts[2]));
+      if (lunar) {
+        var ly = document.getElementById('youthLunarYear');
+        var lm = document.getElementById('youthLunarMonth');
+        var ld = document.getElementById('youthLunarDay');
+        var lp = document.getElementById('youthLunarLeap');
+        if (ly) ly.value = lunar.year;
+        if (lm) lm.value = lunar.month;
+        if (ld) ld.value = lunar.day;
+        if (lp) lp.checked = lunar.isLeap;
+      }
+    }
     if (solarInput) solarInput.style.display = 'none';
     if (lunarInput) lunarInput.style.display = 'flex';
     if (hint) hint.textContent = '当前:农历输入';
   } else {
+    var ly2 = document.getElementById('youthLunarYear');
+    var lm2 = document.getElementById('youthLunarMonth');
+    var ld2 = document.getElementById('youthLunarDay');
+    var lp2 = document.getElementById('youthLunarLeap');
+    if (ly2 && ly2.value && lm2 && lm2.value && ld2 && ld2.value) {
+      var solar = lunarToSolar(parseInt(ly2.value), parseInt(lm2.value), parseInt(ld2.value), lp2 ? lp2.checked : false);
+      if (solar) {
+        var dateEl2 = document.getElementById('youthDate');
+        if (dateEl2) dateEl2.value = solar.year + '-' + String(solar.month).padStart(2,'0') + '-' + String(solar.day).padStart(2,'0');
+      }
+    }
     if (solarInput) solarInput.style.display = '';
     if (lunarInput) lunarInput.style.display = 'none';
     if (hint) hint.textContent = '当前:公历输入';
@@ -20446,10 +20764,36 @@ function onLiCalModeChange() {
   var solarInput = document.getElementById('liSolarInput');
   var lunarInput = document.getElementById('liLunarInput');
   if (mode === 'lunar') {
+    var dateEl = document.getElementById('liDate');
+    if (dateEl && dateEl.value) {
+      var parts = dateEl.value.split('-');
+      var lunar = solarToLunar(parseInt(parts[0]), parseInt(parts[1]), parseInt(parts[2]));
+      if (lunar) {
+        var ly = document.getElementById('liLunarYear');
+        var lm = document.getElementById('liLunarMonth');
+        var ld = document.getElementById('liLunarDay');
+        var lp = document.getElementById('liLunarLeap');
+        if (ly) ly.value = lunar.year;
+        if (lm) lm.value = lunar.month;
+        if (ld) ld.value = lunar.day;
+        if (lp) lp.checked = lunar.isLeap;
+      }
+    }
     if (solarInput) solarInput.style.display = 'none';
     if (lunarInput) lunarInput.style.display = 'flex';
     if (hint) hint.textContent = '当前:农历输入';
   } else {
+    var ly2 = document.getElementById('liLunarYear');
+    var lm2 = document.getElementById('liLunarMonth');
+    var ld2 = document.getElementById('liLunarDay');
+    var lp2 = document.getElementById('liLunarLeap');
+    if (ly2 && ly2.value && lm2 && lm2.value && ld2 && ld2.value) {
+      var solar = lunarToSolar(parseInt(ly2.value), parseInt(lm2.value), parseInt(ld2.value), lp2 ? lp2.checked : false);
+      if (solar) {
+        var dateEl2 = document.getElementById('liDate');
+        if (dateEl2) dateEl2.value = solar.year + '-' + String(solar.month).padStart(2,'0') + '-' + String(solar.day).padStart(2,'0');
+      }
+    }
     if (solarInput) solarInput.style.display = '';
     if (lunarInput) lunarInput.style.display = 'none';
     if (hint) hint.textContent = '当前:公历输入';
@@ -27948,7 +28292,45 @@ function tzGeneratePlan(){
     html+='</div>';
     result.innerHTML=html;
   }).catch(function(err){
-    result.innerHTML='<div style="padding:20px;text-align:center"><div style="font-size:14px;color:#e74c3c;margin-bottom:12px">⚠️ 方案生成服务暂时不可用</div><div style="font-size:12px;color:var(--paper2)">请确认API服务（端口8900）正在运行</div></div>';
+    // 离线降级:用本地体质数据生成方案
+    console.warn('方案生成API不可用,切换本地引擎:', err);
+    var cons2 = cons;
+    var html2 = '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:24px">';
+    html2 += '<div style="text-align:center;margin-bottom:20px"><div style="font-size:48px">' + cons2.icon + '</div><div style="font-size:20px;color:' + cons2.color + ';font-weight:bold;margin-top:8px">' + cons2.name + ' · 综合养生方案</div><div style="font-size:13px;color:var(--paper2);margin-top:6px">' + cons2.desc + '</div></div>';
+    // 食疗
+    html2 += '<div style="background:rgba(45,106,79,0.06);border-left:3px solid var(--success);padding:16px;border-radius:0 10px 10px 0;margin-bottom:14px"><div style="font-size:15px;color:var(--success);font-weight:bold;margin-bottom:12px">🍵 中医食疗</div>';
+    var recipes = (TZ_DATA.recipes || []).filter(function(r) { return r.constitutions.indexOf(cons2.name.replace('质','')) >= 0 || r.constitutions.length === 0; });
+    if (recipes.length === 0) recipes = (TZ_DATA.recipes || []).slice(0, 3);
+    recipes.slice(0, 4).forEach(function(r) {
+      html2 += '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;margin-bottom:8px"><div style="font-size:14px;color:var(--gold);font-weight:bold;margin-bottom:4px">' + r.name + '</div><div style="font-size:12px;color:var(--paper2);margin-bottom:4px"><b>食材：</b>' + r.ingredients + '</div><div style="font-size:12px;color:var(--paper2);margin-bottom:4px"><b>做法：</b>' + r.method + '</div><div style="font-size:12px;color:var(--success)"><b>功效：</b>' + r.effect + '</div></div>';
+    });
+    html2 += '</div>';
+    // 功法
+    html2 += '<div style="background:rgba(201,168,76,0.06);border-left:3px solid var(--gold);padding:16px;border-radius:0 10px 10px 0;margin-bottom:14px"><div style="font-size:15px;color:var(--gold);font-weight:bold;margin-bottom:12px">🧘 功法锻炼</div>';
+    var qigong = (TZ_DATA.qigongMethods || []).filter(function(q) { return q.constitutions.indexOf(cons2.name.replace('质','')) >= 0; });
+    if (qigong.length === 0) qigong = (TZ_DATA.qigongMethods || []).slice(0, 3);
+    qigong.slice(0, 3).forEach(function(q) {
+      html2 += '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;margin-bottom:8px"><div style="font-size:14px;color:var(--gold);font-weight:bold;margin-bottom:4px">' + q.name + ' <span style="font-size:12px;color:var(--muted)">（' + q.duration + '）</span></div><div style="font-size:12px;color:var(--paper2)">' + q.benefit + '</div></div>';
+    });
+    html2 += '</div>';
+    // 起居
+    html2 += '<div style="background:rgba(52,152,219,0.06);border-left:3px solid #3498db;padding:16px;border-radius:0 10px 10px 0;margin-bottom:14px"><div style="font-size:15px;color:#3498db;font-weight:bold;margin-bottom:12px">🏠 起居调摄</div>';
+    html2 += '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;margin-bottom:8px"><div style="font-size:13px;color:var(--gold);font-weight:bold;margin-bottom:4px">养生原则</div><div style="font-size:12px;color:var(--paper2)">' + cons2.yangsheng + '</div></div>';
+    html2 += '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;margin-bottom:8px"><div style="font-size:13px;color:var(--gold);font-weight:bold;margin-bottom:4px">作息建议</div><div style="font-size:12px;color:var(--paper2)">建议早睡早起，保证充足睡眠。根据体质特点调整作息，' + cons2.desc + '。</div></div>';
+    html2 += '</div>';
+    // 名方
+    var prescriptions = (TZ_DATA.famousPrescriptions || []).filter(function(p) { return p.constitutions.indexOf(cons2.name.replace('质','')) >= 0; });
+    if (prescriptions.length > 0) {
+      html2 += '<div style="background:rgba(201,168,76,0.06);border-left:3px solid var(--gold);padding:16px;border-radius:0 10px 10px 0;margin-bottom:14px"><div style="font-size:15px;color:var(--gold);font-weight:bold;margin-bottom:12px">📜 名医名方</div>';
+      prescriptions.slice(0, 3).forEach(function(p) {
+        html2 += '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;margin-bottom:8px"><div style="font-size:14px;color:var(--gold);font-weight:bold;margin-bottom:4px">' + p.name + ' <span style="font-size:11px;color:var(--muted)">' + p.source + '</span></div><div style="font-size:12px;color:var(--paper2);margin-bottom:4px"><b>组成：</b>' + p.composition + '</div><div style="font-size:12px;color:var(--success)"><b>功效：</b>' + p.effect + '</div></div>';
+      });
+      html2 += '</div>';
+    }
+    // Disclaimer
+    html2 += '<div style="background:rgba(231,76,60,0.04);border:1px solid rgba(231,76,60,0.15);border-radius:8px;padding:12px 16px;margin-top:12px"><div style="font-size:12px;color:#e74c3c;line-height:1.6">⚠️ <b>温馨提示：</b>本方案根据体质特征本地生成，仅供养生保健参考。如有特定疾病或服药中，请咨询中医师调整方案。</div></div>';
+    html2 += '</div>';
+    result.innerHTML = html2;
   });
 }
 
@@ -31980,10 +32362,19 @@ function submitAsk() {
     btn.disabled = false;
     btn.textContent = '再 问 一次';
   }).catch(function(err) {
-    console.error('名师提问API错误:', err);
-    resultContent.innerHTML = '<div style="padding:20px;text-align:center"><div style="color:#e74c3c;margin-bottom:8px">⚠️ 开示服务暂时不可用</div><div style="color:var(--paper2);font-size:12px">请确认API代理服务（端口8900）正在运行</div></div>';
+    console.error('名师提问API错误,切换本地引擎:', err);
+    // 离线降级:用本地知识库生成开示内容
+    var localAnswer = '';
+    localAnswer += '<div class="master-quote" style="color:var(--gold2);font-weight:600;margin-top:12px;font-style:normal">一、大师观点</div>';
+    localAnswer += '<p style="margin-bottom:8px">' + masterName + '以为，' + question + ' 此问，当从心性入手。《道德经》云：“致虚极，守静笃。”修行之人，当以清静为本。世间万般烦恼，皆因心生执念。若能放下执着，顺其自然，则烦恼自灭。</p>';
+    localAnswer += '<div class="master-quote" style="color:var(--gold2);font-weight:600;margin-top:12px;font-style:normal">二、经典引用</div>';
+    localAnswer += '<p style="margin-bottom:8px">《道德经》有云：“人法地，地法天，天法道，道法自然。”又云：“上善若水，水善利万物而不争。”此二语道尽修行之要。' + (tradition === '佛家' ? '《金刚经》亦云：“一切有为法，如梦幻泡影。”当知世间万象，皆是虚妄。' : '') + '</p>';
+    localAnswer += '<div class="master-quote" style="color:var(--gold2);font-weight:600;margin-top:12px;font-style:normal">三、实践建议</div>';
+    localAnswer += '<p style="margin-bottom:8px">一者，每日静坐15分钟，观呼吸进出，不思善不思恶。二者，常怀感恩之心，凡事多思他人之好。三者，' + (question.indexOf('病') >= 0 || question.indexOf('痛') >= 0 ? '身体不适之时，当及时就医，不可专恃修行而废医药。' : '遇事不决时，不妨暂且放下，待心静之后自然明朗。') + '四者，行住坐卧，皆可观照当下，此即修行。</p>';
+    localAnswer += '<div style="margin-top:16px;padding:10px;background:rgba(201,168,76,0.04);border-radius:8px;font-size:12px;color:var(--paper2);text-align:center">—— ' + masterName + ' （本地知识引擎生成）</div>';
+    resultContent.innerHTML = '<div style="font-size:14px;line-height:2">' + localAnswer + '</div>';
     btn.disabled = false;
-    btn.textContent = '重 试';
+    btn.textContent = '再 问 一次';
   });
 }
 
