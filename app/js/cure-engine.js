@@ -1668,6 +1668,5 @@ function showCureCategory(catId) {
   out.innerHTML = html;
   out.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 console.log('[cure-engine.js] 化解方案引擎 v1.0 加载完成');
