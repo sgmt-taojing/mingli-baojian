@@ -11683,6 +11683,22 @@ function computeBazi() {
   document.getElementById('baziResult').classList.add('visible');
   document.getElementById('baziResult').scrollIntoView({ behavior: 'smooth' });
 
+  // === 化解方案与开运建议 ===
+  try {
+    var _cureYear = year;
+    var _baziCureData = {dayStem: dayStem, dayBranch: dayBranch, monthBranch: monthBranch, yearStem: yStem, wuxing: dayEle};
+    var _baziCureHtml = '';
+    try { _baziCureHtml += getAnnualCurePlan(_baziCureData, _cureYear); } catch(_ce) { console.warn('年度化解引擎错误:', _ce); }
+    try { _baziCureHtml += getFengshuiResolution({houseType:'住宅', direction:'未知', zhaiMing: '', yaoMing: '', matching: true, period: '九', wangShan: true, xuankong: ''}); } catch(_ce) { console.warn('风水化解引擎错误:', _ce); }
+    if (_baziCureHtml && _baziCureHtml.trim()) {
+      var _curePanel = '<div class="bazi-new-module">';
+      _curePanel += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">🔮 化解方案与开运建议 <span class="toggle-icon">▼</span></div>';
+      _curePanel += '<div class="bazi-module-body collapsed"><div id="bazi-cure-result">' + _baziCureHtml + '</div></div>';
+      _curePanel += '</div>';
+      document.getElementById('baziResult').innerHTML += _curePanel;
+    }
+  } catch(_ce) { console.warn('八字化解方案生成错误:', _ce); }
+
   // === 首次排盘推送老黄历 ===
   // 用户首次完成排盘后，自动推送今日老黄历内容
   if (!localStorage.getItem('_firstAlmanacPushed')) {
@@ -18910,6 +18926,17 @@ function renderFengshuiResultPro(data) {
       html += '</div></div>';
     }
   } catch(e7) { console.warn('FengshuiV3 error:', e7); }
+
+  // === 化解方案与开运建议 ===
+  try {
+    var _cureHtml = getFengshuiResolution(data);
+    if (_cureHtml && _cureHtml.trim()) {
+      html += '<div class="bazi-new-module">';
+      html += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">🔮 化解方案与开运建议 <span class="toggle-icon">▼</span></div>';
+      html += '<div class="bazi-module-body collapsed"><div id="fengshui-pro-cure-result">' + _cureHtml + '</div></div>';
+      html += '</div>';
+    }
+  } catch(_ce) { console.warn('风水化解方案生成错误:', _ce); }
 
   out.innerHTML = html;
 }
@@ -32129,6 +32156,16 @@ function runLiuyaoEngine() {
       html += '<p style="color:var(--gold)"><b>变卦分析：</b>' + duan.bianAnalysis + '</p>';
     }
     html += '<p style="opacity:0.8">' + duan.advice + '</p>';
+    // === 化解方案与开运建议 ===
+    try {
+      var _cureHtml = getLiuyaoResolution(gua, duan);
+      if (_cureHtml && _cureHtml.trim()) {
+        html += '<div class="bazi-new-module">';
+        html += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">🔮 化解方案与开运建议 <span class="toggle-icon">▼</span></div>';
+        html += '<div class="bazi-module-body collapsed"><div id="liuyao-cure-result">' + _cureHtml + '</div></div>';
+        html += '</div>';
+      }
+    } catch(_ce) { console.warn('六爻化解引擎错误:', _ce); }
     _showEngineResult('yjEngineResult', html);
     // === V3引擎校准 ===
     try {
@@ -32212,6 +32249,16 @@ function runMeihuaEngine() {
     html += '<p><b>终局：</b>' + analyze.endRelation + '</p>';
     html += '<p><b>综合：</b>' + analyze.verdict + '</p>';
     html += '<p style="opacity:0.8">' + analyze.advice + '</p>';
+    // === 化解方案与开运建议 ===
+    try {
+      var _cureHtml = getMeihuaResolution(gua, analyze);
+      if (_cureHtml && _cureHtml.trim()) {
+        html += '<div class="bazi-new-module">';
+        html += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">🔮 化解方案与开运建议 <span class="toggle-icon">▼</span></div>';
+        html += '<div class="bazi-module-body collapsed"><div id="meihua-cure-result">' + _cureHtml + '</div></div>';
+        html += '</div>';
+      }
+    } catch(_ce) { console.warn('梅花化解引擎错误:', _ce); }
     _showEngineResult('mhEngineResult', html);
     // === V3引擎校准 ===
     try {
@@ -32279,9 +32326,15 @@ function runQimenEngine() {
     if (analyze.mascot) html += '<p style="opacity:0.7"><b>吉祥物：</b>' + analyze.mascot + '</p>';
     html += '<p style="opacity:0.8">' + analyze.advice + '</p>';
     // 化解方案
-    if (typeof getQimenResolution === 'function') {
-      html += getQimenResolution(pan, analyze);
-    }
+    try {
+      var _cureHtml = getQimenResolution(pan, analyze);
+      if (_cureHtml && _cureHtml.trim()) {
+        html += '<div class="bazi-new-module">';
+        html += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">🔮 化解方案与开运建议 <span class="toggle-icon">▼</span></div>';
+        html += '<div class="bazi-module-body collapsed"><div id="qimen-cure-result">' + _cureHtml + '</div></div>';
+        html += '</div>';
+      }
+    } catch(_ce) { console.warn('奇门化解引擎错误:', _ce); }
     var dims = analyze.dimensions || {};
     if (Object.keys(dims).length > 0) {
       html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:12px;font-size:12px">';
@@ -32309,6 +32362,16 @@ function runLiurenEngine() {
     html += '<p><b>三传神将：</b>' + analyze.chuanShen.join(' → ') + '</p>';
     html += '<p><b>吉凶：</b>' + analyze.luck + '</p>';
     html += '<p style="opacity:0.8">' + analyze.advice + '</p>';
+    // === 化解方案与开运建议 ===
+    try {
+      var _cureHtml = getLiurenResolution(pan, analyze);
+      if (_cureHtml && _cureHtml.trim()) {
+        html += '<div class="bazi-new-module">';
+        html += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">🔮 化解方案与开运建议 <span class="toggle-icon">▼</span></div>';
+        html += '<div class="bazi-module-body collapsed"><div id="liuren-cure-result">' + _cureHtml + '</div></div>';
+        html += '</div>';
+      }
+    } catch(_ce) { console.warn('六壬化解引擎错误:', _ce); }
     _showEngineResult('lrEngineResult', html);
     // === V3引擎校准 ===
     try {
@@ -32387,9 +32450,15 @@ function runZiweiEngine() {
     html += '<p><b>概述：</b>' + analyze.overview + '</p>';
     html += '<p style="opacity:0.8">' + analyze.advice + '</p>';
     // 化解方案
-    if (typeof getZiweiResolution === 'function') {
-      html += getZiweiResolution(pan, analyze);
-    }
+    try {
+      var _cureHtml = getZiweiResolution(pan, analyze);
+      if (_cureHtml && _cureHtml.trim()) {
+        html += '<div class="bazi-new-module">';
+        html += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">🔮 化解方案与开运建议 <span class="toggle-icon">▼</span></div>';
+        html += '<div class="bazi-module-body collapsed"><div id="ziwei-cure-result">' + _cureHtml + '</div></div>';
+        html += '</div>';
+      }
+    } catch(_ce) { console.warn('紫微化解引擎错误:', _ce); }
     _showEngineResult('zwEngineResult', html);
   } catch(e) { alert('紫微引擎错误：'+e.message); }
 }
@@ -32430,6 +32499,16 @@ function runFengshuiEngine() {
     html += '<p><b>评分：</b>' + res.score + '/100</p>';
     html += '<p><b>建议：</b>' + res.advice + '</p>';
     html += '<ul style="padding-left:18px;opacity:0.8"><li>' + res.layoutTips.join('</li><li>') + '</li></ul>';
+    // === 化解方案与开运建议 ===
+    try {
+      var _cureHtml = getFengshuiResolution(res);
+      if (_cureHtml && _cureHtml.trim()) {
+        html += '<div class="bazi-new-module">';
+        html += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">🔮 化解方案与开运建议 <span class="toggle-icon">▼</span></div>';
+        html += '<div class="bazi-module-body collapsed"><div id="fengshui-cure-result">' + _cureHtml + '</div></div>';
+        html += '</div>';
+      }
+    } catch(_ce) { console.warn('风水化解引擎错误:', _ce); }
     _showEngineResult('fsEngineResult', html);
   } catch(e) { alert('风水引擎错误：'+e.message); }
 }
