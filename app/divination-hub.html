@@ -32596,8 +32596,8 @@ function runLiuyaoEngine() {
     try {
       if (window.LiuyaoV3 && LiuyaoV3.analyzeLiuyao) {
         var v3Yj = [7,7,7,7,7,7];
-        if (gua.benGua && gua.benGua.lines) {
-          for (var yi = 0; yi < 6; yi++) { v3Yj[yi] = gua.benGua.lines[yi] ? 7 : 8; }
+        if (gua.lines && gua.lines.length >= 6) {
+          for (var yi = 0; yi < 6; yi++) { v3Yj[yi] = gua.lines[yi].line === '阳' ? 7 : 8; }
         }
         if (gua.dongYao) {
           for (var dyi = 0; dyi < gua.dongYao.length; dyi++) {
@@ -34485,8 +34485,8 @@ if (typeof window !== 'undefined') {
       html += '<p><b>时间：</b>' + year + '年' + month + '月' + day + '日 ' + ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][hour] + '时</p>';
       html += '<p><b>日干支：</b>' + pan.dayGan + pan.dayZhi + '</p>';
       html += '<p><b>月将：</b>' + pan.yueJiang + '</p>';
-      html += '<p><b>三传：</b>' + pan.sanChuan.join(' → ') + '</p>';
-      html += '<p><b>三传神将：</b>' + analyze.chuanShen.join(' → ') + '</p>';
+      html += '<p><b>三传：</b>' + (pan.sanChuan.chu||'') + ' → ' + (pan.sanChuan.zhong||'') + ' → ' + (pan.sanChuan.mo||'') + '</p>';
+      html += '<p><b>三传神将：</b>' + (Array.isArray(analyze.chuanShen) ? analyze.chuanShen.join(' → ') : (analyze.chuanShen||'')) + '</p>';
       html += '<p><b>吉凶：</b>' + analyze.luck + '</p>';
       html += '<p style="opacity:0.8">' + analyze.advice + '</p>';
       const el = document.getElementById('liurenResult');
