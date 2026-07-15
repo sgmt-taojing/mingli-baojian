@@ -7199,7 +7199,7 @@ function _yjStartImpl(mode) {
   const qxTimeEl = document.getElementById('yjQixinTime');
   const qxTime = qxTimeEl ? qxTimeEl.value : '';
   if(mode === 'matter' && !qxTime){
-    alert('⚠️ 事盘占卜需填写「起心动念时辰」\n\n正宗易经占卜讲究"心诚则灵，时到则应"。\n请填写您心中升起疑问的那一刻，系统将结合此时辰综合判卦。\n\n（若不确定精确时间，可填写大致时辰）');
+    showToast('⚠️ 事盘占卜需填写「起心动念时辰」，请填写您心中升起疑问的那一刻');
     document.getElementById('yjQixinTime').focus();
     return;
   }
@@ -15541,12 +15541,12 @@ function computeYangzhaiPro() {
       var lm = parseInt(document.getElementById('yzpLunarMonth').value);
       var ld = parseInt(document.getElementById('yzpLunarDay').value);
       birthHour = parseInt(document.getElementById('yzpLunarHour').value) * 2;
-      if (!ly || !lm || !ld) { alert('请填写完整农历出生日期'); return; }
+      if (!ly || !lm || !ld) { showToast('请填写完整农历出生日期'); return; }
       var solar = lunarToSolar(ly, lm, ld, false);
       birthDate = solar.year + '-' + String(solar.month).padStart(2,'0') + '-' + String(solar.day).padStart(2,'0');
     } else {
       birthDate = document.getElementById('yzpBirthDate').value;
-      if (!birthDate) { alert('请填写出生日期'); return; }
+      if (!birthDate) { showToast('请填写出生日期'); return; }
       birthHour = 12; // 默认午时
     }
 
@@ -15556,7 +15556,7 @@ function computeYangzhaiPro() {
     var month = parseInt(parts[1]);
     var day = parseInt(parts[2]);
     var bazi = computeBaziCore(year, month, day, birthHour);
-    if (!bazi) { alert('八字计算失败'); return; }
+    if (!bazi) { showToast('八字计算失败，请检查输入'); return; }
 
     // 获取已知问题
     var problems = [];
@@ -18649,16 +18649,14 @@ function recommendMobileNumbers(){
     var parts=birthDate.split('-');
     var Y=parseInt(parts[0]),M=parseInt(parts[1]),D=parseInt(parts[2]);
     var hour=parseInt(birthHour||'0');
-    var stems=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-    var dayGzIdx=(Y*365+M*30+D)%60;
-    var dayStem=stems[dayGzIdx%10];
-    var stemWx={甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
-    dayWx=stemWx[dayStem];
-    var shengMap={木:'水',火:'木',土:'火',金:'土',水:'金'};
-    var keMap={木:'金',火:'水',土:'木',金:'火',水:'土'};
-    var isWeak=(dayGzIdx%2===0);
-    xiShen=isWeak?shengMap[dayWx]:keMap[dayWx];
-    jiShen=keMap[dayWx];
+    try {
+      var baziInfo=computeBaziCore(Y,M,D,hour);
+      dayWx=baziInfo.dayWuxing||'土';
+      xiShen=baziInfo.mingType?baziInfo.mingType.yongshenEle||xiShen:xiShen;
+      jiShen=baziInfo.mingType?baziInfo.mingType.jishenEle||jiShen:jiShen;
+    } catch(e) {
+      console.warn('八字计算失败,使用默认值:',e.message);
+    }
   }
   
   // 数字五行
@@ -18902,16 +18900,14 @@ function recommendTailNumbers(){
     var parts=birthDate.split('-');
     var Y=parseInt(parts[0]),M=parseInt(parts[1]),D=parseInt(parts[2]);
     var hour=parseInt(birthHour||'0');
-    var stems=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-    var dayGzIdx=(Y*365+M*30+D)%60;
-    var dayStem=stems[dayGzIdx%10];
-    var stemWx={甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
-    dayWx=stemWx[dayStem];
-    var shengMap={木:'水',火:'木',土:'火',金:'土',水:'金'};
-    var keMap={木:'金',火:'水',土:'木',金:'火',水:'土'};
-    var isWeak=(dayGzIdx%2===0);
-    xiShen=isWeak?shengMap[dayWx]:keMap[dayWx];
-    jiShen=keMap[dayWx];
+    try {
+      var baziInfo=computeBaziCore(Y,M,D,hour);
+      dayWx=baziInfo.dayWuxing||'土';
+      xiShen=baziInfo.mingType?baziInfo.mingType.yongshenEle||xiShen:xiShen;
+      jiShen=baziInfo.mingType?baziInfo.mingType.jishenEle||jiShen:jiShen;
+    } catch(e) {
+      console.warn('八字计算失败,使用默认值:',e.message);
+    }
   }
   
   // 行业五行
