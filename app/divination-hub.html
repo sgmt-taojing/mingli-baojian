@@ -32799,6 +32799,40 @@ function runMeihuaEngine() {
       html += '<div style="font-size:12px;line-height:1.8;opacity:.8">动爻五行属' + _dongWx + _seasonHint + '，应期多在该五行当令之月。具体应期以动爻地支冲合之日为准。</div>';
       html += '</div>';
     } catch(_ye) { console.warn('梅花应期计算错误:', _ye); }
+    // === 📋 梅花白话解读 ===
+    try {
+      var _mhPlain = '<div class="bazi-new-module">';
+      _mhPlain += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">📋 梅花白话解读 <span class="toggle-icon">▼</span></div>';
+      _mhPlain += '<div class="bazi-module-body collapsed" style="padding:12px 16px">';
+      // 1. 体用总断
+      _mhPlain += '<div style="background:rgba(231,76,60,.04);border-left:3px solid #e74c3c;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
+      _mhPlain += '<div style="font-size:13px;font-weight:bold;color:#e74c3c;margin-bottom:4px">🌸 体用总断</div>';
+      _mhPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8"><b>体卦</b>（' + analyze.tiGua + '）代表自己，<b>用卦</b>（' + analyze.yongGua + '）代表所问之事。' + analyze.relation + '。初断：' + (analyze.initial||'') + '。终局：' + (analyze.endRelation||'') + '。</div>';
+      _mhPlain += '</div>';
+      // 2. 事业方向
+      _mhPlain += '<div style="background:rgba(52,152,219,.04);border-left:3px solid #3498db;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
+      _mhPlain += '<div style="font-size:13px;font-weight:bold;color:#3498db;margin-bottom:4px">💼 事业方向</div>';
+      _mhPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">' + (analyze.relation.indexOf('体克用') >= 0 ? '体克用，事业可成但需努力，努力付出终有回报。' : analyze.relation.indexOf('用克体') >= 0 ? '用克体，事业阻力大，不宜强求，等待时机为上。' : analyze.relation.indexOf('体生用') >= 0 ? '体生用，付出多回报少，需调整策略避免过度消耗。' : analyze.relation.indexOf('用生体') >= 0 ? '用生体，贵人相助，事业顺遂，把握机会。' : '体用比和，事业平稳，按部就班即可。') + '</div>';
+      _mhPlain += '</div>';
+      // 3. 财运分析
+      _mhPlain += '<div style="background:rgba(39,174,96,.04);border-left:3px solid #27ae60;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
+      _mhPlain += '<div style="font-size:13px;font-weight:bold;color:#27ae60;margin-bottom:4px">💰 财运分析</div>';
+      _mhPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">' + (analyze.relation.indexOf('用生体') >= 0 ? '财来生身，财运亨通，积极求财必有所得。' : analyze.relation.indexOf('体生用') >= 0 ? '财去生事，投资需谨慎，不宜大手笔。' : analyze.relation.indexOf('体克用') >= 0 ? '求财辛苦但可得，需主动出击。' : analyze.relation.indexOf('用克体') >= 0 ? '财不就身，不宜投资，守财为上。' : '财运平稳，量入为出。') + '变卦' + bian + '预示财运走向。</div>';
+      _mhPlain += '</div>';
+      // 4. 感情婚姻
+      _mhPlain += '<div style="background:rgba(155,89,182,.04);border-left:3px solid #9b59b6;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
+      _mhPlain += '<div style="font-size:13px;font-weight:bold;color:#9b59b6;margin-bottom:4px">💕 感情婚姻</div>';
+      _mhPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">' + (analyze.relation.indexOf('用生体') >= 0 ? '对方主动示好，感情发展顺利。' : analyze.relation.indexOf('体生用') >= 0 ? '你付出较多，需看对方回应是否值得。' : analyze.relation.indexOf('体克用') >= 0 ? '感情需主动追求，付出终有回报。' : analyze.relation.indexOf('用克体') >= 0 ? '感情有阻力，不宜强求，顺其自然。' : '感情平和，互相尊重为上。') + '动爻在第' + (gua.dongYao+1) + '爻，预示变化发生的位置。</div>';
+      _mhPlain += '</div>';
+      // 5. 健康提醒
+      _mhPlain += '<div style="background:rgba(230,126,34,.04);border-left:3px solid #e67e22;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
+      _mhPlain += '<div style="font-size:13px;font-weight:bold;color:#e67e22;margin-bottom:4px">🏥 健康提醒</div>';
+      _mhPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">体卦五行对应身体器官：木=肝胆，火=心血管，土=脾胃，金=肺呼吸，水=肾泌尿。' + (analyze.relation.indexOf('用克体') >= 0 ? '用克体，对应器官易受克伐，需提前调养。' : '体卦不受克，身体基本健康。') + '变卦暗示病情走向：变卦生体卦则痊愈快，变卦克体卦则需积极治疗。</div>';
+      _mhPlain += '</div>';
+      _mhPlain += '</div></div>';
+      html += _mhPlain;
+    } catch(_mhe) { console.warn('梅花白话解读错误:', _mhe); }
+
     // === 📋 缘主须知 ===
     html += '<div style="margin:12px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(46,204,113,0.06),rgba(46,204,113,0.01));border:1px solid rgba(46,204,113,0.15);border-radius:12px">';
     html += '<div style="font-size:14px;font-weight:700;color:var(--jade2);margin-bottom:8px;letter-spacing:2px">📋 缘主须知</div>';
@@ -33140,6 +33174,41 @@ function runQimenEngine() {
       html += '<div style="font-size:12px;line-height:1.8;opacity:.8">' + _qmYingqi + '</div>';
       html += '</div>';
     } catch(_qe) { console.warn('奇门应期计算错误:', _qe); }
+    // === 📋 奇门白话解读 ===
+    try {
+      var _qmPlain = '<div class="bazi-new-module">';
+      _qmPlain += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">📋 奇门白话解读 <span class="toggle-icon">▼</span></div>';
+      _qmPlain += '<div class="bazi-module-body collapsed" style="padding:12px 16px">';
+      // 1. 整体吉凶
+      var _qmLuckColor2 = analyze.luck === '吉' ? '#27ae60' : (analyze.luck === '凶' ? '#e74c3c' : '#f39c12');
+      _qmPlain += '<div style="background:rgba(231,76,60,.04);border-left:3px solid ' + _qmLuckColor2 + ';padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
+      _qmPlain += '<div style="font-size:13px;font-weight:bold;color:' + _qmLuckColor2 + ';margin-bottom:4px">🔮 整体吉凶</div>';
+      _qmPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">本次起卦<b style="color:' + _qmLuckColor2 + '">' + analyze.luck + '</b>。' + (analyze.wuBuYu ? '<span style="color:#e74c3c">⚠️ 五不遇时，时辰大忌，不宜行动。</span>' : '') + (analyze.isMaXing ? '马星动象，有出行或变动之兆。' : '') + '用神<b>' + (analyze.yongShen||'') + '</b>落<b>' + (analyze.palace||'') + '</b>宫，' + (analyze.luck === '吉' ? '格局有利，可以行动。' : analyze.luck === '凶' ? '格局不利，宜守不宜进。' : '格局平平，需谨慎行事。') + '</div>';
+      _qmPlain += '</div>';
+      // 2. 事业谋为
+      _qmPlain += '<div style="background:rgba(52,152,219,.04);border-left:3px solid #3498db;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
+      _qmPlain += '<div style="font-size:13px;font-weight:bold;color:#3498db;margin-bottom:4px">💼 事业谋为</div>';
+      _qmPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">八门主事：<b>' + (analyze.men||'') + '</b>门当值。开门利求职见贵，休门利求财安养，生门利经营求财，伤门利讨债捕捉，杜门利躲灾避难，景门利考试文书，死门不利吉事，惊门利诉讼。' + (analyze.strategy||'') + '</div>';
+      _qmPlain += '</div>';
+      // 3. 财运分析
+      _qmPlain += '<div style="background:rgba(39,174,96,.04);border-left:3px solid #27ae60;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
+      _qmPlain += '<div style="font-size:13px;font-weight:bold;color:#27ae60;margin-bottom:4px">💰 财运分析</div>';
+      _qmPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">生门为财门，落宫旺相则财源广进。' + (analyze.men === '生门' ? '生门当值，利于经营求财。' : analyze.men === '开门' ? '开门当值，利于仕途升迁带动财运。' : analyze.men === '休门' ? '休门当值，利于稳健投资。' : '当前门非财门，求财需等待时机。') + '天盘乙奇为财星，落宫与用神宫位生合则财旺。</div>';
+      _qmPlain += '</div>';
+      // 4. 感情人际
+      _qmPlain += '<div style="background:rgba(155,89,182,.04);border-left:3px solid #9b59b6;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
+      _qmPlain += '<div style="font-size:13px;font-weight:bold;color:#9b59b6;margin-bottom:4px">💕 感情人际</div>';
+      _qmPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">六合主婚姻感情，乙庚主男女匹配。' + (analyze.shen === '六合' ? '六合当值，感情和合，利于婚恋。' : '神盘' + (analyze.shen||'') + '当值，' + (analyze.luck === '吉' ? '人际关系顺畅。' : '人际需注意沟通方式。')) + '五不遇时不宜婚嫁谈判。</div>';
+      _qmPlain += '</div>';
+      // 5. 健康出行
+      _qmPlain += '<div style="background:rgba(230,126,34,.04);border-left:3px solid #e67e22;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
+      _qmPlain += '<div style="font-size:13px;font-weight:bold;color:#e67e22;margin-bottom:4px">🏥 健康出行</div>';
+      _qmPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">天芮星主病，落宫需注意对应身体部位。' + (analyze.star === '天芮' ? '天芮当值，需注意健康，不宜探病。' : '天盘' + (analyze.star||'') + '当值，' + (analyze.luck === '吉' ? '身体无碍。' : '需注意休息调养。')) + '马星动则利出行，五不遇时不宜远行。</div>';
+      _qmPlain += '</div>';
+      _qmPlain += '</div></div>';
+      html += _qmPlain;
+    } catch(_qpe) { console.warn('奇门白话解读错误:', _qpe); }
+
     // === 📋 缘主须知 ===
     html += '<div style="margin:12px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(138,92,246,0.06),rgba(138,92,246,0.01));border:1px solid rgba(138,92,246,0.15);border-radius:12px">';
     html += '<div style="font-size:14px;font-weight:700;color:var(--violet2);margin-bottom:8px;letter-spacing:2px">📋 缘主须知</div>';
@@ -33537,6 +33606,41 @@ function runLiurenEngine() {
     if (analyze.keti) html += '<div style="font-size:12px;line-height:1.8;margin-bottom:6px;opacity:.8"><b>课体：</b>' + analyze.keti + '</div>';
     html += '<div style="font-size:12px;line-height:1.8;opacity:.8"><b>断语：</b>' + analyze.advice + '</div>';
     html += '</div>';
+    // === 📋 大六壬白话解读 ===
+    try {
+      var _lrPlain = '<div class="bazi-new-module">';
+      _lrPlain += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">📋 六壬白话解读 <span class="toggle-icon">▼</span></div>';
+      _lrPlain += '<div class="bazi-module-body collapsed" style="padding:12px 16px">';
+      // 1. 三传论事
+      var _lrLuckColor2 = analyze.luck === '吉' ? '#27ae60' : (analyze.luck === '凶' ? '#e74c3c' : '#f39c12');
+      _lrPlain += '<div style="background:rgba(231,76,60,.04);border-left:3px solid ' + _lrLuckColor2 + ';padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
+      _lrPlain += '<div style="font-size:13px;font-weight:bold;color:' + _lrLuckColor2 + ';margin-bottom:4px">⬡ 三传论事</div>';
+      _lrPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8"><b>初传</b>（' + pan.sanChuan.chu + '）为事之始因，<b>中传</b>（' + pan.sanChuan.zhong + '）为事之经过，<b>末传</b>（' + pan.sanChuan.mo + '）为事之结局。' + (analyze.luck === '吉' ? '三传递生，事态向好发展。' : analyze.luck === '凶' ? '三传克害，事多波折。' : '三传平缓，事态平稳。') + '取法：<b>' + (pan.sanChuan.method||'贼克法') + '</b>。</div>';
+      _lrPlain += '</div>';
+      // 2. 事业谋为
+      _lrPlain += '<div style="background:rgba(52,152,219,.04);border-left:3px solid #3498db;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
+      _lrPlain += '<div style="font-size:13px;font-weight:bold;color:#3498db;margin-bottom:4px">💼 事业谋为</div>';
+      _lrPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">日干代表求测者，日支代表所测之事。干上神生干则事业有助，干上神克干则阻力大。' + (analyze.luck === '吉' ? '目前利于行动，可积极推进。' : analyze.luck === '凶' ? '目前不宜大动作，以守为攻。' : '局势不明，需观察等待。') + '初传为起因，看初传天将判断贵人方位。</div>';
+      _lrPlain += '</div>';
+      // 3. 财运分析
+      _lrPlain += '<div style="background:rgba(39,174,96,.04);border-left:3px solid #27ae60;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
+      _lrPlain += '<div style="font-size:13px;font-weight:bold;color:#27ae60;margin-bottom:4px">💰 财运分析</div>';
+      _lrPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">财看青龙及财爻所在天将。青龙临日辰则财旺，临空亡则财虚。' + (analyze.luck === '吉' ? '财运向好，可适度投资。' : analyze.luck === '凶' ? '财运不济，守财为上。' : '财运平稳，量力而行。') + '末传为结局，末传生初传则最终有得。</div>';
+      _lrPlain += '</div>';
+      // 4. 感情婚姻
+      _lrPlain += '<div style="background:rgba(155,89,182,.04);border-left:3px solid #9b59b6;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
+      _lrPlain += '<div style="font-size:13px;font-weight:bold;color:#9b59b6;margin-bottom:4px">💕 感情婚姻</div>';
+      _lrPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">婚姻看天后与六合。天后临日干则女方主动，六合临日支则感情和合。' + (analyze.luck === '吉' ? '感情顺遂，可谈婚论嫁。' : analyze.luck === '凶' ? '感情有波折，需耐心经营。' : '感情平淡，顺其自然。') + '三传递生则感情层层深入，三传克害则多有口舌是非。</div>';
+      _lrPlain += '</div>';
+      // 5. 健康出行
+      _lrPlain += '<div style="background:rgba(230,126,34,.04);border-left:3px solid #e67e22;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
+      _lrPlain += '<div style="font-size:13px;font-weight:bold;color:#e67e22;margin-bottom:4px">🏥 健康出行</div>';
+      _lrPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">疾病看白虎及天空。白虎临日辰则病重，天空临日辰则病轻或虚惊。' + (analyze.luck === '吉' ? '身体无大碍。' : analyze.luck === '凶' ? '需注意身体，及时就医。' : '身体一般，注意调养。') + '出行看驿马，驿马临身则宜出行，五不遇时不宜远行。</div>';
+      _lrPlain += '</div>';
+      _lrPlain += '</div></div>';
+      html += _lrPlain;
+    } catch(_lre) { console.warn('六壬白话解读错误:', _lre); }
+
     // === 📋 缘主须知 ===
     html += '<div style="margin:12px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(46,204,113,0.06),rgba(46,204,113,0.01));border:1px solid rgba(46,204,113,0.15);border-radius:12px">';
     html += '<div style="font-size:14px;font-weight:700;color:var(--jade2);margin-bottom:8px;letter-spacing:2px">📋 缘主须知</div>';
