@@ -32681,7 +32681,17 @@ function runMeihuaEngine() {
     const analyze = meihuaAnalyze(gua, '所问之事');
     const ben = _GUA_XIANG[gua.benGua.lower].name + _GUA_XIANG[gua.benGua.upper].name;
     const bian = _GUA_XIANG[gua.bianGua.lower].name + _GUA_XIANG[gua.bianGua.upper].name;
+        // 🎯 排盘结论总览
+    var _mhSummary = '<div style="margin:12px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.02));border:1px solid rgba(201,168,76,0.2);border-radius:12px">';
+    _mhSummary += '<div style="font-size:14px;font-weight:700;color:var(--gold);margin-bottom:8px;letter-spacing:2px">🎯 排盘结论总览</div>';
+    _mhSummary += '<div style="font-size:13px;line-height:1.8;margin-bottom:6px"><b>本卦：</b>' + ben + ' → <b>变卦：</b>' + bian + '（第' + (gua.dongYao+1) + '爻动）</div>';
+    _mhSummary += '<div style="font-size:13px;line-height:1.8;margin-bottom:6px"><b>体卦：</b>' + analyze.tiGua + '（代表自己）· <b>用卦：</b>' + analyze.yongGua + '（代表所问之事）</div>';
+    _mhSummary += '<div style="font-size:13px;line-height:1.8;margin-bottom:6px"><b>体用关系：</b>' + analyze.relation + ' → <b>终局：</b>' + (analyze.endRelation||'') + '</div>';
+    _mhSummary += '<div style="font-size:13px;line-height:1.8;margin-bottom:6px"><b>综合断语：</b><span style="color:var(--gold);font-weight:600">' + analyze.verdict + '</span></div>';
+    _mhSummary += '<div style="font-size:12px;line-height:1.8;opacity:.8"><b>建议：</b>' + (analyze.advice || '卦象仅供参考，心正则卦灵。') + '</div>';
+    _mhSummary += '</div>';
     let html = '<h4 style="color:var(--jade2)">🌸 梅花引擎演算结果</h4>';
+    html += _mhSummary;
     html += '<p><b>本卦：</b>' + ben + ' · 动爻第'+(gua.dongYao+1)+'爻</p>';
     html += '<p><b>变卦：</b>' + bian + '</p>';
     html += '<p><b>体卦：</b>' + analyze.tiGua + ' · <b>用卦：</b>' + analyze.yongGua + '</p>';
@@ -32982,7 +32992,18 @@ function runQimenEngine() {
     const pan = qimenPaiPan(now.getFullYear(), now.getMonth()+1, now.getDate(), hour, 'auto');
     var qmQ = document.getElementById('qmQuestion')?.value || '事业';
     const analyze = qimenAnalyze(pan, qmQ);
+    // 🎯 排盘结论总览
+    var _qmLuckColor = analyze.luck === '吉' ? '#27ae60' : (analyze.luck === '凶' ? '#e74c3c' : '#f39c12');
+    var _qmSummary = '<div style="margin:12px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.02));border:1px solid rgba(201,168,76,0.2);border-radius:12px">';
+    _qmSummary += '<div style="font-size:14px;font-weight:700;color:var(--gold);margin-bottom:8px;letter-spacing:2px">🎯 排盘结论总览</div>';
+    _qmSummary += '<div style="font-size:13px;line-height:1.8;margin-bottom:6px"><b>吉凶判定：</b><span style="color:' + _qmLuckColor + ';font-weight:600;font-size:16px">' + analyze.luck + '</span>' + (analyze.wuBuYu ? ' · <span style="color:#e74c3c">⚠️ 五不遇时，时辰大忌</span>' : '') + (analyze.isMaXing ? ' · <span style="color:#3498db">🐎 马星动象</span>' : '') + '</div>';
+    _qmSummary += '<div style="font-size:13px;line-height:1.8;margin-bottom:6px"><b>用神：</b>' + analyze.yongShen + '落<b style="color:var(--gold)">' + analyze.palace + '宫</b> · 天盘' + (analyze.qi||'—') + ' · ' + (analyze.men||'—') + ' · ' + (analyze.star||'—') + ' · ' + (analyze.shen||'—') + '</div>';
+    if (analyze.gejuText) { _qmSummary += '<div style="font-size:13px;line-height:1.8;margin-bottom:6px"><b>格局：</b>' + analyze.gejuText + '</div>'; }
+    _qmSummary += '<div style="font-size:12px;line-height:1.8;opacity:.85;margin-bottom:6px"><b>策略：</b>' + (analyze.strategy || '需综合天时地利人和判断') + '</div>';
+    _qmSummary += '<div style="font-size:12px;line-height:1.8;opacity:.8"><b>建议：</b>' + (analyze.advice || '奇门遁甲为时空方位之学，择吉而行，趋吉避凶。切勿迷信盲从。') + '</div>';
+    _qmSummary += '</div>';
     let html = '<h4 style="color:var(--violet2)">☰ 奇门引擎演算结果</h4>';
+    html += _qmSummary;
     html += '<p><b>遁局：</b>' + (pan.dun==='yang'?'阳':'阴') + '遁' + pan.ju + '局</p>';
     html += '<p><b>用神：</b>' + analyze.yongShen + ' · 落' + analyze.palace + '宫</p>';
     html += '<p><b>天盘：</b>' + analyze.qi + ' · 门：' + analyze.men + ' · 星：' + analyze.star + ' · 神：' + analyze.shen + '</p>';
@@ -33259,7 +33280,18 @@ function runLiurenEngine() {
     const hour = hourVal ? parseInt(hourVal) : now.getHours();
     const pan = liurenPaiPan(now.getFullYear(), now.getMonth()+1, now.getDate(), hour, 0);
     const analyze = liurenAnalyze(pan, document.getElementById('lrQuestion')?.value || '所问之事');
+        // 🎯 排盘结论总览
+    var _lrLuckColor = analyze.luck === '吉' ? '#27ae60' : (analyze.luck === '凶' ? '#e74c3c' : '#f39c12');
+    var _lrSummary = '<div style="margin:12px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.02));border:1px solid rgba(201,168,76,0.2);border-radius:12px">';
+    _lrSummary += '<div style="font-size:14px;font-weight:700;color:var(--gold);margin-bottom:8px;letter-spacing:2px">🎯 排盘结论总览</div>';
+    _lrSummary += '<div style="font-size:13px;line-height:1.8;margin-bottom:6px"><b>吉凶判定：</b><span style="color:' + _lrLuckColor + ';font-weight:600;font-size:16px">' + analyze.luck + '</span></div>';
+    _lrSummary += '<div style="font-size:13px;line-height:1.8;margin-bottom:6px"><b>三传脉络：</b><span style="color:var(--gold)">' + pan.sanChuan.chu + '</span>（起因）→ <span style="color:var(--gold)">' + pan.sanChuan.zhong + '</span>（过程）→ <span style="color:var(--gold)">' + pan.sanChuan.mo + '</span>（结局）</div>';
+    _lrSummary += '<div style="font-size:12px;line-height:1.8;margin-bottom:6px"><b>月将：</b>' + pan.yueJiang + ' · <b>取法：</b>' + (pan.sanChuan.method || '贼克法') + ' · <b>三传神将：</b>' + (Array.isArray(analyze.chuanShen) ? analyze.chuanShen.join(' → ') : (analyze.chuanShen||'无')) + '</div>';
+    _lrSummary += '<div style="font-size:12px;line-height:1.8;opacity:.85;margin-bottom:6px"><b>事态发展：</b>初传为事之始因，中传为事之经过，末传为事之结局。三传皆吉则事成顺遂，末传为凶则结局难美。</div>';
+    _lrSummary += '<div style="font-size:12px;line-height:1.8;opacity:.8"><b>建议：</b>' + (analyze.advice || '大六壬为古法占卜，重在参考。君子谋道不谋食，行正道自有天佑。') + '</div>';
+    _lrSummary += '</div>';
     let html = '<h4 style="color:var(--orange)">⬡ 六壬引擎演算结果</h4>';
+    html += _lrSummary;
     html += '<p><b>日干支：</b>' + pan.dayGan + pan.dayZhi + ' · 占时：' + pan.shiZhi + '</p>';
     html += '<p><b>月将：</b>' + pan.yueJiang + '</p>';
     html += '<p><b>三传：</b>' + pan.sanChuan.chu + ' → ' + pan.sanChuan.zhong + ' → ' + pan.sanChuan.mo + '</p>';
@@ -33657,7 +33689,17 @@ function runZiweiEngine() {
     const sex = document.getElementById('zwSex')?.value || 'male';
     const pan = ziweiPaiPan(year, month, day, hour, sex);
     const analyze = ziweiAnalysis(pan);
+    // 🎯 排盘结论总览
+    var _zwSummary = '<div style="margin:12px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.02));border:1px solid rgba(201,168,76,0.2);border-radius:12px">';
+    _zwSummary += '<div style="font-size:14px;font-weight:700;color:var(--gold);margin-bottom:8px;letter-spacing:2px">🎯 排盘结论总览</div>';
+    _zwSummary += '<div style="font-size:13px;line-height:1.8;margin-bottom:6px"><b>命宫：</b>' + pan.mingZhi + '（' + (pan.mingGan||'') + pan.mingZhi + '）· <b>身宫：</b>' + pan.shenZhi + '</div>';
+    _zwSummary += '<div style="font-size:13px;line-height:1.8;margin-bottom:6px"><b>五行局：</b>' + pan.ju + ' · <b>格局层次：</b>' + (analyze.geju || '待定') + '</div>';
+    _zwSummary += '<div style="font-size:13px;line-height:1.8;margin-bottom:6px"><b>四化要点：</b>' + (analyze.sihuaText || '无') + '</div>';
+    _zwSummary += '<div style="font-size:12px;line-height:1.8;opacity:.85;margin-bottom:6px"><b>概述：</b>' + (analyze.overview || '命宫主星决定先天性格与人生基调，十二宫各有所司，四化流转影响各阶段运势。') + '</div>';
+    _zwSummary += '<div style="font-size:12px;line-height:1.8;opacity:.8"><b>建议：</b>' + (analyze.advice || '紫微斗数为命理参考，命由天定运由己造，行善积德自然趋吉避凶。') + '</div>';
+    _zwSummary += '</div>';
     let html = '<h4 style="color:var(--fire)">🌌 紫微引擎演算结果</h4>';
+    html += _zwSummary;
     html += '<p><b>命宫：</b>' + pan.mingZhi + ' · 身宫：' + pan.shenZhi + '</p>';
     html += '<p><b>五行局：</b>' + pan.ju + '</p>';
     html += '<p><b>格局：</b>' + analyze.geju + '</p>';
@@ -34164,7 +34206,18 @@ function runFengshuiEngine() {
     const layout = document.getElementById('fsLayout')?.value || '三室两厅';
     const birthYear = parseInt(document.getElementById('fsBirthYear')?.value) || null;
     const res = fengshuiAnalyze(type, direction, year, layout, birthYear);
+        // 🎯 排盘结论总览
+    var _fsScoreColor = (res.score||0) >= 80 ? '#27ae60' : ((res.score||0) >= 60 ? '#f39c12' : '#e74c3c');
+    var _fsSummary = '<div style="margin:12px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.02));border:1px solid rgba(201,168,76,0.2);border-radius:12px">';
+    _fsSummary += '<div style="font-size:14px;font-weight:700;color:var(--gold);margin-bottom:8px;letter-spacing:2px">🎯 排盘结论总览</div>';
+    _fsSummary += '<div style="font-size:13px;line-height:1.8;margin-bottom:6px"><b>风水评分：</b><span style="color:' + _fsScoreColor + ';font-weight:600;font-size:16px">' + (res.score||0) + '/100</span></div>';
+    _fsSummary += '<div style="font-size:13px;line-height:1.8;margin-bottom:6px"><b>宅命：</b>' + res.zhaiMing + ' · <b>宅主命卦：</b>' + res.yaoMing + ' · <b>配合：</b>' + (res.matching ? '<span style="color:#27ae60">相配</span>' : '<span style="color:#e74c3c">不配</span>') + '</div>';
+    _fsSummary += '<div style="font-size:13px;line-height:1.8;margin-bottom:6px"><b>元运：</b>' + res.period + '运 · ' + (res.wangShan ? '<span style="color:#27ae60">当运旺山旺向</span>' : '<span style="color:#f39c12">非当运，需布局催旺</span>') + '</div>';
+    _fsSummary += '<div style="font-size:12px;line-height:1.8;opacity:.85;margin-bottom:6px"><b>玄空：</b>' + (res.xuankong || '无') + '</div>';
+    _fsSummary += '<div style="font-size:12px;line-height:1.8;opacity:.8"><b>核心建议：</b>' + (res.advice || '阳宅三要（大门、主卧、灶位）务必设在吉方，凶方以厨房或卫生间压之。九宫飞星每年变化，建议年底查看流年飞星布局更新。') + '</div>';
+    _fsSummary += '</div>';
     let html = '<h4 style="color:var(--violet2)">🏔️ 风水引擎演算结果</h4>';
+    html += _fsSummary;
     html += '<p><b>宅型：</b>' + res.houseType + ' · 坐向：' + res.direction + ' · 建筑年代：' + res.buildYear + '</p>';
     html += '<p><b>宅命：</b>' + res.zhaiMing + ' · 宅主命卦：' + res.yaoMing + '</p>';
     html += '<p><b>宅命配合：</b>' + (res.matching?'相配':'不配') + '</p>';
