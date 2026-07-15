@@ -32640,6 +32640,47 @@ function runLiuyaoEngine() {
       }
       html += '</div></div>';
     } catch(_gce) { console.warn('卦辞详解渲染错误:', _gce); }
+    // === 📋 六爻白话解读 ===
+    try {
+      var _lyPlain = '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">📋 六爻白话解读 <span class="toggle-icon">▼</span></div>';
+      _lyPlain += '<div class="bazi-module-body" style="display:none">';
+      // 本卦白话
+      _lyPlain += '<div style="margin-bottom:14px;padding:12px;background:rgba(0,0,0,0.15);border-radius:8px">';
+      _lyPlain += '<div style="font-weight:700;color:var(--gold);margin-bottom:8px">本卦 · ' + ben + '</div>';
+      var _benGuaMeaning = (_GUA_XIANG[gua.benGua.lower] && _GUA_XIANG[gua.benGua.lower].meaning) || '';
+      var _benGuaSummary = (_GUA_XIANG[gua.benGua.lower] && _GUA_XIANG[gua.benGua.lower].summary) || '';
+      _lyPlain += '<div style="font-size:13px;line-height:1.8">' + (_benGuaSummary || '本卦反映当前事态') + '</div>';
+      if (_benGuaMeaning) _lyPlain += '<div style="font-size:12px;opacity:.7;margin-top:4px">' + _benGuaMeaning + '</div>';
+      _lyPlain += '</div>';
+      // 变卦白话
+      if (bian !== ben) {
+        _lyPlain += '<div style="margin-bottom:14px;padding:12px;background:rgba(0,0,0,0.15);border-radius:8px">';
+        _lyPlain += '<div style="font-weight:700;color:var(--gold);margin-bottom:8px">变卦 · ' + bian + '</div>';
+        var _bianGuaMeaning2 = (_GUA_XIANG[gua.bianGua.lower] && _GUA_XIANG[gua.bianGua.lower].meaning) || '';
+        var _bianGuaSummary2 = (_GUA_XIANG[gua.bianGua.lower] && _GUA_XIANG[gua.bianGua.lower].summary) || '';
+        _lyPlain += '<div style="font-size:13px;line-height:1.8">' + (_bianGuaSummary2 || '变卦反映事态走向') + '</div>';
+        if (_bianGuaMeaning2) _lyPlain += '<div style="font-size:12px;opacity:.7;margin-top:4px">' + _bianGuaMeaning2 + '</div>';
+        _lyPlain += '</div>';
+      }
+      // 用神旺衰白话
+      _lyPlain += '<div style="margin-bottom:14px;padding:12px;background:rgba(0,0,0,0.15);border-radius:8px">';
+      _lyPlain += '<div style="font-weight:700;color:var(--gold);margin-bottom:8px">用神分析</div>';
+      _lyPlain += '<div style="font-size:13px;line-height:1.8">所测事物为<b>' + duan.yongshen + '</b>，' + (duan.yongshenWang ? '当前旺相，说明事情有利、时机成熟，可以积极推进。' : '当前休囚偏弱，说明条件尚不充分，需要等待时机或借助外力。') + (duan.xunKong ? ' 但用神旬空，表示事情尚有虚浮不实之处，需注意落实。' : '') + '</div>';
+      _lyPlain += '</div>';
+      // 断语白话
+      _lyPlain += '<div style="margin-bottom:14px;padding:12px;background:rgba(0,0,0,0.15);border-radius:8px">';
+      _lyPlain += '<div style="font-weight:700;color:var(--gold);margin-bottom:8px">综合判断</div>';
+      _lyPlain += '<div style="font-size:13px;line-height:1.8">' + duan.verdict + '</div>';
+      if (duan.yingqi) _lyPlain += '<div style="font-size:12px;opacity:.7;margin-top:4px">应期：' + duan.yingqi + '</div>';
+      _lyPlain += '</div>';
+      // 建议白话
+      _lyPlain += '<div style="margin-bottom:14px;padding:12px;background:rgba(0,0,0,0.15);border-radius:8px">';
+      _lyPlain += '<div style="font-weight:700;color:var(--gold);margin-bottom:8px">行动建议</div>';
+      _lyPlain += '<div style="font-size:13px;line-height:1.8">' + duan.advice + '</div>';
+      _lyPlain += '</div>';
+      _lyPlain += '</div>';
+      html += _lyPlain;
+    } catch(_lye) { console.warn('六爻白话解读错误:', _lye); }
     // === 📝 术语注释 ===
     try {
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
