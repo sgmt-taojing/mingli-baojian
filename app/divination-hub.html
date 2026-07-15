@@ -19318,7 +19318,50 @@ function computeFengshui() {
 
 function exportFengshuiReport() {
   showToast('报告生成中，请稍候...');
-  // TODO: 实现报告导出
+  try {
+    var resultEl = document.getElementById('fsEngineResult');
+    if (!resultEl || !resultEl.innerHTML) {
+      showToast('请先完成风水排盘');
+      return;
+    }
+    // 提取排盘结果文本
+    var tmp = document.createElement('div');
+    tmp.innerHTML = resultEl.innerHTML;
+    var reportText = '命理宝鉴 · 风水排盘报告\n';
+    reportText += '生成时间：' + new Date().toLocaleString('zh-CN') + '\n';
+    reportText += '========================================\n\n';
+    // 遍历所有文本节点
+    function extractText(node) {
+      var result = '';
+      node.childNodes.forEach(function(child) {
+        if (child.nodeType === 3) { result += child.textContent; }
+        else if (child.nodeType === 1) {
+          var tag = child.tagName.toLowerCase();
+          if (tag === 'br' || tag === 'div' || tag === 'p' || tag === 'li' || tag === 'tr') result += '\n';
+          if (tag === 'td' || tag === 'th') result += ' | ';
+          result += extractText(child);
+        }
+      });
+      return result;
+    }
+    reportText += extractText(tmp);
+    reportText += '\n\n========================================\n';
+    reportText += '免责声明：本报告基于传统风水学理论生成，仅供文化学习与参考。\n';
+    reportText += '命理宝鉴：https://sgmt-taojing.github.io/mingli-baojian/app/divination-hub.html\n';
+    // 创建下载
+    var blob = new Blob([reportText], {type: 'text/plain;charset=utf-8'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = '风水排盘报告_' + new Date().toISOString().slice(0,10) + '.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('报告已导出');
+  } catch(e) {
+    showToast('导出失败：' + e.message);
+  }
 }
 
 // ================================================================
