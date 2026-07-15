@@ -3937,6 +3937,14 @@ setTimeout(removeLoadingOverlay,5000);
         <span class="mobile-quick-icon">🎵</span>
         <div class="mobile-quick-text"><div class="mobile-quick-name">养心音乐</div><div class="mobile-quick-desc">净心修心</div></div>
       </div>
+      <div class="mobile-quick-item" onclick="showSection('tizhi');tzSwitchTab('prescription')">
+        <span class="mobile-quick-icon">💊</span>
+        <div class="mobile-quick-text"><div class="mobile-quick-name">名医名方</div><div class="mobile-quick-desc">中医名方</div></div>
+      </div>
+      <div class="mobile-quick-item" onclick="showSection('annual-fortune');showTempleBrowser()">
+        <span class="mobile-quick-icon">🏛️</span>
+        <div class="mobile-quick-text"><div class="mobile-quick-name">寺庙参拜</div><div class="mobile-quick-desc">名山指南</div></div>
+      </div>
     </div>
   </div>
 </section>
@@ -4529,6 +4537,7 @@ setTimeout(removeLoadingOverlay,5000);
     <button class="zhanbu-subtab" onclick="showZhanbuSub('liuren',this)">⬡ 大六壬</button>
     <button class="zhanbu-subtab" onclick="showZhanbuSub('ziwei',this)">🌌 紫微斗数</button>
     <button class="zhanbu-subtab" onclick="showZhanbuSub('cezi',this)">✍️ 测字</button>
+    <button class="zhanbu-subtab" onclick="showSection('screenshot');closeMore()" style="margin-left:auto">📷 面相</button>
   </div>
   <!-- 子模块容器（各子section的输入+结果区域会被JS动态移入） -->
   <div id="zhanbuContent">
@@ -5177,6 +5186,7 @@ setTimeout(removeLoadingOverlay,5000);
         <button onclick="runAnnualFortune()" style="padding:10px 24px;border:1px solid var(--gold);border-radius:8px;background:rgba(201,168,76,0.1);color:var(--gold);cursor:pointer;font-family:inherit;font-size:13px;letter-spacing:2px">🎊 生成年度运势</button>
         <button onclick="runWorshipGuide()" style="padding:10px 24px;border:1px solid var(--jade);border-radius:8px;background:rgba(39,174,96,0.08);color:var(--jade);cursor:pointer;font-family:inherit;font-size:13px;letter-spacing:2px">🙏 生成祈福参拜指南</button>
         <button onclick="showTempleBrowser()" style="padding:10px 24px;border:1px solid var(--violet2);border-radius:8px;background:rgba(138,92,246,0.08);color:var(--violet2);cursor:pointer;font-family:inherit;font-size:13px;letter-spacing:2px">🏛️ 名山寺庙浏览</button>
+        <button onclick="showSection('jiazi')" style="padding:10px 24px;border:1px solid var(--cyan);border-radius:8px;background:rgba(0,188,212,0.08);color:var(--cyan);cursor:pointer;font-family:inherit;font-size:13px;letter-spacing:2px">🔮 六十甲子流年</button>
       </div>
     </div>
     <!-- 结果区 -->
@@ -5253,6 +5263,7 @@ setTimeout(removeLoadingOverlay,5000);
     <button class="zhanbu-subtab fs-pro-subtab" onclick="showFengshuiProSub('fengshui-stars-content',this)" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent">⭐ 流年飞星</button>
     <button class="zhanbu-subtab fs-pro-subtab" onclick="showFengshuiProSub('fengshui-cure-content',this)" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent">💊 家庭化解</button>
     <button class="zhanbu-subtab fs-pro-subtab" onclick="showFengshuiProSub('fengshui-zeri-content',this)" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent">📅 风水择日</button>
+    <button class="zhanbu-subtab fs-pro-subtab" onclick="showSection('huajie')" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent">🛡️ 开运化解</button>
   </div>
 
   <!-- 1. 每日风水方位指南 -->
@@ -22562,7 +22573,6 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
     <button class="more-item" onclick="showSection('yanzhi'); closeMore();">💬 <span>言值</span></button>
     <button class="more-item" onclick="showSection('more'); showMoreModule('knowledge',this); closeMore();">📚 <span>知识库</span></button>
     <button class="more-item" onclick="showSection('tizhi'); closeMore();">🧬 <span>体质</span></button>
-    <button class="more-item" onclick="showSection('more'); showMoreModule('faith',this); closeMore();">🙏 <span>信众</span></button>
     <button class="more-item" onclick="showSection('user'); closeMore();">🙏 <span>信众中心</span></button>
     <button class="more-item" onclick="showSection('more'); showMoreModule('koujue',this); closeMore();">📿 <span>口诀</span></button>
     <button class="more-item" onclick="showSection('jiuri'); closeMore();">💮 <span>吉日</span></button>
@@ -22575,6 +22585,9 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
     <button class="more-item" onclick="showSection('lifeindex'); closeMore();">🌟 <span>命理全鉴</span></button>
     <button class="more-item" onclick="showSection('cure-center'); closeMore();">💎 <span>化解中心</span></button>
     <button class="more-item" onclick="showSection('push-plan'); closeMore();">📡 <span>推送计划</span></button>
+    <button class="more-item" onclick="showSection('screenshot'); closeMore();">📷 <span>面相分析</span></button>
+    <button class="more-item" onclick="showSection('jiazi'); closeMore();">🔮 <span>六十甲子</span></button>
+    <button class="more-item" onclick="showSection('huajie'); closeMore();">🛡️ <span>开运化解</span></button>
   </div>
 </div>
 
