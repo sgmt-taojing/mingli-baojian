@@ -33651,12 +33651,12 @@ function runQimenEngine() {
     html += '</div>';
     html += '<div style="display:none;margin-top:10px;font-size:12px;color:var(--paper2);line-height:2;opacity:.85">';
     html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">遁局：</strong>奇门遁甲分阳遁九局、阴遁九局共十八局，以节气定遁，冬至阳遁、夏至阴遁</div>';
-    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">值符：</strong>九星之首，为当班之神，主导全局走向。值符所落之宫为用神参考</div>';
-    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">值使：</strong>八门当班之门，为值符所掌之門，管事之出入</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">值符：</strong>六甲旬首所乘之干为值符，为十干之帅，主导全局走向。值符所落之宫为用神参考，值符所在之宫百事可为</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">值使：</strong>值符所落之宫对应的八门为值使，为执行之神，管事之出入。值使所落之宫定事情执行力强弱</div>';
     html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">六仪三奇：</strong>六仪为戊己庚辛壬癸，三奇为乙丙丁。乙为日奇、丙为月奇、丁为星奇，三奇得使为吉</div>';
     html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">天盘干/地盘干：</strong>天盘干为流动之干，代表外在条件；地盘干为固定之干，代表内在基础。天地盘组合断吉凶</div>';
     html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">八门：</strong>休、生、伤、杜、景、死、惊、开。开门、休门、生门为三吉门；死门、惊门、伤门为三凶门</div>';
-    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">九星：</strong>天蓬、天任、天冲、天辅、天英、天芮、天柱、天心、天禽。天心、天任、天辅、天禽为吉星；天蓬、天芮为凶星</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">九星：</strong>天蓬（大凶）、天任（吉）、天冲（中吉）、天辅（大吉）、天英（中平）、天芮（大凶）、天柱（凶）、天心（大吉）、天禽（吉，寄中宫）。吉星落旺相之宫则吉力倍增，落休囚之宫则吉力减半</div>';
     html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">八神：</strong>值符、腾蛇、太阴、六合、白虎、玄武、九地、九天。值符最吉，白虎玄武主凶</div>';
     html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">用神：</strong>奇门断事取用之天干，如问事业取时干为用神，问婚姻取乙为女、庚为男</div>';
     html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">空亡：</strong>旬空之地，力量减损。用神落空亡则事难成，需出空之日方应</div>';
@@ -33664,6 +33664,10 @@ function runQimenEngine() {
     html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">五不遇时：</strong>时干克日干，为奇门大忌，百事不宜，须改日再谋</div>';
     html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">后天八卦排列：</strong>坎一（北）、坤二（西南）、震三（东）、巽四（东南）、中五、乾六（西北）、兑七（西）、艮八（东北）、离九（南）</div>';
     html += '<div><strong style="color:var(--gold)">应期：</strong>预测事情发生的时间，以用神所落宫位的地支当令之月为应期</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">伏吟：</strong>天地盘干同宫为伏吟，主事迟滞不顺，宜静不宜动，守旧为吉</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">反吟：</strong>天地盘干相冲为反吟，主事反复多变，动荡不安，利客不利主</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">击刑：</strong>天盘干与地盘干相刑害，主刑伤破耗，用神遇击刑则事多波折</div>';
+    html += '<div><strong style="color:var(--gold)">入墓：</strong>天盘干落入墓库之宫，力量被收藏，主事隐晦不显，需冲开之日方应</div>';
     html += '</div></div>';
     // 化解方案
     try {
@@ -34036,31 +34040,128 @@ function runLiurenEngine() {
       var _lrPlain = '<div class="bazi-new-module">';
       _lrPlain += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">📋 六壬白话解读 <span class="toggle-icon">▼</span></div>';
       _lrPlain += '<div class="bazi-module-body collapsed" style="padding:12px 16px">';
-      // 1. 三传论事
+      // 基于实际盘面数据做个性化推演
+      var _lrCS = analyze.chuanShen || ['贵人','贵人','贵人'];
+      var _lrSC = analyze.sanChuan || [pan.sanChuan.chu, pan.sanChuan.zhong, pan.sanChuan.mo];
+      var _lrGood = ['贵人','青龙','六合','太阴','天后','太常'];
+      var _lrBad = ['腾蛇','朱雀','勾陈','白虎','玄武','天空'];
+      var _lrZhiWx = {'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+      var _lrWxKe = {'金':'木','木':'土','土':'水','水':'火','火':'金'};
+      // 三传天将吉凶
+      var _lrChuJi = _lrGood.includes(_lrCS[0]);
+      var _lrZhongJi = _lrGood.includes(_lrCS[1]);
+      var _lrMoJi = _lrGood.includes(_lrCS[2]);
+      var _lrChuXiong = _lrBad.includes(_lrCS[0]);
+      var _lrMoXiong = _lrBad.includes(_lrCS[2]);
+      // 三传五行生克
+      var _lrChuWx = _lrZhiWx[_lrSC[0]] || '土';
+      var _lrMoWx = _lrZhiWx[_lrSC[2]] || '土';
+      var _lrMoShengChu = (_lrWxKe[_lrMoWx] === _lrChuWx); // 末传克初传
+      var _lrChuShengMo = (_lrWxKe[_lrChuWx] === _lrMoWx); // 初传克末传
       var _lrLuckColor2 = analyze.luck === '吉' ? '#27ae60' : (analyze.luck === '凶' ? '#e74c3c' : '#f39c12');
+      // 1. 三传论事 — 基于三传天将与五行生克
       _lrPlain += '<div style="background:rgba(231,76,60,.04);border-left:3px solid ' + _lrLuckColor2 + ';padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
       _lrPlain += '<div style="font-size:13px;font-weight:bold;color:' + _lrLuckColor2 + ';margin-bottom:4px">⬡ 三传论事</div>';
-      _lrPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8"><b>初传</b>（' + pan.sanChuan.chu + '）为事之始因，<b>中传</b>（' + pan.sanChuan.zhong + '）为事之经过，<b>末传</b>（' + pan.sanChuan.mo + '）为事之结局。' + (analyze.luck === '吉' ? '三传递生，事态向好发展。' : analyze.luck === '凶' ? '三传克害，事多波折。' : '三传平缓，事态平稳。') + '取法：<b>' + (pan.sanChuan.method||'贼克法') + '</b>。</div>';
+      var _lrSCDesc = '初传<b>' + _lrSC[0] + '</b>（' + _lrCS[0] + '）为事之始因，';
+      if (_lrChuJi) _lrSCDesc += '初传吉将（' + _lrCS[0] + '），主事初有贵人扶持，开端顺利。';
+      else if (_lrChuXiong) _lrSCDesc += '初传凶将（' + _lrCS[0] + '），主事初有阻碍，需谨慎起步。';
+      else _lrSCDesc += '初传天将平缓，事初无大碍。';
+      _lrSCDesc += '中传<b>' + _lrSC[1] + '</b>（' + _lrCS[1] + '）为事之经过，';
+      if (_lrZhongJi) _lrSCDesc += '中传吉将，中途有转机。';
+      else if (_lrBad.includes(_lrCS[1])) _lrSCDesc += '中传凶将，中途有波折。';
+      else _lrSCDesc += '中传平稳。';
+      _lrSCDesc += '末传<b>' + _lrSC[2] + '</b>（' + _lrCS[2] + '）为事之结局，';
+      if (_lrMoJi) _lrSCDesc += '末传吉将，结局圆满。';
+      else if (_lrMoXiong) _lrSCDesc += '末传凶将，结局需防不利。';
+      else _lrSCDesc += '末传平稳。';
+      if (_lrMoShengChu) _lrSCDesc += '末传克初传，先难后易，事情先逆后顺。';
+      else if (_lrChuShengMo) _lrSCDesc += '初传克末传，先易后难，需防虎头蛇尾。';
+      else _lrSCDesc += '初末无克，事态前后一贯。';
+      _lrSCDesc += '取法：<b>' + (pan.sanChuan.method||'贼克法') + '</b>。';
+      _lrPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">' + _lrSCDesc + '</div>';
       _lrPlain += '</div>';
-      // 2. 事业谋为
+      // 2. 事业谋为 — 基于四课干支关系
+      var _lrKe1 = pan.siKe[0] || {shang:'',xia:''};
+      var _lrKe3 = pan.siKe[2] || {shang:'',xia:''};
+      var _lrGanShang = _lrKe1.shang;
+      var _lrZhiShang = _lrKe3.shang;
+      var _lrGanWx2 = _lrZhiWx[_lrGanShang] || '土';
+      var _lrZhiWx2 = _lrZhiWx[_lrZhiShang] || '土';
+      var _lrGanShengZhi = (_lrWxKe[_lrGanWx2] === _lrZhiWx2);
+      var _lrZhiShengGan = (_lrWxKe[_lrZhiWx2] === _lrGanWx2);
       _lrPlain += '<div style="background:rgba(52,152,219,.04);border-left:3px solid #3498db;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
       _lrPlain += '<div style="font-size:13px;font-weight:bold;color:#3498db;margin-bottom:4px">💼 事业谋为</div>';
-      _lrPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">日干代表求测者，日支代表所测之事。干上神生干则事业有助，干上神克干则阻力大。' + (analyze.luck === '吉' ? '目前利于行动，可积极推进。' : analyze.luck === '凶' ? '目前不宜大动作，以守为攻。' : '局势不明，需观察等待。') + '初传为起因，看初传天将判断贵人方位。</div>';
+      var _lrSYDesc = '日干上神为<b>' + _lrGanShang + '</b>（' + _lrGanWx2 + '），日支上神为<b>' + _lrZhiShang + '</b>（' + _lrZhiWx2 + '）。';
+      if (_lrGanShengZhi) _lrSYDesc += '干上神克支上神，自身条件优于外部环境，利于主动出击。初传天将<b>' + _lrCS[0] + '</b>临初传，';
+      else if (_lrZhiShengGan) _lrSYDesc += '支上神克干上神，外部阻力较大，宜以守为攻。初传天将<b>' + _lrCS[0] + '</b>，';
+      else _lrSYDesc += '干支上神无克，局势平稳。初传天将<b>' + _lrCS[0] + '</b>，';
+      if (_lrChuJi) _lrSYDesc += '贵人方位可寻。';
+      else _lrSYDesc += '需防小人之力。';
+      _lrPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">' + _lrSYDesc + '</div>';
       _lrPlain += '</div>';
-      // 3. 财运分析
+      // 3. 财运分析 — 基于青龙位置
+      var _lrHasQingLong = _lrCS.indexOf('青龙') >= 0;
+      var _lrQLPos = _lrCS.indexOf('青龙');
       _lrPlain += '<div style="background:rgba(39,174,96,.04);border-left:3px solid #27ae60;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
       _lrPlain += '<div style="font-size:13px;font-weight:bold;color:#27ae60;margin-bottom:4px">💰 财运分析</div>';
-      _lrPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">财看青龙及财爻所在天将。青龙临日辰则财旺，临空亡则财虚。' + (analyze.luck === '吉' ? '财运向好，可适度投资。' : analyze.luck === '凶' ? '财运不济，守财为上。' : '财运平稳，量力而行。') + '末传为结局，末传生初传则最终有得。</div>';
+      var _lrCYDesc = '';
+      if (_lrHasQingLong) {
+        var _lrQLChuan = ['初传','中传','末传'][_lrQLPos];
+        _lrCYDesc = '青龙临<b>' + _lrQLChuan + '</b>（' + _lrSC[_lrQLPos] + '），主财运到来。';
+        if (_lrQLPos === 0) _lrCYDesc += '财运来得早，宜把握时机。';
+        else if (_lrQLPos === 2) _lrCYDesc += '财运来得晚，需耐心等待。';
+        else _lrCYDesc += '财运中期而至，稳步推进。';
+      } else {
+        var _lrHasBaiHu = _lrCS.indexOf('白虎') >= 0;
+        if (_lrHasBaiHu) _lrCYDesc = '白虎临三传，财运有破耗之象，宜守财不宜投资。';
+        else _lrCYDesc = '三传无青龙，财运平缓。看末传<b>' + _lrSC[2] + '</b>（' + _lrCS[2] + '），';
+        if (_lrMoJi) _lrCYDesc += '末传吉将，最终有得。';
+        else _lrCYDesc += '末传无吉将，量力而行。';
+      }
+      if (_lrMoShengChu) _lrCYDesc += '末传克初传，财先失后得。';
+      _lrPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">' + _lrCYDesc + '</div>';
       _lrPlain += '</div>';
-      // 4. 感情婚姻
+      // 4. 感情婚姻 — 基于天后/六合位置
+      var _lrHasTianHou = _lrCS.indexOf('天后') >= 0;
+      var _lrHasLiuHe = _lrCS.indexOf('六合') >= 0;
       _lrPlain += '<div style="background:rgba(155,89,182,.04);border-left:3px solid #9b59b6;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
       _lrPlain += '<div style="font-size:13px;font-weight:bold;color:#9b59b6;margin-bottom:4px">💕 感情婚姻</div>';
-      _lrPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">婚姻看天后与六合。天后临日干则女方主动，六合临日支则感情和合。' + (analyze.luck === '吉' ? '感情顺遂，可谈婚论嫁。' : analyze.luck === '凶' ? '感情有波折，需耐心经营。' : '感情平淡，顺其自然。') + '三传递生则感情层层深入，三传克害则多有口舌是非。</div>';
+      var _lrGMDesc = '';
+      if (_lrHasTianHou && _lrHasLiuHe) _lrGMDesc = '天后与六合同临三传，感情和合美满，婚姻顺遂。';
+      else if (_lrHasTianHou) {
+        var _lrTHPos = ['初传','中传','末传'][_lrCS.indexOf('天后')];
+        _lrGMDesc = '天后临<b>' + _lrTHPos + '</b>，女方主动，感情有进展。';
+      } else if (_lrHasLiuHe) {
+        var _lrLHPos = ['初传','中传','末传'][_lrCS.indexOf('六合')];
+        _lrGMDesc = '六合临<b>' + _lrLHPos + '</b>，感情和合，宜把握时机。';
+      } else {
+        var _lrHasShe = _lrCS.indexOf('腾蛇') >= 0;
+        var _lrHasZhu = _lrCS.indexOf('朱雀') >= 0;
+        if (_lrHasShe) _lrGMDesc = '腾蛇临三传，感情多有口舌猜忌，需坦诚沟通。';
+        else if (_lrHasZhu) _lrGMDesc = '朱雀临三传，多有争吵，宜忍让。';
+        else _lrGMDesc = '三传无天后六合，感情平淡，顺其自然。';
+      }
+      _lrPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">' + _lrGMDesc + '</div>';
       _lrPlain += '</div>';
-      // 5. 健康出行
+      // 5. 健康出行 — 基于白虎/天空位置
+      var _lrHasBaiHu2 = _lrCS.indexOf('白虎') >= 0;
+      var _lrHasTianKong = _lrCS.indexOf('天空') >= 0;
       _lrPlain += '<div style="background:rgba(230,126,34,.04);border-left:3px solid #e67e22;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
       _lrPlain += '<div style="font-size:13px;font-weight:bold;color:#e67e22;margin-bottom:4px">🏥 健康出行</div>';
-      _lrPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">疾病看白虎及天空。白虎临日辰则病重，天空临日辰则病轻或虚惊。' + (analyze.luck === '吉' ? '身体无大碍。' : analyze.luck === '凶' ? '需注意身体，及时就医。' : '身体一般，注意调养。') + '出行看驿马，驿马临身则宜出行，五不遇时不宜远行。</div>';
+      var _lrJKDesc = '';
+      if (_lrHasBaiHu2) {
+        var _lrBHPos = ['初传','中传','末传'][_lrCS.indexOf('白虎')];
+        _lrJKDesc = '白虎临<b>' + _lrBHPos + '</b>，';
+        if (_lrBHPos === 0) _lrJKDesc += '病情来势较猛，需及时就医。';
+        else if (_lrBHPos === 2) _lrJKDesc += '病情后期需注意调养。';
+        else _lrJKDesc += '中途有病痛之象，注意身体。';
+      } else if (_lrHasTianKong) {
+        _lrJKDesc = '天空临三传，多为虚惊一场，不必过虑。';
+      } else {
+        _lrJKDesc = '三传无白虎天空，身体无大碍。';
+      }
+      _lrJKDesc += '出行看驿马，驿马临身则宜出行，五不遇时不宜远行。';
+      _lrPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">' + _lrJKDesc + '</div>';
       _lrPlain += '</div>';
       _lrPlain += '</div></div>';
       html += _lrPlain;
