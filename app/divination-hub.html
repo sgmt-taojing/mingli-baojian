@@ -34715,16 +34715,26 @@ function runZeriEngine() {
   try {
     const lm = parseInt(document.getElementById('zeriMonth')?.value || 1);
     const ld = parseInt(document.getElementById('zeriDay')?.value || 1);
-    const res = zeriCalcFull(lm, ld);
+    const evt = document.getElementById('zeriEvent')?.value || '';
+    const res = zeriCalcFull(lm, ld, null, evt);
     let html = '<h4 style="color:var(--gold)">📅 择日引擎演算结果</h4>';
-    html += '<p><b>农历：</b>' + res.lunarMonth + '月' + res.lunarDay + '日 · ' + res.dayGanZhi + '</p>';
-    html += '<p><b>建除：</b>' + res.jianchu.name + '日（' + res.jianchu.luck + '）</p>';
-    html += '<p><b>彭祖百忌：</b>' + res.pengzu.join('；') + '</p>';
-    html += '<p><b>星宿：</b>' + res.xiuxing + '</p>';
-    html += '<p><b>宜忌：</b>' + res.yiji + '</p>';
-    html += '<p><b>吉时：</b>' + res.goodHoursText + '</p>';
+    html += '<p><b>日期：</b>' + res.date + '</p>';
+    html += '<p><b>干支：</b>' + res.ganzhi + '</p>';
+    html += '<p><b>建除：</b>' + res.jianchu + '日</p>';
+    html += '<p><b>值神：</b>' + res.huanghei + '</p>';
+    html += '<p><b>星宿：</b>' + res.xingxiu + '</p>';
+    html += '<p><b>冲煞：</b>' + res.chongsha + '</p>';
+    html += '<p><b>胎神占方：</b>' + res.taishen + '</p>';
+    html += '<p><b>彭祖百忌：</b>' + res.pengzu + '</p>';
+    html += '<p><b>吉神宜趋：</b>' + (Array.isArray(res.jishen) ? res.jishen.join('、') : res.jishen) + '</p>';
+    html += '<p><b>凶神宜忌：</b>' + (Array.isArray(res.xiongshen) ? res.xiongshen.join('、') : res.xiongshen) + '</p>';
+    html += '<p><b>宜：</b>' + (Array.isArray(res.yi) ? res.yi.join('、') : res.yi) + '</p>';
+    html += '<p><b>忌：</b>' + (Array.isArray(res.ji) ? res.ji.join('、') : res.ji) + '</p>';
+    html += '<p><b>空亡：</b>' + res.kongwang + '</p>';
     html += '<p><b>评分：</b>' + res.score + '/100</p>';
-    html += '<p style="opacity:0.8">' + res.summary + '</p>';
+    html += '<p style="opacity:0.8">' + res.analysis + '</p>';
+    html += '<p style="color:var(--gold)"><b>建议：</b>' + res.suggestion + '</p>';
+    html += '<p style="color:#e74c3c"><b>避免：</b>' + res.avoid + '</p>';
     _showEngineResult('zrEngineResult', html);
   } catch(e) { showToast('择日引擎错误：'+e.message); }
 }

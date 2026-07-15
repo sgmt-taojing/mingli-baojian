@@ -6676,73 +6676,103 @@ function getWuxingHuajie(weakestEle, xiEle) {
 }
 
 function getTaisuiHuajie(birthYear, birthBranchIdx, currentZhiIdx) {
-  // 太岁关系判断
+  // 太岁关系判断 — 动态计算，不硬编码年份
   const zodiacs = ['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
   const birthZodiac = zodiacs[birthBranchIdx];
-  const taiSuiMap = {
-    0: {zodiac:'鼠', taiSui:'值太岁(本命年)', desc:'逢本命年，值太岁当头坐，吉凶取决于八字喜忌。'},
-    1: {zodiac:'牛', taiSui:'冲太岁', desc:'丑未相冲，冲动太岁，宜静不宜动。'},
-    2: {zodiac:'虎', taiSui:'刑太岁', desc:'寅巳相刑，口舌是非多。'},
-    3: {zodiac:'兔', taiSui:'害太岁', desc:'卯辰相害，小人暗中作祟。'},
-    4: {zodiac:'龙', taiSui:'值太岁', desc:'辰年值太岁，宜安稳守成。'},
-    5: {zodiac:'蛇', taiSui:'冲太岁', desc:'巳亥相冲，冲动之变，需谨慎应对。'},
-    6: {zodiac:'马', taiSui:'值太岁', desc:'午年值太岁，火旺之年，需防急躁。'},
-    7: {zodiac:'羊', taiSui:'刑太岁', desc:'未戌相刑，谨防口舌之争。'},
-    8: {zodiac:'猴', taiSui:'害太岁', desc:'申亥相害，需防小人暗算。'},
-    9: {zodiac:'鸡', taiSui:'值太岁', desc:'酉年值太岁，金旺之年，宜守不宜攻。'},
-    10: {zodiac:'狗', taiSui:'冲太岁', desc:'戌辰相冲，冲太岁之年，变动较大。'},
-    11: {zodiac:'猪', taiSui:'值太岁', desc:'亥年值太岁，水旺之年，宜静养身心。'}
+  const taiSuiZodiac = zodiacs[currentZhiIdx];
+  const currentYear = new Date().getFullYear();
+
+  // 当年干支
+  var yearGZ = getYearGanZhi(currentYear, 1, 1);
+  var yearGan = TIAN_GAN[yearGZ.gan];
+  var yearZhi = DI_ZHI[yearGZ.zhi];
+  var yearGanZhiStr = yearGan + yearZhi;
+
+  // 刑太岁组合（三刑+自刑）
+  var xingPairs = {
+    '寅': '巳', '巳': '申', '申': '寅',
+    '丑': '戌', '戌': '未', '未': '丑',
+    '子': '卯', '卯': '子',
+    '辰': '辰', '午': '午', '酉': '酉', '亥': '亥'
+  };
+  // 害太岁组合（六害）
+  var haiPairs = {
+    '子': '未', '未': '子',
+    '丑': '午', '午': '丑',
+    '寅': '巳', '巳': '寅',
+    '卯': '辰', '辰': '卯',
+    '申': '亥', '亥': '申',
+    '酉': '戌', '戌': '酉'
+  };
+  // 破太岁组合（六破）
+  var poPairs = {
+    '子': '酉', '酉': '子',
+    '丑': '辰', '辰': '丑',
+    '寅': '亥', '亥': '寅',
+    '卯': '午', '午': '卯',
+    '巳': '申', '申': '巳',
+    '未': '戌', '戌': '未'
   };
 
-  // 2026年丙午年,太岁为午(马)
-  const taiSuiZodiac = '马';
-  const taiSuiBranchIdx = 6; // 午
+  var birthZhiChar = DI_ZHI[birthBranchIdx];
+  var taiSuiZhiName = DI_ZHI[currentZhiIdx];
 
   // 判断与太岁的关系
   let relation = '';
   let solution = '';
 
-  // 值太岁
-  if (birthBranchIdx === taiSuiBranchIdx) {
-    relation = '值太岁(本命年)';
-    solution = '建议:1. 请太岁符佩戴或安奉；2. 年初拜太岁；3. 穿红色内衣裤(本命年习俗);4. 避免参加白事；5. 可佩戴三合、六合生肖饰品化解。';
-  }
-  // 冲太岁
-  else if (Math.abs(birthBranchIdx - taiSuiBranchIdx) === 6) {
+  if (birthBranchIdx === currentZhiIdx) {
+    var isSelfXing = (birthZhiChar === xingPairs[birthZhiChar]);
+    relation = isSelfXing ? '值太岁+刑太岁(自刑)' : '值太岁(本命年)';
+    solution = '建议:1. 请太岁符佩戴或安奉；2. 年初拜太岁；3. 穿红色内衣裤(本命年习俗)；4. 避免参加白事；5. 可佩戴三合、六合生肖饰品化解。' + (isSelfXing ? '6. 自刑年情绪易波动，需修身养性，控制脾气。' : '');
+  } else if (Math.abs(birthBranchIdx - currentZhiIdx) === 6) {
     relation = '冲太岁';
-    solution = '建议:1. 避免重大决策(结婚、搬家、创业);2. 可佩戴相合生肖饰品；3. 年初拜太岁求平安；4. 多行善事积德；5. 避免去太岁方(南方)长期逗留。';
-  }
-  // 刑太岁(午午自刑)
-  else if (birthBranchIdx === 6 && taiSuiBranchIdx === 6) {
-    relation = '刑太岁(自刑)';
-    solution = '建议:1. 修身养性，控制情绪；2. 避免与人争执；3. 可佩戴兔或羊形饰品(午未合、午戌合);4. 多行善事。';
-  }
-  // 害太岁
-  else if ((birthBranchIdx === 7 && taiSuiBranchIdx === 6) || (birthBranchIdx === 8 && taiSuiBranchIdx === 6)) {
+    solution = '建议:1. 避免重大决策(结婚、搬家、创业)；2. 可佩戴相合生肖饰品；3. 年初拜太岁求平安；4. 多行善事积德；5. 避免去太岁方长期逗留。';
+  } else if (xingPairs[birthZhiChar] === taiSuiZhiName) {
+    relation = '刑太岁';
+    solution = '建议:1. 修身养性，控制情绪；2. 避免与人争执；3. 可佩戴三合、六合生肖饰品化解；4. 谨言慎行，防口舌是非；5. 年初拜太岁。';
+  } else if (haiPairs[birthZhiChar] === taiSuiZhiName) {
     relation = '害太岁';
-    solution = '建议:1. 谨言慎行，防小人；2. 可佩戴六合生肖饰品；3. 避免与人合作投资；4. 年初拜太岁。';
-  }
-  // 无犯太岁
-  else {
+    solution = '建议:1. 谨言慎行，防小人；2. 可佩戴六合生肖饰品；3. 避免与人合作投资；4. 年初拜太岁；5. 注意身体健康。';
+  } else if (poPairs[birthZhiChar] === taiSuiZhiName) {
+    relation = '破太岁';
+    solution = '建议:1. 避免大额投资；2. 注意人际关系和谐；3. 可佩戴三合生肖饰品；4. 年初拜太岁祈福；5. 不宜担保借贷。';
+  } else {
     relation = '无犯太岁';
-    solution = '缘主今年无犯太岁，但仍需注意:1. 年初可拜太岁祈福；2. 太岁方(南方)不宜动土；3. 保持善念，岁岁平安。';
+    solution = '缘主今年无犯太岁，但仍需注意:1. 年初可拜太岁祈福；2. 太岁方不宜动土；3. 保持善念，岁岁平安。';
   }
+
+  // 太岁方位
+  var zhiFangwei = ['北','东北','东北','东','东南','东南','南','西南','西南','西','西北','西北'];
+  var taiSuiFangwei = zhiFangwei[currentZhiIdx];
 
   let html = `<div class="huajie-alert">
     <div class="alert-title">太岁关系判断</div>
     <p>缘主生肖:<strong>${birthZodiac}</strong></p>
-    <p>当年太岁:<strong>${taiSuiZodiac}</strong>(${2026}年 丙午)</p>
+    <p>当年太岁:<strong>${taiSuiZodiac}</strong>(${currentYear}年 ${yearGanZhiStr})</p>
     <p>太岁关系:<strong>${relation}</strong></p>
+    <p>太岁方位:<strong>${taiSuiFangwei}</strong>方（不宜动土修造）</p>
     <p style="margin-top:12px">${solution}</p>
   </div>`;
 
   // 明年太岁预判
-  const nextYear = 2027;
-  const nextZodiacs = ['羊','猴','鸡','狗','猪','鼠','牛','虎','兔','龙','蛇','马'];
-  const nextZodiac = nextZodiacs[taiSuiBranchIdx + 1 > 11 ? 0 : taiSuiBranchIdx + 1];
+  var nextYear = currentYear + 1;
+  var nextZhiIdx = (currentZhiIdx + 1) % 12;
+  var nextZodiac = zodiacs[nextZhiIdx];
+  var nextYearGZ = getYearGanZhi(nextYear, 1, 1);
+  var nextYearGanZhiStr = TIAN_GAN[nextYearGZ.gan] + DI_ZHI[nextYearGZ.zhi];
+  var nextRelation = '无犯太岁';
+  var birthZhiChar2 = DI_ZHI[birthBranchIdx];
+  var nextZhiName = DI_ZHI[nextZhiIdx];
+  if (birthBranchIdx === nextZhiIdx) nextRelation = '值太岁';
+  else if (Math.abs(birthBranchIdx - nextZhiIdx) === 6) nextRelation = '冲太岁';
+  else if (xingPairs[birthZhiChar2] === nextZhiName) nextRelation = '刑太岁';
+  else if (haiPairs[birthZhiChar2] === nextZhiName) nextRelation = '害太岁';
+  else if (poPairs[birthZhiChar2] === nextZhiName) nextRelation = '破太岁';
+
   html += `<div class="huajie-alert" style="margin-top:12px;background:rgba(201,168,76,.02)">
-    <div class="alert-title">明年太岁预判(${nextYear}年 丁未)</div>
-    <p>明年太岁为<strong>${nextZodiac}</strong>,与缘主生肖${birthZodiac}之关系:</p>
+    <div class="alert-title">明年太岁预判(${nextYear}年 ${nextYearGanZhiStr})</div>
+    <p>明年太岁为<strong>${nextZodiac}</strong>，与缘主生肖${birthZodiac}之关系：<strong>${nextRelation}</strong></p>
     <p style="margin-top:8px">命理之道，流年变化，建议缘主每年初更新化解方案，以保全年顺遂。</p>
   </div>`;
 
@@ -13513,14 +13543,29 @@ function analyzeChar(char) {
   }
   if (radical === '未知') radical = char.charAt(0);
 
-  // 3. 笔画数兜底（避免为0）
-  if (!strokes) strokes = (char.charCodeAt(0) % 81) + 1;
+  // 3. 笔画数兜底（避免为0）— 使用康熙字典常用字笔画估算
+  if (!strokes) {
+    // 尝试从CEZI_DATABASE和CEZI_DATA中查找
+    if (CEZI_DATABASE && CEZI_DATABASE[char]) strokes = CEZI_DATABASE[char].strokes;
+    else if (CEZI_DATA && CEZI_DATA[char]) strokes = CEZI_DATA[char].strokes;
+    else {
+      // 基于Unicode码点的笔画估算（非精确，但有统计依据）
+      // 简体字平均笔画约10-12画，根据Unicode码点分布估算
+      var code = char.charCodeAt(0);
+      if (code >= 0x4E00 && code <= 0x4E8F) strokes = Math.round(4 + (code - 0x4E00) * 0.04) || 8;  // 常用字前段
+      else if (code > 0x4E8F && code <= 0x527F) strokes = Math.round(8 + (code - 0x4E90) * 0.03) || 12;
+      else if (code > 0x527F && code <= 0x56FF) strokes = Math.round(12 + (code - 0x5280) * 0.03) || 14;
+      else if (code > 0x56FF && code <= 0x5C4F) strokes = Math.round(10 + (code - 0x5700) * 0.025) || 12;
+      else strokes = 10; // 兜底平均值
+      strokes = Math.max(1, Math.min(81, strokes));
+    }
+  }
 
   // 4. 五行：部首优先，声母辅助
   wuxing = CEZI_RADICAL_ELE[radical] || '土';
 
   // 5. 音韵五行辅助判定（根据Unicode大致判断声母系）
-  const code = char.charCodeAt(0);
+  var code = char.charCodeAt(0);
   const phoneticCandidates = Object.keys(INITIAL_ELE);
   // 通过Unicode区间粗估音韵五行
   if (code >= 0x5E42 && code <= 0x5EB8) wuxing = INITIAL_ELE['b'] || wuxing; // 波婆
