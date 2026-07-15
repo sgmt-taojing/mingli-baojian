@@ -26656,6 +26656,9 @@ function _renderFamilyReport(allResults, familyEleCount, relations, solutions) {
   html += '</div>';
   html += '</div>';
 
+  // 免责声明
+  html += '<div style="margin-top:20px;padding:16px;background:rgba(231,76,60,0.05);border:1px solid rgba(231,76,60,0.15);border-radius:8px;text-align:center"><div style="font-size:12px;color:#e74c3c;font-weight:600;margin-bottom:4px">⚠ 免责声明</div><div style="font-size:11px;color:var(--paper2);line-height:1.8">本平台内容仅供国学文化学习与娱乐参考，不构成任何专业建议。家庭关系分析旨在促进理解与和谐，请勿以此作为家庭决策的唯一依据。</div></div>';
+
   output.innerHTML = html;
   output.style.display = 'block';
   output.scrollIntoView({ behavior: 'smooth' });
@@ -30665,19 +30668,30 @@ function computeJiaziCycle(name, sex, birthYear, birthMonth, birthDay, birthHour
     });
   }
 
-  // 冲太岁年：年龄6/18/30/42/54
-  var chongAges = [6, 18, 30, 42, 54];
-  for (var i = 0; i < chongAges.length; i++) {
-    var age3 = chongAges[i];
-    var yr = birthYear + age3;
-    warnings.push({
-      type: '冲太岁',
-      age: age3,
-      year: yr,
-      ganZhi: getYearGanZhi(yr).stem + getYearGanZhi(yr).branch,
-      note: '冲太岁年，变动频繁。可能涉及搬家、转学、换工作等。',
-      resolve: '提前规划，主动求变以化解被动冲击。佩戴相合生肖吉祥物。'
-    });
+  // 冲太岁年：遍历60甲子找年支与出生年支相冲的年份
+  var birthBranch = birthGanZhi.branch;
+  for (var i = 0; i < ZHI_CHONG_PAIRS.length; i++) {
+    var chongBranch = '';
+    if (ZHI_CHONG_PAIRS[i].a === birthBranch) chongBranch = ZHI_CHONG_PAIRS[i].b;
+    if (ZHI_CHONG_PAIRS[i].b === birthBranch) chongBranch = ZHI_CHONG_PAIRS[i].a;
+    if (!chongBranch) continue;
+    for (var n = 0; n < 60; n++) {
+      var gz = JIAZI_60[n];
+      if (gz[1] === chongBranch) {
+        var yr = jiaziStart.startYear + n;
+        var age3 = yr - birthYear;
+        if (age3 > 0 && age3 <= 80) {
+          warnings.push({
+            type: '冲太岁',
+            age: age3,
+            year: yr,
+            ganZhi: getYearGanZhi(yr).stem + getYearGanZhi(yr).branch,
+            note: '冲太岁年，变动频繁。可能涉及搬家、转学、换工作等。',
+            resolve: '提前规划，主动求变以化解被动冲击。佩戴相合生肖吉祥物。'
+          });
+        }
+      }
+    }
   }
 
   // 合太岁年
@@ -31332,6 +31346,9 @@ function renderJiaziCycleReport(data) {
 
     html += '</div>';
   }
+
+  // 免责声明
+  html += '<div style="margin-top:20px;padding:16px;background:rgba(231,76,60,0.05);border:1px solid rgba(231,76,60,0.15);border-radius:8px;text-align:center"><div style="font-size:12px;color:#e74c3c;font-weight:600;margin-bottom:4px">⚠ 免责声明</div><div style="font-size:11px;color:' + paper2 + ';line-height:1.8">本平台内容仅供国学文化学习与娱乐参考，不构成任何专业建议。占卜结果不作为决策依据。</div></div>';
 
   // 页脚
   html += '<div style="text-align:center;padding:16px;font-size:12px;color:' + paper2 + ';opacity:0.5;letter-spacing:2px">易道智鉴 · 六十甲子周期推算 · ' + new Date().toLocaleDateString('zh-CN') + '</div>';
@@ -36369,40 +36386,72 @@ function computeHealthForecast(baziData, pillars) {
   };
 
   // 计算日主当前所处长生阶段
-  // 使用年支来推算当前大阶段 (简化:用年龄对应的长生周期)
+  // 古制：日干对当前大运地支论长生位，阳顺阴逆从长生地支起
   var csStart = CHANGSHENG_START[dayStem];
   if (csStart) {
     var startIdx = BRANCHES.indexOf(csStart);
     var isYang = (GAN_YINYANG_JS[dayStem] === '阳');
-    // 每个长生阶段约10年(12阶段×10年=120年)
-    var stageIdx = Math.floor(age / 10) % 12;
-    if (!isYang) stageIdx = (12 - stageIdx) % 12;
-    var currentCS = CS_ORDER[stageIdx];
-    var nextCS = CS_ORDER[(stageIdx + 1) % 12];
+    // 从日干长生地支开始，阳顺阴逆数到当前大运地支
+    var currentDayunZhi = null;
+    if (baziData.dayun && baziData.dayun.length > 0) {
+      for (var di = 0; di < baziData.dayun.length; di++) {
+        if (age >= baziData.dayun[di].ageStart && age < baziData.dayun[di].ageEnd) {
+          currentDayunZhi = baziData.dayun[di].zhi;
+          break;
+        }
+      }
+    }
+    // 如果没有大运数据，回退到日柱地支
+    var refZhi = currentDayunZhi || pillars[2].branch;
+    var refIdx = BRANCHES.indexOf(refZhi);
+    var step = isYang ? ((refIdx - startIdx + 12) % 12) : ((startIdx - refIdx + 12) % 12);
+    var currentCS = CS_ORDER[step];
+    var nextCS = CS_ORDER[(step + 1) % 12];
+    // 计算当前大运的年龄范围
+    var csAgeStart = currentDayunZhi ? null : 0; // 有大运就用大运年龄范围
+    var csAgeEnd = currentDayunZhi ? null : 0;
+    if (baziData.dayun) {
+      for (var dj = 0; dj < baziData.dayun.length; dj++) {
+        if (baziData.dayun[dj].zhi === refZhi && age >= baziData.dayun[dj].ageStart && age < baziData.dayun[dj].ageEnd) {
+          csAgeStart = Math.round(baziData.dayun[dj].ageStart);
+          csAgeEnd = Math.round(baziData.dayun[dj].ageEnd);
+          break;
+        }
+      }
+    }
+    var ageRangeStr = (csAgeStart !== null && csAgeEnd !== null) ? csAgeStart + '-' + csAgeEnd + '岁' : '当前大运期间';
     csHealth.currentStage = {
       stage: currentCS,
-      ageRange: (stageIdx * 10) + '-' + ((stageIdx + 1) * 10) + '岁',
-      meaning: csHealth.stageMeaning[currentCS] || ''
+      ageRange: ageRangeStr,
+      meaning: csHealth.stageMeaning[currentCS] || '',
+      refZhi: refZhi,
+      refSource: currentDayunZhi ? '当前大运' : '日柱地支'
     };
     csHealth.nextStage = {
       stage: nextCS,
-      ageRange: ((stageIdx + 1) * 10) + '-' + ((stageIdx + 2) * 10) + '岁',
+      ageRange: '下一大运期间',
       meaning: csHealth.stageMeaning[nextCS] || ''
     };
 
-    // 需要注意的年份
+    // 需要注意的年份——推算未来大运中长生位为病/死/绝/衰的阶段
     var riskStages = ['病', '死', '绝', '衰'];
-    for (var ri = 0; ri < CS_ORDER.length; ri++) {
-      if (riskStages.indexOf(CS_ORDER[ri]) >= 0) {
-        var riskAgeStart = isYang ? ri * 10 : (12 - ri) * 10;
-        var riskAgeEnd = riskAgeStart + 10;
-        if (riskAgeStart > age && riskAgeStart < age + 30) {
-          csHealth.ageAdvice.push({
-            stage: CS_ORDER[ri],
-            ageRange: riskAgeStart + '-' + riskAgeEnd + '岁',
-            meaning: csHealth.stageMeaning[CS_ORDER[ri]] || '',
-            advice: '此阶段需提前预防，定期体检，调整生活方式'
-          });
+    if (baziData.dayun) {
+      for (var rj = 0; rj < baziData.dayun.length; rj++) {
+        var dyZhi = baziData.dayun[rj].zhi;
+        var dyIdx = BRANCHES.indexOf(dyZhi);
+        var dyStep = isYang ? ((dyIdx - startIdx + 12) % 12) : ((startIdx - dyIdx + 12) % 12);
+        var dyCS = CS_ORDER[dyStep];
+        if (riskStages.indexOf(dyCS) >= 0) {
+          var riskAgeS = Math.round(baziData.dayun[rj].ageStart);
+          var riskAgeE = Math.round(baziData.dayun[rj].ageEnd);
+          if (riskAgeS > age && riskAgeS < age + 30) {
+            csHealth.ageAdvice.push({
+              stage: dyCS,
+              ageRange: riskAgeS + '-' + riskAgeE + '岁',
+              meaning: csHealth.stageMeaning[dyCS] || '',
+              advice: '此阶段需提前预防，定期体检，调整生活方式'
+            });
+          }
         }
       }
     }
