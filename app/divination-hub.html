@@ -35045,7 +35045,7 @@ function runFengshuiEngine() {
       var _fsScoreColor = (res.score >= 80) ? '#27ae60' : (res.score >= 60) ? '#f39c12' : '#e74c3c';
       _fsPlain += '<div style="background:rgba(231,76,60,.04);border-left:3px solid ' + _fsScoreColor + ';padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
       _fsPlain += '<div style="font-size:13px;font-weight:bold;color:' + _fsScoreColor + ';margin-bottom:4px">🏠 整体评价</div>';
-      _fsPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">本宅为<b>' + res.houseType + '</b>，坐向<b>' + res.direction + '</b>，建于<b>' + res.buildYear + '</b>年。' + _fsScoreText + '，评分<b style="color:' + _fsScoreColor + '">' + res.score + '/100</b>。' + (res.matching ? '宅命相配，居住者运势顺畅。' : '宅命不配，需通过风水布局调整化解。') + '</div>';
+      _fsPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">' + _fsOverallDesc + '</div>';
       _fsPlain += '</div>';
       
       // 2. 财运方位
@@ -35057,7 +35057,7 @@ function runFengshuiEngine() {
       // 3. 健康影响
       _fsPlain += '<div style="background:rgba(230,126,34,.04);border-left:3px solid #e67e22;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
       _fsPlain += '<div style="font-size:13px;font-weight:bold;color:#e67e22;margin-bottom:4px">🏥 健康影响</div>';
-      _fsPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">天医方主健康，宜做卧室。五黄大凶方不可做卧室或厨房，否则家人多病。二黑病符方宜用铜器化解。' + (res.matching ? '宅命相配则身心安康。' : '宅命不配需注意，尤其宅主命卦所忌方位不可做主卧。') + '</div>';
+      _fsPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">' + _fsJKDesc + '</div>';
       _fsPlain += '</div>';
       
       // 4. 事业学业
@@ -35069,7 +35069,7 @@ function runFengshuiEngine() {
       // 5. 家庭关系
       _fsPlain += '<div style="background:rgba(155,89,182,.04);border-left:3px solid #9b59b6;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
       _fsPlain += '<div style="font-size:13px;font-weight:bold;color:#9b59b6;margin-bottom:4px">👨‍👩‍👧 家庭关系</div>';
-      _fsPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">夫妻卧室宜在延年或生气方，增进感情。子女房宜在生气方，利成长。老人房宜在天医方，利健康。' + (res.matching ? '宅命相配，家人和睦。' : '宅命不配，需调整卧室方位化解。') + '家中争吵多因五鬼方布局不当，可在该方摆放葫芦化解。</div>';
+      _fsPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">' + _fsJMDesc + '</div>';
       _fsPlain += '</div>';
       
       _fsPlain += '</div></div>';
