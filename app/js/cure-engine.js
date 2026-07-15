@@ -10,12 +10,10 @@
  * 
  * 引用古籍：《协纪辨方书》《选择通德类情》《永宁通书》《钦定授时通考》《阳宅集成》《八宅明镜》《玄空秘旨》
  */
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 // ================================================================
 // 一、紫微斗数化解方案
 // ================================================================
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 /**
  * 紫微斗数排盘后化解方案
@@ -25,59 +23,50 @@
  */
 function getZiweiResolution(panData, analyzeData) {
   if (!panData) return '<p style="opacity:.5">排盘数据缺失，无法生成化解方案</p>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var mingZhi = panData.mingZhi || '未知';
   var ju = panData.ju || '未知';
   var sihua = analyzeData ? analyzeData.sihuaText : '';
   var geju = analyzeData ? analyzeData.geju : '';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
   html += '<h4 style="color:var(--gold);letter-spacing:3px;margin-bottom:16px">🛡️ 紫微斗数化解方案</h4>';
   html += '<p style="font-size:12px;opacity:.5;margin-bottom:16px">命宫：' + mingZhi + ' · 五行局：' + ju + ' · 格局：' + geju + '</p>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 1. 命宫主星化解
   html += '<div style="margin-bottom:20px">';
   html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">⭐ 命宫主星化解</h5>';
   html += _getZiweiMainStarCure(panData);
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 2. 煞星化解
   html += '<div style="margin-bottom:20px">';
   html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">⚔️ 煞星化解</h5>';
   html += _getZiweiShaCure(panData);
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 3. 四化应对
   html += '<div style="margin-bottom:20px">';
   html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">🔄 四化应对</h5>';
   html += _getZiweiSihuaCure(panData, analyzeData);
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 4. 大运十年化解重点
   html += '<div style="margin-bottom:20px">';
   html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">📅 大运十年化解重点</h5>';
   html += _getZiweiDayunCure(panData);
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 5. 流年化解方案
   html += '<div style="margin-bottom:8px">';
   html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">🌠 流年化解方案</h5>';
   html += _getZiweiLiunianCure(panData);
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   html += '<p style="font-size:11px;opacity:.4;margin-top:16px;line-height:1.8">《紫微斗数全书》云：「星曜吉凶非定数，化解有道可转机。」以上方案结合命宫主星、煞星、四化及大运流年综合制定，缘主可据实际情况选取执行。</p>';
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getZiweiMainStarCure(panData) {
   // 十四主星化解方案数据库
@@ -181,7 +170,6 @@ function _getZiweiMainStarCure(panData) {
       timing: '秋季(申月)稳固财运'
     }
   };
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 尝试获取命宫主星
   var mainStar = '';
@@ -195,7 +183,6 @@ function _getZiweiMainStarCure(panData) {
   }
   if (!mainStar && analyzeData && analyzeData.mainStar) mainStar = analyzeData.mainStar;
   if (!mainStar) mainStar = '紫微'; // 默认
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 匹配主星
   var matchedKey = null;
@@ -203,7 +190,6 @@ function _getZiweiMainStarCure(panData) {
     if (mainStar.indexOf(key) >= 0) { matchedKey = key; break; }
   }
   if (!matchedKey) matchedKey = '紫微';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var d = starCureDB[matchedKey];
   var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
@@ -219,7 +205,6 @@ function _getZiweiMainStarCure(panData) {
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getZiweiShaCure(panData) {
   var shaCureDB = {
@@ -230,7 +215,6 @@ function _getZiweiShaCure(panData) {
     '地空': { cure: '佩戴黄水晶或金发晶填补空亡；家中中央放黄水晶球', item: '黄水晶球、金发晶', direction: '中央', classic: '《紫微斗数全书》：「地空主空虚破财，宜以土填之。」' },
     '地劫': { cure: '佩戴和田玉或翡翠化解劫夺之煞；家中西南放陶瓷葫芦', item: '和田玉、陶瓷葫芦', direction: '西南', classic: '《紫微斗数全书》：「地劫主劫失，宜以土固之。」' }
   };
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   var hasSha = false;
@@ -264,7 +248,6 @@ function _getZiweiShaCure(panData) {
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getZiweiSihuaCure(panData, analyzeData) {
   var sihuaCureDB = {
@@ -273,12 +256,11 @@ function _getZiweiSihuaCure(panData, analyzeData) {
     '化科': { desc: '化科主名声学业，为吉化', cure: '宜在文昌位(东南)放文昌塔或毛笔架，增强化科之名声。多读书学习，参加考试比赛。', item: '文昌塔、毛笔架', classic: '化科为名，宜学不宜怠' },
     '化忌': { desc: '化忌主阻滞困扰，为凶化', cure: '化忌是最需化解的四化。1. 佩戴黑曜石化解忌星之煞；2. 根据化忌所在宫位调整方位；3. 多行善事积累功德；4. 避免在化忌所主事项上强求。', item: '黑曜石手串、五行化解符', classic: '化忌为困，宜忍不宜争' }
   };
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   var sihuaText = (analyzeData && analyzeData.sihuaText) ? analyzeData.sihuaText : '';
   for (var hua in sihuaCureDB) {
-    if (sihuaText.indexOf(hua) >= 0 || true) { // 显示所有四化
+    if (sihuaText.indexOf(hua) >= 0 ) {
       var d = sihuaCureDB[hua];
       var isJi = (hua === '化忌');
       html += '<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid rgba(201,168,76,0.06)';
@@ -296,7 +278,6 @@ function _getZiweiSihuaCure(panData, analyzeData) {
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getZiweiDayunCure(panData) {
   var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
@@ -313,7 +294,6 @@ function _getZiweiDayunCure(panData) {
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getZiweiLiunianCure(panData) {
   var currentYear = new Date().getFullYear();
@@ -327,60 +307,50 @@ function _getZiweiLiunianCure(panData) {
   html += '<li><strong>流年文昌：</strong>丙午年文昌在东南，宜在东南放文昌塔或四支毛笔，利考试学业</li>';
   html += '<li><strong>流年桃花：</strong>丙午年桃花在卯(正东)，单身者宜在正东放粉色水晶球催桃花</li>';
   html += '</ul>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 // ================================================================
 // 二、奇门遁甲化解方案
 // ================================================================
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function getQimenResolution(panData, analyzeData) {
   if (!panData) return '<p style="opacity:.5">排盘数据缺失，无法生成化解方案</p>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
   html += '<h4 style="color:var(--gold);letter-spacing:3px;margin-bottom:16px">🛡️ 奇门遁甲化解方案</h4>';
   html += '<p style="font-size:12px;opacity:.5;margin-bottom:16px">遁局：' + (panData.dun === 'yang' ? '阳' : '阴') + '遁' + panData.ju + '局</p>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 1. 八门吉凶化解
   html += '<div style="margin-bottom:20px">';
   html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">🚪 八门吉凶化解</h5>';
   html += _getQimenMenCure(analyzeData);
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 2. 九星化解
   html += '<div style="margin-bottom:20px">';
   html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">⭐ 九星化解</h5>';
   html += _getQimenXingCure(analyzeData);
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 3. 八神化解
   html += '<div style="margin-bottom:20px">';
   html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">👻 八神化解</h5>';
   html += _getQimenShenCure(analyzeData);
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 4. 伏吟反吟处理
   html += '<div style="margin-bottom:8px">';
   html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">🔄 伏吟/反吟处理</h5>';
   html += _getQimenFuFanCure(panData, analyzeData);
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   html += '<p style="font-size:11px;opacity:.4;margin-top:16px;line-height:1.8">《奇门遁甲秘笈大全》云：「门星神三盘各有吉凶，善用者趋吉避凶，不善用者凶上加凶。」以上方案据三盘综合制定。</p>';
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getQimenMenCure(analyzeData) {
   var menCureDB = {
@@ -393,14 +363,12 @@ function _getQimenMenCure(analyzeData) {
     '死门': { nature: '凶门', desc: '死门主死亡凶险', cure: '1.佩戴黑曜石或墨玉化解死门之煞；2.绝对避免西南方行事；3.家中西南放铜葫芦化解', item: '黑曜石、铜葫芦、墨玉' },
     '惊门': { nature: '凶门', desc: '惊门主惊恐口舌', cure: '1.佩戴蓝水晶化解惊门之煞；2.避免正西方行事；3.家中正西放蓝色水晶簇', item: '蓝水晶、蓝色水晶簇' }
   };
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var men = analyzeData ? analyzeData.men : '';
   var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   for (var m in menCureDB) {
-    if (men.indexOf(m) >= 0 || true) {
+    if (men.indexOf(m) >= 0 ) {
       var d = menCureDB[m];
       var isJi = (d.nature === '凶门');
       html += '<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(201,168,76,0.04)';
@@ -415,7 +383,6 @@ function _getQimenMenCure(analyzeData) {
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getQimenXingCure(analyzeData) {
   var xingCureDB = {
@@ -429,12 +396,11 @@ function _getQimenXingCure(analyzeData) {
     '天任': { nature: '吉星', desc: '天任主富厚安泰', cure: '佩戴翡翠增强，东北方放陶瓷聚宝盆' },
     '天英': { nature: '凶星', desc: '天英主火炎血光', cure: '佩戴海蓝宝化解，正南方放蓝色水晶簇' }
   };
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var star = analyzeData ? analyzeData.star : '';
   var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   for (var x in xingCureDB) {
-    if (star.indexOf(x) >= 0 || true) {
+    if (star.indexOf(x) >= 0 ) {
       var d = xingCureDB[x];
       var isJi = (d.nature === '凶星');
       html += '<div style="margin-bottom:8px;padding:6px 0;';
@@ -448,7 +414,6 @@ function _getQimenXingCure(analyzeData) {
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getQimenShenCure(analyzeData) {
   var shenCureDB = {
@@ -461,12 +426,11 @@ function _getQimenShenCure(analyzeData) {
     '九地': { desc: '九地主稳固厚重', cure: '佩戴和田玉增强稳固，西南放陶瓷摆件' },
     '九天': { desc: '九天主高远威武', cure: '佩戴白水晶增强气势，西北放金属鹰摆件' }
   };
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var shen = analyzeData ? analyzeData.shen : '';
   var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   for (var s in shenCureDB) {
-    if (shen.indexOf(s) >= 0 || true) {
+    if (shen.indexOf(s) >= 0 ) {
       var d = shenCureDB[s];
       html += '<div style="margin-bottom:6px;padding:4px 0">';
       html += '<p><strong style="color:var(--gold)">' + s + '</strong> — ' + d.desc + '</p>';
@@ -477,7 +441,6 @@ function _getQimenShenCure(analyzeData) {
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getQimenFuFanCure(panData, analyzeData) {
   var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
@@ -487,48 +450,40 @@ function _getQimenFuFanCure(panData, analyzeData) {
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 // ================================================================
 // 三、大六壬化解方案
 // ================================================================
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function getLiurenResolution(panData, analyzeData) {
   if (!panData) return '<p style="opacity:.5">排盘数据缺失，无法生成化解方案</p>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
   html += '<h4 style="color:var(--gold);letter-spacing:3px;margin-bottom:16px">🛡️ 大六壬化解方案</h4>';
   html += '<p style="font-size:12px;opacity:.5;margin-bottom:16px">日干支：' + (panData.dayGan || '') + (panData.dayZhi || '') + ' · 占时：' + (panData.shiZhi || '') + '</p>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 1. 四课三传化解
   html += '<div style="margin-bottom:20px">';
   html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">📜 四课三传化解</h5>';
   html += _getLiurenSanChuanCure(panData, analyzeData);
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 2. 天将化解
   html += '<div style="margin-bottom:20px">';
   html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">👼 天将化解</h5>';
   html += _getLiurenTianJiangCure(panData, analyzeData);
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 3. 神煞化解
   html += '<div style="margin-bottom:8px">';
   html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">⚡ 神煞化解</h5>';
   html += _getLiurenShenShaCure(panData, analyzeData);
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   html += '<p style="font-size:11px;opacity:.4;margin-top:16px;line-height:1.8">《大六壬大全》云：「壬通万物之灵，课演天地之机。知机者善化解，不明者随流转。」</p>';
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getLiurenSanChuanCure(panData, analyzeData) {
   var sanChuan = panData.sanChuan || [];
@@ -544,7 +499,6 @@ function _getLiurenSanChuanCure(panData, analyzeData) {
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getLiurenTianJiangCure(panData, analyzeData) {
   var tianJiangCureDB = {
@@ -561,7 +515,6 @@ function _getLiurenTianJiangCure(panData, analyzeData) {
     '太阴': { cure: '佩戴月光石增强阴助荫庇', item: '月光石' },
     '天后': { cure: '佩戴粉晶增强姻缘喜庆', item: '粉水晶' }
   };
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   var chuanShen = (analyzeData && analyzeData.chuanShen) ? analyzeData.chuanShen : [];
@@ -583,7 +536,6 @@ function _getLiurenTianJiangCure(panData, analyzeData) {
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getLiurenShenShaCure(panData, analyzeData) {
   var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
@@ -599,53 +551,43 @@ function _getLiurenShenShaCure(panData, analyzeData) {
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 // ================================================================
 // 四、梅花易数化解方案
 // ================================================================
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function getMeihuaResolution(guaData, analyzeData) {
   if (!guaData) return '<p style="opacity:.5">排盘数据缺失，无法生成化解方案</p>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
   html += '<h4 style="color:var(--gold);letter-spacing:3px;margin-bottom:16px">🛡️ 梅花易数化解方案</h4>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var tiGua = analyzeData ? analyzeData.tiGua : '';
   var yongGua = analyzeData ? analyzeData.yongGua : '';
   var relation = analyzeData ? analyzeData.relation : '';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   html += '<p style="font-size:12px;opacity:.5;margin-bottom:16px">体卦：' + tiGua + ' · 用卦：' + yongGua + ' · 关系：' + relation + '</p>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 1. 体用生克化解
   html += '<div style="margin-bottom:20px">';
   html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">⚖️ 体用生克化解</h5>';
   html += _getMeihuaTiYongCure(analyzeData);
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 2. 互卦变卦化解
   html += '<div style="margin-bottom:8px">';
   html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">🔄 互卦变卦化解</h5>';
   html += _getMeihuaHuBianCure(guaData, analyzeData);
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   html += '<p style="font-size:11px;opacity:.4;margin-top:16px;line-height:1.8">《梅花易数》云：「体为己，用为事。体生用为耗，用生体为益。用克体为凶，体克用为得。」</p>';
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getMeihuaTiYongCure(analyzeData) {
   var relation = analyzeData ? analyzeData.relation : '';
   var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   if (relation.indexOf('用克体') >= 0 || relation.indexOf('克') >= 0) {
     html += '<p style="color:var(--orange);margin-bottom:8px"><strong>用克体 — 凶象</strong></p>';
@@ -668,19 +610,16 @@ function _getMeihuaTiYongCure(analyzeData) {
   } else {
     html += '<p style="font-size:12px;line-height:2">体用关系平和，宜保持现状，顺其自然。可佩戴白水晶稳定气场。</p>';
   }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 五行对应水晶
   html += '<div style="margin-top:12px;padding:10px;background:rgba(201,168,76,0.04);border-radius:6px">';
   html += '<p style="font-size:11px;opacity:.7;margin-bottom:4px">五行对应水晶速查：</p>';
   html += '<p style="font-size:11px;opacity:.7">木→绿幽灵/翡翠 · 火→红玛瑙/紫水晶 · 土→黄水晶/和田玉 · 金→白水晶/金银 · 水→海蓝宝/黑曜石</p>';
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getMeihuaHuBianCure(guaData, analyzeData) {
   var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
@@ -697,20 +636,16 @@ function _getMeihuaHuBianCure(guaData, analyzeData) {
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 // ================================================================
 // 五、六爻化解方案
 // ================================================================
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function getLiuyaoResolution(guaData, duanData) {
   if (!guaData) return '<p style="opacity:.5">排盘数据缺失，无法生成化解方案</p>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
   html += '<h4 style="color:var(--gold);letter-spacing:3px;margin-bottom:16px">🛡️ 六爻化解方案</h4>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var ben = '';
   var bian = '';
@@ -720,30 +655,25 @@ function getLiuyaoResolution(guaData, duanData) {
   if (guaData.bianGua && _GUA_XIANG) {
     bian = _GUA_XIANG[guaData.bianGua.lower].name + _GUA_XIANG[guaData.bianGua.upper].name;
   }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   html += '<p style="font-size:12px;opacity:.5;margin-bottom:16px">本卦：' + ben + ' · 变卦：' + bian + '</p>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 1. 六亲旺衰化解
   html += '<div style="margin-bottom:20px">';
   html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">👨‍👩‍👧‍👦 六亲旺衰化解</h5>';
   html += _getLiuyaoLiuqinCure(guaData, duanData);
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 2. 世应关系化解
   html += '<div style="margin-bottom:8px">';
   html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">⚖️ 世应关系化解</h5>';
   html += _getLiuyaoShiYingCure(guaData, duanData);
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   html += '<p style="font-size:11px;opacity:.4;margin-top:16px;line-height:1.8">《增删卜易》云：「六亲旺衰定吉凶，世应生克明事体。化解之道，在于扶弱抑强，趋吉避凶。」</p>';
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getLiuyaoLiuqinCure(guaData, duanData) {
   var liuqinCureDB = {
@@ -753,13 +683,11 @@ function _getLiuyaoLiuqinCure(guaData, duanData) {
     '子孙': { weak: '子孙爻弱主无靠，宜佩戴绿幽灵或翡翠增强食伤之力', strong: '子孙爻过旺主懒散，宜佩戴白水晶增强克制', item: '绿幽灵、翡翠' },
     '官鬼': { weak: '官鬼爻弱主无地位，宜佩戴黄水晶或虎眼石增强官星', strong: '官鬼爻过旺主压力，宜佩戴黑曜石化解官鬼之煞', item: '虎眼石、黑曜石' }
   };
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   var zg = guaData.zhuangGua;
   var liuqin = zg ? zg.liuqin : [];
   var yongshen = duanData ? duanData.yongshen : '';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   for (var i = 0; i < liuqin.length; i++) {
     var lq = liuqin[i];
@@ -778,7 +706,6 @@ function _getLiuyaoLiuqinCure(guaData, duanData) {
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getLiuyaoShiYingCure(guaData, duanData) {
   var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
@@ -788,18 +715,15 @@ function _getLiuyaoShiYingCure(guaData, duanData) {
     html += '</div>';
     return html;
   }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var shi = zg.shiying.shi;
   var ying = zg.shiying.ying;
   html += '<p style="font-size:12px;line-height:2">世爻在第' + (shi+1) + '爻，应爻在第' + (ying+1) + '爻。</p>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   if (duanData) {
     if (duanData.shiAnalysis) html += '<p style="font-size:12px;line-height:1.8;opacity:.8"><strong>世爻：</strong>' + duanData.shiAnalysis + '</p>';
     if (duanData.yingAnalysis) html += '<p style="font-size:12px;line-height:1.8;opacity:.8"><strong>应爻：</strong>' + duanData.yingAnalysis + '</p>';
   }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   html += '<ul style="font-size:12px;line-height:2;padding-left:20px;opacity:.85">';
   html += '<li><strong>世爻旺：</strong>主自身力量强，宜主动出击。佩戴白水晶增强决断力</li>';
@@ -812,41 +736,34 @@ function _getLiuyaoShiYingCure(guaData, duanData) {
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 // ================================================================
 // 六、风水化解方案
 // ================================================================
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function getFengshuiResolution(fsData) {
   if (!fsData) return '<p style="opacity:.5">排盘数据缺失，无法生成化解方案</p>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
   html += '<h4 style="color:var(--gold);letter-spacing:3px;margin-bottom:16px">🛡️ 风水化解方案</h4>';
   html += '<p style="font-size:12px;opacity:.5;margin-bottom:16px">宅型：' + (fsData.houseType || '') + ' · 坐向：' + (fsData.direction || '') + ' · 宅命：' + (fsData.zhaiMing || '') + '</p>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 1. 八宅煞气化解
   html += '<div style="margin-bottom:20px">';
   html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">🏠 八宅煞气化解</h5>';
   html += _getFengshuiBazhaiCure(fsData);
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 2. 玄空飞星化解
   html += '<div style="margin-bottom:8px">';
   html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">⭐ 玄空飞星化解</h5>';
   html += _getFengshuiXuankongCure(fsData);
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   html += '<p style="font-size:11px;opacity:.4;margin-top:16px;line-height:1.8">《八宅明镜》云：「宅之吉凶在方位，人之吉凶在命卦。宅命相配则吉，不配则凶。」《玄空秘旨》云：「星曜吉凶随时转，化解有道可转机。」</p>';
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getFengshuiBazhaiCure(fsData) {
   var shaCureDB = {
@@ -855,11 +772,9 @@ function _getFengshuiBazhaiCure(fsData) {
     '六煞': { desc: '六煞主口舌是非', cure: '1.在六煞位放蓝色水晶簇化解；2.此方位不宜安床；3.可在此放水缸或鱼缸化煞', item: '蓝水晶簇、水缸' },
     '祸害': { desc: '祸害主病痛官非', cure: '1.在祸害位放铜葫芦或五帝钱；2.此方位保持明亮；3.避免在此方位长期逗留', item: '铜葫芦、五帝钱' }
   };
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   html += '<p style="font-size:12px;line-height:2;opacity:.8">宅命：' + (fsData.zhaiMing || '未知') + ' · 宅主命卦：' + (fsData.yaoMing || '未知') + ' · 配合：' + (fsData.matching ? '相配' : '不配') + '</p>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   if (fsData.matching === false) {
     html += '<div style="margin:10px 0;padding:10px;background:rgba(231,76,60,0.04);border-radius:6px">';
@@ -867,7 +782,6 @@ function _getFengshuiBazhaiCure(fsData) {
     html += '<p style="font-size:12px;line-height:1.8;margin-top:4px">化解之法：1.大门颜色按命卦五行选择(东四命用绿色/蓝色，西四命用黄色/白色)；2.门垫下放六帝钱；3.宅主卧室选吉位安床</p>';
     html += '</div>';
   }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   for (var sha in shaCureDB) {
     var d = shaCureDB[sha];
@@ -880,7 +794,6 @@ function _getFengshuiBazhaiCure(fsData) {
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getFengshuiXuankongCure(fsData) {
   var flyingStarCure = {
@@ -894,12 +807,10 @@ function _getFengshuiXuankongCure(fsData) {
     '八白': { nature: '吉', desc: '八白左辅主财运置业', cure: '八白位放聚宝盆或黄水晶增强财运', item: '聚宝盆、黄水晶' },
     '九紫': { nature: '吉', desc: '九紫右弼主喜庆姻缘', cure: '九紫位放红色花瓶或紫水晶增强喜庆之气', item: '红色花瓶、紫水晶' }
   };
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   html += '<p style="font-size:12px;line-height:2;opacity:.8">元运：' + (fsData.period || '九') + '运 · ' + (fsData.wangShan ? '当运' : '非当运') + '</p>';
   html += '<p style="font-size:12px;line-height:1.8;opacity:.7;margin-top:4px">玄空评语：' + (fsData.xuankong || '') + '</p>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 当前九运(2024-2043年)飞星化解重点
   html += '<div style="margin-top:12px;padding:10px;background:rgba(201,168,76,0.04);border-radius:6px">';
@@ -911,7 +822,6 @@ function _getFengshuiXuankongCure(fsData) {
   html += '<li><strong>七赤盗贼：</strong>每年七赤飞临方位宜放蓝色水晶或水缸化解</li>';
   html += '</ul>';
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   for (var star in flyingStarCure) {
     var d = flyingStarCure[star];
@@ -927,12 +837,10 @@ function _getFengshuiXuankongCure(fsData) {
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 // ================================================================
 // 七、化解物品数据库
 // ================================================================
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function getCureItemCatalog() {
   var catalog = {
@@ -987,11 +895,9 @@ function getCureItemCatalog() {
       { name: '八卦镜', element: '通用', color: '铜色', price: '50-200元', use: '反射煞气、镇宅', placement: '门外/窗外', care: '保持清洁', source: '风水用品店' }
     ]
   };
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   return catalog;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 /**
  * 获取化解物品推荐HTML
@@ -1001,7 +907,6 @@ function getCureItemCatalog() {
 function getCureItemRecommendation(elementType) {
   var catalog = getCureItemCatalog();
   var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var items = [];
   if (elementType === '木') items = items.concat(catalog.crystals.filter(function(x){return x.element==='木';}), catalog.woods);
@@ -1010,7 +915,6 @@ function getCureItemRecommendation(elementType) {
   else if (elementType === '金') items = items.concat(catalog.crystals.filter(function(x){return x.element==='金';}), catalog.metals);
   else if (elementType === '水') items = items.concat(catalog.crystals.filter(function(x){return x.element==='水';}), catalog.water);
   else items = catalog.crystals.concat(catalog.metals).concat(catalog.woods);
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   for (var i = 0; i < items.length && i < 8; i++) {
     var item = items[i];
@@ -1026,17 +930,14 @@ function getCureItemRecommendation(elementType) {
     html += '<p style="font-size:11px;opacity:.5;margin-top:2px">购买：' + item.source + '</p>';
     html += '</div>';
   }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 // ================================================================
 // 八、年度变化化解方案
 // ================================================================
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 /**
  * 根据流年变化生成化解方案
@@ -1046,7 +947,6 @@ function getCureItemRecommendation(elementType) {
  */
 function getAnnualCurePlan(baziData, currentYear) {
   if (!currentYear) currentYear = new Date().getFullYear();
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 流年干支计算 (2026=丙午)
   var yearGanZhi = _getYearGanZhi(currentYear);
@@ -1054,61 +954,51 @@ function getAnnualCurePlan(baziData, currentYear) {
   var yearZhi = yearGanZhi.zhi;
   var yearGanEle = _GAN_ELE[yearGan] || '火';
   var yearZhiEle = _ZHI_ELE[yearZhi] || '火';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
   html += '<h4 style="color:var(--gold);letter-spacing:3px;margin-bottom:16px">📅 ' + currentYear + '年 ' + yearGan + yearZhi + ' 年度化解方案</h4>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 1. 流年天干地支对日主的影响
   html += '<div style="margin-bottom:20px">';
   html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">🔮 流年干支对日主影响</h5>';
   html += _getAnnualGanZhiCure(baziData, yearGan, yearZhi, yearGanEle, yearZhiEle);
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 2. 流年飞星对家居的影响
   html += '<div style="margin-bottom:20px">';
   html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">⭐ 流年飞星化解</h5>';
   html += _getAnnualFlyingStarCure(currentYear);
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 3. 流年太岁方位化解
   html += '<div style="margin-bottom:20px">';
   html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">🛡️ 流年太岁方位化解</h5>';
   html += _getAnnualTaishuiCure(yearZhi);
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 4. 流年三煞方位化解
   html += '<div style="margin-bottom:20px">';
   html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">⚔️ 流年三煞方位化解</h5>';
   html += _getAnnualSanshaCure(yearZhi);
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 5. 流年五黄二黑化解
   html += '<div style="margin-bottom:8px">';
   html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">☣️ 五黄二黑化解</h5>';
   html += _getAnnualWuhuangErheiCure(currentYear);
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   html += '<p style="font-size:11px;opacity:.4;margin-top:16px;line-height:1.8">《协纪辨方书》云：「流年吉凶随时而转，太岁三煞五黄二黑，皆为年内大煞，需及时化解。」《选择通德类情》云：「择日择方，以避煞为先，化煞为辅。」</p>';
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getAnnualGanZhiCure(baziData, yearGan, yearZhi, yearGanEle, yearZhiEle) {
   var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   var dayStem = baziData ? baziData.dayStem : '甲';
   var dayEle = _GAN_ELE ? (_GAN_ELE[dayStem] || '木') : '木';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   html += '<p style="font-size:12px;line-height:2">日主：<strong>' + dayStem + '(' + dayEle + ')</strong> · 流年：<strong>' + yearGan + yearZhi + '(' + yearGanEle + '/' + yearZhiEle + ')</strong></p>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var relation = '';
   var cure = '';
@@ -1128,20 +1018,17 @@ function _getAnnualGanZhiCure(baziData, yearGan, yearZhi, yearGanEle, yearZhiEle
     relation = '流年克日主 — 官杀压力';
     cure = '今年压力较大需谨慎。宜佩戴黑曜石化解官杀之煞，避免冲动决策。多行善积德。';
   }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   html += '<p style="font-size:12px;line-height:2;margin-top:8px"><strong>关系：</strong>' + relation + '</p>';
   html += '<p style="font-size:12px;line-height:2;margin-top:4px"><strong>化解：</strong>' + cure + '</p>';
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getAnnualFlyingStarCure(currentYear) {
   // 2026年九紫入中宫的飞星图
   var starPositions = _getAnnualFlyingStarPositions(currentYear);
   var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 飞星图表格
   html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:16px;font-size:11px;text-align:center">';
@@ -1157,7 +1044,6 @@ function _getAnnualFlyingStarCure(currentYear) {
     html += '</div>';
   }
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 化解重点
   html += '<ul style="font-size:12px;line-height:2;padding-left:20px;opacity:.85">';
@@ -1177,7 +1063,6 @@ function _getAnnualFlyingStarCure(currentYear) {
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getAnnualFlyingStarPositions(year) {
   // 计算流年飞星入中宫
@@ -1186,10 +1071,8 @@ function _getAnnualFlyingStarPositions(year) {
   var baseStar = 3; // 2024年三碧入中
   var diff = year - 2024;
   var centerStar = ((baseStar - diff - 1) % 9 + 9) % 9 + 1;
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var starNames = {1:'一白', 2:'二黑', 3:'三碧', 4:'四绿', 5:'五黄', 6:'六白', 7:'七赤', 8:'八白', 9:'九紫'};
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 洛书飞布顺序：中宫→西北→正西→东北→正南→正北→西南→正东→东南
   var flyOrder = ['中宫', '西北', '正西', '东北', '正南', '正北', '西南', '正东', '东南'];
@@ -1200,7 +1083,6 @@ function _getAnnualFlyingStarPositions(year) {
   }
   return positions;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getAnnualTaishuiCure(yearZhi) {
   var taishuiFang = {
@@ -1217,7 +1099,6 @@ function _getAnnualTaishuiCure(yearZhi) {
     '戌': '西北/东南',
     '亥': '西北/东南'
   };
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var fang = taishuiFang[yearZhi] || '正南/正北';
   var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
@@ -1234,7 +1115,6 @@ function _getAnnualTaishuiCure(yearZhi) {
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getAnnualSanshaCure(yearZhi) {
   var sanshaFang = {
@@ -1243,7 +1123,6 @@ function _getAnnualSanshaCure(yearZhi) {
     '亥卯未': '正西(申酉戌)',
     '巳酉丑': '正东(寅卯辰)'
   };
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 确定三煞
   var sansha = '';
@@ -1252,7 +1131,6 @@ function _getAnnualSanshaCure(yearZhi) {
   else if (['寅','午','戌'].indexOf(yearZhi) >= 0) sansha = '正北(亥子丑方)';
   else if (['亥','卯','未'].indexOf(yearZhi) >= 0) sansha = '正西(申酉戌方)';
   else if (['巳','酉','丑'].indexOf(yearZhi) >= 0) sansha = '正东(寅卯辰方)';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   html += '<p style="font-size:12px;line-height:2"><strong>三煞方位：</strong>' + sansha + '</p>';
@@ -1267,7 +1145,6 @@ function _getAnnualSanshaCure(yearZhi) {
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getAnnualWuhuangErheiCure(currentYear) {
   var positions = _getAnnualFlyingStarPositions(currentYear);
@@ -1277,7 +1154,6 @@ function _getAnnualWuhuangErheiCure(currentYear) {
     if (positions[pos] === '五黄') wuhuangFang = pos;
     if (positions[pos] === '二黑') erheiFang = pos;
   }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   html += '<div style="margin-bottom:12px;padding:10px;background:rgba(231,76,60,0.04);border-radius:6px">';
@@ -1291,7 +1167,6 @@ function _getAnnualWuhuangErheiCure(currentYear) {
   html += '<li>可放六帝钱或铜麒麟增强化解之力</li>';
   html += '</ul>';
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   html += '<div style="padding:10px;background:rgba(231,76,60,0.03);border-radius:6px">';
   html += '<p style="color:var(--orange);font-size:13px"><strong>二黑病符 — ' + erheiFang + '</strong></p>';
@@ -1307,23 +1182,19 @@ function _getAnnualWuhuangErheiCure(currentYear) {
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 // ================================================================
 // 九、家庭成员化解方案
 // ================================================================
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function getFamilyCurePlan(familyData, currentYear) {
   if (!familyData || !familyData.members || familyData.members.length === 0) {
     return '<p style="opacity:.5">家庭成员数据缺失</p>';
   }
   if (!currentYear) currentYear = new Date().getFullYear();
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
   html += '<h4 style="color:var(--gold);letter-spacing:3px;margin-bottom:16px">👨‍👩‍👧‍👦 家庭成员化解方案</h4>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 每位成员的个性化化解
   html += '<div style="margin-bottom:20px">';
@@ -1339,7 +1210,6 @@ function getFamilyCurePlan(familyData, currentYear) {
     html += '</div>';
   }
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 家庭整体化解
   html += '<div style="margin-bottom:20px">';
@@ -1348,7 +1218,6 @@ function getFamilyCurePlan(familyData, currentYear) {
   html += _getFamilyOverallCure(familyData, currentYear);
   html += '</div>';
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 化解物品协同效应检查
   html += '<div style="margin-bottom:8px">';
@@ -1357,12 +1226,10 @@ function getFamilyCurePlan(familyData, currentYear) {
   html += _getCureItemSynergyCheck(familyData);
   html += '</div>';
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getMemberCureText(bazi, currentYear) {
   var dayEle = _GAN_ELE ? (_GAN_ELE[bazi.dayStem] || '木') : '木';
@@ -1375,7 +1242,6 @@ function _getMemberCureText(bazi, currentYear) {
   text += '4. 根据个人命盘，选择有利的方位和时辰行事。';
   return text;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getFamilyOverallCure(familyData, currentYear) {
   var html = '<ul style="font-size:12px;line-height:2;padding-left:20px;opacity:.85">';
@@ -1391,7 +1257,6 @@ function _getFamilyOverallCure(familyData, currentYear) {
   html += '<p style="font-size:11px;opacity:.4;margin-top:8px">《阳宅集成》：「宅以人为本，人以宅为家。宅命相配，家道兴旺。」</p>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getCureItemSynergyCheck(familyData) {
   var html = '<ul style="font-size:12px;line-height:2;padding-left:20px;opacity:.85">';
@@ -1404,20 +1269,16 @@ function _getCureItemSynergyCheck(familyData) {
   html += '<p style="font-size:11px;opacity:.4;margin-top:8px">化解物品协同效应需定期检查，建议每年初更新方案。</p>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 // ================================================================
 // 十、会员分级化解
 // ================================================================
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function getMembershipCurePlan(baziData, membershipLevel, currentYear) {
   if (!membershipLevel) membershipLevel = 'free';
   if (!currentYear) currentYear = new Date().getFullYear();
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   if (membershipLevel === 'free') {
     html += '<h4 style="color:var(--gold);letter-spacing:3px;margin-bottom:16px">🆓 免费用户化解方案概要</h4>';
@@ -1469,51 +1330,42 @@ function getMembershipCurePlan(baziData, membershipLevel, currentYear) {
     html += '</div>';
     html += '</div>';
   }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   html += '</div>';
   return html;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 // ================================================================
 // 十一、辅助函数
 // ================================================================
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 var _GAN_ELE = { '甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水' };
 var _ZHI_ELE = { '子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水' };
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _eleSheng(a, b) {
   var sheng = { '木':'火','火':'土','土':'金','金':'水','水':'木' };
   return sheng[a] === b;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _eleKe(a, b) {
   var ke = { '木':'土','土':'水','水':'火','火':'金','金':'木' };
   return ke[a] === b;
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getElementCrystal(ele) {
   var map = { '木':'绿幽灵或翡翠', '火':'红玛瑙或紫水晶', '土':'黄水晶或和田玉', '金':'白水晶或金银', '水':'海蓝宝或黑曜石' };
   return map[ele] || '白水晶';
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getElementColor(ele) {
   var map = { '木':'绿色、青色', '火':'红色、紫色', '土':'黄色、棕色', '金':'白色、金色', '水':'蓝色、黑色' };
   return map[ele] || '白色';
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getElementDirection(ele) {
   var map = { '木':'东方、东南', '火':'南方', '土':'中央、西南', '金':'西方、西北', '水':'北方' };
   return map[ele] || '东方';
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function _getYearGanZhi(year) {
   // 2024=甲子...不对,2024=甲辰
@@ -1528,20 +1380,16 @@ function _getYearGanZhi(year) {
   var zhiIdx = ((baseZhiIdx + diff) % 12 + 12) % 12;
   return { gan: ganList[ganIdx], zhi: zhiList[zhiIdx] };
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 // ================================================================
 // 十二、化解中心渲染函数
 // ================================================================
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function renderCureCenter() {
   var out = document.getElementById('cureCenterOutput');
   if (!out) return;
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var html = '';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 化解中心标题
   html += '<div class="result-banner">';
@@ -1554,11 +1402,9 @@ function renderCureCenter() {
   html += '<span class="rb-tag">家庭化解</span>';
   html += '</div>';
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 化解方案分类
   html += '<div class="cure-category-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:20px">';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   var categories = [
     { id: 'cure-bazi', icon: '🌟', title: '八字化解', desc: '五行补缺·太岁化解·催旺专项' },
@@ -1572,7 +1418,6 @@ function renderCureCenter() {
     { id: 'cure-family', icon: '👨‍👩‍👧‍👦', title: '家庭化解', desc: '成员化解·协同检查' },
     { id: 'cure-items', icon: '💎', title: '物品大全', desc: '50+种物品·购买指南·摆放规则' }
   ];
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   for (var i = 0; i < categories.length; i++) {
     var c = categories[i];
@@ -1582,26 +1427,21 @@ function renderCureCenter() {
     html += '<div style="font-size:11px;opacity:.6;line-height:1.6">' + c.desc + '</div>';
     html += '</div>';
   }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   html += '</div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   // 化解方案输出区
   html += '<div id="cureCategoryOutput" style="margin-top:20px"></div>';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   out.innerHTML = html;
   out.style.display = 'block';
   out.classList.add('visible');
 }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
 function showCureCategory(catId) {
   var out = document.getElementById('cureCategoryOutput');
   if (!out) return;
   var html = '';
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   if (catId === 'cure-bazi') {
     html += '<h4 style="color:var(--gold);margin-bottom:12px">🌟 八字化解方案</h4>';
@@ -1663,7 +1503,6 @@ function showCureCategory(catId) {
       html += '</div>';
     }
   }
-  html += '<p style="font-size:11px;opacity:.4;margin-top:8px">流年化解需每年更新，建议缘主每年初重新排盘调整。化煞之道，贵在及时。</p>';
 
   out.innerHTML = html;
   out.scrollIntoView({behavior:'smooth',block:'nearest'});

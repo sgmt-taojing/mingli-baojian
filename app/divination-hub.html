@@ -18438,12 +18438,23 @@ function getFengshuiAdvice(dayEle, weakestEle) {
 
 // 命卦计算(东四命/西四命)
 function getMingGua(year, sex) {
-  const last2 = year % 100;
   let gua;
-  if (sex === 'male') {
-    gua = (100 - last2) % 9;
+  if (year >= 2000) {
+    // 2000年后命卦公式
+    var diff = year - 2000;
+    if (sex === 'male') {
+      gua = (9 - diff % 9) % 9;
+    } else {
+      gua = (diff % 9 + 6) % 9;
+    }
   } else {
-    gua = (last2 + 5) % 9;
+    // 1900-1999年传统公式
+    var last2 = year % 100;
+    if (sex === 'male') {
+      gua = (100 - last2) % 9;
+    } else {
+      gua = (last2 + 5) % 9;
+    }
   }
   if (gua === 0) gua = 9;
   if (gua === 5) gua = sex === 'male' ? 2 : 8;
@@ -29786,9 +29797,9 @@ const _BAGONG_ORDER = {
 };
 const _GONG_ZHI = {
   0:['子','寅','辰','午','申','戌'], 7:['未','巳','卯','丑','亥','酉'],
-  2:['卯','丑','亥','酉','未','巳'], 4:['子','寅','辰','午','申','戌'],
-  5:['丑','亥','酉','未','巳','卯'], 6:['寅','辰','午','申','戌','子'],
-  3:['辰','午','申','戌','子','寅'], 1:['酉','未','巳','卯','丑','亥']
+  2:['卯','丑','亥','酉','未','巳'], 3:['子','寅','辰','午','申','戌'],
+  4:['丑','亥','酉','未','巳','卯'], 5:['寅','辰','午','申','戌','子'],
+  6:['辰','午','申','戌','子','寅'], 1:['酉','未','巳','卯','丑','亥']
 };
 const _GONG_GAN = {0:'甲',1:'丁',2:'己',3:'庚',4:'辛',5:'戊',6:'丙',7:'乙'}; // 乾甲坤乙民丙兑丁坎戊离己震庚巽辛
 const _LIUSHEN = ['青龙','朱雀','勾陈','腾蛇','白虎','玄武'];
@@ -29832,7 +29843,7 @@ function _peiTianGan(gongIdx, gan) {
   let outerGan;
   if (gongIdx === 0) { outerGan = '壬'; } // 乾内甲外壬
   else if (gongIdx === 7) { outerGan = '癸'; } // 坤内乙外癸
-  else { outerGan = _STEMS[_qyMod(_STEMS.indexOf(gan) + 5, 10)]; } // 其他: 外卦干 = 内卦干 + 5
+  else { outerGan = gan; } // 其他: 内外卦同干 (京房纳甲法)
   return [innerGan, innerGan, innerGan, outerGan, outerGan, outerGan];
 }
 
@@ -29854,7 +29865,7 @@ function _peiLiuShen(dayGan) {
 }
 
 function _shiYingFromPos(pos) {
-  const map = [0,1,2,3,4,5,3,2];
+  const map = [5,0,1,2,3,4,3,2];
   const s = map[pos] || 0;
   const y = _qyMod(s + 3, 6);
   return {shi: s, ying: y};
@@ -31896,16 +31907,26 @@ function _xuankongBrief(year, dir) {
   // 《沈氏玄空学》:「向星以向方之运星入中宫，视其阴阳而定顺逆」
   const xiangNum = yunPan[xiangDirNum] || period; // 向方运星
   
-  // 阳顺阴逆: 奇数为阳(顺飞), 偶数为阴(逆飞)
-  // 《沈氏玄空学》:「一二三四五六七八九，奇数为阳顺飞，偶数为阴逆飞」
-  // 顺飞: 5→6→7→8→9→1→2→3→4 (中→乾→兑→艮→离→坎→坤→震→巽)
-  // 逆飞: 5→4→3→2→1→9→8→7→6 (中→巽→震→坤→坎→离→艮→兑→乾)
+  // 阳顺阴逆: 按三元龙阴阳判定
+  // 《沈氏玄空学》:「各元龙之阴阳，看坐向所临之卦而定」
+  // 天元龙(乾坤艮巽+子午卯酉): 阳顺飞
+  // 地元龙(甲庚壬丙+辰戌丑未): 阴逆飞  
+  // 人元龙(乙辛丁癸+寅申巳亥): 阳顺飞
+  // 洛书方位对应: 1坎(子/癸)阳, 2坤(坤/未)坤阳/未阴, 3震(卯/乙)阳, 4巽(巽/辰)巽阳/辰阴
+  //                6乾(乾/戌)乾阳/戌阴, 7兑(酉/辛)阳, 8艮(艮/丑)艮阳/丑阴, 9离(午/丁)阳
+  // 简化: 以方位卦象的天元龙阴阳为准 (子午卯酉乾坤艮巽为阳, 辰戌丑未为阴)
+  // 坎1震3巽4乾6离9为阳顺飞, 坤2兑7艮8为阴逆飞 (按地卦阴阳)
+  // 更准确: 24山各山有阴阳, 此处按8方位的默认山阴阳
+  const yangGongs = [1,3,4,6,9]; // 坎震巽乾离为阳
+  const isZuoYang = yangGongs.includes(zuoDirNum);
+  const isXiangYang = yangGongs.includes(xiangDirNum);
+  
   const shunFei = [5,6,7,8,9,1,2,3,4];
   const niFei = [5,4,3,2,1,9,8,7,6];
   
   // 山星飞布 (阳顺阴逆)
   const shanPan = {};
-  const shanFeiXu = (zuoNum % 2 === 1) ? shunFei : niFei;
+  const shanFeiXu = isZuoYang ? shunFei : niFei;
   for (let i = 0; i < 9; i++) {
     const star = ((zuoNum - 1 + i) % 9) + 1;
     shanPan[shanFeiXu[i]] = star;
@@ -31913,7 +31934,7 @@ function _xuankongBrief(year, dir) {
   
   // 向星飞布 (阳顺阴逆)
   const xiangPan = {};
-  const xiangFeiXu = (xiangNum % 2 === 1) ? shunFei : niFei;
+  const xiangFeiXu = isXiangYang ? shunFei : niFei;
   for (let i = 0; i < 9; i++) {
     const star = ((xiangNum - 1 + i) % 9) + 1;
     xiangPan[xiangFeiXu[i]] = star;
@@ -32812,22 +32833,22 @@ function runMeihuaEngine() {
       // 2. 事业方向
       _mhPlain += '<div style="background:rgba(52,152,219,.04);border-left:3px solid #3498db;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
       _mhPlain += '<div style="font-size:13px;font-weight:bold;color:#3498db;margin-bottom:4px">💼 事业方向</div>';
-      _mhPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">' + (analyze.relation.indexOf('体克用') >= 0 ? '体克用，事业可成但需努力，努力付出终有回报。' : analyze.relation.indexOf('用克体') >= 0 ? '用克体，事业阻力大，不宜强求，等待时机为上。' : analyze.relation.indexOf('体生用') >= 0 ? '体生用，付出多回报少，需调整策略避免过度消耗。' : analyze.relation.indexOf('用生体') >= 0 ? '用生体，贵人相助，事业顺遂，把握机会。' : '体用比和，事业平稳，按部就班即可。') + '</div>';
+      _mhPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">' + (analyze.relation === '我克' ? '体克用，事业可成但需努力，努力付出终有回报。' : analyze.relation === '克我' ? '用克体，事业阻力大，不宜强求，等待时机为上。' : analyze.relation === '我生' ? '体生用，付出多回报少，需调整策略避免过度消耗。' : analyze.relation === '生我' ? '用生体，贵人相助，事业顺遂，把握机会。' : '体用比和，事业平稳，按部就班即可。') + '</div>';
       _mhPlain += '</div>';
       // 3. 财运分析
       _mhPlain += '<div style="background:rgba(39,174,96,.04);border-left:3px solid #27ae60;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
       _mhPlain += '<div style="font-size:13px;font-weight:bold;color:#27ae60;margin-bottom:4px">💰 财运分析</div>';
-      _mhPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">' + (analyze.relation.indexOf('用生体') >= 0 ? '财来生身，财运亨通，积极求财必有所得。' : analyze.relation.indexOf('体生用') >= 0 ? '财去生事，投资需谨慎，不宜大手笔。' : analyze.relation.indexOf('体克用') >= 0 ? '求财辛苦但可得，需主动出击。' : analyze.relation.indexOf('用克体') >= 0 ? '财不就身，不宜投资，守财为上。' : '财运平稳，量入为出。') + '变卦' + bian + '预示财运走向。</div>';
+      _mhPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">' + (analyze.relation === '生我' ? '财来生身，财运亨通，积极求财必有所得。' : analyze.relation === '我生' ? '财去生事，投资需谨慎，不宜大手笔。' : analyze.relation === '我克' ? '求财辛苦但可得，需主动出击。' : analyze.relation === '克我' ? '财不就身，不宜投资，守财为上。' : '财运平稳，量入为出。') + '变卦' + bian + '预示财运走向。</div>';
       _mhPlain += '</div>';
       // 4. 感情婚姻
       _mhPlain += '<div style="background:rgba(155,89,182,.04);border-left:3px solid #9b59b6;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
       _mhPlain += '<div style="font-size:13px;font-weight:bold;color:#9b59b6;margin-bottom:4px">💕 感情婚姻</div>';
-      _mhPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">' + (analyze.relation.indexOf('用生体') >= 0 ? '对方主动示好，感情发展顺利。' : analyze.relation.indexOf('体生用') >= 0 ? '你付出较多，需看对方回应是否值得。' : analyze.relation.indexOf('体克用') >= 0 ? '感情需主动追求，付出终有回报。' : analyze.relation.indexOf('用克体') >= 0 ? '感情有阻力，不宜强求，顺其自然。' : '感情平和，互相尊重为上。') + '动爻在第' + (gua.dongYao+1) + '爻，预示变化发生的位置。</div>';
+      _mhPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">' + (analyze.relation === '生我' ? '对方主动示好，感情发展顺利。' : analyze.relation === '我生' ? '你付出较多，需看对方回应是否值得。' : analyze.relation === '我克' ? '感情需主动追求，付出终有回报。' : analyze.relation === '克我' ? '感情有阻力，不宜强求，顺其自然。' : '感情平和，互相尊重为上。') + '动爻在第' + (gua.dongYao+1) + '爻，预示变化发生的位置。</div>';
       _mhPlain += '</div>';
       // 5. 健康提醒
       _mhPlain += '<div style="background:rgba(230,126,34,.04);border-left:3px solid #e67e22;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
       _mhPlain += '<div style="font-size:13px;font-weight:bold;color:#e67e22;margin-bottom:4px">🏥 健康提醒</div>';
-      _mhPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">体卦五行对应身体器官：木=肝胆，火=心血管，土=脾胃，金=肺呼吸，水=肾泌尿。' + (analyze.relation.indexOf('用克体') >= 0 ? '用克体，对应器官易受克伐，需提前调养。' : '体卦不受克，身体基本健康。') + '变卦暗示病情走向：变卦生体卦则痊愈快，变卦克体卦则需积极治疗。</div>';
+      _mhPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">体卦五行对应身体器官：木=肝胆，火=心血管，土=脾胃，金=肺呼吸，水=肾泌尿。' + (analyze.relation === '克我' ? '用克体，对应器官易受克伐，需提前调养。' : '体卦不受克，身体基本健康。') + '变卦暗示病情走向：变卦生体卦则痊愈快，变卦克体卦则需积极治疗。</div>';
       _mhPlain += '</div>';
       _mhPlain += '</div></div>';
       html += _mhPlain;
