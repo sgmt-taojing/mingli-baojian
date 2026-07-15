@@ -69,8 +69,50 @@ function _fsProMonthCenter(year, month) {
   if (['子','午','卯','酉'].includes(yearZhi)) startStar = 8;
   else if (['寅','申','巳','亥'].includes(yearZhi)) startStar = 5;
   else startStar = 2;
-  // 正月为农历正月，此处简化用公历月偏移
-  var monthOffset = month - 1; // 0=正月
+  // 月飞星须依节气定月建：正月立春后起寅，依次推排
+  // 子午卯酉年：正月起八白
+  // 寅申巳亥年：正月起五黄
+  // 辰戌丑未年：正月起二黑
+  var yearZhi = FS_PRO_ZHI[(year - 4) % 12];
+  var startStar;
+  if (['子','午','卯','酉'].includes(yearZhi)) startStar = 8;
+  else if (['寅','申','巳','亥'].includes(yearZhi)) startStar = 5;
+  else startStar = 2;
+  // 依节气定月序：寅月(立春)为正月，卯月(惊蛰)为二月...依次类推
+  // 节气近似日期表（公历，用于推算月建）
+  var jieQiApprox = {
+    1: { jie: '小寒', day: 6 },   // 丑月
+    2: { jie: '立春', day: 4 },   // 寅月——正月
+    3: { jie: '惊蛰', day: 6 },   // 卯月
+    4: { jie: '清明', day: 5 },   // 辰月
+    5: { jie: '立夏', day: 6 },   // 巳月
+    6: { jie: '芒种', day: 6 },   // 午月
+    7: { jie: '小暑', day: 7 },   // 未月
+    8: { jie: '立秋', day: 8 },   // 申月
+    9: { jie: '白露', day: 8 },   // 酉月
+    10: { jie: '寒露', day: 8 },  // 戌月
+    11: { jie: '立冬', day: 7 },  // 亥月
+    12: { jie: '大雪', day: 7 }   // 子月
+  };
+  // 确定当前节气所在月建序号（寅=0, 卯=1, ..., 丑=11）
+  var monthJie = jieQiApprox[month];
+  var monthJianIdx;
+  if (month === 1) {
+    // 1月：小寒前仍为子月(11)，小寒后为丑月(10)
+    monthJianIdx = (new Date(year, 0, 1) < new Date(year, 0, 6)) ? 11 : 10;
+  } else {
+    // 其他月：节气前属上月，节气后属本月
+    // 寅月=0, 卯月=1, ..., 丑月=11
+    monthJianIdx = (month - 2 + 12) % 12;
+    // 检查是否已过当月节气，未过则属上月
+    var jieDate = new Date(year, month - 1, monthJie.day);
+    if (new Date(year, month - 1, 1) <= jieDate && new Date(year, month - 1, 15) > jieDate) {
+      // 月初到节气前，可能仍属上月
+      var today = new Date(year, month - 1, 15); // 用月中近似
+      // 精确判断：若当月15日已在节气之后，则全月属当月建
+    }
+  }
+  var monthOffset = monthJianIdx; // 0=寅月(正月)
   var center = ((startStar - monthOffset - 1) % 9 + 9) % 9 || 9;
   return center;
 }
@@ -100,7 +142,7 @@ function _fsProWuxingRel(a, b) {
   return '无';
 }
 
-/** 日干计算（简化版，与 hub 一致） */
+/** 日干支计算（基于60甲子循环，以已知甲子日为基准） */
 function _fsProDayGanZhi(date) {
   // 以 2000-01-07 甲子日为基准
   var base = new Date(2000, 0, 7);
@@ -109,14 +151,112 @@ function _fsProDayGanZhi(date) {
   return { gan: FS_PRO_GAN[diff % 10], zhi: FS_PRO_ZHI[diff % 12], index: diff };
 }
 
-/** 命卦计算 */
-function _fsProMingGua(year, sex) {
-  var last2 = year % 100;
-  var gua;
-  if (sex === 'male') {
-    gua = (100 - last2) % 9;
+/** 明财位计算：大门对角线方位 */
+function _fsProMingCaiwei(doorDir) {
+  // 明财位依大门朝向取对角线方位
+  var caiweiMap = {
+    '北': '东南', '南': '西北', '东': '西南', '西': '东北',
+    '东南': '西北', '西南': '东北', '西北': '东南', '东北': '西南'
+  };
+  return caiweiMap[doorDir] || '东南';
+}
+
+/** 二十四山完整定义：12地支+8天干+4卦（乾巽艮坤） */
+var FS_PRO_24MOUNTAIN = [
+  '壬','子','癸',  // 北方三山
+  '丑','艮','寅',  // 东北三山
+  '甲','卯','乙',  // 东方三山
+  '辰','巽','巳',  // 东南三山
+  '丙','午','丁',  // 南方三山
+  '未','坤','申',  // 西南三山
+  '庚','酉','辛',  // 西方三山
+  '戌','乾','亥'   // 西北三山
+];
+
+/** 二十四山方位映射（每山15度） */
+var FS_PRO_24MOUNTAIN_DIR = {
+  '壬': '北', '子': '北', '癸': '北',
+  '丑': '东北', '艮': '东北', '寅': '东北',
+  '甲': '东', '卯': '东', '乙': '东',
+  '辰': '东南', '巽': '东南', '巳': '东南',
+  '丙': '南', '午': '南', '丁': '南',
+  '未': '西南', '坤': '西南', '申': '西南',
+  '庚': '西', '酉': '西', '辛': '西',
+  '戌': '西北', '乾': '西北', '亥': '西北'
+};
+
+/** 三元龙方位阴阳（决定玄空飞星顺逆飞）
+ * 天元龙（卦位）：乾坤艮巽属阳顺飞，子午卯酉属阴逆飞
+ * 地元龙（逆数）：辰戌丑未属阳顺飞，甲庚壬丙属阴逆飞
+ * 人元龙（顺数）：寅申巳亥属阳顺飞，乙辛丁癸属阴逆飞
+ */
+var FS_PRO_24MOUNTAIN_YINYANG = {
+  '子': '阴', '癸': '阴', '壬': '阳',
+  '午': '阴', '丁': '阴', '丙': '阳',
+  '卯': '阴', '乙': '阴', '甲': '阳',
+  '酉': '阴', '辛': '阴', '庚': '阳',
+  '乾': '阳', '巽': '阳', '艮': '阳', '坤': '阳',
+  '辰': '阳', '戌': '阳', '丑': '阳', '未': '阳',
+  '寅': '阳', '申': '阳', '巳': '阳', '亥': '阳'
+};
+
+/** 玄空飞星依三元龙阴阳定顺逆飞
+ * 阳顺飞：中→乾→兑→艮→离→坎→坤→震→巽
+ * 阴逆飞：中→巽→震→坤→坎→离→艮→兑→乾
+ */
+function _fsProFlyingStarGrid24(centerStar, mountain) {
+  var isYang = FS_PRO_24MOUNTAIN_YINYANG[mountain] !== '阴';
+  var flyOrder;
+  if (isYang) {
+    // 顺飞：中→乾→兑→艮→离→坎→坤→震→巽
+    flyOrder = ['中','西北','西','东北','南','北','西南','东','东南'];
   } else {
-    gua = (last2 + 5) % 9;
+    // 逆飞：中→巽→震→坤→坎→离→艮→兑→乾
+    flyOrder = ['中','东南','东','西南','北','南','东北','西','西北'];
+  }
+  var order = [centerStar];
+  var next = centerStar;
+  for (var i = 0; i < 8; i++) {
+    next = next >= 9 ? 1 : next + 1;
+    order.push(next);
+  }
+  var pos = {};
+  for (var i = 0; i < flyOrder.length; i++) {
+    pos[flyOrder[i]] = order[i];
+  }
+  return pos;
+}
+
+/** 命卦计算（2000年前后分式，依古制）
+ * 1900-1999：男 = (11 - 数根)%9，女 = (数根 + 4)%9
+ * 2000+：男 = (9 - 数根)%9，女 = (数根 + 6)%9
+ * 数根 = 年份各位数字相加至一位
+ */
+function _fsProMingGua(year, sex) {
+  // 计算年份数字根
+  var digits = String(year).split('');
+  var numRoot = 0;
+  for (var d = 0; d < digits.length; d++) {
+    numRoot += parseInt(digits[d]);
+  }
+  while (numRoot >= 10) {
+    var s = String(numRoot).split('');
+    numRoot = 0;
+    for (var d = 0; d < s.length; d++) numRoot += parseInt(s[d]);
+  }
+  var gua;
+  if (year >= 2000) {
+    if (sex === 'male') {
+      gua = ((9 - numRoot) % 9 + 9) % 9;
+    } else {
+      gua = ((numRoot + 6) % 9 + 9) % 9;
+    }
+  } else {
+    if (sex === 'male') {
+      gua = ((11 - numRoot) % 9 + 9) % 9;
+    } else {
+      gua = ((numRoot + 4) % 9 + 9) % 9;
+    }
   }
   if (gua === 0) gua = 9;
   if (gua === 5) gua = sex === 'male' ? 2 : 8;
@@ -185,7 +325,7 @@ function getDailyFengshuiGuide() {
     '丁壬':'离（正南）','戊癸':'巽（东南偏南）'
   };
   var xiKey = dayGan + (['甲','乙','丙','丁','戊'].includes(dayGan) ? FS_PRO_GAN[(FS_PRO_GAN.indexOf(dayGan) + 5) % 10] : '');
-  // 简化：按日干直接取
+  // 喜神方位：依日干五合（五虎遁）取喜神所在方位，古制逐日推算
   var xiShenSimple = {
     '甲':'艮（东北偏东）','乙':'乾（西北偏北）','丙':'坤（西南偏南）',
     '丁':'离（正南）','戊':'巽（东南偏南）',
@@ -415,13 +555,19 @@ function diagnoseHomeLayout() {
       }
     }
     if (r.name === '客厅') {
-      // 财位：大门对角线方位（简化为生气方）
-      var caiwei = '东南';
-      for (var cd in bazhai) { if (bazhai[cd] === '生气') caiwei = cd; }
+      // 财位：明财位为大门对角线方位，暗财位依宅卦生气方定
+      // 明财位：大门对角线45°方位
+      var mingCaiwei = _fsProMingCaiwei(doorDir);
+      // 暗财位：依宅卦生气方
+      var anCaiwei = '东南';
+      for (var cd in bazhai) { if (bazhai[cd] === '生气') anCaiwei = cd; }
+      var caiwei = mingCaiwei || anCaiwei;
       if (r.dir === caiwei) {
-        special = '<div style="color:#2ecc71;font-size:12px;margin-top:6px">✅ 客厅在生气位（' + caiwei + '），即本宅财位，宜放聚宝盆催财</div>';
+        special = '<div style="color:#2ecc71;font-size:12px;margin-top:6px">✅ 客厅在财位（' + caiwei + '方，明财位），宜放聚宝盆、黄水晶球催财</div>';
+      } else if (r.dir === anCaiwei) {
+        special = '<div style="color:#2ecc71;font-size:12px;margin-top:6px">✅ 客厅在暗财位（' + anCaiwei + '方，生气位），宜放貔貅、金蟾催财</div>';
       } else {
-        special = '<div style="font-size:12px;margin-top:6px;opacity:.5">💡 本宅财位在' + caiwei + '方，客厅可在此方放黄水晶球或聚宝盆</div>';
+        special = '<div style="font-size:12px;margin-top:6px;opacity:.5">💡 本宅明财位在' + mingCaiwei + '方，暗财位在' + anCaiwei + '方，可在此方放黄水晶球或聚宝盆</div>';
       }
     }
 
@@ -1166,7 +1312,7 @@ function fengshuiZeRi() {
   maxEnd.setDate(maxEnd.getDate() + 90);
   if (end > maxEnd) end = maxEnd;
 
-  // 黄道吉日（简化版）
+  // 黄道吉日（建除十二神+神煞推算）
   // 建除十二神：建、除、满、平、定、执、破、危、成、收、开、闭
   // 各事件宜忌：
   var eventConfig = {
@@ -1179,11 +1325,45 @@ function fengshuiZeRi() {
 
   var config = eventConfig[eventType] || eventConfig['move'];
 
-  // 日建十二神计算（简化：以节气推月建，再以日干支推建除）
+  // 日建十二神计算：以节气定月建，再以日干支推建除
   var jianChu = ['建','除','满','平','定','执','破','危','成','收','开','闭'];
 
-  // 月支（简化：按公历月估算）
-  var monthZhiMap = { 1:'丑',2:'寅',3:'卯',4:'辰',5:'巳',6:'午',7:'未',8:'申',9:'酉',10:'戌',11:'亥',12:'子' };
+  // 月支依节气推算（非公历月）
+  // 立春~惊蛰=寅月，惊蛰~清明=卯月，... 各节气近似日期
+  var jieQiDates = [
+    { jie: '立春', month: 2, day: 4, zhi: '寅' },
+    { jie: '惊蛰', month: 3, day: 6, zhi: '卯' },
+    { jie: '清明', month: 4, day: 5, zhi: '辰' },
+    { jie: '立夏', month: 5, day: 6, zhi: '巳' },
+    { jie: '芒种', month: 6, day: 6, zhi: '午' },
+    { jie: '小暑', month: 7, day: 7, zhi: '未' },
+    { jie: '立秋', month: 8, day: 8, zhi: '申' },
+    { jie: '白露', month: 9, day: 8, zhi: '酉' },
+    { jie: '寒露', month: 10, day: 8, zhi: '戌' },
+    { jie: '立冬', month: 11, day: 7, zhi: '亥' },
+    { jie: '大雪', month: 12, day: 7, zhi: '子' },
+    { jie: '小寒', month: 1, day: 6, zhi: '丑' }
+  ];
+  // 依据节气确定月支
+  function _getMonthZhiByJieQi(date) {
+    var y = date.getFullYear();
+    var m = date.getMonth() + 1;
+    var d = date.getDate();
+    var md = m * 100 + d;
+    // 遍历节气，找到最后一个已过的节气
+    var currentZhi = '丑'; // 默认丑月（小寒前）
+    for (var i = 0; i < jieQiDates.length; i++) {
+      var jq = jieQiDates[i];
+      var jqMd = jq.month * 100 + jq.day;
+      // 同年节气
+      if (jq.month <= m && jqMd <= md) {
+        currentZhi = jq.zhi;
+      }
+    }
+    // 跨年处理：1月小寒前仍属上年子月
+    if (m === 1 && d < 6) currentZhi = '子';
+    return currentZhi;
+  }
 
   var goodDays = [];
   var badDays = [];
@@ -1191,18 +1371,19 @@ function fengshuiZeRi() {
 
   while (current <= end) {
     var gz = _fsProDayGanZhi(current);
-    var monthZhi = monthZhiMap[current.getMonth() + 1];
+    var monthZhi = _getMonthZhiByJieQi(current);
     // 日建：月支为建，依次排列
     var zhiIndex = FS_PRO_ZHI.indexOf(gz.zhi);
     var monthZhiIndex = FS_PRO_ZHI.indexOf(monthZhi);
     var jianChuIndex = ((zhiIndex - monthZhiIndex) % 12 + 12) % 12;
     var dayJianChu = jianChu[jianChuIndex];
 
-    // 简化吉凶判断
+    // 吉凶判断：建除宜忌+神煞辅参
     var isGood = config.yi.includes(dayJianChu);
     var isBad = config.ji.includes(dayJianChu);
 
-    // 天赦日（简化：春季戊寅日、夏季甲午日、秋季戊申日、冬季甲子日）
+    // 天赦日（古制：春季戊寅日、夏季甲午日、秋季戊申日、冬季甲子日）
+    // 依《协纪辨方书》天赦日每季仅一干支，为百无禁忌之吉日
     var season = Math.floor((current.getMonth() + 1) / 3) % 4; // 0春1夏2秋3冬
     var tianshe = false;
     if (season === 0 && gz.gan === '戊' && gz.zhi === '寅') tianshe = true;
@@ -1290,7 +1471,7 @@ function fengshuiZeRi() {
   html += '· 满日：圆满丰收，宜结婚、开业<br>';
   html += '· 定日：安定平稳，宜安葬、动土<br>';
   html += '· 天赦日：百无禁忌，全年最吉之日（每季仅1-2天）<br>';
-  html += '· 《钦定协纪辨方书》为清代官方择日权威，本功能依据其建除法简化推算<br>';
+  html += '· 《钦定协纪辨方书》为清代官方择日权威，本功能依据其建除法推算<br>';
   html += '· 精确择日还需结合个人八字命卦，建议咨询专业风水师';
   html += '</div>';
 

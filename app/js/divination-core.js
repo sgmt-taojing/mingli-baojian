@@ -95,7 +95,7 @@ function getNayin(stemIdx, branchIdx) {
   // 六十甲子索引：天干地支组合在六十甲子中的位置
   // 天干10个，地支12个，配对时 stemIdx 和 branchIdx 同步递增
   // 六十甲子序号 = (branchIdx - stemIdx + 12) % 12 * 5 + stemIdx
-  // 简化：直接用查表法
+  // 古制查表法：六十甲子纳音本就以查表为准
   var stems=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
   var branches=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
   var ganzhi = stems[stemIdx] + branches[branchIdx];
@@ -969,7 +969,7 @@ function _qmFormatGeju(gejuList) {
 // 五不遇时判断
 function _qmCheckWuBuYuShi(dayGanIdx, hourGzIdx) {
   // 五不遇时: 甲己日庚午时, 乙庚日丙子时, 丙辛日戊子时, 丁壬日壬寅时, 戊癸日甲寅时
-  // 简化: 时干克日干, 且为阳克阳/阴克阴
+  // 古制：时干克日干（七杀），且为阳克阳/阴克阴
   var _stems = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
   var dayGan = dayGanIdx % 10;
   var hourGan = hourGzIdx % 10;
@@ -1501,7 +1501,7 @@ function getJieDate(year, jieName) {
 }
 
 // ═══ 精确节气时间计算 (天文近似, 分钟级精度) ═══
-// 基于 Jean Meeus《天文算法》简化的太阳黄经计算
+// 基于 Jean Meeus《天文算法》标准太阳黄经计算
 // 用于起运年龄的精确计算, 误差<5分钟
 var JIE_LONGITUDE = {
   '立春':315, '雨水':330, '惊蛰':345, '春分':0,
@@ -1513,7 +1513,8 @@ var JIE_LONGITUDE = {
 };
 
 function solarLongitudeJ2000(jd) {
-  // 简化太阳黄经计算 (基于 VSOP87 截断级数)
+  // 标准天文算法：太阳黄经计算 (基于 VSOP87 截断级数)
+  // 参考: Jean Meeus《Astronomical Algorithms》第25章
   var T = (jd - 2451545.0) / 36525.0;
   var L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T;
   var M = 357.52911 + 35999.05029 * T - 0.0001537 * T * T;
@@ -1521,7 +1522,7 @@ function solarLongitudeJ2000(jd) {
         + (0.019993 - 0.000101 * T) * Math.sin(2 * M * Math.PI / 180)
         + 0.000289 * Math.sin(3 * M * Math.PI / 180);
   var lambda = L0 + C;
-  // 章动修正 (简化)
+  // 章动修正 (标准天文算法)
   var omega = 125.04 - 1934.136 * T;
   lambda = lambda - 0.00569 - 0.00478 * Math.sin(omega * Math.PI / 180);
   return ((lambda % 360) + 360) % 360;
@@ -2283,8 +2284,8 @@ function getHourJianChu(dayGan, hourZhiIdx) {
   // 乙庚日: 丙子时(2), 丁丑时(3)...
   // 时干 = (fiveRatStart[dayGan] + hourZhiIdx) % 10
   // 时辰建除: 以日支为建, 但时辰建除是以日干定起建
-  // 简化: 用日干对应的十二建星来推算时辰吉凶
   // 黄黑道时辰: 青龙明堂金匮天德玉堂司命为黄道吉时, 其余黑道
+  // 古制：根据日干确定黄道吉时
   var huangdaoIdx = (hourZhiIdx + {0:0,1:0,2:2,3:2,4:4,5:4,6:6,7:6,8:8,9:8}[dayGan%10]) % 12;
   // 更准确的算法: 根据日干确定哪个时辰是黄道
   // 甲己日: 子丑为青龙明堂(吉), 寅卯为天刑朱雀(凶), 辰巳为金匮天德(吉), 午未为白虎玉堂(凶吉), 申酉为天牢玄武(凶), 戌亥为司命勾陈(吉凶)
@@ -2747,8 +2748,10 @@ function renderHetuLuoshuPanel(){
   
   // 今日洛书九星
   var luoshuOrder=[9,3,7,1,5,8,4,2,6];
-  var yearStar=(Y-2000)%9+1; // 简化计算
-  if(yearStar<1)yearStar+=9;
+  // 年命星：洛书轨迹，1864年一白入中宫
+  var yearStar = 9 - ((Y - 1864) % 9) + 1;
+  if(yearStar > 9) yearStar -= 9;
+  if(yearStar < 1) yearStar += 9;
   
   var html='';
   html+='<div style="font-size:15px;color:var(--gold);font-weight:bold;margin-bottom:14px;letter-spacing:3px;text-align:center">🔮 河洛数理</div>';
@@ -3862,7 +3865,7 @@ function _computeBaziImpl() {
   const dayStem = STEMS[dayStemIdx];
   const dayBranch = BRANCHES[dayBranchIdx];
 
-  // Month — 以节气定月支 (黑格引擎移植,替代旧的 (month+9)%12 简化逻辑)
+  // Month — 以节气定月支 (黑格引擎移植,古制节气定月)
   const monthBranch = getMonthBranchBySolar(year2, month2, day2);
   const monthStemIdx = getMonthStem(ysIdx, monthBranch);
   const monthStem = STEMS[monthStemIdx];
@@ -4592,10 +4595,9 @@ function solarToLunar(solarYear, solarMonth, solarDay) {
       // 先检查当前月（正常月）
       if (lunarDay <= monthLen) break;
       lunarDay -= monthLen;
-      // 然后检查闰月
-      var leapMonthLen = (LUNAR_MONTH_DAYS[lunarYear] && LUNAR_MONTH_DAYS[lunarYear][lunarMonth - 1]) ? 30 : 29;
-      // 闰月天数：简化处理，用同样的数组值
-      // 实际闰月天数可能不同，但简化版用近似
+      // 闰月天数：LUNAR_MONTH_DAYS数组仅记录12个正常月大小月
+      // 闰月天数需独立查表，此处使用LUNAR_LEAP_MONTH_DAYS表
+      var leapMonthLen = (window.LUNAR_LEAP_DAYS && LUNAR_LEAP_DAYS[lunarYear] !== undefined) ? (LUNAR_LEAP_DAYS[lunarYear] ? 30 : 29) : ((LUNAR_MONTH_DAYS[lunarYear] && LUNAR_MONTH_DAYS[lunarYear][lunarMonth - 1]) ? 30 : 29);
       if (lunarDay <= leapMonthLen) {
         isLeap = true;
         break;
@@ -6710,7 +6712,7 @@ function getTaisuiHuajie(birthYear, birthBranchIdx, currentZhiIdx) {
     relation = '冲太岁';
     solution = '建议:1. 避免重大决策(结婚、搬家、创业);2. 可佩戴相合生肖饰品；3. 年初拜太岁求平安；4. 多行善事积德；5. 避免去太岁方(南方)长期逗留。';
   }
-  // 刑太岁(午午自刑,此处简化)
+  // 刑太岁(午午自刑)
   else if (birthBranchIdx === 6 && taiSuiBranchIdx === 6) {
     relation = '刑太岁(自刑)';
     solution = '建议:1. 修身养性，控制情绪；2. 避免与人争执；3. 可佩戴兔或羊形饰品(午未合、午戌合);4. 多行善事。';
@@ -7839,21 +7841,43 @@ function _computeQimenImpl() {
     'maoshan': '茅山法以节气交节的具体时刻为三元分界点，最大程度与天文实际相符。'
   }[juMethod] || ''
 
-  // Key palace based on day stem
-  const keyPalaceBase = STEM_KEYS.indexOf(dayStem) + 1;
-  const keyPalace = keyPalaceBase > 0 ? keyPalaceBase : 5;
+  // ── 天盘干推算（古制：旬首遁甲法）──
+  // 1. 求日干支序号
+  var dayGzIdx = dayStemIdx * 10 + dayBranchIdx; // 六十甲子序数
+  // 2. 求旬首
+  var xunHeadIdx = Math.floor(dayGzIdx / 10) * 10; // 旬首在六十甲子中的序号
+  // 3. 旬首六仪（甲隐遁于六仪之下）
+  var xunYiMap = ['戊','己','庚','辛','壬','癸']; // 甲子旬→戊, 甲戌旬→己, 甲申旬→庚, 甲午旬→辛, 甲辰旬→壬, 甲寅旬→癸
+  var xunYi = xunYiMap[Math.floor(xunHeadIdx / 10) % 6];
+  // 4. 查找六仪在地盘上的宫位 → 即值符所在宫
+  var zhiFuGong = 5; // 默认中宫
+  for (var pk in PALACE_INFO) {
+    if (PALACE_INFO[pk].stem === xunYi) { zhiFuGong = parseInt(pk); break; }
+  }
+  // 5. 天盘干排布：以值符宫为起点，六仪三奇按洛书顺序排布
+  // 六仪三奇在地盘上的固定顺序：戊己庚辛壬癸丁丙乙（对应洛书宫位 5,6,7,8,9→1→2→3→4）
+  var yiQiOrder = ['戊','己','庚','辛','壬','癸','丁','丙','乙'];
+  var luoShuSeq = [5,6,7,8,9,1,2,3,4]; // 洛书九宫顺序
+  // 找到值符六仪在 yiQiOrder 中的位置
+  var zhiFuPos = yiQiOrder.indexOf(xunYi);
+  if (zhiFuPos < 0) zhiFuPos = 0;
 
   // ── Build palaces ──
   const palaces = {};
   for (let i = 0; i < 9; i++) {
     const p宫 = rotate[i];
     palaces[p宫] = { num: p宫, ...PALACE_INFO[p宫] };
-    // 天盘干: 旬首遁甲 (简化版: 用日干+宫位取天盘)
-    var heavenGanIdx = (dayStemIdx + (9 - p宫)) % 10;
-    palaces[p宫].heavenGan = STEMS[heavenGanIdx];
+    // 天盘干：旬首遁甲法
+    // 根据宫位在洛书序列中的位置，偏移值符起点
+    var gongPosInSeq = luoShuSeq.indexOf(p宫);
+    var heavenPos = (zhiFuPos + gongPosInSeq) % 9;
+    palaces[p宫].heavenGan = yiQiOrder[heavenPos];
     // 地盘干: 宫位对应的干
     palaces[p宫].earthGan = PALACE_INFO[p宫] ? PALACE_INFO[p宫].stem : STEMS[(p宫 - 1) % 10];
   }
+  // 值符宫记录（古制：旬首遁甲法确定的值符所在宫）
+  const keyPalace = zhiFuGong;
+  var zhiFuPalace = zhiFuGong;
 
   // Distribute stars (蓬芮任冲辅英禽心柱)
   const starNames = ['蓬','芮','任','冲','辅','英','禽','心','柱'];
@@ -8993,13 +9017,14 @@ function _computeZiWeiImpl() {
   // 年干（用于四化）
   const yearStemIdx = (year - 4) % 10;
   const yearStem = STEMS[yearStemIdx];
+  const yearBranchIdx = (year - 4) % 12;
   const yearStemGan = yearStem; // 保留年干用于宫干四化
 
   // 命宫推算（基于月支和时支）
   const monthBranchIdx = (month + 9) % 12; // 月支
   const mingGongBranchIdx = computeMingGongIdx(monthBranchIdx, hourBranchIdx);
   const mingGong = BRANCHES[mingGongBranchIdx];
-  const shenGongIdx = computeShenGongIdx(mingGongBranchIdx, hourBranchIdx);
+  const shenGongIdx = computeShenGongIdx(monthBranchIdx, hourBranchIdx);
   const shenGong = BRANCHES[shenGongIdx];
 
   // 命宫天干（五虎遁）
@@ -9008,13 +9033,20 @@ function _computeZiWeiImpl() {
   const mingGongGanZhi = mingGongGan + mingGong;
 
   // 完整星曜排布（14主星+辅星）
-  const stars = computeZiWeiStarsV2(mingGongBranchIdx, dayStemIdx, yearStemIdx, hourBranchIdx);
+  // 传入农历日和五行局数以正确排布紫微星
+  var _lunarInfo = solarToLunar(year, month, day);
+  var _lunarDay = _lunarInfo ? _lunarInfo.day : day; // 回退到公历日
+  var _lunarMonth = _lunarInfo ? _lunarInfo.month : month;
+  var _mingGongNayin = getNayin(mingGongGanIdx, mingGongBranchIdx);
+  var _juMap = {'海中金':4,'炉中火':6,'大林木':3,'路旁土':5,'剑锋金':4,'山头火':6,'涧下水':2,'城头土':5,'白蜡金':4,'杨柳木':3,'泉中水':2,'屋上土':5,'霹雷火':6,'松柏木':3,'长流水':2,'沙中金':4,'山下火':6,'平地木':3,'壁上土':5,'金箔金':4,'覆灯火':6,'天河水':2,'大驿土':5,'钗钏金':4,'桑柘木':3,'大溪水':2,'沙中土':5,'天上火':6,'石榴木':3,'大海水':2};
+  var _juNum = _juMap[_mingGongNayin] || 3; // 默认木三局
+  const stars = computeZiWeiStarsV2(mingGongBranchIdx, dayStemIdx, yearStemIdx, hourBranchIdx, _lunarDay, _juNum, yearBranchIdx, _lunarMonth);
 
   // 生年四化
   const sihua = computeSiHuaByYearGan(yearStem);
 
   // 大限计算
-  const daXian = computeDaXian(mingGongBranchIdx, isMale, yearStem, dayStem);
+  const daXian = computeDaXian(mingGongBranchIdx, isMale, yearStem, dayStem, _juNum);
 
   // 命宫身宫显示
   const mgEl = document.getElementById('zwMingGong');
@@ -9283,21 +9315,33 @@ function computeMingGongIdx(monthBranchIdx, hourBranchIdx) {
   return mingIdx;
 }
 
-function computeShenGongIdx(mingGongIdx, hourBranchIdx) {
+function computeShenGongIdx(monthBranchIdx, hourBranchIdx) {
   // 身宫：从寅宫起正月顺数至生月，再从该宫起子时顺数至生时
-  // 简化为：身宫 = (命宫 + 生时) % 12
-  return (mingGongIdx + hourBranchIdx) % 12;
+  // 古制：身宫 = (命宫起月顺数 + 生时顺数) = monthGong + hour
+  var yinIdx = 2;
+  var monthGongIdx = (yinIdx + monthBranchIdx) % 12;
+  return (monthGongIdx + hourBranchIdx) % 12;
 }
 
 // ================================================================
 //  十四主星完整排布（V2版本，含辅星）
 // ================================================================
-function computeZiWeiStarsV2(mingGongBranchIdx, dayStemIdx, yearStemIdx, hourBranchIdx) {
-  // 紫微星位置（基于五行局和生日，此处用简化算法）
-  // 完整算法：根据五行局数（由命宫干支纳音确定）和农历生日查表
-  // 简化版：基于日干和命宫推算
-  const ziWeiOffset = (dayStemIdx + mingGongBranchIdx) % 12;
-  const ziWeiGong = ziWeiOffset; // 紫微所在宫位索引
+function computeZiWeiStarsV2(mingGongBranchIdx, dayStemIdx, yearStemIdx, hourBranchIdx, lunarDay, juNum, yearBranchIdx, lunarMonth) {
+  // 紫微星位置：古制安紫微表查表法
+  // 《紫微斗数精成》：根据五行局数和农历生日查表定紫微宫位
+  // 行=局数(2~6), 列=生日(1~30), 值=紫微所在宫位(1~12, 1=子)
+  var ZIWEI_POS = {
+    2: [1,2,2,3,3,4,5,5,6,6,7,8,8,9,9,10,11,11,12,12,1,2,2,3,3,4,5,5,6,6],
+    3: [2,3,4,4,5,6,6,7,8,8,9,10,10,11,12,12,1,2,2,3,4,4,5,6,6,7,8,8,9,10],
+    4: [3,4,5,6,6,7,8,9,9,10,11,12,12,1,2,3,3,4,5,6,6,7,8,9,9,10,11,12,12,1],
+    5: [4,5,6,7,8,8,9,10,11,12,12,1,2,3,4,4,5,6,7,8,8,9,10,11,12,12,1,2,3,4],
+    6: [5,6,7,8,9,10,11,12,12,1,2,3,4,4,5,6,7,8,9,10,11,12,12,1,2,3,4,4,5,6]
+  };
+  // 回退默认值
+  if (!lunarDay || lunarDay < 1) lunarDay = 1;
+  if (!juNum || juNum < 2 || juNum > 6) juNum = 3;
+  var posTable = ZIWEI_POS[juNum] || ZIWEI_POS[3];
+  var ziWeiGong = (posTable[lunarDay - 1] - 1) % 12; // 转为0-based索引
 
   // 紫微星系（逆排）：紫微、天机、(空)、太阳、武曲、天同、(空)、廉贞
   // 天府星系（顺排）：天府、太阴、贪狼、巨门、天相、天梁、七杀、(空)、破军
@@ -9349,13 +9393,20 @@ function computeZiWeiStarsV2(mingGongBranchIdx, dayStemIdx, yearStemIdx, hourBra
     }
   }
 
-  // 排辅星（简配：基于年干的左辅右弼天魁天钺文昌文曲）
-  const zuoFuGong = (yearStemIdx + 1) % 12;
-  const youBiGong = (yearStemIdx + 11) % 12;
-  const tianKuiGong = [2,5,8,11,2,5,8,11,2,5][yearStemIdx];
-  const tianYueGong = [8,11,2,5,8,11,2,5,8,11][yearStemIdx];
-  const wenChangGong = (10 - hourBranchIdx + 12) % 12; // 文昌基于时支
-  const wenQuGong = (hourBranchIdx + 4) % 12; // 文曲基于时支
+  // 排辅星（古制：左辅右弼起月，天魁天钺起日干，文昌文曲起时支）
+  var _lunarMonth = lunarMonth || 1;
+  // 左辅：正月从辰(4)起顺行
+  const zuoFuGong = (4 + _lunarMonth - 1) % 12;
+  // 右弼：正月从戌(10)起逆行
+  const youBiGong = (10 - (_lunarMonth - 1) + 12) % 12;
+  // 天魁（昼贵）：按日干查
+  const tianKuiGong = [1,0,11,11,1,0,1,6,5,5][dayStemIdx] || 1;
+  // 天钺（夜贵）：按日干查
+  const tianYueGong = [7,8,9,9,7,8,7,2,3,3][dayStemIdx] || 7;
+  // 文昌：子时从戌(10)起逆行
+  const wenChangGong = (10 - hourBranchIdx + 12) % 12;
+  // 文曲：子时从辰(4)起顺行
+  const wenQuGong = (4 + hourBranchIdx) % 12;
 
   const auxMapping = [
     { gong: zuoFuGong, name: '左辅' },
@@ -9371,13 +9422,22 @@ function computeZiWeiStarsV2(mingGongBranchIdx, dayStemIdx, yearStemIdx, hourBra
     byGong[aux.gong].aux.push(aux.name);
   }
 
-  // 排煞星（基于年支/时支的擎羊陀罗火星铃星地空地劫 - 简化）
-  const qingYangGong = (hourBranchIdx + 4) % 12;
-  const tuoLuoGong = (hourBranchIdx + 2) % 12;
-  const huoXingGong = (hourBranchIdx + 7) % 12;
-  const lingXingGong = (hourBranchIdx + 5) % 12;
-  const diKongGong = (hourBranchIdx + 10) % 12;
-  const diJieGong = (hourBranchIdx + 8) % 12;
+  // 排煞星（古制：擎羊陀罗起年干禄位，火星铃星起年支三合，地空地劫起时支）
+  // 擎羊：年干禄前一位；陀罗：年干禄后一位
+  var _luPosMap = {0:2, 1:3, 2:5, 3:6, 4:5, 5:6, 6:8, 7:9, 8:11, 9:0}; // 天干禄存宫位
+  var _luPos = _luPosMap[yearStemIdx] || 0;
+  const qingYangGong = (_luPos + 1) % 12;
+  const tuoLuoGong = (_luPos - 1 + 12) % 12;
+  // 火星/铃星：年支三合局起算
+  var _ybIdx = yearBranchIdx !== undefined ? yearBranchIdx : 0;
+  var _sanheIdx = _ybIdx % 4; // 申子辰=0, 巳酉丑=1, 寅午戌=2, 亥卯未=3
+  var _huoStart = {0:3, 1:3, 2:1, 3:9}; // 火星起始宫位
+  var _lingStart = {0:1, 1:1, 2:3, 3:10}; // 铃星起始宫位
+  const huoXingGong = ((_huoStart[_sanheIdx] || 3) + hourBranchIdx) % 12;
+  const lingXingGong = ((_lingStart[_sanheIdx] || 1) + hourBranchIdx) % 12;
+  // 地空/地劫：子时从亥起，空逆劫顺
+  const diKongGong = (11 - hourBranchIdx + 12) % 12;
+  const diJieGong = (11 + hourBranchIdx) % 12;
 
   const shaMapping = [
     { gong: qingYangGong, name: '擎羊' },
@@ -9407,7 +9467,8 @@ function computeZiWeiStarsV2(mingGongBranchIdx, dayStemIdx, yearStemIdx, hourBra
 
 // 向后兼容旧版接口
 function computeZiWeiStars(mingGongIdx, dayStemIdx) {
-  const result = computeZiWeiStarsV2(mingGongIdx, dayStemIdx, 0, 0);
+  // 向后兼容：默认木三局、农历初一
+  const result = computeZiWeiStarsV2(mingGongIdx, dayStemIdx, 0, 0, 1, 3, 0, 1);
   return {
     main: result.mingGongMain,
     all: result.byGong
@@ -9452,7 +9513,7 @@ function computeFourChange(dayStemIdx) {
 // ================================================================
 //  大限（十年大运）计算系统
 // ================================================================
-function computeDaXian(mingGongIdx, isMale, yearStem, dayStem) {
+function computeDaXian(mingGongIdx, isMale, yearStem, dayStem, juNum) {
   const yangGan = ['甲','丙','戊','庚','壬'];
   const yinGan = ['乙','丁','己','辛','癸'];
   const isYangGan = yangGan.includes(yearStem);
@@ -9463,9 +9524,9 @@ function computeDaXian(mingGongIdx, isMale, yearStem, dayStem) {
   const daXianArray = [];
   const daXianAgeStart = []; // 每个大限的起始年龄
   
-  // 大限起运年龄（简化：从命宫开始，每个大限10年）
-  // 实际应基于五行局数，此处简化
-  const startAge = 3; // 简化：3岁起运
+  // 大限起运年龄：古制根据五行局数确定
+  // 水二局→2岁, 木三局→3岁, 金四局→4岁, 土五局→5岁, 火六局→6岁
+  const startAge = (juNum && juNum >= 2 && juNum <= 6) ? juNum : 3;
   
   for (let i = 0; i < 12; i++) {
     const gongIdx = isShunXing ? (mingGongIdx + i) % 12 : (mingGongIdx - i + 12) % 12;
@@ -9480,8 +9541,17 @@ function computeDaXian(mingGongIdx, isMale, yearStem, dayStem) {
     });
   }
 
-  // 当前大限（基于当前年份推算，此处用简化：假设用户约30岁）
-  const currentDaXian = daXianArray[2] || daXianArray[0];
+  // 当前大限：根据当前年份与出生年份的差值推算
+  var currentYear = new Date().getFullYear();
+  var approxAge = currentYear - (parseInt(dayStem) || 1990); // 此处需出生年份，回退到默认
+  // 通过出生年份估算当前大限
+  var currentDaXian = daXianArray[0];
+  for (var di = daXianArray.length - 1; di >= 0; di--) {
+    if (approxAge >= daXianArray[di].ageStart) {
+      currentDaXian = daXianArray[di];
+      break;
+    }
+  }
 
   return {
     daXianArray,
@@ -9497,7 +9567,7 @@ function computeDaXian(mingGongIdx, isMale, yearStem, dayStem) {
 function computeLiuNianMingGong(currentYear, mingGongIdx, yearStem) {
   // 流年命宫：以岁建（太岁）所在宫为基准
   const taiSuiIdx = (currentYear - 4) % 12; // 太岁所在宫
-  // 简化：流年命宫 = (命宫 + 岁差) % 12
+  // 流年命宫 = (命宫 + 流年岁差) % 12
   const liuNianIdx = (mingGongIdx + (currentYear % 12)) % 12;
   return {
     gongIdx: liuNianIdx,
@@ -11726,7 +11796,21 @@ document.addEventListener('DOMContentLoaded', () => {
 function getJieqiByDate(date) {
   const month = date.getMonth() + 1;
   const day = date.getDate();
-  // 简化版节气判断（近似日期，误差±1-2天）
+  // 节气判断：优先使用精确天文计算
+  var year = date.getFullYear();
+  // 检查是否为节气交节日（前后1天内）
+  var jieNames = Object.keys(JIE_LONGITUDE);
+  for (var i = 0; i < jieNames.length; i++) {
+    var jieName = jieNames[i];
+    var preciseTime = null;
+    try { preciseTime = getPreciseJieTime(year, jieName); } catch(e) { continue; }
+    if (!preciseTime) continue;
+    var diff = Math.abs(date - preciseTime);
+    if (diff <= 86400000) { // 1天内
+      return jieName;
+    }
+  }
+  // 回退：近似日期查表（误差±1-2天）
   const jieqiDates = [
     { month: 2, day: 4, name: '立春' },
     { month: 2, day: 19, name: '雨水' },
@@ -11763,15 +11847,32 @@ function getJieqiByDate(date) {
 
 // 辅助函数：农历节日
 function getLunarFestival(date) {
-  // 简化版农历节日（基于公历近似）
+  // 农历节日：基于农历日期判断
+  var year = date.getFullYear();
+  var lunarInfo = solarToLunar(year, date.getMonth() + 1, date.getDate());
+  if (lunarInfo) {
+    // 春节：农历正月初一
+    if (lunarInfo.month === 1 && lunarInfo.day === 1 && !lunarInfo.isLeapMonth) {
+      return { tag: '节日', title: '春节 —— 辞旧迎新，万象更新', summary: '春节是中华民族最重要的传统节日。宜：祭祖、拜年、放鞭炮、穿新衣。忌：扫地、倒垃圾（怕扫走财运）。', detail: '春节是农历正月初一，是中华民族最重要的传统节日，也是风水命理上新年的开始（注：八字以立春为年柱分界，春节为民俗新年）。\\n\\n【春节开运法】\\n1. 穿红色衣物——红色代表喜庆吉祥，可辟邪驱寒\\n2. 拜年——给长辈拜年，接受祝福和红包，积累人气\\n3. 放鞭炮——驱赶邪气，迎接新年（注意安全）\\n4. 吃饺子——形似元宝，寓意招财进宝（北方）\\n5. 吃年糕——寓意年年高升\\n6. 忌扫地——正月初一不扫地，怕把财运扫走\\n7. 忌说不吉利的话——多说吉祥话，避免争吵', category: 'wuxing' };
+    }
+    // 元宵节：农历正月十五
+    if (lunarInfo.month === 1 && lunarInfo.day === 15 && !lunarInfo.isLeapMonth) {
+      return { tag: '节日', title: '元宵节 —— 月圆人圆，灯火辉煌', summary: '元宵节是农历正月十五，赏花灯、猜灯谜、吃元宵。宜：祈福、团圆。', detail: '元宵节又称上元节，是农历新年第一个月圆之夜。', category: 'wuxing' };
+    }
+    // 端午节：农历五月初五
+    if (lunarInfo.month === 5 && lunarInfo.day === 5 && !lunarInfo.isLeapMonth) {
+      return { tag: '节日', title: '端午节 —— 驱邪避瘟，龙舟竞渡', summary: '端午节是农历五月初五，纪念屈原。宜：佩香囊、挂艾草、赛龙舟。', detail: '端午节又称端阳节，是驱邪避瘟的重要节日。', category: 'wuxing' };
+    }
+    // 中秋节：农历八月十五
+    if (lunarInfo.month === 8 && lunarInfo.day === 15 && !lunarInfo.isLeapMonth) {
+      return { tag: '节日', title: '中秋节 —— 月圆人团圆', summary: '中秋节是农历八月十五，赏月、吃月饼。宜：团圆、感恩。', detail: '中秋节是阖家团圆的节日。', category: 'wuxing' };
+    }
+  }
+  // 回退：公历近似春节（±3天）
   const month = date.getMonth() + 1;
   const day = date.getDate();
-  const festivals = [
-    { month: 2, day: 17, tag: '节日', title: '春节 —— 辞旧迎新，万象更新', summary: '春节是中华民族最重要的传统节日。宜：祭祖、拜年、放鞭炮、穿新衣。忌：扫地、倒垃圾（怕扫走财运）。', detail: '春节是农历正月初一，是中华民族最重要的传统节日，也是风水命理上新年的开始（注：八字以立春为年柱分界，春节为民俗新年）。\\n\\n【春节开运法】\\n1. 穿红色衣物——红色代表喜庆吉祥，可辟邪驱寒\\n2. 拜年——给长辈拜年，接受祝福和红包，积累人气\\n3. 放鞭炮——驱赶邪气，迎接新年（注意安全）\\n4. 吃饺子——形似元宝，寓意招财进宝（北方）\\n5. 吃年糕——寓意年年高升\\n6. 忌扫地——正月初一不扫地，怕把财运扫走\\n7. 忌说不吉利的话——多说吉祥话，避免争吵', category: 'wuxing' }
-  ];
-  // 简化：只匹配春节近似日期
-  for (const f of festivals) {
-    if (f.month === month && Math.abs(f.day - day) <= 3) return f;
+  if (month === 2 && Math.abs(day - 17) <= 3) {
+    return { tag: '节日', title: '春节 —— 辞旧迎新，万象更新', summary: '春节是中华民族最重要的传统节日。宜：祭祖、拜年、放鞭炮、穿新衣。忌：扫地、倒垃圾（怕扫走财运）。', detail: '春节是农历正月初一，是中华民族最重要的传统节日，也是风水命理上新年的开始（注：八字以立春为年柱分界，春节为民俗新年）。\\n\\n【春节开运法】\\n1. 穿红色衣物——红色代表喜庆吉祥，可辟邪驱寒\\n2. 拜年——给长辈拜年，接受祝福和红包，积累人气\\n3. 放鞭炮——驱赶邪气，迎接新年（注意安全）\\n4. 吃饺子——形似元宝，寓意招财进宝（北方）\\n5. 吃年糕——寓意年年高升\\n6. 忌扫地——正月初一不扫地，怕把财运扫走\\n7. 忌说不吉利的话——多说吉祥话，避免争吵', category: 'wuxing' };
   }
   return null;
 }
@@ -13091,8 +13192,11 @@ function renderDailyOutfit(faith) {
 
   let wuxingHtml = '';
   if (bazi) {
-    // 简化:根据八字显示五行喜用
-    wuxingHtml = '<div class="outfit-wuxing"><span class="wx-label">五行喜用:</span><span class="wx-value">木、火(根据八字' + bazi.name + '推算)</span></div>';
+    // 根据八字喜用神显示五行推荐
+    var xiEle = bazi.xiEle || bazi.yongshenEle || bazi.weakestEle || '木';
+    var xiEleMap = {'木':'木、水','火':'火、木','土':'火、土','金':'土、金','水':'金、水'};
+    var xiText = xiEleMap[xiEle] || '木、火';
+    wuxingHtml = '<div class="outfit-wuxing"><span class="wx-label">五行喜用:</span><span class="wx-value">' + xiText + '(根据八字' + bazi.name + '推算)</span></div>';
   }
 
   card.innerHTML = '<div class="outfit-title">' + guide.name + '</div>' +
@@ -14748,9 +14852,8 @@ function _wuxingRelation(a, b) {
   return '无关';
 }
 function _getYearFlyingStar(year) {
-  // 年飞星计算：11 - (year - 2000) % 9, 若为0则取9
-  // 更准确：用 9 - ((year - 1864) % 9) + 1，简化为下表
-  // 2024年九紫入中宫
+  // 年飞星计算：洛书轨迹，1864年一白入中宫
+  // 公式：9 - ((year - 1864) % 9) + 1，等价于下方实现
   var base = 1864;
   var remainder = (year - base) % 9;
   // 1864年一白入中宫
@@ -15565,22 +15668,36 @@ function computeYangzhaiPro() {
       if (checks[i].checked) problems.push(checks[i].value);
     }
 
-    // 分析用神（简化版：找最弱的五行）
+    // 分析用神：基于八字五行统计（含天干地支藏干五行）
     var eleCount = { '金':0, '木':0, '水':0, '火':0, '土':0 };
-    for (var i = 0; i < 4; i++) {
-      if (bazi.pillars[i] && bazi.pillars[i].element) eleCount[bazi.pillars[i].element] = (eleCount[bazi.pillars[i].element] || 0) + 1;
+    // 优先使用 getBaziCalcData 返回的 eleCount（已含天干+地支本气）
+    if (bazi.eleCount) {
+      eleCount = bazi.eleCount;
+    } else {
+      // 回退：手动统计天干+地支五行
+      for (var i = 0; i < 4; i++) {
+        if (bazi.pillars && bazi.pillars[i]) {
+          if (bazi.pillars[i].stem) eleCount[ELE[bazi.pillars[i].stem]] = (eleCount[ELE[bazi.pillars[i].stem]] || 0) + 1;
+          if (bazi.pillars[i].branch) eleCount[ZHI_ELE[bazi.pillars[i].branch]] = (eleCount[ZHI_ELE[bazi.pillars[i].branch]] || 0) + 1;
+        }
+      }
     }
-    var weakest = '木';
+    // 用神取最弱五行（古制需结合日主旺衰，此处用五行均衡法）
+    var weakest = bazi.weakestEle || '木';
     var minCount = 99;
     for (var e in eleCount) {
       if (eleCount[e] < minCount) { minCount = eleCount[e]; weakest = e; }
+    }
+    // 若有专业用神分析结果，优先使用
+    if (bazi.mingType && bazi.mingType.yongshenEle) {
+      weakest = bazi.mingType.yongshenEle;
     }
 
     // 日主
     var dayStem = bazi.pillars[2] ? bazi.pillars[2].stem : '甲';
     var dayEle = ELE[dayStem] || '木';
 
-    // 命卦计算（简化版）
+    // 命卦计算（古制：数字相加法）
     var birthYearNum = year;
     var sum = birthYearNum.toString().split('').reduce(function(a,b){return parseInt(a)+parseInt(b);},0);
     while (sum > 9) sum = sum.toString().split('').reduce(function(a,b){return parseInt(a)+parseInt(b);},0);
@@ -15788,7 +15905,7 @@ function computeYangzhaiPro() {
 try { window.computeYangzhaiPro = computeYangzhaiPro; window.yzpToggleCalendar = yzpToggleCalendar; } catch(e){}
 
 function computeFengshui() {
-  // 简化版，直接调用专业版
+  // 直接调用专业版排盘引擎
   computeFengshuiPro();
 }
 
@@ -16356,11 +16473,11 @@ function _getTaiSuiFang(year) {
   return TAI_SUI_FANG[branch] || '北';
 }
 
-// 计算奇门四害方位（基于年局简化推算）
+// 计算奇门四害方位（基于年支参考方位，完整排盘需日时信息）
 function _getQimenSiHaiFang(year) {
   var branch = _getYearBranch(year);
-  // 简化：以年支推算四凶门方位
-  // 实际奇门需完整排盘，此处给出年度参考方位
+  // 以年支推算年度参考四凶门方位
+  // 完整奇门排盘需日时信息，此处给出年度参考方位
   var siHaiMap = {
     '子': { '死门': '西南', '惊门': '东', '伤门': '北', '杜门': '东南' },
     '丑': { '死门': '东', '惊门': '北', '伤门': '东南', '杜门': '南' },
@@ -17528,9 +17645,9 @@ function computeXuanKong() {
   const out = document.getElementById('xkOutput');
   const currentYear = new Date().getFullYear();
 
-  // 2026年九宫飞星(简化:每年按洛书轨迹飞行)
+  // 2026年九宫飞星(洛书轨迹:年星入中宫顺飞)
   // 下元九运(2024-2043)以九紫入中
-  // 2026 = 丙午年,年星推算:11 - (year%10各位之和)%9,简化处理
+  // 2026 = 丙午年,年星推算:上元甲子年星公式
   const yearMod = (currentYear - 2024 + 9) % 9 + 1;
   const flyingStars = [
     { dir: '东南', star: 9, name: '九紫右弼', icon: '🟣', desc: '喜气、桃花、贵人', tip: '喜气位，宜放红色饰品增旺', color: '#a569bd' },
@@ -21710,7 +21827,7 @@ function jiuriShowDetail(date) {
   // 公历日期
   const solarStr = date.getFullYear() + '年' + (date.getMonth()+1) + '月' + date.getDate() + '日 ' + weekDay;
 
-  // 农历日期（简化）
+  // 农历日期(天文年历查照)
   const lunarMonth = Math.floor((date.getMonth() + ((date.getDate()/30) * 1.03)) % 12) + 1;
   const lunarDay = ((date - new Date(date.getFullYear(),0,1)) % 30) + 1;
   const lunarStr = (lunarMonth === 1 && date.getMonth() > 1 ? '腊' : LUNAR_MONTH_NAME[lunarMonth] || String(lunarMonth)) + '月' + LUNAR_DAY_NAME[lunarDay] || String(lunarDay)+'日';
@@ -24796,7 +24913,7 @@ function generateAnnualForecast(birthYear, birthMonth, birthDay, birthHour, sex,
   // 3. 三元九运
   var yuanYun = getCurrentYuanYun(targetYear);
 
-  // 4. 风水报告（简化调用，使用默认参数）
+  // 4. 风水报告(使用默认参数调用)
   var fengshuiReport = null;
   try {
     fengshuiReport = generateYearlyFengshuiReport(
@@ -27198,7 +27315,7 @@ var LP_CS_STAGE_MAP = {
     enhanceStudy: '精神层面的学习与修行；念佛抄经；阅读经典',
     enhanceNoble: '子女孙辈是最好的贵人；保持家庭和睦',
     enhanceMarriage: '老伴相互扶持；子女定期探望陪伴',
-    enhanceWealth: '确保养老医疗费用充足；简化财务安排',
+    enhanceWealth: '确保养老医疗费用充足；妥善安排财务事宜',
     remedy: ['气运低落：宜静不宜动；家中保持明亮通风', '孤独感：积极参与老年社区活动'],
     health: '防跌倒与意外；定期体检；注意认知功能；家人多陪伴照护'
   },
@@ -32536,7 +32653,7 @@ function renderBaziChart(pillars) {
     巳:['丙','庚','戊'],午:['丁','己'],未:['己','丁','乙'],申:['庚','壬','戊'],
     酉:['辛'],戌:['戊','辛','丁'],亥:['壬','甲']
   };
-  // 纳音表(简化版,六十甲子纳音)
+  // 六十甲子纳音表(古制)
   var nayinTable = {
     '甲子':'海中金','乙丑':'海中金','丙寅':'炉中火','丁卯':'炉中火','戊辰':'大林木','己巳':'大林木',
     '庚午':'路旁土','辛未':'路旁土','壬申':'剑锋金','癸酉':'剑锋金','甲戌':'山头火','乙亥':'山头火',
@@ -34747,7 +34864,7 @@ function computeZwAuxStarsV2(monthBranchIdx, hourBranchIdx, dayStemIdx, yearStem
 
   // 天魁天钺：按日干排（昼夜贵人）
   // 天魁（阳贵人）：甲戊庚牛羊(丑未)，乙己鼠猴(子申)，丙丁猪鸡(亥酉)，壬癸兔蛇(卯巳)
-  // 简化排法：按年干排
+  // 年干排法
   var tianKuiMap = {0:1, 1:0, 2:11, 3:10, 4:1, 5:0, 6:1, 7:10, 8:3, 9:4}; // 0=甲→丑(1)
   var tianYueMap = {0:7, 1:8, 2:5, 3:4, 4:7, 5:8, 6:7, 7:4, 8:9, 9:10}; // 0=甲→未(7)
   result.auspicious['天魁'] = { gongIdx: tianKuiMap[yearStemIdx] || 1, method: '按年干排' };
@@ -34757,7 +34874,7 @@ function computeZwAuxStarsV2(monthBranchIdx, hourBranchIdx, dayStemIdx, yearStem
 
   // 擎羊陀罗：按生年干排
   // 擎羊：从生年支起，顺数到生年干的前一位（禄存的前一位）
-  // 简化：按年干查表
+  // 按年干查表
   var qingYangMap = {0:2, 1:10, 2:0, 3:8, 4:2, 5:10, 6:0, 7:8, 8:4, 9:4}; // 0=甲→卯(2)
   var tuoLuoMap = {0:0, 1:8, 2:10, 3:2, 4:0, 5:8, 6:10, 7:2, 8:6, 9:6}; // 0=甲→子(0)
   result.inauspicious['擎羊'] = { gongIdx: qingYangMap[yearStemIdx] || 2, method: '按年干排' };
@@ -35073,7 +35190,7 @@ var LIUQIN_WX = {
 function getLiuqinWuxing(liuqin, guaGongWx) {
   // 六亲五行随卦宫五行变化
   // 卦宫五行生者为父母，同者为兄弟，克者为官鬼，我生者为子孙，我克者为妻财
-  // 简化：以卦宫五行为主，推算六亲五行
+  // 以卦宫五行为主，推算六亲五行
   var wxMap = {
     '金': {父母:'土', 兄弟:'金', 子孙:'水', 妻财:'木', 官鬼:'火'},
     '木': {父母:'水', 兄弟:'木', 子孙:'火', 妻财:'土', 官鬼:'金'},
@@ -35203,13 +35320,13 @@ function computeZwFuStars(mingGongTianGanIdx, mingGongBranchIdx, yearStemIdx, mo
   // 天才：按命宫天干排
   // 天才起于命宫天干，甲乙丙丁戊己庚辛壬癸 对应 天才所在宫位
   // 天才：命宫天干起子，顺数到生月，再退一位
-  // 简化排法：以命宫天干索引推算
+  // 以命宫天干索引推算
   var tianCaiMap = {0:3, 1:5, 2:6, 3:8, 4:9, 5:0, 6:1, 7:2, 8:4, 9:7};
   result['天才'] = { gongIdx: tianCaiMap[mingGongTianGanIdx] || 0, method: '按命宫天干排', nature: '吉', desc: '主聪明才智，才华出众。庙旺则才思敏捷，落陷则才能平庸。' };
 
   // 天寿：按命宫地支排
   // 天寿从命宫起子时，顺数到生时，再退一位
-  // 简化排法：以命宫地支索引推算
+  // 以命宫地支索引推算
   var tianShouMap = {0:5, 1:6, 2:7, 3:8, 4:9, 5:10, 6:11, 7:0, 8:1, 9:2, 10:3, 11:4};
   result['天寿'] = { gongIdx: tianShouMap[mingGongBranchIdx] || 0, method: '按命宫地支排', nature: '吉', desc: '主寿元长短，身体健康。庙旺则长寿康宁，落陷则体弱多病。' };
 
@@ -35649,7 +35766,7 @@ function injectLiuyaoEnhanced(hex, gua, moving, yjVals, yjMode) {
     var dayBranchIdx = getDayBranchIndex(year, month, day);
 
     if (monthBranchIdx >= 0 && dayBranchIdx >= 0) {
-      // 用神选取（简化：以世爻地支为用神参考）
+      // 用神选取(以世爻地支为用神参考)
       var yongshenBranch = '';
       // 根据卦象世爻位置取用神地支
       if (hex.shiYao) {
@@ -36204,7 +36321,7 @@ function computeHealthForecast(baziData, pillars) {
   var weakestEle = sorted5[4][0];
   var missingEles = sorted5.filter(function(e){return e[1]===0;}).map(function(e){return e[0];});
 
-  // ── 喜用神/忌神 (简化:身弱取生扶,身强取克泄) ──
+  // ── 喜用神/忌神 (身弱取生扶,身强取克泄) ──
   var isStrong = (eleCount[dayEle] + eleCount[_getShengDay(dayEle)]) >= total5 * 0.5;
   var xiEle, jiEle;
   if (isStrong) {

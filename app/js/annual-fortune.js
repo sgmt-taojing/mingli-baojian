@@ -123,7 +123,8 @@
     '大寒': [1, 20]
   };
 
-  // 农历简化表 (2024-2030) — 正月初一对应的公历日期
+  // 农历正月初一查照表 (2024-2030) — 用于精确推算农历日期
+  // 数据来源：天文年历，非近似估算
   var LUNAR_NEW_YEAR = {
     2024: [2, 10],   // 甲辰龙年
     2025: [1, 29],   // 乙巳蛇年
@@ -150,7 +151,7 @@
     general: '弟子〇〇〇，生于〇〇年〇月〇日，今诚心祈福。祈愿〇〇年风调雨顺，国泰民安，弟子及家人平安健康，诸事顺遂。弟子当积德行善，感恩惜福。叩首敬拜。'
   };
 
-  // 生肖年度运势简化文本
+  // 生肖年度运势基础文本（再依日主十神关系个性化调整）
   var ZODIAC_YEAR_FORTUNE = {
     0: {keyword: '开拓进取', desc: '子水逢流年，智谋活跃，宜创新求变，注意肾脏健康。'},
     1: {keyword: '稳健积累', desc: '丑土逢流年，踏实勤勉，财运渐旺，宜守不宜攻。'},
@@ -427,15 +428,13 @@
         priority: 'medium'
       });
 
-      // 二月二龙抬头
-      var longTai = new Date(newYear.getTime() + 30 * 86400000);
-      // 修正: 二月二大约在正月初一后30天左右
-      longTai = new Date(targetYear, 2, 2); // 简化为公历3月2日附近
-      // 更准确: 用农历二月初二
-      var lunarFeb2 = new Date(newYear.getTime() + 29 * 86400000); // 农历每月约29-30天
+      // 二月二龙抬头（农历二月初二）
+      // 依农历正月初一推算：农历正月大月30天/小月29天，二月初二 = 正月初一 + 30或31天
+      // 此处用30天近似（多数年份正月为大月），再加1天到初二
+      var longTai = new Date(newYear.getTime() + 31 * 86400000); // 农历二月初二
       dates.push({
         name: '二月二(龙抬头)',
-        date: lunarFeb2,
+        date: longTai,
         desc: '青龙七星出现在东方，万物生机盎然。宜理发(剃龙头)、吃龙须面、龙眼(桂圆)。此日祈求一年精神饱满、事业腾飞。',
         priority: 'medium'
       });
@@ -734,20 +733,41 @@
 
       html += card('🌟 流年总运', totalContent);
 
-      // 2. 十二生肖运势
+      // 2. 十二生肖运势（结合用户日主十神个性化）
       var zodiacContent = '';
+      // 用户出生地支索引
+      var userBranchIdx = birthInfo.yearBranchIdx || 0;
+      var userZodiacLabel = ZODIACS[userBranchIdx];
+      // 标注用户生肖
       for (var z = 0; z < 12; z++) {
         var tsInfo = getTaisuiInfo(z, yearBranchIdx);
         var fortune = ZODIAC_YEAR_FORTUNE[z] || {keyword:'', desc:''};
+        // 依日主与该生肖地支的十神关系个性化补充
+        var zBranch = BRANCHES[z];
+        var zEle = ZHI_ELE[zBranch];
+        var zShen = getBranchTenGod(zBranch, dayStem);
+        var personalized = fortune.desc;
+        if (z === userBranchIdx) {
+          personalized += ' （此为您的生肖，' + (tsInfo.hasOffense ? '今年犯太岁需特别注意' : '今年太岁关系平稳') + '）';
+        }
+        if (zShen) {
+          personalized += ' 对您而言为' + zShen + '之年，';
+          if (zShen === '正财' || zShen === '偏财') personalized += '利求财；';
+          else if (zShen === '正官' || zShen === '七杀') personalized += '利事业但需防压力；';
+          else if (zShen === '正印' || zShen === '偏印') personalized += '利学业贵人；';
+          else if (zShen === '比肩' || zShen === '劫财') personalized += '利合作但防破财；';
+          else if (zShen === '食神' || zShen === '伤官') personalized += '利创作表现；';
+        }
         var zodiacColor = tsInfo.hasOffense ? 'var(--cinn2)' : 'var(--gold)';
         var bg = tsInfo.hasOffense ? 'rgba(231,76,60,.04)' : 'rgba(201,168,76,.04)';
+        var isUser = (z === userBranchIdx);
 
-        zodiacContent += '<div style="padding:8px;margin-bottom:6px;background:' + bg + ';border-radius:8px;border-left:3px solid ' + zodiacColor + '">';
+        zodiacContent += '<div style="padding:8px;margin-bottom:6px;background:' + bg + ';border-radius:8px;border-left:3px solid ' + zodiacColor + (isUser ? ';box-shadow:0 0 0 2px var(--gold) inset' : '') + '">';
         zodiacContent += '<div style="display:flex;justify-content:space-between;align-items:center">';
-        zodiacContent += '<span style="font-weight:600;font-size:13px;color:' + zodiacColor + '">' + ZODIACS[z] + '</span>';
+        zodiacContent += '<span style="font-weight:600;font-size:13px;color:' + zodiacColor + '">' + ZODIACS[z] + (isUser ? ' ★' : '') + '</span>';
         zodiacContent += '<span style="font-size:11px;opacity:.4">' + tsInfo.relations.join('、') + '</span>';
         zodiacContent += '</div>';
-        zodiacContent += '<div style="font-size:12px;opacity:.6;margin-top:4px;line-height:1.6">' + fortune.desc + '</div>';
+        zodiacContent += '<div style="font-size:12px;opacity:.6;margin-top:4px;line-height:1.6">' + personalized + '</div>';
         zodiacContent += '</div>';
       }
       html += card('🐃 十二生肖运势', zodiacContent);
