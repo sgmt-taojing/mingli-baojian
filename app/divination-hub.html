@@ -3933,6 +3933,10 @@ setTimeout(removeLoadingOverlay,5000);
         <span class="mobile-quick-icon">🧬</span>
         <div class="mobile-quick-text"><div class="mobile-quick-name">体质辨识</div><div class="mobile-quick-desc">五行养生</div></div>
       </div>
+      <div class="mobile-quick-item" onclick="showSection('healing-music')">
+        <span class="mobile-quick-icon">🎵</span>
+        <div class="mobile-quick-text"><div class="mobile-quick-name">养心音乐</div><div class="mobile-quick-desc">净心修心</div></div>
+      </div>
     </div>
   </div>
 </section>
@@ -29283,27 +29287,545 @@ function tzRenderQigong(){
 }
 
 function tzRenderPrescriptions(){
-  var list=TZ_DATA.famousPrescriptions||[];
-  var html=list.map(function(p){
-    return '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:18px">'+
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
-        '<span style="font-size:16px;color:var(--gold);font-weight:bold">💊 '+p.name+'</span>'+
-        '<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(201,168,76,0.1);color:var(--gold2)">'+p.category+'</span>'+
-      '</div>'+
-      '<div style="font-size:12px;color:var(--paper3);margin-bottom:8px">出处：'+p.source+'</div>'+
-      '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;margin-bottom:10px">'+
-        '<div style="font-size:12px;color:var(--gold);margin-bottom:6px">组成</div>'+
-        '<div style="font-size:13px;color:var(--paper);line-height:1.7">'+p.composition+'</div>'+
-      '</div>'+
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'+
-        '<div style="background:rgba(45,106,79,0.06);border-radius:6px;padding:10px"><div style="font-size:11px;color:var(--success);margin-bottom:4px">功效</div><div style="font-size:12px;color:var(--paper2)">'+p.effect+'</div></div>'+
-        '<div style="background:rgba(255,255,255,0.03);border-radius:6px;padding:10px"><div style="font-size:11px;color:var(--gold2);margin-bottom:4px">主治</div><div style="font-size:12px;color:var(--paper2)">'+p.usage+'</div></div>'+
-      '</div>'+
-      '<div style="display:flex;gap:4px;flex-wrap:wrap">'+p.constitutions.map(function(c){return '<span style="font-size:11px;padding:2px 8px;background:rgba(201,168,76,0.08);border:1px solid var(--border);border-radius:10px;color:var(--gold2)">适合：'+c+'质</span>';}).join('')+'</div>'+
-    '</div>';
-  }).join('');
-  var el=document.getElementById('tzPrescriptionList');
-  if(el) el.innerHTML=html;
+  rxRenderDoctorsByDynasty();
+  rxRenderHeritage();
+  rxRenderNihonsha();
+}
+
+// ===== 名医名方数据库 =====
+var RX_DOCTORS_DATA = {
+  dynasties: [
+    {
+      dynasty: '汉代',
+      doctors: [
+        {
+          name: '张仲景', era: '东汉末年', school: '伤寒学派',
+          book: '《伤寒杂病论》',
+          thought: '创立六经辨证体系，确立辨证论治原则，被后世尊为"医圣"。强调诊病须脉证合参，方证对应。',
+          prescriptions: [
+            {name:'桂枝汤', composition:'桂枝、芍药、生姜、大枣、炙甘草', effect:'解肌发表，调和营卫', indication:'外感风寒表虚证，头痛发热、汗出恶风', usage:'水煎服，温覆取微汗', contraindication:'表实无汗者忌用', symptoms:'头痛,发热,汗出,恶风,感冒'},
+            {name:'麻黄汤', composition:'麻黄、桂枝、杏仁、炙甘草', effect:'发汗解表，宣肺平喘', indication:'外感风寒表实证，恶寒发热、无汗而喘', usage:'水煎服，温覆取汗', contraindication:'表虚自汗者忌用', symptoms:'发热,恶寒,无汗,咳喘,感冒'},
+            {name:'白虎汤', composition:'石膏、知母、粳米、炙甘草', effect:'清热生津', indication:'阳明经证，大热、大汗、大渴、脉洪大', usage:'水煎服', contraindication:'表证未解或阴虚发热者忌用', symptoms:'高热,口渴,出汗,烦躁'},
+            {name:'小柴胡汤', composition:'柴胡、黄芩、人参、半夏、炙甘草、生姜、大枣', effect:'和解少阳', indication:'少阳证，寒热往来、胸胁苦满、口苦咽干', usage:'水煎服', contraindication:'肝阳上亢者慎用', symptoms:'寒热往来,口苦,咽干,目眩,胸胁胀满'},
+            {name:'承气汤系列', composition:'大承气汤：大黄、芒硝、枳实、厚朴', effect:'峻下热结', indication:'阳明腑实证，大便秘结、腹痛拒按', usage:'水煎服，得下即停服', contraindication:'孕妇禁用，脾胃虚寒者忌用', symptoms:'便秘,腹痛,腹胀,发热'}
+          ]
+        },
+        {
+          name: '华佗', era: '东汉末年', school: '外科鼻祖',
+          book: '《中藏经》（传）',
+          thought: '精于方药、针灸、外科手术，发明麻沸散用于麻醉，创五禽戏导引功法。提倡"治未病"理念。',
+          prescriptions: [
+            {name:'麻沸散', composition:'蔓陀罗花、生草乌、香白芷等（传方）', effect:'麻醉止痛', indication:'外科手术麻醉', usage:'内服', contraindication:'非手术不可用', symptoms:'疼痛,手术'},
+            {name:'五禽戏', composition:'虎、鹿、熊、猿、鸟五种动作', effect:'强身健体，疏通经络', indication:'养生保健，慢性病康复', usage:'每日练习', contraindication:'急性病期不宜', symptoms:'体虚,乏力,养生'},
+            {name:'华佗夹脊穴', composition:'督脉旁开0.5寸，第一胸椎至第五腰椎', effect:'调理脏腑，疏通经络', indication:'腰背痛、内脏疾患', usage:'针刺或按摩', contraindication:'孕妇腰骶部慎用', symptoms:'腰痛,背痛,脏腑失调'}
+          ]
+        }
+      ]
+    },
+    {
+      dynasty: '魏晋南北朝',
+      doctors: [
+        {
+          name: '皇甫谧', era: '魏晋', school: '针灸学派',
+          book: '《针灸甲乙经》',
+          thought: '系统整理古代针灸文献，编成《针灸甲乙经》，是中国现存最早的针灸学专著，奠定针灸学基础。',
+          prescriptions: [
+            {name:'皇甫谧针灸方', composition:'按经络穴位选穴，以督脉、膀胱经为主', effect:'疏通经络，调和气血', indication:'各类痛症、脏腑病', usage:'针刺或艾灸', contraindication:'孕妇特定穴位禁针', symptoms:'头痛,腰痛,关节痛,麻木'},
+            {name:'酸枣仁汤（原方）', composition:'酸枣仁、甘草、知母、茯苓、川芎', effect:'养血安神，清热除烦', indication:'虚劳虚烦不得眠', usage:'水煎服', contraindication:'实热证不宜', symptoms:'失眠,心烦,多梦,虚劳'}
+          ]
+        },
+        {
+          name: '葛洪', era: '东晋', school: '炼丹道家',
+          book: '《肘后备急方》《抱朴子》',
+          thought: '著有《肘后备急方》，收录大量简便验方，青蒿截疟的记载启发屠呦呦发现青蒿素。',
+          prescriptions: [
+            {name:'青蒿截疟方', composition:'青蒿', effect:'截疟清热', indication:'疟疾寒热往来', usage:'水煎服或鲜汁', contraindication:'脾胃虚寒者慎用', symptoms:'疟疾,发热,寒战'}
+          ]
+        }
+      ]
+    },
+    {
+      dynasty: '宋代',
+      doctors: [
+        {
+          name: '钱乙', era: '北宋', school: '儿科鼻祖',
+          book: '《小儿药证直诀》',
+          thought: '中国儿科之父，首创小儿五脏辨证体系。将六味地黄丸化裁用于儿科，奠定滋阴补肾法基础。',
+          prescriptions: [
+            {name:'六味地黄丸', composition:'熟地黄、山茱萸、山药、泽泻、茯苓、牡丹皮', effect:'滋阴补肾', indication:'肾阴不足证，腰膝酸软、头晕耳鸣、小儿发育不良', usage:'制丸服', contraindication:'脾虚泄泻者慎用', symptoms:'腰膝酸软,头晕,耳鸣,盗汗,阴虚'},
+            {name:'泻白散', composition:'地骨皮、桑白皮、甘草、粳米', effect:'清泻肺热，止咳平喘', indication:'肺热咳嗽证', usage:'水煎服', contraindication:'风寒咳嗽者不宜', symptoms:'咳嗽,气喘,发热,肺热'},
+            {name:'七味白术散', composition:'人参、白术、茯苓、甘草、藿香、木香、葛根', effect:'健脾止泻', indication:'小儿脾虚泄泻', usage:'水煎服', contraindication:'湿热泻者不宜', symptoms:'腹泻,食欲不振,小儿消化不良'}
+          ]
+        },
+        {
+          name: '陈自明', era: '南宋', school: '妇科大家',
+          book: '《妇人良方大全》',
+          thought: '系统整理宋代以前妇产科经验，对月经病、带下病、妊娠病有深入论述。',
+          prescriptions: [
+            {name:'良方温经汤', composition:'当归、川芎、芍药、桂心、莪术、牡丹皮、人参、甘草、牛膝', effect:'温经散寒，祛瘀养血', indication:'寒凝血瘀之月经不调', usage:'水煎服', contraindication:'血热者不宜', symptoms:'月经不调,痛经,少腹冷痛'}
+          ]
+        }
+      ]
+    },
+    {
+      dynasty: '唐代',
+      doctors: [
+        {
+          name: '孙思邈', era: '唐朝', school: '综合学派',
+          book: '《备急千金要方》《千金翼方》',
+          thought: '被尊为"药王"，重视医德，提出"大医精诚"。强调食疗为先，药疗为后，收集大量民间验方。',
+          prescriptions: [
+            {name:'独活寄生汤', composition:'独活、桑寄生、杜仲、牛膝、细辛、秦艽、茯苓、肉桂、防风、川芎、人参、甘草、当归、芍药、干地黄', effect:'祛风湿，止痹痛，益肝肾，补气血', indication:'痹证日久，肝肾两虚，腰膝疼痛', usage:'水煎服', contraindication:'孕妇慎用', symptoms:'腰痛,膝痛,关节痛,风湿,麻木'},
+            {name:'温胆汤', composition:'半夏、竹茹、枳实、陈皮、茯苓、甘草', effect:'理气化痰，清胆和胃', indication:'胆郁痰扰证，虚烦不眠、呕吐呃逆', usage:'水煎服', contraindication:'寒痰者不宜', symptoms:'失眠,眩晕,呕吐,心悸,胆怯'},
+            {name:'犀角地黄汤', composition:'水牛角（代犀角）、生地黄、芍药、牡丹皮', effect:'清热解毒，凉血散瘀', indication:'热入血分证，吐血衄血、斑色紫黑', usage:'水煎服', contraindication:'阳虚失血者忌用', symptoms:'出血,发热,斑疹,神昏'},
+            {name:'苇茎汤', composition:'苇茎、薏苡仁、冬瓜仁、桃仁', effect:'清肺化痰，逐瘀排脓', indication:'肺痈，咳吐腥臭脓血痰', usage:'水煎服', contraindication:'孕妇慎用', symptoms:'咳嗽,胸痛,吐脓痰,肺痈'}
+          ]
+        }
+      ]
+    },
+    {
+      dynasty: '金元时期',
+      doctors: [
+        {
+          name: '刘完素', era: '金朝', school: '寒凉派（河间学派）',
+          book: '《素问玄机原病式》《宣明论方》',
+          thought: '倡"六气皆从火化"论，善用寒凉药物，开创金元四大家之寒凉派。认为火热是导致疾病的重要因素。',
+          prescriptions: [
+            {name:'防风通圣散', composition:'防风、荆芥、连翘、麻黄、薄荷、川芎、当归、白芍、白术、栀子、大黄、芒硝、石膏、黄芩、桔梗、甘草、滑石', effect:'疏风解表，清热通便', indication:'风热壅盛，表里俱实证', usage:'水煎服或制丸', contraindication:'孕妇慎用，脾胃虚寒者忌', symptoms:'感冒,便秘,头痛,咽痛,风热'},
+            {name:'凉膈散', composition:'大黄、芒硝、栀子、黄芩、连翘、薄荷、甘草', effect:'泻火通便，清上泄下', indication:'上中二焦邪郁生热证', usage:'水煎服', contraindication:'孕妇忌用', symptoms:'口渴,咽痛,便秘,烦躁,发热'}
+          ]
+        },
+        {
+          name: '张从正', era: '金朝', school: '攻邪派',
+          book: '《儒门事亲》',
+          thought: '主张"治病重在驱邪，邪去正自安"，善用汗、吐、下三法攻邪。认为补法应慎用，邪去即是补。',
+          prescriptions: [
+            {name:'禹功散', composition:'黑牵牛、茴香', effect:'逐水通便，行气消肿', indication:'水湿内停，水肿胀满', usage:'姜汁调服', contraindication:'孕妇禁用，体虚者慎用', symptoms:'水肿,腹胀,便秘'},
+            {name:'木香槟榔丸', composition:'木香、槟榔、青皮、陈皮、莪术、黄连、黄柏、大黄、香附、牵牛', effect:'行气导滞，泻热通便', indication:'痢疾，食积', usage:'制丸服', contraindication:'孕妇禁用', symptoms:'痢疾,腹痛,腹胀,便秘'}
+          ]
+        },
+        {
+          name: '李杲（李东垣）', era: '金朝', school: '补土派（脾胃派）',
+          book: '《脾胃论》《兰室秘藏》',
+          thought: '提出"内伤脾胃，百病由生"，重视脾胃在发病中的作用，善用升阳益气法。创立甘温除热法。',
+          prescriptions: [
+            {name:'补中益气汤', composition:'黄芪、人参、白术、炙甘草、当归、陈皮、升麻、柴胡', effect:'补中益气，升阳举陷', indication:'脾胃气虚下陷证，内脏下垂、久泻脱肛', usage:'水煎服', contraindication:'阴虚火旺者慎用', symptoms:'乏力,气短,脱肛,内脏下垂,便溏'},
+            {name:'升阳益胃汤', composition:'黄芪、半夏、人参、炙甘草、独活、防风、白芍、羌活、橘皮、茯苓、柴胡、泽泻、白术、黄连', effect:'益气升阳，清热除湿', indication:'脾胃气虚，湿热内停', usage:'水煎服', contraindication:'阴虚者慎用', symptoms:'乏力,食欲不振,便溏,体重减轻'},
+            {name:'生脉散', composition:'人参、麦冬、五味子', effect:'益气生津，敛阴止汗', indication:'气阴两虚证，气短自汗、口干舌燥', usage:'水煎服', contraindication:'外感未解者不宜', symptoms:'气短,自汗,口干,心悸,乏力'}
+          ]
+        },
+        {
+          name: '朱震亨（朱丹溪）', era: '元朝', school: '滋阴派',
+          book: '《格致余论》《丹溪心法》',
+          thought: '提出"阳常有余，阴常不足"论，强调滋阴降火。认为相火妄动为致病之源，主张节欲保精。',
+          prescriptions: [
+            {name:'大补阴丸', composition:'黄柏、知母、熟地黄、龟板', effect:'滋阴降火', indication:'阴虚火旺证，骨蒸潮热、盗汗遗精', usage:'制丸服', contraindication:'脾胃虚寒者忌用', symptoms:'潮热,盗汗,遗精,腰膝酸软,阴虚'},
+            {name:'保和丸', composition:'山楂、神曲、半夏、茯苓、陈皮、连翘、莱菔子', effect:'消食和胃', indication:'食积证，脘腹胀满、嗳腐吞酸', usage:'制丸服', contraindication:'脾虚食少者不宜久服', symptoms:'腹胀,嗳气,吞酸,食欲不振,食积'},
+            {name:'越鞠丸', composition:'香附、川芎、苍术、神曲、栀子', effect:'行气解郁', indication:'六郁证，气、血、痰、火、湿、食诸郁', usage:'制丸服', contraindication:'阴虚火旺者慎用', symptoms:'胸胁胀闷,脘腹胀痛,饮食不消'}
+          ]
+        }
+      ]
+    },
+    {
+      dynasty: '明代',
+      doctors: [
+        {
+          name: '李时珍', era: '明朝', school: '本草学派',
+          book: '《本草纲目》《濒湖脉学》',
+          thought: '历时27年编成《本草纲目》，收药1892种，为中药学集大成之作。重视药物考证与临床验证。',
+          prescriptions: [
+            {name:'濒湖白花蛇酒', composition:'白花蛇、羌活、当归、天麻、秦艽、五加皮、防风', effect:'祛风通络，活血止痛', indication:'中风偏瘫、风湿痹痛', usage:'浸酒服', contraindication:'孕妇忌用，阴虚血燥者慎', symptoms:'中风,半身不遂,风湿,关节痛'},
+            {name:'李时珍治咳方', composition:'款冬花、紫菀、百部、生姜', effect:'润肺止咳化痰', indication:'久咳不止', usage:'水煎服', contraindication:'肺热咳嗽者加减', symptoms:'咳嗽,久咳,痰多'}
+          ]
+        },
+        {
+          name: '张景岳（张介宾）', era: '明朝', school: '温补学派',
+          book: '《景岳全书》《类经》',
+          thought: '提出"阳非有余，阴常不足"论，善用熟地黄，人称"张熟地"。重视温补真阴真阳。',
+          prescriptions: [
+            {name:'左归丸', composition:'熟地黄、山药、山茱萸、枸杞子、川牛膝、菟丝子、鹿角胶、龟板胶', effect:'滋阴补肾，填精益髓', indication:'真阴不足证，腰酸腿软、自汗盗汗', usage:'制丸服', contraindication:'脾虚泄泻者慎用', symptoms:'腰酸,腿软,盗汗,遗精,头晕'},
+            {name:'右归丸', composition:'熟地黄、山药、山茱萸、枸杞子、杜仲、菟丝子、附子、肉桂、当归、鹿角胶', effect:'温补肾阳，填精止遗', indication:'肾阳不足证，畏寒肢冷、阳痿滑精', usage:'制丸服', contraindication:'阴虚火旺者忌用', symptoms:'畏寒,肢冷,阳痿,遗精,腰膝冷痛'},
+            {name:'金水六君煎', composition:'当归、熟地黄、陈皮、半夏、茯苓、炙甘草', effect:'滋养肺肾，祛痰止咳', indication:'肺肾阴虚，湿痰内停', usage:'水煎服', contraindication:'外感咳嗽者不宜', symptoms:'咳嗽,痰多,腰酸,阴虚'}
+          ]
+        },
+        {
+          name: '吴又可（吴有性）', era: '明末', school: '温疫学派',
+          book: '《温疫论》',
+          thought: '创立温疫学说，提出"戾气"致病论，认为温疫由特殊致病物质通过口鼻侵入人体。',
+          prescriptions: [
+            {name:'达原饮', composition:'槟榔、厚朴、草果、知母、芍药、黄芩、甘草', effect:'开达膜原，辟秽化浊', indication:'温疫初起，憎寒发热', usage:'水煎服', contraindication:'无湿浊者不宜', symptoms:'发热,恶寒,胸闷,温疫'}
+          ]
+        }
+      ]
+    },
+    {
+      dynasty: '清代',
+      doctors: [
+        {
+          name: '叶天士（叶桂）', era: '清朝', school: '温病学派',
+          book: '《温热论》《临证指南医案》',
+          thought: '创立卫气营血辨证体系，为温病学派奠基人。善用轻清灵动之品，用药精简。',
+          prescriptions: [
+            {name:'银翘散', composition:'金银花、连翘、薄荷、牛蒡子、桔梗、淡豆豉、淡竹叶、芦根、荆芥穗、甘草', effect:'辛凉透表，清热解毒', indication:'温病初起，发热微恶风寒、口渴', usage:'水煎服', contraindication:'风寒感冒者不宜', symptoms:'发热,咽痛,咳嗽,口渴,风热感冒'},
+            {name:'桑菊饮', composition:'桑叶、菊花、杏仁、连翘、薄荷、桔梗、甘草、芦根', effect:'疏风清热，宣肺止咳', indication:'风温初起，咳嗽、身热不甚', usage:'水煎服', contraindication:'风寒咳嗽者不宜', symptoms:'咳嗽,发热,口渴,咽痛'}
+          ]
+        },
+        {
+          name: '吴鞠通（吴瑭）', era: '清朝', school: '温病学派',
+          book: '《温病条辨》',
+          thought: '创立三焦辨证体系，完善温病学说。提出"治上焦如羽，治中焦如衡，治下焦如权"。',
+          prescriptions: [
+            {name:'桑杏汤', composition:'桑叶、杏仁、沙参、象贝、豆豉、栀子皮、梨皮', effect:'清宣温燥，润肺止咳', indication:'外感温燥证，头痛身热、干咳无痰', usage:'水煎服', contraindication:'风寒咳嗽者不宜', symptoms:'干咳,发热,口渴,咽干'},
+            {name:'增液汤', composition:'玄参、麦冬、细生地', effect:'增液润燥', indication:'阳明温病，津液不足，大便秘结', usage:'水煎服', contraindication:'脾虚便溏者不宜', symptoms:'便秘,口干,阴虚'},
+            {name:'安宫牛黄丸', composition:'牛黄、郁金、犀角（水牛角代）、黄连、黄芩、栀子、朱砂、雄黄、冰片、麝香、珍珠', effect:'清热解毒，豁痰开窍', indication:'热病邪陷心包，高热昏迷', usage:'化服', contraindication:'孕妇禁用，寒闭者忌用', symptoms:'高热,昏迷,惊厥,中风'}
+          ]
+        },
+        {
+          name: '王清任', era: '清朝', school: '活血化瘀派',
+          book: '《医林改错》',
+          thought: '重视解剖，纠正前人脏腑之误。善用活血化瘀法，创制多个逐瘀汤方。',
+          prescriptions: [
+            {name:'血府逐瘀汤', composition:'桃仁、红花、当归、生地黄、川芎、赤芍、牛膝、桔梗、柴胡、枳壳、甘草', effect:'活血化瘀，行气止痛', indication:'胸中血瘀证，胸痛头痛、失眠多梦', usage:'水煎服', contraindication:'孕妇禁用', symptoms:'胸痛,头痛,失眠,心痛,血瘀'},
+            {name:'补阳还五汤', composition:'黄芪、当归尾、赤芍、地龙、川芎、桃仁、红花', effect:'补气活血通络', indication:'中风后遗症，半身不遂、口眼歪斜', usage:'水煎服', contraindication:'阴虚血热者慎用', symptoms:'中风,半身不遂,口眼歪斜,气虚血瘀'},
+            {name:'少腹逐瘀汤', composition:'小茴香、干姜、延胡索、没药、当归、川芎、官桂、赤芍、蒲黄、五灵脂', effect:'活血祛瘀，温经止痛', indication:'少腹瘀血证，月经不调、痛经', usage:'水煎服', contraindication:'孕妇禁用', symptoms:'痛经,月经不调,少腹痛,血瘀'}
+          ]
+        },
+        {
+          name: '唐宗海', era: '清末', school: '中西医结合先驱',
+          book: '《血证论》',
+          thought: '中西医汇通派早期代表，系统论述血证诊治，提出止血、消瘀、宁血、补血四法。',
+          prescriptions: [
+            {name:'十灰散', composition:'大蓟、小蓟、荷叶、侧柏叶、白茅根、茜草根、栀子、大黄、牡丹皮、棕榈皮', effect:'凉血止血', indication:'血热妄行之各种出血', usage:'研末服', contraindication:'虚寒性出血不宜', symptoms:'吐血,咯血,衄血,便血,出血'}
+          ]
+        }
+      ]
+    },
+    {
+      dynasty: '近现代',
+      doctors: [
+        {
+          name: '张锡纯', era: '清末民初', school: '中西汇通派',
+          book: '《医学衷中参西录》',
+          thought: '中西医汇通派代表，主张"衷中参西"，以中医理论为本，参用西医知识。善用石膏、山药等药。',
+          prescriptions: [
+            {name:'镇肝熄风汤', composition:'怀牛膝、生赭石、生龙骨、生牡蛎、生龟板、生白芍、玄参、天冬、川楝子、生麦芽、茵陈、甘草', effect:'镇肝息风，滋阴潜阳', indication:'肝阳上亢，气血逆乱之中风', usage:'水煎服', contraindication:'痰湿盛者慎用', symptoms:'中风,头痛,眩晕,面赤'},
+            {name:'玉液汤', composition:'生山药、生黄芪、知母、生鸡内金、葛根、五味子、天花粉', effect:'益气滋阴，固肾止渴', indication:'消渴证（糖尿病），气阴两虚', usage:'水煎服', contraindication:'湿热证不宜', symptoms:'口渴,多饮,多尿,消渴,糖尿病'},
+            {name:'活络效灵丹', composition:'当归、丹参、生明乳香、生明没药', effect:'活血祛瘀，通络止痛', indication:'气血凝滞，心腹疼痛、腿臂疼痛', usage:'水煎服', contraindication:'孕妇禁用', symptoms:'心痛,腹痛,关节痛,血瘀'}
+          ]
+        },
+        {
+          name: '施今墨', era: '民国至新中国', school: '北京四大名医',
+          book: '《施今墨临床经验集》',
+          thought: '北京四大名医之一，善用对药（药对），重视脾胃调理，提倡中西医结合。',
+          prescriptions: [
+            {name:'施氏调胃方', composition:'党参、白术、茯苓、炙甘草、半夏、陈皮、木香、砂仁', effect:'健脾和胃，理气止痛', indication:'脾胃虚弱，脘腹胀痛', usage:'水煎服', contraindication:'胃阴虚者加减', symptoms:'胃痛,腹胀,食欲不振,乏力'},
+            {name:'施氏降压方', composition:'天麻、钩藤、石决明、牛膝、杜仲、黄芩、栀子', effect:'平肝潜阳，清热降压', indication:'肝阳上亢型高血压', usage:'水煎服', contraindication:'低血压者不宜', symptoms:'头痛,眩晕,高血压,面赤'}
+          ]
+        },
+        {
+          name: '蒲辅周', era: '新中国', school: '时方派',
+          book: '《蒲辅周医案》《蒲辅周医疗经验》',
+          thought: '擅治温病与内科杂病，重视正气护养，用药轻灵，提倡"汗而毋伤，下而毋损"。',
+          prescriptions: [
+            {name:'蒲氏宣透方', composition:'银花、连翘、薄荷、牛蒡子、桔梗、芦根', effect:'轻宣透表，清热解毒', indication:'外感风热，温病初起', usage:'水煎服', contraindication:'风寒者不宜', symptoms:'发热,咽痛,咳嗽,感冒'}
+          ]
+        },
+        {
+          name: '邓铁涛', era: '新中国', school: '岭南学派',
+          book: '《邓铁涛医学文集》',
+          thought: '岭南医学代表，擅治心血管疾病，提倡"脾胃为后天之本"，研制冠心方治疗冠心病。',
+          prescriptions: [
+            {name:'邓氏冠心方', composition:'党参、麦冬、五味子、丹参、赤芍、红花', effect:'益气养阴，活血通脉', indication:'冠心病，气阴两虚兼血瘀', usage:'水煎服', contraindication:'出血倾向者慎用', symptoms:'胸痛,心悸,气短,冠心病,心痛'},
+            {name:'邓氏治重症肌无力方', composition:'黄芪、党参、白术、当归、升麻、柴胡、陈皮、炙甘草', effect:'健脾益气升阳', indication:'重症肌无力，脾胃气虚', usage:'水煎服', contraindication:'阴虚火旺者加减', symptoms:'乏力,肌肉无力,眼睑下垂'}
+          ]
+        }
+      ]
+    }
+  ]
+};
+
+function rxRenderDoctorsByDynasty(){
+  var container=document.getElementById('rxDoctorsByDynasty');
+  if(!container) return;
+  var html='';
+  RX_DOCTORS_DATA.dynasties.forEach(function(dyn,idx){
+    var dynastyId='rxDyn-'+idx;
+    html+='<div class="bazi-module-title'+(idx>0?' collapsed':'')+'" onclick="toggleBaziModule(this)">🏥 '+dyn.dynasty+'名医 ('+dyn.doctors.length+'位) <span class="toggle-icon">▼</span></div>';
+    html+='<div class="bazi-module-body'+(idx>0?' collapsed':'')+'" style="padding:16px">';
+    dyn.doctors.forEach(function(doc,dIdx){
+      var docId='rxDoc-'+idx+'-'+dIdx;
+      html+='<div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px">';
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
+      html+='<span style="font-size:16px;color:var(--gold);font-weight:bold">👨‍⚕️ '+doc.name+'</span>';
+      html+='<span style="font-size:11px;padding:2px 10px;border-radius:10px;background:rgba(201,168,76,0.1);color:var(--gold2)">'+doc.school+'</span>';
+      html+='</div>';
+      html+='<div style="font-size:12px;color:var(--paper3);margin-bottom:6px">'+doc.era+' · 著作：'+doc.book+'</div>';
+      html+='<div style="font-size:13px;color:var(--paper);line-height:1.7;margin-bottom:12px;background:rgba(255,255,255,0.02);border-radius:8px;padding:10px">💡 '+doc.thought+'</div>';
+      html+='<div style="font-size:13px;color:var(--gold);margin-bottom:8px;font-weight:bold">代表名方：</div>';
+      doc.prescriptions.forEach(function(rx){
+        html+='<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;margin-bottom:8px;border-left:3px solid rgba(201,168,76,0.3)">';
+        html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
+        html+='<span style="font-size:14px;color:var(--gold);font-weight:bold">💊 '+rx.name+'</span>';
+        html+='</div>';
+        html+='<div style="font-size:12px;color:var(--paper2);margin-bottom:4px"><b style="color:var(--gold2)">组成：</b>'+rx.composition+'</div>';
+        html+='<div style="font-size:12px;color:var(--paper2);margin-bottom:4px"><b style="color:var(--success)">功效：</b>'+rx.effect+'</div>';
+        html+='<div style="font-size:12px;color:var(--paper2);margin-bottom:4px"><b style="color:var(--gold2)">主治：</b>'+rx.indication+'</div>';
+        html+='<div style="font-size:12px;color:var(--paper2);margin-bottom:4px"><b style="color:var(--paper3)">用法：</b>'+rx.usage+'</div>';
+        html+='<div style="font-size:12px;color:#e74c3c;margin-bottom:4px"><b>禁忌：</b>'+rx.contraindication+'</div>';
+        html+='<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">';
+        rx.symptoms.split(',').forEach(function(s){
+          html+='<span style="font-size:10px;padding:1px 6px;background:rgba(201,168,76,0.08);border:1px solid var(--border);border-radius:8px;color:var(--gold2)">'+s+'</span>';
+        });
+        html+='</div>';
+        html+='</div>';
+      });
+      html+='</div>';
+    });
+    html+='</div>';
+  });
+  container.innerHTML=html;
+}
+
+function rxGetAllPrescriptions(){
+  var all=[];
+  RX_DOCTORS_DATA.dynasties.forEach(function(dyn){
+    dyn.doctors.forEach(function(doc){
+      doc.prescriptions.forEach(function(rx){
+        rx._doctor=doc.name;
+        rx._dynasty=dyn.dynasty;
+        all.push(rx);
+      });
+    });
+  });
+  return all;
+}
+
+function rxSearchPrescriptions(){
+  var input=document.getElementById('rxSearchInput');
+  var resultDiv=document.getElementById('rxSearchResult');
+  var dynDiv=document.getElementById('rxDoctorsByDynasty');
+  if(!input) return;
+  var q=input.value.trim().toLowerCase();
+  if(!q){
+    resultDiv.style.display='none';
+    resultDiv.innerHTML='';
+    dynDiv.style.display='block';
+    return;
+  }
+  var allRx=rxGetAllPrescriptions();
+  var matched=allRx.filter(function(rx){
+    var hay=(rx.name+' '+rx.composition+' '+rx.effect+' '+rx.indication+' '+rx.symptoms+' '+rx._doctor+' '+rx._dynasty).toLowerCase();
+    return hay.indexOf(q)>=0;
+  });
+  dynDiv.style.display='none';
+  resultDiv.style.display='block';
+  if(matched.length===0){
+    resultDiv.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">未找到匹配的方剂</div>';
+    return;
+  }
+  var html='<div style="font-size:13px;color:var(--gold);margin-bottom:12px">🔍 找到 '+matched.length+' 个匹配方剂：</div>';
+  matched.forEach(function(rx){
+    html+='<div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;border-left:3px solid rgba(201,168,76,0.3)">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
+    html+='<span style="font-size:14px;color:var(--gold);font-weight:bold">💊 '+rx.name+'</span>';
+    html+='<span style="font-size:11px;color:var(--paper3)">'+rx._dynasty+' · '+rx._doctor+'</span>';
+    html+='</div>';
+    html+='<div style="font-size:12px;color:var(--paper2);margin-bottom:4px"><b style="color:var(--gold2)">组成：</b>'+rx.composition+'</div>';
+    html+='<div style="font-size:12px;color:var(--paper2);margin-bottom:4px"><b style="color:var(--success)">功效：</b>'+rx.effect+'</div>';
+    html+='<div style="font-size:12px;color:var(--paper2);margin-bottom:4px"><b style="color:var(--gold2)">主治：</b>'+rx.indication+'</div>';
+    html+='<div style="font-size:12px;color:#e74c3c"><b>禁忌：</b>'+rx.contraindication+'</div>';
+    html+='</div>';
+  });
+  resultDiv.innerHTML=html;
+}
+
+function rxClearSearch(){
+  var input=document.getElementById('rxSearchInput');
+  var resultDiv=document.getElementById('rxSearchResult');
+  var dynDiv=document.getElementById('rxDoctorsByDynasty');
+  if(input) input.value='';
+  if(resultDiv){resultDiv.style.display='none';resultDiv.innerHTML='';}
+  if(dynDiv) dynDiv.style.display='block';
+}
+
+// ===== 非遗中医展示 =====
+var RX_HERITAGE_DATA = [
+  {name:'中医针灸', batch:'第一批国家级非遗（2006年）', inheritors:'贺普仁、王雪苔等', desc:'针灸是中医药的重要代表，包括毫针刺法、灸法、拔罐等多种技术，以经络学说为理论基础。', techniques:'毫针刺法、艾灸法、拔罐法、电针法、头针、耳针、火针'},
+  {name:'中医推拿', batch:'第一批国家级非遗（2006年）', inheritors:'丁季峰、严隽陶等', desc:'中医推拿又称按摩，是通过手法作用于人体体表特定部位来防治疾病的方法。', techniques:'㨰法、揉法、按法、推法、拿法、拍法、摇法、扳法'},
+  {name:'中医正骨', batch:'第一批国家级非遗（2006年）', inheritors:'郭维淮、孙树椿等', desc:'中医正骨是以手法整复骨折、脱位及治疗筋伤的传统医学技术。', techniques:'正骨八法：手摸心会、拔伸牵引、旋转屈伸、提按端挤、摇摆触碰、夹挤分骨、折顶回旋、按摩推拿'},
+  {name:'中药炮制技艺', batch:'第一批国家级非遗（2006年）', inheritors:'金世元、王孝涛等', desc:'中药炮制是根据中医药理论，按照辨证施治用药需要和药物自身性质，对中药进行加工处理的技术。', techniques:'炒法、炙法、煅法、煨法、蒸法、煮法、淬法、制炭法'},
+  {name:'藏医药', batch:'第一批国家级非遗（2006年）', inheritors:'强巴赤列、占堆等', desc:'藏医药是藏族人民在青藏高原特殊环境下形成的医学体系，具有独特的理论体系和诊疗方法。', techniques:'望诊、触诊、问诊三诊法；尿诊；放血疗法；药浴疗法；艾灸'},
+  {name:'蒙医药', batch:'第一批国家级非遗（2006年）', inheritors:'巴根那、布仁达来等', desc:'蒙医药是蒙古族传统医学，以赫依、希拉、巴达干三根学说为理论基础。', techniques:'脉诊、尿诊；放血疗法；针灸；药浴；涂擦按摩；蒙医正骨'},
+  {name:'中医生命与疾病认知方法', batch:'第一批国家级非遗（2006年）', inheritors:'路志正、邓铁涛等', desc:'中医药对生命与疾病的认知体系，包括阴阳五行、脏腑经络、病因病机、辨证论治等理论。', techniques:'阴阳五行学说、脏腑经络理论、辨证论治体系、四诊合参'},
+  {name:'同仁堂中医药文化', batch:'第一批国家级非遗（2006年）', inheritors:'同仁堂传承群体', desc:'北京同仁堂创建于1669年，是中药老字号代表，"炮制虽繁必不敢省人工，品味虽贵必不敢减物力"。', techniques:'中药材鉴别、炮制、制剂工艺；传统丸散膏丹制作技艺'},
+  {name:'胡庆余堂中药文化', batch:'第一批国家级非遗（2006年）', inheritors:'胡庆余堂传承群体', desc:'杭州胡庆余堂由胡雪岩于1874年创建，"戒欺"为店训，是江南药王代表。', techniques:'中药炮制、丸散制作、膏方熬制；药材鉴别'},
+  {name:'藏医药浴法', batch:'联合国教科文组织非遗（2018年）', inheritors:'藏族传承群体', desc:'藏医药浴法是藏医学特色疗法，将全身或局部浸泡于五味甘露药液中防治疾病。', techniques:'五味甘露药浴配方；药浴温度控制；药浴后护理'},
+  {name:'太极拳', batch:'联合国教科文组织非遗（2020年）', inheritors:'陈氏、杨氏等传承群体', desc:'太极拳融合中医经络学说和阴阳哲学，是中医导引养生的重要实践。', techniques:'陈式、杨式、吴式、武式、孙式等流派；推手；站桩'},
+  {name:'中医诊法', batch:'第二批国家级非遗（2008年）', inheritors:'周仲瑛、徐景藩等', desc:'中医诊法是中医获取临床信息的独特方法，包括望、闻、问、切四诊。', techniques:'望诊（望舌、望神、望色）、闻诊（听声、嗅味）、问诊（十问歌）、切诊（脉诊、按诊）'},
+  {name:'中医传统制剂方法', batch:'第二批国家级非遗（2008年）', inheritors:'多种流派传承人', desc:'中药传统制剂方法包括丸、散、膏、丹、酒、露、胶、曲等剂型的制作工艺。', techniques:'蜜丸制作、水丸制作、膏药熬制、丹药炼制、药酒浸泡、露剂蒸馏'},
+  {name:'维医药', batch:'第一批国家级非遗（2006年）', inheritors:'巴音克希克等', desc:'维吾尔医药是新疆维吾尔族传统医学，以四体液学说（胆液质、血液质、黏液质、黑胆液质）为理论基础。', techniques:'四体液辨证；尿诊；脉诊；草药内服；药浴；熏蒸'},
+  {name:'壮医药', batch:'第一批国家级非遗（2006年）', inheritors:'黄瑾明、黄汉儒等', desc:'壮医药是壮族传统医学，以三气同步、三道两路为核心理论，善用草药和药线点灸。', techniques:'药线点灸；目诊；甲诊；草药内服外敷；药浴'},
+  {name:'傣医药', batch:'第一批国家级非遗（2006年）', inheritors:'林艳芳等', desc:'傣医药是傣族传统医学，以四塔（风、火、水、土）五蕴为理论基础，具有热带医学特色。', techniques:'四塔辨证；拖擦疗法；睡药疗法；蒸药疗法；拔罐；刺血'},
+  {name:'羌医药', batch:'第二批国家级非遗（2008年）', inheritors:'羌族传承群体', desc:'羌医药是羌族传统医学，以白石文化为背景，善用高原草药治疗跌打损伤和风湿病。', techniques:'羌医脉诊；草药内服外敷；熏蒸疗法；角吸疗法'}
+];
+
+function rxRenderHeritage(){
+  var container=document.getElementById('rxHeritageList');
+  if(!container) return;
+  var html='';
+  RX_HERITAGE_DATA.forEach(function(item,idx){
+    var collapsed=idx>0?' collapsed':'';
+    html+='<div class="bazi-module-title'+collapsed+'" onclick="toggleBaziModule(this)">🏺 '+item.name+' <span class="toggle-icon">▼</span></div>';
+    html+='<div class="bazi-module-body'+collapsed+'" style="padding:16px">';
+    html+='<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;margin-bottom:10px">';
+    html+='<div style="font-size:12px;color:var(--gold2);margin-bottom:6px">'+item.batch+'</div>';
+    html+='<div style="font-size:12px;color:var(--paper3);margin-bottom:8px">传承人：'+item.inheritors+'</div>';
+    html+='<div style="font-size:13px;color:var(--paper);line-height:1.7;margin-bottom:10px">'+item.desc+'</div>';
+    html+='<div style="background:rgba(45,106,79,0.06);border-radius:8px;padding:10px">';
+    html+='<div style="font-size:12px;color:var(--success);margin-bottom:6px;font-weight:bold">核心技法</div>';
+    html+='<div style="font-size:12px;color:var(--paper2);line-height:1.6">'+item.techniques+'</div>';
+    html+='</div>';
+    html+='</div>';
+    html+='</div>';
+  });
+  container.innerHTML=html;
+}
+
+// ===== 倪海夏知识模块 =====
+var RX_NIHONSHA_DATA = {
+  intro: {
+    name: '倪海夏（倪海厦）',
+    years: '1954-2012',
+    title: '美国经方派中医师，汉唐中医学院创办人',
+    bio: '倪海夏，生于台湾，后赴美国行医，在佛罗里达州创办汉唐中医学院。一生致力于经方（张仲景《伤寒杂病论》方）的传承与推广，著有《人纪》系列教材，通过网络教学影响全球中医学习者。其学术思想以经方为核心，强调六经辨证，善用仲景方治疗各类疾病。'
+  },
+  academicFeatures: [
+    '以经方为主，强调张仲景《伤寒论》《金匮要略》方的原方运用',
+    '重视六经辨证体系，以太阳、阳明、少阳、太阴、少阴、厥阴为辨证纲领',
+    '强调经方与时方的区别，认为经方药味少、效力专、配伍严谨',
+    '善用桂枝汤系列、麻黄汤系列、承气汤系列、四逆汤系列等仲景方',
+    '注重脉诊与腹诊结合，强调方证对应',
+    '提倡"上工治未病"，重视预防医学'
+  ],
+  coreTheories: [
+    {
+      title: '六经辨证体系',
+      content: '太阳病：表证，恶寒发热、头项强痛。代表方：桂枝汤、麻黄汤。\n阳明病：里热实证，大热大汗大渴。代表方：白虎汤、承气汤。\n少阳病：半表半里证，寒热往来、口苦咽干。代表方：小柴胡汤。\n太阴病：脾阳虚证，腹满吐利。代表方：理中汤。\n少阴病：心肾阳虚或阴虚证，脉微细但欲寐。代表方：四逆汤、黄连阿胶汤。\n厥阴病：寒热错杂证，消渴气上撞心。代表方：乌梅丸。'
+    },
+    {
+      title: '经方与时方之区别',
+      content: '经方：指张仲景《伤寒杂病论》中的方剂，药味少（多为3-7味），配伍严谨，效力专宏，历经两千年临床验证。\n时方：后世医家创制的方剂，药味较多，配伍灵活，适应面广。\n倪师认为：经方是中医的根本，初学者应先精通经方，再涉猎时方。经方方证对应明确，用之得当效如桴鼓。'
+    },
+    {
+      title: '阴阳辨证纲领',
+      content: '阳证：面色红赤、身热汗出、口渴饮冷、便秘尿赤、舌红苔黄、脉洪大数。\n阴证：面色苍白、畏寒肢冷、口不渴或喜热饮、便溏尿清、舌淡苔白、脉微细迟。\n倪师强调：阴阳是辨证的总纲，先辨阴阳，再定六经，最后选方药。阴阳辨识准确，治疗方向就不会错。'
+    },
+    {
+      title: '上工治未病',
+      content: '倪师推崇"上工治未病"理念：\n1. 在疾病未发生时，通过养生预防；\n2. 在疾病初起时，及时截断病势，防止传变；\n3. 治病时注重保护脾胃正气，避免过度攻伐；\n4. 重视情志调摄对疾病的影响；\n5. 强调睡眠、饮食、运动对健康的基石作用。'
+    }
+  ],
+  formulaSeries: [
+    {
+      series: '桂枝汤系列',
+      formulas: '桂枝汤（调和营卫）、桂枝加葛根汤（治项背强）、桂枝加附子汤（治漏汗不止）、桂枝加桂汤（治气上冲胸）、桂枝去芍药汤（治胸满）、小建中汤（建中补虚）',
+      application: '倪师善用桂枝汤系列治疗外感风寒、营卫不和、脾胃虚弱等证。认为桂枝汤是"群方之祖"，加减变化可治百病。'
+    },
+    {
+      series: '麻黄汤系列',
+      formulas: '麻黄汤（发汗解表）、大青龙汤（外寒内热）、小青龙汤（外寒内饮）、麻杏石甘汤（宣肺清热）、麻黄附子细辛汤（太少两感）',
+      application: '倪师用麻黄汤系列治疗外感风寒表实证、咳喘、风水水肿等。强调麻黄用量需谨慎，中病即止。'
+    },
+    {
+      series: '承气汤系列',
+      formulas: '大承气汤（峻下热结）、小承气汤（轻下热结）、调胃承气汤（缓下热结）、桃核承气汤（下焦蓄血）',
+      application: '倪师用承气汤系列治疗阳明腑实证，强调"有故无殒"，只要辨证准确，攻下及时，可收立竿见影之效。'
+    },
+    {
+      series: '四逆汤系列',
+      formulas: '四逆汤（回阳救逆）、四逆加人参汤（回阳益气）、通脉四逆汤（破阴回阳）、真武汤（温阳利水）、附子汤（温阳祛寒）',
+      application: '倪师善用四逆汤系列抢救心肾阳虚危证，认为附子是"回阳救逆第一品药"，用量需大胆而精准。'
+    }
+  ],
+  studyPath: [
+    {order:1, name:'针灸大成', desc:'先学针灸，掌握经络穴位，建立对人体的空间认知', reason:'针灸入门快，可快速建立对经络系统的理解'},
+    {order:2, name:'神农本草经', desc:'学习中药学基础，掌握365味药物性味归经', reason:'了解药物特性是处方的基础'},
+    {order:3, name:'黄帝内经', desc:'学习中医基础理论，理解阴阳五行、脏腑经络', reason:'理论根基决定临床高度'},
+    {order:4, name:'伤寒论', desc:'学习六经辨证体系，掌握经方运用', reason:'中医临床的核心，方证对应的典范'},
+    {order:5, name:'金匮要略', desc:'学习杂病诊治，补充伤寒论的内容', reason:'与伤寒论互补，构成完整的经方体系'}
+  ],
+  note: '以上内容为学习参考，实际用药需遵医嘱。倪海夏医师的学术思想主要基于其《人纪》系列教材和临床医案，学习者应结合经典原文和临床实践，不可盲从。'
+};
+
+function rxRenderNihonsha(){
+  var container=document.getElementById('rxNihonshaContent');
+  if(!container) return;
+  var d=RX_NIHONSHA_DATA;
+  var html='';
+
+  // 人物介绍
+  html+='<div class="bazi-module-title" onclick="toggleBaziModule(this)">👤 人物介绍 <span class="toggle-icon">▼</span></div>';
+  html+='<div class="bazi-module-body" style="padding:16px">';
+  html+='<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:16px">';
+  html+='<div style="font-size:18px;color:var(--gold);font-weight:bold;margin-bottom:8px">'+d.intro.name+'（'+d.intro.years+'）</div>';
+  html+='<div style="font-size:13px;color:var(--gold2);margin-bottom:10px">'+d.intro.title+'</div>';
+  html+='<div style="font-size:13px;color:var(--paper);line-height:1.8">'+d.intro.bio+'</div>';
+  html+='</div></div>';
+
+  // 学术特色
+  html+='<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">🎓 学术特色 <span class="toggle-icon">▼</span></div>';
+  html+='<div class="bazi-module-body collapsed" style="padding:16px">';
+  html+='<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:16px">';
+  d.academicFeatures.forEach(function(f){
+    html+='<div style="font-size:13px;color:var(--paper);line-height:1.8;margin-bottom:8px;padding-left:16px;border-left:3px solid rgba(201,168,76,0.3)">'+f+'</div>';
+  });
+  html+='</div></div>';
+
+  // 核心理论
+  html+='<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">📚 核心理论摘要 <span class="toggle-icon">▼</span></div>';
+  html+='<div class="bazi-module-body collapsed" style="padding:16px">';
+  d.coreTheories.forEach(function(t){
+    html+='<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:16px;margin-bottom:12px">';
+    html+='<div style="font-size:15px;color:var(--gold);font-weight:bold;margin-bottom:10px">'+t.title+'</div>';
+    html+='<div style="font-size:13px;color:var(--paper);line-height:1.8;white-space:pre-wrap">'+t.content+'</div>';
+    html+='</div>';
+  });
+  html+='</div>';
+
+  // 代表方剂运用
+  html+='<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">💊 代表方剂运用 <span class="toggle-icon">▼</span></div>';
+  html+='<div class="bazi-module-body collapsed" style="padding:16px">';
+  d.formulaSeries.forEach(function(fs){
+    html+='<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:16px;margin-bottom:12px">';
+    html+='<div style="font-size:15px;color:var(--gold);font-weight:bold;margin-bottom:8px">'+fs.series+'</div>';
+    html+='<div style="font-size:13px;color:var(--paper2);line-height:1.7;margin-bottom:8px"><b style="color:var(--gold2)">方剂：</b>'+fs.formulas+'</div>';
+    html+='<div style="font-size:13px;color:var(--paper);line-height:1.7"><b style="color:var(--success)">运用：</b>'+fs.application+'</div>';
+    html+='</div>';
+  });
+  html+='</div>';
+
+  // 学习路径建议
+  html+='<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">📖 学习路径建议（人纪系列） <span class="toggle-icon">▼</span></div>';
+  html+='<div class="bazi-module-body collapsed" style="padding:16px">';
+  html+='<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:16px">';
+  html+='<div style="font-size:13px;color:var(--gold2);margin-bottom:12px">倪师建议按以下顺序学习《人纪》系列教材：</div>';
+  d.studyPath.forEach(function(s){
+    html+='<div style="display:flex;gap:12px;margin-bottom:12px;align-items:flex-start">';
+    html+='<div style="flex-shrink:0;width:28px;height:28px;border-radius:50%;background:rgba(201,168,76,0.15);color:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px">'+s.order+'</div>';
+    html+='<div style="flex:1">';
+    html+='<div style="font-size:14px;color:var(--gold);font-weight:bold;margin-bottom:4px">'+s.name+'</div>';
+    html+='<div style="font-size:12px;color:var(--paper2);line-height:1.6;margin-bottom:4px">'+s.desc+'</div>';
+    html+='<div style="font-size:12px;color:var(--success)">💡 '+s.reason+'</div>';
+    html+='</div></div>';
+  });
+  html+='</div></div>';
+
+  // 免责声明
+  html+='<div style="background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.2);border-radius:10px;padding:14px;margin-top:12px">';
+  html+='<div style="font-size:12px;color:#e74c3c;line-height:1.7">⚠️ '+d.note+'</div>';
+  html+='</div>';
+
+  container.innerHTML=html;
 }
 
 function tzRenderQuestionnaire(){
@@ -36005,6 +36527,759 @@ if (document.readyState === 'complete') {
 } else {
   window.addEventListener('load', function() { setTimeout(initKbSearch, 500); });
 }
+
+// ============================================================
+// 🎵 养心净心音乐播放器
+// ============================================================
+var HM_CATEGORIES = [
+  {key:'fo', name:'佛教梵呗', icon:'🪷', color:'#c9a84c'},
+  {key:'dao', name:'道教音乐', icon:'☯️', color:'#27ae60'},
+  {key:'yangsheng', name:'养生音乐', icon:'🌿', color:'#16a085'},
+  {key:'jingxin', name:'净心音乐', icon:'💎', color:'#2980b9'}
+];
+
+var HM_TRACKS = [
+  // 佛教梵呗
+  {cat:'fo', title:'大悲咒', desc:'千手千眼观世音菩萨大悲心陀罗尼', url:'', gen:'bell', merit:true},
+  {cat:'fo', title:'心经', desc:'般若波罗蜜多心经', url:'', gen:'bell', merit:true},
+  {cat:'fo', title:'六字大明咒', desc:'嗡嘛呢叭咪吽', url:'', gen:'bell', merit:true},
+  {cat:'fo', title:'药师咒', desc:'药师琉璃光如来灌顶咒', url:'', gen:'muyu', merit:true},
+  {cat:'fo', title:'阿弥陀佛圣号', desc:'南无阿弥陀佛六字洪名', url:'', gen:'bell', merit:true},
+  // 道教音乐
+  {cat:'dao', title:'太上老君说常清静经', desc:'大道无形，生育天地', url:'', gen:'chime', merit:true},
+  {cat:'dao', title:'太乙金光神咒', desc:'金光烁烁，覆映吾身', url:'', gen:'chime', merit:true},
+  {cat:'dao', title:'道教早晚功课', desc:'清静经 + 心印妙经', url:'', gen:'chime', merit:true},
+  {cat:'dao', title:'太上感应篇', desc:'祸福无门，惟人自召', url:'', gen:'muyu', merit:true},
+  {cat:'dao', title:'三官经', desc:'天官地官水官赐福', url:'', gen:'chime', merit:true},
+  // 养生音乐
+  {cat:'yangsheng', title:'角音·木·肝', desc:'角调养肝，生机勃发', url:'', gen:'tone_wood', merit:false},
+  {cat:'yangsheng', title:'徵音·火·心', desc:'徵调养心，温阳活血', url:'', gen:'tone_fire', merit:false},
+  {cat:'yangsheng', title:'宫音·土·脾', desc:'宫调养脾，健运中焦', url:'', gen:'tone_earth', merit:false},
+  {cat:'yangsheng', title:'商音·金·肺', desc:'商调养肺，清肃降气', url:'', gen:'tone_metal', merit:false},
+  {cat:'yangsheng', title:'羽音·水·肾', desc:'羽调养肾，藏精固本', url:'', gen:'tone_water', merit:false},
+  {cat:'yangsheng', title:'禅修冥想', desc:'静坐冥想，观照呼吸', url:'', gen:'meditation', merit:false},
+  {cat:'yangsheng', title:'古琴养生', desc:'太古遗音，调心养性', url:'', gen:'guqin', merit:false},
+  // 净心音乐
+  {cat:'jingxin', title:'水晶钵', desc:'纯净共振，净化磁场', url:'', gen:'crystal_bowl', merit:false},
+  {cat:'jingxin', title:'颂钵', desc:'泛音疗愈，深层放松', url:'', gen:'singing_bowl', merit:false},
+  {cat:'jingxin', title:'雨声白噪音', desc:'天降甘霖，洗心涤虑', url:'', gen:'rain', merit:false},
+  {cat:'jingxin', title:'溪流水声', desc:'山间清泉，潺潺流淌', url:'', gen:'stream', merit:false},
+  {cat:'jingxin', title:'鸟鸣晨曦', desc:'林间鸟语，生机盎然', url:'', gen:'birds', merit:false}
+];
+
+var hmAudioCtx = null;
+var hmCurrentTrack = null;
+var hmCurrentIdx = -1;
+var hmIsPlaying = false;
+var hmIsLoop = false;
+var hmVolume = 0.6;
+var hmActiveCategory = 'fo';
+var hmPlayStartTime = 0;
+var hmTrackDuration = 180; // 3 minutes default
+var hmAnimId = null;
+var hmActiveNodes = [];
+var hmActiveSources = [];
+
+function hmInit() {
+  hmRenderCategoryTabs();
+  hmRenderPlaylist();
+}
+
+function hmRenderCategoryTabs() {
+  var container = document.getElementById('hmCategoryTabs');
+  if (!container) return;
+  var html = '';
+  HM_CATEGORIES.forEach(function(cat) {
+    var isActive = (cat.key === hmActiveCategory);
+    html += '<button onclick="hmSelectCategory(\''+cat.key+'\')" style="padding:8px 16px;border:1px solid '+(isActive?'var(--gold)':'var(--border)')+';border-radius:20px;background:'+(isActive?'rgba(201,168,76,0.12)':'transparent')+';color:'+(isActive?'var(--gold)':'var(--paper3)')+';cursor:pointer;font-family:inherit;font-size:13px;transition:all .25s">'+cat.icon+' '+cat.name+'</button>';
+  });
+  container.innerHTML = html;
+}
+
+function hmSelectCategory(key) {
+  hmActiveCategory = key;
+  hmRenderCategoryTabs();
+  hmRenderPlaylist();
+}
+
+function hmRenderPlaylist() {
+  var container = document.getElementById('hmPlaylist');
+  if (!container) return;
+  var tracks = HM_TRACKS.filter(function(t){ return t.cat === hmActiveCategory; });
+  var cat = HM_CATEGORIES.find(function(c){ return c.key === hmActiveCategory; });
+  var html = '<div style="font-size:13px;color:var(--gold);margin-bottom:12px;font-weight:600">'+(cat?cat.icon:'')+' '+(cat?cat.name:'')+' · 共'+tracks.length+'首</div>';
+  tracks.forEach(function(track, idx) {
+    var realIdx = HM_TRACKS.indexOf(track);
+    var isCurrent = (realIdx === hmCurrentIdx);
+    html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:6px;border-radius:8px;background:'+(isCurrent?"rgba(201,168,76,0.08)":"rgba(255,255,255,0.02)")+';border:1px solid '+(isCurrent?"var(--border)":"transparent")+';transition:all .25s;cursor:pointer">';
+    html += '<div onclick="hmPlayTrack('+realIdx+')" style="flex:1;min-width:0">';
+    html += '<div style="font-size:13px;color:'+(isCurrent?'var(--gold)':'var(--paper2)')+';font-weight:'+(isCurrent?'600':'400')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(isCurrent&&hmIsPlaying?'🔊 ':'')+track.title+'</div>';
+    html += '<div style="font-size:11px;color:var(--paper3);opacity:.6;margin-top:2px">'+track.desc+'</div>';
+    html += '</div>';
+    if (track.merit) {
+      html += '<button onclick="event.stopPropagation();hmMerit('+realIdx+')" style="flex-shrink:0;padding:5px 10px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--gold);cursor:pointer;font-size:11px;font-family:inherit;transition:all .25s">🙏 闻乐功德</button>';
+    }
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function hmEnsureAudioCtx() {
+  if (!hmAudioCtx) {
+    try {
+      hmAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch(e) {
+      showToast('您的浏览器不支持 Web Audio API');
+      return false;
+    }
+  }
+  if (hmAudioCtx.state === 'suspended') {
+    hmAudioCtx.resume();
+  }
+  return true;
+}
+
+function hmStopAllNodes() {
+  hmActiveNodes.forEach(function(node) {
+    try { if (node.stop) node.stop(); } catch(e) {}
+    try { if (node.disconnect) node.disconnect(); } catch(e) {}
+  });
+  hmActiveSources.forEach(function(src) {
+    try { src.stop(); } catch(e) {}
+    try { src.disconnect(); } catch(e) {}
+  });
+  hmActiveNodes = [];
+  hmActiveSources = [];
+  if (hmAnimId) {
+    cancelAnimationFrame(hmAnimId);
+    hmAnimId = null;
+  }
+}
+
+function hmPlayTrack(idx) {
+  if (idx < 0 || idx >= HM_TRACKS.length) return;
+  if (idx === hmCurrentIdx && hmIsPlaying) {
+    hmPause();
+    return;
+  }
+  if (idx === hmCurrentIdx && !hmIsPlaying) {
+    hmResume();
+    return;
+  }
+  hmStopAllNodes();
+  hmCurrentIdx = idx;
+  hmCurrentTrack = HM_TRACKS[idx];
+  hmIsPlaying = true;
+  hmPlayStartTime = 0;
+  hmTrackDuration = 180;
+  hmRenderPlaylist();
+  hmUpdateNowPlaying();
+  hmUpdatePlayBtn();
+  if (!hmEnsureAudioCtx()) return;
+  hmGenerateSound(hmCurrentTrack.gen);
+  hmStartProgressAnimation();
+}
+
+function hmGenerateSound(genType) {
+  if (!hmAudioCtx) return;
+  var ctx = hmAudioCtx;
+  var masterGain = ctx.createGain();
+  masterGain.gain.value = hmVolume;
+  masterGain.connect(ctx.destination);
+  hmActiveNodes.push(masterGain);
+
+  switch(genType) {
+    case 'bell': hmGenBell(ctx, masterGain); break;
+    case 'muyu': hmGenMuyu(ctx, masterGain); break;
+    case 'chime': hmGenChime(ctx, masterGain); break;
+    case 'tone_wood': hmGenTone(ctx, masterGain, 349.23, 'triangle'); break; // F4
+    case 'tone_fire': hmGenTone(ctx, masterGain, 523.25, 'triangle'); break; // C5
+    case 'tone_earth': hmGenTone(ctx, masterGain, 392.00, 'triangle'); break; // G4
+    case 'tone_metal': hmGenTone(ctx, masterGain, 440.00, 'triangle'); break; // A4
+    case 'tone_water': hmGenTone(ctx, masterGain, 293.66, 'triangle'); break; // D4
+    case 'meditation': hmGenMeditation(ctx, masterGain); break;
+    case 'guqin': hmGenGuqin(ctx, masterGain); break;
+    case 'crystal_bowl': hmGenBowl(ctx, masterGain, 528); break;
+    case 'singing_bowl': hmGenBowl(ctx, masterGain, 432); break;
+    case 'rain': hmGenRain(ctx, masterGain); break;
+    case 'stream': hmGenStream(ctx, masterGain); break;
+    case 'birds': hmGenBirds(ctx, masterGain); break;
+    default: hmGenBell(ctx, masterGain);
+  }
+}
+
+// 钟磬音 - 悠远的寺院钟声
+function hmGenBell(ctx, master) {
+  var baseFreq = 220;
+  var harmonics = [1, 2.76, 5.4, 8.93];
+  var decay = [1.0, 0.4, 0.25, 0.15];
+  var interval = 4000; // 4秒一次
+
+  function strikeBell(time) {
+    harmonics.forEach(function(h, i) {
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.frequency.value = baseFreq * h;
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(0, time);
+      gain.gain.linearRampToValueAtTime(decay[i] * 0.3, time + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + 3.5);
+      osc.connect(gain);
+      gain.connect(master);
+      osc.start(time);
+      osc.stop(time + 4);
+      hmActiveSources.push(osc);
+    });
+  }
+
+  var startTime = ctx.currentTime;
+  strikeBell(startTime);
+  // 每4秒敲一次
+  var bellInterval = setInterval(function() {
+    if (!hmIsPlaying) { clearInterval(bellInterval); return; }
+    strikeBell(ctx.currentTime);
+  }, interval);
+  hmActiveNodes.push({ stop: function() { clearInterval(bellInterval); }, disconnect: function(){} });
+}
+
+// 木鱼声 - 节奏均匀的木鱼
+function hmGenMuyu(ctx, master) {
+  var interval = 500; // 0.5秒一次
+
+  function knockMuyu(time) {
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.frequency.setValueAtTime(180, time);
+    osc.frequency.exponentialRampToValueAtTime(80, time + 0.08);
+    osc.type = 'square';
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(0.25, time + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.12);
+    osc.connect(gain);
+    gain.connect(master);
+    osc.start(time);
+    osc.stop(time + 0.15);
+    hmActiveSources.push(osc);
+  }
+
+  var startTime = ctx.currentTime;
+  knockMuyu(startTime);
+  var muyuInterval = setInterval(function() {
+    if (!hmIsPlaying) { clearInterval(muyuInterval); return; }
+    knockMuyu(ctx.currentTime);
+  }, interval);
+  hmActiveNodes.push({ stop: function() { clearInterval(muyuInterval); }, disconnect: function(){} });
+}
+
+// 编磬音 - 清脆悦耳
+function hmGenChime(ctx, master) {
+  var freqs = [523.25, 587.33, 659.25, 698.46, 783.99, 880.00]; // C5 D5 E5 F5 G5 A5
+  var interval = 800;
+  var noteIdx = 0;
+
+  function playChime(time) {
+    var freq = freqs[noteIdx % freqs.length];
+    noteIdx++;
+    var harmonics = [1, 2, 3];
+    var decay = [0.3, 0.15, 0.08];
+    harmonics.forEach(function(h, i) {
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.frequency.value = freq * h;
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(0, time);
+      gain.gain.linearRampToValueAtTime(decay[i] * 0.25, time + 0.005);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + 2);
+      osc.connect(gain);
+      gain.connect(master);
+      osc.start(time);
+      osc.stop(time + 2.5);
+      hmActiveSources.push(osc);
+    });
+  }
+
+  playChime(ctx.currentTime);
+  var chimeInterval = setInterval(function() {
+    if (!hmIsPlaying) { clearInterval(chimeInterval); return; }
+    playChime(ctx.currentTime);
+  }, interval);
+  hmActiveNodes.push({ stop: function() { clearInterval(chimeInterval); }, disconnect: function(){} });
+}
+
+// 五行音 - 持续低频音
+function hmGenTone(ctx, master, freq, type) {
+  var osc = ctx.createOscillator();
+  var gain = ctx.createGain();
+  var lfo = ctx.createOscillator();
+  var lfoGain = ctx.createGain();
+  osc.frequency.value = freq;
+  osc.type = type || 'sine';
+  lfo.frequency.value = 0.2; // 慢速振动
+  lfoGain.gain.value = 0.05;
+  lfo.connect(lfoGain);
+  lfoGain.connect(gain.gain);
+  gain.gain.value = 0.15;
+  osc.connect(gain);
+  gain.connect(master);
+  osc.start();
+  lfo.start();
+  hmActiveSources.push(osc, lfo);
+}
+
+// 禅修冥想 - 低频持续音+间歇钟声
+function hmGenMeditation(ctx, master) {
+  var osc1 = ctx.createOscillator();
+  var osc2 = ctx.createOscillator();
+  var gain1 = ctx.createGain();
+  var gain2 = ctx.createGain();
+  osc1.frequency.value = 136.1; // OM频率
+  osc1.type = 'sine';
+  osc2.frequency.value = 204.15; // 和谐音
+  osc2.type = 'sine';
+  gain1.gain.value = 0.12;
+  gain2.gain.value = 0.06;
+  osc1.connect(gain1);
+  osc2.connect(gain2);
+  gain1.connect(master);
+  gain2.connect(master);
+  osc1.start();
+  osc2.start();
+  hmActiveSources.push(osc1, osc2);
+}
+
+// 古琴音 - 拨弦模拟
+function hmGenGuqin(ctx, master) {
+  var pentatonic = [261.63, 293.66, 329.63, 392.00, 440.00]; // C D E G A
+  var interval = 1200;
+  var noteIdx = 0;
+
+  function pluckString(time) {
+    var freq = pentatonic[noteIdx % pentatonic.length];
+    noteIdx++;
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.frequency.value = freq;
+    osc.type = 'triangle';
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(0.2, time + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 3);
+    osc.connect(gain);
+    gain.connect(master);
+    osc.start(time);
+    osc.stop(time + 3.5);
+    hmActiveSources.push(osc);
+    // 泛音
+    var osc2 = ctx.createOscillator();
+    var gain2 = ctx.createGain();
+    osc2.frequency.value = freq * 2;
+    osc2.type = 'sine';
+    gain2.gain.setValueAtTime(0, time);
+    gain2.gain.linearRampToValueAtTime(0.05, time + 0.03);
+    gain2.gain.exponentialRampToValueAtTime(0.001, time + 2);
+    osc2.connect(gain2);
+    gain2.connect(master);
+    osc2.start(time);
+    osc2.stop(time + 2.5);
+    hmActiveSources.push(osc2);
+  }
+
+  pluckString(ctx.currentTime);
+  var guqinInterval = setInterval(function() {
+    if (!hmIsPlaying) { clearInterval(guqinInterval); return; }
+    pluckString(ctx.currentTime);
+  }, interval);
+  hmActiveNodes.push({ stop: function() { clearInterval(guqinInterval); }, disconnect: function(){} });
+}
+
+// 水晶钵/颂钵 - 泛音共振
+function hmGenBowl(ctx, master, baseFreq) {
+  var freqs = [baseFreq, baseFreq * 1.5, baseFreq * 2, baseFreq * 2.5];
+  var gains = [0.15, 0.08, 0.05, 0.03];
+  freqs.forEach(function(f, i) {
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    var lfo = ctx.createOscillator();
+    var lfoGain = ctx.createGain();
+    osc.frequency.value = f;
+    osc.type = 'sine';
+    lfo.frequency.value = 0.1 + i * 0.05;
+    lfoGain.gain.value = 0.02;
+    lfo.connect(lfoGain);
+    lfoGain.connect(gain.gain);
+    gain.gain.value = gains[i];
+    osc.connect(gain);
+    gain.connect(master);
+    osc.start();
+    lfo.start();
+    hmActiveSources.push(osc, lfo);
+  });
+}
+
+var hmNoiseSeed = 12345;
+function hmNoise() {
+  hmNoiseSeed = (hmNoiseSeed * 9301 + 49297) % 233280;
+  return hmNoiseSeed / 233280;
+}
+
+// 雨声白噪音
+function hmGenRain(ctx, master) {
+  var bufferSize = 4096;
+  var noise = ctx.createScriptProcessor(bufferSize, 1, 1);
+  noise.onaudioprocess = function(e) {
+    var output = e.outputBuffer.getChannelData(0);
+    for (var i = 0; i < bufferSize; i++) {
+      output[i] = (hmNoise() - 0.5) * 0.3;
+    }
+  };
+  var filter = ctx.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.value = 1000;
+  filter.Q.value = 0.5;
+  noise.connect(filter);
+  filter.connect(master);
+  hmActiveNodes.push(noise, filter);
+}
+
+// 溪流水声
+function hmGenStream(ctx, master) {
+  var bufferSize = 4096;
+  var noise = ctx.createScriptProcessor(bufferSize, 1, 1);
+  var lfo = ctx.createOscillator();
+  var lfoGain = ctx.createGain();
+  var filter = ctx.createBiquadFilter();
+  noise.onaudioprocess = function(e) {
+    var output = e.outputBuffer.getChannelData(0);
+    for (var i = 0; i < bufferSize; i++) {
+      output[i] = (hmNoise() - 0.5) * 0.25;
+    }
+  };
+  filter.type = 'lowpass';
+  filter.frequency.value = 500;
+  filter.Q.value = 1;
+  lfo.frequency.value = 0.3;
+  lfoGain.gain.value = 200;
+  lfo.connect(lfoGain);
+  lfoGain.connect(filter.frequency);
+  noise.connect(filter);
+  filter.connect(master);
+  lfo.start();
+  hmActiveSources.push(lfo);
+  hmActiveNodes.push(noise, filter);
+}
+
+// 鸟鸣声
+function hmGenBirds(ctx, master) {
+  var chirpInterval = 1500;
+
+  function playChirp(time) {
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.frequency.setValueAtTime(2000, time);
+    osc.frequency.exponentialRampToValueAtTime(3500, time + 0.05);
+    osc.frequency.exponentialRampToValueAtTime(1800, time + 0.1);
+    osc.frequency.exponentialRampToValueAtTime(3000, time + 0.15);
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(0.1, time + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.2);
+    osc.connect(gain);
+    gain.connect(master);
+    osc.start(time);
+    osc.stop(time + 0.25);
+    hmActiveSources.push(osc);
+  }
+
+  playChirp(ctx.currentTime);
+  var birdInterval = setInterval(function() {
+    if (!hmIsPlaying) { clearInterval(birdInterval); return; }
+    playChirp(ctx.currentTime);
+    // 随机第二次鸣叫
+    setTimeout(function() {
+      if (hmIsPlaying) playChirp(ctx.currentTime);
+    }, 300);
+  }, chirpInterval);
+  hmActiveNodes.push({ stop: function() { clearInterval(birdInterval); }, disconnect: function(){} });
+}
+
+function hmTogglePlay() {
+  if (hmCurrentIdx < 0) {
+    // 自动播放第一首
+    var firstTrack = HM_TRACKS.findIndex(function(t){ return t.cat === hmActiveCategory; });
+    if (firstTrack >= 0) hmPlayTrack(firstTrack);
+    return;
+  }
+  if (hmIsPlaying) hmPause();
+  else hmResume();
+}
+
+function hmPause() {
+  hmIsPlaying = false;
+  hmStopAllNodes();
+  hmUpdatePlayBtn();
+  hmRenderPlaylist();
+  if (hmAudioCtx) hmAudioCtx.suspend();
+}
+
+function hmResume() {
+  if (!hmCurrentTrack) return;
+  hmIsPlaying = true;
+  if (!hmEnsureAudioCtx()) return;
+  hmGenerateSound(hmCurrentTrack.gen);
+  hmStartProgressAnimation();
+  hmUpdatePlayBtn();
+  hmRenderPlaylist();
+}
+
+function hmNext() {
+  if (hmCurrentIdx < 0) return;
+  var catTracks = HM_TRACKS.filter(function(t){ return t.cat === hmActiveCategory; });
+  var currentInCat = catTracks.indexOf(HM_TRACKS[hmCurrentIdx]);
+  var nextInCat = (currentInCat + 1) % catTracks.length;
+  var nextIdx = HM_TRACKS.indexOf(catTracks[nextInCat]);
+  hmPlayTrack(nextIdx);
+}
+
+function hmPrev() {
+  if (hmCurrentIdx < 0) return;
+  var catTracks = HM_TRACKS.filter(function(t){ return t.cat === hmActiveCategory; });
+  var currentInCat = catTracks.indexOf(HM_TRACKS[hmCurrentIdx]);
+  var prevInCat = (currentInCat - 1 + catTracks.length) % catTracks.length;
+  var prevIdx = HM_TRACKS.indexOf(catTracks[prevInCat]);
+  hmPlayTrack(prevIdx);
+}
+
+function hmToggleLoop() {
+  hmIsLoop = !hmIsLoop;
+  var btn = document.getElementById('hmLoopBtn');
+  if (btn) {
+    if (hmIsLoop) {
+      btn.style.color = 'var(--gold)';
+      btn.style.borderColor = 'var(--gold)';
+      btn.style.background = 'rgba(201,168,76,0.08)';
+      showToast('循环播放已开启');
+    } else {
+      btn.style.color = 'var(--paper3)';
+      btn.style.borderColor = 'var(--border)';
+      btn.style.background = 'transparent';
+      showToast('循环播放已关闭');
+    }
+  }
+}
+
+function hmSetVolume(val) {
+  hmVolume = val / 100;
+  if (hmAudioCtx) {
+    hmActiveNodes.forEach(function(node) {
+      if (node.gain) node.gain.value = hmVolume;
+    });
+  }
+}
+
+function hmUpdatePlayBtn() {
+  var btn = document.getElementById('hmPlayBtn');
+  if (btn) btn.textContent = hmIsPlaying ? '⏸' : '▶';
+}
+
+function hmUpdateNowPlaying() {
+  if (!hmCurrentTrack) return;
+  var titleEl = document.getElementById('hmNowPlayingTitle');
+  var catEl = document.getElementById('hmNowPlayingCat');
+  var iconEl = document.getElementById('hmNowPlayingIcon');
+  var cat = HM_CATEGORIES.find(function(c){ return c.key === hmCurrentTrack.cat; });
+  if (titleEl) titleEl.textContent = hmCurrentTrack.title;
+  if (catEl) catEl.textContent = (cat ? cat.name : '') + ' · ' + hmCurrentTrack.desc;
+  if (iconEl) iconEl.textContent = (cat ? cat.icon : '🎵');
+}
+
+function hmStartProgressAnimation() {
+  if (hmAnimId) cancelAnimationFrame(hmAnimId);
+  if (!hmPlayStartTime) hmPlayStartTime = Date.now();
+  function update() {
+    if (!hmIsPlaying) return;
+    var elapsed = (Date.now() - hmPlayStartTime) / 1000;
+    if (elapsed >= hmTrackDuration) {
+      if (hmIsLoop) {
+        hmPlayStartTime = Date.now();
+        elapsed = 0;
+      } else {
+        hmNext();
+        return;
+      }
+    }
+    var pct = (elapsed / hmTrackDuration) * 100;
+    var fill = document.getElementById('hmProgressFill');
+    if (fill) fill.style.width = pct + '%';
+    var curEl = document.getElementById('hmCurrentTime');
+    if (curEl) curEl.textContent = hmFormatTime(elapsed);
+    var totEl = document.getElementById('hmTotalTime');
+    if (totEl) totEl.textContent = hmFormatTime(hmTrackDuration);
+    hmAnimId = requestAnimationFrame(update);
+  }
+  hmAnimId = requestAnimationFrame(update);
+}
+
+function hmFormatTime(sec) {
+  var m = Math.floor(sec / 60);
+  var s = Math.floor(sec % 60);
+  return m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function hmMerit(idx) {
+  var track = HM_TRACKS[idx];
+  if (!track) return;
+  var faith = 'fo';
+  if (track.cat === 'dao') faith = 'dao';
+  else if (track.cat === 'yangsheng' || track.cat === 'jingxin') faith = 'all';
+  addMerit(faith, 1, '闻乐净心：' + track.title);
+  showToast('🎵 闻乐功德 +1 · ' + track.title);
+}
+
+// 初始化音乐播放器
+if (document.readyState === 'complete') {
+  setTimeout(hmInit, 300);
+} else {
+  window.addEventListener('load', function() { setTimeout(hmInit, 300); });
+}
+
+// ============================================================
+// 🌿 养生百科知识库
+// ============================================================
+var TZ_ENCYCLOPEDIA = {
+  seasons: [
+    {title:'春养肝', icon:'🌱', summary:'春季属木，肝当令。宜养肝气，疏泄情志，多食绿色酸味食物。', details:'春季万物生发，肝气旺盛。养生要点：①早睡早起，缓步散步；②少酸增甘，养脾气；③多食绿叶蔬菜，如菠菜、芹菜；④保持心情舒畅，戒怒戒躁；⑤可饮菊花茶、枸杞茶疏肝明目。'},
+    {title:'夏养心', icon:'☀️', summary:'夏季属火，心当令。宜养心气，清热消暑，多食红色苦味食物。', details:'夏季炎热，心火旺盛。养生要点：①晚睡早起，午休片刻；②饮食清淡，少油腻；③多食苦瓜、莲子、百合；④多饮绿茶消暑；⑤静心凝神，避免大喜伤心；⑥运动宜在清晨或傍晚。'},
+    {title:'长夏养脾胃', icon:'🌾', summary:'长夏属土，脾当令。宜健脾祛湿，饮食有节，忌生冷。', details:'长夏湿气重，脾胃易受伤。养生要点：①饮食有节，不过饱过饥；②忌生冷油腻；③多食薏米、山药、扁豆；④避免久坐湿地；⑤适当运动助消化；⑥可艾灸中脘、足三里。'},
+    {title:'秋养肺', icon:'🍂', summary:'秋季属金，肺当令。宜养肺气，润燥生津，多食白色辛味食物。', details:'秋季干燥，肺易受伤。养生要点：①早睡早起，与鸡俱兴；②多食梨、银耳、蜂蜜润肺；③少食辛辣；④适当秋冻增强体质；⑤深呼吸养肺气；⑥叩齿咽津，润养肺阴。'},
+    {title:'冬养肾', icon:'❄️', summary:'冬季属水，肾当令。宜养肾气，藏精固本，多食黑色咸味食物。', details:'冬季寒冷，肾气当令。养生要点：①早睡晚起，必待日光；②注意保暖，尤其腰脚；③多食黑色食物：黑豆、黑芝麻、核桃；④适当进补：羊肉、枸杞；⑤减少运动量，避免大汗；⑥可泡脚温阳。'}
+  ],
+  shichen: [
+    {time:'子时 23:00-01:00', organ:'胆经', icon:'🌙', summary:'子时一阳生，胆经当令。宜安眠养胆。', details:'子时是阴阳交替之时，胆经最旺。此时应熟睡，让胆经完成代谢。长期子时不睡，易患胆结石、偏头痛。建议：23点前入睡，养胆气，助阳气生发。'},
+    {time:'丑时 01:00-03:00', organ:'肝经', icon:'🌑', summary:'丑时肝经当令，宜深睡养肝血。', details:'丑时肝经最旺，肝脏解毒排毒。此时必须深睡，让肝脏完成代谢。长期熬夜伤肝，易患肝病。建议：保持深度睡眠，不饮酒，不夜食。'},
+    {time:'寅时 03:00-05:00', organ:'肺经', icon:'🌅', summary:'寅时肺经当令，宜深睡养肺气。', details:'寅时肺经最旺，将肝贮藏的新鲜血液输送全身。此时应保持深度睡眠。老年人易在此时醒来，说明肺气不足。建议：深睡，可做深呼吸练习。'},
+    {time:'卯时 05:00-07:00', organ:'大肠经', icon:'🌄', summary:'卯时大肠经当令，宜起床排便。', details:'卯时大肠经最旺，利于排便。建议：起床后喝一杯温水，养成定时排便习惯。可按摩腹部促进肠蠕动。'},
+    {time:'辰时 07:00-09:00', organ:'胃经', icon:'🍳', summary:'辰时胃经当令，宜吃好早餐。', details:'辰时胃经最旺，消化吸收功能最强。建议：7-9点吃早餐，营养丰富，温热为主。长期不吃早餐伤胃。'},
+    {time:'巳时 09:00-11:00', organ:'脾经', icon:'📚', summary:'巳时脾经当令，宜学习工作。', details:'巳时脾经最旺，脾主运化，此时大脑最活跃，精力充沛。建议：此时学习和工作效率最高。可适量饮水。'},
+    {time:'午时 11:00-13:00', organ:'心经', icon:'☀️', summary:'午时心经当令，宜午休养心。', details:'午时心经最旺，阳极阴生。建议：午餐后小憩15-30分钟，养心气。不宜午睡过长，以免影响夜间睡眠。'},
+    {time:'未时 13:00-15:00', organ:'小肠经', icon:'📖', summary:'未时小肠经当令，宜吸收营养。', details:'未时小肠经最旺，泌别清浊。建议：午餐在13点前吃完，利于小肠吸收。可适当饮水。'},
+    {time:'申时 15:00-17:00', organ:'膀胱经', icon:'💧', summary:'申时膀胱经当令，宜多饮水排毒。', details:'申时膀胱经最旺，排泄废物。建议：多喝水，利于排毒。此时运动效果佳，可做拉伸运动疏通膀胱经。'},
+    {time:'酉时 17:00-19:00', organ:'肾经', icon:'🌇', summary:'酉时肾经当令，宜休息养肾。', details:'酉时肾经最旺，肾藏精。建议：此时不宜剧烈运动，宜静坐收功。可按摩涌泉穴，泡脚温养肾气。'},
+    {time:'戌时 19:00-21:00', organ:'心包经', icon:'🌆', summary:'戌时心包经当令，宜散步放松。', details:'戌时心包经最旺，保护心脏。建议：散步、听音乐、放松心情。可按摩内关穴。不宜剧烈运动。'},
+    {time:'亥时 21:00-23:00', organ:'三焦经', icon:'🌃', summary:'亥时三焦经当令，宜安睡养百脉。', details:'亥时三焦经最旺，通百脉。建议：21-23点入睡，养百脉。此时睡好，百脉得以休养，皮肤红润。可在睡前泡脚。'}
+  ],
+  jieqi: [
+    {name:'立春', focus:'养肝升阳', detail:'立春阳气初生，宜食辛甘发散之物，如葱、姜、韭菜。早起缓行，舒展身体。'},
+    {name:'雨水', focus:'疏肝健脾', detail:'雨水湿气渐重，宜健脾祛湿。食薏米、山药，忌生冷。'},
+    {name:'惊蛰', focus:'养肝保肝', detail:'惊蛰万物复苏，肝气旺盛。宜清淡饮食，保持心情平和。'},
+    {name:'春分', focus:'平衡阴阳', detail:'春分阴阳各半，宜调和阴阳。食菠菜、豆芽，早睡早起。'},
+    {name:'清明', focus:'疏肝养肝', detail:'清明肝气最旺，宜踏青舒缓情绪。饮菊花茶，食荠菜。'},
+    {name:'谷雨', focus:'健脾祛湿', detail:'谷雨雨水增多，宜健脾祛湿。食扁豆、赤小豆，避免潮湿环境。'},
+    {name:'立夏', focus:'养心安神', detail:'立夏心火渐旺，宜养心。食莲子、百合，午休养心。'},
+    {name:'小满', focus:'清热祛湿', detail:'小满湿热渐重，宜清热祛湿。食绿豆、冬瓜，忌辛辣油腻。'},
+    {name:'芒种', focus:'清热解毒', detail:'芒种暑湿，宜清热解暑。饮绿茶，食苦瓜，保持清爽。'},
+    {name:'夏至', focus:'养心护阳', detail:'夏至阳气最盛，宜护阳养心。忌贪凉，适当出汗排毒。'},
+    {name:'小暑', focus:'消暑养心', detail:'小暑炎热，宜消暑。食绿豆汤、西瓜，避免烈日下运动。'},
+    {name:'大暑', focus:'清热降火', detail:'大暑最热，宜清热降火。多饮水，食苦瓜、莲子心，静心避暑。'},
+    {name:'立秋', focus:'润肺养阴', detail:'立秋燥气渐起，宜润肺。食梨、银耳、蜂蜜，少食辛辣。'},
+    {name:'处暑', focus:'滋阴润燥', detail:'处暑暑气渐消，宜滋阴润燥。食百合、莲藕，早睡早起。'},
+    {name:'白露', focus:'润肺防燥', detail:'白露凉燥，宜润肺。食芝麻、糯米，注意保暖。'},
+    {name:'秋分', focus:'阴阳平衡', detail:'秋分阴阳各半，宜调和。食核桃、龙眼，适当秋冻。'},
+    {name:'寒露', focus:'养阴防燥', detail:'寒露气温下降，宜养阴。食山药、白萝卜，注意足部保暖。'},
+    {name:'霜降', focus:'补肝益肾', detail:'霜降进补好时机，食栗子、柿子，补肝益肾。'},
+    {name:'立冬', focus:'补肾藏精', detail:'立冬阳气内藏，宜补肾。食黑豆、核桃，早睡晚起。'},
+    {name:'小雪', focus:'温补肾阳', detail:'小雪寒冷，宜温补。食羊肉、枸杞，注意保暖。'},
+    {name:'大雪', focus:'温阳进补', detail:'大雪阴气盛，宜温阳进补。食当归生姜羊肉汤，泡脚暖身。'},
+    {name:'冬至', focus:'养肾护阳', detail:'冬至一阳生，宜护阳。早睡晚起，食温热食物，忌寒凉。'},
+    {name:'小寒', focus:'温肾壮阳', detail:'小寒最冷时节，宜温肾。食牛肉、羊肉，艾灸关元、气海。'},
+    {name:'大寒', focus:'固本培元', detail:'大寒将至春，宜固本。食黑米、黑芝麻，适当运动迎接春天。'}
+  ],
+  gongfa: [
+    {name:'八段锦', icon:'🤸', summary:'八段锦是传统导引功法，八个动作调理五脏六腑。', details:'八段锦动作：①双手托天理三焦；②左右开弓似射雕；③调理脾胃须单举；④五劳七伤往后瞧；⑤摇头摆尾去心火；⑥两手攀足固肾腰；⑦攒拳怒目增气力；⑧背后七颠百病消。每日练习，强身健体。'},
+    {name:'五禽戏', icon:'🐅', summary:'华佗所创，模仿虎鹿熊猿鸟五种动物动作。', details:'五禽戏：①虎戏——威猛刚柔，疏通肝经；②鹿戏——轻盈舒展，固肾壮腰；③熊戏——沉稳浑厚，健脾助消化；④猿戏——灵敏活泼，养心安神；⑤鸟戏——展翅飞翔，调畅气机。全套练习约15分钟。'},
+    {name:'易筋经', icon:'💪', summary:'少林传统功法，通过拉伸筋骨强健体魄。', details:'易筋经十二式：①韦驮献杵；②横担降魔；③掌托天门；④摘星换斗；⑤倒拽九牛尾；⑥出爪亮翅；⑦九鬼拔马刀；⑧三盘落地；⑨青龙探爪；⑩卧虎扑食；⑪打躬击鼓；⑫掉尾摇头。练习时配合呼吸，舒展筋骨。'},
+    {name:'六字诀', icon:'🗣️', summary:'通过六种发音吐纳调理五脏六腑。', details:'六字诀：①嘘字诀——平肝气，疏肝理气；②呵字诀——降心火，清心安神；③呼字诀——健脾气，消食化滞；④呬字诀——润肺气，清热化痰；⑤吹字诀——补肾气，固肾培元；⑥嘻字诀——理三焦，通调水道。每字发音6次，配合呼吸吐纳。'}
+  ],
+  diet: [
+    {name:'药食同源', icon:'🍵', summary:'许多食物本身具有药性，日常饮食即可调养身体。', details:'药食同源理论认为食物与药物同源同用。常见药食同源之物：①山药——健脾益肾；②枸杞——滋补肝肾；③红枣——补中益气；④生姜——温中散寒；⑤蜂蜜——润肺养胃；⑥莲子——养心安神；⑦百合——润肺止咳；⑧桂圆——补血安神。日常合理搭配，寓医于食。'},
+    {name:'四气五味', icon:'🌡️', summary:'食物有寒热温凉四气，酸苦甘辛咸五味。', details:'四气：寒凉食物清热泻火（如苦瓜、绿豆）；温热食物温阳散寒（如羊肉、生姜）；平性食物平和养胃（如大米、猪肉）。\n五味：酸入肝（收敛）；苦入心（降火）；甘入脾（补益）；辛入肺（发散）；咸入肾（软坚）。根据体质选择合适性味的食物。'},
+    {name:'归经理论', icon:'🧭', summary:'不同食物归入不同经络脏腑，针对性调养。', details:'归经是指食物对特定脏腑经络的趋向性。①归心经：莲子、龙眼、小麦；②归肝经：枸杞、菊花、醋；③归脾经：山药、大枣、糯米；④归肺经：百合、银耳、梨；⑤归肾经：黑豆、核桃、黑芝麻。根据需要调养的脏腑，选择对应归经的食物。'}
+  ]
+};
+
+function tzRenderEncyclopedia() {
+  var container = document.getElementById('tzEncyclopediaContainer');
+  if (!container) return;
+  var html = '';
+
+  // 四季养生
+  html += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)" style="cursor:pointer">🌸 四季养生 <span class="toggle-icon">▼</span></div>';
+  html += '<div class="bazi-module-body collapsed" style="padding:12px 0">';
+  TZ_ENCYCLOPEDIA.seasons.forEach(function(s) {
+    html += '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px">';
+    html += '<div style="font-size:14px;color:var(--gold);font-weight:600;margin-bottom:6px">'+s.icon+' '+s.title+'</div>';
+    html += '<div style="font-size:12px;color:var(--paper3);line-height:1.7;margin-bottom:8px">'+s.summary+'</div>';
+    html += '<div style="font-size:12px;color:var(--paper2);line-height:1.8;opacity:.8;padding:8px;background:rgba(0,0,0,0.15);border-radius:6px">'+s.details.replace(/\n/g, '<br>')+'</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // 十二时辰养生
+  html += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)" style="cursor:pointer">🕐 十二时辰养生 <span class="toggle-icon">▼</span></div>';
+  html += '<div class="bazi-module-body collapsed" style="padding:12px 0">';
+  TZ_ENCYCLOPEDIA.shichen.forEach(function(s) {
+    html += '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px">';
+    html += '<div style="font-size:14px;color:var(--gold);font-weight:600;margin-bottom:6px">'+s.icon+' '+s.time+' · '+s.organ+'</div>';
+    html += '<div style="font-size:12px;color:var(--paper3);line-height:1.7;margin-bottom:8px">'+s.summary+'</div>';
+    html += '<div style="font-size:12px;color:var(--paper2);line-height:1.8;opacity:.8;padding:8px;background:rgba(0,0,0,0.15);border-radius:6px">'+s.details+'</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // 二十四节气养生
+  html += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)" style="cursor:pointer">🌿 二十四节气养生 <span class="toggle-icon">▼</span></div>';
+  html += '<div class="bazi-module-body collapsed" style="padding:12px 0">';
+  html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">';
+  TZ_ENCYCLOPEDIA.jieqi.forEach(function(j) {
+    html += '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:10px">';
+    html += '<div style="font-size:13px;color:var(--gold);font-weight:600;margin-bottom:4px">'+j.name+'</div>';
+    html += '<div style="font-size:11px;color:var(--paper3);margin-bottom:6px">重点：'+j.focus+'</div>';
+    html += '<div style="font-size:11px;color:var(--paper2);line-height:1.6;opacity:.7">'+j.detail+'</div>';
+    html += '</div>';
+  });
+  html += '</div></div>';
+
+  // 导引功法
+  html += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)" style="cursor:pointer">🧘 导引功法 <span class="toggle-icon">▼</span></div>';
+  html += '<div class="bazi-module-body collapsed" style="padding:12px 0">';
+  TZ_ENCYCLOPEDIA.gongfa.forEach(function(g) {
+    html += '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px">';
+    html += '<div style="font-size:14px;color:var(--gold);font-weight:600;margin-bottom:6px">'+g.icon+' '+g.name+'</div>';
+    html += '<div style="font-size:12px;color:var(--paper3);line-height:1.7;margin-bottom:8px">'+g.summary+'</div>';
+    html += '<div style="font-size:12px;color:var(--paper2);line-height:1.8;opacity:.8;padding:8px;background:rgba(0,0,0,0.15);border-radius:6px">'+g.details+'</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // 饮食养生
+  html += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)" style="cursor:pointer">🍵 饮食养生 <span class="toggle-icon">▼</span></div>';
+  html += '<div class="bazi-module-body collapsed" style="padding:12px 0">';
+  TZ_ENCYCLOPEDIA.diet.forEach(function(d) {
+    html += '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px">';
+    html += '<div style="font-size:14px;color:var(--gold);font-weight:600;margin-bottom:6px">'+d.icon+' '+d.name+'</div>';
+    html += '<div style="font-size:12px;color:var(--paper3);line-height:1.7;margin-bottom:8px">'+d.summary+'</div>';
+    html += '<div style="font-size:12px;color:var(--paper2);line-height:1.8;opacity:.8;padding:8px;background:rgba(0,0,0,0.15);border-radius:6px">'+d.details.replace(/\n/g, '<br>')+'</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  container.innerHTML = html;
+}
+
+// 在 tzSwitchTab 中触发百科渲染
+var _origTzSwitchTab = tzSwitchTab;
+tzSwitchTab = function(name) {
+  _origTzSwitchTab(name);
+  if (name === 'encyclopedia') tzRenderEncyclopedia();
+};
 
 </script>
 
