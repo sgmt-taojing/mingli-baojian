@@ -3677,6 +3677,10 @@ setTimeout(removeLoadingOverlay,5000);
         <span class="tab-emoji">🎊</span>
         <span class="tab-name">年度运势</span>
       </button>
+      <button class="nav-tab" onclick="showSection('healing-music')" id="tab-healing-music">
+        <span class="tab-emoji">🎵</span>
+        <span class="tab-name">养心音乐</span>
+      </button>
 
     </div>
     <div class="nav-user">古 老 预 测 术</div>
@@ -3959,6 +3963,7 @@ setTimeout(removeLoadingOverlay,5000);
     <button id="tzTab-bazi" onclick="tzSwitchTab('bazi')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">🔮 八字体质</button>
     <button id="tzTab-checkin" onclick="tzSwitchTab('checkin')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">✅ 打卡记录</button>
     <button id="tzTab-wuxing" onclick="tzSwitchTab('wuxing')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">☯️ 五行养生</button>
+    <button id="tzTab-encyclopedia" onclick="tzSwitchTab('encyclopedia')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">🌿 养生百科</button>
   </div>
 
   <!-- ===== Tab: 报告分析 ===== -->
@@ -4033,10 +4038,28 @@ setTimeout(removeLoadingOverlay,5000);
 
   <!-- ===== Tab: 名医名方 ===== -->
   <div id="tz-tab-prescription" class="tz-panel" style="display:none">
+    <!-- 名医名方数据库 -->
     <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
-      <h4 style="font-size:16px;color:var(--gold);margin-bottom:12px">💊 名医名方</h4>
-      <p style="font-size:13px;color:var(--paper2);line-height:1.7;margin-bottom:16px">经典中医方剂，按体质分类，源自历代名医。</p>
-      <div id="tzPrescriptionList" style="display:grid;gap:12px"></div>
+      <h4 style="font-size:16px;color:var(--gold);margin-bottom:12px">💊 名医名方数据库</h4>
+      <p style="font-size:13px;color:var(--paper2);line-height:1.7;margin-bottom:16px">收录历代名医及其代表方剂，按朝代分类，支持按症状搜索。</p>
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+        <input type="text" id="rxSearchInput" placeholder="搜索方剂名、症状、功效...如：头痛、桂枝汤、失眠" style="flex:1;min-width:200px;padding:8px 12px;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:inherit" oninput="rxSearchPrescriptions()">
+        <button onclick="rxClearSearch()" style="padding:8px 14px;border:1px solid var(--border);border-radius:6px;background:rgba(255,255,255,0.04);color:var(--muted);cursor:pointer;font-size:12px;font-family:inherit">清除</button>
+      </div>
+      <div id="rxSearchResult" style="display:none;margin-bottom:16px"></div>
+      <div id="rxDoctorsByDynasty"></div>
+    </div>
+    <!-- 非遗中医展示 -->
+    <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+      <h4 style="font-size:16px;color:var(--gold);margin-bottom:12px">🏺 非遗中医展示</h4>
+      <p style="font-size:13px;color:var(--paper2);line-height:1.7;margin-bottom:16px">国家级非物质文化遗产中医项目展示。</p>
+      <div id="rxHeritageList"></div>
+    </div>
+    <!-- 倪海夏知识模块 -->
+    <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+      <h4 style="font-size:16px;color:var(--gold);margin-bottom:12px">📖 倪海夏中医知识精华</h4>
+      <p style="font-size:13px;color:var(--paper2);line-height:1.7;margin-bottom:16px">美国经方派中医师，汉唐中医学院创办人。</p>
+      <div id="rxNihonshaContent"></div>
     </div>
   </div>
 
@@ -4128,6 +4151,15 @@ setTimeout(removeLoadingOverlay,5000);
       <p style="font-size:13px;color:var(--paper2);line-height:1.7;margin-bottom:16px">木火土金水，五行对应五脏，点击查看各五行养生方案。</p>
       <div id="tzWxBtns" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;justify-content:center"></div>
       <div id="tzWuxingDetail"></div>
+    </div>
+  </div>
+
+  <!-- ===== Tab: 养生百科 ===== -->
+  <div id="tz-tab-encyclopedia" class="tz-panel" style="display:none">
+    <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+      <h4 style="font-size:16px;color:var(--gold);margin-bottom:12px">🌿 养生百科</h4>
+      <p style="font-size:13px;color:var(--paper2);line-height:1.7;margin-bottom:16px">四季养生 · 十二时辰 · 二十四节气 · 导引功法 · 饮食养生，点击各板块展开查看详情。</p>
+      <div id="tzEncyclopediaContainer"></div>
     </div>
   </div>
 </section>
@@ -5140,6 +5172,7 @@ setTimeout(removeLoadingOverlay,5000);
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <button onclick="runAnnualFortune()" style="padding:10px 24px;border:1px solid var(--gold);border-radius:8px;background:rgba(201,168,76,0.1);color:var(--gold);cursor:pointer;font-family:inherit;font-size:13px;letter-spacing:2px">🎊 生成年度运势</button>
         <button onclick="runWorshipGuide()" style="padding:10px 24px;border:1px solid var(--jade);border-radius:8px;background:rgba(39,174,96,0.08);color:var(--jade);cursor:pointer;font-family:inherit;font-size:13px;letter-spacing:2px">🙏 生成祈福参拜指南</button>
+        <button onclick="showTempleBrowser()" style="padding:10px 24px;border:1px solid var(--violet2);border-radius:8px;background:rgba(138,92,246,0.08);color:var(--violet2);cursor:pointer;font-family:inherit;font-size:13px;letter-spacing:2px">🏛️ 名山寺庙浏览</button>
       </div>
     </div>
     <!-- 结果区 -->
@@ -5974,6 +6007,65 @@ setTimeout(removeLoadingOverlay,5000);
     <label><input type="checkbox" id="notifyShichen"> 时辰提醒(重要时辰推送，如子时静坐、午时用膳)</label>
     <p class="input-hint" style="font-size:11px;color:var(--gold);margin:4px 0 0 8px">时辰提醒基于您的绑定八字时辰，按农历十二时辰推送养生建议。</p>
     <label><input type="checkbox" id="notifyJiri" checked> 吉日提醒(黄道吉日推送+当日宜做事项)</label>
+  </div>
+</section>
+
+<!-- ===== HEALING MUSIC (养心净心音乐) SECTION ===== -->
+<section class="section" id="section-healing-music">
+  <div class="section-header">
+    <span class="sh-symbol" style="color:var(--gold)">🎵</span>
+    <h2 class="sh-title">养 心 净 心 音 乐</h2>
+    <p class="sh-en">Healing Music · Purify the Mind · Nourish the Spirit</p>
+    <p class="sh-desc">佛道梵呗 · 五行养生 · 颂钵白噪音 · Web Audio 生成钟磬木鱼 · 闻乐修心，功德日增</p>
+  </div>
+  <div class="back-row"><button class="back-btn" onclick="showSection('hero')">返回首页</button></div>
+
+  <!-- 播放器主体 -->
+  <div style="max-width:900px;margin:0 auto;padding:0 16px">
+    <!-- 分类标签 -->
+    <div id="hmCategoryTabs" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:20px"></div>
+
+    <!-- 播放列表 -->
+    <div id="hmPlaylist" style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px"></div>
+
+    <!-- 播放器控制栏 -->
+    <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:14px;padding:16px 20px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <span id="hmNowPlayingIcon" style="font-size:28px">🎵</span>
+        <div style="flex:1;min-width:0">
+          <div id="hmNowPlayingTitle" style="font-size:14px;color:var(--gold);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">请选择一首音乐</div>
+          <div id="hmNowPlayingCat" style="font-size:11px;color:var(--paper3);opacity:.7">未播放</div>
+        </div>
+      </div>
+      <!-- 进度条 -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <span id="hmCurrentTime" style="font-size:11px;color:var(--paper3);min-width:36px;text-align:right">0:00</span>
+        <div id="hmProgressTrack" style="flex:1;height:6px;background:rgba(201,168,76,0.12);border-radius:3px;cursor:pointer;position:relative;overflow:hidden">
+          <div id="hmProgressFill" style="width:0%;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:3px;transition:width 0.2s ease"></div>
+        </div>
+        <span id="hmTotalTime" style="font-size:11px;color:var(--paper3);min-width:36px">0:00</span>
+      </div>
+      <!-- 按钮组 -->
+      <div style="display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button id="hmPrevBtn" onclick="hmPrev()" style="width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--paper2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .25s" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--paper2)'">⏮</button>
+        <button id="hmPlayBtn" onclick="hmTogglePlay()" style="width:52px;height:52px;border-radius:50%;border:none;background:var(--gold);color:#fff;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;transition:all .25s;box-shadow:0 0 20px rgba(201,168,76,0.3)">▶</button>
+        <button id="hmNextBtn" onclick="hmNext()" style="width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--paper2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .25s" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--paper2)'">⏭</button>
+        <div style="width:1px;height:28px;background:var(--border);margin:0 4px"></div>
+        <!-- 音量 -->
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:14px;opacity:.7">🔊</span>
+          <input type="range" id="hmVolume" min="0" max="100" value="60" oninput="hmSetVolume(this.value)" style="width:80px;accent-color:var(--gold);cursor:pointer">
+        </div>
+        <!-- 循环 -->
+        <button id="hmLoopBtn" onclick="hmToggleLoop()" style="width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--paper3);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .25s" title="循环播放">🔁</button>
+      </div>
+    </div>
+
+    <!-- 说明 -->
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--paper3);opacity:.5;line-height:1.7">
+      💡 部分曲目使用 Web Audio API 实时生成钟磬、木鱼音色，无需加载音频文件<br>
+      闻乐净心，点击「闻乐功德」可累积修行功德
+    </div>
   </div>
 </section>
 
@@ -17883,6 +17975,61 @@ function initWorshipGuide(faith) {
 }
 
 // ================================================================
+//  名山寺庙浏览器 — 基于TEMPLE_GUIDE数据库
+// ================================================================
+function showTempleBrowser(filter) {
+  if (typeof TEMPLE_GUIDE === 'undefined') {
+    showToast('寺庙指南数据库未加载');
+    return;
+  }
+  var out = document.getElementById('annualFortuneOutput');
+  if (!out) return;
+  var temples = Object.keys(TEMPLE_GUIDE);
+  var foList = [], daoList = [], ruList = [];
+  temples.forEach(function(key) {
+    var t = TEMPLE_GUIDE[key];
+    if (t.tradition === '佛') foList.push(t);
+    else if (t.tradition === '道') daoList.push(t);
+    else ruList.push(t);
+  });
+  var html = '<div style="background:rgba(138,92,246,0.04);border:1px solid rgba(138,92,246,0.15);border-radius:12px;padding:20px;margin-bottom:16px">';
+  html += '<div style="font-size:18px;font-weight:700;color:var(--violet2);margin-bottom:16px;letter-spacing:2px">🏛️ 名山寺庙参拜指南 · ' + temples.length + '座</div>';
+  // 筛选按钮
+  html += '<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">';
+  html += '<button onclick="showTempleBrowser(\"all\")" style="padding:6px 16px;border:1px solid var(--border);border-radius:20px;background:var(--title);color:#fff;cursor:pointer;font-size:12px">全部 ' + temples.length + '</button>';
+  html += '<button onclick="showTempleBrowser(\"佛\")" style="padding:6px 16px;border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--gold);cursor:pointer;font-size:12px">佛教 ' + foList.length + '</button>';
+  html += '<button onclick="showTempleBrowser(\"道\")" style="padding:6px 16px;border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--jade2);cursor:pointer;font-size:12px">道教 ' + daoList.length + '</button>';
+  html += '<button onclick="showTempleBrowser(\"儒\")" style="padding:6px 16px;border:1px solid var(--border);border-radius:20px;background:transparent;color:#3498db;cursor:pointer;font-size:12px">儒教 ' + ruList.length + '</button>';
+  html += '</div>';
+  // 寺庙列表
+  var showList = (filter && filter !== 'all') ? temples.filter(function(k){return TEMPLE_GUIDE[k].tradition === filter;}) : temples;
+  html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">';
+  showList.forEach(function(key) {
+    var t = TEMPLE_GUIDE[key];
+    var color = t.tradition === '佛' ? 'var(--gold)' : t.tradition === '道' ? 'var(--jade2)' : '#3498db';
+    html += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)" style="border-left:3px solid ' + color + ';padding:10px 14px">';
+    html += '<span style="color:' + color + ';font-weight:600">' + t.name + '</span> <span style="opacity:.5;font-size:11px">' + t.location + '</span> <span class="toggle-icon">▼</span>';
+    html += '</div>';
+    html += '<div class="bazi-module-body" style="display:none;padding:12px 14px;font-size:12px;line-height:2">';
+    html += '<div><b style="color:' + color + '">主神：</b>' + (t.deity || '—') + '</div>';
+    html += '<div><b style="color:' + color + '">位置：</b>' + (t.location || '—') + '</div>';
+    html += '<div><b style="color:' + color + '">灵验：</b>' + (t.bestFor ? t.bestFor.join('、') : '—') + '</div>';
+    html += '<div><b style="color:' + color + '">最佳时间：</b>' + (t.bestTime || '—') + '</div>';
+    html += '<div><b style="color:' + color + '">参拜路线：</b>' + (t.ritual || '—') + '</div>';
+    html += '<div><b style="color:' + color + '">供品：</b>' + (t.offering || '—') + '</div>';
+    html += '<div><b style="color:' + color + '">禁忌：</b>' + (t.taboos || '—') + '</div>';
+    html += '<div><b style="color:' + color + '">灵验提示：</b>' + (t.lingyan || '—') + '</div>';
+    html += '<div><b style="color:' + color + '">交通：</b>' + (t.transport || '—') + '</div>';
+    if (t.nearby) html += '<div><b style="color:' + color + '">周边：</b>' + t.nearby + '</div>';
+    html += '<div style="margin-top:8px"><button onclick="addMerit(\''+t.tradition+'\',1,\'参拜'+t.name+'\')" style="padding:4px 12px;border:1px solid var(--gold);border-radius:6px;background:rgba(201,168,76,0.08);color:var(--gold);cursor:pointer;font-size:11px">🙏 参拜打卡</button></div>';
+    html += '</div>';
+  });
+  html += '</div></div>';
+  out.innerHTML = html;
+  out.scrollIntoView({behavior:'smooth'});
+}
+
+// ================================================================
 //  ENHANCED DIVINATION FUNCTIONS
 // ================================================================
 
@@ -28952,7 +29099,7 @@ function bindBazi() {
 // 保留体质模块函数（tizhi-module.js 可能尚未加载时的 fallback）
 
 function tzSwitchTab(name){
-  var allTabs = ['report','selftest','plan','food','qigong','prescription','bazi','checkin','wuxing'];
+  var allTabs = ['report','selftest','plan','food','qigong','prescription','bazi','checkin','wuxing','encyclopedia'];
   allTabs.forEach(function(t){
     var panel=document.getElementById('tz-tab-'+t);
     var btn=document.getElementById('tzTab-'+t);
@@ -30045,6 +30192,8 @@ if (typeof window.SHOP_DATA !== 'undefined') {
 <script src="knowledge/zodiac-complete.js?t=1783048068"></script>
 <script src="knowledge/wisdom-quotes.js?t=1783048068"></script>
 <script src="knowledge/gzh-collect-system.js?t=1783048068"></script>
+<script src="knowledge/temple-guide-insert.js?t=1783048068"></script>
+<script src="knowledge/shop-medicine-data.js?t=1783048068"></script>
 <script src="js/push-plan.js?t=1783048068"></script>
 <script src="js/cure-engine.js?v=20260714"></script>
 <script src="js/annual-fortune.js?v=20260714"></script>
