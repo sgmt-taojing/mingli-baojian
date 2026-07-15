@@ -34071,6 +34071,68 @@ function runZiweiEngine() {
         html += '</div></div>';
       }
     } catch(_mde) { console.warn('命宫详细解读错误:', _mde); }
+    // === 📋 紫微白话解读 ===
+    try {
+      var _zwPlain = '<div class="bazi-new-module">';
+      _zwPlain += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">📋 紫微白话解读 <span class="toggle-icon">▼</span></div>';
+      _zwPlain += '<div class="bazi-module-body collapsed" style="padding:12px 16px">';
+      
+      // 1. 性格解读（基于命宫主星）
+      var _zwMainStar = '';
+      if (pan.stars && pan.stars[pan.mingPos]) {
+        var _mingStars = pan.stars[pan.mingPos].filter(function(s){ return ['紫微','天机','太阳','武曲','天同','廉贞','天府','太阴','贪狼','巨门','天相','天梁','七杀','破军'].indexOf(s.name) >= 0; });
+        _zwMainStar = _mingStars.map(function(s){ return s.name; }).join('、') || '无主星';
+      }
+      var _zwPersonality = {
+        '紫微': {trait:'帝王之气', like:'天生有领导力，做事大气，追求高品质生活', advice:'别太端着，接地气才能得人心'},
+        '天机': {trait:'聪明机敏', like:'脑子转得快，善于谋划分析，学习能力超强', advice:'别想太多，行动力才是关键'},
+        '太阳': {trait:'热情慷慨', like:'像太阳一样发光发热，乐于助人，光明磊落', advice:'别太操心别人，照顾好自己'},
+        '武曲': {trait:'刚毅务实', like:'执行力强，做事干脆利落，财商高', advice:'别太硬碰硬，学会圆融'},
+        '天同': {trait:'乐观随和', like:'天生福星，心态好，享受生活，人缘佳', advice:'别太安逸，适当给自己压力'},
+        '廉贞': {trait:'能干多才', like:'能力强，交际广，但内心有傲气', advice:'别太较真，放平心态'},
+        '天府': {trait:'稳重保守', like:'像银行金库一样靠谱，理财能力强，有安全感', advice:'别太保守，适当冒险'},
+        '太阴': {trait:'温柔细腻', like:'像月光一样温柔，感情丰富，重视家庭', advice:'别太敏感，开心就好'},
+        '贪狼': {trait:'多才多欲', like:'兴趣广泛，桃花旺，学什么都快', advice:'专注一件事，别贪多嚼不烂'},
+        '巨门': {trait:'口才出众', like:'嘴巴厉害，分析能力强，适合靠嘴吃饭', advice:'少说是非，多积口德'},
+        '天相': {trait:'正直可靠', like:'天生的辅佐之才，做事有板有眼，值得信赖', advice:'别太死板，学会变通'},
+        '天梁': {trait:'老成持重', like:'像老大哥一样照顾人，有正义感，逢凶化吉', advice:'别太好为人师，尊重他人选择'},
+        '七杀': {trait:'冲锋陷阵', like:'行动派，敢想敢干，不怕困难', advice:'别太冲动，三思而后行'},
+        '破军': {trait:'破旧立新', like:'天生改革者，不安于现状，敢于打破常规', advice:'别太折腾，稳定也是种智慧'}
+      };
+      var _zwP = _zwPersonality[_zwMainStar.split('、')[0]] || {trait:'综合型', like:'各有所长，需结合全盘分析', advice:'发挥优势，弥补不足'};
+      _zwPlain += '<div style="background:rgba(231,76,60,.04);border-left:3px solid #e74c3c;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
+      _zwPlain += '<div style="font-size:13px;font-weight:bold;color:#e74c3c;margin-bottom:4px">🎭 你的性格</div>';
+      _zwPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">命宫主星<b style="color:var(--gold)">' + _zwMainStar + '</b>，你是一个<b>' + _zwP.trait + '</b>的人，' + _zwP.like + '。<span style="color:var(--gold)">建议：</span>' + _zwP.advice + '</div>';
+      _zwPlain += '</div>';
+      
+      // 2. 事业方向（基于格局）
+      _zwPlain += '<div style="background:rgba(52,152,219,.04);border-left:3px solid #3498db;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
+      _zwPlain += '<div style="font-size:13px;font-weight:bold;color:#3498db;margin-bottom:4px">💼 事业方向</div>';
+      _zwPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">' + (analyze.overview || '紫微斗数以十二宫全方位推演人生，官禄宫主事业，财帛宫主财运，迁移宫主外出发展。') + '</div>';
+      _zwPlain += '</div>';
+      
+      // 3. 财运分析（基于四化）
+      _zwPlain += '<div style="background:rgba(39,174,96,.04);border-left:3px solid #27ae60;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
+      _zwPlain += '<div style="font-size:13px;font-weight:bold;color:#27ae60;margin-bottom:4px">💰 财运分析</div>';
+      _zwPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">四化影响财运：' + (analyze.sihuaText || '化禄增财、化权增势、化科增名、化忌增阻') + '。财运强弱看财帛宫主星旺衰，大运流年逢化禄则财旺。</div>';
+      _zwPlain += '</div>';
+      
+      // 4. 感情婚姻（基于夫妻宫）
+      _zwPlain += '<div style="background:rgba(155,89,182,.04);border-left:3px solid #9b59b6;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
+      _zwPlain += '<div style="font-size:13px;font-weight:bold;color:#9b59b6;margin-bottom:4px">💕 感情婚姻</div>';
+      _zwPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">夫妻宫反映婚姻状况。紫微在夫妻宫配偶强势，天机在夫妻宫配偶聪明，七杀在夫妻宫婚姻多波折。化忌入夫妻宫需注意感情经营，化禄入夫妻宫感情顺遂。</div>';
+      _zwPlain += '</div>';
+      
+      // 5. 健康提示（基于疾厄宫）
+      _zwPlain += '<div style="background:rgba(230,126,34,.04);border-left:3px solid #e67e22;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
+      _zwPlain += '<div style="font-size:13px;font-weight:bold;color:#e67e22;margin-bottom:4px">🏥 健康提示</div>';
+      _zwPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">疾厄宫主健康。五行局决定体质偏向：水二局注意肾脏泌尿，木三局注意肝胆筋骨，金四局注意肺部呼吸，土五局注意脾胃消化，火六局注意心脏血压。大运化忌入疾厄宫时需格外注意身体。</div>';
+      _zwPlain += '</div>';
+      
+      _zwPlain += '</div></div>';
+      html += _zwPlain;
+    } catch(_zpe) { console.warn('紫微白话解读错误:', _zpe); }
+
     // === 📋 缘主须知 ===
     html += '<div style="margin:12px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(231,76,60,0.06),rgba(231,76,60,0.01));border:1px solid rgba(231,76,60,0.15);border-radius:12px">';
     html += '<div style="font-size:14px;font-weight:700;color:var(--fire2);margin-bottom:8px;letter-spacing:2px">📋 缘主须知</div>';
@@ -34341,6 +34403,48 @@ function runFengshuiEngine() {
     html += '<div style="font-size:13px;font-weight:600;color:var(--gold);margin-bottom:8px">💡 综合布局提示</div>';
     html += '<ul style="padding-left:18px;opacity:0.8;margin:0"><li>' + res.layoutTips.join('</li><li>') + '</li></ul>';
     html += '</div>';
+
+    // === 📋 风水白话解读 ===
+    try {
+      var _fsPlain = '<div class="bazi-new-module">';
+      _fsPlain += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">📋 风水白话解读 <span class="toggle-icon">▼</span></div>';
+      _fsPlain += '<div class="bazi-module-body collapsed" style="padding:12px 16px">';
+      
+      // 1. 整体评价
+      var _fsScoreText = (res.score >= 80) ? '风水上佳' : (res.score >= 60) ? '风水尚可' : '风水欠佳';
+      var _fsScoreColor = (res.score >= 80) ? '#27ae60' : (res.score >= 60) ? '#f39c12' : '#e74c3c';
+      _fsPlain += '<div style="background:rgba(231,76,60,.04);border-left:3px solid ' + _fsScoreColor + ';padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
+      _fsPlain += '<div style="font-size:13px;font-weight:bold;color:' + _fsScoreColor + ';margin-bottom:4px">🏠 整体评价</div>';
+      _fsPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">本宅为<b>' + res.houseType + '</b>，坐向<b>' + res.direction + '</b>，建于<b>' + res.buildYear + '</b>年。' + _fsScoreText + '，评分<b style="color:' + _fsScoreColor + '">' + res.score + '/100</b>。' + (res.matching ? '宅命相配，居住者运势顺畅。' : '宅命不配，需通过风水布局调整化解。') + '</div>';
+      _fsPlain += '</div>';
+      
+      // 2. 财运方位
+      _fsPlain += '<div style="background:rgba(39,174,96,.04);border-left:3px solid #27ae60;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
+      _fsPlain += '<div style="font-size:13px;font-weight:bold;color:#27ae60;margin-bottom:4px">💰 财运方位</div>';
+      _fsPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">' + (res.wangShan ? '当运旺山旺向，财运亨通。大门、主卧在吉方则财源广进。' : '非当运，需在生气方或天医方摆放催财物品（如水晶、貔貅、聚宝盆）。') + '当前为<b>' + res.period + '运</b>，' + (res.period === 9 ? '九运（2024-2043）离卦当令，南方为旺方，宜做客厅或主卧。' : '需根据当运飞星布局调整。') + '</div>';
+      _fsPlain += '</div>';
+      
+      // 3. 健康影响
+      _fsPlain += '<div style="background:rgba(230,126,34,.04);border-left:3px solid #e67e22;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
+      _fsPlain += '<div style="font-size:13px;font-weight:bold;color:#e67e22;margin-bottom:4px">🏥 健康影响</div>';
+      _fsPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">天医方主健康，宜做卧室。五黄大凶方不可做卧室或厨房，否则家人多病。二黑病符方宜用铜器化解。' + (res.matching ? '宅命相配则身心安康。' : '宅命不配需注意，尤其宅主命卦所忌方位不可做主卧。') + '</div>';
+      _fsPlain += '</div>';
+      
+      // 4. 事业学业
+      _fsPlain += '<div style="background:rgba(52,152,219,.04);border-left:3px solid #3498db;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
+      _fsPlain += '<div style="font-size:13px;font-weight:bold;color:#3498db;margin-bottom:4px">📚 事业学业</div>';
+      _fsPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">延年方主人际和谐、事业顺利，宜做客厅或书房。生气方主生机活力，宜做主卧。伏位方主平稳，宜安床。绝命、五鬼方宜做厨房或卫生间压之。书房宜设在文昌位（' + (res.period === 9 ? '九运文昌在北方' : '当运文昌位') + '），利读书考试。</div>';
+      _fsPlain += '</div>';
+      
+      // 5. 家庭关系
+      _fsPlain += '<div style="background:rgba(155,89,182,.04);border-left:3px solid #9b59b6;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
+      _fsPlain += '<div style="font-size:13px;font-weight:bold;color:#9b59b6;margin-bottom:4px">👨‍👩‍👧 家庭关系</div>';
+      _fsPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">夫妻卧室宜在延年或生气方，增进感情。子女房宜在生气方，利成长。老人房宜在天医方，利健康。' + (res.matching ? '宅命相配，家人和睦。' : '宅命不配，需调整卧室方位化解。') + '家中争吵多因五鬼方布局不当，可在该方摆放葫芦化解。</div>';
+      _fsPlain += '</div>';
+      
+      _fsPlain += '</div></div>';
+      html += _fsPlain;
+    } catch(_fse) { console.warn('风水白话解读错误:', _fse); }
 
     // === 📋 缘主须知 ===
     html += '<div style="margin:12px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(138,92,246,0.06),rgba(138,92,246,0.01));border:1px solid rgba(138,92,246,0.15);border-radius:12px">';
