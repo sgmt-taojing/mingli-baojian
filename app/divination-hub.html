@@ -4919,6 +4919,7 @@ setTimeout(removeLoadingOverlay,5000);
 
 <!-- ===== KNOWLEDGE ===== -->
 <section class="section" id="section-knowledge">
+  <div class="back-row"><button class="back-btn" onclick="showSection('hero')">返回首页</button></div>
   <div class="section-header">
     <span class="sh-symbol" style="color:var(--gold)">📚</span>
     <h2 class="sh-title">易 学 知 识 库</h2>
@@ -4959,6 +4960,18 @@ setTimeout(removeLoadingOverlay,5000);
         <button class="kb-cat-btn" onclick="filterKbByCategory('shensha')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">神煞</button>
         <button class="kb-cat-btn" onclick="filterKbByCategory('hechong')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">合冲刑害</button>
         <button class="kb-cat-btn" onclick="filterKbByCategory('koujue')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">口诀库</button>
+      </div>
+      <!-- 热门词条快捷入口 -->
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center;">
+        <span style="font-size:12px;color:var(--text-dim);margin-right:4px;">🔥 热门:</span>
+        <button onclick="quickSearchKb('天乙贵人')" style="padding:3px 10px;border:1px solid rgba(201,168,76,.2);border-radius:12px;background:transparent;color:var(--paper2);cursor:pointer;font-size:12px;">天乙贵人</button>
+        <button onclick="quickSearchKb('六冲')" style="padding:3px 10px;border:1px solid rgba(201,168,76,.2);border-radius:12px;background:transparent;color:var(--paper2);cursor:pointer;font-size:12px;">六冲</button>
+        <button onclick="quickSearchKb('飞星')" style="padding:3px 10px;border:1px solid rgba(201,168,76,.2);border-radius:12px;background:transparent;color:var(--paper2);cursor:pointer;font-size:12px;">飞星</button>
+        <button onclick="quickSearchKb('纳甲')" style="padding:3px 10px;border:1px solid rgba(201,168,76,.2);border-radius:12px;background:transparent;color:var(--paper2);cursor:pointer;font-size:12px;">纳甲</button>
+        <button onclick="quickSearchKb('四化')" style="padding:3px 10px;border:1px solid rgba(201,168,76,.2);border-radius:12px;background:transparent;color:var(--paper2);cursor:pointer;font-size:12px;">四化</button>
+        <button onclick="quickSearchKb('用神')" style="padding:3px 10px;border:1px solid rgba(201,168,76,.2);border-radius:12px;background:transparent;color:var(--paper2);cursor:pointer;font-size:12px;">用神</button>
+        <button onclick="quickSearchKb('三奇')" style="padding:3px 10px;border:1px solid rgba(201,168,76,.2);border-radius:12px;background:transparent;color:var(--paper2);cursor:pointer;font-size:12px;">三奇</button>
+        <button onclick="quickSearchKb('空亡')" style="padding:3px 10px;border:1px solid rgba(201,168,76,.2);border-radius:12px;background:transparent;color:var(--paper2);cursor:pointer;font-size:12px;">空亡</button>
       </div>
       <!-- 统计信息 -->
       <div id="kbStats" style="font-size:12px;color:var(--text-dim);margin-bottom:8px;"></div>
@@ -10041,10 +10054,13 @@ function showMoreModule(name, btn) {
   }
   // 知识库：确保网格可见
   if (name === 'knowledge') {
-    const grid = document.getElementById('knowledge-grid');
-    const detailPage = document.getElementById('knowledge-detail');
-    if (grid) grid.style.display = '';
-    if (detailPage) detailPage.style.display = 'none';
+    // 知识库面板在独立的 section-knowledge 中，直接跳转
+    showSection('knowledge');
+    // 确保检索初始化
+    if (typeof initKbSearch === 'function' && !_kbAllEntries) {
+      setTimeout(initKbSearch, 100);
+    }
+    return;
   }
   // 体质面板：无需特殊初始化（内容直接内联）
   // VIP面板：无需特殊初始化（内容直接内联）
@@ -34932,6 +34948,32 @@ var _kbSearchTimer = null;
 var _kbCurrentCategory = 'all';
 var _kbAllEntries = null;
 
+// 快捷搜索
+function quickSearchKb(term) {
+  var input = document.getElementById('kbSearchInput');
+  if (input) { input.value = term; }
+  searchKbEntries(term);
+}
+
+// 简易拼音映射（常用字）
+var _kbPinyinMap = {
+  '八字':'bazi','四柱':'sizhu','日主':'rizhu','十神':'shishen','格局':'geju','用神':'yongshen',
+  '大运':'dayun','流年':'liunian','神煞':'shensha','天干':'tiangan','地支':'dizhi',
+  '六爻':'liuyao','纳甲':'najia','六亲':'liuqin','世应':'shiying',
+  '风水':'fengshui','玄空':'xuankong','飞星':'feixing','八宅':'bazhai','罗盘':'luopan',
+  '紫微':'ziwei','主星':'zhuxing','宫位':'gongwei','四化':'sihua',
+  '奇门':'qimen','八门':'bamen','九星':'jiuxing','三奇':'sanqi','六仪':'liuyi',
+  '梅花':'meihua','体用':'tiyong','互卦':'hugua','变卦':'biangua',
+  '六壬':'liuren','四课':'sike','三传':'sanchuan','天将':'tianjiang',
+  '姓名':'xingming','五格':'wuge','三才':'sancai','纳音':'nayin',
+  '五行':'wuxing','八卦':'bagua','周易':'zhouyi','易经':'yijing',
+  '合冲':'hechong','刑害':'xinghai','空亡':'kongwang','胎元':'taiyuan',
+  '天乙贵人':'tianyiguiren','文昌星':'wenchangxing','桃花':'taohua',
+  '驿马':'yima','华盖':'huagai','羊刃':'yangren','魁罡':'kuigang',
+  '金匮':'jinkui','天德':'tiande','月德':'yuede','三合':'sanhe','六合':'liuhe',
+  '口诀':'koujue','咒语':'zhouyu','经文':'jingwen','修心':'xiuxin'
+};
+
 function debounceKbSearch(val) {
   clearTimeout(_kbSearchTimer);
   _kbSearchTimer = setTimeout(function() { searchKbEntries(val); }, 300);
@@ -35021,7 +35063,94 @@ function _collectKbEntries() {
       }
     }
   } catch(e) {}
+  // 从 KNOWLEDGE_DETAILS 收集
+  try {
+    if (typeof window.KNOWLEDGE_DETAILS !== 'undefined') {
+      for (var k in window.KNOWLEDGE_DETAILS) {
+        var html = window.KNOWLEDGE_DETAILS[k] || '';
+        // 从HTML中提取纯文本前200字
+        var text = html.replace(/<[^>]+>/g, '').substring(0, 200);
+        _kbAllEntries.push({
+          key: 'kd.' + k,
+          category: _guessCategory(k),
+          title: _kbTitleFromKey(k),
+          intro: text,
+          overview: html,
+          source: 'details'
+        });
+      }
+    }
+  } catch(e) {}
+  // 从 BAZI_KNOWLEDGE_BASE 收集
+  try {
+    if (typeof BAZI_KNOWLEDGE !== 'undefined') {
+      for (var k in BAZI_KNOWLEDGE) {
+        var item = BAZI_KNOWLEDGE[k];
+        _kbAllEntries.push({
+          key: 'bazi.' + k,
+          category: 'bazi',
+          title: item.title || k,
+          intro: (item.content || item.desc || '').substring(0, 200),
+          overview: item.content || item.desc || '',
+          source: 'bazi-kb'
+        });
+      }
+    }
+  } catch(e) {}
+  // 从 ZIWEI_KNOWLEDGE_BASE 收集
+  try {
+    if (typeof ZIWEI_KNOWLEDGE !== 'undefined') {
+      for (var k in ZIWEI_KNOWLEDGE) {
+        var item = ZIWEI_KNOWLEDGE[k];
+        _kbAllEntries.push({
+          key: 'ziwei.' + k,
+          category: 'ziwei',
+          title: item.title || item.name || k,
+          intro: (item.content || item.desc || '').substring(0, 200),
+          overview: item.content || item.desc || '',
+          source: 'ziwei-kb'
+        });
+      }
+    }
+  } catch(e) {}
+  // 从 QIMEN_KNOWLEDGE_BASE 收集
+  try {
+    if (typeof QIMEN_KNOWLEDGE !== 'undefined') {
+      for (var k in QIMEN_KNOWLEDGE) {
+        var item = QIMEN_KNOWLEDGE[k];
+        _kbAllEntries.push({
+          key: 'qimen.' + k,
+          category: 'qimen',
+          title: item.title || item.name || k,
+          intro: (item.content || item.desc || '').substring(0, 200),
+          overview: item.content || item.desc || '',
+          source: 'qimen-kb'
+        });
+      }
+    }
+  } catch(e) {}
+  // 从 FENGSHUI_KNOWLEDGE_BASE 收集
+  try {
+    if (typeof FENGSHUI_KNOWLEDGE !== 'undefined') {
+      for (var k in FENGSHUI_KNOWLEDGE) {
+        var item = FENGSHUI_KNOWLEDGE[k];
+        _kbAllEntries.push({
+          key: 'fengshui.' + k,
+          category: 'fengshui',
+          title: item.title || item.name || k,
+          intro: (item.content || item.desc || '').substring(0, 200),
+          overview: item.content || item.desc || '',
+          source: 'fengshui-kb'
+        });
+      }
+    }
+  } catch(e) {}
   return _kbAllEntries;
+}
+
+function _kbTitleFromKey(key) {
+  var names = {bagua:'易经八卦',liushisigua:'六十四卦',bazi:'八字四柱',qimen:'奇门遁甲',wuxing:'五行体系',fengshui:'风水堪舆',shishen:'十神详解',nayin:'纳音五行',shensha:'神煞体系',hechong:'合冲刑害',liuyao:'六爻基础',xingming:'姓名学基础',shengxiao:'十二生肖',constellation:'西方星座',ziwei:'紫微斗数',meihua:'梅花易数',liuren:'大六壬',tizhi:'中医体质',rujia:'儒家',daojia:'道家',fojia:'佛家',zeji:'择吉',huxing:'好户型',cezi:'测字',jingdian:'经典朗读',fanyin:'梵音音乐',meirikoujue:'每日口诀',gongde:'功德',zhishitupu:'知识图谱',yangsheng:'养生调理',daochang:'道场导航',jiazinayin:'甲子纳音',jieqi:'节气',zhouyi:'周易',yanzhi:'言值'};
+  return names[key] || key;
 }
 
 function _guessCategory(key) {
@@ -35067,7 +35196,14 @@ function searchKbEntries(query) {
       var title = (e.title || '').toLowerCase();
       var intro = (e.intro || '').toLowerCase();
       var key = (e.key || '').toLowerCase();
-      if (title.indexOf(query) < 0 && intro.indexOf(query) < 0 && key.indexOf(query) < 0) continue;
+      // 拼音搜索：检查拼音映射
+      var pinyinMatch = false;
+      for (var py in _kbPinyinMap) {
+        if (_kbPinyinMap[py].indexOf(query) >= 0 && title.indexOf(py) >= 0) {
+          pinyinMatch = true; break;
+        }
+      }
+      if (title.indexOf(query) < 0 && intro.indexOf(query) < 0 && key.indexOf(query) < 0 && !pinyinMatch) continue;
     }
     results.push(e);
   }
