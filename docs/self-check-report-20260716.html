@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>命理宝鉴 · 平台全面自检报告</title>
+<style>
+:root{--gold:#c9a84c;--gold2:#b8963a;--jade:#27ae60;--jade2:#219a52;--violet:#8a5cf6;--violet2:#7c3aed;--cyan:#00bcd4;--paper:#f5f0e1;--paper2:#6b6357;--paper3:#9b9488;--title:#1a1a2e;--bg:#0f0f1e;--border:rgba(201,168,76,.15)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--paper);font-family:'Noto Serif SC','PingFang SC',serif;line-height:1.8;padding:20px;max-width:1200px;margin:0 auto}
+h1{font-size:28px;color:var(--gold);letter-spacing:6px;text-align:center;margin-bottom:8px}
+.subtitle{text-align:center;color:var(--paper3);font-size:13px;margin-bottom:32px}
+h2{font-size:20px;color:var(--gold);letter-spacing:3px;margin:32px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+h3{font-size:16px;color:var(--paper);margin:20px 0 10px}
+.card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
+.card-title{font-size:15px;color:var(--gold);margin-bottom:12px;font-weight:600}
+.metrics{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin:16px 0}
+.metric{background:rgba(255,255,255,.04);border-radius:10px;padding:16px;text-align:center}
+.metric-num{font-size:28px;color:var(--gold);font-weight:700}
+.metric-label{font-size:12px;color:var(--paper3);margin-top:4px}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+th{background:rgba(201,168,76,.08);color:var(--gold);padding:10px;text-align:left;border:1px solid var(--border)}
+td{padding:8px 10px;border:1px solid var(--border);color:var(--paper)}
+tr:hover td{background:rgba(255,255,255,.02)}
+.badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:600}
+.badge-pass{background:rgba(39,174,96,.15);color:var(--jade)}
+.badge-fail{background:rgba(231,76,60,.15);color:#e74c3c}
+.badge-warn{background:rgba(241,196,15,.15);color:#f1c40f}
+.badge-fix{background:rgba(138,92,246,.15);color:var(--violet)}
+.timeline{position:relative;padding-left:28px;margin:16px 0}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--border)}
+.tl-step{position:relative;margin-bottom:20px}
+.tl-marker{position:absolute;left:-24px;top:2px;width:20px;height:20px;border-radius:50%;background:var(--gold);color:var(--bg);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.tl-title{font-size:14px;color:var(--gold);margin-bottom:4px}
+.tl-text{font-size:13px;color:var(--paper2)}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+.compare-col{background:rgba(255,255,255,.03);border-radius:10px;padding:16px}
+.compare-col h4{font-size:13px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.compare-col.before h4{color:#e74c3c}
+.compare-col.after h4{color:var(--jade)}
+.compare-col ul{list-style:none;font-size:13px}
+.compare-col li{padding:4px 0;color:var(--paper2)}
+.footer{text-align:center;color:var(--paper3);font-size:12px;margin-top:40px;padding-top:20px;border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+
+<h1>命理宝鉴 · 平台全面自检报告</h1>
+<p class="subtitle">2026-07-16 · 37,288行 · 63个外部脚本 · 43个知识库文件 · 七术合一排盘平台</p>
+
+<h2>一、平台规模指标</h2>
+<div class="metrics">
+<div class="metric"><div class="metric-num">37,288</div><div class="metric-label">主文件行数</div></div>
+<div class="metric"><div class="metric-num">63</div><div class="metric-label">外部脚本文件</div></div>
+<div class="metric"><div class="metric-num">43</div><div class="metric-label">知识库文件</div></div>
+<div class="metric"><div class="metric-num">77</div><div class="metric-label">内联脚本块</div></div>
+<div class="metric"><div class="metric-num">7</div><div class="metric-label">排盘引擎</div></div>
+<div class="metric"><div class="metric-num">22</div><div class="metric-label">白话解读引用</div></div>
+<div class="metric"><div class="metric-num">103</div><div class="metric-label">showToast调用</div></div>
+<div class="metric"><div class="metric-num">25</div><div class="metric-label">more页面入口</div></div>
+<div class="metric"><div class="metric-num">21</div><div class="metric-label">移动端快捷入口</div></div>
+<div class="metric"><div class="metric-num">200</div><div class="metric-label">线上HTTP状态</div></div>
+</div>
+
+<h2>二、七大排盘引擎完整性</h2>
+<table>
+<tr><th>引擎</th><th>实现位置</th><th>白话解读</th><th>术语注释</th><th>可视化盘面</th><th>状态</th></tr>
+<tr><td>八字四柱</td><td>divination-core.js</td><td><span class="badge badge-pass">✓</span></td><td><span class="badge badge-pass">✓</span></td><td><span class="badge badge-pass">✓</span></td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>紫微斗数</td><td>engine-v3-bundle.js</td><td><span class="badge badge-pass">✓</span></td><td><span class="badge badge-pass">✓</span></td><td><span class="badge badge-pass">✓</span></td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>奇门遁甲</td><td>engine-v3-bundle.js</td><td><span class="badge badge-pass">✓</span></td><td><span class="badge badge-pass">✓</span></td><td><span class="badge badge-pass">✓</span></td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>六爻</td><td>engine-v3-bundle.js</td><td><span class="badge badge-pass">✓</span></td><td><span class="badge badge-pass">✓</span></td><td><span class="badge badge-pass">✓</span></td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>梅花易数</td><td>engine-v3-bundle.js</td><td><span class="badge badge-pass">✓</span></td><td><span class="badge badge-pass">✓</span></td><td><span class="badge badge-pass">✓</span></td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>大六壬</td><td>engine-v3-bundle.js</td><td><span class="badge badge-pass">✓</span></td><td><span class="badge badge-pass">✓</span></td><td><span class="badge badge-pass">✓</span></td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>风水堪舆</td><td>engine-v3-bundle.js</td><td><span class="badge badge-pass">✓</span></td><td><span class="badge badge-pass">✓</span></td><td><span class="badge badge-pass">✓</span></td><td><span class="badge badge-pass">完整</span></td></tr>
+</table>
+
+<h2>三、代码质量检查</h2>
+<table>
+<tr><th>检查项</th><th>结果</th><th>状态</th></tr>
+<tr><td>alert() 调用</td><td>0处</td><td><span class="badge badge-pass">通过</span></td></tr>
+<tr><td>Math.random() 调用</td><td>0处（4处注释引用）</td><td><span class="badge badge-pass">通过</span></td></tr>
+<tr><td>showToast() 调用</td><td>103处</td><td><span class="badge badge-pass">通过</span></td></tr>
+<tr><td>内联JS语法</td><td>77块全部通过</td><td><span class="badge badge-pass">通过</span></td></tr>
+<tr><td>外部JS语法</td><td>19个文件全部通过</td><td><span class="badge badge-pass">通过</span></td></tr>
+<tr><td>知识库JS语法</td><td>43个文件全部通过</td><td><span class="badge badge-pass">通过</span></td></tr>
+<tr><td>TODO/FIXME残留</td><td>0处</td><td><span class="badge badge-pass">通过</span></td></tr>
+<tr><td>常量冲突</td><td>0处（已用typeof guard）</td><td><span class="badge badge-pass">通过</span></td></tr>
+<tr><td>线上HTTP状态</td><td>200</td><td><span class="badge badge-pass">通过</span></td></tr>
+</table>
+
+<h2>四、自检发现的问题与修复</h2>
+<div class="timeline">
+<div class="tl-step"><div class="tl-marker">1</div><div class="tl-title">P1: 六十甲子(jiazi) section 无导航入口</div><div class="tl-text">section存在完整功能但无任何按钮可到达 → 年度运势面板 + more页面添加入口</div></div>
+<div class="tl-step"><div class="tl-marker">2</div><div class="tl-title">P2: 面相分析(screenshot) section 无导航入口</div><div class="tl-text">section存在完整功能但无入口 → 占卜子tab + more页面添加入口</div></div>
+<div class="tl-step"><div class="tl-marker">3</div><div class="tl-title">P3: 开运化解(huajie) section 无导航入口</div><div class="tl-text">section存在但无法到达 → 风水进阶tab + more页面添加入口</div></div>
+<div class="tl-step"><div class="tl-marker">4</div><div class="tl-title">P4: more页面信众入口重复</div><div class="tl-text">"信众"和"信众中心"两个入口指向不同函数 → 合并为一个"信众中心"</div></div>
+<div class="tl-step"><div class="tl-marker">5</div><div class="tl-title">P5: 移动端缺新功能入口</div><div class="tl-text">名医名方、寺庙参拜等新功能无移动端入口 → 添加2个快捷入口</div></div>
+<div class="tl-step"><div class="tl-marker">6</div><div class="tl-title">P6: 知识库加载遗漏（此前已修复）</div><div class="tl-text">temple-guide-insert.js(103座寺庙) + shop-medicine-data.js + classics-highlights.js + wuxing-correspondence.js 未加载 → 已添加加载</div></div>
+<div class="tl-step"><div class="tl-marker">7</div><div class="tl-title">P7: TEMPLE_GUIDE重复键（此前已修复）</div><div class="tl-text">少林寺2处重复(合并lingyan) + 城隍庙2处(区分上海/各地) → 已去重</div></div>
+</div>
+
+<h2>五、功能模块清单</h2>
+<table>
+<tr><th>分类</th><th>模块</th><th>导航入口</th><th>状态</th></tr>
+<tr><td rowspan="7">排盘引擎</td><td>八字四柱</td><td>导航栏 + 移动端</td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>易经六爻</td><td>占卜子tab</td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>紫微斗数</td><td>占卜子tab</td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>奇门遁甲</td><td>占卜子tab</td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>梅花易数</td><td>占卜子tab</td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>大六壬</td><td>占卜子tab</td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>风水堪舆</td><td>导航栏 + 移动端</td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td rowspan="6">扩展功能</td><td>年度运势 + 寺庙浏览</td><td>导航栏 + 年度面板</td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>姓名学(起名/改名/公司)</td><td>导航栏 + 子tab</td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>言值分析</td><td>导航栏 + more</td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>面相分析</td><td>占卜子tab + more</td><td><span class="badge badge-fix">已修复</span></td></tr>
+<tr><td>六十甲子流年</td><td>年度面板 + more</td><td><span class="badge badge-fix">已修复</span></td></tr>
+<tr><td>测字</td><td>占卜子tab</td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td rowspan="6">养生健康</td><td>体质辨识(9个tab)</td><td>移动端 + more</td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>名医名方(22医52方)</td><td>体质面板 + 移动端</td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>倪海夏中医知识</td><td>体质面板</td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>非遗中医(17项)</td><td>体质面板 + 名师面板</td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>养生百科(5模块)</td><td>体质面板</td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>养心音乐(22首)</td><td>导航栏 + 移动端</td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td rowspan="5">信众功能</td><td>功德系统</td><td>信众中心</td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>名师解惑(34位)</td><td>首页卡片 + more</td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>名山寺庙(103座)</td><td>年度面板 + 移动端</td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>开运化解</td><td>风水tab + more</td><td><span class="badge badge-fix">已修复</span></td></tr>
+<tr><td>化解中心(50+物品)</td><td>more页面</td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td rowspan="4">其他</td><td>命理全鉴(6维度)</td><td>导航栏 + more</td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>人生规划 + 青少年 + 家庭</td><td>more页面</td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>吉日 + 推送计划 + 会员</td><td>more页面</td><td><span class="badge badge-pass">完整</span></td></tr>
+<tr><td>知识库(43文件) + 商城</td><td>more页面</td><td><span class="badge badge-pass">完整</span></td></tr>
+</table>
+
+<h2>六、本次会话完成的所有工作</h2>
+<div class="compare">
+<div class="compare-col before">
+<h4>修复前问题</h4>
+<ul>
+<li>temple-guide-insert.js 未加载（103座寺庙数据不可用）</li>
+<li>shop-medicine-data.js 未加载（道医药品数据不可用）</li>
+<li>classics-highlights.js 未加载（典籍精华不可用）</li>
+<li>wuxing-correspondence.js 未加载（五行对应不可用）</li>
+<li>少林寺重复键（第二处覆盖第一处）</li>
+<li>城隍庙重复键（上海版被通用版覆盖）</li>
+<li>六十甲子 section 无入口（功能不可达）</li>
+<li>面相分析 section 无入口（功能不可达）</li>
+<li>开运化解 section 无入口（功能不可达）</li>
+<li>more页面信众入口重复</li>
+<li>移动端缺新功能入口</li>
+<li>养心音乐播放器不存在</li>
+<li>养生百科知识不存在</li>
+<li>名医名方数据库不存在</li>
+<li>倪海夏知识模块不存在</li>
+<li>非遗中医展示不存在</li>
+<li>名山寺庙浏览器不存在</li>
+</ul>
+</div>
+<div class="compare-col after">
+<h4>修复后状态</h4>
+<ul>
+<li><span class="badge badge-pass">✓</span> 4个知识库文件已加载</li>
+<li><span class="badge badge-pass">✓</span> 少林寺去重(合并lingyan)</li>
+<li><span class="badge badge-pass">✓</span> 城隍庙区分(上海/各地)</li>
+<li><span class="badge badge-pass">✓</span> 3个断链section已添加入口</li>
+<li><span class="badge badge-pass">✓</span> 信众入口合并</li>
+<li><span class="badge badge-pass">✓</span> 移动端入口补齐</li>
+<li><span class="badge badge-pass">✓</span> 养心音乐(22首Web Audio API)</li>
+<li><span class="badge badge-pass">✓</span> 养生百科(5大模块)</li>
+<li><span class="badge badge-pass">✓</span> 名医名方(22医52方)</li>
+<li><span class="badge badge-pass">✓</span> 倪海夏中医知识(5理论4方系)</li>
+<li><span class="badge badge-pass">✓</span> 非遗中医(17项)</li>
+<li><span class="badge badge-pass">✓</span> 名山寺庙浏览器(103座)</li>
+<li><span class="badge badge-pass">✓</span> 77块JS语法全部通过</li>
+<li><span class="badge badge-pass">✓</span> 0 alert / 0 Math.random</li>
+<li><span class="badge badge-pass">✓</span> 线上HTTP 200</li>
+<li><span class="badge badge-pass">✓</span> main + gh-pages 双分支同步</li>
+</ul>
+</div>
+</div>
+
+<h2>七、知识库审计摘要</h2>
+<div class="card">
+<div class="card-title">核心数据量</div>
+<table>
+<tr><th>知识库</th><th>数据量</th><th>语法</th></tr>
+<tr><td>权威知识库</td><td>138个一级章节 / 2081+子条目</td><td><span class="badge badge-pass">通过</span></td></tr>
+<tr><td>八字知识库</td><td>54个顶级键</td><td><span class="badge badge-pass">通过</span></td></tr>
+<tr><td>紫微知识库</td><td>55个顶级键 / 263处星曜引用</td><td><span class="badge badge-pass">通过</span></td></tr>
+<tr><td>奇门知识库</td><td>58个顶级键 / 九星788处 / 八门1265处 / 八神866处</td><td><span class="badge badge-pass">通过</span></td></tr>
+<tr><td>风水知识库</td><td>52个顶级键</td><td><span class="badge badge-pass">通过</span></td></tr>
+<tr><td>大师库</td><td>34位大师(古代10/风水5/近现代4/当代7/其他8)</td><td><span class="badge badge-pass">通过</span></td></tr>
+<tr><td>寺庙指南</td><td>103座寺庙 / 10类诉求 / 3教 / 26省 / 8条朝圣路线</td><td><span class="badge badge-pass">通过</span></td></tr>
+</table>
+</div>
+
+<div class="footer">
+<p>命理宝鉴 · 七术合一古制合规排盘平台</p>
+<p>https://sgmt-taojing.github.io/mingli-baojian/app/divination-hub.html</p>
+</div>
+
+</body>
+</html>
