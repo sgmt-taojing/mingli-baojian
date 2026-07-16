@@ -6038,6 +6038,14 @@ setTimeout(removeLoadingOverlay,5000);
     <p class="input-hint" style="font-size:11px;color:var(--gold);margin:4px 0 0 8px">时辰提醒基于您的绑定八字时辰，按农历十二时辰推送养生建议。</p>
     <label><input type="checkbox" id="notifyJiri" checked> 吉日提醒(黄道吉日推送+当日宜做事项)</label>
   </div>
+
+  <!-- G. 年度循环推送（60甲子） -->
+  <div class="annual-push-panel" id="annualPushPanel" style="display:none">
+    <h4>📅 年度循环推送 · 60甲子化解方案</h4>
+    <p style="font-size:12px;color:var(--paper3);margin-bottom:12px">每年年末年初自动生成本年度运势回顾+来年化解方案，按60甲子循环推送，终身信众享完整版。</p>
+    <div id="annualPushStatus"></div>
+    <div id="annualPushHistory"></div>
+  </div>
 </section>
 
 <!-- ===== HEALING MUSIC (养心净心音乐) SECTION ===== -->
@@ -17585,9 +17593,12 @@ function initUserCenter() {
     document.getElementById('dailyOutfit').style.display = 'block';
     document.getElementById('dailyAdvice').style.display = 'block';
     document.getElementById('reminderSettings').style.display = 'block';
+    var annualPanel = document.getElementById('annualPushPanel');
+    if (annualPanel) annualPanel.style.display = 'block';
     renderReminderList(faith);
     renderDailyOutfit(faith);
     renderDailyAdvice(faith);
+    renderAnnualPush();
   }
 }
 
@@ -27856,6 +27867,234 @@ function meritBtn(faith, type) {
         'plan':'依仪修行，精进不懈'
     };
     addMerit(faith, 1, reasons[type] || '身心修行，日行一善');
+}
+
+// ============================================================
+// 60甲子循环推送系统 — 年度运势+化解方案
+// ============================================================
+var GAN_ZHI_CYCLE = [
+  '甲子','乙丑','丙寅','丁卯','戊辰','己巳','庚午','辛未','壬申','癸酉',
+  '甲戌','乙亥','丙子','丁丑','戊寅','己卯','庚辰','辛巳','壬午','癸未',
+  '甲申','乙酉','丙戌','丁亥','戊子','己丑','庚寅','辛卯','壬辰','癸巳',
+  '甲午','乙未','丙申','丁酉','戊戌','己亥','庚子','辛丑','壬寅','癸卯',
+  '甲辰','乙巳','丙午','丁未','戊申','己酉','庚戌','辛亥','壬子','癸丑',
+  '甲寅','乙卯','丙辰','丁巳','戊午','己未','庚申','辛酉','壬戌','癸亥'
+];
+
+var GAN_ZHI_PROPERTIES = {
+  '甲子':{wuxing:'水',taisui:'鼠',direction:'正北',energy:'生发之始',advice:'子年水旺，木火不足者宜早备火行化解物'},
+  '乙丑':{wuxing:'土',taisui:'牛',direction:'东北',energy:'厚积薄发',advice:'丑年湿土厚重，金水不足者宜增金元素'},
+  '丙寅':{wuxing:'木',taisui:'虎',direction:'东北',energy:'木火相生',advice:'寅年木旺，土弱脾胃虚者宜备土行调和物'},
+  '丁卯':{wuxing:'木',taisui:'兔',direction:'正东',energy:'柔融通达',advice:'卯年木气偏柔，金不足者肺气易弱宜备金行物'},
+  '戊辰':{wuxing:'土',taisui:'龙',direction:'东南',energy:'龙腾变化',advice:'辰年土旺水库，火弱心气不足者宜增火元素'},
+  '己巳':{wuxing:'火',taisui:'蛇',direction:'东南',energy:'巳火渐旺',advice:'巳年火气渐升，水弱肾气不足者宜补水行物'},
+  '庚午':{wuxing:'火',taisui:'马',direction:'正南',energy:'炎上之势',advice:'午年火极旺，水弱宜备强力水行化解物'},
+  '辛未':{wuxing:'土',taisui:'羊',direction:'西南',energy:'未土燥热',advice:'未年土带火气，木弱肝气不足者宜备木行物'},
+  '壬申':{wuxing:'金',taisui:'猴',direction:'西南',energy:'金水相生',advice:'申年金旺，木弱肝胆易伤宜备木行化解物'},
+  '癸酉':{wuxing:'金',taisui:'鸡',direction:'正西',energy:'金气肃杀',advice:'酉年金锐，木火不足者宜早备温暖调和物'}
+};
+
+function getGanZhiProp(yearGz) {
+  // 补充通用属性
+  var stem = yearGz[0], branch = yearGz[1];
+  var stems = '甲乙丙丁戊己庚辛壬癸', branches = '子丑寅卯辰巳午未申酉戌亥';
+  var wuxing = {'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
+  var zodiac = {'子':'鼠','丑':'牛','寅':'虎','卯':'兔','辰':'龙','巳':'蛇','午':'马','未':'羊','申':'猴','酉':'鸡','戌':'狗','亥':'猪'};
+  var dirs = {'子':'正北','丑':'东北','寅':'东北','卯':'正东','辰':'东南','巳':'东南','午':'正南','未':'西南','申':'西南','酉':'正西','戌':'西北','亥':'西北'};
+  var builtin = GAN_ZHI_PROPERTIES[yearGz];
+  if (builtin) return builtin;
+  return {
+    wuxing: wuxing[stem] || '未知',
+    taisui: zodiac[branch] || '未知',
+    direction: dirs[branch] || '未知',
+    energy: yearGz + '年',
+    advice: '根据八字五行喜用选化解物品'
+  };
+}
+
+function getCurrentYearGanzhi() {
+  var now = new Date();
+  var year = now.getFullYear();
+  // 立春前算上年，4为甲子起始偏移(1984=甲子年)
+  var offsetYear = (now < new Date(year, 1, 4)) ? year - 1 : year;
+  var idx = (offsetYear - 4) % 60;
+  if (idx < 0) idx += 60;
+  return {ganzhi: GAN_ZHI_CYCLE[idx], idx: idx, year: offsetYear};
+}
+
+function getNextYears(startIdx, count) {
+  var result = [];
+  for (var i = 1; i <= count; i++) {
+    var idx = (startIdx + i) % 60;
+    result.push({ganzhi: GAN_ZHI_CYCLE[idx], idx: idx, year: (new Date().getFullYear() + i)});
+  }
+  return result;
+}
+
+// 年度推送渲染
+function renderAnnualPush() {
+  var statusEl = document.getElementById('annualPushStatus');
+  var historyEl = document.getElementById('annualPushHistory');
+  if (!statusEl || !historyEl) return;
+  
+  var current = getCurrentYearGanzhi();
+  var prop = getGanZhiProp(current.ganzhi);
+  var nextYears = getNextYears(current.idx, 3);
+  var memberLevel = localStorage.getItem('memberLevel') || 'free';
+  
+  // 状态面板
+  var html = '<div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);border-radius:12px;padding:16px;margin-bottom:16px">';
+  html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">';
+  html += '<div><span style="font-size:18px;color:var(--gold);font-family:Ma Shan Zheng,serif;letter-spacing:4px">' + current.ganzhi + '年</span>';
+  html += '<span style="font-size:11px;color:var(--paper3);margin-left:8px">第' + (current.idx+1) + '/60甲子</span></div>';
+  html += '<span class="rich-badge" style="font-size:10px;background:rgba(39,174,96,.15);color:var(--jade)">' + prop.taisui + '年·' + prop.wuxing + '行</span>';
+  html += '</div>';
+  html += '<div style="font-size:12px;color:var(--paper2);line-height:1.7;margin-bottom:10px">' + prop.energy + ' · 太岁方位：' + prop.direction + ' · ' + prop.advice + '</div>';
+  
+  // 会员权限判断
+  var isTransition = isYearTransition() || memberLevel === 'lifetime';
+  html += '<div style="display:flex;gap:10px;flex-wrap:wrap">';
+  if (memberLevel === 'lifetime') {
+    html += '<button onclick="generateAnnualPush()" style="padding:8px 18px;border:1px solid var(--gold);border-radius:8px;background:rgba(201,168,76,0.1);color:var(--gold);cursor:pointer;font-family:inherit;font-size:12px;letter-spacing:2px">🔄 生成年度运势+化解方案</button>';
+  } else if (memberLevel === 'annual') {
+    html += '<button onclick="generateAnnualPush()" style="padding:8px 18px;border:1px solid var(--gold);border-radius:8px;background:rgba(201,168,76,0.1);color:var(--gold);cursor:pointer;font-family:inherit;font-size:12px;letter-spacing:2px">🔄 生成年度运势概览</button>';
+    html += '<button onclick="showToast(\'终身会员享完整60甲子循环化解方案\')" style="padding:8px 18px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--cinn2);cursor:pointer;font-family:inherit;font-size:12px;letter-spacing:2px">👑 升级终身会员</button>';
+  } else {
+    html += '<button onclick="showToast(\'年度会员及以上可享年度运势推送。免费会员可查看60甲子流年纵览。\')" style="padding:8px 18px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--paper3);cursor:pointer;font-family:inherit;font-size:12px;letter-spacing:2px">🔒 升级会员解锁完整推送</button>';
+  }
+  html += '</div>';
+  html += '</div>';
+  
+  // 未来3年预览
+  html += '<div style="background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px">';
+  html += '<div style="font-size:13px;color:var(--gold);margin-bottom:10px">📅 未来三年循环推送预览</div>';
+  nextYears.forEach(function(ny) {
+    var np = getGanZhiProp(ny.ganzhi);
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(201,168,76,.06);font-size:12px">';
+    html += '<div><b style="color:var(--gold2)">' + ny.ganzhi + '</b> <span style="color:var(--paper3)">' + ny.year + '年</span></div>';
+    html += '<div style="color:var(--paper3);font-size:11px">' + np.taisui + '·' + np.wuxing + '·推' + (ny.idx-2+1) + '/' + (ny.idx-1+2) + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  
+  statusEl.innerHTML = html;
+  
+  // 历史推送记录
+  var pushHistory = JSON.parse(localStorage.getItem('annualPushHistory') || '[]');
+  if (pushHistory.length > 0) {
+    var hHtml = '<div style="font-size:13px;color:var(--gold);margin-bottom:8px">📜 历史推送记录</div>';
+    pushHistory.slice(-5).reverse().forEach(function(ph) {
+      hHtml += '<div style="font-size:12px;color:var(--paper2);padding:4px 0;border-bottom:1px solid rgba(201,168,76,.04)">';
+      hHtml += '<b>' + ph.ganzhi + '</b> <span style="opacity:.5">' + ph.date + '</span>';
+      hHtml += ' <span style="font-size:10px;color:var(--jade)">' + (ph.type === 'full' ? '完整方案' : '运势概览') + '</span>';
+      hHtml += '</div>';
+    });
+    historyEl.innerHTML = hHtml;
+  }
+}
+
+// 年度推送生成
+function generateAnnualPush() {
+  var memberLevel = localStorage.getItem('memberLevel') || 'free';
+  if (memberLevel === 'free') {
+    showToast('请先升级为年度会员或终身会员');
+    return;
+  }
+  var current = getCurrentYearGanzhi();
+  var prop = getGanZhiProp(current.ganzhi);
+  
+  var pushHistory = JSON.parse(localStorage.getItem('annualPushHistory') || '[]');
+  var already = pushHistory.find(function(p){ return p.ganzhi === current.ganzhi; });
+  if (already) {
+    showToast(current.ganzhi + '年运势已生成，可查看历史记录');
+    return;
+  }
+  
+  // 生成推送内容
+  var pushData = {
+    ganzhi: current.ganzhi,
+    date: new Date().toISOString().split('T')[0],
+    type: memberLevel === 'lifetime' ? 'full' : 'overview',
+    level: memberLevel,
+    properties: prop,
+    cycleIdx: current.idx + 1,
+    totalCycle: 60
+  };
+  
+  pushHistory.push(pushData);
+  localStorage.setItem('annualPushHistory', JSON.stringify(pushHistory));
+  
+  // 生成化解方案内容
+  var contentHtml = '';
+  if (memberLevel === 'lifetime' || memberLevel === 'annual') {
+    contentHtml = generateAnnualContent(current, prop, memberLevel);
+  }
+  
+  // 显示结果弹窗
+  var msg = document.createElement('div');
+  msg.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);z-index:99999;overflow-y:auto;padding:40px 20px';
+  msg.innerHTML = '<div style="max-width:700px;margin:0 auto;background:var(--ink2);border:1px solid var(--border);border-radius:14px;padding:28px;position:relative">';
+  msg.innerHTML += '<button onclick="this.parentElement.parentElement.remove()" style="position:absolute;top:16px;right:16px;background:none;border:1px solid var(--border);color:var(--paper3);padding:6px 14px;cursor:pointer;font-size:14px;border-radius:4px">✕</button>';
+  msg.innerHTML += '<div style="font-family:Ma Shan Zheng,serif;font-size:24px;color:var(--gold);letter-spacing:6px;text-align:center;margin-bottom:20px">' + current.ganzhi + '年 运势化解方案</div>';
+  msg.innerHTML += '<p style="text-align:center;font-size:12px;color:var(--paper3);margin-bottom:20px">60甲子第' + (current.idx+1) + '位 · ' + prop.taisui + '年 · ' + prop.wuxing + '行</p>';
+  msg.innerHTML += contentHtml;
+  msg.innerHTML += '<div style="text-align:center;margin-top:20px"><button onclick="this.parentElement.parentElement.remove()" style="padding:10px 30px;border:1px solid var(--gold);border-radius:8px;background:rgba(201,168,76,0.1);color:var(--gold);cursor:pointer;font-family:inherit;font-size:14px;letter-spacing:4px">已知，收藏于心</button></div>';
+  msg.innerHTML += '</div>';
+  document.body.appendChild(msg);
+  
+  addMerit(localStorage.getItem('userFaith') || 'fo', 3, '生成' + current.ganzhi + '年化解方案');
+  
+  // 刷新推送面板
+  setTimeout(function(){ renderAnnualPush(); }, 500);
+}
+
+function generateAnnualContent(current, prop, level) {
+  var nextYear = getNextYears(current.idx, 1)[0];
+  var nextProp = getGanZhiProp(nextYear.ganzhi);
+  var html = '';
+  
+  // 年度五行分析
+  html += '<div class="bazi-module-title" onclick="toggleBaziModule(this)">🎯 年度五行分析 <span class="toggle-icon">▼</span></div>';
+  html += '<div class="bazi-module-body" style="padding:14px;font-size:13px;line-height:1.8">';
+  html += '<div>本年干支：<b style="color:var(--gold2)">' + current.ganzhi + '</b>（天干' + current.ganzhi[0] + ' 地支' + current.ganzhi[1] + '）</div>';
+  html += '<div>五行属性：<b>' + prop.wuxing + '行</b></div>';
+  html += '<div>太岁：' + prop.taisui + '年</div>';
+  html += '<div>方位：' + prop.direction + '</div>';
+  html += '<div>能量特质：' + prop.energy + '</div>';
+  html += '<div style="margin-top:8px;color:var(--gold);font-weight:600">化解要点：' + prop.advice + '</div>';
+  html += '</div>';
+  
+  // 化解方案
+  html += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">🛡️ 年度化解方案 <span class="toggle-icon">▼</span></div>';
+  html += '<div class="bazi-module-body collapsed" style="padding:14px;font-size:13px;line-height:1.8">';
+  html += '<div style="margin-bottom:8px">📌 <b>太岁化解：</b>' + prop.taisui + '年值太岁，可于立春当日（2月4日）参拜太岁，安奉太岁符。</div>';
+  html += '<div style="margin-bottom:8px">🏠 <b>方位布局：</b>太岁方' + prop.direction + '宜静不宜动，可摆放五行调和物。财位根据流年飞星调整。</div>';
+  if (level === 'lifetime') {
+    html += '<div style="margin-bottom:8px">📋 <b>专属方案：</b>根据绑定八字五行喜用，生成个性化化解方案（物品清单/方位布局/开光时辰/注意事项）。</div>';
+    html += '<div style="margin-bottom:8px">👨‍👩‍👧‍👦 <b>家庭成员：</b>每位成员独立分析+综合化解方案。</div>';
+    html += '<div style="margin-bottom:8px">📦 <b>化解物品清单：</b>太岁符/五行调和物/财位催财物/文昌位布置物/健康化煞物。</div>';
+  }
+  html += '<div style="margin-bottom:8px">🔜 <b>次年预告：</b>' + nextYear.ganzhi + '年（' + nextProp.taisui + '·' + nextProp.wuxing + '行）——' + nextProp.advice.substring(0,20) + '...</div>';
+  html += '</div>';
+  
+  // 60甲子循环状态
+  html += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">🔮 60甲子循环 <span class="toggle-icon">▼</span></div>';
+  html += '<div class="bazi-module-body collapsed" style="padding:14px;font-size:13px;line-height:1.8">';
+  html += '<div>当前位置：第<b style="color:var(--gold2)">' + (current.idx+1) + '</b>位 / 共60位</div>';
+  html += '<div>循环进度：<div style="height:4px;background:rgba(201,168,76,.1);border-radius:2px;margin:8px 0"><div style="height:100%;width:' + ((current.idx+1)/60*100).toFixed(0) + '%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:2px"></div></div></div>';
+  html += '<div>已推送：<b>' + (current.idx+1) + '</b>次 | 剩余：<b>' + (60-current.idx-1) + '</b>次</div>';
+  html += '<div style="margin-top:8px;color:var(--paper3);font-size:11px">60甲子一轮回，天干地支周而复始。每年年末年初自动推送，终身会员享完整循环。</div>';
+  html += '</div>';
+  
+  return html;
+}
+
+function isYearTransition() {
+  var now = new Date();
+  var m = now.getMonth() + 1;
+  var d = now.getDate();
+  // 年末年初推送窗口：11月15日到次年2月15日
+  return (m === 11 && d >= 15) || m === 12 || m === 1 || (m === 2 && d <= 15);
 }
 
 // ============================================================
