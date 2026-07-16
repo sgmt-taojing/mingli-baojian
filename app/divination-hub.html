@@ -10171,7 +10171,7 @@ function showMoreModule(name, btn) {
   if (name === 'almanac') initAlmanac();
   if (name === 'faith') {
     const savedFaith = (localStorage.getItem('userFaith') && localStorage.getItem('userFaith') !== 'all') ? localStorage.getItem('userFaith') : 'fo';
-    if (typeof renderFaithPanelFromSelect === 'function') renderFaithPanelFromSelect(savedFaith);
+    renderFaithPanelFromSelect(savedFaith);
     // 联动口诀库：更新信仰面板口诀区
     setTimeout(function(){ if(typeof updateFaithKoujue==='function') updateFaithKoujue(savedFaith); }, 300);
   }
@@ -10197,18 +10197,119 @@ function showMoreModule(name, btn) {
 }
 
 
-// selectFaith：跳转到 faith-renderer.js 的 renderFaithPanelFromSelect
+// selectFaith：信仰选择入口
 function selectFaith(faith) {
-    if (typeof renderFaithPanelFromSelect === 'function') renderFaithPanelFromSelect(faith);
-    // 同时为 section-user 信众中心初始化（修复「更多→信众中心」入口）
     localStorage.setItem('userFaith', faith);
+    renderFaithPanelFromSelect(faith);
     initUserCenter();
-    // 切换到 section-user 的信众内容展示
+    // 切换到信众内容展示
     var worshipGuide = document.getElementById('worshipGuide');
     if (worshipGuide) {
       worshipGuide.style.display = 'block';
       showWorship(faith);
     }
+    // 滚动到信众中心
+    var userSection = document.getElementById('section-user');
+    if (userSection) {
+      var bindArea = document.getElementById('userBaziBind');
+      if (bindArea) bindArea.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+}
+
+// ============================================================
+// 信仰面板渲染 — 选择信仰后显示个性化内容
+// ============================================================
+var FAITH_PANELS = {
+  ru: {
+    name: '儒家', icon: '📖', color: '#3498db',
+    desc: '修身齐家治国平天下',
+    practices: ['每日诵读经典（《论语》《大学》《中庸》）','晨起三省吾身','注重礼仪待人','重视教育投资'],
+    festivals: [
+      {date:'09-28',name:'孔子诞辰',activity:'参拜孔庙/文庙，献花行礼'},
+      {date:'清明',name:'清明祭祖',activity:'祭拜先祖，慎终追远'}
+    ],
+    mantra: '大学之道，在明明德，在亲民，在止于至善。'
+  },
+  dao: {
+    name: '道家', icon: '☯️', color: 'var(--jade)',
+    desc: '道法自然，清静无为',
+    practices: ['每日静坐冥想15分钟','练习八段锦或太极','诵读《道德经》《清静经》','顺应节气调理作息'],
+    festivals: [
+      {date:'02-15',name:'老子圣诞',activity:'参拜道观，诵道德经'},
+      {date:'冬至',name:'元始天尊圣诞',activity:'参拜道观，祈福消灾'}
+    ],
+    mantra: '人法地，地法天，天法道，道法自然。'
+  },
+  fo: {
+    name: '佛家', icon: '🪷', color: 'var(--gold)',
+    desc: '慈悲智慧，离苦得乐',
+    practices: ['每日诵经或念佛号','初一十五持素','行善布施，日行一善','禅修观呼吸10分钟'],
+    festivals: [
+      {date:'04-08',name:'佛诞日',activity:'参拜佛寺，浴佛供灯'},
+      {date:'07-15',name:'盂兰盆节',activity:'超度先人，供僧祈福'},
+      {date:'01-01',name:'弥勒圣诞',activity:'参拜弥勒殿，新年祈福'}
+    ],
+    mantra: '诸恶莫作，众善奉行，自净其意，是诸佛教。'
+  },
+  all: {
+    name: '兼修', icon: '📿', color: 'var(--violet)',
+    desc: '儒道释圆融通达，广学多闻',
+    practices: ['儒以修身，道以养生，佛以修心','择机参拜儒道佛场所','每日诵读各家经典','行善积德，不拘一家之言'],
+    festivals: [
+      {date:'01-01',name:'新年祈福',activity:'参拜寺庙道观，祈愿全年顺遂'},
+      {date:'清明',name:'祭祖追远',activity:'祭祖扫墓，缅怀先人'}
+    ],
+    mantra: '三教一家，万法归一。修身养性，利益众生。'
+  }
+};
+
+function renderFaithPanelFromSelect(faith) {
+  var panel = FAITH_PANELS[faith] || FAITH_PANELS.fo;
+  // 在信仰选择区域下方渲染个性化面板
+  var setup = document.getElementById('userSetup');
+  if (!setup) return;
+  
+  // 创建或更新信仰面板
+  var existing = document.getElementById('faithPanel');
+  if (!existing) {
+    existing = document.createElement('div');
+    existing.id = 'faithPanel';
+    setup.parentNode.insertBefore(existing, setup.nextSibling);
+  }
+  
+  var html = '<div style="background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.12);border-radius:12px;padding:20px;margin-bottom:16px">';
+  html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">';
+  html += '<span style="font-size:28px">' + panel.icon + '</span>';
+  html += '<div><div style="font-family:Ma Shan Zheng,serif;font-size:20px;color:' + panel.color + ';letter-spacing:4px">' + panel.name + '</div>';
+  html += '<div style="font-size:12px;color:var(--paper3);margin-top:2px">' + panel.desc + '</div></div></div>';
+  
+  // 日常修行
+  html += '<div class="bazi-module-title" onclick="toggleBaziModule(this)" style="font-size:14px;padding:10px 12px">📋 日常修行建议 <span class="toggle-icon">▼</span></div>';
+  html += '<div class="bazi-module-body" style="padding:12px">';
+  panel.practices.forEach(function(p) {
+    html += '<div style="font-size:13px;color:var(--paper);line-height:1.8;padding-left:14px;border-left:2px solid ' + panel.color + ';margin-bottom:6px;opacity:.8">' + p + '</div>';
+  });
+  html += '</div>';
+  
+  // 年度节庆
+  html += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)" style="font-size:14px;padding:10px 12px">📅 年度节庆参拜 <span class="toggle-icon">▼</span></div>';
+  html += '<div class="bazi-module-body collapsed" style="padding:12px">';
+  panel.festivals.forEach(function(f) {
+    html += '<div style="font-size:13px;color:var(--paper);line-height:1.8;margin-bottom:8px"><b style="color:' + panel.color + '">' + f.date + '</b> ' + f.name + ' — ' + f.activity + '</div>';
+  });
+  html += '</div>';
+  
+  // 每日心法
+  html += '<div style="margin-top:14px;padding:14px;background:rgba(201,168,76,0.05);border-radius:8px;text-align:center">';
+  html += '<div style="font-size:11px;color:var(--gold);opacity:.6;margin-bottom:6px">每日心法</div>';
+  html += '<div style="font-size:14px;color:var(--gold);font-family:Ma Shan Zheng,serif;letter-spacing:3px;line-height:1.8">' + panel.mantra + '</div>';
+  html += '</div>';
+  
+  html += '</div>';
+  existing.innerHTML = html;
+  
+  // 加载功德记录
+  loadMeritRecord(faith);
 }
 
 // ===== 黄历计算引擎 =====
@@ -14376,10 +14477,48 @@ function getAnnualReminder(hj) {
       命理之道，贵在知时。流年更替，五行流转，去年之方今年未必合宜，建议重新排盘调整。<br>
       为缘主持续守护--会员可每年自动获取最新化解方案，无需手动续约。
     </div>
-    <button class="huajie-renew-btn" onclick="showToast('预约功能开发中，敬请期待')">预 约 明 年 化 解 方 案</button>
+    <button class="huajie-renew-btn" onclick="scheduleRenewHuajie()">预 约 明 年 化 解 方 案</button>
   </div>`;
 
   return html;
+}
+
+// 预约明年化解方案
+function scheduleRenewHuajie() {
+  var now = new Date();
+  var nextYear = now.getFullYear() + 1;
+  var renewDate = nextYear + '-02-04'; // 立春日
+  
+  // 存储预约信息
+  var renewals = JSON.parse(localStorage.getItem('huajieRenewals') || '[]');
+  var existing = renewals.find(function(r){ return r.year === nextYear; });
+  if (existing) {
+    showToast('已预约' + nextYear + '年化解方案，无需重复预约');
+    return;
+  }
+  renewals.push({
+    year: nextYear,
+   预约日期: now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.getDate(),
+    执行日期: renewDate,
+    status: 'pending'
+  });
+  localStorage.setItem('huajieRenewals', JSON.stringify(renewals));
+  
+  // 显示预约成功面板
+  var msg = document.createElement('div');
+  msg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid #c9a84c;color:#c9a84c;padding:24px 32px;border-radius:14px;font-size:14px;z-index:99999;text-align:center;box-shadow:0 0 40px rgba(201,168,76,0.3);max-width:360px';
+  msg.innerHTML = '<div style="font-size:36px;margin-bottom:10px">✅</div>';
+  msg.innerHTML += '<div style="font-weight:bold;font-size:16px;margin-bottom:8px">化解方案预约成功</div>';
+  msg.innerHTML += '<div style="font-size:12px;color:#aaa;line-height:1.8">' + nextYear + '年立春(' + renewDate + ')后<br>系统将自动为您生成新年化解方案<br><br>预约日期：' + now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.getDate() + '</div>';
+  document.body.appendChild(msg);
+  setTimeout(function(){
+    msg.style.opacity = '0';
+    msg.style.transition = 'opacity 0.8s';
+    setTimeout(function(){ if(msg.parentNode) document.body.removeChild(msg); }, 800);
+  }, 2500);
+  
+  // 记录功德
+  addMerit(localStorage.getItem('userFaith') || 'fo', 1, '预约化解方案，持续修行');
 }
 
 function getJinang(hj) {
