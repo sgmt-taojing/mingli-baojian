@@ -30651,6 +30651,21 @@ setTimeout(initShop, 500);
     {text:"积善行德，福报自来。", author:"《太上感应篇》"},
     {text:"君子谋时而动，顺势而为。", author:"《鬼谷子》"}
   ];
+  // 优先使用每日口诀数据库（365条）
+  if (typeof KOUJUE_DAILY_DATABASE !== 'undefined' && KOUJUE_DAILY_DATABASE.length > 0) {
+    var now = new Date();
+    var m = now.getMonth() + 1;
+    var d = now.getDate();
+    var dateKey = m + '-' + d;
+    var entry = KOUJUE_DAILY_DATABASE.find(function(e){ return e.date === dateKey; });
+    if (entry) {
+      var el2 = document.getElementById('daily-quote-text');
+      var au2 = document.getElementById('daily-quote-author');
+      if(el2) el2.textContent = entry.text;
+      if(au2) au2.textContent = '—— ' + entry.source + ' · ' + (entry.category || '');
+      return;
+    }
+  }
   var day = new Date().getDate();
   var q = quotes[day % quotes.length];
   var el = document.getElementById('daily-quote-text');
