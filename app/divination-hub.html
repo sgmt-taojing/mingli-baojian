@@ -100,8 +100,8 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 .cat-card .cc-en{font-size:11px;letter-spacing:3px;text-transform:uppercase;opacity:.4;display:block;margin-bottom:14px}
 .cat-card .cc-desc{font-size:13px;opacity:.5;line-height:1.8;font-weight:300;letter-spacing:1px}
 .cat-card .cc-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
-.cc-action{margin-top:10px;font-size:11px;color:var(--gold);letter-spacing:2px;padding:5px 14px;border:1px solid rgba(201,168,76,0.2);border-radius:20px;display:inline-block;cursor:pointer;transition:all .2s}
-.cc-action:hover{background:rgba(201,168,76,0.1);border-color:var(--gold)}
+.cc-action{margin-top:10px;font-size:11px;color:var(--gold);letter-spacing:2px;padding:5px 14px;border:1px solid rgba(201,168,76,0.2);border-radius:20px;display:inline-block;cursor:pointer;transition:all .25s;background:rgba(201,168,76,0.03)}
+.cc-action:hover{background:rgba(201,168,76,0.12);border-color:var(--gold);box-shadow:0 0 12px rgba(201,168,76,.15)}
 .cat-tag{padding:4px 10px;border:1px solid rgba(201,168,76,.15);font-size:10px;letter-spacing:2px;opacity:.4}
 .cat-card.bazi{border-color:rgba(41,128,185,.12)}
 .cat-card.bazi::before{background:linear-gradient(135deg,rgba(41,128,185,.06) 0%,transparent 60%)}
@@ -159,11 +159,11 @@ select.input-field option{background:var(--ink2)}
 .result.visible{display:block}
 
 /* RESULT BANNER */
-.result-banner{text-align:center;margin-bottom:32px;padding:28px 20px;border-bottom:1px solid rgba(201,168,76,.08)}
+.result-banner{text-align:center;margin-bottom:32px;padding:32px 20px;border-bottom:1px solid rgba(201,168,76,.08);position:relative}
 .result-banner .rb-name{font-family:'Ma Shan Zheng',serif;font-size:clamp(28px,5vw,44px);letter-spacing:8px;margin-bottom:10px}
 .result-banner .rb-meta{font-size:12px;letter-spacing:3px;opacity:.4;font-weight:300}
 .result-banner .rb-tags{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:14px}
-.rb-tag{padding:4px 14px;border:1px solid rgba(201,168,76,.15);font-size:11px;letter-spacing:2px;opacity:.5}
+.rb-tag{padding:4px 14px;border:1px solid rgba(201,168,76,.15);font-size:11px;letter-spacing:2px;opacity:.6;border-radius:16px;background:rgba(201,168,76,.03)}
 
 /* PILLAR CHART */
 .pillar-chart{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);margin-bottom:20px;overflow:hidden}
@@ -314,8 +314,8 @@ select.input-field option{background:var(--ink2)}
 
 /* BACK BTN */
 .back-row{text-align:center;margin:32px 0 16px}
-.back-btn{padding:13px 40px;border:1px solid rgba(201,168,76,.2);background:transparent;color:var(--paper3);font-family:'Noto Serif SC',serif;font-size:13px;letter-spacing:4px;cursor:pointer;transition:all .3s}
-.back-btn:hover{border-color:var(--gold);color:var(--gold)}
+.back-btn{padding:12px 36px;border:1px solid rgba(201,168,76,.2);background:transparent;color:var(--paper3);font-family:'Noto Serif SC',serif;font-size:13px;letter-spacing:4px;cursor:pointer;transition:all .3s;border-radius:6px}
+.back-btn:hover{border-color:var(--gold);color:var(--gold);box-shadow:0 0 16px rgba(201,168,76,.12);background:rgba(201,168,76,.04)}
 
 /* ACTION BAR */
 .action-bar{display:flex;justify-content:center;gap:12px;margin-top:28px;flex-wrap:wrap}
@@ -3702,6 +3702,7 @@ setTimeout(removeLoadingOverlay,5000);
     <div class="hero-divider"></div>
     <p class="hero-desc">融合千年命理智慧与先进人工智能，为您开启命运密码的探索之旅</p>
     <p class="hero-motto" style="font-size:16px;color:var(--gold);letter-spacing:6px;margin-top:16px;opacity:.7;font-family:'Ma Shan Zheng',serif">知命 · 改运 · 修心持善守静</p>
+    <div style="width:40px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:24px auto 0"></div>
 
     <div id="daily-quote" style="text-align:center;padding:20px 16px 12px;max-width:600px;margin:0 auto">
       <div style="font-size:14px;color:var(--paper2);line-height:2;letter-spacing:2px;font-style:italic;opacity:.8" id="daily-quote-text"></div>
@@ -3709,7 +3710,7 @@ setTimeout(removeLoadingOverlay,5000);
     </div>
 
     <!-- 今日知识卡片 -->
-    <div id="daily-knowledge-card" style="max-width:680px;margin:8px auto 24px;padding:20px 24px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:14px;cursor:pointer;transition:all .4s ease" onclick="toggleDailyKnowledgeDetail()">
+    <div id="daily-knowledge-card" style="max-width:680px;margin:8px auto 24px;padding:20px 24px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:14px;cursor:pointer;transition:all .4s ease" onclick="toggleDailyKnowledgeDetail()" onmouseover="this.style.borderColor='rgba(201,168,76,0.3)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(201,168,76,0.15)';this.style.transform='translateY(0)'">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
         <span style="font-size:20px">📖</span>
         <span style="font-family:'Ma Shan Zheng',serif;font-size:18px;color:var(--gold);letter-spacing:3px">今日命理知识</span>
@@ -22543,9 +22544,9 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
     <span class="btm-icon">🏡</span>
     <span class="btm-label">风水</span>
   </button>
-  <button class="bottom-tab" id="btm-yanzhi" onclick="playSound('click');showSection('yanzhi')">
-    <span class="btm-icon">💬</span>
-    <span class="btm-label">言值</span>
+  <button class="bottom-tab" id="btm-annual-fortune" onclick="playSound('click');showSection('annual-fortune')">
+    <span class="btm-icon">🎊</span>
+    <span class="btm-label">运势</span>
   </button>
   <button class="bottom-tab" id="btm-xingming" onclick="playSound('click');showSection('xingming')">
     <span class="btm-icon">🔤</span>
