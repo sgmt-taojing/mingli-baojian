@@ -27675,6 +27675,38 @@ function addMerit(faith, amount, reason) {
     loadMeritRecord(faith);
 }
 
+// ============================================================
+// 功德记录显示
+// ============================================================
+function loadMeritRecord(faith) {
+    var record = JSON.parse(localStorage.getItem('meritRecord') || '{}');
+    var total = record['merit_total'] || 0;
+    var faithMerit = record['merit_' + faith] || 0;
+    
+    // 在信众中心显示功德
+    var meritDisplay = document.getElementById('meritDisplay');
+    if (!meritDisplay) {
+        // 动态创建功德显示面板
+        var userBaziBind = document.getElementById('userBaziBind');
+        if (userBaziBind && userBaziBind.parentNode) {
+            meritDisplay = document.createElement('div');
+            meritDisplay.id = 'meritDisplay';
+            meritDisplay.style.cssText = 'background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);border-radius:12px;padding:16px 20px;margin-bottom:16px';
+            userBaziBind.parentNode.insertBefore(meritDisplay, userBaziBind);
+        }
+    }
+    if (meritDisplay) {
+        var faithNames = {ru:'儒家', dao:'道家', fo:'佛家', all:'兼修'};
+        var fname = faithNames[faith] || '修行';
+        meritDisplay.innerHTML = '<div style="display:flex;align-items:center;gap:12px">' +
+            '<div style="font-size:32px">🙏</div>' +
+            '<div style="flex:1">' +
+            '<div style="font-size:14px;color:var(--gold);font-weight:600">累计功德：' + total + ' 点</div>' +
+            '<div style="font-size:12px;color:var(--paper3);margin-top:2px">' + fname + '修行：' + faithMerit + ' 点</div>' +
+            '</div></div>';
+    }
+}
+
 // Quick merit buttons (for music/diet/exercise/mantra sections)
 function meritBtn(faith, type) {
     var reasons = {
