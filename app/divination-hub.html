@@ -36567,6 +36567,14 @@ var HM_TRACKS = [
   {cat:'dao', title:'道教早晚功课', desc:'清静经 + 心印妙经', url:'', gen:'chime', merit:true},
   {cat:'dao', title:'太上感应篇', desc:'祸福无门，惟人自召', url:'', gen:'muyu', merit:true},
   {cat:'dao', title:'三官经', desc:'天官地官水官赐福', url:'', gen:'chime', merit:true},
+  // 道家旺运养生
+  {cat:'dao', title:'紫微星降·旺运罄', desc:'紫微帝星加持，提升官禄事业运', url:'', gen:'dao_wealth', merit:true},
+  {cat:'dao', title:'财神咒·聚气鼓', desc:'赵公明元帅财神咒，聚财纳福', url:'', gen:'dao_drum', merit:true},
+  {cat:'dao', title:'文昌帝君启智咒', desc:'文昌帝君加持，启智慧旺学业', url:'', gen:'dao_wenchang', merit:true},
+  {cat:'dao', title:'太岁星君镇宅音', desc:'太岁星君护佑，化煞镇宅保平安', url:'', gen:'dao_taishui', merit:true},
+  {cat:'dao', title:'药王孙思邈养生诀', desc:'药王真人传方，祛病延年', url:'', gen:'dao_yaowang', merit:true},
+  {cat:'dao', title:'八仙过海·逍遥游', desc:'八仙自在心法，疏肝解郁畅情志', url:'', gen:'dao_baxian', merit:true},
+  {cat:'dao', title:'黄庭经·内观养神', desc:'黄庭内外景经，内观存神养气', url:'', gen:'dao_huangting', merit:true},
   // 养生音乐
   {cat:'yangsheng', title:'角音·木·肝', desc:'角调养肝，生机勃发', url:'', gen:'tone_wood', merit:false},
   {cat:'yangsheng', title:'徵音·火·心', desc:'徵调养心，温阳活血', url:'', gen:'tone_fire', merit:false},
@@ -36720,6 +36728,13 @@ function hmGenerateSound(genType) {
     case 'rain': hmGenRain(ctx, masterGain); break;
     case 'stream': hmGenStream(ctx, masterGain); break;
     case 'birds': hmGenBirds(ctx, masterGain); break;
+    case 'dao_wealth': hmGenDaoWealth(ctx, masterGain); break;
+    case 'dao_drum': hmGenDaoDrum(ctx, masterGain); break;
+    case 'dao_wenchang': hmGenDaoWenchang(ctx, masterGain); break;
+    case 'dao_taishui': hmGenDaoTaishui(ctx, masterGain); break;
+    case 'dao_yaowang': hmGenDaoYaowang(ctx, masterGain); break;
+    case 'dao_baxian': hmGenDaoBaxian(ctx, masterGain); break;
+    case 'dao_huangting': hmGenDaoHuangting(ctx, masterGain); break;
     default: hmGenBell(ctx, masterGain);
   }
 }
@@ -37015,6 +37030,253 @@ function hmGenBirds(ctx, master) {
     }, 300);
   }, chirpInterval);
   hmActiveNodes.push({ stop: function() { clearInterval(birdInterval); }, disconnect: function(){} });
+}
+
+// ============================================================
+// 道家旺运养生音色生成函数
+// ============================================================
+
+// 紫微旺运罄 — 编磬音 + 低频共振，提升气场
+function hmGenDaoWealth(ctx, master) {
+  var notes = [523.25, 659.25, 783.99, 1046.50]; // C5 E5 G5 C6 — 大调明亮
+  var idx = 0;
+  function playNote(time) {
+    var freq = notes[idx % notes.length];
+    // 编磬主音
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.frequency.value = freq;
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(0.15, time + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 2.5);
+    osc.connect(gain); gain.connect(master);
+    osc.start(time); osc.stop(time + 2.8);
+    hmActiveSources.push(osc);
+    // 低频共振加持
+    var sub = ctx.createOscillator();
+    var subGain = ctx.createGain();
+    sub.frequency.value = freq / 4;
+    sub.type = 'sine';
+    subGain.gain.setValueAtTime(0, time);
+    subGain.gain.linearRampToValueAtTime(0.08, time + 0.3);
+    subGain.gain.exponentialRampToValueAtTime(0.001, time + 3);
+    sub.connect(subGain); subGain.connect(master);
+    sub.start(time); sub.stop(time + 3.2);
+    hmActiveSources.push(sub);
+    idx++;
+  }
+  playNote(ctx.currentTime);
+  var interval = setInterval(function() {
+    if (!hmIsPlaying) { clearInterval(interval); return; }
+    playNote(ctx.currentTime);
+  }, 2500);
+  hmActiveNodes.push({ stop: function() { clearInterval(interval); }, disconnect: function(){} });
+}
+
+// 财神聚气鼓 — 道教堂鼓节奏，低沉有力
+function hmGenDaoDrum(ctx, master) {
+  var beatPattern = [0, 400, 800, 1200, 1600, 2000, 2400, 3000]; // 鼓点节奏
+  var beatIdx = 0;
+  function playDrum(time) {
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.frequency.setValueAtTime(120, time);
+    osc.frequency.exponentialRampToValueAtTime(50, time + 0.15);
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(0.25, time + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.3);
+    osc.connect(gain); gain.connect(master);
+    osc.start(time); osc.stop(time + 0.35);
+    hmActiveSources.push(osc);
+    // 鼓边泛音
+    var edge = ctx.createOscillator();
+    var edgeGain = ctx.createGain();
+    edge.frequency.value = 800;
+    edge.type = 'triangle';
+    edgeGain.gain.setValueAtTime(0, time);
+    edgeGain.gain.linearRampToValueAtTime(0.03, time + 0.003);
+    edgeGain.gain.exponentialRampToValueAtTime(0.001, time + 0.08);
+    edge.connect(edgeGain); edgeGain.connect(master);
+    edge.start(time); edge.stop(time + 0.1);
+    hmActiveSources.push(edge);
+  }
+  function scheduleBeat() {
+    if (!hmIsPlaying) return;
+    playDrum(ctx.currentTime);
+    beatIdx = (beatIdx + 1) % beatPattern.length;
+    setTimeout(scheduleBeat, beatPattern[beatIdx]);
+  }
+  playDrum(ctx.currentTime);
+  setTimeout(scheduleBeat, beatPattern[(beatIdx + 1) % beatPattern.length]);
+  hmActiveNodes.push({ stop: function() {}, disconnect: function(){} });
+}
+
+// 文昌启智音 — 罄音+清脆高频，启发智慧
+function hmGenDaoWenchang(ctx, master) {
+  var notes = [783.99, 880.00, 987.77, 1174.66]; // G5 A5 B5 D6 — 高频清亮
+  var idx = 0;
+  function playNote(time) {
+    var freq = notes[idx % notes.length];
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.frequency.value = freq;
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(0.1, time + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 1.8);
+    osc.connect(gain); gain.connect(master);
+    osc.start(time); osc.stop(time + 2);
+    hmActiveSources.push(osc);
+    // 泛音列
+    var harm = ctx.createOscillator();
+    var harmGain = ctx.createGain();
+    harm.frequency.value = freq * 2;
+    harm.type = 'sine';
+    harmGain.gain.setValueAtTime(0, time);
+    harmGain.gain.linearRampToValueAtTime(0.04, time + 0.02);
+    harmGain.gain.exponentialRampToValueAtTime(0.001, time + 1.5);
+    harm.connect(harmGain); harmGain.connect(master);
+    harm.start(time); harm.stop(time + 1.6);
+    hmActiveSources.push(harm);
+    idx++;
+  }
+  playNote(ctx.currentTime);
+  var interval = setInterval(function() {
+    if (!hmIsPlaying) { clearInterval(interval); return; }
+    playNote(ctx.currentTime);
+  }, 2000);
+  hmActiveNodes.push({ stop: function() { clearInterval(interval); }, disconnect: function(){} });
+}
+
+// 太岁镇宅音 — 低频方波 + 罄音，沉稳守护
+function hmGenDaoTaishui(ctx, master) {
+  // 持续低频底音
+  var drone = ctx.createOscillator();
+  var droneGain = ctx.createGain();
+  drone.frequency.value = 65.41; // C2 极低频
+  drone.type = 'triangle';
+  droneGain.gain.setValueAtTime(0, ctx.currentTime);
+  droneGain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.5);
+  drone.connect(droneGain); droneGain.connect(master);
+  drone.start(); drone.stop(ctx.currentTime + 300);
+  hmActiveSources.push(drone);
+  // 周期性罄音
+  function playChime(time) {
+    var freq = 261.63; // C4
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.frequency.value = freq;
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(0.1, time + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 3);
+    osc.connect(gain); gain.connect(master);
+    osc.start(time); osc.stop(time + 3.2);
+    hmActiveSources.push(osc);
+  }
+  playChime(ctx.currentTime);
+  var interval = setInterval(function() {
+    if (!hmIsPlaying) { clearInterval(interval); drone.stop(); return; }
+    playChime(ctx.currentTime);
+  }, 4000);
+  hmActiveNodes.push({ stop: function() { clearInterval(interval); try{drone.stop();}catch(e){} }, disconnect: function(){ try{drone.disconnect();droneGain.disconnect();}catch(e){} } });
+}
+
+// 药王养生诀 — 五音疗疾序列，木火土金水循环
+function hmGenDaoYaowang(ctx, master) {
+  var fiveTones = [
+    {freq: 349.23, dur: 2000, name: '角·木·肝'}, // F4
+    {freq: 523.25, dur: 2000, name: '徵·火·心'}, // C5
+    {freq: 392.00, dur: 2000, name: '宫·土·脾'}, // G4
+    {freq: 440.00, dur: 2000, name: '商·金·肺'}, // A4
+    {freq: 293.66, dur: 2000, name: '羽·水·肾'}  // D4
+  ];
+  var idx = 0;
+  function playTone(time) {
+    var tone = fiveTones[idx % fiveTones.length];
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.frequency.value = tone.freq;
+    osc.type = 'triangle';
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(0.1, time + 0.1);
+    gain.gain.linearRampToValueAtTime(0.08, time + tone.dur/2/1000);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + tone.dur/1000);
+    osc.connect(gain); gain.connect(master);
+    osc.start(time); osc.stop(time + tone.dur/1000 + 0.1);
+    hmActiveSources.push(osc);
+    idx++;
+  }
+  playTone(ctx.currentTime);
+  var interval = setInterval(function() {
+    if (!hmIsPlaying) { clearInterval(interval); return; }
+    playTone(ctx.currentTime);
+  }, 2200);
+  hmActiveNodes.push({ stop: function() { clearInterval(interval); }, disconnect: function(){} });
+}
+
+// 八仙逍遥游 — 轻快古琴拨弦 + 鸟鸣点缀
+function hmGenDaoBaxian(ctx, master) {
+  var melody = [392.00, 440.00, 523.25, 440.00, 392.00, 329.63, 392.00, 523.25]; // G4 A4 C5 A4 G4 E4 G4 C5
+  var idx = 0;
+  function pluck(time) {
+    var freq = melody[idx % melody.length];
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.frequency.value = freq;
+    osc.type = 'sawtooth';
+    var filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 2000;
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(0.08, time + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.8);
+    osc.connect(filter); filter.connect(gain); gain.connect(master);
+    osc.start(time); osc.stop(time + 0.9);
+    hmActiveSources.push(osc);
+    idx++;
+  }
+  pluck(ctx.currentTime);
+  var interval = setInterval(function() {
+    if (!hmIsPlaying) { clearInterval(interval); return; }
+    pluck(ctx.currentTime);
+  }, 600);
+  hmActiveNodes.push({ stop: function() { clearInterval(interval); }, disconnect: function(){} });
+}
+
+// 黄庭内观养神 — 超低频OM音 + 呼吸节奏
+function hmGenDaoHuangting(ctx, master) {
+  // OM基音
+  var om = ctx.createOscillator();
+  var omGain = ctx.createGain();
+  om.frequency.value = 136.10; // Earth OM 频率
+  om.type = 'sine';
+  omGain.gain.setValueAtTime(0, ctx.currentTime);
+  omGain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 2);
+  om.connect(omGain); omGain.connect(master);
+  om.start(); om.stop(ctx.currentTime + 300);
+  hmActiveSources.push(om);
+  // 呼吸节奏调制（4秒吸 4秒呼）
+  var lfo = ctx.createOscillator();
+  var lfoGain = ctx.createGain();
+  lfo.frequency.value = 0.125; // 8秒一个周期
+  lfoGain.gain.value = 0.04;
+  lfo.connect(lfoGain); lfoGain.connect(omGain.gain);
+  lfo.start(); lfo.stop(ctx.currentTime + 300);
+  hmActiveSources.push(lfo);
+  // 高频泛音
+  var harm = ctx.createOscillator();
+  var harmGain = ctx.createGain();
+  harm.frequency.value = 272.20; // 倍频
+  harm.type = 'sine';
+  harmGain.gain.setValueAtTime(0, ctx.currentTime);
+  harmGain.gain.linearRampToValueAtTime(0.03, ctx.currentTime + 3);
+  harm.connect(harmGain); harmGain.connect(master);
+  harm.start(); harm.stop(ctx.currentTime + 300);
+  hmActiveSources.push(harm);
+  hmActiveNodes.push({ stop: function() { try{om.stop();lfo.stop();harm.stop();}catch(e){} }, disconnect: function(){ try{om.disconnect();lfo.disconnect();harm.disconnect();}catch(e){} } });
 }
 
 function hmTogglePlay() {
