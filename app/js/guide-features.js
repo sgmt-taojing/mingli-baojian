@@ -1070,7 +1070,7 @@ function displayMobileFengshui(fengshui) {
     var copyBtn = '<div style="margin-top:16px;text-align:center">';
     copyBtn += '<button onclick="copyResultText(this)" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px">📋 复制结果</button>';
     copyBtn += '</div>';
-    resultDiv.innerHTML += termExplain + copyBtn;
+    resultDiv.insertAdjacentHTML("beforeend", termExplain + copyBtn);
   }
 }
 
@@ -3084,7 +3084,7 @@ function displayXieyin(xieyin) {
 
       // 检查是否已经有这个提示
       if (!yinlvDiv.innerHTML.includes('经检测，此名无不良谐音')) {
-        yinlvDiv.innerHTML += noXieyinHtml;
+        yinlvDiv.insertAdjacentHTML("beforeend", noXieyinHtml);
       }
     }
 
@@ -5264,7 +5264,7 @@ function addMerit(faith, amount, reason) {
     var msg = document.createElement('div');
     msg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid #c9a84c;color:#c9a84c;padding:20px 30px;border-radius:14px;font-size:16px;z-index:99999;text-align:center;box-shadow:0 0 40px rgba(201,168,76,0.3)';
     msg.innerHTML = '<div style="font-size:32px;margin-bottom:8px">🙏</div><div style="font-weight:bold">+' + amount + ' 功德</div>';
-    if (reason) msg.innerHTML += '<div style="font-size:12px;color:#aaa;margin-top:6px">' + reason + '</div>';
+    if (reason) msg.insertAdjacentHTML("beforeend", '<div style="font-size:12px;color:#aaa;margin-top:6px">' + reason + '</div>');
     document.body.appendChild(msg);
     setTimeout(function(){msg.style.opacity='0';msg.style.transition='opacity 0.8s';setTimeout(function(){document.body.removeChild(msg);},800);}, 1500);
     
