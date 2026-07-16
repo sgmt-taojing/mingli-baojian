@@ -4921,7 +4921,7 @@ function renderCeziSectionResult(char) {
   window.koujueSwitchCategory = koujueSwitchCategory;
 
   // 收藏管理
-  function getFavs(){ return JSON.parse(localStorage.getItem('koujue_favs')||'[]'); }
+  function getFavs(){ return safeGetJSON('koujue_favs', []); }
   function setFavs(arr){ localStorage.setItem('koujue_favs',JSON.stringify(arr)); }
   function isFav(id){ return getFavs().indexOf(id)>=0; }
   function toggleFav(id){
@@ -5246,7 +5246,7 @@ function renderCeziSectionResult(char) {
 // ============================================================
 function addMerit(faith, amount, reason) {
     if (!amount) amount = 1;
-    var record = JSON.parse(localStorage.getItem('meritRecord') || '{}');
+    var record = safeGetJSON('meritRecord', {});
     var meritKey = 'merit_' + faith;
     if (!record[meritKey]) record[meritKey] = 0;
     record[meritKey] += amount;
@@ -5396,7 +5396,7 @@ function meritActionBtn(faith, actionId) {
 
 // 加载功德记录并更新 UI
 function loadMeritRecord(faith) {
-  var record = JSON.parse(localStorage.getItem('meritRecord') || '{}');
+  var record = safeGetJSON('meritRecord', {});
   var meritKey = 'merit_' + faith;
   var total = record[meritKey] || 0;
   var grandTotal = record['merit_total'] || 0;
@@ -5490,7 +5490,7 @@ function renderMeritActions() {
   var foPanel = document.getElementById('merit-actions-fo');
   if (foPanel) foPanel.style.display = 'grid';
   // 初始化功德等级显示
-  var record = JSON.parse(localStorage.getItem('meritRecord') || '{}');
+  var record = safeGetJSON('meritRecord', {});
   var total = record['merit_total'] || 0;
   loadMeritRecord('fo');
 }

@@ -4983,7 +4983,7 @@ function renderNewBaziModules(data) {
   if (typeof renderUserBaziCard === 'function') renderUserBaziCard();
 
   // === I. 检查是否会员，显示年度提醒 ===
-  const member = JSON.parse(localStorage.getItem('memberInfo') || '{}');
+  const member = safeGetJSON('memberInfo', {});
   if (member.level && member.level !== 'free') {
     const noticeEl = document.getElementById('memberAnnualNotice');
     const contentEl = document.getElementById('annualNoticeContent');
@@ -13218,7 +13218,7 @@ function renderReminderList(faith) {
 function renderDailyOutfit(faith) {
   const card = document.getElementById('outfitCard');
   const guide = OUTFIT_GUIDE[faith] || OUTFIT_GUIDE['all'];
-  const bazi = JSON.parse(localStorage.getItem('userBazi') || 'null');
+  const bazi = safeGetJSON('userBazi', null);
 
   let wuxingHtml = '';
   if (bazi) {
@@ -19348,7 +19348,7 @@ function exportBaziReport(format = 'html') {
   }
   const name = document.getElementById('baziName').value || '有缘人';
   const sex = document.getElementById('baziSex').value;
-  const bazi = JSON.parse(localStorage.getItem('userBazi') || '{}');
+  const bazi = safeGetJSON('userBazi', {});
 
   // 构建报告内容
   const reportContent = buildReportContent(resultEl, name, sex, bazi);
@@ -19367,7 +19367,7 @@ function buildReportContent(resultEl, name, sex, bazi) {
   const nextYear = currentYear + 1;
 
   // 获取会员信息
-  const member = JSON.parse(localStorage.getItem('memberInfo') || '{}');
+  const member = safeGetJSON('memberInfo', {});
   const isMember = member.level && member.level !== 'free';
 
   // 构建会员年度提醒
@@ -19755,7 +19755,7 @@ function matchMyMingua(btn, suitableStr) {
   }
 
   // 从 localStorage 获取八字
-  const bazi = JSON.parse(localStorage.getItem('userBazi') || '{}');
+  const bazi = safeGetJSON('userBazi', {});
   let birthYear = bazi.year || null;
   if (!birthYear && bazi.birthday) {
     birthYear = parseInt(bazi.birthday.split('-')[0]);
@@ -25365,7 +25365,7 @@ function checkAnnualForecastPush() {
   // 判断用户会员等级
   var userLevel = 'free';
   try {
-    var data = JSON.parse(localStorage.getItem('mlbj_data') || '{}');
+    var data = safeGetJSON('mlbj_data', {});
     if (data.user && data.user.vipLevel) userLevel = data.user.vipLevel;
     // 通达检测
     if (data.user && data.user.phone) {
@@ -25388,7 +25388,7 @@ function checkAnnualForecastPush() {
   var pushKey = 'annual_forecast_push_' + targetYear;
   var pushState = {};
   try {
-    pushState = JSON.parse(localStorage.getItem('annual_forecast_push_state') || '{}');
+    pushState = safeGetJSON('annual_forecast_push_state', {});
   } catch(e) {}
 
   // 非会员推送2次（12月初 + 12月中下旬）
@@ -26465,7 +26465,7 @@ function computeFamilyPaipan() {
   }
 
   // 会员验证
-  var member = JSON.parse(localStorage.getItem('memberInfo') || '{}');
+  var member = safeGetJSON('memberInfo', {});
   var memberLevel = member.level || 'free';
 
   if (memberLevel !== '明道') {
@@ -32522,7 +32522,7 @@ function exportReportAsText() {
   }
   var text = resultEl.innerText || resultEl.textContent || '';
   var name = '';
-  try { var bz = JSON.parse(localStorage.getItem('userBazi') || '{}'); name = bz.name || ''; } catch(e){}
+  try { var bz = safeGetJSON('userBazi', {}); name = bz.name || ''; } catch(e){}
   var header = '易道智鉴 · 命理报告\n';
   if (name) header += '缘主：' + name + '\n';
   header += '生成时间：' + new Date().toLocaleString('zh-CN') + '\n';
@@ -32567,7 +32567,7 @@ function exportReportAsHTMLFile() {
     return;
   }
   var name = '有缘人';
-  try { var bz = JSON.parse(localStorage.getItem('userBazi') || '{}'); name = bz.name || name; } catch(e){}
+  try { var bz = safeGetJSON('userBazi', {}); name = bz.name || name; } catch(e){}
 
   // 获取内联样式
   var styles = _getReportInlineStyles();
@@ -32620,7 +32620,7 @@ function exportReportAsImage() {
 
 function _doExportImage(targetEl) {
   var name = '有缘人';
-  try { var bz = JSON.parse(localStorage.getItem('userBazi') || '{}'); name = bz.name || name; } catch(e){}
+  try { var bz = safeGetJSON('userBazi', {}); name = bz.name || name; } catch(e){}
 
   html2canvas(targetEl, {
     backgroundColor: '#080808',

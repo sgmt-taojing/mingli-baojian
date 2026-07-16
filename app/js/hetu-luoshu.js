@@ -53,7 +53,7 @@ var HETU_LUOSHU_SYSTEM = {
 
 // ── 河洛会员分级工具 ──
 function _hlGetMemberLevel() {
-  var member = JSON.parse(localStorage.getItem('memberInfo') || '{}');
+  var member = safeGetJSON('memberInfo', {});
   var level = (member.level || 'free').toLowerCase();
   var superUsers = [];
   try { superUsers = JSON.parse(localStorage.getItem('superUsers') || '[]'); } catch(e) {}

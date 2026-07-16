@@ -3618,19 +3618,19 @@ setTimeout(removeLoadingOverlay,5000);
   }
 })();
 </script>
-<script src="knowledge/authoritative-knowledge-base.js"></script>
-    <script src="knowledge/faith-knowledge-base.js"></script>
-    <script src="knowledge/faith-deities-detail.js"></script>
-    <script src="knowledge/scripture-database.js"></script>
-    <script src="voice-reader.js"></script>
-    <script src="knowledge/faith-renderer.js"></script>
-    <script src="knowledge/knowledge-supplement.js"></script>
-    <script src="knowledge/koujue-database-full.js"></script>
+<script src="knowledge/authoritative-knowledge-base.js" defer></script>
+    <script src="knowledge/faith-knowledge-base.js" defer></script>
+    <script src="knowledge/faith-deities-detail.js" defer></script>
+    <script src="knowledge/scripture-database.js" defer></script>
+    <script src="voice-reader.js" defer></script>
+    <script src="knowledge/faith-renderer.js" defer></script>
+    <script src="knowledge/knowledge-supplement.js" defer></script>
+    <script src="knowledge/koujue-database-full.js" defer></script>
 </head>
 <body>
 
 <!-- LOADING OVERLAY -->
-<div id="loading-overlay" style="position:fixed;inset:0;background:#1a1a2e;z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s">
+<div id="loading-overlay" aria-live="polite" style="position:fixed;inset:0;background:#1a1a2e;z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s">
   <div class="loading-logo" style="font-size:36px;margin-bottom:16px;animation:pulseGlow 2s infinite">☯</div>
   <div class="loading-brand" style="font-size:14px;color:var(--gold);letter-spacing:6px">易道智鉴</div>
   <div class="load-bar-wrap" style="width:120px;height:2px;background:rgba(201,168,76,.1);margin-top:20px;border-radius:1px;overflow:hidden">
@@ -3645,43 +3645,43 @@ setTimeout(removeLoadingOverlay,5000);
 </div>
 
 <!-- NAV -->
-<nav class="top-nav">
+<nav class="top-nav" role="navigation" aria-label="主导航">
   <div class="nav-inner">
     <div class="nav-brand">易道智鉴</div>
-    <div class="nav-tabs">
-      <button class="nav-tab" onclick="showSection('hero')" id="tab-hero">
+    <div class="nav-tabs" role="tablist">
+      <button class="nav-tab" role="tab" aria-selected="false" aria-controls="section-hero" onclick="showSection('hero')" id="tab-hero">
         <span class="tab-emoji">🏠</span>
         <span class="tab-name">首页</span>
       </button>
-      <button class="nav-tab" onclick="showSection('bazi')" id="tab-bazi">
+      <button class="nav-tab" role="tab" aria-selected="false" aria-controls="section-bazi" onclick="showSection('bazi')" id="tab-bazi">
         <span class="tab-emoji">🌟</span>
         <span class="tab-name">命盘</span>
       </button>
-      <button class="nav-tab" onclick="showSection('zhanbu')" id="tab-zhanbu">
+      <button class="nav-tab" role="tab" aria-selected="false" aria-controls="section-zhanbu" onclick="showSection('zhanbu')" id="tab-zhanbu">
         <span class="tab-emoji">䷀</span>
         <span class="tab-name">占卜</span>
       </button>
-      <button class="nav-tab" onclick="showSection('fengshui')" id="tab-fengshui">
+      <button class="nav-tab" role="tab" aria-selected="false" aria-controls="section-fengshui" onclick="showSection('fengshui')" id="tab-fengshui">
         <span class="tab-emoji">🏡</span>
         <span class="tab-name">风水</span>
       </button>
-      <button class="nav-tab" onclick="showSection('xingming')" id="tab-xingming">
+      <button class="nav-tab" role="tab" aria-selected="false" aria-controls="section-xingming" onclick="showSection('xingming')" id="tab-xingming">
         <span class="tab-emoji">🔤</span>
         <span class="tab-name">姓名</span>
       </button>
-      <button class="nav-tab" onclick="showSection('jiuri')" id="tab-jiuri">
+      <button class="nav-tab" role="tab" aria-selected="false" aria-controls="section-jiuri" onclick="showSection('jiuri')" id="tab-jiuri">
         <span class="tab-emoji">💮</span>
         <span class="tab-name">吉日</span>
       </button>
-      <button class="nav-tab" onclick="showSection('more')" id="tab-more">
+      <button class="nav-tab" role="tab" aria-selected="false" aria-controls="section-more" onclick="showSection('more')" id="tab-more">
         <span class="tab-emoji">☰</span>
         <span class="tab-name">更多</span>
       </button>
-      <button class="nav-tab" onclick="showSection('annual-fortune')" id="tab-annual-fortune">
+      <button class="nav-tab" role="tab" aria-selected="false" aria-controls="section-annual-fortune" onclick="showSection('annual-fortune')" id="tab-annual-fortune">
         <span class="tab-emoji">🎊</span>
         <span class="tab-name">年度运势</span>
       </button>
-      <button class="nav-tab" onclick="showSection('healing-music')" id="tab-healing-music">
+      <button class="nav-tab" role="tab" aria-selected="false" aria-controls="section-healing-music" onclick="showSection('healing-music')" id="tab-healing-music">
         <span class="tab-emoji">🎵</span>
         <span class="tab-name">养心音乐</span>
       </button>
@@ -3705,10 +3705,10 @@ setTimeout(removeLoadingOverlay,5000);
 
 
 <!-- MAIN -->
-<div class="main">
+<main class="main">
 
 <!-- ===== 首页 HERO ===== -->
-<section class="section active" id="section-hero">
+<section class="section active" id="section-hero" role="tabpanel" aria-labelledby="tab-hero">
   <div class="wechat-disclaimer">⚠️ 本平台内容仅供国学文化学习与娱乐参考，不构成任何专业建议。占卜结果不作为决策依据，养生建议不替代医疗诊断。</div>
   <div class="hero">
     <p class="hero-eyebrow">易道智鉴 · 先进AI推演</p>
@@ -3971,7 +3971,7 @@ setTimeout(removeLoadingOverlay,5000);
 </section>
 
 <!-- ===== TIZHI (体质辨识) SECTION ===== -->
-<section class="section" id="section-tizhi">
+<section class="section" id="section-tizhi" role="tabpanel" aria-labelledby="tab-tizhi">
   <div class="section-header">
     <span class="sh-symbol" style="color:var(--gold)">🧬</span>
     <h2 class="sh-title">体质辨识 · 中医养生</h2>
@@ -4192,7 +4192,7 @@ setTimeout(removeLoadingOverlay,5000);
 </section>
 
 <!-- ===== BAZI SECTION ===== -->
-<section class="section" id="section-bazi">
+<section class="section" id="section-bazi" role="tabpanel" aria-labelledby="tab-bazi">
   <div class="section-header">
     <span class="sh-symbol" style="color:var(--cyan)">🌟</span>
     <h2 class="sh-title">八字命盘 · 运势详解</h2>
@@ -4538,7 +4538,7 @@ setTimeout(removeLoadingOverlay,5000);
 </section>
 
 <!-- ===== ZHANBU (占卜) COMPOSITE SECTION ===== -->
-<section class="section" id="section-zhanbu">
+<section class="section" id="section-zhanbu" role="tabpanel" aria-labelledby="tab-zhanbu">
   <div class="section-header">
     <span class="sh-symbol" style="color:var(--gold)">䷀</span>
     <h2 class="sh-title">占卜问卦</h2>
@@ -4870,7 +4870,7 @@ setTimeout(removeLoadingOverlay,5000);
 </section>
 
 <!-- ===== YIJING SECTION ===== -->
-<section class="section section-deplacer" id="section-yijing">
+<section class="section section-deplacer" id="section-yijing" role="tabpanel" aria-labelledby="tab-yijing">
     <div class="section-header">
     <span class="sh-symbol" style="color:var(--gold)">䷀</span>
     <h2 class="sh-title">易经六爻</h2>
@@ -4896,7 +4896,7 @@ setTimeout(removeLoadingOverlay,5000);
   </section>
 
 <!-- ===== QIMEN SECTION ===== -->
-<section class="section section-deplacer" id="section-qimen">
+<section class="section section-deplacer" id="section-qimen" role="tabpanel" aria-labelledby="tab-qimen">
     <div class="section-header">
     <span class="sh-symbol" style="color:var(--violet)">☰</span>
     <h2 class="sh-title">奇门遁甲</h2>
@@ -4917,7 +4917,7 @@ setTimeout(removeLoadingOverlay,5000);
   </section>
 
 <!-- ===== ZIWEI SECTION ===== -->
-<section class="section section-deplacer" id="section-ziwei">
+<section class="section section-deplacer" id="section-ziwei" role="tabpanel" aria-labelledby="tab-ziwei">
     <div class="section-header">
     <span class="sh-symbol" style="color:var(--fire)">🌌</span>
     <h2 class="sh-title">紫微斗数</h2>
@@ -4938,7 +4938,7 @@ setTimeout(removeLoadingOverlay,5000);
   </section>
 
 <!-- ===== MEIHUA SECTION ===== -->
-<section class="section section-deplacer" id="section-meihua">
+<section class="section section-deplacer" id="section-meihua" role="tabpanel" aria-labelledby="tab-meihua">
     <div class="section-header">
     <span class="sh-symbol" style="color:var(--jade)">🌸</span>
     <h2 class="sh-title">梅花易数</h2>
@@ -4958,7 +4958,7 @@ setTimeout(removeLoadingOverlay,5000);
   </section>
 
 <!-- ===== DA LIU REN SECTION ===== -->
-<section class="section section-deplacer" id="section-liuren">
+<section class="section section-deplacer" id="section-liuren" role="tabpanel" aria-labelledby="tab-liuren">
     <div class="section-header">
     <span class="sh-symbol" style="color:var(--orange)">⬡</span>
     <h2 class="sh-title">大六壬</h2>
@@ -4978,7 +4978,7 @@ setTimeout(removeLoadingOverlay,5000);
   </section>
 
 <!-- ===== KNOWLEDGE ===== -->
-<section class="section" id="section-knowledge">
+<section class="section" id="section-knowledge" role="tabpanel" aria-labelledby="tab-knowledge">
   <div class="back-row"><button class="back-btn" onclick="showSection('hero')">返回首页</button></div>
   <div class="section-header">
     <span class="sh-symbol" style="color:var(--gold)">📚</span>
@@ -5053,7 +5053,7 @@ setTimeout(removeLoadingOverlay,5000);
 </section>
 
 <!-- ===== CEZI SECTION (测字) ===== -->
-<section class="section section-deplacer" id="section-cezi">
+<section class="section section-deplacer" id="section-cezi" role="tabpanel" aria-labelledby="tab-cezi">
     <div class="section-header">
     <span class="sh-symbol" style="color:var(--gold)">✍️</span>
     <h2 class="sh-title">测 字 解 析</h2>
@@ -5114,7 +5114,7 @@ setTimeout(removeLoadingOverlay,5000);
   </section>
 
 <!-- ===== HUAJIE SECTION ===== -->
-<section class="section section-deplacer" id="section-huajie">
+<section class="section section-deplacer" id="section-huajie" role="tabpanel" aria-labelledby="tab-huajie">
     <div class="section-header">
     <span class="sh-symbol" style="color:var(--gold)">🛡️</span>
     <h2 class="sh-title">开运化解</h2>
@@ -5137,7 +5137,7 @@ setTimeout(removeLoadingOverlay,5000);
   </section>
 
 <!-- ===== 化解中心 SECTION ===== -->
-<section class="section section-deplacer" id="section-cure-center">
+<section class="section section-deplacer" id="section-cure-center" role="tabpanel" aria-labelledby="tab-cure-center">
     <div class="section-header">
     <span class="sh-symbol" style="color:var(--gold)">💎</span>
     <h2 class="sh-title">化解中心</h2>
@@ -5158,7 +5158,7 @@ setTimeout(removeLoadingOverlay,5000);
 </section>
 
 <!-- ===== ANNUAL FORTUNE SECTION ===== -->
-<section class="section" id="section-annual-fortune">
+<section class="section" id="section-annual-fortune" role="tabpanel" aria-labelledby="tab-annual-fortune">
   <div class="section-header">
     <span class="sh-symbol" style="color:var(--gold)">🎊</span>
     <h2 class="sh-title">年 度 运 势</h2>
@@ -5261,7 +5261,7 @@ setTimeout(removeLoadingOverlay,5000);
 </section>
 
 <!-- ===== FENGSHUI PRO SECTION ===== -->
-<section class="section" id="section-fengshui-pro">
+<section class="section" id="section-fengshui-pro" role="tabpanel" aria-labelledby="tab-fengshui-pro">
   <div class="section-header">
     <span class="sh-symbol" style="color:var(--jade)">🏔️</span>
     <h2 class="sh-title">风 水 进 阶</h2>
@@ -5380,7 +5380,7 @@ setTimeout(removeLoadingOverlay,5000);
 </section>
 
 <!-- ===== YANZHI (言值·沟通技巧) SECTION ===== -->
-<section class="section" id="section-yanzhi">
+<section class="section" id="section-yanzhi" role="tabpanel" aria-labelledby="tab-yanzhi">
   <div class="section-header">
     <span class="sh-symbol" style="color:#e67e22">💬</span>
     <h2 class="sh-title">言 值</h2>
@@ -5691,7 +5691,7 @@ setTimeout(removeLoadingOverlay,5000);
 </section>
 
 <!-- ===== XINGMING (姓名) COMPOSITE SECTION ===== -->
-<section class="section" id="section-xingming">
+<section class="section" id="section-xingming" role="tabpanel" aria-labelledby="tab-xingming">
   <div class="section-header">
     <span class="sh-symbol" style="color:var(--gold)">🔤</span>
     <h2 class="sh-title">姓名吉凶</h2>
@@ -5713,7 +5713,7 @@ setTimeout(removeLoadingOverlay,5000);
 </section>
 
 <!-- ===== MOBILE NUMBER SECTION ===== -->
-<section class="section" id="section-mobile">
+<section class="section" id="section-mobile" role="tabpanel" aria-labelledby="tab-mobile">
     <div class="section-header">
     <span class="sh-symbol" style="color:var(--cyan)">📱</span>
     <h2 class="sh-title">手机号分析</h2>
@@ -5724,7 +5724,7 @@ setTimeout(removeLoadingOverlay,5000);
   <div class="input-card">
     <h3>输入手机号</h3>
     <div class="input-row" style="justify-content:center">
-      <input type="tel" id="mobileInput" class="input-field" style="max-width:280px;font-size:18px;letter-spacing:4px" placeholder="请输入11位手机号" maxlength="11">
+      <input type="tel" id="mobileInput" class="input-field" style="max-width:280px;font-size:18px;letter-spacing:4px" placeholder="请输入11位手机号" maxlength="11" pattern="[0-9]*" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
     </div>
     <!-- 生辰八字 + 工作信息 -->
     <div style="background:rgba(201,168,76,0.03);border:1px solid rgba(201,168,76,0.12);border-radius:10px;padding:14px;margin-top:12px">
@@ -5833,7 +5833,7 @@ setTimeout(removeLoadingOverlay,5000);
   </section>
 
 <!-- ===== JIURI SECTION (吉日查询) ===== -->
-<section class="section" id="section-jiuri">
+<section class="section" id="section-jiuri" role="tabpanel" aria-labelledby="tab-jiuri">
   <div class="section-header">
     <span class="sh-symbol" style="color:var(--gold)">💮</span>
     <h2 class="sh-title">吉 日 查 询</h2>
@@ -5928,7 +5928,7 @@ setTimeout(removeLoadingOverlay,5000);
 </section>
 
 <!-- ===== USER CENTER SECTION (信众中心) ===== -->
-<section class="section" id="section-user">
+<section class="section" id="section-user" role="tabpanel" aria-labelledby="tab-user">
   <div class="section-header">
     <span class="sh-symbol" style="color:var(--gold)">🙏</span>
     <h2 class="sh-title">信 众 中 心</h2>
@@ -6060,7 +6060,7 @@ setTimeout(removeLoadingOverlay,5000);
 </section>
 
 <!-- ===== HEALING MUSIC (养心净心音乐) SECTION ===== -->
-<section class="section" id="section-healing-music">
+<section class="section" id="section-healing-music" role="tabpanel" aria-labelledby="tab-healing-music">
   <div class="section-header">
     <span class="sh-symbol" style="color:var(--gold)">🎵</span>
     <h2 class="sh-title">养 心 净 心 音 乐</h2>
@@ -6120,7 +6120,7 @@ setTimeout(removeLoadingOverlay,5000);
 
 <!-- ===== 改名建议模块 ===== -->
 <!-- 升级内容:全面升级改名建议模块，新增知识科普、详细算法说明、经典引用 -->
-<section class="section" id="section-rename">
+<section class="section" id="section-rename" role="tabpanel" aria-labelledby="tab-rename">
     <div class="section-header">
     <span class="sh-symbol" style="color:var(--gold)">🔤</span>
     <h2 class="sh-title">起名 / 改名</h2>
@@ -6353,7 +6353,7 @@ setTimeout(removeLoadingOverlay,5000);
 
 
 <!-- ===== 公司取名模块（专业升级版）===== -->
-<section class="section" id="section-company">
+<section class="section" id="section-company" role="tabpanel" aria-labelledby="tab-company">
     <div class="section-header">
     <span class="sh-symbol" style="color:var(--cyan)">🏢</span>
     <h2 class="sh-title">公司取名（专业版）</h2>
@@ -6506,7 +6506,7 @@ setTimeout(removeLoadingOverlay,5000);
   </div>
   </section>
 <!-- ===== 姓名分析模块 ===== -->
-<section class="section" id="section-name-analyze">
+<section class="section" id="section-name-analyze" role="tabpanel" aria-labelledby="tab-name-analyze">
     <div class="section-header">
     <span class="sh-symbol" style="color:var(--gold)">📊</span>
     <h2 class="sh-title">姓名分析</h2>
@@ -6558,7 +6558,7 @@ setTimeout(removeLoadingOverlay,5000);
   </section>
 
 <!-- ===== LUOPAN SECTION ===== -->
-<section class="section" id="section-luopan">
+<section class="section" id="section-luopan" role="tabpanel" aria-labelledby="tab-luopan">
   <div class="section-header">
     <span class="sh-symbol" style="color:var(--gold)">🧭</span>
     <h2 class="sh-title">电 子 罗 盘</h2>
@@ -6673,7 +6673,7 @@ setTimeout(removeLoadingOverlay,5000);
 </section>
 
 <!-- ===== 截图分析模块 ===== -->
-<section class="section" id="section-screenshot">
+<section class="section" id="section-screenshot" role="tabpanel" aria-labelledby="tab-screenshot">
   <div class="section-header">
     <span class="sh-symbol" style="color:var(--cyan)">📷</span>
     <h2 class="sh-title">面相分析</h2>
@@ -6701,7 +6701,7 @@ setTimeout(removeLoadingOverlay,5000);
   <!-- 截图预览 -->
   <div class="screenshot-preview" id="screenshotPreview" style="display:none;margin:20px 0;padding:20px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.1);border-radius:12px;">
     <h4 style="color:var(--gold);margin-bottom:12px;">📷 面部照片预览</h4>
-    <img id="screenshotImage" style="max-width:100%;border-radius:8px;margin-bottom:16px;">
+    <img id="screenshotImage" alt="功能截图展示" style="max-width:100%;border-radius:8px;margin-bottom:16px;">
     <div style="display:flex;gap:12px;">
       <button class="action-btn" onclick="analyzeScreenshot()">🔍 面相分析</button>
       <button class="action-btn" onclick="showMianxiangManual()" style="margin-left:8px">📝 手动分析</button>
@@ -6724,7 +6724,7 @@ setTimeout(removeLoadingOverlay,5000);
 </section>
 
 <!-- ===== 名师解惑 ===== -->
-<section class="section" id="section-masters">
+<section class="section" id="section-masters" role="tabpanel" aria-labelledby="tab-masters">
   <div class="section-header">
     <span class="sh-symbol" style="color:var(--gold)">📿</span>
     <h2 class="sh-title">名 师 解 惑</h2>
@@ -7236,7 +7236,7 @@ setTimeout(removeLoadingOverlay,5000);
 </section>
 
 <!-- ===== 家庭综合排盘 ===== -->
-<section class="section" id="section-family">
+<section class="section" id="section-family" role="tabpanel" aria-labelledby="tab-family">
   <div class="section-header">
     <h2>👨‍👩‍👧‍👦 家庭综合排盘</h2>
     <p>全家八字综合分析，五行分布一目了然</p>
@@ -7254,7 +7254,7 @@ setTimeout(removeLoadingOverlay,5000);
 </section>
 
 <!-- ===== 人生规划 ===== -->
-<section class="section" id="section-lifeplan">
+<section class="section" id="section-lifeplan" role="tabpanel" aria-labelledby="tab-lifeplan">
   <div class="section-header">
     <h2>🧭 人生规划</h2>
     <p>基于八字五行十神+长生十二宫，命理全鉴周期规划指引</p>
@@ -7364,7 +7364,7 @@ setTimeout(removeLoadingOverlay,5000);
 </section>
 
 <!-- ===== 青少年规划 ===== -->
-<section class="section" id="section-youth">
+<section class="section" id="section-youth" role="tabpanel" aria-labelledby="tab-youth">
   <div class="section-header">
     <h2>🧒 青少年规划</h2>
     <p>基于八字五行十神，为孩子量身定制兴趣·学业·志愿·职业·城市·婚恋·性格·健康全方位指引</p>
@@ -7557,7 +7557,7 @@ setTimeout(removeLoadingOverlay,5000);
 </section>
 
 <!-- ===== 六十甲子 ===== -->
-<section class="section" id="section-jiazi">
+<section class="section" id="section-jiazi" role="tabpanel" aria-labelledby="tab-jiazi">
   <div class="section-header">
     <h2>🔮 六十甲子</h2>
     <p>六十甲子一轮回，运势全图60年</p>
@@ -7605,7 +7605,7 @@ setTimeout(removeLoadingOverlay,5000);
 </section>
 
 <!-- ===== 推送计划矩阵 ===== -->
-<section class="section" id="section-push-plan">
+<section class="section" id="section-push-plan" role="tabpanel" aria-labelledby="tab-push-plan">
   <div class="section-header" style="text-align:center;padding:28px 16px 20px">
     <span class="sh-symbol" style="font-size:36px;display:block;margin-bottom:8px">📡</span>
     <h2 class="sh-title" style="font-family:'Ma Shan Zheng',serif;font-size:32px;letter-spacing:8px;color:var(--gold);margin:0 0 6px">推 送 计 划</h2>
@@ -7617,7 +7617,7 @@ setTimeout(removeLoadingOverlay,5000);
 </section>
 
 <!-- ===== 命理全鉴综合评价 ===== -->
-<section class="section" id="section-lifeindex">
+<section class="section" id="section-lifeindex" role="tabpanel" aria-labelledby="tab-lifeindex">
   <div class="section-header" style="text-align:center;padding:28px 16px 20px">
     <span class="sh-symbol" style="font-size:36px;display:block;margin-bottom:8px">🌟</span>
     <h2 class="sh-title" style="font-family:'Ma Shan Zheng',serif;font-size:32px;letter-spacing:8px;color:var(--gold);margin:0 0 6px">命 理 全 鉴</h2>
@@ -9874,6 +9874,12 @@ function detectCongge(pillars, dayStem) {
 // ================================================================
 //  TOAST NOTIFICATION
 // ================================================================
+
+// 安全读取localStorage JSON
+function safeGetJSON(key, fallback) {
+  try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+  catch(e) { console.warn('[safeGetJSON] parse failed:', key, e); return fallback; }
+}
 
 function showToast(msg) {
   let t = document.getElementById('toastMsg');
@@ -12560,7 +12566,7 @@ function renderNewBaziModules(data) {
   }));
 
   // === I. 检查是否会员，显示年度提醒 ===
-  const member = JSON.parse(localStorage.getItem('memberInfo') || '{}');
+  const member = safeGetJSON('memberInfo', {});
   if (member.level && member.level !== 'free') {
     const noticeEl = document.getElementById('memberAnnualNotice');
     const contentEl = document.getElementById('annualNoticeContent');
@@ -14509,7 +14515,7 @@ function scheduleRenewHuajie() {
   var renewDate = nextYear + '-02-04'; // 立春日
   
   // 存储预约信息
-  var renewals = JSON.parse(localStorage.getItem('huajieRenewals') || '[]');
+  var renewals = safeGetJSON('huajieRenewals', []);
   var existing = renewals.find(function(r){ return r.year === nextYear; });
   if (existing) {
     showToast('已预约' + nextYear + '年化解方案，无需重复预约');
@@ -17553,7 +17559,7 @@ function renderReminderList(faith) {
 function renderDailyOutfit(faith) {
   const card = document.getElementById('outfitCard');
   const guide = OUTFIT_GUIDE[faith] || OUTFIT_GUIDE['all'];
-  const bazi = JSON.parse(localStorage.getItem('userBazi') || 'null');
+  const bazi = safeGetJSON('userBazi', null);
 
   let wuxingHtml = '';
   if (bazi) {
@@ -20807,7 +20813,7 @@ function exportBaziReport(format = 'html') {
   }
   const name = document.getElementById('baziName').value || '有缘人';
   const sex = document.getElementById('baziSex').value;
-  const bazi = JSON.parse(localStorage.getItem('userBazi') || '{}');
+  const bazi = safeGetJSON('userBazi', {});
 
   // 构建报告内容
   const reportContent = buildReportContent(resultEl, name, sex, bazi);
@@ -20826,7 +20832,7 @@ function buildReportContent(resultEl, name, sex, bazi) {
   const nextYear = currentYear + 1;
 
   // 获取会员信息
-  const member = JSON.parse(localStorage.getItem('memberInfo') || '{}');
+  const member = safeGetJSON('memberInfo', {});
   const isMember = member.level && member.level !== 'free';
 
   // 构建会员年度提醒
@@ -21178,7 +21184,7 @@ function matchMyMingua(btn, suitableStr) {
   }
 
   // 从 localStorage 获取八字
-  const bazi = JSON.parse(localStorage.getItem('userBazi') || '{}');
+  const bazi = safeGetJSON('userBazi', {});
   let birthYear = bazi.year || null;
   if (!birthYear && bazi.birthday) {
     birthYear = parseInt(bazi.birthday.split('-')[0]);
@@ -27470,7 +27476,7 @@ function renderCeziSectionResult(char, baziInfo) {
   window.koujueSwitchCategory = koujueSwitchCategory;
 
   // 收藏管理
-  function getFavs(){ return JSON.parse(localStorage.getItem('koujue_favs')||'[]'); }
+  function getFavs(){ return safeGetJSON('koujue_favs', []); }
   function setFavs(arr){ localStorage.setItem('koujue_favs',JSON.stringify(arr)); }
   function isFav(id){ return getFavs().indexOf(id)>=0; }
   function toggleFav(id){
@@ -27795,7 +27801,7 @@ function renderCeziSectionResult(char, baziInfo) {
 // ============================================================
 function addMerit(faith, amount, reason) {
     if (!amount) amount = 1;
-    var record = JSON.parse(localStorage.getItem('meritRecord') || '{}');
+    var record = safeGetJSON('meritRecord', {});
     var meritKey = 'merit_' + faith;
     if (!record[meritKey]) record[meritKey] = 0;
     record[meritKey] += amount;
@@ -27820,7 +27826,7 @@ function addMerit(faith, amount, reason) {
 // 功德记录显示
 // ============================================================
 function loadMeritRecord(faith) {
-    var record = JSON.parse(localStorage.getItem('meritRecord') || '{}');
+    var record = safeGetJSON('meritRecord', {});
     var total = record['merit_total'] || 0;
     var faithMerit = record['merit_' + faith] || 0;
     
@@ -27971,7 +27977,7 @@ function renderAnnualPush() {
   statusEl.innerHTML = html;
   
   // 历史推送记录
-  var pushHistory = JSON.parse(localStorage.getItem('annualPushHistory') || '[]');
+  var pushHistory = safeGetJSON('annualPushHistory', []);
   if (pushHistory.length > 0) {
     var hHtml = '<div style="font-size:13px;color:var(--gold);margin-bottom:8px">📜 历史推送记录</div>';
     pushHistory.slice(-5).reverse().forEach(function(ph) {
@@ -27994,7 +28000,7 @@ function generateAnnualPush() {
   var current = getCurrentYearGanzhi();
   var prop = getGanZhiProp(current.ganzhi);
   
-  var pushHistory = JSON.parse(localStorage.getItem('annualPushHistory') || '[]');
+  var pushHistory = safeGetJSON('annualPushHistory', []);
   var already = pushHistory.find(function(p){ return p.ganzhi === current.ganzhi; });
   if (already) {
     showToast(current.ganzhi + '年运势已生成，可查看历史记录');
@@ -29279,7 +29285,7 @@ function analyzeScreenshot() {
   formData.append('image', imgFile);
 
   // 先尝试调用本地AI服务
-  fetch('http://localhost:8911/api/face-analyze', {
+  fetch((typeof FACE_API!=='undefined'?FACE_API:'http://localhost:8911')+'/api/face-analyze', {
     method: 'POST',
     body: formData,
     timeout: 30000
@@ -30723,7 +30729,7 @@ function tzSelectWuxing(key){
           if(scripts){
             scripts.forEach(function(s){
               var code = s.replace(/<script[^>]*>/,'').replace(/<\/script>/,'');
-              try{ eval(code) }catch(e){console.warn('[懒加载脚本]',e)}
+              try{ (new Function(code))() }catch(e){console.warn('[懒加载脚本]',e)}
             });
           }
         }
@@ -31200,23 +31206,23 @@ function copyResultText(btn){
 }
 
 </script>
-<script src="knowledge/knowledge-details.js"></script>
-<script src="knowledge/knowledge-details-extra.js"></script>
-<script src="knowledge/liuyao-knowledge-base.js"></script>
-<script src="knowledge/bazi-knowledge-base.js"></script>
-<script src="knowledge/ziwei-knowledge-base.js"></script>
-<script src="knowledge/qimen-knowledge-base.js"></script>
-<script src="knowledge/meihua-knowledge-base.js"></script>
-<script src="knowledge/liuren-knowledge-base.js"></script>
-<script src="knowledge/fengshui-knowledge-base.js"></script>
-<script src="knowledge/zhouyi-knowledge-base.js"></script>
+<script src="knowledge/knowledge-details.js" defer></script>
+<script src="knowledge/knowledge-details-extra.js" defer></script>
+<script src="knowledge/liuyao-knowledge-base.js" defer></script>
+<script src="knowledge/bazi-knowledge-base.js" defer></script>
+<script src="knowledge/ziwei-knowledge-base.js" defer></script>
+<script src="knowledge/qimen-knowledge-base.js" defer></script>
+<script src="knowledge/meihua-knowledge-base.js" defer></script>
+<script src="knowledge/liuren-knowledge-base.js" defer></script>
+<script src="knowledge/fengshui-knowledge-base.js" defer></script>
+<script src="knowledge/zhouyi-knowledge-base.js" defer></script>
 
-<script src="knowledge/yangzhai-knowledge-base.js"></script>
-<script src="knowledge/zodiac-knowledge-base.js"></script>
-<script src="knowledge/masters-knowledge.js"></script>
-    <script src="knowledge/nishan-knowledge.js"></script>
-<script src="knowledge/shop-data.js"></script>
-<script src="knowledge/faith-content.js"></script>
+<script src="knowledge/yangzhai-knowledge-base.js" defer></script>
+<script src="knowledge/zodiac-knowledge-base.js" defer></script>
+<script src="knowledge/masters-knowledge.js" defer></script>
+    <script src="knowledge/nishan-knowledge.js" defer></script>
+<script src="knowledge/shop-data.js" defer></script>
+<script src="knowledge/faith-content.js" defer></script>
 <script>
 // shop-data.js 加载后再次初始化
 if (typeof window.SHOP_DATA !== 'undefined') {
@@ -31225,63 +31231,65 @@ if (typeof window.SHOP_DATA !== 'undefined') {
 </script>
 
 <!-- 口诀库渲染器 -->
-<script src="knowledge/koujue-renderer.js"></script>
+<script src="knowledge/koujue-renderer.js" defer></script>
 
 <!-- 知识库补充文件 -->
-<script src="knowledge/knowledge-supplement-1.js"></script>
-<script src="knowledge/knowledge-supplement-2.js"></script>
-<script src="knowledge/knowledge-supplement-3.js"></script>
-<script src="knowledge/knowledge-supplement-4.js"></script>
-<script src="knowledge/knowledge-supplement-5.js"></script>
-<script src="knowledge/knowledge-supplement-6.js"></script>
-<script src="knowledge/knowledge-deep-supplement.js"></script>
-<script src="knowledge/yanzhi-knowledge-base.js"></script>
-<script src="knowledge/knowledge-index.js"></script>
+<script src="knowledge/knowledge-supplement-1.js" defer></script>
+<script src="knowledge/knowledge-supplement-2.js" defer></script>
+<script src="knowledge/knowledge-supplement-3.js" defer></script>
+<script src="knowledge/knowledge-supplement-4.js" defer></script>
+<script src="knowledge/knowledge-supplement-5.js" defer></script>
+<script src="knowledge/knowledge-supplement-6.js" defer></script>
+<script src="knowledge/knowledge-deep-supplement.js" defer></script>
+<script src="knowledge/yanzhi-knowledge-base.js" defer></script>
+<script src="knowledge/knowledge-index.js" defer></script>
 
 <!-- 外部JS引擎 -->
-<script src="js/calc-engine-lib.js?v=20260703p1"></script>
-<script src="js/divination-core.js?v=20260706a"></script>
-<script src="js/engine-v3-bundle.js?v=20260714b"></script>
-<script src="js/guide-features.js?t=1783048068"></script>
-<script src="js/shop-module.js?t=1783048068"></script>
-<script src="js/shop-category.js?t=1783048068"></script>
-<script src="js/tizhi-module.js?t=1783048068"></script>
-<script src="js/cezi-database.js?t=1783048068"></script>
-<script src="js/liuren-upgrade.js?t=1783048068"></script>
-<script src="js/liuren-interp.js?t=1783048068"></script>
-<script src="js/hetu-luoshu.js?t=1783048068"></script>
-<script src="js/heige-integration.js?t=1783048068"></script>
-<script src="js/ai-interpreter.js?t=1783048068"></script>
-<script src="js/feedback.js?t=1783048068"></script>
-<script src="js/fengshui-pro.js?v=20260714"></script>
-<script src="js/master-class-data.js?t=1783048068"></script>
+<script src="js/calc-engine-lib.js?v=20260703p1" defer></script>
+<script src="js/divination-core.js?v=20260706a" defer></script>
+<script src="js/engine-v3-bundle.js?v=20260714b" defer></script>
+<script src="js/guide-features.js?t=1783048068" defer></script>
+<script src="js/shop-module.js?t=1783048068" defer></script>
+<script src="js/shop-category.js?t=1783048068" defer></script>
+<script src="js/tizhi-module.js?t=1783048068" defer></script>
+<script src="js/cezi-database.js?t=1783048068" defer></script>
+<script src="js/liuren-upgrade.js?t=1783048068" defer></script>
+<script src="js/liuren-interp.js?t=1783048068" defer></script>
+<script src="js/hetu-luoshu.js?t=1783048068" defer></script>
+<script src="js/heige-integration.js?t=1783048068" defer></script>
+<script src="js/ai-interpreter.js?t=1783048068" defer></script>
+<script src="js/feedback.js?t=1783048068" defer></script>
+<script src="js/fengshui-pro.js?v=20260714" defer></script>
+<script src="js/master-class-data.js?t=1783048068" defer></script>
 <!-- 额外知识库 -->
-<script src="knowledge/faith-guide.js?t=1783048068"></script>
-<script src="knowledge/incantation-database.js?t=1783048068"></script>
-<script src="knowledge/psychology-wisdom.js?t=1783048068"></script>
-<script src="knowledge/zodiac-complete.js?t=1783048068"></script>
-<script src="knowledge/wisdom-quotes.js?t=1783048068"></script>
-<script src="knowledge/gzh-collect-system.js?t=1783048068"></script>
-<script src="knowledge/temple-guide-insert.js?t=1783048068"></script>
-<script src="knowledge/shop-medicine-data.js?t=1783048068"></script>
-<script src="knowledge/classics-highlights.js?t=1783048068"></script>
-<script src="knowledge/wuxing-correspondence.js?t=1783048068"></script>
-<script src="knowledge/yanzhi-part2.js?t=1783048068"></script>
-<script src="knowledge/ziwei-new-sections.js?t=1783048068"></script>
-<script src="knowledge/koujue-daily.js?t=1783048068"></script>
-<script src="knowledge/wisdom-supplement.js?t=1783048068"></script>
-<script src="knowledge/huajie-age-specific.js?t=1783048068"></script>
-<script src="js/push-plan.js?t=1783048068"></script>
-<script src="js/evolution-engine.js?t=1783048068"></script>
-<script src="js/cure-engine.js?v=20260714"></script>
-<script src="js/annual-fortune.js?v=20260714"></script>
+<script src="knowledge/faith-guide.js?t=1783048068" defer></script>
+<script src="knowledge/incantation-database.js?t=1783048068" defer></script>
+<script src="knowledge/psychology-wisdom.js?t=1783048068" defer></script>
+<script src="knowledge/zodiac-complete.js?t=1783048068" defer></script>
+<script src="knowledge/wisdom-quotes.js?t=1783048068" defer></script>
+<script src="knowledge/gzh-collect-system.js?t=1783048068" defer></script>
+<script src="knowledge/temple-guide-insert.js?t=1783048068" defer></script>
+<script src="knowledge/shop-medicine-data.js?t=1783048068" defer></script>
+<script src="knowledge/classics-highlights.js?t=1783048068" defer></script>
+<script src="knowledge/wuxing-correspondence.js?t=1783048068" defer></script>
+<script src="knowledge/yanzhi-part2.js?t=1783048068" defer></script>
+<script src="knowledge/ziwei-new-sections.js?t=1783048068" defer></script>
+<script src="knowledge/koujue-daily.js?t=1783048068" defer></script>
+<script src="knowledge/wisdom-supplement.js?t=1783048068" defer></script>
+<script src="knowledge/huajie-age-specific.js?t=1783048068" defer></script>
+<script src="js/push-plan.js?t=1783048068" defer></script>
+<script src="js/evolution-engine.js?t=1783048068" defer></script>
+<script src="js/cure-engine.js?v=20260714" defer></script>
+<script src="js/annual-fortune.js?v=20260714" defer></script>
 
 
 <!-- 页脚 -->
-<div class="back-top" id="backTop" onclick="scrollToTop()">↑</div>
+<div class="back-top" id="backTop" onclick="scrollToTop()" aria-label="返回顶部">↑</div>
 <div style="text-align:center;padding:32px 16px 80px;font-size:11px;color:var(--paper2);opacity:.3;letter-spacing:3px;border-top:1px solid rgba(201,168,76,.06)">
   —— 易道智鉴 · 传承中华古老智慧 ——
 </div>
+<footer style="display:none">易道智鉴</footer>
+</main>
 <script>
 // 易道智鉴 · 测算引擎库
 // 包含：六爻、紫微斗数、奇门遁甲、梅花易数、大六壬、姓名学、风水、择日

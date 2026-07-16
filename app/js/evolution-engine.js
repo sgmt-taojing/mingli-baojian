@@ -114,7 +114,7 @@ var EvolutionEngine = (function() {
 
   function getLog() {
     try {
-      return JSON.parse(localStorage.getItem(LOG_KEY) || '[]');
+      return safeGetJSON(LOG_KEY, []);
     } catch(e) { return []; }
   }
 
@@ -249,7 +249,7 @@ var EvolutionEngine = (function() {
     checks.forEach(function(c) {
       results.total++;
       try {
-        var exists = eval(c.varName);
+        var exists = window[c.varName];
         if (!exists) {
           results.incomplete++;
           results.issues.push(c.name + ': 数据不可用');
