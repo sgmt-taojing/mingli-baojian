@@ -1,4 +1,5 @@
 /**
+typeof window.escapeHtml === "function" || (window.escapeHtml = function(s) { if(!s) return ""; return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); });
  * AI智能解读模块 - 易道智鉴
  * 在规则推演基础上叠加AI能力，提供自然语言深度解读
  * 
@@ -488,7 +489,7 @@ async function aiInterpret(type) {
       '<button class="ai-action-btn" onclick="aiGenerateFullReport(\'' + type + '\')">📄 生成完整报告</button>' +
       '</div>';
   } catch (err) {
-    content.innerHTML = '<div class="ai-error">⚠️ AI解读暂时不可用，请稍后重试或查看规则推演结果。<br><span style="font-size:12px;opacity:0.6">' + (err.message || '') + '</span></div>';
+    content.innerHTML = '<div class="ai-error">⚠️ AI解读暂时不可用，请稍后重试或查看规则推演结果。<br><span style="font-size:12px;opacity:0.6">' + escapeHtml(err.message || '') + '</span></div>';
   } finally {
     if (btn) {
       btn.disabled = false;

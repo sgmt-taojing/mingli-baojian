@@ -1,4 +1,5 @@
 // divination-core.js | Build: 2026-07-03T17:30:00+08:00
+typeof window.escapeHtml === "function" || (window.escapeHtml = function(s) { if(!s) return ""; return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); });
 // 排盘音效（兼容voice-reader.js未加载时）
 // ═══ 全局错误保护 ═══
 window.onerror = function(msg, url, line, col, err) {
@@ -2950,7 +2951,7 @@ function tzStep1Analyze(fileName, content, type) {
 
     if (!obj) {
       // Fallback: show raw text
-      result.innerHTML = '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px"><h4 style="font-size:15px;color:var(--gold);margin-bottom:12px">📊 指标分析结果</h4><div style="font-size:14px;color:var(--text);line-height:1.8;white-space:pre-wrap">' + text + '</div><div style="margin-top:16px;text-align:center"><button class="compute-btn" style="padding:10px 30px;font-size:14px" onclick="tzStep2Suggestions()">🌿 生成理疗建议</button></div></div>';
+      result.innerHTML = '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px"><h4 style="font-size:15px;color:var(--gold);margin-bottom:12px">📊 指标分析结果</h4><div style="font-size:14px;color:var(--text);line-height:1.8;white-space:pre-wrap">' + escapeHtml(text) + '</div><div style="margin-top:16px;text-align:center"><button class="compute-btn" style="padding:10px 30px;font-size:14px" onclick="tzStep2Suggestions()">🌿 生成理疗建议</button></div></div>';
       tzLastAnalysis = {raw: text};
       return;
     }
@@ -3101,7 +3102,7 @@ function tzStep2Suggestions() {
     }
 
     if (!obj) {
-      step2Div.innerHTML = '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="background:var(--violet2);color:#fff;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600">第二步</span><span style="font-size:14px;color:var(--violet2);font-weight:600">理疗建议</span></div><div style="font-size:14px;color:var(--text);line-height:1.8;white-space:pre-wrap">' + text + '</div></div>';
+      step2Div.innerHTML = '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="background:var(--violet2);color:#fff;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600">第二步</span><span style="font-size:14px;color:var(--violet2);font-weight:600">理疗建议</span></div><div style="font-size:14px;color:var(--text);line-height:1.8;white-space:pre-wrap">' + escapeHtml(text) + '</div></div>';
       return;
     }
 
