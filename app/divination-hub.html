@@ -3468,7 +3468,7 @@ body:not(.wechat) .wechat-disclaimer{display:none!important}
 
 <script>
 function scrollToTop(){window.scrollTo({top:0,behavior:'smooth'})}
-console.log("易道智鉴 v2026.06.14.1400 - 快捷栏版");
+// console.log("易道智鉴 - 快捷栏版");
 // === 微信环境检测与适配 ===
 function detectWechat(){
   var ua=navigator.userAgent.toLowerCase();
@@ -5304,7 +5304,7 @@ setTimeout(removeLoadingOverlay,5000);
       <div class="input-row"><select class="input-field" id="fs-pro-bathroom-dir"><option value="">卫生间方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
       <div class="input-row"><select class="input-field" id="fs-pro-study-dir"><option value="">书房方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
       <div class="input-row"><select class="input-field" id="fs-pro-living-dir"><option value="">客厅方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
-      <div class="input-row"><input class="input-field" type="number" id="fs-pro-build-year" placeholder="建造年份" min="1900" max="2025" value="2000"></div>
+      <div class="input-row"><input class="input-field" type="number" id="fs-pro-build-year" placeholder="建造年份" min="1900" max="2100" value="2000"></div>
       <button class="compute-btn" onclick="fsProCompute('layout')">开 始 诊 断</button>
     </div>
     <div id="fs-pro-output-layout" style="display:none"></div>
@@ -11050,7 +11050,7 @@ function tzStep2Suggestions() {
     temperature: 0.4
   };
 
-  fetch('http://127.0.0.1:8900/v1/chat/completions', {
+  fetch((typeof apiBase!=='undefined'?apiBase:'http://127.0.0.1:8900')+'/v1/chat/completions', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(payload)
@@ -18868,7 +18868,7 @@ function _analyzeFloorPlanAI(imageData, context) {
   var fsAiStatus = document.getElementById('fsAiStatus');
   if (fsAiStatus) fsAiStatus.innerHTML = '<div style="padding:20px;text-align:center"><div style="font-size:24px">🔮 AI分析中...</div><p style="margin-top:12px;opacity:.6">正在解读您的户型图</p></div>';
 
-  fetch('http://127.0.0.1:8900/v1/chat/completions', {
+  fetch((typeof apiBase!=='undefined'?apiBase:'http://127.0.0.1:8900')+'/v1/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -25367,7 +25367,7 @@ function generateCompanyNamesEnhanced() {
       existingAnalysis += ' 人格' + existingWuge.renGe + '(' + existingWuge.renGeWuxing + ')';
       existingAnalysis += ' 地格' + existingWuge.diGe + '(' + existingWuge.diGeWuxing + ')';
       existingAnalysis += ' 总格' + existingWuge.zongGe + '(' + existingWuge.zongGeWuxing + ')';
-      console.log(existingAnalysis);
+      // console.log(existingAnalysis);
     }
   }
   
@@ -27813,7 +27813,7 @@ function showKnowledgeDetail(key, name) {
     jieqi: 'jieqi', zhouyi: 'zhouyi', yanzhi: 'yanzhi'
   };
   var mappedKey = keyMap[key] || key;
-  console.log('[知识库] showKnowledgeDetail called: key=' + key + ' mappedKey=' + mappedKey + ' KNOWLEDGE_DETAILS=' + !!window.KNOWLEDGE_DETAILS);
+  // console.log('[知识库] showKnowledgeDetail called: key=' + key);
   // 确保知识库详情弹窗z-index最高
   var modal = document.getElementById('knowledgeDetailModal');
   if (modal) modal.style.zIndex = '10001';
@@ -29190,7 +29190,7 @@ function tzGeneratePlan(){
   prompt+='4. 起居调摄（作息/穴位/注意事项）\n\n';
   prompt+='用JSON格式回复：{"食疗":[{"名称":"...","食材":"...","做法":"...","功效":"..."}],"功法":[{"名称":"...","理由":"...","时长":"..."}],"正念":[{"方法":"...","步骤":"...","益处":"..."}],"起居":[{"方面":"...","建议":"..."}],"总结":"..."}';
 
-  fetch('http://127.0.0.1:8900/v1/chat/completions',{
+  fetch((typeof apiBase!=='undefined'?apiBase:'http://127.0.0.1:8900')+'/v1/chat/completions',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({model:'openclaw',messages:[{role:'user',content:prompt}],max_tokens:2000,temperature:0.4})
@@ -30673,6 +30673,13 @@ setTimeout(initShop, 500);
   if(el) el.textContent = q.text;
   if(au) au.textContent = '—— ' + q.author;
 })();
+
+// ===== 自动设置当前年份 =====
+  var _cy = new Date().getFullYear();
+  ['qimen-year','liuren-year','fs-pro-fx-year'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el && el.value == '2026') el.value = _cy;
+  });
 
 // ===== 返回顶部按钮滚动监听 =====
 window.addEventListener('scroll',function(){
@@ -36168,7 +36175,7 @@ function submitAsk() {
     temperature: 0.7
   };
 
-  fetch('http://127.0.0.1:8900/v1/chat/completions', {
+  fetch((typeof apiBase!=='undefined'?apiBase:'http://127.0.0.1:8900')+'/v1/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
