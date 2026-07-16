@@ -583,7 +583,7 @@ function aiCopyText(type) {
   var text = content.innerText;
   if (navigator.clipboard) {
     navigator.clipboard.writeText(text).then(function() {
-      alert('已复制到剪贴板');
+      showToast('已复制到剪贴板');
     }).catch(function() {
       _aiFallbackCopy(text);
     });
@@ -656,9 +656,9 @@ function _aiFallbackCopy(text) {
   textarea.select();
   try {
     document.execCommand('copy');
-    alert('已复制到剪贴板');
+    showToast('已复制到剪贴板');
   } catch (e) {
-    alert('复制失败，请手动选择文本复制');
+    showToast('复制失败，请手动选择文本复制');
   }
   document.body.removeChild(textarea);
 }

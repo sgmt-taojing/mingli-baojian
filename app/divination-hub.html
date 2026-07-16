@@ -22212,29 +22212,7 @@ function getDailyWisdom(date, stemIdx) {
 
 
 // --- 综合评分 ---
-function calcJiuriScore(stemIdx, branchIdx, dayDate) {
-  let score = 50;
-  const stem = J_STEMS[stemIdx];
-  // 天干：甲丙戊庚壬为阳干，较为吉祥
-  if ([0,2,4,6,8].includes(stemIdx)) score += 10;
-  // 地支：子午卯酉为四正，较吉
-  if ([0,4,8].includes(branchIdx)) score += 8;
-  if (branchIdx === 4) score += 5;
-  // 月相：初一、十五、廿三为特殊日
-  const d = dayDate.getDate();
-  if (d === 1 || d === 15) score += 15;
-  else if (d === 3 || d === 7 || d === 13 || d === 23) score += 5;
-  else if (d === 5 || d === 14 || d === 20) score -= 5;
-  // 周末+5
-  if (dayDate.getDay() === 0 || dayDate.getDay() === 6) score += 3;
-  // 建除：建/除/满/定/执/成为吉
-  const jcIdx = (dayDate - new Date(2025,0,1)) / 86400000 % 12;
-  const jcFate = JIANCHU_FATE[(jcIdx + 12) % 12];
-  if (jcFate === '吉') score += 8;
-  else if (jcFate === '大吉') score += 15;
-  else if (jcFate === '凶') score -= 10;
-  return Math.max(1, Math.min(100, Math.round(score)));
-}
+// calcJiuriScore 已由第二定义（基于建除/值神/星宿/吉神凶神的传统规则版）覆盖
 
 // --- 月历渲染 ---
 let _jiuriYear = new Date().getFullYear();
@@ -30923,9 +30901,7 @@ function renderShopProducts() {
 }
 
 // ===== 兼容旧调用 =====
-function showShopCategory(cat, btn) {
-  filterShopProducts(cat, btn);
-}
+// showShopCategory 已由主定义（第7879行）处理，此处不再重复定义
 function renderShopProductsOld(category) {
   renderShopProducts();
 }
@@ -32906,7 +32882,7 @@ function meihuaAnalyze(guaData, question) {
   const yong = isTiUpper ? guaData.benGua.lower : guaData.benGua.upper;
   const tiWx = _GUA_XIANG[ti].wuxing;
   const yongWx = _GUA_XIANG[yong].wuxing;
-  const relation = _wuxingRelation(tiWx, yongWx);
+  const relation = _wuxingRelationTiYong(tiWx, yongWx);
   let result = '';
   if (relation === '生我') result = '用生体，事吉，得外力相助。';
   else if (relation === '我生') result = '体生用，事耗，付出多。';
@@ -32917,7 +32893,7 @@ function meihuaAnalyze(guaData, question) {
   // 变卦分析
   const bianYong = isTiUpper ? guaData.bianGua.lower : guaData.bianGua.upper;
   const bianYongWx = _GUA_XIANG[bianYong].wuxing;
-  const endRelation = _wuxingRelation(tiWx, bianYongWx);
+  const endRelation = _wuxingRelationTiYong(tiWx, bianYongWx);
   let endResult = '';
   if (endRelation === '生我') endResult = '变卦用生体，结局吉。';
   else if (endRelation === '我生') endResult = '变卦体生用，结局耗。';
@@ -32932,8 +32908,8 @@ function meihuaAnalyze(guaData, question) {
     const huYong = isTiUpper ? guaData.huGua.lower : guaData.huGua.upper;
     const huTiWx = _GUA_XIANG[huTi] ? _GUA_XIANG[huTi].wuxing : tiWx;
     const huYongWx = _GUA_XIANG[huYong] ? _GUA_XIANG[huYong].wuxing : yongWx;
-    const huRel = _wuxingRelation(tiWx, huYongWx);
-    const huRel2 = _wuxingRelation(huTiWx, yongWx);
+    const huRel = _wuxingRelationTiYong(tiWx, huYongWx);
+    const huRel2 = _wuxingRelationTiYong(huTiWx, yongWx);
     if (huRel === '生我' || huRel === '比和') huAnalysis = '互卦生体，过程顺利，有贵人相助。';
     else if (huRel === '克我') huAnalysis = '互卦克体，过程受阻，需防小人。';
     else huAnalysis = '互卦泄体，过程虽费力但无大碍。';
@@ -32965,7 +32941,7 @@ function meihuaAnalyze(guaData, question) {
   };
 }
 
-function _wuxingRelation(a, b) {
+function _wuxingRelationTiYong(a, b) {
   if (a === b) return '比和';
   const sheng = {'金生水':true,'水生木':true,'木生火':true,'火生土':true,'土生金':true};
   if (sheng[a+'生'+b]) return '我生';
@@ -34033,8 +34009,8 @@ function runLiuyaoEngine() {
         var _monthWx = _zhiWuxing(gua.monthZhi || '子');
         var _yaoWS = '—';
         try {
-          var _rel = _wuxingRelation(_monthWx, _yaoWx);
-          var _rel2 = _wuxingRelation(_yaoWx, _monthWx);
+          var _rel = _wuxingRelationTiYong(_monthWx, _yaoWx);
+          var _rel2 = _wuxingRelationTiYong(_yaoWx, _monthWx);
           if (_yaoWx === _monthWx) _yaoWS = '旺';
           else if (_rel === '生') _yaoWS = '相';
           else if (_rel === '克') _yaoWS = '死';
@@ -34115,13 +34091,13 @@ function runLiuyaoEngine() {
           var _ysWx2 = _zhiWuxing(_ysZhi2);
           var _shiZhi = zg.dizhi[zg.shiying.shi];
           var _shiWx = _zhiWuxing(_shiZhi);
-          var _relShi = _wuxingRelation(_ysWx2, _shiWx);
+          var _relShi = _wuxingRelationTiYong(_ysWx2, _shiWx);
           _chainHtm += '用神(' + _ysWx2 + ')→世爻(' + _shiWx + '): ' + (_relShi === '生' ? '生世（有益于我）' : _relShi === '克' ? '克世（压制我）' : _relShi === '同' ? '比和（同类相助）' : '无直接关系') + '；';
           if (gua.dongYao && gua.dongYao.length > 0) {
             for (var _di2 = 0; _di2 < gua.dongYao.length; _di2++) {
               var _dzhi = zg.dizhi[gua.dongYao[_di2]];
               var _dwx = _zhiWuxing(_dzhi);
-              var _drel = _wuxingRelation(_dwx, _ysWx2);
+              var _drel = _wuxingRelationTiYong(_dwx, _ysWx2);
               _chainHtm += '动爻(' + _dwx + ')→用神(' + _ysWx2 + '): ' + (_drel === '生' ? '生用神（有力）' : _drel === '克' ? '克用神（减力）' : _drel === '同' ? '比和（助用）' : '无直接关系') + '；';
             }
           }
@@ -34480,7 +34456,7 @@ function runMeihuaEngine() {
       html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.03)"><td style="padding:5px 8px;text-align:center;color:var(--gold2)">用卦</td><td style="text-align:center">' + analyze.yongGua + '</td><td style="text-align:center">' + _yongWx + '</td><td style="text-align:center">' + _yongRel + '</td><td style="text-align:center;color:' + (_yongLuck === '吉' ? 'var(--jade2)' : _yongLuck === '凶' ? '#e74c3c' : 'var(--orange)') + '">' + _yongLuck + '</td><td style="text-align:center;font-size:11px">' + _yongSeason + '</td></tr>';
       // 互卦
       if (gua.huGua) {
-        var _huRel = _wuxingRelation(_tiWx, _huYongWx);
+        var _huRel = _wuxingRelationTiYong(_tiWx, _huYongWx);
         var _huLuck = (_huRel === '生我' || _huRel === '比和') ? '吉' : (_huRel === '克我' ? '凶' : '耗');
         var _huName = (_GUA_XIANG[gua.huGua.lower] ? _GUA_XIANG[gua.huGua.lower].name : '?') + (_GUA_XIANG[gua.huGua.upper] ? _GUA_XIANG[gua.huGua.upper].name : '?');
         html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.03)"><td style="padding:5px 8px;text-align:center;color:var(--gold2)">互卦</td><td style="text-align:center">' + _huName + '</td><td style="text-align:center">' + _huYongWx + '</td><td style="text-align:center">' + _huRel + '</td><td style="text-align:center;color:' + (_huLuck === '吉' ? 'var(--jade2)' : _huLuck === '凶' ? '#e74c3c' : 'var(--orange)') + '">' + _huLuck + '</td></tr>';

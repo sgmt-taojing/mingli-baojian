@@ -137,7 +137,7 @@ function showMedicineDetail(item) {
   var content = document.getElementById('medicineDetailContent');
   
   if (!modal || !title || !content) {
-    alert(item.name + '\n\n' + item.desc + '\n\n价格: ¥' + item.price + '\n\n' + item.master + ' | ' + item.origin);
+    showToast(item.name + '：¥' + item.price + '（' + item.master + '）');
     return;
   }
   

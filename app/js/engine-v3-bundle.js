@@ -2786,7 +2786,7 @@ function castCoins(seed) {
   for (let i = 0; i < 3; i++) {
     const r = seed !== undefined
       ? ((seed * 1103515245 + 12345 + i * 7919) & 0x7fffffff) / 0x7fffffff
-      : Math.random();
+      : ((Date.now() * 1103515245 + 12345 + i * 7919) & 0x7fffffff) / 0x7fffffff;
     coins.push(r < 0.5 ? 2 : 3);
   }
   const total = coins[0] + coins[1] + coins[2];

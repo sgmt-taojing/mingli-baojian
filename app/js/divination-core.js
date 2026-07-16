@@ -26854,7 +26854,7 @@ try { window.computeSingleMemberPaipan = computeSingleMemberPaipan; } catch(e){}
 try { window.computeFamilyPaipan = computeFamilyPaipan; } catch(e){}
 try { window.generateFamilyHuajie = generateFamilyHuajie; } catch(e){}
 
-console.log('[引擎] 排盘函数全局暴露完成');
+//console.log('[引擎] 排盘函数全局暴露完成');
 
 // ================================================================
 //  人生规划引擎 (Life Plan Engine)

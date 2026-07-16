@@ -327,10 +327,10 @@ function shareProduct(productId) {
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(function(){
       if (typeof showToast === 'function') showToast('商品信息已复制，可粘贴分享');
-      else alert('商品信息已复制到剪贴板');
-    }).catch(function(){ alert(text); });
+      else showToast('商品信息已复制到剪贴板');
+    }).catch(function(){ showToast(text); });
   } else {
-    alert(text);
+    showToast(text);
   }
 }
 
@@ -445,7 +445,7 @@ function checkout() {
   if (shopCart.length === 0) return;
   var totalQty = shopCart.reduce(function(s,c){ return s+c.qty; }, 0);
   var totalAmount = shopCart.reduce(function(s,c){ return s + parsePrice(c.price)*c.qty; }, 0);
-  alert('✅ 订单已提交！\n\n商品数量：'+totalQty+' 件\n结缘金额：'+totalAmount.toLocaleString()+'元\n\n客服将在24小时内联系您确认订单并发送付款链接。\n\n祝您修身增慧、福慧双修！');
+  showToast('✅ 订单已提交！\n\n商品数量：'+totalQty+' 件\n结缘金额：'+totalAmount.toLocaleString()+'元\n\n客服将在24小时内联系您确认订单并发送付款链接。\n\n祝您修身增慧、福慧双修！');
   shopCart = [];
   updateCartUI();
   toggleCartModal();

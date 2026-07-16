@@ -845,18 +845,18 @@ let savedCompanyNames = [];
 
 function saveCompanyName(name) {
   if (savedCompanyNames.includes(name)) {
-    alert('已收藏此名称');
+    showToast('已收藏此名称');
     return;
   }
 
   savedCompanyNames.push(name);
-  alert(`"${name}" 已加入收藏列表`);
+  showToast(name + " 已加入收藏列表");
 }
 
 // 显示收藏列表
 function showSavedList() {
   if (savedCompanyNames.length === 0) {
-    alert('收藏列表为空');
+    showToast('收藏列表为空');
     return;
   }
 
@@ -893,7 +893,7 @@ function clearSavedList() {
 // 导出收藏列表
 function exportSavedList() {
   if (savedCompanyNames.length === 0) {
-    alert('收藏列表为空');
+    showToast('收藏列表为空');
     return;
   }
 
@@ -1116,7 +1116,7 @@ function analyzeMobileBaziMatchCore(mobileNumber, baziAnalysis) {
 // 显示八字匹配结果
 function displayBaziMatchResult(result) {
   if (!result) {
-    alert('无法分析匹配度');
+    showToast('无法分析匹配度');
     return;
   }
 
@@ -2712,18 +2712,18 @@ function computeRename() {
     const birthDate = document.getElementById('renameBirthDate').value;
 
     if (!currentName) {
-      alert('请输入当前姓名');
+      showToast('请输入当前姓名');
       return;
     }
 
     if (!newNames) {
-      alert('请输入想改的名字');
+      showToast('请输入想改的名字');
       return;
     }
 
     const nameList = newNames.split('\n').filter(n => n.trim());
     if (nameList.length === 0) {
-      alert('请输入想改的名字');
+      showToast('请输入想改的名字');
       return;
     }
 
@@ -2743,7 +2743,7 @@ function computeRename() {
     }
   } catch(e) {
     console.error('computeRename error:', e);
-    alert('分析过程出错：' + e.message);
+    showToast('分析过程出错：' + e.message);
   } finally {
     if(btn){ btn.disabled=false; btn.textContent='📋 分析输入的名字'; }
   }
@@ -2796,7 +2796,7 @@ function analyzeName(currentName, newName, sex, birthDate) {
 
 function displayRenameResult(analysis) {
   if (!analysis.success) {
-    alert(analysis.message);
+    showToast(analysis.message);
     return;
   }
 
@@ -3426,7 +3426,7 @@ document.addEventListener('DOMContentLoaded', function() {
         computeBazi();
       } else {
         console.error('computeBazi 函数未定义');
-        alert('排盘函数未加载完成，请刷新页面重试');
+        showToast('排盘函数未加载完成，请刷新页面重试');
       }
     });
   }
@@ -8168,7 +8168,7 @@ function showComprehensiveScore(name, userInfo) {
 
 function recordNameFeedback(liked) {
   if (!window._currentNameScore) {
-    alert('请先进行姓名评分分析');
+    showToast('请先进行姓名评分分析');
     return;
   }
   var result = NameEvolution.recordFeedback(

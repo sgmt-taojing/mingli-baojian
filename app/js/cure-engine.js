@@ -1508,4 +1508,4 @@ function showCureCategory(catId) {
   out.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
-console.log('[cure-engine.js] 化解方案引擎 v1.0 加载完成');
+//console.log('[cure-engine.js] 化解方案引擎 v1.0 加载完成');
