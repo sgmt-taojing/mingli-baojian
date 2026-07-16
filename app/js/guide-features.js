@@ -994,7 +994,7 @@ function analyzeMobileBaziMatch(mobileNumber, baziInfo) {
   };
 }
 
-// 导出公司名(占位函数,实际功能需根据完整代码调整)
+// 公司取名功能已在 divination-hub.html 的 generateCompanyNamesEnhanced() 中实现
 
 
 // ================================================================
