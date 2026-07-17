@@ -5740,6 +5740,162 @@ function generateReport(result) {
   return lines.join('\n');
 }
 
+// ═══════════════════════════════════════════════════════════════
+// R2.10: 克应分析 + 本命行年法
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * 克应分析 — 根据三传与占时关系判断应期
+ *
+ * 《大六壬大全》:「初传与占时相冲，应期在冲日；相合，应期在合日。」
+ * 《六壬指南》:「初传旺则应近，休则应远。」
+ *
+ * @param {object} sanChuan - 三传对象（含 faInfo/zhongInfo/moInfo）
+ * @param {string} zhanShi - 占时地支
+ * @returns {object} 应期分析结果
+ */
+function analyzeKeying(sanChuan, zhanShi) {
+  var faZhi = sanChuan.faInfo ? sanChuan.faInfo.zhi : '';
+  var zhongZhi = sanChuan.zhongInfo ? sanChuan.zhongInfo.zhi : '';
+  var moZhi = sanChuan.moInfo ? sanChuan.moInfo.zhi : '';
+  var faWX = ZHI_WX[faZhi] || '';
+
+  // 地支相冲表
+  var CHONG_MAP = {'子':'午','午':'子','丑':'未','未':'丑','寅':'申','申':'寅','卯':'酉','酉':'卯','辰':'戌','戌':'辰','巳':'亥','亥':'巳'};
+  // 地支相合表
+  var HE_MAP = {'子':'丑','丑':'子','寅':'亥','亥':'寅','卯':'戌','戌':'卯','辰':'酉','酉':'辰','巳':'申','申':'巳','午':'未','未':'午'};
+
+  var yingQi = [];
+  var yingQiDesc = '';
+
+  // 1. 初传与占时的关系
+  if (faZhi && zhanShi) {
+    if (CHONG_MAP[faZhi] === zhanShi) {
+      yingQi.push({type:'冲日', zhi: faZhi, desc:'初传' + faZhi + '与占时' + zhanShi + '相冲，应期在' + faZhi + '日或' + zhanShi + '日'});
+      yingQiDesc += '初传与占时相冲，应期较快，约在冲日（' + faZhi + '或' + zhanShi + '日）应事。';
+    } else if (HE_MAP[faZhi] === zhanShi) {
+      yingQi.push({type:'合日', zhi: HE_MAP[faZhi], desc:'初传' + faZhi + '与占时' + zhanShi + '相合，应期在' + HE_MAP[faZhi] + '日'});
+      yingQiDesc += '初传与占时相合，应期在合日（' + HE_MAP[faZhi] + '日）应事，事成且久。';
+    } else {
+      // 无冲无合，看初传本身定应期
+      yingQi.push({type:'初传日', zhi: faZhi, desc:'初传' + faZhi + '与占时无冲合，应期在' + faZhi + '日'});
+      yingQiDesc += '初传与占时无冲合，应期在初传' + faZhi + '日。';
+    }
+  }
+
+  // 2. 初传旺衰定远近
+  var faWangShuai = '';
+  var远近 = '';
+  // 判断初传旺衰：看初传五行与占时五行关系
+  var shiWX = ZHI_WX[zhanShi] || '';
+  if (faWX && shiWX) {
+    if (faWX === shiWX) {
+      faWangShuai = '旺';
+      远近 = '近';
+      yingQiDesc += ' 初传旺于占时，应期近——数日内可见。';
+    } else if (WX_SHENG[shiWX] === faWX) {
+      faWangShuai = '相';
+      远近 = '近';
+      yingQiDesc += ' 初传相于占时，应期较近——一两周内。';
+    } else if (WX_SHENG[faWX] === shiWX) {
+      faWangShuai = '休';
+      远近 = '远';
+      yingQiDesc += ' 初传休于占时，应期较远——月余可见。';
+    } else if (WX_KE[faWX] === shiWX) {
+      faWangShuai = '囚';
+      远近 = '远';
+      yingQiDesc += ' 初传囚于占时，应期远——数月之后。';
+    } else if (WX_KE[shiWX] === faWX) {
+      faWangShuai = '死';
+      远近 = '甚远';
+      yingQiDesc += ' 初传死于占时，应期甚远或不应。';
+    }
+  }
+
+  // 3. 末传辅助判断应期
+  if (moZhi) {
+    yingQi.push({type:'末传日', zhi: moZhi, desc:'末传' + moZhi + '为事之终，亦可作为应期参考'});
+  }
+
+  return {
+    faZhi: faZhi,
+    zhanShi: zhanShi,
+    relation: CHONG_MAP[faZhi] === zhanShi ? '冲' : (HE_MAP[faZhi] === zhanShi ? '合' : '无'),
+    faWangShuai: faWangShuai,
+    远近: 远近,
+    yingQi: yingQi,
+    desc: yingQiDesc
+  };
+}
+
+/**
+ * 本命行年法 — 计算本命与行年
+ *
+ * 《大六壬大全》:「本命者，生年支也。行年者，男一岁起丙寅顺行，女一岁起壬申逆行。」
+ *
+ * @param {number} birthYear - 出生年份（公历）
+ * @param {string} sex - 性别（'男' 或 '女'）
+ * @returns {object} {benMing, xingNian, xingNianDetail}
+ */
+function computeBenMing(birthYear, sex) {
+  // 十二地支
+  var ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  // 天干
+  var GAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+
+  // 本命：出生年支
+  var benMingIdx = (birthYear - 4) % 12; // 1984年=鼠年(子)=0
+  if (benMingIdx < 0) benMingIdx += 12;
+  var benMing = ZHI[benMingIdx];
+
+  // 行年：男1岁起丙寅顺行，女1岁起壬申逆行
+  var xingNian = '';
+  var xingNianDetail = '';
+  var currentAge = new Date().getFullYear() - birthYear;
+
+  if (sex === '男' || sex === 'male') {
+    // 男1岁=丙寅，顺行
+    // 丙=2(索引), 寅=2
+    var startGanIdx = 2; // 丙
+    var startZhiIdx = 2; // 寅
+    var ageOffset = currentAge - 1;
+    var ganIdx = (startGanIdx + ageOffset + 10) % 10;
+    var zhiIdx = (startZhiIdx + ageOffset + 12) % 12;
+    xingNian = GAN[ganIdx] + ZHI[zhiIdx];
+    xingNianDetail = '男命行年从1岁起丙寅顺行，今年' + currentAge + '岁，行年为' + xingNian + '。' +
+      '行年干支与日辰生克关系可断吉凶：' +
+      (WX_SHENG[GAN_WX[GAN[ganIdx]]] === GAN_WX[GAN[ganIdx]] ? '行年五行比和，平顺之年。' :
+       '行年' + GAN[ganIdx] + '(' + GAN_WX[GAN[ganIdx]] + ')' +
+       '，宜察与日干之生克定吉凶。');
+  } else if (sex === '女' || sex === 'female') {
+    // 女1岁=壬申，逆行
+    // 壬=8(索引), 申=8
+    var startGanIdx2 = 8; // 壬
+    var startZhiIdx2 = 8; // 申
+    var ageOffset2 = currentAge - 1;
+    var ganIdx2 = (startGanIdx2 - ageOffset2 + 10 * 100) % 10;
+    var zhiIdx2 = (startZhiIdx2 - ageOffset2 + 12 * 100) % 12;
+    xingNian = GAN[ganIdx2] + ZHI[zhiIdx2];
+    xingNianDetail = '女命行年从1岁起壬申逆行，今年' + currentAge + '岁，行年为' + xingNian + '。' +
+      '行年干支与日辰生克关系可断吉凶：' +
+      (WX_SHENG[GAN_WX[GAN[ganIdx2]]] === GAN_WX[GAN[ganIdx2]] ? '行年五行比和，平顺之年。' :
+       '行年' + GAN[ganIdx2] + '(' + GAN_WX[GAN[ganIdx2]] + ')' +
+       '，宜察与日干之生克定吉凶。');
+  } else {
+    xingNian = '';
+    xingNianDetail = '性别未指定，无法计算行年。';
+  }
+
+  return {
+    benMing: benMing,
+    benMingIdx: benMingIdx,
+    xingNian: xingNian,
+    xingNianDetail: xingNianDetail,
+    currentAge: currentAge,
+    sex: sex
+  };
+}
+
 window.LiurenV3 = {
   // 核心函数
   computeLiuRen,
@@ -5774,6 +5930,9 @@ window.LiurenV3 = {
   isFanYin,
   isBaZhuan,
   isSiKeBuQuan,
+  // R2.10: 克应分析 + 本命行年
+  analyzeKeying,
+  computeBenMing,
   
   // 常量
   STEMS,
