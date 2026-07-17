@@ -6797,6 +6797,205 @@ function computeBenMing(birthYear, sex) {
   };
 }
 
+/**
+ * R3.4: 六壬·课体格局辨识
+ *
+ * 辨识常见课体格局并判断吉凶
+ *
+ * 《大六壬大全》:「课体者，天地盘四课三传之格局也。格局正则事理明，格局变则事理异。」
+ *
+ * @param {object} sanChuan - 三传对象（含 faInfo/zhongInfo/moInfo）
+ * @param {string} zhanShi - 占时地支
+ * @param {object} siKe - 四课对象
+ * @returns {object} { ketiType, gejuName, luck, description }
+ */
+function analyzeKetiGeshi(sanChuan, zhanShi, siKe) {
+  var faZhi = sanChuan.faInfo ? sanChuan.faInfo.zhi : '';
+  var zhongZhi = sanChuan.zhongInfo ? sanChuan.zhongInfo.zhi : '';
+  var moZhi = sanChuan.moInfo ? sanChuan.moInfo.zhi : '';
+
+  var faWX = ZHI_WX[faZhi] || '';
+  var zhongWX = ZHI_WX[zhongZhi] || '';
+  var moWX = ZHI_WX[moZhi] || '';
+
+  // 地支相冲表
+  var CHONG = {'子':'午','午':'子','丑':'未','未':'丑','寅':'申','申':'寅','卯':'酉','酉':'卯','辰':'戌','戌':'辰','巳':'亥','亥':'巳'};
+  // 地支相合表（六合）
+  var LIUHE = {'子':'丑','丑':'子','寅':'亥','亥':'寅','卯':'戌','戌':'卯','辰':'酉','酉':'辰','巳':'申','申':'巳','午':'未','未':'午'};
+  // 地支三合局
+  var SANHE_JU = [
+    {zhi:['寅','午','戌'], ju:'火局'},
+    {zhi:['申','子','辰'], ju:'水局'},
+    {zhi:['亥','卯','未'], ju:'木局'},
+    {zhi:['巳','酉','丑'], ju:'金局'}
+  ];
+  // 连茹判断：地支顺序相连（子丑寅...）
+  var ZHI_ORDER = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+
+  var matched = [];
+
+  // ═══ 1. 重审课（初传与日辰相同） ═══
+  // 初传地支与日支或日干寄宫相同
+  // 需要日干信息，但函数签名中无日干，用 siKe.jiGong 代替
+  var dayJiGong = siKe && siKe.jiGong ? siKe.jiGong : '';
+  if (faZhi && (faZhi === zhanShi || faZhi === dayJiGong)) {
+    matched.push({
+      ketiType: '重审课',
+      gejuName: '重审',
+      luck: '中平',
+      description: '初传' + faZhi + '与日辰(寄宫' + dayJiGong + ')相同，为重审课。'+
+        '重审者，再三审查之意。事有反复，需谨慎对待，不可草率决定。'+
+        '占事主延迟、复查；占人主反复不定。宜三思而后行。'
+    });
+  }
+
+  // ═══ 2. 元首课（初传为日干之寄宫） ═══
+  if (faZhi && dayJiGong && faZhi === dayJiGong) {
+    matched.push({
+      ketiType: '元首课',
+      gejuName: '元首',
+      luck: '大吉',
+      description: '初传' + faZhi + '为日干寄宫(' + dayJiGong + ')所发用，为元首课。'+
+        '元首者，万物之始也。上克下发用，尊制卑之象。'+
+        '六壬第一吉课，主万事亨通，尊长得令，事业开创，谋为大利。'
+    });
+  }
+
+  // ═══ 3. 始终课（初传与末传相冲） ═══
+  if (faZhi && moZhi && CHONG[faZhi] === moZhi) {
+    matched.push({
+      ketiType: '始终课',
+      gejuName: '始终',
+      luck: '凶',
+      description: '初传' + faZhi + '与末传' + moZhi + '相冲，为始终课。'+
+        '始终者，初末相冲，有始无终之象。'+
+        '事有始无终，半途而废。占谋为主先成后败，占关系主先合后分。需防善始不善终。'
+    });
+  }
+
+  // ═══ 4. 转接课（初传与中传比和） ═══
+  if (faWX && zhongWX && faWX === zhongWX) {
+    matched.push({
+      ketiType: '转接课',
+      gejuName: '转接',
+      luck: '中吉',
+      description: '初传' + faZhi + '(' + faWX + ')与中传' + zhongZhi + '(' + zhongWX + ')五行比和，为转接课。'+
+        '转接者，初中同气，事有承接转接之象。'+
+        '前因后果相连，事有转机。前段之努力在后段得以延续，宜把握转折点。'
+    });
+  }
+
+  // ═══ 5. 递生课（初中末递相生） ═══
+  if (faWX && zhongWX && moWX &&
+      WX_SHENG[faWX] === zhongWX && WX_SHENG[zhongWX] === moWX) {
+    matched.push({
+      ketiType: '递生课',
+      gejuName: '递生',
+      luck: '大吉',
+      description: '初传' + faZhi + '(' + faWX + ')生中传' + zhongZhi + '(' + zhongWX + ')生末传' + moZhi + '(' + moWX + ')，递相生，为递生课。'+
+        '递生者，初中末依次相生，生机链不断之象。'+
+        '事有层层推进，步步生辉。占谋为主大吉，事业蒸蒸日上，贵人层层扶持。'
+    });
+  }
+
+  // ═══ 6. 递克课（初中末递相克） ═══
+  if (faWX && zhongWX && moWX &&
+      WX_KE[faWX] === zhongWX && WX_KE[zhongWX] === moWX) {
+    matched.push({
+      ketiType: '递克课',
+      gejuName: '递克',
+      luck: '大凶',
+      description: '初传' + faZhi + '(' + faWX + ')克中传' + zhongZhi + '(' + zhongWX + ')克末传' + moZhi + '(' + moWX + ')，递相克，为递克课。'+
+        '递克者，初中末依次相克，戾气链不断之象。'+
+        '事有层层受阻，步步遭殃。占谋为主大凶，事业每况愈下，宜速避让，不可强求。'
+    });
+  }
+
+  // ═══ 7. 连茹课（初中末三位连茹） ═══
+  // 连茹：三个地支在十二地支顺序中相连（如子丑寅、寅卯辰等）
+  if (faZhi && zhongZhi && moZhi) {
+    var faIdx = ZHI_ORDER.indexOf(faZhi);
+    var zhongIdx = ZHI_ORDER.indexOf(zhongZhi);
+    var moIdx = ZHI_ORDER.indexOf(moZhi);
+    if (faIdx >= 0 && zhongIdx >= 0 && moIdx >= 0) {
+      // 顺序连茹：初→中→末依次+1
+      var isShunLian = (zhongIdx === (faIdx + 1) % 12) && (moIdx === (faIdx + 2) % 12);
+      // 逆序连茹：初→中→末依次-1
+      var isNiLian = (zhongIdx === (faIdx + 11) % 12) && (moIdx === (faIdx + 10) % 12);
+      if (isShunLian || isNiLian) {
+        var lianDir = isShunLian ? '顺连' : '倒连';
+        var lianDesc = isShunLian ?
+          '顺连(' + faZhi + '→' + zhongZhi + '→' + moZhi + ')，事有顺次推进之象，宜顺势而为。' :
+          '倒连(' + faZhi + '→' + zhongZhi + '→' + moZhi + ')，事有逆次退缩之象，宜退守自保。';
+        matched.push({
+          ketiType: '连茹课',
+          gejuName: lianDir + '连茹',
+          luck: isShunLian ? '吉' : '凶',
+          description: '初传' + faZhi + '、中传' + zhongZhi + '、末传' + moZhi + '三位地支' + lianDir + '连茹，为连茹课。'+
+            '连茹者，如藤蔓相连，引而申之。' + lianDesc +
+            '占事主接连不断，牵一发而动全身。'
+        });
+      }
+    }
+  }
+
+  // ═══ 8. 三合课（初中末三合局） ═══
+  if (faZhi && zhongZhi && moZhi) {
+    for (var si = 0; si < SANHE_JU.length; si++) {
+      var sanHe = SANHE_JU[si];
+      if (sanHe.zhi.indexOf(faZhi) >= 0 &&
+          sanHe.zhi.indexOf(zhongZhi) >= 0 &&
+          sanHe.zhi.indexOf(moZhi) >= 0 &&
+          faZhi !== zhongZhi && zhongZhi !== moZhi && faZhi !== moZhi) {
+        matched.push({
+          ketiType: '三合课',
+          gejuName: sanHe.ju,
+          luck: '吉',
+          description: '初传' + faZhi + '、中传' + zhongZhi + '、末传' + moZhi + '三合' + sanHe.ju + '，为三合课。'+
+            '三合者，初中末三传合成一局，凝聚合力之象。'+
+            '占事主众人合力，事可大成。占谋为主有贵人同心，占婚为主百年好合，占财为主合谋生财。宜合作共赢。'
+        });
+        break;
+      }
+    }
+  }
+
+  // ═══ 汇总结果 ═══
+  // 如果匹配到多个课体，取最显著的一个（优先级：大吉 > 大凶 > 吉 > 凶 > 中吉 > 中平）
+  var priority = {'大吉':5, '大凶':4, '吉':3, '凶':2, '中吉':1, '中平':0};
+  var best = null;
+  var bestScore = -1;
+  for (var mi = 0; mi < matched.length; mi++) {
+    var score = priority[matched[mi].luck] || 0;
+    if (score > bestScore) {
+      bestScore = score;
+      best = matched[mi];
+    }
+  }
+
+  // 如果未匹配到任何课体
+  if (!best) {
+    best = {
+      ketiType: '通用课',
+      gejuName: '通用',
+      luck: '中平',
+      description: '三传' + faZhi + '→' + zhongZhi + '→' + moZhi +
+        '未匹配标准课体格局。需结合四课、天将、神煞综合判断吉凶。' +
+        '初传' + faZhi + '(' + faWX + ')，中传' + zhongZhi + '(' + zhongWX + ')，末传' + moZhi + '(' + moWX + ')。'
+    };
+  }
+
+  return {
+    ketiType: best.ketiType,
+    gejuName: best.gejuName,
+    luck: best.luck,
+    description: best.description,
+    allMatched: matched,
+    sanChuan: { fa: faZhi, zhong: zhongZhi, mo: moZhi },
+    sanChuanWX: { fa: faWX, zhong: zhongWX, mo: moWX }
+  };
+}
+
 window.LiurenV3 = {
   // 核心函数
   computeLiuRen,
@@ -6834,6 +7033,8 @@ window.LiurenV3 = {
   // R2.10: 克应分析 + 本命行年
   analyzeKeying,
   computeBenMing,
+  // R3.4: 课体格局辨识
+  analyzeKetiGeshi,
   
   // 常量
   STEMS,
