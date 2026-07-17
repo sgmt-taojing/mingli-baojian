@@ -7207,6 +7207,210 @@ function analyzeZiweiFull(panData) {
 }
 
 /**
+ * R1.4: 十二宫逐宫详析
+ * 每宫输出：主星组合分析+庙旺落陷+煞星冲照+四化影响+人生方面论述
+ */
+function analyzeEachGong(panData) {
+  const gongMap = panData.gongMap;
+  const stars = panData.stars || [];
+  const sihuaPalaces = panData.sihuaPalaces || [];
+  const mingPos = gongMap['命宫'];
+
+  // 十二宫名称顺序（以命宫为起点，逆时针）
+  const gongOrder = ['命宫','兄弟','夫妻','子女','财帛','疾厄','迁移','交友','事业','田宅','福德','父母'];
+  // 每宫对应的人生方面
+  const gongAspects = {
+    '命宫': {icon:'🎯', desc:'性格特质、外貌气质、先天格局、人生基调', color:'#c9a84c'},
+    '兄弟': {icon:'👥', desc:'兄弟姐妹缘分、朋友关系、合伙运势', color:'#3498db'},
+    '夫妻': {icon:'💕', desc:'配偶特征、婚姻质量、感情运势', color:'#e74c3c'},
+    '子女': {icon:'👶', desc:'子女数量、亲子关系、生育运势', color:'#27ae60'},
+    '财帛': {icon:'💰', desc:'财运格局、理财方式、财源方向', color:'#e67e22'},
+    '疾厄': {icon:'🏥', desc:'健康状况、易患部位、体质特征', color:'#9b59b6'},
+    '迁移': {icon:'✈️', desc:'外出运势、旅行迁移、社交能力', color:'#1abc9c'},
+    '交友': {icon:'🤝', desc:'交友缘分、下属关系、人际圈层', color:'#f39c12'},
+    '事业': {icon:'💼', desc:'事业方向、工作能力、职场运势', color:'#2980b9'},
+    '田宅': {icon:'🏠', desc:'房产运势、家庭环境、资产积累', color:'#16a085'},
+    '福德': {icon:'🧘', desc:'精神世界、兴趣爱好、内心追求', color:'#8e44ad'},
+    '父母': {icon:'👴', desc:'父母缘分、长辈关系、家教背景', color:'#d35400'}
+  };
+
+  // 主星组合释义库
+  const starCombos = {
+    '紫微': {nature:'帝星，主尊贵权威', traits:'性格稳重，有领导力，心胸开阔。但易孤高自许，需辅星佐助方成大器。'},
+    '天府': {nature:'财库之星，主稳重保守', traits:'为人踏实，善于理财，有包容力。但过于保守则错失良机。'},
+    '太阳': {nature:'贵星，主光明磊落', traits:'热情慷慨，乐于助人，事业心强。庙旺则显贵，落陷则劳碌。'},
+    '太阴': {nature:'母星，主温柔细腻', traits:'心思细密，有艺术天赋，重感情。庙旺则财顺，落陷则优柔。'},
+    '武曲': {nature:'财星，主刚毅果断', traits:'执行力强，善于理财，性格刚直。但过于刚强易得罪人。'},
+    '天同': {nature:'福星，主温和乐观', traits:'乐观开朗，知足常乐，人缘好。但过于安逸则缺乏动力。'},
+    '廉贞': {nature:'次桃花星，主刚柔并济', traits:'能文能武，交际能力强。但情绪波动大，易惹是非。'},
+    '贪狼': {nature:'桃花星，主欲望多变', traits:'多才多艺，社交能力强，好奇心旺盛。但易沉迷物欲。'},
+    '巨门': {nature:'暗星，主口舌是非', traits:'口才好，善于分析，但易招口舌之争。庙旺则能以口才谋生。'},
+    '天相': {nature:'印星，主稳重正直', traits:'为人正直，有协调能力，适合辅佐之位。但缺乏开创力。'},
+    '天梁': {nature:'荫星，主清高正直', traits:'性格清高，有侠义精神，乐于助人。适合公职或学术。'},
+    '七杀': {nature:'将星，主刚毅冲动', traits:'执行力极强，敢于冒险，人生起伏大。适合军警或创业。'},
+    '破军': {nature:'耗星，主变革破旧', traits:'敢于破旧立新，不墨守成规。但人生多变动荡，需防破败。'},
+  };
+
+  // 煞星影响
+  const shaEffects = {
+    '擎羊': '刑伤阻碍，增加冲劲但也易招是非',
+    '陀罗': '拖延纠缠，做事多波折但暗藏韧性',
+    '火星': '急躁冲动，突发变化，宜冷静',
+    '铃星': '暗中破坏，情绪波动，需修心',
+    '地空': '精神空虚，想法不切实际，破财',
+    '地劫': '突然破耗，意外损失，宜保守',
+    '天刑': '法律纠纷，官非口舌，宜守规矩',
+    '化忌': '波折阻碍，该宫位所主事项多不顺'
+  };
+
+  // 四化影响
+  const sihuaEffects = {
+    '化禄': '财源广进，该宫位事项顺利发财',
+    '化权': '权力增强，该宫位事项有掌控力',
+    '化科': '名声显赫，该宫位事项有贵人助',
+    '化忌': '波折阻碍，该宫位事项多不顺'
+  };
+
+  // 查找某宫的四化
+  function getGongSihua(gongIdx) {
+    var results = [];
+    for (var i = 0; i < sihuaPalaces.length; i++) {
+      var sp = sihuaPalaces[i];
+      if (sp.pos === gongIdx || sp.gongIdx === gongIdx) {
+        results.push(sp);
+      }
+    }
+    return results;
+  }
+
+  var results = [];
+  for (var gi = 0; gi < 12; gi++) {
+    var gongIdx = mod(mingPos + gi, 12);
+    var gongName = gongOrder[gi];
+    var gongStars = stars[gongIdx] || [];
+    var aspect = gongAspects[gongName];
+
+    // 分类星曜：主星/辅星/煞星
+    var mainStars = [];
+    var auxStars = [];
+    var shaStars = [];
+    for (var si = 0; si < gongStars.length; si++) {
+      var sn = gongStars[si];
+      if (starCombos[sn]) mainStars.push(sn);
+      else if (shaEffects[sn]) shaStars.push(sn);
+      else auxStars.push(sn);
+    }
+
+    // 庙旺平陷
+    var starStrengths = mainStars.map(function(s) {
+      var table = STAR_STRENGTH[s];
+      if (!table) return {star:s, strength:1, label:'平'};
+      var v = table[gongIdx];
+      return {star:s, strength:v, label: STRENGTH_LABELS[v] || '平'};
+    });
+
+    // 四化
+    var gongSihua = getGongSihua(gongIdx);
+
+    // 对宫星曜
+    var oppIdx = mod(gongIdx + 6, 12);
+    var oppStars = stars[oppIdx] || [];
+
+    // 组合分析文案
+    var comboText = '';
+    if (mainStars.length === 0) {
+      comboText = '本宫无主星，' + (oppStars.length > 0 ? '借对宫(' + gongOrder[(gi+6)%12] + ')' + oppStars.join('、') + '论命。性格多变，受环境影响大。' : '性格空灵，需结合大限流年判断。');
+    } else {
+      for (var mi = 0; mi < mainStars.length; mi++) {
+        var ms = mainStars[mi];
+        var combo = starCombos[ms];
+        if (combo) {
+          var strengthInfo = starStrengths[mi] || {};
+          var strengthLabel = strengthInfo.label || '平';
+          comboText += ms + '(' + strengthLabel + ')：' + combo.nature + '。' + combo.traits + ' ';
+          if (strengthLabel === '庙' || strengthLabel === '旺') {
+            comboText += '星曜入' + strengthLabel + '，正面特质充分发挥。 ';
+          } else if (strengthLabel === '陷') {
+            comboText += '星曜落陷，负面特质显现，需修身克制。 ';
+          }
+        }
+      }
+      // 双星组合特论
+      if (mainStars.length >= 2) {
+        var pair = mainStars.slice(0, 2).join('+');
+        var pairText = {
+          '紫微+天府': '紫府同宫，尊贵财库双全，极格之命，但易孤高。',
+          '紫微+贪狼': '紫贪同宫，欲望与权势并重，桃花旺，需克制。',
+          '紫微+天相': '紫相同宫，权印相随，适合管理职，稳重有余魄力不足。',
+          '紫微+七杀': '紫杀同宫，帝星化将，威权极重，人生起伏大。',
+          '紫微+破军': '紫破同宫，帝星变革，开创力极强但动荡多。',
+          '太阳+太阴': '日月同宫，阴阳调和，才华出众，但易二心不定。',
+          '武曲+天府': '武府同宫，理财能力极佳，财源稳固。',
+          '武曲+贪狼': '武贪同宫，三十年一暴发，宜耐心等待时机。',
+          '武曲+天相': '武相同宫，财印相随，适合金融管理。',
+          '武曲+七杀': '武杀同宫，刚毅过人，适合军警武职。',
+          '武曲+破军': '武破同宫，破旧立新，适合创业但波折多。',
+          '天同+太阴': '同月同宫，温柔优雅，文艺天赋，但缺乏魄力。',
+          '天同+巨门': '同巨同宫，口才好但易招是非，宜以口才谋生。',
+          '天同+天梁': '同梁同宫，福荫双全，安逸稳定，适合文职。',
+          '廉贞+天府': '廉府同宫，刚柔并济，理财有方，适合商界。',
+          '廉贞+贪狼': '廉贪同宫，桃花极旺，才华横溢但易沉迷。',
+          '廉贞+天相': '廉相同宫，印星带桃花，适合外交公关。',
+          '廉贞+七杀': '廉杀同宫，刚烈果断，适合军警竞技。',
+          '廉贞+破军': '廉破同宫，变革力强，但感情多波折。'
+        };
+        if (pairText[pair]) comboText += '【组合】' + pairText[pair] + ' ';
+      }
+    }
+
+    // 煞星影响
+    var shaText = '';
+    if (shaStars.length > 0) {
+      for (var ssi = 0; ssi < shaStars.length; ssi++) {
+        var sn2 = shaStars[ssi];
+        if (shaEffects[sn2]) {
+          shaText += sn2 + '：' + shaEffects[sn2] + ' ';
+        }
+      }
+    }
+
+    // 四化影响
+    var sihuaText = '';
+    if (gongSihua.length > 0) {
+      for (var ssi2 = 0; ssi2 < gongSihua.length; ssi2++) {
+        var sp2 = gongSihua[ssi2];
+        var spType = sp2.type || sp2.sihua || '';
+        var spStar = sp2.star || '';
+        if (sihuaEffects[spType]) {
+          sihuaText += spType + '(' + spStar + ')：' + sihuaEffects[spType] + ' ';
+        }
+      }
+    }
+
+    results.push({
+      gongName: gongName,
+      gongIdx: gongIdx,
+      gongZhi: BRANCHES[gongIdx],
+      icon: aspect.icon,
+      desc: aspect.desc,
+      color: aspect.color,
+      mainStars: mainStars,
+      auxStars: auxStars,
+      shaStars: shaStars,
+      starStrengths: starStrengths,
+      gongSihua: gongSihua,
+      oppGongName: gongOrder[(gi+6)%12],
+      oppStars: oppStars,
+      comboText: comboText,
+      shaText: shaText,
+      sihuaText: sihuaText
+    });
+  }
+
+  return results;
+}
+
+/**
  * 生成建议
  */
 function generateAdvice(gejuResult, sihuaDetail, currentDayun, sanfang) {
@@ -7262,6 +7466,7 @@ window.ZiweiV3 = {
   analyzeSanfang,
   getGeju,
   analyzeZiweiFull,
+  analyzeEachGong,
 
   // 工具
   getHourIdx,

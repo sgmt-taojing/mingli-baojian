@@ -36198,6 +36198,13 @@ function runZiweiEngine() {
         // V3概述与建议
         v3Html += '<div style="margin-bottom:8px;padding:8px;background:rgba(201,168,76,0.04);border-radius:6px"><b>V3概述：</b>' + v3Za.overview + '</div>';
         v3Html += '<div style="opacity:0.8"><b>V3建议：</b>' + v3Za.advice + '</div>';
+        // R1.4: 十二宫逐宫详析
+        try {
+          if (typeof buildZiweiGongAnalysisHTML === 'function') {
+            var _gongHTML = buildZiweiGongAnalysisHTML(v3Zw);
+            if (_gongHTML) v3Html += _gongHTML;
+          }
+        } catch(e4) { console.warn('[十二宫详析失败]', e4); }
         v3Html += '</div></div></div>';
         html += v3Html;
       }

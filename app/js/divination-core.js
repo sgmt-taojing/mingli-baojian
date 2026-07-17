@@ -35757,6 +35757,61 @@ function injectQimenGejuAnalysis(palaces, keyPalace) {
 //  集成函数：在紫微排盘中注入庙旺+三方四正分析
 // ================================================================
 
+// ═══ R1.4: 紫微十二宫逐宫详析 ═══
+function buildZiweiGongAnalysisHTML(panData) {
+  if (typeof analyzeEachGong !== 'function' || !panData) return '';
+  var gongResults = analyzeEachGong(panData);
+  if (!gongResults || gongResults.length === 0) return '';
+
+  var html = '';
+  html += '<div class="interp-card" style="background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(155,89,182,.04));border:1px solid rgba(201,168,76,.15);border-radius:10px;padding:16px;margin-bottom:14px">';
+  html += '<div style="font-size:14px;font-weight:bold;color:var(--gold);margin-bottom:10px;letter-spacing:2px">🏛️ 十二宫逐宫详析</div>';
+  html += '<div style="font-size:11px;color:#888;margin-bottom:12px">每宫含主星组合+庙旺落陷+煞星冲照+四化影响+人生论述</div>';
+
+  for (var i = 0; i < gongResults.length; i++) {
+    var g = gongResults[i];
+    html += '<div style="margin-bottom:12px;padding:12px;background:rgba(255,255,255,.02);border-radius:8px;border-left:3px solid ' + g.color + '">';
+    // 宫头
+    html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">';
+    html += '<span style="font-size:14px">' + g.icon + '</span>';
+    html += '<span style="font-size:13px;font-weight:bold;color:' + g.color + '">' + g.gongName + '</span>';
+    html += '<span style="font-size:10px;color:#888">(' + g.gongZhi + '宫)</span>';
+    if (g.mainStars.length > 0) {
+      html += '<span style="font-size:11px;color:var(--paper);margin-left:4px">' + g.mainStars.join('/') + '</span>';
+      // 庙旺标签
+      for (var si = 0; si < g.starStrengths.length; si++) {
+        var ss = g.starStrengths[si];
+        var sColor = ss.label === '庙' ? '#2ecc71' : ss.label === '旺' ? '#27ae60' : ss.label === '陷' ? '#e74c3c' : '#f39c12';
+        html += '<span style="font-size:9px;padding:1px 4px;border-radius:3px;background:' + sColor + ';color:#fff;margin-left:2px">' + ss.label + '</span>';
+      }
+    } else {
+      html += '<span style="font-size:10px;color:#888;margin-left:4px">无主星</span>';
+    }
+    html += '</div>';
+    // 人生方面
+    html += '<div style="font-size:10px;color:#888;margin-bottom:6px">' + g.desc + '</div>';
+    // 主星组合分析
+    if (g.comboText) {
+      html += '<div style="font-size:11px;color:var(--paper);line-height:1.7;margin-bottom:4px">' + g.comboText + '</div>';
+    }
+    // 煞星影响
+    if (g.shaText) {
+      html += '<div style="font-size:10px;color:#e67e22;line-height:1.6;margin-top:4px">⚠️ 煞星：' + g.shaText + '</div>';
+    }
+    // 四化影响
+    if (g.sihuaText) {
+      html += '<div style="font-size:10px;color:#9b59b6;line-height:1.6;margin-top:2px">🌟 四化：' + g.sihuaText + '</div>';
+    }
+    // 对宫
+    if (g.oppStars.length > 0) {
+      html += '<div style="font-size:9px;color:#888;margin-top:4px">对宫' + g.oppGongName + '：' + g.oppStars.join('、') + '</div>';
+    }
+    html += '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
 function injectZiweiEnhancedAnalysis(mingGongBranchIdx, starsByGong) {
   var html = '';
   // 庙旺平陷分析
