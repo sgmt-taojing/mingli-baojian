@@ -9839,6 +9839,253 @@ function generateAdvice(gejuResult, sihuaDetail, currentDayun, sanfang) {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// R3.8: 小限流月分析
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * analyzeXiaoxian(panData)
+ * 小限分析
+ *
+ * 《紫微斗数全书》：「小限起命宫，男顺女逆，一岁一宫。」
+ *
+ * @param {Object} panData — ziweiCalcV3() 的返回值
+ * @returns {Object} 小限分析结果
+ */
+function analyzeXiaoxian(panData) {
+  var gongMap = panData.gongMap || {};
+  var stars = panData.stars || [];
+  var mingPos = gongMap['命宫'] != null ? gongMap['命宫'] : 0;
+  var sex = panData.sex || 'male';
+  var birthYear = panData.year || new Date().getFullYear();
+  var currentYear = new Date().getFullYear();
+  var age = currentYear - birthYear + 1; // 虚岁
+
+  // 小限宫位定位：男命从命宫起1岁顺行，女命从命宫起1岁逆行
+  var xiaoxianOffset = age - 1;
+  var xiaoxianPos;
+  if (sex === 'male') {
+    xiaoxianPos = mod(mingPos + xiaoxianOffset, 12);
+  } else {
+    xiaoxianPos = mod(mingPos - xiaoxianOffset, 12);
+  }
+  var xiaoxianGongName = getGongNameByPos(xiaoxianPos, gongMap);
+  var xiaoxianZhi = BRANCHES[xiaoxianPos];
+
+  // 当前年龄小限宫位主星组合
+  var xiaoxianStars = stars[xiaoxianPos] || [];
+  var oppPos = mod(xiaoxianPos + 6, 12);
+  var oppStars = stars[oppPos] || [];
+  var sanfangPos1 = mod(xiaoxianPos + 4, 12);
+  var sanfangPos2 = mod(xiaoxianPos + 5, 12);
+  var sanfangStars = (stars[sanfangPos1] || []).concat(stars[sanfangPos2] || []);
+
+  // 主星庙旺
+  var xiaoxianStrengths = xiaoxianStars.map(function(s) {
+    var table = STAR_STRENGTH[s];
+    if (!table) return { star: s, label: '平' };
+    return { star: s, label: STRENGTH_LABELS[table[xiaoxianPos]] || '平' };
+  });
+
+  // 小限宫位与命宫三方四正关系
+  var diffToMing = mod(xiaoxianPos - mingPos, 12);
+  var sanfangRelation = '';
+  if (diffToMing === 0) {
+    sanfangRelation = '小限宫位与命宫同宫，今年个人内在状态为核心，性格、健康直接受影响';
+  } else if (diffToMing === 6) {
+    sanfangRelation = '小限宫位在命宫对宫(迁移位)，今年外出运势强，宜动不宜静，环境变化大';
+  } else if (diffToMing === 4 || diffToMing === 8) {
+    sanfangRelation = '小限宫位与命宫在三方会照，今年运势与命宫形成合力，发展顺利';
+  } else if (diffToMing === 5 || diffToMing === 7) {
+    sanfangRelation = '小限宫位与命宫在三方四正会照，今年运势平稳，有贵人助力';
+  } else {
+    sanfangRelation = '小限宫位与命宫不在三方四正会照，今年运势独立发展，需靠自身努力';
+  }
+
+  // 小限主星吉凶判断
+  var starAnalysis = '';
+  if (xiaoxianStars.length === 0) {
+    starAnalysis = '小限宫位无主星，借对宫' + (oppStars.length > 0 ? oppStars.join('、') : '空宫') + '之力，性格多变动，需参考对宫星曜判断。';
+  } else {
+    var hasZiwei = xiaoxianStars.indexOf('紫微') >= 0;
+    var hasTianfu = xiaoxianStars.indexOf('天府') >= 0;
+    var hasQisha = xiaoxianStars.indexOf('七杀') >= 0;
+    var hasPojun = xiaoxianStars.indexOf('破军') >= 0;
+    var hasTanlang = xiaoxianStars.indexOf('贪狼') >= 0;
+    var hasTaiyang = xiaoxianStars.indexOf('太阳') >= 0;
+    var hasTaiyin = xiaoxianStars.indexOf('太阴') >= 0;
+    var hasTianliang = xiaoxianStars.indexOf('天梁') >= 0;
+    var hasTianji = xiaoxianStars.indexOf('天机') >= 0;
+
+    if (hasZiwei) starAnalysis = '紫微坐小限，今年领导力增强，有贵人提携，但需防孤傲自大。';
+    else if (hasTianfu) starAnalysis = '天府坐小限，今年理财能力佳，财运稳定，宜守不宜攻。';
+    else if (hasQisha || hasPojun || hasTanlang) starAnalysis = '杀破狼坐小限，今年变动大，宜主动求变，开创格局，但需防冲动行事。';
+    else if (hasTaiyang) starAnalysis = '太阳坐小限，今年事业心强，男性贵人多，宜积极进取。';
+    else if (hasTaiyin) starAnalysis = '太阴坐小限，今年财运平稳，女性贵人多，宜理财置业。';
+    else if (hasTianliang) starAnalysis = '天梁坐小限，今年贵人运佳，逢凶化吉，宜稳重行事。';
+    else if (hasTianji) starAnalysis = '天机坐小限，今年思维敏捷，宜学习谋划，但需防想多做少。';
+    else starAnalysis = xiaoxianStars.join('、') + '坐小限，今年运势需结合庙旺与四化综合判断。';
+  }
+
+  // 汇总
+  var summary = '虚岁' + age + '，小限在' + xiaoxianGongName + '(' + xiaoxianZhi + '宫)。';
+  if (xiaoxianStars.length > 0) {
+    summary += '主星' + xiaoxianStars.join('、') + '。';
+  } else {
+    summary += '无主星，借对宫' + (oppStars.join('、') || '空') + '。';
+  }
+  summary += starAnalysis;
+  summary += sanfangRelation + '。';
+
+  return {
+    age: age,
+    sex: sex,
+    xiaoxianGong: { name: xiaoxianGongName, pos: xiaoxianPos, zhi: xiaoxianZhi },
+    xiaoxianStars: xiaoxianStars,
+    xiaoxianOppStars: oppStars,
+    xiaoxianSanfangStars: sanfangStars,
+    xiaoxianStrengths: xiaoxianStrengths,
+    sanfangRelation: sanfangRelation,
+    starAnalysis: starAnalysis,
+    summary: summary
+  };
+}
+
+/**
+ * analyzeLiuyue(panData, currentMonth)
+ * 流月分析
+ *
+ * 《紫微斗数全书》：「流月以流年地支宫为正月，顺数到当前月。」
+ * 流月天干：以流年天干起五虎遁，定流月天干
+ *
+ * @param {Object} panData — ziweiCalcV3() 的返回值
+ * @param {number} currentMonth — 当前月份(1-12, 农历)
+ * @returns {Object} 流月分析结果
+ */
+function analyzeLiuyue(panData, currentMonth) {
+  var gongMap = panData.gongMap || {};
+  var stars = panData.stars || [];
+  var mingPos = gongMap['命宫'] != null ? gongMap['命宫'] : 0;
+  var currentYear = new Date().getFullYear();
+
+  // 1. 流年地支宫位
+  var yearZhiIdx = mod(currentYear - 4, 12);
+  var yearZhi = BRANCHES[yearZhiIdx];
+  var liunianGanIdx = mod(currentYear - 4, 10);
+  var liunianGan = STEMS[liunianGanIdx];
+
+  // 2. 流月宫位定位：以流年地支宫为正月(一月)，顺数到当前月
+  var monthOffset = currentMonth - 1;
+  var liuyuePos = mod(yearZhiIdx + monthOffset, 12);
+  var liuyueGongName = getGongNameByPos(liuyuePos, gongMap);
+  var liuyueZhi = BRANCHES[liuyuePos];
+
+  // 3. 流月天干：五虎遁年起月法
+  // 甲己之年丙作首，乙庚之岁戊为头，丙辛之岁庚为首，丁壬壬寅顺水流，戊癸甲寅好追求
+  var wuhuDun = {
+    '甲': '丙', '己': '丙',
+    '乙': '戊', '庚': '戊',
+    '丙': '庚', '辛': '庚',
+    '丁': '壬', '壬': '壬',
+    '戊': '甲', '癸': '甲'
+  };
+  var firstMonthGan = wuhuDun[liunianGan] || '丙';
+  var firstMonthGanIdx = STEMS.indexOf(firstMonthGan);
+  var liuyueGanIdx = mod(firstMonthGanIdx + monthOffset, 10);
+  var liuyueGan = STEMS[liuyueGanIdx];
+
+  // 4. 流月天干四化
+  var liuyueSihuaTable = SIHUA_TABLE[liuyueGan] || {};
+  var liuyueSihua = [];
+  for (var sk in liuyueSihuaTable) {
+    if (!liuyueSihuaTable.hasOwnProperty(sk)) continue;
+    var sStar = liuyueSihuaTable[sk];
+    var sPos = -1;
+    for (var sp = 0; sp < 12; sp++) {
+      if ((stars[sp] || []).indexOf(sStar) >= 0) {
+        sPos = sp;
+        break;
+      }
+    }
+    var sGongName = sPos >= 0 ? getGongNameByPos(sPos, gongMap) : '未定位';
+    var typeLabel = sk === 'lu' ? '化禄' : sk === 'quan' ? '化权' : sk === 'ke' ? '化科' : '化忌';
+    var color = sk === 'lu' ? '#27ae60' : sk === 'quan' ? '#e74c3c' : sk === 'ke' ? '#c9a84c' : '#8e44ad';
+    liuyueSihua.push({
+      type: typeLabel,
+      star: sStar,
+      gongIdx: sPos,
+      gongName: sGongName,
+      color: color
+    });
+  }
+
+  // 5. 流月宫位主星组合
+  var liuyueStars = stars[liuyuePos] || [];
+  var oppPos = mod(liuyuePos + 6, 12);
+  var oppStars = stars[oppPos] || [];
+  var sanfangPos1 = mod(liuyuePos + 4, 12);
+  var sanfangPos2 = mod(liuyuePos + 5, 12);
+  var sanfangStars = (stars[sanfangPos1] || []).concat(stars[sanfangPos2] || []);
+
+  // 主星庙旺
+  var liuyueStrengths = liuyueStars.map(function(s) {
+    var table = STAR_STRENGTH[s];
+    if (!table) return { star: s, label: '平' };
+    return { star: s, label: STRENGTH_LABELS[table[liuyuePos]] || '平' };
+  });
+
+  // 流月宫位与命宫关系
+  var diffToMing = mod(liuyuePos - mingPos, 12);
+  var mingRelation = '';
+  if (diffToMing === 0) {
+    mingRelation = '流月宫位与命宫同宫，本月内在状态为核心，直接影响性格与健康';
+  } else if (diffToMing === 6) {
+    mingRelation = '流月宫位在命宫对宫(迁移位)，本月外出运势强，宜动不宜静';
+  } else if (diffToMing === 4 || diffToMing === 8) {
+    mingRelation = '流月宫位与命宫三方会照，本月运势与命宫形成合力';
+  } else if (diffToMing === 5 || diffToMing === 7) {
+    mingRelation = '流月宫位与命宫三方四正会照，本月运势平稳';
+  } else {
+    mingRelation = '流月宫位与命宫不在三方四正会照，本月运势独立发展';
+  }
+
+  // 流月四化影响
+  var sihuaImpact = [];
+  for (var si = 0; si < liuyueSihua.length; si++) {
+    var lsh = liuyueSihua[si];
+    if (lsh.gongIdx === mingPos) sihuaImpact.push(lsh.type + '(' + lsh.star + ')入命宫');
+    if (lsh.gongIdx === gongMap['财帛']) sihuaImpact.push(lsh.type + '(' + lsh.star + ')入财帛宫');
+    if (lsh.gongIdx === gongMap['官禄']) sihuaImpact.push(lsh.type + '(' + lsh.star + ')入官禄宫');
+  }
+  var sihuaImpactStr = sihuaImpact.length > 0 ? sihuaImpact.join('、') : '无直接影响';
+
+  // 汇总
+  var summary = currentYear + '年' + currentMonth + '月(农历)，流月宫位在' + liuyueGongName + '(' + liuyueZhi + '宫)，流月天干' + liuyueGan + '。';
+  if (liuyueStars.length > 0) {
+    summary += '主星' + liuyueStars.join('、') + '。';
+  } else {
+    summary += '无主星，借对宫' + (oppStars.join('、') || '空') + '。';
+  }
+  summary += '流月四化(' + liuyueGan + '干起)：' + liuyueSihua.map(function(s) { return s.type + s.star; }).join('、') + '。';
+  summary += '四化影响：' + sihuaImpactStr + '。';
+  summary += mingRelation + '。';
+
+  return {
+    currentMonth: currentMonth,
+    liuyueGong: { name: liuyueGongName, pos: liuyuePos, zhi: liuyueZhi },
+    liuyueGan: liuyueGan,
+    liuyueStars: liuyueStars,
+    liuyueOppStars: oppStars,
+    liuyueSanfangStars: sanfangStars,
+    liuyueStrengths: liuyueStrengths,
+    liuyueSihua: liuyueSihua,
+    sihuaImpact: sihuaImpactStr,
+    mingRelation: mingRelation,
+    summary: summary
+  };
+}
+
+
+// ═══════════════════════════════════════════════════════════════
 // 导出
 // ═══════════════════════════════════════════════════════════════
 
@@ -9863,6 +10110,9 @@ window.ZiweiV3 = {
   analyzeDayunDetail,
   analyzeSihuaDetail,
   analyzeLiunian,
+  // R3.8: 小限流月
+  analyzeXiaoxian,
+  analyzeLiuyue,
 
   // 工具
   getHourIdx,

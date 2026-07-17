@@ -36338,6 +36338,74 @@ function runZiweiEngine() {
             }
           }
         } catch(eR26) { console.warn('[流年分析失败]', eR26); }
+        // R3.8: 小限分析
+        try {
+          if (window.ZiweiV3 && window.ZiweiV3.analyzeXiaoxian) {
+            var _xxResult = window.ZiweiV3.analyzeXiaoxian(v3Zw);
+            if (_xxResult && _xxResult.xiaoxianGong) {
+              v3Html += '<div style="margin:14px 0;padding:14px;background:linear-gradient(135deg,rgba(155,89,182,.04),rgba(201,168,76,.03));border:1px solid rgba(155,89,182,.12);border-radius:10px">';
+              v3Html += '<div style="font-size:14px;font-weight:bold;color:#9b59b6;margin-bottom:10px;letter-spacing:2px">🔮 小限分析 (虚岁' + _xxResult.age + ')</div>';
+              v3Html += '<div style="padding:8px 10px;background:rgba(255,255,255,.02);border-radius:8px;margin-bottom:8px">';
+              v3Html += '<div style="font-size:12px;font-weight:600;color:var(--gold)">小限宫位：' + _xxResult.xiaoxianGong.name + '(' + _xxResult.xiaoxianGong.zhi + '宫)</div>';
+              var xxStarText = _xxResult.xiaoxianStars.length > 0 ? _xxResult.xiaoxianStars.join('、') : '无主星(借对宫' + (_xxResult.xiaoxianOppStars.join('、') || '空') + ')';
+              v3Html += '<div style="font-size:11px;margin-top:4px">主星：' + xxStarText + '</div>';
+              if (_xxResult.xiaoxianStrengths.length > 0) {
+                var xxStrTexts = [];
+                for (var xxs = 0; xxs < _xxResult.xiaoxianStrengths.length; xxs++) {
+                  xxStrTexts.push(_xxResult.xiaoxianStrengths[xxs].star + '(' + _xxResult.xiaoxianStrengths[xxs].label + ')');
+                }
+                v3Html += '<div style="font-size:10px;color:#888;margin-top:2px">庙旺：' + xxStrTexts.join('、') + '</div>';
+              }
+              v3Html += '</div>';
+              v3Html += '<div style="font-size:11px;line-height:1.8;color:var(--paper);margin-bottom:6px"><b style="color:#9b59b6">星情分析：</b>' + _xxResult.starAnalysis + '</div>';
+              v3Html += '<div style="font-size:11px;line-height:1.8;color:var(--paper);margin-bottom:6px"><b style="color:#9b59b6">与命宫关系：</b>' + _xxResult.sanfangRelation + '</div>';
+              v3Html += '<div style="margin-top:10px;padding:8px 12px;background:rgba(155,89,182,0.04);border-radius:6px;font-size:11px;line-height:1.7;color:var(--paper)"><b style="color:#9b59b6">小限总结：</b>' + _xxResult.summary + '</div>';
+              v3Html += '</div>';
+            }
+          }
+        } catch(eR38a) { console.warn('[小限分析失败]', eR38a); }
+        // R3.8: 流月分析
+        try {
+          if (window.ZiweiV3 && window.ZiweiV3.analyzeLiuyue) {
+            var _lyMonth = new Date().getMonth() + 1;
+            var _lyResult = window.ZiweiV3.analyzeLiuyue(v3Zw, _lyMonth);
+            if (_lyResult && _lyResult.liuyueGong) {
+              v3Html += '<div style="margin:14px 0;padding:14px;background:linear-gradient(135deg,rgba(231,76,60,.04),rgba(201,168,76,.03));border:1px solid rgba(231,76,60,.12);border-radius:10px">';
+              v3Html += '<div style="font-size:14px;font-weight:bold;color:#e74c3c;margin-bottom:10px;letter-spacing:2px">📅 流月分析 (农历' + _lyResult.currentMonth + '月)</div>';
+              v3Html += '<div style="padding:8px 10px;background:rgba(255,255,255,.02);border-radius:8px;margin-bottom:8px">';
+              v3Html += '<div style="font-size:12px;font-weight:600;color:var(--gold)">流月宫位：' + _lyResult.liuyueGong.name + '(' + _lyResult.liuyueGong.zhi + '宫) &nbsp; 流月天干：' + _lyResult.liuyueGan + '</div>';
+              var lyStarText = _lyResult.liuyueStars.length > 0 ? _lyResult.liuyueStars.join('、') : '无主星(借对宫' + (_lyResult.liuyueOppStars.join('、') || '空') + ')';
+              v3Html += '<div style="font-size:11px;margin-top:4px">主星：' + lyStarText + '</div>';
+              if (_lyResult.liuyueStrengths.length > 0) {
+                var lyStrTexts = [];
+                for (var lys = 0; lys < _lyResult.liuyueStrengths.length; lys++) {
+                  lyStrTexts.push(_lyResult.liuyueStrengths[lys].star + '(' + _lyResult.liuyueStrengths[lys].label + ')');
+                }
+                v3Html += '<div style="font-size:10px;color:#888;margin-top:2px">庙旺：' + lyStrTexts.join('、') + '</div>';
+              }
+              v3Html += '</div>';
+              // 流月四化
+              if (_lyResult.liuyueSihua && _lyResult.liuyueSihua.length > 0) {
+                v3Html += '<div style="font-size:12px;font-weight:600;color:var(--gold);margin:8px 0 4px">流月四化(' + _lyResult.liuyueGan + '干起)</div>';
+                v3Html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px">';
+                for (var lysi = 0; lysi < _lyResult.liuyueSihua.length; lysi++) {
+                  var lysh = _lyResult.liuyueSihua[lysi];
+                  v3Html += '<div style="padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:10px">';
+                  v3Html += '<span style="color:' + lysh.color + ';font-weight:600">' + lysh.type + '</span> ';
+                  v3Html += '<span style="color:var(--gold)">' + lysh.star + '</span> ';
+                  v3Html += '<span style="opacity:.7">→</span> ';
+                  v3Html += '<span style="font-weight:600">' + lysh.gongName + '</span>';
+                  v3Html += '</div>';
+                }
+                v3Html += '</div>';
+              }
+              v3Html += '<div style="font-size:11px;line-height:1.8;color:var(--paper);margin-top:8px"><b style="color:#e74c3c">四化影响：</b>' + _lyResult.sihuaImpact + '</div>';
+              v3Html += '<div style="font-size:11px;line-height:1.8;color:var(--paper);margin-bottom:6px"><b style="color:#e74c3c">与命宫关系：</b>' + _lyResult.mingRelation + '</div>';
+              v3Html += '<div style="margin-top:10px;padding:8px 12px;background:rgba(231,76,60,0.04);border-radius:6px;font-size:11px;line-height:1.7;color:var(--paper)"><b style="color:#e74c3c">流月总结：</b>' + _lyResult.summary + '</div>';
+              v3Html += '</div>';
+            }
+          }
+        } catch(eR38b) { console.warn('[流月分析失败]', eR38b); }
         v3Html += '</div></div></div>';
         html += v3Html;
       }
