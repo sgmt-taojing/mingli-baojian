@@ -7605,6 +7605,102 @@ function analyzeEachGong(panData) {
 }
 
 /**
+ * R1.5: 紫微大限分析
+ * 每步大限含主星组合+大限四化+与本命互动+十年运势概述
+ */
+function analyzeDayunDetail(panData) {
+  var dayunList = panData.dayun || [];
+  var stars = panData.stars || [];
+  var mingPos = panData.gongMap['命宫'];
+  var yearGan = panData.yearGan;
+  var yearGanIdx = STEMS.indexOf(yearGan);
+  var sihuaTable = SIHUA_TABLE[yearGan] || {};
+  
+  var results = [];
+  for (var di = 0; di < dayunList.length; di++) {
+    var d = dayunList[di];
+    var dPos = d.pos;
+    var dStars = stars[dPos] || [];
+    var oppPos = mod(dPos + 6, 12);
+    var oppStars = stars[oppPos] || [];
+    var caiweiPos = mod(dPos + 4, 12);
+    var guanluPos = mod(dPos + 5, 12);
+    var sanfangStars = (stars[caiweiPos]||[]).concat(stars[guanluPos]||[]);
+    
+    // 大限宫位天干（五虎遁）
+    var dGanIdx = mod(yearGanIdx >= 0 ? (WUHU_START[yearGanIdx] + dPos - 2) : 0, 10);
+    var dGan = STEMS[dGanIdx];
+    
+    // 大限四化
+    var dSihuaTable = SIHUA_TABLE[dGan] || {};
+    var dSihuaPalaces = [];
+    for (var sk in dSihuaTable) {
+      if (!dSihuaTable.hasOwnProperty(sk)) continue;
+      var sStar = dSihuaTable[sk];
+      // 找该星所在宫位
+      for (var sp = 0; sp < 12; sp++) {
+        var spStars = stars[sp] || [];
+        if (spStars.indexOf(sStar) >= 0) {
+          dSihuaPalaces.push({type: sk, star: sStar, gongIdx: sp, gongName: ZW_GONGS[mod(sp - mingPos + 12, 12)]});
+          break;
+        }
+      }
+    }
+    
+    // 主星庙旺
+    var dStarStrengths = dStars.map(function(s) {
+      var table = STAR_STRENGTH[s];
+      if (!table) return {star:s, label:'平'};
+      return {star:s, label: STRENGTH_LABELS[table[dPos]] || '平'};
+    });
+    
+    // 大限运势概述
+    var overview = '';
+    var hasJi = dSihuaPalaces.some(function(p) { return p.type === '化忌'; });
+    var hasLu = dSihuaPalaces.some(function(p) { return p.type === '化禄'; });
+    var hasQuan = dSihuaPalaces.some(function(p) { return p.type === '化权'; });
+    var hasKe = dSihuaPalaces.some(function(p) { return p.type === '化科'; });
+    
+    if (hasLu && !hasJi) {
+      overview = '大限化禄入命三方，此十年财运亨通，事业有突破。';
+    } else if (hasJi && !hasLu) {
+      overview = '大限化忌入命三方，此十年波折较多，宜稳不宜动。';
+    } else if (hasLu && hasJi) {
+      overview = '大限禄忌同入，此十年起伏不定，吉凶参半，需把握机遇、防范风险。';
+    } else if (hasQuan) {
+      overview = '大限化权入命三方，此十年权力上升，适合掌权管理。';
+    } else if (hasKe) {
+      overview = '大限化科入命三方，此十年名声显赫，学业考试有利。';
+    } else {
+      overview = '大限无四化入命三方，运势平稳，按部就班。';
+    }
+    
+    // 星曜组合简析
+    var starText = dStars.length > 0 ? dStars.join('、') : '无主星(借对宫' + (oppStars.join('、')||'空') + ')';
+    var strengthText = dStarStrengths.map(function(s) { return s.star + '(' + s.label + ')'; }).join('、');
+    
+    results.push({
+      gongName: d.gong,
+      gongZhi: d.gongZhi,
+      pos: dPos,
+      ageRange: d.ageRange,
+      startAge: d.startAge,
+      endAge: d.endAge,
+      stars: dStars,
+      starText: starText,
+      starStrengths: dStarStrengths,
+      strengthText: strengthText,
+      dGan: dGan,
+      dSihua: dSihuaPalaces,
+      sanfangStars: sanfangStars,
+      oppStars: oppStars,
+      overview: overview
+    });
+  }
+  return results;
+}
+
+/**
  * 生成建议
  */
 function generateAdvice(gejuResult, sihuaDetail, currentDayun, sanfang) {
@@ -7661,6 +7757,7 @@ window.ZiweiV3 = {
   getGeju,
   analyzeZiweiFull,
   analyzeEachGong,
+  analyzeDayunDetail,
 
   // 工具
   getHourIdx,

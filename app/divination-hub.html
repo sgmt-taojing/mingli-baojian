@@ -36195,6 +36195,34 @@ function runZiweiEngine() {
           v3Html += '<tr><td style="padding:3px 4px">' + dy.gong + '(' + dy.gongZhi + ')</td><td style="padding:3px 4px">' + dy.ageRange + '</td><td style="padding:3px 4px">' + dy.stars + '</td></tr>';
         }
         v3Html += '</table></div>';
+        // R1.5: 大限详析
+        try {
+          if (window.ZiweiV3 && window.ZiweiV3.analyzeDayunDetail) {
+            var _dyDetail = window.ZiweiV3.analyzeDayunDetail(v3Zw);
+            if (_dyDetail && _dyDetail.length > 0) {
+              v3Html += '<div style="margin-bottom:10px"><b style="color:var(--fire2)">大限详析：</b>';
+              for (var ddi = 0; ddi < Math.min(_dyDetail.length, 6); ddi++) {
+                var dd = _dyDetail[ddi];
+                var ddColor = dd.overview.indexOf('亨通') >= 0 ? '#27ae60' : dd.overview.indexOf('波折') >= 0 ? '#e74c3c' : '#f39c12';
+                v3Html += '<div style="margin-top:6px;padding:8px;background:rgba(255,255,255,.02);border-radius:6px;border-left:3px solid ' + ddColor + '">';
+                v3Html += '<div style="font-size:12px"><b>' + dd.gongName + '(' + dd.gongZhi + '宫)</b> ' + dd.ageRange + ' · 大限干:' + dd.dGan + ' · 主星:' + dd.starText + '</div>';
+                if (dd.strengthText) v3Html += '<div style="font-size:10px;color:#888">庙旺：' + dd.strengthText + '</div>';
+                // 大限四化
+                if (dd.dSihua && dd.dSihua.length > 0) {
+                  v3Html += '<div style="font-size:10px;color:#9b59b6">大限四化：';
+                  for (var ds = 0; ds < dd.dSihua.length; ds++) {
+                    var dsh = dd.dSihua[ds];
+                    v3Html += dsh.type + '(' + dsh.star + ')入' + dsh.gongName + ' ';
+                  }
+                  v3Html += '</div>';
+                }
+                v3Html += '<div style="font-size:11px;color:' + ddColor + ';margin-top:4px">' + dd.overview + '</div>';
+                v3Html += '</div>';
+              }
+              v3Html += '</div>';
+            }
+          }
+        } catch(e3b) { console.warn('[大限详析失败]', e3b); }
         // V3概述与建议
         v3Html += '<div style="margin-bottom:8px;padding:8px;background:rgba(201,168,76,0.04);border-radius:6px"><b>V3概述：</b>' + v3Za.overview + '</div>';
         v3Html += '<div style="opacity:0.8"><b>V3建议：</b>' + v3Za.advice + '</div>';
