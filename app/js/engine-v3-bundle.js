@@ -4047,6 +4047,9 @@ function analyzeTiYong(benGua, movingYao, huGua, bianGua, season) {
   var huGuaJx  = _relJudgment(huUpperCode);
   var bianGuaJx = _relJudgment(bianGuaCode);
 
+  // ═══ R3.1: 体用生克细化 — tiYongDetail ═══
+  var tiYongDetail = _buildTiYongDetail(tiEle, yongEle, benGuaCode, huGua, bianGua, bianYongEle, bianGuaCode, tiName, yongName, tiWangshuai, yongWangshuai, season);
+
   return {
     ti: { name: tiName, element: tiEle, position: tiPosition, wangshuai: tiWangshuai },
     yong: { name: yongName, element: yongEle, position: yongPosition, wangshuai: yongWangshuai },
@@ -4059,7 +4062,139 @@ function analyzeTiYong(benGua, movingYao, huGua, bianGua, season) {
     score: score,
     level: level,
     season: season || null,
+    tiYongDetail: tiYongDetail,
   };
+}
+
+/**
+ * R3.1: 体用生克细化详情构建
+ */
+function _buildTiYongDetail(tiEle, yongEle, benGuaCode, huGua, bianYongEle, bianGuaCode, tiName, yongName, tiWs, yongWs, season) {
+  // 1. 本卦体用五行生克详细分析
+  var relTexts = {
+    'yongshengti': {
+      title: '用生体（大吉）',
+      desc: '用卦五行（' + yongEle + '）生体卦五行（' + tiEle + '），事物发展顺利，有外力帮助。'+
+            '所求之事多有贵人扶持，事半功倍，顺水推舟而成。',
+      advice: '宜把握时机，积极行动，顺势而为。',
+      luck: '大吉'
+    },
+    'tishengyong': {
+      title: '体生用（小凶）',
+      desc: '体卦五行（' + tiEle + '）生用卦五行（' + yongEle + '），精力外耗，付出多于收获。'+
+            '所求之事需投入大量精力，事倍功半，劳心劳力。',
+      advice: '宜量力而行，不可过度付出，留有余地。',
+      luck: '小凶'
+    },
+    'tikeyong': {
+      title: '体克用（小吉）',
+      desc: '体卦五行（' + tiEle + '）克用卦五行（' + yongEle + '），经过努力可成，需主动出击。'+
+            '所求之事在掌握之中，但需付出辛劳，以力胜之。',
+      advice: '宜主动出击，坚持不懈，以实力取胜。',
+      luck: '小吉'
+    },
+    'yongketi': {
+      title: '用克体（大凶）',
+      desc: '用卦五行（' + yongEle + '）克体卦五行（' + tiEle + '），阻碍重重，事难成就。'+
+            '所求之事外力压制，举步维艰，强求则招祸。',
+      advice: '宜暂避锋芒，待时转运，不可强行。',
+      luck: '大凶'
+    },
+    'bihe': {
+      title: '体用比和（中吉）',
+      desc: '体卦用卦五行同为' + tiEle + '，顺其自然，平稳发展。'+
+            '所求之事无大碍亦无大助，和顺平稳，水到渠成。',
+      advice: '宜保持现状，稳扎稳打，不可冒进。',
+      luck: '中吉'
+    }
+  };
+  var benGuaDetail = relTexts[benGuaCode] || relTexts['bihe'];
+
+  // 2. 互卦对体用的影响
+  var huUpperCode2 = getShengKeCode(tiEle, huGua.upperElement);
+  var huLowerCode2 = getShengKeCode(tiEle, huGua.lowerElement);
+  var huImpact = {
+    upperElement: huGua.upperElement,
+    upperRelation: shengKeText(huUpperCode2),
+    upperEffect: _huGuaEffectText(huUpperCode2, huGua.upperElement, tiEle),
+    lowerElement: huGua.lowerElement,
+    lowerRelation: shengKeText(huLowerCode2),
+    lowerEffect: _huGuaEffectText(huLowerCode2, huGua.lowerElement, tiEle),
+    summary: ''
+  };
+  var huHelpful = (huUpperCode2 === 'yongshengti' || huUpperCode2 === 'bihe') ? 1 : 0;
+  huHelpful += (huLowerCode2 === 'yongshengti' || huLowerCode2 === 'bihe') ? 1 : 0;
+  if (huHelpful === 2) {
+    huImpact.summary = '互卦上下皆生扶体卦，过程顺利，内在因素有利。';
+  } else if (huHelpful === 1) {
+    huImpact.summary = '互卦一正一偏，过程有波折但总体可控。';
+  } else {
+    huImpact.summary = '互卦上下皆不生体，过程艰难，内在因素不利。';
+  }
+
+  // 3. 变卦后的体用关系变化趋势
+  var bianDetail = relTexts[bianGuaCode] || relTexts['bihe'];
+  var trendDesc = '';
+  var luckOrder = {'大吉':5, '中吉':4, '小吉':3, '小凶':2, '大凶':1};
+  var benLuck = luckOrder[benGuaDetail.luck] || 3;
+  var bianLuck = luckOrder[bianDetail.luck] || 3;
+  if (bianLuck > benLuck) {
+    trendDesc = '变卦后体用关系转好，由「' + benGuaDetail.title + '」转为「' + bianDetail.title + '」，事情向好的方向发展，先苦后甜。';
+  } else if (bianLuck < benLuck) {
+    trendDesc = '变卦后体用关系转差，由「' + benGuaDetail.title + '」转为「' + bianDetail.title + '」，事情向不利方向发展，需防后患。';
+  } else {
+    trendDesc = '变卦后体用关系维持「' + benGuaDetail.title + '」格局，趋势平稳，无明显变化。';
+  }
+
+  // 4. 旺衰影响分析
+  var wangshuaiAnalysis = '';
+  if (tiWs && yongWs) {
+    var tiLevel = tiWs.state;
+    var yongLevel = yongWs.state;
+    var stateRank = {'旺':5, '相':4, '休':3, '囚':2, '死':1};
+    var tiRank = stateRank[tiLevel] || 3;
+    var yongRank = stateRank[yongLevel] || 3;
+    if (tiRank > yongRank) {
+      wangshuaiAnalysis = '体卦' + tiLevel + '而用卦' + yongLevel + '，体强用弱，于我有利，宜进取。';
+    } else if (tiRank < yongRank) {
+      wangshuaiAnalysis = '体卦' + tiLevel + '而用卦' + yongLevel + '，体弱用强，于我不利，宜守持。';
+    } else {
+      wangshuaiAnalysis = '体用皆为' + tiLevel + '，力量均衡，势均力敌，宜审时度势。';
+    }
+  }
+
+  return {
+    benGuaAnalysis: {
+      title: benGuaDetail.title,
+      desc: benGuaDetail.desc,
+      advice: benGuaDetail.advice,
+      luck: benGuaDetail.luck,
+      tiElement: tiEle,
+      yongElement: yongEle
+    },
+    huGuaImpact: huImpact,
+    bianGuaAnalysis: {
+      title: bianDetail.title,
+      desc: bianDetail.desc,
+      advice: bianDetail.advice,
+      luck: bianDetail.luck,
+      bianYongElement: bianYongEle,
+      trend: trendDesc
+    },
+    wangshuaiAnalysis: wangshuaiAnalysis || '未提供季节信息，无法判断旺衰。',
+    season: season || null
+  };
+}
+
+function _huGuaEffectText(code, huEle, tiEle) {
+  var map = {
+    'yongshengti': '互卦' + huEle + '生体' + tiEle + '——过程中有暗中助力，贵人暗扶',
+    'tishengyong': '体' + tiEle + '生互卦' + huEle + '——过程中精力被消耗，需防力不从心',
+    'bihe': '互卦' + huEle + '与体' + tiEle + '比和——过程平稳，无额外阻力',
+    'tikeyong': '体' + tiEle + '克互卦' + huEle + '——过程中阻力被我克服，化险为夷',
+    'yongketi': '互卦' + huEle + '克体' + tiEle + '——过程中遇内在阻碍，需防暗箭'
+  };
+  return map[code] || '影响待定';
 }
 
 function _relJudgment(code) {
@@ -4135,6 +4270,248 @@ function computeMeihuaFull(params) {
   };
 }
 
+/**
+ * R3.2: 梅花·断卦步骤完整化
+ * 完整断卦五步法：卦名释义 → 体用分析 → 互卦分析 → 变卦分析 → 断卦总结
+ *
+ * @param {object} params - 同 computeMeihuaFull 参数
+ * @returns {object} 包含完整断卦步骤的结果
+ */
+function analyzeMeihuaFull(params) {
+  // 先调用 computeMeihuaFull 获取基础排盘数据
+  var base = computeMeihuaFull(params);
+  var benGua = base.benGua;
+  var huGua = base.huGua;
+  var bianGua = base.bianGua;
+  var tiYong = base.tiYong;
+  var season = base.season;
+
+  // ═══ 第一步：卦名释义 ═══
+  var guaNameAnalysis = _buildGuaNameAnalysis(benGua);
+
+  // ═══ 第二步：体用分析（调用R3.1增强） ═══
+  var tiYongAnalysis = {
+    title: '体用分析',
+    tiGua: {
+      name: tiYong.ti.name,
+      element: tiYong.ti.element,
+      position: tiYong.ti.position,
+      wangshuai: tiYong.ti.wangshuai ? tiYong.ti.wangshuai.state : '未知',
+      wangshuaiDesc: tiYong.ti.wangshuai ? tiYong.ti.wangshuai.desc : ''
+    },
+    yongGua: {
+      name: tiYong.yong.name,
+      element: tiYong.yong.element,
+      position: tiYong.yong.position,
+      wangshuai: tiYong.yong.wangshuai ? tiYong.yong.wangshuai.state : '未知',
+      wangshuaiDesc: tiYong.yong.wangshuai ? tiYong.yong.wangshuai.desc : ''
+    },
+    relation: tiYong.benGuaRelation.text,
+    judgment: tiYong.benGuaRelation.judgment,
+    detail: tiYong.tiYongDetail ? tiYong.tiYongDetail.benGuaAnalysis : null,
+    wangshuaiAnalysis: tiYong.tiYongDetail ? tiYong.tiYongDetail.wangshuaiAnalysis : ''
+  };
+
+  // ═══ 第三步：互卦分析 ═══
+  var huGuaAnalysis = {
+    title: '互卦分析',
+    huGuaName: huGua.name,
+    huGuaSymbol: huGua.symbol,
+    upperName: huGua.upperName,
+    lowerName: huGua.lowerName,
+    upperElement: huGua.upperElement,
+    lowerElement: huGua.lowerElement,
+    judgment: huGua.judgment,
+    impact: tiYong.tiYongDetail ? tiYong.tiYongDetail.huGuaImpact : null,
+    desc: '互卦由本卦二三四爻（下互）与三四五爻（上互）组成，揭示事物发展过程中的内在因素与隐藏力量。'+
+          '互卦上卦' + huGua.upperName + '（' + huGua.upperElement + '），下卦' + huGua.lowerName + '（' + huGua.lowerElement + '）。'
+  };
+
+  // ═══ 第四步：变卦分析 ═══
+  var bianGuaAnalysis = {
+    title: '变卦分析',
+    bianGuaName: bianGua.name,
+    bianGuaSymbol: bianGua.symbol,
+    changedYao: bianGua.changedYao,
+    upperName: bianGua.upperName,
+    lowerName: bianGua.lowerName,
+    judgment: bianGua.judgment,
+    newRelation: tiYong.bianGuaRelation.text,
+    newJudgment: tiYong.bianGuaRelation.judgment,
+    detail: tiYong.tiYongDetail ? tiYong.tiYongDetail.bianGuaAnalysis : null,
+    desc: '变卦由本卦第' + bianGua.changedYao + '爻阴阳互变而来，揭示事物发展的最终趋势与结局。'+
+          '变卦后用卦变为' + (tiYong.bianGuaRelation.bianYongName || '未知') + '，体用关系转为「' + tiYong.bianGuaRelation.text + '」。'
+  };
+
+  // ═══ 第五步：断卦总结 ═══
+  var luckLevel = tiYong.level;
+  var luckGrade = _determineLuckGrade(tiYong.score);
+  var summaryAdvice = _buildSummaryAdvice(luckGrade, tiYong, guaNameAnalysis);
+
+  var conclusion = {
+    title: '断卦总结',
+    luckGrade: luckGrade,
+    score: tiYong.score,
+    level: luckLevel,
+    benGuaName: benGua.name,
+    bianGuaName: bianGua.name,
+    summary: _buildConclusionText(benGua, tiYong, luckGrade, season),
+    advice: summaryAdvice,
+    keyPoints: _buildKeyPoints(tiYong, huGua, bianGua)
+  };
+
+  return {
+    input: params,
+    steps: {
+      step1_guaName: guaNameAnalysis,
+      step2_tiYong: tiYongAnalysis,
+      step3_huGua: huGuaAnalysis,
+      step4_bianGua: bianGuaAnalysis,
+      step5_conclusion: conclusion
+    },
+    benGua: benGua,
+    huGua: huGua,
+    bianGua: bianGua,
+    tiYong: tiYong,
+    season: season
+  };
+}
+
+/**
+ * R3.2: 卦名释义
+ */
+function _buildGuaNameAnalysis(benGua) {
+  var kingWen = benGua.kingWen;
+  var info = HEXAGRAM_INFO[kingWen] || {};
+  var guaCi = info.judgment || '';
+  var upperSym = benGua.upperName;
+  var lowerSym = benGua.lowerName;
+  var guaName = benGua.name;
+
+  // 卦象组合含义
+  var compositionDesc = '';
+  var compositions = {
+    '乾乾': '乾为天——刚健中正，自强不息之象。',
+    '坤坤': '坤为地——厚德载物，柔顺包容之象。',
+    '震震': '震为雷——雷声震动，奋发有为之象。',
+    '巽巽': '巽为风——风行无阻，顺而入之之象。',
+    '坎坎': '坎为水——重险叠陷，需谨慎前行之象。',
+    '离离': '离为火——光明相继，明照四方之象。',
+    '艮艮': '艮为山——山重路阻，宜止不宜行之象。',
+    '兑兑': '兑为泽——喜悦相随，和悦待人之际。'
+  };
+  var key = upperSym + lowerSym;
+  compositionDesc = compositions[key] || (upperSym + '上' + lowerSym + '下——' + (TRIGRAM_ELEMENT[upperSym] || '') + '与' + (TRIGRAM_ELEMENT[lowerSym] || '') + '相配。');
+
+  // 彖辞白话解读（简化版）
+  var tuanText = '';
+  var tuanMap = {
+    1: '大哉乾元，万物资始——乾卦象征天的刚健之力，万物由此开始。',
+    2: '至哉坤元，万物资生——坤卦象征地的柔顺之德，万物由此生长。',
+    3: '刚柔始交而难生——屯卦象征初创之难，万事开头难。',
+    4: '蒙，山下有险——蒙卦象征蒙昧待启，需教育引导。',
+    11: '天地交而万物通——泰卦象征天地交融，万事亨通。',
+    12: '天地不交而万物不通——否卦象征天地隔绝，万事闭塞。',
+    63: '既济，亨小——既济象征事已成功，但需防患于未然。',
+    64: '未济，亨——未济象征事未完成，仍需努力。'
+  };
+  tuanText = tuanMap[kingWen] || ('卦辞：' + guaCi + '。此卦寓意需结合体用生克综合判断。');
+
+  // 大象传
+  var xiangText = '';
+  var xiangMap = {
+    1: '天行健，君子以自强不息。',
+    2: '地势坤，君子以厚德载物。',
+    3: '云雷屯，君子以经纶。',
+    4: '山下出泉，蒙，君子以果行育德。',
+    5: '云上于天，需，君子以饮食宴乐。',
+    6: '天与水违行，讼，君子以作事谋始。',
+    7: '地中有水，师，君子以容民畜众。',
+    8: '地上有水，比，先王以建万国亲诸侯。',
+    11: '天地交，泰，后以财成天地之道。',
+    12: '天地不交，否，君子以俭德辟难。'
+  };
+  xiangText = xiangMap[kingWen] || (TRIGRAM_SYMBOL[upperSym] + '上' + TRIGRAM_SYMBOL[lowerSym] + '下，君子观此象以修身处事。');
+
+  return {
+    title: '卦名释义',
+    guaName: guaName,
+    guaSymbol: benGua.symbol,
+    guaCi: guaCi,
+    composition: compositionDesc,
+    tuan: tuanText,
+    xiang: xiangText,
+    upperTrigram: upperSym,
+    lowerTrigram: lowerSym
+  };
+}
+
+/**
+ * R3.2: 判断吉凶等级
+ */
+function _determineLuckGrade(score) {
+  if (score >= 85) return '大吉';
+  if (score >= 70) return '吉';
+  if (score >= 50) return '中';
+  if (score >= 35) return '凶';
+  return '大凶';
+}
+
+/**
+ * R3.2: 构建总结建议
+ */
+function _buildSummaryAdvice(luckGrade, tiYong, guaNameAnalysis) {
+  var advices = {
+    '大吉': '万事亨通，宜积极进取，把握良机。' + guaNameAnalysis.guaName + '卦象大吉，可放手施为。',
+    '吉': '事可成，宜稳步推进。虽有「' + (tiYong.benGuaRelation ? tiYong.benGuaRelation.text : '') + '」之象，但总体向好。',
+    '中': '吉凶参半，宜审时度势，不可冒进。需观变卦趋势再定行止。',
+    '凶': '事多阻碍，宜守不宜攻。暂避锋芒，待时转运。',
+    '大凶': '事不可为，宜止不宜行。强求招祸，宜静待时机转变。'
+  };
+  return advices[luckGrade] || advices['中'];
+}
+
+/**
+ * R3.2: 构建结论文本
+ */
+function _buildConclusionText(benGua, tiYong, luckGrade, season) {
+  var parts = [];
+  parts.push('本卦为「' + benGua.name + '」' + benGua.symbol);
+  if (tiYong.benGuaRelation) {
+    parts.push('体用关系为「' + tiYong.benGuaRelation.text + '」');
+  }
+  if (tiYong.bianGuaRelation) {
+    parts.push('变卦后体用转为「' + tiYong.bianGuaRelation.text + '」');
+  }
+  if (season) {
+    if (tiYong.ti && tiYong.ti.wangshuai) {
+      parts.push('体卦于' + season + '季为「' + tiYong.ti.wangshuai.state + '」');
+    }
+  }
+  parts.push('综合判断：' + luckGrade);
+  return parts.join('，') + '。';
+}
+
+/**
+ * R3.2: 构建要点
+ */
+function _buildKeyPoints(tiYong, huGua, bianGua) {
+  var points = [];
+  if (tiYong.benGuaRelation) {
+    points.push('本卦体用：' + tiYong.benGuaRelation.text + '——' + tiYong.benGuaRelation.judgment);
+  }
+  if (tiYong.huGuaRelation && tiYong.huGuaRelation.upper) {
+    points.push('互卦上对体：' + tiYong.huGuaRelation.upper.text + '——' + tiYong.huGuaRelation.upper.judgment);
+  }
+  if (tiYong.bianGuaRelation) {
+    points.push('变卦体用：' + tiYong.bianGuaRelation.text + '——' + tiYong.bianGuaRelation.judgment);
+  }
+  if (tiYong.tiYongDetail && tiYong.tiYongDetail.wangshuaiAnalysis) {
+    points.push('旺衰分析：' + tiYong.tiYongDetail.wangshuaiAnalysis);
+  }
+  return points;
+}
+
 
 // ═══════════════════════════════════════════════
 //  导出
@@ -4161,6 +4538,8 @@ window.MeihuaV3 = {
     analyzeTiYong,
     // 完整断卦
     computeMeihuaFull,
+    // R3.2: 完整断卦步骤
+    analyzeMeihuaFull,
   };
 };
 
