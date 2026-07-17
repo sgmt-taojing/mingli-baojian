@@ -35391,12 +35391,294 @@ function buildWuxingQuantifyHTML(pillars, dayStem) {
   return html;
 }
 
+// ═══ R1.3: 大运分项详析 ═══
+function buildDayunDetailedAnalysis(pillars, dayStem, dayun) {
+  if (!dayun || !Array.isArray(dayun) || dayun.length === 0) return '';
+  var dayEle = ELE[dayStem];
+  var yinEle = null;
+  for (var k in WUXING_SHENG) { if (WUXING_SHENG[k] === dayEle) yinEle = k; }
+  var shangEle = WUXING_SHENG[dayEle];
+  var caiEle = WUXING_KE[dayEle];
+  var guanEle = null;
+  for (var k2 in WUXING_KE) { if (WUXING_KE[k2] === dayEle) guanEle = k2; }
+
+  // 大运与命柱的互动检测
+  function checkInteractions(dyGan, dyZhi) {
+    var interactions = [];
+    var pillarStems = pillars.map(function(p){return p.stem;});
+    var pillarBranches = pillars.map(function(p){return p.branch;});
+    // 天克地冲
+    for (var pi = 0; pi < 4; pi++) {
+      var stemKe = (WUXING_KE[dyGan] === ELE[pillars[pi].stem]);
+      var branchChong = (Math.abs(dyZhi.charCodeAt(0) - pillars[pi].branch.charCodeAt(0)) === 6);
+      if (stemKe && branchChong) {
+        interactions.push({type:'天克地冲', target: pillars[pi].name + pillars[pi].stem + pillars[pi].branch, impact:'严重'});
+      }
+    }
+    // 天合地合
+    var heStems = {甲:'己',乙:'庚',丙:'辛',丁:'壬',戊:'癸',己:'甲',庚:'乙',辛:'丙',壬:'丁',癸:'戊'};
+    var heBranches = {子:'丑',丑:'子',寅:'亥',卯:'戌',辰:'酉',巳:'申',午:'未',未:'午',申:'巳',酉:'辰',戌:'卯',亥:'寅'};
+    if (heStems[dyGan]) {
+      for (var pi2 = 0; pi2 < 4; pi2++) {
+        if (pillars[pi2].stem === heStems[dyGan]) {
+          interactions.push({type:'天干合', target: pillars[pi2].name + pillars[pi2].stem, impact:'中等'});
+        }
+      }
+    }
+    if (heBranches[dyZhi]) {
+      for (var pi3 = 0; pi3 < 4; pi3++) {
+        if (pillars[pi3].branch === heBranches[dyZhi]) {
+          interactions.push({type:'地支合', target: pillars[pi3].name + pillars[pi3].branch, impact:'中等'});
+        }
+      }
+    }
+    // 相冲
+    var chongMap = {子:'午',丑:'未',寅:'申',卯:'酉',辰:'戌',巳:'亥',午:'子',未:'丑',申:'寅',酉:'卯',戌:'辰',亥:'巳'};
+    if (chongMap[dyZhi]) {
+      for (var pi4 = 0; pi4 < 4; pi4++) {
+        if (pillars[pi4].branch === chongMap[dyZhi]) {
+          interactions.push({type:'地支冲', target: pillars[pi4].name + pillars[pi4].branch, impact:'严重'});
+        }
+      }
+    }
+    return interactions;
+  }
+
+  // 大运分项分析
+  function analyzeDayunItem(d) {
+    var ganEle = ELE[d.gan] || ELE[d.stem];
+    var zhiEle = ZHI_ELE[d.zhi] || ZHI_ELE[d.branch];
+    var gan = d.gan || d.stem;
+    var zhi = d.zhi || d.branch;
+    var ganShen = getTenGod(gan, null, dayStem);
+    // 判断喜忌
+    var ganIsXi = (ganEle === shangEle || ganEle === caiEle || ganEle === guanEle) && !isStrong;
+    var ganIsXi2 = (ganEle === yinEle || ganEle === dayEle) && isStrong === false;
+    var zhiIsXi = (zhiEle === shangEle || zhiEle === caiEle || zhiEle === guanEle) && !isStrong;
+    var zhiIsXi2 = (zhiEle === yinEle || zhiEle === dayEle) && isStrong === false;
+    var ganXi = isStrong ? (ganEle === shangEle || ganEle === caiEle || ganEle === guanEle) : (ganEle === yinEle || ganEle === dayEle);
+    var zhiXi = isStrong ? (zhiEle === shangEle || zhiEle === caiEle || zhiEle === guanEle) : (zhiEle === yinEle || zhiEle === dayEle);
+    var ganJi = isStrong ? (ganEle === yinEle || ganEle === dayEle) : (ganEle === shangEle || ganEle === caiEle || ganEle === guanEle);
+    var zhiJi = isStrong ? (zhiEle === yinEle || zhiEle === dayEle) : (zhiEle === shangEle || zhiEle === caiEle || zhiEle === guanEle);
+    var isStrong = false; // will be set below
+    // 需要日主旺衰来判断喜忌，从外部获取
+    var power = getWuXingPower(pillars, dayStem);
+    isStrong = power.ratio >= 0.5;
+    ganXi = isStrong ? (ganEle === shangEle || ganEle === caiEle || ganEle === guanEle) : (ganEle === yinEle || ganEle === dayEle);
+    zhiXi = isStrong ? (zhiEle === shangEle || zhiEle === caiEle || zhiEle === guanEle) : (zhiEle === yinEle || zhiEle === dayEle);
+    ganJi = isStrong ? (ganEle === yinEle || ganEle === dayEle) : (ganEle === shangEle || ganEle === caiEle || ganEle === guanEle);
+    zhiJi = isStrong ? (zhiEle === yinEle || zhiEle === dayEle) : (zhiEle === shangEle || zhiEle === caiEle || zhiEle === guanEle);
+
+    var interactions = checkInteractions(gan, zhi);
+
+    // 天干管前五年
+    var ganAnalysis = '';
+    if (ganXi) {
+      ganAnalysis = '天干' + gan + '(' + ganEle + ')为喜神，前五年运势向好。' +
+        (ganShen === '正官' || ganShen === '七杀' ? '官杀克身，事业有压力但亦有动力，宜主动担当。' : '') +
+        (ganShen === '正印' || ganShen === '偏印' ? '印星生身，贵人扶持，学业和名声有提升。' : '') +
+        (ganShen === '比肩' || ganShen === '劫财' ? '比劫帮身，人际活跃，但需防破财。' : '') +
+        (ganShen === '食神' || ganShen === '伤官' ? '食伤泄秀，才华发挥，适合创作和表达。' : '') +
+        (ganShen === '正财' || ganShen === '偏财' ? '财星耗身，有进财之机但需量力而行。' : '');
+    } else if (ganJi) {
+      ganAnalysis = '天干' + gan + '(' + ganEle + ')为忌神，前五年运势受阻。' +
+        (ganShen === '正官' || ganShen === '七杀' ? '官杀克身过重，事业压力倍增，宜低调蛰伏。' : '') +
+        (ganShen === '正印' || ganShen === '偏印' ? '印星过旺，依赖心重，行动力不足。' : '') +
+        (ganShen === '比肩' || ganShen === '劫财' ? '比劫争财，破财风险大，不宜合伙。' : '') +
+        (ganShen === '食神' || ganShen === '伤官' ? '食伤泄气过重，精力分散，需专注。' : '') +
+        (ganShen === '正财' || ganShen === '偏财' ? '财星为忌，贪财招灾，宜知足。' : '');
+    } else {
+      ganAnalysis = '天干' + gan + '(' + ganEle + ')中性平利，前五年运势平稳。';
+    }
+
+    // 地支管后五年
+    var zhiAnalysis = '';
+    if (zhiXi) {
+      zhiAnalysis = '地支' + zhi + '(' + zhiEle + ')为喜神，后五年运势渐佳。';
+    } else if (zhiJi) {
+      zhiAnalysis = '地支' + zhi + '(' + zhiEle + ')为忌神，后五年需谨慎。';
+    } else {
+      zhiAnalysis = '地支' + zhi + '(' + zhiEle + ')中性，后五年平稳过渡。';
+    }
+
+    // 分项分析
+    var careerScore = 5, wealthScore = 5, healthScore = 5, marriageScore = 5;
+    var careerText = '', wealthText = '', healthText = '', marriageText = '';
+
+    // 事业：看官杀
+    if (ganShen === '正官' || ganShen === '七杀') {
+      careerScore = ganXi ? 8 : 4;
+      careerText = (ganXi ? '官杀为喜，事业有晋升和掌权之机，宜积极进取。' : '官杀为忌，事业压力大，谨防官非口舌。');
+    } else if (ganShen === '正印' || ganShen === '偏印') {
+      careerScore = ganXi ? 7 : 5;
+      careerText = (ganXi ? '印星护身，工作稳定，有贵人提携。' : '印星过旺，工作安逸但缺乏突破。');
+    } else if (ganShen === '食神' || ganShen === '伤官') {
+      careerScore = ganXi ? 7 : 4;
+      careerText = (ganXi ? '食伤泄秀，才华得以发挥，适合创意类工作。' : '食伤过旺，心高气傲，易与上司不合。');
+    } else if (ganShen === '比肩' || ganShen === '劫财') {
+      careerScore = ganXi ? 6 : 4;
+      careerText = (ganXi ? '比劫帮身，团队协作顺利。' : '比劫争财，竞争激烈，需防小人。');
+    } else if (ganShen === '正财' || ganShen === '偏财') {
+      careerScore = ganXi ? 7 : 5;
+      careerText = (ganXi ? '财星生官，事业有成。' : '财星为忌，贪利忘义，因财招灾。');
+    }
+
+    // 财运：看财星
+    if (ganShen === '正财' || ganShen === '偏财') {
+      wealthScore = ganXi ? 9 : 3;
+      wealthText = (ganXi ? '财星当值，财运亨通，是求财的好时机。' : '财多身弱，求财辛苦，谨防因财致祸。');
+    } else if (ganShen === '食伤' || ganShen === '食神' || ganShen === '伤官') {
+      wealthScore = ganXi ? 7 : 5;
+      wealthText = (ganXi ? '食伤生财，凭才华赚钱，财源广进。' : '泄身太过，财来财去。');
+    } else if (ganShen === '比肩' || ganShen === '劫财') {
+      wealthScore = ganXi ? 5 : 3;
+      wealthText = (ganXi ? '比劫帮身可合伙求财。' : '比劫夺财，破财风险大，不宜投资。');
+    } else {
+      wealthScore = 5;
+      wealthText = '财运平稳，量入为出。';
+    }
+
+    // 健康：看五行生克
+    var keEle = WUXING_KE[dayEle];
+    if (ganEle === keEle) {
+      healthScore = 3;
+      healthText = '大运天干' + ganEle + '克日主' + dayEle + '，' + ({木:'肝胆',火:'心脏',土:'脾胃',金:'肺',水:'肾'}[dayEle]) + '系统需特别注意。';
+    } else if (ganEle === yinEle) {
+      healthScore = 8;
+      healthText = '印星生身，身体有护佑，精力充沛。';
+    } else if (ganEle === dayEle) {
+      healthScore = 7;
+      healthText = '比劫帮身，体质增强。';
+    } else {
+      healthScore = 6;
+      healthText = '健康平稳，注意日常保养。';
+    }
+
+    // 婚姻：看财官和夫妻宫
+    var dayBranch = pillars[2].branch;
+    var chongDayBranch = chongMap[zhi] === dayBranch;
+    var heDayBranch = heBranches[zhi] === dayBranch;
+    if (ganShen === '正财' || ganShen === '偏财' || ganShen === '正官' || ganShen === '七杀') {
+      marriageScore = ganXi ? 8 : 4;
+      marriageText = (ganXi ? '财官星动，感情有发展机遇。' : '财官为忌，感情波折，需防第三者。');
+    } else if (chongDayBranch) {
+      marriageScore = 3;
+      marriageText = '大运地支冲夫妻宫，婚姻动荡，需多沟通包容。';
+    } else if (heDayBranch) {
+      marriageScore = 8;
+      marriageText = '大运地支合夫妻宫，感情升温，已婚者恩爱，未婚者有姻缘。';
+    } else {
+      marriageScore = 6;
+      marriageText = '婚姻平稳，无大波折。';
+    }
+
+    return {
+      gan: gan, zhi: zhi, ganEle: ganEle, zhiEle: zhiEle, ganShen: ganShen,
+      ganXi: ganXi, zhiXi: zhiXi, ganJi: ganJi, zhiJi: zhiJi,
+      ganAnalysis: ganAnalysis, zhiAnalysis: zhiAnalysis,
+      careerScore: careerScore, careerText: careerText,
+      wealthScore: wealthScore, wealthText: wealthText,
+      healthScore: healthScore, healthText: healthText,
+      marriageScore: marriageScore, marriageText: marriageText,
+      interactions: interactions
+    };
+  }
+
+  // 合冲刑害辅助表
+  var chongMap = {子:'午',丑:'未',寅:'申',卯:'酉',辰:'戌',巳:'亥',午:'子',未:'丑',申:'寅',酉:'卯',戌:'辰',亥:'巳'};
+  var heStems2 = {甲:'己',乙:'庚',丙:'辛',丁:'壬',戊:'癸',己:'甲',庚:'乙',辛:'丙',壬:'丁',癸:'戊'};
+  var heBranches2 = {子:'丑',丑:'子',寅:'亥',卯:'戌',辰:'酉',巳:'申',午:'未',未:'午',申:'巳',酉:'辰',戌:'卯',亥:'寅'};
+
+  // 修正函数中的局部chongMap和heBranches引用
+  // 实际上analyzeDayunItem中已经定义了局部变量，这里提供全局备用
+
+  var html = '';
+  html += '<div class="interp-card" style="background:linear-gradient(135deg,rgba(52,152,219,.06),rgba(155,89,182,.03));border:1px solid rgba(52,152,219,.15);border-radius:10px;padding:16px;margin-bottom:14px">';
+  html += '<div style="font-size:14px;font-weight:bold;color:#3498db;margin-bottom:10px;letter-spacing:2px">🔮 大运分项详析</div>';
+  html += '<div style="font-size:11px;color:#888;margin-bottom:12px">天干管前五年·地支管后五年·每运含事业/财运/健康/感情分项</div>';
+
+  // 取前6步大运分析
+  var maxItems = Math.min(dayun.length, 6);
+  for (var di = 0; di < maxItems; di++) {
+    var d = dayun[di];
+    var gan = d.gan || d.stem;
+    var zhi = d.zhi || d.branch;
+    if (!gan || !zhi) continue;
+    var analysis = analyzeDayunItem(d);
+    var ageRange = (d.ageStart || d.age || '?') + '-' + (d.ageEnd || '?') + '岁';
+    var yearRange = (d.yearStart || '?') + '-' + (d.yearEnd || '?') + '年';
+
+    // 喜忌颜色
+    var overallColor = analysis.ganXi ? '#27ae60' : analysis.ganJi ? '#e74c3c' : '#f39c12';
+    var overallLabel = analysis.ganXi ? '喜神运' : analysis.ganJi ? '忌神运' : '平运';
+
+    html += '<div style="margin-bottom:14px;padding:12px;background:rgba(255,255,255,.02);border-radius:8px;border-left:3px solid ' + overallColor + '">';
+    // 大运头
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">';
+    html += '<span style="font-size:16px;font-weight:bold;color:' + overallColor + '">' + gan + zhi + '</span>';
+    html += '<span style="font-size:11px;color:#888">' + ageRange + ' · ' + yearRange + '</span>';
+    html += '<span style="font-size:11px;padding:2px 8px;border-radius:8px;background:' + overallColor + ';color:#fff">' + overallLabel + '</span>';
+    html += '<span style="font-size:11px;color:#888;margin-left:auto">十神：' + analysis.ganShen + '</span>';
+    html += '</div>';
+
+    // 天干/地支分管
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">';
+    html += '<div style="padding:8px;background:rgba(52,152,219,.04);border-radius:6px"><b style="color:#3498db;font-size:11px">天干' + gan + '(管前5年)</b><div style="font-size:10px;color:var(--paper2);margin-top:4px;line-height:1.6">' + analysis.ganAnalysis + '</div></div>';
+    html += '<div style="padding:8px;background:rgba(155,89,182,.04);border-radius:6px"><b style="color:#9b59b6;font-size:11px">地支' + zhi + '(管后5年)</b><div style="font-size:10px;color:var(--paper2);margin-top:4px;line-height:1.6">' + analysis.zhiAnalysis + '</div></div>';
+    html += '</div>';
+
+    // 四维评分
+    html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px">';
+    var dims = [
+      {name:'事业', score:analysis.careerScore, text:analysis.careerText, color:'#2980b9'},
+      {name:'财运', score:analysis.wealthScore, text:analysis.wealthText, color:'#c9a84c'},
+      {name:'健康', score:analysis.healthScore, text:analysis.healthText, color:'#27ae60'},
+      {name:'感情', score:analysis.marriageScore, text:analysis.marriageText, color:'#e74c3c'}
+    ];
+    for (var dm = 0; dm < 4; dm++) {
+      var stars = '★'.repeat(Math.floor(dims[dm].score/2)) + '☆'.repeat(5 - Math.floor(dims[dm].score/2));
+      html += '<div style="padding:6px;background:rgba(255,255,255,.02);border-radius:4px;text-align:center">';
+      html += '<div style="font-size:10px;color:#888">' + dims[dm].name + '</div>';
+      html += '<div style="font-size:11px;color:' + dims[dm].color + '">' + stars + '</div>';
+      html += '</div>';
+    }
+    html += '</div>';
+
+    // 分项文案
+    html += '<div style="font-size:10px;color:var(--paper2);line-height:1.6">';
+    html += '💼 ' + analysis.careerText + ' ';
+    html += '💰 ' + analysis.wealthText + ' ';
+    html += '🏥 ' + analysis.healthText + ' ';
+    html += '💕 ' + analysis.marriageText;
+    html += '</div>';
+
+    // 互动提示
+    if (analysis.interactions.length > 0) {
+      html += '<div style="margin-top:6px;font-size:10px;color:#e67e22">';
+      for (var ii = 0; ii < analysis.interactions.length; ii++) {
+        var int = analysis.interactions[ii];
+        html += '⚠️ ' + int.type + '(' + int.target + ') ';
+      }
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
 function injectBaziEnhancedAnalysis(pillars, dayStem, dayBranch) {
   var html = '';
   // 0. 五行力量精确量化（R1.1）
   try {
     html += buildWuxingQuantifyHTML(pillars, dayStem);
   } catch(e) { console.warn('[五行量化分析失败]', e.message); }
+  // 0.2 大运分项详析（R1.3）
+  try {
+    if (window._currentDayun && Array.isArray(window._currentDayun)) {
+      html += buildDayunDetailedAnalysis(pillars, dayStem, window._currentDayun);
+    }
+  } catch(e) { console.warn('[大运详析失败]', e.message); }
   // 1. 合冲刑害深度分析
   try {
     var hc = analyzeHeChong(pillars);
