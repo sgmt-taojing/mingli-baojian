@@ -3206,6 +3206,112 @@ function analyzeLiuyao(params) {
     }
   };
 
+  // ═══ R2.7: 月令综合旺衰 + 旬空判断 ═══
+  // 1. 月令综合旺衰：月建五行对用神的旺衰影响（旺/相/休/囚/死）
+  var monthZhi = params.monthZhi || '';
+  var monthWX = ZHI_WX[monthZhi] || '';
+  var monthWangShuai = null;
+  if (monthZhi && yongshenWX) {
+    var wsLevel = '', wsDesc = '';
+    if (monthWX === yongshenWX) {
+      wsLevel = '旺'; wsDesc = '月建与用神同类五行，旺相有力';
+    } else if (WX_SHENG[monthWX] === yongshenWX) {
+      wsLevel = '相'; wsDesc = '月建生用神，相生得助，有月令贵人';
+    } else if (WX_SHENG[yongshenWX] === monthWX) {
+      wsLevel = '休'; wsDesc = '用神生月建，泄气休废，力量减弱';
+    } else if (WX_KE[yongshenWX] === monthWX) {
+      wsLevel = '囚'; wsDesc = '用神克月建，囚禁受制，事难遂愿';
+    } else if (WX_KE[monthWX] === yongshenWX) {
+      wsLevel = '死'; wsDesc = '月建克用神，死地无气，事不可为';
+    }
+    // 月建与日辰合参
+    var dayWsLevel = wangShuai.level || '';
+    var combinedDesc = '月建' + monthZhi + '(' + monthWX + ')对用神(' + yongshenWX + ')为「' + wsLevel + '」，日辰' + dayZhi + '(' + dayWX + ')为「' + dayWsLevel + '」。「月建为六爻之提纲，日辰为六爻之主宰」——';
+    if ((wsLevel === '旺' || wsLevel === '相') && (dayWsLevel === '旺' || dayWsLevel === '相')) {
+      combinedDesc += '月日均生扶用神，用神旺相有力，断卦大吉。';
+    } else if ((wsLevel === '旺' || wsLevel === '相') && (dayWsLevel === '死' || dayWsLevel === '囚')) {
+      combinedDesc += '月令虽扶但日辰克伐，吉中有阻，需防暗变。';
+    } else if ((wsLevel === '死' || wsLevel === '囚') && (dayWsLevel === '旺' || dayWsLevel === '相')) {
+      combinedDesc += '月令虽克但日辰生扶，凶中有救，事可缓图。';
+    } else if ((wsLevel === '死' || wsLevel === '囚') && (dayWsLevel === '死' || dayWsLevel === '囚')) {
+      combinedDesc += '月日均克制用神，用神衰弱无气，断卦不吉。';
+    } else {
+      combinedDesc += '月日对用神力量中和，断卦中平。';
+    }
+    monthWangShuai = {
+      monthZhi: monthZhi,
+      monthWX: monthWX,
+      yongshenWX: yongshenWX,
+      monthLevel: wsLevel,
+      monthDesc: wsDesc,
+      dayLevel: dayWsLevel,
+      combinedDesc: combinedDesc
+    };
+  }
+
+  // 2. 旬空判断：基于日干支推算旬空地支
+  var dayGanZhi = (dayGan || '') + (dayZhi || '');
+  var xunKong = [];
+  var xunKongDesc = '';
+  // 六十甲子旬空表
+  var XUN_KONG_MAP = {
+    '甲子': ['戌','亥'], '甲戌': ['申','酉'], '甲申': ['午','未'],
+    '甲午': ['辰','巳'], '甲辰': ['寅','卯'], '甲寅': ['子','丑']
+  };
+  // 找到日干支所在旬
+  var ganIdx = TIAN_GAN.indexOf(dayGan);
+  var zhiIdx = DI_ZHI.indexOf(dayZhi);
+  if (ganIdx >= 0 && zhiIdx >= 0) {
+    // 旬首：甲子/甲戌/甲申/甲午/甲辰/甲寅
+    var xunStartIdx = ganIdx; // 旬首天干索引（甲=0）
+    // 日干支在六十甲子中的序号
+    var jiaziIdx = (ganIdx * 10 - ganIdx + zhiIdx + 60) % 60;
+    // 简化：直接根据天干找旬首
+    var xunGan = '甲';
+    // 旬首地支 = 日支往前推到与甲配对
+    var offset = ganIdx; // 日干到甲的距离
+    var xunZhiIdx = (zhiIdx - offset + 12) % 12;
+    var xunKey = xunGan + DI_ZHI[xunZhiIdx];
+    xunKong = XUN_KONG_MAP[xunKey] || [];
+    xunKongDesc = xunKong.length === 2 ? ('旬空(' + xunKey + '旬)：' + xunKong[0] + '、' + xunKong[1]) : '';
+  }
+
+  // 标注空亡爻，判断真空vs假空
+  var kongWang = { xunKong: xunKong, xunKongDesc: xunKongDesc, yaos: [] };
+  if (xunKong.length === 2) {
+    for (var kwi = 0; kwi < yaos.length; kwi++) {
+      var kyao = yaos[kwi];
+      if (xunKong.indexOf(kyao.zhi) >= 0) {
+        // 判断真空/假空：旺相之爻空为假空（有空不空），休囚之爻空为真空
+        var kyaoWs = judgeWangShuai(kyao.wuxing, dayWX);
+        var kongType = '';
+        var kongDesc = '';
+        if (kyaoWs.level === '旺' || kyaoWs.level === '相') {
+          kongType = '假空';
+          kongDesc = '旺相之爻逢空，假空——暂时落空，待出空之日即可发挥作用';
+        } else if (kyaoWs.level === '休' || kyaoWs.level === '囚') {
+          kongType = '休空';
+          kongDesc = '休囚之爻逢空，力量更弱，需待旺月出空方有转机';
+        } else if (kyaoWs.level === '死') {
+          kongType = '真空';
+          kongDesc = '死地之爻逢空，真空——彻底无用，事不可成';
+        } else {
+          kongType = '空亡';
+          kongDesc = '爻逢空亡，力量受限';
+        }
+        kongWang.yaos.push({
+          pos: kyao.pos, name: kyao.name, zhi: kyao.zhi,
+          liuqin: kyao.liuqin, wuxing: kyao.wuxing,
+          wangShuai: kyaoWs.level, kongType: kongType, desc: kongDesc,
+          isYongshen: kyao.isYongshen
+        });
+      }
+    }
+    if (kongWang.yaos.length === 0) {
+      kongWang.note = '卦中无爻落入旬空';
+    }
+  }
+
   // 断卦综合判断
   var yuanJiSummary = '';
   var hasYuan = yuanYao && (yuanWangShuai === '旺' || yuanWangShuai === '相');
@@ -3234,7 +3340,10 @@ function analyzeLiuyao(params) {
     yuanJiSummary: yuanJiSummary,
     yuanShenWX: yuanWX,
     jiShenWX: jiWX,
-    chouShenWX: chouWX
+    chouShenWX: chouWX,
+    // R2.7: 月令旺衰 + 旬空
+    monthWangShuai: monthWangShuai,
+    kongWang: kongWang
   };
 }
 
