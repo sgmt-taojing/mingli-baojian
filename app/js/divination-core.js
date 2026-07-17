@@ -5721,16 +5721,61 @@ function getBranchTenGods(branch, dayStem) {
 function getWuXingPower(pillars, dayStem) {
   var dayEle = ELE[dayStem];
   var scores = {'木':0, '火':0, '土':0, '金':0, '水':0};
+  var detailLog = []; // 量化明细日志
   
   // 藏干本气/中气/余气权重
   var cangganMap = {'子':['癸'],'丑':['己','癸','辛'],'寅':['甲','丙','戊'],'卯':['乙'],'辰':['戊','乙','癸'],'巳':['丙','庚','戊'],'午':['丁','己'],'未':['己','丁','乙'],'申':['庚','壬','戊'],'酉':['辛'],'戌':['戊','辛','丁'],'亥':['壬','甲']};
-  var weights = [1, 0.5, 0.2]; // 本气/中气/余气
+  var weights = [1.0, 0.5, 0.2]; // 本气/中气/余气
+  
+  // ═══ 月令旺相休囚死权重系数 ═══
+  // 当令者旺(×3.0)，我生者相(×2.0)，生我者休(×1.5)，克我者囚(×0.5)，我克者死(×0.3)
+  var WX_WANGXIU = {'木':{旺:'寅卯',相:'巳午',休:'亥子',囚:'申酉',死:'辰戌丑未'},'火':{旺:'巳午',相:'辰戌丑未',休:'寅卯',囚:'亥子',死:'申酉'},'土':{旺:'辰戌丑未',相:'申酉',休:'巳午',囚:'寅卯',死:'亥子'},'金':{旺:'申酉',相:'亥子',休:'辰戌丑未',囚:'巳午',死:'寅卯'},'水':{旺:'亥子',相:'寅卯',休:'申酉',囚:'辰戌丑未',死:'巳午'}};
+  var monthBranch = pillars[1].branch;
+  var monthEle = ZHI_ELE[monthBranch];
+  // 计算月令对各五行的权重系数
+  var monthWeight = {'木':1.0,'火':1.0,'土':1.0,'金':1.0,'水':1.0};
+  for (var we in WX_WANGXIU) {
+    if (!WX_WANGXIU.hasOwnProperty(we)) continue;
+    var st = WX_WANGXIU[we];
+    if (st.旺.indexOf(monthBranch) >= 0) monthWeight[we] = 3.0;
+    else if (st.相.indexOf(monthBranch) >= 0) monthWeight[we] = 2.0;
+    else if (st.休.indexOf(monthBranch) >= 0) monthWeight[we] = 1.5;
+    else if (st.囚.indexOf(monthBranch) >= 0) monthWeight[we] = 0.5;
+    else if (st.死.indexOf(monthBranch) >= 0) monthWeight[we] = 0.3;
+  }
+  detailLog.push('月令' + monthBranch + '(' + monthEle + '气)：旺相休囚死权重 ' + Object.entries(monthWeight).map(function(e){return e[0]+'×'+e[1];}).join('，'));
+  
+  // ═══ 透干有力判定 ═══
+  // 天干在四柱中透出，且地支有根（通根），则力量加权
+  var stemSet = {};
+  for (var si = 0; si < pillars.length; si++) {
+    stemSet[pillars[si].stem] = (stemSet[pillars[si].stem] || 0) + 1;
+  }
   
   for (var pi = 0; pi < pillars.length; pi++) {
     var p = pillars[pi];
-    // 天干+1
+    // 天干基础分+1
     var stemEle = ELE[p.stem];
-    scores[stemEle] += 1;
+    var stemBase = 1.0;
+    // 透干有力：天干在月支或日支有通根，加权0.5
+    var hasRoot = false;
+    var cgList0 = cangganMap[p.branch] || [];
+    for (var ri = 0; ri < cgList0.length; ri++) {
+      if (ELE[cgList0[ri]] === stemEle) { hasRoot = true; break; }
+    }
+    // 检查月支通根
+    var monthCg = cangganMap[monthBranch] || [];
+    for (var ri2 = 0; ri2 < monthCg.length; ri2++) {
+      if (ELE[monthCg[ri2]] === stemEle) { hasRoot = true; break; }
+    }
+    if (hasRoot) {
+      stemBase += 0.5;
+      detailLog.push(p.name + '天干' + p.stem + '(' + stemEle + ')透干有力，通根加权+0.5');
+    }
+    // 月令权重施加于天干
+    stemBase *= monthWeight[stemEle];
+    scores[stemEle] += stemBase;
+    detailLog.push(p.name + '天干' + p.stem + '(' + stemEle + ')：基础1.0' + (hasRoot ? '+通根0.5' : '') + '×月令权重' + monthWeight[stemEle] + ' = ' + stemBase.toFixed(2));
     
     // 地支藏干加权
     var cgList = cangganMap[p.branch] || ZHI_SHENG[p.branch] || [];
@@ -5739,8 +5784,28 @@ function getWuXingPower(pillars, dayStem) {
       var w = ci < weights.length ? weights[ci] : 0.1;
       // 月支藏干×2
       if (pi === 1) w *= 2;
+      // 月令权重施加于藏干
+      w *= monthWeight[cgEle];
       scores[cgEle] += w;
+      detailLog.push(p.name + '地支' + p.branch + '藏' + cgList[ci] + '(' + cgEle + ')：' + ['本气','中气','余气'][ci] + weights[ci] + (pi === 1 ? '×月支2' : '') + '×月令' + monthWeight[cgEle] + ' = ' + w.toFixed(2));
     }
+  }
+  
+  // ═══ 党众加分 ═══
+  // 同党（比劫+印星）≥4个时，加0.2系数（党众势强）
+  var yinEle = null;
+  for (var k in WUXING_SHENG) { if (WUXING_SHENG[k] === dayEle) yinEle = k; }
+  var tongCount = scores[dayEle] + (scores[yinEle] || 0);
+  if (tongCount >= 4) {
+    var bonus = tongCount * 0.1;
+    scores[dayEle] += bonus;
+    if (scores[yinEle]) scores[yinEle] += bonus;
+    detailLog.push('党众加分：同党(比劫+印星)力量' + tongCount.toFixed(1) + '≥4，加成+0.' + Math.round(bonus * 10) + '系数');
+  }
+  
+  // 四舍五入到两位小数
+  for (var ek in scores) {
+    scores[ek] = Math.round(scores[ek] * 100) / 100;
   }
   
   // 计算同党（生我+同我）和异党（我生+我克+克我）
@@ -5778,13 +5843,17 @@ function getWuXingPower(pillars, dayStem) {
   
   return {
     score: scores,
-    tong: tong,
-    yi: yi,
+    tong: Math.round(tong * 100) / 100,
+    yi: Math.round(yi * 100) / 100,
     ratio: ratio,
     strengthLevel: strengthLevel,
     tonggenCount: tonggenCount,
     tonggenDetail: tonggenDetail.join('、'),
-    tip: tip
+    tip: tip,
+    detailLog: detailLog,
+    monthWeight: monthWeight,
+    monthBranch: monthBranch,
+    monthEle: monthEle
   };
 }
 
@@ -35070,8 +35139,156 @@ function buildSanFangSiZhengHTML(mingGongIdx, starsByGong) {
 //  集成函数：在八字排盘中注入合冲刑害+空亡+藏干分析
 // ================================================================
 
+// ═══ R1.1: 五行力量精确量化报告 ═══
+function buildWuxingQuantifyHTML(pillars, dayStem) {
+  var dayEle = ELE[dayStem];
+  var power = getWuXingPower(pillars, dayStem);
+  var scores = power.score;
+  var total = 0;
+  for (var e in scores) total += scores[e];
+  total = Math.round(total * 100) / 100;
+
+  // 五行颜色
+  var colors = {'木':'#27ae60','火':'#e74c3c','土':'#e67e22','金':'#95a5a6','水':'#2980b9'};
+  // 五行对应脏腑
+  var organs = {'木':'肝胆','火':'心脏小肠','土':'脾胃','金':'肺大肠','水':'肾膀胱'};
+  // 五行对应方位
+  var directions = {'木':'东方','火':'南方','土':'中央','金':'西方','水':'北方'};
+  // 五行生克关系
+  var yinEle = null;
+  for (var k in WUXING_SHENG) { if (WUXING_SHENG[k] === dayEle) yinEle = k; }
+  var shangEle = WUXING_SHENG[dayEle]; // 食伤（我生）
+  var caiEle = WUXING_KE[dayEle];     // 财星（我克）
+  var guanEle = null;
+  for (var k2 in WUXING_KE) { if (WUXING_KE[k2] === dayEle) guanEle = k2; } // 官杀（克我）
+
+  // 按力量排序
+  var sorted = Object.entries(scores).sort(function(a,b){return b[1]-a[1];});
+  var strongest = sorted[0][0];
+  var weakest = sorted[4][0];
+
+  // 旺衰等级判定
+  function getLevel(score, total) {
+    var pct = total > 0 ? score / total : 0;
+    if (pct >= 0.35) return {name:'极旺',color:'#c0392b',desc:'力量极强，主导命局走向'};
+    if (pct >= 0.25) return {name:'偏旺',color:'#e67e22',desc:'力量较强，有明显影响'};
+    if (pct >= 0.15) return {name:'中和',color:'#27ae60',desc:'力量适中，相对平衡'};
+    if (pct >= 0.08) return {name:'偏弱',color:'#2980b9',desc:'力量不足，需扶助'};
+    return {name:'极弱',color:'#95a5a6',desc:'力量微弱，几乎无影响'};
+  }
+
+  // 十神归属
+  function getRole(ele) {
+    if (ele === dayEle) return '比劫（同我）';
+    if (ele === yinEle) return '印星（生我）';
+    if (ele === shangEle) return '食伤（我生）';
+    if (ele === caiEle) return '财星（我克）';
+    if (ele === guanEle) return '官杀（克我）';
+    return '';
+  }
+
+  var html = '';
+  html += '<div class="interp-card" style="background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(52,152,219,.03));border:1px solid rgba(201,168,76,.15);border-radius:10px;padding:16px;margin-bottom:14px">';
+  html += '<div style="font-size:14px;font-weight:bold;color:var(--gold);margin-bottom:10px;letter-spacing:2px">🔬 五行力量精确量化</div>';
+
+  // 量化总览
+  html += '<div style="font-size:12px;color:var(--paper2);line-height:1.8;margin-bottom:12px">';
+  html += '月令<b>' + power.monthBranch + '</b>（' + power.monthEle + '气）· 总力量<b>' + total.toFixed(1) + '</b>分 · 同党(印比)<b style="color:'+(power.ratio>=0.5?'#e74c3c':'#3498db')+'">' + power.tong.toFixed(1) + '</b> vs 异党(财官伤)<b>' + power.yi.toFixed(1) + '</b> · 占比<b>' + (power.ratio*100).toFixed(0) + '%</b>';
+  html += '</div>';
+
+  // 五行力量条形图
+  html += '<div style="display:flex;height:28px;border-radius:6px;overflow:hidden;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.2)">';
+  var order = ['木','火','土','金','水'];
+  for (var i = 0; i < order.length; i++) {
+    var e2 = order[i];
+    var pct2 = total > 0 ? (scores[e2] / total * 100) : 0;
+    if (pct2 < 1) continue;
+    html += '<div style="width:' + pct2 + '%;background:' + colors[e2] + ';display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:bold;min-width:20px">' + e2 + '</div>';
+  }
+  html += '</div>';
+
+  // 逐五行详析
+  html += '<div style="display:grid;gap:8px">';
+  for (var j = 0; j < sorted.length; j++) {
+    var ele2 = sorted[j][0];
+    var score2 = sorted[j][1];
+    var pct3 = total > 0 ? (score2 / total * 100) : 0;
+    var level = getLevel(score2, total);
+    var role = getRole(ele2);
+    var monthW = power.monthWeight[ele2];
+    var monthWDesc = monthW >= 3.0 ? '旺' : monthW >= 2.0 ? '相' : monthW >= 1.5 ? '休' : monthW >= 0.5 ? '囚' : '死';
+
+    html += '<div style="display:grid;grid-template-columns:60px 1fr;gap:10px;align-items:start;padding:8px 10px;background:rgba(255,255,255,.02);border-radius:6px;border-left:3px solid ' + colors[ele2] + '">';
+    // 左侧：五行+分数
+    html += '<div style="text-align:center">';
+    html += '<div style="font-size:18px;font-weight:bold;color:' + colors[ele2] + '">' + ele2 + '</div>';
+    html += '<div style="font-size:14px;font-weight:bold;color:' + level.color + '">' + score2.toFixed(1) + '</div>';
+    html += '<div style="font-size:10px;color:#888">' + pct3.toFixed(0) + '%</div>';
+    html += '</div>';
+    // 右侧：详细
+    html += '<div style="font-size:11px;line-height:1.7">';
+    html += '<b style="color:' + level.color + '">' + level.name + '</b> · ';
+    html += '<span style="color:#888">十神：</span>' + role + ' · ';
+    html += '<span style="color:#888">月令：</span>' + monthWDesc + '(×' + monthW + ') · ';
+    html += '<span style="color:#888">方位：</span>' + directions[ele2] + ' · ';
+    html += '<span style="color:#888">脏腑：</span>' + organs[ele2];
+    html += '<br><span style="color:var(--paper2);font-size:10px">' + level.desc + '</span>';
+    // 最强/最弱标注
+    if (ele2 === strongest && score2 > 0) html += '<span style="color:#e74c3c;font-size:10px;margin-left:4px">⚠ 最旺</span>';
+    if (ele2 === weakest) html += '<span style="color:#3498db;font-size:10px;margin-left:4px">↓ 最弱</span>';
+    // 喜忌标注
+    if (ele2 === dayEle) html += '<span style="color:#9b59b6;font-size:10px;margin-left:4px">[日主]</span>';
+    html += '</div>';
+    html += '</div>';
+  }
+  html += '</div>';
+
+  // 旺衰诊断结论
+  html += '<div style="margin-top:12px;padding:10px 12px;background:rgba(201,168,76,.06);border-radius:6px;border:1px solid rgba(201,168,76,.1)">';
+  html += '<div style="font-size:12px;font-weight:bold;color:var(--gold);margin-bottom:6px">📊 旺衰诊断结论</div>';
+  html += '<div style="font-size:11px;color:var(--paper2);line-height:1.8">';
+  html += '日主<b style="color:' + colors[dayEle] + '">' + dayEle + '</b>力量<b>' + scores[dayEle].toFixed(1) + '</b>分（' + (scores[dayEle]/total*100).toFixed(0) + '%），' + power.strengthLevel + '。';
+  html += '同党(印比)力量<b>' + power.tong.toFixed(1) + '</b>，异党(财官伤)力量<b>' + power.yi.toFixed(1) + '</b>，同党占比<b>' + (power.ratio*100).toFixed(0) + '%</b>。';
+  if (power.tonggenCount > 0) {
+    html += '通根<b>' + power.tonggenCount + '</b>处：' + power.tonggenDetail + '。';
+  } else {
+    html += '<b style="color:#e74c3c">无通根</b>，日主虚浮无力。';
+  }
+  html += '</div>';
+  html += '<div style="font-size:11px;color:#888;margin-top:6px;line-height:1.7">';
+  html += '💡 <b>五行喜忌：</b>';
+  if (power.ratio >= 0.5) {
+    html += '日主偏旺，宜<b style="color:#27ae60">' + shangEle + '(食伤泄秀)</b>、<b style="color:#27ae60">' + caiEle + '(财星耗身)</b>、<b style="color:#27ae60">' + guanEle + '(官杀克身)</b>；忌<b style="color:#e74c3c">' + yinEle + '(印星)</b>、<b style="color:#e74c3c">' + dayEle + '(比劫)</b>再助。';
+  } else {
+    html += '日主偏弱，宜<b style="color:#27ae60">' + yinEle + '(印星生身)</b>、<b style="color:#27ae60">' + dayEle + '(比劫帮身)</b>；忌<b style="color:#e74c3c">' + shangEle + '(食伤泄)</b>、<b style="color:#e74c3c">' + caiEle + '(财星耗)</b>、<b style="color:#e74c3c">' + guanEle + '(官杀克)</b>。';
+  }
+  html += '</div>';
+  // 五行偏枯预警
+  if (scores[strongest] / total >= 0.4) {
+    html += '<div style="font-size:11px;color:#e67e22;margin-top:6px;line-height:1.7">⚠️ <b>五行偏枯预警：</b>' + strongest + '过旺（' + pct3.toFixed(0) + '%），' + organs[strongest] + '系统需注意保养。建议多接触' + weakest + '属性事物（' + directions[weakest] + '方位、' + colors[weakest] + '色调）以平衡。</div>';
+  }
+  html += '</div>';
+
+  // 量化明细日志（可折叠）
+  if (power.detailLog && power.detailLog.length > 0) {
+    html += '<details style="margin-top:10px"><summary style="font-size:11px;color:#888;cursor:pointer">📐 量化计算明细（点击展开）</summary>';
+    html += '<div style="font-size:10px;color:#666;line-height:1.8;margin-top:8px;padding:8px;background:rgba(0,0,0,.03);border-radius:4px;white-space:pre-line;font-family:monospace">';
+    for (var li = 0; li < power.detailLog.length; li++) {
+      html += power.detailLog[li] + '\n';
+    }
+    html += '</div></details>';
+  }
+
+  html += '</div>';
+  return html;
+}
+
 function injectBaziEnhancedAnalysis(pillars, dayStem, dayBranch) {
   var html = '';
+  // 0. 五行力量精确量化（R1.1）
+  try {
+    html += buildWuxingQuantifyHTML(pillars, dayStem);
+  } catch(e) { console.warn('[五行量化分析失败]', e.message); }
   // 1. 合冲刑害深度分析
   try {
     var hc = analyzeHeChong(pillars);
