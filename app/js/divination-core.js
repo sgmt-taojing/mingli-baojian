@@ -3732,6 +3732,12 @@ function generateInterpretation(data) {
   html += '<div style="font-size:12px;color:var(--paper);line-height:1.8">';
   html += loveAdvice + '</div></div>';
 
+  // ═══════ R2.2: 婚期推断 ═══════
+  try {
+    var _hunqi = buildHunqiAnalysisHTML(data);
+    if (_hunqi) html += _hunqi;
+  } catch(e) { console.warn('[婚期推断失败]', e.message); }
+
   // ═══════ 柒·健康养生 ═══════
   var healthWarnings = {
     '木': {organs:'肝胆、眼睛、筋骨、甲状腺', detail:'木主肝胆，木日主者需特别注意肝火和肝气郁结。肝脏是人体最大的解毒器官——少熬夜是最好的保肝。春季多踏青、多看绿色可养肝明目。', food:'枸杞菊花茶、柠檬水、绿叶蔬菜、绿豆', avoid:'过量饮酒、油炸食物、生冷夜宵'},
@@ -3750,6 +3756,12 @@ function generateInterpretation(data) {
   html += '<b>🍵 推荐饮食：</b>' + health.food + '<br>';
   html += '<b>⚠️ 避忌：</b>' + health.avoid;
   html += '</div></div>';
+
+  // ═══════ R2.4: 流年与命局互动分析 ═══════
+  try {
+    var _lnInter = buildLiunianInteractionHTML(data);
+    if (_lnInter) html += _lnInter;
+  } catch(e) { console.warn('[流年互动分析失败]', e.message); }
 
   // ═══════ 捌·五行化解 ═══════
   var huajieMap = {
@@ -37048,6 +37060,255 @@ function buildGejuChengBaiHTML(data) {
   return html;
 }
 try { window.buildGejuChengBaiHTML = buildGejuChengBaiHTML; } catch(e){}
+
+// ═══ R2.2: 婚期推断 ═══
+function buildHunqiAnalysisHTML(data) {
+  var pillars = data.pillars || [];
+  if (pillars.length < 4) return '';
+  var dayStem = data.dayStem || '';
+  var dayEle = ELE[dayStem] || data.dayWuxing || '';
+  var dayBranch = pillars[2].branch;
+  var isStrong = data.isStrong;
+  var sex = data.sex || 'male';
+  var mingType = data.mingType || {};
+  
+  // 男看财星，女看官杀
+  var caiEle = WUXING_KE[dayEle];
+  var guanEle = null;
+  for (var k in WUXING_KE) { if (WUXING_KE[k] === dayEle) guanEle = k; }
+  var spouseEle = sex === 'male' ? caiEle : guanEle;
+  var spouseStarName = sex === 'male' ? '财星' : '官杀星';
+  
+  // 检查财官星在命局中的分布
+  var starPositions = [];
+  for (var pi = 0; pi < 4; pi++) {
+    if (pi === 2) continue;
+    if (ELE[pillars[pi].stem] === spouseEle) {
+      starPositions.push({pos: pi, type: '天干', stem: pillars[pi].stem, pillar: pillars[pi].name});
+    }
+    var cgList = (ZHI_CANGGAN || {})[pillars[pi].branch] || [];
+    for (var ci = 0; ci < cgList.length; ci++) {
+      if (ELE[cgList[ci]] === spouseEle) {
+        starPositions.push({pos: pi, type: '藏干', stem: cgList[ci], pillar: pillars[pi].name});
+      }
+    }
+  }
+  
+  // 夫妻宫（日支）被合/冲的流年推断
+  var heBranches = {子:'丑',丑:'子',寅:'亥',卯:'戌',辰:'酉',巳:'申',午:'未',未:'午',申:'巳',酉:'辰',戌:'卯',亥:'寅'};
+  var chongBranches = {子:'午',丑:'未',寅:'申',卯:'酉',辰:'戌',巳:'亥',午:'子',未:'丑',申:'寅',酉:'卯',戌:'辰',亥:'巳'};
+  var heYear = heBranches[dayBranch];
+  var chongYear = chongBranches[dayBranch];
+  
+  // 推断婚期年龄段
+  var ageRanges = [];
+  if (starPositions.length === 0) {
+    ageRanges.push('配偶星不显，晚婚为宜（28岁后）');
+  } else if (starPositions.length === 1) {
+    ageRanges.push('配偶星' + starPositions[0].pillar + '透出，适婚年龄25-30岁');
+  } else {
+    ageRanges.push('配偶星多现，异性缘佳，早婚可能性大（22-28岁）');
+  }
+  
+  // 夫妻宫合冲推断
+  var timingTips = [];
+  if (heYear) timingTips.push('流年地支为' + heYear + '（合动夫妻宫）时，姻缘易动');
+  if (chongYear) timingTips.push('流年地支为' + chongYear + '（冲动夫妻宫）时，婚姻有变');
+  
+  // 配偶特征推断
+  var spouseTraits = [];
+  var dayBranchEle = ZHI_ELE[dayBranch];
+  if (dayBranchEle === dayEle) spouseTraits.push('配偶与您性格相似，如朋友般相处');
+  else if (WUXING_SHENG[dayBranchEle] === dayEle) spouseTraits.push('配偶如长辈般照顾您（印星坐夫妻宫）');
+  else if (WUXING_KE[dayBranchEle] === dayEle) spouseTraits.push('配偶能力较强，可能管束您（官杀坐夫妻宫）');
+  else if (WUXING_SHENG[dayEle] === dayBranchEle) spouseTraits.push('配偶温柔依赖，需您照顾（食伤坐夫妻宫）');
+  else if (WUXING_KE[dayEle] === dayBranchEle) spouseTraits.push('配偶务实，重视物质（财星坐夫妻宫）');
+  
+  // 配偶方向
+  var eleDirections = {木:'东方',火:'南方',土:'中央',金:'西方',水:'北方'};
+  var spouseDir = eleDirections[spouseEle] || '未知';
+  
+  // 婚配生肖参考
+  var shengXiao = {子:'鼠',丑:'牛',寅:'虎',卯:'兔',辰:'龙',巳:'蛇',午:'马',未:'羊',申:'猴',酉:'鸡',戌:'狗',亥:'猪'};
+  var sanHe = {子:['申','辰'],丑:['巳','酉'],寅:['午','戌'],卯:['亥','未'],辰:['申','子'],巳:['丑','酉'],午:['寅','戌'],未:['亥','卯'],申:['子','辰'],酉:['巳','丑'],戌:['寅','午'],亥:['卯','未']};
+  var liuHe = heBranches;
+  var goodMatches = [];
+  if (sanHe[dayBranch]) {
+    for (var si = 0; si < sanHe[dayBranch].length; si++) {
+      goodMatches.push(shengXiao[sanHe[dayBranch][si]]);
+    }
+  }
+  if (liuHe[dayBranch]) {
+    goodMatches.push(shengXiao[liuHe[dayBranch]]);
+  }
+  var badMatches = [];
+  if (chongBranches[dayBranch]) {
+    badMatches.push(shengXiao[chongBranches[dayBranch]]);
+  }
+  
+  var html = '';
+  html += '<div class="interp-card" style="background:linear-gradient(135deg,rgba(231,76,60,.04),rgba(243,156,18,.03));border:1px solid rgba(231,76,60,.15);border-radius:10px;padding:16px;margin-bottom:14px">';
+  html += '<div style="font-size:14px;font-weight:bold;color:#e74c3c;margin-bottom:10px;letter-spacing:2px">💕 婚期推断与配偶特征</div>';
+  
+  html += '<div style="font-size:11px;color:var(--paper2);line-height:1.7;margin-bottom:8px">';
+  html += '<b>配偶星：</b>' + spouseStarName + '(' + spouseEle + ') · <b>夫妻宫：</b>日支' + dayBranch + '(' + dayBranchEle + ') · <b>配偶方向：</b>' + spouseDir + '方';
+  html += '</div>';
+  
+  // 配偶星分布
+  html += '<div style="margin-bottom:8px"><div style="font-size:11px;font-weight:bold;color:#e74c3c;margin-bottom:4px">🌟 配偶星分布</div>';
+  if (starPositions.length > 0) {
+    for (var sp = 0; sp < starPositions.length; sp++) {
+      html += '<div style="font-size:10px;color:var(--paper2)">• ' + starPositions[sp].pillar + starPositions[sp].type + starPositions[sp].stem + '(' + spouseEle + ')</div>';
+    }
+  } else {
+    html += '<div style="font-size:10px;color:#888">配偶星不透不藏，晚婚为宜，需大运行配偶星方遇正缘</div>';
+  }
+  html += '</div>';
+  
+  // 婚期推断
+  html += '<div style="margin-bottom:8px"><div style="font-size:11px;font-weight:bold;color:#e74c3c;margin-bottom:4px">📅 婚期推断</div>';
+  for (var ar = 0; ar < ageRanges.length; ar++) {
+    html += '<div style="font-size:10px;color:var(--paper2);line-height:1.6">• ' + ageRanges[ar] + '</div>';
+  }
+  for (var tt = 0; tt < timingTips.length; tt++) {
+    html += '<div style="font-size:10px;color:#f39c12;line-height:1.6">• ' + timingTips[tt] + '</div>';
+  }
+  html += '</div>';
+  
+  // 配偶特征
+  if (spouseTraits.length > 0) {
+    html += '<div style="margin-bottom:8px"><div style="font-size:11px;font-weight:bold;color:#e74c3c;margin-bottom:4px">💑 配偶特征</div>';
+    for (var st = 0; st < spouseTraits.length; st++) {
+      html += '<div style="font-size:10px;color:var(--paper2);line-height:1.6">• ' + spouseTraits[st] + '</div>';
+    }
+    html += '</div>';
+  }
+  
+  // 婚配生肖参考
+  html += '<div style="margin-bottom:4px"><div style="font-size:11px;font-weight:bold;color:#e74c3c;margin-bottom:4px">🐷 婚配生肖参考</div>';
+  html += '<div style="font-size:10px;color:#27ae60">宜配：' + (goodMatches.length > 0 ? goodMatches.join('、') : '无特别推荐') + '</div>';
+  html += '<div style="font-size:10px;color:#e74c3c">忌配：' + (badMatches.length > 0 ? badMatches.join('、') : '无特别禁忌') + '</div>';
+  html += '</div>';
+  
+  html += '</div>';
+  return html;
+}
+try { window.buildHunqiAnalysisHTML = buildHunqiAnalysisHTML; } catch(e){}
+
+// ═══ R2.4: 流年与命局互动分析 ═══
+function buildLiunianInteractionHTML(data) {
+  var pillars = data.pillars || [];
+  if (pillars.length < 4) return '';
+  var dayStem = data.dayStem || '';
+  var dayEle = ELE[dayStem] || data.dayWuxing || '';
+  var dayBranch = pillars[2].branch;
+  var mingType = data.mingType || {};
+  var yongshenEle = mingType.yongshenEle || '';
+  var jishenEle = mingType.jishenEle || '';
+  
+  var currentYear = new Date().getFullYear();
+  var yearStems = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  var yearBranches = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  
+  var heStems = {甲:'己',乙:'庚',丙:'辛',丁:'壬',戊:'癸',己:'甲',庚:'乙',辛:'丙',壬:'丁',癸:'戊'};
+  var heBranches = {子:'丑',丑:'子',寅:'亥',卯:'戌',辰:'酉',巳:'申',午:'未',未:'午',申:'巳',酉:'辰',戌:'卯',亥:'寅'};
+  var chongBranches = {子:'午',丑:'未',寅:'申',卯:'酉',辰:'戌',巳:'亥',午:'子',未:'丑',申:'寅',酉:'卯',戌:'辰',亥:'巳'};
+  
+  var html = '';
+  html += '<div class="interp-card" style="background:linear-gradient(135deg,rgba(52,152,219,.04),rgba(231,76,60,.03));border:1px solid rgba(52,152,219,.15);border-radius:10px;padding:16px;margin-bottom:14px">';
+  html += '<div style="font-size:14px;font-weight:bold;color:#3498db;margin-bottom:10px;letter-spacing:2px">📅 流年与命局互动分析</div>';
+  
+  // 分析近5年流年
+  html += '<div style="display:grid;gap:10px">';
+  for (var yi = 0; yi < 5; yi++) {
+    var yr = currentYear + yi;
+    var stemIdx = ((yr - 4) % 10 + 10) % 10;
+    var zhiIdx = ((yr - 4) % 12 + 12) % 12;
+    var yrStem = yearStems[stemIdx];
+    var yrZhi = yearBranches[zhiIdx];
+    var yrEle = ELE[yrStem];
+    var yrZhiEle = ZHI_ELE[yrZhi];
+    
+    var interactions = [];
+    var luckLevel = '平';
+    var luckColor = '#f39c12';
+    
+    // 1. 天克地冲检测
+    for (var pi = 0; pi < 4; pi++) {
+      var stemKe = (WUXING_KE[yrStem] === ELE[pillars[pi].stem]);
+      var branchChong = (chongBranches[yrZhi] === pillars[pi].branch);
+      if (stemKe && branchChong) {
+        interactions.push({type:'天克地冲', target: pillars[pi].name, impact:'严重', desc: yrStem + yrZhi + '天克地冲' + pillars[pi].stem + pillars[pi].branch + '，' + pillars[pi].name + '受损'});
+        luckLevel = '凶';
+        luckColor = '#e74c3c';
+      }
+    }
+    
+    // 2. 岁运并临（流年与某柱干支相同）
+    for (var pi2 = 0; pi2 < 4; pi2++) {
+      if (yrStem === pillars[pi2].stem && yrZhi === pillars[pi2].branch) {
+        interactions.push({type:'岁运并临', target: pillars[pi2].name, impact:'重大', desc: yrStem + yrZhi + '与' + pillars[pi2].name + '干支相同，岁运并临，主大吉或大凶'});
+      }
+    }
+    
+    // 3. 流年合动命局
+    if (heStems[yrStem]) {
+      for (var pi3 = 0; pi3 < 4; pi3++) {
+        if (pillars[pi3].stem === heStems[yrStem]) {
+          interactions.push({type:'天干合', target: pillars[pi3].name, impact:'中等', desc: yrStem + '合' + pillars[pi3].stem + '（' + pillars[pi3].name + '天干被合），有合作或牵绊之象'});
+        }
+      }
+    }
+    if (heBranches[yrZhi]) {
+      for (var pi4 = 0; pi4 < 4; pi4++) {
+        if (pillars[pi4].branch === heBranches[yrZhi]) {
+          interactions.push({type:'地支合', target: pillars[pi4].name, impact:'中等', desc: yrZhi + '合' + pillars[pi4].branch + '（' + pillars[pi4].name + '地支被合），' + (pi4 === 2 ? '夫妻宫被合，姻缘易动' : '有会聚之象')});
+        }
+      }
+    }
+    
+    // 4. 流年地支冲命局
+    if (chongBranches[yrZhi]) {
+      for (var pi5 = 0; pi5 < 4; pi5++) {
+        if (pillars[pi5].branch === chongBranches[yrZhi]) {
+          interactions.push({type:'地支冲', target: pillars[pi5].name, impact:'严重', desc: yrZhi + '冲' + pillars[pi5].branch + '（' + pillars[pi5].name + '地支被冲），' + (pi5 === 2 ? '夫妻宫被冲，婚姻动荡' : pi5 === 1 ? '月令被冲，事业或家庭有变' : '动荡之象')});
+          if (luckLevel !== '凶') { luckLevel = '小凶'; luckColor = '#e67e22'; }
+        }
+      }
+    }
+    
+    // 5. 喜忌判断
+    if (yrEle === yongshenEle) {
+      interactions.push({type:'喜神年', target: '日主', impact:'吉', desc: yrStem + '(' + yrEle + ')为喜用神年，运势向好，宜积极进取'});
+      if (luckLevel !== '凶' && luckLevel !== '小凶') { luckLevel = '吉'; luckColor = '#27ae60'; }
+    } else if (yrEle === jishenEle) {
+      interactions.push({type:'忌神年', target: '日主', impact:'凶', desc: yrStem + '(' + yrEle + ')为忌神年，运势受阻，宜低调保守'});
+      if (luckLevel !== '凶') { luckLevel = '小凶'; luckColor = '#e67e22'; }
+    }
+    
+    // 输出
+    html += '<div style="padding:10px;background:rgba(255,255,255,.02);border-radius:6px;border-left:3px solid ' + luckColor + '">';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
+    html += '<span style="font-size:14px;font-weight:bold;color:' + luckColor + '">' + yrStem + yrZhi + '</span>';
+    html += '<span style="font-size:10px;color:#888">' + yr + '年</span>';
+    html += '<span style="font-size:10px;padding:1px 6px;border-radius:6px;background:' + luckColor + ';color:#fff">' + luckLevel + '</span>';
+    html += '</div>';
+    if (interactions.length === 0) {
+      html += '<div style="font-size:10px;color:#888">无明显互动，运势平稳</div>';
+    } else {
+      for (var ii = 0; ii < interactions.length; ii++) {
+        var int = interactions[ii];
+        var intColor = int.impact === '吉' ? '#27ae60' : int.impact === '严重' || int.impact === '凶' ? '#e74c3c' : int.impact === '中等' ? '#f39c12' : '#3498db';
+        html += '<div style="font-size:10px;color:' + intColor + ';line-height:1.5">' + int.type + '：' + int.desc + '</div>';
+      }
+    }
+    html += '</div>';
+  }
+  html += '</div>';
+  html += '</div>';
+  return html;
+}
+try { window.buildLiunianInteractionHTML = buildLiunianInteractionHTML; } catch(e){}
 
 // ═══════ 补全：命局层次 ═══════
 function judgeMingJuCengci(geju, yongshen, isStrong, eleCount) {
