@@ -3521,6 +3521,114 @@ function generateInterpretation(data) {
     html += '</div></div>';
   }
 
+  // ═══════ 叁·补 四柱精论 ═══════
+  if (data.pillars && data.pillars.length === 4) {
+    var pl = data.pillars;
+    var dStem = data.dayStem || dayMaster;
+    var dEle2 = ELE[dStem] || dayWuxing;
+    var dishiArr = data.dishi || [];
+    var plNames = ['年柱','月柱','日柱','时柱'];
+    var plLabels = ['祖业根基','父母宫','自身配偶','子女晚景'];
+    var plIcons = ['🏛️','👨‍👩‍👧','💑','👶'];
+    var plColors = ['#9b59b6','#3498db','#e74c3c','#27ae60'];
+    // 十神定位
+    var plTenGod = [];
+    for (var pli = 0; pli < 4; pli++) {
+      if (pli === 2) { plTenGod.push('日主'); continue; }
+      plTenGod.push(getTenGod(pl[pli].stem, pl[pli].branch, dStem));
+    }
+    // 纳音
+    var plNayin = [];
+    for (var pni = 0; pni < 4; pni++) {
+      try { plNayin.push(getNayin(pl[pni].stemIdx, pl[pni].branchIdx)); } catch(e) { plNayin.push(''); }
+    }
+    // 神煞定位
+    var plShensha = ['','','',''];
+    if (shensha && shensha.positions) {
+      for (var sp in shensha.positions) {
+        var posArr = shensha.positions[sp];
+        if (Array.isArray(posArr)) {
+          for (var pi3 = 0; pi3 < posArr.length; pi3++) {
+            if (posArr[pi3] >= 0 && posArr[pi3] < 4) {
+              plShensha[posArr[pi3]] += (plShensha[posArr[pi3]] ? '、' : '') + sp;
+            }
+          }
+        }
+      }
+    }
+
+    // 四柱逐柱分析文案
+    var pillarAnalysis = [
+      // 年柱
+      {
+        title: '年柱——祖业根基',
+        intro: '年柱代表祖辈基业、家族传承和童年环境（1-15岁运势）。',
+        aspects: [
+          {label:'祖业', text:'年柱天干' + pl[0].stem + '(' + (ELE[pl[0].stem]||'') + ')为' + plTenGod[0] + '，' + (plTenGod[0]==='正官'||plTenGod[0]==='正印'||plTenGod[0]==='正财' ? '祖上殷实，家境尚可，能得祖辈福荫。' : plTenGod[0]==='七杀'||plTenGod[0]==='偏印' ? '祖业起伏较大，祖辈多有波折，需自力更生。' : plTenGod[0]==='比肩'||plTenGod[0]==='劫财' ? '家族同辈多，竞争激烈，需争气方得出头。' : '祖上以才艺谋生，家业需靠自己开拓。')},
+          {label:'童年', text:'年支' + pl[0].branch + '(' + (ZHI_ELE[pl[0].branch]||'') + ')，' + (dishiArr[0] ? '日主于此处' + dishiArr[0] + '。' : '') + (dishiArr[0]==='长生'||dishiArr[0]==='临官'||dishiArr[0]==='帝旺' ? '童年精力充沛，成长环境良好。' : dishiArr[0]==='墓'||dishiArr[0]==='绝' ? '童年体弱多病或环境艰苦，需长辈悉心照料。' : '童年平顺，正常成长。')},
+          {label:'与祖辈', text:plShensha[0] ? ('年柱带' + plShensha[0] + '，与祖辈缘分' + (plShensha[0].indexOf('贵人')>=0||plShensha[0].indexOf('天德')>=0 ? '深厚，祖辈庇佑。' : plShensha[0].indexOf('驿马')>=0 ? '较远，可能离乡发展。' : '一般。')) : '年柱无明显神煞，与祖辈缘分平常。'}
+        ]
+      },
+      // 月柱
+      {
+        title: '月柱——父母宫',
+        intro: '月柱代表父母兄弟、家庭教育和社会背景（16-30岁运势）。',
+        aspects: [
+          {label:'父母', text:'月柱天干' + pl[1].stem + '(' + (ELE[pl[1].stem]||'') + ')为' + plTenGod[1] + '，' + (plTenGod[1]==='正印' ? '母亲慈爱，教育有方，得母亲福荫最大。' : plTenGod[1]==='偏印' ? '母亲个性独立，教育方式独特，缘分较淡。' : plTenGod[1]==='正官'||plTenGod[1]==='七杀' ? '父亲严厉，管教有方，家庭纪律性强。' : plTenGod[1]==='正财'||plTenGod[1]==='偏财' ? '父母重视物质，家境随财运起伏。' : plTenGod[1]==='比肩'||plTenGod[1]==='劫财' ? '兄弟姐妹多，家庭热闹但花销大。' : '父母开明，注重才艺培养。')},
+          {label:'家庭', text:'月支' + pl[1].branch + '(' + (ZHI_ELE[pl[1].branch]||'') + ')为月令，' + (dishiArr[1] ? '日主于此处' + dishiArr[1] + '。' : '') + (dishiArr[1]==='长生'||dishiArr[1]==='临官'||dishiArr[1]==='帝旺' ? '青年时期运势旺盛，事业起步顺利。' : dishiArr[1]==='死'||dishiArr[1]==='墓'||dishiArr[1]==='绝' ? '青年时期压力大，需埋头苦干。' : '青年时期平稳发展。')},
+          {label:'教育', text:plShensha[1] ? ('月柱带' + plShensha[1] + '，' + (plShensha[1].indexOf('文昌')>=0||plShensha[1].indexOf('学堂')>=0 ? '学业运极佳，读书事半功倍。' : plShensha[1].indexOf('华盖')>=0 ? '聪慧孤傲，适合专精一门学问。' : '神煞影响一般。')) : '月柱无文昌类神煞，学业靠勤奋。'}
+        ]
+      },
+      // 日柱
+      {
+        title: '日柱——自身配偶',
+        intro: '日柱代表自身和配偶宫位（31-50岁运势）。日干为自身，日支为配偶宫。',
+        aspects: [
+          {label:'自身', text:'日干' + pl[2].stem + '(' + (ELE[pl[2].stem]||'') + ')即日主本身，代表您的核心性格和生命能量。' + (isStrong ? '日主偏旺，精力充沛，主观意识强。' : '日主偏弱，心思细腻，需借力发展。')},
+          {label:'配偶', text:'日支' + pl[2].branch + '(' + (ZHI_ELE[pl[2].branch]||'') + ')为配偶宫，' + (dishiArr[2] ? '日主于此处' + dishiArr[2] + '。' : '') + (dishiArr[2]==='长生'||dishiArr[2]==='临官'||dishiArr[2]==='帝旺' ? '配偶能力强，婚姻对你助力大。' : dishiArr[2]==='墓'||dishiArr[2]==='绝' ? '配偶身体或运势偏弱，需多关怀。' : '配偶条件中平，婚姻需共同经营。')},
+          {label:'婚姻', text:plShensha[2] ? ('日柱带' + plShensha[2] + '，' + (plShensha[2].indexOf('桃花')>=0 ? '异性缘佳，需注意婚外诱惑。' : plShensha[2].indexOf('孤辰')>=0||plShensha[2].indexOf('寡宿')>=0 ? '婚姻可能较晚或需防孤独，建议多社交。' : plShensha[2].indexOf('贵人')>=0 ? '婚姻中有贵人相助，逢凶化吉。' : '神煞对婚姻影响一般。')) : '日柱无明显婚姻类神煞。'}
+        ]
+      },
+      // 时柱
+      {
+        title: '时柱——子女晚景',
+        intro: '时柱代表子女、晚辈和晚年运势（50岁后运势）。',
+        aspects: [
+          {label:'子女', text:'时柱天干' + pl[3].stem + '(' + (ELE[pl[3].stem]||'') + ')为' + plTenGod[3] + '，' + (plTenGod[3]==='正官'||plTenGod[3]==='正印' ? '子女孝顺有出息，晚年可享清福。' : plTenGod[3]==='七杀' ? '子女个性刚强，需严加管教，日后有成就。' : plTenGod[3]==='食神' ? '子女有才艺，性格温和，亲子关系好。' : plTenGod[3]==='伤官' ? '子女聪明但叛逆，需引导其才华。' : plTenGod[3]==='正财'||plTenGod[3]==='偏财' ? '子女有经济头脑，晚年物质无忧。' : plTenGod[3]==='比肩'||plTenGod[3]==='劫财' ? '子女独立早，朋友多但花销大。' : '子女发展平顺。')},
+          {label:'晚景', text:'时支' + pl[3].branch + '(' + (ZHI_ELE[pl[3].branch]||'') + ')，' + (dishiArr[3] ? '日主于此处' + dishiArr[3] + '。' : '') + (dishiArr[3]==='长生'||dishiArr[3]==='临官'||dishiArr[3]==='帝旺' ? '晚年运势旺盛，精力不衰，安享晚年。' : dishiArr[3]==='墓'||dishiArr[3]==='绝' ? '晚年宜静养，注意健康。' : '晚年平稳，知足常乐。')},
+          {label:'晚运', text:plShensha[3] ? ('时柱带' + plShensha[3] + '，' + (plShensha[3].indexOf('贵人')>=0||plShensha[3].indexOf('天德')>=0 ? '晚年有贵人照拂。' : plShensha[3].indexOf('华盖')>=0 ? '晚年好玄学佛道，精神世界丰富。' : plShensha[3].indexOf('驿马')>=0 ? '晚年走动多，适合旅游养老。' : '神煞对晚运影响一般。')) : '时柱无明显神煞，晚运平常。'}
+        ]
+      }
+    ];
+
+    html += '<div style="background:linear-gradient(135deg,rgba(155,89,182,.04),rgba(52,152,219,.04));border:1px solid rgba(155,89,182,.15);border-radius:10px;padding:16px;margin-bottom:14px">';
+    html += '<div style="font-size:14px;font-weight:bold;color:#9b59b6;margin-bottom:10px;letter-spacing:2px">叁·补 · 四柱精论</div>';
+    html += '<div style="font-size:11px;color:#888;margin-bottom:12px">年柱看祖业·月柱看父母·日柱看自身配偶·时柱看子女晚景</div>';
+
+    for (var pai = 0; pai < 4; pai++) {
+      var pa = pillarAnalysis[pai];
+      html += '<div style="margin-bottom:14px;padding:12px;background:rgba(255,255,255,.02);border-radius:8px;border-left:3px solid ' + plColors[pai] + '">';
+      // 柱头
+      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">';
+      html += '<span style="font-size:16px">' + plIcons[pai] + '</span>';
+      html += '<span style="font-size:13px;font-weight:bold;color:' + plColors[pai] + '">' + pa.title + '</span>';
+      html += '<span style="font-size:11px;color:#888;margin-left:auto">' + pl[pai].stem + pl[pai].branch + ' · ' + (plTenGod[pai]||'') + (plNayin[pai] ? ' · ' + plNayin[pai] : '') + '</span>';
+      html += '</div>';
+      // 简介
+      html += '<div style="font-size:11px;color:var(--paper2);margin-bottom:8px;line-height:1.7">' + pa.intro + '</div>';
+      // 逐项
+      for (var aai = 0; aai < pa.aspects.length; aai++) {
+        var aa = pa.aspects[aai];
+        html += '<div style="font-size:11px;line-height:1.7;margin-bottom:4px">';
+        html += '<b style="color:' + plColors[pai] + ';min-width:40px;display:inline-block">' + aa.label + '：</b>';
+        html += '<span style="color:var(--paper)">' + aa.text + '</span>';
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+
   // ═══════ 肆·运程指导 ═══════
   var currentYear = new Date().getFullYear();
   var yearGanZhi = '';
