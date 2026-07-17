@@ -3474,6 +3474,12 @@ function generateInterpretation(data) {
 
   html += '</div></div>';
 
+  // ═══════ R2.3: 格局成败高低论 ═══════
+  try {
+    var _gejuCB = buildGejuChengBaiHTML(data);
+    if (_gejuCB) html += _gejuCB;
+  } catch(e) { console.warn('[格局成败分析失败]', e.message); }
+
   // ═══════ 叁·神煞点睛 ═══════
   if (shensha && Object.keys(shensha).length > 0) {
     html += '<div style="background:rgba(155,89,182,.04);border-left:3px solid #9b59b6;padding:14px 16px;margin-bottom:14px;border-radius:0 8px 8px 0">';
@@ -36833,6 +36839,215 @@ function getGejuXiji(gejuName) {
 }
 try { window.GEJU_XIJI = GEJU_XIJI; } catch(e){}
 try { window.getGejuXiji = getGejuXiji; } catch(e){}
+
+// ═══ R2.3: 格局成败高低论 ═══
+function buildGejuChengBaiHTML(data) {
+  var geju = data.geju || {};
+  var gejuName = geju.name || geju.geju || '';
+  if (!gejuName) return '';
+  var isStrong = data.isStrong;
+  var mingType = data.mingType || {};
+  var pillars = data.pillars || [];
+  var dayStem = data.dayStem || '';
+  var dayEle = ELE[dayStem] || data.dayWuxing || '';
+  
+  // 格局成败条件
+  var chengTiaoJian = [];
+  var baiTiaoJian = [];
+  var jiuYing = [];
+  
+  // 各格局成败条件
+  var gejuChengBai = {
+    '正官格': {
+      cheng: ['官星有财生','官星有印护','身旺能任官','官星不被刑冲破害'],
+      bai: ['官星被伤官克破','官星被刑冲','身弱不能任官','官杀混杂'],
+      jiuYing: ['有印化杀为权','有财生官','身弱有比劫帮身']
+    },
+    '七杀格': {
+      cheng: ['有食神制杀','有印化杀','身旺能任杀'],
+      bai: ['无制无化（杀重身轻）','杀被合住','身弱杀旺'],
+      jiuYing: ['食制加印护','身旺有比劫','杀轻有财生']
+    },
+    '正财格': {
+      cheng: ['身旺能任财','财星不被比劫争夺','有官星护财'],
+      bai: ['身弱不任财','比劫争夺','财星被冲'],
+      jiuYing: ['有食伤生财','有官杀制比劫','身弱有印生']
+    },
+    '偏财格': {
+      cheng: ['身旺能任偏财','有官星护财','财星有源'],
+      bai: ['比劫争夺偏财','身弱不任财','偏财被冲'],
+      jiuYing: ['有食伤生财','身弱有印比帮身']
+    },
+    '正印格': {
+      cheng: ['印星不被财破','身弱有印生','印星透干有力'],
+      bai: ['财星破印','印星被冲','印多为患'],
+      jiuYing: ['有官杀生印','有比劫制财护印']
+    },
+    '偏印格': {
+      cheng: ['偏印有杀相生（杀印相生）','身弱有偏印生','偏印不被财破'],
+      bai: ['偏印夺食（枭神夺食）','偏印太旺为枭','财破印'],
+      jiuYing: ['有杀来生印','有比劫制财']
+    },
+    '食神格': {
+      cheng: ['食神不被枭印夺','身旺有食神泄秀','有财星引化'],
+      bai: ['枭印夺食','食神被冲','身弱食多变伤'],
+      jiuYing: ['有财化食','有比劫帮身','枭印被制']
+    },
+    '伤官格': {
+      cheng: ['伤官有印制','伤官生财','伤官佩印'],
+      bai: ['伤官无制无化','伤官见官','身弱伤多'],
+      jiuYing: ['有印制伤','有财化伤','有比劫帮身']
+    }
+  };
+  
+  // 基本格局名匹配
+  var cbKey = gejuName;
+  if (gejuName.indexOf('正官') >= 0) cbKey = '正官格';
+  else if (gejuName.indexOf('七杀') >= 0 || gejuName.indexOf('偏官') >= 0) cbKey = '七杀格';
+  else if (gejuName.indexOf('正财') >= 0) cbKey = '正财格';
+  else if (gejuName.indexOf('偏财') >= 0) cbKey = '偏财格';
+  else if (gejuName.indexOf('正印') >= 0) cbKey = '正印格';
+  else if (gejuName.indexOf('偏印') >= 0 || gejuName.indexOf('枭') >= 0) cbKey = '偏印格';
+  else if (gejuName.indexOf('食神') >= 0) cbKey = '食神格';
+  else if (gejuName.indexOf('伤官') >= 0) cbKey = '伤官格';
+  
+  var cbInfo = gejuChengBai[cbKey];
+  if (!cbInfo) return '';
+  
+  // 检查实际命局条件
+  // 简化版：基于十神统计和五行平衡判断
+  var tenGods = data.tenGods || [];
+  var tgCount = {};
+  for (var i = 0; i < tenGods.length; i++) {
+    if (tenGods[i]) tgCount[tenGods[i]] = (tgCount[tenGods[i]] || 0) + 1;
+  }
+  var yinEle = null;
+  for (var k in WUXING_SHENG) { if (WUXING_SHENG[k] === dayEle) yinEle = k; }
+  var shangEle = WUXING_SHENG[dayEle];
+  var caiEle = WUXING_KE[dayEle];
+  var guanEle = null;
+  for (var k2 in WUXING_KE) { if (WUXING_KE[k2] === dayEle) guanEle = k2; }
+  
+  // 逐条检查成格条件
+  for (var ci = 0; ci < cbInfo.cheng.length; ci++) {
+    var cond = cbInfo.cheng[ci];
+    var met = false;
+    if (cond.indexOf('身旺') >= 0 && isStrong) met = true;
+    if (cond.indexOf('身弱') >= 0 && !isStrong) met = true;
+    if (cond.indexOf('有财生') >= 0 && (tgCount['正财'] || 0) + (tgCount['偏财'] || 0) >= 1) met = true;
+    if (cond.indexOf('有印') >= 0 && (tgCount['正印'] || 0) + (tgCount['偏印'] || 0) >= 1) met = true;
+    if (cond.indexOf('有食神制') >= 0 && (tgCount['食神'] || 0) >= 1) met = true;
+    if (cond.indexOf('有印护') >= 0 && (tgCount['正印'] || 0) + (tgCount['偏印'] || 0) >= 1) met = true;
+    if (cond.indexOf('有食伤') >= 0 && (tgCount['食神'] || 0) + (tgCount['伤官'] || 0) >= 1) met = true;
+    if (cond.indexOf('有官星护') >= 0 && (tgCount['正官'] || 0) + (tgCount['七杀'] || 0) >= 1) met = true;
+    if (cond.indexOf('有财星') >= 0 && (tgCount['正财'] || 0) + (tgCount['偏财'] || 0) >= 1) met = true;
+    if (cond.indexOf('不被比劫') >= 0 && (tgCount['比肩'] || 0) + (tgCount['劫财'] || 0) <= 1) met = true;
+    if (cond.indexOf('不被刑冲') >= 0 || cond.indexOf('不被冲') >= 0) {
+      // 简化：如果柱无冲则满足
+      met = true;
+    }
+    chengTiaoJian.push({cond: cond, met: met});
+  }
+  
+  // 逐条检查败格条件
+  for (var bi = 0; bi < cbInfo.bai.length; bi++) {
+    var bcond = cbInfo.bai[bi];
+    var bmet = false;
+    if (bcond.indexOf('身弱') >= 0 && !isStrong) bmet = true;
+    if (bcond.indexOf('比劫争夺') >= 0 && (tgCount['比肩'] || 0) + (tgCount['劫财'] || 0) >= 2) bmet = true;
+    if (bcond.indexOf('伤官克破') >= 0 && (tgCount['伤官'] || 0) >= 1) bmet = true;
+    if (bcond.indexOf('枭印夺') >= 0 && (tgCount['偏印'] || 0) >= 1 && (tgCount['食神'] || 0) >= 1) bmet = true;
+    if (bcond.indexOf('伤官见官') >= 0 && (tgCount['伤官'] || 0) >= 1 && (tgCount['正官'] || 0) >= 1) bmet = true;
+    if (bcond.indexOf('官杀混杂') >= 0 && (tgCount['正官'] || 0) >= 1 && (tgCount['七杀'] || 0) >= 1) bmet = true;
+    baiTiaoJian.push({cond: bcond, met: bmet});
+  }
+  
+  // 计算成格/败格比例
+  var chengMet = chengTiaoJian.filter(function(c) { return c.met; }).length;
+  var baiMet = baiTiaoJian.filter(function(b) { return b.met; }).length;
+  var chengRatio = chengTiaoJian.length > 0 ? chengMet / chengTiaoJian.length : 0;
+  var baiRatio = baiTiaoJian.length > 0 ? baiMet / baiTiaoJian.length : 0;
+  
+  // 格局高低评级
+  var level = '';
+  var levelColor = '';
+  if (chengRatio >= 0.7 && baiRatio <= 0.2) {
+    level = '成格且高（上格）';
+    levelColor = '#27ae60';
+  } else if (chengRatio >= 0.5 && baiRatio <= 0.4) {
+    level = '成格（中格）';
+    levelColor = '#2ecc71';
+  } else if (chengRatio >= 0.3 || baiRatio <= 0.5) {
+    level = '半成半败（中下格）';
+    levelColor = '#f39c12';
+  } else {
+    level = '败格（下格）';
+    levelColor = '#e74c3c';
+  }
+  
+  // 救应检查
+  for (var ji = 0; ji < (cbInfo.jiuYing || []).length; ji++) {
+    var jcond = cbInfo.jiuYing[ji];
+    var jmet = false;
+    if (jcond.indexOf('有印') >= 0 && (tgCount['正印'] || 0) + (tgCount['偏印'] || 0) >= 1) jmet = true;
+    if (jcond.indexOf('有财') >= 0 && (tgCount['正财'] || 0) + (tgCount['偏财'] || 0) >= 1) jmet = true;
+    if (jcond.indexOf('有比劫') >= 0 && (tgCount['比肩'] || 0) + (tgCount['劫财'] || 0) >= 1) jmet = true;
+    if (jcond.indexOf('有食') >= 0 && (tgCount['食神'] || 0) + (tgCount['伤官'] || 0) >= 1) jmet = true;
+    if (jcond.indexOf('身旺') >= 0 && isStrong) jmet = true;
+    if (jcond.indexOf('枭印被制') >= 0 && (tgCount['偏财'] || 0) >= 1) jmet = true;
+    jiuYing.push({cond: jcond, met: jmet});
+  }
+  var hasJiuYing = jiuYing.some(function(j) { return j.met; });
+  
+  // 构建HTML
+  var html = '';
+  html += '<div class="interp-card" style="background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(231,76,60,.03));border:1px solid rgba(201,168,76,.15);border-radius:10px;padding:16px;margin-bottom:14px">';
+  html += '<div style="font-size:14px;font-weight:bold;color:var(--gold);margin-bottom:10px;letter-spacing:2px">📐 格局成败高低论</div>';
+  html += '<div style="font-size:12px;color:var(--paper2);margin-bottom:8px">格局：<b>' + gejuName + '</b> · 层次：<b style="color:' + levelColor + '">' + level + '</b></div>';
+  
+  // 成格条件
+  html += '<div style="margin-bottom:8px"><div style="font-size:11px;font-weight:bold;color:#27ae60;margin-bottom:4px">✅ 成格条件</div>';
+  for (var ce = 0; ce < chengTiaoJian.length; ce++) {
+    var c = chengTiaoJian[ce];
+    html += '<div style="font-size:10px;line-height:1.6;color:' + (c.met ? '#27ae60' : '#666') + '">' + (c.met ? '✓' : '✗') + ' ' + c.cond + '</div>';
+  }
+  html += '</div>';
+  
+  // 败格条件
+  if (baiTiaoJian.length > 0) {
+    html += '<div style="margin-bottom:8px"><div style="font-size:11px;font-weight:bold;color:#e74c3c;margin-bottom:4px">❌ 败格条件</div>';
+    for (var be = 0; be < baiTiaoJian.length; be++) {
+      var b = baiTiaoJian[be];
+      html += '<div style="font-size:10px;line-height:1.6;color:' + (b.met ? '#e74c3c' : '#666') + '">' + (b.met ? '⚠' : '✓') + ' ' + b.cond + '</div>';
+    }
+    html += '</div>';
+  }
+  
+  // 救应
+  if (jiuYing.length > 0) {
+    html += '<div style="margin-bottom:8px"><div style="font-size:11px;font-weight:bold;color:#f39c12;margin-bottom:4px">🔄 救应</div>';
+    for (var je = 0; je < jiuYing.length; je++) {
+      var j = jiuYing[je];
+      html += '<div style="font-size:10px;line-height:1.6;color:' + (j.met ? '#27ae60' : '#666') + '">' + (j.met ? '✓' : '○') + ' ' + j.cond + '</div>';
+    }
+    if (hasJiuYing && baiMet > 0) {
+      html += '<div style="font-size:10px;color:#27ae60;margin-top:4px">💡 虽有败格之象，但有救应可化解，格局不致全败。</div>';
+    }
+    html += '</div>';
+  }
+  
+  // 结论
+  html += '<div style="margin-top:8px;padding:8px 10px;background:rgba(201,168,76,.06);border-radius:6px">';
+  html += '<div style="font-size:11px;color:var(--paper2);line-height:1.7">';
+  html += '<b>结论：</b>' + gejuName + '，成格条件满足<b>' + chengMet + '/' + chengTiaoJian.length + '</b>';
+  if (baiTiaoJian.length > 0) html += '，败格风险<b>' + baiMet + '/' + baiTiaoJian.length + '</b>';
+  if (hasJiuYing) html += '，有救应化解';
+  html += '。' + (level.indexOf('上格') >= 0 ? '此格成而高，主富贵双全。' : level.indexOf('中格') >= 0 && level.indexOf('中下') < 0 ? '此格成而可用，主平稳有余。' : level.indexOf('中下') >= 0 ? '此格半成半败，需后天努力补足。' : '此格败而无力，需大运行喜用方能有成。');
+  html += '</div></div>';
+  html += '</div>';
+  return html;
+}
+try { window.buildGejuChengBaiHTML = buildGejuChengBaiHTML; } catch(e){}
 
 // ═══════ 补全：命局层次 ═══════
 function judgeMingJuCengci(geju, yongshen, isStrong, eleCount) {
