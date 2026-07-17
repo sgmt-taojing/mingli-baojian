@@ -2527,6 +2527,170 @@ function generateSummary(mingGua, isZhaiCompatible, feiXing, xingShi) {
   return parts.join('\n');
 }
 
+// ============================================================
+// === D.2 玄空飞星组合断 — analyzeFeixingCombo ===
+// ============================================================
+
+/**
+ * 25种常见飞星组合含义表
+ * 格式: '山星-向星' → { name, jixiong, area, desc }
+ */
+var FEIXING_COMBOS = {
+  '1-4': { name: '文昌组合', jixiong: '吉', area: '学业/桃花', desc: '一白水生四绿木，主文昌发秀，利读书考试、文职升迁。少年主聪慧，成年主桃花人缘。' },
+  '1-1': { name: '比和组合', jixiong: '吉', area: '官贵/人缘', desc: '一白重逢，主官贵齐聚、人缘极佳，利仕途与社交。' },
+  '1-6': { name: '金水相生', jixiong: '吉', area: '官运/偏财', desc: '六白金生一白水，主官升迁、偏财旺，利远行求谋。' },
+  '1-7': { name: '水火交战', jixiong: '凶', area: '感情/口舌', desc: '一白水克七赤金，主口舌是非、感情波折，宜用木通关化解。' },
+  '1-8': { name: '土水相克', jixiong: '凶', area: '健康/子嗣', desc: '八白土克一白水，主中男有灾、肾病、子嗣艰难，宜用金化解。' },
+  '1-9': { name: '水火既济', jixiong: '吉', area: '喜庆/姻缘', desc: '一白水与九紫火，水火既济，主喜庆姻缘、添丁进财。' },
+  '2-5': { name: '病符组合', jixiong: '大凶', area: '健康/灾祸', desc: '二黑土与五黄土交加，主重病、灾祸、损主，宜用金属六铜钱化解。' },
+  '2-2': { name: '病符重叠', jixiong: '凶', area: '健康', desc: '二黑重叠，病符力量倍增，主久病不愈、妇科疾病，宜金属化解。' },
+  '2-7': { name: '先天火土', jixiong: '吉', area: '财运/喜庆', desc: '二七先天合火，主喜庆进财、置业，但过旺则主火灾，需注意防火。' },
+  '2-8': { name: '比和土旺', jixiong: '平', area: '财运/健康', desc: '二八同为土，比和则财旺但土过旺主脾胃病，宜金泄土。' },
+  '3-7': { name: '贼盗组合', jixiong: '凶', area: '破财/争斗', desc: '三碧木与七赤金，金克木主贼盗、破财、争斗，宜用水通关或火制金。' },
+  '3-3': { name: '禄存重叠', jixiong: '凶', area: '口舌/官非', desc: '三碧重叠，主口舌官非、兄弟不和，宜用火泄木气化解。' },
+  '3-4': { name: '碧绿风魔', jixiong: '凶', area: '口舌/健康', desc: '三四同为木，主口舌是非、风疾、手脚受伤，宜火泄之。' },
+  '3-8': { name: '木土相克', jixiong: '凶', area: '健康/财运', desc: '三碧木克八白土，主脾胃病、破财，宜火通关化解。' },
+  '3-9': { name: '木火通明', jixiong: '吉', area: '学业/事业', desc: '三碧木生九紫火，木火通明主文才出众、事业升迁，利学业考试。' },
+  '4-1': { name: '文昌组合', jixiong: '吉', area: '学业/桃花', desc: '四绿木与一白水，水生木主文昌发秀，利读书、考试、文职。' },
+  '4-4': { name: '文曲重叠', jixiong: '吉', area: '学业', desc: '四绿重叠主文昌极旺，利学术研究，但过旺则主桃花困扰。' },
+  '4-7': { name: '金克木', jixiong: '凶', area: '健康/破财', desc: '七赤金克四绿木，主呼吸道疾病、破财，宜水通关化解。' },
+  '4-8': { name: '木土相克', jixiong: '凶', area: '健康', desc: '四绿木克八白土，主脾胃病、消化不良，宜火化解。' },
+  '6-1': { name: '金水相生', jixiong: '吉', area: '官运/偏财', desc: '六白金生一白水，主官贵升迁、偏财进益，利武职远行。' },
+  '6-6': { name: '武曲重叠', jixiong: '吉', area: '官运/偏财', desc: '六白重叠主权力集中、偏财旺，但过刚易折，宜水泄金。' },
+  '6-8': { name: '土金相生', jixiong: '吉', area: '财运/置业', desc: '八白土生六白金，主财运亨通、置业有利，丁财两旺。' },
+  '7-3': { name: '贼盗组合', jixiong: '凶', area: '破财/争斗', desc: '七赤金克三碧木，主贼盗、破财、口舌争斗，宜水通关化解。' },
+  '8-8': { name: '左辅重叠', jixiong: '吉', area: '正财/置业', desc: '八白重叠主正财极旺、置业有利，但土过旺主脾胃病，宜金泄。' },
+  '9-1': { name: '火水未济', jixiong: '凶', area: '健康/感情', desc: '九紫火与一白水，水火未济主感情波折、心血管疾病，宜木通关。' }
+};
+
+/**
+ * 五行生克关系判断
+ * @returns {string} '生'/'克'/'比和'
+ */
+function wxRelation(a, b) {
+  var wxA = NINE_STARS[a] ? NINE_STARS[a].wuxing : '';
+  var wxB = NINE_STARS[b] ? NINE_STARS[b].wuxing : '';
+  if (!wxA || !wxB) return '未知';
+  if (wxA === wxB) return '比和';
+  var shengMap = { '金': '水', '水': '木', '木': '火', '火': '土', '土': '金' };
+  var keMap = { '金': '木', '木': '土', '土': '水', '水': '火', '火': '金' };
+  if (shengMap[wxA] === wxB) return '生(山生向)';
+  if (shengMap[wxB] === wxA) return '生(向生山)';
+  if (keMap[wxA] === wxB) return '克(山克向)';
+  if (keMap[wxB] === wxA) return '克(向克山)';
+  return '未知';
+}
+
+/**
+ * analyzeFeixingCombo(panData)
+ * 玄空飞星组合断 — 分析山星与向星组合的含义
+ *
+ * @param {Object} panData — computeFeixing() 的返回值
+ * @returns {Object} { combos, daoShanDaoXiang, summary }
+ */
+function analyzeFeixingCombo(panData) {
+  var gongPositions = panData.gongPositions || {};
+  var yun = panData.yun || 1;
+  var wangXing = yun; // 当运旺星
+  var combos = [];
+
+  // 遍历九宫，分析每宫的山星-向星组合
+  for (var gongNum in gongPositions) {
+    if (!gongPositions.hasOwnProperty(gongNum)) continue;
+    var gData = gongPositions[gongNum];
+    var shanStar = gData.shan;
+    var xiangStar = gData.xiang;
+    var key = shanStar + '-' + xiangStar;
+    var combo = FEIXING_COMBOS[key];
+
+    // 运星与山向星的关系
+    var yunStar = gData.yun;
+    var yunShanRel = wxRelation(yunStar, shanStar);
+    var yunXiangRel = wxRelation(yunStar, xiangStar);
+
+    // 判断该宫是否为到山/到向
+    var isDaoShan = (shanStar === wangXing);
+    var isDaoXiang = (xiangStar === wangXing);
+
+    var comboItem = {
+      gong: gData.gua || '',
+      direction: gData.direction || '',
+      shanStar: shanStar,
+      xiangStar: xiangStar,
+      yunStar: yunStar,
+      comboName: combo ? combo.name : shanStar + '-' + xiangStar + '组合',
+      jixiong: combo ? combo.jixiong : '平',
+      area: combo ? combo.area : '一般',
+      desc: combo ? combo.desc : NINE_STARS[shanStar].name + '山' + NINE_STARS[xiangStar].name + '向，组合无特殊吉凶。',
+      yunShanRel: yunShanRel,
+      yunXiangRel: yunXiangRel,
+      isDaoShan: isDaoShan,
+      isDaoXiang: isDaoXiang
+    };
+    combos.push(comboItem);
+  }
+
+  // 到山到向 vs 上山下水判断
+  var sittingGua = panData.sitting ? panData.sitting.gua : null;
+  var facingGua = panData.facing ? panData.facing.gua : null;
+  var shanPan = panData.shanPan || {};
+  var xiangPan = panData.xiangPan || {};
+
+  var shanAtSitting = sittingGua ? shanPan[sittingGua] : null;
+  var xiangAtFacing = facingGua ? xiangPan[facingGua] : null;
+  var shanAtFacing = facingGua ? shanPan[facingGua] : null;
+  var xiangAtSitting = sittingGua ? xiangPan[sittingGua] : null;
+
+  var daoShanDaoXiang = {
+    isDaoShanDaoXiang: false,
+    isShangShanXiaShui: false,
+    isShuangXingDaoXiang: false,
+    isShuangXingDaoShan: false,
+    pattern: '',
+    desc: ''
+  };
+
+  if (shanAtSitting === wangXing && xiangAtFacing === wangXing) {
+    daoShanDaoXiang.isDaoShanDaoXiang = true;
+    daoShanDaoXiang.pattern = '到山到向';
+    daoShanDaoXiang.desc = '当运旺星' + wangXing + '到山到向，丁财两旺，为玄空最吉之格局。《沈氏玄空学》："旺山旺向，丁财并发。"';
+  } else if (shanAtFacing === wangXing && xiangAtSitting === wangXing) {
+    daoShanDaoXiang.isShangShanXiaShui = true;
+    daoShanDaoXiang.pattern = '上山下水';
+    daoShanDaoXiang.desc = '当运旺星' + wangXing + '上山下水，山神下水损丁，水神上山破财。《沈氏玄空学》："山上龙神不下水，水里龙神不上山。"此为破格。';
+  } else if (shanAtFacing === wangXing && xiangAtFacing === wangXing) {
+    daoShanDaoXiang.isShuangXingDaoXiang = true;
+    daoShanDaoXiang.pattern = '双星到向';
+    daoShanDaoXiang.desc = '当运旺星' + wangXing + '双星到向，旺财不旺丁，宜向方见水聚财。';
+  } else if (shanAtSitting === wangXing && xiangAtSitting === wangXing) {
+    daoShanDaoXiang.isShuangXingDaoShan = true;
+    daoShanDaoXiang.pattern = '双星到坐';
+    daoShanDaoXiang.desc = '当运旺星' + wangXing + '双星到坐，旺丁不旺财，宜另布旺财之局。';
+  } else {
+    daoShanDaoXiang.pattern = '非旺山向';
+    daoShanDaoXiang.desc = '当运旺星' + wangXing + '未到山向，需靠合十、生成等法补救。';
+  }
+
+  // 汇总
+  var goodCombos = combos.filter(function(c) { return c.jixiong === '吉' || c.jixiong === '大吉'; });
+  var badCombos = combos.filter(function(c) { return c.jixiong === '凶' || c.jixiong === '大凶'; });
+  var summary = '玄空飞星组合断：共分析' + combos.length + '宫位。';
+  summary += '到山到向格局：' + daoShanDaoXiang.pattern + '。';
+  if (goodCombos.length > 0) {
+    summary += '吉组合' + goodCombos.length + '组：' + goodCombos.map(function(c) { return c.gong + c.comboName; }).join('、') + '。';
+  }
+  if (badCombos.length > 0) {
+    summary += '凶组合' + badCombos.length + '组：' + badCombos.map(function(c) { return c.gong + c.comboName; }).join('、') + '，需化解。';
+  }
+  summary += daoShanDaoXiang.desc;
+
+  return {
+    combos: combos,
+    daoShanDaoXiang: daoShanDaoXiang,
+    summary: summary
+  };
+}
+
 
 // ============================================================
 // === E. 模块导出 ===
@@ -2548,6 +2712,8 @@ window.FengshuiV3 = {
     computeXingshi,
     // D. 综合
     comprehensiveFengshui,
+    // D.2 飞星组合断
+    analyzeFeixingCombo,
     // 常量
     GUAS,
     DONG_SI_GUAS,
@@ -3574,6 +3740,164 @@ function analyzeLiuyao(params) {
     yuanJiSummary = '元神忌神力量相当，断卦中平——事可缓图，不宜急进。';
   }
 
+  // ═══ R3.3: 六爻·应期判断 ═══
+  // 地支相冲表
+  var YQ_CHONG = {'子':'午','午':'子','丑':'未','未':'丑','寅':'申','申':'寅','卯':'酉','酉':'卯','辰':'戌','戌':'辰','巳':'亥','亥':'巳'};
+  // 地支相合表（六合）
+  var YQ_HE = {'子':'丑','丑':'子','寅':'亥','亥':'寅','卯':'戌','戌':'卯','辰':'酉','酉':'辰','巳':'申','申':'巳','午':'未','未':'午'};
+  // 地支三合局
+  var YQ_SANHE = [
+    {zhi:['寅','午','戌'], ju:'火局'},
+    {zhi:['申','子','辰'], ju:'水局'},
+    {zhi:['亥','卯','未'], ju:'木局'},
+    {zhi:['巳','酉','丑'], ju:'金局'}
+  ];
+  // 六冲顺序
+  var YQ_ZHI_LIST = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+
+  var yingqi = { rules: [], summary: '', nearFar: '', detail: {} };
+
+  if (yongshenYao) {
+    var ysZhi = yongshenYao.zhi || '';
+    var ysWX = yongshenYao.wuxing || '';
+    var ysMoving = yongshenYao.moving || false;
+    var ysWsLevel = wangShuai ? wangShuai.level : '';
+
+    // 1. 静卦应期：以用神旺衰定应期
+    // 旺则逢合、衰则逢生、动则逢合、合则逢冲
+    if (!ysMoving) {
+      // 用神静爻
+      // 逢冲日或逢值日为应期
+      var chongZhi = YQ_CHONG[ysZhi] || '';
+      yingqi.rules.push({
+        rule: '用神静→冲动日或逢值日',
+        zhi: chongZhi + '日或' + ysZhi + '日',
+        desc: '用神' + yongshenYao.name + '爻(' + ysZhi + ')为静爻，静者待冲，逢冲日(' + chongZhi + '日)或逢值日(' + ysZhi + '日)为应期。'
+      });
+
+      // 旺衰辅助
+      if (ysWsLevel === '旺' || ysWsLevel === '相') {
+        // 旺则逢合
+        var heZhi = YQ_HE[ysZhi] || '';
+        yingqi.rules.push({
+          rule: '用神旺→逢合日',
+          zhi: heZhi + '日',
+          desc: '用神旺相(' + ysWsLevel + ')，旺则逢合，合日(' + heZhi + '日)为应期。事成且稳固。'
+        });
+      } else if (ysWsLevel === '休' || ysWsLevel === '囚' || ysWsLevel === '死') {
+        // 衰则逢生
+        var shengWX = '';
+        for (var wxk4 in WX_SHENG) { if (WX_SHENG[wxk4] === ysWX) shengWX = wxk4; }
+        // 找生用神五行的地支
+        var shengZhi = '';
+        for (var zhiK in ZHI_WX) { if (ZHI_WX[zhiK] === shengWX) { shengZhi = zhiK; break; } }
+        yingqi.rules.push({
+          rule: '用神衰→逢生日',
+          zhi: shengZhi + '日',
+          desc: '用神衰弱(' + ysWsLevel + ')，衰则逢生，生用神之日(' + shengZhi + '日,' + shengWX + '生' + ysWX + ')为应期。'
+        });
+      }
+    } else {
+      // 2. 动卦应期：以动爻定应期
+      // 动而逢合为应期
+      var heZhi2 = YQ_HE[ysZhi] || '';
+      yingqi.rules.push({
+        rule: '用神动→逢合日',
+        zhi: heZhi2 + '日',
+        desc: '用神' + yongshenYao.name + '爻(' + ysZhi + ')为动爻，动则逢合，合日(' + heZhi2 + '日)为应期。动而逢合则事定。'
+      });
+    }
+
+    // 3. 用神旬空→出空之期为应期
+    if (xunKong.indexOf(ysZhi) >= 0) {
+      // 出空日 = 用神地支本身逢值日即出空
+      yingqi.rules.push({
+        rule: '用神旬空→出空日',
+        zhi: ysZhi + '日',
+        desc: '用神' + ysZhi + '逢旬空(' + xunKongDesc + ')，出空之日(' + ysZhi + '日)为应期。空则待出，出空方能应事。'
+      });
+    }
+
+    // 4. 用神逢冲→合日为应期
+    // 检查用神是否被日辰冲
+    if (dayZhi && YQ_CHONG[dayZhi] === ysZhi) {
+      var heZhi3 = YQ_HE[ysZhi] || '';
+      yingqi.rules.push({
+        rule: '用神逢冲→合日',
+        zhi: heZhi3 + '日',
+        desc: '用神' + ysZhi + '被日辰' + dayZhi + '冲，逢冲则散，合日(' + heZhi3 + '日)为应期，冲后逢合事乃成。'
+      });
+    }
+
+    // 5. 用神逢合→冲日为应期
+    if (dayZhi && YQ_HE[dayZhi] === ysZhi) {
+      var chongZhi2 = YQ_CHONG[ysZhi] || '';
+      yingqi.rules.push({
+        rule: '用神逢合→冲日',
+        zhi: chongZhi2 + '日',
+        desc: '用神' + ysZhi + '与日辰' + dayZhi + '合，合者需冲开，冲日(' + chongZhi2 + '日)为应期。'
+      });
+    }
+
+    // 6. 远近判断：用神旺则近，衰则远
+    var nearFar = '';
+    var timeUnit = '';
+    if (ysWsLevel === '旺' || ysWsLevel === '相') {
+      nearFar = '近';
+      timeUnit = '日周月（数日内至一周）';
+      yingqi.rules.push({
+        rule: '用神旺→应期近',
+        zhi: '',
+        desc: '用神旺相(' + ysWsLevel + ')，应期近——约在数日至一周内应事。'
+      });
+    } else if (ysWsLevel === '休') {
+      nearFar = '中';
+      timeUnit = '周月（一至数周）';
+      yingqi.rules.push({
+        rule: '用神休→应期中',
+        zhi: '',
+        desc: '用神休气(' + ysWsLevel + ')，应期中等——约在一至数周内应事。'
+      });
+    } else if (ysWsLevel === '囚' || ysWsLevel === '死') {
+      nearFar = '远';
+      timeUnit = '月年（数月至年余）';
+      yingqi.rules.push({
+        rule: '用神衰→应期远',
+        zhi: '',
+        desc: '用神衰弱(' + ysWsLevel + ')，应期远——约在数月至年余应事，需耐心等待。'
+      });
+    }
+    yingqi.nearFar = nearFar;
+    yingqi.timeUnit = timeUnit;
+
+    // 汇总
+    var yqSumParts = [];
+    for (var yqi = 0; yqi < yingqi.rules.length; yqi++) {
+      yqSumParts.push(yingqi.rules[yqi].desc);
+    }
+    yingqi.summary = yqSumParts.length > 0 ? yqSumParts.join(' ') : '无法判断应期，需更多信息。';
+
+    yingqi.detail = {
+      yongshenZhi: ysZhi,
+      yongshenWX: ysWX,
+      yongshenMoving: ysMoving,
+      yongshenWangShuai: ysWsLevel,
+      dayZhi: dayZhi,
+      xunKong: xunKong
+    };
+  } else {
+    // 用神不上卦
+    yingqi.summary = '用神不上卦，无以直接断应期。需寻伏神，待伏神出露之日为应期。';
+    if (fuFei && fuFei.fuShen) {
+      yingqi.rules.push({
+        rule: '伏神出露日',
+        zhi: fuFei.fuShen.zhi + '日',
+        desc: '用神不上卦，伏神在' + fuFei.fuShen.zhi + '，待伏神出露之日(' + fuFei.fuShen.zhi + '日)为应期。'
+      });
+      yingqi.detail = { fuShenZhi: fuFei.fuShen.zhi };
+    }
+  }
+
   return {
     hexagram, najia, liuqin, liushen, shiying, yongshenInfo,
     yaos, yongshenYao, wangShuai, shiYingRelation,
@@ -3594,7 +3918,9 @@ function analyzeLiuyao(params) {
     chongHe: chongHe,
     fuFei: fuFei,
     // R2.9: 动爻化进化退 + 暗动爻
-    dongYaoAnalysis: dongYaoAnalysis
+    dongYaoAnalysis: dongYaoAnalysis,
+    // R3.3: 应期判断
+    yingqi: yingqi
   };
 }
 
