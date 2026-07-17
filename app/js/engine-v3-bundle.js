@@ -3312,6 +3312,102 @@ function analyzeLiuyao(params) {
     }
   }
 
+  // ═══ R2.8: 六冲六合卦 + 伏神飞神 ═══
+  // 1. 六冲卦检测：八纯卦（乾坎艮震巽离坤兑）为六冲卦
+  var benGuaName = hexagram.benGua ? hexagram.benGua.name : '';
+  var LIUCHONG_GUA = ['乾','坎','艮','震','巽','离','坤','兑'];
+  var isLiuChong = LIUCHONG_GUA.indexOf(benGuaName) >= 0;
+
+  // 2. 六合卦检测：特定的卦象组合
+  var LIUHE_GUA = ['否','泰','临','遁','大壮','观','大过','小过','颐','中孚','渐','归妹','丰','旅','贲','节','涣','井','同寅','同人而'];
+  // 实际六合卦：内卦三爻与外卦三爻逐一相合
+  // 地支六合：子丑合、寅亥合、卯戌合、辰酉合、巳申合、午未合
+  var ZHI_HE_MAP = {'子':'丑','丑':'子','寅':'亥','亥':'寅','卯':'戌','戌':'卯','辰':'酉','酉':'辰','巳':'申','申':'巳','午':'未','未':'午'};
+  var isLiuHe = false;
+  if (najia && najia.length >= 6) {
+    // najia 从初爻到上爻
+    var n0 = najia[0].zhi, n1 = najia[1].zhi, n2 = najia[2].zhi;
+    var n3 = najia[3].zhi, n4 = najia[4].zhi, n5 = najia[5].zhi;
+    // 六合卦条件：初与四合、二与五合、三与上合
+    if (ZHI_HE_MAP[n0] === n3 && ZHI_HE_MAP[n1] === n4 && ZHI_HE_MAP[n2] === n5) {
+      isLiuHe = true;
+    }
+  }
+  // 补充经典六合卦名检测
+  if (!isLiuHe) {
+    var LIUHE_NAMES = ['否','泰','临','遁','大壮','观','大过','小过','颐','中孚','渐','归妹','丰','旅','贲','节','涣','井'];
+    if (LIUHE_NAMES.indexOf(benGuaName) >= 0) {
+      isLiuHe = true;
+    }
+  }
+
+  var chongHe = {
+    isLiuChong: isLiuChong,
+    isLiuHe: isLiuHe,
+    benGuaName: benGuaName,
+    desc: ''
+  };
+  if (isLiuChong) {
+    chongHe.desc = '此卦为六冲卦（八纯卦），冲者散也——主事多散乱、反复、不持久。占事宜速不宜迟，占关系主分离，占求财主聚散无常。但冲中也有生机，逢合月日可解。';
+  } else if (isLiuHe) {
+    chongHe.desc = '此卦为六合卦，合者和也——主事多和合、迟缓、久长。占事宜缓不宜急，占关系主合好，占求财主渐进。但合久必分，逢冲月日需防变故。';
+  } else {
+    chongHe.desc = '此卦非六冲非六合，冲合之中平。需看各爻生克关系定吉凶。';
+  }
+
+  // 3. 伏神飞神：当用神不上卦时，从本宫首卦寻伏神
+  var fuFei = null;
+  if (!yongshenYao) {
+    // 用神不上卦，需要寻伏神
+    var gongName = hexagram.benGua ? hexagram.benGua.gong : '';
+    // 找该宫首卦（六纯卦）
+    var gongFirstGua = BAGONG.find(function(g) { return g.gong === gongName && g.name === gongName; });
+    if (gongFirstGua) {
+      // 获取首卦的纳甲
+      var firstNajia = getNajia({ lower: gongFirstGua.lower, upper: gongFirstGua.upper });
+      // 在首卦纳甲中找用神对应的六亲
+      var gongWX = GONG_WX[gongName] || '';
+      // 首卦的六亲与用神一致的那个爻
+      var fuYao = null;
+      for (var fni = 0; fni < firstNajia.length; fni++) {
+        var fnYao = firstNajia[fni];
+        var fnWX = ZHI_WX[fnYao.zhi] || '';
+        var fnLiuqin = '';
+        if (fnWX === gongWX) fnLiuqin = '兄弟';
+        else if (WX_SHENG[gongWX] === fnWX) fnLiuqin = '父母';
+        else if (WX_SHENG[fnWX] === gongWX) fnLiuqin = '子孙';
+        else if (WX_KE[gongWX] === fnWX) fnLiuqin = '妻财';
+        else if (WX_KE[fnWX] === gongWX) fnLiuqin = '官鬼';
+        if (fnLiuqin === yongshenInfo.yongshen) {
+          fuYao = { pos: fnYao.pos, gan: fnYao.gan, zhi: fnYao.zhi, wuxing: fnWX, liuqin: fnLiuqin };
+          break;
+        }
+      }
+      if (fuYao) {
+        // 飞神 = 本卦中对应位置的爻
+        var feiYao = yaos.find(function(y) { return y.pos === fuYao.pos; });
+        var fuFeiRelation = '';
+        if (feiYao) {
+          var fuWX = fuYao.wuxing;
+          var feiWX = feiYao.wuxing;
+          if (fuWX === feiWX) fuFeiRelation = '伏神与飞神同类五行，伏神可得飞神助力';
+          else if (WX_SHENG[feiWX] === fuWX) fuFeiRelation = '飞神生伏神，伏神得飞神之助，易出';
+          else if (WX_SHENG[fuWX] === feiWX) fuFeiRelation = '伏神生飞神，伏神泄气于飞神，难出';
+          else if (WX_KE[feiWX] === fuWX) fuFeiRelation = '飞神克伏神，伏神被压制，终不起';
+          else if (WX_KE[fuWX] === feiWX) fuFeiRelation = '伏神克飞神，伏神可冲破飞神而出';
+        }
+        fuFei = {
+          gongName: gongName,
+          yongshenName: yongshenInfo.yongshen,
+          fuShen: { pos: fuYao.pos, gan: fuYao.gan, zhi: fuYao.zhi, wuxing: fuYao.wuxing, liuqin: fuYao.liuqin },
+          feiShen: feiYao ? { pos: feiYao.pos, gan: feiYao.gan, zhi: feiYao.zhi, wuxing: feiYao.wuxing, liuqin: feiYao.liuqin } : null,
+          relation: fuFeiRelation,
+          desc: '用神' + yongshenInfo.yongshen + '不上卦，从' + gongName + '宫首卦' + gongName + '卦中寻伏神。伏神在' + (['初','二','三','四','五','上'][fuYao.pos]) + '爻(' + fuYao.gan + fuYao.zhi + ')，' + (feiYao ? '飞神在' + (['初','二','三','四','五','上'][feiYao.pos]) + '爻(' + feiYao.gan + feiYao.zhi + ')。' : '') + fuFeiRelation
+        };
+      }
+    }
+  }
+
   // 断卦综合判断
   var yuanJiSummary = '';
   var hasYuan = yuanYao && (yuanWangShuai === '旺' || yuanWangShuai === '相');
@@ -3343,7 +3439,10 @@ function analyzeLiuyao(params) {
     chouShenWX: chouWX,
     // R2.7: 月令旺衰 + 旬空
     monthWangShuai: monthWangShuai,
-    kongWang: kongWang
+    kongWang: kongWang,
+    // R2.8: 六冲六合 + 伏神飞神
+    chongHe: chongHe,
+    fuFei: fuFei
   };
 }
 
@@ -7810,6 +7909,488 @@ function analyzeDayunDetail(panData) {
 }
 
 /**
+ * R2.5: 紫微·四化深度释义
+ * 每个四化落宫的具体含义 + 四化互动分析 + 生年四化vs大限四化对比
+ * @param {object} panData - 排盘数据
+ * @returns {object} { sihuaDetails, sihuaInteractions, summary }
+ */
+function analyzeSihuaDetail(panData) {
+  var sihuaPalaces = panData.sihuaPalaces || [];
+  var gongMap = panData.gongMap;
+  var stars = panData.stars || [];
+  var mingPos = gongMap['命宫'];
+  var yearGan = panData.yearGan;
+  var dayun = panData.dayun || [];
+  var currentDayun = panData.currentDayun;
+
+  // 四化落宫释义库
+  var sihuaMeanings = {
+    '化禄': {
+      '命宫': '自身有福气财运，天生带财库，做事顺遂，贵人多助',
+      '兄弟': '兄弟姐妹缘深，朋友带来财运，合伙获利',
+      '夫妻': '配偶有财，婚姻带来财运，感情美满富足',
+      '子女': '子女有出息，投资获利，生育顺利',
+      '财帛': '财源广进，收入丰厚，理财有道，一生不缺钱',
+      '疾厄': '身体健康，遇病易愈，体质好',
+      '迁移': '外出得财，在外人缘好，适合外地发展',
+      '交友': '朋友带来财运，下属忠诚能干',
+      '官禄': '事业有成，升职加薪，创业顺利',
+      '田宅': '房产丰厚，家庭和睦，置产获利',
+      '福德': '精神愉悦，兴趣广泛，享受人生',
+      '父母': '父母关爱，长辈提携，家教良好'
+    },
+    '化权': {
+      '命宫': '性格强势有主见，领导力强，敢作敢为，不宜合作',
+      '兄弟': '兄弟姐妹中有能人，朋友强势，需注意摩擦',
+      '夫妻': '配偶强势掌权，婚姻中有主导权争夺，需互相尊重',
+      '子女': '子女个性强，管教需用心，子女有成就',
+      '财帛': '理财有方，善掌控财富，但易因强势破财',
+      '疾厄': '身体壮健但易因过劳伤身，注意肝胆',
+      '迁移': '在外有掌控力，适合外出掌权，但易招竞争',
+      '交友': '下属服从，朋友有权势，但需防权力斗争',
+      '官禄': '事业掌权，升职快，管理能力强，适合领导岗',
+      '田宅': '家中掌权，房产投资有眼光，但家庭易有摩擦',
+      '福德': '内心强大，精神充实，但易因执着而不安',
+      '父母': '父母严格，长辈管教有力，家教正统'
+    },
+    '化科': {
+      '命宫': '名声好，气质文雅，有学问，受人尊重',
+      '兄弟': '兄弟姐妹有学识，朋友贵气，社交圈层高',
+      '夫妻': '配偶温文尔雅，婚姻有品味，感情清雅',
+      '子女': '子女聪明好学，学业优秀，亲子关系和谐',
+      '财帛': '财源正派，收入稳定，以名声得财',
+      '疾厄': '身体调养有方，注重养生，少病少灾',
+      '迁移': '在外有名望，外出遇贵人，口碑好',
+      '交友': '朋友有学问，下属能干且忠诚',
+      '官禄': '事业有声名，考试顺利，适合学术文艺',
+      '田宅': '家庭环境优雅，房产有升值潜力',
+      '福德': '精神追求高雅，兴趣有品位，内心平和',
+      '父母': '父母有教养，长辈是贵人，家学渊源'
+    },
+    '化忌': {
+      '命宫': '早年波折，性格执念重，多思多虑，需修炼心性',
+      '兄弟': '兄弟姐妹缘薄，朋友易失信，合伙需谨慎',
+      '夫妻': '感情波折，婚姻多摩擦，需包容忍让',
+      '子女': '子女缘薄，亲子关系紧张，生育不易',
+      '财帛': '财运不稳，财来财去，需谨慎理财防破财',
+      '疾厄': '健康有隐患，慢性病多，需注重保养',
+      '迁移': '外出不顺，在外多波折，不宜远行',
+      '交友': '朋友易背叛，下属不服，人际纠纷多',
+      '官禄': '事业多阻碍，升职有波折，需坚持忍耐',
+      '田宅': '房产有纠纷，家庭不和睦，置产需谨慎',
+      '福德': '精神不安，容易焦虑抑郁，需修心养性',
+      '父母': '父母缘薄，长辈健康有忧，家庭有变故'
+    }
+  };
+
+  // 构建四化详情
+  var sihuaDetails = [];
+  var luPos = -1, quanPos = -1, kePos = -1, jiPos = -1;
+  for (var i = 0; i < sihuaPalaces.length; i++) {
+    var sp = sihuaPalaces[i];
+    var type = sp.type;
+    var star = sp.star;
+    var gongName = sp.gong;
+    var pos = sp.pos;
+
+    if (type === '化禄') luPos = pos;
+    else if (type === '化权') quanPos = pos;
+    else if (type === '化科') kePos = pos;
+    else if (type === '化忌') jiPos = pos;
+
+    var meaning = sihuaMeanings[type] && sihuaMeanings[type][gongName] ? sihuaMeanings[type][gongName] : '该宫位受' + type + '影响，运势有所转变';
+    var advice = '';
+    if (type === '化禄') advice = '顺势而为，把握机缘，广结善缘';
+    else if (type === '化权') advice = '勇于担当，发挥领导力，但需适度放权';
+    else if (type === '化科') advice = '提升学识，经营名声，考试升职有利';
+    else if (type === '化忌') advice = '保守为宜，化解执念，修身养性';
+
+    var color = type === '化禄' ? '#27ae60' : type === '化权' ? '#e74c3c' : type === '化科' ? '#c9a84c' : '#8e44ad';
+
+    sihuaDetails.push({
+      type: type,
+      star: star,
+      gong: gongName,
+      pos: pos,
+      gongZhi: BRANCHES[pos],
+      meaning: meaning,
+      advice: advice,
+      color: color
+    });
+  }
+
+  // 四化互动分析
+  var sihuaInteractions = [];
+
+  // 1. 禄忌冲：化禄与化忌在对宫
+  if (luPos >= 0 && jiPos >= 0) {
+    if (mod(luPos + 6, 12) === jiPos) {
+      var luGong = getGongNameByPos(luPos, gongMap);
+      var jiGong = getGongNameByPos(jiPos, gongMap);
+      sihuaInteractions.push({
+        name: '禄忌冲',
+        desc: '化禄入' + luGong + '与化忌入' + jiGong + '在对宫对冲',
+        effect: '财运有波折，吉凶参半。化禄带来的财气被化忌冲散，需谨慎守财，不宜冒进。',
+        severity: '中凶',
+        color: '#e67e22'
+      });
+    }
+  }
+
+  // 2. 禄权交驰：化禄与化权在三方会照
+  if (luPos >= 0 && quanPos >= 0) {
+    var diff1 = mod(quanPos - luPos, 12);
+    if (diff1 === 4 || diff1 === 5 || diff1 === 7 || diff1 === 8 || diff1 === 6) {
+      sihuaInteractions.push({
+        name: '禄权交驰',
+        desc: '化禄与化权在三方四正会照',
+        effect: '富贵双全。化禄主财，化权主权，二者交驰则财权双得，事业财运俱佳。',
+        severity: '大吉',
+        color: '#27ae60'
+      });
+    }
+  }
+
+  // 3. 科禄权三奇：三化同会
+  var sanhuiCount = 0;
+  var sanhuiGongs = [];
+  if (luPos >= 0) { sanhuiCount++; sanhuiGongs.push(getGongNameByPos(luPos, gongMap)); }
+  if (quanPos >= 0) { sanhuiCount++; sanhuiGongs.push(getGongNameByPos(quanPos, gongMap)); }
+  if (kePos >= 0) { sanhuiCount++; sanhuiGongs.push(getGongNameByPos(kePos, gongMap)); }
+  if (sanhuiCount >= 3) {
+    // 检查是否在三方四正内会照
+    var allInSanfang = true;
+    var positions = [luPos, quanPos, kePos].filter(function(p) { return p >= 0; });
+    for (var pi = 0; pi < positions.length; pi++) {
+      for (var pj = pi + 1; pj < positions.length; pj++) {
+ var d = mod(positions[pj] - positions[pi], 12);
+        if (d !== 0 && d !== 4 && d !== 5 && d !== 6 && d !== 7 && d !== 8) {
+          allInSanfang = false;
+        }
+      }
+    }
+    if (allInSanfang) {
+      sihuaInteractions.push({
+        name: '科禄权三奇嘉会',
+        desc: '化禄、化权、化科三化同会于三方四正(' + sanhuiGongs.join('、') + ')',
+        effect: '大吉格局！三奇嘉会主大富贵，名利双收，事业财运名声俱达顶峰。',
+        severity: '大吉',
+        color: '#2ecc71'
+      });
+    }
+  }
+
+  // 4. 双忌夹命：两个化忌夹命宫
+  if (jiPos >= 0) {
+    var prevPos = mod(mingPos - 1, 12);
+    var nextPos = mod(mingPos + 1, 12);
+    // 检查大限四化是否有另一个化忌
+    var hasDoubleJi = false;
+    if (currentDayun) {
+      var dGanIdx = STEMS.indexOf(yearGan);
+      // 检查大限天干四化
+      for (var di = 0; di < dayun.length; di++) {
+        if (dayun[di].pos === prevPos || dayun[di].pos === nextPos) {
+          // 简化检查：如果化忌在对宫相邻
+        }
+      }
+    }
+    // 生年化忌夹命：化忌在命宫前后两宫
+    if (jiPos === prevPos || jiPos === nextPos) {
+      hasDoubleJi = false; // 单忌不算双忌
+    }
+    // 检查是否有大限化忌也在附近
+    if (currentDayun && currentDayun.dGan) {
+      var dSihua = SIHUA_TABLE[currentDayun.dGan] || {};
+      if (dSihua.ji) {
+        for (var sp2 = 0; sp2 < 12; sp2++) {
+          if ((stars[sp2] || []).indexOf(dSihua.ji) >= 0) {
+            if ((sp2 === prevPos && jiPos === nextPos) || (sp2 === nextPos && jiPos === prevPos)) {
+              hasDoubleJi = true;
+            }
+          }
+        }
+      }
+    }
+    if (hasDoubleJi) {
+      sihuaInteractions.push({
+        name: '双忌夹命',
+        desc: '生年化忌与大限化忌分居命宫前后两宫',
+        effect: '大凶！双忌夹命主运势困顿，多波折阻碍，需谨慎行事，保守为上。',
+        severity: '大凶',
+        color: '#c0392b'
+      });
+    }
+  }
+
+  // 5. 禄忌同宫：化禄化忌同宫
+  if (luPos >= 0 && jiPos >= 0 && luPos === jiPos) {
+    var sameGong = getGongNameByPos(luPos, gongMap);
+    sihuaInteractions.push({
+      name: '禄忌同宫',
+      desc: '化禄与化忌同入' + sameGong + '宫',
+      effect: '吉凶交织。该宫位事项有得有失，财来财去，需平衡心态，不宜过度追求。',
+      severity: '中平',
+      color: '#f39c12'
+    });
+  }
+
+  // 生年四化 vs 大限四化对比
+  var daxianCompare = null;
+  if (currentDayun) {
+    var dGanIdx2 = -1;
+    // 计算大限天干
+    var yearGanIdx = STEMS.indexOf(yearGan);
+    if (yearGanIdx >= 0) {
+      dGanIdx2 = mod(WUHU_START[yearGanIdx] + currentDayun.pos - 2, 10);
+    }
+    var dGan2 = dGanIdx2 >= 0 ? STEMS[dGanIdx2] : '';
+    var dSihuaTable = SIHUA_TABLE[dGan2] || {};
+    var dSihuaPalaces = [];
+    for (var sk in dSihuaTable) {
+      if (!dSihuaTable.hasOwnProperty(sk)) continue;
+      var sStar = dSihuaTable[sk];
+      for (var sp3 = 0; sp3 < 12; sp3++) {
+        if ((stars[sp3] || []).indexOf(sStar) >= 0) {
+          dSihuaPalaces.push({ type: sk, star: sStar, gongIdx: sp3, gongName: getGongNameByPos(sp3, gongMap) });
+          break;
+        }
+      }
+    }
+
+    var compareItems = [];
+    var types = ['lu', 'quan', 'ke', 'ji'];
+    var typeNames = { lu: '化禄', quan: '化权', ke: '化科', ji: '化忌' };
+    for (var ti = 0; ti < types.length; ti++) {
+      var tk = types[ti];
+      var sn = panData.sihua[tk];
+      var snD = dSihuaTable[tk];
+      var sPosN = -1, sPosD = -1;
+      for (var pp = 0; pp < 12; pp++) {
+        if ((stars[pp] || []).indexOf(sn) >= 0) sPosN = pp;
+        if ((stars[pp] || []).indexOf(snD) >= 0) sPosD = pp;
+      }
+      var nGong = sPosN >= 0 ? getGongNameByPos(sPosN, gongMap) : '未定位';
+      var dGongName = sPosD >= 0 ? getGongNameByPos(sPosD, gongMap) : '未定位';
+      var sameGong2 = sPosN === sPosD && sPosN >= 0;
+      var effect = '';
+      if (tk === 'lu') effect = sameGong2 ? '财运叠加，大限更旺' : '大限财源转向' + dGongName;
+      else if (tk === 'quan') effect = sameGong2 ? '权力叠加，掌控力大增' : '大限权力转向' + dGongName;
+      else if (tk === 'ke') effect = sameGong2 ? '名声叠加，声誉更盛' : '大限名望转向' + dGongName;
+      else effect = sameGong2 ? '阻碍叠加，需特别谨慎' : '大限阻碍转向' + dGongName;
+      compareItems.push({
+        type: typeNames[tk],
+        natalStar: sn, natalGong: nGong,
+        daxianStar: snD, daxianGong: dGongName,
+        sameGong: sameGong2, effect: effect
+      });
+    }
+    daxianCompare = { dGan: dGan2, items: compareItems };
+  }
+
+  // 总结
+  var hasJi = jiPos >= 0;
+  var hasLu = luPos >= 0;
+  var hasSanqi = sihuaInteractions.some(function(x) { return x.name.indexOf('三奇') >= 0; });
+  var hasLiji = sihuaInteractions.some(function(x) { return x.name === '禄忌冲' || x.name === '禄忌同宫'; });
+  var summary = '';
+  if (hasSanqi) {
+    summary = '命盘四化中科禄权三奇嘉会，为大吉之格，名利双收，富贵兼得。';
+  } else if (hasJi && hasLiji) {
+    summary = '命盘四化有禄忌冲克，财运有波折，吉凶参半，需谨慎理财、稳中求进。';
+  } else if (hasLu && !hasJi) {
+    summary = '命盘化禄落位吉利，财源广进，配合化权化科，整体运势良好。';
+  } else if (hasJi && !hasLu) {
+    summary = '命盘化忌入' + (jiPos >= 0 ? getGongNameByPos(jiPos, gongMap) : '') + '宫，该领域多波折，需化解执念、修身养性。';
+  } else {
+    summary = '四化分布平稳，各宫位受不同四化影响，需综合全盘判断吉凶。';
+  }
+  if (daxianCompare) {
+    summary += ' 大限四化与生年四化' + (daxianCompare.items.some(function(x) { return x.sameGong; }) ? '有叠加共振，' : '各有落位，') + '需结合大限宫位综合论断。';
+  }
+
+  return {
+    sihuaDetails: sihuaDetails,
+    sihuaInteractions: sihuaInteractions,
+    daxianCompare: daxianCompare,
+    summary: summary
+  };
+}
+
+/**
+ * R2.6: 紫微·流年分析
+ * 流年宫位定位 + 流年天干四化排布 + 流年与本命/大限互动
+ * @param {object} panData - 排盘数据
+ * @param {number} currentYear - 当前年份（公历）
+ * @returns {object} { liunianGong, liunianStars, liunianSihua, interaction, summary }
+ */
+function analyzeLiunian(panData, currentYear) {
+  var gongMap = panData.gongMap;
+  var stars = panData.stars || [];
+  var mingPos = gongMap['命宫'];
+  var yearGan = panData.yearGan;
+  var yearGanIdx = STEMS.indexOf(yearGan);
+  var dayun = panData.dayun || [];
+  var currentDayun = panData.currentDayun;
+
+  // 1. 流年宫位定位：流年地支对应的宫位
+  var yearZhiIdx = mod(currentYear - 4, 12);
+  var yearZhi = BRANCHES[yearZhiIdx];
+  // 流年宫位 = 流年地支所在宫位
+  var liunianGongPos = yearZhiIdx;
+  // 流年宫名（以命宫为基准的宫位名）
+  var liunianGongName = getGongNameByPos(liunianGongPos, gongMap);
+
+  // 2. 流年天干四化排布
+  // 流年天干 = (年份 - 4) % 10
+  var liunianGanIdx = mod(currentYear - 4, 10);
+  var liunianGan = STEMS[liunianGanIdx];
+  var liunianSihuaTable = SIHUA_TABLE[liunianGan] || {};
+  var liunianSihua = [];
+  var lSihuaPalaces = [];
+  for (var sk in liunianSihuaTable) {
+    if (!liunianSihuaTable.hasOwnProperty(sk)) continue;
+    var sStar = liunianSihuaTable[sk];
+    var sPos = -1;
+    for (var sp = 0; sp < 12; sp++) {
+      if ((stars[sp] || []).indexOf(sStar) >= 0) {
+        sPos = sp;
+        break;
+      }
+    }
+    var sGongName = sPos >= 0 ? getGongNameByPos(sPos, gongMap) : '未定位';
+    var typeLabel = sk === 'lu' ? '化禄' : sk === 'quan' ? '化权' : sk === 'ke' ? '化科' : '化忌';
+    var color = sk === 'lu' ? '#27ae60' : sk === 'quan' ? '#e74c3c' : sk === 'ke' ? '#c9a84c' : '#8e44ad';
+    liunianSihua.push({
+      type: typeLabel,
+      star: sStar,
+      gongIdx: sPos,
+      gongName: sGongName,
+      color: color
+    });
+    if (sPos >= 0) lSihuaPalaces.push(sPos);
+  }
+
+  // 3. 流年宫位主星组合
+  var liunianStars = stars[liunianGongPos] || [];
+  var oppPos = mod(liunianGongPos + 6, 12);
+  var oppStars = stars[oppPos] || [];
+  var sanfangPos1 = mod(liunianGongPos + 4, 12);
+  var sanfangPos2 = mod(liunianGongPos + 5, 12);
+  var sanfangStars = (stars[sanfangPos1] || []).concat(stars[sanfangPos2] || []);
+
+  // 主星庙旺
+  var liunianStrengths = liunianStars.map(function(s) {
+    var table = STAR_STRENGTH[s];
+    if (!table) return { star: s, label: '平' };
+    return { star: s, label: STRENGTH_LABELS[table[liunianGongPos]] || '平' };
+  });
+
+  // 4. 流年与大限/本命的互动
+  var interaction = {
+    liunianToMing: '',
+    liunianToCaiwei: '',
+    liunianToGuanlu: '',
+    liunianSanfangToMing: false,
+    daxianInteract: ''
+  };
+
+  // 流年宫位与命宫的关系（三方四正会照否）
+  var diffToMing = mod(liunianGongPos - mingPos, 12);
+  var isSanfang = (diffToMing === 0 || diffToMing === 4 || diffToMing === 5 || diffToMing === 6 || diffToMing === 7 || diffToMing === 8);
+  interaction.liunianSanfangToMing = isSanfang;
+  if (diffToMing === 0) {
+    interaction.liunianToMing = '流年宫位与命宫同宫，今年个人运势为核心，性格、健康、事业均受直接影响';
+  } else if (diffToMing === 6) {
+    interaction.liunianToMing = '流年宫位在命宫对宫(迁移位)，今年外出运势强，宜动不宜静，适合外出发展';
+  } else if (diffToMing === 4 || diffToMing === 8) {
+    interaction.liunianToMing = '流年宫位与命宫在三方会照，今年运势与命宫形成合力，发展顺利';
+  } else if (diffToMing === 5 || diffToMing === 7) {
+    interaction.liunianToMing = '流年宫位与命宫在三方四正会照，今年运势平稳，有贵人助力';
+  } else {
+    interaction.liunianToMing = '流年宫位与命宫不在三方四正会照，今年运势独立发展，需靠自身努力';
+  }
+
+  // 流年四化对命宫/财帛/官禄的影响
+  var caiweiPos = gongMap['财帛'];
+  var guanluPos = gongMap['官禄'];
+  var sihuaImpactOnMing = [];
+  var sihuaImpactOnCaiwei = [];
+  var sihuaImpactOnGuanlu = [];
+
+  for (var si = 0; si < liunianSihua.length; si++) {
+    var lsh = liunianSihua[si];
+    if (lsh.gongIdx < 0) continue;
+    if (lsh.gongIdx === mingPos) {
+      sihuaImpactOnMing.push(lsh.type + '(' + lsh.star + ')入命宫');
+    }
+    if (lsh.gongIdx === caiweiPos) {
+      sihuaImpactOnCaiwei.push(lsh.type + '(' + lsh.star + ')入财帛宫');
+    }
+    if (lsh.gongIdx === guanluPos) {
+      sihuaImpactOnGuanlu.push(lsh.type + '(' + lsh.star + ')入官禄宫');
+    }
+  }
+
+  interaction.sihuaImpactOnMing = sihuaImpactOnMing.join('、') || '无直接影响';
+  interaction.sihuaImpactOnCaiwei = sihuaImpactOnCaiwei.join('、') || '无直接影响';
+  interaction.sihuaImpactOnGuanlu = sihuaImpactOnGuanlu.join('、') || '无直接影响';
+
+  // 流年与大限互动
+  if (currentDayun) {
+    var dyPos = currentDayun.pos;
+    var diffToDy = mod(liunianGongPos - dyPos, 12);
+    if (diffToDy === 0) {
+      interaction.daxianInteract = '流年宫位与大限宫位重合，今年大限能量集中爆发，运势转折关键年';
+    } else if (diffToDy === 6) {
+      interaction.daxianInteract = '流年宫位在大限对宫，今年大限运势有对立冲突，需平衡调整';
+    } else if (diffToDy === 4 || diffToDy === 5 || diffToDy === 7 || diffToDy === 8) {
+      interaction.daxianInteract = '流年宫位与大限三方四正会照，今年大限运势顺利推进，宜积极行动';
+    } else {
+      interaction.daxianInteract = '流年宫位与大限宫位关系一般，今年大限运势平稳推进';
+    }
+  }
+
+  // 总结
+  var hasLuInMing = sihuaImpactOnMing.some(function(s) { return s.indexOf('化禄') >= 0; });
+  var hasJiInMing = sihuaImpactOnMing.some(function(s) { return s.indexOf('化忌') >= 0; });
+  var hasLuInCai = sihuaImpactOnCaiwei.some(function(s) { return s.indexOf('化禄') >= 0; });
+  var hasJiInCai = sihuaImpactOnCaiwei.some(function(s) { return s.indexOf('化忌') >= 0; });
+  var hasQuanInGuan = sihuaImpactOnGuanlu.some(function(s) { return s.indexOf('化权') >= 0; });
+
+  var summary = currentYear + '年(' + liunianGan + yearZhi + '年)流年宫位在' + liunianGongName + '(' + yearZhi + '宫)';
+  if (liunianStars.length > 0) {
+    summary += '，主星' + liunianStars.join('、');
+  } else {
+    summary += '，无主星(借对宫' + (oppStars.join('、') || '空') + ')';
+  }
+  summary += '。';
+  if (hasLuInMing) summary += '流年化禄入命，今年财运亨通，贵人多助。';
+  if (hasLuInCai) summary += '流年化禄入财帛，今年财源广进。';
+  if (hasQuanInGuan) summary += '流年化权入官禄，今年事业升职有望。';
+  if (hasJiInMing) summary += '流年化忌入命，今年多波折，宜保守。';
+  if (hasJiInCai) summary += '流年化忌入财帛，今年财运不稳，慎防破财。';
+  if (!hasLuInMing && !hasJiInMing && !hasLuInCai && !hasJiInCai && !hasQuanInGuan) {
+    summary += '流年四化无直接入命宫/财帛/官禄，运势平稳，按部就班。';
+  }
+  if (isSanfang) summary += '流年与命宫三方四正会照，整体运势有合力助推。';
+  if (interaction.daxianInteract) summary += interaction.daxianInteract + '。';
+
+  return {
+    liunianGong: { name: liunianGongName, pos: liunianGongPos, zhi: yearZhi },
+    liunianStars: liunianStars,
+    liunianOppStars: oppStars,
+    liunianSanfangStars: sanfangStars,
+    liunianStrengths: liunianStrengths,
+    liunianSihua: liunianSihua,
+    interaction: interaction,
+    liunianGan: liunianGan,
+    liunianZhi: yearZhi,
+    summary: summary
+  };
+}
+
+/**
  * 生成建议
  */
 function generateAdvice(gejuResult, sihuaDetail, currentDayun, sanfang) {
@@ -7867,6 +8448,8 @@ window.ZiweiV3 = {
   analyzeZiweiFull,
   analyzeEachGong,
   analyzeDayunDetail,
+  analyzeSihuaDetail,
+  analyzeLiunian,
 
   // 工具
   getHourIdx,
