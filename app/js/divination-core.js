@@ -36495,6 +36495,47 @@ function injectLiuyaoEnhanced(hex, gua, moving, yjVals, yjMode) {
       html += '<p style="font-size:12px;opacity:.7;margin-top:8px;padding:8px 12px;background:rgba(46,204,113,.06);border-left:3px solid #2ecc71">' + mjRj.summary + '</p>';
       html += '</div>';
     }
+    
+    // R1.6: 元神/忌神/仇神分析
+    try {
+      var _lyAnalysis = window._currentLiuyaoAnalysis;
+      if (_lyAnalysis && _lyAnalysis.yuanJiChou) {
+        var yjc = _lyAnalysis.yuanJiChou;
+        html += '<div class="interp-card" style="background:linear-gradient(135deg,rgba(231,76,60,.04),rgba(46,204,113,.04));border:1px solid rgba(201,168,76,.15);border-radius:10px;padding:16px;margin-top:16px">';
+        html += '<h5 style="color:var(--gold);letter-spacing:2px">⚔️ 元神·忌神·仇神分析</h5>';
+        html += '<div style="font-size:11px;color:#888;margin-bottom:10px">元神=生用神者（助力） · 忌神=克用神者（阻碍） · 仇神=克元神/生忌神者（间接为害）</div>';
+        
+        var yjcColors = {'元神':'#27ae60','忌神':'#e74c3c','仇神':'#e67e22'};
+        var yjcIcons = {'元神':'🟢','忌神':'🔴','仇神':'🟠'};
+        var yjcOrder = ['yuanShen','jiShen','chouShen'];
+        html += '<div style="display:grid;gap:10px">';
+        for (var yji = 0; yji < yjcOrder.length; yji++) {
+          var yj = yjc[yjcOrder[yji]];
+          if (!yj) continue;
+          var yjColor = yjcColors[yj.name] || '#888';
+          var yjIcon = yjcIcons[yj.name] || '⚪';
+          html += '<div style="display:grid;grid-template-columns:40px 1fr;gap:10px;align-items:start;padding:10px;background:rgba(255,255,255,.02);border-radius:6px;border-left:3px solid ' + yjColor + '">';
+          html += '<div style="text-align:center"><div style="font-size:16px">' + yjIcon + '</div><div style="font-size:10px;color:' + yjColor + ';font-weight:bold">' + yj.name + '</div><div style="font-size:10px;color:#888">' + (yj.wuxing||'') + '</div></div>';
+          html += '<div>';
+          if (yj.yaoPos && yj.yaoPos !== '不上卦') {
+            html += '<div style="font-size:11px;color:var(--paper)"><b>' + yj.yaoPos + '</b>' + (yj.liuqin ? ' · ' + yj.liuqin : '') + (yj.wangShuai ? ' · 旺衰:' + yj.wangShuai : '') + (yj.moving ? ' · 动爻' : ' · 静爻') + '</div>';
+          } else {
+            html += '<div style="font-size:11px;color:#888"><b>' + yj.yaoPos + '</b></div>';
+          }
+          html += '<div style="font-size:10px;color:var(--paper2);margin-top:4px;line-height:1.6">' + (yj.text||'') + '</div>';
+          html += '</div>';
+          html += '</div>';
+        }
+        html += '</div>';
+        if (_lyAnalysis.yuanJiSummary) {
+          html += '<div style="margin-top:10px;padding:10px 12px;background:rgba(201,168,76,.06);border-radius:6px;border:1px solid rgba(201,168,76,.1)">';
+          html += '<div style="font-size:12px;font-weight:bold;color:var(--gold);margin-bottom:4px">📊 综合判断</div>';
+          html += '<div style="font-size:11px;color:var(--paper2);line-height:1.7">' + _lyAnalysis.yuanJiSummary + '</div>';
+          html += '</div>';
+        }
+        html += '</div>';
+      }
+    } catch(e2) { console.warn('[元神忌神分析失败]', e2.message); }
   } catch(e) {
     console.warn('[六爻增强分析失败]', e.message);
   }

@@ -3127,6 +3127,101 @@ function analyzeLiuyao(params) {
     ? judgeWXRelation(shiYao.wuxing, yingYao.wuxing)
     : '未知';
 
+  // 11. R1.6: 元神/忌神/仇神分析
+  // 元神=生用神者, 忌神=克用神者, 仇神=克元神/生忌神者
+  var yongshenWX2 = yongshenYao ? yongshenYao.wuxing : '土';
+  // 找到生用神的五行（元神）
+  var yuanWX = null;
+  for (var wxk in WX_SHENG) { if (WX_SHENG[wxk] === yongshenWX2) yuanWX = wxk; }
+  // 找到克用神的五行（忌神）
+  var jiWX = null;
+  for (var wxk2 in WX_KE) { if (WX_KE[wxk2] === yongshenWX2) jiWX = wxk2; }
+  // 找到克元神的五行（仇神）
+  var chouWX = null;
+  if (yuanWX) {
+    for (var wxk3 in WX_KE) { if (WX_KE[wxk3] === yuanWX) chouWX = wxk3; }
+  }
+
+  // 在六爻中找元神、忌神、仇神爻
+  var yuanYao = yaos.find(function(y) { return y.wuxing === yuanWX; });
+  var jiYao = yaos.find(function(y) { return y.wuxing === jiWX; });
+  var chouYao = yaos.find(function(y) { return y.wuxing === chouWX; });
+
+  // 旺衰判断
+  function getYaoWangShuai(yaoWX, dayWX) {
+    return judgeWangShuai(yaoWX, dayWX);
+  }
+  var yuanWangShuai = yuanYao ? getYaoWangShuai(yuanWX, dayWX) : null;
+  var jiWangShuai = jiYao ? getYaoWangShuai(jiWX, dayWX) : null;
+  var chouWangShuai = chouYao ? getYaoWangShuai(chouWX, dayWX) : null;
+
+  // 元神忌神仇神分析文本
+  var yuanJiChouAnalysis = {
+    yuanShen: yuanYao ? {
+      name: '元神',
+      wuxing: yuanWX,
+      yaoPos: yuanYao.name + '爻',
+      liuqin: yuanYao.liuqin,
+      wangShuai: yuanWangShuai,
+      moving: yuanYao.moving,
+      text: '元神' + yuanWX + '（生用神' + yongshenWX2 + '），在' + yuanYao.name + '爻，' +
+        (yuanYao.moving ? '动爻，' : '静爻，') +
+        '旺衰：' + (yuanWangShuai || '未知') + '。' +
+        (yuanWangShuai === '旺' || yuanWangShuai === '相' ? '元神旺相，有力生扶用神，事有助力。' :
+         yuanWangShuai === '休' || yuanWangShuai === '囚' ? '元神休囚，助力不足，需等待时机。' :
+         yuanWangShuai === '死' ? '元神受制严重，无力帮扶。' : '')
+    } : {
+      name: '元神', wuxing: yuanWX, yaoPos: '不上卦', text: '元神' + yuanWX + '不上卦，无生扶用神之力，需寻伏神。'
+    },
+    jiShen: jiYao ? {
+      name: '忌神',
+      wuxing: jiWX,
+      yaoPos: jiYao.name + '爻',
+      liuqin: jiYao.liuqin,
+      wangShuai: jiWangShuai,
+      moving: jiYao.moving,
+      text: '忌神' + jiWX + '（克用神' + yongshenWX2 + '），在' + jiYao.name + '爻，' +
+        (jiYao.moving ? '动爻，' : '静爻，') +
+        '旺衰：' + (jiWangShuai || '未知') + '。' +
+        (jiWangShuai === '旺' || jiWangShuai === '相' ? '忌神旺相，克伐用神，事多阻碍。' :
+         jiWangShuai === '休' || jiWangShuai === '囚' ? '忌神休囚，阻碍减轻，可缓图之。' :
+         jiWangShuai === '死' ? '忌神受制，无力为害。' : '')
+    } : {
+      name: '忌神', wuxing: jiWX, yaoPos: '不上卦', text: '忌神' + jiWX + '不上卦，无克制用神之害。'
+    },
+    chouShen: chouYao ? {
+      name: '仇神',
+      wuxing: chouWX,
+      yaoPos: chouYao.name + '爻',
+      liuqin: chouYao.liuqin,
+      wangShuai: chouWangShuai,
+      moving: chouYao.moving,
+      text: '仇神' + chouWX + '（克元神' + yuanWX + '/生忌神' + jiWX + '），在' + chouYao.name + '爻，' +
+        (chouYao.moving ? '动爻，' : '静爻，') +
+        '旺衰：' + (chouWangShuai || '未知') + '。' +
+        (chouWangShuai === '旺' || chouWangShuai === '相' ? '仇神旺相，克制元神、生扶忌神，间接为害。' :
+         '仇神不旺，间接为害有限。')
+    } : {
+      name: '仇神', wuxing: chouWX, yaoPos: '不上卦', text: '仇神' + chouWX + '不上卦，无力间接为害。'
+    }
+  };
+
+  // 断卦综合判断
+  var yuanJiSummary = '';
+  var hasYuan = yuanYao && (yuanWangShuai === '旺' || yuanWangShuai === '相');
+  var hasJiStrong = jiYao && (jiWangShuai === '旺' || jiWangShuai === '相');
+  if (hasYuan && !hasJiStrong) {
+    yuanJiSummary = '元神旺相有力生扶用神，忌神不旺，断卦偏吉——事可成，有贵人助力。';
+  } else if (hasJiStrong && !hasYuan) {
+    yuanJiSummary = '忌神旺相克伐用神，元神不上卦或休囚，断卦偏凶——事多阻碍，宜等待时机。';
+  } else if (hasYuan && hasJiStrong) {
+    yuanJiSummary = '元神忌神俱旺，双方角力——事有波折但可成，需付出更多努力。';
+  } else if (!yuanYao && !jiYao) {
+    yuanJiSummary = '元神忌神均不上卦，用神独立支撑——事靠自己，无外力干预。';
+  } else {
+    yuanJiSummary = '元神忌神力量相当，断卦中平——事可缓图，不宜急进。';
+  }
+
   return {
     hexagram, najia, liuqin, liushen, shiying, yongshenInfo,
     yaos, yongshenYao, wangShuai, shiYingRelation,
@@ -3134,6 +3229,12 @@ function analyzeLiuyao(params) {
     bianGuaName: hexagram.bianGua ? hexagram.bianGua.name : null,
     gongName: hexagram.benGua ? hexagram.benGua.gong : '未知',
     movingCount: hexagram.moving.length,
+    // R1.6: 元神忌神仇神
+    yuanJiChou: yuanJiChouAnalysis,
+    yuanJiSummary: yuanJiSummary,
+    yuanShenWX: yuanWX,
+    jiShenWX: jiWX,
+    chouShenWX: chouWX
   };
 }
 
