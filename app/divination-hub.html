@@ -36233,6 +36233,111 @@ function runZiweiEngine() {
             if (_gongHTML) v3Html += _gongHTML;
           }
         } catch(e4) { console.warn('[十二宫详析失败]', e4); }
+        // R2.5: 四化深度释义
+        try {
+          if (window.ZiweiV3 && window.ZiweiV3.analyzeSihuaDetail) {
+            var _shDetail = window.ZiweiV3.analyzeSihuaDetail(v3Zw);
+            if (_shDetail && _shDetail.sihuaDetails && _shDetail.sihuaDetails.length > 0) {
+              v3Html += '<div style="margin:14px 0;padding:14px;background:linear-gradient(135deg,rgba(155,89,182,.04),rgba(201,168,76,.03));border:1px solid rgba(155,89,182,.12);border-radius:10px">';
+              v3Html += '<div style="font-size:14px;font-weight:bold;color:#9b59b6;margin-bottom:10px;letter-spacing:2px">🔮 四化深度释义</div>';
+              // 四化落宫详情
+              for (var sdi = 0; sdi < _shDetail.sihuaDetails.length; sdi++) {
+                var sd = _shDetail.sihuaDetails[sdi];
+                v3Html += '<div style="margin-bottom:10px;padding:10px;background:rgba(255,255,255,.02);border-radius:8px;border-left:3px solid ' + sd.color + '">';
+                v3Html += '<div style="font-size:12px;font-weight:600;color:' + sd.color + '">' + sd.type + '(' + sd.star + ') → ' + sd.gong + '(' + sd.gongZhi + '宫)</div>';
+                v3Html += '<div style="font-size:11px;color:var(--paper);line-height:1.7;margin-top:4px">' + sd.meaning + '</div>';
+                v3Html += '<div style="font-size:10px;color:var(--gold);margin-top:2px">💡 ' + sd.advice + '</div>';
+                v3Html += '</div>';
+              }
+              // 四化互动分析
+              if (_shDetail.sihuaInteractions && _shDetail.sihuaInteractions.length > 0) {
+                v3Html += '<div style="font-size:12px;font-weight:600;color:var(--gold);margin:10px 0 6px">⚡ 四化互动分析</div>';
+                for (var sii = 0; sii < _shDetail.sihuaInteractions.length; sii++) {
+                  var si2 = _shDetail.sihuaInteractions[sii];
+                  v3Html += '<div style="margin-bottom:8px;padding:8px 10px;background:rgba(255,255,255,.02);border-radius:6px;border-left:3px solid ' + si2.color + '">';
+                  v3Html += '<div style="font-size:11px;font-weight:600;color:' + si2.color + '">' + si2.name + ' <span style="font-size:9px;opacity:.7">[' + si2.severity + ']</span></div>';
+                  v3Html += '<div style="font-size:10px;opacity:.7;margin-top:2px">' + si2.desc + '</div>';
+                  v3Html += '<div style="font-size:10px;color:var(--paper);margin-top:2px">' + si2.effect + '</div>';
+                  v3Html += '</div>';
+                }
+              }
+              // 生年四化 vs 大限四化对比
+              if (_shDetail.daxianCompare) {
+                var dc = _shDetail.daxianCompare;
+                v3Html += '<div style="font-size:12px;font-weight:600;color:var(--gold);margin:10px 0 6px">🔄 生年四化 vs 大限四化(' + dc.dGan + '干)</div>';
+                v3Html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:10px">';
+                v3Html += '<tr style="background:rgba(201,168,76,0.06)"><th style="padding:4px;text-align:left;border:1px solid var(--border)">四化</th><th style="padding:4px;text-align:left;border:1px solid var(--border)">生年星/宫</th><th style="padding:4px;text-align:left;border:1px solid var(--border)">大限星/宫</th><th style="padding:4px;text-align:left;border:1px solid var(--border)">效果</th></tr>';
+                for (var dci = 0; dci < dc.items.length; dci++) {
+                  var di2 = dc.items[dci];
+                  var rowColor = di2.sameGong ? 'rgba(46,204,113,0.04)' : '';
+                  v3Html += '<tr' + (rowColor ? ' style="background:' + rowColor + '"' : '') + '>';
+                  v3Html += '<td style="padding:4px;border:1px solid var(--border);font-weight:600">' + di2.type + '</td>';
+                  v3Html += '<td style="padding:4px;border:1px solid var(--border)">' + di2.natalStar + '/' + di2.natalGong + '</td>';
+                  v3Html += '<td style="padding:4px;border:1px solid var(--border)">' + di2.daxianStar + '/' + di2.daxianGong + '</td>';
+                  v3Html += '<td style="padding:4px;border:1px solid var(--border);font-size:9px">' + di2.effect + (di2.sameGong ? ' ⚡' : '') + '</td>';
+                  v3Html += '</tr>';
+                }
+                v3Html += '</table></div>';
+              }
+              // 总结
+              v3Html += '<div style="margin-top:10px;padding:8px 12px;background:rgba(201,168,76,0.04);border-radius:6px;font-size:11px;line-height:1.7;color:var(--paper)"><b style="color:var(--gold)">释义总结：</b>' + _shDetail.summary + '</div>';
+              v3Html += '</div>';
+            }
+          }
+        } catch(eR25) { console.warn('[四化深度释义失败]', eR25); }
+        // R2.6: 流年分析
+        try {
+          if (window.ZiweiV3 && window.ZiweiV3.analyzeLiunian) {
+            var _lnYear = new Date().getFullYear();
+            var _lnResult = window.ZiweiV3.analyzeLiunian(v3Zw, _lnYear);
+            if (_lnResult && _lnResult.liunianGong) {
+              v3Html += '<div style="margin:14px 0;padding:14px;background:linear-gradient(135deg,rgba(52,152,219,.04),rgba(201,168,76,.03));border:1px solid rgba(52,152,219,.12);border-radius:10px">';
+              v3Html += '<div style="font-size:14px;font-weight:bold;color:#3498db;margin-bottom:10px;letter-spacing:2px">📅 流年分析 (' + _lnYear + '年 ' + _lnResult.liunianGan + _lnResult.liunianZhi + '年)</div>';
+              // 流年宫位信息
+              v3Html += '<div style="padding:8px 10px;background:rgba(255,255,255,.02);border-radius:8px;margin-bottom:8px">';
+              v3Html += '<div style="font-size:12px;font-weight:600;color:var(--gold)">流年宫位：' + _lnResult.liunianGong.name + '(' + _lnResult.liunianGong.zhi + '宫)</div>';
+              var lnStarText = _lnResult.liunianStars.length > 0 ? _lnResult.liunianStars.join('、') : '无主星(借对宫' + (_lnResult.liunianOppStars.join('、') || '空') + ')';
+              v3Html += '<div style="font-size:11px;margin-top:4px">主星：' + lnStarText + '</div>';
+              if (_lnResult.liunianStrengths.length > 0) {
+                var strTexts = [];
+                for (var ls = 0; ls < _lnResult.liunianStrengths.length; ls++) {
+                  strTexts.push(_lnResult.liunianStrengths[ls].star + '(' + _lnResult.liunianStrengths[ls].label + ')');
+                }
+                v3Html += '<div style="font-size:10px;color:#888;margin-top:2px">庙旺：' + strTexts.join('、') + '</div>';
+              }
+              v3Html += '</div>';
+              // 流年四化
+              if (_lnResult.liunianSihua && _lnResult.liunianSihua.length > 0) {
+                v3Html += '<div style="font-size:12px;font-weight:600;color:var(--gold);margin:8px 0 4px">流年四化(' + _lnResult.liunianGan + '干起)</div>';
+                v3Html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px">';
+                for (var lsi = 0; lsi < _lnResult.liunianSihua.length; lsi++) {
+                  var lsh2 = _lnResult.liunianSihua[lsi];
+                  v3Html += '<div style="padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:10px">';
+                  v3Html += '<span style="color:' + lsh2.color + ';font-weight:600">' + lsh2.type + '</span> ';
+                  v3Html += '<span style="color:var(--gold)">' + lsh2.star + '</span> ';
+                  v3Html += '<span style="opacity:.7">→</span> ';
+                  v3Html += '<span style="font-weight:600">' + lsh2.gongName + '</span>';
+                  v3Html += '</div>';
+                }
+                v3Html += '</div>';
+              }
+              // 互动分析
+              v3Html += '<div style="font-size:12px;font-weight:600;color:var(--gold);margin:10px 0 4px">🔗 流年互动分析</div>';
+              v3Html += '<div style="padding:8px 10px;background:rgba(255,255,255,.02);border-radius:6px;font-size:11px;line-height:1.8">';
+              v3Html += '<div style="margin-bottom:4px"><b style="color:#3498db">与命宫：</b>' + _lnResult.interaction.liunianToMing + '</div>';
+              if (_lnResult.interaction.daxianInteract) {
+                v3Html += '<div style="margin-bottom:4px"><b style="color:#9b59b6">与大限：</b>' + _lnResult.interaction.daxianInteract + '</div>';
+              }
+              v3Html += '<div style="margin-bottom:4px"><b style="color:#27ae60">对命宫：</b>' + _lnResult.interaction.sihuaImpactOnMing + '</div>';
+              v3Html += '<div style="margin-bottom:4px"><b style="color:#e67e22">对财帛：</b>' + _lnResult.interaction.sihuaImpactOnCaiwei + '</div>';
+              v3Html += '<div><b style="color:#e74c3c">对官禄：</b>' + _lnResult.interaction.sihuaImpactOnGuanlu + '</div>';
+              v3Html += '</div>';
+              // 总结
+              v3Html += '<div style="margin-top:10px;padding:8px 12px;background:rgba(52,152,219,0.04);border-radius:6px;font-size:11px;line-height:1.7;color:var(--paper)"><b style="color:#3498db">流年总结：</b>' + _lnResult.summary + '</div>';
+              v3Html += '</div>';
+            }
+          }
+        } catch(eR26) { console.warn('[流年分析失败]', eR26); }
         v3Html += '</div></div></div>';
         html += v3Html;
       }

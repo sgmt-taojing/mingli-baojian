@@ -3408,6 +3408,156 @@ function analyzeLiuyao(params) {
     }
   }
 
+  // ═══ R2.9: 动爻化进化退 + 暗动爻 ═══
+  // 地支顺序（阳顺阴逆）用于判断进退神方向
+  var ZHI_ORDER = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  var ZHI_WX_LOCAL = {'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+  // 进退神判断：同类五行地支的前进/后退
+  // 前进方向：寅→卯(木), 巳→午(火), 申→酉(金), 亥→子(水), 辰→未→戌→丑(土前进)
+  // 后退方向：卯→寅, 午→巳, 酉→申, 子→亥, 丑→戌→未→辰
+  var JIN_TUI_MAP = {
+    '寅': {jin:'卯', tui:null}, '卯': {jin:null, tui:'寅'},
+    '巳': {jin:'午', tui:null}, '午': {jin:null, tui:'巳'},
+    '申': {jin:'酉', tui:null}, '酉': {jin:null, tui:'申'},
+    '亥': {jin:'子', tui:null}, '子': {jin:null, tui:'亥'},
+    '辰': {jin:'未', tui:null}, '未': {jin:'戌', tui:null}, '戌': {jin:'丑', tui:null}, '丑': {jin:null, tui:'戌'},
+    '丑_d': {jin:null, tui:'辰'}, '戌_d': {jin:null, tui:'未'}, '未_d': {jin:null, tui:'辰'}
+  };
+  // 简化版进退判断函数
+  function isHuaJin(origZhi, newZhi) {
+    var origWX = ZHI_WX_LOCAL[origZhi] || '';
+    var newWX = ZHI_WX_LOCAL[newZhi] || '';
+    if (origWX !== newWX) return false; // 必须同类五行
+    var origIdx = ZHI_ORDER.indexOf(origZhi);
+    var newIdx = ZHI_ORDER.indexOf(newZhi);
+    // 阳支前进：子→丑→寅...（顺序方向）
+    // 阴支前进：逆序方向
+    var origIsYang = (origIdx % 2 === 0); // 子(0)阳, 丑(1)阴...
+    if (origIsYang) {
+      // 阳支前进 = 顺序方向
+      return (newIdx === (origIdx + 2) % 12) || (newIdx === (origIdx + 1) % 12 && newIdx % 2 === 1);
+    } else {
+      // 阴支前进 = 逆序方向
+      return (newIdx === (origIdx - 2 + 12) % 12) || (newIdx === (origIdx - 1 + 12) % 12 && newIdx % 2 === 0);
+    }
+  }
+  function isHuaTui(origZhi, newZhi) {
+    var origWX = ZHI_WX_LOCAL[origZhi] || '';
+    var newWX = ZHI_WX_LOCAL[newZhi] || '';
+    if (origWX !== newWX) return false;
+    return !isHuaJin(origZhi, newZhi); // 同类五行但不进则退
+  }
+
+  // 获取变卦纳甲
+  var bianNajia = null;
+  if (hexagram.bianGua) {
+    bianNajia = getNajia(hexagram.bianGua);
+  }
+
+  var dongYaoAnalysis = { movingYaos: [], anDongYaos: [], summary: '' };
+
+  // 1. 动爻分析
+  if (hexagram.moving && hexagram.moving.length > 0 && bianNajia) {
+    for (var mi = 0; mi < hexagram.moving.length; mi++) {
+      var moveInfo = hexagram.moving[mi];
+      var mPos = moveInfo.pos;
+      var origYao = yaos.find(function(y) { return y.pos === mPos; });
+      var bianYao = bianNajia.find(function(n) { return n.pos === mPos; });
+      if (!origYao || !bianYao) continue;
+
+      var origZhi = origYao.zhi;
+      var bianZhi = bianYao.zhi;
+      var origWX = ZHI_WX_LOCAL[origZhi] || '';
+      var bianWX = ZHI_WX_LOCAL[bianZhi] || '';
+      var huaType = '';
+      var huaDesc = '';
+
+      // 化进神
+      if (isHuaJin(origZhi, bianZhi)) {
+        huaType = '化进神';
+        huaDesc = '动爻' + origZhi + '化' + bianZhi + '为化进神——其力倍增，势力渐强，占吉事则吉上加吉，占凶事则凶上加凶。';
+      }
+      // 化退神
+      else if (isHuaTui(origZhi, bianZhi)) {
+        huaType = '化退神';
+        huaDesc = '动爻' + origZhi + '化' + bianZhi + '为化退神——其力减退，势力渐弱，占吉事则吉减，占凶事则凶减。';
+      }
+      // 化回头克
+      else if (WX_KE[bianWX] === origWX) {
+        huaType = '化回头克';
+        huaDesc = '动爻' + origZhi + '(' + origWX + ')化' + bianZhi + '(' + bianWX + ')为化回头克——变爻五行克本爻五行，大凶之兆，凡事不遂。';
+      }
+      // 化空
+      else if (xunKong.indexOf(bianZhi) >= 0) {
+        huaType = '化空';
+        huaDesc = '动爻' + origZhi + '化' + bianZhi + '为化空——变爻落入旬空，事有虚象，待出空之日方有实效。';
+      }
+      // 化回头生
+      else if (WX_SHENG[bianWX] === origWX) {
+        huaType = '化回头生';
+        huaDesc = '动爻' + origZhi + '(' + origWX + ')化' + bianZhi + '(' + bianWX + ')为化回头生——变爻五行生本爻五行，吉兆，事有后福。';
+      }
+      // 化比和
+      else if (origWX === bianWX) {
+        huaType = '化比和';
+        huaDesc = '动爻' + origZhi + '化' + bianZhi + '为化比和——五行相同，力量维持不变。';
+      }
+      // 其他
+      else {
+        huaType = '化' + bianZhi;
+        huaDesc = '动爻' + origZhi + '(' + origWX + ')化' + bianZhi + '(' + bianWX + ')，五行变化，需视具体占事判断吉凶。';
+      }
+
+      dongYaoAnalysis.movingYaos.push({
+        pos: mPos, name: origYao.name,
+        origZhi: origZhi, origWX: origWX,
+        bianZhi: bianZhi, bianWX: bianWX,
+        liuqin: origYao.liuqin,
+        huaType: huaType, desc: huaDesc,
+        isYongshen: origYao.isYongshen
+      });
+    }
+  }
+
+  // 2. 暗动爻：日辰冲静爻为暗动
+  // 地支相冲：子午冲、丑未冲、寅申冲、卯酉冲、辰戌冲、巳亥冲
+  var ZHI_CHONG_MAP = {'子':'午','午':'子','丑':'未','未':'丑','寅':'申','申':'寅','卯':'酉','酉':'卯','辰':'戌','戌':'辰','巳':'亥','亥':'巳'};
+  var dayChongZhi = ZHI_CHONG_MAP[dayZhi] || '';
+  if (dayChongZhi) {
+    for (var ai = 0; ai < yaos.length; ai++) {
+      var aYao = yaos[ai];
+      if (!aYao.moving && aYao.zhi === dayChongZhi) {
+        // 静爻被日辰冲 → 暗动
+        var aYaoWs = judgeWangShuai(aYao.wuxing, dayWX);
+        var anDongDesc = '';
+        if (aYaoWs.level === '旺' || aYaoWs.level === '相') {
+          anDongDesc = '静爻' + aYao.name + '(' + aYao.zhi + ')被日辰' + dayZhi + '冲，旺相之爻被冲为暗动——暗中发力，有意外之变，吉凶看所占何事。';
+        } else {
+          anDongDesc = '静爻' + aYao.name + '(' + aYao.zhi + ')被日辰' + dayZhi + '冲，休囚之爻被冲为日破——冲之无用，事不可成。';
+        }
+        dongYaoAnalysis.anDongYaos.push({
+          pos: aYao.pos, name: aYao.name, zhi: aYao.zhi,
+          liuqin: aYao.liuqin, wuxing: aYao.wuxing,
+          wangShuai: aYaoWs.level, desc: anDongDesc,
+          isYongshen: aYao.isYongshen
+        });
+      }
+    }
+  }
+
+  // 汇总
+  var dongSummaryParts = [];
+  if (dongYaoAnalysis.movingYaos.length > 0) {
+    dongSummaryParts.push('动爻' + dongYaoAnalysis.movingYaos.length + '个');
+    for (var ds = 0; ds < dongYaoAnalysis.movingYaos.length; ds++) {
+      dongSummaryParts.push(dongYaoAnalysis.movingYaos[ds].huaType);
+    }
+  }
+  if (dongYaoAnalysis.anDongYaos.length > 0) {
+    dongSummaryParts.push('暗动爻' + dongYaoAnalysis.anDongYaos.length + '个');
+  }
+  dongYaoAnalysis.summary = dongSummaryParts.length > 0 ? dongSummaryParts.join('，') : '无动爻无暗动，卦象静态。';
+
   // 断卦综合判断
   var yuanJiSummary = '';
   var hasYuan = yuanYao && (yuanWangShuai === '旺' || yuanWangShuai === '相');
@@ -3442,7 +3592,9 @@ function analyzeLiuyao(params) {
     kongWang: kongWang,
     // R2.8: 六冲六合 + 伏神飞神
     chongHe: chongHe,
-    fuFei: fuFei
+    fuFei: fuFei,
+    // R2.9: 动爻化进化退 + 暗动爻
+    dongYaoAnalysis: dongYaoAnalysis
   };
 }
 
