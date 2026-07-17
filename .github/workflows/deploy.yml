@@ -27,10 +27,16 @@ jobs:
           fetch-depth: 1
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      - name: Prepare deploy directory
+        run: |
+          mkdir -p _site
+          cp -r app _site/app
+          cp -r docs _site/docs
+          cp .nojekyll _site/.nojekyll
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: '_site'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
