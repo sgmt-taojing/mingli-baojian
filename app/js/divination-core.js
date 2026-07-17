@@ -3710,6 +3710,198 @@ function generateInterpretation(data) {
   html += '→ ' + career.peak + '<br><br>';
   html += '<b>💰 财运分析：</b>' + caiAdvice + '</div></div>';
 
+  // ═══════ 伍·补·六亲宫位 ═══════
+  if (data.pillars && data.pillars.length === 4) {
+    var pl2 = data.pillars;
+    var dStem2 = data.dayStem || dayMaster.replace(/木|火|土|金|水/g, '');
+    var plTenGod2 = [];
+    for (var pli2 = 0; pli2 < 4; pli2++) {
+      if (pli2 === 2) { plTenGod2.push('日主'); continue; }
+      plTenGod2.push(tenGods[pli2] || getTenGod(pl2[pli2].stem, pl2[pli2].branch, dStem2));
+    }
+
+    // 父母宫（月柱）分析
+    var yueZhuTG = plTenGod2[1] || '';
+    var yueZhuZhi = pl2[1].branch || '';
+    var yueZhiWX = ZHI_ELE[yueZhuZhi] || '';
+    var parentAnalysis = '';
+    if (yueZhuTG === '正印') {
+      parentAnalysis = '月柱天干为正印，母亲慈爱有方，教育重视，得母亲福荫深厚。家庭背景以文化教育为主，书香门第。';
+    } else if (yueZhuTG === '偏印') {
+      parentAnalysis = '月柱天干为偏印，母亲个性独立或为继母，教育方式不走寻常路。家庭背景偏重技艺或特殊行业。';
+    } else if (yueZhuTG === '正官' || yueZhuTG === '七杀') {
+      parentAnalysis = '月柱天干为' + yueZhuTG + '，父亲严厉有威严，家教严格。家庭背景有公职或管理色彩，门风端正。';
+    } else if (yueZhuTG === '正财' || yueZhuTG === '偏财') {
+      parentAnalysis = '月柱天干为' + yueZhuTG + '，父母重视物质基础，家境随财运起伏。' + (yueZhuTG === '偏财' ? '父亲可能经商，家境富裕但波动大。' : '父母勤俭持家，家境稳健。');
+    } else if (yueZhuTG === '比肩' || yueZhuTG === '劫财') {
+      parentAnalysis = '月柱天干为' + yueZhuTG + '，兄弟姐妹众多，家庭热闹。父母对子女一视同仁，但资源分散，需自力更生。';
+    } else if (yueZhuTG === '食神' || yueZhuTG === '伤官') {
+      parentAnalysis = '月柱天干为' + yueZhuTG + '，父母开明有才艺，注重培养子女兴趣爱好。家庭氛围轻松活跃。';
+    } else {
+      parentAnalysis = '月柱天干十神不显，父母缘分平顺，家庭背景中等。';
+    }
+    // 月支补充
+    var yueZhiDesc = '';
+    if (yueZhiWX === dayWuxing) {
+      yueZhiDesc = '月支与日主同类五行，得月令之气，根基扎实。';
+    } else if (WUXING_SHENG && WUXING_SHENG[yueZhiWX] === dayWuxing) {
+      yueZhiDesc = '月支五行生日主，得月令生扶，有长辈贵人。';
+    } else if (WUXING_KE && WUXING_KE[yueZhiWX] === dayWuxing) {
+      yueZhiDesc = '月支五行克日主，月令克身，父母管教严格，压力较大。';
+    }
+    // 神煞补充
+    var parentShensha = '';
+    if (shensha && shensha.positions) {
+      if (shensha.positions['天乙贵人'] && shensha.positions['天乙贵人'].indexOf(1) >= 0) {
+        parentShensha = '月柱带天乙贵人，父母有贵气，家庭背景优越。';
+      } else if (shensha.positions['驿马'] && shensha.positions['驿马'].indexOf(1) >= 0) {
+        parentShensha = '月柱带驿马，父母多走动，家庭迁徙或分居。';
+      } else if (shensha.positions['华盖'] && shensha.positions['华盖'].indexOf(1) >= 0) {
+        parentShensha = '月柱带华盖，父母有宗教或文化倾向。';
+      }
+    }
+
+    // 兄弟宫（比劫星）分析
+    var bijieCount = (tenGodCount['比肩'] || 0) + (tenGodCount['劫财'] || 0);
+    var brotherAnalysis = '';
+    if (bijieCount >= 3) {
+      brotherAnalysis = '命局比劫' + bijieCount + '重，兄弟姐妹众多，人脉广泛。兄弟助力大但也容易竞争破财。人际关系上你天生有号召力，但也需注意「比劫夺财」——朋友多了路好走，但钱财上要分明。';
+    } else if (bijieCount === 2) {
+      brotherAnalysis = '命局比劫2重，兄弟姐妹关系融洽，能互相帮助。人际关系良好，有志同道合的朋友支持。适合团队合作，但不宜合伙经营大额投资。';
+    } else if (bijieCount === 1) {
+      brotherAnalysis = '命局比劫1重，兄弟姊妹数量不多但关系尚可。人际交往重质不重量，有一两个知心好友即可。适合独立创业，不必依赖团队。';
+    } else {
+      brotherAnalysis = '命局比劫不显，兄弟缘分较薄，多为独生子女或与兄弟聚少离多。人际关系偏独立型，靠自身能力闯荡。';
+    }
+
+    // 夫妻宫（日支）分析
+    var riZhi2 = pl2[2].branch || '';
+    var riZhiWX2 = ZHI_ELE[riZhi2] || '';
+    var riZhiCanggan = ZHI_CANGGAN[riZhi2] || [];
+    var riZhiMainQi = riZhiCanggan[0] || '';
+    var riZhiTG2 = getTenGod(riZhiMainQi, riZhi2, dStem2) || '';
+    var marriageLevel = '';
+    var spouseFeature = '';
+    if (riZhiTG2 === '正官' || riZhiTG2 === '七杀') {
+      marriageLevel = '上等';
+      spouseFeature = '配偶宫坐官杀，配偶有权威、责任心强。' + (riZhiTG2 === '正官' ? '正官得位，婚姻端正，配偶端庄贤淑。' : '七杀在支，配偶个性强势，婚姻中有张有弛。');
+    } else if (riZhiTG2 === '正财' || riZhiTG2 === '偏财') {
+      marriageLevel = '上等';
+      spouseFeature = '配偶宫坐财星，配偶有经济头脑、务实能干。' + (riZhiTG2 === '正财' ? '正财得位，配偶勤俭持家，婚姻稳固。' : '偏财在支，配偶慷慨大方但也善理财，家境富裕。');
+    } else if (riZhiTG2 === '正印' || riZhiTG2 === '偏印') {
+      marriageLevel = '中等偏上';
+      spouseFeature = '配偶宫坐印星，配偶温文尔雅、有学识。' + (riZhiTG2 === '正印' ? '正印得位，配偶体贴关怀，如母如友。' : '偏印在支，配偶个性独特，有艺术气质但略冷淡。');
+    } else if (riZhiTG2 === '食神' || riZhiTG2 === '伤官') {
+      marriageLevel = '中等';
+      spouseFeature = '配偶宫坐食伤，配偶才华横溢、浪漫多情。' + (riZhiTG2 === '食神' ? '食神得位，配偶温和有礼，婚姻和谐。' : '伤官在支，配偶聪明但个性倔强，婚姻需多包容。');
+    } else if (riZhiTG2 === '比肩' || riZhiTG2 === '劫财') {
+      marriageLevel = '中等偏下';
+      spouseFeature = '配偶宫坐比劫，配偶个性与你相近如朋友。' + (riZhiTG2 === '比肩' ? '比肩在支，夫妻如兄弟般相处，婚姻平顺但缺激情。' : '劫财在支，夫妻易争执破财，需注意经营感情。');
+    } else {
+      marriageLevel = '中等';
+      spouseFeature = '配偶宫十神不显，配偶性格平和，婚姻质量取决于双方经营。';
+    }
+    // 日支与日主五行关系
+    var riZhiRelation = '';
+    if (riZhiWX2 === dayWuxing) {
+      riZhiRelation = '日支与日主同类五行，夫妻性格相似，志趣相投。';
+    } else if (riZhiWX2 && WUXING_SHENG && WUXING_SHENG[riZhiWX2] === dayWuxing) {
+      riZhiRelation = '日支生日主，配偶付出较多，对你关怀备至。';
+    } else if (riZhiWX2 && WUXING_SHENG && WUXING_SHENG[dayWuxing] === riZhiWX2) {
+      riZhiRelation = '日主生日支，你付出较多，对配偶体贴入微。';
+    } else if (riZhiWX2 && WUXING_KE && WUXING_KE[riZhiWX2] === dayWuxing) {
+      riZhiRelation = '日支克日主，配偶对你管束较多，需学会沟通。';
+    } else if (riZhiWX2 && WUXING_KE && WUXING_KE[dayWuxing] === riZhiWX2) {
+      riZhiRelation = '日主克日支，你主导婚姻，需注意尊重配偶。';
+    }
+
+    // 子女宫（时柱）分析
+    var shiZhuTG = plTenGod2[3] || '';
+    var shiZhuZhi = pl2[3].branch || '';
+    var shiZhiWX = ZHI_ELE[shiZhuZhi] || '';
+    var shiZhiCanggan = ZHI_CANGGAN[shiZhuZhi] || [];
+    var shiZhiMainQi = shiZhiCanggan[0] || '';
+    var shiZhiTG2 = getTenGod(shiZhiMainQi, shiZhuZhi, dStem2) || '';
+    var childAnalysis = '';
+    if (shiZhuTG === '正官' || shiZhuTG === '七杀' || shiZhiTG2 === '正官' || shiZhiTG2 === '七杀') {
+      childAnalysis = '时柱带官杀，子女有出息、有责任感。' + (shiZhiTG2 === '正官' ? '子女孝顺端正，晚年可享清福。' : '子女个性刚强，需严加管教但日后有成就。');
+    } else if (shiZhuTG === '食神' || shiZhuTG === '伤官' || shiZhiTG2 === '食神' || shiZhiTG2 === '伤官') {
+      childAnalysis = '时柱带食伤，子女聪明有才艺。' + (shiZhiTG2 === '食神' ? '子女温和有礼，亲子关系融洽，晚年安乐。' : '子女才华出众但个性叛逆，需引导其才华向正面发展。');
+    } else if (shiZhuTG === '正财' || shiZhuTG === '偏财' || shiZhiTG2 === '正财' || shiZhiTG2 === '偏财') {
+      childAnalysis = '时柱带财星，子女有经济头脑。' + (shiZhiTG2 === '正财' ? '子女勤俭持家，晚年物质无忧。' : '子女善于理财投资，但需注意勿过度追求物质。');
+    } else if (shiZhuTG === '正印' || shiZhuTG === '偏印' || shiZhiTG2 === '正印' || shiZhiTG2 === '偏印') {
+      childAnalysis = '时柱带印星，子女好学有知。' + (shiZhiTG2 === '正印' ? '子女学业优秀，品行端正，晚年得子女照顾。' : '子女个性独立，有独特见解，但略嫌冷淡。');
+    } else if (shiZhuTG === '比肩' || shiZhuTG === '劫财' || shiZhiTG2 === '比肩' || shiZhiTG2 === '劫财') {
+      childAnalysis = '时柱带比劫，子女独立早。' + (shiZhiTG2 === '比肩' ? '子女朋友多，社交能力强，但花销大。' : '子女个性倔强，需注意理财教育。');
+    } else {
+      childAnalysis = '时柱十神不显，子女发展平顺，亲子关系正常。晚年运势平稳，知足常乐。';
+    }
+    // 时支与日主五行关系
+    var childRelation = '';
+    if (shiZhiWX === dayWuxing) {
+      childRelation = '时支与日主同类五行，子女性格与你相似，有传承之象。';
+    } else if (shiZhiWX && WUXING_SHENG && WUXING_SHENG[shiZhiWX] === dayWuxing) {
+      childRelation = '时支生日主，子女孝顺，晚年得享清福。';
+    } else if (shiZhiWX && WUXING_SHENG && WUXING_SHENG[dayWuxing] === shiZhiWX) {
+      childRelation = '日主生时支，你为子女付出较多，亲子关系密切。';
+    } else if (shiZhiWX && WUXING_KE && WUXING_KE[shiZhiWX] === dayWuxing) {
+      childRelation = '时支克日主，子女个性叛逆，需多沟通理解。';
+    } else if (shiZhiWX && WUXING_KE && WUXING_KE[dayWuxing] === shiZhiWX) {
+      childRelation = '日主克时支，你对子女管教严格，需注意方式。';
+    }
+    // 神煞补充
+    var childShensha = '';
+    if (shensha && shensha.positions) {
+      if (shensha.positions['天乙贵人'] && shensha.positions['天乙贵人'].indexOf(3) >= 0) {
+        childShensha = '时柱带天乙贵人，子女有贵气，晚年得子女之福。';
+      } else if (shensha.positions['桃花'] && shensha.positions['桃花'].indexOf(3) >= 0) {
+        childShensha = '时柱带桃花，子女相貌出众，人缘好。';
+      } else if (shensha.positions['文昌'] && shensha.positions['文昌'].indexOf(3) >= 0) {
+        childShensha = '时柱带文昌，子女学业优秀，文采出众。';
+      }
+    }
+
+    html += '<div style="background:rgba(155,89,182,.04);border-left:3px solid #9b59b6;padding:14px 16px;margin-bottom:14px;border-radius:0 8px 8px 0">';
+    html += '<div style="font-size:14px;font-weight:bold;color:#9b59b6;margin-bottom:10px;letter-spacing:2px">伍 · 补 · 六亲宫位</div>';
+    html += '<div style="font-size:12px;color:var(--paper);line-height:2">';
+
+    // 父母宫
+    html += '<div style="margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(155,89,182,.1)">';
+    html += '<b style="color:#9b59b6">👨‍👩‍👧 父母宫（月柱）</b><br>';
+    html += '<b>十神：</b>' + (yueZhuTG || '不明') + ' | <b>月支：</b>' + yueZhuZhi + '(' + yueZhiWX + ')<br>';
+    html += parentAnalysis + '<br>';
+    if (yueZhiDesc) html += yueZhiDesc + '<br>';
+    if (parentShensha) html += '<span style="color:#e67e22">★ ' + parentShensha + '</span><br>';
+    html += '</div>';
+
+    // 兄弟宫
+    html += '<div style="margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(155,89,182,.1)">';
+    html += '<b style="color:#9b59b6">🤝 兄弟宫（比劫星）</b><br>';
+    html += '<b>比劫数：</b>' + bijieCount + '重<br>';
+    html += brotherAnalysis + '<br>';
+    html += '</div>';
+
+    // 夫妻宫
+    html += '<div style="margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(155,89,182,.1)">';
+    html += '<b style="color:#9b59b6">💑 夫妻宫（日支）</b><br>';
+    html += '<b>日支：</b>' + riZhi2 + '(' + riZhiWX2 + ') | <b>藏干：</b>' + (riZhiCanggan.join('') || '无') + '<br>';
+    html += '<b>婚姻等级：</b><span style="color:' + (marriageLevel.indexOf('上') >= 0 ? '#2ecc71' : marriageLevel.indexOf('下') >= 0 ? '#e74c3c' : '#f39c12') + '">' + marriageLevel + '</span><br>';
+    html += spouseFeature + '<br>';
+    if (riZhiRelation) html += riZhiRelation + '<br>';
+    html += '</div>';
+
+    // 子女宫
+    html += '<div style="margin-bottom:4px">';
+    html += '<b style="color:#9b59b6">👶 子女宫（时柱）</b><br>';
+    html += '<b>时干十神：</b>' + (shiZhuTG || '不明') + ' | <b>时支：</b>' + shiZhuZhi + '(' + shiZhiWX + ')<br>';
+    html += childAnalysis + '<br>';
+    if (childRelation) html += childRelation + '<br>';
+    if (childShensha) html += '<span style="color:#e67e22">★ ' + childShensha + '</span><br>';
+    html += '</div>';
+
+    html += '</div></div>';
+  }
+
   // ═══════ 陆·缘分感情 ═══════
   var guanCount = (tenGodCount['正官'] || 0) + (tenGodCount['七杀'] || 0);
   var caiCount2 = (tenGodCount['正财'] || 0) + (tenGodCount['偏财'] || 0);
