@@ -2691,6 +2691,200 @@ function analyzeFeixingCombo(panData) {
   };
 }
 
+// ============================================================
+// === D.3 流年飞星叠加 — analyzeLiunianFeixing ===
+// ============================================================
+
+/**
+ * 流年飞星入中宫计算
+ * 《沈氏玄空学》：上元甲子年中宫一白入中
+ * 口诀：上元甲子一白求，中元四绿木为头，下元七赤为大位，逐年逆行是真途。
+ * 即：上元(1864-1923)起始一白，中元(1924-1983)起始四绿，下元(1984-2043)起始七赤
+ * 逐年逆飞（中宫星数递减）
+ *
+ * @param {number} year — 公元年份
+ * @returns {number} 该年入中宫的流年飞星 (1-9)
+ */
+function computeLiunianZhongGong(year) {
+  // 三元起始星：上元1，中元4，下元7
+  var startStar;
+  if (year >= 1864 && year <= 1923) startStar = 1;
+  else if (year >= 1924 && year <= 1983) startStar = 4;
+  else if (year >= 1984 && year <= 2043) startStar = 7;
+ else if (year >= 2044 && year <= 2103) startStar = 1; // 下一上元
+  else startStar = 7; // 默认下元
+
+  // 逐年逆飞：距元年之差，中宫星递减
+  var elapsed = year - (year >= 1984 ? 1984 : year >= 1924 ? 1924 : 1864);
+  var zhongGong = ((startStar - 1 - elapsed) % 9 + 9) % 9 + 1;
+  return zhongGong;
+}
+
+/**
+ * analyzeLiunianFeixing(panData, year)
+ * 流年飞星叠加分析
+ *
+ * @param {Object} panData — computeFeixing() 的返回值
+ * @param {number} year — 要分析的公历年份
+ * @returns {Object} { year, zhongGong, feixing, interactions, summary }
+ */
+function analyzeLiunianFeixing(panData, year) {
+  // 1. 计算流年飞星入中宫
+  var lnZhongGong = computeLiunianZhongGong(year);
+
+  // 2. 流年飞星盘（顺飞入中）
+  var lnPan = feiStar(lnZhongGong);
+
+  // 3. 九宫流年飞星与运盘/山向盘叠加
+  var yunPan = panData.yunPan || {};
+  var shanPan = panData.shanPan || {};
+  var xiangPan = panData.xiangPan || {};
+  var yun = panData.yun || 1;
+  var wangXing = yun;
+
+  var feixing = [];
+  var interactions = [];
+  var gongNames = { 1: '坎(北)', 2: '坤(西南)', 3: '震(东)', 4: '巽(东南)', 5: '中宫', 6: '乾(西北)', 7: '兑(西)', 8: '艮(东北)', 9: '离(南)' };
+
+  for (var gongNum = 1; gongNum <= 9; gongNum++) {
+    if (gongNum === 5) continue; // 中宫单独处理
+    var gStr = String(gongNum);
+    var lnStar = lnPan[gongNum] || 0;
+    var yunStar = yunPan[gongNum] || 0;
+    var shanStar = shanPan[gongNum] || 0;
+    var xiangStar = xiangPan[gongNum] || 0;
+
+    var lnInfo = NINE_STARS[lnStar] || { name: '?' };
+    var yunInfo = NINE_STARS[yunStar] || { name: '?' };
+
+    feixing.push({
+      gong: gongNames[gongNum] || '',
+      gongNum: gongNum,
+      lnStar: lnStar,
+      lnName: lnInfo.name || '',
+      yunStar: yunStar,
+      shanStar: shanStar,
+      xiangStar: xiangStar
+    });
+
+    // 流年飞星与运盘飞星叠加
+    var lnYunRel = wxRelation(lnStar, yunStar);
+    // 流年飞星与山星叠加
+    var lnShanRel = wxRelation(lnStar, shanStar);
+    // 流年飞星与向星叠加
+    var lnXiangRel = wxRelation(lnStar, xiangStar);
+
+    // 吉凶变化判断
+    var change = '平';
+    var detail = '';
+
+    // 流年旺星到该宫
+    if (lnStar === wangXing) {
+      change = '吉';
+      detail = '流年旺星' + wangXing + '(' + (NINE_STARS[wangXing] ? NINE_STARS[wangXing].name : '') + ')飞临' + (gongNames[gongNum] || '') + '，激活该宫能量，主此年该方位大吉。';
+    }
+    // 流年五黄飞临
+    else if (lnStar === 5) {
+      change = '凶';
+      detail = '流年五黄煞飞临' + (gongNames[gongNum] || '') + '，主灾病、官非，宜安金属化解，不宜动土修造。';
+    }
+    // 流年二黑飞临
+    else if (lnStar === 2) {
+      change = '凶';
+      detail = '流年二黑病符飞临' + (gongNames[gongNum] || '') + '，主健康欠佳、小病不断，宜金属化解。';
+    }
+    // 流年三碧飞临
+    else if (lnStar === 3) {
+      change = '凶';
+      detail = '流年三碧禄存飞临' + (gongNames[gongNum] || '') + '，主口舌是非、官非争斗，宜火泄之。';
+    }
+    // 流年七赤飞临
+    else if (lnStar === 7) {
+      change = '凶';
+      detail = '流年七赤破军飞临' + (gongNames[gongNum] || '') + '，主破财、争斗，宜水泄之。';
+    }
+    // 流年一白/四绿/六白/八白/九紫飞临
+    else if (lnStar === 1 || lnStar === 4) {
+      change = '吉';
+      detail = '流年' + (NINE_STARS[lnStar] ? NINE_STARS[lnStar].name : '') + '飞临' + (gongNames[gongNum] || '') + '，主文昌官贵、人缘桃花，此年该方位吉利。';
+    }
+    else if (lnStar === 6 || lnStar === 8) {
+      change = '吉';
+      detail = '流年' + (NINE_STARS[lnStar] ? NINE_STARS[lnStar].name : '') + '飞临' + (gongNames[gongNum] || '') + '，主官运偏财、正财置业，此年该方位吉利。';
+    }
+    else if (lnStar === 9) {
+      change = '吉';
+      detail = '流年九紫右弼飞临' + (gongNames[gongNum] || '') + '，主喜庆姻缘、添丁进财，此年该方位吉利。';
+    }
+
+    // 与运盘叠加后的变化
+    if (lnStar === yunStar && lnStar !== 5 && lnStar !== 2) {
+      detail += ' 流年星与运盘星同宫，力量倍增。';
+    }
+    if (lnStar === shanStar && shanStar === wangXing) {
+      detail += ' 流年星冲动山星旺星，丁气发动。';
+      change = '吉';
+    }
+    if (lnStar === xiangStar && xiangStar === wangXing) {
+      detail += ' 流年星冲动向星旺星，财气发动。';
+      change = '吉';
+    }
+
+    interactions.push({
+      gong: gongNames[gongNum] || '',
+      gongNum: gongNum,
+      lnStar: lnStar,
+      lnName: NINE_STARS[lnStar] ? NINE_STARS[lnStar].name : '',
+      yunStar: yunStar,
+      shanStar: shanStar,
+      xiangStar: xiangStar,
+      lnYunRel: lnYunRel,
+      lnShanRel: lnShanRel,
+      lnXiangRel: lnXiangRel,
+      change: change,
+      detail: detail
+    });
+  }
+
+  // 中宫叠加
+  var zhongGongInfo = {
+    gong: '中宫',
+    gongNum: 5,
+    lnStar: lnZhongGong,
+    lnName: NINE_STARS[lnZhongGong] ? NINE_STARS[lnZhongGong].name : '',
+    yunStar: yunPan[5] || 0,
+    shanStar: shanPan[5] || 0,
+    xiangStar: xiangPan[5] || 0
+  };
+  feixing.unshift(zhongGongInfo);
+
+  // 汇总
+  var goodCount = interactions.filter(function(i) { return i.change === '吉'; }).length;
+  var badCount = interactions.filter(function(i) { return i.change === '凶'; }).length;
+  var summary = year + '年流年飞星' + lnZhongGong + '(' + (NINE_STARS[lnZhongGong] ? NINE_STARS[lnZhongGong].name : '') + ')入中宫。';
+  summary += '吉位' + goodCount + '个，凶位' + badCount + '个。';
+  if (lnZhongGong === wangXing) {
+    summary += '流年旺星入中宫，全年运势大旺，丁财两旺。';
+  } else if (lnZhongGong === 5) {
+    summary += '流年五黄入中宫，全年须慎防灾病，中宫不宜动土，宜安金属化解。';
+  } else if (lnZhongGong === 2) {
+    summary += '流年二黑入中宫，全年健康运势偏弱，宜金属化解。';
+  }
+  // 找出最吉和最凶方位
+  var goodGongs = interactions.filter(function(i) { return i.change === '吉'; }).map(function(i) { return i.gong; });
+  var badGongs = interactions.filter(function(i) { return i.change === '凶'; }).map(function(i) { return i.gong; });
+  if (goodGongs.length > 0) summary += '吉位：' + goodGongs.join('、') + '。';
+  if (badGongs.length > 0) summary += '凶位：' + badGongs.join('、') + '，需化解。';
+
+  return {
+    year: year,
+    zhongGong: zhongGongInfo,
+    feixing: feixing,
+    interactions: interactions,
+    summary: summary
+  };
+}
+
 
 // ============================================================
 // === E. 模块导出 ===
@@ -2714,6 +2908,8 @@ window.FengshuiV3 = {
     comprehensiveFengshui,
     // D.2 飞星组合断
     analyzeFeixingCombo,
+    // D.3 流年飞星叠加
+    analyzeLiunianFeixing,
     // 常量
     GUAS,
     DONG_SI_GUAS,
