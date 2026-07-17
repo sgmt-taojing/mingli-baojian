@@ -6371,10 +6371,103 @@ function analyzeQimenFull(panData) {
   if (panData.wuBuYu && panData.wuBuYu.isWuBuYu) result.summary += ' | ⚠️五不遇时';
   
   // 详细分析
-  // 1. 值符值使
+  // 1. R1.7: 值符值使深度分析
+  var zhiFuGong = panData.zhiFuGong;
+  var zhiFuStar = panData.zhiFuStar;
+  var zhiShiMen = panData.zhiShiMen;
+  var zhiFuGongEle = GONG_WX[JIU_GONG_NAME[zhiFuGong]] || '土';
+  // 九星五行: 蓬=水 芮=土 冲=木 辅=木 禽=土 心=金 柱=金 任=土 英=火
+  var STAR_WX_MAP = {蓬:'水',芮:'土',冲:'木',辅:'木',禽:'土',心:'金',柱:'金',任:'土',英:'火'};
+  var zhiFuStarEle = STAR_WX_MAP[zhiFuStar] || '土';
+  // 八门五行: 休=水 生=土 伤=木 杜=木 景=火 死=土 惊=金 开=金
+  var MEN_WX_MAP = {休:'水',生:'土',伤:'木',杜:'木',景:'火',死:'土',惊:'金',开:'金'};
+  var zhiShiMenEle = MEN_WX_MAP[zhiShiMen] || '土';
+  
+  // 五行生克判断
+  function judgeWXRelation2(a, b) {
+    if (a === b) return '比和';
+    var shengMap = {木:'火',火:'土',土:'金',金:'水',水:'木'};
+    var keMap = {木:'土',土:'水',水:'火',火:'金',金:'木'};
+    if (shengMap[a] === b) return '我生';
+    if (shengMap[b] === a) return '生我';
+    if (keMap[a] === b) return '我克';
+    if (keMap[b] === a) return '克我';
+    return '未知';
+  }
+  
+  // 值符星旺衰（落宫五行生克）
+  var zhiFuWangShuai = '';
+  var zhiFuRelation = judgeWXRelation2(zhiFuStarEle, zhiFuGongEle);
+  if (zhiFuRelation === '比和') { zhiFuWangShuai = '旺（星宫同气，力量充沛）'; }
+  else if (zhiFuRelation === '生我') { zhiFuWangShuai = '相（宫生星，得地有力）'; }
+  else if (zhiFuRelation === '我生') { zhiFuWangShuai = '休（星生宫，泄气减力）'; }
+  else if (zhiFuRelation === '克我') { zhiFuWangShuai = '囚（宫克星，受制无力）'; }
+  else if (zhiFuRelation === '我克') { zhiFuWangShuai = '死（星克宫，不得地）'; }
+  
+  // 值使门吉凶（门宫关系）
+  var zhiShiMenJiXiong = '';
+  var zhiShiRelation = judgeWXRelation2(zhiShiMenEle, zhiFuGongEle);
+  var menJiMap = {休:'吉',生:'吉',开:'吉',伤:'凶',杜:'凶',景:'平',死:'凶',惊:'凶'};
+  var menJi = menJiMap[zhiShiMen] || '平';
+  if (zhiShiRelation === '生我' || zhiShiRelation === '比和') {
+    zhiShiMenJiXiong = menJi + '（门宫相生，力量增强）';
+  } else if (zhiShiRelation === '克我') {
+    zhiShiMenJiXiong = menJi + '（门迫，力量受制）';
+  } else if (zhiShiRelation === '我克') {
+    zhiShiMenJiXiong = menJi + '（宫制门，力量减弱）';
+  } else {
+    zhiShiMenJiXiong = menJi + '（门宫相泄）';
+  }
+  
+  // 三奇六仪组合分析
+  var qiYiCombos = [];
+  for (var p2 = 1; p2 <= 9; p2++) {
+    if (p2 === 5) continue;
+    var tp2 = panData.tianpan[p2] || '';
+    var dp2 = panData.dipan[p2] || '';
+    if (tp2 && dp2 && tp2 !== dp2) {
+      var combo = tp2 + '+' + dp2;
+      var comboText = '';
+      // 十个常见三奇六仪组合
+      var comboLib = {
+        '乙+戊': {name:'青龙合会', type:'吉', text:'日奇与戊土相会，谋事可成，利于合作求财。'},
+        '乙+奇': {name:'日奇得使', type:'吉', text:'乙奇逢吉门，宜为祈福、求医、和解之事。'},
+        '丙+戊': {name:'飞鸟跌穴', type:'吉', text:'月奇逢戊，谋为吉事，出行求财大吉。'},
+        '丙+乙': {name:'日月并行', type:'吉', text:'日月相会，公谋私为皆吉。'},
+        '丁+戊': {name:'青龙转光', type:'吉', text:'星奇逢戊，贵人升迁，求名求利皆吉。'},
+        '戊+丙': {name:'青龙返首', type:'吉', text:'戊加丙奇，为大吉之格，谋为凡事皆吉。'},
+        '戊+乙': {name:'青龙合灵', type:'平', text:'戊乙相合，事可缓图，不宜急进。'},
+        '戊+丁': {name:'青龙耀明', type:'吉', text:'戊加星奇，谒贵求名大吉。'},
+        '乙+辛': {name:'青龙逃走', type:'凶', text:'日奇被辛金克制，谋事不成，破财。'},
+        '丙+庚': {name:'荧入太白', type:'凶', text:'丙奇入庚，贼来劫财，宜防盗窃。'},
+        '丁+庚': {name:'星奇入墓', type:'凶', text:'丁奇逢庚，文书阻隔，谋事不顺。'},
+        '戊+庚': {name:'值符飞宫', type:'凶', text:'戊加庚，吉事转凶，宜改图谋。'},
+        '庚+戊': {name:'太白入荧', type:'凶', text:'庚加戊，贼来劫财，宜防守。'},
+        '庚+丙': {name:'太白入荧', type:'凶', text:'庚加丙，贼来劫财，同上。'},
+        '庚+乙': {name:'太白逢星', type:'凶', text:'庚加乙，合而不化，谋事多阻。'},
+        '庚+辛': {name:'白虎干格', type:'凶', text:'庚加辛，主刑伤血光，不宜远行。'}
+      };
+      if (comboLib[combo]) {
+        qiYiCombos.push({gong:p2, combo:combo, name:comboLib[combo].name, type:comboLib[combo].type, text:comboLib[combo].text});
+      }
+    }
+  }
+  
+  // 组装值符值使详情
+  var zfzsContent = '值符落<b>' + zhiFuGong + '宫</b>(' + (JIU_GONG_NAME[zhiFuGong]||'') + '宫) — <b>' + (STARS_FULL[zhiFuStar]||zhiFuStar) + '</b><br>';
+  zfzsContent += '值符星五行<b>' + zhiFuStarEle + '</b>，落宫五行<b>' + zhiFuGongEle + '</b>，' + zhiFuRelation + '→旺衰：<b>' + zhiFuWangShuai + '</b><br>';
+  zfzsContent += '值使：<b>' + (MEN_FULL[zhiShiMen]||zhiShiMen) + '</b>门，五行<b>' + zhiShiMenEle + '</b>，门宫' + zhiShiRelation + '→吉凶：<b>' + zhiShiMenJiXiong + '</b>';
+  if (qiYiCombos.length > 0) {
+    zfzsContent += '<br><b>三奇六仪组合：</b>';
+    for (var qc = 0; qc < qiYiCombos.length; qc++) {
+      var c = qiYiCombos[qc];
+      var cColor = c.type === '吉' ? '#27ae60' : c.type === '凶' ? '#e74c3c' : '#f39c12';
+      zfzsContent += '<br><span style="color:' + cColor + '">' + c.gong + '宫 ' + c.combo + ' ' + c.name + '(' + c.type + ')：' + c.text + '</span>';
+    }
+  }
   result.details.push({
-    label: '值符值使',
-    content: '值符落' + panData.zhiFuGong + '宫(' + JIU_GONG_NAME[panData.zhiFuGong] + '宫) — ' + STARS_FULL[panData.zhiFuStar] + ' | 值使: ' + MEN_FULL[panData.zhiShiMen] || panData.zhiShiMen
+    label: '值符值使深度分析',
+    content: zfzsContent
   });
   
   // 2. 天地盘
