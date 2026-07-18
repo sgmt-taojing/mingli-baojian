@@ -61,20 +61,12 @@ function _fsProYearCenter(year) {
 
 /** 计算月飞星入中宫 */
 function _fsProMonthCenter(year, month) {
-  // 子午卯酉年：正月起八白
-  // 寅申巳亥年：正月起五黄
-  // 辰戌丑未年：正月起二黑
-  var yearZhi = FS_PRO_ZHI[(year - 4) % 12];
-  var startStar;
-  if (['子','午','卯','酉'].includes(yearZhi)) startStar = 8;
-  else if (['寅','申','巳','亥'].includes(yearZhi)) startStar = 5;
-  else startStar = 2;
   // 月飞星须依节气定月建：正月立春后起寅，依次推排
   // 子午卯酉年：正月起八白
   // 寅申巳亥年：正月起五黄
   // 辰戌丑未年：正月起二黑
-  var yearZhi = FS_PRO_ZHI[(year - 4) % 12];
-  var startStar;
+  const yearZhi = FS_PRO_ZHI[(year - 4) % 12];
+  let startStar;
   if (['子','午','卯','酉'].includes(yearZhi)) startStar = 8;
   else if (['寅','申','巳','亥'].includes(yearZhi)) startStar = 5;
   else startStar = 2;
