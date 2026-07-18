@@ -12082,8 +12082,10 @@ function computeBazi() {
     tenGods: [],
     taiYuan: _taiYuan,
     mingGong: _mingGong,
-    shenGong: _shenGong
+    shenGong: _shenGong,
+    pillars: pillars
   };
+  try { localStorage.setItem('lastBaziData', JSON.stringify(baziData)); } catch(_ls) {}
   for (var _ti=0; _ti<4; _ti++) { if (_ti!==2) baziData.tenGods.push(getTenGod(pillars[_ti].stem, pillars[_ti].branch, dayStem)); }
   try { document.getElementById('baziResult').innerHTML += generateInterpretation(baziData); } catch(e) {}
   try {
@@ -12150,7 +12152,7 @@ function computeBazi() {
 
   // === 导出/复制按钮 ===
   try {
-    var _exportBtns = '<div style="margin-top:16px;text-align:center"><button onclick="exportReportGeneric(\'baziResult\',\'八字命盘报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'baziResult\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button></div>';
+    var _exportBtns = '<div style="margin-top:16px;text-align:center"><button onclick="exportReportGeneric(\'baziResult\',\'八字命盘报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'baziResult\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button><button onclick="showScreensaver()" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">🖼️ 五行屏保</button></div>';
     document.getElementById('baziResult').innerHTML += _exportBtns;
   } catch(_ee) {}
   } catch(_ge2) { console.warn('八字术语解释渲染错误:', _ge2); }

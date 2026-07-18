@@ -39919,3 +39919,185 @@ try { window.runHealthForecast = runHealthForecast; } catch(e){}
 try { window.buildFamilyEthicsGuide = buildFamilyEthicsGuide; } catch(e) {}
 try { window.buildMonthlyFortuneTrend = buildMonthlyFortuneTrend; } catch(e) {}
 
+// ══════════════════════════════════════════════════════════════
+//  E4 屏保画 — 根据命理五行生成个性化屏保
+// ══════════════════════════════════════════════════════════════
+
+function generateScreensaver(baziData) {
+  if (!baziData || !baziData.pillars) return '';
+  var dayStem = baziData.pillars[2] && baziData.pillars[2].stem || '癸';
+  var dayEle = ({'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'})[dayStem] || '水';
+  
+  // 五行主题配色
+  var themes = {
+    '木': { primary: '#4a7c59', secondary: '#2d5a3d', accent: '#8fbc8f', bg1: '#0a1f0e', bg2: '#1a3a20', emoji: '🌳', element: '木', desc: '生机勃发·木德仁厚' },
+    '火': { primary: '#c0392b', secondary: '#922b21', accent: '#f39c12', bg1: '#1a0a0a', bg2: '#3a1515', emoji: '🔥', element: '火', desc: '热情似火·火德礼明' },
+    '土': { primary: '#a08060', secondary: '#7d6040', accent: '#d4a76a', bg1: '#1a150a', bg2: '#2a2010', emoji: '⛰️', element: '土', desc: '厚德载物·土德信实' },
+    '金': { primary: '#95a5a6', secondary: '#7f8c8d', accent: '#bdc3c7', bg1: '#0e0e12', bg2: '#1e1e24', emoji: '⚔️', element: '金', desc: '刚毅果断·金德义勇' },
+    '水': { primary: '#2980b9', secondary: '#1a5276', accent: '#5dade2', bg1: '#0a0e1a', bg2: '#0f1f3a', emoji: '🌊', element: '水', desc: '上善若水·水德智达' }
+  };
+  var theme = themes[dayEle] || themes['水'];
+  
+  // 五行相生方位图
+  var sheng = ['木→火→土→金→水→木'];
+  
+  // 构建HTML画布
+  var html = '';
+  html += '<div id="screensaverModal" style="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;flex-direction:column;padding:20px">';
+  html += '<div style="position:relative;width:1080px;max-width:100%;aspect-ratio:9/16;background:linear-gradient(180deg,' + theme.bg1 + ' 0%,' + theme.bg2 + ' 50%,' + theme.bg1 + ' 100%);border-radius:12px;overflow:hidden;box-shadow:0 0 60px rgba(0,0,0,0.5)">';
+  
+  // 背景纹理
+  html += '<div style="position:absolute;inset:0;opacity:0.03;background-image:radial-gradient(circle at 30% 20%,' + theme.accent + ' 0%,transparent 50%),radial-gradient(circle at 70% 80%,' + theme.primary + ' 0%,transparent 50%)"></div>';
+  
+  // 顶部：日主信息
+  html += '<div style="position:absolute;top:60px;left:0;right:0;text-align:center">';
+  html += '<div style="font-size:120px;line-height:1;margin-bottom:20px;opacity:0.8">' + theme.emoji + '</div>';
+  html += '<div style="font-size:28px;color:' + theme.accent + ';letter-spacing:8px;margin-bottom:8px">日主 ' + dayStem + ' · ' + theme.element + '</div>';
+  html += '<div style="font-size:16px;color:' + theme.primary + ';letter-spacing:4px;opacity:0.8">' + theme.desc + '</div>';
+  html += '</div>';
+  
+  // 中部：五行相生圆环
+  html += '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:400px;height:400px">';
+  // SVG五行相生图
+  html += '<svg viewBox="0 0 400 400" style="width:100%;height:100%">';
+  var positions = [
+    {x:200,y:60,label:'木',color:'#4a7c59'},
+    {x:340,y:180,label:'火',color:'#c0392b'},
+    {x:280,y:340,label:'土',color:'#a08060'},
+    {x:120,y:340,label:'金',color:'#95a5a6'},
+    {x:60,y:180,label:'水',color:'#2980b9'}
+  ];
+  // 相生箭头
+  for (var i = 0; i < 5; i++) {
+    var from = positions[i], to = positions[(i+1)%5];
+    html += '<path d="M' + from.x + ' ' + from.y + ' Q 200 200 ' + to.x + ' ' + to.y + '" fill="none" stroke="' + theme.accent + '" stroke-width="1.5" opacity="0.3" stroke-dasharray="4 4"/>';
+  }
+  // 五行节点
+  positions.forEach(function(p) {
+    var isDay = (p.label === dayEle);
+    html += '<circle cx="' + p.x + '" cy="' + p.y + '" r="' + (isDay ? 36 : 28) + '" fill="' + p.color + '" opacity="' + (isDay ? 0.9 : 0.4) + '" stroke="' + theme.accent + '" stroke-width="' + (isDay ? 2 : 1) + '"/>';
+    html += '<text x="' + p.x + '" y="' + (p.y + 8) + '" text-anchor="middle" fill="#fff" font-size="' + (isDay ? 24 : 18) + '" font-family="serif" font-weight="bold">' + p.label + '</text>';
+  });
+  html += '</svg>';
+  html += '</div>';
+  
+  // 底部：八字四柱
+  html += '<div style="position:absolute;bottom:80px;left:0;right:0;text-align:center">';
+  html += '<div style="font-size:14px;color:' + theme.primary + ';letter-spacing:6px;opacity:0.6;margin-bottom:12px">四柱命盘</div>';
+  html += '<div style="display:flex;justify-content:center;gap:24px">';
+  var pillarNames = ['年柱','月柱','日柱','时柱'];
+  for (var i = 0; i < 4; i++) {
+    var p = baziData.pillars[i];
+    if (p) {
+      html += '<div style="text-align:center"><div style="font-size:12px;color:' + theme.primary + ';opacity:0.5;margin-bottom:4px">' + pillarNames[i] + '</div><div style="font-size:22px;color:' + theme.accent + ';font-family:serif;font-weight:bold">' + p.stem + p.branch + '</div></div>';
+    }
+  }
+  html += '</div>';
+  html += '</div>';
+  
+  // 底部水印
+  html += '<div style="position:absolute;bottom:20px;left:0;right:0;text-align:center;font-size:12px;color:' + theme.primary + ';opacity:0.3;letter-spacing:3px">命理宝鉴 · 五行屏保</div>';
+  html += '</div>';
+  
+  // 操作按钮
+  html += '<div style="margin-top:16px;display:flex;gap:12px">';
+  html += '<button onclick="downloadScreensaver()" style="padding:10px 24px;background:' + theme.primary + ';color:#fff;border:none;border-radius:20px;font-size:13px;cursor:pointer;letter-spacing:2px">📥 下载图片</button>';
+  html += '<button onclick="closeScreensaver()" style="padding:10px 24px;background:none;color:var(--paper3);border:1px solid rgba(255,255,255,0.2);border-radius:20px;font-size:13px;cursor:pointer;letter-spacing:2px">✕ 关闭</button>';
+  html += '</div>';
+  html += '</div>';
+  
+  return html;
+}
+
+function downloadScreensaver() {
+  // 使用html2canvas或canvas API生成图片
+  try {
+    var modal = document.getElementById('screensaverModal');
+    if (!modal) return;
+    var canvas = document.createElement('canvas');
+    canvas.width = 1080;
+    canvas.height = 1920;
+    var ctx = canvas.getContext('2d');
+    
+    // 获取主题色
+    var bgDiv = modal.querySelector('div[style*="aspect-ratio"]');
+    if (!bgDiv) return;
+    var bgStyle = bgDiv.style.background;
+    
+    // 绘制渐变背景
+    var gradient = ctx.createLinearGradient(0, 0, 0, 1920);
+    gradient.addColorStop(0, '#0a0e1a');
+    gradient.addColorStop(0.5, '#0f1f3a');
+    gradient.addColorStop(1, '#0a0e1a');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 1080, 1920);
+    
+    // 绘制五行圆环
+    var cx = 540, cy = 960, r = 200;
+    var elements = [
+      {label:'木',color:'#4a7c59',angle:-90},
+      {label:'火',color:'#c0392b',angle:-18},
+      {label:'土',color:'#a08060',angle:54},
+      {label:'金',color:'#95a5a6',angle:126},
+      {label:'水',color:'#2980b9',angle:198}
+    ];
+    elements.forEach(function(e) {
+      var x = cx + r * Math.cos(e.angle * Math.PI / 180);
+      var y = cy + r * Math.sin(e.angle * Math.PI / 180);
+      ctx.beginPath();
+      ctx.arc(x, y, 36, 0, 2 * Math.PI);
+      ctx.fillStyle = e.color;
+      ctx.globalAlpha = 0.8;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 28px serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(e.label, x, y + 10);
+    });
+    
+    // 绘制标题
+    ctx.fillStyle = '#c9a84c';
+    ctx.font = 'bold 36px serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('命理宝鉴 · 五行屏保', 540, 1800);
+    
+    // 下载
+    var link = document.createElement('a');
+    link.download = 'mingli-screensaver-' + Date.now() + '.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showToast('屏保已下载');
+  } catch(e) {
+    console.warn('screensaver download error:', e);
+    showToast('下载失败，请截图保存');
+  }
+}
+
+function closeScreensaver() {
+  var modal = document.getElementById('screensaverModal');
+  if (modal) modal.remove();
+}
+
+function showScreensaver() {
+  // 从localStorage获取八字数据
+  try {
+    var baziStr = localStorage.getItem('lastBaziData');
+    var baziData = baziStr ? JSON.parse(baziStr) : null;
+    if (!baziData) {
+      showToast('请先排盘生成命盘');
+      return;
+    }
+    var html = generateScreensaver(baziData);
+    document.body.insertAdjacentHTML('beforeend', html);
+  } catch(e) {
+    console.warn('show screensaver error:', e);
+    showToast('请先排盘生成命盘');
+  }
+}
+
+try { window.generateScreensaver = generateScreensaver; } catch(e) {}
+try { window.downloadScreensaver = downloadScreensaver; } catch(e) {}
+try { window.closeScreensaver = closeScreensaver; } catch(e) {}
+try { window.showScreensaver = showScreensaver; } catch(e) {}
+
