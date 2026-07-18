@@ -2073,7 +2073,21 @@ function _xuankongBrief(year, dir) {
   if (yunPan[5] === 2) tips.push('二黑入中，注意健康');
   if (yunPan[5] === 3) tips.push('三碧入中，防止是非口舌');
   
-  return panText + (tips.length > 0 ? '分析: ' + tips.join('；') : '分析: 需结合具体格局判断。');
+  // 返回文本和数据对象
+  return {
+    text: panText + (tips.length > 0 ? '分析: ' + tips.join('；') : '分析: 需结合具体格局判断。'),
+    period: period,
+    yunPan: yunPan,
+    shanPan: shanPan,
+    xiangPan: xiangPan,
+    wangStar: wangStar,
+    shengStar: shengStar,
+    zuoNum: zuoNum,
+    xiangNum: xiangNum,
+    wangShan: zuoNum === wangStar,
+    wangXiang: xiangNum === wangStar,
+    tips: tips
+  };
 }
 
 function _getOppositeDir(dir) {
@@ -2371,7 +2385,7 @@ function runLiuyaoEngine() {
     console.error('[六爻引擎错误错误]', e.message, e.stack);
     var _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 六爻引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
-    else { alert('六爻引擎错误：'+e.message); }
+    else { showToast('六爻引擎错误：'+e.message); }
   }
 }
 
@@ -2398,7 +2412,7 @@ function runMeihuaEngine() {
     console.error('[梅花引擎错误错误]', e.message, e.stack);
     var _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 梅花引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
-    else { alert('梅花引擎错误：'+e.message); }
+    else { showToast('梅花引擎错误：' + e.message); }
   }
 }
 
@@ -2434,7 +2448,7 @@ function runQimenEngine() {
     console.error('[奇门引擎错误]', e.message, e.stack);
     var el = document.getElementById('qmEngineResult');
     if(el){ el.style.display='block'; el.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px"><h5 style="color:#e74c3c">❌ 奇门引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p><p style="font-size:11px;opacity:.5;margin-top:4px">'+(e.stack||'').split("\n").slice(0,3).join("<br>")+'</p></div>'; }
-    else { alert('奇门引擎错误：'+e.message); }
+    else { showToast('奇门引擎错误：' + e.message); }
   }
 }
 
@@ -2458,7 +2472,7 @@ function runLiurenEngine() {
     console.error('[六壬引擎错误错误]', e.message, e.stack);
     var _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 六壬引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
-    else { alert('六壬引擎错误：'+e.message); }
+    else { showToast('六壬引擎错误：' + e.message); }
   }
 }
 
@@ -2483,7 +2497,7 @@ function runZiweiEngine() {
     console.error('[紫微引擎错误错误]', e.message, e.stack);
     var _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 紫微引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
-    else { alert('紫微引擎错误：'+e.message); }
+    else { showToast('紫微引擎错误：' + e.message); }
   }
 }
 
@@ -2518,7 +2532,7 @@ function runXingmingEngine() {
     console.error('[姓名学引擎错误错误]', e.message, e.stack);
     var _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 姓名学引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
-    else { alert('姓名学引擎错误：'+e.message); }
+    else { showToast('姓名学引擎错误：' + e.message); }
   }
 }
 
@@ -2535,7 +2549,7 @@ function runFengshuiEngine() {
     html += '<p><b>宅命：</b>' + res.zhaiMing + ' · 宅主命卦：' + res.yaoMing + '</p>';
     html += '<p><b>宅命配合：</b>' + (res.matching?'相配':'不配') + '</p>';
     html += '<p><b>元运：</b>' + res.period + '运 · ' + (res.wangShan?'当运':'非当运') + '</p>';
-    html += '<p><b>玄空：</b>' + res.xuankong + '</p>';
+    html += '<p><b>玄空：</b>' + (res.xuankong && res.xuankong.text ? res.xuankong.text : res.xuankong) + '</p>';
     html += '<p><b>评分：</b>' + res.score + '/100</p>';
     html += '<p><b>建议：</b>' + res.advice + '</p>';
     html += '<ul style="padding-left:18px;opacity:0.8"><li>' + res.layoutTips.join('</li><li>') + '</li></ul>';
@@ -2544,7 +2558,7 @@ function runFengshuiEngine() {
     console.error('[风水引擎错误错误]', e.message, e.stack);
     var _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 风水引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
-    else { alert('风水引擎错误：'+e.message); }
+    else { showToast('风水引擎错误：' + e.message); }
   }
 }
 
@@ -2567,7 +2581,7 @@ function runZeriEngine() {
     console.error('[择日引擎错误错误]', e.message, e.stack);
     var _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 择日引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
-    else { alert('择日引擎错误：'+e.message); }
+    else { showToast('择日引擎错误：' + e.message); }
   }
 }
 
@@ -2605,7 +2619,7 @@ if (typeof window !== 'undefined') {
     console.error('[奇门引擎错误错误]', e.message, e.stack);
     var _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 奇门引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
-    else { alert('奇门引擎错误：'+e.message); }
+    else { showToast('奇门引擎错误：' + e.message); }
   }
   }
   window.runQimen = runQimen;
@@ -2632,7 +2646,7 @@ if (typeof window !== 'undefined') {
     console.error('[紫微引擎错误错误]', e.message, e.stack);
     var _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 紫微引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
-    else { alert('紫微引擎错误：'+e.message); }
+    else { showToast('紫微引擎错误：' + e.message); }
   }
   }
   window.runZiwei = runZiwei;
@@ -2660,7 +2674,7 @@ if (typeof window !== 'undefined') {
     console.error('[梅花引擎错误错误]', e.message, e.stack);
     var _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 梅花引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
-    else { alert('梅花引擎错误：'+e.message); }
+    else { showToast('梅花引擎错误：' + e.message); }
   }
   }
   window.runMeihua = runMeihua;
@@ -2687,7 +2701,7 @@ if (typeof window !== 'undefined') {
     console.error('[六壬引擎错误错误]', e.message, e.stack);
     var _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 六壬引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
-    else { alert('六壬引擎错误：'+e.message); }
+    else { showToast('六壬引擎错误：' + e.message); }
   }
   }
   window.runLiuren = runLiuren;
@@ -2762,11 +2776,11 @@ function submitAsk() {
   var resultContent = document.getElementById('askResultContent');
 
   if (!select || !select.value) {
-    alert('请先选择一位大师');
+    showToast('请先选择一位大师');
     return;
   }
   if (!input || !input.value.trim()) {
-    alert('请输入您的问题');
+    showToast('请输入您的问题');
     return;
   }
 
@@ -3097,4 +3111,4 @@ try { window.runZiweiEngine = runZiweiEngine; } catch(e){}
 try { window.runXingmingEngine = runXingmingEngine; } catch(e){}
 try { window.runFengshuiEngine = runFengshuiEngine; } catch(e){}
 try { window.runZeriEngine = runZeriEngine; } catch(e){}
-console.log('[引擎] calc-engine-lib函数全局暴露完成');
+//console.log('[引擎] calc-engine-lib函数全局暴露完成');

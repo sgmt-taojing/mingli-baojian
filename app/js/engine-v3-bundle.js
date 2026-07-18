@@ -5062,8 +5062,237 @@ window.MeihuaV3 = {
     computeMeihuaFull,
     // R3.2: 完整断卦步骤
     analyzeMeihuaFull,
+    // R3.3: 卦气数值化分析
+    analyzeGuaQi,
+    computeGuaQiScore,
   };
 };
+
+/**
+ * R3.3: 梅花·卦气数值化分析
+ * 依据《梅花易数》卦气篇，将卦气旺衰量化为具体数值
+ * 卦气数值表：春震100/夏离100/秋兑100/冬坎100，其他卦按方位五行得月令情况递减
+ *
+ * 卦气核心原则：
+ *   - 当令之卦气最旺（如春震木旺→100分）
+ *   - 生令之卦次旺（如春离火相→80分）
+ *   - 同令之卦平和（如春巽木比和→90分）
+ *   - 克令之卦衰弱（如春乾金囚→40分）
+ *   - 令克之卦最弱（如春坤土死→20分）
+ */
+
+/**
+ * 卦气数值表：八卦在四季的卦气分值（0-100）
+ * 依据：当令者旺(100)、生令者相(80)、同气者比和(90)、克令者囚(40)、令克者死(20)
+ */
+var GUA_QI_TABLE = {
+  // 春季（寅卯辰月）— 木旺
+  '春': {
+    '震': 100,  // 震为木，当令最旺
+    '巽': 90,   // 巽为木，同气比和
+    '离': 80,   // 离为火，木生火，相
+    '坎': 60,   // 坎为水，水生木，休
+    '乾': 40,   // 乾为金，金克木，囚
+    '兑': 40,   // 兑为金，金克木，囚
+    '坤': 20,   // 坤为土，木克土，死
+    '艮': 20,   // 艮为土，木克土，死
+  },
+  // 夏季（巳午未月）— 火旺
+  '夏': {
+    '离': 100,  // 离为火，当令最旺
+    '坤': 80,   // 坤为土，火生土，相
+    '艮': 80,   // 艮为土，火生土，相
+    '震': 60,   // 震为木，木生火，休
+    '巽': 60,   // 巽为木，木生火，休
+    '坎': 40,   // 坎为水，水克火，囚
+    '乾': 20,   // 乾为金，火克金，死
+    '兑': 20,   // 兑为金，火克金，死
+  },
+  // 秋季（申酉戌月）— 金旺
+  '秋': {
+    '乾': 100,  // 乾为金，当令最旺
+    '兑': 100,  // 兑为金，当令最旺
+    '坎': 80,   // 坎为水，金生水，相
+    '坤': 60,   // 坤为土，土生金，休
+    '艮': 60,   // 艮为土，土生金，休
+    '震': 40,   // 震为木，金克木，囚
+    '巽': 40,   // 巽为木，金克木，囚
+    '离': 20,   // 离为火，火克金，死
+  },
+  // 冬季（亥子丑月）— 水旺
+  '冬': {
+    '坎': 100,  // 坎为水，当令最旺
+    '震': 80,   // 震为木，水生木，相
+    '巽': 80,   // 巽为木，水生木，相
+    '乾': 60,   // 乾为金，金生水，休
+    '兑': 60,   // 兑为金，金生水，休
+    '离': 40,   // 离为火，水克火，囚
+    '坤': 20,   // 坤为土，土克水，死
+    '艮': 20,   // 艮为土，土克水，死
+  },
+};
+
+/**
+ * 计算单卦卦气分值
+ * @param {string} trigramName - 卦名（乾/兑/离/震/巽/坎/艮/坤）
+ * @param {string} season - 季节（春/夏/秋/冬）
+ * @returns {object} 卦气分值及描述
+ */
+function computeGuaQiScore(trigramName, season) {
+  try {
+    if (!trigramName || !season) return { score: 50, level: '平', desc: '卦气数据不足' };
+    var seasonTable = GUA_QI_TABLE[season];
+    if (!seasonTable) return { score: 50, level: '平', desc: '季节数据不足' };
+    var score = seasonTable[trigramName];
+    if (typeof score === 'undefined') return { score: 50, level: '平', desc: '卦气数据不足' };
+
+    var level, desc;
+    if (score >= 100) {
+      level = '旺';
+      desc = trigramName + '卦在' + season + '季当令，卦气最旺，力量充沛';
+    } else if (score >= 80) {
+      level = '相';
+      desc = trigramName + '卦在' + season + '季得生扶，卦气次旺，生机勃勃';
+    } else if (score >= 60) {
+      level = '休';
+      desc = trigramName + '卦在' + season + '季退气，卦气平和，能量一般';
+    } else if (score >= 40) {
+      level = '囚';
+      desc = trigramName + '卦在' + season + '季受制，卦气衰弱，力量被困';
+    } else {
+      level = '死';
+      desc = trigramName + '卦在' + season + '季至衰，卦气极弱，无气无力';
+    }
+
+    return { score: score, level: level, desc: desc };
+  } catch (e) {
+    return { score: 50, level: '平', desc: '卦气计算异常: ' + e.message };
+  }
+}
+
+/**
+ * R3.3: 梅花·卦气数值化完整分析
+ * 对体卦和用卦的卦气进行数值化对比，分析卦气旺衰对断卦结果的影响
+ *
+ * @param {object} tiYong - analyzeTiYong() 返回的体用分析结果
+ * @param {string} season - 季节（春/夏/秋/冬）
+ * @returns {object} 卦气分析结果
+ */
+function analyzeGuaQi(tiYong, season) {
+  try {
+    if (!tiYong || !season) return null;
+
+    var tiName = tiYong.ti.name;
+    var yongName = tiYong.yong.name;
+    var tiEle = tiYong.ti.element;
+    var yongEle = tiYong.yong.element;
+
+    // 计算体卦和用卦的卦气分值
+    var tiQi = computeGuaQiScore(tiName, season);
+    var yongQi = computeGuaQiScore(yongName, season);
+
+    // 体用卦气对比分析
+    var qiDiff = tiQi.score - yongQi.score;
+    var comparison, advice;
+
+    if (qiDiff >= 40) {
+      comparison = '体卦卦气远强于用卦（' + tiQi.score + ' vs ' + yongQi.score + '），自身力量充沛，外力相对薄弱。\n' +
+                   '体卦' + tiQi.desc + '；用卦' + yongQi.desc + '。\n' +
+                   '体旺用衰→自身有力而外力不足，谋事靠己，宜主动出击，以实力取胜。';
+      advice = '宜把握主动权，凭借自身实力推进，不宜过度依赖外力。';
+    } else if (qiDiff >= 10) {
+      comparison = '体卦卦气略强于用卦（' + tiQi.score + ' vs ' + yongQi.score + '），自身有一定优势。\n' +
+                   '体卦' + tiQi.desc + '；用卦' + yongQi.desc + '。\n' +
+                   '体略旺于用→自身条件较好，外力亦有助力，谋事可成。';
+      advice = '宜积极行动，内外兼修，既有自身实力又有外力配合。';
+    } else if (qiDiff >= -10) {
+      comparison = '体用卦气相当（' + tiQi.score + ' vs ' + yongQi.score + '），双方力量均衡。\n' +
+                   '体卦' + tiQi.desc + '；用卦' + yongQi.desc + '。\n' +
+                   '体用气均→势均力敌，成败取决于其他因素（动爻、互卦、变卦）。';
+      advice = '宜审时度势，观察动静，不可冒进，待机而动。';
+    } else if (qiDiff >= -40) {
+      comparison = '用卦卦气略强于体卦（' + tiQi.score + ' vs ' + yongQi.score + '），外力稍占优势。\n' +
+                   '体卦' + tiQi.desc + '；用卦' + yongQi.desc + '。\n' +
+                   '用略旺于体→外力较强，自身稍显不足，谋事需借力。';
+      advice = '宜借助外力，顺势而为，不宜独断专行。';
+    } else {
+      comparison = '用卦卦气远强于体卦（' + tiQi.score + ' vs ' + yongQi.score + '），外力强盛，自身薄弱。\n' +
+                   '体卦' + tiQi.desc + '；用卦' + yongQi.desc + '。\n' +
+                   '体衰用旺→自身无力而外力强盛，受制于人，谋事艰难。';
+      advice = '宜暂避锋芒，休养生息，待卦气转运再行谋划。';
+    }
+
+    // 卦气旺衰对断卦结果的影响
+    var impact = '';
+    var tiScore = tiQi.score;
+    var yongScore = yongQi.score;
+
+    // 体卦卦气旺→自身有力
+    if (tiScore >= 80) {
+      impact += '体卦卦气旺盛，自身条件优越，有足够的实力应对所求之事。';
+      if (tiYong.benGuaRelation.code === 'yongshengti' || tiYong.benGuaRelation.code === 'bihe') {
+        impact += '且体用关系吉利，内外皆顺，大吉之象。';
+      } else if (tiYong.benGuaRelation.code === 'yongketi') {
+        impact += '虽体卦旺但用卦克体，幸得卦气旺可抗克，凶中转吉。';
+      }
+    } else if (tiScore <= 40) {
+      impact += '体卦卦气衰弱，自身条件不足，应对所求之事力不从心。';
+      if (tiYong.benGuaRelation.code === 'yongketi') {
+        impact += '且用卦克体，卦气又衰，雪上加霜，大凶之象。';
+      } else if (tiYong.benGuaRelation.code === 'yongshengti') {
+        impact += '幸得用卦生体，可借外力弥补自身不足。';
+      }
+    } else {
+      impact += '体卦卦气平和，自身条件一般，需结合其他因素综合判断。';
+    }
+
+    // 用卦卦气旺→外力强
+    impact += ' ';
+    if (yongScore >= 80) {
+      impact += '用卦卦气旺盛，外力强盛。';
+      if (tiYong.benGuaRelation.code === 'yongshengti') {
+        impact += '且用生体，外力助我，事半功倍。';
+      } else if (tiYong.benGuaRelation.code === 'yongketi') {
+        impact += '但用克体，外力强而压制，阻碍重重。';
+      }
+    } else if (yongScore <= 40) {
+      impact += '用卦卦气衰弱，外力不足。';
+      if (tiYong.benGuaRelation.code === 'yongketi') {
+        impact += '虽用克体但卦气衰，克力大减，不足为惧。';
+      } else if (tiYong.benGuaRelation.code === 'yongshengti') {
+        impact += '虽用生体但卦气衰，助力有限，不可过度依赖。';
+      }
+    } else {
+      impact += '用卦卦气平和，外力一般。';
+    }
+
+    // 卦气修正分数
+    var qiModifier = 0;
+    if (tiScore >= 100) qiModifier += 10;
+    else if (tiScore >= 80) qiModifier += 5;
+    else if (tiScore <= 20) qiModifier -= 10;
+    else if (tiScore <= 40) qiModifier -= 5;
+
+    if (yongScore >= 100 && tiYong.benGuaRelation.code === 'yongketi') qiModifier -= 10;
+    else if (yongScore >= 100 && tiYong.benGuaRelation.code === 'yongshengti') qiModifier += 5;
+    else if (yongScore <= 20 && tiYong.benGuaRelation.code === 'yongketi') qiModifier += 5;
+
+    return {
+      tiGuaQi: tiQi,
+      yongGuaQi: yongQi,
+      qiDiff: qiDiff,
+      comparison: comparison,
+      advice: advice,
+      impact: impact,
+      qiModifier: qiModifier,
+      summary: '体卦' + tiName + '（' + tiEle + '）卦气' + tiQi.level + '（' + tiQi.score + '分），' +
+               '用卦' + yongName + '（' + yongEle + '）卦气' + yongQi.level + '（' + yongQi.score + '分），' +
+               (qiDiff >= 0 ? '体强于用' : '用强于体') + '。'
+    };
+  } catch (e) {
+    return { error: '卦气分析异常: ' + e.message };
+  }
+}
 
 })();
 
@@ -8145,7 +8374,267 @@ function analyzeQimenFull(panData) {
     result.details.push({ label: '格局详情', content: gejuDetail });
   }
   
+  // 9. R3.6: 超神接气/置闰法分析
+  try {
+    var chaoshenInfo = _analyzeChaoshenJieqi(panData);
+    if (chaoshenInfo) {
+      result.details.push({ label: '超神接气/定局法', content: chaoshenInfo });
+    }
+  } catch (e) { /* ignore */ }
+  
+  // 10. R3.7: 用神多维度选取
+  try {
+    var multiYongshen = _analyzeMultiYongshen(panData);
+    if (multiYongshen) {
+      result.details.push({ label: '用神多维度分析', content: multiYongshen });
+    }
+  } catch (e) { /* ignore */ }
+  
   return result;
+}
+
+/**
+ * R3.6: 超神接气/置闰法分析
+ * 依据《奇门遁甲统宗大全》超神接气篇
+ *
+ * 三种定局方法：
+ *   1. 置闰法 — 芒种后置闰、大雪后置闰
+ *   2. 拆补法 — 上元中元下元的天数补足
+ *   3. 茅山法 — 按节气时刻精确分割
+ *
+ * 超神：节气未到而遁局已到（日干支在节气之前）
+ * 接气：节气已到而遁局未到（日干支在节气之后）
+ */
+function _analyzeChaoshenJieqi(panData) {
+  try {
+    if (!panData || !panData.jieqi) return null;
+    
+    var jieqi = panData.jieqi;
+    var juName = panData.juName || '';
+    var yuan = panData.yuan || '';
+    
+    // 超神接气说明
+    var parts = [];
+    parts.push('【超神接气说明】');
+    parts.push('奇门定局以节气为准，但日干支与节气不完全同步，产生“超神”与“接气”两种情况：');
+    parts.push('• 超神：节气未到而遁局先到（日干支在节气前），为超神，主事提前发动。');
+    parts.push('• 接气：节气已到而遁局后到（日干支在节气后），为接气，主事延后应验。');
+    parts.push('');
+    
+    // 三种定局方法对比
+    parts.push('【三种定局方法对比】');
+    parts.push('┌─────────┬────────────────────────────┬────────────────────────────┐');
+    parts.push('│ 方法    │ 定局原则                   │ 特点                       │');
+    parts.push('├─────────┼────────────────────────────┼────────────────────────────┤');
+    parts.push('│ 置闰法  │ 芒种后置闰、大雪后置闰     │ 保持三元各5日完整，最正统  │');
+    parts.push('│ 拆补法  │ 上元中元下元天数补足       │ 无需置闰，拆分补足天数    │');
+    parts.push('│ 茅山法  │ 按节气时刻精确分割三元     │ 最精确，但需天文历算      │');
+    parts.push('└─────────┴────────────────────────────┴────────────────────────────┘');
+    parts.push('');
+    
+    // 置闰法详述
+    parts.push('【置闰法详述】');
+    parts.push('《奇门遁甲统宗大全》云：“置闰之法，以芒种、大雪为界。”');
+    parts.push('• 芒种后置闰：芒种节气后，若日干支未到夏至，则在芒种后重复一局（芒种六三九），直至夏至前一天。');
+    parts.push('• 大雪后置闰：大雪节气后，若日干支未到冬至，则在大雪后重复一局（大雪四七一），直至冬至前一天。');
+    parts.push('• 置闰法保证上中下三元各5日完整，为最正统的定局方法。');
+    parts.push('');
+    
+    // 拆补法详述
+    parts.push('【拆补法详述】');
+    parts.push('拆补法不置闰，而是将节气前后不足5日的天数拆分补足：');
+    parts.push('• 节气前余日：归入上一节气下元，称“残下元”。');
+    parts.push('• 节气后余日：归入本节气上元，称“补上元”。');
+    parts.push('• 中元5日完整，上元下元可能不足或超过5日。');
+    parts.push('• 拆补法无需置闰，但三元天数不均，适合快速定局。');
+    parts.push('');
+    
+    // 茅山法详述
+    parts.push('【茅山法详述】');
+    parts.push('茅山法（又称“按气定局法”）以节气精确时刻为准：');
+    parts.push('• 从节气时刻起，每5日为一元（上元→中元→下元）。');
+    parts.push('• 下一节气时刻起，换用新节气的遁局。');
+    parts.push('• 不足5日的部分由下一节气上元补齐。');
+    parts.push('• 茅山法最精确，但需精确的节气时刻数据（天文计算）。');
+    parts.push('');
+    
+    // 当前定局判断
+    parts.push('【当前定局信息】');
+    parts.push('当前节气：' + jieqi + (yuan ? ' ' + yuan : '') + ' | 遁局：' + juName);
+    if (panData.jieqiExactTime) {
+      parts.push('节气精确时刻：' + panData.jieqiExactTime);
+    }
+    parts.push('注：V3引擎采用天文节气定局（太阳黄经精确计算），等效于茅山法。');
+    
+    return parts.join('\n');
+  } catch (e) {
+    return null;
+  }
+}
+
+/**
+ * R3.7: 奇门用神多维度选取
+ * 依据《奇门遁甲统宗大全》用神篇
+ *
+ * 多重用神体系：
+ *   1. 日干落宫 — 命主自身状态
+ *   2. 时干落宫 — 事体本身状态
+ *   3. 年命落宫 — 本命年命（出生年干落宫）
+ *   4. 多重用神综合分析 — 三者落宫的五行生克关系
+ *   5. 不同事项取用原则 — 求财看生门/求婚看六合/求官看开门等
+ */
+function _analyzeMultiYongshen(panData) {
+  try {
+    if (!panData || !panData.dipan || !panData.tianpan) return null;
+    
+    var parts = [];
+    
+    // 九宫五行映射（宫位→五行）
+    var GONG_WX_MAP = {1:'水',2:'土',3:'木',4:'木',6:'金',7:'金',8:'土',9:'火'};
+    // 九宫方位
+    var GONG_FW_MAP = {1:'北方',2:'西南',3:'东方',4:'东南',6:'西北',7:'西方',8:'东北',9:'南方'};
+    
+    // 天干落宫查找函数：在天地盘中找到该天干所在宫位
+    function findStemGong(stem) {
+      // 先查天盘
+      for (var p = 1; p <= 9; p++) {
+        if (p === 5) continue;
+        if (panData.tianpan && panData.tianpan[p] === stem) return p;
+      }
+      // 再查地盘
+      for (var p2 = 1; p2 <= 9; p2++) {
+        if (p2 === 5) continue;
+        if (panData.dipan && panData.dipan[p2] === stem) return p2;
+      }
+      return -1;
+    }
+    
+    // 获取宫位完整信息
+    function getGongInfo(gong) {
+      if (gong < 1 || gong > 9 || gong === 5) return null;
+      var wx = GONG_WX_MAP[gong] || '土';
+      var fw = GONG_FW_MAP[gong] || '';
+      var tp = (panData.tianpan && panData.tianpan[gong]) || '';
+      var dp = (panData.dipan && panData.dipan[gong]) || '';
+      var men = (panData.men && panData.men[gong]) || '';
+      var star = (panData.stars && panData.stars[gong]) || '';
+      var shen = (panData.shen && panData.shen[gong]) || '';
+      return { gong: gong, wx: wx, fw: fw, tianpan: tp, dipan: dp, men: men, star: star, shen: shen };
+    }
+    
+    // 五行生克判断
+    function wxRelation(a, b) {
+      if (a === b) return '比和';
+      var shengMap = {金:'水',水:'木',木:'火',火:'土',土:'金'};
+      var keMap = {金:'木',木:'土',土:'水',水:'火',火:'金'};
+      if (shengMap[a] === b) return '我生';
+      if (shengMap[b] === a) return '生我';
+      if (keMap[a] === b) return '我克';
+      if (keMap[b] === a) return '克我';
+      return '未知';
+    }
+    
+    // 1. 日干落宫（命主自身）
+    var dayGan = panData.dayGanName ? panData.dayGanName.charAt(0) : '';
+    var riGong = -1;
+    if (dayGan) {
+      riGong = findStemGong(dayGan);
+    }
+    parts.push('【日干落宫·命主自身】');
+    if (riGong > 0) {
+      var riInfo = getGongInfo(riGong);
+      parts.push('日干' + dayGan + '落' + riGong + '宫（' + riInfo.fw + '，五行' + riInfo.wx + '）');
+      parts.push('天盘仪：' + riInfo.tianpan + ' | 地盘仪：' + riInfo.dipan);
+      parts.push('八门：' + (riInfo.men || '无') + ' | 九星：' + (riInfo.star || '无') + ' | 八神：' + (riInfo.shen || '无'));
+      // 命主落宫五行旺衰判断
+      var riGanWX = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'}[dayGan] || '土';
+      var riRel = wxRelation(riGanWX, riInfo.wx);
+      if (riRel === '比和') parts.push('命主与落宫比和→自身状态平稳，得地有力。');
+      else if (riRel === '生我') parts.push('宫生命主（' + riInfo.wx + '生' + riGanWX + '）→环境有利，自身得助。');
+      else if (riRel === '我生') parts.push('命主生宫（' + riGanWX + '生' + riInfo.wx + '）→精力外泄，付出较多。');
+      else if (riRel === '克我') parts.push('宫克命主（' + riInfo.wx + '克' + riGanWX + '）→环境压制，自身受限。');
+      else if (riRel === '我克') parts.push('命主克宫（' + riGanWX + '克' + riInfo.wx + '）→自身掌控局面，但费力。');
+    } else {
+      parts.push('日干落宫信息不足。');
+    }
+    parts.push('');
+    
+    // 2. 时干落宫（事体本身）
+    var hourGan = panData.hourGanZhi ? panData.hourGanZhi.charAt(0) : '';
+    var shiGong = -1;
+    if (hourGan) {
+      shiGong = findStemGong(hourGan);
+    }
+    parts.push('【时干落宫·事体本身】');
+    if (shiGong > 0) {
+      var shiInfo = getGongInfo(shiGong);
+      parts.push('时干' + hourGan + '落' + shiGong + '宫（' + shiInfo.fw + '，五行' + shiInfo.wx + '）');
+      parts.push('天盘仪：' + shiInfo.tianpan + ' | 地盘仪：' + shiInfo.dipan);
+      parts.push('八门：' + (shiInfo.men || '无') + ' | 九星：' + (shiInfo.star || '无') + ' | 八神：' + (shiInfo.shen || '无'));
+      var shiGanWX = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'}[hourGan] || '土';
+      var shiRel = wxRelation(shiGanWX, shiInfo.wx);
+      if (shiRel === '比和') parts.push('事体与落宫比和→事情发展平稳，无大碍。');
+      else if (shiRel === '生我') parts.push('宫生事体（' + shiInfo.wx + '生' + shiGanWX + '）→外部条件有利，事易成。');
+      else if (shiRel === '我生') parts.push('事体生宫（' + shiGanWX + '生' + shiInfo.wx + '）→事情消耗资源，需投入。');
+      else if (shiRel === '克我') parts.push('宫克事体（' + shiInfo.wx + '克' + shiGanWX + '）→外部阻碍，事难成。');
+      else if (shiRel === '我克') parts.push('事体克宫（' + shiGanWX + '克' + shiInfo.wx + '）→事情主动，但需克服阻力。');
+    } else {
+      parts.push('时干落宫信息不足。');
+    }
+    parts.push('');
+    
+    // 3. 日干与时干落宫关系（命主与事体）
+    if (riGong > 0 && shiGong > 0) {
+      var riInfo2 = getGongInfo(riGong);
+      var shiInfo2 = getGongInfo(shiGong);
+      var gongRel = wxRelation(riInfo2.wx, shiInfo2.wx);
+      parts.push('【命主与事体关系】');
+      parts.push('日干宫（' + riInfo2.wx + '）与时干宫（' + shiInfo2.wx + '）：' + gongRel);
+      if (gongRel === '比和') parts.push('命主与事体比和→谋事顺利，内外一致。');
+      else if (gongRel === '生我') parts.push('事体生命主→事来就我，机会主动找上门，大吉。');
+      else if (gongRel === '我生') parts.push('命主生事体→我求此事，需主动付出，费力方成。');
+      else if (gongRel === '克我') parts.push('事体克命主→事与愿违，强求招祸，宜放弃或改变方向。');
+      else if (gongRel === '我克') parts.push('命主克事体→经过努力可成，但需克服困难。');
+      parts.push('');
+    }
+    
+    // 4. 不同事项取用原则
+    parts.push('【不同事项取用原则】');
+    var matterGuide = [
+      { matter: '求财', yongshen: '生门', desc: '生门为财星，落宫吉则财源广进，凶则破财。兼看日干与生门宫五行生克。' },
+      { matter: '求婚', yongshen: '六合', desc: '六合为婚姻用神，落宫吉则姻缘和合，凶则感情波折。兼看乙奇（女）或庚干（男）。' },
+      { matter: '求官', yongshen: '开门', desc: '开门为官星，落宫吉则官运亨通，凶则仕途受阻。兼看日干与开门宫关系。' },
+      { matter: '考试', yongshen: '景门', desc: '景门为文书考试用神，落宫吉则金榜题名，凶则名落孙山。兼看丁奇。' },
+      { matter: '疾病', yongshen: '天芮', desc: '天芮为病神，落宫看病情轻重。天芮落宫克日干宫→病情严重；日干宫克天芮宫→可愈。' },
+      { matter: '出行', yongshen: '驿马', desc: '看马星落宫，马星临吉门吉星→出行顺利；临凶门凶星→旅途不顺。' },
+      { matter: '官司', yongshen: '惊门', desc: '惊门为官非用神，落宫凶则官司不利。兼看日干与惊门宫关系判断胜败。' },
+      { matter: '失物', yongshen: '玄武', desc: '玄武为盗贼用神，玄武落宫方向寻物。玄武宫克日干宫→难寻；日干宫克玄武宫→可找回。' },
+      { matter: '求子', yongshen: '天芮', desc: '天芮亦为孕妇用神，落宫吉则母子平安，凶则需保胎。兼看六合（子息宫）。' },
+      { matter: '搬家', yongshen: '开门', desc: '开门为新居用神，落宫吉则新居风水好，凶则不宜搬迁。兼看日干与开门宫关系。' },
+    ];
+    for (var mi = 0; mi < matterGuide.length; mi++) {
+      var mg = matterGuide[mi];
+      // 查找该用神所在宫位
+      var ysGong = -1;
+      for (var p3 = 1; p3 <= 9; p3++) {
+        if (p3 === 5) continue;
+        if (mg.yongshen === '生门' && panData.men && panData.men[p3] === '生') ysGong = p3;
+        if (mg.yongshen === '开门' && panData.men && panData.men[p3] === '开') ysGong = p3;
+        if (mg.yongshen === '景门' && panData.men && panData.men[p3] === '景') ysGong = p3;
+        if (mg.yongshen === '惊门' && panData.men && panData.men[p3] === '惊') ysGong = p3;
+        if (mg.yongshen === '六合' && panData.shen && panData.shen[p3] === '六合') ysGong = p3;
+        if (mg.yongshen === '玄武' && panData.shen && panData.shen[p3] === '玄武') ysGong = p3;
+        if (mg.yongshen === '天芮' && panData.stars && panData.stars[p3] === '芮') ysGong = p3;
+        if (mg.yongshen === '驿马' && panData.maXing === p3) ysGong = p3;
+      }
+      var ysInfo = ysGong > 0 ? getGongInfo(ysGong) : null;
+      parts.push('• ' + mg.matter + '→看' + mg.yongshen + (ysInfo ? '（落' + ysGong + '宫，' + ysInfo.fw + '，' + ysInfo.wx + '）' : '（未落宫）') + '：' + mg.desc);
+    }
+    
+    return parts.join('\n');
+  } catch (e) {
+    return null;
+  }
 }
 
 // ─── 导出 ────────────────────────────────────────────────────────
@@ -8165,6 +8654,11 @@ window.QimenV3 = {
   getGeju: getGeju,
   getWuBuYu: getWuBuYu,
   analyzeQimenFull: analyzeQimenFull,
+  
+  // R3.6: 超神接气
+  _analyzeChaoshenJieqi: _analyzeChaoshenJieqi,
+  // R3.7: 用神多维度
+  _analyzeMultiYongshen: _analyzeMultiYongshen,
   
   // 辅助
   getKongWang: getKongWang,
@@ -10085,6 +10579,601 @@ function analyzeLiuyue(panData, currentMonth) {
 }
 
 
+/**
+ * R3.1: 紫微·身宫分析
+ * 身宫星曜组合 + 身宫与命宫关系 + 主星庙旺落陷对中晚年运势的影响
+ * 《紫微斗数全书》：「身宫者，后天造化之所，35岁后渐显。」
+ * @param {object} panData - ziweiCalcV3() 的返回值
+ * @returns {object} 身宫分析结果
+ */
+function analyzeShenGong(panData) {
+  var gongMap = panData.gongMap || {};
+  var stars = panData.stars || [];
+  var mingPos = gongMap['命宫'] != null ? gongMap['命宫'] : 0;
+  var shenIdx = panData.shenIdx != null ? panData.shenIdx : 0;
+  var sihuaPalaces = panData.sihuaPalaces || [];
+
+  // 身宫落在哪个宫位
+  var shenGongName = '';
+  for (var name in gongMap) {
+    if (gongMap[name] === shenIdx) { shenGongName = name; break; }
+  }
+  if (!shenGongName) shenGongName = BRANCHES[shenIdx] + '宫';
+
+  // 身宫主星
+  var shenStars = stars[shenIdx] || [];
+  var shenMainStars = [];
+  var shenAuxStars = [];
+  var shenShaStars = [];
+  var mainStarSet = ['紫微','天机','太阳','武曲','天同','廉贞','天府','太阴','贪狼','巨门','天相','天梁','七杀','破军'];
+  var shaStarSet = ['擎羊','陀罗','火星','铃星','地空','地劫','天刑'];
+  for (var si = 0; si < shenStars.length; si++) {
+    var sn = shenStars[si];
+    if (mainStarSet.indexOf(sn) >= 0) shenMainStars.push(sn);
+    else if (shaStarSet.indexOf(sn) >= 0) shenShaStars.push(sn);
+    else shenAuxStars.push(sn);
+  }
+
+  // 身宫主星庙旺
+  var shenStrengths = shenMainStars.map(function(s) {
+    var table = STAR_STRENGTH[s];
+    if (!table) return { star: s, strength: 1, label: '平' };
+    return { star: s, strength: table[shenIdx], label: STRENGTH_LABELS[table[shenIdx]] || '平' };
+  });
+
+  // 身宫与命宫的关系
+  var shenMingRelation = '';
+  var shenMingDetail = '';
+  if (shenIdx === mingPos) {
+    shenMingRelation = '身命同宫';
+    shenMingDetail = '身宫与命宫同宫，先天与后天合一，性格表里如一，一生运势较为连贯，中年前后均有稳定的自我认知。为人言行一致，目标感强，不易受外界影响而改变方向。';
+  } else {
+    var diff = mod(shenIdx - mingPos, 12);
+    if (diff === 6) {
+      shenMingRelation = '身宫在迁移宫(命宫对宫)';
+      shenMingDetail = '身宫落在迁移宫，35岁后外出运势转佳。中年以后宜离乡发展，在外建立事业根基。外出遇贵人，社交圈扩大，人生舞台从本地拓展到外地。不喜固守一方，宜动不宜静。';
+    } else if (diff === 1 || diff === 11) {
+      shenMingRelation = '身宫在命宫相邻宫位';
+      shenMingDetail = '身宫紧邻命宫，后天发展与先天格局相辅相成，中年后的转变较为温和渐进，不会出现剧烈的人生转向。';
+    } else {
+      // 找身宫对应的十二宫名
+      var relationMap = {
+        '夫妻': '身宫在夫妻宫→婚后运势转佳，配偶为人生转折关键。35岁后婚姻质量直接影响整体运势，好的婚姻助力事业腾飞，差的婚姻则拖累各方面发展。宜慎重选择伴侣，婚后用心经营感情。',
+        '财帛': '身宫在财帛宫→中年以后以财运为重。35岁后经济意识增强，理财能力提升，财富积累加速。一生财源重心在中晚年，宜提前布局投资理财，中年把握财富机遇。',
+        '官禄': '身宫在官禄宫→中晚年以事业为重。35岁后事业心更强，职场发展加速，适合在35岁后集中精力拼搏事业。事业成就决定人生高度，宜在中年抓住升职创业良机。',
+        '迁移': '身宫在迁移宫→中年以后外出发展为主。35岁后宜离乡背井，在外地或海外建立事业。外出遇贵人，社交面广，人生格局因迁移而开阔。',
+        '福德': '身宫在福德宫→中晚年注重精神追求。35岁后从物质追求转向精神修养，对哲学、宗教、艺术等产生兴趣。内心世界丰富，晚年精神愉悦，宜培养高雅爱好。',
+        '兄弟': '身宫在兄弟宫→中年后人际关系为重。35岁后兄弟姐妹和朋友圈子对运势影响加大，合伙合作可能成为人生转折点。宜广结善缘，珍惜手足之情。',
+        '子女': '身宫在子女宫→中晚年以子女为重。35岁后子女教育培养成为人生重心，子女有出息则晚年幸福。宜注重子女教育投资，亲子关系和谐则运势顺遂。',
+        '疾厄': '身宫在疾厄宫→中晚年需注意健康。35岁后体质变化明显，需注重养生保健。健康为万事之基，身体好则运势稳，不宜过度操劳。',
+        '交友': '身宫在交友宫(奴仆宫)→中年后社交圈为重。35岁后朋友和下属对事业影响加大，得力助手可助推事业腾飞。宜善待下属，广交益友。',
+        '田宅': '身宫在田宅宫→中晚年以家业为重。35岁后置产立业意愿增强，房产投资运势佳。家庭和睦则运势稳固，宜注重家庭建设和资产管理。',
+        '父母': '身宫在父母宫→中年后长辈关系为重。35岁后与父母关系变化影响运势，孝敬父母则福报深厚。长辈经验和人脉资源可助推事业。'
+      };
+      shenMingRelation = '身宫在' + shenGongName;
+      shenMingDetail = relationMap[shenGongName] || ('身宫在' + shenGongName + '，35岁后该宫位所主事项成为人生重心。');
+    }
+  }
+
+  // 身宫主星庙旺对中晚年运势的影响
+  var strengthAnalysis = '';
+  if (shenMainStars.length === 0) {
+    strengthAnalysis = '身宫无主星，中晚年发展方向不明确，受环境影响大。宜借对宫星曜之力，培养适应能力，顺势而为。';
+  } else {
+    for (var mi = 0; mi < shenMainStars.length; mi++) {
+      var ms = shenMainStars[mi];
+      var sInfo = shenStrengths[mi] || {};
+      var sLabel = sInfo.label || '平';
+      if (sLabel === '庙') {
+        strengthAnalysis += ms + '入庙坐身宫，中晚年' + getStarLateEffect(ms, '庙') + ' ';
+      } else if (sLabel === '旺') {
+        strengthAnalysis += ms + '旺位坐身宫，中晚年' + getStarLateEffect(ms, '旺') + ' ';
+      } else if (sLabel === '平') {
+        strengthAnalysis += ms + '平位坐身宫，中晚年' + getStarLateEffect(ms, '平') + ' ';
+      } else if (sLabel === '陷') {
+        strengthAnalysis += ms + '落陷坐身宫，中晚年' + getStarLateEffect(ms, '陷') + ' ';
+      }
+    }
+  }
+
+  // 煞星影响
+  var shaText = '';
+  if (shenShaStars.length > 0) {
+    var shaLateEffects = {
+      '擎羊': '中晚年多刑伤阻碍，但冲劲尚在，宜冷静处事',
+      '陀罗': '中晚年做事多拖延纠缠，需防暗中小人',
+      '火星': '中晚年性急易冲动，宜修心养性',
+      '铃星': '中晚年情绪波动大，暗中阻碍多',
+      '地空': '中晚年精神空虚，理财易失误，宜保守',
+      '地劫': '中晚年意外破耗多，不宜投机',
+      '天刑': '中晚年易有官非纠纷，宜守规矩'
+    };
+    for (var ssi = 0; ssi < shenShaStars.length; ssi++) {
+      var sn2 = shenShaStars[ssi];
+      if (shaLateEffects[sn2]) shaText += sn2 + '：' + shaLateEffects[sn2] + '。 ';
+    }
+  }
+
+  // 四化影响
+  var sihuaText = '';
+  for (var spi = 0; spi < sihuaPalaces.length; spi++) {
+    var sp = sihuaPalaces[spi];
+    if (sp.pos === shenIdx || sp.gongIdx === shenIdx) {
+      if (sp.type === '化禄') sihuaText += '化禄(' + sp.star + ')入身宫：中晚年财源广进，运势顺遂。 ';
+      else if (sp.type === '化权') sihuaText += '化权(' + sp.star + ')入身宫：中晚年权力上升，掌控力强。 ';
+      else if (sp.type === '化科') sihuaText += '化科(' + sp.star + ')入身宫：中晚年名声显赫，贵人多助。 ';
+      else if (sp.type === '化忌') sihuaText += '化忌(' + sp.star + ')入身宫：中晚年波折较多，需化解执念。 ';
+    }
+  }
+
+  // 总结
+  var summary = '身宫在' + shenGongName + '(' + BRANCHES[shenIdx] + '宫)。';
+  summary += shenMingDetail;
+  if (shenMainStars.length > 0) {
+    summary += '身宫主星：' + shenMainStars.join('、') + '，' + shenStrengths.map(function(s) { return s.star + '(' + s.label + ')'; }).join('、') + '。';
+  } else {
+    summary += '身宫无主星，借对宫之力。';
+  }
+  summary += strengthAnalysis;
+  if (shaText) summary += ' 煞星影响：' + shaText.trim();
+  if (sihuaText) summary += ' 四化影响：' + sihuaText.trim();
+
+  return {
+    shenGongName: shenGongName,
+    shenIdx: shenIdx,
+    shenStars: shenStars,
+    shenMainStars: shenMainStars,
+    shenAuxStars: shenAuxStars,
+    shenShaStars: shenShaStars,
+    shenStrengths: shenStrengths,
+    shenMingRelation: shenMingRelation,
+    shenMingDetail: shenMingDetail,
+    strengthAnalysis: strengthAnalysis,
+    shaText: shaText,
+    sihuaText: sihuaText,
+    summary: summary
+  };
+}
+
+/**
+ * 辅助函数：主星在中晚年的庙旺落陷影响
+ * @param {string} star - 主星名
+ * @param {string} level - 庙/旺/平/陷
+ * @returns {string} 影响描述
+ */
+function getStarLateEffect(star, level) {
+  var effects = {
+    '紫微': { '庙': '权威显赫，领导力充沛，事业大有成就', '旺': '稳重有为，管理能力佳，受人尊重', '平': '尚能发挥，需辅星助力方成大器', '陷': '孤高自许，怀才不遇，需防刚愎自用' },
+    '天机': { '庙': '智谋超群，谋划有成，宜从事策略规划', '旺': '思维敏捷，善于理财投资', '平': '多思多虑，需防想多做少', '陷': '思虑过度，优柔寡断，易错失良机' },
+    '太阳': { '庙': '光芒四射，事业有成，男性贵人多', '旺': '热情慷慨，事业心强，博爱无私', '平': '尚有热情，需防操劳过度', '陷': '劳碌奔波，付出多收获少，需量力而行' },
+    '武曲': { '庙': '财运亨通，刚毅果断，理财有方', '旺': '执行力强，财源稳定', '平': '尚能守成，不宜冒进', '陷': '过于刚强，易得罪人，财来财去' },
+    '天同': { '庙': '福禄双全，安逸享福，人缘极佳', '旺': '乐观开朗，知足常乐', '平': '尚有福气，需防安于现状', '陷': '缺乏动力，过于安逸，需激励奋进' },
+    '廉贞': { '庙': '才华横溢，交际能力极强', '旺': '能文能武，事业有成', '平': '情绪波动，需修身养性', '陷': '是非缠身，感情波折，宜守规矩' },
+    '天府': { '庙': '财库丰盈，稳重有成，晚年富足', '旺': '理财有方，积蓄丰厚', '平': '尚能守财，开源不足', '陷': '财库不稳，过于保守，错失良机' },
+    '太阴': { '庙': '财运顺遂，温柔富贵，女性贵人多', '旺': '心思细密，理财有道', '平': '尚能平稳，需防优柔', '陷': '情绪不稳，优柔寡断，财来财去' },
+    '贪狼': { '庙': '多才多艺，桃花旺盛，交际得财', '旺': '才华出众，社交能力强', '平': '欲望尚可，需防沉迷', '陷': '沉迷物欲，桃花劫多，宜克制' },
+    '巨门': { '庙': '口才出众，以言得财，适合演说教学', '旺': '善于分析，口才有用武之地', '平': '易招口舌，需谨言慎行', '陷': '是非不断，口舌官司，宜沉默是金' },
+    '天相': { '庙': '权印双全，辅佐有成，管理有方', '旺': '正直稳重，协调力强', '平': '尚能辅佐，缺乏开创', '陷': '印信受损，易卷入口舌官司' },
+    '天梁': { '庙': '贵人运极佳，逢凶化吉，受人敬重', '旺': '清高正直，有侠义精神', '平': '尚有荫庇，需防清高过度', '陷': '孤芳自赏，过于固执，宜变通' },
+    '七杀': { '庙': '开创有成，权柄在握，事业大发展', '旺': '刚毅果断，敢于冒险', '平': '尚有冲劲，需防冲动', '陷': '刚猛失度，多起伏动荡，宜稳中求进' },
+    '破军': { '庙': '变革有成，先破后立，开创新局', '旺': '敢于创新，不墨守成规', '平': '变动尚可，需防破耗', '陷': '动荡不安，多劳少成，宜守不宜攻' }
+  };
+  if (effects[star] && effects[star][level]) return effects[star][level];
+  return '运势需结合全盘综合判断';
+}
+
+/**
+ * R3.2: 紫微·星曜组合分析
+ * 双星组合论述 + 主星与辅星/煞星组合论述 + 吉凶互参
+ * 《太微赋》《骨髓赋》星曜组合论
+ * @param {object} panData - ziweiCalcV3() 的返回值
+ * @returns {object} 星曜组合分析结果
+ */
+function analyzeStarCombos(panData) {
+  var gongMap = panData.gongMap || {};
+  var stars = panData.stars || [];
+  var mingPos = gongMap['命宫'] != null ? gongMap['命宫'] : 0;
+  var sihuaPalaces = panData.sihuaPalaces || [];
+  var results = [];
+
+  // 双星组合释义库（扩展版）
+  var dualStarCombos = {
+    '武曲+天府': {
+      nature: '财库双全',
+      jixiong: '吉',
+      desc: '武曲为财星，天府为库星，二者同宫财库充盈。理财能力极佳，一生财源稳固，善于积蓄和管理。适合金融、银行、会计等行业。',
+      advice: '宜稳健理财，不宜过度投机。财运在中晚年更佳。',
+      classic: '《骨髓赋》云：「武曲天府，财库充盈。」'
+    },
+    '太阳+太阴': {
+      nature: '日月同宫',
+      jixiong: '中吉',
+      desc: '太阳主贵，太阴主富，日月同宫则贵富兼备。但阴阳交替，易二心不定，做事反复。庙旺则才华出众，落陷则劳碌奔波。',
+      advice: '宜专注一途，勿朝三暮四。庙旺则大成，落陷需勤勉。',
+      classic: '《太微赋》云：「日月同宫，贵富兼备，但多反复。」'
+    },
+    '紫微+七杀': {
+      nature: '帝星化将',
+      jixiong: '大吉（波动大）',
+      desc: '紫微为帝星，七杀为将星，帝星化将则权柄极重。开创力与领导力并存，适合创业或军警界。但人生起伏大，大起大落。',
+      advice: '宜掌握一技之长，在动荡中寻找机遇。不宜冒进，需谋定而后动。',
+      classic: '《骨髓赋》云：「紫微七杀同度，化为权柄。」'
+    },
+    '天机+太阴': {
+      nature: '机月组合',
+      jixiong: '吉',
+      desc: '天机主智，太阴主富，机月同宫则智慧与财富并存。心思细密，善于谋划理财，适合文职、企划、投资分析。性格温和内敛。',
+      advice: '宜从事脑力劳动，发挥分析能力。不宜过于保守，适时出击。',
+      classic: '《骨髓赋》云：「机月同梁，作吏之才。」'
+    },
+    '武曲+七杀': {
+      nature: '刚毅过人',
+      jixiong: '中平（波动大）',
+      desc: '武曲主财，七杀主权，二者同宫刚毅过人。执行力极强，敢于冒险，适合军警、武职、创业。但过于刚强，易得罪人，人生多起伏。',
+      advice: '宜学会柔和处事，刚柔并济。军警武职可大成。',
+      classic: '《太微赋》云：「武曲七杀，刚毅过人。」'
+    },
+    '武曲+破军': {
+      nature: '破旧立新',
+      jixiong: '中平（动荡）',
+      desc: '武曲主财，破军主变，二者同宫主破旧立新。适合创业但波折多，财来财去。中年后渐趋稳定，先破后成。',
+      advice: '宜做好风险管理，不宜all-in。适合创新行业或自主创业。',
+      classic: '《骨髓赋》云：「武曲破军，破旧立新。」'
+    },
+    '廉贞+贪狼': {
+      nature: '桃花极旺',
+      jixiong: '中平（桃花重）',
+      desc: '廉贞为次桃花，贪狼为正桃花，二者同宫桃花极旺。才华横溢，交际能力极强，但易沉迷酒色财气。感情生活丰富但多波折。',
+      advice: '宜将桃花能量转化为艺术创作或社交事业。需克制欲望，防桃花劫。',
+      classic: '《骨髓赋》云：「廉贞贪狼，桃花极旺，才华与欲望并存。」'
+    },
+    '廉贞+七杀': {
+      nature: '刚烈果断',
+      jixiong: '中平（刚烈）',
+      desc: '廉贞主感情，七杀主权，二者同宫刚烈果断。能文能武，适合军警、竞技、极限运动。性格刚猛，不宜受约束，宜独立行事。',
+      advice: '宜学会合作共事，不宜独断专行。适合需要魄力的行业。',
+      classic: '《太微赋》云：「廉贞七杀，刚烈果断。」'
+    },
+    '廉贞+破军': {
+      nature: '变革力强',
+      jixiong: '中平（动荡）',
+      desc: '廉贞主感情，破军主变，二者同宫变革力强。感情多波折，事业多变动。适合创新型行业，但需防感情和事业的双重动荡。',
+      advice: '宜稳定感情基础后再拼事业。不宜同时在感情和事业上大动。',
+      classic: '《骨髓赋》云：「廉贞破军，变革力强，感情多波折。」'
+    },
+    '紫微+天府': {
+      nature: '至尊至富',
+      jixiong: '大吉',
+      desc: '紫微主贵，天府主富，紫府同宫则贵富双全。极格之命，天生领导力与理财力并存。但易孤高自许，需辅星佐助方成大器。',
+      advice: '宜培养谦逊品格，广纳人才。得辅星夹辅则大成。',
+      classic: '《骨髓赋》云：「紫微天府，尊贵财库双全。」'
+    },
+    '紫微+贪狼': {
+      nature: '欲望与权势',
+      jixiong: '中吉（桃花重）',
+      desc: '紫微主权，贪狼主欲，二者同宫欲望与权势并重。桃花旺，交际能力强，但需克制欲望。庙旺则成大器，落陷则沉迷物欲。',
+      advice: '宜将欲望转化为事业动力，克制桃花。',
+      classic: '《太微赋》云：「紫微贪狼，欲望权势并存。」'
+    },
+    '紫微+天相': {
+      nature: '权印相随',
+      jixiong: '吉',
+      desc: '紫微主权，天相主印，二者同宫权印相随。适合管理职位，稳重有余但魄力不足。善于协调，有服务精神。',
+      advice: '宜大胆决策，不宜过于保守。适合行政管理工作。',
+      classic: '《骨髓赋》云：「紫微天相，权印相随。」'
+    },
+    '紫微+破军': {
+      nature: '帝星变革',
+      jixiong: '中平（动荡大）',
+      desc: '紫微主尊，破军主变，二者同宫帝星变革。开创力极强但动荡多，适合创业或改革型事业。人生大起大落，需定力。',
+      advice: '宜在稳定中求变，不宜频繁更换赛道。创业需做好风险预案。',
+      classic: '《太微赋》云：「紫微破军，帝星变革，开创力极强。」'
+    },
+    '天同+太阴': {
+      nature: '温柔优雅',
+      jixiong: '吉',
+      desc: '天同主福，太阴主富，二者同宫温柔优雅。文艺天赋佳，性格柔和，人缘好。但缺乏魄力，过于依赖。',
+      advice: '宜培养行动力，不宜过于安逸。适合文艺、教育行业。',
+      classic: '《骨髓赋》云：「天同太阴，温柔优雅，文艺天赋。」'
+    },
+    '天同+巨门': {
+      nature: '口才是非',
+      jixiong: '中平',
+      desc: '天同主福，巨门主口，二者同宫口才好但易招是非。宜以口才谋生，如教学、演说、销售。但需防口舌之争。',
+      advice: '宜谨言慎行，善用口才而非被口才所累。',
+      classic: '《太微赋》云：「天同巨门，口才是非并存。」'
+    },
+    '天同+天梁': {
+      nature: '福荫双全',
+      jixiong: '吉',
+      desc: '天同主福，天梁主荫，二者同宫福荫双全。安逸稳定，逢凶化吉。适合文职或公职，一生平稳。',
+      advice: '宜在稳定中寻求突破，不宜过于安逸。适合公务员或文职。',
+      classic: '《骨髓赋》云：「天同天梁，福寿双全。」'
+    },
+    '武曲+贪狼': {
+      nature: '武贪同宫',
+      jixiong: '中吉（晚发）',
+      desc: '武曲主财，贪狼主欲，二者同宫三十年一暴发。早年辛苦，中年后突然发财。宜耐心等待时机，不可急躁。',
+      advice: '宜积累实力，等待爆发时机。三十岁后渐入佳境。',
+      classic: '《骨髓赋》云：「武曲贪狼，三十年一暴发。」'
+    },
+    '武曲+天相': {
+      nature: '财印相随',
+      jixiong: '吉',
+      desc: '武曲主财，天相主印，二者同宫财印相随。适合金融管理、财务工作。稳重有信，善于管理。',
+      advice: '宜发挥理财管理特长，适合金融行业。',
+      classic: '《太微赋》云：「武曲天相，财印相随。」'
+    },
+    '廉贞+天府': {
+      nature: '刚柔并济',
+      jixiong: '吉',
+      desc: '廉贞主刚，天府主柔，二者同宫刚柔并济。理财有方，适合商界。性格能屈能伸，社交能力佳。',
+      advice: '宜从商，发挥刚柔并济的优势。',
+      classic: '《骨髓赋》云：「廉贞天府，刚柔并济。」'
+    },
+    '廉贞+天相': {
+      nature: '印星带桃花',
+      jixiong: '中吉',
+      desc: '廉贞主桃花，天相主印，二者同宫印星带桃花。适合外交、公关、服务行业。善于协调，有魅力。',
+      advice: '宜发挥公关协调能力，适合外向型工作。',
+      classic: '《太微赋》云：「廉贞天相，印星带桃花。」'
+    },
+    '太阳+巨门': {
+      nature: '暗中有光',
+      jixiong: '中吉',
+      desc: '太阳主光，巨门主暗，二者同宫暗中有光。口才好，适合传播、媒体、教学。庙旺则能以口才扬名。',
+      advice: '宜从事传播教育行业，发挥口才优势。',
+      classic: '《骨髓赋》云：「太阳巨门，暗中有光，以口扬名。」'
+    }
+  };
+
+  // 主星+辅星/煞星组合释义库
+  var auxComboEffects = {
+    '紫微+左辅': '紫微得左辅辅助，如帝得相，领导力有助力，众人辅佐，成大业之格。',
+    '紫微+右弼': '紫微得右弼辅助，如帝得谋士，暗中贵人相助，决策有智囊。',
+    '紫微+左辅+右弼': '紫微得左辅右弼同宫或夹辅，为「辅弼拱主」之贵格，大富大贵之命。',
+    '紫微+文昌': '紫微得文昌，文武双全，有学识有领导力，宜从政或学术管理。',
+    '紫微+文曲': '紫微得文曲，才华出众，有文艺天赋，宜文艺或文化管理。',
+    '紫微+天魁': '紫微得天魁，贵人运极旺，长辈提携，仕途顺遂。',
+    '紫微+天钺': '紫微得天钺，贵人运旺，异性贵人多助。',
+    '紫微+擎羊': '紫微遇擎羊，孤芳自赏，尊贵之气受损。性格孤高，易得罪人，需修身养性。',
+    '紫微+陀罗': '紫微遇陀罗，做事多拖延纠缠，帝星受困，怀才不遇感重。',
+    '紫微+火星': '紫微遇火星，急躁冲动，帝星暴怒，决策易失误，宜冷静。',
+    '紫微+铃星': '紫微遇铃星，暗中受阻，情绪波动大，需防小人在背后作祟。',
+    '紫微+地空': '紫微遇地空，精神追求高于物质，宜哲学宗教，不宜经商。',
+    '紫微+地劫': '紫微遇地劫，突然破耗，不宜投机，宜稳健发展。',
+    '天机+化忌': '天机化忌，多思多虑变为偏执执念，想太多做太少，易精神内耗。需学会放下，行动胜过空想。',
+    '天机+擎羊': '天机遇擎羊，聪明反被聪明误，多谋但易招刑伤，宜守法。',
+    '天机+陀罗': '天机遇陀罗，思虑过度，犹豫不决，错失良机。',
+    '天机+火星': '天机遇火星，思维敏捷但急躁，决策草率易出错。',
+    '太阳+擎羊': '太阳遇擎羊，光明中有刑伤，博爱但易招是非，宜竞争性行业。',
+    '太阳+化忌': '太阳化忌，劳碌奔波，付出多认可少，男性长辈缘薄。需调整心态，不以他人认可为动力。',
+    '太阴+化忌': '太阴化忌，情绪不稳，财运波折，女性亲属健康有忧。需修心养性，理财宜保守。',
+    '武曲+擎羊': '武曲遇擎羊，刚毅过甚易伤人，财来财去有刑耗。宜学会柔和。',
+    '武曲+陀罗': '武曲遇陀罗，理财多拖延，财运受阻但暗藏韧性。',
+    '武曲+火星': '武曲遇火星，急躁投资易破财，宜冷静分析后决策。',
+    '武曲+化忌': '武曲化忌，财运大败，不宜投资投机，宜保守。需防财务纠纷。',
+    '天同+擎羊': '天同遇擎羊，福气受损，安逸中有波折，但天同能化解部分煞气。',
+    '天同+化忌': '天同化忌，福分受损，乐观变悲观，需调整心态，寻找生活乐趣。',
+    '廉贞+化忌': '廉贞化忌，感情波折极大，易陷入感情纠纷甚至官非。「廉贞化忌，为囚为狱」，宜守规矩。',
+    '廉贞+擎羊': '廉贞遇擎羊，感情带刑伤，易因感情惹是非。',
+    '贪狼+化忌': '贪狼化忌，桃花劫，酒色伤身，赌博破财。需克制欲望，转化能量。',
+    '贪狼+火星': '贪狼遇火星，为「火贪格」，主突然暴发横财。但需注意守财，不宜过度投机。',
+    '贪狼+铃星': '贪狼遇铃星，为「铃贪格」，亦主暗中有横财，但不如火贪明快。',
+    '巨门+化忌': '巨门化忌，口舌是非加剧，易招官司纠纷。宜沉默是金，少说多做。',
+    '巨门+擎羊': '巨门遇擎羊，口舌带刑伤，易因言惹祸，甚至官非。宜谨言。',
+    '天相+擎羊': '天相遇擎羊，印信受损，权柄有刑，易卷入官司。',
+    '天相+化忌': '天相化忌，印信受损，服务精神受挫，易被误解。',
+    '天梁+化忌': '天梁化忌，贵人运受损，逢凶化吉能力减弱，需自力更生。',
+    '七杀+擎羊': '七杀遇擎羊，刚猛加倍，刑伤重，宜军警或竞争性行业。',
+    '七杀+化忌': '七杀化忌，刚猛失度，易有官非刑伤，事业受挫。宜稳中求进。',
+    '破军+化忌': '破军化忌，变动失序，破耗加倍，多劳少成。宜守不宜攻，等待时机。',
+    '破军+擎羊': '破军遇擎羊，变动带刑伤，破败加速，宜保守。',
+    '破军+火星': '破军遇火星，变动急躁，冲动行事易败。宜三思而后行。'
+  };
+
+  // 遍历十二宫，分析每宫的星曜组合
+  var gongOrder = ['命宫','兄弟','夫妻','子女','财帛','疾厄','迁移','交友','事业','田宅','福德','父母'];
+  var mainStarSet = ['紫微','天机','太阳','武曲','天同','廉贞','天府','太阴','贪狼','巨门','天相','天梁','七杀','破军'];
+  var auxStarSet = ['左辅','右弼','文昌','文曲','天魁','天钺'];
+  var shaStarSet = ['擎羊','陀罗','火星','铃星','地空','地劫','天刑'];
+  var sihuaStarSet = ['化禄','化权','化科','化忌'];
+
+  for (var gi = 0; gi < 12; gi++) {
+    var gongIdx = mod(mingPos + gi, 12);
+    var gongName = gongOrder[gi];
+    var gongStars = stars[gongIdx] || [];
+
+    // 分类星曜
+    var gMain = [], gAux = [], gSha = [], gSihua = [];
+    for (var si = 0; si < gongStars.length; si++) {
+      var sn = gongStars[si];
+      if (mainStarSet.indexOf(sn) >= 0) gMain.push(sn);
+      else if (auxStarSet.indexOf(sn) >= 0) gAux.push(sn);
+      else if (shaStarSet.indexOf(sn) >= 0) gSha.push(sn);
+      // 四化在sihuaPalaces中处理
+    }
+
+    // 查找该宫四化
+    var gongSihua = [];
+    for (var spi = 0; spi < sihuaPalaces.length; spi++) {
+      var sp = sihuaPalaces[spi];
+      if (sp.pos === gongIdx || sp.gongIdx === gongIdx) {
+        gongSihua.push(sp.type + '(' + sp.star + ')');
+      }
+    }
+
+    var comboAnalysis = [];
+
+    // 1. 双星组合分析
+    if (gMain.length >= 2) {
+      var pairKey = gMain[0] + '+' + gMain[1];
+      var pair = dualStarCombos[pairKey];
+      if (pair) {
+        comboAnalysis.push({
+          type: 'dual',
+          name: pairKey,
+          nature: pair.nature,
+          jixiong: pair.jixiong,
+          desc: pair.desc,
+          advice: pair.advice,
+          classic: pair.classic
+        });
+      } else {
+        // 未在预设库中的组合，生成通用描述
+        comboAnalysis.push({
+          type: 'dual',
+          name: pairKey,
+          nature: '双星同宫',
+          jixiong: '中平',
+          desc: gMain[0] + '与' + gMain[1] + '同宫，两星特质交织，需结合庙旺与四化综合判断吉凶。',
+          advice: '宜根据星曜庙旺与四化落位综合论断。',
+          classic: ''
+        });
+      }
+    }
+
+    // 2. 主星+辅星/煞星组合分析
+    if (gMain.length > 0) {
+      // 主星+辅星
+      for (var ai = 0; ai < gAux.length; ai++) {
+        var auxKey = gMain[0] + '+' + gAux[ai];
+        if (auxComboEffects[auxKey]) {
+          comboAnalysis.push({
+            type: 'aux',
+            name: auxKey,
+            desc: auxComboEffects[auxKey],
+            jixiong: '吉'
+          });
+        }
+      }
+      // 左辅+右弼同时出现
+      if (gAux.indexOf('左辅') >= 0 && gAux.indexOf('右弼') >= 0 && gMain.length > 0) {
+        var lbKey = gMain[0] + '+左辅+右弼';
+        if (auxComboEffects[lbKey]) {
+          comboAnalysis.push({
+            type: 'aux',
+            name: lbKey,
+            desc: auxComboEffects[lbKey],
+            jixiong: '大吉'
+          });
+        }
+      }
+      // 主星+煞星
+      for (var ssi = 0; ssi < gSha.length; ssi++) {
+        var shaKey = gMain[0] + '+' + gSha[ssi];
+        if (auxComboEffects[shaKey]) {
+          comboAnalysis.push({
+            type: 'sha',
+            name: shaKey,
+            desc: auxComboEffects[shaKey],
+            jixiong: '凶'
+          });
+        }
+      }
+      // 主星+化忌
+      for (var si2 = 0; si2 < gongSihua.length; si2++) {
+        var sh = gongSihua[si2];
+        if (sh.indexOf('化忌') >= 0) {
+          var jiKey = gMain[0] + '+化忌';
+          if (auxComboEffects[jiKey]) {
+            comboAnalysis.push({
+              type: 'sihua',
+              name: jiKey,
+              desc: auxComboEffects[jiKey],
+              jixiong: '凶'
+            });
+          }
+        }
+        if (sh.indexOf('化禄') >= 0 && gMain[0] === '贪狼') {
+          // 贪狼化禄特殊论
+          comboAnalysis.push({
+            type: 'sihua',
+            name: '贪狼+化禄',
+            desc: '贪狼化禄，桃花得财，交际生财，但需防沉迷享乐。',
+            jixiong: '中吉'
+          });
+        }
+      }
+    }
+
+    // 3. 煞星组合（多煞同宫）
+    if (gSha.length >= 2) {
+      var shaComboText = '';
+      if (gSha.indexOf('擎羊') >= 0 && gSha.indexOf('陀罗') >= 0) {
+        shaComboText = '擎羊陀罗同宫，刑伤加倍，阻碍重重，宜守规矩、忍辱负重。';
+      } else if (gSha.indexOf('火星') >= 0 && gSha.indexOf('铃星') >= 0) {
+        shaComboText = '火星铃星同宫，急躁加倍，变化剧烈，宜冷静处事、三思后行。';
+      } else if (gSha.indexOf('地空') >= 0 && gSha.indexOf('地劫') >= 0) {
+        shaComboText = '地空地劫同宫，破财破耗极大，精神空虚，宜修行不宜经商。';
+      }
+      if (shaComboText) {
+        comboAnalysis.push({
+          type: 'sha_combo',
+          name: gSha.slice(0, 2).join('+'),
+          desc: shaComboText,
+          jixiong: '大凶'
+        });
+      }
+    }
+
+    // 4. 吉凶互参总结
+    var jiCount = comboAnalysis.filter(function(c) { return c.jixiong === '吉' || c.jixiong === '大吉' || c.jixiong === '中吉'; }).length;
+    var xiongCount = comboAnalysis.filter(function(c) { return c.jixiong === '凶' || c.jixiong === '大凶'; }).length;
+    var pingCount = comboAnalysis.filter(function(c) { return c.jixiong === '中平' || c.jixiong === '中平（波动大）' || c.jixiong === '中平（动荡）' || c.jixiong === '中平（刚烈）' || c.jixiong === '中平（桃花重）'; }).length;
+
+    var overall = '';
+    if (comboAnalysis.length === 0) {
+      overall = '本宫星曜组合无特殊格局，需结合大限流年综合判断。';
+    } else if (jiCount > xiongCount && jiCount > 0) {
+      overall = '本宫星曜组合以吉为主，' + (pingCount > 0 ? '虽有部分平局因素，但' : '') + '整体倾向吉利。宜顺势发挥星曜正面特质。';
+    } else if (xiongCount > jiCount && xiongCount > 0) {
+      overall = '本宫星曜组合以凶为主，' + (jiCount > 0 ? '虽有吉星化解，但' : '') + '整体倾向波折。需谨慎行事，修身养性。';
+    } else if (jiCount > 0 && xiongCount > 0) {
+      overall = '本宫星曜组合吉凶参半，需结合庙旺落陷与四化综合判断。吉星可化解部分凶性，凶星则考验定力。';
+    } else {
+      overall = '本宫星曜组合以平为主，吉凶需结合庙旺与四化落位判断。';
+    }
+
+    if (comboAnalysis.length > 0) {
+      results.push({
+        gongName: gongName,
+        gongIdx: gongIdx,
+        mainStars: gMain,
+        auxStars: gAux,
+        shaStars: gSha,
+        sihua: gongSihua,
+        combos: comboAnalysis,
+        overall: overall,
+        jiCount: jiCount,
+        xiongCount: xiongCount,
+        pingCount: pingCount
+      });
+    }
+  }
+
+  // 命宫专项总结
+  var mingCombos = results.filter(function(r) { return r.gongName === '命宫'; });
+  var summary = '';
+  if (mingCombos.length > 0 && mingCombos[0].combos.length > 0) {
+    var mc = mingCombos[0];
+    summary = '命宫星曜组合分析：';
+    for (var ci = 0; ci < mc.combos.length; ci++) {
+      var c = mc.combos[ci];
+      summary += c.name + '(' + c.jixiong + ')，';
+    }
+    summary = summary.replace(/，$/, '。');
+    summary += mc.overall;
+  } else {
+    summary = '命宫无特殊星曜组合格局，需结合三方四正与四化综合论断。';
+  }
+
+  return {
+    gongCombos: results,
+    summary: summary
+  };
+}
+
 // ═══════════════════════════════════════════════════════════════
 // 导出
 // ═══════════════════════════════════════════════════════════════
@@ -10113,6 +11202,10 @@ window.ZiweiV3 = {
   // R3.8: 小限流月
   analyzeXiaoxian,
   analyzeLiuyue,
+  // R3.1: 身宫分析
+  analyzeShenGong,
+  // R3.2: 星曜组合分析
+  analyzeStarCombos,
 
   // 工具
   getHourIdx,

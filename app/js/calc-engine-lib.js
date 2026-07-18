@@ -2073,7 +2073,21 @@ function _xuankongBrief(year, dir) {
   if (yunPan[5] === 2) tips.push('二黑入中，注意健康');
   if (yunPan[5] === 3) tips.push('三碧入中，防止是非口舌');
   
-  return panText + (tips.length > 0 ? '分析: ' + tips.join('；') : '分析: 需结合具体格局判断。');
+  // 返回文本和数据对象
+  return {
+    text: panText + (tips.length > 0 ? '分析: ' + tips.join('；') : '分析: 需结合具体格局判断。'),
+    period: period,
+    yunPan: yunPan,
+    shanPan: shanPan,
+    xiangPan: xiangPan,
+    wangStar: wangStar,
+    shengStar: shengStar,
+    zuoNum: zuoNum,
+    xiangNum: xiangNum,
+    wangShan: zuoNum === wangStar,
+    wangXiang: xiangNum === wangStar,
+    tips: tips
+  };
 }
 
 function _getOppositeDir(dir) {
@@ -2535,7 +2549,7 @@ function runFengshuiEngine() {
     html += '<p><b>宅命：</b>' + res.zhaiMing + ' · 宅主命卦：' + res.yaoMing + '</p>';
     html += '<p><b>宅命配合：</b>' + (res.matching?'相配':'不配') + '</p>';
     html += '<p><b>元运：</b>' + res.period + '运 · ' + (res.wangShan?'当运':'非当运') + '</p>';
-    html += '<p><b>玄空：</b>' + res.xuankong + '</p>';
+    html += '<p><b>玄空：</b>' + (res.xuankong && res.xuankong.text ? res.xuankong.text : res.xuankong) + '</p>';
     html += '<p><b>评分：</b>' + res.score + '/100</p>';
     html += '<p><b>建议：</b>' + res.advice + '</p>';
     html += '<ul style="padding-left:18px;opacity:0.8"><li>' + res.layoutTips.join('</li><li>') + '</li></ul>';

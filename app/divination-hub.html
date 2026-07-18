@@ -36134,6 +36134,89 @@ function runZiweiEngine() {
     html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">经典格局：</strong>如紫府朝垣、府相朝垣、杀破狼等特殊星曜组合，决定命局层次</div>';
     html += '<div><strong style="color:var(--gold)">天地盘：</strong>天盘为动态排盘结果（命宫实际位置），地盘为固定顺序（命宫=子位），对照参考</div>';
     html += '</div></div>';
+    // === R3.1 身宫分析 ===
+    try {
+      if (window.ZiweiV3 && ZiweiV3.analyzeShenGong) {
+        var _sg = ZiweiV3.analyzeShenGong(pan);
+        if (_sg) {
+          html += '<div class="bazi-new-module">';
+          html += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">🏮 身宫分析·中晚年造化 <span class="toggle-icon">▼</span></div>';
+          html += '<div class="bazi-module-body collapsed"><div style="padding:8px 0">';
+          html += '<div style="margin-bottom:10px;padding:10px 12px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(201,168,76,0.02));border:1px solid rgba(201,168,76,0.15);border-radius:8px">';
+          html += '<div style="font-size:14px;font-weight:700;color:var(--gold);margin-bottom:6px">身宫定位：' + _sg.shenGongName + '(' + (_sg.shenIdx >= 0 ? ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][_sg.shenIdx] : '') + '宫)</div>';
+          html += '<div style="font-size:13px;color:var(--paper2);line-height:1.8;margin-bottom:6px"><b>身命关系：</b>' + _sg.shenMingRelation + '</div>';
+          html += '<div style="font-size:12px;color:var(--paper2);line-height:2">' + _sg.shenMingDetail + '</div>';
+          html += '</div>';
+          // 身宫主星
+          if (_sg.shenMainStars.length > 0) {
+            html += '<div style="margin-bottom:10px"><b style="color:var(--fire2)">身宫主星：</b>';
+            for (var _si = 0; _si < _sg.shenMainStars.length; _si++) {
+              var _ms = _sg.shenMainStars[_si];
+              var _sl = _sg.shenStrengths[_si] ? _sg.shenStrengths[_si].label : '平';
+              var _sc = _sl === '庙' ? '#27ae60' : _sl === '旺' ? '#2ecc71' : _sl === '平' ? '#f39c12' : '#e74c3c';
+              html += '<span style="display:inline-block;padding:2px 8px;margin:2px 4px;border-radius:4px;background:' + _sc + '20;color:' + _sc + ';font-size:12px">' + _ms + '(' + _sl + ')</span>';
+            }
+            html += '</div>';
+          } else {
+            html += '<div style="margin-bottom:10px"><b style="color:var(--fire2)">身宫主星：</b><span style="color:var(--paper3);font-size:12px">无主星，借对宫之力</span></div>';
+          }
+          // 庙旺影响
+          if (_sg.strengthAnalysis) {
+            html += '<div style="margin-bottom:10px;padding:8px 10px;background:rgba(39,174,96,0.04);border-left:3px solid #27ae60;border-radius:4px"><b style="color:#27ae60;font-size:12px">中晚年运势影响：</b><div style="font-size:12px;color:var(--paper2);line-height:1.8;margin-top:4px">' + _sg.strengthAnalysis + '</div></div>';
+          }
+          // 煞星影响
+          if (_sg.shaText) {
+            html += '<div style="margin-bottom:10px;padding:8px 10px;background:rgba(231,76,60,0.04);border-left:3px solid #e74c3c;border-radius:4px"><b style="color:#e74c3c;font-size:12px">煞星影响：</b><div style="font-size:12px;color:var(--paper2);line-height:1.8;margin-top:4px">' + _sg.shaText + '</div></div>';
+          }
+          // 四化影响
+          if (_sg.sihuaText) {
+            html += '<div style="margin-bottom:10px;padding:8px 10px;background:rgba(142,68,173,0.04);border-left:3px solid #8e44ad;border-radius:4px"><b style="color:#8e44ad;font-size:12px">四化影响：</b><div style="font-size:12px;color:var(--paper2);line-height:1.8;margin-top:4px">' + _sg.sihuaText + '</div></div>';
+          }
+          html += '</div></div>';
+          html += '</div>';
+        }
+      }
+    } catch(_sgErr) { console.warn('身宫分析错误:', _sgErr); }
+    // === R3.2 星曜组合分析 ===
+    try {
+      if (window.ZiweiV3 && ZiweiV3.analyzeStarCombos) {
+        var _sc2 = ZiweiV3.analyzeStarCombos(pan);
+        if (_sc2 && _sc2.gongCombos && _sc2.gongCombos.length > 0) {
+          html += '<div class="bazi-new-module">';
+          html += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">⭐ 星曜组合分析·吉凶互参 <span class="toggle-icon">▼</span></div>';
+          html += '<div class="bazi-module-body collapsed"><div style="padding:8px 0">';
+          // 命宫总结
+          if (_sc2.summary) {
+            html += '<div style="margin-bottom:12px;padding:10px 12px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(201,168,76,0.02));border:1px solid rgba(201,168,76,0.15);border-radius:8px"><b style="color:var(--gold);font-size:13px">命宫组合总论：</b><div style="font-size:12px;color:var(--paper2);line-height:1.8;margin-top:4px">' + _sc2.summary + '</div></div>';
+          }
+          // 各宫组合详析
+          for (var _gi = 0; _gi < _sc2.gongCombos.length; _gi++) {
+            var _gc = _sc2.gongCombos[_gi];
+            html += '<div style="margin-bottom:10px;padding:8px 10px;border:1px solid rgba(201,168,76,0.08);border-radius:6px">';
+            html += '<div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:6px">' + _gc.gongName + '：' + _gc.mainStars.join('、') + '</div>';
+            // 各组合
+            for (var _ci = 0; _ci < _gc.combos.length; _ci++) {
+              var _cb = _gc.combos[_ci];
+              var _jxColor = _cb.jixiong === '大吉' ? '#2ecc71' : _cb.jixiong === '吉' || _cb.jixiong === '中吉' ? '#27ae60' : _cb.jixiong === '大凶' ? '#c0392b' : _cb.jixiong === '凶' ? '#e74c3c' : '#f39c12';
+              html += '<div style="margin:4px 0;padding:6px 8px;background:rgba(0,0,0,0.02);border-radius:4px">';
+              html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">';
+              html += '<span style="font-size:12px;font-weight:700;color:var(--paper1)">' + _cb.name + '</span>';
+              html += '<span style="font-size:10px;padding:1px 6px;border-radius:3px;background:' + _jxColor + '20;color:' + _jxColor + '">' + _cb.jixiong + '</span>';
+              html += '</div>';
+              html += '<div style="font-size:11px;color:var(--paper2);line-height:1.7">' + _cb.desc + '</div>';
+              if (_cb.advice) html += '<div style="font-size:11px;color:var(--paper3);line-height:1.7;margin-top:2px">💡 ' + _cb.advice + '</div>';
+              if (_cb.classic) html += '<div style="font-size:10px;color:var(--paper3);font-style:italic;margin-top:2px;opacity:0.7">📖 ' + _cb.classic + '</div>';
+              html += '</div>';
+            }
+            // 吉凶互参
+            html += '<div style="font-size:11px;color:var(--paper3);margin-top:4px;padding:4px 6px;background:rgba(0,0,0,0.03);border-radius:3px">📊 吉' + _gc.jiCount + ' / 凶' + _gc.xiongCount + ' / 平' + _gc.pingCount + ' → ' + _gc.overall + '</div>';
+            html += '</div>';
+          }
+          html += '</div></div>';
+          html += '</div>';
+        }
+      }
+    } catch(_scErr) { console.warn('星曜组合分析错误:', _scErr); }
     // 化解方案
     try {
       var _cureHtml = getZiweiResolution(pan, analyze);

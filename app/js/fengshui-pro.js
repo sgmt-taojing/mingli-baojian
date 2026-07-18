@@ -1480,6 +1480,495 @@ function fengshuiZeRi() {
 }
 
 // ============================================================
+// 8. 城门诀 (R3.4)
+// ============================================================
+
+/**
+ * 玄空飞星·城门诀
+ * 以向方两旁宫位的向星判断城门是否可用
+ * 参考：《沈氏玄空学》城门篇
+ * 城门诀是玄空飞星的重要辅助法门，城门开则引入旺气，可补旺山旺向之不足
+ */
+function computeChengmenJue(xuankongData, chaoxiang) {
+  try {
+    // 八方位与两旁方位的映射
+    var dirNumMap = {'北':1,'南':9,'东':3,'西':7,'东北':8,'西北':6,'东南':4,'西南':2};
+    var numDirMap = {1:'北',2:'西南',3:'东',4:'东南',6:'西北',7:'西',8:'东北',9:'南'};
+    // 每个向方两旁的宫位（顺时针和逆时针相邻方位）
+    var adjacentMap = {
+      '北':   ['西北','东北'],
+      '南':   ['东南','西南'],
+      '东':   ['东北','东南'],
+      '西':   ['西南','西北'],
+      '东北': ['北','东'],
+      '西北': ['西','北'],
+      '东南': ['东','南'],
+      '西南': ['南','西']
+    };
+
+    // 当前元运旺星和生气星
+    var period = xuankongData && xuankongData.period ? xuankongData.period : (Math.floor((new Date().getFullYear() - 1864) / 20) + 1);
+    var wangStar = period;
+    var shengStar = (period % 9) + 1; // 生气星（下一运旺星）
+
+    // 九星信息
+    var starNames = {1:'一白贪狼',2:'二黑巨门',3:'三碧禄存',4:'四绿文曲',5:'五黄廉贞',6:'六白武曲',7:'七赤破军',8:'八白左辅',9:'九紫右弼'};
+    var starElements = {1:'水',2:'土',3:'木',4:'木',5:'土',6:'金',7:'金',8:'土',9:'火'};
+
+    // 如果有完整的飞星盘数据，使用之；否则基于简略数据推算
+    var xiangPan = xuankongData && xuankongData.xiangPan ? xuankongData.xiangPan : null;
+    var yunPan = xuankongData && xuankongData.yunPan ? xuankongData.yunPan : null;
+
+    var xiangDir = chaoxiang || '南';
+    var adjDirs = adjacentMap[xiangDir] || ['东南','西南'];
+
+    var results = [];
+    var html = '';
+    html += '<div style="margin-top:30px">';
+    html += '<h5 style="font-size:14px;letter-spacing:4px;color:var(--gold);margin-bottom:6px">🚪 城门诀分析</h5>';
+    html += '<p style="font-size:12px;opacity:.5;margin-bottom:16px">向方两旁宫位向星判断 · 《沈氏玄空学》城门篇</p>';
+
+    html += '<div style="background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.12);border-radius:10px;padding:16px;margin-bottom:16px">';
+    html += '<div style="font-size:12px;opacity:.7;line-height:1.8;margin-bottom:8px">';
+    html += '<strong>城门诀原理：</strong>城门者，向方两旁宫位也。若两旁宫位之向星为当旺之星或生气之星，则城门可用，开门开窗可引入旺气。<br>';
+    html += '<strong>城门与旺山旺向：</strong>若本宅已得旺山旺向，城门为锦上添花；若非旺山旺向，城门可补救宅运，以城门之力补向方之不足。<br>';
+    html += '<strong>城门开与不开：</strong>城门可用之方宜开门开窗、设通道，引旺气入宅；城门不可用之方忌开门窗，否则引凶气入宅。';
+    html += '</div></div>';
+
+    for (var i = 0; i < adjDirs.length; i++) {
+      var adjDir = adjDirs[i];
+      var adjNum = dirNumMap[adjDir] || 1;
+      
+      // 获取该宫位的向星
+      var xiangStar = null;
+      if (xiangPan && xiangPan[adjNum]) {
+        xiangStar = xiangPan[adjNum];
+      } else {
+        // 简略推算：基于运盘推算向星
+        xiangStar = ((period - 1 + adjNum) % 9) + 1;
+      }
+      
+      var starName = starNames[xiangStar] || '未知';
+      var starEle = starElements[xiangStar] || '土';
+      var isWang = (xiangStar === wangStar);
+      var isSheng = (xiangStar === shengStar);
+      var usable = isWang || isSheng;
+      
+      var statusText = '';
+      var statusColor = '';
+      var effectText = '';
+      var cureText = '';
+      
+      if (isWang) {
+        statusText = '城门可用（旺星到城门）';
+        statusColor = '#2ecc71';
+        effectText = '当旺之星' + starName + '到' + adjDir + '方城门位，开门开窗可引入当旺之气，大吉。主速发财运，事业兴旺。';
+        cureText = '宜在此方开门、开窗、设通道。若为墙壁，可常开窗通风。可放金属风铃或铜葫芦催旺。';
+      } else if (isSheng) {
+        statusText = '城门可用（生气星到城门）';
+        statusColor = '#2ecc71';
+        effectText = '生气之星' + starName + '到' + adjDir + '方城门位，开门开窗可引入生气，吉。主渐进式发展，未来运势看涨。';
+        cureText = '宜在此方开门、开窗。可放水培植物或蓝色装饰品催旺生气。';
+      } else if (xiangStar === 5) {
+        statusText = '城门不可用（五黄到城门）';
+        statusColor = '#e74c3c';
+        effectText = '五黄大凶之星到' + adjDir + '方城门位，开门开窗引入凶气，主灾祸、疾病、破财。';
+        cureText = '忌在此方开门开窗。若已有门窗，宜常闭，挂六字真言铜葫芦+金属风铃化解。';
+      } else if (xiangStar === 2) {
+        statusText = '城门不可用（二黑到城门）';
+        statusColor = '#e74c3c';
+        effectText = '二黑病符星到' + adjDir + '方城门位，开门开窗引入病气，主家人健康受损、脾胃疾病。';
+        cureText = '忌在此方开门开窗。若已有门窗，宜常闭，放铜葫芦+金属风铃化解。';
+      } else if (xiangStar === 3) {
+        statusText = '城门不宜用（三碧到城门）';
+        statusColor = '#e67e22';
+        effectText = '三碧是非星到' + adjDir + '方城门位，开门开窗易引口舌是非、官非争斗。';
+        cureText = '不宜在此方开门开窗。若已有门窗，宜放红色装饰品（火泄木）化解。';
+      } else if (xiangStar === 7) {
+        statusText = '城门不宜用（七赤到城门）';
+        statusColor = '#e67e22';
+        effectText = '七赤破军星到' + adjDir + '方城门位，开门开窗易引破财、争斗、口舌。';
+        cureText = '不宜在此方开门开窗。若已有门窗，宜放蓝色装饰品或水族箱（水泄金）化解。';
+      } else {
+        statusText = '城门平淡（退气之星）';
+        statusColor = '#c9a84c';
+        effectText = starName + '到' + adjDir + '方城门位，非旺非生，城门开与不开影响不大，平平淡淡。';
+        cureText = '可开门窗但非必要。无需特别催旺或化解。';
+      }
+      
+      results.push({
+        direction: adjDir,
+        xiangStar: xiangStar,
+        starName: starName,
+        usable: usable,
+        status: statusText,
+        effect: effectText,
+        cure: cureText
+      });
+      
+      html += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.15);border-radius:10px;padding:16px;margin-bottom:12px;border-left:3px solid ' + statusColor + '">';
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
+      html += '<span style="font-size:15px;color:var(--gold);font-weight:bold">' + adjDir + '方城门</span>';
+      html += '<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:' + statusColor + '20;color:' + statusColor + '">' + statusText + '</span>';
+      html += '</div>';
+      html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;font-size:12px;margin-bottom:10px">';
+      html += '<div><span style="opacity:.5">向星：</span><span style="color:' + statusColor + '">' + starName + '(' + starEle + ')</span></div>';
+      html += '<div><span style="opacity:.5">当旺星：</span>' + starNames[wangStar] + '</div>';
+      html += '<div><span style="opacity:.5">生气星：</span>' + starNames[shengStar] + '</div>';
+      html += '</div>';
+      html += '<div style="font-size:12px;opacity:.7;line-height:1.7;margin-bottom:6px">📌 <strong>影响：</strong>' + effectText + '</div>';
+      html += '<div style="font-size:12px;color:#2ecc71;line-height:1.7">🛡️ <strong>建议：</strong>' + cureText + '</div>';
+      html += '</div>';
+    }
+
+    // 城门诀总结
+    var anyUsable = results.some(function(r) { return r.usable; });
+    html += '<div style="background:rgba(46,204,113,0.06);border:1px solid rgba(46,204,113,0.15);border-radius:10px;padding:14px;margin-top:8px">';
+    if (anyUsable) {
+      var usableDirs = results.filter(function(r){return r.usable;}).map(function(r){return r.direction;}).join('、');
+      html += '<div style="font-size:13px;color:#2ecc71;line-height:1.8">✅ <strong>城门诀总结：</strong>本宅' + usableDirs + '方城门可用，宜开门开窗引入旺气。';
+      html += '若本宅已得旺山旺向，城门为锦上添花，令宅运更旺；若非旺山旺向，城门可补救，以城门之力补向方之不足，化凶为吉。</div>';
+    } else {
+      var allBad = results.every(function(r) { return r.xiangStar === 5 || r.xiangStar === 2; });
+      if (allBad) {
+        html += '<div style="font-size:13px;color:#e74c3c;line-height:1.8">⚠️ <strong>城门诀总结：</strong>本宅两旁城门均不可用，向方两旁均为凶星。宜封堵两旁门窗，专以向方纳气。若无旺山旺向，需以布局化煞为主，放铜葫芦、五帝钱等化解凶气。</div>';
+      } else {
+        html += '<div style="font-size:13px;color:#c9a84c;line-height:1.8">⚪ <strong>城门诀总结：</strong>本宅两旁城门均非旺星，城门之力有限。宅运主要依靠向方及山向格局。宜以八宅布局和流年飞星化解为主，不必刻意开城门。</div>';
+      }
+    }
+    html += '</div>';
+
+    // 经典引用
+    html += '<div style="background:rgba(201,168,76,0.04);border-left:3px solid var(--gold);padding:8px 12px;border-radius:0 6px 6px 0;font-size:11px;opacity:.5;line-height:1.6;margin-top:12px">';
+    html += '📜 《沈氏玄空学》：「城门者，向方两旁宫位也。两旁向星若为当旺或生气，则城门可用，开门引气，可补宅运之不足。」';
+    html += '</div>';
+
+    html += '</div>';
+    return html;
+  } catch(e) {
+    console.error('[城门诀分析错误]', e.message);
+    return '<div style="padding:16px;color:#e74c3c;font-size:12px">城门诀分析出错: ' + e.message + '</div>';
+  }
+}
+
+// ============================================================
+// 9. 飞星组合深化 (R3.5)
+// ============================================================
+
+/**
+ * 经典飞星组合含义深化分析
+ * 参考：《沈氏玄空学》《紫白诀》《飞星赋》
+ * 每种组合含：组合名称、吉凶、影响方面、化解方法
+ */
+function computeFeixingCombos(xuankongData, chaoxiang) {
+  try {
+    // 经典飞星组合数据库（山星+向星组合）
+    var comboDB = [
+      {
+        stars: [1, 4],
+        name: '一四同宫',
+        alias: '文昌会合',
+        luck: '吉',
+        aspects: '学业·考试·文采·官职',
+        desc: '一白水生四绿木，水木相生，主文昌大发。利读书、考试、升学、文职工作。',
+        detail: '一白为坎水，四绿为巽木，水生木而旺文昌。《紫白诀》云：「一四同宫，准发科名之显。」此组合最利学子书房、文职办公位。若流年一白或四绿飞临，更验。',
+        cure: '宜在此方设书房、书桌。可放文昌塔（7层或9层）、四枝毛笔、绿色植物催旺。忌放金属物品（金克木破文昌）。',
+        classic: '《紫白诀》：「一四同宫，准发科名之显。」《沈氏玄空学》：「一白水生四绿木，发文昌，主科甲功名。」'
+      },
+      {
+        stars: [2, 7],
+        name: '二七同道',
+        alias: '先天火数',
+        luck: '凶',
+        aspects: '火灾·脾胃·炎症·口舌',
+        desc: '二黑土与七赤金，先天河图二七为火，主火患。又土生金泄气，主脾胃疾病。',
+        detail: '二黑坤土，七赤兑金，先天数二七为火。《飞星赋》云：「二七同道，惊伤脾胃。」又主火灾、炎症、消化系统疾病。若太岁叠临，防火灾。',
+        cure: '宜放金属风铃或铜葫芦（金泄土生水制火）。忌红色、紫色装饰。厨房在此方尤需注意防火。可放黄色陶瓷器（土泄火气）化解。',
+        classic: '《飞星赋》：「二七同道，惊伤脾胃。」《玄机赋》：「二七为火，防火灾。」'
+      },
+      {
+        stars: [3, 7],
+        name: '三七相克',
+        alias: '穿心煞',
+        luck: '凶',
+        aspects: '口舌·是非·官非·争斗',
+        desc: '三碧木被七赤金克，金木相战，主口舌是非、官非争斗、手足受伤。',
+        detail: '三碧震木，七赤兑金，金克木。《飞星赋》云：「三七交加，贼盗官灾。」又主长男与少女不和，易生口角争斗。若动象叠临，主官非诉讼。',
+        cure: '宜放水族箱或蓝色装饰品（水通关：金生水、水生木）化解。忌金属摆件。可放黑曜石球吸收争斗之气。',
+        classic: '《飞星赋》：「三七交加，贼盗官灾。」《玄机赋》：「三碧七赤，金木相战，主口舌是非。」'
+      },
+      {
+        stars: [2, 5],
+        name: '二五交加',
+        alias: '损主煞',
+        luck: '大凶',
+        aspects: '疾病·灾祸·损主妇·绝症',
+        desc: '二黑土与五黄土，两凶土叠加，主大灾。尤损主妇（坤为母），主重病、绝症、意外。',
+        detail: '二黑巨门土，五黄廉贞土，两土叠临为最凶组合。《飞星赋》云：「二五交加必损主。」二黑坤为母，五黄为大凶之星，两凶叠临，主损主妇、重病、绝症。此组合最忌动土，动则发凶。',
+        cure: '宜放金属风铃、铜葫芦、六帝钱（金泄土气）化解。忌黄色、红色装饰，忌动土。保持此方安静，不宜久坐久卧。可放金属器具或金属时钟持续泄土气。',
+        classic: '《飞星赋》：「二五交加必损主。」《沈氏玄空学》：「二黑五黄，两凶叠临，主损主妇，大凶之象。」'
+      },
+      {
+        stars: [3, 8],
+        name: '三八为朋',
+        alias: '伤足煞',
+        luck: '凶',
+        aspects: '伤足·肝胆·手足·意外',
+        desc: '三碧木克八白土，木土相克，主伤足、肝胆疾病、手足受伤。',
+        detail: '三碧震木，八白艮土，木克土。《飞星赋》云：「三八为朋，伤足损胎。」震为足，艮为手，木克土主手足受伤。又主肝胆疾病、肠胃不和。但八白为吉星，若得令亦可为吉。',
+        cure: '宜放红色装饰品或紫色水晶（火通关：木生火、火生土）化解。忌绿色植物过多。可放红地毯或红色中国结。',
+        classic: '《飞星赋》：「三八为朋，伤足损胎。」《玄机赋》：「三碧八白，木克土，主伤足。」'
+      },
+      {
+        stars: [4, 9],
+        name: '四九为友',
+        alias: '木火通明',
+        luck: '吉',
+        aspects: '聪明·文采·科名·姻缘',
+        desc: '四绿木生九紫火，木火通明，主聪明文采、科甲功名、姻缘喜庆。',
+        detail: '四绿巽木，九紫离火，木生火而通明。《玄机赋》云：「木火通明，聪明文采。」主发文昌、利考试升学。九紫又主喜庆姻缘，四九组合既利学业又利感情。',
+        cure: '宜在此方设书桌或卧室。可放绿色植物+红色装饰（木火相生）催旺。忌黑色、蓝色装饰（水克火破局）。',
+        classic: '《玄机赋》：「木火通明，聪明文采。」《紫白诀》：「四绿九紫，木火通明，主科名喜庆。」'
+      },
+      {
+        stars: [1, 6],
+        name: '一六共宗',
+        alias: '官贵局',
+        luck: '吉',
+        aspects: '官贵·事业·武职·远行',
+        desc: '一白水与六白金，金生水，主官贵、事业升迁、武职显达。',
+        detail: '一白坎水，六白乾金，金生水。《玄机赋》云：「一六共宗，主官贵。」六白为武曲星，一白为官星，金水相生主事业顺利、升迁有望。利公务员、军人、警察等武职。',
+        cure: '宜在此方设办公位或主卧。可放金属摆件（铜马、铜印）或黄水晶催旺。忌红色装饰（火克金破局）。',
+        classic: '《玄机赋》：「一六共宗，主官贵。」《沈氏玄空学》：「金水相生，主官贵显达。」'
+      },
+      {
+        stars: [2, 8],
+        name: '二八合十',
+        alias: '进财局',
+        luck: '吉',
+        aspects: '进财·置业·积蓄·田产',
+        desc: '二黑与八白合十（2+8=10），主进财、置业、积蓄丰厚。',
+        detail: '二黑坤土，八白艮土，二八合十。《沈氏玄空学》以合十为吉局，二八合十主田产进财、置业有利。八白为当旺财星尤吉，即使二黑退气，合十亦可减轻凶性。',
+        cure: '宜在此方放保险箱、聚宝盆、黄水晶球催财。可放黄色或红色装饰品（火生土旺财）。忌金属风铃（金泄土气破财）。',
+        classic: '《沈氏玄空学》：「二八合十，主进财。」合十之法，可化凶为吉，减轻凶星之害。'
+      },
+      {
+        stars: [3, 9],
+        name: '三九木火',
+        alias: '木火通明',
+        luck: '吉',
+        aspects: '科名·文书·创意·才智',
+        desc: '三碧木生九紫火，木火通明，主发科名、利文书、创意才智。',
+        detail: '三碧震木，九紫离火，木生火。《玄机赋》云：「木火通明，主科名。」与四九组合类似，但三九更主创意和行动力，四九更主文采和感情。三九利设计、创作、军警、技术人员。',
+        cure: '宜在此方工作学习。可放绿色植物+红色装饰催旺。放紫色水晶或红水晶增强火气。忌黑色蓝色装饰。',
+        classic: '《玄机赋》：「三碧九紫，木火通明，主科名。」《飞星赋》：「三九木火通明，才华横溢。」'
+      },
+      {
+        stars: [7, 1],
+        name: '七一金水',
+        alias: '口才局',
+        luck: '吉',
+        aspects: '口才·交际·桃花·远行',
+        desc: '七赤金生一白水，金水相生，主口才出众、交际有利、桃花旺盛。',
+        detail: '七赤兑金，一白坎水，金生水。《玄机赋》云：「七一相生，主口才。」兑为口、坎为水，金水相生主口才好、交际广泛。又主桃花，利感情。但若在衰败之宫，金水过旺主风流、酒色。',
+        cure: '宜在此方设会客区或演讲台。可放金属摆件+水培植物催旺。若防桃花过旺，可放黄色陶瓷器（土克水）平衡。',
+        classic: '《玄机赋》：「七一相生，主口才。」《飞星赋》：「七一金水相生，利口才交际。」'
+      },
+      {
+        stars: [6, 8],
+        name: '六八武辅',
+        alias: '武贵财局',
+        luck: '吉',
+        aspects: '武贵·偏财·置业·功名',
+        desc: '六白金与八白土，土生金，主武贵功名、偏财置业。',
+        detail: '六白乾金，八白艮土，土生金。《玄机赋》云：「六八相生，主武贵。」六白武曲星逢八白左辅土生之，主武职升迁、偏财运佳。利军警、体育、工程等行业。又主置业有利。',
+        cure: '宜在此方设办公位或放保险箱。可放黄水晶球+铜马催旺。忌红色装饰（火克金）。',
+        classic: '《玄机赋》：「六八相生，主武贵。」《沈氏玄空学》：「六白八白，土金相生，主功名置业。」'
+      },
+      {
+        stars: [9, 5],
+        name: '九五紫黄',
+        alias: '紫黄毒药',
+        luck: '大凶',
+        aspects: '毒药·绝症·火灾·血光',
+        desc: '九紫火生五黄土，火炎土燥，主毒药、绝症、火灾、血光之灾。',
+        detail: '九紫离火，五黄廉贞土，火生土而五黄更凶。《飞星赋》云：「紫黄毒药，入口封喉。」九紫本吉，但生五黄凶土则化为大凶。主服毒、绝症、火灾、血光。若太岁叠临，其凶更甚。',
+        cure: '宜放金属器具、铜葫芦、金属风铃（金泄土）化解。忌红色、紫色、黄色装饰。忌在此方烹饪（火生土）。保持安静，忌动土。',
+        classic: '《飞星赋》：「紫黄毒药，入口封喉。」《沈氏玄空学》：「九紫生五黄，火炎土燥，大凶之象。」'
+      },
+      {
+        stars: [1, 5],
+        name: '一五水土',
+        alias: '水泛克土',
+        luck: '凶',
+        aspects: '肾病·泌尿·流产·酒色',
+        desc: '一白水克五黄土，水泛克土，主肾病、泌尿系统疾病、流产、酒色之灾。',
+        detail: '一白坎水，五黄廉贞土，本为土克水，但五黄为凶星，反主水泛。《飞星赋》云：「一五同宫，主肾病酒色。」主肾脏、泌尿、生殖系统疾病，又主酒色破财。',
+        cure: '宜放金属器具（金通关：土生金、金生水）化解。忌黑色蓝色装饰（水更旺）。可放铜葫芦或金属风铃。',
+        classic: '《飞星赋》：「一五同宫，主肾病酒色。」五黄克一白，水受克则病。'
+      },
+      {
+        stars: [3, 5],
+        name: '三五土木',
+        alias: '刑伤煞',
+        luck: '凶',
+        aspects: '刑伤·官非·手足·肝胆',
+        desc: '三碧木克五黄土，木土相克，主刑伤、官非、手足肝胆疾病。',
+        detail: '三碧震木，五黄廉贞土，木克土。《飞星赋》云：「三五刑伤。」三碧为是非星，五黄为灾祸星，两凶叠临主刑伤官非。震为足，又主手足受伤、肝胆疾病。',
+        cure: '宜放红色装饰品（火通关：木生火、火生土）化解。忌绿色植物。可放红地毯或紫水晶。',
+        classic: '《飞星赋》：「三五刑伤，主官非刑伤。」《玄机赋》：「三碧五黄，木克土，主刑伤。」'
+      },
+      {
+        stars: [7, 5],
+        name: '七五金土',
+        alias: '交剑煞',
+        luck: '凶',
+        aspects: '争斗·破财·刀伤·肺病',
+        desc: '七赤金泄五黄土，土金相生但五黄凶性不减，主争斗、破财、刀伤、肺病。',
+        detail: '七赤兑金，五黄廉贞土，土生金而泄气。《飞星赋》云：「七五交剑，主争斗破财。」七赤为破军星主争斗，五黄为大凶星，组合主刀伤、肺病、争斗破财。',
+        cure: '宜放水族箱或蓝色装饰品（水泄金气）化解。忌金属摆件。可放黑曜石球或蓝色地毯。',
+        classic: '《飞星赋》：「七五交剑，主争斗破财。」《玄机赋》：「七赤五黄，金泄土气，主争斗。」'
+      }
+    ];
+
+    // 获取飞星盘数据
+    var shanPan = xuankongData && xuankongData.shanPan ? xuankongData.shanPan : null;
+    var xiangPan = xuankongData && xuankongData.xiangPan ? xuankongData.xiangPan : null;
+    var yunPan = xuankongData && xuankongData.yunPan ? xuankongData.yunPan : null;
+    var period = xuankongData && xuankongData.period ? xuankongData.period : (Math.floor((new Date().getFullYear() - 1864) / 20) + 1);
+    var wangStar = period;
+
+    var starNames = {1:'一白',2:'二黑',3:'三碧',4:'四绿',5:'五黄',6:'六白',7:'七赤',8:'八白',9:'九紫'};
+    var gongNames = {1:'坎(北)',2:'坤(西南)',3:'震(东)',4:'巽(东南)',6:'乾(西北)',7:'兑(西)',8:'艮(东北)',9:'离(南)'};
+    var dirNumMap = {'北':1,'南':9,'东':3,'西':7,'东北':8,'西北':6,'东南':4,'西南':2};
+
+    // 收集九宫的山向星组合
+    var combos = [];
+    var palacePositions = [1,2,3,4,6,7,8,9]; // 排除中宫
+
+    for (var pi = 0; pi < palacePositions.length; pi++) {
+      var gongNum = palacePositions[pi];
+      var shanStar = shanPan ? (shanPan[gongNum] || 0) : 0;
+      var xiangStar = xiangPan ? (xiangPan[gongNum] || 0) : 0;
+      var yunStar = yunPan ? (yunPan[gongNum] || 0) : 0;
+      
+      if (shanStar > 0 && xiangStar > 0) {
+        // 查找匹配的经典组合
+        var matched = null;
+        for (var ci = 0; ci < comboDB.length; ci++) {
+          var combo = comboDB[ci];
+          if ((combo.stars[0] === shanStar && combo.stars[1] === xiangStar) ||
+              (combo.stars[0] === xiangStar && combo.stars[1] === shanStar)) {
+            matched = combo;
+            break;
+          }
+        }
+        
+        // 同时检查运星与山向星的组合
+        var matchedYunShan = null;
+        var matchedYunXiang = null;
+        for (var ci2 = 0; ci2 < comboDB.length; ci2++) {
+          var combo2 = comboDB[ci2];
+          if ((combo2.stars[0] === yunStar && combo2.stars[1] === shanStar) ||
+              (combo2.stars[0] === shanStar && combo2.stars[1] === yunStar)) {
+            matchedYunShan = combo2;
+          }
+          if ((combo2.stars[0] === yunStar && combo2.stars[1] === xiangStar) ||
+              (combo2.stars[0] === xiangStar && combo2.stars[1] === yunStar)) {
+            matchedYunXiang = combo2;
+          }
+        }
+        
+        combos.push({
+          gongNum: gongNum,
+          gongName: gongNames[gongNum] || ('宫' + gongNum),
+          shanStar: shanStar,
+          xiangStar: xiangStar,
+          yunStar: yunStar,
+          matched: matched,
+          matchedYunShan: matchedYunShan,
+          matchedYunXiang: matchedYunXiang
+        });
+      }
+    }
+
+    // 如果没有完整飞星盘数据，基于运盘生成组合分析
+    var html = '';
+    html += '<div style="margin-top:30px">';
+    html += '<h5 style="font-size:14px;letter-spacing:4px;color:var(--gold);margin-bottom:6px">🌟 飞星组合深化分析</h5>';
+    html += '<p style="font-size:12px;opacity:.5;margin-bottom:16px">经典飞星组合吉凶解读 · 《沈氏玄空学》《紫白诀》《飞星赋》</p>';
+
+    // 飞星组合图例
+    html += '<div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap">';
+    html += '<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(46,204,113,0.12);color:#2ecc71">吉</span>';
+    html += '<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(231,76,60,0.12);color:#e74c3c">凶</span>';
+    html += '<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(220,53,69,0.12);color:#dc3545">大凶</span>';
+    html += '<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(201,168,76,0.12);color:#c9a84c">平</span>';
+    html += '</div>';
+
+    if (combos.length > 0) {
+      // 有完整飞星盘：按宫位显示匹配的组合
+      for (var i = 0; i < combos.length; i++) {
+        var c = combos[i];
+        var allMatches = [];
+        if (c.matched) allMatches.push({type: '山向', combo: c.matched});
+        if (c.matchedYunShan && c.matchedYunShan !== c.matched) allMatches.push({type: '运山', combo: c.matchedYunShan});
+        if (c.matchedYunXiang && c.matchedYunXiang !== c.matched && c.matchedYunXiang !== c.matchedYunShan) allMatches.push({type: '运向', combo: c.matchedYunXiang});
+        
+        if (allMatches.length === 0) continue;
+        
+        for (var mi = 0; mi < allMatches.length; mi++) {
+          var m = allMatches[mi];
+          var luckColor = m.combo.luck === '吉' ? '#2ecc71' : m.combo.luck === '大凶' ? '#dc3545' : m.combo.luck === '凶' ? '#e74c3c' : '#c9a84c';
+          var luckBg = m.combo.luck === '吉' ? 'rgba(46,204,113,0.06)' : m.combo.luck === '大凶' ? 'rgba(220,53,69,0.06)' : m.combo.luck === '凶' ? 'rgba(231,76,60,0.06)' : 'rgba(201,168,76,0.06)';
+          
+          html += '<div style="background:' + luckBg + ';border:1px solid ' + luckColor + '20;border-radius:10px;padding:16px;margin-bottom:12px;border-left:3px solid ' + luckColor + '">';
+          html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">';
+          html += '<span style="font-size:14px;color:var(--gold);font-weight:bold">' + c.gongName + ' · ' + m.combo.name + '</span>';
+          html += '<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:' + luckColor + '20;color:' + luckColor + '">' + m.combo.luck + '</span>';
+          html += '</div>';
+          html += '<div style="font-size:12px;opacity:.6;margin-bottom:8px">组合：' + starNames[c.shanStar] + '(山) + ' + starNames[c.xiangStar] + '(向)';
+          if (m.type !== '山向') html += ' · ' + m.type + '组合';
+          html += ' | 别名：' + m.combo.alias + '</div>';
+          html += '<div style="font-size:12px;opacity:.7;line-height:1.7;margin-bottom:8px">📋 <strong>影响方面：</strong>' + m.combo.aspects + '</div>';
+          html += '<div style="font-size:12px;opacity:.7;line-height:1.7;margin-bottom:8px">📖 <strong>详解：</strong>' + m.combo.detail + '</div>';
+          html += '<div style="font-size:12px;color:#2ecc71;line-height:1.7;margin-bottom:8px">🛡️ <strong>化解/催旺：</strong>' + m.combo.cure + '</div>';
+          html += '<div style="background:rgba(201,168,76,0.04);border-left:3px solid var(--gold);padding:6px 10px;border-radius:0 6px 6px 0;font-size:11px;opacity:.5;line-height:1.6">📜 ' + m.combo.classic + '</div>';
+          html += '</div>';
+        }
+      }
+    }
+
+    // 经典组合速查表（即使无完整飞星盘也显示）
+    html += '<div style="margin-top:20px"><h6 style="font-size:13px;letter-spacing:3px;color:var(--gold);margin-bottom:12px">📚 经典飞星组合速查表</h6>';
+    html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px">';
+    
+    for (var di = 0; di < comboDB.length; di++) {
+      var db = comboDB[di];
+      var lc = db.luck === '吉' ? '#2ecc71' : db.luck === '大凶' ? '#dc3545' : db.luck === '凶' ? '#e74c3c' : '#c9a84c';
+      var lbg = db.luck === '吉' ? 'rgba(46,204,113,0.04)' : db.luck === '大凶' ? 'rgba(220,53,69,0.04)' : db.luck === '凶' ? 'rgba(231,76,60,0.04)' : 'rgba(201,168,76,0.04)';
+      
+      html += '<div style="background:' + lbg + ';border:1px solid ' + lc + '15;border-radius:8px;padding:12px;border-left:3px solid ' + lc + '">';
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
+      html += '<span style="font-size:13px;color:var(--gold);font-weight:bold">' + db.name + '</span>';
+      html += '<span style="font-size:10px;padding:1px 6px;border-radius:3px;background:' + lc + '20;color:' + lc + '">' + db.luck + '</span>';
+      html += '</div>';
+      html += '<div style="font-size:11px;opacity:.5;margin-bottom:4px">' + db.alias + ' | ' + db.aspects + '</div>';
+      html += '<div style="font-size:11px;opacity:.7;line-height:1.6;margin-bottom:4px">' + db.desc + '</div>';
+      html += '<div style="font-size:11px;color:#2ecc71;line-height:1.6">化解：' + db.cure + '</div>';
+      html += '</div>';
+    }
+    html += '</div></div>';
+
+    html += '</div>';
+    return html;
+  } catch(e) {
+    console.error('[飞星组合分析错误]', e.message);
+    return '<div style="padding:16px;color:#e74c3c;font-size:12px">飞星组合分析出错: ' + e.message + '</div>';
+  }
+}
+
+// ============================================================
 // 子导航切换
 // ============================================================
 

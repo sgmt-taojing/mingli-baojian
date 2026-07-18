@@ -15026,12 +15026,8 @@ function getShensha(pillars, dayStemIdx, dayBranchIdx) {
     result.push({name:'国印贵人', desc:'掌印之星，主权力、地位，利于仕途、公职。'});
   }
 
-  // 词馆（以日干查，检查四柱地支）
-  var ciguanMap = {0:'申',1:'酉',2:'亥',3:'子',4:'亥',5:'子',6:'寅',7:'卯',8:'巳',9:'午'};
-  var cgTarget = ciguanMap[dayStemIdx];
-  if (cgTarget && allBranches.indexOf(cgTarget) >= 0) {
-    result.push({name:'词馆', desc:'文才之星，主口才佳、善于辞令，利于演讲、写作、外交。'});
-  }
+  // 词馆（R3.8修正：日干帝旺处，详见后文R3.8补充）
+  // 旧版词馆映射有误，已在R3.8中修正为帝旺处
 
   // 禄神（以日干查）
   var lushenMap = {0:'寅',1:'卯',2:'巳',3:'午',4:'巳',5:'午',6:'申',7:'酉',8:'亥',9:'子'};
@@ -15097,7 +15093,156 @@ function getShensha(pillars, dayStemIdx, dayBranchIdx) {
     result.push({name:'魁罡', desc:'性格刚烈果断，聪敏果断，有领导才能。慎防婚姻不顺。'});
   }
 
-  return result.slice(0, 15);
+  // ═══ R3.8: 神煞补全 ═══
+
+  // 天赦日（春戊寅、夏甲午、秋戊申、冬甲子）
+  var tiansheDays = {
+    '春': ['戊寅'],
+    '夏': ['甲午'],
+    '秋': ['戊申'],
+    '冬': ['甲子']
+  };
+  // 判断季节
+  var seasonMap = {'寅':'春','卯':'春','辰':'春','巳':'夏','午':'夏','未':'夏','申':'秋','酉':'秋','戌':'秋','亥':'冬','子':'冬','丑':'冬'};
+  var curSeason = seasonMap[mBranch] || '冬';
+  var tiansheTargets = tiansheDays[curSeason] || [];
+  if (tiansheTargets.indexOf(dayPillar) >= 0) {
+    result.push({name:'天赦日', desc:'天赦日为天地赦罪之日，百无禁忌，逢凶化吉。宜祈福、消灾、和解、忏悔，万事皆吉。'});
+  }
+
+  // 词馆（修正：日干帝旺处）
+  // 甲见卯、乙见子、丙戊见午、丁己见酉、庚见酉、辛见申、壬见子、癸见亥
+  var ciguanMapV2 = {0:'卯',1:'子',2:'午',3:'酉',4:'午',5:'酉',6:'酉',7:'申',8:'子',9:'亥'};
+  var cgTargetV2 = ciguanMapV2[dayStemIdx];
+  if (cgTargetV2 && allBranches.indexOf(cgTargetV2) >= 0) {
+    result.push({name:'词馆(帝旺)', desc:'词馆为日干帝旺处，主口才极佳、善于辞令，利于演讲、写作、外交、学术。'});
+  }
+
+  // ═══ R3.8: 神煞与柱位关联分析 ═══
+  // 年柱神煞看祖辈、月柱看父母、日柱看自身、时柱看子女
+  // 为已有神煞补充柱位信息
+  var pillarNames = ['年柱', '月柱', '日柱', '时柱'];
+  var pillarScope = ['祖辈根基', '父母兄弟', '自身配偶', '子女晚辈'];
+  for (var si = 0; si < result.length; si++) {
+    var shenshaItem = result[si];
+    // 检查该神煞出现在哪些柱位
+    var locations = [];
+    // 天乙贵人
+    if (shenshaItem.name === '天乙贵人') {
+      var tianyiIdx = tianyiMap[dayStemIdx] || [];
+      for (var pi = 0; pi < allBranches.length; pi++) {
+        if (tianyiIdx.indexOf(BRANCHES.indexOf(allBranches[pi])) >= 0) locations.push(pillarNames[pi]);
+      }
+    }
+    // 驿马
+    if (shenshaItem.name === '驿马') {
+      var maT = maMap[yBranch];
+      for (var pi2 = 1; pi2 < allBranches.length; pi2++) {
+        if (allBranches[pi2] === maT) locations.push(pillarNames[pi2]);
+      }
+    }
+    // 桃花
+    if (shenshaItem.name === '桃花') {
+      for (var pi3 = 0; pi3 < allBranches.length; pi3++) {
+        if (allBranches[pi3] === taoMap[yBranch] || allBranches[pi3] === taoMap[dBranch]) locations.push(pillarNames[pi3]);
+      }
+    }
+    // 华盖
+    if (shenshaItem.name === '华盖') {
+      for (var pi4 = 0; pi4 < allBranches.length; pi4++) {
+        if (allBranches[pi4] === hgMap[yBranch] || allBranches[pi4] === hgMap[dBranch]) locations.push(pillarNames[pi4]);
+      }
+    }
+    // 文昌
+    if (shenshaItem.name === '文昌贵人') {
+      for (var pi5 = 0; pi5 < allBranches.length; pi5++) {
+        if (allBranches[pi5] === wenchangMap[dayStemIdx]) locations.push(pillarNames[pi5]);
+      }
+    }
+    // 羊刃
+    if (shenshaItem.name.indexOf('羊刃') >= 0) {
+      for (var pi6 = 0; pi6 < allBranches.length; pi6++) {
+        if (allBranches[pi6] === yangrenMap[dayStemIdx]) locations.push(pillarNames[pi6]);
+      }
+    }
+    // 学堂
+    if (shenshaItem.name === '学堂') {
+      for (var pi7 = 0; pi7 < allBranches.length; pi7++) {
+        if (allBranches[pi7] === xtMap[dayStemIdx]) locations.push(pillarNames[pi7]);
+      }
+    }
+    // 词馆(帝旺)
+    if (shenshaItem.name.indexOf('词馆') >= 0) {
+      for (var pi8 = 0; pi8 < allBranches.length; pi8++) {
+        if (allBranches[pi8] === cgTargetV2) locations.push(pillarNames[pi8]);
+      }
+    }
+    // 禄神
+    if (shenshaItem.name === '禄神') {
+      for (var pi9 = 0; pi9 < allBranches.length; pi9++) {
+        if (allBranches[pi9] === lushenMap[dayStemIdx]) locations.push(pillarNames[pi9]);
+      }
+    }
+    // 天德贵人
+    if (shenshaItem.name === '天德贵人') {
+      var tdT = tiandeMap[mBranch];
+      var allStemsArr = pillars.map(function(p){return p.stem;});
+      for (var pi10 = 0; pi10 < allStemsArr.length; pi10++) {
+        if (allStemsArr[pi10] === tdT) locations.push(pillarNames[pi10]);
+      }
+      for (var pi10b = 0; pi10b < allBranches.length; pi10b++) {
+        if (allBranches[pi10b] === tdT && locations.indexOf(pillarNames[pi10b]) < 0) locations.push(pillarNames[pi10b]);
+      }
+    }
+    // 月德贵人
+    if (shenshaItem.name === '月德贵人') {
+      var ydT = yuedeMap[mBranch];
+      var allStemsArr2 = pillars.map(function(p){return p.stem;});
+      for (var pi11 = 0; pi11 < allStemsArr2.length; pi11++) {
+        if (allStemsArr2[pi11] === ydT) locations.push(pillarNames[pi11]);
+      }
+    }
+    // 亡神
+    if (shenshaItem.name === '亡神') {
+      for (var pi12 = 0; pi12 < allBranches.length; pi12++) {
+        if (allBranches[pi12] === wsTarget) locations.push(pillarNames[pi12]);
+      }
+    }
+    // 劫煞
+    if (shenshaItem.name === '劫煞') {
+      for (var pi13 = 0; pi13 < allBranches.length; pi13++) {
+        if (allBranches[pi13] === jsTarget) locations.push(pillarNames[pi13]);
+      }
+    }
+    // 将星
+    if (shenshaItem.name === '将星') {
+      for (var pi14 = 0; pi14 < allBranches.length; pi14++) {
+        if (allBranches[pi14] === jiangTarget) locations.push(pillarNames[pi14]);
+      }
+    }
+    // 天赦日 — 日柱专属
+    if (shenshaItem.name === '天赦日') {
+      locations.push('日柱');
+    }
+    // 魁罡 — 日柱专属
+    if (shenshaItem.name === '魁罡') {
+      locations.push('日柱');
+    }
+
+    // 补充柱位释义
+    if (locations.length > 0) {
+      var scopeTexts = [];
+      for (var li = 0; li < locations.length; li++) {
+        var pIdx = pillarNames.indexOf(locations[li]);
+        if (pIdx >= 0) scopeTexts.push(locations[li] + '(' + pillarScope[pIdx] + ')');
+      }
+      shenshaItem.pillarLocations = locations.join('、');
+      shenshaItem.pillarScope = scopeTexts.join('、');
+    }
+  }
+
+  // 返回全部神煞（不再限制15个）
+  return result;
 }
 
 // 十神详解
@@ -16329,6 +16474,38 @@ function renderFengshuiResultPro(data) {
     if (data.score < 60) html += '<p style="font-size:12px;color:#e74c3c;margin-top:12px">⚠️ 综合评分较低，建议请专业风水师现场勘测</p>';
     html += '</div>';
   }
+
+  // ===== R3.4 城门诀分析 =====
+  try {
+    var chengmenData = null;
+    if (data.xuankong) {
+      chengmenData = {
+        period: data.xuankong.period || (Math.floor((data.buildYear - 1864) / 20) + 1),
+        yunPan: data.xuankong.yunPan || null,
+        shanPan: data.xuankong.shanPan || null,
+        xiangPan: data.xuankong.xiangPan || null
+      };
+    }
+    if (typeof computeChengmenJue === 'function') {
+      html += computeChengmenJue(chengmenData, data.chaoxiang);
+    }
+  } catch(e) { console.warn('[城门诀注入失败]', e.message); }
+
+  // ===== R3.5 飞星组合深化分析 =====
+  try {
+    var feixingData = null;
+    if (data.xuankong) {
+      feixingData = {
+        period: data.xuankong.period || (Math.floor((data.buildYear - 1864) / 20) + 1),
+        yunPan: data.xuankong.yunPan || null,
+        shanPan: data.xuankong.shanPan || null,
+        xiangPan: data.xuankong.xiangPan || null
+      };
+    }
+    if (typeof computeFeixingCombos === 'function') {
+      html += computeFeixingCombos(feixingData, data.chaoxiang);
+    }
+  } catch(e) { console.warn('[飞星组合注入失败]', e.message); }
 
   // 导出
   html += '<div style="margin-top:24px;text-align:center"><button class="btn-secondary" onclick="exportFengshuiReport()">📄 导出报告</button></div>';
