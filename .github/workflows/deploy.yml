@@ -27,11 +27,15 @@ jobs:
           fetch-depth: 1
       - name: Setup Pages
         uses: actions/configure-pages@v5
-      - name: Prepare deploy directory (size-optimized)
+      - name: Prepare deploy directory
         run: |
           mkdir -p _site
-          # 只复制 app/ 目录（HTML + CSS + JS + KB）
+          # 复制 app/ 目录（HTML + CSS + JS + KB）
           cp -r app _site/app
+          # 复制根目录 js/ 和 knowledge/ 和 css/ 到 _site/ 根（因为HTML使用 ../js 和 ../knowledge 引用）
+          if [ -d js ]; then cp -r js _site/js; fi
+          if [ -d knowledge ]; then cp -r knowledge _site/knowledge; fi
+          if [ -d css ]; then cp -r css _site/css; fi
           # 创建.nojekyll（禁用Jekyll处理，避免下划线开头文件被忽略）
           touch _site/.nojekyll
           # 创建根目录跳转页（指向app/下的主页面）
@@ -58,9 +62,9 @@ jobs:
             '<body><p><a href="app/wechat-hub.html">命理宝鉴移动端</a></p></body>' \
             '</html>' > _site/mobile.html
           # 输出大小信息便于debug
-          echo "✅ Deploy size:"
+          echo "Deploy size:"
           du -sh _site/
-          du -sh _site/app/* 2>/dev/null | head -10
+          du -sh _site/app _site/js _site/knowledge _site/css 2>/dev/null
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
