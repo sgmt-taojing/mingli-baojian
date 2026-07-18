@@ -34920,7 +34920,29 @@ function runQimenEngine() {
         var _gIcon = _isJi ? '✅' : _isXiong ? '❌' : '⚖️';
         html += '<div style="margin-bottom:4px;padding:4px 8px;border-left:2px solid ' + _gColor + ';background:rgba(201,168,76,0.03)">';
         var _gejuMeaning = '';
-        var _gejuMap = {'青龙返首':'百事皆吉，大成就之象','飞鸟跌穴':'谋为皆成，贵人相助','玉女守门':'阴私和合，婚姻吉','真诈格':'真假难辨，宜防被骗','假诈格':'虚多实少，不宜大兴','重诈格':'反复不定，需谨慎','天假格':'天意成全，事有转机','地假格':'借地生财，宜谋略','人假格':'人情助力，宜交际','神假格':'神明庇佑，逢凶化吉','鬼假格':'暗中作祟，宜祭化解','太白入荧':'贼来客欺，防破财','荧入太白':'贼去客胜，宜进攻','青龙折足':'根基不稳，谋为难成','腾蛇夭矫':'惊恐虚诈，多波折','朱雀投江':'口舌是非，文书不利','五不遇时':'时干克日干，百事不宜','伏吟':'伏匿不动，宜守不宜进','反吟':'反复动荡，事多逆转'};
+        var _gejuMap = {
+          // [舒晗课程校正] 格局含义 — 依据密训班02格局深度解析
+          '青龙返首':'百事皆吉，大成就之象。戊加丙，为大吉格之首',
+          '飞鸟跌穴':'谋为皆成，贵人相助。丙加戊，大吉格',
+          '玉女守门':'阴私和合，婚姻吉。丁加开门所在宫',
+          '真诈格':'门星神俱吉，真假难辨，宜防被骗',
+          '假诈格':'门吉星凶神吉，虚多实少，不宜大兴',
+          '重诈格':'门凶星吉神吉，反复不定，需谨慎',
+          '天假格':'丙加景门加九天，天意成全，事有转机',
+          '地假格':'丁加杜门加九地，借地生财，宜谋略',
+          '人假格':'己加死门加太阴，人情助力，宜交际',
+          '神假格':'辛加伤门加腾蛇，神明庇佑，逢凶化吉',
+          '鬼假格':'癸加惊门加玄武，暗中作祟，宜祭化解',
+          '太白入荧':'贼来客欺，防破财。庚加丙',
+          '荧入太白':'贼去客胜，宜进攻。丙加庚',
+          '青龙折足':'根基不稳，谋为难成。戊加辛',
+          '腾蛇夭矫':'惊恐虚诈，多波折。辛加乙或癸加丁',
+          '朱雀投江':'口舌是非，文书不利。丁加癸',
+          '白虎猖狂':'刑伤破败，谋事多阻。辛加乙',
+          '五不遇时':'时干克日干，百事不宜',
+          '伏吟':'伏匿不动，宜守不宜进。伏吟用冲（以动制静）',
+          '反吟':'反复动荡，事多逆转。反吟用合（以静制动）'
+        };
         for (var _gmKey in _gejuMap) { if (_gItem.indexOf(_gmKey) >= 0) { _gejuMeaning = _gejuMap[_gmKey]; break; } }
         html += _gIcon + ' <span style="color:' + _gColor + ';font-weight:600">' + _gItem + '</span>';
         if (_gejuMeaning) html += '<div style="font-size:10px;opacity:.7;margin-left:20px">→ ' + _gejuMeaning + '</div>';
@@ -34956,22 +34978,22 @@ function runQimenEngine() {
       // 2. 事业谋为
       _qmPlain += '<div style="background:rgba(52,152,219,.04);border-left:3px solid #3498db;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
       _qmPlain += '<div style="font-size:13px;font-weight:bold;color:#3498db;margin-bottom:4px">💼 事业谋为</div>';
-      _qmPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">八门主事：<b>' + (analyze.men||'') + '</b>门当值。开门利求职见贵，休门利求财安养，生门利经营求财，伤门利讨债捕捉，杜门利躲灾避难，景门利考试文书，死门不利吉事，惊门利诉讼。' + (analyze.strategy||'') + '</div>';
+      _qmPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">八门主事：<b>' + (analyze.men||'') + '</b>门当值。开门利求职见贵，休门利求财安养，生门利经营求财，伤门利讨债捕捉，杜门利躲灾避难，景门利考试文书，死门不利吉事，惊门利诉讼。[舒晗密训] 门吉星吉神吉为真诈格，事可成；门凶星吉神吉为重诈格，反复可成。' + (analyze.strategy||'') + '</div>';
       _qmPlain += '</div>';
       // 3. 财运分析
       _qmPlain += '<div style="background:rgba(39,174,96,.04);border-left:3px solid #27ae60;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
       _qmPlain += '<div style="font-size:13px;font-weight:bold;color:#27ae60;margin-bottom:4px">💰 财运分析</div>';
-      _qmPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">生门为财门，落宫旺相则财源广进。' + (analyze.men === '生门' ? '生门当值，利于经营求财。' : analyze.men === '开门' ? '开门当值，利于仕途升迁带动财运。' : analyze.men === '休门' ? '休门当值，利于稳健投资。' : '当前门非财门，求财需等待时机。') + '天盘乙奇为财星，落宫与用神宫位生合则财旺。</div>';
+      _qmPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">生门为财门，落宫旺相则财源广进。[舒晗密训] 正财（工资/主业）看戊土与生门与日干关系；偏财（投资/副业）看丁奇、伤门/杜门与日干关系。生门落宫五行生本宫五行→财来找我（易得）；相克→我去求财（费力）。' + (analyze.men === '生门' ? '生门当值，利于经营求财。' : analyze.men === '开门' ? '开门当值，利于仕途升迁带动财运。' : analyze.men === '休门' ? '休门当值，利于稳健投资。' : '当前门非财门，求财需等待时机。') + '天盘乙奇为财星，落宫与用神宫位生合则财旺。</div>';
       _qmPlain += '</div>';
       // 4. 感情人际
       _qmPlain += '<div style="background:rgba(155,89,182,.04);border-left:3px solid #9b59b6;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
       _qmPlain += '<div style="font-size:13px;font-weight:bold;color:#9b59b6;margin-bottom:4px">💕 感情人际</div>';
-      _qmPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">六合主婚姻感情，乙庚主男女匹配。' + (analyze.shen === '六合' ? '六合当值，感情和合，利于婚恋。' : '神盘' + (analyze.shen||'') + '当值，' + (analyze.luck === '吉' ? '人际关系顺畅。' : '人际需注意沟通方式。')) + '五不遇时不宜婚嫁谈判。</div>';
+      _qmPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">六合主婚姻感情，乙庚主男女匹配。[舒晗密训] 乙奇为女方用神，庚金为男方用神，乙庚合为夫妻宫。' + (analyze.shen === '六合' ? '六合当值，感情和合，利于婚恋。' : '神盘' + (analyze.shen||'') + '当值，' + (analyze.luck === '吉' ? '人际关系顺畅。' : '人际需注意沟通方式。')) + '五不遇时不宜婚嫁谈判。腾蛇临宫主感情虚惊反复，白虎临宫主争执强硬。</div>';
       _qmPlain += '</div>';
       // 5. 健康出行
       _qmPlain += '<div style="background:rgba(230,126,34,.04);border-left:3px solid #e67e22;padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0">';
       _qmPlain += '<div style="font-size:13px;font-weight:bold;color:#e67e22;margin-bottom:4px">🏥 健康出行</div>';
-      _qmPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">天芮星主病，落宫需注意对应身体部位。' + (analyze.star === '天芮' ? '天芮当值，需注意健康，不宜探病。' : '天盘' + (analyze.star||'') + '当值，' + (analyze.luck === '吉' ? '身体无碍。' : '需注意休息调养。')) + '马星动则利出行，五不遇时不宜远行。</div>';
+      _qmPlain += '<div style="font-size:12px;color:var(--paper);line-height:1.8">天芮星主病，落宫需注意对应身体部位。[舒晗密训] 天芮落宫五行断病：坎主肾/泌尿，震主肝/胆，离主心/血，乾主肺/头，坤主脾胃/腹。' + (analyze.star === '天芮' ? '天芮当值，需注意健康，不宜探病。' : '天盘' + (analyze.star||'') + '当值，' + (analyze.luck === '吉' ? '身体无碍。' : '需注意休息调养。')) + '马星动则利出行，五不遇时不宜远行。</div>';
       _qmPlain += '</div>';
       _qmPlain += '</div></div>';
       html += _qmPlain;
@@ -35007,10 +35029,12 @@ function runQimenEngine() {
     html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">五不遇时：</strong>时干克日干，为奇门大忌，百事不宜，须改日再谋</div>';
     html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">后天八卦排列：</strong>坎一（北）、坤二（西南）、震三（东）、巽四（东南）、中五、乾六（西北）、兑七（西）、艮八（东北）、离九（南）</div>';
     html += '<div><strong style="color:var(--gold)">应期：</strong>预测事情发生的时间，以用神所落宫位的地支当令之月为应期</div>';
-    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">伏吟：</strong>天地盘干同宫为伏吟，主事迟滞不顺，宜静不宜动，守旧为吉</div>';
-    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">反吟：</strong>天地盘干相冲为反吟，主事反复多变，动荡不安，利客不利主</div>';
-    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">击刑：</strong>天盘干与地盘干相刑害，主刑伤破耗，用神遇击刑则事多波折</div>';
-    html += '<div><strong style="color:var(--gold)">入墓：</strong>天盘干落入墓库之宫，力量被收藏，主事隐晦不显，需冲开之日方应</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">伏吟：</strong>天地盘干同宫为伏吟，主事迟滞不顺，宜静不宜动，守旧为吉。[舒晗密训] 伏吟用冲（以动制静），主静止、慢、痛、呻吟反复</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">反吟：</strong>天地盘干相冲为反吟，主事反复多变，动荡不安，利客不利主。[舒晗密训] 反吟用合（以静制动），主快而反复，波动变幻</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">击刑：</strong>天盘干与地盘干相刑害，主刑伤破耗，用神遇击刑则事多波折。[舒晗密训] 化解用合解法/通关法/移位法</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">入墓：</strong>天盘干落入墓库之宫，力量被收藏，主事隐晦不显，需冲开之日方应。[舒晗密训] 化解用冲开法/库库转化/敲击法</div>';
+    html += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">门迫：</strong>八门五行克宫位五行，力量受制。[舒晗密训] 化解用通关法/换宫法/五行调和法</div>';
+    html += '<div><strong style="color:var(--gold)">空亡：</strong>旬空之地，力量减损。用神落空亡则事难成，需出空之日方应。[舒晗密训] 化解用填实法/冲起法/合住法</div>';
     html += '</div></div>';
     // 化解方案
     try {
