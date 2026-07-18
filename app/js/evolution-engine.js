@@ -14,12 +14,12 @@
  *   EvolutionEngine.getEvolutionLog() — 获取进化日志
  */
 
-var EvolutionEngine = (function() {
+let EvolutionEngine = (function() {
 
   // ============================================================
   // 一、已知命例验证数据库
   // ============================================================
-  var TEST_CASES = {
+  let TEST_CASES = {
     bazi: [
       {
         name: '标准男命',
@@ -80,7 +80,7 @@ var EvolutionEngine = (function() {
   // ============================================================
   // 二、古制合规性规则
   // ============================================================
-  var ANCIENT_RULES = {
+  let ANCIENT_RULES = {
     bazi: [
       { rule: '年柱用立春分界', check: function(r) { return r && r.yearPillar; } },
       { rule: '月柱用节气定月', check: function(r) { return r && r.monthPillar; } },
@@ -110,7 +110,7 @@ var EvolutionEngine = (function() {
   // ============================================================
   // 三、进化日志
   // ============================================================
-  var LOG_KEY = 'evolutionLog';
+  let LOG_KEY = 'evolutionLog';
 
   function getLog() {
     try {
@@ -123,7 +123,7 @@ var EvolutionEngine = (function() {
   }
 
   function addLog(type, module, message, severity, detail) {
-    var log = getLog();
+    let log = getLog();
     log.push({
       time: new Date().toISOString(),
       type: type, // 'verify' | 'audit' | 'fix' | 'evolve'
@@ -139,8 +139,8 @@ var EvolutionEngine = (function() {
   // 四、八字引擎验证
   // ============================================================
   function verifyBaziEngine() {
-    var results = { pass: 0, fail: 0, errors: [] };
-    var cases = TEST_CASES.bazi;
+    let results = { pass: 0, fail: 0, errors: [] };
+    let cases = TEST_CASES.bazi;
 
     cases.forEach(function(tc) {
       try {
@@ -150,7 +150,7 @@ var EvolutionEngine = (function() {
           return;
         }
         // 调用排盘
-        var r = null;
+        let r = null;
         try {
           if (typeof BaziEngine !== 'undefined' && BaziEngine.compute) {
             r = BaziEngine.compute(tc.date, tc.sex);
@@ -172,8 +172,8 @@ var EvolutionEngine = (function() {
         }
 
         // 验证预期值
-        var exp = tc.expected;
-        var pass = true;
+        let exp = tc.expected;
+        let pass = true;
         if (exp.yearPillar && r.yearPillar !== exp.yearPillar) {
           results.errors.push(tc.name + ': 年柱不符 期望' + exp.yearPillar + ' 实际' + r.yearPillar);
           pass = false;
@@ -197,7 +197,7 @@ var EvolutionEngine = (function() {
     });
 
     // 古制合规性检查
-    var ruleResults = checkAncientRules('bazi', ANCIENT_RULES.bazi);
+    let ruleResults = checkAncientRules('bazi', ANCIENT_RULES.bazi);
     results.pass += ruleResults.pass;
     results.fail += ruleResults.fail;
     results.errors = results.errors.concat(ruleResults.errors);
@@ -209,10 +209,10 @@ var EvolutionEngine = (function() {
   // 五、古制合规性检查
   // ============================================================
   function checkAncientRules(module, rules) {
-    var results = { pass: 0, fail: 0, errors: [] };
+    let results = { pass: 0, fail: 0, errors: [] };
     rules.forEach(function(r) {
       try {
-        var ok = r.check({});
+        let ok = r.check({});
         if (ok) {
           results.pass++;
         } else {
@@ -232,8 +232,8 @@ var EvolutionEngine = (function() {
   // 六、知识库完整性审计
   // ============================================================
   function auditKnowledgeBase() {
-    var results = { total: 0, complete: 0, incomplete: 0, issues: [] };
-    var checks = [
+    let results = { total: 0, complete: 0, incomplete: 0, issues: [] };
+    let checks = [
       { name: '八字知识库', varName: 'window.BAZI_KB', minKeys: 50 },
       { name: '紫微知识库', varName: 'window.ZIWEI_KB', minKeys: 50 },
       { name: '奇门知识库', varName: 'window.QIMEN_KB', minKeys: 50 },
@@ -249,7 +249,7 @@ var EvolutionEngine = (function() {
     checks.forEach(function(c) {
       results.total++;
       try {
-        var exists = window[c.varName];
+        let exists = window[c.varName];
         if (!exists) {
           results.incomplete++;
           results.issues.push(c.name + ': 数据不可用');
@@ -257,7 +257,7 @@ var EvolutionEngine = (function() {
           return;
         }
         // 检查键数量（如果是对象）
-        var keyCount = 0;
+        let keyCount = 0;
         if (typeof exists === 'object') {
           if (Array.isArray(exists)) {
             keyCount = exists.length;
@@ -286,8 +286,8 @@ var EvolutionEngine = (function() {
   // 七、代码质量检查
   // ============================================================
   function auditCodeQuality() {
-    var results = { issues: [], score: 100 };
-    var checks = [
+    let results = { issues: [], score: 100 };
+    let checks = [
       { name: 'alert()调用', penalty: 10, check: function() { return document.querySelectorAll && 0; } },
       { name: 'Math.random()非注释', penalty: 10, check: function() { return 0; } },
       { name: 'console.log活跃', penalty: 5, check: function() { return 0; } },
@@ -295,7 +295,7 @@ var EvolutionEngine = (function() {
     ];
 
     checks.forEach(function(c) {
-      var count = c.check();
+      let count = c.check();
       if (count > 0) {
         results.issues.push(c.name + ': ' + count + '处');
         results.score -= c.penalty * count;
@@ -312,7 +312,7 @@ var EvolutionEngine = (function() {
   function runFullAudit() {
     addLog('audit', 'system', '开始完整审计', 'info');
     
-    var report = {
+    let report = {
       time: new Date().toISOString(),
       bazi: verifyBaziEngine(),
       knowledge: auditKnowledgeBase(),
@@ -337,12 +337,12 @@ var EvolutionEngine = (function() {
   // 九、进化建议
   // ============================================================
   function getEvolutionSuggestions() {
-    var log = getLog();
-    var recentErrors = log.filter(function(l) { return l.severity === 'error' || l.severity === 'warn'; }).slice(-20);
-    var suggestions = [];
+    let log = getLog();
+    let recentErrors = log.filter(function(l) { return l.severity === 'error' || l.severity === 'warn'; }).slice(-20);
+    let suggestions = [];
 
     // 按模块统计问题
-    var moduleIssues = {};
+    let moduleIssues = {};
     recentErrors.forEach(function(l) {
       if (!moduleIssues[l.module]) moduleIssues[l.module] = 0;
       moduleIssues[l.module]++;

@@ -4,27 +4,27 @@
 // ═══ 从divination-core.js兼容的函数（防止跨文件引用丢失）═══
 if (typeof _qmGetMaXing !== 'function') {
   window._qmGetMaXing = function(hourZhiIdx) {
-    var maMap = {0:'寅',4:'寅',8:'寅', 5:'亥',9:'亥',1:'亥', 2:'申',6:'申',10:'申', 3:'巳',7:'巳',11:'巳'};
-    var maZhi = maMap[hourZhiIdx];
-    var maGongMap = {'子':1,'丑':8,'寅':8,'卯':3,'辰':4,'巳':4,'午':9,'未':2,'申':2,'酉':7,'戌':6,'亥':6};
+    let maMap = {0:'寅',4:'寅',8:'寅', 5:'亥',9:'亥',1:'亥', 2:'申',6:'申',10:'申', 3:'巳',7:'巳',11:'巳'};
+    let maZhi = maMap[hourZhiIdx];
+    let maGongMap = {'子':1,'丑':8,'寅':8,'卯':3,'辰':4,'巳':4,'午':9,'未':2,'申':2,'酉':7,'戌':6,'亥':6};
     return maGongMap[maZhi] || 5;
   };
 }
 if (typeof _qmCheckWuBuYuShi !== 'function') {
   window._qmCheckWuBuYuShi = function(dayGanIdx, hourGzIdx) {
-    var _stems = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-    var dayStem = dayGanIdx % 10;
-    var hourStem = hourGzIdx % 10;
-    var gangsters = {'甲':'庚','乙':'辛','丙':'壬','丁':'癸','戊':'甲','己':'乙','庚':'丙','辛':'丁','壬':'戊','癸':'己'};
+    let _stems = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+    let dayStem = dayGanIdx % 10;
+    let hourStem = hourGzIdx % 10;
+    let gangsters = {'甲':'庚','乙':'辛','丙':'壬','丁':'癸','戊':'甲','己':'乙','庚':'丙','辛':'丁','壬':'戊','癸':'己'};
     return gangsters[_stems[dayStem]] === _stems[hourStem];
   };
 }
 if (typeof _qmGetKongWang !== 'function') {
   window._qmGetKongWang = function(dayGzIdx) {
-    var xunKong = ['戌亥','申酉','午未','辰巳','寅卯','子丑'];
-    var xunIdx = Math.floor((dayGzIdx % 60) / 10);
-    var kongZhi = xunKong[xunIdx];
-    var kongGongMap = {'子':1,'丑':8,'寅':8,'卯':3,'辰':4,'巳':4,'午':9,'未':2,'申':2,'酉':7,'戌':6,'亥':6};
+    let xunKong = ['戌亥','申酉','午未','辰巳','寅卯','子丑'];
+    let xunIdx = Math.floor((dayGzIdx % 60) / 10);
+    let kongZhi = xunKong[xunIdx];
+    let kongGongMap = {'子':1,'丑':8,'寅':8,'卯':3,'辰':4,'巳':4,'午':9,'未':2,'申':2,'酉':7,'戌':6,'亥':6};
     return [kongGongMap[kongZhi[0]], kongGongMap[kongZhi[1]]];
   };
 }
@@ -1252,46 +1252,46 @@ function qimenAnalyze(panData, question) {
   const isMaXing = maPos === palace;
   
   // 五不遇时
-  var wuBuYu = false;
+  let wuBuYu = false;
   if (panData.dayGzIdx !== undefined && panData.hourGzIdx !== undefined) {
     wuBuYu = _qmCheckWuBuYuShi(panData.dayGzIdx % 10, panData.hourGzIdx % 10);
     if (wuBuYu) geju.push('五不遇时');
   }
   
   // 空亡宫位
-  var kongWangGongs = [];
+  let kongWangGongs = [];
   if (panData.dayGzIdx !== undefined) {
     kongWangGongs = _qmGetKongWang(panData.dayGzIdx);
   }
-  var isKongWangGong = kongWangGongs.indexOf(palace) >= 0;
+  let isKongWangGong = kongWangGongs.indexOf(palace) >= 0;
   if (isKongWangGong) kongwang = true;
   
   // 日干落宫（命主状态）
-  var dayGanPalace = 0, dayGanQi = '';
+  let dayGanPalace = 0, dayGanQi = '';
   if (panData.dayGzIdx !== undefined && panData.dipan) {
-    var dayGan = _QM_STEMS[panData.dayGzIdx % 10];
-    for (var dp = 1; dp <= 9; dp++) {
+    let dayGan = _QM_STEMS[panData.dayGzIdx % 10];
+    for (let dp = 1; dp <= 9; dp++) {
       if (panData.dipan[dp] === dayGan) { dayGanPalace = dp; dayGanQi = panData.tianpan ? (panData.tianpan[dp] || '') : ''; break; }
     }
   }
   
   // 时干落宫（事体状态）
-  var hourGanPalace = 0, hourGanQi = '';
+  let hourGanPalace = 0, hourGanQi = '';
   if (panData.hourGzIdx !== undefined && panData.dipan) {
-    var hourGan = _QM_STEMS[panData.hourGzIdx % 10];
-    for (var hp = 1; hp <= 9; hp++) {
+    let hourGan = _QM_STEMS[panData.hourGzIdx % 10];
+    for (let hp = 1; hp <= 9; hp++) {
       if (panData.dipan[hp] === hourGan) { hourGanPalace = hp; hourGanQi = panData.tianpan ? (panData.tianpan[hp] || '') : ''; break; }
     }
   }
   
   // 值使（值使门）
-  var zhiShi = panData.men ? (panData.men[palace] || '') : '';
+  let zhiShi = panData.men ? (panData.men[palace] || '') : '';
   if (zhiShi && zhiShi.length === 1) {
     zhiShi = ({'休':'休门','生':'生门','伤':'伤门','杜':'杜门','景':'景门','死':'死门','惊':'惊门','开':'开门'}[zhiShi] || zhiShi);
   }
   
   // 调用 V2 获取完整分析
-  var v2Result = getQimenReadingV2(palace, panData, question, null);
+  let v2Result = getQimenReadingV2(palace, panData, question, null);
   
   let strategy = '用神在' + palace + '宫，天盘' + qi + '，门' + men + '，星' + star + '，神' + shen + '。';
   if (geju.length > 0) strategy += ' 格局: ' + geju.join('、') + '。';
@@ -2130,17 +2130,17 @@ function zeriCalcFull(lunarMonth, lunarDay, dayGanZhi, event) {
   // 全量择日计算（传统智慧）
   // event: 事项类型（嫁娶/搬家/开业/动土/安葬/出行/求职/祈福等）
   const today = new Date();
-  var Y = today.getFullYear(), M = today.getMonth()+1, D = today.getDate();
+  let Y = today.getFullYear(), M = today.getMonth()+1, D = today.getDate();
   
   // 使用完整黄历计算函数
-  var yearGZ = getYearGanZhi(Y, M, D);
-  var monthGZ = getMonthGanZhi(Y, M, D);
-  var dayGZ = getDayGanZhi(Y, M, D);
+  let yearGZ = getYearGanZhi(Y, M, D);
+  let monthGZ = getMonthGanZhi(Y, M, D);
+  let dayGZ = getDayGanZhi(Y, M, D);
   if (dayGanZhi) {
     // 如果传入dayGanZhi，用它覆盖
     if (typeof dayGanZhi === 'string') {
-      var ganIdx = TIAN_GAN.indexOf(dayGanZhi[0]);
-      var zhiIdx = DI_ZHI.indexOf(dayGanZhi[1]);
+      let ganIdx = TIAN_GAN.indexOf(dayGanZhi[0]);
+      let zhiIdx = DI_ZHI.indexOf(dayGanZhi[1]);
       dayGZ = {gan: ganIdx, zhi: zhiIdx, index: ganIdx * 12 + zhiIdx};
     } else if (typeof dayGanZhi === 'object') {
       dayGZ = dayGanZhi;
@@ -2148,43 +2148,43 @@ function zeriCalcFull(lunarMonth, lunarDay, dayGanZhi, event) {
   }
   
   // 建除十二神
-  var jianchuName = getJianChu(monthGZ.zhi, dayGZ.zhi);
+  let jianchuName = getJianChu(monthGZ.zhi, dayGZ.zhi);
   
   // 星宿 + 吉凶
-  var xingxiu = getXingXiu(Y, M, D);
-  var xingxiuJixiong = XINGXIU_JIXIONG[xingxiu.name] || '平';
+  let xingxiu = getXingXiu(Y, M, D);
+  let xingxiuJixiong = XINGXIU_JIXIONG[xingxiu.name] || '平';
   
   // 值神
-  var zhishen = getZhishen(dayGZ.gan, dayGZ.zhi);
-  var zhishenIsHuangdao = ZHISHEN_TYPE[zhishen];
+  let zhishen = getZhishen(dayGZ.gan, dayGZ.zhi);
+  let zhishenIsHuangdao = ZHISHEN_TYPE[zhishen];
   
   // 冲煞详情
-  var dayZhiName = DI_ZHI[dayGZ.zhi];
-  var chongshaInfo = CHONGSHA_DETAIL[dayZhiName] || {chong:'', sha:''};
+  let dayZhiName = DI_ZHI[dayGZ.zhi];
+  let chongshaInfo = CHONGSHA_DETAIL[dayZhiName] || {chong:'', sha:''};
   
   // 胎神占方
-  var taiShen = TAI_SHEN_60[dayGZ.index];
+  let taiShen = TAI_SHEN_60[dayGZ.index];
   
   // 彭祖百忌（完整）
-  var pengzuGanStr = PENGZU_FULL[TIAN_GAN[dayGZ.gan]] || '';
-  var pengzuZhiStr = PENGZU_FULL[DI_ZHI[dayGZ.zhi]] || '';
-  var pengzu = [pengzuGanStr, pengzuZhiStr].filter(Boolean);
+  let pengzuGanStr = PENGZU_FULL[TIAN_GAN[dayGZ.gan]] || '';
+  let pengzuZhiStr = PENGZU_FULL[DI_ZHI[dayGZ.zhi]] || '';
+  let pengzu = [pengzuGanStr, pengzuZhiStr].filter(Boolean);
   
   // 吉神
-  var jishenList = calcJishen(yearGZ, monthGZ, dayGZ);
+  let jishenList = calcJishen(yearGZ, monthGZ, dayGZ);
   // 凶神
-  var xiongshenList = calcXiongshen(yearGZ, monthGZ, dayGZ);
+  let xiongshenList = calcXiongshen(yearGZ, monthGZ, dayGZ);
   
   // 日空亡
-  var kongWang = getDayKongWang(dayGZ.index);
+  let kongWang = getDayKongWang(dayGZ.index);
   
   // 宜忌（基于建除+吉凶神）
-  var yiList = JIAN_CHU_YI[jianchuName] || ['祭祀'];
-  var jiList = JIAN_CHU_JI[jianchuName] || ['诸事不宜'];
+  let yiList = JIAN_CHU_YI[jianchuName] || ['祭祀'];
+  let jiList = JIAN_CHU_JI[jianchuName] || ['诸事不宜'];
   if (xiongshenList.indexOf('月破') !== -1) jiList = jiList.concat(['月破日不宜举大事']);
   
   // 事项对应用神
-  var eventMap = {
+  let eventMap = {
     '嫁娶': {good:['天德','月德','三合','六合','天喜'], bad:['月破','月厌','劫煞','灾煞'], jianchu:['成','开','定']},
     '搬家': {good:['天德','月德','天恩','母仓'], bad:['月破','月煞','四击'], jianchu:['开','成','满']},
     '开业': {good:['天恩','月恩','母仓','圣心','益后'], bad:['月破','月厌','劫煞'], jianchu:['开','满','成']},
@@ -2194,12 +2194,12 @@ function zeriCalcFull(lunarMonth, lunarDay, dayGanZhi, event) {
     '求职': {good:['天恩','月恩','圣心'], bad:['月破','天吏'], jianchu:['建','成','开']},
     '祈福': {good:['天德','月德','天恩','母仓','圣心'], bad:['月破','月厌'], jianchu:['开','定','满']}
   };
-  var evtConfig = eventMap[event] || {good:[], bad:[], jianchu:[]};
+  let evtConfig = eventMap[event] || {good:[], bad:[], jianchu:[]};
   
   // 综合评分
-  var score = 50;
+  let score = 50;
   // 建除十二神
-  var jcLuckMap = {'建':0,'除':1,'满':1,'平':0,'定':1,'执':0,'破':-1,'危':0,'成':1,'收':0,'开':1,'闭':-1};
+  let jcLuckMap = {'建':0,'除':1,'满':1,'平':0,'定':1,'执':0,'破':-1,'危':0,'成':1,'收':0,'开':1,'闭':-1};
   score += (jcLuckMap[jianchuName] || 0) * 10;
   // 建除匹配事项
   if (evtConfig.jianchu && evtConfig.jianchu.indexOf(jianchuName) !== -1) score += 15;
@@ -2209,38 +2209,38 @@ function zeriCalcFull(lunarMonth, lunarDay, dayGanZhi, event) {
   if (xingxiuJixiong === '吉') score += 8;
   else if (xingxiuJixiong === '凶') score -= 8;
   // 吉神加分
-  for (var i = 0; i < jishenList.length; i++) {
+  for (let i = 0; i < jishenList.length; i++) {
     score += 5;
     if (evtConfig.good && evtConfig.good.indexOf(jishenList[i]) !== -1) score += 8;
   }
   // 凶神减分
-  for (var i = 0; i < xiongshenList.length; i++) {
+  for (let i = 0; i < xiongshenList.length; i++) {
     score -= 6;
     if (evtConfig.bad && evtConfig.bad.indexOf(xiongshenList[i]) !== -1) score -= 10;
   }
   score = Math.max(10, Math.min(100, score));
   
   // 专业分析
-  var analysisParts = [];
+  let analysisParts = [];
   analysisParts.push('日柱' + TIAN_GAN[dayGZ.gan] + DI_ZHI[dayGZ.zhi] + '，建除' + jianchuName + '日，值神' + zhishen + '（' + (zhishenIsHuangdao ? '黄道' : '黑道') + '）。');
   analysisParts.push('星宿' + xingxiu.name + xingxiu.animal + '（' + xingxiuJixiong + '）。');
   if (jishenList.length > 0) analysisParts.push('吉神宜趋：' + jishenList.join('、') + '，利行事。');
   if (xiongshenList.length > 0) analysisParts.push('凶神宜忌：' + xiongshenList.join('、') + '，需谨慎。');
   if (evtConfig.good && evtConfig.good.length > 0) {
-    var matched = jishenList.filter(function(j){return evtConfig.good.indexOf(j) !== -1;});
+    let matched = jishenList.filter(function(j){return evtConfig.good.indexOf(j) !== -1;});
     if (matched.length > 0) analysisParts.push('与' + (event||'所选') + '事项相合吉神：' + matched.join('、') + '，大吉。');
   }
   if (evtConfig.bad && evtConfig.bad.length > 0) {
-    var matchedBad = xiongshenList.filter(function(x){return evtConfig.bad.indexOf(x) !== -1;});
+    let matchedBad = xiongshenList.filter(function(x){return evtConfig.bad.indexOf(x) !== -1;});
     if (matchedBad.length > 0) analysisParts.push('与' + (event||'所选') + '事项相冲凶神：' + matchedBad.join('、') + '，不利。');
   }
   if (xiongshenList.indexOf('月破') !== -1) analysisParts.push('月破日，大凶，不宜举大事。');
   analysisParts.push('空亡：' + kongWang + '，凡事难圆满。');
-  var analysis = analysisParts.join('');
+  let analysis = analysisParts.join('');
   
   // 建议/避免
-  var suggestion = yiList.join('、') || '祭祀祈福';
-  var avoid = jiList.join('、') || '诸事不宜';
+  let suggestion = yiList.join('、') || '祭祀祈福';
+  let avoid = jiList.join('、') || '诸事不宜';
   if (event && evtConfig.jianchu) {
     if (evtConfig.jianchu.indexOf(jianchuName) !== -1) {
       suggestion = '宜' + event + '（建除' + jianchuName + '日与' + event + '相合）';
@@ -2249,7 +2249,7 @@ function zeriCalcFull(lunarMonth, lunarDay, dayGanZhi, event) {
     }
   }
   
-  var huangheiStr = zhishen + '(' + (zhishenIsHuangdao ? '黄道' : '黑道') + ')';
+  let huangheiStr = zhishen + '(' + (zhishenIsHuangdao ? '黄道' : '黑道') + ')';
   
   return {
     date: Y + '年' + M + '月' + D + '日',
@@ -2275,27 +2275,27 @@ function zeriCalcFull(lunarMonth, lunarDay, dayGanZhi, event) {
 const _origCalcJiuriScore = (typeof calcJiuriScore === 'function') ? calcJiuriScore : null;
 function calcJiuriScore(stemIdx, branchIdx, dayDate) {
   // 基于传统规则评分（无硬编码日期、无Math.random）
-  var Y = dayDate.getFullYear(), M = dayDate.getMonth()+1, D = dayDate.getDate();
-  var yearGZ = getYearGanZhi(Y, M, D);
-  var monthGZ = getMonthGanZhi(Y, M, D);
-  var dayGZ = getDayGanZhi(Y, M, D);
-  var score = 50;
+  let Y = dayDate.getFullYear(), M = dayDate.getMonth()+1, D = dayDate.getDate();
+  let yearGZ = getYearGanZhi(Y, M, D);
+  let monthGZ = getMonthGanZhi(Y, M, D);
+  let dayGZ = getDayGanZhi(Y, M, D);
+  let score = 50;
   // 建除十二神
-  var jcName = getJianChu(monthGZ.zhi, dayGZ.zhi);
-  var jcLuckMap = {'建':0,'除':1,'满':1,'平':0,'定':1,'执':0,'破':-1,'危':0,'成':1,'收':0,'开':1,'闭':-1};
+  let jcName = getJianChu(monthGZ.zhi, dayGZ.zhi);
+  let jcLuckMap = {'建':0,'除':1,'满':1,'平':0,'定':1,'执':0,'破':-1,'危':0,'成':1,'收':0,'开':1,'闭':-1};
   score += (jcLuckMap[jcName] || 0) * 10;
   // 值神黄道/黑道
-  var zs = getZhishen(dayGZ.gan, dayGZ.zhi);
+  let zs = getZhishen(dayGZ.gan, dayGZ.zhi);
   if (ZHISHEN_TYPE[zs]) score += 8; else score -= 4;
   // 星宿吉凶
-  var xx = getXingXiu(Y, M, D);
-  var xxJ = XINGXIU_JIXIONG[xx.name] || '平';
+  let xx = getXingXiu(Y, M, D);
+  let xxJ = XINGXIU_JIXIONG[xx.name] || '平';
   if (xxJ === '吉') score += 6; else if (xxJ === '凶') score -= 6;
   // 吉神加分
-  var js = calcJishen(yearGZ, monthGZ, dayGZ);
+  let js = calcJishen(yearGZ, monthGZ, dayGZ);
   score += js.length * 4;
   // 凶神减分
-  var xs = calcXiongshen(yearGZ, monthGZ, dayGZ);
+  let xs = calcXiongshen(yearGZ, monthGZ, dayGZ);
   score -= xs.length * 5;
   // 月破大凶
   if (xs.indexOf('月破') !== -1) score -= 15;
@@ -2348,7 +2348,7 @@ function _showEngineResult(containerId, html) {
     el.className = 'engine-result-card';
     el.style.cssText = 'margin-top:16px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px;font-size:13px;line-height:1.9;color:var(--ink);box-shadow:0 4px 20px rgba(0,0,0,0.15)';
     // Try to find parent panel to append to
-    var panel = document.querySelector('.result:visible') || document.querySelector('.result') || document.getElementById('zhanbuContent');
+    let panel = document.querySelector('.result:visible') || document.querySelector('.result') || document.getElementById('zhanbuContent');
     if (panel) panel.appendChild(el);
     else document.body.appendChild(el);
   }
@@ -2383,7 +2383,7 @@ function runLiuyaoEngine() {
     _showEngineResult('yjEngineResult', html);
   } catch(e) { 
     console.error('[六爻引擎错误错误]', e.message, e.stack);
-    var _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
+    let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 六爻引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
     else { showToast('六爻引擎错误：'+e.message); }
   }
@@ -2410,7 +2410,7 @@ function runMeihuaEngine() {
     _showEngineResult('mhEngineResult', html);
   } catch(e) { 
     console.error('[梅花引擎错误错误]', e.message, e.stack);
-    var _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
+    let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 梅花引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
     else { showToast('梅花引擎错误：' + e.message); }
   }
@@ -2437,16 +2437,16 @@ function runQimenEngine() {
     if (analyze.huajie) html += '<p style="opacity:0.7"><b>化解建议：</b>' + analyze.huajie + '</p>';
     if (analyze.mascot) html += '<p style="opacity:0.7"><b>吉祥物：</b>' + analyze.mascot + '</p>';
     html += '<p style="opacity:0.8">' + analyze.advice + '</p>';
-    var dims = analyze.dimensions || {};
+    let dims = analyze.dimensions || {};
     if (Object.keys(dims).length > 0) {
       html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:12px;font-size:12px">';
-      for (var dk in dims) html += '<div>' + dk + '：' + dims[dk] + '</div>';
+      for (let dk in dims) html += '<div>' + dk + '：' + dims[dk] + '</div>';
       html += '</div>';
     }
     _showEngineResult('qmEngineResult', html);
   } catch(e) { 
     console.error('[奇门引擎错误]', e.message, e.stack);
-    var el = document.getElementById('qmEngineResult');
+    let el = document.getElementById('qmEngineResult');
     if(el){ el.style.display='block'; el.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px"><h5 style="color:#e74c3c">❌ 奇门引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p><p style="font-size:11px;opacity:.5;margin-top:4px">'+(e.stack||'').split("\n").slice(0,3).join("<br>")+'</p></div>'; }
     else { showToast('奇门引擎错误：' + e.message); }
   }
@@ -2470,7 +2470,7 @@ function runLiurenEngine() {
     _showEngineResult('lrEngineResult', html);
   } catch(e) { 
     console.error('[六壬引擎错误错误]', e.message, e.stack);
-    var _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
+    let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 六壬引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
     else { showToast('六壬引擎错误：' + e.message); }
   }
@@ -2495,7 +2495,7 @@ function runZiweiEngine() {
     _showEngineResult('zwEngineResult', html);
   } catch(e) { 
     console.error('[紫微引擎错误错误]', e.message, e.stack);
-    var _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
+    let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 紫微引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
     else { showToast('紫微引擎错误：' + e.message); }
   }
@@ -2522,15 +2522,15 @@ function runXingmingEngine() {
     _showEngineResult('xmEngineResult', html);
     // 化解方案注入
     if (birthDate && typeof appendHuajieToResult === 'function') {
-      var _p = birthDate.split('-').map(Number);
+      let _p = birthDate.split('-').map(Number);
       if (_p.length === 3) {
-        var _h = birthHour !== '' ? parseInt(birthHour) * 2 : 12;
+        let _h = birthHour !== '' ? parseInt(birthHour) * 2 : 12;
         appendHuajieToResult('xmEngineResult', _p[0], _p[1], _p[2], _h, sex, name);
       }
     }
   } catch(e) { 
     console.error('[姓名学引擎错误错误]', e.message, e.stack);
-    var _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
+    let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 姓名学引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
     else { showToast('姓名学引擎错误：' + e.message); }
   }
@@ -2556,7 +2556,7 @@ function runFengshuiEngine() {
     _showEngineResult('fsEngineResult', html);
   } catch(e) { 
     console.error('[风水引擎错误错误]', e.message, e.stack);
-    var _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
+    let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 风水引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
     else { showToast('风水引擎错误：' + e.message); }
   }
@@ -2579,7 +2579,7 @@ function runZeriEngine() {
     _showEngineResult('zrEngineResult', html);
   } catch(e) { 
     console.error('[择日引擎错误错误]', e.message, e.stack);
-    var _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
+    let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 择日引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
     else { showToast('择日引擎错误：' + e.message); }
   }
@@ -2617,7 +2617,7 @@ if (typeof window !== 'undefined') {
       if (el) { el.innerHTML = html; el.style.display = 'block'; }
     } catch(e) { 
     console.error('[奇门引擎错误错误]', e.message, e.stack);
-    var _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
+    let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 奇门引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
     else { showToast('奇门引擎错误：' + e.message); }
   }
@@ -2644,7 +2644,7 @@ if (typeof window !== 'undefined') {
       if (el) { el.innerHTML = html; el.style.display = 'block'; }
     } catch(e) { 
     console.error('[紫微引擎错误错误]', e.message, e.stack);
-    var _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
+    let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 紫微引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
     else { showToast('紫微引擎错误：' + e.message); }
   }
@@ -2672,7 +2672,7 @@ if (typeof window !== 'undefined') {
       if (el) { el.innerHTML = html; el.style.display = 'block'; }
     } catch(e) { 
     console.error('[梅花引擎错误错误]', e.message, e.stack);
-    var _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
+    let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 梅花引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
     else { showToast('梅花引擎错误：' + e.message); }
   }
@@ -2699,7 +2699,7 @@ if (typeof window !== 'undefined') {
       if (el) { el.innerHTML = html; el.style.display = 'block'; }
     } catch(e) { 
     console.error('[六壬引擎错误错误]', e.message, e.stack);
-    var _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
+    let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 六壬引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
     else { showToast('六壬引擎错误：' + e.message); }
   }
@@ -2716,7 +2716,7 @@ function showMastersTab(tab, btn) {
   document.querySelectorAll('.masters-tab').forEach(function(t) { t.classList.remove('active'); });
   if (btn) btn.classList.add('active');
   document.querySelectorAll('.masters-panel').forEach(function(p) { p.classList.remove('active'); });
-  var panel = document.getElementById('mastersPanel-' + tab);
+  let panel = document.getElementById('mastersPanel-' + tab);
   if (panel) panel.classList.add('active');
 }
 
@@ -2731,7 +2731,7 @@ function toggleMasterCard(card) {
 
 // 打开提问弹窗
 function openAskModal() {
-  var modal = document.getElementById('askModal');
+  let modal = document.getElementById('askModal');
   if (modal) {
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -2740,14 +2740,14 @@ function openAskModal() {
 
 // 关闭提问弹窗
 function closeAskModal() {
-  var modal = document.getElementById('askModal');
+  let modal = document.getElementById('askModal');
   if (modal) {
     modal.classList.remove('active');
     document.body.style.overflow = '';
     // 重置
-    var result = document.getElementById('askResult');
+    let result = document.getElementById('askResult');
     if (result) result.classList.remove('active');
-    var input = document.getElementById('askInput');
+    let input = document.getElementById('askInput');
     if (input) input.value = '';
   }
 }
@@ -2755,10 +2755,10 @@ function closeAskModal() {
 // 指定大师打开提问弹窗
 function openAskModalWithMaster(masterName, tradition) {
   openAskModal();
-  var select = document.getElementById('askMasterSelect');
+  let select = document.getElementById('askMasterSelect');
   if (select) {
-    for (var i = 0; i < select.options.length; i++) {
-      var val = select.options[i].value;
+    for (let i = 0; i < select.options.length; i++) {
+      let val = select.options[i].value;
       if (val.indexOf(masterName) >= 0) {
         select.selectedIndex = i;
         break;
@@ -2769,11 +2769,11 @@ function openAskModalWithMaster(masterName, tradition) {
 
 // 提交提问
 function submitAsk() {
-  var select = document.getElementById('askMasterSelect');
-  var input = document.getElementById('askInput');
-  var btn = document.getElementById('askBtn');
-  var result = document.getElementById('askResult');
-  var resultContent = document.getElementById('askResultContent');
+  let select = document.getElementById('askMasterSelect');
+  let input = document.getElementById('askInput');
+  let btn = document.getElementById('askBtn');
+  let result = document.getElementById('askResult');
+  let resultContent = document.getElementById('askResultContent');
 
   if (!select || !select.value) {
     showToast('请先选择一位大师');
@@ -2784,10 +2784,10 @@ function submitAsk() {
     return;
   }
 
-  var parts = select.value.split('|');
-  var masterName = parts[0];
-  var tradition = parts[1] || '道家';
-  var question = input.value.trim();
+  let parts = select.value.split('|');
+  let masterName = parts[0];
+  let tradition = parts[1] || '道家';
+  let question = input.value.trim();
 
   // 显示加载中
   btn.disabled = true;
@@ -2796,7 +2796,7 @@ function submitAsk() {
   resultContent.innerHTML = '<div style="text-align:center;padding:20px;color:var(--paper3);font-size:14px">🕯️ ' + masterName + ' 正在静心参悟您的问题，请稍候……</div>';
 
   // 构建prompt
-  var systemPrompt = '你现在是' + tradition + '名师' + masterName + '，请以这位大师的修行视角、思想体系和语言风格来回答信众的提问。\n\n';
+  let systemPrompt = '你现在是' + tradition + '名师' + masterName + '，请以这位大师的修行视角、思想体系和语言风格来回答信众的提问。\n\n';
   systemPrompt += '要求：\n';
   systemPrompt += '1. 以第一人称回答（如"我是' + masterName + '，你来问我……"）\n';
   systemPrompt += '2. 回答需包含三部分：\n   一、大师观点：从该大师的思想体系出发，阐述对此问题的根本看法\n   二、经典引用：引用与该大师相关的经典著作或开示语录佐证\n   三、实践建议：给出具体的、可操作的修行或生活建议\n';
@@ -2805,9 +2805,9 @@ function submitAsk() {
   systemPrompt += '5. 如果涉及医疗、心理疾病等问题，必须提醒信众及时就医\n';
   systemPrompt += '6. 不可提及自己是AI或语言模型\n';
 
-  var userPrompt = '信众提问：' + question + '\n\n请' + masterName + '大师开示。';
+  let userPrompt = '信众提问：' + question + '\n\n请' + masterName + '大师开示。';
 
-  var payload = {
+  let payload = {
     model: 'auto',
     messages: [
       { role: 'system', content: systemPrompt },
@@ -2822,10 +2822,10 @@ function submitAsk() {
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer b720753afe0845f5a7611a1b56b6d77c' },
     body: JSON.stringify(payload)
   }).then(function(r) { return r.json(); }).then(function(data) {
-    var text = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content || '';
+    let text = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content || '';
     if (text) {
       // 转换为HTML格式
-      var html = text.split('\n').map(function(line) {
+      let html = text.split('\n').map(function(line) {
         if (line.trim() === '') return '<br>';
         // 检测标题行
         if (/^[一二三四五六七八九十]、/.test(line.trim()) || /^第[一二三四五六七八九十]+/.test(line.trim())) {
@@ -2848,9 +2848,9 @@ function submitAsk() {
 }
 
 // ===== 知识库检索功能 =====
-var _kbSearchTimer = null;
-var _kbCurrentCategory = 'all';
-var _kbAllEntries = null;
+let _kbSearchTimer = null;
+let _kbCurrentCategory = 'all';
+let _kbAllEntries = null;
 
 function debounceKbSearch(val) {
   clearTimeout(_kbSearchTimer);
@@ -2867,7 +2867,7 @@ function filterKbByCategory(cat) {
   event.target.classList.add('kb-cat-active');
   event.target.style.background = 'var(--gold-dim)';
   // 重新搜索
-  var input = document.getElementById('kbSearchInput');
+  let input = document.getElementById('kbSearchInput');
   searchKbEntries(input ? input.value : '');
 }
 
@@ -2877,8 +2877,8 @@ function _collectKbEntries() {
   // 从 AUTHORITATIVE_KNOWLEDGE 收集
   try {
     if (typeof AUTHORITATIVE_KNOWLEDGE !== 'undefined') {
-      for (var k in AUTHORITATIVE_KNOWLEDGE) {
-        var item = AUTHORITATIVE_KNOWLEDGE[k];
+      for (let k in AUTHORITATIVE_KNOWLEDGE) {
+        let item = AUTHORITATIVE_KNOWLEDGE[k];
         if (typeof item === 'object') {
           _kbAllEntries.push({
             key: k,
@@ -2890,7 +2890,7 @@ function _collectKbEntries() {
           });
           // 子条目
           if (item.sections) {
-            for (var sk in item.sections) {
+            for (let sk in item.sections) {
               _kbAllEntries.push({
                 key: k + '.' + sk,
                 category: item.category || _guessCategory(k),
@@ -2908,8 +2908,8 @@ function _collectKbEntries() {
   // 从 KNOWLEDGE_DETAILS_EXTRA 收集
   try {
     if (typeof KNOWLEDGE_DETAILS_EXTRA !== 'undefined') {
-      for (var k in KNOWLEDGE_DETAILS_EXTRA) {
-        var item = KNOWLEDGE_DETAILS_EXTRA[k];
+      for (let k in KNOWLEDGE_DETAILS_EXTRA) {
+        let item = KNOWLEDGE_DETAILS_EXTRA[k];
         _kbAllEntries.push({
           key: k,
           category: _guessCategory(k),
@@ -2924,8 +2924,8 @@ function _collectKbEntries() {
   // 从 KOUJUE_DATABASE 收集
   try {
     if (typeof KOUJUE_DATABASE !== 'undefined') {
-      for (var cat in KOUJUE_DATABASE) {
-        var items = KOUJUE_DATABASE[cat];
+      for (let cat in KOUJUE_DATABASE) {
+        let items = KOUJUE_DATABASE[cat];
         if (Array.isArray(items)) {
           items.forEach(function(item, idx) {
             _kbAllEntries.push({
@@ -2945,8 +2945,8 @@ function _collectKbEntries() {
 }
 
 function _guessCategory(key) {
-  var k = key.toLowerCase();
-  var map = {
+  let k = key.toLowerCase();
+  let map = {
     bazi: ['bazi','八字','日主','十神','格局','用神','大运','流年','神煞','天干','地支'],
     liuyao: ['liuyao','六爻','纳甲','六亲','用神'],
     fengshui: ['fengshui','风水','玄空','飞星','八宅','罗盘'],
@@ -2965,8 +2965,8 @@ function _guessCategory(key) {
     hechong: ['hechong','合冲','刑害'],
     koujue: ['koujue','口诀','咒语']
   };
-  for (var cat in map) {
-    for (var i = 0; i < map[cat].length; i++) {
+  for (let cat in map) {
+    for (let i = 0; i < map[cat].length; i++) {
       if (k.indexOf(map[cat][i].toLowerCase()) >= 0) return cat;
     }
   }
@@ -2974,26 +2974,26 @@ function _guessCategory(key) {
 }
 
 function searchKbEntries(query) {
-  var entries = _collectKbEntries();
-  var results = [];
+  let entries = _collectKbEntries();
+  let results = [];
   query = (query || '').trim().toLowerCase();
   
-  for (var i = 0; i < entries.length; i++) {
-    var e = entries[i];
+  for (let i = 0; i < entries.length; i++) {
+    let e = entries[i];
     // 分类过滤
     if (_kbCurrentCategory !== 'all' && e.category !== _kbCurrentCategory) continue;
     // 关键词过滤
     if (query) {
-      var title = (e.title || '').toLowerCase();
-      var intro = (e.intro || '').toLowerCase();
-      var key = (e.key || '').toLowerCase();
+      let title = (e.title || '').toLowerCase();
+      let intro = (e.intro || '').toLowerCase();
+      let key = (e.key || '').toLowerCase();
       if (title.indexOf(query) < 0 && intro.indexOf(query) < 0 && key.indexOf(query) < 0) continue;
     }
     results.push(e);
   }
   
   // 排序
-  var sortVal = document.getElementById('kbSortSelect') ? document.getElementById('kbSortSelect').value : 'relevance';
+  let sortVal = document.getElementById('kbSortSelect') ? document.getElementById('kbSortSelect').value : 'relevance';
   if (sortVal === 'category') {
     results.sort(function(a, b) { return a.category.localeCompare(b.category); });
   } else if (sortVal === 'alpha') {
@@ -3004,8 +3004,8 @@ function searchKbEntries(query) {
 }
 
 function renderKbResults(results, total) {
-  var container = document.getElementById('kbResults');
-  var stats = document.getElementById('kbStats');
+  let container = document.getElementById('kbResults');
+  let stats = document.getElementById('kbStats');
   if (stats) {
     stats.textContent = '共 ' + total + ' 条知识 · 匹配 ' + results.length + ' 条';
   }
@@ -3015,8 +3015,8 @@ function renderKbResults(results, total) {
     return;
   }
   
-  var html = '';
-  var catColors = {
+  let html = '';
+  let catColors = {
     bazi: '#c0392b', liuyao: '#2980b9', fengshui: '#27ae60', ziwei: '#8e44ad',
     qimen: '#d35400', meihua: '#16a085', liuren: '#2c3e50', xingming: '#e67e22',
     tizhi: '#e74c3c', zhouyi: '#34495e', bagua: '#7f8c8d', wuxing: '#f39c12',
@@ -3025,10 +3025,10 @@ function renderKbResults(results, total) {
   };
   
   results.forEach(function(e) {
-    var color = catColors[e.category] || '#95a5a6';
-    var catLabel = _kbCatLabel(e.category);
-    var title = e.title || e.key;
-    var intro = (e.intro || '').substring(0, 120);
+    let color = catColors[e.category] || '#95a5a6';
+    let catLabel = _kbCatLabel(e.category);
+    let title = e.title || e.key;
+    let intro = (e.intro || '').substring(0, 120);
     if (intro.length === 120) intro += '...';
     
     html += '<div class="kb-result-card" onclick="showKbDetail(\'' + e.key.replace(/'/g, '\\') + '\')" ' +
@@ -3047,7 +3047,7 @@ function renderKbResults(results, total) {
 }
 
 function _kbCatLabel(cat) {
-  var labels = {
+  let labels = {
     bazi: '八字', liuyao: '六爻', fengshui: '风水', ziwei: '紫微',
     qimen: '奇门', meihua: '梅花', liuren: '六壬', xingming: '姓名学',
     tizhi: '体质', zhouyi: '周易', bagua: '八卦', wuxing: '五行',
@@ -3058,16 +3058,16 @@ function _kbCatLabel(cat) {
 }
 
 function showKbDetail(key) {
-  var entries = _collectKbEntries();
-  var entry = null;
-  for (var i = 0; i < entries.length; i++) {
+  let entries = _collectKbEntries();
+  let entry = null;
+  for (let i = 0; i < entries.length; i++) {
     if (entries[i].key === key) { entry = entries[i]; break; }
   }
   if (!entry) return;
   
-  var modal = document.getElementById('kbDetailModal');
-  var content = document.getElementById('kbDetailContent');
-  var catLabel = _kbCatLabel(entry.category);
+  let modal = document.getElementById('kbDetailModal');
+  let content = document.getElementById('kbDetailContent');
+  let catLabel = _kbCatLabel(entry.category);
   
   content.innerHTML = 
     '<div style="margin-bottom:12px;">' +

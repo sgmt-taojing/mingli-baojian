@@ -18,13 +18,13 @@
 // ============================================================
 
 /** 天干地支（复用 hub 内部定义，确保独立可用） */
-var FS_PRO_GAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-var FS_PRO_ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-var FS_PRO_WUXING_GAN = { '甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水' };
-var FS_PRO_WUXING_ZHI = { '子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水' };
+let FS_PRO_GAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+let FS_PRO_ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+let FS_PRO_WUXING_GAN = { '甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水' };
+let FS_PRO_WUXING_ZHI = { '子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水' };
 
 /** 八卦方位映射 */
-var FS_PRO_BAGUA = {
+let FS_PRO_BAGUA = {
   '坎': { dir: '北', element: '水', num: 1 },
   '坤': { dir: '西南', element: '土', num: 2 },
   '震': { dir: '东', element: '木', num: 3 },
@@ -36,7 +36,7 @@ var FS_PRO_BAGUA = {
 };
 
 /** 九星名称 */
-var FS_PRO_STARS = {
+let FS_PRO_STARS = {
   1: { name: '一白贪狼', element: '水', desc: '桃花·人缘·文昌', auspicious: true },
   2: { name: '二黑巨门', element: '土', desc: '病符·健康·脾胃', auspicious: false },
   3: { name: '三碧禄存', element: '木', desc: '是非·口舌·官非', auspicious: false },
@@ -49,13 +49,13 @@ var FS_PRO_STARS = {
 };
 
 /** 飞星顺飞宫位顺序：中→乾→兑→艮→离→坎→坤→震→巽 */
-var FS_PRO_FLY_ORDER = ['中','西北','西','东北','南','北','西南','东','东南'];
+let FS_PRO_FLY_ORDER = ['中','西北','西','东北','南','北','西南','东','东南'];
 
 /** 计算年飞星入中宫 */
 function _fsProYearCenter(year) {
-  var base = 1864;
-  var remainder = (year - base) % 9;
-  var center = ((9 - remainder) % 9) || 9;
+  let base = 1864;
+  let remainder = (year - base) % 9;
+  let center = ((9 - remainder) % 9) || 9;
   return center;
 }
 
@@ -72,7 +72,7 @@ function _fsProMonthCenter(year, month) {
   else startStar = 2;
   // 依节气定月序：寅月(立春)为正月，卯月(惊蛰)为二月...依次类推
   // 节气近似日期表（公历，用于推算月建）
-  var jieQiApprox = {
+  let jieQiApprox = {
     1: { jie: '小寒', day: 6 },   // 丑月
     2: { jie: '立春', day: 4 },   // 寅月——正月
     3: { jie: '惊蛰', day: 6 },   // 卯月
@@ -87,8 +87,8 @@ function _fsProMonthCenter(year, month) {
     12: { jie: '大雪', day: 7 }   // 子月
   };
   // 确定当前节气所在月建序号（寅=0, 卯=1, ..., 丑=11）
-  var monthJie = jieQiApprox[month];
-  var monthJianIdx;
+  let monthJie = jieQiApprox[month];
+  let monthJianIdx;
   if (month === 1) {
     // 1月：小寒前仍为子月(11)，小寒后为丑月(10)
     monthJianIdx = (new Date(year, 0, 1) < new Date(year, 0, 6)) ? 11 : 10;
@@ -97,28 +97,28 @@ function _fsProMonthCenter(year, month) {
     // 寅月=0, 卯月=1, ..., 丑月=11
     monthJianIdx = (month - 2 + 12) % 12;
     // 检查是否已过当月节气，未过则属上月
-    var jieDate = new Date(year, month - 1, monthJie.day);
+    let jieDate = new Date(year, month - 1, monthJie.day);
     if (new Date(year, month - 1, 1) <= jieDate && new Date(year, month - 1, 15) > jieDate) {
       // 月初到节气前，可能仍属上月
-      var today = new Date(year, month - 1, 15); // 用月中近似
+      let today = new Date(year, month - 1, 15); // 用月中近似
       // 精确判断：若当月15日已在节气之后，则全月属当月建
     }
   }
-  var monthOffset = monthJianIdx; // 0=寅月(正月)
-  var center = ((startStar - monthOffset - 1) % 9 + 9) % 9 || 9;
+  let monthOffset = monthJianIdx; // 0=寅月(正月)
+  let center = ((startStar - monthOffset - 1) % 9 + 9) % 9 || 9;
   return center;
 }
 
 /** 获取飞星盘布局 */
 function _fsProFlyingStarGrid(centerStar) {
-  var order = [centerStar];
-  var next = centerStar;
-  for (var i = 0; i < 8; i++) {
+  let order = [centerStar];
+  let next = centerStar;
+  for (let i = 0; i < 8; i++) {
     next = next >= 9 ? 1 : next + 1;
     order.push(next);
   }
-  var pos = {};
-  for (var i = 0; i < FS_PRO_FLY_ORDER.length; i++) {
+  let pos = {};
+  for (let i = 0; i < FS_PRO_FLY_ORDER.length; i++) {
     pos[FS_PRO_FLY_ORDER[i]] = order[i];
   }
   return pos;
@@ -126,8 +126,8 @@ function _fsProFlyingStarGrid(centerStar) {
 
 /** 五行相生相克 */
 function _fsProWuxingRel(a, b) {
-  var sheng = { '水':'木','木':'火','火':'土','土':'金','金':'水' };
-  var ke = { '水':'火','火':'金','金':'木','木':'土','土':'水' };
+  let sheng = { '水':'木','木':'火','火':'土','土':'金','金':'水' };
+  let ke = { '水':'火','火':'金','金':'木','木':'土','土':'水' };
   if (sheng[a] === b) return '生';
   if (ke[a] === b) return '克';
   if (a === b) return '比和';
@@ -137,8 +137,8 @@ function _fsProWuxingRel(a, b) {
 /** 日干支计算（基于60甲子循环，以已知甲子日为基准） */
 function _fsProDayGanZhi(date) {
   // 以 2000-01-07 甲子日为基准
-  var base = new Date(2000, 0, 7);
-  var diff = Math.floor((date - base) / 86400000);
+  let base = new Date(2000, 0, 7);
+  let diff = Math.floor((date - base) / 86400000);
   diff = ((diff % 60) + 60) % 60;
   return { gan: FS_PRO_GAN[diff % 10], zhi: FS_PRO_ZHI[diff % 12], index: diff };
 }
@@ -146,7 +146,7 @@ function _fsProDayGanZhi(date) {
 /** 明财位计算：大门对角线方位 */
 function _fsProMingCaiwei(doorDir) {
   // 明财位依大门朝向取对角线方位
-  var caiweiMap = {
+  let caiweiMap = {
     '北': '东南', '南': '西北', '东': '西南', '西': '东北',
     '东南': '西北', '西南': '东北', '西北': '东南', '东北': '西南'
   };
@@ -154,7 +154,7 @@ function _fsProMingCaiwei(doorDir) {
 }
 
 /** 二十四山完整定义：12地支+8天干+4卦（乾巽艮坤） */
-var FS_PRO_24MOUNTAIN = [
+let FS_PRO_24MOUNTAIN = [
   '壬','子','癸',  // 北方三山
   '丑','艮','寅',  // 东北三山
   '甲','卯','乙',  // 东方三山
@@ -166,7 +166,7 @@ var FS_PRO_24MOUNTAIN = [
 ];
 
 /** 二十四山方位映射（每山15度） */
-var FS_PRO_24MOUNTAIN_DIR = {
+let FS_PRO_24MOUNTAIN_DIR = {
   '壬': '北', '子': '北', '癸': '北',
   '丑': '东北', '艮': '东北', '寅': '东北',
   '甲': '东', '卯': '东', '乙': '东',
@@ -182,7 +182,7 @@ var FS_PRO_24MOUNTAIN_DIR = {
  * 地元龙（逆数）：辰戌丑未属阳顺飞，甲庚壬丙属阴逆飞
  * 人元龙（顺数）：寅申巳亥属阳顺飞，乙辛丁癸属阴逆飞
  */
-var FS_PRO_24MOUNTAIN_YINYANG = {
+let FS_PRO_24MOUNTAIN_YINYANG = {
   '子': '阴', '癸': '阴', '壬': '阳',
   '午': '阴', '丁': '阴', '丙': '阳',
   '卯': '阴', '乙': '阴', '甲': '阳',
@@ -197,8 +197,8 @@ var FS_PRO_24MOUNTAIN_YINYANG = {
  * 阴逆飞：中→巽→震→坤→坎→离→艮→兑→乾
  */
 function _fsProFlyingStarGrid24(centerStar, mountain) {
-  var isYang = FS_PRO_24MOUNTAIN_YINYANG[mountain] !== '阴';
-  var flyOrder;
+  let isYang = FS_PRO_24MOUNTAIN_YINYANG[mountain] !== '阴';
+  let flyOrder;
   if (isYang) {
     // 顺飞：中→乾→兑→艮→离→坎→坤→震→巽
     flyOrder = ['中','西北','西','东北','南','北','西南','东','东南'];
@@ -206,14 +206,14 @@ function _fsProFlyingStarGrid24(centerStar, mountain) {
     // 逆飞：中→巽→震→坤→坎→离→艮→兑→乾
     flyOrder = ['中','东南','东','西南','北','南','东北','西','西北'];
   }
-  var order = [centerStar];
-  var next = centerStar;
-  for (var i = 0; i < 8; i++) {
+  let order = [centerStar];
+  let next = centerStar;
+  for (let i = 0; i < 8; i++) {
     next = next >= 9 ? 1 : next + 1;
     order.push(next);
   }
-  var pos = {};
-  for (var i = 0; i < flyOrder.length; i++) {
+  let pos = {};
+  for (let i = 0; i < flyOrder.length; i++) {
     pos[flyOrder[i]] = order[i];
   }
   return pos;
@@ -226,17 +226,17 @@ function _fsProFlyingStarGrid24(centerStar, mountain) {
  */
 function _fsProMingGua(year, sex) {
   // 计算年份数字根
-  var digits = String(year).split('');
-  var numRoot = 0;
-  for (var d = 0; d < digits.length; d++) {
+  let digits = String(year).split('');
+  let numRoot = 0;
+  for (let d = 0; d < digits.length; d++) {
     numRoot += parseInt(digits[d]);
   }
   while (numRoot >= 10) {
-    var s = String(numRoot).split('');
+    let s = String(numRoot).split('');
     numRoot = 0;
-    for (var d = 0; d < s.length; d++) numRoot += parseInt(s[d]);
+    for (let d = 0; d < s.length; d++) numRoot += parseInt(s[d]);
   }
-  var gua;
+  let gua;
   if (year >= 2000) {
     if (sex === 'male') {
       gua = ((9 - numRoot) % 9 + 9) % 9;
@@ -252,8 +252,8 @@ function _fsProMingGua(year, sex) {
   }
   if (gua === 0) gua = 9;
   if (gua === 5) gua = sex === 'male' ? 2 : 8;
-  var isDong = [1, 9, 3, 4].includes(gua);
-  var nameMap = { 1: '坎', 2: '坤', 3: '震', 4: '巽', 6: '乾', 7: '兑', 8: '艮', 9: '离' };
+  let isDong = [1, 9, 3, 4].includes(gua);
+  let nameMap = { 1: '坎', 2: '坤', 3: '震', 4: '巽', 6: '乾', 7: '兑', 8: '艮', 9: '离' };
   return { gua: gua, guaName: nameMap[gua], isDong: isDong, type: isDong ? '东四命' : '西四命' };
 }
 
@@ -261,7 +261,7 @@ function _fsProMingGua(year, sex) {
 function _fsProBazhai(zhaiGua) {
   // 以宅卦为准，推算八方游星
   // 伏位→生气→延年→天医→祸害→六煞→五鬼→绝命
-  var bazhaiMap = {
+  let bazhaiMap = {
     1: { '北':'伏位','南':'延年','东':'天医','西':'祸害','东南':'生气','西南':'绝命','西北':'六煞','东北':'五鬼' },
     2: { '北':'绝命','南':'天医','东':'祸害','西':'延年','东南':'五鬼','西南':'伏位','西北':'生气','东北':'天医' },
     3: { '北':'天医','南':'生气','东':'伏位','西':'绝命','东南':'延年','西南':'祸害','西北':'五鬼','东北':'六煞' },
@@ -277,7 +277,7 @@ function _fsProBazhai(zhaiGua) {
 /** Toast 提示 */
 function _fsProToast(msg) {
   if (typeof showToast === 'function') { showToast(msg); return; }
-  var t = document.createElement('div');
+  let t = document.createElement('div');
   t.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:rgba(201,168,76,0.95);color:#080808;padding:10px 24px;border-radius:8px;font-size:13px;letter-spacing:2px;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.3)';
   t.textContent = msg;
   document.body.appendChild(t);
@@ -286,7 +286,7 @@ function _fsProToast(msg) {
 
 /** 生成带颜色的星盘 HTML */
 function _fsProStarColor(star) {
-  var colors = { 1:'#5dade2', 2:'#e74c3c', 3:'#27ae60', 4:'#27ae60', 5:'#e74c3c', 6:'#bdc3c7', 7:'#e67e22', 8:'#f1c40f', 9:'#e74c3c' };
+  let colors = { 1:'#5dade2', 2:'#e74c3c', 3:'#27ae60', 4:'#27ae60', 5:'#e74c3c', 6:'#bdc3c7', 7:'#e67e22', 8:'#f1c40f', 9:'#e74c3c' };
   return colors[star] || '#c9a84c';
 }
 
@@ -300,65 +300,65 @@ function _fsProStarColor(star) {
  * 参考：《钦定协纪辨方书》《玉匣记》《紫白诀》
  */
 function getDailyFengshuiGuide() {
-  var date = new Date();
-  var gz = _fsProDayGanZhi(date);
-  var dayGan = gz.gan;
-  var dayGanEle = FS_PRO_WUXING_GAN[dayGan];
+  let date = new Date();
+  let gz = _fsProDayGanZhi(date);
+  let dayGan = gz.gan;
+  let dayGanEle = FS_PRO_WUXING_GAN[dayGan];
 
   // 财神方位：日干所克之方位
-  var caiShenMap = {
+  let caiShenMap = {
     '甲':'东北','乙':'东北','丙':'正西','丁':'正西',
     '戊':'正北','己':'正北','庚':'正东','辛':'正东',
     '壬':'正南','癸':'正南'
   };
   // 喜神方位
-  var xiShenMap = {
+  let xiShenMap = {
     '甲己':'艮（东北偏东）','乙庚':'乾（西北偏北）','丙辛':'坤（西南偏南）',
     '丁壬':'离（正南）','戊癸':'巽（东南偏南）'
   };
-  var xiKey = dayGan + (['甲','乙','丙','丁','戊'].includes(dayGan) ? FS_PRO_GAN[(FS_PRO_GAN.indexOf(dayGan) + 5) % 10] : '');
+  let xiKey = dayGan + (['甲','乙','丙','丁','戊'].includes(dayGan) ? FS_PRO_GAN[(FS_PRO_GAN.indexOf(dayGan) + 5) % 10] : '');
   // 喜神方位：依日干五合（五虎遁）取喜神所在方位，古制逐日推算
-  var xiShenSimple = {
+  let xiShenSimple = {
     '甲':'艮（东北偏东）','乙':'乾（西北偏北）','丙':'坤（西南偏南）',
     '丁':'离（正南）','戊':'巽（东南偏南）',
     '己':'艮（东北偏东）','庚':'乾（西北偏北）','辛':'坤（西南偏南）',
     '壬':'离（正南）','癸':'巽（东南偏南）'
   };
   // 福神方位
-  var fuShenMap = {
+  let fuShenMap = {
     '甲':'东南','乙':'正北','丙':'正东','丁':'东南',
     '戊':'正北','己':'正东','庚':'东南','辛':'正北',
     '壬':'正东','癸':'东南'
   };
 
   // 当月飞星
-  var monthCenter = _fsProMonthCenter(date.getFullYear(), date.getMonth() + 1);
-  var monthStars = _fsProFlyingStarGrid(monthCenter);
+  let monthCenter = _fsProMonthCenter(date.getFullYear(), date.getMonth() + 1);
+  let monthStars = _fsProFlyingStarGrid(monthCenter);
   // 当年飞星
-  var yearCenter = _fsProYearCenter(date.getFullYear());
-  var yearStars = _fsProFlyingStarGrid(yearCenter);
+  let yearCenter = _fsProYearCenter(date.getFullYear());
+  let yearStars = _fsProFlyingStarGrid(yearCenter);
 
   // 五黄位（年+月）
-  var wuhuangYear = '中';
-  var wuhuangMonth = '中';
-  for (var d in yearStars) { if (yearStars[d] === 5) wuhuangYear = d; }
-  for (var dm in monthStars) { if (monthStars[dm] === 5) wuhuangMonth = dm; }
+  let wuhuangYear = '中';
+  let wuhuangMonth = '中';
+  for (let d in yearStars) { if (yearStars[d] === 5) wuhuangYear = d; }
+  for (let dm in monthStars) { if (monthStars[dm] === 5) wuhuangMonth = dm; }
   // 二黑位
-  var erheiYear = '中';
-  for (var dy in yearStars) { if (yearStars[dy] === 2) erheiYear = dy; }
+  let erheiYear = '中';
+  for (let dy in yearStars) { if (yearStars[dy] === 2) erheiYear = dy; }
 
   // 出行吉方（喜神方 + 生气方）
-  var chuxingJi = xiShenSimple[dayGan];
+  let chuxingJi = xiShenSimple[dayGan];
 
   // 日建（地支）对应的煞方
-  var shaMap = {
+  let shaMap = {
     '子':'南（午方）','丑':'东（寅方）','寅':'北（申方）','卯':'西（酉方）',
     '辰':'南（巳方）','巳':'东（辰方）','午':'北（子方）','未':'西（丑方）',
     '申':'南（寅方）','酉':'东（卯方）','戌':'北（辰方）','亥':'西（巳方）'
   };
-  var daySha = shaMap[gz.zhi] || '无';
+  let daySha = shaMap[gz.zhi] || '无';
 
-  var html = '';
+  let html = '';
   html += '<div class="fs-pro-result" style="animation:fadeUp .6s ease">';
 
   // 日期信息
@@ -397,7 +397,7 @@ function getDailyFengshuiGuide() {
   html += '<div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:16px;margin-bottom:20px">';
   html += '<h5 style="color:var(--gold);font-size:13px;letter-spacing:3px;margin-bottom:8px">🔨 动土方位吉凶</h5>';
   html += '<p style="font-size:12px;line-height:1.8;opacity:.7">';
-  var dongtuJi = (wuhuangYear === '中' && wuhuangMonth === '中');
+  let dongtuJi = (wuhuangYear === '中' && wuhuangMonth === '中');
   if (daySha.indexOf('无') !== -1) {
     html += '今日无严重煞方，动土可视情况而行。';
   } else {
@@ -429,10 +429,10 @@ function _fsProGodCard(icon, title, direction, color, desc) {
 }
 
 function _fsProFmtDate(d) {
-  var y = d.getFullYear();
-  var m = (d.getMonth() + 1).toString().padStart(2, '0');
-  var day = d.getDate().toString().padStart(2, '0');
-  var week = ['日','一','二','三','四','五','六'][d.getDay()];
+  let y = d.getFullYear();
+  let m = (d.getMonth() + 1).toString().padStart(2, '0');
+  let day = d.getDate().toString().padStart(2, '0');
+  let week = ['日','一','二','三','四','五','六'][d.getDay()];
   return y + '年' + m + '月' + day + '日 星期' + week;
 }
 
@@ -446,25 +446,25 @@ function _fsProFmtDate(d) {
  * 参考：《八宅明镜》《阳宅三要》《沈氏玄空学》
  */
 function diagnoseHomeLayout() {
-  var doorDir = document.getElementById('fs-pro-door-dir').value;
-  var bedroomDir = document.getElementById('fs-pro-bedroom-dir').value;
-  var kitchenDir = document.getElementById('fs-pro-kitchen-dir').value;
-  var bathroomDir = document.getElementById('fs-pro-bathroom-dir').value;
-  var studyDir = document.getElementById('fs-pro-study-dir').value;
-  var livingDir = document.getElementById('fs-pro-living-dir').value;
-  var buildYear = parseInt(document.getElementById('fs-pro-build-year').value) || 2000;
+  let doorDir = document.getElementById('fs-pro-door-dir').value;
+  let bedroomDir = document.getElementById('fs-pro-bedroom-dir').value;
+  let kitchenDir = document.getElementById('fs-pro-kitchen-dir').value;
+  let bathroomDir = document.getElementById('fs-pro-bathroom-dir').value;
+  let studyDir = document.getElementById('fs-pro-study-dir').value;
+  let livingDir = document.getElementById('fs-pro-living-dir').value;
+  let buildYear = parseInt(document.getElementById('fs-pro-build-year').value) || 2000;
 
   // 宅卦推算：以门向定宅卦
-  var dirToGua = { '北':1, '南':9, '东':3, '西':7, '东南':4, '西南':2, '西北':6, '东北':8 };
-  var zhaiGua = dirToGua[doorDir] || 1;
-  var bazhai = _fsProBazhai(zhaiGua);
-  var yearStar = _fsProYearCenter(buildYear);
-  var yearStarPos = _fsProFlyingStarGrid(yearStar);
-  var currentYearStar = _fsProYearCenter(new Date().getFullYear());
-  var currentStarPos = _fsProFlyingStarGrid(currentYearStar);
+  let dirToGua = { '北':1, '南':9, '东':3, '西':7, '东南':4, '西南':2, '西北':6, '东北':8 };
+  let zhaiGua = dirToGua[doorDir] || 1;
+  let bazhai = _fsProBazhai(zhaiGua);
+  let yearStar = _fsProYearCenter(buildYear);
+  let yearStarPos = _fsProFlyingStarGrid(yearStar);
+  let currentYearStar = _fsProYearCenter(new Date().getFullYear());
+  let currentStarPos = _fsProFlyingStarGrid(currentYearStar);
 
   // 八宅吉凶位说明
-  var bazhaiDesc = {
+  let bazhaiDesc = {
     '生气': { level: '大吉', color: '#2ecc71', desc: '生气星主丁财两旺，精力充沛，宜主卧、书房', items: '宜放发财树、水晶洞、绿色植物催旺' },
     '天医': { level: '吉', color: '#27ae60', desc: '天医星主健康长寿，宜卧室、疗养', items: '宜放葫芦、玉器、铜制摆件' },
     '延年': { level: '吉', color: '#f1c40f', desc: '延年星主人际和谐、姻缘，宜主卧、客厅', items: '宜放粉色水晶、和合二仙、双数摆件' },
@@ -476,7 +476,7 @@ function diagnoseHomeLayout() {
   };
 
   // 各房间诊断
-  var rooms = [
+  let rooms = [
     { name: '大门', dir: doorDir, icon: '🚪', importance: '大门为气口，主一宅之枢' },
     { name: '主卧', dir: bedroomDir, icon: '🛏️', importance: '主卧关系家主健康与夫妻感情' },
     { name: '厨房', dir: kitchenDir, icon: '🍳', importance: '厨房主饮食健康，火气所在' },
@@ -485,11 +485,11 @@ function diagnoseHomeLayout() {
     { name: '客厅', dir: livingDir, icon: '🛋️', importance: '客厅主家庭和睦与财运' }
   ];
 
-  var html = '';
+  let html = '';
   html += '<div class="fs-pro-result" style="animation:fadeUp .6s ease">';
 
   // 宅卦信息
-  var guaName = { 1:'坎',2:'坤',3:'震',4:'巽',6:'乾',7:'兑',8:'艮',9:'离' }[zhaiGua];
+  let guaName = { 1:'坎',2:'坤',3:'震',4:'巽',6:'乾',7:'兑',8:'艮',9:'离' }[zhaiGua];
   html += '<div style="text-align:center;margin-bottom:20px;padding:16px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:10px">';
   html += '<div style="font-size:14px;opacity:.5;letter-spacing:2px">宅卦</div>';
   html += '<div style="font-size:28px;color:var(--gold);font-family:Ma Shan Zheng,serif;letter-spacing:6px">' + guaName + '宅 · ' + doorDir + '向</div>';
@@ -497,15 +497,15 @@ function diagnoseHomeLayout() {
   html += '</div>';
 
   // 逐房间诊断
-  for (var i = 0; i < rooms.length; i++) {
-    var r = rooms[i];
-    var bPos = bazhai[r.dir] || '伏位';
-    var bInfo = bazhaiDesc[bPos] || bazhaiDesc['伏位'];
-    var yStar = currentStarPos[r.dir] || 0;
-    var starInfo = FS_PRO_STARS[yStar] || { name: '未知', desc: '', auspicious: false };
+  for (let i = 0; i < rooms.length; i++) {
+    let r = rooms[i];
+    let bPos = bazhai[r.dir] || '伏位';
+    let bInfo = bazhaiDesc[bPos] || bazhaiDesc['伏位'];
+    let yStar = currentStarPos[r.dir] || 0;
+    let starInfo = FS_PRO_STARS[yStar] || { name: '未知', desc: '', auspicious: false };
 
     // 特殊诊断
-    var special = '';
+    let special = '';
     if (r.name === '厨房') {
       // 厨房属火，不宜在北方（水克火）
       if (r.dir === '北') {
@@ -540,8 +540,8 @@ function diagnoseHomeLayout() {
     }
     if (r.name === '书房') {
       // 文昌位：四绿星所在方位或东南方
-      var wenchangDir = '东南';
-      for (var wd in currentStarPos) { if (currentStarPos[wd] === 4) wenchangDir = wd; }
+      let wenchangDir = '东南';
+      for (let wd in currentStarPos) { if (currentStarPos[wd] === 4) wenchangDir = wd; }
       if (r.dir === wenchangDir) {
         special = '<div style="color:#2ecc71;font-size:12px;margin-top:6px">✅ 书房在文昌位（' + wenchangDir + '），大利学业与考试</div>';
       }
@@ -549,11 +549,11 @@ function diagnoseHomeLayout() {
     if (r.name === '客厅') {
       // 财位：明财位为大门对角线方位，暗财位依宅卦生气方定
       // 明财位：大门对角线45°方位
-      var mingCaiwei = _fsProMingCaiwei(doorDir);
+      let mingCaiwei = _fsProMingCaiwei(doorDir);
       // 暗财位：依宅卦生气方
-      var anCaiwei = '东南';
-      for (var cd in bazhai) { if (bazhai[cd] === '生气') anCaiwei = cd; }
-      var caiwei = mingCaiwei || anCaiwei;
+      let anCaiwei = '东南';
+      for (let cd in bazhai) { if (bazhai[cd] === '生气') anCaiwei = cd; }
+      let caiwei = mingCaiwei || anCaiwei;
       if (r.dir === caiwei) {
         special = '<div style="color:#2ecc71;font-size:12px;margin-top:6px">✅ 客厅在财位（' + caiwei + '方，明财位），宜放聚宝盆、黄水晶球催财</div>';
       } else if (r.dir === anCaiwei) {
@@ -602,20 +602,20 @@ function diagnoseHomeLayout() {
  * 参考：《八宅明镜》《阳宅三要》《商业风水秘笈》
  */
 function analyzeBusinessFengshui() {
-  var shopType = document.getElementById('fs-pro-shop-type').value;
-  var doorDir = document.getElementById('fs-pro-shop-door').value;
-  var cashierDir = document.getElementById('fs-pro-cashier').value;
-  var bossDir = document.getElementById('fs-pro-boss-office').value;
-  var staffDir = document.getElementById('fs-pro-staff-area').value;
-  var counterDir = document.getElementById('fs-pro-counter').value;
+  let shopType = document.getElementById('fs-pro-shop-type').value;
+  let doorDir = document.getElementById('fs-pro-shop-door').value;
+  let cashierDir = document.getElementById('fs-pro-cashier').value;
+  let bossDir = document.getElementById('fs-pro-boss-office').value;
+  let staffDir = document.getElementById('fs-pro-staff-area').value;
+  let counterDir = document.getElementById('fs-pro-counter').value;
 
-  var dirToGua = { '北':1, '南':9, '东':3, '西':7, '东南':4, '西南':2, '西北':6, '东北':8 };
-  var zhaiGua = dirToGua[doorDir] || 1;
-  var bazhai = _fsProBazhai(zhaiGua);
-  var currentYear = new Date().getFullYear();
-  var currentStarPos = _fsProFlyingStarGrid(_fsProYearCenter(currentYear));
+  let dirToGua = { '北':1, '南':9, '东':3, '西':7, '东南':4, '西南':2, '西北':6, '东北':8 };
+  let zhaiGua = dirToGua[doorDir] || 1;
+  let bazhai = _fsProBazhai(zhaiGua);
+  let currentYear = new Date().getFullYear();
+  let currentStarPos = _fsProFlyingStarGrid(_fsProYearCenter(currentYear));
 
-  var bazhaiDesc = {
+  let bazhaiDesc = {
     '生气': { level: '大吉', color: '#2ecc71', desc: '丁财两旺', action: '宜设收银台、老板办公室' },
     '天医': { level: '吉', color: '#27ae60', desc: '健康贵人', action: '宜休息区、财务室' },
     '延年': { level: '吉', color: '#f1c40f', desc: '人缘和谐', action: '宜会客室、洽谈区' },
@@ -626,7 +626,7 @@ function analyzeBusinessFengshui() {
     '绝命': { level: '大凶', color: '#dc3545', desc: '破财伤丁', action: '宜仓库、卫生间' }
   };
 
-  var areas = [
+  let areas = [
     { name: '大门/入口', dir: doorDir, icon: '🚪', role: '纳气之口，决定商铺整体气运' },
     { name: '收银台', dir: cashierDir, icon: '💰', role: '财位所在，关系商铺营收' },
     { name: '老板办公室', dir: bossDir, icon: '👔', role: '决策中心，关系老板运势' },
@@ -634,11 +634,11 @@ function analyzeBusinessFengshui() {
     { name: '展示柜台', dir: counterDir, icon: '🏷️', role: '商品展示与销售' }
   ];
 
-  var html = '';
+  let html = '';
   html += '<div class="fs-pro-result" style="animation:fadeUp .6s ease">';
 
   // 店铺类型信息
-  var shopTypeInfo = {
+  let shopTypeInfo = {
     'retail': '零售商铺',
     'restaurant': '餐饮店铺',
     'office': '办公场所',
@@ -651,14 +651,14 @@ function analyzeBusinessFengshui() {
   html += '</div>';
 
   // 各区域诊断
-  for (var i = 0; i < areas.length; i++) {
-    var a = areas[i];
-    var bPos = bazhai[a.dir] || '伏位';
-    var bInfo = bazhaiDesc[bPos] || bazhaiDesc['伏位'];
-    var yStar = currentStarPos[a.dir] || 0;
-    var starInfo = FS_PRO_STARS[yStar] || { name: '未知', desc: '' };
+  for (let i = 0; i < areas.length; i++) {
+    let a = areas[i];
+    let bPos = bazhai[a.dir] || '伏位';
+    let bInfo = bazhaiDesc[bPos] || bazhaiDesc['伏位'];
+    let yStar = currentStarPos[a.dir] || 0;
+    let starInfo = FS_PRO_STARS[yStar] || { name: '未知', desc: '' };
 
-    var advice = '';
+    let advice = '';
     if (a.name === '收银台') {
       if (['生气','天医','延年'].includes(bPos)) {
         advice = '收银台在吉位，大吉。宜在收银台放黄水晶球、金蟾、貔貅催财。背后宜有靠（墙或屏风），不可背对大门。';
@@ -739,7 +739,7 @@ function analyzeBusinessFengshui() {
  * 参考：《阳宅大全》《风水化煞全书记》《沈氏玄空学》
  */
 function getShaqiCatalog() {
-  var shaqiList = [
+  let shaqiList = [
     {
       name: '路冲煞',
       icon: '🛣️',
@@ -898,7 +898,7 @@ function getShaqiCatalog() {
     }
   ];
 
-  var html = '';
+  let html = '';
   html += '<div class="fs-pro-result" style="animation:fadeUp .6s ease">';
 
   // 煞气图例
@@ -906,9 +906,9 @@ function getShaqiCatalog() {
   html += '<p style="font-size:13px;opacity:.6;line-height:1.8">煞气共12种，以下按严重程度排列。<br>';
   html += '<span style="color:#dc3545">大凶</span>需立即化解 · <span style="color:#e74c3c">凶</span>建议化解 · <span style="color:#e67e22">中凶</span>酌情化解</p></div>';
 
-  for (var i = 0; i < shaqiList.length; i++) {
-    var s = shaqiList[i];
-    var sevColor = s.severity === '大凶' ? '#dc3545' : s.severity === '凶' ? '#e74c3c' : '#e67e22';
+  for (let i = 0; i < shaqiList.length; i++) {
+    let s = shaqiList[i];
+    let sevColor = s.severity === '大凶' ? '#dc3545' : s.severity === '凶' ? '#e74c3c' : '#e67e22';
 
     html += '<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(201,168,76,0.1);border-radius:10px;padding:16px;margin-bottom:16px">';
     // 标题行
@@ -933,8 +933,8 @@ function getShaqiCatalog() {
     html += '<div style="margin-bottom:10px">';
     html += '<div style="font-size:12px;color:#2ecc71;margin-bottom:6px">✅ 化解方案</div>';
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px">';
-    for (var j = 0; j < s.cure.length; j++) {
-      var c = s.cure[j];
+    for (let j = 0; j < s.cure.length; j++) {
+      let c = s.cure[j];
       html += '<div style="background:rgba(46,204,113,0.06);border:1px solid rgba(46,204,113,0.12);border-radius:8px;padding:10px;font-size:11px;line-height:1.6">';
       html += '<strong style="color:#2ecc71">' + c.item + '</strong><br>';
       html += '<span style="opacity:.6">材质：' + c.material + '</span><br>';
@@ -980,14 +980,14 @@ function getShaqiCatalog() {
  * 参考：《沈氏玄空学》《紫白诀》
  */
 function renderAnnualFlyingStars() {
-  var year = parseInt(document.getElementById('fs-pro-fx-year').value) || new Date().getFullYear();
-  var centerStar = _fsProYearCenter(year);
-  var starPos = _fsProFlyingStarGrid(centerStar);
-  var currentMonth = new Date().getMonth() + 1;
-  var monthCenter = _fsProMonthCenter(year, currentMonth);
-  var monthStarPos = _fsProFlyingStarGrid(monthCenter);
+  let year = parseInt(document.getElementById('fs-pro-fx-year').value) || new Date().getFullYear();
+  let centerStar = _fsProYearCenter(year);
+  let starPos = _fsProFlyingStarGrid(centerStar);
+  let currentMonth = new Date().getMonth() + 1;
+  let monthCenter = _fsProMonthCenter(year, currentMonth);
+  let monthStarPos = _fsProFlyingStarGrid(monthCenter);
 
-  var html = '';
+  let html = '';
   html += '<div class="fs-pro-result" style="animation:fadeUp .6s ease">';
 
   // 年份选择
@@ -1003,13 +1003,13 @@ function renderAnnualFlyingStars() {
 
   // 九宫格顺序：东南→南→西南→东→中→西→东北→北→西北
   // 对应视觉方位（上南下北，左东右西）
-  var gridOrder = ['东南','南','西南','东','中','西','东北','北','西北'];
-  for (var i = 0; i < gridOrder.length; i++) {
-    var dir = gridOrder[i];
-    var star = starPos[dir];
-    var starInfo = FS_PRO_STARS[star];
-    var color = _fsProStarColor(star);
-    var bg = starInfo.auspicious ? 'rgba(46,204,113,0.08)' : (star === 5 || star === 2 ? 'rgba(231,76,60,0.08)' : 'rgba(231,76,60,0.04)');
+  let gridOrder = ['东南','南','西南','东','中','西','东北','北','西北'];
+  for (let i = 0; i < gridOrder.length; i++) {
+    let dir = gridOrder[i];
+    let star = starPos[dir];
+    let starInfo = FS_PRO_STARS[star];
+    let color = _fsProStarColor(star);
+    let bg = starInfo.auspicious ? 'rgba(46,204,113,0.08)' : (star === 5 || star === 2 ? 'rgba(231,76,60,0.08)' : 'rgba(231,76,60,0.04)');
 
     html += '<div style="background:' + bg + ';border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative">';
     html += '<div style="position:absolute;top:4px;left:4px;font-size:9px;opacity:.4">' + dir + '</div>';
@@ -1029,10 +1029,10 @@ function renderAnnualFlyingStars() {
   // 大凶方位预警
   html += '<div style="background:rgba(231,76,60,0.06);border:1px solid rgba(231,76,60,0.2);border-radius:10px;padding:16px;margin-bottom:16px">';
   html += '<h5 style="color:#e74c3c;font-size:13px;letter-spacing:3px;margin-bottom:12px">⚠️ 大凶方位预警</h5>';
-  for (var d in starPos) {
-    var st = starPos[d];
+  for (let d in starPos) {
+    let st = starPos[d];
     if (st === 5 || st === 2 || st === 3 || st === 7) {
-      var si = FS_PRO_STARS[st];
+      let si = FS_PRO_STARS[st];
       html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">';
       html += '<span style="color:#e74c3c;font-weight:bold;width:60px">' + d + '方</span>';
       html += '<span style="color:' + _fsProStarColor(st) + '">' + st + '·' + si.name + '</span>';
@@ -1050,10 +1050,10 @@ function renderAnnualFlyingStars() {
   // 大吉方位催旺
   html += '<div style="background:rgba(46,204,113,0.06);border:1px solid rgba(46,204,113,0.2);border-radius:10px;padding:16px;margin-bottom:16px">';
   html += '<h5 style="color:#2ecc71;font-size:13px;letter-spacing:3px;margin-bottom:12px">🌟 大吉方位催旺</h5>';
-  for (var dg in starPos) {
-    var sg = starPos[dg];
+  for (let dg in starPos) {
+    let sg = starPos[dg];
     if (sg === 8 || sg === 9 || sg === 1 || sg === 4 || sg === 6) {
-      var sgi = FS_PRO_STARS[sg];
+      let sgi = FS_PRO_STARS[sg];
       html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">';
       html += '<span style="color:#2ecc71;font-weight:bold;width:60px">' + dg + '方</span>';
       html += '<span style="color:' + _fsProStarColor(sg) + '">' + sg + '·' + sgi.name + '</span>';
@@ -1074,9 +1074,9 @@ function renderAnnualFlyingStars() {
   html += '<h5 style="color:#5dade2;font-size:13px;letter-spacing:3px;margin-bottom:10px">📅 当月（' + currentMonth + '月）飞星变化</h5>';
   html += '<div style="font-size:12px;opacity:.6;margin-bottom:10px">' + monthCenter + '入中宫</div>';
   html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;font-size:11px">';
-  for (var md in monthStarPos) {
-    var ms = monthStarPos[ms];
-    var mInfo = FS_PRO_STARS[monthStarPos[md]];
+  for (let md in monthStarPos) {
+    let ms = monthStarPos[ms];
+    let mInfo = FS_PRO_STARS[monthStarPos[md]];
     html += '<div style="background:rgba(255,255,255,0.03);border-radius:6px;padding:8px;text-align:center">';
     html += '<div style="opacity:.5">' + md + '</div>';
     html += '<div style="color:' + _fsProStarColor(monthStarPos[md]) + ';font-size:16px;font-weight:bold">' + monthStarPos[md] + '</div>';
@@ -1099,20 +1099,20 @@ function renderAnnualFlyingStars() {
  * 参考：《沈氏玄空学》《紫白诀》《八宅明镜》
  */
 function generateFamilyAnnualCure() {
-  var year = new Date().getFullYear();
-  var centerStar = _fsProYearCenter(year);
-  var starPos = _fsProFlyingStarGrid(centerStar);
+  let year = new Date().getFullYear();
+  let centerStar = _fsProYearCenter(year);
+  let starPos = _fsProFlyingStarGrid(centerStar);
 
   // 获取成员列表
-  var members = [];
-  var memberRows = document.querySelectorAll('.fs-pro-family-member-row');
-  for (var i = 0; i < memberRows.length; i++) {
-    var row = memberRows[i];
-    var name = row.querySelector('.fm-name').value.trim();
-    var birthYear = parseInt(row.querySelector('.fm-year').value);
-    var sex = row.querySelector('.fm-sex').value;
+  let members = [];
+  let memberRows = document.querySelectorAll('.fs-pro-family-member-row');
+  for (let i = 0; i < memberRows.length; i++) {
+    let row = memberRows[i];
+    let name = row.querySelector('.fm-name').value.trim();
+    let birthYear = parseInt(row.querySelector('.fm-year').value);
+    let sex = row.querySelector('.fm-sex').value;
     if (name && birthYear) {
-      var mingGua = _fsProMingGua(birthYear, sex);
+      let mingGua = _fsProMingGua(birthYear, sex);
       members.push({ name: name, birthYear: birthYear, sex: sex, mingGua: mingGua });
     }
   }
@@ -1123,14 +1123,14 @@ function generateFamilyAnnualCure() {
   }
 
   // 化解方案数据
-  var cureItems = {
+  let cureItems = {
     5: { name: '五黄大灾', items: ['六字真言铜葫芦（金属材质，金色，挂于五黄方位，1对）', '金属风铃（铜制，金色，挂于五黄方位，1串）', '铜制六帝钱（金色，挂于门框，1串）'], avoid: '忌动土、忌红色、忌黄色、忌久坐此方' },
     2: { name: '二黑病符', items: ['铜葫芦（纯铜，金色，放于病符方位，1对）', '金属风铃（铜制，金色，挂于此方，1串）', '天医符（纸质，黄色，贴于此方墙上，1张）'], avoid: '忌红色、忌黄色、忌久卧此方' },
     3: { name: '三碧是非', items: ['红色地毯（布质，红色，铺于此方地面，1块）', '紫水晶簇（天然紫水晶，紫色，放于此方桌面，1块）', '红色中国结（丝绳，红色，挂于此方，1个）'], avoid: '忌绿色、忌黑色、忌在此方争吵' },
     7: { name: '七赤破财', items: ['蓝色装饰画（布面，蓝色，挂于此方墙上，1幅）', '小型水族箱（玻璃，蓝色，放于此方，1个，养6条黑色金鱼）', '黑曜石球（天然黑曜石，黑色，放于此方，1个）'], avoid: '忌红色、忌金属摆件' }
   };
 
-  var auspiciousCures = {
+  let auspiciousCures = {
     8: { name: '八白正财', items: ['黄水晶球（天然黄水晶，黄色，放于财位，1个）', '聚宝盆（陶瓷，金色内衬，放于财位，1个，内放88枚硬币）', '红色地毯（布质，红色，铺于此方，1块）'], tip: '宜在此方办公、谈生意、放保险箱' },
     9: { name: '九紫喜庆', items: ['紫色水晶簇（天然紫水晶，紫色，放于此方，1块）', '九枝红玫瑰（鲜花，红色，放于此方花瓶，1束）', '红色装饰灯（LED，暖红色，放于此方，1盏）'], tip: '宜在此方相亲、婚房、庆祝' },
     1: { name: '一白桃花', items: ['水培富贵竹（活体植物，绿色，放于此方，1瓶，水养4枝）', '蓝色装饰（玻璃/布面，蓝色，放于此方，适量）'], tip: '宜在此方社交、交友、谈心' },
@@ -1138,7 +1138,7 @@ function generateFamilyAnnualCure() {
     6: { name: '六白武曲', items: ['铜马（纯铜，金色，放于此方，1对，马头朝外）', '金属印章（铜制，金色，放于此方桌面，1枚）'], tip: '宜在此方办公、求职、见贵人' }
   };
 
-  var html = '';
+  let html = '';
   html += '<div class="fs-pro-result" style="animation:fadeUp .6s ease">';
 
   // 年度概况
@@ -1148,12 +1148,12 @@ function generateFamilyAnnualCure() {
   html += '</div>';
 
   // 为每位成员生成方案
-  for (var mi = 0; mi < members.length; mi++) {
-    var m = members[mi];
+  for (let mi = 0; mi < members.length; mi++) {
+    let m = members[mi];
     // 东四命吉方：北、南、东、东南
     // 西四命吉方：西、西南、西北、东北
-    var goodDirs = m.mingGua.isDong ? ['北','南','东','东南'] : ['西','西南','西北','东北'];
-    var badDirs = m.mingGua.isDong ? ['西','西南','西北','东北'] : ['北','南','东','东南'];
+    let goodDirs = m.mingGua.isDong ? ['北','南','东','东南'] : ['西','西南','西北','东北'];
+    let badDirs = m.mingGua.isDong ? ['西','西南','西北','东北'] : ['北','南','东','东南'];
 
     html += '<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(201,168,76,0.15);border-radius:12px;padding:20px;margin-bottom:16px">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">';
@@ -1164,15 +1164,15 @@ function generateFamilyAnnualCure() {
     // 流年凶方需化解
     html += '<div style="margin-bottom:12px">';
     html += '<div style="font-size:12px;color:#e74c3c;margin-bottom:6px">⚠️ 需化解的凶方</div>';
-    for (var d in starPos) {
-      var st = starPos[d];
+    for (let d in starPos) {
+      let st = starPos[d];
       if (cureItems[st]) {
-        var ci = cureItems[st];
-        var affectsMe = badDirs.includes(d);
+        let ci = cureItems[st];
+        let affectsMe = badDirs.includes(d);
         html += '<div style="background:rgba(231,76,60,0.04);border-radius:6px;padding:10px;margin-bottom:6px">';
         html += '<div style="font-size:12px;color:#e74c3c;font-weight:bold">' + d + '方 — ' + ci.name + (affectsMe ? '（⚠️ 此方为你的凶方，重点化解）' : '') + '</div>';
         html += '<div style="font-size:11px;opacity:.6;margin-top:4px">化解物品：</div>';
-        for (var ii = 0; ii < ci.items.length; ii++) {
+        for (let ii = 0; ii < ci.items.length; ii++) {
           html += '<div style="font-size:11px;opacity:.7;padding-left:12px">• ' + ci.items[ii] + '</div>';
         }
         html += '<div style="font-size:11px;color:#e67e22;margin-top:4px">禁忌：' + ci.avoid + '</div>';
@@ -1184,15 +1184,15 @@ function generateFamilyAnnualCure() {
     // 吉方催旺
     html += '<div style="margin-bottom:12px">';
     html += '<div style="font-size:12px;color:#2ecc71;margin-bottom:6px">🌟 宜催旺的吉方</div>';
-    for (var gd in starPos) {
-      var gs = starPos[gd];
+    for (let gd in starPos) {
+      let gs = starPos[gd];
       if (auspiciousCures[gs]) {
-        var ac = auspiciousCures[gs];
-        var goodForMe = goodDirs.includes(gd);
+        let ac = auspiciousCures[gs];
+        let goodForMe = goodDirs.includes(gd);
         html += '<div style="background:rgba(46,204,113,0.04);border-radius:6px;padding:10px;margin-bottom:6px">';
         html += '<div style="font-size:12px;color:#2ecc71;font-weight:bold">' + gd + '方 — ' + ac.name + (goodForMe ? '（✅ 此方为你的吉方，加倍催旺）' : '') + '</div>';
         html += '<div style="font-size:11px;opacity:.6;margin-top:4px">催旺物品：</div>';
-        for (var ai = 0; ai < ac.items.length; ai++) {
+        for (let ai = 0; ai < ac.items.length; ai++) {
           html += '<div style="font-size:11px;opacity:.7;padding-left:12px">• ' + ac.items[ai] + '</div>';
         }
         html += '<div style="font-size:11px;color:#27ae60;margin-top:4px">提示：' + ac.tip + '</div>';
@@ -1215,20 +1215,20 @@ function generateFamilyAnnualCure() {
   html += '<div style="background:rgba(155,89,182,0.06);border:1px solid rgba(155,89,182,0.2);border-radius:10px;padding:20px;margin-top:16px">';
   html += '<h5 style="color:#9b59b6;font-size:14px;letter-spacing:3px;margin-bottom:14px">📅 分季度执行计划</h5>';
 
-  var quarters = [
+  let quarters = [
     { name: '第一季度（1-3月）', focus: '春季木旺，重点化解三碧是非星方位', tasks: ['春节前完成五黄、二黑方位物品布置', '三碧方放红色装饰', '开春检查所有化煞物品是否完好'] },
     { name: '第二季度（4-6月）', focus: '夏季火旺，催旺九紫喜庆星方位', tasks: ['九紫方放红色装饰催喜庆', '四绿方放文昌塔催学业（中高考在即）', '检查五黄方是否有动土，及时补救'] },
     { name: '第三季度（7-9月）', focus: '秋季金旺，化解七赤破财星方位', tasks: ['七赤方放蓝色装饰或水族箱', '八白财位放黄水晶球催财', '中秋前后检查流月飞星变化'] },
     { name: '第四季度（10-12月）', focus: '冬季水旺，总结年度风水效果', tasks: ['年终盘点化解效果，调整不灵验的物品', '提前准备来年飞星盘分析', '冬至前后为关键转折点，注意五黄方位'] }
   ];
 
-  for (var qi = 0; qi < quarters.length; qi++) {
-    var q = quarters[qi];
+  for (let qi = 0; qi < quarters.length; qi++) {
+    let q = quarters[qi];
     html += '<div style="margin-bottom:12px">';
     html += '<div style="font-size:13px;color:#9b59b6;font-weight:bold;margin-bottom:4px">' + q.name + '</div>';
     html += '<div style="font-size:11px;opacity:.5;margin-bottom:4px">' + q.focus + '</div>';
     html += '<ul style="font-size:11px;opacity:.7;padding-left:20px;line-height:1.8">';
-    for (var ti = 0; ti < q.tasks.length; ti++) {
+    for (let ti = 0; ti < q.tasks.length; ti++) {
       html += '<li>' + q.tasks[ti] + '</li>';
     }
     html += '</ul></div>';
@@ -1259,9 +1259,9 @@ function generateFamilyAnnualCure() {
 
 /** 添加家庭成员行 */
 function addFamilyMemberRow() {
-  var container = document.getElementById('fs-pro-family-members');
+  let container = document.getElementById('fs-pro-family-members');
   if (!container) return;
-  var row = document.createElement('div');
+  let row = document.createElement('div');
   row.className = 'fs-pro-family-member-row';
   row.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px';
   row.innerHTML =
@@ -1283,31 +1283,31 @@ function addFamilyMemberRow() {
  * 参考：《钦定协纪辨方书》《玉匣记》《象吉通书》
  */
 function fengshuiZeRi() {
-  var eventType = document.getElementById('fs-pro-zeri-type').value;
-  var startDate = document.getElementById('fs-pro-zeri-start').value;
-  var endDate = document.getElementById('fs-pro-zeri-end').value;
+  let eventType = document.getElementById('fs-pro-zeri-type').value;
+  let startDate = document.getElementById('fs-pro-zeri-start').value;
+  let endDate = document.getElementById('fs-pro-zeri-end').value;
 
   if (!startDate || !endDate) {
     _fsProToast('请选择查询日期范围');
     return '<div style="text-align:center;padding:40px;color:#e74c3c">请选择日期范围</div>';
   }
 
-  var start = new Date(startDate);
-  var end = new Date(endDate);
+  let start = new Date(startDate);
+  let end = new Date(endDate);
   if (start > end) {
     _fsProToast('开始日期不能晚于结束日期');
     return '<div style="text-align:center;padding:40px;color:#e74c3c">日期范围无效</div>';
   }
 
   // 限制查询范围（最多90天）
-  var maxEnd = new Date(start);
+  let maxEnd = new Date(start);
   maxEnd.setDate(maxEnd.getDate() + 90);
   if (end > maxEnd) end = maxEnd;
 
   // 黄道吉日（建除十二神+神煞推算）
   // 建除十二神：建、除、满、平、定、执、破、危、成、收、开、闭
   // 各事件宜忌：
-  var eventConfig = {
+  let eventConfig = {
     move: { name: '搬家入宅', yi: ['成','开','满'], ji: ['破','收','闭','建'], desc: '入宅择日宜选成日、开日、满日', special: '入宅宜选天赦日、天愿日、母仓日' },
     construction: { name: '动土装修', yi: ['成','定','开'], ji: ['破','收','闭','建','执'], desc: '动土宜选成日、定日、开日', special: '动土须避开太岁方、三煞方、五黄方' },
     business: { name: '开业', yi: ['成','满','开','定'], ji: ['破','收','闭'], desc: '开业宜选成日、满日、开日', special: '开业宜选天富日、天贵日、月财日' },
@@ -1315,14 +1315,14 @@ function fengshuiZeRi() {
     burial: { name: '安葬', yi: ['定','成','收','闭'], ji: ['建','满','破','开'], desc: '安葬宜选定日、成日、收日', special: '安葬须避开重丧日、三丧日' }
   };
 
-  var config = eventConfig[eventType] || eventConfig['move'];
+  let config = eventConfig[eventType] || eventConfig['move'];
 
   // 日建十二神计算：以节气定月建，再以日干支推建除
-  var jianChu = ['建','除','满','平','定','执','破','危','成','收','开','闭'];
+  let jianChu = ['建','除','满','平','定','执','破','危','成','收','开','闭'];
 
   // 月支依节气推算（非公历月）
   // 立春~惊蛰=寅月，惊蛰~清明=卯月，... 各节气近似日期
-  var jieQiDates = [
+  let jieQiDates = [
     { jie: '立春', month: 2, day: 4, zhi: '寅' },
     { jie: '惊蛰', month: 3, day: 6, zhi: '卯' },
     { jie: '清明', month: 4, day: 5, zhi: '辰' },
@@ -1338,15 +1338,15 @@ function fengshuiZeRi() {
   ];
   // 依据节气确定月支
   function _getMonthZhiByJieQi(date) {
-    var y = date.getFullYear();
-    var m = date.getMonth() + 1;
-    var d = date.getDate();
-    var md = m * 100 + d;
+    let y = date.getFullYear();
+    let m = date.getMonth() + 1;
+    let d = date.getDate();
+    let md = m * 100 + d;
     // 遍历节气，找到最后一个已过的节气
-    var currentZhi = '丑'; // 默认丑月（小寒前）
-    for (var i = 0; i < jieQiDates.length; i++) {
-      var jq = jieQiDates[i];
-      var jqMd = jq.month * 100 + jq.day;
+    let currentZhi = '丑'; // 默认丑月（小寒前）
+    for (let i = 0; i < jieQiDates.length; i++) {
+      let jq = jieQiDates[i];
+      let jqMd = jq.month * 100 + jq.day;
       // 同年节气
       if (jq.month <= m && jqMd <= md) {
         currentZhi = jq.zhi;
@@ -1357,33 +1357,33 @@ function fengshuiZeRi() {
     return currentZhi;
   }
 
-  var goodDays = [];
-  var badDays = [];
-  var current = new Date(start);
+  let goodDays = [];
+  let badDays = [];
+  let current = new Date(start);
 
   while (current <= end) {
-    var gz = _fsProDayGanZhi(current);
-    var monthZhi = _getMonthZhiByJieQi(current);
+    let gz = _fsProDayGanZhi(current);
+    let monthZhi = _getMonthZhiByJieQi(current);
     // 日建：月支为建，依次排列
-    var zhiIndex = FS_PRO_ZHI.indexOf(gz.zhi);
-    var monthZhiIndex = FS_PRO_ZHI.indexOf(monthZhi);
-    var jianChuIndex = ((zhiIndex - monthZhiIndex) % 12 + 12) % 12;
-    var dayJianChu = jianChu[jianChuIndex];
+    let zhiIndex = FS_PRO_ZHI.indexOf(gz.zhi);
+    let monthZhiIndex = FS_PRO_ZHI.indexOf(monthZhi);
+    let jianChuIndex = ((zhiIndex - monthZhiIndex) % 12 + 12) % 12;
+    let dayJianChu = jianChu[jianChuIndex];
 
     // 吉凶判断：建除宜忌+神煞辅参
-    var isGood = config.yi.includes(dayJianChu);
-    var isBad = config.ji.includes(dayJianChu);
+    let isGood = config.yi.includes(dayJianChu);
+    let isBad = config.ji.includes(dayJianChu);
 
     // 天赦日（古制：春季戊寅日、夏季甲午日、秋季戊申日、冬季甲子日）
     // 依《协纪辨方书》天赦日每季仅一干支，为百无禁忌之吉日
-    var season = Math.floor((current.getMonth() + 1) / 3) % 4; // 0春1夏2秋3冬
-    var tianshe = false;
+    let season = Math.floor((current.getMonth() + 1) / 3) % 4; // 0春1夏2秋3冬
+    let tianshe = false;
     if (season === 0 && gz.gan === '戊' && gz.zhi === '寅') tianshe = true;
     if (season === 1 && gz.gan === '甲' && gz.zhi === '午') tianshe = true;
     if (season === 2 && gz.gan === '戊' && gz.zhi === '申') tianshe = true;
     if (season === 3 && gz.gan === '甲' && gz.zhi === '子') tianshe = true;
 
-    var dayInfo = {
+    let dayInfo = {
       date: new Date(current),
       ganzhi: gz.gan + gz.zhi,
       jianchu: dayJianChu,
@@ -1399,7 +1399,7 @@ function fengshuiZeRi() {
     current.setDate(current.getDate() + 1);
   }
 
-  var html = '';
+  let html = '';
   html += '<div class="fs-pro-result" style="animation:fadeUp .6s ease">';
 
   // 事件信息
@@ -1422,9 +1422,9 @@ function fengshuiZeRi() {
     html += '<div style="background:rgba(46,204,113,0.06);border:1px solid rgba(46,204,113,0.2);border-radius:10px;padding:16px;margin-bottom:16px">';
     html += '<h5 style="color:#2ecc71;font-size:14px;letter-spacing:3px;margin-bottom:12px">✅ 宜选吉日（共' + goodDays.length + '天）</h5>';
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px">';
-    for (var gi = 0; gi < goodDays.length; gi++) {
-      var gd = goodDays[gi];
-      var dStr = gd.date.getFullYear() + '-' + (gd.date.getMonth() + 1).toString().padStart(2, '0') + '-' + gd.date.getDate().toString().padStart(2, '0');
+    for (let gi = 0; gi < goodDays.length; gi++) {
+      let gd = goodDays[gi];
+      let dStr = gd.date.getFullYear() + '-' + (gd.date.getMonth() + 1).toString().padStart(2, '0') + '-' + gd.date.getDate().toString().padStart(2, '0');
       html += '<div style="background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.15);border-radius:8px;padding:10px;text-align:center">';
       html += '<div style="font-size:13px;color:#2ecc71;font-weight:bold">' + dStr + '</div>';
       html += '<div style="font-size:11px;opacity:.6;margin-top:2px">' + gd.ganzhi + '日 · 星期' + gd.week + '</div>';
@@ -1443,9 +1443,9 @@ function fengshuiZeRi() {
     html += '<div style="background:rgba(231,76,60,0.04);border:1px solid rgba(231,76,60,0.1);border-radius:10px;padding:16px">';
     html += '<h5 style="color:#e74c3c;font-size:13px;letter-spacing:3px;margin-bottom:10px">❌ 应避开的日子（共' + badDays.length + '天）</h5>';
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;font-size:11px">';
-    for (var bi = 0; bi < Math.min(badDays.length, 20); bi++) {
-      var bd = badDays[bi];
-      var bdStr = bd.date.getFullYear() + '-' + (bd.date.getMonth() + 1).toString().padStart(2, '0') + '-' + bd.date.getDate().toString().padStart(2, '0');
+    for (let bi = 0; bi < Math.min(badDays.length, 20); bi++) {
+      let bd = badDays[bi];
+      let bdStr = bd.date.getFullYear() + '-' + (bd.date.getMonth() + 1).toString().padStart(2, '0') + '-' + bd.date.getDate().toString().padStart(2, '0');
       html += '<div style="background:rgba(231,76,60,0.06);border-radius:6px;padding:8px;text-align:center">';
       html += '<div style="color:#e74c3c">' + bdStr + '</div>';
       html += '<div style="opacity:.5">' + bd.ganzhi + ' · ' + bd.jianchu + '日</div>';
@@ -1484,10 +1484,10 @@ function fengshuiZeRi() {
 function computeChengmenJue(xuankongData, chaoxiang) {
   try {
     // 八方位与两旁方位的映射
-    var dirNumMap = {'北':1,'南':9,'东':3,'西':7,'东北':8,'西北':6,'东南':4,'西南':2};
-    var numDirMap = {1:'北',2:'西南',3:'东',4:'东南',6:'西北',7:'西',8:'东北',9:'南'};
+    let dirNumMap = {'北':1,'南':9,'东':3,'西':7,'东北':8,'西北':6,'东南':4,'西南':2};
+    let numDirMap = {1:'北',2:'西南',3:'东',4:'东南',6:'西北',7:'西',8:'东北',9:'南'};
     // 每个向方两旁的宫位（顺时针和逆时针相邻方位）
-    var adjacentMap = {
+    let adjacentMap = {
       '北':   ['西北','东北'],
       '南':   ['东南','西南'],
       '东':   ['东北','东南'],
@@ -1499,23 +1499,23 @@ function computeChengmenJue(xuankongData, chaoxiang) {
     };
 
     // 当前元运旺星和生气星
-    var period = xuankongData && xuankongData.period ? xuankongData.period : (Math.floor((new Date().getFullYear() - 1864) / 20) + 1);
-    var wangStar = period;
-    var shengStar = (period % 9) + 1; // 生气星（下一运旺星）
+    let period = xuankongData && xuankongData.period ? xuankongData.period : (Math.floor((new Date().getFullYear() - 1864) / 20) + 1);
+    let wangStar = period;
+    let shengStar = (period % 9) + 1; // 生气星（下一运旺星）
 
     // 九星信息
-    var starNames = {1:'一白贪狼',2:'二黑巨门',3:'三碧禄存',4:'四绿文曲',5:'五黄廉贞',6:'六白武曲',7:'七赤破军',8:'八白左辅',9:'九紫右弼'};
-    var starElements = {1:'水',2:'土',3:'木',4:'木',5:'土',6:'金',7:'金',8:'土',9:'火'};
+    let starNames = {1:'一白贪狼',2:'二黑巨门',3:'三碧禄存',4:'四绿文曲',5:'五黄廉贞',6:'六白武曲',7:'七赤破军',8:'八白左辅',9:'九紫右弼'};
+    let starElements = {1:'水',2:'土',3:'木',4:'木',5:'土',6:'金',7:'金',8:'土',9:'火'};
 
     // 如果有完整的飞星盘数据，使用之；否则基于简略数据推算
-    var xiangPan = xuankongData && xuankongData.xiangPan ? xuankongData.xiangPan : null;
-    var yunPan = xuankongData && xuankongData.yunPan ? xuankongData.yunPan : null;
+    let xiangPan = xuankongData && xuankongData.xiangPan ? xuankongData.xiangPan : null;
+    let yunPan = xuankongData && xuankongData.yunPan ? xuankongData.yunPan : null;
 
-    var xiangDir = chaoxiang || '南';
-    var adjDirs = adjacentMap[xiangDir] || ['东南','西南'];
+    let xiangDir = chaoxiang || '南';
+    let adjDirs = adjacentMap[xiangDir] || ['东南','西南'];
 
-    var results = [];
-    var html = '';
+    let results = [];
+    let html = '';
     html += '<div style="margin-top:30px">';
     html += '<h5 style="font-size:14px;letter-spacing:4px;color:var(--gold);margin-bottom:6px">🚪 城门诀分析</h5>';
     html += '<p style="font-size:12px;opacity:.5;margin-bottom:16px">向方两旁宫位向星判断 · 《沈氏玄空学》城门篇</p>';
@@ -1527,12 +1527,12 @@ function computeChengmenJue(xuankongData, chaoxiang) {
     html += '<strong>城门开与不开：</strong>城门可用之方宜开门开窗、设通道，引旺气入宅；城门不可用之方忌开门窗，否则引凶气入宅。';
     html += '</div></div>';
 
-    for (var i = 0; i < adjDirs.length; i++) {
-      var adjDir = adjDirs[i];
-      var adjNum = dirNumMap[adjDir] || 1;
+    for (let i = 0; i < adjDirs.length; i++) {
+      let adjDir = adjDirs[i];
+      let adjNum = dirNumMap[adjDir] || 1;
       
       // 获取该宫位的向星
-      var xiangStar = null;
+      let xiangStar = null;
       if (xiangPan && xiangPan[adjNum]) {
         xiangStar = xiangPan[adjNum];
       } else {
@@ -1540,16 +1540,16 @@ function computeChengmenJue(xuankongData, chaoxiang) {
         xiangStar = ((period - 1 + adjNum) % 9) + 1;
       }
       
-      var starName = starNames[xiangStar] || '未知';
-      var starEle = starElements[xiangStar] || '土';
-      var isWang = (xiangStar === wangStar);
-      var isSheng = (xiangStar === shengStar);
-      var usable = isWang || isSheng;
+      let starName = starNames[xiangStar] || '未知';
+      let starEle = starElements[xiangStar] || '土';
+      let isWang = (xiangStar === wangStar);
+      let isSheng = (xiangStar === shengStar);
+      let usable = isWang || isSheng;
       
-      var statusText = '';
-      var statusColor = '';
-      var effectText = '';
-      var cureText = '';
+      let statusText = '';
+      let statusColor = '';
+      let effectText = '';
+      let cureText = '';
       
       if (isWang) {
         statusText = '城门可用（旺星到城门）';
@@ -1614,14 +1614,14 @@ function computeChengmenJue(xuankongData, chaoxiang) {
     }
 
     // 城门诀总结
-    var anyUsable = results.some(function(r) { return r.usable; });
+    let anyUsable = results.some(function(r) { return r.usable; });
     html += '<div style="background:rgba(46,204,113,0.06);border:1px solid rgba(46,204,113,0.15);border-radius:10px;padding:14px;margin-top:8px">';
     if (anyUsable) {
-      var usableDirs = results.filter(function(r){return r.usable;}).map(function(r){return r.direction;}).join('、');
+      let usableDirs = results.filter(function(r){return r.usable;}).map(function(r){return r.direction;}).join('、');
       html += '<div style="font-size:13px;color:#2ecc71;line-height:1.8">✅ <strong>城门诀总结：</strong>本宅' + usableDirs + '方城门可用，宜开门开窗引入旺气。';
       html += '若本宅已得旺山旺向，城门为锦上添花，令宅运更旺；若非旺山旺向，城门可补救，以城门之力补向方之不足，化凶为吉。</div>';
     } else {
-      var allBad = results.every(function(r) { return r.xiangStar === 5 || r.xiangStar === 2; });
+      let allBad = results.every(function(r) { return r.xiangStar === 5 || r.xiangStar === 2; });
       if (allBad) {
         html += '<div style="font-size:13px;color:#e74c3c;line-height:1.8">⚠️ <strong>城门诀总结：</strong>本宅两旁城门均不可用，向方两旁均为凶星。宜封堵两旁门窗，专以向方纳气。若无旺山旺向，需以布局化煞为主，放铜葫芦、五帝钱等化解凶气。</div>';
       } else {
@@ -1655,7 +1655,7 @@ function computeChengmenJue(xuankongData, chaoxiang) {
 function computeFeixingCombos(xuankongData, chaoxiang) {
   try {
     // 经典飞星组合数据库（山星+向星组合）
-    var comboDB = [
+    let comboDB = [
       {
         stars: [1, 4],
         name: '一四同宫',
@@ -1824,31 +1824,31 @@ function computeFeixingCombos(xuankongData, chaoxiang) {
     ];
 
     // 获取飞星盘数据
-    var shanPan = xuankongData && xuankongData.shanPan ? xuankongData.shanPan : null;
-    var xiangPan = xuankongData && xuankongData.xiangPan ? xuankongData.xiangPan : null;
-    var yunPan = xuankongData && xuankongData.yunPan ? xuankongData.yunPan : null;
-    var period = xuankongData && xuankongData.period ? xuankongData.period : (Math.floor((new Date().getFullYear() - 1864) / 20) + 1);
-    var wangStar = period;
+    let shanPan = xuankongData && xuankongData.shanPan ? xuankongData.shanPan : null;
+    let xiangPan = xuankongData && xuankongData.xiangPan ? xuankongData.xiangPan : null;
+    let yunPan = xuankongData && xuankongData.yunPan ? xuankongData.yunPan : null;
+    let period = xuankongData && xuankongData.period ? xuankongData.period : (Math.floor((new Date().getFullYear() - 1864) / 20) + 1);
+    let wangStar = period;
 
-    var starNames = {1:'一白',2:'二黑',3:'三碧',4:'四绿',5:'五黄',6:'六白',7:'七赤',8:'八白',9:'九紫'};
-    var gongNames = {1:'坎(北)',2:'坤(西南)',3:'震(东)',4:'巽(东南)',6:'乾(西北)',7:'兑(西)',8:'艮(东北)',9:'离(南)'};
-    var dirNumMap = {'北':1,'南':9,'东':3,'西':7,'东北':8,'西北':6,'东南':4,'西南':2};
+    let starNames = {1:'一白',2:'二黑',3:'三碧',4:'四绿',5:'五黄',6:'六白',7:'七赤',8:'八白',9:'九紫'};
+    let gongNames = {1:'坎(北)',2:'坤(西南)',3:'震(东)',4:'巽(东南)',6:'乾(西北)',7:'兑(西)',8:'艮(东北)',9:'离(南)'};
+    let dirNumMap = {'北':1,'南':9,'东':3,'西':7,'东北':8,'西北':6,'东南':4,'西南':2};
 
     // 收集九宫的山向星组合
-    var combos = [];
-    var palacePositions = [1,2,3,4,6,7,8,9]; // 排除中宫
+    let combos = [];
+    let palacePositions = [1,2,3,4,6,7,8,9]; // 排除中宫
 
-    for (var pi = 0; pi < palacePositions.length; pi++) {
-      var gongNum = palacePositions[pi];
-      var shanStar = shanPan ? (shanPan[gongNum] || 0) : 0;
-      var xiangStar = xiangPan ? (xiangPan[gongNum] || 0) : 0;
-      var yunStar = yunPan ? (yunPan[gongNum] || 0) : 0;
+    for (let pi = 0; pi < palacePositions.length; pi++) {
+      let gongNum = palacePositions[pi];
+      let shanStar = shanPan ? (shanPan[gongNum] || 0) : 0;
+      let xiangStar = xiangPan ? (xiangPan[gongNum] || 0) : 0;
+      let yunStar = yunPan ? (yunPan[gongNum] || 0) : 0;
       
       if (shanStar > 0 && xiangStar > 0) {
         // 查找匹配的经典组合
-        var matched = null;
-        for (var ci = 0; ci < comboDB.length; ci++) {
-          var combo = comboDB[ci];
+        let matched = null;
+        for (let ci = 0; ci < comboDB.length; ci++) {
+          let combo = comboDB[ci];
           if ((combo.stars[0] === shanStar && combo.stars[1] === xiangStar) ||
               (combo.stars[0] === xiangStar && combo.stars[1] === shanStar)) {
             matched = combo;
@@ -1857,10 +1857,10 @@ function computeFeixingCombos(xuankongData, chaoxiang) {
         }
         
         // 同时检查运星与山向星的组合
-        var matchedYunShan = null;
-        var matchedYunXiang = null;
-        for (var ci2 = 0; ci2 < comboDB.length; ci2++) {
-          var combo2 = comboDB[ci2];
+        let matchedYunShan = null;
+        let matchedYunXiang = null;
+        for (let ci2 = 0; ci2 < comboDB.length; ci2++) {
+          let combo2 = comboDB[ci2];
           if ((combo2.stars[0] === yunStar && combo2.stars[1] === shanStar) ||
               (combo2.stars[0] === shanStar && combo2.stars[1] === yunStar)) {
             matchedYunShan = combo2;
@@ -1885,7 +1885,7 @@ function computeFeixingCombos(xuankongData, chaoxiang) {
     }
 
     // 如果没有完整飞星盘数据，基于运盘生成组合分析
-    var html = '';
+    let html = '';
     html += '<div style="margin-top:30px">';
     html += '<h5 style="font-size:14px;letter-spacing:4px;color:var(--gold);margin-bottom:6px">🌟 飞星组合深化分析</h5>';
     html += '<p style="font-size:12px;opacity:.5;margin-bottom:16px">经典飞星组合吉凶解读 · 《沈氏玄空学》《紫白诀》《飞星赋》</p>';
@@ -1900,19 +1900,19 @@ function computeFeixingCombos(xuankongData, chaoxiang) {
 
     if (combos.length > 0) {
       // 有完整飞星盘：按宫位显示匹配的组合
-      for (var i = 0; i < combos.length; i++) {
-        var c = combos[i];
-        var allMatches = [];
+      for (let i = 0; i < combos.length; i++) {
+        let c = combos[i];
+        let allMatches = [];
         if (c.matched) allMatches.push({type: '山向', combo: c.matched});
         if (c.matchedYunShan && c.matchedYunShan !== c.matched) allMatches.push({type: '运山', combo: c.matchedYunShan});
         if (c.matchedYunXiang && c.matchedYunXiang !== c.matched && c.matchedYunXiang !== c.matchedYunShan) allMatches.push({type: '运向', combo: c.matchedYunXiang});
         
         if (allMatches.length === 0) continue;
         
-        for (var mi = 0; mi < allMatches.length; mi++) {
-          var m = allMatches[mi];
-          var luckColor = m.combo.luck === '吉' ? '#2ecc71' : m.combo.luck === '大凶' ? '#dc3545' : m.combo.luck === '凶' ? '#e74c3c' : '#c9a84c';
-          var luckBg = m.combo.luck === '吉' ? 'rgba(46,204,113,0.06)' : m.combo.luck === '大凶' ? 'rgba(220,53,69,0.06)' : m.combo.luck === '凶' ? 'rgba(231,76,60,0.06)' : 'rgba(201,168,76,0.06)';
+        for (let mi = 0; mi < allMatches.length; mi++) {
+          let m = allMatches[mi];
+          let luckColor = m.combo.luck === '吉' ? '#2ecc71' : m.combo.luck === '大凶' ? '#dc3545' : m.combo.luck === '凶' ? '#e74c3c' : '#c9a84c';
+          let luckBg = m.combo.luck === '吉' ? 'rgba(46,204,113,0.06)' : m.combo.luck === '大凶' ? 'rgba(220,53,69,0.06)' : m.combo.luck === '凶' ? 'rgba(231,76,60,0.06)' : 'rgba(201,168,76,0.06)';
           
           html += '<div style="background:' + luckBg + ';border:1px solid ' + luckColor + '20;border-radius:10px;padding:16px;margin-bottom:12px;border-left:3px solid ' + luckColor + '">';
           html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">';
@@ -1935,10 +1935,10 @@ function computeFeixingCombos(xuankongData, chaoxiang) {
     html += '<div style="margin-top:20px"><h6 style="font-size:13px;letter-spacing:3px;color:var(--gold);margin-bottom:12px">📚 经典飞星组合速查表</h6>';
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px">';
     
-    for (var di = 0; di < comboDB.length; di++) {
-      var db = comboDB[di];
-      var lc = db.luck === '吉' ? '#2ecc71' : db.luck === '大凶' ? '#dc3545' : db.luck === '凶' ? '#e74c3c' : '#c9a84c';
-      var lbg = db.luck === '吉' ? 'rgba(46,204,113,0.04)' : db.luck === '大凶' ? 'rgba(220,53,69,0.04)' : db.luck === '凶' ? 'rgba(231,76,60,0.04)' : 'rgba(201,168,76,0.04)';
+    for (let di = 0; di < comboDB.length; di++) {
+      let db = comboDB[di];
+      let lc = db.luck === '吉' ? '#2ecc71' : db.luck === '大凶' ? '#dc3545' : db.luck === '凶' ? '#e74c3c' : '#c9a84c';
+      let lbg = db.luck === '吉' ? 'rgba(46,204,113,0.04)' : db.luck === '大凶' ? 'rgba(220,53,69,0.04)' : db.luck === '凶' ? 'rgba(231,76,60,0.04)' : 'rgba(201,168,76,0.04)';
       
       html += '<div style="background:' + lbg + ';border:1px solid ' + lc + '15;border-radius:8px;padding:12px;border-left:3px solid ' + lc + '">';
       html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
@@ -1965,9 +1965,9 @@ function computeFeixingCombos(xuankongData, chaoxiang) {
 // ============================================================
 
 function showFengshuiProSub(id, btnEl) {
-  var subIds = ['fengshui-daily-content','fengshui-layout-content','fengshui-business-content','fengshui-shaqi-content','fengshui-stars-content','fengshui-cure-content','fengshui-zeri-content'];
+  let subIds = ['fengshui-daily-content','fengshui-layout-content','fengshui-business-content','fengshui-shaqi-content','fengshui-stars-content','fengshui-cure-content','fengshui-zeri-content'];
   subIds.forEach(function(sid) {
-    var el = document.getElementById(sid);
+    let el = document.getElementById(sid);
     if (el) el.style.display = (sid === id) ? 'block' : 'none';
   });
   if (btnEl) {
@@ -1978,10 +1978,10 @@ function showFengshuiProSub(id, btnEl) {
 
 /** 触发计算并渲染 */
 function fsProCompute(type) {
-  var outputId = 'fs-pro-output-' + type;
-  var output = document.getElementById(outputId);
+  let outputId = 'fs-pro-output-' + type;
+  let output = document.getElementById(outputId);
   if (!output) return;
-  var html = '';
+  let html = '';
   switch (type) {
     case 'daily': html = getDailyFengshuiGuide(); break;
     case 'layout': html = diagnoseHomeLayout(); break;

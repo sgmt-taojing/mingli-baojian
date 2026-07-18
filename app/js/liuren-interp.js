@@ -92,7 +92,7 @@ function buildLiuRenProfessionalInterpretation(keShi, name, year, month, day, ho
   sanChuanPan += '\n';
 
   sanChuanPan += '【三传生克流转】\n';
-  for (var i = 0; i < ck.length; i++) {
+  for (let i = 0; i < ck.length; i++) {
     sanChuanPan += '  ▸ ' + ck[i] + '\n';
   }
   sanChuanPan += '\n《六壬指南》曰:「三传者，始、中、终也。三传递生则事顺，递克则事阻。」\n';
@@ -107,14 +107,14 @@ function buildLiuRenProfessionalInterpretation(keShi, name, year, month, day, ho
   tianJiangPan += '贵人所在：' + tj.guirenZhi + '位（' + (tj.shunPai ? '顺排' : '逆排') + '）\n\n';
   
   const tianJiangList = [];
-  for (var zhi in tj.fenbu) {
+  for (let zhi in tj.fenbu) {
     tianJiangList.push({zhi: zhi, info: tj.fenbu[zhi]});
   }
   tianJiangList.sort(function(a, b) {
     return BRANCHES.indexOf(a.zhi) - BRANCHES.indexOf(b.zhi);
   });
   
-  for (var i = 0; i < tianJiangList.length; i++) {
+  for (let i = 0; i < tianJiangList.length; i++) {
     let t = tianJiangList[i];
     const marker = '';
     if (t.zhi === sc.faYong) marker = ' ←初传';
@@ -151,7 +151,7 @@ function buildLiuRenProfessionalInterpretation(keShi, name, year, month, day, ho
   shenShaPan += '当日课中所临神煞共' + ss.length + '位：\n\n';
   
   let jiShaCount = 0, xiongShaCount = 0;
-  for (var i = 0; i < ss.length; i++) {
+  for (let i = 0; i < ss.length; i++) {
     let s = ss[i];
     let tag = s.nature === '大吉' || s.nature === '吉' ? '【吉】' : (s.nature === '大凶' || s.nature === '凶' ? '【凶】' : '【平】');
     if (s.nature === '大吉' || s.nature === '吉') jiShaCount++;
@@ -228,7 +228,7 @@ function buildLiuRenProfessionalInterpretation(keShi, name, year, month, day, ho
   
   // 基于神煞的建议
   let hasTianDe = false, hasYiMa = false;
-  for (var i = 0; i < ss.length; i++) {
+  for (let i = 0; i < ss.length; i++) {
     if (ss[i].name === '天德') hasTianDe = true;
     if (ss[i].name === '驿马') hasYiMa = true;
   }

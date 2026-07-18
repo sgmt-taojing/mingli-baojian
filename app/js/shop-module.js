@@ -171,7 +171,7 @@ function renderShopProducts() {
     
     if (isClassic) {
       // 经典著作 - 书卷风格卡片
-      var tagsHtml = (item.tags||[]).map(function(t){
+      let tagsHtml = (item.tags||[]).map(function(t){
         return '<span class="classic-tag">'+t+'</span>';
       }).join('');
       let priceHtml = item.price;
@@ -245,11 +245,11 @@ function showProductDetail(productId) {
   
   title.textContent = item.name;
   
-  var tagsHtml = (item.tags||[]).map(function(t){
+  let tagsHtml = (item.tags||[]).map(function(t){
     return '<span>'+t+'</span>';
   }).join('');
   
-  var isClassic = item.categoryId === 'jingdian';
+  let isClassic = item.categoryId === 'jingdian';
   const html = '';
   
   // 大图
@@ -462,7 +462,7 @@ setTimeout(initShop, 500);
 
 // ===== 每日一句命理名言 =====
 (function(){
-  var quotes = [
+  let quotes = [
     {text:"上善若水，水善利万物而不争，处众人之所恶，故几于道。", author:"《道德经》第八章"},
     {text:"致虚极，守静笃。万物并作，吾以观复。归根曰静，是谓复命。", author:"《道德经》第十六章"},
     {text:"知人者智，自知者明。胜人者有力，自胜者强。知足者富。", author:"《道德经》第三十三章"},

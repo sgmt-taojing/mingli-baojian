@@ -15,7 +15,7 @@
   const ZHI_ELE = {子:'水',丑:'土',寅:'木',卯:'木',辰:'土',巳:'火',午:'火',未:'土',申:'金',酉:'金',戌:'土',亥:'水'};
 
   // 太岁地支方位
-  var BRANCH_DIRECTIONS = {
+  let BRANCH_DIRECTIONS = {
     0: '正北',   // 子
     1: '东北偏北', // 丑
     2: '东北偏东', // 寅
@@ -32,7 +32,7 @@
 
   // 年干吉位表
   // 甲己年、乙庚年、丙辛年、丁壬年、戊癸年
-  var YEAR_STEM_DIRECTIONS = {
+  let YEAR_STEM_DIRECTIONS = {
     0: {cai:'东北', xi:'东北', gui:'正北', wenchang:'正南'},  // 甲
     5: {cai:'东北', xi:'东北', gui:'正北', wenchang:'正南'},  // 己
     1: {cai:'正北', xi:'西北', gui:'西南', wenchang:'正北'},  // 乙
@@ -50,7 +50,7 @@
   const HAI_PAIRS = [[0,7],[7,0],[1,6],[6,1],[2,5],[5,2],[3,4],[4,3],[8,11],[11,8],[9,10],[10,9]];
 
   // 相刑: 寅巳申(无恩之刑)、丑戌未(恃势之刑)、子卯(无礼之刑)、辰辰(自刑)、午午(自刑)、酉酉(自刑)、亥亥(自刑)
-  var XING_GROUPS = [
+  let XING_GROUPS = [
     [2,5,8],   // 寅巳申
     [1,10,7],  // 丑戌未
     [0,3],     // 子卯
@@ -67,7 +67,7 @@
   const TEN_GOD_NAMES = {比:'比肩',劫:'劫财',食:'食神',伤:'伤官',财:'正财',才:'偏财',官:'正官',杀:'七杀',印:'正印',枭:'偏印'};
 
   // 天干十神表(本地副本)
-  var TENGAN_LOCAL = {
+  let TENGAN_LOCAL = {
     甲:{比:'甲',劫:'乙',食:'丙',伤:'丁',财:'己',才:'戊',官:'辛',杀:'庚',印:'癸',枭:'壬'},
     乙:{比:'乙',劫:'甲',食:'丁',伤:'丙',财:'戊',才:'己',官:'庚',杀:'辛',印:'壬',枭:'癸'},
     丙:{比:'丙',劫:'丁',食:'戊',伤:'己',财:'辛',才:'庚',官:'癸',杀:'壬',印:'乙',枭:'甲'},
@@ -81,7 +81,7 @@
   };
 
   // 长生十二宫
-  var CHANGSHENG_START_LOCAL = {
+  let CHANGSHENG_START_LOCAL = {
     '甲':'亥','丙':'寅','戊':'寅','庚':'巳','壬':'申',
     '乙':'午','丁':'酉','己':'酉','辛':'子','癸':'卯'
   };
@@ -89,14 +89,14 @@
   const GAN_YINYANG = {'甲':'阳','乙':'阴','丙':'阳','丁':'阴','戊':'阳','己':'阴','庚':'阳','辛':'阴','壬':'阳','癸':'阴'};
 
   // 藏干表
-  var ZHI_CANGGAN_LOCAL = {
+  let ZHI_CANGGAN_LOCAL = {
     '子':['癸'],'丑':['己','癸','辛'],'寅':['甲','丙','戊'],'卯':['乙'],
     '辰':['戊','乙','癸'],'巳':['丙','戊','庚'],'午':['丁','己'],'未':['己','丁','乙'],
     '申':['庚','壬','戊'],'酉':['辛'],'戌':['戊','辛','丁'],'亥':['壬','甲']
   };
 
   // 节气近似日期表 (月, 日偏移基准)
-  var JIEQI_APPROX = {
+  let JIEQI_APPROX = {
     '立春': [2, 4],   // 2月3-5日
     '雨水': [2, 19],
     '惊蛰': [3, 6],
@@ -125,7 +125,7 @@
 
   // 农历正月初一查照表 (2024-2030) — 用于精确推算农历日期
   // 数据来源：天文年历，非近似估算
-  var LUNAR_NEW_YEAR = {
+  let LUNAR_NEW_YEAR = {
     2024: [2, 10],   // 甲辰龙年
     2025: [1, 29],   // 乙巳蛇年
     2026: [2, 17],   // 丙午马年
@@ -136,7 +136,7 @@
   };
 
   // 供品建议
-  var OFFERING_SUGGESTIONS = {
+  let OFFERING_SUGGESTIONS = {
     common: ['清香三炷', '鲜花一束', '素果五种(苹果、橘子、香蕉、葡萄、桂圆)', '清茶三杯', '素斋五碟', '红烛一对'],
     caiShen: ['金元宝', '黄水晶聚宝盆', '五色米(白黄红绿黑)', '甜汤圆三碗', '发糕五个'],
     taiSui: ['太岁衣', '太岁金', '平安米', '清酒三杯', '红绳一条'],
@@ -144,7 +144,7 @@
   };
 
   // 祈福文书模板
-  var PRAYER_TEMPLATES = {
+  let PRAYER_TEMPLATES = {
     taiSui: '弟子〇〇〇，生于〇〇年〇月〇日，今值〇〇年太岁星君当值，诚心叩拜。祈愿太岁星君护佑，赐弟子一年平安顺遂，消灾解厄，福寿康宁。弟子誓行善事，广结善缘，以报神恩。叩首再拜。',
     caiShen: '弟子〇〇〇，恭迎财神爷降临。今备香花果茶之仪，诚心叩拜。祈愿财神赐福，财源广进，生意兴隆，事业顺遂。弟子当以正道取财，乐善好施，不负神恩。叩首敬拜。',
     wenChang: '弟子〇〇〇，恭拜文昌帝君。祈愿帝君开慧启智，助弟子学业精进，考试顺利，金榜题名。弟子当勤勉不辍，以学问济世，不负帝君之恩。叩首敬拜。',
@@ -152,7 +152,7 @@
   };
 
   // 生肖年度运势基础文本（再依日主十神关系个性化调整）
-  var ZODIAC_YEAR_FORTUNE = {
+  let ZODIAC_YEAR_FORTUNE = {
     0: {keyword: '开拓进取', desc: '子水逢流年，智谋活跃，宜创新求变，注意肾脏健康。'},
     1: {keyword: '稳健积累', desc: '丑土逢流年，踏实勤勉，财运渐旺，宜守不宜攻。'},
     2: {keyword: '奋发有为', desc: '寅木逢流年，魄力十足，事业有突破，注意肝胆。'},
@@ -187,7 +187,7 @@
   function getTenGodLocal(yearStem, dayStem) {
     let map = TENGAN_LOCAL[dayStem];
     if (!map) return '';
-    for (var rel in map) {
+    for (let rel in map) {
       if (map[rel] === yearStem) return TEN_GOD_NAMES[rel] || rel;
     }
     return '';
@@ -200,7 +200,7 @@
     let map = TENGAN_LOCAL[dayStem];
     if (!map) return '';
     let benQi = canggan[0];
-    for (var rel in map) {
+    for (let rel in map) {
       if (map[rel] === benQi) return TEN_GOD_NAMES[rel] || rel;
     }
     return '';
@@ -235,7 +235,7 @@
     let data = LUNAR_NEW_YEAR[year];
     if (data) return new Date(year, data[0] - 1, data[1]);
     // 近似: 1月21日到2月21日之间,用公式估算
-    var offset = ((year - 4) % 19 + 19) % 19; // 默冬周期近似
+    let offset = ((year - 4) % 19 + 19) % 19; // 默冬周期近似
     let day = 21 + Math.round(offset * 0.53);
     return new Date(year, 0, day > 31 ? day - 31 : day);
   }
@@ -287,7 +287,7 @@
       }
 
       // 害太岁
-      for (var i = 0; i < HAI_PAIRS.length; i++) {
+      for (let i = 0; i < HAI_PAIRS.length; i++) {
         if (HAI_PAIRS[i][0] === birthBranchIdx && HAI_PAIRS[i][1] === yearBranchIdx) {
           relations.push('害太岁');
           solutions.push('谨言慎行，防小人暗算');
@@ -299,7 +299,7 @@
       }
 
       // 刑太岁
-      for (var g = 0; g < XING_GROUPS.length; g++) {
+      for (let g = 0; g < XING_GROUPS.length; g++) {
         let group = XING_GROUPS[g];
         if (group.indexOf(birthBranchIdx) >= 0 && group.indexOf(yearBranchIdx) >= 0 && birthBranchIdx !== yearBranchIdx) {
           relations.push('刑太岁');
@@ -320,7 +320,7 @@
       }
 
       // 破太岁
-      for (var j = 0; j < PO_PAIRS.length; j++) {
+      for (let j = 0; j < PO_PAIRS.length; j++) {
         if (PO_PAIRS[j][0] === birthBranchIdx && PO_PAIRS[j][1] === yearBranchIdx) {
           relations.push('破太岁');
           solutions.push('谨慎理财，防破财');
@@ -431,7 +431,7 @@
       // 二月二龙抬头（农历二月初二）
       // 依农历正月初一推算：农历正月大月30天/小月29天，二月初二 = 正月初一 + 30或31天
       // 此处用30天近似（多数年份正月为大月），再加1天到初二
-      var longTai = new Date(newYear.getTime() + 31 * 86400000); // 农历二月初二
+      let longTai = new Date(newYear.getTime() + 31 * 86400000); // 农历二月初二
       dates.push({
         name: '二月二(龙抬头)',
         date: longTai,
@@ -539,7 +539,7 @@
       if (tsInfo.solutions.length > 0) {
         taisuiContent += '<div style="margin-top:10px;padding:10px;background:rgba(231,76,60,.05);border-radius:8px;border-left:3px solid var(--cinn)">' +
           '<div style="font-size:12px;font-weight:600;margin-bottom:6px">🛡️ 化解建议</div>';
-        for (var s = 0; s < tsInfo.solutions.length; s++) {
+        for (let s = 0; s < tsInfo.solutions.length; s++) {
           taisuiContent += '<div style="font-size:12px;padding:2px 0;opacity:.8">' + (s+1) + '. ' + tsInfo.solutions[s] + '</div>';
         }
         taisuiContent += '</div>';
@@ -571,7 +571,7 @@
       // 3. 祈福吉日
       let dates = getWorshipDates(targetYear);
       const dateContent = '';
-      for (var d = 0; d < dates.length; d++) {
+      for (let d = 0; d < dates.length; d++) {
         let dt = dates[d];
         let priorityColor = dt.priority === 'high' ? 'var(--cinn2)' : (dt.priority === 'medium' ? 'var(--gold)' : 'var(--danger)');
         dateContent += '<div style="padding:8px 0;border-bottom:1px solid rgba(201,168,76,.06)">' +
@@ -612,13 +612,13 @@
 
       // 5. 祈福文书模板
       const prayerContent = '';
-      var prayers = [
+      let prayers = [
         {title: '拜太岁祈福文', text: PRAYER_TEMPLATES.taiSui},
         {title: '迎财神祈福文', text: PRAYER_TEMPLATES.caiShen},
         {title: '拜文昌祈福文', text: PRAYER_TEMPLATES.wenChang},
         {title: '通用祈福文', text: PRAYER_TEMPLATES.general}
       ];
-      for (var p = 0; p < prayers.length; p++) {
+      for (let p = 0; p < prayers.length; p++) {
         prayerContent += '<div style="margin-bottom:12px;padding:10px;background:rgba(255,255,255,.03);border-radius:8px">' +
           '<div style="font-size:12px;font-weight:600;color:var(--gold);margin-bottom:4px">' + prayers[p].title + '</div>' +
           '<div style="font-size:12px;opacity:.6;line-height:1.8;font-family:var(--font-serif)">' + prayers[p].text + '</div></div>';
@@ -643,7 +643,7 @@
       }
 
       // 按喜用神推荐
-      var eleItems = {
+      let eleItems = {
         '木': ['绿幽灵水晶', '翡翠玉器', '绿色植物', '木质佛珠', '檀香'],
         '火': ['红玛瑙', '紫水晶', '红色中国结', '朱砂饰品', '红绳'],
         '土': ['黄水晶', '陶瓷聚宝盆', '蜜蜡琥珀', '和田玉', '黄玉'],
@@ -702,7 +702,7 @@
       let dayEle = ELE[dayStem];
 
       // 五行生克关系
-      var relMap = {
+      let relMap = {
         '木': {金:'克我(官杀)',火:'我生(食伤)',水:'生我(印星)',木:'同我(比劫)',土:'我克(财星)'},
         '火': {木:'生我(印星)',土:'我生(食伤)',金:'我克(财星)',火:'同我(比劫)',水:'克我(官杀)'},
         '土': {火:'生我(印星)',金:'我生(食伤)',木:'克我(官杀)',土:'同我(比劫)',水:'我克(财星)'},
@@ -739,7 +739,7 @@
       let userBranchIdx = birthInfo.yearBranchIdx || 0;
       let userZodiacLabel = ZODIACS[userBranchIdx];
       // 标注用户生肖
-      for (var z = 0; z < 12; z++) {
+      for (let z = 0; z < 12; z++) {
         let tsInfo = getTaisuiInfo(z, yearBranchIdx);
         let fortune = ZODIAC_YEAR_FORTUNE[z] || {keyword:'', desc:''};
         // 依日主与该生肖地支的十神关系个性化补充
@@ -774,10 +774,10 @@
 
       // 3. 逐月运势
       const monthContent = '';
-      var monthBranches = ['寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑']; // 正月到十二月
+      let monthBranches = ['寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑']; // 正月到十二月
       const monthNames = ['正月(寅)', '二月(卯)', '三月(辰)', '四月(巳)', '五月(午)', '六月(未)', '七月(申)', '八月(酉)', '九月(戌)', '十月(亥)', '冬月(子)', '腊月(丑)'];
 
-      for (var m = 0; m < 12; m++) {
+      for (let m = 0; m < 12; m++) {
         let mBranch = monthBranches[m];
         let mZhiEle = ZHI_ELE[mBranch];
         let mShen = getBranchTenGod(mBranch, dayStem);
@@ -828,7 +828,7 @@
       // 4. 财神方位(按月)
       const caiContent = '';
       // 月干推算: 年干×2+月支序号(寅=1)
-      for (var cm = 0; cm < 12; cm++) {
+      for (let cm = 0; cm < 12; cm++) {
         let cmBranch = monthBranches[cm];
         let cmBranchIdx = BRANCHES.indexOf(cmBranch);
         // 月干: (年干Index*2 + cmBranchIdx) % 10, 但寅月=1月
@@ -846,20 +846,20 @@
       const alertContent = '';
       const hasAlert = false;
 
-      for (var am = 0; am < 12; am++) {
+      for (let am = 0; am < 12; am++) {
         let aBranchIdx = BRANCHES.indexOf(monthBranches[am]);
         let aIsChong = (Math.abs(aBranchIdx - yearBranchIdx) === 6);
         let aIsZhi = (aBranchIdx === yearBranchIdx);
 
         // 害月
         const aIsHai = false;
-        for (var ah = 0; ah < HAI_PAIRS.length; ah++) {
+        for (let ah = 0; ah < HAI_PAIRS.length; ah++) {
           if (HAI_PAIRS[ah][0] === aBranchIdx && HAI_PAIRS[ah][1] === yearBranchIdx) { aIsHai = true; break; }
         }
 
         // 刑月
         const aIsXing = false;
-        for (var ax = 0; ax < XING_GROUPS.length; ax++) {
+        for (let ax = 0; ax < XING_GROUPS.length; ax++) {
           let ag = XING_GROUPS[ax];
           if (ag.indexOf(aBranchIdx) >= 0 && ag.indexOf(yearBranchIdx) >= 0 && aBranchIdx !== yearBranchIdx) { aIsXing = true; break; }
         }

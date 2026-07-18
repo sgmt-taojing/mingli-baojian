@@ -37,7 +37,7 @@ function computeLiuRen() {
   ctr.innerHTML = '';
 
   // 渲染七个专业板块
-  var sections = [
+  let sections = [
     {title:'🔮 课体总断', body: interpretation.keTiPan, accent:'orange'},
     {title:'📜 四课分析', body: interpretation.siKePan, accent:'gold-accent'},
     {title:'🔄 三传详解', body: interpretation.sanChuanPan, accent:'violet-accent'},
@@ -47,7 +47,7 @@ function computeLiuRen() {
     {title:'📅 流年推演', body: interpretation.liunianTuiyan, accent:'gold-accent'}
   ];
 
-  for (var i = 0; i < sections.length; i++) {
+  for (let i = 0; i < sections.length; i++) {
     let s = sections[i];
     let block = document.createElement('div');
     block.className = 'interp-block';
@@ -132,7 +132,7 @@ function _ganJiGong(stem) {
 // 三传构建（基于四课贼克）
 function _buildSanChuan(siKe, dayStemIdx, dayBranchIdx) {
   let dayStem = STEMS[dayStemIdx];
-  var kes = [
+  let kes = [
     {zhi: siKe.ke1, shang: siKe.ke1Gan},
     {zhi: siKe.ke2, shang: siKe.ke2Gan},
     {zhi: siKe.ke3, shang: siKe.ke3Gan},
@@ -140,14 +140,14 @@ function _buildSanChuan(siKe, dayStemIdx, dayBranchIdx) {
   ];
 
   const zeKe = [], keZe = [];
-  for (var i = 0; i < kes.length; i++) {
+  for (let i = 0; i < kes.length; i++) {
     let shangWx = _getGanWx(kes[i].shang);
     let zhiWx = LR_ZHI_WX[kes[i].zhi];
     if (_wxKe(zhiWx, shangWx)) zeKe.push({zhi:kes[i].zhi, shang:kes[i].shang, idx:i, type:'下克上(贼)'});
     if (_wxKe(shangWx, zhiWx)) keZe.push({zhi:kes[i].zhi, shang:kes[i].shang, idx:i, type:'上克下(克)'});
   }
 
-  var faYong, faType;
+  let faYong, faType;
   let candidates = zeKe.length > 0 ? zeKe : keZe;
   
   if (candidates.length === 0) {
@@ -187,9 +187,9 @@ function _buildTianJiangFenbu(dayStemIdx, hourBranchIdx) {
   let shunPai = (guirenIdx >= 4 && guirenIdx <= 9);
   
   const fenbu = {};
-  for (var i = 0; i < 12; i++) {
+  for (let i = 0; i < 12; i++) {
     let zhi = BRANCHES[i];
-    var offset;
+    let offset;
     if (shunPai) {
       offset = (i - guirenIdx + 12) % 12;
     } else {
@@ -213,7 +213,7 @@ function _buildLiuRenShenSha(dayStemIdx, dayBranchIdx, month) {
   const result = [];
 
   const zhiSha = ['yima','taohua','huagai','jiangxing','wangshen','jiesha','zaisha'];
-  for (var i = 0; i < zhiSha.length; i++) {
+  for (let i = 0; i < zhiSha.length; i++) {
     let ts = _lrshen(zhiSha[i], dayBranch);
     if (ts) {
       let info = LR_SHENSHA[zhiSha[i]];

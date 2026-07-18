@@ -100,7 +100,7 @@ function renderMasters() {
     card.onmouseover = function() { this.style.borderColor=schoolColor;this.style.background='rgba(255,255,255,0.05)' };
     card.onmouseout = function() { this.style.borderColor='rgba(255,255,255,0.1)';this.style.background='rgba(255,255,255,0.03)' };
     
-    var servicesHtml = m.services.map(function(s) {
+    let servicesHtml = m.services.map(function(s) {
       return '<span style="font-size:11px;background:' + schoolBg + ';color:' + schoolColor + ';padding:4px 10px;border-radius:12px;margin:4px 4px 4px 0;display:inline-block">' + s + '</span>';
     }).join('');
     

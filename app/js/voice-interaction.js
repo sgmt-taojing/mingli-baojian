@@ -70,7 +70,7 @@ window.startVoiceInput = function(targetId, opts){
 
   recognition.onresult = function(event){
     const interim = '';
-    for(var i = event.resultIndex; i < event.results.length; i++){
+    for (let i = event.resultIndex; i < event.results.length; i++){
       if(event.results[i].isFinal){
         finalText += event.results[i][0].transcript;
       } else {
@@ -133,7 +133,7 @@ function parseVoiceDate(text){
   // 时辰解析
   const zhiMap = {子:23,丑:1,寅:3,卯:5,辰:7,巳:9,午:11,未:13,申:15,酉:17,戌:19,亥:21};
   const hour = -1;
-  for(var z in zhiMap){
+  for (let z in zhiMap){
     if(text.indexOf(z + '时') > -1 || text.indexOf(z + '刻') > -1){
       hour = zhiMap[z]; break;
     }
@@ -165,7 +165,7 @@ window.startVoiceCommand = function(){
 
   recognition.onresult = function(event){
     const text = '';
-    for(var i = 0; i < event.results.length; i++){
+    for (let i = 0; i < event.results.length; i++){
       if(event.results[i].isFinal) text += event.results[i][0].transcript;
     }
     if(text) executeVoiceCommand(text);
@@ -185,7 +185,7 @@ function executeVoiceCommand(text){
   showToast('🗣️ ' + text, 'info');
 
   // 导航命令
-  var navMap = {
+  let navMap = {
     '八字': 'nav-bazi', '排盘': 'nav-bazi', '四柱': 'nav-bazi',
     '紫微': 'nav-ziwei', '紫微斗数': 'nav-ziwei',
     '奇门': 'nav-qimen', '奇门遁甲': 'nav-qimen',
@@ -202,7 +202,7 @@ function executeVoiceCommand(text){
     '舒晗': 'nav-shuhan',
   };
 
-  for(var key in navMap){
+  for (let key in navMap){
     if(text.indexOf(key) > -1){
       let el = document.getElementById(navMap[key]);
       if(el){el.click(); showToast('已切换到' + key, 'success'); return;}

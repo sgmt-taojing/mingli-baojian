@@ -20,7 +20,7 @@ window.MASTER_LESSONS_DATA = {
 function initMasterClassData() {
   if (typeof MASTER_LESSONS_DATA === 'undefined') return;
   ['shuhan','nihaisha'].forEach(function(master) {
-    var lessons = MASTER_LESSONS_DATA[master] || [];
+    let lessons = MASTER_LESSONS_DATA[master] || [];
     lessons.forEach(function(l) {
       if (typeof addLesson === 'function') {
         addLesson(master, l);

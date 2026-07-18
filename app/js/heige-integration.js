@@ -7,7 +7,7 @@
 let HEIGE_API = (typeof HEIGE_API_BASE !== 'undefined') ? HEIGE_API_BASE : 'http://127.0.0.1:8911';
 
 // HeiGe 方法论 11 步流程标签
-var HEIGE_STEPS = [
+let HEIGE_STEPS = [
   { id: 'read', name: '读盘定盘面', desc: '提取日主、月令、刑冲合会关键要素' },
   { id: 'wangshuai', name: '判定日主旺衰', desc: '月令得失→通根→生扶→党众→定档' },
   { id: 'yongshen', name: '取用神定喜忌', desc: '调候≥扶抑>通关>病药；从格顺势' },
@@ -20,7 +20,7 @@ var HEIGE_STEPS = [
 ];
 
 // 调候用神速查表（穷通宝鉴摘要）— 用于前端快速参考
-var TIAOHOU_TABLE = {
+let TIAOHOU_TABLE = {
   '甲寅': '丙火温照，癸水润泽', '甲卯': '丙火温照，癸水润泽',
   '甲辰': '庚金伐木，丁火照暖', '甲巳': '癸水优先，丁火辅助',
   '甲午': '癸水为急，丁火为佐', '甲未': '癸水润土，丁火明局',
@@ -84,7 +84,7 @@ var TIAOHOU_TABLE = {
 };
 
 // 五行养生调养表（摘自 references/15）
-var WUXING_YANGSHENG = {
+let WUXING_YANGSHENG = {
   '木': {
     organs: '肝胆',
     diet: '绿色蔬菜、酸味食物、枸杞、菊花茶',
@@ -123,7 +123,7 @@ var WUXING_YANGSHENG = {
 };
 
 // 色彩服饰调候表（摘自 references/16）
-var WUXING_SECAI = {
+let WUXING_SECAI = {
   '木': { colors: '青绿碧翠', materials: '木质、竹质、棉麻', direction: '东方', industries: '教育、文化、出版、设计、园艺' },
   '火': { colors: '红紫橙粉', materials: '琉璃、红绳、电子', direction: '南方', industries: '传媒、餐饮、能源、演艺、IT' },
   '土': { colors: '黄棕咖褐', materials: '陶瓷、玉石、水晶', direction: '中央/本地', industries: '地产、建筑、农业、金融、仓储' },
@@ -138,7 +138,7 @@ var WUXING_SECAI = {
  */
 async function heigePaipan(params) {
   try {
-    var resp = await fetch(HEIGE_API + '/paipan', {
+    let resp = await fetch(HEIGE_API + '/paipan', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params)
@@ -159,7 +159,7 @@ async function heigePaipan(params) {
  */
 async function heigeAnalyze(params) {
   try {
-    var resp = await fetch(HEIGE_API + '/analyze', {
+    let resp = await fetch(HEIGE_API + '/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params)
@@ -222,7 +222,7 @@ function renderHeigeFramework(chart) {
   html += '<div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:20px;margin:16px 0;border:1px solid var(--gold)">';
   html += '<div style="color:var(--gold);font-size:14px;font-weight:bold;letter-spacing:2px;margin-bottom:12px">🔬 HeiGe 方法论 · 11步系统推演</div>';
   html += '<div style="display:flex;flex-wrap:wrap;gap:6px">';
-  for (var i = 0; i < HEIGE_STEPS.length; i++) {
+  for (let i = 0; i < HEIGE_STEPS.length; i++) {
     let s = HEIGE_STEPS[i];
     html += '<span style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--gold)" title="' + s.desc + '">' + (i+1) + '. ' + s.name + '</span>';
   }

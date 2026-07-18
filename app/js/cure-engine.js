@@ -70,7 +70,7 @@ function getZiweiResolution(panData, analyzeData) {
 
 function _getZiweiMainStarCure(panData) {
   // 十四主星化解方案数据库
-  var starCureDB = {
+  let starCureDB = {
     '紫微': {
       summary: '紫微为帝星，主尊贵领导，但帝星孤高，需辅弼相助',
       advice: '1. 佩戴黄水晶增强帝王之气；2. 办公室正北方位放置龙形摆件；3. 多穿金色、黄色衣物增强气场；4. 家中客厅悬挂山水画，寓意「靠山稳固」',
@@ -174,7 +174,7 @@ function _getZiweiMainStarCure(panData) {
   // 尝试获取命宫主星
   const mainStar = '';
   if (panData.palaces) {
-    for (var i = 0; i < panData.palaces.length; i++) {
+    for (let i = 0; i < panData.palaces.length; i++) {
       if (panData.palaces[i].name === '命宫' || panData.palaces[i].zhi === panData.mingZhi) {
         mainStar = panData.palaces[i].stars ? panData.palaces[i].stars.join('') : '';
         break;
@@ -186,7 +186,7 @@ function _getZiweiMainStarCure(panData) {
 
   // 匹配主星
   const matchedKey = null;
-  for (var key in starCureDB) {
+  for (let key in starCureDB) {
     if (mainStar.indexOf(key) >= 0) { matchedKey = key; break; }
   }
   if (!matchedKey) matchedKey = '紫微';
@@ -207,7 +207,7 @@ function _getZiweiMainStarCure(panData) {
 }
 
 function _getZiweiShaCure(panData) {
-  var shaCureDB = {
+  let shaCureDB = {
     '擎羊': { cure: '佩戴白水晶或银饰化解刀刃之煞；家中正西放铜麒麟一对', item: '白水晶、铜麒麟', direction: '正西', classic: '《紫微斗数全书》：「擎羊主刀刃血光，宜以金化之。」' },
     '陀罗': { cure: '佩戴茶晶或黑曜石化解拖延之煞；家中东北方放黑曜石葫芦', item: '茶晶、黑曜石葫芦', direction: '东北', classic: '《紫微斗数全书》：「陀罗主拖延暗损，宜以土化之。」' },
     '火星': { cure: '佩戴海蓝宝或蓝水晶化解火燥之煞；家中正北放蓝色水晶簇', item: '海蓝宝、蓝水晶簇', direction: '正北', classic: '《紫微斗数全书》：「火星主暴败，宜以水制之。」' },
@@ -218,11 +218,11 @@ function _getZiweiShaCure(panData) {
 
   const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   const hasSha = false;
-  for (var sha in shaCureDB) {
+  for (let sha in shaCureDB) {
     // 检查排盘中是否有此煞星
     const found = false;
     if (panData.palaces) {
-      for (var i = 0; i < panData.palaces.length; i++) {
+      for (let i = 0; i < panData.palaces.length; i++) {
         let stars = panData.palaces[i].stars || [];
         let allStars = stars.join('');
         if (allStars.indexOf(sha) >= 0) { found = true; break; }
@@ -250,7 +250,7 @@ function _getZiweiShaCure(panData) {
 }
 
 function _getZiweiSihuaCure(panData, analyzeData) {
-  var sihuaCureDB = {
+  let sihuaCureDB = {
     '化禄': { desc: '化禄主财运亨通，为吉化', cure: '宜在财位(根据命主日干定)放聚宝盆或黄水晶，增强化禄之财气。多行布施积累福报，使禄星更旺。', item: '聚宝盆、黄水晶', classic: '化禄为财，宜守不宜散' },
     '化权': { desc: '化权主权势提升，为吉化', cure: '宜在事业位(西北)放铜马或龙印，增强化权之权势。但权大势大需以德服人，避免专横。', item: '铜马、龙印', classic: '化权为威，宜德不宜暴' },
     '化科': { desc: '化科主名声学业，为吉化', cure: '宜在文昌位(东南)放文昌塔或毛笔架，增强化科之名声。多读书学习，参加考试比赛。', item: '文昌塔、毛笔架', classic: '化科为名，宜学不宜怠' },
@@ -259,7 +259,7 @@ function _getZiweiSihuaCure(panData, analyzeData) {
 
   const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   let sihuaText = (analyzeData && analyzeData.sihuaText) ? analyzeData.sihuaText : '';
-  for (var hua in sihuaCureDB) {
+  for (let hua in sihuaCureDB) {
     if (sihuaText.indexOf(hua) >= 0 ) {
       let d = sihuaCureDB[hua];
       let isJi = (hua === '化忌');
@@ -354,7 +354,7 @@ function getQimenResolution(panData, analyzeData) {
 
 function _getQimenMenCure(analyzeData) {
   // [舒晗课程校正] 八门象意与化解 — 依据密训班11-12课八门九星八神象意
-  var menCureDB = {
+  let menCureDB = {
     '开门': { nature: '吉门', desc: '开门主通达开拓，利求职见贵、升迁调动、开创事业', cure: '[舒晗课程校正] 开门为金，利西北方行事。开门临宫百事可为，佩戴白水晶增强开门之吉。开门受克（火克金）则权力受损，需用土通关（放黄色陶瓷物）', item: '白水晶、金属摆件、铜龙' },
     '休门': { nature: '吉门', desc: '休门主安养休息，利求财安养、婚恋和合、暗中谋划', cure: '[舒晗课程校正] 休门为水，利正北方休养。休门临宫宜守不宜攻，佩戴海蓝宝增强休门之吉。休门受克（土克水）则安养不成，需用金通关（放白色金属物）', item: '海蓝宝、蓝色摆件、水晶球' },
     '生门': { nature: '吉门', desc: '生门主生发财运，利经营求财、置业搬家、种植养殖', cure: '[舒晗课程校正] 生门为土，利东北方求财。生门临宫财源广进，佩戴黄水晶增强生门之吉。生门催财四维实操：1.定位（以家中经济支柱命盘找生门落宫）；2.选物（聚宝盆内置铜钱、大米、五帝钱/水晶）；3.择时（早上7-11点辰巳时阳气上升期）；4.定向（聚宝盆下垫红纸，书写该人生辰八字）。正财看戊土，偏财看丁奇', item: '黄水晶、聚宝盆、五帝钱' },
@@ -368,7 +368,7 @@ function _getQimenMenCure(analyzeData) {
   let men = analyzeData ? analyzeData.men : '';
   const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
 
-  for (var m in menCureDB) {
+  for (let m in menCureDB) {
     if (men.indexOf(m) >= 0 ) {
       let d = menCureDB[m];
       let isJi = (d.nature === '凶门');
@@ -387,7 +387,7 @@ function _getQimenMenCure(analyzeData) {
 
 function _getQimenXingCure(analyzeData) {
   // [舒晗课程校正] 九星象意与化解 — 依据密训班11-12课八门九星八神象意
-  var xingCureDB = {
+  let xingCureDB = {
     '天蓬': { nature: '凶星', desc: '天蓬主盗贼水灾，为大凶之星，主胆大妄为', cure: '[舒晗课程校正] 天蓬为水，主盗贼水灾。佩戴黑曜石化解，家中正北放黑曜石玄武。天蓬落坎宫（比和）则盗贼猖獗，落离宫（水克火）则水灾血光' },
     '天芮': { nature: '凶星', desc: '天芮主疾病缠身，为大凶之星，病星所在即为病位', cure: '[舒晗课程校正] 天芮为土，主疾病。佩戴和田玉化解，家中西南放铜葫芦祛病。天芮落宫五行断病：落坎（土克水）主肾病泌尿，落震（木克土）主肝胆脾胃，落离（火生土）主心脏血液' },
     '天冲': { nature: '凶星', desc: '天冲主冲动伤损，为中凶星，主急躁冲动', cure: '[舒晗课程校正] 天冲为木，主冲动伤损。佩戴茶晶化解，家中正东放黑曜石麒麟。天冲临震宫（比和）则冲动更甚，宜静守勿动' },
@@ -401,7 +401,7 @@ function _getQimenXingCure(analyzeData) {
 
   let star = analyzeData ? analyzeData.star : '';
   const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
-  for (var x in xingCureDB) {
+  for (let x in xingCureDB) {
     if (star.indexOf(x) >= 0 ) {
       let d = xingCureDB[x];
       let isJi = (d.nature === '凶星');
@@ -420,7 +420,7 @@ function _getQimenXingCure(analyzeData) {
 function _getQimenShenCure(analyzeData) {
   // [舒晗课程校正] 八神象意与化解 — 依据密训班11-12课八门九星八神象意
   // 舒晗八神排列：值符→腾蛇→太阴→六合→白虎→玄武→九地→九天
-  var shenCureDB = {
+  let shenCureDB = {
     '值符': { desc: '值符主贵人统领，为八神之首，最吉之神。主领导、贵人、正道', cure: '[舒晗课程校正] 值符为木，主贵人。佩戴黄水晶增强贵人运，西北方放铜龙。值符所落之宫百事可为，为当前主导力量，事态发展总纲' },
     '腾蛇': { desc: '腾蛇主虚惊怪异，为凶神。主虚惊、神经性、缠绕反复', cure: '[舒晗课程校正] 腾蛇为火，主虚惊怪异。佩戴黑曜石化解虚惊，家中放黑曜石葫芦。腾蛇临宫防神经衰弱、虚惊之事。测病主神经性疾患' },
     '太阴': { desc: '太阴主暗助荫庇，为吉神。主阴私暗助、女性贵人', cure: '[舒晗课程校正] 太阴为金，主暗助。佩戴月光石增强阴助，西方放白色花瓶。太阴临宫宜暗中谋划，女性贵人相助' },
@@ -433,7 +433,7 @@ function _getQimenShenCure(analyzeData) {
 
   let shen = analyzeData ? analyzeData.shen : '';
   const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
-  for (var s in shenCureDB) {
+  for (let s in shenCureDB) {
     if (shen.indexOf(s) >= 0 ) {
       let d = shenCureDB[s];
       html += '<div style="margin-bottom:6px;padding:4px 0">';
@@ -523,7 +523,7 @@ function _getLiurenSanChuanCure(panData, analyzeData) {
 }
 
 function _getLiurenTianJiangCure(panData, analyzeData) {
-  var tianJiangCureDB = {
+  let tianJiangCureDB = {
     '贵人': { cure: '佩戴黄水晶增强贵人助力', item: '黄水晶' },
     '腾蛇': { cure: '佩戴黑曜石化解虚惊怪异', item: '黑曜石' },
     '朱雀': { cure: '佩戴蓝水晶化解口舌是非', item: '蓝水晶' },
@@ -540,9 +540,9 @@ function _getLiurenTianJiangCure(panData, analyzeData) {
 
   const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   let chuanShen = (analyzeData && analyzeData.chuanShen) ? analyzeData.chuanShen : [];
-  for (var i = 0; i < chuanShen.length; i++) {
+  for (let i = 0; i < chuanShen.length; i++) {
     let shen = chuanShen[i];
-    for (var key in tianJiangCureDB) {
+    for (let key in tianJiangCureDB) {
       if (shen.indexOf(key) >= 0) {
         let d = tianJiangCureDB[key];
         html += '<div style="margin-bottom:8px;padding:4px 0">';
@@ -698,7 +698,7 @@ function getLiuyaoResolution(guaData, duanData) {
 }
 
 function _getLiuyaoLiuqinCure(guaData, duanData) {
-  var liuqinCureDB = {
+  let liuqinCureDB = {
     '父母': { weak: '父母爻弱主辛苦，宜佩戴白水晶或和田玉增强印星', strong: '父母爻过旺主劳碌，宜佩戴红玛瑙泄印星之力', item: '白水晶、和田玉' },
     '兄弟': { weak: '兄弟爻弱主人缘差，宜佩戴粉晶增强比劫之力', strong: '兄弟爻过旺主破财，宜佩戴黄水晶守住财运', item: '粉水晶、黄水晶' },
     '妻财': { weak: '妻财爻弱主财运差，宜佩戴黄水晶或金发晶增强财星', strong: '妻财爻过旺主妻夺夫权，宜佩戴黑曜石平衡', item: '黄水晶、金发晶' },
@@ -711,7 +711,7 @@ function _getLiuyaoLiuqinCure(guaData, duanData) {
   let liuqin = zg ? zg.liuqin : [];
   let yongshen = duanData ? duanData.yongshen : '';
 
-  for (var i = 0; i < liuqin.length; i++) {
+  for (let i = 0; i < liuqin.length; i++) {
     let lq = liuqin[i];
     if (liuqinCureDB[lq]) {
       let d = liuqinCureDB[lq];
@@ -788,7 +788,7 @@ function getFengshuiResolution(fsData) {
 }
 
 function _getFengshuiBazhaiCure(fsData) {
-  var shaCureDB = {
+  let shaCureDB = {
     '绝命': { desc: '绝命煞主破财伤丁', cure: '1.在大门挂铜葫芦化解绝命之气；2.门垫下放六帝钱；3.门上挂八卦镜反射煞气', item: '铜葫芦、六帝钱、八卦镜' },
     '五鬼': { desc: '五鬼煞主火灾盗贼', cure: '1.在五鬼位放铜铃或铜葫芦；2.避免在此方位设厨房或卧室；3.此方位保持整洁，不宜堆放杂物', item: '铜铃、铜葫芦' },
     '六煞': { desc: '六煞主口舌是非', cure: '1.在六煞位放蓝色水晶簇化解；2.此方位不宜安床；3.可在此放水缸或鱼缸化煞', item: '蓝水晶簇、水缸' },
@@ -805,8 +805,8 @@ function _getFengshuiBazhaiCure(fsData) {
     html += '</div>';
   }
 
-  for (var sha in shaCureDB) {
-    var d = shaCureDB[sha];
+  for (let sha in shaCureDB) {
+    let d = shaCureDB[sha];
     html += '<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(201,168,76,0.04)">';
     html += '<p><strong style="color:var(--orange)">' + sha + '</strong> — ' + d.desc + '</p>';
     html += '<p style="font-size:12px;line-height:1.8;margin-top:4px">' + d.cure + '</p>';
@@ -818,7 +818,7 @@ function _getFengshuiBazhaiCure(fsData) {
 }
 
 function _getFengshuiXuankongCure(fsData) {
-  var flyingStarCure = {
+  let flyingStarCure = {
     '一白': { nature: '吉', desc: '一白桃花主姻缘人缘', cure: '一白位放水缸或鱼缸增强桃花人缘' },
     '二黑': { nature: '凶', desc: '二黑病符主疾病', cure: '二黑位放铜葫芦或六帝钱化解病符，保持此方位整洁', item: '铜葫芦、六帝钱' },
     '三碧': { nature: '凶', desc: '三碧禄存主口舌官非', cure: '三碧位放红色地毯或红色物品化解三碧之木煞', item: '红色地毯' },
@@ -845,7 +845,7 @@ function _getFengshuiXuankongCure(fsData) {
   html += '</ul>';
   html += '</div>';
 
-  for (var star in flyingStarCure) {
+  for (let star in flyingStarCure) {
     let d = flyingStarCure[star];
     let isJi = (d.nature === '凶' || d.nature === '大凶');
     html += '<div style="margin-bottom:8px;padding:6px 0;';
@@ -865,7 +865,7 @@ function _getFengshuiXuankongCure(fsData) {
 // ================================================================
 
 function getCureItemCatalog() {
-  var catalog = {
+  let catalog = {
     // 五行水晶类
     crystals: [
       { name: '白水晶', element: '金', color: '白色透明', price: '20-200元', use: '增强金气、净化气场、提升决断力', placement: '西方/西北', care: '每月月光净化一次', source: '东海水晶市场、珠宝店' },
@@ -938,7 +938,7 @@ function getCureItemRecommendation(elementType) {
   else if (elementType === '水') items = items.concat(catalog.crystals.filter(function(x){return x.element==='水';}), catalog.water);
   else items = catalog.crystals.concat(catalog.metals).concat(catalog.woods);
 
-  for (var i = 0; i < items.length && i < 8; i++) {
+  for (let i = 0; i < items.length && i < 8; i++) {
     let item = items[i];
     html += '<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(201,168,76,0.04)">';
     html += '<p><strong style="color:var(--gold)">' + item.name + '</strong> <span style="font-size:11px;opacity:.5">(' + item.element + ')</span></p>';
@@ -1055,7 +1055,7 @@ function _getAnnualFlyingStarCure(currentYear) {
   // 飞星图表格
   html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:16px;font-size:11px;text-align:center">';
   const positions = ['东南', '正南', '西南', '正东', '中宫', '正西', '东北', '正北', '西北'];
-  for (var i = 0; i < 9; i++) {
+  for (let i = 0; i < 9; i++) {
     let star = starPositions[positions[i]] || '?';
     let isJi = (star === '一白' || star === '四绿' || star === '六白' || star === '八白' || star === '九紫');
     let isXiong = (star === '二黑' || star === '三碧' || star === '五黄' || star === '七赤');
@@ -1069,7 +1069,7 @@ function _getAnnualFlyingStarCure(currentYear) {
 
   // 化解重点
   html += '<ul style="font-size:12px;line-height:2;padding-left:20px;opacity:.85">';
-  for (var pos in starPositions) {
+  for (let pos in starPositions) {
     let s = starPositions[pos];
     if (s === '五黄') html += '<li><strong>五黄(' + pos + ')：</strong>大凶之位，挂铜铃，放铜葫芦，不可动土</li>';
     else if (s === '二黑') html += '<li><strong>二黑(' + pos + ')：</strong>病符之位，放铜葫芦或六帝钱，保持通风</li>';
@@ -1090,7 +1090,7 @@ function _getAnnualFlyingStarPositions(year) {
   // 计算流年飞星入中宫
   // 2024年三碧入中, 2025年二黑入中, 2026年一白入中, 2027年九紫入中...
   // 飞星顺序：入中宫后按洛书顺序飞布
-  var baseStar = 3; // 2024年三碧入中
+  let baseStar = 3; // 2024年三碧入中
   let diff = year - 2024;
   let centerStar = ((baseStar - diff - 1) % 9 + 9) % 9 + 1;
 
@@ -1099,7 +1099,7 @@ function _getAnnualFlyingStarPositions(year) {
   // 洛书飞布顺序：中宫→西北→正西→东北→正南→正北→西南→正东→东南
   const flyOrder = ['中宫', '西北', '正西', '东北', '正南', '正北', '西南', '正东', '东南'];
   const positions = {};
-  for (var i = 0; i < 9; i++) {
+  for (let i = 0; i < 9; i++) {
     let starNum = ((centerStar - 1 + i) % 9) + 1;
     positions[flyOrder[i]] = starNames[starNum];
   }
@@ -1107,7 +1107,7 @@ function _getAnnualFlyingStarPositions(year) {
 }
 
 function _getAnnualTaishuiCure(yearZhi) {
-  var taishuiFang = {
+  let taishuiFang = {
     '子': '正北(太岁方)/正南(岁破方)',
     '丑': '东北/西南',
     '寅': '东北/西南',
@@ -1139,7 +1139,7 @@ function _getAnnualTaishuiCure(yearZhi) {
 }
 
 function _getAnnualSanshaCure(yearZhi) {
-  var sanshaFang = {
+  let sanshaFang = {
     '申子辰': '正南(巳午未)',
     '寅午戌': '正北(亥子丑)',
     '亥卯未': '正西(申酉戌)',
@@ -1172,7 +1172,7 @@ function _getAnnualWuhuangErheiCure(currentYear) {
   let positions = _getAnnualFlyingStarPositions(currentYear);
   const wuhuangFang = '';
   const erheiFang = '';
-  for (var pos in positions) {
+  for (let pos in positions) {
     if (positions[pos] === '五黄') wuhuangFang = pos;
     if (positions[pos] === '二黑') erheiFang = pos;
   }
@@ -1221,7 +1221,7 @@ function getFamilyCurePlan(familyData, currentYear) {
   // 每位成员的个性化化解
   html += '<div style="margin-bottom:20px">';
   html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">👤 各成员个性化化解</h5>';
-  for (var i = 0; i < familyData.members.length; i++) {
+  for (let i = 0; i < familyData.members.length; i++) {
     let m = familyData.members[i];
     html += '<div style="margin-bottom:16px;padding:14px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
     html += '<p style="color:var(--gold);font-size:13px;margin-bottom:8px"><strong>' + (m.name || '成员' + (i+1)) + '</strong> (' + (m.relation || '') + ')</p>';
@@ -1395,8 +1395,8 @@ function _getYearGanZhi(year) {
   const ganList = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
   const zhiList = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
   const baseYear = 2024;
-  var baseGanIdx = 0; // 甲
-  var baseZhiIdx = 4; // 辰
+  let baseGanIdx = 0; // 甲
+  let baseZhiIdx = 4; // 辰
   let diff = year - baseYear;
   let ganIdx = ((baseGanIdx + diff) % 10 + 10) % 10;
   let zhiIdx = ((baseZhiIdx + diff) % 12 + 12) % 12;
@@ -1428,7 +1428,7 @@ function renderCureCenter() {
   // 化解方案分类
   html += '<div class="cure-category-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:20px">';
 
-  var categories = [
+  let categories = [
     { id: 'cure-bazi', icon: '🌟', title: '八字化解', desc: '五行补缺·太岁化解·催旺专项' },
     { id: 'cure-ziwei', icon: '🔮', title: '紫微化解', desc: '主星化解·煞星化解·四化应对' },
     { id: 'cure-qimen', icon: '☰', title: '奇门化解', desc: '八门九星·八神化解·伏吟反吟' },
@@ -1441,7 +1441,7 @@ function renderCureCenter() {
     { id: 'cure-items', icon: '💎', title: '物品大全', desc: '50+种物品·购买指南·摆放规则' }
   ];
 
-  for (var i = 0; i < categories.length; i++) {
+  for (let i = 0; i < categories.length; i++) {
     let c = categories[i];
     html += '<div class="cure-category-card" style="padding:16px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:10px;cursor:pointer;transition:all .3s" onclick="showCureCategory(\'' + c.id + '\')">';
     html += '<div style="font-size:24px;margin-bottom:8px">' + c.icon + '</div>';
@@ -1502,12 +1502,12 @@ function showCureCategory(catId) {
   } else if (catId === 'cure-items') {
     html += '<h4 style="color:var(--gold);margin-bottom:12px">💎 化解物品大全</h4>';
     let catalog = getCureItemCatalog();
-    for (var category in catalog) {
+    for (let category in catalog) {
       let items = catalog[category];
       let catName = {crystals:'💎 水晶类', metals:'🪙 金属类', woods:'🪵 木器类', earth:'🏺 土器类', water:'💧 水器类', fire:'🔥 火器类', talismans:'📜 符咒类'}[category] || category;
       html += '<div style="margin-bottom:16px">';
       html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:8px">' + catName + '</h5>';
-      for (var i = 0; i < items.length; i++) {
+      for (let i = 0; i < items.length; i++) {
         let item = items[i];
         html += '<div style="margin-bottom:8px;padding:10px;background:rgba(255,255,255,0.02);border-radius:6px;border:1px solid rgba(201,168,76,0.06)">';
         html += '<div style="display:flex;justify-content:space-between;align-items:center">';

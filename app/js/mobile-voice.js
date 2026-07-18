@@ -116,7 +116,7 @@ window.mobileVoiceInput = function(targetId, opts){
   
   recognition.onresult = function(event){
     const interim = '';
-    for(var i = event.resultIndex; i < event.results.length; i++){
+    for (let i = event.resultIndex; i < event.results.length; i++){
       if(event.results[i].isFinal){
         finalText += event.results[i][0].transcript;
       } else {
@@ -203,7 +203,7 @@ function parseVoiceDate(text){
   let y = m[1], mo = m[2], d = m[3];
   const zhiMap = {子:23,丑:1,寅:3,卯:5,辰:7,巳:9,午:11,未:13,申:15,酉:17,戌:19,亥:21};
   const hour = -1;
-  for(var z in zhiMap){
+  for (let z in zhiMap){
     if(text.indexOf(z + '时') > -1){hour = zhiMap[z]; break;}
   }
   if(hour < 0){
@@ -240,7 +240,7 @@ window.mobileVoiceCommand = function(){
   
   recognition.onresult = function(event){
     const text = '';
-    for(var i = 0; i < event.results.length; i++){
+    for (let i = 0; i < event.results.length; i++){
       if(event.results[i].isFinal) text += event.results[i][0].transcript;
     }
     if(text) executeCommand(text);
@@ -264,7 +264,7 @@ function executeCommand(text){
   text = text.replace(/\s/g, '');
   
   // 简化命令映射 — 信众自然语言
-  var commands = [
+  let commands = [
     // 排盘类
     {keys:['八字','排盘','算命','四柱'], action:function(){openMobileTool('bazi');}},
     {keys:['紫微','斗数'], action:function(){openMobileTool('zhanbu-ziwei');}},
@@ -290,8 +290,8 @@ function executeCommand(text){
     {keys:['停止','停下','安静'], action:function(){mobileStopSpeak();}},
   ];
   
-  for(var i = 0; i < commands.length; i++){
-    for(var j = 0; j < commands[i].keys.length; j++){
+  for (let i = 0; i < commands.length; i++){
+    for (let j = 0; j < commands[i].keys.length; j++){
       if(text.indexOf(commands[i].keys[j]) > -1){
         commands[i].action();
         return;
@@ -406,7 +406,7 @@ window.addEventListener('message', function(event){
       showListeningOverlay();
       r.onresult = function(e){
         const text = '';
-        for(var i = 0; i < e.results.length; i++){
+        for (let i = 0; i < e.results.length; i++){
           if(e.results[i].isFinal) text += e.results[i][0].transcript;
         }
         updateListeningOverlay(text);

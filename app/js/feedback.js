@@ -195,7 +195,7 @@
    */
   function exchange(ruleId) {
     let rule = null
-    for (var i = 0; i < EXCHANGE_RULES.length; i++) {
+    for (let i = 0; i < EXCHANGE_RULES.length; i++) {
       if (EXCHANGE_RULES[i].id === ruleId) {
         rule = EXCHANGE_RULES[i];
         break;
