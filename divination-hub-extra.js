@@ -22,7 +22,7 @@ function exportReport(title, contentHtml) {
 function exportBaziReport() {
   const name = document.getElementById('baziNameOut').textContent || '命盘报告';
   const resultDiv = document.getElementById('baziResult');
-  if (!resultDiv) { alert('请先生成八字报告'); return; }
+  if (!resultDiv) { showToast('请先生成八字报告'); return; }
   const tempDiv = resultDiv.cloneNode(true);
   const backRow = tempDiv.querySelector('.back-row');
   if (backRow) backRow.remove();
@@ -32,7 +32,7 @@ function exportBaziReport() {
 function exportHuajieReport() {
   const name = '化解方案';
   const hjOutput = document.getElementById('hjOutput');
-  if (!hjOutput) { alert('请先生成化解方案'); return; }
+  if (!hjOutput) { showToast('请先生成化解方案'); return; }
   exportReport(name, hjOutput.innerHTML);
 }
 
