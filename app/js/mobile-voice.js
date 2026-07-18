@@ -441,5 +441,5 @@ if(document.readyState === 'loading'){
 // 声线切换
 window.setMobileVoice = function(v){currentVoice = v;};
 
-console.log('🎙️ 移动端语音模块已加载 (微信:' + isWechat + ' 移动:' + isMobile + ')');
+// console.log('🎙️ 移动端语音模块已加载 (微信:' + isWechat + ' 移动:' + isMobile + ')');
 })();

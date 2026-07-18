@@ -343,5 +343,5 @@ if(document.readyState === 'loading'){
 setTimeout(function(){injectVoiceUI();}, 5000);
 setTimeout(function(){injectVoiceUI();}, 10000);
 
-console.log('🎙️ 语音交互模块已加载 (Web Speech API + Edge-TTS)');
+// console.log('🎙️ 语音交互模块已加载 (Web Speech API + Edge-TTS)');
 })();
