@@ -11932,7 +11932,7 @@ function computeBazi() {
   var xjParts = xjData.split(/[，。；；]/).filter(function(p){return p.trim().length > 3;});
   xjDiv.innerHTML = '<div class="xj-title">喜忌速查</div><div class="xj-grid">';
   xjParts.forEach(function(p){ xjDiv.innerHTML += '<div class="xj-item">'+p.trim()+'</div>'; });
-  xjDiv.innerHTML += insertAdjacentHTML('beforeend', '</div>');
+  xjDiv.insertAdjacentHTML('beforeend', '</div>');
   grid.appendChild(xjDiv);
 
   // === 8大分析卡片 ===
@@ -11982,14 +11982,14 @@ function computeBazi() {
   var _xunKong = getXunKong(dayStem, dayBranch);
   var _xunName = getXunName(dayStem, dayBranch);
   var _dishi = pillars.map(function(p){ return getDishi(dayStem, p.branch); });
-  refDiv.innerHTML += insertAdjacentHTML('beforeend', '<div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(201,168,76,.1);display:grid;grid-template-columns:repeat(3,1fr);gap:6px">');
+  refDiv.insertAdjacentHTML('beforeend', '<div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(201,168,76,.1);display:grid;grid-template-columns:repeat(3,1fr);gap:6px">');
   refDiv.innerHTML += '<span class="ref-tag">胎元<span>'+_taiYuan+'</span></span>';
   refDiv.innerHTML += '<span class="ref-tag">命宫<span>'+_mingGong+'</span></span>';
   refDiv.innerHTML += '<span class="ref-tag">身宫<span>'+_shenGong+'</span></span>';
   refDiv.innerHTML += '<span class="ref-tag">旬空<span>'+_xunKong+'</span></span>';
   refDiv.innerHTML += '<span class="ref-tag">旬名<span>'+_xunName+'</span></span>';
   refDiv.innerHTML += '<span class="ref-tag">长生<span>'+_dishi.join('/')+'</span></span>';
-  refDiv.innerHTML += insertAdjacentHTML('beforeend', '</div>');
+  refDiv.insertAdjacentHTML('beforeend', '</div>');
   grid.appendChild(refDiv);
 
   // === Export Buttons ===
@@ -12093,7 +12093,7 @@ function computeBazi() {
   if (_mt.tiaohou) {
     coreMetrics += '<div style="padding:8px 12px;background:rgba(52,152,219,.04);border:1px solid rgba(52,152,219,.15);border-radius:8px;margin-bottom:12px;font-size:12px;color:var(--paper2);line-height:1.6">' + _mt.tiaohou + '</div>';
   }
-  try { document.getElementById('baziResult').innerHTML += coreMetrics; } catch(e) {}
+  try { document.getElementById('baziResult').insertAdjacentHTML('beforeend', coreMetrics); } catch(e) {}
 
   // === 大白话解读 ===
   var baziData = {
@@ -12143,7 +12143,7 @@ function computeBazi() {
     _baziNotice += '<div>5. 补五行方法：穿戴对应颜色衣物、食用对应味道食物、选择对应方位居住或办公。</div>';
     _baziNotice += '<div>6. 命理为先天参考，后天努力更重要。行善积德、修身养性可改善运势。</div>';
     _baziNotice += '</div></div>';
-    try { document.getElementById('baziResult').innerHTML += _baziNotice; } catch(e2) {}
+    try { document.getElementById('baziResult').insertAdjacentHTML('beforeend', _baziNotice); } catch(e2) {}
   } catch(_bne) { console.warn('八字缘主须知渲染错误:', _bne); }
 
   // === 📖 术语解释 ===
@@ -12172,12 +12172,12 @@ function computeBazi() {
     _baziGlossary += '<div style="margin-bottom:4px"><strong style="color:var(--gold)">合冲刑害：</strong>地支间的特殊关系——六合、三合为和，六冲为冲，三刑为刑，相害为害，影响命局互动</div>';
     _baziGlossary += '<div><strong style="color:var(--gold)">格局：</strong>命局中五行十神的特殊组合，如正官格、偏财格、食神格等，决定命局层次与取向</div>';
     _baziGlossary += '</div></div>';
-    try { document.getElementById('baziResult').innerHTML += _baziGlossary; } catch(_ge) {}
+    try { document.getElementById('baziResult').insertAdjacentHTML('beforeend', _baziGlossary); } catch(_ge) {}
 
   // === 导出/复制按钮 ===
   try {
     var _exportBtns = '<div style="margin-top:16px;text-align:center"><button onclick="exportReportGeneric(\'baziResult\',\'八字命盘报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'baziResult\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button><button onclick="showScreensaver()" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">🖼️ 五行屏保</button></div>';
-    document.getElementById('baziResult').innerHTML += _exportBtns;
+    document.getElementById('baziResult').insertAdjacentHTML('beforeend', _exportBtns);
   } catch(_ee) {}
   } catch(_ge2) { console.warn('八字术语解释渲染错误:', _ge2); }
 
@@ -12185,7 +12185,7 @@ function computeBazi() {
   var copyBtn = '<div style="margin-top:16px;text-align:center">';
   copyBtn += '<button onclick="copyResultText(this)" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px">📋 复制结果</button>';
   copyBtn += '</div>';
-  try { document.getElementById('baziResult').innerHTML += copyBtn; } catch(e) {}
+  try { document.getElementById('baziResult').insertAdjacentHTML('beforeend', copyBtn); } catch(e) {}
 
   // === V3引擎校准版排盘 ===
   try {
@@ -12294,7 +12294,7 @@ function computeBazi() {
       // 引擎版本标识
       v3Html += '<div style="text-align:center;font-size:10px;opacity:.3;letter-spacing:2px;margin-top:8px">⚡ Powered by BaziV3 Engine</div>';
       v3Html += '</div></div></div>';
-      try { document.getElementById('baziResult').innerHTML += v3Html; } catch(e2) { console.warn('V3 bazi render error:', e2); }
+      try { document.getElementById('baziResult').insertAdjacentHTML('beforeend', v3Html); } catch(e2) { console.warn('V3 bazi render error:', e2); }
     }
   } catch(e3) { console.warn('BaziV3 error:', e3); }
 
@@ -12367,7 +12367,7 @@ function computeBazi() {
     _vizHtml += '<div style="font-size:10px;opacity:.4;text-align:center;margin-top:6px">天干+地支五行统计（共' + total + '个） · 最旺：<span style="color:var(--gold)">' + _strongestEle + '</span> · 最弱：<span style="color:var(--gold)">' + _weakestEle + '</span></div>';
     _vizHtml += '</div>';
     _vizHtml += '</div></div></div>';
-    document.getElementById('baziResult').innerHTML += _vizHtml;
+    document.getElementById('baziResult').insertAdjacentHTML('beforeend', _vizHtml);
   } catch(_vizErr) { console.warn('四柱可视化渲染错误:', _vizErr); }
 
   // === 化解方案与开运建议 ===
@@ -12382,7 +12382,7 @@ function computeBazi() {
       _curePanel += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">🔮 化解方案与开运建议 <span class="toggle-icon">▼</span></div>';
       _curePanel += '<div class="bazi-module-body collapsed"><div id="bazi-cure-result">' + _baziCureHtml + '</div></div>';
       _curePanel += '</div>';
-      document.getElementById('baziResult').innerHTML += _curePanel;
+      document.getElementById('baziResult').insertAdjacentHTML('beforeend', _curePanel);
     }
   } catch(_ce) { console.warn('八字化解方案生成错误:', _ce); }
 
@@ -12390,7 +12390,7 @@ function computeBazi() {
   try {
     var _afYear = year, _afMonth = month, _afDay = day, _afHour = hour, _afSex = sex;
     var _afPanel = _buildAnnualFortunePanel(_afYear, _afMonth, _afDay, _afHour, _afSex);
-    if (_afPanel) document.getElementById('baziResult').innerHTML += _afPanel;
+    if (_afPanel) document.getElementById('baziResult').insertAdjacentHTML('beforeend', _afPanel);
   } catch(_afe) { console.warn('八字年度运势生成错误:', _afe); }
 
   // === 首次排盘推送老黄历 ===
@@ -15128,7 +15128,7 @@ function showYjResult() {
     simpleSummary += '吉凶参半，有好有坏。关键看你怎么把握，做事要脚踏实地。';
   }
   simpleSummary += '</div></div>';
-  ctr.innerHTML += simpleSummary;
+  ctr.insertAdjacentHTML('beforeend', simpleSummary);
 
   // 起心动念时辰分析（仅事盘）
   if (yjMode === 'matter' && yjQixinTime) {
@@ -15223,7 +15223,7 @@ function showYjResult() {
   copyBtn += '<button onclick="copyResultText(this)" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px">📋 复制结果</button>';
   copyBtn += '</div>';
   var yjResultEl = document.getElementById('yjResult');
-  if (yjResultEl) yjResultEl.innerHTML += copyBtn;
+  if (yjResultEl) yjResultEl.insertAdjacentHTML('beforeend', copyBtn);
 
   document.getElementById('yjResult').classList.add('visible');
   document.getElementById('yjResult').scrollIntoView({ behavior: 'smooth' });
@@ -15601,7 +15601,7 @@ function computeQimen() {
   qimenGuestHost += '<strong style="color:var(--gold)">凶门（死伤惊）临身：</strong>须谨慎行事，忌冒进。<br>';
   qimenGuestHost += '<strong style="color:var(--gold)">门迫宫：</strong>门克宫为门迫，做事多阻碍，需迂回而行。';
   qimenGuestHost += '</div></div>';
-  if (qmReadBox) qmReadBox.innerHTML += qimenGuestHost;
+  if (qmReadBox) qmReadBox.insertAdjacentHTML('beforeend', qimenGuestHost);
 
   document.getElementById('qmResult').classList.add('visible');
   document.getElementById('qmResult').scrollIntoView({ behavior: 'smooth' });
@@ -20958,9 +20958,9 @@ function analyzeMobile() {
           fengshuiResult.style.display = 'block';
           var tiaoliEl = document.getElementById('tiaoliAdvice');
           if (tiaoliEl) {
-            tiaoliEl.innerHTML += matchHtml;
+            tiaoliEl.insertAdjacentHTML('beforeend', matchHtml);
           } else {
-            fengshuiResult.innerHTML += matchHtml;
+            fengshuiResult.insertAdjacentHTML('beforeend', matchHtml);
           }
         }
       }
@@ -25398,7 +25398,7 @@ function computeRename() {
         yongshenHtml += '<p style="font-size:12px;opacity:.7;line-height:1.8">建议取名用字五行偏「' + baziYongshen.element + '」，以补益命局先天不足。</p>';
         if (birthCity) yongshenHtml += '<p style="font-size:11px;opacity:.5;margin-top:4px">出生地：' + birthCity + (liveCity ? ' | 居住地：' + liveCity : '') + '</p>';
         yongshenHtml += '</div>';
-        wuxingBox.innerHTML += yongshenHtml;
+        wuxingBox.insertAdjacentHTML('beforeend', yongshenHtml);
       }
     }
   }
@@ -25575,7 +25575,7 @@ function computeRenameEnhanced() {
         yongshenHtml += '<p style="font-size:12px;opacity:.7;line-height:1.8">建议取名用字五行偏「' + baziYongshen.element + '」，以补益命局先天不足。</p>';
         if (birthCity) yongshenHtml += '<p style="font-size:11px;opacity:.5;margin-top:4px">出生地：' + birthCity + (liveCity ? ' | 居住地：' + liveCity : '') + '</p>';
         yongshenHtml += '</div>';
-        wuxingBox.innerHTML += yongshenHtml;
+        wuxingBox.insertAdjacentHTML('beforeend', yongshenHtml);
       }
       
       // 显示取名禁忌
@@ -26206,7 +26206,7 @@ function displayXieyin(xieyin) {
 
       // 检查是否已经有这个提示
       if (!yinlvDiv.innerHTML.includes('经检测，此名无不良谐音')) {
-        yinlvDiv.innerHTML += noXieyinHtml;
+        yinlvDiv.insertAdjacentHTML('beforeend', noXieyinHtml);
       }
     }
 
@@ -28217,7 +28217,7 @@ function generateAnnualPush() {
   msg.innerHTML += insertAdjacentHTML('beforeend', '<button onclick="this.parentElement.parentElement.remove()" style="position:absolute;top:16px;right:16px;background:none;border:1px solid var(--border);color:var(--paper3);padding:6px 14px;cursor:pointer;font-size:14px;border-radius:4px">✕</button>');
   msg.innerHTML += '<div style="font-family:Ma Shan Zheng,serif;font-size:24px;color:var(--gold);letter-spacing:6px;text-align:center;margin-bottom:20px">' + current.ganzhi + '年 运势化解方案</div>';
   msg.innerHTML += '<p style="text-align:center;font-size:12px;color:var(--paper3);margin-bottom:20px">60甲子第' + (current.idx+1) + '位 · ' + prop.taisui + '年 · ' + prop.wuxing + '行</p>';
-  msg.innerHTML += contentHtml;
+  msg.insertAdjacentHTML('beforeend', contentHtml);
   msg.innerHTML += insertAdjacentHTML('beforeend', '<div style="text-align:center;margin-top:20px"><button onclick="this.parentElement.parentElement.remove()" style="padding:10px 30px;border:1px solid var(--gold);border-radius:8px;background:rgba(201,168,76,0.1);color:var(--gold);cursor:pointer;font-family:inherit;font-size:14px;letter-spacing:4px">已知，收藏于心</button></div>');
   msg.innerHTML += insertAdjacentHTML('beforeend', '</div>');
   document.body.appendChild(msg);
@@ -34642,7 +34642,7 @@ function runLiuyaoEngine() {
         v3LiuHtml += '<div style="text-align:center;font-size:10px;opacity:.3;letter-spacing:2px;margin-top:8px">⚡ Powered by LiuyaoV3 Engine</div>';
         v3LiuHtml += '</div></div>';
         var yjResultEl = document.getElementById('yjResult') || document.getElementById('yjEngineResult');
-        if (yjResultEl) yjResultEl.innerHTML += v3LiuHtml;
+        if (yjResultEl) yjResultEl.insertAdjacentHTML('beforeend', v3LiuHtml);
       }
     } catch(e4) { console.warn('LiuyaoV3 error:', e4); }
   } catch(e) { showToast('六爻引擎错误：'+e.message); }
@@ -35033,7 +35033,7 @@ function runMeihuaEngine() {
         v3MhHtml += '<div style="text-align:center;font-size:10px;opacity:.3;letter-spacing:2px;margin-top:8px">⚡ Powered by MeihuaV3 Engine</div>';
         v3MhHtml += '</div></div>';
         var mhResultEl = document.getElementById('mhResult') || document.getElementById('mhEngineResult');
-        if (mhResultEl) mhResultEl.innerHTML += v3MhHtml;
+        if (mhResultEl) mhResultEl.insertAdjacentHTML('beforeend', v3MhHtml);
       }
     } catch(e5) { console.warn('MeihuaV3 error:', e5); }
   } catch(e) { showToast('梅花引擎错误：'+e.message); }
@@ -35963,7 +35963,7 @@ function runLiurenEngine() {
         v3LrHtml += '<div style="text-align:center;font-size:10px;opacity:.3;letter-spacing:2px;margin-top:8px">⚡ Powered by LiurenV3 Engine</div>';
         v3LrHtml += '</div></div>';
         var lrResultEl = document.getElementById('lrResult') || document.getElementById('lrEngineResult');
-        if (lrResultEl) lrResultEl.innerHTML += v3LrHtml;
+        if (lrResultEl) lrResultEl.insertAdjacentHTML('beforeend', v3LrHtml);
       }
     } catch(e6) { console.warn('LiurenV3 error:', e6); }
   } catch(e) { showToast('六壬引擎错误：'+e.message); }
