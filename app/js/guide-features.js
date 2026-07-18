@@ -5,6 +5,29 @@ var _gfSeed = Date.now();
 function _dpick(arr) { if(!arr||arr.length===0) return ''; _gfSeed = (_gfSeed * 9301 + 49297) % 233280; return arr[Math.floor((_gfSeed / 233280) * arr.length)]; }
 function _drand() { _gfSeed = (_gfSeed * 9301 + 49297) % 233280; return _gfSeed / 233280; }
 
+// 异步确认模态框（替代原生 confirm）—— 仅在未定义时注入
+if (typeof window !== 'undefined' && typeof window.showConfirm !== 'function') {
+  window.showConfirm = function(msg, onOk, onCancel) {
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;display:flex;align-items:center;justify-content:center';
+    overlay.innerHTML = '<div style="background:#1a1a2e;border:1px solid rgba(201,168,76,0.4);border-radius:12px;padding:24px;max-width:360px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.5)">' +
+      '<div style="color:#f0e8d8;font-size:15px;line-height:1.7;margin-bottom:20px;letter-spacing:1px">' + msg + '</div>' +
+      '<div style="display:flex;gap:12px;justify-content:flex-end">' +
+      '<button data-act="cancel" style="padding:8px 20px;background:transparent;color:#888;border:1px solid #555;border-radius:6px;cursor:pointer;font-size:13px">取消</button>' +
+      '<button data-act="ok" style="padding:8px 20px;background:linear-gradient(135deg,#c9a84c,#a08430);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;letter-spacing:1px">确认</button>' +
+      '</div></div>';
+    document.body.appendChild(overlay);
+    function close(result) {
+      document.body.removeChild(overlay);
+      if (result && typeof onOk === 'function') onOk();
+      else if (!result && typeof onCancel === 'function') onCancel();
+    }
+    overlay.querySelector('[data-act="ok"]').onclick = function() { close(true); };
+    overlay.querySelector('[data-act="cancel"]').onclick = function() { close(false); };
+    overlay.onclick = function(e) { if (e.target === overlay) close(false); };
+  };
+}
+
 function toggleGuide() {
   const guideBanner = document.getElementById('guideBanner');
   if (guideBanner) {
@@ -884,10 +907,11 @@ function removeSavedItem(index) {
 
 // 清空收藏列表
 function clearSavedList() {
-  if (confirm('确定清空收藏列表?')) {
+  showConfirm('确定清空收藏列表?', function() {
     savedCompanyNames = [];
-    document.getElementById('savedList').style.display = 'none';
-  }
+    var el = document.getElementById('savedList');
+    if (el) el.style.display = 'none';
+  });
 }
 
 // 导出收藏列表

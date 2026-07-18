@@ -4725,7 +4725,7 @@ function _computeBaziImpl() {
   var xjParts = xjData.split(/[，。；；]/).filter(function(p){return p.trim().length > 3;});
   xjDiv.innerHTML = '<div class="xj-title">喜忌速查</div><div class="xj-grid">';
   xjParts.forEach(function(p){ xjDiv.innerHTML += '<div class="xj-item">'+p.trim()+'</div>'; });
-  xjDiv.innerHTML += '</div>';
+  xjDiv.innerHTML += insertAdjacentHTML('beforeend', '</div>');
   grid.appendChild(xjDiv);
 
   // === 8大分析卡片 ===
@@ -4775,14 +4775,14 @@ function _computeBaziImpl() {
   var _xunKong = getXunKong(dayStem, dayBranch);
   var _xunName = getXunName(dayStem, dayBranch);
   var _dishi = pillars.map(function(p){ return getDishi(dayStem, p.branch); });
-  refDiv.innerHTML += '<div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(201,168,76,.1);display:grid;grid-template-columns:repeat(3,1fr);gap:6px">';
+  refDiv.innerHTML += insertAdjacentHTML('beforeend', '<div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(201,168,76,.1);display:grid;grid-template-columns:repeat(3,1fr);gap:6px">');
   refDiv.innerHTML += '<span class="ref-tag">胎元<span>'+_taiYuan+'</span></span>';
   refDiv.innerHTML += '<span class="ref-tag">命宫<span>'+_mingGong+'</span></span>';
   refDiv.innerHTML += '<span class="ref-tag">身宫<span>'+_shenGong+'</span></span>';
   refDiv.innerHTML += '<span class="ref-tag">旬空<span>'+_xunKong+'</span></span>';
   refDiv.innerHTML += '<span class="ref-tag">旬名<span>'+_xunName+'</span></span>';
   refDiv.innerHTML += '<span class="ref-tag">长生<span>'+_dishi.join('/')+'</span></span>';
-  refDiv.innerHTML += '</div>';
+  refDiv.innerHTML += insertAdjacentHTML('beforeend', '</div>');
   grid.appendChild(refDiv);
 
   // === Export Buttons ===
@@ -8241,7 +8241,7 @@ function showYjResult() {
   document.getElementById('yjResult').scrollIntoView({ behavior: 'smooth' });
   // 导出报告按钮
   var _yjResEl = document.getElementById('yjResult');
-  if (_yjResEl) _yjResEl.innerHTML += '<div style="margin-top:16px;text-align:center"><button onclick="exportReportGeneric(\'yjResult\',\'六爻占卜报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button></div>';
+  if (_yjResEl) _yjResEl.innerHTML += insertAdjacentHTML('beforeend', '<div style="margin-top:16px;text-align:center"><button onclick="exportReportGeneric(\'yjResult\',\'六爻占卜报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button></div>');
 }
 
 function yjReset() {
@@ -10837,7 +10837,7 @@ function _computeMeiHuaImpl() {
   document.getElementById('mhResult').scrollIntoView({ behavior: 'smooth' });
   // 导出/复制按钮
   var _mhRes2 = document.getElementById('mhResult');
-  if (_mhRes2) _mhRes2.innerHTML += '<div style="margin-top:16px;text-align:center"><button onclick="exportReportGeneric(\'mhResult\',\'梅花易数排盘报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'mhResult\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button></div>';
+  if (_mhRes2) _mhRes2.innerHTML += insertAdjacentHTML('beforeend', '<div style="margin-top:16px;text-align:center"><button onclick="exportReportGeneric(\'mhResult\',\'梅花易数排盘报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'mhResult\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button></div>');
   if(btn){ btn.disabled=false; btn.textContent='开始排盘'; }
 }
 
@@ -11743,7 +11743,7 @@ function _computeLiuRenImpl() {
   document.getElementById('lrResult').scrollIntoView({ behavior: 'smooth' });
   // 导出/复制按钮
   var _lrRes2 = document.getElementById('lrResult');
-  if (_lrRes2) _lrRes2.innerHTML += '<div style="margin-top:16px;text-align:center"><button onclick="exportReportGeneric(\'lrResult\',\'大六壬排盘报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'lrResult\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button></div>';
+  if (_lrRes2) _lrRes2.innerHTML += insertAdjacentHTML('beforeend', '<div style="margin-top:16px;text-align:center"><button onclick="exportReportGeneric(\'lrResult\',\'大六壬排盘报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'lrResult\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button></div>');
 }
 
 // ═══ 构建完整六壬课式 ═══
@@ -27026,16 +27026,17 @@ function renderUserBaziCard() {
  * 清除缘主信息
  */
 function clearUserBazi() {
-  if (!confirm('确定要清除您的缘主信息吗？此操作不可撤销。')) return;
-  try { localStorage.removeItem('userBazi'); } catch(e) {}
-  var cardEl = document.getElementById('userBaziCard');
-  if (cardEl) { cardEl.innerHTML = ''; cardEl.style.display = 'none'; }
-  var manageEl = document.getElementById('userBaziManage');
-  if (manageEl) manageEl.style.display = 'none';
-  // 重新显示绑定表单
-  var bindEl = document.getElementById('userBaziBind');
-  if (bindEl) bindEl.style.display = 'block';
-  showToast('缘主信息已清除');
+  showConfirm('确定要清除您的缘主信息吗？此操作不可撤销。', function() {
+    try { localStorage.removeItem('userBazi'); } catch(e) {}
+    var cardEl = document.getElementById('userBaziCard');
+    if (cardEl) { cardEl.innerHTML = ''; cardEl.style.display = 'none'; }
+    var manageEl = document.getElementById('userBaziManage');
+    if (manageEl) manageEl.style.display = 'none';
+    // 重新显示绑定表单
+    var bindEl = document.getElementById('userBaziBind');
+    if (bindEl) bindEl.style.display = 'block';
+    showToast('缘主信息已清除');
+  });
 }
 
 /**
@@ -32467,7 +32468,7 @@ function runJiaziCycle() {
         playSound('success');
         resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
         // 导出/复制按钮
-        resultEl.innerHTML += '<div style="margin-top:16px;text-align:center"><button onclick="exportReportGeneric(\'jiaziResult\',\'六十甲子周期报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'jiaziResult\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button></div>';
+        resultEl.innerHTML += insertAdjacentHTML('beforeend', '<div style="margin-top:16px;text-align:center"><button onclick="exportReportGeneric(\'jiaziResult\',\'六十甲子周期报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'jiaziResult\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button></div>');
       }
     } catch(e) {
       if (resultEl) {

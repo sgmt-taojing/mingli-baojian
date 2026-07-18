@@ -1865,11 +1865,11 @@ function shareCheckin(){
 }
 
 function clearHistory(){
-  if(confirm('确定要清空所有打卡记录吗？此操作不可恢复。')){
+  showConfirm('确定要清空所有打卡记录吗？此操作不可恢复。', function(){
     localStorage.removeItem('checkinData');
     showToast('历史记录已清空');
     renderCheckin();
-  }
+  });
 }
 
 function downloadFile(content,filename,type){
@@ -2298,11 +2298,11 @@ function parseAIResult(){
 }
 
 function clearAIResult(){
-  if(confirm('确定要清空已粘贴的解读结果吗？')){
+  showConfirm('确定要清空已粘贴的解读结果吗？', function(){
     document.getElementById('aiResultText').value='';
     document.getElementById('parsePreview').style.display='none';
     document.getElementById('parseBtn').disabled=true;
-  }
+  });
 }
 
 function importFoodTherapy(){
@@ -2519,5 +2519,6 @@ renderExerciseLibrary();
   </div>
 </div>
 
+</div>
 </body>
 </html>

@@ -9988,10 +9988,36 @@ function handleImportFile(e) {
 }
 
 function clearAllLocalData() {
-  if (!confirm('确认清空所有本地数据？此操作不可恢复！')) return;
-  localStorage.clear();
-  showToast('🗑️ 已清空全部数据');
-  setTimeout(function() { location.reload(); }, 1500);
+  showConfirm('确认清空所有本地数据？此操作不可恢复！', function() {
+    localStorage.clear();
+    showToast('🗑️ 已清空全部数据');
+    setTimeout(function() { location.reload(); }, 1500);
+  });
+}
+
+// 异步确认模态框（替代原生 confirm）
+function showConfirm(msg, onOk, onCancel) {
+  if (typeof window !== 'undefined' && typeof window.showConfirm === 'function' && window.showConfirm.length >= 2 && window.showConfirm !== showConfirm) {
+    try { return window.showConfirm(msg, onOk, onCancel); } catch(e) { /* fallthrough */ }
+  }
+  // 回退：用 toast + 自定义按钮模态
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;display:flex;align-items:center;justify-content:center;font-family:"Noto Serif SC",serif';
+  overlay.innerHTML = '<div style="background:#1a1a2e;border:1px solid rgba(201,168,76,0.4);border-radius:12px;padding:24px;max-width:360px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.5)">' +
+    '<div style="color:#f0e8d8;font-size:15px;line-height:1.7;margin-bottom:20px;letter-spacing:1px">' + msg + '</div>' +
+    '<div style="display:flex;gap:12px;justify-content:flex-end">' +
+    '<button data-act="cancel" style="padding:8px 20px;background:transparent;color:#888;border:1px solid #555;border-radius:6px;cursor:pointer;font-size:13px">取消</button>' +
+    '<button data-act="ok" style="padding:8px 20px;background:linear-gradient(135deg,#c9a84c,#a08430);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;letter-spacing:1px">确认</button>' +
+    '</div></div>';
+  document.body.appendChild(overlay);
+  function close(result) {
+    document.body.removeChild(overlay);
+    if (result && typeof onOk === 'function') onOk();
+    else if (!result && typeof onCancel === 'function') onCancel();
+  }
+  overlay.querySelector('[data-act="ok"]').onclick = function() { close(true); };
+  overlay.querySelector('[data-act="cancel"]').onclick = function() { close(false); };
+  overlay.onclick = function(e) { if (e.target === overlay) close(false); };
 }
 
 function showToast(msg) {
@@ -11906,7 +11932,7 @@ function computeBazi() {
   var xjParts = xjData.split(/[，。；；]/).filter(function(p){return p.trim().length > 3;});
   xjDiv.innerHTML = '<div class="xj-title">喜忌速查</div><div class="xj-grid">';
   xjParts.forEach(function(p){ xjDiv.innerHTML += '<div class="xj-item">'+p.trim()+'</div>'; });
-  xjDiv.innerHTML += '</div>';
+  xjDiv.innerHTML += insertAdjacentHTML('beforeend', '</div>');
   grid.appendChild(xjDiv);
 
   // === 8大分析卡片 ===
@@ -11956,14 +11982,14 @@ function computeBazi() {
   var _xunKong = getXunKong(dayStem, dayBranch);
   var _xunName = getXunName(dayStem, dayBranch);
   var _dishi = pillars.map(function(p){ return getDishi(dayStem, p.branch); });
-  refDiv.innerHTML += '<div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(201,168,76,.1);display:grid;grid-template-columns:repeat(3,1fr);gap:6px">';
+  refDiv.innerHTML += insertAdjacentHTML('beforeend', '<div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(201,168,76,.1);display:grid;grid-template-columns:repeat(3,1fr);gap:6px">');
   refDiv.innerHTML += '<span class="ref-tag">胎元<span>'+_taiYuan+'</span></span>';
   refDiv.innerHTML += '<span class="ref-tag">命宫<span>'+_mingGong+'</span></span>';
   refDiv.innerHTML += '<span class="ref-tag">身宫<span>'+_shenGong+'</span></span>';
   refDiv.innerHTML += '<span class="ref-tag">旬空<span>'+_xunKong+'</span></span>';
   refDiv.innerHTML += '<span class="ref-tag">旬名<span>'+_xunName+'</span></span>';
   refDiv.innerHTML += '<span class="ref-tag">长生<span>'+_dishi.join('/')+'</span></span>';
-  refDiv.innerHTML += '</div>';
+  refDiv.innerHTML += insertAdjacentHTML('beforeend', '</div>');
   grid.appendChild(refDiv);
 
   // === Export Buttons ===
@@ -14672,7 +14698,7 @@ function scheduleRenewHuajie() {
   var msg = document.createElement('div');
   msg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid #c9a84c;color:#c9a84c;padding:24px 32px;border-radius:14px;font-size:14px;z-index:99999;text-align:center;box-shadow:0 0 40px rgba(201,168,76,0.3);max-width:360px';
   msg.innerHTML = '<div style="font-size:36px;margin-bottom:10px">✅</div>';
-  msg.innerHTML += '<div style="font-weight:bold;font-size:16px;margin-bottom:8px">化解方案预约成功</div>';
+  msg.innerHTML += insertAdjacentHTML('beforeend', '<div style="font-weight:bold;font-size:16px;margin-bottom:8px">化解方案预约成功</div>');
   msg.innerHTML += '<div style="font-size:12px;color:#aaa;line-height:1.8">' + nextYear + '年立春(' + renewDate + ')后<br>系统将自动为您生成新年化解方案<br><br>预约日期：' + now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.getDate() + '</div>';
   document.body.appendChild(msg);
   setTimeout(function(){
@@ -23949,10 +23975,11 @@ function removeSavedItem(index) {
 
 // 清空收藏列表
 function clearSavedList() {
-  if (confirm('确定清空收藏列表?')) {
+  showConfirm('确定清空收藏列表?', function() {
     savedCompanyNames = [];
-    document.getElementById('savedList').style.display = 'none';
-  }
+    var el = document.getElementById('savedList');
+    if (el) el.style.display = 'none';
+  });
 }
 
 // 导出收藏列表
@@ -25579,10 +25606,10 @@ function computeRenameEnhanced() {
           if (problems.length > 0) {
             var tabooBox2 = document.getElementById('renameTabooBox');
             if (tabooBox2) {
-              tabooBox2.innerHTML += '<div style="margin-top:10px;padding:12px;background:rgba(231,76,60,0.03);border:1px solid rgba(231,76,60,0.1);border-radius:8px">';
-              tabooBox2.innerHTML += '<h5 style="font-size:13px;color:#e74c3c;margin-bottom:6px">📝 原名问题分析</h5>';
+              tabooBox2.innerHTML += insertAdjacentHTML('beforeend', '<div style="margin-top:10px;padding:12px;background:rgba(231,76,60,0.03);border:1px solid rgba(231,76,60,0.1);border-radius:8px">');
+              tabooBox2.innerHTML += insertAdjacentHTML('beforeend', '<h5 style="font-size:13px;color:#e74c3c;margin-bottom:6px">📝 原名问题分析</h5>');
               tabooBox2.innerHTML += '<div style="font-size:12px;opacity:.7;line-height:1.8">原名「' + currentName + '」存在以下问题：<br>· ' + problems.join('<br>· ') + '</div>';
-              tabooBox2.innerHTML += '<div style="font-size:12px;opacity:.6;margin-top:6px">建议改名时重点补强以上数理。</div></div>';
+              tabooBox2.innerHTML += insertAdjacentHTML('beforeend', '<div style="font-size:12px;opacity:.6;margin-top:6px">建议改名时重点补强以上数理。</div></div>');
             }
           }
         }
@@ -25722,13 +25749,13 @@ function generateCompanyNamesEnhanced() {
         var notice = document.createElement('div');
         notice.style.cssText = 'margin-top:16px;padding:14px;background:rgba(0,100,150,0.04);border:1px solid rgba(0,100,150,0.12);border-radius:8px';
         notice.innerHTML = '<h5 style="font-size:13px;color:var(--cyan);margin-bottom:8px;letter-spacing:2px">📍 注册注意事项</h5>';
-        notice.innerHTML += '<div style="font-size:12px;opacity:.7;line-height:2">';
+        notice.innerHTML += insertAdjacentHTML('beforeend', '<div style="font-size:12px;opacity:.7;line-height:2">');
         notice.innerHTML += '· 注册地：' + regCity + '<br>';
-        notice.innerHTML += '· 建议在注册前核查工商名称是否可用<br>';
-        notice.innerHTML += '· 公司名应避免与同行业知名企业雷同<br>';
-        notice.innerHTML += '· 建议同时注册商标保护品牌<br>';
+        notice.innerHTML += insertAdjacentHTML('beforeend', '· 建议在注册前核查工商名称是否可用<br>');
+        notice.innerHTML += insertAdjacentHTML('beforeend', '· 公司名应避免与同行业知名企业雷同<br>');
+        notice.innerHTML += insertAdjacentHTML('beforeend', '· 建议同时注册商标保护品牌<br>');
         if (mainBiz) notice.innerHTML += '· 主营方向：' + mainBiz + '，建议名称与业务相关联<br>';
-        notice.innerHTML += '</div>';
+        notice.innerHTML += insertAdjacentHTML('beforeend', '</div>');
         grid.appendChild(notice);
       }
     }, 500);
@@ -28187,12 +28214,12 @@ function generateAnnualPush() {
   var msg = document.createElement('div');
   msg.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);z-index:99999;overflow-y:auto;padding:40px 20px';
   msg.innerHTML = '<div style="max-width:700px;margin:0 auto;background:var(--ink2);border:1px solid var(--border);border-radius:14px;padding:28px;position:relative">';
-  msg.innerHTML += '<button onclick="this.parentElement.parentElement.remove()" style="position:absolute;top:16px;right:16px;background:none;border:1px solid var(--border);color:var(--paper3);padding:6px 14px;cursor:pointer;font-size:14px;border-radius:4px">✕</button>';
+  msg.innerHTML += insertAdjacentHTML('beforeend', '<button onclick="this.parentElement.parentElement.remove()" style="position:absolute;top:16px;right:16px;background:none;border:1px solid var(--border);color:var(--paper3);padding:6px 14px;cursor:pointer;font-size:14px;border-radius:4px">✕</button>');
   msg.innerHTML += '<div style="font-family:Ma Shan Zheng,serif;font-size:24px;color:var(--gold);letter-spacing:6px;text-align:center;margin-bottom:20px">' + current.ganzhi + '年 运势化解方案</div>';
   msg.innerHTML += '<p style="text-align:center;font-size:12px;color:var(--paper3);margin-bottom:20px">60甲子第' + (current.idx+1) + '位 · ' + prop.taisui + '年 · ' + prop.wuxing + '行</p>';
   msg.innerHTML += contentHtml;
-  msg.innerHTML += '<div style="text-align:center;margin-top:20px"><button onclick="this.parentElement.parentElement.remove()" style="padding:10px 30px;border:1px solid var(--gold);border-radius:8px;background:rgba(201,168,76,0.1);color:var(--gold);cursor:pointer;font-family:inherit;font-size:14px;letter-spacing:4px">已知，收藏于心</button></div>';
-  msg.innerHTML += '</div>';
+  msg.innerHTML += insertAdjacentHTML('beforeend', '<div style="text-align:center;margin-top:20px"><button onclick="this.parentElement.parentElement.remove()" style="padding:10px 30px;border:1px solid var(--gold);border-radius:8px;background:rgba(201,168,76,0.1);color:var(--gold);cursor:pointer;font-family:inherit;font-size:14px;letter-spacing:4px">已知，收藏于心</button></div>');
+  msg.innerHTML += insertAdjacentHTML('beforeend', '</div>');
   document.body.appendChild(msg);
   
   addMerit(localStorage.getItem('userFaith') || 'fo', 3, '生成' + current.ganzhi + '年化解方案');

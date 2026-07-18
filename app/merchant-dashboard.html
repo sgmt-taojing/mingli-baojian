@@ -191,11 +191,12 @@ function loadProducts(){
 }
 
 function delProduct(id){
-  if(!confirm('确认下架？'))return;
-  var all=JSON.parse(localStorage.getItem('merchantProducts')||'[]');
-  all=all.filter(function(p){return p.id!==id});
-  localStorage.setItem('merchantProducts',JSON.stringify(all));
-  loadProducts();
+  showConfirm('确认下架？', function(){
+    var all=JSON.parse(localStorage.getItem('merchantProducts')||'[]');
+    all=all.filter(function(p){return p.id!==id});
+    localStorage.setItem('merchantProducts',JSON.stringify(all));
+    loadProducts();
+  });
 }
 
 function loadOrders(){

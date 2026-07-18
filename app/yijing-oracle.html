@@ -1325,7 +1325,7 @@ async function castCoins() {
   let total = 0;
   const coins = [];
   for (let i = 0; i < 3; i++) {
-    const val = Math.random() < 0.5 ? 2 : 3; // 2=背(head), 3=字(tail)
+    const val = (Date.now() % 2 === 0) ? 2 : 3; // 2=背(head), 3=字(tail), 基于时间确定性
     total += val;
     coins.push(val);
   }
