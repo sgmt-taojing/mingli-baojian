@@ -194,6 +194,21 @@ body{font-family:var(--font);background:var(--ink);color:var(--paper);line-heigh
     <div class="card-title">💡 缘主须知</div>
     <div class="card-desc">初缘每项工具仅限体验1次（按手机号）。开通会员享不限次数+深度报告。<br>AI辅助创作｜国学感悟仅供修身闲聊交流，非专业定论，无法律及实操指导效力，读者凡事自辨自省，所有个人抉择后果自行负责</div>
   </div>
+  <!-- 排盘AI助手 -->
+  <div class="card ai-ctx-card" style="margin-top:10px;border-color:rgba(201,168,76,0.2);background:linear-gradient(135deg,rgba(201,168,76,0.04),transparent)">
+    <div class="card-title">🤖 AI排盘助手</div>
+    <div style="font-size:12px;color:var(--paper2);margin-bottom:8px">排盘后不懂看？让AI帮您解读</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <button class="ai-quick-btn" onclick="aiQuickAsk('帮我解读一下我的八字排盘结果')">📖 解读八字</button>
+      <button class="ai-quick-btn" onclick="aiQuickAsk('我的紫微斗数命盘怎么看？')">⭐ 解读紫微</button>
+      <button class="ai-quick-btn" onclick="aiQuickAsk('奇门遁甲排盘结果怎么分析？')">🌀 解读奇门</button>
+      <button class="ai-quick-btn" onclick="aiQuickAsk('我的八字五行缺什么？怎么补？')">⚖️ 五行分析</button>
+    </div>
+    <div style="margin-top:8px;display:flex;gap:6px;align-items:center">
+      <input type="text" id="aiInput_tools" placeholder="问AI助手..." style="flex:1;background:rgba(0,0,0,0.2);border:1px solid rgba(201,168,76,0.15);border-radius:16px;padding:8px 14px;color:var(--paper);font-size:13px;font-family:inherit;outline:none" onkeydown="if(event.key==='Enter')aiSendFromCtx('tools')">
+      <button onclick="aiSendFromCtx('tools')" style="flex-shrink:0;width:34px;height:34px;border-radius:50%;border:none;background:linear-gradient(135deg,#c9a84c,#b8932f);color:#1a1e14;font-size:16px;cursor:pointer">➤</button>
+    </div>
+  </div>
 </div>
 
 <div class="section" id="section-life">
@@ -221,6 +236,21 @@ body{font-family:var(--font);background:var(--ink);color:var(--paper);line-heigh
     <div class="tool-card" onclick="window.location.href='divination-hub.html#section-more';setTimeout(function(){showMoreModule('tizhi',document.getElementById('moreTab-tizhi'))},200)"><span class="tool-free">免费</span><span class="tool-icon">🧬</span><div class="tool-name">体质辨识</div><div class="tool-sub">AI体检报告分析</div></div>
     <div class="tool-card" onclick="window.location.href='divination-hub.html#section-more';setTimeout(function(){showMoreModule('faith',document.getElementById('moreTab-faith'))},200)"><span class="tool-free">免费</span><span class="tool-icon">🙏</span><div class="tool-name">佛道信仰</div><div class="tool-sub">参拜·功德·本命佛</div></div>
   </div>
+  <!-- 生活AI助手 -->
+  <div class="card ai-ctx-card" style="margin-top:10px;border-color:rgba(201,168,76,0.2);background:linear-gradient(135deg,rgba(201,168,76,0.04),transparent)">
+    <div class="card-title">🤖 AI生活顾问</div>
+    <div style="font-size:12px;color:var(--paper2);margin-bottom:8px">选号·取名·择日·风水，随时问</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <button class="ai-quick-btn" onclick="aiQuickAsk('手机号尾号选什么数字吉利？')">📱 选号建议</button>
+      <button class="ai-quick-btn" onclick="aiQuickAsk('给宝宝取名字有什么建议？')">👶 取名参考</button>
+      <button class="ai-quick-btn" onclick="aiQuickAsk('本月哪天适合搬家？')">📅 搬家择日</button>
+      <button class="ai-quick-btn" onclick="aiQuickAsk('家里玄关放什么摆件好？')">🏠 风水摆件</button>
+    </div>
+    <div style="margin-top:8px;display:flex;gap:6px;align-items:center">
+      <input type="text" id="aiInput_life" placeholder="问AI助手..." style="flex:1;background:rgba(0,0,0,0.2);border:1px solid rgba(201,168,76,0.15);border-radius:16px;padding:8px 14px;color:var(--paper);font-size:13px;font-family:inherit;outline:none" onkeydown="if(event.key==='Enter')aiSendFromCtx('life')">
+      <button onclick="aiSendFromCtx('life')" style="flex-shrink:0;width:34px;height:34px;border-radius:50%;border:none;background:linear-gradient(135deg,#c9a84c,#b8932f);color:#1a1e14;font-size:16px;cursor:pointer">➤</button>
+    </div>
+  </div>
 </div>
 
 <!-- ===== Tab 3: 知识 ===== -->
@@ -236,6 +266,21 @@ body{font-family:var(--font);background:var(--ink);color:var(--paper);line-heigh
     <div class="tool-card" onclick="openKnowledge('quotes')"><span class="tool-icon">💎</span><div class="tool-name">智慧语录</div><div class="tool-sub">每日推荐·分类浏览</div></div>
     <div class="tool-card" onclick="openKnowledge('scripture')"><span class="tool-icon">📜</span><div class="tool-name">经典朗读</div><div class="tool-sub">儒道佛经典·诵读</div></div>
     <div class="tool-card" onclick="openKnowledge('music')"><span class="tool-icon">🎵</span><div class="tool-name">梵音音乐</div><div class="tool-sub">咒语·唱诵</div></div>
+  </div>
+  <!-- 知识AI助手 -->
+  <div class="card ai-ctx-card" style="margin-top:10px;border-color:rgba(201,168,76,0.2);background:linear-gradient(135deg,rgba(201,168,76,0.04),transparent)">
+    <div class="card-title">🤖 AI知识问答</div>
+    <div style="font-size:12px;color:var(--paper2);margin-bottom:8px">命理·中医·经典，不懂就问</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <button class="ai-quick-btn" onclick="aiQuickAsk('什么是十天干十二地支？')">📜 天干地支</button>
+      <button class="ai-quick-btn" onclick="aiQuickAsk('五行相生相克是什么意思？')">☯️ 五行生克</button>
+      <button class="ai-quick-btn" onclick="aiQuickAsk('倪海厦老师讲伤寒论的核心是什么？')">📚 倪师伤寒</button>
+      <button class="ai-quick-btn" onclick="aiQuickAsk('八卦分别代表什么含义？')">🔮 八卦含义</button>
+    </div>
+    <div style="margin-top:8px;display:flex;gap:6px;align-items:center">
+      <input type="text" id="aiInput_knowledge" placeholder="问AI助手..." style="flex:1;background:rgba(0,0,0,0.2);border:1px solid rgba(201,168,76,0.15);border-radius:16px;padding:8px 14px;color:var(--paper);font-size:13px;font-family:inherit;outline:none" onkeydown="if(event.key==='Enter')aiSendFromCtx('knowledge')">
+      <button onclick="aiSendFromCtx('knowledge')" style="flex-shrink:0;width:34px;height:34px;border-radius:50%;border:none;background:linear-gradient(135deg,#c9a84c,#b8932f);color:#1a1e14;font-size:16px;cursor:pointer">➤</button>
+    </div>
   </div>
 </div>
 
@@ -343,6 +388,21 @@ body{font-family:var(--font);background:var(--ink);color:var(--paper);line-heigh
       <span>累计打卡: <span class="highlight" id="totalCheckin">0</span>天</span>
     </div>
   </div>
+  <!-- 修行AI助手 -->
+  <div class="card ai-ctx-card" style="margin-top:10px;border-color:rgba(201,168,76,0.2);background:linear-gradient(135deg,rgba(201,168,76,0.04),transparent)">
+    <div class="card-title">🤖 AI修行指导</div>
+    <div style="font-size:12px;color:var(--paper2);margin-bottom:8px">日课·功德·信仰，心中有惑随时问</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <button class="ai-quick-btn" onclick="aiQuickAsk('今天适合做什么功德？')">📿 今日功德</button>
+      <button class="ai-quick-btn" onclick="aiQuickAsk('心经和金刚经有什么区别？初学者该读哪个？')">📖 经文选择</button>
+      <button class="ai-quick-btn" onclick="aiQuickAsk('如何正确上香拜佛？')">🛐 参拜礼仪</button>
+      <button class="ai-quick-btn" onclick="aiQuickAsk('本命佛是怎么定的？')">🙏 本命佛</button>
+    </div>
+    <div style="margin-top:8px;display:flex;gap:6px;align-items:center">
+      <input type="text" id="aiInput_practice" placeholder="问AI助手..." style="flex:1;background:rgba(0,0,0,0.2);border:1px solid rgba(201,168,76,0.15);border-radius:16px;padding:8px 14px;color:var(--paper);font-size:13px;font-family:inherit;outline:none" onkeydown="if(event.key==='Enter')aiSendFromCtx('practice')">
+      <button onclick="aiSendFromCtx('practice')" style="flex-shrink:0;width:34px;height:34px;border-radius:50%;border:none;background:linear-gradient(135deg,#c9a84c,#b8932f);color:#1a1e14;font-size:16px;cursor:pointer">➤</button>
+    </div>
+  </div>
 </div>
 
 <!-- ===== Tab 4: 调理 ===== -->
@@ -356,6 +416,21 @@ body{font-family:var(--font);background:var(--ink);color:var(--paper);line-heigh
     <div class="health-card" onclick="openHealth('mingfang')"><span class="h-icon">💊</span><div class="h-name">名医名方</div><div class="h-sub">方剂查询</div></div>
     <div class="health-card" onclick="openHealth('shichen')"><span class="h-icon">🕐</span><div class="h-name">时辰养生</div><div class="h-sub">12时辰经络</div></div>
     <div class="health-card" onclick="window.location.href='divination-hub.html#section-bazi';setTimeout(function(){if(typeof runHealthForecast==='function'){var t=document.querySelectorAll('.bazi-module-title');for(var i=0;i<t.length;i++){if(t[i].textContent.indexOf('健康预测')>=0){t[i].click();setTimeout(function(){runHealthForecast()},300);break;}}}},500)"><span class="h-icon">🔮</span><div class="h-name">健康预测</div><div class="h-sub">八字命理预警</div></div>
+  </div>
+  <!-- 调理AI助手 -->
+  <div class="card ai-ctx-card" style="margin-top:10px;border-color:rgba(201,168,76,0.2);background:linear-gradient(135deg,rgba(201,168,76,0.04),transparent)">
+    <div class="card-title">🤖 AI养生顾问</div>
+    <div style="font-size:12px;color:var(--paper2);margin-bottom:8px">体质·食疗·方剂·节气，专业问</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <button class="ai-quick-btn" onclick="aiQuickAsk('我是阳虚体质，日常怎么调理？')">🧬 体质调理</button>
+      <button class="ai-quick-btn" onclick="aiQuickAsk('夏天养心吃什么食物好？')">🥗 食疗建议</button>
+      <button class="ai-quick-btn" onclick="aiQuickAsk('倪海厦老师讲的扶阳是什么意思？')">☀️ 扶阳理论</button>
+      <button class="ai-quick-btn" onclick="aiQuickAsk('八段锦怎么做？有什么好处？')">🧘 功法指导</button>
+    </div>
+    <div style="margin-top:8px;display:flex;gap:6px;align-items:center">
+      <input type="text" id="aiInput_health" placeholder="问AI助手..." style="flex:1;background:rgba(0,0,0,0.2);border:1px solid rgba(201,168,76,0.15);border-radius:16px;padding:8px 14px;color:var(--paper);font-size:13px;font-family:inherit;outline:none" onkeydown="if(event.key==='Enter')aiSendFromCtx('health')">
+      <button onclick="aiSendFromCtx('health')" style="flex-shrink:0;width:34px;height:34px;border-radius:50%;border:none;background:linear-gradient(135deg,#c9a84c,#b8932f);color:#1a1e14;font-size:16px;cursor:pointer">➤</button>
+    </div>
   </div>
 </div>
 
@@ -383,6 +458,21 @@ body{font-family:var(--font);background:var(--ink);color:var(--paper);line-heigh
   <div class="card" style="margin-top:10px">
     <div class="card-title">📦 我的订单</div>
     <div class="card-desc">暂无订单</div>
+  </div>
+  <!-- 商城AI助手 -->
+  <div class="card ai-ctx-card" style="margin-top:10px;border-color:rgba(201,168,76,0.2);background:linear-gradient(135deg,rgba(201,168,76,0.04),transparent)">
+    <div class="card-title">🤖 AI选品顾问</div>
+    <div style="font-size:12px;color:var(--paper2);margin-bottom:8px">根据八字五行推荐开运好物</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <button class="ai-quick-btn" onclick="aiQuickAsk('我五行缺木，适合戴什么开运物？')">🌲 缺木推荐</button>
+      <button class="ai-quick-btn" onclick="aiQuickAsk('本命佛是地藏菩萨，佩戴有什么讲究？')">🙏 本命佛讲究</button>
+      <button class="ai-quick-btn" onclick="aiQuickAsk('手串戴左手还是右手？有什么说法？')">📿 佩戴讲究</button>
+      <button class="ai-quick-btn" onclick="aiQuickAsk('属羊的人今年适合请什么吉祥物？')">🐏 生肖吉祥</button>
+    </div>
+    <div style="margin-top:8px;display:flex;gap:6px;align-items:center">
+      <input type="text" id="aiInput_shop" placeholder="问AI助手..." style="flex:1;background:rgba(0,0,0,0.2);border:1px solid rgba(201,168,76,0.15);border-radius:16px;padding:8px 14px;color:var(--paper);font-size:13px;font-family:inherit;outline:none" onkeydown="if(event.key==='Enter')aiSendFromCtx('shop')">
+      <button onclick="aiSendFromCtx('shop')" style="flex-shrink:0;width:34px;height:34px;border-radius:50%;border:none;background:linear-gradient(135deg,#c9a84c,#b8932f);color:#1a1e14;font-size:16px;cursor:pointer">➤</button>
+    </div>
   </div>
 </div>
 
@@ -427,6 +517,21 @@ body{font-family:var(--font);background:var(--ink);color:var(--paper);line-heigh
   </div>
   <div class="user-menu-item" onclick="shareToFriend()">
     <span class="user-menu-icon">📤</span><span class="user-menu-text">分享给好友</span><span class="user-menu-arrow">›</span>
+  </div>
+  <!-- 我的AI助手 -->
+  <div class="card ai-ctx-card" style="margin-top:10px;border-color:rgba(201,168,76,0.2);background:linear-gradient(135deg,rgba(201,168,76,0.04),transparent)">
+    <div class="card-title">🤖 AI专属顾问</div>
+    <div style="font-size:12px;color:var(--paper2);margin-bottom:8px">会员服务·使用帮助·个性化建议</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <button class="ai-quick-btn" onclick="aiQuickAsk('会员有哪些权益？值得开通吗？')">👑 会员权益</button>
+      <button class="ai-quick-btn" onclick="aiQuickAsk('八字排盘怎么看？新手教程')">📖 新手教程</button>
+      <button class="ai-quick-btn" onclick="aiQuickAsk('我的八字喜用神是木，日常生活有什么建议？')">🎯 专属建议</button>
+      <button class="ai-quick-btn" onclick="aiQuickAsk('如何查看我的历史排盘记录？')">📋 使用帮助</button>
+    </div>
+    <div style="margin-top:8px;display:flex;gap:6px;align-items:center">
+      <input type="text" id="aiInput_user" placeholder="问AI助手..." style="flex:1;background:rgba(0,0,0,0.2);border:1px solid rgba(201,168,76,0.15);border-radius:16px;padding:8px 14px;color:var(--paper);font-size:13px;font-family:inherit;outline:none" onkeydown="if(event.key==='Enter')aiSendFromCtx('user')">
+      <button onclick="aiSendFromCtx('user')" style="flex-shrink:0;width:34px;height:34px;border-radius:50%;border:none;background:linear-gradient(135deg,#c9a84c,#b8932f);color:#1a1e14;font-size:16px;cursor:pointer">➤</button>
+    </div>
   </div>
 </div>
 
@@ -2099,6 +2204,96 @@ function aiVoiceInput(){
 document.getElementById('aiInput').addEventListener('keydown', function(e){
   if(e.key === 'Enter') aiSendMsg();
 });
+
+// ════════ 各Tab场景化AI入口 ════════
+var AI_CTX_PROMPTS = {
+  tools: '用户在排盘页面提问，可能是关于八字/紫微/奇门等排盘结果的解读需求。请用简洁语言解释命理术语。',
+  life: '用户在生活页面提问，可能是关于选号、取名、择日、风水布局等日常应用。请给实用建议。',
+  knowledge: '用户在知识页面提问，可能是关于命理基础知识、中医理论、经典文献等。请用通俗语言解释。',
+  practice: '用户在修行页面提问，可能是关于功德、经文、参拜礼仪、本命佛等信仰问题。请尊重各信仰传统。',
+  health: '用户在调理页面提问，可能是关于体质、食疗、方剂、节气养生等中医问题。请给出养生建议并提醒咨询专业医师。',
+  shop: '用户在商城页面提问，可能是关于开运物选择、佩戴讲究、生肖吉祥物等。请根据五行八字知识给出推荐。',
+  user: '用户在个人中心提问，可能是关于会员权益、使用帮助、个性化建议等。请给出清晰指引。'
+};
+
+function aiSendFromCtx(ctx){
+  var input = document.getElementById('aiInput_' + ctx);
+  if(!input || !input.value.trim()) return;
+  var q = input.value.trim();
+  input.value = '';
+  
+  // 跳转到AI助手tab
+  var aiTab = document.querySelector('[onclick="switchTab(\'ai\',this)"]');
+  if(aiTab) aiTab.click();
+  
+  // 填入问题并发送
+  setTimeout(function(){
+    var aiInput = document.getElementById('aiInput');
+    if(aiInput){
+      aiInput.value = q;
+      aiSendMsgWithContext(ctx);
+    }
+  }, 300);
+}
+
+async function aiSendMsgWithContext(ctx){
+  var input = document.getElementById('aiInput');
+  var q = input.value.trim();
+  if(!q) return;
+  input.value = '';
+  
+  var area = document.getElementById('aiChatArea');
+  if(aiChatHistory.length === 0) area.innerHTML = '';
+  
+  var userDiv = document.createElement('div');
+  userDiv.className = 'ai-bubble-user';
+  userDiv.textContent = q;
+  area.appendChild(userDiv);
+  
+  var typingDiv = document.createElement('div');
+  typingDiv.className = 'ai-bubble-bot';
+  typingDiv.id = 'aiTyping';
+  typingDiv.innerHTML = '<div class="ai-label">🤖 AI命理助手</div><span class="ai-typing"></span><span class="ai-typing"></span><span class="ai-typing"></span>';
+  area.appendChild(typingDiv);
+  area.scrollTop = area.scrollHeight;
+  
+  aiChatHistory.push({role:'user', content:q});
+  
+  try{
+    var ctxPrompt = AI_CTX_PROMPTS[ctx] || '';
+    var sysMsg = {role:'system', content:'你是易道智鉴的AI命理助手。用户可能在手机上使用，回答要简洁易懂，避免过长。' + ctxPrompt + '涉及命理、风水、中医、养生等问题时，给出实用建议。提醒用户理性参考。'};
+    var chatCtx = aiChatHistory.slice(-10);
+    
+    var resp = await fetch('https://api.g2claw.com/v1/chat/completions', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'***'},
+      body:JSON.stringify({model:'auto',messages:[sysMsg].concat(chatCtx),max_tokens:800,temperature:0.7})
+    });
+    
+    if(!resp.ok) throw new Error('API '+resp.status);
+    var data = await resp.json();
+    var reply = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '抱歉，暂时无法回答，请稍后再试。';
+    
+    typingDiv.remove();
+    
+    var botDiv = document.createElement('div');
+    botDiv.className = 'ai-bubble-bot';
+    botDiv.innerHTML = '<div class="ai-label">🤖 AI命理助手</div>' + aiFmtText(reply) + '<div style="margin-top:6px;display:flex;gap:6px"><button class="ai-quick-btn" onclick="aiReadLast()" style="font-size:10px;padding:3px 8px">🔊 朗读</button></div>';
+    area.appendChild(botDiv);
+    area.scrollTop = area.scrollHeight;
+    
+    aiLastReply = reply;
+    aiChatHistory.push({role:'assistant', content:reply});
+    if(aiChatHistory.length > 40) aiChatHistory = aiChatHistory.slice(-40);
+  }catch(err){
+    typingDiv.remove();
+    var errDiv = document.createElement('div');
+    errDiv.className = 'ai-bubble-bot';
+    errDiv.innerHTML = '<div class="ai-label">🤖 AI命理助手</div>⚠️ 网络不稳定，请稍后重试。<br><span style="font-size:11px;color:var(--paper3)">'+(err.message||'')+'</span>';
+    area.appendChild(errDiv);
+    area.scrollTop = area.scrollHeight;
+  }
+}
 </script>
 <script src="js/mobile-voice.js?v=20260718"></script>
 </body>
