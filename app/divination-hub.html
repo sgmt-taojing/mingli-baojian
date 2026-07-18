@@ -4341,6 +4341,14 @@ setTimeout(removeLoadingOverlay,5000);
         <option value="normal">子时流派: 不换日</option>
         <option value="late">子时流派: 晚子换日</option>
       </select>
+      <select class="input-field" id="baziDayunMode" style="width:160px" title="大运排法流派">
+        <option value="standard">大运排法: 标准起运</option>
+        <option value="precise">大运排法: 精确起运(按分钟)</option>
+      </select>
+      <select class="input-field" id="baziLiuchun" style="width:160px" title="年柱切换标准">
+        <option value="lichun">年柱: 立春切换</option>
+        <option value="zhengshuo">年柱: 正月初一切换</option>
+      </select>
       <input type="text" class="input-field" id="baziBirthplace" placeholder="出生地(可选,如北京)" maxlength="20" style="width:160px">
       <input type="text" class="input-field" id="baziResidence" placeholder="居住地(可选,如上海)" maxlength="20" style="width:160px">
     </div>
@@ -12121,6 +12129,12 @@ function computeBazi() {
     _baziGlossary += '<div><strong style="color:var(--gold)">格局：</strong>命局中五行十神的特殊组合，如正官格、偏财格、食神格等，决定命局层次与取向</div>';
     _baziGlossary += '</div></div>';
     try { document.getElementById('baziResult').innerHTML += _baziGlossary; } catch(_ge) {}
+
+  // === 导出/复制按钮 ===
+  try {
+    var _exportBtns = '<div style="margin-top:16px;text-align:center"><button onclick="exportReportGeneric(\'baziResult\',\'八字命盘报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'baziResult\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button></div>';
+    document.getElementById('baziResult').innerHTML += _exportBtns;
+  } catch(_ee) {}
   } catch(_ge2) { console.warn('八字术语解释渲染错误:', _ge2); }
 
   // === 复制结果按钮 ===

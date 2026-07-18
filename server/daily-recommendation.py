@@ -840,6 +840,41 @@ def generate_daily_recommendation():
 
     return msg
 
+# === 免费会员推送策略 ===
+# 第1周每天→1月内每周一→3月后不推→年底恢复
+FREE_MEMBER_PUSH_POLICY = {
+    'week1': {'frequency': 'daily', 'desc': '注册第1周每日推送'},
+    'month1': {'frequency': 'weekly_monday', 'desc': '注册1个月内每周一推送'},
+    'month3': {'frequency': 'off', 'desc': '注册3个月后停止推送'},
+    'year_end': {'frequency': 'daily', 'desc': '年底(12月)恢复每日推送'},
+}
+
+def should_push_to_free_member(regist_date_str=None):
+    """判断免费会员今日是否应推送\n    regist_date_str: 注册日期 'YYYY-MM-DD'格式"""
+    if not regist_date_str:
+        return True  # 无注册日期默认推送
+    try:
+        regist = datetime.datetime.strptime(regist_date_str, '%Y-%m-%d')
+    except:
+        return True
+    now = datetime.datetime.now()
+    days_since = (now - regist).days
+    
+    # 年底(12月)恢复每日推送
+    if now.month == 12:
+        return True
+    # 第1周每天推
+    if days_since <= 7:
+        return True
+    # 第1月内每周一推
+    if days_since <= 30:
+        return now.weekday() == 0  # 周一
+    # 3个月后不推
+    if days_since > 90:
+        return False
+    # 1-3月之间每周一推
+    return now.weekday() == 0
+
 if __name__ == '__main__':
     msg = generate_daily_recommendation()
     print(msg)
