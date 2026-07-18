@@ -5670,7 +5670,7 @@ function showKnowledgeDetail(key, name) {
     html += '<div class="kd-section">' + window.KNOWLEDGE_DETAILS[mappedKey] + '</div>';
     
     detailEl.innerHTML = html;
-    let modal = document.getElementById('knowledgeDetailModal');
+    modal = document.getElementById('knowledgeDetailModal');
     if (modal) {
       modal.style.display = 'block';
       document.body.style.overflow = 'hidden';
@@ -5797,7 +5797,7 @@ function showKnowledgeDetail(key, name) {
     html = '<div class="kd-section">' + window.CONSTELLATION_KB.intro + '</div>';
   }
   detailEl.innerHTML = html || '<p style="color:var(--paper2);text-align:center;padding:40px 0">该领域知识正在完善中，敬请期待...</p>';
-  let modal = document.getElementById('knowledgeDetailModal');
+  modal = document.getElementById('knowledgeDetailModal');
   if (modal) {
     modal.style.display = 'block';
     document.body.style.overflow = 'hidden';
