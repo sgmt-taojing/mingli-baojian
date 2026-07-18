@@ -925,12 +925,16 @@ function _qmStars(score) {
   return s;
 }
 
-// 四害化解方案表
+// [舒晗课程校正] 四害化解方案表 — 依据密训班01四害化解绝技
+// 空亡：填实法/冲起法/合住法
+// 击刑：合解法/通关法/移位法
+// 入墓：冲开法/库库转化/敲击法
+// 门迫：通关法/换宫法/五行调和法
 var _QM_SIHAI_HUAJIE = {
-  '死门': {mascot:'铜铃/六字真言', direction:'东北方', color:'黄色/金色', method:'寅时(凌晨3-5点)挂铜铃于门楣，诵六字大明咒七遍'},
-  '惊门': {mascot:'白色水晶/金属风铃', direction:'正西方', color:'白色/银色', method:'酉时(下午5-7点)置白水晶于西窗台，挂金属风铃'},
-  '伤门': {mascot:'红色装饰/紫水晶', direction:'正东方', color:'红色/紫色', method:'卯时(上午5-7点)置紫水晶于东方位，配红色装饰'},
-  '杜门': {mascot:'绿色植物/木质文昌塔', direction:'东南方', color:'绿色/青色', method:'辰时(上午7-9点)置绿植或文昌塔于东南方位'}
+  '死门': {mascot:'铜铃/六字真言/黑曜石', direction:'西南方', color:'黄色/金色', method:'[舒晗课程校正] 死门落宫为门迫（土克水等），用通关法化解。具体：寅时(凌晨3-5点)挂铜铃于门楣，诵六字大明咒七遍。若死门临坤宫，放铜葫芦收煞；临坎宫，放黄色物品通关（土克水，用金通关）'},
+  '惊门': {mascot:'白色水晶/金属风铃/蓝水晶', direction:'正西方', color:'白色/银色', method:'[舒晗课程校正] 惊门主口舌惊恐，用通关法化解（金克木用水通关，放黑色/蓝色物品）。酉时(下午5-7点)置白水晶于西窗台，挂金属风铃。惊门临震宫主口舌伤人，宜移位避开'},
+  '伤门': {mascot:'红色装饰/紫水晶/黑曜石麒麟', direction:'正东方', color:'红色/紫色', method:'[舒晗课程校正] 伤门主伤害争斗，用通关法化解（木克土用火通关，放红色物品）。卯时(上午5-7点)置紫水晶于东方位，配红色装饰。伤门临中宫/坤宫主外伤，宜移位法避开该方位'},
+  '杜门': {mascot:'绿色植物/木质文昌塔/绿幽灵水晶', direction:'东南方', color:'绿色/青色', method:'[舒晗课程校正] 杜门主闭塞不通，用五行调和法（补宫位之不足）。辰时(上午7-9点)置绿植或文昌塔于东南方位，疏通气场。杜门临乾宫主事业受阻，宜多沟通破除闭塞'}
 };
 
 // 吉祥物推荐表（基于五行）
@@ -1239,17 +1243,27 @@ function getQimenReadingV2(palace, panData, question, baziData) {
     return _qmScore(dimPalace, dMen || '开门', dStar || '天心', dShen || '值符', dQi || '戊', geju, dKong);
   };
   
+  // [舒晗课程校正] 六维运势分析 — 依据密训导图03六大专项
+  // 舒晗六大专项：财运/事业/婚姻/学业/疾病/官司
   var careerScore = dimScore(question, '开门');
   var wealthScore = dimScore(question, '生门');
   var marriageScore = dimScore(question, '六合');
   var healthScore = dimScore(question, '天芮');
+  var studyScore = dimScore(question, '天辅');  // [舒晗课程校正] 学业看天辅星/景门
+  var lawsuitScore = dimScore(question, '惊门');  // [舒晗课程校正] 官非看惊门
   var fengshuiScore = dimScore(question, '生门') * 0.7 + dimScore(question, '开门') * 0.3;
   
   var dimensions = {
-    事业: _qmStars(careerScore) + ' ' + (careerScore >= 3 ? '事业宫位' + (PALACE_INFO[yongShenPalace]||{}).name + '，' + (men && _QM_JI_MEN.indexOf(men) >= 0 ? '吉门临宫，事业可成。' : men && _QM_XIONG_MEN.indexOf(men) >= 0 ? '凶门临宫，事业受阻。' : '门宫平和，稳步发展。') : '事业宫位欠佳，宜守不宜动。'),
-    财运: _qmStars(wealthScore) + ' ' + (wealthScore >= 3 ? '生门落宫得地，财运亨通。' + (isMaXing ? '马星动财，求财迅速。' : '') : '财运宫位不佳，需谨慎投资。' + (isKongWang ? '空亡减力，财不落实。' : '')),
-    婚姻: _qmStars(marriageScore) + ' ' + (marriageScore >= 3 ? '六合神临吉宫，姻缘可成。' : '婚姻宫位不佳，需耐心等待。'),
-    健康: _qmStars(healthScore) + ' ' + (healthScore >= 3 ? '天芮星落宫不凶，健康无虞。' : '天芮星临凶宫，注意身体。' + (shen === '白虎' ? '白虎临宫，防血光之灾。' : '')),
+    事业: _qmStars(careerScore) + ' ' + (careerScore >= 3 ? '开门落宫得地，事业可成。' + (men && _QM_JI_MEN.indexOf(men) >= 0 ? '吉门临宫，仕途亨通。' : '') : '事业宫位欠佳，宜守不宜动。' + (isKongWang ? '空亡减力，谋事不落实。' : '')),
+    // [舒晗课程校正] 财运双诊法：信息符号层（生门宫位临九星八神）+ 五行关系层（生门落宫五行与本宫五行生克）
+    财运: _qmStars(wealthScore) + ' ' + (wealthScore >= 3 ? '生门落宫得地，财运亨通。' + (isMaXing ? '马星动财，求财迅速。' : '') + '正财看戊土，偏财看丁奇。' : '财运宫位不佳，需谨慎投资。' + (isKongWang ? '空亡减力，财不落实。' : '') + '生门落宫五行克本宫五行，我去求财，费力。'),
+    婚姻: _qmStars(marriageScore) + ' ' + (marriageScore >= 3 ? '六合神临吉宫，姻缘可成。乙庚合为夫妻宫，男看乙奇，女看庚金。' : '婚姻宫位不佳，需耐心等待。' + (shen === '腾蛇' ? '腾蛇临宫，感情虚惊反复。' : '')),
+    // [舒晗课程校正] 学业看天辅星（文昌）+景门（文书考试）
+    学习: _qmStars(studyScore) + ' ' + (studyScore >= 3 ? '天辅星（文昌）落宫得地，利考试升学。景门主文书，临吉宫则金榜题名。' : '学业宫位不佳，需加倍努力。丁奇为文书用神，落宫凶则考试不利。'),
+    // [舒晗课程校正] 疾病看天芮星（病星）+伤门/死门
+    健康: _qmStars(healthScore) + ' ' + (healthScore >= 3 ? '天芮星落宫不凶，健康无虞。' : '天芮星临凶宫，注意身体。' + (shen === '白虎' ? '白虎临宫，防血光之灾。' : '') + (shen === '腾蛇' ? '腾蛇临宫，防神经性疾患。' : '')),
+    // [舒晗课程校正] 官非看惊门+六仪击刑
+    官非: _qmStars(lawsuitScore) + ' ' + (lawsuitScore >= 3 ? '惊门落宫平和，无官非之忧。' : '惊门临凶宫，须防口舌诉讼。' + (shen === '白虎' ? '白虎临宫，恐有刑伤。' : '') + (shen === '玄武' ? '玄武临宫，防暗中小人陷害。' : '')),
     风水: _qmStars(fengshuiScore) + ' ' + (fengshuiScore >= 3 ? '风水宫位得宜，宅运平稳。' + palaceDir + '方位宜布置吉物。' : '风水宫位欠佳，' + palaceDir + '方位需化解。')
   };
   
@@ -1355,6 +1369,9 @@ function getQimenReadingHTML(palace) {
   html += '<div>财运：' + (dims['财运']||'') + '</div>';
   html += '<div>婚姻：' + (dims['婚姻']||'') + '</div>';
   html += '<div>健康：' + (dims['健康']||'') + '</div>';
+  // [舒晗课程校正] 新增学习和官非维度
+  html += '<div>学习：' + (dims['学习']||'') + '</div>';
+  html += '<div>官非：' + (dims['官非']||'') + '</div>';
   html += '<div style="grid-column:1/-1">风水：' + (dims['风水']||'') + '</div>';
   html += '</div>';
   html += '</div>';
