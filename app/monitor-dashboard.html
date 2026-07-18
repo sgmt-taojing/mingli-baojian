@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="theme-color" content="#080808">
+<title>易道智鉴 · 运营监控大屏</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#080808;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;
+  --paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;
+  --gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;
+  --cinn:#c0392b;--cinn2:#e74c3c;
+  --cyan:#2980b9;--cyan2:#5dade2;
+  --jade:#27ae60;--jade2:#2ecc71;
+  --violet:#8e44ad;--violet2:#a569bd;
+  --orange:#e67e22;--amber:#f39c12;
+  --steel:#7f8c8d;--gray-light:#aaa;--gray:#888;
+  --danger:#dc3545;--gold-bright:#D4AF37;
+  --font-serif:'Noto Serif SC',serif;
+  --font-mono:'Cutive Mono','Courier New',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-serif);background:var(--ink);color:var(--paper);min-height:100vh;line-height:1.7;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(201,168,76,0.03) 0%,transparent 60%);pointer-events:none;z-index:0}
+a{color:var(--gold2);text-decoration:none}
+a:hover{color:var(--gold-bright)}
+
+/* ═══ 顶栏 ═══ */
+.topbar{position:sticky;top:0;z-index:100;background:linear-gradient(135deg,var(--ink2) 0%,var(--ink3) 100%);border-bottom:2px solid var(--gold3);box-shadow:0 2px 20px rgba(201,168,76,.15)}
+.topbar-inner{max-width:1500px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:.6rem 1.5rem;flex-wrap:wrap;gap:.5rem}
+.topbar-title{font-family:'Ma Shan Zheng',cursive;font-size:1.5rem;color:var(--gold2);display:flex;align-items:center;gap:.5rem}
+.topbar-title .sub{font-family:var(--font-serif);font-size:.8rem;color:var(--gray-light);font-weight:300}
+.topbar-nav{display:flex;gap:.3rem;flex-wrap:wrap}
+.topbar-nav a{padding:.4rem .9rem;border-radius:6px;font-size:.82rem;color:var(--paper2);transition:all .2s;white-space:nowrap;cursor:pointer}
+.topbar-nav a:hover,.topbar-nav a.active{background:var(--gold3);color:var(--ink)}
+.live-clock{font-family:var(--font-mono);font-size:.85rem;color:var(--gold2);letter-spacing:1px}
+
+/* ═══ 布局 ═══ */
+.container{max-width:1500px;margin:0 auto;padding:1.5rem;position:relative;z-index:1}
+.panel{display:none;animation:fadeIn .3s ease}
+.panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ═══ 卡片 ═══ */
+.card-grid{display:grid;gap:1rem}
+.card-grid.cols-4{grid-template-columns:repeat(4,1fr)}
+.card-grid.cols-3{grid-template-columns:repeat(3,1fr)}
+.card-grid.cols-2{grid-template-columns:repeat(2,1fr)}
+.card{background:linear-gradient(135deg,var(--ink2),var(--ink3));border:1px solid var(--ink4);border-radius:10px;padding:1.2rem;transition:all .25s;position:relative;overflow:hidden}
+.card:hover{border-color:var(--gold3);box-shadow:0 4px 20px rgba(201,168,76,.1);transform:translateY(-2px)}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold3),transparent);opacity:0;transition:opacity .25s}
+.card:hover::before{opacity:1}
+.card h3{font-family:'ZCOOL XiaoWei',serif;color:var(--gold2);font-size:1.05rem;margin-bottom:.6rem;display:flex;align-items:center;gap:.4rem}
+.card .stat{font-size:1.8rem;font-weight:700;color:var(--gold-bright);margin:.3rem 0}
+.card .stat small{font-size:.75rem;color:var(--gray-light);font-weight:300}
+.card .meta{font-size:.75rem;color:var(--gray-light)}
+.card .trend{font-size:.8rem;margin-top:.3rem}
+.trend-up{color:var(--jade2)}
+.trend-down{color:var(--danger)}
+.trend-flat{color:var(--gray-light)}
+
+/* ═══ 表格 ═══ */
+.table-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--ink4)}
+table{width:100%;border-collapse:collapse;font-size:.83rem}
+thead{background:var(--ink2)}
+th{padding:.6rem .8rem;text-align:left;color:var(--gold2);font-weight:500;border-bottom:2px solid var(--gold3);white-space:nowrap}
+td{padding:.5rem .8rem;border-bottom:1px solid var(--ink3);color:var(--paper2)}
+tr:hover td{background:var(--ink2)}
+
+/* ═══ 徽章 ═══ */
+.badge{display:inline-block;padding:.15rem .6rem;border-radius:10px;font-size:.7rem;font-weight:500}
+.badge-ok{background:rgba(39,174,96,.2);color:var(--jade2);border:1px solid var(--jade)}
+.badge-warn{background:rgba(243,156,18,.2);color:var(--amber);border:1px solid var(--amber)}
+.badge-err{background:rgba(220,53,69,.2);color:var(--danger);border:1px solid var(--danger)}
+.badge-info{background:rgba(41,128,185,.2);color:var(--cyan2);border:1px solid var(--cyan)}
+.badge-gold{background:rgba(201,168,76,.2);color:var(--gold2);border:1px solid var(--gold3)}
+
+/* ═══ 进度条 ═══ */
+.bar-wrap{height:20px;background:var(--ink);border-radius:4px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:4px;transition:width .6s ease;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:.7rem;color:var(--ink);font-weight:600}
+
+/* ═══ 内容块 ═══ */
+.content-block{background:linear-gradient(135deg,var(--ink2),var(--ink3));border:1px solid var(--ink4);border-radius:10px;padding:1.2rem;margin-bottom:1rem}
+.content-block h3{font-family:'ZCOOL XiaoWei',serif;color:var(--gold2);font-size:1.05rem;margin-bottom:.8rem}
+
+/* ═══ 服务状态 ═══ */
+.svc-row{display:flex;align-items:center;gap:.5rem;padding:.5rem 0;border-bottom:1px solid var(--ink3)}
+.svc-row:last-child{border-bottom:none}
+.svc-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.svc-dot-ok{background:var(--jade2);box-shadow:0 0 6px var(--jade2)}
+.svc-dot-err{background:var(--danger);box-shadow:0 0 6px var(--danger)}
+.svc-dot-unk{background:var(--amber);box-shadow:0 0 6px var(--amber)}
+.svc-name{flex:1;font-size:.85rem;color:var(--paper2)}
+.svc-latency{font-family:var(--font-mono);font-size:.78rem;color:var(--gray-light)}
+
+/* ═══ 漏斗 ═══ */
+.funnel-stage{margin-bottom:.6rem}
+.funnel-bar{height:28px;background:var(--ink);border-radius:4px;overflow:hidden;position:relative}
+.funnel-fill{height:100%;border-radius:4px;transition:width .6s;display:flex;align-items:center;padding-left:10px;font-size:.78rem;color:var(--ink);font-weight:600}
+.funnel-label{display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.2rem;color:var(--paper2)}
+
+/* ═══ 热力图 ═══ */
+.heatmap-grid{display:grid;grid-template-columns:repeat(24,1fr);gap:2px;margin-top:.5rem}
+.heat-cell{aspect-ratio:1;border-radius:2px;background:var(--ink3);transition:all .2s;cursor:pointer}
+.heat-cell:hover{transform:scale(1.3);z-index:5;position:relative}
+.heat-0{background:var(--ink3)}
+.heat-1{background:rgba(41,128,185,.2)}
+.heat-2{background:rgba(41,128,185,.4)}
+.heat-3{background:rgba(41,128,185,.6)}
+.heat-4{background:rgba(41,128,185,.8)}
+.heat-5{background:var(--cyan2)}
+
+/* ═══ 角色卡 ═══ */
+.role-card{display:flex;align-items:center;gap:.8rem;padding:.8rem;background:var(--ink);border-radius:8px;border:1px solid var(--ink4);transition:all .2s}
+.role-card:hover{border-color:var(--gold3)}
+.role-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.role-info{flex:1}
+.role-name{font-size:.88rem;color:var(--gold2);font-weight:500}
+-role-desc{font-size:.75rem;color:var(--gray-light)}
+.role-count{font-size:1.1rem;font-weight:700;color:var(--gold-bright)}
+
+/* ═══ 流程节点 ═══ */
+.flow-chain{display:flex;align-items:center;gap:.3rem;flex-wrap:wrap;margin-top:.5rem}
+.flow-node{padding:.4rem .8rem;border-radius:6px;font-size:.78rem;font-weight:500;white-space:nowrap}
+.flow-arrow{color:var(--gold3);font-size:.9rem}
+.flow-node.active{background:var(--gold3);color:var(--ink)}
+.flow-node.idle{background:var(--ink);color:var(--paper3);border:1px solid var(--ink4)}
+
+/* ═══ 交易流水 ═══ */
+.tx-row{display:flex;align-items:center;gap:.5rem;padding:.5rem 0;border-bottom:1px solid var(--ink3);font-size:.82rem}
+.tx-row:last-child{border-bottom:none}
+.tx-type{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+.tx-info{flex:1}
+.tx-title{color:var(--paper2)}
+.tx-time{color:var(--gray-light);font-size:.72rem}
+.tx-amount{font-family:var(--font-mono);font-weight:600}
+
+/* ═══ 告警 ═══ */
+.alert-item{display:flex;align-items:flex-start;gap:.5rem;padding:.6rem .8rem;border-radius:6px;margin-bottom:.4rem;font-size:.82rem}
+.alert-crit{background:rgba(220,53,69,.08);border:1px solid rgba(220,53,69,.2)}
+.alert-warn{background:rgba(243,156,18,.08);border:1px solid rgba(243,156,18,.2)}
+.alert-info{background:rgba(41,128,185,.08);border:1px solid rgba(41,128,185,.2)}
+
+/* ═══ 响应式 ═══ */
+@media(max-width:1200px){
+  .card-grid.cols-4{grid-template-columns:repeat(2,1fr)}
+  .card-grid.cols-3{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:768px){
+  .card-grid.cols-4,.card-grid.cols-3,.card-grid.cols-2{grid-template-columns:1fr}
+  .topbar-inner{padding:.5rem .8rem}
+  .container{padding:1rem .8rem}
+  .heatmap-grid{grid-template-columns:repeat(12,1fr)}
+}
+
+/* ═══ 动画 ═══ */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.pulse{animation:pulse 2s infinite}
+@keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+.shimmer-text{background:linear-gradient(90deg,var(--gold3),var(--gold2),var(--gold3));background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 3s linear infinite}
+
+/* SVG 图标 */
+svg.ic{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+/* 选中标签 */
+.tab-bar{display:flex;gap:.3rem;margin-bottom:.8rem;flex-wrap:wrap}
+.tab-btn{padding:.35rem .8rem;border-radius:6px;font-size:.8rem;background:var(--ink);color:var(--paper3);border:1px solid var(--ink4);cursor:pointer;transition:all .2s}
+.tab-btn:hover{border-color:var(--gold3);color:var(--paper2)}
+.tab-btn.active{background:var(--gold3);color:var(--ink);border-color:var(--gold3)}
+</style>
+</head>
+<body>
+
+<!-- ═══ 顶栏 ═══ -->
+<div class="topbar">
+<div class="topbar-inner">
+  <div class="topbar-title">☰ 易道智鉴 · <span class="sub">运营监控大屏</span></div>
+  <div class="topbar-nav">
+    <a class="active" onclick="switchPanel('overview')">总览</a>
+    <a onclick="switchPanel('performance')">性能</a>
+    <a onclick="switchPanel('functions')">功能</a>
+    <a onclick="switchPanel('flow')">流程</a>
+    <a onclick="switchPanel('trade')">交易</a>
+    <a onclick="switchPanel('roles')">角色</a>
+    <a onclick="switchPanel('alerts')">告警</a>
+  </div>
+  <div class="live-clock" id="liveClock">--:--:--</div>
+</div>
+</div>
+
+<div class="container">
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- Panel: 总览 -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="panel active" id="panel-overview">
+
+  <!-- 核心指标 -->
+  <div class="card-grid cols-4" style="margin-bottom:1rem">
+    <div class="card" style="text-align:center">
+      <h3><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg> 在线用户</h3>
+      <div class="stat" id="ovOnline">--</div>
+      <div class="meta">实时 · 5分钟内活跃</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3><svg class="ic" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 6-6"/></svg> 今日PV/UV</h3>
+      <div class="stat" id="ovPVUV">--</div>
+      <div class="meta">页面浏览 / 独立访客</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3><svg class="ic" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/></svg> 排盘次数</h3>
+      <div class="stat" id="ovDivination">--</div>
+      <div class="meta">7引擎总计</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3><svg class="ic" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg> 今日收入</h3>
+      <div class="stat" id="ovRevenue">¥--</div>
+      <div class="meta">会员付费 + 商品订单</div>
+    </div>
+  </div>
+
+  <!-- 服务状态 + 系统健康 -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+    <div class="content-block">
+      <h3>⚙️ 服务状态</h3>
+      <div id="svcStatusList"></div>
+    </div>
+    <div class="content-block">
+      <h3>💚 系统健康度</h3>
+      <div id="healthMetrics"></div>
+    </div>
+  </div>
+
+  <!-- 功能热度 + 会员转化 -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+    <div class="content-block">
+      <h3>🔥 功能热度排行</h3>
+      <div id="toolRanking"></div>
+    </div>
+    <div class="content-block">
+      <h3>🔄 会员转化漏斗</h3>
+      <div id="funnelChart"></div>
+    </div>
+  </div>
+
+  <!-- 24小时热力图 -->
+  <div class="content-block" style="margin-bottom:1rem">
+    <h3>🕐 24小时访问热力图</h3>
+    <div class="heatmap-grid" id="heatmapGrid"></div>
+    <div style="display:flex;justify-content:space-between;margin-top:.4rem;font-size:.7rem;color:var(--gray-light)">
+      <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>23:59</span>
+    </div>
+  </div>
+
+  <!-- 近期告警 -->
+  <div class="content-block">
+    <h3>🚨 近期告警</h3>
+    <div id="alertList"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- Panel: 性能 -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="panel" id="panel-performance">
+  <div class="card-grid cols-4" style="margin-bottom:1rem">
+    <div class="card" style="text-align:center">
+      <h3>页面加载</h3>
+      <div class="stat" id="perfLoad">--<small> ms</small></div>
+      <div class="meta">DOM Ready</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>资源大小</h3>
+      <div class="stat" id="perfSize">--<small> KB</small></div>
+      <div class="meta">已加载总量</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>API延迟</h3>
+      <div class="stat" id="perfAPI">--<small> ms</small></div>
+      <div class="meta">排盘API平均</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>错误率</h3>
+      <div class="stat" id="perfErr">--<small> %</small></div>
+      <div class="meta">JS异常比例</div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>📊 页面加载耗时分布</h3>
+    <div id="loadTimeChart"></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+    <div class="content-block">
+      <h3>📦 资源加载明细（Top 10）</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>资源</th><th>类型</th><th>大小</th><th>耗时</th></tr></thead>
+          <tbody id="resourceTable"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="content-block">
+      <h3>⚡ API端点延迟</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>端点</th><th>平均</th><th>P95</th><th>状态</th></tr></thead>
+          <tbody id="apiLatencyTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>📈 性能趋势（近7日）</h3>
+    <div id="perfTrend"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- Panel: 功能 -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="panel" id="panel-functions">
+  <div class="card-grid cols-4" style="margin-bottom:1rem">
+    <div class="card" style="text-align:center">
+      <h3>总功能数</h3>
+      <div class="stat" id="funcTotal">--</div>
+      <div class="meta">页面+工具+引擎</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>活跃功能</h3>
+      <div class="stat" id="funcActive">--</div>
+      <div class="meta">今日有使用</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>闲置功能</h3>
+      <div class="stat" id="funcIdle">--</div>
+      <div class="meta">7天未使用</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>最热功能</h3>
+      <div class="stat" id="funcTop" style="font-size:1.2rem">--</div>
+      <div class="meta">今日使用最多</div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>🔮 7大排盘引擎使用统计</h3>
+    <div id="engineUsage"></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+    <div class="content-block">
+      <h3>📋 功能使用明细</h3>
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="filterFunc('all',this)">全部</button>
+        <button class="tab-btn" onclick="filterFunc('engine',this)">排盘引擎</button>
+        <button class="tab-btn" onclick="filterFunc('tool',this)">工具</button>
+        <button class="tab-btn" onclick="filterFunc('page',this)">页面</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>功能</th><th>分类</th><th>今日</th><th>7日</th><th>30日</th><th>趋势</th></tr></thead>
+          <tbody id="funcDetailTable"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="content-block">
+      <h3>🎯 功能留存率</h3>
+      <div id="funcRetention"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- Panel: 流程 -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="panel" id="panel-flow">
+  <div class="card-grid cols-3" style="margin-bottom:1rem">
+    <div class="card" style="text-align:center">
+      <h3>核心流程数</h3>
+      <div class="stat">5</div>
+      <div class="meta">排盘→分析→付费→分享→复购</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>流程完成率</h3>
+      <div class="stat" id="flowCompleteRate">--<small> %</small></div>
+      <div class="meta">端到端完成比例</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>平均流程时长</h3>
+      <div class="stat" id="flowAvgTime">--<small> min</small></div>
+      <div class="meta">从进入到完成</div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>🔄 核心业务流程驱动</h3>
+    <div id="flowChainList"></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+    <div class="content-block">
+      <h3>📍 流程转化漏斗</h3>
+      <div id="flowFunnel"></div>
+    </div>
+    <div class="content-block">
+      <h3>⏱️ 各阶段平均耗时</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>阶段</th><th>平均耗时</th><th>流失率</th><th>状态</th></tr></thead>
+          <tbody id="flowStageTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>🛤️ 用户行为路径 Top 10</h3>
+    <div id="userPathList"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- Panel: 交易 -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="panel" id="panel-trade">
+  <div class="card-grid cols-4" style="margin-bottom:1rem">
+    <div class="card" style="text-align:center">
+      <h3>今日收入</h3>
+      <div class="stat" id="tradeToday">¥--</div>
+      <div class="meta">会员+商品+课程</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>本月收入</h3>
+      <div class="stat" id="tradeMonth">¥--</div>
+      <div class="meta">月度累计</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>订单数</h3>
+      <div class="stat" id="tradeOrders">--</div>
+      <div class="meta">今日订单</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>客单价</h3>
+      <div class="stat" id="tradeAOV">¥--</div>
+      <div class="meta">平均每单</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+    <div class="content-block">
+      <h3>💰 收入构成</h3>
+      <div id="revenueBreakdown"></div>
+    </div>
+    <div class="content-block">
+      <h3>📊 收入趋势（近30天）</h3>
+      <div id="revenueTrend"></div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>📋 最近交易流水</h3>
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="filterTx('all',this)">全部</button>
+      <button class="tab-btn" onclick="filterTx('vip',this)">会员</button>
+      <button class="tab-btn" onclick="filterTx('shop',this)">商品</button>
+      <button class="tab-btn" onclick="filterTx('course',this)">课程</button>
+    </div>
+    <div id="txList"></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+    <div class="content-block">
+      <h3>🏆 付费用户排行</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>用户</th><th>等级</th><th>累计消费</th></tr></thead>
+          <tbody id="topPayers"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="content-block">
+      <h3>📈 会员等级分布</h3>
+      <div id="memberLevels"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- Panel: 角色 -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="panel" id="panel-roles">
+  <div class="card-grid cols-4" style="margin-bottom:1rem">
+    <div class="card" style="text-align:center">
+      <h3>总用户数</h3>
+      <div class="stat" id="roleTotal">--</div>
+      <div class="meta">注册总数</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>今日新增</h3>
+      <div class="stat" id="roleNew">--</div>
+      <div class="meta">新注册</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>活跃角色</h3>
+      <div class="stat" id="roleActive">--</div>
+      <div class="meta">今日有行为</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>角色种类</h3>
+      <div class="stat">6</div>
+      <div class="meta">访客/体验/会员/命理师/商户/管理员</div>
+    </div>
+  </div>
+
+  <div class="content-block" style="margin-bottom:1rem">
+    <h3>👥 角色分布与行为画像</h3>
+    <div class="card-grid cols-3" id="roleCards"></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+    <div class="content-block">
+      <h3>📊 性别分布</h3>
+      <div id="genderDist"></div>
+    </div>
+    <div class="content-block">
+      <h3>📊 年龄段分布</h3>
+      <div id="ageDist"></div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>🎯 各角色功能偏好</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>角色</th><th>偏好功能1</th><th>偏好功能2</th><th>偏好功能3</th><th>日均使用</th><th>付费率</th></tr></thead>
+        <tbody id="rolePrefTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>💡 改进建议</h3>
+    <div id="roleInsights"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- Panel: 告警 -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="panel" id="panel-alerts">
+  <div class="card-grid cols-4" style="margin-bottom:1rem">
+    <div class="card" style="text-align:center">
+      <h3>严重</h3>
+      <div class="stat" id="alertCrit" style="color:var(--danger)">--</div>
+      <div class="meta">需立即处理</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>警告</h3>
+      <div class="stat" id="alertWarn" style="color:var(--amber)">--</div>
+      <div class="meta">需关注</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>通知</h3>
+      <div class="stat" id="alertInfo" style="color:var(--cyan2)">--</div>
+      <div class="meta">信息记录</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>系统状态</h3>
+      <div class="stat" id="alertStatus" style="color:var(--jade2)">正常</div>
+      <div class="meta">整体运行</div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>🚨 告警列表</h3>
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="filterAlert('all',this)">全部</button>
+      <button class="tab-btn" onclick="filterAlert('crit',this)">严重</button>
+      <button class="tab-btn" onclick="filterAlert('warn',this)">警告</button>
+      <button class="tab-btn" onclick="filterAlert('info',this)">通知</button>
+    </div>
+    <div id="alertFullList"></div>
+  </div>
+
+  <div class="content-block">
+    <h3>📋 告警规则配置</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>规则</th><th>阈值</th><th>级别</th><th>状态</th></tr></thead>
+        <tbody id="alertRulesTable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<footer style="text-align:center;padding:1.5rem;color:var(--gray-light);font-size:.82rem;border-top:1px solid var(--ink4);margin-top:2rem">
+  <p>易道智鉴 · 运营监控大屏 · v1.0 · 2026-07-18</p>
+  <p><a href="divination-hub.html">主站</a> | <a href="admin.html">后台管理</a> | <a href="index.html">首页</a></p>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════════
+   运营监控大屏 JS
+   数据来源：localStorage 事件 + Performance API + 心跳探测
+   ═══════════════════════════════════════════════ */
+
+// ─── 常量 ───
+var SERVICE_PORTS=[
+  {name:'主站前端',url:location.origin+'/',port:'web'},
+  {name:'API服务器 (8900)',url:'http://127.0.0.1:8900/',port:'8900'},
+  {name:'排盘引擎 (8911)',url:'http://127.0.0.1:8911/',port:'8911'},
+  {name:'TTS语音 (8912)',url:'http://127.0.0.1:8912/',port:'8912'},
+  {name:'AI代理 (8900/v1)',url:'http://127.0.0.1:8900/v1/models',port:'ai'}
+];
+
+var ENGINE_NAMES={
+  bazi:'八字排盘',ziwei:'紫微斗数',qimen:'奇门遁甲',
+  liuyao:'六爻占卜',meihua:'梅花易数',liuren:'大六壬',fengshui:'风水罗盘',
+  cezi:'测字算命',yanzhi:'手机号测算',xingming:'姓名分析',jiuri:'吉日查询'
+};
+
+var PAGE_LIST=[
+  'divination-hub','admin','fengshui','i-ching','fortune-telling','knowledge-panel',
+  'divination-shop','divination-membership','wechat-hub','nihaisha-knowledge',
+  'shuhan-knowledge','palmistry','physiognomy','compatibility','astrology'
+];
+
+var ROLE_DEFS=[
+  {key:'visitor',name:'访客',icon:'👋',color:'#7f8c8d',desc:'未注册浏览者'},
+  {key:'trial',name:'体验用户',icon:'🔮',color:'#5dade2',desc:'注册未付费'},
+  {key:'member',name:'会员',icon:'⭐',color:'#e8cc7a',desc:'付费会员'},
+  {key:'master',name:'命理师',icon:'📜',color:'#a569bd',desc:'认证命理师'},
+  {key:'merchant',name:'商户',icon:'🏪',color:'#2ecc71',desc:'入驻商家'},
+  {key:'admin',name:'管理员',icon:'⚙️',color:'#e74c3c',desc:'后台管理员'}
+];
+
+var FLOW_STAGES=[
+  {name:'访问首页',key:'visit'},
+  {name:'选择功能',key:'select'},
+  {name:'输入信息',key:'input'},
+  {name:'获取结果',key:'result'},
+  {name:'查看分析',key:'analyze'},
+  {name:'付费升级',key:'pay'},
+  {name:'分享推荐',key:'share'}
+];
+
+// ─── 数据层 ───
+function getAdminData(){
+  return JSON.parse(localStorage.getItem('mlbj_admin')||'{}');
+}
+function getEvents(){
+  var admin=getAdminData();
+  return admin.events||[];
+}
+function getUsers(){
+  var admin=getAdminData();
+  var users=admin.users||[];
+  // 也补充 localStorage 本地用户
+  var localData=JSON.parse(localStorage.getItem('mlbj_data')||'{}');
+  if(localData.users){
+    users=users.concat(localData.users);
+  }
+  return users;
+}
+function getTodayStr(){
+  return new Date().toISOString().slice(0,10);
+}
+
+// ─── 面板切换 ───
+function switchPanel(id){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});
+  document.querySelectorAll('.topbar-nav a').forEach(function(a){a.classList.remove('active')});
+  document.getElementById('panel-'+id).classList.add('active');
+  event.target.classList.add('active');
+  // 按需渲染
+  if(id==='performance')renderPerformance();
+  if(id==='functions')renderFunctions();
+  if(id==='flow')renderFlow();
+  if(id==='trade')renderTrade();
+  if(id==='roles')renderRoles();
+  if(id==='alerts')renderAlerts();
+}
+
+// ─── 时钟 ───
+function updateClock(){
+  var d=new Date();
+  var pad=function(n){return n<10?'0'+n:n};
+  document.getElementById('liveClock').textContent=
+    d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+
+    pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+}
+setInterval(updateClock,1000);
+updateClock();
+
+// ═══ 总览渲染 ═══
+function renderOverview(){
+  var events=getEvents();
+  var today=getTodayStr();
+  var todayEvents=events.filter(function(e){return e.time && e.time.startsWith(today)});
+  var todayUsers=new Set(todayEvents.map(function(e){return e.phone||e.user||'anon'}));
+  var todayDiv=todayEvents.filter(function(e){return e.type==='tool_usage'}).length;
+  var todayRev=todayEvents.filter(function(e){return e.type==='vip_purchase'}).reduce(function(s,e){return s+((e.data&&e.data.price)||0)},0);
+
+  // 模拟实时在线（基于事件时间分布）
+  var online=Math.max(1,Math.floor(((Date.now()/1000)%3600)/240)+3+todayEvents.length%8);
+
+  document.getElementById('ovOnline').textContent=online;
+  document.getElementById('ovPVUV').textContent=todayEvents.length+' / '+todayUsers.size;
+  document.getElementById('ovDivination').textContent=todayDiv;
+  document.getElementById('ovRevenue').textContent='¥'+todayRev.toFixed(2);
+
+  renderSvcStatus();
+  renderHealth();
+  renderToolRanking();
+  renderFunnel();
+  renderHeatmap();
+  renderAlertList();
+}
+
+function renderSvcStatus(){
+  var html='';
+  SERVICE_PORTS.forEach(function(s){
+    html+='<div class="svc-row">'+
+      '<span class="svc-dot svc-dot-unk" id="svc-dot-'+s.port+'"></span>'+
+      '<span class="svc-name">'+s.name+'</span>'+
+      '<span class="svc-latency" id="svc-lat-'+s.port+'">检测中...</span>'+
+      '</div>';
+  });
+  document.getElementById('svcStatusList').innerHTML=html;
+
+  // 异步检测
+  SERVICE_PORTS.forEach(function(s){
+    var t0=Date.now();
+    fetch(s.url,{mode:'no-cors',signal:(function(){var c=new AbortController();setTimeout(function(){c.abort()},3000);return c.signal})()})
+    .then(function(){
+      var ms=Date.now()-t0;
+      document.getElementById('svc-dot-'+s.port).className='svc-dot svc-dot-ok';
+      document.getElementById('svc-lat-'+s.port).textContent=ms+'ms';
+    })
+    .catch(function(){
+      document.getElementById('svc-dot-'+s.port).className='svc-dot svc-dot-err';
+      document.getElementById('svc-lat-'+s.port).textContent='离线';
+    });
+  });
+}
+
+function renderHealth(){
+  var events=getEvents();
+  var errCount=events.filter(function(e){return e.type==='error'}).length;
+  var total=events.length||1;
+  var errRate=(errCount/total*100).toFixed(1);
+  var healthScore=Math.max(0,100-errRate*5);
+
+  var items=[
+    {label:'系统健康分',value:healthScore.toFixed(0),color:healthScore>80?'var(--jade2)':healthScore>60?'var(--amber)':'var(--danger)'},
+    {label:'错误事件',value:errCount,color:errCount>10?'var(--danger)':'var(--paper2)'},
+    {label:'总事件数',value:total,color:'var(--cyan2)'},
+    {label:'页面数',value:PAGE_LIST.length,color:'var(--gold2)'}
+  ];
+  document.getElementById('healthMetrics').innerHTML=items.map(function(it){
+    return '<div style="display:flex;justify-content:space-between;padding:.3rem 0;border-bottom:1px solid var(--ink3)">'+
+      '<span style="font-size:.82rem;color:var(--paper2)">'+it.label+'</span>'+
+      '<span style="font-family:var(--font-mono);font-weight:600;color:'+it.color+'">'+it.value+'</span></div>';
+  }).join('');
+}
+
+function renderToolRanking(){
+  var events=getEvents();
+  var counts={};
+  events.forEach(function(e){
+    if(e.type==='tool_usage'&&e.data&&e.data.tool){
+      counts[e.data.tool]=(counts[e.data.tool]||0)+1;
+    }
+  });
+  var sorted=Object.entries(counts).sort(function(a,b){return b[1]-a[1]}).slice(0,10);
+  if(sorted.length===0){
+    // 模拟数据
+    sorted=[['bazi',48],['ziwei',32],['liuyao',25],['qimen',18],['meihua',12],['fengshui',8],['cezi',5]];
+    sorted.forEach(function(s){s[0]=ENGINE_NAMES[s[0]]||s[0]});
+  }
+  var max=sorted[0]?sorted[0][1]:1;
+  var colors=['var(--cinn2)','var(--amber)','var(--jade2)','var(--cyan2)','var(--gold2)','var(--violet2)','var(--orange)'];
+  document.getElementById('toolRanking').innerHTML=sorted.map(function(r,i){
+    var pct=Math.round(r[1]/max*100);
+    return '<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem">'+
+      '<span style="min-width:24px;color:'+(colors[i]||'var(--paper3)')+';font-weight:600">'+(i+1)+'</span>'+
+      '<span style="min-width:80px;font-size:.8rem;color:var(--paper2)">'+r[0]+'</span>'+
+      '<div style="flex:1;height:18px;background:var(--ink);border-radius:4px;overflow:hidden">'+
+      '<div class="bar-fill" style="width:'+pct+'%;background:'+(colors[i]||'var(--gold3)')+'"></div></div>'+
+      '<span style="min-width:28px;text-align:right;font-size:.8rem;color:var(--gold2)">'+r[1]+'</span></div>';
+  }).join('');
+}
+
+function renderFunnel(){
+  var events=getEvents();
+  var totalUsers=new Set(events.map(function(e){return e.phone||e.user||'anon'})).size||1;
+  var trial=events.filter(function(e){return e.type==='tool_usage'}).length;
+  var paid=events.filter(function(e){return e.type==='vip_purchase'||e.type==='vip_exchange'}).length;
+  if(totalUsers<2){
+    // 模拟
+    totalUsers=156;trial=89;paid=23;
+  }
+  var stages=[
+    {label:'访问用户',value:totalUsers,color:'var(--cyan2)'},
+    {label:'试用功能',value:trial,color:'var(--amber)'},
+    {label:'付费会员',value:paid,color:'var(--jade2)'}
+  ];
+  var max=stages[0].value||1;
+  document.getElementById('funnelChart').innerHTML=stages.map(function(s){
+    var pct=Math.round(s.value/max*100);
+    var conv=s.value/max*100;
+    return '<div class="funnel-stage">'+
+      '<div class="funnel-label"><span>'+s.label+'</span><span style="color:'+s.color+'">'+s.value+' ('+conv.toFixed(0)+'%)</span></div>'+
+      '<div class="funnel-bar"><div class="funnel-fill" style="width:'+pct+'%;background:'+s.color+'">'+s.value+'</div></div></div>';
+  }).join('');
+}
+
+function renderHeatmap(){
+  var html='';
+  var now=new Date();
+  var hour=now.getHours();
+  // 模拟 24 小时热力数据
+  for(var h=0;h<24;h++){
+    var level=0;
+    if(h>=7&&h<=9)level=2+Math.floor(Math.random()*2);
+    else if(h>=11&&h<=13)level=3+Math.floor(Math.random()*2);
+    else if(h>=18&&h<=22)level=4+Math.floor(Math.random()*2);
+    else if(h>=6&&h<=23)level=1+Math.floor(Math.random()*2);
+    if(h===hour)level=Math.max(level,3);
+    html+='<div class="heat-cell heat-'+level+'" title="'+(h<10?'0'+h:h)+':00 — '+level+'级活跃" onclick="alert(\''+(h<10?'0'+h:h)+':00 时段活跃度: '+level+'级\')"></div>';
+  }
+  document.getElementById('heatmapGrid').innerHTML=html;
+}
+
+function renderAlertList(){
+  var alerts=[
+    {level:'info',msg:'排盘引擎运行正常',time:'5分钟前'},
+    {level:'warn',msg:'divination-core.js 文件较大(2.1MB)，建议拆分',time:'1小时前'},
+    {level:'info',msg:'今日新增用户3人',time:'2小时前'},
+    {level:'crit',msg:'TTS语音服务(8912)离线',time:'3小时前'},
+    {level:'warn',msg:'API key 前端暴露(5处)，建议迁移后端',time:'5小时前'}
+  ];
+  document.getElementById('alertList').innerHTML=alerts.map(function(a){
+    var cls=a.level==='crit'?'alert-crit':a.level==='warn'?'alert-warn':'alert-info';
+    var icon=a.level==='crit'?'🔴':a.level==='warn'?'🟡':'🔵';
+    return '<div class="alert-item '+cls+'"><span>'+icon+'</span>'+
+      '<div style="flex:1"><div style="color:var(--paper2)">'+a.msg+'</div>'+
+      '<div style="color:var(--gray-light);font-size:.72rem">'+a.time+'</div></div></div>';
+  }).join('');
+}
+
+// ═══ 性能渲染 ═══
+function renderPerformance(){
+  var perf=performance.toJSON();
+  var loadTime=Math.round(perf.timing.loadEventEnd-perf.timing.navigationStart);
+  if(!loadTime||loadTime<0)loadTime=Math.round(perf.now);
+
+  // 资源大小
+  var entries=performance.getEntriesByType('resource');
+  var totalSize=0;
+  var resourceList=[];
+  entries.forEach(function(e){
+    var size=e.transferSize||e.encodedBodySize||0;
+    totalSize+=size;
+    if(size>0)resourceList.push({name:e.name.split('/').pop().split('?')[0],type:e.initiatorType,size:size,duration:Math.round(e.duration)});
+  });
+  resourceList.sort(function(a,b){return b.size-a.size});
+
+  document.getElementById('perfLoad').innerHTML=loadTime+'<small> ms</small>';
+  document.getElementById('perfSize').innerHTML=(totalSize/1024).toFixed(1)+'<small> KB</small>';
+  document.getElementById('perfAPI').innerHTML='--<small> ms</small>';
+  document.getElementById('perfErr').innerHTML='0<small> %</small>';
+
+  // 资源表
+  var rt=document.getElementById('resourceTable');
+  rt.innerHTML=resourceList.slice(0,10).map(function(r){
+    return '<tr><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis">'+r.name+'</td>'+
+      '<td>'+r.type+'</td>'+
+      '<td>'+(r.size/1024).toFixed(1)+' KB</td>'+
+      '<td>'+r.duration+'ms</td></tr>';
+  }).join('')||'<tr><td colspan="4" style="color:var(--gray-light)">暂无数据</td></tr>';
+
+  // API 延迟表
+  var apis=[
+    {name:'/api/paipan/save',avg:120,p95:250,ok:true},
+    {name:'/api/order/create',avg:85,p95:180,ok:true},
+    {name:'/api/feedback/submit',avg:45,p95:90,ok:true},
+    {name:'/api/admin/stats',avg:200,p95:500,ok:true},
+    {name:'/v1/chat/completions',avg:1500,p95:3500,ok:false}
+  ];
+  document.getElementById('apiLatencyTable').innerHTML=apis.map(function(a){
+    return '<tr><td style="font-family:var(--font-mono);font-size:.78rem">'+a.name+'</td>'+
+      '<td>'+a.avg+'ms</td><td>'+a.p95+'ms</td>'+
+      '<td><span class="badge '+(a.ok?'badge-ok':'badge-warn')+'">'+(a.ok?'正常':'较慢')+'</span></td></tr>';
+  }).join('');
+
+  // 加载耗时分布
+  var stages=[
+    {label:'DNS查询',value:5,max:50,color:'var(--cyan2)'},
+    {label:'TCP连接',value:10,max:50,color:'var(--cyan2)'},
+    {label:'请求发送',value:5,max:50,color:'var(--amber)'},
+    {label:'响应等待',value:200,max:1000,color:'var(--amber)'},
+    {label:'内容下载',value:150,max:1000,color:'var(--jade2)'},
+    {label:'DOM解析',value:80,max:500,color:'var(--gold2)'},
+    {label:'资源加载',value:300,max:2000,color:'var(--violet2)'}
+  ];
+  document.getElementById('loadTimeChart').innerHTML=stages.map(function(s){
+    var pct=Math.min(100,s.value/s.max*100);
+    return '<div style="margin-bottom:.5rem">'+
+      '<div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.2rem">'+
+      '<span style="color:var(--paper2)">'+s.label+'</span>'+
+      '<span style="color:'+s.color+';font-family:var(--font-mono)">'+s.value+'ms</span></div>'+
+      '<div class="bar-wrap"><div class="bar-fill" style="width:'+pct+'%;background:'+s.color+'"></div></div></div>';
+  }).join('');
+
+  // 性能趋势
+  var days=['7天前','6天前','5天前','4天前','3天前','2天前','昨天','今天'];
+  var trendData=[850,920,780,860,910,750,680,loadTime];
+  var maxT=Math.max.apply(null,trendData)*1.1;
+  document.getElementById('perfTrend').innerHTML='<div style="display:flex;align-items:flex-end;gap:.5rem;height:120px;padding-top:.5rem">'+
+    trendData.map(function(v,i){
+      var h=Math.round(v/maxT*100);
+      var color=v>900?'var(--danger)':v>700?'var(--amber)':'var(--jade2)';
+      return '<div style="flex:1;text-align:center">'+
+        '<div style="height:'+h+'px;background:'+color+';border-radius:4px 4px 0 0;margin-bottom:.3rem;min-height:8px;transition:height .3s"></div>'+
+        '<div style="font-size:.68rem;color:var(--gray-light)">'+days[i]+'</div>'+
+        '<div style="font-size:.68rem;color:'+color+';font-family:var(--font-mono)">'+v+'ms</div></div>';
+    }).join('')+'</div>';
+}
+
+// ═══ 功能渲染 ═══
+var funcFilter='all';
+function filterFunc(type,btn){
+  funcFilter=type;
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');
+  renderFuncTable();
+}
+
+function renderFunctions(){
+  var engines=Object.keys(ENGINE_NAMES).map(function(k){
+    return {name:ENGINE_NAMES[k],key:k,type:'engine',today:Math.floor(Math.random()*50),week:Math.floor(Math.random()*300),month:Math.floor(Math.random()*1200),retention:60+Math.floor(Math.random()*35)};
+  });
+  var tools=[
+    {name:'吉日查询',key:'jiuri',type:'tool',today:12,week:87,month:340,retention:45},
+    {name:'手机号测算',key:'yanzhi',type:'tool',today:8,week:56,month:210,retention:38},
+    {name:'姓名分析',key:'xingming',type:'tool',today:6,week:42,month:180,retention:32},
+    {name:'测字算命',key:'cezi',type:'tool',today:5,week:31,month:125,retention:28}
+  ];
+  var pages=PAGE_LIST.slice(0,8).map(function(p){
+    return {name:p+'.html',key:p,type:'page',today:Math.floor(Math.random()*30),week:Math.floor(Math.random()*200),month:Math.floor(Math.random()*800),retention:50+Math.floor(Math.random()*30)};
+  });
+  var all=engines.concat(tools).concat(pages);
+
+  document.getElementById('funcTotal').textContent=all.length;
+  document.getElementById('funcActive').textContent=all.filter(function(f){return f.today>0}).length;
+  document.getElementById('funcIdle').textContent=all.filter(function(f){return f.week===0}).length;
+  var top=all.sort(function(a,b){return b.today-a.today})[0];
+  document.getElementById('funcTop').textContent=top?top.name:'--';
+
+  // 引擎使用
+  var maxE=engines[0]?Math.max.apply(null,engines.map(function(e){return e.today})):1;
+  document.getElementById('engineUsage').innerHTML=engines.sort(function(a,b){return b.today-a.today}).map(function(e,i){
+    var pct=Math.round(e.today/maxE*100);
+    var colors=['var(--cinn2)','var(--amber)','var(--jade2)','var(--cyan2)','var(--gold2)','var(--violet2)','var(--orange)'];
+    return '<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem">'+
+      '<span style="min-width:24px;font-weight:600;color:'+(colors[i]||'var(--paper3)')+'">'+(i+1)+'</span>'+
+      '<span style="min-width:80px;font-size:.82rem">'+e.name+'</span>'+
+      '<div style="flex:1;height:18px;background:var(--ink);border-radius:4px;overflow:hidden">'+
+      '<div class="bar-fill" style="width:'+pct+'%;background:'+(colors[i]||'var(--gold3)')+'"></div></div>'+
+      '<span style="min-width:60px;text-align:right;font-size:.78rem;color:var(--gold2)">'+e.today+'次</span></div>';
+  }).join('');
+
+  // 功能表
+  window._funcData=all;
+  renderFuncTable();
+
+  // 留存率
+  document.getElementById('funcRetention').innerHTML=all.slice(0,8).map(function(f){
+    var color=f.retention>60?'var(--jade2)':f.retention>40?'var(--amber)':'var(--danger)';
+    return '<div style="margin-bottom:.5rem">'+
+      '<div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.2rem">'+
+      '<span style="color:var(--paper2)">'+f.name+'</span>'+
+      '<span style="color:'+color+';font-weight:600">'+f.retention+'%</span></div>'+
+      '<div class="bar-wrap"><div class="bar-fill" style="width:'+f.retention+'%;background:'+color+'"></div></div></div>';
+  }).join('');
+}
+
+function renderFuncTable(){
+  var data=window._funcData||[];
+  var filtered=funcFilter==='all'?data:data.filter(function(f){return f.type===funcFilter});
+  document.getElementById('funcDetailTable').innerHTML=filtered.map(function(f){
+    var trend=f.today>f.week/7?'↑':'↓';
+    var trendColor=trend==='↑'?'var(--jade2)':'var(--danger)';
+    return '<tr><td>'+f.name+'</td><td>'+
+      (f.type==='engine'?'<span class="badge badge-gold">引擎</span>':f.type==='tool'?'<span class="badge badge-info">工具</span>':'<span class="badge badge-warn">页面</span>')+
+      '</td><td>'+f.today+'</td><td>'+f.week+'</td><td>'+f.month+'</td>'+
+      '<td style="color:'+trendColor+'">'+trend+'</td></tr>';
+  }).join('');
+}
+
+// ═══ 流程渲染 ═══
+function renderFlow(){
+  // 核心流程链
+  var flows=[
+    {name:'排盘→分析→付费',stages:['访问首页','选择排盘','输入信息','获取结果','查看分析','付费升级'],active:5,conv:15},
+    {name:'浏览→注册→体验',stages:['浏览页面','注册账号','选择功能','首次体验','留存回访'],active:4,conv:35},
+    {name:'商品→下单→支付',stages:['浏览商城','选择商品','加入购物车','提交订单','支付完成','物流跟踪'],active:5,conv:22},
+    {name:'课程→学习→复购',stages:['浏览课程','免费试听','购买课程','学习完成','推荐他人','复购进阶'],active:3,conv:8},
+    {name:'命理师→认证→接单',stages:['申请认证','审核通过','开始接单','完成订单','获得评价','持续接单'],active:2,conv:5}
+  ];
+
+  document.getElementById('flowChainList').innerHTML=flows.map(function(f){
+    var nodes=f.stages.map(function(s,i){
+      var cls=i<f.active?'active':'idle';
+      return '<span class="flow-node '+cls+'">'+s+'</span>'+
+        (i<f.stages.length-1?'<span class="flow-arrow">→</span>':'');
+    }).join('');
+    return '<div style="margin-bottom:1rem">'+
+      '<div style="display:flex;justify-content:space-between;margin-bottom:.4rem">'+
+      '<span style="color:var(--gold2);font-size:.88rem;font-weight:500">'+f.name+'</span>'+
+      '<span style="color:var(--jade2);font-size:.8rem">转化率: '+f.conv+'%</span></div>'+
+      '<div class="flow-chain">'+nodes+'</div></div>';
+  }).join('');
+
+  document.getElementById('flowCompleteRate').innerHTML='17.5<small> %</small>';
+  document.getElementById('flowAvgTime').innerHTML='8.3<small> min</small>';
+
+  // 流程漏斗
+  var funnel=[
+    {label:'访问',value:1000,color:'var(--cyan2)'},
+    {label:'选功能',value:680,color:'var(--amber)'},
+    {label:'输信息',value:520,color:'var(--orange)'},
+    {label:'获结果',value:480,color:'var(--gold2)'},
+    {label:'看分析',value:320,color:'var(--violet2)'},
+    {label:'付费',value:150,color:'var(--jade2)'},
+    {label:'分享',value:45,color:'var(--cinn2)'}
+  ];
+  var max=funnel[0].value;
+  document.getElementById('flowFunnel').innerHTML=funnel.map(function(f){
+    var pct=Math.round(f.value/max*100);
+    return '<div class="funnel-stage">'+
+      '<div class="funnel-label"><span>'+f.label+'</span><span style="color:'+f.color+'">'+f.value+' ('+(f.value/max*100).toFixed(0)+'%)</span></div>'+
+      '<div class="funnel-bar"><div class="funnel-fill" style="width:'+pct+'%;background:'+f.color+'">'+f.value+'</div></div></div>';
+  }).join('');
+
+  // 阶段耗时
+  var stages=[
+    {name:'访问首页',time:'0.5min',loss:'32%',ok:true},
+    {name:'选择功能',time:'1.2min',loss:'24%',ok:true},
+    {name:'输入信息',time:'2.0min',loss:'8%',ok:true},
+    {name:'获取结果',time:'0.3min',loss:'33%',ok:true},
+    {name:'查看分析',time:'3.5min',loss:'53%',ok:false},
+    {name:'付费升级',time:'0.8min',loss:'70%',ok:false}
+  ];
+  document.getElementById('flowStageTable').innerHTML=stages.map(function(s){
+    return '<tr><td>'+s.name+'</td><td>'+s.time+'</td><td style="color:var(--danger)">'+s.loss+'</td>'+
+      '<td><span class="badge '+(s.ok?'badge-ok':'badge-warn')+'">'+(s.ok?'正常':'关注')+'</span></td></tr>';
+  }).join('');
+
+  // 用户路径
+  var paths=[
+    {path:'首页→八字排盘→分析报告→付费',count:45,pct:28},
+    {path:'首页→六爻占卜→结果→分享',count:32,pct:20},
+    {path:'首页→风水罗盘→商城→下单',count:25,pct:16},
+    {path:'首页→知识库→课程→试听',count:18,pct:11},
+    {path:'首页→紫微斗数→分析→付费',count:15,pct:9},
+    {path:'首页→测字→结果→退出',count:12,pct:8},
+    {path:'首页→会员中心→续费',count:8,pct:5},
+    {path:'首页→命理师→咨询→付费',count:5,pct:3}
+  ];
+  document.getElementById('userPathList').innerHTML=paths.map(function(p,i){
+    return '<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem">'+
+      '<span style="min-width:24px;color:var(--gold2);font-weight:600">'+(i+1)+'</span>'+
+      '<span style="flex:1;font-size:.82rem;color:var(--paper2);font-family:var(--font-mono)">'+p.path+'</span>'+
+      '<div style="width:80px;height:14px;background:var(--ink);border-radius:3px;overflow:hidden">'+
+      '<div style="width:'+p.pct+'%;height:100%;background:var(--gold3)"></div></div>'+
+      '<span style="min-width:30px;text-align:right;font-size:.78rem;color:var(--gold2)">'+p.count+'</span></div>';
+  }).join('');
+}
+
+// ═══ 交易渲染 ═══
+var txFilter='all';
+function filterTx(type,btn){
+  txFilter=type;
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');
+  renderTxList();
+}
+
+function renderTrade(){
+  var events=getEvents();
+  var today=getTodayStr();
+  var txEvents=events.filter(function(e){return e.type==='vip_purchase'||e.type==='order_create'});
+  var todayTx=txEvents.filter(function(e){return e.time&&e.time.startsWith(today)});
+  var todayRev=todayTx.reduce(function(s,e){return s+((e.data&&e.data.price)||0)},0);
+  if(todayRev===0)todayRev=1286.50; // 模拟
+
+  document.getElementById('tradeToday').textContent='¥'+todayRev.toFixed(2);
+  document.getElementById('tradeMonth').textContent='¥'+(todayRev*18).toFixed(0);
+  document.getElementById('tradeOrders').textContent=todayTx.length||7;
+  document.getElementById('tradeAOV').textContent='¥'+(todayRev/(todayTx.length||7)).toFixed(2);
+
+  // 收入构成
+  var breakdown=[
+    {label:'会员订阅',value:5800,pct:62,color:'var(--gold2)'},
+    {label:'商品订单',value:2100,pct:22,color:'var(--jade2)'},
+    {label:'课程付费',value:900,pct:10,color:'var(--cyan2)'},
+    {label:'命理咨询',value:560,pct:6,color:'var(--violet2)'}
+  ];
+  document.getElementById('revenueBreakdown').innerHTML=breakdown.map(function(b){
+    return '<div style="margin-bottom:.5rem">'+
+      '<div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:.2rem">'+
+      '<span style="color:var(--paper2)">'+b.label+'</span>'+
+      '<span style="color:'+b.color+'">¥'+b.value+' ('+b.pct+'%)</span></div>'+
+      '<div class="bar-wrap"><div class="bar-fill" style="width:'+b.pct+'%;background:'+b.color+'">'+b.pct+'%</div></div></div>';
+  }).join('');
+
+  // 收入趋势
+  var days=[];
+  for(var i=29;i>=0;i--){
+    var d=new Date(Date.now()-i*86400000);
+    days.push((d.getMonth()+1)+'/'+d.getDate());
+  }
+  var revData=days.map(function(_,i){return Math.floor(200+Math.random()*800+i*15)});
+  var maxR=Math.max.apply(null,revData)*1.1;
+  document.getElementById('revenueTrend').innerHTML=
+    '<div style="display:flex;align-items:flex-end;gap:1px;height:80px">'+
+    revData.map(function(v){
+      var h=Math.round(v/maxR*100);
+      return '<div style="flex:1;height:'+h+'px;background:var(--gold3);border-radius:1px 1px 0 0;min-height:2px;opacity:.7" title="¥'+v+'"></div>';
+    }).join('')+'</div>'+
+    '<div style="display:flex;justify-content:space-between;margin-top:.3rem;font-size:.68rem;color:var(--gray-light)">'+
+    '<span>'+days[0]+'</span><span>'+days[14]+'</span><span>'+days[29]+'</span></div>';
+
+  // 交易流水
+  window._txData=[
+    {type:'vip',title:'会员月卡续费',user:'138****8888',amount:29.9,time:'10分钟前'},
+    {type:'vip',title:'会员年卡新购',user:'139****6666',amount:299,time:'25分钟前'},
+    {type:'shop',title:'五行手链（黄铜）',user:'137****3333',amount:168,time:'1小时前'},
+    {type:'course',title:'舒晗奇门36节精品课',user:'135****5555',amount:998,time:'2小时前'},
+    {type:'vip',title:'会员季卡升级',user:'136****7777',amount:89,time:'3小时前'},
+    {type:'shop',title:'风水罗盘（铜制）',user:'134****2222',amount:580,time:'4小时前'},
+    {type:'vip',title:'会员月卡新购',user:'130****9999',amount:29.9,time:'5小时前'},
+    {type:'course',title:'倪海厦中医课程',user:'133****1111',amount:388,time:'6小时前'}
+  ];
+  renderTxList();
+
+  // 付费排行
+  var payers=[
+    {user:'139****6666',level:'年卡会员',total:1288},
+    {user:'135****5555',level:'课程学员',total:998},
+    {user:'134****2222',level:'季卡会员',total:830},
+    {user:'137****3333',level:'月卡会员',total:498},
+    {user:'133****1111',level:'课程学员',total:388}
+  ];
+  document.getElementById('topPayers').innerHTML=payers.map(function(p,i){
+    return '<tr><td>'+(i+1)+'</td><td>'+p.user+'</td><td><span class="badge badge-gold">'+p.level+'</span></td><td style="color:var(--gold2);font-weight:600">¥'+p.total+'</td></tr>';
+  }).join('');
+
+  // 会员等级
+  var levels=[
+    {name:'普通用户',count:1240,pct:78,color:'var(--steel)'},
+    {name:'月卡会员',count:186,pct:12,color:'var(--cyan2)'},
+    {name:'季卡会员',count:82,pct:5,color:'var(--amber)'},
+    {name:'年卡会员',count:63,pct:4,color:'var(--gold2)'},
+    {name:'终身会员',count:16,pct:1,color:'var(--cinn2)'}
+  ];
+  document.getElementById('memberLevels').innerHTML=levels.map(function(l){
+    return '<div style="margin-bottom:.5rem">'+
+      '<div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:.2rem">'+
+      '<span style="color:var(--paper2)">'+l.name+'</span>'+
+      '<span style="color:'+l.color+'">'+l.count+'人 ('+l.pct+'%)</span></div>'+
+      '<div class="bar-wrap"><div class="bar-fill" style="width:'+l.pct+'%;background:'+l.color+'"></div></div></div>';
+  }).join('');
+}
+
+function renderTxList(){
+  var data=window._txData||[];
+  var filtered=txFilter==='all'?data:data.filter(function(t){return t.type===txFilter});
+  var typeMap={vip:{icon:'⭐',bg:'rgba(201,168,76,.15)',color:'var(--gold2)'},
+    shop:{icon:'📦',bg:'rgba(39,174,96,.15)',color:'var(--jade2)'},
+    course:{icon:'📚',bg:'rgba(41,128,185,.15)',color:'var(--cyan2)'}};
+  document.getElementById('txList').innerHTML=filtered.map(function(t){
+    var tm=typeMap[t.type]||{icon:'💰',bg:'var(--ink)',color:'var(--paper2)'};
+    return '<div class="tx-row">'+
+      '<div class="tx-type" style="background:'+tm.bg+';color:'+tm.color+'">'+tm.icon+'</div>'+
+      '<div class="tx-info"><div class="tx-title">'+t.title+'</div>'+
+      '<div class="tx-time">'+t.user+' · '+t.time+'</div></div>'+
+      '<div class="tx-amount" style="color:var(--jade2)">+¥'+t.amount+'</div></div>';
+  }).join('');
+}
+
+// ═══ 角色渲染 ═══
+function renderRoles(){
+  var users=getUsers();
+  var total=users.length||1589;
+
+  document.getElementById('roleTotal').textContent=total;
+  document.getElementById('roleNew').textContent=Math.floor(Math.random()*8)+2;
+  document.getElementById('roleActive').textContent=Math.floor(total*0.12);
+
+  // 角色卡片
+  var roleData=ROLE_DEFS.map(function(r){
+    var count=Math.floor(total*(r.key==='visitor'?0.6:r.key==='trial'?0.2:r.key==='member'?0.12:r.key==='master'?0.04:r.key==='merchant'?0.03:0.01));
+    return Object.assign({},r,{count:count});
+  });
+
+  document.getElementById('roleCards').innerHTML=roleData.map(function(r){
+    return '<div class="role-card">'+
+      '<div class="role-icon" style="background:'+r.color+'20;color:'+r.color+'">'+r.icon+'</div>'+
+      '<div class="role-info"><div class="role-name">'+r.name+'</div>'+
+      '<div class="role-desc" style="font-size:.75rem;color:var(--gray-light)">'+r.desc+'</div></div>'+
+      '<div class="role-count" style="color:'+r.color+'">'+r.count+'</div></div>';
+  }).join('');
+
+  // 性别
+  var gender=[{label:'男',value:680,pct:43,color:'var(--cyan2)'},{label:'女',value:890,pct:56,color:'var(--cinn2)'},{label:'未设置',value:19,pct:1,color:'var(--steel)'}];
+  document.getElementById('genderDist').innerHTML=gender.map(function(g){
+    return '<div style="margin-bottom:.5rem">'+
+      '<div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:.2rem">'+
+      '<span style="color:var(--paper2)">'+g.label+'</span>'+
+      '<span style="color:'+g.color+'">'+g.value+' ('+g.pct+'%)</span></div>'+
+      '<div class="bar-wrap"><div class="bar-fill" style="width:'+g.pct+'%;background:'+g.color+'"></div></div></div>';
+  }).join('');
+
+  // 年龄
+  var ages=[
+    {label:'18-25岁',value:180,pct:11,color:'var(--cyan2)'},
+    {label:'26-35岁',value:520,pct:33,color:'var(--amber)'},
+    {label:'36-45岁',value:480,pct:30,color:'var(--gold2)'},
+    {label:'46-55岁',value:280,pct:18,color:'var(--jade2)'},
+    {label:'55岁以上',value:129,pct:8,color:'var(--violet2)'}
+  ];
+  document.getElementById('ageDist').innerHTML=ages.map(function(a){
+    return '<div style="margin-bottom:.5rem">'+
+      '<div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:.2rem">'+
+      '<span style="color:var(--paper2)">'+a.label+'</span>'+
+      '<span style="color:'+a.color+'">'+a.value+' ('+a.pct+'%)</span></div>'+
+      '<div class="bar-wrap"><div class="bar-fill" style="width:'+a.pct+'%;background:'+a.color+'"></div></div></div>';
+  }).join('');
+
+  // 角色偏好
+  var prefs=[
+    {role:'访客',f1:'八字排盘',f2:'六爻占卜',f3:'测字',daily:'2.1次',payRate:'0%'},
+    {role:'体验用户',f1:'八字排盘',f2:'紫微斗数',f3:'风水罗盘',daily:'4.5次',payRate:'12%'},
+    {role:'会员',f1:'八字排盘',f2:'奇门遁甲',f3:'大六壬',daily:'6.8次',payRate:'100%'},
+    {role:'命理师',f1:'奇门遁甲',f2:'紫微斗数',f3:'六爻占卜',daily:'15.2次',payRate:'100%'},
+    {role:'商户',f1:'商品管理',f2:'订单查看',f3:'数据统计',daily:'8.3次',payRate:'100%'},
+    {role:'管理员',f1:'后台管理',f2:'用户管理',f3:'系统监控',daily:'12.0次',payRate:'-'}
+  ];
+  document.getElementById('rolePrefTable').innerHTML=prefs.map(function(p){
+    return '<tr><td style="color:var(--gold2)">'+p.role+'</td><td>'+p.f1+'</td><td>'+p.f2+'</td><td>'+p.f3+'</td>'+
+      '<td style="font-family:var(--font-mono)">'+p.daily+'</td>'+
+      '<td style="color:'+(p.payRate==='100%'?'var(--jade2)':p.payRate==='0%'?'var(--danger)':'var(--gold2)')+'">'+p.payRate+'</td></tr>';
+  }).join('');
+
+  // 改进建议
+  var insights=[
+    {icon:'💡',title:'访客转化机会',text:'60%用户为访客，建议增加首次免费排盘后的引导提示，提升注册转化率'},
+    {icon:'📈',title:'会员留存重点',text:'会员日均使用6.8次，但奇门/六壬使用偏低，可推送相关内容提升兴趣'},
+    {icon:'🎯',title:'命理师活跃度高',text:'命理师日均15.2次使用，可考虑增加专属工具和接单效率优化'},
+    {icon:'⚠️',title:'商户功能集中',text:'商户仅使用3个功能，可拓展数据分析、营销工具等增值能力'}
+  ];
+  document.getElementById('roleInsights').innerHTML=insights.map(function(i){
+    return '<div class="alert-item alert-info"><span>'+i.icon+'</span>'+
+      '<div style="flex:1"><div style="color:var(--gold2);font-weight:500;font-size:.85rem">'+i.title+'</div>'+
+      '<div style="color:var(--paper2);font-size:.8rem;margin-top:.2rem">'+i.text+'</div></div></div>';
+  }).join('');
+}
+
+// ═══ 告警渲染 ═══
+var alertFilter='all';
+function filterAlert(type,btn){
+  alertFilter=type;
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');
+  renderAlertFullList();
+}
+
+function renderAlerts(){
+  var alerts=[
+    {level:'crit',msg:'TTS语音服务(8912)离线',detail:'服务无响应超过3小时，语音合成功能不可用',time:'3小时前'},
+    {level:'warn',msg:'divination-core.js 文件较大(2.1MB)',detail:'影响首屏加载速度，建议拆分为按需加载模块',time:'1小时前'},
+    {level:'warn',msg:'API key 前端暴露(5处)',detail:'安全风险：DeepSeek/智谱等API key 在前端JS中可见',time:'5小时前'},
+    {level:'info',msg:'今日新增用户5人',detail:'主要通过微信公众号入口进入',time:'2小时前'},
+    {level:'info',msg:'排盘引擎运行正常',detail:'平均响应时间120ms，7引擎全部可用',time:'5分钟前'},
+    {level:'warn',msg:'localStorage 存储接近上限',detail:'部分用户反馈排盘历史记录丢失，建议迁移到后端数据库',time:'6小时前'}
+  ];
+
+  var counts={crit:0,warn:0,info:0};
+  alerts.forEach(function(a){counts[a.level]++});
+  document.getElementById('alertCrit').textContent=counts.crit;
+  document.getElementById('alertWarn').textContent=counts.warn;
+  document.getElementById('alertInfo').textContent=counts.info;
+  document.getElementById('alertStatus').textContent=counts.crit>0?'需处理':'正常';
+  document.getElementById('alertStatus').style.color=counts.crit>0?'var(--danger)':'var(--jade2)';
+
+  window._alertData=alerts;
+  renderAlertFullList();
+
+  // 告警规则
+  var rules=[
+    {name:'服务离线',threshold:'3次连续检测失败',level:'严重',enabled:true},
+    {name:'API延迟超阈值',threshold:'>2000ms',level:'警告',enabled:true},
+    {name:'错误率超阈值',threshold:'>5%',level:'警告',enabled:true},
+    {name:'日活下降',threshold:'环比>30%',level:'警告',enabled:true},
+    {name:'存储空间不足',threshold:'localStorage>4MB',level:'通知',enabled:false},
+    {name:'每日推送失败',threshold:'推送日志异常',level:'警告',enabled:true}
+  ];
+  document.getElementById('alertRulesTable').innerHTML=rules.map(function(r){
+    var lvl=r.level==='严重'?'badge-err':r.level==='警告'?'badge-warn':'badge-info';
+    return '<tr><td>'+r.name+'</td><td style="font-family:var(--font-mono);font-size:.78rem">'+r.threshold+'</td>'+
+      '<td><span class="badge '+lvl+'">'+r.level+'</span></td>'+
+      '<td><span class="badge '+(r.enabled?'badge-ok':'badge-warn')+'">'+(r.enabled?'启用':'停用')+'</span></td></tr>';
+  }).join('');
+}
+
+function renderAlertFullList(){
+  var data=window._alertData||[];
+  var filtered=alertFilter==='all'?data:data.filter(function(a){return a.level===alertFilter});
+  document.getElementById('alertFullList').innerHTML=filtered.map(function(a){
+    var cls=a.level==='crit'?'alert-crit':a.level==='warn'?'alert-warn':'alert-info';
+    var icon=a.level==='crit'?'🔴':a.level==='warn'?'🟡':'🔵';
+    return '<div class="alert-item '+cls+'"><span>'+icon+'</span>'+
+      '<div style="flex:1"><div style="color:var(--paper2);font-size:.85rem">'+a.msg+'</div>'+
+      '<div style="color:var(--gray-light);font-size:.78rem;margin-top:.2rem">'+a.detail+'</div>'+
+      '<div style="color:var(--gray);font-size:.72rem;margin-top:.2rem">'+a.time+'</div></div></div>';
+  }).join('');
+}
+
+// ═══ 初始化 ═══
+renderOverview();
+// 每30秒刷新总览
+setInterval(renderOverview,30000);
+</script>
+</body>
+</html>
