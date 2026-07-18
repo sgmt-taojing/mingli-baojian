@@ -39252,8 +39252,670 @@ function runHealthForecast() {
   }
 }
 
+// ════════════════════════════════════════════════════════════════
+// 月度运势走向报告 — buildMonthlyFortuneTrend
+// ════════════════════════════════════════════════════════════════
+
+/**
+ * 构建月度运势走向报告
+ * @param {Object} baziData - 八字数据对象（含 dayStem/dayMaster, dayBranch, dayStemIdx, pillars, xiEle, mingType 等）
+ * @param {string} startMonth - 起始月 ISO格式 "YYYY-MM"
+ * @param {string} endMonth - 结束月 ISO格式 "YYYY-MM"
+ * @returns {string} HTML字符串
+ */
+function buildMonthlyFortuneTrend(baziData, startMonth, endMonth) {
+  if (!baziData || !startMonth || !endMonth) return '';
+
+  // ── 统一提取日主信息（兼容两种 baziData 结构） ──
+  var dayStem = baziData.dayStem || baziData.dayMaster || '甲';
+  var dayBranch = baziData.dayBranch || '';
+  var dayStemIdx = baziData.dayStemIdx;
+  if (dayStemIdx === undefined) {
+    dayStemIdx = STEMS.indexOf(dayStem);
+  }
+  var dayEle = ELE[dayStem] || '木';
+
+  // 喜忌神
+  var xiEle = baziData.xiEle || (baziData.mingType && baziData.mingType.yongshenEle) || '水';
+  var jiEle = baziData.jiEle || (baziData.mingType && baziData.mingType.jishenEle) || '';
+  if (!jiEle) {
+    // 推导忌神：生扶日主的五行为忌（身旺时），克泄日主的五行为忌（身弱时）
+    var _shengMap = {木:'水',火:'木',土:'火',金:'土',水:'金'};
+    var _keMap = {木:'金',火:'水',土:'木',金:'火',水:'土'};
+    var isStrong = baziData.isStrong || (baziData.mingType && (baziData.mingType.strengthLevel || '').indexOf('强') >= 0) || false;
+    jiEle = isStrong ? _shengMap[dayEle] : _keMap[dayEle];
+  }
+
+  // 月支地支顺序（从寅开始）
+  var _monthBranchOrder = ['寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑'];
+  // 五行相生关系
+  var _shengOf = {木:'水',火:'木',土:'火',金:'土',水:'金'}; // 生我者
+  var _iSheng = {木:'火',火:'土',土:'金',金:'水',水:'木'}; // 我生者
+  var _keOf = {木:'金',火:'水',土:'木',金:'火',水:'土'};   // 克我者
+  var _iKe = {木:'土',火:'金',土:'水',金:'木',水:'火'};    // 我克者
+  var _sameEle = {木:'木',火:'火',土:'土',金:'金',水:'水'}; // 同我者
+
+  // 解析起止月
+  var _sParts = startMonth.split('-');
+  var _eParts = endMonth.split('-');
+  var sYear = parseInt(_sParts[0]), sMonth = parseInt(_sParts[1]);
+  var eYear = parseInt(_eParts[0]), eMonth = parseInt(_eParts[1]);
+  if (isNaN(sYear) || isNaN(sMonth) || isNaN(eYear) || isNaN(eMonth)) return '';
+  if (sYear > eYear || (sYear === eYear && sMonth > eMonth)) return '';
+
+  // 限制最多24个月，防止过多
+  var _monthCount = 0;
+  var _cy = sYear, _cm = sMonth;
+  while (_cy < eYear || (_cy === eYear && _cm <= eMonth)) {
+    _monthCount++;
+    if (_monthCount > 24) break;
+    _cm++;
+    if (_cm > 12) { _cm = 1; _cy++; }
+  }
+  _monthCount = Math.min(_monthCount, 24);
+
+  // 五虎遁月干推算：根据年干推算寅月天干起始
+  function _getMonthStem(yearStemIdx, monthBranch) {
+    var yinMonthGanIdx = (yearStemIdx * 2 + 2) % 10;
+    var monthIdx = _monthBranchOrder.indexOf(monthBranch);
+    return STEMS[(yinMonthGanIdx + monthIdx) % 10];
+  }
+
+  // 十神推算（月支对日主）
+  function _getTenGodSimple(stem, dayStem) {
+    if (!stem || !dayStem) return '';
+    var tg = TENGAN[dayStem];
+    if (!tg) return '';
+    for (var rel in tg) {
+      if (tg[rel] === stem) return TEGAN_NAMES[rel] || rel;
+    }
+    return '';
+  }
+
+  // 地支关系判定
+  function _getZhiRelation(b1, b2) {
+    if (!b1 || !b2 || b1 === b2) return [];
+    var rels = [];
+    // 六合
+    var _liuheMap = {子:'丑',丑:'子',寅:'亥',亥:'寅',卯:'戌',戌:'卯',辰:'酉',酉:'辰',巳:'申',申:'巳',午:'未',未:'午'};
+    if (_liuheMap[b1] === b2) rels.push('六合');
+    // 六冲
+    var _chongMap = {子:'午',午:'子',丑:'未',未:'丑',寅:'申',申:'寅',卯:'酉',酉:'卯',辰:'戌',戌:'辰',巳:'亥',亥:'巳'};
+    if (_chongMap[b1] === b2) rels.push('六冲');
+    // 相刑
+    var _xingSets = [['寅','巳','申'],['丑','戌','未']];
+    for (var si = 0; si < _xingSets.length; si++) {
+      var set = _xingSets[si];
+      if (set.indexOf(b1) >= 0 && set.indexOf(b2) >= 0) { rels.push('相刑'); break; }
+    }
+    if ('辰午酉亥'.indexOf(b1) >= 0 && b1 === b2) rels.push('自刑');
+    // 六害
+    var _haiMap = {子:'未',未:'子',丑:'午',午:'丑',寅:'巳',巳:'寅',卯:'辰',辰:'卯',申:'亥',亥:'申',酉:'戌',戌:'酉'};
+    if (_haiMap[b1] === b2) rels.push('六害');
+    return rels;
+  }
+
+  // 评级
+  function _getRating(monthZhiEle, isXiMonth, isJiMonth, zhiRels) {
+    var score = 0;
+    if (isXiMonth) score += 3;
+    if (isJiMonth) score -= 3;
+    // 六冲减分
+    for (var ri = 0; ri < zhiRels.length; ri++) {
+      if (zhiRels[ri] === '六冲') score -= 2;
+      if (zhiRels[ri] === '相刑') score -= 2;
+      if (zhiRels[ri] === '六害') score -= 1;
+      if (zhiRels[ri] === '六合') score += 1;
+    }
+    if (score >= 4) return '大吉';
+    if (score >= 2) return '吉';
+    if (score >= 0) return '平';
+    if (score >= -2) return '小凶';
+    return '凶';
+  }
+
+  // 评级对应颜色
+  var _ratingColors = {
+    '大吉': '#c0392b',
+    '吉': '#27ae60',
+    '平': '#7f8c8d',
+    '小凶': '#e67e22',
+    '凶': '#c0392b'
+  };
+
+  // 生成建议
+  function _getAdvice(rating, monthZhiEle, tenGod, zhiRels, isXiMonth, isJiMonth) {
+    var advice = { career: '', wealth: '', health: '', love: '' };
+
+    if (rating === '大吉' || rating === '吉') {
+      advice.career = '事业顺势，宜积极进取，把握机遇' + (isXiMonth ? '，贵人运强' : '');
+      advice.wealth = '财运通达，' + (tenGod.indexOf('财') >= 0 ? '正偏财俱佳' : '宜稳健投资') + '，可适度扩张';
+      advice.health = '精力充沛，' + (monthZhiEle === '火' ? '注意心火' : monthZhiEle === '水' ? '注意肾水' : '整体康健') + '，保持作息规律';
+      advice.love = '感情和谐，' + (zhiRels.indexOf('六合') >= 0 ? '姻缘和合，宜增进感情' : '人际关系顺遂') + '；';
+    } else if (rating === '平') {
+      advice.career = '事业平稳，按部就班，不宜冒进，宜积累实力';
+      advice.wealth = '财运平稳，' + (isXiMonth ? '可小试投资' : '以守为主，避免大额支出');
+      advice.health = '身体无大碍，' + (monthZhiEle === '土' ? '注意脾胃' : monthZhiEle === '金' ? '注意呼吸道' : '注意日常保健');
+      advice.love = '感情平淡，' + (zhiRels.indexOf('六害') >= 0 ? '须防口舌是非' : '宜主动沟通增进了解');
+    } else {
+      advice.career = '事业多阻，宜低调行事，避免冲突' + (zhiRels.indexOf('六冲') >= 0 ? '，防变动波折' : '') + (zhiRels.indexOf('相刑') >= 0 ? '，防是非纠纷' : '');
+      advice.wealth = '财运不济，' + (isJiMonth ? '忌神当令，切忌投机' : '宜守不宜攻') + '，控制开支';
+      advice.health = '注意身体，' + (monthZhiEle === '木' ? '肝胆易损' : monthZhiEle === '火' ? '心血管需防' : monthZhiEle === '土' ? '脾胃虚弱' : monthZhiEle === '金' ? '肺部易患' : '肾水不足') + '，宜静养';
+      advice.love = '感情波动，' + (zhiRels.indexOf('六冲') >= 0 ? '防争吵分离' : zhiRels.indexOf('相刑') >= 0 ? '防误会矛盾' : '宜忍让包容') + '，忌冲动决定';
+    }
+    return advice;
+  }
+
+  // ── 逐月分析 ──
+  var months = [];
+  var cy = sYear, cm = sMonth;
+  var cnt = 0;
+  while ((cy < eYear || (cy === eYear && cm <= eMonth)) && cnt < 24) {
+    months.push({ year: cy, month: cm });
+    cm++;
+    if (cm > 12) { cm = 1; cy++; }
+    cnt++;
+  }
+
+  var monthResults = [];
+  var jiMonthCount = 0;
+  var xiMonthCount = 0;
+
+  for (var mi = 0; mi < months.length; mi++) {
+    var _y = months[mi].year, _m = months[mi].month;
+
+    // 推算月支：公历月对应地支（以节气近似，寅月≈2月）
+    // 月支：寅=1月(2月), 卯=2月(3月), ... 丑=12月(1月)
+    // 用近似映射：月支 = _monthBranchOrder[(_m - 2 + 12) % 12]
+    var monthBranchIdx = (_m - 2 + 12) % 12;
+    var mZhi = _monthBranchOrder[monthBranchIdx];
+    var mZhiEle = ZHI_ELE[mZhi];
+
+    // 年干推算月干（五虎遁）
+    var yearStemIdx = ((_y - 4) % 10 + 10) % 10; // 年干序号，0=甲
+    var mGan = _getMonthStem(yearStemIdx, mZhi);
+    var mGanEle = ELE[mGan];
+
+    // 月支对日主的十神
+    var mTenGod = _getTenGodSimple(mGan, dayStem);
+
+    // 月支与日支的合冲刑害
+    var zhiRels = dayBranch ? _getZhiRelation(mZhi, dayBranch) : [];
+
+    // 喜忌判断
+    var isXiMonth = (mZhiEle === xiEle) || (mGanEle === xiEle);
+    var isJiMonth = (jiEle && (mZhiEle === jiEle || mGanEle === jiEle));
+
+    if (isXiMonth) xiMonthCount++;
+    if (isJiMonth) jiMonthCount++;
+
+    // 评级
+    var rating = _getRating(mZhiEle, isXiMonth, isJiMonth, zhiRels);
+
+    // 建议
+    var advice = _getAdvice(rating, mZhiEle, mTenGod, zhiRels, isXiMonth, isJiMonth);
+
+    monthResults.push({
+      year: _y, month: _m, mGan: mGan, mZhi: mZhi, mGanEle: mGanEle, mZhiEle: mZhiEle,
+      mTenGod: mTenGod, zhiRels: zhiRels, isXiMonth: isXiMonth, isJiMonth: isJiMonth,
+      rating: rating, advice: advice
+    });
+  }
+
+  // ── 构建HTML ──
+  var html = '';
+  html += '<div style="margin:16px 0;padding:20px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:8px">';
+  html += '<div style="font-size:16px;font-weight:700;color:var(--gold);letter-spacing:3px;margin-bottom:16px;text-align:center">📈 月度运势走向报告</div>';
+  html += '<div style="font-size:12px;color:var(--paper2);opacity:.7;text-align:center;margin-bottom:16px">' + startMonth + ' 至 ' + endMonth + ' ｜ 日主：' + dayStem + '(' + dayEle + ') ｜ 喜用：' + xiEle + ' ｜ 忌神：' + jiEle + '</div>';
+
+  // 逐月卡片
+  for (var ri = 0; ri < monthResults.length; ri++) {
+    var mr = monthResults[ri];
+    var isWarn = (mr.rating === '凶' || mr.rating === '小凶');
+    var ratingColor = _ratingColors[mr.rating] || '#7f8c8d';
+    var monthLabel = mr.year + '年' + mr.month + '月';
+    var gzLabel = mr.mGan + mr.mZhi;
+
+    var cardBg = isWarn ? 'rgba(231,76,60,0.06)' : 'rgba(201,168,76,0.03)';
+    var borderColor = isWarn ? 'rgba(231,76,60,0.25)' : 'rgba(201,168,76,0.1)';
+
+    html += '<div style="margin-bottom:12px;padding:14px 16px;background:' + cardBg + ';border:1px solid ' + borderColor + ';border-radius:8px">';
+
+    // 头部：月份 + 干支 + 评级
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">';
+    html += '<div style="font-size:14px;font-weight:700;color:var(--gold)">' + monthLabel + ' ｜ ' + gzLabel + '</div>';
+    html += '<div style="font-size:13px;font-weight:700;color:' + ratingColor + ';padding:2px 12px;border:1px solid ' + ratingColor + ';border-radius:12px">' + mr.rating + '</div>';
+    html += '</div>';
+
+    // 警告标记
+    if (isWarn) {
+      html += '<div style="font-size:12px;color:#e74c3c;font-weight:700;margin-bottom:8px">⚠ 此月需特别注意，' + (mr.isJiMonth ? '忌神当令' : '地支' + (mr.zhiRels.join('、') || '不利')) + '，宜谨慎行事</div>';
+    }
+
+    // 分析内容
+    html += '<div style="font-size:12px;line-height:2;color:var(--paper2);opacity:.9">';
+    html += '<div>📌 月度干支：<strong style="color:var(--gold)">' + gzLabel + '</strong>（' + mr.mGanEle + '/' + mr.mZhiEle + '）</div>';
+    html += '<div>🔗 十神关系：<strong>' + (mr.mTenGod || '—') + '</strong>（月干对日主）</div>';
+    if (dayBranch) {
+      html += '<div>⚖️ 地支关系：' + (mr.zhiRels.length > 0 ? '<strong style="color:' + (mr.zhiRels.indexOf('六冲') >= 0 || mr.zhiRels.indexOf('相刑') >= 0 ? '#e74c3c' : 'var(--gold)') + '">' + mr.zhiRels.join('、') + '</strong>（月支' + mr.mZhi + ' ↔ 日支' + dayBranch + '）' : '无明显刑冲合害（月支' + mr.mZhi + ' ↔ 日支' + dayBranch + '）') + '</div>';
+    }
+    html += '<div>' + (mr.isXiMonth ? '✅ 喜用神月——<strong style="color:#27ae60">吉月</strong>' : mr.isJiMonth ? '❌ 忌神月——<strong style="color:#e74c3c">凶月</strong>' : '➖ 中性月——五行无明显喜忌') + '</div>';
+    html += '</div>';
+
+    // 四维建议
+    html += '<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+    html += '<div style="padding:8px 10px;background:rgba(41,128,185,0.04);border-radius:6px;font-size:11px;line-height:1.7"><strong style="color:#2980b9">💼 事业</strong><br>' + mr.advice.career + '</div>';
+    html += '<div style="padding:8px 10px;background:rgba(201,168,76,0.04);border-radius:6px;font-size:11px;line-height:1.7"><strong style="color:var(--gold)">💰 财运</strong><br>' + mr.advice.wealth + '</div>';
+    html += '<div style="padding:8px 10px;background:rgba(46,204,113,0.04);border-radius:6px;font-size:11px;line-height:1.7"><strong style="color:#27ae60">🏥 健康</strong><br>' + mr.advice.health + '</div>';
+    html += '<div style="padding:8px 10px;background:rgba(231,76,60,0.04);border-radius:6px;font-size:11px;line-height:1.7"><strong style="color:#e74c3c">💕 感情</strong><br>' + mr.advice.love + '</div>';
+    html += '</div>';
+
+    html += '</div>';
+  }
+
+  // ── 综合化解方案 ──
+  html += '<div style="margin-top:16px;padding:16px 18px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:8px">';
+  html += '<div style="font-size:15px;font-weight:700;color:var(--gold);letter-spacing:2px;margin-bottom:12px">🌿 综合化解方案</div>';
+
+  var totalAdvice = [];
+  totalAdvice.push('本周期共' + monthResults.length + '个月，其中喜用神月' + xiMonthCount + '个、忌神月' + jiMonthCount + '个。整体趋势：' + (xiMonthCount > jiMonthCount ? '运势偏佳，宜顺势而为' : xiMonthCount < jiMonthCount ? '运势偏弱，宜守不宜进' : '运势平稳，宜蓄势待发') + '。');
+
+  if (jiMonthCount > xiMonthCount) {
+    totalAdvice.push('忌神月较多，凶月期间宜低调行事，避免重大决策和投资，可佩戴' + xiEle + '属性饰品（如' + (xiEle === '木' ? '绿幽灵' : xiEle === '火' ? '红玛瑙' : xiEle === '土' ? '黄水晶' : xiEle === '金' ? '白水晶' : '黑曜石') + '）补益用神。');
+  }
+  if (xiMonthCount > 0) {
+    totalAdvice.push('喜用神月（' + xiEle + '五行当令）为关键机遇期，宜在此期间推进重要项目、谈判、求职等事宜，事半功倍。');
+  }
+  // 检查有无六冲月
+  var chongMonths = monthResults.filter(function(mr) { return mr.zhiRels.indexOf('六冲') >= 0; });
+  if (chongMonths.length > 0) {
+    var chongLabels = chongMonths.map(function(mr) { return mr.year + '年' + mr.month + '月'; }).join('、');
+    totalAdvice.push('以下月份地支六冲日支，变动较多：' + chongLabels + '。宜提前规划，避免冲动行事，注意出行安全。');
+  }
+  // 检查相刑月
+  var xingMonths = monthResults.filter(function(mr) { return mr.zhiRels.indexOf('相刑') >= 0; });
+  if (xingMonths.length > 0) {
+    var xingLabels = xingMonths.map(function(mr) { return mr.year + '年' + mr.month + '月'; }).join('、');
+    totalAdvice.push('以下月份有相刑，易生是非纠纷：' + xingLabels + '。宜忍让包容，避免口舌之争，可多行善积德化解。');
+  }
+  // 补五行建议
+  totalAdvice.push('日常可多接触' + xiEle + '五行：穿戴' + (xiEle === '木' ? '绿色' : xiEle === '火' ? '红色' : xiEle === '土' ? '黄色' : xiEle === '金' ? '白色' : '黑色') + '衣物，朝' + (xiEle === '木' ? '东' : xiEle === '火' ? '南' : xiEle === '土' ? '中' : xiEle === '金' ? '西' : '北') + '方行事，食用' + (xiEle === '木' ? '酸味' : xiEle === '火' ? '苦味' : xiEle === '土' ? '甘味' : xiEle === '金' ? '辛味' : '咸味') + '食物，以补益用神五行。');
+
+  // 限制3-5条
+  if (totalAdvice.length > 5) totalAdvice = totalAdvice.slice(0, 5);
+  if (totalAdvice.length < 3) totalAdvice.push('命理为先天参考，后天努力更重要。保持积极心态，行善积德，可改善运势。');
+
+  html += '<div style="font-size:12px;line-height:2.2;color:var(--paper2);opacity:.9">';
+  for (var ai = 0; ai < totalAdvice.length; ai++) {
+    html += '<div style="margin-bottom:6px;padding-left:12px;border-left:2px solid var(--gold)"><strong style="color:var(--gold)">' + (ai + 1) + '.</strong> ' + totalAdvice[ai] + '</div>';
+  }
+  html += '</div>';
+  html += '</div>';
+
+  html += '</div>';
+
+  return html;
+}
+
+// ═══ 家庭伦理道德全量指导服务 ═══
+function buildFamilyEthicsGuide(baziData) {
+  if (!baziData || !baziData.pillars || baziData.pillars.length < 4) return '';
+  var pillars = baziData.pillars;
+  var dayStem = baziData.dayStem || pillars[2].stem;
+  var dayBranch = pillars[2].branch;
+  var dayStemIdx = baziData.dayStemIdx !== undefined ? baziData.dayStemIdx : (STEMS ? STEMS.indexOf(dayStem) : 0);
+  var isStrong = baziData.isStrong || false;
+  var mingType = baziData.mingType || {};
+  var yongshenEle = mingType.yongshenEle || '';
+  var jishenEle = mingType.jishenEle || '';
+  var tenGods = baziData.tenGods || [];
+
+  // 十神获取辅助
+  function _tg(stem, branch) {
+    try { return getTenGod(stem, branch, dayStem); } catch(e) { return ''; }
+  }
+  function _tgStem(stem) {
+    try { return getTenGod(stem, '', dayStem); } catch(e) { return ''; }
+  }
+  function _tgBranch(branch) {
+    try { return getTenGod('', branch, dayStem); } catch(e) { return ''; }
+  }
+  // 获取地支藏干
+  function _canggan(branch) {
+    return (ZHI_CANGGAN && ZHI_CANGGAN[branch]) || [];
+  }
+  // 十神类别判断
+  function _godCategory(god) {
+    if (!god) return 'other';
+    if (god.indexOf('比肩') >= 0 || god.indexOf('劫财') >= 0) return 'bi';
+    if (god.indexOf('食神') >= 0 || god.indexOf('伤官') >= 0) return 'shi';
+    if (god.indexOf('正财') >= 0 || god.indexOf('偏财') >= 0) return 'cai';
+    if (god.indexOf('正官') >= 0 || god.indexOf('七杀') >= 0) return 'guan';
+    if (god.indexOf('正印') >= 0 || god.indexOf('偏印') >= 0) return 'yin';
+    return 'other';
+  }
+
+  // 统计十神个数
+  var godCount = {bi:0, shi:0, cai:0, guan:0, yin:0};
+  var allGods = [];
+  for (var pi = 0; pi < 4; pi++) {
+    if (pi === 2) continue;
+    var g = _tg(pillars[pi].stem, pillars[pi].branch);
+    allGods.push(g);
+    var cat = _godCategory(g);
+    if (godCount[cat] !== undefined) godCount[cat]++;
+    // 藏干十神
+    var cg = _canggan(pillars[pi].branch);
+    for (var ci = 0; ci < cg.length; ci++) {
+      var g2 = _tgStem(cg[ci]);
+      var cat2 = _godCategory(g2);
+      if (cat2 !== 'other' && godCount[cat2] !== undefined) godCount[cat2]++;
+    }
+  }
+  // 日支藏干十神（夫妻宫）
+  var dayBranchCanggan = _canggan(dayBranch);
+  var dayBranchGods = [];
+  for (var dci = 0; dci < dayBranchCanggan.length; dci++) {
+    var dg = _tgStem(dayBranchCanggan[dci]);
+    if (dg) dayBranchGods.push({stem: dayBranchCanggan[dci], god: dg, isBen: dci === 0});
+  }
+
+  // 四柱名称
+  var pillarNames = ['年柱','月柱','日柱','时柱'];
+  var yearPillar = pillars[0];
+  var monthPillar = pillars[1];
+  var hourPillar = pillars[3];
+
+  // 年柱十神（长辈）
+  var yearStemGod = _tgStem(yearPillar.stem);
+  var yearBranchGod = _tgBranch(yearPillar.branch);
+  // 月柱十神（平辈）
+  var monthStemGod = _tgStem(monthPillar.stem);
+  var monthBranchGod = _tgBranch(monthPillar.branch);
+  // 时柱十神（晚辈）
+  var hourStemGod = _tgStem(hourPillar.stem);
+  var hourBranchGod = _tgBranch(hourPillar.branch);
+
+  // ═══ 1. 长辈（父母）关系分析 ═══
+  var parentSection = (function() {
+    var yearGodCat = _godCategory(yearStemGod);
+    var yinCount = godCount.yin;
+    var guanCount = godCount.guan;
+    var rating, ratingColor, desc, advice, caution, resolve;
+
+    // 印星代表母亲，财星克印、官杀生印
+    if (yinCount >= 3) {
+      rating = '深厚'; ratingColor = '#2ecc71';
+      desc = '命局印星旺盛，与父母缘分深厚。父母对您关爱有加，成长过程中得到良好的家庭教育和支持。';
+      advice = [
+        '常回家看望父母，多陪伴聊天，让父母感到被重视和关爱',
+        '在做重大决定时主动征询父母意见，尊重他们的人生经验',
+        '关注父母身体健康，定期陪他们做体检，留意饮食起居'
+      ];
+      caution = '切忌因工作忙碌而长期忽略父母，不要把父母的付出视为理所当然。印星过旺也需注意不要过度依赖父母，要有独立主见。';
+      resolve = '印星适度为佳。如印星过旺（4个以上），可适当独立决策，减少对父母的过度依赖；可通过运动、社交平衡印星力量。';
+    } else if (yinCount >= 1) {
+      rating = '中等'; ratingColor = '#f39c12';
+      desc = '命局印星适中，与父母关系正常。有基本的亲情纽带，但可能因各种原因相处时间有限或沟通不够深入。';
+      advice = [
+        '每周至少通话一次，分享生活近况，让父母安心',
+        '逢年过节尽量回家团聚，创造温馨的家庭回忆',
+        '了解父母的兴趣爱好，偶尔陪他们一起参与活动'
+      ];
+      caution = '避免因代沟而产生隔阂，不要用"你们不懂"来搪塞父母的关心。也不可因小事与父母争执冷战。';
+      resolve = '可通过佩戴印星对应五行饰品（如印星为火则佩红色饰品）增强与父母的缘分。';
+    } else {
+      rating = '淡薄'; ratingColor = '#e74c3c';
+      desc = '命局印星偏弱，与父母缘分较淡。可能因聚少离多、代沟较深或早年离家发展，亲情联结需要刻意经营。';
+      advice = [
+        '主动打破沉默，即使不习惯也要尝试表达关心和感恩',
+        '通过书信或文字传达难以当面说出口的感情',
+        '寻找与父母的共同话题，从日常生活小事开始沟通'
+      ];
+      caution = '不可因缘分淡薄而彻底放弃沟通。不要在心里积累怨恨或委屈，学会释怀过去的不愉快。';
+      resolve = '印星弱者可在居家东方（印星方位）摆放温馨家庭合照，多穿印星对应五行颜色的衣物。也可通过行善积德回向父母来增进福缘。';
+    }
+
+    // 年柱天干十神修正
+    if (yearGodCat === 'yin') {
+      desc += '年柱透印星，长辈对您的学业和成长影响深远。';
+    } else if (yearGodCat === 'cai') {
+      desc += '年柱透财星，父母勤劳持家，家庭经济条件对成长影响较大。';
+    } else if (yearGodCat === 'guan') {
+      desc += '年柱透官杀，家教严格，父母对您期望较高。';
+    }
+
+    return {rating:rating, ratingColor:ratingColor, desc:desc, advice:advice, caution:caution, resolve:resolve,
+      meta: '年柱 ' + yearPillar.stem + yearPillar.branch + ' | 年干十神：' + (yearStemGod||'—') + ' | 年支十神：' + (yearBranchGod||'—')};
+  })();
+
+  // ═══ 2. 平辈（兄弟姊妹）关系分析 ═══
+  var siblingSection = (function() {
+    var biCount = godCount.bi;
+    var monthGodCat = _godCategory(monthStemGod);
+    var rating, ratingColor, desc, advice, caution, resolve;
+
+    if (biCount >= 4) {
+      rating = '深厚'; ratingColor = '#2ecc71';
+      desc = '命局比肩劫财旺盛，兄弟姐妹缘分深厚。手足之间感情融洽，遇到困难时能够互相扶持、共同面对。';
+      advice = [
+        '珍惜手足之情，定期组织家庭聚会，维系兄弟姐妹间的联系',
+        '在兄弟姐妹遇到困难时主动伸出援手，做到守望相助',
+        '尊重各兄弟姐妹的生活方式和经济状况差异，不攀比不计较'
+      ];
+      caution = '比劫过旺易因财产或利益分配产生纠纷。切忌在父母面前争宠或攀比，不要在经济上过度牵扯导致反目。';
+      resolve = '比劫过旺者需注意分清你我界限，亲兄弟明算账。可通过修身养性、培养独立兴趣来平衡比劫力量。';
+    } else if (biCount >= 2) {
+      rating = '中等'; ratingColor = '#f39c12';
+      desc = '命局比肩劫财适中，与兄弟姐妹关系尚可。有基本的手足情谊，但各自忙碌，走动可能不够频繁。';
+      advice = [
+        '利用节假日主动联系兄弟姐妹，组织家庭活动',
+        '在父母赡养等家庭事务中主动承担，与手足协商分工',
+        '关心兄弟姐妹的子女成长，维系家族亲情纽带'
+      ];
+      caution = '不要因各自成家后疏于走动。避免因家庭琐事或经济问题产生嫌隙。';
+      resolve = '可佩戴比肩五行饰品增强手足缘分。定期家庭聚餐是最简单有效的化解方式。';
+    } else {
+      rating = '淡薄'; ratingColor = '#e74c3c';
+      desc = '命局比肩劫财偏弱，与兄弟姐妹缘分较淡。可能为独生子女，或手足之间聚少离多、感情联结不够紧密。';
+      advice = [
+        '主动联络兄弟姐妹，即使生活轨迹不同也要保持基本联系',
+        '寻找共同兴趣点，从轻松的话题开始重建交流',
+        '在重要节日和人生节点送上祝福和关心，让对方感受到家人温暖'
+      ];
+      caution = '不要因缘分淡而彻底疏远。不可因财产或父母遗产问题与手足对簿公堂，伤了最后的亲情。';
+      resolve = '比劫弱者可多参加家族宗亲活动，结交志同道合的朋友作为"异姓兄弟"，弥补手足缘分的不足。';
+    }
+
+    if (monthGodCat === 'bi') {
+      desc += '月柱透比劫，与兄弟姐妹关系密切，手足情深。';
+    }
+
+    return {rating:rating, ratingColor:ratingColor, desc:desc, advice:advice, caution:caution, resolve:resolve,
+      meta: '月柱 ' + monthPillar.stem + monthPillar.branch + ' | 月干十神：' + (monthStemGod||'—') + ' | 月支十神：' + (monthBranchGod||'—')};
+  })();
+
+  // ═══ 3. 配偶（夫妻）关系分析 ═══
+  var spouseSection = (function() {
+    var caiCount = godCount.cai;
+    var dayBranchBenqiGod = dayBranchGods.length > 0 ? dayBranchGods[0].god : '';
+    var dayBranchCat = _godCategory(dayBranchBenqiGod);
+    var rating, ratingColor, desc, advice, caution, resolve;
+
+    if (dayBranchCat === 'cai') {
+      rating = '深厚'; ratingColor = '#2ecc71';
+      desc = '日支夫妻宫坐财星，与配偶缘分深厚。婚姻关系和谐，伴侣贤惠能干，对您的事业和财运有正面助益。';
+      advice = [
+        '珍惜伴侣的付出，经常表达感谢和爱意，不要把对方的关心当作理所当然',
+        '共同规划家庭未来，定期进行二人世界的约会和旅行',
+        '在重大财务决策上与伴侣协商，尊重对方的意见和感受'
+      ];
+      caution = '财星坐夫妻宫虽吉，但切忌因事业忙碌而忽略夫妻情感交流。不可因财权问题产生矛盾。';
+      resolve = '夫妻宫坐财星为佳配。如财星过旺需注意不要因桃花干扰而影响婚姻，可通过加强夫妻沟通化解。';
+    } else if (dayBranchCat === 'guan') {
+      rating = '中等'; ratingColor = '#f39c12';
+      desc = '日支夫妻宫坐官杀，配偶个性较强，有主见和担当。婚姻中既有互相督促的成长，也可能存在意见分歧。';
+      advice = [
+        '尊重配偶的独立人格，学会在分歧中寻找共识而非争个输赢',
+        '给彼此适当的空间和自由，不要过度干涉对方的生活圈',
+        '用温和的方式沟通，避免因言语犀利伤害对方'
+      ];
+      caution = '官杀坐夫妻宫易有争权现象。切忌在公共场合让对方难堪，不要用冷战来处理矛盾。';
+      resolve = '可在卧室摆放和合二仙或鸳鸯摆件，穿戴粉色系衣物增进夫妻感情。如七杀坐宫需特别注意沟通方式。';
+    } else if (dayBranchCat === 'bi') {
+      rating = '中等'; ratingColor = '#f39c12';
+      desc = '日支夫妻宫坐比劫，与配偶性格相似，如朋友般的夫妻关系。但也容易因个性都强而产生摩擦。';
+      advice = [
+        '学会换位思考，多从对方角度考虑问题',
+        '培养共同兴趣爱好，增加相处的乐趣和默契',
+        '在经济上保持适度独立，避免因金钱产生不必要的矛盾'
+      ];
+      caution = '比劫坐夫妻宫易有争财或第三者干扰。切忌过度强势，不要忽视伴侣的情感需求。';
+      resolve = '可通过佩戴与日主相合五行饰品来化解比劫冲克。定期进行夫妻深度沟通，坦诚分享内心感受。';
+    } else if (dayBranchCat === 'shi') {
+      rating = '深厚'; ratingColor = '#2ecc71';
+      desc = '日支夫妻宫坐食伤，与配偶感情细腻丰富。对方温柔体贴，夫妻之间有很好的情感交流。';
+      advice = [
+        '用创意和浪漫经营婚姻，经常给伴侣制造小惊喜',
+        '共同参与文艺活动或学习新技能，让感情在共同成长中升华',
+        '注重情感表达的细节，一句温暖的话胜过千言万语'
+      ];
+      caution = '食伤过旺易情绪化。不要因小事钻牛角尖，避免过度敏感导致无端猜疑。';
+      resolve = '食伤坐夫妻宫为情深之配。如伤官过旺需注意言语分寸，可通过冥想或运动释放情绪，避免将负面情绪带入婚姻。';
+    } else if (dayBranchCat === 'yin') {
+      rating = '深厚'; ratingColor = '#2ecc71';
+      desc = '日支夫妻宫坐印星，配偶像长辈般关爱您，婚姻中有被呵护的安全感。伴侣体贴入微，是温暖的港湾。';
+      advice = [
+        '感恩伴侣的照顾，不要把关爱当作束缚',
+        '适度回馈对方的爱，让婚姻成为双向的温暖流动',
+        '在家庭决策中也要让对方参与，避免一方过度付出'
+      ];
+      caution = '印星过旺易过度依赖。切忌失去自我，不要把所有决定权都交给对方。';
+      resolve = '印星坐夫妻宫为温馨之配。保持适度的独立性，让婚姻既有依赖又有自由空间。';
+    } else {
+      rating = '中等'; ratingColor = '#f39c12';
+      desc = '日支夫妻宫藏干十神不明朗，婚姻关系需要双方共同经营。缘分的深浅更多取决于后天的沟通和努力。';
+      advice = [
+        '建立定期的夫妻沟通时间，分享彼此的想法和感受',
+        '学会倾听，真正理解对方的需求而非急于表达自己',
+        '在矛盾中先冷静再沟通，避免情绪化的争吵'
+      ];
+      caution = '不要把工作压力带回家中。避免长期忽视伴侣的感受和需求。';
+      resolve = '可通过共同参加婚姻成长课程或阅读婚姻经营书籍来增进理解。居家西南方摆放粉色水晶有助于增强姻缘。';
+    }
+
+    return {rating:rating, ratingColor:ratingColor, desc:desc, advice:advice, caution:caution, resolve:resolve,
+      meta: '日支 ' + dayBranch + ' | 夫妻宫藏干：' + (dayBranchCanggan.join('、') || '—') + ' | 本气十神：' + (dayBranchBenqiGod || '—')};
+  })();
+
+  // ═══ 4. 晚辈（子女）关系分析 ═══
+  var childSection = (function() {
+    var shiCount = godCount.shi;
+    var hourGodCat = _godCategory(hourStemGod);
+    var rating, ratingColor, desc, advice, caution, resolve;
+
+    if (shiCount >= 4) {
+      rating = '深厚'; ratingColor = '#2ecc71';
+      desc = '命局食神伤官旺盛，与子女缘分深厚。子女聪明活泼、才华出众，与您感情亲密。晚年可享天伦之乐。';
+      advice = [
+        '因材施教，发现并培养子女的兴趣天赋，不要强加自己的期望',
+        '多陪伴子女成长，参与他们的重要时刻，建立深厚的亲子信任',
+        '用身教胜于言传，做子女的好榜样，以自身行动影响他们'
+      ];
+      caution = '食伤过旺易过度溺爱或干预。切忌替子女做所有决定，不要以爱之名束缚他们的自由发展。';
+      resolve = '食伤适度为佳。如过旺可通过适度放手、培养自己的兴趣爱好来转移注意力，给子女成长空间。';
+    } else if (shiCount >= 2) {
+      rating = '中等'; ratingColor = '#f39c12';
+      desc = '命局食神伤官适中，与子女关系正常。亲子之间有基本的感情基础，但需要更多用心经营才能加深缘分。';
+      advice = [
+        '每天抽出专属时间陪伴子女，哪怕只有半小时也要全心全意',
+        '多鼓励少批评，关注子女的情绪健康而非只看重成绩',
+        '与子女一起制定家庭规则，让他们参与决策以培养责任感'
+      ];
+      caution = '不要因工作忙碌而缺席子女成长。避免用物质补偿代替情感陪伴。';
+      resolve = '可通过佩戴食伤五行饰品增强与子女缘分。多参加亲子活动是最自然的化解方式。';
+    } else {
+      rating = '淡薄'; ratingColor = '#e74c3c';
+      desc = '命局食神伤官偏弱，与子女缘分较淡。可能因工作原因聚少离多，或与子女在沟通上存在障碍。';
+      advice = [
+        '主动了解子女的世界，学习他们感兴趣的事物以拉近距离',
+        '用平等的姿态交流，不要以长辈身份压制子女的想法',
+        '从生活细节入手表达关爱，一顿可口的饭菜也是爱的表达'
+      ];
+      caution = '不可因缘分淡而放弃沟通。不要用"我都是为了你好"来强制子女服从。切忌将工作情绪发泄到子女身上。';
+      resolve = '食伤弱者可在居家西方（子女方位）摆放儿童照片或可爱饰品。多行善事、关爱他人子女也能增进自身子女缘分。';
+    }
+
+    if (hourGodCat === 'shi') {
+      desc += '时柱透食伤，子女才华出众，晚年享福。';
+    } else if (hourGodCat === 'guan') {
+      desc += '时柱透官杀，子女有出息但个性较强，需注重沟通方式。';
+    }
+
+    return {rating:rating, ratingColor:ratingColor, desc:desc, advice:advice, caution:caution, resolve:resolve,
+      meta: '时柱 ' + hourPillar.stem + hourPillar.branch + ' | 时干十神：' + (hourStemGod||'—') + ' | 时支十神：' + (hourBranchGod||'—')};
+  })();
+
+  // ═══ 组装HTML ═══
+  var html = '';
+  html += '<div style="margin:20px 0;">';
+  html += '<div style="text-align:center;margin-bottom:16px">';
+  html += '<div style="font-size:18px;font-weight:bold;color:var(--gold,#c9a84c);letter-spacing:4px;margin-bottom:4px">🏡 家庭伦理道德全量指导</div>';
+  html += '<div style="font-size:12px;color:#888;letter-spacing:1px">基于八字四柱十神分析的家庭关系指南</div>';
+  html += '</div>';
+
+  // 通用卡片生成函数
+  function _card(idx, title, icon, section) {
+    var h = '';
+    h += '<div style="background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin-bottom:12px">';
+    h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">';
+    h += '<div style="font-size:15px;font-weight:bold;color:var(--gold,#c9a84c);letter-spacing:2px">' + icon + ' ' + title + '</div>';
+    h += '<div style="font-size:12px;color:' + section.ratingColor + ';font-weight:bold;border:1px solid ' + section.ratingColor + ';border-radius:12px;padding:2px 10px">缘分：' + section.rating + '</div>';
+    h += '</div>';
+    h += '<div style="font-size:11px;color:#999;margin-bottom:8px;padding:4px 8px;background:rgba(0,0,0,0.02);border-radius:4px">' + section.meta + '</div>';
+    h += '<div style="font-size:13px;line-height:1.8;color:var(--paper,#333);margin-bottom:10px">' + section.desc + '</div>';
+    // 相处建议
+    h += '<div style="font-size:12px;font-weight:bold;color:var(--gold,#c9a84c);margin-bottom:6px">💡 相处建议</div>';
+    h += '<div style="font-size:12px;line-height:1.9;color:var(--paper2,#666);margin-bottom:10px;padding-left:8px;border-left:2px solid rgba(201,168,76,0.2)">';
+    for (var ai = 0; ai < section.advice.length; ai++) {
+      h += '<div>' + (ai+1) + '. ' + section.advice[ai] + '</div>';
+    }
+    h += '</div>';
+    // 注意事项
+    h += '<div style="font-size:12px;font-weight:bold;color:#e74c3c;margin-bottom:6px">⚠️ 注意事项</div>';
+    h += '<div style="font-size:12px;line-height:1.9;color:#666;margin-bottom:10px;padding:8px 10px;background:rgba(231,76,60,0.03);border-radius:4px">' + section.caution + '</div>';
+    // 化解建议
+    h += '<div style="font-size:12px;font-weight:bold;color:#3498db;margin-bottom:6px">🔧 化解建议</div>';
+    h += '<div style="font-size:12px;line-height:1.9;color:#666;padding:8px 10px;background:rgba(52,152,219,0.03);border-radius:4px">' + section.resolve + '</div>';
+    h += '</div>';
+    return h;
+  }
+
+  html += _card(1, '长辈（父母）关系', '👴', parentSection);
+  html += _card(2, '平辈（兄弟姊妹）关系', '🤝', siblingSection);
+  html += _card(3, '配偶（夫妻）关系', '💍', spouseSection);
+  html += _card(4, '晚辈（子女）关系', '👶', childSection);
+
+  // ═══ 家庭和谐总纲 ═══
+  html += '<div style="background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.02));border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:16px;margin-bottom:12px">';
+  html += '<div style="font-size:15px;font-weight:bold;color:var(--gold,#c9a84c);letter-spacing:3px;margin-bottom:12px;text-align:center">🌟 家庭和谐总纲</div>';
+  html += '<div style="font-size:12px;line-height:2;color:var(--paper,#333)">';
+  html += '<div style="margin-bottom:6px"><b style="color:var(--gold,#c9a84c)">一、孝亲尊长</b>——百善孝为先。父母恩重如山，无论多忙都要常怀感恩之心，用实际行动回报养育之恩。尊重长辈的人生经验和智慧，虚心听取他们的教诲。</div>';
+  html += '<div style="margin-bottom:6px"><b style="color:var(--gold,#c9a84c)">二、手足相亲</b>——兄弟姐妹是血脉相连的至亲。在顺境时共享喜悦，在逆境时守望相助。不计较得失，不攀比贫富，珍惜这份天定的手足缘分。</div>';
+  html += '<div style="margin-bottom:6px"><b style="color:var(--gold,#c9a84c)">三、夫妻和顺</b>——夫妻是缘定三生的伴侣。以爱为基础，以尊重为前提，以包容为润滑剂。大事商量，小事体谅，在平淡的日常中经营不平凡的感情。</div>';
+  html += '<div style="margin-bottom:6px"><b style="color:var(--gold,#c9a84c)">四、慈幼有方</b>——对子女既要有慈爱之心，也要有教育之方。因材施教，以身作则。给予足够的爱与自由，同时树立正确的价值观和品格。</div>';
+  html += '<div><b style="color:var(--gold,#c9a84c)">五、家和万事兴</b>——家庭和睦是一切幸福的根基。遇到矛盾先自省，沟通胜过争吵，理解胜过指责。让家成为每个成员温暖的避风港，而非冰冷的是非场。</div>';
+  html += '</div>';
+  html += '</div>';
+
+  html += '</div>';
+  return html;
+}
+
 // 挂载到window
 try { window.computeHealthForecast = computeHealthForecast; } catch(e){}
 try { window.renderHealthForecast = renderHealthForecast; } catch(e){}
 try { window.runHealthForecast = runHealthForecast; } catch(e){}
+try { window.buildFamilyEthicsGuide = buildFamilyEthicsGuide; } catch(e) {}
+try { window.buildMonthlyFortuneTrend = buildMonthlyFortuneTrend; } catch(e) {}
 

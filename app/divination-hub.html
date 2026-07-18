@@ -12086,6 +12086,24 @@ function computeBazi() {
   };
   for (var _ti=0; _ti<4; _ti++) { if (_ti!==2) baziData.tenGods.push(getTenGod(pillars[_ti].stem, pillars[_ti].branch, dayStem)); }
   try { document.getElementById('baziResult').innerHTML += generateInterpretation(baziData); } catch(e) {}
+  try {
+    var _fegHtml = buildFamilyEthicsGuide(baziData);
+    if (_fegHtml) document.getElementById('baziResult').insertAdjacentHTML('beforeend', _fegHtml);
+  } catch(eFeg) { console.warn('family ethics error:', eFeg); }
+
+  // === 📈 月度运势走向报告 ===
+  try {
+    if (!baziData.dayStem) baziData.dayStem = dayStem;
+    if (!baziData.dayBranch) baziData.dayBranch = dayBranch;
+    if (baziData.dayStemIdx === undefined) baziData.dayStemIdx = dayStemIdx;
+    if (!baziData.pillars) baziData.pillars = pillars;
+    if (!baziData.xiEle) baziData.xiEle = xiEle;
+    var _now = new Date();
+    var _startM = _now.getFullYear() + '-' + String(_now.getMonth()+1).padStart(2,'0');
+    var _endM = (_now.getFullYear()+1) + '-12';
+    var _trendHtml = buildMonthlyFortuneTrend(baziData, _startM, _endM);
+    if (_trendHtml) document.getElementById('baziResult').insertAdjacentHTML('beforeend', _trendHtml);
+  } catch(eTrend) { console.warn('monthly trend error:', eTrend); }
 
   // === 📋 缘主须知 ===
   try {
