@@ -797,16 +797,19 @@ function getQimenReading(palace) {
 
 // ========== 奇门遁甲 V2 动态解读引擎 ==========
 
-// 用神取法表：问事类型 → 对应用神
+// [舒晗课程校正] 用神取法表 — 依据密训班01/02用神五层法
+// 舒晗事体用神表：求财→生门+戊/庚，工作→开门+值符，婚姻→乙奇(男)/庚金(女)+休门
+// 疾病→天芮+伤门/死门，走失→时干+杜门/六合，官司→惊门+六仪击刑
 var _QM_YONGSHEN_MAP = {
   '财':'生门','求财':'生门','投资':'生门','生意':'生门','交易':'生门',
+  '偏财':'丁奇','副业':'丁奇',
   '官':'开门','事业':'开门','工作':'开门','升迁':'开门','求职':'开门',
   '婚':'六合','婚姻':'六合','感情':'六合','恋爱':'六合','相亲':'六合',
   '病':'天芮','疾病':'天芮','健康':'天芮','身体':'天芮',
   '出行':'景门','旅游':'景门','出差':'景门',
-  '考试':'天辅','学业':'天辅','升学':'天辅','文考':'天辅',
-  '诉讼':'惊门','官司':'惊门','争':'惊门','纠纷':'惊门',
-  '盗':'玄武','贼':'玄武','失':'玄武','丢失':'玄武',
+  '考试':'天辅','学业':'天辅','升学':'天辅','文考':'天辅','学习':'天辅',
+  '诉讼':'惊门','官司':'惊门','争':'惊门','纠纷':'惊门','官非':'惊门',
+  '盗':'玄武','贼':'玄武','失':'玄武','丢失':'玄武','走失':'杜门',
   '住宅':'生门','风水':'生门','搬家':'生门','置产':'生门'
 };
 
@@ -1188,19 +1191,33 @@ function getQimenReadingV2(palace, panData, question, baziData) {
     var starWx = _QM_STAR_WX[star] || '土';
     var starRel = _qmWxRelation(starWx, palaceWx);
     var starJi = _QM_JI_STAR.indexOf(star) >= 0;
-    detailParts.push('二、九星分析：天盘' + star + '（' + starWx + '），' + (starJi ? '为吉星' : '为凶星') + '，与宫位' + starRel + '。' + (starRel === '生我' || starRel === '比和' ? '星宫相生，吉力增强。' : starRel === '克我' ? '星克宫，减力之象。' : '星泄宫，耗费精力。'));
+    // [舒晗课程校正] 九星象意补充 — 依据密训班11-12课
+    var starDesc = {
+      '天蓬':'胆大妄为，主盗贼水灾','天芮':'病星，主疾病缠绵','天冲':'冲动伤损，主急躁','天辅':'文昌星，主文教辅佐',
+      '天禽':'稳重权威，寄中宫','天心':'医药之星，主治病救人','天柱':'破败惊恐','天任':'富厚安泰','天英':'火炎血光'
+    };
+    detailParts.push('二、九星分析：天盘' + star + '（' + starWx + '），' + (starJi ? '为吉星' : '为凶星') + '，' + (starDesc[star]||'') + '，与宫位' + starRel + '。' + (starRel === '生我' || starRel === '比和' ? '星宫相生，吉力增强。' : starRel === '克我' ? '星克宫，减力之象。' : '星泄宫，耗费精力。'));
   }
   
   if (men) {
     var menWx = _QM_MEN_WX[men] || '土';
     var menRel = _qmWxRelation(menWx, palaceWx);
     var menJi = _QM_JI_MEN.indexOf(men) >= 0;
-    detailParts.push('三、八门分析：' + men + '（' + menWx + '），' + (menJi ? '为吉门' : '为凶门') + '，与宫位' + menRel + '。' + (menRel === '生我' || menRel === '比和' ? '门宫相生，谋事可成。' : menRel === '克我' ? '门迫宫，事多阻碍。' : '门泄宫，需迂回而行。'));
+    // [舒晗课程校正] 八门象意补充 — 依据密训班11-12课
+    var menDesc = {
+      '开门':'通达开拓，利求职见贵','休门':'安养休息，利求财婚恋','生门':'生发财运，利经营求财','伤门':'伤害争斗',
+      '杜门':'闭塞不通，利躲灾避难','景门':'文书信息，利考试面试','死门':'死亡凶险，不利吉事','惊门':'惊恐口舌，利诉讼'
+    };
+    detailParts.push('三、八门分析：' + men + '（' + menWx + '），' + (menJi ? '为吉门' : men === '景门' ? '为平门' : '为凶门') + '，' + (menDesc[men]||'') + '，与宫位' + menRel + '。' + (menRel === '生我' || menRel === '比和' ? '门宫相生，谋事可成。' : menRel === '克我' ? '门迫宫，事多阻碍。' : '门泄宫，需迂回而行。'));
   }
   
   if (shen) {
     var shenJi = _QM_JI_SHEN.indexOf(shen) >= 0;
-    detailParts.push('四、八神分析：' + shen + '神，' + (shenJi ? '为吉神护卫，百恶消散。' : '为凶神临宫，宜谨慎防范。'));
+    // [舒晗课程校正] 八神象意补充 — 依据密训班11-12课
+    var shenDesc = {
+      '值符':'贵人统领，最吉之神','腾蛇':'虚惊怪异','太阴':'暗助荫庇','六合':'婚姻和合','白虎':'凶险血光','玄武':'盗贼暗昧','九地':'稳固厚重','九天':'高远威武'
+    };
+    detailParts.push('四、八神分析：' + shen + '神，' + (shenDesc[shen]||'') + '，' + (shenJi ? '为吉神护卫，百恶消散。' : '为凶神临宫，宜谨慎防范。'));
   }
   
   if (qi) {
@@ -1270,17 +1287,21 @@ function getQimenReadingV2(palace, panData, question, baziData) {
   // 格局分析
   var gejuText = _qmFormatGeju(geju);
   
-  // 空亡分析
+  // [舒晗课程校正] 空亡分析 — 依据密训班01四害化解绝技
   var kongwangText = '空亡在' + (kongWangGongs.length > 0 ? kongWangGongs.map(function(g){ return PALACE_INFO[g] ? PALACE_INFO[g].name : g + '宫'; }).join('、') : '无') + '。';
-  if (isKongWang) kongwangText += '用神落空亡宫，谋事减力30-50%，需填实后方可成就。';
-  else kongwangText += '用神不落空亡，谋事有力。';
+  if (isKongWang) {
+    kongwangText += '用神落空亡宫，谋事减力30-50%，需填实后方可成就。[舒晗密训] 空亡化解三法：1.填实法（放置该宫五行之物，如坎宫空亡放黑色球/鱼缸）；2.冲起法（待冲之时机，如午日冲起子空）；3.合住法（用地支合住空亡之干）。';
+  } else {
+    kongwangText += '用神不落空亡，谋事有力。';
+  }
   
   // 马星分析
   var maxingText = '马星在' + (maXingGong > 0 ? (PALACE_INFO[maXingGong] ? PALACE_INFO[maXingGong].name : maXingGong + '宫') : '未知') + '。';
   if (isMaXing) maxingText += '马星临用神宫，事动速成，但易反复。宜速战速决，不宜拖延。';
   else maxingText += '马星不临用神宫，事态平稳，按部就班。';
   
-  // 四害分析
+  // [舒晗课程校正] 四害分析 — 依据密训班01四害化解绝技
+  // 四害：空亡、击刑、入墓、门迫
   var sihaiParts = [];
   var sihaiGongs = {};
   if (panData.men) {
@@ -1288,6 +1309,7 @@ function getQimenReadingV2(palace, panData, question, baziData) {
       if (sp === 5) continue;
       var spMen = panData.men[sp] || '';
       if (spMen && spMen.length === 1) spMen = ({'休':'休门','生':'生门','伤':'伤门','杜':'杜门','景':'景门','死':'死门','惊':'惊门','开':'开门'}[spMen] || spMen);
+      // [舒晗密训] 门迫：八门五行克宫位五行
       if (spMen === '死门') sihaiGongs[sp] = '死门';
       else if (spMen === '惊门') sihaiGongs[sp] = '惊门';
       else if (spMen === '伤门') sihaiGongs[sp] = '伤门';
@@ -1297,7 +1319,11 @@ function getQimenReadingV2(palace, panData, question, baziData) {
   for (var sg in sihaiGongs) {
     var sMen = sihaiGongs[sg];
     var hua = _QM_SIHAI_HUAJIE[sMen];
-    sihaiParts.push(sMen + '落' + (PALACE_INFO[sg] ? PALACE_INFO[sg].name : sg + '宫') + '，化解：' + hua.mascot + '，置于' + hua.direction + '，' + hua.method);
+    sihaiParts.push(sMen + '落' + (PALACE_INFO[sg] ? PALACE_INFO[sg].name : sg + '宫') + '，[舒晗密训] 门迫化解：' + hua.mascot + '，置于' + hua.direction + '，' + hua.method);
+  }
+  // [舒晗课程校正] 空亡四害检测
+  if (kongWangGongs.length > 0) {
+    sihaiParts.push('空亡在' + kongWangGongs.map(function(g){ return PALACE_INFO[g] ? PALACE_INFO[g].name : g + '宫'; }).join('、') + '，[舒晗密训] 化解：填实法（放该宫五行之物）/冲起法（待冲之时机）/合住法（地支合住空亡之干）');
   }
   var sihai = sihaiParts.length > 0 ? sihaiParts.join('；') : '无明显四害临宫。';
   
