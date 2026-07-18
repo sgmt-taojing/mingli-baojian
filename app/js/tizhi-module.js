@@ -274,10 +274,10 @@ var TZ_DATA = {
 ;
 
 function tzSwitchTab(name){
-  var allTabs = ['report','selftest','plan','food','qigong','prescription','bazi','checkin','wuxing'];
+  const allTabs = ['report','selftest','plan','food','qigong','prescription','bazi','checkin','wuxing'];
   allTabs.forEach(function(t){
-    var panel=document.getElementById('tz-tab-'+t);
-    var btn=document.getElementById('tzTab-'+t);
+    let panel = document.getElementById('tz-tab-'+t);
+    let btn = document.getElementById('tzTab-'+t);
     if(panel) panel.style.display = (t===name)?'block':'none';
     if(btn){
       if(t===name){btn.style.background='var(--title)';btn.style.color='#fff';btn.style.fontWeight='600';}
@@ -294,35 +294,35 @@ function tzSwitchTab(name){
 }
 
 function tzPopulatePlanSelect(){
-  var sel=document.getElementById('tzPlanTizhi');
+  let sel = document.getElementById('tzPlanTizhi');
   if(!sel) return;
   // Check if already populated
   if(sel.options.length>1) return;
   TZ_DATA.constitutions.forEach(function(c){
-    var opt=document.createElement('option');
+    let opt = document.createElement('option');
     opt.value=c.key;opt.textContent=c.icon+' '+c.name;
     sel.appendChild(opt);
   });
   // Try to get last result
   try{
-    var last=window._tzLastResult;
+    let last = window._tzLastResult;
     if(last && last.key){sel.value=last.key;}
   }catch(e){}
 }
 
 function tzGeneratePlan(){
-  var sel=document.getElementById('tzPlanTizhi');
-  var tizhiKey=sel.value;
+  let sel = document.getElementById('tzPlanTizhi');
+  let tizhiKey = sel.value;
   if(!tizhiKey){showToast('请先选择体质类型');return;}
-  var cons=TZ_DATA.constitutions.find(function(c){return c.key===tizhiKey;});
+  let cons = TZ_DATA.constitutions.find(function(c){return c.key===tizhiKey;});
   if(!cons) return;
-  var result=document.getElementById('tzPlanResult');
+  let result = document.getElementById('tzPlanResult');
   result.style.display='block';
   result.innerHTML='<div style="text-align:center;padding:30px"><div style="font-size:32px;margin-bottom:16px;animation:spin 2s linear infinite">🎯</div><div style="font-size:16px;color:var(--gold);margin-bottom:8px">AI正在生成您的综合养生方案...</div><div style="font-size:13px;color:var(--paper2)">基于' + cons.name + '体质特征</div></div>';
 
   // Build context for AI
-  var wuKey={木:'Mu',火:'Huo',土:'Tu',金:'Jin',水:'Shui'}[cons.yangsheng.match(/[木火土金水]/)?cons.yangsheng.match(/[木火土金水]/)[0]:'土'];
-  var prompt='你是中医养生专家。请为"' + cons.name + '"体质的人生成一份综合养生方案。\n';
+  let wuKey = {木:'Mu',火:'Huo',土:'Tu',金:'Jin',水:'Shui'}[cons.yangsheng.match(/[木火土金水]/)?cons.yangsheng.match(/[木火土金水]/)[0]:'土'];
+  const prompt = '你是中医养生专家。请为"' + cons.name + '"体质的人生成一份综合养生方案。\n';
   prompt+='体质特征：' + cons.desc + '\n';
   prompt+='基本养生原则：' + cons.yangsheng + '\n\n';
   prompt+='请从以下四个维度给出具体方案：\n';
@@ -337,15 +337,15 @@ function tzGeneratePlan(){
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({model:'openclaw',messages:[{role:'user',content:prompt}],max_tokens:2000,temperature:0.4})
   }).then(function(r){return r.json();}).then(function(data){
-    var text=data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content||'';
-    var jsonMatch=text.match(/\{[\s\S]+\}/);
-    var obj=null;
+    let text = data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content||'';
+    let jsonMatch = text.match(/\{[\s\S]+\}/);
+    const obj = null;
     if(jsonMatch){try{obj=JSON.parse(jsonMatch[0]);}catch(e){obj=null;}}
     if(!obj){
       result.innerHTML='<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px"><div style="font-size:14px;color:var(--text);line-height:1.8;white-space:pre-wrap">'+text+'</div></div>';
       return;
     }
-    var html='<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:24px">';
+    const html = '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:24px">';
     // Header
     html+='<div style="text-align:center;margin-bottom:20px"><div style="font-size:48px">'+cons.icon+'</div><div style="font-size:20px;color:'+cons.color+';font-weight:bold;margin-top:8px">'+cons.name+' · 综合养生方案</div><div style="font-size:13px;color:var(--paper2);margin-top:6px">'+cons.desc+'</div></div>';
     // 食疗
@@ -386,7 +386,7 @@ function tzGeneratePlan(){
 }
 
 function tzRenderQigong(){
-  var list=TZ_DATA.qigongMethods||[];
+  let list = TZ_DATA.qigongMethods||[];
   var html=list.map(function(q){
     return '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:18px">'+
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'+
@@ -406,21 +406,21 @@ function tzRenderQigong(){
       '<div style="display:flex;gap:4px;flex-wrap:wrap">'+q.constitutions.map(function(c){return '<span style="font-size:11px;padding:2px 8px;background:rgba(201,168,76,0.08);border:1px solid var(--border);border-radius:10px;color:var(--gold2)">适合：'+c+'</span>';}).join('')+'</div>'+
     '</div>';
   }).join('');
-  var el=document.getElementById('tzQigongList');
+  let el = document.getElementById('tzQigongList');
   if(el) el.innerHTML=html;
 
   // Also render exercise filters and list
-  var exFilters=['全部','有氧运动','力量训练','柔韧训练','呼吸训练'];
+  const exFilters = ['全部','有氧运动','力量训练','柔韧训练','呼吸训练'];
   var fhtml=exFilters.map(function(f,i){
     return '<button onclick="tzFilterExercise(\''+(i===0?'all':f)+'\')" style="padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:'+(i===0?'var(--title)':'rgba(255,255,255,0.04)')+';color:'+(i===0?'#fff':'var(--muted)')+';cursor:pointer;font-size:12px;font-family:inherit">'+f+'</button>';
   }).join('');
-  var fel=document.getElementById('tzExFilters');
+  let fel = document.getElementById('tzExFilters');
   if(fel) fel.innerHTML=fhtml;
   if(!document.getElementById('tzExerciseList').innerHTML) tzRenderExercise('all');
 }
 
 function tzRenderPrescriptions(){
-  var list=TZ_DATA.famousPrescriptions||[];
+  let list = TZ_DATA.famousPrescriptions||[];
   var html=list.map(function(p){
     return '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:18px">'+
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
@@ -439,12 +439,12 @@ function tzRenderPrescriptions(){
       '<div style="display:flex;gap:4px;flex-wrap:wrap">'+p.constitutions.map(function(c){return '<span style="font-size:11px;padding:2px 8px;background:rgba(201,168,76,0.08);border:1px solid var(--border);border-radius:10px;color:var(--gold2)">适合：'+c+'质</span>';}).join('')+'</div>'+
     '</div>';
   }).join('');
-  var el=document.getElementById('tzPrescriptionList');
+  let el = document.getElementById('tzPrescriptionList');
   if(el) el.innerHTML=html;
 }
 
 function tzRenderQuestionnaire(){
-  var html='';
+  const html = '';
   TZ_DATA.questions.forEach(function(q,idx){
     html+='<div style="margin-bottom:16px;padding:14px;background:rgba(255,255,255,0.03);border-radius:8px">'+
       '<div style="font-size:14px;color:var(--text);margin-bottom:10px"><b style="color:var(--gold)">'+(idx+1)+'.</b> '+q.q+'</div>'+
@@ -461,7 +461,7 @@ function tzRenderQuestionnaire(){
 }
 
 function tzSelectAnswer(qIdx,aIdx,el){
-  var siblings=el.parentNode.querySelectorAll('label');
+  let siblings = el.parentNode.querySelectorAll('label');
   siblings.forEach(function(s){
     s.style.background='rgba(255,255,255,0.03)';
     s.style.color='var(--muted)';
@@ -474,22 +474,22 @@ function tzSelectAnswer(qIdx,aIdx,el){
 }
 
 function tzCalculateResult(){
-  var answers=window._tzAnswers||{};
-  var scores={};
+  let answers = window._tzAnswers||{};
+  const scores = {};
   TZ_DATA.questions.forEach(function(q,idx){
-    var a=answers[idx]||0;
+    let a = answers[idx]||0;
     if(q.scores){
       Object.keys(q.scores).forEach(function(k){
         scores[k]=(scores[k]||0)+q.scores[k]*a;
       });
     }
   });
-  var sorted=Object.keys(scores).sort(function(a,b){return scores[b]-scores[a];});
-  var top=sorted[0]||'pinghe';
-  var second=sorted[1]||'pinghe';
-  var cons=TZ_DATA.constitutions;
-  var topC=cons.find(function(c){return c.key===top;})||cons[0];
-  var secondC=cons.find(function(c){return c.key===second;})||cons[0];
+  let sorted = Object.keys(scores).sort(function(a,b){return scores[b]-scores[a];});
+  let top = sorted[0]||'pinghe';
+  let second = sorted[1]||'pinghe';
+  let cons = TZ_DATA.constitutions;
+  let topC = cons.find(function(c){return c.key===top;})||cons[0];
+  let secondC = cons.find(function(c){return c.key===second;})||cons[0];
   window._tzLastResult={key:top,name:topC.name};
 
   var html='<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:24px">'+
@@ -513,9 +513,9 @@ function tzCalculateResult(){
     '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:16px">'+
       '<div style="font-size:13px;color:var(--paper2);margin-bottom:8px">📈 各体质得分</div>';
   sorted.forEach(function(k){
-    var cc=cons.find(function(c){return c.key===k;});
+    let cc = cons.find(function(c){return c.key===k;});
     if(cc){
-      var pct=Math.min(100,Math.round((scores[k]||0)/20*100));
+      let pct = Math.min(100,Math.round((scores[k]||0)/20*100));
       html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'+
         '<span style="font-size:13px;color:var(--muted);min-width:80px">'+cc.icon+' '+cc.name+'</span>'+
         '<div style="flex:1;height:8px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden">'+
@@ -534,7 +534,7 @@ function tzCalculateResult(){
 }
 
 function tzRenderFood(filter){
-  var list=TZ_DATA.recipes;
+  let list = TZ_DATA.recipes;
   if(filter!=='all') list=list.filter(function(r){return r.constitutions.indexOf(filter)>=0;});
   var html=list.map(function(r){
     return '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:16px">'+
@@ -546,9 +546,9 @@ function tzRenderFood(filter){
     '</div>';
   }).join('');
   // Also build filters
-  var filterEl=document.getElementById('tzFoodFilters');
+  let filterEl = document.getElementById('tzFoodFilters');
   if(filterEl && !filterEl.innerHTML){
-    var fhtml='<button onclick="tzFilterFood(\'all\')" style="padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--title);color:#fff;cursor:pointer;font-size:12px;font-family:inherit">全部</button>';
+    const fhtml = '<button onclick="tzFilterFood(\'all\')" style="padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--title);color:#fff;cursor:pointer;font-size:12px;font-family:inherit">全部</button>';
     TZ_DATA.constitutions.forEach(function(c){
       fhtml+='<button onclick="tzFilterFood(\''+c.name.replace(/质$/,'')+'\')" style="padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,0.04);color:var(--muted);cursor:pointer;font-size:12px;font-family:inherit">'+c.icon+' '+c.name.replace(/质$/,'')+'</button>';
     });
@@ -557,12 +557,12 @@ function tzRenderFood(filter){
   document.getElementById('tzFoodList').innerHTML=html||'<div style="text-align:center;color:var(--muted);padding:20px">暂无相关食谱</div>';
   
   // 增强版：追加体质食疗方案 + 节气饮食建议
-  var extraHtml='';
+  const extraHtml = '';
   
   // 体质食疗方案（本地库）
   if(TZ_DATA.foodTherapy && filter!=='all'){
-    var tizhiKey=filter;
-    var ftList=TZ_DATA.foodTherapy[tizhiKey]||[];
+    let tizhiKey = filter;
+    let ftList = TZ_DATA.foodTherapy[tizhiKey]||[];
     if(ftList.length>0){
       extraHtml+='<div style="margin-top:20px;padding:16px;background:rgba(46,204,113,0.04);border:1px solid rgba(46,204,113,0.15);border-radius:12px">';
       extraHtml+='<div style="font-size:15px;color:var(--jade2);font-weight:bold;margin-bottom:12px">🍵 '+tizhiKey+'体质专属食疗方</div>';
@@ -580,10 +580,10 @@ function tzRenderFood(filter){
   
   // 节气饮食建议
   if(TZ_DATA.seasonalFoods){
-    var now=new Date();
-    var month=now.getMonth()+1;
-    var season=month>=3&&month<=5?'春':month>=6&&month<=8?'夏':month>=9&&month<=11?'秋':'冬';
-    var sf=TZ_DATA.seasonalFoods[season];
+    let now = new Date();
+    let month = now.getMonth()+1;
+    let season = month>=3&&month<=5?'春':month>=6&&month<=8?'夏':month>=9&&month<=11?'秋':'冬';
+    let sf = TZ_DATA.seasonalFoods[season];
     if(sf){
       extraHtml+='<div style="margin-top:16px;padding:16px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:12px">';
       extraHtml+='<div style="font-size:15px;color:var(--gold);font-weight:bold;margin-bottom:8px">🌿 当前'+season+'季饮食建议</div>';
@@ -598,7 +598,7 @@ function tzRenderFood(filter){
   }
   
   if(extraHtml){
-    var cur=document.getElementById('tzFoodList').innerHTML;
+    let cur = document.getElementById('tzFoodList').innerHTML;
     document.getElementById('tzFoodList').innerHTML=cur+extraHtml;
   }
 }
@@ -610,9 +610,9 @@ function tzFilterFood(f){
 }
 
 function tzRenderExercise(filter){
-  var list=TZ_DATA.exercises;
+  let list = TZ_DATA.exercises;
   if(filter!=='all') list=list.filter(function(e){return e.type===filter;});
-  var intColors={'低':'#4CAF50','中':'#FF9800','高':'#f44336'};
+  const intColors = {'低':'#4CAF50','中':'#FF9800','高':'#f44336'};
   var html=list.map(function(e){
     return '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:16px">'+
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
@@ -635,24 +635,24 @@ function tzFilterExercise(f){
 }
 
 function tzAnalyzeBazi(){
-  var dateStr=document.getElementById('tzBaziDate').value;
-  var hourIdx=parseInt(document.getElementById('tzBaziHour').value);
-  var gender=document.getElementById('tzBaziGender').value;
+  let dateStr = document.getElementById('tzBaziDate').value;
+  let hourIdx = parseInt(document.getElementById('tzBaziHour').value);
+  let gender = document.getElementById('tzBaziGender').value;
   if(!dateStr){showToast('请选择出生日期');return;}
-  var parts=dateStr.split('-');
-  var y=parseInt(parts[0]),m=parseInt(parts[1]),day=parseInt(parts[2]);
+  let parts = dateStr.split('-');
+  let y = parseInt(parts[0]),m=parseInt(parts[1]),day=parseInt(parts[2]);
 
-  var jdn = Math.floor((1461*(y+4800+Math.floor((m-14)/12)))/4)+Math.floor((367*(m-2-12*Math.floor((m-14)/12)))/12)-Math.floor((3*Math.floor((y+4900+Math.floor((m-14)/12))/100))/4)+day-32075;
-  var gzOffset=(jdn-11)%60;
+  let jdn = Math.floor((1461*(y+4800+Math.floor((m-14)/12)))/4)+Math.floor((367*(m-2-12*Math.floor((m-14)/12)))/12)-Math.floor((3*Math.floor((y+4900+Math.floor((m-14)/12))/100))/4)+day-32075;
+  let gzOffset = (jdn-11)%60;
   if(gzOffset<0) gzOffset+=60;
-  var stems=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-  var dayStem=stems[gzOffset%10];
-  var stemWuxing={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
-  var wu=stemWuxing[dayStem];
+  const stems = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  let dayStem = stems[gzOffset%10];
+  const stemWuxing = {'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
+  let wu = stemWuxing[dayStem];
 
-  var baziKey={'甲':'甲乙木','乙':'甲乙木','丙':'丙丁火','丁':'丙丁火','戊':'戊己土','己':'戊己土','庚':'庚辛金','辛':'庚辛金','壬':'壬癸水','癸':'壬癸水'}[dayStem];
-  var baziInfo=TZ_DATA.baziMap[baziKey]||TZ_DATA.baziMap['甲乙木'];
-  var wuData=TZ_DATA.wuxing[{木:'Mu',火:'Huo',土:'Tu',金:'Jin',水:'Shui'}[wu]];
+  let baziKey = {'甲':'甲乙木','乙':'甲乙木','丙':'丙丁火','丁':'丙丁火','戊':'戊己土','己':'戊己土','庚':'庚辛金','辛':'庚辛金','壬':'壬癸水','癸':'壬癸水'}[dayStem];
+  let baziInfo = TZ_DATA.baziMap[baziKey]||TZ_DATA.baziMap['甲乙木'];
+  let wuData = TZ_DATA.wuxing[{木:'Mu',火:'Huo',土:'Tu',金:'Jin',水:'Shui'}[wu]];
 
   var html='<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:24px">'+
     '<h5 style="font-family:\'Ma Shan Zheng\',serif;font-size:20px;color:var(--gold);margin-bottom:16px;text-align:center">🔮 日主'+dayStem+'('+wu+'行) 体质分析</h5>'+
@@ -694,8 +694,8 @@ function tzAnalyzeBazi(){
 }
 
 function tzSubmitCheckin(){
-  var today=new Date().toISOString().slice(0,10);
-  var items=[];
+  let today = new Date().toISOString().slice(0,10);
+  const items = [];
   if(document.getElementById('tzCheckDiet').checked) items.push('饮食调理');
   if(document.getElementById('tzCheckExercise').checked) items.push('功法锻炼');
   if(document.getElementById('tzCheckSleep').checked) items.push('早睡早起');
@@ -704,10 +704,10 @@ function tzSubmitCheckin(){
   if(document.getElementById('tzCheckTea').checked) items.push('药膳茶饮');
   if(document.getElementById('tzCheckMeditation').checked) items.push('正念冥想');
   if(document.getElementById('tzCheckReading').checked) items.push('经典诵读');
-  var note=document.getElementById('tzCheckNote').value;
+  let note = document.getElementById('tzCheckNote').value;
 
-  var key='tz_checkin_'+today;
-  var data={date:today,items:items,note:note};
+  let key = 'tz_checkin_'+today;
+  const data = {date:today,items:items,note:note};
   try{localStorage.setItem(key,JSON.stringify(data));}catch(e){}
 
   showToast('✅ 打卡成功！今日完成'+items.length+'项调理');
@@ -715,15 +715,15 @@ function tzSubmitCheckin(){
 }
 
 function tzRenderCheckin(){
-  var today=new Date().toISOString().slice(0,10);
-  var todayKey='tz_checkin_'+today;
-  var todayData=null;
+  let today = new Date().toISOString().slice(0,10);
+  let todayKey = 'tz_checkin_'+today;
+  const todayData = null;
   try{todayData=JSON.parse(localStorage.getItem(todayKey)||'null');}catch(e){}
 
-  var streak=0,total=0;
-  var d=new Date();
+  let streak = 0,total=0;
+  let d = new Date();
   for(var _i=0;_i<365;_i++){
-    var k='tz_checkin_'+d.toISOString().slice(0,10);
+    let k = 'tz_checkin_'+d.toISOString().slice(0,10);
     if(localStorage.getItem(k)){streak++;total++;d.setDate(d.getDate()-1);}
     else break;
   }
@@ -732,7 +732,7 @@ function tzRenderCheckin(){
   for(var _j=0;_j<365;_j++){
     if(++_safety>365) break;
     d.setDate(d.getDate()+1);
-    var k='tz_checkin_'+d.toISOString().slice(0,10);
+    let k = 'tz_checkin_'+d.toISOString().slice(0,10);
     if(localStorage.getItem(k)){total++;}
     else break;
   }
@@ -741,12 +741,12 @@ function tzRenderCheckin(){
   if(document.getElementById('tzTotalDays')) document.getElementById('tzTotalDays').textContent=total;
   if(document.getElementById('tzTodayStatus')) document.getElementById('tzTodayStatus').textContent=todayData?'已打卡':'未打卡';
 
-  var html='<h5 style="font-size:15px;color:var(--gold);margin-bottom:12px">📅 最近打卡记录</h5>';
-  var hasHistory=false;
+  const html = '<h5 style="font-size:15px;color:var(--gold);margin-bottom:12px">📅 最近打卡记录</h5>';
+  const hasHistory = false;
   for(var i=0;i<7;i++){
-    var dd=new Date();dd.setDate(dd.getDate()-i);
-    var dk='tz_checkin_'+dd.toISOString().slice(0,10);
-    var dData=null;
+    let dd = new Date();dd.setDate(dd.getDate()-i);
+    let dk = 'tz_checkin_'+dd.toISOString().slice(0,10);
+    const dData = null;
     try{dData=JSON.parse(localStorage.getItem(dk)||'null');}catch(e){}
     if(dData){
       hasHistory=true;
@@ -761,22 +761,22 @@ function tzRenderCheckin(){
     }
   }
   if(!hasHistory) html+='<div style="text-align:center;color:var(--muted);padding:20px;font-size:13px">暂无打卡记录，开始您的第一次打卡吧！</div>';
-  var el=document.getElementById('tzCheckinHistory');
+  let el = document.getElementById('tzCheckinHistory');
   if(el) el.innerHTML=html;
 }
 
 function tzRenderWxButtons(){
-  var btns=['Mu','Huo','Tu','Jin','Shui'];
+  const btns = ['Mu','Huo','Tu','Jin','Shui'];
   var html=btns.map(function(k){
     var d=TZ_DATA.wuxing[k];
     return '<button class="tz-wx-btn" data-key="'+k+'" style="padding:10px 20px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-family:inherit;font-size:14px;background:rgba(255,255,255,0.04);color:var(--muted)" onclick="tzSelectWuxing(\''+k+'\')">'+d.icon+' '+d.name+'·'+d.organs[0]+'</button>';
   }).join('');
-  var el=document.getElementById('tzWxBtns');
+  let el = document.getElementById('tzWxBtns');
   if(el) el.innerHTML=html;
 }
 
 function tzSelectWuxing(key){
-  var d=TZ_DATA.wuxing[key];
+  let d = TZ_DATA.wuxing[key];
   document.querySelectorAll('#tzWxBtns button').forEach(function(b){
     if(b.dataset.key===key){b.style.background='var(--title)';b.style.color='#fff';b.style.borderColor='var(--gold)';}
     else{b.style.background='rgba(255,255,255,0.04)';b.style.color='var(--muted)';b.style.borderColor='var(--border)';}
@@ -808,6 +808,6 @@ function tzSelectWuxing(key){
       '<div style="font-size:13px;color:var(--paper2)">'+d.avoid+'</div>'+
     '</div>'+
   '</div>';
-  var el=document.getElementById('tzWuxingDetail');
+  let el = document.getElementById('tzWuxingDetail');
   if(el) el.innerHTML=html;
 }

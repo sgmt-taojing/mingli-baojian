@@ -4,7 +4,7 @@
 // 方法论：排盘→旺衰→用神→格局→岁运→十神六亲→分维度断语→调候趋避
 // ═══════════════════════════════════════════════════════════════
 
-var HEIGE_API = (typeof HEIGE_API_BASE !== 'undefined') ? HEIGE_API_BASE : 'http://127.0.0.1:8911';
+let HEIGE_API = (typeof HEIGE_API_BASE !== 'undefined') ? HEIGE_API_BASE : 'http://127.0.0.1:8911';
 
 // HeiGe 方法论 11 步流程标签
 var HEIGE_STEPS = [
@@ -144,7 +144,7 @@ async function heigePaipan(params) {
       body: JSON.stringify(params)
     });
     if (!resp.ok) {
-      var err = await resp.json();
+      let err = await resp.json();
       return { error: err.error || '排盘失败' };
     }
     return await resp.json();
@@ -178,7 +178,7 @@ async function heigeAnalyze(params) {
  * @returns {string} 调候建议
  */
 function getTiaohou(dayGan, monthZhi) {
-  var key = dayGan + monthZhi;
+  let key = dayGan + monthZhi;
   return TIAOHOU_TABLE[key] || '查穷通宝鉴';
 }
 
@@ -208,22 +208,22 @@ function getSecai(wuxing) {
 function renderHeigeFramework(chart) {
   if (!chart || chart.error) return '<div style="padding:20px;color:#e74c3c">' + (chart && chart.error ? chart.error : '排盘失败') + '</div>';
 
-  var pillars = chart.pillars || {};
-  var dayMaster = chart.day_master || '';
-  var wuxingPower = chart.wuxing_power || {};
-  var samePct = chart.same_party_pct || 0;
-  var relations = chart.relations || {};
-  var geju = chart.geju || [];
-  var shensha = chart.shensha || {};
-  var dayun = chart.dayun || [];
-  var html = '';
+  let pillars = chart.pillars || {};
+  let dayMaster = chart.day_master || '';
+  let wuxingPower = chart.wuxing_power || {};
+  let samePct = chart.same_party_pct || 0;
+  let relations = chart.relations || {};
+  let geju = chart.geju || [];
+  let shensha = chart.shensha || {};
+  let dayun = chart.dayun || [];
+  const html = '';
 
   // 方法论标签
   html += '<div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:20px;margin:16px 0;border:1px solid var(--gold)">';
   html += '<div style="color:var(--gold);font-size:14px;font-weight:bold;letter-spacing:2px;margin-bottom:12px">🔬 HeiGe 方法论 · 11步系统推演</div>';
   html += '<div style="display:flex;flex-wrap:wrap;gap:6px">';
   for (var i = 0; i < HEIGE_STEPS.length; i++) {
-    var s = HEIGE_STEPS[i];
+    let s = HEIGE_STEPS[i];
     html += '<span style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--gold)" title="' + s.desc + '">' + (i+1) + '. ' + s.name + '</span>';
   }
   html += '</div></div>';
@@ -236,12 +236,12 @@ function renderHeigeFramework(chart) {
   html += '<tr style="border-bottom:1px solid rgba(0,0,0,0.1)"><td></td><td>年柱</td><td>月柱</td><td>日柱</td><td>时柱</td></tr>';
   html += '<tr><td style="color:var(--paper2)">天干</td>';
   ['年','月','日','时'].forEach(function(k) {
-    var p = pillars[k] || '--';
+    let p = pillars[k] || '--';
     html += '<td style="text-align:center;font-weight:bold;color:var(--ink)">' + p.charAt(0) + '</td>';
   });
   html += '</tr><tr><td style="color:var(--paper2)">地支</td>';
   ['年','月','日','时'].forEach(function(k) {
-    var p = pillars[k] || '--';
+    let p = pillars[k] || '--';
     html += '<td style="text-align:center;font-weight:bold;color:var(--ink)">' + p.charAt(1) + '</td>';
   });
   html += '</tr></table>';
@@ -263,7 +263,7 @@ function renderHeigeFramework(chart) {
   if (relations && Object.keys(relations).length > 0) {
     html += '<div style="margin-top:8px;font-size:12px"><b>刑冲合会：</b>';
     Object.keys(relations).forEach(function(k) {
-      var arr = relations[k];
+      let arr = relations[k];
       if (arr && arr.length > 0) {
         html += '<span style="margin-right:8px;color:#c0392b">' + k + ': ' + (Array.isArray(arr) ? arr.join(', ') : arr) + '</span>';
       }
@@ -283,9 +283,9 @@ function renderHeigeFramework(chart) {
   html += '</div>';
 
   // 调候提示
-  var dayGan = dayMaster.charAt(0);
-  var monthZhi = pillars.month ? pillars.month.charAt(1) : '';
-  var th = getTiaohou(dayGan, monthZhi);
+  let dayGan = dayMaster.charAt(0);
+  let monthZhi = pillars.month ? pillars.month.charAt(1) : '';
+  let th = getTiaohou(dayGan, monthZhi);
   if (th) {
     html += '<div style="background:rgba(46,204,113,0.05);border-left:3px solid #27ae60;padding:10px 14px;margin:8px 0;border-radius:0 6px 6px 0">';
     html += '<div style="font-size:12px;color:#27ae60"><b>调候用神：</b>' + th + '</div>';
@@ -298,7 +298,7 @@ function renderHeigeFramework(chart) {
     html += '<div style="margin-top:12px;font-size:12px"><b>大运：</b></div>';
     html += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">';
     dayun.slice(0, 8).forEach(function(d) {
-      var isCurrent = d.current;
+      let isCurrent = d.current;
       html += '<div style="background:' + (isCurrent ? 'rgba(231,76,60,0.1)' : 'rgba(0,0,0,0.03)') + ';border:1px solid ' + (isCurrent ? '#e74c3c' : 'rgba(0,0,0,0.1)') + ';border-radius:4px;padding:4px 8px;text-align:center;min-width:70px">';
       html += '<div style="font-weight:bold;color:var(--ink)">' + d.gan + d.zhi + '</div>';
       html += '<div style="font-size:10px;color:var(--paper2)">' + d.start_age + '-' + d.end_age + '岁</div>';

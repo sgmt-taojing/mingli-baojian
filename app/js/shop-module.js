@@ -1,10 +1,10 @@
 // ===== 商城分类切换 =====
 // ===== 商城状态 =====
-var currentShopCategory = 'all';
-var currentSortMode = 'default';
-var currentSearchKeyword = '';
-var currentSchoolFilter = 'all';
-var shopCart = [];
+const currentShopCategory = 'all';
+const currentSortMode = 'default';
+const currentSearchKeyword = '';
+const currentSchoolFilter = 'all';
+const shopCart = [];
 
 // ===== 分类筛选 =====
 function filterShopProducts(cat, btn) {
@@ -14,7 +14,7 @@ function filterShopProducts(cat, btn) {
   if (btn) btn.classList.add('active');
   // 显示/隐藏专区简介
   ['daoyi','foyi','masters'].forEach(function(k){
-    var intro=document.getElementById('shopIntro-'+k);
+    let intro = document.getElementById('shopIntro-'+k);
     if(intro) intro.style.display = (cat===k)?'block':'none';
   });
   renderShopProducts();
@@ -31,14 +31,14 @@ function filterBySchool(school, btn) {
 
 // ===== 搜索 =====
 function searchShopProducts() {
-  var input = document.getElementById('shopSearchInput');
+  let input = document.getElementById('shopSearchInput');
   currentSearchKeyword = input? input.value.trim().toLowerCase(): '';
   renderShopProducts();
 }
 
 // ===== 排序 =====
 function sortShopProducts() {
-  var select = document.getElementById('shopSortSelect');
+  let select = document.getElementById('shopSortSelect');
   currentSortMode = select? select.value: 'default';
   renderShopProducts();
 }
@@ -64,7 +64,7 @@ function filterCustom(btn) {
 }
 function sortByHot() {
   currentSortMode = 'sales';
-  var select = document.getElementById('shopSortSelect');
+  let select = document.getElementById('shopSortSelect');
   if (select) select.value = 'sales';
   // 高亮热度按钮
   document.querySelectorAll('.hot-sort-btn').forEach(function(b) { b.classList.add('active'); });
@@ -74,12 +74,12 @@ function sortByHot() {
 // ===== 获取筛选后商品 =====
 function getFilteredShopProducts() {
   if (typeof window.SHOP_DATA === 'undefined') return [];
-  var products = window.SHOP_DATA.products.slice();
+  let products = window.SHOP_DATA.products.slice();
   
   // 分类筛选
   if (currentShopCategory !== 'all') {
     products = products.filter(function(p) {
-      var cat = currentShopCategory;
+      let cat = currentShopCategory;
       if (cat === 'jixiang') return p.categoryId === 'mingli-huajie';
       if (cat === 'daoyi') return p.subcategoryId === 'daoyi';
       if (cat === 'foyi') return p.subcategoryId === 'foyi';
@@ -95,7 +95,7 @@ function getFilteredShopProducts() {
   // 派别筛选
   if (currentSchoolFilter !== 'all') {
     products = products.filter(function(p) {
-      var s = currentSchoolFilter;
+      let s = currentSchoolFilter;
       if (s === 'buddhist') return p.categoryId === 'fojia' || p.subcategoryId === 'foyi' || p.subcategoryId === 'fojia-jing';
       if (s === 'daoist') return p.categoryId === 'daojia' || p.subcategoryId === 'daoyi' || p.subcategoryId === 'daojia-jing';
       if (s === 'confucian') return p.categoryId === 'rujia' || p.subcategoryId === 'rujia-jing';
@@ -109,10 +109,10 @@ function getFilteredShopProducts() {
   // 搜索筛选
   if (currentSearchKeyword) {
     products = products.filter(function(p) {
-      var name = (p.name||'').toLowerCase();
-      var author = (p.author||'').toLowerCase();
-      var desc = (p.description||'').toLowerCase();
-      var tags = (p.tags||[]).join(' ').toLowerCase();
+      let name = (p.name||'').toLowerCase();
+      let author = (p.author||'').toLowerCase();
+      let desc = (p.description||'').toLowerCase();
+      let tags = (p.tags||[]).join(' ').toLowerCase();
       return name.indexOf(currentSearchKeyword)>=0 || author.indexOf(currentSearchKeyword)>=0 || desc.indexOf(currentSearchKeyword)>=0 || tags.indexOf(currentSearchKeyword)>=0;
     });
   }
@@ -145,17 +145,17 @@ function getFilteredShopProducts() {
 // 结缘价解析（从"¥128"或"¥168-588"提取最小值）
 function parsePrice(str) {
   if (!str) return 0;
-  var m = String(str).match(/\d+/);
+  let m = String(str).match(/\d+/);
   return m? parseInt(m[0]): 0;
 }
 
 // ===== 渲染商品 =====
 function renderShopProducts() {
-  var grid = document.getElementById('shopProductGrid');
-  var empty = document.getElementById('shopEmpty');
+  let grid = document.getElementById('shopProductGrid');
+  let empty = document.getElementById('shopEmpty');
   if (!grid) return;
   
-  var products = getFilteredShopProducts();
+  let products = getFilteredShopProducts();
   
   if (products.length === 0) {
     grid.innerHTML = '';
@@ -164,17 +164,17 @@ function renderShopProducts() {
   }
   if (empty) empty.style.display = 'none';
   
-  var html = '';
+  const html = '';
   products.forEach(function(item) {
-    var isClassic = item.categoryId === 'jingdian';
-    var isMaster = item.subcategoryId === 'daoyi' || item.subcategoryId === 'foyi';
+    let isClassic = item.categoryId === 'jingdian';
+    let isMaster = item.subcategoryId === 'daoyi' || item.subcategoryId === 'foyi';
     
     if (isClassic) {
       // 经典著作 - 书卷风格卡片
       var tagsHtml = (item.tags||[]).map(function(t){
         return '<span class="classic-tag">'+t+'</span>';
       }).join('');
-      var priceHtml = item.price;
+      let priceHtml = item.price;
       if (item.originalPrice) {
         priceHtml += '<small>'+item.originalPrice+'</small>';
       }
@@ -235,12 +235,12 @@ function showProductDetailFromData(productId) {
 // ===== 商品详情弹窗 =====
 function showProductDetail(productId) {
   if (typeof window.SHOP_DATA === 'undefined') return;
-  var item = window.SHOP_DATA.products.find(function(p) { return p.id === productId; });
+  let item = window.SHOP_DATA.products.find(function(p) { return p.id === productId; });
   if (!item) return;
   
-  var modal = document.getElementById('shopDetailModal');
-  var title = document.getElementById('shopDetailTitle');
-  var content = document.getElementById('shopDetailContent');
+  let modal = document.getElementById('shopDetailModal');
+  let title = document.getElementById('shopDetailTitle');
+  let content = document.getElementById('shopDetailContent');
   if (!modal || !title || !content) return;
   
   title.textContent = item.name;
@@ -250,7 +250,7 @@ function showProductDetail(productId) {
   }).join('');
   
   var isClassic = item.categoryId === 'jingdian';
-  var html = '';
+  const html = '';
   
   // 大图
   html += '<div class="detail-img-large">'+(item.image||'📦')+'</div>';
@@ -278,8 +278,8 @@ function showProductDetail(productId) {
   
   // 经典著作增加阅读建议
   if (isClassic) {
-    var subCat = item.subcategoryId || '';
-    var suggestion = '';
+    let subCat = item.subcategoryId || '';
+    const suggestion = '';
     if (subCat === 'rujia-jing') suggestion = '建议先通读白话翻译了解大意，再对照原文逐章精读，结合注疏深入理解。可配合相关研究论著拓展视野。';
     else if (subCat === 'daojia-jing') suggestion = '建议由浅入深，先读白话版建立整体认知，再研读注疏版深入义理。注意结合实践体悟，切忌仅停留在文字层面。';
     else if (subCat === 'fojia-jing') suggestion = '建议以恭敬心读诵，先了解背景知识，再逐品研读。可配合高僧大德讲经视频辅助理解，注重实修实证。';
@@ -305,7 +305,7 @@ function showProductDetail(productId) {
 }
 
 function closeShopDetail() {
-  var modal = document.getElementById('shopDetailModal');
+  let modal = document.getElementById('shopDetailModal');
   if (modal) modal.style.display = 'none';
   document.body.style.overflow = '';
 }
@@ -313,9 +313,9 @@ function closeShopDetail() {
 // ===== 分享商品 =====
 function shareProduct(productId) {
   if (typeof window.SHOP_DATA === 'undefined') return;
-  var item = window.SHOP_DATA.products.find(function(p) { return p.id === productId; });
+  let item = window.SHOP_DATA.products.find(function(p) { return p.id === productId; });
   if (!item) return;
-  var text = '🦞 易道智鉴·好物推荐\n';
+  const text = '🦞 易道智鉴·好物推荐\n';
   text += '━━━━━━━━━━━\n';
   text += '📦 ' + item.name + '\n';
   if (item.author) text += '✍️ ' + item.author + '\n';
@@ -337,10 +337,10 @@ function shareProduct(productId) {
 // ===== 购物车 =====
 function addToCart(productId) {
   if (typeof window.SHOP_DATA === 'undefined') return;
-  var item = window.SHOP_DATA.products.find(function(p) { return p.id === productId; });
+  let item = window.SHOP_DATA.products.find(function(p) { return p.id === productId; });
   if (!item) return;
   
-  var existing = shopCart.find(function(c){ return c.id === productId; });
+  let existing = shopCart.find(function(c){ return c.id === productId; });
   if (existing) {
     existing.qty++;
   } else {
@@ -349,7 +349,7 @@ function addToCart(productId) {
   updateCartUI();
   
   // 视觉反馈
-  var badge = document.getElementById('cartBadge');
+  let badge = document.getElementById('cartBadge');
   if (badge) {
     badge.style.transform = 'scale(1.5)';
     setTimeout(function(){ badge.style.transform = 'scale(1)'; }, 200);
@@ -362,7 +362,7 @@ function removeFromCart(productId) {
 }
 
 function changeCartQty(productId, delta) {
-  var item = shopCart.find(function(c){ return c.id === productId; });
+  let item = shopCart.find(function(c){ return c.id === productId; });
   if (!item) return;
   item.qty += delta;
   if (item.qty <= 0) {
@@ -373,8 +373,8 @@ function changeCartQty(productId, delta) {
 }
 
 function updateCartUI() {
-  var badge = document.getElementById('cartBadge');
-  var totalQty = shopCart.reduce(function(s,c){ return s+c.qty; }, 0);
+  let badge = document.getElementById('cartBadge');
+  let totalQty = shopCart.reduce(function(s,c){ return s+c.qty; }, 0);
   if (badge) {
     if (totalQty > 0) {
       badge.style.display = 'flex';
@@ -385,14 +385,14 @@ function updateCartUI() {
   }
   
   // 如果购物车弹窗打开，更新内容
-  var modal = document.getElementById('shopCartModal');
+  let modal = document.getElementById('shopCartModal');
   if (modal && modal.style.display === 'block') {
     renderCartContent();
   }
 }
 
 function renderCartContent() {
-  var content = document.getElementById('shopCartContent');
+  let content = document.getElementById('shopCartContent');
   if (!content) return;
   
   if (shopCart.length === 0) {
@@ -400,10 +400,10 @@ function renderCartContent() {
     return;
   }
   
-  var html = '';
-  var totalAmount = 0;
+  const html = '';
+  const totalAmount = 0;
   shopCart.forEach(function(item) {
-    var priceNum = parsePrice(item.price);
+    let priceNum = parsePrice(item.price);
     totalAmount += priceNum * item.qty;
     html += '<div class="cart-item">';
     html += '<div class="cart-item-img">'+(item.image||'📦')+'</div>';
@@ -429,7 +429,7 @@ function renderCartContent() {
 }
 
 function toggleCartModal() {
-  var modal = document.getElementById('shopCartModal');
+  let modal = document.getElementById('shopCartModal');
   if (!modal) return;
   if (modal.style.display === 'block') {
     modal.style.display = 'none';
@@ -443,8 +443,8 @@ function toggleCartModal() {
 
 function checkout() {
   if (shopCart.length === 0) return;
-  var totalQty = shopCart.reduce(function(s,c){ return s+c.qty; }, 0);
-  var totalAmount = shopCart.reduce(function(s,c){ return s + parsePrice(c.price)*c.qty; }, 0);
+  let totalQty = shopCart.reduce(function(s,c){ return s+c.qty; }, 0);
+  let totalAmount = shopCart.reduce(function(s,c){ return s + parsePrice(c.price)*c.qty; }, 0);
   showToast('✅ 订单已提交！\n\n商品数量：'+totalQty+' 件\n结缘金额：'+totalAmount.toLocaleString()+'元\n\n客服将在24小时内联系您确认订单并发送付款链接。\n\n祝您修身增慧、福慧双修！');
   shopCart = [];
   updateCartUI();
@@ -498,20 +498,20 @@ setTimeout(initShop, 500);
     {text:"积善行德，福报自来。", author:"《太上感应篇》"},
     {text:"君子谋时而动，顺势而为。", author:"《鬼谷子》"}
   ];
-  var day = new Date().getDate();
-  var q = quotes[day % quotes.length];
-  var el = document.getElementById('daily-quote-text');
-  var au = document.getElementById('daily-quote-author');
+  let day = new Date().getDate();
+  let q = quotes[day % quotes.length];
+  let el = document.getElementById('daily-quote-text');
+  let au = document.getElementById('daily-quote-author');
 
   // 智慧语录库增强：优先使用 WisdomQuotes
   if (typeof WisdomQuotes !== 'undefined') {
-    var today = new Date();
-    var dateStr = today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate();
-    var wq = WisdomQuotes.getDailyQuotes(dateStr);
+    let today = new Date();
+    let dateStr = today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate();
+    let wq = WisdomQuotes.getDailyQuotes(dateStr);
     if (wq && wq.length > 0) {
       q = { text: wq[0].text, author: wq[0].source };
       // 额外语录放到展开区
-      var extra = document.getElementById('daily-wisdom-extra');
+      let extra = document.getElementById('daily-wisdom-extra');
       if (extra && wq.length > 1) {
         extra.style.display = 'block';
         extra.innerHTML = '<div style="font-size:12px;color:var(--paper2);line-height:1.8;opacity:0.6;border-top:1px solid rgba(201,168,76,0.1);padding-top:8px;margin-top:4px">' +
@@ -527,19 +527,19 @@ setTimeout(initShop, 500);
 
 // ===== 返回顶部按钮滚动监听 =====
 window.addEventListener('scroll',function(){
-  var el=document.getElementById('backTop');
+  let el = document.getElementById('backTop');
   if(el){ if(window.scrollY>400) el.classList.add('show'); else el.classList.remove('show'); }
 });
 
 // ===== 全局复制结果功能 =====
 function copyResultText(btn){
-  var text=btn.closest('.result-section')?.innerText||btn.closest('#baziResult')?.innerText||btn.closest('#yjResult')?.innerText||btn.closest('#mobileFengshuiResult')?.innerText||'';
+  let text = btn.closest('.result-section')?.innerText||btn.closest('#baziResult')?.innerText||btn.closest('#yjResult')?.innerText||btn.closest('#mobileFengshuiResult')?.innerText||'';
   if(!text){
     text=document.querySelector('[id$=Result]')?.innerText||'';
   }
   if(!text)return;
   navigator.clipboard.writeText(text).then(function(){
-    var orig=btn.textContent;
+    let orig = btn.textContent;
     btn.textContent='已复制!';
     btn.style.color='#27ae60';
     setTimeout(function(){btn.textContent=orig;btn.style.color=''},1500);

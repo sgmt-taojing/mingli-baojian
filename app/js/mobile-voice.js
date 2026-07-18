@@ -10,11 +10,11 @@
 (function(){
 'use strict';
 
-var TTS_BASE = '/api/tts';
-var currentVoice = 'female';
-var currentAudio = null;
-var isWechat = /MicroMessenger/i.test(navigator.userAgent);
-var isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+const TTS_BASE = '/api/tts';
+const currentVoice = 'female';
+const currentAudio = null;
+let isWechat = /MicroMessenger/i.test(navigator.userAgent);
+let isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
 // ========== 移动端适配 ==========
 
@@ -24,7 +24,7 @@ function showWechatGuide(){
   if(sessionStorage.getItem('wechat_guide_shown')) return;
   sessionStorage.setItem('wechat_guide_shown', '1');
   
-  var guide = document.createElement('div');
+  let guide = document.createElement('div');
   guide.id = 'wechatVoiceGuide';
   guide.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px';
   guide.innerHTML = '<div style="background:linear-gradient(135deg,#2c2823,#1a1814);border:1px solid rgba(201,168,76,.3);border-radius:16px;padding:28px 24px;max-width:320px;text-align:center">'+
@@ -42,8 +42,8 @@ window.mobileSpeak = function(text, opts){
   if(!text) return;
   if(currentAudio){currentAudio.pause(); currentAudio = null;}
   
-  var voice = opts.voice || currentVoice;
-  var url = TTS_BASE + '?text=' + encodeURIComponent(text.substring(0, 500)) + '&voice=' + voice;
+  let voice = opts.voice || currentVoice;
+  let url = TTS_BASE + '?text=' + encodeURIComponent(text.substring(0, 500)) + '&voice=' + voice;
   
   // 显示播放控件
   showPlayer(text.substring(0, 50) + '...', function(){
@@ -61,10 +61,10 @@ window.mobileStopSpeak = function(){
 };
 
 function showPlayer(label, onReady){
-  var existing = document.getElementById('mobilePlayer');
+  let existing = document.getElementById('mobilePlayer');
   if(existing) existing.remove();
   
-  var player = document.createElement('div');
+  let player = document.createElement('div');
   player.id = 'mobilePlayer';
   player.style.cssText = 'position:fixed;bottom:70px;left:12px;right:12px;background:linear-gradient(135deg,#2c2823,#1a1814);border:1px solid rgba(201,168,76,.3);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;z-index:9998;box-shadow:0 4px 20px rgba(0,0,0,.4)';
   player.innerHTML = '<div style="font-size:20px">🔊</div>'+
@@ -75,13 +75,13 @@ function showPlayer(label, onReady){
 }
 
 function hidePlayer(){
-  var p = document.getElementById('mobilePlayer');
+  let p = document.getElementById('mobilePlayer');
   if(p) p.remove();
 }
 
 // ========== 语音输入 (ASR) ==========
-var recognition = null;
-var isListening = false;
+const recognition = null;
+const isListening = false;
 
 window.mobileVoiceInput = function(targetId, opts){
   opts = opts || {};
@@ -93,7 +93,7 @@ window.mobileVoiceInput = function(targetId, opts){
   
   if(isListening){stopVoice(); return;}
   
-  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if(!SR){
     showToast('您的浏览器不支持语音输入，请使用Chrome或Safari浏览器', 'warning');
     return;
@@ -106,16 +106,16 @@ window.mobileVoiceInput = function(targetId, opts){
   recognition.maxAlternatives = 3;
   
   isListening = true;
-  var btn = document.getElementById(targetId + '_mic') || document.querySelector('[data-mic="' + targetId + '"]');
+  let btn = document.getElementById(targetId + '_mic') || document.querySelector('[data-mic="' + targetId + '"]');
   if(btn){btn.innerHTML = '🔴'; btn.classList.add('recording');}
   
   showListeningOverlay();
   
-  var finalText = '';
-  var target = document.getElementById(targetId);
+  const finalText = '';
+  let target = document.getElementById(targetId);
   
   recognition.onresult = function(event){
-    var interim = '';
+    const interim = '';
     for(var i = event.resultIndex; i < event.results.length; i++){
       if(event.results[i].isFinal){
         finalText += event.results[i][0].transcript;
@@ -127,7 +127,7 @@ window.mobileVoiceInput = function(targetId, opts){
     
     if(target){
       if(opts.isDate){
-        var parsed = parseVoiceDate(finalText + interim);
+        let parsed = parseVoiceDate(finalText + interim);
         target.value = parsed || (finalText + interim);
       } else {
         target.value = finalText + interim;
@@ -137,7 +137,7 @@ window.mobileVoiceInput = function(targetId, opts){
   
   recognition.onerror = function(event){
     hideListeningOverlay();
-    var msg = '语音识别失败';
+    const msg = '语音识别失败';
     if(event.error === 'no-speech') msg = '没有听到声音，请大声一点';
     else if(event.error === 'not-allowed') msg = '请允许使用麦克风';
     showToast(msg, 'error');
@@ -149,7 +149,7 @@ window.mobileVoiceInput = function(targetId, opts){
     if(btn){btn.innerHTML = '🎤'; btn.classList.remove('recording');}
     if(opts.onend) opts.onend(finalText);
     if(opts.autoSubmit && finalText){
-      var submitBtn = document.getElementById(opts.autoSubmit);
+      let submitBtn = document.getElementById(opts.autoSubmit);
       if(submitBtn) submitBtn.click();
     }
     recognition = null;
@@ -166,7 +166,7 @@ function stopVoice(){
 
 // 听写浮层
 function showListeningOverlay(){
-  var ov = document.createElement('div');
+  let ov = document.createElement('div');
   ov.id = 'voiceOverlay';
   ov.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:99997;display:flex;flex-direction:column;align-items:center;justify-content:center';
   ov.innerHTML = '<div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#c9a84c,#b8932f);display:flex;align-items:center;justify-content:center;font-size:36px;animation:pulse 1.5s infinite;margin-bottom:16px">🎤</div>'+
@@ -175,7 +175,7 @@ function showListeningOverlay(){
     '<button onclick="window._stopMobileVoice()" style="margin-top:16px;background:none;border:1px solid rgba(201,168,76,.3);color:#c9a84c;padding:6px 20px;border-radius:16px;font-size:12px;cursor:pointer">停止</button>';
   document.body.appendChild(ov);
   if(!document.getElementById('voicePulseStyle')){
-    var s = document.createElement('style');
+    let s = document.createElement('style');
     s.id = 'voicePulseStyle';
     s.textContent = '@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.1);opacity:.8}}';
     document.head.appendChild(s);
@@ -183,12 +183,12 @@ function showListeningOverlay(){
 }
 
 function updateListeningOverlay(text){
-  var el = document.getElementById('voiceText');
+  let el = document.getElementById('voiceText');
   if(el) el.textContent = text || '正在聆听...';
 }
 
 function hideListeningOverlay(){
-  var ov = document.getElementById('voiceOverlay');
+  let ov = document.getElementById('voiceOverlay');
   if(ov) ov.remove();
 }
 
@@ -198,19 +198,19 @@ window._stopMobileVoice = stopVoice;
 function parseVoiceDate(text){
   if(!text) return null;
   text = text.replace(/\s/g, '');
-  var m = text.match(/(\d{4})\s*年\s*(\d{1,2})\s*[月]\s*(\d{1,2})\s*[日号]/);
+  let m = text.match(/(\d{4})\s*年\s*(\d{1,2})\s*[月]\s*(\d{1,2})\s*[日号]/);
   if(!m) return null;
-  var y = m[1], mo = m[2], d = m[3];
-  var zhiMap = {子:23,丑:1,寅:3,卯:5,辰:7,巳:9,午:11,未:13,申:15,酉:17,戌:19,亥:21};
-  var hour = -1;
+  let y = m[1], mo = m[2], d = m[3];
+  const zhiMap = {子:23,丑:1,寅:3,卯:5,辰:7,巳:9,午:11,未:13,申:15,酉:17,戌:19,亥:21};
+  const hour = -1;
   for(var z in zhiMap){
     if(text.indexOf(z + '时') > -1){hour = zhiMap[z]; break;}
   }
   if(hour < 0){
-    var hm = text.match(/(\d{1,2})\s*[点时:：]/);
+    let hm = text.match(/(\d{1,2})\s*[点时:：]/);
     if(hm) hour = parseInt(hm[1]);
   }
-  var result = y + '-' + String(mo).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+  let result = y + '-' + String(mo).padStart(2,'0') + '-' + String(d).padStart(2,'0');
   if(hour >= 0) result += 'T' + String(hour).padStart(2,'0') + ':00';
   return result;
 }
@@ -224,7 +224,7 @@ window.mobileVoiceCommand = function(){
   
   if(isListening){stopVoice(); return;}
   
-  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if(!SR){
     showToast('您的浏览器不支持语音输入，请使用Chrome或Safari', 'warning');
     return;
@@ -239,7 +239,7 @@ window.mobileVoiceCommand = function(){
   showListeningOverlay();
   
   recognition.onresult = function(event){
-    var text = '';
+    const text = '';
     for(var i = 0; i < event.results.length; i++){
       if(event.results[i].isFinal) text += event.results[i][0].transcript;
     }
@@ -311,8 +311,8 @@ function openMobileTool(toolKey){
 }
 
 function readCurrentPage(){
-  var active = document.querySelector('.tab-content.active') || document.querySelector('.panel.active') || document.body;
-  var text = active.innerText.substring(0, 500);
+  let active = document.querySelector('.tab-content.active') || document.querySelector('.panel.active') || document.body;
+  let text = active.innerText.substring(0, 500);
   if(text.length > 20){
     mobileSpeak(text);
   }
@@ -324,9 +324,9 @@ function injectMobileVoiceUI(){
   if(!isMobile) return;
   
   // 底部导航栏添加语音按钮
-  var tabBar = document.querySelector('.tab-bar');
+  let tabBar = document.querySelector('.tab-bar');
   if(tabBar && !document.getElementById('voiceTabBtn')){
-    var voiceTab = document.createElement('button');
+    let voiceTab = document.createElement('button');
     voiceTab.id = 'voiceTabBtn';
     voiceTab.className = 'tab';
     voiceTab.style.cssText = 'flex:0.8;background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(201,168,76,.05));position:relative';
@@ -336,7 +336,7 @@ function injectMobileVoiceUI(){
       mobileVoiceCommand();
     };
     // 插入到第3个位置（排盘/生活之后）
-    var tabs = tabBar.querySelectorAll('.tab');
+    let tabs = tabBar.querySelectorAll('.tab');
     if(tabs.length >= 2){
       tabBar.insertBefore(voiceTab, tabs[2]);
     } else {
@@ -351,13 +351,13 @@ function injectMobileVoiceUI(){
 
 function injectMicToInputs(){
   // 在iframe内注入
-  var iframe = document.getElementById('toolFrame');
+  let iframe = document.getElementById('toolFrame');
   if(iframe && iframe.contentDocument){
     try{
-      var doc = iframe.contentDocument;
-      var dateInput = doc.getElementById('birthDate');
+      let doc = iframe.contentDocument;
+      let dateInput = doc.getElementById('birthDate');
       if(dateInput && !doc.getElementById('birthDate_mic')){
-        var mic = doc.createElement('button');
+        let mic = doc.createElement('button');
         mic.id = 'birthDate_mic';
         mic.innerHTML = '🎤';
         mic.style.cssText = 'position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:20px;cursor:pointer;z-index:10';
@@ -373,9 +373,9 @@ function injectMicToInputs(){
   }
   
   // 非iframe模式（直接在当前页面）
-  var dateInput = document.getElementById('birthDate');
+  let dateInput = document.getElementById('birthDate');
   if(dateInput && !document.getElementById('birthDate_mic')){
-    var mic = document.createElement('button');
+    let mic = document.createElement('button');
     mic.id = 'birthDate_mic';
     mic.innerHTML = '🎤';
     mic.style.cssText = 'position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:20px;cursor:pointer;z-index:10';
@@ -396,23 +396,23 @@ window.addEventListener('message', function(event){
       showWechatGuide();
     } else {
       // 在父页面执行语音识别，结果发送回iframe
-      var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      let SR = window.SpeechRecognition || window.webkitSpeechRecognition;
       if(!SR) return;
-      var r = new SR();
+      let r = new SR();
       r.lang = 'zh-CN';
       r.continuous = false;
       r.interimResults = true;
       isListening = true;
       showListeningOverlay();
       r.onresult = function(e){
-        var text = '';
+        const text = '';
         for(var i = 0; i < e.results.length; i++){
           if(e.results[i].isFinal) text += e.results[i][0].transcript;
         }
         updateListeningOverlay(text);
         if(event.data.isDate){
-          var parsed = parseVoiceDate(text);
-          var iframe = document.getElementById('toolFrame');
+          let parsed = parseVoiceDate(text);
+          let iframe = document.getElementById('toolFrame');
           if(iframe && iframe.contentWindow){
             iframe.contentWindow.postMessage({type:'voiceResult', target:event.data.target, value:parsed || text}, '*');
           }

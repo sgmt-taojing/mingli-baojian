@@ -24,12 +24,12 @@
 function getZiweiResolution(panData, analyzeData) {
   if (!panData) return '<p style="opacity:.5">排盘数据缺失，无法生成化解方案</p>';
 
-  var mingZhi = panData.mingZhi || '未知';
-  var ju = panData.ju || '未知';
-  var sihua = analyzeData ? analyzeData.sihuaText : '';
-  var geju = analyzeData ? analyzeData.geju : '';
+  let mingZhi = panData.mingZhi || '未知';
+  let ju = panData.ju || '未知';
+  let sihua = analyzeData ? analyzeData.sihuaText : '';
+  let geju = analyzeData ? analyzeData.geju : '';
 
-  var html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
+  const html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
   html += '<h4 style="color:var(--gold);letter-spacing:3px;margin-bottom:16px">🛡️ 紫微斗数化解方案</h4>';
   html += '<p style="font-size:12px;opacity:.5;margin-bottom:16px">命宫：' + mingZhi + ' · 五行局：' + ju + ' · 格局：' + geju + '</p>';
 
@@ -172,7 +172,7 @@ function _getZiweiMainStarCure(panData) {
   };
 
   // 尝试获取命宫主星
-  var mainStar = '';
+  const mainStar = '';
   if (panData.palaces) {
     for (var i = 0; i < panData.palaces.length; i++) {
       if (panData.palaces[i].name === '命宫' || panData.palaces[i].zhi === panData.mingZhi) {
@@ -185,14 +185,14 @@ function _getZiweiMainStarCure(panData) {
   if (!mainStar) mainStar = '紫微'; // 默认
 
   // 匹配主星
-  var matchedKey = null;
+  const matchedKey = null;
   for (var key in starCureDB) {
     if (mainStar.indexOf(key) >= 0) { matchedKey = key; break; }
   }
   if (!matchedKey) matchedKey = '紫微';
 
-  var d = starCureDB[matchedKey];
-  var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
+  let d = starCureDB[matchedKey];
+  const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   html += '<p style="margin-bottom:8px"><strong>主星：</strong>' + matchedKey + ' — ' + d.summary + '</p>';
   html += '<div style="margin-top:10px;padding:10px;background:rgba(201,168,76,0.04);border-radius:6px">';
   html += '<p style="font-size:12px;line-height:2">' + d.advice + '</p>';
@@ -216,21 +216,21 @@ function _getZiweiShaCure(panData) {
     '地劫': { cure: '佩戴和田玉或翡翠化解劫夺之煞；家中西南放陶瓷葫芦', item: '和田玉、陶瓷葫芦', direction: '西南', classic: '《紫微斗数全书》：「地劫主劫失，宜以土固之。」' }
   };
 
-  var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
-  var hasSha = false;
+  const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
+  const hasSha = false;
   for (var sha in shaCureDB) {
     // 检查排盘中是否有此煞星
-    var found = false;
+    const found = false;
     if (panData.palaces) {
       for (var i = 0; i < panData.palaces.length; i++) {
-        var stars = panData.palaces[i].stars || [];
-        var allStars = stars.join('');
+        let stars = panData.palaces[i].stars || [];
+        let allStars = stars.join('');
         if (allStars.indexOf(sha) >= 0) { found = true; break; }
       }
     }
     if (found) {
       hasSha = true;
-      var d = shaCureDB[sha];
+      let d = shaCureDB[sha];
       html += '<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid rgba(201,168,76,0.06)">';
       html += '<p><strong style="color:var(--orange)">' + sha + '</strong></p>';
       html += '<p style="font-size:12px;line-height:1.8;margin-top:4px">' + d.cure + '</p>';
@@ -257,12 +257,12 @@ function _getZiweiSihuaCure(panData, analyzeData) {
     '化忌': { desc: '化忌主阻滞困扰，为凶化', cure: '化忌是最需化解的四化。1. 佩戴黑曜石化解忌星之煞；2. 根据化忌所在宫位调整方位；3. 多行善事积累功德；4. 避免在化忌所主事项上强求。', item: '黑曜石手串、五行化解符', classic: '化忌为困，宜忍不宜争' }
   };
 
-  var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
-  var sihuaText = (analyzeData && analyzeData.sihuaText) ? analyzeData.sihuaText : '';
+  const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
+  let sihuaText = (analyzeData && analyzeData.sihuaText) ? analyzeData.sihuaText : '';
   for (var hua in sihuaCureDB) {
     if (sihuaText.indexOf(hua) >= 0 ) {
-      var d = sihuaCureDB[hua];
-      var isJi = (hua === '化忌');
+      let d = sihuaCureDB[hua];
+      let isJi = (hua === '化忌');
       html += '<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid rgba(201,168,76,0.06)';
       if (isJi) html += ';background:rgba(231,76,60,0.03);padding:10px;border-radius:6px';
       html += '">';
@@ -280,7 +280,7 @@ function _getZiweiSihuaCure(panData, analyzeData) {
 }
 
 function _getZiweiDayunCure(panData) {
-  var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
+  const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   html += '<p style="font-size:12px;line-height:2">大运十年一转，需根据当前大运宫位星曜调整化解方案：</p>';
   html += '<ul style="font-size:12px;line-height:2;padding-left:20px;opacity:.85">';
   html += '<li><strong>大运遇紫微、天府：</strong>此运事业财运俱佳，宜在西北放铜龙增强帝星之力，把握机遇大胆发展</li>';
@@ -296,8 +296,8 @@ function _getZiweiDayunCure(panData) {
 }
 
 function _getZiweiLiunianCure(panData) {
-  var currentYear = new Date().getFullYear();
-  var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
+  let currentYear = new Date().getFullYear();
+  const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   html += '<p style="font-size:12px;line-height:2">' + currentYear + '年 丙午流年化解方案：</p>';
   html += '<ul style="font-size:12px;line-height:2;padding-left:20px;opacity:.85">';
   html += '<li><strong>流年太岁：</strong>丙午年太岁在午(正南方)，不宜在正南方动土修造，可在此方位安放太岁符</li>';
@@ -319,7 +319,7 @@ function _getZiweiLiunianCure(panData) {
 function getQimenResolution(panData, analyzeData) {
   if (!panData) return '<p style="opacity:.5">排盘数据缺失，无法生成化解方案</p>';
 
-  var html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
+  const html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
   html += '<h4 style="color:var(--gold);letter-spacing:3px;margin-bottom:16px">🛡️ 奇门遁甲化解方案</h4>';
   html += '<p style="font-size:12px;opacity:.5;margin-bottom:16px">遁局：' + (panData.dun === 'yang' ? '阳' : '阴') + '遁' + panData.ju + '局</p>';
 
@@ -365,13 +365,13 @@ function _getQimenMenCure(analyzeData) {
     '惊门': { nature: '凶门', desc: '惊门主惊恐口舌，利诉讼（古法），现代主口舌是非', cure: '[舒晗课程校正] 惊门为金，主口舌惊恐。化解用通关法（金克木用水通关，放黑色/蓝色物品）。1.佩戴蓝水晶化解惊门之煞；2.避免正西方行事；3.家中正西放蓝色水晶簇。惊门临震宫（金克木）主口舌伤人', item: '蓝水晶、蓝色水晶簇、黑色摆件' }
   };
 
-  var men = analyzeData ? analyzeData.men : '';
-  var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
+  let men = analyzeData ? analyzeData.men : '';
+  const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
 
   for (var m in menCureDB) {
     if (men.indexOf(m) >= 0 ) {
-      var d = menCureDB[m];
-      var isJi = (d.nature === '凶门');
+      let d = menCureDB[m];
+      let isJi = (d.nature === '凶门');
       html += '<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(201,168,76,0.04)';
       if (isJi) html += ';background:rgba(231,76,60,0.02);padding:8px;border-radius:4px';
       html += '">';
@@ -399,12 +399,12 @@ function _getQimenXingCure(analyzeData) {
     '天英': { nature: '凶星', desc: '天英主火炎血光，为中平偏凶，主暴躁血光', cure: '[舒晗课程校正] 天英为火，主血光。佩戴海蓝宝化解（水克火），正南方放蓝色水晶簇。天英临离宫（比和）则火炎更甚，防血光火灾' }
   };
 
-  var star = analyzeData ? analyzeData.star : '';
-  var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
+  let star = analyzeData ? analyzeData.star : '';
+  const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   for (var x in xingCureDB) {
     if (star.indexOf(x) >= 0 ) {
-      var d = xingCureDB[x];
-      var isJi = (d.nature === '凶星');
+      let d = xingCureDB[x];
+      let isJi = (d.nature === '凶星');
       html += '<div style="margin-bottom:8px;padding:6px 0;';
       if (isJi) html += 'background:rgba(231,76,60,0.02);padding:8px;border-radius:4px';
       html += '">';
@@ -431,11 +431,11 @@ function _getQimenShenCure(analyzeData) {
     '九天': { desc: '九天主高远威武，为吉神。主高远、出征、威武', cure: '[舒晗课程校正] 九天为金，主高远。佩戴白水晶增强气势，西北放金属鹰摆件。九天临宫宜主动出击、远行谋事，利武职公关' }
   };
 
-  var shen = analyzeData ? analyzeData.shen : '';
-  var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
+  let shen = analyzeData ? analyzeData.shen : '';
+  const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   for (var s in shenCureDB) {
     if (shen.indexOf(s) >= 0 ) {
-      var d = shenCureDB[s];
+      let d = shenCureDB[s];
       html += '<div style="margin-bottom:6px;padding:4px 0">';
       html += '<p><strong style="color:var(--gold)">' + s + '</strong> — ' + d.desc + '</p>';
       html += '<p style="font-size:12px;line-height:1.8;margin-top:2px;opacity:.8">' + d.cure + '</p>';
@@ -450,7 +450,7 @@ function _getQimenFuFanCure(panData, analyzeData) {
   // [舒晗课程校正] 伏吟反吟化解 — 依据密训笔记第2课
   // 核心总则：伏吟用冲（以动制静），反吟用合（以静制动）
   // 禁忌：四土之地不取四土之时（巽坤乾艮四角宫位化解不可用辰戌丑未四土之时）
-  var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
+  const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   // [舒晗课程校正] 伏吟化解总则：用冲（以动制静）
   html += '<p style="font-size:12px;line-height:2"><strong>伏吟化解：</strong>[舒晗密训笔记第2课] 伏吟主静止、慢、痛、呻吟反复，宜守不宜攻，主旧事重来、疾病缠绵。化解总则：<strong>伏吟用冲（以动制静）</strong>。</p>';
   html += '<p style="font-size:12px;line-height:2;margin-top:6px;padding-left:12px">1. 佩戴开光白水晶或黑曜石疏通气场（黑曜石为动石，冲伏吟之静）；</p>';
@@ -480,7 +480,7 @@ function _getQimenFuFanCure(panData, analyzeData) {
 function getLiurenResolution(panData, analyzeData) {
   if (!panData) return '<p style="opacity:.5">排盘数据缺失，无法生成化解方案</p>';
 
-  var html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
+  const html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
   html += '<h4 style="color:var(--gold);letter-spacing:3px;margin-bottom:16px">🛡️ 大六壬化解方案</h4>';
   html += '<p style="font-size:12px;opacity:.5;margin-bottom:16px">日干支：' + (panData.dayGan || '') + (panData.dayZhi || '') + ' · 占时：' + (panData.shiZhi || '') + '</p>';
 
@@ -508,8 +508,8 @@ function getLiurenResolution(panData, analyzeData) {
 }
 
 function _getLiurenSanChuanCure(panData, analyzeData) {
-  var sanChuan = panData.sanChuan || [];
-  var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
+  let sanChuan = panData.sanChuan || [];
+  const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   html += '<p style="font-size:12px;line-height:2">三传：' + (sanChuan.join(' → ') || '未知') + '</p>';
   html += '<ul style="font-size:12px;line-height:2;padding-left:20px;opacity:.85">';
   html += '<li><strong>初传化解：</strong>初传主事之始，若初传逢凶神，宜佩戴黑曜石化解。初传逢吉神则顺其自然，佩戴白水晶增强吉气</li>';
@@ -538,13 +538,13 @@ function _getLiurenTianJiangCure(panData, analyzeData) {
     '天后': { cure: '佩戴粉晶增强姻缘喜庆', item: '粉水晶' }
   };
 
-  var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
-  var chuanShen = (analyzeData && analyzeData.chuanShen) ? analyzeData.chuanShen : [];
+  const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
+  let chuanShen = (analyzeData && analyzeData.chuanShen) ? analyzeData.chuanShen : [];
   for (var i = 0; i < chuanShen.length; i++) {
-    var shen = chuanShen[i];
+    let shen = chuanShen[i];
     for (var key in tianJiangCureDB) {
       if (shen.indexOf(key) >= 0) {
-        var d = tianJiangCureDB[key];
+        let d = tianJiangCureDB[key];
         html += '<div style="margin-bottom:8px;padding:4px 0">';
         html += '<p><strong style="color:var(--gold)">' + key + '</strong> — ' + d.cure + '</p>';
         html += '<p style="font-size:11px;opacity:.6">📦 ' + d.item + '</p>';
@@ -560,7 +560,7 @@ function _getLiurenTianJiangCure(panData, analyzeData) {
 }
 
 function _getLiurenShenShaCure(panData, analyzeData) {
-  var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
+  const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   html += '<ul style="font-size:12px;line-height:2;padding-left:20px;opacity:.85">';
   html += '<li><strong>桃花煞：</strong>佩戴粉晶或草莓晶化解，家中桃花位放粉色水晶球</li>';
   html += '<li><strong>华盖煞：</strong>佩戴紫水晶化解孤寂，多参加社交活动</li>';
@@ -581,12 +581,12 @@ function _getLiurenShenShaCure(panData, analyzeData) {
 function getMeihuaResolution(guaData, analyzeData) {
   if (!guaData) return '<p style="opacity:.5">排盘数据缺失，无法生成化解方案</p>';
 
-  var html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
+  const html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
   html += '<h4 style="color:var(--gold);letter-spacing:3px;margin-bottom:16px">🛡️ 梅花易数化解方案</h4>';
 
-  var tiGua = analyzeData ? analyzeData.tiGua : '';
-  var yongGua = analyzeData ? analyzeData.yongGua : '';
-  var relation = analyzeData ? analyzeData.relation : '';
+  let tiGua = analyzeData ? analyzeData.tiGua : '';
+  let yongGua = analyzeData ? analyzeData.yongGua : '';
+  let relation = analyzeData ? analyzeData.relation : '';
 
   html += '<p style="font-size:12px;opacity:.5;margin-bottom:16px">体卦：' + tiGua + ' · 用卦：' + yongGua + ' · 关系：' + relation + '</p>';
 
@@ -608,8 +608,8 @@ function getMeihuaResolution(guaData, analyzeData) {
 }
 
 function _getMeihuaTiYongCure(analyzeData) {
-  var relation = analyzeData ? analyzeData.relation : '';
-  var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
+  let relation = analyzeData ? analyzeData.relation : '';
+  const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
 
   if (relation.indexOf('用克体') >= 0 || relation.indexOf('克') >= 0) {
     html += '<p style="color:var(--orange);margin-bottom:8px"><strong>用克体 — 凶象</strong></p>';
@@ -644,7 +644,7 @@ function _getMeihuaTiYongCure(analyzeData) {
 }
 
 function _getMeihuaHuBianCure(guaData, analyzeData) {
-  var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
+  const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   html += '<p style="font-size:12px;line-height:2"><strong>互卦化解：</strong>互卦主事物发展过程，若互卦五行克体卦，宜在过程中佩戴体卦五行水晶化解。互卦生体卦则过程顺利。</p>';
   html += '<p style="font-size:12px;line-height:2;margin-top:10px"><strong>变卦化解：</strong>变卦主事物结局，若变卦克体卦，结局多不顺。宜佩戴体卦五行水晶，并在变卦对应方位放化解物品。变卦生体卦则结局圆满。</p>';
   html += '<p style="font-size:12px;line-height:2;margin-top:10px"><strong>具体建议：</strong></p>';
@@ -666,11 +666,11 @@ function _getMeihuaHuBianCure(guaData, analyzeData) {
 function getLiuyaoResolution(guaData, duanData) {
   if (!guaData) return '<p style="opacity:.5">排盘数据缺失，无法生成化解方案</p>';
 
-  var html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
+  const html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
   html += '<h4 style="color:var(--gold);letter-spacing:3px;margin-bottom:16px">🛡️ 六爻化解方案</h4>';
 
-  var ben = '';
-  var bian = '';
+  const ben = '';
+  const bian = '';
   if (guaData.benGua && _GUA_XIANG) {
     ben = _GUA_XIANG[guaData.benGua.lower].name + _GUA_XIANG[guaData.benGua.upper].name;
   }
@@ -706,16 +706,16 @@ function _getLiuyaoLiuqinCure(guaData, duanData) {
     '官鬼': { weak: '官鬼爻弱主无地位，宜佩戴黄水晶或虎眼石增强官星', strong: '官鬼爻过旺主压力，宜佩戴黑曜石化解官鬼之煞', item: '虎眼石、黑曜石' }
   };
 
-  var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
-  var zg = guaData.zhuangGua;
-  var liuqin = zg ? zg.liuqin : [];
-  var yongshen = duanData ? duanData.yongshen : '';
+  const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
+  let zg = guaData.zhuangGua;
+  let liuqin = zg ? zg.liuqin : [];
+  let yongshen = duanData ? duanData.yongshen : '';
 
   for (var i = 0; i < liuqin.length; i++) {
-    var lq = liuqin[i];
+    let lq = liuqin[i];
     if (liuqinCureDB[lq]) {
-      var d = liuqinCureDB[lq];
-      var isYong = (yongshen.indexOf(lq) >= 0);
+      let d = liuqinCureDB[lq];
+      let isYong = (yongshen.indexOf(lq) >= 0);
       html += '<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(201,168,76,0.04)';
       if (isYong) html += ';background:rgba(201,168,76,0.04);padding:8px;border-radius:4px';
       html += '">';
@@ -730,16 +730,16 @@ function _getLiuyaoLiuqinCure(guaData, duanData) {
 }
 
 function _getLiuyaoShiYingCure(guaData, duanData) {
-  var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
-  var zg = guaData.zhuangGua;
+  const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
+  let zg = guaData.zhuangGua;
   if (!zg || !zg.shiying) {
     html += '<p style="font-size:12px;opacity:.6">世应信息不足。</p>';
     html += '</div>';
     return html;
   }
 
-  var shi = zg.shiying.shi;
-  var ying = zg.shiying.ying;
+  let shi = zg.shiying.shi;
+  let ying = zg.shiying.ying;
   html += '<p style="font-size:12px;line-height:2">世爻在第' + (shi+1) + '爻，应爻在第' + (ying+1) + '爻。</p>';
 
   if (duanData) {
@@ -766,7 +766,7 @@ function _getLiuyaoShiYingCure(guaData, duanData) {
 function getFengshuiResolution(fsData) {
   if (!fsData) return '<p style="opacity:.5">排盘数据缺失，无法生成化解方案</p>';
 
-  var html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
+  const html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
   html += '<h4 style="color:var(--gold);letter-spacing:3px;margin-bottom:16px">🛡️ 风水化解方案</h4>';
   html += '<p style="font-size:12px;opacity:.5;margin-bottom:16px">宅型：' + (fsData.houseType || '') + ' · 坐向：' + (fsData.direction || '') + ' · 宅命：' + (fsData.zhaiMing || '') + '</p>';
 
@@ -795,7 +795,7 @@ function _getFengshuiBazhaiCure(fsData) {
     '祸害': { desc: '祸害主病痛官非', cure: '1.在祸害位放铜葫芦或五帝钱；2.此方位保持明亮；3.避免在此方位长期逗留', item: '铜葫芦、五帝钱' }
   };
 
-  var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
+  const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   html += '<p style="font-size:12px;line-height:2;opacity:.8">宅命：' + (fsData.zhaiMing || '未知') + ' · 宅主命卦：' + (fsData.yaoMing || '未知') + ' · 配合：' + (fsData.matching ? '相配' : '不配') + '</p>';
 
   if (fsData.matching === false) {
@@ -830,7 +830,7 @@ function _getFengshuiXuankongCure(fsData) {
     '九紫': { nature: '吉', desc: '九紫右弼主喜庆姻缘', cure: '九紫位放红色花瓶或紫水晶增强喜庆之气', item: '红色花瓶、紫水晶' }
   };
 
-  var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
+  const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   html += '<p style="font-size:12px;line-height:2;opacity:.8">元运：' + (fsData.period || '九') + '运 · ' + (fsData.wangShan ? '当运' : '非当运') + '</p>';
   html += '<p style="font-size:12px;line-height:1.8;opacity:.7;margin-top:4px">玄空评语：' + (fsData.xuankong || '') + '</p>';
 
@@ -846,8 +846,8 @@ function _getFengshuiXuankongCure(fsData) {
   html += '</div>';
 
   for (var star in flyingStarCure) {
-    var d = flyingStarCure[star];
-    var isJi = (d.nature === '凶' || d.nature === '大凶');
+    let d = flyingStarCure[star];
+    let isJi = (d.nature === '凶' || d.nature === '大凶');
     html += '<div style="margin-bottom:8px;padding:6px 0;';
     if (isJi) html += 'background:rgba(231,76,60,0.02);padding:8px;border-radius:4px';
     html += '">';
@@ -927,10 +927,10 @@ function getCureItemCatalog() {
  * @returns {string} HTML
  */
 function getCureItemRecommendation(elementType) {
-  var catalog = getCureItemCatalog();
-  var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
+  let catalog = getCureItemCatalog();
+  const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
 
-  var items = [];
+  const items = [];
   if (elementType === '木') items = items.concat(catalog.crystals.filter(function(x){return x.element==='木';}), catalog.woods);
   else if (elementType === '火') items = items.concat(catalog.crystals.filter(function(x){return x.element==='火';}), catalog.fire);
   else if (elementType === '土') items = items.concat(catalog.crystals.filter(function(x){return x.element==='土';}), catalog.earth);
@@ -939,7 +939,7 @@ function getCureItemRecommendation(elementType) {
   else items = catalog.crystals.concat(catalog.metals).concat(catalog.woods);
 
   for (var i = 0; i < items.length && i < 8; i++) {
-    var item = items[i];
+    let item = items[i];
     html += '<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(201,168,76,0.04)">';
     html += '<p><strong style="color:var(--gold)">' + item.name + '</strong> <span style="font-size:11px;opacity:.5">(' + item.element + ')</span></p>';
     html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:4px;font-size:11px;opacity:.7;margin-top:4px">';
@@ -971,13 +971,13 @@ function getAnnualCurePlan(baziData, currentYear) {
   if (!currentYear) currentYear = new Date().getFullYear();
 
   // 流年干支计算 (2026=丙午)
-  var yearGanZhi = _getYearGanZhi(currentYear);
-  var yearGan = yearGanZhi.gan;
-  var yearZhi = yearGanZhi.zhi;
-  var yearGanEle = _GAN_ELE[yearGan] || '火';
-  var yearZhiEle = _ZHI_ELE[yearZhi] || '火';
+  let yearGanZhi = _getYearGanZhi(currentYear);
+  let yearGan = yearGanZhi.gan;
+  let yearZhi = yearGanZhi.zhi;
+  let yearGanEle = _GAN_ELE[yearGan] || '火';
+  let yearZhiEle = _ZHI_ELE[yearZhi] || '火';
 
-  var html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
+  const html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
   html += '<h4 style="color:var(--gold);letter-spacing:3px;margin-bottom:16px">📅 ' + currentYear + '年 ' + yearGan + yearZhi + ' 年度化解方案</h4>';
 
   // 1. 流年天干地支对日主的影响
@@ -1016,14 +1016,14 @@ function getAnnualCurePlan(baziData, currentYear) {
 }
 
 function _getAnnualGanZhiCure(baziData, yearGan, yearZhi, yearGanEle, yearZhiEle) {
-  var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
-  var dayStem = baziData ? baziData.dayStem : '甲';
-  var dayEle = _GAN_ELE ? (_GAN_ELE[dayStem] || '木') : '木';
+  const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
+  let dayStem = baziData ? baziData.dayStem : '甲';
+  let dayEle = _GAN_ELE ? (_GAN_ELE[dayStem] || '木') : '木';
 
   html += '<p style="font-size:12px;line-height:2">日主：<strong>' + dayStem + '(' + dayEle + ')</strong> · 流年：<strong>' + yearGan + yearZhi + '(' + yearGanEle + '/' + yearZhiEle + ')</strong></p>';
 
-  var relation = '';
-  var cure = '';
+  const relation = '';
+  const cure = '';
   if (dayEle === yearGanEle) {
     relation = '比劫 — 同气相助';
     cure = '今年运势平稳但易竞争。宜佩戴黄水晶稳固财运，避免与人争执。多行善积德以化比劫之争。';
@@ -1049,17 +1049,17 @@ function _getAnnualGanZhiCure(baziData, yearGan, yearZhi, yearGanEle, yearZhiEle
 
 function _getAnnualFlyingStarCure(currentYear) {
   // 2026年九紫入中宫的飞星图
-  var starPositions = _getAnnualFlyingStarPositions(currentYear);
-  var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
+  let starPositions = _getAnnualFlyingStarPositions(currentYear);
+  const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
 
   // 飞星图表格
   html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:16px;font-size:11px;text-align:center">';
-  var positions = ['东南', '正南', '西南', '正东', '中宫', '正西', '东北', '正北', '西北'];
+  const positions = ['东南', '正南', '西南', '正东', '中宫', '正西', '东北', '正北', '西北'];
   for (var i = 0; i < 9; i++) {
-    var star = starPositions[positions[i]] || '?';
-    var isJi = (star === '一白' || star === '四绿' || star === '六白' || star === '八白' || star === '九紫');
-    var isXiong = (star === '二黑' || star === '三碧' || star === '五黄' || star === '七赤');
-    var bg = isJi ? 'rgba(46,204,113,0.06)' : isXiong ? 'rgba(231,76,60,0.06)' : 'rgba(201,168,76,0.04)';
+    let star = starPositions[positions[i]] || '?';
+    let isJi = (star === '一白' || star === '四绿' || star === '六白' || star === '八白' || star === '九紫');
+    let isXiong = (star === '二黑' || star === '三碧' || star === '五黄' || star === '七赤');
+    let bg = isJi ? 'rgba(46,204,113,0.06)' : isXiong ? 'rgba(231,76,60,0.06)' : 'rgba(201,168,76,0.04)';
     html += '<div style="padding:8px 4px;background:' + bg + ';border-radius:4px">';
     html += '<div style="opacity:.5">' + positions[i] + '</div>';
     html += '<div style="color:' + (isJi ? 'var(--gold)' : isXiong ? 'var(--orange)' : 'var(--paper)') + ';font-weight:bold;margin-top:2px">' + star + '</div>';
@@ -1070,7 +1070,7 @@ function _getAnnualFlyingStarCure(currentYear) {
   // 化解重点
   html += '<ul style="font-size:12px;line-height:2;padding-left:20px;opacity:.85">';
   for (var pos in starPositions) {
-    var s = starPositions[pos];
+    let s = starPositions[pos];
     if (s === '五黄') html += '<li><strong>五黄(' + pos + ')：</strong>大凶之位，挂铜铃，放铜葫芦，不可动土</li>';
     else if (s === '二黑') html += '<li><strong>二黑(' + pos + ')：</strong>病符之位，放铜葫芦或六帝钱，保持通风</li>';
     else if (s === '三碧') html += '<li><strong>三碧(' + pos + ')：</strong>是非之位，放红色地毯或红色物品化解</li>';
@@ -1091,16 +1091,16 @@ function _getAnnualFlyingStarPositions(year) {
   // 2024年三碧入中, 2025年二黑入中, 2026年一白入中, 2027年九紫入中...
   // 飞星顺序：入中宫后按洛书顺序飞布
   var baseStar = 3; // 2024年三碧入中
-  var diff = year - 2024;
-  var centerStar = ((baseStar - diff - 1) % 9 + 9) % 9 + 1;
+  let diff = year - 2024;
+  let centerStar = ((baseStar - diff - 1) % 9 + 9) % 9 + 1;
 
-  var starNames = {1:'一白', 2:'二黑', 3:'三碧', 4:'四绿', 5:'五黄', 6:'六白', 7:'七赤', 8:'八白', 9:'九紫'};
+  const starNames = {1:'一白', 2:'二黑', 3:'三碧', 4:'四绿', 5:'五黄', 6:'六白', 7:'七赤', 8:'八白', 9:'九紫'};
 
   // 洛书飞布顺序：中宫→西北→正西→东北→正南→正北→西南→正东→东南
-  var flyOrder = ['中宫', '西北', '正西', '东北', '正南', '正北', '西南', '正东', '东南'];
-  var positions = {};
+  const flyOrder = ['中宫', '西北', '正西', '东北', '正南', '正北', '西南', '正东', '东南'];
+  const positions = {};
   for (var i = 0; i < 9; i++) {
-    var starNum = ((centerStar - 1 + i) % 9) + 1;
+    let starNum = ((centerStar - 1 + i) % 9) + 1;
     positions[flyOrder[i]] = starNames[starNum];
   }
   return positions;
@@ -1122,8 +1122,8 @@ function _getAnnualTaishuiCure(yearZhi) {
     '亥': '西北/东南'
   };
 
-  var fang = taishuiFang[yearZhi] || '正南/正北';
-  var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
+  let fang = taishuiFang[yearZhi] || '正南/正北';
+  const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   html += '<p style="font-size:12px;line-height:2"><strong>太岁方位：</strong>' + fang + '</p>';
   html += '<ul style="font-size:12px;line-height:2;padding-left:20px;opacity:.85">';
   html += '<li>太岁方不可动土修造，宜静不宜动</li>';
@@ -1147,14 +1147,14 @@ function _getAnnualSanshaCure(yearZhi) {
   };
 
   // 确定三煞
-  var sansha = '';
-  var zhiGroup = yearZhi;
+  const sansha = '';
+  let zhiGroup = yearZhi;
   if (['申','子','辰'].indexOf(yearZhi) >= 0) sansha = '正南(巳午未方)';
   else if (['寅','午','戌'].indexOf(yearZhi) >= 0) sansha = '正北(亥子丑方)';
   else if (['亥','卯','未'].indexOf(yearZhi) >= 0) sansha = '正西(申酉戌方)';
   else if (['巳','酉','丑'].indexOf(yearZhi) >= 0) sansha = '正东(寅卯辰方)';
 
-  var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
+  const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   html += '<p style="font-size:12px;line-height:2"><strong>三煞方位：</strong>' + sansha + '</p>';
   html += '<ul style="font-size:12px;line-height:2;padding-left:20px;opacity:.85">';
   html += '<li>三煞方绝对不可动土修造</li>';
@@ -1169,15 +1169,15 @@ function _getAnnualSanshaCure(yearZhi) {
 }
 
 function _getAnnualWuhuangErheiCure(currentYear) {
-  var positions = _getAnnualFlyingStarPositions(currentYear);
-  var wuhuangFang = '';
-  var erheiFang = '';
+  let positions = _getAnnualFlyingStarPositions(currentYear);
+  const wuhuangFang = '';
+  const erheiFang = '';
   for (var pos in positions) {
     if (positions[pos] === '五黄') wuhuangFang = pos;
     if (positions[pos] === '二黑') erheiFang = pos;
   }
 
-  var html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
+  const html = '<div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
   html += '<div style="margin-bottom:12px;padding:10px;background:rgba(231,76,60,0.04);border-radius:6px">';
   html += '<p style="color:var(--orange);font-size:13px"><strong>五黄大煞 — ' + wuhuangFang + '</strong></p>';
   html += '<p style="font-size:12px;line-height:1.8;margin-top:4px">五黄为流年最大凶星，主灾祸死亡。化解方法：</p>';
@@ -1215,14 +1215,14 @@ function getFamilyCurePlan(familyData, currentYear) {
   }
   if (!currentYear) currentYear = new Date().getFullYear();
 
-  var html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
+  const html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
   html += '<h4 style="color:var(--gold);letter-spacing:3px;margin-bottom:16px">👨‍👩‍👧‍👦 家庭成员化解方案</h4>';
 
   // 每位成员的个性化化解
   html += '<div style="margin-bottom:20px">';
   html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">👤 各成员个性化化解</h5>';
   for (var i = 0; i < familyData.members.length; i++) {
-    var m = familyData.members[i];
+    let m = familyData.members[i];
     html += '<div style="margin-bottom:16px;padding:14px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid rgba(201,168,76,0.1)">';
     html += '<p style="color:var(--gold);font-size:13px;margin-bottom:8px"><strong>' + (m.name || '成员' + (i+1)) + '</strong> (' + (m.relation || '') + ')</p>';
     if (m.bazi) {
@@ -1254,10 +1254,10 @@ function getFamilyCurePlan(familyData, currentYear) {
 }
 
 function _getMemberCureText(bazi, currentYear) {
-  var dayEle = _GAN_ELE ? (_GAN_ELE[bazi.dayStem] || '木') : '木';
-  var weak = bazi.weakestEle || '木';
-  var xi = bazi.xiEle || '木';
-  var text = '';
+  let dayEle = _GAN_ELE ? (_GAN_ELE[bazi.dayStem] || '木') : '木';
+  let weak = bazi.weakestEle || '木';
+  let xi = bazi.xiEle || '木';
+  const text = '';
   text += '1. 补' + weak + '：佩戴' + _getElementCrystal(weak) + '，多穿' + _getElementColor(weak) + '色衣物；';
   text += '2. 催' + xi + '：在' + _getElementDirection(xi) + '方位布局，增强喜用神之力；';
   text += '3. ' + currentYear + '年需注意流年太岁关系，如有犯太岁需请太岁符；';
@@ -1266,7 +1266,7 @@ function _getMemberCureText(bazi, currentYear) {
 }
 
 function _getFamilyOverallCure(familyData, currentYear) {
-  var html = '<ul style="font-size:12px;line-height:2;padding-left:20px;opacity:.85">';
+  const html = '<ul style="font-size:12px;line-height:2;padding-left:20px;opacity:.85">';
   html += '<li><strong>客厅布局：</strong>根据家主命卦选择吉位安放沙发，背靠实墙，面朝吉方</li>';
   html += '<li><strong>卧室分配：</strong>各成员卧室选个人命卦吉位，床头朝吉方</li>';
   html += '<li><strong>厨房位置：</strong>厨房宜在凶方(以凶制凶)，灶台朝吉方</li>';
@@ -1281,7 +1281,7 @@ function _getFamilyOverallCure(familyData, currentYear) {
 }
 
 function _getCureItemSynergyCheck(familyData) {
-  var html = '<ul style="font-size:12px;line-height:2;padding-left:20px;opacity:.85">';
+  const html = '<ul style="font-size:12px;line-height:2;padding-left:20px;opacity:.85">';
   html += '<li><strong>水晶协同：</strong>不同成员佩戴不同五行水晶时，检查是否相克。如一人补金(白水晶)、一人补火(红玛瑙)，火克金需注意</li>';
   html += '<li><strong>方位冲突：</strong>不同成员的吉方可能不同，卧室方位以个人命卦为准，客厅以家主命卦为准</li>';
   html += '<li><strong>物品冲突：</strong>避免在同一方位放相克物品(如火方放水缸、水方放红色物品)</li>';
@@ -1300,7 +1300,7 @@ function getMembershipCurePlan(baziData, membershipLevel, currentYear) {
   if (!membershipLevel) membershipLevel = 'free';
   if (!currentYear) currentYear = new Date().getFullYear();
 
-  var html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
+  const html = '<div class="cure-resolution-block" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(0,0,0,0.3));border:1px solid rgba(201,168,76,0.25);border-radius:12px">';
 
   if (membershipLevel === 'free') {
     html += '<h4 style="color:var(--gold);letter-spacing:3px;margin-bottom:16px">🆓 免费用户化解方案概要</h4>';
@@ -1361,45 +1361,45 @@ function getMembershipCurePlan(baziData, membershipLevel, currentYear) {
 // 十一、辅助函数
 // ================================================================
 
-var _GAN_ELE = { '甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水' };
-var _ZHI_ELE = { '子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水' };
+const _GAN_ELE = { '甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水' };
+const _ZHI_ELE = { '子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水' };
 
 function _eleSheng(a, b) {
-  var sheng = { '木':'火','火':'土','土':'金','金':'水','水':'木' };
+  const sheng = { '木':'火','火':'土','土':'金','金':'水','水':'木' };
   return sheng[a] === b;
 }
 
 function _eleKe(a, b) {
-  var ke = { '木':'土','土':'水','水':'火','火':'金','金':'木' };
+  const ke = { '木':'土','土':'水','水':'火','火':'金','金':'木' };
   return ke[a] === b;
 }
 
 function _getElementCrystal(ele) {
-  var map = { '木':'绿幽灵或翡翠', '火':'红玛瑙或紫水晶', '土':'黄水晶或和田玉', '金':'白水晶或金银', '水':'海蓝宝或黑曜石' };
+  const map = { '木':'绿幽灵或翡翠', '火':'红玛瑙或紫水晶', '土':'黄水晶或和田玉', '金':'白水晶或金银', '水':'海蓝宝或黑曜石' };
   return map[ele] || '白水晶';
 }
 
 function _getElementColor(ele) {
-  var map = { '木':'绿色、青色', '火':'红色、紫色', '土':'黄色、棕色', '金':'白色、金色', '水':'蓝色、黑色' };
+  const map = { '木':'绿色、青色', '火':'红色、紫色', '土':'黄色、棕色', '金':'白色、金色', '水':'蓝色、黑色' };
   return map[ele] || '白色';
 }
 
 function _getElementDirection(ele) {
-  var map = { '木':'东方、东南', '火':'南方', '土':'中央、西南', '金':'西方、西北', '水':'北方' };
+  const map = { '木':'东方、东南', '火':'南方', '土':'中央、西南', '金':'西方、西北', '水':'北方' };
   return map[ele] || '东方';
 }
 
 function _getYearGanZhi(year) {
   // 2024=甲子...不对,2024=甲辰
   // 2024年=甲辰, 2025=乙巳, 2026=丙午, 2027=丁未
-  var ganList = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-  var zhiList = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-  var baseYear = 2024;
+  const ganList = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  const zhiList = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  const baseYear = 2024;
   var baseGanIdx = 0; // 甲
   var baseZhiIdx = 4; // 辰
-  var diff = year - baseYear;
-  var ganIdx = ((baseGanIdx + diff) % 10 + 10) % 10;
-  var zhiIdx = ((baseZhiIdx + diff) % 12 + 12) % 12;
+  let diff = year - baseYear;
+  let ganIdx = ((baseGanIdx + diff) % 10 + 10) % 10;
+  let zhiIdx = ((baseZhiIdx + diff) % 12 + 12) % 12;
   return { gan: ganList[ganIdx], zhi: zhiList[zhiIdx] };
 }
 
@@ -1408,10 +1408,10 @@ function _getYearGanZhi(year) {
 // ================================================================
 
 function renderCureCenter() {
-  var out = document.getElementById('cureCenterOutput');
+  let out = document.getElementById('cureCenterOutput');
   if (!out) return;
 
-  var html = '';
+  const html = '';
 
   // 化解中心标题
   html += '<div class="result-banner">';
@@ -1442,7 +1442,7 @@ function renderCureCenter() {
   ];
 
   for (var i = 0; i < categories.length; i++) {
-    var c = categories[i];
+    let c = categories[i];
     html += '<div class="cure-category-card" style="padding:16px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:10px;cursor:pointer;transition:all .3s" onclick="showCureCategory(\'' + c.id + '\')">';
     html += '<div style="font-size:24px;margin-bottom:8px">' + c.icon + '</div>';
     html += '<div style="font-size:14px;color:var(--gold);letter-spacing:2px;margin-bottom:4px">' + c.title + '</div>';
@@ -1461,9 +1461,9 @@ function renderCureCenter() {
 }
 
 function showCureCategory(catId) {
-  var out = document.getElementById('cureCategoryOutput');
+  let out = document.getElementById('cureCategoryOutput');
   if (!out) return;
-  var html = '';
+  const html = '';
 
   if (catId === 'cure-bazi') {
     html += '<h4 style="color:var(--gold);margin-bottom:12px">🌟 八字化解方案</h4>';
@@ -1501,14 +1501,14 @@ function showCureCategory(catId) {
     html += '<button class="compute-btn" onclick="showSection(\'family\')">前 往 家 庭 排 盘</button>';
   } else if (catId === 'cure-items') {
     html += '<h4 style="color:var(--gold);margin-bottom:12px">💎 化解物品大全</h4>';
-    var catalog = getCureItemCatalog();
+    let catalog = getCureItemCatalog();
     for (var category in catalog) {
-      var items = catalog[category];
-      var catName = {crystals:'💎 水晶类', metals:'🪙 金属类', woods:'🪵 木器类', earth:'🏺 土器类', water:'💧 水器类', fire:'🔥 火器类', talismans:'📜 符咒类'}[category] || category;
+      let items = catalog[category];
+      let catName = {crystals:'💎 水晶类', metals:'🪙 金属类', woods:'🪵 木器类', earth:'🏺 土器类', water:'💧 水器类', fire:'🔥 火器类', talismans:'📜 符咒类'}[category] || category;
       html += '<div style="margin-bottom:16px">';
       html += '<h5 style="font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:8px">' + catName + '</h5>';
       for (var i = 0; i < items.length; i++) {
-        var item = items[i];
+        let item = items[i];
         html += '<div style="margin-bottom:8px;padding:10px;background:rgba(255,255,255,0.02);border-radius:6px;border:1px solid rgba(201,168,76,0.06)">';
         html += '<div style="display:flex;justify-content:space-between;align-items:center">';
         html += '<span style="color:var(--gold);font-size:13px">' + item.name + '</span>';

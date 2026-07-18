@@ -23,7 +23,7 @@
 
   // 异步确认模态框（替代原生 confirm）
   window.showConfirm = function(msg, onOk, onCancel) {
-    var overlay = document.createElement('div');
+    let overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;display:flex;align-items:center;justify-content:center';
     overlay.innerHTML = '<div style="background:#1a1a2e;border:1px solid rgba(201,168,76,0.4);border-radius:12px;padding:24px;max-width:360px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.5)">' +
       '<div style="color:#f0e8d8;font-size:15px;line-height:1.7;margin-bottom:20px;letter-spacing:1px">' + msg + '</div>' +

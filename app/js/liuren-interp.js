@@ -3,19 +3,19 @@
 // 基于《大六壬大全》《六壬指南》《六壬粹言》《壬归》经典体系
 
 function buildLiuRenProfessionalInterpretation(keShi, name, year, month, day, hourBranch, yueJiang) {
-  var ds = keShi.dayStem;
-  var db = keShi.dayBranch;
-  var sc = keShi.sanChuan;
-  var sk = keShi.siKe;
-  var tj = keShi.tianJiangFenbu;
-  var ss = keShi.shenSha;
-  var tg = keShi.tiGuan;
-  var ck = keShi.chuanKe;
-  var ct = keShi.chuanTianJiang;
-  var de = ELE[ds];
+  let ds = keShi.dayStem;
+  let db = keShi.dayBranch;
+  let sc = keShi.sanChuan;
+  let sk = keShi.siKe;
+  let tj = keShi.tianJiangFenbu;
+  let ss = keShi.shenSha;
+  let tg = keShi.tiGuan;
+  let ck = keShi.chuanKe;
+  let ct = keShi.chuanTianJiang;
+  let de = ELE[ds];
 
   // ═══ a) 课体总断 ═══
-  var keTiPan = '';
+  const keTiPan = '';
   keTiPan += '══════ 课体总断 ══════\n\n';
   keTiPan += '【课名】' + tg.name + '课\n';
   keTiPan += '【吉凶】' + tg.jiXiong + '\n';
@@ -29,27 +29,27 @@ function buildLiuRenProfessionalInterpretation(keShi, name, year, month, day, ho
   keTiPan += '在此' + tg.name + '课中：' + tg.advice + '\n';
 
   // ═══ b) 四课分析 ═══
-  var siKePan = '';
+  const siKePan = '';
   siKePan += '══════ 四课排列 ══════\n\n';
   siKePan += '第一课（日子阳神）：' + sk.ke1 + '（上' + sk.ke1Gan + '）\n';
   siKePan += '  日干' + ds + '寄宫于' + sk.ke1 + '，上乘之神为' + sk.ke1Gan + '。\n';
   siKePan += '  天地盘关系：地盘' + sk.ke1 + '(' + LR_ZHI_WX[sk.ke1] + ') ← 天盘' + sk.ke1Gan + '(' + _getGanWx(sk.ke1Gan) + ')\n';
-  var ka1 = _analyzeKe(sk.ke1, sk.ke1Gan, ds);
+  let ka1 = _analyzeKe(sk.ke1, sk.ke1Gan, ds);
   siKePan += '  ' + ka1 + '\n\n';
 
   siKePan += '第二课（日干阴神）：' + sk.ke2 + '（上' + sk.ke2Gan + '）\n';
   siKePan += '  日干阴神主暗中变化。\n';
-  var ka2 = _analyzeKe(sk.ke2, sk.ke2Gan, ds);
+  let ka2 = _analyzeKe(sk.ke2, sk.ke2Gan, ds);
   siKePan += '  ' + ka2 + '\n\n';
 
   siKePan += '第三课（日支阳神）：' + sk.ke3 + '（上' + sk.ke3Gan + '）\n';
   siKePan += '  日支' + db + '主外部环境和所问之事。\n';
-  var ka3 = _analyzeKe(sk.ke3, sk.ke3Gan, ds);
+  let ka3 = _analyzeKe(sk.ke3, sk.ke3Gan, ds);
   siKePan += '  ' + ka3 + '\n\n';
 
   siKePan += '第四课（日支阴神）：' + sk.ke4 + '（上' + sk.ke4Gan + '）\n';
   siKePan += '  日支阴神主事体暗中变化。\n';
-  var ka4 = _analyzeKe(sk.ke4, sk.ke4Gan, ds);
+  let ka4 = _analyzeKe(sk.ke4, sk.ke4Gan, ds);
   siKePan += '  ' + ka4 + '\n\n';
 
   siKePan += '【四课总评】\n';
@@ -60,7 +60,7 @@ function buildLiuRenProfessionalInterpretation(keShi, name, year, month, day, ho
   else siKePan += '上下基本和谐，事可着手。\n';
 
   // ═══ c) 三传详解 ═══
-  var sanChuanPan = '';
+  const sanChuanPan = '';
   sanChuanPan += '══════ 三传详解 ══════\n\n';
   sanChuanPan += '发用之法：' + (sc.faType || '常规取法') + '\n\n';
   
@@ -102,11 +102,11 @@ function buildLiuRenProfessionalInterpretation(keShi, name, year, month, day, ho
   else sanChuanPan += '开局平稳。\n';
 
   // ═══ d) 天将分布 ═══
-  var tianJiangPan = '';
+  const tianJiangPan = '';
   tianJiangPan += '══════ 十二天将分布 ══════\n\n';
   tianJiangPan += '贵人所在：' + tj.guirenZhi + '位（' + (tj.shunPai ? '顺排' : '逆排') + '）\n\n';
   
-  var tianJiangList = [];
+  const tianJiangList = [];
   for (var zhi in tj.fenbu) {
     tianJiangList.push({zhi: zhi, info: tj.fenbu[zhi]});
   }
@@ -115,8 +115,8 @@ function buildLiuRenProfessionalInterpretation(keShi, name, year, month, day, ho
   });
   
   for (var i = 0; i < tianJiangList.length; i++) {
-    var t = tianJiangList[i];
-    var marker = '';
+    let t = tianJiangList[i];
+    const marker = '';
     if (t.zhi === sc.faYong) marker = ' ←初传';
     if (t.zhi === sc.zhongChuan) marker = ' ←中传';
     if (t.zhi === sc.moChuan) marker = ' ←末传';
@@ -127,8 +127,8 @@ function buildLiuRenProfessionalInterpretation(keShi, name, year, month, day, ho
   tianJiangPan += '\n';
   
   // 特殊组合
-  var faGod = ct.fa ? ct.fa.name : '';
-  var moGod = ct.mo ? ct.mo.name : '';
+  let faGod = ct.fa ? ct.fa.name : '';
+  let moGod = ct.mo ? ct.mo.name : '';
   tianJiangPan += '【天将生克关系】\n';
   if (faGod === '青龙' && moGod === '贵人') {
     tianJiangPan += '初传青龙，末传贵人——始于财喜，终于贵显，大吉之象。\n';
@@ -146,14 +146,14 @@ function buildLiuRenProfessionalInterpretation(keShi, name, year, month, day, ho
   tianJiangPan += '\n《大六壬大全》论十二天将云:「贵人统十二天将之首，为至尊至贵。课中贵人得地，万事可成。」\n';
 
   // ═══ e) 神煞影响 ═══
-  var shenShaPan = '';
+  const shenShaPan = '';
   shenShaPan += '══════ 神煞影响 ══════\n\n';
   shenShaPan += '当日课中所临神煞共' + ss.length + '位：\n\n';
   
-  var jiShaCount = 0, xiongShaCount = 0;
+  let jiShaCount = 0, xiongShaCount = 0;
   for (var i = 0; i < ss.length; i++) {
-    var s = ss[i];
-    var tag = s.nature === '大吉' || s.nature === '吉' ? '【吉】' : (s.nature === '大凶' || s.nature === '凶' ? '【凶】' : '【平】');
+    let s = ss[i];
+    let tag = s.nature === '大吉' || s.nature === '吉' ? '【吉】' : (s.nature === '大凶' || s.nature === '凶' ? '【凶】' : '【平】');
     if (s.nature === '大吉' || s.nature === '吉') jiShaCount++;
     if (s.nature === '大凶' || s.nature === '凶') xiongShaCount++;
     shenShaPan += tag + ' ' + s.name + '（临' + s.zhi + '位）\n';
@@ -171,11 +171,11 @@ function buildLiuRenProfessionalInterpretation(keShi, name, year, month, day, ho
   }
 
   // ═══ f) 大白话结论 ═══
-  var baihuaJielun = '';
+  const baihuaJielun = '';
   baihuaJielun += '══════ 大白话解读 ══════\n\n';
   
   // 综合判断
-  var zongHe = '';
+  const zongHe = '';
   if (tg.jiXiong === '大吉') {
     zongHe = '这是一个非常好的课象。天时地利人和都站在你这边，所问之事大概率会顺利达成。';
   } else if (tg.jiXiong === '吉') {
@@ -227,7 +227,7 @@ function buildLiuRenProfessionalInterpretation(keShi, name, year, month, day, ho
   }
   
   // 基于神煞的建议
-  var hasTianDe = false, hasYiMa = false;
+  let hasTianDe = false, hasYiMa = false;
   for (var i = 0; i < ss.length; i++) {
     if (ss[i].name === '天德') hasTianDe = true;
     if (ss[i].name === '驿马') hasYiMa = true;
@@ -250,16 +250,16 @@ function buildLiuRenProfessionalInterpretation(keShi, name, year, month, day, ho
   }
 
   // ═══ g) 流年推演 ═══
-  var liunianTuiyan = '';
+  const liunianTuiyan = '';
   liunianTuiyan += '══════ 流年推演 ══════\n\n';
-  var currentYear = new Date().getFullYear();
+  let currentYear = new Date().getFullYear();
   
   liunianTuiyan += '以日干' + ds + '（属' + de + '）为基准，结合三传' + sc.faYong + '→' + sc.zhongChuan + '→' + sc.moChuan + '推演：\n\n';
   
   // 基于三传五行推算时间节点
-  var faMonth = _zhiToMonth(sc.faYong);
-  var zhongMonth = _zhiToMonth(sc.zhongChuan);
-  var moMonth = _zhiToMonth(sc.moChuan);
+  let faMonth = _zhiToMonth(sc.faYong);
+  let zhongMonth = _zhiToMonth(sc.zhongChuan);
+  let moMonth = _zhiToMonth(sc.moChuan);
   
   liunianTuiyan += '【第一阶段：发端期】\n';
   liunianTuiyan += '时段：' + faMonth + '月前后\n';
@@ -275,8 +275,8 @@ function buildLiuRenProfessionalInterpretation(keShi, name, year, month, day, ho
   
   // 流年吉凶
   liunianTuiyan += '【' + currentYear + '年重点月份】\n';
-  var shengMonth = {'木':[1,2,3],'火':[4,5,6],'金':[7,8,9],'水':[10,11,12],'土':[3,6,9,12]};
-  var wangMonths = shengMonth[de] || [3,6,9,12];
+  const shengMonth = {'木':[1,2,3],'火':[4,5,6],'金':[7,8,9],'水':[10,11,12],'土':[3,6,9,12]};
+  let wangMonths = shengMonth[de] || [3,6,9,12];
   liunianTuiyan += '日主' + ds + '五行属' + de + '，旺于' + wangMonths.join('、') + '月。在这些月份运势最强，适合做重要决策。\n';
   liunianTuiyan += '初传' + sc.faYong + '应于' + faMonth + '月，中传应于' + zhongMonth + '月，末传应于' + moMonth + '月。\n';
   liunianTuiyan += '\n温馨提示：以上为命理参考，真正的命运掌握在自己手中。积极行动、持续努力才是最好的「化解」。\n';
@@ -295,10 +295,10 @@ function buildLiuRenProfessionalInterpretation(keShi, name, year, month, day, ho
 
 // ═══ 辅助解读函数 ═══
 function _analyzeKe(zhi, gan, dayStem) {
-  var zw = LR_ZHI_WX[zhi];
-  var gw = _getGanWx(gan);
-  var de = ELE[dayStem];
-  var result = '地盘' + zhi + '(' + zw + ')，天盘' + gan + '(' + gw + ') → ';
+  let zw = LR_ZHI_WX[zhi];
+  let gw = _getGanWx(gan);
+  let de = ELE[dayStem];
+  const result = '地盘' + zhi + '(' + zw + ')，天盘' + gan + '(' + gw + ') → ';
   
   if (_wxKe(gw, zw)) {
     result += '天克地，上制下。主外部压力克制内事，有强制之意。';
@@ -315,32 +315,32 @@ function _analyzeKe(zhi, gan, dayStem) {
 }
 
 function _zhiToMonth(zhi) {
-  var map = {寅:'1',卯:'2',辰:'3',巳:'4',午:'5',未:'6',申:'7',酉:'8',戌:'9',亥:'10',子:'11',丑:'12'};
+  const map = {寅:'1',卯:'2',辰:'3',巳:'4',午:'5',未:'6',申:'7',酉:'8',戌:'9',亥:'10',子:'11',丑:'12'};
   return map[zhi] || '?';
 }
 
 function _getJiFang(stem) {
-  var map = {甲:'东',乙:'东南',丙:'南',丁:'西南',戊:'中',己:'中',庚:'西',辛:'西北',壬:'北',癸:'东北'};
+  const map = {甲:'东',乙:'东南',丙:'南',丁:'西南',戊:'中',己:'中',庚:'西',辛:'西北',壬:'北',癸:'东北'};
   return map[stem] || '东';
 }
 
 function _getShengFang(ele) {
-  var map = {木:'东',火:'南',土:'中',金:'西',水:'北'};
+  const map = {木:'东',火:'南',土:'中',金:'西',水:'北'};
   return map[ele] || '东';
 }
 
 function _getKaiYunWu(ele) {
-  var map = {木:'绿色植物或木质饰品',火:'红色摆件或水晶',土:'黄色水晶或陶器',金:'金属摆件或白色水晶',水:'小鱼缸或蓝色饰品'};
+  const map = {木:'绿色植物或木质饰品',火:'红色摆件或水晶',土:'黄色水晶或陶器',金:'金属摆件或白色水晶',水:'小鱼缸或蓝色饰品'};
   return map[ele] || '水晶';
 }
 
 function _getXingYunSe(ele) {
-  var map = {木:'绿、青',火:'红、紫',土:'黄、棕',金:'白、银',水:'黑、蓝'};
+  const map = {木:'绿、青',火:'红、紫',土:'黄、棕',金:'白、银',水:'黑、蓝'};
   return map[ele] || '黄';
 }
 
 function _getJiRi(stem) {
-  var map = {甲:'寅卯',乙:'寅卯',丙:'巳午',丁:'巳午',戊:'辰戌丑未',己:'辰戌丑未',庚:'申酉',辛:'申酉',壬:'亥子',癸:'亥子'};
+  const map = {甲:'寅卯',乙:'寅卯',丙:'巳午',丁:'巳午',戊:'辰戌丑未',己:'辰戌丑未',庚:'申酉',辛:'申酉',壬:'亥子',癸:'亥子'};
   return map[stem] || '';
 }
 // ═══ END PROFESSIONAL INTERPRETATION ═══

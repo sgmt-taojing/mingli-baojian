@@ -1166,10 +1166,10 @@ const PUSH_PLAN = {
  * @param {string} containerId - 容器元素ID
  */
 function renderPushPlan(containerId) {
-  var container = document.getElementById(containerId);
+  let container = document.getElementById(containerId);
   if (!container) return;
 
-  var html = '';
+  const html = '';
 
   /* ---- 顶部标题 ---- */
   html += '<div class="push-plan-hero">';
@@ -1210,14 +1210,14 @@ function renderPushPlan(containerId) {
  * 渲染会员等级对比
  */
 function renderTierComparison() {
-  var html = '';
+  const html = '';
   html += '<div class="pp-section">';
   html += '  <h3 class="pp-section-title"><span class="pp-section-icon">👑</span> 会员等级推送对比</h3>';
   html += '  <div class="pp-tier-grid">';
 
   Object.keys(PUSH_PLAN.tiers).forEach(function(key) {
-    var tier = PUSH_PLAN.tiers[key];
-    var isCurrent = (key === 'free') ? '' : '';
+    let tier = PUSH_PLAN.tiers[key];
+    let isCurrent = (key === 'free') ? '' : '';
     html += '<div class="pp-tier-card pp-tier-' + key + '" style="border-color:' + tier.color + '40">';
     html += '  <div class="pp-tier-badge" style="background:' + tier.color + '20;color:' + tier.color + ';border:1px solid ' + tier.color + '50">' + tier.icon + ' ' + tier.name + '</div>';
     html += '  <div class="pp-tier-name" style="color:' + tier.color + '">' + tier.name + '</div>';
@@ -1249,7 +1249,7 @@ function renderTierComparison() {
  * 渲染每日推送时间表
  */
 function renderDailySchedule() {
-  var html = '';
+  const html = '';
   html += '<div class="pp-section">';
   html += '  <h3 class="pp-section-title"><span class="pp-section-icon">⏰</span> 每日推送时间表</h3>';
   html += '  <div class="pp-schedule-grid">';
@@ -1265,15 +1265,15 @@ function renderDailySchedule() {
     html += '  </div>';
     html += '  <div class="pp-schedule-tiers">';
     item.tiers.forEach(function(t) {
-      var tier = PUSH_PLAN.tiers[t];
+      let tier = PUSH_PLAN.tiers[t];
       html += '<span class="pp-tier-tag" style="background:' + tier.color + '15;color:' + tier.color + ';border:1px solid ' + tier.color + '30">' + tier.icon + ' ' + tier.name + '</span>';
     });
     html += '  </div>';
     html += '  <div class="pp-schedule-content">';
 
     Object.keys(item.content).forEach(function(tierKey) {
-      var content = item.content[tierKey];
-      var tier = PUSH_PLAN.tiers[tierKey];
+      let content = item.content[tierKey];
+      let tier = PUSH_PLAN.tiers[tierKey];
       html += '<div class="pp-content-block pp-content-' + tierKey + '">';
       html += '<div class="pp-content-tier" style="color:' + tier.color + '">' + tier.icon + ' ' + tier.name + '</div>';
       html += '<div class="pp-content-headline">' + content.headline + '</div>';
@@ -1302,7 +1302,7 @@ function renderDailySchedule() {
  * 渲染节气推送日历
  */
 function renderSolarTermsCalendar() {
-  var html = '';
+  const html = '';
   html += '<div class="pp-section">';
   html += '  <h3 class="pp-section-title"><span class="pp-section-icon">🌿</span> 二十四节气推送</h3>';
   html += '  <p class="pp-section-desc">每个节气前1天推送养生+运势提醒（年度会员+终身会员）</p>';
@@ -1345,14 +1345,14 @@ function renderSolarTermsCalendar() {
  * 渲染节日推送
  */
 function renderFestivalsList() {
-  var html = '';
+  const html = '';
   html += '<div class="pp-section">';
   html += '  <h3 class="pp-section-title"><span class="pp-section-icon">🎊</span> 传统节日专题推送</h3>';
   html += '  <p class="pp-section-desc">所有用户均可收到节日祝福，会员解锁完整专题内容</p>';
   html += '  <div class="pp-festival-grid">';
 
   PUSH_PLAN.festivals.forEach(function(fest) {
-    var allContent = fest.content.all;
+    let allContent = fest.content.all;
     html += '<div class="pp-festival-card">';
     html += '  <div class="pp-festival-header" style="background:linear-gradient(135deg,' + 'rgba(201,168,76,0.08),' + 'rgba(201,168,76,0.02))">';
     html += '    <span class="pp-festival-icon">' + fest.icon + '</span>';
@@ -1392,8 +1392,8 @@ function renderFestivalsList() {
  * 渲染月运推送
  */
 function renderMonthlyPlan() {
-  var html = '';
-  var m = PUSH_PLAN.monthly;
+  const html = '';
+  let m = PUSH_PLAN.monthly;
   html += '<div class="pp-section">';
   html += '  <h3 class="pp-section-title"><span class="pp-section-icon">🌙</span> 月运报告</h3>';
   html += '  <p class="pp-section-desc">推送时间：' + m.schedule + ' | 推送对象：年度会员 + 终身会员</p>';
@@ -1409,14 +1409,14 @@ function renderMonthlyPlan() {
   html += '    </div>';
   html += '    <div class="pp-monthly-tiers">';
   m.tiers.forEach(function(t) {
-    var tier = PUSH_PLAN.tiers[t];
+    let tier = PUSH_PLAN.tiers[t];
     html += '<span class="pp-tier-tag" style="background:' + tier.color + '15;color:' + tier.color + ';border:1px solid ' + tier.color + '30">' + tier.icon + ' ' + tier.name + '</span>';
   });
   html += '    </div>';
 
   Object.keys(m.content).forEach(function(tierKey) {
-    var content = m.content[tierKey];
-    var tier = PUSH_PLAN.tiers[tierKey];
+    let content = m.content[tierKey];
+    let tier = PUSH_PLAN.tiers[tierKey];
     html += '<div class="pp-content-block pp-content-' + tierKey + '">';
     html += '<div class="pp-content-tier" style="color:' + tier.color + '">' + tier.icon + ' ' + tier.name + '内容</div>';
     html += '<ul class="pp-content-list">';
@@ -1437,7 +1437,7 @@ function renderMonthlyPlan() {
  * 渲染年度推送（含跨年）
  */
 function renderAnnualPlan() {
-  var html = '';
+  const html = '';
   html += '<div class="pp-section">';
   html += '  <h3 class="pp-section-title"><span class="pp-section-icon">🔮</span> 年度推送 · 跨年化解全流程</h3>';
   html += '  <p class="pp-section-desc">从公历12月到立春，完整的跨年化解方案推送时间线</p>';
@@ -1446,7 +1446,7 @@ function renderAnnualPlan() {
   html += '  <div class="pp-timeline">';
 
   PUSH_PLAN.annual.forEach(function(item, idx) {
-    var isLast = (idx === PUSH_PLAN.annual.length - 1);
+    let isLast = (idx === PUSH_PLAN.annual.length - 1);
     html += '<div class="pp-timeline-item">';
     html += '  <div class="pp-timeline-dot ' + (item.tiers.includes('lifetime') ? 'pp-dot-lifetime' : 'pp-dot-annual') + '"></div>';
     if (!isLast) html += '  <div class="pp-timeline-line"></div>';
@@ -1455,15 +1455,15 @@ function renderAnnualPlan() {
     html += '    <div class="pp-timeline-title">' + item.title + '</div>';
     html += '    <div class="pp-timeline-tiers">';
     item.tiers.forEach(function(t) {
-      var tier = PUSH_PLAN.tiers[t];
+      let tier = PUSH_PLAN.tiers[t];
       html += '<span class="pp-tier-tag" style="background:' + tier.color + '15;color:' + tier.color + ';border:1px solid ' + tier.color + '30">' + tier.icon + ' ' + tier.name + '</span>';
     });
     html += '    </div>';
     html += '    <div class="pp-timeline-content">';
 
     Object.keys(item.content).forEach(function(tierKey) {
-      var content = item.content[tierKey];
-      var tier = PUSH_PLAN.tiers[tierKey];
+      let content = item.content[tierKey];
+      let tier = PUSH_PLAN.tiers[tierKey];
       html += '<div class="pp-content-block pp-content-' + tierKey + '">';
       html += '<div class="pp-content-tier" style="color:' + tier.color + '">' + tier.icon + ' ' + tier.name + '</div>';
       html += '<ul class="pp-content-list">';
@@ -1489,8 +1489,8 @@ function renderAnnualPlan() {
  * 渲染引流转化策略
  */
 function renderConversionStrategy() {
-  var html = '';
-  var c = PUSH_PLAN.conversion;
+  const html = '';
+  let c = PUSH_PLAN.conversion;
   html += '<div class="pp-section">';
   html += '  <h3 class="pp-section-title"><span class="pp-section-icon">📈</span> 引流转化设计</h3>';
   html += '  <p class="pp-section-desc">免费用户推送底部嵌入"升级解锁"卡片，自然引导转化</p>';
@@ -1499,7 +1499,7 @@ function renderConversionStrategy() {
   html += '  <div class="pp-conversion-grid">';
   html += '    <h4 class="pp-conv-sub-title">每日推送底部"升级解锁"卡片</h4>';
   c.dailyUpgradeCards.forEach(function(card) {
-    var styleClass = card.style === 'highlight' ? 'pp-conv-card pp-conv-highlight' : 'pp-conv-card';
+    let styleClass = card.style === 'highlight' ? 'pp-conv-card pp-conv-highlight' : 'pp-conv-card';
     html += '<div class="' + styleClass + '">';
     html += '  <span class="pp-conv-icon">' + card.icon + '</span>';
     html += '  <div class="pp-conv-body">';
@@ -1541,7 +1541,7 @@ function renderConversionStrategy() {
   html += '    <h4 class="pp-conv-sub-title">引流文案库</h4>';
   html += '    <div class="pp-copy-grid">';
   Object.keys(c.copywriting).forEach(function(style) {
-    var label = { gentle: '温和型', curiosity: '好奇型', value: '价值型', urgency: '紧迫型', social: '社交型' }[style] || style;
+    let label = { gentle: '温和型', curiosity: '好奇型', value: '价值型', urgency: '紧迫型', social: '社交型' }[style] || style;
     html += '<div class="pp-copy-card">';
     html += '  <span class="pp-copy-label">' + label + '</span>';
     html += '  <p class="pp-copy-text">' + c.copywriting[style] + '</p>';

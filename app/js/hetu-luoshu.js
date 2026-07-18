@@ -53,54 +53,54 @@ var HETU_LUOSHU_SYSTEM = {
 
 // ── 河洛会员分级工具 ──
 function _hlGetMemberLevel() {
-  var member = safeGetJSON('memberInfo', {});
-  var level = (member.level || 'free').toLowerCase();
-  var superUsers = [];
+  let member = safeGetJSON('memberInfo', {});
+  let level = (member.level || 'free').toLowerCase();
+  const superUsers = [];
   try { superUsers = JSON.parse(localStorage.getItem('superUsers') || '[]'); } catch(e) {}
-  var userPhone = member.phone || '';
+  let userPhone = member.phone || '';
   if (superUsers.indexOf(userPhone) >= 0 || level === 'super') return 'super';
   return level;
 }
 
 function _hlGetAccessPercent() {
-  var lv = _hlGetMemberLevel();
+  let lv = _hlGetMemberLevel();
   if (lv === 'super' || lv === 'lifetime' || lv === 'yearly') return 100;
   if (lv === 'monthly') return 60;
   return 30;
 }
 
 function _hlNumToWuxing(num) {
-  var n = parseInt(num);
+  let n = parseInt(num);
   if (n === 0) n = 10;
-  var map = {1:'水',6:'水',2:'火',7:'火',3:'木',8:'木',4:'金',9:'金',5:'土',10:'土'};
+  const map = {1:'水',6:'水',2:'火',7:'火',3:'木',8:'木',4:'金',9:'金',5:'土',10:'土'};
   return map[n] || '土';
 }
 
 function _hlNumShengCheng(num) {
-  var n = parseInt(num);
+  let n = parseInt(num);
   if (n === 0) n = 10;
   if (n >= 1 && n <= 5) return '生数';
   return '成数';
 }
 
 function _hlDetermineWuxingJu(wuxingCount) {
-  var max = 0, maxWx = '';
-  var keys = Object.keys(wuxingCount);
+  let max = 0, maxWx = '';
+  let keys = Object.keys(wuxingCount);
   for (var i = 0; i < keys.length; i++) {
     if (wuxingCount[keys[i]] > max) { max = wuxingCount[keys[i]]; maxWx = keys[i]; }
   }
-  var juMap = {'水':'水局','火':'火局','木':'木局','金':'金局','土':'土局'};
+  const juMap = {'水':'水局','火':'火局','木':'木局','金':'金局','土':'土局'};
   return juMap[maxWx] || '土局';
 }
 
 function _hlFlyStars(year) {
-  var baseYear = 1864;
-  var offset = (year - baseYear) % 9;
+  const baseYear = 1864;
+  let offset = (year - baseYear) % 9;
   if (offset < 0) offset += 9;
-  var centerStar = ((1 - offset - 1) % 9 + 9) % 9 + 1;
-  var flyOrder = [5,6,7,8,9,1,2,3,4];
-  var stars = {};
-  var cur = centerStar;
+  let centerStar = ((1 - offset - 1) % 9 + 9) % 9 + 1;
+  const flyOrder = [5,6,7,8,9,1,2,3,4];
+  const stars = {};
+  let cur = centerStar;
   for (var i = 0; i < 9; i++) {
     stars[flyOrder[i]] = cur;
     cur--;
@@ -120,13 +120,13 @@ function _hlNameToStrokes(name) {
     '张':7,'王':4,'李':7,'刘':6,'陈':7,'杨':7,'赵':7,'黄':11,'周':8,'吴':7,
     '郑':8,'孙':6,'马':3,'朱':6,'胡':9,'郭':10,'何':7,'高':10,'林':8,'罗':8
   };
-  var strokes = [];
+  const strokes = [];
   for (var i = 0; i < name.length; i++) {
-    var ch = name[i];
+    let ch = name[i];
     if (strokeMap[ch]) {
       strokes.push(strokeMap[ch]);
     } else {
-      var code = name.charCodeAt(i);
+      let code = name.charCodeAt(i);
       strokes.push((code % 9) + 1);
     }
   }
@@ -140,35 +140,35 @@ function analyzeByHetuLuoshu(input, type) {
     luoshu: { palaceCount: {}, stars: {}, luckyStars: [], unluckyStars: [], prosperousStar: null, declineStar: null },
     conclusion: '', advice: '', resolveMethods: [], enhanceMethods: []
   };
-  var nums = [];
+  const nums = [];
   if (type === 'mobile') {
-    var s = String(input).replace(/\D/g, '');
+    let s = String(input).replace(/\D/g, '');
     for (var i = 0; i < s.length; i++) nums.push(parseInt(s[i]));
   } else if (type === 'name') {
     nums = _hlNameToStrokes(input);
   } else if (type === 'birthday' || type === 'date') {
-    var parts = String(input).split(/[-\/\s:]+/);
+    let parts = String(input).split(/[-\/\s:]+/);
     for (var p = 0; p < parts.length; p++) {
-      var ps = String(parts[p]);
+      let ps = String(parts[p]);
       for (var c = 0; c < ps.length; c++) {
-        var d = parseInt(ps[c]);
+        let d = parseInt(ps[c]);
         if (!isNaN(d)) nums.push(d);
       }
     }
   }
   // 河图五行分析
   for (var ni = 0; ni < nums.length; ni++) {
-    var wx = _hlNumToWuxing(nums[ni]);
-    var sc = _hlNumShengCheng(nums[ni]);
+    let wx = _hlNumToWuxing(nums[ni]);
+    let sc = _hlNumShengCheng(nums[ni]);
     result.hetu.numbers.push({num: nums[ni], wuxing: wx, type: sc});
     result.hetu.wuxingCount[wx]++;
     if (sc === '生数') result.hetu.shengCount++; else result.hetu.chengCount++;
   }
   result.hetu.wuxingJu = _hlDetermineWuxingJu(result.hetu.wuxingCount);
-  var juInfo = HETU_LUOSHU_SYSTEM.hetu.wuxingJu[result.hetu.wuxingJu];
+  let juInfo = HETU_LUOSHU_SYSTEM.hetu.wuxingJu[result.hetu.wuxingJu];
   if (juInfo) result.hetu.juInfo = juInfo;
-  var maxWx = result.hetu.wuxingJu.replace('局','');
-  var bkeys = Object.keys(HETU_LUOSHU_SYSTEM.hetu.bagua);
+  let maxWx = result.hetu.wuxingJu.replace('局','');
+  let bkeys = Object.keys(HETU_LUOSHU_SYSTEM.hetu.bagua);
   for (var bk = 0; bk < bkeys.length; bk++) {
     if (HETU_LUOSHU_SYSTEM.hetu.bagua[bkeys[bk]].element === maxWx) {
       result.hetu.bagua = bkeys[bk] + ' -> ' + HETU_LUOSHU_SYSTEM.hetu.bagua[bkeys[bk]].gua + '卦';
@@ -178,10 +178,10 @@ function analyzeByHetuLuoshu(input, type) {
   // 洛书九宫分析
   result.luoshu.palaceCount = {1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0};
   for (var pi = 0; pi < nums.length; pi++) {
-    var pn = nums[pi] === 0 ? 1 : nums[pi];
+    let pn = nums[pi] === 0 ? 1 : nums[pi];
     if (pn >= 1 && pn <= 9) result.luoshu.palaceCount[pn]++;
   }
-  var prosperous = [], decline = [];
+  const prosperous = [], decline = [];
   for (var pk = 1; pk <= 9; pk++) {
     if (result.luoshu.palaceCount[pk] >= 2) prosperous.push(pk);
     if (result.luoshu.palaceCount[pk] === 0) decline.push(pk);
@@ -189,13 +189,13 @@ function analyzeByHetuLuoshu(input, type) {
   result.luoshu.prosperousPalaces = prosperous;
   result.luoshu.declinePalaces = decline;
   // 九星分析
-  var currentYear = new Date().getFullYear();
-  var flyStars = _hlFlyStars(currentYear);
+  let currentYear = new Date().getFullYear();
+  let flyStars = _hlFlyStars(currentYear);
   result.luoshu.flyStars = flyStars;
-  var luckyCount = 0, unluckyCount = 0;
+  let luckyCount = 0, unluckyCount = 0;
   for (var sk = 1; sk <= 9; sk++) {
-    var starNum = flyStars[sk];
-    var starInfo = HETU_LUOSHU_SYSTEM.luoshu.nineStars[starNum];
+    let starNum = flyStars[sk];
+    let starInfo = HETU_LUOSHU_SYSTEM.luoshu.nineStars[starNum];
     if (starInfo) {
       result.luoshu.stars[sk] = {star: starInfo.name, luck: starInfo.luck, domain: starInfo.domain, count: result.luoshu.palaceCount[sk] || 0};
       if (starInfo.luck.indexOf('吉') >= 0) { luckyCount++; result.luoshu.luckyStars.push({palace: sk, star: starInfo}); }
@@ -204,51 +204,51 @@ function analyzeByHetuLuoshu(input, type) {
   }
   result.luoshu.luckyRatio = Math.round(luckyCount / 9 * 100);
   result.luoshu.unluckyRatio = Math.round(unluckyCount / 9 * 100);
-  var maxStar = 0, maxStarPalace = 0;
+  let maxStar = 0, maxStarPalace = 0;
   for (var ms = 1; ms <= 9; ms++) {
     if ((result.luoshu.palaceCount[ms] || 0) > maxStar) { maxStar = result.luoshu.palaceCount[ms] || 0; maxStarPalace = ms; }
   }
   if (maxStarPalace > 0) {
-    var pStar = flyStars[maxStarPalace];
+    let pStar = flyStars[maxStarPalace];
     result.luoshu.prosperousStar = HETU_LUOSHU_SYSTEM.luoshu.nineStars[pStar];
     result.luoshu.prosperousStarPalace = maxStarPalace;
   }
   // 综合结论
-  var juName = result.hetu.wuxingJu;
-  var juDetail = HETU_LUOSHU_SYSTEM.hetu.wuxingJu[juName];
-  var conclusions = [];
+  let juName = result.hetu.wuxingJu;
+  let juDetail = HETU_LUOSHU_SYSTEM.hetu.wuxingJu[juName];
+  const conclusions = [];
   if (juDetail) conclusions.push('五行局为' + juName + '，特质：' + juDetail.characteristics + '。' + juDetail.applies + '。');
-  var total = result.hetu.shengCount + result.hetu.chengCount;
+  let total = result.hetu.shengCount + result.hetu.chengCount;
   if (total > 0) {
-    var shengPct = Math.round(result.hetu.shengCount / total * 100);
-    var chengPct = Math.round(result.hetu.chengCount / total * 100);
+    let shengPct = Math.round(result.hetu.shengCount / total * 100);
+    let chengPct = Math.round(result.hetu.chengCount / total * 100);
     if (shengPct > chengPct) conclusions.push('生数占比' + shengPct + '%，先天之数偏旺，主天赋禀赋佳，适合开创性事业。');
     else if (chengPct > shengPct) conclusions.push('成数占比' + chengPct + '%，后天之数偏旺，主后天努力得力，靠勤奋获成功。');
     else conclusions.push('生数与成数均衡，先天后天兼备，稳步发展之象。');
   }
   if (result.luoshu.prosperousStar) {
-    var ps2 = result.luoshu.prosperousStar;
+    let ps2 = result.luoshu.prosperousStar;
     if (ps2.luck.indexOf('吉') >= 0) conclusions.push('当旺九星为' + ps2.name + '（' + ps2.domain + '），' + ps2.whenProsperous + '。');
     else conclusions.push('当旺九星为' + ps2.name + '（' + ps2.domain + '），需注意：' + ps2.whenDecline + '。');
   }
-  var wxSorted = Object.keys(result.hetu.wuxingCount).sort(function(a,b){return result.hetu.wuxingCount[b]-result.hetu.wuxingCount[a];});
+  let wxSorted = Object.keys(result.hetu.wuxingCount).sort(function(a,b){return result.hetu.wuxingCount[b]-result.hetu.wuxingCount[a];});
   if (wxSorted[0] && result.hetu.wuxingCount[wxSorted[0]] > 0) {
-    var wxDesc = {水:'智慧灵动但多变',火:'热情积极但易躁',木:'仁慈生发但易优柔',金:'刚毅果断但易固执',土:'厚重包容但易保守'};
+    const wxDesc = {水:'智慧灵动但多变',火:'热情积极但易躁',木:'仁慈生发但易优柔',金:'刚毅果断但易固执',土:'厚重包容但易保守'};
     conclusions.push('五行偏向「' + wxSorted[0] + '」，' + (wxDesc[wxSorted[0]]||'') + '。');
   }
   result.conclusion = conclusions.join(' ');
   // 化解与催旺
-  var advices = [];
+  const advices = [];
   if (juDetail) advices.push('基于' + juName + '特质，' + juDetail.applies + '。');
   for (var ui = 0; ui < result.luoshu.unluckyStars.length; ui++) {
-    var us = result.luoshu.unluckyStars[ui];
+    let us = result.luoshu.unluckyStars[ui];
     if (us.star.resolveMethod) {
       result.resolveMethods.push({star: us.star.name, palace: us.palace, method: us.star.resolveMethod, domain: us.star.domain});
       advices.push(us.star.name + '（' + us.star.domain + '）化解：' + us.star.resolveMethod + '。');
     }
   }
   for (var li = 0; li < result.luoshu.luckyStars.length; li++) {
-    var ls = result.luoshu.luckyStars[li];
+    let ls = result.luoshu.luckyStars[li];
     if (ls.star.enhanceMethod) result.enhanceMethods.push({star: ls.star.name, palace: ls.palace, method: ls.star.enhanceMethod, domain: ls.star.domain});
   }
   result.advice = advices.join(' ');
@@ -256,26 +256,26 @@ function analyzeByHetuLuoshu(input, type) {
 }
 
 function getHetuDailyData(year, month, day) {
-  var stems = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-  var branches = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-  var dayStemIdx = 0, dayBranchIdx = 0;
+  const stems = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  const branches = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  let dayStemIdx = 0, dayBranchIdx = 0;
   try { dayStemIdx = getDayStemIndex(year, month, day); } catch(e) {}
   try { dayBranchIdx = getDayBranchIndex(year, month, day); } catch(e) {}
-  var dayStem = stems[dayStemIdx];
-  var dayBranch = branches[dayBranchIdx];
-  var stemWuxing = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
-  var hetuShengMap = {木:3,火:2,土:5,金:4,水:1};
-  var hetuChengMap = {木:8,火:7,土:10,金:9,水:6};
-  var stemEle = stemWuxing[dayStem];
-  var hetuSheng = hetuShengMap[stemEle];
-  var hetuCheng = hetuChengMap[stemEle];
-  var zhiToPalace = {子:1,丑:8,寅:8,卯:3,辰:4,巳:4,午:9,未:2,申:2,酉:7,戌:6,亥:6};
-  var luoshuPalace = zhiToPalace[dayBranch] || 5;
-  var palaceInfo = HETU_LUOSHU_SYSTEM.luoshu.palace[luoshuPalace];
-  var flyStars = _hlFlyStars(year);
-  var todayStarNum = flyStars[luoshuPalace];
-  var todayStarInfo = HETU_LUOSHU_SYSTEM.luoshu.nineStars[todayStarNum];
-  var yiList = [], jiList = [];
+  let dayStem = stems[dayStemIdx];
+  let dayBranch = branches[dayBranchIdx];
+  const stemWuxing = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
+  const hetuShengMap = {木:3,火:2,土:5,金:4,水:1};
+  const hetuChengMap = {木:8,火:7,土:10,金:9,水:6};
+  let stemEle = stemWuxing[dayStem];
+  let hetuSheng = hetuShengMap[stemEle];
+  let hetuCheng = hetuChengMap[stemEle];
+  const zhiToPalace = {子:1,丑:8,寅:8,卯:3,辰:4,巳:4,午:9,未:2,申:2,酉:7,戌:6,亥:6};
+  let luoshuPalace = zhiToPalace[dayBranch] || 5;
+  let palaceInfo = HETU_LUOSHU_SYSTEM.luoshu.palace[luoshuPalace];
+  let flyStars = _hlFlyStars(year);
+  let todayStarNum = flyStars[luoshuPalace];
+  let todayStarInfo = HETU_LUOSHU_SYSTEM.luoshu.nineStars[todayStarNum];
+  const yiList = [], jiList = [];
   if (stemEle === '水') { yiList.push('学习','规划','沟通'); jiList.push('冲动决策'); }
   else if (stemEle === '火') { yiList.push('创新','表达','社交'); jiList.push('暴躁','争执'); }
   else if (stemEle === '木') { yiList.push('种植','教育','慈善'); jiList.push('过度消耗'); }
@@ -296,13 +296,13 @@ function getHetuDailyData(year, month, day) {
 }
 
 function renderHetuLuoshuDaily() {
-  var now = new Date();
-  var Y = now.getFullYear(), M = now.getMonth() + 1, D = now.getDate();
-  var data = getHetuDailyData(Y, M, D);
-  var el = document.getElementById('almanacHetuLuoshu');
+  let now = new Date();
+  let Y = now.getFullYear(), M = now.getMonth() + 1, D = now.getDate();
+  let data = getHetuDailyData(Y, M, D);
+  let el = document.getElementById('almanacHetuLuoshu');
   if (!el) return;
-  var accessPct = _hlGetAccessPercent();
-  var html = '';
+  let accessPct = _hlGetAccessPercent();
+  const html = '';
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">';
   html += '<div style="background:rgba(52,152,219,0.06);border:1px solid rgba(52,152,219,0.15);border-radius:8px;padding:12px;text-align:center">';
   html += '<div style="font-size:11px;color:var(--paper2);margin-bottom:6px">🌀 今日河图数</div>';
@@ -316,7 +316,7 @@ function renderHetuLuoshuDaily() {
   html += '<div style="font-size:10px;opacity:.5;margin-top:2px">' + (data.palaceInfo ? data.palaceInfo.direction + ' · ' + data.palaceInfo.element : '') + '</div>';
   html += '</div></div>';
   if (data.todayStarInfo) {
-    var s = data.todayStarInfo;
+    let s = data.todayStarInfo;
     html += '<div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:12px;margin-bottom:12px">';
     html += '<div style="font-size:11px;color:var(--paper2);margin-bottom:6px">⭐ 今日当值九星</div>';
     html += '<div style="font-size:14px;color:' + (s.color||'var(--gold)') + ';font-weight:bold">' + s.name + '</div>';
@@ -338,12 +338,12 @@ function renderHetuLuoshuDaily() {
     html += '<div style="background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.1);border-radius:8px;padding:12px;margin-bottom:12px">';
     html += '<div style="font-size:11px;color:var(--gold);margin-bottom:8px;text-align:center">🔮 今日九宫飞星图</div>';
     html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;max-width:280px;margin:0 auto">';
-    var gridOrder = [4,9,2,3,5,7,8,1,6];
+    const gridOrder = [4,9,2,3,5,7,8,1,6];
     for (var gi = 0; gi < 9; gi++) {
-      var palaceNum = gridOrder[gi];
-      var starAtPalace = data.flyStars[palaceNum];
-      var starData = HETU_LUOSHU_SYSTEM.luoshu.nineStars[starAtPalace];
-      var isToday = palaceNum === data.luoshuPalace;
+      let palaceNum = gridOrder[gi];
+      let starAtPalace = data.flyStars[palaceNum];
+      let starData = HETU_LUOSHU_SYSTEM.luoshu.nineStars[starAtPalace];
+      let isToday = palaceNum === data.luoshuPalace;
       html += '<div style="background:' + (isToday?'rgba(201,168,76,0.2)':'rgba(255,255,255,0.03)') + ';border:1px solid ' + (isToday?'var(--gold)':'rgba(201,168,76,0.1)') + ';border-radius:6px;padding:6px;text-align:center">';
       html += '<div style="font-size:9px;opacity:.5">' + palaceNum + '宫</div>';
       if (starData) { html += '<div style="font-size:11px;color:' + (starData.color||'var(--gold)') + ';font-weight:bold">' + starData.name.substring(0,3) + '</div>'; html += '<div style="font-size:8px;opacity:.5">' + starData.luck + '</div>'; }

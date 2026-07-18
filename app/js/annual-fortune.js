@@ -8,11 +8,11 @@
   //  常量定义
   // ══════════════════════════════════════════════════════════════
 
-  var STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-  var BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-  var ZODIACS = ['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
-  var ELE = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
-  var ZHI_ELE = {子:'水',丑:'土',寅:'木',卯:'木',辰:'土',巳:'火',午:'火',未:'土',申:'金',酉:'金',戌:'土',亥:'水'};
+  const STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  const BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  const ZODIACS = ['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
+  const ELE = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
+  const ZHI_ELE = {子:'水',丑:'土',寅:'木',卯:'木',辰:'土',巳:'火',午:'火',未:'土',申:'金',酉:'金',戌:'土',亥:'水'};
 
   // 太岁地支方位
   var BRANCH_DIRECTIONS = {
@@ -47,7 +47,7 @@
 
   // 相冲: 差6
   // 相害: 子未、丑午、寅巳、卯辰、申亥、酉戌
-  var HAI_PAIRS = [[0,7],[7,0],[1,6],[6,1],[2,5],[5,2],[3,4],[4,3],[8,11],[11,8],[9,10],[10,9]];
+  const HAI_PAIRS = [[0,7],[7,0],[1,6],[6,1],[2,5],[5,2],[3,4],[4,3],[8,11],[11,8],[9,10],[10,9]];
 
   // 相刑: 寅巳申(无恩之刑)、丑戌未(恃势之刑)、子卯(无礼之刑)、辰辰(自刑)、午午(自刑)、酉酉(自刑)、亥亥(自刑)
   var XING_GROUPS = [
@@ -61,10 +61,10 @@
   ];
 
   // 相破: 子酉、丑辰、寅亥、卯午、巳申、未戌
-  var PO_PAIRS = [[0,9],[9,0],[1,4],[4,1],[2,11],[11,2],[3,6],[6,3],[5,8],[8,5],[7,10],[10,7]];
+  const PO_PAIRS = [[0,9],[9,0],[1,4],[4,1],[2,11],[11,2],[3,6],[6,3],[5,8],[8,5],[7,10],[10,7]];
 
   // 十神名(本地副本,避免依赖外部)
-  var TEN_GOD_NAMES = {比:'比肩',劫:'劫财',食:'食神',伤:'伤官',财:'正财',才:'偏财',官:'正官',杀:'七杀',印:'正印',枭:'偏印'};
+  const TEN_GOD_NAMES = {比:'比肩',劫:'劫财',食:'食神',伤:'伤官',财:'正财',才:'偏财',官:'正官',杀:'七杀',印:'正印',枭:'偏印'};
 
   // 天干十神表(本地副本)
   var TENGAN_LOCAL = {
@@ -85,8 +85,8 @@
     '甲':'亥','丙':'寅','戊':'寅','庚':'巳','壬':'申',
     '乙':'午','丁':'酉','己':'酉','辛':'子','癸':'卯'
   };
-  var CS_ORDER = ['长生','沐浴','冠带','临官','帝旺','衰','病','死','墓','绝','胎','养'];
-  var GAN_YINYANG = {'甲':'阳','乙':'阴','丙':'阳','丁':'阴','戊':'阳','己':'阴','庚':'阳','辛':'阴','壬':'阳','癸':'阴'};
+  const CS_ORDER = ['长生','沐浴','冠带','临官','帝旺','衰','病','死','墓','绝','胎','养'];
+  const GAN_YINYANG = {'甲':'阳','乙':'阴','丙':'阳','丁':'阴','戊':'阳','己':'阴','庚':'阳','辛':'阴','壬':'阳','癸':'阴'};
 
   // 藏干表
   var ZHI_CANGGAN_LOCAL = {
@@ -185,7 +185,7 @@
 
   // 获取十神
   function getTenGodLocal(yearStem, dayStem) {
-    var map = TENGAN_LOCAL[dayStem];
+    let map = TENGAN_LOCAL[dayStem];
     if (!map) return '';
     for (var rel in map) {
       if (map[rel] === yearStem) return TEN_GOD_NAMES[rel] || rel;
@@ -195,11 +195,11 @@
 
   // 获取地支十神
   function getBranchTenGod(yearBranch, dayStem) {
-    var canggan = ZHI_CANGGAN_LOCAL[yearBranch] || [];
+    let canggan = ZHI_CANGGAN_LOCAL[yearBranch] || [];
     if (canggan.length === 0) return '';
-    var map = TENGAN_LOCAL[dayStem];
+    let map = TENGAN_LOCAL[dayStem];
     if (!map) return '';
-    var benQi = canggan[0];
+    let benQi = canggan[0];
     for (var rel in map) {
       if (map[rel] === benQi) return TEN_GOD_NAMES[rel] || rel;
     }
@@ -208,12 +208,12 @@
 
   // 长生十二宫
   function getDishiLocal(gan, zhi) {
-    var start = CHANGSHENG_START_LOCAL[gan];
+    let start = CHANGSHENG_START_LOCAL[gan];
     if (!start) return '';
-    var forward = (GAN_YINYANG[gan] === '阳');
-    var si = BRANCHES.indexOf(start);
-    var zi = BRANCHES.indexOf(zhi);
-    var step = forward ? ((zi - si + 12) % 12) : ((si - zi + 12) % 12);
+    let forward = (GAN_YINYANG[gan] === '阳');
+    let si = BRANCHES.indexOf(start);
+    let zi = BRANCHES.indexOf(zhi);
+    let step = forward ? ((zi - si + 12) % 12) : ((si - zi + 12) % 12);
     return CS_ORDER[step];
   }
 
@@ -221,22 +221,22 @@
   function getJieDateSafe(year, jieName) {
     try {
       if (typeof getJieDate === 'function') {
-        var d = getJieDate(year, jieName);
+        let d = getJieDate(year, jieName);
         if (d) return d;
       }
     } catch(e) {}
-    var approx = JIEQI_APPROX[jieName];
+    let approx = JIEQI_APPROX[jieName];
     if (!approx) return null;
     return new Date(year, approx[0] - 1, approx[1]);
   }
 
   // 获取农历正月初一
   function getLunarNewYear(year) {
-    var data = LUNAR_NEW_YEAR[year];
+    let data = LUNAR_NEW_YEAR[year];
     if (data) return new Date(year, data[0] - 1, data[1]);
     // 近似: 1月21日到2月21日之间,用公式估算
     var offset = ((year - 4) % 19 + 19) % 19; // 默冬周期近似
-    var day = 21 + Math.round(offset * 0.53);
+    let day = 21 + Math.round(offset * 0.53);
     return new Date(year, 0, day > 31 ? day - 31 : day);
   }
 
@@ -262,9 +262,9 @@
 
   function getTaisuiInfo(birthBranchIdx, yearBranchIdx) {
     try {
-      var diff = (birthBranchIdx - yearBranchIdx + 12) % 12;
-      var relations = [];
-      var solutions = [];
+      let diff = (birthBranchIdx - yearBranchIdx + 12) % 12;
+      const relations = [];
+      const solutions = [];
 
       // 值太岁
       if (birthBranchIdx === yearBranchIdx) {
@@ -300,7 +300,7 @@
 
       // 刑太岁
       for (var g = 0; g < XING_GROUPS.length; g++) {
-        var group = XING_GROUPS[g];
+        let group = XING_GROUPS[g];
         if (group.indexOf(birthBranchIdx) >= 0 && group.indexOf(yearBranchIdx) >= 0 && birthBranchIdx !== yearBranchIdx) {
           relations.push('刑太岁');
           solutions.push('修身养性，遵纪守法');
@@ -338,9 +338,9 @@
         solutions.push('保持善念，岁岁平安');
       }
 
-      var taisuiDirection = BRANCH_DIRECTIONS[yearBranchIdx];
-      var taisuiZodiac = getZodiacByBranchIdx(yearBranchIdx);
-      var birthZodiac = getZodiacByBranchIdx(birthBranchIdx);
+      let taisuiDirection = BRANCH_DIRECTIONS[yearBranchIdx];
+      let taisuiZodiac = getZodiacByBranchIdx(yearBranchIdx);
+      let birthZodiac = getZodiacByBranchIdx(birthBranchIdx);
 
       return {
         birthBranchIdx: birthBranchIdx,
@@ -363,7 +363,7 @@
 
   function getAuspiciousDirections(yearStemIdx) {
     try {
-      var dirs = YEAR_STEM_DIRECTIONS[yearStemIdx];
+      let dirs = YEAR_STEM_DIRECTIONS[yearStemIdx];
       if (!dirs) return {error: '无法获取吉位'};
       return {
         caiShen: dirs.cai,
@@ -382,8 +382,8 @@
 
   function getWorshipDates(targetYear) {
     try {
-      var dates = [];
-      var lichun = getJieDateSafe(targetYear, '立春');
+      const dates = [];
+      let lichun = getJieDateSafe(targetYear, '立春');
       if (lichun) {
         dates.push({
           name: '立春',
@@ -393,7 +393,7 @@
         });
       }
 
-      var newYear = getLunarNewYear(targetYear);
+      let newYear = getLunarNewYear(targetYear);
       dates.push({
         name: '正月初一(春节)',
         date: newYear,
@@ -402,7 +402,7 @@
       });
 
       // 初五迎财神
-      var day5 = new Date(newYear.getTime() + 4 * 86400000);
+      let day5 = new Date(newYear.getTime() + 4 * 86400000);
       dates.push({
         name: '正月初五(迎财神)',
         date: day5,
@@ -411,7 +411,7 @@
       });
 
       // 初九拜天公
-      var day9 = new Date(newYear.getTime() + 8 * 86400000);
+      let day9 = new Date(newYear.getTime() + 8 * 86400000);
       dates.push({
         name: '正月初九(拜天公)',
         date: day9,
@@ -420,7 +420,7 @@
       });
 
       // 十五元宵
-      var day15 = new Date(newYear.getTime() + 14 * 86400000);
+      let day15 = new Date(newYear.getTime() + 14 * 86400000);
       dates.push({
         name: '正月十五(元宵节)',
         date: day15,
@@ -440,8 +440,8 @@
       });
 
       // 腊月二十三(祭灶)
-      var nextYearLunar = getLunarNewYear(targetYear + 1);
-      var jiZao = new Date(nextYearLunar.getTime() - 7 * 86400000);
+      let nextYearLunar = getLunarNewYear(targetYear + 1);
+      let jiZao = new Date(nextYearLunar.getTime() - 7 * 86400000);
       dates.push({
         name: '腊月二十三(祭灶)',
         date: jiZao,
@@ -450,7 +450,7 @@
       });
 
       // 除夕
-      var chuXi = new Date(nextYearLunar.getTime() - 1 * 86400000);
+      let chuXi = new Date(nextYearLunar.getTime() - 1 * 86400000);
       dates.push({
         name: '除夕(大年三十)',
         date: chuXi,
@@ -470,14 +470,14 @@
 
   function isYearTransitionPeriod() {
     try {
-      var now = new Date();
-      var year = now.getFullYear();
-      var lichun = getJieDateSafe(year, '立春');
+      let now = new Date();
+      let year = now.getFullYear();
+      let lichun = getJieDateSafe(year, '立春');
       if (!lichun) return false;
 
       // 腊月(农历十二月)开始到立春前
       // 近似: 立春前45天到立春日
-      var startDate = new Date(lichun.getTime() - 45 * 86400000);
+      let startDate = new Date(lichun.getTime() - 45 * 86400000);
       return now >= startDate && now < lichun;
     } catch(e) {
       return false;
@@ -502,7 +502,7 @@
   }
 
   function tag(text, color) {
-    var bg = color || 'rgba(201,168,76,.15)';
+    let bg = color || 'rgba(201,168,76,.15)';
     return '<span style="display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;background:' + bg + ';color:var(--gold);margin:2px 4px 2px 0">' + text + '</span>';
   }
 
@@ -513,10 +513,10 @@
   function generateWorshipGuide(birthInfo, targetYear) {
     try {
       targetYear = targetYear || new Date().getFullYear();
-      var yearStemIdx = getYearStemIdx(targetYear);
-      var yearBranchIdx = getYearBranchIdx(targetYear);
-      var yearGanZhi = getYearGanZhi(targetYear);
-      var html = '';
+      let yearStemIdx = getYearStemIdx(targetYear);
+      let yearBranchIdx = getYearBranchIdx(targetYear);
+      let yearGanZhi = getYearGanZhi(targetYear);
+      const html = '';
 
       // 标题
       html += '<div style="text-align:center;margin-bottom:20px">' +
@@ -525,12 +525,12 @@
         '</div>';
 
       // 1. 太岁方位与化解
-      var tsInfo = getTaisuiInfo(birthInfo.stemIdx !== undefined ? birthInfo.stemIdx : 0, yearBranchIdx);
+      let tsInfo = getTaisuiInfo(birthInfo.stemIdx !== undefined ? birthInfo.stemIdx : 0, yearBranchIdx);
       // birthInfo中的birthBranchIdx
-      var birthBranchIdx = birthInfo.yearBranchIdx !== undefined ? birthInfo.yearBranchIdx : 0;
+      let birthBranchIdx = birthInfo.yearBranchIdx !== undefined ? birthInfo.yearBranchIdx : 0;
       tsInfo = getTaisuiInfo(birthBranchIdx, yearBranchIdx);
 
-      var taisuiContent = '';
+      const taisuiContent = '';
       taisuiContent += infoRow('缘主生肖', getZodiacByBranchIdx(birthBranchIdx));
       taisuiContent += infoRow('当年太岁', tsInfo.taisuiZodiac + '太岁(' + yearGanZhi + '年)');
       taisuiContent += infoRow('太岁方位', tsInfo.taisuiDirection);
@@ -547,8 +547,8 @@
       html += card('🛡️ 太岁方位与化解', taisuiContent);
 
       // 2. 流年吉位
-      var dirs = getAuspiciousDirections(yearStemIdx);
-      var dirContent = '';
+      let dirs = getAuspiciousDirections(yearStemIdx);
+      const dirContent = '';
       if (dirs.error) {
         dirContent = '<div style="color:var(--danger);font-size:13px">' + dirs.error + '</div>';
       } else {
@@ -569,11 +569,11 @@
       html += card('🧭 流年吉位', dirContent);
 
       // 3. 祈福吉日
-      var dates = getWorshipDates(targetYear);
-      var dateContent = '';
+      let dates = getWorshipDates(targetYear);
+      const dateContent = '';
       for (var d = 0; d < dates.length; d++) {
-        var dt = dates[d];
-        var priorityColor = dt.priority === 'high' ? 'var(--cinn2)' : (dt.priority === 'medium' ? 'var(--gold)' : 'var(--danger)');
+        let dt = dates[d];
+        let priorityColor = dt.priority === 'high' ? 'var(--cinn2)' : (dt.priority === 'medium' ? 'var(--gold)' : 'var(--danger)');
         dateContent += '<div style="padding:8px 0;border-bottom:1px solid rgba(201,168,76,.06)">' +
           '<div style="display:flex;align-items:center;gap:8px">' +
           '<span style="font-weight:600;color:' + priorityColor + ';font-size:13px">' + dt.name + '</span>' +
@@ -585,7 +585,7 @@
       html += card('📅 祈福吉日', dateContent);
 
       // 4. 参拜指南
-      var worshipContent = '';
+      const worshipContent = '';
       worshipContent += '<div style="font-size:13px;line-height:2">';
       worshipContent += '<div style="font-weight:600;color:var(--gold);margin-bottom:6px">参拜前准备</div>';
       worshipContent += '1. 沐浴更衣，着整洁衣物，忌穿黑色<br>';
@@ -611,7 +611,7 @@
       html += card('🙏 参拜指南', worshipContent);
 
       // 5. 祈福文书模板
-      var prayerContent = '';
+      const prayerContent = '';
       var prayers = [
         {title: '拜太岁祈福文', text: PRAYER_TEMPLATES.taiSui},
         {title: '迎财神祈福文', text: PRAYER_TEMPLATES.caiShen},
@@ -626,9 +626,9 @@
       html += card('📜 祈福文书模板', prayerContent);
 
       // 6. 化煞物品清单(按生肖和八字用神)
-      var itemContent = '';
-      var birthZodiac = getZodiacByBranchIdx(birthBranchIdx);
-      var xiEle = birthInfo.xiEle || '未知';
+      const itemContent = '';
+      let birthZodiac = getZodiacByBranchIdx(birthBranchIdx);
+      let xiEle = birthInfo.xiEle || '未知';
 
       itemContent += '<div style="margin-bottom:10px">';
       itemContent += '<div style="font-size:13px;margin-bottom:6px">缘主生肖：<strong>' + birthZodiac + '</strong> · 喜用神：<strong>' + xiEle + '</strong></div>';
@@ -650,7 +650,7 @@
         '金': ['白水晶', '铜葫芦', '金银饰品', '金属风铃', '铜钱'],
         '水': ['黑曜石', '蓝水晶', '海蓝宝', '蓝色黑曜石', '水晶球']
       };
-      var items = eleItems[xiEle] || [];
+      let items = eleItems[xiEle] || [];
       if (items.length > 0) {
         itemContent += '<div style="padding:8px;background:rgba(46,204,113,.05);border-radius:8px;margin-bottom:8px">';
         itemContent += '<div style="font-size:12px;font-weight:600;color:var(--jade)">🌿 喜用神(' + xiEle + ')补益物品</div>';
@@ -679,13 +679,13 @@
   function generateYearlyGuidance(birthInfo, targetYear) {
     try {
       targetYear = targetYear || new Date().getFullYear();
-      var yearStemIdx = getYearStemIdx(targetYear);
-      var yearBranchIdx = getYearBranchIdx(targetYear);
-      var yearStem = STEMS[yearStemIdx];
-      var yearBranch = BRANCHES[yearBranchIdx];
-      var yearGanZhi = yearStem + yearBranch;
-      var dayStem = STEMS[birthInfo.stemIdx] || STEMS[0];
-      var html = '';
+      let yearStemIdx = getYearStemIdx(targetYear);
+      let yearBranchIdx = getYearBranchIdx(targetYear);
+      let yearStem = STEMS[yearStemIdx];
+      let yearBranch = BRANCHES[yearBranchIdx];
+      let yearGanZhi = yearStem + yearBranch;
+      let dayStem = STEMS[birthInfo.stemIdx] || STEMS[0];
+      const html = '';
 
       // 标题
       html += '<div style="text-align:center;margin-bottom:20px">' +
@@ -694,12 +694,12 @@
         '</div>';
 
       // 1. 流年总运
-      var ganShen = getTenGodLocal(yearStem, dayStem);
-      var zhiShen = getBranchTenGod(yearBranch, dayStem);
-      var dishi = getDishiLocal(dayStem, yearBranch);
-      var yearEle = ELE[yearStem];
-      var yearZhiEle = ZHI_ELE[yearBranch];
-      var dayEle = ELE[dayStem];
+      let ganShen = getTenGodLocal(yearStem, dayStem);
+      let zhiShen = getBranchTenGod(yearBranch, dayStem);
+      let dishi = getDishiLocal(dayStem, yearBranch);
+      let yearEle = ELE[yearStem];
+      let yearZhiEle = ZHI_ELE[yearBranch];
+      let dayEle = ELE[dayStem];
 
       // 五行生克关系
       var relMap = {
@@ -709,10 +709,10 @@
         '金': {土:'生我(印星)',水:'我生(食伤)',火:'克我(官杀)',金:'同我(比劫)',木:'我克(财星)'},
         '水': {金:'生我(印星)',木:'我生(食伤)',土:'克我(官杀)',水:'同我(比劫)',火:'我克(财星)'}
       };
-      var ganRel = (relMap[dayEle] && relMap[dayEle][yearEle]) || '';
-      var zhiRel = (relMap[dayEle] && relMap[dayEle][yearZhiEle]) || '';
+      let ganRel = (relMap[dayEle] && relMap[dayEle][yearEle]) || '';
+      let zhiRel = (relMap[dayEle] && relMap[dayEle][yearZhiEle]) || '';
 
-      var totalContent = '';
+      const totalContent = '';
       totalContent += infoRow('流年干支', yearGanZhi);
       totalContent += infoRow('流年天干', yearStem + '(' + yearEle + ') · ' + ganShen + ' · ' + ganRel);
       totalContent += infoRow('流年地支', yearBranch + '(' + yearZhiEle + ') · ' + zhiShen + ' · ' + zhiRel);
@@ -720,8 +720,8 @@
       totalContent += infoRow('太岁关系', getTaisuiInfo(birthInfo.yearBranchIdx || 0, yearBranchIdx).relations.join('、'));
 
       // 总运评语
-      var overall = '';
-      var xiEle = birthInfo.xiEle || '';
+      const overall = '';
+      let xiEle = birthInfo.xiEle || '';
       if (yearEle === xiEle || yearZhiEle === xiEle) {
         overall = '流年五行与喜用神相合，今年为顺遂之年，宜把握机遇、主动出击。';
       } else if (yearEle === birthInfo.jiEle || yearZhiEle === birthInfo.jiEle) {
@@ -734,19 +734,19 @@
       html += card('🌟 流年总运', totalContent);
 
       // 2. 十二生肖运势（结合用户日主十神个性化）
-      var zodiacContent = '';
+      const zodiacContent = '';
       // 用户出生地支索引
-      var userBranchIdx = birthInfo.yearBranchIdx || 0;
-      var userZodiacLabel = ZODIACS[userBranchIdx];
+      let userBranchIdx = birthInfo.yearBranchIdx || 0;
+      let userZodiacLabel = ZODIACS[userBranchIdx];
       // 标注用户生肖
       for (var z = 0; z < 12; z++) {
-        var tsInfo = getTaisuiInfo(z, yearBranchIdx);
-        var fortune = ZODIAC_YEAR_FORTUNE[z] || {keyword:'', desc:''};
+        let tsInfo = getTaisuiInfo(z, yearBranchIdx);
+        let fortune = ZODIAC_YEAR_FORTUNE[z] || {keyword:'', desc:''};
         // 依日主与该生肖地支的十神关系个性化补充
-        var zBranch = BRANCHES[z];
-        var zEle = ZHI_ELE[zBranch];
-        var zShen = getBranchTenGod(zBranch, dayStem);
-        var personalized = fortune.desc;
+        let zBranch = BRANCHES[z];
+        let zEle = ZHI_ELE[zBranch];
+        let zShen = getBranchTenGod(zBranch, dayStem);
+        let personalized = fortune.desc;
         if (z === userBranchIdx) {
           personalized += ' （此为您的生肖，' + (tsInfo.hasOffense ? '今年犯太岁需特别注意' : '今年太岁关系平稳') + '）';
         }
@@ -758,9 +758,9 @@
           else if (zShen === '比肩' || zShen === '劫财') personalized += '利合作但防破财；';
           else if (zShen === '食神' || zShen === '伤官') personalized += '利创作表现；';
         }
-        var zodiacColor = tsInfo.hasOffense ? 'var(--cinn2)' : 'var(--gold)';
-        var bg = tsInfo.hasOffense ? 'rgba(231,76,60,.04)' : 'rgba(201,168,76,.04)';
-        var isUser = (z === userBranchIdx);
+        let zodiacColor = tsInfo.hasOffense ? 'var(--cinn2)' : 'var(--gold)';
+        let bg = tsInfo.hasOffense ? 'rgba(231,76,60,.04)' : 'rgba(201,168,76,.04)';
+        let isUser = (z === userBranchIdx);
 
         zodiacContent += '<div style="padding:8px;margin-bottom:6px;background:' + bg + ';border-radius:8px;border-left:3px solid ' + zodiacColor + (isUser ? ';box-shadow:0 0 0 2px var(--gold) inset' : '') + '">';
         zodiacContent += '<div style="display:flex;justify-content:space-between;align-items:center">';
@@ -773,23 +773,23 @@
       html += card('🐃 十二生肖运势', zodiacContent);
 
       // 3. 逐月运势
-      var monthContent = '';
+      const monthContent = '';
       var monthBranches = ['寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑']; // 正月到十二月
-      var monthNames = ['正月(寅)', '二月(卯)', '三月(辰)', '四月(巳)', '五月(午)', '六月(未)', '七月(申)', '八月(酉)', '九月(戌)', '十月(亥)', '冬月(子)', '腊月(丑)'];
+      const monthNames = ['正月(寅)', '二月(卯)', '三月(辰)', '四月(巳)', '五月(午)', '六月(未)', '七月(申)', '八月(酉)', '九月(戌)', '十月(亥)', '冬月(子)', '腊月(丑)'];
 
       for (var m = 0; m < 12; m++) {
-        var mBranch = monthBranches[m];
-        var mZhiEle = ZHI_ELE[mBranch];
-        var mShen = getBranchTenGod(mBranch, dayStem);
-        var mDishi = getDishiLocal(dayStem, mBranch);
+        let mBranch = monthBranches[m];
+        let mZhiEle = ZHI_ELE[mBranch];
+        let mShen = getBranchTenGod(mBranch, dayStem);
+        let mDishi = getDishiLocal(dayStem, mBranch);
 
         // 判断是否冲太岁月或犯太岁月
-        var mBranchIdx = BRANCHES.indexOf(mBranch);
-        var isChong = (Math.abs(mBranchIdx - yearBranchIdx) === 6);
-        var isZhi = (mBranchIdx === yearBranchIdx);
+        let mBranchIdx = BRANCHES.indexOf(mBranch);
+        let isChong = (Math.abs(mBranchIdx - yearBranchIdx) === 6);
+        let isZhi = (mBranchIdx === yearBranchIdx);
 
-        var alertTag = '';
-        var alertBg = '';
+        const alertTag = '';
+        const alertBg = '';
         if (isChong) {
           alertTag = tag('⚠️ 冲太岁月', 'rgba(231,76,60,.15)');
           alertBg = 'rgba(231,76,60,.04)';
@@ -802,8 +802,8 @@
         }
 
         // 月运建议
-        var monthAdvice = '';
-        var mRel = (relMap[dayEle] && relMap[dayEle][mZhiEle]) || '';
+        const monthAdvice = '';
+        let mRel = (relMap[dayEle] && relMap[dayEle][mZhiEle]) || '';
         if (mZhiEle === xiEle) {
           monthAdvice = '此月五行' + mZhiEle + '与喜用神相合，运势较好，宜进取。';
         } else if (mZhiEle === (birthInfo.jiEle || '')) {
@@ -826,15 +826,15 @@
       html += card('📆 逐月运势', monthContent);
 
       // 4. 财神方位(按月)
-      var caiContent = '';
+      const caiContent = '';
       // 月干推算: 年干×2+月支序号(寅=1)
       for (var cm = 0; cm < 12; cm++) {
-        var cmBranch = monthBranches[cm];
-        var cmBranchIdx = BRANCHES.indexOf(cmBranch);
+        let cmBranch = monthBranches[cm];
+        let cmBranchIdx = BRANCHES.indexOf(cmBranch);
         // 月干: (年干Index*2 + cmBranchIdx) % 10, 但寅月=1月
         // 正确: (yearStemIdx*2 + cmBranchIdx + 2) % 10
-        var cmStemIdx = (yearStemIdx * 2 + cmBranchIdx + 2) % 10;
-        var cmDirs = YEAR_STEM_DIRECTIONS[cmStemIdx] || {};
+        let cmStemIdx = (yearStemIdx * 2 + cmBranchIdx + 2) % 10;
+        let cmDirs = YEAR_STEM_DIRECTIONS[cmStemIdx] || {};
         caiContent += '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(201,168,76,.06);font-size:12px">' +
           '<span>' + monthNames[cm] + '</span>' +
           '<span style="opacity:.6">' + STEMS[cmStemIdx] + cmBranch + '月 · 财神位：' + (cmDirs.cai || '—') + '</span>' +
@@ -843,30 +843,30 @@
       html += card('💰 逐月财神方位', caiContent);
 
       // 5. 重点月份预警
-      var alertContent = '';
-      var hasAlert = false;
+      const alertContent = '';
+      const hasAlert = false;
 
       for (var am = 0; am < 12; am++) {
-        var aBranchIdx = BRANCHES.indexOf(monthBranches[am]);
-        var aIsChong = (Math.abs(aBranchIdx - yearBranchIdx) === 6);
-        var aIsZhi = (aBranchIdx === yearBranchIdx);
+        let aBranchIdx = BRANCHES.indexOf(monthBranches[am]);
+        let aIsChong = (Math.abs(aBranchIdx - yearBranchIdx) === 6);
+        let aIsZhi = (aBranchIdx === yearBranchIdx);
 
         // 害月
-        var aIsHai = false;
+        const aIsHai = false;
         for (var ah = 0; ah < HAI_PAIRS.length; ah++) {
           if (HAI_PAIRS[ah][0] === aBranchIdx && HAI_PAIRS[ah][1] === yearBranchIdx) { aIsHai = true; break; }
         }
 
         // 刑月
-        var aIsXing = false;
+        const aIsXing = false;
         for (var ax = 0; ax < XING_GROUPS.length; ax++) {
-          var ag = XING_GROUPS[ax];
+          let ag = XING_GROUPS[ax];
           if (ag.indexOf(aBranchIdx) >= 0 && ag.indexOf(yearBranchIdx) >= 0 && aBranchIdx !== yearBranchIdx) { aIsXing = true; break; }
         }
 
         if (aIsChong || aIsZhi || aIsHai || aIsXing) {
           hasAlert = true;
-          var alerts = [];
+          const alerts = [];
           if (aIsZhi) alerts.push('值太岁月');
           if (aIsChong) alerts.push('冲太岁月');
           if (aIsHai) alerts.push('害太岁月');
@@ -901,8 +901,8 @@
   function generateAnnualReport(birthInfo, targetYear) {
     try {
       targetYear = targetYear || new Date().getFullYear();
-      var html = '';
-      var isTransition = isYearTransitionPeriod();
+      const html = '';
+      let isTransition = isYearTransitionPeriod();
 
       // 报告标题
       html += '<div style="text-align:center;margin-bottom:24px;padding:20px;background:rgba(201,168,76,.04);border-radius:16px">' +

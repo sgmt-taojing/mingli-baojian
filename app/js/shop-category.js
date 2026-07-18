@@ -6,7 +6,7 @@ function showShopCategory(name, btn) {
   
   // 切换面板显示
   document.querySelectorAll('.shop-panel').forEach(p => p.style.display = 'none');
-  var panel = document.getElementById('shopPanel-' + name);
+  let panel = document.getElementById('shopPanel-' + name);
   if (panel) panel.style.display = 'block';
   
   // 懒加载数据
@@ -21,11 +21,11 @@ function showShopCategory(name, btn) {
 
 // ===== 渲染道医产品 =====
 function renderDaoyiProducts() {
-  var grid = document.getElementById('daoyi-grid');
+  let grid = document.getElementById('daoyi-grid');
   if (!grid || typeof DAO_MEDICINE === 'undefined') return;
   
   DAO_MEDICINE.forEach(function(item) {
-    var card = document.createElement('div');
+    let card = document.createElement('div');
     card.className = 'medicine-card';
     card.style.cssText = 'background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.2);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .3s';
     card.onmouseover = function() { this.style.borderColor='rgba(201,168,76,0.5)';this.style.transform='translateY(-4px)' };
@@ -52,18 +52,18 @@ function renderDaoyiProducts() {
 
 // ===== 渲染佛医产品 =====
 function renderFoyiProducts() {
-  var grid = document.getElementById('foyi-grid');
+  let grid = document.getElementById('foyi-grid');
   if (!grid || typeof FO_MEDICINE === 'undefined') return;
   
   FO_MEDICINE.forEach(function(item) {
-    var card = document.createElement('div');
+    let card = document.createElement('div');
     card.className = 'medicine-card';
     card.style.cssText = 'background:rgba(255,255,255,0.03);border:1px solid rgba(147,112,219,0.2);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .3s';
     card.onmouseover = function() { this.style.borderColor='rgba(147,112,219,0.5)';this.style.transform='translateY(-4px)' };
     card.onmouseout = function() { this.style.borderColor='rgba(147,112,219,0.2)';this.style.transform='translateY(0)' };
     card.onclick = function() { showMedicineDetail(item) };
     
-    var blessingBadge = item.blessing ? '<span style="font-size:10px;background:rgba(147,112,219,0.2);color:#9370DB;padding:2px 6px;border-radius:8px;margin-top:8px;display:inline-block">✨ 已加持</span>' : '';
+    let blessingBadge = item.blessing ? '<span style="font-size:10px;background:rgba(147,112,219,0.2);color:#9370DB;padding:2px 6px;border-radius:8px;margin-top:8px;display:inline-block">✨ 已加持</span>' : '';
     
     card.innerHTML = 
       '<div style="height:100px;background:linear-gradient(135deg,rgba(147,112,219,0.12),rgba(147,112,219,0.03));display:flex;align-items:center;justify-content:center;font-size:48px">' + item.image + '</div>' +
@@ -86,15 +86,15 @@ function renderFoyiProducts() {
 
 // ===== 渲染名医推荐 =====
 function renderMasters() {
-  var grid = document.getElementById('masters-grid');
+  let grid = document.getElementById('masters-grid');
   if (!grid || typeof MASTERS_LIST === 'undefined') return;
   
   MASTERS_LIST.forEach(function(m) {
-    var card = document.createElement('div');
+    let card = document.createElement('div');
     card.className = 'master-card';
     
-    var schoolColor = m.school === '道医' ? 'var(--gold)' : (m.school === '佛医' ? '#9370DB' : 'var(--cyan)');
-    var schoolBg = m.school === '道医' ? 'rgba(201,168,76,0.1)' : (m.school === '佛医' ? 'rgba(147,112,219,0.1)' : 'rgba(0,188,212,0.1)');
+    let schoolColor = m.school === '道医' ? 'var(--gold)' : (m.school === '佛医' ? '#9370DB' : 'var(--cyan)');
+    let schoolBg = m.school === '道医' ? 'rgba(201,168,76,0.1)' : (m.school === '佛医' ? 'rgba(147,112,219,0.1)' : 'rgba(0,188,212,0.1)');
     
     card.style.cssText = 'background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:20px;transition:all .3s';
     card.onmouseover = function() { this.style.borderColor=schoolColor;this.style.background='rgba(255,255,255,0.05)' };
@@ -132,9 +132,9 @@ function renderMasters() {
 
 // ===== 产品详情弹窗 =====
 function showMedicineDetail(item) {
-  var modal = document.getElementById('medicineDetailModal');
-  var title = document.getElementById('medicineDetailTitle');
-  var content = document.getElementById('medicineDetailContent');
+  let modal = document.getElementById('medicineDetailModal');
+  let title = document.getElementById('medicineDetailTitle');
+  let content = document.getElementById('medicineDetailContent');
   
   if (!modal || !title || !content) {
     showToast(item.name + '：¥' + item.price + '（' + item.master + '）');
@@ -143,7 +143,7 @@ function showMedicineDetail(item) {
   
   title.textContent = item.name;
   
-  var color = item.school === '道医' ? 'var(--gold)' : '#9370DB';
+  let color = item.school === '道医' ? 'var(--gold)' : '#9370DB';
   
   content.innerHTML = 
     '<div style="font-size:48px;text-align:center;margin-bottom:20px">' + item.image + '</div>' +
@@ -178,7 +178,7 @@ function showMedicineDetail(item) {
 }
 
 function closeMedicineDetail() {
-  var modal = document.getElementById('medicineDetailModal');
+  let modal = document.getElementById('medicineDetailModal');
   if (modal) {
     modal.style.display = 'none';
     document.body.style.overflow = '';

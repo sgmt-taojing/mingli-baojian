@@ -8,7 +8,7 @@
   'use strict';
 
   // ===== 常量定义 =====
-  var STORAGE_KEYS = {
+  const STORAGE_KEYS = {
     LIST: 'mlbj_feedback_list',
     POINTS: 'mlbj_feedback_points',
     STREAK: 'mlbj_feedback_streak',
@@ -17,7 +17,7 @@
   };
 
   // 反馈类型对应积分
-  var POINT_RULES = {
+  const POINT_RULES = {
     'like':    { points: 1,  label: '点赞' },
     'dislike': { points: 3,  label: '点踩' },
     'suggest': { points: 5,  label: '建议' },
@@ -25,13 +25,13 @@
   };
 
   // 连续反馈奖励
-  var STREAK_BONUS = {
+  const STREAK_BONUS = {
     7:  20,
     30: 100
   };
 
   // 积分兑换规则
-  var EXCHANGE_RULES = [
+  const EXCHANGE_RULES = [
     { id: 'vip_1day',   points: 100,   vipType: '常修', days: 1,   label: '1天常修会员' },
     { id: 'vip_7day',   points: 500,   vipType: '常修', days: 7,   label: '7天常修会员' },
     { id: 'vip_30day',  points: 2000,  vipType: '精进', days: 30,  label: '30天精进会员' },
@@ -40,14 +40,14 @@
 
   // ===== 工具函数 =====
   function _getToday() {
-    var d = new Date();
+    let d = new Date()
     return d.getFullYear() + '-' +
       String(d.getMonth() + 1).padStart(2, '0') + '-' +
       String(d.getDate()).padStart(2, '0');
   }
 
   function _getYesterday() {
-    var d = new Date(Date.now() - 86400000);
+    let d = new Date(Date.now() - 86400000)
     return d.getFullYear() + '-' +
       String(d.getMonth() + 1).padStart(2, '0') + '-' +
       String(d.getDate()).padStart(2, '0');
@@ -55,7 +55,7 @@
 
   function _load(key, defaultVal) {
     try {
-      var v = localStorage.getItem(key);
+      let v = localStorage.getItem(key)
       return v ? JSON.parse(v) : defaultVal;
     } catch(e) {
       return defaultVal;
@@ -71,8 +71,8 @@
   }
 
   function _dateDiffDays(d1, d2) {
-    var date1 = new Date(d1);
-    var date2 = new Date(d2);
+    let date1 = new Date(d1)
+    let date2 = new Date(d2)
     return Math.round((date2 - date1) / 86400000);
   }
 
@@ -97,12 +97,11 @@
       return { success: false, message: '反馈内容不能超过500字' };
     }
 
-    var today = _getToday();
-    var list = _load(STORAGE_KEYS.LIST, []);
-    var points = _load(STORAGE_KEYS.POINTS, 0);
-    var streak = _load(STORAGE_KEYS.STREAK, 0);
-    var lastDate = _load(STORAGE_KEYS.LAST_DATE, '');
-
+    let today = _getToday()
+    let list = _load(STORAGE_KEYS.LIST, [])
+    let points = _load(STORAGE_KEYS.POINTS, 0)
+    let streak = _load(STORAGE_KEYS.STREAK, 0)
+    let lastDate = _load(STORAGE_KEYS.LAST_DATE, '')
     // 计算连续天数
     if (lastDate === today) {
       // 今天已反馈，不增加连续天数
@@ -113,19 +112,18 @@
     }
 
     // 基础积分
-    var earnPoints = POINT_RULES[type].points;
-
+    let earnPoints = POINT_RULES[type].points
     // 连续反馈奖励（仅在达到7天或30天时触发）
-    var streakBonus = 0;
+    const streakBonus = 0
     if (STREAK_BONUS[streak]) {
       streakBonus = STREAK_BONUS[streak];
     }
 
-    var totalEarn = earnPoints + streakBonus;
+    let totalEarn = earnPoints + streakBonus
     points += totalEarn;
 
     // 构造反馈记录
-    var record = {
+    let record = {
       id: 'fb_' + Date.now(),
       type: type,
       typeLabel: POINT_RULES[type].label,
@@ -160,7 +158,7 @@
   }
 
   function _getTargetLabel(target) {
-    var map = {
+    let map = {
       'daily_push': '今日推送',
       'bazi': '八字排盘',
       'qimen': '奇门排盘',
@@ -196,7 +194,7 @@
    * @returns {object} { success, message, vipType, days }
    */
   function exchange(ruleId) {
-    var rule = null;
+    let rule = null
     for (var i = 0; i < EXCHANGE_RULES.length; i++) {
       if (EXCHANGE_RULES[i].id === ruleId) {
         rule = EXCHANGE_RULES[i];
@@ -207,7 +205,7 @@
       return { success: false, message: '无效的兑换选项' };
     }
 
-    var points = _load(STORAGE_KEYS.POINTS, 0);
+    let points = _load(STORAGE_KEYS.POINTS, 0)
     if (points < rule.points) {
       return { success: false, message: '积分不足，还差' + (rule.points - points) + '积分' };
     }
@@ -217,7 +215,7 @@
     _save(STORAGE_KEYS.POINTS, points);
 
     // 记录兑换日志
-    var log = _load(STORAGE_KEYS.EXCHANGE_LOG, []);
+    let log = _load(STORAGE_KEYS.EXCHANGE_LOG, [])
     log.unshift({
       id: 'ex_' + Date.now(),
       ruleId: ruleId,
@@ -243,10 +241,9 @@
 
   function _updateVipStatus(rule) {
     // 尝试与现有VIP系统对接
-    var vipKey = 'mlbj_vip_info';
-    var vipInfo = _load(vipKey, null);
-    var now = new Date();
-
+    const vipKey = 'mlbj_vip_info'
+    let vipInfo = _load(vipKey, null)
+    let now = new Date()
     if (!vipInfo || vipInfo.expireDate === 'expired') {
       vipInfo = {
         level: rule.vipType,
@@ -261,12 +258,12 @@
         vipInfo.expireDate = '永久';
       } else {
         // 升级会员等级
-        var levelOrder = { '常修': 1, '精进': 2, '明道': 3 };
+        const levelOrder = { '常修': 1, '精进': 2, '明道': 3 }
         if (levelOrder[rule.vipType] > levelOrder[vipInfo.level]) {
           vipInfo.level = rule.vipType;
         }
         if (vipInfo.expireDate !== '永久') {
-          var baseDate = new Date(vipInfo.expireDate);
+          let baseDate = new Date(vipInfo.expireDate)
           if (baseDate < now) baseDate = now;
           vipInfo.expireDate = _addDays(baseDate, rule.days);
         }
@@ -278,7 +275,7 @@
   }
 
   function _addDays(date, days) {
-    var d = new Date(date);
+    let d = new Date(date)
     d.setDate(d.getDate() + days);
     return d.toISOString().slice(0, 10);
   }
@@ -294,12 +291,11 @@
    * 获取统计数据
    */
   function getStats() {
-    var list = _load(STORAGE_KEYS.LIST, []);
-    var points = _load(STORAGE_KEYS.POINTS, 0);
-    var streak = _load(STORAGE_KEYS.STREAK, 0);
-    var exchangeLog = _load(STORAGE_KEYS.EXCHANGE_LOG, []);
-
-    var stats = {
+    let list = _load(STORAGE_KEYS.LIST, [])
+    let points = _load(STORAGE_KEYS.POINTS, 0)
+    let streak = _load(STORAGE_KEYS.STREAK, 0)
+    let exchangeLog = _load(STORAGE_KEYS.EXCHANGE_LOG, [])
+    let stats = {
       totalFeedback: list.length,
       totalPoints: points,
       currentStreak: streak,
@@ -314,7 +310,7 @@
       if (stats.byType[item.type] !== undefined) {
         stats.byType[item.type]++;
       }
-      var tl = item.targetLabel || item.target;
+      let tl = item.targetLabel || item.target
       stats.byTarget[tl] = (stats.byTarget[tl] || 0) + 1;
       if (item.status === 'adopted') stats.adopted++;
       if (item.status === 'pending') stats.pending++;
@@ -348,17 +344,17 @@
    * @returns {object} { daily_push, bazi, qimen, other }
    */
   function getModuleWeights() {
-    var list = _load(STORAGE_KEYS.LIST, []);
-    var weights = {
+    let list = _load(STORAGE_KEYS.LIST, [])
+    let weights = {
       daily_push: 1.0,
       bazi: 1.0,
       qimen: 1.0,
       other: 1.0
     };
 
-    var counts = {};
+    const counts = {}
     list.forEach(function(item) {
-      var key = item.target || 'other';
+      let key = item.target || 'other'
       if (!counts[key]) counts[key] = { like: 0, dislike: 0, suggest: 0, correct: 0 };
       if (counts[key][item.type] !== undefined) {
         counts[key][item.type]++;
@@ -366,14 +362,13 @@
     });
 
     Object.keys(counts).forEach(function(key) {
-      var c = counts[key];
-      var likeScore = c.like * 0.05;
-      var dislikeScore = c.dislike * 0.08;
-      var suggestScore = c.suggest * 0.03;
-      var correctScore = c.correct * 0.02;
-
+      let c = counts[key]
+      let likeScore = c.like * 0.05
+      let dislikeScore = c.dislike * 0.08
+      let suggestScore = c.suggest * 0.03
+      let correctScore = c.correct * 0.02
       // 点赞多 → 权重提升；点踩多 → 权重降低
-      var adjust = likeScore + suggestScore - dislikeScore - correctScore;
+      let adjust = likeScore + suggestScore - dislikeScore - correctScore
       // 限制在 0.5 ~ 1.5 范围
       weights[key] = Math.max(0.5, Math.min(1.5, 1.0 + adjust));
     });
@@ -386,11 +381,10 @@
    */
   function getTopIssues(limit) {
     limit = limit || 5;
-    var list = _load(STORAGE_KEYS.LIST, []);
-    var targetCounts = {};
-
+    let list = _load(STORAGE_KEYS.LIST, [])
+    const targetCounts = {}
     list.forEach(function(item) {
-      var tl = item.targetLabel || item.target;
+      let tl = item.targetLabel || item.target
       if (!targetCounts[tl]) targetCounts[tl] = { count: 0, samples: [] };
       targetCounts[tl].count++;
       if (targetCounts[tl].samples.length < 3) {
@@ -398,7 +392,7 @@
       }
     });
 
-    var sorted = Object.keys(targetCounts)
+    let sorted = Object.keys(targetCounts)
       .map(function(k) { return { target: k, count: targetCounts[k].count, samples: targetCounts[k].samples }; })
       .sort(function(a, b) { return b.count - a.count; })
       .slice(0, limit);

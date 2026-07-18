@@ -23,12 +23,12 @@ typeof window.escapeHtml === "function" || (window.escapeHtml = function(s) { if
  * @returns {Promise<string>} AI回复文本
  */
 async function callG2ClawAPI(messages, options) {
-  var opts = options || {};
-  var maxTokens = opts.max_tokens || 2000;
-  var temperature = opts.temperature || 0.7;
+  let opts = options || {};
+  let maxTokens = opts.max_tokens || 2000;
+  let temperature = opts.temperature || 0.7;
 
-  var controller = new AbortController();
-  var timeoutId = setTimeout(function() { controller.abort(); }, 30000);
+  let controller = new AbortController();
+  let timeoutId = setTimeout(function() { controller.abort(); }, 30000);
 
   try {
     var response = await fetch('https://api.g2claw.com/v1/chat/completions', {
@@ -52,7 +52,7 @@ async function callG2ClawAPI(messages, options) {
       throw new Error('API返回状态码: ' + response.status);
     }
 
-    var data = await response.json();
+    let data = await response.json();
     if (!data.choices || !data.choices[0] || !data.choices[0].message) {
       throw new Error('API返回数据格式异常');
     }
@@ -76,10 +76,10 @@ async function callG2ClawAPI(messages, options) {
  */
 function _aiGetSanyuanContext() {
   try {
-    var year = new Date().getFullYear();
-    var yy = getCurrentYuanYun(year);
-    var data = yy.data || {};
-    var ctx = '【三元九运框架】\n';
+    let year = new Date().getFullYear();
+    let yy = getCurrentYuanYun(year);
+    let data = yy.data || {};
+    const ctx = '【三元九运框架】\n';
     ctx += '当前大运：' + (yy.name || '九紫离火运') + ' (' + (yy.periodInThisCycle || '2024-2043') + ')\n';
     ctx += '五行：' + (yy.wuxing || '火') + ' | 卦象：' + (yy.gua || '离') + ' | 方位：' + (yy.direction || '正南') + '\n';
     ctx += '星曜：' + (yy.star || '九紫右弼') + ' | 元：' + (yy.yuan || '下元') + ' | 第' + (yy.yunYear || 1) + '年/20年\n';
@@ -103,7 +103,7 @@ function _aiGetSanyuanContext() {
 function _aiGetPaipanDataText(type, data) {
   if (!data) return '排盘数据未获取到';
 
-  var text = '';
+  const text = '';
   try {
     switch (type) {
       case 'bazi':
@@ -128,7 +128,7 @@ function _aiGetPaipanDataText(type, data) {
         if (data.dayun && data.dayun.length) {
           text += '大运：';
           for (var i = 0; i < Math.min(data.dayun.length, 8); i++) {
-            var dy = data.dayun[i];
+            let dy = data.dayun[i];
             text += (dy.ganzhi || dy.name || '') + '(' + (dy.startAge || dy.age || '') + '岁) ';
           }
           text += '\n';
@@ -146,7 +146,7 @@ function _aiGetPaipanDataText(type, data) {
         if (data.palaces) {
           text += '九宫信息：\n';
           for (var p in data.palaces) {
-            var pal = data.palaces[p];
+            let pal = data.palaces[p];
             text += '  ' + p + ': 天盘' + (pal.tianPan || '') + ' 地盘' + (pal.diPan || '') + ' 八门' + (pal.bamen || '') + ' 九星' + (pal.jiuxing || '') + ' 八神' + (pal.bashen || '') + '\n';
           }
         }
@@ -253,13 +253,13 @@ function _aiCollectPaipanData(type) {
   try {
     switch (type) {
       case 'bazi':
-        var baziEl = document.getElementById('baziResult');
+        let baziEl = document.getElementById('baziResult');
         if (baziEl) {
-          var data = {};
+          const data = {};
           data.name = (document.getElementById('baziNameOut') || {}).textContent || '';
           data.birthStr = (document.getElementById('baziMetaOut') || {}).textContent || '';
           // 从页面提取四柱信息
-          var pillarEls = baziEl.querySelectorAll('.pillar-chart .pillar-gz, .pillar-cell .gz');
+          let pillarEls = baziEl.querySelectorAll('.pillar-chart .pillar-gz, .pillar-cell .gz');
           if (pillarEls.length >= 4) {
             data.fourPillars = {
               year: { ganzhi: pillarEls[0] ? pillarEls[0].textContent.trim() : '' },
@@ -275,9 +275,9 @@ function _aiCollectPaipanData(type) {
         break;
 
       case 'qimen':
-        var qmEl = document.getElementById('qmResult');
+        let qmEl = document.getElementById('qmResult');
         if (qmEl) {
-          var data = {};
+          const data = {};
           data.time = (document.getElementById('qmMeta') || {}).textContent || '';
           data.fullText = qmEl.innerText.substring(0, 3000);
           return data;
@@ -285,9 +285,9 @@ function _aiCollectPaipanData(type) {
         break;
 
       case 'ziwei':
-        var zwEl = document.getElementById('zwResult');
+        let zwEl = document.getElementById('zwResult');
         if (zwEl) {
-          var data = {};
+          const data = {};
           data.name = (document.getElementById('zwNameOut') || {}).textContent || '';
           data.birthStr = (document.getElementById('zwMetaOut') || {}).textContent || '';
           data.fullText = zwEl.innerText.substring(0, 3000);
@@ -296,9 +296,9 @@ function _aiCollectPaipanData(type) {
         break;
 
       case 'meihua':
-        var mhEl = document.getElementById('mhResult');
+        let mhEl = document.getElementById('mhResult');
         if (mhEl) {
-          var data = {};
+          const data = {};
           data.time = (document.getElementById('mhMeta') || {}).textContent || '';
           data.fullText = mhEl.innerText.substring(0, 3000);
           return data;
@@ -306,9 +306,9 @@ function _aiCollectPaipanData(type) {
         break;
 
       case 'liuren':
-        var lrEl = document.getElementById('lrResult');
+        let lrEl = document.getElementById('lrResult');
         if (lrEl) {
-          var data = {};
+          const data = {};
           data.time = (document.getElementById('lrMeta') || {}).textContent || '';
           data.fullText = lrEl.innerText.substring(0, 3000);
           return data;
@@ -316,27 +316,27 @@ function _aiCollectPaipanData(type) {
         break;
 
       case 'huajie':
-        var hjEl = document.getElementById('hjOutput');
+        let hjEl = document.getElementById('hjOutput');
         if (hjEl) {
-          var data = {};
+          const data = {};
           data.fullText = hjEl.innerText.substring(0, 3000);
           return data;
         }
         break;
 
       case 'lifeplan':
-        var lpEl = document.getElementById('lifeplanResult');
+        let lpEl = document.getElementById('lifeplanResult');
         if (lpEl) {
-          var data = {};
+          const data = {};
           data.fullText = lpEl.innerText.substring(0, 3000);
           return data;
         }
         break;
 
       case 'jiazi':
-        var jzEl = document.getElementById('jiaziResult');
+        let jzEl = document.getElementById('jiaziResult');
         if (jzEl) {
-          var data = {};
+          const data = {};
           data.fullText = jzEl.innerText.substring(0, 3000);
           return data;
         }
@@ -371,11 +371,11 @@ async function aiDivineInterpret(type, baziData, question) {
     'jiazi': '六十甲子周期'
   };
 
-  var typeName = typeNames[type] || '命理推演';
-  var sanyuanCtx = _aiGetSanyuanContext();
-  var paipanText = _aiGetPaipanDataText(type, baziData);
+  let typeName = typeNames[type] || '命理推演';
+  let sanyuanCtx = _aiGetSanyuanContext();
+  let paipanText = _aiGetPaipanDataText(type, baziData);
 
-  var systemPrompt = '你是一位精通八字命理、奇门遁甲、紫微斗数、梅花易数、大六壬等传统术数的资深命理师，基于中华古老智慧知识体系进行推演解读。\n\n';
+  const systemPrompt = '你是一位精通八字命理、奇门遁甲、紫微斗数、梅花易数、大六壬等传统术数的资深命理师，基于中华古老智慧知识体系进行推演解读。\n\n';
   systemPrompt += '解读原则：\n';
   systemPrompt += '1. 专业准确：基于排盘数据，运用传统命理学理论进行解读\n';
   systemPrompt += '2. 通俗易懂：用现代语言解释，避免生涩术语堆砌\n';
@@ -389,7 +389,7 @@ async function aiDivineInterpret(type, baziData, question) {
   systemPrompt += '- 禁止涉及医疗、法律等专业领域建议\n\n';
   systemPrompt += '免责声明：所有解读仅供参考，不构成专业建议，人生掌握在自己手中。';
 
-  var userPrompt = sanyuanCtx + '\n';
+  let userPrompt = sanyuanCtx + '\n';
   userPrompt += paipanText + '\n';
 
   if (question) {
@@ -420,10 +420,10 @@ async function aiDivineInterpret(type, baziData, question) {
  * @returns {Promise<string>} 完整AI命理报告
  */
 async function aiGenerateReport(type, baziData) {
-  var sanyuanCtx = _aiGetSanyuanContext();
-  var paipanText = _aiGetPaipanDataText(type, baziData);
+  let sanyuanCtx = _aiGetSanyuanContext();
+  let paipanText = _aiGetPaipanDataText(type, baziData);
 
-  var systemPrompt = '你是一位精通八字命理、奇门遁甲、紫微斗数等传统术数的资深命理师，现在需要为缘主生成一份完整的命理报告。\n\n';
+  const systemPrompt = '你是一位精通八字命理、奇门遁甲、紫微斗数等传统术数的资深命理师，现在需要为缘主生成一份完整的命理报告。\n\n';
   systemPrompt += '报告要求：\n';
   systemPrompt += '1. 语言专业而通俗，让非专业人士也能理解\n';
   systemPrompt += '2. 分析要全面深入，覆盖人生各主要方面\n';
@@ -432,7 +432,7 @@ async function aiGenerateReport(type, baziData) {
   systemPrompt += '5. 报告末尾加上免责声明\n\n';
   systemPrompt += '禁止：封建迷信、恐吓性语言、绝对化判断、医疗法律建议。';
 
-  var userPrompt = sanyuanCtx + '\n';
+  let userPrompt = sanyuanCtx + '\n';
   userPrompt += paipanText + '\n';
   userPrompt += '请生成一份完整的命理报告，包含以下章节：\n\n';
   userPrompt += '## 一、命盘总论\n（整体命局分析，五行强弱，格局特点）\n\n';
@@ -462,14 +462,14 @@ async function aiGenerateReport(type, baziData) {
  * @param {string} type - 排盘类型
  */
 async function aiInterpret(type) {
-  var btn = document.querySelector('[data-ai-btn="' + type + '"]');
-  var section = document.getElementById('aiSection_' + type);
-  var content = document.getElementById('aiContent_' + type);
+  let btn = document.querySelector('[data-ai-btn="' + type + '"]');
+  let section = document.getElementById('aiSection_' + type);
+  let content = document.getElementById('aiContent_' + type);
 
   if (!section || !content) return;
 
   // 收集排盘数据
-  var paipanData = _aiCollectPaipanData(type);
+  let paipanData = _aiCollectPaipanData(type);
 
   // 显示区域
   section.style.display = 'block';
@@ -482,7 +482,7 @@ async function aiInterpret(type) {
   }
 
   try {
-    var result = await aiDivineInterpret(type, paipanData, '');
+    let result = await aiDivineInterpret(type, paipanData, '');
     content.innerHTML = '<div class="ai-result-text">' + _aiFormatText(result) + '</div>';
     content.innerHTML += '<div class="ai-actions">' +
       '<button class="ai-action-btn" onclick="aiCopyText(\'' + type + '\')">📋 复制解读</button>' +
@@ -503,13 +503,13 @@ async function aiInterpret(type) {
  * @param {string} type - 排盘类型
  */
 async function aiAsk(type) {
-  var input = document.getElementById('aiQuestion_' + type);
-  var content = document.getElementById('aiContent_' + type);
-  var askBtn = document.querySelector('[data-ai-ask="' + type + '"]');
+  let input = document.getElementById('aiQuestion_' + type);
+  let content = document.getElementById('aiContent_' + type);
+  let askBtn = document.querySelector('[data-ai-ask="' + type + '"]');
 
   if (!input || !input.value.trim()) return;
 
-  var question = input.value.trim();
+  let question = input.value.trim();
   input.value = '';
 
   // 如果AI区域没展开，先展开
@@ -527,16 +527,16 @@ async function aiAsk(type) {
   }
 
   try {
-    var paipanData = _aiCollectPaipanData(type);
-    var result = await aiDivineInterpret(type, paipanData, question);
+    let paipanData = _aiCollectPaipanData(type);
+    let result = await aiDivineInterpret(type, paipanData, question);
 
     // 移除loading
-    var loading = content.querySelector('.ai-loading');
+    let loading = content.querySelector('.ai-loading');
     if (loading) loading.remove();
 
     content.innerHTML += '<div class="ai-answer">' + _aiFormatText(result) + '</div>';
   } catch (err) {
-    var loading = content.querySelector('.ai-loading');
+    let loading = content.querySelector('.ai-loading');
     if (loading) loading.remove();
     content.innerHTML += '<div class="ai-error">⚠️ AI暂时无法回答，请稍后重试。<br><span style="font-size:12px;opacity:0.6">' + (err.message || '') + '</span></div>';
   } finally {
@@ -552,16 +552,16 @@ async function aiAsk(type) {
  * @param {string} type - 排盘类型
  */
 async function aiGenerateFullReport(type) {
-  var content = document.getElementById('aiContent_' + type);
+  let content = document.getElementById('aiContent_' + type);
   if (!content) return;
 
   content.innerHTML += '<div class="ai-loading">🤖 AI正在生成完整命理报告，请稍候（约30秒）...</div>';
 
   try {
-    var paipanData = _aiCollectPaipanData(type);
-    var report = await aiGenerateReport(type, paipanData);
+    let paipanData = _aiCollectPaipanData(type);
+    let report = await aiGenerateReport(type, paipanData);
 
-    var loading = content.querySelector('.ai-loading');
+    let loading = content.querySelector('.ai-loading');
     if (loading) loading.remove();
 
     content.innerHTML += '<div class="ai-report">' + _aiFormatText(report) + '</div>';
@@ -569,7 +569,7 @@ async function aiGenerateFullReport(type) {
       '<button class="ai-action-btn" onclick="aiExportReport(\'' + type + '\')">📋 导出报告</button>' +
       '</div>';
   } catch (err) {
-    var loading = content.querySelector('.ai-loading');
+    let loading = content.querySelector('.ai-loading');
     if (loading) loading.remove();
     content.innerHTML += '<div class="ai-error">⚠️ 报告生成失败，请稍后重试。<br><span style="font-size:12px;opacity:0.6">' + (err.message || '') + '</span></div>';
   }
@@ -579,9 +579,9 @@ async function aiGenerateFullReport(type) {
  * 复制AI解读文本
  */
 function aiCopyText(type) {
-  var content = document.getElementById('aiContent_' + type);
+  let content = document.getElementById('aiContent_' + type);
   if (!content) return;
-  var text = content.innerText;
+  let text = content.innerText;
   if (navigator.clipboard) {
     navigator.clipboard.writeText(text).then(function() {
       showToast('已复制到剪贴板');
@@ -597,20 +597,20 @@ function aiCopyText(type) {
  * 导出AI报告
  */
 function aiExportReport(type) {
-  var content = document.getElementById('aiContent_' + type);
+  let content = document.getElementById('aiContent_' + type);
   if (!content) return;
-  var reportEl = content.querySelector('.ai-report');
+  let reportEl = content.querySelector('.ai-report');
   if (!reportEl) return;
 
-  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>AI命理报告</title>';
+  const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>AI命理报告</title>';
   html += '<style>body{font-family:"Songti SC","SimSun",serif;max-width:800px;margin:0 auto;padding:40px 20px;background:#fdf6e3;color:#333;line-height:1.8}h1,h2,h3{color:#c9a84c}a{color:#c9a84c}</style>';
   html += '</head><body>';
   html += reportEl.innerHTML;
   html += '</body></html>';
 
-  var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
+  let blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  let url = URL.createObjectURL(blob);
+  let a = document.createElement('a');
   a.href = url;
   a.download = 'AI命理报告_' + type + '_' + new Date().toISOString().slice(0,10) + '.html';
   document.body.appendChild(a);
@@ -643,13 +643,13 @@ function _aiFormatText(text) {
 }
 
 function _aiEscapeHtml(text) {
-  var div = document.createElement('div');
+  let div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
 }
 
 function _aiFallbackCopy(text) {
-  var textarea = document.createElement('textarea');
+  let textarea = document.createElement('textarea');
   textarea.value = text;
   textarea.style.position = 'fixed';
   textarea.style.opacity = '0';
@@ -684,15 +684,15 @@ function _aiInitSections() {
   ];
 
   for (var i = 0; i < targets.length; i++) {
-    var t = targets[i];
-    var el = document.getElementById(t.id);
+    let t = targets[i];
+    let el = document.getElementById(t.id);
     if (!el) continue;
     if (el.getAttribute('data-ai-injected')) continue; // 避免重复注入
 
     el.setAttribute('data-ai-injected', '1');
 
     // 创建AI区域
-    var aiSection = document.createElement('div');
+    let aiSection = document.createElement('div');
     aiSection.className = 'ai-section';
     aiSection.id = 'aiSection_' + t.type;
     aiSection.style.cssText = 'display:none;margin-top:16px;padding:16px;border:1px solid rgba(201,168,76,0.2);border-radius:12px;background:rgba(201,168,76,0.04)';
@@ -705,7 +705,7 @@ function _aiInitSections() {
       '</div>';
 
     // 创建AI解读按钮
-    var aiBtn = document.createElement('button');
+    let aiBtn = document.createElement('button');
     aiBtn.className = 'ai-btn';
     aiBtn.setAttribute('data-ai-btn', t.type);
     aiBtn.onclick = function(type) { return function() { aiInterpret(type); }; }(t.type);
@@ -724,7 +724,7 @@ function _aiInitSections() {
 
 function _aiInjectStyles() {
   if (document.getElementById('ai-interpreter-styles')) return;
-  var style = document.createElement('style');
+  let style = document.createElement('style');
   style.id = 'ai-interpreter-styles';
   style.textContent = [
     '.ai-section { animation: aiFadeIn 0.3s ease; }',
@@ -764,10 +764,10 @@ try {
     setTimeout(_aiInitSections, 500);
 
     // 监听section切换，延迟注入（处理动态显示的section）
-    var origShowSection = window.showSection;
+    let origShowSection = window.showSection;
     if (typeof origShowSection === 'function') {
       window.showSection = function(name) {
-        var result = origShowSection.apply(this, arguments);
+        let result = origShowSection.apply(this, arguments);
         setTimeout(_aiInitSections, 200);
         return result;
       };
