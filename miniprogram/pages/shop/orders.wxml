@@ -1,0 +1,40 @@
+<view class="page-orders">
+  <view class="tab-bar">
+    <view class="tab-item {{currentTab === item.id ? 'active' : ''}}" wx:for="{{tabs}}" wx:key="id" data-id="{{item.id}}" bindtap="onTabChange">{{item.name}}</view>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+
+  <block wx:if="{{!loading && orders.length > 0}}">
+    <view class="order-list">
+      <view class="order-card" wx:for="{{orders}}" wx:key="id" data-id="{{item.id}}" bindtap="onOrderTap">
+        <view class="order-header">
+          <text class="order-id">{{item.id}}</text>
+          <text class="order-status status-{{item.status}}">{{item.statusText}}</text>
+        </view>
+        <view class="order-items">
+          <view class="order-item-row" wx:for="{{item.items}}" wx:for-item="prod" wx:key="index">
+            <text class="prod-name">{{prod.name}}</text>
+            <text class="prod-qty">x{{prod.qty}}</text>
+            <text class="prod-price">¥{{prod.price}}</text>
+          </view>
+        </view>
+        <view class="order-footer">
+          <text class="order-time">{{item.time}}</text>
+          <view class="order-total">
+            <text class="total-label">合计：</text>
+            <text class="total-amount">¥{{item.total}}</text>
+          </view>
+        </view>
+        <view class="order-actions" wx:if="{{item.status === 'pending'}}">
+          <view class="action-btn pay-btn" data-id="{{item.id}}" catchtap="onPayOrder">立即付款</view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <view class="empty" wx:if="{{!loading && orders.length === 0}}">
+    <view class="empty-icon">📋</view>
+    <view class="empty-text">暂无订单</view>
+  </view>
+</view>

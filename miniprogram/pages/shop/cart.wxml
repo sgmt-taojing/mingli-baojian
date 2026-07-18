@@ -1,0 +1,42 @@
+<view class="page-cart">
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+
+  <block wx:if="{{!loading && cartItems.length > 0}}">
+    <view class="cart-list">
+      <view class="cart-item" wx:for="{{cartItems}}" wx:key="id">
+        <view class="item-check" data-id="{{item.id}}" bindtap="onToggleItem">
+          <view class="checkbox {{selectedIds.includes(item.id) ? 'checked' : ''}}"></view>
+        </view>
+        <view class="item-img">🛍️</view>
+        <view class="item-info">
+          <view class="item-name">{{item.name}}</view>
+          <view class="item-price">¥{{item.price}}</view>
+          <view class="item-qty">
+            <view class="qty-btn" data-id="{{item.id}}" data-delta="-1" bindtap="onQtyChange">-</view>
+            <view class="qty-num">{{item.qty}}</view>
+            <view class="qty-btn" data-id="{{item.id}}" data-delta="1" bindtap="onQtyChange">+</view>
+          </view>
+        </view>
+        <view class="item-remove" data-id="{{item.id}}" bindtap="onRemove">删除</view>
+      </view>
+    </view>
+
+    <view class="cart-footer">
+      <view class="footer-check" bindtap="onToggleAll">
+        <view class="checkbox {{allSelected ? 'checked' : ''}}"></view>
+        <text>全选</text>
+      </view>
+      <view class="footer-total">
+        <text class="total-label">合计：</text>
+        <text class="total-price">¥{{totalPrice}}</text>
+      </view>
+      <view class="footer-checkout {{selectedIds.length === 0 ? 'disabled' : ''}}" bindtap="onCheckout">去结算({{selectedIds.length}})</view>
+    </view>
+  </block>
+
+  <view class="empty" wx:if="{{!loading && cartItems.length === 0}}">
+    <view class="empty-icon">🛒</view>
+    <view class="empty-text">购物车是空的</view>
+    <view class="empty-btn" bindtap="onContinueShopping">去逛逛</view>
+  </view>
+</view>

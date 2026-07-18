@@ -1,0 +1,22 @@
+<view class="page-favorites">
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+
+  <block wx:if="{{!loading && favorites.length > 0}}">
+    <view class="fav-grid">
+      <view class="fav-card" wx:for="{{favorites}}" wx:key="id" data-id="{{item.id}}" bindtap="onProductTap">
+        <view class="fav-img">🛍️</view>
+        <view class="fav-info">
+          <view class="fav-name">{{item.name}}</view>
+          <view class="fav-desc">{{item.desc}}</view>
+          <view class="fav-price">¥{{item.price}}</view>
+        </view>
+        <view class="fav-remove" data-id="{{item.id}}" catchtap="onRemoveFavorite">取消收藏</view>
+      </view>
+    </view>
+  </block>
+
+  <view class="empty" wx:if="{{!loading && favorites.length === 0}}">
+    <view class="empty-icon">⭐</view>
+    <view class="empty-text">还没有收藏任何商品</view>
+  </view>
+</view>
