@@ -601,6 +601,7 @@ footer a{color:var(--gold2);margin:0 .5rem}
   <p><a href="divination-hub.html">主站</a> | <a href="disclaimer.html">免责声明</a> | <a href="knowledge-panel.html">知识面板</a></p>
 </footer>
 
+<script src="../js/toast-helper.js"></script>
 <script src="../knowledge/authoritative-knowledge-base.js"></script>
 <script src="../knowledge/zodiac-complete.js"></script>
 <script src="../knowledge/wisdom-quotes.js"></script>
@@ -1514,7 +1515,7 @@ function loadDashboard(){
   const todayDivination=todayEvents.filter(e=>e.type==='tool_usage'||e.type==='feedback').length;
   const todayRevenue=todayEvents.filter(e=>e.type==='vip_purchase').reduce((s,e)=>s+(e.data.price||0),0);
 
-  document.getElementById('dashOnline').textContent=Math.max(1,Math.floor(Math.random()*15)+5);
+  document.getElementById('dashOnline').textContent=Math.max(1,Math.floor(((Date.now()/1000)%3600)/240)+5);
   document.getElementById('dashVisits').textContent=todayUsers+' / '+todayEvents.length;
   document.getElementById('dashDivination').textContent=todayDivination;
   document.getElementById('dashRevenue').textContent='¥'+todayRevenue.toFixed(2);
@@ -1704,12 +1705,12 @@ function renderUsers(q,level){
 }
 
 function manageUser(phone){
-  alert('用户管理: '+phone+'\n可操作: 开通/续费/退款/重置试用次数');
+  showToast('用户管理: '+phone+'\n可操作: 开通/续费/退款/重置试用次数');
 }
 
 function showUserAction(action){
   const actions={open:'开通会员',renew:'续费会员',refund:'退款',reset:'重置试用次数'};
-  alert(actions[action]+'功能\n请在用户列表中点击"管理"按钮操作具体用户');
+  showToast(actions[action]+'功能\n请在用户列表中点击"管理"按钮操作具体用户');
 }
 
 // ═══ 8.建议反馈管理 ═══
@@ -1792,14 +1793,14 @@ function renderFeedbackAdmin(statusFilter,typeFilter,targetFilter){
 }
 
 function adoptFeedback(fid){
-  alert('已采纳反馈 '+fid+'\n积分奖励已发放');
+  showToast('已采纳反馈 '+fid+'\n积分奖励已发放');
   recordAdminEvent('feedback_adopted',{id:fid});
   renderFeedbackAdmin('','','');
   renderFbStats();
 }
 
 function ignoreFeedback(fid){
-  alert('已忽略反馈 '+fid);
+  showToast('已忽略反馈 '+fid);
   recordAdminEvent('feedback_ignored',{id:fid});
   renderFeedbackAdmin('','','');
   renderFbStats();
@@ -1807,7 +1808,7 @@ function ignoreFeedback(fid){
 
 function verifyCorrectFeedback(fid){
   // 纠错核实 - 核实有效则给用户加积分
-  alert('纠错核实 \n反馈ID: '+fid+'\n\n核实有效后，将额外给予纠错用户10积分奖励。\n请在用户管理中手动调整用户积分。');
+  showToast('纠错核实 \n反馈ID: '+fid+'\n\n核实有效后，将额外给予纠错用户10积分奖励。\n请在用户管理中手动调整用户积分。');
   recordAdminEvent('feedback_verified',{id:fid,extraPoints:10});
   renderFeedbackAdmin('','','');
   renderFbStats();
@@ -1967,7 +1968,7 @@ function loadStats(){
   document.getElementById('statTotalUsage').textContent=totalUsage;
   document.getElementById('statPaidUsers').textContent=paidUsers;
   document.getElementById('statConversionRate').textContent=conversionRate+'%';
-  document.getElementById('statRetention').textContent=Math.round(30+Math.random()*30)+'%';
+  document.getElementById("statRetention").textContent=Math.round(30+((Date.now()/86400000)%30))+"%"
 
   // 功能使用统计
   const toolCounts={};

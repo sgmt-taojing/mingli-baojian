@@ -1332,7 +1332,8 @@
         </div>
     </div>
 
-    <script>
+    <script src="../js/toast-helper.js"></script>
+<script>
         // 商品数据（30个商品）
         const products = [
             {
@@ -2516,7 +2517,7 @@
         // 显示结算弹窗
         function showCheckout() {
             if (cart.length === 0) {
-                alert('购物车是空的！');
+                showToast('购物车是空的！');
                 return;
             }
             document.getElementById('checkoutModal').classList.add('active');
@@ -2529,7 +2530,7 @@
 
         // 处理支付
         function processPayment(method) {
-            alert(`即将跳转到${method === 'wechat' ? '微信' : '支付宝'}支付...\n（此为演示，实际需接入支付接口）`);
+            showToast(`即将跳转到${method === 'wechat' ? '微信' : '支付宝'}支付...\n（此为演示，实际需接入支付接口）`);
         }
 
         // 提交订单
@@ -2539,11 +2540,11 @@
             const address = document.getElementById('recipientAddress').value;
             
             if (!name || !phone || !address) {
-                alert('请填写完整的收货信息！');
+                showToast('请填写完整的收货信息！');
                 return;
             }
             
-            alert('订单提交成功！\n（此为演示，实际需接入订单系统）');
+            showToast('订单提交成功！\n（此为演示，实际需接入订单系统）');
             
             // 清空购物车
             cart = [];

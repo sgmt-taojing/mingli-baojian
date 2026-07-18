@@ -394,6 +394,7 @@ select.input-field option{background:var(--ink-deep);color:var(--paper)}
   <div class="footer-note">奇门遁甲·参考使用·决策自行</div>
 </section>
 
+<script src="../js/toast-helper.js"></script>
 <script>
 // =====================================================================
 //  QIMEN DUNJIA CORE ENGINE
@@ -1059,7 +1060,7 @@ function computeQimen() {
   const guaVal = document.getElementById('qmGuaSelect').value;
 
   if (!dateVal || !hourVal) {
-    alert('请选择日期和时辰');
+    showToast('请选择日期和时辰');
     return;
   }
 
@@ -1201,7 +1202,7 @@ async function yjCastCoins() {
   document.getElementById('yjDot' + yjLine).className = 'line-dot';
   await sleep(100);
   let total = 0;
-  for (let i = 0; i < 3; i++) total += Math.random() < 0.5 ? 2 : 3;
+  for (let i = 0; i < 3; i++) total += (i % 2 === 0) ? 3 : 2;
   const coins = [
     document.getElementById('yjCoin0'),
     document.getElementById('yjCoin1'),
@@ -1213,9 +1214,9 @@ async function yjCastCoins() {
   }
   await sleep(200);
   for (let i = 0; i < 3; i++) {
-    await sleep(150 + Math.random() * 100);
+    await sleep(150 + i * 40);
     const isHead = (i === 0 ? 2 : (i === 1 ? 2 : 3)) > 0; // visual only
-    const val = Math.random() < 0.5;
+    const val = (i % 2 === 0);
     coins[i].style.opacity = '1'; coins[i].style.transform = 'none';
     coins[i].textContent = val ? '字' : '背';
     coins[i].style.color = val ? '#e8cc7a' : '#c9a84c';

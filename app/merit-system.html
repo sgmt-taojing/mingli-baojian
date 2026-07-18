@@ -114,7 +114,8 @@
     <button class="nav-btn" onclick="window.location.href='divination-knowledge.html'">📚 知识库</button>
   </div>
   
-  <script>
+  <script src="../js/toast-helper.js"></script>
+<script>
     var merit = parseInt(localStorage.getItem('qianyuan_merit') || '0');
     document.getElementById('meritNum').textContent = merit;
     
@@ -122,7 +123,7 @@
       merit += n;
       localStorage.setItem('qianyuan_merit', merit);
       document.getElementById('meritNum').textContent = merit;
-      alert('功德 +' + n + '，当前功德：' + merit);
+      showToast('功德 +' + n + '，当前功德：' + merit);
     }
   </script>
 </body>

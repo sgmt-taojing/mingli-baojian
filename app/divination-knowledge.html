@@ -4873,10 +4873,10 @@ function queryJiri() {
       jiriList.push({
         date: date.getFullYear() + '年' + (date.getMonth()+1) + '月' + date.getDate() + '日',
         week: '星期' + weekDays[dayOfWeek],
-        lunar: '农历' + lunarMonths[(date.getMonth()+9)%12] + '月' + lunarDays[Math.floor(Math.random()*30)],
-        yi: ['祈福','求嗣','嫁娶','出行','开市'][Math.floor(Math.random()*5)],
-        ji: ['动土','安葬','开仓','嫁娶'][Math.floor(Math.random()*4)],
-        jishi: ['子时(23-1)', '卯时(5-7)', '午时(11-13)'][Math.floor(Math.random()*3)],
+        lunar: '农历' + lunarMonths[(date.getMonth()+9)%12] + '月' + lunarDays[(date.getDate()+dayOfWeek)%30],
+        yi: ['祈福','求嗣','嫁娶','出行','开市'][(date.getDate()+3)%5],
+        ji: ['动土','安葬','开仓','嫁娶'][(date.getDate()+2)%4],
+        jishi: ['子时(23-1)', '卯时(5-7)', '午时(11-13)'][(dayOfWeek+1)%3],
         recommend: daochangData.filter(function(d) { return d.wishes.some(function(w) { return w.includes(type) || type.includes(w); }); }).slice(0,2).map(function(d) { return d.name; }).join('、') || '北京白云观、杭州灵隐寺'
       });
     }
@@ -5726,8 +5726,8 @@ function calcNaming() {
   recommendEls.forEach(function(e, ei) {
     if (ei > 2) return;
     var chars = nameDB[e];
-    var w1 = chars[Math.floor(Math.random()*chars.length)].w;
-    var w2 = chars[Math.floor(Math.random()*chars.length)].w;
+    var w1 = chars[(ei*7+3)%chars.length].w;
+    var w2 = chars[(ei*5+chars.length/2)%chars.length].w;
     names.push((surname?surname:'') + w1 + w2);
   });
   html += '<div style="margin-top:12px;padding:12px;background:rgba(201,168,76,.06);border-radius:6px;font-size:13px">' +

@@ -322,6 +322,7 @@ body{font-family:var(--font);background:var(--ink);color:var(--paper);line-heigh
 <button onclick="wxTab('user',this)"><span class="tab-icon">👤</span>我的</button>
 </div>
 
+<script src="../js/toast-helper.js"></script>
 <script src="../knowledge/wisdom-quotes.js"></script>
 <script src="../knowledge/zodiac-complete.js"></script>
 <script src="../knowledge/koujue-database-full.js"></script>
@@ -445,7 +446,7 @@ function loadJieqi(){
 function wxBaziCalc(){
   var dateStr=document.getElementById('wxBaziDate').value;
   var hourIdx=parseInt(document.getElementById('wxBaziHour').value);
-  if(!dateStr){alert('请选择出生日期');return}
+  if(!dateStr){showToast('请选择出生日期');return}
   var parts=dateStr.split('-');
   var year=parseInt(parts[0]),month=parseInt(parts[1]),day=parseInt(parts[2]);
   // 简化排盘
@@ -466,7 +467,7 @@ function wxBaziCalc(){
 // 测字
 function wxCeziCalc(){
   var ch=document.getElementById('wxCeziInput').value;
-  if(!ch){alert('请输入一个字');return}
+  if(!ch){showToast('请输入一个字');return}
   if(typeof CEZI_DATABASE!=='undefined'&&CEZI_DATABASE[ch]){
     var d=CEZI_DATABASE[ch];
     var el=document.getElementById('wxCeziResult');
@@ -483,7 +484,7 @@ function wxCheckin(){
   var streak=parseInt(localStorage.getItem('wx_checkin_streak')||'0');
   var lastDate=localStorage.getItem('wx_checkin_last');
   var today=new Date().toISOString().slice(0,10);
-  if(lastDate===today){alert('今日已打卡！');updateCheckinCount();return}
+  if(lastDate===today){showToast('今日已打卡！');updateCheckinCount();return}
   // 计算连续天数
   var yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
   if(lastDate===yesterday) streak++;
@@ -491,7 +492,7 @@ function wxCheckin(){
   localStorage.setItem('wx_checkin_last',today);
   localStorage.setItem('wx_checkin_streak',streak);
   localStorage.setItem(key,'1');
-  alert('打卡成功！连续第'+streak+'天 🎉');
+  showToast('打卡成功！连续第'+streak+'天 🎉');
   updateCheckinCount();
 }
 function updateCheckinCount(){

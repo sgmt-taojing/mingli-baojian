@@ -43,7 +43,8 @@
         </div>
     </div>
     
-    <script src="../knowledge/knowledge-details.js"></script>
+    <script src="../js/toast-helper.js"></script>
+<script src="../knowledge/knowledge-details.js"></script>
     <script src="../knowledge/authoritative-knowledge-base.js"></script>
     <script>
         let yaos = [null, null, null, null, null, null];
@@ -56,7 +57,9 @@
         }
         
         function randomDivination() {
-            yaos = yaos.map(() => Math.random() > 0.5 ? '—' : '--');
+            // 基于点击时间戳的确定性伪随机（同一次点击结果一致）
+            const seed = Date.now() % 100000;
+            yaos = yaos.map((_, i) => ((seed * (i+7) * 31) % 100 > 50) ? '—' : '--');
             const btns = document.querySelectorAll('.yao-btn');
             btns.forEach((btn, i) => {
                 btn.textContent = yaos[i];
@@ -66,7 +69,7 @@
         
         function interpretGua() {
             if (yaos.some(y => y === null)) {
-                alert('请先完成起卦（六爻均需确定）');
+                showToast('请先完成起卦（六爻均需确定）');
                 return;
             }
             

@@ -95,7 +95,7 @@ window.mobileVoiceInput = function(targetId, opts){
   
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if(!SR){
-    alert('您的浏览器不支持语音输入，请使用Chrome或Safari浏览器');
+    showToast('您的浏览器不支持语音输入，请使用Chrome或Safari浏览器', 'warning');
     return;
   }
   
@@ -140,7 +140,7 @@ window.mobileVoiceInput = function(targetId, opts){
     var msg = '语音识别失败';
     if(event.error === 'no-speech') msg = '没有听到声音，请大声一点';
     else if(event.error === 'not-allowed') msg = '请允许使用麦克风';
-    alert(msg);
+    showToast(msg, 'error');
   };
   
   recognition.onend = function(){
@@ -226,7 +226,7 @@ window.mobileVoiceCommand = function(){
   
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if(!SR){
-    alert('您的浏览器不支持语音输入，请使用Chrome或Safari');
+    showToast('您的浏览器不支持语音输入，请使用Chrome或Safari', 'warning');
     return;
   }
   
@@ -248,7 +248,7 @@ window.mobileVoiceCommand = function(){
   
   recognition.onerror = function(event){
     hideListeningOverlay();
-    alert('语音识别失败: ' + event.error);
+    showToast('语音识别失败: ' + event.error, 'error');
   };
   
   recognition.onend = function(){
@@ -299,7 +299,7 @@ function executeCommand(text){
     }
   }
   
-  alert('未识别指令: "' + text + '"\n可尝试说: "算八字"、"看黄历"、"查运势"、"倪海厦"');
+  showToast('未识别指令: "' + text + '"\n可尝试说: "算八字"、"看黄历"、"查运势"、"倪海厦"', 'info');
 }
 
 function openMobileTool(toolKey){

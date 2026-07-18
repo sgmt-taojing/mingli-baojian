@@ -104,18 +104,19 @@ input:focus{border-color:#c9a84c}
 </div>
 </div>
 
+<script src="../js/toast-helper.js"></script>
 <script>
 var currentMerchant=null;
 var currentTab='overview';
 
 function merchantLogin(){
   var phone=document.getElementById('loginPhone').value.trim();
-  if(!phone){alert('请输入手机号');return}
+  if(!phone){showToast('请输入手机号');return}
   var list=JSON.parse(localStorage.getItem('merchantList')||'[]');
   var m=list.find(function(x){return x.phone===phone});
-  if(!m){alert('未找到商家信息，请先入驻');return}
+  if(!m){showToast('未找到商家信息，请先入驻');return}
   if(m.status!=='approved'&&m.status!=='pending'){
-    alert('商家状态异常：'+m.status);return;
+    showToast('商家状态异常：'+m.status);return;
   }
   currentMerchant=m;
   document.getElementById('loginBox').classList.add('hidden');
@@ -170,13 +171,13 @@ function addProduct(){
     status:'active',
     createDate:new Date().toISOString().slice(0,10)
   };
-  if(!p.name){alert('请填写商品名称');return}
+  if(!p.name){showToast('请填写商品名称');return}
   var all=JSON.parse(localStorage.getItem('merchantProducts')||'[]');
   all.push(p);
   localStorage.setItem('merchantProducts',JSON.stringify(all));
   document.getElementById('addProductForm').classList.add('hidden');
   loadProducts();
-  alert('商品已上架');
+  showToast('商品已上架');
 }
 
 function loadProducts(){
@@ -208,7 +209,7 @@ function loadOrders(){
   // 收入明细
   var total=orders.reduce(function(s,o){return s+(o.merchantAmount||0)},0);
   var platform=orders.reduce(function(s,o){return s+(o.platformAmount||0)},0);
-  document.getElementById('incomeDetail').innerHTML='<div style="font-size:13px;color:#f0e8d8;line-height:2.2">总订单数：'+orders.length+'<br>商家收入：¥'+total.toFixed(2)+'<br>平台分成：¥'+platform.toFixed(2)+'<br>分成比例：'+(currentMerchant.split*100)+'% / '+(100-currentMerchant.split*100)+'%<br>可提现：¥'+total.toFixed(2)+'</div><button class="btn" style="margin-top:10px" onclick="alert(\'提现功能开发中\')">申请提现</button>';
+  document.getElementById('incomeDetail').innerHTML='<div style="font-size:13px;color:#f0e8d8;line-height:2.2">总订单数：'+orders.length+'<br>商家收入：¥'+total.toFixed(2)+'<br>平台分成：¥'+platform.toFixed(2)+'<br>分成比例：'+(currentMerchant.split*100)+'% / '+(100-currentMerchant.split*100)+'%<br>可提现：¥'+total.toFixed(2)+'</div><button class="btn" style="margin-top:10px" onclick="showToast(\'提现功能开发中\')">申请提现</button>';
 }
 
 function switchTab(tab,el){

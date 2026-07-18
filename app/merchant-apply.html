@@ -115,14 +115,15 @@ textarea{min-height:70px;resize:vertical}
 <p style="margin-top:16px"><a href="merchant-dashboard.html" style="color:#c9a84c">前往商家后台 →</a></p>
 </div>
 
+<script src="../js/toast-helper.js"></script>
 <script>
 function submitApply(){
   var name=document.getElementById('mName').value.trim();
   var phone=document.getElementById('mPhone').value.trim();
   var agree=document.getElementById('mAgree').checked;
-  if(!name){alert('请填写商家名称');return}
-  if(!phone){alert('请填写联系电话');return}
-  if(!agree){alert('请勾选入驻协议');return}
+  if(!name){showToast('请填写商家名称');return}
+  if(!phone){showToast('请填写联系电话');return}
+  if(!agree){showToast('请勾选入驻协议');return}
   
   var data={
     id:'m'+Date.now(),

@@ -2156,7 +2156,7 @@ function aiStopRead(){
 function aiVoiceInput(){
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if(!SR){
-    alert('您的浏览器不支持语音输入，请使用Chrome或Safari');
+    showToast('您的浏览器不支持语音输入，请使用Chrome或Safari','warning');
     return;
   }
   var micBtn = document.getElementById('aiMicBtn');
@@ -2295,6 +2295,7 @@ async function aiSendMsgWithContext(ctx){
   }
 }
 </script>
+<script src="../js/toast-helper.js"></script>
 <script src="../js/mobile-voice.js?v=20260718"></script>
 </body>
 </html>
