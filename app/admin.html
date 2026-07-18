@@ -1474,19 +1474,19 @@ async function checkServices(){
 function loadFileStats(){
   const stats=document.getElementById('fileStats');
   stats.innerHTML='<p style="color:var(--gray-light)">文件统计需后端API支持，当前显示静态信息：</p>';
-  stats.innerHTML+='<div class="table-wrap"><table><thead><tr><th>目录</th><th>说明</th></tr></thead><tbody>'+
+  stats.insertAdjacentHTML('beforeend', '<div class="table-wrap"><table><thead><tr><th>目录</th><th>说明</th></tr></thead><tbody>'+
     '<tr><td>app/</td><td>前端页面与脚本</td></tr>'+
     '<tr><td>app/knowledge/</td><td>知识库JS文件</td></tr>'+
     '<tr><td>server/</td><td>后端服务（排盘/API代理/知识服务）</td></tr>'+
     '<tr><td>docs/</td><td>项目文档</td></tr>'+
-    '</tbody></table></div>';
+    '</tbody></table></div>');
   // 尝试用Performance API估算
   if(window.performance&&performance.getEntriesByType){
     const entries=performance.getEntriesByType('resource');
     let totalSize=0;
     entries.forEach(e=>{if(e.transferSize)totalSize+=e.transferSize;});
     if(totalSize>0){
-      stats.innerHTML+='<p style="margin-top:.5rem;font-size:.8rem;color:var(--cyan2)">已加载资源总大小: '+(totalSize/1024).toFixed(1)+' KB</p>';
+      stats.insertAdjacentHTML('beforeend', '<p style="margin-top:.5rem;font-size:.8rem;color:var(--cyan2)">已加载资源总大小: '+(totalSize/1024).toFixed(1)+' KB</p>');
     }
   }
 }
@@ -1980,9 +1980,9 @@ function loadStats(){
   document.getElementById('usageStats').innerHTML=Object.keys(toolCounts).length===0?
     '<div class="meta">暂无数据，显示模拟数据：</div>':'';
   const mockData=[{name:'八字排盘',count:128,pct:35},{name:'六爻占卜',count:85,pct:23},{name:'测字',count:62,pct:17},{name:'吉日查询',count:45,pct:12},{name:'手机号测算',count:30,pct:8},{name:'姓名分析',count:18,pct:5}];
-  document.getElementById('usageStats').innerHTML+='<div class="table-wrap"><table><thead><tr><th>功能</th><th>使用次数</th><th>占比</th><th>趋势</th></tr></thead><tbody>'+
+  document.getElementById('usageStats').insertAdjacentHTML('beforeend', '<div class="table-wrap"><table><thead><tr><th>功能</th><th>使用次数</th><th>占比</th><th>趋势</th></tr></thead><tbody>'+
     mockData.map(d=>'<tr><td>'+d.name+'</td><td>'+d.count+'</td><td>'+d.pct+'%</td><td><span class="badge badge-ok">↑</span></td></tr>').join('')+
-    '</tbody></table></div>';
+    '</tbody></table></div>');
 
   // 付费转化分析
   document.getElementById('paidConversion').innerHTML=
