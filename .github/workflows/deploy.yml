@@ -30,10 +30,28 @@ jobs:
       - name: Prepare deploy directory
         run: |
           mkdir -p _site
+          # 复制所有目录
           cp -r app _site/app
           cp -r docs _site/docs
           cp -r knowledge _site/knowledge
-          cp .nojekyll _site/.nojekyll
+          # 复制根目录HTML（index.html + divination-hub.html等）
+          cp *.html _site/ 2>/dev/null || true
+          # 创建.nojekyll（禁用Jekyll处理）
+          touch _site/.nojekyll
+          # 创建根目录跳转页（指向app/下的主页面）
+          cat > _site/index.html << 'HTMLEOF'
+          <!DOCTYPE html>
+          <html lang="zh-CN">
+          <head>
+            <meta charset="UTF-8">
+            <meta http-equiv="refresh" content="0; url=app/divination-hub.html">
+            <title>命理宝鉴</title>
+          </head>
+          <body>
+            <p>正在跳转到<a href="app/divination-hub.html">命理宝鉴主页面</a>...</p>
+          </body>
+          </html>
+          HTMLEOF
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
