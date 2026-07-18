@@ -10,6 +10,17 @@ import datetime
 import sys
 import os
 
+try:
+    from lunarcalendar import Converter, Solar
+    def get_lunar_date(year, month, day):
+        s = Solar(year, month, day)
+        l = Converter.Solar2Lunar(s)
+        month_str = f'闰{l.month}月' if l.isleap else f'{l.month}月'
+        return f'农历{l.year}年{month_str}{l.day}日'
+except ImportError:
+    def get_lunar_date(year, month, day):
+        return f'农历'
+
 # === 1. 干支计算 ===
 TIAN_GAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸']
 DI_ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥']
@@ -287,19 +298,42 @@ def get_weather(city="Jinan"):
             data = resp.read().decode('utf-8').strip()
         # Parse: ☀️ +23°C 57% ↗14km/h
         parts = data.split()
-        condition = parts[0] if len(parts) > 0 else ''
+        condition_emoji = parts[0] if len(parts) > 0 else ''
         temp = parts[1] if len(parts) > 1 else ''
         humidity = parts[2] if len(parts) > 2 else ''
         wind = parts[3] if len(parts) > 3 else ''
+        # 天气英文转中文
+        WEATHER_CN = {
+            '☀️': '晴', '⛅': '多云', '☁️': '阴', '🌧️': '小雨', '🌧': '雨',
+            '⛈️': '雷阵雨', '🌨️': '雪', '❄️': '雪', '🌫️': '雾', ' haze': '霾',
+            '🌦️': '阵雨', '🌧️🌧️': '大雨', '☀️☀️': '晴',
+        }
+        condition_cn = WEATHER_CN.get(condition_emoji, condition_emoji)
+        # 如果emoji没匹配到，尝试从raw文本判断
+        raw_lower = data.lower()
+        if 'rain' in raw_lower or 'drizzle' in raw_lower:
+            condition_cn = '雨'
+        elif 'snow' in raw_lower:
+            condition_cn = '雪'
+        elif 'fog' in raw_lower or 'mist' in raw_lower or 'haze' in raw_lower:
+            condition_cn = '雾'
+        elif 'cloud' in raw_lower:
+            condition_cn = '多云'
+        elif 'clear' in raw_lower or 'sunny' in raw_lower:
+            condition_cn = '晴'
+        elif 'thunder' in raw_lower:
+            condition_cn = '雷阵雨'
+        elif condition_cn == condition_emoji and condition_emoji:
+            condition_cn = condition_emoji  # 保留emoji
         return {
-            'condition': condition,
+            'condition': condition_cn,
             'temp': temp,
             'humidity': humidity,
             'wind': wind,
             'raw': data
         }
     except Exception as e:
-        return {'condition': '☀️', 'temp': '+22°C', 'humidity': '60%', 'wind': '5km/h', 'raw': str(e)}
+        return {'condition': '晴', 'temp': '+22°C', 'humidity': '60%', 'wind': '5km/h', 'raw': str(e)}
 
 # === 4. 节气节日 ===
 SOLAR_TERMS_INFO = {
@@ -380,25 +414,107 @@ WISDOM = {
     ]
 }
 
-# 穿衣指南（根据天气温度）
-def get_clothing_guide(temp_str):
+# 五行对应关系全量表
+WUXING_MAP = {
+    '木': {
+        'colors': ['绿','青','翠'],
+        'numbers': [3, 8],
+        'directions': ['东','东南'],
+        'foods': ['酸味','绿色蔬菜','柑橘','芒枣'],
+        'organs': ['肝','胆','目','筋'],
+        'occupations': ['教育','文化','出版','服装','园艺','木材','家具'],
+        'materials': ['棉麻','木质饰品','竹制品'],
+        'seasons': ['春'],
+        'tastes': ['酸'],
+    },
+    '火': {
+        'colors': ['红','紫','橙','粉'],
+        'numbers': [2, 7],
+        'directions': ['南'],
+        'foods': ['苦味','红色食物','辣椒','红豆'],
+        'organs': ['心','小肠','舌','脉'],
+        'occupations': ['IT','电子','电力','照明','餐饮','美容','娱乐'],
+        'materials': ['丝质','红色饰品','紫水晶'],
+        'seasons': ['夏'],
+        'tastes': ['苦'],
+    },
+    '土': {
+        'colors': ['黄','棕','咖','卡其'],
+        'numbers': [5, 0],
+        'directions': ['中','东北','西南'],
+        'foods': ['甜味','黄色食物','土豆','南瓜','小米'],
+        'organs': ['脾','胃','口','肉'],
+        'occupations': ['房地产','建筑','农业','陶瓷','石材','仓储'],
+        'materials': ['陶瓷','玉石','水晶'],
+        'seasons': ['四季'],
+        'tastes': ['甘'],
+    },
+    '金': {
+        'colors': ['白','金','银','灰'],
+        'numbers': [4, 9],
+        'directions': ['西','西北'],
+        'foods': ['辛味','白色食物','白萝卜','梨','大蒜'],
+        'organs': ['肺','大肠','鼻','皮毛'],
+        'occupations': ['金融','机械','汽车','五金','珠宝','法律','军事'],
+        'materials': ['金银饰品','金属手表','铜器'],
+        'seasons': ['秋'],
+        'tastes': ['辛'],
+    },
+    '水': {
+        'colors': ['黑','蓝','深灰'],
+        'numbers': [1, 6],
+        'directions': ['北'],
+        'foods': ['咸味','黑色食物','黑豆','海带','紫菜'],
+        'organs': ['肾','膀胱','耳','骨'],
+        'occupations': ['物流','水产','旅游','酒店','贸易','酒类','清洁'],
+        'materials': ['珍珠','黑曜石','蓝色宝石'],
+        'seasons': ['冬'],
+        'tastes': ['咸'],
+    },
+}
+
+# 日主五行→喜用五行→穿搭推荐
+YONGSHEN_DRESS = {
+    '木': {'colors': '绿/青/翠色系', 'materials': '棉麻、木质手串', 'accessories': '绿幽灵水晶、翡翠'},
+    '火': {'colors': '红/紫/橙色系', 'materials': '丝质衣物', 'accessories': '红玛瑙、紫水晶'},
+    '土': {'colors': '黄/棕/卡其色系', 'materials': '陶瓷饰品', 'accessories': '黄水晶、玉石'},
+    '金': {'colors': '白/金/银色系', 'materials': '金属手表、金银手镯', 'accessories': '白水晶、银饰'},
+    '水': {'colors': '黑/蓝/深灰色系', 'materials': '珍珠饰品', 'accessories': '黑曜石、海蓝宝'},
+}
+
+def get_clothing_guide_by_wuxing(day_gan_ele, xi_yong_ele=None):
+    """根据日主五行和喜用神五行推荐穿搭"""
+    base = YONGSHEN_DRESS.get(day_gan_ele, YONGSHEN_DRESS['土'])
+    if xi_yong_ele and xi_yong_ele in YONGSHEN_DRESS:
+        xi = YONGSHEN_DRESS[xi_yong_ele]
+        return f"👕 日主{day_gan_ele}，喜用{xi_yong_ele}：宜穿{base['colors']}或{xi['colors']}，{base['materials']}，配{xi['accessories']}"
+    return f"👕 日主{day_gan_ele}：宜穿{base['colors']}，{base['materials']}，配{base['accessories']}"
+
+# 穿衣指南（根据天气温度+五行）
+def get_clothing_guide(temp_str, day_gan_ele='土', xi_yong_ele=None):
     try:
         temp_c = int(temp_str.replace('+','').replace('°C','').replace('C',''))
     except:
         temp_c = 22
     
+    # 温度建议
     if temp_c <= 5:
-        return '🧥 羽绒服/厚棉衣，围巾手套必备，注意防寒保暖'
+        temp_advice = '羽绒服/厚棉衣，围巾手套必备，注意防寒保暖'
     elif temp_c <= 12:
-        return '🧶 厚外套/风衣，内搭毛衣，早晚温差大注意添衣'
+        temp_advice = '厚外套/风衣，内搭毛衣，早晚温差大注意添衣'
     elif temp_c <= 18:
-        return '👔 薄外套/夹克，内搭长袖，舒适为主'
+        temp_advice = '薄外套/夹克，内搭长袖，舒适为主'
     elif temp_c <= 25:
-        return '👕 轻薄长袖或短袖+薄外套，灵活搭配'
+        temp_advice = '轻薄长袖或短袖+薄外套，灵活搭配'
     elif temp_c <= 30:
-        return '👕 短袖T恤/薄衫，透气舒适，注意防晒'
+        temp_advice = '短袖T恤/薄衫，透气舒适，注意防晒'
     else:
-        return '🩳 轻薄透气衣物，帽子墨镜，做好防晒措施'
+        temp_advice = '轻薄透气衣物，帽子墨镜，做好防晒措施'
+    
+    # 五行穿搭建议
+    wuxing_advice = get_clothing_guide_by_wuxing(day_gan_ele, xi_yong_ele)
+    
+    return f'🧥 {temp_advice}\n👤 {wuxing_advice}'
 
 # 方位指南
 def get_direction_guide(ganzhi, yi_ji):
@@ -549,13 +665,16 @@ def generate_daily_recommendation():
     # 节日
     holiday = HOLIDAYS.get((month, day), '')
     
-    # 智慧（每日轮换儒道佛）
-    wisdom_type = ['儒','道','佛'][day % 3]
+    # 智慧（每日轮换儒道佛，加入日期偏移避免连续重复）
+    wisdom_type = ['儒','道','佛'][(day + now.month) % 3]
     wisdom_list = WISDOM[wisdom_type]
-    wisdom = wisdom_list[day % len(wisdom_list)]
+    # 用年月日组合偏移，避免连续三天推送同一类内容
+    wisdom_offset = (year * 372 + month * 31 + day) % len(wisdom_list)
+    wisdom = wisdom_list[wisdom_offset]
     
-    # 穿衣指南
-    clothing = get_clothing_guide(weather['temp'])
+    # 穿衣指南（温度+五行）
+    day_gan_ele = WU_XING_GAN[TIAN_GAN.index(ganzhi['day_gan'])]
+    clothing = get_clothing_guide(weather['temp'], day_gan_ele)
     
     # 方位指南
     direction = get_direction_guide(ganzhi, yi_ji)
@@ -571,7 +690,8 @@ def generate_daily_recommendation():
     msg = f"""📅 乾元命理宝鉴 · 每日推荐
 ━━━━━━━━━━━━━━━━━━
 
-🌍 {year}年{month}月{day}日 {weekday}
+⏰ {year}年{month}月{day}日 {weekday}
+🌍 阳历：{year}年{month}月{day}日 | {get_lunar_date(year, month, day)}
 🏮 {ganzhi['year_gan']}{ganzhi['year_zhi']}年（{ganzhi['year_shengxiao']}年）
 🌙 {ganzhi['month_gan']}{ganzhi['month_zhi']}月 · {ganzhi['day_gan']}{ganzhi['day_zhi']}日
 
@@ -585,6 +705,7 @@ def generate_daily_recommendation():
 ☀️ 黄道黑道：{huanghei}
 ⚔️ 冲煞：{chong} · {sha}
 📜 彭祖百忌：{pengzu}
+🐾 生肖五行：{ganzhi['year_shengxiao']}（{WU_XING_ZHI[DI_ZHI.index(ganzhi["year_zhi"])]}）· 日支{ganzhi["day_zhi"]}（{WU_XING_ZHI[DI_ZHI.index(ganzhi["day_zhi"])]}）
 
 🧭 喜神：{XISHEN_FANG.get(ganzhi['day_gan'],'东北')}
 💰 财神：{CAISHEN_FANG.get(ganzhi['day_gan'],'正北')}
@@ -617,20 +738,25 @@ def generate_daily_recommendation():
             msg += f"   🎁 供奉建议：香花灯水果\n"
             msg += f"   📿 诵读经文：可念诵相关经文回向\n"
 
-    # 天气
+    # 天气（穿衣合并为一条）
     msg += f"""
 ━━━ 🌤️ 济南天气 ━━━
 
 天气：{weather['condition']} 气温：{weather['temp']} 湿度：{weather['humidity']} 风速：{weather['wind']}
-
 {clothing}
 """
 
-    # 方位指南
+    # 方位指南（去掉重复的财神方位，已在黄历区显示）
     msg += f"""
 ━━━ 🧭 方位指南 ━━━
-{direction}
+  • 喜神方位：{XISHEN_FANG.get(ganzhi['day_gan'],'东北')}（祈福求喜宜向此方）
+  • 福神方位：{FUSHEN_FANG.get(ganzhi['day_gan'],'东南')}（祈福求福宜向此方）
+  • 出行大吉方：{XISHEN_FANG.get(ganzhi['day_gan'],'东北').split('（')[0]}
 """
+    if '出行' in yi_ji['yi'] or '赴任' in yi_ji['yi']:
+        msg += '  • ✅ 今日宜出行，可放心外出\n'
+    elif '出行' in yi_ji['ji']:
+        msg += '  • ⚠️ 今日忌出行，非必要不远行\n'
 
     # 智慧
     msg += f"""
@@ -644,7 +770,7 @@ def generate_daily_recommendation():
 
     # 口诀推荐
     koujue_tips = [
-        '今日宜诵「净心神咒」三遍：太上台星，应变无停。驱邪缚魅，保命护身。',
+        '今日宜诵「净心神咒(zhòu)」三遍：太上台星，应变无停。驱邪缚魅(mèi)，保命护身。',
         '今日宜诵「心经」一遍：色不异空，空不异色。色即是空，空即是色。',
         '今日宜诵「清净经」：大道无形，生育天地；大道无名，长养万物。',
         '今日宜静坐冥想15分钟，观呼吸，放杂念，养心神。',
@@ -669,13 +795,31 @@ def generate_daily_recommendation():
 {daily_knowledge['summary']}
 """
 
+    # 三元九运引导化解
+    msg += f"""
+━━━ 🌟 三元九运 · 缘主运势提点 ━━━
+
+当前处于下元九运（2024-2043年），离火当令，火旺之世。
+缘主日主癸水，九运火旺水弱，宜补水助身、金白水清。
+
+💡 化解建议：
+  • 佩戴金属饰物（金银手镯、铜牌）增强金水之气
+  • 居家北方摆放鱼缸或水景，补水润身
+  • 穿搭以黑蓝白为主色调，水金相生
+  • 多近水边散步，滋养命局
+
+🛒 化解物品可前往「商城」选购，专业开光法器助缘主转运纳福。
+
+💪 缘主命局根基稳固，大运乙丑(43-52岁)冠带期，渐入佳境。日主癸水虽在九运稍弱，但乙木伤官泄秀，才华可展。保持正念，善积福德，前途光明可期！
+"""
+
     # 免责声明
     msg += """
 ━━━━━━━━━━━━━━━━━━
 
 ⚠️ 以上内容仅供文化交流与生活参考，不构成任何决策依据。如有重大事项，请结合实际情况理性判断。
 
-🙏 祝您今日吉祥如意，平安喜顺！"""
+🙏 祝缘主今日吉祥如意，平安喜顺！"""
 
     return msg
 
