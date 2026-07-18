@@ -1,0 +1,10 @@
+# 每日推送服务 — 定时生成每日推荐内容
+FROM python:3.11-slim
+WORKDIR /app
+RUN pip install --no-cache-dir lunarcalendar requests
+COPY daily-recommendation.py .
+# 使用cron定时执行
+RUN apt-get update && apt-get install -y cron && rm -rf /var/lib/apt/lists/*
+RUN echo "0 6 * * * cd /app && python3 daily-recommendation.py >> /var/log/push.log 2>&1" > /etc/cron.d/daily-push
+RUN chmod 0644 /etc/cron.d/daily-push && crontab /etc/cron.d/daily-push
+CMD ["cron", "-f"]

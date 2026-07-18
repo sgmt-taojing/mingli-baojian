@@ -11132,7 +11132,7 @@ function tzStep1Analyze(fileName, content, type) {
   prompt += '重要提示：\n- 如数值在参考范围内，状态为"正常"\n- 如数值高于参考范围，状态为"偏高↑"\n- 如数值低于参考范围，状态为"偏低↓"\n- 所有分析仅供养生保健参考，不构成医疗诊断\n\n';
   prompt += '报告内容：' + (typeof content === 'string' ? content.substring(0, 4000) : content);
 
-  var apiBase = 'http://127.0.0.1:8900';
+  var apiBase = '';
   var payload = {
     model: 'openclaw',
     messages: [{role: 'user', content: prompt}],
@@ -11152,7 +11152,7 @@ function tzStep1Analyze(fileName, content, type) {
     }];
   }
 
-  fetch(apiBase + '/v1/chat/completions', {
+  fetch('/v1/chat/completions', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(payload)
@@ -11291,7 +11291,7 @@ function tzStep2Suggestions() {
     temperature: 0.4
   };
 
-  fetch((typeof apiBase!=='undefined'?apiBase:'http://127.0.0.1:8900')+'/v1/chat/completions', {
+  fetch('/v1/chat/completions', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(payload)
@@ -19184,7 +19184,7 @@ function _analyzeFloorPlanAI(imageData, context) {
   var fsAiStatus = document.getElementById('fsAiStatus');
   if (fsAiStatus) fsAiStatus.innerHTML = '<div style="padding:20px;text-align:center"><div style="font-size:24px">🔮 AI分析中...</div><p style="margin-top:12px;opacity:.6">正在解读您的户型图</p></div>';
 
-  fetch((typeof apiBase!=='undefined'?apiBase:'http://127.0.0.1:8900')+'/v1/chat/completions', {
+  fetch('/v1/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -29443,7 +29443,7 @@ function analyzeScreenshot() {
   formData.append('image', imgFile);
 
   // 先尝试调用本地AI服务
-  fetch((typeof FACE_API!=='undefined'?FACE_API:'http://localhost:8911')+'/api/face-analyze', {
+  fetch('/api/face-analyze', {
     method: 'POST',
     body: formData,
     timeout: 30000
@@ -29853,7 +29853,7 @@ function tzGeneratePlan(){
   prompt+='4. 起居调摄（作息/穴位/注意事项）\n\n';
   prompt+='用JSON格式回复：{"食疗":[{"名称":"...","食材":"...","做法":"...","功效":"..."}],"功法":[{"名称":"...","理由":"...","时长":"..."}],"正念":[{"方法":"...","步骤":"...","益处":"..."}],"起居":[{"方面":"...","建议":"..."}],"总结":"..."}';
 
-  fetch((typeof apiBase!=='undefined'?apiBase:'http://127.0.0.1:8900')+'/v1/chat/completions',{
+  fetch('/v1/chat/completions',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({model:'openclaw',messages:[{role:'user',content:prompt}],max_tokens:2000,temperature:0.4})
@@ -37356,7 +37356,7 @@ function submitAsk() {
     temperature: 0.7
   };
 
-  fetch((typeof apiBase!=='undefined'?apiBase:'http://127.0.0.1:8900')+'/v1/chat/completions', {
+  fetch('/v1/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)

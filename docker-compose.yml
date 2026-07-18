@@ -1,0 +1,72 @@
+# 命理宝鉴 — 一键部署配置
+# 用法: docker-compose up -d
+
+version: '3.8'
+
+services:
+  # ═══ 前端静态服务 ═══
+  web:
+    image: nginx:alpine
+    container_name: mingli-web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./app:/usr/share/nginx/html/app
+      - ./knowledge:/usr/share/nginx/html/knowledge
+      - ./docs:/usr/share/nginx/html/docs
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - api-proxy
+      - paipan
+      - tts
+    restart: unless-stopped
+
+  # ═══ AI API代理服务 ═══
+  api-proxy:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.api
+    container_name: mingli-api
+    ports:
+      - "8900:8900"
+    environment:
+      - G2CLAW_API_KEY=${G2CLAW_API_KEY:-}
+      - PORT=8900
+    restart: unless-stopped
+
+  # ═══ 排盘服务 ═══
+  paipan:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.paipan
+    container_name: mingli-paipan
+    ports:
+      - "8911:8911"
+    environment:
+      - PORT=8911
+    restart: unless-stopped
+
+  # ═══ TTS语音服务 ═══
+  tts:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.tts
+    container_name: mingli-tts
+    ports:
+      - "8912:8912"
+    environment:
+      - PORT=8912
+    restart: unless-stopped
+
+  # ═══ 每日推送服务 ═══
+  daily-push:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.push
+    container_name: mingli-push
+    environment:
+      - TZ=Asia/Shanghai
+      - PUSH_API_BASE=${PUSH_API_BASE:-}
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped

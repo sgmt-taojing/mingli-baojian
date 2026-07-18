@@ -8,7 +8,7 @@
 (function(){
 'use strict';
 
-var TTS_BASE = 'http://127.0.0.1:8912';
+var TTS_BASE = '/api/tts';
 var currentVoice = 'female';
 var currentAudio = null;
 
@@ -19,7 +19,7 @@ window.speakText = function(text, opts){
   var voice = opts.voice || currentVoice;
   // 停止当前播放
   if(currentAudio){currentAudio.pause();currentAudio = null;}
-  var url = TTS_BASE + '/api/tts?text=' + encodeURIComponent(text.substring(0, 2000)) + '&voice=' + voice;
+  var url = TTS_BASE + '?text=' + encodeURIComponent(text.substring(0, 2000)) + '&voice=' + voice;
   currentAudio = new Audio(url);
   currentAudio.onended = function(){currentAudio = null; if(opts.onend) opts.onend();};
   currentAudio.onerror = function(){currentAudio = null; if(opts.onerror) opts.onerror('TTS播放失败');};

@@ -1,0 +1,8 @@
+# AI API代理服务 — 转发g2claw API，隐藏密钥
+FROM python:3.11-slim
+WORKDIR /app
+RUN pip install --no-cache-dir http-server
+COPY api-proxy-server.py .
+COPY Dockerfile.api .
+EXPOSE 8900
+CMD ["python3", "api-proxy-server.py"]

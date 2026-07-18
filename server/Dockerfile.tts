@@ -1,0 +1,7 @@
+# TTS语音服务 — Edge-TTS
+FROM python:3.11-slim
+WORKDIR /app
+RUN pip install --no-cache-dir edge-tts
+COPY tts-server.py .
+EXPOSE 8912
+CMD ["python3", "tts-server.py"]

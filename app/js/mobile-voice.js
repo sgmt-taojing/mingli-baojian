@@ -10,7 +10,7 @@
 (function(){
 'use strict';
 
-var TTS_BASE = 'http://127.0.0.1:8912';
+var TTS_BASE = '/api/tts';
 var currentVoice = 'female';
 var currentAudio = null;
 var isWechat = /MicroMessenger/i.test(navigator.userAgent);
@@ -43,7 +43,7 @@ window.mobileSpeak = function(text, opts){
   if(currentAudio){currentAudio.pause(); currentAudio = null;}
   
   var voice = opts.voice || currentVoice;
-  var url = TTS_BASE + '/api/tts?text=' + encodeURIComponent(text.substring(0, 500)) + '&voice=' + voice;
+  var url = TTS_BASE + '?text=' + encodeURIComponent(text.substring(0, 500)) + '&voice=' + voice;
   
   // 显示播放控件
   showPlayer(text.substring(0, 50) + '...', function(){

@@ -2085,7 +2085,7 @@ async function aiSendMsg(){
     var ctx = aiChatHistory.slice(-10);
     var sysMsg = {role:'system', content:'你是易道智鉴的AI命理助手。用户可能在手机上使用，回答要简洁易懂，避免过长。涉及命理、风水、中医、养生等问题时，给出实用建议。提醒用户理性参考。'};
     
-    var resp = await fetch('https://api.g2claw.com/v1/chat/completions', {
+    var resp = await fetch('/v1/chat/completions', {
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer sk-g2claw-default'},
       body:JSON.stringify({model:'auto',messages:[sysMsg].concat(ctx),max_tokens:800,temperature:0.7})
@@ -2142,7 +2142,7 @@ function aiReadLast(){
   aiStopRead();
   var voice = aiCurrentVoice;
   var voiceMap = {female:'zh-CN-XiaoxiaoNeural', male:'zh-CN-YunyangNeural', female2:'zh-CN-XiaochenNeural', male2:'zh-CN-YunfengNeural'};
-  var url = 'http://127.0.0.1:8912/api/tts?text=' + encodeURIComponent(aiLastReply.substring(0,500)) + '&voice=' + (voiceMap[voice]||voice);
+  var url = '/api/tts?text=' + encodeURIComponent(aiLastReply.substring(0,500)) + '&voice=' + (voiceMap[voice]||voice);
   aiAudio = new Audio(url);
   aiAudio.onended = function(){aiAudio = null;};
   aiAudio.onerror = function(){aiAudio = null;};
@@ -2264,7 +2264,7 @@ async function aiSendMsgWithContext(ctx){
     var sysMsg = {role:'system', content:'你是易道智鉴的AI命理助手。用户可能在手机上使用，回答要简洁易懂，避免过长。' + ctxPrompt + '涉及命理、风水、中医、养生等问题时，给出实用建议。提醒用户理性参考。'};
     var chatCtx = aiChatHistory.slice(-10);
     
-    var resp = await fetch('https://api.g2claw.com/v1/chat/completions', {
+    var resp = await fetch('/v1/chat/completions', {
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'***'},
       body:JSON.stringify({model:'auto',messages:[sysMsg].concat(chatCtx),max_tokens:800,temperature:0.7})

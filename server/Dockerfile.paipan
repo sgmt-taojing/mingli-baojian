@@ -1,0 +1,7 @@
+# 排盘服务 — Python排盘引擎
+FROM python:3.11-slim
+WORKDIR /app
+RUN pip install --no-cache-dir lunar_python sxtwl
+COPY paipan-server.py paipan.py .
+EXPOSE 8911
+CMD ["python3", "paipan-server.py"]
