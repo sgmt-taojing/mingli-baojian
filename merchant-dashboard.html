@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>商家后台 · 易道智鉴</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Serif SC',serif;background:#0a0a12;color:#f0e8d8;line-height:1.8;max-width:600px;margin:0 auto;padding:16px}
+h1{color:#c9a84c;font-size:20px;letter-spacing:3px;margin-bottom:16px}
+.card{background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.12);border-radius:12px;padding:14px;margin-bottom:12px}
+.card h3{color:#c9a84c;font-size:13px;margin-bottom:10px}
+label{display:block;font-size:11px;color:#a09080;margin-bottom:3px}
+input,select,textarea{width:100%;padding:9px;background:#141428;border:1px solid rgba(201,168,76,0.15);border-radius:8px;color:#f0e8d8;font-size:12px;font-family:inherit;outline:none;margin-bottom:8px}
+input:focus{border-color:#c9a84c}
+.btn{padding:9px 16px;background:linear-gradient(135deg,#c9a84c,#a08030);color:#0a0a12;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn:active{transform:scale(0.98)}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-outline{background:transparent;border:1px solid #a08030;color:#c9a84c}
+.tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto}
+.tab{padding:8px 14px;border:1px solid rgba(201,168,76,0.15);border-radius:20px;color:#8a8070;font-size:12px;cursor:pointer;white-space:nowrap}
+.tab.active{background:#c9a84c;color:#0a0a12;border-color:#c9a84c}
+.stat{display:flex;gap:10px;margin-bottom:12px}
+.stat-item{flex:1;text-align:center;padding:12px 8px;background:rgba(201,168,76,0.04);border-radius:8px}
+.stat-num{font-size:20px;font-weight:bold;color:#c9a84c}
+.stat-label{font-size:10px;color:#8a8070}
+.prod-item{display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(201,168,76,0.03);border-radius:8px;margin-bottom:6px}
+.prod-name{font-size:12px;color:#f0e8d8}
+.prod-price{font-size:12px;color:#c9a84c;font-weight:bold}
+.login-box{text-align:center;padding:40px 20px}
+.row{display:flex;gap:8px}
+.row>div{flex:1}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<div id="loginBox" class="login-box">
+<h1>🏪 商家后台</h1>
+<div class="card" style="max-width:360px;margin:20px auto">
+<h3>📱 商家登录</h3>
+<label>手机号</label>
+<input type="tel" id="loginPhone" placeholder="入驻时填写的手机号">
+<label>验证码（输入任意6位数字）</label>
+<input type="text" id="loginCode" placeholder="6位验证码" maxlength="6">
+<button class="btn" style="width:100%" onclick="merchantLogin()">登录</button>
+<p style="font-size:11px;color:#8a8070;margin-top:10px">还没入驻？<a href="merchant-apply.html" style="color:#c9a84c">申请入驻 →</a></p>
+</div>
+</div>
+
+<div id="dashboard" class="hidden">
+<h1 id="dashTitle">🏪 商家后台</h1>
+<div class="tabs">
+<div class="tab active" onclick="switchTab('overview',this)">📊 概览</div>
+<div class="tab" onclick="switchTab('products',this)">📦 商品</div>
+<div class="tab" onclick="switchTab('orders',this)">📋 订单</div>
+<div class="tab" onclick="switchTab('income',this)">💰 收入</div>
+</div>
+
+<div id="tab-overview">
+<div class="stat">
+<div class="stat-item"><div class="stat-num" id="statProducts">0</div><div class="stat-label">在售商品</div></div>
+<div class="stat-item"><div class="stat-num" id="statOrders">0</div><div class="stat-label">总订单</div></div>
+<div class="stat-item"><div class="stat-num" id="statIncome">¥0</div><div class="stat-label">本月收入</div></div>
+</div>
+<div class="card">
+<h3>🏪 商家信息</h3>
+<div id="merchantInfo" style="font-size:12px;color:#a09080;line-height:2"></div>
+</div>
+</div>
+
+<div id="tab-products" class="hidden">
+<button class="btn" style="margin-bottom:12px" onclick="showAddProduct()">+ 新增商品</button>
+<div id="addProductForm" class="card hidden">
+<h3>新增商品</h3>
+<label>商品名称</label>
+<input type="text" id="pName" placeholder="如：五台山开光貔貅">
+<div class="row">
+<div><label>结缘价</label><input type="text" id="pPrice" placeholder="如：结缘 168"></div>
+<div><label>库存</label><input type="number" id="pStock" placeholder="99"></div>
+</div>
+<label>用途说明</label>
+<textarea id="pPurpose" placeholder="如：招财辟邪·镇宅护身"></textarea>
+<label>制作过程</label>
+<textarea id="pProcess" placeholder="如：本寺僧人手工制作·开光加持"></textarea>
+<div class="row">
+<div><label>派别</label><select id="pSchool"><option value="佛教">佛教</option><option value="道教">道教</option><option value="儒家">儒家</option><option value="民间">民间</option></select></div>
+<div><label>分类</label><select id="pCat"><option value="法器">法器</option><option value="吉祥物">吉祥物</option><option value="经典">经典</option><option value="茶饮">茶饮</option><option value="养生品">养生品</option></select></div>
+</div>
+<button class="btn" onclick="addProduct()">上架商品</button>
+</div>
+<div id="productList"></div>
+</div>
+
+<div id="tab-orders" class="hidden">
+<div id="orderList"></div>
+</div>
+
+<div id="tab-income" class="hidden">
+<div class="card">
+<h3>💰 收入明细</h3>
+<div id="incomeDetail"></div>
+</div>
+</div>
+</div>
+
+<script>
+var currentMerchant=null;
+var currentTab='overview';
+
+function merchantLogin(){
+  var phone=document.getElementById('loginPhone').value.trim();
+  if(!phone){alert('请输入手机号');return}
+  var list=JSON.parse(localStorage.getItem('merchantList')||'[]');
+  var m=list.find(function(x){return x.phone===phone});
+  if(!m){alert('未找到商家信息，请先入驻');return}
+  if(m.status!=='approved'&&m.status!=='pending'){
+    alert('商家状态异常：'+m.status);return;
+  }
+  currentMerchant=m;
+  document.getElementById('loginBox').classList.add('hidden');
+  document.getElementById('dashboard').classList.remove('hidden');
+  document.getElementById('dashTitle').textContent='🏪 '+m.name;
+  loadOverview();
+  loadProducts();
+  loadOrders();
+}
+
+function loadOverview(){
+  var products=getMerchantProducts();
+  var orders=getMerchantOrders();
+  var monthIncome=orders.reduce(function(s,o){return s+(o.merchantAmount||0)},0);
+  document.getElementById('statProducts').textContent=products.length;
+  document.getElementById('statOrders').textContent=orders.length;
+  document.getElementById('statIncome').textContent='¥'+monthIncome.toFixed(0);
+  var info='商家：'+currentMerchant.name+'<br>派别：'+currentMerchant.school+'<br>类型：'+currentMerchant.type+'<br>认证：'+currentMerchant.cert+'<br>分成比例：'+(currentMerchant.split*100)+'%<br>状态：'+(currentMerchant.status==='approved'?'✅ 已通过':'⏳ 待审核');
+  document.getElementById('merchantInfo').innerHTML=info;
+}
+
+function getMerchantProducts(){
+  var all=JSON.parse(localStorage.getItem('merchantProducts')||'[]');
+  return all.filter(function(p){return p.merchantId===currentMerchant.id});
+}
+
+function getMerchantOrders(){
+  var all=JSON.parse(localStorage.getItem('merchantOrders')||'[]');
+  return all.filter(function(o){return o.merchantId===currentMerchant.id});
+}
+
+function showAddProduct(){
+  document.getElementById('addProductForm').classList.toggle('hidden');
+}
+
+function addProduct(){
+  var p={
+    id:'p'+Date.now(),
+    merchantId:currentMerchant.id,
+    merchantName:currentMerchant.name,
+    name:document.getElementById('pName').value.trim(),
+    price:document.getElementById('pPrice').value.trim(),
+    stock:parseInt(document.getElementById('pStock').value)||0,
+    purpose:document.getElementById('pPurpose').value.trim(),
+    process:document.getElementById('pProcess').value.trim(),
+    school:document.getElementById('pSchool').value,
+    cat:document.getElementById('pCat').value,
+    certified:currentMerchant.cert,
+    master:currentMerchant.master,
+    masterwork:currentMerchant.status==='approved',
+    split:currentMerchant.split,
+    status:'active',
+    createDate:new Date().toISOString().slice(0,10)
+  };
+  if(!p.name){alert('请填写商品名称');return}
+  var all=JSON.parse(localStorage.getItem('merchantProducts')||'[]');
+  all.push(p);
+  localStorage.setItem('merchantProducts',JSON.stringify(all));
+  document.getElementById('addProductForm').classList.add('hidden');
+  loadProducts();
+  alert('商品已上架');
+}
+
+function loadProducts(){
+  var products=getMerchantProducts();
+  var html='';
+  if(products.length===0){html='<p style="text-align:center;color:#8a8070;padding:20px">暂无商品，点击上方按钮新增</p>'}
+  products.forEach(function(p){
+    html+='<div class="prod-item"><div><div class="prod-name">'+p.name+'</div><div style="font-size:10px;color:#8a8070">'+p.school+'·'+p.cat+'·库存'+p.stock+'</div></div><div style="text-align:right"><div class="prod-price">'+p.price+'</div><button class="btn btn-sm btn-outline" onclick="delProduct(\''+p.id+'\')">下架</button></div></div>';
+  });
+  document.getElementById('productList').innerHTML=html;
+}
+
+function delProduct(id){
+  if(!confirm('确认下架？'))return;
+  var all=JSON.parse(localStorage.getItem('merchantProducts')||'[]');
+  all=all.filter(function(p){return p.id!==id});
+  localStorage.setItem('merchantProducts',JSON.stringify(all));
+  loadProducts();
+}
+
+function loadOrders(){
+  var orders=getMerchantOrders();
+  var html='';
+  if(orders.length===0){html='<p style="text-align:center;color:#8a8070;padding:20px">暂无订单</p>'}
+  orders.forEach(function(o){
+    html+='<div class="prod-item"><div><div class="prod-name">'+o.productName+'</div><div style="font-size:10px;color:#8a8070">'+o.date+'·'+o.buyer+'</div></div><div style="text-align:right"><div class="prod-price">¥'+o.amount+'</div><div style="font-size:10px;color:#27ae60">分成¥'+(o.merchantAmount||0).toFixed(0)+'</div></div></div>';
+  });
+  document.getElementById('orderList').innerHTML=html;
+  // 收入明细
+  var total=orders.reduce(function(s,o){return s+(o.merchantAmount||0)},0);
+  var platform=orders.reduce(function(s,o){return s+(o.platformAmount||0)},0);
+  document.getElementById('incomeDetail').innerHTML='<div style="font-size:13px;color:#f0e8d8;line-height:2.2">总订单数：'+orders.length+'<br>商家收入：¥'+total.toFixed(2)+'<br>平台分成：¥'+platform.toFixed(2)+'<br>分成比例：'+(currentMerchant.split*100)+'% / '+(100-currentMerchant.split*100)+'%<br>可提现：¥'+total.toFixed(2)+'</div><button class="btn" style="margin-top:10px" onclick="alert(\'提现功能开发中\')">申请提现</button>';
+}
+
+function switchTab(tab,el){
+  currentTab=tab;
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+  el.classList.add('active');
+  ['overview','products','orders','income'].forEach(function(t){
+    document.getElementById('tab-'+t).classList.toggle('hidden',t!==tab);
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>易经占卜 - 易道智鉴</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Microsoft YaHei", sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 20px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        h1 { text-align: center; color: #667eea; margin-bottom: 30px; font-size: 2.5em; }
+        .divination-area { text-align: center; padding: 40px; }
+        .yao-input { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin: 30px 0; }
+        .yao-btn { padding: 20px; font-size: 24px; border: 2px solid #667eea; background: white; border-radius: 10px; cursor: pointer; transition: all 0.3s; }
+        .yao-btn.active { background: #667eea; color: white; }
+        .yao-btn:hover { transform: scale(1.05); }
+        .btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 40px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; margin: 10px; transition: transform 0.3s; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4); }
+        .result { margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px; display: none; }
+        .result.show { display: block; }
+        .gua-display { font-size: 48px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>☯ 易经占卜</h1>
+        <div class="divination-area">
+            <p style="margin-bottom: 20px; color: #666;">请诚心默念您的问题，然后点击六次爻线按钮进行占卜</p>
+            <div class="yao-input" id="yaoInput">
+                <button class="yao-btn" onclick="toggleYao(0)">初爻</button>
+                <button class="yao-btn" onclick="toggleYao(1)">二爻</button>
+                <button class="yao-btn" onclick="toggleYao(2)">三爻</button>
+                <button class="yao-btn" onclick="toggleYao(3)">四爻</button>
+                <button class="yao-btn" onclick="toggleYao(4)">五爻</button>
+                <button class="yao-btn" onclick="toggleYao(5)">上爻</button>
+            </div>
+            <button class="btn" onclick="randomDivination()">随机起卦</button>
+            <button class="btn" onclick="interpretGua()">解读卦象</button>
+        </div>
+        <div class="result" id="result">
+            <h2>卦象解读</h2>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+    
+    <script src="knowledge/knowledge-details.js"></script>
+    <script src="knowledge/authoritative-knowledge-base.js"></script>
+    <script>
+        let yaos = [null, null, null, null, null, null];
+        
+        function toggleYao(index) {
+            const btn = document.querySelectorAll('.yao-btn')[index];
+            yaos[index] = yaos[index] === null ? '--' : (yaos[index] === '--' ? '—' : null);
+            btn.textContent = yaos[index] || `第${index + 1}爻`;
+            btn.classList.toggle('active', yaos[index] !== null);
+        }
+        
+        function randomDivination() {
+            yaos = yaos.map(() => Math.random() > 0.5 ? '—' : '--');
+            const btns = document.querySelectorAll('.yao-btn');
+            btns.forEach((btn, i) => {
+                btn.textContent = yaos[i];
+                btn.classList.add('active');
+            });
+        }
+        
+        function interpretGua() {
+            if (yaos.some(y => y === null)) {
+                alert('请先完成起卦（六爻均需确定）');
+                return;
+            }
+            
+            const guaString = yaos.join('');
+            const resultHTML = `
+                <div class="gua-display">${guaString}</div>
+                <p><strong>卦象：</strong>系统正在结合易经知识库进行解读...</p>
+                <p><strong>分析：</strong>易道智鉴平台将为您提供专业的易经卦象分析。</p>
+            `;
+            
+            document.getElementById('resultContent').innerHTML = resultHTML;
+            document.getElementById('result').classList.add('show');
+        }
+    </script>
+</body>
+</html>

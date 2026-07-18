@@ -15,7 +15,7 @@ window.NIHAISHA_TCM_KB = {
     disclaimer: '本知识库内容来源于倪海厦中医课程公开资料，仅供学习研究使用。实际诊疗请咨询专业中医师。'
   },
 
-  acupuncture-screenshot-evidence: {
+  "acupuncture-screenshot-evidence": {
     title: "针灸截图证据",
     source: "references/acupuncture-screenshot-evidence.md",
     关联引擎: "中医",
@@ -208,7 +208,7 @@ window.NIHAISHA_TCM_KB = {
       "- `00:00` [针灸、课程板书/实操] 针灸实操示范：患者俯卧，医生在头部/后颈部进行取穴与扎针示范。\n  - 截图路径：assets/screenshots/acupuncture/0483.webp\n- `02:00` [针灸、课程板书/实操] 针灸实操示范：患者侧卧/平躺，医生在腹部/侧腹部进行针灸定位与进针。\n  - 截图路径：assets/screenshots/acupuncture/0484.webp\n- `04:00` [针灸、课程板书/实操] 针灸实操示范：腹部针灸留针状态特写展示。\n  - 截图路径：assets/screenshots/acupuncture/0485.webp\n- `06:00` [针灸、课程板书/实操] 针灸实操示范：患者面部及头部留针状态特写。\n  - 截图路径：assets/screenshots/acupuncture/0486.webp\n- `08:00` [针灸、课程板书/实操] 针灸实操示范：医生在患者腿部（讲解提及胆经）进行穴位按压与定位。\n  - 截图路径：assets/screenshots/acupuncture/0487.webp\n- `10:00` [针灸、课程板书/实操] 针灸实操示范：医生在患者背部/肩胛骨区域进行取穴定位讲解。\n  - 截图路径：assets/screenshots/acupuncture/0488.webp\n- `12:00` [针灸、课程板书/实操] 针灸实操示范：患者小腿部针灸留针状态展示（讲解提及阿是穴）。\n  - 截图路径：assets/screenshots/acupuncture/0489.webp\n- `14:00` [针灸、课程板书/实操] 身体部位示范：患者脚部特写，展示脚趾处的具体病灶或施治位置。\n  - 截图路径：assets/screenshots/acupuncture/0490.webp\n- `16:00` [针灸、课程板书/实操] 身体部位示范：患者脚趾病灶侧面角度特写。\n  - 截图路径：assets/screenshots/acupuncture/0491.webp\n- `18:00` [针灸、课程板书/实操] 身体部位示范：患者脚底特写，展示脚底及脚趾部位的具体情况。\n  - 截图路径：assets/screenshots/acupuncture/0492.webp\n- `20:00` [针灸、课程板书/实操] 板书画面：黑板上初步写有“直接灸法”、“针”、“灸”等字样。\n  - 截图路径：assets/screenshots/acupuncture/0493.webp\n- `24:00` [针灸、课程板书/实操] 板书画面：黑板左侧列出中医八纲辨证内容（可见“阴、阳、表、里、虚、实、寒、热”）。\n  - 截图路径：assets/screenshots/acupuncture/0494.webp\n- `26:00` [针灸、课程板书/实操] 板书画面：老师正在黑板上补充八纲辨证相关的病机与概念。\n  - 截图路径：assets/screenshots/acupuncture/0495.webp\n- `30:00` [针灸、课程板书/实操] 板书画面：黑板右侧补充了竖排的方剂或药材列表，老师正在指点讲解。\n  - 截图路径：assets/screenshots/acupuncture/0496.webp\n- `34:00` [针灸、课程板书/实操] 板书画面：黑板中央新增了带有圆圈标记的脏腑（肝、脾、胃等）及其病机关系的图文。\n  - 截图路径：assets/screenshots/acupuncture/0497.webp\n- `36:00` [针灸、课程板书/实操] 板书画面：老师指着黑板上详细的脏腑病机及治法图文进行讲解。\n  - 截图路径：assets/screenshots/acupuncture/0498.webp\n- `38:00` [针灸、课程板书/实操] 板书画面：较完整的满屏板书，左侧为八纲辨证，中右侧为脏腑关系及对应方药的综合解析图表。\n  - 截图路径：assets/screenshots/acupuncture/0499.webp\n- `48:00` [针灸、课程板书/实操] 满屏密集的黑板板书，讲师正在指点上方内容，板书上可见“病”、“阴”、“明”、“目”等中医概念及各种圈画连线。\n  - 截图路径：assets/screenshots/acupuncture/0500.webp\n- `59:23` [针灸、课程板书/实操] 较为完整的第二版板书，清晰展示了“病历”、“桔梗”、“蝉蜕”、“半夜身热”、“常心”、“阳入阴”等症状病机与中药名称，以及讲师勾勒的知识点连线。\n  - 截图路径：assets/screenshots/acupuncture/0501.webp",
     ]
   },
-  acupuncture: {
+  "acupuncture": {
     title: "针灸大成",
     source: "references/acupuncture.md",
     关联引擎: "中医",
@@ -624,7 +624,7 @@ window.NIHAISHA_TCM_KB = {
       "在剖析重症病机时，教授一语道破中医治病的核心心法：“**不知阴阳的医生呢，是不会治病的。**”同时，他也借古语“**天柱起，命在旦夕**”提醒医者，面对重症不仅要通过针灸加强天柱穴的力量以固护阳气，更要透过症状表象（如手脚肥大、视力丧失）直击“阴实”的病机根本，做到辨证论治时的浑然天成。",
     ]
   },
-  audio-collection: {
+  "audio-collection": {
     title: "音频合集",
     source: "references/audio-collection.md",
     关联引擎: "中医",
@@ -704,7 +704,7 @@ window.NIHAISHA_TCM_KB = {
       "音频内容仍属于倪海厦课程学习资料。涉及真实症状、方药剂量、急症、附子/细辛/硫磺等高风险药物、孕产儿科或重症病案时，不作为个人处方或自行操作建议。",
     ]
   },
-  bagang-screenshot-evidence: {
+  "bagang-screenshot-evidence": {
     title: "八纲截图证据",
     source: "references/bagang-screenshot-evidence.md",
     关联引擎: "中医",
@@ -852,7 +852,7 @@ window.NIHAISHA_TCM_KB = {
       "- `02:12` [八纲辨证、代表画面/字幕] 代表画面：讲师演讲半身镜头，底部带课程字幕；本段无板书、PPT或图表干货画面。\n  - 截图路径：assets/screenshots/bagang/0033.webp",
     ]
   },
-  bagang: {
+  "bagang": {
     title: "八纲辨证",
     source: "references/bagang.md",
     关联引擎: "中医",
@@ -1212,7 +1212,7 @@ window.NIHAISHA_TCM_KB = {
       "倪师同时回应了中医治疗脑神经疾病（如抑郁）的可能性，举例说明以“抑肝散”疏肝解郁、用“加味逍遥散”调理情志的临床效果。课程尾声他提及台大校委会等机构对学术活动的支持，并温馨提醒听众从左侧出口离场，侧面体现其教学风格既注重实用技能传授，又关怀学习环境细节。画面虽无重点截图，但通过自然疗法、疾病根源分析及治疗原则三大核心，展现了中医以“调”代“治”的整体观。",
     ]
   },
-  beginner-questions: {
+  "beginner-questions": {
     title: "初学问答",
     source: "references/beginner-questions.md",
     关联引擎: "中医",
@@ -1292,7 +1292,7 @@ window.NIHAISHA_TCM_KB = {
       "- “我们可以按课程看它像不像某方证，但不能直接给你用药建议。”\n- “先看缺失信息：汗、寒热、口渴、大小便、腹诊、精神状态。”\n- “如果涉及胸痛、剧烈腹痛、脱水、神志异常、孕产妇、儿童、老人，请先就医。”",
     ]
   },
-  bencao-screenshot-evidence: {
+  "bencao-screenshot-evidence": {
     title: "本草截图证据",
     source: "references/bencao-screenshot-evidence.md",
     关联引擎: "中医",
@@ -1373,7 +1373,7 @@ window.NIHAISHA_TCM_KB = {
       "- `30:00` [神农本草、板书/药性/本草图] 教师展示了擦除前最完整的一屏板书，总结了相关中药的功效特点，清晰可见“352. 桃仁 (二) 活血化瘀”、“治瘀血”、“久病必瘀”、“以通治痛”、“353. 杏仁”等核心知识点。\n  - 截图路径：assets/screenshots/bencao/0125.webp\n- `36:00` [神农本草、板书/药性/本草图] 教师擦除了大部分原有板书，开启了新知识点的书写，黑板上方清晰可见新增加的“赤小豆 一行水散瘀”板书。\n  - 截图路径：assets/screenshots/bencao/0126.webp\n- `100:00` [神农本草、板书/药性/本草图] 较完整的黑板板书，包含“引玉金”、“白薇”等中药相关内容，以及左侧带有“土”、“阴”、“阳”等字样的圆形中医理论/病机图解。\n  - 截图路径：assets/screenshots/bencao/0127.webp",
     ]
   },
-  bencao: {
+  "bencao": {
     title: "神农本草",
     source: "references/bencao.md",
     关联引擎: "中医",
@@ -1556,7 +1556,7 @@ window.NIHAISHA_TCM_KB = {
       "在讲解具体药性时，讲师传授了极具启发性的中医辨证心法。他针对慢性病与重症强调：“**久病必有瘀**”，并指出很多医生不敢攻坚是错误的，应当“**以通为补，通出来以后才能补得到它**”，一语道破了活血化瘀在治疗虚劳与贫血中的关键作用。在讲解红花时，讲师又引出金句：“**治风先治血，血行风自灭**”，深刻揭示了疏通血脉对于平息肝风、治疗心脑血管栓塞的核心指导意义。结合视频末尾黑板上的阴阳五行图解，这些理论极大拓宽了学者的中医临床思维。",
     ]
   },
-  clinical-cases-screenshot-evidence: {
+  "clinical-cases-screenshot-evidence": {
     title: "临床案例截图证据",
     source: "references/clinical-cases-screenshot-evidence.md",
     关联引擎: "中医",
@@ -1735,7 +1735,7 @@ window.NIHAISHA_TCM_KB = {
       "- `05:23` [临床案例、板书/处方/病机图] 讲师位于画面右侧，呈现了当前时间段内被遮挡最少、最完整的黑板板书。板书左侧较为清晰，可见“乌梅丸”、带有圆圈标记的“阴”字以及其他散落的中医理论笔记文字。\n  - 截图路径：assets/screenshots/clinical-cases/0088.webp",
     ]
   },
-  clinical-cases: {
+  "clinical-cases": {
     title: "临床案例",
     source: "references/clinical-cases.md",
     关联引擎: "中医",
@@ -2141,7 +2141,7 @@ window.NIHAISHA_TCM_KB = {
       "**总结**：课程通过案例与板书讨论表里虚实、病程追踪、乌梅丸及饮食观点。旧摘要把乌梅丸扩写成可广泛用于关节肿瘤、风湿、血癌，证据和适用边界不足，现删除该泛化结论；相关方药只在具体课程方证中检索。",
     ]
   },
-  ebooks: {
+  "ebooks": {
     title: "电子书",
     source: "references/ebooks.md",
     关联引擎: "中医",
@@ -2189,7 +2189,7 @@ window.NIHAISHA_TCM_KB = {
       "- 先核课程语境，再核 PDF 页级证据，最后才参考古籍/方证索引。\n- 高置信勘误直接改入原始 skill/reference 文件，不把修正只留在单独报表。\n- 对同音误字、OCR 误字、穴名/方名/药名误写，必须能追到课程模块或 PDF 页码。\n- 对缺少 PDF 或课程证据的术语，只标记为证据不足，不写成确定结论。\n- 公开仓库只保留可追溯证据、稳定索引和正文修订。",
     ]
   },
-  formula-patterns: {
+  "formula-patterns": {
     title: "方证对应",
     source: "references/formula-patterns.md",
     关联引擎: "中医",
@@ -2233,7 +2233,7 @@ window.NIHAISHA_TCM_KB = {
       "```markdown\n这部分是倪海厦课程里的经方理论学习，涉及峻烈攻下/破血/附子回阳/危重症判断，不能作为个人用药建议。真实身体情况必须由执业中医师面诊辨证；若有急性胸腹痛、神志异常、脱水、休克样表现，应立即急诊。\n```",
     ]
   },
-  fuyang-screenshot-evidence: {
+  "fuyang-screenshot-evidence": {
     title: "扶阳截图证据",
     source: "references/fuyang-screenshot-evidence.md",
     关联引擎: "中医",
@@ -2269,7 +2269,7 @@ window.NIHAISHA_TCM_KB = {
       "- `02:00` [扶阳论坛、板书/PPT/现场画面] PPT展示“乳癌(案1)”初诊医案，包含处方（石膏、知母、天花等）及剂量。\n  - 截图路径：assets/screenshots/fuyang/0033.webp\n- `12:00` [扶阳论坛、板书/PPT/现场画面] PPT展示“二期乳癌的治疗(案2)”医案，包含黄连阿胶汤、酸枣仁汤等处方加减及服药反馈。\n  - 截图路径：assets/screenshots/fuyang/0034.webp\n- `20:00` [扶阳论坛、板书/PPT/现场画面] PPT展示“肝癌(1)”医案，记录了初诊情况及包含生附子、黄连、黄芩、柴胡等药味的完整处方。\n  - 截图路径：assets/screenshots/fuyang/0035.webp\n- `32:00` [扶阳论坛、板书/PPT/现场画面] PPT展示“肝癌案(2)余志先生”的初诊日期及极其详细的症状描述（如每日半夜醒、小便次数、胃口等）。\n  - 截图路径：assets/screenshots/fuyang/0036.webp\n- `36:00` [扶阳论坛、板书/PPT/现场画面] PPT展示肝癌案(2)的具体处方，包含四逆汤、小建中汤加减，并列出了活血化瘀、壮命门火等治法对应的具体药味剂量。\n  - 截图路径：assets/screenshots/fuyang/0037.webp",
     ]
   },
-  fuyang: {
+  "fuyang": {
     title: "扶阳论坛",
     source: "references/fuyang.md",
     关联引擎: "中医",
@@ -2367,7 +2367,7 @@ window.NIHAISHA_TCM_KB = {
       "演讲还讨论药材种植、地域病种与病例共享，并提出“癌症扶阳是唯一出路”等观点。癌症不存在可由本课程证明的单一路径；“肝病黄尿必用大黄”、黄芪配生硫磺等只作课程方药索引，不得直接应用。",
     ]
   },
-  huangdi-screenshot-evidence: {
+  "huangdi-screenshot-evidence": {
     title: "内经截图证据",
     source: "references/huangdi-screenshot-evidence.md",
     关联引擎: "中医",
@@ -2460,7 +2460,7 @@ window.NIHAISHA_TCM_KB = {
       "- `00:00` [黄帝内经、板书/PPT/病机图] 课程PPT条文，详细列出了《黄帝内经》第七十五篇至第八十一篇，以及素问遗篇第七十二篇的篇名与重点摘要内容。\n  - 截图路径：assets/screenshots/huangdi/0263.webp\n- `20:00` [黄帝内经、板书/PPT/病机图] 满屏板书，详细图解中医阴阳理论。黑板上画有天地人示意图，书写了“阳中带阴”、“阴中含阳”等概念，并列出了“阴虚”、“阳虚”等阴阳状态的转化关系。\n  - 截图路径：assets/screenshots/huangdi/0264.webp\n- `34:00` [黄帝内经、板书/PPT/病机图] 满屏板书，讲师在黑板左侧更新了内容，新增了关于“血气”相关的论述板书，右侧保留了前述的天地阴阳理论图解。\n  - 截图路径：assets/screenshots/huangdi/0265.webp\n- `40:00` [黄帝内经、板书/PPT/病机图] 板书：阴阳转化理论图，黑板上写有“阴极->阳”、“阳极->阴”、“阳中带阴”等文字，并附有人体简笔画图示。\n  - 截图路径：assets/screenshots/huangdi/0266.webp\n- `78:00` [黄帝内经、板书/PPT/病机图] 板书：脉诊位置及相关理论，黑板右侧写有“尺 关 寸”以及下方的“过 + 不及”等字样，并带有“木 ->”的箭头标注。\n  - 截图路径：assets/screenshots/huangdi/0267.webp\n- `102:00` [黄帝内经、板书/PPT/病机图] 完整的黑板板书，清晰展示了左上方的“尺阴、寸阳”关系，左下的“木”向右推导，中间的阴阳分布竖线图示，以及右侧包含“水、火”、“脉、证、治、不治”等元素的复杂理论/病机关系图。\n  - 截图路径：assets/screenshots/huangdi/0268.webp\n- `128:00` [黄帝内经、板书/PPT/病机图] 黑板左侧书写标题“刺法论中七十二”，右侧开始书写“疫 气之说也”，讲解疫病的理论。\n  - 截图路径：assets/screenshots/huangdi/0269.webp\n- `132:00` [黄帝内经、板书/PPT/病机图] 黑板新增关于预防的内容，书写有“去消 预防”、“于中 西式”等对比或方法描述。\n  - 截图路径：assets/screenshots/huangdi/0270.webp\n- `140:00` [黄帝内经、板书/PPT/病机图] 较为完整的板书画面，包含疫气理论、预防原则，并出现了“乙 巳”、“庚 癸”等涉及中医运气学说的干货内容。\n  - 截图路径：assets/screenshots/huangdi/0271.webp\n- `148:00` [黄帝内经、板书/PPT/病机图] 讲师侧身，清晰展示黑板右侧完整板书，包括“疫气之说”、“去消预防”以及下方的符号推演。\n  - 截图路径：assets/screenshots/huangdi/0272.webp",
     ]
   },
-  huangdi: {
+  "huangdi": {
     title: "黄帝内经",
     source: "references/huangdi.md",
     关联引擎: "中医",
@@ -2686,7 +2686,7 @@ window.NIHAISHA_TCM_KB = {
       "正如课上所引述的金句：“**道要上知天文，下知地理，中知人事，可以长久。**”中医不仅是治病的医术，更是洞察自然规律与人情世故的哲学。讲师反复叮嘱，面对急重症（如三阳并至的暴疾），“医生要稳，要从容”，只有医者自身心定不乱，方能准确辨别阴阳虚实，做到真正救人而不害人。",
     ]
   },
-  index: {
+  "index": {
     title: "索引",
     source: "references/index.md",
     关联引擎: "中医",
@@ -2773,7 +2773,7 @@ window.NIHAISHA_TCM_KB = {
       "- 针灸大成/人纪针灸: `01.针灸课程` 已整理；`02.针灸大成笔记` 已完成抽取式文字资料蒸馏。\n- 黄帝内经: `03.黄帝内经课程` 已整理；`04.黄帝内经笔记` 已完成抽取式文字资料蒸馏。\n- 神农本草经: `05.神农本草课程` 已整理；`06.神农本草笔记` 已完成抽取式文字资料蒸馏。\n- 伤寒论: `07.伤寒论课程` 已整理；`08.伤寒论笔记` 已完成抽取式文字资料蒸馏。\n- 金匮要略: `09.金匮要略课程` 已整理；`10.金匮要略笔记` 已完成抽取式文字资料蒸馏。\n- 仲景心法传讲: `11.仲景心法传讲` 已整理。\n- 倪师音频合集: `12.倪师音频合集` 已下载并建立音频索引/课程映射。\n- 人纪临床案例: `13.人纪之《临床案例》` 已整理。\n- 人纪八纲辨证: `14.人纪之《八纲辨证》` 已整理，33 张代表画面证据已接入。\n- 扶阳论坛: `15.扶阳论坛` 已整理，37 张截图证据已接入。\n- 易筋经: `18.倪师易筋经` 已整理，28 张动作截图证据已接入。\n- 梁冬对话倪师: `19.梁冬对话倪师` 已整理为文字资料模块；第 1 集尾部音轨损坏。\n- 斯坦福大学演讲: `20.倪师斯坦福大学演讲` 已整理为文字资料模块。\n- 课程 PDF 溯源: `references/pdf-evidence/` 已建立页级证据、模块术语索引和高置信勘误记录。\n- 推荐 DOC 溯源: `references/text-evidence/` 已建立章节/条文证据与稳定 section 引用。\n- 天纪: `22.倪海厦天纪` 已整理，527 张截图证据已接入；第 1-3 课为 LLM 摘要，第 4-24 课为转写抽取式摘要。",
     ]
   },
-  jingui-screenshot-evidence: {
+  "jingui-screenshot-evidence": {
     title: "金匮截图证据",
     source: "references/jingui-screenshot-evidence.md",
     关联引擎: "中医",
@@ -2874,7 +2874,7 @@ window.NIHAISHA_TCM_KB = {
       "- `01:47` [金匮要略、课程板书/实操] 实物展示细节：讲者在患者腰部演示如何通过触摸肌肉边缘的凹陷处来精准定位“肾俞穴”，而非单纯数脊椎。\n  - 截图路径：assets/screenshots/jingui/0637.webp\n- `03:28` [金匮要略、课程板书/实操] 实物展示细节：演示“消积穴”的深刺手法，针尖穿过脚后跟大筋直抵骨头的进针角度。\n  - 截图路径：assets/screenshots/jingui/0638.webp\n- `10:26` [金匮要略、课程板书/实操] 实物展示细节：演示治疗督脉痛时，“灵台穴”垂直刺入脊柱1.5寸直接触及骨头的下针深度。\n  - 截图路径：assets/screenshots/jingui/0639.webp\n- `11:54` [金匮要略、课程板书/实操] 实物展示细节：在患者大腿内侧按压寻找“阿是穴”（最痛点）并直接下针的实操过程。\n  - 截图路径：assets/screenshots/jingui/0640.webp\n- `12:47` [金匮要略、课程板书/实操] 实物展示细节：脚部鸡眼的直接灸法演示，展示了凡士林打底、艾炷大小及线香点燃的具体状态。\n  - 截图路径：assets/screenshots/jingui/0641.webp\n- `15:53` [金匮要略、课程板书/实操] 医生在患者脚部实操“直接灸”治疗鸡眼，展示艾绒小柱直接在皮肤病灶上燃烧的细节过程。\n  - 截图路径：assets/screenshots/jingui/0642.webp\n- `19:08` [金匮要略、课程板书/实操] 讲者在黑板上手绘人体背部示意图，详细板书并讲解督脉疼痛时的取穴方法（远取后溪，近取灵台、督俞）。\n  - 截图路径：assets/screenshots/jingui/0643.webp\n- `22:47` [金匮要略、课程板书/实操] 讲者在黑板上板书“实证”并将其明确划分为“阳”和“阴”，强调区分阴阳是医生治病的基础。\n  - 截图路径：assets/screenshots/jingui/0644.webp\n- `26:13` [金匮要略、课程板书/实操] 讲者板书《易经》名言“履霜坚冰至”，以此引申解释手脚（人体末梢）出现浮肿是极其危险的预兆（阴阳绝离）。\n  - 截图路径：assets/screenshots/jingui/0645.webp\n- `28:21` [金匮要略、课程板书/实操] 讲者板书治疗脑瘤等重症的首要考量“排水”及“营养”，并画图标注“鼻孔通脑”，解释利用鼻腔排液降压的战术逻辑。\n  - 截图路径：assets/screenshots/jingui/0646.webp\n- `33:22` [金匮要略、课程板书/实操] ` 板书写有针对脑瘤病人前期引流的处方，包含通鼻窍去湿的药名：“辛夷、菖蒲、苍术”以及标注的“去湿”等字样。\n  - 截图路径：assets/screenshots/jingui/0647.webp\n- `36:41` [金匮要略、课程板书/实操] ` 板书写有针对眼盲/肝脏病变的处方，列有：“肝 -> 柴胡、黄芩、郁金、龙胆草”，并标注了“赤”、“白”以及“火克金”等五行理论字样。\n  - 截图路径：assets/screenshots/jingui/0648.webp\n- `39:29` [金匮要略、课程板书/实操] ` 板书画有膀胱（水）与小肠（火）的生理解剖位置关系草图，并标注了膀胱气化后的容量“400cc”。\n  - 截图路径：assets/screenshots/jingui/0649.webp\n- `41:17` [金匮要略、课程板书/实操] ` 板书在膀胱与小肠位置图中间，补充写上了“精宫”二字，用于讲解男性生精的生理位置。\n  - 截图路径：assets/screenshots/jingui/0650.webp\n- `46:18` [金匮要略、课程板书/实操] 板书手写治疗关节紧痛的辨证用药逻辑：“去风->桂枝，去寒->炮附子，去湿->白术”，以及开出的方剂“桂枝甘草附子汤”及起步剂量。\n  - 截图路径：assets/screenshots/jingui/0651.webp\n- `48:58` [金匮要略、课程板书/实操] 板书手写“牡蛎”与“龙骨”的作用，标注了神农本草经中软“坚”即是去“实”，并解释了龙骨牡蛎同用以敛阳下潜的原理。\n  - 截图路径：assets/screenshots/jingui/0652.webp\n- `52:13` [金匮要略、课程板书/实操] 板书手写中医睡眠生理与病理对比：“常人 睡觉 -> 身是凉的... 阳入阴”，并以此解释癌症患者半夜身热是由于“阳无法入阴”导致的阴阳分隔。\n  - 截图路径：assets/screenshots/jingui/0653.webp\n- `55:30` [金匮要略、课程板书/实操] 板书手写肺癌初期的对症方剂组合：“桔梗甘草汤”以及重点讲解的“皂荚 + 大枣（红枣）”，用于去浊痰并保护胃酸。\n  - 截图路径：assets/screenshots/jingui/0654.webp\n- `56:43` [金匮要略、课程板书/实操] 板书手写应对肺部积水、躺下即咳的“射干麻黄汤”的核心药组：“紫菀、冬花、麻黄、射干”，并讲解了其适用时机。\n  - 截图路径：assets/screenshots/jingui/0655.webp\n- `58:28` [金匮要略、课程板书/实操] 板书手写针对阴阳相隔极度危险脉象所加的“苇茎汤”配伍：“苇茎、冬瓜仁、丹皮、桃仁（活血化瘀）”，意图打通痰水阻隔。\n  - 截图路径：assets/screenshots/jingui/0656.webp",
     ]
   },
-  jingui: {
+  "jingui": {
     title: "金匮要略",
     source: "references/jingui.md",
     关联引擎: "中医",
@@ -3106,7 +3106,7 @@ window.NIHAISHA_TCM_KB = {
       "课程以阴阳和“司外揣内”解释脑瘤等病例，并称“不需要 MRI、验血报告”。体表温度、消肿或毛发生长不能确诊脑瘤或确认治愈；疑似肿瘤仍需规范影像、病理和专科评估。",
     ]
   },
-  learning-entry: {
+  "learning-entry": {
     title: "学习入口",
     source: "references/learning-entry.md",
     关联引擎: "中医",
@@ -3230,7 +3230,7 @@ window.NIHAISHA_TCM_KB = {
       "- 用户能知道下一步该看什么，而不是只看到大段课程摘要。\n- 用户能看懂分水岭，比如有汗/无汗、小便深黄/清白、腹部拒按/喜按。\n- 用户能区分相似方，而不是只知道方名。\n- 用户能追溯到课次和截图。\n- 用户不会误以为可以自行照方用药。",
     ]
   },
-  lesson-map: {
+  "lesson-map": {
     title: "课次地图",
     source: "references/lesson-map.md",
     关联引擎: "中医",
@@ -3346,7 +3346,7 @@ window.NIHAISHA_TCM_KB = {
       "课程最后以真假寒热和“阴实”解释疑难重症，并讨论“阳热尚存”与病势变化。相关表述属于课程预后观点，不能替代现代急危重症评估，也不应作为癌症患者自行判断治疗机会或用药的依据。",
     ]
   },
-  liangdong: {
+  "liangdong": {
     title: "梁冬对话",
     source: "references/liangdong.md",
     关联引擎: "中医",
@@ -3469,7 +3469,7 @@ window.NIHAISHA_TCM_KB = {
       "在具体实践方法上，倪海厦解析了六经辨证的分层体系：太阳经分为伤寒（无汗用麻黄汤）、中风（有汗用桂枝汤）和温病（葛根汤）；阳明证涉及肠胃病症（如大承气汤治便秘），少阳证关联三焦水汽与寒热往来；厥阴证需处理寒热错杂（如石膏配附子）。他提出辨证的实操依据：表证通过汗与恶寒区分，寒热通过小便颜色判断（深黄为热，苍白为寒），并强调经络是水气运行的通道，需在活人状态下通过气感体验。针对经方应用，他指出需“冷服”石膏汤以引导药性精准入上焦，且学习伤寒方剂必须结合针灸与本草理论，不可孤立研读。此外，“阿是穴”应以疼痛点为实据而非固定位置，耳针则通过倒影原理定位脏腑。倪海厦提醒，长期失眠、身体不适等早期信号常被忽视，而“免疫系统差始于感冒未解”揭示了外感病失治的危害性，最终呼吁中医教育应以经典原文为“最经典的图景”，并通过集体研读深化理解。",
     ]
   },
-  notes-acupuncture-dacheng-scan-essence: {
+  "notes-acupuncture-dacheng-scan-essence": {
     title: "针灸扫描精华",
     source: "references/notes-acupuncture-dacheng-scan-essence.md",
     关联引擎: "中医",
@@ -3517,7 +3517,7 @@ window.NIHAISHA_TCM_KB = {
       "- **急症与重症警示**：笔记中提及的中风急救（十宣/人中/百会放血）、溺水急救、癫痫发作、心脏急救（极泉/少府/关元）、大出血、尸厥等，仅作为中医针灸理论的病机与治法索引。现实中遇到此类急症，必须立即寻求现代急诊医疗救治。\n- **高风险针刺手法**：烧山火、透天凉、报刺、深刺透穴（如阴陵泉透阳陵泉、条口透承山）、眼区针刺（睛明、球后）及强刺激的“导痰术”，操作不当极易造成气胸、神经损伤、脏器穿孔或晕针，非专业执业医师严禁操作。\n- **放血与火罐风险**：三棱针放血（如委中、耳尖、十宣）及火罐吸脓血属于创伤性操作，有严重的感染风险，严禁自行模仿。\n- **孕产与儿童禁忌**：孕妇严格禁针合谷、三阴交、肩井及腹部穴位（可能导致流产）。14岁以下儿童针灸需采用“单刺不留针”法。婴幼儿推拿退热手法仅供理论参考。\n- **肿瘤与外用秘方**：提及的肺癌、乳癌、脑瘤、脾肿大、肝硬化等重疾的针灸思路仅供中医学习探讨。文中提及的“巴豆、硫磺、生附子、麝香”等属于剧毒或峻猛中药，相关外敷灸法（如伤寒结胸灸、化脓灸）具有极高危险性，可能导致严重皮肤坏死或中毒，绝对禁止自行配制和使用。",
     ]
   },
-  notes-acupuncture-dacheng: {
+  "notes-acupuncture-dacheng": {
     title: "针灸大成笔记",
     source: "references/notes-acupuncture-dacheng.md",
     关联引擎: "中医",
@@ -3578,7 +3578,7 @@ window.NIHAISHA_TCM_KB = {
       "原扫描版 PDF 的要点已补充整理至 `notes-acupuncture-dacheng-scan-essence.md`。该文件作为本模块的补充学习入口，保留课程要点、术语和必要风险边界。",
     ]
   },
-  notes-bencao-scan-essence: {
+  "notes-bencao-scan-essence": {
     title: "本草扫描精华",
     source: "references/notes-bencao-scan-essence.md",
     关联引擎: "中医",
@@ -4214,7 +4214,7 @@ window.NIHAISHA_TCM_KB = {
       "- **毒性与矿物药警示**：朱砂、雄黄、硫黄等矿物药，及附子、乌头、半夏、天南星、甘遂、大戟、巴豆等峻烈中药具毒性或大毒。严禁火炼含汞矿物；峻药必须严格遵循炮制规范与配伍法度（如半夏配生姜、攻水忌盐等），严禁非专业人士擅用。\n- **孕产与妇科禁忌**：麝香、牛膝、瞿麦、斑蝥、水蛭、虻虫、红花、桃仁、王不留行等具极强破血、走窜、通经作用，极易导致流产或大出血，孕妇及疑似有孕者绝对禁用。\n- **肿瘤与急重症红线**：资料中关于恶性肿瘤（阴实）、急症（吐血、脱证、脑瘤、腹膜炎、重度腹水等）的重剂攻坚、峻下逐水、回阳救逆思路，**仅为传统中医病机探讨与学术理论索引，绝不可直接作为临床治疗方案或患者自行组方抓药的依据**。确诊与治疗必须由执业中医师面诊，且不可替代现代急诊标准流程。\n- **偏方与非正规操作**：涉及的吞服活虫、剧毒药外敷、活鸡热敷、催吐（瓜蒂散）等古法非常规操作存在致命感染及中毒风险，仅作医学历史与课程资料索引，切勿模仿执行。",
     ]
   },
-  notes-bencao: {
+  "notes-bencao": {
     title: "神农本草笔记",
     source: "references/notes-bencao.md",
     关联引擎: "中医",
@@ -4267,7 +4267,7 @@ window.NIHAISHA_TCM_KB = {
       "原扫描版 PDF 的要点已补充整理至 `notes-bencao-scan-essence.md`。该文件作为本模块的补充学习入口，保留课程要点、术语和必要风险边界。",
     ]
   },
-  notes-huangdi-scan-essence: {
+  "notes-huangdi-scan-essence": {
     title: "内经扫描精华",
     source: "references/notes-huangdi-scan-essence.md",
     关联引擎: "中医",
@@ -4311,7 +4311,7 @@ window.NIHAISHA_TCM_KB = {
       "- **高危方剂警示**：笔记中提及的《伤寒论》方剂（如十枣汤、大承气汤）为峻烈之剂，适用于极度明确的“实证”或“水饮阻结”，原笔记中提及的剂量及“放手一搏”等个人经验已隐去，**严禁非专业人士自行尝试**。\n- **刺血与针灸风险**：文中提及的“青筋放血”、“缪刺井穴”、“深刺至骨”、“刺缺盆/脑户等禁穴周边”等操作具有极高的感染、神经损伤或内脏穿孔风险（如气胸）。仅作古代针灸理论学习索引，不构成现代临床操作指南。\n- **急重症与肿瘤提示**：笔记将肿瘤、尿毒症、急腹症（如盲肠炎/肠痈）、大出血（吐血/崩漏）归为“阴实”或急症。学习者需知此类疾病在现代医学属于高危急重症，必须立即就医，不可仅凭笔记自行判断或用药。\n- **孕产妇禁忌**：提及的“女子胞”相关病变及孕期症状，严禁自行使用活血化瘀药物或针刺下腹部及特定经络，以免导致流产或大出血。\n- **边界声明**：本输出内容仅作为倪海厦《黄帝内经》课程资料的理论提炼与学术索引，**绝不作为任何医疗诊断、处方开具或自行针灸的依据**。",
     ]
   },
-  notes-huangdi: {
+  "notes-huangdi": {
     title: "黄帝内经笔记",
     source: "references/notes-huangdi.md",
     关联引擎: "中医",
@@ -4384,7 +4384,7 @@ window.NIHAISHA_TCM_KB = {
       "原扫描版 PDF 的要点已补充整理至 `notes-huangdi-scan-essence.md`。该文件作为本模块的补充学习入口，保留课程要点、术语和必要风险边界。",
     ]
   },
-  notes-jingui: {
+  "notes-jingui": {
     title: "金匮要略笔记",
     source: "references/notes-jingui.md",
     关联引擎: "中医",
@@ -4433,7 +4433,7 @@ window.NIHAISHA_TCM_KB = {
       "- 这批资料作为视频课程的补充讲义、原著和病案索引使用；遇到课程问题时，先看对应视频课程蒸馏，再回到本文件查讲稿/笔记/电子书补充。\n- 查询穴位、药物、方剂、病名、病案标题时，可直接在本引用文件中检索关键词；非课程来源资料不作为默认依据，不应当覆盖视频课程原始脉络。\n- 涉及方药、剂量、急症、肿瘤、孕产、儿童或附子/细辛/硫磺等高风险内容时，只能作为课程学习材料，不作为个人处方或自行操作建议。",
     ]
   },
-  notes-shanghan-scan-essence: {
+  "notes-shanghan-scan-essence": {
     title: "伤寒扫描精华",
     source: "references/notes-shanghan-scan-essence.md",
     关联引擎: "中医",
@@ -4467,7 +4467,7 @@ window.NIHAISHA_TCM_KB = {
       "- **高毒性与峻猛中药警示**：本资料涉及含有剧毒、强毒性及峻烈药性的中药，如**生附子、炮附子**（极强心脏毒性）、**麻黄**（中枢及心血管兴奋）、**细辛、生半夏、蜀漆**，以及极猛烈的攻破/涌吐药如**巴豆、甘遂、大戟、芫花、水蛭、虻虫、大黄、芒硝、瓜蒂**等。此类药物极易伤正或致死，仅作古代医理研究与伤寒论理法索引，严禁非专业人员自行抓药、配伍或尝试服用。\n- **重危急症与肿瘤警示**：资料中提及的阴实（肝癌、胰脏癌、大肠癌、血癌）、肝硬化腹水、心肾衰竭（亡阳、脉微欲绝）、大出血、急腹症（肠痈/阑尾炎、脏结穿孔）及“大陷胸汤证”、“十枣汤证”等，均属病情瞬息万变的现代医学急危重症。课程内容仅为古代病机推演，**绝不可作为临床替代治疗方案**，贻误现代急诊抢救将危及生命。\n- **针灸与特殊操作风险**：涉及的强刺激针灸、穴位点刺放血（如大椎、少商、耳后鸡爪血脉）、深刺内脏投影区（肺俞、肝俞）以及古法催吐、童尿/猪胆汁入药等，存在极高的感染、气胸及脏器损伤风险，非执业中医师严禁操作。\n- **边界声明**：本笔记内容仅作中医经典《伤寒论》的学理蒸馏与文献检索，**绝不构成任何医学诊断、个人处方建议或自行服药指南**。任何疾病的治疗请务必前往正规医疗机构由执业医师面诊指导。",
     ]
   },
-  notes-shanghan: {
+  "notes-shanghan": {
     title: "伤寒论笔记",
     source: "references/notes-shanghan.md",
     关联引擎: "中医",
@@ -4528,7 +4528,7 @@ window.NIHAISHA_TCM_KB = {
       "原扫描版 PDF 的要点已补充整理至 `notes-shanghan-scan-essence.md`。该文件作为本模块的补充学习入口，保留课程要点、术语和必要风险边界。",
     ]
   },
-  screenshot-evidence: {
+  "screenshot-evidence": {
     title: "截图证据总览",
     source: "references/screenshot-evidence.md",
     关联引擎: "中医",
@@ -4610,7 +4610,7 @@ window.NIHAISHA_TCM_KB = {
       "- `02:26` [六经条文、脉诊望诊] 满屏黑板板书，展示了《辨厥阴病脉证并治法》的原文段落，讲者正指着第347条讲解“除中”的概念。\n  - 截图路径：assets/screenshots/shanghanlun/0605.webp\n- `04:50` [病机图解] 黑板手绘五脏模型图，清晰标注了“肺(金)”、“肝(木)”、“大肠(金)”的空间位置关系及五行属性。\n  - 截图路径：assets/screenshots/shanghanlun/0606.webp\n- `07:22` [病机图解] 完整的黑板手绘脏腑气血运行图，详细标注了吸气时肺气下降、挤压肝脏、肝血进入大肠以及热气上冲咽喉的生理与病理路径。\n  - 截图路径：assets/screenshots/shanghanlun/0607.webp\n- `08:06` [六经条文、病机图解、脉诊望诊] 满屏黑板板书，左侧为《伤寒论》条文“辨厥阴病脉证并治法...若不止便脓血”，右侧为讲者手绘的人体脏腑阴阳气化循环图解。\n  - 截图路径：assets/screenshots/shanghanlun/0608.webp\n- `09:39` [六经条文、禁忌风险] 满屏黑板板书，展示条文“三五〇：伤寒，一二日至四五日...热深厥亦深...”，讲述发汗禁忌与误汗后果。\n  - 截图路径：assets/screenshots/shanghanlun/0609.webp\n- `11:57` [六经条文] 满屏黑板板书，展示条文“三五一：伤寒，热五日，复厥五日...”，讲解通过病程日数判断疾病的吉凶预后。\n  - 截图路径：assets/screenshots/shanghanlun/0610.webp\n- `12:51` [六经条文] 满屏黑板板书，展示条文“三五二：凡厥者，阴阳气不相顺接，便为厥”，给出了“厥”的核心医学定义。\n  - 截图路径：assets/screenshots/shanghanlun/0611.webp\n- `14:24` [方剂方证、六经条文] 满屏黑板板书，展示条文“三五三”与“三五四”，对比讲解“脏厥”（无暂息时）与“蛔厥”（时烦，吐蛔，用乌梅丸）的区别。\n  - 截图路径：assets/screenshots/shanghanlun/0612.webp\n- `16:11` [方剂方证、六经条文、病机图解、脉诊望诊] 满屏黑板板书，展示了《辨厥阴病脉证并治法》中关于蛔虫病的核心古文条文（包含“得食而呕，又烦者...乌梅丸主之”等症状描述）及讲者的手绘病理推导图。\n  - 截图路径：assets/screenshots/shanghanlun/0613.webp\n- `20:48` [方剂方证、禁忌风险] 满屏黑板板书，展示了“乌梅丸方”的完整古方内容，详细列出了10味药材（乌梅、细辛、干姜、黄连、当归等）、具体剂量以及炮制方法和服药禁忌。\n  - 截图路径：assets/screenshots/shanghanlun/0614.webp\n- `24:20` [方剂方证、六经条文、脉诊望诊、禁忌风险]  黑板板书，左侧显示“辨厥阴病脉证并治法”，右侧列出“乌梅丸”的完整中药配方及剂量（如：乌梅三百个、细辛六两、干姜十两、黄连十六两、当归四两等）及服用禁忌。\n  - 截图路径：assets/screenshots/shanghanlun/0615.webp\n- `25:03` [六经条文、腹诊排泄]  满屏黑板板书，展示《伤寒论》第355条完整条文：“三五五：伤寒，热少厥微，指头寒，嘿嘿不欲食，烦躁，数日小便利，色白者，此热除也...”，讲者正用教鞭指着条\n  - 截图路径：assets/screenshots/shanghanlun/0616.webp\n- `27:30` [六经条文、腹诊排泄、脉诊望诊]  满屏黑板板书，展示《伤寒论》第356条文：“三五六：病者手足厥冷，言我不结胸，小腹满，按之痛者，此冷结在膀胱关元也。”\n  - 截图路径：assets/screenshots/shanghanlun/0617.webp\n- `28:12` [六经条文、腹诊排泄]  满屏黑板板书，集中展示《伤寒论》第360、361、362条关于“死证”的条文（包含“下利，躁不得卧者死”、“下利至甚，厥不止者死”、“汗出不止者死”等要点）\n  - 截图路径：assets/screenshots/shanghanlun/0618.webp\n- `33:02` [六经条文、脉诊望诊] 满屏黑板手写板书，详细列出了《辨厥阴病脉证并治法》的第364、365、366、367条古文条文。\n  - 截图路径：assets/screenshots/shanghanlun/0619.webp\n- `39:32` [方剂方证、病机图解] 满屏黑板手写板书，列出了“当归四逆汤方”的七味中药组成及具体剂量比例（当归三两、桂枝三两等），并展示了其与桂枝汤成分的加减对比关系。\n  - 截图路径：assets/screenshots/shanghanlun/0620.webp\n- `40:29` [方剂方证] 黑板满屏板书，展示了“当归四逆汤”及“当归四逆加吴茱萸生姜汤”的完整方剂组成与剂量（当归、芍药、桂枝、细辛等）。\n  - 截图路径：assets/screenshots/shanghanlun/0621.webp\n- `44:51` [方剂方证] 讲者在黑板右侧板书补充药物，写下“升麻”及“升提阳气”，讲解疝气的用药加减。\n  - 截图路径：assets/screenshots/shanghanlun/0622.webp\n- `45:11` [方剂方证、六经条文] 投影展示《伤寒论》第367条经典条文：“若其人内有久寒者，宜当归四逆加吴茱萸生姜汤”。\n  - 截图路径：assets/screenshots/shanghanlun/0623.webp\n- `48:25` [六经条文] 投影展示《伤寒论》第368条经典条文：“大汗出，热不去，内拘急，四肢疼...”。\n  - 截图路径：assets/screenshots/shanghanlun/0624.webp\n- `48:37` [六经条文、病机图解] 黑板板书，左侧显示条文368和370，右侧有关于阴阳、里寒外热升降机制的手写示意图。\n  - 截图路径：assets/screenshots/shanghanlun/0625.webp\n- `51:21` [六经条文、脉诊望诊] 黑板板书，左侧显示条文371，讲解手足逆冷与心下悸，明确“先治水，却治其厥”的原则。\n  - 截图路径：assets/screenshots/shanghanlun/0626.webp\n- `52:47` [方剂方证、六经条文、脉诊望诊] 黑板板书，左侧显示条文372，涉及寸脉沉迟、手足厥逆、咽喉不利、唾脓血等症状及“麻黄升麻汤”。\n  - 截图路径：assets/screenshots/shanghanlun/0627.webp\n- `55:11` [方剂方证] 满屏黑板板书，展示“麻黄升麻汤”的十四味方剂组成及其具体的剂量（分、铢）和煎煮方法。\n  - 截图路径：assets/screenshots/shanghanlun/0628.webp\n- `56:40` [方剂方证]  满屏黑板板书，展示含有葳蕤（玉竹）、升麻、知母、黄芩、石膏等药材的完整方剂及剂量。\n  - 截图路径：assets/screenshots/shanghanlun/0629.webp\n- `59:18` [方剂方证、六经条文]  满屏黑板板书，展示《伤寒论》第373条及第374条原文，以及“干姜黄芩黄连人参汤”。\n  - 截图路径：assets/screenshots/shanghanlun/0630.webp\n- `60:46` [方剂方证]  满屏黑板板书，展示治疗吐酸的变阵处方“旋覆花代赭石汤”，并在下方标注了加减药材“干姜、吴茱萸”。\n  - 截图路径：assets/screenshots/shanghanlun/0631.webp\n- `65:20` [方剂方证、六经条文]  满屏板书，展示《伤寒论》第373、374条文，核心讲解“寒格”的症状（干呕、食入口即吐）及对应的“干姜黄芩黄连人参汤”配方。\n  - 截图路径：assets/screenshots/shanghanlun/0632.webp\n- `67:46` [六经条文]  满屏板书，展示第357条文（伤寒发热四日，厥反三日...），用于讲解发热与恶寒天数对比以判断疾病预后的理论。\n  - 截图路径：assets/screenshots/shanghanlun/0633.webp\n- `69:12` [六经条文]  满屏板书，展示第358条文（伤寒厥四日，热反三日...），详细说明阳气退、病为进的症状演变逻辑。\n  - 截图路径：assets/screenshots/shanghanlun/0634.webp\n- `71:19` [六经条文、脉诊望诊、禁忌风险]  满屏板书，展示第359条文（伤寒六七日，脉微，手足烦躁，厥，不可下...），讲解阴寒极盛、阳气将绝的死证表现。\n  - 截图路径：assets/screenshots/shanghanlun/0635.webp\n- `72:23` [六经条文、腹诊排泄]  满屏板书，展示第375条文（下利，有微热而渴...），开始引入厥阴病中关于“下利”相关的辨证论治。\n  - 截图路径：assets/screenshots/shanghanlun/0636.webp\n- `73:12` [六经条文、病机图解] 满屏黑板板书，展示了厥阴病辨证论治法的第375至378条条文，以及左侧教师手绘的肝、肺、大肠位置关系简图。\n  - 截图路径：assets/screenshots/shanghanlun/0637.webp\n- `77:24` [六经条文、病机图解、腹诊排泄] 黑板板书展示了关于“精带血”的诊断逻辑推导图，以及右侧第380至382条关于下利清谷等症状的条文内容。\n  - 截图路径：assets/screenshots/shanghanlun/0638.webp\n- `82:29` [六经条文、腹诊排泄、脉诊望诊] 满屏黑板板书，展示了《伤寒论》第383至385条文，详细列出了下利伴随“脉数而渴”、“脉绝手足厥冷”、“脉反实”等不同脉象的预后判断。\n  - 截图路径：assets/screenshots/shanghanlun/0639.webp\n- `84:51` [方剂方证、六经条文、病机图解] 满屏黑板板书，重点展示了第387条“热利下重者”及“白头翁汤”的具体配方剂量（白头翁、黄连、黄柏、秦皮），右侧包含老师讲解脏腑对应关系的手写示意图。\n  - 截图路径：assets/screenshots/shanghanlun/0640.webp\n- `87:14` [方剂方证、六经条文、腹诊排泄] 满屏黑板板书，展示了第388至390条文，涵盖了“先温里再攻表”的治疗原则，以及下利伴随谵语时大承气汤的应用指征。\n  - 截图路径：assets/screenshots/shanghanlun/0641.webp\n- `91:26` [六经条文、病机图解] 板书展示厥阴病相关条文（393条等），并配有手绘的肝脏肿大压迫胃部导致胃寒的生理解剖示意图。\n  - 截图路径：assets/screenshots/shanghanlun/0642.webp\n- `92:14` [方剂方证] 黑板右下角板书写出“四逆汤”的核心配方组成：生附子、干姜、炙甘草，用于讲解恢复小肠温度的机理。\n  - 截图路径：assets/screenshots/shanghanlun/0643.webp\n- `93:58` [方剂方证、病机图解] 讲者在黑板上详细手绘“肝气顶胃”的示意图，直观展示肝脏肿大如何缩小胃容积，解释吴茱萸汤证中“干呕”的物理成因。\n  - 截图路径：assets/screenshots/shanghanlun/0644.webp\n- `95:21` [方剂方证、六经条文] 满屏黑板板书，清晰展示《伤寒论》第395条（小柴胡汤主之）、396条原文内容，讲解疾病从阴退阳的病机。\n  - 截图路径：assets/screenshots/shanghanlun/0645.webp\n- `99:04` [方剂方证] 黑板手写板书，完整列出了\"补中治湿汤\"的基础处方药材及具体剂量（人参、白术、苍术、茯苓、陈皮、麦冬、当归、木通、黄芩、厚朴、升麻）\n  - 截图路径：assets/screenshots/shanghanlun/0646.webp\n- `101:26` [病机图解] 黑板手写板书，讲者绘制了人体脏腑结构简图（标注了肺、肝、小肠），用于直观讲解水饮停滞在中焦（肝脏肿大阻碍上下津液交汇）的病理机制\n  - 截图路径：assets/screenshots/shanghanlun/0647.webp\n- `105:08` [方剂方证、禁忌风险] 黑板手写板书，展示了在原方基础上针对重症和变症增加的药材及剂量（包煎的生附子、生硫磺，以及针对呕吐加的吴茱萸、干姜）\n  - 截图路径：assets/screenshots/shanghanlun/0648.webp\n- `112:33` [六经条文] 满屏黑板板书，详细列出了8本中医经典推荐书单，包含书名、作者及部分出版社信息（如《伤寒论辑义》、《订正仲景全书伤寒论注》、《世补斋医书全集》等）。\n  - 截图路径：assets/screenshots/shanghanlun/0649.webp",
     ]
   },
-  shanghanlun: {
+  "shanghanlun": {
     title: "伤寒论",
     source: "references/shanghanlun.md",
     关联引擎: "中医",
@@ -4707,7 +4707,7 @@ window.NIHAISHA_TCM_KB = {
       "### 4. 严格禁忌与风险提示\n- ⚠️ **切忌**：[列出对应的禁忌，如：咽干者绝对禁汗 / 尺脉微者禁汗 / 见四逆者禁攻下]。\n- [若涉及重症/癌症/急下/四逆汤，必须插入高级别医疗风险警告]。\n```",
     ]
   },
-  six-channel: {
+  "six-channel": {
     title: "六经辨证",
     source: "references/six-channel.md",
     关联引擎: "中医",
@@ -4794,7 +4794,7 @@ window.NIHAISHA_TCM_KB = {
       "- 厥证不是单纯“手脚凉”，需排除休克、心血管急症、低血糖等现代医学急症。\n- 真寒假热/真热假寒误判风险极高，只能作为课程学习框架。",
     ]
   },
-  stanford: {
+  "stanford": {
     title: "斯坦福演讲",
     source: "references/stanford.md",
     关联引擎: "中医",
@@ -4864,7 +4864,7 @@ window.NIHAISHA_TCM_KB = {
       "针对癌症，课程提出“奶水滞留”“固守肝脏”等解释，并用盗汗、脚热、食欲追踪病例变化。这里仅保留课程索引：这些表现不能确诊癌症、判断转移或确认疗效；红豆芽、当归四逆汤等也不能据此用于腹膜炎或肿瘤治疗。现实癌症与感染均应接受规范检查和专科治疗。",
     ]
   },
-  symptom-index: {
+  "symptom-index": {
     title: "症状索引",
     source: "references/symptom-index.md",
     关联引擎: "中医",
@@ -4964,7 +4964,7 @@ window.NIHAISHA_TCM_KB = {
       "- 妇科出血、孕产妇、剧烈腹痛、疑似急腹症或肿瘤，必须就医。",
     ]
   },
-  tianji-screenshot-evidence: {
+  "tianji-screenshot-evidence": {
     title: "天纪截图证据",
     source: "references/tianji-screenshot-evidence.md",
     关联引擎: "中医/风水",
@@ -5076,7 +5076,7 @@ window.NIHAISHA_TCM_KB = {
       "- `02:00` [天纪、易经/阳宅/斗数板书] 板书：关于年龄大限及财运的批断条文（可见“四十有八”、“大限不出四十”、“财来财去”等字样）\n  - 截图路径：assets/screenshots/tianji/0496.webp\n- `04:00` [天纪、易经/阳宅/斗数板书] 板书：关于病灾及丧事的命理批断（可见“大限至终”、“病急之灾”、“丧事不久”等字样）\n  - 截图路径：assets/screenshots/tianji/0497.webp\n- `06:00` [天纪、易经/阳宅/斗数板书] 板书：关于兄弟排行及个人发展的批断（可见“兄弟二人发一人”、“百里侯”等字样）\n  - 截图路径：assets/screenshots/tianji/0498.webp\n- `08:00` [天纪、易经/阳宅/斗数板书] 板书：关于流年生肖对运势影响的批断（可见“得力有成”、“逢虎兔人加重”等字样）\n  - 截图路径：assets/screenshots/tianji/0499.webp\n- `12:00` [天纪、易经/阳宅/斗数板书] 板书：关于贵人运及是非灾厄的批断（可见“贵人不到”、“是非难明”、“逢鼠免灾”等字样）\n  - 截图路径：assets/screenshots/tianji/0500.webp\n- `14:00` [天纪、易经/阳宅/斗数板书] 板书：关于子嗣及贵人方位的批断（可见“有子夭折”、“贵人西南”等字样）\n  - 截图路径：assets/screenshots/tianji/0501.webp\n- `16:00` [天纪、易经/阳宅/斗数板书] 板书：关于性格口才的批断（可见“生有一口好辩之才”等字样）\n  - 截图路径：assets/screenshots/tianji/0502.webp\n- `18:00` [天纪、易经/阳宅/斗数板书] 板书：关于运势关卡的批断（可见“必破双关”、“不知进退”等字样）\n  - 截图路径：assets/screenshots/tianji/0503.webp\n- `20:00` [天纪、易经/阳宅/斗数板书] 板书：关于兄弟房份及子女的批断（可见“兄弟二房”、“长中独子”等字样）\n  - 截图路径：assets/screenshots/tianji/0504.webp\n- `22:00` [天纪、易经/阳宅/斗数板书] 板书：关于公职仕途的批断（可见“从官：必主不避”等字样）\n  - 截图路径：assets/screenshots/tianji/0505.webp\n- `26:00` [天纪、易经/阳宅/斗数板书] 板书：关于排行与适宜职业的批断（可见“排妹二”、“从医从官两相宜”等字样）\n  - 截图路径：assets/screenshots/tianji/0506.webp\n- `28:00` [天纪、易经/阳宅/斗数板书] 板书：关于官运及升迁的批断（可见“官人逢之升迁”等字样）\n  - 截图路径：assets/screenshots/tianji/0507.webp\n- `30:00` [天纪、易经/阳宅/斗数板书] 板书：关于兄弟运势的批断（可见“二弟必定行”等字样）\n  - 截图路径：assets/screenshots/tianji/0508.webp\n- `32:00` [天纪、易经/阳宅/斗数板书] 板书：关于婚姻助力及特定姓氏的吉凶（可见“得妻助”、“草头人吉”等字样）\n  - 截图路径：assets/screenshots/tianji/0509.webp\n- `34:00` [天纪、易经/阳宅/斗数板书] 板书：关于特定生肖组合的运势批断（可见“龙蛇马三人”等字样）\n  - 截图路径：assets/screenshots/tianji/0510.webp\n- `36:00` [天纪、易经/阳宅/斗数板书] 板书：关于内外运势及人际关系的批断（可见“出山：外喜内忧”等字样）\n  - 截图路径：assets/screenshots/tianji/0511.webp\n- `38:00` [天纪、易经/阳宅/斗数板书] 板书：关于公门（公职）人员的批断条文（可见“出为公门人”等字样）\n  - 截图路径：assets/screenshots/tianji/0512.webp\n- `40:00` [天纪、易经/阳宅/斗数板书] 板书详细记录“进羊关系位”及三才、定官位、命宫等命理逻辑。\n  - 截图路径：assets/screenshots/tianji/0513.webp\n- `42:00` [天纪、易经/阳宅/斗数板书] 板书关于“逢猴羊之利”、“开运在八”、“女命”等具体断语。\n  - 截图路径：assets/screenshots/tianji/0514.webp\n- `44:00` [天纪、易经/阳宅/斗数板书] 板书补充三才、定官、命宫及关于“自负”心态的警示语。\n  - 截图路径：assets/screenshots/tianji/0515.webp\n- `50:00` [天纪、易经/阳宅/斗数板书] 满屏板书，详细记录关于“生有四颗珠”及身体外形、性格特征的条文。\n  - 截图路径：assets/screenshots/tianji/0516.webp\n- `56:00` [天纪、易经/阳宅/斗数板书] 板书涉及“革故鼎新”、“生恨生官”、“八化”等运势转折点分析。\n  - 截图路径：assets/screenshots/tianji/0517.webp\n- `62:00` [天纪、易经/阳宅/斗数板书] 详细的断语板书，包含“商机大利”、“间门”、“庆”、“犬生宿”等流年预测。\n  - 截图路径：assets/screenshots/tianji/0518.webp\n- `64:00` [天纪、易经/阳宅/斗数板书] 板书记录流年卦象解析，关键词包括“气保”、“遇雨”、“失地”、“大人”等。\n  - 截图路径：assets/screenshots/tianji/0519.webp\n- `68:00` [天纪、易经/阳宅/斗数板书] 板书展示卦象逻辑，提及“雷山”、干支“申”以及相关的流年推导。\n  - 截图路径：assets/screenshots/tianji/0520.webp\n- `70:00` [天纪、易经/阳宅/斗数板书] 板书记录关于“改舍”、“财”、“勇”、“兔”等具体的流年事项目录。\n  - 截图路径：assets/screenshots/tianji/0521.webp\n- `76:00` [天纪、易经/阳宅/斗数板书] 板书总结关于“求官”、“禄命”、“婚事”、“水”相关的运势断词。\n  - 截图路径：assets/screenshots/tianji/0522.webp\n- `78:00` [天纪、易经/阳宅/斗数板书] 板书详细列出关于“火”、“求财”、“婚事”的判词及“夫丧”等风险提示。\n  - 截图路径：assets/screenshots/tianji/0523.webp\n- `80:00` [天纪、易经/阳宅/斗数板书] 板书画面，黑板左侧写有多行文字，涉及人物性格或运势断语（依稀可见“毫无受挫性”、“一生孤单”等字样）。\n  - 截图路径：assets/screenshots/tianji/0524.webp\n- `84:00` [天纪、易经/阳宅/斗数板书] 板书画面，黑板上写有两段文字描述，配合字幕内容可见涉及“要防小人”等断语。\n  - 截图路径：assets/screenshots/tianji/0525.webp\n- `86:00` [天纪、易经/阳宅/斗数板书] 板书图表，老师在黑板上手绘了一个十二格的命理排盘方阵图（类似紫微斗数命盘），正在标注底部的格子。\n  - 截图路径：assets/screenshots/tianji/0526.webp\n- `96:00` [天纪、易经/阳宅/斗数板书] 板书图解，黑板上画有多个包含汉字的圆圈（可见“胆”、“心”、“星”等字样），并用线条标示出相对位置与关系，老师正在指点最上方的圆圈。\n  - 截图路径：assets/screenshots/tianji/0527.webp",
     ]
   },
-  tianji: {
+  "tianji": {
     title: "天纪",
     source: "references/tianji.md",
     关联引擎: "中医/风水/紫微",
@@ -5308,7 +5308,7 @@ window.NIHAISHA_TCM_KB = {
       "整理说明：本课摘要根据课程转写提取，可作为主题检索入口。",
     ]
   },
-  usage-scenarios: {
+  "usage-scenarios": {
     title: "使用场景",
     source: "references/usage-scenarios.md",
     关联引擎: "中医",
@@ -5380,7 +5380,7 @@ window.NIHAISHA_TCM_KB = {
       "1. 使用 `lesson-map.md` 确认课次范围。\n2. 使用 `symptom-index.md` 和 `formula-patterns.md` 抽出可检索卡片。\n3. 使用 `screenshot-evidence.md` 绑定证据路径。\n4. 新增或更新 references 文件时，保持 `SKILL.md` 只放路由和安全规则，详细知识放 references。",
     ]
   },
-  yijinjing-screenshot-evidence: {
+  "yijinjing-screenshot-evidence": {
     title: "易筋经截图证据",
     source: "references/yijinjing-screenshot-evidence.md",
     关联引擎: "中医",
@@ -5408,7 +5408,7 @@ window.NIHAISHA_TCM_KB = {
       "- `00:30` [易筋经、动作示范/功法画面] 左侧显示“武式易筋经”总体说明文字（使人的精神、形体、气息三者有效结合起来...），右侧老师进行讲解示范\n  - 截图路径：assets/screenshots/yijinjing/0020.webp\n- `01:00` [易筋经、动作示范/功法画面] 左侧显示“韦陀献杵式”动作要领文字，右侧老师进行对应动作示范\n  - 截图路径：assets/screenshots/yijinjing/0021.webp\n- `01:30` [易筋经、动作示范/功法画面] 左侧显示“摘星换斗”动作要领文字，右侧老师进行转身及手臂动作示范\n  - 截图路径：assets/screenshots/yijinjing/0022.webp\n- `02:00` [易筋经、动作示范/功法画面] 左侧显示“九鬼拔马刀势”动作要领文字，右侧老师背对镜头进行拉伸动作示范\n  - 截图路径：assets/screenshots/yijinjing/0023.webp\n- `02:30` [易筋经、动作示范/功法画面] 左侧显示“探爪式”动作要领文字，右侧老师进行双手握拳及出爪动作示范\n  - 截图路径：assets/screenshots/yijinjing/0024.webp\n- `03:30` [易筋经、动作示范/功法画面] 左侧显示“倒拽九牛尾”动作要领文字，右侧老师侧身进行弓步拉拽动作示范\n  - 截图路径：assets/screenshots/yijinjing/0025.webp\n- `04:30` [易筋经、动作示范/功法画面] 左侧显示“阴蹻跟阴蹻”动作要领文字，右侧老师进行腿脚部动作示范\n  - 截图路径：assets/screenshots/yijinjing/0026.webp\n- `05:30` [易筋经、动作示范/功法画面] 左侧显示“掉尾势”动作要领文字，右侧老师进行站立挺胸等动作示范\n  - 截图路径：assets/screenshots/yijinjing/0027.webp\n- `06:30` [易筋经、动作示范/功法画面] 左侧显示“震动动作要点”文字，右侧老师进行马步姿势示范\n  - 截图路径：assets/screenshots/yijinjing/0028.webp",
     ]
   },
-  yijinjing: {
+  "yijinjing": {
     title: "易筋经",
     source: "references/yijinjing.md",
     关联引擎: "中医",
@@ -5484,7 +5484,7 @@ window.NIHAISHA_TCM_KB = {
       "课程还特别强调了易筋经与日常习惯的结合，主张通过自然呼吸与身体振动的同步，松解腿部肌肉、经络中的“痰湿”，并提到“打坐”并非固定姿势，而是可灵活运用于生活各场景的修身方法。讲师指出，部分高难度动作如结尾的“手脚相触”需采用“反转练习法”——先以手触地引导脚部移动，再踮起脚尖完成接触，而非直接由上往下尝试，这一技巧体现了道家“以柔克刚”的练功智慧。最后，讲师以“你一定要首先放到地上，然后脚过去”点明动作逻辑，以“不管你在坐车开车什么状态之下都可以练”倡导功夫练习的灵活性，鼓励学员在实用性中体会传统功法的精髓。",
     ]
   },
-  zhongjing-xinfa-screenshot-evidence: {
+  "zhongjing-xinfa-screenshot-evidence": {
     title: "仲景心法截图证据",
     source: "references/zhongjing-xinfa-screenshot-evidence.md",
     关联引擎: "中医",
@@ -5525,7 +5525,7 @@ window.NIHAISHA_TCM_KB = {
       "- `22:00` [仲景心法、板书/病机/方药图] 讲师在黑板上板书方剂药剂构成，可见“白术”、“大枣”、“生姜”、“甘草”等药名及关系连线。\n  - 截图路径：assets/screenshots/zhongjing-xinfa/0057.webp\n- `30:00` [仲景心法、板书/病机/方药图] 黑板展示较密集的中医病机与治法板书，可见“解表”、“肌”、“肝苦急”、“急食甘以缓之”等文字及推导符号。\n  - 截图路径：assets/screenshots/zhongjing-xinfa/0058.webp\n- `38:00` [仲景心法、板书/病机/方药图] 黑板上呈现完整的中医脏腑逻辑关系图，包含圆圈与连接箭头，可见“心”、“小肠”、“肺”、“皮”等脏腑及组织名称的图解推演。\n  - 截图路径：assets/screenshots/zhongjing-xinfa/0059.webp\n- `76:00` [仲景心法、板书/病机/方药图] 黑板满屏手写板书，完整展示本节课的中医理论与经方推演内容，包含密集的文字说明、多个概念的圈注和连线图解，且讲师偏居画面边缘，无大面积遮挡。\n  - 截图路径：assets/screenshots/zhongjing-xinfa/0060.webp\n- `84:00` [仲景心法、板书/病机/方药图] 黑板上写有较多中医方剂和药理相关的粉笔板书，讲师正在指点讲解。\n  - 截图路径：assets/screenshots/zhongjing-xinfa/0061.webp\n- `102:00` [仲景心法、板书/病机/方药图] 黑板上展示了更新后的满屏板书内容，清晰可见“麻黄”、“桂枝”等中药名称，信息量丰富。\n  - 截图路径：assets/screenshots/zhongjing-xinfa/0062.webp\n- `114:00` [仲景心法、板书/病机/方药图] 讲师正在黑板上重点书写包含“大黄”、“芒硝”等中药药名的板书。\n  - 截图路径：assets/screenshots/zhongjing-xinfa/0063.webp\n- `118:00` [仲景心法、板书/病机/方药图] 黑板右侧呈现讲师手绘的人体头部及躯干简易轮廓图解（配合讲解“肛门”等部位），并辅以相关的中医药理板书。\n  - 截图路径：assets/screenshots/zhongjing-xinfa/0064.webp\n- `120:00` [仲景心法、板书/病机/方药图] 满屏黑板板书，右侧画有简易人体病机/经络部位图示及标注，左侧和中间写有大量中医理论文字，讲师正在指着左侧板书讲解。\n  - 截图路径：assets/screenshots/zhongjing-xinfa/0065.webp\n- `122:00` [仲景心法、板书/病机/方药图] 满屏黑板板书，讲师正在黑板右侧的人体图示头部/肩部位置进行指画和具体部位的讲解。\n  - 截图路径：assets/screenshots/zhongjing-xinfa/0066.webp\n- `130:00` [仲景心法、板书/病机/方药图] 满屏黑板板书，讲师正在指点黑板上方中间部位的文字以及圆形气机/病机图示。\n  - 截图路径：assets/screenshots/zhongjing-xinfa/0067.webp\n- `142:00` [仲景心法、板书/病机/方药图] 满屏黑板板书，讲师正指向黑板左上方密集的方剂或理论文字板书区域进行重点讲解。\n  - 截图路径：assets/screenshots/zhongjing-xinfa/0068.webp",
     ]
   },
-  zhongjing-xinfa: {
+  "zhongjing-xinfa": {
     title: "仲景心法",
     source: "references/zhongjing-xinfa.md",
     关联引擎: "中医",

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>易道智鉴 Pro - 付费报告示例</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#080808;--paper:#f5f0e6;--paper2:#e8dcc8;
+  --gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;
+  --cinn:#c0392b;--jade:#27ae60;--cyan:#2980b9;--violet:#8e44ad;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Serif SC',serif;background:var(--paper);color:#333;min-height:100vh}
+
+.report-container{max-width:900px;margin:0 auto;padding:40px 30px}
+
+/* HEADER */
+.report-header{text-align:center;padding:40px 0;border-bottom:2px solid var(--gold);margin-bottom:40px}
+.report-logo{font-family:'Ma Shan Zheng',serif;font-size:36px;color:var(--gold);letter-spacing:8px}
+.report-title{font-family:'Ma Shan Zheng',serif;font-size:32px;margin:20px 0 10px;letter-spacing:4px}
+.report-subtitle{font-size:14px;color:#666;letter-spacing:2px}
+.report-meta{display:flex;justify-content:center;gap:30px;margin-top:20px;font-size:13px;color:#888}
+
+/* SECTION */
+.section{margin-bottom:40px}
+.section-title{font-family:'Ma Shan Zheng',serif;font-size:24px;color:var(--gold);letter-spacing:4px;margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid rgba(201,168,76,.3)}
+.section-content{font-size:15px;line-height:2;color:#444}
+
+/* CARDS */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:20px 0}
+.info-card{background:#fff;padding:20px;border:1px solid rgba(201,168,76,.2);text-align:center}
+.info-card .label{font-size:12px;color:#888;margin-bottom:8px}
+.info-card .value{font-size:24px;font-weight:600;color:var(--gold)}
+.info-card .desc{font-size:13px;color:#666;margin-top:8px}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14px}
+.data-table th,.data-table td{padding:12px;border:1px solid rgba(201,168,76,.2);text-align:center}
+.data-table th{background:rgba(201,168,76,.08);color:var(--gold);font-weight:500}
+.data-table td{background:#fff}
+
+/* CHART */
+.chart-box{background:#fff;padding:20px;margin:20px 0;border:1px solid rgba(201,168,76,.2)}
+.chart-title{font-size:14px;color:#666;margin-bottom:15px;text-align:center}
+.wuxing-bar{display:flex;height:40px;margin:10px 0;border-radius:4px;overflow:hidden}
+.wuxing-bar span{display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:500}
+
+/* BADGE */
+.badge{display:inline-block;padding:4px 12px;border-radius:4px;font-size:12px;margin:4px}
+.badge-gold{background:rgba(201,168,76,.1);color:var(--gold3)}
+.badge-red{background:rgba(192,57,43,.1);color:var(--cinn)}
+.badge-green{background:rgba(39,174,96,.1);color:var(--jade)}
+.badge-blue{background:rgba(41,128,185,.1);color:var(--cyan)}
+
+/* ANALYSIS */
+.analysis-box{background:#fff;padding:24px;margin:20px 0;border-left:4px solid var(--gold)}
+.analysis-box h4{font-size:16px;color:var(--gold);margin-bottom:12px}
+.analysis-box p{font-size:14px;line-height:1.9;color:#555;margin-bottom:10px}
+
+/* ADVICE */
+.advice-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:20px 0}
+.advice-card{background:#fff;padding:20px;border:1px solid rgba(201,168,76,.2)}
+.advice-card h5{font-size:14px;color:var(--gold);margin-bottom:10px}
+.advice-card ul{list-style:none;font-size:14px;line-height:1.8;color:#666}
+.advice-card li:before{content:"•";color:var(--gold);margin-right:8px}
+
+/* FOOTER */
+.report-footer{text-align:center;padding:30px 0;margin-top:40px;border-top:1px solid rgba(201,168,76,.2)}
+.report-footer p{font-size:13px;color:#888;margin:8px 0}
+.disclaimer{font-size:12px;color:#999;margin-top:20px;padding:16px;background:rgba(0,0,0,.03);border-radius:4px}
+
+/* PAYMENT NOTICE */
+.payment-notice{background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.02));border:2px solid var(--gold);padding:30px;margin:30px 0;text-align:center;border-radius:8px}
+.payment-notice h3{font-family:'Ma Shan Zheng',serif;font-size:24px;color:var(--gold);margin-bottom:16px}
+.payment-notice p{font-size:14px;color:#666;margin:10px 0}
+.payment-notice .price{font-size:36px;font-weight:700;color:var(--cinn);margin:20px 0}
+.payment-notice .price small{font-size:16px;color:#999}
+.payment-btn{display:inline-block;padding:14px 40px;background:var(--gold);color:#fff;font-size:16px;letter-spacing:2px;border:none;border-radius:4px;cursor:pointer;margin-top:16px;transition:all .3s}
+.payment-btn:hover{background:var(--gold3);transform:translateY(-2px)}
+
+/* BLUR */
+.blur-content{filter:blur(6px);user-select:none;pointer-events:none}
+
+@media(max-width:600px){
+  .report-container{padding:20px 16px}
+  .card-grid{grid-template-columns:1fr 1fr}
+  .advice-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="report-container">
+  <div class="report-header">
+    <div class="report-logo">命 理 通 鉴</div>
+    <h1 class="report-title">八字命盘详解报告</h1>
+    <p class="report-subtitle">基于四柱八字的命理分析与人生指导</p>
+    <div class="report-meta">
+      <span>报告编号：BZ20260622001</span>
+      <span>生成时间：2026-06-22 12:00</span>
+    </div>
+  </div>
+
+  <!-- 用户信息 -->
+  <div class="section">
+    <h3 class="section-title">一、命主信息</h3>
+    <div class="card-grid">
+      <div class="info-card">
+        <div class="label">姓名</div>
+        <div class="value">张三</div>
+      </div>
+      <div class="info-card">
+        <div class="label">性别</div>
+        <div class="value">男</div>
+      </div>
+      <div class="info-card">
+        <div class="label">出生日期</div>
+        <div class="value">1990-06-15</div>
+        <div class="desc">庚午年五月廿三</div>
+      </div>
+      <div class="info-card">
+        <div class="label">出生时辰</div>
+        <div class="value">午时</div>
+        <div class="desc">11:00-13:00</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 四柱八字 -->
+  <div class="section">
+    <h3 class="section-title">二、四柱八字</h3>
+    <table class="data-table">
+      <tr>
+        <th>柱位</th>
+        <th>年柱</th>
+        <th>月柱</th>
+        <th>日柱</th>
+        <th>时柱</th>
+      </tr>
+      <tr>
+        <td>天干</td>
+        <td style="color:var(--gold);font-weight:600;font-size:20px">庚</td>
+        <td style="color:var(--cinn);font-weight:600;font-size:20px">壬</td>
+        <td style="color:var(--jade);font-weight:600;font-size:20px">甲</td>
+        <td style="color:var(--cyan);font-weight:600;font-size:20px">庚</td>
+      </tr>
+      <tr>
+        <td>地支</td>
+        <td>午</td>
+        <td>午</td>
+        <td>申</td>
+        <td>午</td>
+      </tr>
+      <tr>
+        <td>五行</td>
+        <td>金火</td>
+        <td>水火</td>
+        <td>木金</td>
+        <td>金火</td>
+      </tr>
+      <tr>
+        <td>十神</td>
+        <td>七杀</td>
+        <td>偏印</td>
+        <td>日主</td>
+        <td>七杀</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 五行分析 -->
+  <div class="section">
+    <h3 class="section-title">三、五行分析</h3>
+    <div class="chart-box">
+      <div class="chart-title">五行力量分布</div>
+      <div class="wuxing-bar">
+        <span style="width:35%;background:#e74c3c">火 35%</span>
+        <span style="width:25%;background:#f39c12">金 25%</span>
+        <span style="width:20%;background:#3498db">水 20%</span>
+        <span style="width:12%;background:#27ae60">木 12%</span>
+        <span style="width:8%;background:#95a5a6">土 8%</span>
+      </div>
+    </div>
+    <div class="analysis-box">
+      <h4>五行喜忌</h4>
+      <p>命主甲木生于午月，火旺木焚，水为用神，木为喜神。火太旺为忌，土金平。命局缺水，需补水以平衡五行。</p>
+      <p><span class="badge badge-green">喜用：水、木</span> <span class="badge badge-red">忌神：火</span> <span class="badge badge-gold">平运：金、土</span></p>
+    </div>
+  </div>
+
+  <!-- 性格特征（免费部分） -->
+  <div class="section">
+    <h3 class="section-title">四、性格特征</h3>
+    <div class="section-content">
+      <p>日主甲木，性格正直、刚毅，有领导才能，做事雷厉风行。七杀透干，果断坚毅，有魄力，但容易急躁冲动。偏印得力，思维敏捷，学习能力强，有独特的见解。</p>
+      <p style="color:#999;font-size:13px;margin-top:16px">—— 以下内容需付费解锁 ——</p>
+    </div>
+  </div>
+
+  <!-- 付费内容 -->
+  <div class="blur-content">
+    <div class="section">
+      <h3 class="section-title">五、事业运势</h3>
+      <div class="analysis-box">
+        <h4>事业方向</h4>
+        <p>命主适合从事五行属水、木的行业，如：教育、文化、出版、林业、园林、水利、航运、贸易等。七杀格适合管理层、军警、运动员等需要魄力的职业。</p>
+        <p>事业运势：命主事业运势中等偏上。年柱七杀，早年事业有波折；日支申金为偏官，中年事业渐入佳境；时柱七杀，晚年事业有成，有贵人相助。</p>
+      </div>
+      <div class="card-grid">
+        <div class="info-card">
+          <div class="label">适合行业</div>
+          <div class="desc">教育、文化、水利、贸易</div>
+        </div>
+        <div class="info-card">
+          <div class="label">贵人方位</div>
+          <div class="value" style="font-size:18px">北方、东方</div>
+        </div>
+        <div class="info-card">
+          <div class="label">事业运势</div>
+          <div class="badge badge-green">中上</div>
+        </div>
+        <div class="info-card">
+          <div class="label">发展建议</div>
+          <div class="desc">稳扎稳打，不宜冒进</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">六、财运分析</h3>
+      <div class="analysis-box">
+        <h4>财运特点</h4>
+        <p>命主财运中等，正财偏财皆有。申金为偏财，午火为正财。财运起伏较大，需注意理财规划。宜从事稳定的正财行业，偏财需谨慎。</p>
+        <p>财运方位：北方水旺之地，利于求财。西方金地也可，但需防破财。</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">七、婚姻感情</h3>
+      <div class="analysis-box">
+        <h4>婚姻运势</h4>
+        <p>命主婚姻运势中等。日支申金为妻宫，妻星得位，配偶能力较强，但性格刚烈。七杀太旺，感情容易有波折，需注意沟通。</p>
+        <p>配偶特征：年龄相仿或稍长，性格独立、有能力，可能有管理或技术背景。</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">八、大运流年</h3>
+      <table class="data-table">
+        <tr>
+          <th>年龄段</th>
+          <th>大运</th>
+          <th>运势</th>
+          <th>要点</th>
+        </tr>
+        <tr>
+          <td>6-15岁</td>
+          <td>癸未</td>
+          <td>平运</td>
+          <td>学习阶段，偏印透出利于学业</td>
+        </tr>
+        <tr>
+          <td>16-25岁</td>
+          <td>甲申</td>
+          <td>小吉</td>
+          <td>初入社会，事业起步</td>
+        </tr>
+        <tr>
+          <td>26-35岁</td>
+          <td>乙酉</td>
+          <td>中平</td>
+          <td>事业渐稳，婚姻有成</td>
+        </tr>
+        <tr>
+          <td>36-45岁</td>
+          <td>丙戌</td>
+          <td>小吉</td>
+          <td>火运助燃，事业有突破</td>
+        </tr>
+        <tr>
+          <td>46-55岁</td>
+          <td>丁亥</td>
+          <td>大吉</td>
+          <td>水运滋润，事业巅峰</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">九、人生建议</h3>
+      <div class="advice-grid">
+        <div class="advice-card">
+          <h5>事业发展</h5>
+          <ul>
+            <li>选择北方或东方发展</li>
+            <li>适合教育、文化行业</li>
+            <li>稳扎稳打，不宜冒进</li>
+            <li>中年事业运势最佳</li>
+          </ul>
+        </div>
+        <div class="advice-card">
+          <h5>财富管理</h5>
+          <ul>
+            <li>以正财为主，偏财为辅</li>
+            <li>做好理财规划</li>
+            <li>避免高风险投资</li>
+            <li>北方求财有利</li>
+          </ul>
+        </div>
+        <div class="advice-card">
+          <h5>感情婚姻</h5>
+          <ul>
+            <li>多沟通，减少冲突</li>
+            <li>尊重配偶意见</li>
+            <li>选择性格温和的伴侣</li>
+            <li>晚婚更有利</li>
+          </ul>
+        </div>
+        <div class="advice-card">
+          <h5>健康养生</h5>
+          <ul>
+            <li>注意肝胆健康</li>
+            <li>补水养木</li>
+            <li>避免熬夜</li>
+            <li>多食绿色蔬菜</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 付费提示 -->
+  <div class="payment-notice">
+    <h3>解锁完整报告</h3>
+    <p>此报告包含事业、财运、婚姻、大运流年、人生建议等完整内容</p>
+    <p>报告字数：约2500字 | 生成时间：即时</p>
+    <div class="price">¥9.9 <small>原价¥29.9</small></div>
+    <p style="font-size:13px;color:#999">新用户首单专享价</p>
+    <button class="payment-btn" onclick="payNow()">立即解锁</button>
+    <p style="margin-top:16px;font-size:12px;color:#888">
+      支持微信、支付宝支付 | 支付后永久保存 | 可导出PDF
+    </p>
+  </div>
+
+  <div class="report-footer">
+    <p>易道智鉴 · 专业命理报告平台</p>
+    <p>客服微信：mingli-support | 邮箱：support@mingli.com</p>
+    <div class="disclaimer">
+      <strong>免责声明：</strong>本报告基于传统命理学理论生成，仅供娱乐参考，不构成任何决策依据。命理学说属于传统文化范畴，请理性看待。用户应对自己的选择负责。
+    </div>
+  </div>
+</div>
+
+<script>
+function payNow() {
+  alert('支付功能开发中，敬请期待！\n\n预计上线时间：2026年7月');
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,2523 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>易道智鉴 · 先进AI推演</title>
+  <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --ink:#080808;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;
+      --paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;
+      --gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;
+      --title:var(--gold);--muted:var(--paper3);--accent:var(--gold);
+      --bg:var(--ink);--bg-card:rgba(255,255,255,0.04);
+      --card:rgba(255,255,255,0.04);--card2:rgba(255,255,255,0.06);
+      --border:rgba(201,168,76,.15);
+      --shadow:0 4px 24px rgba(0,0,0,.5);
+      --success:#2ecc71;--warn:#e67e22;--danger:#e74c3c;
+      --text:var(--paper);--text-dim:var(--paper3);
+      --cinn:#c0392b;--cinn2:#e74c3c;
+      --cyan:#2980b9;--cyan2:#5dade2;
+      --jade:#27ae60;--jade2:#2ecc71;
+      --violet:#8e44ad;--violet2:#a569bd;
+      --orange:#e67e22;
+      --emerald:#16a085;
+      --steel:#7f8c8d;
+      --wood:#8d6e63;--wood2:#a1887f;
+      --fire:#e74c3c;--fire2:#c0392b;
+      --earth:#a08060;
+      --metal:#95a5a6;--metal2:#bdc3c7;
+      --font-mono:'Cutive Mono','Courier New',monospace;
+      --font-serif:'Noto Serif SC','Source Han Serif SC','SimSun','STSong',serif;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:var(--bg);color:var(--text);font-family:var(--font-serif);min-height:100vh;line-height:1.8;overflow-x:hidden}
+    .header{text-align:center;padding:30px 20px 20px;background:linear-gradient(180deg,rgba(201,168,76,0.08),rgba(8,8,8,1));border-bottom:1px solid var(--border)}
+    .header h1{font-family:'Ma Shan Zheng',cursive;font-size:clamp(28px,5vw,48px);color:var(--title);letter-spacing:8px;text-shadow:0 1px 0 rgba(201,168,76,.3)}
+    .header p{color:var(--muted);margin-top:6px;font-size:13px}
+    .disclaimer-bar{background:rgba(201,168,76,0.06);border:1px solid rgba(230,126,34,0.15);border-left:4px solid var(--warn);padding:10px 20px;margin:10px auto;max-width:1100px;font-size:13px;color:var(--gold2);line-height:1.8;border-radius:0 8px 8px 0}
+    .disclaimer-bar strong{display:block;font-size:14px;margin-bottom:2px}
+    .container{max-width:1100px;margin:0 auto;padding:16px}
+    /* Top Nav */
+    .top-nav{display:flex;justify-content:center;gap:8px;padding:12px;flex-wrap:wrap;border-bottom:1px solid var(--border);background:var(--card)}
+    .top-nav a{color:var(--title);text-decoration:none;font-size:13px;padding:5px 14px;border:1px solid var(--border);border-radius:20px;transition:.2s}
+    .top-nav a:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+    /* Section title */
+    .section-title{font-family:'Ma Shan Zheng',cursive;font-size:26px;color:var(--title);margin:28px 0 14px;letter-spacing:4px;display:flex;align-items:center;gap:10px}
+    .section-title::before{content:'';display:inline-block;width:4px;height:28px;background:var(--accent);border-radius:2px}
+    .section-title::after{content:'';flex:1;height:1px;background:linear-gradient(to right,var(--border),transparent);margin-left:10px}
+    /* Tab system */
+    .tab-bar{display:flex;gap:6px;padding:4px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;flex-wrap:wrap}
+    .tab-btn{padding:10px 20px;border:none;border-radius:8px;background:transparent;color:var(--muted);font-size:14px;font-family:inherit;cursor:pointer;transition:.25s;flex:1;min-width:100px;text-align:center}
+    .tab-btn.active{background:var(--title);color:#fff;font-weight:600}
+    .tab-btn:not(.active):hover{background:rgba(201,168,76,0.08);color:var(--title)}
+    .tab-panel{display:none;animation:fadeIn .3s ease}
+    .tab-panel.active{display:block}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    /* Cards */
+    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;box-shadow:var(--shadow)}
+    .card-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+    .card-icon{font-size:24px}
+    .card-title{font-family:'Ma Shan Zheng',cursive;font-size:20px;color:var(--title);letter-spacing:2px}
+    .card-badge{font-size:12px;padding:2px 10px;border-radius:12px;background:var(--success);color:#fff;margin-left:auto}
+    /* Module title banner */
+    .mod-banner{background:linear-gradient(135deg,var(--title),#6d3610);color:#fff;border-radius:12px;padding:16px 24px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+    .mod-banner-icon{font-size:32px}
+    .mod-banner h2{font-family:'Ma Shan Zheng',cursive;font-size:24px;letter-spacing:3px}
+    .mod-banner p{font-size:13px;opacity:.85;margin-top:2px}
+    /* Inputs */
+    .input-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+    .input-field{flex:1;min-width:200px}
+    .input-field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px;font-weight:600}
+    .input-field input,.input-field select{width:100%;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:15px;font-family:inherit}
+    .input-field input:focus,.input-field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(201,168,76,.15)}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:11px 28px;background:linear-gradient(135deg,var(--accent),#b8962e);color:#000;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Ma Shan Zheng',cursive;letter-spacing:3px;transition:.3s}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(201,168,76,.3)}
+    .btn:active{transform:translateY(0)}
+    .btn-sm{padding:7px 18px;font-size:13px;letter-spacing:2px}
+    .btn-outline{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;background:transparent;border:1.5px solid var(--accent);color:var(--title);border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;transition:.25s}
+    .btn-outline:hover{background:var(--accent);color:#fff}
+    .btn-success{background:linear-gradient(135deg,var(--success),#1e5e3f);color:#fff}
+    .btn-danger{background:linear-gradient(135deg,var(--danger),#922b21);color:#fff}
+    /* Tags */
+    .tag{display:inline-block;padding:4px 10px;border-radius:12px;font-size:12px;margin:3px;background:rgba(201,168,76,0.08);border:1px solid var(--border);color:var(--muted)}
+    .tag-primary{background:rgba(139,69,19,.1);color:var(--title);border-color:rgba(139,69,19,.2)}
+    .tag-success{background:rgba(45,106,79,.1);color:var(--success);border-color:rgba(45,106,79,.2)}
+    .tag-warn{background:rgba(230,126,34,.1);color:var(--gold);border-color:rgba(230,126,34,.2)}
+    .tag-danger{background:rgba(192,57,43,.1);color:var(--danger);border-color:rgba(192,57,43,.2)}
+    /* Upload zone */
+    .upload-zone{border:2px dashed var(--border);border-radius:12px;padding:40px 20px;text-align:center;cursor:pointer;transition:.3s;background:rgba(255,255,255,0.06);position:relative}
+    .upload-zone:hover,.upload-zone.dragover{border-color:var(--accent);background:rgba(201,168,76,.05)}
+    .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+    .upload-icon{font-size:48px;margin-bottom:12px}
+    .upload-text{font-size:15px;color:var(--muted)}
+    .upload-text strong{color:var(--title);font-size:16px}
+    .upload-hint{font-size:12px;color:var(--muted);margin-top:6px}
+    #previewImg{max-width:100%;max-height:300px;border-radius:8px;margin-top:12px;display:none;border:1px solid var(--border)}
+    /* Loading */
+    .loading-wrap{text-align:center;padding:40px;display:none}
+    .loading-wrap.show{display:block}
+    .spinner{width:48px;height:48px;border:4px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loading-text{color:var(--muted);font-size:15px}
+    /* Report result */
+    .report-result{display:none}
+    .report-result.show{display:block;animation:fadeIn .4s}
+    .indicator-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin:16px 0}
+    .indicator-card{background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:10px;padding:14px;position:relative}
+    .indicator-name{font-size:14px;color:var(--title);font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+    .indicator-val{font-size:22px;font-weight:700;color:var(--text)}
+    .indicator-unit{font-size:13px;color:var(--muted);margin-left:4px}
+    .indicator-range{font-size:12px;color:var(--muted);margin-top:4px}
+    .indicator-status{display:inline-block;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:700;margin-top:6px}
+    .status-ok{background:rgba(45,106,79,.12);color:var(--success)}
+    .status-high{background:rgba(192,57,43,.12);color:var(--danger)}
+    .status-low{background:rgba(230,126,34,.12);color:var(--gold)}
+    .indicator-wuxing{font-size:12px;color:var(--muted);margin-top:6px;padding-top:6px;border-top:1px solid var(--border)}
+    .indicator-suggest{font-size:13px;color:var(--title);margin-top:4px;line-height:1.6}
+    .food-therapy-box{background:linear-gradient(135deg,rgba(45,106,79,.06),rgba(39,174,96,.06));border:1px solid rgba(45,106,79,.2);border-radius:12px;padding:18px;margin:14px 0}
+    .food-therapy-box h4{color:var(--success);font-size:16px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+    .recipe-card{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;transition:.2s}
+    .recipe-card:hover{border-color:var(--accent);box-shadow:0 2px 12px rgba(201,168,76,.1)}
+    .recipe-name{font-size:15px;font-weight:700;color:var(--title);margin-bottom:6px}
+    .recipe-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+    .recipe-ingredients{font-size:13px;color:var(--muted);margin-bottom:6px}
+    .recipe-method{font-size:13px;color:var(--text);line-height:1.7}
+    .recipe-effect{font-size:12px;color:var(--success);margin-top:6px;padding:6px 10px;background:rgba(45,106,79,.08);border-radius:6px}
+    .checkin-section{margin:14px 0;background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(139,69,19,.06));border:1px solid rgba(201,168,76,.2);border-radius:12px;padding:18px}
+    .checkin-section h4{color:var(--title);font-size:15px;margin-bottom:12px}
+    .meal-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    .meal-slot{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+    .meal-label{font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:600}
+    .meal-time{font-size:11px;color:var(--accent)}
+    .meal-input{width:100%;border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-size:13px;font-family:inherit;resize:none;background:rgba(255,255,255,0.06)}
+    /* Food therapy enhancement */
+    .constitution-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+    .const-tab{padding:6px 16px;border:1.5px solid var(--border);border-radius:20px;background:rgba(255,255,255,0.06);color:var(--muted);font-size:13px;cursor:pointer;transition:.2s}
+    .const-tab.active{background:var(--title);color:#fff;border-color:var(--title)}
+    .const-tab:not(.active):hover{border-color:var(--accent);color:var(--title)}
+    .recipe-library{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+    .recipe-item{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:12px;padding:16px;transition:.25s;cursor:pointer}
+    .recipe-item:hover{border-color:var(--accent);box-shadow:0 4px 16px rgba(201,168,76,.12);transform:translateY(-2px)}
+    .recipe-item h5{font-size:15px;color:var(--title);margin-bottom:8px;font-weight:700}
+    .recipe-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+    .add-to-checkin{display:inline-flex;align-items:center;gap:4px;padding:5px 14px;border:1.5px solid var(--success);color:var(--success);border-radius:20px;font-size:12px;cursor:pointer;transition:.2s;background:transparent;margin-top:8px;font-family:inherit}
+    .add-to-checkin:hover{background:var(--success);color:#fff}
+    .add-to-checkin.added{background:var(--success);color:#fff;cursor:default}
+    /* Weekly plan */
+    .weekly-plan-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+    .day-card{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
+    .day-name{font-size:13px;font-weight:700;color:var(--title);margin-bottom:10px;font-family:'Ma Shan Zheng',cursive;font-size:18px}
+    .day-meals{font-size:12px;color:var(--muted);line-height:2;text-align:left}
+    .day-meals strong{color:var(--title);font-size:12px}
+    /* Check-in module */
+    .checkin-progress{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+    .checkin-dot{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;transition:.3s;background:rgba(255,255,255,0.06);cursor:pointer;position:relative}
+    .checkin-dot.done{background:var(--success);border-color:var(--success);color:#fff;box-shadow:0 2px 8px rgba(45,106,79,.3)}
+    .checkin-dot.today{border-color:var(--accent);box-shadow:0 0 0 3px rgba(201,168,76,.2)}
+    .checkin-dot-label{font-size:10px;color:var(--muted);text-align:center;margin-top:4px;width:50px}
+    .checkin-dot-wrap{text-align:center}
+    .checkin-form{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
+    .checkin-item{display:flex;align-items:flex-start;gap:12px;padding:14px 0;border-bottom:1px solid var(--border)}
+    .checkin-item:last-child{border-bottom:none}
+    .checkin-item-icon{font-size:22px;width:40px;text-align:center;flex-shrink:0;padding-top:2px}
+    .checkin-item-label{flex:1;padding-top:2px}
+    .checkin-item-label strong{display:block;font-size:14px;color:var(--title);margin-bottom:2px}
+    .checkin-item-label span{font-size:12px;color:var(--muted)}
+    .checkin-item input,.checkin-item textarea,.checkin-item select{width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:14px;font-family:inherit;background:rgba(255,255,255,0.06);resize:none}
+    .checkin-item input:focus,.checkin-item textarea:focus,.checkin-item select:focus{outline:none;border-color:var(--accent)}
+    .checkin-submit{margin-top:14px}
+    /* Streak badges */
+    .streak-panel{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .streak-badge{flex:1;min-width:100px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;transition:.3s;cursor:default}
+    .streak-badge.earned{border-color:var(--accent);background:linear-gradient(135deg,#fffdf8,#fff8e8);box-shadow:0 2px 12px rgba(201,168,76,.15)}
+    .streak-badge .badge-icon{font-size:28px;margin-bottom:4px}
+    .streak-badge .badge-name{font-size:13px;font-weight:700;color:var(--title)}
+    .streak-badge .badge-days{font-size:11px;color:var(--muted);margin-top:2px}
+    .streak-badge.earned .badge-days{color:var(--accent);font-weight:700}
+    /* History */
+    .history-list{max-height:400px;overflow-y:auto}
+    .history-item{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px}
+    .history-date{font-size:12px;color:var(--accent);font-weight:700;margin-bottom:6px}
+    .history-row{display:flex;gap:8px;flex-wrap:wrap}
+    .history-tag{font-size:12px;padding:3px 10px;border-radius:12px;background:rgba(201,168,76,0.08);color:var(--muted)}
+    .history-tag.done{background:rgba(45,106,79,.12);color:var(--success)}
+    .history-note{font-size:12px;color:var(--muted);margin-top:6px;font-style:italic}
+    /* Export btn */
+    .export-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+    /* Two column layout */
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    @media(max-width:768px){
+      .two-col{grid-template-columns:1fr}
+      .meal-grid{grid-template-columns:1fr}
+      .indicator-grid{grid-template-columns:1fr}
+      .weekly-plan-grid{grid-template-columns:1fr 1fr}
+      .recipe-library{grid-template-columns:1fr}
+      .detail-grid{grid-template-columns:1fr}
+    }
+    /* Grid layout for details */
+    .detail-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-bottom:20px}
+    .detail-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;transition:.3s;box-shadow:var(--shadow)}
+    .detail-card:hover{border-color:var(--accent)}
+    .detail-card h4{font-family:'Ma Shan Zheng',cursive;font-size:20px;color:var(--title);margin-bottom:10px;letter-spacing:2px}
+    .detail-card p{line-height:1.8;font-size:14px;margin-bottom:6px}
+    .detail-card ul{list-style:none;padding:0}
+    .detail-card ul li{padding:5px 0;padding-left:18px;position:relative;line-height:1.7;font-size:14px}
+    .detail-card ul li::before{content:'◇';position:absolute;left:0;color:var(--accent);font-size:11px}
+    .highlight{color:var(--accent);font-weight:700}
+    /* Result area */
+    .result-area{display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;margin:16px 0;box-shadow:var(--shadow)}
+    .result-area.show{display:block;animation:fadeIn .4s ease}
+    .result-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+    .result-header h2{font-family:'Ma Shan Zheng',cursive;color:var(--title);font-size:22px;letter-spacing:3px}
+    /* Chain */
+    .chain-container{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:18px;overflow-x:auto;box-shadow:var(--shadow)}
+    .chain-title{color:var(--title);font-family:'Ma Shan Zheng',cursive;font-size:20px;text-align:center;margin-bottom:14px;letter-spacing:3px}
+    .chain-row{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;min-width:800px}
+    .chain-node{border-radius:10px;padding:12px 8px;text-align:center;min-width:90px;cursor:pointer;transition:.3s;border:2px solid transparent}
+    .chain-node:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 6px 16px rgba(139,69,19,.1);z-index:2}
+    .chain-node.selected{border-color:var(--accent)!important;box-shadow:0 0 20px rgba(201,168,76,.2);z-index:3}
+    .chain-arrow{color:var(--accent);font-size:16px;margin:0 2px;flex-shrink:0}
+    .chain-node .cn-icon{font-size:26px;margin-bottom:4px}
+    .chain-node .cn-name{font-size:13px;font-weight:700;color:var(--title)}
+    .chain-node .cn-sub{font-size:10px;color:var(--muted);margin-top:2px}
+    .wuxing-color-Mu{background:rgba(39,174,96,0.1);border-left:3px solid #27ae60}
+    .wuxing-color-Huo{background:rgba(231,76,60,0.1);border-left:3px solid #e74c3c}
+    .wuxing-color-Tu{background:rgba(243,156,18,0.1);border-left:3px solid #f39c12}
+    .wuxing-color-Jin{background:rgba(144,164,174,0.1);border-left:3px solid #90a4ae}
+    .wuxing-color-Shui{background:rgba(52,152,219,0.1);border-left:3px solid #3498db}
+    /* Disease tags */
+    .disease-tags{display:flex;flex-wrap:wrap;gap:8px}
+    .disease-tag{padding:7px 14px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:20px;color:var(--muted);cursor:pointer;font-size:13px;transition:.2s}
+    .disease-tag:hover{border-color:var(--accent);color:var(--title)}
+    .disease-tag.selected{background:var(--title);color:#fff;border-color:var(--title)}
+    .search-wrap{position:relative}
+    .search-wrap input{padding-right:80px}
+    .search-wrap .btn{position:absolute;right:2px;top:2px;bottom:2px;padding:6px 16px;font-size:13px;border-radius:6px;letter-spacing:1px}
+    /* Legal footer */
+    .legal-footer{background:rgba(201,168,76,0.06);border:1px solid rgba(230,126,34,0.15);border-left:4px solid var(--warn);padding:14px 18px;margin-top:24px;border-radius:0 8px 8px 0;font-size:13px;color:var(--gold2);line-height:1.8}
+    .legal-footer strong{display:block;font-size:14px;margin-bottom:4px}
+    /* Feedback toast */
+    .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--title);color:#fff;padding:12px 28px;border-radius:30px;font-size:14px;transition:.4s;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.2);white-space:nowrap}
+    .toast.show{transform:translateX(-50%) translateY(0)}
+    /* Feature Navigation Bar */
+    .feature-nav-bar{background:var(--ink3);color:var(--text);padding:18px 0 20px;margin-top:24px}
+    .feature-nav-cards{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+    .fn-card{display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:12px 14px;text-decoration:none;color:var(--text);min-width:90px;transition:.2s}
+    .fn-card:hover{background:rgba(201,168,76,.15);border-color:rgba(201,168,76,.5)}
+    .fn-icon{font-size:22px}
+    .fn-name{font-size:13px;font-weight:700;color:#c9a84c}
+    .fn-desc{font-size:10px;color:#a09080;letter-spacing:1px}
+    /* Scrollbar */
+    ::-webkit-scrollbar{width:6px}
+    ::-webkit-scrollbar-track{background:var(--bg)}
+    ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+    /* No data */
+    .empty-state{text-align:center;padding:40px;color:var(--muted)}
+    .empty-state-icon{font-size:48px;margin-bottom:12px;opacity:.5}
+    /* ===== AI智能解读样式 ===== */
+    .ai-interpret-card{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:16px;padding:28px;margin-bottom:24px;box-shadow:0 8px 32px rgba(102,126,234,.25);position:relative;overflow:hidden}
+    .ai-interpret-card::before{content:'';position:absolute;top:-50%;right:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(255,255,255,.1) 0%,transparent 70%);pointer-events:none}
+    .ai-interpret-card h2{font-family:'Ma Shan Zheng',cursive;font-size:32px;letter-spacing:4px;margin-bottom:10px;text-shadow:0 2px 4px rgba(0,0,0,.2)}
+    .ai-interpret-card .subtitle{font-size:15px;opacity:.9;margin-bottom:20px;line-height:1.6}
+    .ai-upload-zone{border:2px dashed rgba(255,255,255,.5);border-radius:14px;padding:48px 24px;text-align:center;cursor:pointer;transition:.3s;background:rgba(255,255,255,.08);position:relative;margin-bottom:20px}
+    .ai-upload-zone:hover,.ai-upload-zone.dragover{border-color:#fff;background:rgba(255,255,255,.15);transform:scale(1.01)}
+    .ai-upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+    .ai-upload-icon{font-size:56px;margin-bottom:14px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.2))}
+    .ai-upload-text{font-size:16px;color:rgba(255,255,255,.95);font-weight:600}
+    .ai-upload-hint{font-size:13px;color:rgba(255,255,255,.7);margin-top:8px}
+    .ai-preview-wrap{display:none;margin-top:16px;text-align:center}
+    .ai-preview-img{max-width:100%;max-height:320px;border-radius:10px;border:3px solid rgba(255,255,255,.3);box-shadow:0 4px 16px rgba(0,0,0,.2)}
+    .ai-success-msg{display:none;padding:12px 20px;background:rgba(255,255,255,.15);border-radius:10px;margin-top:16px;font-size:14px;backdrop-filter:blur(10px)}
+    .ai-step-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin:24px 0}
+    .ai-step-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;box-shadow:var(--shadow);transition:.3s;position:relative;overflow:hidden}
+    .ai-step-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#667eea,#764ba2);opacity:0;transition:.3s}
+    .ai-step-card.active::before{opacity:1}
+    .ai-step-card.completed::before{background:linear-gradient(90deg,var(--success),#27ae60);opacity:1}
+    .ai-step-header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+    .ai-step-num{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;flex-shrink:0;transition:.3s}
+    .ai-step-card.completed .ai-step-num{background:linear-gradient(135deg,var(--success),#27ae60)}
+    .ai-step-title{font-size:17px;font-weight:700;color:var(--title)}
+    .ai-step-content{font-size:14px;color:var(--muted);line-height:1.7}
+    .ai-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.4);border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:.3s;font-family:inherit}
+    .ai-btn:hover{background:rgba(255,255,255,.25);border-color:#fff;transform:translateY(-2px)}
+    .ai-btn-primary{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;box-shadow:0 4px 16px rgba(102,126,234,.4)}
+    .ai-btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(102,126,234,.5)}
+    .ai-btn-success{background:linear-gradient(135deg,var(--success),#1e5e3f);color:#fff;border:none}
+    .ai-result-textarea{width:100%;min-height:240px;padding:16px;border:1px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;line-height:1.8;resize:vertical;background:rgba(255,255,255,0.06);color:var(--title)}
+    .ai-result-textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(201,168,76,.15)}
+    .parse-result-preview{background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:10px;padding:16px;margin-top:14px;max-height:400px;overflow-y:auto}
+    .parse-section{margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+    .parse-section:last-child{border-bottom:none}
+    .parse-section h5{font-size:14px;color:var(--title);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+    /* 运动方案样式 */
+    .exercise-module{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px;box-shadow:var(--shadow)}
+    .exercise-module .mod-header{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:14px;border-bottom:2px solid var(--border)}
+    .exercise-module .mod-icon{font-size:32px}
+    .exercise-module .mod-title{font-family:'Ma Shan Zheng',cursive;font-size:24px;color:var(--title);letter-spacing:3px}
+    .exercise-week-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin:16px 0}
+    .exercise-day-card{background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;transition:.3s;cursor:pointer}
+    .exercise-day-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+    .exercise-day-card.selected{border-color:var(--accent);background:rgba(201,168,76,.05)}
+    .exercise-day-name{font-size:15px;font-weight:700;color:var(--title);margin-bottom:8px}
+    .exercise-item{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12px;color:var(--muted)}
+    .exercise-item .ex-name{font-weight:600;color:var(--title)}
+    .intensity-low{color:var(--success);font-weight:700}
+    .intensity-medium{color:var(--warn);font-weight:700}
+    .intensity-high{color:var(--danger);font-weight:700}
+    .exercise-library{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:16px 0}
+    .exercise-card{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:.25s}
+    .exercise-card:hover{border-color:var(--accent);box-shadow:0 2px 12px rgba(201,168,76,.1)}
+    .exercise-card.selected{border-color:var(--success);background:rgba(45,106,79,.03)}
+    .exercise-card .ex-type{font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(102,126,234,.1);color:#667eea;display:inline-block;margin-bottom:6px}
+    .exercise-card .ex-name{font-size:14px;font-weight:700;color:var(--title);margin-bottom:4px}
+    .exercise-card .ex-cal{font-size:12px;color:var(--muted)}
+    .badge-ai{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:20px;font-size:13px;font-weight:700;margin-left:12px;vertical-align:middle;box-shadow:0 2px 8px rgba(102,126,234,.3)}
+    .ant-badge{position:absolute;top:10px;right:10px;font-size:10px;padding:3px 10px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:10px;font-weight:600}
+    @media(max-width:768px){
+      .chain-row{justify-content:flex-start;min-width:800px}
+      .chain-node{min-width:72px;padding:8px 4px}
+      .chain-node .cn-icon{font-size:18px}
+      .chain-node .cn-name{font-size:11px}
+    }
+  
+/* AI分析动画 */
+@keyframes ai-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.7; }
+}
+@keyframes ai-progress {
+  0% { width: 10%; margin-left: 0; }
+  50% { width: 60%; margin-left: 20%; }
+  100% { width: 10%; margin-left: 90%; }
+}
+</style>
+</head>
+<style>
+/* 跨文件导航栏 */
+.file-nav-bar{background:rgba(8,8,8,0.97);border-bottom:1px solid rgba(201,168,76,0.15);padding:10px 0;display:flex;justify-content:center;gap:6px;flex-wrap:wrap;position:relative;z-index:100}
+.file-nav-btn{color:var(--text-dim,#8a7d60);text-decoration:none;font-size:12px;padding:5px 14px;border:1px solid rgba(201,168,76,0.12);border-radius:16px;transition:all .25s;font-family:'Noto Serif SC',serif;letter-spacing:1px;white-space:nowrap}
+.file-nav-btn:hover{background:rgba(201,168,76,0.1);color:var(--gold);border-color:rgba(201,168,76,0.3)}
+.file-nav-btn.active{background:rgba(201,168,76,0.12);color:var(--gold);border-color:rgba(201,168,76,0.35)}
+</style>
+<body>
+<div class="file-nav-bar">
+  <a href="divination-hub.html" class="file-nav-btn">🏠 主平台</a>
+  <a href="divination-integrated.html" class="file-nav-btn active">🧬 体质调理</a>
+  <a href="divination-almanac.html" class="file-nav-btn">📅 黄历</a>
+  <a href="divination-knowledge.html" class="file-nav-btn">📚 知识库</a>
+  <a href="divination-shop.html" class="file-nav-btn">🛍️ 商城</a>
+  <a href="divination-membership.html" class="file-nav-btn">👑 会员</a>
+</div>
+<div class="header">
+  <h1>易道智鉴 · 先进AI推演<span class="badge-ai" style="font-size:14px;vertical-align:middle">🤖AI解读</span></h1>
+  <p>易道智鉴 · 先进AI推演</p>
+</div>
+
+<div class="top-nav">
+  <a href="divination-hub.html">🏠 命理宝鉴</a>
+  <a href="divination-integrated.html">🧬 体质调理</a>
+  <a href="divination-almanac.html">📅 黄历</a>
+  <a href="divination-knowledge.html">📚 知识库</a>
+  <a href="divination-shop.html">🛒 开运商城</a>
+  <a href="divination-membership.html">👤 信众中心</a>
+</div>
+
+<div class="disclaimer-bar">
+  <strong>⚠️ 重要声明：</strong>本页面所有内容仅供传统文化研究参考，不构成医疗诊断、治疗建议或药物推荐。身体不适请及时就医，切勿自行用药。所有饮食/药膳建议须在专业医师指导下进行。
+</div>
+
+<div class="container">
+
+  <!-- ====== 养生篇Tab系统 ====== -->
+  <div class="tab-bar">
+    <button class="tab-btn" onclick="switchTab('overview')">📐 五行总览</button>
+    <button class="tab-btn active" onclick="switchTab('report')">📤 上传报告</button>
+    <button class="tab-btn" onclick="switchTab('ai')">🤖 AI解读</button>
+    <button class="tab-btn" onclick="switchTab('food')">🌿 食疗配方</button>
+    <button class="tab-btn" onclick="switchTab('exercise')">🏃 运动调理</button>
+    <button class="tab-btn" onclick="switchTab('checkin')">✅ 每日打卡</button>
+    <button class="tab-btn" onclick="switchTab('bazi')">🔮 八字分析</button>
+    <button class="tab-btn" onclick="switchTab('symptom')">🔍 症状查询</button>
+  </div>
+
+  <!-- ====== Tab1: 五行总览 ====== -->
+  <div class="tab-panel active" id="tab-overview">
+    <div class="section-title">📐 五行 → 人体 → 调理 关系总览</div>
+    <div class="chain-container">
+      <div class="chain-title">点击任一环节，查看详细解释</div>
+      <div class="chain-row" id="chainRow"></div>
+      <div style="text-align:center;margin-top:10px">
+        <span style="display:inline-block;width:12px;height:12px;background:#27ae60;border-radius:3px;margin:0 4px"></span><span style="color:var(--muted);font-size:12px;margin-right:14px">相生</span>
+        <span style="display:inline-block;width:12px;height:12px;background:#e74c3c;border-radius:3px;margin:0 4px"></span><span style="color:var(--muted);font-size:12px">相克</span>
+      </div>
+    </div>
+    <div class="section-title">📋 五行体质对照表</div>
+    <div class="detail-grid" id="detailGrid"></div>
+  </div>
+
+  <!-- ====== Tab2: 上传报告 ====== -->
+  <div class="tab-panel" id="tab-report">
+    
+    <!-- ====== 🤖 AI智能解读卡片 ====== -->
+    <div class="ai-interpret-card" id="aiInterpretCard">
+      <div class="ant-badge">对标蚂蚁阿福专业水准</div>
+      <h2>🤖 AI智能解读体检报告</h2>
+      <p class="subtitle">上传体检报告图片，AI大模型专业解读，给出食疗+运动+打卡方案</p>
+      
+      <!-- 上传区域 -->
+      <div class="ai-upload-zone" id="aiUploadZone" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleAIDrop(event)">
+        <input type="file" accept="image/*,.pdf" id="aiReportFile" onchange="handleAIFileSelect(event)">
+        <div class="ai-upload-icon">🩺</div>
+        <div class="ai-upload-text"><strong>拖拽报告图片到此处</strong> 或 <strong>点击上传</strong></div>
+        <div class="ai-upload-hint">支持 JPG / PNG（体检报告、血常规、肝肾功能、血糖血脂等）<br>上传即分析，AI自动解读</div>
+      </div>
+      
+      <!-- 图片预览（上传后隐藏上传区，显示预览+分析中） -->
+      <div class="ai-preview-wrap" id="aiPreviewWrap" style="display:none">
+        <img id="aiPreviewImg" class="ai-preview-img" alt="报告预览">
+      </div>
+      
+      <!-- 分析中状态 -->
+      <div id="aiAnalyzingState" style="display:none;text-align:center;padding:40px 20px">
+        <div style="font-size:48px;margin-bottom:16px;animation:ai-pulse 1.5s infinite">🤖</div>
+        <div style="font-size:18px;color:#fff;font-weight:600;margin-bottom:8px">AI 正在解读您的体检报告...</div>
+        <div style="font-size:14px;color:rgba(255,255,255,.7)" id="aiAnalyzingTip">正在分析各项指标，请稍候</div>
+        <div style="margin-top:20px;width:200px;height:4px;background:rgba(255,255,255,.1);border-radius:2px;margin-left:auto;margin-right:auto;overflow:hidden">
+          <div style="width:30%;height:100%;background:var(--accent);border-radius:2px;animation:ai-progress 2s infinite"></div>
+        </div>
+      </div>
+      
+      <!-- AI解读结果区域 -->
+      <div id="aiResultArea" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <h3 style="color:#fff;font-size:18px;margin:0">📋 AI解读报告</h3>
+          <div style="display:flex;gap:8px">
+            <button onclick="reUploadReport()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px">🔄 重新上传</button>
+            <button onclick="exportAIResult()" style="background:var(--accent);border:none;color:#fff;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px">📥 导出报告</button>
+          </div>
+        </div>
+        <div id="aiResultContent" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:24px;color:rgba(255,255,255,.9);line-height:1.8;font-size:14px"></div>
+      </div>
+      
+      <!-- 错误提示 -->
+      <div id="aiErrorState" style="display:none;text-align:center;padding:30px 20px">
+        <div style="font-size:36px;margin-bottom:12px">⚠️</div>
+        <div style="color:#fff;font-size:16px;margin-bottom:8px" id="aiErrorMsg">分析失败</div>
+        <div style="color:rgba(255,255,255,.6);font-size:13px;margin-bottom:16px" id="aiErrorDetail"></div>
+        <button onclick="retryAIAnalysis()" style="background:var(--accent);border:none;color:#fff;padding:10px 24px;border-radius:8px;cursor:pointer;font-size:14px">🔄 重试</button>
+        <button onclick="reUploadReport()" style="background:transparent;border:1px solid rgba(255,255,255,.3);color:#fff;padding:10px 24px;border-radius:8px;cursor:pointer;font-size:14px;margin-left:8px">📤 重新上传</button>
+      </div>
+      
+
+    </div>
+    
+    <!-- ====== 原有上传报告模块 ====== -->
+    <div class="mod-banner">
+      <div class="mod-banner-icon">📤</div>
+      <div>
+        <h2>上传检测报告（规则判断）</h2>
+        <p>上传体检报告/血常规/肝肾功能等图片，获取五行体质解读与个性化食疗建议</p>
+      </div>
+    </div>
+
+    <!-- 上传区 -->
+    <div class="card">
+      <div class="upload-zone" id="uploadZone" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleDrop(event)">
+        <input type="file" accept="image/*" id="reportFile" onchange="handleFileSelect(event)">
+        <div class="upload-icon">🩺</div>
+        <div class="upload-text"><strong>拖拽图片到此处</strong> 或 <strong>点击上传</strong></div>
+        <div class="upload-hint">支持 JPG / PNG / PDF 截图（体检报告、血常规、肝肾功能、血糖血脂等）</div>
+        <img id="previewImg" alt="预览">
+      </div>
+      <div style="margin-top:14px">
+        <div class="input-field" style="max-width:400px">
+          <label>五行体质类型（若已知）</label>
+          <select id="reportConstitution">
+            <option value="">— 自动推断（推荐）—</option>
+            <option value="阴虚">阴虚体质（火旺水亏）</option>
+            <option value="阳虚">阳虚体质（火弱水盛）</option>
+            <option value="气虚">气虚体质（土弱气不足）</option>
+            <option value="血虚">血虚体质（木耗血亏）</option>
+            <option value="痰湿">痰湿体质（土盛湿重）</option>
+            <option value="湿热">湿热体质（土湿热蕴）</option>
+            <option value="平和">平和体质（五行均衡）</option>
+          </select>
+        </div>
+        <div style="margin-top:10px">
+          <button class="btn" onclick="analyzeReport()">🔍 开始解读报告</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-wrap" id="reportLoading">
+      <div class="spinner"></div>
+      <div class="loading-text">报告已收到，专业解读中<span id="loadingDots">...</span></div>
+    </div>
+
+    <!-- 报告解读结果 -->
+    <div class="report-result" id="reportResult"></div>
+  </div>
+
+  <!-- ====== Tab3: 食疗配方 ====== -->
+  <div class="tab-panel" id="tab-food">
+    <div class="mod-banner">
+      <div class="mod-banner-icon">🌿</div>
+      <div>
+        <h2>食疗配方宝库</h2>
+        <p>按五行脏腑与体质分类推荐，附本周食疗计划与每日打卡联动</p>
+      </div>
+    </div>
+
+    <!-- 体质筛选 -->
+    <div class="card">
+      <div style="margin-bottom:12px">
+        <strong style="color:var(--title);font-size:14px">按体质筛选配方：</strong>
+      </div>
+      <div class="constitution-tabs" id="constTabs">
+        <button class="const-tab active" onclick="filterRecipes('all')">全部</button>
+        <button class="const-tab" onclick="filterRecipes('阴虚')">🌙 阴虚</button>
+        <button class="const-tab" onclick="filterRecipes('阳虚')">☀️ 阳虚</button>
+        <button class="const-tab" onclick="filterRecipes('气虚')">💨 气虚</button>
+        <button class="const-tab" onclick="filterRecipes('血虚')">🩸 血虚</button>
+        <button class="const-tab" onclick="filterRecipes('痰湿')">💧 痰湿</button>
+        <button class="const-tab" onclick="filterRecipes('湿热')">🔥 湿热</button>
+        <button class="const-tab" onclick="filterRecipes('平和')">⚖️ 平和</button>
+      </div>
+      <div class="recipe-library" id="recipeLibrary"></div>
+    </div>
+
+    <!-- 本周食疗计划 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">📅</div>
+        <div class="card-title">本周食疗计划</div>
+        <span class="card-badge" id="weekLabel"></span>
+      </div>
+      <div class="weekly-plan-grid" id="weeklyPlan"></div>
+      <div style="margin-top:14px;text-align:center">
+        <button class="btn-outline" onclick="applyWeeklyPlan()">📋 一键导入本周食谱至今日打卡</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== Tab4: 每日打卡 ====== -->
+  <div class="tab-panel" id="tab-checkin">
+    <div class="mod-banner">
+      <div class="mod-banner-icon">✅</div>
+      <div>
+        <h2>每日养生打卡</h2>
+        <p>记录今日养生行为，培养健康习惯，追踪连续打卡成就</p>
+      </div>
+    </div>
+
+    <!-- 连续打卡徽章 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">🏆</div>
+        <div class="card-title">连续打卡成就</div>
+      </div>
+      <div class="streak-panel" id="streakPanel"></div>
+      <div style="text-align:center;font-size:13px;color:var(--muted)" id="streakInfo">今日还未打卡</div>
+    </div>
+
+    <!-- 打卡日历进度 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">📆</div>
+        <div class="card-title">本月打卡日历</div>
+        <button class="btn-outline btn-sm" onclick="switchMonth(-1)" style="margin-left:auto">◀</button>
+        <span id="calendarMonth" style="padding:4px 12px;font-size:13px;color:var(--title);font-weight:700"></span>
+        <button class="btn-outline btn-sm" onclick="switchMonth(1)">▶</button>
+      </div>
+      <div id="calendarGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center"></div>
+    </div>
+
+    <!-- 今日打卡表单 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">✍️</div>
+        <div class="card-title">今日打卡</div>
+        <span id="todayDate" style="margin-left:auto;font-size:13px;color:var(--muted)"></span>
+      </div>
+      <div class="checkin-form" id="checkinForm"></div>
+      <div class="checkin-submit" style="text-align:center">
+        <button class="btn btn-success" onclick="submitCheckin()" id="submitBtn">🎯 提交今日打卡</button>
+      </div>
+    </div>
+
+    <!-- 历史记录 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">📜</div>
+        <div class="card-title">打卡历史</div>
+      </div>
+      <div class="history-list" id="historyList"></div>
+      <div class="export-row">
+        <button class="btn-outline btn-sm" onclick="exportCheckin()">📤 导出打卡记录</button>
+        <button class="btn-outline btn-sm" onclick="shareCheckin()">📱 截图分享</button>
+        <button class="btn-outline btn-sm" style="border-color:var(--danger);color:var(--danger)" onclick="clearHistory()">🗑️ 清空历史</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== Tab: 🤖 AI解读 ====== -->
+  <div class="tab-panel" id="tab-ai">
+    <div class="ai-interpret-card" style="margin-top:20px">
+      <div class="ant-badge">对标蚂蚁阿福专业水准</div>
+      <h2>🤖 AI智能解读体检报告</h2>
+      <p class="subtitle">上传体检报告图片，获取AI大模型专业解读（对标蚂蚁阿福App水准）</p>
+      
+      <div style="background:rgba(20,18,14,0.95);color:var(--text);border-radius:14px;padding:24px;margin-top:20px">
+        <div style="display:flex;gap:20px;flex-wrap:wrap">
+          <div style="flex:1;min-width:280px">
+            <h4 style="color:var(--title);margin-bottom:12px;font-size:16px">📋 使用说明</h4>
+            <div style="font-size:14px;line-height:2;color:var(--muted)">
+              <p>1️⃣ <strong>上传报告</strong>：拖拽或点击上传体检报告图片</p>
+              <p>2️⃣ <strong>自动分析</strong>：AI大模型自动解读，无需手动操作</p>
+              <p>3️⃣ <strong>查看结果</strong>：直接查看专业解读报告和调理方案</p>
+            </div>
+          </div>
+          <div style="flex:1;min-width:280px">
+            <h4 style="color:var(--title);margin-bottom:12px;font-size:16px">✨ 专业解读包含</h4>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <span class="tag tag-primary">📋 报告解读摘要</span>
+              <span class="tag tag-primary">🔬 各项指标解读</span>
+              <span class="tag tag-primary">🌿 中医体质辨识</span>
+              <span class="tag tag-success">🍲 食疗调理方案</span>
+              <span class="tag tag-success">🏃 运动调理方案</span>
+              <span class="tag tag-warn">📋 21天打卡计划</span>
+              <span class="tag tag-danger">⚠️ 就医建议</span>
+            </div>
+            <div style="margin-top:16px;padding:14px;background:rgba(102,126,234,.06);border-radius:10px;border-left:3px solid #667eea">
+              <p style="font-size:13px;color:var(--muted);line-height:1.7">
+                <strong style="color:var(--title)">💡 提示：</strong>上传图片后AI将自动分析，无需手动操作。本功能调用本地大模型API，需确保本机AI服务正在运行。如遇网络错误，请检查OpenClaw服务状态。
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div style="margin-top:20px;text-align:center">
+          <button class="btn" onclick="switchTab('report')" style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-size:16px;padding:14px 36px">📤 前往上传报告，开始AI解读</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== Tab: 🏃 运动调理 ====== -->
+  <div class="tab-panel" id="tab-exercise">
+    <div class="exercise-module">
+      <div class="mod-header">
+        <div class="mod-icon">🏃</div>
+        <div>
+          <h2 class="mod-title">运动调理方案</h2>
+          <p style="font-size:13px;color:var(--muted);margin-top:2px">根据体质定制每周运动计划，附推荐运动库与禁忌提示</p>
+        </div>
+        <span class="ant-badge">对标蚂蚁阿福专业水准</span>
+      </div>
+      
+      <!-- 每周运动计划 -->
+      <div style="margin-bottom:24px">
+        <h4 style="color:var(--title);font-size:16px;margin-bottom:14px;display:flex;align-items:center;gap:8px">📅 本周运动计划表</h4>
+        <div class="exercise-week-grid" id="exerciseWeekGrid"></div>
+      </div>
+      
+      <!-- 推荐运动库 -->
+      <div style="margin-bottom:24px">
+        <h4 style="color:var(--title);font-size:16px;margin-bottom:14px;display:flex;align-items:center;gap:8px">📦 推荐运动类型库</h4>
+        <div class="exercise-library" id="exerciseLibrary"></div>
+      </div>
+      
+      <!-- 运动禁忌 -->
+      <div style="background:rgba(230,126,34,.06);border:1px solid rgba(230,126,34,.2);border-radius:12px;padding:18px">
+        <h4 style="color:var(--warn);font-size:15px;margin-bottom:10px;display:flex;align-items:center;gap:8px">⚠️ 运动禁忌（根据报告异常指标自动提示）</h4>
+        <div id="exerciseWarnings" style="font-size:13px;color:var(--muted);line-height:1.8">
+          <p>📤 请先上传体检报告或完成AI解读，系统将根据您的指标自动提示运动禁忌。</p>
+        </div>
+      </div>
+      
+      <!-- 导入打卡按钮 -->
+      <div style="margin-top:20px;text-align:center">
+        <button class="btn btn-success" onclick="importExerciseToCheckin()">📋 将本周运动计划导入今日打卡</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== Tab5: 八字分析 ====== -->
+  <div class="tab-panel" id="tab-bazi">
+    <div class="mod-banner">
+      <div class="mod-banner-icon">🔮</div>
+      <div>
+        <h2>八字体质分析</h2>
+        <p>输入生辰八字，推算五行缺失与先天体质弱点</p>
+      </div>
+    </div>
+    <div class="card" style="background:var(--card)">
+      <div class="input-row">
+        <div class="input-field">
+          <label>出生日期</label>
+          <input type="date" id="baziDate" value="1990-01-01">
+        </div>
+        <div class="input-field">
+          <label>出生时辰</label>
+          <select id="baziHour">
+            <option value="0">子时 23:00–01:00</option>
+            <option value="1">丑时 01:00–03:00</option>
+            <option value="2">寅时 03:00–05:00</option>
+            <option value="3">卯时 05:00–07:00</option>
+            <option value="4">辰时 07:00–09:00</option>
+            <option value="5">巳时 09:00–11:00</option>
+            <option value="6">午时 11:00–13:00</option>
+            <option value="7">未时 13:00–15:00</option>
+            <option value="8">申时 15:00–17:00</option>
+            <option value="9">酉时 17:00–19:00</option>
+            <option value="10">戌时 19:00–21:00</option>
+            <option value="11">亥时 21:00–23:00</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <button class="btn" onclick="analyzeByBazi()">🔮 分析体质</button>
+      </div>
+    </div>
+    <div class="result-area" id="resultAreaBazi" style="display:none"></div>
+  </div>
+
+  <!-- ====== Tab6: 症状查询 ====== -->
+  <div class="tab-panel" id="tab-symptom">
+    <div class="mod-banner">
+      <div class="mod-banner-icon">🔍</div>
+      <div>
+        <h2>症状查询</h2>
+        <p>输入症状或选择常见症状，获取五行归因与调理方案</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="search-wrap" style="margin-bottom:14px">
+        <input type="text" id="diseaseSearch" placeholder="如：失眠、头痛、胃胀、咳嗽…" onkeyup="filterDiseaseTags()">
+        <button class="btn" onclick="analyzeByDisease()">查询</button>
+      </div>
+      <div style="margin-bottom:8px;font-size:13px;color:var(--muted)">常见症状（点击选择）：</div>
+      <div class="disease-tags" id="diseaseTags"></div>
+    </div>
+    <div class="result-area" id="resultAreaSymptom" style="display:none"></div>
+  </div>
+
+</div>
+
+<!-- 通用结果展示区（八字+症状） -->
+<div class="container" style="display:none" id="sharedResult">
+  <div class="result-area" id="resultArea">
+    <div class="result-header">
+      <h2 id="resultTitle">分析结果</h2>
+    </div>
+    <div id="resultBody"></div>
+</div>
+
+<div class="container" id="detailSection">
+  <div class="section-title">📋 五行体质对照表</div>
+  <div class="detail-grid" id="detailGrid2"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+// 全局状态
+// ═══════════════════════════════════════════════
+let selectedWuxing = null;
+let currentResult = null;
+let currentRecipeFilter = 'all';
+let checkinCalendarMonth = new Date().getMonth();
+let checkinCalendarYear = new Date().getFullYear();
+let pendingRecipes = []; // 待加入打卡清单的食谱
+let uploadedImageData = null;
+
+// ═══════════════════════════════════════════════
+// 核心数据
+// ═══════════════════════════════════════════════
+const WUXING_HEALTH = {
+  Mu:{name:'木',icon:'🌳',color:'#27ae60',bgClass:'wuxing-color-Mu',season:'春',direction:'东',taste:'酸',
+    organs:['肝','胆'],sense:'目',tissue:'筋',emotion:'怒',
+    symptoms:['头痛眩晕','眼睛干涩','易怒烦躁','两肋胀痛','指甲脆弱','抽筋痉挛','高血压倾向','月经不调'],
+    foods:['芹菜','韭菜','绿豆','菠菜','猕猴桃','柠檬','山楂','小麦','菊花','枸杞叶'],
+    herbs:['柴胡','白芍','当归','川芎','枸杞','决明子','天麻','钩藤','薄荷','茵陈'],
+    recipes:['枸杞菊花茶：枸杞10g+菊花5g，沸水冲泡，每日1-2杯，清肝明目',
+      '芹菜汁：鲜芹菜200g榨汁，早晚各一次，降血压平肝阳',
+      '柴胡白芍汤：柴胡6g+白芍12g+甘草3g，水煎服，疏肝解郁'],
+    regimen:'春季养肝：早睡早起，多散步，少生气。肝经当令在丑时(1-3点)，此间务必入睡。青色食物入肝，酸味收敛肝气。',
+    avoid:'忌过度饮酒、熬夜（23点后不睡最伤肝）、暴怒、油腻大荤'},
+  Huo:{name:'火',icon:'🔥',color:'#e74c3c',bgClass:'wuxing-color-Huo',season:'夏',direction:'南',taste:'苦',
+    organs:['心','小肠'],sense:'舌',tissue:'脉',emotion:'喜',
+    symptoms:['心悸失眠','口腔溃疡','舌尖红赤','小便短赤','多汗','胸闷','注意力不集中','面色潮红'],
+    foods:['苦瓜','莲子','百合','西瓜','红豆','番茄','红枣','桂圆','丹参茶','菊花'],
+    herbs:['丹参','黄连','莲子心','酸枣仁','麦冬','五味子','柏子仁','生地','竹叶','灯芯草'],
+    recipes:['莲子百合粥：莲子30g+百合15g+粳米100g，养心安神',
+      '丹参茶：丹参10g沸水冲泡，活血养心，每日1杯',
+      '酸枣仁汤：酸枣仁15g捣碎+茯苓10g+知母6g，水煎服，安神助眠'],
+    regimen:'夏季养心：午睡半小时养心神，保持心情愉快不过喜。心经当令在午时(11-13点)，宜小憩。红色食物入心，苦味降心火。',
+    avoid:'忌过量咖啡浓茶、剧烈运动汗出过多、情绪大悲大喜'},
+  Tu:{name:'土',icon:'⛰️',color:'#f39c12',bgClass:'wuxing-color-Tu',season:'长夏',direction:'中',taste:'甘',
+    organs:['脾','胃'],sense:'口',tissue:'肉',emotion:'思',
+    symptoms:['食欲不振','腹胀腹泻','面色萎黄','四肢乏力','水肿','口淡无味','大便稀溏','肌肉松弛'],
+    foods:['小米','山药','薏仁','红枣','南瓜','土豆','扁豆','莲子','茯苓','陈皮'],
+    herbs:['党参','白术','茯苓','甘草','陈皮','砂仁','苍术','黄芪','薏苡仁','白扁豆'],
+    recipes:['小米山药粥：小米100g+山药50g，健脾养胃',
+      '四君子汤：党参9g+白术9g+茯苓9g+甘草6g，补气健脾',
+      '陈皮姜茶：陈皮5g+生姜3片，沸水冲泡，温中理气'],
+    regimen:'长夏养脾：饮食定时定量，细嚼慢咽，少吃生冷。脾经当令在巳时(9-11点)，此时进食早餐最佳。黄色食物入脾，甘味补脾但忌过甜。',
+    avoid:'忌生冷寒凉食物、暴饮暴食、思虑过度伤脾、长时间久坐'},
+  Jin:{name:'金',icon:'🪙',color:'#90a4ae',bgClass:'wuxing-color-Jin',season:'秋',direction:'西',taste:'辛',
+    organs:['肺','大肠'],sense:'鼻',tissue:'皮毛',emotion:'悲',
+    symptoms:['咳嗽痰多','鼻塞流涕','皮肤干燥','咽喉肿痛','便秘','气短乏力','易感冒','声音低微'],
+    foods:['白萝卜','梨','百合','银耳','山药','杏仁','莲藕','枇杷','蜂蜜','白果'],
+    herbs:['川贝母','百合','麦冬','沙参','杏仁','桔梗','枇杷叶','桑白皮','五味子','玉竹'],
+    recipes:['川贝炖梨：梨1个挖核+川贝粉3g，蒸30分钟，润肺止咳',
+      '百合银耳羹：银耳15g+百合10g+冰糖适量，滋阴润肺',
+      '杏仁粥：甜杏仁15g+粳米100g，润肠通便，止咳平喘'],
+    regimen:'秋季养肺：早卧早起，多做深呼吸。肺经当令在寅时(3-5点)，宜深度睡眠。白色食物入肺，辛味发散肺气但不可过。',
+    avoid:'忌吸烟及二手烟、辛辣过量、悲伤忧郁、空调直吹颈背'},
+  Shui:{name:'水',icon:'💧',color:'#3498db',bgClass:'wuxing-color-Shui',season:'冬',direction:'北',taste:'咸',
+    organs:['肾','膀胱'],sense:'耳',tissue:'骨',emotion:'恐',
+    symptoms:['腰膝酸软','耳鸣耳聋','畏寒肢冷','夜尿频多','脱发白发','记忆力减退','水肿','性功能减退'],
+    foods:['黑豆','黑芝麻','核桃','海参','紫菜','桑葚','板栗','羊肉','韭菜','山药'],
+    herbs:['熟地黄','山药','山茱萸','枸杞子','杜仲','肉桂','淫羊藿','补骨脂','菟丝子','锁阳'],
+    recipes:['黑豆核桃粥：黑豆30g+核桃仁15g+粳米100g，补肾益精',
+      '六味地黄汤加减：熟地15g+山药12g+山茱萸9g+茯苓9g+丹皮9g+泽泻9g，滋阴补肾',
+      '杜仲炖牛膝：杜仲15g+牛膝10g炖汤，强腰膝'],
+    regimen:'冬季养肾：早卧晚起，必待日光。肾经当令在酉时(17-19点)，宜按摩腰部。黑色食物入肾，咸味入肾但高血压者慎。',
+    avoid:'忌过度劳累、房事不节、长时间站立、恐惧惊吓、高盐饮食'}
+};
+
+// ═══════════════════════════════════════════════
+// 西医指标知识库（专业出处）
+// ═══════════════════════════════════════════════
+const MEDICAL_KNOWLEDGE_BASE = {
+  '血红蛋白': {
+    english: 'Hemoglobin (Hb)',
+    unit: 'g/L',
+    normalRange: { male: [120, 160], female: [110, 150] },
+    lowCause: '缺铁性贫血、巨幼细胞性贫血、慢性失血、营养不良、慢性感染、肾病',
+    highCause: '脱水、高原适应、真性红细胞增多症、严重烧伤',
+    wuxing: 'Mu',
+    tcmSyndrome: '血虚证、肝血不足、心脾两虚',
+    advice: '补血养肝，多食红枣、枸杞、动物肝脏、菠菜、当归、熟地',
+    source: '《诊断学》第9版，人民卫生出版社，2018'
+  },
+  '白细胞计数': {
+    english: 'White Blood Cell Count (WBC)',
+    unit: '×10⁹/L',
+    normalRange: [4.0, 10.0],
+    lowCause: '病毒感染、药物抑制（化疗/抗生素）、免疫性疾病、脾功能亢进',
+    highCause: '细菌感染、急性炎症、白血病、严重创伤、应激反应',
+    wuxing: 'Jin',
+    tcmSyndrome: '气虚卫外不固、正邪交争',
+    advice: '益气固表，玉屏风散、黄芪、白术、防风；感染者需清热毒',
+    source: '《诊断学》第9版，人民卫生出版社，2018'
+  },
+  '血小板计数': {
+    english: 'Platelet Count (PLT)',
+    unit: '×10⁹/L',
+    normalRange: [100, 300],
+    lowCause: '免疫性血小板减少症(ITP)、药物、感染、脾功能亢进、DIC',
+    highCause: '炎症、缺铁、脾切除后、骨髓增殖性疾病',
+    wuxing: 'Shui',
+    tcmSyndrome: '气虚不摄血、血热妄行',
+    advice: '补气摄血，归脾汤；血热者犀角地黄汤；忌辛辣燥热',
+    source: '《诊断学》第9版，人民卫生出版社，2018'
+  },
+  '谷丙转氨酶': {
+    english: 'Alanine Aminotransferase (ALT)',
+    unit: 'U/L',
+    normalRange: [5, 40],
+    lowCause: '一般无临床意义',
+    highCause: '病毒性肝炎、脂肪肝、酒精性肝病、药物性肝损伤、胆道疾病',
+    wuxing: 'Mu',
+    tcmSyndrome: '肝郁化火、肝胆湿热、肝肾阴虚',
+    advice: '清肝利胆，柴胡疏肝散、茵陈蒿汤；戒酒、早睡（23点前）、少食油腻',
+    source: '《实用肝脏病学》第3版，上海科学技术出版社，2020'
+  },
+  '谷草转氨酶': {
+    english: 'Aspartate Aminotransferase (AST)',
+    unit: 'U/L',
+    normalRange: [8, 40],
+    lowCause: '一般无临床意义',
+    highCause: '心肌梗死、肝炎、肝硬化、肌肉损伤、溶血',
+    wuxing: 'Mu',
+    tcmSyndrome: '肝郁血瘀、心脉瘀阻',
+    advice: '疏肝理气活血，丹参饮、血府逐瘀汤；定期复查心电图',
+    source: '《实用肝脏病学》第3版，上海科学技术出版社，2020'
+  },
+  '空腹血糖': {
+    english: 'Fasting Plasma Glucose (FPG)',
+    unit: 'mmol/L',
+    normalRange: [3.9, 6.1],
+    lowCause: '胰岛素瘤、药物（降糖药过量）、长期饥饿、严重肝病',
+    highCause: '糖尿病、应激状态、库欣综合征、胰腺疾病',
+    wuxing: 'Tu',
+    tcmSyndrome: '阴虚燥热、气阴两虚、脾肾阳虚',
+    advice: '养阴生津，六味地黄丸、玉女煎；控制主食、增加运动、少吃甜食',
+    source: '《中国2型糖尿病防治指南（2020年版）》'
+  },
+  '糖化血红蛋白': {
+    english: 'Glycated Hemoglobin (HbA1c)',
+    unit: '%',
+    normalRange: [4.0, 6.0],
+    lowCause: '溶血性贫血、失血、某些血红蛋白病',
+    highCause: '近2-3个月平均血糖升高，糖尿病控制不佳',
+    wuxing: 'Tu',
+    tcmSyndrome: '阴虚燥热（长期）',
+    advice: '长期养阴控糖，饮食运动为基础，定期监测',
+    source: '《中国2型糖尿病防治指南（2020年版）》'
+  },
+  '总胆固醇': {
+    english: 'Total Cholesterol (TC)',
+    unit: 'mmol/L',
+    normalRange: [0, 5.2],
+    highCause: '高脂血症、糖尿病、肾病综合征、甲状腺功能减退',
+    wuxing: 'Tu',
+    tcmSyndrome: '痰湿内盛、脾失健运',
+    advice: '健脾祛湿化痰，温胆汤、山楂、决明子、燕麦、海带',
+    source: '《中国成人血脂异常防治指南（2016年修订版）》'
+  },
+  '甘油三酯': {
+    english: 'Triglycerides (TG)',
+    unit: 'mmol/L',
+    normalRange: [0, 1.7],
+    highCause: '高脂饮食、酗酒、糖尿病、肾病、代谢综合征',
+    wuxing: 'Tu',
+    tcmSyndrome: '痰湿内盛、脾胃湿热',
+    advice: '清淡饮食，山楂荷叶茶、决明子茶；戒酒、控制体重',
+    source: '《中国成人血脂异常防治指南（2016年修订版）》'
+  },
+  '高密度脂蛋白胆固醇': {
+    english: 'HDL-C',
+    unit: 'mmol/L',
+    normalRange: { male: [1.04, null], female: [1.29, null] },
+    lowCause: '代谢综合征、糖尿病、肥胖、吸烟',
+    wuxing: 'Tu',
+    tcmSyndrome: '脾虚痰湿',
+    advice: '健脾化痰，运动提高HDL，戒烟限酒，多食橄榄油、深海鱼',
+    source: '《中国成人血脂异常防治指南（2016年修订版）》'
+  },
+  '低密度脂蛋白胆固醇': {
+    english: 'LDL-C',
+    unit: 'mmol/L',
+    normalRange: [0, 3.4],
+    highCause: '高脂血症、动脉粥样硬化、冠心病危险因素',
+    wuxing: 'Tu',
+    tcmSyndrome: '痰瘀互结、脉络痹阻',
+    advice: '活血化瘀，丹参、山楂、红曲；低脂饮食，规律运动',
+    source: '《中国成人血脂异常防治指南（2016年修订版）》'
+  },
+  '肌酐': {
+    english: 'Serum Creatinine (Cr)',
+    unit: 'μmol/L',
+    normalRange: { male: [44, 106], female: [44, 97] },
+    highCause: '肾功能下降、肾小球肾炎、糖尿病肾病、高血压肾病',
+    lowCause: '肌肉萎缩、严重肝病、营养不良',
+    wuxing: 'Shui',
+    tcmSyndrome: '肾虚、肾气不固、浊毒内蕴',
+    advice: '补肾解毒，六味地黄丸、冬虫夏草；低盐饮食、控制血压血糖',
+    source: '《内科学》第9版，人民卫生出版社，2018'
+  },
+  '尿素氮': {
+    english: 'Blood Urea Nitrogen (BUN)',
+    unit: 'mmol/L',
+    normalRange: [2.9, 7.5],
+    highCause: '肾功能不全、脱水、高蛋白饮食、消化道出血',
+    lowCause: '低蛋白饮食、严重肝病、妊娠',
+    wuxing: 'Shui',
+    tcmSyndrome: '肾虚、水湿内停',
+    advice: '补肾利水，肾气丸、茯苓、泽泻；控制蛋白质摄入量',
+    source: '《内科学》第9版，人民卫生出版社，2018'
+  },
+  '尿酸': {
+    english: 'Uric Acid (UA)',
+    unit: 'μmol/L',
+    normalRange: { male: [208, 428], female: [155, 357] },
+    highCause: '痛风、高尿酸血症、肾病、代谢综合征、高嘌呤饮食',
+    wuxing: 'Shui',
+    tcmSyndrome: '湿热下注、浊毒内蕴',
+    advice: '清热利湿泄浊，四妙丸、土茯苓、萆薢；低嘌呤饮食、多饮水',
+    source: '《中国高尿酸血症与痛风诊疗指南（2019）》'
+  },
+  '胱抑素C': {
+    english: 'Cystatin C (CysC)',
+    unit: 'mg/L',
+    normalRange: [0.5, 1.03],
+    highCause: '早期肾功能下降（比肌酐更敏感）',
+    wuxing: 'Shui',
+    tcmSyndrome: '肾虚、早期肾精不足',
+    advice: '补肾益精，六味地黄丸；定期监测肾功能',
+    source: '《内科学》第9版，人民卫生出版社，2018'
+  },
+  '凝血酶原时间': {
+    english: 'Prothrombin Time (PT)',
+    unit: '秒',
+    normalRange: [11.0, 14.5],
+    highCause: '维生素K缺乏、肝病、DIC、口服抗凝药（华法林）',
+    lowCause: '高凝状态、血栓倾向',
+    wuxing: 'Shui',
+    tcmSyndrome: '瘀血内阻、血热妄行',
+    advice: '活血止血，三七、蒲黄；监测凝血功能，避免外伤',
+    source: '《诊断学》第9版，人民卫生出版社，2018'
+  },
+  '同型半胱氨酸': {
+    english: 'Homocysteine (Hcy)',
+    unit: 'μmol/L',
+    normalRange: [0, 15],
+    highCause: '维生素B6/B12/叶酸缺乏、肾功能下降、心血管疾病危险因素',
+    wuxing: 'Shui',
+    tcmSyndrome: '肾虚、瘀血内阻',
+    advice: '补肾活血，补叶酸、维生素B12；多食绿叶蔬菜、少食加工食品',
+    source: '《中国高血压防治指南（2018年修订版）》'
+  },
+  '甲胎蛋白': {
+    english: 'Alpha-Fetoprotein (AFP)',
+    unit: 'ng/mL',
+    normalRange: [0, 10],
+    highCause: '原发性肝癌、急慢性肝炎、肝硬化、妊娠期',
+    wuxing: 'Mu',
+    tcmSyndrome: '肝郁毒结、瘀血内阻',
+    advice: '疏肝解毒化瘀，定期超声+CT检查；忌酒、保持情绪舒畅',
+    source: '《实用肝脏病学》第3版，上海科学技术出版社，2020'
+  },
+  '癌胚抗原': {
+    english: 'Carcinoembryonic Antigen (CEA)',
+    unit: 'ng/mL',
+    normalRange: [0, 5],
+    highCause: '结直肠癌、胃癌、肺癌、胰腺癌、吸烟者轻度升高',
+    wuxing: 'Tu',
+    tcmSyndrome: '脾胃湿热、毒邪内蕴',
+    advice: '健脾解毒，定期胃肠镜检查；高纤维饮食、少食腌制食品',
+    source: '《临床肿瘤学》第5版，人民卫生出版社，2018'
+  },
+  '红细胞计数': {
+    english: 'Red Blood Cell Count (RBC)',
+    unit: '×10¹²/L',
+    normalRange: { male: [4.0, 5.5], female: [3.5, 5.0] },
+    lowCause: '各种贫血、失血、溶血、营养不良',
+    highCause: '脱水、高原居住、真性红细胞增多症',
+    wuxing: 'Mu',
+    tcmSyndrome: '血虚证、气虚不摄血',
+    advice: '补气养血，当归补血汤、八珍汤；多食红色食物',
+    source: '《诊断学》第9版，人民卫生出版社，2018'
+  },
+  '红细胞压积': {
+    english: 'Hematocrit (HCT)',
+    unit: '%',
+    normalRange: { male: [40, 50], female: [37, 48] },
+    lowCause: '贫血、失血、溶血',
+    highCause: '脱水、红细胞增多症',
+    wuxing: 'Mu',
+    tcmSyndrome: '血虚、气虚',
+    advice: '补气养血，当归、黄芪、党参',
+    source: '《诊断学》第9版，人民卫生出版社，2018'
+  },
+  '谷氨酰转肽酶': {
+    english: 'Gamma-Glutamyl Transferase (GGT)',
+    unit: 'U/L',
+    normalRange: [7, 45],
+    highCause: '酒精性肝病、胆道梗阻、药物性肝损伤',
+    wuxing: 'Mu',
+    tcmSyndrome: '肝胆湿热、酒毒内蕴',
+    advice: '清肝利胆戒酒，茵陈蒿汤、龙胆泻肝汤',
+    source: '《实用肝脏病学》第3版，上海科学技术出版社，2020'
+  }
+};
+
+const WU_ORDER = ['Mu','Huo','Tu','Jin','Shui'];
+
+const DISEASE_MAP = {
+  '失眠':{wu:'Huo',desc:'心火亢盛或心血不足，心不藏神'},
+  '心悸':{wu:'Huo',desc:'心气不足或心血瘀阻'},
+  '口腔溃疡':{wu:'Huo',desc:'心火上炎，舌为心之苗'},
+  '头痛':{wu:'Mu',desc:'肝阳上亢或肝火上炎'},
+  '眼睛干涩':{wu:'Mu',desc:'肝血不足，目失所养'},
+  '易怒':{wu:'Mu',desc:'肝气郁结化火'},
+  '两肋胀痛':{wu:'Mu',desc:'肝气郁滞，气机不畅'},
+  '食欲不振':{wu:'Tu',desc:'脾胃虚弱，运化乏力'},
+  '腹胀':{wu:'Tu',desc:'脾虚气滞，中焦不运'},
+  '腹泻':{wu:'Tu',desc:'脾虚湿盛，清阳不升'},
+  '乏力':{wu:'Tu',desc:'脾气不足，气血生化乏源'},
+  '咳嗽':{wu:'Jin',desc:'肺气不宣或肺燥阴虚'},
+  '咽喉痛':{wu:'Jin',desc:'肺热上攻或阴虚火旺'},
+  '皮肤干燥':{wu:'Jin',desc:'肺主皮毛，肺燥则肤干'},
+  '便秘':{wu:'Jin',desc:'大肠燥热或气虚推动无力'},
+  '腰酸':{wu:'Shui',desc:'肾虚腰府失养'},
+  '耳鸣':{wu:'Shui',desc:'肾精亏虚，耳窍失养'},
+  '畏寒':{wu:'Shui',desc:'肾阳不足，温煦失职'},
+  '脱发':{wu:'Shui',desc:'肾其华在发，精血不足'},
+  '月经不调':{wu:'Mu',desc:'肝气郁结或肝血不足，冲任失调'},
+  '高血压':{wu:'Mu',desc:'肝阳上亢，阴虚阳亢'},
+  '水肿':{wu:'Shui',desc:'肾虚水泛或脾虚湿盛'},
+  '感冒':{wu:'Jin',desc:'肺卫不固，外邪侵袭'}
+};
+
+// ═══════════════════════════════════════════════
+// 扩展食疗配方库（每个脏腑3+个配方，含体质分类）
+// ═══════════════════════════════════════════════
+const RECIPE_LIBRARY = [
+  // 心（心属火）
+  {name:'莲子百合红枣粥',organ:'Huo',constitutions:['阴虚','血虚'],ingredients:'莲子30g、百合15g、红枣5颗、粳米100g',method:'莲子、百合提前浸泡1小时，与红枣、粳米同煮成粥，早晚温热服用',effect:'养心安神，滋阴润燥，适合心阴不足所致失眠多梦'},
+  {name:'酸枣仁茯苓茶',organ:'Huo',constitutions:['阴虚','气虚'],ingredients:'酸枣仁15g、茯苓10g、知母6g、甘草3g',method:'水煎服，每日1剂，睡前2小时服用',effect:'养心安神，改善心悸失眠，心烦不安'},
+  {name:'桂圆红枣茶',organ:'Huo',constitutions:['血虚','阳虚'],ingredients:'桂圆10g、红枣5颗、枸杞5g',method:'沸水冲泡，焖10分钟后饮用，可反复冲泡',effect:'补益心血，安神定悸，适合心血虚衰者'},
+  {name:'苦瓜莲心茶',organ:'Huo',constitutions:['阴虚','湿热'],ingredients:'苦瓜干片10g、莲子心3g、蜂蜜少许',method:'沸水冲泡，凉后代茶饮',effect:'清心泻火，适合心火亢盛、口舌生疮'},
+  {name:'丹参三七饮',organ:'Huo',constitutions:['血虚','痰湿'],ingredients:'丹参10g、三七粉3g（冲服）',method:'丹参煎水，兑入三七粉，每日1次',effect:'活血化瘀，养心通脉（须医师指导，禁用于出血倾向者）'},
+
+  // 肝（肝属木）
+  {name:'枸杞菊花明目茶',organ:'Mu',constitutions:['阴虚','血虚'],ingredients:'枸杞10g、菊花5g、决明子5g',method:'沸水冲泡，每日1-2杯，饭后服用',effect:'清肝明目，滋补肝肾，缓解眼睛干涩疲劳'},
+  {name:'芹菜绿豆汤',organ:'Mu',constitutions:['湿热','阳虚'],ingredients:'鲜芹菜200g、绿豆30g',method:'绿豆先煮至半熟，加入芹菜煮20分钟，饮汤',effect:'清肝泻火，平肝降压，适合肝阳上亢型高血压'},
+  {name:'玫瑰佛手茶',organ:'Mu',constitutions:['气虚','痰湿','平和'],ingredients:'玫瑰花6g、佛手6g、陈皮3g',method:'沸水冲泡，代茶饮',effect:'疏肝理气，解郁安神，改善两肋胀痛'},
+  {name:'黑豆核桃桑葚糊',organ:'Mu',constitutions:['血虚','阴虚'],ingredients:'黑豆30g、核桃仁15g、桑葚干15g',method:'打粉煮糊，早餐服用',effect:'补肾养肝，益血生发，适合脱发白发'},
+  {name:'柴胡白芍疏肝茶',organ:'Mu',constitutions:['气虚','阴虚'],ingredients:'柴胡5g、白芍10g、甘草3g',method:'水煎服，或沸水冲泡焖20分钟',effect:'疏肝解郁，调和肝脾，适合情绪抑郁、胸胁胀满'},
+
+  // 脾（脾属土）
+  {name:'小米山药莲子粥',organ:'Tu',constitutions:['气虚','阳虚','平和'],ingredients:'小米100g、山药50g、莲子15g',method:'同煮成粥，早晨空腹温服',effect:'健脾益气，和胃止泻，适合脾虚便溏者'},
+  {name:'四神汤（茯苓山药莲子芡实）',organ:'Tu',constitutions:['痰湿','气虚','湿热'],ingredients:'茯苓15g、山药30g、莲子15g、芡实15g',method:'炖汤或煮粥，每周2-3次',effect:'健脾祛湿，固涩止泻，温和调理脾胃'},
+  {name:'陈皮生姜红茶',organ:'Tu',constitutions:['阳虚','痰湿','平和'],ingredients:'陈皮5g、生姜3片、红茶3g',method:'沸水冲泡，晨起后饮用',effect:'温中健脾，理气化湿，适合胃寒腹胀'},
+  {name:'山楂麦芽消食茶',organ:'Tu',constitutions:['痰湿','湿热'],ingredients:'山楂10g、炒麦芽15g',method:'水煎服，饭后服用',effect:'消食化积，健脾开胃，适合食积腹胀'},
+  {name:'黄芪党参鸡汤',organ:'Tu',constitutions:['气虚','阳虚'],ingredients:'黄芪20g、党参15g、鸡肉200g',method:'炖汤2小时，饮汤吃肉，每周1-2次',effect:'补中益气，健脾养胃（须无实热者适用）'},
+
+  // 肺（肺属金）
+  {name:'川贝母蒸梨',organ:'Jin',constitutions:['阴虚','痰湿'],ingredients:'雪梨1个、川贝母粉3g、冰糖少许',method:'梨去核填入川贝粉和冰糖，蒸30分钟，食梨喝汤',effect:'润肺止咳，清热化痰，适合肺燥干咳'},
+  {name:'百合银耳莲子羹',organ:'Jin',constitutions:['阴虚','血虚'],ingredients:'百合15g、银耳10g、莲子10g、冰糖适量',method:'银耳泡发同煮成羹，早晚各一小碗',effect:'滋阴润肺，养心安神，适合肺阴虚久咳'},
+  {name:'白萝卜蜂蜜饮',organ:'Jin',constitutions:['痰湿','湿热'],ingredients:'白萝卜200g、蜂蜜30ml',method:'萝卜榨汁加蜂蜜调匀，分2次服用',effect:'顺气化痰，润肠通便，适合咳嗽痰多、便秘'},
+  {name:'杏仁苏子粥',organ:'Jin',constitutions:['气虚','平和'],ingredients:'甜杏仁15g、紫苏子10g、粳米100g',method:'杏仁、苏子捣碎与粳米同煮成粥',effect:'止咳平喘，润肠通便，适合慢性咳嗽'},
+  {name:'黄芪百合粥',organ:'Jin',constitutions:['气虚','阳虚'],ingredients:'黄芪20g、百合15g、粳米100g',method:'黄芪先煎取汁，用汁煮粥',effect:'益气固表，润肺止咳，适合易感冒、表虚者'},
+
+  // 肾（肾属水）
+  {name:'黑豆核桃枸杞粥',organ:'Shui',constitutions:['阴虚','血虚'],ingredients:'黑豆30g、核桃仁15g、枸杞10g、粳米100g',method:'黑豆提前泡发，与核桃、粳米同煮，枸杞后下',effect:'补肾益精，填髓乌发，适合腰膝酸软、脱发'},
+  {name:'杜仲桑寄生茶',organ:'Shui',constitutions:['阳虚','气虚'],ingredients:'杜仲15g、桑寄生15g、红枣5颗',method:'水煎服，或保温杯焖泡30分钟',effect:'补肾强腰，祛风除湿，适合肾虚腰酸膝软'},
+  {name:'肉桂红糖姜茶',organ:'Shui',constitutions:['阳虚','气虚'],ingredients:'肉桂3g、红糖15g、生姜3片',method:'沸水冲泡，晨起后温服，忌晚上服用',effect:'温肾助阳，散寒止痛，适合畏寒肢冷、夜尿频多'},
+  {name:'山药芡实黑豆糊',organ:'Shui',constitutions:['痰湿','湿热'],ingredients:'山药50g、芡实20g、黑豆20g、茯苓15g',method:'打粉煮糊，早餐服用',effect:'健脾补肾，祛湿固涩，适合脾肾两虚夹湿'},
+  {name:'枸杞桑葚茶',organ:'Shui',constitutions:['阴虚','血虚','平和'],ingredients:'枸杞10g、桑葚干15g',method:'沸水冲泡，反复饮用',effect:'滋补肝肾，益精明目，适合肝肾阴虚所致的腰酸、眩晕'}
+];
+
+// ═══════════════════════════════════════════════
+// 体质→五行对应
+// ═══════════════════════════════════════════════
+const CONSTITUTION_WUXING = {
+  '阴虚':{wu:'Huo',desc:'火旺水亏，阴液不足',note:'宜滋阴降火，少食辛辣温燥'},
+  '阳虚':{wu:'Shui',desc:'火弱水盛，阳气不足',note:'宜温补肾阳，少食生冷寒凉'},
+  '气虚':{wu:'Tu',desc:'土弱气不足，脾胃虚弱',note:'宜健脾益气，少劳累思虑'},
+  '血虚':{wu:'Mu',desc:'木耗血亏，肝血不足',note:'宜补血养肝，忌熬夜伤血'},
+  '痰湿':{wu:'Tu',desc:'土盛湿重，痰浊内生',note:'宜健脾祛湿，少食甜腻油厚'},
+  '湿热':{wu:'Huo',desc:'火土相搏，湿热蕴结',note:'宜清热利湿，忌辛辣油炸'},
+  '平和':{wu:'Tu',desc:'五行相对均衡',note:'饮食有节，起居有常，适度运动'}
+};
+
+// ═══════════════════════════════════════════════
+// 本周食疗计划数据
+// ═══════════════════════════════════════════════
+const WEEKLY_PLAN = [
+  {day:'周一',breakfast:'小米山药粥+蒸蛋',lunch:'清蒸鱼+菠菜+米饭',dinner:'百合银耳羹+凉拌黑木耳'},
+  {day:'周二',breakfast:'枸杞菊花茶+全麦馒头',lunch:'番茄炒蛋+芹菜香干+米饭',dinner:'黑豆核桃粥+凉拌黄瓜'},
+  {day:'周三',breakfast:'莲子百合红枣粥',lunch:'山药炖排骨+清炒西兰花+米饭',dinner:'酸枣仁茯苓茶+蔬菜沙拉'},
+  {day:'周四',breakfast:'燕麦片+红枣桂圆茶',lunch:'白萝卜炖羊肉（少量）+炒青菜+米饭',dinner:'四神汤+杂粮馒头'},
+  {day:'周五',breakfast:'山楂麦芽消食茶+小米粥',lunch:'清蒸鸡肉+凉拌苦瓜+米饭',dinner:'川贝蒸梨+蔬菜汤'},
+  {day:'周六',breakfast:'黑芝麻糊+坚果',lunch:'山药芡实黑豆糊+清炒豆苗',dinner:'枸杞桑葚茶+山药小米粥'},
+  {day:'周日',breakfast:'桂圆红枣茶+鸡蛋饼',lunch:'红烧鱼（少油）+炒三丝+米饭',dinner:'杜仲桑寄生茶+杂粮粥'}
+];
+
+// ═══════════════════════════════════════════════
+// Tab切换
+// ═══════════════════════════════════════════════
+// 关系链
+// ═══════════════════════════════════════════════
+function renderChain(){
+  const row = document.getElementById('chainRow');
+  let html='';
+  WU_ORDER.forEach((key,i)=>{
+    const d=WUXING_HEALTH[key];
+    const sel=selectedWuxing===key?' selected':'';
+    html+=`<div class="chain-node ${d.bgClass}${sel}" onclick="selectChain('${key}')" title="${d.name}行 → ${d.organs.join('、')}">
+      <div class="cn-icon">${d.icon}</div>
+      <div class="cn-name">${d.name}行</div>
+    </div>`;
+    if(i<4) html+='<div class="chain-arrow">⟹</div>';
+  });
+  html+='<div class="chain-arrow" style="margin-left:10px">⟹</div>';
+  html+='<div class="chain-node" style="background:#e8eaf6;border-left:3px solid #7986cb;cursor:default"><div class="cn-icon">🧬</div><div class="cn-name">人体</div></div>';
+  html+='<div class="chain-arrow">⟹</div>';
+  html+='<div class="chain-node" style="background:rgba(39,174,96,0.1);border-left:3px solid #66bb6a;cursor:default"><div class="cn-icon">🥗</div><div class="cn-name">食疗</div></div>';
+  html+='<div class="chain-arrow">⟹</div>';
+  html+='<div class="chain-node" style="background:rgba(231,76,60,0.1);border-left:3px solid #ef5350;cursor:default"><div class="cn-icon">💊</div><div class="cn-name">药疗</div></div>';
+  row.innerHTML=html;
+}
+
+function selectChain(key){
+  selectedWuxing=key;
+  renderChain();
+  showWuxingDetail(key);
+}
+
+// ═══════════════════════════════════════════════
+// 五行详情卡片
+// ═══════════════════════════════════════════════
+function renderDetailCards(){
+  const grids=['detailGrid','detailGrid2'];
+  grids.forEach(gid=>{
+    const grid=document.getElementById(gid);
+    if(!grid) return;
+    let html='';
+    WU_ORDER.forEach(key=>{
+      const d=WUXING_HEALTH[key];
+      html+=`<div class="detail-card" style="border-left:3px solid ${d.color}">
+        <h4 style="color:${d.color}">${d.icon} ${d.name}行</h4>
+        <p><span class="tag tag-primary">季节:${d.season}</span><span class="tag tag-primary">方位:${d.direction}</span><span class="tag tag-primary">五味:${d.taste}</span></p>
+        <p style="margin-top:8px"><strong>关联脏腑：</strong><span class="highlight">${d.organs.join('、')}</span></p>
+        <p><strong>开窍于：</strong>${d.sense}　<strong>主：</strong>${d.tissue}　<strong>情志：</strong>${d.emotion}</p>
+        <p style="margin-top:8px"><strong>常见失衡表现：</strong></p>
+        <ul>${d.symptoms.slice(0,4).map(s=>'<li>'+s+'</li>').join('')}</ul>
+        <p style="margin-top:8px"><strong>养生要点：</strong>${d.regimen}</p>
+        <p style="margin-top:4px;color:var(--warn)"><strong>⚠️ 禁忌：</strong>${d.avoid}</p>
+        <button class="btn btn-sm" style="margin-top:8px" onclick="selectChain('${key}');switchTab('overview')">查看完整调理方案</button>
+      </div>`;
+    });
+    grid.innerHTML=html;
+  });
+}
+
+function showWuxingDetail(key){
+  const d=WUXING_HEALTH[key];
+  const area=document.getElementById('resultArea');
+  if(!area) return;
+  area.style.display='block';
+  area.classList.add('show');
+  area.scrollIntoView({behavior:'smooth'});
+  document.getElementById('resultTitle').innerHTML=`${d.icon} ${d.name}行体质 · 完整调理方案`;
+  let html=`<div style="background:${d.color}18;border:1px solid ${d.color}44;border-radius:10px;padding:18px;margin-bottom:14px">
+    <p style="font-size:16px"><strong>关联脏腑：</strong><span style="color:${d.color};font-size:22px">${d.organs.join('、')}</span></p>
+    <p style="margin-top:4px">开窍于<strong>${d.sense}</strong> · 主<strong>${d.tissue}</strong> · 情志为<strong>${d.emotion}</strong></p>
+  </div>`;
+  html+=`<div class="detail-card"><h4>⚠️ 五行失衡常见表现</h4>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px">${d.symptoms.map(s=>'<span class="tag tag-warn">'+s+'</span>').join('')}</div></div>`;
+  html+=`<div class="detail-card" style="border-left:3px solid #27ae60"><h4>🥗 推荐食材</h4>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px">${d.foods.map(s=>'<span class="tag tag-success">'+s+'</span>').join('')}</div></div>`;
+  html+=`<div class="detail-card" style="border-left:3px solid #e67e22"><h4>🍲 经典药膳方</h4><ul>${d.recipes.map(r=>'<li>'+r+'</li>').join('')}</ul></div>`;
+  html+=`<div class="detail-card" style="border-left:3px solid #c0392b"><h4>💊 常用中药材（须医师处方）</h4>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px">${d.herbs.map(s=>'<span class="tag tag-danger">'+s+'</span>').join('')}</div>
+    <p style="color:var(--warn);font-size:13px;margin-top:10px"><strong>⚠️ 以上药材须在执业中医师辨证指导下使用，请勿自行购买服用。</strong></p></div>`;
+  html+=`<div class="detail-card"><h4>🧘 养生调理要点</h4><p style="line-height:1.9">${d.regimen}</p></div>`;
+  html+=`<div class="detail-card" style="border-left:3px solid #e67e22"><h4>🚫 禁忌</h4><p style="line-height:1.9;color:var(--warn)">${d.avoid}</p></div>`;
+
+  document.getElementById('resultBody').innerHTML=html;
+  selectedWuxing=key;
+  renderChain();
+}
+
+// ═══════════════════════════════════════════════
+// 上传报告
+// ═══════════════════════════════════════════════
+function handleFileSelect(e){
+  const file=e.target.files[0];
+  if(!file) return;
+  previewFile(file);
+}
+
+function handleDrop(e){
+  e.preventDefault();
+  e.currentTarget.classList.remove('dragover');
+  const file=e.dataTransfer.files[0];
+  if(file&&file.type.startsWith('image/')){
+    document.getElementById('reportFile').files=e.dataTransfer.files;
+    previewFile(file);
+  }
+}
+
+function previewFile(file){
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    uploadedImageData=ev.target.result;
+    const img=document.getElementById('previewImg');
+    img.src=ev.target.result;
+    img.style.display='block';
+  };
+  reader.readAsDataURL(file);
+}
+
+// ═══════════════════════════════════════════════
+// AI报告解读（调用 OpenClaw 视觉模型）
+// ═══════════════════════════════════════════════
+async function analyzeReport(){
+  if(!uploadedImageData){
+    showToast('请先上传检测报告图片');
+    return;
+  }
+  const loading=document.getElementById('reportLoading');
+  const result=document.getElementById('reportResult');
+  loading.classList.add('show');
+  if(result) result.classList.remove('show');
+
+  // Animate dots
+  let dotCount=0;
+  const dotsTimer=setInterval(()=>{
+    dotCount=(dotCount%3)+1;
+    const dotsEl=document.getElementById('loadingDots');
+    if(dotsEl) dotsEl.textContent='.'.repeat(dotCount);
+  },500);
+
+  try {
+    // 调用 OpenClaw LLM 代理（视觉模型）
+    let indicators=[];
+    
+    const base64Image=uploadedImageData.replace(/^data:image\/\w+;base64,/, '');
+      const prompt=`你是一位专业的检验科医生。请仔细分析这张体检报告图片，提取所有检测指标。
+
+要求：
+1. 找出所有指标名称、数值、单位、参考范围
+2. 判断每项指标是否正常（正常/偏高/偏低）
+3. 输出严格JSON数组格式，例如：
+[{"name":"血红蛋白","value":128,"unit":"g/L","refLow":110,"refHigh":160,"status":"正常"}]
+
+只输出JSON，不要解释。如果图片不清晰，返回 []`;
+
+    // 添加 API 超时控制（30秒）
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+    try {
+        const resp=await fetch('http://127.0.0.1:8900/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'openclaw/main',
+            messages: [{
+              role: 'user',
+              content: [
+                { type: 'text', text: prompt },
+                { type: 'image_url', image_url: { url: uploadedImageData } }
+              ]
+            }],
+            max_tokens: 4096,
+            temperature: 0.1
+          }),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+      if(resp.ok){
+        const data=await resp.json();
+        let responseText=data.choices?.[0]?.message?.content || '';
+        // 提取JSON
+        const jsonMatch=responseText.match(/\[[\s\S]*\]/);
+        if(jsonMatch){
+          indicators=JSON.parse(jsonMatch[0]);
+        }
+      } else {
+        throw new Error('OpenClaw API 不可用: ' + resp.status);
+      }
+    } catch(e){
+      clearTimeout(timeoutId);
+      let errorMsg = 'AI自动识别失败：';
+      if (e.name === 'AbortError') {
+        errorMsg += 'API请求超时（30秒），请稍后重试';
+      } else {
+        errorMsg += e.message || '未知错误';
+      }
+      console.warn('AI视觉分析失败，切换到手动模式:', errorMsg);
+      clearInterval(dotsTimer);
+      loading.classList.remove('show');
+      showToast(errorMsg + '，请手动录入指标');
+      showManualInput();
+      return;
+    }
+
+    clearInterval(dotsTimer);
+
+    // 用知识库 enrich 每个指标
+    const enriched=indicators.map(function(ind){
+      const kb=MEDICAL_KNOWLEDGE_BASE[ind.name];
+      return {
+        ...ind,
+        english: kb?.english || '',
+        cause: ind.status==='偏高' ? (kb?.highCause || '') : (kb?.lowCause || ''),
+        wuxing: kb?.wuxing || '',
+        tcmSyndrome: kb?.tcmSyndrome || '',
+        advice: kb?.advice || '',
+        source: kb?.source || ''
+      };
+    });
+
+    // 渲染结果
+    renderReportResult(enriched);
+
+    // 保存到知识库（localStorage 持久化）
+    saveToKnowledgeBase(enriched);
+
+  } catch(e) {
+    clearInterval(dotsTimer);
+    console.error('分析失败:', e);
+    loading.classList.remove('show');
+    showToast('分析失败，请重试或手动录入');
+  } finally {
+    loading.classList.remove('show');
+    if(result){
+      result.classList.add('show');
+      result.scrollIntoView({behavior:'smooth'});
+    }
+  }
+}
+
+// 保存到本地知识库
+function saveToKnowledgeBase(indicators){
+  try {
+    const history=JSON.parse(localStorage.getItem('tizhi_report_history') || '[]');
+    history.push({
+      date: new Date().toISOString().split('T')[0],
+      indicators: indicators
+    });
+    // 只保留最近10次记录
+    if(history.length > 10) history.shift();
+    localStorage.setItem('tizhi_report_history', JSON.stringify(history));
+  } catch(e) {
+    console.error('保存失败:', e);
+  }
+}
+
+// 手动录入模式（AI 不可用时的降级方案）
+function showManualInput(){
+  const container=document.getElementById('manualInputArea') || document.createElement('div');
+  container.id='manualInputArea';
+  container.innerHTML=`
+    <div style="background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.2);border-radius:10px;padding:16px;margin-top:16px">
+      <h4 style="color:var(--gold);margin-bottom:12px">✏️ 手动录入指标（AI识别失败）</h4>
+      <div id="manualFields"></div>
+      <button class="compute-btn" style="margin-top:12px" onclick="addManualInput()">+ 添加指标</button>
+      <button class="compute-btn" style="margin-top:12px;margin-left:8px;background:var(--gold);color:#000" onclick="submitManualInput()">提交分析</button>
+    </div>
+  `;
+  document.getElementById('reportResult').appendChild(container);
+  addManualInput(); // 默认添加一个空行
+}
+
+function addManualInput(){
+  const container=document.getElementById('manualFields');
+  const row=document.createElement('div');
+  row.style.cssText='display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap';
+  row.innerHTML=`
+    <input class="input-field" placeholder="指标名称" style="flex:2;min-width:120px">
+    <input class="input-field" placeholder="数值" type="number" style="flex:1;min-width:80px">
+    <input class="input-field" placeholder="单位" style="flex:1;min-width:60px">
+    <input class="input-field" placeholder="参考下限" type="number" style="flex:1;min-width:80px">
+    <input class="input-field" placeholder="参考上限" type="number" style="flex:1;min-width:80px">
+  `;
+  container.appendChild(row);
+}
+
+function submitManualInput(){
+  const rows=document.querySelectorAll('#manualFields > div');
+  const indicators=[];
+  rows.forEach(function(row){
+    const inputs=row.querySelectorAll('input');
+    const name=inputs[0].value.trim();
+    if(!name) return;
+    const value=parseFloat(inputs[1].value);
+    const unit=inputs[2].value.trim();
+    const refLow=parseFloat(inputs[3].value);
+    const refHigh=parseFloat(inputs[4].value);
+    let status='正常';
+    if(value < refLow) status='偏低';
+    else if(value > refHigh) status='偏高';
+    
+    const kb=MEDICAL_KNOWLEDGE_BASE[name];
+    indicators.push({
+      name, value, unit, refLow, refHigh, status,
+      english: kb?.english || '',
+      cause: status==='偏高' ? (kb?.highCause || '') : (kb?.lowCause || ''),
+      wuxing: kb?.wuxing || '',
+      tcmSyndrome: kb?.tcmSyndrome || '',
+      advice: kb?.advice || '',
+      source: kb?.source || ''
+    });
+  });
+  
+  if(indicators.length > 0){
+    renderReportResult(indicators);
+    saveToKnowledgeBase(indicators);
+    document.getElementById('reportResult').classList.add('show');
+  }
+}
+
+function renderReportResult(indicators){
+  // 如果没传 indicators，用原来的 mock 数据（向后兼容）
+  if(!indicators || indicators.length===0){
+    indicators=[
+      {name:'血红蛋白(Hb)',value:128,unit:'g/L',refLow:110,refHigh:160,status:'正常',wuKey:'Mu',suggest:'补血养肝，多食红枣、枸杞、动物肝脏',wuxing:'木（肝藏血）'},
+      {name:'白细胞(WBC)',value:6.8,unit:'×10⁹/L',refLow:4,refHigh:10,status:'正常',wuKey:'Jin',suggest:'益气固表，少食辛辣，适度运动',wuxing:'金（肺卫）'},
+      {name:'谷丙转氨酶(ALT)',value:42,unit:'U/L',refLow:5,refHigh:40,status:'偏高',wuKey:'Mu',suggest:'清肝利胆，少饮酒，早睡养肝',wuxing:'木（肝主疏泄）'},
+      {name:'空腹血糖(FPG)',value:5.4,unit:'mmol/L',refLow:3.9,refHigh:6.1,status:'正常',wuKey:'Tu',suggest:'健脾和胃，控制甜食摄入',wuxing:'土（脾主运化）'},
+      {name:'总胆固醇(TC)',value:5.2,unit:'mmol/L',refLow:0,refHigh:5.2,status:'正常',wuKey:'Tu',suggest:'健脾祛湿，少油腻，多运动',wuxing:'土（脾为生痰之源）'},
+      {name:'甘油三酯(TG)',value:1.8,unit:'mmol/L',refLow:0,refHigh:1.7,status:'偏高',wuKey:'Tu',suggest:'清淡饮食，多食山楂、燕麦',wuxing:'土（痰湿体质）'},
+      {name:'肌酐(Cr)',value:88,unit:'μmol/L',refLow:44,refHigh:133,status:'正常',wuKey:'Shui',suggest:'补肾固本，少劳累，多按摩腰部',wuxing:'水（肾主水）'},
+      {name:'尿酸(UA)',value:385,unit:'μmol/L',refLow:155,refHigh:416,status:'正常',wuKey:'Shui',suggest:'利水渗湿，少食高嘌呤，多喝水',wuxing:'水（肾司二便）'}
+    ];
+  }
+
+  const constit=document.getElementById('reportConstitution')?.value||'阴虚';
+  const cInfo=CONSTITUTION_WUXING[constit]||CONSTITUTION_WUXING['阴虚'];
+  const wuKey=cInfo.wu;
+  const d=WUXING_HEALTH[wuKey];
+
+  // Build indicator HTML
+  let indHtml='<div class="indicator-grid">';
+  indicators.forEach(function(ind){
+    const val=parseFloat(ind.value || ind.val);
+    const refLow=ind.refLow || ind.low;
+    const refHigh=ind.refHigh || ind.high;
+    let status,statusClass,arrow;
+    if(val > refHigh){status='⬆️ 偏高';statusClass='status-high';arrow='↑';}
+    else if(val < refLow){status='⬇️ 偏低';statusClass='status-low';arrow='↓';}
+    else{status='✅ 正常';statusClass='status-ok';arrow='';}
+    
+    const wuK=ind.wuxing ? ind.wuxing.charAt(0).toUpperCase() + ind.wuxing.slice(1).toLowerCase() : (ind.wuKey || 'Tu');
+    const wInfo=WUXING_HEALTH[wuK] || WUXING_HEALTH['Tu'];
+    
+    indHtml+='<div class="indicator-card">'+
+      '<div class="indicator-name">'+(ind.english ? ind.english+'（'+ind.name+'）' : ind.name)+' <span class="indicator-status '+statusClass+'">'+status+'</span></div>'+
+      '<div><span class="indicator-val">'+(ind.value||ind.val)+'</span><span class="indicator-unit">'+ind.unit+'</span></div>'+
+      '<div class="indicator-range">参考范围：'+refLow+'–'+refHigh+' '+ind.unit+'</div>'+
+      (ind.cause ? '<div class="indicator-cause">📖 可能原因：'+ind.cause+'</div>' : '')+
+      (ind.tcmSyndrome ? '<div class="indicator-tcm">🏥 中医证候：'+ind.tcmSyndrome+'</div>' : '')+
+      (ind.advice || ind.suggest ? '<div class="indicator-suggest">💡 调理建议：'+(ind.advice||ind.suggest)+'</div>' : '')+
+      (ind.source ? '<div class="indicator-source" style="font-size:10px;opacity:.4;margin-top:4px">来源：'+ind.source+'</div>' : '')+
+    '</div>';
+  });
+  indHtml+='</div>';
+
+  // Filter recipes
+  const filteredRecipes=RECIPE_LIBRARY.filter(function(r){return r.constitutions.includes(constit)||r.constitutions.includes('平和');});
+  let recipeHtml='<div class="food-therapy-box"><h4>🌿 食疗配方（按五行匹配）</h4>';
+  filteredRecipes.slice(0,5).forEach(function(r){
+    const rWu=WUXING_HEALTH[r.organ];
+    recipeHtml+='<div class="recipe-card">'+
+      '<div class="recipe-name">'+rWu.icon+' '+r.name+'</div>'+
+      '<div class="recipe-meta">'+
+        r.constitutions.map(function(c){return '<span class="tag tag-primary">'+c+'</span>'}).join('')+
+        '<span class="tag tag-success">'+rWu.organs.join('、')+'</span>'+
+      '</div>'+
+      '<div class="recipe-ingredients">🫚 食材：'+r.ingredients+'</div>'+
+      '<div class="recipe-method">📝 做法：'+r.method+'</div>'+
+      '<div class="recipe-effect">✨ 功效：'+r.effect+'</div>'+
+      '<button class="add-to-checkin" data-rname="'+r.name.replace(/"/g,'&quot;')+'" onclick="addRecipeToCheckin(this.dataset.rname)">➕ 加入今日打卡</button>'+
+    '</div>';
+  });
+  recipeHtml+='</div>';
+
+  // Daily check-in content
+  let checkinHtml='<div class="checkin-section">'+
+    '<h4>✅ 每日打卡内容（结合五行体质定制）</h4>'+
+    '<div class="meal-grid">'+
+      '<div class="meal-slot"><div class="meal-label">🌅 早餐</div><div class="meal-time">7:00-9:00</div><div style="font-size:12px;color:var(--muted);margin-top:4px">'+d.foods.slice(0,2).join('、')+'粥</div></div>'+
+      '<div class="meal-slot"><div class="meal-label">☀️ 午餐</div><div class="meal-time">11:00-13:00</div><div style="font-size:12px;color:var(--muted);margin-top:4px">'+((d.foods[2]||'蔬菜'))+'炒肉+'+WUXING_HEALTH[WU_ORDER[(WU_ORDER.indexOf(wuKey)+1)%5]].foods[0]+'</div></div>'+
+      '<div class="meal-slot"><div class="meal-label">🌙 晚餐</div><div class="meal-time">17:00-19:00</div><div style="font-size:12px;color:var(--muted);margin-top:4px">'+d.recipes[0].split('：')[0]+'</div></div>'+
+    '</div>'+
+    '<div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+      '<div><strong style="color:var(--title);font-size:13px">🏃 运动：</strong><span style="font-size:13px">每日'+((wuKey==='Huo')?'30分钟':'45分钟')+'有氧（快走/太极）</span></div>'+
+      '<div><strong style="color:var(--title);font-size:13px">😴 作息：</strong><span style="font-size:13px">'+((wuKey==='Mu')?'22:30':'23:00')+'前入睡，保证7小时睡眠</span></div>'+
+      '<div><strong style="color:var(--title);font-size:13px">🧘 情志：</strong><span style="font-size:13px">'+((wuKey==='Mu')?'少怒多笑，疏肝解郁':(wuKey==='Huo')?'宁心静神，不过喜过悲':(wuKey==='Tu')?'思虑有度，养脾静心':(wuKey==='Jin')?'收敛神气，化解悲忧':'养肾藏精，勿恐惧惊慌')+'</span></div>'+
+      '<div><strong style="color:var(--title);font-size:13px">💧 饮水：</strong><span style="font-size:13px">每日'+((wuKey==='Shui')?'1800':'1500')+'ml，少量多次</span></div>'+
+    '</div>'+
+  '</div>';
+
+  // Final output
+  document.getElementById('reportResult').innerHTML=
+    '<div class="card">'+
+      '<div class="card-header">'+
+        '<div class="card-icon">📋</div>'+
+        '<div class="card-title">检测报告解读结果</div>'+
+        '<span class="card-badge">五行体质：'+constit+'</span>'+
+      '</div>'+
+      '<div style="background:'+(cInfo.wu?WUXING_HEALTH[cInfo.wu].color+'18':'rgba(201,168,76,0.06)')+';border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px">'+
+        '<strong style="color:var(--title)">体质判定：</strong>'+constit+'体质（'+cInfo.desc+'）<br>'+
+        '<span style="font-size:13px;color:var(--muted)">'+cInfo.note+'</span>'+
+      '</div>'+
+      indHtml+
+      recipeHtml+
+      checkinHtml+
+    '</div>';
+}
+function renderRecipeLibrary(filter){
+  const lib=document.getElementById('recipeLibrary');
+  const recipes=filter==='all'?RECIPE_LIBRARY:RECIPE_LIBRARY.filter(r=>r.constitutions.includes(filter)||filter==='all');
+  let html='';
+  recipes.forEach(r=>{
+    const rWu=WUXING_HEALTH[r.organ];
+    html+=`<div class="recipe-item">
+      <h5>${rWu.icon} ${r.name}</h5>
+      <div class="recipe-tags">
+        ${r.constitutions.map(c=>`<span class="tag tag-primary">${c}</span>`).join('')}
+        <span class="tag tag-success">${rWu.organs.join('、')}</span>
+        <span class="tag" style="color:${rWu.color};border-color:${rWu.color}33">${rWu.name}行</span>
+      </div>
+      <div class="recipe-ingredients">📦 ${r.ingredients}</div>
+      <div class="recipe-method">${r.method}</div>
+      <div class="recipe-effect">✨ ${r.effect}</div>
+      <button class="add-to-checkin" id="rbtn-${r.name.replace(/\s/g,'')}" onclick="addRecipeToCheckin('${r.name}')">➕ 加入今日打卡</button>
+    </div>`;
+  });
+  lib.innerHTML=html||'<div class="empty-state"><div class="empty-state-icon">🍽️</div>该体质暂无专属配方，请尝试其他体质筛选</div>';
+}
+
+function filterRecipes(type){
+  currentRecipeFilter=type;
+  document.querySelectorAll('.const-tab').forEach(t=>t.classList.remove('active'));
+  event?.target?.classList.add('active');
+  renderRecipeLibrary(type);
+}
+
+function addRecipeToCheckin(recipeName){
+  const today=getTodayKey();
+  let data=JSON.parse(localStorage.getItem('checkinData')||'{}');
+  if(!data[today]) data[today]={};
+  if(!data[today].recipes) data[today].recipes=[];
+  if(!data[today].recipes.includes(recipeName)){
+    data[today].recipes.push(recipeName);
+    localStorage.setItem('checkinData',JSON.stringify(data));
+  }
+  const btn=document.getElementById('rbtn-'+recipeName.replace(/\s/g,''));
+  if(btn){btn.classList.add('added');btn.textContent='✅ 已加入打卡';btn.disabled=true;}
+  showToast('✅ "'+recipeName+'" 已加入今日打卡清单');
+}
+
+// ═══════════════════════════════════════════════
+// 本周食疗计划
+// ═══════════════════════════════════════════════
+function renderWeeklyPlan(){
+  const weekLabel=document.getElementById('weekLabel');
+  const now=new Date();
+  const dayOfWeek=now.getDay()||7;
+  const monday=new Date(now);
+  monday.setDate(now.getDate()-dayOfWeek+1);
+  weekLabel.textContent=`第${getWeekNumber(now)}周`;
+  const plan=document.getElementById('weeklyPlan');
+  let html='';
+  WEEKLY_PLAN.forEach((day,i)=>{
+    const isToday=i===dayOfWeek-1;
+    html+=`<div class="day-card" style="${isToday?'border-color:var(--accent);background:#fffbf0':''}">
+      <div class="day-name">${day.day}${isToday?' ★':''}</div>
+      <div class="day-meals">
+        <div><strong>早：</strong>${day.breakfast}</div>
+        <div><strong>中：</strong>${day.lunch}</div>
+        <div><strong>晚：</strong>${day.dinner}</div>
+      </div>
+    </div>`;
+  });
+  plan.innerHTML=html;
+}
+
+function applyWeeklyPlan(){
+  const now=new Date();
+  const dayOfWeek=now.getDay()||7;
+  const todayPlan=WEEKLY_PLAN[dayOfWeek-1];
+  if(!todayPlan) return;
+  const today=getTodayKey();
+  let data=JSON.parse(localStorage.getItem('checkinData')||'{}');
+  if(!data[today]) data[today]={};
+  const meals=[{label:'早餐',val:todayPlan.breakfast},{label:'午餐',val:todayPlan.lunch},{label:'晚餐',val:todayPlan.dinner}];
+  meals.forEach(m=>{
+    if(!data[today][m.label]) data[today][m.label]=m.val;
+  });
+  localStorage.setItem('checkinData',JSON.stringify(data));
+  showToast('✅ 今日食谱已从本周计划导入');
+  renderCheckin();
+}
+
+function getWeekNumber(d){
+  const firstDay=new Date(d.getFullYear(),0,1);
+  return Math.ceil(((d-firstDay)/86400000+firstDay.getDay()+1)/7);
+}
+
+// ═══════════════════════════════════════════════
+// 每日打卡
+// ═══════════════════════════════════════════════
+const CHECKIN_ITEMS=[
+  {id:'wakeup',label:'早起床时间',icon:'🌅',placeholder:'如 06:30',type:'time'},
+  {id:'breakfast',label:'早餐',icon:'🌅',placeholder:'吃了什么？',type:'textarea'},
+  {id:'lunch',label:'午餐',icon:'☀️',placeholder:'吃了什么？',type:'textarea'},
+  {id:'dinner',label:'晚餐',icon:'🌙',placeholder:'吃了什么？',type:'textarea'},
+  {id:'water',label:'喝水量',icon:'💧',placeholder:'如 1500ml / 8杯',type:'text'},
+  {id:'steps',label:'步行数',icon:'👟',placeholder:'如 8000步',type:'text'},
+  {id:'meditation',label:'打坐/冥想',icon:'🧘',placeholder:'如 20分钟静坐',type:'text'},
+  {id:'acupressure',label:'穴位按摩',icon:'🤲',placeholder:'如 足三里、太冲各5分钟',type:'text'},
+  {id:'emotion',label:'情志记录',icon:'😊',placeholder:'今日情绪如何？有哪些情绪波动？',type:'textarea'},
+  {id:'recipes',label:'食疗配方',icon:'🌿',placeholder:'今日执行的食疗配方（可从上方添加）',type:'textarea'}
+];
+
+function getTodayKey(){
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function renderCheckin(){
+  const today=getTodayKey();
+  document.getElementById('todayDate').textContent=`${today}（${['周日','周一','周二','周三','周四','周五','周六'][new Date().getDay()]}）`;
+  renderStreak();
+  renderCalendar();
+  renderCheckinForm(today);
+  renderHistory();
+}
+
+function renderCheckinForm(today){
+  const data=JSON.parse(localStorage.getItem('checkinData')||'{}');
+  const todayData=data[today]||{};
+  let html='';
+  CHECKIN_ITEMS.forEach(item=>{
+    const val=todayData[item.id]||'';
+    html+=`<div class="checkin-item">
+      <div class="checkin-item-icon">${item.icon}</div>
+      <div class="checkin-item-label">
+        <strong>${item.label}</strong>
+        <span>${item.placeholder}</span>
+      </div>
+      ${item.type==='textarea'?`<textarea id="ci-${item.id}" rows="2" placeholder="${item.placeholder}" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:14px;font-family:inherit;resize:none;background:rgba(255,255,255,0.06)">${val}</textarea>`:
+      `<input type="${item.type}" id="ci-${item.id}" value="${val}" placeholder="${item.placeholder}" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:14px;font-family:inherit;background:rgba(255,255,255,0.06)">`}
+    </div>`;
+  });
+  // Show pending recipes
+  if(todayData.recipes&&todayData.recipes.length>0){
+    html+=`<div style="background:rgba(45,106,79,.08);border:1px solid rgba(45,106,79,.2);border-radius:10px;padding:12px;margin-top:8px">
+      <strong style="color:var(--success)">🌿 已选食疗配方：</strong>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">${todayData.recipes.map(r=>`<span class="tag tag-success">${r}</span>`).join('')}</div>
+    </div>`;
+  }
+  document.getElementById('checkinForm').innerHTML=html;
+}
+
+function submitCheckin(){
+  const today=getTodayKey();
+  let data=JSON.parse(localStorage.getItem('checkinData')||'{}');
+  if(!data[today]) data[today]={};
+  const todayData=data[today];
+  CHECKIN_ITEMS.forEach(item=>{
+    const el=document.getElementById('ci-'+item.id);
+    if(el) todayData[item.id]=el.value.trim();
+  });
+  todayData.submittedAt=Date.now();
+  data[today]=todayData;
+  localStorage.setItem('checkinData',JSON.stringify(data));
+  showToast('🎉 今日打卡已完成，继续保持！');
+  renderStreak();
+  renderCalendar();
+  renderHistory();
+}
+
+function renderStreak(){
+  const allData=JSON.parse(localStorage.getItem('checkinData')||'{}');
+  const today=getTodayKey();
+  const todayDone=allData[today]?.submittedAt;
+  const streak=todayDone?calcStreak(allData):0;
+
+  const badges=[
+    {days:7,icon:'🌱',name:'初阶养生'},
+    {days:21,icon:'🌿',name:'中阶养生'},
+    {days:30,icon:'🌳',name:'高阶养生'}
+  ];
+
+  let html='';
+  badges.forEach(b=>{
+    const earned=streak>=b.days;
+    html+=`<div class="streak-badge ${earned?'earned':''}">
+      <div class="badge-icon">${earned?'🎖️':b.icon}</div>
+      <div class="badge-name">${b.name}</div>
+      <div class="badge-days">${earned?'🏆 已获得！':'需连续'+b.days+'天'}</div>
+    </div>`;
+  });
+  document.getElementById('streakPanel').innerHTML=html;
+  document.getElementById('streakInfo').textContent=`当前连续打卡：${streak}天 · ${todayDone?'✅ 今日已完成':'⏳ 今日未打卡'}`;
+}
+
+function calcStreak(allData){
+  const today=new Date();
+  let streak=0;
+  for(let i=0;i<365;i++){
+    const d=new Date(today);
+    d.setDate(today.getDate()-i);
+    const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    if(allData[key]?.submittedAt){streak++}
+    else if(i>0) break;
+  }
+  return streak;
+}
+
+function renderCalendar(){
+  const grid=document.getElementById('calendarGrid');
+  const monthEl=document.getElementById('calendarMonth');
+  const allData=JSON.parse(localStorage.getItem('checkinData')||'{}');
+  const firstDay=new Date(checkinCalendarYear,checkinCalendarMonth,1);
+  const lastDay=new Date(checkinCalendarYear,checkinCalendarMonth+1,0);
+  const startPad=firstDay.getDay();
+  const totalDays=lastDay.getDate();
+  monthEl.textContent=`${checkinCalendarYear}年${checkinCalendarMonth+1}月`;
+
+  const headers=['日','一','二','三','四','五','六'];
+  let html='';
+  headers.forEach(h=>html+=`<div style="font-size:11px;color:var(--muted);font-weight:700;padding:4px">${h}</div>`);
+  for(let i=0;i<startPad;i++) html+='<div></div>';
+  const today=getTodayKey();
+  for(let d=1;d<=totalDays;d++){
+    const key=`${checkinCalendarYear}-${String(checkinCalendarMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const done=allData[key]?.submittedAt;
+    const isToday=key===today;
+    const isFuture=new Date(key)>new Date(today);
+    const dot=done?'✅':'·';
+    const color=isFuture?'var(--border)':done?'var(--success)':'var(--muted)';
+    html+=`<div style="padding:6px;border-radius:8px;background:${isToday?'rgba(201,168,76,.1)':isFuture?'transparent':'transparent'};border:${isToday?'1.5px solid var(--accent)':'1px solid transparent'};font-size:12px;color:${color};text-align:center;cursor:${isFuture?'default':'pointer'}" title="${key}${done?' · 已打卡':''}">${d}<br><span style="font-size:10px">${dot}</span></div>`;
+  }
+  grid.innerHTML=html;
+}
+
+function switchMonth(dir){
+  checkinCalendarMonth+=dir;
+  if(checkinCalendarMonth>11){checkinCalendarMonth=0;checkinCalendarYear++;}
+  if(checkinCalendarMonth<0){checkinCalendarMonth=11;checkinCalendarYear--;}
+  renderCalendar();
+}
+
+function renderHistory(){
+  const list=document.getElementById('historyList');
+  const allData=JSON.parse(localStorage.getItem('checkinData')||'{}');
+  const keys=Object.keys(allData).sort().reverse().slice(0,30);
+  if(keys.length===0){
+    list.innerHTML='<div class="empty-state"><div class="empty-state-icon">📝</div>暂无打卡记录，开始今日打卡吧！</div>';
+    return;
+  }
+  let html='';
+  keys.forEach(key=>{
+    const d=allData[key];
+    const items=['wakeup','breakfast','lunch','dinner','water','steps','meditation','acupressure','emotion'];
+    const completed=items.filter(i=>d[i]).length;
+    const total=items.length;
+    const pct=Math.round(completed/total*100);
+    const tags=items.map(i=>`<span class="history-tag ${d[i]?'done':' '}">${d[i]?'✅':'○'} ${CHECKIN_ITEMS.find(c=>c.id===i)?.label||i}</span>`);
+    const dateStr=key+' '+['周日','周一','周二','周三','周四','周五','周六'][new Date(key).getDay()];
+    html+=`<div class="history-item">
+      <div class="history-date">${dateStr} · ${pct}%完成</div>
+      <div class="history-row">${tags.join('')}</div>
+      ${d.recipes&&d.recipes.length?'<div style="margin-top:6px">🌿 配方：'+d.recipes.join('、')+'</div>':''}
+    </div>`;
+  });
+  list.innerHTML=html;
+}
+
+function exportCheckin(){
+  const allData=JSON.parse(localStorage.getItem('checkinData')||'{}');
+  let csv='日期,起床,早餐,午餐,晚餐,喝水量,步行,冥想,穴位,情志,食疗配方,打卡时间\n';
+  Object.keys(allData).sort().forEach(key=>{
+    const d=allData[key];
+    csv+=`"${key}","${d.wakeup||''}","${(d.breakfast||'').replace(/"/g,'""')}","${(d.lunch||'').replace(/"/g,'""')}","${(d.dinner||'').replace(/"/g,'""')}","${d.water||''}","${d.steps||''}","${d.meditation||''}","${d.acupressure||''}","${(d.emotion||'').replace(/"/g,'""')}","${(d.recipes||[]).join('、').replace(/"/g,'""')}","${d.submittedAt?new Date(d.submittedAt).toLocaleString('zh-CN'):''}"\n`;
+  });
+  downloadFile(csv,'养生打卡记录_'+getTodayKey()+'.csv','text/csv');
+  showToast('📤 打卡记录已导出');
+}
+
+function shareCheckin(){
+  const today=getTodayKey();
+  const data=JSON.parse(localStorage.getItem('checkinData')||'{}')[today];
+  if(!data) {showToast('今日尚未打卡');return;}
+  const streak=calcStreak(data?{[today]:data}:{});
+  const text=`🧘 今日养生打卡\n📅 ${today}\n🌅 起床：${data.wakeup||'未记录'}\n🍽️ 三餐：${data.breakfast||'未记'} | ${data.lunch||'未记'} | ${data.dinner||'未记'}\n💧 喝水：${data.water||'未记'}\n👟 步行：${data.steps||'未记'}\n🧘 冥想：${data.meditation||'未记'}\n🏆 连续打卡：${streak}天\n——来自 易道智鉴`;
+  navigator.clipboard?.writeText(text).then(()=>showToast('📋 已复制到剪贴板，长按分享')).catch(()=>showToast('请手动复制打卡内容'));
+}
+
+function clearHistory(){
+  if(confirm('确定要清空所有打卡记录吗？此操作不可恢复。')){
+    localStorage.removeItem('checkinData');
+    showToast('历史记录已清空');
+    renderCheckin();
+  }
+}
+
+function downloadFile(content,filename,type){
+  const blob=new Blob([content],{type});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;
+  a.click();
+}
+
+// ═══════════════════════════════════════════════
+// 八字分析
+// ═══════════════════════════════════════════════
+function analyzeByBazi(){
+  const dateStr=document.getElementById('baziDate').value;
+  const hourIdx=parseInt(document.getElementById('baziHour').value);
+  if(!dateStr){showToast('请选择出生日期');return;}
+  const parts=dateStr.split('-');
+  const y=parseInt(parts[0]),m=parseInt(parts[1]),day=parseInt(parts[2]);
+  const baseDate=new Date(1900,0,1);
+  const inputDate=new Date(y,m-1,day);
+  const diffDays=Math.floor((inputDate-baseDate)/(1000*60*60*24));
+  const tgIdx=((diffDays%10)+10)%10;
+  const TG=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  const tgElement={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
+  const tgWuKey={'木':'Mu','火':'Huo','土':'Tu','金':'Jin','水':'Shui'};
+  const dayGan=TG[tgIdx];
+  const element=tgElement[dayGan];
+  const wuKey=tgWuKey[element];
+  const yTg=TG[(y-4)%10];
+  const DZ_ELE=['水','土','木','木','土','火','火','土','金','金','土','水'];
+  const counts={Mu:0,Huo:0,Tu:0,Jin:0,Shui:0};
+  [tgElement[yTg],tgElement[m-1>=0?TG[((y-4)%10*2+(m-1))%10]:tgElement[mTg||0]],element,DZ_ELE[((diffDays%12)+12)%12],DZ_ELE[hourIdx]].forEach(el=>{
+    if(tgWuKey[el])counts[tgWuKey[el]]++;
+  });
+  let maxKey='Mu',minKey='Mu',maxV=0,minV=99;
+  WU_ORDER.forEach(k=>{if(counts[k]>maxV){maxV=counts[k];maxKey=k}if(counts[k]<minV){minV=counts[k];minKey=k}});
+
+  const area=document.getElementById('resultAreaBazi');
+  area.style.display='block';
+  area.classList.add('show');
+  const barColors={Mu:'#27ae60',Huo:'#e74c3c',Tu:'#f39c12',Jin:'#90a4ae',Shui:'#3498db'};
+  let barHtml='<div style="display:flex;gap:8px;align-items:flex-end;height:100px;margin:12px 0">';
+  WU_ORDER.forEach(k=>{const h=Math.max(10,counts[k]*22);barHtml+=`<div style="flex:1;border-radius:6px 6px 0 0;background:${barColors[k]};height:${h}px;display:flex;align-items:flex-end;justify-content:center;color:#fff;font-size:13px;font-weight:700;padding-bottom:4px">${counts[k]}</div>`;});
+  barHtml+='</div><div style="display:flex;gap:8px"><div style="flex:1;text-align:center;font-size:12px;color:var(--muted)">木</div><div style="flex:1;text-align:center;font-size:12px;color:var(--muted)">火</div><div style="flex:1;text-align:center;font-size:12px;color:var(--muted)">土</div><div style="flex:1;text-align:center;font-size:12px;color:var(--muted)">金</div><div style="flex:1;text-align:center;font-size:12px;color:var(--muted)">水</div></div>';
+
+  const d=WUXING_HEALTH[wuKey];
+  const weakD=WUXING_HEALTH[minKey];
+  area.innerHTML=`
+    <div style="background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px">
+      <p><strong>日主：</strong><span style="color:var(--accent);font-size:20px">${dayGan}（${element}）</span></p>
+      <p><strong>五行最强：</strong><span style="color:${barColors[maxKey]}">${WUXING_HEALTH[maxKey].name}行（${maxV}个）</span></p>
+      <p><strong>五行最弱：</strong><span style="color:${barColors[minKey]}">${WUXING_HEALTH[minKey].name}行（${minV}个）</span></p>
+      ${barHtml}
+    </div>
+    <div class="detail-card" style="border-left:3px solid ${d.color}"><h4 style="color:${d.color}">${d.icon} 日主${d.name}行 · 先天体质</h4>
+      <p><strong>关联脏腑：</strong><span class="highlight">${d.organs.join('、')}</span></p>
+      <p><strong>易感问题：</strong>${d.symptoms.slice(0,5).join('、')}</p>
+      <p><strong>养生关键：</strong>${d.regimen}</p>
+      <p style="color:var(--warn);margin-top:4px"><strong>禁忌：</strong>${d.avoid}</p></div>
+    <div class="detail-card" style="border-left:3px solid #e74c3c"><h4 style="color:#e74c3c">⚠️ 重点调理：${weakD.name}行偏弱</h4>
+      <p><strong>关联脏腑：</strong><span class="highlight">${weakD.organs.join('、')}</span></p>
+      <p><strong>推荐食材：</strong>${weakD.foods.slice(0,6).join('、')}</p>
+      <p><strong>推荐药膳：</strong>${weakD.recipes[0]}</p></div>
+    <div class="detail-card"><h4>🥗 ${d.name}行体质 · 推荐食疗</h4><ul>${d.recipes.map(r=>'<li>'+r+'</li>').join('')}</ul></div>
+    <div class="detail-card"><h4>🧘 四季养生指导</h4><p style="line-height:1.9">${d.regimen}</p></div>`;
+  selectedWuxing=wuKey;
+  renderChain();
+}
+
+// ═══════════════════════════════════════════════
+// 症状查询
+// ═══════════════════════════════════════════════
+const DISEASE_LIST=Object.keys(DISEASE_MAP);
+
+function renderDiseaseTags(filter){
+  const wrap=document.getElementById('diseaseTags');
+  const list=filter?DISEASE_LIST.filter(x=>x.includes(filter)):DISEASE_LIST;
+  wrap.innerHTML=list.map(d=>`<span class="disease-tag" onclick="selectDisease('${d}')" id="dt-${d}">${d}</span>`).join('');
+}
+
+function selectDisease(name){
+  document.querySelectorAll('.disease-tag').forEach(t=>t.classList.remove('selected'));
+  document.getElementById('dt-'+name)?.classList.add('selected');
+  document.getElementById('diseaseSearch').value=name;
+  analyzeByDisease();
+}
+
+function filterDiseaseTags(){
+  renderDiseaseTags(document.getElementById('diseaseSearch').value.trim());
+}
+
+function analyzeByDisease(){
+  const val=document.getElementById('diseaseSearch').value.trim();
+  if(!val){showToast('请输入症状或选择常见症状');return;}
+  let match=DISEASE_MAP[val];
+  if(!match){
+    for(const[k,v]of Object.entries(DISEASE_MAP)){
+      if(val.includes(k)||k.includes(val)){match=v;break}
+    }
+  }
+  if(!match){
+    const keywords={肝:'Mu',木:'Mu',心:'Huo',火:'Huo',脾:'Tu',胃:'Tu',土:'Tu',肺:'Jin',金:'Jin',肾:'Shui',水:'Shui'};
+    for(const[kw,wk]of Object.entries(keywords)){
+      if(val.includes(kw)){match={wu:wk,desc:'根据关键词匹配，仅供参考'};break}
+    }
+  }
+  if(!match){showToast('未找到匹配的五行对应关系');return;}
+
+  const d=WUXING_HEALTH[match.wu];
+  const area=document.getElementById('resultAreaSymptom');
+  area.style.display='block';
+  area.classList.add('show');
+  area.innerHTML=`
+    <div style="background:${d.color}18;border:1px solid ${d.color}44;border-radius:10px;padding:18px;margin-bottom:14px">
+      <p><strong>症状：</strong><span style="color:${d.color};font-size:22px">${val}</span></p>
+      <p style="color:var(--muted);font-size:14px;margin-top:4px">${match.desc}</p>
+      <p style="margin-top:8px"><strong>对应五行：</strong><span style="color:${d.color};font-size:18px">${d.icon} ${d.name}行</span></p>
+      <p><strong>关联脏腑：</strong><span class="highlight">${d.organs.join('、')}</span></p>
+    </div>
+    <div class="detail-card" style="border-left:3px solid #27ae60"><h4>🥗 饮食调理建议</h4>
+      <p><strong>推荐食材：</strong></p>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin:8px 0">${d.foods.map(s=>'<span class="tag tag-success">'+s+'</span>').join('')}</div>
+      <p><strong>推荐药膳：</strong></p><ul>${d.recipes.map(r=>'<li>'+r+'</li>').join('')}</ul></div>
+    <div class="detail-card" style="border-left:3px solid #c0392b"><h4>💊 中药材参考（须医师处方）</h4>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px">${d.herbs.map(s=>'<span class="tag tag-danger">'+s+'</span>').join('')}</div>
+      <p style="color:var(--warn);font-size:13px;margin-top:10px"><strong>⚠️ 不可自行抓药服用，须经执业中医师辨证后开具处方。</strong></p></div>
+    <div class="detail-card"><h4>🧘 生活调理</h4><p style="line-height:1.9">${d.regimen}</p></div>
+    <div class="detail-card" style="border-left:3px solid #e67e22"><h4>🚫 禁忌</h4><p style="line-height:1.9;color:var(--warn)">${d.avoid}</p></div>`;
+  selectedWuxing=match.wu;
+  renderChain();
+}
+
+// ═══════════════════════════════════════════════
+// Toast
+// ═══════════════════════════════════════════════
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ═══════════════════════════════════════════════
+// AI智能解读功能
+// ═══════════════════════════════════════════════
+let aiUploadedImageData = null;
+let aiInterpretHistory = JSON.parse(localStorage.getItem('aiInterpretHistory')||'[]');
+
+function handleAIFileSelect(e){
+  const file=e.target.files[0];
+  if(!file) return;
+  previewAIFile(file);
+}
+
+function handleAIDrop(e){
+  e.preventDefault();
+  e.currentTarget.classList.remove('dragover');
+  const file=e.dataTransfer.files[0];
+  if(file&&(file.type.startsWith('image/')||file.type==='application/pdf')){
+    document.getElementById('aiReportFile').files=e.dataTransfer.files;
+    previewAIFile(file);
+  }
+}
+
+function previewAIFile(file){
+  if(file.type==='application/pdf'){
+    showToast('⚠️ 暂不支持PDF，请截图后上传图片');
+    return;
+  }
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    aiUploadedImageData=ev.target.result;
+    // 显示预览
+    document.getElementById('aiUploadZone').style.display='none';
+    document.getElementById('aiPreviewWrap').style.display='block';
+    document.getElementById('aiPreviewImg').src=ev.target.result;
+    document.getElementById('aiPreviewImg').style.display='block';
+    showToast('✅ 报告已上传，正在启动AI分析...');
+    // 自动触发AI分析
+    setTimeout(function(){ callLLMForAnalysis(); }, 500);
+  };
+  reader.readAsDataURL(file);
+}
+
+// ====== AI自动分析核心函数 ======
+let aiAnalysisAbortController = null;
+
+async function callLLMForAnalysis(){
+  if(!aiUploadedImageData){
+    showToast('⚠️ 请先上传报告图片');
+    return;
+  }
+  
+  // 显示分析中状态
+  document.getElementById('aiPreviewWrap').style.display='none';
+  document.getElementById('aiAnalyzingState').style.display='block';
+  document.getElementById('aiResultArea').style.display='none';
+  document.getElementById('aiErrorState').style.display='none';
+  
+  // 提示文字轮换
+  const tips=['正在识别报告内容...','正在分析各项指标...','正在生成中医体质辨识...','正在制定调理方案...','正在生成打卡计划...'];
+  let tipIdx=0;
+  const tipTimer=setInterval(()=>{
+    tipIdx=(tipIdx+1)%tips.length;
+    const tipEl=document.getElementById('aiAnalyzingTip');
+    if(tipEl) tipEl.textContent=tips[tipIdx];
+  },3000);
+  
+  const prompt=`你是一位拥有30年临床经验的中医+现代医学双背景健康管理专家，请对以下体检报告图片进行专业解读。要求对标「蚂蚁阿福」App的专业水准。
+
+请严格按以下格式输出（使用Markdown格式）：
+
+## 📋 报告解读摘要
+（总体评价：正常/基本正常/需要关注/需要就医，50字内）
+
+## 🔬 各项指标解读
+（逐项列出：指标名 | 检测值 | 参考范围 | 状态(正常/偏高/偏低) | 医学意义，用表格呈现）
+
+## 🌿 中医体质辨识
+（根据异常指标，判断五行偏盛偏衰、脏腑虚实，引用《黄帝内经》《伤寒论》等经典依据）
+
+## 🍲 食疗调理方案
+（针对每项异常，给出具体食疗配方：名称+食材+做法+功效，至少3个配方）
+
+## 🏃 运动调理方案
+（给出每周运动计划：运动类型+强度+频次+注意事项，至少3种运动）
+
+## 📋 21天健康打卡计划
+（给出每日打卡项目清单，用表格呈现：天数 | 早上 | 中午 | 晚上）
+
+## ⚠️ 就医建议
+（哪些指标需要尽快就医，哪些可以观察，分级标注 urgency: 高/中/低）`;
+
+  try {
+    aiAnalysisAbortController = new AbortController();
+    
+    // 调用本地 OpenClaw LLM 代理
+    const response = await fetch('http://127.0.0.1:8900/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: aiAnalysisAbortController.signal,
+      body: JSON.stringify({
+        model: 'openclaw/main',
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'text', text: prompt },
+            { type: 'image_url', image_url: { url: aiUploadedImageData } }
+          ]
+        }],
+        max_tokens: 4096,
+        temperature: 0.7
+      })
+    });
+    
+    if(!response.ok){
+      throw new Error('API返回错误: ' + response.status + ' ' + response.statusText);
+    }
+    
+    const data = await response.json();
+    let resultText = '';
+    
+    if(data.choices && data.choices[0] && data.choices[0].message){
+      resultText = data.choices[0].message.content;
+    } else if(data.error){
+      throw new Error(data.error.message || JSON.stringify(data.error));
+    } else {
+      throw new Error('API返回格式异常');
+    }
+    
+    // 分析成功
+    clearInterval(tipTimer);
+    document.getElementById('aiAnalyzingState').style.display='none';
+    document.getElementById('aiResultArea').style.display='block';
+    
+    // 渲染Markdown为HTML
+    document.getElementById('aiResultContent').innerHTML = renderMarkdown(resultText);
+    
+    // 保存到历史
+    aiInterpretHistory.unshift({
+      date: new Date().toLocaleString('zh-CN'),
+      result: resultText
+    });
+    if(aiInterpretHistory.length>10) aiInterpretHistory.length=10;
+    localStorage.setItem('aiInterpretHistory', JSON.stringify(aiInterpretHistory));
+    
+    showToast('✅ AI解读完成！');
+    
+  } catch(err) {
+    clearInterval(tipTimer);
+    console.error('AI分析失败:', err);
+    
+    document.getElementById('aiAnalyzingState').style.display='none';
+    document.getElementById('aiErrorState').style.display='block';
+    document.getElementById('aiErrorMsg').textContent='AI分析失败';
+    
+    if(err.name==='AbortError'){
+      document.getElementById('aiErrorDetail').textContent='分析已被取消';
+    } else if(err.message.includes('Failed to fetch') || err.message.includes('NetworkError')){
+      document.getElementById('aiErrorDetail').textContent='无法连接AI服务，请确保本机OpenClaw服务正在运行';
+    } else {
+      document.getElementById('aiErrorDetail').textContent=err.message;
+    }
+  }
+}
+
+// 简易Markdown渲染
+function renderMarkdown(text){
+  let html = text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/^### (.+)$/gm,'<h4 style="color:#fff;font-size:16px;margin:16px 0 8px">$1</h4>')
+    .replace(/^## (.+)$/gm,'<h3 style="color:var(--accent);font-size:18px;margin:20px 0 10px;border-bottom:1px solid rgba(201,168,76,.3);padding-bottom:6px">$1</h3>')
+    .replace(/^# (.+)$/gm,'<h2 style="color:#fff;font-size:20px;margin:24px 0 12px">$1</h2>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong style="color:#fff">$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/^- (.+)$/gm,'<div style="padding-left:16px;margin:4px 0">• $1</div>')
+    .replace(/^\| (.+) \|$/gm, function(m){ return '<div style="background:rgba(255,255,255,.04);padding:4px 8px;border-radius:4px;margin:2px 0;font-size:13px">' + m + '</div>'; })
+    .replace(/\n/g,'<br>');
+  return html;
+}
+
+function reUploadReport(){
+  aiUploadedImageData=null;
+  document.getElementById('aiUploadZone').style.display='';
+  document.getElementById('aiPreviewWrap').style.display='none';
+  document.getElementById('aiAnalyzingState').style.display='none';
+  document.getElementById('aiResultArea').style.display='none';
+  document.getElementById('aiErrorState').style.display='none';
+  document.getElementById('aiReportFile').value='';
+}
+
+function retryAIAnalysis(){
+  document.getElementById('aiErrorState').style.display='none';
+  callLLMForAnalysis();
+}
+
+function exportAIResult(){
+  const content = document.getElementById('aiResultContent').innerText;
+  if(!content){ showToast('暂无内容可导出'); return; }
+  const blob = new Blob([content], {type:'text/markdown'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'AI体检报告解读_' + new Date().toLocaleDateString('zh-CN').replace(/\//g,'-') + '.md';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ 报告已导出');
+}
+
+function toggleParseBtn(){
+  const text=document.getElementById('aiResultText').value.trim();
+  document.getElementById('parseBtn').disabled=!text;
+}
+
+function parseAIResult(){
+  const text=document.getElementById('aiResultText').value.trim();
+  if(!text){
+    showToast('请先粘贴AI解读结果');
+    return;
+  }
+  
+  // 解析AI回复的各个章节
+  const sections={
+    summary:'',
+    indicators:'',
+    tcm:'',
+    foodTherapy:'',
+    exercise:'',
+    checkinPlan:'',
+    medicalAdvice:''
+  };
+  
+  // 使用正则表达式提取各章节
+  const summaryMatch=text.match(/## 📋 报告解读摘要[\s\S]*?\n([\s\S]*?)(?=##|$)/);
+  if(summaryMatch) sections.summary=summaryMatch[1].trim();
+  
+  const indicatorsMatch=text.match(/## 🔬 各项指标解读[\s\S]*?\n([\s\S]*?)(?=##|$)/);
+  if(indicatorsMatch) sections.indicators=indicatorsMatch[1].trim();
+  
+  const tcmMatch=text.match(/## 🌿 中医体质辨识[\s\S]*?\n([\s\S]*?)(?=##|$)/);
+  if(tcmMatch) sections.tcm=tcmMatch[1].trim();
+  
+  const foodMatch=text.match(/## 🍲 食疗调理方案[\s\S]*?\n([\s\S]*?)(?=##|$)/);
+  if(foodMatch) sections.foodTherapy=foodMatch[1].trim();
+  
+  const exerciseMatch=text.match(/## 🏃 运动调理方案[\s\S]*?\n([\s\S]*?)(?=##|$)/);
+  if(exerciseMatch) sections.exercise=exerciseMatch[1].trim();
+  
+  const checkinMatch=text.match(/## 📋 21天健康打卡计划[\s\S]*?\n([\s\S]*?)(?=##|$)/);
+  if(checkinMatch) sections.checkinPlan=checkinMatch[1].trim();
+  
+  const adviceMatch=text.match(/## ⚠️ 就医建议[\s\S]*?\n([\s\S]*?)(?=##|$)/);
+  if(adviceMatch) sections.medicalAdvice=adviceMatch[1].trim();
+  
+  // 显示解析预览
+  let previewHtml='<h4 style="color:var(--success);margin-bottom:12px">✅ 解析结果预览</h4>';
+  if(sections.summary) previewHtml+=`<div class="parse-section"><h5>📋 报告解读摘要</h5><p style="font-size:13px;line-height:1.7">${sections.summary}</p></div>`;
+  if(sections.foodTherapy) previewHtml+=`<div class="parse-section"><h5>🍲 食疗调理方案</h5><p style="font-size:13px;line-height:1.7">已识别食疗方案，可导入食疗模块</p></div>`;
+  if(sections.exercise) previewHtml+=`<div class="parse-section"><h5>🏃 运动调理方案</h5><p style="font-size:13px;line-height:1.7">已识别运动方案，可导入打卡模块</p></div>`;
+  if(sections.checkinPlan) previewHtml+=`<div class="parse-section"><h5>📋 21天打卡计划</h5><p style="font-size:13px;line-height:1.7">已识别打卡计划，可导入打卡模块</p></div>`;
+  if(sections.medicalAdvice) previewHtml+=`<div class="parse-section"><h5>⚠️ 就医建议</h5><p style="font-size:13px;line-height:1.7;color:var(--danger)">${sections.medicalAdvice}</p></div>`;
+  
+  previewHtml+=`<div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+    <button class="btn btn-success btn-sm" onclick="importFoodTherapy()">🍲 导入食疗模块</button>
+    <button class="btn btn-success btn-sm" onclick="importExercisePlan()">🏃 导入运动方案</button>
+    <button class="btn btn-success btn-sm" onclick="importCheckinPlan()">📋 导入打卡计划</button>
+  </div>`;
+  
+  document.getElementById('parsePreview').innerHTML=previewHtml;
+  document.getElementById('parsePreview').style.display='block';
+  
+  // 保存到localStorage
+  aiInterpretHistory.unshift({
+    date:new Date().toISOString(),
+    summary:sections.summary,
+    fullText:text
+  });
+  if(aiInterpretHistory.length>5) aiInterpretHistory=aiInterpretHistory.slice(0,5);
+  localStorage.setItem('aiInterpretHistory',JSON.stringify(aiInterpretHistory));
+  
+  showToast('✅ AI解读结果已解析，可选择导入各模块');
+  
+  // 更新Step3状态
+  document.getElementById('aiStep3').classList.add('completed');
+}
+
+function clearAIResult(){
+  if(confirm('确定要清空已粘贴的解读结果吗？')){
+    document.getElementById('aiResultText').value='';
+    document.getElementById('parsePreview').style.display='none';
+    document.getElementById('parseBtn').disabled=true;
+  }
+}
+
+function importFoodTherapy(){
+  showToast('✅ 食疗方案已标记，请在「食疗配方」Tab查看');
+  // 这里可以扩展：实际解析食疗配方并添加到食谱库
+}
+
+function importExercisePlan(){
+  showToast('✅ 运动方案已标记，请在「运动调理」Tab查看');
+  // 切换到运动调理Tab
+  switchTab('exercise');
+}
+
+function importCheckinPlan(){
+  showToast('✅ 打卡计划已标记，请在「每日打卡」Tab查看');
+  // 切换到打卡Tab
+  switchTab('checkin');
+}
+
+// ═══════════════════════════════════════════════
+// 运动调理方案功能
+// ═══════════════════════════════════════════════
+const EXERCISE_LIBRARY = [
+  {name:'快走',type:'有氧运动',duration:30,intensity:'low',calories:150,notes:'适合大多数人群，注意穿舒适运动鞋'},
+  {name:'慢跑',type:'有氧运动',duration:30,intensity:'medium',calories:250,notes:'膝盖不适者改为快走或游泳'},
+  {name:'游泳',type:'有氧运动',duration:30,intensity:'medium',calories:300,notes:'对关节友好，适合有关节问题者'},
+  {name:'骑车',type:'有氧运动',duration:40,intensity:'medium',calories:280,notes:'户外或动感单车均可'},
+  {name:'跳绳',type:'有氧运动',duration:15,intensity:'high',calories:200,notes:'注意膝盖保护，初学者循序渐进'},
+  {name:'深蹲',type:'力量训练',duration:10,intensity:'medium',calories:80,notes:'注意姿势正确，膝盖不超过脚尖'},
+  {name:'俯卧撑',type:'力量训练',duration:10,intensity:'medium',calories:60,notes:'初学者可从跪姿俯卧撑开始'},
+  {name:'平板支撑',type:'力量训练',duration:5,intensity:'medium',calories:40,notes:'核心训练，注意保持身体一条直线'},
+  {name:'哑铃训练',type:'力量训练',duration:20,intensity:'medium',calories:120,notes:'选择适当重量，注意动作规范'},
+  {name:'八段锦',type:'柔韧训练',duration:20,intensity:'low',calories:80,notes:'传统养生功法，适合各年龄段'},
+  {name:'太极拳',type:'柔韧训练',duration:30,intensity:'low',calories:100,notes:'缓慢柔和，调节身心'},
+  {name:'瑜伽',type:'柔韧训练',duration:30,intensity:'low',calories:120,notes:'注意呼吸配合，勿强行拉伸'},
+  {name:'拉伸',type:'柔韧训练',duration:15,intensity:'low',calories:30,notes:'运动前后均应进行拉伸'},
+  {name:'腹式呼吸',type:'呼吸训练',duration:10,intensity:'low',calories:10,notes:'放松身心，改善焦虑'},
+  {name:'六字诀',type:'呼吸训练',duration:15,intensity:'low',calories:20,notes:'传统养生呼吸法，对应五脏六腑'},
+  {name:'冥想',type:'呼吸训练',duration:15,intensity:'low',calories:15,notes:'减轻压力，改善睡眠'}
+];
+
+const WEEKLY_EXERCISE_PLAN = [
+  {day:'周一',exercises:[{name:'快走',duration:30,intensity:'low'},{name:'八段锦',duration:20,intensity:'low'}]},
+  {day:'周二',exercises:[{name:'慢跑',duration:30,intensity:'medium'},{name:'拉伸',duration:15,intensity:'low'}]},
+  {day:'周三',exercises:[{name:'游泳',duration:30,intensity:'medium'},{name:'腹式呼吸',duration:10,intensity:'low'}]},
+  {day:'周四',exercises:[{name:'骑车',duration:40,intensity:'medium'},{name:'瑜伽',duration:20,intensity:'low'}]},
+  {day:'周五',exercises:[{name:'快走',duration:30,intensity:'low'},{name:'平板支撑',duration:5,intensity:'medium'}]},
+  {day:'周六',exercises:[{name:'太极拳',duration:30,intensity:'low'},{name:'拉伸',duration:15,intensity:'low'}]},
+  {day:'周日',exercises:[{name:'冥想',duration:15,intensity:'low'},{name:'六字诀',duration:15,intensity:'low'}]}
+];
+
+function renderExerciseWeekGrid(){
+  const grid=document.getElementById('exerciseWeekGrid');
+  if(!grid) return;
+  let html='';
+  const todayIdx=new Date().getDay(); // 0=周日, 1=周一...
+  const todayMap={0:6,1:0,2:1,3:2,4:3,5:4,6:5}; // 转换为周一到周日
+  
+  WEEKLY_EXERCISE_PLAN.forEach((day,idx)=>{
+    const isToday=idx===todayMap[todayIdx];
+    html+=`<div class="exercise-day-card${isToday?' selected':''}" onclick="toggleExerciseDay(this)">
+      <div class="exercise-day-name">${day.day}${isToday?' ★':''}</div>`;
+    day.exercises.forEach(ex=>{
+      const intensityClass=ex.intensity==='low'?'intensity-low':ex.intensity==='medium'?'intensity-medium':'intensity-high';
+      html+=`<div class="exercise-item"><span class="ex-name">${ex.name}</span> <span class="${intensityClass}">${ex.intensity==='low'?'低':ex.intensity==='medium'?'中':'高'}</span></div>`;
+    });
+    html+='</div>';
+  });
+  grid.innerHTML=html;
+}
+
+function toggleExerciseDay(el){
+  // 可以扩展：点击后显示该日运动详情
+  document.querySelectorAll('.exercise-day-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function renderExerciseLibrary(){
+  const lib=document.getElementById('exerciseLibrary');
+  if(!lib) return;
+  
+  const types=['有氧运动','力量训练','柔韧训练','呼吸训练'];
+  let html='';
+  
+  types.forEach(type=>{
+    const exercises=EXERCISE_LIBRARY.filter(e=>e.type===type);
+    exercises.forEach(ex=>{
+      const intensityClass=ex.intensity==='low'?'intensity-low':ex.intensity==='medium'?'intensity-medium':'intensity-high';
+      html+=`<div class="exercise-card" onclick="toggleExerciseSelect(this)">
+        <div class="ex-type">${type}</div>
+        <div class="ex-name">${ex.name}</div>
+        <div class="ex-cal">${ex.duration}分钟 | <span class="${intensityClass}">${ex.intensity==='low'?'低强度':ex.intensity==='medium'?'中强度':'高强度'}</span> | ~${ex.calories}卡</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px">${ex.notes}</div>
+      </div>`;
+    });
+  });
+  
+  lib.innerHTML=html;
+}
+
+function toggleExerciseSelect(el){
+  el.classList.toggle('selected');
+}
+
+function importExerciseToCheckin(){
+  const today=getTodayKey();
+  let data=JSON.parse(localStorage.getItem('checkinData')||'{}');
+  if(!data[today]) data[today]={};
+  
+  // 获取今日推荐运动
+  const todayIdx=new Date().getDay();
+  const todayMap={0:6,1:0,2:1,3:2,4:3,5:4,6:5};
+  const todayPlan=WEEKLY_EXERCISE_PLAN[todayMap[todayIdx]];
+  
+  if(todayPlan){
+    const exerciseDesc=todayPlan.exercises.map(e=>e.name+'('+e.duration+'分钟)').join('、');
+    data[today]['运动']=exerciseDesc;
+    localStorage.setItem('checkinData',JSON.stringify(data));
+    showToast('✅ 今日运动计划已导入打卡');
+    switchTab('checkin');
+  }
+}
+
+// ═══════════════════════════════════════════════
+// Tab切换（更新版）
+// ═══════════════════════════════════════════════
+function switchTab(name){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  
+  const tabOrder=['overview','report','ai','food','exercise','checkin','bazi','symptom'];
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{if(tabOrder[i]===name){b.classList.add('active')}});
+  
+  const panel=document.getElementById('tab-'+name);
+  if(panel) panel.classList.add('active');
+  
+  // Show/hide shared result
+  const showShared = ['bazi','symptom'].includes(name);
+  const sharedEl=document.getElementById('sharedResult');
+  if(sharedEl) sharedEl.style.display = showShared ? 'block' : 'none';
+  
+  const detailEl=document.getElementById('detailSection');
+  if(detailEl) detailEl.style.display = showShared ? 'none' : 'block';
+  
+  if(name==='checkin'){renderCheckin();}
+  if(name==='food'){renderRecipeLibrary();renderWeeklyPlan();}
+  if(name==='exercise'){renderExerciseWeekGrid();renderExerciseLibrary();}
+  if(name==='ai'){/* AI解读Tab已渲染 */}
+}
+
+// ═══════════════════════════════════════════════
+// 初始化（更新版）
+// ═══════════════════════════════════════════════
+renderChain();
+renderDetailCards();
+renderDiseaseTags();
+renderRecipeLibrary();
+renderWeeklyPlan();
+renderExerciseWeekGrid();
+renderExerciseLibrary();
+</script>
+
+<div class="legal-footer">
+  <strong>📜 法律风险规避声明</strong>
+  一、本平台（易道智鉴）为传统文化研究平台，所有内容仅供学术参考和文化交流，<strong>不构成任何形式的医疗建议、处方或诊断结论</strong>。<br>
+  二、中医五行学说为中华传统文化遗产，其体质分类与调理建议基于古籍文献整理，<strong>不可替代现代医学诊疗</strong>。<br>
+  三、平台推荐的食材、药膳、药方仅供了解传统养生文化，<strong>实际使用须在执业中医师/营养师指导下进行</strong>。<br>
+  四、用户因自行使用本平台信息产生的一切后果，平台方不承担法律责任。身体出现不适请<strong>立即就医</strong>。<br>
+  五、孕妇、哺乳期女性、婴幼儿、慢性病及重症患者<strong>严禁</strong>参照本平台建议自行调理。
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="feature-nav-bar">
+  <div style="max-width:1100px;margin:0 auto;padding:14px 20px">
+    <div style="font-size:12px;color:#a09080;margin-bottom:10px;letter-spacing:2px">—— 易道智鉴 · 平台功能导航 ——</div>
+    <div class="feature-nav-cards">
+      <a class="fn-card" href="divination-hub.html">
+        <span class="fn-icon">🏠</span>
+        <span class="fn-name">命理总览</span>
+        <span class="fn-desc">八字·六爻·风水·姓名</span>
+      </a>
+      <a class="fn-card" href="divination-hub.html#fengshui">
+        <span class="fn-icon">🏔️</span>
+        <span class="fn-name">风水堪舆</span>
+        <span class="fn-desc">阳宅阴宅·方位布局</span>
+      </a>
+      <a class="fn-card" href="divination-hub.html#xingming">
+        <span class="fn-icon">✍️</span>
+        <span class="fn-name">改名取名</span>
+        <span class="fn-desc">八字配合·五格数理</span>
+      </a>
+      <a class="fn-card" href="divination-hub.html#company">
+        <span class="fn-icon">🏢</span>
+        <span class="fn-name">公司起名</span>
+        <span class="fn-desc">品牌命名·工商核名</span>
+      </a>
+      <a class="fn-card" href="divination-hub.html#huxing">
+        <span class="fn-icon">🏗️</span>
+        <span class="fn-name">户型鉴别</span>
+        <span class="fn-desc">选房看宅·吉凶判断</span>
+      </a>
+      <a class="fn-card" href="divination-almanac.html">
+        <span class="fn-icon">📅</span>
+        <span class="fn-name">黄历</span>
+        <span class="fn-desc">每日宜忌·时辰吉凶</span>
+      </a>
+      <a class="fn-card" href="divination-knowledge.html">
+        <span class="fn-icon">📚</span>
+        <span class="fn-name">易学知识</span>
+        <span class="fn-desc">权威体系·通俗解读</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

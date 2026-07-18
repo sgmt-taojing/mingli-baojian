@@ -1,0 +1,1901 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#080808">
+<title>易道智鉴 · 简化版</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#080808;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;
+  --paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;
+  --gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;
+  --cinn:#c0392b;--cinn2:#e74c3c;
+  --cyan:#2980b9;--cyan2:#5dade2;
+  --jade:#27ae60;--jade2:#2ecc71;
+  --violet:#8e44ad;
+  --orange:#e67e22;
+  --steel:#7f8c8d;
+  --metal:#95a5a6;
+  --font:'Noto Serif SC','Source Han Serif SC',serif;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes shimmer{0%{opacity:.6}50%{opacity:1}100%{opacity:.6}}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--ink);color:var(--paper);min-height:100vh;overflow-x:hidden}
+
+/* ─── TOP NAV ─── */
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(8,8,8,.97);backdrop-filter:blur(12px);border-bottom:1px solid rgba(201,168,76,.08);height:56px;display:flex;align-items:center;padding:0 20px}
+.nav-brand{font-family:'Ma Shan Zheng',serif;font-size:20px;color:var(--gold);letter-spacing:6px;flex-shrink:0}
+.nav-tabs{display:flex;gap:0;margin-left:32px;flex:1;overflow-x:auto;scrollbar-width:none}
+.nav-tabs::-webkit-scrollbar{display:none}
+.nav-tab{padding:16px 16px;font-size:12px;letter-spacing:2px;cursor:pointer;color:var(--paper3);border:none;background:none;font-family:var(--font);white-space:nowrap;transition:all .25s;position:relative;border-bottom:2px solid transparent}
+.nav-tab:hover{color:var(--paper2)}
+.nav-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* ─── MAIN ─── */
+.main{margin-top:56px}
+
+/* ─── PAGE SECTIONS ─── */
+.page{display:none;min-height:calc(100vh - 56px - 70px);padding:32px 20px 100px;max-width:900px;margin:0 auto;animation:fadeUp .5s ease}
+.page.active{display:block}
+
+/* ─── HOME ─── */
+.home-greeting{text-align:center;padding:32px 0 24px}
+.home-greeting .hg-eyebrow{font-size:11px;letter-spacing:6px;text-transform:uppercase;color:var(--gold);opacity:.5;margin-bottom:12px}
+.home-greeting .hg-title{font-family:'Ma Shan Zheng',serif;font-size:clamp(36px,8vw,60px);letter-spacing:8px;text-shadow:0 0 40px rgba(201,168,76,.15)}
+.home-greeting .hg-sub{font-size:13px;color:var(--paper3);letter-spacing:3px;margin-top:10px}
+
+/* 今日运势速览 */
+.today-panel{background:rgba(255,255,255,.025);border:1px solid rgba(201,168,76,.1);border-radius:12px;padding:20px 24px;margin-bottom:28px;text-align:center}
+.today-panel .tp-date{font-size:12px;letter-spacing:4px;color:var(--gold);opacity:.6;margin-bottom:8px}
+.today-panel .tp-label{font-size:13px;letter-spacing:3px;opacity:.5;margin-bottom:6px}
+.today-panel .tp-score{font-family:'Ma Shan Zheng',serif;font-size:52px;color:var(--gold);text-shadow:0 0 30px rgba(201,168,76,.3);line-height:1}
+.today-panel .tp-desc{font-size:13px;opacity:.6;margin-top:8px;letter-spacing:2px}
+.today-panel .tp-tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.tp-tag{padding:4px 12px;border:1px solid rgba(201,168,76,.15);font-size:10px;letter-spacing:2px;opacity:.5;border-radius:20px}
+
+/* 场景卡片网格 */
+.scene-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.scene-card{position:relative;padding:24px 20px;border:1px solid rgba(201,168,76,.1);background:rgba(255,255,255,.02);cursor:pointer;transition:all .35s ease;text-align:left;border-radius:10px;overflow:hidden}
+.scene-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .35s;pointer-events:none}
+.scene-card:hover{transform:translateY(-2px);border-color:rgba(201,168,76,.3)}
+.scene-card:hover::before{opacity:1}
+.scene-card .sc-icon{font-size:36px;margin-bottom:12px;display:block}
+.scene-card .sc-name{font-family:'Ma Shan Zheng',serif;font-size:20px;letter-spacing:4px;margin-bottom:4px}
+.scene-card .sc-en{font-size:10px;letter-spacing:3px;text-transform:uppercase;opacity:.35;margin-bottom:10px;display:block}
+.scene-card .sc-desc{font-size:12px;opacity:.5;line-height:1.7;letter-spacing:1px}
+
+/* 卡片配色 */
+.scene-card.bazi::before{background:linear-gradient(135deg,rgba(41,128,185,.06) 0%,transparent 60%)}
+.scene-card.bazi .sc-name{color:var(--cyan)}
+.scene-card.career::before{background:linear-gradient(135deg,rgba(201,168,76,.06) 0%,transparent 60%)}
+.scene-card.career .sc-name{color:var(--gold)}
+.scene-card.love::before{background:linear-gradient(135deg,rgba(231,76,60,.06) 0%,transparent 60%)}
+.scene-card.love .sc-name{color:var(--cinn2)}
+.scene-card.wealth::before{background:linear-gradient(135deg,rgba(39,174,96,.06) 0%,transparent 60%)}
+.scene-card.wealth .sc-name{color:var(--jade2)}
+.scene-card.fengshui::before{background:linear-gradient(135deg,rgba(142,68,173,.06) 0%,transparent 60%)}
+.scene-card.fengshui .sc-name{color:var(--violet)}
+.scene-card.lucky::before{background:linear-gradient(135deg,rgba(230,126,34,.06) 0%,transparent 60%)}
+.scene-card.lucky .sc-name{color:var(--orange)}
+
+/* ─── SECTION HEADER ─── */
+.section-hdr{text-align:center;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid rgba(201,168,76,.08)}
+.section-hdr .sh-icon{font-family:'Ma Shan Zheng',serif;font-size:44px;margin-bottom:10px;display:block}
+.section-hdr .sh-title{font-family:'Ma Shan Zheng',serif;font-size:clamp(24px,5vw,36px);letter-spacing:6px}
+.section-hdr .sh-en{font-size:10px;letter-spacing:4px;text-transform:uppercase;opacity:.35;margin-bottom:8px;display:block}
+.section-hdr .sh-desc{font-size:12px;opacity:.4;letter-spacing:2px;line-height:1.7}
+
+/* ─── INPUT CARD ─── */
+.input-card{background:rgba(255,255,255,.025);border:1px solid rgba(201,168,76,.1);border-radius:12px;padding:24px 20px;margin-bottom:20px}
+.input-card h3{font-family:'Ma Shan Zheng',serif;font-size:18px;color:var(--paper2);letter-spacing:4px;margin-bottom:16px;text-align:center}
+.input-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:10px}
+.input-field{background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.12);color:var(--paper);font-family:var(--font);font-size:13px;padding:10px 14px;letter-spacing:2px;outline:none;transition:all .3s;min-width:130px;text-align:center;appearance:none;-webkit-appearance:none;border-radius:6px}
+.input-field:focus{border-color:var(--gold);box-shadow:0 0 16px rgba(201,168,76,.1)}
+.input-field::placeholder{opacity:.25}
+.input-field[type="date"]{color-scheme:dark}
+select.input-field{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23c9a84c' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
+select.input-field option{background:var(--ink2)}
+
+.cal-toggle{display:flex;justify-content:center;gap:0;margin-bottom:14px}
+.cal-btn{padding:7px 20px;font-size:12px;letter-spacing:3px;border:1px solid rgba(201,168,76,.15);background:rgba(255,255,255,.03);color:var(--paper3);cursor:pointer;transition:all .25s;font-family:var(--font);border-radius:20px}
+.cal-btn:first-child{border-radius:20px 0 0 20px}
+.cal-btn:last-child{border-radius:0 20px 20px 0}
+.cal-btn.active{background:rgba(201,168,76,.12);border-color:var(--gold);color:var(--gold)}
+.cal-btn:hover:not(.active){border-color:rgba(201,168,76,.3);color:var(--paper2)}
+.cal-panel{display:none}
+.cal-panel.active{display:block}
+
+.sex-row{display:flex;justify-content:center;gap:16px;margin-bottom:14px}
+.sex-btn{padding:10px 32px;border:1px solid rgba(201,168,76,.15);background:rgba(255,255,255,.02);color:var(--paper3);cursor:pointer;transition:all .25s;font-family:var(--font);font-size:13px;letter-spacing:3px;border-radius:8px;display:flex;align-items:center;gap:8px}
+.sex-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.08)}
+.sex-btn:hover:not(.active){border-color:rgba(201,168,76,.3);color:var(--paper2)}
+.sex-btn input[type="radio"]{display:none}
+
+.compute-btn{padding:12px 40px;background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:var(--font);font-size:14px;letter-spacing:5px;cursor:pointer;transition:all .35s;display:block;margin:16px auto 0;border-radius:6px}
+.compute-btn:hover:not(:disabled){background:var(--gold);color:var(--ink);box-shadow:0 0 30px rgba(201,168,76,.25)}
+.compute-btn:disabled{opacity:.35;cursor:not-allowed}
+
+/* ─── RESULT ─── */
+.result{display:none;animation:fadeUp .7s ease}
+.result.visible{display:block}
+
+/* Result banner */
+.result-banner{text-align:center;margin-bottom:28px;padding:24px 20px;border-bottom:1px solid rgba(201,168,76,.08);border-radius:10px}
+.rb-name{font-family:'Ma Shan Zheng',serif;font-size:clamp(28px,5vw,42px);letter-spacing:8px}
+.rb-meta{font-size:12px;letter-spacing:3px;opacity:.4;font-weight:300;margin-top:8px}
+.rb-tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.rb-tag{padding:4px 12px;border:1px solid rgba(201,168,76,.15);font-size:10px;letter-spacing:2px;opacity:.5;border-radius:20px}
+
+/* ─── PILLAR CHART (四柱展示) ─── */
+.pillar-chart{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);border-radius:10px;margin-bottom:20px;overflow:hidden}
+.pillar-header{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid rgba(201,168,76,.08)}
+.ph-col{padding:12px 8px;text-align:center;font-size:10px;letter-spacing:3px;text-transform:uppercase;opacity:.35;border-right:1px solid rgba(201,168,76,.05)}
+.ph-col:last-child{border-right:none}
+.pillar-row{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid rgba(201,168,76,.04)}
+.pillar-row:last-child{border-bottom:none}
+.pr-col{padding:16px 8px;text-align:center;border-right:1px solid rgba(201,168,76,.05);transition:background .2s}
+.pr-col:last-child{border-right:none}
+.pr-col:hover{background:rgba(201,168,76,.03)}
+.pr-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;opacity:.3;margin-bottom:8px}
+.pr-gan{font-family:'Ma Shan Zheng',serif;font-size:28px;letter-spacing:2px;line-height:1;margin-bottom:4px}
+.pr-zhi{font-family:'Ma Shan Zheng',serif;font-size:24px;letter-spacing:2px;line-height:1;margin-bottom:6px}
+.pr-ele{font-size:11px;letter-spacing:2px;opacity:.4}
+.pr-na{font-size:10px;letter-spacing:2px;opacity:.5;margin-top:4px}
+
+/* 天干地支颜色 */
+.gan-甲{color:var(--cyan)}.gan-乙{color:var(--jade)}.gan-丙{color:var(--cinn2)}.gan-丁{color:var(--cinn)}
+.gan-戊{color:var(--orange)}.gan-己{color:#a08060}.gan-庚{color:var(--metal)}.gan-辛{color:var(--steel)}
+.gan-壬{color:var(--cyan)}.gan-癸{color:var(--cyan2)}
+.zhi-子{color:var(--cyan2)}.zhi-丑{color:#a08060}.zhi-寅{color:var(--jade)}.zhi-卯{color:var(--jade2)}
+.zhi-辰{color:var(--orange)}.zhi-巳{color:var(--cinn2)}.zhi-午{color:var(--cinn)}.zhi-未{color:#a08060}
+.zhi-申{color:var(--metal)}.zhi-酉{color:var(--steel)}.zhi-戌{color:var(--orange)}.zhi-亥{color:var(--cyan)}
+
+/* ─── CHARTS ROW ─── */
+.charts-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:20px}
+
+/* 五行雷达图 */
+.wuxing-radar{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);border-radius:10px;padding:20px;text-align:center}
+.wuxing-radar h4{font-size:11px;letter-spacing:4px;text-transform:uppercase;opacity:.4;margin-bottom:16px}
+.radar-svg{width:220px;height:220px;margin:0 auto}
+
+/* 十神饼图 */
+.ten-gods-pie{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);border-radius:10px;padding:20px;text-align:center}
+.ten-gods-pie h4{font-size:11px;letter-spacing:4px;text-transform:uppercase;opacity:.4;margin-bottom:16px}
+.pie-svg{width:200px;height:200px;margin:0 auto}
+.pie-legend{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:12px}
+
+/* ─── ANALYSIS CARDS ─── */
+.analysis-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-bottom:20px}
+.analysis-card{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);border-radius:10px;padding:18px 20px;position:relative;overflow:hidden}
+.analysis-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;opacity:.2}
+.analysis-card.gold::before{background:var(--gold)}.analysis-card.cyan::before{background:var(--cyan)}
+.analysis-card.jade::before{background:var(--jade)}.analysis-card.cinn::before{background:var(--cinn2)}
+.analysis-card.violet::before{background:var(--violet)}.analysis-card.orange::before{background:var(--orange)}
+.analysis-card h5{font-size:10px;letter-spacing:4px;text-transform:uppercase;opacity:.4;margin-bottom:10px}
+.analysis-card p{font-size:13px;line-height:1.8;font-weight:300;letter-spacing:1px;opacity:.75}
+.classical-ref{margin-top:12px;padding:10px 14px;background:rgba(201,168,76,.06);border-left:2px solid var(--gold);font-size:12px;line-height:1.8;opacity:.7}
+
+/* 五行柱状图 */
+.ele-bar{display:flex;height:8px;border-radius:4px;overflow:hidden;gap:2px;margin:10px 0 8px}
+.ele-seg{border-radius:2px;transition:width .8s ease}
+.ele-木{background:#27ae60}.ele-火{background:#e74c3c}.ele-土{background:#e67e22}.ele-金{background:#95a5a6}.ele-水{background:#2980b9}
+.ele-legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.ele-l-item{font-size:11px;letter-spacing:2px;opacity:.45}
+
+/* 十神网格 */
+.ten-gods-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}
+.tg-item{padding:10px 6px;text-align:center;border:1px solid rgba(201,168,76,.07);border-radius:6px;transition:all .2s}
+.tg-item:hover{border-color:rgba(201,168,76,.2);background:rgba(201,168,76,.03)}
+.tg-gan{font-family:'Ma Shan Zheng',serif;font-size:18px;letter-spacing:1px;margin-bottom:4px}
+.tg-name{font-size:10px;letter-spacing:2px;opacity:.5}
+.tg-role{font-size:9px;letter-spacing:2px;opacity:.35;margin-top:4px}
+
+/* ─── AI ANALYSIS TABS ─── */
+.ai-tabs{display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid rgba(201,168,76,.08);overflow-x:auto;scrollbar-width:none}
+.ai-tabs::-webkit-scrollbar{display:none}
+.ai-tab{padding:10px 16px;font-size:12px;letter-spacing:2px;cursor:pointer;color:var(--paper3);border:none;background:none;font-family:var(--font);white-space:nowrap;position:relative;border-bottom:2px solid transparent;transition:all .25s}
+.ai-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.ai-tab:hover:not(.active){color:var(--paper2)}
+
+.ai-content{display:none}
+.ai-content.active{display:block}
+.ai-loading{text-align:center;padding:40px 20px;opacity:.6}
+.ai-loading .spinner{width:32px;height:32px;border:2px solid rgba(201,168,76,.1);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ai-loading p{font-size:13px;letter-spacing:3px;animation:shimmer 1.5s infinite}
+
+/* ─── DAYUN TABLE ─── */
+.dayun-section{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);border-radius:10px;padding:20px;margin-bottom:20px}
+.dayun-section h4{font-size:11px;letter-spacing:4px;text-transform:uppercase;opacity:.4;margin-bottom:14px;text-align:center}
+.dayun-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.dy-item{padding:14px 16px;border:1px solid rgba(201,168,76,.07);border-radius:8px;transition:all .2s;cursor:default}
+.dy-item:hover{border-color:rgba(201,168,76,.2);background:rgba(201,168,76,.03)}
+.dy-item.xi{border-color:rgba(39,174,96,.2);background:rgba(39,174,96,.03)}
+.dy-item.ji{border-color:rgba(231,76,60,.15);background:rgba(231,76,60,.03)}
+.dy-head{display:flex;justify-content:space-between;margin-bottom:6px}
+.dy-age{font-size:10px;letter-spacing:2px;opacity:.4}
+.dy-range{font-size:10px;letter-spacing:2px;opacity:.4}
+.dy-pillar{font-family:'Ma Shan Zheng',serif;font-size:20px;letter-spacing:3px;margin-bottom:4px}
+.dy-ganzhi{font-size:11px;letter-spacing:2px;opacity:.4;margin-bottom:6px}
+.dy-desc{font-size:11px;opacity:.4;line-height:1.6;font-weight:300}
+
+/* ─── WUXING EXPLAINER ─── */
+.wuxing-explainer{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:20px}
+.we-card{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);border-radius:8px;padding:16px;text-align:center}
+.we-card h5{font-family:'Ma Shan Zheng',serif;font-size:20px;letter-spacing:3px;margin-bottom:8px}
+.we-card p{font-size:11px;opacity:.4;line-height:1.6;letter-spacing:1px}
+.we-木 h5{color:#27ae60}.we-火 h5{color:#e74c3c}.we-土 h5{color:#e67e22}.we-金 h5{color:#95a5a6}.we-水 h5{color:#2980b9}
+
+/* 五行相生相克图 */
+.wuxing-cycle{margin-bottom:20px}
+.wuxing-cycle h4{font-size:11px;letter-spacing:4px;text-transform:uppercase;opacity:.4;margin-bottom:14px;text-align:center}
+.cycle-svg{width:100%;max-width:400px;margin:0 auto;display:block}
+
+/* ─── BACK BTN ─── */
+.back-row{text-align:center;margin:28px 0 16px}
+.back-btn{padding:11px 36px;border:1px solid rgba(201,168,76,.2);background:transparent;color:var(--paper3);font-family:var(--font);font-size:13px;letter-spacing:4px;cursor:pointer;transition:all .3s;border-radius:6px}
+.back-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ─── WARNINGS ─── */
+.warn-banner{background:rgba(231,76,60,.04);border:1px solid rgba(231,76,60,.15);border-radius:8px;padding:16px 20px;margin-bottom:16px}
+.warn-title{font-size:11px;letter-spacing:4px;text-transform:uppercase;opacity:.6;margin-bottom:10px;color:#e74c3c}
+.warn-red{background:rgba(231,76,60,.05);border-left:3px solid #e74c3c;padding:8px 12px;font-size:12px;opacity:.8;line-height:1.7;margin-bottom:6px;border-radius:0 4px 4px 0}
+.warn-yellow{background:rgba(230,126,34,.04);border-left:3px solid #e67e22;padding:8px 12px;font-size:12px;opacity:.8;line-height:1.7;margin-bottom:6px;border-radius:0 4px 4px 0}
+.warn-green{background:rgba(39,174,96,.04);border-left:3px solid #27ae60;padding:8px 12px;font-size:12px;opacity:.8;line-height:1.7;border-radius:0 4px 4px 0}
+
+/* ─── KNOWLEDGE PAGE ─── */
+.knowledge-section{text-align:center;padding:20px 0}
+.knowledge-section h2{font-family:'Ma Shan Zheng',serif;font-size:28px;letter-spacing:6px;margin-bottom:24px}
+.koujue-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.koujue-card{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.1);border-radius:10px;padding:18px;cursor:pointer;transition:all .3s;text-align:left}
+.koujue-card:hover{border-color:rgba(201,168,76,.3);transform:translateY(-1px)}
+.koujue-card h4{font-size:15px;color:var(--gold);margin-bottom:6px;font-weight:500}
+.koujue-card p{font-size:12px;opacity:.5;line-height:1.7}
+.koujue-detail{background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.15);border-radius:10px;padding:20px;margin-top:12px;animation:fadeUp .3s}
+.koujue-detail h5{font-size:12px;color:var(--gold);letter-spacing:3px;margin-bottom:12px}
+.koujue-detail pre{font-size:13px;line-height:2;opacity:.8;white-space:pre-wrap;font-family:var(--font)}
+
+/* ─── 智语宝库 ─── */
+.wisdom-section{padding:0 0 32px}
+.wisdom-section h2{font-family:'Ma Shan Zheng',serif;font-size:24px;letter-spacing:5px;margin-bottom:20px}
+.wisdom-quote{display:block;background:rgba(255,255,255,.03);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:10px;text-align:left;cursor:pointer;transition:all .3s}
+.wisdom-quote:hover{background:rgba(201,168,76,.06);border-left-color:var(--violet2)}
+.wisdom-quote .wq-text{font-size:13px;line-height:1.9;color:var(--paper2);font-family:'Noto Serif SC',serif}
+.wisdom-quote .wq-source{font-size:11px;opacity:.45;margin-top:6px;letter-spacing:2px}
+.wisdom-quote .wq-tag{display:inline-block;background:rgba(201,168,76,.1);color:var(--gold);font-size:10px;padding:2px 8px;border-radius:20px;margin-top:6px;letter-spacing:1px}
+.wisdom-quote.dao{background:rgba(76,175,80,.04);border-left-color:#27ae60}
+.wisdom-quote.dao:hover{border-left-color:#2ecc71}
+.wisdom-quote.dao .wq-tag{background:rgba(76,175,80,.12);color:#27ae60}
+.wisdom-quote.buddha{background:rgba(155,89,182,.04);border-left-color:#8e44ad}
+.wisdom-quote.buddha:hover{border-left-color:#9b59b6}
+.wisdom-quote.buddha .wq-tag{background:rgba(155,89,182,.12);color:#9b59b6}
+.wisdom-quote.confucian{background:rgba(201,168,76,.04);border-left-color:#c9a84c}
+.wisdom-quote.confucian:hover{border-left-color:#e0b84a}
+.wisdom-quote.confucian .wq-tag{background:rgba(201,168,76,.12);color:#c9a84c}
+.wisdom-quote.life{background:rgba(52,152,219,.04);border-left-color:#2980b9}
+.wisdom-quote.life:hover{border-left-color:#3498db}
+.wisdom-quote.life .wq-tag{background:rgba(52,152,219,.12);color:#2980b9}
+
+/* ─── 每日慧语(首页) ─── */
+.daily-wisdom{margin:16px 0 0;padding:20px;background:rgba(255,255,255,.025);border:1px solid rgba(201,168,76,.1);border-radius:12px;text-align:left}
+.daily-wisdom .dw-label{font-size:10px;letter-spacing:4px;opacity:.4;margin-bottom:10px}
+.daily-wisdom .dw-text{font-family:'Noto Serif SC',serif;font-size:14px;line-height:2;color:var(--paper2);margin-bottom:8px}
+.daily-wisdom .dw-source{font-size:11px;opacity:.4;letter-spacing:2px}
+.daily-wisdom .dw-nav{display:flex;gap:8px;margin-top:12px}
+.daily-wisdom .dw-nav button{background:transparent;border:1px solid rgba(201,168,76,.2);color:var(--gold);padding:4px 14px;font-size:11px;border-radius:20px;cursor:pointer;transition:all .2s}
+.daily-wisdom .dw-nav button:hover{background:rgba(201,168,76,.1)}
+
+/* ─── 手印教学 ─── */
+.mudra-section{padding:0 0 32px}
+.mudra-section h2{font-family:'Ma Shan Zheng',serif;font-size:24px;letter-spacing:5px;margin-bottom:20px}
+.mudra-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.mudra-tab{padding:6px 16px;background:transparent;border:1px solid rgba(201,168,76,.2);color:var(--paper3);font-size:12px;border-radius:20px;cursor:pointer;transition:all .2s}
+.mudra-tab.active{background:rgba(201,168,76,.12);color:var(--gold);border-color:var(--gold)}
+.mudra-card{background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.1);border-radius:12px;padding:20px;margin-bottom:12px;text-align:left}
+.mudra-card h4{font-size:15px;color:var(--gold);margin-bottom:6px}
+.mudra-card .mc-emoji{font-size:28px;margin-bottom:8px}
+.mudra-card p{font-size:12px;opacity:.7;line-height:1.8}
+.mudra-card .mc-use{font-size:11px;color:#27ae60;margin-top:6px;letter-spacing:1px}
+.mudra-card .mc-note{font-size:11px;opacity:.45;margin-top:4px;font-style:italic}
+
+/* ─── SHOP PAGE ─── */
+.shop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.shop-card{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);border-radius:10px;padding:20px;text-align:center;transition:all .3s}
+.shop-card:hover{border-color:rgba(201,168,76,.25)}
+.shop-icon{font-size:40px;margin-bottom:12px}
+.shop-card h4{font-size:15px;letter-spacing:3px;margin-bottom:8px}
+.shop-card p{font-size:12px;opacity:.5;line-height:1.7}
+.shop-card .shop-price{font-family:'Ma Shan Zheng',serif;font-size:22px;color:var(--gold);margin-top:12px}
+
+/* ─── MEMBER PAGE ─── */
+.member-info{text-align:center;padding:32px 20px;background:rgba(255,255,255,.025);border:1px solid rgba(201,168,76,.1);border-radius:12px;margin-bottom:24px}
+.member-info .mi-avatar{font-size:56px;margin-bottom:16px}
+.member-info h3{font-family:'Ma Shan Zheng',serif;font-size:24px;letter-spacing:6px;margin-bottom:8px}
+.member-info .mi-level{font-size:12px;letter-spacing:3px;color:var(--gold);opacity:.7;margin-bottom:12px}
+.member-info p{font-size:12px;opacity:.5;letter-spacing:2px}
+
+/* ─── BOTTOM NAV ─── */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(8,8,8,.97);backdrop-filter:blur(12px);border-top:1px solid rgba(201,168,76,.08);display:flex;height:60px}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;color:var(--paper3);transition:all .2s;border:none;background:none;font-family:var(--font);font-size:10px;letter-spacing:1px}
+.bn-item.active{color:var(--gold)}
+.bn-item .bn-icon{font-size:20px}
+.bn-item:hover{color:var(--paper2)}
+
+/* ─── LUCKY DAY PAGE ─── */
+.lucky-input{text-align:center;padding:20px;max-width:500px;margin:0 auto}
+.lucky-result{margin-top:20px}
+
+/* ─── CAREER/LOVE/WEALTH SECTIONS ─── */
+.mini-analysis{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);border-radius:10px;padding:20px;margin-bottom:16px}
+.mini-analysis h4{font-family:'Ma Shan Zheng',serif;font-size:20px;letter-spacing:4px;margin-bottom:12px;text-align:center}
+.mini-analysis p{font-size:13px;line-height:1.9;opacity:.75;letter-spacing:1px}
+
+/* ─── FENGSHUI PAGE ─── */
+.fengshui-intro{text-align:center;padding:20px;background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);border-radius:10px;margin-bottom:20px}
+.fengshui-intro h3{font-family:'Ma Shan Zheng',serif;font-size:24px;letter-spacing:6px;margin-bottom:10px}
+.fengshui-intro p{font-size:12px;opacity:.5;letter-spacing:2px;line-height:1.7}
+.fengshui-guides{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.fs-guide{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all .3s}
+.fs-guide:hover{border-color:rgba(201,168,76,.3);transform:translateY(-1px)}
+.fs-guide .fsg-icon{font-size:36px;margin-bottom:12px}
+.fs-guide h4{font-size:16px;letter-spacing:3px;margin-bottom:8px}
+.fs-guide p{font-size:12px;opacity:.5;line-height:1.6}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(201,168,76,.12);border-radius:3px}
+
+/* ─── MORE PAGE ─── */
+.more-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;padding:20px 0}
+.more-card{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);border-radius:12px;padding:25px 15px;text-align:center;cursor:pointer;transition:all .3s}
+.more-card:hover{border-color:rgba(201,168,76,.3);transform:translateY(-2px);box-shadow:0 4px 20px rgba(201,168,76,.1)}
+.more-card .more-icon{font-size:40px;margin-bottom:12px}
+.more-card h4{font-family:'Ma Shan Zheng',serif;font-size:18px;letter-spacing:3px;margin-bottom:8px;color:var(--gold)}
+.more-card p{font-size:11px;opacity:.5;line-height:1.6;letter-spacing:1px}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:768px){
+  .nav-inner{padding:0 12px}
+  .nav-tabs{margin-left:12px}
+  .nav-tab{padding:14px 10px;font-size:11px;letter-spacing:1px}
+  .scene-grid{grid-template-columns:1fr 1fr}
+  .pillar-header,.pillar-row{grid-template-columns:repeat(2,1fr)}
+  .charts-row{grid-template-columns:1fr}
+  .ten-gods-grid{grid-template-columns:repeat(3,1fr)}
+  .dayun-grid{grid-template-columns:1fr 1fr}
+  .bottom-nav{height:56px}
+  .bottom-nav .bn-item{font-size:9px}
+}
+@media(max-width:480px){
+  .scene-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <div class="nav-brand">乾元命理</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-page="home">🏠 首页</button>
+    <button class="nav-tab" data-page="bazi">🔮 测八字</button>
+    <button class="nav-tab" data-page="knowledge">📚 知识库</button>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- ══════════════ HOME ══════════════ -->
+  <div class="page active" id="page-home">
+
+    <div class="home-greeting">
+      <div class="hg-eyebrow">易道智鉴 · 简化版</div>
+      <div class="hg-title">道法自然</div>
+      <div class="hg-sub">以易为本 · 以人为本</div>
+    </div>
+
+    <!-- 今日运势速览 -->
+    <div class="today-panel" id="todayPanel">
+      <div class="tp-date" id="tpDate"></div>
+      <div class="tp-label">今日综合运势</div>
+      <div class="tp-score" id="tpScore">—</div>
+      <div class="tp-desc" id="tpDesc"></div>
+      <div class="tp-tags" id="tpTags"></div>
+    </div>
+
+    <!-- 每日慧语 -->
+    <div class="daily-wisdom" id="dailyWisdom">
+      <div class="dw-label">✦ 每日慧语</div>
+      <div class="dw-text" id="dwText">道法自然，无为而治。顺天应人，随缘自在。</div>
+      <div class="dw-source" id="dwSource">—— 《道德经》</div>
+      <div class="dw-nav">
+        <button onclick="prevWisdom()">← 上一条</button>
+        <button onclick="shuffleWisdom()">换一批</button>
+        <button onclick="nextWisdom()">下一条 →</button>
+      </div>
+    </div>
+
+    <!-- 场景卡片 -->
+    <div class="scene-grid">
+      <div class="scene-card bazi" onclick="showPage('bazi')">
+        <span class="sc-icon">🔮</span>
+        <div class="sc-name">测八字</div>
+        <div class="sc-en">BaZi Analysis</div>
+        <div class="sc-desc">输入出生信息，AI深度解读命盘格局</div>
+      </div>
+      <div class="scene-card career" onclick="showPage('bazi')">
+        <span class="sc-icon">💼</span>
+        <div class="sc-name">看事业</div>
+        <div class="sc-en">Career Forecast</div>
+        <div class="sc-desc">事业方向、贵人运势、职场建议</div>
+      </div>
+      <div class="scene-card love" onclick="showPage('bazi')">
+        <span class="sc-icon">💕</span>
+        <div class="sc-name">算姻缘</div>
+        <div class="sc-en">Love & Marriage</div>
+        <div class="sc-desc">感情走势、婚配分析、桃花方位</div>
+      </div>
+      <div class="scene-card wealth" onclick="showPage('bazi')">
+        <span class="sc-icon">💰</span>
+        <div class="sc-name">财运分析</div>
+        <div class="sc-en">Wealth Analysis</div>
+        <div class="sc-desc">财位判断、投资建议、理财方向</div>
+      </div>
+      <div class="scene-card fengshui" onclick="showPage('fengshui')">
+        <span class="sc-icon">🏠</span>
+        <div class="sc-name">看风水</div>
+        <div class="sc-en">Feng Shui</div>
+        <div class="sc-desc">居家布局、旺宅指南、化解调理</div>
+      </div>
+      <div class="scene-card lucky" onclick="showPage('lucky')">
+        <span class="sc-icon">📅</span>
+        <div class="sc-name">选吉日</div>
+        <div class="sc-en">Auspicious Dates</div>
+        <div class="sc-desc">结婚搬家开业吉日推荐</div>
+      </div>
+    </div>
+
+    <!-- 五行速查 -->
+    <div style="margin-top:28px">
+      <div style="text-align:center;font-size:11px;letter-spacing:4px;text-transform:uppercase;opacity:.3;margin-bottom:14px">五行速查</div>
+      <div class="wuxing-explainer">
+        <div class="we-card we-木"><h5>木</h5><p>肝胆·仁慈·东方<br>春生·青色</p></div>
+        <div class="we-card we-火"><h5>火</h5><p>心脏·礼节·南方<br>夏长·赤色</p></div>
+        <div class="we-card we-土"><h5>土</h5><p>脾胃·信用·中央<br>长夏·黄色</p></div>
+        <div class="we-card we-金"><h5>金</h5><p>肺肠·义气·西方<br>秋收·白色</p></div>
+        <div class="we-card we-水"><h5>水</h5><p>肾膀·智谋·北方<br>冬藏·黑色</p></div>
+      </div>
+    </div>
+
+    <!-- 五行相生相克图 -->
+    <div class="wuxing-cycle" style="margin-top:20px">
+      <svg class="cycle-svg" viewBox="0 0 400 200">
+        <!-- 相生箭头 -->
+        <defs>
+          <marker id="sheng" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#27ae60" opacity=".6"/></marker>
+          <marker id="ke" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#e74c3c" opacity=".5"/></marker>
+        </defs>
+        <!-- 木生火 -->
+        <line x1="70" y1="55" x2="130" y2="95" stroke="#27ae60" stroke-width="1.5" marker-end="url(#sheng)" opacity=".5"/>
+        <!-- 火生土 -->
+        <line x1="195" y1="115" x2="205" y2="155" stroke="#e74c3c" stroke-width="1.5" marker-end="url(#sheng)" opacity=".5"/>
+        <!-- 土生金 -->
+        <line x1="265" y1="155" x2="330" y2="115" stroke="#e67e22" stroke-width="1.5" marker-end="url(#sheng)" opacity=".5"/>
+        <!-- 金生水 -->
+        <line x1="365" y1="95" x2="305" y2="55" stroke="#95a5a6" stroke-width="1.5" marker-end="url(#sheng)" opacity=".5"/>
+        <!-- 水生木 -->
+        <line x1="250" y1="35" x2="100" y2="35" stroke="#2980b9" stroke-width="1.5" marker-end="url(#sheng)" opacity=".5"/>
+        <!-- 木克土 -->
+        <line x1="85" y1="60" x2="190" y2="150" stroke="#27ae60" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#ke)" opacity=".4"/>
+        <!-- 土克水 -->
+        <line x1="220" y1="160" x2="300" y2="100" stroke="#e67e22" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#ke)" opacity=".4"/>
+        <!-- 水克火 -->
+        <line x1="330" y1="60" x2="205" y2="115" stroke="#2980b9" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#ke)" opacity=".4"/>
+        <!-- 火克金 -->
+        <line x1="130" y1="105" x2="80" y2="60" stroke="#e74c3c" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#ke)" opacity=".4"/>
+        <!-- 金克木 -->
+        <line x1="250" y1="35" x2="200" y2="135" stroke="#95a5a6" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#ke)" opacity=".4"/>
+        <!-- 元素圆 -->
+        <circle cx="55" cy="45" r="28" fill="rgba(39,174,96,.08)" stroke="#27ae60" stroke-width="1.5"/>
+        <text x="55" y="42" text-anchor="middle" font-size="16" font-family="'Ma Shan Zheng',serif" fill="#27ae60">木</text>
+        <text x="55" y="56" text-anchor="middle" font-size="9" fill="#27ae60" opacity=".6">肝胆</text>
+        <circle cx="175" cy="110" r="28" fill="rgba(231,76,60,.08)" stroke="#e74c3c" stroke-width="1.5"/>
+        <text x="175" y="107" text-anchor="middle" font-size="16" font-family="'Ma Shan Zheng',serif" fill="#e74c3c">火</text>
+        <text x="175" y="121" text-anchor="middle" font-size="9" fill="#e74c3c" opacity=".6">心脏</text>
+        <circle cx="220" cy="170" r="28" fill="rgba(230,126,34,.08)" stroke="#e67e22" stroke-width="1.5"/>
+        <text x="220" y="167" text-anchor="middle" font-size="16" font-family="'Ma Shan Zheng',serif" fill="#e67e22">土</text>
+        <text x="220" y="181" text-anchor="middle" font-size="9" fill="#e67e22" opacity=".6">脾胃</text>
+        <circle cx="355" cy="100" r="28" fill="rgba(149,165,166,.08)" stroke="#95a5a6" stroke-width="1.5"/>
+        <text x="355" y="97" text-anchor="middle" font-size="16" font-family="'Ma Shan Zheng',serif" fill="#95a5a6">金</text>
+        <text x="355" y="111" text-anchor="middle" font-size="9" fill="#95a5a6" opacity=".6">肺肠</text>
+        <circle cx="295" cy="30" r="28" fill="rgba(41,128,185,.08)" stroke="#2980b9" stroke-width="1.5"/>
+        <text x="295" y="27" text-anchor="middle" font-size="16" font-family="'Ma Shan Zheng',serif" fill="#2980b9">水</text>
+        <text x="295" y="41" text-anchor="middle" font-size="9" fill="#2980b9" opacity=".6">肾膀</text>
+        <!-- 图例 -->
+        <text x="10" y="195" font-size="9" fill="#27ae60" opacity=".6">─ 生</text>
+        <text x="50" y="195" font-size="9" fill="#e74c3c" opacity=".5" stroke-dasharray="2,2">─ 克</text>
+      </svg>
+    </div>
+
+    <!-- 天干地支对照图 -->
+    <div style="margin-top:20px;background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);border-radius:10px;padding:20px">
+      <div style="font-size:11px;letter-spacing:4px;text-transform:uppercase;opacity:.4;margin-bottom:14px;text-align:center">天干地支对照</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div>
+          <div style="font-size:10px;letter-spacing:3px;opacity:.3;margin-bottom:8px;text-align:center">十天干</div>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">
+            <div style="text-align:center;padding:8px 4px;border:1px solid rgba(201,168,76,.08);border-radius:4px"><div style="font-family:'Ma Shan Zheng',serif;font-size:18px;color:#2980b9">甲</div><div style="font-size:9px;opacity:.3">阳木</div></div>
+            <div style="text-align:center;padding:8px 4px;border:1px solid rgba(201,168,76,.08);border-radius:4px"><div style="font-family:'Ma Shan Zheng',serif;font-size:18px;color:#27ae60">乙</div><div style="font-size:9px;opacity:.3">阴木</div></div>
+            <div style="text-align:center;padding:8px 4px;border:1px solid rgba(201,168,76,.08);border-radius:4px"><div style="font-family:'Ma Shan Zheng',serif;font-size:18px;color:#e74c3c">丙</div><div style="font-size:9px;opacity:.3">阳火</div></div>
+            <div style="text-align:center;padding:8px 4px;border:1px solid rgba(201,168,76,.08);border-radius:4px"><div style="font-family:'Ma Shan Zheng',serif;font-size:18px;color:#c0392b">丁</div><div style="font-size:9px;opacity:.3">阴火</div></div>
+            <div style="text-align:center;padding:8px 4px;border:1px solid rgba(201,168,76,.08);border-radius:4px"><div style="font-family:'Ma Shan Zheng',serif;font-size:18px;color:#e67e22">戊</div><div style="font-size:9px;opacity:.3">阳土</div></div>
+            <div style="text-align:center;padding:8px 4px;border:1px solid rgba(201,168,76,.08);border-radius:4px"><div style="font-family:'Ma Shan Zheng',serif;font-size:18px;color:#a08060">己</div><div style="font-size:9px;opacity:.3">阴土</div></div>
+            <div style="text-align:center;padding:8px 4px;border:1px solid rgba(201,168,76,.08);border-radius:4px"><div style="font-family:'Ma Shan Zheng',serif;font-size:18px;color:#95a5a6">庚</div><div style="font-size:9px;opacity:.3">阳金</div></div>
+            <div style="text-align:center;padding:8px 4px;border:1px solid rgba(201,168,76,.08);border-radius:4px"><div style="font-family:'Ma Shan Zheng',serif;font-size:18px;color:#7f8c8d">辛</div><div style="font-size:9px;opacity:.3">阴金</div></div>
+            <div style="text-align:center;padding:8px 4px;border:1px solid rgba(201,168,76,.08);border-radius:4px"><div style="font-family:'Ma Shan Zheng',serif;font-size:18px;color:#2980b9">壬</div><div style="font-size:9px;opacity:.3">阳水</div></div>
+            <div style="text-align:center;padding:8px 4px;border:1px solid rgba(201,168,76,.08);border-radius:4px"><div style="font-family:'Ma Shan Zheng',serif;font-size:18px;color:#5dade2">癸</div><div style="font-size:9px;opacity:.3">阴水</div></div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:10px;letter-spacing:3px;opacity:.3;margin-bottom:8px;text-align:center">十二地支</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
+            <div style="text-align:center;padding:6px 2px;border:1px solid rgba(201,168,76,.08);border-radius:4px"><div style="font-family:'Ma Shan Zheng',serif;font-size:16px;color:#5dade2">子</div><div style="font-size:8px;opacity:.3">水</div></div>
+            <div style="text-align:center;padding:6px 2px;border:1px solid rgba(201,168,76,.08);border-radius:4px"><div style="font-family:'Ma Shan Zheng',serif;font-size:16px;color:#a08060">丑</div><div style="font-size:8px;opacity:.3">土</div></div>
+            <div style="text-align:center;padding:6px 2px;border:1px solid rgba(201,168,76,.08);border-radius:4px"><div style="font-family:'Ma Shan Zheng',serif;font-size:16px;color:#27ae60">寅</div><div style="font-size:8px;opacity:.3">木</div></div>
+            <div style="text-align:center;padding:6px 2px;border:1px solid rgba(201,168,76,.08);border-radius:4px"><div style="font-family:'Ma Shan Zheng',serif;font-size:16px;color:#2ecc71">卯</div><div style="font-size:8px;opacity:.3">木</div></div>
+            <div style="text-align:center;padding:6px 2px;border:1px solid rgba(201,168,76,.08);border-radius:4px"><div style="font-family:'Ma Shan Zheng',serif;font-size:16px;color:#e67e22">辰</div><div style="font-size:8px;opacity:.3">土</div></div>
+            <div style="text-align:center;padding:6px 2px;border:1px solid rgba(201,168,76,.08);border-radius:4px"><div style="font-family:'Ma Shan Zheng',serif;font-size:16px;color:#e74c3c">巳</div><div style="font-size:8px;opacity:.3">火</div></div>
+            <div style="text-align:center;padding:6px 2px;border:1px solid rgba(201,168,76,.08);border-radius:4px"><div style="font-family:'Ma Shan Zheng',serif;font-size:16px;color:#c0392b">午</div><div style="font-size:8px;opacity:.3">火</div></div>
+            <div style="text-align:center;padding:6px 2px;border:1px solid rgba(201,168,76,.08);border-radius:4px"><div style="font-family:'Ma Shan Zheng',serif;font-size:16px;color:#a08060">未</div><div style="font-size:8px;opacity:.3">土</div></div>
+            <div style="text-align:center;padding:6px 2px;border:1px solid rgba(201,168,76,.08);border-radius:4px"><div style="font-family:'Ma Shan Zheng',serif;font-size:16px;color:#95a5a6">申</div><div style="font-size:8px;opacity:.3">金</div></div>
+            <div style="text-align:center;padding:6px 2px;border:1px solid rgba(201,168,76,.08);border-radius:4px"><div style="font-family:'Ma Shan Zheng',serif;font-size:16px;color:#7f8c8d">酉</div><div style="font-size:8px;opacity:.3">金</div></div>
+            <div style="text-align:center;padding:6px 2px;border:1px solid rgba(201,168,76,.08);border-radius:4px"><div style="font-family:'Ma Shan Zheng',serif;font-size:16px;color:#e67e22">戌</div><div style="font-size:8px;opacity:.3">土</div></div>
+            <div style="text-align:center;padding:6px 2px;border:1px solid rgba(201,168,76,.08);border-radius:4px"><div style="font-family:'Ma Shan Zheng',serif;font-size:16px;color:#2980b9">亥</div><div style="font-size:8px;opacity:.3">水</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════ BAZI ══════════════ -->
+  <div class="page" id="page-bazi">
+    <div class="section-hdr">
+      <span class="sh-icon">🔮</span>
+      <div class="sh-title">八字分析</div>
+      <div class="sh-en">BaZi Analysis</div>
+      <div class="sh-desc">输入出生信息，AI深度解读命盘</div>
+    </div>
+
+    <!-- 输入 -->
+    <div class="input-card" id="baziInput">
+      <h3>输入出生信息</h3>
+      <div class="cal-toggle">
+        <button class="cal-btn active" onclick="toggleCal(this,'solar')">公历</button>
+        <button class="cal-btn" onclick="toggleCal(this,'lunar')">农历</button>
+      </div>
+      <div class="cal-panel solar active" id="solarPanel">
+        <div class="input-row">
+          <input class="input-field" type="date" id="baziDate" placeholder="出生日期">
+        </div>
+      </div>
+      <div class="cal-panel lunar" id="lunarPanel">
+        <div class="input-row">
+          <input class="input-field" type="number" id="lunarYear" placeholder="年" min="1900" max="2100">
+          <input class="input-field" type="number" id="lunarMonth" placeholder="月" min="1" max="12">
+          <input class="input-field" type="number" id="lunarDay" placeholder="日" min="1" max="30">
+        </div>
+        <label style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px;opacity:.5;margin-bottom:10px;cursor:pointer">
+          <input type="checkbox" id="lunarLeapMonth" style="accent-color:var(--gold)"> 闰月
+        </label>
+      </div>
+      <div class="input-row">
+        <select class="input-field" id="baziHour">
+          <option value="">选择时辰</option>
+          <option value="0">子时 23-1点</option><option value="2">丑时 1-3点</option>
+          <option value="4">寅时 3-5点</option><option value="6">卯时 5-7点</option>
+          <option value="8">辰时 7-9点</option><option value="10">巳时 9-11点</option>
+          <option value="12">午时 11-13点</option><option value="14">未时 13-15点</option>
+          <option value="16">申时 15-17点</option><option value="18">酉时 17-19点</option>
+          <option value="20">戌时 19-21点</option><option value="22">亥时 21-23点</option>
+        </select>
+      </div>
+      <div class="sex-row">
+        <label class="sex-btn" onclick="selectSexBtn(this,'male')">
+          <input type="radio" name="baziSex" value="male"> 👨 男
+        </label>
+        <label class="sex-btn" onclick="selectSexBtn(this,'female')">
+          <input type="radio" name="baziSex" value="female"> 👩 女
+        </label>
+      </div>
+      <button class="compute-btn" id="baziBtn" onclick="computeBaziV3()">开始分析</button>
+    </div>
+
+    <!-- 结果 -->
+    <div class="result" id="baziResult">
+      <div class="result-banner">
+        <div class="rb-name" id="rbName"></div>
+        <div class="rb-meta" id="rbMeta"></div>
+        <div class="rb-tags" id="rbTags"></div>
+      </div>
+
+      <!-- 四柱 -->
+      <div class="pillar-chart">
+        <div class="pillar-header">
+          <div class="ph-col">年柱</div><div class="ph-col">月柱</div><div class="ph-col">日柱</div><div class="ph-col">时柱</div>
+        </div>
+        <div class="pillar-row">
+          <div class="pr-col"><div class="pr-label">天干</div><div class="pr-gan" id="bz0g"></div></div>
+          <div class="pr-col"><div class="pr-label">天干</div><div class="pr-gan" id="bz1g"></div></div>
+          <div class="pr-col"><div class="pr-label">天干</div><div class="pr-gan" id="bz2g"></div></div>
+          <div class="pr-col"><div class="pr-label">天干</div><div class="pr-gan" id="bz3g"></div></div>
+        </div>
+        <div class="pillar-row">
+          <div class="pr-col"><div class="pr-label">地支</div><div class="pr-zhi" id="bz0z"></div></div>
+          <div class="pr-col"><div class="pr-label">地支</div><div class="pr-zhi" id="bz1z"></div></div>
+          <div class="pr-col"><div class="pr-label">地支</div><div class="pr-zhi" id="bz2z"></div></div>
+          <div class="pr-col"><div class="pr-label">地支</div><div class="pr-zhi" id="bz3z"></div></div>
+        </div>
+        <div class="pillar-row">
+          <div class="pr-col"><div class="pr-ele" id="bz0e"></div><div class="pr-na" id="bz0n"></div></div>
+          <div class="pr-col"><div class="pr-ele" id="bz1e"></div><div class="pr-na" id="bz1n"></div></div>
+          <div class="pr-col"><div class="pr-ele" id="bz2e"></div><div class="pr-na" id="bz2n"></div></div>
+          <div class="pr-col"><div class="pr-ele" id="bz3e"></div><div class="pr-na" id="bz3n"></div></div>
+        </div>
+      </div>
+
+      <!-- 图表区 -->
+      <div class="charts-row">
+        <!-- 五行雷达图 -->
+        <div class="wuxing-radar">
+          <h4>五行分布</h4>
+          <svg class="radar-svg" id="radarChart" viewBox="0 0 220 220"></svg>
+          <div class="ele-legend" id="eleLegend"></div>
+        </div>
+        <!-- 十神饼图 -->
+        <div class="ten-gods-pie">
+          <h4>十神关系</h4>
+          <svg class="pie-svg" id="pieChart" viewBox="0 0 200 200"></svg>
+          <div class="pie-legend" id="pieLegend"></div>
+        </div>
+      </div>
+
+      <!-- 五行柱状图 -->
+      <div class="analysis-card gold" style="margin-bottom:16px">
+        <h5>五行数量统计</h5>
+        <div class="ele-bar" id="eleBar"></div>
+      </div>
+
+      <!-- 重点提醒 -->
+      <div class="warn-banner" id="warnBanner" style="display:none">
+        <div class="warn-title">⚡ 本命盘重点提醒</div>
+        <div id="warnContent"></div>
+      </div>
+
+      <!-- 十神详情 -->
+      <div class="analysis-card cyan">
+        <h5>十神分析</h5>
+        <div class="ten-gods-grid" id="tenGodsGrid"></div>
+      </div>
+
+      <!-- AI分析 TABS -->
+      <div style="margin-top:16px">
+        <div class="ai-tabs">
+          <button class="ai-tab active" onclick="switchAiTab(this,'personality')">🧩 性格</button>
+          <button class="ai-tab" onclick="switchAiTab(this,'career')">💼 事业</button>
+          <button class="ai-tab" onclick="switchAiTab(this,'love')">💕 感情</button>
+          <button class="ai-tab" onclick="switchAiTab(this,'wealth')">💰 财运</button>
+          <button class="ai-tab" onclick="switchAiTab(this,'health')">🏥 健康</button>
+        </div>
+        <div class="ai-content active" id="ai-personality">
+          <div class="ai-loading" id="ai-loading-personality">
+            <div class="spinner"></div>
+            <p>AI分析中...</p>
+          </div>
+          <div id="ai-personality-text"></div>
+        </div>
+        <div class="ai-content" id="ai-career">
+          <div class="ai-loading" id="ai-loading-career"><div class="spinner"></div><p>AI分析中...</p></div>
+          <div id="ai-career-text"></div>
+        </div>
+        <div class="ai-content" id="ai-love">
+          <div class="ai-loading" id="ai-loading-love"><div class="spinner"></div><p>AI分析中...</p></div>
+          <div id="ai-love-text"></div>
+        </div>
+        <div class="ai-content" id="ai-wealth">
+          <div class="ai-loading" id="ai-loading-wealth"><div class="spinner"></div><p>AI分析中...</p></div>
+          <div id="ai-wealth-text"></div>
+        </div>
+        <div class="ai-content" id="ai-health">
+          <div class="ai-loading" id="ai-loading-health"><div class="spinner"></div><p>AI分析中...</p></div>
+          <div id="ai-health-text"></div>
+        </div>
+      </div>
+
+      <!-- 大运 -->
+      <div class="dayun-section">
+        <h4>大运走势</h4>
+        <div class="dayun-grid" id="dayunGrid"></div>
+      </div>
+
+      <!-- 五行生克说明 -->
+      <div style="margin-top:16px">
+        <div style="font-size:11px;letter-spacing:4px;text-transform:uppercase;opacity:.3;margin-bottom:12px;text-align:center">五行生克</div>
+        <div class="wuxing-cycle">
+          <svg class="cycle-svg" viewBox="0 0 400 200" style="max-width:300px">
+            <defs>
+              <marker id="sheng2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#27ae60" opacity=".6"/></marker>
+              <marker id="ke2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#e74c3c" opacity=".5"/></marker>
+            </defs>
+            <line x1="70" y1="55" x2="130" y2="95" stroke="#27ae60" stroke-width="1.5" marker-end="url(#sheng2)" opacity=".5"/>
+            <line x1="195" y1="115" x2="205" y2="155" stroke="#e74c3c" stroke-width="1.5" marker-end="url(#sheng2)" opacity=".5"/>
+            <line x1="265" y1="155" x2="330" y2="115" stroke="#e67e22" stroke-width="1.5" marker-end="url(#sheng2)" opacity=".5"/>
+            <line x1="365" y1="95" x2="305" y2="55" stroke="#95a5a6" stroke-width="1.5" marker-end="url(#sheng2)" opacity=".5"/>
+            <line x1="250" y1="35" x2="100" y2="35" stroke="#2980b9" stroke-width="1.5" marker-end="url(#sheng2)" opacity=".5"/>
+            <line x1="85" y1="60" x2="190" y2="150" stroke="#27ae60" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#ke2)" opacity=".4"/>
+            <line x1="220" y1="160" x2="300" y2="100" stroke="#e67e22" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#ke2)" opacity=".4"/>
+            <line x1="330" y1="60" x2="205" y2="115" stroke="#2980b9" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#ke2)" opacity=".4"/>
+            <line x1="130" y1="105" x2="80" y2="60" stroke="#e74c3c" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#ke2)" opacity=".4"/>
+            <circle cx="55" cy="45" r="28" fill="rgba(39,174,96,.08)" stroke="#27ae60" stroke-width="1.5"/>
+            <text x="55" y="42" text-anchor="middle" font-size="16" font-family="'Ma Shan Zheng',serif" fill="#27ae60">木</text>
+            <circle cx="175" cy="110" r="28" fill="rgba(231,76,60,.08)" stroke="#e74c3c" stroke-width="1.5"/>
+            <text x="175" y="107" text-anchor="middle" font-size="16" font-family="'Ma Shan Zheng',serif" fill="#e74c3c">火</text>
+            <circle cx="220" cy="170" r="28" fill="rgba(230,126,34,.08)" stroke="#e67e22" stroke-width="1.5"/>
+            <text x="220" y="167" text-anchor="middle" font-size="16" font-family="'Ma Shan Zheng',serif" fill="#e67e22">土</text>
+            <circle cx="355" cy="100" r="28" fill="rgba(149,165,166,.08)" stroke="#95a5a6" stroke-width="1.5"/>
+            <text x="355" y="97" text-anchor="middle" font-size="16" font-family="'Ma Shan Zheng',serif" fill="#95a5a6">金</text>
+            <circle cx="295" cy="30" r="28" fill="rgba(41,128,185,.08)" stroke="#2980b9" stroke-width="1.5"/>
+            <text x="295" y="27" text-anchor="middle" font-size="16" font-family="'Ma Shan Zheng',serif" fill="#2980b9">水</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="back-row">
+        <button class="back-btn" onclick="backToInput()">← 重新分析</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ KNOWLEDGE ══════════════ -->
+  <div class="page" id="page-knowledge">
+    <div class="section-hdr">
+      <span class="sh-icon">📚</span>
+      <div class="sh-title">知识库</div>
+      <div class="sh-en">Knowledge Base</div>
+      <div class="sh-desc">命理基础知识、口诀、心法</div>
+    </div>
+
+    <div class="knowledge-section">
+      <h2>口诀宝库</h2>
+      <div class="koujue-grid">
+        <div class="koujue-card" onclick="toggleKoujue(this)">
+          <h4>🔮 八字速记口诀</h4>
+          <p>天干地支、五行生克、十神关系速查记忆口诀</p>
+        </div>
+        <div class="koujue-detail" style="display:none">
+          <h5>📖 天干记忆</h5>
+          <pre>甲乙丙丁戊己庚辛壬癸
+甲木乙木丙火丁火戊土己土庚金辛金壬水癸水
+口诀：甲木青，乙木绿，丙火红，丁火赤
+      戊土黄，己土黄，庚金白，辛金白
+      壬水黑，癸水黑</pre>
+          <h5 style="margin-top:16px">📖 地支生肖</h5>
+          <pre>子丑寅卯辰巳午未申酉戌亥
+子-鼠 丑-牛 寅-虎 卯-兔 辰-龙 巳-蛇
+午-马 未-羊 申-猴 酉-鸡 戌-狗 亥-猪
+口诀：子鼠丑牛寅虎卯兔辰龙巳蛇
+      午马未羊申猴酉鸡戌狗亥猪</pre>
+          <h5 style="margin-top:16px">📖 五行相生</h5>
+          <pre>木生火 → 火生土 → 土生金 → 金生水 → 水生木
+木生火：木为火之母，火为木之子
+火生土：火焚木成土，土为火之余
+土生金：土中藏金，金从土出
+金生水：金属融化为液体水
+水生木：水润木生，木赖水养</pre>
+          <h5 style="margin-top:16px">📖 五行相克</h5>
+          <pre>木克土 → 土克水 → 水克火 → 火克金 → 金克木
+木克土：木破土而出
+土克水：土堤防水
+水克火：水灭火
+火克金：火炼金成液
+金克木：金斧伐木</pre>
+          <h5 style="margin-top:16px">📖 十神速记</h5>
+          <pre>比肩：与我同者，夺财助身
+劫财：夺财之星，破耗之兆
+食神：泄秀之神，福寿之源
+伤官：伤官见官，为祸百端
+正财：养命之源，福祸相依
+偏财：横财偏门，来去匆匆
+正官：贵气之神，正道之途
+七杀：七杀攻身，凶险之兆
+正印：护身之德，学历功名
+偏印：夺食之星，晦暗之兆</pre>
+        </div>
+
+        <div class="koujue-card" onclick="toggleKoujue(this)">
+          <h4>🧘 五行养生口诀</h4>
+          <p>根据五行理论，总结的日常养生要点</p>
+        </div>
+        <div class="koujue-detail" style="display:none">
+          <h5>📖 五行养生总纲</h5>
+          <pre>木：春养肝，绿色蔬菜要多吃
+火：夏养心，红色食物最相宜
+土：长夏养脾，黄色食物最养人
+金：秋养肺，白色食物润肺燥
+水：冬养肾，黑色食物补肾精</pre>
+          <h5 style="margin-top:16px">📖 四季养生</h5>
+          <pre>春三月：夜卧早起，广步于庭，予而勿夺
+夏三月：夜卧早起，无厌于日，使气得泄
+秋三月：早卧早起，与鸡俱兴，使志安宁
+冬三月：早卧晚起，必待日光，去寒就温</pre>
+          <h5 style="margin-top:16px">📖 五脏对应</h5>
+          <pre>肝（木）→ 魂 → 目 → 青 → 怒伤肝
+心（火）→ 神 → 舌 → 赤 → 喜伤心
+脾（土）→ 意 → 口 → 黄 → 思伤脾
+肺（金）→ 魄 → 鼻 → 白 → 忧伤肺
+肾（水）→ 志 → 耳 → 黑 → 恐伤肾</pre>
+        </div>
+
+        <div class="koujue-card" onclick="toggleKoujue(this)">
+          <h4>🏠 风水基础口诀</h4>
+          <p>阳宅风水基本原理与布局要诀</p>
+        </div>
+        <div class="koujue-detail" style="display:none">
+          <h5>📖 阳宅风水三要</h5>
+          <pre>门、主、灶——风水中最重要的三个位置
+
+门：气口也，气之入口，纳气第一
+主：主人之位，气聚之所
+灶：饮食之源，生气之根
+
+门、主、灶相互关系：
+门生主 → 宅气旺盛，主人平安
+主生灶 → 食禄充足，身体健康
+灶克门 → 耗财之兆，不吉</pre>
+          <h5 style="margin-top:16px">📖 旺宅方位</h5>
+          <pre>文昌位：利于学业事业
+  甲(艮) 丙(巽) 戊(坎) 庚(乾) 壬(坤)
+  
+财位：利于招财进宝
+  明财位（大门口对角）
+  暗财位（生旺方位）
+  
+桃花位：利于感情人缘
+  子水年：坎宫（北）
+  丑寅年：艮宫（东北）
+  卯年：震宫（东）
+  ...以此类推</pre>
+        </div>
+
+        <div class="koujue-card" onclick="toggleKoujue(this)">
+          <h4>💑 婚配口诀</h4>
+          <p>传统婚配原则与合婚要点</p>
+        </div>
+        <div class="koujue-detail" style="display:none">
+          <h5>📖 合婚原则</h5>
+          <pre>年命合婚：看年命五行是否相生相合
+  木命男配水命女 → 大吉
+  金命男配土命女 → 大吉
+  火命男配木命女 → 大吉
+  
+属相合婚：
+  六合：子丑、寅亥、卯戌、辰酉、巳申、午未
+  三合：申子辰、亥卯未、寅午戌、巳酉丑
+  六冲：子午、丑未、寅申、卯酉、辰戌、巳亥
+  六害：子未、丑午、寅巳、卯辰、申亥、酉戌</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ FENGSHUI ══════════════ -->
+  <div class="page" id="page-fengshui">
+    <div class="section-hdr">
+      <span class="sh-icon">🏠</span>
+      <div class="sh-title">风水指南</div>
+      <div class="sh-en">Feng Shui</div>
+      <div class="sh-desc">阳宅布局、旺宅指南</div>
+    </div>
+    <div class="fengshui-intro">
+      <h3>风水入门</h3>
+      <p>风水之道，在于天人合一，顺势而为。住宅风水以"藏风聚气"为根本，以"山环水抱"为佳局。</p>
+    </div>
+    <div class="fengshui-guides">
+      <div class="fs-guide" onclick="showFsGuide('layout')">
+        <div class="fsg-icon">📐</div>
+        <h4>布局原则</h4>
+        <p>门、主、灶三要素<br>采光、通风、动线</p>
+      </div>
+      <div class="fs-guide" onclick="showFsGuide('directions')">
+        <div class="fsg-icon">🧭</div>
+        <h4>方位吉凶</h4>
+        <p>八卦方位对应<br>旺位、衰位、财位</p>
+      </div>
+      <div class="fs-guide" onclick="showFsGuide('huajie')">
+        <div class="fsg-icon">⚕️</div>
+        <h4>化解调理</h4>
+        <p>五行相冲化解<br>方位调理建议</p>
+      </div>
+      <div class="fs-guide" onclick="showFsGuide('plants')">
+        <div class="fsg-icon">🌿</div>
+        <h4>植物旺宅</h4>
+        <p>五行对应植物<br>摆放位置建议</p>
+      </div>
+    </div>
+    <div id="fsDetail" style="margin-top:20px"></div>
+  </div>
+
+  <!-- ══════════════ LUCKY DAY ══════════════ -->
+  <div class="page" id="page-lucky">
+    <div class="section-hdr">
+      <span class="sh-icon">📅</span>
+      <div class="sh-title">择吉日</div>
+      <div class="sh-en">Auspicious Dates</div>
+      <div class="sh-desc">根据用途推荐吉日良辰</div>
+    </div>
+    <div class="input-card lucky-input">
+      <h3>选择用途</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px">
+        <button class="cal-btn active" onclick="selectLuckyType(this,'wedding')">💒 结婚</button>
+        <button class="cal-btn" onclick="selectLuckyType(this,'move')">🏠 搬家</button>
+        <button class="cal-btn" onclick="selectLuckyType(this,'business')">🏪 开业</button>
+        <button class="cal-btn" onclick="selectLuckyType(this,'travel')">✈️ 出行</button>
+      </div>
+      <div class="input-row">
+        <input class="input-field" type="month" id="luckyMonth">
+      </div>
+      <button class="compute-btn" onclick="computeLuckyDay()">查询吉日</button>
+    </div>
+    <div class="lucky-result" id="luckyResult"></div>
+  </div>
+
+  <!-- ══════════════ MORE PAGE ══════════════ -->
+  <div class="page" id="page-more">
+    <div class="section-hdr">
+      <span class="sh-icon">📋</span>
+      <div class="sh-title">更多功能</div>
+      <div class="sh-en">More Features</div>
+      <div class="sh-desc">探索全部命理工具与智慧资源</div>
+    </div>
+    <div class="more-grid">
+      <div class="more-card" onclick="showPage('faith')">
+        <div class="more-icon">🙏</div>
+        <h4>信众板块</h4>
+        <p>佛教·道教·儒家<br>修行指南</p>
+      </div>
+      <div class="more-card" onclick="showPage('liuyao')">
+        <div class="more-icon">☯️</div>
+        <h4>六爻预测</h4>
+        <p>易经占卜<br>卦象解读</p>
+      </div>
+      <div class="more-card" onclick="showPage('name')">
+        <div class="more-icon">✍️</div>
+        <h4>姓名学</h4>
+        <p>姓名分析<br>改名建议</p>
+      </div>
+      <div class="more-card" onclick="showPage('tizhi')">
+        <div class="more-icon">💊</div>
+        <h4>中医体质</h4>
+        <p>体质辨识<br>养生方案</p>
+      </div>
+      <div class="more-card" onclick="showPage('ziwei')">
+        <div class="more-icon">⭐</div>
+        <h4>紫微斗数</h4>
+        <p>命盘解读<br>运势分析</p>
+      </div>
+      <div class="more-card" onclick="showPage('qimen')">
+        <div class="more-icon">🌀</div>
+        <h4>奇门遁甲</h4>
+        <p>时空预测<br>决策参考</p>
+      </div>
+      <div class="more-card" onclick="showPage('meihua')">
+        <div class="more-icon">🌸</div>
+        <h4>梅花易数</h4>
+        <p>数字占卜<br>即时预测</p>
+      </div>
+      <div class="more-card" onclick="showPage('liuren')">
+        <div class="more-icon">📿</div>
+        <h4>大六壬</h4>
+        <p>天罡神课<br>精准占断</p>
+      </div>
+      <div class="more-card" onclick="showPage('cezi')">
+        <div class="more-icon">📝</div>
+        <h4>测字解字</h4>
+        <p>字形分析<br>寓意解读</p>
+      </div>
+      <div class="more-card" onclick="showPage('yijing')">
+        <div class="more-icon">📖</div>
+        <h4>易经64卦</h4>
+        <p>完整卦象<br>爻辞详解</p>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="bn-item active" data-page="home" onclick="showPage('home')">
+    <span class="bn-icon">🏠</span>首页
+  </button>
+  <button class="bn-item" data-page="bazi" onclick="showPage('bazi')">
+    <span class="bn-icon">🔮</span>八字
+  </button>
+  <button class="bn-item" data-page="knowledge" onclick="showPage('knowledge')">
+    <span class="bn-icon">📚</span>知识库
+  </button>
+  <button class="bn-item" data-page="more" onclick="showPage('more')">
+    <span class="bn-icon">📋</span>更多
+  </button>
+</nav>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// 命理核心数据（来自原版 divination-hub.html）
+// ═══════════════════════════════════════════════════════
+const STEMS=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+const BRANCHES=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+const ELE={甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
+const ZHI_ELE={子:'水',丑:'土',寅:'木',卯:'木',辰:'土',巳:'火',午:'火',未:'土',申:'金',酉:'金',戌:'土',亥:'水'};
+const TENGAN={
+  甲:{比:'甲',劫:'乙',食:'丙',伤:'丁',财:'戊',才:'己',官:'庚',杀:'辛',印:'壬',枭:'癸'},
+  乙:{比:'乙',劫:'甲',食:'丁',伤:'丙',财:'己',才:'戊',官:'辛',杀:'庚',印:'癸',枭:'壬'},
+  丙:{比:'丙',劫:'丁',食:'戊',伤:'己',财:'庚',才:'辛',官:'壬',杀:'癸',印:'甲',枭:'乙'},
+  丁:{比:'丁',劫:'丙',食:'己',伤:'戊',财:'辛',才:'庚',官:'癸',杀:'壬',印:'乙',枭:'甲'},
+  戊:{比:'戊',劫:'己',食:'庚',伤:'辛',财:'壬',才:'癸',官:'甲',杀:'乙',印:'丙',枭:'丁'},
+  己:{比:'己',劫:'戊',食:'辛',伤:'庚',财:'癸',才:'壬',官:'乙',杀:'甲',印:'丁',枭:'丙'},
+  庚:{比:'庚',劫:'辛',食:'壬',伤:'癸',财:'甲',才:'乙',官:'丙',杀:'丁',印:'戊',枭:'己'},
+  辛:{比:'辛',劫:'庚',食:'癸',伤:'壬',财:'乙',才:'甲',官:'丁',杀:'丙',印:'己',枭:'戊'},
+  壬:{比:'壬',劫:'癸',食:'甲',伤:'乙',财:'丙',才:'丁',官:'戊',杀:'己',印:'庚',枭:'辛'},
+  癸:{比:'癸',劫:'壬',食:'乙',伤:'甲',财:'丁',才:'丙',官:'己',杀:'戊',印:'辛',枭:'庚'},
+};
+const TEGAN_NAMES={比:'比肩',劫:'劫财',食:'食神',伤:'伤官',财:'正财',才:'偏财',官:'正官',杀:'七杀',印:'正印',枭:'偏印'};
+const MONTH_STEM_BASE={寅:'甲',卯:'乙',辰:'丙',巳:'丁',午:'戊',未:'己',申:'庚',酉:'辛',戌:'壬',亥:'癸',子:'甲',丑:'乙'};
+
+// 五行相生相克
+function getXSheng(ele){const m={'木':'水','火':'木','土':'火','金':'土','水':'金'};return m[ele]||'水';}
+function getKe(ele){const m={'木':'土','火':'金','土':'水','金':'木','水':'火'};return m[ele]||'火';}
+
+// 时干计算
+function getHourStem(dayStemIdx,hourBranch){
+  const branchIdx=BRANCHES.indexOf(hourBranch);
+  return (dayStemIdx*2+branchIdx)%10;
+}
+
+// 日干支索引
+function getDayStemIndex(year,month,day){
+  const a=Math.floor((14-month)/12);
+  const y=year+4800-a;
+  const m=month+12*a-3;
+  let jd=day+Math.floor((153*m+2)/5)+365*y+Math.floor(y/4)-Math.floor(y/100)+Math.floor(y/400)-32045;
+  return((jd-4)%10+10)%10;
+}
+function getDayBranchIndex(year,month,day){
+  const a=Math.floor((14-month)/12);
+  const y=year+4800-a;
+  const m=month+12*a-3;
+  let jd=day+Math.floor((153*m+2)/5)+365*y+Math.floor(y/4)-Math.floor(y/100)+Math.floor(y/400)-32045;
+  return((jd+2)%12+12)%12;
+}
+
+// 年干支
+function getYearStemBranch(year,month,day){
+  const stemIdx=((year-4)%10+10)%10;
+  const branchIdx=((year-4)%12+12)%12;
+  return{stemIdx,branchIdx,stem:STEMS[stemIdx],branch:BRANCHES[branchIdx]};
+}
+
+// 月干
+function getMonthStem(dayStemIdx,monthBranch){
+  const base=MONTH_STEM_BASE[monthBranch];
+  const baseIdx=STEMS.indexOf(base);
+  return(dayStemIdx%5*2+baseIdx)%10;
+}
+
+// 十神
+function getTenGod(gan,zhi,dayStem){
+  const ts=TENGAN[dayStem];
+  if(!ts)return'';
+  for(const[k,v]of Object.entries(ts)){
+    if(v===gan)return TEGAN_NAMES[k];
+  }
+  return'';
+}
+
+// ═══════════════════════════════════════════════════════
+// 导航
+// ═══════════════════════════════════════════════════════
+function showPage(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.bn-item').forEach(b=>b.classList.remove('active'));
+  const p=document.getElementById('page-'+page);
+  if(p)p.classList.add('active');
+  document.querySelectorAll('[data-page="'+page+'"]').forEach(el=>el.classList.add('active'));
+}
+
+// ═══════════════════════════════════════════════════════
+// 农历转换（简化）
+// ═══════════════════════════════════════════════════════
+function lunarToSolar(ly,lm,ld,isLeap){
+  // 简化：使用近似转换
+  // 实际需要查农历数据表
+  const baseDate=new Date(ly,lm-1,ld);
+  const offset=isLeap?30:0;
+  const solarDate=new Date(baseDate.getTime()+(22+lm*2+offset)*86400000);
+  return{solarDate};
+}
+
+// ═══════════════════════════════════════════════════════
+// 日历模式切换
+// ═══════════════════════════════════════════════════════
+function toggleCal(btn,mode){
+  document.querySelectorAll('.cal-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.cal-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(mode==='solar'?'solarPanel':'lunarPanel').classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════
+// 性别选择
+// ═══════════════════════════════════════════════════════
+function selectSexBtn(el,sex){
+  document.querySelectorAll('.sex-btn').forEach(b=>{b.classList.remove('active');b.style.borderColor='rgba(201,168,76,.15)';b.style.color='var(--paper3)';});
+  el.classList.add('active');
+  el.style.borderColor='var(--gold)';
+  el.style.color='var(--gold)';
+  document.querySelector('input[name="baziSex"][value="'+sex+'"]').checked=true;
+}
+
+// ═══════════════════════════════════════════════════════
+// 口诀展开
+// ═══════════════════════════════════════════════════════
+function toggleKoujue(card){
+  const detail=card.nextElementSibling;
+  if(detail&&detail.classList.contains('koujue-detail')){
+    detail.style.display=detail.style.display==='none'?'block':'none';
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// 择吉日
+// ═══════════════════════════════════════════════════════
+let luckyType='wedding';
+function selectLuckyType(btn,type){
+  luckyType=type;
+  document.querySelectorAll('.lucky-input .cal-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function computeLuckyDay(){
+  const monthStr=document.getElementById('luckyMonth').value;
+  if(!monthStr){alert('请选择月份');return;}
+  const[year,month]=monthStr.split('-').map(Number);
+  const tips={
+    wedding:'结婚宜选双方八字相合、日子吉利的日期，避开三娘煞、彭祖忌日',
+    move:'搬家宜选天德、月德、三合吉日，避免与宅主相冲之日',
+    business:'开业宜选开市、进财、定磉吉日，避开破日、闭日',
+    travel:'出行宜选驿马、三合吉日，避免月破、日破之日'
+  };
+  const names={wedding:'结婚',move:'搬家',business:'开业',travel:'出行'};
+  const luckyDays=[3,5,8,12,15,18,21,24,27];
+  let html='<div class="analysis-card gold">';
+  html+='<h5>💡 '+names[luckyType]+'吉日推荐</h5>';
+  html+='<p>'+tips[luckyType]+'</p>';
+  html+='</div>';
+  html+='<div class="dayun-grid">';
+  luckyDays.forEach(d=>{
+    if(d<=new Date(year,month,0).getDate()){
+      const isWeekend=(new Date(year,month-1,d)).getDay()%6===0;
+      html+=`<div class="dy-item ${isWeekend?'xi':''}">
+        <div class="dy-pillar">${month}月${d}日</div>
+        <div class="dy-ganzhi">${isWeekend?'⭐ 推荐':'适宜'}</div>
+        <div class="dy-desc">${isWeekend?'周末休息日，宜${names[luckyType]}':'公历工作日，${names[luckyType]}需提前安排'}</div>
+      </div>`;
+    }
+  });
+  html+='</div>';
+  document.getElementById('luckyResult').innerHTML=html;
+}
+
+// ═══════════════════════════════════════════════════════
+// 风水指南
+// ═══════════════════════════════════════════════════════
+function showFsGuide(type){
+  const guides={
+    layout:`<div class="analysis-card gold"><h5>📐 阳宅布局三要</h5>
+<p><strong>门</strong>：气口，纳气第一。门宜开在生旺方位，避免在衰死方开门。门与窗不宜正对，气场直进直出不聚财。</p>
+<p><strong>主</strong>：主人之位，宜在房屋中心或后方，坐实朝虚，有靠山之象。</p>
+<p><strong>灶</strong>：厨房，灶口宜向吉方，忌对门口或水槽。灶台背后宜有实墙，忌悬空。</p></div>
+<div class="analysis-card cyan"><h5>🏠 客厅布局</h5>
+<p>沙发宜靠墙摆放，忌背门而坐。茶几宜比沙发矮，忌高于沙发。电视背景墙宜在坐山方。</p></div>`,
+    directions:`<div class="analysis-card gold"><h5>🧭 八卦方位对应</h5>
+<p>乾（西北）：主事业、老父、贵人<br>坎（北）：主事业、智慧、中男<br>艮（东北）：主财富、少男、子孙<br>震（东）：主事业、长男、春天<br>巽（东南）：主文昌、长女、学业</p>
+<p>离（南）：主名声、中女、夏天<br>坤（西南）：主母亲、家庭、阴气<br>兑（西）：主口才、少女、桃花</p></div>`,
+    huajie:`<div class="analysis-card cinn"><h5>⚕️ 常见冲煞化解</h5>
+<p><strong>门对门</strong>：挂珠帘或放置阔叶植物<br><strong>梁压顶</strong>：做假天花板遮盖或挂五行八卦镜<br><strong>穿堂煞</strong>：设置屏风或玄关阻隔<br><strong>路冲</strong>：安置石狮子或山海镇</p></div>
+<div class="analysis-card jade"><h5>🌿 五行化解</h5>
+<p>缺木：放置绿植、木质家具<br>缺火：红色装饰、灯具<br>缺土：黄水晶、陶瓷器<br>缺金：金属摆件、白玉石<br>缺水：鱼缸、黑色摆件</p></div>`,
+    plants:`<div class="analysis-card jade"><h5>🌿 五行旺宅植物</h5>
+<p><strong>木（东、东南）</strong>：绿萝、发财树、富贵竹<br><strong>火（南）</strong>：红掌、鸿运当头、牡丹<br><strong>土（中央、东北、西南）</strong>：仙人掌、龙骨、虎皮兰<br><strong>金（西、西北）</strong>：金桔、白掌、万年青<br><strong>水（北）</strong>：铜钱草、水培绿萝、风水轮</p></div>`
+  };
+  document.getElementById('fsDetail').innerHTML=guides[type]||'';
+}
+
+// ═══════════════════════════════════════════════════════
+// AI分析切换
+// ═══════════════════════════════════════════════════════
+function switchAiTab(btn,tab){
+  document.querySelectorAll('.ai-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.ai-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('ai-'+tab).classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════
+// 返回输入
+// ═══════════════════════════════════════════════════════
+function backToInput(){
+  document.getElementById('baziResult').classList.remove('visible');
+  document.getElementById('baziInput').style.display='block';
+  window._baziData=null;
+}
+
+// ═══════════════════════════════════════════════════════
+// 绘制五行雷达图（纯SVG）
+// ═══════════════════════════════════════════════════════
+function drawRadarChart(eleCount,total){
+  const svg=document.getElementById('radarChart');
+  const cx=110,cy=110,r=80;
+  const order=['木','火','土','金','水'];
+  const colors={'木':'#27ae60','火':'#e74c3c','土':'#e67e22','金':'#95a5a6','水':'#2980b9'};
+  const angles=[-Math.PI/2,-Math.PI/2+2*Math.PI/5,-Math.PI/2+4*Math.PI/5,-Math.PI/2+6*Math.PI/5,-Math.PI/2+8*Math.PI/5];
+
+  // 计算点
+  const getPoint=(angle,radius)=>({x:cx+radius*Math.cos(angle),y:cy+radius*Math.sin(angle)});
+
+  // 背景网格（3层）
+  let grid='';
+  for(let level=1;level<=3;level++){
+    const pts=angles.map(a=>getPoint(a,r*level/3));
+    grid+=`<polygon points="${pts.map(p=>p.x+','+p.y).join(' ')}" fill="none" stroke="rgba(201,168,76,0.08)" stroke-width="1"/>`;
+  }
+  // 射线
+  angles.forEach(a=>{
+    const p=getPoint(a,r);
+    grid+=`<line x1="${cx}" y1="${cy}" x2="${p.x}" y2="${p.y}" stroke="rgba(201,168,76,0.06)" stroke-width="1"/>`;
+  });
+
+  // 数据多边形
+  const vals=order.map(e=>eleCount[e]||0);
+  const maxVal=Math.max(...vals,1);
+  const dataPts=angles.map((a,i)=>getPoint(a,r*(vals[i]/maxVal)));
+  let dataPoly=`<polygon points="${dataPts.map(p=>p.x+','+p.y).join(' ')}" fill="rgba(201,168,76,0.15)" stroke="#c9a84c" stroke-width="1.5"/>`;
+
+  // 数据点
+  dataPts.forEach((p,i)=>{
+    dataPoly+=`<circle cx="${p.x}" cy="${p.y}" r="4" fill="${colors[order[i]]}" stroke="rgba(8,8,8,0.8)" stroke-width="1.5"/>`;
+  });
+
+  // 标签
+  let labels='';
+  angles.forEach((a,i)=>{
+    const lx=cx+(r+18)*Math.cos(a);
+    const ly=cy+(r+18)*Math.sin(a);
+    labels+=`<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-size="14" font-family="'Ma Shan Zheng',serif" fill="${colors[order[i]]}">${order[i]}</text>`;
+  });
+
+  svg.innerHTML=grid+dataPoly+labels;
+}
+
+// ═══════════════════════════════════════════════════════
+// 绘制十神饼图（纯SVG stroke-dasharray）
+// ═══════════════════════════════════════════════════════
+function drawPieChart(tenGods){
+  const svg=document.getElementById('pieChart');
+  const cx=100,cy=100,r=70;
+  const colors={'比':'#2980b9','劫':'#5dade2','食':'#27ae60','伤':'#2ecc71','财':'#e67e22','才':'#f39c12','官':'#c0392b','杀':'#e74c3c','印':'#8e44ad','枭':'#9b59b6','无':"#555"};
+
+  let total=Object.values(tenGods).reduce((a,b)=>a+b,0)||1;
+  let html='';
+  let offset=0;
+
+  for(const[name,count]of Object.entries(tenGods)){
+    if(count===0)continue;
+    const pct=count/total;
+    const dashLen=2*Math.PI*r*pct;
+    const gapLen=2*Math.PI*r*(1-pct);
+    const rotate=offset*360-90;
+    html+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${colors[name]||'#888'}" stroke-width="24"
+      stroke-dasharray="${dashLen} ${gapLen}" stroke-dashoffset="0"
+      transform="rotate(${rotate} ${cx} ${cy})"
+      style="transition:all .8s ease"/>`;
+    offset+=pct;
+  }
+
+  // 中心文字
+  html+=`<circle cx="${cx}" cy="${cy}" r="46" fill="rgba(8,8,8,0.85)"/>`;
+  html+=`<text x="${cx}" y="${cy-6}" text-anchor="middle" font-size="22" font-family="'Ma Shan Zheng',serif" fill="#c9a84c">十神</text>`;
+  html+=`<text x="${cx}" y="${cy+12}" text-anchor="middle" font-size="10" fill="#a09080">关系图</text>`;
+
+  svg.innerHTML=html;
+
+  // 图例
+  let legend='<div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px">';
+  for(const[name,count]of Object.entries(tenGods)){
+    if(count===0)continue;
+    legend+=`<span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;letter-spacing:1px;opacity:.6">
+      <span style="width:8px;height:8px;border-radius:50%;background:${colors[name]||'#888'};display:inline-block"></span>
+      ${name}(${count})
+    </span>`;
+  }
+  legend+='</div>';
+  document.getElementById('pieLegend').innerHTML=legend;
+}
+
+// ═══════════════════════════════════════════════════════
+// 绘制五行柱状图
+// ═══════════════════════════════════════════════════════
+function drawEleBar(eleCount,total){
+  const order=['木','火','土','金','水'];
+  const colors={木:'#27ae60',火:'#e74c3c',土:'#e67e22',金:'#95a5a6',水:'#2980b9'};
+  let bar='',legend='';
+  order.forEach(e=>{
+    const pct=Math.round((eleCount[e]||0)/total*100);
+    bar+=`<div class="ele-seg ele-${e}" style="width:${pct}%"></div>`;
+    legend+=`<span class="ele-l-item"><span style="color:${colors[e]}">■</span> ${e} ${eleCount[e]||0}个(${pct}%)</span>`;
+  });
+  document.getElementById('eleBar').innerHTML=bar;
+  document.getElementById('eleLegend').innerHTML=legend;
+}
+
+// ═══════════════════════════════════════════════════════
+// AI分析（Ollama + 本地降级）
+// ═══════════════════════════════════════════════════════
+// 古籍引用数据库
+const CLASSICAL_QUOTES={
+  '甲':['《滴天髓》：甲木参天，脱胎要火，春不容金，秋不容土。','《穷通宝鉴》：甲木喜庚金斫削，方成栋梁之材。'],
+  '乙':['《滴天髓》：乙木虽柔，刲羊解牛，怀丁抱丙，跨凤乘猴。','《穷通宝鉴》：乙木喜丙火照暖，癸水滋润。'],
+  '丙':['《滴天髓》：丙火猛烈，欺霜侮雪，煅庚金，逢辛反怯。','《渊海子平》：丙火太阳之象，不畏秋霜，能煅庚金。'],
+  '丁':['《滴天髓》：丁火柔中，内性昭融，抱乙而孝，合壬而忠。','《穷通宝鉴》：丁火不离甲木，甲木为丁火之母。'],
+  '戊':['《滴天髓》：戊土固重，既中且正，静翕动辟，万物司命。','《三命通会》：戊土厚重，喜甲木疏劈，方能生长万物。'],
+  '己':['《滴天髓》：己土卑湿，中正蓄藏，不愁木盛，不畏水狂。','《穷通宝鉴》：己土喜丙火温煦，癸水滋润。'],
+  '庚':['《滴天髓》：庚金带煞，刚健为最，得水而清，得火而锐。','《渊海子平》：庚金须丁火煅炼，方能成器。'],
+  '辛':['《滴天髓》：辛金软弱，温润而清，畏土之叠，乐水之盈。','《穷通宝鉴》：辛金喜壬水淘洗，忌戊土埋没。'],
+  '壬':['《滴天髓》：壬水通河，能泄金气，刚中之德，周流不滞。','《三命通会》：壬水汪洋，喜戊土堤防，方能蓄积。'],
+  '癸':['《滴天髓》：癸水至弱，达于天津，得龙而润，功化斯神。','《穷通宝鉴》：癸水喜辛金发源，忌火土太过。'],
+  '子':['《三命通会》：子水仲冬，阴极阳生，藏癸水。','《渊海子平》：子为墨池，水之正位。'],
+  '丑':['《三命通会》：丑土季冬，金库之地，藏己辛癸。','《穷通宝鉴》：丑为冰霜之土，喜丙火温暖。'],
+  '寅':['《三命通会》：寅木孟春，三阳开泰，藏甲丙戊。','《渊海子平》：寅为广谷，木之长生。'],
+  '卯':['《三命通会》：卯木仲春，万物生长，藏乙木。','《神峰通考》：卯为琼林，乙木专禄。'],
+  '辰':['《三命通会》：辰土季春，水库之地，藏戊乙癸。','《渊海子平》：辰为草泽，水之墓库。'],
+  '巳':['《三命通会》：巳火孟夏，金之长生，藏丙庚戊。','《穷通宝鉴》：巳为炉冶之火，喜金铸器。'],
+  '午':['《三命通会》：午火仲夏，阳气极盛，藏丁己。','《渊海子平》：午为烽堠，火之正位。'],
+  '未':['《三命通会》：未土季夏，木库之地，藏己丁乙。','《穷通宝鉴》：未为花园之土，喜水滋润。'],
+  '申':['《三命通会》：申金孟秋，水之长生，藏庚壬戊。','《渊海子平》：申为名都，金之健旺。'],
+  '酉':['《三命通会》：酉金仲秋，金之帝旺，藏辛金。','《神峰通考》：酉为钟鸣，辛金专禄。'],
+  '戌':['《三命通会》：戌土季秋，火库之地，藏戊辛丁。','《渊海子平》：戌为烧原，火之墓库。'],
+  '亥':['《三命通会》：亥水孟冬，木之长生，藏壬甲。','《穷通宝鉴》：亥为天门，水之建禄。']
+};
+
+function getClassicalRef(dayStem,dim){
+  const stemQuotes=CLASSICAL_QUOTES[dayStem]||[];
+  // 根据维度选不同引用
+  const idx=dim==='personality'?0:dim==='career'?0:dim==='love'?1:dim==='wealth'?0:1;
+  const quote=stemQuotes[idx%stemQuotes.length];
+  return quote?`<div class="classical-ref">📖 ${quote}</div>`:'';
+}
+
+async function runAIAnalysis(baziData){
+  const{pillars,eleCount,total,dayStem,dayEle,isStrong,strongest,weakest}=baziData;
+  const dims=['personality','career','love','wealth','health'];
+  const prompts={
+    personality:`你是一位专业的命理师。请分析以下八字格局的性格特点。
+
+八字信息：
+- 日主：${dayStem}（${dayEle}）
+- 年柱：${pillars[0].stem}${pillars[0].branch}
+- 月柱：${pillars[1].stem}${pillars[1].branch}
+- 时柱：${pillars[3].stem}${pillars[3].branch}
+- 五行分布：木${eleCount.木}、火${eleCount.火}、土${eleCount.土}、金${eleCount.金}、水${eleCount.水}
+- ${isStrong?'身旺':'身弱'}格局
+- 最旺五行：${strongest}，最弱五行：${weakest}
+
+请从以下角度分析性格特点（150字以内，用自然的中文命理语言）：
+1. 日主性格特质
+2. 优点与优势
+3. 需注意的弱点
+4. 与人相处的方式
+
+请务必引用以下古籍原文来支持你的分析（选最相关的1-2条）：
+- 《三命通会》：万民英著，明代命理集大成
+- 《滴天髓》：刘基著，命理经典
+- 《穷通宝鉴》：余春台著，调候用神专著
+- 《渊海子平》：徐大升著，宋代命理基础
+- 《神峰通考》：张楠著，明代命理名著
+
+格式：
+分析文字...
+【古籍引用】《三命通会》卷X：原文引用...`,
+    career:`你是一位专业的命理师。请分析以下八字格局的事业运势。
+
+八字信息：
+- 日主：${dayStem}（${dayEle}）
+- 年柱：${pillars[0].stem}${pillars[0].branch}
+- 月柱：${pillars[1].stem}${pillars[1].branch}
+- 时柱：${pillars[3].stem}${pillars[3].branch}
+- 五行分布：木${eleCount.木}、火${eleCount.火}、土${eleCount.土}、金${eleCount.金}、水${eleCount.水}
+- ${isStrong?'身旺':'身弱'}格局
+
+请分析事业运势（150字以内）：
+1. 适合的职业方向
+2. 事业高峰期与低谷期
+3. 贵人运势
+4. 职场建议
+
+请务必引用以下古籍原文来支持你的分析（选最相关的1-2条）：
+- 《三命通会》：万民英著，明代命理集大成
+- 《滴天髓》：刘基著，命理经典
+- 《穷通宝鉴》：余春台著，调候用神专著
+- 《渊海子平》：徐大升著，宋代命理基础
+- 《神峰通考》：张楠著，明代命理名著
+
+格式：
+分析文字...
+【古籍引用】《三命通会》卷X：原文引用...`,
+    love:`你是一位专业的命理师。请分析以下八字格局的感情婚姻。
+
+八字信息：
+- 日主：${dayStem}（${dayEle}）
+- 日支（夫妻宫）：${pillars[2].branch}（${ZHI_ELE[pillars[2].branch]}）
+- 年柱：${pillars[0].stem}${pillars[0].branch}
+- 月柱：${pillars[1].stem}${pillars[1].branch}
+- 五行分布：木${eleCount.木}、火${eleCount.火}、土${eleCount.土}、金${eleCount.金}、水${eleCount.水}
+
+请分析感情婚姻（150字以内）：
+1. 感情模式与性格
+2. 理想伴侣特征
+3. 桃花运势
+4. 婚恋建议
+
+请务必引用以下古籍原文来支持你的分析（选最相关的1-2条）：
+- 《三命通会》：万民英著，明代命理集大成
+- 《滴天髓》：刘基著，命理经典
+- 《穷通宝鉴》：余春台著，调候用神专著
+- 《渊海子平》：徐大升著，宋代命理基础
+- 《神峰通考》：张楠著，明代命理名著
+
+格式：
+分析文字...
+【古籍引用】《三命通会》卷X：原文引用...`,
+    wealth:`你是一位专业的命理师。请分析以下八字格局的财运。
+
+八字信息：
+- 日主：${dayStem}（${dayEle}）
+- 年柱：${pillars[0].stem}${pillars[0].branch}
+- 月柱：${pillars[1].stem}${pillars[1].branch}
+- 五行分布：木${eleCount.木}、火${eleCount.火}、土${eleCount.土}、金${eleCount.金}、水${eleCount.水}
+- ${isStrong?'身旺':'身弱'}格局
+
+请分析财运（150字以内）：
+1. 财运特点与财位
+2. 理财方式建议
+3. 适合的投资方向
+4. 财运高峰期
+
+请务必引用以下古籍原文来支持你的分析（选最相关的1-2条）：
+- 《三命通会》：万民英著，明代命理集大成
+- 《滴天髓》：刘基著，命理经典
+- 《穷通宝鉴》：余春台著，调候用神专著
+- 《渊海子平》：徐大升著，宋代命理基础
+- 《神峰通考》：张楠著，明代命理名著
+
+格式：
+分析文字...
+【古籍引用】《三命通会》卷X：原文引用...`,
+    health:`你是一位专业的命理师。请分析以下八字格局的健康运势。
+
+八字信息：
+- 日主：${dayStem}（${dayEle}）
+- 五行分布：木${eleCount.木}、火${eleCount.火}、土${eleCount.土}、金${eleCount.金}、水${eleCount.水}
+- ${isStrong?'身旺':'身弱'}格局
+
+请分析健康运势（150字以内）：
+1. 需重点关注的器官/系统
+2. 养生建议
+3. 生活习惯注意事项
+4. 疾病预防重点
+
+请务必引用以下古籍原文来支持你的分析（选最相关的1-2条）：
+- 《三命通会》：万民英著，明代命理集大成
+- 《滴天髓》：刘基著，命理经典
+- 《穷通宝鉴》：余春台著，调候用神专著
+- 《渊海子平》：徐大升著，宋代命理基础
+- 《神峰通考》：张楠著，明代命理名著
+
+格式：
+分析文字...
+【古籍引用】《三命通会》卷X：原文引用...`
+  };
+
+  // 并行调用所有维度
+  for(const dim of dims){
+    const loading=document.getElementById('ai-loading-'+dim);
+    const textEl=document.getElementById('ai-'+dim+'-text');
+    try{
+      const controller=new AbortController();
+      const timeout=setTimeout(()=>controller.abort(),8000);
+      const resp=await fetch('http://localhost:11434/api/generate',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({model:'qwen2.5:1.5b',prompt:prompts[dim],stream:false}),
+        signal:controller.signal
+      });
+      clearTimeout(timeout);
+      if(resp.ok){
+        const data=await resp.json();
+        const text=data.response||'';
+        loading.style.display='none';
+        const classicalRef=getClassicalRef(dayStem,dim);
+        textEl.innerHTML=`<div class="analysis-card ${dim==='personality'?'gold':dim==='career'?'cyan':dim==='love'?'cinn':dim==='wealth'?'jade':'violet'}">
+          <p style="white-space:pre-wrap;line-height:2">${text}</p>${classicalRef}</div>`;
+      }else throw new Error('non-200');
+    }catch{
+      // 降级到本地分析
+      loading.style.display='none';
+      textEl.innerHTML=getLocalAnalysis(dim,baziData);
+    }
+  }
+}
+
+// 本地降级分析
+function getLocalAnalysis(dim,baziData){
+  const{dayStem,dayEle,pillars,isStrong,strongest,weakest,eleCount}=baziData;
+  const m={
+    personality:{
+      甲:{t:'刚毅正直',a:'有担当、有魄力、做事果断',w:'过于固执、不知变通'},
+      乙:{t:'柔韧灵活',a:'善于适应、情商高、人缘好',w:'缺乏主见、容易妥协'},
+      丙:{t:'热情开朗',a:'有感染力、领导力强',w:'脾气急躁、易冲动'},
+      丁:{t:'细腻温暖',a:'内心敏感、善解人意',w:'容易想太多、患得患失'},
+      戊:{t:'稳重踏实',a:'可靠、有责任感、能扛事',w:'过于保守、不善变通'},
+      己:{t:'包容务实',a:'善于积累、能屈能伸',w:'缺乏魄力、过于忍让'},
+      庚:{t:'刚强果断',a:'做事干脆、有竞争力',w:'过于强硬、锋芒太露'},
+      辛:{t:'精致自律',a:'追求完美、品味高雅',w:'挑剔刻薄、不易满足'},
+      壬:{t:'聪慧变通',a:'思路开阔、适应力强',w:'容易分散精力、难专注'},
+      癸:{t:'细腻深沉',a:'善于思考、直觉敏锐',w:'优柔寡断、不善表达'}
+    },
+    career:{
+      甲:{g:'法律、金融、机械、外科医生',r:'金主义，适合果断决策的工作'},
+      乙:{g:'文化、教育、咨询、设计',r:'木主仁，适合与人沟通的工作'},
+      丙:{g:'传媒、餐饮、IT互联网、能源',r:'火主礼，适合展示才华的工作'},
+      丁:{g:'艺术、教育、服务、演艺',r:'丁火细腻，适合服务型工作'},
+      戊:{g:'房地产、建筑、金融、仓储',r:'土主信，适合稳定可靠的行业'},
+      己:{g:'农业、财务、医疗、服务',r:'己土务实，适合服务行业'},
+      庚:{g:'法律、金融、军警、机械',r:'庚金刚健，适合挑战性工作'},
+      辛:{g:'金融、设计、珠宝、演艺',r:'辛金精致，适合艺术创作'},
+      壬:{g:'物流、旅游、贸易、咨询',r:'壬水灵动，适合灵活领域'},
+      癸:{g:'文化、教育、玄学、医疗',r:'癸水深沉，适合思考型工作'}
+    },
+    love:{
+      甲:'感情直率主动，配偶宜选包容型。',
+      乙:'感情细腻敏感，忌与金旺者相冲。',
+      丙:'感情热烈如火，配偶宜选沉稳冷静。',
+      丁:'感情内敛深沉，不善表达但忠诚。',
+      戊:'感情忠贞务实，重视对方人品。',
+      己:'感情包容被动，需要对方主动引导。',
+      庚:'感情理智冷静，一旦认定便专一。',
+      辛:'感情精致挑剔，不轻易动情。',
+      壬:'感情自然随缘，桃花运佳但易散。',
+      癸:'感情含蓄内敛，婚姻宜晚不宜早。'
+    },
+    wealth:{
+      甲:{a:'财来财去，宜稳健理财。金旺之年得财。'},
+      乙:{a:'细水长流型，宜积累储蓄。木旺之年财源广。'},
+      丙:{a:'财来财去但能守住，宜多元投资。'},
+      乙:{a:'食伤生财，宜技能变现或创业。'},
+      丁:{a:'正财稳定，宜固定收入+副业。'},
+      戊:{a:'宜置产置业，房产投资运佳。'},
+      己:{a:'宜稳健理财，不宜投机。'},
+      庚:{a:'正财佳，宜踏实工作。偏财运偶有惊喜。'},
+      辛:{a:'宜精致消费与投资平衡，注意守财。'},
+      壬:{a:'财源广但流动性强，宜分散投资。'},
+      癸:{a:'宜长期投资，慢慢积累财富。'}
+    },
+    health:{
+      木:'肝胆·眼睛·筋骨。少熬夜、少饮酒、多运动。',
+      火:'心脏·小肠·血压。控制情绪、规律作息。',
+      土:'脾胃·消化。饮食规律、细嚼慢咽、少吃生冷。',
+      金:'肺·皮肤·大肠。多呼吸新鲜空气、注意保暖。',
+      水:'肾·泌尿系统。注意保暖、多喝温水、少憋尿。'
+    }
+  };
+  const colorMap={personality:'gold',career:'cyan',love:'cinn',wealth:'jade',health:'violet'};
+  let content='';
+  if(dim==='personality'){
+    const dm=m.personality[dayStem]||{t:'综合型',a:'各有所长',w:'平衡发展'};
+    content=`日主${dayStem}（${dayEle}），${dm.t}。
+
+**优点**：${dm.a}
+**注意**：${dm.w}
+
+身${isStrong?'旺':'弱'}格局，${strongest}旺${weakest}弱，对性格有较大影响。`;
+  }else if(dim==='career'){
+    const cm=m.career[dayStem]||{g:'综合型行业',r:'顺势而为'};
+    content=`适合方向：${cm.g}
+核心优势：${cm.r}
+${isStrong?'身旺者宜主动出击，发挥优势':'身弱者宜稳扎稳打，借助平台发展'}`;
+  }else if(dim==='love'){
+    content=`${m.love[dayStem]||'感情运势平稳，顺其自然发展'}
+日支${pillars[2].branch}（${ZHI_ELE[pillars[2].branch]}）临夫妻宫，影响婚姻模式。`;
+  }else if(dim==='wealth'){
+    const wm=m.wealth[dayStem]||{a:'财运平稳，稳中求财'};
+    content=`${wm.a}
+${isStrong?'身旺者财来能守，宜积极理财':'身弱财多难守，宜先提升自己再谈理财'}`;
+  }else{
+    content=`重点关注：${m.health[dayEle]||'身体保养'}
+${isStrong?'身旺者注意肝胆、心血管':'身弱者注意脾胃、肾气'}`;
+  }
+  return`<div class="analysis-card ${colorMap[dim]}"><p style="white-space:pre-wrap;line-height:2">${content}</p></div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// 大运计算
+// ═══════════════════════════════════════════════════════
+function computeDayun(pillars,sex,birthYear,dayStemIdx,dayEle){
+  const result=[];
+  const startZhi=BRANCHES.indexOf(pillars[1].branch);
+  const startGan=STEMS.indexOf(pillars[1].stem);
+  const yearStemIdx=STEMS.indexOf(pillars[0].stem);
+  const isYang=yearStemIdx%2===0;
+  const isMale=sex==='male';
+  const direction=(isYang&&isMale)||(!isYang&&!isMale)?1:-1;
+  const qiyunMonth=(direction===1)?
+    ((pillars[1].branchIdx-getDayBranchIndex(birthYear,1,1)+12)%12):
+    ((getDayBranchIndex(birthYear,1,1)-pillars[1].branchIdx+12)%12);
+  const qiyunAge=Math.round(qiyunMonth*10/3)/10;
+
+  for(let i=0;i<8;i++){
+    const zhiIdx=(startZhi+i*direction*3+36)%12;
+    const ganIdx=(startGan+i*direction*3+40)%10;
+    const zhi=BRANCHES[zhiIdx];
+    const gan=STEMS[ganIdx];
+    const ageStart=Math.round((qiyunAge+i*10)*10)/10;
+    const ageEnd=Math.round((qiyunAge+(i+1)*10)*10)/10;
+    const yearStart=birthYear+Math.floor(ageStart);
+    const yearEnd=birthYear+Math.floor(ageEnd);
+    const ganEle=ELE[gan];
+    const zhiEle=ZHI_ELE[zhi];
+    const rel=getTenGod(gan,zhi,STEMS[dayStemIdx]);
+    const isXi=ganEle===dayEle||zhiEle===dayEle;
+    const isJi=(ganEle===getKe(dayEle)||zhiEle===getKe(dayEle));
+    const ganZhiCombo=gan+zhi;
+    const dayunTips={
+      甲:'甲木大运：事业上升期，宜积极进取。',
+      乙:'乙木大运：财运平稳，宜稳扎稳打。',
+      丙:'丙火大运：名气地位提升，宜展示才华。',
+      丁:'丁火大运：感情桃花运，注意人际关系。',
+      戊:'戊土大运：财运佳，宜置产兴业。',
+      己:'己土大运：事业稳固，宜积累人脉。',
+      庚:'庚金大运：挑战与机遇并存，宜果断决策。',
+      辛:'辛金大运：财运稳定，宜精细理财。',
+      壬:'壬水大运：财运亨通，宜多元发展。',
+      癸:'癸水大运：学业智慧提升，宜学习进修。'
+    };
+    result.push({index:i+1,gan,zhi,ganEle,zhiEle,ageStart,ageEnd,yearStart,yearEnd,rel,isXi,isJi,ganZhiCombo,tip:dayunTips[gan]||ganZhiCombo+'运'});
+  }
+  return result;
+}
+
+// ═══════════════════════════════════════════════════════
+// 核心：八字计算 V3
+// ═══════════════════════════════════════════════════════
+function computeBaziV3(){
+  const btn=document.getElementById('baziBtn');
+  btn.disabled=true;btn.textContent='排盘中...';
+
+  const calMode=document.querySelector('.cal-btn.active')?.textContent.includes('公历')?'solar':'lunar';
+  let year,month,day;
+  if(calMode==='solar'){
+    const dateStr=document.getElementById('baziDate').value;
+    if(!dateStr){alert('请输入出生日期');btn.disabled=false;btn.textContent='开始分析';return;}
+    [year,month,day]=dateStr.split('-').map(Number);
+  }else{
+    const ly=parseInt(document.getElementById('lunarYear').value);
+    const lm=parseInt(document.getElementById('lunarMonth').value);
+    const ld=parseInt(document.getElementById('lunarDay').value);
+    if(!ly||!lm||!ld){alert('请输入完整的农历日期');btn.disabled=false;btn.textContent='开始分析';return;}
+    const solar=lunarToSolar(ly,lm,ld,document.getElementById('lunarLeapMonth').checked);
+    const d=solar.solarDate;
+    year=d.getFullYear();month=d.getMonth()+1;day=d.getDate();
+  }
+
+  const hourVal=document.getElementById('baziHour').value;
+  const hour=hourVal?parseInt(hourVal):12;
+  const sex=document.querySelector('input[name="baziSex"]:checked')?.value||'male';
+
+  // === 排盘 ===
+  const{stemIdx:ysIdx,branchIdx:ybIdx,stem:yStem,branch:yBranch}=getYearStemBranch(year,month,day);
+  const dayStemIdx=getDayStemIndex(year,month,day);
+  const dayBranchIdx=getDayBranchIndex(year,month,day);
+  const dayStem=STEMS[dayStemIdx];
+  const dayBranch=BRANCHES[dayBranchIdx];
+  const monthBranch=BRANCHES[(month+9)%12];
+  const monthStemIdx=getMonthStem(dayStemIdx,monthBranch);
+  const monthStem=STEMS[monthStemIdx];
+  const monthBranchIdx=BRANCHES.indexOf(monthBranch);
+  const hourBranchIdx=Math.floor(hour/2)%12;
+  const hourBranch=BRANCHES[hourBranchIdx];
+  const hourStemIdx=getHourStem(dayStemIdx,hourBranch);
+  const hourStem=STEMS[hourStemIdx];
+
+  const pillars=[
+    {stem:yStem,branch:yBranch,stemIdx:ysIdx,branchIdx:ybIdx,name:'年柱'},
+    {stem:monthStem,branch:monthBranch,stemIdx:monthStemIdx,branchIdx:monthBranchIdx,name:'月柱'},
+    {stem:dayStem,branch:dayBranch,stemIdx:dayStemIdx,branchIdx:dayBranchIdx,name:'日柱'},
+    {stem:hourStem,branch:hourBranch,stemIdx:hourStemIdx,branchIdx:hourBranchIdx,name:'时柱'}
+  ];
+
+  // 五行统计
+  const eleCount={木:0,火:0,土:0,金:0,水:0};
+  for(const p of pillars){eleCount[ELE[p.stem]]++;eleCount[ZHI_ELE[p.branch]]++;}
+  const total=Object.values(eleCount).reduce((a,b)=>a+b,0);
+  const sorted=Object.entries(eleCount).sort((a,b)=>a[1]-b[1]);
+  const weakest=sorted[0][0];
+  const strongest=sorted[4][0];
+  const dayEle=ELE[dayStem];
+
+  // 旺衰判断
+  const monthEle=ZHI_ELE[monthBranch];
+  const ms=(monthEle===dayEle)?3:(monthEle===getXSheng(dayEle))?2:(monthEle===getKe(dayEle))?0:1;
+  const dayBranchEle=ZHI_ELE[dayBranch];
+  const ds=(dayBranchEle===dayEle)?3:(dayBranchEle===getXSheng(dayEle))?2:1;
+  const totalStrength=ms+ds+Math.min(2,eleCount[dayEle]);
+  const isStrong=totalStrength>=5;
+
+  // 十神统计
+  const tenGods={比:0,劫:0,食:0,伤:0,财:0,才:0,官:0,杀:0,印:0,枭:0,无:0};
+  const tenGodMap=TENGAN[dayStem];
+  for(let i=0;i<4;i++){
+    if(i===2)continue;
+    const p=pillars[i];
+    let found=null;
+    for(const[k,v]of Object.entries(tenGodMap)){
+      if(v===p.stem){found=k;break;}
+    }
+    if(found)tenGods[found]++;
+  }
+
+  // 存储数据
+  const baziData={pillars,eleCount,total,dayStem,dayEle,dayStemIdx,isStrong,strongest,weakest,tenGods,sex,birthYear:year};
+  window._baziData=baziData;
+
+  // === 渲染 ===
+  const baziNameEl=document.getElementById('rbName');
+  const baziMetaEl=document.getElementById('rbMeta');
+  const baziTagsEl=document.getElementById('rbTags');
+  if(baziNameEl)baziNameEl.textContent='命盘分析';
+  if(baziMetaEl)baziMetaEl.textContent=`${year}年${month}月${day}日 ${hour}时 · ${sex==='male'?'男':'女'}命`;
+  if(baziTagsEl)baziTagsEl.innerHTML=`
+    <span class="rb-tag">${dayEle}日主</span>
+    <span class="rb-tag">${dayStem}日</span>
+    <span class="rb-tag">${ELE[monthStem]}月</span>
+    <span class="rb-tag">${ZHI_ELE[dayBranch]}时</span>
+    <span class="rb-tag">${isStrong?'身旺':'身弱'}</span>
+  `;
+
+  // 四柱
+  for(let i=0;i<4;i++){
+    const p=pillars[i];
+    document.getElementById('bz'+i+'g').textContent=p.stem;
+    document.getElementById('bz'+i+'g').className='pr-gan gan-'+p.stem;
+    document.getElementById('bz'+i+'z').textContent=p.branch;
+    document.getElementById('bz'+i+'z').className='pr-zhi zhi-'+p.branch;
+    document.getElementById('bz'+i+'e').textContent=ELE[p.stem]+'·'+ZHI_ELE[p.branch];
+    if(i===2)document.getElementById('bz'+i+'n').textContent='日主';
+    else{
+      const rel=getTenGod(p.stem,p.branch,dayStem);
+      document.getElementById('bz'+i+'n').textContent=rel;
+    }
+  }
+
+  // 图表
+  drawRadarChart(eleCount,total);
+  drawPieChart(tenGods);
+  drawEleBar(eleCount,total);
+
+  // 重点提醒
+  const warnings=[];
+  if(eleCount[dayEle]<2)warnings.push({level:'warn-red',text:'🔴 日主偏弱：易受大运流年影响，需重点补强日主五行（'+dayEle+'）'});
+  if(isStrong&&eleCount[getKe(dayEle)]>=3)warnings.push({level:'warn-yellow',text:'🟡 身旺克泄重重：忌神强旺之年易有重大挫折'});
+  if(eleCount[strongest]>=5)warnings.push({level:'warn-yellow',text:'🟡 五行偏枯：'+strongest+'过旺，其余不足'});
+  if(warnings.length===0)warnings.push({level:'warn-green',text:'✅ 命局较平衡，无重大隐患，顺势而为即可'});
+
+  const warnBanner=document.getElementById('warnBanner');
+  const warnContent=document.getElementById('warnContent');
+  if(warnBanner)warnBanner.style.display='block';
+  if(warnContent)warnContent.innerHTML=warnings.map(w=>`<div class="${w.level}">${w.text}</div>`).join('');
+
+  // 十神网格
+  const tgGrid=document.getElementById('tenGodsGrid');
+  if(tgGrid)tgGrid.innerHTML='';
+  const tenGodColors={比:'#2980b9',劫:'#5dade2',食:'#27ae60',伤:'#2ecc71',财:'#e67e22',才:'#f39c12',官:'#c0392b',杀:'#e74c3c',印:'#8e44ad',枭:'#9b59b6'};
+  for(const[k,v]of Object.entries(tenGods)){
+    if(v===0)continue;
+    const colors2={甲:'#2980b9',乙:'#27ae60',丙:'#e74c3c',丁:'#c0392b',戊:'#e67e22',己:'#a08060',庚:'#95a5a6',辛:'#7f8c8d',壬:'#2980b9',癸:'#5dade2'};
+    let gan='';
+    for(let i=0;i<4;i++){if(i===2)continue;const p=pillars[i];const ts=TENGAN[dayStem];for(const[rk,rv]of Object.entries(ts)){if(rk===k&&rv===p.stem){gan=p.stem;break;}}}
+    if(tgGrid)tgGrid.innerHTML+=`<div class="tg-item">
+      <div class="tg-gan" style="color:${gan?colors2[gan]:'#c9a84c'}">${gan||'—'}</div>
+      <div class="tg-name">×${v}</div>
+      <div class="tg-role" style="color:${tenGodColors[k]||'#888'}">${TEGAN_NAMES[k]}</div>
+    </div>`;
+  }
+
+  // 大运
+  const dayun=computeDayun(pillars,sex,year,dayStemIdx,dayEle);
+  const dayunGrid=document.getElementById('dayunGrid');
+  if(dayunGrid){
+    dayunGrid.innerHTML='';
+    dayun.forEach(d=>{
+      const cls=d.isXi?'xi':d.isJi?'ji':'';
+      dayunGrid.innerHTML+=`<div class="dy-item ${cls}">
+        <div class="dy-head"><span class="dy-age">${d.ageStart}-${d.ageEnd}岁</span><span class="dy-range">${d.yearStart}-${d.yearEnd}</span></div>
+        <div class="dy-pillar">${d.gan}${d.zhi}</div>
+        <div class="dy-ganzhi">${d.rel}坐宫</div>
+        <div class="dy-desc">${d.tip}</div>
+      </div>`;
+    });
+  }
+
+  // 显示结果
+  document.getElementById('baziResult').classList.add('visible');
+  document.getElementById('baziInput').style.display='none';
+  btn.disabled=false;btn.textContent='开始分析';
+
+  // 启动AI分析
+  runAIAnalysis(baziData);
+}
+
+// ═══════════════════════════════════════════════════════
+// 今日运势
+// ═══════════════════════════════════════════════════════
+function initTodayPanel(){
+  const now=new Date();
+  const dateEl=document.getElementById('tpDate');
+  const scoreEl=document.getElementById('tpScore');
+  const descEl=document.getElementById('tpDesc');
+  const tagsEl=document.getElementById('tpTags');
+  if(!dateEl)return;
+
+  const year=now.getFullYear(),month=now.getMonth()+1,day=now.getDate();
+  dateEl.textContent=`${year}年${month}月${day}日 · ${['日','一','二','三','四','五','六'][now.getDay()]}`;
+
+  // 简单运势计算
+  const dayStemIdx=getDayStemIndex(year,month,day);
+  const dayBranchIdx=getDayBranchIndex(year,month,day);
+  const score=Math.floor(((dayStemIdx+dayBranchIdx)/22*30+70));
+  scoreEl.textContent=score+'分';
+
+  const ele=ELE[STEMS[dayStemIdx]];
+  const eleDesc={木:'🌿 木气充盈日，宜学习新知、播种梦想',火:'🔥 火气旺盛日，宜展示才华、拓展人脉',土:'🏔️ 土气沉稳日，宜务实行动、稳扎稳打',金:'⚔️ 金气锐利日，宜决断投资、突破难题',水:'🌊 水气灵动日，宜创意发想、沟通协作'};
+  descEl.textContent=eleDesc[ele]||'今日运势平稳';
+
+  const signs=['宜静心','宜进取','宜守成','宜社交','宜独处'];
+  tagsEl.innerHTML=signs.slice(0,3).map(s=>`<span class="tp-tag">${s}</span>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// 启动
+// ═══════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',function(){
+  initTodayPanel();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=5.0,user-scalable=yes">
+<meta name="theme-color" content="#080808">
+<title>倪师中医学堂 — 易道智鉴</title>
+<style>
+/* ════ Variables & Reset ════ */
+:root{
+  --ink:#080808;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;
+  --paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;
+  --gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;
+  --cinn:#c0392b;--cinn2:#e74c3c;
+  --jade:#27ae60;--jade2:#2ecc71;
+  --orange:#e67e22;
+  --danger:#dc3545;
+  --border:rgba(201,168,76,.15);
+  --card-bg:rgba(255,255,255,.035);
+  --card-bg2:rgba(255,255,255,.06);
+  --shadow:0 4px 24px rgba(0,0,0,.5);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Noto Serif SC','Source Han Serif SC','Songti SC','STSong',serif;
+  background:var(--ink);color:var(--paper);min-height:100vh;line-height:1.8;
+  overflow-x:hidden;padding-top:64px;
+}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(201,168,76,.04) 0%,transparent 60%);pointer-events:none;z-index:0}
+a{color:var(--gold2);text-decoration:none}
+
+/* ════ Top Nav ════ */
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(8,8,8,.97);backdrop-filter:blur(12px);border-bottom:1px solid rgba(201,168,76,.08);height:64px;display:flex;align-items:center;padding:0 20px;gap:16px}
+.nav-back{display:flex;align-items:center;gap:8px;color:var(--paper3);font-size:13px;letter-spacing:3px;cursor:pointer;transition:color .25s;padding:8px 0;white-space:nowrap}
+.nav-back:hover{color:var(--gold)}
+.nav-back .arrow{font-size:18px}
+.nav-title{font-size:18px;color:var(--gold);letter-spacing:4px;font-weight:600;flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-menu-btn{display:none;background:none;border:1px solid var(--border);color:var(--paper3);padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-family:inherit}
+
+/* ════ Layout ════ */
+.container{max-width:1200px;margin:0 auto;padding:24px 20px 60px;position:relative;z-index:1}
+
+/* ════ Disclaimer Banner ════ */
+.disclaimer-banner{background:rgba(192,57,43,.07);border:1px solid rgba(192,57,43,.2);border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:13px;color:#e0a090;line-height:1.7}
+.disclaimer-banner .dis-icon{margin-right:6px}
+.disclaimer-banner strong{color:#e8a090}
+
+/* ════ Section System ════ */
+.section{display:none;animation:fadeUp .4s ease}
+.section.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+.section-header{text-align:center;margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.section-header .sh-icon{font-size:42px;margin-bottom:8px}
+.section-header .sh-title{font-size:clamp(22px,4vw,32px);color:var(--gold);letter-spacing:6px;margin-bottom:6px}
+.section-header .sh-desc{font-size:13px;color:var(--paper3);letter-spacing:2px}
+
+/* ════ Cards ════ */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:24px}
+.card{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:24px 20px;transition:all .3s;cursor:pointer;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0;transition:opacity .3s}
+.card:hover{border-color:rgba(201,168,76,.35);background:var(--card-bg2);transform:translateY(-3px);box-shadow:var(--shadow)}
+.card:hover::before{opacity:1}
+.card-icon{font-size:36px;margin-bottom:12px}
+.card-title{font-size:18px;color:var(--gold2);letter-spacing:3px;margin-bottom:8px}
+.card-desc{font-size:13px;color:var(--paper3);line-height:1.7}
+.card-tag{display:inline-block;font-size:11px;color:var(--gold);border:1px solid rgba(201,168,76,.2);padding:2px 8px;border-radius:10px;margin-top:8px;letter-spacing:1px}
+
+/* ════ Tabs ════ */
+.tab-bar{display:flex;gap:4px;margin-bottom:20px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:4px}
+.tab-btn{padding:10px 18px;font-size:14px;color:var(--paper3);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:inherit;letter-spacing:2px;transition:all .25s}
+.tab-btn:hover{color:var(--paper2)}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+.tab-content{display:none;animation:fadeUp .3s ease}
+.tab-content.active{display:block}
+
+/* ════ Content Panels ════ */
+.panel{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
+.panel h3{color:var(--gold2);font-size:17px;letter-spacing:3px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.08)}
+.panel h4{color:var(--gold);font-size:15px;letter-spacing:2px;margin:12px 0 8px}
+.panel p{font-size:14px;color:var(--paper2);margin-bottom:8px;line-height:1.9}
+.panel ul{list-style:none;padding-left:0}
+.panel ul li{font-size:14px;color:var(--paper2);padding:4px 0 4px 16px;position:relative}
+.panel ul li::before{content:'◆';position:absolute;left:0;color:var(--gold3);font-size:10px;top:7px}
+.panel .tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.panel .tag-row span{font-size:12px;padding:3px 10px;border-radius:12px;border:1px solid rgba(201,168,76,.15);color:var(--paper3)}
+.panel .warn{background:rgba(192,57,43,.06);border:1px solid rgba(192,57,43,.15);border-radius:8px;padding:10px 14px;font-size:13px;color:#e0a090;margin:10px 0}
+.panel .note{background:rgba(39,174,96,.05);border:1px solid rgba(39,174,96,.12);border-radius:8px;padding:10px 14px;font-size:13px;color:#a0d0a0;margin:10px 0}
+
+/* ════ Search ════ */
+.search-box{display:flex;gap:10px;margin-bottom:20px}
+.search-input{flex:1;padding:12px 16px;background:var(--ink2);border:1px solid var(--border);border-radius:8px;color:var(--paper);font-size:14px;font-family:inherit;outline:none;transition:border-color .25s}
+.search-input:focus{border-color:var(--gold)}
+.search-btn{padding:12px 24px;background:linear-gradient(135deg,var(--gold3),var(--gold));color:var(--ink);border:none;border-radius:8px;font-size:14px;cursor:pointer;font-family:inherit;letter-spacing:2px;transition:all .25s;white-space:nowrap}
+.search-btn:hover{box-shadow:0 0 16px rgba(201,168,76,.2)}
+
+/* ════ Filter chips ════ */
+.filter-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.chip{font-size:12px;padding:5px 12px;border:1px solid var(--border);border-radius:14px;color:var(--paper3);cursor:pointer;transition:all .2s;font-family:inherit;background:none}
+.chip:hover,.chip.active{background:rgba(201,168,76,.1);color:var(--gold);border-color:rgba(201,168,76,.3)}
+
+/* ════ Search Results ════ */
+.search-results{margin-top:16px}
+.result-item{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin-bottom:10px;transition:border-color .2s}
+.result-item:hover{border-color:rgba(201,168,76,.25)}
+.result-item .ri-source{font-size:11px;color:var(--gold3);letter-spacing:1px;margin-bottom:4px}
+.result-item .ri-title{font-size:15px;color:var(--paper);margin-bottom:4px}
+.result-item .ri-desc{font-size:13px;color:var(--paper3);line-height:1.7}
+.result-item .ri-tags{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.result-item .ri-tags span{font-size:10px;padding:2px 8px;border-radius:8px;background:rgba(201,168,76,.08);color:var(--paper3)}
+.no-results{text-align:center;padding:40px;color:var(--paper3);font-size:14px}
+
+/* ════ Table ════ */
+.data-table{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0}
+.data-table th{background:rgba(201,168,76,.06);color:var(--gold);padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);font-weight:600;letter-spacing:1px;font-size:12px;white-space:nowrap}
+.data-table td{padding:10px 12px;border-bottom:1px solid rgba(201,168,76,.05);color:var(--paper2);vertical-align:top}
+.data-table tr:hover td{background:rgba(201,168,76,.03)}
+
+/* ════ Beginner Q&A ════ */
+.qa-input-area{text-align:center;padding:30px 20px}
+.qa-input-area h3{color:var(--gold2);font-size:20px;letter-spacing:4px;margin-bottom:16px}
+.qa-input-area p{color:var(--paper3);font-size:13px;margin-bottom:20px;max-width:500px;margin-left:auto;margin-right:auto}
+.qa-suggestions{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px}
+.qa-suggestions .sugg{font-size:13px;padding:8px 16px;border:1px solid var(--border);border-radius:20px;color:var(--paper3);cursor:pointer;transition:all .25s;background:none;font-family:inherit}
+.qa-suggestions .sugg:hover{background:rgba(201,168,76,.08);color:var(--gold);border-color:rgba(201,168,76,.3)}
+.qa-output{text-align:left;margin-top:24px}
+.qa-output .qa-translate{background:rgba(201,168,76,.05);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px;font-size:14px;color:var(--paper2)}
+.qa-output .qa-translate strong{color:var(--gold2)}
+.qa-output .qa-watershed{display:grid;grid-template-columns:1fr;gap:8px;margin:14px 0}
+.qa-output .qa-ws-item{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:10px 14px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;font-size:13px}
+.qa-output .qa-ws-item .ws-q{color:var(--paper3)}
+.qa-output .qa-ws-item .ws-a{color:var(--jade2)}
+.qa-output .qa-ws-item .ws-b{color:var(--cinn2)}
+
+/* ════ Course Map ════ */
+.course-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.course-item{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:16px;transition:all .25s;cursor:pointer}
+.course-item:hover{border-color:rgba(201,168,76,.3);background:var(--card-bg2)}
+.course-item .ci-num{font-size:28px;color:var(--gold3);font-weight:300;margin-bottom:4px}
+.course-item .ci-title{font-size:15px;color:var(--gold2);letter-spacing:2px;margin-bottom:6px}
+.course-item .ci-desc{font-size:12px;color:var(--paper3);line-height:1.6}
+
+/* ════ Back to Top ════ */
+.back-top{position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:50%;background:var(--ink2);border:1px solid var(--border);color:var(--gold);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:all .3s;z-index:150}
+.back-top.show{opacity:1}
+.back-top:hover{background:var(--ink3);border-color:var(--gold)}
+
+/* ════ Sidebar Nav (desktop) ════ */
+.sidebar-nav{position:sticky;top:80px;display:flex;flex-direction:column;gap:4px;margin-bottom:24px}
+.sidebar-nav .sn-item{padding:8px 14px;font-size:13px;color:var(--paper3);cursor:pointer;border-left:2px solid transparent;transition:all .2s;letter-spacing:1px}
+.sidebar-nav .sn-item:hover{color:var(--paper2)}
+.sidebar-nav .sn-item.active{color:var(--gold);border-left-color:var(--gold);background:rgba(201,168,76,.04)}
+
+/* ════ Responsive ════ */
+@media(min-width:769px){
+  .layout-with-sidebar{display:grid;grid-template-columns:200px 1fr;gap:24px}
+}
+
+@media(max-width:768px){
+  .top-nav{padding:0 12px}
+  .nav-title{font-size:15px;letter-spacing:2px}
+  .nav-back{font-size:12px}
+  .container{padding:16px 12px 40px}
+  .card-grid{grid-template-columns:1fr;gap:12px}
+  .card{padding:18px 16px}
+  .data-table{font-size:12px}
+  .data-table th,.data-table td{padding:8px 8px}
+  .tab-btn{padding:8px 12px;font-size:13px}
+  .search-box{flex-direction:column}
+  .search-btn{width:100%}
+  .panel{padding:16px 14px}
+  .course-list{grid-template-columns:1fr}
+  .qa-output .qa-ws-item{grid-template-columns:1fr;font-size:12px}
+  .qa-output .qa-ws-item > div{padding:4px 0}
+  .nav-menu-btn{display:block}
+  .sidebar-nav{display:none}
+  .layout-with-sidebar{display:block}
+}
+
+@media(max-width:480px){
+  .nav-title{font-size:14px;letter-spacing:1px}
+  .nav-back span:not(.arrow){display:none}
+  .section-header .sh-title{font-size:20px;letter-spacing:3px}
+  .section-header .sh-icon{font-size:32px}
+  .card-icon{font-size:28px}
+  .card-title{font-size:16px}
+  .panel h3{font-size:15px}
+  .disclaimer-banner{font-size:12px;padding:12px 14px}
+}
+
+/* ════ Utility ════ */
+.hidden{display:none!important}
+.text-center{text-align:center}
+.text-gold{color:var(--gold)}
+.text-warn{color:#e0a090}
+.text-jade{color:#a0d0a0}
+.mt-16{margin-top:16px}
+.mt-24{margin-top:24px}
+.mb-16{margin-bottom:16px}
+</style>
+</head>
+<body>
+
+<!-- ════ Top Nav ════ -->
+<nav class="top-nav">
+  <div class="nav-back" onclick="goHome()">
+    <span class="arrow">←</span>
+    <span>返回主平台</span>
+  </div>
+  <div class="nav-title">倪师中医学堂</div>
+  <button class="nav-menu-btn" onclick="toggleMobileMenu()">☰ 菜单</button>
+</nav>
+
+<!-- ════ Mobile Menu ════ -->
+<div id="mobileMenu" class="hidden" style="position:fixed;top:64px;left:0;right:0;z-index:180;background:rgba(8,8,8,.98);border-bottom:1px solid var(--border);padding:12px;display:none">
+  <div style="display:flex;flex-direction:column;gap:4px">
+    <button class="tab-btn" onclick="showSection('home');toggleMobileMenu()" style="text-align:left">📚 学习入口</button>
+    <button class="tab-btn" onclick="showSection('beginner');toggleMobileMenu()" style="text-align:left">💬 白话问答</button>
+    <button class="tab-btn" onclick="showSection('liujing');toggleMobileMenu()" style="text-align:left">☯️ 六经辨证</button>
+    <button class="tab-btn" onclick="showSection('fangzheng');toggleMobileMenu()" style="text-align:left">📜 方证检索</button>
+    <button class="tab-btn" onclick="showSection('zhenjiu');toggleMobileMenu()" style="text-align:left">🪡 针灸经络</button>
+    <button class="tab-btn" onclick="showSection('coursemap');toggleMobileMenu()" style="text-align:left">🗺️ 课程地图</button>
+    <button class="tab-btn" onclick="showSection('search');toggleMobileMenu()" style="text-align:left">🔍 全局搜索</button>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ════ Disclaimer ════ -->
+<div class="disclaimer-banner">
+  <span class="dis-icon">⚠️</span>
+  <strong>医疗免责声明：</strong>本页面内容仅作倪海厦中医课程学习与理论整理用途，不构成任何医学诊断、处方或个人用药建议。涉及真实身体不适、急症、孕产儿童、肿瘤、附子等高风险内容时，请务必咨询合格医疗专业人员或急诊。切勿自行照方用药或进行针灸操作。
+</div>
+
+<div class="layout-with-sidebar">
+<!-- Desktop sidebar -->
+<div class="sidebar-nav" id="sidebarNav">
+  <div class="sn-item active" onclick="showSection('home')">📚 学习入口</div>
+  <div class="sn-item" onclick="showSection('beginner')">💬 白话问答</div>
+  <div class="sn-item" onclick="showSection('liujing')">☯️ 六经辨证</div>
+  <div class="sn-item" onclick="showSection('fangzheng')">📜 方证检索</div>
+  <div class="sn-item" onclick="showSection('zhenjiu')">🪡 针灸经络</div>
+  <div class="sn-item" onclick="showSection('coursemap')">🗺️ 课程地图</div>
+  <div class="sn-item" onclick="showSection('search')">🔍 全局搜索</div>
+</div>
+
+<div>
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION: HOME / Learning Entry -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div id="section-home" class="section active">
+  <div class="section-header">
+    <div class="sh-icon">📖</div>
+    <div class="sh-title">倪师中医学堂</div>
+    <div class="sh-desc">按「学这个为了做什么」组织 · 课程学习入口</div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card" onclick="showSection('beginner')">
+      <div class="card-icon">💬</div>
+      <div class="card-title">白话问答</div>
+      <div class="card-desc">不懂中医术语也能学。输入"感冒怕冷""手脚冰凉""睡不着"等日常语言，自动转化为中医辨证问题。</div>
+      <span class="card-tag">零基础入口</span>
+    </div>
+    <div class="card" onclick="showSection('liujing')">
+      <div class="card-icon">☯️</div>
+      <div class="card-title">辨证学习</div>
+      <div class="card-desc">六经辨证框架：太阳、阳明、少阳、太阴、少阴、厥阴。每经含提纲、方证、传变与注意事项。</div>
+      <span class="card-tag">建立辨证框架</span>
+    </div>
+    <div class="card" onclick="showSection('fangzheng')">
+      <div class="card-icon">📜</div>
+      <div class="card-title">方证学习</div>
+      <div class="card-desc">按方剂名或症状搜索方证，课程方义、相似方鉴别、禁忌与风险提示。桂枝汤、麻黄汤、小柴胡汤……</div>
+      <span class="card-tag">掌握方证对应</span>
+    </div>
+    <div class="card" onclick="showSection('zhenjiu')">
+      <div class="card-icon">🪡</div>
+      <div class="card-title">针灸经络</div>
+      <div class="card-desc">十二经络导航、常用穴位表（穴名/定位/主治/配穴）、子午流注时辰养生、五输穴与保健穴。</div>
+      <span class="card-tag">针灸学习</span>
+    </div>
+    <div class="card" onclick="showSection('coursemap')">
+      <div class="card-icon">🗺️</div>
+      <div class="card-title">课程地图</div>
+      <div class="card-desc">13大模块逐课导航：伤寒论、金匮要略、针灸、黄帝内经、神农本草、仲景心法、临床案例……</div>
+      <span class="card-tag">课程复习</span>
+    </div>
+    <div class="card" onclick="showSection('search')">
+      <div class="card-icon">🔍</div>
+      <div class="card-title">全局搜索</div>
+      <div class="card-desc">跨模块关键词检索：方名、症状、六经、穴位、课次，一站式找到相关课程知识点。</div>
+      <span class="card-tag">查找课程依据</span>
+    </div>
+  </div>
+
+  <!-- 推荐学习路径 -->
+  <div class="panel mt-24">
+    <h3>🛤️ 推荐学习路径</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-top:12px">
+      <div style="padding:14px;background:rgba(201,168,76,.04);border-radius:8px;border:1px solid var(--border)">
+        <h4 style="color:var(--gold2)">入门路径：先会分辨</h4>
+        <ul>
+          <li>读六经辨证总览表</li>
+          <li>用5个问题练习：发热、便秘、下利、腹痛、手足冷</li>
+          <li>再进入方证模块看代表方</li>
+        </ul>
+      </div>
+      <div style="padding:14px;background:rgba(201,168,76,.04);border-radius:8px;border:1px solid var(--border)">
+        <h4 style="color:var(--gold2)">方证路径：有中医基础</h4>
+        <ul>
+          <li>从桂枝汤/麻黄汤、小柴胡汤、白虎汤/承气汤、四逆汤四组开始</li>
+          <li>每组记三件事：主症、鉴别点、禁忌</li>
+          <li>用课程地图找板书证据</li>
+        </ul>
+      </div>
+      <div style="padding:14px;background:rgba(201,168,76,.04);border-radius:8px;border:1px solid var(--border)">
+        <h4 style="color:var(--gold2)">逐课路径：跟视频复习</h4>
+        <ul>
+          <li>用课程地图看每讲主题</li>
+          <li>每讲提炼3张卡：病机卡、方证卡、禁忌卡</li>
+          <li>保留3~5张关键截图作为复习锚点</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 安全边界 -->
+  <div class="panel" style="border-color:rgba(192,57,43,.2)">
+    <h3 style="color:#e0a090">🛡️ 安全学习边界</h3>
+    <div class="warn">以下内容只能作为课程理论学习，不能自行操作：<br>
+      • 附子、生附子、炮附子、四逆汤辈、白通汤等回阳救逆方<br>
+      • 大承气汤、抵当汤、大陷胸汤等峻烈攻下破血方<br>
+      • 癌症、肿瘤、阴实等危重症判断<br>
+      • 孕产妇、儿童、老人、胸痛、急腹痛、神志异常等<br>
+      真实病情必须由执业中医师面诊辨证；急症请立即急诊。</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION: BEGINNER Q&A -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div id="section-beginner" class="section">
+  <div class="section-header">
+    <div class="sh-icon">💬</div>
+    <div class="sh-title">白话问答</div>
+    <div class="sh-desc">用日常语言学习中医辨证思路</div>
+  </div>
+
+  <div class="qa-input-area">
+    <h3>你哪里不舒服？用大白话说就行</h3>
+    <p>不用懂中医术语，像跟朋友聊天一样描述你的问题。比如"感冒了怕冷没汗""手脚一直冰凉""这几天睡不着心里烦"。</p>
+    <div class="search-box" style="max-width:600px;margin:0 auto">
+      <input type="text" class="search-input" id="beginnerInput" placeholder="如：感冒怕冷没汗、手脚冰凉、拉肚子像水…" onkeyup="if(event.key==='Enter')doBeginnerSearch()">
+      <button class="search-btn" onclick="doBeginnerSearch()">学习分析</button>
+    </div>
+    <div class="qa-suggestions">
+      <button class="sugg" onclick="setBeginnerInput('感冒了怕冷没汗身上疼')">感冒怕冷没汗</button>
+      <button class="sugg" onclick="setBeginnerInput('一阵冷一阵热口苦')">一阵冷一阵热</button>
+      <button class="sugg" onclick="setBeginnerInput('手脚一直冰凉')">手脚冰凉</button>
+      <button class="sugg" onclick="setBeginnerInput('睡不着心里烦')">睡不着心烦</button>
+      <button class="sugg" onclick="setBeginnerInput('拉肚子像水一样')">拉水样便</button>
+      <button class="sugg" onclick="setBeginnerInput('好几天不大便')">便秘几天</button>
+      <button class="sugg" onclick="setBeginnerInput('肚子胀按着不舒服')">腹胀腹痛</button>
+      <button class="sugg" onclick="setBeginnerInput('经期感冒')">经期感冒</button>
+    </div>
+  </div>
+
+  <div id="beginnerOutput" class="qa-output"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION: SIX-CHANNEL (六经辨证) -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div id="section-liujing" class="section">
+  <div class="section-header">
+    <div class="sh-icon">☯️</div>
+    <div class="sh-title">六经辨证</div>
+    <div class="sh-desc">太阳 → 阳明 → 少阳 → 太阴 → 少阴 → 厥阴</div>
+  </div>
+
+  <div class="search-box">
+    <input type="text" class="search-input" id="liujingSearch" placeholder="搜索六经内容：症状、方名、病机…" onkeyup="filterLiujing(this.value)">
+    <button class="search-btn" onclick="filterLiujing(document.getElementById('liujingSearch').value)">搜索</button>
+  </div>
+
+  <div class="tab-bar" id="liujingTabs">
+    <button class="tab-btn active" onclick="switchLiujingTab('taiyang',this)">☀️ 太阳</button>
+    <button class="tab-btn" onclick="switchLiujingTab('yangming',this)">🔆 阳明</button>
+    <button class="tab-btn" onclick="switchLiujingTab('shaoyang',this)">🌗 少阳</button>
+    <button class="tab-btn" onclick="switchLiujingTab('taiyin',this)">🌍 太阴</button>
+    <button class="tab-btn" onclick="switchLiujingTab('shaoyin',this)">🌑 少阴</button>
+    <button class="tab-btn" onclick="switchLiujingTab('jueyin',this)">🌒 厥阴</button>
+  </div>
+
+  <div id="liujing-content"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION: FANGZHENG (方证检索) -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div id="section-fangzheng" class="section">
+  <div class="section-header">
+    <div class="sh-icon">📜</div>
+    <div class="sh-title">方证检索</div>
+    <div class="sh-desc">按方剂名或症状搜索 · 方证对比</div>
+  </div>
+
+  <div class="search-box">
+    <input type="text" class="search-input" id="fangzhengSearch" placeholder="输入方名（桂枝汤、麻黄汤…）或症状（发热、便秘…）" onkeyup="doFangzhengSearch(this.value)">
+    <button class="search-btn" onclick="doFangzhengSearch(document.getElementById('fangzhengSearch').value)">搜索</button>
+  </div>
+
+  <div class="filter-chips" id="fangzhengChips"></div>
+  <div id="fangzhengResults" class="search-results"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION: ZHENJIU (针灸经络) -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div id="section-zhenjiu" class="section">
+  <div class="section-header">
+    <div class="sh-icon">🪡</div>
+    <div class="sh-title">针灸经络</div>
+    <div class="sh-desc">十二经络 · 常用穴位 · 子午流注</div>
+  </div>
+
+  <div class="search-box">
+    <input type="text" class="search-input" id="zhenjiuSearch" placeholder="搜索穴位名、经络、主治…" onkeyup="doZhenjiuSearch(this.value)">
+    <button class="search-btn" onclick="doZhenjiuSearch(document.getElementById('zhenjiuSearch').value)">搜索</button>
+  </div>
+
+  <div class="tab-bar" id="zhenjiuTabs">
+    <button class="tab-btn active" onclick="switchZhenjiuTab('meridians',this)">十二经络</button>
+    <button class="tab-btn" onclick="switchZhenjiuTab('points',this)">常用穴位</button>
+    <button class="tab-btn" onclick="switchZhenjiuTab('ziwu',this)">子午流注</button>
+    <button class="tab-btn" onclick="switchZhenjiuTab('wushu',this)">五输穴</button>
+  </div>
+
+  <div id="zhenjiu-content"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION: COURSE MAP -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div id="section-coursemap" class="section">
+  <div class="section-header">
+    <div class="sh-icon">🗺️</div>
+    <div class="sh-title">课程地图</div>
+    <div class="sh-desc">13大模块 · 逐课导航</div>
+  </div>
+
+  <div class="course-list" id="courseList"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION: GLOBAL SEARCH -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div id="section-search" class="section">
+  <div class="section-header">
+    <div class="sh-icon">🔍</div>
+    <div class="sh-title">全局搜索</div>
+    <div class="sh-desc">跨模块关键词检索</div>
+  </div>
+
+  <div class="search-box">
+    <input type="text" class="search-input" id="globalSearch" placeholder="输入关键词：方名、症状、六经、穴位、课次…" onkeyup="if(event.key==='Enter')doGlobalSearch()">
+    <button class="search-btn" onclick="doGlobalSearch()">搜索</button>
+  </div>
+
+  <div class="filter-chips" id="globalFilterChips">
+    <button class="chip active" onclick="setGlobalFilter('all',this)">全部</button>
+    <button class="chip" onclick="setGlobalFilter('liujing',this)">六经</button>
+    <button class="chip" onclick="setGlobalFilter('fangzheng',this)">方证</button>
+    <button class="chip" onclick="setGlobalFilter('zhenjiu',this)">针灸</button>
+    <button class="chip" onclick="setGlobalFilter('course',this)">课程</button>
+  </div>
+
+  <div id="globalSearchResults" class="search-results"></div>
+</div>
+
+</div><!-- /layout-with-sidebar inner -->
+</div><!-- /layout-with-sidebar -->
+
+</div><!-- /container -->
+
+<!-- Back to top -->
+<div class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   DATA: Built-in course knowledge (mirrors nihaisha-tcm-kb.js
+   structure, with expanded learning-oriented content)
+   ════════════════════════════════════════════════════════════ */
+
+var KB = {
+  // ── 六经辨证 ──
+  liujing: {
+    taiyang: {
+      name: '太阳病',
+      icon: '☀️',
+      summary: '病在表，体表寒水与营卫。多数外感刚开始的一层。',
+      gang: '脉浮、头项强痛、恶寒',
+      fangzheng: [
+        { name:'太阳中风', desc:'有汗、恶风、脉缓', fang:'桂枝汤', theory:'桂枝壮心阳（动脉），白芍强心阴（静脉）；等量配伍调节动静脉循环' },
+        { name:'太阳伤寒', desc:'无汗、体痛、脉紧', fang:'麻黄汤', theory:'麻黄发汗解表，桂枝温通经脉，杏仁降肺气' },
+        { name:'项背强几几', desc:'无汗恶风，项背肌肉拘急', fang:'葛根汤', theory:'葛根升津液濡养筋脉，合桂枝汤加麻黄' },
+        { name:'表寒里热', desc:'无汗烦躁', fang:'大青龙汤', theory:'外散风寒，内清郁热' }
+      ],
+      chuanbian: '太阳→少阳→阳明（由表入里）；若误治可传三阴',
+      jiaoji: '津液不足、尺脉迟微、咽干、淋家、疮家禁汗。有表证时不可攻下。',
+      mingli: '太阳病对应膀胱经/小肠经，与八字中壬水/丙火受克相关'
+    },
+    yangming: {
+      name: '阳明病',
+      icon: '🔆',
+      summary: '里实热，胃家实。热和实偏重。',
+      gang: '但热不寒、大渴、大便难、腹拒按',
+      fangzheng: [
+        { name:'阳明经热', desc:'高热大渴大汗，大便未必结', fang:'白虎汤', theory:'石膏清肺胃之热，知母润燥生津' },
+        { name:'阳明腑实轻', desc:'尚能食、放屁', fang:'小承气汤', theory:'轻下热结' },
+        { name:'阳明腑实重', desc:'不放屁、无食欲、天枢拒按、谵语', fang:'大承气汤', theory:'峻下热结，急下存阴' },
+        { name:'脾约', desc:'羊屎状便，津液枯竭', fang:'麻子仁丸', theory:'润肠通便' },
+        { name:'寒实便秘', desc:'多日不便但无痛苦，小便清白', fang:'温阳方', theory:'温阳通便' }
+      ],
+      chuanbian: '太阳传入或少阳传入；过经不解转里实热',
+      jiaoji: '承气汤中病即止，不可过下伤正。大承气汤为峻烈攻下方，不能自行使用。',
+      mingli: '阳明对应胃经/大肠经，与八字中戊土/庚金相关；阳明热盛多见火旺之命'
+    },
+    shaoyang: {
+      name: '少阳病',
+      icon: '🌗',
+      summary: '半表半里，三焦/胆/枢机。卡在表里之间。',
+      gang: '往来寒热、胸胁苦满、口苦、咽干、目眩、默默不欲饮食、心烦喜呕',
+      fangzheng: [
+        { name:'少阳本病', desc:'往来寒热、胸胁苦满、口苦咽干目眩', fang:'小柴胡汤', theory:'柴胡疏少阳，黄芩清胆热，半夏降逆止呕，人参扶正' },
+        { name:'热入血室', desc:'经期外感，一阵冷一阵热、烦、如见鬼状', fang:'小柴胡汤', theory:'经期外感不可按普通太阳表证发汗' }
+      ],
+      chuanbian: '少阳为枢机，可出太阳、入阳明；枢机不利暗示运势转折',
+      jiaoji: '少阳治法以和解为主，不可汗、不可吐、不可下。经期外感不能按普通太阳表证发汗。',
+      mingli: '少阳对应胆经/三焦经，与八字中甲木/壬水相关；枢机不利暗示运势转折点'
+    },
+    taiyin: {
+      name: '太阴病',
+      icon: '🌍',
+      summary: '里虚寒湿，脾。脾胃偏寒湿。',
+      gang: '自利不渴、腹满时痛',
+      fangzheng: [
+        { name:'太阴本病', desc:'自利不渴、腹满时痛、食不下', fang:'理中汤/四逆辈', theory:'温中散寒，健脾燥湿' }
+      ],
+      chuanbian: '太阳误下传太阴；或阳明过寒传太阴',
+      jiaoji: '治太阴阴证一定要利小便。不能见腹满就用攻下。',
+      mingli: '太阴对应脾经，与八字中己土/丑未相关；太阴病多见土虚水旺之命'
+    },
+    shaoyin: {
+      name: '少阴病',
+      icon: '🌑',
+      summary: '心肾里寒极盛。更深层的虚寒或心肾问题，风险高。',
+      gang: '脉微细、但欲寐、自利而渴、手足寒',
+      fangzheng: [
+        { name:'少阴寒化', desc:'四肢厥冷、下利清谷、脉微欲绝', fang:'四逆汤类', theory:'破阴回阳；附子温肾阳，干姜温肺脾。高风险救逆方，不能自行使用。' },
+        { name:'少阴热化', desc:'心烦不得卧、口燥咽干', fang:'黄连阿胶汤', theory:'滋阴降火' },
+        { name:'少阴咽痛', desc:'下利、咽痛、心烦', fang:'猪肤汤/甘草汤/桔梗汤', theory:'润燥利咽' }
+      ],
+      chuanbian: '太阴不愈传少阴；少阴里证不可按太阳病强发汗',
+      jiaoji: '少阴里证不可强发汗。四逆汤辈是高风险回阳救逆方，必须面诊，不能自行尝试。',
+      mingli: '少阴对应心经/肾经，与八字中丁火/癸水相关；少阴病多见水冷火熄之命'
+    },
+    jueyin: {
+      name: '厥阴病',
+      icon: '🌒',
+      summary: '阴阳不相顺接，寒热错杂。六经之末，复杂深层阶段。',
+      gang: '厥（手脚冰冷可至肘膝）、消渴、气上撞心、饥不欲食、吐蛔',
+      fangzheng: [
+        { name:'厥阴本病', desc:'寒热错杂、消渴、气上撞心、饥不欲食', fang:'乌梅丸', theory:'寒热并用，调理厥阴枢机' },
+        { name:'血虚寒厥', desc:'手足末梢厥寒、冻疮', fang:'当归四逆汤', theory:'当归活血，桂枝通阳，细辛散寒' },
+        { name:'热厥', desc:'四肢厥冷但胸腹热、口渴', fang:'白虎汤/承气汤', theory:'热深厥深，清下其热则厥自回' }
+      ],
+      chuanbian: '厥阴是六经之末，阴阳要重新顺接；寒热错杂，真寒假热/真热假寒',
+      jiaoji: '厥阴病为危重阶段，寒热错杂极易误判。必须面诊，不能自行用药。',
+      mingli: '厥阴对应肝经/心包经，与八字中乙木/丁火相关；厥阴病多见木火交战、水火未济之命'
+    }
+  },
+
+  // ── 方证对应 ──
+  fangzheng: [
+    { name:'桂枝汤', category:'调和营卫', liujing:'太阳', zheng:'太阳中风，有汗恶风脉缓', theory:'桂枝壮心阳（动脉），白芍强心阴（静脉）；等量配伍调节动静脉循环', yangsheng:'体质偏虚易感冒者，可参考桂枝汤调和营卫的思路', jiaoji:'服药后需喝热粥助汗，不可大汗淋漓' },
+    { name:'麻黄汤', category:'发汗解表', liujing:'太阳', zheng:'太阳伤寒，无汗体痛脉紧', theory:'麻黄发汗解表，桂枝温通经脉，杏仁降肺气', yangsheng:'无', jiaoji:'津液不足、尺脉迟微、咽干、淋家、疮家禁汗' },
+    { name:'葛根汤', category:'解肌舒筋', liujing:'太阳', zheng:'项背强几几，无汗恶风', theory:'葛根升津液濡养筋脉，合桂枝汤加麻黄', yangsheng:'颈部僵硬可参考舒筋思路', jiaoji:'有汗者慎用' },
+    { name:'大青龙汤', category:'外散内清', liujing:'太阳', zheng:'表寒里热，无汗烦躁', theory:'外散风寒，内清郁热', yangsheng:'无', jiaoji:'峻汗之剂，不可过服' },
+    { name:'小柴胡汤', category:'和解少阳', liujing:'少阳', zheng:'往来寒热、胸胁苦满、口苦咽干目眩、心烦喜呕', theory:'柴胡疏少阳，黄芩清胆热，半夏降逆止呕，人参扶正', yangsheng:'情绪波动大、胸胁不适者可参考疏肝理气思路', jiaoji:'少阳不可汗、吐、下' },
+    { name:'白虎汤', category:'清热生津', liujing:'阳明', zheng:'阳明经热，大热大渴大汗', theory:'石膏清肺胃之热', yangsheng:'热性体质者需清热降火，忌辛辣', jiaoji:'无汗不渴者不可用' },
+    { name:'大承气汤', category:'峻下热结', liujing:'阳明', zheng:'阳明腑实重，不放屁、无食欲、天枢拒按、谵语', theory:'峻下热结，急下存阴', yangsheng:'无', jiaoji:'峻烈攻下方，中病即止。不能自行使用。' },
+    { name:'小承气汤', category:'轻下热结', liujing:'阳明', zheng:'阳明腑实轻，尚能食、放屁', theory:'轻下热结', yangsheng:'无', jiaoji:'中病即止' },
+    { name:'麻子仁丸', category:'润肠通便', liujing:'阳明', zheng:'脾约，羊屎状便', theory:'润肠通便', yangsheng:'津液枯竭型便秘可参考润肠思路', jiaoji:'脾虚便溏者不可用' },
+    { name:'四逆汤', category:'回阳救逆', liujing:'少阴', zheng:'少阴寒化，四肢厥冷、下利清谷、脉微欲绝', theory:'破阴回阳；附子温肾阳，干姜温肺脾', yangsheng:'阳虚体质者需温阳散寒，忌食生冷', jiaoji:'高风险救逆方！必须面诊，不能自行使用！' },
+    { name:'当归四逆汤', category:'温经散寒', liujing:'厥阴', zheng:'手足末梢厥寒、冻疮', theory:'当归活血，桂枝通阳，细辛散寒', yangsheng:'手脚冰冷者可参考温经散寒思路，注意保暖', jiaoji:'寒厥可用，热厥不可用' },
+    { name:'黄连阿胶汤', category:'滋阴降火', liujing:'少阴', zheng:'少阴热化，心烦不得卧、口燥咽干', theory:'滋阴降火', yangsheng:'阴虚火旺失眠可参考滋阴思路', jiaoji:'脾虚湿盛者慎用' },
+    { name:'乌梅丸', category:'寒热并用', liujing:'厥阴', zheng:'厥阴本病，寒热错杂、消渴、气上撞心、饥不欲食、吐蛔', theory:'寒热并用，调理厥阴枢机', yangsheng:'无', jiaoji:'厥阴病为危重阶段，必须面诊' },
+    { name:'理中汤', category:'温中散寒', liujing:'太阴', zheng:'太阴病，自利不渴、腹满时痛', theory:'温中散寒，健脾燥湿', yangsheng:'脾胃虚寒者可参考温中思路，忌生冷', jiaoji:'湿热者不可用' },
+    { name:'五苓散', category:'健脾利水', liujing:'太阳/太阴', zheng:'水湿内停，水肿，小便不利', theory:'健脾利水；白术茯苓健脾，泽泻猪苓利水', yangsheng:'湿气重者需健脾利湿，忌油腻甜食', jiaoji:'阴虚津伤者慎用' },
+    { name:'桃核承气汤', category:'活血化瘀', liujing:'太阳', zheng:'蓄血证，少腹急结', theory:'久病必有瘀；活血化瘀', yangsheng:'慢性病患者需注意活血化瘀，适当运动', jiaoji:'破血方，孕妇禁用' },
+    { name:'炙甘草汤', category:'滋阴养心', liujing:'太阳/少阴', zheng:'心动悸、脉结代', theory:'滋阴养血，益气温阳', yangsheng:'心悸气短者可参考养心思路', jiaoji:'痰湿内阻者慎用' },
+    { name:'栀子豉汤', category:'清热除烦', liujing:'太阳/阳明', zheng:'虚烦不得眠、心中懊憹', theory:'清热除烦', yangsheng:'心烦失眠（热型）可参考清热除烦思路', jiaoji:'脾胃虚寒者慎用' }
+  ],
+
+  // ── 针灸经络 ──
+  zhenjiu: {
+    meridians: [
+      { name:'手太阴肺经', time:'寅时 3-5点', points:'中府、尺泽、列缺、太渊、鱼际、少商', zhuzhi:'咳嗽、气喘、胸闷、咽喉肿痛' },
+      { name:'手阳明大肠经', time:'卯时 5-7点', points:'商阳、合谷、曲池、肩髃、迎香', zhuzhi:'牙痛、咽喉肿痛、鼻衄、面瘫' },
+      { name:'足阳明胃经', time:'辰时 7-9点', points:'承泣、四白、地仓、颊车、天枢、足三里、丰隆', zhuzhi:'胃痛、腹胀、呕吐、面疾、膝痛' },
+      { name:'足太阴脾经', time:'巳时 9-11点', points:'隐白、太白、公孙、三阴交、阴陵泉、血海', zhuzhi:'腹胀、泄泻、月经不调、痛经' },
+      { name:'手少阴心经', time:'午时 11-13点', points:'极泉、少海、神门、少府、少冲', zhuzhi:'心痛、心悸、失眠、癫狂' },
+      { name:'手太阳小肠经', time:'未时 13-15点', points:'少泽、后溪、养老、天宗、听宫', zhuzhi:'头痛、项强、耳聋、目黄' },
+      { name:'足太阳膀胱经', time:'申时 15-17点', points:'睛明、攒竹、风门、肺俞、心俞、肾俞、委中、昆仑', zhuzhi:'头痛、项背痛、腰痛、下肢痿痹' },
+      { name:'足少阴肾经', time:'酉时 17-19点', points:'涌泉、然谷、太溪、复溜、照海', zhuzhi:'月经不调、遗精、腰痛、咽干' },
+      { name:'手厥阴心包经', time:'戌时 19-21点', points:'天池、曲泽、内关、大陵、劳宫、中冲', zhuzhi:'心痛、心烦、胸闷、胃痛' },
+      { name:'手少阳三焦经', time:'亥时 21-23点', points:'关冲、中渚、外关、支沟、翳风、耳门', zhuzhi:'耳鸣、耳聋、偏头痛、肩臂痛' },
+      { name:'足少阳胆经', time:'子时 23-1点', points:'瞳子髎、听会、风池、肩井、环跳、风市、阳陵泉、悬钟', zhuzhi:'偏头痛、耳鸣、胁痛、下肢痿痹' },
+      { name:'足厥阴肝经', time:'丑时 1-3点', points:'大敦、行间、太冲、中封、曲泉', zhuzhi:'头痛、眩晕、胁痛、月经不调' }
+    ],
+    points: [
+      { name:'足三里', meridian:'足阳明胃经', location:'犊鼻下3寸，胫骨前嵴外开1横指', zhuzhi:'胃痛、呕吐、腹胀、消化不良、免疫力低下', peixue:'中脘、内关治胃病；配三阴交治妇科', note:'胃经合穴；强胃气、增免疫力；有胃气则生，无胃气则死' },
+      { name:'三阴交', meridian:'足太阴脾经', location:'内踝尖上3寸，胫骨内侧面后缘', zhuzhi:'月经不调、痛经、更年期综合征、失眠', peixue:'配足三里健脾；配太冲疏肝', note:'妇科大穴' },
+      { name:'合谷', meridian:'手阳明大肠经', location:'手背第1、2掌骨间，第2掌骨桡侧中点', zhuzhi:'头痛、牙痛、面瘫、咽喉肿痛', peixue:'配太冲称"开四关"，疏肝理气；配曲池治发热', note:'大肠经原穴；孕妇禁针' },
+      { name:'太冲', meridian:'足厥阴肝经', location:'足背第1、2跖骨结合部前凹陷处', zhuzhi:'头痛、眩晕、失眠、月经不调', peixue:'配合谷称"开四关"', note:'肝经输穴；疏肝理气' },
+      { name:'百会', meridian:'督脉', location:'头顶正中线与两耳尖连线交点', zhuzhi:'头痛、眩晕、失眠、脱肛', peixue:'配四神聪治失眠；配风池治头痛', note:'诸阳之会' },
+      { name:'关元', meridian:'任脉', location:'前正中线上，脐下3寸', zhuzhi:'月经不调、阳痿、遗尿、腹泻', peixue:'配足三里保健；配气海治下元虚寒', note:'小肠募穴；温阳固本' },
+      { name:'中脘', meridian:'任脉', location:'前正中线上，脐上4寸', zhuzhi:'胃痛、腹胀、呕吐、消化不良', peixue:'配足三里、内关治胃病', note:'胃募穴、腑会；统治一切肠胃疾病' },
+      { name:'涌泉', meridian:'足少阴肾经', location:'足底前1/3与后2/3交界处', zhuzhi:'头痛、失眠、高血压、急救', peixue:'配太溪补肾；配百会治头痛', note:'肾经井穴；急救要穴' },
+      { name:'内关', meridian:'手厥阴心包经', location:'腕横纹上2寸，掌长肌腱与桡侧腕屈肌腱之间', zhuzhi:'心悸、胸闷、胃痛、呕吐、失眠', peixue:'配足三里治胃病；配神门治失眠', note:'心包经络穴；治疗心胸胃疾病' },
+      { name:'后溪', meridian:'手太阳小肠经', location:'第5掌指关节后尺侧赤白肉际处', zhuzhi:'头项强痛、腰背痛、癫痫', peixue:'配列缺治颈项痛；配申脉治脊柱痛', note:'小肠经输穴；统管督脉' },
+      { name:'风池', meridian:'足少阳胆经', location:'项后枕骨下，胸锁乳突肌与斜方肌之间凹陷处', zhuzhi:'头痛、感冒、眩晕、颈项强痛', peixue:'配合谷治感冒；配百会治头痛', note:'祛风要穴' },
+      { name:'神门', meridian:'手少阴心经', location:'腕横纹尺侧端，尺侧腕屈肌腱桡侧凹陷处', zhuzhi:'失眠、心悸、健忘、癫狂', peixue:'配内关、百会治失眠', note:'心经原穴；安神要穴' }
+    ],
+    ziwu: [
+      { time:'寅时 3-5点', meridian:'肺经', tip:'此时规律醒来提示肺脏异常' },
+      { time:'卯时 5-7点', meridian:'大肠经', tip:'此时自然排便证明大肠功能正常' },
+      { time:'辰时 7-9点', meridian:'胃经', tip:'此时应进食早餐' },
+      { time:'巳时 9-11点', meridian:'脾经', tip:'脾主运化，此时消化吸收最佳' },
+      { time:'午时 11-13点', meridian:'心经', tip:'心经当令，宜午休养心' },
+      { time:'未时 13-15点', meridian:'小肠经', tip:'此时嗜睡提示小肠偏虚' },
+      { time:'申时 15-17点', meridian:'膀胱经', tip:'膀胱经主表，此时多饮水排毒' },
+      { time:'酉时 17-19点', meridian:'肾经', tip:'此时疲惫提示肾虚' },
+      { time:'戌时 19-21点', meridian:'心包经', tip:'心包经当令，宜放松心情' },
+      { time:'亥时 21-23点', meridian:'三焦经', tip:'三焦经当令，宜入睡养三焦' },
+      { time:'子时 23-1点', meridian:'胆经', tip:'胆为初阳之官，阳气此时萌发' },
+      { time:'丑时 1-3点', meridian:'肝经', tip:'此时失眠为肝脏异常预警' }
+    ],
+    wushu: [
+      { name:'井穴', location:'手足末端', zhuzhi:'病在脏者取之井；急救用', example:'少商、涌泉、隐白' },
+      { name:'荥穴', location:'掌指/跖趾关节前', zhuzhi:'病变于色者取之荥', example:'鱼际、行间、内庭' },
+      { name:'输穴', location:'掌指/跖趾关节后', zhuzhi:'病时间时甚者取之输；定时发作的疾病', example:'太渊、太冲、太白' },
+      { name:'经穴', location:'腕踝附近', zhuzhi:'病主喘咳寒热', example:'经渠、中封、解溪' },
+      { name:'合穴', location:'肘膝附近', zhuzhi:'病主逆气而泄；饮食不节导致肠胃胀满', example:'尺泽、曲泉、足三里' }
+    ]
+  },
+
+  // ── 课程地图 ──
+  courses: [
+    { num:'01', title:'针灸课程', desc:'经络穴位、任督二脉、十二正经、奇经八脉、配穴法、针灸急救、导引功法。44课，501张截图。', tags:['经络','穴位','配穴','急救'] },
+    { num:'02', title:'针灸大成笔记', desc:'针灸大成文字讲义、笔记、补充资料抽取式蒸馏。', tags:['笔记','讲义'] },
+    { num:'03', title:'黄帝内经课程', desc:'素问篇章、四时养生、五行病机、藏象、脉诊、经络气血、病因病机、治未病理论。19课，272张截图。', tags:['养生','五行','脉诊','藏象'] },
+    { num:'04', title:'黄帝内经笔记', desc:'黄帝内经笔记、课程稿、图文笔记和原著资料抽取式蒸馏。', tags:['笔记','原著'] },
+    { num:'05', title:'神农本草课程', desc:'中药性味归经、药物分类、剂型剂量、君臣佐使、药性理论、单味药功用。16课，127张截图。', tags:['药性','归经','配伍'] },
+    { num:'06', title:'神农本草笔记', desc:'神农本草讲稿、彩版笔记、单味药图文笔记。', tags:['笔记','图文'] },
+    { num:'07', title:'伤寒论课程', desc:'六经辨证总纲、各方证详解、传变规律、误治变证、禁忌。核心课程，15课，649张截图。', tags:['六经','方证','辨证'] },
+    { num:'08', title:'伤寒论笔记', desc:'伤寒论讲稿、图文笔记、学习笔记。', tags:['笔记','讲稿'] },
+    { num:'09', title:'金匮要略课程', desc:'杂病、妇科、痰饮、水气、黄疸、胸痹、虚劳、重症/癌症课程观点。656张截图。', tags:['杂病','妇科','痰饮'] },
+    { num:'10', title:'金匮要略笔记', desc:'金匮要略教程整理稿与学习笔记。', tags:['笔记'] },
+    { num:'11', title:'仲景心法传讲', desc:'经方心法、病机推演、方药组合、眼诊、癌症/重症课程观点。68张截图。', tags:['心法','病机','眼诊'] },
+    { num:'13', title:'人纪临床案例', desc:'倪师医案、肿瘤、心脏病、肝病、肾衰、乳癌、红斑性狼疮、经方案例。88张截图。', tags:['医案','肿瘤','重症'] },
+    { num:'14', title:'人纪八纲辨证', desc:'表里寒热虚实阴阳、四诊合参、癌病课程观点、治未病、中西医诊断差异。33张代表画面。', tags:['八纲','四诊','治未病'] },
+    { num:'15', title:'扶阳论坛', desc:'扶阳理论、阳气、阴阳虚实、附子/生硫磺等攻坚药、重症/癌症/尿毒症课程观点。37张截图。', tags:['扶阳','附子','重症'] },
+    { num:'18', title:'倪师易筋经', desc:'五脏逼毒法、文式/武式易筋经、呼吸发音、动作心法、养生功法。28张截图。', tags:['功法','呼吸','五脏'] },
+    { num:'19', title:'梁冬对话倪师', desc:'国学堂访谈、中医科学性、中西医差异、正统中医学习路径、经方和六经辨证入门。', tags:['访谈','入门'] },
+    { num:'20', title:'斯坦福大学演讲', desc:'中医诊疗逻辑、八纲辨证、癌症课程观点、中西医差异、治未病和经方体系。', tags:['演讲','经方'] },
+    { num:'22', title:'倪海厦天纪', desc:'易经、八卦、阳宅、风水、紫微斗数、命宫、四化、先天卦/后天卦、天干地支、占卜术数。527张截图。', tags:['天纪','易经','紫微','风水'] }
+  ],
+
+  // ── 白话问答映射 ──
+  beginnerMap: [
+    { keywords:['感冒','怕冷','冷','没汗','无汗','身痛','身上痛','酸痛'], translate:'感冒怕冷，按课程先看有没有出汗、怕冷重不重、身上痛不痛、咽喉干不干', watersheds:[
+      {q:'有没有出汗？', a:'有汗 → 太阳中风方向（桂枝汤）', b:'无汗 → 太阳伤寒方向（麻黄汤）'},
+      {q:'怕风还是怕冷？', a:'怕风偏太阳中风', b:'怕冷重偏太阳伤寒'},
+      {q:'身上痛不痛？', a:'身痛偏伤寒', b:'不明显偏中风'},
+      {q:'咽喉干不干？', a:'咽干需排除禁汗', b:'无咽干可考虑发汗'}
+    ], liujing:'太阳', fangzheng:['桂枝汤','麻黄汤','葛根汤'], warn:'津液不足、尺脉迟微、咽干、淋家、疮家禁汗。有表证时不可攻下。' },
+    { keywords:['一阵冷一阵热','忽冷忽热','往来寒热','口苦','胸胁','恶心'], translate:'一阵冷一阵热，课程里先看少阳枢机方向', watersheds:[
+      {q:'是否恶心想吐？', a:'有恶心 → 少阳方向', b:'无恶心 → 排除少阳'},
+      {q:'胸胁胀不胀？', a:'胸胁苦满 → 少阳', b:'无 → 需进一步鉴别'},
+      {q:'口苦吗？', a:'口苦 → 少阳', b:'无口苦 → 需鉴别'},
+      {q:'女性是否经期？', a:'经期 → 热入血室，小柴胡汤方向', b:'非经期 → 少阳本病'}
+    ], liujing:'少阳', fangzheng:['小柴胡汤'], warn:'少阳不可汗、吐、下。经期外感不能按普通太阳表证发汗。' },
+    { keywords:['手脚冰凉','手脚冷','手足冷','四逆','怕冷手脚'], translate:'手脚冰凉，课程里要先分清是末梢冷还是冷到肘膝，有没有其他症状', watersheds:[
+      {q:'冷到手指脚趾还是肘膝？', a:'手指脚趾 → 当归四逆汤方向', b:'冷到肘膝 → 四逆汤辈方向（高风险）'},
+      {q:'有没有下利、想睡、精神差？', a:'有 → 少阴方向（高风险）', b:'无 → 进一步鉴别'},
+      {q:'有没有胸胁胀、情绪问题？', a:'有 → 四逆散方向（疏肝）', b:'无 → 排除气郁'},
+      {q:'有没有冻疮？', a:'有 → 当归四逆汤方向', b:'无 → 需进一步分'}
+    ], liujing:'厥阴/少阴', fangzheng:['当归四逆汤','四逆散','四逆汤'], warn:'四逆汤辈是高风险回阳救逆方，不能自行使用！必须面诊辨证。' },
+    { keywords:['睡不着','失眠','心烦','心慌','心悸','睡不好'], translate:'睡不着心烦，课程里要看是不是汗吐下后出现，白天烦还是夜里烦', watersheds:[
+      {q:'是否发汗后出现？', a:'汗后心悸 → 桂枝甘草汤方向', b:'非汗后 → 进一步鉴别'},
+      {q:'白天烦还是夜里烦？', a:'白天烦 → 干姜附子汤方向', b:'夜里烦 → 栀子豉汤或黄连阿胶汤方向'},
+      {q:'有没有心悸？', a:'心悸脉结代 → 炙甘草汤方向', b:'无心悸 → 进一步分'},
+      {q:'有没有胸痛？', a:'有胸痛 → 需就医排除心脏问题', b:'无胸痛 → 课程学习方向'}
+    ], liujing:'太阳/少阴', fangzheng:['栀子豉汤','黄连阿胶汤','炙甘草汤','桂枝甘草汤'], warn:'胸痛需立即就医排除心脏问题。' },
+    { keywords:['拉肚子','腹泻','拉水','下利','大便稀','水泻'], translate:'拉肚子，课程里要先分大便臭热还是清稀，肚子按着痛不痛', watersheds:[
+      {q:'大便臭热还是清稀？', a:'臭热 → 热利方向', b:'清稀 → 寒利方向'},
+      {q:'肚子按着痛不痛？', a:'拒按 → 注意热结旁流风险', b:'喜按 → 虚寒方向'},
+      {q:'小便深黄还是清白？', a:'深黄 → 热证', b:'清白 → 寒证'},
+      {q:'有没有放屁？', a:'有屁 → 实热不重', b:'无屁且拒按 → 注意大承气汤证风险'}
+    ], liujing:'太阴/阳明', fangzheng:['理中汤','五苓散'], warn:'热结旁流看似拉水但可能有燥屎堵住，需谨慎辨别。剧烈腹泻伴脱水请立即就医。' },
+    { keywords:['便秘','不大便','大便干','几天没拉','大便硬'], translate:'便秘，课程里要看小便颜色、肚子按着痛不痛、有没有放屁', watersheds:[
+      {q:'小便深黄还是清白？', a:'深黄 → 热实方向', b:'清白 → 寒实方向'},
+      {q:'肚子拒按还是喜按？', a:'拒按 → 实证', b:'喜按 → 虚证'},
+      {q:'有没有放屁？', a:'有屁 → 小承气汤方向', b:'无屁 → 大承气汤方向（高风险）'},
+      {q:'大便什么形状？', a:'羊屎状 → 脾约（津液枯竭）', b:'正常形状但难解 → 需进一步分'}
+    ], liujing:'阳明', fangzheng:['大承气汤','小承气汤','麻子仁丸'], warn:'大承气汤为峻烈攻下方，中病即止，不能自行使用。多日不大便伴腹痛呕吐请就医。' },
+    { keywords:['肚子胀','腹胀','肚子痛','腹痛','肚子不舒服'], translate:'腹胀腹痛，课程里要先分按着舒服还是更痛，大便通不通', watersheds:[
+      {q:'按着舒服还是更痛？', a:'喜按 → 虚证（太阴方向）', b:'拒按 → 实证（阳明方向）'},
+      {q:'大便通吗？', a:'不通 → 实胀', b:'通畅 → 虚胀'},
+      {q:'痛在少腹、心下还是全腹？', a:'少腹 → 蓄血方向', b:'心下 → 痞/结胸方向', c:'全腹 → 需紧急排除急腹症'},
+      {q:'小便什么颜色？', a:'深黄 → 偏热', b:'清白 → 偏寒'}
+    ], liujing:'太阴/阳明', fangzheng:['理中汤','大承气汤','小承气汤'], warn:'剧烈腹痛、全腹压痛、伴呕吐发热请立即就医排除急腹症。' },
+    { keywords:['经期','月经','感冒来月经','来例假感冒'], translate:'经期感冒，课程里讲"热入血室"，不能按普通太阳表证发汗', watersheds:[
+      {q:'正在月经吗？', a:'是 → 热入血室方向', b:'否 → 普通外感'},
+      {q:'是否一阵冷一阵热？', a:'是 → 小柴胡汤方向', b:'否 → 进一步鉴别'},
+      {q:'有没有烦、像做梦害怕？', a:'有 → 热入血室特征', b:'无 → 需进一步分'},
+      {q:'出血量如何？', a:'量多 → 需注意血虚', b:'正常 → 按常规学习'}
+    ], liujing:'少阳', fangzheng:['小柴胡汤'], warn:'经期外感不能按普通太阳表证发汗。出血量大或伴剧痛请就医。' }
+  ]
+};
+
+/* ════════════════════════════════════════════════════════════
+   LOGIC
+   ════════════════════════════════════════════════════════════ */
+
+// Load external KB if available
+var externalKB = null;
+try {
+  if (typeof NIHAISHA_TCM_KB !== 'undefined') {
+    externalKB = NIHAISHA_TCM_KB;
+  }
+} catch(e) { /* file may not exist, fallback to built-in */ }
+
+/* ── Navigation ── */
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
+  var el = document.getElementById('section-' + id);
+  if (el) el.classList.add('active');
+  document.querySelectorAll('.sn-item').forEach(function(n){ n.classList.remove('active'); });
+  // highlight sidebar
+  var items = document.querySelectorAll('.sn-item');
+  items.forEach(function(it){
+    var onclick = it.getAttribute('onclick') || '';
+    if (onclick.indexOf(id) >= 0) it.classList.add('active');
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goHome() {
+  window.location.href = 'divination-hub.html';
+}
+
+function toggleMobileMenu() {
+  var m = document.getElementById('mobileMenu');
+  if (m.classList.contains('hidden')) {
+    m.classList.remove('hidden');
+    m.style.display = 'block';
+  } else {
+    m.classList.add('hidden');
+    m.style.display = 'none';
+  }
+}
+
+/* ── Six-Channel (六经) ── */
+function renderLiujing(key) {
+  var d = KB.liujing[key];
+  if (!d) return;
+  var fangHTML = d.fangzheng.map(function(f, i) {
+    return '<div class="panel"><h4>' + (i+1) + '. ' + f.name + '</h4>' +
+      '<p><strong>证候：</strong>' + f.desc + '</p>' +
+      '<p><strong>方剂：</strong><span class="text-gold">' + f.fang + '</span></p>' +
+      '<p><strong>方义：</strong>' + f.theory + '</p>' +
+      '</div>';
+  }).join('');
+
+  document.getElementById('liujing-content').innerHTML =
+    '<div class="panel">' +
+    '<h3>' + d.icon + ' ' + d.name + '</h3>' +
+    '<p><strong>病位：</strong>' + d.summary + '</p>' +
+    '<p><strong>提纲：</strong>' + d.gang + '</p>' +
+    '</div>' +
+    '<div class="panel"><h3>📋 方证</h3>' + fangHTML + '</div>' +
+    '<div class="panel"><h3>🔄 传变</h3><p>' + d.chuanbian + '</p></div>' +
+    '<div class="panel"><h3>⚠️ 禁忌与注意事项</h3><div class="warn">' + d.jiaoji + '</div></div>' +
+    '<div class="panel"><h3>🔮 命理关联</h3><p>' + d.mingli + '</p></div>';
+}
+
+function switchLiujingTab(key, btn) {
+  document.querySelectorAll('#liujingTabs .tab-btn').forEach(function(t){ t.classList.remove('active'); });
+  btn.classList.add('active');
+  renderLiujing(key);
+}
+
+function filterLiujing(q) {
+  q = (q || '').trim().toLowerCase();
+  if (!q) {
+    var active = document.querySelector('#liujingTabs .tab-btn.active');
+    if (active) {
+      var key = active.getAttribute('onclick').match(/'([^']+)'/);
+      if (key) renderLiujing(key[1]);
+    }
+    return;
+  }
+  // Search across all six channels
+  var results = '';
+  var found = false;
+  Object.keys(KB.liujing).forEach(function(key) {
+    var d = KB.liujing[key];
+    var text = (d.name + d.summary + d.gang + d.chuanbian + d.jiaoji + d.mingli + d.fangzheng.map(function(f){ return f.name + f.desc + f.fang + f.theory; }).join('')).toLowerCase();
+    if (text.indexOf(q) >= 0) {
+      found = true;
+      results += '<div class="result-item"><div class="ri-source">' + d.icon + ' ' + d.name + '</div>' +
+        '<div class="ri-title">' + d.gang + '</div>' +
+        '<div class="ri-desc">' + d.summary + '</div>' +
+        '<div class="ri-tags"><span>六经：' + d.name + '</span></div></div>';
+    }
+  });
+  if (!found) {
+    document.getElementById('liujing-content').innerHTML = '<div class="no-results">未找到包含"' + q + '"的六经内容</div>';
+  } else {
+    document.getElementById('liujing-content').innerHTML = '<div class="search-results">' + results + '</div>';
+  }
+}
+
+/* ── Fangzheng (方证) ── */
+function renderFangzhengChips() {
+  var cats = {};
+  KB.fangzheng.forEach(function(f) {
+    cats[f.category] = true;
+  });
+  var html = '<button class="chip active" onclick="filterFangzhengByCat(\'all\',this)">全部</button>';
+  Object.keys(cats).forEach(function(c) {
+    html += '<button class="chip" onclick="filterFangzhengByCat(\'' + c + '\',this)">' + c + '</button>';
+  });
+  document.getElementById('fangzhengChips').innerHTML = html;
+}
+
+var fzCurrentCat = 'all';
+
+function filterFangzhengByCat(cat, btn) {
+  fzCurrentCat = cat;
+  document.querySelectorAll('#fangzhengChips .chip').forEach(function(c){ c.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  var q = document.getElementById('fangzhengSearch').value;
+  doFangzhengSearch(q);
+}
+
+function doFangzhengSearch(q) {
+  q = (q || '').trim().toLowerCase();
+  var list = KB.fangzheng.filter(function(f) {
+    if (fzCurrentCat !== 'all' && f.category !== fzCurrentCat) return false;
+    if (!q) return true;
+    var text = (f.name + f.category + f.liujing + f.zheng + f.theory + f.yangsheng + f.jiaoji).toLowerCase();
+    return text.indexOf(q) >= 0;
+  });
+  if (list.length === 0) {
+    document.getElementById('fangzhengResults').innerHTML = '<div class="no-results">未找到相关方证</div>';
+    return;
+  }
+  var html = list.map(function(f) {
+    var isHighRisk = f.jiaoji.indexOf('高风险') >= 0 || f.jiaoji.indexOf('不能自行') >= 0 || f.jiaoji.indexOf('峻烈') >= 0;
+    return '<div class="result-item">' +
+      '<div class="ri-source">' + f.liujing + ' · ' + f.category + (isHighRisk ? ' · <span style="color:#e74c3c">⚠️ 高风险</span>' : '') + '</div>' +
+      '<div class="ri-title">' + f.name + '</div>' +
+      '<div class="ri-desc"><strong>方证：</strong>' + f.zheng + '</div>' +
+      '<div class="ri-desc"><strong>方义：</strong>' + f.theory + '</div>' +
+      (f.yangsheng && f.yangsheng !== '无' ? '<div class="ri-desc"><strong>养生提示：</strong>' + f.yangsheng + '</div>' : '') +
+      '<div class="ri-desc" style="color:#e0a090"><strong>禁忌：</strong>' + f.jiaoji + '</div>' +
+      '</div>';
+  }).join('');
+  document.getElementById('fangzhengResults').innerHTML = html;
+}
+
+/* ── Zhenjiu (针灸) ── */
+function switchZhenjiuTab(key, btn) {
+  document.querySelectorAll('#zhenjiuTabs .tab-btn').forEach(function(t){ t.classList.remove('active'); });
+  btn.classList.add('active');
+  renderZhenjiu(key);
+}
+
+function renderZhenjiu(key) {
+  if (key === 'meridians') {
+    var rows = KB.zhenjiu.meridians.map(function(m) {
+      return '<tr><td><strong>' + m.name + '</strong></td><td>' + m.time + '</td><td>' + m.points + '</td><td>' + m.zhuzhi + '</td></tr>';
+    }).join('');
+    document.getElementById('zhenjiu-content').innerHTML =
+      '<div class="panel"><h3>🧭 十二经络</h3>' +
+      '<div style="overflow-x:auto"><table class="data-table"><thead><tr><th>经络</th><th>当令时辰</th><th>主要穴位</th><th>主治</th></tr></thead><tbody>' +
+      rows + '</tbody></table></div></div>';
+  } else if (key === 'points') {
+    var cards = KB.zhenjiu.points.map(function(p) {
+      return '<div class="panel"><h4>' + p.name + '</h4>' +
+        '<p><strong>经络：</strong>' + p.meridian + '</p>' +
+        '<p><strong>定位：</strong>' + p.location + '</p>' +
+        '<p><strong>主治：</strong>' + p.zhuzhi + '</p>' +
+        '<p><strong>配穴：</strong>' + p.peixue + '</p>' +
+        '<div class="note">📝 ' + p.note + '</div></div>';
+    }).join('');
+    document.getElementById('zhenjiu-content').innerHTML = '<div class="panel"><h3>🪡 常用穴位表</h3></div>' + cards;
+  } else if (key === 'ziwu') {
+    var rows2 = KB.zhenjiu.ziwu.map(function(z) {
+      return '<tr><td><strong>' + z.time + '</strong></td><td>' + z.meridian + '</td><td>' + z.tip + '</td></tr>';
+    }).join('');
+    document.getElementById('zhenjiu-content').innerHTML =
+      '<div class="panel"><h3>🕐 子午流注</h3>' +
+      '<p style="margin-bottom:12px">十二时辰与经络对应关系。不同时辰醒来或不适，可提示对应脏腑的问题。</p>' +
+      '<div style="overflow-x:auto"><table class="data-table"><thead><tr><th>时辰</th><th>当令经络</th><th>预警提示</th></tr></thead><tbody>' +
+      rows2 + '</tbody></table></div></div>' +
+      '<div class="panel"><h3>💡 养生导引</h3><ul>' +
+      '<li><strong>易筋经：</strong>通过极限扭转与放松排浊；瘀不去新不生</li>' +
+      '<li><strong>丹田呼吸：</strong>随时随地用丹田呼吸，而非胸腔呼吸</li>' +
+      '<li><strong>五脏逼毒法：</strong>发特定声音排出脏腑毒素（咝-肺、呵-心、呼-脾、嘘-肝、吹-肾）</li>' +
+      '</ul></div>';
+  } else if (key === 'wushu') {
+    var rows3 = KB.zhenjiu.wushu.map(function(w) {
+      return '<tr><td><strong>' + w.name + '</strong></td><td>' + w.location + '</td><td>' + w.zhuzhi + '</td><td>' + w.example + '</td></tr>';
+    }).join('');
+    document.getElementById('zhenjiu-content').innerHTML =
+      '<div class="panel"><h3>📍 五输穴</h3>' +
+      '<p style="margin-bottom:12px">五输穴是十二经脉在肘膝关节以下的五个特定穴位，按井、荥、输、经、合排列。</p>' +
+      '<div style="overflow-x:auto"><table class="data-table"><thead><tr><th>类别</th><th>位置</th><th>主治</th><th>示例</th></tr></thead><tbody>' +
+      rows3 + '</tbody></table></div>' +
+      '<div class="note" style="margin-top:12px">📝 针灸法则：迎随补泻（顺经为补、逆经为泻）、左病右治、寒证用灸、热证用针、同身寸</div></div>';
+  }
+}
+
+function doZhenjiuSearch(q) {
+  q = (q || '').trim().toLowerCase();
+  if (!q) {
+    var active = document.querySelector('#zhenjiuTabs .tab-btn.active');
+    if (active) {
+      var match = active.getAttribute('onclick').match(/'([^']+)'/);
+      if (match) renderZhenjiu(match[1]);
+    }
+    return;
+  }
+  // Search across all zhenjiu data
+  var results = '';
+  var found = false;
+  KB.zhenjiu.meridians.forEach(function(m) {
+    var text = (m.name + m.time + m.points + m.zhuzhi).toLowerCase();
+    if (text.indexOf(q) >= 0) {
+      found = true;
+      results += '<div class="result-item"><div class="ri-source">🧭 经络</div><div class="ri-title">' + m.name + '（' + m.time + '）</div><div class="ri-desc">穴位：' + m.points + '</div><div class="ri-desc">主治：' + m.zhuzhi + '</div></div>';
+    }
+  });
+  KB.zhenjiu.points.forEach(function(p) {
+    var text = (p.name + p.meridian + p.location + p.zhuzhi + p.peixue + p.note).toLowerCase();
+    if (text.indexOf(q) >= 0) {
+      found = true;
+      results += '<div class="result-item"><div class="ri-source">🪡 穴位</div><div class="ri-title">' + p.name + '（' + p.meridian + '）</div><div class="ri-desc">定位：' + p.location + '</div><div class="ri-desc">主治：' + p.zhuzhi + '</div><div class="ri-desc">配穴：' + p.peixue + '</div></div>';
+    }
+  });
+  KB.zhenjiu.ziwu.forEach(function(z) {
+    var text = (z.time + z.meridian + z.tip).toLowerCase();
+    if (text.indexOf(q) >= 0) {
+      found = true;
+      results += '<div class="result-item"><div class="ri-source">🕐 子午流注</div><div class="ri-title">' + z.time + ' · ' + z.meridian + '</div><div class="ri-desc">' + z.tip + '</div></div>';
+    }
+  });
+  if (!found) {
+    document.getElementById('zhenjiu-content').innerHTML = '<div class="no-results">未找到包含"' + q + '"的针灸内容</div>';
+  } else {
+    document.getElementById('zhenjiu-content').innerHTML = '<div class="search-results">' + results + '</div>';
+  }
+}
+
+/* ── Beginner Q&A ── */
+function setBeginnerInput(text) {
+  document.getElementById('beginnerInput').value = text;
+  doBeginnerSearch();
+}
+
+function doBeginnerSearch() {
+  var input = document.getElementById('beginnerInput').value.trim();
+  var output = document.getElementById('beginnerOutput');
+  if (!input) {
+    output.innerHTML = '';
+    return;
+  }
+
+  // Find matching beginner map entry
+  var match = null;
+  var inputLower = input.toLowerCase();
+  for (var i = 0; i < KB.beginnerMap.length; i++) {
+    var entry = KB.beginnerMap[i];
+    for (var j = 0; j < entry.keywords.length; j++) {
+      if (inputLower.indexOf(entry.keywords[j]) >= 0) {
+        match = entry;
+        break;
+      }
+    }
+    if (match) break;
+  }
+
+  if (!match) {
+    output.innerHTML =
+      '<div class="panel"><h3>📋 课程学习分析</h3>' +
+      '<div class="qa-translate"><strong>理解你的问题：</strong>"' + input + '"</div>' +
+      '<p>这个问题暂时没有直接匹配的课程入口。建议尝试以下方式：</p>' +
+      '<ul>' +
+      '<li>用更具体的症状描述，如"感冒怕冷没汗""手脚冰凉""拉肚子像水"</li>' +
+      '<li>前往<a onclick="showSection(\'liujing\')" style="color:var(--gold);cursor:pointer">六经辨证</a>浏览各经内容</li>' +
+      '<li>前往<a onclick="showSection(\'fangzheng\')" style="color:var(--gold);cursor:pointer">方证检索</a>搜索相关方剂</li>' +
+      '<li>前往<a onclick="showSection(\'search\')" style="color:var(--gold);cursor:pointer">全局搜索</a>跨模块查找</li>' +
+      '</ul></div>';
+    return;
+  }
+
+  var wsHTML = match.watersheds.map(function(w) {
+    return '<div class="qa-ws-item">' +
+      '<div class="ws-q">' + w.q + '</div>' +
+      '<div class="ws-a">' + w.a + '</div>' +
+      '<div class="ws-b">' + w.b + '</div>' +
+      '</div>';
+  }).join('');
+
+  var fzHTML = match.fangzheng.map(function(f) {
+    return '<span class="card-tag" style="cursor:pointer" onclick="showSection(\'fangzheng\');document.getElementById(\'fangzhengSearch\').value=\'' + f + '\';doFangzhengSearch(\'' + f + '\')">' + f + '</span>';
+  }).join('');
+
+  output.innerHTML =
+    '<div class="panel">' +
+    '<h3>📋 课程学习分析</h3>' +
+    '<div class="warn" style="margin-bottom:14px">⚠️ 这是按倪海厦课程做学习拆解，不是诊断，也不是用药建议。</div>' +
+    '<div class="qa-translate"><strong>问题翻译：</strong>' + match.translate + '</div>' +
+    '<h4 style="margin-top:16px">🔍 先看几个分水岭：</h4>' +
+    '<div class="qa-watershed">' + wsHTML + '</div>' +
+    '<h4 style="margin-top:16px">📜 课程方向：</strong>六经 → <span class="text-gold">' + match.liujing + '</span></h4>' +
+    '<h4 style="margin-top:12px">📄 相关方证：</h4>' +
+    '<div style="margin-top:8px">' + fzHTML + '</div>' +
+    '<div class="warn" style="margin-top:14px"><strong>⚠️ 注意事项：</strong>' + match.warn + '</div>' +
+    '<div class="note" style="margin-top:10px">如果涉及胸痛、剧烈腹痛、脱水、神志异常、孕产妇、儿童、老人，请先就医。</div>' +
+    '</div>';
+}
+
+/* ── Course Map ── */
+function renderCourseMap() {
+  var html = KB.courses.map(function(c) {
+    var tags = c.tags.map(function(t) { return '<span class="card-tag">' + t + '</span>'; }).join('');
+    return '<div class="course-item" onclick="showSection(\'search\');document.getElementById(\'globalSearch\').value=\'' + c.title + '\';doGlobalSearch()">' +
+      '<div class="ci-num">' + c.num + '</div>' +
+      '<div class="ci-title">' + c.title + '</div>' +
+      '<div class="ci-desc">' + c.desc + '</div>' +
+      '<div style="margin-top:8px">' + tags + '</div>' +
+      '</div>';
+  }).join('');
+  document.getElementById('courseList').innerHTML = html;
+}
+
+/* ── Global Search ── */
+var gsFilter = 'all';
+
+function setGlobalFilter(f, btn) {
+  gsFilter = f;
+  document.querySelectorAll('#globalFilterChips .chip').forEach(function(c){ c.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  doGlobalSearch();
+}
+
+function doGlobalSearch() {
+  var q = document.getElementById('globalSearch').value.trim().toLowerCase();
+  if (!q) {
+    document.getElementById('globalSearchResults').innerHTML = '<div class="no-results">请输入搜索关键词</div>';
+    return;
+  }
+  var results = [];
+  var found = false;
+
+  // Search 六经
+  if (gsFilter === 'all' || gsFilter === 'liujing') {
+    Object.keys(KB.liujing).forEach(function(key) {
+      var d = KB.liujing[key];
+      var text = (d.name + d.summary + d.gang + d.chuanbian + d.jiaoji + d.mingli + d.fangzheng.map(function(f){ return f.name + f.desc + f.fang + f.theory; }).join('')).toLowerCase();
+      if (text.indexOf(q) >= 0) {
+        found = true;
+        results.push({ source:'☯️ 六经辨证', title:d.name + ' — ' + d.gang, desc:d.summary, tags:['六经：' + d.name] });
+      }
+    });
+  }
+
+  // Search 方证
+  if (gsFilter === 'all' || gsFilter === 'fangzheng') {
+    KB.fangzheng.forEach(function(f) {
+      var text = (f.name + f.category + f.liujing + f.zheng + f.theory + f.yangsheng + f.jiaoji).toLowerCase();
+      if (text.indexOf(q) >= 0) {
+        found = true;
+        results.push({ source:'📜 方证检索', title:f.name + '（' + f.liujing + '·' + f.category + '）', desc:f.zheng, tags:['方剂：' + f.name] });
+      }
+    });
+  }
+
+  // Search 针灸
+  if (gsFilter === 'all' || gsFilter === 'zhenjiu') {
+    KB.zhenjiu.meridians.forEach(function(m) {
+      var text = (m.name + m.time + m.points + m.zhuzhi).toLowerCase();
+      if (text.indexOf(q) >= 0) {
+        found = true;
+        results.push({ source:'🧭 针灸·经络', title:m.name + '（' + m.time + '）', desc:'穴位：' + m.points + '；主治：' + m.zhuzhi, tags:['经络'] });
+      }
+    });
+    KB.zhenjiu.points.forEach(function(p) {
+      var text = (p.name + p.meridian + p.location + p.zhuzhi + p.peixue + p.note).toLowerCase();
+      if (text.indexOf(q) >= 0) {
+        found = true;
+        results.push({ source:'🪡 针灸·穴位', title:p.name + '（' + p.meridian + '）', desc:'定位：' + p.location + '；主治：' + p.zhuzhi, tags:['穴位：' + p.name] });
+      }
+    });
+  }
+
+  // Search 课程
+  if (gsFilter === 'all' || gsFilter === 'course') {
+    KB.courses.forEach(function(c) {
+      var text = (c.num + c.title + c.desc + c.tags.join('')).toLowerCase();
+      if (text.indexOf(q) >= 0) {
+        found = true;
+        results.push({ source:'🗺️ 课程地图', title:c.num + ' · ' + c.title, desc:c.desc, tags: c.tags.map(function(t){ return '课程：' + t; }) });
+      }
+    });
+  }
+
+  if (!found) {
+    document.getElementById('globalSearchResults').innerHTML = '<div class="no-results">未找到包含"' + q + '"的内容，请尝试其他关键词</div>';
+    return;
+  }
+
+  var html = results.map(function(r) {
+    var tags = (r.tags || []).map(function(t) { return '<span>' + t + '</span>'; }).join('');
+    return '<div class="result-item">' +
+      '<div class="ri-source">' + r.source + '</div>' +
+      '<div class="ri-title">' + r.title + '</div>' +
+      '<div class="ri-desc">' + r.desc + '</div>' +
+      '<div class="ri-tags">' + tags + '</div>' +
+      '</div>';
+  }).join('');
+  document.getElementById('globalSearchResults').innerHTML = html;
+}
+
+/* ── Back to top ── */
+window.addEventListener('scroll', function() {
+  var bt = document.getElementById('backTop');
+  if (window.scrollY > 300) bt.classList.add('show');
+  else bt.classList.remove('show');
+});
+
+/* ── Init ── */
+renderLiujing('taiyang');
+renderFangzhengChips();
+doFangzhengSearch('');
+renderZhenjiu('meridians');
+renderCourseMap();
+</script>
+
+</body>
+</html>

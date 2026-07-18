@@ -1,0 +1,239 @@
+<!-- 权威知识库展示面板 -->
+<div id="authoritativeKnowledgePanel" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(8,8,8,0.98);z-index:9999;overflow-y:auto;padding:20px">
+  
+  <!-- 顶部导航 -->
+  <div style="max-width:1200px;margin:0 auto;padding:20px 0">
+    <button onclick="closeAuthoritativePanel()" style="float:right;background:none;border:1px solid rgba(201,168,76,0.3);color:var(--gold);padding:8px 20px;cursor:pointer;border-radius:6px;font-size:13px;letter-spacing:2px">✕ 关闭</button>
+    <h2 style="font-family:'Ma Shan Zheng',serif;font-size:32px;color:var(--gold);letter-spacing:6px;margin-bottom:8px">📚 易道智鉴 · 权威知识库</h2>
+    <p style="color:var(--paper2);font-size:14px;margin-bottom:30px">全网最权威、最丰富、最通俗易懂的命理知识体系</p>
+  </div>
+  
+  <!-- 十大领域卡片 -->
+  <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));gap:20px;padding:0 0 40px 0">
+    
+    <!-- 1. 八字命理学 -->
+    <div class="knowledge-card" onclick="showKnowledgeDetail('bazi')" style="background:linear-gradient(135deg, rgba(201,168,76,0.08), rgba(201,168,76,0.02));border:1px solid rgba(201,168,76,0.2);border-radius:16px;padding:24px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-20px;right:-20px;font-size:120px;opacity:0.06">☰</div>
+      <div style="font-size:42px;margin-bottom:16px">📖</div>
+      <h3 style="font-family:'Ma Shan Zheng',serif;font-size:22px;color:var(--gold);letter-spacing:3px;margin-bottom:12px">八字命理学</h3>
+      <div style="font-size:12px;color:var(--paper2);line-height:1.8;margin-bottom:16px">
+        <div>✅ 天干地支详解（10天干+12地支）</div>
+        <div>✅ 十神系统（10神含义+组合）</div>
+        <div>✅ 格局判断（正格8+变格6）</div>
+        <div>✅ 用神选取（扶抑、病药、调候）</div>
+        <div>✅ 大运流年（应期判断）</div>
+      </div>
+      <div style="font-size:11px;color:var(--gold2);margin-bottom:8px">📖 引用经典：《渊海子平》《三命通会》《滴天髓》</div>
+      <div style="font-size:11px;color:var(--paper3)">难度：★★★★☆ | 学习路径：7步</div>
+    </div>
+    
+    <!-- 2. 六爻预测学 -->
+    <div class="knowledge-card" onclick="showKnowledgeDetail('liuyao')" style="background:linear-gradient(135deg, rgba(41,128,185,0.08), rgba(41,128,185,0.02));border:1px solid rgba(41,128,185,0.2);border-radius:16px;padding:24px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-20px;right:-20px;font-size:120px;opacity:0.06">☱</div>
+      <div style="font-size:42px;margin-bottom:16px">🔮</div>
+      <h3 style="font-family:'Ma Shan Zheng',serif;font-size:22px;color:var(--cyan);letter-spacing:3px;margin-bottom:12px">六爻预测学</h3>
+      <div style="font-size:12px;color:var(--paper2);line-height:1.8;margin-bottom:16px">
+        <div>✅ 起卦方法（铜钱法+时间法）</div>
+        <div>✅ 装卦步骤（世应、六亲、六神）</div>
+        <div>✅ 用神选取（5类六亲含义）</div>
+        <div>✅ 分类占断（求财、婚姻、疾病等）</div>
+        <div>✅ 应期判断（冲合刑害破）</div>
+      </div>
+      <div style="font-size:11px;color:var(--cyan2);margin-bottom:8px">📖 引用经典：《周易》《卜筮正宗》《增删卜易》</div>
+      <div style="font-size:11px;color:var(--paper3)">难度：★★★★★ | 学习路径：6步</div>
+    </div>
+    
+    <!-- 3. 风水学 -->
+    <div class="knowledge-card" onclick="showKnowledgeDetail('fengshui')" style="background:linear-gradient(135deg, rgba(39,174,96,0.08), rgba(39,174,96,0.02));border:1px solid rgba(39,174,96,0.2);border-radius:16px;padding:24px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-20px;right:-20px;font-size:120px;opacity:0.06">☲</div>
+      <div style="font-size:42px;margin-bottom:16px">🏡</div>
+      <h3 style="font-family:'Ma Shan Zheng',serif;font-size:22px;color:var(--jade);letter-spacing:3px;margin-bottom:12px">风水学</h3>
+      <div style="font-size:12px;color:var(--paper2);line-height:1.8;margin-bottom:16px">
+        <div>✅ 形势派（龙穴砂水向5要素）</div>
+        <div>✅ 理气派（三元九运、飞星盘）</div>
+        <div>✅ 阳宅风水（大门、客厅、卧室等）</div>
+        <div>✅ 阴宅风水（墓地对后代影响）</div>
+        <div>✅ 现代应用（办公室、商铺风水）</div>
+      </div>
+      <div style="font-size:11px;color:var(--jade2);margin-bottom:8px">📖 引用经典：《葬书》《青囊经》《地理五诀》</div>
+      <div style="font-size:11px;color:var(--paper3)">难度：★★★★☆ | 流派：3大派</div>
+    </div>
+    
+    <!-- 4. 姓名学 -->
+    <div class="knowledge-card" onclick="showKnowledgeDetail('xingming')" style="background:linear-gradient(135deg, rgba(142,68,173,0.08), rgba(142,68,173,0.02));border:1px solid rgba(142,68,173,0.2);border-radius:16px;padding:24px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-20px;right:-20px;font-size:120px;opacity:0.06">☳</div>
+      <div style="font-size:42px;margin-bottom:16px">✍️</div>
+      <h3 style="font-family:'Ma Shan Zheng',serif;font-size:22px;color:var(--violet);letter-spacing:3px;margin-bottom:12px">姓名学</h3>
+      <div style="font-size:12px;color:var(--paper2);line-height:1.8;margin-bottom:16px">
+        <div>✅ 五格剖象法（天格、人格、地格等）</div>
+        <div>✅ 五格数理吉凶（1-81数理含义）</div>
+        <div>✅ 八字配合起名（用神+五格双优）</div>
+        <div>✅ 字音字形字义选择</div>
+        <div>✅ 改名注意事项</div>
+      </div>
+      <div style="font-size:11px;color:var(--violet2);margin-bottom:8px">📖 引用经典：《五格剖象法》《姓名学大全》</div>
+      <div style="font-size:11px;color:var(--paper3)">难度：★★★☆☆ | 实用指数：★★★★★</div>
+    </div>
+    
+    <!-- 5. 中医体质学 -->
+    <div class="knowledge-card" onclick="showKnowledgeDetail('tizhi')" style="background:linear-gradient(135deg, rgba(230,126,34,0.08), rgba(230,126,34,0.02));border:1px solid rgba(230,126,34,0.2);border-radius:16px;padding:24px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-20px;right:-20px;font-size:120px;opacity:0.06">☴</div>
+      <div style="font-size:42px;margin-bottom:16px">🧬</div>
+      <h3 style="font-family:'Ma Shan Zheng',serif;font-size:22px;color:var(--orange);letter-spacing:3px;margin-bottom:12px">中医体质学</h3>
+      <div style="font-size:12px;color:var(--paper2);line-height:1.8;margin-bottom:16px">
+        <div>✅ 九种体质详解（平和、气虚、阳虚等）</div>
+        <div>✅ 体质辨证（舌象、脉象、性格）</div>
+        <div>✅ 体质调理方案（中药、食疗、艾灸）</div>
+        <div>✅ 体质与健康关系</div>
+        <div>✅ 体质与命理配合</div>
+      </div>
+      <div style="font-size:11px;color:var(--orange);margin-bottom:8px">📖 引用经典：《黄帝内经》《中医体质分类与判定》</div>
+      <div style="font-size:11px;color:var(--paper3)">难度：★★★☆☆ | 健康指数：★★★★★</div>
+    </div>
+    
+    <!-- 6. 易经占卜 -->
+    <div class="knowledge-card" onclick="showKnowledgeDetail('yijing')" style="background:linear-gradient(135deg, rgba(192,57,43,0.08), rgba(192,57,43,0.02));border:1px solid rgba(192,57,43,0.2);border-radius:16px;padding:24px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-20px;right:-20px;font-size:120px;opacity:0.06">☵</div>
+      <div style="font-size:42px;margin-bottom:16px">☯</div>
+      <h3 style="font-family:'Ma Shan Zheng',serif;font-size:22px;color:var(--cinn);letter-spacing:3px;margin-bottom:12px">易经占卜</h3>
+      <div style="font-size:12px;color:var(--paper2);line-height:1.8;margin-bottom:16px">
+        <div>✅ 六十四卦完整解读（已完成）</div>
+        <div>✅ 卦象结构分析</div>
+        <div>✅ 核心意象提取</div>
+        <div>✅ 命理应用指导</div>
+        <div>✅ 实用趋避建议</div>
+      </div>
+      <div style="font-size:11px;color:var(--cinn2);margin-bottom:8px">📖 引用经典：《周易》《易传》《周易本义》</div>
+      <div style="font-size:11px;color:var(--paper3)">难度：★★★★☆ | 卦象：64卦全覆盖</div>
+    </div>
+    
+    <!-- 7. 紫微斗数 -->
+    <div class="knowledge-card" onclick="showKnowledgeDetail('ziwei')" style="background:linear-gradient(135deg, rgba(22,160,133,0.08), rgba(22,160,133,0.02));border:1px solid rgba(22,160,133,0.2);border-radius:16px;padding:24px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-20px;right:-20px;font-size:120px;opacity:0.06">☶</div>
+      <div style="font-size:42px;margin-bottom:16px">⭐</div>
+      <h3 style="font-family:'Ma Shan Zheng',serif;font-size:22px;color:var(--emerald);letter-spacing:3px;margin-bottom:12px">紫微斗数</h3>
+      <div style="font-size:12px;color:var(--paper2);line-height:1.8;margin-bottom:16px">
+        <div>✅ 十四主星详解（紫微、天机等）</div>
+        <div>✅ 十二宫位含义</div>
+        <div>✅ 命盘排盘方法</div>
+        <div>✅ 三方四正分析</div>
+        <div>✅ 流年流月判断</div>
+      </div>
+      <div style="font-size:11px;color:var(--emerald);margin-bottom:8px">📖 引用经典：《紫微斗数全书》</div>
+      <div style="font-size:11px;color:var(--paper3)">难度：★★★★★ | 星曜：14主星+众副星</div>
+    </div>
+    
+    <!-- 8. 奇门遁甲 -->
+    <div class="knowledge-card" onclick="showKnowledgeDetail('qimen')" style="background:linear-gradient(135deg, rgba(127,140,141,0.08), rgba(127,140,141,0.02));border:1px solid rgba(127,140,141,0.2);border-radius:16px;padding:24px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-20px;right:-20px;font-size:120px;opacity:0.06">☷</div>
+      <div style="font-size:42px;margin-bottom:16px">🌀</div>
+      <h3 style="font-family:'Ma Shan Zheng',serif;font-size:22px;color:var(--steel);letter-spacing:3px;margin-bottom:12px">奇门遁甲</h3>
+      <div style="font-size:12px;color:var(--paper2);line-height:1.8;margin-bottom:16px">
+        <div>✅ 核心概念（遁甲、三奇、八门、九星）</div>
+        <div>✅ 阳遁九局+阴遁九局</div>
+        <div>✅ 起局方法</div>
+        <div>✅ 预测应用（事业、婚姻等）</div>
+        <div>✅ 择吉应用</div>
+      </div>
+      <div style="font-size:11px;color:var(--steel);margin-bottom:8px">📖 引用经典：《奇门遁甲大全》</div>
+      <div style="font-size:11px;color:var(--paper3)">难度：★★★★★ | 中国第三大秘术</div>
+    </div>
+    
+    <!-- 9. 梅花易数 -->
+    <div class="knowledge-card" onclick="showKnowledgeDetail('meihua')" style="background:linear-gradient(135deg, rgba(141,110,99,0.08), rgba(141,110,99,0.02));border:1px solid rgba(141,110,99,0.2);border-radius:16px;padding:24px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-20px;right:-20px;font-size:120px;opacity:0.06">☵
+      <div style="font-size:42px;margin-bottom:16px">🌸</div>
+      <h3 style="font-family:'Ma Shan Zheng',serif;font-size:22px;color:var(--wood);letter-spacing:3px;margin-bottom:12px">梅花易数</h3>
+      <div style="font-size:12px;color:var(--paper2);line-height:1.8;margin-bottom:16px">
+        <div>✅ 随心起卦（数字、时间、声音等）</div>
+        <div>✅ 体用生克判断</div>
+        <div>✅ 互卦变卦分析</div>
+        <div>✅ 应期判断</div>
+        <div>✅ 分类占断</div>
+      </div>
+      <div style="font-size:11px;color:var(--wood2);margin-bottom:8px">📖 引用经典：《梅花易数》（邵雍）</div>
+      <div style="font-size:11px;color:var(--paper3)">难度：★★★★☆ | 特色：随心起卦</div>
+    </div>
+    
+    <!-- 10. 大六壬 -->
+    <div class="knowledge-card" onclick="showKnowledgeDetail('liuren')" style="background:linear-gradient(135deg, rgba(165,105,79,0.08), rgba(165,105,79,0.02));border:1px solid rgba(165,105,79,0.2);border-radius:16px;padding:24px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-20px;right:-20px;font-size:120px;opacity:0.06">☲
+      <div style="font-size:42px;margin-bottom:16px">🔢</div>
+      <h3 style="font-family:'Ma Shan Zheng',serif;font-size:22px;color:#a569bd;letter-spacing:3px;margin-bottom:12px">大六壬</h3>
+      <div style="font-size:12px;color:var(--paper2);line-height:1.8;margin-bottom:16px">
+        <div>✅ 四课三传</div>
+        <div>✅ 天将系统（贵人、螣蛇等）</div>
+        <div>✅ 神煞应用</div>
+        <div>✅ 分类预测</div>
+        <div>✅ 应期判断</div>
+      </div>
+      <div style="font-size:11px;color:#a569bd;margin-bottom:8px">📖 引用经典：《大六壬全书》</div>
+      <div style="font-size:11px;color:var(--paper3)">难度：★★★★★ | 精细预测</div>
+    </div>
+    
+  </div>
+  
+  <!-- 底部说明 -->
+  <div style="max-width:1200px;margin:0 auto;padding:40px 0;text-align:center;border-top:1px solid rgba(201,168,76,0.1)">
+    <div style="font-size:13px;color:var(--paper2);line-height:2">
+      <div style="margin-bottom:16px">
+        <span style="color:var(--gold);font-family:'Ma Shan Zheng',serif;font-size:18px;letter-spacing:3px">易道智鉴</span>
+        — 打造全网最权威、最丰富、最通俗易懂的命理智能体
+      </div>
+      <div style="font-size:12px;color:var(--paper3);max-width:800px;margin:0 auto;line-height:1.8">
+        本知识库引用历代经典著作，结合现代科学观点，力求准确、全面、易懂。<br>
+        所有内容仅供参考，具体应用请咨询专业人士。<br>
+        <span style="color:var(--gold);font-size:11px">持续更新中，欢迎反馈建议。</span>
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+<!-- 知识详情弹窗 -->
+<div id="knowledgeDetailModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.95);z-index:10000;overflow-y:auto">
+  <div style="max-width:900px;margin:40px auto;background:var(--ink2);border-radius:16px;padding:40px;position:relative">
+    <button onclick="closeKnowledgeDetail()" style="position:absolute;top:20px;right:20px;background:none;border:1px solid rgba(201,168,76,0.3);color:var(--gold);padding:8px 20px;cursor:pointer;border-radius:6px">✕ 关闭</button>
+    <div id="knowledgeDetailContent"></div>
+  </div>
+</div>
+
+<script>
+// 打开权威知识库面板
+function openAuthoritativePanel() {
+  document.getElementById('authoritativeKnowledgePanel').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+// 关闭权威知识库面板
+function closeAuthoritativePanel() {
+  document.getElementById('authoritativeKnowledgePanel').style.display = 'none';
+  document.body.style.overflow = 'auto';
+}
+
+// 显示知识详情
+function showKnowledgeDetail(field) {
+  const detail = document.getElementById('knowledgeDetailContent');
+  const data = AUTHORITATIVE_KNOWLEDGE[field];
+  
+  if (!data) {
+    detail.innerHTML = '<p style="color:var(--paper2);text-align:center;padding:40px">暂未收录该领域详细内容，正在建设中...</p>';
+    document.getElementById('knowledgeDetailModal').style.display = 'block';
+    return;
+  }
+  
+  // 根据field生成详细内容（这里需要配合authoritative-knowledge-base.js的数据结构）
+  let html = '<h2 style="font-family:\'Ma Shan Zheng\',serif;font-size:28px;color:var(--gold);letter-spacing:4px;margin-bottom:20px">' + data.overview.title + '</h2>';
+  html += '<p style="color:var(--paper2);font-size:14px;line-height:1.8;margin-bottom:30px">' + data.overview.classic_source + '</p>';
+  
+  // ... 根据数据结构动态生成内容
+  
+  detail.innerHTML = html;
+  document.getElementById('knowledgeDetailModal').style.display = 'block';
+}
+
+// 关闭知识详情
+function closeKnowledgeDetail() {
+  document.getElementById('knowledgeDetailModal').style.display = 'none';
+}
+</script>
