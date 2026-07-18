@@ -69,8 +69,26 @@ body{background:var(--bg);color:var(--paper);font-family:'Noto Serif SC',serif;l
 <div class="footer">⚠️ 本知识库为学习参考资料，不构成任何决策建议<br>舒晗国学·奇门遁甲系统课程知识提取 · 32课基础知识 + 9份补充资料 + 8份密训PDF</div>
 <script src="../js/engine-v3-bundle.js"></script>
 <script src="../knowledge/shuhan-mixun-tianji.js"></script>
+<script src="../knowledge/shuhan-basic-kb.js"></script>
 <script>
 var KB=window.SHUHAN_MIXUN_TIANJI_KB||{};
+// 合并基础课KB
+if(window.SHUHAN_BASIC_KB){
+  KB.basicCourse=KB.basicCourse||{};
+  var _sbk=window.SHUHAN_BASIC_KB;
+  if(_sbk.content){
+    Object.keys(_sbk.content).forEach(function(n){
+      var c=_sbk.content[n];
+      KB.basicCourse['lesson'+n]={title:c.summary||('第'+n+'课'),content:c.core||[],keyPoints:c.core||[]};
+    });
+  }
+  // 补充 lessons 索引
+  if(_sbk.lessons){
+    Object.keys(_sbk.lessons).forEach(function(n){
+      if(!KB.basicCourse['lesson'+n])KB.basicCourse['lesson'+n]={title:_sbk.lessons[n],content:[]};
+    });
+  }
+}
 var tabs=[
 {id:'overview',name:'📋 总览'},
 {id:'basicCourse',name:'📚 基础32课'},
