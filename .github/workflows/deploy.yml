@@ -27,18 +27,14 @@ jobs:
           fetch-depth: 1
       - name: Setup Pages
         uses: actions/configure-pages@v5
-      - name: Prepare deploy directory
+      - name: Prepare deploy directory (size-optimized)
         run: |
           mkdir -p _site
-          # 复制所有目录
+          # 只复制 app/ 目录（HTML + CSS + JS + KB）
           cp -r app _site/app
-          cp -r docs _site/docs
-          cp -r knowledge _site/knowledge
-          # 复制根目录HTML
-          cp *.html _site/ 2>/dev/null || true
-          # 创建.nojekyll（禁用Jekyll处理）
+          # 创建.nojekyll（禁用Jekyll处理，避免下划线开头文件被忽略）
           touch _site/.nojekyll
-          # 用printf创建根目录跳转页（避免heredoc缩进问题）
+          # 创建根目录跳转页（指向app/下的主页面）
           printf '%s\n' \
             '<!DOCTYPE html>' \
             '<html lang="zh-CN">' \
@@ -46,26 +42,25 @@ jobs:
             '<meta charset="UTF-8">' \
             '<meta http-equiv="refresh" content="0; url=app/divination-hub.html">' \
             '<title>命理宝鉴</title>' \
+            '<style>body{font-family:system-ui;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#1a1e14;color:#c9a84c}</style>' \
             '</head>' \
-            '<body>' \
-            '<p>正在跳转到<a href="app/divination-hub.html">命理宝鉴主页面</a>...</p>' \
-            '</body>' \
+            '<body><div style="text-align:center"><h1>命理宝鉴</h1><p><a href="app/divination-hub.html" style="color:#c9a84c">进入主页面 →</a></p></div></body>' \
             '</html>' > _site/index.html
-          # 创建微信版入口
+          # 创建移动端入口
           printf '%s\n' \
             '<!DOCTYPE html>' \
             '<html lang="zh-CN">' \
             '<head>' \
             '<meta charset="UTF-8">' \
             '<meta http-equiv="refresh" content="0; url=app/wechat-hub.html">' \
-            '<title>命理宝鉴 - 移动端</title>' \
+            '<title>命理宝鉴 · 移动端</title>' \
             '</head>' \
-            '<body>' \
-            '<p>正在跳转到<a href="app/wechat-hub.html">命理宝鉴移动端</a>...</p>' \
-            '</body>' \
+            '<body><p><a href="app/wechat-hub.html">命理宝鉴移动端</a></p></body>' \
             '</html>' > _site/mobile.html
-          echo "✅ Deploy directory prepared:"
-          ls -la _site/ | head -10
+          # 输出大小信息便于debug
+          echo "✅ Deploy size:"
+          du -sh _site/
+          du -sh _site/app/* 2>/dev/null | head -10
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

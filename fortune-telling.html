@@ -1,107 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>八字命理 - 易道智鉴</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: "Microsoft YaHei", sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 20px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-        h1 { text-align: center; color: #667eea; margin-bottom: 30px; font-size: 2.5em; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; color: #333; font-weight: bold; }
-        input, select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; transition: border-color 0.3s; }
-        input:focus, select:focus { outline: none; border-color: #667eea; }
-        .btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 40px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; width: 100%; margin-top: 20px; transition: transform 0.3s; }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4); }
-        .result { margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px; display: none; }
-        .result.show { display: block; }
-    </style>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; url=app/fortune-telling.html">
+<title>跳转中...</title>
 </head>
 <body>
-    <div class="container">
-        <h1>🎋 八字命理分析</h1>
-        <div class="form-group">
-            <label for="name">姓名</label>
-            <input type="text" id="name" placeholder="请输入姓名">
-        </div>
-        <div class="form-group">
-            <label for="birthYear">出生年份</label>
-            <input type="number" id="birthYear" placeholder="如：1990" min="1900" max="2100">
-        </div>
-        <div class="form-group">
-            <label for="birthMonth">出生月份</label>
-            <select id="birthMonth">
-                <option value="">请选择</option>
-                <option value="1">正月</option>
-                <option value="2">二月</option>
-                <option value="3">三月</option>
-                <option value="4">四月</option>
-                <option value="5">五月</option>
-                <option value="6">六月</option>
-                <option value="7">七月</option>
-                <option value="8">八月</option>
-                <option value="9">九月</option>
-                <option value="10">十月</option>
-                <option value="11">冬月</option>
-                <option value="12">腊月</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="birthDay">出生日期</label>
-            <input type="number" id="birthDay" placeholder="如：15" min="1" max="31">
-        </div>
-        <div class="form-group">
-            <label for="birthHour">出生时辰</label>
-            <select id="birthHour">
-                <option value="">请选择</option>
-                <option value="23-1">子时 (23:00-01:00)</option>
-                <option value="1-3">丑时 (01:00-03:00)</option>
-                <option value="3-5">寅时 (03:00-05:00)</option>
-                <option value="5-7">卯时 (05:00-07:00)</option>
-                <option value="7-9">辰时 (07:00-09:00)</option>
-                <option value="9-11">巳时 (09:00-11:00)</option>
-                <option value="11-13">午时 (11:00-13:00)</option>
-                <option value="13-15">未时 (13:00-15:00)</option>
-                <option value="15-17">申时 (15:00-17:00)</option>
-                <option value="17-19">酉时 (17:00-19:00)</option>
-                <option value="19-21">戌时 (19:00-21:00)</option>
-                <option value="21-23">亥时 (21:00-23:00)</option>
-            </select>
-        </div>
-        <button class="btn" onclick="analyzeBazi()">开始分析</button>
-        <div class="result" id="result">
-            <h2>分析结果</h2>
-            <div id="resultContent"></div>
-        </div>
-    </div>
-    
-    <script src="knowledge/knowledge-details.js"></script>
-    <script src="knowledge/authoritative-knowledge-base.js"></script>
-    <script>
-        function analyzeBazi() {
-            const name = document.getElementById('name').value;
-            const year = document.getElementById('birthYear').value;
-            const month = document.getElementById('birthMonth').value;
-            const day = document.getElementById('birthDay').value;
-            const hour = document.getElementById('birthHour').value;
-            
-            if (!name || !year || !month || !day || !hour) {
-                alert('请填写完整信息');
-                return;
-            }
-            
-            // 这里可以调用知识库进行分析
-            const resultHTML = `
-                <p><strong>姓名：</strong>${name}</p>
-                <p><strong>出生时间：</strong>${year}年${month}月${day}日 ${hour}时</p>
-                <p><strong>八字分析：</strong>系统正在完善中，将结合权威知识库为您进行详细分析...</p>
-            `;
-            
-            document.getElementById('resultContent').innerHTML = resultHTML;
-            document.getElementById('result').classList.add('show');
-        }
-    </script>
+<p>正在跳转到 <a href="app/fortune-telling.html">目标页面</a>...</p>
 </body>
 </html>
