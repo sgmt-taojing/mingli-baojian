@@ -128,9 +128,9 @@
 
 | # | 任务 | 规模 | 备注 |
 |---|------|------|------|
-| TD1 | innerHTML += → insertAdjacentHTML | 106处 | 逐步手动替换 |
-| TD2 | var → let/const | 11,477处 | 渐进迁移 |
-| TD3 | addEventListener清理 | 63处 | 补removeEventListener |
+| TD1 | innerHTML += → insertAdjacentHTML | JS核心文件已清零(divination-core 13处+ai-interpreter 9处+shop-admin 2处)，HTML内嵌68处需人工审查 | 渐进式 |
+| TD2 | var → let/const | ai-interpreter.js 已清零(9处→0)，divination-core.js 5976处+engine-v3-bundle 1190处渐进迁移中 | 渐进式 |
+| TD3 | addEventListener清理 | 111处分析完成，大部分为DOMContentLoaded/全局绑定无需清理 | 低优先级 |
 | TD4 | API key迁移到后端 | 5处 | 依赖F1完成 |
 
 ---

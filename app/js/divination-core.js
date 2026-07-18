@@ -4906,7 +4906,7 @@ function _computeBaziImpl() {
   if (_mt.tiaohou) {
     coreMetrics += '<div style="padding:8px 12px;background:rgba(52,152,219,.04);border:1px solid rgba(52,152,219,.15);border-radius:8px;margin-bottom:12px;font-size:12px;color:var(--paper2);line-height:1.6">' + _mt.tiaohou + '</div>';
   }
-  try { document.getElementById('baziResult').innerHTML += coreMetrics; } catch(e) {}
+  try { document.getElementById('baziResult').insertAdjacentHTML('beforeend', coreMetrics); } catch(e) {}
 
   // === 大白话解读 ===
   var baziData = {
@@ -4928,7 +4928,7 @@ function _computeBaziImpl() {
   var copyBtn = '<div style="margin-top:16px;text-align:center">';
   copyBtn += '<button onclick="copyResultText(this)" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px">📋 复制结果</button>';
   copyBtn += '</div>';
-  try { document.getElementById('baziResult').innerHTML += copyBtn; } catch(e) {}
+  try { document.getElementById('baziResult').insertAdjacentHTML('beforeend', copyBtn); } catch(e) {}
 
   // ── 排盘流程说明 ──
   var bzProcBox = document.getElementById('baziProcessBox');
@@ -4986,7 +4986,7 @@ function _computeBaziImpl() {
       strongest: strongest, weakest: weakest, monthBranch: monthBranch,
       eleCount: eleCount, sex: sex, name: name, birthplace: birthplace, residence: residence
     });
-    document.getElementById('baziResult').innerHTML += baziGuide;
+    document.getElementById('baziResult').insertAdjacentHTML('beforeend', baziGuide);
   } catch(e) {}
 
   // ═══ 三元九运命理框架 ═══
@@ -4996,7 +4996,7 @@ function _computeBaziImpl() {
       xiEle: (typeof xiEle !== 'undefined' ? xiEle : (typeof weakest !== 'undefined' ? weakest : '木')),
       currentYear: new Date().getFullYear()
     });
-    document.getElementById('baziResult').innerHTML += _syBazi;
+    document.getElementById('baziResult').insertAdjacentHTML('beforeend', _syBazi);
   } catch(e) { console.warn('[三元九运八字分析块失败]', e.message); }
 
   // === 化解方案注入 ===
@@ -5005,7 +5005,7 @@ function _computeBaziImpl() {
   // === P0/P1增强分析：合冲刑害+空亡+藏干 ===
   try {
     var _enhancedHTML = injectBaziEnhancedAnalysis(pillars, dayStem, dayBranch);
-    if (_enhancedHTML) document.getElementById('baziResult').innerHTML += _enhancedHTML;
+    if (_enhancedHTML) document.getElementById('baziResult').insertAdjacentHTML('beforeend', _enhancedHTML);
   } catch(e) { console.warn('[增强分析注入失败]', e.message); }
 
   // 下一步引导
@@ -8873,7 +8873,7 @@ function _computeQimenImpl() {
   // === P0奇门格局分析 ===
   try {
     var _gejuHTML = injectQimenGejuAnalysis(palaces, keyPalace);
-    if (_gejuHTML) document.getElementById('qmResult').innerHTML += _gejuHTML;
+    if (_gejuHTML) document.getElementById('qmResult').insertAdjacentHTML('beforeend', _gejuHTML);
   } catch(e) { console.warn('[奇门格局分析注入失败]', e.message); }
 
   document.getElementById('qmResult').classList.add('visible');
@@ -8888,7 +8888,7 @@ function _computeQimenImpl() {
       dayStem: dayStem, dayEle: ELE[dayStem] || '木',
       currentYear: year
     });
-    document.getElementById('qmResult').innerHTML += _syQm;
+    document.getElementById('qmResult').insertAdjacentHTML('beforeend', _syQm);
   } catch(e) { console.warn('[三元九运奇门分析块失败]', e.message); }
 
   // === 化解方案注入 ===
@@ -8898,7 +8898,7 @@ function _computeQimenImpl() {
   // === 暗干/伏吟/反吟/应期 增强分析 ===
   try {
     var _qmEnhancedHTML = injectQimenEnhanced(palaces, keyPalace, dayStem, dayBranch, hourStem, hourBranch);
-    if (_qmEnhancedHTML) document.getElementById('qmResult').innerHTML += _qmEnhancedHTML;
+    if (_qmEnhancedHTML) document.getElementById('qmResult').insertAdjacentHTML('beforeend', _qmEnhancedHTML);
   } catch(e) { console.warn('[奇门增强分析注入失败]', e.message); }
 
   // === 九星旺衰 ===
@@ -8918,7 +8918,7 @@ function _computeQimenImpl() {
       _xsHTML += '</div>';
     }
     _xsHTML += '</div></div>';
-    document.getElementById('qmResult').innerHTML += _xsHTML;
+    document.getElementById('qmResult').insertAdjacentHTML('beforeend', _xsHTML);
   } catch(e) { console.warn('[九星旺衰渲染失败]', e.message); }
 
   // === 三奇得使 / 五不遇时 ===
@@ -8937,7 +8937,7 @@ function _computeQimenImpl() {
       _specialHTML += '<p style="font-size:12px;color:#2ecc71;margin-top:6px">✅ 五不遇时：无</p>';
     }
     _specialHTML += '</div>';
-    document.getElementById('qmResult').innerHTML += _specialHTML;
+    document.getElementById('qmResult').insertAdjacentHTML('beforeend', _specialHTML);
   } catch(e) { console.warn('[三奇得使/五不遇时渲染失败]', e.message); }
 }
 
@@ -10025,13 +10025,13 @@ function _computeZiWeiImpl() {
   // === P1紫微增强分析：庙旺平陷+三方四正 ===
   try {
     var _zwEnhancedHTML = injectZiweiEnhancedAnalysis(mingGongBranchIdx, stars.byGong);
-    if (_zwEnhancedHTML) document.getElementById('zwResult').innerHTML += _zwEnhancedHTML;
+    if (_zwEnhancedHTML) document.getElementById('zwResult').insertAdjacentHTML('beforeend', _zwEnhancedHTML);
   } catch(e) { console.warn('[紫微增强分析注入失败]', e.message); }
 
   // === 副星分析（天才/天寿/天官/天福等） ===
   try {
     var _zwFuHTML = injectZiweiFuStarsAnalysis(mingGongGanIdx, mingGongBranchIdx, yearStemIdx, monthBranchIdx);
-    if (_zwFuHTML) document.getElementById('zwResult').innerHTML += _zwFuHTML;
+    if (_zwFuHTML) document.getElementById('zwResult').insertAdjacentHTML('beforeend', _zwFuHTML);
   } catch(e) { console.warn('[紫微副星分析注入失败]', e.message); }
 
   // === 命主身主 ===
@@ -10042,7 +10042,7 @@ function _computeZiWeiImpl() {
     _msHTML += '<div style="padding:10px;background:rgba(201,168,76,.04);border-radius:8px"><div style="font-size:12px;color:var(--gold);font-weight:bold">命主：' + _msZhu.mingZhu + '</div><div style="font-size:11px;opacity:.7;margin-top:4px">' + _msZhu.mingZhuDesc + '</div></div>';
     _msHTML += '<div style="padding:10px;background:rgba(201,168,76,.04);border-radius:8px"><div style="font-size:12px;color:var(--gold);font-weight:bold">身主：' + _msZhu.shenZhu + '</div><div style="font-size:11px;opacity:.7;margin-top:4px">' + _msZhu.shenZhuDesc + '</div></div>';
     _msHTML += '</div></div>';
-    document.getElementById('zwResult').innerHTML += _msHTML;
+    document.getElementById('zwResult').insertAdjacentHTML('beforeend', _msHTML);
   } catch(e) { console.warn('[命主身主渲染失败]', e.message); }
 
   // === 化解方案注入 ===

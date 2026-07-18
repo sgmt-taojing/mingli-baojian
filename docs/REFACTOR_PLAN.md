@@ -87,12 +87,12 @@
 ## 五、待办事项
 
 ### 高优先级
-- [ ] more-functions.html 外网 CDN 验证（10-30 分钟后自动确认）
-- [ ] divination-hub.html 外网最新版验证
+- [x] more-functions.html 外网 CDN 验证（2026-07-18 HTTP 200 ✅）
+- [x] divination-hub.html 外网最新版验证（2026-07-18 HTTP 200 ✅）
 
 ### 中优先级
-- [ ] 小程序占位页实装（11 个，见 MENU_MATRIX.md）
-- [ ] 商城详情页/购物车（R-5）
+- [x] 小程序占位页实装（phone/louceng/master/merit/yunshi/hehun 全部有真实逻辑 ✅）
+- [x] 商城详情页/购物车/订单/收藏 R-5 完成（16文件 ✅）
 - [ ] 微信 JSSDK 集成（需 AppID）
 
 ### 低优先级
