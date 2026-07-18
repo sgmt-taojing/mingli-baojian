@@ -56,8 +56,17 @@ body{background:var(--bg);color:var(--paper);font-family:'Noto Serif SC',serif;l
 </div>
 <div class="footer">倪海厦中医课程知识库 · 43个模块 · 5730行 · 全量移植自 nihaisha-nishi-tcm 仓库<br>知识提取时间：2026-07-18 · Skill已安装：~/.openclaw-autoclaw/skills/nihaisha/</div>
 <script src="knowledge/nihaisha-tcm-kb.js"></script>
+<script src="knowledge/nihaisha-batch1.js"></script>
+<script src="knowledge/nihaisha-batch2.js"></script>
+<script src="knowledge/nihaisha-batch3.js"></script>
+<script src="knowledge/nihaisha-batch4.js"></script>
 <script>
 var KB=window.NIHAISHA_TCM_KB||{};
+// 合并全量移植batch（优先级最高，覆盖精简版）
+['NIHAISHA_BATCH1','NIHAISHA_BATCH2','NIHAISHA_BATCH3','NIHAISHA_BATCH4'].forEach(function(k){
+  if(window[k]){Object.assign(KB, window[k]);}
+});
+window.NIHAISHA_TCM_KB = KB;
 
 // 46个模块，按分类分组（排除_meta）
 var tabGroups=[
