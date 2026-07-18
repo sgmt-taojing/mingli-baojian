@@ -15026,12 +15026,8 @@ function getShensha(pillars, dayStemIdx, dayBranchIdx) {
     result.push({name:'国印贵人', desc:'掌印之星，主权力、地位，利于仕途、公职。'});
   }
 
-  // 词馆（以日干查，检查四柱地支）
-  var ciguanMap = {0:'申',1:'酉',2:'亥',3:'子',4:'亥',5:'子',6:'寅',7:'卯',8:'巳',9:'午'};
-  var cgTarget = ciguanMap[dayStemIdx];
-  if (cgTarget && allBranches.indexOf(cgTarget) >= 0) {
-    result.push({name:'词馆', desc:'文才之星，主口才佳、善于辞令，利于演讲、写作、外交。'});
-  }
+  // 词馆（R3.8修正：日干帝旺处，详见后文R3.8补充）
+  // 旧版词馆映射有误，已在R3.8中修正为帝旺处
 
   // 禄神（以日干查）
   var lushenMap = {0:'寅',1:'卯',2:'巳',3:'午',4:'巳',5:'午',6:'申',7:'酉',8:'亥',9:'子'};
