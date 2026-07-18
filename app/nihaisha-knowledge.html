@@ -26,25 +26,33 @@ body{background:var(--bg);color:var(--paper);font-family:'Noto Serif SC',serif;l
 .card-body ul{list-style:none;padding-left:0}
 .card-body li{padding:4px 0;padding-left:16px;position:relative}
 .card-body li::before{content:'·';color:var(--gold);position:absolute;left:0}
+.card-body p{margin-bottom:8px}
+.card-body .sub-title{color:var(--gold2);font-size:14px;margin-top:10px;display:block}
 .warning{background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#e74c3c;opacity:.8}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
-@media(max-width:768px){.grid{grid-template-columns:1fr}.header h1{font-size:16px}.container{padding:16px 12px}}
+.search-box{margin-bottom:16px;display:flex;gap:8px}
+.search-input{flex:1;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--paper);font-size:13px;font-family:inherit;outline:none}
+.search-input:focus{border-color:var(--gold)}
+@media(max-width:768px){.grid{grid-template-columns:1fr}.header h1{font-size:16px}.container{padding:16px 12px}.nav-tab{padding:8px 14px;font-size:12px}}
 .footer{text-align:center;padding:24px;color:var(--paper3);font-size:11px;opacity:.5}
 </style>
 </head>
 <body>
 <div class="header">
 <div class="header-inner">
-<h1>倪海厦·中医国学知识库<span>天纪·伤寒论·金匮要略·针灸·本草 — 学习参考</span></h1>
+<h1>倪海厦·中医国学知识库<span>天纪·伤寒论·金匮要略·针灸·本草·仲景心法·扶阳·易筋经 — 学习参考</span></h1>
 <a href="divination-hub.html" class="back-btn">← 返回主平台</a>
 </div>
 </div>
 <div class="container">
 <div class="warning">⚠️ 本知识库仅供学习参考，不作为医疗诊断、处方或治疗建议。涉及健康问题请咨询专业医师。</div>
+<div class="search-box">
+<input type="text" class="search-input" id="globalSearch" placeholder="🔍 搜索知识库（方名/症状/穴位/课次...）" onkeyup="if(event.key==='Enter')doSearch()">
+</div>
 <div class="nav-tabs" id="navTabs"></div>
 <div id="content"></div>
 </div>
-<div class="footer">倪海厦中医课程知识库 (nihaisha-nishi-tcm) · 15748行references · 14大模块<br>知识提取时间：2026-07-18 · Skill已安装：~/.openclaw-autoclaw/skills/nihaisha/</div>
+<div class="footer">倪海厦中医课程知识库 (nihaisha-nishi-tcm) · 15748行references · 30个模块<br>知识提取时间：2026-07-18 · Skill已安装：~/.openclaw-autoclaw/skills/nihaisha/</div>
 <script src="../knowledge/nihaisha-tcm-kb.js"></script>
 <script>
 var KB=window.NIHAISHA_TCM_KB||{};
@@ -62,17 +70,109 @@ var tabs=[
 {id:'fuyang',name:'☀️ 扶阳论坛'},
 {id:'yijinjing',name:'🧘 易筋经'},
 {id:'liangdong',name:'📺 梁冬对话'},
-{id:'stanford',name:'🎓 斯坦福演讲'}
+{id:'stanford',name:'🎓 斯坦福演讲'},
+{id:'jingui',name:'📕 金匮要略'},
+{id:'shanghanlun',name:'📘 伤寒论'},
+{id:'symptomIndex',name:'🩺 症状索引'},
+{id:'lessonMap',name:'🗺️ 课次地图'},
+{id:'learningEntry',name:'📚 学习入口'},
+{id:'beginnerQuestions',name:'💬 初学问答'},
+{id:'usageScenarios',name:'🎯 使用场景'},
+{id:'ebooks',name:'📖 电子书'},
+{id:'audioCollection',name:'🎧 音频合集'},
+{id:'notesShanghan',name:'📝 伤寒笔记'},
+{id:'notesJingui',name:'📝 金匮笔记'},
+{id:'notesHuangdi',name:'📝 内经笔记'},
+{id:'notesBencao',name:'📝 本草笔记'},
+{id:'notesAcupuncture',name:'📝 针灸笔记'},
+{id:'crossModuleThemes',name:'🔗 跨模块主题'},
+{id:'mingliCorrelation',name:'🔮 命理关联'}
 ];
 var nav=document.getElementById('navTabs');
 var content=document.getElementById('content');
+var currentTab='tianji';
+
 tabs.forEach(function(t,i){
 var btn=document.createElement('button');
 btn.className='nav-tab'+(i===0?' active':'');
 btn.textContent=t.name;
-btn.onclick=function(){document.querySelectorAll('.nav-tab').forEach(function(b){b.classList.remove('active')});btn.classList.add('active');showPanel(t.id)};
+btn.onclick=function(){
+document.querySelectorAll('.nav-tab').forEach(function(b){b.classList.remove('active')});
+btn.classList.add('active');
+currentTab=t.id;
+showPanel(t.id);
+};
 nav.appendChild(btn);
 });
+
+function escapeHTML(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function renderValue(v,depth){
+var html='';
+if(v===null||v===undefined){return '<p>—</p>';}
+if(typeof v==='string'){
+html+='<p>'+escapeHTML(v)+'</p>';
+}else if(Array.isArray(v)){
+html+='<ul>';
+v.forEach(function(it){
+if(typeof it==='string'){
+html+='<li>'+escapeHTML(it)+'</li>';
+}else if(typeof it==='object'&&it){
+var parts=[];
+if(it.title)parts.push('<b>'+escapeHTML(it.title)+'</b>');
+if(it.name)parts.push('<b>'+escapeHTML(it.name)+'</b>');
+if(it.desc)parts.push(escapeHTML(it.desc));
+if(it.content)parts.push(escapeHTML(it.content));
+if(it.theory)parts.push(escapeHTML(it.theory));
+if(it.fang)parts.push('方剂：<b>'+escapeHTML(it.fang)+'</b>');
+if(it.zheng)parts.push('证候：'+escapeHTML(it.zheng));
+if(it.jiaoji)parts.push('禁忌：'+escapeHTML(it.jiaoji));
+if(it.source)parts.push('<i style="color:var(--paper3)">来源：'+escapeHTML(it.source)+'</i>');
+if(it.tip)parts.push(escapeHTML(it.tip));
+for(var k in it){
+if(['title','name','desc','content','theory','fang','zheng','jiaoji','source','tip'].indexOf(k)<0){
+parts.push('<b>'+k+'：</b>'+escapeHTML(typeof it[k]==='string'?it[k]:JSON.stringify(it[k])));
+}
+}
+html+='<li>'+parts.join(' · ')+'</li>';
+}else{
+html+='<li>'+escapeHTML(String(it))+'</li>';
+}
+});
+html+='</ul>';
+}else if(typeof v==='object'){
+Object.keys(v).forEach(function(key){
+var sv=v[key];
+html+='<span class="sub-title">◆ '+escapeHTML(key)+'</span>';
+if(typeof sv==='string'){
+html+='<p>'+escapeHTML(sv)+'</p>';
+}else if(Array.isArray(sv)){
+html+='<ul>';
+sv.forEach(function(it){
+if(typeof it==='string'){html+='<li>'+escapeHTML(it)+'</li>';}
+else if(typeof it==='object'&&it){
+var parts=[];
+for(var k in it){
+if(typeof it[k]==='string'){parts.push('<b>'+k+'：</b>'+escapeHTML(it[k]));}
+}
+html+='<li>'+parts.join(' · ')+'</li>';
+}else{html+='<li>'+escapeHTML(String(it))+'</li>';}
+});
+html+='</ul>';
+}else if(typeof sv==='object'&&sv){
+html+='<div style="margin-left:12px;padding-left:12px;border-left:2px solid var(--border)">';
+html+=renderValue(sv,depth+1);
+html+='</div>';
+}else{
+html+='<p>'+escapeHTML(String(sv))+'</p>';
+}
+});
+}else{
+html+='<p>'+escapeHTML(String(v))+'</p>';
+}
+return html;
+}
+
 function showPanel(id){
 content.innerHTML='';
 var p=document.createElement('div');
@@ -81,30 +181,58 @@ var html='';
 try{
 var data=KB[id];
 if(!data){html='<div class="card"><div class="card-body">该模块内容正在整理中...</div></div>';p.innerHTML=html;content.appendChild(p);return;}
+
 if(typeof data==='object'){
 Object.keys(data).forEach(function(key){
 var v=data[key];
-html+='<div class="card"><div class="card-title">'+key+'</div><div class="card-body">';
-if(typeof v==='string'){html+='<p>'+v+'</p>';}
-else if(Array.isArray(v)){html+='<ul>';v.forEach(function(it){html+='<li>'+(typeof it==='string'?it:JSON.stringify(it))+'</li>'});html+='</ul>';}
-else if(typeof v==='object'){
-if(v.content){html+='<p>'+v.content+'</p>';}
-if(v.items){html+='<ul>';v.items.forEach(function(it){html+='<li>'+(typeof it==='string'?it:JSON.stringify(it))+'</li>'});html+='</ul>';}
-Object.keys(v).forEach(function(sk){
-if(sk!=='content'&&sk!=='items'){
-var sv=v[sk];
-html+='<p><b>'+sk+'：</b>'+(typeof sv==='string'?sv:JSON.stringify(sv))+'</p>';
-}
-});
-}else{html+='<p>'+String(v)+'</p>';}
+var title=key.replace(/_/g,' ');
+html+='<div class="card"><div class="card-title">'+escapeHTML(title)+'</div><div class="card-body">';
+html+=renderValue(v,0);
 html+='</div></div>';
 });
-}else{html='<div class="card"><div class="card-body"><p>'+String(data)+'</p></div></div>';}
-}catch(e){html='<div class="card"><div class="card-body">内容加载中...'+e.message+'</div></div>';}
+}else{
+html='<div class="card"><div class="card-body"><p>'+escapeHTML(String(data))+'</p></div></div>';
+}
+}catch(e){
+html='<div class="card"><div class="card-body">内容加载中...'+escapeHTML(e.message)+'</div></div>';
+}
 if(!html){html='<div class="card"><div class="card-body">该模块内容正在整理中...</div></div>';}
 p.innerHTML=html;
 content.appendChild(p);
 }
+
+function doSearch(){
+var q=document.getElementById('globalSearch').value.trim().toLowerCase();
+if(!q){showPanel(currentTab);return;}
+var results=[];
+var searchIn=function(obj,path){
+if(typeof obj==='string'){
+if(obj.toLowerCase().indexOf(q)>-1){results.push({title:path,body:obj.substring(0,200)});}
+}else if(Array.isArray(obj)){
+obj.forEach(function(it,i){searchIn(it,path+'['+i+']');});
+}else if(typeof obj==='object'&&obj){
+Object.keys(obj).forEach(function(k){searchIn(obj[k],path+'.'+k);});
+}
+};
+searchIn(KB,'');
+var p=document.createElement('div');
+p.className='panel active';
+var html='';
+if(results.length===0){
+html='<div class="card"><div class="card-body">未找到包含"'+escapeHTML(q)+'"的内容</div></div>';
+}else{
+html='<div class="card"><div class="card-title">搜索结果（'+results.length+'条）</div><div class="card-body">';
+results.slice(0,50).forEach(function(r){
+html+='<p><b>'+escapeHTML(r.title)+'</b></p><p style="color:var(--paper3);font-size:12px;margin-bottom:10px">'+escapeHTML(r.body)+'</p>';
+});
+html+='</div></div>';
+}
+p.innerHTML=html;
+content.innerHTML='';
+content.appendChild(p);
+}
+
+document.getElementById('globalSearch').addEventListener('keydown',function(e){if(e.key==='Enter')doSearch();});
 showPanel('tianji');
 </script>
 </body>

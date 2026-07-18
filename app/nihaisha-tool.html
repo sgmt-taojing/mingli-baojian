@@ -50,7 +50,7 @@ body{background:var(--bg);color:var(--paper);font-family:'Noto Serif SC',serif;l
 <div class="warning">⚠️ 本工具仅供学习参考，不作为医疗诊断、处方或治疗建议。涉及健康问题请咨询专业医师。</div>
 <div class="welcome">
 <h2>🪷 倪海厦中医课程智慧</h2>
-<p>覆盖伤寒论、金匮要略、仲景心法、临床案例、八纲辨证、扶阳论坛、易筋经、天纪（易经/紫微/风水）、黄帝内经、神农本草、针灸等13大模块。可用自然语言按症状、方剂、穴位、课程模块检索倪师课程资料。</p>
+<p>覆盖伤寒论、金匮要略、仲景心法、临床案例、八纲辨证、扶阳论坛、易筋经、天纪（易经/紫微/风水）、黄帝内经、神农本草、针灸、梁冬对话、斯坦福演讲等30大模块。可用自然语言按症状、方剂、穴位、课程模块检索倪师课程资料。</p>
 </div>
 <div class="search-box">
 <input type="text" id="searchInput" placeholder="输入症状、方剂、穴位、课程关键词...（如：感冒怕冷、桂枝汤、合谷穴）">
@@ -98,9 +98,29 @@ body{background:var(--bg);color:var(--paper);font-family:'Noto Serif SC',serif;l
 <div class="module-title">八纲辨证</div>
 <div class="module-desc">阴阳表里寒热虚实的辨证体系</div>
 </div>
+<div class="module-card" onclick="openModule('zhongjing')">
+<div class="module-icon">🔮</div>
+<div class="module-title">仲景心法</div>
+<div class="module-desc">经方心法、病机推演、眼诊、癌症/重症观点</div>
+</div>
+<div class="module-card" onclick="openModule('fuyang')">
+<div class="module-icon">☀️</div>
+<div class="module-title">扶阳论坛</div>
+<div class="module-desc">扶阳理论、附子/硫磺、重症/癌症/尿毒症</div>
+</div>
+<div class="module-card" onclick="openModule('yijinjing')">
+<div class="module-icon">🧘</div>
+<div class="module-title">易筋经</div>
+<div class="module-desc">五脏逼毒法、文式/武式易筋经、呼吸心法</div>
+</div>
+<div class="module-card" onclick="openModule('symptomIndex')">
+<div class="module-icon">🩺</div>
+<div class="module-title">症状索引</div>
+<div class="module-desc">按症状反查方剂与课程</div>
 </div>
 </div>
-<div class="footer">nihaisha-nishi-tcm · GitHub开源项目 · 15748行references<br>安装路径：~/.openclaw-autoclaw/skills/nihaisha/</div>
+</div>
+<div class="footer">nihaisha-nishi-tcm · GitHub开源项目 · 15748行references · 30个模块<br>安装路径：~/.openclaw-autoclaw/skills/nihaisha/</div>
 <script>
 // Load the nihaisha TCM knowledge base for local search
 var KB = window.NIHAISHA_TCM_KB || {};
@@ -115,7 +135,11 @@ huangdi:['黄帝内经','五行','脏腑','经络'],
 bencao:['本草','药性','剂型'],
 acupuncture:['针灸','穴位','经络','合谷','足三里'],
 clinical:['临床','医案','案例'],
-bagang:['八纲','阴阳','表里','寒热','虚实']
+bagang:['八纲','阴阳','表里','寒热','虚实'],
+zhongjing:['仲景','心法','眼诊','癌症'],
+fuyang:['扶阳','附子','硫磺','阳气'],
+yijinjing:['易筋经','逼毒','呼吸','五脏'],
+symptomIndex:['症状','发热','头痛','失眠','便秘']
 };
 var keywords=modMap[mod]||[];
 document.getElementById('searchInput').value=keywords[0]||mod;

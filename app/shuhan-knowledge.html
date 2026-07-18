@@ -29,34 +29,52 @@ body{background:var(--bg);color:var(--paper);font-family:'Noto Serif SC',serif;l
 .card-body ul{list-style:none;padding-left:0}
 .card-body li{padding:4px 0;padding-left:16px;position:relative}
 .card-body li::before{content:'·';color:var(--gold);position:absolute;left:0}
+.card-body p{margin-bottom:8px}
 .tag{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;margin:2px 4px}
 .tag-p0{background:rgba(231,76,60,.15);color:#e74c3c;border:1px solid rgba(231,76,60,.3)}
 .tag-p1{background:rgba(243,156,18,.15);color:#f39c12;border:1px solid rgba(243,156,18,.3)}
 .tag-p2{background:rgba(52,152,219,.15);color:#3498db;border:1px solid rgba(52,152,219,.3)}
 .tag-new{background:rgba(39,174,96,.15);color:#27ae60;border:1px solid rgba(39,174,96,.3)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
-@media(max-width:768px){.grid{grid-template-columns:1fr}.header h1{font-size:16px}.container{padding:16px 12px}}
+.search-box{margin-bottom:16px;display:flex;gap:8px}
+.search-input{flex:1;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--paper);font-size:13px;font-family:inherit;outline:none}
+.search-input:focus{border-color:var(--gold)}
+.lesson-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:16px}
+.lesson-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:all .25s}
+.lesson-card:hover{border-color:rgba(201,168,76,.3);transform:translateY(-2px)}
+.lesson-num{font-size:24px;color:var(--gold2);font-weight:300}
+.lesson-title{font-size:14px;color:var(--gold);letter-spacing:1px;margin:4px 0}
+.lesson-desc{font-size:12px;color:var(--paper3);line-height:1.6}
+.lesson-detail{background:var(--card);border:1px solid var(--gold);border-radius:12px;padding:20px;margin-bottom:16px}
+.lesson-detail h3{color:var(--gold);font-size:16px;margin-bottom:12px;letter-spacing:2px}
+.lesson-detail .kp{background:rgba(201,168,76,.05);border-left:3px solid var(--gold);padding:8px 12px;margin:6px 0;font-size:13px;border-radius:0 6px 6px 0}
 .footer{text-align:center;padding:24px;color:var(--paper3);font-size:11px;opacity:.5}
+@media(max-width:768px){.grid{grid-template-columns:1fr}.header h1{font-size:16px}.container{padding:16px 12px}.lesson-grid{grid-template-columns:1fr}.search-box{flex-direction:column}}
 </style>
 </head>
 <body>
 <div class="header">
 <div class="header-inner">
-<h1>舒晗国学·奇门知识库<span>基于舒晗老师奇门遁甲系统课程 · 专业学习与参考</span></h1>
+<h1>舒晗国学·奇门知识库<span>基于舒晗老师奇门遁甲系统课程 · 32课基础 + 9份补充 + 8份密训</span></h1>
 <a href="divination-hub.html" class="back-btn">← 返回主平台</a>
 </div>
 </div>
 <div class="container">
+<div class="search-box">
+<input type="text" class="search-input" id="globalSearch" placeholder="🔍 搜索32课/补充资料/密训内容..." onkeyup="if(event.key==='enter')doSearch()">
+</div>
 <div class="nav-tabs" id="navTabs"></div>
 <div id="content"></div>
 </div>
-<div class="footer">⚠️ 本知识库为学习参考资料，不构成任何决策建议<br>舒晗国学·奇门遁甲系统课程知识提取</div>
+<div class="footer">⚠️ 本知识库为学习参考资料，不构成任何决策建议<br>舒晗国学·奇门遁甲系统课程知识提取 · 32课基础知识 + 9份补充资料 + 8份密训PDF</div>
 <script src="js/engine-v3-bundle.js"></script>
 <script src="../knowledge/shuhan-mixun-tianji.js"></script>
 <script>
 var KB=window.SHUHAN_MIXUN_TIANJI_KB||{};
 var tabs=[
 {id:'overview',name:'📋 总览'},
+{id:'basicCourse',name:'📚 基础32课'},
+{id:'supplements',name:'📄 补充资料'},
 {id:'paipan',name:'🔮 排盘体系'},
 {id:'shihai',name:'⚔️ 四害调理'},
 {id:'liuwei',name:'📊 六维运势'},
@@ -67,32 +85,107 @@ var tabs=[
 ];
 var nav=document.getElementById('navTabs');
 var content=document.getElementById('content');
+var currentTab='overview';
 tabs.forEach(function(t,i){
 var btn=document.createElement('button');
 btn.className='nav-tab'+(i===0?' active':'');
 btn.textContent=t.name;
-btn.onclick=function(){document.querySelectorAll('.nav-tab').forEach(function(b){b.classList.remove('active')});btn.classList.add('active');showPanel(t.id)};
+btn.onclick=function(){
+document.querySelectorAll('.nav-tab').forEach(function(b){b.classList.remove('active')});
+btn.classList.add('active');
+currentTab=t.id;
+showPanel(t.id);
+};
 nav.appendChild(btn);
 });
+function escapeHTML(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
 function showPanel(id){
 content.innerHTML='';
 var p=document.createElement('div');
 p.className='panel active';
 var html='';
 try{
-if(id==='overview'&&KB.overview){
+if(id==='overview'){
 html+='<div class="card"><div class="card-title">📚 知识库概览</div><div class="card-body">';
-html+='<p><b>来源：</b>'+KB.source+'</p>';
-html+='<p><b>提取时间：</b>'+KB.extractedAt+'</p>';
-if(KB.mixun&&KB.mixun.courseSystem){
-html+='<p><b>课程体系：</b>'+KB.mixun.courseSystem+'</p>';
+html+='<p><b>来源：</b>'+(KB.source||'舒晗奇门遁甲课程')+'</p>';
+html+='<p><b>提取时间：</b>'+(KB.extractedAt||'2026-07-18')+'</p>';
+if(KB.basicCourse){
+html+='<p><b>基础课程：</b>32课（周易源流→风水调理，系统覆盖奇门遁甲基础体系）</p>';
+}
+if(KB.supplements){
+html+='<p><b>补充资料：</b>9份（决策学/动态分析/格局体系/概念整理/化解精要/财运案例/流年查询表/课程笔记）</p>';
+}
+if(KB.mixun){
+html+='<p><b>密训内容：</b>8份PDF（四害化解/催财布局/八大秘法/伏吟反吟/六维运势/格局体系/用神体系）</p>';
+}
+if(KB.tianji){
+html+='<p><b>天纪框架：</b>倪海厦天纪（易经/紫微/风水）参考体系</p>';
 }
 html+='</div></div>';
+}
+if(id==='basicCourse'&&KB.basicCourse){
+var lessons=KB.basicCourse;
+html+='<div class="card"><div class="card-title">📚 奇门遁甲基础知识32课</div><div class="card-body"><p>舒晗老师基础知识课完整32课内容，从周易源流到风水调理，系统覆盖奇门遁甲基础体系。点击任意课程卡片查看详情。</p></div></div>';
+html+='<div class="lesson-grid">';
+for(var i=1;i<=32;i++){
+var lk='lesson'+i;
+var ls=lessons[lk];
+if(ls){
+html+='<div class="lesson-card" onclick="showLesson('+i+')">';
+html+='<div class="lesson-num">'+String(i).padStart(2,'0')+'</div>';
+html+='<div class="lesson-title">'+escapeHTML(ls.title||'第'+i+'课')+'</div>';
+var desc='';
+if(ls.content&&Array.isArray(ls.content)&&ls.content.length>0){desc=ls.content[0].substring(0,60);}
+else if(ls.content&&typeof ls.content==='string'){desc=ls.content.substring(0,60);}
+html+='<div class="lesson-desc">'+escapeHTML(desc)+'...</div>';
+html+='</div>';
+}
+}
+html+='</div>';
+html+='<div id="lessonDetail"></div>';
+}
+if(id==='supplements'&&KB.supplements){
+var sp=KB.supplements;
+var spMap={
+decision:'决策学布阵秘法',
+dynamics:'动态分析精要',
+patterns:'格局体系',
+concepts:'概念整理',
+resolve:'化解精要',
+wealth_cases:'财运布局经典案例',
+liunian_table:'流年宫位查询表',
+notes_day1:'第1天课程笔记',
+notes_day2:'第2天课程笔记'
+};
+html+='<div class="card"><div class="card-title">📄 补充资料（9份）</div><div class="card-body"><p>基础知识课配套补充资料，涵盖决策学、动态分析、格局体系、概念整理、化解精要、财运案例、流年查询表、课程笔记等。</p></div></div>';
+Object.keys(spMap).forEach(function(k){
+if(sp[k]){
+html+='<div class="card"><div class="card-title">'+spMap[k]+'</div><div class="card-body">';
+var d=sp[k];
+if(d.title){html+='<p><b>'+escapeHTML(d.title)+'</b></p>';}
+if(d.source){html+='<p style="color:var(--paper3);font-size:12px">来源：'+escapeHTML(d.source)+'</p>';}
+if(d.content&&Array.isArray(d.content)){
+d.content.forEach(function(c){html+='<p>'+escapeHTML(c)+'</p>';});
+}else if(d.content&&typeof d.content==='string'){
+html+='<p>'+escapeHTML(d.content)+'</p>';
+}
+if(d.keyPoints&&Array.isArray(d.keyPoints)){
+html+='<ul>';
+d.keyPoints.forEach(function(kp){html+='<li>'+escapeHTML(kp)+'</li>';});
+html+='</ul>';
+}
+html+='</div></div>';
+}
+});
 }
 if(KB.mixun){
 var m=KB.mixun;
 if(id==='paipan'&&m.paipan){html+=renderSection('排盘体系',m.paipan);}
-if(id==='shihai'&&m.sihai){html+=renderSection('四害调理',m.sihai);}
+if(id==='shihai'){
+if(m.sihaiHuajie){html+=renderSection('四害化解',m.sihaiHuajie);}
+if(m.sihai){html+=renderSection('四害调理',m.sihai);}
+}
 if(id==='liuwei'&&m.liuweiModel){html+=renderSection('六维运势分析',m.liuweiModel);}
 if(id==='mifa'&&m.eightSecrets){html+=renderSection('八大秘法',m.eightSecrets);}
 if(id==='geju'&&m.gejuSystem){html+=renderSection('格局体系',m.gejuSystem);}
@@ -101,35 +194,97 @@ if(id==='yongshen'&&m.yongshen){html+=renderSection('用神体系',m.yongshen);}
 if(KB.tianji&&id==='tianji'){
 html+=renderSection('天纪框架',KB.tianji);
 }
-}catch(e){html='<div class="card"><div class="card-body">内容加载中...</div></div>';}
+}catch(e){html='<div class="card"><div class="card-body">内容加载中...'+escapeHTML(e.message)+'</div></div>';}
 if(!html){html='<div class="card"><div class="card-body">该模块内容正在整理中...</div></div>';}
 p.innerHTML=html;
 content.appendChild(p);
 }
+
 function renderSection(title,obj){
 var html='';
+if(!obj)return html;
 if(Array.isArray(obj)){
 obj.forEach(function(item,i){
-html+='<div class="card"><div class="card-title">'+(item.title||title+' '+(i+1))+'</div><div class="card-body">';
-if(item.content){html+='<p>'+(typeof item.content==='string'?item.content:JSON.stringify(item.content))+'</p>';}
-if(item.items){html+='<ul>';item.items.forEach(function(it){html+='<li>'+(typeof it==='string'?it:JSON.stringify(it))+'</li>'});html+='</ul>';}
+html+='<div class="card"><div class="card-title">'+escapeHTML(item.title||title+' '+(i+1))+'</div><div class="card-body">';
+if(item.content){html+='<p>'+(typeof item.content==='string'?escapeHTML(item.content):escapeHTML(JSON.stringify(item.content)))+'</p>';}
+if(item.items){html+='<ul>';item.items.forEach(function(it){html+='<li>'+(typeof it==='string'?escapeHTML(it):escapeHTML(JSON.stringify(it)))+'</li>';});html+='</ul>';}
 html+='</div></div>';
 });
 }else if(typeof obj==='object'){
 Object.keys(obj).forEach(function(key){
-html+='<div class="card"><div class="card-title">'+key+'</div><div class="card-body">';
+html+='<div class="card"><div class="card-title">'+escapeHTML(key)+'</div><div class="card-body">';
 var v=obj[key];
-if(typeof v==='string'){html+='<p>'+v+'</p>';}
-else if(Array.isArray(v)){html+='<ul>';v.forEach(function(it){html+='<li>'+(typeof it==='string'?it:JSON.stringify(it))+'</li>'});html+='</ul>';}
-else if(typeof v==='object'){html+='<p>'+JSON.stringify(v,null,2).replace(/[{}"\[\]]/g,'').replace(/,\n/g,'<br>')+'</p>';}
-else{html+='<p>'+String(v)+'</p>';}
+if(typeof v==='string'){html+='<p>'+escapeHTML(v)+'</p>';}
+else if(Array.isArray(v)){html+='<ul>';v.forEach(function(it){html+='<li>'+(typeof it==='string'?escapeHTML(it):escapeHTML(JSON.stringify(it)))+'</li>';});html+='</ul>';}
+else if(typeof v==='object'&&v){
+Object.keys(v).forEach(function(sk){
+var sv=v[sk];
+html+='<p><b>'+escapeHTML(sk)+'：</b>'+(typeof sv==='string'?escapeHTML(sv):escapeHTML(JSON.stringify(sv)))+'</p>';
+});
+}else{html+='<p>'+escapeHTML(String(v))+'</p>';}
 html+='</div></div>';
 });
 }else{
-html+='<div class="card"><div class="card-body"><p>'+String(obj)+'</p></div></div>';
+html+='<div class="card"><div class="card-body"><p>'+escapeHTML(String(obj))+'</p></div></div>';
 }
 return html;
 }
+
+function showLesson(num){
+var lk='lesson'+num;
+var ls=KB.basicCourse&&KB.basicCourse[lk];
+if(!ls)return;
+var html='<div class="lesson-detail"><h3>第'+num+'课：'+escapeHTML(ls.title||'')+'</h3>';
+if(ls.source){html+='<p style="color:var(--paper3);font-size:12px;margin-bottom:10px">来源：'+escapeHTML(ls.source)+'</p>';}
+if(ls.content&&Array.isArray(ls.content)){
+ls.content.forEach(function(c){html+='<p>'+escapeHTML(c)+'</p>';});
+}else if(ls.content&&typeof ls.content==='string'){
+html+='<p>'+escapeHTML(ls.content)+'</p>';
+}
+if(ls.keyPoints&&Array.isArray(ls.keyPoints)){
+html+='<h4 style="color:var(--gold2);margin:12px 0 6px">🔑 核心要点</h4>';
+ls.keyPoints.forEach(function(kp){html+='<div class="kp">'+escapeHTML(kp)+'</div>';});
+}
+html+='</div>';
+var detail=document.getElementById('lessonDetail');
+if(detail){
+detail.innerHTML=html;
+detail.scrollIntoView({behavior:'smooth'});
+}
+}
+
+function doSearch(){
+var q=document.getElementById('globalSearch').value.trim().toLowerCase();
+if(!q){showPanel(currentTab);return;}
+var results=[];
+var searchIn=function(obj,path){
+if(typeof obj==='string'){
+if(obj.toLowerCase().indexOf(q)>-1){results.push({title:path,body:obj.substring(0,200)});}
+}else if(Array.isArray(obj)){
+obj.forEach(function(it,i){searchIn(it,path+'['+i+']');});
+}else if(typeof obj==='object'&&obj){
+Object.keys(obj).forEach(function(k){searchIn(obj[k],path+'.'+k);});
+}
+};
+searchIn(KB,'');
+var p=document.createElement('div');
+p.className='panel active';
+var html='';
+if(results.length===0){
+html='<div class="card"><div class="card-body">未找到包含"'+escapeHTML(q)+'"的内容</div></div>';
+}else{
+html='<div class="card"><div class="card-title">搜索结果（'+results.length+'条）</div><div class="card-body">';
+results.slice(0,50).forEach(function(r){
+html+='<p><b>'+escapeHTML(r.title)+'</b></p><p style="color:var(--paper3);font-size:12px;margin-bottom:8px">'+escapeHTML(r.body)+'</p>';
+});
+html+='</div></div>';
+}
+p.innerHTML=html;
+content.innerHTML='';
+content.appendChild(p);
+}
+
+document.getElementById('globalSearch').addEventListener('keydown',function(e){if(e.key==='Enter')doSearch();});
 showPanel('overview');
 </script>
 </body>
