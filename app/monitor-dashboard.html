@@ -839,7 +839,7 @@ function renderHeatmap(){
     else if(h>=18&&h<=22)level=4+Math.floor(Math.random()*2);
     else if(h>=6&&h<=23)level=1+Math.floor(Math.random()*2);
     if(h===hour)level=Math.max(level,3);
-    html+='<div class="heat-cell heat-'+level+'" title="'+(h<10?'0'+h:h)+':00 — '+level+'级活跃" onclick="alert(\''+(h<10?'0'+h:h)+':00 时段活跃度: '+level+'级\')"></div>';
+    html+='<div class="heat-cell heat-'+level+'" title="'+(h<10?'0'+h:h)+':00 时段活跃度: '+level+'级"></div>';
   }
   document.getElementById('heatmapGrid').innerHTML=html;
 }
