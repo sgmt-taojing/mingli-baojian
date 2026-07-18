@@ -19745,6 +19745,57 @@ function renderFengshuiResultPro(data) {
         html += '<div style="font-size:12px;line-height:1.8;white-space:pre-wrap">' + v3FsResult.summary + '</div>';
         html += '</div>';
       }
+      // R3.5: 飞星组合断
+      try {
+        if (window.FengshuiV3 && FengshuiV3.analyzeFeixingCombo && v3FsResult && v3FsResult.feiXing) {
+          var _fxCombo = FengshuiV3.analyzeFeixingCombo(v3FsResult.feiXing);
+          if (_fxCombo && _fxCombo.combos && _fxCombo.combos.length > 0) {
+            html += '<div style="margin-bottom:12px;padding:10px;background:rgba(155,89,182,0.04);border-radius:8px">';
+            html += '<div style="font-size:12px;color:#9b59b6;margin-bottom:6px">🔮 飞星组合断</div>';
+            for (var fc = 0; fc < Math.min(_fxCombo.combos.length, 9); fc++) {
+              var cb = _fxCombo.combos[fc];
+              var cbColor = cb.luck === '吉' ? '#27ae60' : cb.luck === '凶' ? '#e74c3c' : '#f39c12';
+              html += '<div style="font-size:11px;line-height:1.6;margin-bottom:4px;padding:4px 6px;background:rgba(255,255,255,.02);border-radius:4px">';
+              html += '<span style="color:' + cbColor + ';font-weight:bold">' + (cb.gongName||cb.gong||'') + '宫</span> ';
+              html += '<span style="color:var(--paper2)">山' + (cb.shanXing||'') + ' 向' + (cb.xiangXing||'') + '</span> ';
+              html += '<span style="color:' + cbColor + '">[' + (cb.luck||'') + ']</span> ';
+              html += '<span style="color:#888">' + (cb.comboName||'') + '</span>';
+              if (cb.effect) html += '<div style="font-size:10px;color:#666;margin-left:12px">' + cb.effect + '</div>';
+              html += '</div>';
+            }
+            if (_fxCombo.daoShanDaoXiang) {
+              html += '<div style="font-size:11px;color:var(--gold);margin-top:6px">' + _fxCombo.daoShanDaoXiang + '</div>';
+            }
+            if (_fxCombo.summary) {
+              html += '<div style="font-size:11px;color:var(--paper2);margin-top:4px;line-height:1.6">' + _fxCombo.summary + '</div>';
+            }
+            html += '</div>';
+          }
+        }
+      } catch(eFx) { console.warn('飞星组合断失败:', eFx); }
+      
+      // R3.6: 流年飞星叠加
+      try {
+        if (window.FengshuiV3 && FengshuiV3.analyzeLiunianFeixing && v3FsResult && v3FsResult.feiXing) {
+          var _lnFx = FengshuiV3.analyzeLiunianFeixing(v3FsResult.feiXing, new Date().getFullYear());
+          if (_lnFx && _lnFx.interactions) {
+            html += '<div style="margin-bottom:12px;padding:10px;background:rgba(52,152,219,0.04);border-radius:8px">';
+            html += '<div style="font-size:12px;color:#3498db;margin-bottom:6px">📅 流年飞星叠加 (' + _lnFx.year + '年)</div>';
+            if (_lnFx.zhongGong) html += '<div style="font-size:11px;color:var(--paper2)">流年入中宫：<b>' + _lnFx.zhongGong + '</b></div>';
+            for (var li = 0; li < Math.min(_lnFx.interactions.length, 9); li++) {
+              var int = _lnFx.interactions[li];
+              var intColor = int.luck === '吉' ? '#27ae60' : int.luck === '凶' ? '#e74c3c' : '#f39c12';
+              html += '<div style="font-size:10px;line-height:1.5;margin-bottom:2px">';
+              html += '<span style="color:' + intColor + '">[' + (int.luck||'') + ']</span> ';
+              html += '<span style="color:var(--paper2)">' + (int.gongName||'') + ': ' + (int.desc||'') + '</span>';
+              html += '</div>';
+            }
+            if (_lnFx.summary) html += '<div style="font-size:11px;color:var(--paper2);margin-top:4px;line-height:1.6">' + _lnFx.summary + '</div>';
+            html += '</div>';
+          }
+        }
+      } catch(eLnFx) { console.warn('流年飞星叠加失败:', eLnFx); }
+      
       html += '<div style="text-align:center;font-size:10px;opacity:.3;letter-spacing:2px;margin-top:8px">⚡ Powered by FengshuiV3 Engine</div>';
       html += '</div></div>';
     }
