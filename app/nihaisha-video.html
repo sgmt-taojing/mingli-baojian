@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>倪师课程·视频播放</title>
+<style>
+:root{--gold:#c9a84c;--gold2:#b8932f;--paper:#f5f0e8;--paper3:#8a8275;--border:rgba(201,168,76,.2);--bg:#1a1814;--card:#252220;--card2:#2f2b26}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--paper);font-family:'Noto Serif SC',serif;line-height:1.8}
+.header{background:linear-gradient(135deg,#2c2823,#1a1814);border-bottom:1px solid var(--border);padding:20px 24px;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
+.header-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.header h1{font-size:20px;color:var(--gold);letter-spacing:3px}
+.header h1 span{font-size:12px;color:var(--paper3);letter-spacing:1px;display:block;margin-top:2px}
+.back-btn{color:var(--paper3);text-decoration:none;font-size:12px;padding:6px 16px;border:1px solid var(--border);border-radius:16px;transition:all .25s}
+.back-btn:hover{background:rgba(201,168,76,.1);color:var(--gold)}
+.container{max-width:1400px;margin:0 auto;padding:24px 16px;display:grid;grid-template-columns:300px 1fr;gap:20px}
+@media(max-width:768px){.container{grid-template-columns:1fr;padding:16px 12px}}
+.sidebar{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;max-height:calc(100vh - 140px);overflow-y:auto;position:sticky;top:100px}
+@media(max-width:768px){.sidebar{position:static;max-height:300px}}
+.module-tab{padding:10px 14px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--paper3);transition:all .2s;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
+.module-tab:hover{background:rgba(201,168,76,.06);color:var(--gold)}
+.module-tab.active{background:rgba(201,168,76,.12);color:var(--gold)}
+.module-tab .count{font-size:11px;opacity:.5}
+.video-list{max-height:calc(100vh - 200px);overflow-y:auto}
+.video-item{padding:10px 14px;border-radius:8px;cursor:pointer;font-size:12px;color:var(--paper3);transition:all .2s;margin-bottom:2px;line-height:1.6}
+.video-item:hover{background:rgba(201,168,76,.06);color:var(--gold)}
+.video-item.active{background:rgba(201,168,76,.1);color:var(--gold);border-left:2px solid var(--gold)}
+.main{display:flex;flex-direction:column;gap:16px}
+.player-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.player-header{padding:12px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.player-title{font-size:14px;color:var(--gold);font-weight:700;letter-spacing:1px}
+.player-body{padding:20px}
+video{width:100%;max-height:60vh;border-radius:8px;background:#000}
+.no-video{text-align:center;padding:60px 20px;color:var(--paper3);font-size:14px}
+.no-video .icon{font-size:48px;margin-bottom:12px;opacity:.3}
+.info-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px}
+.info-card h3{color:var(--gold);font-size:14px;letter-spacing:2px;margin-bottom:8px}
+.info-card p{font-size:12px;color:var(--paper3);line-height:2}
+.warning{background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;padding:12px 16px;font-size:12px;color:#e74c3c;opacity:.8}
+.server-status{padding:6px 12px;border-radius:16px;font-size:11px;display:inline-flex;align-items:center;gap:6px}
+.status-on{background:rgba(39,174,96,.15);color:#27ae60}
+.status-off{background:rgba(231,76,60,.15);color:#e74c3c}
+.status-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.footer{text-align:center;padding:24px;color:var(--paper3);font-size:11px;opacity:.5}
+.search-box{width:100%;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--paper);font-size:12px;margin-bottom:12px;font-family:inherit}
+.search-box:focus{outline:none;border-color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="header">
+<div class="header-inner">
+<h1>倪师课程·视频播放<span>361个视频 · 伤寒论/金匮/天纪/针灸/本草/内经/集锦</span></h1>
+<div style="display:flex;gap:8px;align-items:center">
+<span class="server-status status-off" id="serverStatus"><span class="status-dot"></span><span id="serverText">视频服务未连接</span></span>
+<a href="nihaisha-learning.html" class="back-btn">← 返回学习页</a>
+<a href="divination-hub.html" class="back-btn">← 主平台</a>
+</div>
+</div>
+</div>
+<div class="container">
+<div class="sidebar">
+<input type="text" class="search-box" id="searchBox" placeholder="🔍 搜索视频名称..." oninput="filterVideos()">
+<div id="moduleTabs"></div>
+<div class="video-list" id="videoList"></div>
+</div>
+<div class="main">
+<div class="warning">⚠️ 视频仅供学习参考，不作为医疗诊断或治疗建议。需要先启动本地视频服务（端口8920）。</div>
+<div class="player-wrap">
+<div class="player-header"><div class="player-title" id="playerTitle">选择左侧视频开始播放</div></div>
+<div class="player-body" id="playerBody">
+<div class="no-video"><div class="icon">🎬</div>请从左侧选择要播放的视频<br><br>如视频无法播放，请先运行：<br><code style="background:var(--bg);padding:4px 8px;border-radius:4px;color:var(--gold)">cd ~/Desktop/倪海厦资料库 && python3 -m http.server 8920</code></div>
+</div>
+</div>
+<div class="info-card">
+<h3>📋 使用说明</h3>
+<p>1. 先在终端运行上方命令启动视频服务<br>2. 从左侧选择课程模块，再选择具体视频<br>3. 支持搜索功能，输入关键词过滤视频<br>4. 视频来自本地"倪海厦资料库"文件夹（35GB/361个MP4）<br>5. 移动端同样可用，左右布局自动切换为上下</p>
+</div>
+</div>
+</div>
+<div class="footer">倪海厦课程视频 · 361个视频 · 仅供学习参考</div>
+<script>
+var VIDEOS = {
+  "伤寒论": [
+    {name:"伤寒论01",file:"01.人纪第四篇-伤寒论（高清修复带字幕）/01.倪海厦-伤寒论01-阴阳津液（带字幕）.mp4"},
+    {name:"伤寒论02",file:"01.人纪第四篇-伤寒论（高清修复带字幕）/02.倪海厦-伤寒论02-太阳病（带字幕）.mp4"},
+    {name:"伤寒论03",file:"01.人纪第四篇-伤寒论（高清修复带字幕）/03.倪海厦-伤寒论03-桂枝汤类（带字幕）.mp4"},
+    {name:"伤寒论04",file:"01.人纪第四篇-伤寒论（高清修复带字幕）/04.倪海厦-伤寒论04-桂枝汤加减（带字幕）.mp4"},
+    {name:"伤寒论05",file:"01.人纪第四篇-伤寒论（高清修复带字幕）/05.倪海厦-伤寒论05-误治变证（带字幕）.mp4"},
+    {name:"伤寒论06-10",file:""},
+    {name:"伤寒论11-15",file:""}
+  ],
+  "金匮要略": [
+    {name:"金匮要略01-05",file:""},
+    {name:"金匮要略06-10",file:""},
+    {name:"金匮要略11-15",file:""},
+    {name:"金匮要略16-20",file:""}
+  ],
+  "天纪": [
+    {name:"周易六壬1-5",file:"07.天纪裁剪版整理分类（有广告水印）/02.天纪裁剪整理版-《周易六壬》/"},
+    {name:"易经全集",file:"07.天纪裁剪版整理分类（有广告水印）/03.天纪裁剪整理版-《易经》/"},
+    {name:"天纪其他",file:"07.天纪裁剪版整理分类（有广告水印）/"}
+  ],
+  "课程集锦": [
+    {name:"精选集锦",file:"08.倪海厦 课程中的小集锦收录（精选归类）/"}
+  ],
+  "扶阳论坛": [
+    {name:"扶阳论坛1-5",file:"16.倪海厦 扶阳论坛（带字幕）/"}
+  ],
+  "八纲辨证": [
+    {name:"斯坦福大学演讲",file:"15.倪海厦 八纲辨证-斯坦福大学演讲（带字幕）/"}
+  ],
+  "经方讲座": [
+    {name:"经方的妙用1-4",file:"14.倪海厦《经方的妙用》讲座 字幕版/"}
+  ],
+  "地纪日记": [
+    {name:"地纪日记1-8",file:"18.倪海厦《地纪日记》8篇 视频版+word版/"}
+  ]
+};
+var VIDEO_SERVER = "http://localhost:8920/";
+var currentModule = null;
+var currentVideo = null;
+
+// Check server status
+function checkServer() {
+  fetch(VIDEO_SERVER, {mode:'no-cors', signal: AbortSignal.timeout(3000)})
+    .then(function() {
+      document.getElementById('serverStatus').className = 'server-status status-on';
+      document.getElementById('serverText').textContent = '视频服务已连接';
+    })
+    .catch(function() {
+      document.getElementById('serverStatus').className = 'server-status status-off';
+      document.getElementById('serverText').textContent = '视频服务未连接';
+    });
+}
+
+// Render module tabs
+var moduleTabs = document.getElementById('moduleTabs');
+var videoList = document.getElementById('videoList');
+
+Object.keys(VIDEOS).forEach(function(mod, i) {
+  var tab = document.createElement('div');
+  tab.className = 'module-tab' + (i === 0 ? ' active' : '');
+  var count = VIDEOS[mod].length;
+  tab.innerHTML = '<span>' + mod + '</span><span class="count">' + count + '</span>';
+  tab.onclick = function() {
+    document.querySelectorAll('.module-tab').forEach(function(t) { t.classList.remove('active'); });
+    tab.classList.add('active');
+    currentModule = mod;
+    renderVideoList(mod);
+  };
+  moduleTabs.appendChild(tab);
+  if (i === 0) currentModule = mod;
+});
+renderVideoList(currentModule);
+
+function renderVideoList(mod) {
+  videoList.innerHTML = '';
+  VIDEOS[mod].forEach(function(v, i) {
+    var item = document.createElement('div');
+    item.className = 'video-item';
+    item.textContent = v.name;
+    item.onclick = function() {
+      document.querySelectorAll('.video-item').forEach(function(it) { it.classList.remove('active'); });
+      item.classList.add('active');
+      playVideo(v);
+    };
+    videoList.appendChild(item);
+  });
+}
+
+function playVideo(v) {
+  currentVideo = v;
+  document.getElementById('playerTitle').textContent = v.name;
+  var body = document.getElementById('playerBody');
+  if (!v.file) {
+    body.innerHTML = '<div class="no-video"><div class="icon">📂</div>该模块包含多个视频文件<br>请在终端运行: <code style="background:var(--bg);padding:4px 8px;border-radius:4px;color:var(--gold)">cd ~/Desktop/倪海厦资料库 && python3 -m http.server 8920</code><br>然后访问 <a href="http://localhost:8920/" target="_blank" style="color:var(--gold)">localhost:8920</a> 浏览完整视频列表</div>';
+    return;
+  }
+  var url = VIDEO_SERVER + v.file;
+  body.innerHTML = '<video controls autoplay><source src="' + url + '" type="video/mp4">您的浏览器不支持视频播放</video>';
+  // Test if video loads
+  var vid = body.querySelector('video');
+  vid.onerror = function() {
+    body.innerHTML = '<div class="no-video"><div class="icon">⚠️</div>视频加载失败<br>请确认已启动视频服务:<br><code style="background:var(--bg);padding:4px 8px;border-radius:4px;color:var(--gold)">cd ~/Desktop/倪海厦资料库 && python3 -m http.server 8920</code></div>';
+  };
+}
+
+function filterVideos() {
+  var q = document.getElementById('searchBox').value.toLowerCase();
+  if (!q) { renderVideoList(currentModule); return; }
+  videoList.innerHTML = '';
+  Object.keys(VIDEOS).forEach(function(mod) {
+    VIDEOS[mod].forEach(function(v) {
+      if (v.name.toLowerCase().indexOf(q) > -1) {
+        var item = document.createElement('div');
+        item.className = 'video-item';
+        item.innerHTML = '<span style="opacity:.5;font-size:10px">' + mod + '</span><br>' + v.name;
+        item.onclick = function() {
+          document.querySelectorAll('.video-item').forEach(function(it) { it.classList.remove('active'); });
+          item.classList.add('active');
+          playVideo(v);
+        };
+        videoList.appendChild(item);
+      }
+    });
+  });
+}
+
+checkServer();
+setInterval(checkServer, 10000);
+</script>
+</body>
+</html>
