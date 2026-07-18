@@ -42,6 +42,15 @@ body{font-family:var(--font);background:var(--ink);color:var(--paper);line-heigh
 .tool-card{background:linear-gradient(135deg,rgba(201,168,76,0.05),rgba(201,168,76,0.01));border:1px solid rgba(201,168,76,0.12);border-radius:12px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
 .tool-card:active{transform:scale(0.96);border-color:var(--gold)}
 .tool-card .tool-icon{font-size:32px;display:block;margin-bottom:6px}
+.ai-quick-btn{background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);border-radius:16px;padding:5px 12px;color:var(--gold);font-size:12px;font-family:inherit;cursor:pointer;transition:all .2s;white-space:nowrap}
+.ai-quick-btn:active{background:rgba(201,168,76,0.15)}
+.ai-bubble-user{background:linear-gradient(135deg,rgba(201,168,76,0.15),rgba(201,168,76,0.08));border-radius:12px 12px 4px 12px;padding:10px 14px;margin:8px 0 8px 40px;color:var(--paper);font-size:13px;line-height:1.7}
+.ai-bubble-bot{background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.08);border-radius:12px 12px 12px 4px;padding:10px 14px;margin:8px 0;color:var(--paper);font-size:13px;line-height:1.8}
+.ai-bubble-bot .ai-label{color:var(--gold);font-size:11px;margin-bottom:4px}
+.ai-typing{display:inline-block;width:6px;height:6px;background:var(--gold);border-radius:50%;margin:0 2px;animation:aiBlink 1.4s infinite}
+.ai-typing:nth-child(2){animation-delay:.2s}
+.ai-typing:nth-child(3){animation-delay:.4s}
+@keyframes aiBlink{0%,60%,100%{opacity:.3}30%{opacity:1}}
 .tool-card .tool-name{font-size:13px;color:var(--gold);font-weight:600}
 .tool-card .tool-sub{font-size:10px;color:var(--paper3);margin-top:2px}
 .tool-card .tool-lock{position:absolute;top:6px;right:6px;font-size:9px;padding:1px 5px;border-radius:6px;background:rgba(192,57,43,0.2);color:var(--cinn2)}
@@ -230,6 +239,60 @@ body{font-family:var(--font);background:var(--ink);color:var(--paper);line-heigh
   </div>
 </div>
 
+<!-- ===== Tab: AI助手 ===== -->
+<div class="section" id="section-ai">
+  <div class="card" style="background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(201,168,76,0.02));border:1px solid rgba(201,168,76,0.15)">
+    <div class="card-title" style="justify-content:center;font-size:15px">🤖 AI命理助手</div>
+    <div style="text-align:center;font-size:12px;color:var(--paper2);margin-bottom:12px;line-height:1.8">
+      智能解读 · 自由提问 · 语音对话<br>
+      <span style="color:var(--paper3);font-size:11px">命理风水中医皆可问</span>
+    </div>
+  </div>
+
+  <!-- 快捷问题 -->
+  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
+    <button class="ai-quick-btn" onclick="aiQuickAsk('今日运势如何？')">🔮 今日运势</button>
+    <button class="ai-quick-btn" onclick="aiQuickAsk('我的八字喜用神是什么？')">🀄 八字喜用</button>
+    <button class="ai-quick-btn" onclick="aiQuickAsk('今年有什么需要注意的？')">⚠️ 年运提醒</button>
+    <button class="ai-quick-btn" onclick="aiQuickAsk('如何提升财运？')">💰 财运建议</button>
+    <button class="ai-quick-btn" onclick="aiQuickAsk('感情婚姻方面有什么建议？')">💕 感情指引</button>
+    <button class="ai-quick-btn" onclick="aiQuickAsk('健康方面需要注意什么？')">🏥 健康养生</button>
+    <button class="ai-quick-btn" onclick="aiQuickAsk('倪海厦中医有什么入门建议？')">📚 中医入门</button>
+    <button class="ai-quick-btn" onclick="aiQuickAsk('风水布局有什么建议？')">🏠 风水布局</button>
+  </div>
+
+  <!-- 对话区 -->
+  <div id="aiChatArea" style="background:rgba(0,0,0,0.15);border-radius:12px;padding:12px;min-height:200px;max-height:400px;overflow-y:auto;margin-bottom:10px">
+    <div style="text-align:center;color:var(--paper3);font-size:13px;padding:40px 0">
+      💬 向AI命理助手提问吧<br><span style="font-size:11px">支持语音输入 · 点击🎤说话</span>
+    </div>
+  </div>
+
+  <!-- 输入区 -->
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+    <button id="aiMicBtn" onclick="aiVoiceInput()" style="flex-shrink:0;width:40px;height:40px;border-radius:50%;border:1px solid rgba(201,168,76,0.3);background:rgba(201,168,76,0.08);color:var(--gold);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">🎤</button>
+    <input id="aiInput" type="text" placeholder="输入问题或点击麦克风说话..." style="flex:1;background:rgba(0,0,0,0.2);border:1px solid rgba(201,168,76,0.15);border-radius:20px;padding:10px 16px;color:var(--paper);font-size:14px;font-family:inherit;outline:none">
+    <button onclick="aiSendMsg()" style="flex-shrink:0;width:40px;height:40px;border-radius:50%;border:none;background:linear-gradient(135deg,#c9a84c,#b8932f);color:#1a1e14;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">➤</button>
+  </div>
+
+  <!-- 声线+功能 -->
+  <div style="display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap">
+    <select id="aiVoiceSel" onchange="aiSetVoice(this.value)" style="background:rgba(0,0,0,0.2);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:4px 8px;color:var(--paper2);font-size:12px;font-family:inherit">
+      <option value="female">女声(晓晓)</option>
+      <option value="male">男声(云扬)</option>
+      <option value="female2">女声(晓辰)</option>
+      <option value="male2">男声(云枫)</option>
+    </select>
+    <button class="ai-quick-btn" onclick="aiReadLast()" style="font-size:11px">🔊 朗读</button>
+    <button class="ai-quick-btn" onclick="aiStopRead()" style="font-size:11px">⏹ 停止</button>
+    <button class="ai-quick-btn" onclick="aiClearChat()" style="font-size:11px">🗑 清空</button>
+  </div>
+
+  <div style="text-align:center;font-size:11px;color:var(--paper3);margin-top:8px;line-height:1.6">
+    AI解读仅供参考，不构成专业建议<br>请理性参考，凡事自辨自省
+  </div>
+</div>
+
 <!-- ===== Tab 3: 修行 ===== -->
 <div class="section" id="section-practice">
   <div class="checkin-box card">
@@ -378,6 +441,7 @@ body{font-family:var(--font);background:var(--ink);color:var(--paper);line-heigh
   <button class="tab active" onclick="switchTab('tools',this)"><span class="tab-icon">🧮</span>排盘</button>
   <button class="tab" onclick="switchTab('life',this)"><span class="tab-icon">🏠</span>生活</button>
   <button class="tab" onclick="switchTab('knowledge',this)"><span class="tab-icon">📚</span>知识</button>
+  <button class="tab" onclick="switchTab('ai',this)"><span class="tab-icon" style="font-size:22px">🤖</span>助手</button>
   <button class="tab" onclick="switchTab('practice',this)"><span class="tab-icon">🙏</span>修行</button>
   <button class="tab" onclick="switchTab('shop',this)"><span class="tab-icon">🛍️</span>商城</button>
   <button class="tab" onclick="switchTab('user',this)"><span class="tab-icon">👤</span>我的</button>
@@ -1870,6 +1934,170 @@ function openAnnualForecast() {
 // 页面加载时初始化年度预测卡片
 document.addEventListener('DOMContentLoaded', function() {
   setTimeout(initAnnualForecastCard, 500);
+});
+
+// ════════ AI命理助手 ════════
+var aiChatHistory = [];
+var aiCurrentVoice = 'female';
+var aiAudio = null;
+var aiLastReply = '';
+
+function aiSetVoice(v){aiCurrentVoice = v;}
+
+function aiQuickAsk(q){
+  document.getElementById('aiInput').value = q;
+  aiSendMsg();
+}
+
+async function aiSendMsg(){
+  var input = document.getElementById('aiInput');
+  var q = input.value.trim();
+  if(!q) return;
+  input.value = '';
+  
+  var area = document.getElementById('aiChatArea');
+  // 清空欢迎语
+  if(aiChatHistory.length === 0) area.innerHTML = '';
+  
+  // 用户气泡
+  var userDiv = document.createElement('div');
+  userDiv.className = 'ai-bubble-user';
+  userDiv.textContent = q;
+  area.appendChild(userDiv);
+  
+  // 打字指示
+  var typingDiv = document.createElement('div');
+  typingDiv.className = 'ai-bubble-bot';
+  typingDiv.id = 'aiTyping';
+  typingDiv.innerHTML = '<div class="ai-label">🤖 AI命理助手</div><span class="ai-typing"></span><span class="ai-typing"></span><span class="ai-typing"></span>';
+  area.appendChild(typingDiv);
+  area.scrollTop = area.scrollHeight;
+  
+  aiChatHistory.push({role:'user', content:q});
+  
+  try{
+    // 收集上下文（最近5轮）
+    var ctx = aiChatHistory.slice(-10);
+    var sysMsg = {role:'system', content:'你是易道智鉴的AI命理助手。用户可能在手机上使用，回答要简洁易懂，避免过长。涉及命理、风水、中医、养生等问题时，给出实用建议。提醒用户理性参考。'};
+    
+    var resp = await fetch('https://api.g2claw.com/v1/chat/completions', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer sk-g2claw-default'},
+      body:JSON.stringify({model:'auto',messages:[sysMsg].concat(ctx),max_tokens:800,temperature:0.7})
+    });
+    
+    if(!resp.ok) throw new Error('API '+resp.status);
+    var data = await resp.json();
+    var reply = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '抱歉，暂时无法回答，请稍后再试。';
+    
+    typingDiv.remove();
+    
+    var botDiv = document.createElement('div');
+    botDiv.className = 'ai-bubble-bot';
+    botDiv.innerHTML = '<div class="ai-label">🤖 AI命理助手</div>' + aiFmtText(reply) + '<div style="margin-top:6px;display:flex;gap:6px"><button class="ai-quick-btn" onclick="aiReadLast()" style="font-size:10px;padding:3px 8px">🔊 朗读</button></div>';
+    area.appendChild(botDiv);
+    area.scrollTop = area.scrollHeight;
+    
+    aiLastReply = reply;
+    aiChatHistory.push({role:'assistant', content:reply});
+    
+    // 保留最多20轮
+    if(aiChatHistory.length > 40) aiChatHistory = aiChatHistory.slice(-40);
+    
+    // 自动语音播报（如果TTS可用）
+    if(aiAudio === null && sessionStorage.getItem('aiAutoSpeak') === '1'){
+      aiReadLast();
+    }
+  }catch(err){
+    typingDiv.remove();
+    var errDiv = document.createElement('div');
+    errDiv.className = 'ai-bubble-bot';
+    errDiv.innerHTML = '<div class="ai-label">🤖 AI命理助手</div>⚠️ 网络不稳定，请稍后重试。<br><span style="font-size:11px;color:var(--paper3)">'+(err.message||'')+'</span>';
+    area.appendChild(errDiv);
+    area.scrollTop = area.scrollHeight;
+  }
+}
+
+function aiFmtText(text){
+  if(!text) return '';
+  text = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  text = text.replace(/\*\*(.+?)\*\*/g,'<b style="color:var(--gold)">$1</b>');
+  text = text.replace(/\n/g,'<br>');
+  return text;
+}
+
+function aiClearChat(){
+  aiChatHistory = [];
+  aiLastReply = '';
+  document.getElementById('aiChatArea').innerHTML = '<div style="text-align:center;color:var(--paper3);font-size:13px;padding:40px 0">💬 向AI命理助手提问吧<br><span style="font-size:11px">支持语音输入 · 点击🎤说话</span></div>';
+}
+
+function aiReadLast(){
+  if(!aiLastReply) return;
+  aiStopRead();
+  var voice = aiCurrentVoice;
+  var voiceMap = {female:'zh-CN-XiaoxiaoNeural', male:'zh-CN-YunyangNeural', female2:'zh-CN-XiaochenNeural', male2:'zh-CN-YunfengNeural'};
+  var url = 'http://127.0.0.1:8912/api/tts?text=' + encodeURIComponent(aiLastReply.substring(0,500)) + '&voice=' + (voiceMap[voice]||voice);
+  aiAudio = new Audio(url);
+  aiAudio.onended = function(){aiAudio = null;};
+  aiAudio.onerror = function(){aiAudio = null;};
+  aiAudio.play();
+}
+
+function aiStopRead(){
+  if(aiAudio){aiAudio.pause(); aiAudio = null;}
+}
+
+function aiVoiceInput(){
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){
+    alert('您的浏览器不支持语音输入，请使用Chrome或Safari');
+    return;
+  }
+  var micBtn = document.getElementById('aiMicBtn');
+  if(micBtn.dataset.listening === '1'){
+    if(window._aiRecog) window._aiRecog.stop();
+    return;
+  }
+  micBtn.dataset.listening = '1';
+  micBtn.style.background = 'rgba(231,76,60,0.2)';
+  micBtn.innerHTML = '🔴';
+  
+  var r = new SR();
+  window._aiRecog = r;
+  r.lang = 'zh-CN';
+  r.continuous = false;
+  r.interimResults = true;
+  var finalText = '';
+  var input = document.getElementById('aiInput');
+  
+  r.onresult = function(e){
+    var interim = '';
+    for(var i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal) finalText += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
+    }
+    input.value = finalText + interim;
+  };
+  r.onerror = function(e){
+    micBtn.dataset.listening = '0';
+    micBtn.style.background = 'rgba(201,168,76,0.08)';
+    micBtn.innerHTML = '🎤';
+  };
+  r.onend = function(){
+    micBtn.dataset.listening = '0';
+    micBtn.style.background = 'rgba(201,168,76,0.08)';
+    micBtn.innerHTML = '🎤';
+    if(finalText.trim()){
+      aiSendMsg();
+    }
+  };
+  r.start();
+}
+
+// 回车发送
+document.getElementById('aiInput').addEventListener('keydown', function(e){
+  if(e.key === 'Enter') aiSendMsg();
 });
 </script>
 <script src="js/mobile-voice.js?v=20260718"></script>
