@@ -34466,6 +34466,113 @@ function runLiuyaoEngine() {
           v3LiuHtml += '<div style="font-size:12px;line-height:1.8">' + v3LiuResult.verdict + '</div>';
           v3LiuHtml += '</div>';
         }
+        // R1.6: 元神忌神仇神
+        try {
+          if (v3LiuResult.yuanJiChou) {
+            var yjc = v3LiuResult.yuanJiChou;
+            v3LiuHtml += '<div style="margin-bottom:12px;padding:10px;background:rgba(155,89,182,0.04);border-radius:8px">';
+            v3LiuHtml += '<div style="font-size:12px;color:#9b59b6;margin-bottom:6px">🔮 元神忌神仇神</div>';
+            var _spirits = [
+              {key:'yuanShen',label:'元神',color:'#27ae60',data:yjc.yuanShen},
+              {key:'jiShen',label:'忌神',color:'#e74c3c',data:yjc.jiShen},
+              {key:'chouShen',label:'仇神',color:'#f39c12',data:yjc.chouShen}
+            ];
+            for (var sp=0; sp<_spirits.length; sp++) {
+              var sd = _spirits[sp].data;
+              if (!sd) continue;
+              v3LiuHtml += '<div style="font-size:11px;margin-bottom:4px;padding:4px 6px;background:rgba(255,255,255,.02);border-radius:4px">';
+              v3LiuHtml += '<span style="color:'+_spirits[sp].color+';font-weight:bold">'+_spirits[sp].label+'</span> ';
+              v3LiuHtml += '<span style="color:var(--paper2)">'+(sd.name||'')+'('+sd.wuxing+') '+(sd.yaoPos||'不上卦')+'</span> ';
+              if (sd.wangShuai) v3LiuHtml += '<span style="color:#888">'+sd.wangShuai+'</span> ';
+              if (sd.moving) v3LiuHtml += '<span style="color:#e74c3c">动</span>';
+              if (sd.text) v3LiuHtml += '<div style="font-size:10px;color:#666;margin-left:8px">'+sd.text+'</div>';
+              v3LiuHtml += '</div>';
+            }
+            if (v3LiuResult.yuanJiSummary) v3LiuHtml += '<div style="font-size:11px;color:var(--gold);margin-top:4px;line-height:1.6">'+v3LiuResult.yuanJiSummary+'</div>';
+            v3LiuHtml += '</div>';
+          }
+        } catch(eLy1) {}
+        // R2.7: 月令旺衰+旬空
+        try {
+          if (v3LiuResult.monthWangShuai || v3LiuResult.kongWang) {
+            v3LiuHtml += '<div style="margin-bottom:12px;padding:10px;background:rgba(52,152,219,0.04);border-radius:8px">';
+            v3LiuHtml += '<div style="font-size:12px;color:#3498db;margin-bottom:6px">📅 月令旺衰与旬空</div>';
+            if (v3LiuResult.monthWangShuai) {
+              var mw = v3LiuResult.monthWangShuai;
+              v3LiuHtml += '<div style="font-size:11px;color:var(--paper2);line-height:1.6">月建'+(mw.monthBranch||'')+'('+(mw.monthEle||'')+') → 用神'+(mw.wangShuai||'')+'</div>';
+              if (mw.desc) v3LiuHtml += '<div style="font-size:10px;color:#666;margin-left:8px">'+mw.desc+'</div>';
+            }
+            if (v3LiuResult.kongWang) {
+              var kw = v3LiuResult.kongWang;
+              v3LiuHtml += '<div style="font-size:11px;color:#f39c12;margin-top:4px">旬空：'+(kw.xunKong||'').split('').join('、')+'</div>';
+              if (kw.yaos && kw.yaos.length > 0) {
+                for (var kwi=0; kwi<kw.yaos.length; kwi++) {
+                  var kwy = kw.yaos[kwi];
+                  v3LiuHtml += '<div style="font-size:10px;color:#888;margin-left:8px">第'+kwy.pos+'爻('+kwy.branch+')空亡'+(kwy.isZhenKong?'【真空】':'【假空】')+'</div>';
+                }
+              }
+            }
+            v3LiuHtml += '</div>';
+          }
+        } catch(eLy2) {}
+        // R2.8: 六冲六合+伏神飞神
+        try {
+          if (v3LiuResult.chongHe || v3LiuResult.fuFei) {
+            v3LiuHtml += '<div style="margin-bottom:12px;padding:10px;background:rgba(231,76,60,0.04);border-radius:8px">';
+            v3LiuHtml += '<div style="font-size:12px;color:#e74c3c;margin-bottom:6px">⚔ 六冲六合与伏飞神</div>';
+            if (v3LiuResult.chongHe) {
+              var ch = v3LiuResult.chongHe;
+              v3LiuHtml += '<div style="font-size:11px;color:var(--paper2);line-height:1.6">'+(ch.desc||ch.type||'')+'</div>';
+            }
+            if (v3LiuResult.fuFei) {
+              var ff = v3LiuResult.fuFei;
+              if (ff.desc) v3LiuHtml += '<div style="font-size:11px;color:var(--paper2);margin-top:4px;line-height:1.6">'+ff.desc+'</div>';
+              if (ff.fuShen) v3LiuHtml += '<div style="font-size:10px;color:#888;margin-left:8px">伏神：'+ff.fuShen+'('+ (ff.fuEle||'') +')</div>';
+              if (ff.feiShen) v3LiuHtml += '<div style="font-size:10px;color:#888;margin-left:8px">飞神：'+ff.feiShen+'('+ (ff.feiEle||'') +')</div>';
+              if (ff.relation) v3LiuHtml += '<div style="font-size:10px;color:#f39c12;margin-left:8px">'+ff.relation+'</div>';
+            }
+            v3LiuHtml += '</div>';
+          }
+        } catch(eLy3) {}
+        // R2.9: 动爻化进退+暗动
+        try {
+          if (v3LiuResult.dongYaoAnalysis) {
+            var dy = v3LiuResult.dongYaoAnalysis;
+            v3LiuHtml += '<div style="margin-bottom:12px;padding:10px;background:rgba(243,156,18,0.04);border-radius:8px">';
+            v3LiuHtml += '<div style="font-size:12px;color:#f39c12;margin-bottom:6px">⚡ 动爻化进化退与暗动</div>';
+            if (dy.movingYaos && dy.movingYaos.length > 0) {
+              for (var myi=0; myi<dy.movingYaos.length; myi++) {
+                var my = dy.movingYaos[myi];
+                v3LiuHtml += '<div style="font-size:10px;color:var(--paper2);margin-bottom:3px">第'+my.pos+'爻 '+my.fromBranch+'→'+my.toBranch+' <span style="color:'+(my.huaType.indexOf('进')>=0?'#27ae60':my.huaType.indexOf('退')>=0?'#e74c3c':'#f39c12')+'">'+my.huaType+'</span>'+(my.desc?' — '+my.desc:'')+'</div>';
+              }
+            }
+            if (dy.anDongYaos && dy.anDongYaos.length > 0) {
+              v3LiuHtml += '<div style="font-size:11px;color:#9b59b6;margin-top:4px">暗动爻：</div>';
+              for (var ayi=0; ayi<dy.anDongYaos.length; ayi++) {
+                var ay = dy.anDongYaos[ayi];
+                v3LiuHtml += '<div style="font-size:10px;color:#888;margin-left:8px">第'+ay.pos+'爻('+ay.branch+') 被日支'+ay.dayBranch+'冲 → 暗动'+(ay.desc?' — '+ay.desc:'')+'</div>';
+              }
+            }
+            if (dy.summary) v3LiuHtml += '<div style="font-size:11px;color:var(--gold);margin-top:4px;line-height:1.6">'+dy.summary+'</div>';
+            v3LiuHtml += '</div>';
+          }
+        } catch(eLy4) {}
+        // R3.3: 应期判断
+        try {
+          if (v3LiuResult.yingqi) {
+            var yq = v3LiuResult.yingqi;
+            v3LiuHtml += '<div style="margin-bottom:12px;padding:10px;background:rgba(39,174,96,0.04);border-radius:8px">';
+            v3LiuHtml += '<div style="font-size:12px;color:#27ae60;margin-bottom:6px">⏰ 应期判断</div>';
+            if (yq.rules && yq.rules.length > 0) {
+              for (var yqi=0; yqi<yq.rules.length; yqi++) {
+                v3LiuHtml += '<div style="font-size:10px;color:var(--paper2);line-height:1.5">• '+yq.rules[yqi]+'</div>';
+              }
+            }
+            if (yq.nearFar) v3LiuHtml += '<div style="font-size:11px;color:#3498db;margin-top:4px">远近：'+yq.nearFar+'</div>';
+            if (yq.summary) v3LiuHtml += '<div style="font-size:11px;color:var(--gold);margin-top:4px;line-height:1.6">'+yq.summary+'</div>';
+            v3LiuHtml += '</div>';
+          }
+        } catch(eLy5) {}
         v3LiuHtml += '<div style="text-align:center;font-size:10px;opacity:.3;letter-spacing:2px;margin-top:8px">⚡ Powered by LiuyaoV3 Engine</div>';
         v3LiuHtml += '</div></div>';
         var yjResultEl = document.getElementById('yjResult') || document.getElementById('yjEngineResult');
@@ -34819,8 +34926,38 @@ function runMeihuaEngine() {
           if (ty.relation) v3MhHtml += '<div style="font-size:12px;line-height:1.8">体用关系：<strong>' + ty.relation + '</strong></div>';
           if (ty.verdict) v3MhHtml += '<div style="font-size:12px;line-height:1.8;color:var(--gold)">断语：' + ty.verdict + '</div>';
           if (ty.advice) v3MhHtml += '<div style="font-size:12px;line-height:1.8;opacity:.8">' + ty.advice + '</div>';
+          // R3.1: tiYongDetail详情
+          if (ty.tiYongDetail) {
+            var td = ty.tiYongDetail;
+            v3MhHtml += '<div style="margin-top:8px;padding:6px 8px;background:rgba(255,255,255,.02);border-radius:4px">';
+            v3MhHtml += '<div style="font-size:11px;font-weight:bold;color:#9b59b6;margin-bottom:4px">体用生克细化</div>';
+            if (td.relationLabel) v3MhHtml += '<div style="font-size:10px;color:var(--paper2)">关系：'+td.relationLabel+'</div>';
+            if (td.tiStrength) v3MhHtml += '<div style="font-size:10px;color:var(--paper2)">体卦旺衰：'+td.tiStrength+'</div>';
+            if (td.yongStrength) v3MhHtml += '<div style="font-size:10px;color:var(--paper2)">用卦旺衰：'+td.yongStrength+'</div>';
+            if (td.huGuaEffect) v3MhHtml += '<div style="font-size:10px;color:#888;margin-left:8px">互卦影响：'+td.huGuaEffect+'</div>';
+            if (td.bianGuaEffect) v3MhHtml += '<div style="font-size:10px;color:#888;margin-left:8px">变卦趋势：'+td.bianGuaEffect+'</div>';
+            if (td.summary) v3MhHtml += '<div style="font-size:10px;color:var(--gold);margin-top:4px;line-height:1.5">'+td.summary+'</div>';
+            v3MhHtml += '</div>';
+          }
           v3MhHtml += '</div>';
         }
+        // R3.2: 五步断卦法
+        try {
+          if (window.MeihuaV3 && MeihuaV3.analyzeMeihuaFull) {
+            var _mhFull = MeihuaV3.analyzeMeihuaFull({ method: 'number', n1: n1, n2: n2, n3: n3 });
+            if (_mhFull) {
+              v3MhHtml += '<div style="margin-bottom:12px;padding:10px;background:rgba(155,89,182,0.04);border-radius:8px">';
+              v3MhHtml += '<div style="font-size:12px;color:#9b59b6;margin-bottom:6px">🔮 五步断卦</div>';
+              if (_mhFull.guaNameDesc) v3MhHtml += '<div style="font-size:11px;color:var(--paper2);line-height:1.6"><b>卦名：</b>'+_mhFull.guaNameDesc+'</div>';
+              if (_mhFull.tiYongAnalysis) v3MhHtml += '<div style="font-size:11px;color:var(--paper2);line-height:1.6;margin-top:4px"><b>体用：</b>'+_mhFull.tiYongAnalysis+'</div>';
+              if (_mhFull.huGuaAnalysis) v3MhHtml += '<div style="font-size:11px;color:var(--paper2);line-height:1.6;margin-top:4px"><b>互卦：</b>'+_mhFull.huGuaAnalysis+'</div>';
+              if (_mhFull.bianGuaAnalysis) v3MhHtml += '<div style="font-size:11px;color:var(--paper2);line-height:1.6;margin-top:4px"><b>变卦：</b>'+_mhFull.bianGuaAnalysis+'</div>';
+              if (_mhFull.summary) v3MhHtml += '<div style="font-size:11px;color:var(--gold);margin-top:6px;padding:4px 6px;background:rgba(255,255,255,.02);border-radius:4px;line-height:1.6"><b>总结：</b>'+_mhFull.summary+'</div>';
+              if (_mhFull.luckLevel) v3MhHtml += '<div style="font-size:12px;margin-top:4px">吉凶：<b style="color:' + (_mhFull.luckLevel.indexOf('大吉')>=0?'#27ae60':_mhFull.luckLevel.indexOf('凶')>=0?'#e74c3c':'#f39c12') + '">'+_mhFull.luckLevel+'</b></div>';
+              v3MhHtml += '</div>';
+            }
+          }
+        } catch(eMh2) {}
         if (v3MhResult.season) {
           v3MhHtml += '<div style="margin-bottom:12px;padding:10px;background:rgba(201,168,76,0.04);border-radius:8px">';
           v3MhHtml += '<div style="font-size:12px;color:var(--gold);margin-bottom:6px">时令旺衰（V3）</div>';
@@ -35719,6 +35856,44 @@ function runLiurenEngine() {
           v3LrHtml += '<div style="font-size:12px;line-height:1.8">' + v3LrResult.report + '</div>';
           v3LrHtml += '</div>';
         }
+        // R2.10: 克应分析+本命行年
+        try {
+          if (window.LiurenV3 && LiurenV3.analyzeKeying && v3LrResult.sanChuan) {
+            var _keying = LiurenV3.analyzeKeying(v3LrResult.sanChuan, v3LrResult.hourBranch || v3LrResult.zhanShi);
+            if (_keying) {
+              v3LrHtml += '<div style="margin-bottom:12px;padding:10px;background:rgba(52,152,219,0.04);border-radius:8px">';
+              v3LrHtml += '<div style="font-size:12px;color:#3498db;margin-bottom:6px">📅 克应分析</div>';
+              if (_keying.yingqi) v3LrHtml += '<div style="font-size:11px;color:var(--paper2);line-height:1.6">应期：'+_keying.yingqi+'</div>';
+              if (_keying.desc) v3LrHtml += '<div style="font-size:10px;color:#666;margin-left:8px;line-height:1.5">'+_keying.desc+'</div>';
+              v3LrHtml += '</div>';
+            }
+          }
+          if (window.LiurenV3 && LiurenV3.computeBenMing) {
+            var _bm = LiurenV3.computeBenMing(new Date().getFullYear(), 'male');
+            if (_bm) {
+              v3LrHtml += '<div style="margin-bottom:12px;padding:10px;background:rgba(155,89,182,0.04);border-radius:8px">';
+              v3LrHtml += '<div style="font-size:12px;color:#9b59b6;margin-bottom:6px">♟ 本命行年</div>';
+              if (_bm.benMing) v3LrHtml += '<div style="font-size:11px;color:var(--paper2)">本命：'+_bm.benMing+'</div>';
+              if (_bm.xingNian) v3LrHtml += '<div style="font-size:11px;color:var(--paper2)">行年：'+_bm.xingNian+'</div>';
+              if (_bm.xingNianDetail) v3LrHtml += '<div style="font-size:10px;color:#666;margin-left:8px">'+_bm.xingNianDetail+'</div>';
+              v3LrHtml += '</div>';
+            }
+          }
+        } catch(eLr1) {}
+        // R3.4: 课体格局辨识
+        try {
+          if (window.LiurenV3 && LiurenV3.analyzeKetiGeshi && v3LrResult.sanChuan) {
+            var _keti = LiurenV3.analyzeKetiGeshi(v3LrResult.sanChuan, v3LrResult.hourBranch || v3LrResult.zhanShi, v3LrResult.siKe);
+            if (_keti) {
+              v3LrHtml += '<div style="margin-bottom:12px;padding:10px;background:rgba(243,156,18,0.04);border-radius:8px">';
+              v3LrHtml += '<div style="font-size:12px;color:#f39c12;margin-bottom:6px">📋 课体格局</div>';
+              if (_keti.gejuName) v3LrHtml += '<div style="font-size:11px;color:var(--paper2)">课体：<b>'+_keti.gejuName+'</b></div>';
+              if (_keti.luck) v3LrHtml += '<div style="font-size:11px;color:' + (_keti.luck==='吉'?'#27ae60':_keti.luck==='凶'?'#e74c3c':'#f39c12') + '">吉凶：'+_keti.luck+'</div>';
+              if (_keti.description) v3LrHtml += '<div style="font-size:10px;color:#666;margin-left:8px;line-height:1.5">'+_keti.description+'</div>';
+              v3LrHtml += '</div>';
+            }
+          }
+        } catch(eLr2) {}
         v3LrHtml += '<div style="text-align:center;font-size:10px;opacity:.3;letter-spacing:2px;margin-top:8px">⚡ Powered by LiurenV3 Engine</div>';
         v3LrHtml += '</div></div>';
         var lrResultEl = document.getElementById('lrResult') || document.getElementById('lrEngineResult');
