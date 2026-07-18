@@ -27408,6 +27408,11 @@ function computeFamilyPaipan() {
 
     // 渲染报告
     _renderFamilyReport(allResults, familyEleCount, relationAnalysis, solutions);
+    // 添加导出/复制按钮
+    try {
+      var _famExport = '<div style="margin-top:16px;text-align:center"><button onclick="exportReportGeneric(\'familyResult\',\'家庭排盘报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'familyResult\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button></div>';
+      document.getElementById('familyResult').insertAdjacentHTML('beforeend', _famExport);
+    } catch(_ee) {}
   } catch(e) {
     showToast('家庭排盘失败: ' + e.message);
     console.error('[家庭排盘错误]', e);
