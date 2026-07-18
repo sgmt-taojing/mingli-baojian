@@ -36774,6 +36774,32 @@ function runFengshuiEngine() {
       html += '</div></div>';
     } catch(_fste) { console.warn('风水术语注释渲染错误:', _fste); }
 
+    // === R3.4: 风水·城门诀 ===
+    try {
+      if (typeof computeChengmenJue === 'function' && res) {
+        var _cmHtml = computeChengmenJue(res.xuankongData || res, res.chaoxiang || res.direction);
+        if (_cmHtml && _cmHtml.trim()) {
+          html += '<div class="bazi-new-module">';
+          html += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">🚪 城门诀分析 <span class="toggle-icon">▼</span></div>';
+          html += '<div class="bazi-module-body collapsed">' + _cmHtml + '</div>';
+          html += '</div>';
+        }
+      }
+    } catch(_cme) { console.warn('城门诀渲染错误:', _cme); }
+
+    // === R3.5: 风水·飞星组合深化 ===
+    try {
+      if (typeof computeFeixingCombos === 'function' && res) {
+        var _fxHtml = computeFeixingCombos(res.xuankongData || res, res.chaoxiang || res.direction);
+        if (_fxHtml && _fxHtml.trim()) {
+          html += '<div class="bazi-new-module">';
+          html += '<div class="bazi-module-title collapsed" onclick="toggleBaziModule(this)">🌟 飞星组合详析 <span class="toggle-icon">▼</span></div>';
+          html += '<div class="bazi-module-body collapsed">' + _fxHtml + '</div>';
+          html += '</div>';
+        }
+      }
+    } catch(_fxe) { console.warn('飞星组合渲染错误:', _fxe); }
+
     // === 化解方案与开运建议 ===
     try {
       var _cureHtml = getFengshuiResolution(res);
