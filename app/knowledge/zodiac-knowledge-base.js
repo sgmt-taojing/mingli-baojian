@@ -801,3 +801,6 @@ const ZODIAC_KNOWLEDGE = {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = ZODIAC_KNOWLEDGE;
 }
+if (typeof window !== 'undefined') {
+  window.ZODIAC_KB = ZODIAC_KNOWLEDGE;
+}
