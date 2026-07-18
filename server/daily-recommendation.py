@@ -686,6 +686,22 @@ def generate_daily_recommendation():
     chong = f'冲{CHONG_MAP.get(ganzhi["day_zhi"],"?")}（{SHENG_XIAO[DI_ZHI.index(CHONG_MAP.get(ganzhi["day_zhi"],"子"))]}）'
     sha = f'煞{SHA_MAP.get(ganzhi["day_zhi"],"?")}'
     
+    # 生肖五行
+    year_zhi_ele = WU_XING_ZHI[DI_ZHI.index(ganzhi['year_zhi'])]
+    day_zhi_ele = WU_XING_ZHI[DI_ZHI.index(ganzhi['day_zhi'])]
+    
+    # 十神（日干为基）
+    SHISHEN = ['比肩','劫财','食神','伤官','偏财','正财','七杀','正官','偏印','正印']
+    day_gan_idx = TIAN_GAN.index(ganzhi['day_gan'])
+    
+    # 神煞简化（根据日支）
+    SHENSHA_DAY = {
+        '子':'桃花日','丑':'天乙贵人日','寅':'驿马日','卯':'桃花日',
+        '辰':'华盖日','巳':'驿马日','午':'桃花日','未':'天乙贵人日',
+        '申':'文昌日','酉':'桃花日','戌':'华盖日','亥':'文昌日'
+    }
+    shensha = SHENSHA_DAY.get(ganzhi['day_zhi'], '')
+    
     # 组装消息
     msg = f"""📅 乾元命理宝鉴 · 每日推荐
 ━━━━━━━━━━━━━━━━━━
@@ -705,7 +721,8 @@ def generate_daily_recommendation():
 ☀️ 黄道黑道：{huanghei}
 ⚔️ 冲煞：{chong} · {sha}
 📜 彭祖百忌：{pengzu}
-🐾 生肖五行：{ganzhi['year_shengxiao']}（{WU_XING_ZHI[DI_ZHI.index(ganzhi["year_zhi"])]}）· 日支{ganzhi["day_zhi"]}（{WU_XING_ZHI[DI_ZHI.index(ganzhi["day_zhi"])]}）
+🐾 生肖五行：{ganzhi['year_shengxiao']}（{year_zhi_ele}）· 日支{ganzhi["day_zhi"]}（{day_zhi_ele}）
+✨ 今日神煞：{shensha}
 
 🧭 喜神：{XISHEN_FANG.get(ganzhi['day_gan'],'东北')}
 💰 财神：{CAISHEN_FANG.get(ganzhi['day_gan'],'正北')}
