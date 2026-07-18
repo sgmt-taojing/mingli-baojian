@@ -1,0 +1,106 @@
+<!-- pages/shop/detail.wxml -->
+<view class="page">
+
+  <!-- 加载中 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <block wx:if="{{product && !loading}}">
+
+    <!-- 顶部商品图区域 -->
+    <view class="product-image-section">
+      <view class="product-emoji">{{product.emoji}}</view>
+      <view class="product-image-bg"></view>
+    </view>
+
+    <!-- 商品基本信息卡片 -->
+    <view class="product-info-card">
+      <view class="product-price-row">
+        <text class="product-price-symbol">¥</text>
+        <text class="product-price">{{product.price}}</text>
+        <text class="product-stock">库存 {{product.stock}} 件</text>
+      </view>
+      <text class="product-name">{{product.name}}</text>
+      <text class="product-desc">{{product.desc}}</text>
+
+      <!-- 五行属性标签 -->
+      <view class="wuxing-tag" style="border-color: {{wuxingColor}}; color: {{wuxingColor}};">
+        <text class="wuxing-icon">☯</text>
+        <text class="wuxing-text">五行 · {{product.wuxing}}</text>
+      </view>
+    </view>
+
+    <!-- 数量选择器 -->
+    <view class="quantity-section">
+      <text class="quantity-label">购买数量</text>
+      <view class="quantity-control">
+        <view class="quantity-btn {{quantity <= 1 ? 'disabled' : ''}}" bindtap="onQuantityMinus">
+          <text>−</text>
+        </view>
+        <input
+          class="quantity-input"
+          type="number"
+          value="{{quantity}}"
+          bindinput="onQuantityInput"
+        />
+        <view class="quantity-btn {{quantity >= product.stock ? 'disabled' : ''}}" bindtap="onQuantityPlus">
+          <text>+</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 商品详情说明区 -->
+    <view class="detail-section">
+      <view class="section-header">
+        <view class="section-line"></view>
+        <text class="section-title">商品详情</text>
+        <view class="section-line"></view>
+      </view>
+      <view class="detail-content">
+        <text class="detail-text">{{product.detail}}</text>
+      </view>
+
+      <!-- 属性信息 -->
+      <view class="attr-list">
+        <view class="attr-item">
+          <text class="attr-key">商品类别</text>
+          <text class="attr-val">{{product.category}}</text>
+        </view>
+        <view class="attr-item">
+          <text class="attr-key">五行属性</text>
+          <text class="attr-val" style="color: {{wuxingColor}};">{{product.wuxing}}</text>
+        </view>
+        <view class="attr-item">
+          <text class="attr-key">商品编号</text>
+          <text class="attr-val">MLBJ-{{product.id}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 底部占位（防止被固定栏遮挡） -->
+    <view class="bottom-placeholder"></view>
+
+    <!-- 底部操作栏 -->
+    <view class="bottom-bar">
+      <view class="bar-icon" bindtap="onGoToCart">
+        <text class="bar-icon-emoji">🛒</text>
+        <text class="bar-icon-text">购物车</text>
+      </view>
+      <view class="bar-btn bar-btn-cart" bindtap="onAddToCart">
+        <text>加入购物车</text>
+      </view>
+      <view class="bar-btn bar-btn-buy" bindtap="onBuyNow">
+        <text>立即购买</text>
+      </view>
+    </view>
+
+  </block>
+
+  <!-- 商品不存在 -->
+  <view class="not-found" wx:if="{{!product && !loading}}">
+    <text class="not-found-emoji">🔍</text>
+    <text class="not-found-text">商品不存在或已下架</text>
+  </view>
+
+</view>

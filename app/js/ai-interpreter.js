@@ -484,10 +484,10 @@ async function aiInterpret(type) {
   try {
     let result = await aiDivineInterpret(type, paipanData, '');
     content.innerHTML = '<div class="ai-result-text">' + _aiFormatText(result) + '</div>';
-    content.innerHTML += '<div class="ai-actions">' +
+    content.insertAdjacentHTML('beforeend', '<div class="ai-actions">' +
       '<button class="ai-action-btn" onclick="aiCopyText(\'' + type + '\')">📋 复制解读</button>' +
       '<button class="ai-action-btn" onclick="aiGenerateFullReport(\'' + type + '\')">📄 生成完整报告</button>' +
-      '</div>';
+      '</div>');
   } catch (err) {
     content.innerHTML = '<div class="ai-error">⚠️ AI解读暂时不可用，请稍后重试或查看规则推演结果。<br><span style="font-size:12px;opacity:0.6">' + escapeHtml(err.message || '') + '</span></div>';
   } finally {
@@ -517,7 +517,7 @@ async function aiAsk(type) {
     content.innerHTML = '<div class="ai-loading">🤖 AI命理师正在思考您的问题...</div>';
   } else if (content) {
     // 追加问题
-    content.innerHTML += '<div class="ai-question">💬 ' + _aiEscapeHtml(question) + '</div>';
+    content.insertAdjacentHTML('beforeend', '<div class="ai-question">💬 ' + _aiEscapeHtml(question) + '</div>');
     content.innerHTML += '<div class="ai-loading">🤖 AI命理师正在思考...</div>';
   }
 
@@ -534,7 +534,7 @@ async function aiAsk(type) {
     let loading = content.querySelector('.ai-loading');
     if (loading) loading.remove();
 
-    content.innerHTML += '<div class="ai-answer">' + _aiFormatText(result) + '</div>';
+    content.insertAdjacentHTML('beforeend', '<div class="ai-answer">' + _aiFormatText(result) + '</div>');
   } catch (err) {
     let loading = content.querySelector('.ai-loading');
     if (loading) loading.remove();
@@ -564,10 +564,10 @@ async function aiGenerateFullReport(type) {
     let loading = content.querySelector('.ai-loading');
     if (loading) loading.remove();
 
-    content.innerHTML += '<div class="ai-report">' + _aiFormatText(report) + '</div>';
-    content.innerHTML += '<div class="ai-actions">' +
+    content.insertAdjacentHTML('beforeend', '<div class="ai-report">' + _aiFormatText(report) + '</div>');
+    content.insertAdjacentHTML('beforeend', '<div class="ai-actions">' +
       '<button class="ai-action-btn" onclick="aiExportReport(\'' + type + '\')">📋 导出报告</button>' +
-      '</div>';
+      '</div>');
   } catch (err) {
     let loading = content.querySelector('.ai-loading');
     if (loading) loading.remove();

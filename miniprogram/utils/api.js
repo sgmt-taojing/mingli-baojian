@@ -92,6 +92,45 @@ function getProducts() {
   return request('/api/shop/products');
 }
 
+function getProductDetail(id) {
+  return request('/api/shop/products/' + id);
+}
+
+function getCart() {
+  return request('/api/shop/cart');
+}
+
+function addToCart(productId, qty) {
+  return request('/api/shop/cart', { method: 'POST', data: { productId, qty } });
+}
+
+function updateCartItem(itemId, qty) {
+  return request('/api/shop/cart/' + itemId, { method: 'PUT', data: { qty } });
+}
+
+function removeCartItem(itemId) {
+  return request('/api/shop/cart/' + itemId, { method: 'DELETE' });
+}
+
+function getOrders(status, page) {
+  let q = '?';
+  if (status) q += 'status=' + status + '&';
+  if (page) q += 'page=' + page + '&';
+  return request('/api/orders' + q);
+}
+
+function getOrderDetail(id) {
+  return request('/api/orders/' + id);
+}
+
+function getFavorites() {
+  return request('/api/shop/favorites');
+}
+
+function toggleFavorite(productId) {
+  return request('/api/shop/favorites', { method: 'POST', data: { productId } });
+}
+
 function createOrder(data) {
   return request('/api/order/create', { method: 'POST', data });
 }
@@ -115,6 +154,15 @@ module.exports = {
   getAlmanac,
   getKnowledgeList,
   getProducts,
+  getProductDetail,
+  getCart,
+  addToCart,
+  updateCartItem,
+  removeCartItem,
+  getOrders,
+  getOrderDetail,
+  getFavorites,
+  toggleFavorite,
   createOrder,
   submitFeedback,
   getPoints,

@@ -4696,7 +4696,7 @@ function _computeBaziImpl() {
   warnDiv.innerHTML = '<div class="warn-title">⚡ 本命盘重点提醒</div>';
   warnings.forEach(function(w){
     var cls = w.level==='danger'?'warn-red':w.level==='warn'?'warn-yellow':'warn-green';
-    warnDiv.innerHTML += '<div class="'+cls+'">'+w.text+'</div>';
+    warnDiv.insertAdjacentHTML('beforeend', '<div class="'+cls+'">'+w.text+'</div>');
   });
   grid.appendChild(warnDiv);
 
@@ -4713,7 +4713,7 @@ function _computeBaziImpl() {
       wsDiv.innerHTML += '<div class="warn-green" style="white-space:pre-wrap;line-height:1.8">' + mingType.yongshen + '</div>';
     }
     if (mingType.isCongGe) {
-      wsDiv.innerHTML += '<div class="warn-yellow">⚠️ ' + mingType.congGeType + ' — 用神与常格相反，顺其旺势为吉，逆之为凶。</div>';
+      wsDiv.insertAdjacentHTML('beforeend', '<div class="warn-yellow">⚠️ ' + mingType.congGeType + ' — 用神与常格相反，顺其旺势为吉，逆之为凶。</div>');
     }
     grid.appendChild(wsDiv);
   }
@@ -4724,8 +4724,8 @@ function _computeBaziImpl() {
   var xjData = mingType.xiJi || mingType.xiji || mingType.xijiFull || '';
   var xjParts = xjData.split(/[，。；；]/).filter(function(p){return p.trim().length > 3;});
   xjDiv.innerHTML = '<div class="xj-title">喜忌速查</div><div class="xj-grid">';
-  xjParts.forEach(function(p){ xjDiv.innerHTML += '<div class="xj-item">'+p.trim()+'</div>'; });
-  xjDiv.innerHTML += insertAdjacentHTML('beforeend', '</div>');
+  xjParts.forEach(function(p){ xjDiv.insertAdjacentHTML('beforeend', '<div class="xj-item">'+p.trim()+'</div>'); });
+  xjDiv.insertAdjacentHTML('beforeend', '</div>');
   grid.appendChild(xjDiv);
 
   // === 8大分析卡片 ===
@@ -4775,14 +4775,14 @@ function _computeBaziImpl() {
   var _xunKong = getXunKong(dayStem, dayBranch);
   var _xunName = getXunName(dayStem, dayBranch);
   var _dishi = pillars.map(function(p){ return getDishi(dayStem, p.branch); });
-  refDiv.innerHTML += insertAdjacentHTML('beforeend', '<div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(201,168,76,.1);display:grid;grid-template-columns:repeat(3,1fr);gap:6px">');
-  refDiv.innerHTML += '<span class="ref-tag">胎元<span>'+_taiYuan+'</span></span>';
-  refDiv.innerHTML += '<span class="ref-tag">命宫<span>'+_mingGong+'</span></span>';
-  refDiv.innerHTML += '<span class="ref-tag">身宫<span>'+_shenGong+'</span></span>';
-  refDiv.innerHTML += '<span class="ref-tag">旬空<span>'+_xunKong+'</span></span>';
-  refDiv.innerHTML += '<span class="ref-tag">旬名<span>'+_xunName+'</span></span>';
-  refDiv.innerHTML += '<span class="ref-tag">长生<span>'+_dishi.join('/')+'</span></span>';
-  refDiv.innerHTML += insertAdjacentHTML('beforeend', '</div>');
+  refDiv.insertAdjacentHTML('beforeend', '<div style="margin-top:10px);padding-top:8px;border-top:1px solid rgba(201,168,76,.1);display:grid;grid-template-columns:repeat(3,1fr);gap:6px">');
+  refDiv.insertAdjacentHTML('beforeend', '<span class="ref-tag">胎元<span>'+_taiYuan+'</span></span>');
+  refDiv.insertAdjacentHTML('beforeend', '<span class="ref-tag">命宫<span>'+_mingGong+'</span></span>');
+  refDiv.insertAdjacentHTML('beforeend', '<span class="ref-tag">身宫<span>'+_shenGong+'</span></span>');
+  refDiv.insertAdjacentHTML('beforeend', '<span class="ref-tag">旬空<span>'+_xunKong+'</span></span>');
+  refDiv.insertAdjacentHTML('beforeend', '<span class="ref-tag">旬名<span>'+_xunName+'</span></span>');
+  refDiv.insertAdjacentHTML('beforeend', '<span class="ref-tag">长生<span>'+_dishi.join('/')+'</span></span>');
+  refDiv.insertAdjacentHTML('beforeend', '</div>');
   grid.appendChild(refDiv);
 
   // === Export Buttons ===
@@ -4976,7 +4976,7 @@ function _computeBaziImpl() {
   try {
     var _csHTML = renderChangshengModule(dayStem, pillars, _pillarDishi);
     var _csBox = document.getElementById('baziAnalysisGrid') || document.getElementById('baziResult');
-    if (_csBox && _csHTML) _csBox.innerHTML += _csHTML;
+    if (_csBox && _csHTML) _csBox.insertAdjacentHTML('beforeend', _csHTML);
   } catch(e) { console.warn('[长生十二宫模块渲染失败]', e.message); }
 
   // ═══ 个性化指导 ═══
@@ -8131,7 +8131,7 @@ function showYjResult() {
     simpleSummary += '吉凶参半，有好有坏。关键看你怎么把握，做事要脚踏实地。';
   }
   simpleSummary += '</div></div>';
-  ctr.innerHTML += simpleSummary;
+  ctr.insertAdjacentHTML('beforeend', simpleSummary);
 
   // 起心动念时辰分析（仅事盘）
   if (yjMode === 'matter' && yjQixinTime) {
@@ -8226,7 +8226,7 @@ function showYjResult() {
   copyBtn += '<button onclick="copyResultText(this)" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px">📋 复制结果</button>';
   copyBtn += '</div>';
   var yjResultEl = document.getElementById('yjResult');
-  if (yjResultEl) yjResultEl.innerHTML += copyBtn;
+  if (yjResultEl) yjResultEl.insertAdjacentHTML('beforeend', copyBtn);
 
   // ═══ 个性化指导 ═══
   try {
@@ -8234,14 +8234,14 @@ function showYjResult() {
       guaName: hex.name, changedName: changedHex ? changedHex.name : '',
       moving: moving, yjVals: yjVals, mode: yjMode
     });
-    if (yjResultEl) yjResultEl.innerHTML += yjGuide;
+    if (yjResultEl) yjResultEl.insertAdjacentHTML('beforeend', yjGuide);
   } catch(e) {}
 
   document.getElementById('yjResult').classList.add('visible');
   document.getElementById('yjResult').scrollIntoView({ behavior: 'smooth' });
   // 导出报告按钮
   var _yjResEl = document.getElementById('yjResult');
-  if (_yjResEl) _yjResEl.innerHTML += insertAdjacentHTML('beforeend', '<div style="margin-top:16px;text-align:center"><button onclick="exportReportGeneric(\'yjResult\',\'六爻占卜报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button></div>');
+  if (_yjResEl) _yjResEl.insertAdjacentHTML('beforeend', '<div style="margin-top:16px);text-align:center"><button onclick="exportReportGeneric(\'yjResult\',\'六爻占卜报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button></div>');
 }
 
 function yjReset() {
@@ -10005,7 +10005,7 @@ function _computeZiWeiImpl() {
   try {
     var zwGuide = buildZiweiPersonalizedGuidance({});
     var zwRes = document.getElementById('zwResult');
-    if (zwRes) zwRes.innerHTML += zwGuide;
+    if (zwRes) zwRes.insertAdjacentHTML('beforeend', zwGuide);
   } catch(e) {}
 
   // ═══ 三元九运与紫微 ═══
@@ -10016,7 +10016,7 @@ function _computeZiWeiImpl() {
       currentYear: (typeof year !== 'undefined' ? year : new Date().getFullYear())
     });
     var _zwRes = document.getElementById('zwResult');
-    if (_zwRes) _zwRes.innerHTML += _syZw;
+    if (_zwRes) _zwRes.insertAdjacentHTML('beforeend', _syZw);
   } catch(e) { console.warn('[三元九运紫微分析块失败]', e.message); }
 
   // 渲染十二宫盘面
@@ -10818,7 +10818,7 @@ function _computeMeiHuaImpl() {
   try {
     var mhGuide = buildMeihuaPersonalizedGuidance({ guaName: hex ? hex.name : '', changedName: '' });
     var mhRes = document.getElementById('mhResult');
-    if (mhRes) mhRes.innerHTML += mhGuide;
+    if (mhRes) mhRes.insertAdjacentHTML('beforeend', mhGuide);
   } catch(e) {}
 
   // ═══ 三元九运与梅花 ═══
@@ -10830,14 +10830,14 @@ function _computeMeiHuaImpl() {
       currentYear: (typeof year !== 'undefined' ? year : new Date().getFullYear())
     });
     var _mhRes = document.getElementById('mhResult');
-    if (_mhRes) _mhRes.innerHTML += _syMh;
+    if (_mhRes) _mhRes.insertAdjacentHTML('beforeend', _syMh);
   } catch(e) { console.warn('[三元九运梅花分析块失败]', e.message); }
 
   document.getElementById('mhResult').classList.add('visible');
   document.getElementById('mhResult').scrollIntoView({ behavior: 'smooth' });
   // 导出/复制按钮
   var _mhRes2 = document.getElementById('mhResult');
-  if (_mhRes2) _mhRes2.innerHTML += insertAdjacentHTML('beforeend', '<div style="margin-top:16px;text-align:center"><button onclick="exportReportGeneric(\'mhResult\',\'梅花易数排盘报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'mhResult\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button></div>');
+  if (_mhRes2) _mhRes2.insertAdjacentHTML('beforeend', '<div style="margin-top:16px);text-align:center"><button onclick="exportReportGeneric(\'mhResult\',\'梅花易数排盘报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'mhResult\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button></div>');
   if(btn){ btn.disabled=false; btn.textContent='开始排盘'; }
 }
 
@@ -11721,7 +11721,7 @@ function _computeLiuRenImpl() {
   try {
     var lrGuide = buildLiurenPersonalizedGuidance({});
     var lrRes = document.getElementById('lrResult');
-    if (lrRes) lrRes.innerHTML += lrGuide;
+    if (lrRes) lrRes.insertAdjacentHTML('beforeend', lrGuide);
   } catch(e) {}
 
   // ═══ 三元九运与六壬 ═══
@@ -11732,7 +11732,7 @@ function _computeLiuRenImpl() {
       currentYear: (typeof year !== 'undefined' ? year : new Date().getFullYear())
     });
     var _lrRes = document.getElementById('lrResult');
-    if (_lrRes) _lrRes.innerHTML += _syLr;
+    if (_lrRes) _lrRes.insertAdjacentHTML('beforeend', _syLr);
   } catch(e) { console.warn('[三元九运六壬分析块失败]', e.message); }
 
   // === 化解方案注入 ===
@@ -11743,7 +11743,7 @@ function _computeLiuRenImpl() {
   document.getElementById('lrResult').scrollIntoView({ behavior: 'smooth' });
   // 导出/复制按钮
   var _lrRes2 = document.getElementById('lrResult');
-  if (_lrRes2) _lrRes2.innerHTML += insertAdjacentHTML('beforeend', '<div style="margin-top:16px;text-align:center"><button onclick="exportReportGeneric(\'lrResult\',\'大六壬排盘报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'lrResult\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button></div>');
+  if (_lrRes2) _lrRes2.insertAdjacentHTML('beforeend', '<div style="margin-top:16px);text-align:center"><button onclick="exportReportGeneric(\'lrResult\',\'大六壬排盘报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'lrResult\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button></div>');
 }
 
 // ═══ 构建完整六壬课式 ═══
@@ -19232,7 +19232,7 @@ function renderMobileWuxing(mobile){
     for(var wx in wxCount){
       var pct=Math.round(wxCount[wx]/total*100);
       if(pct>0){
-        legend.innerHTML+='<span style="font-size:12px"><span style="color:'+colors[wx]+'">●</span> '+wx+':'+wxCount[wx]+'个('+pct+'%)</span> ';
+        legend.insertAdjacentHTML('beforeend', '<span style="font-size:12px"><span style="color:'+colors[wx]+'">●</span> '+wx+':'+wxCount[wx]+'个('+pct+'%)</span> ');
       }
     }
   }
@@ -21843,7 +21843,7 @@ function appendHuajieToResult(resultElId, year, month, day, hour, sex, name) {
     html += '<p style="font-size:12px;opacity:.6;line-height:1.8">💡 流年飞星与运星叠加：每年流年九紫星飞临之方位为当年最旺位，可在此方位催旺。流年五黄星飞临之方位需化解，避免动土。</p>';
     html += '</div>';
     html += '</div>';
-    el.innerHTML += html;
+    el.insertAdjacentHTML('beforeend', html);
   } catch(e) {
     console.warn('[化解模块注入失败]', e.message);
   }
@@ -24202,7 +24202,7 @@ function runPrecisionZeRi() {
             dayEle: ELE[_zrDayStem] || '木',
             currentYear: new Date().getFullYear()
           });
-          resultEl.innerHTML += _syZr;
+          resultEl.insertAdjacentHTML('beforeend', _syZr);
         } catch(e) { console.warn('[三元九运择日分析块失败]', e.message); }
         // === 导出/复制按钮 ===
         resultEl.innerHTML += '<div style="margin-top:16px;text-align:center"><button onclick="exportReportGeneric(\'' + resultEl.id + '\',\'择日分析报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'' + resultEl.id + '\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button></div>';
@@ -32468,7 +32468,7 @@ function runJiaziCycle() {
         playSound('success');
         resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
         // 导出/复制按钮
-        resultEl.innerHTML += insertAdjacentHTML('beforeend', '<div style="margin-top:16px;text-align:center"><button onclick="exportReportGeneric(\'jiaziResult\',\'六十甲子周期报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'jiaziResult\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button></div>');
+        resultEl.insertAdjacentHTML('beforeend', '<div style="margin-top:16px);text-align:center"><button onclick="exportReportGeneric(\'jiaziResult\',\'六十甲子周期报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'jiaziResult\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button></div>');
       }
     } catch(e) {
       if (resultEl) {

@@ -78,7 +78,7 @@ Page({
       });
       return;
     }
-    wx.showToast({ title: '商品详情开发中', icon: 'none' });
+    wx.navigateTo({ url: '/pages/shop/detail?id=' + id });
   },
 
   onShareAppMessage() {
