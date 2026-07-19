@@ -547,7 +547,7 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 <script src="knowledge/tcm-famous-formulas-kb.js"></script>
 <script>
 // API辅助
-const API_BASE = '';
+const API_BASE = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' ? 'http://127.0.0.1:8920' : '';
 function getAuthToken(){
   return localStorage.getItem('authToken')||'';
 }
