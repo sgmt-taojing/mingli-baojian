@@ -715,7 +715,7 @@ app.post('/api/clinic/submit-analysis', requirePermission('clinic:submit_analysi
   const caseId = parseInt(req.body.caseId);
   const analysis = sec.sanitizeInput(req.body.analysis || '');
   const baziChart = req.body.baziChart ? sec.encrypt(JSON.stringify(req.body.baziChart)) : null;
-  const wuxingSummary = sec.sanitizeInput(req.body.wuxingSummary);
+  const wuxingSummary = sec.sanitizeInput(req.body.wuxingSummary || '');
   
   // 检查病例归属
   const medicalCase = db.prepare('SELECT * FROM medical_cases WHERE id = ?').get(caseId);
@@ -754,12 +754,24 @@ app.post('/api/clinic/submit-diagnosis', requirePermission('clinic:submit_diagno
   const caseId = parseInt(req.body.caseId);
   const diagnosis = sec.sanitizeXSS(sec.sanitizeInput(req.body.diagnosis));
   const prescription = sec.sanitizeXSS(sec.sanitizeInput(req.body.prescription));
-  const reviewComment = sec.sanitizeInput(req.body.reviewComment);
+  const reviewComment = sec.sanitizeInput(req.body.reviewComment || '');
   
-  const masterCase = db.prepare('SELECT * FROM master_cases WHERE id = ?').get(caseId);
+  // caseId可能是medical_cases.id或master_cases.id，统一查找
+  let masterCase = db.prepare('SELECT * FROM master_cases WHERE id = ?').get(caseId);
+  let medicalCase = null;
+  if (!masterCase) {
+    // 尝试作为medical_cases.id查找
+    medicalCase = db.prepare('SELECT * FROM medical_cases WHERE id = ?').get(caseId);
+    if (medicalCase && medicalCase.master_case_id) {
+      masterCase = db.prepare('SELECT * FROM master_cases WHERE id = ?').get(medicalCase.master_case_id);
+    }
+  } else {
+    medicalCase = db.prepare('SELECT * FROM medical_cases WHERE master_case_id = ?').get(caseId);
+  }
   if (!masterCase) return res.json({ error: '案例不存在' });
   
   const finalPlan = JSON.stringify({ diagnosis, prescription });
+  const mcId = masterCase.id;
   
   db.prepare(`
     UPDATE master_cases SET 
@@ -767,24 +779,24 @@ app.post('/api/clinic/submit-diagnosis', requirePermission('clinic:submit_diagno
     reviewer_id = ?, reviewed_at = datetime('now','localtime'),
     final_plan = ?, status = 'completed', completed_at = datetime('now','localtime')
     WHERE id = ?
-  `).run(sec.encrypt(diagnosis), reviewComment, req.userId, sec.encrypt(finalPlan), caseId);
+  `).run(sec.encrypt(diagnosis), reviewComment, req.userId, sec.encrypt(finalPlan), mcId);
   
   // 记录版本
   db.prepare('INSERT INTO master_case_versions (case_id, version_type, version_number, content, content_hash, created_by) VALUES (?, ?, ?, ?, ?, ?)')
-    .run(caseId, 'doctor_diagnosis', 1, sec.encrypt(finalPlan),
+    .run(mcId, 'doctor_diagnosis', 1, sec.encrypt(finalPlan),
           crypto.createHash('sha256').update(finalPlan).digest('hex'), req.userId);
   
   // 更新病例状态
   if (masterCase.patient_id) {
-    const medicalCase = db.prepare('SELECT id FROM medical_cases WHERE master_case_id = ?').get(caseId);
-    if (medicalCase) {
+    const mc = medicalCase || db.prepare('SELECT id FROM medical_cases WHERE master_case_id = ?').get(mcId);
+    if (mc) {
       db.prepare('UPDATE medical_cases SET status = ?, assigned_doctor_id = ?, updated_at = ' + "datetime('now','localtime')" + ' WHERE id = ?')
-        .run('completed', req.userId, medicalCase.id);
+        .run('completed', req.userId, mc.id);
     }
   }
   
   db.prepare('INSERT INTO case_review_logs (case_id, action, actor_id, actor_role, detail) VALUES (?, ?, ?, ?, ?)')
-    .run(caseId, 'diagnosis_submitted', req.userId, 'doctor', '医生提交诊疗方案');
+    .run(mcId, 'diagnosis_submitted', req.userId, 'doctor', '医生提交诊疗方案');
   
   res.json({ ok: true, message: '诊疗方案已提交' });
 });
@@ -794,7 +806,14 @@ app.post('/api/clinic/push-report', requirePermission('clinic:push_report'), (re
   const caseId = parseInt(req.body.caseId);
   const reportText = sec.sanitizeXSS(sec.sanitizeInput(req.body.reportText));
   
-  const masterCase = db.prepare('SELECT * FROM master_cases WHERE id = ?').get(caseId);
+  // caseId可能是medical_cases.id或master_cases.id
+  let masterCase = db.prepare('SELECT * FROM master_cases WHERE id = ?').get(caseId);
+  if (!masterCase) {
+    const mc = db.prepare('SELECT * FROM medical_cases WHERE id = ?').get(caseId);
+    if (mc && mc.master_case_id) {
+      masterCase = db.prepare('SELECT * FROM master_cases WHERE id = ?').get(mc.master_case_id);
+    }
+  }
   if (!masterCase) return res.json({ error: '案例不存在' });
   if (!masterCase.patient_id) return res.json({ error: '无关联病患' });
   
@@ -802,7 +821,7 @@ app.post('/api/clinic/push-report', requirePermission('clinic:push_report'), (re
   const filteredText = rbac.filterZhouyiTerms(reportText);
   
   const result = db.prepare('INSERT INTO tcm_reports (case_id, patient_id, doctor_id, report_text, filtered_text) VALUES (?, ?, ?, ?, ?)')
-    .run(caseId, masterCase.patient_id, req.userId, sec.encrypt(reportText), filteredText);
+    .run(masterCase.id, masterCase.patient_id, req.userId, sec.encrypt(reportText), filteredText);
   
   db.prepare('INSERT INTO case_review_logs (case_id, action, actor_id, actor_role, detail) VALUES (?, ?, ?, ?, ?)')
     .run(caseId, 'report_pushed', req.userId, req.userRoles.find(r => r === 'doctor' || r === 'admin_b'), '推送养生报告');
