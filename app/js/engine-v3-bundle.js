@@ -4131,6 +4131,7 @@ function analyzeLiuyao(params) {
   };
   } catch(e) {
     console.error('[EngineV3] analyzeLiuyao error:', e);
+    showToast('操作出错，请重试');
     return null;
   }
 }
@@ -4916,6 +4917,7 @@ function analyzeMeihuaFull(params) {
   };
   } catch(e) {
     console.error('[EngineV3] analyzeMeihuaFull error:', e);
+    showToast('操作出错，请重试');
     return null;
   }
 }
@@ -6819,6 +6821,7 @@ function computeLiuRen(year, month, day, hour) {
   };
   } catch(e) {
     console.error('[LiurenV3] computeLiuRen error:', e);
+    showToast('操作出错，请重试');
     return null;
   }
 }
@@ -7037,6 +7040,7 @@ function analyzeKeying(sanChuan, zhanShi) {
   };
   } catch(e) {
     console.error('[LiurenV3] analyzeKeying error:', e);
+    showToast('操作出错，请重试');
     return {error: e.message};
   }
 }
@@ -7111,6 +7115,7 @@ function computeBenMing(birthYear, sex) {
   };
   } catch(e) {
     console.error('[LiurenV3] computeBenMing error:', e);
+    showToast('操作出错，请重试');
     return {error: e.message};
   }
 }
@@ -7316,6 +7321,7 @@ function analyzeKetiGeshi(sanChuan, zhanShi, siKe) {
   };
   } catch(e) {
     console.error('[EngineV3] analyzeKetiGeshi error:', e);
+    showToast('操作出错，请重试');
     return null;
   }
 }
@@ -8266,6 +8272,7 @@ function qimenCalcV3(year, month, day, hour, juType) {
   };
   } catch(e) {
     console.error('[EngineV3] qimenCalcV3 error:', e);
+    showToast('操作出错，请重试');
     return null;
   }
 }
@@ -8502,6 +8509,7 @@ function analyzeQimenFull(panData) {
   return result;
   } catch(e) {
     console.error('[EngineV3] analyzeQimenFull error:', e);
+    showToast('操作出错，请重试');
     return null;
   }
 }
@@ -9359,6 +9367,7 @@ function ziweiCalcV3(birthYear, birthMonth, birthDay, birthHour, sex) {
   };
   } catch(e) {
     console.error('[EngineV3] ziweiCalcV3 error:', e);
+    showToast('操作出错，请重试');
     return null;
   }
 }
@@ -9646,6 +9655,7 @@ function analyzeZiweiFull(panData) {
   };
   } catch(e) {
     console.error('[EngineV3] analyzeZiweiFull error:', e);
+    showToast('操作出错，请重试');
     return null;
   }
 }

@@ -344,6 +344,7 @@ function _aiCollectPaipanData(type) {
     }
   } catch (e) {
     console.error('收集排盘数据异常:', e);
+    showToast('收集排盘数据异常:，请重试');
   }
   return { fullText: '排盘数据获取异常' };
 }
@@ -775,6 +776,7 @@ try {
   });
 } catch (e) {
   console.error('AI解读模块初始化异常:', e);
+  showToast('AI解读模块初始化异常:，请重试');
 }
 
 // ════════════════════════════════════════════════════════════════

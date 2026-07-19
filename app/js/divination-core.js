@@ -24,6 +24,7 @@ function runLiuyaoEngine(){ yjStart('person'); }
 function runFengshuiEngine(){ computeFengshui(); }
 function runXingmingEngine(){ try { if(typeof analyzeName==='function'){ let n=document.getElementById('xmName')?.value||document.getElementById('xmCurrentName')?.value||''; let nn=document.getElementById('xmNewName')?.value||n; let s=document.getElementById('xmSex')?.value||'male'; let bd=document.getElementById('xmBirthDate')?.value||''; let bh=document.getElementById('xmBirthHour')?.value||''; let r=analyzeName(n,nn,s,bd); if(r&&r.success){showToast('姓名分析完成'); /* 化解方案注入 */ if(bd){let _p=bd.split('-').map(Number); if(_p.length===3){let _h=bh!==''?parseInt(bh)*2:12; appendHuajieToResult('xmEngineResult',_p[0],_p[1],_p[2],_h,s,n);}} }else if(r){showToast(r.message||'分析失败');} } } catch(e) { console.error('[姓名引擎错误]', e.message); showToast('姓名分析出错: '+e.message); } }
 function runZeriEngine(){ try { runPrecisionZeRi(); } catch(e) { console.error('[择日引擎错误]', e.message); showToast('择日分析出错: '+e.message); } }
+showToast('操作出错，请重试');
 
 function exportWord() {
   let name = document.getElementById('baziNameOut') ? document.getElementById('baziNameOut').textContent : '乾元命理报告';
@@ -12546,6 +12547,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 初始化今日知识推送
   setTimeout(initDailyKnowledge, 300);
   } catch(e) { console.error('DOMContentLoaded init error:', e); showToast('页面初始化出错'); }
+  showToast('DOMContentLoaded init error:，请重试');
 });
 
 // ================================================================
@@ -34509,6 +34511,7 @@ function computeLifeIndex() {
     // ═══ 渲染 ═══
     let resultEl = document.getElementById('lifeIndexResult');
     if (!resultEl) { console.error('[LifeIndex] result div not found'); showToast('结果区域未找到，请重试'); return; }
+    showToast('操作出错，请重试');
     resultEl.style.display = 'block';
     resultEl.innerHTML = _renderLifeIndexResult(name, scores, bazi);
     resultEl.classList.add('visible');
