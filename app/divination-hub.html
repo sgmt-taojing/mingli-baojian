@@ -3873,6 +3873,8 @@ setTimeout(removeLoadingOverlay,5000);
   <a href="nihaisha-tool.html" class="file-nav-btn">🔬 倪师工具</a>
   <a href="nihaisha-learning.html" class="file-nav-btn">📚 倪师学习</a>
   <a href="nihaisha-video.html" class="file-nav-btn">🎬 倪师视频</a>
+  <a href="login.html" class="file-nav-btn" id="navLoginBtn">🔐 登录</a>
+  <a href="javascript:void(0)" class="file-nav-btn" id="navUserBtn" style="display:none" onclick="showSection('user')">🙏 <span id="navUserName">缘主</span></a>
 </div>
 
 
@@ -16555,12 +16557,22 @@ document.addEventListener('DOMContentLoaded', initCompositeSections);
 
 // RBAC 登录检查（可选：首次访问引导登录，但不强制阻断）
 document.addEventListener('DOMContentLoaded', () => {
-  if (typeof RBAC !== 'undefined' && !RBAC.isLoggedIn()) {
-    // 未登录：显示访客模式提示，不强制跳转
-    console.info('[RBAC] 访客模式，建议登录获取完整功能');
-  }
-  // 应用菜单可见性
   if (typeof RBAC !== 'undefined') {
+    if (RBAC.isLoggedIn()) {
+      // 已登录：显示用户名，隐藏登录按钮
+      const user = RBAC.getUser();
+      const loginBtn = document.getElementById('navLoginBtn');
+      const userBtn = document.getElementById('navUserBtn');
+      const userName = document.getElementById('navUserName');
+      if (loginBtn) loginBtn.style.display = 'none';
+      if (userBtn) userBtn.style.display = '';
+      if (userName && user && user.name) userName.textContent = user.name;
+      console.info('[RBAC] 已登录:', user ? user.name : '未知');
+    } else {
+      // 未登录：访客模式
+      console.info('[RBAC] 访客模式，建议登录获取完整功能');
+    }
+    // 应用菜单可见性
     RBAC.applyMenuVisibility();
   }
 });

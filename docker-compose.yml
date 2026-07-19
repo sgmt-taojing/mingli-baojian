@@ -1,5 +1,6 @@
-# 命理宝鉴 — 一键部署配置
+# 命理宝鉴 — 一键部署配置 v2
 # 用法: docker-compose up -d
+# 环境变量: 复制 .env.example 为 .env 并填写密钥
 
 version: '3.8'
 
@@ -14,24 +15,35 @@ services:
       - ./app:/usr/share/nginx/html/app
       - ./knowledge:/usr/share/nginx/html/knowledge
       - ./docs:/usr/share/nginx/html/docs
+      - ./index.html:/usr/share/nginx/html/index.html
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./server/nginx-kb-auth.conf:/etc/nginx/conf.d/kb-auth.conf
     depends_on:
-      - api-proxy
+      - api-server
       - paipan
       - tts
     restart: unless-stopped
 
-  # ═══ AI API代理服务 ═══
-  api-proxy:
+  # ═══ 后端API服务 v2 (Node.js + Express + RBAC) ═══
+  api-server:
     build:
-      context: ./server
-      dockerfile: Dockerfile.api
-    container_name: mingli-api
+      context: .
+      dockerfile: server/Dockerfile.api-v2
+    container_name: mingli-api-v2
     ports:
-      - "8900:8900"
+      - "8920:8920"
     environment:
+      - NODE_ENV=production
+      - API_PORT=8920
+      - MINGLI_ENCRYPT_KEY=${MINGLI_ENCRYPT_KEY:?必须设置加密密钥}
+      - MINGLI_JWT_SECRET=${MINGLI_JWT_SECRET:?必须设置JWT密钥}
       - G2CLAW_API_KEY=${G2CLAW_API_KEY:-}
-      - PORT=8900
+      - AI_API_BASE=${AI_API_BASE:-https://api.g2claw.com}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://127.0.0.1:8080,https://sgmt-taojing.github.io}
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./server/database:/app/server/database
+      - ./knowledge:/app/knowledge
     restart: unless-stopped
 
   # ═══ 排盘服务 ═══

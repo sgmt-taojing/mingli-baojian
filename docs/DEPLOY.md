@@ -1,145 +1,222 @@
-# 命理宝鉴 — 部署指南
+# 命理宝鉴 · 生产部署指南 v2
 
-## 一键Docker部署
+## 快速开始
 
-### 前置要求
-- Docker 20+
-- Docker Compose 2+
-
-### 步骤
+### 1. 环境准备
 
 ```bash
-# 1. 克隆仓库
+# 克隆代码
 git clone https://github.com/sgmt-taojing/mingli-baojian.git
 cd mingli-baojian
 
-# 2. 配置环境变量
+# 复制环境变量模板
 cp .env.example .env
-nano .env  # 填入G2CLAW_API_KEY
 
-# 3. 一键启动
-./deploy.sh start
-
-# 4. 访问
-# Web端: http://localhost:8080/app/divination-hub.html
-# 移动端: http://localhost:8080/app/wechat-hub.html
+# 编辑 .env 文件，填写以下必需项：
+# MINGLI_ENCRYPT_KEY  — 至少32字符的加密密钥（openssl rand -hex 32）
+# MINGLI_JWT_SECRET   — 至少32字符的JWT密钥（openssl rand -hex 32）
+# G2CLAW_API_KEY      — AI API密钥
 ```
 
-### 服务架构
+### 2. Docker部署（推荐）
 
+```bash
+# 一键启动全部服务
+docker-compose up -d
+
+# 查看服务状态
+docker-compose ps
+
+# 查看日志
+docker-compose logs -f api-server
+```
+
+服务端口：
 | 服务 | 端口 | 说明 |
 |------|------|------|
-| web (nginx) | 8080 | 前端静态资源 + 反向代理 |
-| api-proxy | 8900 | AI API代理 (g2claw) |
-| paipan | 8911 | 排盘引擎 (八字/紫微/奇门等) |
-| tts | 8912 | 语音合成 (Edge-TTS) |
-| daily-push | - | 每日推送 (cron定时) |
+| Web前端 | 8080 | Nginx静态服务 |
+| API服务 | 8920 | Node.js后端API |
+| 排盘服务 | 8911 | Python排盘 |
+| TTS语音 | 8912 | Python TTS |
 
-### Nginx代理路由
-
-| 前端路径 | 转发到 | 说明 |
-|----------|--------|------|
-| `/v1/*` | api-proxy:8900 | AI对话API |
-| `/api/paipan/*` | paipan:8911 | 排盘API |
-| `/api/tts` | tts:8912 | 语音合成 |
-| `/app/*` | 静态文件 | 前端页面 |
-| `/knowledge/*` | 静态文件 | 知识库JS |
-
-### 管理命令
+### 3. 本地开发
 
 ```bash
-./deploy.sh start    # 构建并启动
-./deploy.sh stop     # 停止
-./deploy.sh restart  # 重启
-./deploy.sh status   # 状态
-./deploy.sh logs web # 查看日志
+# 安装Node.js依赖
+npm install
+
+# 初始化数据库
+node -e "const {DatabaseSync}=require('node:sqlite');const db=new DatabaseSync('server/database/yidao.db');db.exec(require('fs').readFileSync('server/database/init-schema.sql','utf8'));db.close();"
+
+# 启动后端API
+MINGLI_ENCRYPT_KEY=your_key MINGLI_JWT_SECRET=your_secret node server/api-server-v2.js
+
+# 启动前端（另一个终端）
+python3 -m http.server 8900
 ```
 
-## 本地开发模式（无需Docker）
+## 安全配置
 
-### 启动后端服务
+### 必需的环境变量
 
-```bash
-# 终端1: AI API代理
-cd server && python3 api-proxy-server.py
+| 变量名 | 说明 | 示例 |
+|--------|------|------|
+| MINGLI_ENCRYPT_KEY | AES-256加密密钥 | openssl rand -hex 32 |
+| MINGLI_JWT_SECRET | JWT签名密钥 | openssl rand -hex 32 |
+| G2CLAW_API_KEY | AI API密钥 | 从g2claw.com获取 |
+| CORS_ORIGINS | 允许的前端域名 | https://your-domain.com |
 
-# 终端2: 排盘服务
-cd server && python3 paipan-server.py
+### 安全检查清单
 
-# 终端3: TTS服务
-cd server && python3 tts-server.py
-```
+- [ ] API密钥不在前端代码中（已通过后端代理解决）
+- [ ] AES加密使用GCM模式+随机IV（已升级）
+- [ ] CORS配置为白名单（已限制）
+- [ ] JWT有效期24小时（已缩短）
+- [ ] /api/push/log需要认证（已修复）
+- [ ] /api/merchant/apply有速率限制（已修复）
+- [ ] 超管手机号不在前端（已移除）
+- [ ] localStorage加密存储（已实现）
+- [ ] HTTPS配置（需在Nginx层配置SSL证书）
 
-### 启动前端
+### Nginx SSL配置示例
 
-```bash
-# 方式1: Python简单HTTP服务
-cd app && python3 -m http.server 8080
-
-# 方式2: Node.js
-npx serve app -p 8080
-```
-
-访问: http://localhost:8080/divination-hub.html
-
-## GitHub Pages部署
-
-前端静态页面已自动部署到GitHub Pages:
-- https://sgmt-taojing.github.io/mingli-baojian/app/divination-hub.html
-
-注意: GitHub Pages仅部署前端，后端服务需另行部署。
-AI对话功能在GitHub Pages模式下直连g2claw API。
-
-## 云服务器部署
-
-### 最低配置
-- 1核 CPU
-- 1GB 内存
-- 20GB 磁盘
-- Ubuntu 22.04 / CentOS 8+
-
-### 部署步骤
-
-```bash
-# 1. 安装Docker
-curl -fsSL https://get.docker.com | sh
-
-# 2. 克隆仓库
-git clone https://github.com/sgmt-taojing/mingli-baojian.git
-cd mingli-baojian
-
-# 3. 配置
-cp .env.example .env
-# 编辑.env填入API密钥
-
-# 4. 启动
-./deploy.sh start
-
-# 5. 配置HTTPS (推荐)
-# 使用Caddy或Nginx + Let's Encrypt
-```
-
-### HTTPS配置（可选）
-
-```bash
-# 安装Caddy
-apt install caddy
-
-# 配置 /etc/caddy/Caddyfile
-your-domain.com {
-    reverse_proxy localhost:8080
+```nginx
+server {
+    listen 443 ssl http2;
+    server_name your-domain.com;
+    
+    ssl_certificate /path/to/cert.pem;
+    ssl_certificate_key /path/to/key.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    
+    # 前端静态文件
+    location / {
+        root /usr/share/nginx/html;
+        try_files $uri $uri/ /index.html;
+    }
+    
+    # API代理
+    location /api/ {
+        proxy_pass http://api-server:8920;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    
+    # KB文件鉴权
+    location /knowledge/ {
+        auth_request /api/kb/auth;
+        root /usr/share/nginx/html;
+    }
 }
-
-# 重启Caddy
-systemctl restart caddy
 ```
+
+## 架构概览
+
+```
+┌─────────────────────────────────────────┐
+│           用户浏览器 / 微信              │
+│  ┌──────────┐  ┌──────────┐            │
+│  │ 前端页面  │  │ 登录页面  │            │
+│  │ (8900)   │  │ login.html│            │
+│  └─────┬────┘  └─────┬────┘            │
+│        │              │                  │
+│  ┌─────┴──────────────┴──────────┐     │
+│  │  secure-storage.js (加密存储)  │     │
+│  │  rbac-client.js (权限控制)     │     │
+│  └─────────────┬─────────────────┘     │
+└────────────────┼───────────────────────┘
+                 │ HTTPS
+┌────────────────┼───────────────────────┐
+│        Nginx反向代理                   │
+│  ┌─────┴─────┐                         │
+│  │ /api/ →   │                         │
+│  │ api-server│                         │
+│  └─────┬─────┘                         │
+└────────┼────────────────────────────────┘
+         │
+┌────────┼────────────────────────────────┐
+│  API Server v2 (Node.js:8920)          │
+│  ┌─────┴─────────────────────────┐     │
+│  │  Express + RBAC + JWT         │     │
+│  ├───────────────────────────────┤     │
+│  │  auth/adminAuth中间件          │     │
+│  │  requirePermission()           │     │
+│  │  filterZhouyiTerms()           │     │
+│  ├───────────────────────────────┤     │
+│  │  路由:                         │     │
+│  │  /api/user/*    用户认证       │     │
+│  │  /api/ai/chat   AI代理         │     │
+│  │  /api/kb/*      KB分级访问     │     │
+│  │  /api/clinic/*  诊疗服务       │     │
+│  │  /api/distill/* 知识蒸馏       │     │
+│  │  /api/admin/*   管理接口       │     │
+│  ├───────────────────────────────┤     │
+│  │  SQLite (yidao.db)            │     │
+│  │  21个表 + 索引                 │     │
+│  └───────────────────────────────┘     │
+└─────────────────────────────────────────┘
+```
+
+## 双平台权限体系
+
+### 平台A · 国学体系（会员等级制）
+| 角色 | 权限 |
+|------|------|
+| guest | 访客，仅看公开内容 |
+| free | 注册用户，基础排盘+公开KB |
+| mingdao | 明道会员，进阶排盘+会员KB |
+| advanced | 精进会员，高级排盘+精进KB |
+| vip | VIP终身会员，全部平台A功能 |
+| admin_a | 平台A管理员 |
+
+### 平台B · 诊疗体系（角色制）
+| 角色 | 权限 |
+|------|------|
+| patient | 病患：提交症状、查看报告 |
+| master | 大师：查看病例、提交周易分析 |
+| doctor | 医生：诊疗方案、推送报告、协作讨论 |
+| admin_b | 平台B管理员：蒸馏审核+案例管理 |
+| super_admin | 超级管理员：全部权限 |
 
 ## 故障排查
 
-| 问题 | 解决方案 |
-|------|----------|
-| AI对话不响应 | 检查.env中G2CLAW_API_KEY |
-| 排盘失败 | 检查paipan容器: `docker logs mingli-paipan` |
-| 语音不工作 | 检查tts容器: `docker logs mingli-tts` |
-| 页面空白 | 检查nginx: `docker logs mingli-web` |
-| 跨域错误 | nginx已配置CORS，检查代理路径 |
+### 后端无法启动
+```bash
+# 检查环境变量
+echo $MINGLI_ENCRYPT_KEY
+echo $MINGLI_JWT_SECRET
+
+# 检查端口占用
+lsof -i :8920
+
+# 查看日志
+docker-compose logs api-server
+```
+
+### 数据库问题
+```bash
+# 重新初始化数据库
+rm server/database/yidao.db
+node -e "const {DatabaseSync}=require('node:sqlite');const db=new DatabaseSync('server/database/yidao.db');db.exec(require('fs').readFileSync('server/database/init-schema.sql','utf8'));db.close();"
+```
+
+### CORS错误
+检查 `.env` 中的 `CORS_ORIGINS` 是否包含前端域名。
+
+## 备份
+
+```bash
+# 备份数据库
+cp server/database/yidao.db server/database/yidao.db.bak.$(date +%Y%m%d)
+
+# 备份大师案例（加密存储，可直接备份）
+docker-compose exec api-server node -e "
+const {DatabaseSync}=require('node:sqlite');
+const db=new DatabaseSync('server/database/yidao.db');
+const cases=db.prepare('SELECT * FROM master_cases').all();
+console.log(JSON.stringify(cases));
+" > backup_cases_$(date +%Y%m%d).json
+```
