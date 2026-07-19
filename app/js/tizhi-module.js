@@ -374,7 +374,7 @@ function tzGeneratePlan(){
     }
     // Summary
     if(obj.总结){
-      html+='<div style="background:rgba(201,168,76,0.06);border-left:3px solid var(--gold);padding:14px 18px;border-radius:0 8px 8px 0;margin-bottom:14px"><div style="font-size:14px;color:var(--gold);font-weight:bold;margin-bottom:6px">📝 总结</div><div style="font-size:13px;color:var(--text);line-height:1.8">'+obj.总结+'</div></div>';
+      html+='<div style="background:rgba(201,168,76,0.06);border-left:3px solid var(--gold);padding:14px 18px;border-radius:0 8px 8px 0;margin-bottom:14px"><div style="font-size:14px;color:var(--gold);font-weight:bold;margin-bottom:6px">📝 总结</div><div class="tz-text-13-lh18">'+obj.总结+'</div></div>';
     }
     // Disclaimer
     html+='<div style="background:rgba(231,76,60,0.04);border:1px solid rgba(231,76,60,0.15);border-radius:8px;padding:12px 16px;margin-top:12px"><div style="font-size:12px;color:#e74c3c;line-height:1.6">⚠️ <b>温馨提示：</b>本方案由AI根据体质特征生成，仅供养生保健参考。如有特定疾病或服药中，请咨询中医师调整方案。功法练习请循序渐进，如有不适请停止。</div></div>';
@@ -388,19 +388,19 @@ function tzGeneratePlan(){
 function tzRenderQigong(){
   let list = TZ_DATA.qigongMethods||[];
   let html=list.map(function(q){
-    return '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:18px">'+
+    return '<div class="tz-card-18">'+
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'+
         '<span class="tz-title-lg">'+q.name+'</span>'+
         '<div style="display:flex;gap:6px">'+
-          '<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(201,168,76,0.1);color:var(--gold2)">'+q.type+'</span>'+
+          '<span class="tz-badge-sm">'+q.type+'</span>'+
           '<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(0,0,0,0.2);color:var(--muted)">'+q.difficulty+'</span>'+
           '<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(45,106,79,0.1);color:var(--success)">'+q.duration+'</span>'+
         '</div>'+
       '</div>'+
       '<div style="font-size:13px;color:var(--paper2);line-height:1.7;margin-bottom:10px">'+q.desc+'</div>'+
-      '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;margin-bottom:10px"><div style="font-size:12px;color:var(--gold);margin-bottom:6px">📋 练习步骤</div><div style="font-size:12px;color:var(--paper);line-height:1.8;white-space:pre-line">'+q.steps+'</div></div>'+
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'+
-        '<div style="background:rgba(45,106,79,0.06);border-radius:6px;padding:10px"><div style="font-size:11px;color:var(--success);margin-bottom:4px">✅ 功效</div><div class="tz-text-12">'+q.benefit+'</div></div>'+
+      '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;margin-bottom:10px"><div class="tz-gold-12-mb6">📋 练习步骤</div><div style="font-size:12px;color:var(--paper);line-height:1.8;white-space:pre-line">'+q.steps+'</div></div>'+
+      '<div class="tz-grid-2col">'+
+        '<div class="tz-green-box"><div class="tz-success-11">✅ 功效</div><div class="tz-text-12">'+q.benefit+'</div></div>'+
         '<div style="background:rgba(231,76,60,0.06);border-radius:6px;padding:10px"><div style="font-size:11px;color:#e74c3c;margin-bottom:4px">⚠️ 注意</div><div class="tz-text-12">'+q.caution+'</div></div>'+
       '</div>'+
       '<div class="tz-flex-wrap">'+q.constitutions.map(function(c){return '<span class="tz-badge">适合：'+c+'</span>';}).join('')+'</div>'+
@@ -422,18 +422,18 @@ function tzRenderQigong(){
 function tzRenderPrescriptions(){
   let list = TZ_DATA.famousPrescriptions||[];
   let html=list.map(function(p){
-    return '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:18px">'+
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
+    return '<div class="tz-card-18">'+
+      '<div class="tz-flex-between">'+
         '<span class="tz-title-lg">💊 '+p.name+'</span>'+
-        '<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(201,168,76,0.1);color:var(--gold2)">'+p.category+'</span>'+
+        '<span class="tz-badge-sm">'+p.category+'</span>'+
       '</div>'+
       '<div style="font-size:12px;color:var(--paper3);margin-bottom:8px">出处：'+p.source+'</div>'+
       '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;margin-bottom:10px">'+
-        '<div style="font-size:12px;color:var(--gold);margin-bottom:6px">组成</div>'+
+        '<div class="tz-gold-12-mb6">组成</div>'+
         '<div style="font-size:13px;color:var(--paper);line-height:1.7">'+p.composition+'</div>'+
       '</div>'+
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'+
-        '<div style="background:rgba(45,106,79,0.06);border-radius:6px;padding:10px"><div style="font-size:11px;color:var(--success);margin-bottom:4px">功效</div><div class="tz-text-12">'+p.effect+'</div></div>'+
+      '<div class="tz-grid-2col">'+
+        '<div class="tz-green-box"><div class="tz-success-11">功效</div><div class="tz-text-12">'+p.effect+'</div></div>'+
         '<div style="background:rgba(255,255,255,0.03);border-radius:6px;padding:10px"><div style="font-size:11px;color:var(--gold2);margin-bottom:4px">主治</div><div class="tz-text-12">'+p.usage+'</div></div>'+
       '</div>'+
       '<div class="tz-flex-wrap">'+p.constitutions.map(function(c){return '<span class="tz-badge">适合：'+c+'质</span>';}).join('')+'</div>'+
@@ -537,8 +537,8 @@ function tzRenderFood(filter){
   let list = TZ_DATA.recipes;
   if(filter!=='all') list=list.filter(function(r){return r.constitutions.indexOf(filter)>=0;});
   let html=list.map(function(r){
-    return '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:16px">'+
-      '<div style="font-size:15px;color:var(--gold);font-weight:bold;margin-bottom:8px">🍵 '+r.name+'</div>'+
+    return '<div class="tz-card-16">'+
+      '<div class="tz-title-15">🍵 '+r.name+'</div>'+
       '<div class="tz-text-12-mb6"><b>食材：</b>'+r.ingredients+'</div>'+
       '<div class="tz-text-12-mb6"><b>做法：</b>'+r.method+'</div>'+
       '<div style="font-size:12px;color:var(--success);margin-bottom:8px"><b>功效：</b>'+r.effect+'</div>'+
@@ -586,7 +586,7 @@ function tzRenderFood(filter){
     let sf = TZ_DATA.seasonalFoods[season];
     if(sf){
       extraHtml+='<div style="margin-top:16px;padding:16px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:12px">';
-      extraHtml+='<div style="font-size:15px;color:var(--gold);font-weight:bold;margin-bottom:8px">🌿 当前'+season+'季饮食建议</div>';
+      extraHtml+='<div class="tz-title-15">🌿 当前'+season+'季饮食建议</div>';
       extraHtml+='<div class="tz-text-12-mb6"><b>节气：</b>'+sf.jieqi+'</div>';
       extraHtml+='<div class="tz-text-12-mb6"><b>原则：</b>'+sf.principle+'</div>';
       extraHtml+='<div style="font-size:12px;color:var(--paper2);margin-bottom:8px"><b>时令食材：</b>'+sf.foods.join('、')+'</div>';
@@ -614,8 +614,8 @@ function tzRenderExercise(filter){
   if(filter!=='all') list=list.filter(function(e){return e.type===filter;});
   const intColors = {'低':'#4CAF50','中':'#FF9800','高':'#f44336'};
   let html=list.map(function(e){
-    return '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:16px">'+
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
+    return '<div class="tz-card-16">'+
+      '<div class="tz-flex-between">'+
         '<span style="font-size:15px;color:var(--gold);font-weight:bold">🤸 '+e.name+'</span>'+
         '<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:'+intColors[e.intensity]+'20;color:'+intColors[e.intensity]+'">'+e.intensity+'强度</span>'+
       '</div>'+
@@ -662,18 +662,18 @@ function tzAnalyzeBazi(){
       '<div style="font-size:14px;color:var(--paper2);margin-top:8px">'+baziInfo.tizhi+'</div>'+
       '<div style="font-size:13px;color:var(--text);margin-top:8px;line-height:1.8;max-width:600px;margin-left:auto;margin-right:auto">'+baziInfo.desc+'</div>'+
     '</div>'+
-    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px">'+
-      '<div class="tz-card"><div style="font-size:12px;color:var(--gold);margin-bottom:6px">🕐 季节</div><div class="tz-text-14">'+wuData.season+' · '+wuData.direction+'方</div></div>'+
-      '<div class="tz-card"><div style="font-size:12px;color:var(--gold);margin-bottom:6px">👅 五味</div><div class="tz-text-14">'+wuData.taste+'味入'+wuData.organs[0]+'</div></div>'+
-      '<div class="tz-card"><div style="font-size:12px;color:var(--gold);margin-bottom:6px">😨 情志</div><div class="tz-text-14">'+wuData.emotion+'伤'+wuData.organs[0]+'</div></div>'+
-      '<div class="tz-card"><div style="font-size:12px;color:var(--gold);margin-bottom:6px">👁 关联</div><div class="tz-text-14">'+wuData.sense+' · '+wuData.tissue+'</div></div>'+
+    '<div class="tz-grid-auto">'+
+      '<div class="tz-card"><div class="tz-gold-12-mb6">🕐 季节</div><div class="tz-text-14">'+wuData.season+' · '+wuData.direction+'方</div></div>'+
+      '<div class="tz-card"><div class="tz-gold-12-mb6">👅 五味</div><div class="tz-text-14">'+wuData.taste+'味入'+wuData.organs[0]+'</div></div>'+
+      '<div class="tz-card"><div class="tz-gold-12-mb6">😨 情志</div><div class="tz-text-14">'+wuData.emotion+'伤'+wuData.organs[0]+'</div></div>'+
+      '<div class="tz-card"><div class="tz-gold-12-mb6">👁 关联</div><div class="tz-text-14">'+wuData.sense+' · '+wuData.tissue+'</div></div>'+
     '</div>'+
     '<div style="background:rgba(230,126,34,0.06);border-left:3px solid var(--warn);padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:14px">'+
       '<div style="font-size:13px;color:var(--warn);font-weight:bold;margin-bottom:6px">⚠ 常见症状</div>'+
       '<div class="tz-text-13">'+wuData.symptoms.join('、')+'</div>'+
     '</div>'+
-    '<div style="background:rgba(45,106,79,0.06);border-left:3px solid var(--success);padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:14px">'+
-      '<div style="font-size:13px;color:var(--success);font-weight:bold;margin-bottom:6px">🌿 养生食物</div>'+
+    '<div class="tz-tip-success">'+
+      '<div class="tz-success-title">🌿 养生食物</div>'+
       '<div class="tz-text-13">'+wuData.foods.join('、')+'</div>'+
     '</div>'+
     '<div style="background:rgba(201,168,76,0.06);border-left:3px solid var(--gold);padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:14px">'+
@@ -682,10 +682,10 @@ function tzAnalyzeBazi(){
     '</div>'+
     '<div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:14px;margin-bottom:14px">'+
       '<div class="tz-title-13">📝 调养原则</div>'+
-      '<div style="font-size:13px;color:var(--text);line-height:1.8">'+wuData.regimen+'</div>'+
+      '<div class="tz-text-13-lh18">'+wuData.regimen+'</div>'+
     '</div>'+
     '<div style="background:rgba(192,57,43,0.06);border-left:3px solid var(--danger);padding:12px 16px;border-radius:0 8px 8px 0">'+
-      '<div style="font-size:13px;color:var(--danger);font-weight:bold;margin-bottom:6px">🚫 禁忌</div>'+
+      '<div class="tz-danger-title">🚫 禁忌</div>'+
       '<div class="tz-text-13">'+wuData.avoid+'</div>'+
     '</div>'+
   '</div>';
@@ -787,24 +787,24 @@ function tzSelectWuxing(key){
       '<div style="font-size:24px;color:'+d.color+';font-weight:bold;margin-top:8px">'+d.name+'行 · '+d.organs.join('、')+'</div>'+
       '<div class="tz-text-13-mt6">'+d.season+'季 · '+d.direction+'方 · '+d.taste+'味 · '+d.emotion+'</div>'+
     '</div>'+
-    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px">'+
-      '<div class="tz-card"><div style="font-size:12px;color:var(--gold);margin-bottom:6px">👁 对应</div><div class="tz-text-14">'+d.sense+' · '+d.tissue+'</div></div>'+
-      '<div class="tz-card"><div style="font-size:12px;color:var(--gold);margin-bottom:6px">⚠ 症状</div><div class="tz-text-12">'+d.symptoms.slice(0,4).join('、')+'</div></div>'+
+    '<div class="tz-grid-auto">'+
+      '<div class="tz-card"><div class="tz-gold-12-mb6">👁 对应</div><div class="tz-text-14">'+d.sense+' · '+d.tissue+'</div></div>'+
+      '<div class="tz-card"><div class="tz-gold-12-mb6">⚠ 症状</div><div class="tz-text-12">'+d.symptoms.slice(0,4).join('、')+'</div></div>'+
     '</div>'+
-    '<div style="background:rgba(45,106,79,0.06);border-left:3px solid var(--success);padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:14px">'+
-      '<div style="font-size:13px;color:var(--success);font-weight:bold;margin-bottom:6px">🌿 养生食物</div>'+
-      '<div style="font-size:13px;color:var(--paper2);line-height:1.8">'+d.foods.join('、')+'</div>'+
+    '<div class="tz-tip-success">'+
+      '<div class="tz-success-title">🌿 养生食物</div>'+
+      '<div class="tz-text-13-lh18">'+d.foods.join('、')+'</div>'+
     '</div>'+
     '<div style="background:rgba(201,168,76,0.06);border-left:3px solid var(--gold);padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:14px">'+
       '<div class="tz-title-13">💊 药材</div>'+
-      '<div style="font-size:13px;color:var(--paper2);line-height:1.8">'+d.herbs.join('、')+'</div>'+
+      '<div class="tz-text-13-lh18">'+d.herbs.join('、')+'</div>'+
     '</div>'+
     '<div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:14px;margin-bottom:14px">'+
       '<div class="tz-title-13">📝 调养原则</div>'+
-      '<div style="font-size:13px;color:var(--text);line-height:1.8">'+d.regimen+'</div>'+
+      '<div class="tz-text-13-lh18">'+d.regimen+'</div>'+
     '</div>'+
     '<div style="background:rgba(192,57,43,0.06);border-left:3px solid var(--danger);padding:12px 16px;border-radius:0 8px 8px 0">'+
-      '<div style="font-size:13px;color:var(--danger);font-weight:bold;margin-bottom:6px">🚫 禁忌</div>'+
+      '<div class="tz-danger-title">🚫 禁忌</div>'+
       '<div class="tz-text-13">'+d.avoid+'</div>'+
     '</div>'+
   '</div>';
