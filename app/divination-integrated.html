@@ -105,17 +105,67 @@
     .report-result{display:none}
     .report-result.show{display:block;animation:fadeIn .4s}
     .indicator-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin:16px 0}
-    .indicator-card{background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:10px;padding:14px;position:relative}
-    .indicator-name{font-size:14px;color:var(--title);font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+    .indicator-card{background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:10px;padding:14px;position:relative;transition:.25s}
+    .indicator-card:hover{border-color:var(--accent);box-shadow:0 4px 16px rgba(201,168,76,.1)}
+    .indicator-card.card-danger{border-left:3px solid var(--danger)}
+    .indicator-card.card-warn{border-left:3px solid var(--gold)}
+    .indicator-card.card-ok{border-left:3px solid var(--success)}
+    .indicator-name{font-size:14px;color:var(--title);font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .indicator-en{font-size:11px;color:var(--muted);font-weight:400}
     .indicator-val{font-size:22px;font-weight:700;color:var(--text)}
     .indicator-unit{font-size:13px;color:var(--muted);margin-left:4px}
     .indicator-range{font-size:12px;color:var(--muted);margin-top:4px}
     .indicator-status{display:inline-block;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:700;margin-top:6px}
+    .indicator-urgency{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;margin-left:4px}
+    .urgency-high{background:rgba(192,57,43,.15);color:var(--danger);border:1px solid rgba(192,57,43,.3)}
+    .urgency-mid{background:rgba(230,126,34,.15);color:var(--gold);border:1px solid rgba(230,126,34,.3)}
+    .urgency-low{background:rgba(45,106,79,.15);color:var(--success);border:1px solid rgba(45,106,79,.3)}
     .status-ok{background:rgba(45,106,79,.12);color:var(--success)}
     .status-high{background:rgba(192,57,43,.12);color:var(--danger)}
     .status-low{background:rgba(230,126,34,.12);color:var(--gold)}
     .indicator-wuxing{font-size:12px;color:var(--muted);margin-top:6px;padding-top:6px;border-top:1px solid var(--border)}
     .indicator-suggest{font-size:13px;color:var(--title);margin-top:4px;line-height:1.6}
+    .indicator-cause{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5}
+    .indicator-tcm{font-size:12px;color:var(--cyan2);margin-top:4px;line-height:1.5}
+    .indicator-bar-wrap{margin:8px 0 4px;height:6px;background:rgba(255,255,255,0.08);border-radius:3px;position:relative;overflow:hidden}
+    .indicator-bar-fill{height:100%;border-radius:3px;transition:width .5s ease}
+    .indicator-bar-marker{position:absolute;top:-2px;width:2px;height:10px;background:var(--muted);opacity:.5}
+    .indicator-trend{display:inline-flex;align-items:center;gap:3px;font-size:12px;margin-left:6px}
+    .trend-up{color:var(--danger)}
+    .trend-down{color:var(--gold)}
+    .trend-flat{color:var(--muted)}
+    /* Health score gauge */
+    .health-score-wrap{display:flex;gap:20px;flex-wrap:wrap;align-items:center;justify-content:center;margin:16px 0}
+    .health-gauge{position:relative;width:140px;height:140px;flex-shrink:0}
+    .health-gauge svg{transform:rotate(-90deg)}
+    .health-gauge .gauge-track{fill:none;stroke:rgba(255,255,255,0.06);stroke-width:10}
+    .health-gauge .gauge-fill{fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 1s ease}
+    .health-gauge .gauge-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+    .health-gauge .gauge-score{font-size:36px;font-weight:700;font-family:var(--font-mono);line-height:1}
+    .health-gauge .gauge-label{font-size:12px;color:var(--muted);margin-top:4px}
+    .system-scores{flex:1;min-width:240px}
+    .system-score-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+    .system-score-label{font-size:13px;color:var(--muted);min-width:60px}
+    .system-score-bar{flex:1;height:8px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden}
+    .system-score-fill{height:100%;border-radius:4px;transition:width .6s ease}
+    .system-score-val{font-size:13px;font-weight:700;min-width:36px;text-align:right}
+    /* Abnormal summary panel */
+    .abnormal-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:14px 0}
+    .abnormal-card{border-radius:10px;padding:14px;text-align:center;border:1px solid}
+    .abnormal-card.danger{background:rgba(192,57,43,.08);border-color:rgba(192,57,43,.25)}
+    .abnormal-card.warn{background:rgba(230,126,34,.08);border-color:rgba(230,126,34,.25)}
+    .abnormal-card.ok{background:rgba(45,106,79,.08);border-color:rgba(45,106,79,.25)}
+    .abnormal-card .count{font-size:28px;font-weight:700;font-family:var(--font-mono)}
+    .abnormal-card .label{font-size:12px;color:var(--muted);margin-top:2px}
+    .abnormal-card.danger .count{color:var(--danger)}
+    .abnormal-card.warn .count{color:var(--gold)}
+    .abnormal-card.ok .count{color:var(--success)}
+    .summary-sentence{text-align:center;font-size:14px;color:var(--text);margin:10px 0;padding:10px;background:rgba(255,255,255,0.04);border-radius:8px}
+    /* Trend mini chart */
+    .trend-mini-chart{display:inline-flex;align-items:flex-end;gap:2px;height:20px;margin-left:6px}
+    .trend-mini-bar{width:4px;background:var(--accent);border-radius:1px;opacity:.6}
+    /* AI comprehensive section */
+    .ai-comprehensive-section{margin-top:16px;background:linear-gradient(135deg,rgba(201,168,76,.04),rgba(139,69,19,.04));border:1px solid var(--border);border-radius:12px;padding:20px}
     .food-therapy-box{background:linear-gradient(135deg,rgba(45,106,79,.06),rgba(39,174,96,.06));border:1px solid rgba(45,106,79,.2);border-radius:12px;padding:18px;margin:14px 0}
     .food-therapy-box h4{color:var(--success);font-size:16px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
     .recipe-card{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;transition:.2s}
@@ -843,6 +893,7 @@ const MEDICAL_KNOWLEDGE_BASE = {
     lowCause: '缺铁性贫血、巨幼细胞性贫血、慢性失血、营养不良、慢性感染、肾病',
     highCause: '脱水、高原适应、真性红细胞增多症、严重烧伤',
     wuxing: 'Mu',
+    category: 'blood',
     tcmSyndrome: '血虚证、肝血不足、心脾两虚',
     advice: '补血养肝，多食红枣、枸杞、动物肝脏、菠菜、当归、熟地',
     source: '《诊断学》第9版，人民卫生出版社，2018'
@@ -854,6 +905,7 @@ const MEDICAL_KNOWLEDGE_BASE = {
     lowCause: '病毒感染、药物抑制（化疗/抗生素）、免疫性疾病、脾功能亢进',
     highCause: '细菌感染、急性炎症、白血病、严重创伤、应激反应',
     wuxing: 'Jin',
+    category: 'blood',
     tcmSyndrome: '气虚卫外不固、正邪交争',
     advice: '益气固表，玉屏风散、黄芪、白术、防风；感染者需清热毒',
     source: '《诊断学》第9版，人民卫生出版社，2018'
@@ -865,6 +917,7 @@ const MEDICAL_KNOWLEDGE_BASE = {
     lowCause: '免疫性血小板减少症(ITP)、药物、感染、脾功能亢进、DIC',
     highCause: '炎症、缺铁、脾切除后、骨髓增殖性疾病',
     wuxing: 'Shui',
+    category: 'blood',
     tcmSyndrome: '气虚不摄血、血热妄行',
     advice: '补气摄血，归脾汤；血热者犀角地黄汤；忌辛辣燥热',
     source: '《诊断学》第9版，人民卫生出版社，2018'
@@ -876,6 +929,7 @@ const MEDICAL_KNOWLEDGE_BASE = {
     lowCause: '一般无临床意义',
     highCause: '病毒性肝炎、脂肪肝、酒精性肝病、药物性肝损伤、胆道疾病',
     wuxing: 'Mu',
+    category: 'liver',
     tcmSyndrome: '肝郁化火、肝胆湿热、肝肾阴虚',
     advice: '清肝利胆，柴胡疏肝散、茵陈蒿汤；戒酒、早睡（23点前）、少食油腻',
     source: '《实用肝脏病学》第3版，上海科学技术出版社，2020'
@@ -887,6 +941,7 @@ const MEDICAL_KNOWLEDGE_BASE = {
     lowCause: '一般无临床意义',
     highCause: '心肌梗死、肝炎、肝硬化、肌肉损伤、溶血',
     wuxing: 'Mu',
+    category: 'liver',
     tcmSyndrome: '肝郁血瘀、心脉瘀阻',
     advice: '疏肝理气活血，丹参饮、血府逐瘀汤；定期复查心电图',
     source: '《实用肝脏病学》第3版，上海科学技术出版社，2020'
@@ -898,6 +953,7 @@ const MEDICAL_KNOWLEDGE_BASE = {
     lowCause: '胰岛素瘤、药物（降糖药过量）、长期饥饿、严重肝病',
     highCause: '糖尿病、应激状态、库欣综合征、胰腺疾病',
     wuxing: 'Tu',
+    category: 'glucose_lipid',
     tcmSyndrome: '阴虚燥热、气阴两虚、脾肾阳虚',
     advice: '养阴生津，六味地黄丸、玉女煎；控制主食、增加运动、少吃甜食',
     source: '《中国2型糖尿病防治指南（2020年版）》'
@@ -909,6 +965,7 @@ const MEDICAL_KNOWLEDGE_BASE = {
     lowCause: '溶血性贫血、失血、某些血红蛋白病',
     highCause: '近2-3个月平均血糖升高，糖尿病控制不佳',
     wuxing: 'Tu',
+    category: 'glucose_lipid',
     tcmSyndrome: '阴虚燥热（长期）',
     advice: '长期养阴控糖，饮食运动为基础，定期监测',
     source: '《中国2型糖尿病防治指南（2020年版）》'
@@ -919,6 +976,7 @@ const MEDICAL_KNOWLEDGE_BASE = {
     normalRange: [0, 5.2],
     highCause: '高脂血症、糖尿病、肾病综合征、甲状腺功能减退',
     wuxing: 'Tu',
+    category: 'glucose_lipid',
     tcmSyndrome: '痰湿内盛、脾失健运',
     advice: '健脾祛湿化痰，温胆汤、山楂、决明子、燕麦、海带',
     source: '《中国成人血脂异常防治指南（2016年修订版）》'
@@ -929,6 +987,7 @@ const MEDICAL_KNOWLEDGE_BASE = {
     normalRange: [0, 1.7],
     highCause: '高脂饮食、酗酒、糖尿病、肾病、代谢综合征',
     wuxing: 'Tu',
+    category: 'glucose_lipid',
     tcmSyndrome: '痰湿内盛、脾胃湿热',
     advice: '清淡饮食，山楂荷叶茶、决明子茶；戒酒、控制体重',
     source: '《中国成人血脂异常防治指南（2016年修订版）》'
@@ -939,6 +998,7 @@ const MEDICAL_KNOWLEDGE_BASE = {
     normalRange: { male: [1.04, null], female: [1.29, null] },
     lowCause: '代谢综合征、糖尿病、肥胖、吸烟',
     wuxing: 'Tu',
+    category: 'glucose_lipid',
     tcmSyndrome: '脾虚痰湿',
     advice: '健脾化痰，运动提高HDL，戒烟限酒，多食橄榄油、深海鱼',
     source: '《中国成人血脂异常防治指南（2016年修订版）》'
@@ -949,6 +1009,7 @@ const MEDICAL_KNOWLEDGE_BASE = {
     normalRange: [0, 3.4],
     highCause: '高脂血症、动脉粥样硬化、冠心病危险因素',
     wuxing: 'Tu',
+    category: 'glucose_lipid',
     tcmSyndrome: '痰瘀互结、脉络痹阻',
     advice: '活血化瘀，丹参、山楂、红曲；低脂饮食，规律运动',
     source: '《中国成人血脂异常防治指南（2016年修订版）》'
@@ -960,6 +1021,7 @@ const MEDICAL_KNOWLEDGE_BASE = {
     highCause: '肾功能下降、肾小球肾炎、糖尿病肾病、高血压肾病',
     lowCause: '肌肉萎缩、严重肝病、营养不良',
     wuxing: 'Shui',
+    category: 'kidney',
     tcmSyndrome: '肾虚、肾气不固、浊毒内蕴',
     advice: '补肾解毒，六味地黄丸、冬虫夏草；低盐饮食、控制血压血糖',
     source: '《内科学》第9版，人民卫生出版社，2018'
@@ -971,6 +1033,7 @@ const MEDICAL_KNOWLEDGE_BASE = {
     highCause: '肾功能不全、脱水、高蛋白饮食、消化道出血',
     lowCause: '低蛋白饮食、严重肝病、妊娠',
     wuxing: 'Shui',
+    category: 'kidney',
     tcmSyndrome: '肾虚、水湿内停',
     advice: '补肾利水，肾气丸、茯苓、泽泻；控制蛋白质摄入量',
     source: '《内科学》第9版，人民卫生出版社，2018'
@@ -981,6 +1044,7 @@ const MEDICAL_KNOWLEDGE_BASE = {
     normalRange: { male: [208, 428], female: [155, 357] },
     highCause: '痛风、高尿酸血症、肾病、代谢综合征、高嘌呤饮食',
     wuxing: 'Shui',
+    category: 'kidney',
     tcmSyndrome: '湿热下注、浊毒内蕴',
     advice: '清热利湿泄浊，四妙丸、土茯苓、萆薢；低嘌呤饮食、多饮水',
     source: '《中国高尿酸血症与痛风诊疗指南（2019）》'
@@ -991,6 +1055,7 @@ const MEDICAL_KNOWLEDGE_BASE = {
     normalRange: [0.5, 1.03],
     highCause: '早期肾功能下降（比肌酐更敏感）',
     wuxing: 'Shui',
+    category: 'kidney',
     tcmSyndrome: '肾虚、早期肾精不足',
     advice: '补肾益精，六味地黄丸；定期监测肾功能',
     source: '《内科学》第9版，人民卫生出版社，2018'
@@ -1002,6 +1067,7 @@ const MEDICAL_KNOWLEDGE_BASE = {
     highCause: '维生素K缺乏、肝病、DIC、口服抗凝药（华法林）',
     lowCause: '高凝状态、血栓倾向',
     wuxing: 'Shui',
+    category: 'coagulation',
     tcmSyndrome: '瘀血内阻、血热妄行',
     advice: '活血止血，三七、蒲黄；监测凝血功能，避免外伤',
     source: '《诊断学》第9版，人民卫生出版社，2018'
@@ -1012,6 +1078,7 @@ const MEDICAL_KNOWLEDGE_BASE = {
     normalRange: [0, 15],
     highCause: '维生素B6/B12/叶酸缺乏、肾功能下降、心血管疾病危险因素',
     wuxing: 'Shui',
+    category: 'coagulation',
     tcmSyndrome: '肾虚、瘀血内阻',
     advice: '补肾活血，补叶酸、维生素B12；多食绿叶蔬菜、少食加工食品',
     source: '《中国高血压防治指南（2018年修订版）》'
@@ -1022,6 +1089,7 @@ const MEDICAL_KNOWLEDGE_BASE = {
     normalRange: [0, 10],
     highCause: '原发性肝癌、急慢性肝炎、肝硬化、妊娠期',
     wuxing: 'Mu',
+    category: 'tumor',
     tcmSyndrome: '肝郁毒结、瘀血内阻',
     advice: '疏肝解毒化瘀，定期超声+CT检查；忌酒、保持情绪舒畅',
     source: '《实用肝脏病学》第3版，上海科学技术出版社，2020'
@@ -1032,6 +1100,7 @@ const MEDICAL_KNOWLEDGE_BASE = {
     normalRange: [0, 5],
     highCause: '结直肠癌、胃癌、肺癌、胰腺癌、吸烟者轻度升高',
     wuxing: 'Tu',
+    category: 'tumor',
     tcmSyndrome: '脾胃湿热、毒邪内蕴',
     advice: '健脾解毒，定期胃肠镜检查；高纤维饮食、少食腌制食品',
     source: '《临床肿瘤学》第5版，人民卫生出版社，2018'
@@ -1043,6 +1112,7 @@ const MEDICAL_KNOWLEDGE_BASE = {
     lowCause: '各种贫血、失血、溶血、营养不良',
     highCause: '脱水、高原居住、真性红细胞增多症',
     wuxing: 'Mu',
+    category: 'blood',
     tcmSyndrome: '血虚证、气虚不摄血',
     advice: '补气养血，当归补血汤、八珍汤；多食红色食物',
     source: '《诊断学》第9版，人民卫生出版社，2018'
@@ -1054,6 +1124,7 @@ const MEDICAL_KNOWLEDGE_BASE = {
     lowCause: '贫血、失血、溶血',
     highCause: '脱水、红细胞增多症',
     wuxing: 'Mu',
+    category: 'blood',
     tcmSyndrome: '血虚、气虚',
     advice: '补气养血，当归、黄芪、党参',
     source: '《诊断学》第9版，人民卫生出版社，2018'
@@ -1064,6 +1135,7 @@ const MEDICAL_KNOWLEDGE_BASE = {
     normalRange: [7, 45],
     highCause: '酒精性肝病、胆道梗阻、药物性肝损伤',
     wuxing: 'Mu',
+    category: 'liver',
     tcmSyndrome: '肝胆湿热、酒毒内蕴',
     advice: '清肝利胆戒酒，茵陈蒿汤、龙胆泻肝汤',
     source: '《实用肝脏病学》第3版，上海科学技术出版社，2020'
@@ -1310,12 +1382,17 @@ async function analyzeReport(){
       const prompt=`你是一位专业的检验科医生。请仔细分析这张体检报告图片，提取所有检测指标。
 
 要求：
-1. 找出所有指标名称、数值、单位、参考范围
-2. 判断每项指标是否正常（正常/偏高/偏低）
-3. 输出严格JSON数组格式，例如：
-[{"name":"血红蛋白","value":128,"unit":"g/L","refLow":110,"refHigh":160,"status":"正常"}]
+1. 找出所有指标名称、英文名、数值、单位、参考范围下限和上限
+2. 判断每项指标状态：正常/偏高/偏低
+3. 评估异常程度：正常/轻度异常/中度异常/重度异常
+4. 标注紧急程度：low(正常)/mid(需关注)/high(需就医)
+5. 指标分类：blood(血常规)/liver(肝功能)/kidney(肾功能)/glucose_lipid(血糖血脂)/tumor(肿瘤标志物)/coagulation(凝血)/other(其他)
 
-只输出JSON，不要解释。如果图片不清晰，返回 []`;
+输出严格JSON数组格式，每项包含：name, english, value, unit, refLow, refHigh, status, severity, urgency, category
+例如：
+[{"name":"血红蛋白","english":"Hemoglobin","value":128,"unit":"g/L","refLow":110,"refHigh":160,"status":"正常","severity":"正常","urgency":"low","category":"blood"}]
+
+只输出JSON数组，不要解释。如果图片不清晰，返回 []`;;
 
     // 添加 API 超时控制（30秒）
     const controller = new AbortController();
@@ -1373,14 +1450,41 @@ async function analyzeReport(){
     // 用知识库 enrich 每个指标
     const enriched=indicators.map(function(ind){
       const kb=MEDICAL_KNOWLEDGE_BASE[ind.name];
+      const status=ind.status || (function(){
+        const v=parseFloat(ind.value), lo=parseFloat(ind.refLow), hi=parseFloat(ind.refHigh);
+        if(v<lo) return '偏低'; if(v>hi) return '偏高'; return '正常';
+      })();
+      const urgency=ind.urgency || (function(){
+        if(status==='正常') return 'low';
+        const v=Math.abs(parseFloat(ind.value)-parseFloat(status==='偏高'?ind.refHigh:ind.refLow));
+        const range=parseFloat(ind.refHigh)-parseFloat(ind.refLow);
+        if(range>0 && v/range>0.3) return 'high';
+        if(range>0 && v/range>0.1) return 'mid';
+        return 'mid';
+      })();
+      const category=ind.category || (function(){
+        const cat=kb?.category; if(cat) return cat;
+        const n=ind.name;
+        if(/红|白|血小|细胞|血红|红细|压积/.test(n)) return 'blood';
+        if(/转氨|胆|谷|氨酰/.test(n)) return 'liver';
+        if(/肌|尿|胱抑|肾/.test(n)) return 'kidney';
+        if(/血糖|糖化|胆固|甘油|脂蛋/.test(n)) return 'glucose_lipid';
+        if(/癌|胚|胎|抗原|125|199|AFP|CEA/.test(n)) return 'tumor';
+        if(/凝血|原|活酶/.test(n)) return 'coagulation';
+        return 'other';
+      })();
       return {
         ...ind,
-        english: kb?.english || '',
-        cause: ind.status==='偏高' ? (kb?.highCause || '') : (kb?.lowCause || ''),
+        english: ind.english || kb?.english || '',
+        cause: status==='偏高' ? (kb?.highCause || '') : (kb?.lowCause || ''),
         wuxing: kb?.wuxing || '',
         tcmSyndrome: kb?.tcmSyndrome || '',
         advice: kb?.advice || '',
-        source: kb?.source || ''
+        source: kb?.source || '',
+        status: status,
+        urgency: urgency,
+        category: category,
+        severity: ind.severity || (urgency==='high'?'重度异常':urgency==='mid'?'轻度异常':'正常')
       };
     });
 
@@ -1466,6 +1570,23 @@ function submitManualInput(){
     else if(value > refHigh) status='偏高';
     
     const kb=MEDICAL_KNOWLEDGE_BASE[name];
+    const urgency=(function(){
+      if(status==='正常') return 'low';
+      const v=Math.abs(value-(status==='偏高'?refHigh:refLow));
+      const range=refHigh-refLow;
+      if(range>0 && v/range>0.3) return 'high';
+      return 'mid';
+    })();
+    const category=(function(){
+      if(kb?.category) return kb.category;
+      if(/红|白|血小|细胞|血红/.test(name)) return 'blood';
+      if(/转氨|胆|谷|氨酰/.test(name)) return 'liver';
+      if(/肌|尿|胱抑|肾/.test(name)) return 'kidney';
+      if(/血糖|糖化|胆固|甘油|脂蛋/.test(name)) return 'glucose_lipid';
+      if(/癌|胚|胎|抗原/.test(name)) return 'tumor';
+      if(/凝血/.test(name)) return 'coagulation';
+      return 'other';
+    })();
     indicators.push({
       name, value, unit, refLow, refHigh, status,
       english: kb?.english || '',
@@ -1473,7 +1594,10 @@ function submitManualInput(){
       wuxing: kb?.wuxing || '',
       tcmSyndrome: kb?.tcmSyndrome || '',
       advice: kb?.advice || '',
-      source: kb?.source || ''
+      source: kb?.source || '',
+      urgency: urgency,
+      category: category,
+      severity: urgency==='high'?'重度异常':urgency==='mid'?'轻度异常':'正常'
     });
   });
   
@@ -1488,14 +1612,14 @@ function renderReportResult(indicators){
   // 如果没传 indicators，用原来的 mock 数据（向后兼容）
   if(!indicators || indicators.length===0){
     indicators=[
-      {name:'血红蛋白(Hb)',value:128,unit:'g/L',refLow:110,refHigh:160,status:'正常',wuKey:'Mu',suggest:'补血养肝，多食红枣、枸杞、动物肝脏',wuxing:'木（肝藏血）'},
-      {name:'白细胞(WBC)',value:6.8,unit:'×10⁹/L',refLow:4,refHigh:10,status:'正常',wuKey:'Jin',suggest:'益气固表，少食辛辣，适度运动',wuxing:'金（肺卫）'},
-      {name:'谷丙转氨酶(ALT)',value:42,unit:'U/L',refLow:5,refHigh:40,status:'偏高',wuKey:'Mu',suggest:'清肝利胆，少饮酒，早睡养肝',wuxing:'木（肝主疏泄）'},
-      {name:'空腹血糖(FPG)',value:5.4,unit:'mmol/L',refLow:3.9,refHigh:6.1,status:'正常',wuKey:'Tu',suggest:'健脾和胃，控制甜食摄入',wuxing:'土（脾主运化）'},
-      {name:'总胆固醇(TC)',value:5.2,unit:'mmol/L',refLow:0,refHigh:5.2,status:'正常',wuKey:'Tu',suggest:'健脾祛湿，少油腻，多运动',wuxing:'土（脾为生痰之源）'},
-      {name:'甘油三酯(TG)',value:1.8,unit:'mmol/L',refLow:0,refHigh:1.7,status:'偏高',wuKey:'Tu',suggest:'清淡饮食，多食山楂、燕麦',wuxing:'土（痰湿体质）'},
-      {name:'肌酐(Cr)',value:88,unit:'μmol/L',refLow:44,refHigh:133,status:'正常',wuKey:'Shui',suggest:'补肾固本，少劳累，多按摩腰部',wuxing:'水（肾主水）'},
-      {name:'尿酸(UA)',value:385,unit:'μmol/L',refLow:155,refHigh:416,status:'正常',wuKey:'Shui',suggest:'利水渗湿，少食高嘌呤，多喝水',wuxing:'水（肾司二便）'}
+      {name:'血红蛋白(Hb)',value:128,unit:'g/L',refLow:110,refHigh:160,status:'正常',urgency:'low',category:'blood',severity:'正常',wuKey:'Mu',suggest:'补血养肝，多食红枣、枸杞、动物肝脏',wuxing:'木（肝藏血）'},
+      {name:'白细胞(WBC)',value:6.8,unit:'×10⁹/L',refLow:4,refHigh:10,status:'正常',urgency:'low',category:'blood',severity:'正常',wuKey:'Jin',suggest:'益气固表，少食辛辣，适度运动',wuxing:'金（肺卫）'},
+      {name:'谷丙转氨酶(ALT)',value:42,unit:'U/L',refLow:5,refHigh:40,status:'偏高',urgency:'mid',category:'liver',severity:'轻度异常',wuKey:'Mu',suggest:'清肝利胆，少饮酒，早睡养肝',wuxing:'木（肝主疏泄）'},
+      {name:'空腹血糖(FPG)',value:5.4,unit:'mmol/L',refLow:3.9,refHigh:6.1,status:'正常',urgency:'low',category:'glucose_lipid',severity:'正常',wuKey:'Tu',suggest:'健脾和胃，控制甜食摄入',wuxing:'土（脾主运化）'},
+      {name:'总胆固醇(TC)',value:5.2,unit:'mmol/L',refLow:0,refHigh:5.2,status:'正常',urgency:'low',category:'glucose_lipid',severity:'正常',wuKey:'Tu',suggest:'健脾祛湿，少油腻，多运动',wuxing:'土（脾为生痰之源）'},
+      {name:'甘油三酯(TG)',value:1.8,unit:'mmol/L',refLow:0,refHigh:1.7,status:'偏高',urgency:'mid',category:'glucose_lipid',severity:'轻度异常',wuKey:'Tu',suggest:'清淡饮食，多食山楂、燕麦',wuxing:'土（痰湿体质）'},
+      {name:'肌酐(Cr)',value:88,unit:'μmol/L',refLow:44,refHigh:133,status:'正常',urgency:'low',category:'kidney',severity:'正常',wuKey:'Shui',suggest:'补肾固本，少劳累，多按摩腰部',wuxing:'水（肾主水）'},
+      {name:'尿酸(UA)',value:385,unit:'μmol/L',refLow:155,refHigh:416,status:'正常',urgency:'low',category:'kidney',severity:'正常',wuKey:'Shui',suggest:'利水渗湿，少食高嘌呤，多喝水',wuxing:'水（肾司二便）'}
     ];
   }
 
@@ -1504,26 +1628,104 @@ function renderReportResult(indicators){
   const wuKey=cInfo.wu;
   const d=WUXING_HEALTH[wuKey];
 
+  // === 计算健康综合评分 ===
+  var healthScore=calcHealthScore(indicators);
+  var systemScores=calcSystemScores(indicators);
+
+  // === 异常指标汇总 ===
+  var needDoctor=indicators.filter(function(i){return i.urgency==='high'});
+  var needAttention=indicators.filter(function(i){return i.urgency==='mid'});
+  var normalCount=indicators.filter(function(i){return i.urgency==='low' || (!i.urgency && i.status==='正常')});
+  var normalCnt=normalCount.length;
+  var totalCnt=indicators.length;
+
+  // === 历史趋势数据 ===
+  var history=JSON.parse(localStorage.getItem('tizhi_report_history')||'[]');
+
   // Build indicator HTML
-  let indHtml='<div class="indicator-grid">';
+  var categoryNames={blood:'血常规',liver:'肝功能',kidney:'肾功能',glucose_lipid:'血糖血脂',tumor:'肿瘤标志物',coagulation:'凝血',other:'其他'};
+  var categoryOrder=['blood','liver','kidney','glucose_lipid','tumor','coagulation','other'];
+
+  var indHtml='<div class="indicator-grid">';
   indicators.forEach(function(ind){
-    const val=parseFloat(ind.value || ind.val);
-    const refLow=ind.refLow || ind.low;
-    const refHigh=ind.refHigh || ind.high;
-    let status,statusClass,arrow;
-    if(val > refHigh){status='⬆️ 偏高';statusClass='status-high';arrow='↑';}
-    else if(val < refLow){status='⬇️ 偏低';statusClass='status-low';arrow='↓';}
-    else{status='✅ 正常';statusClass='status-ok';arrow='';}
+    var val=parseFloat(ind.value || ind.val);
+    var refLow=ind.refLow || ind.low;
+    var refHigh=ind.refHigh || ind.high;
+    var status,statusClass,arrow,cardClass='card-ok';
+    if(val > refHigh){status='⬆️ 偏高';statusClass='status-high';arrow='↑';cardClass='card-danger';}
+    else if(val < refLow){status='⬇️ 偏低';statusClass='status-low';arrow='↓';cardClass='card-warn';}
+    else{status='✅ 正常';statusClass='status-ok';arrow='';cardClass='card-ok';}
     
-    const wuK=ind.wuxing ? ind.wuxing.charAt(0).toUpperCase() + ind.wuxing.slice(1).toLowerCase() : (ind.wuKey || 'Tu');
-    const wInfo=WUXING_HEALTH[wuK] || WUXING_HEALTH['Tu'];
+    var urgency=ind.urgency || 'low';
+    var urgencyLabel=urgency==='high'?'需就医':urgency==='mid'?'需关注':'正常';
+    var urgencyClass=urgency==='high'?'urgency-high':urgency==='mid'?'urgency-mid':'urgency-low';
     
-    indHtml+='<div class="indicator-card">'+
-      '<div class="indicator-name">'+(ind.english ? ind.english+'（'+ind.name+'）' : ind.name)+' <span class="indicator-status '+statusClass+'">'+status+'</span></div>'+
-      '<div><span class="indicator-val">'+(ind.value||ind.val)+'</span><span class="indicator-unit">'+ind.unit+'</span></div>'+
+    var wuK=ind.wuxing ? ind.wuxing.charAt(0).toUpperCase() + ind.wuxing.slice(1).toLowerCase() : (ind.wuKey || 'Tu');
+    var wInfo=WUXING_HEALTH[wuK] || WUXING_HEALTH['Tu'];
+    
+    // Progress bar: position of value within range
+    var barPct=50, barColor='var(--success)';
+    if(refHigh && refLow !== undefined && refHigh > refLow){
+      var pct=((val-refLow)/(refHigh-refLow))*100;
+      barPct=Math.max(0,Math.min(100,pct));
+      if(val>refHigh){barPct=100;barColor='var(--danger)';}
+      else if(val<refLow){barPct=0;barColor='var(--gold)';}
+      else{barColor='var(--success)';}
+    }
+    
+    // Trend from history
+    var trendHtml='';
+    if(history.length>=2){
+      var prevValues=[];
+      for(var h=0;h<history.length-1;h++){
+        var prevInd=history[h].indicators.find(function(x){return x.name===ind.name});
+        if(prevInd) prevValues.push(parseFloat(prevInd.value));
+      }
+      if(prevValues.length>0){
+        var prevVal=prevValues[prevValues.length-1];
+        var diff=val-prevVal;
+        if(Math.abs(diff)<0.01){
+          trendHtml='<span class="indicator-trend trend-flat">→ 平稳</span>';
+        } else if(diff>0){
+          trendHtml='<span class="indicator-trend trend-up">↑ +'+(Math.abs(diff)<1?diff.toFixed(2):Math.abs(diff).toFixed(1))+'</span>';
+        } else {
+          trendHtml='<span class="indicator-trend trend-down">↓ '+(Math.abs(diff)<1?Math.abs(diff).toFixed(2):Math.abs(diff).toFixed(1))+'</span>';
+        }
+        // Mini bar chart
+        if(prevValues.length>=2){
+          var maxVal=Math.max.apply(null,prevValues.concat([val]));
+          var minVal=Math.min.apply(null,prevValues.concat([val]));
+          var range=maxVal-minVal||1;
+          var miniBars=prevValues.concat([val]).map(function(v){
+            var h=Math.max(3,((v-minVal)/range)*18);
+            return '<div class="trend-mini-bar" style="height:'+h+'px"></div>';
+          }).join('');
+          trendHtml+='<span class="trend-mini-chart">'+miniBars+'</span>';
+        }
+      } else {
+        trendHtml='<span class="indicator-trend trend-flat">首次记录</span>';
+      }
+    } else {
+      trendHtml='<span class="indicator-trend trend-flat">首次记录</span>';
+    }
+    
+    var catLabel=ind.category ? categoryNames[ind.category] || '其他' : '其他';
+    
+    indHtml+='<div class="indicator-card '+cardClass+'">'+
+      '<div class="indicator-name">'+(ind.english ? ind.english+'（'+ind.name+'）' : ind.name)+
+        ' <span class="indicator-status '+statusClass+'">'+status+'</span>'+
+        ' <span class="indicator-urgency '+urgencyClass+'">'+urgencyLabel+'</span>'+
+        '<span class="tag" style="font-size:10px;margin-left:4px">'+catLabel+'</span>'+
+      '</div>'+
+      '<div><span class="indicator-val">'+(ind.value||ind.val)+'</span><span class="indicator-unit">'+ind.unit+'</span>'+trendHtml+'</div>'+
       '<div class="indicator-range">参考范围：'+refLow+'–'+refHigh+' '+ind.unit+'</div>'+
+      '<div class="indicator-bar-wrap"><div class="indicator-bar-fill" style="width:'+barPct+'%;background:'+barColor+'"></div>'+
+        '<div class="indicator-bar-marker" style="left:0%"></div>'+
+        '<div class="indicator-bar-marker" style="left:100%"></div>'+
+      '</div>'+
       (ind.cause ? '<div class="indicator-cause">📖 可能原因：'+ind.cause+'</div>' : '')+
       (ind.tcmSyndrome ? '<div class="indicator-tcm">🏥 中医证候：'+ind.tcmSyndrome+'</div>' : '')+
+      (ind.wuxing ? '<div class="indicator-wuxing">'+wInfo.icon+' 五行归属：'+wInfo.name+'行（'+wInfo.organs.join('、')+'）</div>' : '')+
       (ind.advice || ind.suggest ? '<div class="indicator-suggest">💡 调理建议：'+(ind.advice||ind.suggest)+'</div>' : '')+
       (ind.source ? '<div class="indicator-source" style="font-size:10px;opacity:.4;margin-top:4px">来源：'+ind.source+'</div>' : '')+
     '</div>';
@@ -1577,10 +1779,159 @@ function renderReportResult(indicators){
         '<strong style="color:var(--title)">体质判定：</strong>'+constit+'体质（'+cInfo.desc+'）<br>'+
         '<span style="font-size:13px;color:var(--muted)">'+cInfo.note+'</span>'+
       '</div>'+
+      // Health score gauge
+      '<div class="health-score-wrap">'+
+        '<div class="health-gauge">'+
+          '<svg width="140" height="140" viewBox="0 0 140 140">'+
+            '<circle class="gauge-track" cx="70" cy="70" r="60"></circle>'+
+            '<circle class="gauge-fill" cx="70" cy="70" r="60" stroke="'+(healthScore>=90?'var(--success)':healthScore>=70?'var(--gold)':healthScore>=50?'var(--orange)':'var(--danger)')+'" stroke-dasharray="377" stroke-dashoffset="'+(377*(1-healthScore/100))+'"></circle>'+
+          '</svg>'+
+          '<div class="gauge-center">'+
+            '<div class="gauge-score" style="color:'+(healthScore>=90?'var(--success)':healthScore>=70?'var(--gold)':healthScore>=50?'var(--orange)':'var(--danger)')+'">'+healthScore+'</div>'+
+            '<div class="gauge-label">'+(healthScore>=90?'优':healthScore>=70?'良':healthScore>=50?'中':'差')+'</div>'+
+          '</div>'+
+        '</div>'+
+        '<div class="system-scores">'+
+          systemScores.map(function(s){
+            return '<div class="system-score-row">'+
+              '<div class="system-score-label">'+s.label+'</div>'+
+              '<div class="system-score-bar"><div class="system-score-fill" style="width:'+s.score+'%;background:'+(s.score>=90?'var(--success)':s.score>=70?'var(--gold)':s.score>=50?'var(--orange)':'var(--danger)')+'"></div></div>'+
+              '<div class="system-score-val" style="color:'+(s.score>=90?'var(--success)':s.score>=70?'var(--gold)':s.score>=50?'var(--orange)':'var(--danger)')+'">'+s.score+'</div>'+
+            '</div>';
+          }).join('')+
+        '</div>'+
+      '</div>'+
+      // Abnormal summary
+      '<div class="summary-sentence">📋 共'+totalCnt+'项指标，'+normalCnt+'项正常，'+needAttention.length+'项需关注，'+needDoctor.length+'项需就医</div>'+
+      '<div class="abnormal-summary">'+
+        '<div class="abnormal-card danger"><div class="count">'+needDoctor.length+'</div><div class="label">🔴 需就医</div></div>'+
+        '<div class="abnormal-card warn"><div class="count">'+needAttention.length+'</div><div class="label">🟠 需关注</div></div>'+
+        '<div class="abnormal-card ok"><div class="count">'+normalCnt+'</div><div class="label">🟢 正常</div></div>'+
+      '</div>'+
+      (needDoctor.length>0 ? '<div style="background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.2);border-radius:8px;padding:12px;margin-bottom:10px"><strong style="color:var(--danger)">⚠️ 以下指标建议尽早就医：</strong> '+needDoctor.map(function(i){return i.name}).join('、')+'</div>' : '')+
+      (needAttention.length>0 ? '<div style="background:rgba(230,126,34,.06);border:1px solid rgba(230,126,34,.15);border-radius:8px;padding:12px;margin-bottom:10px"><strong style="color:var(--gold)">📌 以下指标需关注：</strong> '+needAttention.map(function(i){return i.name}).join('、')+'</div>' : '')+
       indHtml+
+      // AI comprehensive section
+      '<div class="ai-comprehensive-section">'+
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">'+
+          '<span style="font-size:20px">🤖</span>'+
+          '<strong style="color:var(--title);font-size:16px">AI综合解读</strong>'+
+          '<button class="btn-outline btn-sm" style="margin-left:auto" onclick="callAIComprehensive()">生成AI深度解读</button>'+
+        '</div>'+
+        '<div id="aiComprehensiveResult" style="display:none"></div>'+
+        '<div id="aiComprehensiveLoading" style="display:none;text-align:center;padding:20px">'+
+          '<div class="spinner" style="width:36px;height:36px"></div>'+
+          '<div style="color:var(--muted);margin-top:8px;font-size:14px">AI正在生成综合解读方案...</div>'+
+        '</div>'+
+      '</div>'+
       recipeHtml+
       checkinHtml+
     '</div>';
+}
+
+// ════════════════════════════════════════════════
+// 健康综合评分计算
+// ════════════════════════════════════════════════
+function calcHealthScore(indicators){
+  if(!indicators || indicators.length===0) return 100;
+  var totalScore=100;
+  indicators.forEach(function(ind){
+    var urgency=ind.urgency || 'low';
+    var severity=ind.severity || (urgency==='high'?'重度异常':urgency==='mid'?'轻度异常':'正常');
+    if(urgency==='high') totalScore-=15;
+    else if(urgency==='mid') totalScore-=7;
+    else if(ind.status && ind.status!=='正常') totalScore-=3;
+  });
+  return Math.max(0,Math.min(100,Math.round(totalScore)));
+}
+
+function calcSystemScores(indicators){
+  var systems={
+    blood:{label:'血液系统',score:100,count:0},
+    liver:{label:'肝胆系统',score:100,count:0},
+    kidney:{label:'肾脏系统',score:100,count:0},
+    glucose_lipid:{label:'代谢系统',score:100,count:0},
+    tumor:{label:'肿瘤标志物',score:100,count:0},
+    coagulation:{label:'凝血系统',score:100,count:0},
+    other:{label:'其他',score:100,count:0}
+  };
+  var hasTumor=false, hasCoag=false;
+  indicators.forEach(function(ind){
+    var cat=ind.category || 'other';
+    if(!systems[cat]) cat='other';
+    systems[cat].count++;
+    var urgency=ind.urgency || 'low';
+    if(urgency==='high') systems[cat].score-=20;
+    else if(urgency==='mid') systems[cat].score-=10;
+    else if(ind.status && ind.status!=='正常') systems[cat].score-=5;
+    if(cat==='tumor') hasTumor=true;
+    if(cat==='coagulation') hasCoag=true;
+  });
+  // Only include systems with indicators
+  var result=[];
+  for(var key in systems){
+    if(systems[key].count>0){
+      systems[key].score=Math.max(0,Math.min(100,systems[key].score));
+      result.push({label:systems[key].label,score:systems[key].score,key:key});
+    }
+  }
+  // Map to standard 6 systems for display
+  var labelMap={'blood':'血液','liver':'肝胆','kidney':'肾脏','glucose_lipid':'代谢','tumor':'免疫','coagulation':'心血管','other':'其他'};
+  if(!hasTumor && !hasCoag && result.length<=4){
+    // Add immune and cardiovascular placeholder
+  }
+  return result.map(function(r){return {label:r.label,score:r.score}});
+}
+
+// ════════════════════════════════════════════════
+// AI综合解读（调用LLM生成深度解读）
+// ════════════════════════════════════════════════
+async function callAIComprehensive(){
+  var loading=document.getElementById('aiComprehensiveLoading');
+  var result=document.getElementById('aiComprehensiveResult');
+  if(!loading || !result) return;
+  
+  // Gather current indicators
+  var reportResult=document.getElementById('reportResult');
+  if(!reportResult) return;
+  // Get latest indicators from localStorage
+  var history=JSON.parse(localStorage.getItem('tizhi_report_history')||'[]');
+  if(history.length===0){showToast('暂无体检数据');return;}
+  var latest=history[history.length-1];
+  var indicatorData=latest.indicators.map(function(i){
+    return i.name+': '+i.value+' '+i.unit+' (参考范围 '+i.refLow+'-'+i.refHigh+', '+i.status+')';
+  }).join('\n');
+  
+  loading.style.display='block';
+  result.style.display='none';
+  
+  var prompt='你是一位融合现代医学和中医体质学的健康顾问。请根据以下体检指标数据，给出综合解读。\n\n体检指标数据：\n'+indicatorData+'\n\n要求输出以下章节：\n## 📋 报告解读摘要\n（200字内总结整体健康状况）\n\n## ⚠️ 异常指标警示\n（列出需就医和需关注的指标，按优先级排序）\n\n## 🌿 中医体质辨识\n（根据指标异常模式判断体质倾向）\n\n## 🍲 食疗调理方案\n（针对异常指标给出3-5条具体食疗建议）\n\n## 🏃 运动调理方案\n（针对异常指标给出运动建议）\n\n## 📋 21天健康打卡计划\n（每周重点，3周计划）\n\n## ⚠️ 就医建议\n（哪些指标需在多长时间内就医复查）';
+  
+  try{
+    var resp=await fetch('http://127.0.0.1:8900/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'openclaw/main',
+        messages:[{role:'user',content:prompt}],
+        max_tokens:4096,
+        temperature:0.7
+      })
+    });
+    
+    if(!resp.ok) throw new Error('API返回错误: '+resp.status);
+    var data=await resp.json();
+    var text=data.choices && data.choices[0] && data.choices[0].message ? data.choices[0].message.content : 'AI无返回内容';
+    
+    loading.style.display='none';
+    result.style.display='block';
+    result.innerHTML=renderMarkdown(text);
+    showToast('✅ AI综合解读已生成');
+  }catch(e){
+    loading.style.display='none';
+    result.style.display='block';
+    result.innerHTML='<div style="color:var(--danger);padding:12px">AI解读失败：'+e.message+'<br><button class="btn-outline btn-sm" style="margin-top:8px" onclick="callAIComprehensive()">重试</button></div>';
+  }
 }
 function renderRecipeLibrary(filter){
   const lib=document.getElementById('recipeLibrary');
@@ -2085,25 +2436,25 @@ async function callLLMForAnalysis(){
 请严格按以下格式输出（使用Markdown格式）：
 
 ## 📋 报告解读摘要
-（总体评价：正常/基本正常/需要关注/需要就医，50字内）
+（200字内总结整体健康状况）
 
-## 🔬 各项指标解读
-（逐项列出：指标名 | 检测值 | 参考范围 | 状态(正常/偏高/偏低) | 医学意义，用表格呈现）
+## ⚠️ 异常指标警示
+（列出需就医和需关注的指标，按优先级排序）
 
 ## 🌿 中医体质辨识
-（根据异常指标，判断五行偏盛偏衰、脏腑虚实，引用《黄帝内经》《伤寒论》等经典依据）
+（根据指标异常模式判断体质倾向，引用《黄帝内经》《伤寒论》等经典依据）
 
 ## 🍲 食疗调理方案
-（针对每项异常，给出具体食疗配方：名称+食材+做法+功效，至少3个配方）
+（针对异常指标给出3-5条具体食疗建议）
 
 ## 🏃 运动调理方案
-（给出每周运动计划：运动类型+强度+频次+注意事项，至少3种运动）
+（针对异常指标给出运动建议）
 
 ## 📋 21天健康打卡计划
-（给出每日打卡项目清单，用表格呈现：天数 | 早上 | 中午 | 晚上）
+（每周重点，3周计划）
 
 ## ⚠️ 就医建议
-（哪些指标需要尽快就医，哪些可以观察，分级标注 urgency: 高/中/低）`;
+（哪些指标需在多长时间内就医复查，分级标注 urgency: 高/中/低）`;;
 
   try {
     aiAnalysisAbortController = new AbortController();
@@ -2248,8 +2599,8 @@ function parseAIResult(){
   const summaryMatch=text.match(/## 📋 报告解读摘要[\s\S]*?\n([\s\S]*?)(?=##|$)/);
   if(summaryMatch) sections.summary=summaryMatch[1].trim();
   
-  const indicatorsMatch=text.match(/## 🔬 各项指标解读[\s\S]*?\n([\s\S]*?)(?=##|$)/);
-  if(indicatorsMatch) sections.indicators=indicatorsMatch[1].trim();
+  const abnormalMatch=text.match(/## ⚠️ 异常指标警示[\s\S]*?\n([\s\S]*?)(?=##|$)/);
+  if(abnormalMatch) sections.indicators=abnormalMatch[1].trim();
   
   const tcmMatch=text.match(/## 🌿 中医体质辨识[\s\S]*?\n([\s\S]*?)(?=##|$)/);
   if(tcmMatch) sections.tcm=tcmMatch[1].trim();
@@ -2269,6 +2620,7 @@ function parseAIResult(){
   // 显示解析预览
   let previewHtml='<h4 style="color:var(--success);margin-bottom:12px">✅ 解析结果预览</h4>';
   if(sections.summary) previewHtml+=`<div class="parse-section"><h5>📋 报告解读摘要</h5><p style="font-size:13px;line-height:1.7">${sections.summary}</p></div>`;
+  if(sections.indicators) previewHtml+=`<div class="parse-section"><h5>⚠️ 异常指标警示</h5><p style="font-size:13px;line-height:1.7">${sections.indicators}</p></div>`;
   if(sections.foodTherapy) previewHtml+=`<div class="parse-section"><h5>🍲 食疗调理方案</h5><p style="font-size:13px;line-height:1.7">已识别食疗方案，可导入食疗模块</p></div>`;
   if(sections.exercise) previewHtml+=`<div class="parse-section"><h5>🏃 运动调理方案</h5><p style="font-size:13px;line-height:1.7">已识别运动方案，可导入打卡模块</p></div>`;
   if(sections.checkinPlan) previewHtml+=`<div class="parse-section"><h5>📋 21天打卡计划</h5><p style="font-size:13px;line-height:1.7">已识别打卡计划，可导入打卡模块</p></div>`;
