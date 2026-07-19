@@ -390,17 +390,9 @@ app.get('/api/user/profile', auth, (req, res) => {
 });
 
 // 超管手机号检查（不再硬编码在前端，通过API验证）
-app.post('/api/user/check-super', (req, res) => {
-  const phone = sec.sanitizeInput(req.body.phone);
-  if (!phone) return res.json({ isSuper: false });
-  
-  if (!sec.rateLimit('super_check_' + phone, 3, 60000)) {
-    return res.status(429).json({ error: 'RATE_LIMITED' });
-  }
-  
-  const phoneHash = sec.hashPhone(phone);
-  const user = db.prepare('SELECT is_super FROM users WHERE phone_hash = ?').get(phoneHash);
-  res.json({ isSuper: !!(user && user.is_super) });
+app.post('/api/user/check-super', rbac.auth, (req, res) => {
+  const isSuper = (req.userRoles || []).includes('super_admin');
+  res.json({ isSuper: isSuper, roles: req.userRoles || ['free'] });
 });
 
 // ============================
