@@ -16,11 +16,13 @@
   </view>
 
   <block wx:if="{{result}}">
+    <!-- 体质总览 -->
     <view class="card result-score">
       <view class="tizhi-name">{{result.tizhiName}}</view>
       <view class="tizhi-desc">{{result.desc}}</view>
     </view>
 
+    <!-- 五行分布 -->
     <view class="card">
       <view class="card-title">五行分布</view>
       <view class="wx-bar-list">
@@ -34,6 +36,7 @@
       </view>
     </view>
 
+    <!-- 体质特征 -->
     <view class="card">
       <view class="card-title">体质特征</view>
       <view class="feature-list">
@@ -41,25 +44,54 @@
       </view>
     </view>
 
+    <!-- 推荐食材 -->
     <view class="card">
-      <view class="card-title">饮食建议 🍵</view>
+      <view class="card-title">推荐食材</view>
+      <view class="food-tags">
+        <text class="food-tag" wx:for="{{result.foods}}" wx:key="*this">{{item}}</text>
+      </view>
+    </view>
+
+    <!-- 饮食建议 -->
+    <view class="card">
+      <view class="card-title">饮食建议</view>
       <view class="advice-list">
         <text class="advice-item" wx:for="{{result.diet}}" wx:key="*this">• {{item}}</text>
       </view>
     </view>
 
+    <!-- 运动建议 -->
     <view class="card">
-      <view class="card-title">运动建议 🏃</view>
+      <view class="card-title">运动建议</view>
       <view class="advice-list">
         <text class="advice-item" wx:for="{{result.exercise}}" wx:key="*this">• {{item}}</text>
       </view>
     </view>
 
+    <!-- 穴位调理 -->
     <view class="card">
-      <view class="card-title">穴位调理 💆</view>
+      <view class="card-title">穴位调理</view>
       <view class="advice-list">
         <text class="advice-item" wx:for="{{result.acupoints}}" wx:key="*this">• {{item}}</text>
       </view>
+    </view>
+
+    <!-- 四季养生 -->
+    <view class="card">
+      <view class="card-title">四季养生</view>
+      <view class="season-advice">{{result.season}}</view>
+    </view>
+
+    <!-- 时辰养生 -->
+    <view class="card">
+      <view class="card-title">时辰养生</view>
+      <view class="season-advice">{{result.shichen}}</view>
+    </view>
+
+    <!-- 禁忌提醒 -->
+    <view class="card card-warning">
+      <view class="card-title">禁忌提醒</view>
+      <view class="taboo-text">{{result.taboo}}</view>
     </view>
   </block>
 

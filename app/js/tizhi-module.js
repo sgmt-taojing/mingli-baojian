@@ -318,7 +318,7 @@ function tzGeneratePlan(){
   if(!cons) return;
   let result = document.getElementById('tzPlanResult');
   result.style.display='block';
-  result.innerHTML='<div style="text-align:center;padding:30px"><div style="font-size:32px;margin-bottom:16px;animation:spin 2s linear infinite">🎯</div><div style="font-size:16px;color:var(--gold);margin-bottom:8px">AI正在生成您的综合养生方案...</div><div style="font-size:13px;color:var(--paper2)">基于' + cons.name + '体质特征</div></div>';
+  result.innerHTML='<div style="text-align:center;padding:30px"><div style="font-size:32px;margin-bottom:16px;animation:spin 2s linear infinite">🎯</div><div style="font-size:16px;color:var(--gold);margin-bottom:8px">AI正在生成您的综合养生方案...</div><div class="tz-text-13">基于' + cons.name + '体质特征</div></div>';
 
   // Build context for AI
   let wuKey = {木:'Mu',火:'Huo',土:'Tu',金:'Jin',水:'Shui'}[cons.yangsheng.match(/[木火土金水]/)?cons.yangsheng.match(/[木火土金水]/)[0]:'土'];
@@ -345,31 +345,31 @@ function tzGeneratePlan(){
       result.innerHTML='<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px"><div style="font-size:14px;color:var(--text);line-height:1.8;white-space:pre-wrap">'+text+'</div></div>';
       return;
     }
-    const html = '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:24px">';
+    const html = '<div class="tz-card-lg">';
     // Header
-    html+='<div style="text-align:center;margin-bottom:20px"><div style="font-size:48px">'+cons.icon+'</div><div style="font-size:20px;color:'+cons.color+';font-weight:bold;margin-top:8px">'+cons.name+' · 综合养生方案</div><div style="font-size:13px;color:var(--paper2);margin-top:6px">'+cons.desc+'</div></div>';
+    html+='<div class="tz-center-mb20"><div class="tz-icon-lg">'+cons.icon+'</div><div style="font-size:20px;color:'+cons.color+';font-weight:bold;margin-top:8px">'+cons.name+' · 综合养生方案</div><div class="tz-text-13-mt6">'+cons.desc+'</div></div>';
     // 食疗
     if(obj.食疗&&obj.食疗.length){
       html+='<div style="background:rgba(45,106,79,0.06);border-left:3px solid var(--success);padding:16px;border-radius:0 10px 10px 0;margin-bottom:14px"><div style="font-size:15px;color:var(--success);font-weight:bold;margin-bottom:12px">🍵 中医食疗</div>';
-      obj.食疗.forEach(function(r){html+='<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;margin-bottom:8px"><div style="font-size:14px;color:var(--gold);font-weight:bold;margin-bottom:4px">'+r.名称+'</div><div style="font-size:12px;color:var(--paper2);margin-bottom:4px"><b>食材：</b>'+r.食材+'</div><div style="font-size:12px;color:var(--paper2);margin-bottom:4px"><b>做法：</b>'+r.做法+'</div><div style="font-size:12px;color:var(--success)"><b>功效：</b>'+r.功效+'</div></div>';});
+      obj.食疗.forEach(function(r){html+='<div class="tz-card-sm"><div class="tz-title-sm">'+r.名称+'</div><div class="tz-text-12-mb4"><b>食材：</b>'+r.食材+'</div><div class="tz-text-12-mb4"><b>做法：</b>'+r.做法+'</div><div class="tz-success"><b>功效：</b>'+r.功效+'</div></div>';});
       html+='</div>';
     }
     // 功法
     if(obj.功法&&obj.功法.length){
       html+='<div style="background:rgba(201,168,76,0.06);border-left:3px solid var(--gold);padding:16px;border-radius:0 10px 10px 0;margin-bottom:14px"><div style="font-size:15px;color:var(--gold);font-weight:bold;margin-bottom:12px">🧘 功法锻炼</div>';
-      obj.功法.forEach(function(r){html+='<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;margin-bottom:8px"><div style="font-size:14px;color:var(--gold);font-weight:bold;margin-bottom:4px">'+r.名称+' <span style="font-size:12px;color:var(--muted)">（'+r.时长+'）</span></div><div style="font-size:12px;color:var(--paper2)">'+r.理由+'</div></div>';});
+      obj.功法.forEach(function(r){html+='<div class="tz-card-sm"><div class="tz-title-sm">'+r.名称+' <span style="font-size:12px;color:var(--muted)">（'+r.时长+'）</span></div><div class="tz-text-12">'+r.理由+'</div></div>';});
       html+='</div>';
     }
     // 正念
     if(obj.正念&&obj.正念.length){
       html+='<div style="background:rgba(155,89,182,0.06);border-left:3px solid #9b59b6;padding:16px;border-radius:0 10px 10px 0;margin-bottom:14px"><div style="font-size:15px;color:#9b59b6;font-weight:bold;margin-bottom:12px">🧠 正念修习</div>';
-      obj.正念.forEach(function(r){html+='<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;margin-bottom:8px"><div style="font-size:14px;color:#bb8fce;font-weight:bold;margin-bottom:4px">'+r.method||r.方法+'</div><div style="font-size:12px;color:var(--paper2);margin-bottom:4px">'+(r.steps||r.步骤)+'</div><div style="font-size:12px;color:var(--success)">'+(r.benefit||r.益处)+'</div></div>';});
+      obj.正念.forEach(function(r){html+='<div class="tz-card-sm"><div style="font-size:14px;color:#bb8fce;font-weight:bold;margin-bottom:4px">'+r.method||r.方法+'</div><div class="tz-text-12-mb4">'+(r.steps||r.步骤)+'</div><div class="tz-success">'+(r.benefit||r.益处)+'</div></div>';});
       html+='</div>';
     }
     // 起居
     if(obj.起居&&obj.起居.length){
       html+='<div style="background:rgba(52,152,219,0.06);border-left:3px solid #3498db;padding:16px;border-radius:0 10px 10px 0;margin-bottom:14px"><div style="font-size:15px;color:#3498db;font-weight:bold;margin-bottom:12px">🏠 起居调摄</div>';
-      obj.起居.forEach(function(r){html+='<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;margin-bottom:8px"><div style="font-size:13px;color:var(--gold);font-weight:bold;margin-bottom:4px">'+(r.方面||r.aspect)+'</div><div style="font-size:12px;color:var(--paper2)">'+(r.建议||r.advice)+'</div></div>';});
+      obj.起居.forEach(function(r){html+='<div class="tz-card-sm"><div style="font-size:13px;color:var(--gold);font-weight:bold;margin-bottom:4px">'+(r.方面||r.aspect)+'</div><div class="tz-text-12">'+(r.建议||r.advice)+'</div></div>';});
       html+='</div>';
     }
     // Summary
@@ -381,7 +381,7 @@ function tzGeneratePlan(){
     html+='</div>';
     result.innerHTML=html;
   }).catch(function(err){
-    result.innerHTML='<div style="padding:20px;text-align:center"><div style="font-size:14px;color:#e74c3c;margin-bottom:12px">⚠️ 方案生成服务暂时不可用</div><div style="font-size:12px;color:var(--paper2)">请确认网络正常，AI服务可用</div></div>';
+    result.innerHTML='<div style="padding:20px;text-align:center"><div style="font-size:14px;color:#e74c3c;margin-bottom:12px">⚠️ 方案生成服务暂时不可用</div><div class="tz-text-12">请确认网络正常，AI服务可用</div></div>';
   });
 }
 
@@ -390,7 +390,7 @@ function tzRenderQigong(){
   let html=list.map(function(q){
     return '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:18px">'+
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'+
-        '<span style="font-size:16px;color:var(--gold);font-weight:bold">'+q.name+'</span>'+
+        '<span class="tz-title-lg">'+q.name+'</span>'+
         '<div style="display:flex;gap:6px">'+
           '<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(201,168,76,0.1);color:var(--gold2)">'+q.type+'</span>'+
           '<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(0,0,0,0.2);color:var(--muted)">'+q.difficulty+'</span>'+
@@ -400,10 +400,10 @@ function tzRenderQigong(){
       '<div style="font-size:13px;color:var(--paper2);line-height:1.7;margin-bottom:10px">'+q.desc+'</div>'+
       '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;margin-bottom:10px"><div style="font-size:12px;color:var(--gold);margin-bottom:6px">📋 练习步骤</div><div style="font-size:12px;color:var(--paper);line-height:1.8;white-space:pre-line">'+q.steps+'</div></div>'+
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'+
-        '<div style="background:rgba(45,106,79,0.06);border-radius:6px;padding:10px"><div style="font-size:11px;color:var(--success);margin-bottom:4px">✅ 功效</div><div style="font-size:12px;color:var(--paper2)">'+q.benefit+'</div></div>'+
-        '<div style="background:rgba(231,76,60,0.06);border-radius:6px;padding:10px"><div style="font-size:11px;color:#e74c3c;margin-bottom:4px">⚠️ 注意</div><div style="font-size:12px;color:var(--paper2)">'+q.caution+'</div></div>'+
+        '<div style="background:rgba(45,106,79,0.06);border-radius:6px;padding:10px"><div style="font-size:11px;color:var(--success);margin-bottom:4px">✅ 功效</div><div class="tz-text-12">'+q.benefit+'</div></div>'+
+        '<div style="background:rgba(231,76,60,0.06);border-radius:6px;padding:10px"><div style="font-size:11px;color:#e74c3c;margin-bottom:4px">⚠️ 注意</div><div class="tz-text-12">'+q.caution+'</div></div>'+
       '</div>'+
-      '<div style="display:flex;gap:4px;flex-wrap:wrap">'+q.constitutions.map(function(c){return '<span style="font-size:11px;padding:2px 8px;background:rgba(201,168,76,0.08);border:1px solid var(--border);border-radius:10px;color:var(--gold2)">适合：'+c+'</span>';}).join('')+'</div>'+
+      '<div class="tz-flex-wrap">'+q.constitutions.map(function(c){return '<span class="tz-badge">适合：'+c+'</span>';}).join('')+'</div>'+
     '</div>';
   }).join('');
   let el = document.getElementById('tzQigongList');
@@ -424,7 +424,7 @@ function tzRenderPrescriptions(){
   let html=list.map(function(p){
     return '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:18px">'+
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
-        '<span style="font-size:16px;color:var(--gold);font-weight:bold">💊 '+p.name+'</span>'+
+        '<span class="tz-title-lg">💊 '+p.name+'</span>'+
         '<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(201,168,76,0.1);color:var(--gold2)">'+p.category+'</span>'+
       '</div>'+
       '<div style="font-size:12px;color:var(--paper3);margin-bottom:8px">出处：'+p.source+'</div>'+
@@ -433,10 +433,10 @@ function tzRenderPrescriptions(){
         '<div style="font-size:13px;color:var(--paper);line-height:1.7">'+p.composition+'</div>'+
       '</div>'+
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'+
-        '<div style="background:rgba(45,106,79,0.06);border-radius:6px;padding:10px"><div style="font-size:11px;color:var(--success);margin-bottom:4px">功效</div><div style="font-size:12px;color:var(--paper2)">'+p.effect+'</div></div>'+
-        '<div style="background:rgba(255,255,255,0.03);border-radius:6px;padding:10px"><div style="font-size:11px;color:var(--gold2);margin-bottom:4px">主治</div><div style="font-size:12px;color:var(--paper2)">'+p.usage+'</div></div>'+
+        '<div style="background:rgba(45,106,79,0.06);border-radius:6px;padding:10px"><div style="font-size:11px;color:var(--success);margin-bottom:4px">功效</div><div class="tz-text-12">'+p.effect+'</div></div>'+
+        '<div style="background:rgba(255,255,255,0.03);border-radius:6px;padding:10px"><div style="font-size:11px;color:var(--gold2);margin-bottom:4px">主治</div><div class="tz-text-12">'+p.usage+'</div></div>'+
       '</div>'+
-      '<div style="display:flex;gap:4px;flex-wrap:wrap">'+p.constitutions.map(function(c){return '<span style="font-size:11px;padding:2px 8px;background:rgba(201,168,76,0.08);border:1px solid var(--border);border-radius:10px;color:var(--gold2)">适合：'+c+'质</span>';}).join('')+'</div>'+
+      '<div class="tz-flex-wrap">'+p.constitutions.map(function(c){return '<span class="tz-badge">适合：'+c+'质</span>';}).join('')+'</div>'+
     '</div>';
   }).join('');
   let el = document.getElementById('tzPrescriptionList');
@@ -492,13 +492,13 @@ function tzCalculateResult(){
   let secondC = cons.find(function(c){return c.key===second;})||cons[0];
   window._tzLastResult={key:top,name:topC.name};
 
-  let html='<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:24px">'+
+  let html='<div class="tz-card-lg">'+
     '<h4 style="font-family:\'Ma Shan Zheng\',serif;font-size:22px;color:var(--gold);margin-bottom:16px;letter-spacing:3px;text-align:center">📊 您的体质分析结果</h4>'+
     '<div style="display:flex;gap:16px;justify-content:center;margin-bottom:20px;flex-wrap:wrap">'+
       '<div style="background:rgba('+parseInt(topC.color.slice(1,3),16)+','+parseInt(topC.color.slice(3,5),16)+','+parseInt(topC.color.slice(5,7),16)+',0.1);border:2px solid '+topC.color+';border-radius:12px;padding:20px 32px;text-align:center">'+
         '<div style="font-size:40px">'+topC.icon+'</div>'+
         '<div style="font-size:18px;color:'+topC.color+';font-weight:bold;margin-top:8px">主体质：'+topC.name+'</div>'+
-        '<div style="font-size:13px;color:var(--paper2);margin-top:6px">'+topC.desc+'</div>'+
+        '<div class="tz-text-13-mt6">'+topC.desc+'</div>'+
       '</div>'+
       '<div style="background:rgba('+parseInt(secondC.color.slice(1,3),16)+','+parseInt(secondC.color.slice(3,5),16)+','+parseInt(secondC.color.slice(5,7),16)+',0.05);border:1px solid '+secondC.color+';border-radius:12px;padding:20px 32px;text-align:center;opacity:0.8">'+
         '<div style="font-size:32px">'+secondC.icon+'</div>'+
@@ -539,10 +539,10 @@ function tzRenderFood(filter){
   let html=list.map(function(r){
     return '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:16px">'+
       '<div style="font-size:15px;color:var(--gold);font-weight:bold;margin-bottom:8px">🍵 '+r.name+'</div>'+
-      '<div style="font-size:12px;color:var(--paper2);margin-bottom:6px"><b>食材：</b>'+r.ingredients+'</div>'+
-      '<div style="font-size:12px;color:var(--paper2);margin-bottom:6px"><b>做法：</b>'+r.method+'</div>'+
+      '<div class="tz-text-12-mb6"><b>食材：</b>'+r.ingredients+'</div>'+
+      '<div class="tz-text-12-mb6"><b>做法：</b>'+r.method+'</div>'+
       '<div style="font-size:12px;color:var(--success);margin-bottom:8px"><b>功效：</b>'+r.effect+'</div>'+
-      '<div style="display:flex;gap:4px;flex-wrap:wrap">'+r.constitutions.map(function(c){return '<span style="font-size:11px;padding:2px 8px;background:rgba(201,168,76,0.08);border:1px solid var(--border);border-radius:10px;color:var(--gold2)">'+c+'</span>';}).join('')+'</div>'+
+      '<div class="tz-flex-wrap">'+r.constitutions.map(function(c){return '<span class="tz-badge">'+c+'</span>';}).join('')+'</div>'+
     '</div>';
   }).join('');
   // Also build filters
@@ -554,7 +554,7 @@ function tzRenderFood(filter){
     });
     filterEl.innerHTML=fhtml;
   }
-  document.getElementById('tzFoodList').innerHTML=html||'<div style="text-align:center;color:var(--muted);padding:20px">暂无相关食谱</div>';
+  document.getElementById('tzFoodList').innerHTML=html||'<div class="tz-center-muted">暂无相关食谱</div>';
   
   // 增强版：追加体质食疗方案 + 节气饮食建议
   const extraHtml = '';
@@ -567,10 +567,10 @@ function tzRenderFood(filter){
       extraHtml+='<div style="margin-top:20px;padding:16px;background:rgba(46,204,113,0.04);border:1px solid rgba(46,204,113,0.15);border-radius:12px">';
       extraHtml+='<div style="font-size:15px;color:var(--jade2);font-weight:bold;margin-bottom:12px">🍵 '+tizhiKey+'体质专属食疗方</div>';
       ftList.forEach(function(f){
-        extraHtml+='<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;margin-bottom:8px">';
-        extraHtml+='<div style="font-size:14px;color:var(--gold);font-weight:bold;margin-bottom:4px">'+f.name+'</div>';
-        extraHtml+='<div style="font-size:12px;color:var(--paper2);margin-bottom:4px"><b>食材：</b>'+f.ingredients+'</div>';
-        extraHtml+='<div style="font-size:12px;color:var(--paper2);margin-bottom:4px"><b>做法：</b>'+f.method+'</div>';
+        extraHtml+='<div class="tz-card-sm">';
+        extraHtml+='<div class="tz-title-sm">'+f.name+'</div>';
+        extraHtml+='<div class="tz-text-12-mb4"><b>食材：</b>'+f.ingredients+'</div>';
+        extraHtml+='<div class="tz-text-12-mb4"><b>做法：</b>'+f.method+'</div>';
         extraHtml+='<div style="font-size:12px;color:var(--jade2)"><b>功效：</b>'+f.effect+'</div>';
         extraHtml+='</div>';
       });
@@ -587,8 +587,8 @@ function tzRenderFood(filter){
     if(sf){
       extraHtml+='<div style="margin-top:16px;padding:16px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:12px">';
       extraHtml+='<div style="font-size:15px;color:var(--gold);font-weight:bold;margin-bottom:8px">🌿 当前'+season+'季饮食建议</div>';
-      extraHtml+='<div style="font-size:12px;color:var(--paper2);margin-bottom:6px"><b>节气：</b>'+sf.jieqi+'</div>';
-      extraHtml+='<div style="font-size:12px;color:var(--paper2);margin-bottom:6px"><b>原则：</b>'+sf.principle+'</div>';
+      extraHtml+='<div class="tz-text-12-mb6"><b>节气：</b>'+sf.jieqi+'</div>';
+      extraHtml+='<div class="tz-text-12-mb6"><b>原则：</b>'+sf.principle+'</div>';
       extraHtml+='<div style="font-size:12px;color:var(--paper2);margin-bottom:8px"><b>时令食材：</b>'+sf.foods.join('、')+'</div>';
       if(filter!=='all'&&sf.byTizhi&&sf.byTizhi[filter]){
         extraHtml+='<div style="font-size:12px;color:var(--jade2);padding:8px;background:rgba(46,204,113,0.06);border-radius:6px"><b>'+filter+'体质推荐：</b>'+sf.byTizhi[filter]+'</div>';
@@ -625,7 +625,7 @@ function tzRenderExercise(filter){
       '</div>'+
     '</div>';
   }).join('');
-  document.getElementById('tzExerciseList').innerHTML=html||'<div style="text-align:center;color:var(--muted);padding:20px">暂无相关运动</div>';
+  document.getElementById('tzExerciseList').innerHTML=html||'<div class="tz-center-muted">暂无相关运动</div>';
 }
 
 function tzFilterExercise(f){
@@ -654,39 +654,39 @@ function tzAnalyzeBazi(){
   let baziInfo = TZ_DATA.baziMap[baziKey]||TZ_DATA.baziMap['甲乙木'];
   let wuData = TZ_DATA.wuxing[{木:'Mu',火:'Huo',土:'Tu',金:'Jin',水:'Shui'}[wu]];
 
-  let html='<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:24px">'+
+  let html='<div class="tz-card-lg">'+
     '<h5 style="font-family:\'Ma Shan Zheng\',serif;font-size:20px;color:var(--gold);margin-bottom:16px;text-align:center">🔮 日主'+dayStem+'('+wu+'行) 体质分析</h5>'+
     '<div style="text-align:center;margin-bottom:16px">'+
-      '<div style="font-size:48px">'+wuData.icon+'</div>'+
+      '<div class="tz-icon-lg">'+wuData.icon+'</div>'+
       '<div style="font-size:20px;color:'+wuData.color+';font-weight:bold;margin-top:8px">'+wuData.name+'行 · '+wuData.organs.join('、')+'</div>'+
       '<div style="font-size:14px;color:var(--paper2);margin-top:8px">'+baziInfo.tizhi+'</div>'+
       '<div style="font-size:13px;color:var(--text);margin-top:8px;line-height:1.8;max-width:600px;margin-left:auto;margin-right:auto">'+baziInfo.desc+'</div>'+
     '</div>'+
     '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px">'+
-      '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:14px"><div style="font-size:12px;color:var(--gold);margin-bottom:6px">🕐 季节</div><div style="font-size:14px;color:var(--text)">'+wuData.season+' · '+wuData.direction+'方</div></div>'+
-      '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:14px"><div style="font-size:12px;color:var(--gold);margin-bottom:6px">👅 五味</div><div style="font-size:14px;color:var(--text)">'+wuData.taste+'味入'+wuData.organs[0]+'</div></div>'+
-      '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:14px"><div style="font-size:12px;color:var(--gold);margin-bottom:6px">😨 情志</div><div style="font-size:14px;color:var(--text)">'+wuData.emotion+'伤'+wuData.organs[0]+'</div></div>'+
-      '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:14px"><div style="font-size:12px;color:var(--gold);margin-bottom:6px">👁 关联</div><div style="font-size:14px;color:var(--text)">'+wuData.sense+' · '+wuData.tissue+'</div></div>'+
+      '<div class="tz-card"><div style="font-size:12px;color:var(--gold);margin-bottom:6px">🕐 季节</div><div class="tz-text-14">'+wuData.season+' · '+wuData.direction+'方</div></div>'+
+      '<div class="tz-card"><div style="font-size:12px;color:var(--gold);margin-bottom:6px">👅 五味</div><div class="tz-text-14">'+wuData.taste+'味入'+wuData.organs[0]+'</div></div>'+
+      '<div class="tz-card"><div style="font-size:12px;color:var(--gold);margin-bottom:6px">😨 情志</div><div class="tz-text-14">'+wuData.emotion+'伤'+wuData.organs[0]+'</div></div>'+
+      '<div class="tz-card"><div style="font-size:12px;color:var(--gold);margin-bottom:6px">👁 关联</div><div class="tz-text-14">'+wuData.sense+' · '+wuData.tissue+'</div></div>'+
     '</div>'+
     '<div style="background:rgba(230,126,34,0.06);border-left:3px solid var(--warn);padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:14px">'+
       '<div style="font-size:13px;color:var(--warn);font-weight:bold;margin-bottom:6px">⚠ 常见症状</div>'+
-      '<div style="font-size:13px;color:var(--paper2)">'+wuData.symptoms.join('、')+'</div>'+
+      '<div class="tz-text-13">'+wuData.symptoms.join('、')+'</div>'+
     '</div>'+
     '<div style="background:rgba(45,106,79,0.06);border-left:3px solid var(--success);padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:14px">'+
       '<div style="font-size:13px;color:var(--success);font-weight:bold;margin-bottom:6px">🌿 养生食物</div>'+
-      '<div style="font-size:13px;color:var(--paper2)">'+wuData.foods.join('、')+'</div>'+
+      '<div class="tz-text-13">'+wuData.foods.join('、')+'</div>'+
     '</div>'+
     '<div style="background:rgba(201,168,76,0.06);border-left:3px solid var(--gold);padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:14px">'+
-      '<div style="font-size:13px;color:var(--gold);font-weight:bold;margin-bottom:6px">💊 常用药材</div>'+
-      '<div style="font-size:13px;color:var(--paper2)">'+wuData.herbs.join('、')+'</div>'+
+      '<div class="tz-title-13">💊 常用药材</div>'+
+      '<div class="tz-text-13">'+wuData.herbs.join('、')+'</div>'+
     '</div>'+
     '<div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:14px;margin-bottom:14px">'+
-      '<div style="font-size:13px;color:var(--gold);font-weight:bold;margin-bottom:6px">📝 调养原则</div>'+
+      '<div class="tz-title-13">📝 调养原则</div>'+
       '<div style="font-size:13px;color:var(--text);line-height:1.8">'+wuData.regimen+'</div>'+
     '</div>'+
     '<div style="background:rgba(192,57,43,0.06);border-left:3px solid var(--danger);padding:12px 16px;border-radius:0 8px 8px 0">'+
       '<div style="font-size:13px;color:var(--danger);font-weight:bold;margin-bottom:6px">🚫 禁忌</div>'+
-      '<div style="font-size:13px;color:var(--paper2)">'+wuData.avoid+'</div>'+
+      '<div class="tz-text-13">'+wuData.avoid+'</div>'+
     '</div>'+
   '</div>';
   document.getElementById('tzBaziResult').innerHTML=html;
@@ -753,9 +753,9 @@ function tzRenderCheckin(){
       html+='<div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px">'+
         '<div style="display:flex;justify-content:space-between;margin-bottom:6px">'+
           '<span style="font-size:13px;color:var(--gold)">'+dk.replace('tz_checkin_','')+'</span>'+
-          '<span style="font-size:12px;color:var(--success)">✅ '+dData.items.length+'项</span>'+
+          '<span class="tz-success">✅ '+dData.items.length+'项</span>'+
         '</div>'+
-        '<div style="font-size:12px;color:var(--paper2)">'+dData.items.join(' · ')+'</div>'+
+        '<div class="tz-text-12">'+dData.items.join(' · ')+'</div>'+
         (dData.note?'<div style="font-size:12px;color:var(--muted);margin-top:4px;font-style:italic">'+dData.note+'</div>':'')+
       '</div>';
     }
@@ -781,33 +781,94 @@ function tzSelectWuxing(key){
     if(b.dataset.key===key){b.style.background='var(--title)';b.style.color='#fff';b.style.borderColor='var(--gold)';}
     else{b.style.background='rgba(255,255,255,0.04)';b.style.color='var(--muted)';b.style.borderColor='var(--border)';}
   });
-  let html='<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:24px">'+
-    '<div style="text-align:center;margin-bottom:20px">'+
+  let html='<div class="tz-card-lg">'+
+    '<div class="tz-center-mb20">'+
       '<div style="font-size:56px">'+d.icon+'</div>'+
       '<div style="font-size:24px;color:'+d.color+';font-weight:bold;margin-top:8px">'+d.name+'行 · '+d.organs.join('、')+'</div>'+
-      '<div style="font-size:13px;color:var(--paper2);margin-top:6px">'+d.season+'季 · '+d.direction+'方 · '+d.taste+'味 · '+d.emotion+'</div>'+
+      '<div class="tz-text-13-mt6">'+d.season+'季 · '+d.direction+'方 · '+d.taste+'味 · '+d.emotion+'</div>'+
     '</div>'+
     '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px">'+
-      '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:14px"><div style="font-size:12px;color:var(--gold);margin-bottom:6px">👁 对应</div><div style="font-size:14px;color:var(--text)">'+d.sense+' · '+d.tissue+'</div></div>'+
-      '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:14px"><div style="font-size:12px;color:var(--gold);margin-bottom:6px">⚠ 症状</div><div style="font-size:12px;color:var(--paper2)">'+d.symptoms.slice(0,4).join('、')+'</div></div>'+
+      '<div class="tz-card"><div style="font-size:12px;color:var(--gold);margin-bottom:6px">👁 对应</div><div class="tz-text-14">'+d.sense+' · '+d.tissue+'</div></div>'+
+      '<div class="tz-card"><div style="font-size:12px;color:var(--gold);margin-bottom:6px">⚠ 症状</div><div class="tz-text-12">'+d.symptoms.slice(0,4).join('、')+'</div></div>'+
     '</div>'+
     '<div style="background:rgba(45,106,79,0.06);border-left:3px solid var(--success);padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:14px">'+
       '<div style="font-size:13px;color:var(--success);font-weight:bold;margin-bottom:6px">🌿 养生食物</div>'+
       '<div style="font-size:13px;color:var(--paper2);line-height:1.8">'+d.foods.join('、')+'</div>'+
     '</div>'+
     '<div style="background:rgba(201,168,76,0.06);border-left:3px solid var(--gold);padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:14px">'+
-      '<div style="font-size:13px;color:var(--gold);font-weight:bold;margin-bottom:6px">💊 药材</div>'+
+      '<div class="tz-title-13">💊 药材</div>'+
       '<div style="font-size:13px;color:var(--paper2);line-height:1.8">'+d.herbs.join('、')+'</div>'+
     '</div>'+
     '<div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:14px;margin-bottom:14px">'+
-      '<div style="font-size:13px;color:var(--gold);font-weight:bold;margin-bottom:6px">📝 调养原则</div>'+
+      '<div class="tz-title-13">📝 调养原则</div>'+
       '<div style="font-size:13px;color:var(--text);line-height:1.8">'+d.regimen+'</div>'+
     '</div>'+
     '<div style="background:rgba(192,57,43,0.06);border-left:3px solid var(--danger);padding:12px 16px;border-radius:0 8px 8px 0">'+
       '<div style="font-size:13px;color:var(--danger);font-weight:bold;margin-bottom:6px">🚫 禁忌</div>'+
-      '<div style="font-size:13px;color:var(--paper2)">'+d.avoid+'</div>'+
+      '<div class="tz-text-13">'+d.avoid+'</div>'+
     '</div>'+
   '</div>';
   let el = document.getElementById('tzWuxingDetail');
   if(el) el.innerHTML=html;
 }
+
+var TZ_ENCYCLOPEDIA = {
+  seasons: [
+    {title:'春养肝', icon:'🌱', summary:'春季属木，肝当令。宜养肝气，疏泄情志，多食绿色酸味食物。', details:'春季万物生发，肝气旺盛。养生要点：①早睡早起，缓步散步；②少酸增甘，养脾气；③多食绿叶蔬菜，如菠菜、芹菜；④保持心情舒畅，戒怒戒躁；⑤可饮菊花茶、枸杞茶疏肝明目。'},
+    {title:'夏养心', icon:'☀️', summary:'夏季属火，心当令。宜养心气，清热消暑，多食红色苦味食物。', details:'夏季炎热，心火旺盛。养生要点：①晚睡早起，午休片刻；②饮食清淡，少油腻；③多食苦瓜、莲子、百合；④多饮绿茶消暑；⑤静心凝神，避免大喜伤心；⑥运动宜在清晨或傍晚。'},
+    {title:'长夏养脾胃', icon:'🌾', summary:'长夏属土，脾当令。宜健脾祛湿，饮食有节，忌生冷。', details:'长夏湿气重，脾胃易受伤。养生要点：①饮食有节，不过饱过饥；②忌生冷油腻；③多食薏米、山药、扁豆；④避免久坐湿地；⑤适当运动助消化；⑥可艾灸中脘、足三里。'},
+    {title:'秋养肺', icon:'🍂', summary:'秋季属金，肺当令。宜养肺气，润燥生津，多食白色辛味食物。', details:'秋季干燥，肺易受伤。养生要点：①早睡早起，与鸡俱兴；②多食梨、银耳、蜂蜜润肺；③少食辛辣；④适当秋冻增强体质；⑤深呼吸养肺气；⑥叩齿咽津，润养肺阴。'},
+    {title:'冬养肾', icon:'❄️', summary:'冬季属水，肾当令。宜养肾气，藏精固本，多食黑色咸味食物。', details:'冬季寒冷，肾气当令。养生要点：①早睡晚起，必待日光；②注意保暖，尤其腰脚；③多食黑色食物：黑豆、黑芝麻、核桃；④适当进补：羊肉、枸杞；⑤减少运动量，避免大汗；⑥可泡脚温阳。'}
+  ],
+  shichen: [
+    {time:'子时 23:00-01:00', organ:'胆经', icon:'🌙', summary:'子时一阳生，胆经当令。宜安眠养胆。', details:'子时是阴阳交替之时，胆经最旺。此时应熟睡，让胆经完成代谢。长期子时不睡，易患胆结石、偏头痛。建议：23点前入睡，养胆气，助阳气生发。'},
+    {time:'丑时 01:00-03:00', organ:'肝经', icon:'🌑', summary:'丑时肝经当令，宜深睡养肝血。', details:'丑时肝经最旺，肝脏解毒排毒。此时必须深睡，让肝脏完成代谢。长期熬夜伤肝，易患肝病。建议：保持深度睡眠，不饮酒，不夜食。'},
+    {time:'寅时 03:00-05:00', organ:'肺经', icon:'🌅', summary:'寅时肺经当令，宜深睡养肺气。', details:'寅时肺经最旺，将肝贮藏的新鲜血液输送全身。此时应保持深度睡眠。老年人易在此时醒来，说明肺气不足。建议：深睡，可做深呼吸练习。'},
+    {time:'卯时 05:00-07:00', organ:'大肠经', icon:'🌄', summary:'卯时大肠经当令，宜起床排便。', details:'卯时大肠经最旺，利于排便。建议：起床后喝一杯温水，养成定时排便习惯。可按摩腹部促进肠蠕动。'},
+    {time:'辰时 07:00-09:00', organ:'胃经', icon:'🍳', summary:'辰时胃经当令，宜吃好早餐。', details:'辰时胃经最旺，消化吸收功能最强。建议：7-9点吃早餐，营养丰富，温热为主。长期不吃早餐伤胃。'},
+    {time:'巳时 09:00-11:00', organ:'脾经', icon:'📚', summary:'巳时脾经当令，宜学习工作。', details:'巳时脾经最旺，脾主运化，此时大脑最活跃，精力充沛。建议：此时学习和工作效率最高。可适量饮水。'},
+    {time:'午时 11:00-13:00', organ:'心经', icon:'☀️', summary:'午时心经当令，宜午休养心。', details:'午时心经最旺，阳极阴生。建议：午餐后小憩15-30分钟，养心气。不宜午睡过长，以免影响夜间睡眠。'},
+    {time:'未时 13:00-15:00', organ:'小肠经', icon:'📖', summary:'未时小肠经当令，宜吸收营养。', details:'未时小肠经最旺，泌别清浊。建议：午餐在13点前吃完，利于小肠吸收。可适当饮水。'},
+    {time:'申时 15:00-17:00', organ:'膀胱经', icon:'💧', summary:'申时膀胱经当令，宜多饮水排毒。', details:'申时膀胱经最旺，排泄废物。建议：多喝水，利于排毒。此时运动效果佳，可做拉伸运动疏通膀胱经。'},
+    {time:'酉时 17:00-19:00', organ:'肾经', icon:'🌇', summary:'酉时肾经当令，宜休息养肾。', details:'酉时肾经最旺，肾藏精。建议：此时不宜剧烈运动，宜静坐收功。可按摩涌泉穴，泡脚温养肾气。'},
+    {time:'戌时 19:00-21:00', organ:'心包经', icon:'🌆', summary:'戌时心包经当令，宜散步放松。', details:'戌时心包经最旺，保护心脏。建议：散步、听音乐、放松心情。可按摩内关穴。不宜剧烈运动。'},
+    {time:'亥时 21:00-23:00', organ:'三焦经', icon:'🌃', summary:'亥时三焦经当令，宜安睡养百脉。', details:'亥时三焦经最旺，通百脉。建议：21-23点入睡，养百脉。此时睡好，百脉得以休养，皮肤红润。可在睡前泡脚。'}
+  ],
+  jieqi: [
+    {name:'立春', focus:'养肝升阳', detail:'立春阳气初生，宜食辛甘发散之物，如葱、姜、韭菜。早起缓行，舒展身体。'},
+    {name:'雨水', focus:'疏肝健脾', detail:'雨水湿气渐重，宜健脾祛湿。食薏米、山药，忌生冷。'},
+    {name:'惊蛰', focus:'养肝保肝', detail:'惊蛰万物复苏，肝气旺盛。宜清淡饮食，保持心情平和。'},
+    {name:'春分', focus:'平衡阴阳', detail:'春分阴阳各半，宜调和阴阳。食菠菜、豆芽，早睡早起。'},
+    {name:'清明', focus:'疏肝养肝', detail:'清明肝气最旺，宜踏青舒缓情绪。饮菊花茶，食荠菜。'},
+    {name:'谷雨', focus:'健脾祛湿', detail:'谷雨雨水增多，宜健脾祛湿。食扁豆、赤小豆，避免潮湿环境。'},
+    {name:'立夏', focus:'养心安神', detail:'立夏心火渐旺，宜养心。食莲子、百合，午休养心。'},
+    {name:'小满', focus:'清热祛湿', detail:'小满湿热渐重，宜清热祛湿。食绿豆、冬瓜，忌辛辣油腻。'},
+    {name:'芒种', focus:'清热解毒', detail:'芒种暑湿，宜清热解暑。饮绿茶，食苦瓜，保持清爽。'},
+    {name:'夏至', focus:'养心护阳', detail:'夏至阳气最盛，宜护阳养心。忌贪凉，适当出汗排毒。'},
+    {name:'小暑', focus:'消暑养心', detail:'小暑炎热，宜消暑。食绿豆汤、西瓜，避免烈日下运动。'},
+    {name:'大暑', focus:'清热降火', detail:'大暑最热，宜清热降火。多饮水，食苦瓜、莲子心，静心避暑。'},
+    {name:'立秋', focus:'润肺养阴', detail:'立秋燥气渐起，宜润肺。食梨、银耳、蜂蜜，少食辛辣。'},
+    {name:'处暑', focus:'滋阴润燥', detail:'处暑暑气渐消，宜滋阴润燥。食百合、莲藕，早睡早起。'},
+    {name:'白露', focus:'润肺防燥', detail:'白露凉燥，宜润肺。食芝麻、糯米，注意保暖。'},
+    {name:'秋分', focus:'阴阳平衡', detail:'秋分阴阳各半，宜调和。食核桃、龙眼，适当秋冻。'},
+    {name:'寒露', focus:'养阴防燥', detail:'寒露气温下降，宜养阴。食山药、白萝卜，注意足部保暖。'},
+    {name:'霜降', focus:'补肝益肾', detail:'霜降进补好时机，食栗子、柿子，补肝益肾。'},
+    {name:'立冬', focus:'补肾藏精', detail:'立冬阳气内藏，宜补肾。食黑豆、核桃，早睡晚起。'},
+    {name:'小雪', focus:'温补肾阳', detail:'小雪寒冷，宜温补。食羊肉、枸杞，注意保暖。'},
+    {name:'大雪', focus:'温阳进补', detail:'大雪阴气盛，宜温阳进补。食当归生姜羊肉汤，泡脚暖身。'},
+    {name:'冬至', focus:'养肾护阳', detail:'冬至一阳生，宜护阳。早睡晚起，食温热食物，忌寒凉。'},
+    {name:'小寒', focus:'温肾壮阳', detail:'小寒最冷时节，宜温肾。食牛肉、羊肉，艾灸关元、气海。'},
+    {name:'大寒', focus:'固本培元', detail:'大寒将至春，宜固本。食黑米、黑芝麻，适当运动迎接春天。'}
+  ],
+  gongfa: [
+    {name:'八段锦', icon:'🤸', summary:'八段锦是传统导引功法，八个动作调理五脏六腑。', details:'八段锦动作：①双手托天理三焦；②左右开弓似射雕；③调理脾胃须单举；④五劳七伤往后瞧；⑤摇头摆尾去心火；⑥两手攀足固肾腰；⑦攒拳怒目增气力；⑧背后七颠百病消。每日练习，强身健体。'},
+    {name:'五禽戏', icon:'🐅', summary:'华佗所创，模仿虎鹿熊猿鸟五种动物动作。', details:'五禽戏：①虎戏——威猛刚柔，疏通肝经；②鹿戏——轻盈舒展，固肾壮腰；③熊戏——沉稳浑厚，健脾助消化；④猿戏——灵敏活泼，养心安神；⑤鸟戏——展翅飞翔，调畅气机。全套练习约15分钟。'},
+    {name:'易筋经', icon:'💪', summary:'少林传统功法，通过拉伸筋骨强健体魄。', details:'易筋经十二式：①韦驮献杵；②横担降魔；③掌托天门；④摘星换斗；⑤倒拽九牛尾；⑥出爪亮翅；⑦九鬼拔马刀；⑧三盘落地；⑨青龙探爪；⑩卧虎扑食；⑪打躬击鼓；⑫掉尾摇头。练习时配合呼吸，舒展筋骨。'},
+    {name:'六字诀', icon:'🗣️', summary:'通过六种发音吐纳调理五脏六腑。', details:'六字诀：①嘘字诀——平肝气，疏肝理气；②呵字诀——降心火，清心安神；③呼字诀——健脾气，消食化滞；④呬字诀——润肺气，清热化痰；⑤吹字诀——补肾气，固肾培元；⑥嘻字诀——理三焦，通调水道。每字发音6次，配合呼吸吐纳。'}
+  ],
+  diet: [
+    {name:'药食同源', icon:'🍵', summary:'许多食物本身具有药性，日常饮食即可调养身体。', details:'药食同源理论认为食物与药物同源同用。常见药食同源之物：①山药——健脾益肾；②枸杞——滋补肝肾；③红枣——补中益气；④生姜——温中散寒；⑤蜂蜜——润肺养胃；⑥莲子——养心安神；⑦百合——润肺止咳；⑧桂圆——补血安神。日常合理搭配，寓医于食。'},
+    {name:'四气五味', icon:'🌡️', summary:'食物有寒热温凉四气，酸苦甘辛咸五味。', details:'四气：寒凉食物清热泻火（如苦瓜、绿豆）；温热食物温阳散寒（如羊肉、生姜）；平性食物平和养胃（如大米、猪肉）。\n五味：酸入肝（收敛）；苦入心（降火）；甘入脾（补益）；辛入肺（发散）；咸入肾（软坚）。根据体质选择合适性味的食物。'},
+    {name:'归经理论', icon:'🧭', summary:'不同食物归入不同经络脏腑，针对性调养。', details:'归经是指食物对特定脏腑经络的趋向性。①归心经：莲子、龙眼、小麦；②归肝经：枸杞、菊花、醋；③归脾经：山药、大枣、糯米；④归肺经：百合、银耳、梨；⑤归肾经：黑豆、核桃、黑芝麻。根据需要调养的脏腑，选择对应归经的食物。'}
+  ]
+};
