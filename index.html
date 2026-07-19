@@ -2,10 +2,89 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="refresh" content="0; url=app/divination-hub.html">
-<title>命理宝鉴 - 跳转中</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>命理宝鉴 · 易道智鉴</title>
+<style>
+:root{
+  --ink:#080808;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;
+  --paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;
+  --gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;
+  --cinn:#c0392b;--cinn2:#e74c3c;
+  --jade:#27ae60;--cyan:#2980b9;--cyan2:#5dade2;
+  --border:rgba(201,168,76,.15);
+  --bg:#080808;--card:rgba(255,255,255,0.04);--card2:rgba(255,255,255,0.06);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--paper);font-family:'Noto Serif SC',serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.bg-deco{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(201,168,76,0.04) 0%,transparent 60%)}
+.brand{text-align:center;margin-bottom:40px;position:relative;z-index:1}
+.brand h1{font-size:32px;color:var(--gold);letter-spacing:8px;margin-bottom:8px}
+.brand p{color:var(--paper3);font-size:13px;letter-spacing:3px;opacity:.7}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;max-width:900px;width:100%;position:relative;z-index:1}
+.card{display:block;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px 24px;text-decoration:none;transition:all .3s;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0;transition:opacity .3s}
+.card:hover{border-color:rgba(201,168,76,.3);transform:translateY(-3px);background:var(--card2)}
+.card:hover::before{opacity:1}
+.card-icon{font-size:36px;margin-bottom:14px;line-height:1}
+.card-title{color:var(--gold);font-size:16px;font-weight:700;letter-spacing:3px;margin-bottom:6px}
+.card-desc{color:var(--paper3);font-size:12px;line-height:1.8;opacity:.7}
+.footer{margin-top:40px;color:var(--paper3);font-size:11px;opacity:.4;position:relative;z-index:1}
+@media(max-width:768px){.cards{grid-template-columns:1fr}.brand h1{font-size:24px;letter-spacing:4px}}
+</style>
 </head>
 <body>
-<p>正在跳转到<a href="app/divination-hub.html">命理宝鉴主页面</a>...</p>
+<div class="bg-deco"></div>
+<div class="brand">
+<h1>☰ 命理宝鉴</h1>
+<p>易道智鉴 · 国学智慧平台</p>
+</div>
+<div class="cards">
+<a href="app/divination-hub.html" class="card">
+<div class="card-icon">🔮</div>
+<div class="card-title">命理排盘</div>
+<div class="card-desc">八字·紫微·六壬·奇门·梅花·风水·六爻</div>
+</a>
+<a href="app/tcm-clinic.html" class="card">
+<div class="card-icon">🏥</div>
+<div class="card-title">中医诊疗</div>
+<div class="card-desc">三角色协作·大师分析·医生诊疗·病患报告</div>
+</a>
+<a href="app/divination-integrated.html" class="card">
+<div class="card-icon">🧬</div>
+<div class="card-title">体质调理</div>
+<div class="card-desc">五行体质·个性化养生方案</div>
+</a>
+<a href="app/divination-almanac.html" class="card">
+<div class="card-icon">📅</div>
+<div class="card-title">黄历</div>
+<div class="card-desc">每日宜忌·节气·吉时方位</div>
+</a>
+<a href="app/nihaisha-knowledge.html" class="card">
+<div class="card-icon">🪷</div>
+<div class="card-title">倪师知识库</div>
+<div class="card-desc">46模块·伤寒金匮·针灸本草·天纪心法</div>
+</a>
+<a href="app/nihaisha-tool.html" class="card">
+<div class="card-icon">🔬</div>
+<div class="card-title">倪师工具</div>
+<div class="card-desc">症状检索·方证对应·穴位查询</div>
+</a>
+<a href="app/shuhan-knowledge.html" class="card">
+<div class="card-icon">🎯</div>
+<div class="card-title">舒晗知识库</div>
+<div class="card-desc">命理秘笈·实战心法·进阶课程</div>
+</a>
+<a href="app/divination-knowledge.html" class="card">
+<div class="card-icon">📚</div>
+<div class="card-title">知识库</div>
+<div class="card-desc">综合国学·权威典籍·口诀汇编</div>
+</a>
+<a href="app/login.html" class="card">
+<div class="card-icon">🔐</div>
+<div class="card-title">登录</div>
+<div class="card-desc">会员中心·诊疗记录·个人设置</div>
+</a>
+</div>
+<div class="footer">命理宝鉴 · 易道智鉴 · 仅供学习参考</div>
 </body>
 </html>
