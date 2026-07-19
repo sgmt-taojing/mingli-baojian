@@ -400,7 +400,7 @@ function getBaziDimensionHTML(dayStem, dayEle) {
   html += '<div class="analysis-card" style="text-align:center;border:1px solid rgba(201,168,76,.2);margin-top:20px">';
   html += '<h5 style="color:var(--gold);font-size:16px;letter-spacing:4px;margin-bottom:16px">🎯 命格总结</h5>';
   html += '<div style="font-size:28px;color:var(--gold);font-family:\'Ma Shan Zheng\',serif;margin-bottom:12px">' + summary.nature + '</div>';
-  html += '<p style="font-size:14px;line-height:2;opacity:.8">' + summary.talent + '</p>';
+  html += '<p class="rpt-is-84">' + summary.talent + '</p>';
   html += '<p style="font-size:14px;line-height:2;opacity:.6;margin-top:8px">' + summary.life + '</p>';
   html += '<p style="font-size:13px;color:var(--gold);margin-top:12px;font-style:italic">「' + summary.motto + '」</p>';
   html += '</div>';
@@ -423,7 +423,7 @@ function getBaziDimensionHTML(dayStem, dayEle) {
     let d = dims[i];
     html += '<div class="analysis-card" class="rpt-is-7">';
     html += '<h5 style="color:' + d.color + '">' + d.icon + ' ' + d.title + '</h5>';
-    html += '<p style="font-size:14px;line-height:2;opacity:.8">' + d.text + '</p>';
+    html += '<p class="rpt-is-84">' + d.text + '</p>';
     html += '</div>';
   }
   html += '<div class="analysis-card" style="border:1px solid rgba(201,168,76,.2);margin-top:16px">';
@@ -779,8 +779,8 @@ function getYijingReadingHTML(guaName) {
   html += '<p style="font-size:18px;font-family:\'Ma Shan Zheng\',serif;color:var(--gold);margin:16px 0">「' + r.summary + '」</p>';
   if (r.yaoci) html += '<p style="font-size:13px;line-height:1.8;opacity:.7;white-space:pre-line">' + r.yaoci + '</p>';
   if (r.analysis) html += '<p style="font-size:13px;line-height:1.8;opacity:.7;white-space:pre-line">' + r.analysis + '</p>';
-  html += '<p style="font-size:14px;line-height:2;opacity:.8">' + (r.advice || '') + '</p>';
-  if (r.timing) html += '<p style="font-size:12px;line-height:1.8;opacity:.6">⏰ ' + r.timing + '</p>';
+  html += '<p class="rpt-is-84">' + (r.advice || '') + '</p>';
+  if (r.timing) html += '<p class="rpt-is-48">⏰ ' + r.timing + '</p>';
   let dims = r.dimensions || {};
   html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:16px;text-align:center;font-size:12px">';
   html += '<div>事业：' + (dims['事业']||'') + '</div>';
@@ -1387,11 +1387,11 @@ function getQimenReadingHTML(palace) {
   html += '<p style="font-size:18px;font-family:\'Ma Shan Zheng\',serif;color:var(--violet2);margin:16px 0">「' + (r.summary||'') + '」</p>';
   if (r.detail) html += '<p style="font-size:13px;line-height:1.8;opacity:.7;white-space:pre-line">' + r.detail + '</p>';
   if (r.geju) html += '<p style="font-size:13px;line-height:1.8;opacity:.7">🏷️ ' + r.geju + '</p>';
-  if (r.kongwang) html += '<p style="font-size:12px;line-height:1.8;opacity:.6">🕳️ ' + r.kongwang + '</p>';
-  if (r.maxing) html += '<p style="font-size:12px;line-height:1.8;opacity:.6">🐎 ' + r.maxing + '</p>';
-  if (r.sihai) html += '<p style="font-size:12px;line-height:1.8;opacity:.6">⚠️ ' + r.sihai + '</p>';
-  if (r.huajie) html += '<p style="font-size:12px;line-height:1.8;opacity:.6">🛡️ ' + r.huajie + '</p>';
-  if (r.mascot) html += '<p style="font-size:12px;line-height:1.8;opacity:.6">🏆 ' + r.mascot + '</p>';
+  if (r.kongwang) html += '<p class="rpt-is-48">🕳️ ' + r.kongwang + '</p>';
+  if (r.maxing) html += '<p class="rpt-is-48">🐎 ' + r.maxing + '</p>';
+  if (r.sihai) html += '<p class="rpt-is-48">⚠️ ' + r.sihai + '</p>';
+  if (r.huajie) html += '<p class="rpt-is-48">🛡️ ' + r.huajie + '</p>';
+  if (r.mascot) html += '<p class="rpt-is-48">🏆 ' + r.mascot + '</p>';
   let dims = r.dimensions || {};
   html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:16px;text-align:center;font-size:12px">';
   html += '<div>事业：' + (dims['事业']||'') + '</div>';
@@ -1401,7 +1401,7 @@ function getQimenReadingHTML(palace) {
   // [舒晗课程校正] 新增学习和官非维度
   html += '<div>学习：' + (dims['学习']||'') + '</div>';
   html += '<div>官非：' + (dims['官非']||'') + '</div>';
-  html += '<div style="grid-column:1/-1">风水：' + (dims['风水']||'') + '</div>';
+  html += '<div class="rpt-is-85">风水：' + (dims['风水']||'') + '</div>';
   html += '</div>';
   html += '</div>';
   return html;
@@ -1414,8 +1414,8 @@ function getMeihuaReadingHTML(guaName) {
   html += '<h5 style="font-size:16px;color:var(--jade2);letter-spacing:4px">🌿 梅花断语</h5>';
   html += '<p style="font-size:18px;font-family:\'Ma Shan Zheng\',serif;color:var(--jade2);margin:16px 0">「' + (r.summary||'') + '」</p>';
   if (r.yaoci) html += '<p style="font-size:13px;line-height:1.8;opacity:.7;white-space:pre-line">' + r.yaoci + '</p>';
-  html += '<p style="font-size:14px;line-height:2;opacity:.8">' + (r.advice||'') + '</p>';
-  if (r.timing) html += '<p style="font-size:12px;line-height:1.8;opacity:.6">⏰ ' + r.timing + '</p>';
+  html += '<p class="rpt-is-84">' + (r.advice||'') + '</p>';
+  if (r.timing) html += '<p class="rpt-is-48">⏰ ' + r.timing + '</p>';
   let dims = r.dimensions || {};
   html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:16px;text-align:center;font-size:12px">';
   html += '<div>事业：' + (dims['事业']||'') + '</div>';
@@ -1445,7 +1445,7 @@ function getLiurenReadingHTML(dayStem) {
   html += '<div class="analysis-card" style="border:1px solid rgba(230,126,34,.2);margin-top:20px">';
   html += '<h5 style="font-size:16px;color:var(--orange);letter-spacing:4px">⬡ 六壬断语</h5>';
   html += '<p style="font-size:18px;font-family:\'Ma Shan Zheng\',serif;color:var(--orange);margin:16px 0">「' + r.summary + '」</p>';
-  html += '<p style="font-size:14px;line-height:2;opacity:.8">' + r.advice + '</p>';
+  html += '<p class="rpt-is-84">' + r.advice + '</p>';
   html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px;text-align:center;font-size:12px">' + r.dimension + '</div>';
   html += '</div>';
   return html;
@@ -3011,7 +3011,7 @@ function tzStep1Analyze(fileName, content, type) {
     if(isAuth){
       result.innerHTML = '<div style="padding:24px;text-align:center"><div style="font-size:48px;margin-bottom:12px">🔑</div><div style="font-size:15px;color:var(--cinn2);margin-bottom:10px;font-weight:bold">AI分析服务认证失败</div><div style="font-size:13px;color:var(--paper2);margin-bottom:16px;line-height:1.6">API代理服务的认证令牌已过期或未配置。<br>请检查 <code style="background:rgba(255,255,255,.1);padding:2px 6px;border-radius:4px">server/api-proxy-server.py</code> 的 API 配置。</div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="compute-btn" style="padding:8px 20px;font-size:12px" onclick="tzLocalFallback()">📚 使用本地知识库分析</button><button class="compute-btn" style="padding:8px 20px;font-size:12px;opacity:.5" onclick="tzStep1Analyze(\'手动输入\',\'\',\'text\')">🔄 重试</button></div></div>';
     }else{
-      result.innerHTML = '<div style="padding:20px;text-align:center"><div style="font-size:14px;color:var(--cinn2);margin-bottom:12px">⚠️ 分析服务暂时不可用</div><div style="font-size:12px;color:var(--paper2);margin-bottom:16px">请确认网络正常，AI服务可用，或稍后重试</div><div style="font-size:11px;color:var(--paper3)">错误信息: ' + escapeHtml(String(err.message || err)) + '</div><div style="margin-top:12px"><button class="compute-btn" style="padding:8px 20px;font-size:12px" onclick="tzLocalFallback()">📚 使用本地知识库分析</button></div></div>';
+      result.innerHTML = '<div style="padding:20px;text-align:center"><div style="font-size:14px;color:var(--cinn2);margin-bottom:12px">⚠️ 分析服务暂时不可用</div><div style="font-size:12px;color:var(--paper2);margin-bottom:16px">请确认网络正常，AI服务可用，或稍后重试</div><div style="font-size:11px;color:var(--paper3)">错误信息: ' + escapeHtml(String(err.message || err)) + '</div><div class="rpt-is-40"><button class="compute-btn" style="padding:8px 20px;font-size:12px" onclick="tzLocalFallback()">📚 使用本地知识库分析</button></div></div>';
     }
   });
 }
@@ -3042,7 +3042,7 @@ function tzRenderStep1Results(obj) {
   if (obj.categories && obj.categories.length) {
     obj.categories.forEach(function(cat) {
       html += '<div class="rpt-is-17"><div style="font-size:14px;color:var(--gold);font-weight:600;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(201,168,76,0.15)">' + (cat.name || '其他') + '</div>';
-      html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:rgba(201,168,76,0.06)"><th style="padding:6px 8px;text-align:left;color:var(--paper2)">指标</th><th style="padding:6px 8px;text-align:left;color:var(--paper2)">数值</th><th style="padding:6px 8px;text-align:left;color:var(--paper2)">参考范围</th><th style="padding:6px 8px;text-align:left;color:var(--paper2)">状态</th><th style="padding:6px 8px;text-align:left;color:var(--paper2)">解读</th></tr></thead><tbody>';
+      html += '<div class="rpt-is-86"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:rgba(201,168,76,0.06)"><th class="rpt-is-87">指标</th><th class="rpt-is-87">数值</th><th class="rpt-is-87">参考范围</th><th class="rpt-is-87">状态</th><th class="rpt-is-87">解读</th></tr></thead><tbody>';
       if (cat.items && cat.items.length) {
         cat.items.forEach(function(item) {
           let statusColor = 'var(--success)';
@@ -3205,7 +3205,7 @@ function tzStep2Suggestions() {
       step2Div.innerHTML = '<div style="padding:24px;text-align:center;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px"><div style="font-size:14px;color:var(--cinn2);margin-bottom:10px;font-weight:bold">🔑 AI服务认证失败</div><div style="font-size:12px;color:var(--paper2);margin-bottom:14px">API令牌已过期，正在使用本地知识库生成建议...</div></div>';
       setTimeout(function(){tzLocalStep2Fallback();},500);
     }else{
-      step2Div.innerHTML = '<div style="padding:20px;text-align:center;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px"><div style="font-size:14px;color:var(--cinn2);margin-bottom:8px">⚠️ 理疗建议生成失败</div><div style="font-size:12px;color:var(--paper2)">请确认API代理服务正在运行</div><div style="margin-top:10px"><button class="compute-btn" style="padding:6px 16px;font-size:11px" onclick="tzLocalStep2Fallback()">📚 使用本地方案</button></div></div>';
+      step2Div.innerHTML = '<div style="padding:20px;text-align:center;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px"><div style="font-size:14px;color:var(--cinn2);margin-bottom:8px">⚠️ 理疗建议生成失败</div><div style="font-size:12px;color:var(--paper2)">请确认API代理服务正在运行</div><div class="rpt-is-32"><button class="compute-btn" style="padding:6px 16px;font-size:11px" onclick="tzLocalStep2Fallback()">📚 使用本地方案</button></div></div>';
     }
   });
 }
@@ -3787,7 +3787,7 @@ function generateInterpretation(data) {
 
   if (Object.keys(tgAnalysisMap).length > 0) {
     for (let ka in tgAnalysisMap) {
-      html += '<p style="margin-bottom:6px">🔹 <b>' + ka.replace('旺','') + '格：</b>' + tgAnalysisMap[ka] + '</p>';
+      html += '<p class="rpt-is-88">🔹 <b>' + ka.replace('旺','') + '格：</b>' + tgAnalysisMap[ka] + '</p>';
     }
   } else {
     html += '<p>十神分布均衡，各项能力发展相对平均。建议在现有基础上重点培养一两个领域的专长。</p>';
@@ -3850,13 +3850,13 @@ function generateInterpretation(data) {
     if (goodStars.length > 0) {
       html += '<p style="color:var(--jade);margin-bottom:4px"><b>⭐ 吉神：</b></p>';
       for (let gs = 0; gs < goodStars.length; gs++) {
-        html += '<p style="margin-bottom:4px">• <b>' + goodStars[gs].name + '</b>：' + goodStars[gs].txt + '</p>';
+        html += '<p class="rpt-is-49">• <b>' + goodStars[gs].name + '</b>：' + goodStars[gs].txt + '</p>';
       }
     }
     if (neutralStars.length > 0) {
       html += '<p style="color:var(--orange);margin-bottom:4px;margin-top:8px"><b>⚡ 需注意：</b></p>';
       for (let ns = 0; ns < neutralStars.length; ns++) {
-        html += '<p style="margin-bottom:4px">• <b>' + neutralStars[ns].name + '</b>：' + neutralStars[ns].txt + '</p>';
+        html += '<p class="rpt-is-49">• <b>' + neutralStars[ns].name + '</b>：' + neutralStars[ns].txt + '</p>';
       }
     }
 
@@ -4203,23 +4203,23 @@ function generateInterpretation(data) {
 
     // 父母宫
     html += '<div style="margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(155,89,182,.1)">';
-    html += '<b style="color:var(--violet)">👨‍👩‍👧 父母宫（月柱）</b><br>';
+    html += '<b class="rpt-is-63">👨‍👩‍👧 父母宫（月柱）</b><br>';
     html += '<b>十神：</b>' + (yueZhuTG || '不明') + ' | <b>月支：</b>' + yueZhuZhi + '(' + yueZhiWX + ')<br>';
     html += parentAnalysis + '<br>';
     if (yueZhiDesc) html += yueZhiDesc + '<br>';
-    if (parentShensha) html += '<span style="color:var(--orange)">★ ' + parentShensha + '</span><br>';
+    if (parentShensha) html += '<span class="rpt-is-89">★ ' + parentShensha + '</span><br>';
     html += '</div>';
 
     // 兄弟宫
     html += '<div style="margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(155,89,182,.1)">';
-    html += '<b style="color:var(--violet)">🤝 兄弟宫（比劫星）</b><br>';
+    html += '<b class="rpt-is-63">🤝 兄弟宫（比劫星）</b><br>';
     html += '<b>比劫数：</b>' + bijieCount + '重<br>';
     html += brotherAnalysis + '<br>';
     html += '</div>';
 
     // 夫妻宫
     html += '<div style="margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(155,89,182,.1)">';
-    html += '<b style="color:var(--violet)">💑 夫妻宫（日支）</b><br>';
+    html += '<b class="rpt-is-63">💑 夫妻宫（日支）</b><br>';
     html += '<b>日支：</b>' + riZhi2 + '(' + riZhiWX2 + ') | <b>藏干：</b>' + (riZhiCanggan.join('') || '无') + '<br>';
     html += '<b>婚姻等级：</b><span style="color:' + (marriageLevel.indexOf('上') >= 0 ? 'var(--success)' : marriageLevel.indexOf('下') >= 0 ? 'var(--cinn2)' : 'var(--warn)') + '">' + marriageLevel + '</span><br>';
     html += spouseFeature + '<br>';
@@ -4227,12 +4227,12 @@ function generateInterpretation(data) {
     html += '</div>';
 
     // 子女宫
-    html += '<div style="margin-bottom:4px">';
-    html += '<b style="color:var(--violet)">👶 子女宫（时柱）</b><br>';
+    html += '<div class="rpt-is-49">';
+    html += '<b class="rpt-is-63">👶 子女宫（时柱）</b><br>';
     html += '<b>时干十神：</b>' + (shiZhuTG || '不明') + ' | <b>时支：</b>' + shiZhuZhi + '(' + shiZhiWX + ')<br>';
     html += childAnalysis + '<br>';
     if (childRelation) html += childRelation + '<br>';
-    if (childShensha) html += '<span style="color:var(--orange)">★ ' + childShensha + '</span><br>';
+    if (childShensha) html += '<span class="rpt-is-89">★ ' + childShensha + '</span><br>';
     html += '</div>';
 
     html += '</div></div>';
@@ -4252,7 +4252,7 @@ function generateInterpretation(data) {
     loveAdvice = '官杀星不显，缘分需要主动寻找。建议：①多参加朋友介绍；②培养共同爱好的社交圈；③缘分来时主动把握。';
   }
   if (taohua) {
-    loveAdvice += ' <span style="color:var(--orange)">★ 命带桃花，特别提醒：桃花旺人缘好，但需注意感情专一，避免陷入多角关系。</span>';
+    loveAdvice += ' <span class="rpt-is-89">★ 命带桃花，特别提醒：桃花旺人缘好，但需注意感情专一，避免陷入多角关系。</span>';
   }
 
   html += '<div style="background:rgba(192,57,43,.04);border-left:3px solid var(--cinn);padding:14px 16px;margin-bottom:14px;border-radius:0 8px 8px 0">';
@@ -4370,9 +4370,9 @@ function buildBaziPersonalizedGuidance(data) {
   let ys = wxMap[yongshen] || wxMap['木'];
 
   let html = '<div class="analysis-card" style="margin:16px 0;border:1px solid rgba(201,168,76,.25);padding:20px;background:linear-gradient(135deg,rgba(201,168,76,.05),rgba(39,174,96,.03))">';
-  html += '<h5 style="font-size:16px;color:var(--gold);letter-spacing:4px;margin-bottom:16px;">📋 个性化指导</h5>';
+  html += '<h5 class="rpt-is-90">📋 个性化指导</h5>';
   html += '<p style="font-size:12px;opacity:.6;margin-bottom:14px;">根据' + name + '的八字排盘结果，以下是为您量身定制的建议：</p>';
-  html += '<div style="font-size:13px;line-height:2.1">';
+  html += '<div class="rpt-is-91">';
 
   // 职业方位
   html += '<p><b class="rpt-is-1">🧭 有利方位：</b>' + ys.direction + '。';
@@ -4411,8 +4411,8 @@ function buildLiuyaoPersonalizedGuidance(data) {
   let guaName = data.guaName || '';
   let changedName = data.changedName || '';
   let html = '<div class="analysis-card" style="margin:16px 0;border:1px solid rgba(201,168,76,.25);padding:20px">';
-  html += '<h5 style="font-size:16px;color:var(--gold);letter-spacing:4px;margin-bottom:16px;">📋 个性化指导</h5>';
-  html += '<div style="font-size:13px;line-height:2.1">';
+  html += '<h5 class="rpt-is-90">📋 个性化指导</h5>';
+  html += '<div class="rpt-is-91">';
   html += '<p><b class="rpt-is-1">⏰ 应期判断：</b>卦象应在动爻所值之期。如动爻为寅木，则寅日或寅月为应期。变卦提示事态转变的时间节点。</p>';
   html += '<p><b class="rpt-is-1">🧭 方位指导：</b>求财宜往本卦所属方位（如乾卦往西北、坤卦往西南）；求职宜往生我之方；求医宜往天医方。</p>';
   html += '<p><b class="rpt-is-1">📊 成败分析：</b>本卦代表当下状态，变卦代表结果走向。若体用相生比和则成，体用相克则需加倍努力。</p>';
@@ -4423,8 +4423,8 @@ function buildLiuyaoPersonalizedGuidance(data) {
 
 function buildMeihuaPersonalizedGuidance(data) {
   let html = '<div class="analysis-card" style="margin:16px 0;border:1px solid rgba(201,168,76,.25);padding:20px">';
-  html += '<h5 style="font-size:16px;color:var(--gold);letter-spacing:4px;margin-bottom:16px;">📋 个性化指导</h5>';
-  html += '<div style="font-size:13px;line-height:2.1">';
+  html += '<h5 class="rpt-is-90">📋 个性化指导</h5>';
+  html += '<div class="rpt-is-91">';
   html += '<p><b class="rpt-is-1">🍂 时令分析：</b>当前时令对体用关系影响显著。体卦旺于本卦五行之季节则吉，休囚则需等待时机。</p>';
   html += '<p><b class="rpt-is-1">🔄 变卦指导：</b>变卦揭示事态发展方向。体卦不变代表自身稳固，用卦变代表外在环境变化。宜根据变卦五行与体卦关系调整策略。</p>';
   html += '</div></div>';
@@ -4433,8 +4433,8 @@ function buildMeihuaPersonalizedGuidance(data) {
 
 function buildLiurenPersonalizedGuidance(data) {
   let html = '<div class="analysis-card" style="margin:16px 0;border:1px solid rgba(201,168,76,.25);padding:20px">';
-  html += '<h5 style="font-size:16px;color:var(--gold);letter-spacing:4px;margin-bottom:16px;">📋 个性化指导</h5>';
-  html += '<div style="font-size:13px;line-height:2.1">';
+  html += '<h5 class="rpt-is-90">📋 个性化指导</h5>';
+  html += '<div class="rpt-is-91">';
   html += '<p><b class="rpt-is-1">📡 三传时序：</b>初传主事之始，中传主事之中，末传主事之终。初传吉则开局顺利，末传吉则结局圆满。</p>';
   html += '<p><b class="rpt-is-1">🧭 天将方位：</b>贵人所在方位为吉方，宜面此方行事。天空所临之方宜避，玄武所临之方防欺诈。</p>';
   html += '</div></div>';
@@ -4443,8 +4443,8 @@ function buildLiurenPersonalizedGuidance(data) {
 
 function buildZiweiPersonalizedGuidance(data) {
   let html = '<div class="analysis-card" style="margin:16px 0;border:1px solid rgba(201,168,76,.25);padding:20px">';
-  html += '<h5 style="font-size:16px;color:var(--gold);letter-spacing:4px;margin-bottom:16px;">📋 个性化指导</h5>';
-  html += '<div style="font-size:13px;line-height:2.1">';
+  html += '<h5 class="rpt-is-90">📋 个性化指导</h5>';
+  html += '<div class="rpt-is-91">';
   html += '<p><b class="rpt-is-1">📊 大限分析：</b>当前大限所在宫位决定十年运势基调。大限宫位主星吉则十年顺遂，凶星入限需谨慎应对。</p>';
   html += '<p><b class="rpt-is-1">📅 流年提醒：</b>流年宫位与本命宫位的关系决定当年运势。流年化禄入命则年运亨通，化忌入命需防灾厄。</p>';
   html += '<p><b class="rpt-is-1">💼 事业建议：</b>根据命宫主星特性选择职业方向。紫微宜管理，天机宜策划，太阳宜公职，武曲宜金融。</p>';
@@ -4901,12 +4901,12 @@ function _computeBaziImpl() {
   let coreMetrics = '';
   coreMetrics += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;margin-top:8px">';
   let _mt = mingType;
-  coreMetrics += '<div style="text-align:center;padding:10px 8px;background:rgba(201,168,76,.06);border-radius:8px;border:1px solid rgba(201,168,76,.1)"><div style="font-size:10px;opacity:.5;letter-spacing:2px">日主</div><div style="font-size:14px;font-weight:bold;color:var(--gold)">' + dayStem + '</div></div>';
-  coreMetrics += '<div style="text-align:center;padding:10px 8px;background:rgba(201,168,76,.06);border-radius:8px;border:1px solid rgba(201,168,76,.1)"><div style="font-size:10px;opacity:.5;letter-spacing:2px">格局</div><div style="font-size:14px;font-weight:bold;color:var(--gold)">' + (geju || '待定') + '</div></div>';
-  coreMetrics += '<div style="text-align:center;padding:10px 8px;background:rgba(201,168,76,.06);border-radius:8px;border:1px solid rgba(201,168,76,.1)"><div style="font-size:10px;opacity:.5;letter-spacing:2px">用神</div><div style="font-size:14px;font-weight:bold;color:var(--gold)">' + (_mt.yongshenEle || '待取') + '</div></div>';
-  coreMetrics += '<div style="text-align:center;padding:10px 8px;background:rgba(201,168,76,.06);border-radius:8px;border:1px solid rgba(201,168,76,.1)"><div style="font-size:10px;opacity:.5;letter-spacing:2px">旺衰</div><div style="font-size:14px;font-weight:bold;color:var(--gold)">' + (_mt.strengthLevel || '?') + '</div></div>';
-  coreMetrics += '<div style="text-align:center;padding:10px 8px;background:rgba(201,168,76,.06);border-radius:8px;border:1px solid rgba(201,168,76,.1)"><div style="font-size:10px;opacity:.5;letter-spacing:2px">忌神</div><div style="font-size:14px;font-weight:bold;color:var(--gold)">' + (_mt.jishenEle || '?') + '</div></div>';
-  coreMetrics += '<div style="text-align:center;padding:10px 8px;background:rgba(201,168,76,.06);border-radius:8px;border:1px solid rgba(201,168,76,.1)"><div style="font-size:10px;opacity:.5;letter-spacing:2px">同党占比</div><div style="font-size:14px;font-weight:bold;color:var(--gold)">' + (_mt.ratio ? (_mt.ratio*100).toFixed(0)+'%' : '?') + '</div></div>';
+  coreMetrics += '<div class="rpt-is-64"><div class="rpt-is-50">日主</div><div class="rpt-is-51">' + dayStem + '</div></div>';
+  coreMetrics += '<div class="rpt-is-64"><div class="rpt-is-50">格局</div><div class="rpt-is-51">' + (geju || '待定') + '</div></div>';
+  coreMetrics += '<div class="rpt-is-64"><div class="rpt-is-50">用神</div><div class="rpt-is-51">' + (_mt.yongshenEle || '待取') + '</div></div>';
+  coreMetrics += '<div class="rpt-is-64"><div class="rpt-is-50">旺衰</div><div class="rpt-is-51">' + (_mt.strengthLevel || '?') + '</div></div>';
+  coreMetrics += '<div class="rpt-is-64"><div class="rpt-is-50">忌神</div><div class="rpt-is-51">' + (_mt.jishenEle || '?') + '</div></div>';
+  coreMetrics += '<div class="rpt-is-64"><div class="rpt-is-50">同党占比</div><div class="rpt-is-51">' + (_mt.ratio ? (_mt.ratio*100).toFixed(0)+'%' : '?') + '</div></div>';
   coreMetrics += '</div>';
   // 调候提示
   if (_mt.tiaohou) {
@@ -4940,8 +4940,8 @@ function _computeBaziImpl() {
   let bzProcBox = document.getElementById('baziProcessBox');
   if (bzProcBox) {
     let bzProc = '<div class="analysis-card" style="margin:16px 0;border:1px solid rgba(201,168,76,.2);padding:20px">';
-    bzProc += '<h5 style="font-size:15px;color:var(--gold);letter-spacing:3px;margin-bottom:14px">📋 八字排盘流程</h5>';
-    bzProc += '<div style="font-size:13px;line-height:2.1;opacity:.85">';
+    bzProc += '<h5 class="rpt-is-65">📋 八字排盘流程</h5>';
+    bzProc += '<div class="rpt-is-92">';
     bzProc += '<p><b class="rpt-is-1">第一步·定四柱：</b>以出生年月日时为根基，年柱以立春为界，月柱以节气为定，日柱以子时为换日点，时柱以五子遁法起时干。';
     bzProc += '</p>';
     bzProc += '<p><b class="rpt-is-1">第二步·排十神：</b>以日干为日主（我），其余干支依五行生克定十神：比肩、劫财、食神、伤官、偏财、正财、七杀、正官、偏印、正印。';
@@ -4963,16 +4963,16 @@ function _computeBaziImpl() {
   // ── 前后推演 ──
   let bzFcBox = document.getElementById('baziForecastBox');
   if (bzFcBox) {
-    let bzFc = '<div class="analysis-card" style="margin:16px 0;border:1px solid rgba(201,168,76,.15);padding:20px">';
-    bzFc += '<h5 style="font-size:15px;color:var(--gold);letter-spacing:3px;margin-bottom:14px">🔍 前后推演</h5>';
-    bzFc += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">';
-    bzFc += '<div style="padding:14px;background:rgba(46,204,113,.05);border-radius:8px;border:1px solid rgba(46,204,113,.1)"><div style="font-size:13px;color:var(--success);font-weight:bold;margin-bottom:8px">⏪ 大运回溯</div><div style="font-size:12px;line-height:1.8;opacity:.8">';
+    let bzFc = '<div class="analysis-card" class="rpt-is-66">';
+    bzFc += '<h5 class="rpt-is-65">🔍 前后推演</h5>';
+    bzFc += '<div class="rpt-is-93">';
+    bzFc += '<div class="rpt-is-94"><div class="rpt-is-95">⏪ 大运回溯</div><div class="rpt-is-33">';
     bzFc += '<p>过往大运可验证人生轨迹：童年、少年、青年各阶段运势是否符合实际经历。</p>';
-    bzFc += '<p style="opacity:.6;margin-top:6px">大运交接之年（换柱年）多有重大变化。</p>';
+    bzFc += '<p class="rpt-is-34">大运交接之年（换柱年）多有重大变化。</p>';
     bzFc += '</div></div>';
-    bzFc += '<div style="padding:14px;background:rgba(231,76,60,.05);border-radius:8px;border:1px solid rgba(231,76,60,.1)"><div style="font-size:13px;color:var(--cinn2);font-weight:bold;margin-bottom:8px">⏩ 流年预测</div><div style="font-size:12px;line-height:1.8;opacity:.8">';
+    bzFc += '<div class="rpt-is-96"><div class="rpt-is-67">⏩ 流年预测</div><div class="rpt-is-33">';
     bzFc += '<p>结合流年干支与日主关系，预测未来运势：流年与日柱天克地冲需特别注意。</p>';
-    bzFc += '<p style="opacity:.6;margin-top:6px">流年引动命局组合，吉凶各有应期。</p>';
+    bzFc += '<p class="rpt-is-34">流年引动命局组合，吉凶各有应期。</p>';
     bzFc += '</div></div>';
     bzFc += '</div></div>';
     bzFcBox.innerHTML = bzFc;
@@ -5032,7 +5032,7 @@ function _computeBaziImpl() {
     }
     showToast('计算出错: ' + errDetail.substring(0, 80));
     document.getElementById('baziResult').classList.add('visible');
-    document.getElementById('baziResult').innerHTML = '<div style="padding:40px;text-align:center"><div style="font-size:48px;margin-bottom:16px">⚠️</div><h3 class="rpt-is-26">计算遇到问题</h3><p style="color:var(--paper2);font-size:14px;line-height:1.8">八字计算遇到异常，可能是日期输入有误或浏览器环境问题。<br><br><b>错误详情：</b>' + errDetail.substring(0, 120) + errLine + '<br><br>请尝试：<br>• 确认公历/农历日期正确（默认请输入<b>公历/阳历</b>日期）<br>• 检查出生时间是否填写<br>• 刷新页面重试</p></div>';
+    document.getElementById('baziResult').innerHTML = '<div class="rpt-is-68"><div class="rpt-is-52">⚠️</div><h3 class="rpt-is-26">计算遇到问题</h3><p class="rpt-is-69">八字计算遇到异常，可能是日期输入有误或浏览器环境问题。<br><br><b>错误详情：</b>' + errDetail.substring(0, 120) + errLine + '<br><br>请尝试：<br>• 确认公历/农历日期正确（默认请输入<b>公历/阳历</b>日期）<br>• 检查出生时间是否填写<br>• 刷新页面重试</p></div>';
   } finally {
     let _btn = document.getElementById('baziBtn'); if(_btn){ _btn.disabled=false; _btn.textContent='排 盘 演 命'; }
     let _ov = document.getElementById('loadingOverlay'); if(_ov){ _ov.classList.remove('visible'); }
@@ -5827,7 +5827,7 @@ function renderLiuNianOverview(params) {
 
     let row = document.createElement('div');
     row.className = 'liu-nian-row' + (isCurrent ? ' is-current' : '');
-    row.innerHTML = '\n      <div class="ln-year">' + yr + (ln.xusui ? ' <span style="font-size:10px;opacity:.4">' + ln.xusui + '岁</span>' : '') + '</div>\n      <div class="ln-gz">' + yrStem + yrZhi + '</div>\n      <div class="ln-grade ' + gradeClass + '">' + grade + '</div>\n      <div class="ln-tip">' + ln.ganShen + '·' + (ln.dishi || '') + '·' + rel + yrEle + '年</div>\n    ';
+    row.innerHTML = '\n      <div class="ln-year">' + yr + (ln.xusui ? ' <span class="rpt-is-53">' + ln.xusui + '岁</span>' : '') + '</div>\n      <div class="ln-gz">' + yrStem + yrZhi + '</div>\n      <div class="ln-grade ' + gradeClass + '">' + grade + '</div>\n      <div class="ln-tip">' + ln.ganShen + '·' + (ln.dishi || '') + '·' + rel + yrEle + '年</div>\n    ';
     list.appendChild(row);
   });
 }
@@ -6134,7 +6134,7 @@ function renderKaiyunGuide(params) {
       <div class="kaiyun-grid">
         ${crystals.map(c => `<div class="kaiyun-item"><div class="ki-icon">💎</div><div class="ki-label">${c}</div><div class="ki-value">${dayEle}命宜</div></div>`).join('')}
       </div>
-      <div class="kaiyun-list" style="margin-top:12px">
+      <div class="kaiyun-list" class="rpt-is-40">
         <div class="kaiyun-list-item"><span class="kli-icon">💡</span><span class="kli-text">喜用神为${xiEle},补${xiEle}色水晶最佳；${weakestEle}为忌神，避免${weakestEle}色水晶</span></div>
       </div>
     </div>
@@ -6149,7 +6149,7 @@ function renderKaiyunGuide(params) {
           </div>`;
         }).join('')}
       </div>
-      <div class="kaiyun-list" style="margin-top:10px">
+      <div class="kaiyun-list" class="rpt-is-32">
         <div class="kaiyun-list-item"><span class="kli-icon">💡</span><span class="kli-text">最佳数字:${nums.join('、')},可作手机尾号、车牌号等</span></div>
       </div>
     </div>
@@ -6178,13 +6178,13 @@ function renderKaiyunGuide(params) {
           </div>`;
         }).join('')}
         ${['子时23-01','寅时03-05'].map(t => `
-          <div class="kaiyun-jishi-item" style="opacity:.6">
+          <div class="kaiyun-jishi-item" class="rpt-is-54">
             <div class="kji-time">${t}</div>
             <div class="kji-desc">${dayEle}气平稳</div>
           </div>
         `).join('')}
       </div>
-      <div class="kaiyun-list" style="margin-top:10px">
+      <div class="kaiyun-list" class="rpt-is-32">
         <div class="kaiyun-list-item"><span class="kli-icon">💡</span><span class="kli-text">重要决策、商务谈判宜在吉时进行，可提升成功率</span></div>
       </div>
     </div>
@@ -6193,7 +6193,7 @@ function renderKaiyunGuide(params) {
       <div class="kaiyun-grid">
         ${getColorItems(dayEle, xiEle, weakestEle)}
       </div>
-      <div class="kaiyun-list" style="margin-top:10px">
+      <div class="kaiyun-list" class="rpt-is-32">
         <div class="kaiyun-list-item"><span class="kli-icon">👔</span><span class="kli-text">日常穿搭多使用喜用神颜色，有助于增强运势；${weakestEle}色宜少用</span></div>
       </div>
     </div>
@@ -6282,7 +6282,7 @@ function renderClassicRef(params) {
       <h5>📜 经典论命出处</h5>
       ${refs.map(r => `
         <div style="margin-top:12px;padding:12px;background:rgba(255,255,255,.02);border-left:2px solid var(--gold)">
-          <p style="font-size:11px;color:var(--gold);letter-spacing:2px">${r.book}</p>
+          <p class="rpt-is-98">${r.book}</p>
           <p style="margin-top:6px;font-size:13px;line-height:1.8;letter-spacing:1px">${r.text}</p>
         </div>
       `).join('')}
@@ -7484,7 +7484,7 @@ function getTaisuiHuajie(birthYear, birthBranchIdx, currentZhiIdx) {
     <p>当年太岁:<strong>${taiSuiZodiac}</strong>(${currentYear}年 ${yearGanZhiStr})</p>
     <p>太岁关系:<strong>${relation}</strong></p>
     <p>太岁方位:<strong>${taiSuiFangwei}</strong>方（不宜动土修造）</p>
-    <p style="margin-top:12px">${solution}</p>
+    <p class="rpt-is-40">${solution}</p>
   </div>`;
 
   // 明年太岁预判
@@ -7645,7 +7645,7 @@ function getAnnualReminder(hj) {
   </div>`;
 
   // 今年特别提醒
-  html += `<div style="margin-top:20px">
+  html += `<div class="rpt-is-35">
     <h5 style="font-size:14px;letter-spacing:3px;color:var(--gold);margin-bottom:12px">今年特别提醒</h5>
     <ul class="huajie-checklist">`;
 
@@ -7705,8 +7705,8 @@ function getAnnualReminder(hj) {
   for (const m of monthly) {
     const luckColor = m.luck === '吉' ? 'var(--success)' : m.luck === '凶' ? 'var(--cinn2)' : 'rgba(201,168,76,.5)';
     html += `<div class="month-detail" style="border:1px solid rgba(201,168,76,.08);padding:14px 16px;margin-bottom:8px;background:rgba(255,255,255,.01)">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-        <span style="font-size:13px;letter-spacing:3px">${m.name} <small style="opacity:.4">${m.gan}${m.zhi}</small></span>
+      <div class="rpt-is-36">
+        <span style="font-size:13px;letter-spacing:3px">${m.name} <small class="rpt-is-99">${m.gan}${m.zhi}</small></span>
         <span style="color:${luckColor};font-size:12px;border:1px solid ${luckColor};padding:2px 10px;border-radius:2px">${m.luck}</span>
       </div>
       <p style="font-size:12px;opacity:.65;line-height:1.7">${m.focus}</p>
@@ -7953,7 +7953,7 @@ function yjStart(mode) {
   console.error('[六爻占卜错误]', e.message, e.stack);
   showToast('六爻占卜错误，请稍后重试');
   let _eb = document.getElementById('yjDivArea') || document.getElementById('yjResult');
-  if(_eb) _eb.innerHTML = '<div class="rpt-is-27"><h5 class="rpt-is-3">❌ 六爻占卜出错</h5><p class="rpt-is-28">'+e.message+'</p><p style="font-size:11px;opacity:.5;margin-top:4px">'+(e.stack||'').split("\n").slice(0,3).join("<br>")+'</p></div>';
+  if(_eb) _eb.innerHTML = '<div class="rpt-is-27"><h5 class="rpt-is-3">❌ 六爻占卜出错</h5><p class="rpt-is-28">'+e.message+'</p><p class="rpt-is-55">'+(e.stack||'').split("\n").slice(0,3).join("<br>")+'</p></div>';
   let _r = document.getElementById('yjResult'); if(_r){_r.classList.add('visible');_r.scrollIntoView({behavior:'smooth'});}
  }
 }
@@ -8238,7 +8238,7 @@ function showYjResult() {
   duanguaHtml += '<p class="rpt-is-20"><strong class="rpt-is-3">用神选取</strong>:占事不同，用神不同。';
   duanguaHtml += '占事业看官鬼，占财运看妻财，占婚姻看妻财(男命)或官鬼(女命),占疾病看官鬼，占出行看世应。</p>';
   // 世应关系
-  duanguaHtml += '<p class="rpt-is-20"><strong style="color:var(--cyan)">世应关系</strong>:世爻代表自己，应爻代表对方或事情。';
+  duanguaHtml += '<p class="rpt-is-20"><strong class="rpt-is-100">世应关系</strong>:世爻代表自己，应爻代表对方或事情。';
   duanguaHtml += '世爻旺相则己方有利，应爻旺相则对方有利。世应相生则事易成，世应相克则事难成。</p>';
   // 六亲关系
   duanguaHtml += '<p class="rpt-is-20"><strong class="rpt-is-12">六亲关系</strong>:父母、兄弟、子孙、妻财、官鬼，各有其用。';
@@ -8549,7 +8549,7 @@ function computeQimen() {
   console.error('[奇门排盘错误]', e.message, e.stack);
   showToast('奇门排盘错误，请稍后重试');
   let errBox = document.getElementById('qmInterp') || document.getElementById('qmResult');
-  if(errBox) errBox.innerHTML = '<div class="rpt-is-27"><h5 class="rpt-is-3">❌ 排盘出错</h5><p class="rpt-is-28">错误: '+e.message+'</p><p style="font-size:11px;opacity:.5;margin-top:4px">'+(e.stack||'').split('\n').slice(0,3).join('<br>')+'</p></div>';
+  if(errBox) errBox.innerHTML = '<div class="rpt-is-27"><h5 class="rpt-is-3">❌ 排盘出错</h5><p class="rpt-is-28">错误: '+e.message+'</p><p class="rpt-is-55">'+(e.stack||'').split('\n').slice(0,3).join('<br>')+'</p></div>';
   let r = document.getElementById('qmResult'); if(r){r.classList.add('visible');r.scrollIntoView({behavior:'smooth'});}
  }
 }
@@ -8609,10 +8609,10 @@ function _computeQimenImpl() {
   // ── 显示四柱 ──
   document.getElementById('qmMeta').innerHTML = 
     '<div style="display:flex;justify-content:center;gap:24px;margin:16px 0">' +
-    '<div class="rpt-is-11"><div style="font-size:11px;color:var(--gold);letter-spacing:2px">年柱</div><div style="font-size:24px;font-family:\'Ma Shan Zheng\',serif;color:var(--paper)">' + yearStem + yearBranch + '</div></div>' +
-    '<div class="rpt-is-11"><div style="font-size:11px;color:var(--gold);letter-spacing:2px">月柱</div><div style="font-size:24px;font-family:\'Ma Shan Zheng\',serif;color:var(--paper)">' + monthStem + monthBranch + '</div></div>' +
-    '<div class="rpt-is-11"><div style="font-size:11px;color:var(--gold);letter-spacing:2px">日柱</div><div style="font-size:24px;font-family:\'Ma Shan Zheng\',serif;color:var(--paper)">' + dayStem + dayBranch + '</div></div>' +
-    '<div class="rpt-is-11"><div style="font-size:11px;color:var(--gold);letter-spacing:2px">时柱</div><div style="font-size:24px;font-family:\'Ma Shan Zheng\',serif;color:var(--paper)">' + hourStem + hourBranch + '</div></div>' +
+    '<div class="rpt-is-11"><div class="rpt-is-98">年柱</div><div style="font-size:24px;font-family:\'Ma Shan Zheng\',serif;color:var(--paper)">' + yearStem + yearBranch + '</div></div>' +
+    '<div class="rpt-is-11"><div class="rpt-is-98">月柱</div><div style="font-size:24px;font-family:\'Ma Shan Zheng\',serif;color:var(--paper)">' + monthStem + monthBranch + '</div></div>' +
+    '<div class="rpt-is-11"><div class="rpt-is-98">日柱</div><div style="font-size:24px;font-family:\'Ma Shan Zheng\',serif;color:var(--paper)">' + dayStem + dayBranch + '</div></div>' +
+    '<div class="rpt-is-11"><div class="rpt-is-98">时柱</div><div style="font-size:24px;font-family:\'Ma Shan Zheng\',serif;color:var(--paper)">' + hourStem + hourBranch + '</div></div>' +
     '</div>' +
     (lunarStr ? '<div style="text-align:center;font-size:12px;color:var(--gold);opacity:.6;margin-top:4px">农历 ' + lunarStr + ' · ' + (calMode==='lunar'?'(农历输入→已转阳历)':'(阳历自动转换)') + '</div>' : '');
 
@@ -8845,7 +8845,7 @@ function _computeQimenImpl() {
   if (processBox) {
     let processHTML = '<div class="analysis-card" style="margin:16px 0;border:1px solid rgba(155,89,182,.2);padding:20px">';
     processHTML += '<h5 style="font-size:15px;color:var(--violet2);letter-spacing:3px;margin-bottom:14px">📋 奇门起局流程</h5>';
-    processHTML += '<div style="font-size:13px;line-height:2.1;opacity:.85">';
+    processHTML += '<div class="rpt-is-92">';
     processHTML += '<p><b class="rpt-is-1">第一步·定局：</b>' + (isYangDun?'阳':'阴') + '遁' + juNum + '局。';
     let jqInfo = typeof _getJieqi === 'function' ? _getJieqi(month, day) : '';
     if(jqInfo) processHTML += '当前节气「' + jqInfo + '」，' + (isYangDun?'阳气上升，用阳遁':'阴气下降，用阴遁') + '。';
@@ -8873,32 +8873,32 @@ function _computeQimenImpl() {
   // ── 前后推演 ──
   let forecastBox = document.getElementById('qmForecastBox');
   if (forecastBox) {
-    let forecastHTML = '<div class="analysis-card" style="margin:16px 0;border:1px solid rgba(201,168,76,.15);padding:20px">';
-    forecastHTML += '<h5 style="font-size:15px;color:var(--gold);letter-spacing:3px;margin-bottom:14px">🔍 前后推演</h5>';
-    forecastHTML += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">';
+    let forecastHTML = '<div class="analysis-card" class="rpt-is-66">';
+    forecastHTML += '<h5 class="rpt-is-65">🔍 前后推演</h5>';
+    forecastHTML += '<div class="rpt-is-93">';
     // 往前排验证
-    forecastHTML += '<div style="padding:14px;background:rgba(46,204,113,.05);border-radius:8px;border:1px solid rgba(46,204,113,.1)">';
-    forecastHTML += '<div style="font-size:13px;color:var(--success);font-weight:bold;margin-bottom:8px">⏪ 往前排验证</div>';
-    forecastHTML += '<div style="font-size:12px;line-height:1.8;opacity:.8">';
+    forecastHTML += '<div class="rpt-is-94">';
+    forecastHTML += '<div class="rpt-is-95">⏪ 往前排验证</div>';
+    forecastHTML += '<div class="rpt-is-33">';
     let prevDate = new Date(year, month-1, day-1);
     let prevObj = getYearStemBranch(prevDate.getFullYear(), prevDate.getMonth()+1, prevDate.getDate());
     forecastHTML += '<p>前一日：' + prevObj.stem + prevObj.branch + '日，' + (prevDate.getMonth()+1) + '月' + prevDate.getDate() + '日</p>';
     let prev2Date = new Date(year, month-1, day-3);
     let prev2Obj = getYearStemBranch(prev2Date.getFullYear(), prev2Date.getMonth()+1, prev2Date.getDate());
     forecastHTML += '<p>前三日：' + prev2Obj.stem + prev2Obj.branch + '日</p>';
-    forecastHTML += '<p style="opacity:.6;margin-top:6px">可用于验证历史事件的盘面走势</p>';
+    forecastHTML += '<p class="rpt-is-34">可用于验证历史事件的盘面走势</p>';
     forecastHTML += '</div></div>';
     // 往后排预测
-    forecastHTML += '<div style="padding:14px;background:rgba(231,76,60,.05);border-radius:8px;border:1px solid rgba(231,76,60,.1)">';
-    forecastHTML += '<div style="font-size:13px;color:var(--cinn2);font-weight:bold;margin-bottom:8px">⏩ 往后排预测</div>';
-    forecastHTML += '<div style="font-size:12px;line-height:1.8;opacity:.8">';
+    forecastHTML += '<div class="rpt-is-96">';
+    forecastHTML += '<div class="rpt-is-67">⏩ 往后排预测</div>';
+    forecastHTML += '<div class="rpt-is-33">';
     let nextDate = new Date(year, month-1, day+1);
     let nextObj = getYearStemBranch(nextDate.getFullYear(), nextDate.getMonth()+1, nextDate.getDate());
     forecastHTML += '<p>后一日：' + nextObj.stem + nextObj.branch + '日，' + (nextDate.getMonth()+1) + '月' + nextDate.getDate() + '日</p>';
     let next7Date = new Date(year, month-1, day+7);
     let next7Obj = getYearStemBranch(next7Date.getFullYear(), next7Date.getMonth()+1, next7Date.getDate());
     forecastHTML += '<p>后七日：' + next7Obj.stem + next7Obj.branch + '日</p>';
-    forecastHTML += '<p style="opacity:.6;margin-top:6px">可用于预测未来走势与预防</p>';
+    forecastHTML += '<p class="rpt-is-34">可用于预测未来走势与预防</p>';
     forecastHTML += '</div></div>';
     forecastHTML += '</div>';
     // 当前盘面总结
@@ -8984,7 +8984,7 @@ function _computeQimenImpl() {
     if (_sqds.length > 0) {
       _specialHTML += '<p style="font-size:12px;color:var(--success);margin-top:6px">✅ 三奇得使：' + _sqds.join('；') + '</p>';
     } else {
-      _specialHTML += '<p style="font-size:12px;opacity:.6;margin-top:6px">三奇得使：无</p>';
+      _specialHTML += '<p class="rpt-is-101">三奇得使：无</p>';
     }
     if (_wuby) {
       _specialHTML += '<p style="font-size:12px;color:var(--cinn2);margin-top:6px">⚠️ 五不遇时：时干' + hourStem + '克日干' + dayStem + '，大凶之象，凡事不宜。</p>';
@@ -9194,7 +9194,7 @@ function buildSihaiHTML(sihaiList) {
   }
   let typeLabel = {门迫:'🚪 门迫',击刑:'⚡ 击刑',空亡:'🕳️ 空亡',入墓:'📦 入墓'};
   let severityColor = {严重:'var(--cinn2)',次重:'var(--warn)',一般:'var(--orange)'};
-  let html = '<div style="margin-top:20px"><div style="font-size:14px;color:var(--gold);letter-spacing:3px;text-align:center;margin-bottom:12px">⚠️ 四害检测 · ' + sihaiList.length + '项</div>';
+  let html = '<div class="rpt-is-35"><div style="font-size:14px;color:var(--gold);letter-spacing:3px;text-align:center;margin-bottom:12px">⚠️ 四害检测 · ' + sihaiList.length + '项</div>';
   for (let i=0; i<sihaiList.length; i++) {
     let s = sihaiList[i];
     let sc = severityColor[s.severity] || 'var(--warn)';
@@ -9302,7 +9302,7 @@ function buildQimenInterpretation(isYangDun, juNum, jiuxing, bamen, bashen, pala
     html += '</p>';
     html += '<p style="font-size:13px;line-height:2;color:var(--paper2);margin-top:4px">';
     html += '星:' + (zsp?.star?.name||'') + ' · 门:' + (zsp?.door?.name||'') + ' · 神:' + (zsp?.god?.name||'') + '</p>';
-    html += '<p style="font-size:13px;line-height:2;color:var(--paper2)">';
+    html += '<p class="rpt-is-102">';
     html += '组合简析：' + getComboText(zsp?.star?.name, zsp?.door?.name) + '。' + getDoorAdvice(zsp?.door?.name||'') + '</p>';
     html += '</div>';
   }
@@ -9385,7 +9385,7 @@ function buildQimenInterpretation(isYangDun, juNum, jiuxing, bamen, bashen, pala
     html += '以下方位吉星吉门汇聚，为最佳行动方位：</p>';
     for (let ji=0; ji<jiPalaces.length; ji++) {
       let jp = jiPalaces[ji];
-      html += '<p style="font-size:13px;line-height:2;color:var(--paper2)">🏆 <strong>' + (jp.info?jp.info.name:'') + '</strong>（' + (jp.info?jp.info.dir:'') + '方）：' + jp.star + '星 + ' + jp.door + '门。宜在此方进行重要活动，择' + jp.door + '门所主之时辰行动效果更佳。</p>';
+      html += '<p class="rpt-is-102">🏆 <strong>' + (jp.info?jp.info.name:'') + '</strong>（' + (jp.info?jp.info.dir:'') + '方）：' + jp.star + '星 + ' + jp.door + '门。宜在此方进行重要活动，择' + jp.door + '门所主之时辰行动效果更佳。</p>';
     }
   } else {
     html += '当前暂无星门俱佳的方位。建议等待吉门吉星临宫之时再行动。值使门' + bamen + '临' + kp.name + '，此为全局枢纽，所有行动宜以此为核心。</p>';
@@ -9452,7 +9452,7 @@ function buildLiunianHTML(year, palaces) {
       jixiong: LIUNIAN_JIXIONG[starVal]
     };
   }
-  let html = '<div style="margin-top:20px">';
+  let html = '<div class="rpt-is-35">';
   html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">';
   html += '<div style="font-size:14px;color:var(--gold);letter-spacing:3px">🌟 ' + year + '年 流年飞星</div>';
   html += '<div style="display:flex;gap:8px">';
@@ -9800,7 +9800,7 @@ function computeZiWei() {
   console.error('[紫微斗数错误]', e.message, e.stack);
   showToast('紫微斗数错误，请稍后重试');
   let _eb = document.getElementById('zwResult') || document.getElementById('zwResult');
-  if(_eb) _eb.innerHTML = '<div class="rpt-is-27"><h5 class="rpt-is-3">❌ 紫微斗数出错</h5><p class="rpt-is-28">'+e.message+'</p><p style="font-size:11px;opacity:.5;margin-top:4px">'+(e.stack||'').split("\n").slice(0,3).join("<br>")+'</p></div>';
+  if(_eb) _eb.innerHTML = '<div class="rpt-is-27"><h5 class="rpt-is-3">❌ 紫微斗数出错</h5><p class="rpt-is-28">'+e.message+'</p><p class="rpt-is-55">'+(e.stack||'').split("\n").slice(0,3).join("<br>")+'</p></div>';
   let _r = document.getElementById('zwResult'); if(_r){_r.classList.add('visible');_r.scrollIntoView({behavior:'smooth'});}
  }
 }
@@ -9886,7 +9886,7 @@ function _computeZiWeiImpl() {
   const fc = document.getElementById('zwFourChange');
   fc.innerHTML = `
     <div class="interp-item"><p class="ii-label">化禄</p><p class="ii-value" class="rpt-is-3">${sihua.lu.name}</p><p class="ii-desc">${sihua.lu.desc} · 在${sihua.lu.gong}宫</p></div>
-    <div class="interp-item"><p class="ii-label">化权</p><p class="ii-value" style="color:var(--cyan)">${sihua.quan.name}</p><p class="ii-desc">${sihua.quan.desc} · 在${sihua.quan.gong}宫</p></div>
+    <div class="interp-item"><p class="ii-label">化权</p><p class="ii-value" class="rpt-is-100">${sihua.quan.name}</p><p class="ii-desc">${sihua.quan.desc} · 在${sihua.quan.gong}宫</p></div>
     <div class="interp-item"><p class="ii-label">化科</p><p class="ii-value" class="rpt-is-12">${sihua.ke.name}</p><p class="ii-desc">${sihua.ke.desc} · 在${sihua.ke.gong}宫</p></div>
     <div class="interp-item"><p class="ii-label">化忌</p><p class="ii-value" style="color:var(--cinn)">${sihua.ji.name}</p><p class="ii-desc">${sihua.ji.desc} · 在${sihua.ji.gong}宫</p></div>
   `;
@@ -10020,7 +10020,7 @@ function _computeZiWeiImpl() {
   if (zwProcBox) {
     let zwProc = '<div class="analysis-card" style="margin:16px 0;border:1px solid rgba(231,76,60,.2);padding:20px">';
     zwProc += '<h5 style="font-size:15px;color:var(--fire2);letter-spacing:3px;margin-bottom:14px">📋 紫微排盘流程</h5>';
-    zwProc += '<div style="font-size:13px;line-height:2.1;opacity:.85">';
+    zwProc += '<div class="rpt-is-92">';
     zwProc += '<p><b class="rpt-is-1">第一步·定命宫：</b>从寅宫起正月，顺数至出生月，再从该宫起子时，逆数至出生时辰，即为命宫所在。命宫为一生之主，定十二宫之根基。';
     zwProc += '</p>';
     zwProc += '<p><b class="rpt-is-1">第二步·定身宫：</b>从寅宫起正月，顺数至出生月，再从该宫起子时，顺数至出生时辰，即为身宫。身宫代表后天造化。';
@@ -10042,16 +10042,16 @@ function _computeZiWeiImpl() {
   // ── 前后推演 ──
   let zwFcBox = document.getElementById('zwForecastBox');
   if (zwFcBox) {
-    let zwFc = '<div class="analysis-card" style="margin:16px 0;border:1px solid rgba(201,168,76,.15);padding:20px">';
-    zwFc += '<h5 style="font-size:15px;color:var(--gold);letter-spacing:3px;margin-bottom:14px">🔍 前后推演</h5>';
-    zwFc += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">';
-    zwFc += '<div style="padding:14px;background:rgba(46,204,113,.05);border-radius:8px;border:1px solid rgba(46,204,113,.1)"><div style="font-size:13px;color:var(--success);font-weight:bold;margin-bottom:8px">⏪ 大限回溯</div><div style="font-size:12px;line-height:1.8;opacity:.8">';
+    let zwFc = '<div class="analysis-card" class="rpt-is-66">';
+    zwFc += '<h5 class="rpt-is-65">🔍 前后推演</h5>';
+    zwFc += '<div class="rpt-is-93">';
+    zwFc += '<div class="rpt-is-94"><div class="rpt-is-95">⏪ 大限回溯</div><div class="rpt-is-33">';
     zwFc += '<p>命宫大限主一生基本格局，可回溯过往大限验证人生轨迹。</p>';
-    zwFc += '<p style="opacity:.6;margin-top:6px">十年一大限，大限交接之年最需关注。</p>';
+    zwFc += '<p class="rpt-is-34">十年一大限，大限交接之年最需关注。</p>';
     zwFc += '</div></div>';
-    zwFc += '<div style="padding:14px;background:rgba(231,76,60,.05);border-radius:8px;border:1px solid rgba(231,76,60,.1)"><div style="font-size:13px;color:var(--cinn2);font-weight:bold;margin-bottom:8px">⏩ 流年预测</div><div style="font-size:12px;line-height:1.8;opacity:.8">';
+    zwFc += '<div class="rpt-is-96"><div class="rpt-is-67">⏩ 流年预测</div><div class="rpt-is-33">';
     zwFc += '<p>结合流年命宫、流年四化，可预测未来运势走向。</p>';
-    zwFc += '<p style="opacity:.6;margin-top:6px">流年命宫所在宫位 + 四化飞星，断年度吉凶。</p>';
+    zwFc += '<p class="rpt-is-34">流年命宫所在宫位 + 四化飞星，断年度吉凶。</p>';
     zwFc += '</div></div>';
     zwFc += '</div></div>';
     zwFcBox.innerHTML = zwFc;
@@ -10631,7 +10631,7 @@ function computeMeiHua() {
   console.error('[梅花易数错误]', e.message, e.stack);
   showToast('梅花易数错误，请稍后重试');
   let _eb = document.getElementById('mhInterp') || document.getElementById('mhResult');
-  if(_eb) _eb.innerHTML = '<div class="rpt-is-27"><h5 class="rpt-is-3">❌ 梅花易数出错</h5><p class="rpt-is-28">'+e.message+'</p><p style="font-size:11px;opacity:.5;margin-top:4px">'+(e.stack||'').split("\n").slice(0,3).join("<br>")+'</p></div>';
+  if(_eb) _eb.innerHTML = '<div class="rpt-is-27"><h5 class="rpt-is-3">❌ 梅花易数出错</h5><p class="rpt-is-28">'+e.message+'</p><p class="rpt-is-55">'+(e.stack||'').split("\n").slice(0,3).join("<br>")+'</p></div>';
   let _r = document.getElementById('mhResult'); if(_r){_r.classList.add('visible');_r.scrollIntoView({behavior:'smooth'});}
  }
 }
@@ -10836,7 +10836,7 @@ function _computeMeiHuaImpl() {
   if (mhProcBox) {
     let mhProc = '<div class="analysis-card" style="margin:16px 0;border:1px solid rgba(39,174,96,.2);padding:20px">';
     mhProc += '<h5 style="font-size:15px;color:var(--jade2);letter-spacing:3px;margin-bottom:14px">📋 梅花易数起卦流程</h5>';
-    mhProc += '<div style="font-size:13px;line-height:2.1;opacity:.85">';
+    mhProc += '<div class="rpt-is-92">';
     mhProc += '<p><b class="rpt-is-1">第一步·取数：</b>以三个数字起卦，上卦=数1÷8取余，下卦=数2÷8取余，动爻=(数1+数2+数3)÷6取余。此为「万物皆数」之法。';
     mhProc += '</p>';
     mhProc += '<p><b class="rpt-is-1">第二步·装卦：</b>上卦在上，下卦在下，组成六十四卦中的一卦。动爻所在之爻变，得变卦。本卦代表当下，变卦代表未来。';
@@ -10856,16 +10856,16 @@ function _computeMeiHuaImpl() {
   // ── 前后推演 ──
   let mhFcBox = document.getElementById('mhForecastBox');
   if (mhFcBox) {
-    let mhFc = '<div class="analysis-card" style="margin:16px 0;border:1px solid rgba(201,168,76,.15);padding:20px">';
-    mhFc += '<h5 style="font-size:15px;color:var(--gold);letter-spacing:3px;margin-bottom:14px">🔍 前后推演</h5>';
-    mhFc += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">';
-    mhFc += '<div style="padding:14px;background:rgba(46,204,113,.05);border-radius:8px;border:1px solid rgba(46,204,113,.1)"><div style="font-size:13px;color:var(--success);font-weight:bold;margin-bottom:8px">⏪ 本卦回溯</div><div style="font-size:12px;line-height:1.8;opacity:.8">';
+    let mhFc = '<div class="analysis-card" class="rpt-is-66">';
+    mhFc += '<h5 class="rpt-is-65">🔍 前后推演</h5>';
+    mhFc += '<div class="rpt-is-93">';
+    mhFc += '<div class="rpt-is-94"><div class="rpt-is-95">⏪ 本卦回溯</div><div class="rpt-is-33">';
     mhFc += '<p>本卦代表当下事态之始，变卦代表事态之终。</p>';
-    mhFc += '<p style="opacity:.6;margin-top:6px">可回溯过往相同卦象，验证人事走向。</p>';
+    mhFc += '<p class="rpt-is-34">可回溯过往相同卦象，验证人事走向。</p>';
     mhFc += '</div></div>';
-    mhFc += '<div style="padding:14px;background:rgba(231,76,60,.05);border-radius:8px;border:1px solid rgba(231,76,60,.1)"><div style="font-size:13px;color:var(--cinn2);font-weight:bold;margin-bottom:8px">⏩ 变卦预测</div><div style="font-size:12px;line-height:1.8;opacity:.8">';
+    mhFc += '<div class="rpt-is-96"><div class="rpt-is-67">⏩ 变卦预测</div><div class="rpt-is-33">';
     mhFc += '<p>变卦代表事态发展方向，动爻变化提示转机。</p>';
-    mhFc += '<p style="opacity:.6;margin-top:6px">结合互卦判断中间过程，变卦断最终结果。</p>';
+    mhFc += '<p class="rpt-is-34">结合互卦判断中间过程，变卦断最终结果。</p>';
     mhFc += '</div></div>';
     mhFc += '</div></div>';
     mhFcBox.innerHTML = mhFc;
@@ -11671,7 +11671,7 @@ function computeLiuRen() {
   console.error('[大六壬错误]', e.message, e.stack);
   showToast('大六壬错误，请稍后重试');
   let _eb = document.getElementById('lrInterp') || document.getElementById('lrResult');
-  if(_eb) _eb.innerHTML = '<div class="rpt-is-27"><h5 class="rpt-is-3">❌ 大六壬出错</h5><p class="rpt-is-28">'+e.message+'</p><p style="font-size:11px;opacity:.5;margin-top:4px">'+(e.stack||'').split("\n").slice(0,3).join("<br>")+'</p></div>';
+  if(_eb) _eb.innerHTML = '<div class="rpt-is-27"><h5 class="rpt-is-3">❌ 大六壬出错</h5><p class="rpt-is-28">'+e.message+'</p><p class="rpt-is-55">'+(e.stack||'').split("\n").slice(0,3).join("<br>")+'</p></div>';
   let _r = document.getElementById('lrResult'); if(_r){_r.classList.add('visible');_r.scrollIntoView({behavior:'smooth'});}
  }
 }
@@ -11740,7 +11740,7 @@ function _computeLiuRenImpl() {
   if (lrProcBox) {
     let lrProc = '<div class="analysis-card" style="margin:16px 0;border:1px solid rgba(230,126,34,.2);padding:20px">';
     lrProc += '<h5 style="font-size:15px;color:var(--orange);letter-spacing:3px;margin-bottom:14px">📋 六壬起课流程</h5>';
-    lrProc += '<div style="font-size:13px;line-height:2.1;opacity:.85">';
+    lrProc += '<div class="rpt-is-92">';
     lrProc += '<p><b class="rpt-is-1">第一步·定四柱：</b>日柱' + dayStem + dayBranch + '，时柱' + (typeof hourStem!=='undefined'?hourStem:'') + (typeof hourBranch!=='undefined'?hourBranch:'') + '。日干为天，日支为地。';
     lrProc += '</p>';
     lrProc += '<p><b class="rpt-is-1">第二步·布天盘：</b>天盘干支依时辰旋转，天盘日干加地盘日支之上，随天盘十二支顺转。';
@@ -11762,20 +11762,20 @@ function _computeLiuRenImpl() {
   // ── 前后推演 ──
   let lrFcBox = document.getElementById('lrForecastBox');
   if (lrFcBox) {
-    let lrFc = '<div class="analysis-card" style="margin:16px 0;border:1px solid rgba(201,168,76,.15);padding:20px">';
-    lrFc += '<h5 style="font-size:15px;color:var(--gold);letter-spacing:3px;margin-bottom:14px">🔍 前后推演</h5>';
-    lrFc += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">';
-    lrFc += '<div style="padding:14px;background:rgba(46,204,113,.05);border-radius:8px;border:1px solid rgba(46,204,113,.1)"><div style="font-size:13px;color:var(--success);font-weight:bold;margin-bottom:8px">⏪ 往前验证</div><div style="font-size:12px;line-height:1.8;opacity:.8">';
+    let lrFc = '<div class="analysis-card" class="rpt-is-66">';
+    lrFc += '<h5 class="rpt-is-65">🔍 前后推演</h5>';
+    lrFc += '<div class="rpt-is-93">';
+    lrFc += '<div class="rpt-is-94"><div class="rpt-is-95">⏪ 往前验证</div><div class="rpt-is-33">';
     let lrPrev = new Date(year, month-1, day-1);
     let lrPrevObj = getYearStemBranch(lrPrev.getFullYear(), lrPrev.getMonth()+1, lrPrev.getDate());
     lrFc += '<p>前一日：' + lrPrevObj.stem + lrPrevObj.branch + '日</p>';
-    lrFc += '<p style="opacity:.6;margin-top:6px">可对比不同日辰起课结果</p>';
+    lrFc += '<p class="rpt-is-34">可对比不同日辰起课结果</p>';
     lrFc += '</div></div>';
-    lrFc += '<div style="padding:14px;background:rgba(231,76,60,.05);border-radius:8px;border:1px solid rgba(231,76,60,.1)"><div style="font-size:13px;color:var(--cinn2);font-weight:bold;margin-bottom:8px">⏩ 往后预测</div><div style="font-size:12px;line-height:1.8;opacity:.8">';
+    lrFc += '<div class="rpt-is-96"><div class="rpt-is-67">⏩ 往后预测</div><div class="rpt-is-33">';
     let lrNext = new Date(year, month-1, day+1);
     let lrNextObj = getYearStemBranch(lrNext.getFullYear(), lrNext.getMonth()+1, lrNext.getDate());
     lrFc += '<p>后一日：' + lrNextObj.stem + lrNextObj.branch + '日</p>';
-    lrFc += '<p style="opacity:.6;margin-top:6px">可预测未来日辰课式走势</p>';
+    lrFc += '<p class="rpt-is-34">可预测未来日辰课式走势</p>';
     lrFc += '</div></div>';
     lrFc += '</div></div>';
     lrFcBox.innerHTML = lrFc;
@@ -14771,7 +14771,7 @@ function doCezi() {
   console.error('[测字解析错误]', e.message, e.stack);
   showToast('测字解析错误，请稍后重试');
   let _eb = document.getElementById('ceziResult') || document.getElementById('ceziResult');
-  if(_eb) _eb.innerHTML = '<div class="rpt-is-27"><h5 class="rpt-is-3">❌ 测字解析出错</h5><p class="rpt-is-28">'+e.message+'</p><p style="font-size:11px;opacity:.5;margin-top:4px">'+(e.stack||'').split("\n").slice(0,3).join("<br>")+'</p></div>';
+  if(_eb) _eb.innerHTML = '<div class="rpt-is-27"><h5 class="rpt-is-3">❌ 测字解析出错</h5><p class="rpt-is-28">'+e.message+'</p><p class="rpt-is-55">'+(e.stack||'').split("\n").slice(0,3).join("<br>")+'</p></div>';
   let _r = document.getElementById('ceziResult'); if(_r){_r.classList.add('visible');_r.scrollIntoView({behavior:'smooth'});}
  }
 }
@@ -14817,34 +14817,34 @@ function _doCeziImpl() {
   }
 
   // 输出专业六维解读
-  let classicRefHTML = interp.classicRef ? '<div class="cezi-analysis-card" style="border-color:rgba(142,68,173,.15)"><h5>📚 历史案例参考</h5><p class="ca-desc" style="white-space:pre-line">' + interp.classicRef + '</p></div>' : '';
+  let classicRefHTML = interp.classicRef ? '<div class="cezi-analysis-card" style="border-color:rgba(142,68,173,.15)"><h5>📚 历史案例参考</h5><p class="ca-desc" class="rpt-is-56">' + interp.classicRef + '</p></div>' : '';
 
   document.getElementById('ceziAnalysis').innerHTML = `
     <div class="cezi-analysis-card" style="border-color:rgba(201,168,76,.15)">
       <h5>🔍 字形总析</h5>
-      <p class="ca-desc" style="white-space:pre-line">${interp.shapeSummary}</p>
+      <p class="ca-desc" class="rpt-is-56">${interp.shapeSummary}</p>
     </div>
     <div class="cezi-analysis-card" style="border-color:rgba(39,174,96,.15)">
       <h5>📐 六法逐层分析</h5>
-      <p class="ca-desc" style="white-space:pre-line">${interp.liufaAnalysis}</p>
+      <p class="ca-desc" class="rpt-is-56">${interp.liufaAnalysis}</p>
     </div>
     <div class="cezi-analysis-card" style="border-color:rgba(142,68,173,.15)">
       <h5>☯️ 五行生克分析</h5>
-      <p class="ca-desc" style="white-space:pre-line">${interp.wuxingAnalysis}</p>
+      <p class="ca-desc" class="rpt-is-56">${interp.wuxingAnalysis}</p>
     </div>
     <div class="cezi-analysis-card" style="border-color:rgba(41,128,185,.15)">
       <h5>🔢 笔画数理</h5>
-      <p class="ca-desc" style="white-space:pre-line">${interp.strokeAnalysis}</p>
+      <p class="ca-desc" class="rpt-is-56">${interp.strokeAnalysis}</p>
     </div>
     ${classicRefHTML}
     ${dbInfo}
     <div class="cezi-analysis-card" style="border-color:rgba(230,126,34,.15);border-width:2px">
       <h5>💬 大白话结论</h5>
-      <p class="ca-desc" style="white-space:pre-line">${interp.plainConclusion}</p>
+      <p class="ca-desc" class="rpt-is-56">${interp.plainConclusion}</p>
     </div>
     <div class="cezi-analysis-card" style="border-color:rgba(231,76,60,.15)">
       <h5>🤖 AI辅助补充</h5>
-      <p class="ca-desc" style="white-space:pre-line">${interp.aiSupplement}</p>
+      <p class="ca-desc" class="rpt-is-56">${interp.aiSupplement}</p>
     </div>
   `;
 
@@ -16050,7 +16050,7 @@ function _analyzeFloorPlanAI(imageData, context) {
     if (fsAiResult) {
       fsAiResult.innerHTML = '<div class="huajie-alert" style="margin-top:16px;background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.2)">' +
         '<div class="alert-title" class="rpt-is-3">AI分析失败</div>' +
-        '<p style="font-size:13px">请确认网络正常</p>' +
+        '<p class="rpt-is-103">请确认网络正常</p>' +
         '<p class="rpt-is-29">错误：' + err.message + '</p></div>';
     }
   });
@@ -16127,7 +16127,7 @@ function analyzeFloorPlan(imgEl) {
   html += '<p style="font-size:14px;opacity:.5;letter-spacing:2px">户型风水综合评分</p>';
   html += '<p style="font-size:11px;opacity:.3">平均亮度:' + avgBrightness.toFixed(0) + ' / 255</p></div>';
   html += '<div class="fs-score-bar"><div class="fs-score-fill" style="width:' + score + '%;background:' + scoreColor + '"></div></div>';
-  html += '<div style="margin-top:20px"><h5 style="font-size:13px;letter-spacing:4px;color:var(--gold);margin-bottom:12px">分析明细</h5>';
+  html += '<div class="rpt-is-35"><h5 class="rpt-is-104">分析明细</h5>';
   for (const s of suggestions) {
     html += '<div style="padding:8px 0;border-bottom:1px solid rgba(201,168,76,.04);font-size:13px;opacity:.7">' + s.icon + ' ' + s.text + '</div>';
   }
@@ -16139,7 +16139,7 @@ function analyzeFloorPlan(imgEl) {
     console.error('户型图分析错误:', err);
     showToast('户型图分析出错，请重试');
     const out = document.getElementById('fsFloorOutput');
-    if (out) out.innerHTML = '<div style="padding:30px;text-align:center"><div style="font-size:48px;margin-bottom:16px">⚠️</div><h4 class="rpt-is-26">户型图分析失败</h4><p style="color:var(--paper2);font-size:13px">图片格式可能不支持，或图片尺寸异常。<br>请尝试上传 JPG/PNG 格式的户型图。</p></div>';
+    if (out) out.innerHTML = '<div style="padding:30px;text-align:center"><div class="rpt-is-52">⚠️</div><h4 class="rpt-is-26">户型图分析失败</h4><p style="color:var(--paper2);font-size:13px">图片格式可能不支持，或图片尺寸异常。<br>请尝试上传 JPG/PNG 格式的户型图。</p></div>';
     document.getElementById('fsFloorResult').style.display = 'block';
   }
 }
@@ -16407,7 +16407,7 @@ function renderFengshuiResultPro(data) {
     '<p style="margin-top:4px">凶方：<span class="rpt-is-3">' + (data.mingGua.isDong ? '西、西南、西北、东北' : '东、南、东南、北') + '</span></p></div>';
 
   // 评分明细
-  html += '<div class="rpt-is-9"><h5 style="font-size:13px;letter-spacing:4px;color:var(--gold);margin-bottom:12px">评分明细</h5><div class="shensha-grid">';
+  html += '<div class="rpt-is-9"><h5 class="rpt-is-104">评分明细</h5><div class="shensha-grid">';
   for (let i = 0; i < data.items.length; i++) {
     let item = data.items[i];
     let c = item.score >= 10 ? 'var(--success)' : item.score > 0 ? 'var(--gold)' : item.score < 0 ? 'var(--cinn2)' : 'var(--paper3)';
@@ -16424,7 +16424,7 @@ function renderFengshuiResultPro(data) {
   }
 
   // ===== 八方位房间化解方案（核心新增） =====
-  html += '<div style="margin-top:30px"><h5 style="font-size:14px;letter-spacing:4px;color:var(--gold);margin-bottom:16px">🏠 八方位房间化解方案</h5>' +
+  html += '<div class="rpt-is-41"><h5 class="rpt-is-70">🏠 八方位房间化解方案</h5>' +
     '<p style="font-size:12px;opacity:.6;margin-bottom:16px">基于八宅吉凶位 + 流年飞星 + 命卦综合分析</p>';
 
   for (let s = 0; s < data.roomSolutions.length; s++) {
@@ -16434,7 +16434,7 @@ function renderFengshuiResultPro(data) {
     let starColor = rs.yearStar === 8 || rs.yearStar === 9 || rs.yearStar === 1 || rs.yearStar === 4 || rs.yearStar === 6 ? 'var(--success)' : 'var(--cinn2)';
 
     html += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.15);border-radius:10px;padding:16px;margin-bottom:12px' + (rs.isDanger ? ';border-left:3px solid var(--cinn2)' : '') + '">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+      '<div class="rpt-is-42">' +
         '<span style="font-size:15px;color:var(--gold);font-weight:bold">' + rs.direction + '方</span>' +
         '<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:' + (rs.isDanger ? 'rgba(231,76,60,0.15)' : 'rgba(46,204,113,0.1)') + ';color:' + (rs.isDanger ? 'var(--cinn2)' : 'var(--success)') + '">' + rs.advice + '</span>' +
       '</div>' +
@@ -16445,9 +16445,9 @@ function renderFengshuiResultPro(data) {
         '<div><span class="rpt-is-2">最佳用途：</span>' + rs.bestUse + '</div>' +
       '</div>' +
       '<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.05);font-size:12px">' +
-        '<div style="margin-bottom:4px"><span class="rpt-is-2">🪑 家具布置：</span>' + rs.bestUse + '，避免' + rs.avoid + '</div>' +
-        '<div style="margin-bottom:4px"><span class="rpt-is-2">🎨 颜色方案：</span>' + rs.color + (rs.starColor ? '；流年化解色：' + rs.starColor : '') + '</div>' +
-        (rs.favorableColor ? '<div style="margin-bottom:4px"><span class="rpt-is-2">✨ 八字幸运色：</span>' + rs.favorableColor + '</div>' : '') +
+        '<div class="rpt-is-49"><span class="rpt-is-2">🪑 家具布置：</span>' + rs.bestUse + '，避免' + rs.avoid + '</div>' +
+        '<div class="rpt-is-49"><span class="rpt-is-2">🎨 颜色方案：</span>' + rs.color + (rs.starColor ? '；流年化解色：' + rs.starColor : '') + '</div>' +
+        (rs.favorableColor ? '<div class="rpt-is-49"><span class="rpt-is-2">✨ 八字幸运色：</span>' + rs.favorableColor + '</div>' : '') +
         '<div><span class="rpt-is-2">🔮 吉祥物：</span>' + rs.items.join('、') + '</div>' +
       '</div>' +
     '</div>';
@@ -16455,12 +16455,12 @@ function renderFengshuiResultPro(data) {
   html += '</div>';
 
   // ===== 流年化解方案 =====
-  html += '<div style="margin-top:30px"><h5 style="font-size:14px;letter-spacing:4px;color:var(--gold);margin-bottom:16px">📅 流年飞星化解方案（' + data.yearlySolutions.length + '年）</h5>';
+  html += '<div class="rpt-is-41"><h5 class="rpt-is-70">📅 流年飞星化解方案（' + data.yearlySolutions.length + '年）</h5>';
 
   for (let y = 0; y < data.yearlySolutions.length; y++) {
     let ys = data.yearlySolutions[y];
     html += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.15);border-radius:10px;padding:16px;margin-bottom:12px">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+      '<div class="rpt-is-42">' +
         '<span style="font-size:15px;color:var(--gold);font-weight:bold">' + ys.year + '年</span>' +
         '<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(201,168,76,0.1);color:var(--gold)">' + ys.centerStar + '入中宫</span>' +
       '</div>' +
@@ -16480,7 +16480,7 @@ function renderFengshuiResultPro(data) {
 
     // 吉星建议
     if (ys.auspicious.length > 0) {
-      html += '<div style="margin-top:10px"><span style="color:var(--success);font-size:12px">✨ 可催旺方位：</span>';
+      html += '<div class="rpt-is-32"><span style="color:var(--success);font-size:12px">✨ 可催旺方位：</span>';
       for (let a = 0; a < ys.auspicious.length; a++) {
         let aus = ys.auspicious[a];
         html += '<div style="font-size:12px;margin-top:4px;padding:6px 10px;background:rgba(46,204,113,0.06);border-radius:6px">' +
@@ -16495,7 +16495,7 @@ function renderFengshuiResultPro(data) {
 
   // 化解建议（问题汇总）
   if (data.problems.length > 0 || data.score < 80) {
-    html += '<div class="rpt-is-9"><h5 style="font-size:13px;letter-spacing:4px;color:var(--gold);margin-bottom:12px">⚠️ 户型问题化解方案</h5>';
+    html += '<div class="rpt-is-9"><h5 class="rpt-is-104">⚠️ 户型问题化解方案</h5>';
 
     // 详细的户型问题化解数据库
     let fixDetailMap = {
@@ -16754,7 +16754,7 @@ function computeYangzhaiPro() {
     // 1. 八字分析摘要
     html += '<div class="analysis-card" style="margin:16px 0;padding:20px;border:1px solid rgba(201,168,76,.2)">';
     html += '<h5 class="rpt-is-26">📊 八字分析摘要</h5>';
-    html += '<div style="font-size:13px;line-height:2">';
+    html += '<div class="rpt-is-43">';
     html += '<p><b>日主：</b>' + dayStem + '(' + dayEle + ')　<b>用神五行：</b>' + weakest + '</p>';
     html += '<p><b>命卦：</b>' + mingGua + '卦(' + lifeType + ')　<b>五行分布：</b>';
     for (let e in eleCount) html += e + ':' + eleCount[e] + ' ';
@@ -16765,11 +16765,11 @@ function computeYangzhaiPro() {
     // 2. 楼层推荐
     html += '<div class="analysis-card" style="margin:16px 0;padding:20px;border:1px solid rgba(46,204,113,.2)">';
     html += '<h5 style="color:var(--success);margin-bottom:12px">🏢 楼层推荐（基于用神' + weakest + '）</h5>';
-    html += '<div style="font-size:13px;line-height:2">';
+    html += '<div class="rpt-is-43">';
     html += '<p><b class="rpt-is-4">⭐ 推荐楼层：</b>' + recommendFloors.slice(0,5).join('、') + '层</p>';
-    html += '<p style="opacity:.7">理由：用神为' + weakest + '，尾数为' + (weakest==='水'?'1/6':weakest==='火'?'2/7':weakest==='木'?'3/8':weakest==='金'?'4/9':'5/0') + '的楼层五行属' + weakest + '，与用神同频共振，助旺运势。</p>';
+    html += '<p class="rpt-is-71">理由：用神为' + weakest + '，尾数为' + (weakest==='水'?'1/6':weakest==='火'?'2/7':weakest==='木'?'3/8':weakest==='金'?'4/9':'5/0') + '的楼层五行属' + weakest + '，与用神同频共振，助旺运势。</p>';
     html += '<p><b class="rpt-is-3">⚠️ 避忌楼层：</b>' + avoidFloors.slice(0,3).join('、') + '层</p>';
-    html += '<p style="opacity:.7">理由：该楼层五行克泄用神，不利运势发挥。</p>';
+    html += '<p class="rpt-is-71">理由：该楼层五行克泄用神，不利运势发挥。</p>';
     if (floorInput) {
       let fn = parseInt(floorInput);
       let fnWx = fn % 10 === 1 || fn % 10 === 6 ? '水' : fn % 10 === 2 || fn % 10 === 7 ? '火' : fn % 10 === 3 || fn % 10 === 8 ? '木' : fn % 10 === 4 || fn % 10 === 9 ? '金' : '土';
@@ -16839,7 +16839,7 @@ function computeYangzhaiPro() {
     if (needType === '搬家入宅' || needType === '装修择日' || needType === '购房选房') {
       html += '<div class="analysis-card" style="margin:16px 0;padding:20px;border:1px solid rgba(52,152,219,.2)">';
       html += '<h5 style="color:var(--cyan2);margin-bottom:12px">📅 择日建议（基于八字日主' + dayStem + '）</h5>';
-      html += '<div style="font-size:13px;line-height:2">';
+      html += '<div class="rpt-is-43">';
       // 生成未来3个月的吉日建议
       let now = new Date();
       let goodDates = [];
@@ -16880,7 +16880,7 @@ function computeYangzhaiPro() {
     let wxDir = { '金':'西方/西北','木':'东方/东南','水':'北方','火':'南方','土':'中央/东北/西南' };
     html += '<div class="analysis-card" style="margin:16px 0;padding:20px;border:1px solid rgba(155,89,182,.2)">';
     html += '<h5 style="color:var(--violet);margin-bottom:12px">🎨 个性化配色与布局建议</h5>';
-    html += '<div style="font-size:13px;line-height:2">';
+    html += '<div class="rpt-is-43">';
     html += '<p><b>幸运配色：</b>' + (wxColor[weakest]||'绿色') + '（用神' + weakest + '对应色系）</p>';
     html += '<p><b>有利方位：</b>' + (wxDir[weakest]||'东方') + '（用神' + weakest + '对应方位）</p>';
     html += '<p><b>床位朝向：</b>' + (isEastLife ? '东四命宜朝东/东南/北/南' : '西四命宜朝西/西北/西南/东北') + '</p>';
@@ -16919,7 +16919,7 @@ function computeYangzhaiPro() {
     showToast('阳宅分析出错，请重试');
     let out = document.getElementById('fsProResult');
     out.style.display = 'block';
-    out.innerHTML = '<div style="padding:40px;text-align:center"><div style="font-size:48px;margin-bottom:16px">⚠️</div><h3 class="rpt-is-26">计算遇到问题</h3><p style="color:var(--paper2);font-size:14px;line-height:1.8">错误详情：' + (err.message||'').substring(0,120) + '</p></div>';
+    out.innerHTML = '<div class="rpt-is-68"><div class="rpt-is-52">⚠️</div><h3 class="rpt-is-26">计算遇到问题</h3><p class="rpt-is-69">错误详情：' + (err.message||'').substring(0,120) + '</p></div>';
     out.classList.add('visible');
   }
 }
@@ -17150,7 +17150,7 @@ function computeFloorRecommend() {
     // 1. 八字与用神摘要
     html += '<div class="analysis-card" style="margin:16px 0;padding:20px;border:1px solid rgba(201,168,76,.2)">';
     html += '<h5 class="rpt-is-26">📊 命理分析摘要</h5>';
-    html += '<div style="font-size:13px;line-height:2">';
+    html += '<div class="rpt-is-43">';
     html += '<p><b>日主：</b>' + dayStem + '（' + dayEle + '）　<b>喜用神：</b>' + yongshenEle + '</p>';
     html += '<p><b>命卦：</b>' + mingGua.guaName + '卦（' + lifeType + '）　<b>有利五行：</b>' + lifeFavor.join('、') + '</p>';
     html += '<p><b>四柱：</b>' + baziData.pillars.map(function(p){return p.stem+p.branch;}).join(' ') + '</p>';
@@ -17167,7 +17167,7 @@ function computeFloorRecommend() {
     // 2. Top5推荐楼层
     html += '<div class="analysis-card" style="margin:16px 0;padding:20px;border:1px solid rgba(46,204,113,.3)">';
     html += '<h5 style="color:var(--success);margin-bottom:12px">⭐ 推荐楼层 Top 5</h5>';
-    html += '<div style="font-size:13px;line-height:2">';
+    html += '<div class="rpt-is-43">';
     for (let ti = 0; ti < top5.length; ti++) {
       let tf = top5[ti];
       let ratingColor = tf.rating === '优选' ? 'var(--success)' : tf.rating === '可用' ? 'var(--warn)' : 'var(--cinn2)';
@@ -17181,7 +17181,7 @@ function computeFloorRecommend() {
     if (avoidList.length > 0) {
       html += '<div class="analysis-card" style="margin:16px 0;padding:20px;border:1px solid rgba(231,76,60,.3)">';
       html += '<h5 style="color:var(--cinn2);margin-bottom:12px">⚠️ 建议避开的楼层</h5>';
-      html += '<div style="font-size:13px;line-height:2">';
+      html += '<div class="rpt-is-43">';
       for (let ai = 0; ai < avoidList.length; ai++) {
         let af = avoidList[ai];
         html += '<p>' + af.floor + '层（五行属' + af.wuxing + '）— 克泄用神' + yongshenEle + '，不利运势</p>';
@@ -17215,12 +17215,12 @@ function computeFloorRecommend() {
     // 5. 楼层五行对照说明
     html += '<div class="analysis-card" style="margin:16px 0;padding:20px;border:1px solid rgba(155,89,182,.2)">';
     html += '<h5 style="color:var(--violet);margin-bottom:12px">📖 楼层五行对照（河图数）</h5>';
-    html += '<div style="font-size:13px;line-height:2">';
+    html += '<div class="rpt-is-43">';
     html += '<p><b>尾数 1/6</b> → 五行属 <b class="rpt-is-23">水</b>（1层、6层、11层、16层、21层、26层、31层）</p>';
     html += '<p><b>尾数 2/7</b> → 五行属 <b class="rpt-is-3">火</b>（2层、7层、12层、17层、22层、27层、32层）</p>';
     html += '<p><b>尾数 3/8</b> → 五行属 <b class="rpt-is-4">木</b>（3层、8层、13层、18层、23层、28层、33层）</p>';
-    html += '<p><b>尾数 4/9</b> → 五行属 <b style="color:var(--gold2)">金</b>（4层、9层、14层、19层、24层、29层）</p>';
-    html += '<p><b>尾数 5/0</b> → 五行属 <b style="color:var(--orange)">土</b>（5层、10层、15层、20层、25层、30层）</p>';
+    html += '<p><b>尾数 4/9</b> → 五行属 <b class="rpt-is-72">金</b>（4层、9层、14层、19层、24层、29层）</p>';
+    html += '<p><b>尾数 5/0</b> → 五行属 <b class="rpt-is-89">土</b>（5层、10层、15层、20层、25层、30层）</p>';
     html += '</div>';
     html += '<p style="font-size:12px;opacity:.6;margin-top:12px">依据：《河图》「天一生水，地六成之；地二生火，天七成之；天三生木，地八成之；地四生金，天九成之；天五生土，地十成之。」楼层五行以尾数定之。</p>';
     html += '</div>';
@@ -17230,8 +17230,8 @@ function computeFloorRecommend() {
     html += '<h5 class="rpt-is-26">📝 评级标准</h5>';
     html += '<div style="font-size:12px;line-height:2;opacity:.8">';
     html += '<p><b class="rpt-is-4">优选</b>：楼层五行与用神一致或相生，与日主比和或相生，且合命卦有利五行</p>';
-    html += '<p><b style="color:var(--warn)">可用</b>：楼层五行与用神不冲不克，与日主关系尚可</p>';
-    html += '<p><b style="color:var(--orange)">慎选</b>：楼层五行泄用神或克日主，需通过室内配色、风水物品化解</p>';
+    html += '<p><b class="rpt-is-105">可用</b>：楼层五行与用神不冲不克，与日主关系尚可</p>';
+    html += '<p><b class="rpt-is-89">慎选</b>：楼层五行泄用神或克日主，需通过室内配色、风水物品化解</p>';
     html += '<p><b class="rpt-is-3">避开</b>：楼层五行克用神且克日主，大凶，不建议选择</p>';
     html += '</div></div>';
 
@@ -17255,7 +17255,7 @@ function computeFloorRecommend() {
     let out = document.getElementById('floorRecommendResult') || document.getElementById('fsProResult');
     if (out) {
       out.style.display = 'block';
-      out.innerHTML = '<div style="padding:40px;text-align:center"><div style="font-size:48px;margin-bottom:16px">⚠️</div><h3 class="rpt-is-26">计算遇到问题</h3><p style="color:var(--paper2);font-size:14px;line-height:1.8">错误详情：' + (err.message||'').substring(0,120) + '</p></div>';
+      out.innerHTML = '<div class="rpt-is-68"><div class="rpt-is-52">⚠️</div><h3 class="rpt-is-26">计算遇到问题</h3><p class="rpt-is-69">错误详情：' + (err.message||'').substring(0,120) + '</p></div>';
       out.classList.add('visible');
     }
   }
@@ -17471,7 +17471,7 @@ function renderFamilyList() {
   for (let i = 0; i < fsFamilyMembers.length; i++) {
     let m = fsFamilyMembers[i];
     html += '<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:12px;position:relative">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
+      '<div class="rpt-is-36">' +
         '<span style="font-size:14px;color:var(--gold);font-weight:bold">' + m.name + '</span>' +
         '<button onclick="removeFamilyMember(' + i + ')" style="background:none;border:none;color:var(--cinn2);cursor:pointer;font-size:16px;padding:0 4px">×</button>' +
       '</div>' +
@@ -18314,7 +18314,7 @@ function renderFamilyReport(data) {
     '<p style="font-size:11px;opacity:.4;margin-top:4px">全家宅综合评分</p></div>';
 
   // ===== 1. 每人方位一览表 =====
-  html += '<div class="rpt-is-9"><h5 style="font-size:14px;letter-spacing:3px;color:var(--gold);margin-bottom:16px">👥 每人年度方位建议</h5>';
+  html += '<div class="rpt-is-9"><h5 class="rpt-is-73">👥 每人年度方位建议</h5>';
 
   for (let i = 0; i < data.members.length; i++) {
     let m = data.members[i];
@@ -18370,7 +18370,7 @@ function renderFamilyReport(data) {
     if (m.allSorted && m.allSorted[0]) {
       let mascots = _generateMascotAdvice(m.bestBedroom, m.allSorted[0].info, m, data.currentYear);
       if (mascots.length > 0) {
-        html += '<div style="margin-top:10px"><span style="font-size:11px;color:var(--gold)">🔮 推荐吉祥物：</span>';
+        html += '<div class="rpt-is-32"><span style="font-size:11px;color:var(--gold)">🔮 推荐吉祥物：</span>';
         for (let mi = 0; mi < mascots.length; mi++) {
           let ms = mascots[mi];
           html += '<div style="font-size:11px;margin-top:4px;padding:6px 10px;background:rgba(255,255,255,0.02);border-radius:6px">' +
@@ -18389,16 +18389,16 @@ function renderFamilyReport(data) {
   html += '</div>';
 
   // ===== 2. 房间分配建议 =====
-  html += '<div style="margin-top:30px"><h5 style="font-size:14px;letter-spacing:3px;color:var(--gold);margin-bottom:16px">🏠 房间分配建议</h5>';
+  html += '<div class="rpt-is-41"><h5 class="rpt-is-73">🏠 房间分配建议</h5>';
   html += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.15);border-radius:10px;padding:16px">';
   html += '<table style="width:100%;font-size:12px;border-collapse:collapse">';
   html += '<tr class="rpt-is-21"><th class="rpt-is-30">成员</th><th class="rpt-is-30">关系</th><th class="rpt-is-30">建议房间</th><th class="rpt-is-30">方位</th></tr>';
   for (let ri = 0; ri < data.roomAssignment.length; ri++) {
     let ra = data.roomAssignment[ri];
     html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.03)">' +
-      '<td style="padding:8px">' + ra.name + '</td>' +
-      '<td style="padding:8px">' + (ra.relation || '-') + '</td>' +
-      '<td style="padding:8px">' + ra.room + '</td>' +
+      '<td class="rpt-is-44">' + ra.name + '</td>' +
+      '<td class="rpt-is-44">' + (ra.relation || '-') + '</td>' +
+      '<td class="rpt-is-44">' + ra.room + '</td>' +
       '<td style="padding:8px;color:var(--success);font-weight:bold">' + ra.direction + '方</td>' +
     '</tr>';
   }
@@ -18407,7 +18407,7 @@ function renderFamilyReport(data) {
   html += '</div></div>';
 
   // ===== 3. 吉祥物摆放一览表 =====
-  html += '<div style="margin-top:30px"><h5 style="font-size:14px;letter-spacing:3px;color:var(--gold);margin-bottom:16px">🔮 吉祥物摆放一览表</h5>';
+  html += '<div class="rpt-is-41"><h5 class="rpt-is-73">🔮 吉祥物摆放一览表</h5>';
   html += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.15);border-radius:10px;padding:16px">';
 
   // 收集所有成员的吉祥物
@@ -18444,7 +18444,7 @@ function renderFamilyReport(data) {
   html += '</div></div>';
 
   // ===== 4. 奇门遁甲化四害方案 =====
-  html += '<div style="margin-top:30px"><h5 style="font-size:14px;letter-spacing:3px;color:var(--gold);margin-bottom:16px">☰ 奇门遁甲化四害方案（' + data.currentYear + '年）</h5>';
+  html += '<div class="rpt-is-41"><h5 class="rpt-is-73">☰ 奇门遁甲化四害方案（' + data.currentYear + '年）</h5>';
   html += '<div style="background:rgba(142,68,173,0.04);border:1px solid rgba(142,68,173,0.15);border-radius:10px;padding:16px">';
   html += '<p style="font-size:12px;opacity:.6;margin-bottom:12px">四害为奇门四凶门：死门、惊门、伤门、杜门。以下为' + data.currentYear + '年化四害参考方案：</p>';
 
@@ -18455,7 +18455,7 @@ function renderFamilyReport(data) {
     let haiFang = data.siHai[haiName] || '未知';
 
     html += '<div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:12px;margin-bottom:10px;border-left:3px solid var(--violet)">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
+      '<div class="rpt-is-36">' +
         '<span style="font-size:14px;color:var(--violet);font-weight:bold">' + haiName + '（' + haiFang + '方）</span>' +
         '<span style="font-size:10px;padding:2px 6px;border-radius:3px;background:rgba(231,76,60,0.1);color:var(--cinn2)">需化解</span>' +
       '</div>' +
@@ -18477,7 +18477,7 @@ function renderFamilyReport(data) {
   // ===== 5. 年度化解物品清单 =====
   if (data.annualCures) {
     let ac = data.annualCures;
-    html += '<div style="margin-top:30px"><h5 style="font-size:14px;letter-spacing:3px;color:var(--gold);margin-bottom:16px">🔮 年度化解物品清单（' + data.currentYear + '年·' + ac.yearStar + '入中宫）</h5>';
+    html += '<div class="rpt-is-41"><h5 class="rpt-is-73">🔮 年度化解物品清单（' + data.currentYear + '年·' + ac.yearStar + '入中宫）</h5>';
     html += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.15);border-radius:10px;padding:16px">';
 
     // 年度飞星化解物品表
@@ -18518,7 +18518,7 @@ function renderFamilyReport(data) {
     html += '</div></div>';
 
     // 分季度化解重点
-    html += '<div style="margin-top:20px"><h6 style="font-size:12px;letter-spacing:2px;color:var(--gold);margin-bottom:12px">📅 分季度化解重点</h6>';
+    html += '<div class="rpt-is-35"><h6 style="font-size:12px;letter-spacing:2px;color:var(--gold);margin-bottom:12px">📅 分季度化解重点</h6>';
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px">';
     for (let qi = 0; qi < ac.quarterlyFocus.length; qi++) {
       let qf = ac.quarterlyFocus[qi];
@@ -18530,7 +18530,7 @@ function renderFamilyReport(data) {
     html += '</div></div>';
 
     // 化解物品到期处置方法
-    html += '<div style="margin-top:20px"><h6 style="font-size:12px;letter-spacing:2px;color:var(--gold);margin-bottom:12px">♻️ 化解物品到期处置方法</h6>';
+    html += '<div class="rpt-is-35"><h6 style="font-size:12px;letter-spacing:2px;color:var(--gold);margin-bottom:12px">♻️ 化解物品到期处置方法</h6>';
     html += '<div style="background:rgba(142,68,173,0.04);border:1px solid rgba(142,68,173,0.12);border-radius:10px;padding:14px">';
     for (let di = 0; di < ac.disposalMethods.length; di++) {
       let dm = ac.disposalMethods[di];
@@ -18543,7 +18543,7 @@ function renderFamilyReport(data) {
   }
 
   // ===== 6. 月度飞星化解详解 =====
-  html += '<div style="margin-top:30px"><h5 style="font-size:14px;letter-spacing:3px;color:var(--gold);margin-bottom:16px">📅 月度飞星化解详解（' + data.currentYear + '年）</h5>';
+  html += '<div class="rpt-is-41"><h5 class="rpt-is-73">📅 月度飞星化解详解（' + data.currentYear + '年）</h5>';
   html += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.15);border-radius:10px;padding:16px">';
   html += '<p style="font-size:11px;opacity:.5;margin-bottom:12px">每月含九宫飞星分布、凶星化解、吉星增旺、家庭成员个性化建议</p>';
 
@@ -18583,9 +18583,9 @@ function renderFamilyReport(data) {
         html += '<div style="font-size:11px;margin-top:4px;padding:8px 10px;background:rgba(231,76,60,0.06);border-radius:6px">' +
           '<strong class="rpt-is-3">' + wrn.direction + '方·' + wrn.name + '</strong>' +
           (wrn.severity === '严重' ? ' <span style="font-size:9px;padding:1px 4px;border-radius:3px;background:rgba(231,76,60,0.2);color:var(--cinn2)">严重</span>' : '') +
-          '<br><span style="opacity:.7">' + wrn.desc + '</span>' +
+          '<br><span class="rpt-is-71">' + wrn.desc + '</span>' +
           '<br><span class="rpt-is-4">化解：</span>' + wrn.cure +
-          '<br><span style="opacity:.6">物品：' + wrn.items.join('、') + ' | 颜色：' + wrn.color + ' | 忌：' + wrn.avoid + '</span>' +
+          '<br><span class="rpt-is-54">物品：' + wrn.items.join('、') + ' | 颜色：' + wrn.color + ' | 忌：' + wrn.avoid + '</span>' +
         '</div>';
       }
       html += '</div>';
@@ -18598,9 +18598,9 @@ function renderFamilyReport(data) {
         let aus = mtip.auspicious[ma];
         html += '<div style="font-size:11px;margin-top:4px;padding:8px 10px;background:rgba(46,204,113,0.06);border-radius:6px">' +
           '<strong class="rpt-is-4">' + aus.direction + '方·' + aus.name + '</strong>' +
-          '<br><span style="opacity:.7">' + aus.desc + '</span>' +
+          '<br><span class="rpt-is-71">' + aus.desc + '</span>' +
           '<br><span class="rpt-is-1">增旺：</span>' + aus.enhance +
-          '<br><span style="opacity:.6">物品：' + aus.items.join('、') + ' | 颜色：' + aus.color + '</span>' +
+          '<br><span class="rpt-is-54">物品：' + aus.items.join('、') + ' | 颜色：' + aus.color + '</span>' +
         '</div>';
       }
       html += '</div>';
@@ -18614,9 +18614,9 @@ function renderFamilyReport(data) {
         html += '<div style="font-size:11px;margin-top:4px;padding:8px 10px;background:rgba(201,168,76,0.04);border-radius:6px">' +
           '<strong class="rpt-is-1">' + ma.name + '</strong>（' + ma.relation + '）' +
           '<br><span class="rpt-is-4">吉方：' + ma.luckyDirs.join('、') + '方</span> | <span class="rpt-is-3">避方：' + ma.avoidDirs.join('、') + '方</span>' +
-          '<br><span style="opacity:.7">🛏️ ' + ma.bedroomTip + '</span>';
+          '<br><span class="rpt-is-71">🛏️ ' + ma.bedroomTip + '</span>';
         if (ma.personalItems.length > 0) {
-          html += '<br><span style="opacity:.6">🔮 物品：' + ma.personalItems.join('；') + '</span>';
+          html += '<br><span class="rpt-is-54">🔮 物品：' + ma.personalItems.join('；') + '</span>';
         }
         html += '</div>';
       }
@@ -18658,7 +18658,7 @@ function computeBaZhai() {
   html += '<div class="huajie-alert"><div class="alert-title">命卦分析</div>';
   html += '<p>命卦:<strong>' + mingGua.type + '</strong> - ' + mingGua.guaName + '卦(卦数' + mingGua.gua + ')</p></div>';
 
-  html += '<div class="rpt-is-9"><h5 style="font-size:13px;letter-spacing:4px;color:var(--gold);margin-bottom:12px">吉凶方位</h5>';
+  html += '<div class="rpt-is-9"><h5 class="rpt-is-104">吉凶方位</h5>';
   html += '<div class="analysis-grid" style="grid-template-columns:1fr 1fr">';
   html += '<div class="analysis-card" style="border-color:rgba(39,174,96,.15)"><h5 class="rpt-is-4">✅ 吉方</h5>';
   html += '<p>' + (mingGua.isDong ? '东、南、东南、北' : '西、西南、西北、东北') + '</p>';
@@ -18668,7 +18668,7 @@ function computeBaZhai() {
   html += '<p style="font-size:11px;opacity:.5;margin-top:8px">宜作厕所、厨房、储物间</p></div>';
   html += '</div></div>';
 
-  html += '<div class="huajie-alert" style="margin-top:20px"><div class="alert-title">化解方法</div>';
+  html += '<div class="huajie-alert" class="rpt-is-35"><div class="alert-title">化解方法</div>';
   html += '<ul class="huajie-checklist">';
   html += '<li>吉方宜开门窗纳气，放置绿植增旺</li>';
   html += '<li>凶方宜放置重物镇压(如柜子、石头)</li>';
@@ -18713,7 +18713,7 @@ function computeXuanKong() {
   }
   html += '</div>';
 
-  html += '<div style="margin-top:30px"><h5 style="font-size:13px;letter-spacing:4px;color:var(--gold);margin-bottom:12px">各方位化解指南</h5>';
+  html += '<div class="rpt-is-41"><h5 class="rpt-is-104">各方位化解指南</h5>';
   html += '<div class="shensha-grid">';
   for (const star of flyingStars) {
     html += '<div class="shensha-item">';
@@ -19009,7 +19009,7 @@ function analyzeMobileMulti(){
       let html='';
       
       // 排名表
-      html+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">';
+      html+='<div class="rpt-is-86"><table style="width:100%;border-collapse:collapse;font-size:13px">';
       html+='<tr style="border-bottom:2px solid rgba(201,168,76,.2)"><th class="rpt-is-10">排名</th><th class="rpt-is-10">手机号</th><th class="rpt-is-10">八星(40)</th><th class="rpt-is-10">五行(20)</th>';
       if(hasBazi)html+='<th class="rpt-is-10">八字(25)</th>';
       if(indWx)html+='<th class="rpt-is-10">行业(10)</th>';
@@ -19023,7 +19023,7 @@ function analyzeMobileMulti(){
         html+='<tr style="border-bottom:1px solid rgba(201,168,76,.08)">';
         html+='<td style="padding:8px;text-align:center;font-size:16px">'+rankIcon+'</td>';
         html+='<td style="padding:8px;text-align:center;font-family:monospace;font-weight:bold;color:'+rankColor+';letter-spacing:2px">'+r.mobile+'</td>';
-        html+='<td class="rpt-is-10">'+r.scores.baxing+'<br><span style="font-size:10px;opacity:.4">吉'+r.baxingJi+'凶'+r.baxingXiong+'</span></td>';
+        html+='<td class="rpt-is-10">'+r.scores.baxing+'<br><span class="rpt-is-53">吉'+r.baxingJi+'凶'+r.baxingXiong+'</span></td>';
         html+='<td class="rpt-is-10">'+r.scores.wuxing+'</td>';
         if(hasBazi)html+='<td class="rpt-is-10">'+r.scores.bazi+'</td>';
         if(indWx)html+='<td class="rpt-is-10">'+r.scores.industry+'</td>';
@@ -19039,7 +19039,7 @@ function analyzeMobileMulti(){
         html+='<div style="margin-top:16px;padding:14px;background:rgba(46,204,113,.06);border-radius:8px;text-align:center">';
         html+='<div style="font-size:12px;color:var(--success);margin-bottom:6px">🏆 最优推荐</div>';
         html+='<div style="font-size:24px;font-weight:bold;color:var(--success);font-family:monospace;letter-spacing:4px">'+best.mobile+'</div>';
-        html+='<div style="font-size:12px;opacity:.6;margin-top:6px">综合评分 '+best.total+' 分';
+        html+='<div class="rpt-is-101">综合评分 '+best.total+' 分';
         let advantage=best.total-results[1].total;
         if(advantage>0)html+='，领先第2名 '+advantage+' 分';
         html+='</div></div>';
@@ -19071,8 +19071,8 @@ function analyzeMobileMulti(){
         let dim=dims[d];
         let pct=dim.score;
         let barColor=['var(--success)','var(--gold)','var(--orange)','var(--violet)','var(--cyan2)'][d];
-        ihtml+='<div style="margin-bottom:14px">';
-        ihtml+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+        ihtml+='<div class="rpt-is-74">';
+        ihtml+='<div class="rpt-is-75">';
         ihtml+='<span style="font-size:13px;font-weight:bold">'+dim.icon+' '+dim.name+'</span>';
         ihtml+='<span style="font-size:13px;color:'+barColor+';font-weight:bold">'+pct+'%</span>';
         ihtml+='</div>';
@@ -19083,7 +19083,7 @@ function analyzeMobileMulti(){
       
       // 结论
       ihtml+='<div style="margin-top:16px;padding:14px;background:rgba(155,89,182,.05);border-radius:8px;font-size:12px;line-height:1.8">';
-      ihtml+='<b style="color:var(--violet)">结论：</b>对缘主影响最大的是<b>八星数字能量（40%）</b>，其次是<b>八字命理匹配（25%）</b>。';
+      ihtml+='<b class="rpt-is-63">结论：</b>对缘主影响最大的是<b>八星数字能量（40%）</b>，其次是<b>八字命理匹配（25%）</b>。';
       ihtml+='选号时应优先关注吉星组合数量，其次确保五行与八字喜用神'+(hasBazi?xiShen:'（需填生辰）')+'相合。';
       if(!hasBazi) ihtml+='<br>⚠️ 当前未填生辰八字，八字维度（25%）按中性处理，建议填写以获得更精准分析。';
       ihtml+='</div>';
@@ -19532,7 +19532,7 @@ function renderMobileCareer(mobile,occupation,location){
     let shengMap={木:'火',火:'土',土:'金',金:'水',水:'木'};
     let keMap={木:'土',土:'水',水:'火',火:'金',金:'木'};
     
-    html+='<div style="margin-bottom:14px">';
+    html+='<div class="rpt-is-74">';
     html+='<div style="font-size:13px;margin-bottom:6px"><b class="rpt-is-1">行业：</b>'+occupation+'（五行属'+indWx+'）</div>';
     
     if(maxWx===indWx){
@@ -19540,7 +19540,7 @@ function renderMobileCareer(mobile,occupation,location){
     }else if(shengMap[maxWx]===indWx){
       html+='<div style="font-size:12px;color:var(--success)">✓ 号码五行'+maxWx+'生行业五行'+indWx+'，相生助运</div>';
     }else if(keMap[maxWx]===indWx){
-      html+='<div style="font-size:12px;color:var(--cinn2)">⚠ 号码五行'+maxWx+'克行业五行'+indWx+'，不利事业</div>';
+      html+='<div class="rpt-is-76">⚠ 号码五行'+maxWx+'克行业五行'+indWx+'，不利事业</div>';
     }else{
       html+='<div style="font-size:12px;color:var(--gold)">○ 号码五行'+maxWx+'与行业五行'+indWx+'关系中性</div>';
     }
@@ -19559,7 +19559,7 @@ function renderMobileCareer(mobile,occupation,location){
     }
     let directions={木:'东方',火:'南方',土:'中央',金:'西方',水:'北方'};
     
-    html+='<div style="margin-bottom:14px">';
+    html+='<div class="rpt-is-74">';
     html+='<div style="font-size:13px;margin-bottom:6px"><b class="rpt-is-1">居住地：</b>'+location+'（五行属'+locWx+'，方位'+directions[locWx]+'）</div>';
     
     if(maxWx===locWx){
@@ -19567,7 +19567,7 @@ function renderMobileCareer(mobile,occupation,location){
     }else if(shengMap[maxWx]===locWx){
       html+='<div style="font-size:12px;color:var(--success)">✓ 号码五行生居住地五行，相生和谐</div>';
     }else if(keMap[maxWx]===locWx){
-      html+='<div style="font-size:12px;color:var(--cinn2)">⚠ 号码五行克居住地五行，建议调整</div>';
+      html+='<div class="rpt-is-76">⚠ 号码五行克居住地五行，建议调整</div>';
     }else{
       html+='<div style="font-size:12px;color:var(--gold)">○ 号码五行与居住地五行关系中性</div>';
     }
@@ -19614,12 +19614,12 @@ function renderMobileVerdict(mobile,baxingResult,birthDate,birthHour,occupation,
   
   // 统一5维度评分展示
   html+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-bottom:16px">';
-  html+='<div style="text-align:center;padding:10px;border-radius:8px;background:rgba(255,255,255,.02)"><div class="rpt-is-6">综合评分</div><div style="font-size:22px;color:'+color+';font-weight:bold">'+totalScore+'</div></div>';
-  html+='<div style="text-align:center;padding:10px;border-radius:8px;background:rgba(255,255,255,.02)"><div class="rpt-is-6">八星(40)</div><div style="font-size:18px;color:var(--success);font-weight:bold">'+sc.baxing+'</div></div>';
-  html+='<div style="text-align:center;padding:10px;border-radius:8px;background:rgba(255,255,255,.02)"><div class="rpt-is-6">八字(25)</div><div style="font-size:18px;color:var(--gold);font-weight:bold">'+sc.bazi+'</div></div>';
-  html+='<div style="text-align:center;padding:10px;border-radius:8px;background:rgba(255,255,255,.02)"><div class="rpt-is-6">五行(20)</div><div style="font-size:18px;color:var(--cyan2);font-weight:bold">'+sc.wuxing+'</div></div>';
-  html+='<div style="text-align:center;padding:10px;border-radius:8px;background:rgba(255,255,255,.02)"><div class="rpt-is-6">行业(10)</div><div style="font-size:18px;color:var(--orange);font-weight:bold">'+sc.industry+'</div></div>';
-  html+='<div style="text-align:center;padding:10px;border-radius:8px;background:rgba(255,255,255,.02)"><div class="rpt-is-6">方位(5)</div><div style="font-size:18px;color:var(--violet);font-weight:bold">'+sc.location+'</div></div>';
+  html+='<div class="rpt-is-77"><div class="rpt-is-6">综合评分</div><div style="font-size:22px;color:'+color+';font-weight:bold">'+totalScore+'</div></div>';
+  html+='<div class="rpt-is-77"><div class="rpt-is-6">八星(40)</div><div style="font-size:18px;color:var(--success);font-weight:bold">'+sc.baxing+'</div></div>';
+  html+='<div class="rpt-is-77"><div class="rpt-is-6">八字(25)</div><div style="font-size:18px;color:var(--gold);font-weight:bold">'+sc.bazi+'</div></div>';
+  html+='<div class="rpt-is-77"><div class="rpt-is-6">五行(20)</div><div style="font-size:18px;color:var(--cyan2);font-weight:bold">'+sc.wuxing+'</div></div>';
+  html+='<div class="rpt-is-77"><div class="rpt-is-6">行业(10)</div><div style="font-size:18px;color:var(--orange);font-weight:bold">'+sc.industry+'</div></div>';
+  html+='<div class="rpt-is-77"><div class="rpt-is-6">方位(5)</div><div style="font-size:18px;color:var(--violet);font-weight:bold">'+sc.location+'</div></div>';
   html+='</div>';
   
   html+='<div style="font-size:13px;line-height:1.8;opacity:.8;text-align:center;margin-bottom:14px">'+desc+'</div>';
@@ -19743,7 +19743,7 @@ function renderMobileVerdict(mobile,baxingResult,birthDate,birthHour,occupation,
     let wtLuck=workTypeLuck[workType]||workTypeLuck['其他'];
     html+='<div style="margin-top:14px;padding:12px;background:rgba(0,100,150,0.04);border:1px solid rgba(0,100,150,0.12);border-radius:8px">';
     html+='<div style="font-size:13px;color:var(--cyan);font-weight:bold;margin-bottom:6px">💼 工作类型匹配建议（'+workType+'）</div>';
-    html+='<div style="font-size:12px;opacity:.7;line-height:1.8">推荐吉利数字：'+wtLuck.nums.join('、')+'<br>推荐吉星组合：'+wtLuck.star+'<br>'+wtLuck.desc+'</div>';
+    html+='<div class="rpt-is-78">推荐吉利数字：'+wtLuck.nums.join('、')+'<br>推荐吉星组合：'+wtLuck.star+'<br>'+wtLuck.desc+'</div>';
     html+='</div>';
   }
   
@@ -19754,7 +19754,7 @@ function renderMobileVerdict(mobile,baxingResult,birthDate,birthHour,occupation,
     for (let nn=0;nn<=9;nn++){if(numWxMap[nn]===baziInfo.xiShen)xiNums.push(nn);if(numWxMap[nn]===baziInfo.jiShen)jiNums.push(nn);}
     html+='<div style="margin-top:14px;padding:12px;background:rgba(39,174,96,0.04);border:1px solid rgba(39,174,96,0.12);border-radius:8px">';
     html+='<div style="font-size:13px;color:var(--jade);font-weight:bold;margin-bottom:6px">📱 改号建议（八字用神'+baziInfo.xiShen+'）</div>';
-    html+='<div style="font-size:12px;opacity:.7;line-height:1.8">';
+    html+='<div class="rpt-is-78">';
     html+='· 宜多含数字：'+xiNums.join('、')+'（五行属'+baziInfo.xiShen+'，补益用神）<br>';
     html+='· 忌多含数字：'+jiNums.join('、')+'（五行属'+baziInfo.jiShen+'，为忌神）<br>';
     html+='· 推荐尾数组合：'+xiNums.slice(0,2).join('')+'、'+xiNums[0]+''+(xiNums[xiNums.length-1]||xiNums[0])+'<br>';
@@ -20200,7 +20200,7 @@ function recommendTailNumbers(){
   html+='</div></div>';
   
   // TOP 3 大卡片
-  html+='<div style="margin-bottom:14px">';
+  html+='<div class="rpt-is-74">';
   for (let i=0;i<Math.min(3,top.length);i++){
     let t=top[i];
     let color=t.score>=70?'var(--success)':t.score>=55?'var(--gold)':'var(--cinn2)';
@@ -20208,7 +20208,7 @@ function recommendTailNumbers(){
     html+='<div style="width:40px;height:40px;border-radius:50%;background:'+color+'20;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold;color:'+color+'">'+(i+1)+'</div>';
     html+='<div style="flex:1"><div style="font-size:24px;font-weight:bold;color:'+color+';letter-spacing:6px;font-family:monospace">'+t.tail+'</div>';
     html+='<div style="font-size:11px;opacity:.6;margin-top:2px">'+t.stars+' · '+t.desc+'</div></div>';
-    html+='<div style="text-align:right"><div style="font-size:20px;font-weight:bold;color:'+color+'">'+t.score+'</div><div style="font-size:10px;opacity:.4">评分</div></div>';
+    html+='<div style="text-align:right"><div style="font-size:20px;font-weight:bold;color:'+color+'">'+t.score+'</div><div class="rpt-is-53">评分</div></div>';
     html+='</div>';
   }
   html+='</div>';
@@ -20916,7 +20916,7 @@ function getMonthlyReport(hj) {
   html += '</div>';
 
   // 详细文字版(折叠)
-  html += '<div style="margin-top:20px">';
+  html += '<div class="rpt-is-35">';
   html += '<div class="huajie-alert" style="cursor:pointer" onclick="toggleHuajieDetail(this)">';
   html += '<div class="alert-title">📖 逐月详细分析(点击展开)</div>';
   html += '<div class="month-detail-content" style="display:none;margin-top:12px">';
@@ -20928,7 +20928,7 @@ function getMonthlyReport(hj) {
     html += '<div style="margin-bottom:16px;padding:12px;background:rgba(255,255,255,.02);border-radius:6px">';
     html += '<div style="color:var(--gold);font-size:14px;margin-bottom:6px">' + m.month + ' · ' + m.stem + m.zhi + '</div>';
     html += '<p style="font-size:13px;line-height:1.8;opacity:.8">' + m.desc + '</p>';
-    html += '<div style="margin-top:6px;font-size:12px"><span style="color:' + color + '">' + m.overall + '</span> · 重点:' + m.luck + '</div>';
+    html += '<div class="rpt-is-79"><span style="color:' + color + '">' + m.overall + '</span> · 重点:' + m.luck + '</div>';
     html += '</div>';
   }
   html += '</div></div></div>';
@@ -21087,7 +21087,7 @@ function getAgeBasedHuajie(hj) {
     let st = stages[si];
     if (!st.show) continue;
     html += '<div class="analysis-card" style="border-left:3px solid var(--gold2)">';
-    html += '<h5 style="color:var(--gold2)">' + st.title + '</h5>';
+    html += '<h5 class="rpt-is-72">' + st.title + '</h5>';
     html += '<ul class="huajie-checklist">';
     for (let ii = 0; ii < st.items.length; ii++) {
       if (st.items[ii]) html += '<li>' + st.items[ii] + '</li>';
@@ -21209,7 +21209,7 @@ function getTenGodMissingHuajie(hj) {
   let html = '';
 
   // 命中十神分布
-  html += '<div style="margin-bottom:14px">';
+  html += '<div class="rpt-is-74">';
   html += '<div style="font-size:12px;color:var(--paper3);margin-bottom:8px">命中十神分布：</div>';
   html += '<div style="display:flex;flex-wrap:wrap;gap:6px">';
   for (let pi = 0; pi < allTG.length; pi++) {
@@ -21676,7 +21676,7 @@ function renderChangshengModule(dayStem, pillars, dishiList) {
     '养': {type:'吉', color:'var(--jade)', desc:'如胎儿养育，逐渐成形。主准备阶段，积蓄力量，即将迎来新生。', life:'准备期，宜积蓄'}
   };
 
-  let html = '<div class="analysis-card" style="margin:16px 0;border:1px solid rgba(201,168,76,.15);padding:20px">';
+  let html = '<div class="analysis-card" class="rpt-is-66">';
   html += '<h5 style="font-size:15px;color:var(--gold);letter-spacing:3px;margin-bottom:6px">🌀 长生十二宫 · 命运周期解读</h5>';
   html += '<p style="font-size:11px;opacity:.5;margin-bottom:14px;letter-spacing:1px">长生十二宫以日干对四地支，推演日主在人生四大阶段的气运消长。出自《滴天髄》《三命通会》。</p>';
 
@@ -21688,7 +21688,7 @@ function renderChangshengModule(dayStem, pillars, dishiList) {
     let bg = m ? ('background:rgba(' + (m.color === 'var(--jade)' ? '39,174,96' : m.color === 'var(--warn)' ? '243,156,18' : '231,76,60') + ',0.08)') : '';
     let border = m ? ('border:1px solid ' + m.color + '33') : '';
     html += '<div style="text-align:center;padding:10px 6px;border-radius:8px;' + bg + ';' + border + '">';
-    html += '<div style="font-size:10px;opacity:.5;letter-spacing:2px">' + pillarNames[i] + '</div>';
+    html += '<div class="rpt-is-50">' + pillarNames[i] + '</div>';
     html += '<div style="font-size:11px;opacity:.4;margin:2px 0">' + pillars[i].stem + pillars[i].branch + '</div>';
     html += '<div style="font-size:16px;font-weight:bold;color:' + (m ? m.color : 'var(--paper3)') + ';letter-spacing:2px">' + cs + '</div>';
     html += '<div style="font-size:9px;opacity:.5;margin-top:2px">' + (m ? m.type : '') + '</div>';
@@ -21786,7 +21786,7 @@ function renderQimenGrid(palaces, keyPalace) {
       // 宫位标题
       html += '<div style="font-size:9px;color:var(--paper3);text-align:center;border-bottom:1px solid rgba(201,168,76,0.1);padding-bottom:3px;margin-bottom:3px">';
       html += info.name + gongNum + '宫·' + info.dir;
-      if (isKey) html += ' <span style="color:var(--gold2)">★值符</span>';
+      if (isKey) html += ' <span class="rpt-is-72">★值符</span>';
       html += '</div>';
       // 内容
       if (p) {
@@ -21822,10 +21822,10 @@ function renderQimenGrid(palaces, keyPalace) {
   // 图例
   html += '<div style="display:flex;gap:12px;justify-content:center;margin-top:8px;font-size:9px;color:var(--paper3)">';
   html += '<span><span class="rpt-is-23">■</span>天盘</span>';
-  html += '<span><span style="color:var(--warn)">■</span>地盘</span>';
+  html += '<span><span class="rpt-is-105">■</span>地盘</span>';
   html += '<span><span class="rpt-is-12">■</span>吉</span>';
   html += '<span><span class="rpt-is-3">■</span>凶</span>';
-  html += '<span><span style="color:var(--gold2)">★</span>值符宫</span>';
+  html += '<span><span class="rpt-is-72">★</span>值符宫</span>';
   html += '</div>';
   html += '</div>';
   grid.innerHTML = html;
@@ -21879,7 +21879,7 @@ function renderZwGrid() {
   } catch(e) {}
   html += '<div style="display:flex;gap:12px;justify-content:center;margin-top:8px;font-size:9px;color:var(--paper3)">';
   html += '<span><span class="rpt-is-1">■</span>命宫</span>';
-  html += '<span><span style="color:var(--gold2)">■</span>其他宫</span>';
+  html += '<span><span class="rpt-is-72">■</span>其他宫</span>';
   html += '</div>';
   html += '</div>';
   container.innerHTML = html;
@@ -21924,7 +21924,7 @@ function appendHuajieToResult(resultElId, year, month, day, hour, sex, name) {
     html += '<div class="huajie-block"><h5>🧭 三元九运方位调整（' + hjYY.name + '）</h5>';
     html += '<div style="padding:12px;background:rgba(231,76,60,0.04);border-radius:8px;margin-bottom:10px">';
     html += '<p style="font-size:13px;color:var(--cinn2);font-weight:bold;margin-bottom:6px">当前运星：' + hjYY.name + '（' + hjYY.yuan + ' · ' + hjYY.star + ' · ' + hjYY.wuxing + '行）</p>';
-    html += '<p style="font-size:12px;opacity:.7;line-height:1.8">对' + hjDmFull + '日主：' + hjRelDesc + '</p>';
+    html += '<p class="rpt-is-78">对' + hjDmFull + '日主：' + hjRelDesc + '</p>';
     html += '</div>';
     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">';
     html += '<div style="padding:10px;background:rgba(231,76,60,0.06);border-radius:8px;border-left:3px solid var(--cinn2)">';
@@ -21936,7 +21936,7 @@ function appendHuajieToResult(resultElId, year, month, day, hour, sex, name) {
     html += '<p class="rpt-is-13">正北方为零神位，宜放置黑曜石、金属饰品化煞。避免在此方位安床或设灶。</p>';
     html += '</div>';
     html += '</div>';
-    html += '<p style="font-size:12px;opacity:.6;line-height:1.8">💡 流年飞星与运星叠加：每年流年九紫星飞临之方位为当年最旺位，可在此方位催旺。流年五黄星飞临之方位需化解，避免动土。</p>';
+    html += '<p class="rpt-is-106">💡 流年飞星与运星叠加：每年流年九紫星飞临之方位为当年最旺位，可在此方位催旺。流年五黄星飞临之方位需化解，避免动土。</p>';
     html += '</div>';
     html += '</div>';
     el.insertAdjacentHTML('beforeend', html);
@@ -22098,7 +22098,7 @@ function getTempleRecommendation(hj) {
   for (let i = 0; i < daoTemples.length; i++) {
     const t = daoTemples[i];
     html += '<div class="analysis-card" style="border-color:rgba(39,174,96,.15);cursor:pointer" onclick="showTempleDetail(\'' + t.name + '\')">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
+    html += '<div class="rpt-is-42">';
     html += '<h5 style="color:var(--jade);font-size:14px;margin:0">' + t.name + '</h5>';
     html += '<span style="font-size:11px;padding:2px 6px;background:rgba(39,174,96,.1);color:var(--jade);border-radius:4px">' + t.rank + '</span>';
     html += '</div>';
@@ -22117,7 +22117,7 @@ function getTempleRecommendation(hj) {
   for (let i = 0; i < foTemples.length; i++) {
     const t = foTemples[i];
     html += '<div class="analysis-card" style="border-color:rgba(142,68,173,.15);cursor:pointer" onclick="showTempleDetail(\'' + t.name + '\')">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
+    html += '<div class="rpt-is-42">';
     html += '<h5 style="color:var(--violet);font-size:14px;margin:0">' + t.name + '</h5>';
     html += '<span style="font-size:11px;padding:2px 6px;background:rgba(142,68,173,.1);color:var(--violet);border-radius:4px">' + t.rank + '</span>';
     html += '</div>';
@@ -22130,7 +22130,7 @@ function getTempleRecommendation(hj) {
   html += '</div>';
 
   // 还愿提醒
-  html += '<div class="huajie-renew-box" style="margin-top:20px">';
+  html += '<div class="huajie-renew-box" class="rpt-is-35">';
   html += '<div class="renew-title">🙏 还愿提醒</div>';
   html += '<div class="renew-desc">';
   html += '愿望达成后必须还愿，否则运势反噬。建议:<br>';
@@ -22884,7 +22884,7 @@ function jiuriShowDetail(date) {
     <div style="text-align:center;margin-bottom:20px">
       <div style="font-size:13px;opacity:.5;letter-spacing:2px">${solarStr}</div>
       <div style="font-size:13px;opacity:.4;letter-spacing:2px;margin-top:4px">农历 ${lunarStr}</div>
-      <div style="margin-top:12px">
+      <div class="rpt-is-40">
         <span class="jiuri-badge ${ratingClass}">${rating}</span>
         <span style="font-family:Ma Shan Zheng,serif;font-size:28px;color:var(--gold);letter-spacing:4px">${ganzhi}日</span>
         <span style="font-size:13px;opacity:.5;margin-left:8px">${weekDay}</span>
@@ -22893,9 +22893,9 @@ function jiuriShowDetail(date) {
     </div>
 
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px">
-      <div class="jiuri-row"><span style="opacity:.4">冲</span><span class="rpt-is-3">${chongZhu}🐀</span><span style="opacity:.4">煞</span><span class="rpt-is-3">${shaFang}向</span></div>
-      <div class="jiuri-row"><span style="opacity:.4">建除</span><span class="jiuri-badge ${jcFate==='吉'?'good':jcFate==='大吉'?'great':jcFate==='凶'?'bad':'ok'}">${jianchu}</span></div>
-      <div class="jiuri-row"><span style="opacity:.4">星宿</span><span>${xiuName}宿</span><span style="font-size:10px;opacity:.4">(${xiuBang}日)</span><span class="jiuri-badge ${xiuFate==='大吉'?'great':xiuFate==='吉'?'good':'ok'}">${xiuFate}</span></div>
+      <div class="jiuri-row"><span class="rpt-is-99">冲</span><span class="rpt-is-3">${chongZhu}🐀</span><span class="rpt-is-99">煞</span><span class="rpt-is-3">${shaFang}向</span></div>
+      <div class="jiuri-row"><span class="rpt-is-99">建除</span><span class="jiuri-badge ${jcFate==='吉'?'good':jcFate==='大吉'?'great':jcFate==='凶'?'bad':'ok'}">${jianchu}</span></div>
+      <div class="jiuri-row"><span class="rpt-is-99">星宿</span><span>${xiuName}宿</span><span class="rpt-is-53">(${xiuBang}日)</span><span class="jiuri-badge ${xiuFate==='大吉'?'great':xiuFate==='吉'?'good':'ok'}">${xiuFate}</span></div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
@@ -22940,9 +22940,9 @@ function jiuriShowDetail(date) {
   html += `<div class="jiuri-detail-card">
     <h4>🔮 五行分析</h4>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;text-align:center">
-      <div><div style="font-size:10px;opacity:.4">天干</div><div style="font-size:20px;font-family:Ma Shan Zheng,serif;color:var(--gold)">${stem}</div><div class="rpt-is-6">${stemEle}性</div></div>
-      <div><div style="font-size:10px;opacity:.4">地支</div><div style="font-size:20px;font-family:Ma Shan Zheng,serif;color:var(--gold)">${branch}</div><div class="rpt-is-6">${branchEle}性</div></div>
-      <div><div style="font-size:10px;opacity:.4">纳音</div><div style="font-size:11px;opacity:.6">${ganzhi}剑锋</div></div>
+      <div><div class="rpt-is-53">天干</div><div style="font-size:20px;font-family:Ma Shan Zheng,serif;color:var(--gold)">${stem}</div><div class="rpt-is-6">${stemEle}性</div></div>
+      <div><div class="rpt-is-53">地支</div><div style="font-size:20px;font-family:Ma Shan Zheng,serif;color:var(--gold)">${branch}</div><div class="rpt-is-6">${branchEle}性</div></div>
+      <div><div class="rpt-is-53">纳音</div><div class="rpt-is-57">${ganzhi}剑锋</div></div>
     </div>
   </div>`;
 
@@ -22951,7 +22951,7 @@ function jiuriShowDetail(date) {
   let wisdom = getDailyWisdom(date, stemIdx);
   extraHtml += '<div class="jiuri-detail-card"><h4>💡 每日生活智慧</h4>';
   extraHtml += '<div style="margin-top:12px;padding:14px 16px;background:rgba(52,152,219,.06);border-radius:8px;border-left:3px solid var(--cyan2);line-height:1.8">';
-  extraHtml += '<div style="font-size:13px">' + wisdom + '</div></div>';
+  extraHtml += '<div class="rpt-is-103">' + wisdom + '</div></div>';
   extraHtml += '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">';
   let wtTags = ['起居养生','饮食调理','运动锻炼','情志管理','经络保健'];
   for (let wi = 0; wi < wtTags.length; wi++) {
@@ -22966,7 +22966,7 @@ function jiuriShowDetail(date) {
     extraHtml += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:12px">';
     if (stInfo) {
       extraHtml += '<div><div style="font-size:10px;opacity:.4;margin-bottom:4px">时令美食</div><div class="rpt-is-5">' + stInfo.food + '</div></div>';
-      extraHtml += '<div><div style="font-size:10px;opacity:.4;margin-bottom:4px">民俗禁忌</div><div style="font-size:12px;color:var(--cinn2)">' + stInfo.taboo + '</div></div>';
+      extraHtml += '<div><div style="font-size:10px;opacity:.4;margin-bottom:4px">民俗禁忌</div><div class="rpt-is-76">' + stInfo.taboo + '</div></div>';
       extraHtml += '<div><div style="font-size:10px;opacity:.4;margin-bottom:4px">养生要点</div><div class="rpt-is-5">' + stInfo.health + '</div></div>';
     }
     extraHtml += '</div>';
@@ -23973,7 +23973,7 @@ function _generatePrecisionReport(zeriResult, ys, baziData, userInfo) {
       html += '<span>' + (avD.getMonth()+1) + '月' + avD.getDate() + '日</span>';
       html += '<span class="pr-avoid-score">' + av.totalScore + '分/' + av.level + '</span>';
       html += '<span>' + av.ganzhi + '日</span>';
-      html += '<span style="opacity:.6">' + (av.xiongshenList.length > 0 ? av.xiongshenList.slice(0,2).join('、') + '忌' : '') + '</span>';
+      html += '<span class="rpt-is-54">' + (av.xiongshenList.length > 0 ? av.xiongshenList.slice(0,2).join('、') + '忌' : '') + '</span>';
       html += '</div>';
     }
     html += '</div>';
@@ -24195,7 +24195,7 @@ function _suggestGoodHour(best, ys) {
   let top3 = hourScores.slice(0, 3);
   
   // 生成详细建议
-  let result = '<div style="margin-top:12px">';
+  let result = '<div class="rpt-is-40">';
   result += '<div style="font-size:12px;color:var(--gold);margin-bottom:8px">🕐 吉时推荐（精确到小时）</div>';
   result += '<table style="width:100%;font-size:11px">';
   for (let t = 0; t < top3.length; t++) {
@@ -24312,7 +24312,7 @@ function runPrecisionZeRi() {
       }
     } catch(e) {
       if (resultEl) {
-        resultEl.innerHTML = '<div style="color:var(--cinn2);padding:12px">择日推演出错：' + e.message + '</div>';
+        resultEl.innerHTML = '<div class="rpt-is-37">择日推演出错：' + e.message + '</div>';
       }
     }
   }, 200);
@@ -24392,7 +24392,7 @@ function renderZeriMembers() {
   let html = '';
   _zeriMembers.forEach(function(m, idx) {
     html += '<div style="background:rgba(0,0,0,0.15);border:1px solid rgba(0,100,150,0.1);border-radius:8px;padding:12px;margin-bottom:8px" id="' + m.id + '-row">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
+    html += '<div class="rpt-is-42">';
     html += '<span style="font-size:12px;color:var(--cyan);letter-spacing:1px">参与人 #' + (idx + 1) + '</span>';
     html += '<button onclick="removeZeriMember(\'' + m.id + '\')" style="background:none;border:none;color:var(--cinn2);cursor:pointer;font-size:14px;padding:2px 8px">✕</button>';
     html += '</div>';
@@ -24539,7 +24539,7 @@ function analyzeMultiPersonZeri(members, purpose) {
     let ele = ELE_MAP[mb.dayStem];
     if (ele) eleCount[ele] = (eleCount[ele]||0) + 1;
   });
-  html += '<div style="margin-top:12px">';
+  html += '<div class="rpt-is-40">';
   html += '<p style="font-size:11px;opacity:.6;margin-bottom:6px">参与人日主五行分布：</p>';
   let eleColors = {'金':'var(--gold2)','木':'var(--jade)','水':'var(--cyan2)','火':'var(--cinn2)','土':'var(--orange)'};
   html += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
@@ -24938,7 +24938,7 @@ function renderYearlyFengshuiReport(data) {
   html += '</div>';
 
   // 飞星盘
-  html += '<div class="rpt-is-9"><h5 style="font-size:14px;letter-spacing:4px;color:var(--gold);margin-bottom:16px">⭐ ' + data.targetYear + '年九宫飞星盘</h5>';
+  html += '<div class="rpt-is-9"><h5 class="rpt-is-70">⭐ ' + data.targetYear + '年九宫飞星盘</h5>';
   html += '<div class="fs-flyingstar-grid">';
   let gridOrder = ['东南', '南', '西南', '东', '中', '西', '东北', '北', '西北'];
   let gridLabels = { '东南': '东南', '南': '南', '西南': '西南', '东': '东', '中': '中宫', '西': '西', '东北': '东北', '北': '北', '西北': '西北' };
@@ -24962,7 +24962,7 @@ function renderYearlyFengshuiReport(data) {
   for (let n = 0; n < data.negativeAreas.length; n++) {
     let na = data.negativeAreas[n];
     html += '<div style="background:rgba(231,76,60,0.06);border:1px solid rgba(231,76,60,0.2);border-radius:10px;padding:16px;margin-bottom:12px">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
+    html += '<div class="rpt-is-42">';
     html += '<span style="font-size:15px;color:var(--cinn2);font-weight:bold">' + na.starName + ' → ' + na.position + '方</span>';
     html += '<span style="font-size:11px;opacity:.7">' + na.impact + '</span>';
     html += '</div>';
@@ -24980,7 +24980,7 @@ function renderYearlyFengshuiReport(data) {
   for (let p = 0; p < data.positiveAreas.length; p++) {
     let pa = data.positiveAreas[p];
     html += '<div style="background:rgba(46,204,113,0.06);border:1px solid rgba(46,204,113,0.2);border-radius:10px;padding:16px;margin-bottom:12px">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
+    html += '<div class="rpt-is-42">';
     html += '<span style="font-size:15px;color:var(--success);font-weight:bold">' + pa.starName + ' → ' + pa.position + '方</span>';
     html += '<span style="font-size:11px;opacity:.7">' + pa.impact + '</span>';
     html += '</div>';
@@ -24994,18 +24994,18 @@ function renderYearlyFengshuiReport(data) {
   html += '</div>';
 
   // 吉祥物推荐详表
-  html += '<div class="rpt-is-9"><h5 style="font-size:14px;letter-spacing:4px;color:var(--gold);margin-bottom:16px">🎁 吉祥物推荐详表</h5>';
-  html += '<div style="overflow-x:auto"><table style="width:100%;font-size:12px;border-collapse:collapse">';
+  html += '<div class="rpt-is-9"><h5 class="rpt-is-70">🎁 吉祥物推荐详表</h5>';
+  html += '<div class="rpt-is-86"><table style="width:100%;font-size:12px;border-collapse:collapse">';
   html += '<tr style="border-bottom:1px solid rgba(201,168,76,0.2);color:var(--gold)"><th class="rpt-is-30">吉祥物</th><th class="rpt-is-30">用途</th><th class="rpt-is-30">摆放位置</th><th class="rpt-is-30">摆放时间</th><th class="rpt-is-30">处置方法</th><th class="rpt-is-30">价格</th></tr>';
   for (let r = 0; r < data.recommendations.length; r++) {
     let rec = data.recommendations[r];
     html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.04)">';
     html += '<td style="padding:8px;color:var(--gold)">' + rec.item + '</td>';
-    html += '<td style="padding:8px;opacity:.7">' + rec.purpose + '</td>';
-    html += '<td style="padding:8px;opacity:.7">' + rec.placement + '</td>';
-    html += '<td style="padding:8px;opacity:.7">' + rec.timing + '</td>';
-    html += '<td style="padding:8px;opacity:.7">' + rec.disposal + '</td>';
-    html += '<td style="padding:8px;opacity:.7">' + rec.price_range + '</td>';
+    html += '<td class="rpt-is-107">' + rec.purpose + '</td>';
+    html += '<td class="rpt-is-107">' + rec.placement + '</td>';
+    html += '<td class="rpt-is-107">' + rec.timing + '</td>';
+    html += '<td class="rpt-is-107">' + rec.disposal + '</td>';
+    html += '<td class="rpt-is-107">' + rec.price_range + '</td>';
     html += '</tr>';
   }
   html += '</table></div></div>';
@@ -25016,18 +25016,18 @@ function renderYearlyFengshuiReport(data) {
   for (let dp = 0; dp < data.disposal.length; dp++) {
     let dItem = data.disposal[dp];
     html += '<div style="background:rgba(230,126,34,0.05);border:1px solid rgba(230,126,34,0.15);border-radius:8px;padding:12px;margin-bottom:8px;font-size:12px">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+    html += '<div class="rpt-is-75">';
     html += '<span style="color:var(--orange);font-weight:bold">' + dItem.item + '</span>';
     html += '<span class="rpt-is-2">' + dItem.timing + '</span>';
     html += '</div>';
-    html += '<div style="opacity:.7">位置：' + dItem.position + '（' + dItem.starName + '）</div>';
+    html += '<div class="rpt-is-71">位置：' + dItem.position + '（' + dItem.starName + '）</div>';
     html += '<div style="opacity:.7;margin-top:4px">处置：' + dItem.disposal + '</div>';
     html += '</div>';
   }
   html += '</div>';
 
   // 全年风水调整时间表
-  html += '<div class="rpt-is-9"><h5 style="font-size:14px;letter-spacing:4px;color:var(--gold);margin-bottom:16px">📅 全年风水调整时间表</h5>';
+  html += '<div class="rpt-is-9"><h5 class="rpt-is-70">📅 全年风水调整时间表</h5>';
   for (let t = 0; t < data.timeline.length; t++) {
     let tl = data.timeline[t];
     let priorityColor = tl.priority === '高' ? 'var(--cinn2)' : tl.priority === '中' ? 'var(--gold)' : 'var(--success)';
@@ -25035,13 +25035,13 @@ function renderYearlyFengshuiReport(data) {
     html += '<div style="min-width:120px;font-size:12px;color:var(--gold);font-weight:bold">' + tl.time + '</div>';
     html += '<div style="flex:1">';
     html += '<div style="font-size:13px;margin-bottom:4px">' + tl.action + ' <span style="font-size:10px;padding:1px 6px;border-radius:3px;background:' + priorityColor + '22;color:' + priorityColor + '">优先级:' + tl.priority + '</span></div>';
-    html += '<div style="font-size:11px;opacity:.6">' + tl.detail + '</div>';
+    html += '<div class="rpt-is-57">' + tl.detail + '</div>';
     html += '</div></div>';
   }
   html += '</div>';
 
   // 方位综合影响
-  html += '<div class="rpt-is-9"><h5 style="font-size:14px;letter-spacing:4px;color:var(--gold);margin-bottom:16px">🏠 八方位综合影响分析</h5>';
+  html += '<div class="rpt-is-9"><h5 class="rpt-is-70">🏠 八方位综合影响分析</h5>';
   html += '<p style="font-size:12px;opacity:.5;margin-bottom:12px">八宅吉凶位 × 流年飞星 × 户型朝向综合判断</p>';
   for (let di = 0; di < data.directionImpact.length; di++) {
     let dImp = data.directionImpact[di];
@@ -25762,7 +25762,7 @@ function _generateSanyuanJiuyunBlock(type, ctx) {
   if (type === 'bazi') {
     let birthYY = ctx.birthYear ? getCurrentYuanYun(ctx.birthYear) : null;
     html += _header('三元九运命理框架');
-    html += '<div style="font-size:13px;line-height:2;opacity:.9">';
+    html += '<div class="rpt-is-38">';
     if (birthYY) {
       html += '<p><b>出生时运星：</b>' + birthYY.yuan + ' · ' + birthYY.name + '（' + birthYY.star + '），五行属' + birthYY.wuxing + '。</p>';
     }
@@ -25801,7 +25801,7 @@ function _generateSanyuanJiuyunBlock(type, ctx) {
 
   } else if (type === 'qimen') {
     html += _header('三元九运与奇门');
-    html += '<div style="font-size:13px;line-height:2;opacity:.9">';
+    html += '<div class="rpt-is-38">';
     html += '<p><b>运星定位：</b>' + yunInfo + '</p>';
     html += '<p><b>离宫权重调整：</b>九紫离火对应离宫，离宫在奇门中为景门所在。九运期间离宫相关格局权重<b>+20%</b>，景门吉格更吉、凶格更凶。</p>';
     html += '<p><b>运星五行与日主：</b>日主' + dayStem + '(' + dayEle + ')与运星' + yunWx + '为<b>' + rel + '</b>关系。';
@@ -25815,7 +25815,7 @@ function _generateSanyuanJiuyunBlock(type, ctx) {
 
   } else if (type === 'ziwei') {
     html += _header('三元九运与紫微');
-    html += '<div style="font-size:13px;line-height:2;opacity:.9">';
+    html += '<div class="rpt-is-38">';
     html += '<p><b>运星定位：</b>' + yunInfo + '</p>';
     html += '<p><b>太阳星权重：</b>九紫对应离卦，离卦在紫微中对应太阳星。九运期间太阳星权重<b>+20%</b>，太阳入庙旺者事业显达，落陷者需防精力透支。</p>';
     html += '<p><b>运星与命宫主星：</b>当前运星五行' + yunWx + '，与命宫主星的五行关系影响运势基调。';
@@ -25829,7 +25829,7 @@ function _generateSanyuanJiuyunBlock(type, ctx) {
 
   } else if (type === 'meihua') {
     html += _header('三元九运与梅花');
-    html += '<div style="font-size:13px;line-height:2;opacity:.9">';
+    html += '<div class="rpt-is-38">';
     html += '<p><b>运星定位：</b>' + yunInfo + '</p>';
     let castYY = ctx.castYear ? getCurrentYuanYun(ctx.castYear) : curYY;
     html += '<p><b>起卦运星影响：</b>起卦时处于' + castYY.name + '，五行属' + castYY.wuxing + '。运星五行对卦象有底层影响：运星五行与体卦五行相生则吉增，相克则凶增。</p>';
@@ -25845,7 +25845,7 @@ function _generateSanyuanJiuyunBlock(type, ctx) {
 
   } else if (type === 'liuren') {
     html += _header('三元九运与六壬');
-    html += '<div style="font-size:13px;line-height:2;opacity:.9">';
+    html += '<div class="rpt-is-38">';
     html += '<p><b>运星定位：</b>' + yunInfo + '</p>';
     html += '<p><b>南方天将权重：</b>九紫对应离方(正南)，六壬中胜光(午)临南方。九运期间南方天将权重<b>+20%</b>，胜光临用神则吉力倍增，临忌神则凶力加重。</p>';
     html += '<p><b>运星五行与四课三传：</b>运星' + yunWx + '与初传五行关系影响课式判断。';
@@ -25859,7 +25859,7 @@ function _generateSanyuanJiuyunBlock(type, ctx) {
 
   } else if (type === 'huajie') {
     html += _header('三元九运化解');
-    html += '<div style="font-size:13px;line-height:2;opacity:.9">';
+    html += '<div class="rpt-is-38">';
     html += '<p><b>运星催旺（正神位' + zhengShen + '）：</b>九紫火运期间，正南方为正神位，宜放红色/紫色物品、灯光照明、火属性饰品（如红水晶、紫水晶），催旺运星能量。</p>';
     html += '<p><b>零神化解（零神位' + lingShen + '）：</b>正北方为零神位，不宜见真水（鱼缸、水景）。宜放金属/水属性物品泄化——金泄土生水，以金属性饰品（铜葫芦、五帝钱）通关化解。</p>';
     html += '<p><b>日主关系定化解重点：</b>日主' + dayStem + '(' + dayEle + ')与运星' + yunWx + '为<b>' + rel + '</b>关系。';
@@ -25873,7 +25873,7 @@ function _generateSanyuanJiuyunBlock(type, ctx) {
 
   } else if (type === 'floor') {
     html += _header('三元九运楼层维度');
-    html += '<div style="font-size:13px;line-height:2;opacity:.9">';
+    html += '<div class="rpt-is-38">';
     html += '<p><b>运星定位：</b>' + yunInfo + '</p>';
     html += '<p><b>运星楼层评分调整：</b>九紫火运期间——</p>';
     html += '<p>• 楼层尾数2/7(火)：与运星同气，<b class="rpt-is-4">+10分</b></p>';
@@ -25886,7 +25886,7 @@ function _generateSanyuanJiuyunBlock(type, ctx) {
 
   } else if (type === 'zeri') {
     html += _header('三元九运择日维度');
-    html += '<div style="font-size:13px;line-height:2;opacity:.9">';
+    html += '<div class="rpt-is-38">';
     html += '<p><b>运星定位：</b>' + yunInfo + '</p>';
     html += '<p><b>运星日干支评分调整：</b>九紫火运期间——</p>';
     html += '<p>• 日干支五行属火/土：运星同气或相生，<b class="rpt-is-4">+5分</b></p>';
@@ -25898,7 +25898,7 @@ function _generateSanyuanJiuyunBlock(type, ctx) {
 
   } else if (type === 'fengshui') {
     html += _header('三元九运风水维度');
-    html += '<div style="font-size:13px;line-height:2;opacity:.9">';
+    html += '<div class="rpt-is-38">';
     html += '<p><b>运星定位：</b>' + yunInfo + '</p>';
     html += '<p><b>正神位催旺（' + zhengShen + '）：</b>九紫火运期间正南方为正神位，宜催旺——红色装饰、灯光照明、火属性物品（红水晶、紫水晶、中国结）。保持明亮，不宜堆放杂物。</p>';
     html += '<p><b>零神位化解（' + lingShen + '）：</b>正北方为零神位，不宜见真水（鱼缸、水景忌大）。宜金属饰品泄化——铜葫芦、五帝钱、金属风铃等，以金泄土生水通关。</p>';
@@ -26478,7 +26478,7 @@ function renderAnnualForecastHTML(forecast, visibleCount, accessLevel) {
     
     // 维度标题
     html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">';
-    html += '<span style="font-size:14px;font-weight:bold;color:var(--gold)">' + dim.icon + ' ' + dim.name + '</span>';
+    html += '<span class="rpt-is-51">' + dim.icon + ' ' + dim.name + '</span>';
     let starsStr = '';
     for (let s = 0; s < 5; s++) starsStr += s < dim.stars ? '⭐' : '☆';
     html += '<span style="font-size:11px">' + starsStr + '</span>';
@@ -26576,11 +26576,11 @@ function getAnnualHuajie(forecast) {
   html += '<h5 style="color:var(--cyan);margin-bottom:10px">💼 事业化解</h5>';
   if (careerScore <= 2) {
     html += '<div style="font-size:12px;color:var(--cinn2);margin-bottom:8px">⚠️ 事业运较弱，需主动化解：</div>';
-    html += '<div style="font-size:12px;color:var(--paper2);line-height:2;margin-bottom:10px">';
+    html += '<div class="rpt-is-39">';
     html += '<b>📋 需准备物品：</b>黑曜石柱×1、白水晶球×1、绿植×1盆、深色正装<br>';
     html += '<b>🧭 化解方位：</b>办公室正北方（官星位）+ 西北方（贵人位）<br>';
     html += '<b>⏰ 化解时间表（按节气）：</b></div>';
-    html += '<ul style="font-size:12px;color:var(--paper2);line-height:2;padding-left:16px">';
+    html += '<ul class="rpt-is-45">';
     html += '<li><b>立春（2月4日）</b>：第1步——在办公室正北方放黑曜石柱化事业压力；第2步——穿深色正装增威信；第3步——面向正北方默念事业目标7遍</li>';
     html += '<li><b>惊蛰（3月6日）</b>：第1步——主动学习新技能补竞争力；第2步——佩戴白水晶柱增强专注力；第3步——办公桌左手位放绿植挡煞</li>';
     html += '<li><b>立夏（5月6日）</b>：事业上易有口舌，宜静不宜动——不宜此期跳槽或创业；佩戴' + dEle.crystal + '护身</li>';
@@ -26590,11 +26590,11 @@ function getAnnualHuajie(forecast) {
     html += '</ul>';
   } else if (careerScore >= 4) {
     html += '<div style="font-size:12px;color:var(--jade2);margin-bottom:8px">✅ 事业运较好，顺势而为：</div>';
-    html += '<div style="font-size:12px;color:var(--paper2);line-height:2;margin-bottom:10px">';
+    html += '<div class="rpt-is-39">';
     html += '<b>📋 需准备物品：</b>文昌塔×1、黄虎眼石手链×1、绿植×1盆<br>';
     html += '<b>🧭 催旺方位：</b>办公室东南方（文昌位）+ 日干贵人方<br>';
     html += '<b>⏰ 操作步骤（按节气）：</b></div>';
-    html += '<ul style="font-size:12px;color:var(--paper2);line-height:2;padding-left:16px">';
+    html += '<ul class="rpt-is-45">';
     if (careerMonths.length > 0) html += '<li><b>' + careerMonths.join('月、') + '月</b>是事业黄金期——第1步重点突破项目；第2步佩戴黄虎眼石增强气场；第3步主动向领导汇报成果</li>';
     html += '<li><b>立春（2月4日）</b>：在办公室东南方放文昌塔，促进升迁考核</li>';
     html += '<li><b>每月初九</b>：向东南方焚香祈福，增强事业贵人运</li>';
@@ -26602,11 +26602,11 @@ function getAnnualHuajie(forecast) {
     html += '</ul>';
   } else {
     html += '<div style="font-size:12px;color:var(--amber);margin-bottom:8px">事业运平稳，保持节奏：</div>';
-    html += '<div style="font-size:12px;color:var(--paper2);line-height:2;margin-bottom:10px">';
+    html += '<div class="rpt-is-39">';
     html += '<b>📋 需准备物品：</b>' + dEle.crystal + '（饰品）<br>';
     html += '<b>🧭 催旺方位：</b>喜用神方位（' + xiData.dir + '）<br>';
     html += '<b>⏰ 操作步骤：</b></div>';
-    html += '<ul style="font-size:12px;color:var(--paper2);line-height:2;padding-left:16px">';
+    html += '<ul class="rpt-is-45">';
     html += '<li><b>春分（3月21日）</b>：关键节点——提前准备，佩戴' + dEle.crystal + '增强日主</li>';
     html += '<li><b>秋分（9月23日）</b>：第二个关键节点——稳步推进，办公桌保持整洁有序</li>';
     html += '</ul>';
@@ -26618,11 +26618,11 @@ function getAnnualHuajie(forecast) {
   html += '<h5 style="color:var(--gold);margin-bottom:10px">💰 财运化解</h5>';
   if (wealthScore <= 2) {
     html += '<div style="font-size:12px;color:var(--cinn2);margin-bottom:8px">⚠️ 财运偏弱，重点堵漏：</div>';
-    html += '<div style="font-size:12px;color:var(--paper2);line-height:2;margin-bottom:10px">';
+    html += '<div class="rpt-is-39">';
     html += '<b>📋 需准备物品：</b>聚宝盆×1、五帝钱×1串、黄水晶球×1、棕色钱包×1<br>';
     html += '<b>🧭 化解方位：</b>大门对角线明财位 + 日干财位<br>';
     html += '<b>⏰ 堵漏时间表（按节气）：</b></div>';
-    html += '<ul style="font-size:12px;color:var(--paper2);line-height:2;padding-left:16px">';
+    html += '<ul class="rpt-is-45">';
     html += '<li><b>立春前（2月3日）</b>：第1步——在居家大门对角线明财位放聚宝盆+五帝钱；第2步——换棕色/黄色钱包；第3步——设每月自动转存强制储蓄</li>';
     html += '<li><b>春分（3月21日）</b>：理财规划期——梳理收支，制定全年预算</li>';
     html += '<li><b>立夏-夏至（5月-6月）</b>：财运最弱期——不宜投资、不借钱、不做担保；佩戴黄水晶聚宝盆锁财</li>';
@@ -26633,11 +26633,11 @@ function getAnnualHuajie(forecast) {
     html += '</ul>';
   } else if (wealthScore >= 4) {
     html += '<div style="font-size:12px;color:var(--jade2);margin-bottom:8px">✅ 财运较好，把握时机：</div>';
-    html += '<div style="font-size:12px;color:var(--paper2);line-height:2;margin-bottom:10px">';
+    html += '<div class="rpt-is-39">';
     html += '<b>📋 需准备物品：</b>黄水晶聚宝盆×1、黄虎眼石手链×1、三足金蟾×1、五帝钱×1串<br>';
     html += '<b>🧭 催旺方位：</b>明财位 + 日干财位 + 正南方（偏财位）<br>';
     html += '<b>⏰ 操作步骤（按节气）：</b></div>';
-    html += '<ul style="font-size:12px;color:var(--paper2);line-height:2;padding-left:16px">';
+    html += '<ul class="rpt-is-45">';
     if (wealthMonths.length > 0) html += '<li><b>' + wealthMonths.join('月、') + '月</b>财运黄金期——第1步重点投资理财；第2步佩戴黄虎眼石手链；第3步在财位焚香祈福</li>';
     html += '<li><b>惊蛰（3月6日）</b>：正财月——做理财规划，居家东南方放黄水晶球</li>';
     html += '<li><b>夏至（6月21日）</b>：偏财月——正南方放三足金蟾（头朝室内），可小额尝试投资</li>';
@@ -26647,11 +26647,11 @@ function getAnnualHuajie(forecast) {
     html += '</ul>';
   } else {
     html += '<div style="font-size:12px;color:var(--amber);margin-bottom:8px">财运平稳，稳健为主：</div>';
-    html += '<div style="font-size:12px;color:var(--paper2);line-height:2;margin-bottom:10px">';
+    html += '<div class="rpt-is-39">';
     html += '<b>📋 需准备物品：</b>黄水晶球×1、聚宝盆×1<br>';
     html += '<b>🧭 催旺方位：</b>明财位<br>';
     html += '<b>⏰ 操作步骤：</b></div>';
-    html += '<ul style="font-size:12px;color:var(--paper2);line-height:2;padding-left:16px">';
+    html += '<ul class="rpt-is-45">';
     html += '<li><b>春分（3月21日）</b>：理财规划期——佩戴黄水晶增强财气</li>';
     html += '<li><b>秋分（9月23日）</b>：第2轮规划——稳健投资，不贪快钱</li>';
     html += '<li><b>全年</b>：居家财位放聚宝盆，每月定期储蓄</li>';
@@ -26662,10 +26662,10 @@ function getAnnualHuajie(forecast) {
   // ═══════ 3. 感情化解（含节气时间表+操作步骤） ═══════
   html += '<div style="margin-bottom:16px;padding:14px;background:rgba(231,76,60,0.06);border-left:3px solid var(--cinn2);border-radius:0 8px 8px 0">';
   html += '<h5 style="color:var(--cinn2);margin-bottom:10px">💕 感情化解</h5>';
-  html += '<div style="font-size:12px;color:var(--paper2);line-height:2;margin-bottom:10px">';
+  html += '<div class="rpt-is-39">';
   html += '<b>📋 需准备物品：</b>粉水晶球×1、粉色花瓶+鲜花×1、红绳脚链×1<br>';
   html += '<b>🧭 催旺方位：</b>日干桃花位 + 流年桃花位（' + targetYear + '年' + (targetYear === 2026 ? '正西' : '正东') + '）</div>';
-  html += '<ul style="font-size:12px;color:var(--paper2);line-height:2;padding-left:16px">';
+  html += '<ul class="rpt-is-45">';
   if (loveScore <= 2) {
     html += '<li><b>雨水-惊蛰（2月-3月）</b>：桃花月——第1步在卧室桃花位放粉色花瓶+9朵鲜花；第2步佩戴粉水晶手链；第3步红绳系腕</li>';
     html += '<li><b>立夏-夏至（5月-6月）</b>：感情易有矛盾——卧室避免放干花假花；镜子不可对床；穿暖色衣物</li>';
@@ -26686,11 +26686,11 @@ function getAnnualHuajie(forecast) {
   html += '<h5 style="color:var(--jade);margin-bottom:10px">🏥 健康化解</h5>';
   let healthTip = dayMasterEle === '木' ? '肝胆系统，忌熬夜动怒，春季多运动排毒' : dayMasterEle === '火' ? '心血管眼睛，忌过劳激动，夏季注意静心' : dayMasterEle === '土' ? '脾胃消化，忌暴饮饮食，注意饮食规律' : dayMasterEle === '金' ? '呼吸系统，忌抽烟雾霾，秋季注意润肺' : '肾膀胱，忌久坐憋尿，冬季注意保暖';
   let healthCrystal = dayMasterEle === '木' ? '翡翠养肝' : dayMasterEle === '火' ? '红玛瑙养心' : dayMasterEle === '土' ? '和田玉养胃' : dayMasterEle === '金' ? '白水晶养肺' : '黑曜石养肾';
-  html += '<div style="font-size:12px;color:var(--paper2);line-height:2;margin-bottom:10px">';
+  html += '<div class="rpt-is-39">';
   html += '<b>📋 需准备物品：</b>本命佛×1、' + healthCrystal + '饰品×1、艾灸套装×1<br>';
   html += '<b>🧭 化解方位：</b>床头朝喜用方位（' + xiData.dir + '）；家中东方放绿植<br>';
   html += '<b>⏰ 操作步骤（按节气）：</b></div>';
-  html += '<ul style="font-size:12px;color:var(--paper2);line-height:2;padding-left:16px">';
+  html += '<ul class="rpt-is-45">';
   if (healthScore <= 2) {
     html += '<li><b>立春（2月4日）</b>：第1步——去寺庙祈福消灾；第2步——佩戴本命佛+黑曜石挡灾；第3步——床头调整朝向吉方</li>';
     html += '<li><b>全年</b>：重点防' + healthTip + '</li>';
@@ -26735,7 +26735,7 @@ function getAnnualHuajie(forecast) {
 
   html += '<div style="margin-bottom:16px;padding:14px;background:rgba(231,76,60,0.06);border-left:3px solid var(--cinn2);border-radius:0 8px 8px 0">';
   html += '<h5 style="color:var(--cinn2);margin-bottom:10px">🔥 三元九运运星影响</h5>';
-  html += '<div style="font-size:12px;color:var(--paper2);line-height:2;margin-bottom:10px">';
+  html += '<div class="rpt-is-39">';
   html += '<b>当前运星：</b>' + annualYY.name + '（' + annualYY.yuan + ' · ' + annualYY.star + ' · ' + annualYY.wuxing + '行）<br>';
   html += '<b>大运第几年：</b>第' + annualYY.yunYear + '/20年<br>';
   html += '<b>对日主' + dayMaster + '(' + dayMasterEle + ')影响：</b>' + annualRelDesc + '<br>';
@@ -26753,14 +26753,14 @@ function getAnnualHuajie(forecast) {
   html += '<div style="font-size:13px;color:var(--gold);margin-bottom:10px">📅 ' + targetYear + '年化解时间表（按节气）</div>';
   html += '<table style="width:100%;font-size:11px;color:var(--paper2);line-height:1.8">';
   html += '<tr class="rpt-is-21"><td style="padding:4px;width:120px;color:var(--gold)">立春（2月4日）</td><td>全年第一步：设财位聚宝盆、事业防压力、去寺庙祈福、调整卧室方位</td></tr>';
-  html += '<tr class="rpt-is-21"><td style="padding:4px;color:var(--gold)">惊蛰（3月6日）</td><td>桃花月催姻缘、事业学习期、理财规划</td></tr>';
-  html += '<tr class="rpt-is-21"><td style="padding:4px;color:var(--gold)">春分（3月21日）</td><td>关键节点：提交申请、学习新技能、健康体检</td></tr>';
-  html += '<tr class="rpt-is-21"><td style="padding:4px;color:var(--gold)">立夏（5月6日）</td><td>事业压力期宜静、财运弱不宜投资、防感情矛盾</td></tr>';
-  html += '<tr class="rpt-is-21"><td style="padding:4px;color:var(--gold)">夏至（6月21日）</td><td>火最旺时注意静心健康、偏财月可小额操作</td></tr>';
-  html += '<tr class="rpt-is-21"><td style="padding:4px;color:var(--gold)">立秋（8月8日）</td><td>事业回暖期争取升迁、财运回升投资理财、感情回暖</td></tr>';
-  html += '<tr class="rpt-is-21"><td style="padding:4px;color:var(--gold)">秋分（9月23日）</td><td>事业黄金期、第2轮理财窗口、换季体检</td></tr>';
-  html += '<tr class="rpt-is-21"><td style="padding:4px;color:var(--gold)">立冬（11月7日）</td><td>年终收尾、防骗防盗、与领导沟通总结</td></tr>';
-  html += '<tr class="rpt-is-21"><td style="padding:4px;color:var(--gold)">冬至（12月22日）</td><td>偏财月、年终结账、去寺庙祈福、艾灸养生</td></tr>';
+  html += '<tr class="rpt-is-21"><td class="rpt-is-46">惊蛰（3月6日）</td><td>桃花月催姻缘、事业学习期、理财规划</td></tr>';
+  html += '<tr class="rpt-is-21"><td class="rpt-is-46">春分（3月21日）</td><td>关键节点：提交申请、学习新技能、健康体检</td></tr>';
+  html += '<tr class="rpt-is-21"><td class="rpt-is-46">立夏（5月6日）</td><td>事业压力期宜静、财运弱不宜投资、防感情矛盾</td></tr>';
+  html += '<tr class="rpt-is-21"><td class="rpt-is-46">夏至（6月21日）</td><td>火最旺时注意静心健康、偏财月可小额操作</td></tr>';
+  html += '<tr class="rpt-is-21"><td class="rpt-is-46">立秋（8月8日）</td><td>事业回暖期争取升迁、财运回升投资理财、感情回暖</td></tr>';
+  html += '<tr class="rpt-is-21"><td class="rpt-is-46">秋分（9月23日）</td><td>事业黄金期、第2轮理财窗口、换季体检</td></tr>';
+  html += '<tr class="rpt-is-21"><td class="rpt-is-46">立冬（11月7日）</td><td>年终收尾、防骗防盗、与领导沟通总结</td></tr>';
+  html += '<tr class="rpt-is-21"><td class="rpt-is-46">冬至（12月22日）</td><td>偏财月、年终结账、去寺庙祈福、艾灸养生</td></tr>';
   html += '</table>';
   html += '<div style="font-size:11px;color:var(--paper3);margin-top:10px;line-height:1.8">💡 化解时间表依据' + targetYear + '年二十四节气与流月五行旺衰编排，结合缘主日主' + dayMaster + '(' + dayMasterEle + ')定制。建议打印贴于书房，按节气执行。</div>';
 
@@ -27117,7 +27117,7 @@ function renderUserBaziCard() {
     let eleText = Object.entries(eleCount).map(function(e) { return e[0] + ':' + e[1]; }).join('  ');
     let mingGua = bazi.mingGua || {};
 
-    let html = '<div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:20px;margin-top:16px">';
+    let html = '<div class="rpt-is-58">';
     html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">';
     html += '<span style="font-size:24px">👤</span>';
     html += '<span style="font-family:\'Ma Shan Zheng\',serif;font-size:20px;color:var(--gold);letter-spacing:3px">' + bazi.name + '</span>';
@@ -27126,10 +27126,10 @@ function renderUserBaziCard() {
     html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-size:13px;line-height:1.8">';
     html += '<div><span class="rpt-is-2">日主：</span><span class="rpt-is-1">' + (bazi.dayStem || '') + (ELE[bazi.dayStem] || '') + '</span></div>';
     html += '<div><span class="rpt-is-2">生肖：</span><span>' + (bazi.zodiac || '') + '</span></div>';
-    html += '<div style="grid-column:1/-1"><span class="rpt-is-2">四柱：</span><span style="font-family:\'Ma Shan Zheng\',serif;font-size:15px;color:var(--gold);letter-spacing:4px">' + pillarText + '</span></div>';
+    html += '<div class="rpt-is-85"><span class="rpt-is-2">四柱：</span><span style="font-family:\'Ma Shan Zheng\',serif;font-size:15px;color:var(--gold);letter-spacing:4px">' + pillarText + '</span></div>';
     html += '<div><span class="rpt-is-2">用神：</span><span class="rpt-is-4">' + (bazi.xiEle || '') + '</span> <span style="opacity:.3">|</span> <span class="rpt-is-2">忌神：</span><span class="rpt-is-3">' + (bazi.jiEle || '') + '</span></div>';
     html += '<div><span class="rpt-is-2">命卦：</span><span>' + (mingGua.guaName || '') + '卦(' + (mingGua.type || '') + ')</span></div>';
-    html += '<div style="grid-column:1/-1"><span class="rpt-is-2">五行分布：</span><span class="rpt-is-5">' + eleText + '</span></div>';
+    html += '<div class="rpt-is-85"><span class="rpt-is-2">五行分布：</span><span class="rpt-is-5">' + eleText + '</span></div>';
     if (bazi.birthCity) html += '<div><span class="rpt-is-2">出生城市：</span><span>' + bazi.birthCity + '</span></div>';
     if (bazi.residenceCity) html += '<div><span class="rpt-is-2">现居城市：</span><span>' + bazi.residenceCity + '</span></div>';
     html += '</div>';
@@ -27318,7 +27318,7 @@ function renderFamilyMembers() {
     let m = familyMembers[i];
     let hourNames = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
     html += '<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:12px;position:relative">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
+    html += '<div class="rpt-is-36">';
     html += '<span style="font-size:14px;color:var(--gold);font-weight:bold">' + m.name + '</span>';
     html += '<button onclick="removeFamilyPaipanMember(' + m.id + ')" style="background:none;border:none;color:var(--cinn2);cursor:pointer;font-size:16px;padding:0 4px">×</button>';
     html += '</div>';
@@ -27347,8 +27347,8 @@ function computeSingleMemberPaipan(id) {
     let output = document.getElementById('familyResult');
     if (!output) return;
 
-    let html = '<div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:20px;margin-top:16px">';
-    html += '<h4 style="font-family:\'Ma Shan Zheng\',serif;font-size:20px;color:var(--gold);text-align:center;margin-bottom:16px;letter-spacing:3px">' + member.name + ' · 八字排盘</h4>';
+    let html = '<div class="rpt-is-58">';
+    html += '<h4 class="rpt-is-80">' + member.name + ' · 八字排盘</h4>';
     html += _renderMemberBaziCard(result, member);
     html += '</div>';
 
@@ -27452,14 +27452,14 @@ function _renderMemberBaziCard(result, member) {
   html += '<div><span class="rpt-is-2">性别：</span><span>' + (result.sex === 'male' ? '男' : '女') + '</span></div>';
   html += '<div><span class="rpt-is-2">日主：</span><span class="rpt-is-1">' + result.dayStem + dayEle + '</span></div>';
   html += '<div><span class="rpt-is-2">生肖：</span><span>' + result.zodiac + '</span></div>';
-  html += '<div style="grid-column:1/-1"><span class="rpt-is-2">四柱：</span><span style="font-family:\'Ma Shan Zheng\',serif;font-size:15px;color:var(--gold);letter-spacing:4px">' + pillarText + '</span></div>';
+  html += '<div class="rpt-is-85"><span class="rpt-is-2">四柱：</span><span style="font-family:\'Ma Shan Zheng\',serif;font-size:15px;color:var(--gold);letter-spacing:4px">' + pillarText + '</span></div>';
   html += '<div><span class="rpt-is-2">用神：</span><span class="rpt-is-4">' + result.xiEle + '</span> <span style="opacity:.3">|</span> <span class="rpt-is-2">忌神：</span><span class="rpt-is-3">' + result.jiEle + '</span></div>';
   html += '<div><span class="rpt-is-2">命卦：</span><span>' + result.mingGua.guaName + '卦(' + result.mingGua.type + ')</span></div>';
-  html += '<div style="grid-column:1/-1"><span class="rpt-is-2">五行分布：</span><span class="rpt-is-5">' + eleText + '</span></div>';
+  html += '<div class="rpt-is-85"><span class="rpt-is-2">五行分布：</span><span class="rpt-is-5">' + eleText + '</span></div>';
   html += '</div>';
 
   // 五行条形图
-  html += '<div style="margin-top:12px">';
+  html += '<div class="rpt-is-40">';
   let maxCount = 0;
   Object.values(eleCount).forEach(function(v) { if (v > maxCount) maxCount = v; });
   let eleColors = {木:'var(--jade)',火:'var(--cinn2)',土:'var(--warn)',金:'var(--metal)',水:'var(--cyan2)'};
@@ -27730,11 +27730,11 @@ function _renderFamilyReport(allResults, familyEleCount, relations, solutions) {
   let html = '';
 
   // 1. 家庭成员八字概览表
-  html += '<div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:20px;margin-top:16px">';
-  html += '<h4 style="font-family:\'Ma Shan Zheng\',serif;font-size:20px;color:var(--gold);text-align:center;margin-bottom:16px;letter-spacing:3px">📋 家庭成员八字概览</h4>';
-  html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;color:var(--paper2)">';
+  html += '<div class="rpt-is-58">';
+  html += '<h4 class="rpt-is-80">📋 家庭成员八字概览</h4>';
+  html += '<div class="rpt-is-86"><table style="width:100%;border-collapse:collapse;font-size:12px;color:var(--paper2)">';
   html += '<thead><tr style="border-bottom:1px solid rgba(201,168,76,0.2)">';
-  html += '<th class="rpt-is-30">姓名</th><th style="padding:8px">关系</th><th style="padding:8px">四柱</th><th style="padding:8px">日主</th><th style="padding:8px">用神</th><th style="padding:8px">命卦</th>';
+  html += '<th class="rpt-is-30">姓名</th><th class="rpt-is-44">关系</th><th class="rpt-is-44">四柱</th><th class="rpt-is-44">日主</th><th class="rpt-is-44">用神</th><th class="rpt-is-44">命卦</th>';
   html += '</tr></thead><tbody>';
   allResults.forEach(function(r) {
     let pillarText = r.bazi.pillars.map(function(p) { return p.stem + p.branch; }).join(' ');
@@ -27751,8 +27751,8 @@ function _renderFamilyReport(allResults, familyEleCount, relations, solutions) {
   html += '</div>';
 
   // 2. 家庭五行分布图
-  html += '<div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:20px;margin-top:16px">';
-  html += '<h4 style="font-family:\'Ma Shan Zheng\',serif;font-size:20px;color:var(--gold);text-align:center;margin-bottom:16px;letter-spacing:3px">🎨 家庭五行分布图</h4>';
+  html += '<div class="rpt-is-58">';
+  html += '<h4 class="rpt-is-80">🎨 家庭五行分布图</h4>';
   let maxCount = 0;
   Object.values(familyEleCount).forEach(function(v) { if (v > maxCount) maxCount = v; });
   let eleColors = {木:'var(--jade)',火:'var(--cinn2)',土:'var(--warn)',金:'var(--metal)',水:'var(--cyan2)'};
@@ -27769,8 +27769,8 @@ function _renderFamilyReport(allResults, familyEleCount, relations, solutions) {
   html += '</div>';
 
   // 3. 家庭相生相克分析
-  html += '<div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:20px;margin-top:16px">';
-  html += '<h4 style="font-family:\'Ma Shan Zheng\',serif;font-size:20px;color:var(--gold);text-align:center;margin-bottom:16px;letter-spacing:3px">☯ 家庭相生相克分析</h4>';
+  html += '<div class="rpt-is-58">';
+  html += '<h4 class="rpt-is-80">☯ 家庭相生相克分析</h4>';
   if (relations.length === 0) {
     html += '<p style="text-align:center;opacity:.5;font-size:13px">仅有一位成员，无关系分析</p>';
   } else {
@@ -27786,12 +27786,12 @@ function _renderFamilyReport(allResults, familyEleCount, relations, solutions) {
   html += '</div>';
 
   // 4. 综合化解方案
-  html += '<div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:20px;margin-top:16px">';
-  html += '<h4 style="font-family:\'Ma Shan Zheng\',serif;font-size:20px;color:var(--gold);text-align:center;margin-bottom:16px;letter-spacing:3px">🏗️ 综合化解方案</h4>';
+  html += '<div class="rpt-is-58">';
+  html += '<h4 class="rpt-is-80">🏗️ 综合化解方案</h4>';
 
   // 家居布局
   html += '<div class="rpt-is-17">';
-  html += '<h5 style="font-size:14px;color:var(--gold);margin-bottom:8px">🏠 家居布局建议</h5>';
+  html += '<h5 class="rpt-is-108">🏠 家居布局建议</h5>';
   solutions.layoutTips.forEach(function(tip) {
     html += '<div style="font-size:13px;opacity:.8;line-height:1.8;padding:4px 0;padding-left:16px">• ' + tip + '</div>';
   });
@@ -27799,8 +27799,8 @@ function _renderFamilyReport(allResults, familyEleCount, relations, solutions) {
 
   // 方位安排
   html += '<div class="rpt-is-17">';
-  html += '<h5 style="font-size:14px;color:var(--gold);margin-bottom:8px">🧭 方位安排</h5>';
-  html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;color:var(--paper2)">';
+  html += '<h5 class="rpt-is-108">🧭 方位安排</h5>';
+  html += '<div class="rpt-is-86"><table style="width:100%;border-collapse:collapse;font-size:12px;color:var(--paper2)">';
   html += '<thead><tr style="border-bottom:1px solid rgba(201,168,76,0.15)"><th class="rpt-is-22">成员</th><th class="rpt-is-15">命卦类型</th><th class="rpt-is-15">生气方</th><th class="rpt-is-15">天医方</th><th class="rpt-is-15">延年方</th><th class="rpt-is-15">用神</th></tr></thead><tbody>';
   solutions.roomAdvice.forEach(function(r) {
     html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.04)">';
@@ -27818,7 +27818,7 @@ function _renderFamilyReport(allResults, familyEleCount, relations, solutions) {
 
   // 配色方案
   html += '<div class="rpt-is-17">';
-  html += '<h5 style="font-size:14px;color:var(--gold);margin-bottom:8px">🎨 配色方案</h5>';
+  html += '<h5 class="rpt-is-108">🎨 配色方案</h5>';
   solutions.colorAdvice.forEach(function(c) {
     html += '<div style="font-size:13px;opacity:.8;line-height:1.8;padding:4px 0;padding-left:16px">• ' + c + '</div>';
   });
@@ -27826,7 +27826,7 @@ function _renderFamilyReport(allResults, familyEleCount, relations, solutions) {
 
   // 化煞建议
   html += '<div class="rpt-is-17">';
-  html += '<h5 style="font-size:14px;color:var(--gold);margin-bottom:8px">🛡️ 化煞建议</h5>';
+  html += '<h5 class="rpt-is-108">🛡️ 化煞建议</h5>';
   solutions.shaAdvice.forEach(function(s) {
     html += '<div style="font-size:13px;opacity:.8;line-height:1.8;padding:4px 0;padding-left:16px">• ' + s + '</div>';
   });
@@ -27834,7 +27834,7 @@ function _renderFamilyReport(allResults, familyEleCount, relations, solutions) {
 
   // 择日建议
   html += '<div class="rpt-is-19">';
-  html += '<h5 style="font-size:14px;color:var(--gold);margin-bottom:8px">📅 择日建议</h5>';
+  html += '<h5 class="rpt-is-108">📅 择日建议</h5>';
   solutions.dateAdvice.forEach(function(d) {
     html += '<div style="font-size:13px;opacity:.8;line-height:1.8;padding:4px 0;padding-left:16px">• ' + d + '</div>';
   });
@@ -27843,8 +27843,8 @@ function _renderFamilyReport(allResults, familyEleCount, relations, solutions) {
   html += '</div>';
 
   // 5. 每人详细八字卡片
-  html += '<div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:20px;margin-top:16px">';
-  html += '<h4 style="font-family:\'Ma Shan Zheng\',serif;font-size:20px;color:var(--gold);text-align:center;margin-bottom:16px;letter-spacing:3px">👤 成员详细排盘</h4>';
+  html += '<div class="rpt-is-58">';
+  html += '<h4 class="rpt-is-80">👤 成员详细排盘</h4>';
   html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">';
   allResults.forEach(function(r) {
     html += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.1);border-radius:10px;padding:16px">';
@@ -29272,7 +29272,7 @@ function computeLifePlan() {
     console.error('[人生规划] 生成推荐失败:', e.message, e.stack);
     showToast('人生规划生成失败: ' + e.message);
     let errOut = document.getElementById('lifeplanResult');
-    if (errOut) { errOut.innerHTML = '<div style="padding:40px;text-align:center"><div style="font-size:48px;margin-bottom:16px">⚠️</div><h3 class="rpt-is-26">人生规划生成失败</h3><p style="color:var(--paper2);font-size:14px;line-height:1.8">错误: ' + (e.message||'').substring(0,120) + '</p></div>'; errOut.style.display='block'; }
+    if (errOut) { errOut.innerHTML = '<div class="rpt-is-68"><div class="rpt-is-52">⚠️</div><h3 class="rpt-is-26">人生规划生成失败</h3><p class="rpt-is-69">错误: ' + (e.message||'').substring(0,120) + '</p></div>'; errOut.style.display='block'; }
     return;
   }
 
@@ -29318,7 +29318,7 @@ function computeLifePlan() {
     if (pi !== 2 && baziData.tenGods) {
       let tgIdx = pi < 2 ? pi : pi - 1;
       if (baziData.tenGods[tgIdx]) {
-        html += '<p style="font-size:11px;opacity:.6">' + baziData.tenGods[tgIdx] + '</p>';
+        html += '<p class="rpt-is-57">' + baziData.tenGods[tgIdx] + '</p>';
       }
     }
     if (ds) html += '<p style="font-size:11px;color:var(--emerald)">' + ds + '</p>';
@@ -29339,7 +29339,7 @@ function computeLifePlan() {
   html += '<p style="font-size:12px;color:var(--gold);opacity:.7;margin-bottom:12px">长生十二宫象征人生从生到旺再到衰的循环，每个阶段对应不同的人生课题。"适合的年龄做适合的事"。</p>';
 
   // 四柱长生位
-  html += '<div style="margin-bottom:14px">';
+  html += '<div class="rpt-is-74">';
   html += '<p style="font-size:13px;font-weight:600;margin-bottom:8px">四柱长生位（日干论）</p>';
   html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">';
   for (let ci = 0; ci < csStages.length; ci++) {
@@ -29364,7 +29364,7 @@ function computeLifePlan() {
     let dotColor = tl.auspicious ? 'var(--emerald)' : 'var(--fire)';
     html += '<div style="position:relative;margin-bottom:12px;padding:10px;background:' + (isCurrentStage ? 'rgba(201,168,76,.08)' : 'rgba(201,168,76,.03)') + ';border-radius:8px' + (isCurrentStage ? ';border:1px solid var(--gold)' : '') + '">';
     html += '<div style="position:absolute;left:-17px;top:14px;width:10px;height:10px;border-radius:50%;background:' + dotColor + ';border:2px solid var(--bg-card)"></div>';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+    html += '<div class="rpt-is-75">';
     html += '<span style="font-size:13px;font-weight:600;color:' + dotColor + '">' + tl.stage + ' · ' + tl.name + '</span>';
     if (isCurrentStage) html += '<span style="font-size:10px;padding:2px 8px;background:var(--gold);color:var(--bg-card);border-radius:10px">当前</span>';
     html += '</div>';
@@ -29398,7 +29398,7 @@ function computeLifePlan() {
       html += '<div style="padding:12px;background:rgba(72,201,176,.05);border-radius:10px;margin-bottom:10px">';
       html += '<p style="font-size:13px;font-weight:600;color:var(--emerald);margin-bottom:6px">✅ 宜做</p>';
       for (let yi = 0; yi < csInfo.yi.length; yi++) {
-        html += '<p style="font-size:12px;opacity:.7;line-height:1.6;padding-left:8px">• ' + csInfo.yi[yi] + '</p>';
+        html += '<p class="rpt-is-31">• ' + csInfo.yi[yi] + '</p>';
       }
       html += '</div>';
     }
@@ -29408,7 +29408,7 @@ function computeLifePlan() {
       html += '<div style="padding:12px;background:rgba(231,76,60,.05);border-radius:10px;margin-bottom:10px">';
       html += '<p style="font-size:13px;font-weight:600;color:var(--fire);margin-bottom:6px">❌ 忌做</p>';
       for (let ji = 0; ji < csInfo.ji.length; ji++) {
-        html += '<p style="font-size:12px;opacity:.7;line-height:1.6;padding-left:8px">• ' + csInfo.ji[ji] + '</p>';
+        html += '<p class="rpt-is-31">• ' + csInfo.ji[ji] + '</p>';
       }
       html += '</div>';
     }
@@ -29416,10 +29416,10 @@ function computeLifePlan() {
     // 催旺方法
     html += '<div style="padding:12px;background:rgba(201,168,76,.04);border-radius:10px;margin-bottom:10px">';
     html += '<p style="font-size:13px;font-weight:600;color:var(--gold);margin-bottom:6px">🔼 催旺方法</p>';
-    if (csInfo.enhanceStudy) html += '<p style="font-size:12px;opacity:.7;line-height:1.6;padding-left:8px">📚 学业：' + csInfo.enhanceStudy + '</p>';
-    if (csInfo.enhanceNoble) html += '<p style="font-size:12px;opacity:.7;line-height:1.6;padding-left:8px">🤝 贵人：' + csInfo.enhanceNoble + '</p>';
-    if (csInfo.enhanceMarriage) html += '<p style="font-size:12px;opacity:.7;line-height:1.6;padding-left:8px">💕 姻缘：' + csInfo.enhanceMarriage + '</p>';
-    if (csInfo.enhanceWealth) html += '<p style="font-size:12px;opacity:.7;line-height:1.6;padding-left:8px">💰 财运：' + csInfo.enhanceWealth + '</p>';
+    if (csInfo.enhanceStudy) html += '<p class="rpt-is-31">📚 学业：' + csInfo.enhanceStudy + '</p>';
+    if (csInfo.enhanceNoble) html += '<p class="rpt-is-31">🤝 贵人：' + csInfo.enhanceNoble + '</p>';
+    if (csInfo.enhanceMarriage) html += '<p class="rpt-is-31">💕 姻缘：' + csInfo.enhanceMarriage + '</p>';
+    if (csInfo.enhanceWealth) html += '<p class="rpt-is-31">💰 财运：' + csInfo.enhanceWealth + '</p>';
     html += '</div>';
 
     // 化解方法
@@ -29427,7 +29427,7 @@ function computeLifePlan() {
       html += '<div style="padding:12px;background:rgba(231,76,60,.04);border-radius:10px;margin-bottom:10px">';
       html += '<p style="font-size:13px;font-weight:600;color:var(--fire);margin-bottom:6px">🔽 化解方法</p>';
       for (let ri = 0; ri < csInfo.remedy.length; ri++) {
-        html += '<p style="font-size:12px;opacity:.7;line-height:1.6;padding-left:8px">• ' + csInfo.remedy[ri] + '</p>';
+        html += '<p class="rpt-is-31">• ' + csInfo.remedy[ri] + '</p>';
       }
       html += '</div>';
     }
@@ -29456,7 +29456,7 @@ function computeLifePlan() {
       html += '<div style="padding:12px;background:rgba(142,68,173,.04);border-radius:10px">';
       html += '<p style="font-size:13px;font-weight:600;color:var(--violet);margin-bottom:4px">下一阶段：' + ng.info.name + '（' + ng.stage + '，' + ng.info.ageRange[0] + '-' + ng.info.ageRange[1] + '岁）</p>';
       html += '<p style="font-size:12px;opacity:.6;line-height:1.6">' + ng.info.guidance + '</p>';
-      if (ng.info.theme) html += '<p style="font-size:11px;opacity:.5;margin-top:4px">🎯 主题：' + ng.info.theme + '</p>';
+      if (ng.info.theme) html += '<p class="rpt-is-55">🎯 主题：' + ng.info.theme + '</p>';
       html += '</div>';
     }
     html += '</div></div>';
@@ -29491,13 +29491,13 @@ function computeLifePlan() {
     // 催旺
     html += '<p style="font-size:12px;font-weight:600;color:var(--emerald);margin-bottom:4px">🔼 催旺</p>';
     for (let eni = 0; eni < es.enhance.length; eni++) {
-      html += '<p style="font-size:12px;opacity:.7;line-height:1.6;padding-left:8px">• ' + es.enhance[eni].target + '：' + es.enhance[eni].method + '</p>';
+      html += '<p class="rpt-is-31">• ' + es.enhance[eni].target + '：' + es.enhance[eni].method + '</p>';
     }
 
     // 化解
     html += '<p style="font-size:12px;font-weight:600;color:var(--fire);margin-top:6px;margin-bottom:4px">🔽 化解</p>';
     for (let rmi = 0; rmi < es.remedy.length; rmi++) {
-      html += '<p style="font-size:12px;opacity:.7;line-height:1.6;padding-left:8px">• ' + es.remedy[rmi].target + '：' + es.remedy[rmi].method + '</p>';
+      html += '<p class="rpt-is-31">• ' + es.remedy[rmi].target + '：' + es.remedy[rmi].method + '</p>';
     }
 
     // 专项指导 ageGuidance
@@ -29508,7 +29508,7 @@ function computeLifePlan() {
       for (let agk in ag) {
         if (ag.hasOwnProperty(agk)) {
           let agLabel = {character:'性格培养', health:'健康注意', earlyEdu:'早教建议', study:'学习建议', interest:'兴趣发展', psychology:'心理关怀', rebellion:'叛逆期应对', subject:'学科选择', division:'文理分科', exam:'备考策略', stress:'压力管理', major:'专业选择', gradVsWork:'考研vs就业', love:'恋爱观', career:'职业方向', city:'城市选择', startup:'创业vs就业', promotion:'晋升策略', jobHop:'跳槽时机', partner:'合伙人选择', invest:'投资理财', children:'子女教育', parents:'父母赡养', retirement:'退休规划', spiritual:'精神寄托', legacy:'遗产规划'}[agk] || agk;
-          html += '<p style="font-size:12px;opacity:.7;line-height:1.6;padding-left:8px"><b>' + agLabel + '：</b>' + ag[agk] + '</p>';
+          html += '<p class="rpt-is-31"><b>' + agLabel + '：</b>' + ag[agk] + '</p>';
         }
       }
       html += '</div>';
@@ -29521,40 +29521,40 @@ function computeLifePlan() {
   html += '<div class="bazi-new-module">';
   html += '<div class="bazi-module-title" onclick="toggleBaziModule(this)">🎨 兴趣爱好推荐 <span class="toggle-icon">▼</span></div>';
   html += '<div class="bazi-module-body">';
-  html += '<p style="font-size:12px;color:var(--gold);opacity:.7;margin-bottom:8px">基于八字' + hobbies.reasons.join('、') + '</p>';
-  html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">';
+  html += '<p class="rpt-is-81">基于八字' + hobbies.reasons.join('、') + '</p>';
+  html += '<div class="rpt-is-59">';
   for (let i = 0; i < hobbies.items.length; i++) {
     html += '<span style="padding:6px 14px;background:rgba(72,201,176,.08);border:1px solid rgba(72,201,176,.2);border-radius:20px;font-size:13px;color:var(--emerald)">' + hobbies.items[i] + '</span>';
   }
   html += '</div>';
-  html += '<p style="font-size:12px;opacity:.6;line-height:1.8">建议：' + hobbies.items.slice(0, 3).join('、') + '为首选方向，结合孩子实际兴趣试学1-2项，坚持3个月以上再评估是否长期发展。</p>';
+  html += '<p class="rpt-is-106">建议：' + hobbies.items.slice(0, 3).join('、') + '为首选方向，结合孩子实际兴趣试学1-2项，坚持3个月以上再评估是否长期发展。</p>';
   html += '</div></div>';
 
   // ========== 6. 学业方向推荐 ==========
   html += '<div class="bazi-new-module">';
   html += '<div class="bazi-module-title" onclick="toggleBaziModule(this)">📚 学业方向推荐 <span class="toggle-icon">▼</span></div>';
   html += '<div class="bazi-module-body">';
-  html += '<p style="font-size:12px;color:var(--gold);opacity:.7;margin-bottom:8px">基于八字' + study.reasons.join('、') + '</p>';
+  html += '<p class="rpt-is-81">基于八字' + study.reasons.join('、') + '</p>';
   if (study.topGod) html += '<p style="font-size:13px;margin-bottom:8px">最旺十神：<b class="rpt-is-1">' + study.topGod + '</b></p>';
-  html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">';
+  html += '<div class="rpt-is-59">';
   for (let i = 0; i < study.items.length; i++) {
     html += '<span style="padding:6px 14px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:20px;font-size:13px;color:var(--gold)">' + study.items[i] + '</span>';
   }
   html += '</div>';
-  html += '<p style="font-size:12px;opacity:.6;line-height:1.8">建议：优先考虑' + study.items.slice(0, 3).join('、') + '方向，结合实际成绩和学校资源选择。如有条件，可双修或辅修第二专业拓宽路径。</p>';
+  html += '<p class="rpt-is-106">建议：优先考虑' + study.items.slice(0, 3).join('、') + '方向，结合实际成绩和学校资源选择。如有条件，可双修或辅修第二专业拓宽路径。</p>';
   html += '</div></div>';
 
   // ========== 7. 中高考志愿 ==========
   html += '<div class="bazi-new-module">';
   html += '<div class="bazi-module-title" onclick="toggleBaziModule(this)">🎓 中高考志愿推荐 <span class="toggle-icon">▼</span></div>';
   html += '<div class="bazi-module-body">';
-  html += '<p style="font-size:12px;color:var(--gold);opacity:.7;margin-bottom:8px">' + major.reasons.join('；') + '</p>';
-  html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">';
+  html += '<p class="rpt-is-81">' + major.reasons.join('；') + '</p>';
+  html += '<div class="rpt-is-59">';
   for (let i = 0; i < major.items.length; i++) {
     html += '<span style="padding:6px 14px;background:rgba(41,128,185,.08);border:1px solid rgba(41,128,185,.2);border-radius:20px;font-size:13px;color:var(--cyan)">' + major.items[i] + '</span>';
   }
   html += '</div>';
-  html += '<p style="font-size:12px;opacity:.6;line-height:1.8">建议：第一批次志愿以' + major.items.slice(0, 3).join('、') + '为主冲方向；保底志愿选' + major.items.slice(-3).join('、') + '类专业稳录取。</p>';
+  html += '<p class="rpt-is-106">建议：第一批次志愿以' + major.items.slice(0, 3).join('、') + '为主冲方向；保底志愿选' + major.items.slice(-3).join('、') + '类专业稳录取。</p>';
   html += '</div></div>';
 
   // ========== 8. 职业方向推荐（含考公/国企/创业/合伙） ==========
@@ -29563,7 +29563,7 @@ function computeLifePlan() {
   html += '<div class="bazi-module-body">';
 
   // 基础职业推荐
-  html += '<p style="font-size:12px;color:var(--gold);opacity:.7;margin-bottom:8px">基于八字十神组合分析</p>';
+  html += '<p class="rpt-is-81">基于八字十神组合分析</p>';
   html += '<div style="font-size:13px;margin-bottom:10px">';
   for (let r = 0; r < career.reasons.length; r++) {
     html += '<p style="padding:4px 0;opacity:.7">• ' + career.reasons[r] + '</p>';
@@ -29580,7 +29580,7 @@ function computeLifePlan() {
   html += '<div style="margin-bottom:14px;padding:12px;background:rgba(201,168,76,.04);border-radius:10px;border-left:3px solid ' + (gov.suitable ? 'var(--emerald)' : 'var(--fire)') + '">';
   html += '<p style="font-size:14px;font-weight:600;color:' + (gov.suitable ? 'var(--emerald)' : 'var(--fire)') + ';margin-bottom:6px">🏛️ 考公考编 ' + (gov.suitable ? '✓ 适合' : '△ 一般') + '</p>';
   html += '<div class="rpt-is-13">';
-  for (let gi = 0; gi < gov.reasons.length; gi++) html += '<p style="padding:2px 0">• ' + gov.reasons[gi] + '</p>';
+  for (let gi = 0; gi < gov.reasons.length; gi++) html += '<p class="rpt-is-109">• ' + gov.reasons[gi] + '</p>';
   html += '</div>';
   html += '<p style="font-size:12px;opacity:.6;line-height:1.6;margin-top:6px">' + gov.advice + '</p>';
   if (gov.bestYears && gov.bestYears.length > 0) {
@@ -29593,10 +29593,10 @@ function computeLifePlan() {
   html += '<div style="margin-bottom:14px;padding:12px;background:rgba(41,128,185,.04);border-radius:10px;border-left:3px solid ' + (soe.suitable ? 'var(--emerald)' : 'var(--fire)') + '">';
   html += '<p style="font-size:14px;font-weight:600;color:' + (soe.suitable ? 'var(--emerald)' : 'var(--fire)') + ';margin-bottom:6px">🏢 国央企 ' + (soe.suitable ? '✓ 适合' : '△ 一般') + '</p>';
   html += '<div class="rpt-is-13">';
-  for (let si = 0; si < soe.reasons.length; si++) html += '<p style="padding:2px 0">• ' + soe.reasons[si] + '</p>';
+  for (let si = 0; si < soe.reasons.length; si++) html += '<p class="rpt-is-109">• ' + soe.reasons[si] + '</p>';
   html += '</div>';
   if (soe.industries && soe.industries.length > 0) {
-    html += '<p style="font-size:12px;opacity:.6;margin-top:6px">推荐行业：' + soe.industries.join('、') + '</p>';
+    html += '<p class="rpt-is-101">推荐行业：' + soe.industries.join('、') + '</p>';
   }
   html += '<p style="font-size:12px;opacity:.6;line-height:1.6;margin-top:4px">' + soe.advice + '</p>';
   html += '</div>';
@@ -29606,10 +29606,10 @@ function computeLifePlan() {
   html += '<div style="margin-bottom:14px;padding:12px;background:rgba(231,76,60,.04);border-radius:10px;border-left:3px solid ' + (startup.suitable ? 'var(--emerald)' : 'var(--fire)') + '">';
   html += '<p style="font-size:14px;font-weight:600;color:' + (startup.suitable ? 'var(--emerald)' : 'var(--fire)') + ';margin-bottom:6px">🚀 创业 ' + (startup.suitable ? '✓ 适合' : '△ 需谨慎') + '</p>';
   html += '<div class="rpt-is-13">';
-  for (let sti = 0; sti < startup.reasons.length; sti++) html += '<p style="padding:2px 0">• ' + startup.reasons[sti] + '</p>';
+  for (let sti = 0; sti < startup.reasons.length; sti++) html += '<p class="rpt-is-109">• ' + startup.reasons[sti] + '</p>';
   html += '</div>';
   if (startup.industries && startup.industries.length > 0) {
-    html += '<p style="font-size:12px;opacity:.6;margin-top:6px">推荐方向：' + startup.industries.join('、') + '</p>';
+    html += '<p class="rpt-is-101">推荐方向：' + startup.industries.join('、') + '</p>';
   }
   if (startup.timing && startup.timing.length > 0) {
     html += '<p style="font-size:11px;color:var(--emerald);margin-top:4px">最佳创业时机：' + startup.timing.join('、') + '</p>';
@@ -29623,10 +29623,10 @@ function computeLifePlan() {
     html += '<div style="margin-bottom:14px;padding:12px;background:rgba(39,174,96,.04);border-radius:10px;border-left:3px solid ' + (fl.suitable ? 'var(--jade)' : 'var(--fire)') + '">';
     html += '<p style="font-size:14px;font-weight:600;color:' + (fl.suitable ? 'var(--jade)' : 'var(--fire)') + ';margin-bottom:6px">🎨 自由职业 ' + (fl.suitable ? '✓ 适合' : '△ 一般') + '</p>';
     html += '<div class="rpt-is-13">';
-    for (let fli = 0; fli < fl.reasons.length; fli++) html += '<p style="padding:2px 0">• ' + fl.reasons[fli] + '</p>';
+    for (let fli = 0; fli < fl.reasons.length; fli++) html += '<p class="rpt-is-109">• ' + fl.reasons[fli] + '</p>';
     html += '</div>';
     if (fl.industries && fl.industries.length > 0) {
-      html += '<p style="font-size:12px;opacity:.6;margin-top:6px">推荐方向：' + fl.industries.join('、') + '</p>';
+      html += '<p class="rpt-is-101">推荐方向：' + fl.industries.join('、') + '</p>';
     }
     html += '<p style="font-size:12px;opacity:.6;line-height:1.6;margin-top:4px">' + fl.advice + '</p>';
     html += '</div>';
@@ -29654,7 +29654,7 @@ function computeLifePlan() {
   html += '<div class="bazi-new-module">';
   html += '<div class="bazi-module-title" onclick="toggleBaziModule(this)">🗺️ 适合发展的城市 <span class="toggle-icon">▼</span></div>';
   html += '<div class="bazi-module-body">';
-  html += '<p style="font-size:12px;color:var(--gold);opacity:.7;margin-bottom:8px">' + cities.reasons.join('；') + '</p>';
+  html += '<p class="rpt-is-81">' + cities.reasons.join('；') + '</p>';
   for (let ci = 0; ci < cities.items.length; ci++) {
     let city = cities.items[ci];
     let isPrimary = ci === 0;
@@ -29667,7 +29667,7 @@ function computeLifePlan() {
     html += '</div></div>';
   }
   if (residence) {
-    html += '<p style="font-size:12px;opacity:.6;line-height:1.8">当前居住地：' + residence + '。若与推荐方位不符，可考虑在工作地选择朝向喜用方位的住所调理。</p>';
+    html += '<p class="rpt-is-106">当前居住地：' + residence + '。若与推荐方位不符，可考虑在工作地选择朝向喜用方位的住所调理。</p>';
   }
   html += '</div></div>';
 
@@ -29675,7 +29675,7 @@ function computeLifePlan() {
   html += '<div class="bazi-new-module">';
   html += '<div class="bazi-module-title" onclick="toggleBaziModule(this)">💕 适婚年龄与择偶推荐 <span class="toggle-icon">▼</span></div>';
   html += '<div class="bazi-module-body">';
-  html += '<p style="font-size:12px;color:var(--gold);opacity:.7;margin-bottom:8px">基于八字夫妻宫+大运财官分析</p>';
+  html += '<p class="rpt-is-81">基于八字夫妻宫+大运财官分析</p>';
 
   html += '<div style="margin-bottom:12px;padding:12px;background:rgba(231,76,60,.04);border-radius:8px">';
   html += '<p style="font-size:14px;font-weight:600;color:var(--fire);margin-bottom:6px">📅 适婚年龄段</p>';
@@ -29760,7 +29760,7 @@ function computeLifePlan() {
     html += '<p style="font-size:13px;font-weight:600;color:var(--fire);margin-bottom:6px">⚠️ 健康风险期（大运长生位为病/死/墓）</p>';
     for (let rpi = 0; rpi < health.riskPeriods.length; rpi++) {
       let rp = health.riskPeriods[rpi];
-      html += '<p style="font-size:12px;opacity:.7;line-height:1.6;padding-left:8px">• ' + rp.ageRange + '（' + rp.yearRange + '）· ' + rp.stage + '：' + rp.risk + '</p>';
+      html += '<p class="rpt-is-31">• ' + rp.ageRange + '（' + rp.yearRange + '）· ' + rp.stage + '：' + rp.risk + '</p>';
     }
     html += '</div>';
   }
@@ -29904,7 +29904,7 @@ function computeLifePlan() {
       let lt = lpYuanYun.transitions[lpt];
       html += '<div style="position:relative;margin-bottom:12px;padding:10px;background:rgba(142,68,173,.04);border-radius:8px">';
       html += '<div style="position:absolute;left:-17px;top:14px;width:10px;height:10px;border-radius:50%;background:var(--cinn2);border:2px solid var(--bg-card)"></div>';
-      html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+      html += '<div class="rpt-is-75">';
       html += '<span style="font-size:13px;font-weight:600;color:var(--cinn2)">' + lt.fromYun + ' → ' + lt.toYun + '</span>';
       html += '<span style="font-size:12px;color:var(--gold)">' + lt.age + '岁 · ' + lt.year + '年</span>';
       html += '</div>';
@@ -29920,9 +29920,9 @@ function computeLifePlan() {
   html += '<div style="padding:14px;background:rgba(231,76,60,.06);border-radius:10px;margin-bottom:12px">';
   html += '<p style="font-size:14px;font-weight:600;color:var(--cinn2);margin-bottom:8px">🔥 九紫离火运(2024-2043)人生建议</p>';
   html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-bottom:10px">';
-  html += '<div style="padding:8px 10px;background:rgba(231,76,60,.04);border-radius:6px"><span class="rpt-is-6">火旺行业</span><br><span style="font-size:12px;color:var(--cinn2)">AI、新能源、文化、传媒、餐饮、美容</span></div>';
-  html += '<div style="padding:8px 10px;background:rgba(231,76,60,.04);border-radius:6px"><span class="rpt-is-6">火旺方位</span><br><span style="font-size:12px;color:var(--cinn2)">南方</span></div>';
-  html += '<div style="padding:8px 10px;background:rgba(231,76,60,.04);border-radius:6px"><span class="rpt-is-6">火旺颜色</span><br><span style="font-size:12px;color:var(--cinn2)">红色、紫色</span></div>';
+  html += '<div style="padding:8px 10px;background:rgba(231,76,60,.04);border-radius:6px"><span class="rpt-is-6">火旺行业</span><br><span class="rpt-is-76">AI、新能源、文化、传媒、餐饮、美容</span></div>';
+  html += '<div style="padding:8px 10px;background:rgba(231,76,60,.04);border-radius:6px"><span class="rpt-is-6">火旺方位</span><br><span class="rpt-is-76">南方</span></div>';
+  html += '<div style="padding:8px 10px;background:rgba(231,76,60,.04);border-radius:6px"><span class="rpt-is-6">火旺颜色</span><br><span class="rpt-is-76">红色、紫色</span></div>';
   html += '</div>';
 
   // 上下半段运程
@@ -29938,7 +29938,7 @@ function computeLifePlan() {
   // 结合甲子周期长期规划
   html += '<div style="padding:14px;background:rgba(201,168,76,.04);border-radius:10px">';
   html += '<p style="font-size:13px;font-weight:600;color:var(--gold);margin-bottom:6px">🔮 甲子周期与三元九运综合规划</p>';
-  html += '<p style="font-size:12px;opacity:.7;line-height:1.8">缘主一生跨越多个运星周期，每个运星20年对应人生不同阶段。结合甲子60年周期与三元九运180年大循环，建议在运星交替前后3年提前布局新方向，在运星中段全力发展。当前处于' + lpYuanYun.currentYuanYun.name + '，宜顺应火运大势，结合个人日主五行调整行业方向与生活方式。</p>';
+  html += '<p class="rpt-is-78">缘主一生跨越多个运星周期，每个运星20年对应人生不同阶段。结合甲子60年周期与三元九运180年大循环，建议在运星交替前后3年提前布局新方向，在运星中段全力发展。当前处于' + lpYuanYun.currentYuanYun.name + '，宜顺应火运大势，结合个人日主五行调整行业方向与生活方式。</p>';
   html += '</div>';
 
   html += '</div></div>';
@@ -30315,12 +30315,12 @@ function computeYouthPlan() {
     html += '<div class="result-section"><h3>🎨 A. 兴趣爱好推荐</h3>';
     html += '<div class="rs-content">';
     html += '<p style="color:var(--gold);margin-bottom:8px">日主' + dayEle + '·' + hobbyInfo.traits + '</p>';
-    html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">';
+    html += '<div class="rpt-is-59">';
     for (let hi = 0; hi < hobbies.length; hi++) {
       html += '<span class="cat-tag" style="background:rgba(46,204,113,.1);color:var(--jade);padding:6px 14px;border-radius:16px;font-size:13px">' + hobbies[hi] + '</span>';
     }
     html += '</div>';
-    html += '<ul style="font-size:13px;color:var(--paper2);line-height:1.8;padding-left:18px">';
+    html += '<ul class="rpt-is-110">';
     for (let hr = 0; hr < hobbyReasons.length; hr++) { html += '<li>' + hobbyReasons[hr] + '</li>'; }
     html += '</ul></div></div>';
 
@@ -30328,12 +30328,12 @@ function computeYouthPlan() {
     html += '<div class="result-section"><h3>📚 B. 学业方向推荐</h3>';
     html += '<div class="rs-content">';
     html += '<p style="color:var(--gold);margin-bottom:8px">十神' + (godNameMap[topGod] || '') + '旺·' + studyInfo.type + '</p>';
-    html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">';
+    html += '<div class="rpt-is-59">';
     for (let si = 0; si < studyItems.length; si++) {
       html += '<span class="cat-tag" style="background:rgba(52,152,219,.1);color:var(--cyan2);padding:6px 14px;border-radius:16px;font-size:13px">' + studyItems[si] + '</span>';
     }
     html += '</div>';
-    html += '<ul style="font-size:13px;color:var(--paper2);line-height:1.8;padding-left:18px">';
+    html += '<ul class="rpt-is-110">';
     for (let sr = 0; sr < studyReasons.length; sr++) { html += '<li>' + studyReasons[sr] + '</li>'; }
     html += '</ul></div></div>';
 
@@ -30341,21 +30341,21 @@ function computeYouthPlan() {
     html += '<div class="result-section"><h3>🎓 C. 中高考志愿推荐</h3>';
     html += '<div class="rs-content">';
     html += '<p style="color:var(--gold);margin-bottom:8px">用神' + primaryEle + '五行对应·' + scoreAdvice + '</p>';
-    html += '<div style="margin-bottom:12px"><strong style="font-size:14px;color:var(--paper1)">推荐专业（3-5个）：</strong>';
+    html += '<div class="rpt-is-47"><strong style="font-size:14px;color:var(--paper1)">推荐专业（3-5个）：</strong>';
     html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">';
     for (let mi2 = 0; mi2 < Math.min(majors.length, 5); mi2++) {
       html += '<span class="cat-tag" style="background:rgba(155,89,182,.1);color:var(--violet);padding:6px 14px;border-radius:16px;font-size:13px">' + majors[mi2] + '</span>';
     }
     html += '</div></div>';
-    html += '<div style="margin-bottom:12px"><strong style="font-size:14px;color:var(--paper1)">对应大学方向：</strong>';
+    html += '<div class="rpt-is-47"><strong style="font-size:14px;color:var(--paper1)">对应大学方向：</strong>';
     html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">';
     for (let ui = 0; ui < unis.length; ui++) {
       html += '<span class="cat-tag" style="background:rgba(230,126,34,.1);color:var(--orange);padding:6px 14px;border-radius:16px;font-size:13px">' + unis[ui] + '</span>';
     }
     html += '</div></div>';
-    html += '<div style="margin-bottom:12px"><strong style="font-size:14px;color:var(--paper1)">对应行业：</strong>';
+    html += '<div class="rpt-is-47"><strong style="font-size:14px;color:var(--paper1)">对应行业：</strong>';
     html += '<span style="font-size:13px;color:var(--paper2);margin-left:8px">' + industries.join('、') + '</span></div>';
-    html += '<ul style="font-size:13px;color:var(--paper2);line-height:1.8;padding-left:18px">';
+    html += '<ul class="rpt-is-110">';
     for (let mr = 0; mr < majorReasons.length; mr++) { html += '<li>' + majorReasons[mr] + '</li>'; }
     html += '</ul></div></div>';
 
@@ -30373,26 +30373,26 @@ function computeYouthPlan() {
     html += '<div class="result-section"><h3>📍 E. 适合发展城市</h3>';
     html += '<div class="rs-content">';
     html += '<p style="color:var(--gold);margin-bottom:8px">主方位：' + cityInfo.direction + '</p>';
-    html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">';
+    html += '<div class="rpt-is-59">';
     for (let cti = 0; cti < cities.length; cti++) {
       html += '<span class="cat-tag" style="background:rgba(26,188,156,.1);color:var(--emerald);padding:6px 14px;border-radius:16px;font-size:13px">' + cities[cti] + '</span>';
     }
     html += '</div>';
     if (birthplace) html += '<p style="font-size:12px;color:var(--paper2)">出生地：' + birthplace + '</p>';
     if (residence) html += '<p style="font-size:12px;color:var(--paper2)">当前居住地：' + residence + '</p>';
-    html += '<ul style="font-size:13px;color:var(--paper2);line-height:1.8;padding-left:18px">';
+    html += '<ul class="rpt-is-110">';
     for (let ctr = 0; ctr < cityReasons.length; ctr++) { html += '<li>' + cityReasons[ctr] + '</li>'; }
     html += '</ul></div></div>';
 
     // F. 适婚年龄建议
     html += '<div class="result-section"><h3>💍 F. 适婚年龄建议</h3>';
     html += '<div class="rs-content">';
-    html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">';
+    html += '<div class="rpt-is-59">';
     for (let mai = 0; mai < marriageAges.length; mai++) {
       html += '<span class="cat-tag" style="background:rgba(231,76,60,.1);color:var(--cinn2);padding:6px 14px;border-radius:16px;font-size:13px">' + marriageAges[mai] + '</span>';
     }
     html += '</div>';
-    html += '<ul style="font-size:13px;color:var(--paper2);line-height:1.8;padding-left:18px">';
+    html += '<ul class="rpt-is-110">';
     for (let mri = 0; mri < marriageReasons.length; mri++) { html += '<li>' + marriageReasons[mri] + '</li>'; }
     html += '</ul>';
     html += '<p style="font-size:12px;color:var(--paper3);margin-top:8px;font-style:italic">注：青少年阶段仅供参考，婚恋规划为长远参考</p>';
@@ -30401,17 +30401,17 @@ function computeYouthPlan() {
     // G. 性格特点分析
     html += '<div class="result-section"><h3>🌟 G. 性格特点分析</h3>';
     html += '<div class="rs-content">';
-    html += '<p style="font-size:14px;color:var(--paper1);margin-bottom:8px"><strong>性格特点：</strong>' + personality.traits + '</p>';
-    html += '<p style="font-size:14px;color:var(--paper1);margin-bottom:8px"><strong>培养建议：</strong>' + personality.cultivate + '</p>';
-    html += '<p style="font-size:14px;color:var(--paper1);margin-bottom:8px"><strong>注意事项：</strong>' + personality.avoid + '</p>';
+    html += '<p class="rpt-is-111"><strong>性格特点：</strong>' + personality.traits + '</p>';
+    html += '<p class="rpt-is-111"><strong>培养建议：</strong>' + personality.cultivate + '</p>';
+    html += '<p class="rpt-is-111"><strong>注意事项：</strong>' + personality.avoid + '</p>';
     html += '<p style="font-size:13px;color:var(--gold);margin-top:8px">' + personalityExtra + '</p>';
     html += '</div></div>';
 
     // H. 健康注意事项
     html += '<div class="result-section"><h3>🏥 H. 健康注意事项</h3>';
     html += '<div class="rs-content">';
-    html += '<p style="font-size:14px;color:var(--paper1);margin-bottom:8px"><strong>需关注器官：</strong>' + health.organs + '</p>';
-    html += '<p style="font-size:14px;color:var(--paper1);margin-bottom:8px"><strong>饮食与作息：</strong>' + health.tips + '</p>';
+    html += '<p class="rpt-is-111"><strong>需关注器官：</strong>' + health.organs + '</p>';
+    html += '<p class="rpt-is-111"><strong>饮食与作息：</strong>' + health.tips + '</p>';
     if (healthExtra.length > 0) {
       html += '<ul style="font-size:13px;color:var(--paper2);line-height:1.8;padding-left:18px;margin-top:8px">';
       for (let he = 0; he < healthExtra.length; he++) { html += '<li>' + healthExtra[he] + '</li>'; }
@@ -30452,7 +30452,7 @@ function computeYouthPlan() {
     showToast('青少年规划生成失败: ' + e.message);
     let errOut = document.getElementById('youthResult');
     if (errOut) {
-      errOut.innerHTML = '<div style="padding:40px;text-align:center"><div style="font-size:48px;margin-bottom:16px">⚠️</div><h3 class="rpt-is-26">青少年规划生成失败</h3><p style="color:var(--paper2);font-size:14px;line-height:1.8">错误: ' + (e.message||'').substring(0,120) + '</p></div>';
+      errOut.innerHTML = '<div class="rpt-is-68"><div class="rpt-is-52">⚠️</div><h3 class="rpt-is-26">青少年规划生成失败</h3><p class="rpt-is-69">错误: ' + (e.message||'').substring(0,120) + '</p></div>';
       errOut.classList.add('visible');
       errOut.scrollIntoView({behavior:'smooth'});
     }
@@ -30847,7 +30847,7 @@ function _generateCoupleReport(result, mYS, fYS, mBazi, fBazi) {
       html += '<span style="color:var(--cinn2);font-size:12px">女' + alt.femaleScore + '</span>';
       html += '<span class="pr-alt-score">' + alt.coupleScore + '分/' + alt.level + '</span>';
       if (alt.weddingGood.length > 0) {
-        html += '<span style="font-size:11px;opacity:.6">' + alt.weddingGood.join('、') + '</span>';
+        html += '<span class="rpt-is-57">' + alt.weddingGood.join('、') + '</span>';
       }
       html += '</div>';
     }
@@ -30913,7 +30913,7 @@ function _generateCoupleReport(result, mYS, fYS, mBazi, fBazi) {
         html += '<div style="margin:4px 0"><span class="rpt-is-1">★</span> <b>' + hInfo.name + '</b>（' + hourRanges[hInfo.idx] + '） — ' + hInfo.zs + '时</div>';
       }
     } else {
-      html += '<div style="opacity:.6">当日各时辰中规中矩，建议选择上午吉时（辰时/巳时）行礼。</div>';
+      html += '<div class="rpt-is-54">当日各时辰中规中矩，建议选择上午吉时（辰时/巳时）行礼。</div>';
     }
     html += '</div></div>';
   }
@@ -31258,7 +31258,7 @@ function _generateBirthReport(result, fYS, mYS) {
 
       // 五行分布
       if (c.eleCount) {
-        html += '<div style="margin-top:6px;font-size:12px">';
+        html += '<div class="rpt-is-79">';
         html += '<b>五行：</b>';
         let wxColors = { '木': 'var(--jade)', '火': 'var(--cinn2)', '土': 'var(--gold3)', '金': 'var(--metal2)', '水': 'var(--cyan2)' };
         for (let we in c.eleCount) {
@@ -31269,12 +31269,12 @@ function _generateBirthReport(result, fYS, mYS) {
 
       // 十神
       if (c.bazi && c.bazi.tenGods && c.bazi.tenGods.length > 0) {
-        html += '<div style="margin-top:6px;font-size:12px"><b>十神：</b>' + c.bazi.tenGods.join('、') + '</div>';
+        html += '<div class="rpt-is-79"><b>十神：</b>' + c.bazi.tenGods.join('、') + '</div>';
       }
 
       // 长生位
       if (c.dishi && c.dishi.length > 0) {
-        html += '<div style="margin-top:6px;font-size:12px"><b>长生：</b>' + c.dishi.join('、') + '</div>';
+        html += '<div class="rpt-is-79"><b>长生：</b>' + c.dishi.join('、') + '</div>';
       }
 
       // 评估明细
@@ -31363,7 +31363,7 @@ function runZeRiCouple() {
       }
     } catch(e) {
       if (resultEl) {
-        resultEl.innerHTML = '<div style="color:var(--cinn2);padding:12px">双方合参择日出错：' + e.message + '</div>';
+        resultEl.innerHTML = '<div class="rpt-is-37">双方合参择日出错：' + e.message + '</div>';
       }
     }
   }, 200);
@@ -31414,7 +31414,7 @@ function runZeRiBirth() {
       }
     } catch(e) {
       if (resultEl) {
-        resultEl.innerHTML = '<div style="color:var(--cinn2);padding:12px">生子择日出错：' + e.message + '</div>';
+        resultEl.innerHTML = '<div class="rpt-is-37">生子择日出错：' + e.message + '</div>';
       }
     }
   }, 200);
@@ -32253,10 +32253,10 @@ function renderJiaziCycleReport(data) {
   html += '<div class="analysis-card" class="rpt-is-17">';
   html += '<h5 style="color:' + gold + ';font-size:16px;letter-spacing:2px;margin-bottom:12px">📍 甲子定位</h5>';
   html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">';
-  html += '<div style="padding:12px;background:rgba(201,168,76,0.06);border-radius:8px"><div style="font-size:11px;color:' + paper2 + '">出生年干支</div><div style="font-size:18px;color:' + gold + ';font-weight:bold">' + p.birthGanZhi + '</div></div>';
-  html += '<div style="padding:12px;background:rgba(201,168,76,0.06);border-radius:8px"><div style="font-size:11px;color:' + paper2 + '">甲子周期</div><div style="font-size:16px;color:' + gold + '">第' + p.jiaziCycleNum + '个甲子</div><div style="font-size:11px;color:' + paper2 + '">' + p.jiaziStartYear + '-' + p.jiaziEndYear + '</div></div>';
-  html += '<div style="padding:12px;background:rgba(201,168,76,0.06);border-radius:8px"><div style="font-size:11px;color:' + paper2 + '">缘主在周期中</div><div style="font-size:16px;color:' + gold + '">第' + p.birthPosInCycle + '年</div></div>';
-  html += '<div style="padding:12px;background:rgba(201,168,76,0.06);border-radius:8px"><div style="font-size:11px;color:' + paper2 + '">' + p.currentYear + '年当前位置</div><div style="font-size:16px;color:' + gold + '">第' + p.currentPosInCycle + '年</div><div style="font-size:11px;color:' + paper2 + '">' + p.currentGanZhi + '</div></div>';
+  html += '<div class="rpt-is-83"><div style="font-size:11px;color:' + paper2 + '">出生年干支</div><div style="font-size:18px;color:' + gold + ';font-weight:bold">' + p.birthGanZhi + '</div></div>';
+  html += '<div class="rpt-is-83"><div style="font-size:11px;color:' + paper2 + '">甲子周期</div><div style="font-size:16px;color:' + gold + '">第' + p.jiaziCycleNum + '个甲子</div><div style="font-size:11px;color:' + paper2 + '">' + p.jiaziStartYear + '-' + p.jiaziEndYear + '</div></div>';
+  html += '<div class="rpt-is-83"><div style="font-size:11px;color:' + paper2 + '">缘主在周期中</div><div style="font-size:16px;color:' + gold + '">第' + p.birthPosInCycle + '年</div></div>';
+  html += '<div class="rpt-is-83"><div style="font-size:11px;color:' + paper2 + '">' + p.currentYear + '年当前位置</div><div style="font-size:16px;color:' + gold + '">第' + p.currentPosInCycle + '年</div><div style="font-size:11px;color:' + paper2 + '">' + p.currentGanZhi + '</div></div>';
   html += '</div>';
   html += '</div>';
 
@@ -32287,7 +32287,7 @@ function renderJiaziCycleReport(data) {
   }
   html += '</div>';
   // 关键年份列表
-  html += '<details style="margin-top:12px"><summary style="cursor:pointer;color:' + gold + ';font-size:13px">📋 查看逐年详细评分</summary>';
+  html += '<details class="rpt-is-40"><summary style="cursor:pointer;color:' + gold + ';font-size:13px">📋 查看逐年详细评分</summary>';
   html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px;margin-top:8px">';
   for (let i = 0; i < data.fortuneMap.length; i++) {
     let fm = data.fortuneMap[i];
@@ -32334,7 +32334,7 @@ function renderJiaziCycleReport(data) {
       let dy = data.dayunMapping[i];
       let color = gradeToColor(dy.grade);
       html += '<div style="padding:12px;background:rgba(201,168,76,0.06);border-radius:8px;border-top:3px solid ' + color + '">';
-      html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
+      html += '<div class="rpt-is-36">';
       html += '<span style="font-size:18px;color:' + gold + ';font-weight:bold">' + dy.ganZhi + '</span>';
       html += '<span style="font-size:12px;color:' + color + ';font-weight:bold">' + dy.grade + '</span>';
       html += '</div>';
@@ -32360,7 +32360,7 @@ function renderJiaziCycleReport(data) {
     else if (w.type === '合太岁') { bg = 'rgba(39,174,96,0.08)'; border = 'var(--jade)'; }
     else if (w.type === '天克地冲') { bg = 'rgba(142,68,173,0.08)'; border = 'var(--violet2)'; }
     html += '<div style="padding:12px;background:' + bg + ';border-left:3px solid ' + border + ';border-radius:8px">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
+    html += '<div class="rpt-is-36">';
     html += '<span style="font-size:14px;color:' + border + ';font-weight:bold">' + w.type + '</span>';
     html += '<span style="font-size:13px;color:' + gold + '">' + w.age + '岁 · ' + w.year + '年</span>';
     html += '</div>';
@@ -32377,8 +32377,8 @@ function renderJiaziCycleReport(data) {
   html += '<div class="analysis-card" class="rpt-is-17">';
   html += '<h5 style="color:' + gold + ';font-size:16px;letter-spacing:2px;margin-bottom:12px">🎵 纳音五行分析</h5>';
   html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px">';
-  html += '<div style="padding:12px;background:rgba(201,168,76,0.06);border-radius:8px"><div style="font-size:11px;color:' + paper2 + '">出生年纳音</div><div style="font-size:18px;color:' + gold + ';font-weight:bold">' + na.birthNayin + '</div><div style="font-size:12px;color:' + paper2 + '">五行：' + na.birthNayinEle + '</div></div>';
-  html += '<div style="padding:12px;background:rgba(201,168,76,0.06);border-radius:8px"><div style="font-size:11px;color:' + paper2 + '">日柱纳音</div><div style="font-size:18px;color:' + gold + ';font-weight:bold">' + na.dayNayin + '</div><div style="font-size:12px;color:' + paper2 + '">五行：' + na.dayNayinEle + '</div></div>';
+  html += '<div class="rpt-is-83"><div style="font-size:11px;color:' + paper2 + '">出生年纳音</div><div style="font-size:18px;color:' + gold + ';font-weight:bold">' + na.birthNayin + '</div><div style="font-size:12px;color:' + paper2 + '">五行：' + na.birthNayinEle + '</div></div>';
+  html += '<div class="rpt-is-83"><div style="font-size:11px;color:' + paper2 + '">日柱纳音</div><div style="font-size:18px;color:' + gold + ';font-weight:bold">' + na.dayNayin + '</div><div style="font-size:12px;color:' + paper2 + '">五行：' + na.dayNayinEle + '</div></div>';
   html += '</div>';
   html += '<div style="padding:12px;background:rgba(201,168,76,0.04);border-radius:8px;font-size:13px;color:' + paper + ';line-height:1.8;margin-bottom:12px">' + na.nayinRelation + '</div>';
   // 纳音全表
@@ -32409,7 +32409,7 @@ function renderJiaziCycleReport(data) {
     else if (ph.phaseType === '调整期') phaseColor = 'var(--orange)';
     else phaseColor = 'var(--cyan2)';
     html += '<div style="padding:14px;background:rgba(201,168,76,0.06);border-radius:8px;border-left:4px solid ' + phaseColor + '">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
+    html += '<div class="rpt-is-36">';
     html += '<span style="font-size:15px;color:' + gold + ';font-weight:bold">' + ph.ageRange + '</span>';
     html += '<span style="font-size:12px;color:' + phaseColor + ';font-weight:bold;padding:2px 8px;border-radius:10px;background:rgba(201,168,76,0.1)">' + ph.phaseType + '</span>';
     html += '</div>';
@@ -32502,7 +32502,7 @@ function renderJiaziCycleReport(data) {
 
     // 九紫离火运对各日主的影响
     html += '<div style="padding:12px;background:rgba(231,76,60,0.06);border-radius:8px;margin-bottom:14px">';
-    html += '<div style="font-size:13px;color:var(--cinn2);font-weight:bold;margin-bottom:8px">🔥 九紫离火运(2024-2043)对' + sc.dayMasterFull + '日主的影响</div>';
+    html += '<div class="rpt-is-67">🔥 九紫离火运(2024-2043)对' + sc.dayMasterFull + '日主的影响</div>';
     html += '<div style="font-size:13px;color:' + paper + ';line-height:1.8;padding:8px 12px;background:rgba(231,76,60,0.04);border-radius:6px">' + sc.dayMasterImpact + '</div>';
     html += '</div>';
 
@@ -32601,7 +32601,7 @@ function runJiaziCycle() {
       }
     } catch(e) {
       if (resultEl) {
-        resultEl.innerHTML = '<div style="color:var(--cinn2);padding:12px">六十甲子推算出错：' + e.message + '</div>';
+        resultEl.innerHTML = '<div class="rpt-is-37">六十甲子推算出错：' + e.message + '</div>';
       }
     }
   }, 200);
@@ -32859,12 +32859,12 @@ function computeZeRiMulti(persons, purpose, dateRange) {
 
   if (!persons || persons.length === 0) {
     result.error = '至少需要一名参与人';
-    result.report = '<div style="color:var(--cinn2);padding:12px">至少需要一名参与人</div>';
+    result.report = '<div class="rpt-is-37">至少需要一名参与人</div>';
     return result;
   }
   if (persons.length > 6) {
     result.error = '最多支持6名参与人';
-    result.report = '<div style="color:var(--cinn2);padding:12px">最多支持6名参与人</div>';
+    result.report = '<div class="rpt-is-37">最多支持6名参与人</div>';
     return result;
   }
 
@@ -32874,7 +32874,7 @@ function computeZeRiMulti(persons, purpose, dateRange) {
     let p = persons[i];
     if (!p.birthDate) {
       result.error = '第' + (i + 1) + '位参与人缺少出生日期';
-      result.report = '<div style="color:var(--cinn2);padding:12px">' + result.error + '</div>';
+      result.report = '<div class="rpt-is-37">' + result.error + '</div>';
       return result;
     }
     let bDate = new Date(p.birthDate + 'T12:00:00');
@@ -33151,7 +33151,7 @@ function _generateMultiZeRiReport(result, personDataList) {
         '<span class="pr-score-text">综合评分 ' + c.combinedScore + '/100</span></div>';
 
       // 每人单独评分
-      html += '<div style="margin-top:10px">';
+      html += '<div class="rpt-is-32">';
       for (let psi = 0; psi < c.personScores.length; psi++) {
         let ps = c.personScores[psi];
         let psColor = ps.score >= 75 ? 'var(--jade)' : ps.score >= 55 ? 'var(--warn)' : 'var(--cinn2)';
@@ -33230,7 +33230,7 @@ function _generateMultiZeRiReport(result, personDataList) {
     // 检查是否有人评分偏低
     let lowScorers = best.personScores.filter(function(ps) { return ps.score < 55; });
     if (lowScorers.length > 0) {
-      html += '<br><span style="color:var(--warn)">注意：' + lowScorers.map(function(ls) { return ls.name; }).join('、') + '的单独评分偏低，但综合来看仍可选用。</span>';
+      html += '<br><span class="rpt-is-105">注意：' + lowScorers.map(function(ls) { return ls.name; }).join('、') + '的单独评分偏低，但综合来看仍可选用。</span>';
     }
   } else {
     html += '在所选日期范围内，所有日期均有参与人犯冲煞。建议扩大搜索范围，或咨询专业命理师进行更精细的择日。';
@@ -33285,7 +33285,7 @@ function addZeRiPerson() {
   let relationLabel = idx === 0 ? '本人（首选）' : '参与人' + (idx + 1);
 
   let html = '';
-  html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
+  html += '<div class="rpt-is-42">';
   html += '<span style="font-size:13px;color:' + relationColor + ';font-weight:bold">👤 ' + relationLabel + '</span>';
   if (idx > 0) {
     html += '<button onclick="removeZeRiPerson(' + idx + ')" style="background:none;border:none;color:var(--cinn2);cursor:pointer;font-size:16px;padding:4px 8px" title="删除">✕</button>';
@@ -33404,14 +33404,14 @@ function runZeRiMulti() {
     try {
       let result = computeZeRiMulti(persons, purpose, dateRange);
       if (resultEl) {
-        resultEl.innerHTML = result.report || '<div style="color:var(--cinn2);padding:12px">推演失败</div>';
+        resultEl.innerHTML = result.report || '<div class="rpt-is-37">推演失败</div>';
         resultEl.style.display = 'block';
         playSound('success');
         resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     } catch(e) {
       if (resultEl) {
-        resultEl.innerHTML = '<div style="color:var(--cinn2);padding:12px">多人择日出错：' + e.message + '</div>';
+        resultEl.innerHTML = '<div class="rpt-is-37">多人择日出错：' + e.message + '</div>';
       }
     }
   }, 200);
@@ -33906,7 +33906,7 @@ function renderZiweiChart(stars, mingGongIdx, sihua, daXian) {
     if (sihua) {
       let sihuaText = '';
       if (sihua.lu && sihua.lu.gong === gName) sihuaText += '<span class="rpt-is-12">禄</span>';
-      if (sihua.quan && sihua.quan.gong === gName) sihuaText += '<span style="color:var(--cyan)">权</span>';
+      if (sihua.quan && sihua.quan.gong === gName) sihuaText += '<span class="rpt-is-100">权</span>';
       if (sihua.ke && sihua.ke.gong === gName) sihuaText += '<span class="rpt-is-4">科</span>';
       if (sihua.ji && sihua.ji.gong === gName) sihuaText += '<span class="rpt-is-3">忌</span>';
       if (sihuaText) {
@@ -33926,10 +33926,10 @@ function renderZiweiChart(stars, mingGongIdx, sihua, daXian) {
 
   // 图例
   html += '<div style="display:flex;gap:12px;justify-content:center;margin-top:8px;font-size:9px;color:var(--paper3)">';
-  html += '<span><span style="color:var(--violet)">■</span> 紫微星系</span>';
+  html += '<span><span class="rpt-is-63">■</span> 紫微星系</span>';
   html += '<span><span class="rpt-is-23">■</span> 天府星系</span>';
-  html += '<span><span class="rpt-is-12">禄</span><span style="color:var(--cyan)">权</span><span class="rpt-is-4">科</span><span class="rpt-is-3">忌</span> 四化</span>';
-  html += '<span><span style="color:var(--gold2)">★</span> 命宫</span>';
+  html += '<span><span class="rpt-is-12">禄</span><span class="rpt-is-100">权</span><span class="rpt-is-4">科</span><span class="rpt-is-3">忌</span> 四化</span>';
+  html += '<span><span class="rpt-is-72">★</span> 命宫</span>';
   html += '</div>';
   html += '</div>';
 
@@ -34608,7 +34608,7 @@ function computeLifeIndex() {
     if (btn) { btn.disabled = false; btn.textContent = '🌟 开 启 命 理 全 鉴 评 估'; }
     let _r = document.getElementById('lifeIndexResult');
     if(_r) {
-      _r.innerHTML = '<div style="padding:40px;text-align:center"><div style="font-size:48px;margin-bottom:16px">⚠️</div><h3 class="rpt-is-26">命理全鉴评估出错</h3><p style="color:var(--paper2);font-size:14px;line-height:1.8">错误: ' + (e.message||'').substring(0,120) + '</p></div>';
+      _r.innerHTML = '<div class="rpt-is-68"><div class="rpt-is-52">⚠️</div><h3 class="rpt-is-26">命理全鉴评估出错</h3><p class="rpt-is-69">错误: ' + (e.message||'').substring(0,120) + '</p></div>';
       _r.style.display = 'block';
       _r.scrollIntoView({behavior:'smooth'});
     }
@@ -35142,7 +35142,7 @@ function _renderLifeIndexResult(name, scores, bazi) {
   html += '<div style="font-size:13px;color:var(--paper);line-height:2;margin-bottom:8px">';
   html += '最低分维度：<strong class="rpt-is-3">'+scores.weakest.icon+' '+scores.weakest.name+'（'+scores.weakest.score+'分）</strong>';
   if (scores.secondWeakest && scores.secondWeakest.score < 70) {
-    html += '<br>次低分维度：<strong style="color:var(--warn)">'+scores.secondWeakest.icon+' '+scores.secondWeakest.name+'（'+scores.secondWeakest.score+'分）</strong>';
+    html += '<br>次低分维度：<strong class="rpt-is-105">'+scores.secondWeakest.icon+' '+scores.secondWeakest.name+'（'+scores.secondWeakest.score+'分）</strong>';
   }
   html += '</div>';
   html += '</div>';
@@ -35798,16 +35798,16 @@ function analyzeQimenGeju(palaces, keyPalace) {
 function buildQimenGejuHTML(palaces, keyPalace) {
   let gj = analyzeQimenGeju(palaces, keyPalace);
   let html = '<div class="interp-card gold-accent"><h5>🏆 奇门格局分析</h5>';
-  html += '<p style="font-size:13px;line-height:2;color:var(--paper2)">' + gj.summary + '</p>';
+  html += '<p class="rpt-is-102">' + gj.summary + '</p>';
   if (gj.auspicious.length > 0) {
-    html += '<div style="margin-top:10px"><p style="color:var(--success);font-weight:bold;font-size:13px">✅ 吉格</p>';
+    html += '<div class="rpt-is-32"><p style="color:var(--success);font-weight:bold;font-size:13px">✅ 吉格</p>';
     for (let i = 0; i < gj.auspicious.length; i++) {
       html += '<p style="font-size:12px;line-height:1.8;color:var(--paper);margin-top:4px"><strong>' + gj.auspicious[i].name + '：</strong>' + gj.auspicious[i].desc + '</p>';
     }
     html += '</div>';
   }
   if (gj.inauspicious.length > 0) {
-    html += '<div style="margin-top:10px"><p style="color:var(--cinn2);font-weight:bold;font-size:13px">❌ 凶格</p>';
+    html += '<div class="rpt-is-32"><p style="color:var(--cinn2);font-weight:bold;font-size:13px">❌ 凶格</p>';
     for (let j = 0; j < gj.inauspicious.length; j++) {
       html += '<p style="font-size:12px;line-height:1.8;color:var(--paper);margin-top:4px"><strong>' + gj.inauspicious[j].name + '：</strong>' + gj.inauspicious[j].desc + '</p>';
     }
@@ -35858,7 +35858,7 @@ function analyzeCangganTenGod(pillars, dayStem) {
 function buildCangganHTML(pillars, dayStem) {
   let data = analyzeCangganTenGod(pillars, dayStem);
   let html = '<div class="interp-card jade-accent"><h5>🏠 地支藏干十神分析</h5>';
-  html += '<p style="font-size:12px;opacity:.7;line-height:1.8">藏干力量：本气(1.0) > 中气(0.5) > 余气(0.2)，藏干十神影响命局暗藏力量。</p>';
+  html += '<p class="rpt-is-78">藏干力量：本气(1.0) > 中气(0.5) > 余气(0.2)，藏干十神影响命局暗藏力量。</p>';
   html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px">';
   for (let i = 0; i < data.length; i++) {
     let d = data[i];
@@ -36087,7 +36087,7 @@ function analyzeSanFangSiZheng(mingGongIdx, starsByGong) {
 function buildSanFangSiZhengHTML(mingGongIdx, starsByGong) {
   let sf = analyzeSanFangSiZheng(mingGongIdx, starsByGong);
   let html = '<div class="interp-card violet-accent"><h5>📐 三方四正分析</h5>';
-  html += '<p style="font-size:13px;line-height:2;color:var(--paper2)">' + sf.summary + '</p>';
+  html += '<p class="rpt-is-102">' + sf.summary + '</p>';
   html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px">';
   for (let i = 0; i < sf.siZheng.length; i++) {
     let s = sf.siZheng[i];
@@ -36191,7 +36191,7 @@ function buildWuxingQuantifyHTML(pillars, dayStem) {
     html += '<div class="rpt-is-11">';
     html += '<div style="font-size:18px;font-weight:bold;color:' + colors[ele2] + '">' + ele2 + '</div>';
     html += '<div style="font-size:14px;font-weight:bold;color:' + level.color + '">' + score2.toFixed(1) + '</div>';
-    html += '<div style="font-size:10px;color:var(--steel)">' + pct3.toFixed(0) + '%</div>';
+    html += '<div class="rpt-is-60">' + pct3.toFixed(0) + '%</div>';
     html += '</div>';
     // 右侧：详细
     html += '<div style="font-size:11px;line-height:1.7">';
@@ -36239,7 +36239,7 @@ function buildWuxingQuantifyHTML(pillars, dayStem) {
 
   // 量化明细日志（可折叠）
   if (power.detailLog && power.detailLog.length > 0) {
-    html += '<details style="margin-top:10px"><summary style="font-size:11px;color:var(--steel);cursor:pointer">📐 量化计算明细（点击展开）</summary>';
+    html += '<details class="rpt-is-32"><summary style="font-size:11px;color:var(--steel);cursor:pointer">📐 量化计算明细（点击展开）</summary>';
     html += '<div style="font-size:10px;color:var(--paper3);line-height:1.8;margin-top:8px;padding:8px;background:rgba(0,0,0,.03);border-radius:4px;white-space:pre-line;font-family:monospace">';
     for (let li = 0; li < power.detailLog.length; li++) {
       html += power.detailLog[li] + '\n';
@@ -36498,7 +36498,7 @@ function buildDayunDetailedAnalysis(pillars, dayStem, dayun) {
     for (let dm = 0; dm < 4; dm++) {
       let stars = '★'.repeat(Math.floor(dims[dm].score/2)) + '☆'.repeat(5 - Math.floor(dims[dm].score/2));
       html += '<div style="padding:6px;background:rgba(255,255,255,.02);border-radius:4px;text-align:center">';
-      html += '<div style="font-size:10px;color:var(--steel)">' + dims[dm].name + '</div>';
+      html += '<div class="rpt-is-60">' + dims[dm].name + '</div>';
       html += '<div style="font-size:11px;color:' + dims[dm].color + '">' + stars + '</div>';
       html += '</div>';
     }
@@ -36580,7 +36580,7 @@ function injectBaziEnhancedAnalysis(pillars, dayStem, dayBranch) {
     let kw = analyzeKongWangForLuck(pillars, dayStem);
     if (kw) {
       html += '<div class="interp-card cyan-accent"><h5>◎ 空亡判断与运势影响</h5>';
-      html += '<p style="font-size:13px;line-height:2;color:var(--paper2)">' + kw.summary + '</p>';
+      html += '<p class="rpt-is-102">' + kw.summary + '</p>';
       if (kw.effects.length > 0) {
         html += '<div class="rpt-is-8">';
         for (let e = 0; e < kw.effects.length; e++) {
@@ -36635,7 +36635,7 @@ function buildZiweiGongAnalysisHTML(panData) {
     html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">';
     html += '<span style="font-size:14px">' + g.icon + '</span>';
     html += '<span style="font-size:13px;font-weight:bold;color:' + g.color + '">' + g.gongName + '</span>';
-    html += '<span style="font-size:10px;color:var(--steel)">(' + g.gongZhi + '宫)</span>';
+    html += '<span class="rpt-is-60">(' + g.gongZhi + '宫)</span>';
     if (g.mainStars.length > 0) {
       html += '<span style="font-size:11px;color:var(--paper);margin-left:4px">' + g.mainStars.join('/') + '</span>';
       // 庙旺标签
@@ -36677,7 +36677,7 @@ function injectZiweiEnhancedAnalysis(mingGongBranchIdx, starsByGong) {
   // 庙旺平陷分析
   try {
     html += '<div class="interp-card gold-accent"><h5>⭐ 主星庙旺平陷分析</h5>';
-    html += '<p style="font-size:12px;opacity:.7;line-height:1.8">庙旺：星曜力量强，吉凶加倍 | 平闲：力量正常 | 落陷：力量弱，吉凶减半</p>';
+    html += '<p class="rpt-is-78">庙旺：星曜力量强，吉凶加倍 | 平闲：力量正常 | 落陷：力量弱，吉凶减半</p>';
     html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px">';
     let gongNames = ['命宫','兄弟','夫妻','子女','财帛','疾厄','迁移','交友','事业','田宅','福德','父母'];
     for (let i = 0; i < 12; i++) {
@@ -37318,7 +37318,7 @@ function injectLiuyaoEnhanced(hex, gua, moving, yjVals, yjMode) {
     html += '<div class="interp-card gold-accent" class="rpt-is-7">';
     html += '<h5>🔄 互卦分析</h5>';
     html += '<p>互卦：' + huGua.shangName + '上' + huGua.xiaName + '下 ' + huGua.shangTri + huGua.xiaTri + ' ' + huGua.hex.name + '卦</p>';
-    html += '<p style="font-size:12px;opacity:.7">互卦代表事物发展过程中的内在因素，揭示隐藏的变化趋势。取本卦二三四爻为下互，三四五爻为上互。</p>';
+    html += '<p class="rpt-is-114">互卦代表事物发展过程中的内在因素，揭示隐藏的变化趋势。取本卦二三四爻为下互，三四五爻为上互。</p>';
     if (huGua.hex && huGua.hex.judgment) {
       html += '<p class="rpt-is-29">互卦卦辞：' + huGua.hex.judgment + '</p>';
     }
@@ -37350,8 +37350,8 @@ function injectLiuyaoEnhanced(hex, gua, moving, yjVals, yjMode) {
       html += '<div class="interp-card jade-accent" class="rpt-is-7">';
       html += '<h5>📅 月建日建对用神影响</h5>';
       html += '<p>月建' + mjRj.monthJian + '，日建' + mjRj.dayJian + '，用神' + yongshenBranch + '（' + mjRj.wangShuai + '）</p>';
-      html += '<p style="font-size:12px;opacity:.7">月建：' + mjRj.monthRelation + '</p>';
-      html += '<p style="font-size:12px;opacity:.7">日建：' + mjRj.dayRelation + '</p>';
+      html += '<p class="rpt-is-114">月建：' + mjRj.monthRelation + '</p>';
+      html += '<p class="rpt-is-114">日建：' + mjRj.dayRelation + '</p>';
       html += '<p style="font-size:12px;opacity:.7;margin-top:8px;padding:8px 12px;background:rgba(46,204,113,.06);border-left:3px solid var(--success)">' + mjRj.summary + '</p>';
       html += '</div>';
     }
@@ -37375,7 +37375,7 @@ function injectLiuyaoEnhanced(hex, gua, moving, yjVals, yjMode) {
           let yjColor = yjcColors[yj.name] || 'var(--steel)';
           let yjIcon = yjcIcons[yj.name] || '⚪';
           html += '<div style="display:grid;grid-template-columns:40px 1fr;gap:10px;align-items:start;padding:10px;background:rgba(255,255,255,.02);border-radius:6px;border-left:3px solid ' + yjColor + '">';
-          html += '<div class="rpt-is-11"><div style="font-size:16px">' + yjIcon + '</div><div style="font-size:10px;color:' + yjColor + ';font-weight:bold">' + yj.name + '</div><div style="font-size:10px;color:var(--steel)">' + (yj.wuxing||'') + '</div></div>';
+          html += '<div class="rpt-is-11"><div style="font-size:16px">' + yjIcon + '</div><div style="font-size:10px;color:' + yjColor + ';font-weight:bold">' + yj.name + '</div><div class="rpt-is-60">' + (yj.wuxing||'') + '</div></div>';
           html += '<div>';
           if (yj.yaoPos && yj.yaoPos !== '不上卦') {
             html += '<div style="font-size:11px;color:var(--paper)"><b>' + yj.yaoPos + '</b>' + (yj.liuqin ? ' · ' + yj.liuqin : '') + (yj.wangShuai ? ' · 旺衰:' + yj.wangShuai : '') + (yj.moving ? ' · 动爻' : ' · 静爻') + '</div>';
@@ -37416,7 +37416,7 @@ function injectQimenEnhanced(palaces, keyPalace, dayStem, dayBranch, hourStem, h
     let anGan = computeQimenAnGan(palaces);
     html += '<div class="interp-card violet-accent" class="rpt-is-7">';
     html += '<h5>🔓 暗干分析</h5>';
-    html += '<p style="font-size:12px;opacity:.7">暗干即天盘干下暗藏的地盘干，代表表面之下的隐藏因素。</p>';
+    html += '<p class="rpt-is-114">暗干即天盘干下暗藏的地盘干，代表表面之下的隐藏因素。</p>';
     html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px">';
     for (let key in anGan) {
       let ag = anGan[key];
@@ -37431,7 +37431,7 @@ function injectQimenEnhanced(palaces, keyPalace, dayStem, dayBranch, hourStem, h
     let fuFan = computeQimenFuYinFanYin(palaces, true);
     html += '<div class="interp-card ' + (fuFan.hasFanYin ? 'jade-accent' : 'gold-accent') + '" class="rpt-is-7">';
     html += '<h5>⚡ 伏吟/反吟分析</h5>';
-    html += '<p style="font-size:12px;opacity:.7">' + fuFan.summary + '</p>';
+    html += '<p class="rpt-is-114">' + fuFan.summary + '</p>';
     if (fuFan.hasFuYin) {
       html += '<p style="font-size:12px;color:var(--warn);margin-top:6px">⚠️ 伏吟主闭塞停滞，事难启动，宜守不宜攻。' +
         fuFan.fuYin.map(function(f){return f.desc;}).join('；') + '</p>';
@@ -37479,8 +37479,8 @@ function injectDayunJianChuAnalysis(dayunGanZhi, liunianGanZhi, monthBranchIdx) 
     let jc = computeDayunJianChu(dayunGanZhi, liunianGanZhi, monthBranchIdx);
     html += '<div class="interp-card gold-accent" class="rpt-is-7">';
     html += '<h5>🌟 建除十二神（大运流年）</h5>';
-    html += '<p style="font-size:13px">大运' + dayunGanZhi + ' → 建除：' + jc.dayunJianChu + '（' + jc.dayunJiXiong + '）</p>';
-    html += '<p style="font-size:13px">流年' + liunianGanZhi + ' → 建除：' + jc.liunianJianChu + '（' + jc.liunianJiXiong + '）</p>';
+    html += '<p class="rpt-is-103">大运' + dayunGanZhi + ' → 建除：' + jc.dayunJianChu + '（' + jc.dayunJiXiong + '）</p>';
+    html += '<p class="rpt-is-103">流年' + liunianGanZhi + ' → 建除：' + jc.liunianJianChu + '（' + jc.liunianJiXiong + '）</p>';
     html += '<p style="font-size:12px;opacity:.7;margin-top:8px;padding:8px 12px;background:rgba(201,168,76,.06);border-left:3px solid var(--gold)">' + jc.analysis + '</p>';
     html += '</div>';
   } catch(e) {
@@ -37533,7 +37533,7 @@ function injectFengshuiSanheAnalysis(direction) {
         else stageColor = 'var(--warn)';
         html += '<div style="padding:4px;background:rgba(201,168,76,.04);border-radius:4px;text-align:center;font-size:10px">';
         html += '<div style="color:' + stageColor + ';font-weight:bold">' + pos.branch + '</div>';
-        html += '<div style="opacity:.6">' + pos.stage + '</div>';
+        html += '<div class="rpt-is-54">' + pos.stage + '</div>';
         html += '</div>';
       }
       html += '</div>';
@@ -37869,7 +37869,7 @@ function buildGejuChengBaiHTML(data) {
   
   // 败格条件
   if (baiTiaoJian.length > 0) {
-    html += '<div class="rpt-is-19"><div style="font-size:11px;font-weight:bold;color:var(--cinn2);margin-bottom:4px">❌ 败格条件</div>';
+    html += '<div class="rpt-is-19"><div class="rpt-is-115">❌ 败格条件</div>';
     for (let be = 0; be < baiTiaoJian.length; be++) {
       let b = baiTiaoJian[be];
       html += '<div style="font-size:10px;line-height:1.6;color:' + (b.met ? 'var(--cinn2)' : 'var(--paper3)') + '">' + (b.met ? '⚠' : '✓') + ' ' + b.cond + '</div>';
@@ -37997,18 +37997,18 @@ function buildHunqiAnalysisHTML(data) {
   html += '</div>';
   
   // 配偶星分布
-  html += '<div class="rpt-is-19"><div style="font-size:11px;font-weight:bold;color:var(--cinn2);margin-bottom:4px">🌟 配偶星分布</div>';
+  html += '<div class="rpt-is-19"><div class="rpt-is-115">🌟 配偶星分布</div>';
   if (starPositions.length > 0) {
     for (let sp = 0; sp < starPositions.length; sp++) {
       html += '<div style="font-size:10px;color:var(--paper2)">• ' + starPositions[sp].pillar + starPositions[sp].type + starPositions[sp].stem + '(' + spouseEle + ')</div>';
     }
   } else {
-    html += '<div style="font-size:10px;color:var(--steel)">配偶星不透不藏，晚婚为宜，需大运行配偶星方遇正缘</div>';
+    html += '<div class="rpt-is-60">配偶星不透不藏，晚婚为宜，需大运行配偶星方遇正缘</div>';
   }
   html += '</div>';
   
   // 婚期推断
-  html += '<div class="rpt-is-19"><div style="font-size:11px;font-weight:bold;color:var(--cinn2);margin-bottom:4px">📅 婚期推断</div>';
+  html += '<div class="rpt-is-19"><div class="rpt-is-115">📅 婚期推断</div>';
   for (let ar = 0; ar < ageRanges.length; ar++) {
     html += '<div style="font-size:10px;color:var(--paper2);line-height:1.6">• ' + ageRanges[ar] + '</div>';
   }
@@ -38019,7 +38019,7 @@ function buildHunqiAnalysisHTML(data) {
   
   // 配偶特征
   if (spouseTraits.length > 0) {
-    html += '<div class="rpt-is-19"><div style="font-size:11px;font-weight:bold;color:var(--cinn2);margin-bottom:4px">💑 配偶特征</div>';
+    html += '<div class="rpt-is-19"><div class="rpt-is-115">💑 配偶特征</div>';
     for (let st = 0; st < spouseTraits.length; st++) {
       html += '<div style="font-size:10px;color:var(--paper2);line-height:1.6">• ' + spouseTraits[st] + '</div>';
     }
@@ -38027,7 +38027,7 @@ function buildHunqiAnalysisHTML(data) {
   }
   
   // 婚配生肖参考
-  html += '<div style="margin-bottom:4px"><div style="font-size:11px;font-weight:bold;color:var(--cinn2);margin-bottom:4px">🐷 婚配生肖参考</div>';
+  html += '<div class="rpt-is-49"><div class="rpt-is-115">🐷 婚配生肖参考</div>';
   html += '<div style="font-size:10px;color:var(--jade)">宜配：' + (goodMatches.length > 0 ? goodMatches.join('、') : '无特别推荐') + '</div>';
   html += '<div style="font-size:10px;color:var(--cinn2)">忌配：' + (badMatches.length > 0 ? badMatches.join('、') : '无特别禁忌') + '</div>';
   html += '</div>';
@@ -38132,11 +38132,11 @@ function buildLiunianInteractionHTML(data) {
     html += '<div style="padding:10px;background:rgba(255,255,255,.02);border-radius:6px;border-left:3px solid ' + luckColor + '">';
     html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
     html += '<span style="font-size:14px;font-weight:bold;color:' + luckColor + '">' + yrStem + yrZhi + '</span>';
-    html += '<span style="font-size:10px;color:var(--steel)">' + yr + '年</span>';
+    html += '<span class="rpt-is-60">' + yr + '年</span>';
     html += '<span style="font-size:10px;padding:1px 6px;border-radius:6px;background:' + luckColor + ';color:var(--paper)">' + luckLevel + '</span>';
     html += '</div>';
     if (interactions.length === 0) {
-      html += '<div style="font-size:10px;color:var(--steel)">无明显互动，运势平稳</div>';
+      html += '<div class="rpt-is-60">无明显互动，运势平稳</div>';
     } else {
       for (let ii = 0; ii < interactions.length; ii++) {
         let int = interactions[ii];
@@ -39109,8 +39109,8 @@ function renderHealthForecast(result, containerId) {
 
   // ═══ 1. 先天体质分析 ═══
   let c = result.constitution;
-  html += '<div class="hf-section" style="margin-bottom:20px">';
-  html += '<h4 style="color:var(--gold);border-left:4px solid var(--gold);padding-left:10px;margin-bottom:12px">🧬 ' + c.title + '</h4>';
+  html += '<div class="hf-section" class="rpt-is-61">';
+  html += '<h4 class="rpt-is-62">🧬 ' + c.title + '</h4>';
   html += '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:12px">';
   for (let i = 0; i < c.organStrength.length; i++) {
     let os = c.organStrength[i];
@@ -39127,7 +39127,7 @@ function renderHealthForecast(result, containerId) {
   html += '</div>';
   // 弱项
   if (c.weakPoints.length > 0) {
-    html += '<div class="rpt-is-19"><b style="color:var(--warn)">⚠️ 先天弱项：</b></div>';
+    html += '<div class="rpt-is-19"><b class="rpt-is-105">⚠️ 先天弱项：</b></div>';
     for (let wi = 0; wi < c.weakPoints.length; wi++) {
       html += '<div style="padding:6px 10px;background:rgba(243,156,18,.05);border-radius:6px;margin-bottom:4px;font-size:12px;line-height:1.6">' + c.weakPoints[wi].desc + '</div>';
     }
@@ -39143,16 +39143,16 @@ function renderHealthForecast(result, containerId) {
 
   // ═══ 2. 易发疾病器官预警 ═══
   let dw = result.diseaseWarning;
-  html += '<div class="hf-section" style="margin-bottom:20px">';
-  html += '<h4 style="color:var(--gold);border-left:4px solid var(--gold);padding-left:10px;margin-bottom:12px">⚠️ ' + dw.title + '</h4>';
+  html += '<div class="hf-section" class="rpt-is-61">';
+  html += '<h4 class="rpt-is-62">⚠️ ' + dw.title + '</h4>';
   for (let ri = 0; ri < dw.risks.length; ri++) {
     let r = dw.risks[ri];
     let riskColor = r.level === '高' ? 'var(--cinn2)' : r.level === '中' ? 'var(--warn)' : 'var(--jade)';
     let riskBg = r.level === '高' ? 'rgba(231,76,60,.06)' : r.level === '中' ? 'rgba(243,156,18,.05)' : 'rgba(39,174,96,.04)';
     html += '<div style="padding:10px 12px;background:' + riskBg + ';border:1px solid ' + riskColor + '20;border-radius:8px;margin-bottom:8px">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+    html += '<div class="rpt-is-75">';
     html += '<span style="font-weight:bold;color:' + riskColor + '">风险等级：' + r.level + '</span>';
-    html += '<span style="font-size:11px;opacity:.6">' + r.relation + '</span>';
+    html += '<span class="rpt-is-57">' + r.relation + '</span>';
     html += '</div>';
     html += '<div style="font-size:12px;line-height:1.6">' + r.desc + '</div>';
     html += '</div>';
@@ -39161,14 +39161,14 @@ function renderHealthForecast(result, containerId) {
 
   // ═══ 3. 十二长生健康周期 ═══
   let cs = result.csHealth;
-  html += '<div class="hf-section" style="margin-bottom:20px">';
-  html += '<h4 style="color:var(--gold);border-left:4px solid var(--gold);padding-left:10px;margin-bottom:12px">🔄 ' + cs.title + '</h4>';
+  html += '<div class="hf-section" class="rpt-is-61">';
+  html += '<h4 class="rpt-is-62">🔄 ' + cs.title + '</h4>';
   if (cs.currentStage) {
     let stageColor = ['长生','临官','帝旺','冠带','养','胎'].indexOf(cs.currentStage.stage) >= 0 ? 'var(--jade)' : ['沐浴','衰','病'].indexOf(cs.currentStage.stage) >= 0 ? 'var(--warn)' : 'var(--cinn2)';
     html += '<div style="padding:12px;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.15);border-radius:8px;margin-bottom:8px">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
+    html += '<div class="rpt-is-36">';
     html += '<span style="font-size:16px;font-weight:bold;color:' + stageColor + '">' + cs.currentStage.stage + '</span>';
-    html += '<span style="font-size:11px;opacity:.6">' + cs.currentStage.ageRange + '</span>';
+    html += '<span class="rpt-is-57">' + cs.currentStage.ageRange + '</span>';
     html += '</div>';
     html += '<div style="font-size:12px;line-height:1.6;opacity:.8">' + cs.currentStage.meaning + '</div>';
     html += '</div>';
@@ -39191,21 +39191,21 @@ function renderHealthForecast(result, containerId) {
 
   // ═══ 4. 大运流年健康风险 ═══
   let dh = result.dayunHealth;
-  html += '<div class="hf-section" style="margin-bottom:20px">';
-  html += '<h4 style="color:var(--gold);border-left:4px solid var(--gold);padding-left:10px;margin-bottom:12px">📅 ' + dh.title + '</h4>';
+  html += '<div class="hf-section" class="rpt-is-61">';
+  html += '<h4 class="rpt-is-62">📅 ' + dh.title + '</h4>';
   if (dh.currentDayun) {
     let dyRiskColor = dh.currentDayun.risk === '高' ? 'var(--cinn2)' : dh.currentDayun.risk === '中' ? 'var(--warn)' : 'var(--jade)';
     html += '<div style="padding:10px 12px;background:' + dyRiskColor + '08;border:1px solid ' + dyRiskColor + '20;border-radius:8px;margin-bottom:12px">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+    html += '<div class="rpt-is-75">';
     html += '<span style="font-weight:bold;color:' + dyRiskColor + '">当前大运：' + dh.currentDayun.ganzhi + '</span>';
-    html += '<span style="font-size:11px;opacity:.6">' + dh.currentDayun.ageRange + ' | ' + dh.currentDayun.yearRange + '</span>';
+    html += '<span class="rpt-is-57">' + dh.currentDayun.ageRange + ' | ' + dh.currentDayun.yearRange + '</span>';
     html += '</div>';
     html += '<div style="font-size:12px;line-height:1.6;opacity:.8">' + dh.currentDayun.desc + '</div>';
     html += '</div>';
   }
   // 未来5年
   if (dh.futureRisks.length > 0) {
-    html += '<div class="rpt-is-19"><b style="font-size:13px">未来5年健康风险评级：</b></div>';
+    html += '<div class="rpt-is-19"><b class="rpt-is-103">未来5年健康风险评级：</b></div>';
     for (let fi = 0; fi < dh.futureRisks.length; fi++) {
       let fr = dh.futureRisks[fi];
       let frc = fr.risk === '高' ? 'var(--cinn2)' : fr.risk === '中' ? 'var(--warn)' : 'var(--jade)';
@@ -39221,8 +39221,8 @@ function renderHealthForecast(result, containerId) {
 
   // ═══ 5. 家族遗传倾向 ═══
   let hd = result.heredity;
-  html += '<div class="hf-section" style="margin-bottom:20px">';
-  html += '<h4 style="color:var(--gold);border-left:4px solid var(--gold);padding-left:10px;margin-bottom:12px">👨‍👩‍👧 ' + hd.title + '</h4>';
+  html += '<div class="hf-section" class="rpt-is-61">';
+  html += '<h4 class="rpt-is-62">👨‍👩‍👧 ' + hd.title + '</h4>';
   html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">';
   for (let hi = 0; hi < hd.pillars.length; hi++) {
     let hp = hd.pillars[hi];
@@ -39237,18 +39237,18 @@ function renderHealthForecast(result, containerId) {
 
   // ═══ 6. 疾病预防方案 ═══
   let pv = result.prevention;
-  html += '<div class="hf-section" style="margin-bottom:20px">';
-  html += '<h4 style="color:var(--gold);border-left:4px solid var(--gold);padding-left:10px;margin-bottom:12px">🛡️ ' + pv.title + '</h4>';
+  html += '<div class="hf-section" class="rpt-is-61">';
+  html += '<h4 class="rpt-is-62">🛡️ ' + pv.title + '</h4>';
 
   // 饮食
-  html += '<div style="margin-bottom:12px"><b style="color:var(--jade);font-size:13px">🥗 饮食建议</b>';
-  html += '<div style="margin-top:6px;font-size:12px"><span class="rpt-is-12">✅ 宜食：</span>';
+  html += '<div class="rpt-is-47"><b style="color:var(--jade);font-size:13px">🥗 饮食建议</b>';
+  html += '<div class="rpt-is-79"><span class="rpt-is-12">✅ 宜食：</span>';
   for (let ds = 0; ds < pv.diet.suggest.length; ds++) {
     html += '<div style="padding:4px 8px;background:rgba(39,174,96,.04);border-radius:4px;margin-top:4px">';
     html += '<b>' + pv.diet.suggest[ds].wuxing + '：</b>' + pv.diet.suggest[ds].foods + ' (' + pv.diet.suggest[ds].reason + ')';
     html += '</div>';
   }
-  html += '<div style="margin-top:6px;font-size:12px"><span class="rpt-is-3">❌ 忌食：</span>';
+  html += '<div class="rpt-is-79"><span class="rpt-is-3">❌ 忌食：</span>';
   for (let da = 0; da < pv.diet.avoid.length; da++) {
     html += '<div style="padding:4px 8px;background:rgba(231,76,60,.04);border-radius:4px;margin-top:4px">';
     html += '<b>' + pv.diet.avoid[da].wuxing + '：</b>' + pv.diet.avoid[da].foods + ' (' + pv.diet.avoid[da].reason + ')';
@@ -39257,7 +39257,7 @@ function renderHealthForecast(result, containerId) {
   html += '</div>';
 
   // 运动
-  html += '<div style="margin-bottom:12px"><b style="color:var(--cyan2);font-size:13px">🏃 运动建议</b>';
+  html += '<div class="rpt-is-47"><b style="color:var(--cyan2);font-size:13px">🏃 运动建议</b>';
   for (let ex = 0; ex < pv.exercise.length; ex++) {
     html += '<div style="padding:6px 8px;background:rgba(52,152,219,.04);border-radius:4px;margin-top:4px;font-size:12px;line-height:1.6">';
     html += '<b>' + pv.exercise[ex].target + '：</b>' + pv.exercise[ex].type + '（' + pv.exercise[ex].intensity + '）';
@@ -39266,7 +39266,7 @@ function renderHealthForecast(result, containerId) {
   html += '</div>';
 
   // 穴位
-  html += '<div style="margin-bottom:12px"><b style="color:var(--violet);font-size:13px">💆 保健穴位</b>';
+  html += '<div class="rpt-is-47"><b style="color:var(--violet);font-size:13px">💆 保健穴位</b>';
   for (let ac = 0; ac < pv.acupoints.length; ac++) {
     html += '<div style="padding:4px 8px;background:rgba(155,89,182,.04);border-radius:4px;margin-top:4px;font-size:12px">';
     html += '<b>' + pv.acupoints[ac].point + '</b> → ' + pv.acupoints[ac].target + ' (' + pv.acupoints[ac].organ + ')';
@@ -39275,7 +39275,7 @@ function renderHealthForecast(result, containerId) {
   html += '</div>';
 
   // 起居
-  html += '<div style="margin-bottom:12px"><b style="color:var(--orange);font-size:13px">🏠 起居建议</b>';
+  html += '<div class="rpt-is-47"><b style="color:var(--orange);font-size:13px">🏠 起居建议</b>';
   for (let lf = 0; lf < pv.lifestyle.length; lf++) {
     html += '<div style="padding:6px 8px;background:rgba(230,126,34,.04);border-radius:4px;margin-top:4px;font-size:12px;line-height:1.6">';
     html += '<b>' + pv.lifestyle[lf].target + '：</b>' + pv.lifestyle[lf].advice;
@@ -39284,7 +39284,7 @@ function renderHealthForecast(result, containerId) {
   html += '</div>';
 
   // 佩戴
-  html += '<div style="margin-bottom:12px"><b style="color:var(--gold2);font-size:13px">💎 佩戴建议</b><div style="font-size:11px;opacity:.5;margin-top:2px">左为阳主纳进（纳福聚气） · 右为阴主泄出（辟邪泄煞） · 颈近心主护身（本命佛/平安扣/吊坠）</div>';
+  html += '<div class="rpt-is-47"><b style="color:var(--gold2);font-size:13px">💎 佩戴建议</b><div style="font-size:11px;opacity:.5;margin-top:2px">左为阳主纳进（纳福聚气） · 右为阴主泄出（辟邪泄煞） · 颈近心主护身（本命佛/平安扣/吊坠）</div>';
   for (let ac2 = 0; ac2 < pv.accessories.length; ac2++) {
     html += '<div style="padding:6px 8px;background:rgba(241,196,15,.04);border-radius:4px;margin-top:4px;font-size:12px;line-height:1.6">';
     html += '<b>' + pv.accessories[ac2].wuxing + '：</b>' + pv.accessories[ac2].items + ' (颜色：' + pv.accessories[ac2].color + ') - ' + pv.accessories[ac2].reason;
@@ -39305,13 +39305,13 @@ function renderHealthForecast(result, containerId) {
 
   // ═══ 7. 年度健康时间表 ═══
   let sg = result.seasonalGuide;
-  html += '<div class="hf-section" style="margin-bottom:20px">';
-  html += '<h4 style="color:var(--gold);border-left:4px solid var(--gold);padding-left:10px;margin-bottom:12px">🗓️ ' + sg.title + '</h4>';
+  html += '<div class="hf-section" class="rpt-is-61">';
+  html += '<h4 class="rpt-is-62">🗓️ ' + sg.title + '</h4>';
   for (let si = 0; si < sg.seasons.length; si++) {
     let s = sg.seasons[si];
     let sColor = {木:'var(--jade)',火:'var(--cinn2)',土:'var(--orange)',金:'var(--metal)',水:'var(--cyan)'}[s.wuxing];
     html += '<div style="padding:12px;background:rgba(201,168,76,.04);border:1px solid ' + sColor + '15;border-radius:8px;margin-bottom:10px">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
+    html += '<div class="rpt-is-36">';
     html += '<span style="font-weight:bold;color:' + sColor + ';font-size:13px">' + s.season + '</span>';
     html += '<span class="rpt-is-6">' + s.months + '</span>';
     html += '</div>';
@@ -39319,7 +39319,7 @@ function renderHealthForecast(result, containerId) {
     html += '<div style="font-size:11px;opacity:.7;margin-bottom:6px;padding:4px 6px;background:rgba(231,76,60,.04);border-radius:4px">⚠️ ' + s.riskTarget + '</div>';
     html += '<div style="font-size:12px;line-height:1.8">';
     for (let sm = 0; sm < s.measures.length; sm++) {
-      html += '<div style="padding:2px 0">• ' + s.measures[sm] + '</div>';
+      html += '<div class="rpt-is-109">• ' + s.measures[sm] + '</div>';
     }
     html += '</div>';
     html += '</div>';
@@ -39641,7 +39641,7 @@ function buildMonthlyFortuneTrend(baziData, startMonth, endMonth) {
 
     // 四维建议
     html += '<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px">';
-    html += '<div style="padding:8px 10px;background:rgba(41,128,185,0.04);border-radius:6px;font-size:11px;line-height:1.7"><strong style="color:var(--cyan)">💼 事业</strong><br>' + mr.advice.career + '</div>';
+    html += '<div style="padding:8px 10px;background:rgba(41,128,185,0.04);border-radius:6px;font-size:11px;line-height:1.7"><strong class="rpt-is-100">💼 事业</strong><br>' + mr.advice.career + '</div>';
     html += '<div style="padding:8px 10px;background:rgba(201,168,76,0.04);border-radius:6px;font-size:11px;line-height:1.7"><strong class="rpt-is-1">💰 财运</strong><br>' + mr.advice.wealth + '</div>';
     html += '<div style="padding:8px 10px;background:rgba(46,204,113,0.04);border-radius:6px;font-size:11px;line-height:1.7"><strong class="rpt-is-12">🏥 健康</strong><br>' + mr.advice.health + '</div>';
     html += '<div style="padding:8px 10px;background:rgba(231,76,60,0.04);border-radius:6px;font-size:11px;line-height:1.7"><strong class="rpt-is-3">💕 感情</strong><br>' + mr.advice.love + '</div>';
@@ -40037,11 +40037,11 @@ function buildFamilyEthicsGuide(baziData) {
   html += '<div style="background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.02));border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:16px;margin-bottom:12px">';
   html += '<div style="font-size:15px;font-weight:bold;color:var(--gold,var(--gold));letter-spacing:3px;margin-bottom:12px;text-align:center">🌟 家庭和谐总纲</div>';
   html += '<div style="font-size:12px;line-height:2;color:var(--paper,var(--ink3))">';
-  html += '<div style="margin-bottom:6px"><b style="color:var(--gold,var(--gold))">一、孝亲尊长</b>——百善孝为先。父母恩重如山，无论多忙都要常怀感恩之心，用实际行动回报养育之恩。尊重长辈的人生经验和智慧，虚心听取他们的教诲。</div>';
-  html += '<div style="margin-bottom:6px"><b style="color:var(--gold,var(--gold))">二、手足相亲</b>——兄弟姐妹是血脉相连的至亲。在顺境时共享喜悦，在逆境时守望相助。不计较得失，不攀比贫富，珍惜这份天定的手足缘分。</div>';
-  html += '<div style="margin-bottom:6px"><b style="color:var(--gold,var(--gold))">三、夫妻和顺</b>——夫妻是缘定三生的伴侣。以爱为基础，以尊重为前提，以包容为润滑剂。大事商量，小事体谅，在平淡的日常中经营不平凡的感情。</div>';
-  html += '<div style="margin-bottom:6px"><b style="color:var(--gold,var(--gold))">四、慈幼有方</b>——对子女既要有慈爱之心，也要有教育之方。因材施教，以身作则。给予足够的爱与自由，同时树立正确的价值观和品格。</div>';
-  html += '<div><b style="color:var(--gold,var(--gold))">五、家和万事兴</b>——家庭和睦是一切幸福的根基。遇到矛盾先自省，沟通胜过争吵，理解胜过指责。让家成为每个成员温暖的避风港，而非冰冷的是非场。</div>';
+  html += '<div class="rpt-is-88"><b class="rpt-is-116">一、孝亲尊长</b>——百善孝为先。父母恩重如山，无论多忙都要常怀感恩之心，用实际行动回报养育之恩。尊重长辈的人生经验和智慧，虚心听取他们的教诲。</div>';
+  html += '<div class="rpt-is-88"><b class="rpt-is-116">二、手足相亲</b>——兄弟姐妹是血脉相连的至亲。在顺境时共享喜悦，在逆境时守望相助。不计较得失，不攀比贫富，珍惜这份天定的手足缘分。</div>';
+  html += '<div class="rpt-is-88"><b class="rpt-is-116">三、夫妻和顺</b>——夫妻是缘定三生的伴侣。以爱为基础，以尊重为前提，以包容为润滑剂。大事商量，小事体谅，在平淡的日常中经营不平凡的感情。</div>';
+  html += '<div class="rpt-is-88"><b class="rpt-is-116">四、慈幼有方</b>——对子女既要有慈爱之心，也要有教育之方。因材施教，以身作则。给予足够的爱与自由，同时树立正确的价值观和品格。</div>';
+  html += '<div><b class="rpt-is-116">五、家和万事兴</b>——家庭和睦是一切幸福的根基。遇到矛盾先自省，沟通胜过争吵，理解胜过指责。让家成为每个成员温暖的避风港，而非冰冷的是非场。</div>';
   html += '</div>';
   html += '</div>';
 
