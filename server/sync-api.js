@@ -38,9 +38,9 @@ db.exec(`
 
 // === 认证中间件（与 api-server.js 一致） ===
 function auth(req, res, next) {
-  var token = req.headers.authorization?.replace('Bearer ', '');
+  let token = req.headers.authorization?.replace('Bearer ', '');
   if (!token) return res.status(401).json({ error: '未登录' });
-  var payload = sec.verifyToken(token);
+  let payload = sec.verifyToken(token);
   if (!payload) return res.status(401).json({ error: '登录已过期' });
   req.userId = payload.uid;
   next();
@@ -48,12 +48,12 @@ function auth(req, res, next) {
 
 // === 工具函数：读取用户全部同步数据 ===
 function getUserData(userId) {
-  var rows = db.prepare('SELECT data_key, data_value, updated_at FROM user_data WHERE user_id = ?').all(userId);
-  var result = {};
-  var lastSync = null;
-  var version = 0;
+  let rows = db.prepare('SELECT data_key, data_value, updated_at FROM user_data WHERE user_id = ?').all(userId);
+  let result = {};
+  let lastSync = null;
+  let version = 0;
   for (var i = 0; i < rows.length; i++) {
-    var row = rows[i];
+    let row = rows[i];
     try {
       result[row.data_key] = JSON.parse(row.data_value);
     } catch (e) {
@@ -70,7 +70,7 @@ function getUserData(userId) {
 
 // === 工具函数：写入单条用户数据 ===
 function setUserData(userId, key, value) {
-  var jsonStr = JSON.stringify(value);
+  let jsonStr = JSON.stringify(value);
   db.prepare(`
     INSERT INTO user_data (user_id, data_key, data_value, updated_at)
     VALUES (?, ?, ?, datetime('now','localtime'))
@@ -81,9 +81,9 @@ function setUserData(userId, key, value) {
 
 // === 工具函数：获取用户数据的更新时间戳 ===
 function getDataTimestamps(userId) {
-  var rows = db.prepare('SELECT data_key, updated_at FROM user_data WHERE user_id = ?').all(userId);
-  var timestamps = {};
-  var lastSync = null;
+  let rows = db.prepare('SELECT data_key, updated_at FROM user_data WHERE user_id = ?').all(userId);
+  let timestamps = {};
+  let lastSync = null;
   for (var i = 0; i < rows.length; i++) {
     timestamps[rows[i].data_key] = rows[i].updated_at;
     if (!lastSync || rows[i].updated_at > lastSync) {
@@ -97,20 +97,20 @@ function getDataTimestamps(userId) {
 // POST /api/sync/push — 上传本地数据到服务端
 // ═══════════════════════════════════════════
 router.post('/push', auth, (req, res) => {
-  var body = req.body;
-  var userId = req.userId;
+  let body = req.body;
+  let userId = req.userId;
 
   // 速率限制：防止滥用
   if (!sec.rateLimit('sync_push_' + userId, 30, 60000)) {
     return res.status(429).json({ error: '同步请求过于频繁，请稍后再试' });
   }
 
-  var savedKeys = [];
+  let savedKeys = [];
 
   // 逐个存储各数据字段
-  var fields = ['bazi', 'faith', 'preferences', 'favorites', 'deviceType'];
+  let fields = ['bazi', 'faith', 'preferences', 'favorites', 'deviceType'];
   for (var i = 0; i < fields.length; i++) {
-    var key = fields[i];
+    let key = fields[i];
     if (body[key] !== undefined) {
       setUserData(userId, key, body[key]);
       savedKeys.push(key);
@@ -118,7 +118,7 @@ router.post('/push', auth, (req, res) => {
   }
 
   // 如果客户端传了额外的自定义数据字段，也一并存储
-  var knownKeys = { bazi: 1, faith: 1, preferences: 1, favorites: 1, deviceType: 1 };
+  let knownKeys = { bazi: 1, faith: 1, preferences: 1, favorites: 1, deviceType: 1 };
   for (var k in body) {
     if (!knownKeys[k] && body[k] !== undefined) {
       setUserData(userId, k, body[k]);
@@ -130,7 +130,7 @@ router.post('/push', auth, (req, res) => {
   db.prepare('INSERT INTO audit_logs (user_id, action, detail) VALUES (?, ?, ?)')
     .run(userId, 'sync_push', '推送数据: ' + savedKeys.join(', '));
 
-  var status = getDataTimestamps(userId);
+  let status = getDataTimestamps(userId);
 
   res.json({
     ok: true,
@@ -145,13 +145,13 @@ router.post('/push', auth, (req, res) => {
 // GET /api/sync/pull — 拉取服务端最新数据
 // ═══════════════════════════════════════════
 router.get('/pull', auth, (req, res) => {
-  var userId = req.userId;
+  let userId = req.userId;
 
-  var result = getUserData(userId);
+  let result = getUserData(userId);
 
   // 同时拉取 users 表中的基本资料
-  var user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
-  var profile = null;
+  let user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
+  let profile = null;
   if (user) {
     profile = {
       name: user.name,
@@ -183,9 +183,9 @@ router.get('/pull', auth, (req, res) => {
 // GET /api/sync/status — 检查数据版本
 // ═══════════════════════════════════════════
 router.get('/status', auth, (req, res) => {
-  var userId = req.userId;
+  let userId = req.userId;
 
-  var status = getDataTimestamps(userId);
+  let status = getDataTimestamps(userId);
 
   res.json({
     ok: true,
@@ -199,22 +199,22 @@ router.get('/status', auth, (req, res) => {
 // POST /api/sync/merge — 合并数据（带冲突检测）
 // ═══════════════════════════════════════════
 router.post('/merge', auth, (req, res) => {
-  var userId = req.userId;
-  var localData = req.body.data || {};
-  var localTimestamps = req.body.timestamps || {};  // 客户端各字段的本地更新时间
+  let userId = req.userId;
+  let localData = req.body.data || {};
+  let localTimestamps = req.body.timestamps || {};  // 客户端各字段的本地更新时间
 
-  var serverStatus = getDataTimestamps(userId);
-  var serverTimestamps = serverStatus.timestamps;
-  var serverData = getUserData(userId).data;
+  let serverStatus = getDataTimestamps(userId);
+  let serverTimestamps = serverStatus.timestamps;
+  let serverData = getUserData(userId).data;
 
-  var serverNewer = [];    // 服务端更新的字段
-  var clientNewer = [];    // 客户端更新的字段
-  var conflicts = [];      // 时间戳相同但数据不同
+  let serverNewer = [];    // 服务端更新的字段
+  let clientNewer = [];    // 客户端更新的字段
+  let conflicts = [];      // 时间戳相同但数据不同
 
   // 遍历客户端发来的数据
   for (var key in localData) {
-    var localTime = localTimestamps[key];
-    var serverTime = serverTimestamps[key];
+    let localTime = localTimestamps[key];
+    let serverTime = serverTimestamps[key];
 
     if (!serverTime) {
       // 服务端没有这个字段，客户端是新的
@@ -232,7 +232,7 @@ router.post('/merge', auth, (req, res) => {
       serverNewer.push(key);
     } else {
       // 时间戳相同，比较数据
-      var serverValue = serverData[key];
+      let serverValue = serverData[key];
       if (JSON.stringify(serverValue) !== JSON.stringify(localData[key])) {
         conflicts.push(key);
       }
@@ -247,12 +247,12 @@ router.post('/merge', auth, (req, res) => {
   }
 
   // 审计日志
-  var detail = '合并: 服务端更新[' + serverNewer.join(',') + '] 客户端更新[' + clientNewer.join(',') + '] 冲突[' + conflicts.join(',') + ']';
+  let detail = '合并: 服务端更新[' + serverNewer.join(',') + '] 客户端更新[' + clientNewer.join(',') + '] 冲突[' + conflicts.join(',') + ']';
   db.prepare('INSERT INTO audit_logs (user_id, action, detail) VALUES (?, ?, ?)')
     .run(userId, 'sync_merge', detail);
 
   // 构建响应
-  var response = {
+  let response = {
     ok: true,
     serverNewer: serverNewer,
     clientNewer: clientNewer,
@@ -263,7 +263,7 @@ router.post('/merge', auth, (req, res) => {
   if (conflicts.length > 0) {
     response.conflictData = {};
     for (var ci = 0; ci < conflicts.length; ci++) {
-      var ck = conflicts[ci];
+      let ck = conflicts[ci];
       response.conflictData[ck] = {
         server: serverData[ck],
         client: localData[ck]
@@ -284,7 +284,7 @@ router.post('/merge', auth, (req, res) => {
   }
 
   // 更新 lastSync
-  var latestStatus = getDataTimestamps(userId);
+  let latestStatus = getDataTimestamps(userId);
   response.lastSync = latestStatus.lastSync;
   response.version = latestStatus.version;
 

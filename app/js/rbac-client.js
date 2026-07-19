@@ -15,14 +15,14 @@
   'use strict';
 
   // ═══ 常量 ═══
-  var TOKEN_KEY = 'authToken';
-  var ROLES_KEY = 'userRoles';
-  var USER_KEY = 'mlbj_user';
-  var LOGIN_PAGE = 'login.html';
-  var HOME_PAGE = 'divination-hub.html';
+  const TOKEN_KEY = 'authToken';
+  const ROLES_KEY = 'userRoles';
+  const USER_KEY = 'mlbj_user';
+  const LOGIN_PAGE = 'login.html';
+  const HOME_PAGE = 'divination-hub.html';
 
   // 旧版会员等级 → 新版角色映射（兼容）
-  var VIP_LEVEL_TO_ROLE = {
+  const VIP_LEVEL_TO_ROLE = {
     'free': 'free',
     'monthly': 'mingdao',
     'yearly': 'advanced',
@@ -30,7 +30,7 @@
   };
 
   // 角色等级权重（数字越大权限越高）
-  var ROLE_WEIGHT = {
+  const ROLE_WEIGHT = {
     'guest': 0,
     'free': 1,
     'patient': 1,
@@ -53,15 +53,15 @@
    */
   function decodeJwtPayload(token) {
     if (!token || typeof token !== 'string') return null;
-    var parts = token.split('.');
+    let parts = token.split('.');
     if (parts.length !== 3) return null;
     try {
       // base64url → base64
-      var b64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+      let b64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
       // padding
-      var pad = b64.length % 4;
+      let pad = b64.length % 4;
       if (pad) b64 += new Array(5 - pad).join('=');
-      var json = decodeURIComponent(
+      let json = decodeURIComponent(
         atob(b64).split('').map(function (c) {
           return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
         }).join('')
@@ -77,7 +77,7 @@
    */
   function safeGetJSON(key, fallback) {
     try {
-      var raw = localStorage.getItem(key);
+      let raw = localStorage.getItem(key);
       if (!raw) return fallback || {};
       return JSON.parse(raw);
     } catch (e) {
@@ -113,21 +113,21 @@
    */
   function getRoles() {
     // 优先读RBAC角色
-    var rolesRaw = localStorage.getItem(ROLES_KEY);
+    let rolesRaw = localStorage.getItem(ROLES_KEY);
     if (rolesRaw) {
       try {
-        var roles = JSON.parse(rolesRaw);
+        let roles = JSON.parse(rolesRaw);
         if (Array.isArray(roles) && roles.length > 0) return roles;
       } catch (e) {}
     }
 
     // 兼容旧版：从memberInfo推导
-    var member = safeGetJSON('memberInfo', {});
-    var user = safeGetJSON(USER_KEY, {});
-    var fallbackRoles = ['free'];
+    let member = safeGetJSON('memberInfo', {});
+    let user = safeGetJSON(USER_KEY, {});
+    let fallbackRoles = ['free'];
 
     if (member.level && member.level !== 'free') {
-      var mapped = VIP_LEVEL_TO_ROLE[member.level];
+      let mapped = VIP_LEVEL_TO_ROLE[member.level];
       if (mapped) fallbackRoles.push(mapped);
     }
     if (member.level === '明道') {
@@ -137,7 +137,7 @@
       if (fallbackRoles.indexOf('super_admin') < 0) fallbackRoles.push('super_admin');
     }
     if (user.vipLevel && VIP_LEVEL_TO_ROLE[user.vipLevel]) {
-      var r = VIP_LEVEL_TO_ROLE[user.vipLevel];
+      let r = VIP_LEVEL_TO_ROLE[user.vipLevel];
       if (fallbackRoles.indexOf(r) < 0) fallbackRoles.push(r);
     }
 
@@ -157,12 +157,12 @@
    * @returns {boolean} true=有效, false=过期或不存在
    */
   function isTokenValid() {
-    var token = getToken();
+    let token = getToken();
     if (!token) return false;
-    var payload = decodeJwtPayload(token);
+    let payload = decodeJwtPayload(token);
     if (!payload) return false;
     if (!payload.exp) return true; // 无exp字段视为不过期
-    var now = Math.floor(Date.now() / 1000);
+    let now = Math.floor(Date.now() / 1000);
     return payload.exp > now;
   }
 
@@ -181,7 +181,7 @@
    * @returns {boolean}
    */
   function hasRole(role) {
-    var roles = getRoles();
+    let roles = getRoles();
     return roles.indexOf(role) >= 0;
   }
 
@@ -192,7 +192,7 @@
    */
   function hasAnyRole(roleList) {
     if (!roleList || roleList.length === 0) return true;
-    var roles = getRoles();
+    let roles = getRoles();
     for (var i = 0; i < roleList.length; i++) {
       if (roles.indexOf(roleList[i]) >= 0) return true;
     }
@@ -206,10 +206,10 @@
    * @returns {boolean}
    */
   function hasPermission(permission) {
-    var roles = getRoles();
+    let roles = getRoles();
 
     // 权限→角色映射（与后端PERMISSIONS矩阵一致）
-    var PERM_MAP = {
+    const PERM_MAP = {
       'paipan:basic': ['guest', 'free', 'mingdao', 'advanced', 'vip'],
       'paipan:advanced': ['mingdao', 'advanced', 'vip'],
       'paipan:premium': ['advanced', 'vip'],
@@ -233,7 +233,7 @@
       'system:super': ['super_admin']
     };
 
-    var allowed = PERM_MAP[permission];
+    let allowed = PERM_MAP[permission];
     if (!allowed) return false;
 
     for (var i = 0; i < allowed.length; i++) {
@@ -256,10 +256,10 @@
    * @returns {number}
    */
   function getMaxWeight() {
-    var roles = getRoles();
-    var max = 0;
+    let roles = getRoles();
+    let max = 0;
     for (var i = 0; i < roles.length; i++) {
-      var w = getRoleWeight(roles[i]);
+      let w = getRoleWeight(roles[i]);
       if (w > max) max = w;
     }
     return max;
@@ -275,7 +275,7 @@
   function requireAuth(redirectBack) {
     if (isLoggedIn()) return true;
 
-    var currentUrl = redirectBack || (global.location ? global.location.pathname.split('/').pop() : '');
+    let currentUrl = redirectBack || (global.location ? global.location.pathname.split('/').pop() : '');
     if (global.location) {
       global.location.href = LOGIN_PAGE + '?redirect=' + encodeURIComponent(currentUrl);
     }
@@ -314,7 +314,7 @@
    * 菜单项配置
    * key → 所需角色（空数组=所有人可见）
    */
-  var MENU_VISIBILITY = {
+  const MENU_VISIBILITY = {
     'home': [],
     'paipan': [],
     'paipan-advanced': ['mingdao', 'advanced', 'vip'],
@@ -338,7 +338,7 @@
    * @returns {boolean}
    */
   function isMenuVisible(menuKey) {
-    var required = MENU_VISIBILITY[menuKey];
+    let required = MENU_VISIBILITY[menuKey];
     if (!required || required.length === 0) return true;
     return hasAnyRole(required);
   }
@@ -349,9 +349,9 @@
    * 用法: <div data-rbac-menu="paipan-advanced">...</div>
    */
   function applyMenuVisibility() {
-    var elements = document.querySelectorAll('[data-rbac-menu]');
+    let elements = document.querySelectorAll('[data-rbac-menu]');
     for (var i = 0; i < elements.length; i++) {
-      var key = elements[i].getAttribute('data-rbac-menu');
+      let key = elements[i].getAttribute('data-rbac-menu');
       if (isMenuVisible(key)) {
         elements[i].style.display = '';
       } else {
@@ -408,7 +408,7 @@
    */
   function authFetch(url, options) {
     options = options || {};
-    var token = getToken();
+    let token = getToken();
 
     if (!token || !isTokenValid()) {
       // token无效，尝试刷新或跳转登录
@@ -460,7 +460,7 @@
     }
 
     // 检查token过期
-    var token = getToken();
+    let token = getToken();
     if (token && !isTokenValid()) {
       // 静默清除过期token
       localStorage.removeItem(TOKEN_KEY);

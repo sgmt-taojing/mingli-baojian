@@ -41,13 +41,13 @@
   // ──────────────────────────────────────
   //  环境检测
   // ──────────────────────────────────────
-  var isWx = (typeof wx !== 'undefined') && (typeof wx.getStorageSync === 'function');
-  var isBrowser = (typeof window !== 'undefined') && (typeof localStorage !== 'undefined');
+  let isWx = (typeof wx !== 'undefined') && (typeof wx.getStorageSync === 'function');
+  let isBrowser = (typeof window !== 'undefined') && (typeof localStorage !== 'undefined');
 
   // ──────────────────────────────────────
   //  Storage 适配层
   // ──────────────────────────────────────
-  var storage = {
+  let storage = {
     /**
      * 读取本地存储
      * @param {string} key
@@ -56,7 +56,7 @@
     get: function (key) {
       try {
         if (isWx) {
-          var val = wx.getStorageSync(key);
+          let val = wx.getStorageSync(key);
           if (val === '' || val === undefined || val === null) return null;
           return typeof val === 'string' ? val : JSON.stringify(val);
         }
@@ -111,7 +111,7 @@
      * @returns {*}
      */
     getJSON: function (key, fallback) {
-      var raw = this.get(key);
+      let raw = this.get(key);
       if (raw === null || raw === undefined) return fallback;
       try {
         return JSON.parse(raw);
@@ -144,10 +144,10 @@
    * @returns {Promise<Object>} - 解析后的响应 JSON
    */
   function request(options) {
-    var method = (options.method || 'GET').toUpperCase();
-    var url = options.url;
-    var header = options.header || {};
-    var data = options.data || null;
+    let method = (options.method || 'GET').toUpperCase();
+    let url = options.url;
+    let header = options.header || {};
+    let data = options.data || null;
 
     return new Promise(function (resolve, reject) {
       if (isWx) {
@@ -162,7 +162,7 @@
             if (res.statusCode >= 200 && res.statusCode < 300) {
               resolve(res.data);
             } else {
-              var err = new Error('HTTP ' + res.statusCode);
+              let err = new Error('HTTP ' + res.statusCode);
               err.statusCode = res.statusCode;
               err.response = res.data;
               reject(err);
@@ -174,7 +174,7 @@
         });
       } else if (isBrowser && typeof fetch === 'function') {
         // 浏览器 fetch
-        var fetchOptions = {
+        let fetchOptions = {
           method: method,
           headers: header
         };
@@ -200,7 +200,7 @@
           });
       } else if (isBrowser) {
         // 降级到 XMLHttpRequest（老浏览器）
-        var xhr = new XMLHttpRequest();
+        let xhr = new XMLHttpRequest();
         xhr.open(method, url, true);
         for (var k in header) {
           if (header.hasOwnProperty(k)) {
@@ -240,7 +240,7 @@
   // ──────────────────────────────────────
   //  需要同步的数据项定义
   // ──────────────────────────────────────
-  var SYNC_KEYS = [
+  const SYNC_KEYS = [
     'userBazi',      // 八字排盘数据
     'userFaith',     // 信仰选择
     'memberInfo',    // 会员信息
@@ -249,12 +249,12 @@
     'preferences'    // 用户偏好
   ];
 
-  var LAST_SYNC_KEY = 'lastSyncTime';
+  const LAST_SYNC_KEY = 'lastSyncTime';
 
   // ──────────────────────────────────────
   //  SyncClient 主对象
   // ──────────────────────────────────────
-  var SyncClient = {
+  let SyncClient = {
     // ── 配置 ──
     apiBase: 'http://127.0.0.1:8920',
     token: null,
@@ -301,7 +301,7 @@
 
     // ── 获取认证请求头 ──
     _authHeader: function () {
-      var header = {};
+      let header = {};
       if (this.token) {
         header['Authorization'] = 'Bearer ' + this.token;
       }
@@ -314,10 +314,10 @@
      * @returns {Object} 包含所有同步项的对象
      */
     _collectLocalData: function () {
-      var data = {};
+      let data = {};
       for (var i = 0; i < SYNC_KEYS.length; i++) {
-        var key = SYNC_KEYS[i];
-        var raw = storage.get(key);
+        let key = SYNC_KEYS[i];
+        let raw = storage.get(key);
         if (raw !== null && raw !== undefined && raw !== '') {
           // 尝试解析 JSON，如果不是 JSON 就保持原值
           try {
@@ -338,7 +338,7 @@
     _applyRemoteData: function (serverData) {
       if (!serverData || typeof serverData !== 'object') return;
       for (var i = 0; i < SYNC_KEYS.length; i++) {
-        var key = SYNC_KEYS[i];
+        let key = SYNC_KEYS[i];
         if (serverData.hasOwnProperty(key) && serverData[key] !== undefined && serverData[key] !== null) {
           // 对象类型用 JSON 存储，字符串类型直接存
           if (typeof serverData[key] === 'object') {
@@ -365,8 +365,8 @@
         return Promise.resolve({ skipped: true, reason: 'no-token' });
       }
 
-      var localData = this._collectLocalData();
-      var self = this;
+      let localData = this._collectLocalData();
+      let self = this;
 
       console.log('[SyncClient] 开始上传数据, keys=' + Object.keys(localData).join(','));
 
@@ -398,7 +398,7 @@
         return Promise.resolve({ skipped: true, reason: 'no-token' });
       }
 
-      var self = this;
+      let self = this;
 
       console.log('[SyncClient] 开始拉取数据');
 
@@ -434,14 +434,14 @@
         return Promise.resolve('no-token');
       }
 
-      var localLastSync = parseInt(storage.get(LAST_SYNC_KEY) || '0', 10);
-      var localData = this._collectLocalData();
+      let localLastSync = parseInt(storage.get(LAST_SYNC_KEY) || '0', 10);
+      let localData = this._collectLocalData();
       // 本地数据的最新时间戳
-      var localTimestamp = localData._deviceTime || 0;
+      let localTimestamp = localData._deviceTime || 0;
       // 尝试从各项数据中找最新修改时间
       for (var i = 0; i < SYNC_KEYS.length; i++) {
-        var key = SYNC_KEYS[i];
-        var parsed = storage.getJSON(key, null);
+        let key = SYNC_KEYS[i];
+        let parsed = storage.getJSON(key, null);
         if (parsed && typeof parsed === 'object' && parsed.timestamp) {
           if (parsed.timestamp > localTimestamp) {
             localTimestamp = parsed.timestamp;
@@ -449,7 +449,7 @@
         }
       }
 
-      var self = this;
+      let self = this;
 
       return request({
         method: 'GET',
@@ -458,8 +458,8 @@
       }).then(function (res) {
         if (!res) return 'in-sync';
 
-        var serverTimestamp = res.serverTimestamp || res.serverTime || 0;
-        var serverLastSync = res.lastSyncTime || 0;
+        let serverTimestamp = res.serverTimestamp || res.serverTime || 0;
+        let serverLastSync = res.lastSyncTime || 0;
 
         // 如果服务端没有数据，需要 push
         if (!serverLastSync && !serverTimestamp) {
@@ -506,7 +506,7 @@
         return Promise.resolve('skipped:no-token');
       }
 
-      var self = this;
+      let self = this;
 
       return this.checkSync().then(function (status) {
         console.log('[SyncClient] 同步状态:', status);
@@ -555,7 +555,7 @@
      * @param {string} operation - 'push' | 'pull'
      */
     _handleRetry: function (operation) {
-      var self = this;
+      let self = this;
       if (this._retryCount >= this._maxRetries) {
         console.warn('[SyncClient] ' + operation + ' 重试次数已达上限 (' + this._maxRetries + ')，停止重试');
         this._retryCount = 0;
@@ -587,8 +587,8 @@
         return;
       }
 
-      var self = this;
-      var interval = 5 * 60 * 1000; // 5分钟
+      let self = this;
+      let interval = 5 * 60 * 1000; // 5分钟
 
       // 小程序用 setInterval，浏览器也用
       this._timerId = setInterval(function () {
@@ -638,7 +638,7 @@
      * @returns {Promise<string>}
      */
     fullSync: function () {
-      var self = this;
+      let self = this;
       return this.pull().then(function () {
         return self.push();
       }).then(function () {
@@ -663,14 +663,14 @@
      * @returns {string}
      */
     getLastSyncText: function () {
-      var ts = this.getLastSyncTime();
+      let ts = this.getLastSyncTime();
       if (!ts) return '从未同步';
 
-      var now = Date.now();
-      var diff = now - ts;
-      var minutes = Math.floor(diff / 60000);
-      var hours = Math.floor(minutes / 60);
-      var days = Math.floor(hours / 24);
+      let now = Date.now();
+      let diff = now - ts;
+      let minutes = Math.floor(diff / 60000);
+      let hours = Math.floor(minutes / 60);
+      let days = Math.floor(hours / 24);
 
       if (days > 0) return days + '天前同步';
       if (hours > 0) return hours + '小时前同步';

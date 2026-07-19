@@ -6,6 +6,7 @@ const { DatabaseSync } = require('node:sqlite');
 const sec = require('./security-v2.js');
 const rbac = require('./rbac-middleware.js');
 const syncRoutes = require('./sync-api');
+const distillationRoutes = require('./distillation-routes.js');
 const crypto = require('crypto');
 
 const app = express();
@@ -980,6 +981,11 @@ function canAccessKB(roles, level) {
 // 数据同步路由
 // ============================
 app.use('/api/sync', syncRoutes);
+
+// ============================
+// 知识蒸馏路由
+// ============================
+app.use('/api/distill', distillationRoutes);
 
 // === 启动服务 ===
 app.listen(PORT, () => {

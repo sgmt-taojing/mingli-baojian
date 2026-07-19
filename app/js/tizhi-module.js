@@ -812,7 +812,7 @@ function tzSelectWuxing(key){
   if(el) el.innerHTML=html;
 }
 
-var TZ_ENCYCLOPEDIA = {
+const TZ_ENCYCLOPEDIA = {
   seasons: [
     {title:'春养肝', icon:'🌱', summary:'春季属木，肝当令。宜养肝气，疏泄情志，多食绿色酸味食物。', details:'春季万物生发，肝气旺盛。养生要点：①早睡早起，缓步散步；②少酸增甘，养脾气；③多食绿叶蔬菜，如菠菜、芹菜；④保持心情舒畅，戒怒戒躁；⑤可饮菊花茶、枸杞茶疏肝明目。'},
     {title:'夏养心', icon:'☀️', summary:'夏季属火，心当令。宜养心气，清热消暑，多食红色苦味食物。', details:'夏季炎热，心火旺盛。养生要点：①晚睡早起，午休片刻；②饮食清淡，少油腻；③多食苦瓜、莲子、百合；④多饮绿茶消暑；⑤静心凝神，避免大喜伤心；⑥运动宜在清晨或傍晚。'},
