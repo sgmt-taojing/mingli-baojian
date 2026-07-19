@@ -196,12 +196,12 @@ const JIE_DATES = {
  * @returns {Date|null}
  */
 function getJieDate(year, jieName) {
-  var info = JIE_DATES[jieName];
+  let info = JIE_DATES[jieName];
   if (!info) return null;
-  var idx = year - 1900;
+  let idx = year - 1900;
   if (idx < 0 || idx >= info.offsets.length) return null;
-  var ch = info.offsets[idx];
-  var offset = 0;
+  let ch = info.offsets[idx];
+  let offset = 0;
   if (ch === 'a') offset = -1;
   else if (ch === '1') offset = 1;
   else if (ch === '2') offset = 2;
@@ -215,16 +215,16 @@ function getJieDate(year, jieName) {
  * @returns {number} 太阳黄经 (0-360度)
  */
 function solarLongitudeJ2000(jd) {
-  var T = (jd - 2451545.0) / 36525.0;
-  var L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T;
-  var M = 357.52911 + 35999.05029 * T - 0.0001537 * T * T;
-  var Mrad = M * Math.PI / 180;
-  var C = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(Mrad)
+  let T = (jd - 2451545.0) / 36525.0;
+  let L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T;
+  let M = 357.52911 + 35999.05029 * T - 0.0001537 * T * T;
+  let Mrad = M * Math.PI / 180;
+  let C = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(Mrad)
         + (0.019993 - 0.000101 * T) * Math.sin(2 * Mrad)
         + 0.000289 * Math.sin(3 * Mrad);
-  var lambda = L0 + C;
+  let lambda = L0 + C;
   // 章动修正 (标准天文算法, 精度 sufficient for 节气判断)
-  var omega = 125.04 - 1934.136 * T;
+  let omega = 125.04 - 1934.136 * T;
   lambda = lambda - 0.00569 - 0.00478 * Math.sin(omega * Math.PI / 180);
   return ((lambda % 360) + 360) % 360;
 }
@@ -255,30 +255,30 @@ function dateFromJd(jd) {
  * @returns {Date|null}
  */
 function getPreciseJieTime(year, jieName) {
-  var targetLng = JIE_LONGITUDE[jieName];
+  let targetLng = JIE_LONGITUDE[jieName];
   if (targetLng === undefined) return getJieDate(year, jieName);
-  var approx = getJieDate(year, jieName);
+  let approx = getJieDate(year, jieName);
   if (!approx) return null;
   // 在近似日期前后3天内扫描
-  var jdStart = jdFromDate(new Date(approx.getTime() - 3 * 86400000));
-  var jdEnd = jdFromDate(new Date(approx.getTime() + 3 * 86400000));
-  var step = 0.02; // ~30 min
-  var prevLng = solarLongitudeJ2000(jdStart);
-  var prevJd = jdStart;
-  for (var jd = jdStart + step; jd <= jdEnd; jd += step) {
-    var lng = solarLongitudeJ2000(jd);
-    var dPrev = ((targetLng - prevLng + 360) % 360);
-    var dCurr = ((targetLng - lng + 360) % 360);
+  let jdStart = jdFromDate(new Date(approx.getTime() - 3 * 86400000));
+  let jdEnd = jdFromDate(new Date(approx.getTime() + 3 * 86400000));
+  let step = 0.02; // ~30 min
+  let prevLng = solarLongitudeJ2000(jdStart);
+  let prevJd = jdStart;
+  for (let jd = jdStart + step; jd <= jdEnd; jd += step) {
+    let lng = solarLongitudeJ2000(jd);
+    let dPrev = ((targetLng - prevLng + 360) % 360);
+    let dCurr = ((targetLng - lng + 360) % 360);
     // 检测跨越目标黄经 (太阳黄经递增, 正向越过)
     // 正向越过: dPrev 小(接近0) → dCurr 大(接近360, 即刚越过)
     // 也检测 0° 附近的环绕情况
     if ((dPrev < 60 && dCurr > 300) || (dPrev > 300 && dCurr < 60)) {
       // 二分法精确查找
-      var lo = prevJd, hi = jd;
-      for (var i = 0; i < 50; i++) {
-        var mid = (lo + hi) / 2;
-        var midLng = solarLongitudeJ2000(mid);
-        var dMid = ((targetLng - midLng + 360) % 360);
+      let lo = prevJd, hi = jd;
+      for (let i = 0; i < 50; i++) {
+        let mid = (lo + hi) / 2;
+        let midLng = solarLongitudeJ2000(mid);
+        let dMid = ((targetLng - midLng + 360) % 360);
         // 正向跨越: dMid > 180 表示已越过目标 (lng > target)
         if (dMid > 180) hi = mid; else lo = mid;
         if (hi - lo < 0.000001) break;
@@ -300,9 +300,9 @@ function getPreciseJieTime(year, jieName) {
  * 《历代天文律历等通算》标准公式
  */
 function toJDN(year, month, day) {
-  var a = Math.floor((14 - month) / 12);
-  var y = year + 4800 - a;
-  var m = month + 12 * a - 3;
+  let a = Math.floor((14 - month) / 12);
+  let y = year + 4800 - a;
+  let m = month + 12 * a - 3;
   return day + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
 }
 
@@ -314,7 +314,7 @@ function toJDN(year, month, day) {
  * 《渊海子平》「日柱者，命之主也，以子正交时为分界。」
  */
 function getDayStemIndex(year, month, day) {
-  var jdn = toJDN(year, month, day);
+  let jdn = toJDN(year, month, day);
   // 2024-04-30 = 甲子日, jdn=2460431, 2460431%10=1 → (1-1)%10=0=甲 ✓
   return ((jdn - 1) % 10 + 10) % 10;
 }
@@ -333,9 +333,9 @@ function getDayStemIndex(year, month, day) {
  * n = (jdn - 2460431) mod 60, stemIdx = n%10, branchIdx = n%12
  */
 function getDayBranchIndex(year, month, day) {
-  var jdn = toJDN(year, month, day);
+  let jdn = toJDN(year, month, day);
   // 以 2024-04-30 甲子日为基准
-  var diff = jdn - 2460431;
+  let diff = jdn - 2460431;
   return ((diff % 12) + 12) % 12;
 }
 
@@ -344,8 +344,8 @@ function getDayBranchIndex(year, month, day) {
  * 基准: 2024-04-30 = 甲子 (六十甲子序=0)
  */
 function getDayGanZhiIndex(year, month, day) {
-  var jdn = toJDN(year, month, day);
-  var diff = jdn - 2460431; // 2024-04-30 = 甲子
+  let jdn = toJDN(year, month, day);
+  let diff = jdn - 2460431; // 2024-04-30 = 甲子
   return ((diff % 60) + 60) % 60;
 }
 
@@ -381,21 +381,21 @@ function getDayBranchIndexV3(year, month, day) {
 function getYearStemBranchExact(year, month, day, hour, minute) {
   hour = hour || 12;
   minute = minute || 0;
-  var birthDate = new Date(year, month - 1, day, hour, minute);
+  let birthDate = new Date(year, month - 1, day, hour, minute);
 
   // 获取当年和上年立春精确时刻
-  var lichun = getPreciseJieTime(year, '立春');
+  let lichun = getPreciseJieTime(year, '立春');
   if (!lichun) {
     // 回退: 立春约在2月4日
     lichun = new Date(year, 1, 4, 12, 0);
   }
 
   // 立春前: 年柱属上一年
-  var baseYear = (birthDate < lichun) ? year - 1 : year;
+  let baseYear = (birthDate < lichun) ? year - 1 : year;
 
   // 以4年为甲子年基准: 4年=甲子, (year-4)%10=天干, (year-4)%12=地支
-  var stemIdx = ((baseYear - 4) % 10 + 10) % 10;
-  var branchIdx = ((baseYear - 4) % 12 + 12) % 12;
+  let stemIdx = ((baseYear - 4) % 10 + 10) % 10;
+  let branchIdx = ((baseYear - 4) % 12 + 12) % 12;
 
   return {
     stemIdx: stemIdx,
@@ -426,12 +426,12 @@ function getYearStemBranchExact(year, month, day, hour, minute) {
 function getMonthBranchExact(year, month, day, hour, minute) {
   hour = hour || 12;
   minute = minute || 0;
-  var birthDate = new Date(year, month - 1, day, hour, minute);
+  let birthDate = new Date(year, month - 1, day, hour, minute);
 
   // 12节按时间顺序排列 (从上年大雪开始)
   // 大雪(上年12月)→小寒(1月)→立春(2月)→惊蛰(3月)→清明(4月)→立夏(5月)→芒种(6月)
   // →小暑(7月)→立秋(8月)→白露(9月)→寒露(10月)→立冬(11月)→大雪(12月)
-  var jieList = [
+  let jieList = [
     {name:'大雪', branchIdx:0, yearOffset:-1},  // 上年12月
     {name:'小寒', branchIdx:1, yearOffset:0},   // 当年1月
     {name:'立春', branchIdx:2, yearOffset:0},   // 当年2月
@@ -448,11 +448,11 @@ function getMonthBranchExact(year, month, day, hour, minute) {
   ];
 
   // 遍历所有节, 找最后一个 birthDate >= jieDate 的
-  var monthIdx = 1; // 默认丑月(1月小寒前)
-  for (var i = 0; i < jieList.length; i++) {
-    var jq = jieList[i];
-    var jieYear = year + (jq.yearOffset || 0);
-    var jieDate = getPreciseJieTime(jieYear, jq.name);
+  let monthIdx = 1; // 默认丑月(1月小寒前)
+  for (let i = 0; i < jieList.length; i++) {
+    let jq = jieList[i];
+    let jieYear = year + (jq.yearOffset || 0);
+    let jieDate = getPreciseJieTime(jieYear, jq.name);
     if (jieDate && birthDate >= jieDate) {
       monthIdx = jq.branchIdx;
     }
@@ -486,10 +486,10 @@ function getMonthStem(yearStemIdx, monthBranchIdx) {
   // 五虎遁: 寅月天干索引
   // 甲(0)己(5)→丙(2), 乙(1)庚(6)→戊(4), 丙(2)辛(7)→庚(6), 丁(3)壬(8)→壬(8), 戊(4)癸(9)→甲(0)
   // 公式: (yearStemIdx * 2 + 2) % 10
-  var yinMonthGanIdx = (yearStemIdx * 2 + 2) % 10;
+  let yinMonthGanIdx = (yearStemIdx * 2 + 2) % 10;
 
   // 月支相对寅的偏移: 寅=0, 卯=1, 辰=2, 巳=3, 午=4, 未=5, 申=6, 酉=7, 戌=8, 亥=9, 子=10, 丑=11
-  var offsetFromYin = (monthBranchIdx - 2 + 12) % 12;
+  let offsetFromYin = (monthBranchIdx - 2 + 12) % 12;
 
   return (yinMonthGanIdx + offsetFromYin) % 10;
 }
@@ -499,8 +499,8 @@ function getMonthStem(yearStemIdx, monthBranchIdx) {
  * @returns {{stemIdx, branchIdx, stem, branch}}
  */
 function getMonthPillar(year, month, day, hour, minute, yearStemIdx) {
-  var mBranchIdx = getMonthBranchExact(year, month, day, hour, minute);
-  var mStemIdx = getMonthStem(yearStemIdx, mBranchIdx);
+  let mBranchIdx = getMonthBranchExact(year, month, day, hour, minute);
+  let mStemIdx = getMonthStem(yearStemIdx, mBranchIdx);
   return {
     stemIdx: mStemIdx,
     branchIdx: mBranchIdx,
@@ -556,7 +556,7 @@ function getHourBranchIndex(hour) {
  */
 function getHourStem(dayStemIdx, hourBranchIdx) {
   // 五鼠遁: 子时天干 = (dayStemIdx * 2) % 10
-  var ziHourGanIdx = (dayStemIdx * 2) % 10;
+  let ziHourGanIdx = (dayStemIdx * 2) % 10;
   return (ziHourGanIdx + hourBranchIdx) % 10;
 }
 
@@ -581,7 +581,7 @@ function getHourStem(dayStemIdx, hourBranchIdx) {
  */
 function getHourPillar(year, month, day, hour, dayStemIdx, zishiMode) {
   zishiMode = zishiMode || 'normal';
-  var dayShift = 0;
+  let dayShift = 0;
 
   // 晚子换日: 23点后日柱进一位
   if (zishiMode === 'late' && hour >= 23) {
@@ -589,8 +589,8 @@ function getHourPillar(year, month, day, hour, dayStemIdx, zishiMode) {
     dayStemIdx = (dayStemIdx + 1) % 10;
   }
 
-  var hBranchIdx = getHourBranchIndex(hour);
-  var hStemIdx = getHourStem(dayStemIdx, hBranchIdx);
+  let hBranchIdx = getHourBranchIndex(hour);
+  let hStemIdx = getHourStem(dayStemIdx, hBranchIdx);
 
   return {
     stemIdx: hStemIdx,
@@ -622,9 +622,9 @@ function getHourPillar(year, month, day, hour, dayStemIdx, zishiMode) {
  */
 function getTenGod(stem, dayStem) {
   if (!stem || !dayStem) return '';
-  var tenGodMap = TENGAN[dayStem];
+  let tenGodMap = TENGAN[dayStem];
   if (!tenGodMap) return '';
-  for (var rel in tenGodMap) {
+  for (let rel in tenGodMap) {
     if (tenGodMap[rel] === stem) return TEGAN_NAMES[rel];
   }
   return '';
@@ -637,7 +637,7 @@ function getTenGod(stem, dayStem) {
  * @returns {string} 本气十神
  */
 function getBranchTenGod(branch, dayStem) {
-  var canggan = ZHI_CANGGAN[branch] || [];
+  let canggan = ZHI_CANGGAN[branch] || [];
   if (canggan.length === 0) return '';
   return getTenGod(canggan[0], dayStem);
 }
@@ -647,10 +647,10 @@ function getBranchTenGod(branch, dayStem) {
  * @returns {Array<{stem, god, isBen}>}
  */
 function getBranchAllTenGods(branch, dayStem) {
-  var canggan = ZHI_CANGGAN[branch] || [];
-  var result = [];
-  for (var i = 0; i < canggan.length; i++) {
-    var god = getTenGod(canggan[i], dayStem);
+  let canggan = ZHI_CANGGAN[branch] || [];
+  let result = [];
+  for (let i = 0; i < canggan.length; i++) {
+    let god = getTenGod(canggan[i], dayStem);
     result.push({
       stem: canggan[i],
       god: god,
@@ -687,38 +687,38 @@ function getBranchAllTenGods(branch, dayStem) {
  * @returns {Array} 大运列表 (8步)
  */
 function computeDayun(pillars, sex, birthYear, birthMonth, birthDay, birthHour, dayStemIdx, dayMasterEle) {
-  var result = [];
-  var startZhi = BRANCHES.indexOf(pillars[1].branch);
-  var startGan = STEMS.indexOf(pillars[1].stem);
+  let result = [];
+  let startZhi = BRANCHES.indexOf(pillars[1].branch);
+  let startGan = STEMS.indexOf(pillars[1].stem);
 
   // 起运方向: 阳男阴女顺行, 阴男阳女逆行
-  var yearStemIdx = STEMS.indexOf(pillars[0].stem);
-  var isYang = yearStemIdx % 2 === 0;
-  var isMale = sex === 'male';
-  var direction = (isYang && isMale) || (!isYang && !isMale) ? 1 : -1;
+  let yearStemIdx = STEMS.indexOf(pillars[0].stem);
+  let isYang = yearStemIdx % 2 === 0;
+  let isMale = sex === 'male';
+  let direction = (isYang && isMale) || (!isYang && !isMale) ? 1 : -1;
 
   // ═══ 精确起运年龄 (对标 lunar_python) ═══
-  var qiyunAge = 0;
-  var qiyunDetail = '';
+  let qiyunAge = 0;
+  let qiyunDetail = '';
   try {
-    var birthDate = new Date(birthYear, birthMonth - 1, birthDay, birthHour || 12, 0);
-    var JIE_12 = ['立春','惊蛰','清明','立夏','芒种','小暑','立秋','白露','寒露','立冬','大雪','小寒'];
-    var targetJie = null;
+    let birthDate = new Date(birthYear, birthMonth - 1, birthDay, birthHour || 12, 0);
+    let JIE_12 = ['立春','惊蛰','清明','立夏','芒种','小暑','立秋','白露','寒露','立冬','大雪','小寒'];
+    let targetJie = null;
 
     if (direction === 1) {
       // 顺行: 找出生时刻之后的下一个节
-      for (var y = birthYear; y <= birthYear + 1; y++) {
-        for (var j = 0; j < 12; j++) {
-          var jieDate = getPreciseJieTime(y, JIE_12[j]);
+      for (let y = birthYear; y <= birthYear + 1; y++) {
+        for (let j = 0; j < 12; j++) {
+          let jieDate = getPreciseJieTime(y, JIE_12[j]);
           if (jieDate && jieDate > birthDate) { targetJie = jieDate; break; }
         }
         if (targetJie) break;
       }
     } else {
       // 逆行: 找出生时刻之前的上一个节
-      for (var y2 = birthYear; y2 >= birthYear - 1; y2--) {
-        for (var j2 = 11; j2 >= 0; j2--) {
-          var jieDate2 = getPreciseJieTime(y2, JIE_12[j2]);
+      for (let y2 = birthYear; y2 >= birthYear - 1; y2--) {
+        for (let j2 = 11; j2 >= 0; j2--) {
+          let jieDate2 = getPreciseJieTime(y2, JIE_12[j2]);
           if (jieDate2 && jieDate2 < birthDate) { targetJie = jieDate2; break; }
         }
         if (targetJie) break;
@@ -726,16 +726,16 @@ function computeDayun(pillars, sex, birthYear, birthMonth, birthDay, birthHour, 
     }
 
     if (targetJie) {
-      var diffMs = Math.abs(targetJie - birthDate);
-      var totalHours = diffMs / 3600000;
+      let diffMs = Math.abs(targetJie - birthDate);
+      let totalHours = diffMs / 3600000;
       // 3天=1年 → 72小时=1年
       // 1月=6小时, 1时辰(2小时)=10天
-      var years = Math.floor(totalHours / 72);
-      var rem = totalHours % 72;
-      var months = Math.floor(rem / 6);
-      var rem2 = rem % 6;
-      var shichen = Math.floor(rem2 / 2);
-      var days = shichen * 10;
+      let years = Math.floor(totalHours / 72);
+      let rem = totalHours % 72;
+      let months = Math.floor(rem / 6);
+      let rem2 = rem % 6;
+      let shichen = Math.floor(rem2 / 2);
+      let days = shichen * 10;
       qiyunAge = years + months / 12 + days / 360;
       qiyunAge = Math.round(qiyunAge * 1000) / 1000;
       qiyunDetail = years + '岁' + months + '月' + days + '天';
@@ -749,33 +749,33 @@ function computeDayun(pillars, sex, birthYear, birthMonth, birthDay, birthHour, 
   }
 
   // 排8步大运
-  for (var i = 0; i < 8; i++) {
-    var zhiIdx = (startZhi + (i + 1) * direction + 120) % 12;
-    var ganIdx = (startGan + (i + 1) * direction + 100) % 10;
-    var gan = STEMS[ganIdx];
-    var zhi = BRANCHES[zhiIdx];
+  for (let i = 0; i < 8; i++) {
+    let zhiIdx = (startZhi + (i + 1) * direction + 120) % 12;
+    let ganIdx = (startGan + (i + 1) * direction + 100) % 10;
+    let gan = STEMS[ganIdx];
+    let zhi = BRANCHES[zhiIdx];
 
-    var ageStart = Math.round((qiyunAge + i * 10) * 10) / 10;
-    var ageEnd = Math.round((qiyunAge + (i + 1) * 10) * 10) / 10;
-    var yearStart = birthYear + Math.floor(ageStart);
-    var yearEnd = birthYear + Math.floor(ageEnd);
+    let ageStart = Math.round((qiyunAge + i * 10) * 10) / 10;
+    let ageEnd = Math.round((qiyunAge + (i + 1) * 10) * 10) / 10;
+    let yearStart = birthYear + Math.floor(ageStart);
+    let yearEnd = birthYear + Math.floor(ageEnd);
 
-    var ganEle = ELE[gan];
-    var zhiEle = ZHI_ELE[zhi];
+    let ganEle = ELE[gan];
+    let zhiEle = ZHI_ELE[zhi];
 
     // 天干十神
-    var ganShen = getTenGod(gan, STEMS[dayStemIdx]);
+    let ganShen = getTenGod(gan, STEMS[dayStemIdx]);
     // 地支藏干十神
-    var zhiCanggan = ZHI_CANGGAN[zhi] || [];
-    var zhiShenList = zhiCanggan.map(function(cg) { return getTenGod(cg, STEMS[dayStemIdx]); });
-    var zhiShen = zhiShenList.join('/');
+    let zhiCanggan = ZHI_CANGGAN[zhi] || [];
+    let zhiShenList = zhiCanggan.map(function(cg) { return getTenGod(cg, STEMS[dayStemIdx]); });
+    let zhiShen = zhiShenList.join('/');
 
     // 长生十二宫
-    var dishi = getDishi(STEMS[dayStemIdx], zhi);
+    let dishi = getDishi(STEMS[dayStemIdx], zhi);
 
     // 喜忌判断
-    var isXi = dayMasterEle && (ganEle === dayMasterEle || zhiEle === dayMasterEle);
-    var isJi = dayMasterEle && (ganEle === getKeEle(dayMasterEle) || zhiEle === getKeEle(dayMasterEle));
+    let isXi = dayMasterEle && (ganEle === dayMasterEle || zhiEle === dayMasterEle);
+    let isJi = dayMasterEle && (ganEle === getKeEle(dayMasterEle) || zhiEle === getKeEle(dayMasterEle));
 
     result.push({
       index: i + 1,
@@ -803,7 +803,7 @@ function computeDayun(pillars, sex, birthYear, birthMonth, birthDay, birthHour, 
  * 克我者的五行
  */
 function getKeEle(ele) {
-  for (var k in WUXING_KE) {
+  for (let k in WUXING_KE) {
     if (WUXING_KE[k] === ele) return k;
   }
   return '';
@@ -826,8 +826,8 @@ function getKeEle(ele) {
  * @returns {string} 纳音名称 (如「海中金」)
  */
 function getNayin(stemIdx, branchIdx) {
-  var ganzhi = STEMS[stemIdx] + BRANCHES[branchIdx];
-  var idx = JIAZI.indexOf(ganzhi);
+  let ganzhi = STEMS[stemIdx] + BRANCHES[branchIdx];
+  let idx = JIAZI.indexOf(ganzhi);
   if (idx < 0) return '';
   return NAYIN_TABLE[idx] || '';
 }
@@ -839,7 +839,7 @@ function getNayin(stemIdx, branchIdx) {
  */
 function getNayinElement(nayin) {
   if (!nayin) return '';
-  var last = nayin.charAt(nayin.length - 1);
+  let last = nayin.charAt(nayin.length - 1);
   if ('木火土金水'.indexOf(last) >= 0) return last;
   return '';
 }
@@ -952,72 +952,72 @@ const JIANGXING_MAP = {
  * @returns {Array} 神煞列表
  */
 function getShensha(pillars, dayStemIdx) {
-  var yBranch = pillars[0].branch;
-  var mBranch = pillars[1].branch;
-  var dBranch = pillars[2].branch;
-  var hBranch = pillars[3].branch;
-  var allBranches = [yBranch, mBranch, dBranch, hBranch];
-  var dayStem = STEMS[dayStemIdx];
-  var result = [];
+  let yBranch = pillars[0].branch;
+  let mBranch = pillars[1].branch;
+  let dBranch = pillars[2].branch;
+  let hBranch = pillars[3].branch;
+  let allBranches = [yBranch, mBranch, dBranch, hBranch];
+  let dayStem = STEMS[dayStemIdx];
+  let result = [];
 
   // 天乙贵人
-  var tianyiIdxs = TIANYI_MAP[dayStemIdx] || [];
-  var hasTianyi = false;
-  for (var i = 0; i < allBranches.length; i++) {
+  let tianyiIdxs = TIANYI_MAP[dayStemIdx] || [];
+  let hasTianyi = false;
+  for (let i = 0; i < allBranches.length; i++) {
     if (tianyiIdxs.indexOf(BRANCHES.indexOf(allBranches[i])) >= 0) { hasTianyi = true; break; }
   }
   if (hasTianyi) result.push({name:'天乙贵人', desc:'吉星高照，逢凶化吉，贵人多助。'});
 
   // 文昌贵人
-  var wcTarget = WENCHANG_MAP[dayStemIdx];
+  let wcTarget = WENCHANG_MAP[dayStemIdx];
   if (wcTarget && allBranches.indexOf(wcTarget) >= 0) {
     result.push({name:'文昌贵人', desc:'学业之星，利考试、学习、著述。'});
   }
 
   // 桃花 (年支/日支查)
-  var taoTargets = [TAOHUA_MAP[yBranch], TAOHUA_MAP[dBranch]];
-  var hasTao = false;
-  for (var i2 = 0; i2 < allBranches.length; i2++) {
+  let taoTargets = [TAOHUA_MAP[yBranch], TAOHUA_MAP[dBranch]];
+  let hasTao = false;
+  for (let i2 = 0; i2 < allBranches.length; i2++) {
     if (taoTargets.indexOf(allBranches[i2]) >= 0) { hasTao = true; break; }
   }
   if (hasTao) result.push({name:'桃花', desc:'感情丰富，人缘佳，姻缘运强。'});
 
   // 驿马 (年支查)
-  var maTarget = YIMA_MAP[yBranch];
+  let maTarget = YIMA_MAP[yBranch];
   if (maTarget && [mBranch, dBranch, hBranch].indexOf(maTarget) >= 0) {
     result.push({name:'驿马', desc:'奔波走动之象，适合外出、调动。'});
   }
 
   // 华盖 (年支/日支查)
-  var hgTargets = [HUAGAI_MAP[yBranch], HUAGAI_MAP[dBranch]];
-  var hasHg = false;
-  for (var i3 = 0; i3 < allBranches.length; i3++) {
+  let hgTargets = [HUAGAI_MAP[yBranch], HUAGAI_MAP[dBranch]];
+  let hasHg = false;
+  for (let i3 = 0; i3 < allBranches.length; i3++) {
     if (hgTargets.indexOf(allBranches[i3]) >= 0) { hasHg = true; break; }
   }
   if (hasHg) result.push({name:'华盖', desc:'艺术之星，利于学术研究，性情孤高。'});
 
   // 羊刃 (日干查, 月支为真刃)
-  var yrTarget = YANGREN_MAP[dayStemIdx];
+  let yrTarget = YANGREN_MAP[dayStemIdx];
   if (yrTarget) {
     if (mBranch === yrTarget) result.push({name:'月刃（真羊刃）', desc:'刚暴之星在月令，慎防血光官非。'});
     else if (allBranches.indexOf(yrTarget) >= 0) result.push({name:'羊刃', desc:'刚毅果断，慎防血光。'});
   }
 
   // 将星 (年支查)
-  var jiangTarget = JIANGXING_MAP[yBranch];
+  let jiangTarget = JIANGXING_MAP[yBranch];
   if (jiangTarget && allBranches.indexOf(jiangTarget) >= 0) {
     result.push({name:'将星', desc:'掌权之星，利于军警、领导岗位。'});
   }
 
   // 禄神 (日干查)
-  var lsTarget = LUSHEN_MAP[dayStemIdx];
+  let lsTarget = LUSHEN_MAP[dayStemIdx];
   if (lsTarget && allBranches.indexOf(lsTarget) >= 0) {
     result.push({name:'禄神', desc:'食禄之星，主衣食无忧。'});
   }
 
   // 魁罡 (日柱为庚辰/庚戌/壬辰/戊戌)
-  var kgDays = ['庚辰','庚戌','壬辰','戊戌'];
-  var dayPillar = dayStem + dBranch;
+  let kgDays = ['庚辰','庚戌','壬辰','戊戌'];
+  let dayPillar = dayStem + dBranch;
   if (kgDays.indexOf(dayPillar) >= 0) {
     result.push({name:'魁罡', desc:'性格刚烈果断，聪敏有领导才能。'});
   }
@@ -1039,12 +1039,12 @@ function getShensha(pillars, dayStemIdx) {
  * @returns {string} 长生十二宫阶段
  */
 function getDishi(gan, zhi) {
-  var start = CHANGSHENG_START[gan];
+  let start = CHANGSHENG_START[gan];
   if (!start) return '';
-  var forward = (GAN_YINYANG[gan] === '阳');
-  var si = BRANCHES.indexOf(start);
-  var zi = BRANCHES.indexOf(zhi);
-  var step = forward ? ((zi - si + 12) % 12) : ((si - zi + 12) % 12);
+  let forward = (GAN_YINYANG[gan] === '阳');
+  let si = BRANCHES.indexOf(start);
+  let zi = BRANCHES.indexOf(zhi);
+  let step = forward ? ((zi - si + 12) % 12) : ((si - zi + 12) % 12);
   return CS_ORDER[step];
 }
 
@@ -1058,16 +1058,16 @@ function getDishi(gan, zhi) {
  * 甲子旬空戌亥, 甲戌旬空申酉, 甲申旬空午未...
  */
 function getXunKong(dayStem, dayBranch) {
-  var stemIdx = STEMS.indexOf(dayStem);
-  var branchIdx = BRANCHES.indexOf(dayBranch);
-  var n = -1;
-  for (var i = 0; i < 60; i++) {
+  let stemIdx = STEMS.indexOf(dayStem);
+  let branchIdx = BRANCHES.indexOf(dayBranch);
+  let n = -1;
+  for (let i = 0; i < 60; i++) {
     if (i % 10 === stemIdx && i % 12 === branchIdx) { n = i; break; }
   }
   if (n < 0) return '';
-  var xunIdx = Math.floor(n / 10);
-  var kong1 = BRANCHES[(xunIdx * 10 + 10) % 12];
-  var kong2 = BRANCHES[(xunIdx * 10 + 11) % 12];
+  let xunIdx = Math.floor(n / 10);
+  let kong1 = BRANCHES[(xunIdx * 10 + 10) % 12];
+  let kong2 = BRANCHES[(xunIdx * 10 + 11) % 12];
   return kong1 + kong2;
 }
 
@@ -1075,9 +1075,9 @@ function getXunKong(dayStem, dayBranch) {
  * 旬名
  */
 function getXunName(dayStem, dayBranch) {
-  var stemIdx = STEMS.indexOf(dayStem);
-  var branchIdx = BRANCHES.indexOf(dayBranch);
-  for (var i = 0; i < 60; i++) {
+  let stemIdx = STEMS.indexOf(dayStem);
+  let branchIdx = BRANCHES.indexOf(dayBranch);
+  for (let i = 0; i < 60; i++) {
     if (i % 10 === stemIdx && i % 12 === branchIdx) {
       return XUN_NAMES[Math.floor(i / 10)];
     }
@@ -1090,8 +1090,8 @@ function getXunName(dayStem, dayBranch) {
  * 《渊海子平》「胎元: 月干进一位, 月支进三位。」
  */
 function getTaiYuan(monthStem, monthBranch) {
-  var si = STEMS.indexOf(monthStem);
-  var bi = BRANCHES.indexOf(monthBranch);
+  let si = STEMS.indexOf(monthStem);
+  let bi = BRANCHES.indexOf(monthBranch);
   return STEMS[(si + 1) % 10] + BRANCHES[(bi + 3) % 12];
 }
 
@@ -1106,41 +1106,41 @@ function getTaiYuan(monthStem, monthBranch) {
  * 《滴天髓》「旺衰看月令，强弱看通根。」
  */
 function computeWuxingStrength(pillars, dayStem) {
-  var score = {'木':0, '火':0, '土':0, '金':0, '水':0};
-  var weights = [1.0, 0.5, 0.2];
+  let score = {'木':0, '火':0, '土':0, '金':0, '水':0};
+  let weights = [1.0, 0.5, 0.2];
 
-  for (var idx = 0; idx < pillars.length; idx++) {
-    var p = pillars[idx];
+  for (let idx = 0; idx < pillars.length; idx++) {
+    let p = pillars[idx];
     score[ELE[p.stem]] += 1.0;
 
-    var mult = (idx === 1) ? 2.0 : 1.0; // 月支×2
-    var canggan = ZHI_CANGGAN[p.branch] || [];
-    for (var i = 0; i < canggan.length; i++) {
-      var w = weights[i] || 0.2;
+    let mult = (idx === 1) ? 2.0 : 1.0; // 月支×2
+    let canggan = ZHI_CANGGAN[p.branch] || [];
+    for (let i = 0; i < canggan.length; i++) {
+      let w = weights[i] || 0.2;
       score[ELE[canggan[i]]] += Math.round(w * mult * 1000) / 1000;
     }
   }
 
-  for (var k in score) score[k] = Math.round(score[k] * 100) / 100;
+  for (let k in score) score[k] = Math.round(score[k] * 100) / 100;
 
-  var dayEle = ELE[dayStem];
-  var yinEle = null;
-  for (var k2 in WUXING_SHENG) {
+  let dayEle = ELE[dayStem];
+  let yinEle = null;
+  for (let k2 in WUXING_SHENG) {
     if (WUXING_SHENG[k2] === dayEle) yinEle = k2;
   }
 
-  var tong = Math.round((score[dayEle] + score[yinEle]) * 100) / 100;
-  var shangEle = WUXING_SHENG[dayEle];
-  var caiEle = WUXING_KE[dayEle];
-  var guanEle = null;
-  for (var k3 in WUXING_KE) {
+  let tong = Math.round((score[dayEle] + score[yinEle]) * 100) / 100;
+  let shangEle = WUXING_SHENG[dayEle];
+  let caiEle = WUXING_KE[dayEle];
+  let guanEle = null;
+  for (let k3 in WUXING_KE) {
     if (WUXING_KE[k3] === dayEle) guanEle = k3;
   }
-  var yi = Math.round((score[shangEle] + score[caiEle] + score[guanEle]) * 100) / 100;
+  let yi = Math.round((score[shangEle] + score[caiEle] + score[guanEle]) * 100) / 100;
 
-  var total = tong + yi;
-  var ratio = total > 0 ? tong / total : 0;
-  var tip = ratio > 0.55 ? '偏强' : (ratio < 0.45 ? '偏弱' : '均势(需细辨)');
+  let total = tong + yi;
+  let ratio = total > 0 ? tong / total : 0;
+  let tip = ratio > 0.55 ? '偏强' : (ratio < 0.45 ? '偏弱' : '均势(需细辨)');
 
   return {
     score: score,
@@ -1174,31 +1174,31 @@ function computeWuxingStrength(pillars, dayStem) {
  */
 function getGeju(monthBranch, dayStemIdx, pillars) {
   // 地支藏干索引表
-  var zangGan = {
+  let zangGan = {
     '子':[9],'丑':[5,9,7],'寅':[0,2,4],'卯':[1],
     '辰':[4,1,9],'巳':[2,6,4],'午':[3,5],'未':[5,3,1],
     '申':[6,8,4],'酉':[7],'戌':[4,7,3],'亥':[8,0]
   };
 
-  var zang = zangGan[monthBranch] || [];
-  var benQi = zang[0];
-  var zhongQi = zang.length > 1 ? zang[1] : -1;
-  var yuQi = zang.length > 2 ? zang[2] : -1;
+  let zang = zangGan[monthBranch] || [];
+  let benQi = zang[0];
+  let zhongQi = zang.length > 1 ? zang[1] : -1;
+  let yuQi = zang.length > 2 ? zang[2] : -1;
 
   // 检查透干
-  var tianGanIdx = pillars.map(function(p) { return STEMS.indexOf(p.stem); });
-  var benQiTou = tianGanIdx.indexOf(benQi) >= 0;
-  var zhongQiTou = zhongQi >= 0 && tianGanIdx.indexOf(zhongQi) >= 0;
-  var yuQiTou = yuQi >= 0 && tianGanIdx.indexOf(yuQi) >= 0;
+  let tianGanIdx = pillars.map(function(p) { return STEMS.indexOf(p.stem); });
+  let benQiTou = tianGanIdx.indexOf(benQi) >= 0;
+  let zhongQiTou = zhongQi >= 0 && tianGanIdx.indexOf(zhongQi) >= 0;
+  let yuQiTou = yuQi >= 0 && tianGanIdx.indexOf(yuQi) >= 0;
 
-  var geStemIdx = benQi;
-  var geSource = benQiTou ? '本气透干' : '本气（未透，力弱）';
+  let geStemIdx = benQi;
+  let geSource = benQiTou ? '本气透干' : '本气（未透，力弱）';
 
   // 本气为比劫时, 另取透干格
   if (!benQiTou) {
-    var dayStem = STEMS[dayStemIdx];
-    var dayEle = ELE[dayStem];
-    var benQiEle = ELE[STEMS[benQi]];
+    let dayStem = STEMS[dayStemIdx];
+    let dayEle = ELE[dayStem];
+    let benQiEle = ELE[STEMS[benQi]];
     if (benQiEle === dayEle) {
       if (zhongQiTou) { geStemIdx = zhongQi; geSource = '中气透干'; }
       else if (yuQiTou) { geStemIdx = yuQi; geSource = '余气透干'; }
@@ -1206,15 +1206,15 @@ function getGeju(monthBranch, dayStemIdx, pillars) {
   }
 
   // 十神关系定格局名
-  var geStem = STEMS[geStemIdx];
-  var dayStemChar = STEMS[dayStemIdx];
-  var geEle = ELE[geStem];
-  var dayEle = ELE[dayStemChar];
-  var sameYinYang = (geStemIdx % 2) === (dayStemIdx % 2);
+  let geStem = STEMS[geStemIdx];
+  let dayStemChar = STEMS[dayStemIdx];
+  let geEle = ELE[geStem];
+  let dayEle = ELE[dayStemChar];
+  let sameYinYang = (geStemIdx % 2) === (dayStemIdx % 2);
 
   // 建禄/月刃检查
-  var luMap = {'甲':'寅','乙':'卯','丙':'巳','丁':'午','戊':'巳','己':'午','庚':'申','辛':'酉','壬':'亥','癸':'子'};
-  var renMap = {'甲':'卯','乙':'寅','丙':'午','丁':'巳','戊':'午','己':'巳','庚':'酉','辛':'申','壬':'子','癸':'亥'};
+  let luMap = {'甲':'寅','乙':'卯','丙':'巳','丁':'午','戊':'巳','己':'午','庚':'申','辛':'酉','壬':'亥','癸':'子'};
+  let renMap = {'甲':'卯','乙':'寅','丙':'午','丁':'巳','戊':'午','己':'巳','庚':'酉','辛':'申','壬':'子','癸':'亥'};
 
   if (geEle === dayEle) {
     if (sameYinYang) {
@@ -1295,31 +1295,31 @@ function getGeju(monthBranch, dayStemIdx, pillars) {
  */
 function baziCalcV3(year, month, day, hour, sex, options) {
   options = options || {};
-  var zishiMode = options.zishiMode || 'normal';
+  let zishiMode = options.zishiMode || 'normal';
 
   // ═══ 1. 年柱 (立春为界) ═══
-  var yearRes = getYearStemBranchExact(year, month, day, hour, 0);
-  var ysIdx = yearRes.stemIdx;
-  var ybIdx = yearRes.branchIdx;
+  let yearRes = getYearStemBranchExact(year, month, day, hour, 0);
+  let ysIdx = yearRes.stemIdx;
+  let ybIdx = yearRes.branchIdx;
 
   // ═══ 2. 日柱 (先算日柱, 因时柱可能换日) ═══
-  var dayStemIdx = getDayStemIndexV3(year, month, day);
-  var dayBranchIdx = getDayBranchIndexV3(year, month, day);
-  var dayStem = STEMS[dayStemIdx];
-  var dayBranch = BRANCHES[dayBranchIdx];
+  let dayStemIdx = getDayStemIndexV3(year, month, day);
+  let dayBranchIdx = getDayBranchIndexV3(year, month, day);
+  let dayStem = STEMS[dayStemIdx];
+  let dayBranch = BRANCHES[dayBranchIdx];
 
   // ═══ 3. 月柱 (节气定月支, 五虎遁定月干) ═══
-  var mBranchIdx = getMonthBranchExact(year, month, day, hour, 0);
-  var mStemIdx = getMonthStem(ysIdx, mBranchIdx);
-  var monthStem = STEMS[mStemIdx];
-  var monthBranch = BRANCHES[mBranchIdx];
+  let mBranchIdx = getMonthBranchExact(year, month, day, hour, 0);
+  let mStemIdx = getMonthStem(ysIdx, mBranchIdx);
+  let monthStem = STEMS[mStemIdx];
+  let monthBranch = BRANCHES[mBranchIdx];
 
   // ═══ 4. 时柱 (五鼠遁, 含晚子换日) ═══
-  var hourRes = getHourPillar(year, month, day, hour, dayStemIdx, zishiMode);
-  var hsIdx = hourRes.stemIdx;
-  var hbIdx = hourRes.branchIdx;
-  var hourStem = STEMS[hsIdx];
-  var hourBranch = BRANCHES[hbIdx];
+  let hourRes = getHourPillar(year, month, day, hour, dayStemIdx, zishiMode);
+  let hsIdx = hourRes.stemIdx;
+  let hbIdx = hourRes.branchIdx;
+  let hourStem = STEMS[hsIdx];
+  let hourBranch = BRANCHES[hbIdx];
 
   // 如果晚子换日, 日柱需调整
   if (hourRes.dayShift === 1) {
@@ -1330,7 +1330,7 @@ function baziCalcV3(year, month, day, hour, sex, options) {
   }
 
   // ═══ 四柱 ═══
-  var pillars = [
+  let pillars = [
     {stem: yearRes.stem, branch: yearRes.branch, stemIdx: ysIdx, branchIdx: ybIdx, name: '年柱'},
     {stem: monthStem, branch: monthBranch, stemIdx: mStemIdx, branchIdx: mBranchIdx, name: '月柱'},
     {stem: dayStem, branch: dayBranch, stemIdx: dayStemIdx, branchIdx: dayBranchIdx, name: '日柱'},
@@ -1338,18 +1338,18 @@ function baziCalcV3(year, month, day, hour, sex, options) {
   ];
 
   // ═══ 五行统计 ═══
-  var eleCount = {木:0, 火:0, 土:0, 金:0, 水:0};
-  for (var pi = 0; pi < pillars.length; pi++) {
+  let eleCount = {木:0, 火:0, 土:0, 金:0, 水:0};
+  for (let pi = 0; pi < pillars.length; pi++) {
     eleCount[ELE[pillars[pi].stem]]++;
     eleCount[ZHI_ELE[pillars[pi].branch]]++;
   }
 
   // ═══ 十神 (年/月/时干支) ═══
-  var tenGods = [];
-  for (var ti = 0; ti < pillars.length; ti++) {
+  let tenGods = [];
+  for (let ti = 0; ti < pillars.length; ti++) {
     if (ti === 2) continue;
-    var stemGod = getTenGod(pillars[ti].stem, dayStem);
-    var branchGod = getBranchTenGod(pillars[ti].branch, dayStem);
+    let stemGod = getTenGod(pillars[ti].stem, dayStem);
+    let branchGod = getBranchTenGod(pillars[ti].branch, dayStem);
     tenGods.push({
       position: pillars[ti].name,
       stem: pillars[ti].stem,
@@ -1361,31 +1361,31 @@ function baziCalcV3(year, month, day, hour, sex, options) {
   }
 
   // ═══ 纳音 ═══
-  var nayins = pillars.map(function(p) {
+  let nayins = pillars.map(function(p) {
     return getNayin(p.stemIdx, p.branchIdx);
   });
 
   // ═══ 神煞 ═══
-  var shensha = getShensha(pillars, dayStemIdx);
+  let shensha = getShensha(pillars, dayStemIdx);
 
   // ═══ 格局 ═══
-  var geju = getGeju(monthBranch, dayStemIdx, pillars);
+  let geju = getGeju(monthBranch, dayStemIdx, pillars);
 
   // ═══ 五行力量 ═══
-  var wuxingStrength = computeWuxingStrength(pillars, dayStem);
+  let wuxingStrength = computeWuxingStrength(pillars, dayStem);
 
   // ═══ 长生十二宫 (日干对四地支) ═══
-  var dishi = pillars.map(function(p) {
+  let dishi = pillars.map(function(p) {
     return getDishi(dayStem, p.branch);
   });
 
   // ═══ 胎元/旬空 ═══
-  var taiYuan = getTaiYuan(monthStem, monthBranch);
-  var xunKong = getXunKong(dayStem, dayBranch);
-  var xunName = getXunName(dayStem, dayBranch);
+  let taiYuan = getTaiYuan(monthStem, monthBranch);
+  let xunKong = getXunKong(dayStem, dayBranch);
+  let xunName = getXunName(dayStem, dayBranch);
 
   // ═══ 大运 ═══
-  var dayun = computeDayun(pillars, sex, year, month, day, hour, dayStemIdx, ELE[dayStem]);
+  let dayun = computeDayun(pillars, sex, year, month, day, hour, dayStemIdx, ELE[dayStem]);
 
   // ═══ 返回完整结果 ═══
   return {
@@ -2535,7 +2535,7 @@ function generateSummary(mingGua, isZhaiCompatible, feiXing, xingShi) {
  * 25种常见飞星组合含义表
  * 格式: '山星-向星' → { name, jixiong, area, desc }
  */
-var FEIXING_COMBOS = {
+let FEIXING_COMBOS = {
   '1-4': { name: '文昌组合', jixiong: '吉', area: '学业/桃花', desc: '一白水生四绿木，主文昌发秀，利读书考试、文职升迁。少年主聪慧，成年主桃花人缘。' },
   '1-1': { name: '比和组合', jixiong: '吉', area: '官贵/人缘', desc: '一白重逢，主官贵齐聚、人缘极佳，利仕途与社交。' },
   '1-6': { name: '金水相生', jixiong: '吉', area: '官运/偏财', desc: '六白金生一白水，主官升迁、偏财旺，利远行求谋。' },
@@ -2568,12 +2568,12 @@ var FEIXING_COMBOS = {
  * @returns {string} '生'/'克'/'比和'
  */
 function wxRelation(a, b) {
-  var wxA = NINE_STARS[a] ? NINE_STARS[a].wuxing : '';
-  var wxB = NINE_STARS[b] ? NINE_STARS[b].wuxing : '';
+  let wxA = NINE_STARS[a] ? NINE_STARS[a].wuxing : '';
+  let wxB = NINE_STARS[b] ? NINE_STARS[b].wuxing : '';
   if (!wxA || !wxB) return '未知';
   if (wxA === wxB) return '比和';
-  var shengMap = { '金': '水', '水': '木', '木': '火', '火': '土', '土': '金' };
-  var keMap = { '金': '木', '木': '土', '土': '水', '水': '火', '火': '金' };
+  let shengMap = { '金': '水', '水': '木', '木': '火', '火': '土', '土': '金' };
+  let keMap = { '金': '木', '木': '土', '土': '水', '水': '火', '火': '金' };
   if (shengMap[wxA] === wxB) return '生(山生向)';
   if (shengMap[wxB] === wxA) return '生(向生山)';
   if (keMap[wxA] === wxB) return '克(山克向)';
@@ -2589,30 +2589,30 @@ function wxRelation(a, b) {
  * @returns {Object} { combos, daoShanDaoXiang, summary }
  */
 function analyzeFeixingCombo(panData) {
-  var gongPositions = panData.gongPositions || {};
-  var yun = panData.yun || 1;
-  var wangXing = yun; // 当运旺星
-  var combos = [];
+  let gongPositions = panData.gongPositions || {};
+  let yun = panData.yun || 1;
+  let wangXing = yun; // 当运旺星
+  let combos = [];
 
   // 遍历九宫，分析每宫的山星-向星组合
-  for (var gongNum in gongPositions) {
+  for (let gongNum in gongPositions) {
     if (!gongPositions.hasOwnProperty(gongNum)) continue;
-    var gData = gongPositions[gongNum];
-    var shanStar = gData.shan;
-    var xiangStar = gData.xiang;
-    var key = shanStar + '-' + xiangStar;
-    var combo = FEIXING_COMBOS[key];
+    let gData = gongPositions[gongNum];
+    let shanStar = gData.shan;
+    let xiangStar = gData.xiang;
+    let key = shanStar + '-' + xiangStar;
+    let combo = FEIXING_COMBOS[key];
 
     // 运星与山向星的关系
-    var yunStar = gData.yun;
-    var yunShanRel = wxRelation(yunStar, shanStar);
-    var yunXiangRel = wxRelation(yunStar, xiangStar);
+    let yunStar = gData.yun;
+    let yunShanRel = wxRelation(yunStar, shanStar);
+    let yunXiangRel = wxRelation(yunStar, xiangStar);
 
     // 判断该宫是否为到山/到向
-    var isDaoShan = (shanStar === wangXing);
-    var isDaoXiang = (xiangStar === wangXing);
+    let isDaoShan = (shanStar === wangXing);
+    let isDaoXiang = (xiangStar === wangXing);
 
-    var comboItem = {
+    let comboItem = {
       gong: gData.gua || '',
       direction: gData.direction || '',
       shanStar: shanStar,
@@ -2631,17 +2631,17 @@ function analyzeFeixingCombo(panData) {
   }
 
   // 到山到向 vs 上山下水判断
-  var sittingGua = panData.sitting ? panData.sitting.gua : null;
-  var facingGua = panData.facing ? panData.facing.gua : null;
-  var shanPan = panData.shanPan || {};
-  var xiangPan = panData.xiangPan || {};
+  let sittingGua = panData.sitting ? panData.sitting.gua : null;
+  let facingGua = panData.facing ? panData.facing.gua : null;
+  let shanPan = panData.shanPan || {};
+  let xiangPan = panData.xiangPan || {};
 
-  var shanAtSitting = sittingGua ? shanPan[sittingGua] : null;
-  var xiangAtFacing = facingGua ? xiangPan[facingGua] : null;
-  var shanAtFacing = facingGua ? shanPan[facingGua] : null;
-  var xiangAtSitting = sittingGua ? xiangPan[sittingGua] : null;
+  let shanAtSitting = sittingGua ? shanPan[sittingGua] : null;
+  let xiangAtFacing = facingGua ? xiangPan[facingGua] : null;
+  let shanAtFacing = facingGua ? shanPan[facingGua] : null;
+  let xiangAtSitting = sittingGua ? xiangPan[sittingGua] : null;
 
-  var daoShanDaoXiang = {
+  let daoShanDaoXiang = {
     isDaoShanDaoXiang: false,
     isShangShanXiaShui: false,
     isShuangXingDaoXiang: false,
@@ -2672,9 +2672,9 @@ function analyzeFeixingCombo(panData) {
   }
 
   // 汇总
-  var goodCombos = combos.filter(function(c) { return c.jixiong === '吉' || c.jixiong === '大吉'; });
-  var badCombos = combos.filter(function(c) { return c.jixiong === '凶' || c.jixiong === '大凶'; });
-  var summary = '玄空飞星组合断：共分析' + combos.length + '宫位。';
+  let goodCombos = combos.filter(function(c) { return c.jixiong === '吉' || c.jixiong === '大吉'; });
+  let badCombos = combos.filter(function(c) { return c.jixiong === '凶' || c.jixiong === '大凶'; });
+  let summary = '玄空飞星组合断：共分析' + combos.length + '宫位。';
   summary += '到山到向格局：' + daoShanDaoXiang.pattern + '。';
   if (goodCombos.length > 0) {
     summary += '吉组合' + goodCombos.length + '组：' + goodCombos.map(function(c) { return c.gong + c.comboName; }).join('、') + '。';
@@ -2707,7 +2707,7 @@ function analyzeFeixingCombo(panData) {
  */
 function computeLiunianZhongGong(year) {
   // 三元起始星：上元1，中元4，下元7
-  var startStar;
+  let startStar;
   if (year >= 1864 && year <= 1923) startStar = 1;
   else if (year >= 1924 && year <= 1983) startStar = 4;
   else if (year >= 1984 && year <= 2043) startStar = 7;
@@ -2715,8 +2715,8 @@ function computeLiunianZhongGong(year) {
   else startStar = 7; // 默认下元
 
   // 逐年逆飞：距元年之差，中宫星递减
-  var elapsed = year - (year >= 1984 ? 1984 : year >= 1924 ? 1924 : 1864);
-  var zhongGong = ((startStar - 1 - elapsed) % 9 + 9) % 9 + 1;
+  let elapsed = year - (year >= 1984 ? 1984 : year >= 1924 ? 1924 : 1864);
+  let zhongGong = ((startStar - 1 - elapsed) % 9 + 9) % 9 + 1;
   return zhongGong;
 }
 
@@ -2730,32 +2730,32 @@ function computeLiunianZhongGong(year) {
  */
 function analyzeLiunianFeixing(panData, year) {
   // 1. 计算流年飞星入中宫
-  var lnZhongGong = computeLiunianZhongGong(year);
+  let lnZhongGong = computeLiunianZhongGong(year);
 
   // 2. 流年飞星盘（顺飞入中）
-  var lnPan = feiStar(lnZhongGong);
+  let lnPan = feiStar(lnZhongGong);
 
   // 3. 九宫流年飞星与运盘/山向盘叠加
-  var yunPan = panData.yunPan || {};
-  var shanPan = panData.shanPan || {};
-  var xiangPan = panData.xiangPan || {};
-  var yun = panData.yun || 1;
-  var wangXing = yun;
+  let yunPan = panData.yunPan || {};
+  let shanPan = panData.shanPan || {};
+  let xiangPan = panData.xiangPan || {};
+  let yun = panData.yun || 1;
+  let wangXing = yun;
 
-  var feixing = [];
-  var interactions = [];
-  var gongNames = { 1: '坎(北)', 2: '坤(西南)', 3: '震(东)', 4: '巽(东南)', 5: '中宫', 6: '乾(西北)', 7: '兑(西)', 8: '艮(东北)', 9: '离(南)' };
+  let feixing = [];
+  let interactions = [];
+  let gongNames = { 1: '坎(北)', 2: '坤(西南)', 3: '震(东)', 4: '巽(东南)', 5: '中宫', 6: '乾(西北)', 7: '兑(西)', 8: '艮(东北)', 9: '离(南)' };
 
-  for (var gongNum = 1; gongNum <= 9; gongNum++) {
+  for (let gongNum = 1; gongNum <= 9; gongNum++) {
     if (gongNum === 5) continue; // 中宫单独处理
-    var gStr = String(gongNum);
-    var lnStar = lnPan[gongNum] || 0;
-    var yunStar = yunPan[gongNum] || 0;
-    var shanStar = shanPan[gongNum] || 0;
-    var xiangStar = xiangPan[gongNum] || 0;
+    let gStr = String(gongNum);
+    let lnStar = lnPan[gongNum] || 0;
+    let yunStar = yunPan[gongNum] || 0;
+    let shanStar = shanPan[gongNum] || 0;
+    let xiangStar = xiangPan[gongNum] || 0;
 
-    var lnInfo = NINE_STARS[lnStar] || { name: '?' };
-    var yunInfo = NINE_STARS[yunStar] || { name: '?' };
+    let lnInfo = NINE_STARS[lnStar] || { name: '?' };
+    let yunInfo = NINE_STARS[yunStar] || { name: '?' };
 
     feixing.push({
       gong: gongNames[gongNum] || '',
@@ -2768,15 +2768,15 @@ function analyzeLiunianFeixing(panData, year) {
     });
 
     // 流年飞星与运盘飞星叠加
-    var lnYunRel = wxRelation(lnStar, yunStar);
+    let lnYunRel = wxRelation(lnStar, yunStar);
     // 流年飞星与山星叠加
-    var lnShanRel = wxRelation(lnStar, shanStar);
+    let lnShanRel = wxRelation(lnStar, shanStar);
     // 流年飞星与向星叠加
-    var lnXiangRel = wxRelation(lnStar, xiangStar);
+    let lnXiangRel = wxRelation(lnStar, xiangStar);
 
     // 吉凶变化判断
-    var change = '平';
-    var detail = '';
+    let change = '平';
+    let detail = '';
 
     // 流年旺星到该宫
     if (lnStar === wangXing) {
@@ -2847,7 +2847,7 @@ function analyzeLiunianFeixing(panData, year) {
   }
 
   // 中宫叠加
-  var zhongGongInfo = {
+  let zhongGongInfo = {
     gong: '中宫',
     gongNum: 5,
     lnStar: lnZhongGong,
@@ -2859,9 +2859,9 @@ function analyzeLiunianFeixing(panData, year) {
   feixing.unshift(zhongGongInfo);
 
   // 汇总
-  var goodCount = interactions.filter(function(i) { return i.change === '吉'; }).length;
-  var badCount = interactions.filter(function(i) { return i.change === '凶'; }).length;
-  var summary = year + '年流年飞星' + lnZhongGong + '(' + (NINE_STARS[lnZhongGong] ? NINE_STARS[lnZhongGong].name : '') + ')入中宫。';
+  let goodCount = interactions.filter(function(i) { return i.change === '吉'; }).length;
+  let badCount = interactions.filter(function(i) { return i.change === '凶'; }).length;
+  let summary = year + '年流年飞星' + lnZhongGong + '(' + (NINE_STARS[lnZhongGong] ? NINE_STARS[lnZhongGong].name : '') + ')入中宫。';
   summary += '吉位' + goodCount + '个，凶位' + badCount + '个。';
   if (lnZhongGong === wangXing) {
     summary += '流年旺星入中宫，全年运势大旺，丁财两旺。';
@@ -2871,8 +2871,8 @@ function analyzeLiunianFeixing(panData, year) {
     summary += '流年二黑入中宫，全年健康运势偏弱，宜金属化解。';
   }
   // 找出最吉和最凶方位
-  var goodGongs = interactions.filter(function(i) { return i.change === '吉'; }).map(function(i) { return i.gong; });
-  var badGongs = interactions.filter(function(i) { return i.change === '凶'; }).map(function(i) { return i.gong; });
+  let goodGongs = interactions.filter(function(i) { return i.change === '吉'; }).map(function(i) { return i.gong; });
+  let badGongs = interactions.filter(function(i) { return i.change === '凶'; }).map(function(i) { return i.gong; });
   if (goodGongs.length > 0) summary += '吉位：' + goodGongs.join('、') + '。';
   if (badGongs.length > 0) summary += '凶位：' + badGongs.join('、') + '，需化解。';
 
@@ -3491,34 +3491,34 @@ function analyzeLiuyao(params) {
 
   // 11. R1.6: 元神/忌神/仇神分析
   // 元神=生用神者, 忌神=克用神者, 仇神=克元神/生忌神者
-  var yongshenWX2 = yongshenYao ? yongshenYao.wuxing : '土';
+  let yongshenWX2 = yongshenYao ? yongshenYao.wuxing : '土';
   // 找到生用神的五行（元神）
-  var yuanWX = null;
-  for (var wxk in WX_SHENG) { if (WX_SHENG[wxk] === yongshenWX2) yuanWX = wxk; }
+  let yuanWX = null;
+  for (let wxk in WX_SHENG) { if (WX_SHENG[wxk] === yongshenWX2) yuanWX = wxk; }
   // 找到克用神的五行（忌神）
-  var jiWX = null;
-  for (var wxk2 in WX_KE) { if (WX_KE[wxk2] === yongshenWX2) jiWX = wxk2; }
+  let jiWX = null;
+  for (let wxk2 in WX_KE) { if (WX_KE[wxk2] === yongshenWX2) jiWX = wxk2; }
   // 找到克元神的五行（仇神）
-  var chouWX = null;
+  let chouWX = null;
   if (yuanWX) {
-    for (var wxk3 in WX_KE) { if (WX_KE[wxk3] === yuanWX) chouWX = wxk3; }
+    for (let wxk3 in WX_KE) { if (WX_KE[wxk3] === yuanWX) chouWX = wxk3; }
   }
 
   // 在六爻中找元神、忌神、仇神爻
-  var yuanYao = yaos.find(function(y) { return y.wuxing === yuanWX; });
-  var jiYao = yaos.find(function(y) { return y.wuxing === jiWX; });
-  var chouYao = yaos.find(function(y) { return y.wuxing === chouWX; });
+  let yuanYao = yaos.find(function(y) { return y.wuxing === yuanWX; });
+  let jiYao = yaos.find(function(y) { return y.wuxing === jiWX; });
+  let chouYao = yaos.find(function(y) { return y.wuxing === chouWX; });
 
   // 旺衰判断
   function getYaoWangShuai(yaoWX, dayWX) {
     return judgeWangShuai(yaoWX, dayWX);
   }
-  var yuanWangShuai = yuanYao ? getYaoWangShuai(yuanWX, dayWX) : null;
-  var jiWangShuai = jiYao ? getYaoWangShuai(jiWX, dayWX) : null;
-  var chouWangShuai = chouYao ? getYaoWangShuai(chouWX, dayWX) : null;
+  let yuanWangShuai = yuanYao ? getYaoWangShuai(yuanWX, dayWX) : null;
+  let jiWangShuai = jiYao ? getYaoWangShuai(jiWX, dayWX) : null;
+  let chouWangShuai = chouYao ? getYaoWangShuai(chouWX, dayWX) : null;
 
   // 元神忌神仇神分析文本
-  var yuanJiChouAnalysis = {
+  let yuanJiChouAnalysis = {
     yuanShen: yuanYao ? {
       name: '元神',
       wuxing: yuanWX,
@@ -3570,11 +3570,11 @@ function analyzeLiuyao(params) {
 
   // ═══ R2.7: 月令综合旺衰 + 旬空判断 ═══
   // 1. 月令综合旺衰：月建五行对用神的旺衰影响（旺/相/休/囚/死）
-  var monthZhi = params.monthZhi || '';
-  var monthWX = ZHI_WX[monthZhi] || '';
-  var monthWangShuai = null;
+  let monthZhi = params.monthZhi || '';
+  let monthWX = ZHI_WX[monthZhi] || '';
+  let monthWangShuai = null;
   if (monthZhi && yongshenWX) {
-    var wsLevel = '', wsDesc = '';
+    let wsLevel = '', wsDesc = '';
     if (monthWX === yongshenWX) {
       wsLevel = '旺'; wsDesc = '月建与用神同类五行，旺相有力';
     } else if (WX_SHENG[monthWX] === yongshenWX) {
@@ -3587,8 +3587,8 @@ function analyzeLiuyao(params) {
       wsLevel = '死'; wsDesc = '月建克用神，死地无气，事不可为';
     }
     // 月建与日辰合参
-    var dayWsLevel = wangShuai.level || '';
-    var combinedDesc = '月建' + monthZhi + '(' + monthWX + ')对用神(' + yongshenWX + ')为「' + wsLevel + '」，日辰' + dayZhi + '(' + dayWX + ')为「' + dayWsLevel + '」。「月建为六爻之提纲，日辰为六爻之主宰」——';
+    let dayWsLevel = wangShuai.level || '';
+    let combinedDesc = '月建' + monthZhi + '(' + monthWX + ')对用神(' + yongshenWX + ')为「' + wsLevel + '」，日辰' + dayZhi + '(' + dayWX + ')为「' + dayWsLevel + '」。「月建为六爻之提纲，日辰为六爻之主宰」——';
     if ((wsLevel === '旺' || wsLevel === '相') && (dayWsLevel === '旺' || dayWsLevel === '相')) {
       combinedDesc += '月日均生扶用神，用神旺相有力，断卦大吉。';
     } else if ((wsLevel === '旺' || wsLevel === '相') && (dayWsLevel === '死' || dayWsLevel === '囚')) {
@@ -3612,42 +3612,42 @@ function analyzeLiuyao(params) {
   }
 
   // 2. 旬空判断：基于日干支推算旬空地支
-  var dayGanZhi = (dayGan || '') + (dayZhi || '');
-  var xunKong = [];
-  var xunKongDesc = '';
+  let dayGanZhi = (dayGan || '') + (dayZhi || '');
+  let xunKong = [];
+  let xunKongDesc = '';
   // 六十甲子旬空表
-  var XUN_KONG_MAP = {
+  let XUN_KONG_MAP = {
     '甲子': ['戌','亥'], '甲戌': ['申','酉'], '甲申': ['午','未'],
     '甲午': ['辰','巳'], '甲辰': ['寅','卯'], '甲寅': ['子','丑']
   };
   // 找到日干支所在旬
-  var ganIdx = TIAN_GAN.indexOf(dayGan);
-  var zhiIdx = DI_ZHI.indexOf(dayZhi);
+  let ganIdx = TIAN_GAN.indexOf(dayGan);
+  let zhiIdx = DI_ZHI.indexOf(dayZhi);
   if (ganIdx >= 0 && zhiIdx >= 0) {
     // 旬首：甲子/甲戌/甲申/甲午/甲辰/甲寅
-    var xunStartIdx = ganIdx; // 旬首天干索引（甲=0）
+    let xunStartIdx = ganIdx; // 旬首天干索引（甲=0）
     // 日干支在六十甲子中的序号
-    var jiaziIdx = (ganIdx * 10 - ganIdx + zhiIdx + 60) % 60;
+    let jiaziIdx = (ganIdx * 10 - ganIdx + zhiIdx + 60) % 60;
     // 简化：直接根据天干找旬首
-    var xunGan = '甲';
+    let xunGan = '甲';
     // 旬首地支 = 日支往前推到与甲配对
-    var offset = ganIdx; // 日干到甲的距离
-    var xunZhiIdx = (zhiIdx - offset + 12) % 12;
-    var xunKey = xunGan + DI_ZHI[xunZhiIdx];
+    let offset = ganIdx; // 日干到甲的距离
+    let xunZhiIdx = (zhiIdx - offset + 12) % 12;
+    let xunKey = xunGan + DI_ZHI[xunZhiIdx];
     xunKong = XUN_KONG_MAP[xunKey] || [];
     xunKongDesc = xunKong.length === 2 ? ('旬空(' + xunKey + '旬)：' + xunKong[0] + '、' + xunKong[1]) : '';
   }
 
   // 标注空亡爻，判断真空vs假空
-  var kongWang = { xunKong: xunKong, xunKongDesc: xunKongDesc, yaos: [] };
+  let kongWang = { xunKong: xunKong, xunKongDesc: xunKongDesc, yaos: [] };
   if (xunKong.length === 2) {
-    for (var kwi = 0; kwi < yaos.length; kwi++) {
-      var kyao = yaos[kwi];
+    for (let kwi = 0; kwi < yaos.length; kwi++) {
+      let kyao = yaos[kwi];
       if (xunKong.indexOf(kyao.zhi) >= 0) {
         // 判断真空/假空：旺相之爻空为假空（有空不空），休囚之爻空为真空
-        var kyaoWs = judgeWangShuai(kyao.wuxing, dayWX);
-        var kongType = '';
-        var kongDesc = '';
+        let kyaoWs = judgeWangShuai(kyao.wuxing, dayWX);
+        let kongType = '';
+        let kongDesc = '';
         if (kyaoWs.level === '旺' || kyaoWs.level === '相') {
           kongType = '假空';
           kongDesc = '旺相之爻逢空，假空——暂时落空，待出空之日即可发挥作用';
@@ -3676,20 +3676,20 @@ function analyzeLiuyao(params) {
 
   // ═══ R2.8: 六冲六合卦 + 伏神飞神 ═══
   // 1. 六冲卦检测：八纯卦（乾坎艮震巽离坤兑）为六冲卦
-  var benGuaName = hexagram.benGua ? hexagram.benGua.name : '';
-  var LIUCHONG_GUA = ['乾','坎','艮','震','巽','离','坤','兑'];
-  var isLiuChong = LIUCHONG_GUA.indexOf(benGuaName) >= 0;
+  let benGuaName = hexagram.benGua ? hexagram.benGua.name : '';
+  let LIUCHONG_GUA = ['乾','坎','艮','震','巽','离','坤','兑'];
+  let isLiuChong = LIUCHONG_GUA.indexOf(benGuaName) >= 0;
 
   // 2. 六合卦检测：特定的卦象组合
-  var LIUHE_GUA = ['否','泰','临','遁','大壮','观','大过','小过','颐','中孚','渐','归妹','丰','旅','贲','节','涣','井','同寅','同人而'];
+  let LIUHE_GUA = ['否','泰','临','遁','大壮','观','大过','小过','颐','中孚','渐','归妹','丰','旅','贲','节','涣','井','同寅','同人而'];
   // 实际六合卦：内卦三爻与外卦三爻逐一相合
   // 地支六合：子丑合、寅亥合、卯戌合、辰酉合、巳申合、午未合
-  var ZHI_HE_MAP = {'子':'丑','丑':'子','寅':'亥','亥':'寅','卯':'戌','戌':'卯','辰':'酉','酉':'辰','巳':'申','申':'巳','午':'未','未':'午'};
-  var isLiuHe = false;
+  let ZHI_HE_MAP = {'子':'丑','丑':'子','寅':'亥','亥':'寅','卯':'戌','戌':'卯','辰':'酉','酉':'辰','巳':'申','申':'巳','午':'未','未':'午'};
+  let isLiuHe = false;
   if (najia && najia.length >= 6) {
     // najia 从初爻到上爻
-    var n0 = najia[0].zhi, n1 = najia[1].zhi, n2 = najia[2].zhi;
-    var n3 = najia[3].zhi, n4 = najia[4].zhi, n5 = najia[5].zhi;
+    let n0 = najia[0].zhi, n1 = najia[1].zhi, n2 = najia[2].zhi;
+    let n3 = najia[3].zhi, n4 = najia[4].zhi, n5 = najia[5].zhi;
     // 六合卦条件：初与四合、二与五合、三与上合
     if (ZHI_HE_MAP[n0] === n3 && ZHI_HE_MAP[n1] === n4 && ZHI_HE_MAP[n2] === n5) {
       isLiuHe = true;
@@ -3697,13 +3697,13 @@ function analyzeLiuyao(params) {
   }
   // 补充经典六合卦名检测
   if (!isLiuHe) {
-    var LIUHE_NAMES = ['否','泰','临','遁','大壮','观','大过','小过','颐','中孚','渐','归妹','丰','旅','贲','节','涣','井'];
+    let LIUHE_NAMES = ['否','泰','临','遁','大壮','观','大过','小过','颐','中孚','渐','归妹','丰','旅','贲','节','涣','井'];
     if (LIUHE_NAMES.indexOf(benGuaName) >= 0) {
       isLiuHe = true;
     }
   }
 
-  var chongHe = {
+  let chongHe = {
     isLiuChong: isLiuChong,
     isLiuHe: isLiuHe,
     benGuaName: benGuaName,
@@ -3718,23 +3718,23 @@ function analyzeLiuyao(params) {
   }
 
   // 3. 伏神飞神：当用神不上卦时，从本宫首卦寻伏神
-  var fuFei = null;
+  let fuFei = null;
   if (!yongshenYao) {
     // 用神不上卦，需要寻伏神
-    var gongName = hexagram.benGua ? hexagram.benGua.gong : '';
+    let gongName = hexagram.benGua ? hexagram.benGua.gong : '';
     // 找该宫首卦（六纯卦）
-    var gongFirstGua = BAGONG.find(function(g) { return g.gong === gongName && g.name === gongName; });
+    let gongFirstGua = BAGONG.find(function(g) { return g.gong === gongName && g.name === gongName; });
     if (gongFirstGua) {
       // 获取首卦的纳甲
-      var firstNajia = getNajia({ lower: gongFirstGua.lower, upper: gongFirstGua.upper });
+      let firstNajia = getNajia({ lower: gongFirstGua.lower, upper: gongFirstGua.upper });
       // 在首卦纳甲中找用神对应的六亲
-      var gongWX = GONG_WX[gongName] || '';
+      let gongWX = GONG_WX[gongName] || '';
       // 首卦的六亲与用神一致的那个爻
-      var fuYao = null;
-      for (var fni = 0; fni < firstNajia.length; fni++) {
-        var fnYao = firstNajia[fni];
-        var fnWX = ZHI_WX[fnYao.zhi] || '';
-        var fnLiuqin = '';
+      let fuYao = null;
+      for (let fni = 0; fni < firstNajia.length; fni++) {
+        let fnYao = firstNajia[fni];
+        let fnWX = ZHI_WX[fnYao.zhi] || '';
+        let fnLiuqin = '';
         if (fnWX === gongWX) fnLiuqin = '兄弟';
         else if (WX_SHENG[gongWX] === fnWX) fnLiuqin = '父母';
         else if (WX_SHENG[fnWX] === gongWX) fnLiuqin = '子孙';
@@ -3747,11 +3747,11 @@ function analyzeLiuyao(params) {
       }
       if (fuYao) {
         // 飞神 = 本卦中对应位置的爻
-        var feiYao = yaos.find(function(y) { return y.pos === fuYao.pos; });
-        var fuFeiRelation = '';
+        let feiYao = yaos.find(function(y) { return y.pos === fuYao.pos; });
+        let fuFeiRelation = '';
         if (feiYao) {
-          var fuWX = fuYao.wuxing;
-          var feiWX = feiYao.wuxing;
+          let fuWX = fuYao.wuxing;
+          let feiWX = feiYao.wuxing;
           if (fuWX === feiWX) fuFeiRelation = '伏神与飞神同类五行，伏神可得飞神助力';
           else if (WX_SHENG[feiWX] === fuWX) fuFeiRelation = '飞神生伏神，伏神得飞神之助，易出';
           else if (WX_SHENG[fuWX] === feiWX) fuFeiRelation = '伏神生飞神，伏神泄气于飞神，难出';
@@ -3772,12 +3772,12 @@ function analyzeLiuyao(params) {
 
   // ═══ R2.9: 动爻化进化退 + 暗动爻 ═══
   // 地支顺序（阳顺阴逆）用于判断进退神方向
-  var ZHI_ORDER = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-  var ZHI_WX_LOCAL = {'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+  let ZHI_ORDER = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  let ZHI_WX_LOCAL = {'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
   // 进退神判断：同类五行地支的前进/后退
   // 前进方向：寅→卯(木), 巳→午(火), 申→酉(金), 亥→子(水), 辰→未→戌→丑(土前进)
   // 后退方向：卯→寅, 午→巳, 酉→申, 子→亥, 丑→戌→未→辰
-  var JIN_TUI_MAP = {
+  let JIN_TUI_MAP = {
     '寅': {jin:'卯', tui:null}, '卯': {jin:null, tui:'寅'},
     '巳': {jin:'午', tui:null}, '午': {jin:null, tui:'巳'},
     '申': {jin:'酉', tui:null}, '酉': {jin:null, tui:'申'},
@@ -3787,14 +3787,14 @@ function analyzeLiuyao(params) {
   };
   // 简化版进退判断函数
   function isHuaJin(origZhi, newZhi) {
-    var origWX = ZHI_WX_LOCAL[origZhi] || '';
-    var newWX = ZHI_WX_LOCAL[newZhi] || '';
+    let origWX = ZHI_WX_LOCAL[origZhi] || '';
+    let newWX = ZHI_WX_LOCAL[newZhi] || '';
     if (origWX !== newWX) return false; // 必须同类五行
-    var origIdx = ZHI_ORDER.indexOf(origZhi);
-    var newIdx = ZHI_ORDER.indexOf(newZhi);
+    let origIdx = ZHI_ORDER.indexOf(origZhi);
+    let newIdx = ZHI_ORDER.indexOf(newZhi);
     // 阳支前进：子→丑→寅...（顺序方向）
     // 阴支前进：逆序方向
-    var origIsYang = (origIdx % 2 === 0); // 子(0)阳, 丑(1)阴...
+    let origIsYang = (origIdx % 2 === 0); // 子(0)阳, 丑(1)阴...
     if (origIsYang) {
       // 阳支前进 = 顺序方向
       return (newIdx === (origIdx + 2) % 12) || (newIdx === (origIdx + 1) % 12 && newIdx % 2 === 1);
@@ -3804,35 +3804,35 @@ function analyzeLiuyao(params) {
     }
   }
   function isHuaTui(origZhi, newZhi) {
-    var origWX = ZHI_WX_LOCAL[origZhi] || '';
-    var newWX = ZHI_WX_LOCAL[newZhi] || '';
+    let origWX = ZHI_WX_LOCAL[origZhi] || '';
+    let newWX = ZHI_WX_LOCAL[newZhi] || '';
     if (origWX !== newWX) return false;
     return !isHuaJin(origZhi, newZhi); // 同类五行但不进则退
   }
 
   // 获取变卦纳甲
-  var bianNajia = null;
+  let bianNajia = null;
   if (hexagram.bianGua) {
     bianNajia = getNajia(hexagram.bianGua);
   }
 
-  var dongYaoAnalysis = { movingYaos: [], anDongYaos: [], summary: '' };
+  let dongYaoAnalysis = { movingYaos: [], anDongYaos: [], summary: '' };
 
   // 1. 动爻分析
   if (hexagram.moving && hexagram.moving.length > 0 && bianNajia) {
-    for (var mi = 0; mi < hexagram.moving.length; mi++) {
-      var moveInfo = hexagram.moving[mi];
-      var mPos = moveInfo.pos;
-      var origYao = yaos.find(function(y) { return y.pos === mPos; });
-      var bianYao = bianNajia.find(function(n) { return n.pos === mPos; });
+    for (let mi = 0; mi < hexagram.moving.length; mi++) {
+      let moveInfo = hexagram.moving[mi];
+      let mPos = moveInfo.pos;
+      let origYao = yaos.find(function(y) { return y.pos === mPos; });
+      let bianYao = bianNajia.find(function(n) { return n.pos === mPos; });
       if (!origYao || !bianYao) continue;
 
-      var origZhi = origYao.zhi;
-      var bianZhi = bianYao.zhi;
-      var origWX = ZHI_WX_LOCAL[origZhi] || '';
-      var bianWX = ZHI_WX_LOCAL[bianZhi] || '';
-      var huaType = '';
-      var huaDesc = '';
+      let origZhi = origYao.zhi;
+      let bianZhi = bianYao.zhi;
+      let origWX = ZHI_WX_LOCAL[origZhi] || '';
+      let bianWX = ZHI_WX_LOCAL[bianZhi] || '';
+      let huaType = '';
+      let huaDesc = '';
 
       // 化进神
       if (isHuaJin(origZhi, bianZhi)) {
@@ -3883,15 +3883,15 @@ function analyzeLiuyao(params) {
 
   // 2. 暗动爻：日辰冲静爻为暗动
   // 地支相冲：子午冲、丑未冲、寅申冲、卯酉冲、辰戌冲、巳亥冲
-  var ZHI_CHONG_MAP = {'子':'午','午':'子','丑':'未','未':'丑','寅':'申','申':'寅','卯':'酉','酉':'卯','辰':'戌','戌':'辰','巳':'亥','亥':'巳'};
-  var dayChongZhi = ZHI_CHONG_MAP[dayZhi] || '';
+  let ZHI_CHONG_MAP = {'子':'午','午':'子','丑':'未','未':'丑','寅':'申','申':'寅','卯':'酉','酉':'卯','辰':'戌','戌':'辰','巳':'亥','亥':'巳'};
+  let dayChongZhi = ZHI_CHONG_MAP[dayZhi] || '';
   if (dayChongZhi) {
-    for (var ai = 0; ai < yaos.length; ai++) {
-      var aYao = yaos[ai];
+    for (let ai = 0; ai < yaos.length; ai++) {
+      let aYao = yaos[ai];
       if (!aYao.moving && aYao.zhi === dayChongZhi) {
         // 静爻被日辰冲 → 暗动
-        var aYaoWs = judgeWangShuai(aYao.wuxing, dayWX);
-        var anDongDesc = '';
+        let aYaoWs = judgeWangShuai(aYao.wuxing, dayWX);
+        let anDongDesc = '';
         if (aYaoWs.level === '旺' || aYaoWs.level === '相') {
           anDongDesc = '静爻' + aYao.name + '(' + aYao.zhi + ')被日辰' + dayZhi + '冲，旺相之爻被冲为暗动——暗中发力，有意外之变，吉凶看所占何事。';
         } else {
@@ -3908,10 +3908,10 @@ function analyzeLiuyao(params) {
   }
 
   // 汇总
-  var dongSummaryParts = [];
+  let dongSummaryParts = [];
   if (dongYaoAnalysis.movingYaos.length > 0) {
     dongSummaryParts.push('动爻' + dongYaoAnalysis.movingYaos.length + '个');
-    for (var ds = 0; ds < dongYaoAnalysis.movingYaos.length; ds++) {
+    for (let ds = 0; ds < dongYaoAnalysis.movingYaos.length; ds++) {
       dongSummaryParts.push(dongYaoAnalysis.movingYaos[ds].huaType);
     }
   }
@@ -3921,9 +3921,9 @@ function analyzeLiuyao(params) {
   dongYaoAnalysis.summary = dongSummaryParts.length > 0 ? dongSummaryParts.join('，') : '无动爻无暗动，卦象静态。';
 
   // 断卦综合判断
-  var yuanJiSummary = '';
-  var hasYuan = yuanYao && (yuanWangShuai === '旺' || yuanWangShuai === '相');
-  var hasJiStrong = jiYao && (jiWangShuai === '旺' || jiWangShuai === '相');
+  let yuanJiSummary = '';
+  let hasYuan = yuanYao && (yuanWangShuai === '旺' || yuanWangShuai === '相');
+  let hasJiStrong = jiYao && (jiWangShuai === '旺' || jiWangShuai === '相');
   if (hasYuan && !hasJiStrong) {
     yuanJiSummary = '元神旺相有力生扶用神，忌神不旺，断卦偏吉——事可成，有贵人助力。';
   } else if (hasJiStrong && !hasYuan) {
@@ -3938,33 +3938,33 @@ function analyzeLiuyao(params) {
 
   // ═══ R3.3: 六爻·应期判断 ═══
   // 地支相冲表
-  var YQ_CHONG = {'子':'午','午':'子','丑':'未','未':'丑','寅':'申','申':'寅','卯':'酉','酉':'卯','辰':'戌','戌':'辰','巳':'亥','亥':'巳'};
+  let YQ_CHONG = {'子':'午','午':'子','丑':'未','未':'丑','寅':'申','申':'寅','卯':'酉','酉':'卯','辰':'戌','戌':'辰','巳':'亥','亥':'巳'};
   // 地支相合表（六合）
-  var YQ_HE = {'子':'丑','丑':'子','寅':'亥','亥':'寅','卯':'戌','戌':'卯','辰':'酉','酉':'辰','巳':'申','申':'巳','午':'未','未':'午'};
+  let YQ_HE = {'子':'丑','丑':'子','寅':'亥','亥':'寅','卯':'戌','戌':'卯','辰':'酉','酉':'辰','巳':'申','申':'巳','午':'未','未':'午'};
   // 地支三合局
-  var YQ_SANHE = [
+  let YQ_SANHE = [
     {zhi:['寅','午','戌'], ju:'火局'},
     {zhi:['申','子','辰'], ju:'水局'},
     {zhi:['亥','卯','未'], ju:'木局'},
     {zhi:['巳','酉','丑'], ju:'金局'}
   ];
   // 六冲顺序
-  var YQ_ZHI_LIST = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  let YQ_ZHI_LIST = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
 
-  var yingqi = { rules: [], summary: '', nearFar: '', detail: {} };
+  let yingqi = { rules: [], summary: '', nearFar: '', detail: {} };
 
   if (yongshenYao) {
-    var ysZhi = yongshenYao.zhi || '';
-    var ysWX = yongshenYao.wuxing || '';
-    var ysMoving = yongshenYao.moving || false;
-    var ysWsLevel = wangShuai ? wangShuai.level : '';
+    let ysZhi = yongshenYao.zhi || '';
+    let ysWX = yongshenYao.wuxing || '';
+    let ysMoving = yongshenYao.moving || false;
+    let ysWsLevel = wangShuai ? wangShuai.level : '';
 
     // 1. 静卦应期：以用神旺衰定应期
     // 旺则逢合、衰则逢生、动则逢合、合则逢冲
     if (!ysMoving) {
       // 用神静爻
       // 逢冲日或逢值日为应期
-      var chongZhi = YQ_CHONG[ysZhi] || '';
+      let chongZhi = YQ_CHONG[ysZhi] || '';
       yingqi.rules.push({
         rule: '用神静→冲动日或逢值日',
         zhi: chongZhi + '日或' + ysZhi + '日',
@@ -3974,7 +3974,7 @@ function analyzeLiuyao(params) {
       // 旺衰辅助
       if (ysWsLevel === '旺' || ysWsLevel === '相') {
         // 旺则逢合
-        var heZhi = YQ_HE[ysZhi] || '';
+        let heZhi = YQ_HE[ysZhi] || '';
         yingqi.rules.push({
           rule: '用神旺→逢合日',
           zhi: heZhi + '日',
@@ -3982,11 +3982,11 @@ function analyzeLiuyao(params) {
         });
       } else if (ysWsLevel === '休' || ysWsLevel === '囚' || ysWsLevel === '死') {
         // 衰则逢生
-        var shengWX = '';
-        for (var wxk4 in WX_SHENG) { if (WX_SHENG[wxk4] === ysWX) shengWX = wxk4; }
+        let shengWX = '';
+        for (let wxk4 in WX_SHENG) { if (WX_SHENG[wxk4] === ysWX) shengWX = wxk4; }
         // 找生用神五行的地支
-        var shengZhi = '';
-        for (var zhiK in ZHI_WX) { if (ZHI_WX[zhiK] === shengWX) { shengZhi = zhiK; break; } }
+        let shengZhi = '';
+        for (let zhiK in ZHI_WX) { if (ZHI_WX[zhiK] === shengWX) { shengZhi = zhiK; break; } }
         yingqi.rules.push({
           rule: '用神衰→逢生日',
           zhi: shengZhi + '日',
@@ -3996,7 +3996,7 @@ function analyzeLiuyao(params) {
     } else {
       // 2. 动卦应期：以动爻定应期
       // 动而逢合为应期
-      var heZhi2 = YQ_HE[ysZhi] || '';
+      let heZhi2 = YQ_HE[ysZhi] || '';
       yingqi.rules.push({
         rule: '用神动→逢合日',
         zhi: heZhi2 + '日',
@@ -4017,7 +4017,7 @@ function analyzeLiuyao(params) {
     // 4. 用神逢冲→合日为应期
     // 检查用神是否被日辰冲
     if (dayZhi && YQ_CHONG[dayZhi] === ysZhi) {
-      var heZhi3 = YQ_HE[ysZhi] || '';
+      let heZhi3 = YQ_HE[ysZhi] || '';
       yingqi.rules.push({
         rule: '用神逢冲→合日',
         zhi: heZhi3 + '日',
@@ -4027,7 +4027,7 @@ function analyzeLiuyao(params) {
 
     // 5. 用神逢合→冲日为应期
     if (dayZhi && YQ_HE[dayZhi] === ysZhi) {
-      var chongZhi2 = YQ_CHONG[ysZhi] || '';
+      let chongZhi2 = YQ_CHONG[ysZhi] || '';
       yingqi.rules.push({
         rule: '用神逢合→冲日',
         zhi: chongZhi2 + '日',
@@ -4036,8 +4036,8 @@ function analyzeLiuyao(params) {
     }
 
     // 6. 远近判断：用神旺则近，衰则远
-    var nearFar = '';
-    var timeUnit = '';
+    let nearFar = '';
+    let timeUnit = '';
     if (ysWsLevel === '旺' || ysWsLevel === '相') {
       nearFar = '近';
       timeUnit = '日周月（数日内至一周）';
@@ -4067,8 +4067,8 @@ function analyzeLiuyao(params) {
     yingqi.timeUnit = timeUnit;
 
     // 汇总
-    var yqSumParts = [];
-    for (var yqi = 0; yqi < yingqi.rules.length; yqi++) {
+    let yqSumParts = [];
+    for (let yqi = 0; yqi < yingqi.rules.length; yqi++) {
       yqSumParts.push(yingqi.rules[yqi].desc);
     }
     yingqi.summary = yqSumParts.length > 0 ? yqSumParts.join(' ') : '无法判断应期，需更多信息。';
@@ -4285,8 +4285,8 @@ function getTrigramLines(xiantianNum) {
 }
 
 function linesToXiantian(lines) {
-  for (var i = 1; i <= 8; i++) {
-    var ref = XIANTIAN_LINES[i];
+  for (let i = 1; i <= 8; i++) {
+    let ref = XIANTIAN_LINES[i];
     if (ref[0] === lines[0] && ref[1] === lines[1] && ref[2] === lines[2]) return i;
   }
   return 8;
@@ -4310,7 +4310,7 @@ function getShengKeCode(tiEle, yongEle) {
 }
 
 function shengKeText(code) {
-  var map = {
+  let map = {
     'yongshengti':'用生体','tishengyong':'体生用','bihe':'体用比和',
     'tikeyong':'体克用','yongketi':'用克体',
   };
@@ -4318,14 +4318,14 @@ function shengKeText(code) {
 }
 
 function getWangshuaiByMonth(element, monthBranch) {
-  var table = YUE_JIAN_WANG_XIU[monthBranch];
+  let table = YUE_JIAN_WANG_XIU[monthBranch];
   if (!table) return '休';
-  for (var state in table) { if (table[state] === element) return state; }
+  for (let state in table) { if (table[state] === element) return state; }
   return '休';
 }
 
 function monthToSeason(monthBranch) {
-  for (var season in SEASON_MAP) {
+  for (let season in SEASON_MAP) {
     if (SEASON_MAP[season].months.indexOf(monthBranch) >= 0) return season;
   }
   return '冬';
@@ -4344,16 +4344,16 @@ function monthToSeason(monthBranch) {
 function computeMeihuaNumber(n1, n2, n3) {
   n1 = Math.abs(Math.floor(n1)) || 1;
   n2 = Math.abs(Math.floor(n2)) || 1;
-  var upper = n1 % 8; if (upper === 0) upper = 8;
-  var lower = n2 % 8; if (lower === 0) lower = 8;
-  var sumForYao;
+  let upper = n1 % 8; if (upper === 0) upper = 8;
+  let lower = n2 % 8; if (lower === 0) lower = 8;
+  let sumForYao;
   if (n3 !== undefined && n3 !== null) {
     n3 = Math.abs(Math.floor(n3)) || 0;
     sumForYao = n1 + n2 + n3;
   } else {
     sumForYao = n1 + n2;
   }
-  var movingYao = sumForYao % 6; if (movingYao === 0) movingYao = 6;
+  let movingYao = sumForYao % 6; if (movingYao === 0) movingYao = 6;
   return { upper: upper, lower: lower, movingYao: movingYao, method: 'number',
     numbers: n3 !== undefined ? [n1, n2, n3] : [n1, n2] };
 }
@@ -4365,13 +4365,13 @@ function computeMeihuaNumber(n1, n2, n3) {
  * 动爻 = (年支数+月+日+时数) % 6
  */
 function computeMeihuaTime(yearZhi, month, day, hourZhi) {
-  var yearNum = ZHI_NUM[yearZhi] || 1;
-  var hourNum = ZHI_NUM[hourZhi] || 1;
-  var upperSum = yearNum + month + day;
-  var lowerSum = upperSum + hourNum;
-  var upper = upperSum % 8; if (upper === 0) upper = 8;
-  var lower = lowerSum % 8; if (lower === 0) lower = 8;
-  var movingYao = lowerSum % 6; if (movingYao === 0) movingYao = 6;
+  let yearNum = ZHI_NUM[yearZhi] || 1;
+  let hourNum = ZHI_NUM[hourZhi] || 1;
+  let upperSum = yearNum + month + day;
+  let lowerSum = upperSum + hourNum;
+  let upper = upperSum % 8; if (upper === 0) upper = 8;
+  let lower = lowerSum % 8; if (lower === 0) lower = 8;
+  let movingYao = lowerSum % 6; if (movingYao === 0) movingYao = 6;
   return { upper: upper, lower: lower, movingYao: movingYao, method: 'time',
     timeInfo: { yearZhi: yearZhi, month: month, day: day, hourZhi: hourZhi } };
 }
@@ -4382,13 +4382,13 @@ function computeMeihuaTime(yearZhi, month, day, hourZhi) {
 // ═══════════════════════════════════════════════
 
 function buildBenGua(upperXiantian, lowerXiantian, movingYao) {
-  var upperName = XIANTIAN_NAME[upperXiantian];
-  var lowerName = XIANTIAN_NAME[lowerXiantian];
-  var upperLines = getTrigramLines(upperXiantian);
-  var lowerLines = getTrigramLines(lowerXiantian);
-  var lines = lowerLines.concat(upperLines); // [爻1..爻6]
-  var kingWen = getKingWenNum(upperXiantian, lowerXiantian);
-  var info = getHexagramInfo(kingWen);
+  let upperName = XIANTIAN_NAME[upperXiantian];
+  let lowerName = XIANTIAN_NAME[lowerXiantian];
+  let upperLines = getTrigramLines(upperXiantian);
+  let lowerLines = getTrigramLines(lowerXiantian);
+  let lines = lowerLines.concat(upperLines); // [爻1..爻6]
+  let kingWen = getKingWenNum(upperXiantian, lowerXiantian);
+  let info = getHexagramInfo(kingWen);
   return {
     upperName: upperName, lowerName: lowerName,
     upperXiantian: upperXiantian, lowerXiantian: lowerXiantian,
@@ -4405,12 +4405,12 @@ function buildBenGua(upperXiantian, lowerXiantian, movingYao) {
  * 六爻编号：1(初) 2 3 4 5 6(上)
  */
 function computeHugua(benGuaLines, movingYao) {
-  var lowerHu = [benGuaLines[1], benGuaLines[2], benGuaLines[3]];
-  var upperHu = [benGuaLines[2], benGuaLines[3], benGuaLines[4]];
-  var lowerXiantian = linesToXiantian(lowerHu);
-  var upperXiantian = linesToXiantian(upperHu);
-  var kingWen = getKingWenNum(upperXiantian, lowerXiantian);
-  var info = getHexagramInfo(kingWen);
+  let lowerHu = [benGuaLines[1], benGuaLines[2], benGuaLines[3]];
+  let upperHu = [benGuaLines[2], benGuaLines[3], benGuaLines[4]];
+  let lowerXiantian = linesToXiantian(lowerHu);
+  let upperXiantian = linesToXiantian(upperHu);
+  let kingWen = getKingWenNum(upperXiantian, lowerXiantian);
+  let info = getHexagramInfo(kingWen);
   return {
     upperName: XIANTIAN_NAME[upperXiantian], lowerName: XIANTIAN_NAME[lowerXiantian],
     upperXiantian: upperXiantian, lowerXiantian: lowerXiantian,
@@ -4427,15 +4427,15 @@ function computeHugua(benGuaLines, movingYao) {
  * 变卦：动爻阴阳互变
  */
 function computeBianggua(benGuaLines, movingYao) {
-  var changedLines = benGuaLines.slice();
-  var idx = movingYao - 1;
+  let changedLines = benGuaLines.slice();
+  let idx = movingYao - 1;
   changedLines[idx] = changedLines[idx] === 1 ? 0 : 1;
-  var lowerLines = changedLines.slice(0, 3);
-  var upperLines = changedLines.slice(3, 6);
-  var lowerXiantian = linesToXiantian(lowerLines);
-  var upperXiantian = linesToXiantian(upperLines);
-  var kingWen = getKingWenNum(upperXiantian, lowerXiantian);
-  var info = getHexagramInfo(kingWen);
+  let lowerLines = changedLines.slice(0, 3);
+  let upperLines = changedLines.slice(3, 6);
+  let lowerXiantian = linesToXiantian(lowerLines);
+  let upperXiantian = linesToXiantian(upperLines);
+  let kingWen = getKingWenNum(upperXiantian, lowerXiantian);
+  let info = getHexagramInfo(kingWen);
   return {
     upperName: XIANTIAN_NAME[upperXiantian], lowerName: XIANTIAN_NAME[lowerXiantian],
     upperXiantian: upperXiantian, lowerXiantian: lowerXiantian,
@@ -4461,9 +4461,9 @@ function computeBianggua(benGuaLines, movingYao) {
  * @returns {object} {state, element, desc}
  */
 function getSeasonWangshuai(trigramName, season) {
-  var ele = TRIGRAM_ELEMENT[trigramName];
-  var wangEle = SEASON_MAP[season].wang;
-  var state, desc;
+  let ele = TRIGRAM_ELEMENT[trigramName];
+  let wangEle = SEASON_MAP[season].wang;
+  let state, desc;
   if (ele === wangEle) {
     state = '旺';
     desc = trigramName + '卦五行属' + ele + '，' + season + '季' + ele + '旺，当令得权，能量最盛。';
@@ -4504,8 +4504,8 @@ function getSeasonWangshuai(trigramName, season) {
  */
 function analyzeTiYong(benGua, movingYao, huGua, bianGua, season) {
   // 1. 定体用
-  var tiInLower = movingYao <= 3; // 动爻在下卦 → 上卦为体
-  var tiName, yongName, tiEle, yongEle, tiPosition, yongPosition;
+  let tiInLower = movingYao <= 3; // 动爻在下卦 → 上卦为体
+  let tiName, yongName, tiEle, yongEle, tiPosition, yongPosition;
 
   if (tiInLower) {
     tiName = benGua.upperName; yongName = benGua.lowerName;
@@ -4518,42 +4518,42 @@ function analyzeTiYong(benGua, movingYao, huGua, bianGua, season) {
   }
 
   // 2. 本卦体用关系
-  var benGuaCode = getShengKeCode(tiEle, yongEle);
+  let benGuaCode = getShengKeCode(tiEle, yongEle);
 
   // 3. 互卦对体的影响
-  var huUpperCode = getShengKeCode(tiEle, huGua.upperElement);
-  var huLowerCode = getShengKeCode(tiEle, huGua.lowerElement);
+  let huUpperCode = getShengKeCode(tiEle, huGua.upperElement);
+  let huLowerCode = getShengKeCode(tiEle, huGua.lowerElement);
 
   // 4. 变卦对体的影响
   // 变卦中体卦不变，用卦变为新的卦
-  var bianYongName, bianYongEle;
+  let bianYongName, bianYongEle;
   if (tiInLower) {
     bianYongName = bianGua.lowerName; bianYongEle = bianGua.lowerElement;
   } else {
     bianYongName = bianGua.upperName; bianYongEle = bianGua.upperElement;
   }
-  var bianGuaCode = getShengKeCode(tiEle, bianYongEle);
+  let bianGuaCode = getShengKeCode(tiEle, bianYongEle);
 
   // 5. 时令旺衰
-  var tiWangshuai = null;
-  var yongWangshuai = null;
+  let tiWangshuai = null;
+  let yongWangshuai = null;
   if (season) {
     tiWangshuai = getSeasonWangshuai(tiName, season);
     yongWangshuai = getSeasonWangshuai(yongName, season);
   }
 
   // 6. 综合判断
-  var score = 60;
-  var relBonus = {'yongshengti':25, 'bihe':20, 'tikeyong':15, 'tishengyong':10, 'yongketi':0};
+  let score = 60;
+  let relBonus = {'yongshengti':25, 'bihe':20, 'tikeyong':15, 'tishengyong':10, 'yongketi':0};
   score += relBonus[benGuaCode] || 10;
 
   // 变卦加分/减分
-  var bianBonus = {'yongshengti':10, 'bihe':8, 'tikeyong':5, 'tishengyong':3, 'yongketi':-10};
+  let bianBonus = {'yongshengti':10, 'bihe':8, 'tikeyong':5, 'tishengyong':3, 'yongketi':-10};
   score += bianBonus[bianGuaCode] || 5;
 
   // 旺衰加分
   if (tiWangshuai) {
-    var stateBonus = {'旺':15, '相':10, '休':0, '囚':-5, '死':-10};
+    let stateBonus = {'旺':15, '相':10, '休':0, '囚':-5, '死':-10};
     score += stateBonus[tiWangshuai.state] || 0;
   }
 
@@ -4562,15 +4562,15 @@ function analyzeTiYong(benGua, movingYao, huGua, bianGua, season) {
   if (movingYao === 6) score -= 3;
 
   score = Math.max(10, Math.min(95, score));
-  var level = score >= 80 ? '大吉' : score >= 65 ? '吉' : score >= 50 ? '平' : score >= 35 ? '小凶' : '凶';
+  let level = score >= 80 ? '大吉' : score >= 65 ? '吉' : score >= 50 ? '平' : score >= 35 ? '小凶' : '凶';
 
   // 吉凶判断文本
-  var benGuaJx = _relJudgment(benGuaCode);
-  var huGuaJx  = _relJudgment(huUpperCode);
-  var bianGuaJx = _relJudgment(bianGuaCode);
+  let benGuaJx = _relJudgment(benGuaCode);
+  let huGuaJx  = _relJudgment(huUpperCode);
+  let bianGuaJx = _relJudgment(bianGuaCode);
 
   // ═══ R3.1: 体用生克细化 — tiYongDetail ═══
-  var tiYongDetail = _buildTiYongDetail(tiEle, yongEle, benGuaCode, huGua, bianGua, bianYongEle, bianGuaCode, tiName, yongName, tiWangshuai, yongWangshuai, season);
+  let tiYongDetail = _buildTiYongDetail(tiEle, yongEle, benGuaCode, huGua, bianGua, bianYongEle, bianGuaCode, tiName, yongName, tiWangshuai, yongWangshuai, season);
 
   return {
     ti: { name: tiName, element: tiEle, position: tiPosition, wangshuai: tiWangshuai },
@@ -4593,7 +4593,7 @@ function analyzeTiYong(benGua, movingYao, huGua, bianGua, season) {
  */
 function _buildTiYongDetail(tiEle, yongEle, benGuaCode, huGua, bianYongEle, bianGuaCode, tiName, yongName, tiWs, yongWs, season) {
   // 1. 本卦体用五行生克详细分析
-  var relTexts = {
+  let relTexts = {
     'yongshengti': {
       title: '用生体（大吉）',
       desc: '用卦五行（' + yongEle + '）生体卦五行（' + tiEle + '），事物发展顺利，有外力帮助。'+
@@ -4630,12 +4630,12 @@ function _buildTiYongDetail(tiEle, yongEle, benGuaCode, huGua, bianYongEle, bian
       luck: '中吉'
     }
   };
-  var benGuaDetail = relTexts[benGuaCode] || relTexts['bihe'];
+  let benGuaDetail = relTexts[benGuaCode] || relTexts['bihe'];
 
   // 2. 互卦对体用的影响
-  var huUpperCode2 = getShengKeCode(tiEle, huGua.upperElement);
-  var huLowerCode2 = getShengKeCode(tiEle, huGua.lowerElement);
-  var huImpact = {
+  let huUpperCode2 = getShengKeCode(tiEle, huGua.upperElement);
+  let huLowerCode2 = getShengKeCode(tiEle, huGua.lowerElement);
+  let huImpact = {
     upperElement: huGua.upperElement,
     upperRelation: shengKeText(huUpperCode2),
     upperEffect: _huGuaEffectText(huUpperCode2, huGua.upperElement, tiEle),
@@ -4644,7 +4644,7 @@ function _buildTiYongDetail(tiEle, yongEle, benGuaCode, huGua, bianYongEle, bian
     lowerEffect: _huGuaEffectText(huLowerCode2, huGua.lowerElement, tiEle),
     summary: ''
   };
-  var huHelpful = (huUpperCode2 === 'yongshengti' || huUpperCode2 === 'bihe') ? 1 : 0;
+  let huHelpful = (huUpperCode2 === 'yongshengti' || huUpperCode2 === 'bihe') ? 1 : 0;
   huHelpful += (huLowerCode2 === 'yongshengti' || huLowerCode2 === 'bihe') ? 1 : 0;
   if (huHelpful === 2) {
     huImpact.summary = '互卦上下皆生扶体卦，过程顺利，内在因素有利。';
@@ -4655,11 +4655,11 @@ function _buildTiYongDetail(tiEle, yongEle, benGuaCode, huGua, bianYongEle, bian
   }
 
   // 3. 变卦后的体用关系变化趋势
-  var bianDetail = relTexts[bianGuaCode] || relTexts['bihe'];
-  var trendDesc = '';
-  var luckOrder = {'大吉':5, '中吉':4, '小吉':3, '小凶':2, '大凶':1};
-  var benLuck = luckOrder[benGuaDetail.luck] || 3;
-  var bianLuck = luckOrder[bianDetail.luck] || 3;
+  let bianDetail = relTexts[bianGuaCode] || relTexts['bihe'];
+  let trendDesc = '';
+  let luckOrder = {'大吉':5, '中吉':4, '小吉':3, '小凶':2, '大凶':1};
+  let benLuck = luckOrder[benGuaDetail.luck] || 3;
+  let bianLuck = luckOrder[bianDetail.luck] || 3;
   if (bianLuck > benLuck) {
     trendDesc = '变卦后体用关系转好，由「' + benGuaDetail.title + '」转为「' + bianDetail.title + '」，事情向好的方向发展，先苦后甜。';
   } else if (bianLuck < benLuck) {
@@ -4669,13 +4669,13 @@ function _buildTiYongDetail(tiEle, yongEle, benGuaCode, huGua, bianYongEle, bian
   }
 
   // 4. 旺衰影响分析
-  var wangshuaiAnalysis = '';
+  let wangshuaiAnalysis = '';
   if (tiWs && yongWs) {
-    var tiLevel = tiWs.state;
-    var yongLevel = yongWs.state;
-    var stateRank = {'旺':5, '相':4, '休':3, '囚':2, '死':1};
-    var tiRank = stateRank[tiLevel] || 3;
-    var yongRank = stateRank[yongLevel] || 3;
+    let tiLevel = tiWs.state;
+    let yongLevel = yongWs.state;
+    let stateRank = {'旺':5, '相':4, '休':3, '囚':2, '死':1};
+    let tiRank = stateRank[tiLevel] || 3;
+    let yongRank = stateRank[yongLevel] || 3;
     if (tiRank > yongRank) {
       wangshuaiAnalysis = '体卦' + tiLevel + '而用卦' + yongLevel + '，体强用弱，于我有利，宜进取。';
     } else if (tiRank < yongRank) {
@@ -4709,7 +4709,7 @@ function _buildTiYongDetail(tiEle, yongEle, benGuaCode, huGua, bianYongEle, bian
 }
 
 function _huGuaEffectText(code, huEle, tiEle) {
-  var map = {
+  let map = {
     'yongshengti': '互卦' + huEle + '生体' + tiEle + '——过程中有暗中助力，贵人暗扶',
     'tishengyong': '体' + tiEle + '生互卦' + huEle + '——过程中精力被消耗，需防力不从心',
     'bihe': '互卦' + huEle + '与体' + tiEle + '比和——过程平稳，无额外阻力',
@@ -4720,7 +4720,7 @@ function _huGuaEffectText(code, huEle, tiEle) {
 }
 
 function _relJudgment(code) {
-  var map = {
+  let map = {
     'yongshengti': '吉——外力助你，有进益之庆',
     'tishengyong': '泄——需先付出，耗泄之气',
     'bihe':        '吉——体用同气，诸事平稳',
@@ -4746,29 +4746,29 @@ function _relJudgment(code) {
  */
 function computeMeihuaFull(params) {
   // 1. 起卦
-  var guaResult;
+  let guaResult;
   if (params.method === 'time') {
     guaResult = computeMeihuaTime(params.yearZhi, params.month, params.day, params.hourZhi);
   } else {
     guaResult = computeMeihuaNumber(params.n1, params.n2, params.n3);
   }
 
-  var upper = guaResult.upper;
-  var lower = guaResult.lower;
-  var movingYao = guaResult.movingYao;
+  let upper = guaResult.upper;
+  let lower = guaResult.lower;
+  let movingYao = guaResult.movingYao;
 
   // 2. 构建三卦
-  var benGua = buildBenGua(upper, lower, movingYao);
-  var huGua  = computeHugua(benGua.lines, movingYao);
-  var bianGua = computeBianggua(benGua.lines, movingYao);
+  let benGua = buildBenGua(upper, lower, movingYao);
+  let huGua  = computeHugua(benGua.lines, movingYao);
+  let bianGua = computeBianggua(benGua.lines, movingYao);
 
   // 3. 确定季节/月建
-  var season = params.season || null;
-  var monthBranch = params.monthBranch || null;
+  let season = params.season || null;
+  let monthBranch = params.monthBranch || null;
   if (!season && params.method === 'time') {
     // 时间起卦时根据月份推断
-    var monthNum = params.month;
-    var monthBranchMap = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+    let monthNum = params.month;
+    let monthBranchMap = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
     monthBranch = monthBranchMap[(monthNum - 1) % 12] || '子';
     season = monthToSeason(monthBranch);
   }
@@ -4777,7 +4777,7 @@ function computeMeihuaFull(params) {
   }
 
   // 4. 体用分析
-  var tiYong = analyzeTiYong(benGua, movingYao, huGua, bianGua, season);
+  let tiYong = analyzeTiYong(benGua, movingYao, huGua, bianGua, season);
 
   // 5. 返回完整结果
   return {
@@ -4801,18 +4801,18 @@ function computeMeihuaFull(params) {
  */
 function analyzeMeihuaFull(params) {
   // 先调用 computeMeihuaFull 获取基础排盘数据
-  var base = computeMeihuaFull(params);
-  var benGua = base.benGua;
-  var huGua = base.huGua;
-  var bianGua = base.bianGua;
-  var tiYong = base.tiYong;
-  var season = base.season;
+  let base = computeMeihuaFull(params);
+  let benGua = base.benGua;
+  let huGua = base.huGua;
+  let bianGua = base.bianGua;
+  let tiYong = base.tiYong;
+  let season = base.season;
 
   // ═══ 第一步：卦名释义 ═══
-  var guaNameAnalysis = _buildGuaNameAnalysis(benGua);
+  let guaNameAnalysis = _buildGuaNameAnalysis(benGua);
 
   // ═══ 第二步：体用分析（调用R3.1增强） ═══
-  var tiYongAnalysis = {
+  let tiYongAnalysis = {
     title: '体用分析',
     tiGua: {
       name: tiYong.ti.name,
@@ -4835,7 +4835,7 @@ function analyzeMeihuaFull(params) {
   };
 
   // ═══ 第三步：互卦分析 ═══
-  var huGuaAnalysis = {
+  let huGuaAnalysis = {
     title: '互卦分析',
     huGuaName: huGua.name,
     huGuaSymbol: huGua.symbol,
@@ -4850,7 +4850,7 @@ function analyzeMeihuaFull(params) {
   };
 
   // ═══ 第四步：变卦分析 ═══
-  var bianGuaAnalysis = {
+  let bianGuaAnalysis = {
     title: '变卦分析',
     bianGuaName: bianGua.name,
     bianGuaSymbol: bianGua.symbol,
@@ -4866,11 +4866,11 @@ function analyzeMeihuaFull(params) {
   };
 
   // ═══ 第五步：断卦总结 ═══
-  var luckLevel = tiYong.level;
-  var luckGrade = _determineLuckGrade(tiYong.score);
-  var summaryAdvice = _buildSummaryAdvice(luckGrade, tiYong, guaNameAnalysis);
+  let luckLevel = tiYong.level;
+  let luckGrade = _determineLuckGrade(tiYong.score);
+  let summaryAdvice = _buildSummaryAdvice(luckGrade, tiYong, guaNameAnalysis);
 
-  var conclusion = {
+  let conclusion = {
     title: '断卦总结',
     luckGrade: luckGrade,
     score: tiYong.score,
@@ -4903,16 +4903,16 @@ function analyzeMeihuaFull(params) {
  * R3.2: 卦名释义
  */
 function _buildGuaNameAnalysis(benGua) {
-  var kingWen = benGua.kingWen;
-  var info = HEXAGRAM_INFO[kingWen] || {};
-  var guaCi = info.judgment || '';
-  var upperSym = benGua.upperName;
-  var lowerSym = benGua.lowerName;
-  var guaName = benGua.name;
+  let kingWen = benGua.kingWen;
+  let info = HEXAGRAM_INFO[kingWen] || {};
+  let guaCi = info.judgment || '';
+  let upperSym = benGua.upperName;
+  let lowerSym = benGua.lowerName;
+  let guaName = benGua.name;
 
   // 卦象组合含义
-  var compositionDesc = '';
-  var compositions = {
+  let compositionDesc = '';
+  let compositions = {
     '乾乾': '乾为天——刚健中正，自强不息之象。',
     '坤坤': '坤为地——厚德载物，柔顺包容之象。',
     '震震': '震为雷——雷声震动，奋发有为之象。',
@@ -4922,12 +4922,12 @@ function _buildGuaNameAnalysis(benGua) {
     '艮艮': '艮为山——山重路阻，宜止不宜行之象。',
     '兑兑': '兑为泽——喜悦相随，和悦待人之际。'
   };
-  var key = upperSym + lowerSym;
+  let key = upperSym + lowerSym;
   compositionDesc = compositions[key] || (upperSym + '上' + lowerSym + '下——' + (TRIGRAM_ELEMENT[upperSym] || '') + '与' + (TRIGRAM_ELEMENT[lowerSym] || '') + '相配。');
 
   // 彖辞白话解读（简化版）
-  var tuanText = '';
-  var tuanMap = {
+  let tuanText = '';
+  let tuanMap = {
     1: '大哉乾元，万物资始——乾卦象征天的刚健之力，万物由此开始。',
     2: '至哉坤元，万物资生——坤卦象征地的柔顺之德，万物由此生长。',
     3: '刚柔始交而难生——屯卦象征初创之难，万事开头难。',
@@ -4940,8 +4940,8 @@ function _buildGuaNameAnalysis(benGua) {
   tuanText = tuanMap[kingWen] || ('卦辞：' + guaCi + '。此卦寓意需结合体用生克综合判断。');
 
   // 大象传
-  var xiangText = '';
-  var xiangMap = {
+  let xiangText = '';
+  let xiangMap = {
     1: '天行健，君子以自强不息。',
     2: '地势坤，君子以厚德载物。',
     3: '云雷屯，君子以经纶。',
@@ -4983,7 +4983,7 @@ function _determineLuckGrade(score) {
  * R3.2: 构建总结建议
  */
 function _buildSummaryAdvice(luckGrade, tiYong, guaNameAnalysis) {
-  var advices = {
+  let advices = {
     '大吉': '万事亨通，宜积极进取，把握良机。' + guaNameAnalysis.guaName + '卦象大吉，可放手施为。',
     '吉': '事可成，宜稳步推进。虽有「' + (tiYong.benGuaRelation ? tiYong.benGuaRelation.text : '') + '」之象，但总体向好。',
     '中': '吉凶参半，宜审时度势，不可冒进。需观变卦趋势再定行止。',
@@ -4997,7 +4997,7 @@ function _buildSummaryAdvice(luckGrade, tiYong, guaNameAnalysis) {
  * R3.2: 构建结论文本
  */
 function _buildConclusionText(benGua, tiYong, luckGrade, season) {
-  var parts = [];
+  let parts = [];
   parts.push('本卦为「' + benGua.name + '」' + benGua.symbol);
   if (tiYong.benGuaRelation) {
     parts.push('体用关系为「' + tiYong.benGuaRelation.text + '」');
@@ -5018,7 +5018,7 @@ function _buildConclusionText(benGua, tiYong, luckGrade, season) {
  * R3.2: 构建要点
  */
 function _buildKeyPoints(tiYong, huGua, bianGua) {
-  var points = [];
+  let points = [];
   if (tiYong.benGuaRelation) {
     points.push('本卦体用：' + tiYong.benGuaRelation.text + '——' + tiYong.benGuaRelation.judgment);
   }
@@ -5085,7 +5085,7 @@ window.MeihuaV3 = {
  * 卦气数值表：八卦在四季的卦气分值（0-100）
  * 依据：当令者旺(100)、生令者相(80)、同气者比和(90)、克令者囚(40)、令克者死(20)
  */
-var GUA_QI_TABLE = {
+let GUA_QI_TABLE = {
   // 春季（寅卯辰月）— 木旺
   '春': {
     '震': 100,  // 震为木，当令最旺
@@ -5141,12 +5141,12 @@ var GUA_QI_TABLE = {
 function computeGuaQiScore(trigramName, season) {
   try {
     if (!trigramName || !season) return { score: 50, level: '平', desc: '卦气数据不足' };
-    var seasonTable = GUA_QI_TABLE[season];
+    let seasonTable = GUA_QI_TABLE[season];
     if (!seasonTable) return { score: 50, level: '平', desc: '季节数据不足' };
-    var score = seasonTable[trigramName];
+    let score = seasonTable[trigramName];
     if (typeof score === 'undefined') return { score: 50, level: '平', desc: '卦气数据不足' };
 
-    var level, desc;
+    let level, desc;
     if (score >= 100) {
       level = '旺';
       desc = trigramName + '卦在' + season + '季当令，卦气最旺，力量充沛';
@@ -5182,18 +5182,18 @@ function analyzeGuaQi(tiYong, season) {
   try {
     if (!tiYong || !season) return null;
 
-    var tiName = tiYong.ti.name;
-    var yongName = tiYong.yong.name;
-    var tiEle = tiYong.ti.element;
-    var yongEle = tiYong.yong.element;
+    let tiName = tiYong.ti.name;
+    let yongName = tiYong.yong.name;
+    let tiEle = tiYong.ti.element;
+    let yongEle = tiYong.yong.element;
 
     // 计算体卦和用卦的卦气分值
-    var tiQi = computeGuaQiScore(tiName, season);
-    var yongQi = computeGuaQiScore(yongName, season);
+    let tiQi = computeGuaQiScore(tiName, season);
+    let yongQi = computeGuaQiScore(yongName, season);
 
     // 体用卦气对比分析
-    var qiDiff = tiQi.score - yongQi.score;
-    var comparison, advice;
+    let qiDiff = tiQi.score - yongQi.score;
+    let comparison, advice;
 
     if (qiDiff >= 40) {
       comparison = '体卦卦气远强于用卦（' + tiQi.score + ' vs ' + yongQi.score + '），自身力量充沛，外力相对薄弱。\n' +
@@ -5223,9 +5223,9 @@ function analyzeGuaQi(tiYong, season) {
     }
 
     // 卦气旺衰对断卦结果的影响
-    var impact = '';
-    var tiScore = tiQi.score;
-    var yongScore = yongQi.score;
+    let impact = '';
+    let tiScore = tiQi.score;
+    let yongScore = yongQi.score;
 
     // 体卦卦气旺→自身有力
     if (tiScore >= 80) {
@@ -5267,7 +5267,7 @@ function analyzeGuaQi(tiYong, season) {
     }
 
     // 卦气修正分数
-    var qiModifier = 0;
+    let qiModifier = 0;
     if (tiScore >= 100) qiModifier += 10;
     else if (tiScore >= 80) qiModifier += 5;
     else if (tiScore <= 20) qiModifier -= 10;
@@ -6885,18 +6885,18 @@ function generateReport(result) {
  * @returns {object} 应期分析结果
  */
 function analyzeKeying(sanChuan, zhanShi) {
-  var faZhi = sanChuan.faInfo ? sanChuan.faInfo.zhi : '';
-  var zhongZhi = sanChuan.zhongInfo ? sanChuan.zhongInfo.zhi : '';
-  var moZhi = sanChuan.moInfo ? sanChuan.moInfo.zhi : '';
-  var faWX = ZHI_WX[faZhi] || '';
+  let faZhi = sanChuan.faInfo ? sanChuan.faInfo.zhi : '';
+  let zhongZhi = sanChuan.zhongInfo ? sanChuan.zhongInfo.zhi : '';
+  let moZhi = sanChuan.moInfo ? sanChuan.moInfo.zhi : '';
+  let faWX = ZHI_WX[faZhi] || '';
 
   // 地支相冲表
-  var CHONG_MAP = {'子':'午','午':'子','丑':'未','未':'丑','寅':'申','申':'寅','卯':'酉','酉':'卯','辰':'戌','戌':'辰','巳':'亥','亥':'巳'};
+  let CHONG_MAP = {'子':'午','午':'子','丑':'未','未':'丑','寅':'申','申':'寅','卯':'酉','酉':'卯','辰':'戌','戌':'辰','巳':'亥','亥':'巳'};
   // 地支相合表
-  var HE_MAP = {'子':'丑','丑':'子','寅':'亥','亥':'寅','卯':'戌','戌':'卯','辰':'酉','酉':'辰','巳':'申','申':'巳','午':'未','未':'午'};
+  let HE_MAP = {'子':'丑','丑':'子','寅':'亥','亥':'寅','卯':'戌','戌':'卯','辰':'酉','酉':'辰','巳':'申','申':'巳','午':'未','未':'午'};
 
-  var yingQi = [];
-  var yingQiDesc = '';
+  let yingQi = [];
+  let yingQiDesc = '';
 
   // 1. 初传与占时的关系
   if (faZhi && zhanShi) {
@@ -6914,10 +6914,10 @@ function analyzeKeying(sanChuan, zhanShi) {
   }
 
   // 2. 初传旺衰定远近
-  var faWangShuai = '';
-  var远近 = '';
+  let faWangShuai = '';
+  let远近 = '';
   // 判断初传旺衰：看初传五行与占时五行关系
-  var shiWX = ZHI_WX[zhanShi] || '';
+  let shiWX = ZHI_WX[zhanShi] || '';
   if (faWX && shiWX) {
     if (faWX === shiWX) {
       faWangShuai = '旺';
@@ -6969,28 +6969,28 @@ function analyzeKeying(sanChuan, zhanShi) {
  */
 function computeBenMing(birthYear, sex) {
   // 十二地支
-  var ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  let ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
   // 天干
-  var GAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  let GAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
 
   // 本命：出生年支
-  var benMingIdx = (birthYear - 4) % 12; // 1984年=鼠年(子)=0
+  let benMingIdx = (birthYear - 4) % 12; // 1984年=鼠年(子)=0
   if (benMingIdx < 0) benMingIdx += 12;
-  var benMing = ZHI[benMingIdx];
+  let benMing = ZHI[benMingIdx];
 
   // 行年：男1岁起丙寅顺行，女1岁起壬申逆行
-  var xingNian = '';
-  var xingNianDetail = '';
-  var currentAge = new Date().getFullYear() - birthYear;
+  let xingNian = '';
+  let xingNianDetail = '';
+  let currentAge = new Date().getFullYear() - birthYear;
 
   if (sex === '男' || sex === 'male') {
     // 男1岁=丙寅，顺行
     // 丙=2(索引), 寅=2
-    var startGanIdx = 2; // 丙
-    var startZhiIdx = 2; // 寅
-    var ageOffset = currentAge - 1;
-    var ganIdx = (startGanIdx + ageOffset + 10) % 10;
-    var zhiIdx = (startZhiIdx + ageOffset + 12) % 12;
+    let startGanIdx = 2; // 丙
+    let startZhiIdx = 2; // 寅
+    let ageOffset = currentAge - 1;
+    let ganIdx = (startGanIdx + ageOffset + 10) % 10;
+    let zhiIdx = (startZhiIdx + ageOffset + 12) % 12;
     xingNian = GAN[ganIdx] + ZHI[zhiIdx];
     xingNianDetail = '男命行年从1岁起丙寅顺行，今年' + currentAge + '岁，行年为' + xingNian + '。' +
       '行年干支与日辰生克关系可断吉凶：' +
@@ -7000,11 +7000,11 @@ function computeBenMing(birthYear, sex) {
   } else if (sex === '女' || sex === 'female') {
     // 女1岁=壬申，逆行
     // 壬=8(索引), 申=8
-    var startGanIdx2 = 8; // 壬
-    var startZhiIdx2 = 8; // 申
-    var ageOffset2 = currentAge - 1;
-    var ganIdx2 = (startGanIdx2 - ageOffset2 + 10 * 100) % 10;
-    var zhiIdx2 = (startZhiIdx2 - ageOffset2 + 12 * 100) % 12;
+    let startGanIdx2 = 8; // 壬
+    let startZhiIdx2 = 8; // 申
+    let ageOffset2 = currentAge - 1;
+    let ganIdx2 = (startGanIdx2 - ageOffset2 + 10 * 100) % 10;
+    let zhiIdx2 = (startZhiIdx2 - ageOffset2 + 12 * 100) % 12;
     xingNian = GAN[ganIdx2] + ZHI[zhiIdx2];
     xingNianDetail = '女命行年从1岁起壬申逆行，今年' + currentAge + '岁，行年为' + xingNian + '。' +
       '行年干支与日辰生克关系可断吉凶：' +
@@ -7039,34 +7039,34 @@ function computeBenMing(birthYear, sex) {
  * @returns {object} { ketiType, gejuName, luck, description }
  */
 function analyzeKetiGeshi(sanChuan, zhanShi, siKe) {
-  var faZhi = sanChuan.faInfo ? sanChuan.faInfo.zhi : '';
-  var zhongZhi = sanChuan.zhongInfo ? sanChuan.zhongInfo.zhi : '';
-  var moZhi = sanChuan.moInfo ? sanChuan.moInfo.zhi : '';
+  let faZhi = sanChuan.faInfo ? sanChuan.faInfo.zhi : '';
+  let zhongZhi = sanChuan.zhongInfo ? sanChuan.zhongInfo.zhi : '';
+  let moZhi = sanChuan.moInfo ? sanChuan.moInfo.zhi : '';
 
-  var faWX = ZHI_WX[faZhi] || '';
-  var zhongWX = ZHI_WX[zhongZhi] || '';
-  var moWX = ZHI_WX[moZhi] || '';
+  let faWX = ZHI_WX[faZhi] || '';
+  let zhongWX = ZHI_WX[zhongZhi] || '';
+  let moWX = ZHI_WX[moZhi] || '';
 
   // 地支相冲表
-  var CHONG = {'子':'午','午':'子','丑':'未','未':'丑','寅':'申','申':'寅','卯':'酉','酉':'卯','辰':'戌','戌':'辰','巳':'亥','亥':'巳'};
+  let CHONG = {'子':'午','午':'子','丑':'未','未':'丑','寅':'申','申':'寅','卯':'酉','酉':'卯','辰':'戌','戌':'辰','巳':'亥','亥':'巳'};
   // 地支相合表（六合）
-  var LIUHE = {'子':'丑','丑':'子','寅':'亥','亥':'寅','卯':'戌','戌':'卯','辰':'酉','酉':'辰','巳':'申','申':'巳','午':'未','未':'午'};
+  let LIUHE = {'子':'丑','丑':'子','寅':'亥','亥':'寅','卯':'戌','戌':'卯','辰':'酉','酉':'辰','巳':'申','申':'巳','午':'未','未':'午'};
   // 地支三合局
-  var SANHE_JU = [
+  let SANHE_JU = [
     {zhi:['寅','午','戌'], ju:'火局'},
     {zhi:['申','子','辰'], ju:'水局'},
     {zhi:['亥','卯','未'], ju:'木局'},
     {zhi:['巳','酉','丑'], ju:'金局'}
   ];
   // 连茹判断：地支顺序相连（子丑寅...）
-  var ZHI_ORDER = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  let ZHI_ORDER = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
 
-  var matched = [];
+  let matched = [];
 
   // ═══ 1. 重审课（初传与日辰相同） ═══
   // 初传地支与日支或日干寄宫相同
   // 需要日干信息，但函数签名中无日干，用 siKe.jiGong 代替
-  var dayJiGong = siKe && siKe.jiGong ? siKe.jiGong : '';
+  let dayJiGong = siKe && siKe.jiGong ? siKe.jiGong : '';
   if (faZhi && (faZhi === zhanShi || faZhi === dayJiGong)) {
     matched.push({
       ketiType: '重审课',
@@ -7143,17 +7143,17 @@ function analyzeKetiGeshi(sanChuan, zhanShi, siKe) {
   // ═══ 7. 连茹课（初中末三位连茹） ═══
   // 连茹：三个地支在十二地支顺序中相连（如子丑寅、寅卯辰等）
   if (faZhi && zhongZhi && moZhi) {
-    var faIdx = ZHI_ORDER.indexOf(faZhi);
-    var zhongIdx = ZHI_ORDER.indexOf(zhongZhi);
-    var moIdx = ZHI_ORDER.indexOf(moZhi);
+    let faIdx = ZHI_ORDER.indexOf(faZhi);
+    let zhongIdx = ZHI_ORDER.indexOf(zhongZhi);
+    let moIdx = ZHI_ORDER.indexOf(moZhi);
     if (faIdx >= 0 && zhongIdx >= 0 && moIdx >= 0) {
       // 顺序连茹：初→中→末依次+1
-      var isShunLian = (zhongIdx === (faIdx + 1) % 12) && (moIdx === (faIdx + 2) % 12);
+      let isShunLian = (zhongIdx === (faIdx + 1) % 12) && (moIdx === (faIdx + 2) % 12);
       // 逆序连茹：初→中→末依次-1
-      var isNiLian = (zhongIdx === (faIdx + 11) % 12) && (moIdx === (faIdx + 10) % 12);
+      let isNiLian = (zhongIdx === (faIdx + 11) % 12) && (moIdx === (faIdx + 10) % 12);
       if (isShunLian || isNiLian) {
-        var lianDir = isShunLian ? '顺连' : '倒连';
-        var lianDesc = isShunLian ?
+        let lianDir = isShunLian ? '顺连' : '倒连';
+        let lianDesc = isShunLian ?
           '顺连(' + faZhi + '→' + zhongZhi + '→' + moZhi + ')，事有顺次推进之象，宜顺势而为。' :
           '倒连(' + faZhi + '→' + zhongZhi + '→' + moZhi + ')，事有逆次退缩之象，宜退守自保。';
         matched.push({
@@ -7170,8 +7170,8 @@ function analyzeKetiGeshi(sanChuan, zhanShi, siKe) {
 
   // ═══ 8. 三合课（初中末三合局） ═══
   if (faZhi && zhongZhi && moZhi) {
-    for (var si = 0; si < SANHE_JU.length; si++) {
-      var sanHe = SANHE_JU[si];
+    for (let si = 0; si < SANHE_JU.length; si++) {
+      let sanHe = SANHE_JU[si];
       if (sanHe.zhi.indexOf(faZhi) >= 0 &&
           sanHe.zhi.indexOf(zhongZhi) >= 0 &&
           sanHe.zhi.indexOf(moZhi) >= 0 &&
@@ -7191,11 +7191,11 @@ function analyzeKetiGeshi(sanChuan, zhanShi, siKe) {
 
   // ═══ 汇总结果 ═══
   // 如果匹配到多个课体，取最显著的一个（优先级：大吉 > 大凶 > 吉 > 凶 > 中吉 > 中平）
-  var priority = {'大吉':5, '大凶':4, '吉':3, '凶':2, '中吉':1, '中平':0};
-  var best = null;
-  var bestScore = -1;
-  for (var mi = 0; mi < matched.length; mi++) {
-    var score = priority[matched[mi].luck] || 0;
+  let priority = {'大吉':5, '大凶':4, '吉':3, '凶':2, '中吉':1, '中平':0};
+  let best = null;
+  let bestScore = -1;
+  for (let mi = 0; mi < matched.length; mi++) {
+    let score = priority[matched[mi].luck] || 0;
     if (score > bestScore) {
       bestScore = score;
       best = matched[mi];
@@ -7306,49 +7306,49 @@ window.LiurenV3 = {
 
 // ─── 常量 ────────────────────────────────────────────────────────
 
-var STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-var BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-var GAN_ZHI = [];
-for (var i = 0; i < 60; i++) { GAN_ZHI.push(STEMS[i%10] + BRANCHES[i%12]); }
+let STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+let BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+let GAN_ZHI = [];
+for (let i = 0; i < 60; i++) { GAN_ZHI.push(STEMS[i%10] + BRANCHES[i%12]); }
 
 // 六仪三奇
-var LIU_YI = ['戊','己','庚','辛','壬','癸']; // 六仪
-var SAN_QI = ['丁','丙','乙']; // 三奇(逆序: 丁丙乙)
-var LIU_SAN_ALL = ['戊','己','庚','辛','壬','癸','丁','丙','乙']; // 完整排列
+let LIU_YI = ['戊','己','庚','辛','壬','癸']; // 六仪
+let SAN_QI = ['丁','丙','乙']; // 三奇(逆序: 丁丙乙)
+let LIU_SAN_ALL = ['戊','己','庚','辛','壬','癸','丁','丙','乙']; // 完整排列
 
 // 九宫 (洛书数序)
-var JIU_GONG = [1,2,3,4,5,6,7,8,9];
-var JIU_GONG_NAME = {
+let JIU_GONG = [1,2,3,4,5,6,7,8,9];
+let JIU_GONG_NAME = {
   1:'坎', 2:'坤', 3:'震', 4:'巽', 5:'中', 6:'乾', 7:'兑', 8:'艮', 9:'离'
 };
-var JIU_GONG_FANGWEI = {
+let JIU_GONG_FANGWEI = {
   1:'北方', 2:'西南', 3:'东方', 4:'东南', 5:'中宫', 6:'西北', 7:'西方', 8:'东北', 9:'南方'
 };
 
 // 后天八卦
-var BAGUA = {
+let BAGUA = {
   '坎':1, '坤':2, '震':3, '巽':4, '中':5, '乾':6, '兑':7, '艮':8, '离':9
 };
 
 // 八门原始宫位
-var MEN_ORIG = {1:'休', 8:'生', 3:'伤', 4:'杜', 9:'景', 2:'死', 7:'惊', 6:'开'};
-var MEN_NAMES = ['休','生','伤','杜','景','死','惊','开'];
-var MEN_FULL = {'休':'休门','生':'生门','伤':'伤门','杜':'杜门','景':'景门','死':'死门','惊':'惊门','开':'开门'};
+let MEN_ORIG = {1:'休', 8:'生', 3:'伤', 4:'杜', 9:'景', 2:'死', 7:'惊', 6:'开'};
+let MEN_NAMES = ['休','生','伤','杜','景','死','惊','开'];
+let MEN_FULL = {'休':'休门','生':'生门','伤':'伤门','杜':'杜门','景':'景门','死':'死门','惊':'惊门','开':'开门'};
 
 // 九星原始宫位
-var STARS_ORIG = {1:'蓬', 2:'芮', 3:'冲', 4:'辅', 5:'禽', 6:'心', 7:'柱', 8:'任', 9:'英'};
-var STARS_NAMES = ['蓬','芮','冲','辅','禽','心','柱','任','英'];
-var STARS_FULL = {'蓬':'天蓬','芮':'天芮','冲':'天冲','辅':'天辅','禽':'天禽','心':'天心','柱':'天柱','任':'天任','英':'天英'};
+let STARS_ORIG = {1:'蓬', 2:'芮', 3:'冲', 4:'辅', 5:'禽', 6:'心', 7:'柱', 8:'任', 9:'英'};
+let STARS_NAMES = ['蓬','芮','冲','辅','禽','心','柱','任','英'];
+let STARS_FULL = {'蓬':'天蓬','芮':'天芮','冲':'天冲','辅':'天辅','禽':'天禽','心':'天心','柱':'天柱','任':'天任','英':'天英'};
 
 // 八神
-var SHEN_NAMES = ['值符','螣蛇','太阴','六合','白虎','玄武','九地','九天'];
+let SHEN_NAMES = ['值符','螣蛇','太阴','六合','白虎','玄武','九地','九天'];
 
 // 节气遁局表
 // 阳遁: 冬至174, 小寒285, 大寒396, 立春852, 雨水963, 惊蛰174,
 //        春分396, 清明417, 谷雨528, 立夏417, 小满528, 芒种639
 // 阴遁: 夏至936, 小暑825, 大暑714, 立秋258, 处暑147, 白露936,
 //        秋分714, 寒露693, 霜降582, 立冬693, 小雪582, 大雪471
-var JIEQI_JU_TABLE = {
+let JIEQI_JU_TABLE = {
   yang: {
     '冬至':[1,7,4], '小寒':[2,8,5], '大寒':[3,9,6],
     '立春':[8,5,2], '雨水':[9,6,3], '惊蛰':[1,7,4],
@@ -7364,7 +7364,7 @@ var JIEQI_JU_TABLE = {
 };
 
 // 24节气名称 (按时间顺序, 从冬至开始)
-var JIEQI_ORDER = [
+let JIEQI_ORDER = [
   '冬至','小寒','大寒','立春','雨水','惊蛰',
   '春分','清明','谷雨','立夏','小满','芒种',
   '夏至','小暑','大暑','立秋','处暑','白露',
@@ -7372,7 +7372,7 @@ var JIEQI_ORDER = [
 ];
 
 // 节气黄经度数表 (冬至=270°开始)
-var JIEQI_LONGITUDE = {
+let JIEQI_LONGITUDE = {
   '冬至':270, '小寒':285, '大寒':300,
   '立春':315, '雨水':330, '惊蛰':345,
   '春分':0, '清明':15, '谷雨':30,
@@ -7384,13 +7384,13 @@ var JIEQI_LONGITUDE = {
 };
 
 // 天干五行
-var GAN_WX = {'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
+let GAN_WX = {'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
 
 // 地支宫位 (后天八卦)
-var ZHI_GONG = {'子':1,'丑':8,'寅':8,'卯':3,'辰':4,'巳':4,'午':9,'未':2,'申':2,'酉':7,'戌':6,'亥':6};
+let ZHI_GONG = {'子':1,'丑':8,'寅':8,'卯':3,'辰':4,'巳':4,'午':9,'未':2,'申':2,'酉':7,'戌':6,'亥':6};
 
 // 旬首对应六仪
-var XUN_YI = ['戊','己','庚','辛','壬','癸']; // 甲子旬→戊, 甲戌旬→己...
+let XUN_YI = ['戊','己','庚','辛','壬','癸']; // 甲子旬→戊, 甲戌旬→己...
 
 // ─── 天文节气计算 ────────────────────────────────────────────────
 
@@ -7401,28 +7401,28 @@ var XUN_YI = ['戊','己','庚','辛','壬','癸']; // 甲子旬→戊, 甲戌�
  */
 function solarLongitude(jd) {
   // JD → T (儒略世纪, 从 J2000.0)
-  var T = (jd - 2451545.0) / 36525.0;
+  let T = (jd - 2451545.0) / 36525.0;
   
   // 太阳平黄经
-  var L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T;
+  let L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T;
   
   // 太阳平近点角
-  var M = 357.52911 + 35999.05029 * T - 0.0001537 * T * T;
+  let M = 357.52911 + 35999.05029 * T - 0.0001537 * T * T;
   
   // 地球轨道偏心率
-  var e = 0.016708634 - 0.000042037 * T - 0.0000001267 * T * T;
+  let e = 0.016708634 - 0.000042037 * T - 0.0000001267 * T * T;
   
   // 中心差
-  var C = (1.914602 - 0.004817 * T - 0.000014 * T * T) * sinDeg(M)
+  let C = (1.914602 - 0.004817 * T - 0.000014 * T * T) * sinDeg(M)
         + (0.019993 - 0.000101 * T) * sinDeg(2 * M)
         + 0.000289 * sinDeg(3 * M);
   
   // 太阳真黄经
-  var theta = L0 + C;
+  let theta = L0 + C;
   
   // 章动修正 (标准天文算法)
-  var omega = 125.04 - 1934.136 * T;
-  var lambda = theta - 0.00569 - 0.00478 * sinDeg(omega);
+  let omega = 125.04 - 1934.136 * T;
+  let lambda = theta - 0.00569 - 0.00478 * sinDeg(omega);
   
   // 归一化到 [0, 360)
   return ((lambda % 360) + 360) % 360;
@@ -7437,8 +7437,8 @@ function tanDeg(deg) { return Math.tan(deg * Math.PI / 180); }
  */
 function toJulianDay(year, month, day) {
   if (month <= 2) { year -= 1; month += 12; }
-  var A = Math.floor(year / 100);
-  var B = 2 - A + Math.floor(A / 4);
+  let A = Math.floor(year / 100);
+  let B = 2 - A + Math.floor(A / 4);
   // 公历 → JD
   return Math.floor(365.25 * (year + 4716)) 
        + Math.floor(30.6001 * (month + 1)) 
@@ -7451,28 +7451,28 @@ function toJulianDay(year, month, day) {
  * 返回: { jieqi: 节气名, longitude: 黄经度数, nextJieqi: 下一节气 }
  */
 function getJieqiPrecise(year, month, day) {
-  var jd = toJulianDay(year, month, day);
-  var lon = solarLongitude(jd);
+  let jd = toJulianDay(year, month, day);
+  let lon = solarLongitude(jd);
   
   // 找到当前黄经对应的节气
   // 节气按黄经每15°一个, 从春分(0°)开始
   // 但传统节气从冬至(270°)开始排
-  var currentJieqi = '';
-  var nextJieqi = '';
+  let currentJieqi = '';
+  let nextJieqi = '';
   
   // 遍历节气表, 找到当前所在的节气区间
-  var sortedJieqi = [
+  let sortedJieqi = [
     [0,'春分'],[15,'清明'],[30,'谷雨'],[45,'立夏'],[60,'小满'],[75,'芒种'],
     [90,'夏至'],[105,'小暑'],[120,'大暑'],[135,'立秋'],[150,'处暑'],[165,'白露'],
     [180,'秋分'],[195,'寒露'],[210,'霜降'],[225,'立冬'],[240,'小雪'],[255,'大雪'],
     [270,'冬至'],[285,'小寒'],[300,'大寒'],[315,'立春'],[330,'雨水'],[345,'惊蛰']
   ];
   
-  for (var i = 0; i < sortedJieqi.length; i++) {
-    var curLon = sortedJieqi[i][0];
-    var curName = sortedJieqi[i][1];
-    var nextLon = sortedJieqi[(i + 1) % 24][0];
-    var nextName = sortedJieqi[(i + 1) % 24][1];
+  for (let i = 0; i < sortedJieqi.length; i++) {
+    let curLon = sortedJieqi[i][0];
+    let curName = sortedJieqi[i][1];
+    let nextLon = sortedJieqi[(i + 1) % 24][0];
+    let nextName = sortedJieqi[(i + 1) % 24][1];
     
     // 处理跨 0° 的情况
     if (curLon < nextLon) {
@@ -7511,7 +7511,7 @@ function getJieqiPrecise(year, month, day) {
  * 夏至(90°)后到冬至(270°)前为阴遁
  */
 function isYangDun(jieqi) {
-  var idx = JIEQI_ORDER.indexOf(jieqi);
+  let idx = JIEQI_ORDER.indexOf(jieqi);
   // 冬至到芒种 = 阳遁 (index 0~11)
   // 夏至到大雪 = 阴遁 (index 12~23)
   return idx >= 0 && idx <= 11;
@@ -7521,7 +7521,7 @@ function isYangDun(jieqi) {
  * 近似节气 (退化用)
  */
 function getJieqiApprox(year, month, day) {
-  var dates = [
+  let dates = [
     [1,6,'小寒'],[1,20,'大寒'],[2,4,'立春'],[2,19,'雨水'],
     [3,6,'惊蛰'],[3,21,'春分'],[4,5,'清明'],[4,20,'谷雨'],
     [5,6,'立夏'],[5,21,'小满'],[6,6,'芒种'],[6,21,'夏至'],
@@ -7529,9 +7529,9 @@ function getJieqiApprox(year, month, day) {
     [9,8,'白露'],[9,23,'秋分'],[10,8,'寒露'],[10,23,'霜降'],
     [11,7,'立冬'],[11,22,'小雪'],[12,7,'大雪'],[12,22,'冬至']
   ];
-  var jq = '冬至';
-  for (var i = 0; i < dates.length; i++) {
-    var m = dates[i][0], d = dates[i][1], name = dates[i][2];
+  let jq = '冬至';
+  for (let i = 0; i < dates.length; i++) {
+    let m = dates[i][0], d = dates[i][1], name = dates[i][2];
     if (month > m || (month === m && day >= d)) { jq = name; }
   }
   if (month === 12 && day < 22) jq = '大雪';
@@ -7546,10 +7546,10 @@ function getJieqiApprox(year, month, day) {
  * 1900-01-01 = 甲子日 (干支序数0, 已验证)
  */
 function getDayGanZhi(year, month, day) {
-  var baseDate = new Date(1900, 0, 1);
-  var target = new Date(year, month - 1, day);
-  var diff = Math.round((target - baseDate) / 86400000);
-  var idx = ((diff % 60) + 60) % 60;
+  let baseDate = new Date(1900, 0, 1);
+  let target = new Date(year, month - 1, day);
+  let diff = Math.round((target - baseDate) / 86400000);
+  let idx = ((diff % 60) + 60) % 60;
   return { idx: idx, gan: idx % 10, zhi: idx % 12, name: GAN_ZHI[idx] };
 }
 
@@ -7559,8 +7559,8 @@ function getDayGanZhi(year, month, day) {
  * 丁壬日: 庚子时起; 戊癸日: 壬子时起
  */
 function getHourGanZhi(dayGanIdx, hour) {
-  var hourIdx = Math.floor((hour + 1) / 2) % 12; // 子=0, 丑=1...
-  var hourGzIdx = ((dayGanIdx * 12 + hourIdx) % 60 + 60) % 60;
+  let hourIdx = Math.floor((hour + 1) / 2) % 12; // 子=0, 丑=1...
+  let hourGzIdx = ((dayGanIdx * 12 + hourIdx) % 60 + 60) % 60;
   return { idx: hourGzIdx, gan: hourGzIdx % 10, zhi: hourGzIdx % 12, hourIdx: hourIdx, name: GAN_ZHI[hourGzIdx] };
 }
 
@@ -7581,39 +7581,39 @@ function getHourGanZhi(dayGanIdx, hour) {
  *   每符头管5天为一元
  */
 function getDunJu(year, month, day, hour, juType) {
-  var jieqiInfo = getJieqiPrecise(year, month, day);
-  var isYang = jieqiInfo.isYang;
-  var dun = isYang ? 'yang' : 'yin';
+  let jieqiInfo = getJieqiPrecise(year, month, day);
+  let isYang = jieqiInfo.isYang;
+  let dun = isYang ? 'yang' : 'yin';
   
   // 如果手动指定遁局
   if (juType && juType !== 'auto') {
     if (juType === 'yang') dun = 'yang';
     else if (juType === 'yin') dun = 'yin';
     else if (/^\d+$/.test(String(juType))) {
-      var juNum = parseInt(juType);
+      let juNum = parseInt(juType);
       return { dun: dun, ju: juNum, jieqi: jieqiInfo.jieqi, yuan: '指定', method: '手动指定' };
     }
   }
   
-  var dayGz = getDayGanZhi(year, month, day);
+  let dayGz = getDayGanZhi(year, month, day);
   
   // 定元: 以日干支符头定上中下三元
   // 甲己日(日干 idx%5==0)为符头
   // 符头后的5天为一元
   // 上元: 符头甲子/甲午/甲申/甲寅 (旬首日)
   // 实际: 日干支序数 mod 15: 0-4=上元, 5-9=中元, 10-14=下元
-  var dayMod15 = dayGz.idx % 15;
-  var yuan = dayMod15 < 5 ? 0 : dayMod15 < 10 ? 1 : 2; // 0=上, 1=中, 2=下
-  var yuanName = ['上元','中元','下元'][yuan];
+  let dayMod15 = dayGz.idx % 15;
+  let yuan = dayMod15 < 5 ? 0 : dayMod15 < 10 ? 1 : 2; // 0=上, 1=中, 2=下
+  let yuanName = ['上元','中元','下元'][yuan];
   
   // 查遁局表
-  var table = isYang ? JIEQI_JU_TABLE.yang : JIEQI_JU_TABLE.yin;
-  var juArr = table[jieqiInfo.jieqi];
+  let table = isYang ? JIEQI_JU_TABLE.yang : JIEQI_JU_TABLE.yin;
+  let juArr = table[jieqiInfo.jieqi];
   if (!juArr) {
     // 退化: 冬至阳遁1局, 夏至阴遁9局
     juArr = isYang ? [1,7,4] : [9,3,6];
   }
-  var ju = juArr[yuan];
+  let ju = juArr[yuan];
   
   return {
     dun: dun,
@@ -7644,11 +7644,11 @@ function getDunJu(year, month, day, hour, juType) {
  * 中宫5宫寄宫: 阳遁寄艮8, 阴遁寄坤2
  */
 function arrangeDiPan(dun, ju) {
-  var res = {};
-  var startPalace = ju;
+  let res = {};
+  let startPalace = ju;
   
-  for (var i = 0; i < 9; i++) {
-    var palace;
+  for (let i = 0; i < 9; i++) {
+    let palace;
     if (dun === 'yang') {
       // 阳遁顺飞: 从ju宫开始, 按 1→2→3→4→5→6→7→8→9 顺序飞布
       palace = ((startPalace - 1 + i) % 9) + 1;
@@ -7676,43 +7676,43 @@ function arrangeDiPan(dun, ju) {
  *    阳遁顺飞, 阴遁逆飞
  */
 function arrangeTianPan(dipan, hourGzIdx, ju, dun) {
-  var res = {};
+  let res = {};
   
   // 旬首 → 六仪
-  var xunShou = Math.floor(hourGzIdx / 10) * 10; // 0,10,20,30,40,50
-  var xunYiIdx = Math.floor(xunShou / 10) % 6;
-  var xunYi = XUN_YI[xunYiIdx];
+  let xunShou = Math.floor(hourGzIdx / 10) * 10; // 0,10,20,30,40,50
+  let xunYiIdx = Math.floor(xunShou / 10) % 6;
+  let xunYi = XUN_YI[xunYiIdx];
   
   // 找旬首六仪在地盘的宫位
-  var xunGong = 5;
-  for (var p = 1; p <= 9; p++) {
+  let xunGong = 5;
+  for (let p = 1; p <= 9; p++) {
     if (dipan[p] === xunYi) { xunGong = p; break; }
   }
   
   // 天盘飞布: 以值符宫为起点, 按九宫飞布排列地盘六仪三奇
-  var flySeq = [];
-  for (var i = 0; i < 9; i++) {
-    var palace = (dun === 'yang')
+  let flySeq = [];
+  for (let i = 0; i < 9; i++) {
+    let palace = (dun === 'yang')
       ? ((xunGong - 1 + i) % 9) + 1
       : ((xunGong - 1 - i + 90) % 9) + 1;
     flySeq.push(palace);
   }
   
   // 时辰地支宫位
-  var hourZhiIdx = hourGzIdx % 12;
-  var zhiGong = [1,8,8,3,4,4,9,2,2,7,6,6][hourZhiIdx]; // 子丑寅卯辰巳午未申酉戌亥
+  let hourZhiIdx = hourGzIdx % 12;
+  let zhiGong = [1,8,8,3,4,4,9,2,2,7,6,6][hourZhiIdx]; // 子丑寅卯辰巳午未申酉戌亥
   
   // 旋转序列: 以时辰地支宫为目标
-  var rotateSeq = [];
-  for (var i = 0; i < 9; i++) {
-    var palace = (dun === 'yang')
+  let rotateSeq = [];
+  for (let i = 0; i < 9; i++) {
+    let palace = (dun === 'yang')
       ? ((zhiGong - 1 + i) % 9) + 1
       : ((zhiGong - 1 - i + 90) % 9) + 1;
     rotateSeq.push(palace);
   }
   
   // 天盘: rotateSeq[i]宫 = 地盘 flySeq[i]宫的仪
-  for (var i = 0; i < 9; i++) {
+  for (let i = 0; i < 9; i++) {
     res[rotateSeq[i]] = dipan[flySeq[i]];
   }
   
@@ -7731,37 +7731,37 @@ function arrangeTianPan(dipan, hourGzIdx, ju, dun) {
  * 八门原始宫位: 休1 生8 伤3 杜4 景9 死2 惊7 开6
  */
 function arrangeMen(dun, ju, hourGzIdx, dipan) {
-  var res = {};
+  let res = {};
   
   // 旬首 → 六仪 → 在地盘的宫位
-  var xunShou = Math.floor(hourGzIdx / 10) * 10;
-  var xunYiIdx = Math.floor(xunShou / 10) % 6;
-  var xunYi = XUN_YI[xunYiIdx];
+  let xunShou = Math.floor(hourGzIdx / 10) * 10;
+  let xunYiIdx = Math.floor(xunShou / 10) % 6;
+  let xunYi = XUN_YI[xunYiIdx];
   
-  var xunGong = 5;
-  for (var p = 1; p <= 9; p++) {
+  let xunGong = 5;
+  for (let p = 1; p <= 9; p++) {
     if (dipan[p] === xunYi) { xunGong = p; break; }
   }
   
   // 值使 = 旬首宫对应的原始门
-  var zhiShi = MEN_ORIG[xunGong] || '休';
-  var zhiShiIdx = MEN_NAMES.indexOf(zhiShi);
+  let zhiShi = MEN_ORIG[xunGong] || '休';
+  let zhiShiIdx = MEN_NAMES.indexOf(zhiShi);
   
   // 时辰在旬中的序数 (0-9)
-  var hourInXun = hourGzIdx - xunShou;
+  let hourInXun = hourGzIdx - xunShou;
   
   // 九宫飞布 (跳过中宫5)
-  var gongFly = (dun === 'yang')
+  let gongFly = (dun === 'yang')
     ? [1,2,3,4,6,7,8,9]
     : [9,8,7,6,4,3,2,1];
   
-  var startPos = 0;
-  for (var i = 0; i < gongFly.length; i++) {
+  let startPos = 0;
+  for (let i = 0; i < gongFly.length; i++) {
     if (gongFly[i] === xunGong) { startPos = i; break; }
   }
   
-  for (var i = 0; i < 8; i++) {
-    var palace = gongFly[(startPos + hourInXun + i) % gongFly.length];
+  for (let i = 0; i < 8; i++) {
+    let palace = gongFly[(startPos + hourInXun + i) % gongFly.length];
     res[palace] = MEN_NAMES[(zhiShiIdx + i) % 8];
   }
   
@@ -7781,34 +7781,34 @@ function arrangeMen(dun, ju, hourGzIdx, dipan) {
  * 值符星 = 旬首所在宫的原始星
  */
 function arrangeStars(dun, ju, hourGzIdx, tianpan) {
-  var res = {};
+  let res = {};
   
   // 旬首 → 六仪 → 在天盘的宫位
-  var xunShou = Math.floor(hourGzIdx / 10) * 10;
-  var xunYiIdx = Math.floor(xunShou / 10) % 6;
-  var xunYi = XUN_YI[xunYiIdx];
+  let xunShou = Math.floor(hourGzIdx / 10) * 10;
+  let xunYiIdx = Math.floor(xunShou / 10) % 6;
+  let xunYi = XUN_YI[xunYiIdx];
   
-  var xunGong = 5;
-  for (var p = 1; p <= 9; p++) {
+  let xunGong = 5;
+  for (let p = 1; p <= 9; p++) {
     if (tianpan[p] === xunYi) { xunGong = p; break; }
   }
   
   // 值符星 = 旬首所在宫的原始星
-  var zhiFuStar = STARS_ORIG[xunGong] || '蓬';
-  var zhiFuIdx = STARS_NAMES.indexOf(zhiFuStar);
+  let zhiFuStar = STARS_ORIG[xunGong] || '蓬';
+  let zhiFuIdx = STARS_NAMES.indexOf(zhiFuStar);
   
   // 九宫飞布 (含中宫5)
-  var gongFlyFull = (dun === 'yang')
+  let gongFlyFull = (dun === 'yang')
     ? [1,2,3,4,5,6,7,8,9]
     : [9,8,7,6,5,4,3,2,1];
   
-  var startPos = 0;
-  for (var i = 0; i < gongFlyFull.length; i++) {
+  let startPos = 0;
+  for (let i = 0; i < gongFlyFull.length; i++) {
     if (gongFlyFull[i] === xunGong) { startPos = i; break; }
   }
   
-  for (var i = 0; i < 9; i++) {
-    var palace = gongFlyFull[(startPos + i) % 9];
+  for (let i = 0; i < 9; i++) {
+    let palace = gongFlyFull[(startPos + i) % 9];
     res[palace] = STARS_NAMES[(zhiFuIdx + i) % 9];
   }
   
@@ -7826,30 +7826,30 @@ function arrangeStars(dun, ju, hourGzIdx, tianpan) {
  *   中宫无神, 跳过。
  */
 function arrangeShen(dun, hourGzIdx, tianpan) {
-  var res = {};
+  let res = {};
   
   // 旬首 → 六仪 → 在天盘的宫位 (= 值符星所在宫)
-  var xunShou = Math.floor(hourGzIdx / 10) * 10;
-  var xunYiIdx = Math.floor(xunShou / 10) % 6;
-  var xunYi = XUN_YI[xunYiIdx];
+  let xunShou = Math.floor(hourGzIdx / 10) * 10;
+  let xunYiIdx = Math.floor(xunShou / 10) % 6;
+  let xunYi = XUN_YI[xunYiIdx];
   
-  var xunGong = 5;
-  for (var p = 1; p <= 9; p++) {
+  let xunGong = 5;
+  for (let p = 1; p <= 9; p++) {
     if (tianpan[p] === xunYi) { xunGong = p; break; }
   }
   
   // 九宫飞布 (跳过中宫5)
-  var gongFly = (dun === 'yang')
+  let gongFly = (dun === 'yang')
     ? [1,2,3,4,6,7,8,9]
     : [9,8,7,6,4,3,2,1];
   
-  var startPos = 0;
-  for (var i = 0; i < gongFly.length; i++) {
+  let startPos = 0;
+  for (let i = 0; i < gongFly.length; i++) {
     if (gongFly[i] === xunGong) { startPos = i; break; }
   }
   
-  for (var i = 0; i < 8; i++) {
-    var palace = gongFly[(startPos + i) % 8];
+  for (let i = 0; i < 8; i++) {
+    let palace = gongFly[(startPos + i) % 8];
     res[palace] = SHEN_NAMES[i];
   }
   
@@ -7882,20 +7882,20 @@ function arrangeShen(dun, hourGzIdx, tianpan) {
  *   五不遇时
  */
 function getGeju(panData) {
-  var geju = [];
-  var dipan = panData.dipan || {};
-  var tianpan = panData.tianpan || {};
-  var men = panData.men || {};
-  var stars = panData.stars || {};
-  var shen = panData.shen || {};
+  let geju = [];
+  let dipan = panData.dipan || {};
+  let tianpan = panData.tianpan || {};
+  let men = panData.men || {};
+  let stars = panData.stars || {};
+  let shen = panData.shen || {};
   
   // 对冲宫位表
-  var duichong = {1:9, 9:1, 2:8, 8:2, 3:7, 7:3, 4:6, 6:4};
+  let duichong = {1:9, 9:1, 2:8, 8:2, 3:7, 7:3, 4:6, 6:4};
   
-  for (var p = 1; p <= 9; p++) {
+  for (let p = 1; p <= 9; p++) {
     if (p === 5) continue; // 中宫跳过
-    var dip = dipan[p] || '';
-    var tip = tianpan[p] || '';
+    let dip = dipan[p] || '';
+    let tip = tianpan[p] || '';
     if (!dip || !tip) continue;
     
     // 伏吟
@@ -7904,7 +7904,7 @@ function getGeju(panData) {
     }
     
     // 反吟
-    var dc = duichong[p];
+    let dc = duichong[p];
     if (dc && dipan[dc] && tianpan[p] === dipan[dc]) {
       geju.push({ gong: p, name: '反吟', type: '凶', desc: p + '宫天盘' + tip + '加地盘' + dip + '，反吟主反复' });
     }
@@ -7956,17 +7956,17 @@ function getGeju(panData) {
   }
   
   // 三诈格
-  var jiMen = ['休','生','开'];
-  var jiStar = ['辅','心','任','禽'];
-  var jiShen = ['值符','太阴','六合','九天'];
-  var xiongMen = ['死','惊','伤'];
-  var xiongStar = ['芮','柱','蓬'];
+  let jiMen = ['休','生','开'];
+  let jiStar = ['辅','心','任','禽'];
+  let jiShen = ['值符','太阴','六合','九天'];
+  let xiongMen = ['死','惊','伤'];
+  let xiongStar = ['芮','柱','蓬'];
   
-  for (var p = 1; p <= 9; p++) {
+  for (let p = 1; p <= 9; p++) {
     if (p === 5) continue;
-    var pm = men[p] || '';
-    var ps = stars[p] || '';
-    var ph = shen[p] || '';
+    let pm = men[p] || '';
+    let ps = stars[p] || '';
+    let ph = shen[p] || '';
     if (!pm || !ps || !ph) continue;
     
     if (jiMen.indexOf(pm) >= 0 && jiStar.indexOf(ps) >= 0 && jiShen.indexOf(ph) >= 0) {
@@ -7979,12 +7979,12 @@ function getGeju(panData) {
   }
   
   // 五假格
-  var tianpanMap = tianpan;
-  for (var p = 1; p <= 9; p++) {
+  let tianpanMap = tianpan;
+  for (let p = 1; p <= 9; p++) {
     if (p === 5) continue;
-    var pt = tianpanMap[p] || '';
-    var pm2 = men[p] || '';
-    var ph2 = shen[p] || '';
+    let pt = tianpanMap[p] || '';
+    let pm2 = men[p] || '';
+    let ph2 = shen[p] || '';
     if (!pt || !pm2 || !ph2) continue;
     
     if (pt === '丙' && pm2 === '景' && ph2 === '九天') {
@@ -8018,13 +8018,13 @@ function getGeju(panData) {
  *   己日乙丑时, 庚日丙子时, 辛日丁酉时, 壬日戊申时, 癸日己未时
  */
 function getWuBuYu(dayGanIdx, hourGzIdx) {
-  var dayGan = dayGanIdx % 10;
-  var hourGan = hourGzIdx % 10;
-  var dayStem = STEMS[dayGan];
-  var hourStem = STEMS[hourGan];
+  let dayGan = dayGanIdx % 10;
+  let hourGan = hourGzIdx % 10;
+  let dayStem = STEMS[dayGan];
+  let hourStem = STEMS[hourGan];
   
   // 七杀: 甲→庚, 乙→辛, 丙→壬, 丁→癸, 戊→甲, 己→乙, 庚→丙, 辛→丁, 壬→戊, 癸→己
-  var qiSha = {'甲':'庚','乙':'辛','丙':'壬','丁':'癸','戊':'甲','己':'乙','庚':'丙','辛':'丁','壬':'戊','癸':'己'};
+  let qiSha = {'甲':'庚','乙':'辛','丙':'壬','丁':'癸','戊':'甲','己':'乙','庚':'丙','辛':'丁','壬':'戊','癸':'己'};
   
   if (qiSha[dayStem] === hourStem) {
     return {
@@ -8040,15 +8040,15 @@ function getWuBuYu(dayGanIdx, hourGzIdx) {
 // ─── 空亡 / 马星 ─────────────────────────────────────────────────
 
 function getKongWang(dayGzIdx) {
-  var xunKong = ['戌亥','申酉','午未','辰巳','寅卯','子丑'];
-  var xunIdx = Math.floor((dayGzIdx % 60) / 10);
-  var kongZhi = xunKong[xunIdx];
-  var kongGongMap = {'子':1,'丑':8,'寅':8,'卯':3,'辰':4,'巳':4,'午':9,'未':2,'申':2,'酉':7,'戌':6,'亥':6};
+  let xunKong = ['戌亥','申酉','午未','辰巳','寅卯','子丑'];
+  let xunIdx = Math.floor((dayGzIdx % 60) / 10);
+  let kongZhi = xunKong[xunIdx];
+  let kongGongMap = {'子':1,'丑':8,'寅':8,'卯':3,'辰':4,'巳':4,'午':9,'未':2,'申':2,'酉':7,'戌':6,'亥':6};
   return [kongGongMap[kongZhi[0]], kongGongMap[kongZhi[1]]];
 }
 
 function getMaXing(hourZhiIdx) {
-  var maMap = {0:8, 4:8, 8:8, 5:6, 9:6, 1:6, 2:2, 6:2, 10:2, 3:4, 7:4, 11:4};
+  let maMap = {0:8, 4:8, 8:8, 5:6, 9:6, 1:6, 2:2, 6:2, 10:2, 3:4, 7:4, 11:4};
   return maMap[hourZhiIdx] || 5;
 }
 
@@ -8068,53 +8068,53 @@ function qimenCalcV3(year, month, day, hour, juType) {
   juType = juType || 'auto';
   
   // 定遁局
-  var dunJu = getDunJu(year, month, day, hour, juType);
+  let dunJu = getDunJu(year, month, day, hour, juType);
   
   // 日干支
-  var dayGz = getDayGanZhi(year, month, day);
+  let dayGz = getDayGanZhi(year, month, day);
   
   // 时干支
-  var hourGz = getHourGanZhi(dayGz.gan, hour);
+  let hourGz = getHourGanZhi(dayGz.gan, hour);
   
   // 地盘
-  var dipan = arrangeDiPan(dunJu.dun, dunJu.ju);
+  let dipan = arrangeDiPan(dunJu.dun, dunJu.ju);
   
   // 天盘
-  var tianpan = arrangeTianPan(dipan, hourGz.idx, dunJu.ju, dunJu.dun);
+  let tianpan = arrangeTianPan(dipan, hourGz.idx, dunJu.ju, dunJu.dun);
   
   // 八门
-  var men = arrangeMen(dunJu.dun, dunJu.ju, hourGz.idx, dipan);
+  let men = arrangeMen(dunJu.dun, dunJu.ju, hourGz.idx, dipan);
   
   // 九星
-  var stars = arrangeStars(dunJu.dun, dunJu.ju, hourGz.idx, tianpan);
+  let stars = arrangeStars(dunJu.dun, dunJu.ju, hourGz.idx, tianpan);
   
   // 八神
-  var shen = arrangeShen(dunJu.dun, hourGz.idx, tianpan);
+  let shen = arrangeShen(dunJu.dun, hourGz.idx, tianpan);
   
   // 旬首六仪
-  var xunShou = Math.floor(hourGz.idx / 10) * 10;
-  var xunYi = XUN_YI[Math.floor(xunShou / 10) % 6];
+  let xunShou = Math.floor(hourGz.idx / 10) * 10;
+  let xunYi = XUN_YI[Math.floor(xunShou / 10) % 6];
   
   // 值符宫 (天盘旬首所在宫)
-  var zhiFuGong = 5;
-  for (var p = 1; p <= 9; p++) {
+  let zhiFuGong = 5;
+  for (let p = 1; p <= 9; p++) {
     if (tianpan[p] === xunYi) { zhiFuGong = p; break; }
   }
   
   // 值使门
-  var zhiShiMen = MEN_ORIG[zhiFuGong] || '休';
+  let zhiShiMen = MEN_ORIG[zhiFuGong] || '休';
   
   // 空亡
-  var kongWang = getKongWang(dayGz.idx);
+  let kongWang = getKongWang(dayGz.idx);
   
   // 马星
-  var maXing = getMaXing(hourGz.hourIdx);
+  let maXing = getMaXing(hourGz.hourIdx);
   
   // 五不遇时
-  var wuBuYu = getWuBuYu(dayGz.gan, hourGz.gan);
+  let wuBuYu = getWuBuYu(dayGz.gan, hourGz.gan);
   
   // 格局
-  var geju = getGeju({
+  let geju = getGeju({
     dipan: dipan, tianpan: tianpan, men: men, stars: stars, shen: shen
   });
   
@@ -8177,7 +8177,7 @@ function qimenCalcV3(year, month, day, hour, juType) {
 function analyzeQimenFull(panData) {
   if (!panData || !panData.dipan) return null;
   
-  var result = {
+  let result = {
     summary: '',
     gejuText: '',
     luck: '平',
@@ -8186,13 +8186,13 @@ function analyzeQimenFull(panData) {
   };
   
   // 格局
-  var geju = panData.geju || getGeju(panData);
-  var jiGe = geju.filter(function(g) { return g.type === '吉'; });
-  var xiongGe = geju.filter(function(g) { return g.type === '凶'; });
-  var pingGe = geju.filter(function(g) { return g.type === '平'; });
+  let geju = panData.geju || getGeju(panData);
+  let jiGe = geju.filter(function(g) { return g.type === '吉'; });
+  let xiongGe = geju.filter(function(g) { return g.type === '凶'; });
+  let pingGe = geju.filter(function(g) { return g.type === '平'; });
   
   // 格局文本
-  var gejuParts = [];
+  let gejuParts = [];
   if (jiGe.length > 0) gejuParts.push('吉格: ' + jiGe.map(function(g){return g.name;}).join('、'));
   if (xiongGe.length > 0) gejuParts.push('凶格: ' + xiongGe.map(function(g){return g.name;}).join('、'));
   if (pingGe.length > 0) gejuParts.push('平格: ' + pingGe.map(function(g){return g.name;}).join('、'));
@@ -8222,22 +8222,22 @@ function analyzeQimenFull(panData) {
   
   // 详细分析
   // 1. R1.7: 值符值使深度分析
-  var zhiFuGong = panData.zhiFuGong;
-  var zhiFuStar = panData.zhiFuStar;
-  var zhiShiMen = panData.zhiShiMen;
-  var zhiFuGongEle = GONG_WX[JIU_GONG_NAME[zhiFuGong]] || '土';
+  let zhiFuGong = panData.zhiFuGong;
+  let zhiFuStar = panData.zhiFuStar;
+  let zhiShiMen = panData.zhiShiMen;
+  let zhiFuGongEle = GONG_WX[JIU_GONG_NAME[zhiFuGong]] || '土';
   // 九星五行: 蓬=水 芮=土 冲=木 辅=木 禽=土 心=金 柱=金 任=土 英=火
-  var STAR_WX_MAP = {蓬:'水',芮:'土',冲:'木',辅:'木',禽:'土',心:'金',柱:'金',任:'土',英:'火'};
-  var zhiFuStarEle = STAR_WX_MAP[zhiFuStar] || '土';
+  let STAR_WX_MAP = {蓬:'水',芮:'土',冲:'木',辅:'木',禽:'土',心:'金',柱:'金',任:'土',英:'火'};
+  let zhiFuStarEle = STAR_WX_MAP[zhiFuStar] || '土';
   // 八门五行: 休=水 生=土 伤=木 杜=木 景=火 死=土 惊=金 开=金
-  var MEN_WX_MAP = {休:'水',生:'土',伤:'木',杜:'木',景:'火',死:'土',惊:'金',开:'金'};
-  var zhiShiMenEle = MEN_WX_MAP[zhiShiMen] || '土';
+  let MEN_WX_MAP = {休:'水',生:'土',伤:'木',杜:'木',景:'火',死:'土',惊:'金',开:'金'};
+  let zhiShiMenEle = MEN_WX_MAP[zhiShiMen] || '土';
   
   // 五行生克判断
   function judgeWXRelation2(a, b) {
     if (a === b) return '比和';
-    var shengMap = {木:'火',火:'土',土:'金',金:'水',水:'木'};
-    var keMap = {木:'土',土:'水',水:'火',火:'金',金:'木'};
+    let shengMap = {木:'火',火:'土',土:'金',金:'水',水:'木'};
+    let keMap = {木:'土',土:'水',水:'火',火:'金',金:'木'};
     if (shengMap[a] === b) return '我生';
     if (shengMap[b] === a) return '生我';
     if (keMap[a] === b) return '我克';
@@ -8246,8 +8246,8 @@ function analyzeQimenFull(panData) {
   }
   
   // 值符星旺衰（落宫五行生克）
-  var zhiFuWangShuai = '';
-  var zhiFuRelation = judgeWXRelation2(zhiFuStarEle, zhiFuGongEle);
+  let zhiFuWangShuai = '';
+  let zhiFuRelation = judgeWXRelation2(zhiFuStarEle, zhiFuGongEle);
   if (zhiFuRelation === '比和') { zhiFuWangShuai = '旺（星宫同气，力量充沛）'; }
   else if (zhiFuRelation === '生我') { zhiFuWangShuai = '相（宫生星，得地有力）'; }
   else if (zhiFuRelation === '我生') { zhiFuWangShuai = '休（星生宫，泄气减力）'; }
@@ -8255,10 +8255,10 @@ function analyzeQimenFull(panData) {
   else if (zhiFuRelation === '我克') { zhiFuWangShuai = '死（星克宫，不得地）'; }
   
   // 值使门吉凶（门宫关系）
-  var zhiShiMenJiXiong = '';
-  var zhiShiRelation = judgeWXRelation2(zhiShiMenEle, zhiFuGongEle);
-  var menJiMap = {休:'吉',生:'吉',开:'吉',伤:'凶',杜:'凶',景:'平',死:'凶',惊:'凶'};
-  var menJi = menJiMap[zhiShiMen] || '平';
+  let zhiShiMenJiXiong = '';
+  let zhiShiRelation = judgeWXRelation2(zhiShiMenEle, zhiFuGongEle);
+  let menJiMap = {休:'吉',生:'吉',开:'吉',伤:'凶',杜:'凶',景:'平',死:'凶',惊:'凶'};
+  let menJi = menJiMap[zhiShiMen] || '平';
   if (zhiShiRelation === '生我' || zhiShiRelation === '比和') {
     zhiShiMenJiXiong = menJi + '（门宫相生，力量增强）';
   } else if (zhiShiRelation === '克我') {
@@ -8270,16 +8270,16 @@ function analyzeQimenFull(panData) {
   }
   
   // 三奇六仪组合分析
-  var qiYiCombos = [];
-  for (var p2 = 1; p2 <= 9; p2++) {
+  let qiYiCombos = [];
+  for (let p2 = 1; p2 <= 9; p2++) {
     if (p2 === 5) continue;
-    var tp2 = panData.tianpan[p2] || '';
-    var dp2 = panData.dipan[p2] || '';
+    let tp2 = panData.tianpan[p2] || '';
+    let dp2 = panData.dipan[p2] || '';
     if (tp2 && dp2 && tp2 !== dp2) {
-      var combo = tp2 + '+' + dp2;
-      var comboText = '';
+      let combo = tp2 + '+' + dp2;
+      let comboText = '';
       // [舒晗课程校正] 三奇六仪组合分析 — 依据密训班02格局深度解析
-      var comboLib = {
+      let comboLib = {
         '乙+戊': {name:'青龙合会', type:'吉', text:'[舒晗密训] 日奇与戊土相会，谋事可成，利于合作求财。'},
         '乙+奇': {name:'日奇得使', type:'吉', text:'乙奇逢吉门，宜为祈福、求医、和解之事。'},
         '丙+戊': {name:'飞鸟跌穴', type:'吉', text:'[舒晗密训] 月奇逢戊，谋为吉事，出行求财大吉。为大吉格之一。'},
@@ -8311,14 +8311,14 @@ function analyzeQimenFull(panData) {
   }
   
   // 组装值符值使详情
-  var zfzsContent = '值符落<b>' + zhiFuGong + '宫</b>(' + (JIU_GONG_NAME[zhiFuGong]||'') + '宫) — <b>' + (STARS_FULL[zhiFuStar]||zhiFuStar) + '</b><br>';
+  let zfzsContent = '值符落<b>' + zhiFuGong + '宫</b>(' + (JIU_GONG_NAME[zhiFuGong]||'') + '宫) — <b>' + (STARS_FULL[zhiFuStar]||zhiFuStar) + '</b><br>';
   zfzsContent += '值符星五行<b>' + zhiFuStarEle + '</b>，落宫五行<b>' + zhiFuGongEle + '</b>，' + zhiFuRelation + '→旺衰：<b>' + zhiFuWangShuai + '</b><br>';
   zfzsContent += '值使：<b>' + (MEN_FULL[zhiShiMen]||zhiShiMen) + '</b>门，五行<b>' + zhiShiMenEle + '</b>，门宫' + zhiShiRelation + '→吉凶：<b>' + zhiShiMenJiXiong + '</b>';
   if (qiYiCombos.length > 0) {
     zfzsContent += '<br><b>三奇六仪组合：</b>';
-    for (var qc = 0; qc < qiYiCombos.length; qc++) {
-      var c = qiYiCombos[qc];
-      var cColor = c.type === '吉' ? '#27ae60' : c.type === '凶' ? '#e74c3c' : '#f39c12';
+    for (let qc = 0; qc < qiYiCombos.length; qc++) {
+      let c = qiYiCombos[qc];
+      let cColor = c.type === '吉' ? '#27ae60' : c.type === '凶' ? '#e74c3c' : '#f39c12';
       zfzsContent += '<br><span style="color:' + cColor + '">' + c.gong + '宫 ' + c.combo + ' ' + c.name + '(' + c.type + ')：' + c.text + '</span>';
     }
   }
@@ -8328,36 +8328,36 @@ function analyzeQimenFull(panData) {
   });
   
   // 2. 天地盘
-  var dpParts = [];
-  for (var p = 1; p <= 9; p++) {
+  let dpParts = [];
+  for (let p = 1; p <= 9; p++) {
     if (p === 5) continue;
-    var dp = panData.dipan[p] || '';
-    var tp = panData.tianpan[p] || '';
+    let dp = panData.dipan[p] || '';
+    let tp = panData.tianpan[p] || '';
     dpParts.push(p + '宫(' + JIU_GONG_NAME[p] + '): 天' + tp + '地' + dp);
   }
   result.details.push({ label: '天地盘', content: dpParts.join('  ') });
   
   // 3. 八门
-  var menParts = [];
-  for (var p = 1; p <= 9; p++) {
+  let menParts = [];
+  for (let p = 1; p <= 9; p++) {
     if (p === 5) continue;
     if (panData.men[p]) menParts.push(p + '宫:' + MEN_FULL[panData.men[p]]);
   }
   result.details.push({ label: '八门', content: menParts.join('  ') });
   
   // 4. 九星
-  var starParts = [];
-  for (var p = 1; p <= 9; p++) {
+  let starParts = [];
+  for (let p = 1; p <= 9; p++) {
     if (panData.stars[p]) {
-      var sn = STARS_FULL[panData.stars[p]] || panData.stars[p];
+      let sn = STARS_FULL[panData.stars[p]] || panData.stars[p];
       starParts.push(p + '宫:' + sn);
     }
   }
   result.details.push({ label: '九星', content: starParts.join('  ') });
   
   // 5. 八神
-  var shenParts = [];
-  for (var p = 1; p <= 9; p++) {
+  let shenParts = [];
+  for (let p = 1; p <= 9; p++) {
     if (p === 5) continue;
     if (panData.shen[p]) shenParts.push(p + '宫:' + panData.shen[p]);
   }
@@ -8375,7 +8375,7 @@ function analyzeQimenFull(panData) {
   
   // 8. 格局详情
   if (geju.length > 0) {
-    var gejuDetail = geju.map(function(g) {
+    let gejuDetail = geju.map(function(g) {
       return '[' + (g.type === '吉' ? '✅' : g.type === '凶' ? '❌' : '➖') + g.name + '] ' + g.desc;
     }).join('\n');
     result.details.push({ label: '格局详情', content: gejuDetail });
@@ -8383,7 +8383,7 @@ function analyzeQimenFull(panData) {
   
   // 9. R3.6: 超神接气/置闰法分析
   try {
-    var chaoshenInfo = _analyzeChaoshenJieqi(panData);
+    let chaoshenInfo = _analyzeChaoshenJieqi(panData);
     if (chaoshenInfo) {
       result.details.push({ label: '超神接气/定局法', content: chaoshenInfo });
     }
@@ -8391,7 +8391,7 @@ function analyzeQimenFull(panData) {
   
   // 10. R3.7: 用神多维度选取
   try {
-    var multiYongshen = _analyzeMultiYongshen(panData);
+    let multiYongshen = _analyzeMultiYongshen(panData);
     if (multiYongshen) {
       result.details.push({ label: '用神多维度分析', content: multiYongshen });
     }
@@ -8416,12 +8416,12 @@ function _analyzeChaoshenJieqi(panData) {
   try {
     if (!panData || !panData.jieqi) return null;
     
-    var jieqi = panData.jieqi;
-    var juName = panData.juName || '';
-    var yuan = panData.yuan || '';
+    let jieqi = panData.jieqi;
+    let juName = panData.juName || '';
+    let yuan = panData.yuan || '';
     
     // 超神接气说明
-    var parts = [];
+    let parts = [];
     parts.push('【超神接气说明】');
     parts.push('奇门定局以节气为准，但日干支与节气不完全同步，产生“超神”与“接气”两种情况：');
     parts.push('• 超神：节气未到而遁局先到（日干支在节气前），为超神，主事提前发动。');
@@ -8494,22 +8494,22 @@ function _analyzeMultiYongshen(panData) {
   try {
     if (!panData || !panData.dipan || !panData.tianpan) return null;
     
-    var parts = [];
+    let parts = [];
     
     // 九宫五行映射（宫位→五行）
-    var GONG_WX_MAP = {1:'水',2:'土',3:'木',4:'木',6:'金',7:'金',8:'土',9:'火'};
+    let GONG_WX_MAP = {1:'水',2:'土',3:'木',4:'木',6:'金',7:'金',8:'土',9:'火'};
     // 九宫方位
-    var GONG_FW_MAP = {1:'北方',2:'西南',3:'东方',4:'东南',6:'西北',7:'西方',8:'东北',9:'南方'};
+    let GONG_FW_MAP = {1:'北方',2:'西南',3:'东方',4:'东南',6:'西北',7:'西方',8:'东北',9:'南方'};
     
     // 天干落宫查找函数：在天地盘中找到该天干所在宫位
     function findStemGong(stem) {
       // 先查天盘
-      for (var p = 1; p <= 9; p++) {
+      for (let p = 1; p <= 9; p++) {
         if (p === 5) continue;
         if (panData.tianpan && panData.tianpan[p] === stem) return p;
       }
       // 再查地盘
-      for (var p2 = 1; p2 <= 9; p2++) {
+      for (let p2 = 1; p2 <= 9; p2++) {
         if (p2 === 5) continue;
         if (panData.dipan && panData.dipan[p2] === stem) return p2;
       }
@@ -8519,21 +8519,21 @@ function _analyzeMultiYongshen(panData) {
     // 获取宫位完整信息
     function getGongInfo(gong) {
       if (gong < 1 || gong > 9 || gong === 5) return null;
-      var wx = GONG_WX_MAP[gong] || '土';
-      var fw = GONG_FW_MAP[gong] || '';
-      var tp = (panData.tianpan && panData.tianpan[gong]) || '';
-      var dp = (panData.dipan && panData.dipan[gong]) || '';
-      var men = (panData.men && panData.men[gong]) || '';
-      var star = (panData.stars && panData.stars[gong]) || '';
-      var shen = (panData.shen && panData.shen[gong]) || '';
+      let wx = GONG_WX_MAP[gong] || '土';
+      let fw = GONG_FW_MAP[gong] || '';
+      let tp = (panData.tianpan && panData.tianpan[gong]) || '';
+      let dp = (panData.dipan && panData.dipan[gong]) || '';
+      let men = (panData.men && panData.men[gong]) || '';
+      let star = (panData.stars && panData.stars[gong]) || '';
+      let shen = (panData.shen && panData.shen[gong]) || '';
       return { gong: gong, wx: wx, fw: fw, tianpan: tp, dipan: dp, men: men, star: star, shen: shen };
     }
     
     // 五行生克判断
     function wxRelation(a, b) {
       if (a === b) return '比和';
-      var shengMap = {金:'水',水:'木',木:'火',火:'土',土:'金'};
-      var keMap = {金:'木',木:'土',土:'水',水:'火',火:'金'};
+      let shengMap = {金:'水',水:'木',木:'火',火:'土',土:'金'};
+      let keMap = {金:'木',木:'土',土:'水',水:'火',火:'金'};
       if (shengMap[a] === b) return '我生';
       if (shengMap[b] === a) return '生我';
       if (keMap[a] === b) return '我克';
@@ -8542,20 +8542,20 @@ function _analyzeMultiYongshen(panData) {
     }
     
     // 1. 日干落宫（命主自身）
-    var dayGan = panData.dayGanName ? panData.dayGanName.charAt(0) : '';
-    var riGong = -1;
+    let dayGan = panData.dayGanName ? panData.dayGanName.charAt(0) : '';
+    let riGong = -1;
     if (dayGan) {
       riGong = findStemGong(dayGan);
     }
     parts.push('【日干落宫·命主自身】');
     if (riGong > 0) {
-      var riInfo = getGongInfo(riGong);
+      let riInfo = getGongInfo(riGong);
       parts.push('日干' + dayGan + '落' + riGong + '宫（' + riInfo.fw + '，五行' + riInfo.wx + '）');
       parts.push('天盘仪：' + riInfo.tianpan + ' | 地盘仪：' + riInfo.dipan);
       parts.push('八门：' + (riInfo.men || '无') + ' | 九星：' + (riInfo.star || '无') + ' | 八神：' + (riInfo.shen || '无'));
       // 命主落宫五行旺衰判断
-      var riGanWX = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'}[dayGan] || '土';
-      var riRel = wxRelation(riGanWX, riInfo.wx);
+      let riGanWX = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'}[dayGan] || '土';
+      let riRel = wxRelation(riGanWX, riInfo.wx);
       if (riRel === '比和') parts.push('命主与落宫比和→自身状态平稳，得地有力。');
       else if (riRel === '生我') parts.push('宫生命主（' + riInfo.wx + '生' + riGanWX + '）→环境有利，自身得助。');
       else if (riRel === '我生') parts.push('命主生宫（' + riGanWX + '生' + riInfo.wx + '）→精力外泄，付出较多。');
@@ -8567,19 +8567,19 @@ function _analyzeMultiYongshen(panData) {
     parts.push('');
     
     // 2. 时干落宫（事体本身）
-    var hourGan = panData.hourGanZhi ? panData.hourGanZhi.charAt(0) : '';
-    var shiGong = -1;
+    let hourGan = panData.hourGanZhi ? panData.hourGanZhi.charAt(0) : '';
+    let shiGong = -1;
     if (hourGan) {
       shiGong = findStemGong(hourGan);
     }
     parts.push('【时干落宫·事体本身】');
     if (shiGong > 0) {
-      var shiInfo = getGongInfo(shiGong);
+      let shiInfo = getGongInfo(shiGong);
       parts.push('时干' + hourGan + '落' + shiGong + '宫（' + shiInfo.fw + '，五行' + shiInfo.wx + '）');
       parts.push('天盘仪：' + shiInfo.tianpan + ' | 地盘仪：' + shiInfo.dipan);
       parts.push('八门：' + (shiInfo.men || '无') + ' | 九星：' + (shiInfo.star || '无') + ' | 八神：' + (shiInfo.shen || '无'));
-      var shiGanWX = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'}[hourGan] || '土';
-      var shiRel = wxRelation(shiGanWX, shiInfo.wx);
+      let shiGanWX = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'}[hourGan] || '土';
+      let shiRel = wxRelation(shiGanWX, shiInfo.wx);
       if (shiRel === '比和') parts.push('事体与落宫比和→事情发展平稳，无大碍。');
       else if (shiRel === '生我') parts.push('宫生事体（' + shiInfo.wx + '生' + shiGanWX + '）→外部条件有利，事易成。');
       else if (shiRel === '我生') parts.push('事体生宫（' + shiGanWX + '生' + shiInfo.wx + '）→事情消耗资源，需投入。');
@@ -8592,9 +8592,9 @@ function _analyzeMultiYongshen(panData) {
     
     // 3. 日干与时干落宫关系（命主与事体）
     if (riGong > 0 && shiGong > 0) {
-      var riInfo2 = getGongInfo(riGong);
-      var shiInfo2 = getGongInfo(shiGong);
-      var gongRel = wxRelation(riInfo2.wx, shiInfo2.wx);
+      let riInfo2 = getGongInfo(riGong);
+      let shiInfo2 = getGongInfo(shiGong);
+      let gongRel = wxRelation(riInfo2.wx, shiInfo2.wx);
       parts.push('【命主与事体关系】');
       parts.push('日干宫（' + riInfo2.wx + '）与时干宫（' + shiInfo2.wx + '）：' + gongRel);
       if (gongRel === '比和') parts.push('命主与事体比和→谋事顺利，内外一致。');
@@ -8609,7 +8609,7 @@ function _analyzeMultiYongshen(panData) {
     // 舒晗用神五层法：年命用神（根本）→事体用神（核心）→时间用神（引动）→主客动静→四害判断
     parts.push('[舒晗课程校正] 【不同事项取用原则·用神五层法】');
     parts.push('用神选取口诀：日元定本性，值符藏内心，落宫看环境，星神细推寻，最后取用神，万事可分明');
-    var matterGuide = [
+    let matterGuide = [
       // [舒晗课程校正] 财运：正财看戊土+生门，偏财看丁奇+伤门/杜门
       { matter: '求财（正财）', yongshen: '生门', desc: '[舒晗密训] 生门主利润，戊为正财（工资/主业），庚为偏财/银行。生门落宫吉则财源广进，凶则破财。兼看日干与生门宫五行生克。' },
       { matter: '求财（偏财）', yongshen: '丁奇', desc: '[舒晗密训] 偏财（投资/副业）看丁奇、伤门/杜门与日干关系。偏财落宫与日干宫相生则得财，相克则破财。' },
@@ -8629,11 +8629,11 @@ function _analyzeMultiYongshen(panData) {
       { matter: '求子', yongshen: '天芮', desc: '天芮亦为孕妇用神，落宫吉则母子平安，凶则需保胎。兼看六合（子息宫）。' },
       { matter: '搬家', yongshen: '开门', desc: '开门为新居用神，落宫吉则新居风水好，凶则不宜搬迁。兼看日干与开门宫关系。' },
     ];
-    for (var mi = 0; mi < matterGuide.length; mi++) {
-      var mg = matterGuide[mi];
+    for (let mi = 0; mi < matterGuide.length; mi++) {
+      let mg = matterGuide[mi];
       // 查找该用神所在宫位
-      var ysGong = -1;
-      for (var p3 = 1; p3 <= 9; p3++) {
+      let ysGong = -1;
+      for (let p3 = 1; p3 <= 9; p3++) {
         if (p3 === 5) continue;
         if (mg.yongshen === '生门' && panData.men && panData.men[p3] === '生') ysGong = p3;
         if (mg.yongshen === '开门' && panData.men && panData.men[p3] === '开') ysGong = p3;
@@ -8644,7 +8644,7 @@ function _analyzeMultiYongshen(panData) {
         if (mg.yongshen === '天芮' && panData.stars && panData.stars[p3] === '芮') ysGong = p3;
         if (mg.yongshen === '驿马' && panData.maXing === p3) ysGong = p3;
       }
-      var ysInfo = ysGong > 0 ? getGongInfo(ysGong) : null;
+      let ysInfo = ysGong > 0 ? getGongInfo(ysGong) : null;
       parts.push('• ' + mg.matter + '→看' + mg.yongshen + (ysInfo ? '（落' + ysGong + '宫，' + ysInfo.fw + '，' + ysInfo.wx + '）' : '（未落宫）') + '：' + mg.desc);
     }
     
@@ -9599,9 +9599,9 @@ function analyzeEachGong(panData) {
 
   // 查找某宫的四化
   function getGongSihua(gongIdx) {
-    var results = [];
-    for (var i = 0; i < sihuaPalaces.length; i++) {
-      var sp = sihuaPalaces[i];
+    let results = [];
+    for (let i = 0; i < sihuaPalaces.length; i++) {
+      let sp = sihuaPalaces[i];
       if (sp.pos === gongIdx || sp.gongIdx === gongIdx) {
         results.push(sp);
       }
@@ -9609,50 +9609,50 @@ function analyzeEachGong(panData) {
     return results;
   }
 
-  var results = [];
-  for (var gi = 0; gi < 12; gi++) {
-    var gongIdx = mod(mingPos + gi, 12);
-    var gongName = gongOrder[gi];
-    var gongStars = stars[gongIdx] || [];
-    var aspect = gongAspects[gongName];
+  let results = [];
+  for (let gi = 0; gi < 12; gi++) {
+    let gongIdx = mod(mingPos + gi, 12);
+    let gongName = gongOrder[gi];
+    let gongStars = stars[gongIdx] || [];
+    let aspect = gongAspects[gongName];
 
     // 分类星曜：主星/辅星/煞星
-    var mainStars = [];
-    var auxStars = [];
-    var shaStars = [];
-    for (var si = 0; si < gongStars.length; si++) {
-      var sn = gongStars[si];
+    let mainStars = [];
+    let auxStars = [];
+    let shaStars = [];
+    for (let si = 0; si < gongStars.length; si++) {
+      let sn = gongStars[si];
       if (starCombos[sn]) mainStars.push(sn);
       else if (shaEffects[sn]) shaStars.push(sn);
       else auxStars.push(sn);
     }
 
     // 庙旺平陷
-    var starStrengths = mainStars.map(function(s) {
-      var table = STAR_STRENGTH[s];
+    let starStrengths = mainStars.map(function(s) {
+      let table = STAR_STRENGTH[s];
       if (!table) return {star:s, strength:1, label:'平'};
-      var v = table[gongIdx];
+      let v = table[gongIdx];
       return {star:s, strength:v, label: STRENGTH_LABELS[v] || '平'};
     });
 
     // 四化
-    var gongSihua = getGongSihua(gongIdx);
+    let gongSihua = getGongSihua(gongIdx);
 
     // 对宫星曜
-    var oppIdx = mod(gongIdx + 6, 12);
-    var oppStars = stars[oppIdx] || [];
+    let oppIdx = mod(gongIdx + 6, 12);
+    let oppStars = stars[oppIdx] || [];
 
     // 组合分析文案
-    var comboText = '';
+    let comboText = '';
     if (mainStars.length === 0) {
       comboText = '本宫无主星，' + (oppStars.length > 0 ? '借对宫(' + gongOrder[(gi+6)%12] + ')' + oppStars.join('、') + '论命。性格多变，受环境影响大。' : '性格空灵，需结合大限流年判断。');
     } else {
-      for (var mi = 0; mi < mainStars.length; mi++) {
-        var ms = mainStars[mi];
-        var combo = starCombos[ms];
+      for (let mi = 0; mi < mainStars.length; mi++) {
+        let ms = mainStars[mi];
+        let combo = starCombos[ms];
         if (combo) {
-          var strengthInfo = starStrengths[mi] || {};
-          var strengthLabel = strengthInfo.label || '平';
+          let strengthInfo = starStrengths[mi] || {};
+          let strengthLabel = strengthInfo.label || '平';
           comboText += ms + '(' + strengthLabel + ')：' + combo.nature + '。' + combo.traits + ' ';
           if (strengthLabel === '庙' || strengthLabel === '旺') {
             comboText += '星曜入' + strengthLabel + '，正面特质充分发挥。 ';
@@ -9663,8 +9663,8 @@ function analyzeEachGong(panData) {
       }
       // 双星组合特论
       if (mainStars.length >= 2) {
-        var pair = mainStars.slice(0, 2).join('+');
-        var pairText = {
+        let pair = mainStars.slice(0, 2).join('+');
+        let pairText = {
           '紫微+天府': '紫府同宫，尊贵财库双全，极格之命，但易孤高。',
           '紫微+贪狼': '紫贪同宫，欲望与权势并重，桃花旺，需克制。',
           '紫微+天相': '紫相同宫，权印相随，适合管理职，稳重有余魄力不足。',
@@ -9690,10 +9690,10 @@ function analyzeEachGong(panData) {
     }
 
     // 煞星影响
-    var shaText = '';
+    let shaText = '';
     if (shaStars.length > 0) {
-      for (var ssi = 0; ssi < shaStars.length; ssi++) {
-        var sn2 = shaStars[ssi];
+      for (let ssi = 0; ssi < shaStars.length; ssi++) {
+        let sn2 = shaStars[ssi];
         if (shaEffects[sn2]) {
           shaText += sn2 + '：' + shaEffects[sn2] + ' ';
         }
@@ -9701,12 +9701,12 @@ function analyzeEachGong(panData) {
     }
 
     // 四化影响
-    var sihuaText = '';
+    let sihuaText = '';
     if (gongSihua.length > 0) {
-      for (var ssi2 = 0; ssi2 < gongSihua.length; ssi2++) {
-        var sp2 = gongSihua[ssi2];
-        var spType = sp2.type || sp2.sihua || '';
-        var spStar = sp2.star || '';
+      for (let ssi2 = 0; ssi2 < gongSihua.length; ssi2++) {
+        let sp2 = gongSihua[ssi2];
+        let spType = sp2.type || sp2.sihua || '';
+        let spStar = sp2.star || '';
         if (sihuaEffects[spType]) {
           sihuaText += spType + '(' + spStar + ')：' + sihuaEffects[spType] + ' ';
         }
@@ -9741,37 +9741,37 @@ function analyzeEachGong(panData) {
  * 每步大限含主星组合+大限四化+与本命互动+十年运势概述
  */
 function analyzeDayunDetail(panData) {
-  var dayunList = panData.dayun || [];
-  var stars = panData.stars || [];
-  var mingPos = panData.gongMap['命宫'];
-  var yearGan = panData.yearGan;
-  var yearGanIdx = STEMS.indexOf(yearGan);
-  var sihuaTable = SIHUA_TABLE[yearGan] || {};
+  let dayunList = panData.dayun || [];
+  let stars = panData.stars || [];
+  let mingPos = panData.gongMap['命宫'];
+  let yearGan = panData.yearGan;
+  let yearGanIdx = STEMS.indexOf(yearGan);
+  let sihuaTable = SIHUA_TABLE[yearGan] || {};
   
-  var results = [];
-  for (var di = 0; di < dayunList.length; di++) {
-    var d = dayunList[di];
-    var dPos = d.pos;
-    var dStars = stars[dPos] || [];
-    var oppPos = mod(dPos + 6, 12);
-    var oppStars = stars[oppPos] || [];
-    var caiweiPos = mod(dPos + 4, 12);
-    var guanluPos = mod(dPos + 5, 12);
-    var sanfangStars = (stars[caiweiPos]||[]).concat(stars[guanluPos]||[]);
+  let results = [];
+  for (let di = 0; di < dayunList.length; di++) {
+    let d = dayunList[di];
+    let dPos = d.pos;
+    let dStars = stars[dPos] || [];
+    let oppPos = mod(dPos + 6, 12);
+    let oppStars = stars[oppPos] || [];
+    let caiweiPos = mod(dPos + 4, 12);
+    let guanluPos = mod(dPos + 5, 12);
+    let sanfangStars = (stars[caiweiPos]||[]).concat(stars[guanluPos]||[]);
     
     // 大限宫位天干（五虎遁）
-    var dGanIdx = mod(yearGanIdx >= 0 ? (WUHU_START[yearGanIdx] + dPos - 2) : 0, 10);
-    var dGan = STEMS[dGanIdx];
+    let dGanIdx = mod(yearGanIdx >= 0 ? (WUHU_START[yearGanIdx] + dPos - 2) : 0, 10);
+    let dGan = STEMS[dGanIdx];
     
     // 大限四化
-    var dSihuaTable = SIHUA_TABLE[dGan] || {};
-    var dSihuaPalaces = [];
-    for (var sk in dSihuaTable) {
+    let dSihuaTable = SIHUA_TABLE[dGan] || {};
+    let dSihuaPalaces = [];
+    for (let sk in dSihuaTable) {
       if (!dSihuaTable.hasOwnProperty(sk)) continue;
-      var sStar = dSihuaTable[sk];
+      let sStar = dSihuaTable[sk];
       // 找该星所在宫位
-      for (var sp = 0; sp < 12; sp++) {
-        var spStars = stars[sp] || [];
+      for (let sp = 0; sp < 12; sp++) {
+        let spStars = stars[sp] || [];
         if (spStars.indexOf(sStar) >= 0) {
           dSihuaPalaces.push({type: sk, star: sStar, gongIdx: sp, gongName: ZW_GONGS[mod(sp - mingPos + 12, 12)]});
           break;
@@ -9780,18 +9780,18 @@ function analyzeDayunDetail(panData) {
     }
     
     // 主星庙旺
-    var dStarStrengths = dStars.map(function(s) {
-      var table = STAR_STRENGTH[s];
+    let dStarStrengths = dStars.map(function(s) {
+      let table = STAR_STRENGTH[s];
       if (!table) return {star:s, label:'平'};
       return {star:s, label: STRENGTH_LABELS[table[dPos]] || '平'};
     });
     
     // 大限运势概述
-    var overview = '';
-    var hasJi = dSihuaPalaces.some(function(p) { return p.type === '化忌'; });
-    var hasLu = dSihuaPalaces.some(function(p) { return p.type === '化禄'; });
-    var hasQuan = dSihuaPalaces.some(function(p) { return p.type === '化权'; });
-    var hasKe = dSihuaPalaces.some(function(p) { return p.type === '化科'; });
+    let overview = '';
+    let hasJi = dSihuaPalaces.some(function(p) { return p.type === '化忌'; });
+    let hasLu = dSihuaPalaces.some(function(p) { return p.type === '化禄'; });
+    let hasQuan = dSihuaPalaces.some(function(p) { return p.type === '化权'; });
+    let hasKe = dSihuaPalaces.some(function(p) { return p.type === '化科'; });
     
     if (hasLu && !hasJi) {
       overview = '大限化禄入命三方，此十年财运亨通，事业有突破。';
@@ -9808,8 +9808,8 @@ function analyzeDayunDetail(panData) {
     }
     
     // 星曜组合简析
-    var starText = dStars.length > 0 ? dStars.join('、') : '无主星(借对宫' + (oppStars.join('、')||'空') + ')';
-    var strengthText = dStarStrengths.map(function(s) { return s.star + '(' + s.label + ')'; }).join('、');
+    let starText = dStars.length > 0 ? dStars.join('、') : '无主星(借对宫' + (oppStars.join('、')||'空') + ')';
+    let strengthText = dStarStrengths.map(function(s) { return s.star + '(' + s.label + ')'; }).join('、');
     
     results.push({
       gongName: d.gong,
@@ -9839,16 +9839,16 @@ function analyzeDayunDetail(panData) {
  * @returns {object} { sihuaDetails, sihuaInteractions, summary }
  */
 function analyzeSihuaDetail(panData) {
-  var sihuaPalaces = panData.sihuaPalaces || [];
-  var gongMap = panData.gongMap;
-  var stars = panData.stars || [];
-  var mingPos = gongMap['命宫'];
-  var yearGan = panData.yearGan;
-  var dayun = panData.dayun || [];
-  var currentDayun = panData.currentDayun;
+  let sihuaPalaces = panData.sihuaPalaces || [];
+  let gongMap = panData.gongMap;
+  let stars = panData.stars || [];
+  let mingPos = gongMap['命宫'];
+  let yearGan = panData.yearGan;
+  let dayun = panData.dayun || [];
+  let currentDayun = panData.currentDayun;
 
   // 四化落宫释义库
-  var sihuaMeanings = {
+  let sihuaMeanings = {
     '化禄': {
       '命宫': '自身有福气财运，天生带财库，做事顺遂，贵人多助',
       '兄弟': '兄弟姐妹缘深，朋友带来财运，合伙获利',
@@ -9908,28 +9908,28 @@ function analyzeSihuaDetail(panData) {
   };
 
   // 构建四化详情
-  var sihuaDetails = [];
-  var luPos = -1, quanPos = -1, kePos = -1, jiPos = -1;
-  for (var i = 0; i < sihuaPalaces.length; i++) {
-    var sp = sihuaPalaces[i];
-    var type = sp.type;
-    var star = sp.star;
-    var gongName = sp.gong;
-    var pos = sp.pos;
+  let sihuaDetails = [];
+  let luPos = -1, quanPos = -1, kePos = -1, jiPos = -1;
+  for (let i = 0; i < sihuaPalaces.length; i++) {
+    let sp = sihuaPalaces[i];
+    let type = sp.type;
+    let star = sp.star;
+    let gongName = sp.gong;
+    let pos = sp.pos;
 
     if (type === '化禄') luPos = pos;
     else if (type === '化权') quanPos = pos;
     else if (type === '化科') kePos = pos;
     else if (type === '化忌') jiPos = pos;
 
-    var meaning = sihuaMeanings[type] && sihuaMeanings[type][gongName] ? sihuaMeanings[type][gongName] : '该宫位受' + type + '影响，运势有所转变';
-    var advice = '';
+    let meaning = sihuaMeanings[type] && sihuaMeanings[type][gongName] ? sihuaMeanings[type][gongName] : '该宫位受' + type + '影响，运势有所转变';
+    let advice = '';
     if (type === '化禄') advice = '顺势而为，把握机缘，广结善缘';
     else if (type === '化权') advice = '勇于担当，发挥领导力，但需适度放权';
     else if (type === '化科') advice = '提升学识，经营名声，考试升职有利';
     else if (type === '化忌') advice = '保守为宜，化解执念，修身养性';
 
-    var color = type === '化禄' ? '#27ae60' : type === '化权' ? '#e74c3c' : type === '化科' ? '#c9a84c' : '#8e44ad';
+    let color = type === '化禄' ? '#27ae60' : type === '化权' ? '#e74c3c' : type === '化科' ? '#c9a84c' : '#8e44ad';
 
     sihuaDetails.push({
       type: type,
@@ -9944,13 +9944,13 @@ function analyzeSihuaDetail(panData) {
   }
 
   // 四化互动分析
-  var sihuaInteractions = [];
+  let sihuaInteractions = [];
 
   // 1. 禄忌冲：化禄与化忌在对宫
   if (luPos >= 0 && jiPos >= 0) {
     if (mod(luPos + 6, 12) === jiPos) {
-      var luGong = getGongNameByPos(luPos, gongMap);
-      var jiGong = getGongNameByPos(jiPos, gongMap);
+      let luGong = getGongNameByPos(luPos, gongMap);
+      let jiGong = getGongNameByPos(jiPos, gongMap);
       sihuaInteractions.push({
         name: '禄忌冲',
         desc: '化禄入' + luGong + '与化忌入' + jiGong + '在对宫对冲',
@@ -9963,7 +9963,7 @@ function analyzeSihuaDetail(panData) {
 
   // 2. 禄权交驰：化禄与化权在三方会照
   if (luPos >= 0 && quanPos >= 0) {
-    var diff1 = mod(quanPos - luPos, 12);
+    let diff1 = mod(quanPos - luPos, 12);
     if (diff1 === 4 || diff1 === 5 || diff1 === 7 || diff1 === 8 || diff1 === 6) {
       sihuaInteractions.push({
         name: '禄权交驰',
@@ -9976,18 +9976,18 @@ function analyzeSihuaDetail(panData) {
   }
 
   // 3. 科禄权三奇：三化同会
-  var sanhuiCount = 0;
-  var sanhuiGongs = [];
+  let sanhuiCount = 0;
+  let sanhuiGongs = [];
   if (luPos >= 0) { sanhuiCount++; sanhuiGongs.push(getGongNameByPos(luPos, gongMap)); }
   if (quanPos >= 0) { sanhuiCount++; sanhuiGongs.push(getGongNameByPos(quanPos, gongMap)); }
   if (kePos >= 0) { sanhuiCount++; sanhuiGongs.push(getGongNameByPos(kePos, gongMap)); }
   if (sanhuiCount >= 3) {
     // 检查是否在三方四正内会照
-    var allInSanfang = true;
-    var positions = [luPos, quanPos, kePos].filter(function(p) { return p >= 0; });
-    for (var pi = 0; pi < positions.length; pi++) {
-      for (var pj = pi + 1; pj < positions.length; pj++) {
- var d = mod(positions[pj] - positions[pi], 12);
+    let allInSanfang = true;
+    let positions = [luPos, quanPos, kePos].filter(function(p) { return p >= 0; });
+    for (let pi = 0; pi < positions.length; pi++) {
+      for (let pj = pi + 1; pj < positions.length; pj++) {
+ let d = mod(positions[pj] - positions[pi], 12);
         if (d !== 0 && d !== 4 && d !== 5 && d !== 6 && d !== 7 && d !== 8) {
           allInSanfang = false;
         }
@@ -10006,14 +10006,14 @@ function analyzeSihuaDetail(panData) {
 
   // 4. 双忌夹命：两个化忌夹命宫
   if (jiPos >= 0) {
-    var prevPos = mod(mingPos - 1, 12);
-    var nextPos = mod(mingPos + 1, 12);
+    let prevPos = mod(mingPos - 1, 12);
+    let nextPos = mod(mingPos + 1, 12);
     // 检查大限四化是否有另一个化忌
-    var hasDoubleJi = false;
+    let hasDoubleJi = false;
     if (currentDayun) {
-      var dGanIdx = STEMS.indexOf(yearGan);
+      let dGanIdx = STEMS.indexOf(yearGan);
       // 检查大限天干四化
-      for (var di = 0; di < dayun.length; di++) {
+      for (let di = 0; di < dayun.length; di++) {
         if (dayun[di].pos === prevPos || dayun[di].pos === nextPos) {
           // 简化检查：如果化忌在对宫相邻
         }
@@ -10025,9 +10025,9 @@ function analyzeSihuaDetail(panData) {
     }
     // 检查是否有大限化忌也在附近
     if (currentDayun && currentDayun.dGan) {
-      var dSihua = SIHUA_TABLE[currentDayun.dGan] || {};
+      let dSihua = SIHUA_TABLE[currentDayun.dGan] || {};
       if (dSihua.ji) {
-        for (var sp2 = 0; sp2 < 12; sp2++) {
+        for (let sp2 = 0; sp2 < 12; sp2++) {
           if ((stars[sp2] || []).indexOf(dSihua.ji) >= 0) {
             if ((sp2 === prevPos && jiPos === nextPos) || (sp2 === nextPos && jiPos === prevPos)) {
               hasDoubleJi = true;
@@ -10049,7 +10049,7 @@ function analyzeSihuaDetail(panData) {
 
   // 5. 禄忌同宫：化禄化忌同宫
   if (luPos >= 0 && jiPos >= 0 && luPos === jiPos) {
-    var sameGong = getGongNameByPos(luPos, gongMap);
+    let sameGong = getGongNameByPos(luPos, gongMap);
     sihuaInteractions.push({
       name: '禄忌同宫',
       desc: '化禄与化忌同入' + sameGong + '宫',
@@ -10060,21 +10060,21 @@ function analyzeSihuaDetail(panData) {
   }
 
   // 生年四化 vs 大限四化对比
-  var daxianCompare = null;
+  let daxianCompare = null;
   if (currentDayun) {
-    var dGanIdx2 = -1;
+    let dGanIdx2 = -1;
     // 计算大限天干
-    var yearGanIdx = STEMS.indexOf(yearGan);
+    let yearGanIdx = STEMS.indexOf(yearGan);
     if (yearGanIdx >= 0) {
       dGanIdx2 = mod(WUHU_START[yearGanIdx] + currentDayun.pos - 2, 10);
     }
-    var dGan2 = dGanIdx2 >= 0 ? STEMS[dGanIdx2] : '';
-    var dSihuaTable = SIHUA_TABLE[dGan2] || {};
-    var dSihuaPalaces = [];
-    for (var sk in dSihuaTable) {
+    let dGan2 = dGanIdx2 >= 0 ? STEMS[dGanIdx2] : '';
+    let dSihuaTable = SIHUA_TABLE[dGan2] || {};
+    let dSihuaPalaces = [];
+    for (let sk in dSihuaTable) {
       if (!dSihuaTable.hasOwnProperty(sk)) continue;
-      var sStar = dSihuaTable[sk];
-      for (var sp3 = 0; sp3 < 12; sp3++) {
+      let sStar = dSihuaTable[sk];
+      for (let sp3 = 0; sp3 < 12; sp3++) {
         if ((stars[sp3] || []).indexOf(sStar) >= 0) {
           dSihuaPalaces.push({ type: sk, star: sStar, gongIdx: sp3, gongName: getGongNameByPos(sp3, gongMap) });
           break;
@@ -10082,22 +10082,22 @@ function analyzeSihuaDetail(panData) {
       }
     }
 
-    var compareItems = [];
-    var types = ['lu', 'quan', 'ke', 'ji'];
-    var typeNames = { lu: '化禄', quan: '化权', ke: '化科', ji: '化忌' };
-    for (var ti = 0; ti < types.length; ti++) {
-      var tk = types[ti];
-      var sn = panData.sihua[tk];
-      var snD = dSihuaTable[tk];
-      var sPosN = -1, sPosD = -1;
-      for (var pp = 0; pp < 12; pp++) {
+    let compareItems = [];
+    let types = ['lu', 'quan', 'ke', 'ji'];
+    let typeNames = { lu: '化禄', quan: '化权', ke: '化科', ji: '化忌' };
+    for (let ti = 0; ti < types.length; ti++) {
+      let tk = types[ti];
+      let sn = panData.sihua[tk];
+      let snD = dSihuaTable[tk];
+      let sPosN = -1, sPosD = -1;
+      for (let pp = 0; pp < 12; pp++) {
         if ((stars[pp] || []).indexOf(sn) >= 0) sPosN = pp;
         if ((stars[pp] || []).indexOf(snD) >= 0) sPosD = pp;
       }
-      var nGong = sPosN >= 0 ? getGongNameByPos(sPosN, gongMap) : '未定位';
-      var dGongName = sPosD >= 0 ? getGongNameByPos(sPosD, gongMap) : '未定位';
-      var sameGong2 = sPosN === sPosD && sPosN >= 0;
-      var effect = '';
+      let nGong = sPosN >= 0 ? getGongNameByPos(sPosN, gongMap) : '未定位';
+      let dGongName = sPosD >= 0 ? getGongNameByPos(sPosD, gongMap) : '未定位';
+      let sameGong2 = sPosN === sPosD && sPosN >= 0;
+      let effect = '';
       if (tk === 'lu') effect = sameGong2 ? '财运叠加，大限更旺' : '大限财源转向' + dGongName;
       else if (tk === 'quan') effect = sameGong2 ? '权力叠加，掌控力大增' : '大限权力转向' + dGongName;
       else if (tk === 'ke') effect = sameGong2 ? '名声叠加，声誉更盛' : '大限名望转向' + dGongName;
@@ -10113,11 +10113,11 @@ function analyzeSihuaDetail(panData) {
   }
 
   // 总结
-  var hasJi = jiPos >= 0;
-  var hasLu = luPos >= 0;
-  var hasSanqi = sihuaInteractions.some(function(x) { return x.name.indexOf('三奇') >= 0; });
-  var hasLiji = sihuaInteractions.some(function(x) { return x.name === '禄忌冲' || x.name === '禄忌同宫'; });
-  var summary = '';
+  let hasJi = jiPos >= 0;
+  let hasLu = luPos >= 0;
+  let hasSanqi = sihuaInteractions.some(function(x) { return x.name.indexOf('三奇') >= 0; });
+  let hasLiji = sihuaInteractions.some(function(x) { return x.name === '禄忌冲' || x.name === '禄忌同宫'; });
+  let summary = '';
   if (hasSanqi) {
     summary = '命盘四化中科禄权三奇嘉会，为大吉之格，名利双收，富贵兼得。';
   } else if (hasJi && hasLiji) {
@@ -10149,42 +10149,42 @@ function analyzeSihuaDetail(panData) {
  * @returns {object} { liunianGong, liunianStars, liunianSihua, interaction, summary }
  */
 function analyzeLiunian(panData, currentYear) {
-  var gongMap = panData.gongMap;
-  var stars = panData.stars || [];
-  var mingPos = gongMap['命宫'];
-  var yearGan = panData.yearGan;
-  var yearGanIdx = STEMS.indexOf(yearGan);
-  var dayun = panData.dayun || [];
-  var currentDayun = panData.currentDayun;
+  let gongMap = panData.gongMap;
+  let stars = panData.stars || [];
+  let mingPos = gongMap['命宫'];
+  let yearGan = panData.yearGan;
+  let yearGanIdx = STEMS.indexOf(yearGan);
+  let dayun = panData.dayun || [];
+  let currentDayun = panData.currentDayun;
 
   // 1. 流年宫位定位：流年地支对应的宫位
-  var yearZhiIdx = mod(currentYear - 4, 12);
-  var yearZhi = BRANCHES[yearZhiIdx];
+  let yearZhiIdx = mod(currentYear - 4, 12);
+  let yearZhi = BRANCHES[yearZhiIdx];
   // 流年宫位 = 流年地支所在宫位
-  var liunianGongPos = yearZhiIdx;
+  let liunianGongPos = yearZhiIdx;
   // 流年宫名（以命宫为基准的宫位名）
-  var liunianGongName = getGongNameByPos(liunianGongPos, gongMap);
+  let liunianGongName = getGongNameByPos(liunianGongPos, gongMap);
 
   // 2. 流年天干四化排布
   // 流年天干 = (年份 - 4) % 10
-  var liunianGanIdx = mod(currentYear - 4, 10);
-  var liunianGan = STEMS[liunianGanIdx];
-  var liunianSihuaTable = SIHUA_TABLE[liunianGan] || {};
-  var liunianSihua = [];
-  var lSihuaPalaces = [];
-  for (var sk in liunianSihuaTable) {
+  let liunianGanIdx = mod(currentYear - 4, 10);
+  let liunianGan = STEMS[liunianGanIdx];
+  let liunianSihuaTable = SIHUA_TABLE[liunianGan] || {};
+  let liunianSihua = [];
+  let lSihuaPalaces = [];
+  for (let sk in liunianSihuaTable) {
     if (!liunianSihuaTable.hasOwnProperty(sk)) continue;
-    var sStar = liunianSihuaTable[sk];
-    var sPos = -1;
-    for (var sp = 0; sp < 12; sp++) {
+    let sStar = liunianSihuaTable[sk];
+    let sPos = -1;
+    for (let sp = 0; sp < 12; sp++) {
       if ((stars[sp] || []).indexOf(sStar) >= 0) {
         sPos = sp;
         break;
       }
     }
-    var sGongName = sPos >= 0 ? getGongNameByPos(sPos, gongMap) : '未定位';
-    var typeLabel = sk === 'lu' ? '化禄' : sk === 'quan' ? '化权' : sk === 'ke' ? '化科' : '化忌';
-    var color = sk === 'lu' ? '#27ae60' : sk === 'quan' ? '#e74c3c' : sk === 'ke' ? '#c9a84c' : '#8e44ad';
+    let sGongName = sPos >= 0 ? getGongNameByPos(sPos, gongMap) : '未定位';
+    let typeLabel = sk === 'lu' ? '化禄' : sk === 'quan' ? '化权' : sk === 'ke' ? '化科' : '化忌';
+    let color = sk === 'lu' ? '#27ae60' : sk === 'quan' ? '#e74c3c' : sk === 'ke' ? '#c9a84c' : '#8e44ad';
     liunianSihua.push({
       type: typeLabel,
       star: sStar,
@@ -10196,22 +10196,22 @@ function analyzeLiunian(panData, currentYear) {
   }
 
   // 3. 流年宫位主星组合
-  var liunianStars = stars[liunianGongPos] || [];
-  var oppPos = mod(liunianGongPos + 6, 12);
-  var oppStars = stars[oppPos] || [];
-  var sanfangPos1 = mod(liunianGongPos + 4, 12);
-  var sanfangPos2 = mod(liunianGongPos + 5, 12);
-  var sanfangStars = (stars[sanfangPos1] || []).concat(stars[sanfangPos2] || []);
+  let liunianStars = stars[liunianGongPos] || [];
+  let oppPos = mod(liunianGongPos + 6, 12);
+  let oppStars = stars[oppPos] || [];
+  let sanfangPos1 = mod(liunianGongPos + 4, 12);
+  let sanfangPos2 = mod(liunianGongPos + 5, 12);
+  let sanfangStars = (stars[sanfangPos1] || []).concat(stars[sanfangPos2] || []);
 
   // 主星庙旺
-  var liunianStrengths = liunianStars.map(function(s) {
-    var table = STAR_STRENGTH[s];
+  let liunianStrengths = liunianStars.map(function(s) {
+    let table = STAR_STRENGTH[s];
     if (!table) return { star: s, label: '平' };
     return { star: s, label: STRENGTH_LABELS[table[liunianGongPos]] || '平' };
   });
 
   // 4. 流年与大限/本命的互动
-  var interaction = {
+  let interaction = {
     liunianToMing: '',
     liunianToCaiwei: '',
     liunianToGuanlu: '',
@@ -10220,8 +10220,8 @@ function analyzeLiunian(panData, currentYear) {
   };
 
   // 流年宫位与命宫的关系（三方四正会照否）
-  var diffToMing = mod(liunianGongPos - mingPos, 12);
-  var isSanfang = (diffToMing === 0 || diffToMing === 4 || diffToMing === 5 || diffToMing === 6 || diffToMing === 7 || diffToMing === 8);
+  let diffToMing = mod(liunianGongPos - mingPos, 12);
+  let isSanfang = (diffToMing === 0 || diffToMing === 4 || diffToMing === 5 || diffToMing === 6 || diffToMing === 7 || diffToMing === 8);
   interaction.liunianSanfangToMing = isSanfang;
   if (diffToMing === 0) {
     interaction.liunianToMing = '流年宫位与命宫同宫，今年个人运势为核心，性格、健康、事业均受直接影响';
@@ -10236,14 +10236,14 @@ function analyzeLiunian(panData, currentYear) {
   }
 
   // 流年四化对命宫/财帛/官禄的影响
-  var caiweiPos = gongMap['财帛'];
-  var guanluPos = gongMap['官禄'];
-  var sihuaImpactOnMing = [];
-  var sihuaImpactOnCaiwei = [];
-  var sihuaImpactOnGuanlu = [];
+  let caiweiPos = gongMap['财帛'];
+  let guanluPos = gongMap['官禄'];
+  let sihuaImpactOnMing = [];
+  let sihuaImpactOnCaiwei = [];
+  let sihuaImpactOnGuanlu = [];
 
-  for (var si = 0; si < liunianSihua.length; si++) {
-    var lsh = liunianSihua[si];
+  for (let si = 0; si < liunianSihua.length; si++) {
+    let lsh = liunianSihua[si];
     if (lsh.gongIdx < 0) continue;
     if (lsh.gongIdx === mingPos) {
       sihuaImpactOnMing.push(lsh.type + '(' + lsh.star + ')入命宫');
@@ -10262,8 +10262,8 @@ function analyzeLiunian(panData, currentYear) {
 
   // 流年与大限互动
   if (currentDayun) {
-    var dyPos = currentDayun.pos;
-    var diffToDy = mod(liunianGongPos - dyPos, 12);
+    let dyPos = currentDayun.pos;
+    let diffToDy = mod(liunianGongPos - dyPos, 12);
     if (diffToDy === 0) {
       interaction.daxianInteract = '流年宫位与大限宫位重合，今年大限能量集中爆发，运势转折关键年';
     } else if (diffToDy === 6) {
@@ -10276,13 +10276,13 @@ function analyzeLiunian(panData, currentYear) {
   }
 
   // 总结
-  var hasLuInMing = sihuaImpactOnMing.some(function(s) { return s.indexOf('化禄') >= 0; });
-  var hasJiInMing = sihuaImpactOnMing.some(function(s) { return s.indexOf('化忌') >= 0; });
-  var hasLuInCai = sihuaImpactOnCaiwei.some(function(s) { return s.indexOf('化禄') >= 0; });
-  var hasJiInCai = sihuaImpactOnCaiwei.some(function(s) { return s.indexOf('化忌') >= 0; });
-  var hasQuanInGuan = sihuaImpactOnGuanlu.some(function(s) { return s.indexOf('化权') >= 0; });
+  let hasLuInMing = sihuaImpactOnMing.some(function(s) { return s.indexOf('化禄') >= 0; });
+  let hasJiInMing = sihuaImpactOnMing.some(function(s) { return s.indexOf('化忌') >= 0; });
+  let hasLuInCai = sihuaImpactOnCaiwei.some(function(s) { return s.indexOf('化禄') >= 0; });
+  let hasJiInCai = sihuaImpactOnCaiwei.some(function(s) { return s.indexOf('化忌') >= 0; });
+  let hasQuanInGuan = sihuaImpactOnGuanlu.some(function(s) { return s.indexOf('化权') >= 0; });
 
-  var summary = currentYear + '年(' + liunianGan + yearZhi + '年)流年宫位在' + liunianGongName + '(' + yearZhi + '宫)';
+  let summary = currentYear + '年(' + liunianGan + yearZhi + '年)流年宫位在' + liunianGongName + '(' + yearZhi + '宫)';
   if (liunianStars.length > 0) {
     summary += '，主星' + liunianStars.join('、');
   } else {
@@ -10363,43 +10363,43 @@ function generateAdvice(gejuResult, sihuaDetail, currentDayun, sanfang) {
  * @returns {Object} 小限分析结果
  */
 function analyzeXiaoxian(panData) {
-  var gongMap = panData.gongMap || {};
-  var stars = panData.stars || [];
-  var mingPos = gongMap['命宫'] != null ? gongMap['命宫'] : 0;
-  var sex = panData.sex || 'male';
-  var birthYear = panData.year || new Date().getFullYear();
-  var currentYear = new Date().getFullYear();
-  var age = currentYear - birthYear + 1; // 虚岁
+  let gongMap = panData.gongMap || {};
+  let stars = panData.stars || [];
+  let mingPos = gongMap['命宫'] != null ? gongMap['命宫'] : 0;
+  let sex = panData.sex || 'male';
+  let birthYear = panData.year || new Date().getFullYear();
+  let currentYear = new Date().getFullYear();
+  let age = currentYear - birthYear + 1; // 虚岁
 
   // 小限宫位定位：男命从命宫起1岁顺行，女命从命宫起1岁逆行
-  var xiaoxianOffset = age - 1;
-  var xiaoxianPos;
+  let xiaoxianOffset = age - 1;
+  let xiaoxianPos;
   if (sex === 'male') {
     xiaoxianPos = mod(mingPos + xiaoxianOffset, 12);
   } else {
     xiaoxianPos = mod(mingPos - xiaoxianOffset, 12);
   }
-  var xiaoxianGongName = getGongNameByPos(xiaoxianPos, gongMap);
-  var xiaoxianZhi = BRANCHES[xiaoxianPos];
+  let xiaoxianGongName = getGongNameByPos(xiaoxianPos, gongMap);
+  let xiaoxianZhi = BRANCHES[xiaoxianPos];
 
   // 当前年龄小限宫位主星组合
-  var xiaoxianStars = stars[xiaoxianPos] || [];
-  var oppPos = mod(xiaoxianPos + 6, 12);
-  var oppStars = stars[oppPos] || [];
-  var sanfangPos1 = mod(xiaoxianPos + 4, 12);
-  var sanfangPos2 = mod(xiaoxianPos + 5, 12);
-  var sanfangStars = (stars[sanfangPos1] || []).concat(stars[sanfangPos2] || []);
+  let xiaoxianStars = stars[xiaoxianPos] || [];
+  let oppPos = mod(xiaoxianPos + 6, 12);
+  let oppStars = stars[oppPos] || [];
+  let sanfangPos1 = mod(xiaoxianPos + 4, 12);
+  let sanfangPos2 = mod(xiaoxianPos + 5, 12);
+  let sanfangStars = (stars[sanfangPos1] || []).concat(stars[sanfangPos2] || []);
 
   // 主星庙旺
-  var xiaoxianStrengths = xiaoxianStars.map(function(s) {
-    var table = STAR_STRENGTH[s];
+  let xiaoxianStrengths = xiaoxianStars.map(function(s) {
+    let table = STAR_STRENGTH[s];
     if (!table) return { star: s, label: '平' };
     return { star: s, label: STRENGTH_LABELS[table[xiaoxianPos]] || '平' };
   });
 
   // 小限宫位与命宫三方四正关系
-  var diffToMing = mod(xiaoxianPos - mingPos, 12);
-  var sanfangRelation = '';
+  let diffToMing = mod(xiaoxianPos - mingPos, 12);
+  let sanfangRelation = '';
   if (diffToMing === 0) {
     sanfangRelation = '小限宫位与命宫同宫，今年个人内在状态为核心，性格、健康直接受影响';
   } else if (diffToMing === 6) {
@@ -10413,19 +10413,19 @@ function analyzeXiaoxian(panData) {
   }
 
   // 小限主星吉凶判断
-  var starAnalysis = '';
+  let starAnalysis = '';
   if (xiaoxianStars.length === 0) {
     starAnalysis = '小限宫位无主星，借对宫' + (oppStars.length > 0 ? oppStars.join('、') : '空宫') + '之力，性格多变动，需参考对宫星曜判断。';
   } else {
-    var hasZiwei = xiaoxianStars.indexOf('紫微') >= 0;
-    var hasTianfu = xiaoxianStars.indexOf('天府') >= 0;
-    var hasQisha = xiaoxianStars.indexOf('七杀') >= 0;
-    var hasPojun = xiaoxianStars.indexOf('破军') >= 0;
-    var hasTanlang = xiaoxianStars.indexOf('贪狼') >= 0;
-    var hasTaiyang = xiaoxianStars.indexOf('太阳') >= 0;
-    var hasTaiyin = xiaoxianStars.indexOf('太阴') >= 0;
-    var hasTianliang = xiaoxianStars.indexOf('天梁') >= 0;
-    var hasTianji = xiaoxianStars.indexOf('天机') >= 0;
+    let hasZiwei = xiaoxianStars.indexOf('紫微') >= 0;
+    let hasTianfu = xiaoxianStars.indexOf('天府') >= 0;
+    let hasQisha = xiaoxianStars.indexOf('七杀') >= 0;
+    let hasPojun = xiaoxianStars.indexOf('破军') >= 0;
+    let hasTanlang = xiaoxianStars.indexOf('贪狼') >= 0;
+    let hasTaiyang = xiaoxianStars.indexOf('太阳') >= 0;
+    let hasTaiyin = xiaoxianStars.indexOf('太阴') >= 0;
+    let hasTianliang = xiaoxianStars.indexOf('天梁') >= 0;
+    let hasTianji = xiaoxianStars.indexOf('天机') >= 0;
 
     if (hasZiwei) starAnalysis = '紫微坐小限，今年领导力增强，有贵人提携，但需防孤傲自大。';
     else if (hasTianfu) starAnalysis = '天府坐小限，今年理财能力佳，财运稳定，宜守不宜攻。';
@@ -10438,7 +10438,7 @@ function analyzeXiaoxian(panData) {
   }
 
   // 汇总
-  var summary = '虚岁' + age + '，小限在' + xiaoxianGongName + '(' + xiaoxianZhi + '宫)。';
+  let summary = '虚岁' + age + '，小限在' + xiaoxianGongName + '(' + xiaoxianZhi + '宫)。';
   if (xiaoxianStars.length > 0) {
     summary += '主星' + xiaoxianStars.join('、') + '。';
   } else {
@@ -10473,53 +10473,53 @@ function analyzeXiaoxian(panData) {
  * @returns {Object} 流月分析结果
  */
 function analyzeLiuyue(panData, currentMonth) {
-  var gongMap = panData.gongMap || {};
-  var stars = panData.stars || [];
-  var mingPos = gongMap['命宫'] != null ? gongMap['命宫'] : 0;
-  var currentYear = new Date().getFullYear();
+  let gongMap = panData.gongMap || {};
+  let stars = panData.stars || [];
+  let mingPos = gongMap['命宫'] != null ? gongMap['命宫'] : 0;
+  let currentYear = new Date().getFullYear();
 
   // 1. 流年地支宫位
-  var yearZhiIdx = mod(currentYear - 4, 12);
-  var yearZhi = BRANCHES[yearZhiIdx];
-  var liunianGanIdx = mod(currentYear - 4, 10);
-  var liunianGan = STEMS[liunianGanIdx];
+  let yearZhiIdx = mod(currentYear - 4, 12);
+  let yearZhi = BRANCHES[yearZhiIdx];
+  let liunianGanIdx = mod(currentYear - 4, 10);
+  let liunianGan = STEMS[liunianGanIdx];
 
   // 2. 流月宫位定位：以流年地支宫为正月(一月)，顺数到当前月
-  var monthOffset = currentMonth - 1;
-  var liuyuePos = mod(yearZhiIdx + monthOffset, 12);
-  var liuyueGongName = getGongNameByPos(liuyuePos, gongMap);
-  var liuyueZhi = BRANCHES[liuyuePos];
+  let monthOffset = currentMonth - 1;
+  let liuyuePos = mod(yearZhiIdx + monthOffset, 12);
+  let liuyueGongName = getGongNameByPos(liuyuePos, gongMap);
+  let liuyueZhi = BRANCHES[liuyuePos];
 
   // 3. 流月天干：五虎遁年起月法
   // 甲己之年丙作首，乙庚之岁戊为头，丙辛之岁庚为首，丁壬壬寅顺水流，戊癸甲寅好追求
-  var wuhuDun = {
+  let wuhuDun = {
     '甲': '丙', '己': '丙',
     '乙': '戊', '庚': '戊',
     '丙': '庚', '辛': '庚',
     '丁': '壬', '壬': '壬',
     '戊': '甲', '癸': '甲'
   };
-  var firstMonthGan = wuhuDun[liunianGan] || '丙';
-  var firstMonthGanIdx = STEMS.indexOf(firstMonthGan);
-  var liuyueGanIdx = mod(firstMonthGanIdx + monthOffset, 10);
-  var liuyueGan = STEMS[liuyueGanIdx];
+  let firstMonthGan = wuhuDun[liunianGan] || '丙';
+  let firstMonthGanIdx = STEMS.indexOf(firstMonthGan);
+  let liuyueGanIdx = mod(firstMonthGanIdx + monthOffset, 10);
+  let liuyueGan = STEMS[liuyueGanIdx];
 
   // 4. 流月天干四化
-  var liuyueSihuaTable = SIHUA_TABLE[liuyueGan] || {};
-  var liuyueSihua = [];
-  for (var sk in liuyueSihuaTable) {
+  let liuyueSihuaTable = SIHUA_TABLE[liuyueGan] || {};
+  let liuyueSihua = [];
+  for (let sk in liuyueSihuaTable) {
     if (!liuyueSihuaTable.hasOwnProperty(sk)) continue;
-    var sStar = liuyueSihuaTable[sk];
-    var sPos = -1;
-    for (var sp = 0; sp < 12; sp++) {
+    let sStar = liuyueSihuaTable[sk];
+    let sPos = -1;
+    for (let sp = 0; sp < 12; sp++) {
       if ((stars[sp] || []).indexOf(sStar) >= 0) {
         sPos = sp;
         break;
       }
     }
-    var sGongName = sPos >= 0 ? getGongNameByPos(sPos, gongMap) : '未定位';
-    var typeLabel = sk === 'lu' ? '化禄' : sk === 'quan' ? '化权' : sk === 'ke' ? '化科' : '化忌';
-    var color = sk === 'lu' ? '#27ae60' : sk === 'quan' ? '#e74c3c' : sk === 'ke' ? '#c9a84c' : '#8e44ad';
+    let sGongName = sPos >= 0 ? getGongNameByPos(sPos, gongMap) : '未定位';
+    let typeLabel = sk === 'lu' ? '化禄' : sk === 'quan' ? '化权' : sk === 'ke' ? '化科' : '化忌';
+    let color = sk === 'lu' ? '#27ae60' : sk === 'quan' ? '#e74c3c' : sk === 'ke' ? '#c9a84c' : '#8e44ad';
     liuyueSihua.push({
       type: typeLabel,
       star: sStar,
@@ -10530,23 +10530,23 @@ function analyzeLiuyue(panData, currentMonth) {
   }
 
   // 5. 流月宫位主星组合
-  var liuyueStars = stars[liuyuePos] || [];
-  var oppPos = mod(liuyuePos + 6, 12);
-  var oppStars = stars[oppPos] || [];
-  var sanfangPos1 = mod(liuyuePos + 4, 12);
-  var sanfangPos2 = mod(liuyuePos + 5, 12);
-  var sanfangStars = (stars[sanfangPos1] || []).concat(stars[sanfangPos2] || []);
+  let liuyueStars = stars[liuyuePos] || [];
+  let oppPos = mod(liuyuePos + 6, 12);
+  let oppStars = stars[oppPos] || [];
+  let sanfangPos1 = mod(liuyuePos + 4, 12);
+  let sanfangPos2 = mod(liuyuePos + 5, 12);
+  let sanfangStars = (stars[sanfangPos1] || []).concat(stars[sanfangPos2] || []);
 
   // 主星庙旺
-  var liuyueStrengths = liuyueStars.map(function(s) {
-    var table = STAR_STRENGTH[s];
+  let liuyueStrengths = liuyueStars.map(function(s) {
+    let table = STAR_STRENGTH[s];
     if (!table) return { star: s, label: '平' };
     return { star: s, label: STRENGTH_LABELS[table[liuyuePos]] || '平' };
   });
 
   // 流月宫位与命宫关系
-  var diffToMing = mod(liuyuePos - mingPos, 12);
-  var mingRelation = '';
+  let diffToMing = mod(liuyuePos - mingPos, 12);
+  let mingRelation = '';
   if (diffToMing === 0) {
     mingRelation = '流月宫位与命宫同宫，本月内在状态为核心，直接影响性格与健康';
   } else if (diffToMing === 6) {
@@ -10560,17 +10560,17 @@ function analyzeLiuyue(panData, currentMonth) {
   }
 
   // 流月四化影响
-  var sihuaImpact = [];
-  for (var si = 0; si < liuyueSihua.length; si++) {
-    var lsh = liuyueSihua[si];
+  let sihuaImpact = [];
+  for (let si = 0; si < liuyueSihua.length; si++) {
+    let lsh = liuyueSihua[si];
     if (lsh.gongIdx === mingPos) sihuaImpact.push(lsh.type + '(' + lsh.star + ')入命宫');
     if (lsh.gongIdx === gongMap['财帛']) sihuaImpact.push(lsh.type + '(' + lsh.star + ')入财帛宫');
     if (lsh.gongIdx === gongMap['官禄']) sihuaImpact.push(lsh.type + '(' + lsh.star + ')入官禄宫');
   }
-  var sihuaImpactStr = sihuaImpact.length > 0 ? sihuaImpact.join('、') : '无直接影响';
+  let sihuaImpactStr = sihuaImpact.length > 0 ? sihuaImpact.join('、') : '无直接影响';
 
   // 汇总
-  var summary = currentYear + '年' + currentMonth + '月(农历)，流月宫位在' + liuyueGongName + '(' + liuyueZhi + '宫)，流月天干' + liuyueGan + '。';
+  let summary = currentYear + '年' + currentMonth + '月(农历)，流月宫位在' + liuyueGongName + '(' + liuyueZhi + '宫)，流月天干' + liuyueGan + '。';
   if (liuyueStars.length > 0) {
     summary += '主星' + liuyueStars.join('、') + '。';
   } else {
@@ -10604,48 +10604,48 @@ function analyzeLiuyue(panData, currentMonth) {
  * @returns {object} 身宫分析结果
  */
 function analyzeShenGong(panData) {
-  var gongMap = panData.gongMap || {};
-  var stars = panData.stars || [];
-  var mingPos = gongMap['命宫'] != null ? gongMap['命宫'] : 0;
-  var shenIdx = panData.shenIdx != null ? panData.shenIdx : 0;
-  var sihuaPalaces = panData.sihuaPalaces || [];
+  let gongMap = panData.gongMap || {};
+  let stars = panData.stars || [];
+  let mingPos = gongMap['命宫'] != null ? gongMap['命宫'] : 0;
+  let shenIdx = panData.shenIdx != null ? panData.shenIdx : 0;
+  let sihuaPalaces = panData.sihuaPalaces || [];
 
   // 身宫落在哪个宫位
-  var shenGongName = '';
-  for (var name in gongMap) {
+  let shenGongName = '';
+  for (let name in gongMap) {
     if (gongMap[name] === shenIdx) { shenGongName = name; break; }
   }
   if (!shenGongName) shenGongName = BRANCHES[shenIdx] + '宫';
 
   // 身宫主星
-  var shenStars = stars[shenIdx] || [];
-  var shenMainStars = [];
-  var shenAuxStars = [];
-  var shenShaStars = [];
-  var mainStarSet = ['紫微','天机','太阳','武曲','天同','廉贞','天府','太阴','贪狼','巨门','天相','天梁','七杀','破军'];
-  var shaStarSet = ['擎羊','陀罗','火星','铃星','地空','地劫','天刑'];
-  for (var si = 0; si < shenStars.length; si++) {
-    var sn = shenStars[si];
+  let shenStars = stars[shenIdx] || [];
+  let shenMainStars = [];
+  let shenAuxStars = [];
+  let shenShaStars = [];
+  let mainStarSet = ['紫微','天机','太阳','武曲','天同','廉贞','天府','太阴','贪狼','巨门','天相','天梁','七杀','破军'];
+  let shaStarSet = ['擎羊','陀罗','火星','铃星','地空','地劫','天刑'];
+  for (let si = 0; si < shenStars.length; si++) {
+    let sn = shenStars[si];
     if (mainStarSet.indexOf(sn) >= 0) shenMainStars.push(sn);
     else if (shaStarSet.indexOf(sn) >= 0) shenShaStars.push(sn);
     else shenAuxStars.push(sn);
   }
 
   // 身宫主星庙旺
-  var shenStrengths = shenMainStars.map(function(s) {
-    var table = STAR_STRENGTH[s];
+  let shenStrengths = shenMainStars.map(function(s) {
+    let table = STAR_STRENGTH[s];
     if (!table) return { star: s, strength: 1, label: '平' };
     return { star: s, strength: table[shenIdx], label: STRENGTH_LABELS[table[shenIdx]] || '平' };
   });
 
   // 身宫与命宫的关系
-  var shenMingRelation = '';
-  var shenMingDetail = '';
+  let shenMingRelation = '';
+  let shenMingDetail = '';
   if (shenIdx === mingPos) {
     shenMingRelation = '身命同宫';
     shenMingDetail = '身宫与命宫同宫，先天与后天合一，性格表里如一，一生运势较为连贯，中年前后均有稳定的自我认知。为人言行一致，目标感强，不易受外界影响而改变方向。';
   } else {
-    var diff = mod(shenIdx - mingPos, 12);
+    let diff = mod(shenIdx - mingPos, 12);
     if (diff === 6) {
       shenMingRelation = '身宫在迁移宫(命宫对宫)';
       shenMingDetail = '身宫落在迁移宫，35岁后外出运势转佳。中年以后宜离乡发展，在外建立事业根基。外出遇贵人，社交圈扩大，人生舞台从本地拓展到外地。不喜固守一方，宜动不宜静。';
@@ -10654,7 +10654,7 @@ function analyzeShenGong(panData) {
       shenMingDetail = '身宫紧邻命宫，后天发展与先天格局相辅相成，中年后的转变较为温和渐进，不会出现剧烈的人生转向。';
     } else {
       // 找身宫对应的十二宫名
-      var relationMap = {
+      let relationMap = {
         '夫妻': '身宫在夫妻宫→婚后运势转佳，配偶为人生转折关键。35岁后婚姻质量直接影响整体运势，好的婚姻助力事业腾飞，差的婚姻则拖累各方面发展。宜慎重选择伴侣，婚后用心经营感情。',
         '财帛': '身宫在财帛宫→中年以后以财运为重。35岁后经济意识增强，理财能力提升，财富积累加速。一生财源重心在中晚年，宜提前布局投资理财，中年把握财富机遇。',
         '官禄': '身宫在官禄宫→中晚年以事业为重。35岁后事业心更强，职场发展加速，适合在35岁后集中精力拼搏事业。事业成就决定人生高度，宜在中年抓住升职创业良机。',
@@ -10673,14 +10673,14 @@ function analyzeShenGong(panData) {
   }
 
   // 身宫主星庙旺对中晚年运势的影响
-  var strengthAnalysis = '';
+  let strengthAnalysis = '';
   if (shenMainStars.length === 0) {
     strengthAnalysis = '身宫无主星，中晚年发展方向不明确，受环境影响大。宜借对宫星曜之力，培养适应能力，顺势而为。';
   } else {
-    for (var mi = 0; mi < shenMainStars.length; mi++) {
-      var ms = shenMainStars[mi];
-      var sInfo = shenStrengths[mi] || {};
-      var sLabel = sInfo.label || '平';
+    for (let mi = 0; mi < shenMainStars.length; mi++) {
+      let ms = shenMainStars[mi];
+      let sInfo = shenStrengths[mi] || {};
+      let sLabel = sInfo.label || '平';
       if (sLabel === '庙') {
         strengthAnalysis += ms + '入庙坐身宫，中晚年' + getStarLateEffect(ms, '庙') + ' ';
       } else if (sLabel === '旺') {
@@ -10694,9 +10694,9 @@ function analyzeShenGong(panData) {
   }
 
   // 煞星影响
-  var shaText = '';
+  let shaText = '';
   if (shenShaStars.length > 0) {
-    var shaLateEffects = {
+    let shaLateEffects = {
       '擎羊': '中晚年多刑伤阻碍，但冲劲尚在，宜冷静处事',
       '陀罗': '中晚年做事多拖延纠缠，需防暗中小人',
       '火星': '中晚年性急易冲动，宜修心养性',
@@ -10705,16 +10705,16 @@ function analyzeShenGong(panData) {
       '地劫': '中晚年意外破耗多，不宜投机',
       '天刑': '中晚年易有官非纠纷，宜守规矩'
     };
-    for (var ssi = 0; ssi < shenShaStars.length; ssi++) {
-      var sn2 = shenShaStars[ssi];
+    for (let ssi = 0; ssi < shenShaStars.length; ssi++) {
+      let sn2 = shenShaStars[ssi];
       if (shaLateEffects[sn2]) shaText += sn2 + '：' + shaLateEffects[sn2] + '。 ';
     }
   }
 
   // 四化影响
-  var sihuaText = '';
-  for (var spi = 0; spi < sihuaPalaces.length; spi++) {
-    var sp = sihuaPalaces[spi];
+  let sihuaText = '';
+  for (let spi = 0; spi < sihuaPalaces.length; spi++) {
+    let sp = sihuaPalaces[spi];
     if (sp.pos === shenIdx || sp.gongIdx === shenIdx) {
       if (sp.type === '化禄') sihuaText += '化禄(' + sp.star + ')入身宫：中晚年财源广进，运势顺遂。 ';
       else if (sp.type === '化权') sihuaText += '化权(' + sp.star + ')入身宫：中晚年权力上升，掌控力强。 ';
@@ -10724,7 +10724,7 @@ function analyzeShenGong(panData) {
   }
 
   // 总结
-  var summary = '身宫在' + shenGongName + '(' + BRANCHES[shenIdx] + '宫)。';
+  let summary = '身宫在' + shenGongName + '(' + BRANCHES[shenIdx] + '宫)。';
   summary += shenMingDetail;
   if (shenMainStars.length > 0) {
     summary += '身宫主星：' + shenMainStars.join('、') + '，' + shenStrengths.map(function(s) { return s.star + '(' + s.label + ')'; }).join('、') + '。';
@@ -10759,7 +10759,7 @@ function analyzeShenGong(panData) {
  * @returns {string} 影响描述
  */
 function getStarLateEffect(star, level) {
-  var effects = {
+  let effects = {
     '紫微': { '庙': '权威显赫，领导力充沛，事业大有成就', '旺': '稳重有为，管理能力佳，受人尊重', '平': '尚能发挥，需辅星助力方成大器', '陷': '孤高自许，怀才不遇，需防刚愎自用' },
     '天机': { '庙': '智谋超群，谋划有成，宜从事策略规划', '旺': '思维敏捷，善于理财投资', '平': '多思多虑，需防想多做少', '陷': '思虑过度，优柔寡断，易错失良机' },
     '太阳': { '庙': '光芒四射，事业有成，男性贵人多', '旺': '热情慷慨，事业心强，博爱无私', '平': '尚有热情，需防操劳过度', '陷': '劳碌奔波，付出多收获少，需量力而行' },
@@ -10787,14 +10787,14 @@ function getStarLateEffect(star, level) {
  * @returns {object} 星曜组合分析结果
  */
 function analyzeStarCombos(panData) {
-  var gongMap = panData.gongMap || {};
-  var stars = panData.stars || [];
-  var mingPos = gongMap['命宫'] != null ? gongMap['命宫'] : 0;
-  var sihuaPalaces = panData.sihuaPalaces || [];
-  var results = [];
+  let gongMap = panData.gongMap || {};
+  let stars = panData.stars || [];
+  let mingPos = gongMap['命宫'] != null ? gongMap['命宫'] : 0;
+  let sihuaPalaces = panData.sihuaPalaces || [];
+  let results = [];
 
   // 双星组合释义库（扩展版）
-  var dualStarCombos = {
+  let dualStarCombos = {
     '武曲+天府': {
       nature: '财库双全',
       jixiong: '吉',
@@ -10945,7 +10945,7 @@ function analyzeStarCombos(panData) {
   };
 
   // 主星+辅星/煞星组合释义库
-  var auxComboEffects = {
+  let auxComboEffects = {
     '紫微+左辅': '紫微得左辅辅助，如帝得相，领导力有助力，众人辅佐，成大业之格。',
     '紫微+右弼': '紫微得右弼辅助，如帝得谋士，暗中贵人相助，决策有智囊。',
     '紫微+左辅+右弼': '紫微得左辅右弼同宫或夹辅，为「辅弼拱主」之贵格，大富大贵之命。',
@@ -10990,21 +10990,21 @@ function analyzeStarCombos(panData) {
   };
 
   // 遍历十二宫，分析每宫的星曜组合
-  var gongOrder = ['命宫','兄弟','夫妻','子女','财帛','疾厄','迁移','交友','事业','田宅','福德','父母'];
-  var mainStarSet = ['紫微','天机','太阳','武曲','天同','廉贞','天府','太阴','贪狼','巨门','天相','天梁','七杀','破军'];
-  var auxStarSet = ['左辅','右弼','文昌','文曲','天魁','天钺'];
-  var shaStarSet = ['擎羊','陀罗','火星','铃星','地空','地劫','天刑'];
-  var sihuaStarSet = ['化禄','化权','化科','化忌'];
+  let gongOrder = ['命宫','兄弟','夫妻','子女','财帛','疾厄','迁移','交友','事业','田宅','福德','父母'];
+  let mainStarSet = ['紫微','天机','太阳','武曲','天同','廉贞','天府','太阴','贪狼','巨门','天相','天梁','七杀','破军'];
+  let auxStarSet = ['左辅','右弼','文昌','文曲','天魁','天钺'];
+  let shaStarSet = ['擎羊','陀罗','火星','铃星','地空','地劫','天刑'];
+  let sihuaStarSet = ['化禄','化权','化科','化忌'];
 
-  for (var gi = 0; gi < 12; gi++) {
-    var gongIdx = mod(mingPos + gi, 12);
-    var gongName = gongOrder[gi];
-    var gongStars = stars[gongIdx] || [];
+  for (let gi = 0; gi < 12; gi++) {
+    let gongIdx = mod(mingPos + gi, 12);
+    let gongName = gongOrder[gi];
+    let gongStars = stars[gongIdx] || [];
 
     // 分类星曜
-    var gMain = [], gAux = [], gSha = [], gSihua = [];
-    for (var si = 0; si < gongStars.length; si++) {
-      var sn = gongStars[si];
+    let gMain = [], gAux = [], gSha = [], gSihua = [];
+    for (let si = 0; si < gongStars.length; si++) {
+      let sn = gongStars[si];
       if (mainStarSet.indexOf(sn) >= 0) gMain.push(sn);
       else if (auxStarSet.indexOf(sn) >= 0) gAux.push(sn);
       else if (shaStarSet.indexOf(sn) >= 0) gSha.push(sn);
@@ -11012,20 +11012,20 @@ function analyzeStarCombos(panData) {
     }
 
     // 查找该宫四化
-    var gongSihua = [];
-    for (var spi = 0; spi < sihuaPalaces.length; spi++) {
-      var sp = sihuaPalaces[spi];
+    let gongSihua = [];
+    for (let spi = 0; spi < sihuaPalaces.length; spi++) {
+      let sp = sihuaPalaces[spi];
       if (sp.pos === gongIdx || sp.gongIdx === gongIdx) {
         gongSihua.push(sp.type + '(' + sp.star + ')');
       }
     }
 
-    var comboAnalysis = [];
+    let comboAnalysis = [];
 
     // 1. 双星组合分析
     if (gMain.length >= 2) {
-      var pairKey = gMain[0] + '+' + gMain[1];
-      var pair = dualStarCombos[pairKey];
+      let pairKey = gMain[0] + '+' + gMain[1];
+      let pair = dualStarCombos[pairKey];
       if (pair) {
         comboAnalysis.push({
           type: 'dual',
@@ -11053,8 +11053,8 @@ function analyzeStarCombos(panData) {
     // 2. 主星+辅星/煞星组合分析
     if (gMain.length > 0) {
       // 主星+辅星
-      for (var ai = 0; ai < gAux.length; ai++) {
-        var auxKey = gMain[0] + '+' + gAux[ai];
+      for (let ai = 0; ai < gAux.length; ai++) {
+        let auxKey = gMain[0] + '+' + gAux[ai];
         if (auxComboEffects[auxKey]) {
           comboAnalysis.push({
             type: 'aux',
@@ -11066,7 +11066,7 @@ function analyzeStarCombos(panData) {
       }
       // 左辅+右弼同时出现
       if (gAux.indexOf('左辅') >= 0 && gAux.indexOf('右弼') >= 0 && gMain.length > 0) {
-        var lbKey = gMain[0] + '+左辅+右弼';
+        let lbKey = gMain[0] + '+左辅+右弼';
         if (auxComboEffects[lbKey]) {
           comboAnalysis.push({
             type: 'aux',
@@ -11077,8 +11077,8 @@ function analyzeStarCombos(panData) {
         }
       }
       // 主星+煞星
-      for (var ssi = 0; ssi < gSha.length; ssi++) {
-        var shaKey = gMain[0] + '+' + gSha[ssi];
+      for (let ssi = 0; ssi < gSha.length; ssi++) {
+        let shaKey = gMain[0] + '+' + gSha[ssi];
         if (auxComboEffects[shaKey]) {
           comboAnalysis.push({
             type: 'sha',
@@ -11089,10 +11089,10 @@ function analyzeStarCombos(panData) {
         }
       }
       // 主星+化忌
-      for (var si2 = 0; si2 < gongSihua.length; si2++) {
-        var sh = gongSihua[si2];
+      for (let si2 = 0; si2 < gongSihua.length; si2++) {
+        let sh = gongSihua[si2];
         if (sh.indexOf('化忌') >= 0) {
-          var jiKey = gMain[0] + '+化忌';
+          let jiKey = gMain[0] + '+化忌';
           if (auxComboEffects[jiKey]) {
             comboAnalysis.push({
               type: 'sihua',
@@ -11116,7 +11116,7 @@ function analyzeStarCombos(panData) {
 
     // 3. 煞星组合（多煞同宫）
     if (gSha.length >= 2) {
-      var shaComboText = '';
+      let shaComboText = '';
       if (gSha.indexOf('擎羊') >= 0 && gSha.indexOf('陀罗') >= 0) {
         shaComboText = '擎羊陀罗同宫，刑伤加倍，阻碍重重，宜守规矩、忍辱负重。';
       } else if (gSha.indexOf('火星') >= 0 && gSha.indexOf('铃星') >= 0) {
@@ -11135,11 +11135,11 @@ function analyzeStarCombos(panData) {
     }
 
     // 4. 吉凶互参总结
-    var jiCount = comboAnalysis.filter(function(c) { return c.jixiong === '吉' || c.jixiong === '大吉' || c.jixiong === '中吉'; }).length;
-    var xiongCount = comboAnalysis.filter(function(c) { return c.jixiong === '凶' || c.jixiong === '大凶'; }).length;
-    var pingCount = comboAnalysis.filter(function(c) { return c.jixiong === '中平' || c.jixiong === '中平（波动大）' || c.jixiong === '中平（动荡）' || c.jixiong === '中平（刚烈）' || c.jixiong === '中平（桃花重）'; }).length;
+    let jiCount = comboAnalysis.filter(function(c) { return c.jixiong === '吉' || c.jixiong === '大吉' || c.jixiong === '中吉'; }).length;
+    let xiongCount = comboAnalysis.filter(function(c) { return c.jixiong === '凶' || c.jixiong === '大凶'; }).length;
+    let pingCount = comboAnalysis.filter(function(c) { return c.jixiong === '中平' || c.jixiong === '中平（波动大）' || c.jixiong === '中平（动荡）' || c.jixiong === '中平（刚烈）' || c.jixiong === '中平（桃花重）'; }).length;
 
-    var overall = '';
+    let overall = '';
     if (comboAnalysis.length === 0) {
       overall = '本宫星曜组合无特殊格局，需结合大限流年综合判断。';
     } else if (jiCount > xiongCount && jiCount > 0) {
@@ -11170,13 +11170,13 @@ function analyzeStarCombos(panData) {
   }
 
   // 命宫专项总结
-  var mingCombos = results.filter(function(r) { return r.gongName === '命宫'; });
-  var summary = '';
+  let mingCombos = results.filter(function(r) { return r.gongName === '命宫'; });
+  let summary = '';
   if (mingCombos.length > 0 && mingCombos[0].combos.length > 0) {
-    var mc = mingCombos[0];
+    let mc = mingCombos[0];
     summary = '命宫星曜组合分析：';
-    for (var ci = 0; ci < mc.combos.length; ci++) {
-      var c = mc.combos[ci];
+    for (let ci = 0; ci < mc.combos.length; ci++) {
+      let c = mc.combos[ci];
       summary += c.name + '(' + c.jixiong + ')，';
     }
     summary = summary.replace(/，$/, '。');
