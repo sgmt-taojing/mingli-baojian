@@ -1192,73 +1192,197 @@ function switchView(view) {
   renderViewContent(view);
 }
 
-// ===== 渲染视角内容 =====
+// ===== 检查会员状态 =====
+function isMember() {
+  try {
+    let member = JSON.parse(localStorage.getItem('qianyuan_member') || '{}');
+    if (member.level && member.level !== 'free') return true;
+    let roles = JSON.parse(localStorage.getItem('qianyuan_roles') || '[]');
+    return roles.some(function(r) { return r !== 'guest' && r !== 'free'; });
+  } catch(e) { return false; }
+}
+
+// ===== 检查是否已提交八字 =====
+function hasBazi() {
+  let bazi = getUserBazi();
+  return bazi && bazi.date && bazi.dayStem;
+}
+
+// ===== 渲染视角内容（会员版/大众版） =====
 function renderViewContent(view) {
   try {
-  const template = VIEW_TEMPLATES[view];
-  const dateStr = document.getElementById('almanacDate').value;
-  const almanac = getAlmanacData(dateStr);
-  
-  // 根据黄历宜忌，筛选今日适合的事
-  const suitableToday = template.suitable.filter(s => {
-    // 基于黄历宜项匹配
-    let yiStr=(almanac.yi||[]).join('');
-    return yiStr.indexOf(s.keyword||s) >= 0 || (almanac.jishen&&almanac.jishen.length>0);
-  }).slice(0, 5);
-  
-  // 获取今日语录
-  const quoteIndex = Math.floor(new Date(dateStr).getTime() / 86400000) % template.quotes.length;
-  const quote = template.quotes[quoteIndex];
-  
-  // 检查今日是否有诞辰
-  const birthday = template.birthdays.find(b => b.date === dateStr);
-  
-  // 生成修身/养生/修行建议
-  const practiceAdvice = getPracticeAdvice(view, almanac);
-  
-  let html = `
-    <div class="view-header">
-      <h3 class="view-title ${view}">${template.emoji} ${template.name}视角</h3>
-      <span class="view-emoji">${template.emoji}</span>
-    </div>
+    const template = VIEW_TEMPLATES[view];
+    const dateStr = document.getElementById('almanacDate').value;
+    const almanac = getAlmanacData(dateStr);
+    const member = isMember();
+    const hasPersonalBazi = hasBazi();
     
-    <div class="view-section">
-      <h5>今日适宜</h5>
-      <div class="tags">
-        ${suitableToday.map(s => `<span class="view-tag suitable">${s}</span>`).join('')}
-      </div>
-    </div>
+    // 根据黄历宜忌筛选
+    const suitableToday = template.suitable.filter(s => {
+      let yiStr=(almanac.yi||[]).join('');
+      return yiStr.indexOf(s.keyword||s) >= 0 || (almanac.jishen&&almanac.jishen.length>0);
+    }).slice(0, 5);
     
-    <div class="view-section">
-      <h5>今日忌讳</h5>
-      <div class="tags">
-        ${template.unsuitable.map(u => `<span class="view-tag unsuitable">${u}</span>`).join('')}
-      </div>
-    </div>
+    const quoteIndex = Math.floor(new Date(dateStr).getTime() / 86400000) % template.quotes.length;
+    const quote = template.quotes[quoteIndex];
+    const birthday = template.birthdays.find(b => b.date === dateStr);
+    const practiceAdvice = getPracticeAdvice(view, almanac);
     
-    <div class="quote-box ${view}">
-      <p class="quote-text">"${quote.text}"</p>
-      <p class="quote-source">——${quote.source}</p>
-    </div>
+    // 从faith-content KB获取养生功法
+    let cultivationHtml = '';
+    try {
+      let FC = window.FAITH_CONTENT || {};
+      let cultKey = view === 'ru' ? 'rujia' : view === 'dao' ? 'daojia' : 'fojia';
+      let cult = FC.cultivation && FC.cultivation[cultKey];
+      if (cult) {
+        cultivationHtml = '<div class="view-section"><h5>🌸 ' + cult.name + '</h5>';
+        cultivationHtml += '<p style="font-size:12px;opacity:.7;margin-bottom:10px">' + cult.intro + '</p>';
+        if (cult.methods && cult.methods.length > 0) {
+          cult.methods.slice(0, member ? 5 : 2).forEach(function(m) {
+            cultivationHtml += '<div style="margin-bottom:8px;padding:8px 12px;background:rgba(255,255,255,.03);border-radius:8px">';
+            cultivationHtml += '<div style="font-size:13px;color:var(--gold);font-weight:bold">' + m.name;
+            if (m.difficulty) cultivationHtml += ' <span style="font-size:10px;opacity:.5">[' + m.difficulty + ']</span>';
+            cultivationHtml += '</div>';
+            cultivationHtml += '<div style="font-size:11px;opacity:.7;margin-top:2px">' + (m.desc || '') + '</div>';
+            if (member && m.effect) cultivationHtml += '<div style="font-size:11px;color:var(--jade2);margin-top:2px">功效：' + m.effect + '</div>';
+            cultivationHtml += '</div>';
+          });
+          if (!member && cult.methods.length > 2) {
+            cultivationHtml += '<div style="text-align:center;padding:8px;font-size:11px;color:var(--paper3);opacity:.5">还有' + (cult.methods.length - 2) + '种功法，<a href="divination-membership.html" style="color:var(--gold)">升级会员</a>查看</div>';
+          }
+        }
+        cultivationHtml += '</div>';
+      }
+    } catch(e) {}
     
-    ${birthday ? `
-    <div class="birthday-alert">
-      <span class="alert-icon">🎉</span>
-      <p class="alert-title">${birthday.name}</p>
-      <p class="alert-desc">${birthday.lunar} · ${birthday.desc}</p>
-    </div>
-    ` : ''}
+    // 从faith-content KB获取修行指南
+    let guideHtml = '';
+    try {
+      let FC = window.FAITH_CONTENT || {};
+      let guide = view === 'dao' ? FC.taoistGuide : view === 'fo' ? FC.buddhistGuide : null;
+      if (guide) {
+        guideHtml = '<div class="view-section"><h5>📖 修行入门</h5>';
+        guideHtml += '<p style="font-size:12px;opacity:.7;margin-bottom:10px">' + (guide.intro || '') + '</p>';
+        let guideKeys = Object.keys(guide).filter(function(k) { return k !== 'title' && k !== 'intro' && typeof guide[k] === 'object'; });
+        guideKeys.slice(0, member ? 5 : 2).forEach(function(k) {
+          let item = guide[k];
+          if (item && item.name) {
+            guideHtml += '<div style="margin-bottom:6px;padding:6px 10px;background:rgba(255,255,255,.03);border-radius:6px">';
+            guideHtml += '<div style="font-size:12px;color:var(--gold2)">' + item.name + '</div>';
+            if (member && item.desc) guideHtml += '<div style="font-size:11px;opacity:.6;margin-top:2px">' + item.desc.substring(0, 100) + '</div>';
+            guideHtml += '</div>';
+          }
+        });
+        guideHtml += '</div>';
+      }
+    } catch(e) {}
     
-    <div class="practice-advice">
-      <h5>${view === 'ru' ? '君子修身' : view === 'dao' ? '养生修炼' : '修行指南'}</h5>
-      <ul>
-        ${practiceAdvice.map(a => `<li>${a}</li>`).join('')}
-      </ul>
-    </div>
-  `;
-  
-  document.getElementById('viewContent').innerHTML = html;
-  }catch(e){console.error('[视角渲染错误]',e.message);document.getElementById('viewContent').innerHTML='<div style="padding:20px;color:var(--cinn2)">视角内容加载出错: '+e.message+'</div>';}
+    // 从faith-content KB获取斋戒方法
+    let fastingHtml = '';
+    try {
+      let FC = window.FAITH_CONTENT || {};
+      if (FC.fastingMethods && view === 'fo') {
+        fastingHtml = '<div class="view-section"><h5>🥗 斋戒方法</h5>';
+        FC.fastingMethods.slice(0, member ? 5 : 2).forEach(function(f) {
+          fastingHtml += '<div style="margin-bottom:4px;padding:4px 8px;background:rgba(255,255,255,.03);border-radius:4px;font-size:12px"><b style="color:var(--gold2)">' + f.name + '</b>: <span style="opacity:.6">' + (f.desc || '').substring(0, 60) + '</span></div>';
+        });
+        fastingHtml += '</div>';
+      }
+    } catch(e) {}
+    
+    // 会员个性化建议（基于八字）
+    let personalHtml = '';
+    if (member && hasPersonalBazi) {
+      let bazi = getUserBazi();
+      let todayStem = STEMS[Math.floor(new Date(dateStr).getTime() / 86400000) % 10];
+      let todayEle = ELE[todayStem] || '土';
+      let personalAdvice = getPersonalAdvice(bazi.dayEle, todayEle);
+      personalHtml = '<div class="view-section" style="border:1px solid rgba(201,168,76,.2);background:rgba(201,168,76,.04)"><h5>👤 个人专属（' + bazi.dayStem + '日主·' + bazi.dayEle + '）</h5>';
+      personalHtml += '<div style="font-size:12px;color:var(--gold2);margin-bottom:8px">今日日干：' + todayStem + '(' + todayEle + ') | 与您日主关系：' + personalAdvice.relation + '</div>';
+      personalHtml += '<div style="font-size:12px;line-height:1.8">' + personalAdvice.advice + '</div>';
+      personalHtml += '</div>';
+    } else if (!member || !hasPersonalBazi) {
+      personalHtml = '<div class="view-section" style="text-align:center;padding:16px;opacity:.5">';
+      if (!hasPersonalBazi) {
+        personalHtml += '<div style="font-size:12px">📌 录入八字后可获取个人专属建议</div>';
+      }
+      if (!member) {
+        personalHtml += '<div style="font-size:12px;margin-top:4px"><a href="divination-membership.html" style="color:var(--gold)">升级会员</a> 获取完整功法/修行指南/斋戒方法</div>';
+      }
+      personalHtml += '</div>';
+    }
+    
+    // 节日提醒
+    let festivalHtml = '';
+    try {
+      let FKB = window.FESTIVAL_KB || {};
+      let festivals = FKB.festivals || [];
+      let lunar = getSimpleLunar(new Date(dateStr));
+      let lm = lunar.match(/([正二三四五六七八九十冬腊])月/);
+      let ld = lunar.match(/(初[一二三四五六七八九十]|廿[一二三四五六七八九]|三十)/);
+      if (lm && ld) {
+        let dateKey = lm[1] + '月' + ld[1];
+        let todayF = festivals.filter(function(f) { return f.lunarDate && f.lunarDate.indexOf(dateKey) > -1; });
+        if (todayF.length > 0) {
+          festivalHtml = '<div class="view-section" style="border-left:3px solid var(--gold)"><h5>🎉 今日节日</h5>';
+          todayF.forEach(function(f) {
+            festivalHtml += '<div style="margin-bottom:6px"><b style="color:var(--gold)">' + f.name + '</b>';
+            if (f.customs) festivalHtml += '<span style="font-size:11px;opacity:.6;margin-left:6px">习俗：' + f.customs.join('、') + '</span>';
+            if (member && f.origin) festivalHtml += '<div style="font-size:11px;opacity:.5;margin-top:2px">' + f.origin.substring(0, 80) + '</div>';
+            festivalHtml += '</div>';
+          });
+          festivalHtml += '</div>';
+        }
+      }
+    } catch(e) {}
+    
+    // 组装完整HTML
+    let html = '<div class="view-header">' +
+      '<h3 class="view-title ' + view + '">' + template.emoji + ' ' + template.name + '视角' + 
+      (member ? ' <span style="font-size:10px;color:var(--gold3);vertical-align:middle">👑 会员</span>' : ' <span style="font-size:10px;opacity:.4;vertical-align:middle">大众版</span>') +
+      '</h3><span class="view-emoji">' + template.emoji + '</span></div>';
+    
+    // 今日适宜/忌讳
+    html += '<div class="view-section"><h5>今日适宜</h5><div class="tags">';
+    html += suitableToday.map(function(s) { return '<span class="view-tag suitable">' + s + '</span>'; }).join('');
+    html += '</div></div>';
+    html += '<div class="view-section"><h5>今日忌讳</h5><div class="tags">';
+    html += template.unsuitable.map(function(u) { return '<span class="view-tag unsuitable">' + u + '</span>'; }).join('');
+    html += '</div></div>';
+    
+    // 语录
+    html += '<div class="quote-box ' + view + '"><p class="quote-text">"' + quote.text + '"</p><p class="quote-source">——' + quote.source + '</p></div>';
+    
+    // 诞辰
+    if (birthday) {
+      html += '<div class="birthday-alert"><span class="alert-icon">🎉</span><p class="alert-title">' + birthday.name + '</p><p class="alert-desc">' + birthday.lunar + ' · ' + birthday.desc + '</p></div>';
+    }
+    
+    // 节日
+    html += festivalHtml;
+    
+    // 个人专属（会员+八字）
+    html += personalHtml;
+    
+    // 修身/养生/修行建议
+    html += '<div class="practice-advice"><h5>' + (view === 'ru' ? '君子修身' : view === 'dao' ? '养生修炼' : '修行指南') + '</h5><ul>';
+    html += practiceAdvice.map(function(a) { return '<li>' + a + '</li>'; }).join('');
+    html += '</ul></div>';
+    
+    // 养生功法（KB）
+    html += cultivationHtml;
+    
+    // 修行指南（KB）
+    html += guideHtml;
+    
+    // 斋戒方法（KB·仅佛家）
+    html += fastingHtml;
+    
+    document.getElementById('viewContent').innerHTML = html;
+  } catch(e) {
+    console.error('[视角渲染错误]', e.message);
+    document.getElementById('viewContent').innerHTML = '<div style="padding:20px;color:var(--cinn2)">视角内容加载出错: ' + e.message + '</div>';
+  }
 }
 
 // ===== 获取修身/养生/修行建议 =====
@@ -1925,5 +2049,6 @@ function pushDailyToPhone(){
 </div>
 
 <script defer src="../knowledge/festival-knowledge-base.js"></script>
+<script defer src="../knowledge/faith-content.js"></script>
 </body>
 </html>
