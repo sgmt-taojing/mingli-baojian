@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>命理宝鉴 · 软件工程规划V1</title>
+<style>
+:root{--ink:#0a0a0c;--ink2:#13131a;--ink3:#1c1c26;--paper:#e8e2d4;--paper2:#c4bda8;--paper3:#8a8270;--gold:#c9a84c;--gold2:#e8cc7a;--gold3:#9a7c2e;--cinn:#c0392b;--jade:#27ae60;--cyan:#2980b9;--cyan2:#5dade2;--violet:#8e44ad;--border:rgba(201,168,76,.12)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',serif;line-height:1.85;max-width:1200px;margin:0 auto;padding:24px 16px}
+h1{font-size:24px;color:var(--gold);letter-spacing:4px;text-align:center;margin-bottom:8px}
+h2{font-size:18px;color:var(--gold2);letter-spacing:2px;margin:32px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+h3{font-size:15px;color:var(--gold);margin:20px 0 8px;letter-spacing:1px}
+h4{font-size:13px;color:var(--paper2);margin:14px 0 6px}
+p{font-size:13px;color:var(--paper);opacity:.9;margin-bottom:8px}
+.tag{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;margin:2px 4px 2px 0}
+.tag-p0{background:rgba(192,57,43,.15);color:#e74c3c;border:1px solid rgba(192,57,43,.3)}
+.tag-p1{background:rgba(230,126,34,.15);color:#e67e22;border:1px solid rgba(230,126,34,.3)}
+.tag-p2{background:rgba(41,128,185,.15);color:var(--cyan2);border:1px solid rgba(41,128,185,.3)}
+.tag-p3{background:rgba(39,174,96,.15);color:var(--jade);border:1px solid rgba(39,174,96,.3)}
+.tag-done{background:rgba(39,174,96,.12);color:var(--jade);border:1px solid rgba(39,174,96,.2)}
+.tag-warn{background:rgba(231,76,60,.1);color:var(--cinn);border:1px solid rgba(231,76,60,.2)}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}
+th{background:rgba(201,168,76,.06);color:var(--gold);padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);font-weight:600}
+td{padding:7px 10px;border-bottom:1px solid rgba(201,168,76,.06);color:var(--paper);opacity:.85}
+tr:hover td{background:rgba(201,168,76,.03)}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:14px 0}
+.metric{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.metric-val{font-size:28px;font-weight:bold;color:var(--gold)}
+.metric-label{font-size:11px;color:var(--paper3);margin-top:2px}
+.phase{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:12px;padding:16px;margin:12px 0}
+.phase-title{font-size:14px;color:var(--gold);margin-bottom:8px;font-weight:bold;display:flex;align-items:center;gap:8px}
+.phase-num{width:24px;height:24px;border-radius:50%;background:rgba(201,168,76,.15);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold}
+.warn-box{background:rgba(231,76,60,.06);border:1px solid rgba(231,76,60,.15);border-radius:10px;padding:12px;margin:12px 0;font-size:12px}
+.warn-box h4{color:var(--cinn);margin-bottom:4px}
+.ok-box{background:rgba(39,174,96,.05);border:1px solid rgba(39,174,96,.15);border-radius:10px;padding:12px;margin:12px 0;font-size:12px}
+.footer{text-align:center;margin-top:40px;padding:20px;color:var(--paper3);font-size:11px;opacity:.4;border-top:1px solid var(--border)}
+@media(max-width:768px){.metric-grid{grid-template-columns:repeat(2,1fr)}table{font-size:11px}}
+</style>
+</head>
+<body>
+
+<h1>命理宝鉴 · 软件工程规划</h1>
+<p style="text-align:center;color:var(--paper3);font-size:12px">2026-07-19 V1 · 全平台审计+规划+开发+测试+优化</p>
+
+<h2>一、平台资产总览</h2>
+
+<div class="metric-grid">
+<div class="metric"><div class="metric-val">46</div><div class="metric-label">HTML页面</div></div>
+<div class="metric"><div class="metric-val">27</div><div class="metric-label">JS引擎文件</div></div>
+<div class="metric"><div class="metric"><div class="metric-val">54</div><div class="metric-label">知识库文件</div></div></div>
+<div class="metric"><div class="metric-val">22</div><div class="metric-label">服务器文件</div></div>
+<div class="metric"><div class="metric-val">25</div><div class="metric-label">小程序页面</div></div>
+<div class="metric"><div class="metric-val">11MB</div><div class="metric-label">知识库总量</div></div>
+</div>
+
+<h3>核心页面（10个，首页入口）</h3>
+<table>
+<tr><th>页面</th><th>功能</th><th>状态</th></tr>
+<tr><td>index.html</td><td>首页·9卡片门户</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>divination-hub.html</td><td>命理排盘主平台（2.4MB·38个section）</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>tcm-clinic.html</td><td>三角色协作中医诊疗</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>tcm-symptom.html</td><td>症状分析·周易中医联合诊疗</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>divination-almanac.html</td><td>黄历（已接入节日KB）</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>divination-integrated.html</td><td>体质调理</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>nihaisha-knowledge.html</td><td>倪师知识库</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>nihaisha-tool.html</td><td>倪师工具（46模块）</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>shuhan-knowledge.html</td><td>舒晗知识库</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>login.html</td><td>登录/注册</td><td><span class="tag tag-done">完成</span></td></tr>
+</table>
+
+<h3>功能页面（8个，hub内tab）</h3>
+<table>
+<tr><th>页面</th><th>功能</th><th>状态</th></tr>
+<tr><td>divination-knowledge.html</td><td>知识库总览</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>divination-shop.html</td><td>商城</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>divination-membership.html</td><td>会员中心</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>monitor-dashboard.html</td><td>运营监控大屏</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>admin.html</td><td>后台管理</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>admin-shop.html</td><td>商城管理后台</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>nihaisha-learning.html</td><td>倪师中医学堂</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>more-functions.html</td><td>更多功能</td><td><span class="tag tag-done">完成</span></td></tr>
+</table>
+
+<h3>问题页面（20个孤立页面，无导航入口）</h3>
+<div class="warn-box">
+<h4>⚠️ 发现20个孤立页面</h4>
+<p>这些页面存在但无任何导航入口可达，用户无法访问。分为三类处理：</p>
+</div>
+
+<table>
+<tr><th>页面</th><th>内容</th><th>处理方案</th></tr>
+<tr><td>compatibility.html</td><td>缘分匹配（1KB·空壳）</td><td><span class="tag tag-p0">删除</span> 功能已在hub内</td></tr>
+<tr><td>palmistry.html</td><td>手相分析（1KB·空壳）</td><td><span class="tag tag-p0">删除</span> 功能已在hub内</td></tr>
+<tr><td>physiognomy.html</td><td>面相分析（1KB·空壳）</td><td><span class="tag tag-p0">删除</span> 功能已在hub内</td></tr>
+<tr><td>report-divination.html</td><td>报告占卜（1KB·空壳）</td><td><span class="tag tag-p0">删除</span> 功能已在hub内</td></tr>
+<tr><td>divination-index.html</td><td>旧首页（已被index.html取代）</td><td><span class="tag tag-p0">删除</span></td></tr>
+<tr><td>nihaisha-video.html</td><td>视频播放（无法播放）</td><td><span class="tag tag-p0">删除</span> 知识已提取到KB</td></tr>
+<tr><td>astrology.html</td><td>紫微独立页（7KB）</td><td><span class="tag tag-p1">合并</span> 功能已在hub section-ziwei</td></tr>
+<tr><td>fortune-telling.html</td><td>八字独立页（7KB）</td><td><span class="tag tag-p1">合并</span> 功能已在hub section-bazi</td></tr>
+<tr><td>i-ching.html</td><td>易经占卜独立页（6KB）</td><td><span class="tag tag-p1">合并</span> 功能已在hub section-zhanbu</td></tr>
+<tr><td>fengshui-compass.html</td><td>风水罗盘（4KB）</td><td><span class="tag tag-p1">合并</span> 功能已在hub section-fengshui</td></tr>
+<tr><td>yijing-oracle.html</td><td>易经·人盘事盘（95KB）</td><td><span class="tag tag-p2">评估</span> 内容丰富，评估是否保留</td></tr>
+<tr><td>yijing-qimen.html</td><td>易经·奇门遁甲（86KB）</td><td><span class="tag tag-p2">评估</span> 内容丰富，评估是否保留</td></tr>
+<tr><td>koujue-gallery.html</td><td>口诀库（5KB）</td><td><span class="tag tag-p2">接入</span> 添加导航入口</td></tr>
+<tr><td>merit-system.html</td><td>功德系统（6KB）</td><td><span class="tag tag-p2">接入</span> 添加导航入口</td></tr>
+<tr><td>master-class.html</td><td>名师课堂（13KB）</td><td><span class="tag tag-p2">接入</span> 添加导航入口</td></tr>
+<tr><td>clear-cache.html</td><td>缓存清理工具（10KB）</td><td><span class="tag tag-p3">保留</span> 工具类页面</td></tr>
+<tr><td>report-config.html</td><td>报告模块配置（12KB）</td><td><span class="tag tag-p3">保留</span> 管理类页面</td></tr>
+<tr><td>report-sample-bazi.html</td><td>付费报告示例（15KB）</td><td><span class="tag tag-p3">保留</span> 展示类页面</td></tr>
+<tr><td>wechat-h5.html / wechat-hub.html</td><td>微信公众号相关（36KB+138KB）</td><td><span class="tag tag-p2">接入</span> 添加导航入口</td></tr>
+<tr><td>wechat-disclaimer.html</td><td>微信免责声明（5KB）</td><td><span class="tag tag-p3">保留</span> 法律类页面</td></tr>
+</table>
+
+<h2>二、用户角色体系</h2>
+
+<table>
+<tr><th>角色</th><th>权限范围</th><th>所在平台</th><th>状态</th></tr>
+<tr><td>访客（游客）</td><td>排盘基础功能、黄历、知识库浏览</td><td>Web + 小程序</td><td><span class="tag tag-done">已实现</span></td></tr>
+<tr><td>普通会员</td><td>排盘完整功能、体质调理、个人案例</td><td>Web + 小程序</td><td><span class="tag tag-done">已实现</span></td></tr>
+<tr><td>VIP会员（明道/通玄/悟真）</td><td>高级解读、大运流年、化解方案、推送</td><td>Web + 小程序</td><td><span class="tag tag-done">已实现</span></td></tr>
+<tr><td>易经大师</td><td>三角色诊疗·大师端、案例管理、术语过滤</td><td>Web</td><td><span class="tag tag-done">已实现</span></td></tr>
+<tr><td>中医医生</td><td>三角色诊疗·医生端、审核推送、讨论区</td><td>Web</td><td><span class="tag tag-done">已实现</span></td></tr>
+<tr><td>病患</td><td>三角色诊疗·病患端、症状分析、报告查看</td><td>Web + 小程序</td><td><span class="tag tag-done">已实现</span></td></tr>
+<tr><td>商家</td><td>商城入驻、商品管理、订单管理</td><td>Web + 小程序</td><td><span class="tag tag-done">已实现</span></td></tr>
+<tr><td>管理员</td><td>后台管理、用户管理、内容审核</td><td>Web</td><td><span class="tag tag-done">已实现</span></td></tr>
+<tr><td>超管</td><td>全部权限、系统配置、运营监控</td><td>Web</td><td><span class="tag tag-done">已实现</span></td></tr>
+</table>
+
+<h2>三、功能模块审计</h2>
+
+<h3>3.1 排盘引擎（8个）</h3>
+<table>
+<tr><th>引擎</th><th>函数</th><th>Section</th><th>结果板块</th><th>大白话</th><th>状态</th></tr>
+<tr><td>八字排盘</td><td>runBaziEngine</td><td>section-bazi</td><td>15模块（四柱/五行/十神/纳音/神煞/格局/合冲/大运/流年/60甲子等）</td><td>✅</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>六爻占卜</td><td>runLiuyaoEngine</td><td>section-zhanbu</td><td>6板块（象数/命格/变化/时机/方位/智慧）</td><td>✅</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>梅花易数</td><td>runMeihua</td><td>section-zhanbu</td><td>互卦变卦+体用分析+三元九运</td><td>✅</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>奇门遁甲</td><td>runQimen</td><td>section-zhanbu</td><td>八门九星+格局分析+三元九运</td><td>✅</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>大六壬</td><td>runLiuren</td><td>section-zhanbu</td><td>三传四课+天将神煞+三元九运</td><td>✅</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>紫微斗数</td><td>runZiwei</td><td>section-zhanbu</td><td>十四正曜+十二宫分析</td><td>✅</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>风水分析</td><td>runFengshuiEngine</td><td>section-fengshui</td><td>命卦+评分+楼层推荐</td><td>✅</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>择日分析</td><td>runZeriEngine</td><td>section-zeri</td><td>宜忌+吉日排序+推荐</td><td>✅</td><td><span class="tag tag-done">完成</span></td></tr>
+</table>
+
+<h3>3.2 辅助功能（15+个）</h3>
+<table>
+<tr><th>功能</th><th>Section/页面</th><th>状态</th></tr>
+<tr><td>姓名分析</td><td>section-xingming</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>测字</td><td>section-cezi</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>开运化解</td><td>section-huajie</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>人生规划</td><td>section-lifeplan</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>流年运势</td><td>section-annual-fortune</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>60甲子纵览</td><td>section-jiazi</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>体质调理</td><td>section-tizhi</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>家庭排盘</td><td>section-family</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>面相分析</td><td>section-screenshot</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>楼层推荐</td><td>section-fengshui-pro</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>颜择分析</td><td>section-yanzhi</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>疗愈音乐</td><td>section-healing-music</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>推送计划</td><td>section-push-plan</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>知识库</td><td>section-knowledge</td><td><span class="tag tag-done">完成</span></td></tr>
+<tr><td>名师课堂</td><td>section-masters</td><td><span class="tag tag-done">完成</span></td></tr>
+</table>
+
+<h3>3.3 导航栏一致性审计</h3>
+<div class="warn-box">
+<h4>⚠️ 导航栏不统一</h4>
+<p>9个核心页面的导航栏项数不一致（7~18个），用户在不同页面看到的导航入口不同。</p>
+</div>
+<table>
+<tr><th>页面</th><th>导航项数</th><th>缺失项</th></tr>
+<tr><td>divination-hub.html</td><td>18</td><td>—（基准）</td></tr>
+<tr><td>nihaisha-tool.html</td><td>17</td><td>基本完整</td></tr>
+<tr><td>nihaisha-knowledge.html</td><td>16</td><td>基本完整</td></tr>
+<tr><td>shuhan-knowledge.html</td><td>14</td><td>缺tcm-symptom等</td></tr>
+<tr><td>tcm-symptom.html</td><td>13</td><td>缺almanac/membership/shop</td></tr>
+<tr><td>divination-integrated.html</td><td>11</td><td>缺多个</td></tr>
+<tr><td>divination-almanac.html</td><td>10</td><td>缺nihaisha/tool/shuhan/symptom</td></tr>
+<tr><td>tcm-clinic.html</td><td>10</td><td>缺almanac/membership/shop/nihaisha/tool</td></tr>
+<tr><td>divination-knowledge.html</td><td>10</td><td>缺多个</td></tr>
+</table>
+
+<h2>四、知识库体系</h2>
+
+<h3>4.1 知识库分类（54个文件·11MB）</h3>
+<table>
+<tr><th>分类</th><th>文件数</th><th>大小</th><th>核心文件</th></tr>
+<tr><td>命理核心</td><td>8</td><td>1.5MB</td><td>bazi-kb, ziwei-kb, qimen-kb, liuyao-kb, meihua-kb, liuren-kb, zhouyi-kb, wuxing</td></tr>
+<tr><td>风水阳宅</td><td>2</td><td>230KB</td><td>fengshui-kb, yangzhai-kb</td></tr>
+<tr><td>中医诊疗</td><td>3</td><td>230KB</td><td>tcm-diagnosis-kb, tcm-famous-formulas-kb, koujue-daily</td></tr>
+<tr><td>倪师知识</td><td>1</td><td>881KB</td><td>nihaisha-kb（蒸馏版35模块）</td></tr>
+<tr><td>舒晗知识</td><td>1</td><td>840KB</td><td>shuhan-kb-combined（合并版）</td></tr>
+<tr><td>信仰文化</td><td>5</td><td>540KB</td><td>faith-kb, faith-renderer, faith-content, faith-guide, faith-deities</td></tr>
+<tr><td>口诀咒语</td><td>4</td><td>440KB</td><td>koujue-database-full, koujue-renderer, incantation-db, koujue-daily</td></tr>
+<tr><td>节日民俗</td><td>1</td><td>21KB</td><td>festival-kb（23节日）</td></tr>
+<tr><td>测字颜择</td><td>3</td><td>290KB</td><td>cezi-database(在supplement-6), yanzhi-kb, yanzhi-part2</td></tr>
+<tr><td>商城数据</td><td>2</td><td>200KB</td><td>shop-data, shop-medicine-data</td></tr>
+<tr><td>权威知识</td><td>1</td><td>3.2MB</td><td>authoritative-knowledge-base（最大）</td></tr>
+<tr><td>知识补充</td><td>8</td><td>650KB</td><td>knowledge-supplement 1-6, details, details-extra</td></tr>
+<tr><td>其他</td><td>15</td><td>2.1MB</td><td>wisdom-quotes, psychology-wisdom, masters-knowledge等</td></tr>
+</table>
+
+<h3>4.2 知识库问题</h3>
+<div class="warn-box">
+<h4>⚠️ 4个问题需处理</h4>
+<p><b>1. authoritative-knowledge-base.js（3.2MB）过大</b> — 需蒸馏优化</p>
+<p><b>2. 全局变量名冲突</b> — knowledge-deep-supplement.js 和 authoritative-knowledge-base.js 都用 window.AUTHORITATIVE_KNOWLEDGE</p>
+<p><b>3. 3个文件用同一变量名</b> — knowledge-details.js, knowledge-details-extra.js, kb-missing-sections.js 都用 window.KNOWLEDGE_DETAILS</p>
+<p><b>4. knowledge-index.js 的 window 后为空</b> — 可能语法问题</p>
+</div>
+
+<h2>五、开发规划（四阶段）</h2>
+
+<div class="phase">
+<div class="phase-title"><span class="phase-num">1</span>P0：导航统一+孤立页面清理（预计2小时）</div>
+<table>
+<tr><th>任务</th><th>优先级</th><th>预估</th><th>状态</th></tr>
+<tr><td>统一9个核心页面导航栏为完整14项</td><td><span class="tag tag-p0">P0</span></td><td>30min</td><td><span class="tag tag-warn">待做</span></td></tr>
+<tr><td>删除6个空壳页面（compatibility/palmistry/physiognomy/report-divination/divination-index/nihaisha-video）</td><td><span class="tag tag-p0">P0</span></td><td>10min</td><td><span class="tag tag-warn">待做</span></td></tr>
+<tr><td>合并4个独立页到hub（astrology/fortune-telling/i-ching/fengshui-compass）</td><td><span class="tag tag-p1">P1</span></td><td>20min</td><td><span class="tag tag-warn">待做</span></td></tr>
+<tr><td>给5个有用孤立页面添加导航入口（wechat-hub/koujue-gallery/merit-system/master-class/report-sample）</td><td><span class="tag tag-p1">P1</span></td><td>20min</td><td><span class="tag tag-warn">待做</span></td></tr>
+</table>
+</div>
+
+<div class="phase">
+<div class="phase-title"><span class="phase-num">2</span>P1：知识库治理（预计3小时）</div>
+<table>
+<tr><th>任务</th><th>优先级</th><th>预估</th><th>状态</th></tr>
+<tr><td>authoritative-knowledge-base.js 蒸馏（3.2MB→目标800KB）</td><td><span class="tag tag-p0">P0</span></td><td>60min</td><td><span class="tag tag-warn">待做</span></td></tr>
+<tr><td>修复全局变量名冲突（3处）</td><td><span class="tag tag-p0">P0</span></td><td>15min</td><td><span class="tag tag-warn">待做</span></td></tr>
+<tr><td>knowledge-index.js 语法修复</td><td><span class="tag tag-p0">P0</span></td><td>10min</td><td><span class="tag tag-warn">待做</span></td></tr>
+<tr><td>知识库全局索引建立（kb-registry.js）</td><td><span class="tag tag-p1">P1</span></td><td>30min</td><td><span class="tag tag-warn">待做</span></td></tr>
+<tr><td>KB加载性能优化（defer+lazy load）</td><td><span class="tag tag-p1">P1</span></td><td>30min</td><td><span class="tag tag-warn">待做</span></td></tr>
+</table>
+</div>
+
+<div class="phase">
+<div class="phase-title"><span class="phase-num">3</span>P2：功能审计+UI优化（预计4小时）</div>
+<table>
+<tr><th>任务</th><th>优先级</th><th>预估</th><th>状态</th></tr>
+<tr><td>divination-hub 38个section功能验证</td><td><span class="tag tag-p0">P0</span></td><td>60min</td><td><span class="tag tag-warn">待做</span></td></tr>
+<tr><td>小程序25个页面功能验证</td><td><span class="tag tag-p0">P0</span></td><td>40min</td><td><span class="tag tag-warn">待做</span></td></tr>
+<tr><td>后端22个文件API端点测试</td><td><span class="tag tag-p1">P1</span></td><td>40min</td><td><span class="tag tag-warn">待做</span></td></tr>
+<tr><td>divination-core.js 2535处inline style逐步提取</td><td><span class="tag tag-p2">P2</span></td><td>持续</td><td><span class="tag tag-warn">待做</span></td></tr>
+<tr><td>响应式适配审计（1200px/768px双断点）</td><td><span class="tag tag-p1">P1</span></td><td>30min</td><td><span class="tag tag-warn">待做</span></td></tr>
+</table>
+</div>
+
+<div class="phase">
+<div class="phase-title"><span class="phase-num">4</span>P3：测试+交付（预计2小时）</div>
+<table>
+<tr><th>任务</th><th>优先级</th><th>预估</th><th>状态</th></tr>
+<tr><td>全量14项审计检查</td><td><span class="tag tag-p0">P0</span></td><td>20min</td><td><span class="tag tag-warn">待做</span></td></tr>
+<tr><td>GitHub Pages全页面200验证</td><td><span class="tag tag-p0">P0</span></td><td>10min</td><td><span class="tag tag-warn">待做</span></td></tr>
+<tr><td>小程序编译验证</td><td><span class="tag tag-p1">P1</span></td><td>15min</td><td><span class="tag tag-warn">待做</span></td></tr>
+<tr><td>交付报告生成</td><td><span class="tag tag-p0">P0</span></td><td>15min</td><td><span class="tag tag-warn">待做</span></td></tr>
+</table>
+</div>
+
+<h2>六、质量标准</h2>
+
+<h3>6.1 代码质量（当前状态）</h3>
+<table>
+<tr><th>维度</th><th>标准</th><th>当前</th><th>状态</th></tr>
+<tr><td>alert()</td><td>0</td><td>0</td><td><span class="tag tag-done">✅</span></td></tr>
+<tr><td>Math.random()</td><td>0</td><td>0</td><td><span class="tag tag-done">✅</span></td></tr>
+<tr><td>var声明</td><td>0</td><td>0</td><td><span class="tag tag-done">✅</span></td></tr>
+<tr><td>const += bug</td><td>0</td><td>0</td><td><span class="tag tag-done">✅</span></td></tr>
+<tr><td>g2claw前端泄露</td><td>0</td><td>0（仅注释）</td><td><span class="tag tag-done">✅</span></td></tr>
+<tr><td>console.error+showToast</td><td>100%</td><td>100%</td><td><span class="tag tag-done">✅</span></td></tr>
+<tr><td>CSS变量:root定义</td><td>44/44</td><td>44/44</td><td><span class="tag tag-done">✅</span></td></tr>
+<tr><td>HTML div平衡</td><td>全平衡</td><td>46/46</td><td><span class="tag tag-done">✅</span></td></tr>
+<tr><td>JS语法</td><td>全部通过</td><td>27/27</td><td><span class="tag tag-done">✅</span></td></tr>
+<tr><td>KB语法</td><td>全部通过</td><td>54/54</td><td><span class="tag tag-done">✅</span></td></tr>
+</table>
+
+<h3>6.2 待优化项</h3>
+<table>
+<tr><th>维度</th><th>当前</th><th>目标</th><th>优先级</th></tr>
+<tr><td>导航栏统一性</td><td>7~18项不等</td><td>统一14项</td><td><span class="tag tag-p0">P0</span></td></tr>
+<tr><td>孤立页面</td><td>20个</td><td>0（删除/合并/接入）</td><td><span class="tag tag-p0">P0</span></td></tr>
+<tr><td>authoritative-kb大小</td><td>3.2MB</td><td>≤800KB</td><td><span class="tag tag-p0">P0</span></td></tr>
+<tr><td>KB全局变量冲突</td><td>3处</td><td>0</td><td><span class="tag tag-p0">P0</span></td></tr>
+<tr><td>inline style</td><td>2535处</td><td>≤500处</td><td><span class="tag tag-p2">P2</span></td></tr>
+</table>
+
+<div class="footer">命理宝鉴 · 软件工程规划V1 · 2026-07-19</div>
+
+</body>
+</html>
