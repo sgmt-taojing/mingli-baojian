@@ -9,11 +9,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ink:#080808;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;
+  --ink:var(--ink);--ink2:var(--ink2);--ink3:#1a1a1a;--ink4:var(--ink4);
   --paper:var(--paper);--paper2:var(--paper2);--paper3:var(--paper3);
   --gold:var(--gold);--gold2:var(--gold2);--gold3:var(--gold3);
   --cinn:var(--cinn);--cinn2:var(--cinn2);
-  --cyan:var(--cyan);--cyan2:#5dade2;
+  --cyan:var(--cyan);--cyan2:var(--cyan2);
   --jade:var(--jade);--jade2:var(--success);
   --violet:var(--violet2);--violet2:#a569bd;
   --orange:var(--orange);
@@ -1432,7 +1432,7 @@ function updateDailyAdvice(almanac) {
   // 干支信息卡
   html+='<div class="advice-card" style="margin-top:12px;background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(155,89,182,.04));border:1px solid rgba(201,168,76,.15);border-radius:10px;padding:14px">';
   html+='<div style="font-size:12px;color:var(--gold);margin-bottom:8px">☯️ 今日干支 · '+dayStem+dayBranch+' · '+stemWx+'日 · '+jianchu+'日'+(jieqi?' · '+jieqi+'':'')+(almanac.jishen?' · 值'+almanac.jishen.join('/'):'')+'</div>';
-  html+='<div style="font-size:12px;color:#aaa;line-height:1.8">';
+  html+='<div style="font-size:12px;color:var(--paper3);line-height:1.8">';
   if(almanac.chong) html+='<span style="color:var(--cinn2)">'+almanac.chong+'</span> · ';
   if(almanac.sha) html+='<span style="color:var(--cinn2)">'+almanac.sha+'</span> · ';
   if(almanac.xiongsha&&almanac.xiongsha.length) html+='<span style="color:var(--orange)">凶煞:'+almanac.xiongsha.join('/')+'</span>';
@@ -1606,7 +1606,7 @@ function updateDailyAdvice(almanac) {
   if(dailyKnowledge&&dailyKnowledge.title){
     knowledgeHtml='<div class="advice-card" style="margin-top:12px;background:linear-gradient(135deg,rgba(52,152,219,.06),rgba(155,89,182,.04));border:1px solid rgba(52,152,219,.15);border-radius:10px;padding:14px">';
     knowledgeHtml+='<h5 style="color:var(--cyan2);margin-bottom:8px">📖 '+dailyKnowledge.tag+' · '+dailyKnowledge.title+'</h5>';
-    knowledgeHtml+='<p style="font-size:13px;line-height:1.8;color:#666">'+dailyKnowledge.summary+'</p>';
+    knowledgeHtml+='<p style="font-size:13px;line-height:1.8;color:var(--paper3)">'+dailyKnowledge.summary+'</p>';
     knowledgeHtml+='</div>';
   }
 
@@ -1620,11 +1620,11 @@ function updateDailyAdvice(almanac) {
   let zodiacAnimals=['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
   let yearZodiac=zodiacAnimals[(Y-4)%12];
   let ganZhiYear=STEMS[(Y-4)%10]+BRANCHES[(Y-4)%12];
-  html+='<div style="font-size:13px;color:#888">🔥 '+ganZhiYear+'年（'+yearZodiac+'年）</div>';
+  html+='<div style="font-size:13px;color:var(--steel)">🔥 '+ganZhiYear+'年（'+yearZodiac+'年）</div>';
   // 月柱
   let monthGan=STEMS[monthGzIdx%10];
   let monthBranch=BRANCHES[monthGzIdx%12];
-  html+='<div style="font-size:13px;color:#888">🌙 '+monthGan+monthBranch+'月 · '+dayStem+dayBranch+'日</div>';
+  html+='<div style="font-size:13px;color:var(--steel)">🌙 '+monthGan+monthBranch+'月 · '+dayStem+dayBranch+'日</div>';
   html+='</div>';
 
   // === 今日黄历 ===
@@ -1633,16 +1633,16 @@ function updateDailyAdvice(almanac) {
   html+='<div><span style="color:green">✅ 宜：</span>'+(yiList.length?yiList.slice(0,6).join(' '):'诸事皆宜')+'</div></div>';
   html+='<div style="display:flex;gap:20px;font-size:13px;line-height:2">';
   html+='<div><span style="color:red">❌ 忌：</span>'+(jiList.length?jiList.slice(0,4).join(' '):'无忌')+'</div></div>';
-  html+='<div style="font-size:12px;color:#888;line-height:2;margin-top:4px">';
+  html+='<div style="font-size:12px;color:var(--steel);line-height:2;margin-top:4px">';
   html+='📍 建除十二神：<strong>'+jianchu+'</strong> &nbsp; ';
   html+='⭐ 值日星宿：<strong>'+xingxiu+'</strong> &nbsp; ';
   html+='☀️ 黄道黑道：<strong>'+huangdaoText+'</strong> &nbsp; ';
   html+='⚔️ 冲煞：'+(almanac.chong||'无')+'</div>';
-  html+='<div style="font-size:12px;color:#888;line-height:2">';
+  html+='<div style="font-size:12px;color:var(--steel);line-height:2">';
   html+='📜 彭祖百忌：'+pengzuText+'</div>';
-  html+='<div style="font-size:12px;color:#888;line-height:2">';
+  html+='<div style="font-size:12px;color:var(--steel);line-height:2">';
   html+='🧭 喜神：<strong>'+xishen+'</strong> &nbsp; 💰 财神：<strong>'+caishen+'</strong> &nbsp; 🙏 福神：<strong>'+fushen+'</strong></div>';
-  html+='<div style="font-size:12px;color:#888;line-height:2">';
+  html+='<div style="font-size:12px;color:var(--steel);line-height:2">';
   html+='⏰ 时辰吉凶：'+shichenJiXiong+'</div>';
   html+='</div>';
 
@@ -1703,7 +1703,7 @@ function updateDailyAdvice(almanac) {
     html+='<div class="advice-card" style="margin-bottom:12px;background:linear-gradient(135deg,rgba(46,204,113,.06),rgba(39,174,96,.04));border:1px solid rgba(46,204,113,.15);border-radius:10px;padding:14px">';
     html+='<h5 style="color:var(--jade);margin-bottom:8px">🌿 今日节气：'+jieqi+'</h5>';
     html+='<p style="font-size:13px;line-height:1.8;color:#556">'+(jieqiDesc[jieqi]||'')+'</p>';
-    html+='<p style="font-size:12px;color:#888">📖 俗语：「'+(jieqiSuyu[jieqi]||'')+'」</p>';
+    html+='<p style="font-size:12px;color:var(--steel)">📖 俗语：「'+(jieqiSuyu[jieqi]||'')+'」</p>';
     html+='<p style="font-size:12px;color:var(--orange)">⚠️ 注意：'+(jqYi&&jqYi[jieqi]?jqYi[jieqi].split('。')[0]+'。':'顺应节气，保重身体。')+'</p>';
     html+='</div>';
   }
@@ -1725,8 +1725,8 @@ function updateDailyAdvice(almanac) {
   // === 今日道家智慧 ===
   html+='<div class="advice-card" style="margin-bottom:12px;background:linear-gradient(135deg,rgba(155,89,182,.06),rgba(142,68,173,.04));border:1px solid rgba(155,89,182,.15);border-radius:10px;padding:14px">';
   html+='<h5 style="color:var(--violet2);margin-bottom:8px">📚 今日道家智慧</h5>';
-  html+='<div style="font-size:13px;color:#666;margin-bottom:6px">「'+todayDaoist.quote+'」</div>';
-  html+='<div style="font-size:12px;color:#999">—— '+todayDaoist.source+'</div>';
+  html+='<div style="font-size:13px;color:var(--paper3);margin-bottom:6px">「'+todayDaoist.quote+'」</div>';
+  html+='<div style="font-size:12px;color:var(--paper3)">—— '+todayDaoist.source+'</div>';
   html+='<div style="font-size:13px;line-height:1.8;color:#556;margin-top:8px">💡 白话：'+todayDaoist.baihua+'</div>';
   html+='</div>';
 
@@ -1749,7 +1749,7 @@ function updateDailyAdvice(almanac) {
   html+='</div>';
 
   // 免责声明
-  html+='<div style="margin-top:12px;padding:10px;background:#fff8e1;border-left:3px solid #ffc107;border-radius:4px;font-size:11px;color:#888">⚠️ 以上内容仅供文化交流与生活参考，不构成任何法律依据。</div>';
+  html+='<div style="margin-top:12px;padding:10px;background:#fff8e1;border-left:3px solid #ffc107;border-radius:4px;font-size:11px;color:var(--steel)">⚠️ 以上内容仅供文化交流与生活参考，不构成任何法律依据。</div>';
 
   document.getElementById('dailyAdvice').innerHTML=html;
 

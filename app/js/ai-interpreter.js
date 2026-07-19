@@ -603,7 +603,7 @@ function aiExportReport(type) {
   if (!reportEl) return;
 
   const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>AI命理报告</title>';
-  html += '<style>body{font-family:"Songti SC","SimSun",serif;max-width:800px;margin:0 auto;padding:40px 20px;background:#fdf6e3;color:#333;line-height:1.8}h1,h2,h3{color:var(--gold)}a{color:var(--gold)}</style>';
+  html += '<style>body{font-family:"Songti SC","SimSun",serif;max-width:800px;margin:0 auto;padding:40px 20px;background:#fdf6e3;color:var(--ink3);line-height:1.8}h1,h2,h3{color:var(--gold)}a{color:var(--gold)}</style>';
   html += '</head><body>';
   html += reportEl.innerHTML;
   html += '</body></html>';

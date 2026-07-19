@@ -11,10 +11,10 @@
 :root{
   --gold:var(--gold);--gold2:var(--gold2);--gold3:var(--gold3);
   --ink:#0a0a12;--ink2:#141428;--ink3:#1e1e3a;
-  --paper:var(--paper);--paper2:var(--paper2);--paper3:#8a8070;
+  --paper:var(--paper);--paper2:var(--paper2);--paper3:var(--paper3);
   --cinn:var(--cinn);--cinn2:var(--cinn2);
   --jade:var(--jade);--jade2:var(--success);
-  --cyan:var(--cyan);--cyan2:#5dade2;
+  --cyan:var(--cyan);--cyan2:var(--cyan2);
   --amber:var(--warn);
   --danger:#dc3545;
   --font:'Noto Serif SC','Songti SC','STSong',serif;
@@ -1548,12 +1548,12 @@ function updateH5FaithFestival() {
       let color = f.school === 'fo' ? '#c0392b' : (f.school === 'dao' ? '#27ae60' : '#c9a84c');
       if (offset === 0) {
         html += '<div><b style="color:' + color + '">' + icon + ' ' + f.name + '</b></div>';
-        html += '<div style="color:#888;font-size:12px">' + f.temple + ' · ' + f.activity + '</div>';
-        html += '<div style="color:#888;font-size:12px">' + f.desc + '</div>';
+        html += '<div style="color:var(--steel);font-size:12px">' + f.temple + ' · ' + f.activity + '</div>';
+        html += '<div style="color:var(--steel);font-size:12px">' + f.desc + '</div>';
       } else {
         let dayStr = offset === 1 ? '明天' : (offset === 2 ? '后天' : offset + '天后');
         html += '<div>📢 <b>' + dayStr + '：</b>' + icon + ' <b style="color:' + color + '">' + f.name + '</b></div>';
-        html += '<div style="color:#888;font-size:12px">' + f.temple + ' · ' + f.activity + '</div>';
+        html += '<div style="color:var(--steel);font-size:12px">' + f.temple + ' · ' + f.activity + '</div>';
       }
       found = true;
       break;
@@ -1561,7 +1561,7 @@ function updateH5FaithFestival() {
   }
   
   if (!found) {
-    html = '<div style="color:#888">近期无特殊法会活动</div>';
+    html = '<div style="color:var(--steel)">近期无特殊法会活动</div>';
   }
   el.innerHTML = html;
 }
@@ -1598,13 +1598,13 @@ function updateH5YearEndRitual() {
     }
   }
   if (!zodiac) {
-    el.innerHTML = '<div style="color:#888">设置生肖后查看个性化建议</div>';
+    el.innerHTML = '<div style="color:var(--steel)">设置生肖后查看个性化建议</div>';
     return;
   }
   
   let data = ZODIAC_YEAR_END_RITUALS[zodiac];
   if (!data) {
-    el.innerHTML = '<div style="color:#888">暂无' + zodiac + '生肖的年末建议</div>';
+    el.innerHTML = '<div style="color:var(--steel)">暂无' + zodiac + '生肖的年末建议</div>';
     return;
   }
   
@@ -1613,14 +1613,14 @@ function updateH5YearEndRitual() {
   data.rituals.forEach(function(r) {
     html += '<div style="margin-bottom:6px;padding-left:12px">';
     html += '<div><b>• ' + r.name + '</b></div>';
-    html += '<div style="color:#888;font-size:12px">📍 ' + r.temple + ' | 📅 ' + r.timing + '</div>';
-    html += '<div style="color:#888;font-size:12px">' + r.reason + '</div>';
+    html += '<div style="color:var(--steel);font-size:12px">📍 ' + r.temple + ' | 📅 ' + r.timing + '</div>';
+    html += '<div style="color:var(--steel);font-size:12px">' + r.reason + '</div>';
     html += '</div>';
   });
   html += '<div style="margin-top:8px"><b>🔮 下一年度建议：</b></div>';
-  html += '<div style="color:#666;font-size:12px">' + data.nextYearAdvice + '</div>';
+  html += '<div style="color:var(--paper3);font-size:12px">' + data.nextYearAdvice + '</div>';
   html += '<div style="margin-top:6px"><b>🏯 推荐参拜：</b></div>';
-  html += '<div style="color:#666;font-size:12px">' + data.recommendedTemples.join('、') + '</div>';
+  html += '<div style="color:var(--paper3);font-size:12px">' + data.recommendedTemples.join('、') + '</div>';
   
   el.innerHTML = html;
 }

@@ -13,8 +13,8 @@ if (typeof window !== 'undefined' && typeof window.showConfirm !== 'function') {
     overlay.innerHTML = '<div style="background:#1a1a2e;border:1px solid rgba(201,168,76,0.4);border-radius:12px;padding:24px;max-width:360px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.5)">' +
       '<div style="color:var(--paper);font-size:15px;line-height:1.7;margin-bottom:20px;letter-spacing:1px">' + msg + '</div>' +
       '<div style="display:flex;gap:12px;justify-content:flex-end">' +
-      '<button data-act="cancel" style="padding:8px 20px;background:transparent;color:#888;border:1px solid #555;border-radius:6px;cursor:pointer;font-size:13px">取消</button>' +
-      '<button data-act="ok" style="padding:8px 20px;background:linear-gradient(135deg,#c9a84c,#a08430);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;letter-spacing:1px">确认</button>' +
+      '<button data-act="cancel" style="padding:8px 20px;background:transparent;color:var(--steel);border:1px solid var(--paper3);border-radius:6px;cursor:pointer;font-size:13px">取消</button>' +
+      '<button data-act="ok" style="padding:8px 20px;background:linear-gradient(135deg,#c9a84c,#a08430);color:var(--paper);border:none;border-radius:6px;cursor:pointer;font-size:13px;letter-spacing:1px">确认</button>' +
       '</div></div>';
     document.body.appendChild(overlay);
     function close(result) {
@@ -3227,7 +3227,7 @@ function exportRenameResult() {
   <meta charset="UTF-8">
   <title>改名分析报告 - ${nameOut}</title>
   <style>
-    body { font-family: 'Noto Serif SC', serif; background: #080808; color: var(--paper); padding: 40px; max-width: 800px; margin: 0 auto; }
+    body { font-family: 'Noto Serif SC', serif; background: var(--ink); color: var(--paper); padding: 40px; max-width: 800px; margin: 0 auto; }
     h1 { color: var(--gold); text-align: center; letter-spacing: 6px; }
     h2 { color: var(--gold2); border-bottom: 1px solid rgba(201,168,76,.2); padding-bottom: 8px; }
     .result { background: rgba(255,255,255,.02); border: 1px solid rgba(201,168,76,.1); border-radius: 8px; padding: 24px; margin: 16px 0; }
@@ -4347,7 +4347,7 @@ function displayCompanyNamesProEnhanced(scoredNames, industry, style, baziAnalys
     card.className = 'company-name-card';
     card.style.position = 'relative';
     card.innerHTML = `
-      ${isTop3 ? `<div style="position:absolute;top:-8px;left:-8px;background:linear-gradient(135deg,#c9a84c,#8b6914);color:#000;font-size:10px;font-weight:bold;padding:3px 8px;border-radius:10px 10px 10px 0;letter-spacing:2px">🏆 TOP${index+1}</div>` : ''}
+      ${isTop3 ? `<div style="position:absolute;top:-8px;left:-8px;background:linear-gradient(135deg,#c9a84c,#8b6914);color:var(--ink);font-size:10px;font-weight:bold;padding:3px 8px;border-radius:10px 10px 10px 0;letter-spacing:2px">🏆 TOP${index+1}</div>` : ''}
       <button class="cn-save-btn" onclick="saveCompanyName('${name}')">收藏</button>
       <div class="cn-name">${name}</div>
       <div class="cn-score" style="margin-bottom:4px">
@@ -5288,7 +5288,7 @@ function addMerit(faith, amount, reason) {
     let msg = document.createElement('div');
     msg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid var(--gold);color:var(--gold);padding:20px 30px;border-radius:14px;font-size:16px;z-index:99999;text-align:center;box-shadow:0 0 40px rgba(201,168,76,0.3)';
     msg.innerHTML = '<div style="font-size:32px;margin-bottom:8px">🙏</div><div style="font-weight:bold">+' + amount + ' 功德</div>';
-    if (reason) msg.insertAdjacentHTML("beforeend", '<div style="font-size:12px;color:#aaa;margin-top:6px">' + reason + '</div>');
+    if (reason) msg.insertAdjacentHTML("beforeend", '<div style="font-size:12px;color:var(--paper3);margin-top:6px">' + reason + '</div>');
     document.body.appendChild(msg);
     setTimeout(function(){msg.style.opacity='0';msg.style.transition='opacity 0.8s';setTimeout(function(){document.body.removeChild(msg);},800);}, 1500);
     
@@ -6125,7 +6125,7 @@ function showZodiacDetail(zodiac) {
     html += '<p style="margin:0 0 10px 0;color:var(--paper2);line-height:1.8">' + buddhaInfo.intro + '</p>';
     if (buddhaInfo.worship) html += '<p style="margin:0 0 8px 0;font-size:13px;color:var(--paper2)"><b>供奉方法：</b>' + buddhaInfo.worship + '</p>';
     if (buddhaInfo.benefits) html += '<p style="margin:0;font-size:13px;color:var(--paper2)"><b>功德利益：</b>' + buddhaInfo.benefits.join('、') + '</p>';
-    if (buddhaInfo.taboos) html += '<p style="margin:8px 0 0;font-size:12px;color:#f44336"><b>禁忌：</b>' + buddhaInfo.taboos.join('；') + '</p>';
+    if (buddhaInfo.taboos) html += '<p style="margin:8px 0 0;font-size:12px;color:var(--cinn2)"><b>禁忌：</b>' + buddhaInfo.taboos.join('；') + '</p>';
     html += '</div>';
   } else {
     html += '<div style="background:rgba(201,168,76,0.08);padding:16px;border-radius:12px;margin-bottom:16px">';
@@ -6161,12 +6161,12 @@ function showZodiacDetail(zodiac) {
   html += '</div>';
   
   html += '<div style="background:rgba(244,67,54,0.08);padding:16px;border-radius:12px;margin-bottom:16px">';
-  html += '<h4 style="color:#f44336;margin:0 0 10px 0">⚠️ 避免配对</h4>';
+  html += '<h4 style="color:var(--cinn2);margin:0 0 10px 0">⚠️ 避免配对</h4>';
   html += '<p style="margin:0;color:var(--paper2)">' + info.avoid.join('、') + '</p>';
   html += '</div>';
   
   html += '<div style="text-align:center;margin-top:20px">';
-  html += '<button onclick="showKnowledgeDetail(\'shengxiao\')" style="background:var(--gold);color:#000;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:bold">查看完整生肖知识</button>';
+  html += '<button onclick="showKnowledgeDetail(\'shengxiao\')" style="background:var(--gold);color:var(--ink);border:none;padding:12px 24px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:bold">查看完整生肖知识</button>';
   html += '</div>';
   
   // 增强版：追加 ZodiacComplete 数据（本命佛+2025蛇年运势+吉祥物）
@@ -6216,7 +6216,7 @@ function showConstellationDetail(sign) {
   html += '<h5 style="color:#4CAF50;margin:0 0 6px 0">❤️ 喜欢</h5>';
   html += '<p style="margin:0;font-size:13px;color:var(--paper2)">' + info.likes + '</p></div>';
   html += '<div style="background:rgba(244,67,54,0.08);padding:12px;border-radius:8px">';
-  html += '<h5 style="color:#f44336;margin:0 0 6px 0">💔 不喜欢</h5>';
+  html += '<h5 style="color:var(--cinn2);margin:0 0 6px 0">💔 不喜欢</h5>';
   html += '<p style="margin:0;font-size:13px;color:var(--paper2)">' + info.dislikes + '</p></div>';
   html += '</div>';
   
@@ -6237,7 +6237,7 @@ function showConstellationDetail(sign) {
   html += '</div>';
   
   html += '<div style="text-align:center;margin-top:20px">';
-  html += '<button onclick="showKnowledgeDetail(\'constellation\')" style="background:var(--gold);color:#000;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:bold">查看完整星座知识</button>';
+  html += '<button onclick="showKnowledgeDetail(\'constellation\')" style="background:var(--gold);color:var(--ink);border:none;padding:12px 24px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:bold">查看完整星座知识</button>';
   html += '</div>';
   html += '</div>';
   
@@ -6380,7 +6380,7 @@ function showYangzhaiKB() {
   html += '<h4 style="color:var(--paper);font-size:14px">命卦速查表</h4>';
   html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px"><thead><tr style="background:rgba(201,168,76,0.15)"><th style="padding:8px;color:var(--gold)">命卦</th><th style="padding:8px;color:var(--gold)">类型</th><th style="padding:8px;color:var(--gold)">四吉方</th><th style="padding:8px;color:var(--gold)">四凶方</th></tr></thead><tbody>';
   kb.bazhai.mingua.table.forEach(function(row) {
-    html += '<tr style="border-bottom:1px solid rgba(201,168,76,0.1)"><td style="padding:6px;color:var(--paper)">' + row.gua + '</td><td style="padding:6px;color:' + (row.type==='东四命'?'#4CAF50':'#2196f3') + '">' + row.type + '</td><td style="padding:6px;color:var(--paper2);font-size:11px">' + row.best.join('、') + '</td><td style="padding:6px;color:#f44336;font-size:11px">' + row.worst.join('、') + '</td></tr>';
+    html += '<tr style="border-bottom:1px solid rgba(201,168,76,0.1)"><td style="padding:6px;color:var(--paper)">' + row.gua + '</td><td style="padding:6px;color:' + (row.type==='东四命'?'#4CAF50':'#2196f3') + '">' + row.type + '</td><td style="padding:6px;color:var(--paper2);font-size:11px">' + row.best.join('、') + '</td><td style="padding:6px;color:var(--cinn2);font-size:11px">' + row.worst.join('、') + '</td></tr>';
   });
   html += '</tbody></table></div>';
   // 吉凶星
@@ -6391,7 +6391,7 @@ function showYangzhaiKB() {
     html += '<p style="margin:4px 0;font-size:12px;color:var(--paper2)"><strong style="color:var(--paper)">' + k + '</strong>：' + s.meaning + ' → ' + s.effect + '</p>';
   });
   html += '</div>';
-  html += '<div style="background:rgba(244,67,54,0.08);padding:12px;border-radius:8px"><h5 style="color:#f44336;margin:0 0 8px">四凶星</h5>';
+  html += '<div style="background:rgba(244,67,54,0.08);padding:12px;border-radius:8px"><h5 style="color:var(--cinn2);margin:0 0 8px">四凶星</h5>';
   Object.keys(kb.bazhai.xiongxing).forEach(function(k) {
     let s = kb.bazhai.xiongxing[k];
     html += '<p style="margin:4px 0;font-size:12px;color:var(--paper2)"><strong style="color:var(--paper)">' + k + '</strong>：' + s.meaning + ' → ' + s.effect + '</p>';
@@ -6431,9 +6431,9 @@ function showYangzhaiKB() {
   html += '<div id="yk-xingsha" style="margin-bottom:30px"><h3 style="color:var(--gold);border-bottom:1px solid rgba(201,168,76,0.3);padding-bottom:8px">⚔️ 形煞识别与化解</h3>';
   kb.xingsha.shas.forEach(function(sha) {
     html += '<div style="background:rgba(244,67,54,0.06);padding:14px;border-radius:10px;margin-bottom:12px">';
-    html += '<h4 style="color:var(--paper);margin:0 0 6px">' + sha.name + ' <span style="color:#f44336;font-size:12px">' + sha.severity + '</span></h4>';
+    html += '<h4 style="color:var(--paper);margin:0 0 6px">' + sha.name + ' <span style="color:var(--cinn2);font-size:12px">' + sha.severity + '</span></h4>';
     html += '<p style="color:var(--paper2);font-size:13px;margin:4px 0">' + sha.description + '</p>';
-    html += '<p style="color:#f44336;font-size:13px;margin:4px 0">⚠️ 影响：' + sha.symptom + '</p>';
+    html += '<p style="color:var(--cinn2);font-size:13px;margin:4px 0">⚠️ 影响：' + sha.symptom + '</p>';
     html += '<p style="color:#4CAF50;font-size:13px;margin:4px 0">✅ 化解：' + sha.remedy + '</p>';
     html += '<pre style="background:rgba(0,0,0,0.3);padding:8px;border-radius:6px;font-size:11px;color:var(--paper2);margin:8px 0 0;overflow-x:auto">' + sha.illustration + '</pre>';
     html += '</div>';
@@ -6444,7 +6444,7 @@ function showYangzhaiKB() {
   html += '<div id="yk-quejiao" style="margin-bottom:30px"><h3 style="color:var(--gold);border-bottom:1px solid rgba(201,168,76,0.3);padding-bottom:8px">📐 房屋缺角与补救</h3>';
   html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:rgba(201,168,76,0.15)"><th style="padding:8px;color:var(--gold)">方位</th><th style="padding:8px;color:var(--gold)">对应成员</th><th style="padding:8px;color:var(--gold)">影响</th><th style="padding:8px;color:var(--gold)">补救</th></tr></thead><tbody>';
   kb.quejiao.directions.forEach(function(d) {
-    html += '<tr style="border-bottom:1px solid rgba(201,168,76,0.1)"><td style="padding:6px;color:var(--paper)">' + d.position + '</td><td style="padding:6px;color:var(--paper2)">' + d.member + '</td><td style="padding:6px;color:#f44336;font-size:11px">' + d.effect + '</td><td style="padding:6px;color:#4CAF50;font-size:11px">' + d.remedy + '</td></tr>';
+    html += '<tr style="border-bottom:1px solid rgba(201,168,76,0.1)"><td style="padding:6px;color:var(--paper)">' + d.position + '</td><td style="padding:6px;color:var(--paper2)">' + d.member + '</td><td style="padding:6px;color:var(--cinn2);font-size:11px">' + d.effect + '</td><td style="padding:6px;color:#4CAF50;font-size:11px">' + d.remedy + '</td></tr>';
   });
   html += '</tbody></table></div></div>';
   
@@ -6483,19 +6483,19 @@ function showYangzhaiKB() {
   kb.plants.lucky.forEach(function(p) {
     html += '<div style="background:rgba(76,175,80,0.06);padding:8px 12px;border-radius:6px;margin-bottom:4px;font-size:13px;color:var(--paper2)"><strong style="color:var(--paper)">' + p.name + '</strong>（' + p.element + '）→ ' + p.effect + ' | 摆放：' + p.placement + '</div>';
   });
-  html += '<h4 style="color:#f44336;font-size:14px;margin-top:12px">化煞植物</h4>';
+  html += '<h4 style="color:var(--cinn2);font-size:14px;margin-top:12px">化煞植物</h4>';
   kb.plants.sha_plants.forEach(function(p) {
     html += '<div style="background:rgba(244,67,54,0.06);padding:8px 12px;border-radius:6px;margin-bottom:4px;font-size:13px;color:var(--paper2)"><strong style="color:var(--paper)">' + p.name + '</strong> → ' + p.effect + ' | ' + p.placement + '</div>';
   });
   html += '<h4 style="color:var(--paper);font-size:14px;margin-top:12px">⚠️ 禁忌</h4>';
-  kb.plants.taboo.forEach(function(t) { html += '<p style="margin:3px 0;font-size:12px;color:#f44336">• ' + t + '</p>'; });
+  kb.plants.taboo.forEach(function(t) { html += '<p style="margin:3px 0;font-size:12px;color:var(--cinn2)">• ' + t + '</p>'; });
   html += '</div>';
   
   // 楼层选择
   html += '<div id="yk-louceng" style="margin-bottom:30px"><h3 style="color:var(--gold);border-bottom:1px solid rgba(201,168,76,0.3);padding-bottom:8px">🏢 楼层五行选择</h3>';
   html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:rgba(201,168,76,0.15)"><th style="padding:8px;color:var(--gold)">五行命</th><th style="padding:8px;color:var(--gold)">最佳楼层</th><th style="padding:8px;color:var(--gold)">避忌楼层</th></tr></thead><tbody>';
   kb.louceng.table.forEach(function(r) {
-    html += '<tr style="border-bottom:1px solid rgba(201,168,76,0.1)"><td style="padding:6px;color:var(--paper)">' + r.element + '</td><td style="padding:6px;color:#4CAF50;font-size:11px">' + r.best + '</td><td style="padding:6px;color:#f44336;font-size:11px">' + r.avoid + '</td></tr>';
+    html += '<tr style="border-bottom:1px solid rgba(201,168,76,0.1)"><td style="padding:6px;color:var(--paper)">' + r.element + '</td><td style="padding:6px;color:#4CAF50;font-size:11px">' + r.best + '</td><td style="padding:6px;color:var(--cinn2);font-size:11px">' + r.avoid + '</td></tr>';
   });
   html += '</tbody></table></div></div>';
   
@@ -6853,9 +6853,9 @@ function _doRecommendRename(currentName, sex, birthDate, birthHourVal, birthLoca
   html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">';
   top10.forEach(function(r, idx) {
     let rankBadge = '';
-    if (idx === 0) rankBadge = '<span style="display:inline-block;background:linear-gradient(135deg,#f39c12,#e74c3c);color:#fff;font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px">🥇 TOP1</span>';
-    else if (idx === 1) rankBadge = '<span style="display:inline-block;background:linear-gradient(135deg,#bdc3c7,#7f8c8d);color:#fff;font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px">🥈 TOP2</span>';
-    else if (idx === 2) rankBadge = '<span style="display:inline-block;background:linear-gradient(135deg,#cd7f32,#a0522d);color:#fff;font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px">🥉 TOP3</span>';
+    if (idx === 0) rankBadge = '<span style="display:inline-block;background:linear-gradient(135deg,#f39c12,#e74c3c);color:var(--paper);font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px">🥇 TOP1</span>';
+    else if (idx === 1) rankBadge = '<span style="display:inline-block;background:linear-gradient(135deg,#bdc3c7,#7f8c8d);color:var(--paper);font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px">🥈 TOP2</span>';
+    else if (idx === 2) rankBadge = '<span style="display:inline-block;background:linear-gradient(135deg,#cd7f32,#a0522d);color:var(--paper);font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px">🥉 TOP3</span>';
 
     html += '<div class="rename-rec-card" style="padding:14px;background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,' + (idx < 3 ? '.25' : '.1') + ');border-radius:10px;cursor:pointer;transition:all .2s"';
     html += ' onclick="_selectRecommendedName(\'' + r.fullName + '\')"';

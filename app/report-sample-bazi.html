@@ -9,12 +9,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ink:#080808;--paper:#f5f0e6;--paper2:#e8dcc8;
+  --ink:var(--ink);--paper:#f5f0e6;--paper2:#e8dcc8;
   --gold:var(--gold);--gold2:var(--gold2);--gold3:var(--gold3);
   --cinn:var(--cinn);--jade:var(--jade);--cyan:var(--cyan);--violet:var(--violet2);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Noto Serif SC',serif;background:var(--paper);color:#333;min-height:100vh}
+body{font-family:'Noto Serif SC',serif;background:var(--paper);color:var(--ink3);min-height:100vh}
 
 .report-container{max-width:900px;margin:0 auto;padding:40px 30px}
 
@@ -22,32 +22,32 @@ body{font-family:'Noto Serif SC',serif;background:var(--paper);color:#333;min-he
 .report-header{text-align:center;padding:40px 0;border-bottom:2px solid var(--gold);margin-bottom:40px}
 .report-logo{font-family:'Ma Shan Zheng',serif;font-size:36px;color:var(--gold);letter-spacing:8px}
 .report-title{font-family:'Ma Shan Zheng',serif;font-size:32px;margin:20px 0 10px;letter-spacing:4px}
-.report-subtitle{font-size:14px;color:#666;letter-spacing:2px}
-.report-meta{display:flex;justify-content:center;gap:30px;margin-top:20px;font-size:13px;color:#888}
+.report-subtitle{font-size:14px;color:var(--paper3);letter-spacing:2px}
+.report-meta{display:flex;justify-content:center;gap:30px;margin-top:20px;font-size:13px;color:var(--steel)}
 
 /* SECTION */
 .section{margin-bottom:40px}
 .section-title{font-family:'Ma Shan Zheng',serif;font-size:24px;color:var(--gold);letter-spacing:4px;margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid rgba(201,168,76,.3)}
-.section-content{font-size:15px;line-height:2;color:#444}
+.section-content{font-size:15px;line-height:2;color:var(--ink4)}
 
 /* CARDS */
 .card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:20px 0}
-.info-card{background:#fff;padding:20px;border:1px solid rgba(201,168,76,.2);text-align:center}
-.info-card .label{font-size:12px;color:#888;margin-bottom:8px}
+.info-card{background:var(--paper);padding:20px;border:1px solid rgba(201,168,76,.2);text-align:center}
+.info-card .label{font-size:12px;color:var(--steel);margin-bottom:8px}
 .info-card .value{font-size:24px;font-weight:600;color:var(--gold)}
-.info-card .desc{font-size:13px;color:#666;margin-top:8px}
+.info-card .desc{font-size:13px;color:var(--paper3);margin-top:8px}
 
 /* TABLE */
 .data-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14px}
 .data-table th,.data-table td{padding:12px;border:1px solid rgba(201,168,76,.2);text-align:center}
 .data-table th{background:rgba(201,168,76,.08);color:var(--gold);font-weight:500}
-.data-table td{background:#fff}
+.data-table td{background:var(--paper)}
 
 /* CHART */
-.chart-box{background:#fff;padding:20px;margin:20px 0;border:1px solid rgba(201,168,76,.2)}
-.chart-title{font-size:14px;color:#666;margin-bottom:15px;text-align:center}
+.chart-box{background:var(--paper);padding:20px;margin:20px 0;border:1px solid rgba(201,168,76,.2)}
+.chart-title{font-size:14px;color:var(--paper3);margin-bottom:15px;text-align:center}
 .wuxing-bar{display:flex;height:40px;margin:10px 0;border-radius:4px;overflow:hidden}
-.wuxing-bar span{display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:500}
+.wuxing-bar span{display:flex;align-items:center;justify-content:center;color:var(--paper);font-size:12px;font-weight:500}
 
 /* BADGE */
 .badge{display:inline-block;padding:4px 12px;border-radius:4px;font-size:12px;margin:4px}
@@ -57,29 +57,29 @@ body{font-family:'Noto Serif SC',serif;background:var(--paper);color:#333;min-he
 .badge-blue{background:rgba(41,128,185,.1);color:var(--cyan)}
 
 /* ANALYSIS */
-.analysis-box{background:#fff;padding:24px;margin:20px 0;border-left:4px solid var(--gold)}
+.analysis-box{background:var(--paper);padding:24px;margin:20px 0;border-left:4px solid var(--gold)}
 .analysis-box h4{font-size:16px;color:var(--gold);margin-bottom:12px}
-.analysis-box p{font-size:14px;line-height:1.9;color:#555;margin-bottom:10px}
+.analysis-box p{font-size:14px;line-height:1.9;color:var(--paper3);margin-bottom:10px}
 
 /* ADVICE */
 .advice-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:20px 0}
-.advice-card{background:#fff;padding:20px;border:1px solid rgba(201,168,76,.2)}
+.advice-card{background:var(--paper);padding:20px;border:1px solid rgba(201,168,76,.2)}
 .advice-card h5{font-size:14px;color:var(--gold);margin-bottom:10px}
-.advice-card ul{list-style:none;font-size:14px;line-height:1.8;color:#666}
+.advice-card ul{list-style:none;font-size:14px;line-height:1.8;color:var(--paper3)}
 .advice-card li:before{content:"•";color:var(--gold);margin-right:8px}
 
 /* FOOTER */
 .report-footer{text-align:center;padding:30px 0;margin-top:40px;border-top:1px solid rgba(201,168,76,.2)}
-.report-footer p{font-size:13px;color:#888;margin:8px 0}
-.disclaimer{font-size:12px;color:#999;margin-top:20px;padding:16px;background:rgba(0,0,0,.03);border-radius:4px}
+.report-footer p{font-size:13px;color:var(--steel);margin:8px 0}
+.disclaimer{font-size:12px;color:var(--paper3);margin-top:20px;padding:16px;background:rgba(0,0,0,.03);border-radius:4px}
 
 /* PAYMENT NOTICE */
 .payment-notice{background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.02));border:2px solid var(--gold);padding:30px;margin:30px 0;text-align:center;border-radius:8px}
 .payment-notice h3{font-family:'Ma Shan Zheng',serif;font-size:24px;color:var(--gold);margin-bottom:16px}
-.payment-notice p{font-size:14px;color:#666;margin:10px 0}
+.payment-notice p{font-size:14px;color:var(--paper3);margin:10px 0}
 .payment-notice .price{font-size:36px;font-weight:700;color:var(--cinn);margin:20px 0}
-.payment-notice .price small{font-size:16px;color:#999}
-.payment-btn{display:inline-block;padding:14px 40px;background:var(--gold);color:#fff;font-size:16px;letter-spacing:2px;border:none;border-radius:4px;cursor:pointer;margin-top:16px;transition:all .3s}
+.payment-notice .price small{font-size:16px;color:var(--paper3)}
+.payment-btn{display:inline-block;padding:14px 40px;background:var(--gold);color:var(--paper);font-size:16px;letter-spacing:2px;border:none;border-radius:4px;cursor:pointer;margin-top:16px;transition:all .3s}
 .payment-btn:hover{background:var(--gold3);transform:translateY(-2px)}
 
 /* BLUR */
@@ -197,7 +197,7 @@ body{font-family:'Noto Serif SC',serif;background:var(--paper);color:#333;min-he
     <h3 class="section-title">四、性格特征</h3>
     <div class="section-content">
       <p>日主甲木，性格正直、刚毅，有领导才能，做事雷厉风行。七杀透干，果断坚毅，有魄力，但容易急躁冲动。偏印得力，思维敏捷，学习能力强，有独特的见解。</p>
-      <p style="color:#999;font-size:13px;margin-top:16px">—— 以下内容需付费解锁 ——</p>
+      <p style="color:var(--paper3);font-size:13px;margin-top:16px">—— 以下内容需付费解锁 ——</p>
     </div>
   </div>
 
@@ -339,9 +339,9 @@ body{font-family:'Noto Serif SC',serif;background:var(--paper);color:#333;min-he
     <p>此报告包含事业、财运、婚姻、大运流年、人生建议等完整内容</p>
     <p>报告字数：约2500字 | 生成时间：即时</p>
     <div class="price">¥9.9 <small>原价¥29.9</small></div>
-    <p style="font-size:13px;color:#999">新用户首单专享价</p>
+    <p style="font-size:13px;color:var(--paper3)">新用户首单专享价</p>
     <button class="payment-btn" onclick="payNow()">立即解锁</button>
-    <p style="margin-top:16px;font-size:12px;color:#888">
+    <p style="margin-top:16px;font-size:12px;color:var(--steel)">
       支持微信、支付宝支付 | 支付后永久保存 | 可导出PDF
     </p>
   </div>

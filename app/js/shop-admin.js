@@ -42,12 +42,12 @@ function _showPasswordModal(callback) {
   let input = document.createElement('input');
   input.type = 'password';
   input.placeholder = '请输入管理密码';
-  input.style.cssText = 'width:100%;padding:12px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:#fff;font-size:15px;box-sizing:border-box;outline:none;margin-bottom:16px';
+  input.style.cssText = 'width:100%;padding:12px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:var(--paper);font-size:15px;box-sizing:border-box;outline:none;margin-bottom:16px';
   let btnRow = document.createElement('div');
   btnRow.style.cssText = 'display:flex;gap:10px;justify-content:flex-end';
   let cancelBtn = document.createElement('button');
   cancelBtn.textContent = '取消';
-  cancelBtn.style.cssText = 'padding:8px 18px;border-radius:8px;border:none;background:rgba(255,255,255,.1);color:#aaa;cursor:pointer;font-size:14px';
+  cancelBtn.style.cssText = 'padding:8px 18px;border-radius:8px;border:none;background:rgba(255,255,255,.1);color:var(--paper3);cursor:pointer;font-size:14px';
   let okBtn = document.createElement('button');
   okBtn.textContent = '确认';
   okBtn.style.cssText = 'padding:8px 18px;border-radius:8px;border:none;background:linear-gradient(135deg,#c9a84c,#d4af37);color:#1a1f2e;cursor:pointer;font-size:14px;font-weight:600';
@@ -154,7 +154,7 @@ function renderDashboard() {
     '<div class="card"><div class="stat">' + total + '</div><div class="meta">总商品数</div></div>' +
     '<div class="card"><div class="stat" style="color:var(--success)">' + active + '</div><div class="meta">已上架</div></div>' +
     '<div class="card"><div class="stat" style="color:var(--cinn2)">' + offline + '</div><div class="meta">已下架</div></div>' +
-    '<div class="card"><div class="stat" style="color:#5dade2">' + categories + '</div><div class="meta">商品分类</div></div>';
+    '<div class="card"><div class="stat" style="color:var(--cyan2)">' + categories + '</div><div class="meta">商品分类</div></div>';
 }
 
 // ==================== 商品表格 ====================

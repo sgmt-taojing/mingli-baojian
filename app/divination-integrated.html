@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root{
-      --ink:#080808;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;
+      --ink:var(--ink);--ink2:var(--ink2);--ink3:#1a1a1a;--ink4:var(--ink4);
       --paper:var(--paper);--paper2:var(--paper2);--paper3:var(--paper3);
       --gold:var(--gold);--gold2:var(--gold2);--gold3:var(--gold3);
       --title:var(--gold);--muted:var(--paper3);--accent:var(--gold);
@@ -18,7 +18,7 @@
       --success:var(--success);--warn:var(--orange);--danger:var(--cinn2);
       --text:var(--paper);--text-dim:var(--paper3);
       --cinn:var(--cinn);--cinn2:var(--cinn2);
-      --cyan:var(--cyan);--cyan2:#5dade2;
+      --cyan:var(--cyan);--cyan2:var(--cyan2);
       --jade:var(--jade);--jade2:var(--success);
       --violet:var(--violet2);--violet2:#a569bd;
       --orange:var(--orange);
@@ -42,7 +42,7 @@
     /* Top Nav */
     .top-nav{display:flex;justify-content:center;gap:8px;padding:12px;flex-wrap:wrap;border-bottom:1px solid var(--border);background:var(--card)}
     .top-nav a{color:var(--title);text-decoration:none;font-size:13px;padding:5px 14px;border:1px solid var(--border);border-radius:20px;transition:.2s}
-    .top-nav a:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .top-nav a:hover{background:var(--accent);color:var(--paper);border-color:var(--accent)}
     /* Section title */
     .section-title{font-family:'Ma Shan Zheng',cursive;font-size:26px;color:var(--title);margin:28px 0 14px;letter-spacing:4px;display:flex;align-items:center;gap:10px}
     .section-title::before{content:'';display:inline-block;width:4px;height:28px;background:var(--accent);border-radius:2px}
@@ -50,7 +50,7 @@
     /* Tab system */
     .tab-bar{display:flex;gap:6px;padding:4px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;flex-wrap:wrap}
     .tab-btn{padding:10px 20px;border:none;border-radius:8px;background:transparent;color:var(--muted);font-size:14px;font-family:inherit;cursor:pointer;transition:.25s;flex:1;min-width:100px;text-align:center}
-    .tab-btn.active{background:var(--title);color:#fff;font-weight:600}
+    .tab-btn.active{background:var(--title);color:var(--paper);font-weight:600}
     .tab-btn:not(.active):hover{background:rgba(201,168,76,0.08);color:var(--title)}
     .tab-panel{display:none;animation:fadeIn .3s ease}
     .tab-panel.active{display:block}
@@ -60,9 +60,9 @@
     .card-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
     .card-icon{font-size:24px}
     .card-title{font-family:'Ma Shan Zheng',cursive;font-size:20px;color:var(--title);letter-spacing:2px}
-    .card-badge{font-size:12px;padding:2px 10px;border-radius:12px;background:var(--success);color:#fff;margin-left:auto}
+    .card-badge{font-size:12px;padding:2px 10px;border-radius:12px;background:var(--success);color:var(--paper);margin-left:auto}
     /* Module title banner */
-    .mod-banner{background:linear-gradient(135deg,var(--title),#6d3610);color:#fff;border-radius:12px;padding:16px 24px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+    .mod-banner{background:linear-gradient(135deg,var(--title),#6d3610);color:var(--paper);border-radius:12px;padding:16px 24px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
     .mod-banner-icon{font-size:32px}
     .mod-banner h2{font-family:'Ma Shan Zheng',cursive;font-size:24px;letter-spacing:3px}
     .mod-banner p{font-size:13px;opacity:.85;margin-top:2px}
@@ -72,14 +72,14 @@
     .input-field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px;font-weight:600}
     .input-field input,.input-field select{width:100%;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:15px;font-family:inherit}
     .input-field input:focus,.input-field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(201,168,76,.15)}
-    .btn{display:inline-flex;align-items:center;gap:6px;padding:11px 28px;background:linear-gradient(135deg,var(--accent),#b8962e);color:#000;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Ma Shan Zheng',cursive;letter-spacing:3px;transition:.3s}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:11px 28px;background:linear-gradient(135deg,var(--accent),#b8962e);color:var(--ink);border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Ma Shan Zheng',cursive;letter-spacing:3px;transition:.3s}
     .btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(201,168,76,.3)}
     .btn:active{transform:translateY(0)}
     .btn-sm{padding:7px 18px;font-size:13px;letter-spacing:2px}
     .btn-outline{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;background:transparent;border:1.5px solid var(--accent);color:var(--title);border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;transition:.25s}
-    .btn-outline:hover{background:var(--accent);color:#fff}
-    .btn-success{background:linear-gradient(135deg,var(--success),#1e5e3f);color:#fff}
-    .btn-danger{background:linear-gradient(135deg,var(--danger),#922b21);color:#fff}
+    .btn-outline:hover{background:var(--accent);color:var(--paper)}
+    .btn-success{background:linear-gradient(135deg,var(--success),#1e5e3f);color:var(--paper)}
+    .btn-danger{background:linear-gradient(135deg,var(--danger),#922b21);color:var(--paper)}
     /* Tags */
     .tag{display:inline-block;padding:4px 10px;border-radius:12px;font-size:12px;margin:3px;background:rgba(201,168,76,0.08);border:1px solid var(--border);color:var(--muted)}
     .tag-primary{background:rgba(139,69,19,.1);color:var(--title);border-color:rgba(139,69,19,.2)}
@@ -135,7 +135,7 @@
     /* Food therapy enhancement */
     .constitution-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
     .const-tab{padding:6px 16px;border:1.5px solid var(--border);border-radius:20px;background:rgba(255,255,255,0.06);color:var(--muted);font-size:13px;cursor:pointer;transition:.2s}
-    .const-tab.active{background:var(--title);color:#fff;border-color:var(--title)}
+    .const-tab.active{background:var(--title);color:var(--paper);border-color:var(--title)}
     .const-tab:not(.active):hover{border-color:var(--accent);color:var(--title)}
     .recipe-library{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
     .recipe-item{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:12px;padding:16px;transition:.25s;cursor:pointer}
@@ -143,8 +143,8 @@
     .recipe-item h5{font-size:15px;color:var(--title);margin-bottom:8px;font-weight:700}
     .recipe-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
     .add-to-checkin{display:inline-flex;align-items:center;gap:4px;padding:5px 14px;border:1.5px solid var(--success);color:var(--success);border-radius:20px;font-size:12px;cursor:pointer;transition:.2s;background:transparent;margin-top:8px;font-family:inherit}
-    .add-to-checkin:hover{background:var(--success);color:#fff}
-    .add-to-checkin.added{background:var(--success);color:#fff;cursor:default}
+    .add-to-checkin:hover{background:var(--success);color:var(--paper)}
+    .add-to-checkin.added{background:var(--success);color:var(--paper);cursor:default}
     /* Weekly plan */
     .weekly-plan-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
     .day-card{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
@@ -154,7 +154,7 @@
     /* Check-in module */
     .checkin-progress{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
     .checkin-dot{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;transition:.3s;background:rgba(255,255,255,0.06);cursor:pointer;position:relative}
-    .checkin-dot.done{background:var(--success);border-color:var(--success);color:#fff;box-shadow:0 2px 8px rgba(45,106,79,.3)}
+    .checkin-dot.done{background:var(--success);border-color:var(--success);color:var(--paper);box-shadow:0 2px 8px rgba(45,106,79,.3)}
     .checkin-dot.today{border-color:var(--accent);box-shadow:0 0 0 3px rgba(201,168,76,.2)}
     .checkin-dot-label{font-size:10px;color:var(--muted);text-align:center;margin-top:4px;width:50px}
     .checkin-dot-wrap{text-align:center}
@@ -231,7 +231,7 @@
     .disease-tags{display:flex;flex-wrap:wrap;gap:8px}
     .disease-tag{padding:7px 14px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:20px;color:var(--muted);cursor:pointer;font-size:13px;transition:.2s}
     .disease-tag:hover{border-color:var(--accent);color:var(--title)}
-    .disease-tag.selected{background:var(--title);color:#fff;border-color:var(--title)}
+    .disease-tag.selected{background:var(--title);color:var(--paper);border-color:var(--title)}
     .search-wrap{position:relative}
     .search-wrap input{padding-right:80px}
     .search-wrap .btn{position:absolute;right:2px;top:2px;bottom:2px;padding:6px 16px;font-size:13px;border-radius:6px;letter-spacing:1px}
@@ -239,7 +239,7 @@
     .legal-footer{background:rgba(201,168,76,0.06);border:1px solid rgba(230,126,34,0.15);border-left:4px solid var(--warn);padding:14px 18px;margin-top:24px;border-radius:0 8px 8px 0;font-size:13px;color:var(--gold2);line-height:1.8}
     .legal-footer strong{display:block;font-size:14px;margin-bottom:4px}
     /* Feedback toast */
-    .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--title);color:#fff;padding:12px 28px;border-radius:30px;font-size:14px;transition:.4s;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.2);white-space:nowrap}
+    .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--title);color:var(--paper);padding:12px 28px;border-radius:30px;font-size:14px;transition:.4s;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.2);white-space:nowrap}
     .toast.show{transform:translateX(-50%) translateY(0)}
     /* Feature Navigation Bar */
     .feature-nav-bar{background:var(--ink3);color:var(--text);padding:18px 0 20px;margin-top:24px}
@@ -257,12 +257,12 @@
     .empty-state{text-align:center;padding:40px;color:var(--muted)}
     .empty-state-icon{font-size:48px;margin-bottom:12px;opacity:.5}
     /* ===== AI智能解读样式 ===== */
-    .ai-interpret-card{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:16px;padding:28px;margin-bottom:24px;box-shadow:0 8px 32px rgba(102,126,234,.25);position:relative;overflow:hidden}
+    .ai-interpret-card{background:linear-gradient(135deg,#667eea,#764ba2);color:var(--paper);border-radius:16px;padding:28px;margin-bottom:24px;box-shadow:0 8px 32px rgba(102,126,234,.25);position:relative;overflow:hidden}
     .ai-interpret-card::before{content:'';position:absolute;top:-50%;right:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(255,255,255,.1) 0%,transparent 70%);pointer-events:none}
     .ai-interpret-card h2{font-family:'Ma Shan Zheng',cursive;font-size:32px;letter-spacing:4px;margin-bottom:10px;text-shadow:0 2px 4px rgba(0,0,0,.2)}
     .ai-interpret-card .subtitle{font-size:15px;opacity:.9;margin-bottom:20px;line-height:1.6}
     .ai-upload-zone{border:2px dashed rgba(255,255,255,.5);border-radius:14px;padding:48px 24px;text-align:center;cursor:pointer;transition:.3s;background:rgba(255,255,255,.08);position:relative;margin-bottom:20px}
-    .ai-upload-zone:hover,.ai-upload-zone.dragover{border-color:#fff;background:rgba(255,255,255,.15);transform:scale(1.01)}
+    .ai-upload-zone:hover,.ai-upload-zone.dragover{border-color:var(--paper);background:rgba(255,255,255,.15);transform:scale(1.01)}
     .ai-upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
     .ai-upload-icon{font-size:56px;margin-bottom:14px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.2))}
     .ai-upload-text{font-size:16px;color:rgba(255,255,255,.95);font-weight:600}
@@ -276,15 +276,15 @@
     .ai-step-card.active::before{opacity:1}
     .ai-step-card.completed::before{background:linear-gradient(90deg,var(--success),#27ae60);opacity:1}
     .ai-step-header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
-    .ai-step-num{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;flex-shrink:0;transition:.3s}
+    .ai-step-num{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:var(--paper);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;flex-shrink:0;transition:.3s}
     .ai-step-card.completed .ai-step-num{background:linear-gradient(135deg,var(--success),#27ae60)}
     .ai-step-title{font-size:17px;font-weight:700;color:var(--title)}
     .ai-step-content{font-size:14px;color:var(--muted);line-height:1.7}
-    .ai-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.4);border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:.3s;font-family:inherit}
-    .ai-btn:hover{background:rgba(255,255,255,.25);border-color:#fff;transform:translateY(-2px)}
-    .ai-btn-primary{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;box-shadow:0 4px 16px rgba(102,126,234,.4)}
+    .ai-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:rgba(255,255,255,.15);color:var(--paper);border:1.5px solid rgba(255,255,255,.4);border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:.3s;font-family:inherit}
+    .ai-btn:hover{background:rgba(255,255,255,.25);border-color:var(--paper);transform:translateY(-2px)}
+    .ai-btn-primary{background:linear-gradient(135deg,#667eea,#764ba2);color:var(--paper);border:none;box-shadow:0 4px 16px rgba(102,126,234,.4)}
     .ai-btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(102,126,234,.5)}
-    .ai-btn-success{background:linear-gradient(135deg,var(--success),#1e5e3f);color:#fff;border:none}
+    .ai-btn-success{background:linear-gradient(135deg,var(--success),#1e5e3f);color:var(--paper);border:none}
     .ai-result-textarea{width:100%;min-height:240px;padding:16px;border:1px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;line-height:1.8;resize:vertical;background:rgba(255,255,255,0.06);color:var(--title)}
     .ai-result-textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(201,168,76,.15)}
     .parse-result-preview{background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:10px;padding:16px;margin-top:14px;max-height:400px;overflow-y:auto}
@@ -313,8 +313,8 @@
     .exercise-card .ex-type{font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(102,126,234,.1);color:#667eea;display:inline-block;margin-bottom:6px}
     .exercise-card .ex-name{font-size:14px;font-weight:700;color:var(--title);margin-bottom:4px}
     .exercise-card .ex-cal{font-size:12px;color:var(--muted)}
-    .badge-ai{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:20px;font-size:13px;font-weight:700;margin-left:12px;vertical-align:middle;box-shadow:0 2px 8px rgba(102,126,234,.3)}
-    .ant-badge{position:absolute;top:10px;right:10px;font-size:10px;padding:3px 10px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:10px;font-weight:600}
+    .badge-ai{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;background:linear-gradient(135deg,#667eea,#764ba2);color:var(--paper);border-radius:20px;font-size:13px;font-weight:700;margin-left:12px;vertical-align:middle;box-shadow:0 2px 8px rgba(102,126,234,.3)}
+    .ant-badge{position:absolute;top:10px;right:10px;font-size:10px;padding:3px 10px;background:linear-gradient(135deg,#667eea,#764ba2);color:var(--paper);border-radius:10px;font-weight:600}
     @media(max-width:768px){
       .chain-row{justify-content:flex-start;min-width:800px}
       .chain-node{min-width:72px;padding:8px 4px}
@@ -423,7 +423,7 @@
       <!-- 分析中状态 -->
       <div id="aiAnalyzingState" style="display:none;text-align:center;padding:40px 20px">
         <div style="font-size:48px;margin-bottom:16px;animation:ai-pulse 1.5s infinite">🤖</div>
-        <div style="font-size:18px;color:#fff;font-weight:600;margin-bottom:8px">AI 正在解读您的体检报告...</div>
+        <div style="font-size:18px;color:var(--paper);font-weight:600;margin-bottom:8px">AI 正在解读您的体检报告...</div>
         <div style="font-size:14px;color:rgba(255,255,255,.7)" id="aiAnalyzingTip">正在分析各项指标，请稍候</div>
         <div style="margin-top:20px;width:200px;height:4px;background:rgba(255,255,255,.1);border-radius:2px;margin-left:auto;margin-right:auto;overflow:hidden">
           <div style="width:30%;height:100%;background:var(--accent);border-radius:2px;animation:ai-progress 2s infinite"></div>
@@ -433,10 +433,10 @@
       <!-- AI解读结果区域 -->
       <div id="aiResultArea" style="display:none">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-          <h3 style="color:#fff;font-size:18px;margin:0">📋 AI解读报告</h3>
+          <h3 style="color:var(--paper);font-size:18px;margin:0">📋 AI解读报告</h3>
           <div style="display:flex;gap:8px">
-            <button onclick="reUploadReport()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px">🔄 重新上传</button>
-            <button onclick="exportAIResult()" style="background:var(--accent);border:none;color:#fff;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px">📥 导出报告</button>
+            <button onclick="reUploadReport()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:var(--paper);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px">🔄 重新上传</button>
+            <button onclick="exportAIResult()" style="background:var(--accent);border:none;color:var(--paper);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px">📥 导出报告</button>
           </div>
         </div>
         <div id="aiResultContent" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:24px;color:rgba(255,255,255,.9);line-height:1.8;font-size:14px"></div>
@@ -445,10 +445,10 @@
       <!-- 错误提示 -->
       <div id="aiErrorState" style="display:none;text-align:center;padding:30px 20px">
         <div style="font-size:36px;margin-bottom:12px">⚠️</div>
-        <div style="color:#fff;font-size:16px;margin-bottom:8px" id="aiErrorMsg">分析失败</div>
+        <div style="color:var(--paper);font-size:16px;margin-bottom:8px" id="aiErrorMsg">分析失败</div>
         <div style="color:rgba(255,255,255,.6);font-size:13px;margin-bottom:16px" id="aiErrorDetail"></div>
-        <button onclick="retryAIAnalysis()" style="background:var(--accent);border:none;color:#fff;padding:10px 24px;border-radius:8px;cursor:pointer;font-size:14px">🔄 重试</button>
-        <button onclick="reUploadReport()" style="background:transparent;border:1px solid rgba(255,255,255,.3);color:#fff;padding:10px 24px;border-radius:8px;cursor:pointer;font-size:14px;margin-left:8px">📤 重新上传</button>
+        <button onclick="retryAIAnalysis()" style="background:var(--accent);border:none;color:var(--paper);padding:10px 24px;border-radius:8px;cursor:pointer;font-size:14px">🔄 重试</button>
+        <button onclick="reUploadReport()" style="background:transparent;border:1px solid rgba(255,255,255,.3);color:var(--paper);padding:10px 24px;border-radius:8px;cursor:pointer;font-size:14px;margin-left:8px">📤 重新上传</button>
       </div>
       
 
@@ -641,7 +641,7 @@
         </div>
         
         <div style="margin-top:20px;text-align:center">
-          <button class="btn" onclick="switchTab('report')" style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-size:16px;padding:14px 36px">📤 前往上传报告，开始AI解读</button>
+          <button class="btn" onclick="switchTab('report')" style="background:linear-gradient(135deg,#667eea,#764ba2);color:var(--paper);font-size:16px;padding:14px 36px">📤 前往上传报告，开始AI解读</button>
         </div>
       </div>
     </div>
@@ -1429,7 +1429,7 @@ function showManualInput(){
       <h4 style="color:var(--gold);margin-bottom:12px">✏️ 手动录入指标（AI识别失败）</h4>
       <div id="manualFields"></div>
       <button class="compute-btn" style="margin-top:12px" onclick="addManualInput()">+ 添加指标</button>
-      <button class="compute-btn" style="margin-top:12px;margin-left:8px;background:var(--gold);color:#000" onclick="submitManualInput()">提交分析</button>
+      <button class="compute-btn" style="margin-top:12px;margin-left:8px;background:var(--gold);color:var(--ink)" onclick="submitManualInput()">提交分析</button>
     </div>
   `;
   document.getElementById('reportResult').appendChild(container);
@@ -1914,7 +1914,7 @@ function analyzeByBazi(){
   area.classList.add('show');
   const barColors={Mu:'#27ae60',Huo:'#e74c3c',Tu:'#f39c12',Jin:'#90a4ae',Shui:'#3498db'};
   let barHtml='<div style="display:flex;gap:8px;align-items:flex-end;height:100px;margin:12px 0">';
-  WU_ORDER.forEach(k=>{const h=Math.max(10,counts[k]*22);barHtml+=`<div style="flex:1;border-radius:6px 6px 0 0;background:${barColors[k]};height:${h}px;display:flex;align-items:flex-end;justify-content:center;color:#fff;font-size:13px;font-weight:700;padding-bottom:4px">${counts[k]}</div>`;});
+  WU_ORDER.forEach(k=>{const h=Math.max(10,counts[k]*22);barHtml+=`<div style="flex:1;border-radius:6px 6px 0 0;background:${barColors[k]};height:${h}px;display:flex;align-items:flex-end;justify-content:center;color:var(--paper);font-size:13px;font-weight:700;padding-bottom:4px">${counts[k]}</div>`;});
   barHtml+='</div><div style="display:flex;gap:8px"><div style="flex:1;text-align:center;font-size:12px;color:var(--muted)">木</div><div style="flex:1;text-align:center;font-size:12px;color:var(--muted)">火</div><div style="flex:1;text-align:center;font-size:12px;color:var(--muted)">土</div><div style="flex:1;text-align:center;font-size:12px;color:var(--muted)">金</div><div style="flex:1;text-align:center;font-size:12px;color:var(--muted)">水</div></div>';
 
   const d=WUXING_HEALTH[wuKey];
@@ -2182,10 +2182,10 @@ async function callLLMForAnalysis(){
 function renderMarkdown(text){
   let html = text
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/^### (.+)$/gm,'<h4 style="color:#fff;font-size:16px;margin:16px 0 8px">$1</h4>')
+    .replace(/^### (.+)$/gm,'<h4 style="color:var(--paper);font-size:16px;margin:16px 0 8px">$1</h4>')
     .replace(/^## (.+)$/gm,'<h3 style="color:var(--accent);font-size:18px;margin:20px 0 10px;border-bottom:1px solid rgba(201,168,76,.3);padding-bottom:6px">$1</h3>')
-    .replace(/^# (.+)$/gm,'<h2 style="color:#fff;font-size:20px;margin:24px 0 12px">$1</h2>')
-    .replace(/\*\*(.+?)\*\*/g,'<strong style="color:#fff">$1</strong>')
+    .replace(/^# (.+)$/gm,'<h2 style="color:var(--paper);font-size:20px;margin:24px 0 12px">$1</h2>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong style="color:var(--paper)">$1</strong>')
     .replace(/\*(.+?)\*/g,'<em>$1</em>')
     .replace(/^- (.+)$/gm,'<div style="padding-left:16px;margin:4px 0">• $1</div>')
     .replace(/^\| (.+) \|$/gm, function(m){ return '<div style="background:rgba(255,255,255,.04);padding:4px 8px;border-radius:4px;margin:2px 0;font-size:13px">' + m + '</div>'; })

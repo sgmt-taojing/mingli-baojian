@@ -18,12 +18,12 @@ input:focus{border-color:var(--gold)}
 .btn-sm{padding:5px 10px;font-size:11px}
 .btn-outline{background:transparent;border:1px solid var(--gold3);color:var(--gold)}
 .tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto}
-.tab{padding:8px 14px;border:1px solid rgba(201,168,76,0.15);border-radius:20px;color:#8a8070;font-size:12px;cursor:pointer;white-space:nowrap}
+.tab{padding:8px 14px;border:1px solid rgba(201,168,76,0.15);border-radius:20px;color:var(--paper3);font-size:12px;cursor:pointer;white-space:nowrap}
 .tab.active{background:var(--gold);color:#0a0a12;border-color:var(--gold)}
 .stat{display:flex;gap:10px;margin-bottom:12px}
 .stat-item{flex:1;text-align:center;padding:12px 8px;background:rgba(201,168,76,0.04);border-radius:8px}
 .stat-num{font-size:20px;font-weight:bold;color:var(--gold)}
-.stat-label{font-size:10px;color:#8a8070}
+.stat-label{font-size:10px;color:var(--paper3)}
 .prod-item{display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(201,168,76,0.03);border-radius:8px;margin-bottom:6px}
 .prod-name{font-size:12px;color:var(--paper)}
 .prod-price{font-size:12px;color:var(--gold);font-weight:bold}
@@ -44,7 +44,7 @@ input:focus{border-color:var(--gold)}
 <label>验证码（输入任意6位数字）</label>
 <input type="text" id="loginCode" placeholder="6位验证码" maxlength="6">
 <button class="btn" style="width:100%" onclick="merchantLogin()">登录</button>
-<p style="font-size:11px;color:#8a8070;margin-top:10px">还没入驻？<a href="merchant-apply.html" style="color:var(--gold)">申请入驻 →</a></p>
+<p style="font-size:11px;color:var(--paper3);margin-top:10px">还没入驻？<a href="merchant-apply.html" style="color:var(--gold)">申请入驻 →</a></p>
 </div>
 </div>
 
@@ -183,9 +183,9 @@ function addProduct(){
 function loadProducts(){
   var products=getMerchantProducts();
   var html='';
-  if(products.length===0){html='<p style="text-align:center;color:#8a8070;padding:20px">暂无商品，点击上方按钮新增</p>'}
+  if(products.length===0){html='<p style="text-align:center;color:var(--paper3);padding:20px">暂无商品，点击上方按钮新增</p>'}
   products.forEach(function(p){
-    html+='<div class="prod-item"><div><div class="prod-name">'+p.name+'</div><div style="font-size:10px;color:#8a8070">'+p.school+'·'+p.cat+'·库存'+p.stock+'</div></div><div style="text-align:right"><div class="prod-price">'+p.price+'</div><button class="btn btn-sm btn-outline" onclick="delProduct(\''+p.id+'\')">下架</button></div></div>';
+    html+='<div class="prod-item"><div><div class="prod-name">'+p.name+'</div><div style="font-size:10px;color:var(--paper3)">'+p.school+'·'+p.cat+'·库存'+p.stock+'</div></div><div style="text-align:right"><div class="prod-price">'+p.price+'</div><button class="btn btn-sm btn-outline" onclick="delProduct(\''+p.id+'\')">下架</button></div></div>';
   });
   document.getElementById('productList').innerHTML=html;
 }
@@ -202,9 +202,9 @@ function delProduct(id){
 function loadOrders(){
   var orders=getMerchantOrders();
   var html='';
-  if(orders.length===0){html='<p style="text-align:center;color:#8a8070;padding:20px">暂无订单</p>'}
+  if(orders.length===0){html='<p style="text-align:center;color:var(--paper3);padding:20px">暂无订单</p>'}
   orders.forEach(function(o){
-    html+='<div class="prod-item"><div><div class="prod-name">'+o.productName+'</div><div style="font-size:10px;color:#8a8070">'+o.date+'·'+o.buyer+'</div></div><div style="text-align:right"><div class="prod-price">¥'+o.amount+'</div><div style="font-size:10px;color:var(--jade)">分成¥'+(o.merchantAmount||0).toFixed(0)+'</div></div></div>';
+    html+='<div class="prod-item"><div><div class="prod-name">'+o.productName+'</div><div style="font-size:10px;color:var(--paper3)">'+o.date+'·'+o.buyer+'</div></div><div style="text-align:right"><div class="prod-price">¥'+o.amount+'</div><div style="font-size:10px;color:var(--jade)">分成¥'+(o.merchantAmount||0).toFixed(0)+'</div></div></div>';
   });
   document.getElementById('orderList').innerHTML=html;
   // 收入明细

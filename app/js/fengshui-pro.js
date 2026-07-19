@@ -278,7 +278,7 @@ function _fsProBazhai(zhaiGua) {
 function _fsProToast(msg) {
   if (typeof showToast === 'function') { showToast(msg); return; }
   let t = document.createElement('div');
-  t.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:rgba(201,168,76,0.95);color:#080808;padding:10px 24px;border-radius:8px;font-size:13px;letter-spacing:2px;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.3)';
+  t.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:rgba(201,168,76,0.95);color:var(--ink);padding:10px 24px;border-radius:8px;font-size:13px;letter-spacing:2px;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.3)';
   t.textContent = msg;
   document.body.appendChild(t);
   setTimeout(function() { t.remove(); }, 2400);
@@ -1071,7 +1071,7 @@ function renderAnnualFlyingStars() {
 
   // 当月飞星变化
   html += '<div style="background:rgba(93,173,226,0.06);border:1px solid rgba(93,173,226,0.2);border-radius:10px;padding:16px">';
-  html += '<h5 style="color:#5dade2;font-size:13px;letter-spacing:3px;margin-bottom:10px">📅 当月（' + currentMonth + '月）飞星变化</h5>';
+  html += '<h5 style="color:var(--cyan2);font-size:13px;letter-spacing:3px;margin-bottom:10px">📅 当月（' + currentMonth + '月）飞星变化</h5>';
   html += '<div style="font-size:12px;opacity:.6;margin-bottom:10px">' + monthCenter + '入中宫</div>';
   html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;font-size:11px">';
   for (let md in monthStarPos) {

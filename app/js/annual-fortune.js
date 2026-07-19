@@ -490,7 +490,7 @@
 
   function card(title, content) {
     return '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">' +
-      '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">' + title + '</div>' +
+      '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">' + title + '</div>' +
       '<div style="padding:12px">' + content + '</div>' +
       '</div>';
   }
@@ -922,7 +922,7 @@
 
         // 附带祈福参拜指南(折叠)
         html += '<details style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">' +
-          '<summary style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600;cursor:pointer;font-size:14px">🙏 查看祈福参拜指南(点击展开)</summary>' +
+          '<summary style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600;cursor:pointer;font-size:14px">🙏 查看祈福参拜指南(点击展开)</summary>' +
           '<div style="padding:12px">' + generateWorshipGuide(birthInfo, targetYear) + '</div>' +
           '</details>';
       }

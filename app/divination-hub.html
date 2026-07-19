@@ -20,11 +20,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ink:#080808;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;
+  --ink:var(--ink);--ink2:var(--ink2);--ink3:#1a1a1a;--ink4:var(--ink4);
   --paper:var(--paper);--paper2:var(--paper2);--paper3:var(--paper3);
   --gold:var(--gold);--gold2:var(--gold2);--gold3:var(--gold3);
   --cinn:var(--cinn);--cinn2:var(--cinn2);
-  --cyan:var(--cyan);--cyan2:#5dade2;
+  --cyan:var(--cyan);--cyan2:var(--cyan2);
   --jade:var(--jade);--jade2:var(--success);
   --violet:var(--violet2);--violet2:#a569bd;
   --orange:var(--orange);
@@ -3009,7 +3009,7 @@ input, textarea, select {
 }
 .classic-price small {
   font-size: 11px;
-  color: #aaa;
+  color: var(--paper3);
   text-decoration: line-through;
   font-weight: normal;
   margin-left: 4px;
@@ -3272,7 +3272,7 @@ body.wechat .desktop-only{display:none!important}
 body.wechat .more-nav-bar{bottom:env(safe-area-inset-bottom,0)}
 body.wechat .nav-bar{padding-bottom:env(safe-area-inset-bottom,0)}
 body.wechat .section{padding-bottom:80px}
-body.wechat .wechat-back-btn{display:flex!important;position:fixed;top:12px;left:12px;z-index:9999;width:36px;height:36px;border-radius:50%;background:rgba(201,168,76,0.9);color:#fff;align-items:center;justify-content:center;font-size:18px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3)}
+body.wechat .wechat-back-btn{display:flex!important;position:fixed;top:12px;left:12px;z-index:9999;width:36px;height:36px;border-radius:50%;background:rgba(201,168,76,0.9);color:var(--paper);align-items:center;justify-content:center;font-size:18px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3)}
 body:not(.wechat) .wechat-back-btn{display:none!important}
 body.wechat .wechat-disclaimer{display:block!important;padding:16px;margin:20px 0;background:rgba(192,57,43,0.08);border:1px solid rgba(192,57,43,0.2);border-radius:8px;font-size:12px;line-height:1.8;color:var(--paper2);text-align:center}
 body:not(.wechat) .wechat-disclaimer{display:none!important}
@@ -3482,7 +3482,7 @@ body:not(.wechat) .wechat-disclaimer{display:none!important}
   .yz-example-text{font-size:13px;color:var(--paper2);line-height:1.8}
   .yz-tip{background:rgba(230,126,34,.05);border:1px solid rgba(230,126,34,.1);border-radius:8px;padding:10px 14px;margin:8px 0;font-size:12px;color:var(--gold)}
 ${getReportStyles()}
-    body { font-family: 'Noto Serif SC', serif; background: #080808; color: var(--paper); padding: 40px; max-width: 800px; margin: 0 auto; }
+    body { font-family: 'Noto Serif SC', serif; background: var(--ink); color: var(--paper); padding: 40px; max-width: 800px; margin: 0 auto; }
     h1 { color: var(--gold); text-align: center; letter-spacing: 6px; }
     h2 { color: var(--gold2); border-bottom: 1px solid rgba(201,168,76,.2); padding-bottom: 8px; }
     .result { background: rgba(255,255,255,.02); border: 1px solid rgba(201,168,76,.1); border-radius: 8px; padding: 24px; margin: 16px 0; }
@@ -4138,7 +4138,7 @@ setTimeout(removeLoadingOverlay,5000);
 <!-- ===== 更多功能网格 ===== -->
 <section class="section" id="section-more" data-lazy="more-functions.html">
   <div class="section-header"><h2>更多功能</h2><p class="section-sub">知识库 · 黄历 · 体质 · 信众 · 排行 · 商城</p></div>
-  <div id="section-more-placeholder" style="text-align:center;padding:40px 20px;color:#999">加载中...</div>
+  <div id="section-more-placeholder" style="text-align:center;padding:40px 20px;color:var(--paper3)">加载中...</div>
 </section>
 
 <!-- ===== TIZHI (体质辨识) SECTION ===== -->
@@ -4152,7 +4152,7 @@ setTimeout(removeLoadingOverlay,5000);
 
   <!-- Tab 按钮 -->
   <div class="tz-tabs" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:16px;justify-content:center">
-    <button id="tzTab-report" onclick="tzSwitchTab('report')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--title);color:#fff;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">📋 报告分析</button>
+    <button id="tzTab-report" onclick="tzSwitchTab('report')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--title);color:var(--paper);font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">📋 报告分析</button>
     <button id="tzTab-selftest" onclick="tzSwitchTab('selftest')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">📝 体质自测</button>
     <button id="tzTab-plan" onclick="tzSwitchTab('plan')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">🎯 养生方案</button>
     <button id="tzTab-food" onclick="tzSwitchTab('food')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">🥗 食疗推荐</button>
@@ -4177,7 +4177,7 @@ setTimeout(removeLoadingOverlay,5000);
         <label style="display:block;margin-bottom:8px;font-size:14px;color:var(--gold)">✍️ 手动输入指标</label>
         <div id="tzManualFields"></div>
         <button onclick="tzAddMetricField()" style="margin-top:8px;padding:8px 16px;background:rgba(201,168,76,0.1);border:1px solid var(--border);border-radius:6px;color:var(--gold);cursor:pointer;font-size:13px;font-family:inherit">➕ 添加指标</button>
-        <button onclick="tzAnalyzeManualMetrics()" style="margin-top:8px;margin-left:8px;padding:8px 16px;background:var(--gold);border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:13px;font-family:inherit">🔍 开始分析</button>
+        <button onclick="tzAnalyzeManualMetrics()" style="margin-top:8px;margin-left:8px;padding:8px 16px;background:var(--gold);border:none;border-radius:6px;color:var(--paper);cursor:pointer;font-size:13px;font-family:inherit">🔍 开始分析</button>
       </div>
       <div id="tizhiResult" style="display:none"></div>
     </div>
@@ -4206,7 +4206,7 @@ setTimeout(removeLoadingOverlay,5000);
         <select id="tzPlanTizhi" style="padding:8px 12px;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;min-width:160px">
           <option value="">请选择体质类型</option>
         </select>
-        <button onclick="tzGeneratePlan()" style="padding:8px 20px;background:var(--gold);border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:13px;font-family:inherit">🎯 生成方案</button>
+        <button onclick="tzGeneratePlan()" style="padding:8px 20px;background:var(--gold);border:none;border-radius:6px;color:var(--paper);cursor:pointer;font-size:13px;font-family:inherit">🎯 生成方案</button>
       </div>
       <div id="tzPlanResult" style="display:none"></div>
     </div>
@@ -4295,7 +4295,7 @@ setTimeout(removeLoadingOverlay,5000);
             <option value="female">女</option>
           </select>
         </div>
-        <button onclick="tzAnalyzeBazi()" style="padding:8px 20px;background:var(--gold);border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:13px;font-family:inherit;margin-top:20px">🔍 分析体质</button>
+        <button onclick="tzAnalyzeBazi()" style="padding:8px 20px;background:var(--gold);border:none;border-radius:6px;color:var(--paper);cursor:pointer;font-size:13px;font-family:inherit;margin-top:20px">🔍 分析体质</button>
       </div>
       <div id="tzBaziResult" style="display:none"></div>
     </div>
@@ -4335,7 +4335,7 @@ setTimeout(removeLoadingOverlay,5000);
           <textarea id="tzCheckNote" placeholder="今日心得..." style="width:100%;padding:10px;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:inherit;resize:vertical;min-height:60px"></textarea>
         </div>
         <div style="text-align:center;margin-top:12px">
-          <button onclick="tzSubmitCheckin()" style="padding:10px 30px;background:var(--gold);border:none;border-radius:8px;color:#fff;cursor:pointer;font-size:14px;font-family:inherit">✅ 今日打卡</button>
+          <button onclick="tzSubmitCheckin()" style="padding:10px 30px;background:var(--gold);border:none;border-radius:8px;color:var(--paper);cursor:pointer;font-size:14px;font-family:inherit">✅ 今日打卡</button>
         </div>
       </div>
       <div id="tzCheckinHistory"></div>
@@ -5180,7 +5180,7 @@ setTimeout(removeLoadingOverlay,5000);
       </div>
       <!-- 分类标签栏 -->
       <div id="kbCategoryBar" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
-        <button class="kb-cat-btn kb-cat-active" onclick="filterKbByCategory('all')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:var(--gold-dim);color:#fff;cursor:pointer;font-size:13px;">全部</button>
+        <button class="kb-cat-btn kb-cat-active" onclick="filterKbByCategory('all')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:var(--gold-dim);color:var(--paper);cursor:pointer;font-size:13px;">全部</button>
         <button class="kb-cat-btn" onclick="filterKbByCategory('bazi')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">八字命理</button>
         <button class="kb-cat-btn" onclick="filterKbByCategory('liuyao')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">六爻</button>
         <button class="kb-cat-btn" onclick="filterKbByCategory('fengshui')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">风水</button>
@@ -5435,7 +5435,7 @@ setTimeout(removeLoadingOverlay,5000);
 <!-- ===== FENGSHUI SECTION ===== -->
 <section class="section" id="section-fengshui" data-lazy="fengshui.html">
   <div class="section-header"><h2>风水分析</h2><p class="section-sub">户型 · 朝向 · 方位 · 罗盘</p></div>
-  <div id="section-fengshui-placeholder" style="text-align:center;padding:40px 20px;color:#999">加载中...</div>
+  <div id="section-fengshui-placeholder" style="text-align:center;padding:40px 20px;color:var(--paper3)">加载中...</div>
 </section>
 
 <!-- ===== FENGSHUI PRO SECTION ===== -->
@@ -6262,7 +6262,7 @@ setTimeout(removeLoadingOverlay,5000);
       <!-- 按钮组 -->
       <div style="display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap">
         <button id="hmPrevBtn" onclick="hmPrev()" style="width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--paper2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .25s" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--paper2)'">⏮</button>
-        <button id="hmPlayBtn" onclick="hmTogglePlay()" style="width:52px;height:52px;border-radius:50%;border:none;background:var(--gold);color:#fff;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;transition:all .25s;box-shadow:0 0 20px rgba(201,168,76,0.3)">▶</button>
+        <button id="hmPlayBtn" onclick="hmTogglePlay()" style="width:52px;height:52px;border-radius:50%;border:none;background:var(--gold);color:var(--paper);cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;transition:all .25s;box-shadow:0 0 20px rgba(201,168,76,0.3)">▶</button>
         <button id="hmNextBtn" onclick="hmNext()" style="width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--paper2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .25s" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--paper2)'">⏭</button>
         <div style="width:1px;height:28px;background:var(--border);margin:0 4px"></div>
         <!-- 音量 -->
@@ -7943,7 +7943,7 @@ function exportHTML() {
   let name = document.getElementById('baziNameOut') ? document.getElementById('baziNameOut').textContent : '乾元命理报告';
   let meta = document.getElementById('baziMetaOut') ? document.getElementById('baziMetaOut').textContent : '';
   let html = '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>'+name+'</title>';
-  html += '<style>body{font-family:"Songti SC","SimSun",serif;max-width:800px;margin:0 auto;padding:40px 20px;background:#fff;color:#333;line-height:1.8}'
+  html += '<style>body{font-family:"Songti SC","SimSun",serif;max-width:800px;margin:0 auto;padding:40px 20px;background:var(--paper);color:var(--ink3);line-height:1.8}'
   html += 'h1{text-align:center;color:#8B6914;border-bottom:2px solid #D4AF37;padding-bottom:16px}'
   html += 'h2{color:#8B6914;margin-top:32px;border-left:4px solid #D4AF37;padding-left:12px}'
   html += 'table{width:100%;border-collapse:collapse;margin:16px 0}'
@@ -7956,10 +7956,10 @@ function exportHTML() {
   html += 'h3{color:#8B6914;margin-top:0}'
   html += 'ul{padding-left:24px}'
   html += 'li{margin:6px 0}'
-  html += 'footer{text-align:center;color:#999;font-size:12px;margin-top:40px;padding-top:20px;border-top:1px solid #eee}'
+  html += 'footer{text-align:center;color:var(--paper3);font-size:12px;margin-top:40px;padding-top:20px;border-top:1px solid #eee}'
   html += '</style></head><body>';
   html += '<h1>'+name+'</h1>';
-  if (meta) html += '<p style="text-align:center;color:#888;margin-top:-16px">'+meta+'</p>';
+  if (meta) html += '<p style="text-align:center;color:var(--steel);margin-top:-16px">'+meta+'</p>';
 
   // Pillar
   let pillerDiv = document.querySelector('.pillar-render') || document.querySelector('.baZi-output');
@@ -8230,21 +8230,21 @@ function closeMedicineDetail() {
 function exportWord() {
   let name = document.getElementById('baziNameOut') ? document.getElementById('baziNameOut').textContent : '乾元命理报告';
   let html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+name+'</title>';
-  html += '<style>body{font-family:宋体,SimSun,serif;max-width:900px;margin:40px auto;padding:20px;font-size:14pt;line-height:2;color:#333}'
+  html += '<style>body{font-family:宋体,SimSun,serif;max-width:900px;margin:40px auto;padding:20px;font-size:14pt;line-height:2;color:var(--ink3)}'
   html += 'h1{text-align:center;color:#8B6914;border-bottom:3px solid #D4AF37;padding-bottom:16px}'
   html += 'h2{color:#8B6914;border-left:6px solid #D4AF37;padding-left:12px;margin-top:28px}'
-  html += 'h3{color:#666;margin-top:20px}'
+  html += 'h3{color:var(--paper3);margin-top:20px}'
   html += 'table{width:100%;border-collapse:collapse;margin:16px 0}'
   html += 'td,th{padding:8px 12px;border:1px solid #c4a040;text-align:center}'
   html += '.gang{display:flex;justify-content:center;gap:12px;margin:20px 0}'
   html += '.gz{border:1px solid #D4AF37;padding:10px 20px;text-align:center;background:#FFF9E6}'
   html += '.warn{background:#FFF3CD;border:2px solid #FFC107;padding:16px;margin:16px 0}'
   html += 'p{margin:8px 0;text-indent:2em}'
-  html += 'footer{text-align:center;color:#999;font-size:11pt;margin-top:40px}'
+  html += 'footer{text-align:center;color:var(--paper3);font-size:11pt;margin-top:40px}'
   html += '</style></head><body>';
   html += '<h1>'+name+'</h1>';
   let meta = document.getElementById('baziMetaOut');
-  if (meta) html += '<p style="text-align:center;color:#888">'+meta.textContent+'</p>';
+  if (meta) html += '<p style="text-align:center;color:var(--steel)">'+meta.textContent+'</p>';
   html += '<hr style="border:1px solid #D4AF37;margin:20px 0">';
 
   // 四柱
@@ -8252,7 +8252,7 @@ function exportWord() {
   for (let i=0;i<4;i++){
     let g=document.getElementById('bz'+i+'g');let z=document.getElementById('bz'+i+'z');let e=document.getElementById('bz'+i+'e');
     let n=document.getElementById('bz'+i+'n');
-    if(g&&z) html+='<div class="gz"><div style="font-size:20pt">'+g.textContent+z.textContent+'</div><div style="font-size:11pt;color:#888">'+(e?e.textContent:'')+'</div><div style="font-size:11pt;color:#D4AF37">'+(n?n.textContent:'')+'</div></div>';
+    if(g&&z) html+='<div class="gz"><div style="font-size:20pt">'+g.textContent+z.textContent+'</div><div style="font-size:11pt;color:var(--steel)">'+(e?e.textContent:'')+'</div><div style="font-size:11pt;color:#D4AF37">'+(n?n.textContent:'')+'</div></div>';
   }
   html += '</div>';
 
@@ -10115,8 +10115,8 @@ function showConfirm(msg, onOk, onCancel) {
   overlay.innerHTML = '<div style="background:#1a1a2e;border:1px solid rgba(201,168,76,0.4);border-radius:12px;padding:24px;max-width:360px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.5)">' +
     '<div style="color:var(--paper);font-size:15px;line-height:1.7;margin-bottom:20px;letter-spacing:1px">' + msg + '</div>' +
     '<div style="display:flex;gap:12px;justify-content:flex-end">' +
-    '<button data-act="cancel" style="padding:8px 20px;background:transparent;color:#888;border:1px solid #555;border-radius:6px;cursor:pointer;font-size:13px">取消</button>' +
-    '<button data-act="ok" style="padding:8px 20px;background:linear-gradient(135deg,#c9a84c,#a08430);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;letter-spacing:1px">确认</button>' +
+    '<button data-act="cancel" style="padding:8px 20px;background:transparent;color:var(--steel);border:1px solid var(--paper3);border-radius:6px;cursor:pointer;font-size:13px">取消</button>' +
+    '<button data-act="ok" style="padding:8px 20px;background:linear-gradient(135deg,#c9a84c,#a08430);color:var(--paper);border:none;border-radius:6px;cursor:pointer;font-size:13px;letter-spacing:1px">确认</button>' +
     '</div></div>';
   document.body.appendChild(overlay);
   function close(result) {
@@ -11314,7 +11314,7 @@ function tzStep1Analyze(fileName, content, type) {
       tzLastAnalysis = localResult;
       tzRenderStep1Results(localResult);
     } else {
-      result.innerHTML = '<div style="padding:20px;text-align:center"><div style="font-size:14px;color:var(--cinn2);margin-bottom:12px">⚠️ 分析服务暂时不可用</div><div style="font-size:12px;color:var(--paper2);margin-bottom:16px">请确认API代理服务（端口8900）正在运行，或稍后重试</div><div style="font-size:11px;color:#666">错误信息: ' + (err.message || err) + '</div></div>';
+      result.innerHTML = '<div style="padding:20px;text-align:center"><div style="font-size:14px;color:var(--cinn2);margin-bottom:12px">⚠️ 分析服务暂时不可用</div><div style="font-size:12px;color:var(--paper2);margin-bottom:16px">请确认API代理服务（端口8900）正在运行，或稍后重试</div><div style="font-size:11px;color:var(--paper3)">错误信息: ' + (err.message || err) + '</div></div>';
     }
   });
 }
@@ -11324,7 +11324,7 @@ function tzRenderStep1Results(obj) {
   let html = '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:24px">';
 
   // Step indicator
-  html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><span style="background:var(--gold);color:#fff;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600">第一步</span><span style="font-size:14px;color:var(--gold);font-weight:600">指标分析</span></div>';
+  html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><span style="background:var(--gold);color:var(--paper);padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600">第一步</span><span style="font-size:14px;color:var(--gold);font-weight:600">指标分析</span></div>';
 
   // Summary
   if (obj.summary) {
@@ -11437,14 +11437,14 @@ function tzStep2Suggestions() {
     }
 
     if (!obj) {
-      step2Div.innerHTML = '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="background:var(--violet2);color:#fff;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600">第二步</span><span style="font-size:14px;color:var(--violet2);font-weight:600">理疗建议</span></div><div style="font-size:14px;color:var(--text);line-height:1.8;white-space:pre-wrap">' + escapeHtml(text) + '</div></div>';
+      step2Div.innerHTML = '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="background:var(--violet2);color:var(--paper);padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600">第二步</span><span style="font-size:14px;color:var(--violet2);font-weight:600">理疗建议</span></div><div style="font-size:14px;color:var(--text);line-height:1.8;white-space:pre-wrap">' + escapeHtml(text) + '</div></div>';
       return;
     }
 
     let html = '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:24px">';
 
     // Step indicator
-    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><span style="background:var(--violet2);color:#fff;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600">第二步</span><span style="font-size:14px;color:var(--violet2);font-weight:600">理疗建议</span></div>';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><span style="background:var(--violet2);color:var(--paper);padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600">第二步</span><span style="font-size:14px;color:var(--violet2);font-weight:600">理疗建议</span></div>';
 
     // Constitution
     if (obj.体质判断) {
@@ -11489,7 +11489,7 @@ function tzStep2Suggestions() {
     console.error('理疗建议API错误,切换本地引擎:', err);
     // 离线降级:用本地体质数据生成理疗建议
     let html = '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:24px">';
-    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><span style="background:var(--violet2);color:#fff;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600">第二步</span><span style="font-size:14px;color:var(--violet2);font-weight:600">理疗建议（本地生成）</span></div>';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><span style="background:var(--violet2);color:var(--paper);padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600">第二步</span><span style="font-size:14px;color:var(--violet2);font-weight:600">理疗建议（本地生成）</span></div>';
     html += '<div style="background:rgba(155,89,182,0.06);border:1px solid rgba(155,89,182,0.25);border-radius:10px;padding:16px;margin-bottom:16px"><div style="font-size:14px;color:var(--violet);font-weight:bold;margin-bottom:6px">🧬 体质判断</div><div style="font-size:14px;color:var(--text);line-height:1.7">根据指标分析结果，建议参考以下养生方案。如有异常指标，请及时就医复查。</div></div>';
     // 食疗
     let allRecipes = (TZ_DATA.recipes || []).slice(0, 4);
@@ -14808,7 +14808,7 @@ function scheduleRenewHuajie() {
   msg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid var(--gold);color:var(--gold);padding:24px 32px;border-radius:14px;font-size:14px;z-index:99999;text-align:center;box-shadow:0 0 40px rgba(201,168,76,0.3);max-width:360px';
   msg.innerHTML = '<div style="font-size:36px;margin-bottom:10px">✅</div>';
   msg.insertAdjacentHTML('beforeend', '<div style="font-weight:bold;font-size:16px;margin-bottom:8px">化解方案预约成功</div>');
-  msg.insertAdjacentHTML('beforeend', '<div style="font-size:12px;color:#aaa;line-height:1.8">' + nextYear + '年立春(' + renewDate + ')后<br>系统将自动为您生成新年化解方案<br><br>预约日期：' + now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.getDate() + '</div>');
+  msg.insertAdjacentHTML('beforeend', '<div style="font-size:12px;color:var(--paper3);line-height:1.8">' + nextYear + '年立春(' + renewDate + ')后<br>系统将自动为您生成新年化解方案<br><br>预约日期：' + now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.getDate() + '</div>');
   document.body.appendChild(msg);
   setTimeout(function(){
     msg.style.opacity = '0';
@@ -18475,7 +18475,7 @@ function showTempleBrowser(filter) {
   html += '<div style="font-size:18px;font-weight:700;color:var(--violet2);margin-bottom:16px;letter-spacing:2px">🏛️ 名山寺庙参拜指南 · ' + temples.length + '座</div>';
   // 筛选按钮
   html += '<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">';
-  html += '<button onclick="showTempleBrowser(\"all\")" style="padding:6px 16px;border:1px solid var(--border);border-radius:20px;background:var(--title);color:#fff;cursor:pointer;font-size:12px">全部 ' + temples.length + '</button>';
+  html += '<button onclick="showTempleBrowser(\"all\")" style="padding:6px 16px;border:1px solid var(--border);border-radius:20px;background:var(--title);color:var(--paper);cursor:pointer;font-size:12px">全部 ' + temples.length + '</button>';
   html += '<button onclick="showTempleBrowser(\"佛\")" style="padding:6px 16px;border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--gold);cursor:pointer;font-size:12px">佛教 ' + foList.length + '</button>';
   html += '<button onclick="showTempleBrowser(\"道\")" style="padding:6px 16px;border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--jade2);cursor:pointer;font-size:12px">道教 ' + daoList.length + '</button>';
   html += '<button onclick="showTempleBrowser(\"儒\")" style="padding:6px 16px;border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--cyan2);cursor:pointer;font-size:12px">儒教 ' + ruList.length + '</button>';
@@ -19732,7 +19732,7 @@ function renderFengshuiResultPro(data) {
     let c = item.score >= 10 ? '#2ecc71' : item.score > 0 ? '#c9a84c' : item.score < 0 ? '#e74c3c' : '#999';
     html += '<div class="shensha-item"' + (item.needsFix ? ' style="border-left:3px solid var(--cinn2)"' : '') + '>' +
       '<span class="ss-name">' + item.name + '</span>' +
-      (item.isPending ? '<span style="color:#999">待分析</span>' : '<span style="color:' + c + '">' + (item.score > 0 ? '+' : '') + item.score + '分</span>') +
+      (item.isPending ? '<span style="color:var(--paper3)">待分析</span>' : '<span style="color:' + c + '">' + (item.score > 0 ? '+' : '') + item.score + '分</span>') +
       '<span class="ss-desc">' + item.desc + '</span></div>';
   }
   html += '</div></div>';
@@ -19932,8 +19932,8 @@ function renderFengshuiResultPro(data) {
               html += '<span style="color:' + cbColor + ';font-weight:bold">' + (cb.gongName||cb.gong||'') + '宫</span> ';
               html += '<span style="color:var(--paper2)">山' + (cb.shanXing||'') + ' 向' + (cb.xiangXing||'') + '</span> ';
               html += '<span style="color:' + cbColor + '">[' + (cb.luck||'') + ']</span> ';
-              html += '<span style="color:#888">' + (cb.comboName||'') + '</span>';
-              if (cb.effect) html += '<div style="font-size:10px;color:#666;margin-left:12px">' + cb.effect + '</div>';
+              html += '<span style="color:var(--steel)">' + (cb.comboName||'') + '</span>';
+              if (cb.effect) html += '<div style="font-size:10px;color:var(--paper3);margin-left:12px">' + cb.effect + '</div>';
               html += '</div>';
             }
             if (_fxCombo.daoShanDaoXiang) {
@@ -21211,27 +21211,27 @@ ${generatePersonalizedRecommendations(bazi, sex)}
 
 function getReportStyles() {
   return `
-body{font-family:'Noto Serif SC',serif,'SimSun',serif;background:#fff;color:#333;padding:40px;max-width:800px;margin:0 auto;line-height:1.8}
+body{font-family:'Noto Serif SC',serif,'SimSun',serif;background:var(--paper);color:var(--ink3);padding:40px;max-width:800px;margin:0 auto;line-height:1.8}
 h1{color:#8b0000;text-align:center;letter-spacing:6px;border-bottom:3px solid #8b0000;padding-bottom:16px}
 h2{color:#8b4513;border-bottom:2px solid #8b4513;padding-bottom:8px;margin-top:32px}
 h3{color:#2f4f4f;margin-top:24px}
 h4{color:#4a4a4a;margin-top:20px}
 .report-header{text-align:center;margin-bottom:40px}
-.report-meta{color:#666;font-size:12px;margin-top:12px}
+.report-meta{color:var(--paper3);font-size:12px;margin-top:12px}
 .report-content{margin:24px 0}
-.report-footer{text-align:center;color:#999;font-size:11px;margin-top:48px;padding-top:16px;border-top:1px solid #ddd}
+.report-footer{text-align:center;color:var(--paper3);font-size:11px;margin-top:48px;padding-top:16px;border-top:1px solid var(--paper2)}
 .annual-notice{background:#fff3cd;border:3px solid var(--danger);padding:20px;margin:24px 0;border-radius:8px}
 .annual-notice h2{color:var(--danger);border:none;text-align:center;font-size:20px;margin:0 0 16px 0}
 .annual-notice-item{font-weight:bold;color:#8b0000;margin:12px 0;padding:8px;background:rgba(220,53,69,.1);border-left:4px solid var(--danger)}
 .annual-notice-item::before{content:'⚠️ ';font-size:16px}
 .personalized-recommendations{background:#f8f9fa;padding:20px;margin:24px 0;border-radius:8px;border:1px solid #dee2e6}
 .personalized-recommendations h2{color:#28a745;border-color:#28a745;text-align:center}
-.rec-section{margin:16px 0;padding:12px;background:#fff;border-radius:4px}
+.rec-section{margin:16px 0;padding:12px;background:var(--paper);border-radius:4px}
 .rec-section h3{color:#495057;margin:0 0 8px 0;font-size:14px}
-.rec-section ul{margin:0;padding-left:20px;color:#555}
+.rec-section ul{margin:0;padding-left:20px;color:var(--paper3)}
 .rec-section li{margin:4px 0}
 .bazi-module{background:#fafafa;border:1px solid #e0e0e0;border-radius:8px;margin:16px 0;padding:16px}
-.bazi-module-title{font-size:16px;color:#8b0000;font-weight:bold;border-bottom:1px solid #ddd;padding-bottom:8px;margin-bottom:12px}
+.bazi-module-title{font-size:16px;color:#8b0000;font-weight:bold;border-bottom:1px solid var(--paper2);padding-bottom:8px;margin-bottom:12px}
 .lucky-colors,.lucky-dirs{display:inline-block;margin:4px 8px}
 @media print{
 body{padding:20px}
@@ -21295,7 +21295,7 @@ function generateAnnualNotice(nextYear, bazi, sex) {
 <div class="annual-notice">
   <h2>⚠️ ${nextYear}年度重要提醒</h2>
   ${notices.join('')}
-  <p style="text-align:center;margin-top:16px;color:#666;font-size:12px">以上为会员专属年度提醒，请妥善保存</p>
+  <p style="text-align:center;margin-top:16px;color:var(--paper3);font-size:12px">以上为会员专属年度提醒，请妥善保存</p>
 </div>`;
 }
 
@@ -21422,7 +21422,7 @@ function exportAsWord(content, filename) {
   // 转换为Word兼容格式
   const wordContent = content.replace(/<style>[\s\S]*?<\/style>/, `
 <style>
-body{font-family:SimSun,serif;background:#fff;color:#000;padding:40px;max-width:800px;margin:0 auto}
+body{font-family:SimSun,serif;background:var(--paper);color:var(--ink);padding:40px;max-width:800px;margin:0 auto}
 h1{color:#8b0000;text-align:center}h2{color:#8b4513}h3{color:#2f4f4f}
 .annual-notice{background:#fff3cd;border:2px solid var(--danger);padding:16px;margin:16px 0}
 .annual-notice-item{font-weight:bold;color:#8b0000;margin:8px 0;padding:8px;background:#ffeeee;border-left:4px solid var(--danger)}
@@ -21482,7 +21482,7 @@ function exportHuajieReport() {
     showToast('请先计算化解方案后再导出');
     return;
   }
-  const html = `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>化解方案报告</title><style>body{font-family:'Noto Serif SC',serif;background:#080808;color:var(--paper);padding:40px;max-width:800px;margin:0 auto}h1{color:var(--gold);text-align:center;letter-spacing:6px}h2{color:var(--gold2);border-bottom:1px solid rgba(201,168,76,.2);padding-bottom:8px}.result{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.1);border-radius:8px;padding:24px;margin:16px 0}</style></head><body><h1>化解方案报告</h1><div class="result">${resultEl.innerHTML}</div><p style="text-align:center;opacity:.4;margin-top:40px">易道智鉴 · 仅供参考</p></body>
+  const html = `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>化解方案报告</title><style>body{font-family:'Noto Serif SC',serif;background:var(--ink);color:var(--paper);padding:40px;max-width:800px;margin:0 auto}h1{color:var(--gold);text-align:center;letter-spacing:6px}h2{color:var(--gold2);border-bottom:1px solid rgba(201,168,76,.2);padding-bottom:8px}.result{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.1);border-radius:8px;padding:24px;margin:16px 0}</style></head><body><h1>化解方案报告</h1><div class="result">${resultEl.innerHTML}</div><p style="text-align:center;opacity:.4;margin-top:40px">易道智鉴 · 仅供参考</p></body>
 <script>
 // ===== 商城分类切换 =====
 
@@ -28106,7 +28106,7 @@ function addMerit(faith, amount, reason) {
     let msg = document.createElement('div');
     msg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid var(--gold);color:var(--gold);padding:20px 30px;border-radius:14px;font-size:16px;z-index:99999;text-align:center;box-shadow:0 0 40px rgba(201,168,76,0.3)';
     msg.innerHTML = '<div style="font-size:32px;margin-bottom:8px">🙏</div><div style="font-weight:bold">+' + amount + ' 功德</div>';
-    if (reason) msg.insertAdjacentHTML('beforeend', '<div style="font-size:12px;color:#aaa;margin-top:6px">' + reason + '</div>');
+    if (reason) msg.insertAdjacentHTML('beforeend', '<div style="font-size:12px;color:var(--paper3);margin-top:6px">' + reason + '</div>');
     document.body.appendChild(msg);
     setTimeout(function(){msg.style.opacity='0';msg.style.transition='opacity 0.8s';setTimeout(function(){document.body.removeChild(msg);},800);}, 1500);
     
@@ -29169,7 +29169,7 @@ function showZodiacDetail(zodiac) {
     html += '<p style="margin:0 0 10px 0;color:var(--paper2);line-height:1.8">' + buddhaInfo.intro + '</p>';
     if (buddhaInfo.worship) html += '<p style="margin:0 0 8px 0;font-size:13px;color:var(--paper2)"><b>供奉方法：</b>' + buddhaInfo.worship + '</p>';
     if (buddhaInfo.benefits) html += '<p style="margin:0;font-size:13px;color:var(--paper2)"><b>功德利益：</b>' + buddhaInfo.benefits.join('、') + '</p>';
-    if (buddhaInfo.taboos) html += '<p style="margin:8px 0 0;font-size:12px;color:#f44336"><b>禁忌：</b>' + buddhaInfo.taboos.join('；') + '</p>';
+    if (buddhaInfo.taboos) html += '<p style="margin:8px 0 0;font-size:12px;color:var(--cinn2)"><b>禁忌：</b>' + buddhaInfo.taboos.join('；') + '</p>';
     html += '</div>';
   } else {
     html += '<div style="background:rgba(201,168,76,0.08);padding:16px;border-radius:12px;margin-bottom:16px">';
@@ -29205,12 +29205,12 @@ function showZodiacDetail(zodiac) {
   html += '</div>';
   
   html += '<div style="background:rgba(244,67,54,0.08);padding:16px;border-radius:12px;margin-bottom:16px">';
-  html += '<h4 style="color:#f44336;margin:0 0 10px 0">⚠️ 避免配对</h4>';
+  html += '<h4 style="color:var(--cinn2);margin:0 0 10px 0">⚠️ 避免配对</h4>';
   html += '<p style="margin:0;color:var(--paper2)">' + info.avoid.join('、') + '</p>';
   html += '</div>';
   
   html += '<div style="text-align:center;margin-top:20px">';
-  html += '<button onclick="showKnowledgeDetail(\'shengxiao\')" style="background:var(--gold);color:#000;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:bold">查看完整生肖知识</button>';
+  html += '<button onclick="showKnowledgeDetail(\'shengxiao\')" style="background:var(--gold);color:var(--ink);border:none;padding:12px 24px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:bold">查看完整生肖知识</button>';
   html += '</div>';
   html += '</div>';
   
@@ -29254,7 +29254,7 @@ function showConstellationDetail(sign) {
   html += '<h5 style="color:#4CAF50;margin:0 0 6px 0">❤️ 喜欢</h5>';
   html += '<p style="margin:0;font-size:13px;color:var(--paper2)">' + info.likes + '</p></div>';
   html += '<div style="background:rgba(244,67,54,0.08);padding:12px;border-radius:8px">';
-  html += '<h5 style="color:#f44336;margin:0 0 6px 0">💔 不喜欢</h5>';
+  html += '<h5 style="color:var(--cinn2);margin:0 0 6px 0">💔 不喜欢</h5>';
   html += '<p style="margin:0;font-size:13px;color:var(--paper2)">' + info.dislikes + '</p></div>';
   html += '</div>';
   
@@ -29275,7 +29275,7 @@ function showConstellationDetail(sign) {
   html += '</div>';
   
   html += '<div style="text-align:center;margin-top:20px">';
-  html += '<button onclick="showKnowledgeDetail(\'constellation\')" style="background:var(--gold);color:#000;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:bold">查看完整星座知识</button>';
+  html += '<button onclick="showKnowledgeDetail(\'constellation\')" style="background:var(--gold);color:var(--ink);border:none;padding:12px 24px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:bold">查看完整星座知识</button>';
   html += '</div>';
   html += '</div>';
   
@@ -29329,7 +29329,7 @@ function showYangzhaiKB() {
   html += '<h4 style="color:var(--paper);font-size:14px">命卦速查表</h4>';
   html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px"><thead><tr style="background:rgba(201,168,76,0.15)"><th style="padding:8px;color:var(--gold)">命卦</th><th style="padding:8px;color:var(--gold)">类型</th><th style="padding:8px;color:var(--gold)">四吉方</th><th style="padding:8px;color:var(--gold)">四凶方</th></tr></thead><tbody>';
   kb.bazhai.mingua.table.forEach(function(row) {
-    html += '<tr style="border-bottom:1px solid rgba(201,168,76,0.1)"><td style="padding:6px;color:var(--paper)">' + row.gua + '</td><td style="padding:6px;color:' + (row.type==='东四命'?'#4CAF50':'#2196f3') + '">' + row.type + '</td><td style="padding:6px;color:var(--paper2);font-size:11px">' + row.best.join('、') + '</td><td style="padding:6px;color:#f44336;font-size:11px">' + row.worst.join('、') + '</td></tr>';
+    html += '<tr style="border-bottom:1px solid rgba(201,168,76,0.1)"><td style="padding:6px;color:var(--paper)">' + row.gua + '</td><td style="padding:6px;color:' + (row.type==='东四命'?'#4CAF50':'#2196f3') + '">' + row.type + '</td><td style="padding:6px;color:var(--paper2);font-size:11px">' + row.best.join('、') + '</td><td style="padding:6px;color:var(--cinn2);font-size:11px">' + row.worst.join('、') + '</td></tr>';
   });
   html += '</tbody></table></div>';
   // 吉凶星
@@ -29340,7 +29340,7 @@ function showYangzhaiKB() {
     html += '<p style="margin:4px 0;font-size:12px;color:var(--paper2)"><strong style="color:var(--paper)">' + k + '</strong>：' + s.meaning + ' → ' + s.effect + '</p>';
   });
   html += '</div>';
-  html += '<div style="background:rgba(244,67,54,0.08);padding:12px;border-radius:8px"><h5 style="color:#f44336;margin:0 0 8px">四凶星</h5>';
+  html += '<div style="background:rgba(244,67,54,0.08);padding:12px;border-radius:8px"><h5 style="color:var(--cinn2);margin:0 0 8px">四凶星</h5>';
   Object.keys(kb.bazhai.xiongxing).forEach(function(k) {
     let s = kb.bazhai.xiongxing[k];
     html += '<p style="margin:4px 0;font-size:12px;color:var(--paper2)"><strong style="color:var(--paper)">' + k + '</strong>：' + s.meaning + ' → ' + s.effect + '</p>';
@@ -29380,9 +29380,9 @@ function showYangzhaiKB() {
   html += '<div id="yk-xingsha" style="margin-bottom:30px"><h3 style="color:var(--gold);border-bottom:1px solid rgba(201,168,76,0.3);padding-bottom:8px">⚔️ 形煞识别与化解</h3>';
   kb.xingsha.shas.forEach(function(sha) {
     html += '<div style="background:rgba(244,67,54,0.06);padding:14px;border-radius:10px;margin-bottom:12px">';
-    html += '<h4 style="color:var(--paper);margin:0 0 6px">' + sha.name + ' <span style="color:#f44336;font-size:12px">' + sha.severity + '</span></h4>';
+    html += '<h4 style="color:var(--paper);margin:0 0 6px">' + sha.name + ' <span style="color:var(--cinn2);font-size:12px">' + sha.severity + '</span></h4>';
     html += '<p style="color:var(--paper2);font-size:13px;margin:4px 0">' + sha.description + '</p>';
-    html += '<p style="color:#f44336;font-size:13px;margin:4px 0">⚠️ 影响：' + sha.symptom + '</p>';
+    html += '<p style="color:var(--cinn2);font-size:13px;margin:4px 0">⚠️ 影响：' + sha.symptom + '</p>';
     html += '<p style="color:#4CAF50;font-size:13px;margin:4px 0">✅ 化解：' + sha.remedy + '</p>';
     html += '<pre style="background:rgba(0,0,0,0.3);padding:8px;border-radius:6px;font-size:11px;color:var(--paper2);margin:8px 0 0;overflow-x:auto">' + sha.illustration + '</pre>';
     html += '</div>';
@@ -29393,7 +29393,7 @@ function showYangzhaiKB() {
   html += '<div id="yk-quejiao" style="margin-bottom:30px"><h3 style="color:var(--gold);border-bottom:1px solid rgba(201,168,76,0.3);padding-bottom:8px">📐 房屋缺角与补救</h3>';
   html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:rgba(201,168,76,0.15)"><th style="padding:8px;color:var(--gold)">方位</th><th style="padding:8px;color:var(--gold)">对应成员</th><th style="padding:8px;color:var(--gold)">影响</th><th style="padding:8px;color:var(--gold)">补救</th></tr></thead><tbody>';
   kb.quejiao.directions.forEach(function(d) {
-    html += '<tr style="border-bottom:1px solid rgba(201,168,76,0.1)"><td style="padding:6px;color:var(--paper)">' + d.position + '</td><td style="padding:6px;color:var(--paper2)">' + d.member + '</td><td style="padding:6px;color:#f44336;font-size:11px">' + d.effect + '</td><td style="padding:6px;color:#4CAF50;font-size:11px">' + d.remedy + '</td></tr>';
+    html += '<tr style="border-bottom:1px solid rgba(201,168,76,0.1)"><td style="padding:6px;color:var(--paper)">' + d.position + '</td><td style="padding:6px;color:var(--paper2)">' + d.member + '</td><td style="padding:6px;color:var(--cinn2);font-size:11px">' + d.effect + '</td><td style="padding:6px;color:#4CAF50;font-size:11px">' + d.remedy + '</td></tr>';
   });
   html += '</tbody></table></div></div>';
   
@@ -29432,19 +29432,19 @@ function showYangzhaiKB() {
   kb.plants.lucky.forEach(function(p) {
     html += '<div style="background:rgba(76,175,80,0.06);padding:8px 12px;border-radius:6px;margin-bottom:4px;font-size:13px;color:var(--paper2)"><strong style="color:var(--paper)">' + p.name + '</strong>（' + p.element + '）→ ' + p.effect + ' | 摆放：' + p.placement + '</div>';
   });
-  html += '<h4 style="color:#f44336;font-size:14px;margin-top:12px">化煞植物</h4>';
+  html += '<h4 style="color:var(--cinn2);font-size:14px;margin-top:12px">化煞植物</h4>';
   kb.plants.sha_plants.forEach(function(p) {
     html += '<div style="background:rgba(244,67,54,0.06);padding:8px 12px;border-radius:6px;margin-bottom:4px;font-size:13px;color:var(--paper2)"><strong style="color:var(--paper)">' + p.name + '</strong> → ' + p.effect + ' | ' + p.placement + '</div>';
   });
   html += '<h4 style="color:var(--paper);font-size:14px;margin-top:12px">⚠️ 禁忌</h4>';
-  kb.plants.taboo.forEach(function(t) { html += '<p style="margin:3px 0;font-size:12px;color:#f44336">• ' + t + '</p>'; });
+  kb.plants.taboo.forEach(function(t) { html += '<p style="margin:3px 0;font-size:12px;color:var(--cinn2)">• ' + t + '</p>'; });
   html += '</div>';
   
   // 楼层选择
   html += '<div id="yk-louceng" style="margin-bottom:30px"><h3 style="color:var(--gold);border-bottom:1px solid rgba(201,168,76,0.3);padding-bottom:8px">🏢 楼层五行选择</h3>';
   html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:rgba(201,168,76,0.15)"><th style="padding:8px;color:var(--gold)">五行命</th><th style="padding:8px;color:var(--gold)">最佳楼层</th><th style="padding:8px;color:var(--gold)">避忌楼层</th></tr></thead><tbody>';
   kb.louceng.table.forEach(function(r) {
-    html += '<tr style="border-bottom:1px solid rgba(201,168,76,0.1)"><td style="padding:6px;color:var(--paper)">' + r.element + '</td><td style="padding:6px;color:#4CAF50;font-size:11px">' + r.best + '</td><td style="padding:6px;color:#f44336;font-size:11px">' + r.avoid + '</td></tr>';
+    html += '<tr style="border-bottom:1px solid rgba(201,168,76,0.1)"><td style="padding:6px;color:var(--paper)">' + r.element + '</td><td style="padding:6px;color:#4CAF50;font-size:11px">' + r.best + '</td><td style="padding:6px;color:var(--cinn2);font-size:11px">' + r.avoid + '</td></tr>';
   });
   html += '</tbody></table></div></div>';
   
@@ -30759,7 +30759,7 @@ function tzRenderFood(filter){
   // Also build filters
   let filterEl=document.getElementById('tzFoodFilters');
   if(filterEl && !filterEl.innerHTML){
-    let fhtml='<button onclick="tzFilterFood(\'all\')" style="padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--title);color:#fff;cursor:pointer;font-size:12px;font-family:inherit">全部</button>';
+    let fhtml='<button onclick="tzFilterFood(\'all\')" style="padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--title);color:var(--paper);cursor:pointer;font-size:12px;font-family:inherit">全部</button>';
     TZ_DATA.constitutions.forEach(function(c){
       fhtml+='<button onclick="tzFilterFood(\''+c.name.replace(/质$/,'')+'\')" style="padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,0.04);color:var(--muted);cursor:pointer;font-size:12px;font-family:inherit">'+c.icon+' '+c.name.replace(/质$/,'')+'</button>';
     });
@@ -34289,7 +34289,7 @@ function runLiuyaoEngine() {
       let _dongSym = {1:'老阳\\u25cb', 0:'少阳—'};
       // 本卦排盘
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">☰ 六爻排盘 · 本卦 — ' + ben + '</div>';
+      html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">☰ 六爻排盘 · 本卦 — ' + ben + '</div>';
       html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
       html += '<tr style="background:rgba(201,168,76,0.08);color:var(--gold2)"><th style="padding:5px 8px">爻位</th><th>阴阳</th><th>纳甲</th><th>六亲</th><th>六神</th><th>世应</th><th>旺衰</th><th>动</th></tr>';
       // 计算变卦纳甲用于对照
@@ -34337,7 +34337,7 @@ function runLiuyaoEngine() {
       // 本卦变卦对照
       if (_bianZg && gua.dongYao.length > 0) {
         html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-        html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">☰ 本卦 ↔ 变卦对照 — ' + bian + '</div>';
+        html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">☰ 本卦 ↔ 变卦对照 — ' + bian + '</div>';
         html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
         html += '<tr style="background:rgba(201,168,76,0.08);color:var(--gold2)"><th style="padding:5px 8px">爻位</th><th>本卦纳甲</th><th>本卦六亲</th><th>→</th><th>变卦纳甲</th><th>变卦六亲</th><th>变化</th></tr>';
         for (let yi2 = 5; yi2 >= 0; yi2--) {
@@ -34369,7 +34369,7 @@ function runLiuyaoEngine() {
         let _ysShiYing = (zg.shiying.shi === _ysIdx) ? '世位' : (zg.shiying.ying === _ysIdx) ? '应位' : '闲位';
         let _ysDong = gua.dongYao.indexOf(_ysIdx) >= 0;
         html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-        html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🎯 用神分析详情</div>';
+        html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">🎯 用神分析详情</div>';
         html += '<div style="padding:12px 16px;font-size:12px;line-height:2">';
         html += '<div><span style="color:var(--gold2);font-weight:600">用神：</span>' + duan.yongshen + '（' + _ysLq + '·' + _ysZhi + '·' + _ysWx + '）</div>';
         html += '<div><span style="color:var(--gold2);font-weight:600">所在：</span>' + _yaoNames[_ysIdx] + '爻 · ' + _ysShiYing + ' · ' + (_ysDong ? '发动' : '安静') + '</div>';
@@ -34423,7 +34423,7 @@ function runLiuyaoEngine() {
       let _yaoPosFull = ['初爻', '二爻', '三爻', '四爻', '五爻', '上爻'];
       let _hasDong = gua.dongYao && gua.dongYao.length > 0;
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">☰ 卦象爻线可视化</div>';
+      html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">☰ 卦象爻线可视化</div>';
       html += '<div style="padding:16px;display:flex;justify-content:center;gap:24px;flex-wrap:wrap">';
       // 渲染单个卦象
       function _renderYaoLines(lines, dongArr, title, isBian) {
@@ -34502,7 +34502,7 @@ function runLiuyaoEngine() {
       let _benHexData = _YJ_HEX_DATA[_benHexName];
       let _bianHexData = _YJ_HEX_DATA[_bianHexName];
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">📖 卦辞详解</div>';
+      html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">📖 卦辞详解</div>';
       html += '<div style="padding:12px 16px;font-size:12px;line-height:2">';
       if (_benHexData) {
         html += '<div style="margin-bottom:10px;padding:10px;background:rgba(201,168,76,0.04);border-radius:8px">';
@@ -34564,7 +34564,7 @@ function runLiuyaoEngine() {
     // === 📝 术语注释 ===
     try {
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">📝 术语注释</div>';
+      html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">📝 术语注释</div>';
       html += '<div style="padding:12px 16px;font-size:11px;line-height:2;opacity:.85">';
       html += '<div><b style="color:var(--gold2)">纳甲：</b>将天干地支配入六爻，干支所属五行与卦宫五行论生克，为六爻核心排盘法。</div>';
       html += '<div><b style="color:var(--gold2)">六亲：</b>父母、兄弟、子孙、妻财、官鬼，以卦宫五行为主，按五行生克关系确定各爻六亲，代表所测事物类别。</div>';
@@ -34657,9 +34657,9 @@ function runLiuyaoEngine() {
               v3LiuHtml += '<div style="font-size:11px;margin-bottom:4px;padding:4px 6px;background:rgba(255,255,255,.02);border-radius:4px">';
               v3LiuHtml += '<span style="color:'+_spirits[sp].color+';font-weight:bold">'+_spirits[sp].label+'</span> ';
               v3LiuHtml += '<span style="color:var(--paper2)">'+(sd.name||'')+'('+sd.wuxing+') '+(sd.yaoPos||'不上卦')+'</span> ';
-              if (sd.wangShuai) v3LiuHtml += '<span style="color:#888">'+sd.wangShuai+'</span> ';
+              if (sd.wangShuai) v3LiuHtml += '<span style="color:var(--steel)">'+sd.wangShuai+'</span> ';
               if (sd.moving) v3LiuHtml += '<span style="color:var(--cinn2)">动</span>';
-              if (sd.text) v3LiuHtml += '<div style="font-size:10px;color:#666;margin-left:8px">'+sd.text+'</div>';
+              if (sd.text) v3LiuHtml += '<div style="font-size:10px;color:var(--paper3);margin-left:8px">'+sd.text+'</div>';
               v3LiuHtml += '</div>';
             }
             if (v3LiuResult.yuanJiSummary) v3LiuHtml += '<div style="font-size:11px;color:var(--gold);margin-top:4px;line-height:1.6">'+v3LiuResult.yuanJiSummary+'</div>';
@@ -34674,7 +34674,7 @@ function runLiuyaoEngine() {
             if (v3LiuResult.monthWangShuai) {
               let mw = v3LiuResult.monthWangShuai;
               v3LiuHtml += '<div style="font-size:11px;color:var(--paper2);line-height:1.6">月建'+(mw.monthBranch||'')+'('+(mw.monthEle||'')+') → 用神'+(mw.wangShuai||'')+'</div>';
-              if (mw.desc) v3LiuHtml += '<div style="font-size:10px;color:#666;margin-left:8px">'+mw.desc+'</div>';
+              if (mw.desc) v3LiuHtml += '<div style="font-size:10px;color:var(--paper3);margin-left:8px">'+mw.desc+'</div>';
             }
             if (v3LiuResult.kongWang) {
               let kw = v3LiuResult.kongWang;
@@ -34682,7 +34682,7 @@ function runLiuyaoEngine() {
               if (kw.yaos && kw.yaos.length > 0) {
                 for (let kwi=0; kwi<kw.yaos.length; kwi++) {
                   let kwy = kw.yaos[kwi];
-                  v3LiuHtml += '<div style="font-size:10px;color:#888;margin-left:8px">第'+kwy.pos+'爻('+kwy.branch+')空亡'+(kwy.isZhenKong?'【真空】':'【假空】')+'</div>';
+                  v3LiuHtml += '<div style="font-size:10px;color:var(--steel);margin-left:8px">第'+kwy.pos+'爻('+kwy.branch+')空亡'+(kwy.isZhenKong?'【真空】':'【假空】')+'</div>';
                 }
               }
             }
@@ -34701,8 +34701,8 @@ function runLiuyaoEngine() {
             if (v3LiuResult.fuFei) {
               let ff = v3LiuResult.fuFei;
               if (ff.desc) v3LiuHtml += '<div style="font-size:11px;color:var(--paper2);margin-top:4px;line-height:1.6">'+ff.desc+'</div>';
-              if (ff.fuShen) v3LiuHtml += '<div style="font-size:10px;color:#888;margin-left:8px">伏神：'+ff.fuShen+'('+ (ff.fuEle||'') +')</div>';
-              if (ff.feiShen) v3LiuHtml += '<div style="font-size:10px;color:#888;margin-left:8px">飞神：'+ff.feiShen+'('+ (ff.feiEle||'') +')</div>';
+              if (ff.fuShen) v3LiuHtml += '<div style="font-size:10px;color:var(--steel);margin-left:8px">伏神：'+ff.fuShen+'('+ (ff.fuEle||'') +')</div>';
+              if (ff.feiShen) v3LiuHtml += '<div style="font-size:10px;color:var(--steel);margin-left:8px">飞神：'+ff.feiShen+'('+ (ff.feiEle||'') +')</div>';
               if (ff.relation) v3LiuHtml += '<div style="font-size:10px;color:var(--warn);margin-left:8px">'+ff.relation+'</div>';
             }
             v3LiuHtml += '</div>';
@@ -34724,7 +34724,7 @@ function runLiuyaoEngine() {
               v3LiuHtml += '<div style="font-size:11px;color:var(--violet);margin-top:4px">暗动爻：</div>';
               for (let ayi=0; ayi<dy.anDongYaos.length; ayi++) {
                 let ay = dy.anDongYaos[ayi];
-                v3LiuHtml += '<div style="font-size:10px;color:#888;margin-left:8px">第'+ay.pos+'爻('+ay.branch+') 被日支'+ay.dayBranch+'冲 → 暗动'+(ay.desc?' — '+ay.desc:'')+'</div>';
+                v3LiuHtml += '<div style="font-size:10px;color:var(--steel);margin-left:8px">第'+ay.pos+'爻('+ay.branch+') 被日支'+ay.dayBranch+'冲 → 暗动'+(ay.desc?' — '+ay.desc:'')+'</div>';
               }
             }
             if (dy.summary) v3LiuHtml += '<div style="font-size:11px;color:var(--gold);margin-top:4px;line-height:1.6">'+dy.summary+'</div>';
@@ -34810,7 +34810,7 @@ function runMeihuaEngine() {
       let _dongIdx = gua.dongYao;
       // 卦象阴阳图示
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🌸 卦象图示</div>';
+      html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">🌸 卦象图示</div>';
       html += '<div style="padding:16px;display:flex;justify-content:center;gap:32px;flex-wrap:wrap">';
       // 本卦
       html += '<div style="text-align:center">';
@@ -34848,7 +34848,7 @@ function runMeihuaEngine() {
       let _bianYongIdx = (_dongIdx >= 3) ? gua.bianGua.lower : gua.bianGua.upper;
       let _bianYongWx = _GUA_XIANG[_bianYongIdx] ? _GUA_XIANG[_bianYongIdx].wuxing : _yongWx;
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">📊 体用分析表</div>';
+      html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">📊 体用分析表</div>';
       html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
       html += '<tr style="background:rgba(201,168,76,0.08);color:var(--gold2)"><th style="padding:5px 8px">类别</th><th>卦名</th><th>五行</th><th>与体卦关系</th><th>吉凶</th><th>时令旺衰</th></tr>';
       // 体卦
@@ -34875,7 +34875,7 @@ function runMeihuaEngine() {
       html += '</table></div></div>';
       // 断卦逻辑链
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🔗 断卦逻辑链</div>';
+      html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">🔗 断卦逻辑链</div>';
       html += '<div style="padding:12px 16px;font-size:12px;line-height:2.2">';
       html += '<div style="padding:6px 10px;background:rgba(46,204,113,0.04);border-radius:8px;margin-bottom:6px"><span style="color:var(--jade2);font-weight:600">① 体用生克：</span>' + analyze.relation + ' — ' + analyze.initial + '</div>';
       if (analyze.huAnalysis) {
@@ -34992,7 +34992,7 @@ function runMeihuaEngine() {
         return s;
       }
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🌸 梅花卦象圆图</div>';
+      html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">🌸 梅花卦象圆图</div>';
       html += '<div style="padding:16px">';
       // 圆图布局：用嵌套同心圆表示
       html += '<div style="display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap">';
@@ -35055,7 +35055,7 @@ function runMeihuaEngine() {
     // === 📝 术语注释 ===
     try {
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">📝 术语注释</div>';
+      html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">📝 术语注释</div>';
       html += '<div style="padding:12px 16px;font-size:11px;line-height:2;opacity:.85">';
       html += '<div><b style="color:var(--gold2)">体卦：</b>不动之卦，代表自己。动爻所在卦为用卦，另一卦即为体卦。</div>';
       html += '<div><b style="color:var(--gold2)">用卦：</b>动爻所在之卦，代表所测之事。用卦生体卦则吉，克体卦则凶。</div>';
@@ -35108,8 +35108,8 @@ function runMeihuaEngine() {
             if (td.relationLabel) v3MhHtml += '<div style="font-size:10px;color:var(--paper2)">关系：'+td.relationLabel+'</div>';
             if (td.tiStrength) v3MhHtml += '<div style="font-size:10px;color:var(--paper2)">体卦旺衰：'+td.tiStrength+'</div>';
             if (td.yongStrength) v3MhHtml += '<div style="font-size:10px;color:var(--paper2)">用卦旺衰：'+td.yongStrength+'</div>';
-            if (td.huGuaEffect) v3MhHtml += '<div style="font-size:10px;color:#888;margin-left:8px">互卦影响：'+td.huGuaEffect+'</div>';
-            if (td.bianGuaEffect) v3MhHtml += '<div style="font-size:10px;color:#888;margin-left:8px">变卦趋势：'+td.bianGuaEffect+'</div>';
+            if (td.huGuaEffect) v3MhHtml += '<div style="font-size:10px;color:var(--steel);margin-left:8px">互卦影响：'+td.huGuaEffect+'</div>';
+            if (td.bianGuaEffect) v3MhHtml += '<div style="font-size:10px;color:var(--steel);margin-left:8px">变卦趋势：'+td.bianGuaEffect+'</div>';
             if (td.summary) v3MhHtml += '<div style="font-size:10px;color:var(--gold);margin-top:4px;line-height:1.5">'+td.summary+'</div>';
             v3MhHtml += '</div>';
           }
@@ -35185,7 +35185,7 @@ function runQimenEngine() {
 
     // === 九宫格可视化盘面 ===
     html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-    html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🔮 九宫遁甲盘面</div>';
+    html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">🔮 九宫遁甲盘面</div>';
     html += '<div style="padding:12px;display:flex;justify-content:center">';
     html += '<div style="display:grid;grid-template-columns:repeat(3,86px);gap:2px;background:var(--border);padding:2px;border-radius:8px">';
     let _qmGongOrder = [4,9,2,3,5,7,8,1,6];
@@ -35223,7 +35223,7 @@ function runQimenEngine() {
 
     // === 用神分析详情 ===
     html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-    html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🎯 用神分析</div>';
+    html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">🎯 用神分析</div>';
     html += '<div style="padding:12px;font-size:13px;line-height:1.8">';
     html += '<div style="margin-bottom:6px"><b style="color:var(--gold)">用神：</b>' + analyze.yongShen + ' · 落<b style="color:var(--fire2)">' + analyze.palace + '</b>宫</div>';
     html += '<div style="margin-bottom:6px"><b style="color:var(--gold)">天盘干：</b>' + analyze.qi + ' · <b style="color:var(--gold)">门：</b>' + (_qmFullMen[analyze.men] || analyze.men) + ' · <b style="color:var(--gold)">星：</b>' + (_qmFullStars[analyze.star] || analyze.star) + ' · <b style="color:var(--gold)">神：</b>' + analyze.shen + '</div>';
@@ -35242,7 +35242,7 @@ function runQimenEngine() {
 
     // === 天盘地盘对照表 ===
     html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-    html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">📋 天盘地盘对照</div>';
+    html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">📋 天盘地盘对照</div>';
     html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
     html += '<tr style="background:rgba(201,168,76,0.08)"><th style="padding:5px 6px;border:1px solid var(--border);text-align:left">宫位</th><th style="padding:5px 6px;border:1px solid var(--border);text-align:left">地盘</th><th style="padding:5px 6px;border:1px solid var(--border);text-align:left">天盘</th><th style="padding:5px 6px;border:1px solid var(--border);text-align:left">八门</th><th style="padding:5px 6px;border:1px solid var(--border);text-align:left">九星</th><th style="padding:5px 6px;border:1px solid var(--border);text-align:left">八神</th><th style="padding:5px 6px;border:1px solid var(--border);text-align:left">备注</th></tr>';
     let _qmGongDisplay = [1,2,3,4,6,7,8,9];
@@ -35271,7 +35271,7 @@ function runQimenEngine() {
     // === 格局判断详情 ===
     if (analyze.geju && analyze.geju.length > 0) {
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">⚖️ 格局判断</div>';
+      html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">⚖️ 格局判断</div>';
       html += '<div style="padding:12px;font-size:12px;line-height:1.8">';
       let _jiGeju = ['青龙返首','飞鸟跌穴','玉女守门','真诈格','假诈格','重诈格','天假格','地假格','人假格','神假格','鬼假格'];
       let _xiongGeju = ['太白入荧','荧入太白','青龙折足','腾蛇夭矫','朱雀投江','五不遇时','伏吟'];
@@ -35532,7 +35532,7 @@ function runLiurenEngine() {
     try {
       // 四课表
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">⬡ 四课</div>';
+      html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">⬡ 四课</div>';
       html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
       html += '<tr style="background:rgba(201,168,76,0.08);color:var(--gold2)"><th style="padding:5px 8px">课序</th><th>上神</th><th>下神</th><th>天将</th><th>神将含义</th><th>说明</th></tr>';
       let _keLabels = ['第一课', '第二课', '第三课', '第四课'];
@@ -35563,7 +35563,7 @@ function runLiurenEngine() {
       let _chuanZhi = [_chuan.chu, _chuan.zhong, _chuan.mo];
       let _zhiWxMap = {'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">⬡ 三传详情 — ' + (_chuan.method || '贼克法') + '</div>';
+      html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">⬡ 三传详情 — ' + (_chuan.method || '贼克法') + '</div>';
       html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
       html += '<tr style="background:rgba(201,168,76,0.08);color:var(--gold2)"><th style="padding:5px 8px">传序</th><th>天盘</th><th>地盘</th><th>神将</th><th>神将含义</th><th>五行</th><th>六亲</th></tr>';
       for (let ci = 0; ci < 3; ci++) {
@@ -35638,7 +35638,7 @@ function runLiurenEngine() {
           return 0;
         }
         html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-        html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">⬡ 天地盘方阵图</div>';
+        html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">⬡ 天地盘方阵图</div>';
         html += '<div style="padding:16px;display:flex;justify-content:center">';
         html += '<div style="display:grid;grid-template-columns:repeat(4,64px);grid-template-rows:repeat(4,64px);gap:2px;background:var(--border);padding:2px;border-radius:8px">';
         for (let ri = 0; ri < 4; ri++) {
@@ -35705,7 +35705,7 @@ function runLiurenEngine() {
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
       let _lrYongshenZhi = '';
       try { if (analyze.yongshen) _lrYongshenZhi = analyze.yongshen; } catch(_e) {}
-      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">⬡ 天盘 ↔ 地盘对照' + (_lrYongshenZhi ? ' · 用神：' + _lrYongshenZhi : '') + '</div>';
+      html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">⬡ 天盘 ↔ 地盘对照' + (_lrYongshenZhi ? ' · 用神：' + _lrYongshenZhi : '') + '</div>';
       html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">';
       html += '<tr style="background:rgba(201,168,76,0.08);color:var(--gold2)"><th style="padding:4px 6px">地盘</th><th>天盘</th><th>天将</th><th>地盘</th><th>天盘</th><th>天将</th><th>地盘</th><th>天盘</th><th>天将</th><th>地盘</th><th>天盘</th><th>天将</th></tr>';
       let _brArr = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
@@ -35730,7 +35730,7 @@ function runLiurenEngine() {
       if (analyze.keti) {
         let _ketiParts = analyze.keti.split('、');
         html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-        html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">📋 课体格局判断</div>';
+        html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">📋 课体格局判断</div>';
         html += '<div style="padding:12px 16px;font-size:12px;line-height:2">';
         let _ketiDescMap = {
           '重审课': '重审课——上克下，事多反复，宜再审而后行',
@@ -35924,7 +35924,7 @@ function runLiurenEngine() {
       };
       let _methodDesc = _nineGates[_scMethod] || '根据四课生克关系，按九宗门规则取三传。';
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🔧 三传推演方法 — ' + _scMethod + '</div>';
+      html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">🔧 三传推演方法 — ' + _scMethod + '</div>';
       html += '<div style="padding:12px 16px;font-size:12px;line-height:2">';
       html += '<div style="margin-bottom:8px"><b style="color:var(--gold2)">取法：</b>' + _scMethod + '</div>';
       html += '<div style="margin-bottom:8px;opacity:.85"><b style="color:var(--gold2)">原理：</b>' + _methodDesc + '</div>';
@@ -35946,7 +35946,7 @@ function runLiurenEngine() {
     // === 🌙 月将加占时推演过程 ===
     try {
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🌙 月将加占时推演</div>';
+      html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">🌙 月将加占时推演</div>';
       html += '<div style="padding:12px 16px;font-size:12px;line-height:2;opacity:.85">';
       html += '<div style="margin-bottom:6px"><b style="color:var(--gold2)">月将：</b>' + pan.yueJiang + '（根据中气确定，月将太阳所在宫位）</div>';
       html += '<div style="margin-bottom:6px"><b style="color:var(--gold2)">占时：</b>' + pan.shiZhi + '（起卦时辰）</div>';
@@ -35960,7 +35960,7 @@ function runLiurenEngine() {
     // === 📝 术语注释 ===
     try {
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">📝 术语注释</div>';
+      html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">📝 术语注释</div>';
       html += '<div style="padding:12px 16px;font-size:11px;line-height:2;opacity:.85">';
       html += '<div><b style="color:var(--gold2)">四课：</b>以日干、日支为主，各取阳神、阴神，共四课。第一课日干阳神，第二课日干阴神，第三课日支阳神，第四课日支阴神。</div>';
       html += '<div><b style="color:var(--gold2)">三传：</b>初传（起因）、中传（过程）、末传（结局）。由四课按九宗门规则推演而得。</div>';
@@ -36038,7 +36038,7 @@ function runLiurenEngine() {
               v3LrHtml += '<div style="margin-bottom:12px;padding:10px;background:rgba(52,152,219,0.04);border-radius:8px">';
               v3LrHtml += '<div style="font-size:12px;color:var(--cyan2);margin-bottom:6px">📅 克应分析</div>';
               if (_keying.yingqi) v3LrHtml += '<div style="font-size:11px;color:var(--paper2);line-height:1.6">应期：'+_keying.yingqi+'</div>';
-              if (_keying.desc) v3LrHtml += '<div style="font-size:10px;color:#666;margin-left:8px;line-height:1.5">'+_keying.desc+'</div>';
+              if (_keying.desc) v3LrHtml += '<div style="font-size:10px;color:var(--paper3);margin-left:8px;line-height:1.5">'+_keying.desc+'</div>';
               v3LrHtml += '</div>';
             }
           }
@@ -36049,7 +36049,7 @@ function runLiurenEngine() {
               v3LrHtml += '<div style="font-size:12px;color:var(--violet);margin-bottom:6px">♟ 本命行年</div>';
               if (_bm.benMing) v3LrHtml += '<div style="font-size:11px;color:var(--paper2)">本命：'+_bm.benMing+'</div>';
               if (_bm.xingNian) v3LrHtml += '<div style="font-size:11px;color:var(--paper2)">行年：'+_bm.xingNian+'</div>';
-              if (_bm.xingNianDetail) v3LrHtml += '<div style="font-size:10px;color:#666;margin-left:8px">'+_bm.xingNianDetail+'</div>';
+              if (_bm.xingNianDetail) v3LrHtml += '<div style="font-size:10px;color:var(--paper3);margin-left:8px">'+_bm.xingNianDetail+'</div>';
               v3LrHtml += '</div>';
             }
           }
@@ -36063,7 +36063,7 @@ function runLiurenEngine() {
               v3LrHtml += '<div style="font-size:12px;color:var(--warn);margin-bottom:6px">📋 课体格局</div>';
               if (_keti.gejuName) v3LrHtml += '<div style="font-size:11px;color:var(--paper2)">课体：<b>'+_keti.gejuName+'</b></div>';
               if (_keti.luck) v3LrHtml += '<div style="font-size:11px;color:' + (_keti.luck==='吉'?'#27ae60':_keti.luck==='凶'?'#e74c3c':'#f39c12') + '">吉凶：'+_keti.luck+'</div>';
-              if (_keti.description) v3LrHtml += '<div style="font-size:10px;color:#666;margin-left:8px;line-height:1.5">'+_keti.description+'</div>';
+              if (_keti.description) v3LrHtml += '<div style="font-size:10px;color:var(--paper3);margin-left:8px;line-height:1.5">'+_keti.description+'</div>';
               v3LrHtml += '</div>';
             }
           }
@@ -36221,7 +36221,7 @@ function runZiweiEngine() {
 
       // 构建盘面网格 (4列4行)
       let _panHtml = '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-      _panHtml += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🔮 紫微十二宫盘面</div>';
+      _panHtml += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">🔮 紫微十二宫盘面</div>';
       _panHtml += '<div style="padding:14px">';
       _panHtml += '<div style="display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,auto);gap:4px;max-width:560px;margin:0 auto">';
       for (let _row = 0; _row < 4; _row++) {
@@ -36249,7 +36249,7 @@ function runZiweiEngine() {
       // === 天地盘对照表 ===
       let _diPanZhi = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🌍 天地盘对照表</div>';
+      html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">🌍 天地盘对照表</div>';
       html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
       html += '<tr style="background:rgba(201,168,76,0.08)"><th style="padding:6px;border:1px solid var(--border);text-align:left">宫位</th><th style="padding:6px;border:1px solid var(--border);text-align:left">天盘地支</th><th style="padding:6px;border:1px solid var(--border);text-align:left">地盘地支</th><th style="padding:6px;border:1px solid var(--border);text-align:left">说明</th></tr>';
       for (let _ti = 0; _ti < 12; _ti++) {
@@ -36268,7 +36268,7 @@ function runZiweiEngine() {
 
     // === 十二宫星曜分布表 ===
     html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-    html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🌃 十二宫星曜分布</div>';
+    html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">🌃 十二宫星曜分布</div>';
     html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
     html += '<tr style="background:rgba(201,168,76,0.08)"><th style="padding:6px;border:1px solid var(--border);text-align:left">宫位</th><th style="padding:6px;border:1px solid var(--border);text-align:left">宫支</th><th style="padding:6px;border:1px solid var(--border);text-align:left">主星</th><th style="padding:6px;border:1px solid var(--border);text-align:left">星曜含义</th><th style="padding:6px;border:1px solid var(--border);text-align:left">辅星</th><th style="padding:6px;border:1px solid var(--border);text-align:left">煞星</th><th style="padding:6px;border:1px solid var(--border);text-align:left">庙旺</th></tr>';
     let _zwMainStars = ['紫微','天机','太阳','武曲','天同','廉贞','天府','太阴','贪狼','巨门','天相','天梁','七杀','破军'];
@@ -36315,7 +36315,7 @@ function runZiweiEngine() {
 
     // === 四化落宫详情 ===
     html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-    html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">✨ 四化落宫详情</div>';
+    html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">✨ 四化落宫详情</div>';
     html += '<div style="padding:12px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-size:13px">';
     let _sihuaNames = [['lu','化禄','禄'],['quan','化权','权'],['ke','化科','科'],['ji','化忌','忌']];
     let _sihuaColors = { '禄':'var(--jade2)', '权':'var(--fire2)', '科':'var(--gold)', '忌':'var(--fire)' };
@@ -36347,7 +36347,7 @@ function runZiweiEngine() {
     let _guanPos = (_mingPos + 5) % 12;
     let _migPos = _opp[_mingPos];
     html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-    html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">📐 三方四正分析</div>';
+    html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">📐 三方四正分析</div>';
     html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
     html += '<tr style="background:rgba(201,168,76,0.08)"><th style="padding:6px;border:1px solid var(--border);text-align:left">宫位</th><th style="padding:6px;border:1px solid var(--border);text-align:left">宫支</th><th style="padding:6px;border:1px solid var(--border);text-align:left">星曜</th><th style="padding:6px;border:1px solid var(--border);text-align:left">关系</th></tr>';
     let _sfpData = [
@@ -36367,7 +36367,7 @@ function runZiweiEngine() {
 
     // === 大运排布表 ===
     html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-    html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🕐 大运排布</div>';
+    html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">🕐 大运排布</div>';
     if (analyze.daxian && analyze.daxian.length > 0) {
       html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
       html += '<tr style="background:rgba(201,168,76,0.08)"><th style="padding:6px;border:1px solid var(--border);text-align:left">大限</th><th style="padding:6px;border:1px solid var(--border);text-align:left">宫位</th><th style="padding:6px;border:1px solid var(--border);text-align:left">宫支</th><th style="padding:6px;border:1px solid var(--border);text-align:left">年龄</th><th style="padding:6px;border:1px solid var(--border);text-align:left">主星</th><th style="padding:6px;border:1px solid var(--border);text-align:left">四化</th></tr>';
@@ -36414,7 +36414,7 @@ function runZiweiEngine() {
     // === 经典格局详情 ===
     if (analyze.gejuDetail && analyze.gejuDetail.length > 0) {
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">📜 经典格局</div>';
+      html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">📜 经典格局</div>';
       html += '<div style="padding:12px;font-size:12px;line-height:1.8">';
       let _gejuItems = analyze.gejuDetail.split('；');
       for (let _gei = 0; _gei < _gejuItems.length; _gei++) {
@@ -36427,7 +36427,7 @@ function runZiweiEngine() {
 
     // === 庙旺利陷表 ===
     html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-    html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🌟 命宫星曜庙旺</div>';
+    html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">🌟 命宫星曜庙旺</div>';
     html += '<div style="padding:12px;font-size:12px">';
     let _mingStars2 = pan.stars[pan.gongMap['命宫']] || [];
     let _mainInMing = _mingStars2.filter(function(s){ return _zwMainStars.indexOf(s) >= 0; });
@@ -36459,7 +36459,7 @@ function runZiweiEngine() {
       let _mingDesc = _mingMain3.map(function(s){ return _mingDescMap[s] || ''; }).join(' ');
       if (_mingDesc) {
         html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-        html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🌟 命宫详细解读</div>';
+        html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">🌟 命宫详细解读</div>';
         html += '<div style="padding:12px 16px;font-size:12px;line-height:1.8">' + _mingDesc;
         // 身宫补充
         let _shenPos = pan.gongMap['身宫'];
@@ -36718,7 +36718,7 @@ function runZiweiEngine() {
                 let ddColor = dd.overview.indexOf('亨通') >= 0 ? '#27ae60' : dd.overview.indexOf('波折') >= 0 ? '#e74c3c' : '#f39c12';
                 v3Html += '<div style="margin-top:6px;padding:8px;background:rgba(255,255,255,.02);border-radius:6px;border-left:3px solid ' + ddColor + '">';
                 v3Html += '<div style="font-size:12px"><b>' + dd.gongName + '(' + dd.gongZhi + '宫)</b> ' + dd.ageRange + ' · 大限干:' + dd.dGan + ' · 主星:' + dd.starText + '</div>';
-                if (dd.strengthText) v3Html += '<div style="font-size:10px;color:#888">庙旺：' + dd.strengthText + '</div>';
+                if (dd.strengthText) v3Html += '<div style="font-size:10px;color:var(--steel)">庙旺：' + dd.strengthText + '</div>';
                 // 大限四化
                 if (dd.dSihua && dd.dSihua.length > 0) {
                   v3Html += '<div style="font-size:10px;color:var(--violet)">大限四化：';
@@ -36815,7 +36815,7 @@ function runZiweiEngine() {
                 for (let ls = 0; ls < _lnResult.liunianStrengths.length; ls++) {
                   strTexts.push(_lnResult.liunianStrengths[ls].star + '(' + _lnResult.liunianStrengths[ls].label + ')');
                 }
-                v3Html += '<div style="font-size:10px;color:#888;margin-top:2px">庙旺：' + strTexts.join('、') + '</div>';
+                v3Html += '<div style="font-size:10px;color:var(--steel);margin-top:2px">庙旺：' + strTexts.join('、') + '</div>';
               }
               v3Html += '</div>';
               // 流年四化
@@ -36866,7 +36866,7 @@ function runZiweiEngine() {
                 for (let xxs = 0; xxs < _xxResult.xiaoxianStrengths.length; xxs++) {
                   xxStrTexts.push(_xxResult.xiaoxianStrengths[xxs].star + '(' + _xxResult.xiaoxianStrengths[xxs].label + ')');
                 }
-                v3Html += '<div style="font-size:10px;color:#888;margin-top:2px">庙旺：' + xxStrTexts.join('、') + '</div>';
+                v3Html += '<div style="font-size:10px;color:var(--steel);margin-top:2px">庙旺：' + xxStrTexts.join('、') + '</div>';
               }
               v3Html += '</div>';
               v3Html += '<div style="font-size:11px;line-height:1.8;color:var(--paper);margin-bottom:6px"><b style="color:var(--violet)">星情分析：</b>' + _xxResult.starAnalysis + '</div>';
@@ -36893,7 +36893,7 @@ function runZiweiEngine() {
                 for (let lys = 0; lys < _lyResult.liuyueStrengths.length; lys++) {
                   lyStrTexts.push(_lyResult.liuyueStrengths[lys].star + '(' + _lyResult.liuyueStrengths[lys].label + ')');
                 }
-                v3Html += '<div style="font-size:10px;color:#888;margin-top:2px">庙旺：' + lyStrTexts.join('、') + '</div>';
+                v3Html += '<div style="font-size:10px;color:var(--steel);margin-top:2px">庙旺：' + lyStrTexts.join('、') + '</div>';
               }
               v3Html += '</div>';
               // 流月四化
@@ -36987,7 +36987,7 @@ function runFengshuiEngine() {
     let _starNature = {1:'水·吉',2:'土·凶',3:'木·凶',4:'木·吉',5:'土·大凶',6:'金·吉',7:'金·凶',8:'土·吉',9:'火·吉'};
     let _starColor = {1:'#2980b9',2:'#e74c3c',3:'#27ae60',4:'#27ae60',5:'#e74c3c',6:'#95a5a6',7:'#e74c3c',8:'#e67e22',9:'#e74c3c'};
     html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-    html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🌟 九宫飞星图（' + _fsPeriod + '运）</div>';
+    html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">🌟 九宫飞星图（' + _fsPeriod + '运）</div>';
     html += '<div style="padding:12px;display:flex;justify-content:center">';
     html += '<div style="display:grid;grid-template-columns:repeat(3,100px);gap:2px;background:var(--border);padding:2px;border-radius:8px">';
     // 显示顺序: 东南4→南9→西南2 / 东3→中5→西7 / 东北8→北1→西北6
@@ -37017,7 +37017,7 @@ function runFengshuiEngine() {
       '绝命':'破财损丁，凡事不顺','五鬼':'官非火灾，五鬼闹宅','六煞':'桃花口舌，财运反复','祸害':'疾病口舌，诸事波折'
     };
     html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-    html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🏠 八宅吉凶分布</div>';
+    html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">🏠 八宅吉凶分布</div>';
     html += '<div style="padding:12px"><table style="width:100%;border-collapse:collapse;font-size:12px">';
     html += '<tr style="background:rgba(201,168,76,0.08)"><th style="padding:6px;text-align:left">方位</th><th style="padding:6px;text-align:left">八宅</th><th style="padding:6px;text-align:left">吉凶</th><th style="padding:6px;text-align:left">说明</th><th style="padding:6px;text-align:left">布局建议</th></tr>';
     let _dirOrder = ['北','东北','东','东南','南','西南','西','西北'];
@@ -37044,7 +37044,7 @@ function runFengshuiEngine() {
 
     // === 📊 宅命分析表 ===
     html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-    html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">📊 宅命分析</div>';
+    html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">📊 宅命分析</div>';
     html += '<div style="padding:12px"><table style="width:100%;border-collapse:collapse;font-size:12px">';
     html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.04)"><td style="padding:6px;width:30%;opacity:.6">宅卦</td><td style="padding:6px">' + res.zhaiMing + '（' + res.direction + '向）</td></tr>';
     html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.04)"><td style="padding:6px;opacity:.6">宅主命卦</td><td style="padding:6px">' + (res.yaoMing || '未提供出生年') + (res.mingGuaNum ? '（命卦' + res.mingGuaNum + '）' : '') + '</td></tr>';
@@ -37063,7 +37063,7 @@ function runFengshuiEngine() {
       '卫生间': '宜压凶方，忌在吉方或中宫。保持通风干燥，门常闭。'
     };
     html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-    html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🧭 分区域布局建议</div>';
+    html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">🧭 分区域布局建议</div>';
     html += '<div style="padding:12px">';
     for (let _area in _areaAdvice) {
       // 根据八宅为该区域推荐方位
@@ -37157,7 +37157,7 @@ function runFengshuiEngine() {
         '绝命':'宜厨房/卫生间压之，忌居住','五鬼':'宜厨房/卫生间压之，防官非','六煞':'宜卫生间压之，忌卧室','祸害':'宜储物/卫生间，忌长期停留'
       };
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">🧭 八宅方位圆图</div>';
+      html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">🧭 八宅方位圆图</div>';
       html += '<div style="padding:16px;display:flex;justify-content:center">';
       html += '<div style="display:grid;grid-template-columns:repeat(3,110px);grid-template-rows:repeat(3,110px);gap:3px;background:var(--border);padding:3px;border-radius:12px">';
       for (let _gi = 0; _gi < 9; _gi++) {
@@ -37192,7 +37192,7 @@ function runFengshuiEngine() {
     // === 📝 术语注释 ===
     try {
       html += '<div style="margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-      html += '<div style="background:var(--title);color:#fff;padding:10px 16px;font-weight:600">📝 术语注释</div>';
+      html += '<div style="background:var(--title);color:var(--paper);padding:10px 16px;font-weight:600">📝 术语注释</div>';
       html += '<div style="padding:12px 16px;font-size:11px;line-height:2;opacity:.85">';
       html += '<div><b style="color:var(--gold2)">九宫飞星：</b>以当运之星入中宫顺飞九宫，得一至九星分布八方。一白水、二黑土、三碧木、四绿木、五黄土、六白金、七赤金、八白土、九紫火。当旺之星所在方位为吉。</div>';
       html += '<div><b style="color:var(--gold2)">八宅：</b>以宅卦为起点，按大游年歌诀推算八方吉凶。生气（大吉）、天医（中吉）、延年（上吉）、伏位（小吉）为四吉方；绝命、五鬼、六煞、祸害为四凶方。</div>';

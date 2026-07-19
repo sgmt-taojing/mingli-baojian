@@ -28,21 +28,21 @@ function runZeriEngine(){ try { runPrecisionZeRi(); } catch(e) { console.error('
 function exportWord() {
   let name = document.getElementById('baziNameOut') ? document.getElementById('baziNameOut').textContent : '乾元命理报告';
   let html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+name+'</title>';
-  html += '<style>body{font-family:宋体,SimSun,serif;max-width:900px;margin:40px auto;padding:20px;font-size:14pt;line-height:2;color:#333}'
+  html += '<style>body{font-family:宋体,SimSun,serif;max-width:900px;margin:40px auto;padding:20px;font-size:14pt;line-height:2;color:var(--ink3)}'
   html += 'h1{text-align:center;color:#8B6914;border-bottom:3px solid #D4AF37;padding-bottom:16px}'
   html += 'h2{color:#8B6914;border-left:6px solid #D4AF37;padding-left:12px;margin-top:28px}'
-  html += 'h3{color:#666;margin-top:20px}'
+  html += 'h3{color:var(--paper3);margin-top:20px}'
   html += 'table{width:100%;border-collapse:collapse;margin:16px 0}'
   html += 'td,th{padding:8px 12px;border:1px solid #c4a040;text-align:center}'
   html += '.gang{display:flex;justify-content:center;gap:12px;margin:20px 0}'
   html += '.gz{border:1px solid #D4AF37;padding:10px 20px;text-align:center;background:#FFF9E6}'
   html += '.warn{background:#FFF3CD;border:2px solid #FFC107;padding:16px;margin:16px 0}'
   html += 'p{margin:8px 0;text-indent:2em}'
-  html += 'footer{text-align:center;color:#999;font-size:11pt;margin-top:40px}'
+  html += 'footer{text-align:center;color:var(--paper3);font-size:11pt;margin-top:40px}'
   html += '</style></head><body>';
   html += '<h1>'+name+'</h1>';
   let meta = document.getElementById('baziMetaOut');
-  if (meta) html += '<p style="text-align:center;color:#888">'+meta.textContent+'</p>';
+  if (meta) html += '<p style="text-align:center;color:var(--steel)">'+meta.textContent+'</p>';
   html += '<hr style="border:1px solid #D4AF37;margin:20px 0">';
 
   // 四柱
@@ -50,7 +50,7 @@ function exportWord() {
   for (let i=0;i<4;i++){
     let g=document.getElementById('bz'+i+'g');let z=document.getElementById('bz'+i+'z');let e=document.getElementById('bz'+i+'e');
     let n=document.getElementById('bz'+i+'n');
-    if(g&&z) html+='<div class="gz"><div style="font-size:20pt">'+g.textContent+z.textContent+'</div><div style="font-size:11pt;color:#888">'+(e?e.textContent:'')+'</div><div style="font-size:11pt;color:#D4AF37">'+(n?n.textContent:'')+'</div></div>';
+    if(g&&z) html+='<div class="gz"><div style="font-size:20pt">'+g.textContent+z.textContent+'</div><div style="font-size:11pt;color:var(--steel)">'+(e?e.textContent:'')+'</div><div style="font-size:11pt;color:#D4AF37">'+(n?n.textContent:'')+'</div></div>';
   }
   html += '</div>';
 
@@ -3007,7 +3007,7 @@ function tzStep1Analyze(fileName, content, type) {
     if(isAuth){
       result.innerHTML = '<div style="padding:24px;text-align:center"><div style="font-size:48px;margin-bottom:12px">🔑</div><div style="font-size:15px;color:var(--cinn2);margin-bottom:10px;font-weight:bold">AI分析服务认证失败</div><div style="font-size:13px;color:var(--paper2);margin-bottom:16px;line-height:1.6">API代理服务的认证令牌已过期或未配置。<br>请检查 <code style="background:rgba(255,255,255,.1);padding:2px 6px;border-radius:4px">server/api-proxy-server.py</code> 的 API 配置。</div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="compute-btn" style="padding:8px 20px;font-size:12px" onclick="tzLocalFallback()">📚 使用本地知识库分析</button><button class="compute-btn" style="padding:8px 20px;font-size:12px;opacity:.5" onclick="tzStep1Analyze(\'手动输入\',\'\',\'text\')">🔄 重试</button></div></div>';
     }else{
-      result.innerHTML = '<div style="padding:20px;text-align:center"><div style="font-size:14px;color:var(--cinn2);margin-bottom:12px">⚠️ 分析服务暂时不可用</div><div style="font-size:12px;color:var(--paper2);margin-bottom:16px">请确认网络正常，AI服务可用，或稍后重试</div><div style="font-size:11px;color:#666">错误信息: ' + (err.message || err) + '</div><div style="margin-top:12px"><button class="compute-btn" style="padding:8px 20px;font-size:12px" onclick="tzLocalFallback()">📚 使用本地知识库分析</button></div></div>';
+      result.innerHTML = '<div style="padding:20px;text-align:center"><div style="font-size:14px;color:var(--cinn2);margin-bottom:12px">⚠️ 分析服务暂时不可用</div><div style="font-size:12px;color:var(--paper2);margin-bottom:16px">请确认网络正常，AI服务可用，或稍后重试</div><div style="font-size:11px;color:var(--paper3)">错误信息: ' + (err.message || err) + '</div><div style="margin-top:12px"><button class="compute-btn" style="padding:8px 20px;font-size:12px" onclick="tzLocalFallback()">📚 使用本地知识库分析</button></div></div>';
     }
   });
 }
@@ -3017,7 +3017,7 @@ function tzRenderStep1Results(obj) {
   let html = '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:24px">';
 
   // Step indicator
-  html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><span style="background:var(--gold);color:#fff;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600">第一步</span><span style="font-size:14px;color:var(--gold);font-weight:600">指标分析</span></div>';
+  html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><span style="background:var(--gold);color:var(--paper);padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600">第一步</span><span style="font-size:14px;color:var(--gold);font-weight:600">指标分析</span></div>';
 
   // Report type badge
   if (obj.reportType) {
@@ -3145,14 +3145,14 @@ function tzStep2Suggestions() {
     }
 
     if (!obj) {
-      step2Div.innerHTML = '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="background:var(--violet2);color:#fff;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600">第二步</span><span style="font-size:14px;color:var(--violet2);font-weight:600">理疗建议</span></div><div style="font-size:14px;color:var(--text);line-height:1.8;white-space:pre-wrap">' + escapeHtml(text) + '</div></div>';
+      step2Div.innerHTML = '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="background:var(--violet2);color:var(--paper);padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600">第二步</span><span style="font-size:14px;color:var(--violet2);font-weight:600">理疗建议</span></div><div style="font-size:14px;color:var(--text);line-height:1.8;white-space:pre-wrap">' + escapeHtml(text) + '</div></div>';
       return;
     }
 
     let html = '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:24px">';
 
     // Step indicator
-    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><span style="background:var(--violet2);color:#fff;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600">第二步</span><span style="font-size:14px;color:var(--violet2);font-weight:600">理疗建议</span></div>';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><span style="background:var(--violet2);color:var(--paper);padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600">第二步</span><span style="font-size:14px;color:var(--violet2);font-weight:600">理疗建议</span></div>';
 
     // Constitution
     if (obj.体质判断) {
@@ -3244,7 +3244,7 @@ function tzLocalFallback(){
 function tzLocalStep2Fallback(){
   let d=document.getElementById('tzStep2Result');if(!d)return;
   let h='<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:24px">';
-  h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><span style="background:var(--success);color:#fff;padding:2px 10px;border-radius:10px;font-size:12px">本地模式</span><span style="font-size:14px;color:var(--success);font-weight:bold">综合调理方案</span><span style="font-size:11px;color:#666;margin-left:auto">基于中医体质知识库</span></div>';
+  h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><span style="background:var(--success);color:var(--paper);padding:2px 10px;border-radius:10px;font-size:12px">本地模式</span><span style="font-size:14px;color:var(--success);font-weight:bold">综合调理方案</span><span style="font-size:11px;color:var(--paper3);margin-left:auto">基于中医体质知识库</span></div>';
   h+='<div style="background:rgba(155,89,182,.06);border:1px solid rgba(155,89,182,.25);border-radius:10px;padding:16px;margin-bottom:14px"><div style="font-size:14px;color:var(--violet);font-weight:bold;margin-bottom:6px">🧬 体质倾向</div><div style="font-size:13px;line-height:1.7">可能存在<strong style="color:var(--gold)">痰湿质</strong>或<strong style="color:var(--gold)">气虚质</strong>倾向。血脂偏高提示痰湿内蕴。</div></div>';
   h+='<div style="background:rgba(45,106,79,.06);border-left:3px solid var(--success);padding:14px;border-radius:0 10px 10px 0;margin-bottom:12px"><div style="font-size:14px;color:var(--success);font-weight:bold;margin-bottom:8px">🍵 食疗</div>';
   [{n:'红豆薏米粥',d:'薏米30g+赤小豆30g煮粥，每周3-4次',t:'健脾祛湿'},{n:'山楂荷叶茶',d:'干山楂10g+荷叶3g泡茶',t:'消食降脂'},{n:'山药炖排骨',d:'山药200g+排骨炖汤',t:'健脾益气'}].forEach(function(f){h+='<div style="background:rgba(255,255,255,.03);border-radius:6px;padding:10px;margin-bottom:6px"><b style="font-size:13px;color:var(--gold)">'+f.n+'</b><div style="font-size:11px;color:var(--paper2)">'+f.d+'</div><div style="font-size:11px;color:var(--success)">✦ '+f.t+'</div></div>';});h+='</div>';
@@ -3741,7 +3741,7 @@ function generateInterpretation(data) {
   html += '</div>';
   html += '<div style="font-size:12px;color:var(--paper2);line-height:1.8;margin-top:8px">' + strengthDesc + '</div>';
   if (xiJi.length > 0) {
-    html += '<div style="font-size:11px;color:#888;margin-top:6px">💡 喜忌指引：' + xiJi.join('；') + '</div>';
+    html += '<div style="font-size:11px;color:var(--steel);margin-top:6px">💡 喜忌指引：' + xiJi.join('；') + '</div>';
   }
   html += '</div>';
 
@@ -3939,7 +3939,7 @@ function generateInterpretation(data) {
 
     html += '<div style="background:linear-gradient(135deg,rgba(155,89,182,.04),rgba(52,152,219,.04));border:1px solid rgba(155,89,182,.15);border-radius:10px;padding:16px;margin-bottom:14px">';
     html += '<div style="font-size:14px;font-weight:bold;color:var(--violet);margin-bottom:10px;letter-spacing:2px">叁·补 · 四柱精论</div>';
-    html += '<div style="font-size:11px;color:#888;margin-bottom:12px">年柱看祖业·月柱看父母·日柱看自身配偶·时柱看子女晚景</div>';
+    html += '<div style="font-size:11px;color:var(--steel);margin-bottom:12px">年柱看祖业·月柱看父母·日柱看自身配偶·时柱看子女晚景</div>';
 
     for (let pai = 0; pai < 4; pai++) {
       let pa = pillarAnalysis[pai];
@@ -3948,7 +3948,7 @@ function generateInterpretation(data) {
       html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">';
       html += '<span style="font-size:16px">' + plIcons[pai] + '</span>';
       html += '<span style="font-size:13px;font-weight:bold;color:' + plColors[pai] + '">' + pa.title + '</span>';
-      html += '<span style="font-size:11px;color:#888;margin-left:auto">' + pl[pai].stem + pl[pai].branch + ' · ' + (plTenGod[pai]||'') + (plNayin[pai] ? ' · ' + plNayin[pai] : '') + '</span>';
+      html += '<span style="font-size:11px;color:var(--steel);margin-left:auto">' + pl[pai].stem + pl[pai].branch + ' · ' + (plTenGod[pai]||'') + (plNayin[pai] ? ' · ' + plNayin[pai] : '') + '</span>';
       html += '</div>';
       // 简介
       html += '<div style="font-size:11px;color:var(--paper2);margin-bottom:8px;line-height:1.7">' + pa.intro + '</div>';
@@ -4335,7 +4335,7 @@ function generateInterpretation(data) {
   html += '</div>';
 
   // ═══════ 拾·底部免责 ═══════
-  html += '<div style="margin-top:8px;padding:8px 12px;background:#fff8e1;border-left:3px solid #ffc107;border-radius:4px;font-size:10px;color:#888;line-height:1.6">';
+  html += '<div style="margin-top:8px;padding:8px 12px;background:#fff8e1;border-left:3px solid #ffc107;border-radius:4px;font-size:10px;color:var(--steel);line-height:1.6">';
   html += '⚠️ AI辅助创作｜国学感悟仅供修身闲聊交流，非专业定论，无法律及实操指导效力，读者凡事自辨自省，所有个人抉择后果自行负责';
   html += '</div>';
 
@@ -16339,7 +16339,7 @@ function renderFengshuiResultPro(data) {
     let c = item.score >= 10 ? '#2ecc71' : item.score > 0 ? '#c9a84c' : item.score < 0 ? '#e74c3c' : '#999';
     html += '<div class="shensha-item"' + (item.needsFix ? ' style="border-left:3px solid var(--cinn2)"' : '') + '>' +
       '<span class="ss-name">' + item.name + '</span>' +
-      (item.isPending ? '<span style="color:#999">待分析</span>' : '<span style="color:' + c + '">' + (item.score > 0 ? '+' : '') + item.score + '分</span>') +
+      (item.isPending ? '<span style="color:var(--paper3)">待分析</span>' : '<span style="color:' + c + '">' + (item.score > 0 ? '+' : '') + item.score + '分</span>') +
       '<span class="ss-desc">' + item.desc + '</span></div>';
   }
   html += '</div></div>';
@@ -19899,7 +19899,7 @@ function recommendMobileNumbers(){
       }
     }
     html+='<div style="padding:12px;border-radius:8px;background:rgba(255,255,255,.02);border:1px solid rgba(46,204,113,.1);text-align:center;position:relative">';
-    if(i<3) html+='<div style="position:absolute;top:-6px;left:50%;transform:translateX(-50%);background:var(--success);color:#fff;font-size:9px;padding:1px 6px;border-radius:8px">TOP'+(i+1)+'</div>';
+    if(i<3) html+='<div style="position:absolute;top:-6px;left:50%;transform:translateX(-50%);background:var(--success);color:var(--paper);font-size:9px;padding:1px 6px;border-radius:8px">TOP'+(i+1)+'</div>';
     html+='<div style="font-size:18px;font-weight:bold;color:'+color+';letter-spacing:2px;font-family:monospace;margin-top:4px">'+c.number+'</div>';
     html+='<div style="margin-top:4px"><span style="font-size:11px;color:'+color+';padding:1px 6px;border-radius:4px;background:'+color+'15">'+lvl+'</span> <span style="font-size:11px;opacity:.4">评分'+c.score+'</span></div>';
     html+='<div style="font-size:10px;opacity:.4;margin-top:2px">吉星'+c.jx+'组 · 凶星'+c.xx+'组</div>';
@@ -20319,27 +20319,27 @@ ${generatePersonalizedRecommendations(bazi, sex)}
 
 function getReportStyles() {
   return `
-body{font-family:'Noto Serif SC',serif,'SimSun',serif;background:#fff;color:#333;padding:40px;max-width:800px;margin:0 auto;line-height:1.8}
+body{font-family:'Noto Serif SC',serif,'SimSun',serif;background:var(--paper);color:var(--ink3);padding:40px;max-width:800px;margin:0 auto;line-height:1.8}
 h1{color:#8b0000;text-align:center;letter-spacing:6px;border-bottom:3px solid #8b0000;padding-bottom:16px}
 h2{color:#8b4513;border-bottom:2px solid #8b4513;padding-bottom:8px;margin-top:32px}
 h3{color:#2f4f4f;margin-top:24px}
 h4{color:#4a4a4a;margin-top:20px}
 .report-header{text-align:center;margin-bottom:40px}
-.report-meta{color:#666;font-size:12px;margin-top:12px}
+.report-meta{color:var(--paper3);font-size:12px;margin-top:12px}
 .report-content{margin:24px 0}
-.report-footer{text-align:center;color:#999;font-size:11px;margin-top:48px;padding-top:16px;border-top:1px solid #ddd}
+.report-footer{text-align:center;color:var(--paper3);font-size:11px;margin-top:48px;padding-top:16px;border-top:1px solid var(--paper2)}
 .annual-notice{background:#fff3cd;border:3px solid var(--danger);padding:20px;margin:24px 0;border-radius:8px}
 .annual-notice h2{color:var(--danger);border:none;text-align:center;font-size:20px;margin:0 0 16px 0}
 .annual-notice-item{font-weight:bold;color:#8b0000;margin:12px 0;padding:8px;background:rgba(220,53,69,.1);border-left:4px solid var(--danger)}
 .annual-notice-item::before{content:'⚠️ ';font-size:16px}
 .personalized-recommendations{background:#f8f9fa;padding:20px;margin:24px 0;border-radius:8px;border:1px solid #dee2e6}
 .personalized-recommendations h2{color:#28a745;border-color:#28a745;text-align:center}
-.rec-section{margin:16px 0;padding:12px;background:#fff;border-radius:4px}
+.rec-section{margin:16px 0;padding:12px;background:var(--paper);border-radius:4px}
 .rec-section h3{color:#495057;margin:0 0 8px 0;font-size:14px}
-.rec-section ul{margin:0;padding-left:20px;color:#555}
+.rec-section ul{margin:0;padding-left:20px;color:var(--paper3)}
 .rec-section li{margin:4px 0}
 .bazi-module{background:#fafafa;border:1px solid #e0e0e0;border-radius:8px;margin:16px 0;padding:16px}
-.bazi-module-title{font-size:16px;color:#8b0000;font-weight:bold;border-bottom:1px solid #ddd;padding-bottom:8px;margin-bottom:12px}
+.bazi-module-title{font-size:16px;color:#8b0000;font-weight:bold;border-bottom:1px solid var(--paper2);padding-bottom:8px;margin-bottom:12px}
 .lucky-colors,.lucky-dirs{display:inline-block;margin:4px 8px}
 @media print{
 body{padding:20px}
@@ -20403,7 +20403,7 @@ function generateAnnualNotice(nextYear, bazi, sex) {
 <div class="annual-notice">
   <h2>⚠️ ${nextYear}年度重要提醒</h2>
   ${notices.join('')}
-  <p style="text-align:center;margin-top:16px;color:#666;font-size:12px">以上为会员专属年度提醒，请妥善保存</p>
+  <p style="text-align:center;margin-top:16px;color:var(--paper3);font-size:12px">以上为会员专属年度提醒，请妥善保存</p>
 </div>`;
 }
 
@@ -20507,9 +20507,9 @@ function exportReportGeneric(resultId, title) {
   let el = document.getElementById(resultId);
   if (!el) { showToast('未找到报告内容'); return; }
   let html = '<html><head><meta charset="utf-8"><title>'+title+'</title>';
-  html += '<style>body{font-family:serif;max-width:900px;margin:0 auto;padding:20px;color:#333;background:#fafafa}';
+  html += '<style>body{font-family:serif;max-width:900px;margin:0 auto;padding:20px;color:var(--ink3);background:#fafafa}';
   html += 'h2,h3,h4{color:var(--gold)}table{border-collapse:collapse;width:100%;margin:10px 0}';
-  html += 'td,th{border:1px solid #ddd;padding:6px;text-align:center}.gz{font-size:18px;font-weight:bold}</style></head><body>';
+  html += 'td,th{border:1px solid var(--paper2);padding:6px;text-align:center}.gz{font-size:18px;font-weight:bold}</style></head><body>';
   html += '<h2 style="text-align:center">'+title+'</h2>';
   html += '<div>'+el.innerHTML+'</div>';
   html += '</body></html>';
@@ -20566,7 +20566,7 @@ function exportAsWord(content, filename) {
   // 转换为Word兼容格式
   const wordContent = content.replace(/<style>[\s\S]*?<\/style>/, `
 <style>
-body{font-family:SimSun,serif;background:#fff;color:#000;padding:40px;max-width:800px;margin:0 auto}
+body{font-family:SimSun,serif;background:var(--paper);color:var(--ink);padding:40px;max-width:800px;margin:0 auto}
 h1{color:#8b0000;text-align:center}h2{color:#8b4513}h3{color:#2f4f4f}
 .annual-notice{background:#fff3cd;border:2px solid var(--danger);padding:16px;margin:16px 0}
 .annual-notice-item{font-weight:bold;color:#8b0000;margin:8px 0;padding:8px;background:#ffeeee;border-left:4px solid var(--danger)}
@@ -20626,7 +20626,7 @@ function exportHuajieReport() {
     showToast('请先计算化解方案后再导出');
     return;
   }
-  const html = `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>化解方案报告</title><style>body{font-family:'Noto Serif SC',serif;background:#080808;color:var(--paper);padding:40px;max-width:800px;margin:0 auto}h1{color:var(--gold);text-align:center;letter-spacing:6px}h2{color:var(--gold2);border-bottom:1px solid rgba(201,168,76,.2);padding-bottom:8px}.result{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.1);border-radius:8px;padding:24px;margin:16px 0}</style></head><body><h1>化解方案报告</h1><div class="result">${resultEl.innerHTML}</div><p style="text-align:center;opacity:.4;margin-top:40px">易道智鉴 · 仅供参考</p></body>
+  const html = `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>化解方案报告</title><style>body{font-family:'Noto Serif SC',serif;background:var(--ink);color:var(--paper);padding:40px;max-width:800px;margin:0 auto}h1{color:var(--gold);text-align:center;letter-spacing:6px}h2{color:var(--gold2);border-bottom:1px solid rgba(201,168,76,.2);padding-bottom:8px}.result{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.1);border-radius:8px;padding:24px;margin:16px 0}</style></head><body><h1>化解方案报告</h1><div class="result">${resultEl.innerHTML}</div><p style="text-align:center;opacity:.4;margin-top:40px">易道智鉴 · 仅供参考</p></body>
 <script>
 // ===== 商城分类切换 =====
 
@@ -21275,7 +21275,7 @@ function getLoucaiHuajie(hj) {
       let p = loucaiPatterns[li];
       let sevColor = p.severity === '严重' ? 'var(--cinn2)' : 'var(--amber)';
       html += '<div class="analysis-card" style="border-left:3px solid ' + sevColor + '">';
-      html += '<h5 style="color:' + sevColor + '">' + p.icon + ' ' + p.name + ' <span style="font-size:11px;padding:2px 8px;border-radius:6px;background:' + sevColor + ';color:#fff;margin-left:6px">' + p.severity + '</span></h5>';
+      html += '<h5 style="color:' + sevColor + '">' + p.icon + ' ' + p.name + ' <span style="font-size:11px;padding:2px 8px;border-radius:6px;background:' + sevColor + ';color:var(--paper);margin-left:6px">' + p.severity + '</span></h5>';
       html += '<div style="font-size:12px;opacity:.7;margin-bottom:10px;line-height:1.8">' + p.desc + '</div>';
       // 漏财表现
       html += '<div style="font-size:12px;color:var(--gold);margin-bottom:6px">🔍 漏财表现：</div>';
@@ -21688,7 +21688,7 @@ function renderQimenGrid(palaces, keyPalace) {
       let bgRgba = gongNum === 5 ? 'rgba(201,168,76,0.08)' : isJi ? 'rgba(39,174,96,0.04)' : isXiong ? 'rgba(231,76,60,0.04)' : 'rgba(201,168,76,0.03)';
       html += '<div style="border:2px solid ' + borderColor + ';border-radius:8px;padding:6px 4px;background:' + bgRgba + ';min-height:100px;position:relative">';
       // 宫位标题
-      html += '<div style="font-size:9px;color:#8a8070;text-align:center;border-bottom:1px solid rgba(201,168,76,0.1);padding-bottom:3px;margin-bottom:3px">';
+      html += '<div style="font-size:9px;color:var(--paper3);text-align:center;border-bottom:1px solid rgba(201,168,76,0.1);padding-bottom:3px;margin-bottom:3px">';
       html += info.name + gongNum + '宫·' + info.dir;
       if (isKey) html += ' <span style="color:var(--gold2)">★值符</span>';
       html += '</div>';
@@ -21697,8 +21697,8 @@ function renderQimenGrid(palaces, keyPalace) {
         // 天盘干+地盘干
         if (p.heavenGan || p.earthGan) {
           html += '<div style="text-align:center;margin:2px 0">';
-          if (p.heavenGan) html += '<span style="color:#5dade2;font-size:11px;font-weight:bold">' + p.heavenGan + '</span>';
-          if (p.heavenGan && p.earthGan) html += '<span style="color:#8a8070;font-size:8px">/</span>';
+          if (p.heavenGan) html += '<span style="color:var(--cyan2);font-size:11px;font-weight:bold">' + p.heavenGan + '</span>';
+          if (p.heavenGan && p.earthGan) html += '<span style="color:var(--paper3);font-size:8px">/</span>';
           if (p.earthGan) html += '<span style="color:var(--warn);font-size:11px;font-weight:bold">' + p.earthGan + '</span>';
           html += '</div>';
         }
@@ -21717,15 +21717,15 @@ function renderQimenGrid(palaces, keyPalace) {
           html += '<div style="font-size:9px;color:var(--violet);text-align:center">' + (p.god.name || p.god || '') + '</div>';
         }
       } else {
-        html += '<div style="font-size:10px;color:#8a8070;text-align:center;margin-top:20px">—</div>';
+        html += '<div style="font-size:10px;color:var(--paper3);text-align:center;margin-top:20px">—</div>';
       }
       html += '</div>';
     }
   }
   html += '</div>';
   // 图例
-  html += '<div style="display:flex;gap:12px;justify-content:center;margin-top:8px;font-size:9px;color:#8a8070">';
-  html += '<span><span style="color:#5dade2">■</span>天盘</span>';
+  html += '<div style="display:flex;gap:12px;justify-content:center;margin-top:8px;font-size:9px;color:var(--paper3)">';
+  html += '<span><span style="color:var(--cyan2)">■</span>天盘</span>';
   html += '<span><span style="color:var(--warn)">■</span>地盘</span>';
   html += '<span><span style="color:var(--jade)">■</span>吉</span>';
   html += '<span><span style="color:var(--cinn2)">■</span>凶</span>';
@@ -21754,7 +21754,7 @@ function renderZwGrid() {
     let borderC = isMing ? '#c9a84c' : 'rgba(201,168,76,0.15)';
     let bgC = isMing ? 'rgba(201,168,76,0.08)' : 'rgba(201,168,76,0.03)';
     html += '<div style="border:1px solid ' + borderC + ';border-radius:6px;padding:6px 4px;background:' + bgC + ';min-height:70px">';
-    html += '<div style="font-size:9px;color:#8a8070;text-align:center;border-bottom:1px solid rgba(201,168,76,0.1);padding-bottom:2px;margin-bottom:3px">' + zhi + '宫</div>';
+    html += '<div style="font-size:9px;color:var(--paper3);text-align:center;border-bottom:1px solid rgba(201,168,76,0.1);padding-bottom:2px;margin-bottom:3px">' + zhi + '宫</div>';
     html += '<div style="font-size:11px;color:' + (isMing ? '#c9a84c' : '#e8cc7a') + ';text-align:center;font-weight:bold">' + gName + '</div>';
     html += '<div style="font-size:9px;color:var(--paper3);text-align:center;margin-top:2px" id="zwGong_' + idx + '">—</div>';
     html += '</div>';
@@ -21781,7 +21781,7 @@ function renderZwGrid() {
       });
     }
   } catch(e) {}
-  html += '<div style="display:flex;gap:12px;justify-content:center;margin-top:8px;font-size:9px;color:#8a8070">';
+  html += '<div style="display:flex;gap:12px;justify-content:center;margin-top:8px;font-size:9px;color:var(--paper3)">';
   html += '<span><span style="color:var(--gold)">■</span>命宫</span>';
   html += '<span><span style="color:var(--gold2)">■</span>其他宫</span>';
   html += '</div>';
@@ -27632,7 +27632,7 @@ function _renderFamilyReport(allResults, familyEleCount, relations, solutions) {
     html += '<div style="display:flex;align-items:center;gap:8px;margin:6px 0">';
     html += '<span style="width:24px;font-size:14px;opacity:.7">' + ele + '</span>';
     html += '<div style="flex:1;height:20px;background:rgba(255,255,255,0.06);border-radius:10px;overflow:hidden">';
-    html += '<div style="width:' + pct + '%;height:100%;background:' + (eleColors[ele]||'#888') + ';border-radius:10px;transition:width .5s ease;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:11px;color:#fff">' + familyEleCount[ele] + '</div>';
+    html += '<div style="width:' + pct + '%;height:100%;background:' + (eleColors[ele]||'#888') + ';border-radius:10px;transition:width .5s ease;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:11px;color:var(--paper)">' + familyEleCount[ele] + '</div>';
     html += '</div>';
     html += '</div>';
   });
@@ -33552,7 +33552,7 @@ function _doExportImage(targetEl) {
 
 function _getReportInlineStyles() {
   return [
-    'body{font-family:"Noto Serif SC",serif,SimSun;background:#080808;color:var(--paper);padding:40px;max-width:800px;margin:0 auto;line-height:1.8}',
+    'body{font-family:"Noto Serif SC",serif,SimSun;background:var(--ink);color:var(--paper);padding:40px;max-width:800px;margin:0 auto;line-height:1.8}',
     'h1{color:var(--gold);text-align:center;letter-spacing:6px;border-bottom:3px solid var(--gold);padding-bottom:16px}',
     'h2,h3,h4,h5{color:var(--gold)}',
     'h2{border-bottom:1px solid rgba(201,168,76,0.3);padding-bottom:8px;margin-top:28px}',
@@ -33641,7 +33641,7 @@ function renderBaziChart(pillars) {
     html += '<div style="flex:1;min-width:120px;max-width:160px;text-align:center">';
     // 柱名
     html += '<div style="font-size:12px;color:var(--gold);letter-spacing:3px;margin-bottom:6px">' + p.name + '</div>';
-    html += '<div style="font-size:10px;color:#8a8070;margin-bottom:8px">' + (p.desc||'') + '</div>';
+    html += '<div style="font-size:10px;color:var(--paper3);margin-bottom:8px">' + (p.desc||'') + '</div>';
 
     // 天干
     html += '<div style="background:' + stemBg + ';border:1px solid ' + stemColor + ';border-radius:8px;padding:8px 4px;margin-bottom:4px">';
@@ -33657,7 +33657,7 @@ function renderBaziChart(pillars) {
 
     // 藏干
     if (hidden.length > 0) {
-      html += '<div style="font-size:10px;color:#8a8070;margin-top:4px">藏干: ';
+      html += '<div style="font-size:10px;color:var(--paper3);margin-top:4px">藏干: ';
       for (let h = 0; h < hidden.length; h++) {
         let hEle = ELE[hidden[h]] || '';
         html += '<span style="color:' + eleColors[hEle] + '">' + hidden[h] + '</span>';
@@ -33767,10 +33767,10 @@ function renderZiweiChart(stars, mingGongIdx, sihua, daXian) {
       html += '<div style="font-size:10px;color:' + starColor + ';text-align:center;font-weight:bold">' + starData.name + '</div>';
       // 辅星
       if (starData.aux && starData.aux.length > 0) {
-        html += '<div style="font-size:8px;color:#8a8070;text-align:center;margin-top:1px">' + starData.aux.join(' ') + '</div>';
+        html += '<div style="font-size:8px;color:var(--paper3);text-align:center;margin-top:1px">' + starData.aux.join(' ') + '</div>';
       }
     } else {
-      html += '<div style="font-size:9px;color:#8a8070;text-align:center;opacity:0.4;margin-top:8px">空宫</div>';
+      html += '<div style="font-size:9px;color:var(--paper3);text-align:center;opacity:0.4;margin-top:8px">空宫</div>';
     }
 
     // 四化
@@ -33796,7 +33796,7 @@ function renderZiweiChart(stars, mingGongIdx, sihua, daXian) {
   html += '</div>';
 
   // 图例
-  html += '<div style="display:flex;gap:12px;justify-content:center;margin-top:8px;font-size:9px;color:#8a8070">';
+  html += '<div style="display:flex;gap:12px;justify-content:center;margin-top:8px;font-size:9px;color:var(--paper3)">';
   html += '<span><span style="color:var(--violet)">■</span> 紫微星系</span>';
   html += '<span><span style="color:var(--cyan2)">■</span> 天府星系</span>';
   html += '<span><span style="color:var(--jade)">禄</span><span style="color:var(--cyan)">权</span><span style="color:var(--success)">科</span><span style="color:var(--cinn2)">忌</span> 四化</span>';
@@ -33914,9 +33914,9 @@ function renderLiuyaoChart(gua, changedGua, moving, yjVals) {
   }
 
   // 图例
-  html += '<div style="display:flex;gap:12px;justify-content:center;margin-top:8px;font-size:9px;color:#8a8070">';
+  html += '<div style="display:flex;gap:12px;justify-content:center;margin-top:8px;font-size:9px;color:var(--paper3)">';
   html += '<span><span style="color:var(--gold)">━</span> 阳爻</span>';
-  html += '<span><span style="color:#8a8070">━ ━</span> 阴爻</span>';
+  html += '<span><span style="color:var(--paper3)">━ ━</span> 阴爻</span>';
   html += '<span><span style="color:var(--cinn2)">○</span> 动爻</span>';
   html += '</div>';
 
@@ -34279,7 +34279,7 @@ function _ensureMorePanel(itemId) {
     '<div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(255,255,255,0.02);border:1px solid rgba(201,168,76,0.1);border-radius:8px;cursor:pointer;transition:all .3s;margin-bottom:8px" onclick="' + config.action + '" onmouseover="this.style.borderColor=\'rgba(201,168,76,0.3)\';this.style.background=\'rgba(201,168,76,0.04)\'" onmouseout="this.style.borderColor=\'rgba(201,168,76,0.1)\';this.style.background=\'rgba(255,255,255,0.02)\'">' +
     '<span style="font-size:24px">' + config.icon + '</span>' +
     '<div><div style="font-size:14px;color:var(--gold);letter-spacing:2px">' + config.name + '</div>' +
-    '<div style="font-size:11px;color:#8a8070;margin-top:2px">' + config.desc + '</div></div>' +
+    '<div style="font-size:11px;color:var(--paper3);margin-top:2px">' + config.desc + '</div></div>' +
     '<span style="margin-left:auto;color:var(--gold);opacity:0.4">→</span>' +
     '</div>';
 
@@ -35145,7 +35145,7 @@ function exportLifeIndexReport() {
   let content = document.getElementById('lifeIndexResult');
   if (!content) return;
   let html = '<html><head><meta charset="utf-8"><title>命理全鉴评估报告</title>';
-  html += '<style>body{font-family:serif;max-width:900px;margin:0 auto;padding:20px;color:#333}';
+  html += '<style>body{font-family:serif;max-width:900px;margin:0 auto;padding:20px;color:var(--ink3)}';
   html += 'h3{color:var(--gold)}</style></head><body>';
   html += content.innerHTML;
   html += '</body></html>';
@@ -36040,7 +36040,7 @@ function buildWuxingQuantifyHTML(pillars, dayStem) {
     let e2 = order[i];
     let pct2 = total > 0 ? (scores[e2] / total * 100) : 0;
     if (pct2 < 1) continue;
-    html += '<div style="width:' + pct2 + '%;background:' + colors[e2] + ';display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:bold;min-width:20px">' + e2 + '</div>';
+    html += '<div style="width:' + pct2 + '%;background:' + colors[e2] + ';display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--paper);font-weight:bold;min-width:20px">' + e2 + '</div>';
   }
   html += '</div>';
 
@@ -36060,15 +36060,15 @@ function buildWuxingQuantifyHTML(pillars, dayStem) {
     html += '<div style="text-align:center">';
     html += '<div style="font-size:18px;font-weight:bold;color:' + colors[ele2] + '">' + ele2 + '</div>';
     html += '<div style="font-size:14px;font-weight:bold;color:' + level.color + '">' + score2.toFixed(1) + '</div>';
-    html += '<div style="font-size:10px;color:#888">' + pct3.toFixed(0) + '%</div>';
+    html += '<div style="font-size:10px;color:var(--steel)">' + pct3.toFixed(0) + '%</div>';
     html += '</div>';
     // 右侧：详细
     html += '<div style="font-size:11px;line-height:1.7">';
     html += '<b style="color:' + level.color + '">' + level.name + '</b> · ';
-    html += '<span style="color:#888">十神：</span>' + role + ' · ';
-    html += '<span style="color:#888">月令：</span>' + monthWDesc + '(×' + monthW + ') · ';
-    html += '<span style="color:#888">方位：</span>' + directions[ele2] + ' · ';
-    html += '<span style="color:#888">脏腑：</span>' + organs[ele2];
+    html += '<span style="color:var(--steel)">十神：</span>' + role + ' · ';
+    html += '<span style="color:var(--steel)">月令：</span>' + monthWDesc + '(×' + monthW + ') · ';
+    html += '<span style="color:var(--steel)">方位：</span>' + directions[ele2] + ' · ';
+    html += '<span style="color:var(--steel)">脏腑：</span>' + organs[ele2];
     html += '<br><span style="color:var(--paper2);font-size:10px">' + level.desc + '</span>';
     // 最强/最弱标注
     if (ele2 === strongest && score2 > 0) html += '<span style="color:var(--cinn2);font-size:10px;margin-left:4px">⚠ 最旺</span>';
@@ -36092,7 +36092,7 @@ function buildWuxingQuantifyHTML(pillars, dayStem) {
     html += '<b style="color:var(--cinn2)">无通根</b>，日主虚浮无力。';
   }
   html += '</div>';
-  html += '<div style="font-size:11px;color:#888;margin-top:6px;line-height:1.7">';
+  html += '<div style="font-size:11px;color:var(--steel);margin-top:6px;line-height:1.7">';
   html += '💡 <b>五行喜忌：</b>';
   if (power.ratio >= 0.5) {
     html += '日主偏旺，宜<b style="color:var(--jade)">' + shangEle + '(食伤泄秀)</b>、<b style="color:var(--jade)">' + caiEle + '(财星耗身)</b>、<b style="color:var(--jade)">' + guanEle + '(官杀克身)</b>；忌<b style="color:var(--cinn2)">' + yinEle + '(印星)</b>、<b style="color:var(--cinn2)">' + dayEle + '(比劫)</b>再助。';
@@ -36108,8 +36108,8 @@ function buildWuxingQuantifyHTML(pillars, dayStem) {
 
   // 量化明细日志（可折叠）
   if (power.detailLog && power.detailLog.length > 0) {
-    html += '<details style="margin-top:10px"><summary style="font-size:11px;color:#888;cursor:pointer">📐 量化计算明细（点击展开）</summary>';
-    html += '<div style="font-size:10px;color:#666;line-height:1.8;margin-top:8px;padding:8px;background:rgba(0,0,0,.03);border-radius:4px;white-space:pre-line;font-family:monospace">';
+    html += '<details style="margin-top:10px"><summary style="font-size:11px;color:var(--steel);cursor:pointer">📐 量化计算明细（点击展开）</summary>';
+    html += '<div style="font-size:10px;color:var(--paper3);line-height:1.8;margin-top:8px;padding:8px;background:rgba(0,0,0,.03);border-radius:4px;white-space:pre-line;font-family:monospace">';
     for (let li = 0; li < power.detailLog.length; li++) {
       html += power.detailLog[li] + '\n';
     }
@@ -36324,7 +36324,7 @@ function buildDayunDetailedAnalysis(pillars, dayStem, dayun) {
   let html = '';
   html += '<div class="interp-card" style="background:linear-gradient(135deg,rgba(52,152,219,.06),rgba(155,89,182,.03));border:1px solid rgba(52,152,219,.15);border-radius:10px;padding:16px;margin-bottom:14px">';
   html += '<div style="font-size:14px;font-weight:bold;color:var(--cyan2);margin-bottom:10px;letter-spacing:2px">🔮 大运分项详析</div>';
-  html += '<div style="font-size:11px;color:#888;margin-bottom:12px">天干管前五年·地支管后五年·每运含事业/财运/健康/感情分项</div>';
+  html += '<div style="font-size:11px;color:var(--steel);margin-bottom:12px">天干管前五年·地支管后五年·每运含事业/财运/健康/感情分项</div>';
 
   // 取前6步大运分析
   let maxItems = Math.min(dayun.length, 6);
@@ -36345,9 +36345,9 @@ function buildDayunDetailedAnalysis(pillars, dayStem, dayun) {
     // 大运头
     html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">';
     html += '<span style="font-size:16px;font-weight:bold;color:' + overallColor + '">' + gan + zhi + '</span>';
-    html += '<span style="font-size:11px;color:#888">' + ageRange + ' · ' + yearRange + '</span>';
-    html += '<span style="font-size:11px;padding:2px 8px;border-radius:8px;background:' + overallColor + ';color:#fff">' + overallLabel + '</span>';
-    html += '<span style="font-size:11px;color:#888;margin-left:auto">十神：' + analysis.ganShen + '</span>';
+    html += '<span style="font-size:11px;color:var(--steel)">' + ageRange + ' · ' + yearRange + '</span>';
+    html += '<span style="font-size:11px;padding:2px 8px;border-radius:8px;background:' + overallColor + ';color:var(--paper)">' + overallLabel + '</span>';
+    html += '<span style="font-size:11px;color:var(--steel);margin-left:auto">十神：' + analysis.ganShen + '</span>';
     html += '</div>';
 
     // 天干/地支分管
@@ -36367,7 +36367,7 @@ function buildDayunDetailedAnalysis(pillars, dayStem, dayun) {
     for (let dm = 0; dm < 4; dm++) {
       let stars = '★'.repeat(Math.floor(dims[dm].score/2)) + '☆'.repeat(5 - Math.floor(dims[dm].score/2));
       html += '<div style="padding:6px;background:rgba(255,255,255,.02);border-radius:4px;text-align:center">';
-      html += '<div style="font-size:10px;color:#888">' + dims[dm].name + '</div>';
+      html += '<div style="font-size:10px;color:var(--steel)">' + dims[dm].name + '</div>';
       html += '<div style="font-size:11px;color:' + dims[dm].color + '">' + stars + '</div>';
       html += '</div>';
     }
@@ -36495,7 +36495,7 @@ function buildZiweiGongAnalysisHTML(panData) {
   let html = '';
   html += '<div class="interp-card" style="background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(155,89,182,.04));border:1px solid rgba(201,168,76,.15);border-radius:10px;padding:16px;margin-bottom:14px">';
   html += '<div style="font-size:14px;font-weight:bold;color:var(--gold);margin-bottom:10px;letter-spacing:2px">🏛️ 十二宫逐宫详析</div>';
-  html += '<div style="font-size:11px;color:#888;margin-bottom:12px">每宫含主星组合+庙旺落陷+煞星冲照+四化影响+人生论述</div>';
+  html += '<div style="font-size:11px;color:var(--steel);margin-bottom:12px">每宫含主星组合+庙旺落陷+煞星冲照+四化影响+人生论述</div>';
 
   for (let i = 0; i < gongResults.length; i++) {
     let g = gongResults[i];
@@ -36504,21 +36504,21 @@ function buildZiweiGongAnalysisHTML(panData) {
     html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">';
     html += '<span style="font-size:14px">' + g.icon + '</span>';
     html += '<span style="font-size:13px;font-weight:bold;color:' + g.color + '">' + g.gongName + '</span>';
-    html += '<span style="font-size:10px;color:#888">(' + g.gongZhi + '宫)</span>';
+    html += '<span style="font-size:10px;color:var(--steel)">(' + g.gongZhi + '宫)</span>';
     if (g.mainStars.length > 0) {
       html += '<span style="font-size:11px;color:var(--paper);margin-left:4px">' + g.mainStars.join('/') + '</span>';
       // 庙旺标签
       for (let si = 0; si < g.starStrengths.length; si++) {
         let ss = g.starStrengths[si];
         let sColor = ss.label === '庙' ? '#2ecc71' : ss.label === '旺' ? '#27ae60' : ss.label === '陷' ? '#e74c3c' : '#f39c12';
-        html += '<span style="font-size:9px;padding:1px 4px;border-radius:3px;background:' + sColor + ';color:#fff;margin-left:2px">' + ss.label + '</span>';
+        html += '<span style="font-size:9px;padding:1px 4px;border-radius:3px;background:' + sColor + ';color:var(--paper);margin-left:2px">' + ss.label + '</span>';
       }
     } else {
-      html += '<span style="font-size:10px;color:#888;margin-left:4px">无主星</span>';
+      html += '<span style="font-size:10px;color:var(--steel);margin-left:4px">无主星</span>';
     }
     html += '</div>';
     // 人生方面
-    html += '<div style="font-size:10px;color:#888;margin-bottom:6px">' + g.desc + '</div>';
+    html += '<div style="font-size:10px;color:var(--steel);margin-bottom:6px">' + g.desc + '</div>';
     // 主星组合分析
     if (g.comboText) {
       html += '<div style="font-size:11px;color:var(--paper);line-height:1.7;margin-bottom:4px">' + g.comboText + '</div>';
@@ -36533,7 +36533,7 @@ function buildZiweiGongAnalysisHTML(panData) {
     }
     // 对宫
     if (g.oppStars.length > 0) {
-      html += '<div style="font-size:9px;color:#888;margin-top:4px">对宫' + g.oppGongName + '：' + g.oppStars.join('、') + '</div>';
+      html += '<div style="font-size:9px;color:var(--steel);margin-top:4px">对宫' + g.oppGongName + '：' + g.oppStars.join('、') + '</div>';
     }
     html += '</div>';
   }
@@ -37232,7 +37232,7 @@ function injectLiuyaoEnhanced(hex, gua, moving, yjVals, yjMode) {
         let yjc = _lyAnalysis.yuanJiChou;
         html += '<div class="interp-card" style="background:linear-gradient(135deg,rgba(231,76,60,.04),rgba(46,204,113,.04));border:1px solid rgba(201,168,76,.15);border-radius:10px;padding:16px;margin-top:16px">';
         html += '<h5 style="color:var(--gold);letter-spacing:2px">⚔️ 元神·忌神·仇神分析</h5>';
-        html += '<div style="font-size:11px;color:#888;margin-bottom:10px">元神=生用神者（助力） · 忌神=克用神者（阻碍） · 仇神=克元神/生忌神者（间接为害）</div>';
+        html += '<div style="font-size:11px;color:var(--steel);margin-bottom:10px">元神=生用神者（助力） · 忌神=克用神者（阻碍） · 仇神=克元神/生忌神者（间接为害）</div>';
         
         let yjcColors = {'元神':'#27ae60','忌神':'#e74c3c','仇神':'#e67e22'};
         let yjcIcons = {'元神':'🟢','忌神':'🔴','仇神':'🟠'};
@@ -37244,12 +37244,12 @@ function injectLiuyaoEnhanced(hex, gua, moving, yjVals, yjMode) {
           let yjColor = yjcColors[yj.name] || '#888';
           let yjIcon = yjcIcons[yj.name] || '⚪';
           html += '<div style="display:grid;grid-template-columns:40px 1fr;gap:10px;align-items:start;padding:10px;background:rgba(255,255,255,.02);border-radius:6px;border-left:3px solid ' + yjColor + '">';
-          html += '<div style="text-align:center"><div style="font-size:16px">' + yjIcon + '</div><div style="font-size:10px;color:' + yjColor + ';font-weight:bold">' + yj.name + '</div><div style="font-size:10px;color:#888">' + (yj.wuxing||'') + '</div></div>';
+          html += '<div style="text-align:center"><div style="font-size:16px">' + yjIcon + '</div><div style="font-size:10px;color:' + yjColor + ';font-weight:bold">' + yj.name + '</div><div style="font-size:10px;color:var(--steel)">' + (yj.wuxing||'') + '</div></div>';
           html += '<div>';
           if (yj.yaoPos && yj.yaoPos !== '不上卦') {
             html += '<div style="font-size:11px;color:var(--paper)"><b>' + yj.yaoPos + '</b>' + (yj.liuqin ? ' · ' + yj.liuqin : '') + (yj.wangShuai ? ' · 旺衰:' + yj.wangShuai : '') + (yj.moving ? ' · 动爻' : ' · 静爻') + '</div>';
           } else {
-            html += '<div style="font-size:11px;color:#888"><b>' + yj.yaoPos + '</b></div>';
+            html += '<div style="font-size:11px;color:var(--steel)"><b>' + yj.yaoPos + '</b></div>';
           }
           html += '<div style="font-size:10px;color:var(--paper2);margin-top:4px;line-height:1.6">' + (yj.text||'') + '</div>';
           html += '</div>';
@@ -37872,7 +37872,7 @@ function buildHunqiAnalysisHTML(data) {
       html += '<div style="font-size:10px;color:var(--paper2)">• ' + starPositions[sp].pillar + starPositions[sp].type + starPositions[sp].stem + '(' + spouseEle + ')</div>';
     }
   } else {
-    html += '<div style="font-size:10px;color:#888">配偶星不透不藏，晚婚为宜，需大运行配偶星方遇正缘</div>';
+    html += '<div style="font-size:10px;color:var(--steel)">配偶星不透不藏，晚婚为宜，需大运行配偶星方遇正缘</div>';
   }
   html += '</div>';
   
@@ -38001,11 +38001,11 @@ function buildLiunianInteractionHTML(data) {
     html += '<div style="padding:10px;background:rgba(255,255,255,.02);border-radius:6px;border-left:3px solid ' + luckColor + '">';
     html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
     html += '<span style="font-size:14px;font-weight:bold;color:' + luckColor + '">' + yrStem + yrZhi + '</span>';
-    html += '<span style="font-size:10px;color:#888">' + yr + '年</span>';
-    html += '<span style="font-size:10px;padding:1px 6px;border-radius:6px;background:' + luckColor + ';color:#fff">' + luckLevel + '</span>';
+    html += '<span style="font-size:10px;color:var(--steel)">' + yr + '年</span>';
+    html += '<span style="font-size:10px;padding:1px 6px;border-radius:6px;background:' + luckColor + ';color:var(--paper)">' + luckLevel + '</span>';
     html += '</div>';
     if (interactions.length === 0) {
-      html += '<div style="font-size:10px;color:#888">无明显互动，运势平稳</div>';
+      html += '<div style="font-size:10px;color:var(--steel)">无明显互动，运势平稳</div>';
     } else {
       for (let ii = 0; ii < interactions.length; ii++) {
         let int = interactions[ii];
@@ -39867,7 +39867,7 @@ function buildFamilyEthicsGuide(baziData) {
   html += '<div style="margin:20px 0;">';
   html += '<div style="text-align:center;margin-bottom:16px">';
   html += '<div style="font-size:18px;font-weight:bold;color:var(--gold,#c9a84c);letter-spacing:4px;margin-bottom:4px">🏡 家庭伦理道德全量指导</div>';
-  html += '<div style="font-size:12px;color:#888;letter-spacing:1px">基于八字四柱十神分析的家庭关系指南</div>';
+  html += '<div style="font-size:12px;color:var(--steel);letter-spacing:1px">基于八字四柱十神分析的家庭关系指南</div>';
   html += '</div>';
 
   // 通用卡片生成函数
@@ -39878,7 +39878,7 @@ function buildFamilyEthicsGuide(baziData) {
     h += '<div style="font-size:15px;font-weight:bold;color:var(--gold,#c9a84c);letter-spacing:2px">' + icon + ' ' + title + '</div>';
     h += '<div style="font-size:12px;color:' + section.ratingColor + ';font-weight:bold;border:1px solid ' + section.ratingColor + ';border-radius:12px;padding:2px 10px">缘分：' + section.rating + '</div>';
     h += '</div>';
-    h += '<div style="font-size:11px;color:#999;margin-bottom:8px;padding:4px 8px;background:rgba(0,0,0,0.02);border-radius:4px">' + section.meta + '</div>';
+    h += '<div style="font-size:11px;color:var(--paper3);margin-bottom:8px;padding:4px 8px;background:rgba(0,0,0,0.02);border-radius:4px">' + section.meta + '</div>';
     h += '<div style="font-size:13px;line-height:1.8;color:var(--paper,#333);margin-bottom:10px">' + section.desc + '</div>';
     // 相处建议
     h += '<div style="font-size:12px;font-weight:bold;color:var(--gold,#c9a84c);margin-bottom:6px">💡 相处建议</div>';
@@ -39889,10 +39889,10 @@ function buildFamilyEthicsGuide(baziData) {
     h += '</div>';
     // 注意事项
     h += '<div style="font-size:12px;font-weight:bold;color:var(--cinn2);margin-bottom:6px">⚠️ 注意事项</div>';
-    h += '<div style="font-size:12px;line-height:1.9;color:#666;margin-bottom:10px;padding:8px 10px;background:rgba(231,76,60,0.03);border-radius:4px">' + section.caution + '</div>';
+    h += '<div style="font-size:12px;line-height:1.9;color:var(--paper3);margin-bottom:10px;padding:8px 10px;background:rgba(231,76,60,0.03);border-radius:4px">' + section.caution + '</div>';
     // 化解建议
     h += '<div style="font-size:12px;font-weight:bold;color:var(--cyan2);margin-bottom:6px">🔧 化解建议</div>';
-    h += '<div style="font-size:12px;line-height:1.9;color:#666;padding:8px 10px;background:rgba(52,152,219,0.03);border-radius:4px">' + section.resolve + '</div>';
+    h += '<div style="font-size:12px;line-height:1.9;color:var(--paper3);padding:8px 10px;background:rgba(52,152,219,0.03);border-radius:4px">' + section.resolve + '</div>';
     h += '</div>';
     return h;
   }
@@ -40007,7 +40007,7 @@ function generateScreensaver(baziData) {
   
   // 操作按钮
   html += '<div style="margin-top:16px;display:flex;gap:12px">';
-  html += '<button onclick="downloadScreensaver()" style="padding:10px 24px;background:' + theme.primary + ';color:#fff;border:none;border-radius:20px;font-size:13px;cursor:pointer;letter-spacing:2px">📥 下载图片</button>';
+  html += '<button onclick="downloadScreensaver()" style="padding:10px 24px;background:' + theme.primary + ';color:var(--paper);border:none;border-radius:20px;font-size:13px;cursor:pointer;letter-spacing:2px">📥 下载图片</button>';
   html += '<button onclick="closeScreensaver()" style="padding:10px 24px;background:none;color:var(--paper3);border:1px solid rgba(255,255,255,0.2);border-radius:20px;font-size:13px;cursor:pointer;letter-spacing:2px">✕ 关闭</button>';
   html += '</div>';
   html += '</div>';
