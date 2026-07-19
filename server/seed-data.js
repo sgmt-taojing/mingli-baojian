@@ -52,14 +52,15 @@ const users = [
 const userIdMap = {};
 for (const u of users) {
   const enc = sec.encrypt(u.phone);
-  let existing = db.prepare('SELECT id FROM users WHERE phone = ?').get(enc);
+  const phoneHash = sec.hashPhone(u.phone);
+  let existing = db.prepare('SELECT id FROM users WHERE phone_hash = ?').get(phoneHash);
   let uid;
   if (existing) {
     uid = existing.id;
     db.prepare('UPDATE users SET name = ? WHERE id = ?').run(u.name, uid);
   } else {
-    db.prepare('INSERT INTO users (phone, name) VALUES (?, ?)').run(enc, u.name);
-    uid = db.prepare('SELECT id FROM users WHERE phone = ?').get(enc).id;
+    db.prepare('INSERT INTO users (phone, phone_hash, name) VALUES (?, ?, ?)').run(enc, phoneHash, u.name);
+    uid = db.prepare('SELECT id FROM users WHERE phone_hash = ?').get(phoneHash).id;
   }
   db.prepare('INSERT OR IGNORE INTO user_roles (user_id, role) VALUES (?, ?)').run(uid, u.role);
   if (u.role === 'vip' || u.role === 'master' || u.role === 'doctor') {

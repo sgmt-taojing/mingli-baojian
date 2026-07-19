@@ -1,5 +1,6 @@
 // ═══ 命理宝鉴 · 后端API服务 v2 ═══
 // 修复：P0安全修复（API密钥移后端+AES加密+CORS+无认证接口+超管手机号）
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { DatabaseSync } = require('node:sqlite');
