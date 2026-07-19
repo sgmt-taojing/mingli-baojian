@@ -181,80 +181,90 @@ body{background:var(--bg);color:var(--paper);font-family:'Noto Serif SC',serif;m
 </div>
 
 <script>
+// 静态快照数据（GitHub Pages无后端时降级使用）
+const FALLBACK_STATS = {"users":10,"vipUsers":1,"masterUsers":1,"doctorUsers":1,"paipanCount":6,"totalCases":8,"completedCases":5,"pendingCases":3,"totalReports":5,"readReports":4,"totalProducts":6,"totalOrders":5,"completedOrders":2,"totalCourses":5,"totalFeedback":5,"totalPushes":8,"totalPoints":510,"date":""};
+const FALLBACK_CASES = [{"id":6,"status":"completed","symptoms":"胃痛反酸","constitution":"土湿","created_at":"2026-07-19","master_name":"李道明"},{"id":1,"status":"completed","symptoms":"头痛、失眠、口干、心烦易怒","constitution":"木火体质","created_at":"2026-07-14","master_name":"李道明"},{"id":2,"status":"completed","symptoms":"腰膝酸软、畏寒怕冷、夜尿频多","constitution":"水寒体质","created_at":"2026-07-13","master_name":"李道明"},{"id":3,"status":"completed","symptoms":"胃脘胀痛、食欲不振、大便溏稀","constitution":"土湿体质","created_at":"2026-07-12","master_name":"李道明"},{"id":7,"status":"submitted","symptoms":"咳嗽痰多胸闷","constitution":"金燥","created_at":"2026-07-19","master_name":"李道明"},{"id":8,"status":"submitted","symptoms":"心悸失眠多梦","constitution":"火虚","created_at":"2026-07-19","master_name":"李道明"}];
+const FALLBACK_PUSHES = [{"content":"今日宜动土、嫁娶；忌出行、安葬","push_type":"daily_fortune"},{"content":"秋分时节，注意润肺养阴，多食银耳百合","push_type":"health_tip"},{"content":"明日中秋佳节，记得与家人团聚","push_type":"festival_reminder"},{"content":"您的诊疗报告已生成，请查看","push_type":"case_update"},{"content":"今日桃花星入命，社交运旺盛","push_type":"daily_fortune"}];
+
 // 活数据加载
-const API_BASE = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') 
-  ? 'http://127.0.0.1:8920' : '';
+const API_BASE = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? 'http://127.0.0.1:8920' : '';
+const HAS_API = !!API_BASE; // GitHub Pages无后端API
+
+function renderStats(d) {
+  document.getElementById('todayDate').textContent = d.date || new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+  document.getElementById('m-users').textContent = d.users || 0;
+  document.getElementById('m-vip').textContent = `VIP ${d.vipUsers||0} · 大师 ${d.masterUsers||0} · 医生 ${d.doctorUsers||0}`;
+  document.getElementById('m-paipan').textContent = d.paipanCount || 0;
+  document.getElementById('m-paipan-trend').textContent = d.paipanTrend ? `7日${d.paipanTrend.length}次` : '';
+  document.getElementById('m-cases').textContent = d.totalCases || 0;
+  document.getElementById('m-cases-sub').textContent = `完成${d.completedCases||0} · 待处理${d.pendingCases||0}`;
+  document.getElementById('m-reports').textContent = d.totalReports || 0;
+  document.getElementById('m-reports-sub').textContent = `已读${d.readReports||0}`;
+  document.getElementById('m-courses').textContent = d.totalCourses || 0;
+  document.getElementById('m-orders').textContent = d.totalOrders || 0;
+  document.getElementById('m-orders-sub').textContent = `完成${d.completedOrders||0}`;
+  document.getElementById('f-submit').textContent = d.totalCases || 0;
+  document.getElementById('f-master').textContent = d.totalCases || 0;
+  document.getElementById('f-doctor').textContent = d.completedCases || 0;
+  document.getElementById('f-report').textContent = d.totalReports || 0;
+}
+
+function renderCases(cases) {
+  if (!Array.isArray(cases)) return;
+  const list = document.getElementById('caseList');
+  list.innerHTML = cases.slice(0, 6).map(c => {
+    const tagClass = c.status === 'completed' ? 'tag-completed' : c.status === 'submitted' ? 'tag-submitted' : 'tag-draft';
+    const tagText = c.status === 'completed' ? '已完成' : c.status === 'submitted' ? '待诊断' : '草稿';
+    const date = (c.created_at||'').slice(0,10);
+    const sym = (c.symptoms||'').slice(0, 24);
+    return `<li class="activity-item"><span><span class="activity-tag ${tagClass}">${tagText}</span>${sym}</span><span style="color:var(--paper3);font-size:11px">${date}</span></li>`;
+  }).join('');
+}
+
+function renderPushes(pushes) {
+  if (!Array.isArray(pushes)) return;
+  const typeMap = { daily_fortune: '运势', health_tip: '养生', festival_reminder: '节日', case_update: '通知' };
+  const list = document.getElementById('pushList');
+  list.innerHTML = pushes.map(p => {
+    const type = typeMap[p.push_type] || p.push_type;
+    return `<div class="push-item"><span class="push-type">[${type}]</span>${p.content}</div>`;
+  }).join('');
+}
 
 async function loadStats() {
+  if (!HAS_API) { renderStats(FALLBACK_STATS); return; }
   try {
     const resp = await fetch(API_BASE + '/api/public/stats');
     const d = await resp.json();
-    if (d.error) { console.error('stats error:', d.error); return; }
-    
-    document.getElementById('todayDate').textContent = d.date || '';
-    document.getElementById('m-users').textContent = d.users || 0;
-    document.getElementById('m-vip').textContent = `VIP ${d.vipUsers||0} · 大师 ${d.masterUsers||0} · 医生 ${d.doctorUsers||0}`;
-    document.getElementById('m-paipan').textContent = d.paipanCount || 0;
-    document.getElementById('m-paipan-trend').textContent = d.paipanTrend ? `7日${d.paipanTrend.length}次` : '';
-    document.getElementById('m-cases').textContent = d.totalCases || 0;
-    document.getElementById('m-cases-sub').textContent = `完成${d.completedCases||0} · 待处理${d.pendingCases||0}`;
-    document.getElementById('m-reports').textContent = d.totalReports || 0;
-    document.getElementById('m-reports-sub').textContent = `已读${d.readReports||0}`;
-    document.getElementById('m-courses').textContent = d.totalCourses || 0;
-    document.getElementById('m-orders').textContent = d.totalOrders || 0;
-    document.getElementById('m-orders-sub').textContent = `完成${d.completedOrders||0}`;
-    
-    // 诊疗流程
-    document.getElementById('f-submit').textContent = d.totalCases || 0;
-    document.getElementById('f-master').textContent = d.totalCases || 0;
-    document.getElementById('f-doctor').textContent = d.completedCases || 0;
-    document.getElementById('f-report').textContent = d.totalReports || 0;
-  } catch (e) {
-    console.error('loadStats:', e);
-  }
+    if (d.error) { renderStats(FALLBACK_STATS); return; }
+    renderStats(d);
+  } catch (e) { renderStats(FALLBACK_STATS); }
 }
 
 async function loadCases() {
+  if (!HAS_API) { renderCases(FALLBACK_CASES); return; }
   try {
     const resp = await fetch(API_BASE + '/api/public/recent-cases');
     const cases = await resp.json();
-    if (!Array.isArray(cases)) return;
-    
-    const list = document.getElementById('caseList');
-    list.innerHTML = cases.slice(0, 6).map(c => {
-      const tagClass = c.status === 'completed' ? 'tag-completed' : c.status === 'submitted' ? 'tag-submitted' : 'tag-draft';
-      const tagText = c.status === 'completed' ? '已完成' : c.status === 'submitted' ? '待诊断' : '草稿';
-      const date = (c.created_at||'').slice(0,10);
-      const sym = (c.symptoms||'').slice(0, 24);
-      return `<li class="activity-item"><span><span class="activity-tag ${tagClass}">${tagText}</span>${sym}</span><span style="color:var(--paper3);font-size:11px">${date}</span></li>`;
-    }).join('');
-  } catch (e) {
-    console.error('loadCases:', e);
-  }
+    if (!Array.isArray(cases)) { renderCases(FALLBACK_CASES); return; }
+    renderCases(cases);
+  } catch (e) { renderCases(FALLBACK_CASES); }
 }
 
 async function loadPushes() {
+  if (!HAS_API) { renderPushes(FALLBACK_PUSHES); return; }
   try {
     const resp = await fetch(API_BASE + '/api/public/latest-pushes');
     const pushes = await resp.json();
-    if (!Array.isArray(pushes)) return;
-    
-    const typeMap = { daily_fortune: '运势', health_tip: '养生', festival_reminder: '节日', case_update: '通知' };
-    const list = document.getElementById('pushList');
-    list.innerHTML = pushes.map(p => {
-      const type = typeMap[p.push_type] || p.push_type;
-      return `<div class="push-item"><span class="push-type">[${type}]</span>${p.content}</div>`;
-    }).join('');
-  } catch (e) {
-    console.error('loadPushes:', e);
-  }
+    if (!Array.isArray(pushes)) { renderPushes(FALLBACK_PUSHES); return; }
+    renderPushes(pushes);
+  } catch (e) { renderPushes(FALLBACK_PUSHES); }
 }
 
 loadStats();
 loadCases();
 loadPushes();
-// 每5分钟刷新
-setInterval(() => { loadStats(); loadCases(); loadPushes(); }, 300000);
+if (HAS_API) setInterval(() => { loadStats(); loadCases(); loadPushes(); }, 300000);
 </script>
 </body>
 </html>
