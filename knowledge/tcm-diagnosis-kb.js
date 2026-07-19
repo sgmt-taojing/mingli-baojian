@@ -536,13 +536,23 @@ window.TCM_DIAGNOSIS_KB = {};
       { hexagram: '既济', name: '水火既济', element: '水/火', organ: '心/肾', disease_hint: '既济卦主心肾相交，健康。失常则心肾不交', tcm_link: '心肾不交/肾阴虚', formula: '交泰丸/六味地黄丸', acupoints: ['神门','太溪','心俞','肾俞'], health_direction: '交通心肾，滋阴降火' },
       { hexagram: '未济', name: '火水未济', element: '火/水', organ: '心/肾', disease_hint: '未济卦主心肾不交，易致失眠、遗精、潮热', tcm_link: '阴虚火旺/心肾不交', formula: '知柏地黄丸/天王补心丹', acupoints: ['神门','三阴交','太溪','心俞'], health_direction: '滋阴清热，交通心肾' },
       { hexagram: '复', name: '地雷复', element: '木/土', organ: '肝/脾', disease_hint: '复卦主阳气来复，调养之象。失调则肝郁脾虚', tcm_link: '肝郁脾虚', formula: '逍遥散', acupoints: ['太冲','足三里','期门','脾俞'], health_direction: '疏肝健脾，调畅气机' },
-      { hexagram: '垢', name: '天风姤', element: '金/木', organ: '肺/肝', disease_hint: '姤卦主阴气渐盛，易致寒邪内侵、肝肺不调', tcm_link: '风寒感冒/肝郁气滞', formula: '桂枝汤/柴胡疏肝散', acupoints: ['风池','太冲','列缺','合谷'], health_direction: '祛风散寒，疏肝理气' },
+      { hexagram: '姤', name: '天风姤', element: '金/木', organ: '肺/肝', disease_hint: '姤卦主阴气渐盛，易致寒邪内侵、肝肺不调', tcm_link: '风寒感冒/肝郁气滞', formula: '桂枝汤/柴胡疏肝散', acupoints: ['风池','太冲','列缺','合谷'], health_direction: '祛风散寒，疏肝理气' },
       { hexagram: '升', name: '地风升', element: '木/土', organ: '肝/脾', disease_hint: '升卦主气机升发，太过则肝阳上亢', tcm_link: '肝火上炎/肝阳上亢', formula: '天麻钩藤饮/镇肝熄风汤', acupoints: ['太冲','风池','百会','太阳'], health_direction: '平肝潜阳，清热息风' },
-      { hexagram: '降', name: '泽地萃', element: '金/土', organ: '肺/脾', disease_hint: '萃卦主聚而不散，易致痰湿聚积、食滞', tcm_link: '痰湿内阻/食滞胃脘', formula: '二陈汤/保和丸', acupoints: ['丰隆','中脘','足三里','肺俞'], health_direction: '化痰祛湿，消食导滞' },
+      { hexagram: '萃', name: '泽地萃', element: '金/土', organ: '肺/脾', disease_hint: '萃卦主聚而不散，易致痰湿聚积、食滞', tcm_link: '痰湿内阻/食滞胃脘', formula: '二陈汤/保和丸', acupoints: ['丰隆','中脘','足三里','肺俞'], health_direction: '化痰祛湿，消食导滞' },
       { hexagram: '恒', name: '雷风恒', element: '木', organ: '肝/胆', disease_hint: '恒卦主久而不变，易致气机呆滞、肝胆湿热', tcm_link: '肝郁气滞/脾胃湿热', formula: '龙胆泻肝汤/逍遥散', acupoints: ['太冲','阳陵泉','期门','足三里'], health_direction: '疏肝利胆，清热化湿' },
       { hexagram: '损', name: '山泽损', element: '土/金', organ: '脾/肺', disease_hint: '损卦主损下益上，易致脾虚肺弱', tcm_link: '脾肺气虚', formula: '参苓白术散/补中益气汤', acupoints: ['足三里','肺俞','脾俞','太渊'], health_direction: '健脾益气，培土生金' },
       { hexagram: '益', name: '风雷益', element: '木', organ: '肝/胆', disease_hint: '益卦主损上益下，肝胆受益。太过则木旺化火', tcm_link: '肝血虚/肝火上炎', formula: '四物汤/丹栀逍遥散', acupoints: ['三阴交','太冲','肝俞','血海'], health_direction: '养血柔肝，清热平肝' },
-      { hexagram: '晋', name: '火地晋', element: '火/土', organ: '心/脾', disease_hint: '晋卦主明出地上，心脾受益。失调则心脾两虚', tcm_link: '心脾两虚/心火亢盛', formula: '归脾汤/导赤散', acupoints: ['神门','心俞','脾俞','足三里'], health_direction: '补益心脾，清心泻火' }
+      { hexagram: '晋', name: '火地晋', element: '火/土', organ: '心/脾', disease_hint: '晋卦主明出地上，心脾受益。失调则心脾两虚', tcm_link: '心脾两虚/心火亢盛', formula: '归脾汤/导赤散', acupoints: ['神门','心俞','脾俞','足三里'], health_direction: '补益心脾，清心泻火' },
+      { hexagram: '讼', name: '天水讼', element: '金/水', organ: '肺/肾', disease_hint: '讼卦主争讼不和，易致气机紊乱、肺肾不交', tcm_link: '肝郁气滞/肾阴虚', formula: '柴胡疏肝散/六味地黄丸', acupoints: ['太冲','太溪','合谷','列缺'], health_direction: '疏肝理气，滋水涵木' },
+      { hexagram: '屯', name: '水雷屯', element: '水/木', organ: '肾/肝', disease_hint: '屯卦主初生艰难，易致肾精不足、肝血亏虚', tcm_link: '肾精不足/肝血虚', formula: '左归丸/四物汤', acupoints: ['太溪','肾俞','三阴交','肝俞'], health_direction: '补肾益精，养血柔肝' },
+      { hexagram: '蒙', name: '山水蒙', element: '土/水', organ: '脾/肾', disease_hint: '蒙卦主蒙昧不明，易致脾虚湿困、肾阳不振', tcm_link: '太阴脾虚/肾阳虚', formula: '理中汤/金匮肾气丸', acupoints: ['中脘','脾俞','肾俞','足三里'], health_direction: '健脾化湿，温补肾阳' },
+      { hexagram: '观', name: '风地观', element: '木/土', organ: '肝/脾', disease_hint: '观卦主观察静候，易致肝郁脾虚、气机不畅', tcm_link: '肝郁脾虚/痰湿内阻', formula: '逍遥散/二陈汤', acupoints: ['太冲','足三里','期门','脾俞'], health_direction: '疏肝健脾，理气化湿' },
+      { hexagram: '豫', name: '雷地豫', element: '木/土', organ: '肝/脾', disease_hint: '豫卦主安逸怠惰，易致气机滞缓、脾虚湿盛', tcm_link: '肝郁气滞/脾胃湿热', formula: '柴胡疏肝散/平胃散', acupoints: ['太冲','中脘','阴陵泉','足三里'], health_direction: '疏肝理气，健脾化湿' },
+      { hexagram: '井', name: '水风井', element: '水/木', organ: '肾/肝', disease_hint: '井卦主滋养不绝，失调则肾虚肝郁、水不涵木', tcm_link: '肾阴虚/肝郁气滞', formula: '六味地黄丸/一贯煎', acupoints: ['太溪','太冲','肾俞','三阴交'], health_direction: '滋水涵木，疏肝理气' },
+      { hexagram: '鼎', name: '火风鼎', element: '火/木', organ: '心/肝', disease_hint: '鼎卦主变革调养，失调则心肝火旺、阴血耗损', tcm_link: '心火亢盛/肝火上炎', formula: '导赤散/龙胆泻肝汤', acupoints: ['神门','太冲','心俞','行间'], health_direction: '清心泻火，平肝清热' },
+      { hexagram: '贲', name: '山火贲', element: '土/火', organ: '脾/心', disease_hint: '贲卦主修饰华美，失调则心脾两虚、气血不和', tcm_link: '心脾两虚/气滞血瘀', formula: '归脾汤/血府逐瘀汤', acupoints: ['神门','心俞','脾俞','血海'], health_direction: '补益心脾，行气活血' },
+      { hexagram: '涣', name: '风水涣', element: '木/水', organ: '肝/肾', disease_hint: '涣卦主涣散不聚，易致阳气涣散、肾气不固', tcm_link: '肾气不固/卫气不固', formula: '金匮肾气丸/玉屏风散', acupoints: ['肾俞','关元','气海','足三里'], health_direction: '温肾固精，益气固表' },
+      { hexagram: '丰', name: '雷火丰', element: '木/火', organ: '肝/心', disease_hint: '丰卦主丰盛过度，易致肝心火旺、阳亢风动', tcm_link: '肝火上炎/心火亢盛', formula: '天麻钩藤饮/导赤散', acupoints: ['太冲','神门','风池','心俞'], health_direction: '平肝息风，清心泻火' }
     ],
     hexagram_to_syndrome_chain: function(hexagramName) {
       var list = this.hexagram_health;

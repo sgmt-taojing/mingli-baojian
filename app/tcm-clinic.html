@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="var(--ink)">
+<meta name="theme-color" content="#080808">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="中医诊疗">
@@ -13,17 +13,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ink:var(--ink);--ink2:var(--ink2);--ink3:var(--ink3);--ink4:var(--ink4);
-  --paper:var(--paper);--paper2:var(--paper2);--paper3:var(--paper3);
-  --gold:var(--gold);--gold2:var(--gold2);--gold3:var(--gold3);
-  --cinn:var(--cinn);--cinn2:var(--cinn2);
-  --jade:var(--jade);--jade2:var(--success);
-  --cyan:var(--cyan);--cyan2:var(--cyan2);
-  --wood:var(--wood);--wood2:var(--wood2);
-  --fire:var(--cinn2);--earth:var(--earth);--metal:var(--metal);
-  --danger:var(--danger);--success:var(--success);--warn:var(--orange);
+  --ink:#080808;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;
+  --paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;
+  --gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;
+  --cinn:#c0392b;--cinn2:#e74c3c;
+  --jade:#27ae60;--jade2:#2ecc71;
+  --cyan:#2980b9;--cyan2:#5dade2;
+  --wood:#8d6e63;--wood2:#a1887f;
+  --earth:#a08060;--metal:#95a5a6;
+  --danger:#dc3545;--success:#2ecc71;--warn:#e67e22;
+  --orange:#e67e22;
+  --violet:#8e44ad;--violet2:#a569bd;
+  --emerald:#16a085;
+  --steel:#7f8c8d;
+  --metal2:#bdc3c7;
   --border:rgba(201,168,76,.15);
   --card:rgba(255,255,255,0.04);--card2:rgba(255,255,255,0.06);
+  --text:var(--paper);--muted:var(--paper3);--title:var(--gold);
   --font-serif:'Noto Serif SC','Source Han Serif SC','SimSun','STSong',serif;
 }
 *{margin:0;padding:0;box-sizing:border-box}
@@ -200,10 +206,10 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 
   <!-- TAB BAR -->
   <div class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('symptom')">📝 症状描述</button>
-    <button class="tab-btn" onclick="switchTab('mingli')">☯️ 命理推病</button>
-    <button class="tab-btn" onclick="switchTab('yijing')">☰ 周易论治</button>
-    <button class="tab-btn" onclick="switchTab('tizhi')">🧬 体质分析</button>
+    <button class="tab-btn active" onclick="switchTab('symptom', this)">📝 症状描述</button>
+    <button class="tab-btn" onclick="switchTab('mingli', this)">☯️ 命理推病</button>
+    <button class="tab-btn" onclick="switchTab('yijing', this)">☰ 周易论治</button>
+    <button class="tab-btn" onclick="switchTab('tizhi', this)">🧬 体质分析</button>
   </div>
 
   <!-- TAB 1: 症状描述 -->
@@ -243,6 +249,7 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
       <div class="btn-row">
         <button class="btn btn-primary" onclick="analyzeSymptoms()">🔍 开始解读</button>
         <button class="btn btn-secondary" onclick="clearSymptoms()">清除</button>
+        <button class="btn btn-secondary" onclick="exportResult('symptom')">🖨️ 导出报告</button>
       </div>
     </div>
 
@@ -302,7 +309,10 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
         </div>
         <div class="input-group">
           <label>&nbsp;</label>
-          <button class="btn btn-primary" onclick="predictDisease()" style="margin-top:0">🔮 推断疾病走势</button>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-primary" onclick="predictDisease()" style="margin-top:0">🔮 推断疾病走势</button>
+            <button class="btn btn-secondary" onclick="exportResult('mingli')" style="margin-top:0">🖨️</button>
+          </div>
         </div>
       </div>
     </div>
@@ -324,6 +334,7 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
         <button class="btn btn-primary" onclick="castHexagram('time')">🕐 时间起卦</button>
         <button class="btn btn-secondary" onclick="castHexagram('number')">🔢 数字起卦</button>
         <button class="btn btn-secondary" onclick="castHexagram('symptom')">🩺 症状起卦</button>
+        <button class="btn btn-secondary" onclick="exportResult('yijing')">🖨️ 导出报告</button>
       </div>
 
       <div id="numberInput" style="display:none;margin-bottom:16px">
@@ -415,6 +426,7 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
       </div>
       
       <button class="btn btn-primary" onclick="analyzeTizhi()">🧬 开始联合分析</button>
+      <button class="btn btn-secondary" onclick="exportResult('tizhi')" style="margin-left:8px">🖨️ 导出报告</button>
     </div>
 
     <div class="diagnosis-result" id="tizhiResult">
@@ -459,11 +471,16 @@ function initMingliSelects() {
 initMingliSelects();
 
 // ═══ Tab切换 ═══
-function switchTab(name) {
+function switchTab(name, btnEl) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
-  event.target.classList.add('active');
+  if(btnEl) btnEl.classList.add('active');
+  // 清空之前的结果
+  ['symptomResult','mingliResult','yijingResult','tizhiResult'].forEach(id => {
+    let el = document.getElementById(id);
+    if(el) el.style.display = 'none';
+  });
 }
 
 // ═══ 症状选择 ═══
@@ -1076,6 +1093,51 @@ function showToast(msg) {
   toast.textContent = msg;
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ═══ 导出/打印功能 ═══
+function exportResult(type) {
+  let resultDiv;
+  let title;
+  switch(type) {
+    case 'symptom': resultDiv = document.getElementById('symptomResult'); title = '症状解读报告'; break;
+    case 'mingli': resultDiv = document.getElementById('mingliResult'); title = '命理推病报告'; break;
+    case 'yijing': resultDiv = document.getElementById('yijingResult'); title = '周易论治报告'; break;
+    case 'tizhi': resultDiv = document.getElementById('tizhiResult'); title = '体质分析报告'; break;
+    default: return;
+  }
+  if(!resultDiv || resultDiv.style.display === 'none') {
+    showToast('请先生成分析结果');
+    return;
+  }
+  
+  let printWin = window.open('', '_blank');
+  printWin.document.write(`
+    <!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title>
+    <style>
+    body{font-family:'Noto Serif SC',serif;max-width:800px;margin:0 auto;padding:40px;color:#333;}
+    h1{text-align:center;color:#c9a84c;border-bottom:2px solid #c9a84c;padding-bottom:12px;margin-bottom:24px;}
+    .result-section{margin-bottom:24px;page-break-inside:avoid;}
+    .result-section-title{font-size:16px;color:#c9a84c;border-bottom:1px solid #ddd;padding-bottom:8px;margin-bottom:12px;}
+    .syndrome-card{background:#f9f6f0;border:1px solid #e0d6c0;border-radius:8px;padding:16px;margin-bottom:12px;}
+    .syndrome-name{font-size:18px;color:#a08030;margin-bottom:8px;}
+    .syndrome-detail{font-size:13px;color:#555;line-height:1.8;}
+    .doctor-card{display:flex;gap:12px;border:1px solid #e0d6c0;border-radius:8px;padding:12px;margin-bottom:8px;}
+    .solution-step{margin-bottom:16px;padding-left:20px;border-left:3px solid #c9a84c;}
+    .solution-step-title{font-weight:bold;color:#a08030;margin-bottom:4px;}
+    .solution-step-body{font-size:13px;color:#555;line-height:1.8;}
+    .risk-card{border:1px solid #e0d6c0;border-radius:8px;padding:12px;margin-bottom:8px;}
+    .footer{text-align:center;margin-top:32px;padding-top:16px;border-top:1px solid #ddd;font-size:12px;color:#999;}
+    @media print{body{padding:20px;}}
+    </style></head><body>
+    <h1>🌿 ${title}</h1>
+    <p style="text-align:center;color:#888;font-size:13px;margin-bottom:24px">生成时间: ${new Date().toLocaleString('zh-CN')}</p>
+    ${resultDiv.innerHTML}
+    <div class="footer">⚠️ 本报告由易道智鉴·命理中医诊疗系统生成，仅供养生保健参考。如有特定疾病或服药中，请咨询中医师。</div>
+    </body></html>
+  `);
+  printWin.document.close();
+  setTimeout(() => { printWin.print(); }, 500);
 }
 
 console.log('[tcm-clinic.html] 已加载');
