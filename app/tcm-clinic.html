@@ -529,6 +529,24 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 <script src="knowledge/tcm-diagnosis-kb.js"></script>
 <script src="knowledge/tcm-famous-formulas-kb.js"></script>
 <script>
+// API辅助
+const API_BASE = '';
+function getAuthToken(){
+  return localStorage.getItem('authToken')||'';
+}
+async function apiCall(url, method, body){
+  const token = getAuthToken();
+  const res = await fetch(API_BASE + url, {
+    method: method || 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? {'Authorization': 'Bearer ' + token} : {})
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  return res.json();
+}
+
 /* ===== DATA LAYER ===== */
 const STORAGE_KEY = 'tcm_clinic_cases';
 const VERSION_KEY = 'tcm_clinic_versions';
@@ -623,17 +641,41 @@ const FILTER_TERMS = ['八字','五行','天干','地支','卦象','大运','流
 let currentRole = 'patient';
 let currentCaseId = null;
 let currentCollabCaseId = null;
+let _casesCache = null;
 
 /* ===== STORAGE ===== */
 function loadCases(){
+  if(_casesCache) return _casesCache;
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw) return JSON.parse(raw);
+    if(raw){_casesCache = JSON.parse(raw); return _casesCache;}
   }catch(e){}
   return null;
 }
 function saveCases(cases){
+  _casesCache = cases;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(cases));
+}
+
+async function syncCasesFromAPI(){
+  try{
+    let data;
+    if(currentRole === 'patient'){
+      data = await apiCall('/api/clinic/my-reports','GET');
+    }else{
+      data = await apiCall('/api/clinic/assigned-cases','GET');
+    }
+    if(data && data.cases){
+      _casesCache = data.cases;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data.cases));
+      return data.cases;
+    }else if(data && data.error){
+      showToast('数据同步: ' + data.error);
+    }
+  }catch(e){
+    showToast('网络异常，使用本地缓存');
+  }
+  return null;
 }
 function loadVersions(){
   try{return JSON.parse(localStorage.getItem(VERSION_KEY))||{}}catch(e){return {}}
@@ -761,13 +803,14 @@ function showToast(msg){
 }
 
 /* ===== ROLE SWITCHING ===== */
-function switchRole(role,btn){
+async function switchRole(role,btn){
   currentRole = role;
   document.querySelectorAll('.role-tab').forEach(t=>t.classList.remove('active'));
   if(btn) btn.classList.add('active');
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel-'+role).classList.add('active');
-  // Refresh data
+  // Refresh data from API (fallback to local)
+  await syncCasesFromAPI();
   if(role==='patient') renderPatientReport();
   if(role==='master') renderMasterList();
   if(role==='doctor') renderDoctorList();
@@ -1081,7 +1124,7 @@ function renderHexagram(hex,targetId){
   target.dataset.hexagram = JSON.stringify(hex);
 }
 
-function submitMasterAnalysis(){
+async function submitMasterAnalysis(){
   const cases = loadCases();
   const c = cases.find(x=>x.id===currentCaseId);
   if(!c){showToast('病例未找到');return}
@@ -1102,8 +1145,25 @@ function submitMasterAnalysis(){
   const d = document.getElementById('bazi-day').value;
   const h = document.getElementById('bazi-hour').value;
   const oldVersion = c.masterAnalysis ? c.masterAnalysis.version : 0;
+  const baziChart = {year:y||'',month:m||'',day:d||'',hour:h||''};
+  const wuxingSummary = JSON.stringify(wuxing);
+  // Try API first
+  try{
+    const resp = await apiCall('/api/clinic/submit-analysis','POST',{
+      caseId: currentCaseId,
+      analysis: note,
+      baziChart: baziChart,
+      wuxingSummary: wuxingSummary
+    });
+    if(resp && resp.error){
+      showToast('API: ' + resp.error + '，使用本地保存');
+    }
+  }catch(e){
+    showToast('网络异常，使用本地保存');
+  }
+  // Local update (always, as fallback or mirror)
   c.masterAnalysis = {
-    bazi:{year:y||'',month:m||'',day:d||'',hour:h||''},
+    bazi:baziChart,
     wuxing:wuxing,
     hexagram:hexagram,
     analysisNote:note,
@@ -1116,7 +1176,7 @@ function submitMasterAnalysis(){
   };
   // Update status
   if(c.status==='pending_master') c.status='pending_doctor';
-  else if(c.status==='completed'||c.status==='pushed') c.status=c.status; // keep
+  else if(c.status==='completed'||c.status==='pushed') c.status=c.status;
   else c.status='collaborating';
   saveCases(cases);
   addVersion(c.id,'大师提交分析报告 v'+(oldVersion+1));
@@ -1193,7 +1253,7 @@ function backToDoctorList(){
   currentCaseId = null;
 }
 
-function pushToPatient(){
+async function pushToPatient(){
   const cases = loadCases();
   const c = cases.find(x=>x.id===currentCaseId);
   if(!c){showToast('病例未找到');return}
@@ -1210,6 +1270,26 @@ function pushToPatient(){
   if(!syndrome){showToast('请填写证候诊断');return}
   if(!treatment){showToast('请填写治则治法');return}
   const oldVersion = c.doctorDiagnosis ? c.doctorDiagnosis.version : 0;
+  // Generate patient report (filter terms)
+  const ma = c.masterAnalysis||{};
+  const summaryParts = [];
+  if(ma.tizhiTrend) summaryParts.push('您的体质属于'+filterTerms(ma.tizhiTrend));
+  if(syndrome) summaryParts.push('证候为'+syndrome);
+  if(treatment) summaryParts.push('治法：'+treatment);
+  const reportText = summaryParts.join('，');
+  // Try API first
+  try{
+    const resp = await apiCall('/api/clinic/push-report','POST',{
+      caseId: currentCaseId,
+      reportText: reportText
+    });
+    if(resp && resp.error){
+      showToast('API: ' + resp.error);
+    }
+  }catch(e){
+    showToast('网络异常，使用本地保存');
+  }
+  // Local update
   c.doctorDiagnosis = {
     syndrome:syndrome,
     treatment:treatment,
@@ -1224,14 +1304,8 @@ function pushToPatient(){
     completedAt:new Date().toISOString(),
     version:oldVersion+1
   };
-  // Generate patient report (filter terms)
-  const ma = c.masterAnalysis||{};
-  const summaryParts = [];
-  if(ma.tizhiTrend) summaryParts.push('您的体质属于'+filterTerms(ma.tizhiTrend));
-  if(syndrome) summaryParts.push('证候为'+syndrome);
-  if(treatment) summaryParts.push('治法：'+treatment);
   c.patientReport = {
-    summary:summaryParts.join('，'),
+    summary:reportText,
     diet:diet||'遵医嘱饮食',
     exercise:exercise||'适度运动',
     lifestyle:lifestyle||'规律作息',
@@ -1333,12 +1407,26 @@ function loadCollabCase(){
   renderVersionHistory(c.id);
 }
 
-function renderDiscussion(c){
+async function renderDiscussion(c){
   let html = '';
-  if(!c.discussion || c.discussion.length===0){
+  let messages = c.discussion || [];
+  // Try fetching from API
+  try{
+    const resp = await apiCall('/api/clinic/discussions/'+c.id,'GET');
+    if(resp && resp.messages){
+      messages = resp.messages;
+      // Update local cache
+      const cases = loadCases();
+      const cc = cases.find(x=>x.id===c.id);
+      if(cc){cc.discussion = messages; saveCases(cases);}
+    }
+  }catch(e){
+    // Fallback to local data
+  }
+  if(messages.length===0){
     html = '<div class="empty-state" style="padding:20px"><div class="text">暂无讨论消息</div></div>';
   }else{
-    c.discussion.forEach(msg=>{
+    messages.forEach(msg=>{
       const roleLabel = msg.role==='master'?'大师':'医生';
       html += '<div class="discussion-msg role-'+msg.role+'">';
       html += '<div class="msg-header"><span class="msg-role-badge '+msg.role+'">'+roleLabel+'</span><span>'+formatDate(msg.time)+'</span></div>';
@@ -1351,11 +1439,24 @@ function renderDiscussion(c){
   area.scrollTop = area.scrollHeight;
 }
 
-function sendDiscussion(){
+async function sendDiscussion(){
   const role = document.getElementById('discussRole').value;
   const text = document.getElementById('discussText').value.trim();
   if(!text){showToast('请输入消息内容');return}
   if(!currentCollabCaseId){showToast('请先选择病例');return}
+  // Try API first
+  try{
+    const resp = await apiCall('/api/clinic/discuss','POST',{
+      caseId: currentCollabCaseId,
+      content: text
+    });
+    if(resp && resp.error){
+      showToast('API: ' + resp.error);
+    }
+  }catch(e){
+    showToast('网络异常，消息保存到本地');
+  }
+  // Local update
   const cases = loadCases();
   const c = cases.find(x=>x.id===currentCollabCaseId);
   if(!c) return;
@@ -1446,6 +1547,13 @@ function drawQR(){
 initSampleData();
 drawQR();
 renderPatientReport();
+// Sync from API on load
+syncCasesFromAPI().then(()=>{
+  if(currentRole==='patient') renderPatientReport();
+  if(currentRole==='master') renderMasterList();
+  if(currentRole==='doctor') renderDoctorList();
+  if(currentRole==='collab') renderCollabCases();
+});
 
 // KB integration - use symptom data if available
 function getKBSymptoms(){
