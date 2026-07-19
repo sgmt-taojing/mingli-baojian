@@ -4,7 +4,7 @@
 // 禁止 Math.random()，所有数据均为真实对照表
 // ═══════════════════════════════════════════════════════════════
 
-var ZODIAC_COMPLETE = {
+let ZODIAC_COMPLETE = {
   // ─── 十二生肖本命佛 ───
   benmingfo: {
     '鼠': {
@@ -542,28 +542,28 @@ var ZODIAC_COMPLETE = {
 
 // ─── 渲染函数 ───
 function renderZodiacModule(zodiacSign) {
-  var sign = zodiacSign || '鼠';
-  var data = ZODIAC_COMPLETE;
-  var html = '';
+  let sign = zodiacSign || '鼠';
+  let data = ZODIAC_COMPLETE;
+  let html = '';
 
   // 本命佛
-  var bf = data.benmingfo[sign];
+  let bf = data.benmingfo[sign];
   if (bf) {
     html += '<div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:20px;margin:16px 0;border:1px solid var(--gold)">';
     html += '<div style="color:var(--gold);font-size:16px;font-weight:bold;letter-spacing:2px;margin-bottom:12px">🙏 ' + sign + '年本命佛 — ' + bf.buddha + '</div>';
     html += '<div style="color:var(--paper);font-size:13px;line-height:1.8;margin-bottom:10px">' + bf.meaning + '</div>';
     html += '<div style="font-size:12px;color:var(--paper2);margin-bottom:8px"><b style="color:var(--gold)">供奉方法：</b>' + bf.worship + '</div>';
     html += '<div style="font-size:12px;color:var(--paper2)"><b style="color:var(--gold)">佩戴禁忌：</b><br>';
-    for (var i = 0; i < bf.taboos.length; i++) {
+    for (let i = 0; i < bf.taboos.length; i++) {
       html += '　• ' + bf.taboos[i] + '<br>';
     }
     html += '</div></div>';
   }
 
   // 2025年运势
-  var yd = data.yearly_2025[sign];
+  let yd = data.yearly_2025[sign];
   if (yd) {
-    var relColor = yd.relation.indexOf('冲') >= 0 ? '#e74c3c' : yd.relation.indexOf('合') >= 0 ? '#27ae60' : yd.relation.indexOf('值') >= 0 ? '#e67e22' : 'var(--gold)';
+    let relColor = yd.relation.indexOf('冲') >= 0 ? '#e74c3c' : yd.relation.indexOf('合') >= 0 ? '#27ae60' : yd.relation.indexOf('值') >= 0 ? '#e67e22' : 'var(--gold)';
     html += '<div style="background:var(--paper);border-radius:8px;padding:16px;margin:12px 0;border-left:3px solid ' + relColor + '">';
     html += '<div style="color:var(--ink);font-weight:bold;margin-bottom:8px">🌟 2025乙巳蛇年 — ' + sign + '生肖运势</div>';
     html += '<div style="font-size:12px;margin-bottom:6px"><b style="color:' + relColor + '">太岁关系：</b>' + yd.relation + '</div>';
@@ -571,32 +571,32 @@ function renderZodiacModule(zodiacSign) {
     html += '<div style="font-size:12px;color:#27ae60;margin-bottom:4px">✅ 吉方位：' + yd.lucky_direction + '</div>';
     html += '<div style="font-size:12px;color:#e74c3c;margin-bottom:8px">⚠️ 凶方位：' + yd.unlucky_direction + '</div>';
     html += '<div style="font-size:12px;color:var(--paper2);margin-bottom:6px"><b>化解方法：</b><br>';
-    for (var j = 0; j < yd.resolve.length; j++) {
+    for (let j = 0; j < yd.resolve.length; j++) {
       html += '　• ' + yd.resolve[j] + '<br>';
     }
     html += '</div>';
     html += '<div style="font-size:12px;color:#e74c3c"><b>注意事项：</b><br>';
-    for (var k = 0; k < yd.taboos.length; k++) {
+    for (let k = 0; k < yd.taboos.length; k++) {
       html += '　• ' + yd.taboos[k] + '<br>';
     }
     html += '</div></div>';
   }
 
   // 吉祥物推荐
-  var ms = data.mascots;
+  let ms = data.mascots;
   html += '<div style="background:var(--paper);border-radius:8px;padding:16px;margin:12px 0">';
   html += '<div style="color:var(--ink);font-weight:bold;margin-bottom:10px">🎁 ' + sign + '生肖吉祥物推荐</div>';
 
   if (ms.home[sign]) {
-    var h = ms.home[sign];
+    let h = ms.home[sign];
     html += '<div style="font-size:12px;margin-bottom:6px"><b style="color:var(--gold)">🏠 家中：</b>' + h.items.join('、') + ' — ' + h.placement + '（' + h.material + '）— ' + h.meaning + '</div>';
   }
   if (ms.car[sign]) {
-    var c = ms.car[sign];
+    let c = ms.car[sign];
     html += '<div style="font-size:12px;margin-bottom:6px"><b style="color:var(--gold)">🚗 车里：</b>' + c.items.join('、') + ' — ' + c.placement + '（' + c.material + '）</div>';
   }
   if (ms.body[sign]) {
-    var b = ms.body[sign];
+    let b = ms.body[sign];
     html += '<div style="font-size:12px;margin-bottom:6px"><b style="color:var(--gold)">👤 身上：</b>' + b.items.join('、') + ' — ' + b.material + ' — ' + b.wearing + '</div>';
   }
   html += '</div>';
@@ -607,7 +607,7 @@ function renderZodiacModule(zodiacSign) {
 // ═══════════════════════════════════════════════════════════════
 // 12生肖年末仪式与下一年度参拜建议
 // ═══════════════════════════════════════════════════════════════
-var ZODIAC_YEAR_END_RITUALS = {
+let ZODIAC_YEAR_END_RITUALS = {
   '鼠': {
     rituals: [
       {name:'年终拜太岁', temple:'城隍庙/道观太岁殿', reason:'鼠年如犯太岁需化解，年终谢太岁', timing:'腊月廿三至除夕'},

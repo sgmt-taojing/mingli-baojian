@@ -788,18 +788,18 @@ function saveUser(user) {
 }
 
 // ─── 通达 ───
-var SUPER_USERS = ['18511550189'];
+let SUPER_USERS = ['18511550189'];
 
 // 超管登录后显示管理入口
 function checkSuperUserUI() {
-  var user = getUser();
+  let user = getUser();
   if (isSuperUser()) {
     // 在"我的"tab显示管理入口
-    var adminEntry = document.getElementById('adminEntry');
+    let adminEntry = document.getElementById('adminEntry');
     if (adminEntry) adminEntry.style.display = 'block';
     // 解锁所有工具
-    var locks = document.querySelectorAll('.tool-lock');
-    for(var i=0;i<locks.length;i++){
+    let locks = document.querySelectorAll('.tool-lock');
+    for(let i=0;i<locks.length;i++){
       locks[i].style.display = 'none';
     }
   }
@@ -820,7 +820,7 @@ function isVip() {
   if (user.vipLevel === 'free') return false;
   if (user.vipExpire && new Date(user.vipExpire) > new Date()) {
     // 检查是否即将到期（30天内）
-    var daysLeft = Math.ceil((new Date(user.vipExpire) - new Date()) / 86400000);
+    let daysLeft = Math.ceil((new Date(user.vipExpire) - new Date()) / 86400000);
     if (daysLeft <= 30 && daysLeft > 0) {
       checkVipExpiryNotice(daysLeft);
     }
@@ -837,12 +837,12 @@ function isVip() {
 
 // 会员到期提醒（每天最多弹一次）
 function checkVipExpiryNotice(daysLeft) {
-  var today = getToday();
-  var lastNotice = localStorage.getItem('vip_expire_notice_date');
+  let today = getToday();
+  let lastNotice = localStorage.getItem('vip_expire_notice_date');
   if (lastNotice === today) return; // 今天已提醒过
   localStorage.setItem('vip_expire_notice_date', today);
   
-  var msg = '您的会员将在 ' + daysLeft + ' 天后到期。\n';
+  let msg = '您的会员将在 ' + daysLeft + ' 天后到期。\n';
   msg += '到期日：' + new Date(getUser().vipExpire).toLocaleDateString() + '\n';
   msg += '续费可继续享受全部功能，跨年不停服务。';
   
@@ -854,19 +854,19 @@ function checkVipExpiryNotice(daysLeft) {
 
 // 跨年特殊提醒
 function checkNewYearVipNotice() {
-  var now = new Date();
-  var year = now.getFullYear();
-  var month = now.getMonth() + 1;
+  let now = new Date();
+  let year = now.getFullYear();
+  let month = now.getMonth() + 1;
   // 11月-12月检查跨年会员
   if (month >= 11) {
-    var user = getUser();
+    let user = getUser();
     if (user.vipLevel !== 'free' && user.vipLevel !== 'lifetime' && user.vipExpire) {
-      var expire = new Date(user.vipExpire);
-      var nextYear = new Date(year + 1, 0, 1); // 明年1月1日
+      let expire = new Date(user.vipExpire);
+      let nextYear = new Date(year + 1, 0, 1); // 明年1月1日
       if (expire < nextYear) {
-        var daysLeft = Math.ceil((expire - now) / 86400000);
+        let daysLeft = Math.ceil((expire - now) / 86400000);
         if (daysLeft > 0 && daysLeft <= 60) {
-          var key = 'ny_notice_' + year;
+          let key = 'ny_notice_' + year;
           if (localStorage.getItem(key) !== '1') {
             localStorage.setItem(key, '1');
             setTimeout(function() {
@@ -889,14 +889,14 @@ function checkUsage(toolKey) {
   const config = TOOL_CONFIG[toolKey];
   
   // 按天计数：每日重置
-  var today = new Date().toDateString();
+  let today = new Date().toDateString();
   if (!user.usageDate || user.usageDate !== today) {
     user.usageDate = today;
     user.usageLog = {};
     saveUser(user);
   }
   
-  var used = user.usageLog[toolKey] || 0;
+  let used = user.usageLog[toolKey] || 0;
   
   // 免费工具：非会员每日3次
   if (config && config.type === 'free') {
@@ -1018,23 +1018,23 @@ document.addEventListener('DOMContentLoaded', function(){
 // ─── 信众日常关注功能 ───
 function getDailyFortune() {
   // 基于日干支推算每日运势方向
-  var now = new Date();
-  var baseDate = new Date(1900, 0, 31);
-  var dayGzIdx = ((40 + Math.floor((now - baseDate) / 86400000)) % 60 + 60) % 60;
-  var STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-  var BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-  var dayStem = STEMS[dayGzIdx % 10];
-  var dayBranch = BRANCHES[dayGzIdx % 12];
-  var wx = {'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'}[dayStem];
+  let now = new Date();
+  let baseDate = new Date(1900, 0, 31);
+  let dayGzIdx = ((40 + Math.floor((now - baseDate) / 86400000)) % 60 + 60) % 60;
+  let STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  let BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  let dayStem = STEMS[dayGzIdx % 10];
+  let dayBranch = BRANCHES[dayGzIdx % 12];
+  let wx = {'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'}[dayStem];
   
-  var fortune = {
+  let fortune = {
     '木': { score: 85, dir: '东方', color: '青绿', tip: '宜规划新事，读书学习，接触自然' },
     '火': { score: 78, dir: '南方', color: '红色', tip: '宜表达沟通，处理积压事务' },
     '土': { score: 72, dir: '中部', color: '黄色', tip: '宜整理收纳，稳固根基，陪家人' },
     '金': { score: 80, dir: '西方', color: '白色', tip: '宜决断切割，清理旧物，断舍离' },
     '水': { score: 88, dir: '北方', color: '黑蓝', tip: '宜静思冥想，深度交流，内省' }
   };
-  var f = fortune[wx] || fortune['土'];
+  let f = fortune[wx] || fortune['土'];
   return {
     ganZhi: dayStem + dayBranch,
     wuxing: wx,
@@ -1047,8 +1047,8 @@ function getDailyFortune() {
 }
 
 function renderDailyFortune() {
-  var f = getDailyFortune();
-  var html = '<div style="background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.02));border:1px solid rgba(201,168,76,0.15);border-radius:12px;padding:16px;margin-bottom:12px">';
+  let f = getDailyFortune();
+  let html = '<div style="background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.02));border:1px solid rgba(201,168,76,0.15);border-radius:12px;padding:16px;margin-bottom:12px">';
   html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">';
   html += '<span style="font-size:16px;color:var(--gold);font-weight:600">📜 今日运势</span>';
   html += '<span style="font-size:12px;color:var(--paper3)">' + f.ganZhi + '日 · ' + f.wuxing + '</span>';
@@ -1337,36 +1337,36 @@ function closeModal(id) {
 // ─── 推送设置 ───
 function showPushSettings() {
   // 读取现有设置
-  var settings = null;
+  let settings = null;
   try {
-    var raw = localStorage.getItem('pushSettings');
+    let raw = localStorage.getItem('pushSettings');
     if (raw) settings = JSON.parse(raw);
   } catch(e) {}
   
   // 设置推送开关
-  var enabledEl = document.getElementById('psEnabled');
+  let enabledEl = document.getElementById('psEnabled');
   enabledEl.checked = settings ? (settings.enabled !== false) : true;
   // 触发样式更新
   updateToggleStyle(enabledEl);
   
   // 设置模块勾选
-  var modules = (settings && settings.modules) ? settings.modules : {};
-  var checks = document.querySelectorAll('#psModules input[type=checkbox]');
-  for (var i = 0; i < checks.length; i++) {
-    var mod = checks[i].getAttribute('data-module');
+  let modules = (settings && settings.modules) ? settings.modules : {};
+  let checks = document.querySelectorAll('#psModules input[type=checkbox]');
+  for (let i = 0; i < checks.length; i++) {
+    let mod = checks[i].getAttribute('data-module');
     checks[i].checked = modules[mod] !== false; // 默认勾选
   }
   
   // 设置信仰偏好
-  var faithEl = document.getElementById('psFaith');
+  let faithEl = document.getElementById('psFaith');
   faithEl.value = (settings && settings.faith) ? settings.faith : '全部';
   
   document.getElementById('pushSettingsModal').classList.add('show');
 }
 
 function updateToggleStyle(checkbox) {
-  var slider = checkbox.parentElement.querySelector('.ps-toggle-slider');
-  var dot = slider.querySelector('span:last-child');
+  let slider = checkbox.parentElement.querySelector('.ps-toggle-slider');
+  let dot = slider.querySelector('span:last-child');
   if (checkbox.checked) {
     slider.style.background = 'var(--gold)';
     dot.style.transform = 'translateX(20px)';
@@ -1382,15 +1382,15 @@ document.getElementById('psEnabled').addEventListener('change', function() {
 });
 
 function savePushSettings() {
-  var settings = {
+  let settings = {
     enabled: document.getElementById('psEnabled').checked,
     modules: {},
     faith: document.getElementById('psFaith').value
   };
   
-  var checks = document.querySelectorAll('#psModules input[type=checkbox]');
-  for (var i = 0; i < checks.length; i++) {
-    var mod = checks[i].getAttribute('data-module');
+  let checks = document.querySelectorAll('#psModules input[type=checkbox]');
+  for (let i = 0; i < checks.length; i++) {
+    let mod = checks[i].getAttribute('data-module');
     settings.modules[mod] = checks[i].checked;
   }
   
@@ -1407,8 +1407,8 @@ function resetPushSettings() {
   // 恢复默认：全量推送
   document.getElementById('psEnabled').checked = true;
   updateToggleStyle(document.getElementById('psEnabled'));
-  var checks = document.querySelectorAll('#psModules input[type=checkbox]');
-  for (var i = 0; i < checks.length; i++) {
+  let checks = document.querySelectorAll('#psModules input[type=checkbox]');
+  for (let i = 0; i < checks.length; i++) {
     checks[i].checked = true;
   }
   document.getElementById('psFaith').value = '全部';
@@ -1452,7 +1452,7 @@ function updateUI() {
   const isSuper = isSuperUser();
   
   // VIP 标识
-  var badge = document.getElementById('vipBadge');
+  let badge = document.getElementById('vipBadge');
   if (isSuper) {
     badge.textContent = '通达';
     badge.style.background = 'linear-gradient(135deg,#e74c3c,#c0392b)';
@@ -1466,8 +1466,8 @@ function updateUI() {
   // 用户信息
   document.getElementById('userName').textContent = user.phone ? user.phone.slice(0,3) + '****' + user.phone.slice(7) : '缘主';
   
-  var levelNames = { free:'初缘', monthly:'常修', yearly:'精进', lifetime:'明道' };
-  var levelText = isSuper ? '通达（不限次数）' : levelNames[user.vipLevel];
+  let levelNames = { free:'初缘', monthly:'常修', yearly:'精进', lifetime:'明道' };
+  let levelText = isSuper ? '通达（不限次数）' : levelNames[user.vipLevel];
   document.getElementById('userLevel').textContent = levelText + ' · 积分 ' + (user.points || 0);
   
   // 统计
@@ -1522,7 +1522,7 @@ function updatePractice() {
 
 // ─── H5 今日佛道活动 ───
 function updateH5FaithFestival() {
-  var el = document.getElementById('h5FaithFestival');
+  let el = document.getElementById('h5FaithFestival');
   if (!el) return;
   
   // 复用主站的 FAITH_FESTIVALS 和 solarToLunar
@@ -1531,27 +1531,27 @@ function updateH5FaithFestival() {
     return;
   }
   
-  var now = new Date();
-  var html = '';
-  var found = false;
+  let now = new Date();
+  let html = '';
+  let found = false;
   
-  for (var offset = 0; offset <= 3; offset++) {
-    var checkDate = new Date(now);
+  for (let offset = 0; offset <= 3; offset++) {
+    let checkDate = new Date(now);
     checkDate.setDate(checkDate.getDate() + offset);
-    var lunar = solarToLunar(checkDate.getFullYear(), checkDate.getMonth() + 1, checkDate.getDate());
+    let lunar = solarToLunar(checkDate.getFullYear(), checkDate.getMonth() + 1, checkDate.getDate());
     if (!lunar) continue;
-    var key = String(lunar.month).padStart(2, '0') + '-' + String(lunar.day).padStart(2, '0');
-    var festivals = FAITH_FESTIVALS[key];
+    let key = String(lunar.month).padStart(2, '0') + '-' + String(lunar.day).padStart(2, '0');
+    let festivals = FAITH_FESTIVALS[key];
     if (festivals && festivals.length > 0) {
-      var f = festivals[0];
-      var icon = f.school === 'fo' ? '🪷' : (f.school === 'dao' ? '☯️' : '📖');
-      var color = f.school === 'fo' ? '#c0392b' : (f.school === 'dao' ? '#27ae60' : '#c9a84c');
+      let f = festivals[0];
+      let icon = f.school === 'fo' ? '🪷' : (f.school === 'dao' ? '☯️' : '📖');
+      let color = f.school === 'fo' ? '#c0392b' : (f.school === 'dao' ? '#27ae60' : '#c9a84c');
       if (offset === 0) {
         html += '<div><b style="color:' + color + '">' + icon + ' ' + f.name + '</b></div>';
         html += '<div style="color:#888;font-size:12px">' + f.temple + ' · ' + f.activity + '</div>';
         html += '<div style="color:#888;font-size:12px">' + f.desc + '</div>';
       } else {
-        var dayStr = offset === 1 ? '明天' : (offset === 2 ? '后天' : offset + '天后');
+        let dayStr = offset === 1 ? '明天' : (offset === 2 ? '后天' : offset + '天后');
         html += '<div>📢 <b>' + dayStr + '：</b>' + icon + ' <b style="color:' + color + '">' + f.name + '</b></div>';
         html += '<div style="color:#888;font-size:12px">' + f.temple + ' · ' + f.activity + '</div>';
       }
@@ -1568,18 +1568,18 @@ function updateH5FaithFestival() {
 
 // ─── H5 年末仪式 ───
 function updateH5YearEndRitual() {
-  var card = document.getElementById('h5YearEndRitualCard');
-  var el = document.getElementById('h5YearEndRitual');
+  let card = document.getElementById('h5YearEndRitualCard');
+  let el = document.getElementById('h5YearEndRitual');
   if (!card || !el) return;
   if (typeof ZODIAC_YEAR_END_RITUALS === 'undefined') return;
   
   // 判断是否在腊月（农历十二月）显示
-  var now = new Date();
-  var lunar = solarToLunar(now.getFullYear(), now.getMonth() + 1, now.getDate());
+  let now = new Date();
+  let lunar = solarToLunar(now.getFullYear(), now.getMonth() + 1, now.getDate());
   if (!lunar) return;
   
   // 农历十一月（冬月）下旬以后就显示
-  var isYearEnd = (lunar.month === 11 && lunar.day >= 20) || lunar.month === 12;
+  let isYearEnd = (lunar.month === 11 && lunar.day >= 20) || lunar.month === 12;
   if (!isYearEnd) {
     card.style.display = 'none';
     return;
@@ -1588,12 +1588,12 @@ function updateH5YearEndRitual() {
   card.style.display = '';
   
   // 获取用户生肖
-  var user = getUser();
-  var zodiac = user.zodiac || '';
+  let user = getUser();
+  let zodiac = user.zodiac || '';
   if (!zodiac) {
     // 尝试从生辰推算
     if (user.birthYear) {
-      var zodiacList = ['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
+      let zodiacList = ['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
       zodiac = zodiacList[(user.birthYear - 4) % 12] || '';
     }
   }
@@ -1602,13 +1602,13 @@ function updateH5YearEndRitual() {
     return;
   }
   
-  var data = ZODIAC_YEAR_END_RITUALS[zodiac];
+  let data = ZODIAC_YEAR_END_RITUALS[zodiac];
   if (!data) {
     el.innerHTML = '<div style="color:#888">暂无' + zodiac + '生肖的年末建议</div>';
     return;
   }
   
-  var html = '<div style="margin-bottom:8px"><b style="color:var(--gold)">👤 生肖：' + zodiac + '</b></div>';
+  let html = '<div style="margin-bottom:8px"><b style="color:var(--gold)">👤 生肖：' + zodiac + '</b></div>';
   html += '<div style="margin-bottom:6px"><b>📋 年终仪式：</b></div>';
   data.rituals.forEach(function(r) {
     html += '<div style="margin-bottom:6px;padding-left:12px">';
@@ -1647,15 +1647,15 @@ function loadDailyQuote() {
 // ─── 三元九运免费解读 ───
 function initSanyuanFreeGuide() {
   if (typeof getCurrentYuanYun === 'undefined') return;
-  var now = new Date();
-  var yy = getCurrentYuanYun(now.getFullYear());
+  let now = new Date();
+  let yy = getCurrentYuanYun(now.getFullYear());
   document.getElementById('sanyuanTitle').textContent = yy.name + ' (' + yy.periodInThisCycle.split('-')[0] + '-' + (parseInt(yy.periodInThisCycle.split('-')[0]) + 19) + ')';
   document.getElementById('sanyuanYearInfo').textContent = '当前大运第 ' + yy.yunYear + ' 年 / 共20年';
   if (typeof JIU_ZI_LI_HUO_GUIDE !== 'undefined' && JIU_ZI_LI_HUO_GUIDE.overview) {
     document.getElementById('sanyuanOverview').textContent = JIU_ZI_LI_HUO_GUIDE.overview;
   }
   // 检查是否已存生日
-  var data = getData();
+  let data = getData();
   if (data.user && data.user.sanyuanBirth) {
     document.getElementById('sanyuanBirthInput').value = data.user.sanyuanBirth;
     calcSanyuanDayMaster();
@@ -1663,27 +1663,27 @@ function initSanyuanFreeGuide() {
 }
 
 function calcSanyuanDayMaster() {
-  var birthStr = document.getElementById('sanyuanBirthInput').value;
+  let birthStr = document.getElementById('sanyuanBirthInput').value;
   if (!birthStr) { showTip('请输入出生日期'); return; }
-  var parts = birthStr.split('-');
-  var year = parseInt(parts[0]);
-  var month = parseInt(parts[1]);
-  var day = parseInt(parts[2]);
+  let parts = birthStr.split('-');
+  let year = parseInt(parts[0]);
+  let month = parseInt(parts[1]);
+  let day = parseInt(parts[2]);
   if (!year || !month || !day) { showTip('日期格式不正确'); return; }
 
   // 保存到用户数据
-  var data = getData();
+  let data = getData();
   if (!data.user) data.user = {};
   data.user.sanyuanBirth = birthStr;
   saveData(data);
 
   // 计算日主天干
-  var dayStem = _calcDayStem(year, month, day);
-  var dayMasterFull = _getDayMasterFull(dayStem);
+  let dayStem = _calcDayStem(year, month, day);
+  let dayMasterFull = _getDayMasterFull(dayStem);
 
-  var guide = (typeof JIU_ZI_LI_HUO_GUIDE !== 'undefined' && JIU_ZI_LI_HUO_GUIDE.byDayMaster) ? JIU_ZI_LI_HUO_GUIDE.byDayMaster[dayMasterFull] : null;
+  let guide = (typeof JIU_ZI_LI_HUO_GUIDE !== 'undefined' && JIU_ZI_LI_HUO_GUIDE.byDayMaster) ? JIU_ZI_LI_HUO_GUIDE.byDayMaster[dayMasterFull] : null;
 
-  var html = '<div style="margin-bottom:6px"><b style="color:var(--gold)">您的日主：' + dayMasterFull + '</b></div>';
+  let html = '<div style="margin-bottom:6px"><b style="color:var(--gold)">您的日主：' + dayMasterFull + '</b></div>';
   if (guide) {
     html += '<div style="margin-bottom:4px"><span style="color:var(--paper3)">事业：</span>' + guide.career + '</div>';
     html += '<div style="margin-bottom:4px"><span style="color:var(--paper3)">方位：</span>' + guide.direction + '</div>';
@@ -1703,16 +1703,16 @@ function calcSanyuanDayMaster() {
 function _calcDayStem(year, month, day) {
   // 基准: 1900-01-01 = 甲戌日 (甲=1)
   // 实际: 1900-01-01 的干支为甲戌日，日干为甲
-  var baseDate = new Date(1900, 0, 1);
-  var targetDate = new Date(year, month - 1, day);
-  var diffDays = Math.floor((targetDate - baseDate) / 86400000);
-  var stemIdx = ((diffDays % 10) + 10) % 10;
-  var stems = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  let baseDate = new Date(1900, 0, 1);
+  let targetDate = new Date(year, month - 1, day);
+  let diffDays = Math.floor((targetDate - baseDate) / 86400000);
+  let stemIdx = ((diffDays % 10) + 10) % 10;
+  let stems = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
   return stems[stemIdx];
 }
 
 // ─── 附近道场推荐 ───
-var TEMPLE_BY_REGION = {
+let TEMPLE_BY_REGION = {
   '北京': ['北京白云观','雍和宫','戒台寺'],
   '上海': ['龙华寺','静安寺','玉佛寺','城隍庙'],
   '天津': ['大悲院','独乐寺'],
@@ -1747,7 +1747,7 @@ var TEMPLE_BY_REGION = {
 };
 
 // 城市→省份映射
-var CITY_TO_REGION = {
+let CITY_TO_REGION = {
   '北京':'北京','上海':'上海','天津':'天津','重庆':'重庆',
   '杭州':'浙江','宁波':'浙江','温州':'浙江','绍兴':'浙江','嘉兴':'浙江','金华':'浙江','舟山':'浙江','台州':'浙江','湖州':'浙江','丽水':'浙江','衢州':'浙江','义乌':'浙江',
   '成都':'四川','绵阳':'四川','德阳':'四川','南充':'四川','宜宾':'四川','泸州':'四川','乐山':'四川','自贡':'四川','内江':'四川','遂宁':'四川',
@@ -1779,7 +1779,7 @@ var CITY_TO_REGION = {
 };
 
 // 道场详情数据（复用 divination-core.js 中的数据 + 补充）
-var TEMPLE_DATABASE = [
+let TEMPLE_DATABASE = [
   {type:'☯️ 道观', name:'北京白云观', location:'北京市西城区白云观街', deity:'全真列祖', bestFor:'化解太岁、求财、求学', route:'太岁殿→文昌殿→财神殿', region:'北京'},
   {type:'🪷 寺庙', name:'雍和宫', location:'北京市东城区', deity:'格鲁派佛尊', bestFor:'求财、化解小人、求学', route:'天王殿→雍和宫殿→万福阁', region:'北京'},
   {type:'🪷 寺庙', name:'戒台寺', location:'北京市门头沟区', deity:'释迦牟尼', bestFor:'祈福、戒律清净', route:'山门→戒坛→大雄宝殿', region:'北京'},
@@ -1833,11 +1833,11 @@ function recommendNearbyTemples(location) {
   location = location.trim();
 
   // 1. 精确匹配城市→省份
-  var region = CITY_TO_REGION[location];
+  let region = CITY_TO_REGION[location];
 
   // 2. 模糊匹配
   if (!region) {
-    for (var city in CITY_TO_REGION) {
+    for (let city in CITY_TO_REGION) {
       if (location.indexOf(city) >= 0 || city.indexOf(location) >= 0) {
         region = CITY_TO_REGION[city];
         break;
@@ -1847,7 +1847,7 @@ function recommendNearbyTemples(location) {
 
   // 3. 省份直接匹配
   if (!region) {
-    for (var prov in TEMPLE_BY_REGION) {
+    for (let prov in TEMPLE_BY_REGION) {
       if (location.indexOf(prov) >= 0 || prov.indexOf(location) >= 0) {
         region = prov;
         break;
@@ -1855,10 +1855,10 @@ function recommendNearbyTemples(location) {
     }
   }
 
-  var results = [];
+  let results = [];
   if (region) {
     // 从道场数据库中筛选该省份的道场
-    for (var i = 0; i < TEMPLE_DATABASE.length; i++) {
+    for (let i = 0; i < TEMPLE_DATABASE.length; i++) {
       if (TEMPLE_DATABASE[i].region === region) {
         results.push(TEMPLE_DATABASE[i]);
       }
@@ -1867,9 +1867,9 @@ function recommendNearbyTemples(location) {
 
   // 如果没有匹配，返回全国知名道场前5
   if (results.length === 0) {
-    var famous = ['北京白云观','普陀山南海观音','五台山文殊寺','武当山紫霄宫','灵隐寺'];
-    for (var j = 0; j < famous.length; j++) {
-      for (var k = 0; k < TEMPLE_DATABASE.length; k++) {
+    let famous = ['北京白云观','普陀山南海观音','五台山文殊寺','武当山紫霄宫','灵隐寺'];
+    for (let j = 0; j < famous.length; j++) {
+      for (let k = 0; k < TEMPLE_DATABASE.length; k++) {
         if (TEMPLE_DATABASE[k].name === famous[j]) {
           results.push(TEMPLE_DATABASE[k]);
           break;
@@ -1882,11 +1882,11 @@ function recommendNearbyTemples(location) {
 }
 
 function recommendNearbyTemplesH5() {
-  var input = document.getElementById('templeLocationInput').value.trim();
+  let input = document.getElementById('templeLocationInput').value.trim();
   if (!input) { showTip('请输入城市名'); return; }
 
-  var temples = recommendNearbyTemples(input);
-  var el = document.getElementById('templeRecommendResult');
+  let temples = recommendNearbyTemples(input);
+  let el = document.getElementById('templeRecommendResult');
 
   if (temples.length === 0) {
     el.innerHTML = '<div style="color:var(--paper3);font-size:12px">暂无该地区道场数据</div>';
@@ -1894,11 +1894,11 @@ function recommendNearbyTemplesH5() {
     return;
   }
 
-  var region = CITY_TO_REGION[input] || input;
-  var html = '<div style="font-size:12px;color:var(--gold);margin-bottom:8px">📍 ' + (region ? region + '附近' : '全国') + '推荐道场（共' + temples.length + '座）</div>';
+  let region = CITY_TO_REGION[input] || input;
+  let html = '<div style="font-size:12px;color:var(--gold);margin-bottom:8px">📍 ' + (region ? region + '附近' : '全国') + '推荐道场（共' + temples.length + '座）</div>';
   html += '<div style="display:flex;flex-direction:column;gap:8px">';
-  for (var i = 0; i < temples.length; i++) {
-    var t = temples[i];
+  for (let i = 0; i < temples.length; i++) {
+    let t = temples[i];
     html += '<div style="padding:10px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.1);border-radius:8px">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
     html += '<span style="font-size:13px;color:var(--gold);font-weight:600">' + t.type + ' ' + t.name + '</span>';
@@ -1944,22 +1944,22 @@ function recommendNearbyTemplesH5() {
  * 初始化年度预测卡片（页面加载时调用）
  */
 function initAnnualForecastCard() {
-  var now = new Date();
-  var month = now.getMonth() + 1;
-  var card = document.getElementById('annualForecastCard');
+  let now = new Date();
+  let month = now.getMonth() + 1;
+  let card = document.getElementById('annualForecastCard');
   if (!card) return;
 
   // 12月自动显示推送卡片
   if (month === 12) {
-    var targetYear = now.getFullYear() + 1;
-    var titleEl = document.getElementById('annualForecastTitle');
-    var descEl = document.getElementById('annualForecastDesc');
+    let targetYear = now.getFullYear() + 1;
+    let titleEl = document.getElementById('annualForecastTitle');
+    let descEl = document.getElementById('annualForecastDesc');
     if (titleEl) titleEl.textContent = '📋 ' + targetYear + '年年度预测报告';
     if (descEl) descEl.textContent = '提前了解' + targetYear + '年运程走向 · 12维度深度分析';
 
     // 检查推送状态
     if (typeof checkAnnualForecastPush === 'function') {
-      var pushResult = checkAnnualForecastPush();
+      let pushResult = checkAnnualForecastPush();
       if (pushResult.shouldPush && pushResult.message) {
         if (descEl) descEl.textContent = pushResult.message;
       }
@@ -1967,7 +1967,7 @@ function initAnnualForecastCard() {
     card.style.display = 'block';
   } else {
     // 非12月：如果有已生成的报告也可查看
-    var savedReport = localStorage.getItem('annual_forecast_report');
+    let savedReport = localStorage.getItem('annual_forecast_report');
     if (savedReport) {
       card.style.display = 'block';
     } else {
@@ -1980,27 +1980,27 @@ function initAnnualForecastCard() {
  * 打开年度预测报告
  */
 function openAnnualForecast() {
-  var user = getUser();
-  var isSuper = isSuperUser();
-  var targetYear = new Date().getFullYear() + 1;
+  let user = getUser();
+  let isSuper = isSuperUser();
+  let targetYear = new Date().getFullYear() + 1;
 
   // 尝试从缓存读取
-  var cacheKey = 'annual_forecast_report_' + targetYear;
-  var cached = null;
+  let cacheKey = 'annual_forecast_report_' + targetYear;
+  let cached = null;
   try {
     cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
   } catch(e) {}
 
-  var forecast = cached;
+  let forecast = cached;
 
   if (!forecast) {
     // 需要用户出生信息
-    var userData = getData();
-    var birthYear = userData.user && userData.user.birthYear ? userData.user.birthYear : null;
-    var birthMonth = userData.user && userData.user.birthMonth ? userData.user.birthMonth : null;
-    var birthDay = userData.user && userData.user.birthDay ? userData.user.birthDay : null;
-    var birthHour = userData.user && userData.user.birthHour ? userData.user.birthHour : null;
-    var sex = userData.user && userData.user.sex ? userData.user.sex : 'male';
+    let userData = getData();
+    let birthYear = userData.user && userData.user.birthYear ? userData.user.birthYear : null;
+    let birthMonth = userData.user && userData.user.birthMonth ? userData.user.birthMonth : null;
+    let birthDay = userData.user && userData.user.birthDay ? userData.user.birthDay : null;
+    let birthHour = userData.user && userData.user.birthHour ? userData.user.birthHour : null;
+    let sex = userData.user && userData.user.sex ? userData.user.sex : 'male';
 
     if (!birthYear || !birthMonth || !birthDay) {
       // 没有出生信息，提示用户先排盘
@@ -2026,12 +2026,12 @@ function openAnnualForecast() {
   }
 
   // 根据会员等级控制可见度
-  var accessResult = getAnnualForecastWithAccess({
+  let accessResult = getAnnualForecastWithAccess({
     isSuper: isSuper,
     vipLevel: user.vipLevel || 'free'
   }, forecast);
 
-  var html = renderAnnualForecastHTML(forecast, accessResult.visibleCount, accessResult.accessLevel);
+  let html = renderAnnualForecastHTML(forecast, accessResult.visibleCount, accessResult.accessLevel);
 
   showResult('📋 ' + targetYear + '年年度预测报告', html);
 }
@@ -2042,10 +2042,10 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ════════ AI命理助手 ════════
-var aiChatHistory = [];
-var aiCurrentVoice = 'female';
-var aiAudio = null;
-var aiLastReply = '';
+let aiChatHistory = [];
+let aiCurrentVoice = 'female';
+let aiAudio = null;
+let aiLastReply = '';
 
 function aiSetVoice(v){aiCurrentVoice = v;}
 
@@ -2055,23 +2055,23 @@ function aiQuickAsk(q){
 }
 
 async function aiSendMsg(){
-  var input = document.getElementById('aiInput');
-  var q = input.value.trim();
+  let input = document.getElementById('aiInput');
+  let q = input.value.trim();
   if(!q) return;
   input.value = '';
   
-  var area = document.getElementById('aiChatArea');
+  let area = document.getElementById('aiChatArea');
   // 清空欢迎语
   if(aiChatHistory.length === 0) area.innerHTML = '';
   
   // 用户气泡
-  var userDiv = document.createElement('div');
+  let userDiv = document.createElement('div');
   userDiv.className = 'ai-bubble-user';
   userDiv.textContent = q;
   area.appendChild(userDiv);
   
   // 打字指示
-  var typingDiv = document.createElement('div');
+  let typingDiv = document.createElement('div');
   typingDiv.className = 'ai-bubble-bot';
   typingDiv.id = 'aiTyping';
   typingDiv.innerHTML = '<div class="ai-label">🤖 AI命理助手</div><span class="ai-typing"></span><span class="ai-typing"></span><span class="ai-typing"></span>';
@@ -2082,22 +2082,22 @@ async function aiSendMsg(){
   
   try{
     // 收集上下文（最近5轮）
-    var ctx = aiChatHistory.slice(-10);
-    var sysMsg = {role:'system', content:'你是易道智鉴的AI命理助手。用户可能在手机上使用，回答要简洁易懂，避免过长。涉及命理、风水、中医、养生等问题时，给出实用建议。提醒用户理性参考。'};
+    let ctx = aiChatHistory.slice(-10);
+    let sysMsg = {role:'system', content:'你是易道智鉴的AI命理助手。用户可能在手机上使用，回答要简洁易懂，避免过长。涉及命理、风水、中医、养生等问题时，给出实用建议。提醒用户理性参考。'};
     
-    var resp = await fetch('/v1/chat/completions', {
+    let resp = await fetch('/v1/chat/completions', {
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer sk-g2claw-default'},
       body:JSON.stringify({model:'auto',messages:[sysMsg].concat(ctx),max_tokens:800,temperature:0.7})
     });
     
     if(!resp.ok) throw new Error('API '+resp.status);
-    var data = await resp.json();
-    var reply = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '抱歉，暂时无法回答，请稍后再试。';
+    let data = await resp.json();
+    let reply = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '抱歉，暂时无法回答，请稍后再试。';
     
     typingDiv.remove();
     
-    var botDiv = document.createElement('div');
+    let botDiv = document.createElement('div');
     botDiv.className = 'ai-bubble-bot';
     botDiv.innerHTML = '<div class="ai-label">🤖 AI命理助手</div>' + aiFmtText(reply) + '<div style="margin-top:6px;display:flex;gap:6px"><button class="ai-quick-btn" onclick="aiReadLast()" style="font-size:10px;padding:3px 8px">🔊 朗读</button></div>';
     area.appendChild(botDiv);
@@ -2115,7 +2115,7 @@ async function aiSendMsg(){
     }
   }catch(err){
     typingDiv.remove();
-    var errDiv = document.createElement('div');
+    let errDiv = document.createElement('div');
     errDiv.className = 'ai-bubble-bot';
     errDiv.innerHTML = '<div class="ai-label">🤖 AI命理助手</div>⚠️ 网络不稳定，请稍后重试。<br><span style="font-size:11px;color:var(--paper3)">'+(err.message||'')+'</span>';
     area.appendChild(errDiv);
@@ -2140,9 +2140,9 @@ function aiClearChat(){
 function aiReadLast(){
   if(!aiLastReply) return;
   aiStopRead();
-  var voice = aiCurrentVoice;
-  var voiceMap = {female:'zh-CN-XiaoxiaoNeural', male:'zh-CN-YunyangNeural', female2:'zh-CN-XiaochenNeural', male2:'zh-CN-YunfengNeural'};
-  var url = '/api/tts?text=' + encodeURIComponent(aiLastReply.substring(0,500)) + '&voice=' + (voiceMap[voice]||voice);
+  let voice = aiCurrentVoice;
+  let voiceMap = {female:'zh-CN-XiaoxiaoNeural', male:'zh-CN-YunyangNeural', female2:'zh-CN-XiaochenNeural', male2:'zh-CN-YunfengNeural'};
+  let url = '/api/tts?text=' + encodeURIComponent(aiLastReply.substring(0,500)) + '&voice=' + (voiceMap[voice]||voice);
   aiAudio = new Audio(url);
   aiAudio.onended = function(){aiAudio = null;};
   aiAudio.onerror = function(){aiAudio = null;};
@@ -2154,12 +2154,12 @@ function aiStopRead(){
 }
 
 function aiVoiceInput(){
-  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if(!SR){
     showToast('您的浏览器不支持语音输入，请使用Chrome或Safari','warning');
     return;
   }
-  var micBtn = document.getElementById('aiMicBtn');
+  let micBtn = document.getElementById('aiMicBtn');
   if(micBtn.dataset.listening === '1'){
     if(window._aiRecog) window._aiRecog.stop();
     return;
@@ -2168,17 +2168,17 @@ function aiVoiceInput(){
   micBtn.style.background = 'rgba(231,76,60,0.2)';
   micBtn.innerHTML = '🔴';
   
-  var r = new SR();
+  let r = new SR();
   window._aiRecog = r;
   r.lang = 'zh-CN';
   r.continuous = false;
   r.interimResults = true;
-  var finalText = '';
-  var input = document.getElementById('aiInput');
+  let finalText = '';
+  let input = document.getElementById('aiInput');
   
   r.onresult = function(e){
-    var interim = '';
-    for(var i=e.resultIndex;i<e.results.length;i++){
+    let interim = '';
+    for(let i=e.resultIndex;i<e.results.length;i++){
       if(e.results[i].isFinal) finalText += e.results[i][0].transcript;
       else interim += e.results[i][0].transcript;
     }
@@ -2206,7 +2206,7 @@ document.getElementById('aiInput').addEventListener('keydown', function(e){
 });
 
 // ════════ 各Tab场景化AI入口 ════════
-var AI_CTX_PROMPTS = {
+let AI_CTX_PROMPTS = {
   tools: '用户在排盘页面提问，可能是关于八字/紫微/奇门等排盘结果的解读需求。请用简洁语言解释命理术语。',
   life: '用户在生活页面提问，可能是关于选号、取名、择日、风水布局等日常应用。请给实用建议。',
   knowledge: '用户在知识页面提问，可能是关于命理基础知识、中医理论、经典文献等。请用通俗语言解释。',
@@ -2217,18 +2217,18 @@ var AI_CTX_PROMPTS = {
 };
 
 function aiSendFromCtx(ctx){
-  var input = document.getElementById('aiInput_' + ctx);
+  let input = document.getElementById('aiInput_' + ctx);
   if(!input || !input.value.trim()) return;
-  var q = input.value.trim();
+  let q = input.value.trim();
   input.value = '';
   
   // 跳转到AI助手tab
-  var aiTab = document.querySelector('[onclick="switchTab(\'ai\',this)"]');
+  let aiTab = document.querySelector('[onclick="switchTab(\'ai\',this)"]');
   if(aiTab) aiTab.click();
   
   // 填入问题并发送
   setTimeout(function(){
-    var aiInput = document.getElementById('aiInput');
+    let aiInput = document.getElementById('aiInput');
     if(aiInput){
       aiInput.value = q;
       aiSendMsgWithContext(ctx);
@@ -2237,20 +2237,20 @@ function aiSendFromCtx(ctx){
 }
 
 async function aiSendMsgWithContext(ctx){
-  var input = document.getElementById('aiInput');
-  var q = input.value.trim();
+  let input = document.getElementById('aiInput');
+  let q = input.value.trim();
   if(!q) return;
   input.value = '';
   
-  var area = document.getElementById('aiChatArea');
+  let area = document.getElementById('aiChatArea');
   if(aiChatHistory.length === 0) area.innerHTML = '';
   
-  var userDiv = document.createElement('div');
+  let userDiv = document.createElement('div');
   userDiv.className = 'ai-bubble-user';
   userDiv.textContent = q;
   area.appendChild(userDiv);
   
-  var typingDiv = document.createElement('div');
+  let typingDiv = document.createElement('div');
   typingDiv.className = 'ai-bubble-bot';
   typingDiv.id = 'aiTyping';
   typingDiv.innerHTML = '<div class="ai-label">🤖 AI命理助手</div><span class="ai-typing"></span><span class="ai-typing"></span><span class="ai-typing"></span>';
@@ -2260,23 +2260,23 @@ async function aiSendMsgWithContext(ctx){
   aiChatHistory.push({role:'user', content:q});
   
   try{
-    var ctxPrompt = AI_CTX_PROMPTS[ctx] || '';
-    var sysMsg = {role:'system', content:'你是易道智鉴的AI命理助手。用户可能在手机上使用，回答要简洁易懂，避免过长。' + ctxPrompt + '涉及命理、风水、中医、养生等问题时，给出实用建议。提醒用户理性参考。'};
-    var chatCtx = aiChatHistory.slice(-10);
+    let ctxPrompt = AI_CTX_PROMPTS[ctx] || '';
+    let sysMsg = {role:'system', content:'你是易道智鉴的AI命理助手。用户可能在手机上使用，回答要简洁易懂，避免过长。' + ctxPrompt + '涉及命理、风水、中医、养生等问题时，给出实用建议。提醒用户理性参考。'};
+    let chatCtx = aiChatHistory.slice(-10);
     
-    var resp = await fetch('/v1/chat/completions', {
+    let resp = await fetch('/v1/chat/completions', {
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'***'},
       body:JSON.stringify({model:'auto',messages:[sysMsg].concat(chatCtx),max_tokens:800,temperature:0.7})
     });
     
     if(!resp.ok) throw new Error('API '+resp.status);
-    var data = await resp.json();
-    var reply = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '抱歉，暂时无法回答，请稍后再试。';
+    let data = await resp.json();
+    let reply = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '抱歉，暂时无法回答，请稍后再试。';
     
     typingDiv.remove();
     
-    var botDiv = document.createElement('div');
+    let botDiv = document.createElement('div');
     botDiv.className = 'ai-bubble-bot';
     botDiv.innerHTML = '<div class="ai-label">🤖 AI命理助手</div>' + aiFmtText(reply) + '<div style="margin-top:6px;display:flex;gap:6px"><button class="ai-quick-btn" onclick="aiReadLast()" style="font-size:10px;padding:3px 8px">🔊 朗读</button></div>';
     area.appendChild(botDiv);
@@ -2287,7 +2287,7 @@ async function aiSendMsgWithContext(ctx){
     if(aiChatHistory.length > 40) aiChatHistory = aiChatHistory.slice(-40);
   }catch(err){
     typingDiv.remove();
-    var errDiv = document.createElement('div');
+    let errDiv = document.createElement('div');
     errDiv.className = 'ai-bubble-bot';
     errDiv.innerHTML = '<div class="ai-label">🤖 AI命理助手</div>⚠️ 网络不稳定，请稍后重试。<br><span style="font-size:11px;color:var(--paper3)">'+(err.message||'')+'</span>';
     area.appendChild(errDiv);
@@ -2311,16 +2311,16 @@ async function aiSendMsgWithContext(ctx){
 
 <script>
 // 修改 openTool：用 iframe 嵌入而非跳转
-var origOpenTool = openTool;
+let origOpenTool = openTool;
 openTool = function(toolKey) {
   // 手机验证弹窗（非阻塞：不阻止用户使用）
   ensurePhone();
   
-  var config = TOOL_CONFIG[toolKey];
+  let config = TOOL_CONFIG[toolKey];
   if (!config) return;
   
   // 检查使用权限
-  var check = checkUsage(toolKey);
+  let check = checkUsage(toolKey);
   if (!check.allowed) {
     if (check.reason === 'paid') {
       document.getElementById('limitMsg').innerHTML = config.name + '为会员专属功能。<br>开通会员即可解锁全部工具。';
@@ -2335,15 +2335,15 @@ openTool = function(toolKey) {
   recordUsage(toolKey);
   
   // 构建 URL
-  var url = 'divination-hub.html#section-' + config.section;
+  let url = 'divination-hub.html#section-' + config.section;
   if (config.subTab) {
     url += '?sub=' + config.subTab;
   }
   
   // 在 iframe 中打开
-  var panel = document.getElementById('toolPanel');
-  var frame = document.getElementById('toolFrame');
-  var title = document.getElementById('toolPanelTitle');
+  let panel = document.getElementById('toolPanel');
+  let frame = document.getElementById('toolFrame');
+  let title = document.getElementById('toolPanelTitle');
   title.textContent = config.name;
   frame.src = url;
   panel.style.display = 'block';
@@ -2351,38 +2351,38 @@ openTool = function(toolKey) {
   // iframe加载完成后注入overlay清理脚本
   frame.onload = function() {
     try {
-      var doc = frame.contentDocument || frame.contentWindow.document;
+      let doc = frame.contentDocument || frame.contentWindow.document;
       // 注入三重保险：2秒后强制移除loading overlay
-      var script = doc.createElement('script');
-      script.textContent = '\n        function removeLoadingOverlay(){\n          var ov=document.getElementById(\'loading-overlay\');\n          if(ov) ov.remove();\n          var ov2=document.getElementById(\'loadingOverlay\');\n          if(ov2) ov2.classList.remove(\'visible\');\n        }\n        setTimeout(removeLoadingOverlay,1500);\n        setTimeout(removeLoadingOverlay,3000);\n        setTimeout(removeLoadingOverlay,5000);\n      ';
+      let script = doc.createElement('script');
+      script.textContent = '\n        function removeLoadingOverlay(){\n          let ov=document.getElementById(\'loading-overlay\');\n          if(ov) ov.remove();\n          let ov2=document.getElementById(\'loadingOverlay\');\n          if(ov2) ov2.classList.remove(\'visible\');\n        }\n        setTimeout(removeLoadingOverlay,1500);\n        setTimeout(removeLoadingOverlay,3000);\n        setTimeout(removeLoadingOverlay,5000);\n      ';
       doc.body.appendChild(script);
     } catch(e) { console.warn('iframe注入失败:', e); }
   };
 };
 
 function closeToolPanel() {
-  var panel = document.getElementById('toolPanel');
+  let panel = document.getElementById('toolPanel');
   panel.style.display = 'none';
   document.getElementById('toolFrame').src = 'about:blank';
   document.body.style.overflow = '';
 }
 
 // 修改 openKnowledge：也用 iframe
-var origOpenKnowledge = openKnowledge;
+let origOpenKnowledge = openKnowledge;
 openKnowledge = function(type) {
-  var urlMap = {
+  let urlMap = {
     'knowledge': 'divination-hub.html#section-more?sub=knowledge',
     'koujue': 'divination-hub.html#section-more?sub=koujue',
     'quotes': 'divination-hub.html#section-more?sub=knowledge',
     'scripture': 'divination-hub.html#section-more?sub=faith',
     'music': 'divination-hub.html#section-more?sub=faith'
   };
-  var url = urlMap[type] || 'divination-hub.html#section-more';
-  var nameMap = {knowledge:'知识库',koujue:'口诀宝库',quotes:'智慧语录',scripture:'经典朗读',music:'梵音音乐'};
+  let url = urlMap[type] || 'divination-hub.html#section-more';
+  let nameMap = {knowledge:'知识库',koujue:'口诀宝库',quotes:'智慧语录',scripture:'经典朗读',music:'梵音音乐'};
   
-  var panel = document.getElementById('toolPanel');
-  var frame = document.getElementById('toolFrame');
-  var title = document.getElementById('toolPanelTitle');
+  let panel = document.getElementById('toolPanel');
+  let frame = document.getElementById('toolFrame');
+  let title = document.getElementById('toolPanelTitle');
   title.textContent = nameMap[type] || '知识';
   frame.src = url;
   panel.style.display = 'block';
@@ -2390,9 +2390,9 @@ openKnowledge = function(type) {
 };
 
 // 修改 openHealth：也用 iframe
-var origOpenHealth = openHealth;
+let origOpenHealth = openHealth;
 openHealth = function(type) {
-  var urlMap = {
+  let urlMap = {
     'tizhi': 'divination-hub.html#section-more?sub=tizhi',
     'shiliao': 'divination-hub.html#section-more?sub=tizhi',
     'gongfa': 'divination-hub.html#section-more?sub=tizhi',
@@ -2400,12 +2400,12 @@ openHealth = function(type) {
     'mingfang': 'divination-hub.html#section-more?sub=tizhi',
     'shichen': 'divination-hub.html#section-more?sub=faith'
   };
-  var url = urlMap[type] || 'divination-hub.html#section-more?sub=tizhi';
-  var nameMap = {tizhi:'体质辨识',shiliao:'食疗方案',gongfa:'功法锻炼',jieqi:'节气养生',mingfang:'名医名方',shichen:'时辰养生'};
+  let url = urlMap[type] || 'divination-hub.html#section-more?sub=tizhi';
+  let nameMap = {tizhi:'体质辨识',shiliao:'食疗方案',gongfa:'功法锻炼',jieqi:'节气养生',mingfang:'名医名方',shichen:'时辰养生'};
   
-  var panel = document.getElementById('toolPanel');
-  var frame = document.getElementById('toolFrame');
-  var title = document.getElementById('toolPanelTitle');
+  let panel = document.getElementById('toolPanel');
+  let frame = document.getElementById('toolFrame');
+  let title = document.getElementById('toolPanelTitle');
   title.textContent = nameMap[type] || '养生';
   frame.src = url;
   panel.style.display = 'block';
@@ -2413,19 +2413,19 @@ openHealth = function(type) {
 };
 
 // 修改 openPractice：也用 iframe
-var origOpenPractice = openPractice;
+let origOpenPractice = openPractice;
 openPractice = function(type) {
-  var urlMap = {
+  let urlMap = {
     'faith': 'divination-hub.html#section-more?sub=faith',
     'merit': 'divination-hub.html#section-more?sub=faith',
     'guide': 'divination-hub.html#section-more?sub=faith'
   };
-  var url = urlMap[type] || 'divination-hub.html#section-more?sub=faith';
-  var nameMap = {faith:'信众中心',merit:'功德修行',guide:'参拜指南'};
+  let url = urlMap[type] || 'divination-hub.html#section-more?sub=faith';
+  let nameMap = {faith:'信众中心',merit:'功德修行',guide:'参拜指南'};
   
-  var panel = document.getElementById('toolPanel');
-  var frame = document.getElementById('toolFrame');
-  var title = document.getElementById('toolPanelTitle');
+  let panel = document.getElementById('toolPanel');
+  let frame = document.getElementById('toolFrame');
+  let title = document.getElementById('toolPanelTitle');
   title.textContent = nameMap[type] || '修行';
   frame.src = url;
   panel.style.display = 'block';
@@ -2434,7 +2434,7 @@ openPractice = function(type) {
 
 // Android 返回键关闭面板
 window.addEventListener('popstate', function(e) {
-  var panel = document.getElementById('toolPanel');
+  let panel = document.getElementById('toolPanel');
   if (panel && panel.style.display === 'block') {
     closeToolPanel();
     e.preventDefault();

@@ -6,8 +6,8 @@
   'use strict';
 
   // ===== 全局变量别名映射 =====
-  var FK = window.FAITH_KNOWLEDGE || {};
-  var SD = window.SCRIPTURE_DATABASE || { getById: function(){return null;} };
+  let FK = window.FAITH_KNOWLEDGE || {};
+  let SD = window.SCRIPTURE_DATABASE || { getById: function(){return null;} };
   // VR (VoiceReader) 在 voice-reader.js 中导出，延迟引用
 
   const COLORS = {
@@ -51,19 +51,19 @@
     _currentFaith = faith;
     _currentModule = 'deities'; // 默认打开"神仙殿堂"
 
-    var container = document.getElementById('faithContent');
+    let container = document.getElementById('faithContent');
     if (!container) { console.log('[DEBUG] faithContent 不存在!'); return; }
     container.style.display = 'block'; // 确保容器可见
     console.log('[DEBUG] faithContent 存在，开始渲染...');
 
     ['ru','dao','fo'].forEach(function(f){
-      var panel = document.getElementById('faith-detail-' + f);
+      let panel = document.getElementById('faith-detail-' + f);
       if (panel) panel.style.display = 'none';
     });
 
     // Fallback: 'all' 时默认显示佛学
-    var effectiveFaith = (faith === 'all') ? 'fo' : faith;
-    var panel = document.getElementById('faith-detail-' + effectiveFaith);
+    let effectiveFaith = (faith === 'all') ? 'fo' : faith;
+    let panel = document.getElementById('faith-detail-' + effectiveFaith);
     if (!panel) return;
     panel.style.display = 'block';
 
@@ -78,10 +78,10 @@
   // 完整面板渲染
   // ================================================================
   function renderFullPanel(panel, faith) {
-    var col = COLORS[faith];
+    let col = COLORS[faith];
 
     // 检查是否已渲染过动态内容区
-    var existingWrap = document.getElementById('faith-dynamic-wrap-' + faith);
+    let existingWrap = document.getElementById('faith-dynamic-wrap-' + faith);
     if (existingWrap) {
       // 已存在，只更新导航和内容
       renderFullPanel_reloadNav(panel, faith);
@@ -90,23 +90,23 @@
     }
 
     // 首次渲染：在面板末尾添加动态内容区（不清空原有静态内容）
-    var dynamicWrap = document.createElement('div');
+    let dynamicWrap = document.createElement('div');
     dynamicWrap.id = 'faith-dynamic-wrap-' + faith;
     dynamicWrap.style.cssText = 'padding:0 0 24px;margin-top:20px;border-top:1px solid ' + col.border + ';padding-top:20px';
 
     // 信仰标识
-    var title = document.createElement('div');
+    let title = document.createElement('div');
     title.style.cssText = 'text-align:center;margin:16px 0 8px';
     title.innerHTML = '<span style="font-size:24px">' + {ru:'📚',dao:'☯️',fo:'🪷'}[faith] + '</span><br><span style="font-size:16px;font-family:\'Ma Shan Zheng\',serif;color:' + col.main + ';letter-spacing:4px">' + col.label + '</span>';
     dynamicWrap.appendChild(title);
 
     // 模块导航
-    var nav = document.createElement('div');
+    let nav = document.createElement('div');
     nav.id = 'faith-nav-' + faith;
     nav.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:12px;background:' + col.bg + ';border-radius:12px;margin:0 16px 16px;border:1px solid ' + col.border;
     MODULES.forEach(function(mod) {
-      var btn = document.createElement('button');
-      var isActive = mod.id === _currentModule;
+      let btn = document.createElement('button');
+      let isActive = mod.id === _currentModule;
       btn.style.cssText = 'padding:7px 12px;border-radius:8px;border:1px solid ' + col.border + ';background:' + (isActive ? col.main : 'rgba(255,255,255,0.04)') + ';color:' + (isActive ? '#fff' : col.main) + ';font-size:11px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:3px;min-height:36px';
       btn.textContent = mod.icon + ' ' + mod.label;
       btn.onclick = (function(mid) {
@@ -121,7 +121,7 @@
     dynamicWrap.appendChild(nav);
 
     // 内容区
-    var content = document.createElement('div');
+    let content = document.createElement('div');
     content.id = 'faith-module-wrap-' + faith;
     content.style.cssText = 'padding:0 16px;animation:fadeUp .4s ease';
     dynamicWrap.appendChild(content);
@@ -133,13 +133,13 @@
   }
 
   function renderFullPanel_reloadNav(panel, faith) {
-    var nav = document.getElementById('faith-nav-' + faith);
+    let nav = document.getElementById('faith-nav-' + faith);
     if (!nav) return;
-    var col = COLORS[faith];
+    let col = COLORS[faith];
     nav.innerHTML = '';
     MODULES.forEach(function(mod) {
-      var btn = document.createElement('button');
-      var isActive = mod.id === _currentModule;
+      let btn = document.createElement('button');
+      let isActive = mod.id === _currentModule;
       btn.style.cssText = 'padding:7px 12px;border-radius:8px;border:1px solid ' + col.border + ';background:' + (isActive ? col.main : 'rgba(255,255,255,0.04)') + ';color:' + (isActive ? '#fff' : col.main) + ';font-size:11px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:3px;min-height:36px';
       btn.textContent = mod.icon + ' ' + mod.label;
       btn.onclick = (function(mid) {
@@ -154,7 +154,7 @@
   }
 
   function renderModuleContent(panel, faith, moduleId) {
-    var wrap = document.getElementById('faith-module-wrap-' + faith);
+    let wrap = document.getElementById('faith-module-wrap-' + faith);
     if (!wrap) return;
     wrap.innerHTML = '<div style="text-align:center;padding:24px 0"><div style="color:var(--gold);font-size:24px">⏳</div><div style="color:rgba(255,255,255,0.4);font-size:12px;margin-top:8px">加载中...</div></div>';
     // 异步加载
@@ -195,14 +195,14 @@
       return;
     }
 
-    var faithKey = faith === 'fo' ? 'buddhist' : faith === 'dao' ? 'taoist' : 'confucian';
+    let faithKey = faith === 'fo' ? 'buddhist' : faith === 'dao' ? 'taoist' : 'confucian';
     console.log('[DEBUG] faithKey:', faithKey);
     console.log('[DEBUG] FK.deities[faithKey]:', FK.deities ? FK.deities[faithKey] : 'N/A');
     console.log('[DEBUG] FK.deities[faithKey] length:', FK.deities && FK.deities[faithKey] ? FK.deities[faithKey].length : 'undefined');
     
-    var deities = (FK.deities && FK.deities[faithKey]) ? FK.deities[faithKey] : [];
-    var col = COLORS[faith];
-    var faithLabel = {fo:'佛', dao:'道', ru:'儒'}[faith] || '本';
+    let deities = (FK.deities && FK.deities[faithKey]) ? FK.deities[faithKey] : [];
+    let col = COLORS[faith];
+    let faithLabel = {fo:'佛', dao:'道', ru:'儒'}[faith] || '本';
 
     el.innerHTML = '<div style="text-align:center;margin-bottom:16px">' +
       '<div style="font-size:13px;opacity:.4">共收录</div>' +
@@ -210,7 +210,7 @@
       '<div style="font-size:11px;opacity:.3;margin-top:2px">神仙殿堂 · 珍藏典藏</div>' +
       '</div>';
 
-    var grid = document.createElement('div');
+    let grid = document.createElement('div');
     grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px';
 
     if (!deities.length) {
@@ -219,25 +219,25 @@
     }
 
     deities.forEach(function(d) {
-      var card = document.createElement('div');
+      let card = document.createElement('div');
       card.style.cssText = 'background:linear-gradient(135deg,rgba(255,255,255,0.05),rgba(0,0,0,0.1));border:1px solid ' + col.border + ';border-radius:14px;overflow:hidden;transition:all .3s;cursor:pointer';
 
       // 头部：圣像区
-      var emojiMap = {
+      let emojiMap = {
         '释迦牟尼佛':'🙏','观世音':'🕊️','文殊':'📚','普贤':'🌺','地藏':'🌑','弥勒佛':'😄',
         '韦陀':'⚔️','药师佛':'💊','太上老君':'☯️','玉皇大帝':'👑','王母娘娘':'🌸',
         '太乙救苦天尊':'🌟','真武大帝':'🐢','关圣帝君':'⚔️','文昌帝君':'📖',
         '财神赵公明':'💰','土地公':'🏠','月老':'💍','东岳大帝':'⛰️','八仙':'✈️',
         '至圣先师孔子':'🎓','亚圣孟子':'📜'
       };
-      var emoji = emojiMap[d.name] || '✨';
-      var gradientBg = faith === 'fo' ? 'linear-gradient(135deg,#e67e22,#c0392b)' : faith === 'dao' ? 'linear-gradient(135deg,#8e44ad,#2980b9)' : 'linear-gradient(135deg,#c0392b,#8e44ad)';
+      let emoji = emojiMap[d.name] || '✨';
+      let gradientBg = faith === 'fo' ? 'linear-gradient(135deg,#e67e22,#c0392b)' : faith === 'dao' ? 'linear-gradient(135deg,#8e44ad,#2980b9)' : 'linear-gradient(135deg,#c0392b,#8e44ad)';
 
-      var headerHtml =
+      let headerHtml =
         '<div style="background:' + gradientBg + ';padding:18px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,0.1)">' +
           '<div style="width:52px;height:52px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid rgba(255,255,255,0.3)">' +
             (d.portrait ?
-              '<img src="' + d.portrait + '" style="width:100%;height:100%;object-fit:cover" data-emoji="' + emoji + '" onerror="var e=this.getAttribute(&#39;data-emoji&#39;);this.parentNode.innerHTML=e;this.parentNode.style.cssText=&#39;width:52px;height:52px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;border:none&#39;}">' :
+              '<img src="' + d.portrait + '" style="width:100%;height:100%;object-fit:cover" data-emoji="' + emoji + '" onerror="let e=this.getAttribute(&#39;data-emoji&#39;);this.parentNode.innerHTML=e;this.parentNode.style.cssText=&#39;width:52px;height:52px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;border:none&#39;}">' :
               '<div style="width:100%;height:100%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:28px">' + emoji + '</div>') +
           '</div>' +
           '<div style="min-width:0;flex:1">' +
@@ -248,7 +248,7 @@
         '</div>';
 
       // 媒体入口
-      var mediaBar = '';
+      let mediaBar = '';
       if (d.image || d.music || d.video) {
         mediaBar = '<div style="display:flex;gap:6px;padding:10px 16px;background:rgba(0,0,0,0.15)">';
         if (d.image) mediaBar += '<a href="' + d.image + '" target="_blank" class="media-btn" style="flex:1;text-align:center;padding:5px 8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;font-size:10px;color:rgba(255,255,255,0.55);text-decoration:none;transition:all .2s">🖼 图片</a>';
@@ -258,16 +258,16 @@
       }
 
       // 职能简介
-      var responsibilities = Array.isArray(d.responsibilities) ? d.responsibilities.join(' · ') : (d.responsibilities || '');
-      var introHtml = responsibilities ?
+      let responsibilities = Array.isArray(d.responsibilities) ? d.responsibilities.join(' · ') : (d.responsibilities || '');
+      let introHtml = responsibilities ?
         '<div style="padding:10px 16px;font-size:11px;color:' + col.main + ';opacity:.85;line-height:1.6">' + responsibilities + '</div>' : '';
 
       // 详情折叠 — 优先使用 DEITIES_DETAIL 丰富数据
-      var DD = window.DEITIES_DETAIL || {};
-      var ddKey = faithKey; // buddhist / taoist / confucian
-      var dd = DD[ddKey] && DD[ddKey][d.name] ? DD[ddKey][d.name] : null;
+      let DD = window.DEITIES_DETAIL || {};
+      let ddKey = faithKey; // buddhist / taoist / confucian
+      let dd = DD[ddKey] && DD[ddKey][d.name] ? DD[ddKey][d.name] : null;
 
-      var detailsInner = '';
+      let detailsInner = '';
       // 基础信息
       if (d.offerings && d.offerings.length) detailsInner += '<div><span style="font-size:11px;color:' + col.main + ';font-weight:bold">🎁 供奉：</span><span style="font-size:11px;opacity:.7">' + d.offerings.join('、') + '</span></div>';
       if (d.worshipMethod) detailsInner += '<div><span style="font-size:11px;color:' + col.main + ';font-weight:bold">🙏 供奉方法：</span><span style="font-size:11px;opacity:.7;line-height:1.6">' + d.worshipMethod + '</span></div>';
@@ -290,7 +290,7 @@
 
         // 参拜详法
         if (dd.worshipDetail) {
-          var wd = dd.worshipDetail;
+          let wd = dd.worshipDetail;
           detailsInner += '<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06)"><span style="font-size:11px;color:' + col.main + ';font-weight:bold">🕯️ 参拜详法</span>';
           if (wd.bestTime) detailsInner += '<div style="font-size:10px;opacity:.7;margin-top:4px"><b>最佳时间：</b>' + wd.bestTime + '</div>';
           if (wd.steps && wd.steps.length) {
@@ -316,7 +316,7 @@
         }
       }
 
-      var detailsHtml =
+      let detailsHtml =
         '<details style="padding:0 16px 14px">' +
           '<summary style="font-size:11px;color:' + col.main + ';cursor:pointer;font-weight:bold;padding:8px 0;opacity:.7">▸ 展开详情</summary>' +
           '<div style="margin-top:10px;display:grid;gap:8px;animation:fadeUp .3s ease">' +
@@ -347,15 +347,15 @@
   // 模块2：经典经文（新版——使用SCRIPTURE_DATABASE，支持朗读）
   // ================================================================
   function renderScriptures(el, faith) {
-    var SD = window.SCRIPTURE_DATABASE;
+    let SD = window.SCRIPTURE_DATABASE;
     if (!SD) { 
       el.innerHTML = '<p style="text-align:center;opacity:.4">经书数据库加载中...</p>'; 
       return; 
     }
-    var col = COLORS[faith];
-    var faithKey = faith === 'fo' ? 'buddhist' : faith === 'dao' ? 'taoist' : 'confucian';
-    var catName = {fo:'佛教', dao:'道教', ru:'儒家'}[faith] || '';
-    var scriptures = (SD[faithKey] || []).filter(function(s) {
+    let col = COLORS[faith];
+    let faithKey = faith === 'fo' ? 'buddhist' : faith === 'dao' ? 'taoist' : 'confucian';
+    let catName = {fo:'佛教', dao:'道教', ru:'儒家'}[faith] || '';
+    let scriptures = (SD[faithKey] || []).filter(function(s) {
       return s.type !== '密教部'; // 大悲咒等在口诀模块展示
     });
     // 如果过滤后为空，返回全部
@@ -366,11 +366,11 @@
       '<div style="font-size:11px;opacity:.4;margin-top:4px">点击卡片进入全文朗读模式 · 支持语音伴读</div>' +
       '</div>';
 
-    var grid = document.createElement('div');
+    let grid = document.createElement('div');
     grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px';
 
     scriptures.forEach(function(s) {
-      var card = document.createElement('div');
+      let card = document.createElement('div');
       card.style.cssText = 'background:rgba(255,255,255,0.04);border:1px solid ' + col.border + ';border-radius:12px;overflow:hidden;cursor:pointer;transition:.2s';
       card.onmouseenter = function() { card.style.transform = 'translateY(-2px)'; card.style.boxShadow = '0 4px 20px rgba(0,0,0,.3)'; };
       card.onmouseleave = function() { card.style.transform = 'none'; card.style.boxShadow = 'none'; };
@@ -404,22 +404,22 @@
   // 经文朗读器（带拼音+语音伴读）
   // ================================================================
   function renderScriptureReader(el, faith, scriptureId) {
-    var SD = window.SCRIPTURE_DATABASE;
-    var VR = window.VoiceReader;
+    let SD = window.SCRIPTURE_DATABASE;
+    let VR = window.VoiceReader;
     if (!SD || !scriptureId) { el.innerHTML = '<p style="text-align:center;opacity:.4">经书未找到</p>'; return; }
 
-    var s = SD.getById(scriptureId);
+    let s = SD.getById(scriptureId);
     if (!s) { el.innerHTML = '<p style="text-align:center;opacity:.4">经书未找到 (id: ' + scriptureId + ')</p>'; return; }
 
-    var col = COLORS[faith];
-    var hasPinyin = s.sections && s.sections.length > 0;
-    var hasFullText = s.fullText && s.fullText.length > 0;
+    let col = COLORS[faith];
+    let hasPinyin = s.sections && s.sections.length > 0;
+    let hasFullText = s.fullText && s.fullText.length > 0;
 
     // 容器
     el.innerHTML = '';
 
     // ---- 顶部导航 - 返回 - 标题 - 语音控制 ----
-    var header = document.createElement('div');
+    let header = document.createElement('div');
     header.style.cssText = 'display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid ' + col.border;
     header.innerHTML = 
       '<span onclick="renderScriptures(faithContent, currentFaith)" style="cursor:pointer;font-size:22px;opacity:.6;hover:opacity:1" title="返回经书列表">⬅</span>' +
@@ -431,10 +431,10 @@
     el.appendChild(header);
 
     // ---- 语音控制条 ----
-    var voiceBar = document.createElement('div');
+    let voiceBar = document.createElement('div');
     voiceBar.style.cssText = 'background:rgba(0,0,0,.3);border:1px solid ' + col.border + ';border-radius:10px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap';
     
-    var vc = {
+    let vc = {
       playBtn: '<span id="vrPlayBtn" style="cursor:pointer;font-size:24px;padding:4px 8px;border-radius:6px;background:' + col.main + '22" onclick="window.__vrTogglePlay()">▶</span>',
       prevBtn: '<span style="cursor:pointer;font-size:16px;opacity:.5" onclick="window.__vrPrev()">⏮</span>',
       nextBtn: '<span style="cursor:pointer;font-size:16px;opacity:.5" onclick="window.__vrNext()">⏭</span>',
@@ -468,7 +468,7 @@
     el.appendChild(voiceBar);
 
     // ---- 经书描述 ----
-    var desc = document.createElement('div');
+    let desc = document.createElement('div');
     desc.style.cssText = 'font-size:12px;opacity:.7;line-height:1.8;margin-bottom:14px;padding:10px 14px;background:rgba(255,255,255,0.02);border-radius:8px';
     desc.innerHTML = (s.description || '') + 
       (s.recitationMethod ? '<br><br><span style="color:' + col.main + '">🧘 诵持方法：</span>' + s.recitationMethod : '') +
@@ -476,14 +476,14 @@
     el.appendChild(desc);
 
     // ---- 正文 - 带拼音的逐句显示 ----
-    var textArea = document.createElement('div');
+    let textArea = document.createElement('div');
     textArea.id = 'scriptureTextArea';
     textArea.style.cssText = 'line-height:2.2;font-size:16px;padding:14px;background:rgba(0,0,0,.15);border-radius:8px;border:1px solid rgba(255,255,255,0.05);max-height:400px;overflow-y:auto';
 
     if (hasPinyin) {
       // 逐句显示，拼音在上，汉字在下
       s.sections.forEach(function(sec, i) {
-        var line = document.createElement('div');
+        let line = document.createElement('div');
         line.id = 'vrLine_' + i;
         line.style.cssText = 'padding:6px 10px;margin:2px 0;border-radius:6px;transition:.2s;cursor:pointer';
         line.onclick = function() { window.__vrJump(i); };
@@ -493,7 +493,7 @@
         textArea.appendChild(line);
       });
     } else if (hasFullText) {
-      var fullDiv = document.createElement('div');
+      let fullDiv = document.createElement('div');
       fullDiv.style.cssText = 'font-size:15px;line-height:2;letter-spacing:1px;white-space:pre-wrap;color:' + col.main;
       fullDiv.textContent = s.fullText;
       textArea.appendChild(fullDiv);
@@ -507,27 +507,27 @@
       VR.setFromScripture(s.sections);
       VR.setOnHighlight(function(idx) {
         // 高亮当前句
-        var all = textArea.querySelectorAll('[id^="vrLine_"]');
+        let all = textArea.querySelectorAll('[id^="vrLine_"]');
         all.forEach(function(l) {
           l.style.background = 'transparent';
           l.style.borderLeft = '2px solid transparent';
         });
-        var cur = document.getElementById('vrLine_' + idx);
+        let cur = document.getElementById('vrLine_' + idx);
         if (cur) {
           cur.style.background = 'rgba(255,215,0,0.08)';
           cur.style.borderLeft = '2px solid ' + col.main;
           cur.scrollIntoView({block: 'nearest', behavior: 'smooth'});
         }
         // 更新状态
-        var st = document.getElementById('vrStatus');
+        let st = document.getElementById('vrStatus');
         if (st) st.textContent = '正在朗读第 ' + (idx+1) + '/' + s.sections.length + ' 句';
       });
       VR.setOnStateChange(function(state) {
-        var btn = document.getElementById('vrPlayBtn');
+        let btn = document.getElementById('vrPlayBtn');
         if (btn) {
           btn.innerHTML = state.playing && !state.paused ? '⏸' : '▶';
         }
-        var st = document.getElementById('vrStatus');
+        let st = document.getElementById('vrStatus');
         if (st) {
           if (state.playing && !state.paused) st.textContent = '🔊 播放中 · 第' + (state.index+1) + '/' + state.total + '句';
           else if (state.paused) st.textContent = '⏸ 已暂停 · 第' + (state.index+1) + '/' + state.total + '句';
@@ -537,7 +537,7 @@
       
       // 注册全局控制函数
       window.__vrTogglePlay = function() {
-        var st = VR.getStatus();
+        let st = VR.getStatus();
         if (st.playing && !st.paused) VR.pause();
         else VR.play();
       };
@@ -547,12 +547,12 @@
       window.__vrSetSpeed = function(v) { VR.setSpeed(parseFloat(v)); };
       window.__vrSetLoop = function(v) { VR.setLoopMode(v); };
       window.__vrSetTimer = function() {
-        var mins = prompt('设置语音自动停止时间（分钟），0=取消：', '30');
+        let mins = prompt('设置语音自动停止时间（分钟），0=取消：', '30');
         if (mins !== null) {
           mins = parseInt(mins) || 0;
           if (mins > 0) {
             VR.setTimer(mins, function() { alert('⏰ 定时播放已结束'); });
-            var st = document.getElementById('vrStatus');
+            let st = document.getElementById('vrStatus');
             if (st) st.textContent += ' · ⏰ ' + mins + '分钟后停止';
           } else {
             VR.clearTimer();
@@ -562,10 +562,10 @@
       window.__vrJump = function(idx) { VR.jumpTo(idx); };
     } else if (!hasPinyin) {
       // 无拼音标注时提示
-      var st = document.getElementById('vrStatus');
+      let st = document.getElementById('vrStatus');
       if (st) st.textContent = '该经书暂未标注拼音，语音功能不可用';
     } else {
-      var st = document.getElementById('vrStatus');
+      let st = document.getElementById('vrStatus');
       if (st) st.textContent = '⚠️ 浏览器不支持语音合成，请使用Chrome或Safari';
     }
 
@@ -580,22 +580,22 @@
   function renderMantras(el, faith) {
     if (!FK) { el.innerHTML = '<p style="text-align:center;opacity:.4">知识库加载中...</p>'; return; }
 
-    var col = COLORS[faith];
+    let col = COLORS[faith];
     el.innerHTML = '<h3 style="color:' + col.main + ';text-align:center;margin-bottom:16px;font-family:\'Ma Shan Zheng\',serif;font-size:20px;letter-spacing:4px">' + col.label + '咒语口诀</h3>';
 
-    var list = document.createElement('div');
+    let list = document.createElement('div');
     list.style.cssText = 'display:flex;flex-direction:column;gap:12px';
 
     // 信仰专属口诀
-    var faithKey = faith === 'fo' ? 'buddhist' : 'taoist';
-    var mantras = (FK.mantras && FK.mantras[faithKey]) ? FK.mantras[faithKey] : [];
+    let faithKey = faith === 'fo' ? 'buddhist' : 'taoist';
+    let mantras = (FK.mantras && FK.mantras[faithKey]) ? FK.mantras[faithKey] : [];
 
     mantras.forEach(function(m) {
-      var card = document.createElement('div');
+      let card = document.createElement('div');
       card.style.cssText = 'background:rgba(255,255,255,0.03);border:1px solid ' + col.border + ';border-radius:12px;overflow:hidden';
 
       // 音乐按钮
-      var musicBtn = '';
+      let musicBtn = '';
       if (m.music) {
         musicBtn = '<a href="#" onclick="playFaithMusic(\'' + encodeURIComponent(m.music) + '\');return false" style="display:inline-block;margin-top:8px;padding:4px 12px;background:' + col.bg + ';border:1px solid ' + col.border + ';border-radius:6px;font-size:10px;color:' + col.main + ';text-decoration:none">🎵 听诵读</a>';
       }
@@ -613,9 +613,9 @@
     });
 
     // 生活口诀（共用）
-    var lifeMantras = (FK.mantras && FK.mantras.lifeMantras) ? FK.mantras.lifeMantras : [];
+    let lifeMantras = (FK.mantras && FK.mantras.lifeMantras) ? FK.mantras.lifeMantras : [];
     if (lifeMantras.length) {
-      var section = document.createElement('div');
+      let section = document.createElement('div');
       section.style.cssText = 'margin-top:20px;padding-top:16px;border-top:1px solid ' + col.border;
       section.innerHTML = '<h4 style="color:' + col.main + ';margin-bottom:12px;font-size:13px;font-weight:bold">🧩 生活口诀（各教通用）</h4>';
       lifeMantras.forEach(function(m) {
@@ -651,20 +651,20 @@
       return;
     }
 
-    var col = COLORS[faith];
+    let col = COLORS[faith];
     el.innerHTML = '<h3 style="color:' + col.main + ';text-align:center;margin-bottom:16px;font-family:\'Ma Shan Zheng\',serif;font-size:20px;letter-spacing:4px">' + col.label + '禁忌须知</h3>';
 
-    var faithKey = faith === 'fo' ? 'buddhist' : faith === 'dao' ? 'taoist' : 'confucian';
+    let faithKey = faith === 'fo' ? 'buddhist' : faith === 'dao' ? 'taoist' : 'confucian';
     console.log('[DEBUG] faithKey:', faithKey);
     console.log('[DEBUG] FK.taboos[faithKey]:', FK.taboos ? FK.taboos[faithKey] : 'N/A');
     
-    var allTaboos = [];
+    let allTaboos = [];
     if (FK.taboos && FK.taboos[faithKey]) allTaboos = allTaboos.concat(FK.taboos[faithKey]);
     if (FK.taboos && FK.taboos.general) allTaboos = allTaboos.concat(FK.taboos.general);
     
     console.log('[DEBUG] allTaboos length:', allTaboos.length);
 
-    var grid = document.createElement('div');
+    let grid = document.createElement('div');
     grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px';
     
     if (!allTaboos.length) {
@@ -673,7 +673,7 @@
     }
 
     allTaboos.forEach(function(cat) {
-      var card = document.createElement('div');
+      let card = document.createElement('div');
       card.style.cssText = 'background:rgba(255,255,255,0.03);border:1px solid ' + col.border + ';border-radius:10px;overflow:hidden';
       card.innerHTML =
         '<div style="padding:12px 16px;font-size:13px;font-weight:bold;color:' + col.main + ';border-bottom:1px solid rgba(255,255,255,0.05);background:rgba(0,0,0,0.1)">⚠️ ' + cat.category + '</div>' +
@@ -694,21 +694,21 @@
   function renderWorship(el, faith) {
     if (!FK) { el.innerHTML = '<p style="text-align:center;opacity:.4">知识库加载中...</p>'; return; }
 
-    var col = COLORS[faith];
-    var guide = FK.worshipGuide || {};
+    let col = COLORS[faith];
+    let guide = FK.worshipGuide || {};
     el.innerHTML = '<h3 style="color:' + col.main + ';text-align:center;margin-bottom:16px;font-family:\'Ma Shan Zheng\',serif;font-size:20px;letter-spacing:4px">参拜指导</h3>';
 
-    var sections = [
+    let sections = [
       { title: '🕯️ 上香礼仪', data: guide.incense },
       { title: '🙇 跪拜礼仪', data: guide.prostration },
       { title: '🎁 供品须知', data: guide.offerings }
     ];
 
     sections.forEach(function(sec) {
-      var card = document.createElement('div');
+      let card = document.createElement('div');
       card.style.cssText = 'background:rgba(255,255,255,0.03);border:1px solid ' + col.border + ';border-radius:10px;overflow:hidden;margin-bottom:16px';
 
-      var inner = '<div style="padding:12px 16px;font-size:13px;font-weight:bold;color:' + col.main + ';border-bottom:1px solid rgba(255,255,255,0.05);background:rgba(0,0,0,0.1)">' + sec.title + '</div><div style="padding:14px 16px">';
+      let inner = '<div style="padding:12px 16px;font-size:13px;font-weight:bold;color:' + col.main + ';border-bottom:1px solid rgba(255,255,255,0.05);background:rgba(0,0,0,0.1)">' + sec.title + '</div><div style="padding:14px 16px">';
 
       if (sec.data && sec.data.steps) {
         inner += '<ol style="padding-left:20px;margin:0">';
@@ -739,8 +739,8 @@
   function renderAuspicious(el, faith) {
     if (!FK) { el.innerHTML = '<p style="text-align:center;opacity:.4">知识库加载中...</p>'; return; }
 
-    var col = COLORS[faith];
-    var ausp = FK.auspiciousDays || {};
+    let col = COLORS[faith];
+    let ausp = FK.auspiciousDays || {};
     el.innerHTML = '<h3 style="color:' + col.main + ';text-align:center;margin-bottom:16px;font-family:\'Ma Shan Zheng\',serif;font-size:20px;letter-spacing:4px">吉日选择</h3>';
 
     if (ausp.daily) {
@@ -751,12 +751,12 @@
         '</div>';
     }
 
-    var categories = ausp.categories || [];
-    var grid = document.createElement('div');
+    let categories = ausp.categories || [];
+    let grid = document.createElement('div');
     grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px';
 
     categories.forEach(function(cat) {
-      var card = document.createElement('div');
+      let card = document.createElement('div');
       card.style.cssText = 'background:rgba(255,255,255,0.03);border:1px solid ' + col.border + ';border-radius:10px;padding:14px';
       card.innerHTML =
         '<div style="font-size:13px;font-weight:bold;color:' + col.main + ';margin-bottom:8px">📅 ' + (cat.event || '') + '</div>' +
@@ -774,19 +774,19 @@
   function renderFitness(el, faith) {
     if (!FK) { el.innerHTML = '<p style="text-align:center;opacity:.4">知识库加载中...</p>'; return; }
 
-    var col = COLORS[faith];
-    var faithKey = faith === 'fo' ? 'buddhist' : 'taoist';
-    var guides = [];
+    let col = COLORS[faith];
+    let faithKey = faith === 'fo' ? 'buddhist' : 'taoist';
+    let guides = [];
     if (FK.fitnessGuide && FK.fitnessGuide[faithKey]) guides = FK.fitnessGuide[faithKey];
     if (!guides.length && FK.fitnessGuide && FK.fitnessGuide.taoist) guides = FK.fitnessGuide.taoist;
 
     el.innerHTML = '<h3 style="color:' + col.main + ';text-align:center;margin-bottom:16px;font-family:\'Ma Shan Zheng\',serif;font-size:20px;letter-spacing:4px">' + col.label + '健身导引</h3>';
 
     guides.forEach(function(g) {
-      var card = document.createElement('div');
+      let card = document.createElement('div');
       card.style.cssText = 'background:rgba(255,255,255,0.03);border:1px solid ' + col.border + ';border-radius:12px;overflow:hidden;margin-bottom:16px';
 
-      var stepsHtml = '';
+      let stepsHtml = '';
       if (g.steps && g.steps.length) {
         stepsHtml = '<ol style="padding-left:20px;margin:10px 0">';
         g.steps.forEach(function(step) {
@@ -795,7 +795,7 @@
         stepsHtml += '</ol>';
       }
 
-      var benefitsHtml = '';
+      let benefitsHtml = '';
       if (g.benefits && g.benefits.length) {
         benefitsHtml = '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:10px">';
         g.benefits.forEach(function(b) {
@@ -829,18 +829,18 @@
   // ================================================================
   function renderHealth(el, faith) {
     if (!FK) { el.innerHTML = '<p style="text-align:center;opacity:.4">知识库加载中...</p>'; return; }
-    var faithKey = faith === 'fo' ? 'buddhist' : faith === 'dao' ? 'taoist' : 'confucian';
-    var items = (FK.healthGuide && FK.healthGuide[faithKey]) ? FK.healthGuide[faithKey] : [];
-    var col = COLORS[faith];
-    var icons = {buddhist:'🪷', taoist:'☯️', confucian:'🎓'};
+    let faithKey = faith === 'fo' ? 'buddhist' : faith === 'dao' ? 'taoist' : 'confucian';
+    let items = (FK.healthGuide && FK.healthGuide[faithKey]) ? FK.healthGuide[faithKey] : [];
+    let col = COLORS[faith];
+    let icons = {buddhist:'🪷', taoist:'☯️', confucian:'🎓'};
     el.innerHTML = '<div style="text-align:center;margin-bottom:16px"><div style="font-size:28px;margin-bottom:4px">' + icons[faithKey] + '</div><div style="font-size:16px;font-weight:bold;color:' + col.main + ';font-family:Ma Shan Zheng,serif;letter-spacing:4px">' + col.label + '养生妙法</div><div style="font-size:11px;opacity:.3">药食同源 · 修身养性 · 珍藏典藏</div></div>';
-    var grid = document.createElement('div');
+    let grid = document.createElement('div');
     grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px';
     if (!items.length) { el.innerHTML += '<p style="text-align:center;opacity:.4">暂无数据</p>'; return; }
     items.forEach(function(item) {
-      var card = document.createElement('div');
+      let card = document.createElement('div');
       card.style.cssText = 'background:linear-gradient(135deg,rgba(255,255,255,0.04),rgba(0,0,0,0.08));border:1px solid ' + col.border + ';border-radius:14px;overflow:hidden;transition:all .2s';
-      var catIcon = {食疗:'🍲', 饮品:'🍵', 情志:'🧘', 导引:'🏃', 调摄:'🌿', 补益:'💊'}[item.category] || '🍃';
+      let catIcon = {食疗:'🍲', 饮品:'🍵', 情志:'🧘', 导引:'🏃', 调摄:'🌿', 补益:'💊'}[item.category] || '🍃';
       card.innerHTML = '<div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;gap:10px"><div style="width:44px;height:44px;background:' + col.bg + ';border:1px solid ' + col.border + ';border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">' + catIcon + '</div><div><div style="font-size:15px;font-weight:bold;color:' + col.main + '">' + item.name + '</div><div style="font-size:10px;opacity:.5;margin-top:2px">🏷 ' + (item.category || '') + '</div></div></div><div style="padding:12px 16px;font-size:12px;opacity:.75;line-height:1.7;color:rgba(255,255,255,0.8)">' + (item.description || '') + '</div>';
       if (item.methods && item.methods.length) {
         card.innerHTML += '<details style="padding:0 16px 14px"><summary style="font-size:11px;color:' + col.main + ';cursor:pointer;font-weight:bold;padding:8px 0">▸ 修炼方法 ▾</summary><ul style="padding-left:18px;margin:8px 0 0"><li style="font-size:12px;line-height:1.9;opacity:.8;margin-bottom:3px">' + item.methods.join('</li><li style="font-size:12px;line-height:1.9;opacity:.8;margin-bottom:3px">') + '</li></ul></details>';
@@ -859,16 +859,16 @@
   // ================================================================
   function renderRemedy(el, faith) {
     if (!FK) { el.innerHTML = '<p style="text-align:center;opacity:.4">知识库加载中...</p>'; return; }
-    var faithKey = faith === 'fo' ? 'buddhist' : faith === 'dao' ? 'taoist' : 'confucian';
-    var items = (FK.remedyGuide && FK.remedyGuide[faithKey]) ? FK.remedyGuide[faithKey] : [];
-    var col = COLORS[faith];
+    let faithKey = faith === 'fo' ? 'buddhist' : faith === 'dao' ? 'taoist' : 'confucian';
+    let items = (FK.remedyGuide && FK.remedyGuide[faithKey]) ? FK.remedyGuide[faithKey] : [];
+    let col = COLORS[faith];
     el.innerHTML = '<div style="text-align:center;margin-bottom:12px"><div style="font-size:13px;opacity:.4">传统智慧 · 仅供参考</div><div style="font-size:16px;font-weight:bold;color:' + col.main + ';font-family:Ma Shan Zheng,serif;letter-spacing:4px;margin-top:4px">' + col.label + '药方妙法</div><div style="font-size:11px;opacity:.3;margin-top:2px">食疗为主 · 药食同源 · 请遵医嘱</div></div><div style="text-align:center;padding:8px 16px;background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);border-radius:10px;margin-bottom:16px;font-size:11px;color:#e74c3c;opacity:.8">⚠️ 本栏目药方仅供传统文化参考，身体不适请及时就医，遵医嘱治疗</div>';
-    var list = document.createElement('div');
+    let list = document.createElement('div');
     list.style.cssText = 'display:flex;flex-direction:column;gap:14px';
     if (!items.length) { el.innerHTML += '<p style="text-align:center;opacity:.4">暂无数据</p>'; return; }
     items.forEach(function(item) {
-      var catIcon = {食疗:'🍲', 滋补:'💊', 消食:'🍽️', 外治:'👐', 调摄:'🌿'}[item.category] || '🌿';
-      var card = document.createElement('div');
+      let catIcon = {食疗:'🍲', 滋补:'💊', 消食:'🍽️', 外治:'👐', 调摄:'🌿'}[item.category] || '🌿';
+      let card = document.createElement('div');
       card.style.cssText = 'background:linear-gradient(135deg,rgba(255,255,255,0.04),rgba(0,0,0,0.08));border:1px solid ' + col.border + ';border-radius:14px;overflow:hidden;transition:all .2s';
       card.innerHTML = '<div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;gap:10px"><div style="width:48px;height:48px;background:' + col.bg + ';border:1px solid ' + col.border + ';border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">' + catIcon + '</div><div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:bold;color:' + col.main + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + item.name + '</div><div style="font-size:10px;opacity:.5;margin-top:2px">🏷 ' + (item.category || '') + ' · 💡 ' + (item.occasion || '') + '</div></div></div>';
       card.innerHTML += '<div style="padding:12px 16px;display:grid;gap:8px"><div style="background:rgba(0,0,0,0.15);padding:10px 12px;border-radius:8px"><div style="font-size:11px;color:' + col.main + ';font-weight:bold;margin-bottom:5px">🧪 食材</div><div style="font-size:12px;opacity:.85;line-height:1.6">' + (item.ingredients || '') + '</div></div><div style="background:rgba(0,0,0,0.1);padding:10px 12px;border-radius:8px"><div style="font-size:11px;color:' + col.main + ';font-weight:bold;margin-bottom:5px">📋 制作方法</div><div style="font-size:12px;opacity:.85;line-height:1.6">' + (item.method || '') + '</div></div>';
@@ -890,7 +890,7 @@ function playFaithMusic(songName) {
   songName = decodeURIComponent(songName || '');
   if (!songName) return;
   // 尝试查找或提示
-  var msg = '🎵 ' + songName + '\n\n由于版权限制，无法直接播放。\n建议在以下平台搜索收听：\n\n📱 QQ音乐/网易云音乐：搜索 "' + songName + '"\n🌐 网页版：music.163.com\n\n🙏 持咒修行，心诚则灵！';
+  let msg = '🎵 ' + songName + '\n\n由于版权限制，无法直接播放。\n建议在以下平台搜索收听：\n\n📱 QQ音乐/网易云音乐：搜索 "' + songName + '"\n🌐 网页版：music.163.com\n\n🙏 持咒修行，心诚则灵！';
   alert(msg);
 }
 
@@ -913,11 +913,11 @@ function getDailyPractice(faith) {
  * 渲染每日修行指导
  */
 function renderDailyPractice(faith) {
-  var data = getDailyPractice(faith);
+  let data = getDailyPractice(faith);
   if (!data) return '<p style="text-align:center;opacity:.4">数据加载中...</p>';
   
-  var col = {ru:'#c0392b', dao:'#8e44ad', fo:'#e67e22'}[faith];
-  var html = '<div style="text-align:center;margin-bottom:16px">';
+  let col = {ru:'#c0392b', dao:'#8e44ad', fo:'#e67e22'}[faith];
+  let html = '<div style="text-align:center;margin-bottom:16px">';
   html += '<h3 style="color:' + col + ';font-family:Ma Shan Zheng,serif;font-size:20px;letter-spacing:4px">' + data.icon + ' ' + data.name + '每日修行</h3>';
   html += '<p style="font-size:11px;opacity:.4">' + data.weeklyGoal + '</p>';
   html += '</div>';
@@ -943,11 +943,11 @@ function renderDailyPractice(faith) {
  */
 function renderWorkGuidance(faith) {
   if (typeof window.FAITH_CONTENT === 'undefined') return null;
-  var data = window.FAITH_CONTENT.getWorkGuidance(faith);
+  let data = window.FAITH_CONTENT.getWorkGuidance(faith);
   if (!data) return null;
   
-  var col = {ru:'#c0392b', dao:'#8e44ad', fo:'#e67e22'}[faith];
-  var html = '<div style="text-align:center;margin-bottom:16px">';
+  let col = {ru:'#c0392b', dao:'#8e44ad', fo:'#e67e22'}[faith];
+  let html = '<div style="text-align:center;margin-bottom:16px">';
   html += '<h3 style="color:' + col + ';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:3px">' + data.icon + ' ' + data.title + '</h3>';
   html += '</div>';
   
@@ -970,11 +970,11 @@ function renderWorkGuidance(faith) {
  */
 function renderMeritSystem(faith) {
   if (typeof window.FAITH_CONTENT === 'undefined') return null;
-  var data = window.FAITH_CONTENT.getMeritSystem(faith);
+  let data = window.FAITH_CONTENT.getMeritSystem(faith);
   if (!data) return null;
   
-  var col = {ru:'#c0392b', dao:'#8e44ad', fo:'#e67e22'}[faith];
-  var html = '<div style="text-align:center;margin-bottom:16px">';
+  let col = {ru:'#c0392b', dao:'#8e44ad', fo:'#e67e22'}[faith];
+  let html = '<div style="text-align:center;margin-bottom:16px">';
   html += '<h3 style="color:' + col + ';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:3px">' + data.icon + ' ' + data.name + '功德体系</h3>';
   html += '</div>';
   
@@ -1021,11 +1021,11 @@ function renderMeritSystem(faith) {
  */
 function renderLifeGuidance(category, faith) {
   if (typeof window.FAITH_CONTENT === 'undefined') return null;
-  var data = window.FAITH_CONTENT.getLifeGuidance(category, faith);
+  let data = window.FAITH_CONTENT.getLifeGuidance(category, faith);
   if (!data) return null;
   
-  var col = {ru:'#c0392b', dao:'#8e44ad', fo:'#e67e22'}[faith];
-  var html = '<h4 style="color:' + col + ';margin-bottom:12px">' + data.title + '</h4>';
+  let col = {ru:'#c0392b', dao:'#8e44ad', fo:'#e67e22'}[faith];
+  let html = '<h4 style="color:' + col + ';margin-bottom:12px">' + data.title + '</h4>';
   html += '<div style="font-size:12px;line-height:1.9">' + data.content + '</div>';
   if (data.quote) {
     html += '<div style="margin-top:10px;padding:10px;background:' + col + '11;border-radius:6px;font-size:11px;font-style:italic;opacity:.7">' + data.quote + '</div>';
@@ -1038,8 +1038,8 @@ function renderLifeGuidance(category, faith) {
 // ====================================================================
 
 function renderFaithOverview(el, faith) {
-  var col = COLORS[faith];
-  var html = '';
+  let col = COLORS[faith];
+  let html = '';
   html += '<div style="text-align:center;margin-bottom:20px">';
   html += '<h3 style="color:' + col.main + ';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">' + col.label + '信仰概述</h3>';
   html += '<p style="font-size:12px;opacity:.5">核心教义 · 修行体系 · 实践方法</p></div>';
@@ -1074,29 +1074,29 @@ function renderFaithOverview(el, faith) {
 }
 
 function renderFestivalReminder(el, faith) {
-  var col = COLORS[faith];
-  var FAITH_GUIDE = window.FAITH_GUIDE || {};
-  var allFestivals = FAITH_GUIDE.festivalCalendar || [];
-  var lunarMonths = {'正':1,'二':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10,'十一':11,'腊':12};
-  function parseLM(l) { for (var k in lunarMonths) { if (l.indexOf(k)>=0) return lunarMonths[k]; } return null; }
-  var now = new Date(), cm = now.getMonth()+1, upcoming = [];
+  let col = COLORS[faith];
+  let FAITH_GUIDE = window.FAITH_GUIDE || {};
+  let allFestivals = FAITH_GUIDE.festivalCalendar || [];
+  let lunarMonths = {'正':1,'二':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10,'十一':11,'腊':12};
+  function parseLM(l) { for (let k in lunarMonths) { if (l.indexOf(k)>=0) return lunarMonths[k]; } return null; }
+  let now = new Date(), cm = now.getMonth()+1, upcoming = [];
   allFestivals.forEach(function(f) {
-    var m = parseLM(f.lunar); if (m===null) return;
-    var d = m - cm; if (d<0) d+=12;
+    let m = parseLM(f.lunar); if (m===null) return;
+    let d = m - cm; if (d<0) d+=12;
     if (d<=3) upcoming.push({f:f, d:d});
   });
   upcoming.sort(function(a,b){return a.d-b.d});
   upcoming = upcoming.slice(0,10);
-  var html = '<div style="text-align:center;margin-bottom:20px">';
+  let html = '<div style="text-align:center;margin-bottom:20px">';
   html += '<h3 style="color:' + col.main + ';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">📅 节日提醒与倒计时</h3>';
   html += '<p style="font-size:12px;opacity:.5">即将到来的佛道节日 · 提前准备参拜</p></div>';
   if (!upcoming.length) { html += '<div style="text-align:center;padding:30px;opacity:.4">暂无近期节日数据</div>'; }
   else {
     html += '<div style="display:grid;gap:10px">';
     upcoming.forEach(function(item) {
-      var f = item.f, uc = item.d===0?'#e74c3c':item.d===1?'#f39c12':'#3498db';
-      var ul = item.d===0?'🔥 本月':item.d===1?'📌 下月':'📋 '+item.d+'个月后';
-      var fi = f.faith==='fo'?'🪷':f.faith==='dao'?'☯️':f.faith==='ru'?'🎓':'🏮';
+      let f = item.f, uc = item.d===0?'#e74c3c':item.d===1?'#f39c12':'#3498db';
+      let ul = item.d===0?'🔥 本月':item.d===1?'📌 下月':'📋 '+item.d+'个月后';
+      let fi = f.faith==='fo'?'🪷':f.faith==='dao'?'☯️':f.faith==='ru'?'🎓':'🏮';
       html += '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:14px">';
       html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
       html += '<div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">'+fi+'</span><span style="font-size:14px;font-weight:bold;color:'+col.main+'">'+f.name+'</span></div>';
@@ -1111,8 +1111,8 @@ function renderFestivalReminder(el, faith) {
 }
 
 function renderMeritRecord(el, faith) {
-  var col = COLORS[faith];
-  var meritCategories = [
+  let col = COLORS[faith];
+  let meritCategories = [
     { icon:'🙏',name:'诵经念佛',items:['每日念佛','诵经回向','持咒修行','参加共修'],color:'#e74c3c'},
     { icon:'🎁',name:'布施供养',items:['财布施','法布施','无畏布施','供养三宝'],color:'#f39c12'},
     { icon:'🐟',name:'放生护生',items:['放生活动','素食一日','救助动物','环保行动'],color:'#2ecc71'},
@@ -1120,7 +1120,7 @@ function renderMeritRecord(el, faith) {
     { icon:'🧘',name:'禅修静坐',items:['每日静坐','参加禅七','正念练习','身心调养'],color:'#9b59b6'},
     { icon:'📿',name:'持戒修行',items:['持五戒','受八关斋戒','斋日茹素','远离恶缘'],color:'#1abc9c'}
   ];
-  var html = '<div style="text-align:center;margin-bottom:20px">';
+  let html = '<div style="text-align:center;margin-bottom:20px">';
   html += '<h3 style="color:'+col.main+';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">🌟 功德记录与修行日记</h3>';
   html += '<p style="font-size:12px;opacity:.5">记录每日善行 · 精进不退 · 积累福报</p></div>';
   html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px">';
@@ -1148,35 +1148,35 @@ function renderMeritRecord(el, faith) {
   html += '<div style="font-size:11px;opacity:.7;line-height:1.8">• 每日念佛/诵经至少15分钟<br>• 每周参加一次共修或法会<br>• 每月至少一日持八关斋戒<br>• 每月布施供养（量力而行）<br>• 每日反省三业过失<br>• 每月至少做一件利他善事</div></div>';
   el.innerHTML = html;
   window.__updateMeritCount = function() {
-    var checks = el.querySelectorAll('input[type="checkbox"]:checked');
-    var count = checks.length, score = count*10;
-    var ce = document.getElementById('meritCount'), se = document.getElementById('meritScore');
+    let checks = el.querySelectorAll('input[type="checkbox"]:checked');
+    let count = checks.length, score = count*10;
+    let ce = document.getElementById('meritCount'), se = document.getElementById('meritScore');
     if (ce) ce.textContent = count;
     if (se) se.textContent = score;
   };
 }
 
 function renderActivityCalendar(el, faith) {
-  var col = COLORS[faith];
-  var FAITH_GUIDE = window.FAITH_GUIDE || {};
-  var festivals = FAITH_GUIDE.festivalCalendar || [];
-  var monthNames = ['正月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','腊月'];
-  var g = {}; monthNames.forEach(function(m){g[m]=[];});
+  let col = COLORS[faith];
+  let FAITH_GUIDE = window.FAITH_GUIDE || {};
+  let festivals = FAITH_GUIDE.festivalCalendar || [];
+  let monthNames = ['正月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','腊月'];
+  let g = {}; monthNames.forEach(function(m){g[m]=[];});
   festivals.forEach(function(f) {
-    for (var i=0;i<monthNames.length;i++) { if (f.lunar.indexOf(monthNames[i])>=0) { g[monthNames[i]].push(f); break; } }
+    for (let i=0;i<monthNames.length;i++) { if (f.lunar.indexOf(monthNames[i])>=0) { g[monthNames[i]].push(f); break; } }
   });
-  var html = '<div style="text-align:center;margin-bottom:20px">';
+  let html = '<div style="text-align:center;margin-bottom:20px">';
   html += '<h3 style="color:'+col.main+';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">🗓️ 佛道活动年历</h3>';
   html += '<p style="font-size:12px;opacity:.5">全年重要佛道节日一览 · 提前规划参拜行程</p></div>';
   html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px">';
   monthNames.forEach(function(month) {
-    var fs = g[month]||[], has = fs.length>0;
+    let fs = g[month]||[], has = fs.length>0;
     html += '<div style="background:'+(has?'rgba(255,255,255,.03)':'rgba(255,255,255,.01)')+';border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px">';
     html += '<div style="font-size:13px;font-weight:bold;color:'+col.main+';margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06);padding-bottom:6px">📅 '+month+'月</div>';
     if (!has) { html += '<div style="font-size:11px;opacity:.2;text-align:center;padding:10px">暂无收录节日</div>'; }
     else {
       fs.forEach(function(f) {
-        var fi = f.faith==='fo'?'🪷':f.faith==='dao'?'☯️':f.faith==='ru'?'🎓':'🏮';
+        let fi = f.faith==='fo'?'🪷':f.faith==='dao'?'☯️':f.faith==='ru'?'🎓':'🏮';
         html += '<div style="display:flex;align-items:center;gap:6px;padding:5px 0;font-size:11px">';
         html += '<span style="font-size:13px;flex-shrink:0">'+fi+'</span>';
         html += '<span style="font-weight:bold;opacity:.9;flex-shrink:0;min-width:70px">'+f.name+'</span>';
@@ -1199,14 +1199,14 @@ function renderActivityCalendar(el, faith) {
 }
 
 function renderFaithResources(el, faith) {
-  var col = COLORS[faith];
-  var resources = {
+  let col = COLORS[faith];
+  let resources = {
     fo:{books:[{name:'《正信的佛教》',author:'圣严法师',desc:'初学者最好的入门书，解答最常见的佛教疑问'},{name:'《学佛群疑》',author:'圣严法师',desc:'深入解答学佛者的各种疑问'},{name:'《金刚经说什么》',author:'南怀瑾',desc:'深入浅出讲解金刚经的般若智慧'},{name:'《西藏生死书》',author:'索甲仁波切',desc:'了解生死大事，学习临终关怀'},{name:'《佛学基础》',author:'杨卓/界诠法师',desc:'系统学习佛教基础知识'}],apps:['佛教日历','念佛计数器','佛学词典','禅修计时器'],websites:['佛弟子网','佛教导航','显密文库']},
     dao:{books:[{name:'《道德经》',author:'老子',desc:'道教最高圣典'},{name:'《太上感应篇》',author:'佚名',desc:'道教劝善经典'},{name:'《中国道教史》',author:'任继愈',desc:'了解道教发展历史'},{name:'《道教与中国文化》',author:'葛兆光',desc:'了解道教文化影响'},{name:'《内丹养生功法》',author:'胡孚琛',desc:'科学系统地介绍内丹修炼'}],apps:['道教日历','道德经诵读版','八段锦教学','道教音乐'],websites:['道教之音','中国道教协会','白云观官网']},
     ru:{books:[{name:'《论语》',author:'孔子弟子',desc:'儒家根本经典'},{name:'《大学·中庸》',author:'曾子/子思',desc:'修齐治平与中庸之道'},{name:'《孟子》',author:'孟子',desc:'性善论和仁政思想'},{name:'《论语别裁》',author:'南怀瑾',desc:'深入浅出讲解论语'}],apps:['国学经典诵读','四书五经','论语日历'],websites:['国学网','古诗文网']}
   };
-  var data = resources[faith]||resources.fo;
-  var html = '<div style="text-align:center;margin-bottom:20px">';
+  let data = resources[faith]||resources.fo;
+  let html = '<div style="text-align:center;margin-bottom:20px">';
   html += '<h3 style="color:'+col.main+';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">📚 修行资源推荐</h3>';
   html += '<p style="font-size:12px;opacity:.5">经典著作 · 实用工具 · 修行网站</p></div>';
   html += '<div style="margin-bottom:16px"><div style="font-size:13px;font-weight:bold;color:'+col.main+';margin-bottom:10px;border-bottom:1px solid rgba(255,255,255,.06);padding-bottom:8px">📖 推荐书籍</div><div style="display:grid;gap:8px">';
@@ -1222,25 +1222,25 @@ function renderFaithResources(el, faith) {
 }
 
 function renderFaithFAQ(el, faith) {
-  var col = COLORS[faith];
-  var faqs = {
+  let col = COLORS[faith];
+  let faqs = {
     fo:[{q:'什么是皈依？一定要皈依才能学佛吗？',a:'皈依就是归投依靠三宝（佛、法、僧）。皈依是成为正式佛弟子的第一步。不皈依也可以了解佛法，但皈依后有明确的信仰归属和戒律约束，修行更加坚定。皈依不等于出家，在家居士也可以皈依。'},{q:'念佛真的能往生极乐世界吗？',a:'净土宗认为只要信愿行三者具足——深信极乐世界、真切愿往生、至诚恳切念佛——临命终时阿弥陀佛必定来接引。念佛不是消极等死，而是通过念佛净化心灵、提升生命品质。'},{q:'烧香拜佛是迷信吗？',a:'烧香拜佛本身不是迷信。香代表戒定慧三学，拜佛是对觉悟者的礼敬。关键是心态：只求保佑而不努力是迷信，通过拜佛提醒自己精进修行是正信。'},{q:'在家学佛应该怎么开始？',a:'从三方面入手：①阅读入门书籍；②开始简单定课；③参加寺院或居士活动亲近善知识。'}],
     dao:[{q:'道教和道家有什么区别？',a:'道家是先秦哲学思想流派（老庄），道教是在道家思想基础上发展形成的宗教。道教继承了道家核心思想（道、无为、自然），并加入了神仙信仰、斋醮科仪、内丹修炼等宗教元素。'},{q:'普通人可以修炼内丹吗？',a:'内丹修炼需要三个条件：身体健康、有师父指导、足够时间精力。对大多数人来说，先学习道教养生功法更为实际。'},{q:'正一道和全真道有什么不同？',a:'正一道：可以结婚、不忌荤食、以符箓斋醮为主。全真道：出家修行、茹素、禁欲、以内丹修真为主。'},{q:'戊日为什么不能烧香？',a:'道教有「戊不朝真」禁忌——逢戊日不烧香不诵经不拜神。戊日为天地交泰之时，应静养而不扰动。'}]
   };
-  var data = faqs[faith]||faqs.fo;
-  var html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:'+col.main+';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">❓ 常见问答</h3><p style="font-size:12px;opacity:.5">解答信众最常遇到的问题</p></div><div style="display:grid;gap:10px">';
+  let data = faqs[faith]||faqs.fo;
+  let html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:'+col.main+';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">❓ 常见问答</h3><p style="font-size:12px;opacity:.5">解答信众最常遇到的问题</p></div><div style="display:grid;gap:10px">';
   data.forEach(function(faq,i){html+='<details style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;overflow:hidden"><summary style="padding:12px 14px;font-size:13px;font-weight:bold;color:'+col.main+';cursor:pointer">'+(i+1)+'. '+faq.q+'</summary><div style="padding:12px 14px;font-size:12px;opacity:.75;line-height:1.8;border-top:1px solid rgba(255,255,255,.05)">'+faq.a+'</div></details>';});
   html += '</div>';
   el.innerHTML = html;
 }
 
 function renderProgressTracker(el, faith) {
-  var col = COLORS[faith];
-  var phases = [{name:'基础入门',icon:'🚶',desc:'了解基本教义、亲近善知识',progress:30},{name:'皈依受戒',icon:'🙏',desc:'皈依三宝、受持戒律',progress:0},{name:'定课坚持',icon:'📿',desc:'每日诵经念佛、形成习惯',progress:0},{name:'解行并进',icon:'📖',desc:'深入经藏、实践修行',progress:0},{name:'深入修行',icon:'🧘',desc:'参加禅修、专修法门',progress:0},{name:'弘法利生',icon:'🌟',desc:'利益众生、代代相传',progress:0}];
-  var html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:'+col.main+';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">📊 修行进度追踪</h3><p style="font-size:12px;opacity:.5">量力而行 · 日积月累 · 水滴石穿</p></div><div style="display:grid;gap:10px;margin-bottom:16px">';
-  phases.forEach(function(p){var pc=p.progress>=80?'#2ecc71':p.progress>=40?'#f39c12':'#3498db';html+='<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:12px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">'+p.icon+'</span><span style="font-size:13px;font-weight:bold;opacity:.85">'+p.name+'</span></div><span style="font-size:11px;opacity:.4">'+p.progress+'%</span></div><div style="background:rgba(255,255,255,.08);border-radius:4px;height:6px;overflow:hidden"><div style="height:100%;width:'+p.progress+'%;background:'+pc+';border-radius:4px"></div></div><div style="font-size:10px;opacity:.4;margin-top:4px">'+p.desc+'</div></div>';});
+  let col = COLORS[faith];
+  let phases = [{name:'基础入门',icon:'🚶',desc:'了解基本教义、亲近善知识',progress:30},{name:'皈依受戒',icon:'🙏',desc:'皈依三宝、受持戒律',progress:0},{name:'定课坚持',icon:'📿',desc:'每日诵经念佛、形成习惯',progress:0},{name:'解行并进',icon:'📖',desc:'深入经藏、实践修行',progress:0},{name:'深入修行',icon:'🧘',desc:'参加禅修、专修法门',progress:0},{name:'弘法利生',icon:'🌟',desc:'利益众生、代代相传',progress:0}];
+  let html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:'+col.main+';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">📊 修行进度追踪</h3><p style="font-size:12px;opacity:.5">量力而行 · 日积月累 · 水滴石穿</p></div><div style="display:grid;gap:10px;margin-bottom:16px">';
+  phases.forEach(function(p){let pc=p.progress>=80?'#2ecc71':p.progress>=40?'#f39c12':'#3498db';html+='<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:12px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">'+p.icon+'</span><span style="font-size:13px;font-weight:bold;opacity:.85">'+p.name+'</span></div><span style="font-size:11px;opacity:.4">'+p.progress+'%</span></div><div style="background:rgba(255,255,255,.08);border-radius:4px;height:6px;overflow:hidden"><div style="height:100%;width:'+p.progress+'%;background:'+pc+';border-radius:4px"></div></div><div style="font-size:10px;opacity:.4;margin-top:4px">'+p.desc+'</div></div>';});
   html += '</div>';
-  var quotes = ['滴水穿石，非力也，恒也。——修行贵在坚持','不积跬步，无以至千里。——每日定课不可间断','道虽迩，不行不至；事虽小，不为不成。','修行如逆水行舟，不进则退。','一日修来一日功，一日不修一日空。'];
+  let quotes = ['滴水穿石，非力也，恒也。——修行贵在坚持','不积跬步，无以至千里。——每日定课不可间断','道虽迩，不行不至；事虽小，不为不成。','修行如逆水行舟，不进则退。','一日修来一日功，一日不修一日空。'];
   html += '<div style="padding:14px;background:'+col.main+'11;border:1px solid '+col.main+'22;border-radius:12px;text-align:center"><div style="font-size:12px;opacity:.5;margin-bottom:8px">💪 修行箴言</div><div style="font-size:14px;color:'+col.main+';font-style:italic;opacity:.8">'+quotes[Math.floor(Math.random()*quotes.length)]+'</div></div>';
   el.innerHTML = html;
 }
@@ -1265,8 +1265,8 @@ window.FaithContentRenderer = {
 // 三教对比渲染器
 // ====================================================================
 function renderFaithComparison(el) {
-  var html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:var(--gold);font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">📊 三教对比一览</h3><p style="font-size:12px;opacity:.5">佛教 · 道教 · 儒家 · 核心要义对照</p></div>';
-  var comps = [
+  let html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:var(--gold);font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">📊 三教对比一览</h3><p style="font-size:12px;opacity:.5">佛教 · 道教 · 儒家 · 核心要义对照</p></div>';
+  let comps = [
     ['终极追求','涅槃（解脱轮回）','与道合真（长生久视）','成圣成贤（内圣外王）'],
     ['创始人','释迦牟尼佛','张道陵（宗教）/老子（哲学）','孔子'],
     ['核心经典','《大藏经》（三藏十二部）','《道藏》（三洞四辅十二类）','《四书五经》'],
@@ -1283,7 +1283,7 @@ function renderFaithComparison(el) {
   html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
   html += '<tr style="background:rgba(255,255,255,.06)"><th style="padding:10px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,.1);color:var(--gold)">维度</th><th style="padding:10px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,.1);color:#e67e22">🪷 佛教</th><th style="padding:10px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,.1);color:#8e44ad">☯️ 道教</th><th style="padding:10px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,.1);color:#c0392b">🎓 儒家</th></tr>';
   comps.forEach(function(r,i){
-    var bg = i%2===0?'rgba(255,255,255,.02)':'transparent';
+    let bg = i%2===0?'rgba(255,255,255,.02)':'transparent';
     html += '<tr style="background:'+bg+'"><td style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04);font-weight:bold;opacity:.8">'+r[0]+'</td><td style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04);opacity:.75">'+r[1]+'</td><td style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04);opacity:.75">'+r[2]+'</td><td style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04);opacity:.75">'+r[3]+'</td></tr>';
   });
   html += '</table></div>';
@@ -1295,17 +1295,17 @@ function renderFaithComparison(el) {
 // 每日箴言渲染器
 // ====================================================================
 function renderDailyWisdom(el, faith) {
-  var col = COLORS[faith];
-  var wisdoms = {
+  let col = COLORS[faith];
+  let wisdoms = {
     fo: [{t:'一切有为法，如梦幻泡影，如露亦如电，应作如是观。',s:'《金刚经》'},{t:'应无所住而生其心。',s:'《金刚经》'},{t:'色不异空，空不异色，色即是空，空即是色。',s:'《心经》'},{t:'诸恶莫作，众善奉行，自净其意，是诸佛教。',s:'《法句经》'},{t:'若以色见我，以音声求我，是人行邪道，不能见如来。',s:'《金刚经》'},{t:'此有故彼有，此生故彼生；此无故彼无，此灭故彼灭。',s:'《杂阿含经》'},{t:'一花一世界，一叶一如来。',s:'《华严经》'},{t:'善护念。',s:'《金刚经》'},{t:'念佛一声，灭八十亿劫生死重罪。',s:'《观无量寿经》'},{t:'自净其意，是诸佛教。',s:'《增一阿含经》'}],
     dao: [{t:'道可道，非常道；名可名，非常名。',s:'《道德经》第一章'},{t:'上善若水，水善利万物而不争。',s:'《道德经》第八章'},{t:'人法地，地法天，天法道，道法自然。',s:'《道德经》第二十五章'},{t:'祸福无门，唯人自召。善恶之报，如影随形。',s:'《太上感应篇》'},{t:'为学日益，为道日损。损之又损，以至于无为。',s:'《道德经》第四十八章'},{t:'知人者智，自知者明。胜人者有力，自胜者强。',s:'《道德经》第三十三章'},{t:'致虚极，守静笃。万物并作，吾以观复。',s:'《道德经》第十六章'},{t:'天道无亲，常与善人。',s:'《道德经》第七十九章'},{t:'合抱之木，生于毫末；九层之台，起于累土。',s:'《道德经》第六十四章'},{t:'信言不美，美言不信。善者不辩，辩者不善。',s:'《道德经》第八十一章'}],
     ru: [{t:'学而时习之，不亦说乎。',s:'《论语》'},{t:'己所不欲，勿施于人。',s:'《论语》'},{t:'三人行，必有我师焉。',s:'《论语》'},{t:'君子坦荡荡，小人长戚戚。',s:'《论语》'},{t:'大学之道，在明明德，在亲民，在止于至善。',s:'《大学》'},{t:'喜怒哀乐之未发谓之中，发而皆中节谓之和。',s:'《中庸》'},{t:'穷则独善其身，达则兼善天下。',s:'《孟子》'},{t:'天将降大任于是人也，必先苦其心志。',s:'《孟子》'}]
   };
-  var list = wisdoms[faith] || [];
-  var today = new Date();
-  var dayOfYear = Math.floor((today - new Date(today.getFullYear(),0,0)) / 86400000);
-  var w = list[dayOfYear % list.length];
-  var html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:'+col.main+';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">💡 今日修行箴言</h3><p style="font-size:12px;opacity:.5">每日一句经典 · 日日熏修 · 潜移默化</p></div>';
+  let list = wisdoms[faith] || [];
+  let today = new Date();
+  let dayOfYear = Math.floor((today - new Date(today.getFullYear(),0,0)) / 86400000);
+  let w = list[dayOfYear % list.length];
+  let html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:'+col.main+';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">💡 今日修行箴言</h3><p style="font-size:12px;opacity:.5">每日一句经典 · 日日熏修 · 潜移默化</p></div>';
   html += '<div style="background:linear-gradient(135deg,'+col.main+'15,rgba(0,0,0,.1));border:2px solid '+col.main+'33;border-radius:16px;padding:28px 24px;text-align:center;margin-bottom:16px"><div style="font-size:20px;color:'+col.main+';line-height:2;font-weight:bold;letter-spacing:1px;margin-bottom:12px">「'+w.t+'」</div><div style="font-size:13px;opacity:.5">—— '+w.s+'</div></div>';
   html += '<details style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden"><summary style="padding:12px 14px;font-size:12px;font-weight:bold;color:'+col.main+';cursor:pointer">📖 查看全部箴言（共'+list.length+'条）</summary><div style="padding:12px 14px">';
   list.forEach(function(w,i){html+='<div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.03);font-size:12px"><span style="color:'+col.main+';font-weight:bold;flex-shrink:0">'+(i+1)+'.</span><span style="opacity:.8">'+w.t+'</span><span style="opacity:.35;flex-shrink:0">——'+w.s+'</span></div>';});
@@ -1317,8 +1317,8 @@ function renderDailyWisdom(el, faith) {
 // 禅修冥想指导渲染器
 // ====================================================================
 function renderMeditationGuide(el, faith) {
-  var col = COLORS[faith];
-  var html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:'+col.main+';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">🧘 冥想禅修入门指导</h3><p style="font-size:12px;opacity:.5">从零开始学习静坐冥想 · 适合初学者</p></div>';
+  let col = COLORS[faith];
+  let html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:'+col.main+';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">🧘 冥想禅修入门指导</h3><p style="font-size:12px;opacity:.5">从零开始学习静坐冥想 · 适合初学者</p></div>';
   html += '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:16px;margin-bottom:14px"><div style="font-size:14px;font-weight:bold;color:'+col.main+';margin-bottom:12px">📋 禅修前准备</div><div style="display:grid;gap:8px">';
   html += '<div style="font-size:12px;opacity:.75;line-height:1.8"><b>环境：</b>选择安静、通风、光线柔和的房间。避免在风口或阳光直射处打坐。可点一支清香净化空气。</div>';
   html += '<div style="font-size:12px;opacity:.75;line-height:1.8"><b>时间：</b>初学者建议选择清晨（5-7点）或黄昏（17-19点）。每次5-15分钟起步，逐步延长至30-45分钟。</div>';
@@ -1352,14 +1352,14 @@ function renderMeditationGuide(el, faith) {
 // 朝圣日记渲染器
 // ====================================================================
 function renderPilgrimageJournal(el, faith) {
-  var col = COLORS[faith];
-  var html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:'+col.main+';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">📔 朝圣修行日记</h3><p style="font-size:12px;opacity:.5">记录朝圣之旅 · 珍藏修行点滴 · 回顾成长历程</p></div>';
-  var pilgrimages = {
+  let col = COLORS[faith];
+  let html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:'+col.main+';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">📔 朝圣修行日记</h3><p style="font-size:12px;opacity:.5">记录朝圣之旅 · 珍藏修行点滴 · 回顾成长历程</p></div>';
+  let pilgrimages = {
     fo: [{s:'普陀山',d:'观音菩萨',l:'浙江舟山',t:'二月十九/六月十九/九月十九为三大观音圣诞'},{s:'五台山',d:'文殊菩萨',l:'山西忻州',t:'四月初四文殊圣诞，学子考前朝拜尤佳'},{s:'九华山',d:'地藏菩萨',l:'安徽池州',t:'七月三十地藏圣诞，超度先人最佳时机'},{s:'峨眉山',d:'普贤菩萨',l:'四川乐山',t:'二月廿一普贤圣诞，金顶十方普贤像前许愿'},{s:'灵隐寺',d:'释迦牟尼佛',l:'浙江杭州',t:'灵隐寺韦驮菩萨求正财最为灵验'},{s:'法门寺',d:'佛指舍利',l:'陕西宝鸡',t:'供奉佛祖指骨舍利，佛教最高圣物之一'}],
     dao: [{s:'武当山',d:'真武大帝',l:'湖北十堰',t:'三月初三/九月初九为真武圣诞和飞升日'},{s:'龙虎山',d:'张天师',l:'江西鹰潭',t:'天师府为正一道祖庭，请符驱邪最为灵验'},{s:'青城山',d:'太上老君',l:'四川成都',t:'道教发源地之一，天师道创立于此'},{s:'白云观',d:'丘处机',l:'北京西城',t:'全真道三大祖庭之一，燕九节最热闹'},{s:'终南山',d:'老子/王重阳',l:'陕西西安',t:'天下第一福地，全真道发源地'},{s:'茅山',d:'三茅真君',l:'江苏句容',t:'上清派祖庭，符箓驱邪最为灵验'}],
     ru: [{s:'曲阜孔庙',d:'孔子',l:'山东曲阜',t:'八月廿七孔子诞辰，祭孔大典最为隆重'},{s:'孟庙',d:'孟子',l:'山东邹城',t:'四月初二孟子诞辰，参拜亚圣'},{s:'岳麓书院',d:'孔子/朱熹',l:'湖南长沙',t:'千年学府，四大书院之首'}]
   };
-  var items = pilgrimages[faith] || pilgrimages.fo;
+  let items = pilgrimages[faith] || pilgrimages.fo;
   html += '<div style="display:grid;gap:10px">';
   items.forEach(function(p){html+='<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px"><div style="width:44px;height:44px;background:'+col.main+'22;border:1px solid '+col.main+'44;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🏛️</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:bold;opacity:.9">'+p.s+' <span style="font-size:10px;opacity:.5">'+p.d+'</span></div><div style="font-size:10px;opacity:.4">📍 '+p.l+'</div><div style="font-size:10px;opacity:.5;margin-top:4px">💡 '+p.t+'</div></div><span style="font-size:11px;padding:4px 10px;background:rgba(255,255,255,.06);border-radius:6px;opacity:.4;flex-shrink:0">未朝圣</span></div>';});
   html += '</div>';
@@ -1376,8 +1376,8 @@ window.FaithContentRenderer.renderPilgrimageJournal = renderPilgrimageJournal;
 // 修行心法语录渲染器
 // ====================================================================
 function renderPracticeAphorisms(el, faith) {
-  var col = COLORS[faith];
-  var aphorisms = {
+  let col = COLORS[faith];
+  let aphorisms = {
     fo: [
       {t:'菩提本无树，明镜亦非台。本来无一物，何处惹尘埃。',a:'六祖惠能',c:'禅宗六祖惠能大师著名的开悟偈颂，直指心性本空，不假外求。此偈超越了神秀大师「时时勤拂拭」的渐修路径，点出了顿悟法门的精髓——一切烦恼本无自性，觉悟就在当下。'},
       {t:'过去心不可得，现在心不可得，未来心不可得。',a:'《金刚经》',c:'佛陀在《金刚经》中破除了对时间的执着。过去已去不可追回，未来未至不可预期，现在念念迁流不可把握。三心不可得，放下对时间的执着，才能体验到真正的自在。'},
@@ -1399,8 +1399,8 @@ function renderPracticeAphorisms(el, faith) {
       {t:'己欲立而立人，己欲达而达人。',a:'《论语·雍也》',c:'自己希望立身，也帮助别人立身；自己希望通达，也帮助别人通达。这是儒家「恕道」的积极面——推己及人，成己成人。同时也是儒家「内圣外王」精神的具体表达。'}
     ]
   };
-  var items = aphorisms[faith] || [];
-  var html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:'+col.main+';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">💎 修行心法语录</h3><p style="font-size:12px;opacity:.5">历代圣贤悟道心得 · 醍醐灌顶 · 直指人心</p></div>';
+  let items = aphorisms[faith] || [];
+  let html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:'+col.main+';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">💎 修行心法语录</h3><p style="font-size:12px;opacity:.5">历代圣贤悟道心得 · 醍醐灌顶 · 直指人心</p></div>';
   html += '<div style="display:grid;gap:14px">';
   items.forEach(function(item) {
     html += '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:16px">';
@@ -1417,14 +1417,14 @@ function renderPracticeAphorisms(el, faith) {
 // 月修行日历渲染器
 // ====================================================================
 function renderMonthlyPracticeCalendar(el, faith) {
-  var col = COLORS[faith];
-  var now = new Date();
-  var year = now.getFullYear(), month = now.getMonth()+1;
-  var daysInMonth = new Date(year, month, 0).getDate();
-  var html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:'+col.main+';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">📅 '+year+'年'+month+'月修行日历</h3><p style="font-size:12px;opacity:.5">记录每日修行功课完成情况</p></div>';
+  let col = COLORS[faith];
+  let now = new Date();
+  let year = now.getFullYear(), month = now.getMonth()+1;
+  let daysInMonth = new Date(year, month, 0).getDate();
+  let html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:'+col.main+';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">📅 '+year+'年'+month+'月修行日历</h3><p style="font-size:12px;opacity:.5">记录每日修行功课完成情况</p></div>';
 
   // 修行项目
-  var practices = [
+  let practices = [
     {id:'chanting', name:'诵经念佛', icon:'📿'},
     {id:'meditation', name:'静坐禅修', icon:'🧘'},
     {id:'vegetarian', name:'素食斋戒', icon:'🥬'},
@@ -1441,7 +1441,7 @@ function renderMonthlyPracticeCalendar(el, faith) {
   });
   html += '</div>';
 
-  for (var d=1; d<=daysInMonth; d++) {
+  for (let d=1; d<=daysInMonth; d++) {
     html += '<div style="display:flex;flex-wrap:wrap;gap:4px;padding:3px 0;border-top:1px solid rgba(255,255,255,.03)">';
     html += '<div style="min-width:60px;font-size:11px;text-align:center;opacity:.6">'+month+'/'+d+'</div>';
     practices.forEach(function(p) {
@@ -1463,14 +1463,14 @@ window.FaithContentRenderer.renderMonthlyPracticeCalendar = renderMonthlyPractic
 // 戒律详解渲染器
 // ====================================================================
 function renderPreceptsDetail(el, faith) {
-  var col = COLORS[faith];
-  var data = {
+  let col = COLORS[faith];
+  let data = {
     fo: {title:'佛教戒律详解',desc:'戒为无上菩提本，应当具足持净戒。戒律是佛教修行之基础，如同大地承载万物，一切善法皆从戒律而生。持戒不是束缚，而是对自身的保护——如同遵守交通规则才能安全抵达目的地。',items:[{name:'不杀生戒',detail:'不杀害一切有情众生。这包括了不亲手杀、不教他杀、不见杀随喜。培养慈悲心，爱护一切生命。现代生活中，还包括不虐待动物、不破坏生态环境。'},{name:'不偷盗戒',detail:'不取他人未经同意的财物。包括不偷、不抢、不骗、不贪污。广义而言，还包括不偷税漏税、不占公家便宜、不利用职权谋私。'},{name:'不邪淫戒',detail:'不与他人配偶及受保护对象发生不正当关系。在家居士遵守夫妻伦理即可，出家众则完全禁止一切性行为。现代语境下，戒邪淫有助于维护家庭和睦与社会秩序。'},{name:'不妄语戒',detail:'不说谎话、欺骗之语。包括不两舌（挑拨离间）、不恶口（粗言秽语）、不绮语（花言巧语惑人）。修行人应言必真实、语必利益。'},{name:'不饮酒戒',detail:'不饮用一切含酒精饮品及麻醉品。佛教认为酒能乱性，是产生其他过失的诱因。现代社会此戒还可延伸到远离毒品等一切令人心智昏迷的物质。'},{name:'五戒功德',detail:'持五戒可得五种功德：不杀生得健康长寿、不偷盗得财富丰足、不邪淫得家庭和睦、不妄语得信誉卓著、不饮酒得智慧清明。'}]},
     dao: {title:'道教戒律详解',desc:'道教戒律融合了道家思想和古代伦理道德，不同派别有不同的戒律体系。最基本的「老君五戒」与佛教五戒相似但有自己的传承和解释。正一道在家弟子和全真道出家弟子的戒律要求也有所不同。',items:[{name:'初真五戒',detail:'一、不杀生（含不食牛肉、狗肉、泥鳅、鳝鱼——道教四不食）；二、不偷盗；三、不邪淫（全真道要求完全禁欲）；四、不妄语；五、不饮酒（全真道禁酒，正一道适度不禁）。'},{name:'初真十戒',detail:'在五戒基础上增加：六、不得叛逆君王、不孝父母；七、不得毁谤道法、轻慢经书；八、不得贪求无厌、积财不散；九、不得交游非贤、居处杂秽；十、不得轻忽言笑、举动非真。'},{name:'全真道三坛大戒',detail:'全真道比照佛教三坛大戒设立：初真戒（基础戒律）、中极戒（进阶戒律，三百条）、天仙大戒（最高级戒律，不可计数）。受戒者须经过严格的师传考核，出家住观修行。'},{name:'戊不朝真',detail:'道教独有的禁忌——逢戊日（天干为戊的日子）不烧香、不诵经、不拜神、不行法事。戊日被视为天地交泰之日，应静养不扰。六戊月（戊子、戊寅、戊辰、戊午、戊申、戊戌月）尤需注意。'}]},
     ru: {title:'儒家修身戒律',desc:'儒家虽无宗教意义的戒律，但有自己的修身规范体系。孔子的「四勿」——非礼勿视、非礼勿听、非礼勿言、非礼勿动——可谓是儒家的行为准则。此外还有「君子九思」「君子三戒」等修行指南。',items:[{name:'君子三戒',detail:'孔子曰：少之时，血气未定，戒之在色；及其壮也，血气方刚，戒之在斗；及其老也，血气既衰，戒之在得。少年戒色、壮年戒斗、老年戒贪。'},{name:'君子九思',detail:'视思明（看要看清）、听思聪（听要听明）、色思温（脸色温和）、貌思恭（仪态恭敬）、言思忠（言语忠实）、事思敬（做事认真）、疑思问（有疑请教）、忿思难（发怒考虑后果）、见得思义（获利考虑是否合乎道义）。'}]}
   };
-  var d = data[faith] || data.fo;
-  var html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:'+col.main+';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">⚖️ '+d.title+'</h3><p style="font-size:12px;opacity:.5">戒为修行之基 · 了解戒律 · 受持戒律</p></div>';
+  let d = data[faith] || data.fo;
+  let html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:'+col.main+';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">⚖️ '+d.title+'</h3><p style="font-size:12px;opacity:.5">戒为修行之基 · 了解戒律 · 受持戒律</p></div>';
   html += '<div style="background:'+col.main+'11;border:1px solid '+col.main+'22;border-radius:12px;padding:16px;margin-bottom:16px"><div style="font-size:12px;opacity:.75;line-height:1.8">'+d.desc+'</div></div>';
   html += '<div style="display:grid;gap:10px">';
   d.items.forEach(function(item){html+='<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:14px"><div style="font-size:13px;font-weight:bold;color:'+col.main+';margin-bottom:6px">📜 '+item.name+'</div><div style="font-size:12px;opacity:.7;line-height:1.8">'+item.detail+'</div></div>';});
@@ -1484,26 +1484,26 @@ window.FaithContentRenderer.renderPreceptsDetail = renderPreceptsDetail;
 // 模块：新 — 诞辰节日日历（倒计时 + 即将到来的圣诞）
 // ====================================================================
 function renderBirthdayCalendar(el, faith) {
-  var col = COLORS[faith].main;
-  var faithKey = faith === 'fo' ? 'buddhist' : faith === 'dao' ? 'taoist' : 'confucian';
-  var FK_data = FK || window.FAITH_KNOWLEDGE || {};
-  var deities = FK_data.deities ? (FK_data.deities[faithKey] || []) : [];
-  var festivals = FK_data.festivalCalendar || [];
+  let col = COLORS[faith].main;
+  let faithKey = faith === 'fo' ? 'buddhist' : faith === 'dao' ? 'taoist' : 'confucian';
+  let FK_data = FK || window.FAITH_KNOWLEDGE || {};
+  let deities = FK_data.deities ? (FK_data.deities[faithKey] || []) : [];
+  let festivals = FK_data.festivalCalendar || [];
 
-  var html = '';
+  let html = '';
   html += '<div style="text-align:center;margin-bottom:20px">';
   html += '<h3 style="color:' + col + ';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:3px">🎂 诞辰节日历</h3>';
   html += '<p style="font-size:12px;opacity:.5;margin-top:4px">神仙圣诞 · 重要节日 · 参拜时机</p>';
   html += '</div>';
 
   // 农历月份映射（简化）
-  var lunarMonths = {
+  let lunarMonths = {
     '正':1,'二':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10,'十一':11,'腊':12
   };
 
   function lunarToMonthKey(lunar) {
     // 提取农历月份信息
-    for (var key in lunarMonths) {
+    for (let key in lunarMonths) {
       if (lunar.indexOf(key) >= 0) {
         return lunarMonths[key];
       }
@@ -1513,11 +1513,11 @@ function renderBirthdayCalendar(el, faith) {
 
   function getCountdown(lunar) {
     // 简单倒计时（基于农历月份估算）
-    var m = lunarToMonthKey(lunar);
+    let m = lunarToMonthKey(lunar);
     if (m === null) return '';
-    var now = new Date();
-    var currentMonth = now.getMonth() + 1; // 1-12
-    var diff = m - currentMonth;
+    let now = new Date();
+    let currentMonth = now.getMonth() + 1; // 1-12
+    let diff = m - currentMonth;
     if (diff < 0) diff += 12;
     if (diff === 0) return '<span style="color:#e74c3c">🔥 即将到来！</span>';
     if (diff === 1) return '<span style="color:#f39c12">约 ' + diff + '个月后</span>';
@@ -1525,14 +1525,14 @@ function renderBirthdayCalendar(el, faith) {
   }
 
   // Filter deities with birthday
-  var birthdayDeities = deities.filter(function(d) { return d.birthday; });
+  let birthdayDeities = deities.filter(function(d) { return d.birthday; });
   
   if (birthdayDeities.length > 0) {
     html += '<h4 style="color:' + col + ';font-size:13px;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06);padding-bottom:8px">🙏 本教神仙圣诞</h4>';
     html += '<div style="display:grid;gap:10px">';
     birthdayDeities.forEach(function(d) {
-      var countdown = getCountdown(d.birthday);
-      var temple = d.templeLocation || d.temple || '';
+      let countdown = getCountdown(d.birthday);
+      let temple = d.templeLocation || d.temple || '';
       html += '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:12px 14px">';
       html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
       html += '<span style="font-size:14px;font-weight:bold;color:' + col + '">' + d.name + '</span>';
@@ -1552,13 +1552,13 @@ function renderBirthdayCalendar(el, faith) {
 
   // Festival calendar - show next 6 upcoming festivals
   html += '<h4 style="color:' + col + ';font-size:13px;margin:20px 0 12px;border-bottom:1px solid rgba(255,255,255,.06);padding-bottom:8px">📅 重要节日一览</h4>';
-  var relevantFestivals = festivals.filter(function(f) {
+  let relevantFestivals = festivals.filter(function(f) {
     return f.faith === faith || f.faith === 'folk';
   });
   
   html += '<div style="display:grid;gap:8px">';
   relevantFestivals.slice(0, 12).forEach(function(f) {
-    var countdown = getCountdown(f.lunar);
+    let countdown = getCountdown(f.lunar);
     html += '<div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center">';
     html += '<div>';
     html += '<div style="font-size:13px;font-weight:bold;color:' + col + '">' + f.name + '</div>';
@@ -1579,12 +1579,12 @@ function renderBirthdayCalendar(el, faith) {
 // 模块：新 — 寺庙参拜攻略（各菩萨/神仙的道场 + 供奉指南）
 // ====================================================================
 function renderTempleGuide(el, faith) {
-  var col = COLORS[faith].main;
-  var faithKey = faith === 'fo' ? 'buddhist' : faith === 'dao' ? 'taoist' : 'confucian';
-  var FK_data = FK || window.FAITH_KNOWLEDGE || {};
-  var deities = FK_data.deities ? (FK_data.deities[faithKey] || []) : [];
+  let col = COLORS[faith].main;
+  let faithKey = faith === 'fo' ? 'buddhist' : faith === 'dao' ? 'taoist' : 'confucian';
+  let FK_data = FK || window.FAITH_KNOWLEDGE || {};
+  let deities = FK_data.deities ? (FK_data.deities[faithKey] || []) : [];
 
-  var html = '';
+  let html = '';
   html += '<div style="text-align:center;margin-bottom:20px">';
   html += '<h3 style="color:' + col + ';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:3px">🏛️ 名山道场 · 参拜攻略</h3>';
   html += '<p style="font-size:12px;opacity:.5;margin-top:4px">朝圣指路 · 供奉指南 · 注意事项</p>';
@@ -1593,7 +1593,7 @@ function renderTempleGuide(el, faith) {
   // General etiquette
   html += '<div style="background:' + col + '11;border:1px solid ' + col + '22;border-radius:12px;padding:16px;margin-bottom:20px">';
   html += '<div style="font-size:14px;font-weight:bold;color:' + col + ';margin-bottom:10px">🕯️ 参拜通用礼仪</div>';
-  var tips = [
+  let tips = [
     '进殿脱帽、摘墨镜，手机静音或关闭',
     '男左女右跨门槛（不走正中间），踩门槛为大不敬',
     '礼佛三拜：合十 → 弯腰 → 跪拜 → 额头触地 → 起身',
@@ -1609,7 +1609,7 @@ function renderTempleGuide(el, faith) {
   html += '</div>';
 
   // Deity-specific temple tips
-  var withTemple = deities.filter(function(d) { return d.temple; });
+  let withTemple = deities.filter(function(d) { return d.temple; });
   if (withTemple.length === 0) {
     html += '<div style="text-align:center;padding:30px;opacity:.4">暂无道场数据</div>';
   } else {
@@ -1645,7 +1645,7 @@ function renderTempleGuide(el, faith) {
   html += '<div style="margin-top:24px">';
   html += '<div style="font-size:14px;font-weight:bold;color:' + col + ';margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06);padding-bottom:8px">🗓️ 年度朝圣月历</div>';
   html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">';
-  var months = [
+  let months = [
     ['正月','弥勒/玉帝','过年香火最旺'],
     ['二月','观音出家/老君','浴佛节/道祖诞'],
     ['三月','真武/妈祖','武当朝山/海上祈福'],
@@ -1675,12 +1675,12 @@ function renderTempleGuide(el, faith) {
 // 模块：新 — 每日修行功课（晨起/午前/午时/暮时/夜间）
 // ====================================================================
 function renderDailyPractice(el, faith) {
-  var col = COLORS[faith].main;
-  var FK_data = FK || window.FAITH_KNOWLEDGE || {};
-  var practices = FK_data.dailyPractices || {};
-  var data = practices[faith] || null;
+  let col = COLORS[faith].main;
+  let FK_data = FK || window.FAITH_KNOWLEDGE || {};
+  let practices = FK_data.dailyPractices || {};
+  let data = practices[faith] || null;
 
-  var html = '';
+  let html = '';
   html += '<div style="text-align:center;margin-bottom:20px">';
   html += '<h3 style="color:' + col + ';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:3px">📋 每日修行功课</h3>';
   html += '<p style="font-size:12px;opacity:.5;margin-top:4px">晨起诵经 · 日间省思 · 暮时持念 · 夜间忏悔</p>';
@@ -1721,9 +1721,9 @@ function renderDailyPractice(el, faith) {
     html += '<div style="font-size:13px;font-weight:bold;color:' + col + ';margin-bottom:10px;border-bottom:1px solid rgba(255,255,255,.06);padding-bottom:8px">📆 月度重点</div>';
     html += '<div style="display:grid;gap:6px">';
     data.monthlyFocus.forEach(function(month) {
-      var parts = month.split('：');
-      var m = parts[0] || '';
-      var desc = parts.slice(1).join('：') || month;
+      let parts = month.split('：');
+      let m = parts[0] || '';
+      let desc = parts.slice(1).join('：') || month;
       html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12px">';
       html += '<span style="color:' + col + ';font-weight:bold;min-width:36px">' + m + '</span>';
       html += '<span style="opacity:.7">' + desc + '</span>';
@@ -1739,9 +1739,9 @@ function renderDailyPractice(el, faith) {
 // 念佛/持咒计数器渲染器
 // ====================================================================
 function renderChantingCounter(el, faith) {
-  var col = COLORS[faith];
-  var faithKey = faith === 'fo' ? 'buddhist' : faith === 'dao' ? 'taoist' : 'confucian';
-  var counters = {
+  let col = COLORS[faith];
+  let faithKey = faith === 'fo' ? 'buddhist' : faith === 'dao' ? 'taoist' : 'confucian';
+  let counters = {
     buddhist: [
       {id:'namo_amituofo', name:'南无阿弥陀佛', shortName:'阿弥陀佛', icon:'📿', desc:'净土宗核心佛号，一句佛号灭八十亿劫生死重罪', target:10000},
       {id:'namo_guanshiyin', name:'南无观世音菩萨', shortName:'观音菩萨', icon:'🪷', desc:'大慈大悲救苦救难，千处祈求千处应', target:3000},
@@ -1762,9 +1762,9 @@ function renderChantingCounter(el, faith) {
       {id:'daxue_zhongyong', name:'大学中庸诵读', shortName:'学庸', icon:'📚', desc:'大学之道在明明德，中庸之道致中和', target:3}
     ]
   };
-  var counterItems = counters[faithKey] || counters.buddhist;
-  var colMain = COLORS[faith].main;
-  var html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:' + colMain + ';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">📿 念诵计数器</h3><p style="font-size:12px;opacity:.5">每日持诵打卡 · 日课精进 · 水滴石穿</p></div>';
+  let counterItems = counters[faithKey] || counters.buddhist;
+  let colMain = COLORS[faith].main;
+  let html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:' + colMain + ';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">📿 念诵计数器</h3><p style="font-size:12px;opacity:.5">每日持诵打卡 · 日课精进 · 水滴石穿</p></div>';
   html += '<div style="display:grid;gap:14px">';
   counterItems.forEach(function(item) {
     html += '<div style="background:rgba(255,255,255,.03);border:1px solid ' + colMain + '33;border-radius:14px;padding:16px;position:relative;overflow:hidden"><div style="position:absolute;left:0;top:0;height:100%;background:' + colMain + '11;border-radius:14px 0 0 14px;transition:width .5s;z-index:0" id="prog_' + item.id + '"></div><div style="position:relative;z-index:1"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:24px">' + item.icon + '</span><div><div style="font-size:15px;font-weight:bold;color:' + colMain + '">' + item.name + '</div><div style="font-size:10px;opacity:.5">' + item.desc + '</div></div></div><div style="text-align:right"><div style="font-size:28px;font-weight:bold;color:' + colMain + '" id="count_' + item.id + '">0</div><div style="font-size:10px;opacity:.4">目标：' + item.target + '次/日</div></div></div><div style="display:flex;gap:6px;align-items:center"><button style="flex:1;padding:10px;background:' + colMain + ';border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:bold;cursor:pointer">🔢 +1</button><button style="padding:10px 12px;background:' + colMain + '88;border:none;border-radius:8px;color:#fff;font-size:12px;cursor:pointer">+10</button><button style="padding:10px 12px;background:' + colMain + '44;border:none;border-radius:8px;color:#fff;font-size:12px;cursor:pointer">+50</button><button style="padding:10px 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:rgba(255,255,255,.5);font-size:12px;cursor:pointer">↺</button></div></div></div>';
@@ -1778,10 +1778,10 @@ function renderChantingCounter(el, faith) {
 // 诵经记录渲染器
 // ====================================================================
 function renderSutraRecitationRecord(el, faith) {
-  var col = COLORS[faith];
-  var colMain = col.main;
-  var faithKey = faith === 'fo' ? 'buddhist' : faith === 'dao' ? 'taoist' : 'confucian';
-  var sutras = {
+  let col = COLORS[faith];
+  let colMain = col.main;
+  let faithKey = faith === 'fo' ? 'buddhist' : faith === 'dao' ? 'taoist' : 'confucian';
+  let sutras = {
     buddhist: [
       {name:'《心经》', icon:'📜', fullName:'般若波罗蜜多心经', length:260, timePer:'约3分钟'},
       {name:'《金刚经》', icon:'💎', fullName:'金刚般若波罗蜜经', length:5175, timePer:'约40分钟'},
@@ -1801,10 +1801,10 @@ function renderSutraRecitationRecord(el, faith) {
       {name:'《大学》', icon:'📚', fullName:'大学', length:1753, timePer:'约15分钟'}
     ]
   };
-  var list = sutras[faithKey] || sutras.buddhist;
-  var now = new Date();
-  var today = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
-  var html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:' + colMain + ';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">📖 诵经记录</h3><p style="font-size:12px;opacity:.5">今日：' + today + ' · 日诵一经身心清净</p></div>';
+  let list = sutras[faithKey] || sutras.buddhist;
+  let now = new Date();
+  let today = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+  let html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:' + colMain + ';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">📖 诵经记录</h3><p style="font-size:12px;opacity:.5">今日：' + today + ' · 日诵一经身心清净</p></div>';
   html += '<div style="display:grid;gap:12px">';
   list.forEach(function(s) {
     html += '<div style="background:rgba(255,255,255,.03);border:1px solid ' + colMain + '33;border-radius:12px;padding:14px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span style="font-size:24px">' + s.icon + '</span><div style="flex:1"><div style="font-size:15px;font-weight:bold;color:' + colMain + '">' + s.name + '</div><div style="font-size:10px;opacity:.4">' + s.fullName + ' · ' + s.length + '字 · ' + s.timePer + '</div></div><div style="text-align:right"><div style="font-size:10px;opacity:.4">每次诵经功德</div><div style="font-size:11px;color:#27ae60">消业障 · 增智慧 · 种善根</div></div></div></div>';
@@ -1818,10 +1818,10 @@ function renderSutraRecitationRecord(el, faith) {
 // 回向文渲染器
 // ====================================================================
 function renderDedicationOfMerit(el, faith) {
-  var col = COLORS[faith];
-  var colMain = col.main;
-  var faithKey = faith === 'fo' ? 'buddhist' : faith === 'dao' ? 'taoist' : 'confucian';
-  var dedications = {
+  let col = COLORS[faith];
+  let colMain = col.main;
+  let faithKey = faith === 'fo' ? 'buddhist' : faith === 'dao' ? 'taoist' : 'confucian';
+  let dedications = {
     buddhist: [
       {name:'普回向偈',icon:'🪷',occasion:'每次念佛诵经后通用回向',text:'愿以此功德，庄严佛净土。上报四重恩，下济三途苦。若有见闻者，悉发菩提心。尽此一报身，同生极乐国。',note:'最通用的回向偈，适用于一切修行功德回向，简单全面。'},
       {name:'往生西方回向文',icon:'🌅',occasion:'超度先人、为亡者念佛回向',text:'愿生西方净土中，九品莲花为父母。花开见佛悟无生，不退菩萨为伴侣。',note:'净土宗最常用回向文，愿先人及一切众生往生极乐世界。'},
@@ -1837,8 +1837,8 @@ function renderDedicationOfMerit(el, faith) {
       {name:'修身回向文',icon:'🎓',occasion:'每日研读经典后',text:'学而时习之，温故而知新。愿今日所习圣贤之道，能化为明德新民之实。修身齐家，以报天地君亲师之恩。',note:'儒家修身回向，将学问化为实践、智慧融入生活。'}
     ]
   };
-  var items = dedications[faithKey] || dedications.buddhist;
-  var html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:' + colMain + ';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">🙏 功德回向</h3><p style="font-size:12px;opacity:.5">修行功德回向众生 · 心量广大福报无量</p></div>';
+  let items = dedications[faithKey] || dedications.buddhist;
+  let html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:' + colMain + ';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">🙏 功德回向</h3><p style="font-size:12px;opacity:.5">修行功德回向众生 · 心量广大福报无量</p></div>';
   html += '<div style="background:' + colMain + '11;border:1px solid ' + colMain + '22;border-radius:12px;padding:16px;margin-bottom:16px"><div style="font-size:13px;font-weight:bold;color:' + colMain + ';margin-bottom:8px">💡 回向的意义</div><div style="font-size:12px;opacity:.75;line-height:1.8">回向是将自己所修功德转向施与他人，扩大心量、增长慈悲。如同点亮一支蜡烛，用它点亮更多蜡烛——自身光明不减，世间光明倍增。佛教强调普皆回向法界一切众生；道教强调功德积累回向先祖和众生；儒家以修身之学回向齐家治国平天下。</div></div>';
   html += '<div style="display:grid;gap:14px">';
   items.forEach(function(item) {
@@ -1853,10 +1853,10 @@ function renderDedicationOfMerit(el, faith) {
 // 寺院导航渲染器
 // ====================================================================
 function renderTempleNavigation(el, faith) {
-  var col = COLORS[faith];
-  var colMain = col.main;
-  var faithKey = faith === 'fo' ? 'buddhist' : faith === 'dao' ? 'taoist' : 'confucian';
-  var regions = {
+  let col = COLORS[faith];
+  let colMain = col.main;
+  let faithKey = faith === 'fo' ? 'buddhist' : faith === 'dao' ? 'taoist' : 'confucian';
+  let regions = {
     buddhist: [
       {region:'华北',temples:[{name:'雍和宫',loc:'北京东城',note:'藏传皇家寺院，26米弥勒木雕世界之最',deity:'宗喀巴大师'},{name:'广济寺',loc:'北京西城',note:'中国佛教协会所在地',deity:'释迦牟尼佛'},{name:'灵光寺',loc:'北京石景山',note:'供奉佛祖牙舍利',deity:'佛牙舍利'},{name:'五台山',loc:'山西忻州',note:'文殊菩萨道场，四大名山',deity:'文殊菩萨'}]},
       {region:'华东',temples:[{name:'普陀山',loc:'浙江舟山',note:'观音菩萨道场，海天佛国',deity:'观世音菩萨'},{name:'灵隐寺',loc:'浙江杭州',note:'韦驮菩萨求正财灵验',deity:'释迦牟尼佛'},{name:'九华山',loc:'安徽池州',note:'地藏菩萨道场，超度先人',deity:'地藏王菩萨'},{name:'国清寺',loc:'浙江台州',note:'天台宗祖庭，智者大师创立',deity:'释迦牟尼佛'}]},
@@ -1878,8 +1878,8 @@ function renderTempleNavigation(el, faith) {
       {region:'其他',temples:[{name:'岳麓书院',loc:'湖南长沙',note:'千年学府',deity:'孔子'},{name:'北京孔庙',loc:'北京东城',note:'元明清祭孔处',deity:'孔子'}]}
     ]
   };
-  var regionList = regions[faithKey] || regions.buddhist;
-  var html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:' + colMain + ';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">🏛️ 寺院导航地图</h3><p style="font-size:12px;opacity:.5">按地域分类 · 快速查找 · 规划朝圣路线</p></div>';
+  let regionList = regions[faithKey] || regions.buddhist;
+  let html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:' + colMain + ';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">🏛️ 寺院导航地图</h3><p style="font-size:12px;opacity:.5">按地域分类 · 快速查找 · 规划朝圣路线</p></div>';
   regionList.forEach(function(region) {
     html += '<div style="margin-bottom:18px"><div style="font-size:14px;font-weight:bold;color:' + colMain + ';margin-bottom:10px;border-bottom:1px solid ' + colMain + '33;padding-bottom:8px;display:flex;align-items:center;gap:8px"><span>📍</span> ' + region.region + ' <span style="font-size:10px;opacity:.4;font-weight:normal">(' + region.temples.length + '座)</span></div><div style="display:grid;gap:8px">';
     region.temples.forEach(function(t) {
@@ -1895,10 +1895,10 @@ function renderTempleNavigation(el, faith) {
 // 功德箱/功过格渲染器
 // ====================================================================
 function renderMeritBox(el, faith) {
-  var col = COLORS[faith];
-  var colMain = col.main;
-  var html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:' + colMain + ';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">✨ 功过格 · 日行一善</h3><p style="font-size:12px;opacity:.5">记录每日善行恶念 · 积功累德 · 三省吾身</p></div>';
-  var merits = [
+  let col = COLORS[faith];
+  let colMain = col.main;
+  let html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:' + colMain + ';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">✨ 功过格 · 日行一善</h3><p style="font-size:12px;opacity:.5">记录每日善行恶念 · 积功累德 · 三省吾身</p></div>';
+  let merits = [
     {cat:'诵经念佛',items:['早课念佛30分钟','诵一部经','持咒108遍','随众共修'],points:10},
     {cat:'布施供养',items:['财布施捐赠','法布施(分享正法)','无畏布施(安慰他人)','供养三宝'],points:15},
     {cat:'放生护生',items:['放生','素食一日','救助动物','环保行动'],points:20},
@@ -1923,9 +1923,9 @@ function renderMeritBox(el, faith) {
 // 佛道学问答扩展
 // ====================================================================
 function renderFaithFAQExtended(el, faith) {
-  var col = COLORS[faith];
-  var colMain = col.main;
-  var advancedFAQs = {
+  let col = COLORS[faith];
+  let colMain = col.main;
+  let advancedFAQs = {
     fo: [
       {q:'佛教为什么提倡素食？',a:'佛教倡导素食基于慈悲心——不忍食众生肉。大乘经典如《楞伽经》《涅槃经》明确提倡素食。素食不仅是饮食选择，更是修行——通过不杀生培养慈悲心减少世间杀戮。在家居士不强求素食，但建议逐步减少肉食。肉边菜、三净肉(不见杀不闻杀不为我杀)是过渡的方便之法。'},
       {q:'什么是因果报应？为什么好人没好报？',a:'佛教因果律是三世因果——今生所受是过去生所造善业恶业的果报，今生所造是未来生的因。好人今生受苦难可能是在消过去恶业；恶人今生享富贵可能在消耗过去善业福报。因果不是简单的现世报，而是通三世的复杂系统。信因果而不执着结果——只管种善因，莫问果何时。'},
@@ -1937,8 +1937,8 @@ function renderFaithFAQExtended(el, faith) {
       {q:'什么是内丹修炼？',a:'内丹是道教独有的身心修炼体系。以人体为炉鼎，以精气神为药物，以呼吸意念为火候，在体内模拟外丹炼制。三步：炼精化气→炼气化神→炼神还虚。最终达到形神俱妙与道合一。内丹必须有师父指导不可盲目自学，否则有走火入魔之险。'}
     ]
   };
-  var items = advancedFAQs[faith] || advancedFAQs.fo;
-  var html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:' + colMain + ';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">❓ 深入问答</h3><p style="font-size:12px;opacity:.5">常见修行疑惑 · 深入解答</p></div>';
+  let items = advancedFAQs[faith] || advancedFAQs.fo;
+  let html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:' + colMain + ';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">❓ 深入问答</h3><p style="font-size:12px;opacity:.5">常见修行疑惑 · 深入解答</p></div>';
   html += '<div style="display:grid;gap:10px">';
   items.forEach(function(faq,i) {
     html += '<details style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;overflow:hidden"><summary style="padding:12px 14px;font-size:13px;font-weight:bold;color:' + colMain + ';cursor:pointer">' + (i+1) + '. ' + faq.q + '</summary><div style="padding:12px 14px;font-size:12px;opacity:.75;line-height:1.8;border-top:1px solid rgba(255,255,255,.05)">' + faq.a + '</div></details>';
@@ -1951,9 +1951,9 @@ function renderFaithFAQExtended(el, faith) {
 // 修行辅导卡片 - 给新信众的入门指导
 // ====================================================================
 function renderBeginnerGuide(el, faith) {
-  var col = COLORS[faith];
-  var colMain = col.main;
-  var guides = {
+  let col = COLORS[faith];
+  let colMain = col.main;
+  let guides = {
     fo: {title:'在家学佛入门十步',icon:'🙏',steps:[
       {step:1,name:'了解基础',detail:'阅读《正信的佛教》《学佛群疑》等入门书籍，了解佛教不是迷信而是觉悟的教育。重点理解四圣谛、八正道、因果轮回等基本概念。'},
       {step:2,name:'亲近三宝',detail:'常去寺院礼拜，亲近善知识（有修有证的法师或居士）。参加寺院的法会、佛学讲座，在正法环境中耳濡目染。'},
@@ -1980,8 +1980,8 @@ function renderBeginnerGuide(el, faith) {
       {step:4,name:'修身齐家',detail:'在日常生活中践行仁义礼智信：孝敬父母、友爱兄弟、诚信待人、尽职尽责。先从家庭做起，家庭和睦了再推而广之服务社会。'}
     ]}
   };
-  var guide = guides[faith] || guides.fo;
-  var html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:' + colMain + ';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">' + guide.icon + ' ' + guide.title + '</h3><p style="font-size:12px;opacity:.5">循序渐进 · 次第修行 · 不可躐等</p></div>';
+  let guide = guides[faith] || guides.fo;
+  let html = '<div style="text-align:center;margin-bottom:20px"><h3 style="color:' + colMain + ';font-family:Ma Shan Zheng,serif;font-size:18px;letter-spacing:4px">' + guide.icon + ' ' + guide.title + '</h3><p style="font-size:12px;opacity:.5">循序渐进 · 次第修行 · 不可躐等</p></div>';
   html += '<div style="display:grid;gap:12px">';
   guide.steps.forEach(function(s) {
     html += '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px;display:flex;gap:12px"><div style="width:40px;height:40px;background:' + colMain + '22;border:1px solid ' + colMain + '44;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:bold;color:' + colMain + ';flex-shrink:0">' + s.step + '</div><div><div style="font-size:14px;font-weight:bold;color:' + colMain + ';margin-bottom:4px">' + s.name + '</div><div style="font-size:12px;opacity:.7;line-height:1.8">' + s.detail + '</div></div></div>';

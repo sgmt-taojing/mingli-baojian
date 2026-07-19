@@ -1,0 +1,37 @@
+<!-- favorites.wxml -->
+<view class="page">
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{isEmpty}}">
+    <view class="empty-icon">&#xe6c8;</view>
+    <view class="empty-text">还没有收藏</view>
+    <view class="empty-sub">收藏喜欢的命理服务，随时查看</view>
+    <button class="empty-btn" bindtap="goShopping">去逛逛</button>
+  </view>
+
+  <!-- 收藏列表（网格布局） -->
+  <view class="fav-grid" wx:else>
+    <view class="fav-card" wx:for="{{favorites}}" wx:key="id">
+      <!-- 商品图片 -->
+      <view class="fav-cover" data-id="{{item.id}}" bindtap="goDetail">
+        <image src="{{item.cover || '/images/placeholder.png'}}" mode="aspectFill" class="cover-img"></image>
+      </view>
+
+      <!-- 商品信息 -->
+      <view class="fav-info">
+        <view class="fav-title" data-id="{{item.id}}" bindtap="goDetail">{{item.title}}</view>
+        <view class="fav-desc">{{item.desc}}</view>
+        <view class="fav-bottom">
+          <view class="fav-price">¥{{item.price}}</view>
+          <view class="fav-actions">
+            <view class="action-icon cart-icon" data-id="{{item.id}}" catchtap="addToCart">
+              <text class="icon-text">&#xe6c9;</text>
+            </view>
+            <view class="action-icon remove-icon" data-id="{{item.id}}" catchtap="removeFavorite">
+              <text class="icon-text">×</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

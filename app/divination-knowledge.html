@@ -3866,7 +3866,7 @@ body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xm
 
 <script>
 function showToast(msg) {
-  var t = document.getElementById('toastMsg');
+  let t = document.getElementById('toastMsg');
   if (!t) { t = document.createElement('div'); t.id = 'toastMsg'; t.className = 'toast-msg'; document.body.appendChild(t); }
   t.textContent = msg;
   t.classList.add('show');
@@ -3878,7 +3878,7 @@ function showKb(id, evt) {
   // 切换标签页样式
   document.querySelectorAll('.kb-section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.kb-tab').forEach(t => t.classList.remove('active'));
-  var targetSection = document.getElementById('kb-'+id);
+  let targetSection = document.getElementById('kb-'+id);
   if (targetSection) targetSection.classList.add('active');
   if (evt && evt.currentTarget) evt.currentTarget.classList.add('active');
   
@@ -4064,9 +4064,9 @@ document.querySelectorAll('.acc-head').forEach(h => {
 
 // ===== 拼音切换功能 =====
 function togglePinyin() {
-  var btn = document.getElementById('pinyinToggle');
-  var sections = document.querySelectorAll('.kb-section');
-  var allHidden = sections.length > 0 && sections[0].classList.contains('pinyin-hide');
+  let btn = document.getElementById('pinyinToggle');
+  let sections = document.querySelectorAll('.kb-section');
+  let allHidden = sections.length > 0 && sections[0].classList.contains('pinyin-hide');
   if (allHidden) {
     // 当前是隐藏状态 → 显示拼音
     sections.forEach(function(s) { s.classList.remove('pinyin-hide'); });
@@ -4079,11 +4079,11 @@ function togglePinyin() {
 }
 
 // ===== 经典伴读功能（Web Speech API）=====
-var _activeChant = null;
-var _utterance = null;
-var _charIndex = 0;
-var _totalChars = 0;
-var _rateMap = {};
+let _activeChant = null;
+let _utterance = null;
+let _charIndex = 0;
+let _totalChars = 0;
+let _rateMap = {};
 
 function readChant(chantId) {
   if (!('speechSynthesis' in window)) {
@@ -4091,10 +4091,10 @@ function readChant(chantId) {
     return;
   }
 
-  var btn = document.getElementById('btn-' + chantId);
-  var textEl = document.getElementById('text-' + chantId);
-  var progFill = document.getElementById('prog-fill-' + chantId);
-  var progLabel = document.getElementById('prog-label-' + chantId);
+  let btn = document.getElementById('btn-' + chantId);
+  let textEl = document.getElementById('text-' + chantId);
+  let progFill = document.getElementById('prog-fill-' + chantId);
+  let progLabel = document.getElementById('prog-label-' + chantId);
 
 
   if (chantId === _activeChant && window.speechSynthesis.speaking) {
@@ -4113,7 +4113,7 @@ function readChant(chantId) {
   window.speechSynthesis.cancel();
   _activeChant = chantId;
 
-  var text = textEl ? textEl.innerText.trim() : '';
+  let text = textEl ? textEl.innerText.trim() : '';
   if (!text) { showToast('文本内容为空'); return; }
 
 
@@ -4128,19 +4128,19 @@ function readChant(chantId) {
 
 
   // 选择中文语音
-  var voices = window.speechSynthesis.getVoices();
-  var zhVoice = voices.find(function(v){ return v.lang.includes('zh') && !v.lang.includes('en'); });
+  let voices = window.speechSynthesis.getVoices();
+  let zhVoice = voices.find(function(v){ return v.lang.includes('zh') && !v.lang.includes('en'); });
   if (zhVoice) _utterance.voice = zhVoice;
 
   _utterance.onboundary = function(e) {
     if (e.name === 'word' || e.name === 'sentence') {
       _charIndex = e.charIndex;
       if (progFill) {
-        var pct = _totalChars > 0 ? Math.round(_charIndex / _totalChars * 100) : 0;
+        let pct = _totalChars > 0 ? Math.round(_charIndex / _totalChars * 100) : 0;
         progFill.style.width = pct + '%';
       }
       if (progLabel) {
-        var charCount = Math.round(_charIndex / _totalChars * _totalChars);
+        let charCount = Math.round(_charIndex / _totalChars * _totalChars);
         progLabel.textContent = _charIndex + '/' + _totalChars + ' 字';
       }
     }
@@ -4177,9 +4177,9 @@ function setRate(chantId, rate) {
 function stopReading(chantId) {
   window.speechSynthesis.cancel();
   _activeChant = null;
-  var btn = document.getElementById('btn-' + chantId);
+  let btn = document.getElementById('btn-' + chantId);
   if (btn) btn.textContent = '🔊 伴读';
-  var progFill = document.getElementById('prog-fill-' + chantId);
+  let progFill = document.getElementById('prog-fill-' + chantId);
   if (progFill) progFill.style.width = '0%';
 }
 
@@ -4393,7 +4393,7 @@ function renderDailyKoujue() {
 }
 
 // ===== 功德体系数据 =====
-var gongdeTasks = [
+let gongdeTasks = [
   {id:'fangsheng', title:'放生', desc:'参加放生法会或自行放生', points:30, icon:'🐟'},
   {id:'songjing', title:'诵经', desc:'完整诵读经典一遍（心经/道德经等）', points:10, icon:'📿'},
   {id:'bushi', title:'布施', desc:'随缘布施（财物/时间/善举）', points:20, icon:'🙏'},
@@ -4409,12 +4409,12 @@ var gongdeTasks = [
 ];
 
 function renderGongde() {
-  var container = document.getElementById('gongdeTasks');
+  let container = document.getElementById('gongdeTasks');
   if (!container) return;
-  var html = '';
-  for (var i = 0; i < gongdeTasks.length; i++) {
-    var task = gongdeTasks[i];
-    var done = localStorage.getItem('gongde_' + task.id + '_' + new Date().toDateString());
+  let html = '';
+  for (let i = 0; i < gongdeTasks.length; i++) {
+    let task = gongdeTasks[i];
+    let done = localStorage.getItem('gongde_' + task.id + '_' + new Date().toDateString());
     html += '<div onclick="completeGongdeTask(\'' + task.id + '\')" style="display:flex;align-items:center;gap:12px;padding:12px 16px;margin-bottom:8px;background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);border-radius:8px;cursor:pointer;' + (done ? 'opacity:.5' : '') + '">';
     html += '<span style="font-size:24px">' + task.icon + '</span>';
     html += '<div style="flex:1"><div style="font-size:14px">' + task.title + '</div><div style="font-size:11px;opacity:.5">' + task.desc + '</div></div>';
@@ -4428,20 +4428,20 @@ function renderGongde() {
 }
 
 function completeGongdeTask(id) {
-  var key = 'gongde_' + id + '_' + new Date().toDateString();
+  let key = 'gongde_' + id + '_' + new Date().toDateString();
   if (localStorage.getItem(key)) { showToast('今日已完成此善行'); return; }
-  var task = gongdeTasks.find(function(t){return t.id===id;});
-  var taskPoints = task ? task.points : 0;
+  let task = gongdeTasks.find(function(t){return t.id===id;});
+  let taskPoints = task ? task.points : 0;
   localStorage.setItem(key, 'done');
   
   // 更新总功德值
-  var total = parseInt(localStorage.getItem('totalMerit') || '0');
-  var prevLevel = getMeritLevel(total);
+  let total = parseInt(localStorage.getItem('totalMerit') || '0');
+  let prevLevel = getMeritLevel(total);
   total += taskPoints;
   localStorage.setItem('totalMerit', total.toString());
   
   // 检查是否升级
-  var newLevel = getMeritLevel(total);
+  let newLevel = getMeritLevel(total);
   if (newLevel !== prevLevel) {
     showMeritUpgrade(newLevel);
   }
@@ -4452,22 +4452,22 @@ function completeGongdeTask(id) {
 }
 
 function updateGongdeScore() {
-  var score = 0;
-  for (var i = 0; i < gongdeTasks.length; i++) {
+  let score = 0;
+  for (let i = 0; i < gongdeTasks.length; i++) {
     if (localStorage.getItem('gongde_' + gongdeTasks[i].id + '_' + new Date().toDateString())) {
       score += gongdeTasks[i].points;
     }
   }
-  var scoreEl = document.getElementById('gongdeScore');
+  let scoreEl = document.getElementById('gongdeScore');
   if (scoreEl) scoreEl.textContent = score;
   updateTotalMerit();
 }
 
 function updateTotalMerit() {
-  var total = parseInt(localStorage.getItem('totalMerit') || '0');
-  var el = document.getElementById('totalMerit');
+  let total = parseInt(localStorage.getItem('totalMerit') || '0');
+  let el = document.getElementById('totalMerit');
   if (el) el.textContent = total;
-  var levelEl = document.getElementById('meritLevelDisplay');
+  let levelEl = document.getElementById('meritLevelDisplay');
   if (levelEl) levelEl.textContent = getMeritLevel(total);
 }
 
@@ -4480,7 +4480,7 @@ function getMeritLevel(total) {
 }
 
 function showMeritUpgrade(level) {
-  var overlay = document.createElement('div');
+  let overlay = document.createElement('div');
   overlay.className = 'merit-upgrade-overlay';
   overlay.innerHTML = '<div class="merit-upgrade-box"><h3>🎉 恭喜！</h3><p>您的功德等级已晋升为<br><strong style="font-size:22px;color:var(--gold)">「' + level + '」</strong></p><button onclick="this.parentElement.parentElement.remove()">🙏 感恩</button></div>';
   document.body.appendChild(overlay);
@@ -4489,11 +4489,11 @@ function showMeritUpgrade(level) {
 
 // ===== 功德回向 =====
 function submitDedication() {
-  var input = document.getElementById('dedicationInput');
-  var text = input.value.trim();
+  let input = document.getElementById('dedicationInput');
+  let text = input.value.trim();
   if (!text) { showToast('请输入回向对象'); return; }
-  var list = JSON.parse(localStorage.getItem('meritDedications') || '[]');
-  var entry = {text: text, date: new Date().toLocaleDateString('zh-CN')};
+  let list = JSON.parse(localStorage.getItem('meritDedications') || '[]');
+  let entry = {text: text, date: new Date().toLocaleDateString('zh-CN')};
   list.unshift(entry);
   if (list.length > 10) list = list.slice(0, 10);
   localStorage.setItem('meritDedications', JSON.stringify(list));
@@ -4504,9 +4504,9 @@ function submitDedication() {
 }
 
 function renderDedicationHistory() {
-  var container = document.getElementById('dedicationHistory');
+  let container = document.getElementById('dedicationHistory');
   if (!container) return;
-  var list = JSON.parse(localStorage.getItem('meritDedications') || '[]');
+  let list = JSON.parse(localStorage.getItem('meritDedications') || '[]');
   if (list.length === 0) {
     container.innerHTML = '<p style="font-size:12px;color:var(--paper3);opacity:.5">暂无回向记录</p>';
     return;
@@ -4518,24 +4518,24 @@ function renderDedicationHistory() {
 
 // ===== 21天打卡进度 =====
 function updateDay21Progress() {
-  var day21Key = 'day21_start';
-  var startTs = localStorage.getItem(day21Key);
+  let day21Key = 'day21_start';
+  let startTs = localStorage.getItem(day21Key);
   if (!startTs) {
     localStorage.setItem(day21Key, Date.now().toString());
     startTs = Date.now();
   }
   startTs = parseInt(startTs);
-  var daysSince = Math.floor((Date.now() - startTs) / 86400000) + 1;
+  let daysSince = Math.floor((Date.now() - startTs) / 86400000) + 1;
   
   // 统计连续有善行的天数
-  var continuousDays = 0;
-  var today = new Date();
-  for (var d = 0; d < 21; d++) {
-    var checkDate = new Date(today);
+  let continuousDays = 0;
+  let today = new Date();
+  for (let d = 0; d < 21; d++) {
+    let checkDate = new Date(today);
     checkDate.setDate(today.getDate() - d);
-    var dateStr = checkDate.toDateString();
-    var hasDeed = false;
-    for (var i = 0; i < gongdeTasks.length; i++) {
+    let dateStr = checkDate.toDateString();
+    let hasDeed = false;
+    for (let i = 0; i < gongdeTasks.length; i++) {
       if (localStorage.getItem('gongde_' + gongdeTasks[i].id + '_' + dateStr)) {
         hasDeed = true;
         break;
@@ -4548,22 +4548,22 @@ function updateDay21Progress() {
     }
   }
   
-  var progress = Math.min(100, Math.round(continuousDays / 21 * 100));
-  var remaining = Math.max(0, 21 - continuousDays);
+  let progress = Math.min(100, Math.round(continuousDays / 21 * 100));
+  let remaining = Math.max(0, 21 - continuousDays);
   
-  var labelEl = document.getElementById('day21Label');
+  let labelEl = document.getElementById('day21Label');
   if (labelEl) labelEl.textContent = '已完成 ' + continuousDays + ' 天，还剩 ' + remaining + ' 天';
-  var pctEl = document.getElementById('day21Percent');
+  let pctEl = document.getElementById('day21Percent');
   if (pctEl) pctEl.textContent = progress + '%';
-  var fillEl = document.getElementById('day21Fill');
+  let fillEl = document.getElementById('day21Fill');
   if (fillEl) fillEl.style.width = progress + '%';
 }
 
 function renderGongdeRecommend() {
-  var today = new Date();
-  var dayOfWeek = today.getDay();
+  let today = new Date();
+  let dayOfWeek = today.getDay();
   
-  var weekendRec = {
+  let weekendRec = {
     0: {title:'周日 · 登高望远', desc:'今日宜登山祈福，参访名山古刹。推荐：就近寻找附近的寺庙或道观，感受灵山秀水的清净。登山可强身健体，拜佛可净化心灵。', activity:'爬山/公园散步/寺庙参访'},
     1: {title:'周一 · 新周祈福', desc:'新的一周开始，宜到附近寺庙或道观上香祈福，祈求一周顺利。', activity:'上香祈福/寺庙参访'},
     2: {title:'周二 · 文化之旅', desc:'今日宜参访文化古迹、博物馆，增长见闻。读书学习亦是修行。', activity:'博物馆/图书馆/文化古迹'},
@@ -4573,11 +4573,11 @@ function renderGongdeRecommend() {
     6: {title:'周六 · 户外日', desc:'今日宜外出亲近自然。公园散步、登山、观海，亲近山水有益身心。', activity:'公园/登山/观海/骑行'}
   };
   
-  var rec = weekendRec[dayOfWeek];
-  var container = document.getElementById('gongdeRecommend');
+  let rec = weekendRec[dayOfWeek];
+  let container = document.getElementById('gongdeRecommend');
   if (!container) return;
   
-  var html = '<div style="margin-top:16px;padding:20px;background:rgba(201,168,76,.04);border-radius:8px;border:1px solid rgba(201,168,76,.1)">';
+  let html = '<div style="margin-top:16px;padding:20px;background:rgba(201,168,76,.04);border-radius:8px;border:1px solid rgba(201,168,76,.1)">';
   html += '<div style="color:var(--gold);font-size:16px;letter-spacing:2px;margin-bottom:12px">🌟 今日推荐 · ' + rec.title + '</div>';
   html += '<p style="margin-top:8px;line-height:1.8;font-size:14px">' + rec.desc + '</p>';
   html += '<p style="margin-top:8px;color:var(--gold);font-size:12px;letter-spacing:1px">推荐活动：' + rec.activity + '</p>';
@@ -4606,16 +4606,16 @@ function renderGongdeRecommend() {
 // 初始化音乐和口诀
 // ===== 养生调理功能 =====
 function toggleWuxingDetail(element) {
-  var detail = document.getElementById(element + '-detail');
+  let detail = document.getElementById(element + '-detail');
   if (detail) {
     detail.style.display = detail.style.display === 'none' ? 'block' : 'none';
   }
 }
 
 function toggleYangshiTask(task) {
-  var key = 'yangshi_' + task + '_' + new Date().toDateString();
-  var card = document.querySelector('.yangshi-task[data-task="' + task + '"]');
-  var checkBox = card.querySelector('.check-box');
+  let key = 'yangshi_' + task + '_' + new Date().toDateString();
+  let card = document.querySelector('.yangshi-task[data-task="' + task + '"]');
+  let checkBox = card.querySelector('.check-box');
   
   if (localStorage.getItem(key)) {
     localStorage.removeItem(key);
@@ -4633,8 +4633,8 @@ function toggleYangshiTask(task) {
 }
 
 function updateYangshiStats() {
-  var tasks = ['dazuo', 'baduanjin', 'jikou', 'zaoshui'];
-  var todayCount = 0;
+  let tasks = ['dazuo', 'baduanjin', 'jikou', 'zaoshui'];
+  let todayCount = 0;
   tasks.forEach(function(t) {
     if (localStorage.getItem('yangshi_' + t + '_' + new Date().toDateString())) {
       todayCount++;
@@ -4643,13 +4643,13 @@ function updateYangshiStats() {
   document.getElementById('todayCheckCount').textContent = todayCount;
   
   // 计算连续打卡天数
-  var continuous = 0;
-  var today = new Date();
-  for (var i = 0; i < 365; i++) {
-    var checkDate = new Date(today);
+  let continuous = 0;
+  let today = new Date();
+  for (let i = 0; i < 365; i++) {
+    let checkDate = new Date(today);
     checkDate.setDate(today.getDate() - i);
-    var dateStr = checkDate.toDateString();
-    var hasCheck = false;
+    let dateStr = checkDate.toDateString();
+    let hasCheck = false;
     tasks.forEach(function(t) {
       if (localStorage.getItem('yangshi_' + t + '_' + dateStr)) {
         hasCheck = true;
@@ -4664,7 +4664,7 @@ function updateYangshiStats() {
   document.getElementById('continuousDays').textContent = continuous;
   
   // 更新称号
-  var title = '养生新人';
+  let title = '养生新人';
   if (continuous >= 49) title = '养生宗师';
   else if (continuous >= 21) title = '养生达人';
   else if (continuous >= 7) title = '养生新手';
@@ -4674,43 +4674,43 @@ function updateYangshiStats() {
 }
 
 function renderCheckinCalendar() {
-  var container = document.getElementById('checkinCalendar');
+  let container = document.getElementById('checkinCalendar');
   if (!container) return;
   
-  var today = new Date();
-  var year = today.getFullYear();
-  var month = today.getMonth();
-  var daysInMonth = new Date(year, month + 1, 0).getDate();
-  var firstDay = new Date(year, month, 1).getDay();
+  let today = new Date();
+  let year = today.getFullYear();
+  let month = today.getMonth();
+  let daysInMonth = new Date(year, month + 1, 0).getDate();
+  let firstDay = new Date(year, month, 1).getDay();
   
-  var tasks = ['dazuo', 'baduanjin', 'jikou', 'zaoshui'];
-  var html = '';
+  let tasks = ['dazuo', 'baduanjin', 'jikou', 'zaoshui'];
+  let html = '';
   
   // 星期标题
-  var weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+  let weekDays = ['日', '一', '二', '三', '四', '五', '六'];
   weekDays.forEach(function(d) {
     html += '<div style="text-align:center;padding:4px;font-size:11px;color:var(--paper3)">' + d + '</div>';
   });
   
   // 空白格子
-  for (var i = 0; i < firstDay; i++) {
+  for (let i = 0; i < firstDay; i++) {
     html += '<div></div>';
   }
   
   // 日期格子
-  for (var day = 1; day <= daysInMonth; day++) {
-    var checkDate = new Date(year, month, day);
-    var dateStr = checkDate.toDateString();
-    var hasCheck = false;
+  for (let day = 1; day <= daysInMonth; day++) {
+    let checkDate = new Date(year, month, day);
+    let dateStr = checkDate.toDateString();
+    let hasCheck = false;
     tasks.forEach(function(t) {
       if (localStorage.getItem('yangshi_' + t + '_' + dateStr)) {
         hasCheck = true;
       }
     });
     
-    var isToday = day === today.getDate();
-    var bg = hasCheck ? 'rgba(39,174,96,.2)' : 'rgba(255,255,255,.02)';
-    var border = isToday ? '2px solid var(--gold)' : '1px solid rgba(201,168,76,.1)';
+    let isToday = day === today.getDate();
+    let bg = hasCheck ? 'rgba(39,174,96,.2)' : 'rgba(255,255,255,.02)';
+    let border = isToday ? '2px solid var(--gold)' : '1px solid rgba(201,168,76,.1)';
     
     html += '<div style="text-align:center;padding:6px;font-size:12px;background:' + bg + ';border:' + border + ';border-radius:4px;color:' + (hasCheck ? 'var(--jade)' : 'var(--paper3)') + '">' + day + '</div>';
   }
@@ -4719,12 +4719,12 @@ function renderCheckinCalendar() {
 }
 
 function openVideo(bvid, title) {
-  var url = 'https://www.bilibili.com/video/' + bvid;
+  let url = 'https://www.bilibili.com/video/' + bvid;
   window.open(url, '_blank');
 }
 
 // ===== 道场导航功能 =====
-var daochangData = [
+let daochangData = [
   {rank:1, name:'北京白云观', type:'道观', region:'华北', address:'北京市西城区白云观街9号', phone:'010-63463511', openTime:'8:00-16:30', ticket:'10元', feature:'化解太岁、求财、求学最灵；太岁殿供奉60位太岁星君', fashi:'每天 9:00-11:00（太岁法会），每月初一、十五（祈福法会）', wishes:['化太岁','求学','求财','求平安'], lat:39.8885, lng:116.3278},
   {rank:2, name:'北京雍和宫', type:'寺庙', region:'华北', address:'北京市东城区雍和宫大街12号', phone:'010-64044499', openTime:'9:00-16:00', ticket:'25元', feature:'求财、化解小人、求学皆灵；开光唐卡、转运珠', fashi:'每天 10:00-12:00（祈福法会），每月初八、十五（放生法会）', wishes:['求财','求学','求平安'], lat:39.9478, lng:116.4175},
   {rank:3, name:'天津天后宫', type:'寺庙', region:'华北', address:'天津市南开区古文化街80号', phone:'022-27356427', openTime:'8:30-17:00', ticket:'10元', feature:'求平安、求姻缘、求子嗣', fashi:'每年农历三月廿三（妈祖诞辰），每天 9:00-11:00（祈福法会）', wishes:['求平安','求姻缘'], lat:39.1375, lng:117.1903},
@@ -4748,14 +4748,14 @@ var daochangData = [
 ];
 
 function renderDaochangList(data) {
-  var container = document.getElementById('daochangList');
+  let container = document.getElementById('daochangList');
   if (!container) return;
   
-  var html = '';
+  let html = '';
   data.forEach(function(d) {
-    var isFav = localStorage.getItem('daochang_fav_' + d.rank);
-    var typeIcon = d.type === '道观' ? '☯️' : '🪷';
-    var typeColor = d.type === '道观' ? 'var(--gold)' : 'var(--violet)';
+    let isFav = localStorage.getItem('daochang_fav_' + d.rank);
+    let typeIcon = d.type === '道观' ? '☯️' : '🪷';
+    let typeColor = d.type === '道观' ? 'var(--gold)' : 'var(--violet)';
     
     html += '<div style="padding:20px;background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.1);border-radius:8px;transition:all .3s" onmouseover="this.style.borderColor=\'var(--gold)\'" onmouseout="this.style.borderColor=\'rgba(201,168,76,.1)\'">';
     html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">';
@@ -4786,14 +4786,14 @@ function renderDaochangList(data) {
 }
 
 function filterDaochang() {
-  var region = document.getElementById('regionFilter').value;
-  var type = document.getElementById('typeFilter').value;
-  var wish = document.getElementById('wishFilter').value;
+  let region = document.getElementById('regionFilter').value;
+  let type = document.getElementById('typeFilter').value;
+  let wish = document.getElementById('wishFilter').value;
   
-  var filtered = daochangData.filter(function(d) {
-    var matchRegion = region === 'all' || d.region === region;
-    var matchType = type === 'all' || d.type === type;
-    var matchWish = wish === 'all' || d.wishes.includes(wish);
+  let filtered = daochangData.filter(function(d) {
+    let matchRegion = region === 'all' || d.region === region;
+    let matchType = type === 'all' || d.type === type;
+    let matchWish = wish === 'all' || d.wishes.includes(wish);
     return matchRegion && matchType && matchWish;
   });
   
@@ -4801,7 +4801,7 @@ function filterDaochang() {
 }
 
 function toggleFavorite(rank) {
-  var key = 'daochang_fav_' + rank;
+  let key = 'daochang_fav_' + rank;
   if (localStorage.getItem(key)) {
     localStorage.removeItem(key);
     showToast('已取消收藏');
@@ -4814,15 +4814,15 @@ function toggleFavorite(rank) {
 }
 
 function openNavigation(lat, lng) {
-  var url = 'https://uri.amap.com/navigation?to=' + lng + ',' + lat + '&mode=car&policy=1&src=mypage&coordinate=gaode&callnative=1';
+  let url = 'https://uri.amap.com/navigation?to=' + lng + ',' + lat + '&mode=car&policy=1&src=mypage&coordinate=gaode&callnative=1';
   window.open(url, '_blank');
 }
 
 function renderFavorites() {
-  var container = document.getElementById('myFavorites');
+  let container = document.getElementById('myFavorites');
   if (!container) return;
   
-  var favorites = [];
+  let favorites = [];
   daochangData.forEach(function(d) {
     if (localStorage.getItem('daochang_fav_' + d.rank)) {
       favorites.push(d);
@@ -4834,9 +4834,9 @@ function renderFavorites() {
     return;
   }
   
-  var html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">';
+  let html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">';
   favorites.forEach(function(d) {
-    var typeIcon = d.type === '道观' ? '☯️' : '🪷';
+    let typeIcon = d.type === '道观' ? '☯️' : '🪷';
     html += '<div style="padding:16px;background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.1);border-radius:8px">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
     html += '<span>' + typeIcon + ' <span style="color:var(--gold)">' + d.name + '</span></span>';
@@ -4851,24 +4851,24 @@ function renderFavorites() {
 }
 
 function queryJiri() {
-  var type = document.getElementById('jiriType').value;
-  var container = document.getElementById('jiriResult');
+  let type = document.getElementById('jiriType').value;
+  let container = document.getElementById('jiriResult');
   
   // 模拟吉日数据
-  var jiriList = [];
-  var today = new Date();
+  let jiriList = [];
+  let today = new Date();
   
-  for (var i = 1; i <= 30; i++) {
-    var date = new Date(today);
+  for (let i = 1; i <= 30; i++) {
+    let date = new Date(today);
     date.setDate(today.getDate() + i);
-    var dayOfWeek = date.getDay();
+    let dayOfWeek = date.getDay();
     
-    var isGood = (dayOfWeek === 0 || dayOfWeek === 6 || i % 3 === 0);
+    let isGood = (dayOfWeek === 0 || dayOfWeek === 6 || i % 3 === 0);
     
     if (isGood && jiriList.length < 5) {
-      var weekDays = ['日', '一', '二', '三', '四', '五', '六'];
-      var lunarMonths = ['正', '二', '三', '四', '五', '六', '七', '八', '九', '十', '冬', '腊'];
-      var lunarDays = ['初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十', '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十', '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十'];
+      let weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+      let lunarMonths = ['正', '二', '三', '四', '五', '六', '七', '八', '九', '十', '冬', '腊'];
+      let lunarDays = ['初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十', '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十', '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十'];
       
       jiriList.push({
         date: date.getFullYear() + '年' + (date.getMonth()+1) + '月' + date.getDate() + '日',
@@ -4882,7 +4882,7 @@ function queryJiri() {
     }
   }
   
-  var html = '<div style="padding:16px;background:rgba(201,168,76,.04);border-radius:8px;border:1px solid rgba(201,168,76,.1)">';
+  let html = '<div style="padding:16px;background:rgba(201,168,76,.04);border-radius:8px;border:1px solid rgba(201,168,76,.1)">';
   html += '<div style="color:var(--gold);font-size:16px;margin-bottom:16px">📅 未来30天' + type + '吉日</div>';
   
   jiriList.forEach(function(j, idx) {
@@ -4902,7 +4902,7 @@ function queryJiri() {
 }
 
 // ===== 言值沟通技巧知识库 =====
-var YANZHI_KB = {
+let YANZHI_KB = {
   '理论体系': {
     title: '言值沟通理论体系',
     overview: '言值（Yánzhí），谐音"颜值"，寓意说话的价值与魅力。言值沟通学融合了西方沟通理论与东方人情智慧，总结出一套适用于中国人际关系的沟通方法论。核心观点：沟通的本质不是"说"，而是"被听见"。',
@@ -5121,34 +5121,34 @@ var YANZHI_KB = {
 };
 
 // ===== 言值 kb-section =====
-var yanzhiSection = document.createElement('div');
+let yanzhiSection = document.createElement('div');
 yanzhiSection.className = 'kb-section';
 yanzhiSection.id = 'kb-yanzhi';
-yanzhiSection.innerHTML = '<div class="chapter"><h3 class="chapter-title">一、言值沟通理论体系</h3><div class="chapter-content"><p style="color:var(--gold);margin-bottom:16px;font-size:14px">言值（Yánzhí），谐音"颜值"，寓意说话的价值与魅力。融合西方沟通理论与东方人情智慧，总结出一套适用于中国人际关系的沟通方法论。</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin:16px 0">' + (function(){var d=YANZHI_KB['理论体系'].core;var h='';for(var k in d){h+='<div style="background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.12);border-radius:8px;padding:14px"><div style="color:var(--gold);font-size:13px;margin-bottom:8px">◆ '+k+'</div><div style="color:var(--paper2);font-size:13px;line-height:1.8">'+d[k]+'</div></div>';}return h;})() + '</div><div class="quote"><div class="quote-text">沟通的本质不是"说"，而是"被听见"。</div></div></div></div><div class="chapter"><h3 class="chapter-title">二、八大沟通场景速查</h3><div class="chapter-content"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">' + ['同事沟通','客户沟通','夫妻沟通','亲子沟通','领导沟通','商务谈判','冲突化解','演讲表达'].map(function(s){var icons={'同事沟通':'🤝','客户沟通':'💼','夫妻沟通':'💑','亲子沟通':'👨👧','领导沟通':'🎯','商务谈判':'⚖️','冲突化解':'🕊️','演讲表达':'🎤'};var kb={'同事沟通':'同事沟通','客户沟通':'客户沟通','夫妻沟通':'夫妻沟通','亲子沟通':'亲子沟通','领导沟通':'领导沟通','商务谈判':'商务谈判','冲突化解':'冲突化解','演讲表达':'演讲表达'};var d=YANZHI_KB[kb[s]];return '<div style="background:linear-gradient(135deg,rgba(230,126,34,.08),rgba(230,126,34,.02));border:1px solid rgba(230,126,34,.2);border-radius:12px;padding:16px;cursor:pointer" onclick="showYanzhiDetail(\''+kb[s]+'\')"><div style="font-size:28px;margin-bottom:10px">'+icons[s]+'</div><div style="color:var(--gold);font-size:14px;font-weight:bold;margin-bottom:6px">'+s+'</div><div style="color:var(--paper2);font-size:12px;line-height:1.7">'+(d&&d.overview||'')+'</div></div>';}).join('') + '</div></div></div><div class="chapter"><h3 class="chapter-title">三、历史名人沟通案例</h3><div class="chapter-content"><p style="color:var(--paper2);font-size:13px;line-height:1.9;margin-bottom:16px">中国历史上涌现出无数沟通大师，以三寸不烂之舌，或退百万雄兵，或合纵连横，或化解危机。</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">' + ['诸葛亮舌战群儒','苏秦合纵','张仪连横','晏子使楚','触龙说赵太后','邹忌讽齐王纳谏'].map(function(s){var d=YANZHI_KB['历史名嘴'][s];var icon={'诸葛亮舌战群儒':'⚔️','苏秦合纵':'🤝','张仪连横':'♟️','晏子使楚':'🍊','触龙说赵太后':'👨‍👩‍👦','邹忌讽齐王纳谏':'📜'}[s]||'💬';return '<div style="background:linear-gradient(135deg,rgba(230,126,34,.08),rgba(230,126,34,.02));border:1px solid rgba(230,126,34,.2);border-radius:12px;padding:16px;cursor:pointer" onclick="showYanzhiDetail(\'历史名嘴\')"><div style="font-size:28px;margin-bottom:10px">'+icon+'</div><div style="color:var(--gold);font-size:14px;font-weight:bold;margin-bottom:6px">'+s+'</div><div style="color:var(--paper2);font-size:12px;line-height:1.7">'+(d&&d.背景||'')+'</div></div>';}).join('') + '</div></div></div><div class="chapter"><h3 class="chapter-title">四、沟通金句口诀</h3><div class="chapter-content">' + ['同事沟通','客户沟通','夫妻沟通','亲子沟通','领导沟通','商务谈判','冲突化解','演讲表达','历史名嘴'].map(function(s){var kb={'同事沟通':'同事沟通','客户沟通':'客户沟通','夫妻沟通':'夫妻沟通','亲子沟通':'亲子沟通','领导沟通':'领导沟通','商务谈判':'商务谈判','冲突化解':'冲突化解','演讲表达':'演讲表达','历史名嘴':'历史名嘴'};var d=YANZHI_KB[kb[s]];return '<div class="quote"><div class="quote-text" style="font-size:13px">'+(d&&d['金句口诀']||'')+'</div><div class="quote-author">—— '+s+'</div></div>';}).join('') + '</div></div><div id="yanzhi-detail" style="display:none;margin-top:24px;padding:20px;background:rgba(230,126,34,.04);border:1px solid rgba(230,126,34,.15);border-radius:12px"></div><div style="text-align:center;margin-top:24px"><button onclick="showYanzhiDetail=null;document.getElementById(\'yanzhi-detail\').style.display=\'none\'" style="background:none;border:1px solid rgba(230,126,34,.3);color:var(--gold2);padding:8px 24px;border-radius:20px;cursor:pointer;font-size:13px">重置视图</button></div></div>';
+yanzhiSection.innerHTML = '<div class="chapter"><h3 class="chapter-title">一、言值沟通理论体系</h3><div class="chapter-content"><p style="color:var(--gold);margin-bottom:16px;font-size:14px">言值（Yánzhí），谐音"颜值"，寓意说话的价值与魅力。融合西方沟通理论与东方人情智慧，总结出一套适用于中国人际关系的沟通方法论。</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin:16px 0">' + (function(){let d=YANZHI_KB['理论体系'].core;let h='';for(let k in d){h+='<div style="background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.12);border-radius:8px;padding:14px"><div style="color:var(--gold);font-size:13px;margin-bottom:8px">◆ '+k+'</div><div style="color:var(--paper2);font-size:13px;line-height:1.8">'+d[k]+'</div></div>';}return h;})() + '</div><div class="quote"><div class="quote-text">沟通的本质不是"说"，而是"被听见"。</div></div></div></div><div class="chapter"><h3 class="chapter-title">二、八大沟通场景速查</h3><div class="chapter-content"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">' + ['同事沟通','客户沟通','夫妻沟通','亲子沟通','领导沟通','商务谈判','冲突化解','演讲表达'].map(function(s){let icons={'同事沟通':'🤝','客户沟通':'💼','夫妻沟通':'💑','亲子沟通':'👨👧','领导沟通':'🎯','商务谈判':'⚖️','冲突化解':'🕊️','演讲表达':'🎤'};let kb={'同事沟通':'同事沟通','客户沟通':'客户沟通','夫妻沟通':'夫妻沟通','亲子沟通':'亲子沟通','领导沟通':'领导沟通','商务谈判':'商务谈判','冲突化解':'冲突化解','演讲表达':'演讲表达'};let d=YANZHI_KB[kb[s]];return '<div style="background:linear-gradient(135deg,rgba(230,126,34,.08),rgba(230,126,34,.02));border:1px solid rgba(230,126,34,.2);border-radius:12px;padding:16px;cursor:pointer" onclick="showYanzhiDetail(\''+kb[s]+'\')"><div style="font-size:28px;margin-bottom:10px">'+icons[s]+'</div><div style="color:var(--gold);font-size:14px;font-weight:bold;margin-bottom:6px">'+s+'</div><div style="color:var(--paper2);font-size:12px;line-height:1.7">'+(d&&d.overview||'')+'</div></div>';}).join('') + '</div></div></div><div class="chapter"><h3 class="chapter-title">三、历史名人沟通案例</h3><div class="chapter-content"><p style="color:var(--paper2);font-size:13px;line-height:1.9;margin-bottom:16px">中国历史上涌现出无数沟通大师，以三寸不烂之舌，或退百万雄兵，或合纵连横，或化解危机。</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">' + ['诸葛亮舌战群儒','苏秦合纵','张仪连横','晏子使楚','触龙说赵太后','邹忌讽齐王纳谏'].map(function(s){let d=YANZHI_KB['历史名嘴'][s];let icon={'诸葛亮舌战群儒':'⚔️','苏秦合纵':'🤝','张仪连横':'♟️','晏子使楚':'🍊','触龙说赵太后':'👨‍👩‍👦','邹忌讽齐王纳谏':'📜'}[s]||'💬';return '<div style="background:linear-gradient(135deg,rgba(230,126,34,.08),rgba(230,126,34,.02));border:1px solid rgba(230,126,34,.2);border-radius:12px;padding:16px;cursor:pointer" onclick="showYanzhiDetail(\'历史名嘴\')"><div style="font-size:28px;margin-bottom:10px">'+icon+'</div><div style="color:var(--gold);font-size:14px;font-weight:bold;margin-bottom:6px">'+s+'</div><div style="color:var(--paper2);font-size:12px;line-height:1.7">'+(d&&d.背景||'')+'</div></div>';}).join('') + '</div></div></div><div class="chapter"><h3 class="chapter-title">四、沟通金句口诀</h3><div class="chapter-content">' + ['同事沟通','客户沟通','夫妻沟通','亲子沟通','领导沟通','商务谈判','冲突化解','演讲表达','历史名嘴'].map(function(s){let kb={'同事沟通':'同事沟通','客户沟通':'客户沟通','夫妻沟通':'夫妻沟通','亲子沟通':'亲子沟通','领导沟通':'领导沟通','商务谈判':'商务谈判','冲突化解':'冲突化解','演讲表达':'演讲表达','历史名嘴':'历史名嘴'};let d=YANZHI_KB[kb[s]];return '<div class="quote"><div class="quote-text" style="font-size:13px">'+(d&&d['金句口诀']||'')+'</div><div class="quote-author">—— '+s+'</div></div>';}).join('') + '</div></div><div id="yanzhi-detail" style="display:none;margin-top:24px;padding:20px;background:rgba(230,126,34,.04);border:1px solid rgba(230,126,34,.15);border-radius:12px"></div><div style="text-align:center;margin-top:24px"><button onclick="showYanzhiDetail=null;document.getElementById(\'yanzhi-detail\').style.display=\'none\'" style="background:none;border:1px solid rgba(230,126,34,.3);color:var(--gold2);padding:8px 24px;border-radius:20px;cursor:pointer;font-size:13px">重置视图</button></div></div>';
 
 // Insert after kb-daochang
-var kbDaochang = document.getElementById('kb-daochang');
+let kbDaochang = document.getElementById('kb-daochang');
 if (kbDaochang && kbDaochang.parentNode) {
   kbDaochang.parentNode.insertBefore(yanzhiSection, kbDaochang.nextSibling);
 }
 
 function showYanzhiDetail(key) {
-  var d = YANZHI_KB[key];
+  let d = YANZHI_KB[key];
   if (!d) return;
-  var el = document.getElementById('yanzhi-detail');
+  let el = document.getElementById('yanzhi-detail');
   if (!el) return;
-  var html = '<h3 style="color:var(--gold);font-size:18px;margin-bottom:16px;letter-spacing:2px">💬 '+(d.title||key)+'</h3>';
+  let html = '<h3 style="color:var(--gold);font-size:18px;margin-bottom:16px;letter-spacing:2px">💬 '+(d.title||key)+'</h3>';
   html += '<p style="color:var(--paper2);font-size:14px;line-height:1.9;margin-bottom:16px;border-left:3px solid #e67e22;padding-left:14px">'+(d.overview||'')+'</p>';
-  for (var k in d) {
+  for (let k in d) {
     if (k === 'title' || k === 'overview' || k === '金句口诀') continue;
-    var v = d[k];
+    let v = d[k];
     if (typeof v === 'object') {
       html += '<div style="background:rgba(230,126,34,.04);border-radius:8px;padding:14px;margin-bottom:12px">';
       html += '<div style="color:var(--gold2);font-size:13px;font-weight:bold;margin-bottom:8px">◆ '+k+'</div>';
       if (typeof v === 'string') {
         html += '<div style="color:var(--paper2);font-size:13px;line-height:1.8">'+v+'</div>';
       } else {
-        for (var sk in v) {
+        for (let sk in v) {
           if (typeof v[sk] === 'string' && v[sk].charAt(0) !== '❌' && v[sk].charAt(0) !== '①' && v[sk].charAt(0) !== '■') {
             html += '<div style="color:var(--paper2);font-size:13px;line-height:1.8;margin:6px 0"><strong style="color:#e67e22">'+sk+'：</strong>'+v[sk]+'</div>';
           } else if (Array.isArray(v[sk])) {
@@ -5182,7 +5182,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ==================== 知识图谱 数据 ====================
-var WUXING_DATA = {
+let WUXING_DATA = {
   '木': {
     color:'#27ae60',direction:'东方',season:'春季',organ:'肝胆',emotion:'仁慈',
     sheng:'火',ke:'土',beKe:'金',
@@ -5239,7 +5239,7 @@ var WUXING_DATA = {
     yuanwen:'水曰润下。润下作咸。咸伤血，甘胜咸。——《尚书·洪范》'
   }
 };
-var BAGUA_DATA = {
+let BAGUA_DATA = {
   '乾':{symbol:'☰',element:'金',direction:'西北',organ:'头',family:'父',nature:'天',desc:'乾为天，刚健中正，为父、为首、为君。',source:'《易传·说卦》（战国至西汉）载"乾为天，为父，为圆，为君，为金"；《易经·乾卦》象辞"天行健，君子以自强不息"'},
   '兑':{symbol:'☱',element:'金',direction:'西方',organ:'口',family:'少女',nature:'泽',desc:'兑为泽，喜悦和顺，为少女、为口、为说。',source:'《易传·说卦》（战国至西汉）载"兑为泽，为少女，为口舌，为巫，为金"'},
   '离':{symbol:'☲',element:'火',direction:'南方',organ:'目',family:'中女',nature:'火',desc:'离为火，光明美丽，为中女、为目、为丽。',source:'《易传·说卦》（战国至西汉）载"离为火，为目，为日，为电，为中女，为甲胄，为戈兵；其于人也，为大腹"'},
@@ -5251,9 +5251,9 @@ var BAGUA_DATA = {
   '乾宫':{symbol:'☰',element:'金',direction:'西北',organ:'头',family:'父',nature:'天',desc:'乾宫八卦：乾为天、天风姤、天山遁、天地否、风地观、山地剥、火地晋、火天大有',source:'《易经·乾卦》'},
   '兑宫':{symbol:'☱',element:'金',direction:'西方',organ:'口',family:'少女',nature:'泽',desc:'兑宫八卦：兑为泽、泽水困、泽地萃、泽山咸、水山蹇、地山谦、雷山小过、雷泽归妹',source:'《易经·兑卦》'}
 };
-var TIANGAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-var DIZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-var TIANGAN_DATA = {
+let TIANGAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+let DIZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+let TIANGAN_DATA = {
   '甲':{element:'木',yinyang:'阳',organ:'胆',nature:'栋梁之木',desc:'甲木参天，正直刚毅。',source:'《渊海子平·论天干阴阳》（宋代·徐大升）载"甲木参天，脱胎要火"；十干体象歌载"甲木参天，脱胎始遂"'},
   '乙':{element:'木',yinyang:'阴',organ:'肝',nature:'花草之木',desc:'乙木柔美，温和善良。',source:'《渊海子平·论天干阴阳》（宋代·徐大升）载"乙木根荄，种育穷年"；十干体象歌载"乙木engg体春种得荫"'},
   '丙':{element:'火',yinyang:'阳',organ:'小肠',nature:'太阳之火',desc:'丙火光明，热情豪放。',source:'《渊海子平·论天干阴阳》（宋代·徐大升）载"丙火赫奕，纯阳之象"；十干体象歌载"丙火明明与太阳"'},
@@ -5275,7 +5275,7 @@ var TIANGAN_DATA = {
   '壬水':{element:'水',yinyang:'阳',organ:'膀胱',nature:'大海之水',desc:'壬水浩瀚，智慧深远。',source:'《渊海子平·论天干阴阳》（宋代·徐大升）'},
   '癸水':{element:'水',yinyang:'阴',organ:'肾',nature:'雨露之水',desc:'癸水柔顺，润物无声。',source:'《渊海子平·论天干阴阳》（宋代·徐大升）'}
 };
-var DIZHI_DATA = {
+let DIZHI_DATA = {
   '子':{element:'水',animal:'鼠',time:'23-1',cang:'癸',desc:'子水阴极阳生，聪明灵动。',source:'《渊海子平·论地支》（宋代·徐大升）载"子者，滋也，滋始于万物；为一阳初生，藏癸水"；十二支配脏腑歌载"子属膀胱水道耳"'},
   '丑':{element:'土',animal:'牛',time:'1-3',cang:'己癸辛',desc:'丑土藏金水，内秀勤恳。',source:'《渊海子平·论地支》（宋代·徐大升）载"丑者，纽也，纽结于万物；丑为金库，藏己癸辛"'},
   '寅':{element:'木',animal:'虎',time:'3-5',cang:'甲丙戊',desc:'寅木阳刚之始，威猛果断。',source:'《渊海子平·论地支》（宋代·徐大升）载"寅者，引也，引达于万物；寅为木之孟，藏甲丙戊"；十二支配脏腑歌载"寅胆为肝脏"'},
@@ -5301,7 +5301,7 @@ var DIZHI_DATA = {
   '地支:戌':{element:'土',animal:'狗',time:'19-21',cang:'戊辛丁',desc:'戌土火库，忠诚坚定。',source:'《渊海子平·论地支》（宋代·徐大升）'},
   '地支:亥':{element:'水',animal:'猪',time:'21-23',cang:'壬甲',desc:'亥水深邃，包容大度。',source:'《渊海子平·论地支》（宋代·徐大升）'}
 };
-var QIMEN_DATA = {
+let QIMEN_DATA = {
   1:{bagua:'坎',element:'水',men:'休门',xing:'天蓬',jixiong:'半吉',desc:'一宫坎水，休门吉，天蓬星主盗。',source:'《奇门遁甲总序》载"一宫坎水，天蓬星为贼盗之星，休门为吉门，宜休养、访友、求财"'},
   2:{bagua:'坤',element:'土',men:'死门',xing:'天芮',jixiong:'凶',desc:'二宫坤土，死门凶，天芮星主病。',source:'《奇门遁甲总序》载"二宫坤土，天芮星为疾病之星，死门为大凶之门，宜丧葬，忌嫁娶、开业"'},
   3:{bagua:'震',element:'木',men:'伤门',xing:'天冲',jixiong:'半凶',desc:'三宫震木，伤门凶，天冲星主动。',source:'《奇门遁甲总序》载"三宫震木，天冲星为动星，伤门主损伤、争斗，宜讨债、博弈，不宜求财"'},
@@ -5315,17 +5315,17 @@ var QIMEN_DATA = {
 
 // ==================== SVG 图谱渲染 ====================
 function renderTudisGraph() {
-  var svg = document.getElementById('tudisSvg');
+  let svg = document.getElementById('tudisSvg');
   if (!svg) return;
-  var cx = 450, cy = 450;
-  var defs = '<defs>' +
+  let cx = 450, cy = 450;
+  let defs = '<defs>' +
     '<marker id="arrowG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#27ae60"/></marker>' +
     '<marker id="arrowR" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#e74c3c"/></marker>' +
     '<marker id="arrowH" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#ffd700"/></marker>' +
     '<radialGradient id="centerGlow"><stop offset="0%" stop-color="rgba(201,168,76,0.3)"/><stop offset="100%" stop-color="transparent"/></radialGradient>' +
     '</defs>';
 
-  var layers = [
+  let layers = [
     {r:80, items:['木','火','土','金','水'], type:'wuxing'},
     {r:165, items:['乾','兑','离','震','巽','坎','艮','坤'], type:'bagua'},
     {r:270, items:TIANGAN.map(function(t){return '天干:'+t}), type:'tiangan'},
@@ -5333,50 +5333,50 @@ function renderTudisGraph() {
     {r:410, items:['1坎','2坤','3震','4巽','5中','6乾','7兑','8艮','9离'], type:'qimen'}
   ];
 
-  var html = defs;
+  let html = defs;
   // center glow
   html += '<circle cx="'+cx+'" cy="'+cy+'" r="50" fill="url(#centerGlow)"/>';
   html += '<text x="'+cx+'" y="'+(cy+6)+'" text-anchor="middle" fill="#c9a84c" font-size="18" font-family="Noto Serif SC,serif">人</text>';
 
   // draw layers
-  var positions = {}; // store positions for linking
+  let positions = {}; // store positions for linking
   layers.forEach(function(layer) {
-    var n = layer.items.length;
-    var startAngle = -Math.PI / 2;
+    let n = layer.items.length;
+    let startAngle = -Math.PI / 2;
     // draw circle guide
     html += '<circle cx="'+cx+'" cy="'+cy+'" r="'+layer.r+'" fill="none" stroke="rgba(201,168,76,0.08)" stroke-width="1"/>';
     layer.items.forEach(function(item, i) {
-      var angle = startAngle + (2 * Math.PI * i / n);
-      var x = cx + layer.r * Math.cos(angle);
-      var y = cy + layer.r * Math.sin(angle);
+      let angle = startAngle + (2 * Math.PI * i / n);
+      let x = cx + layer.r * Math.cos(angle);
+      let y = cy + layer.r * Math.sin(angle);
       positions[item] = {x:x, y:y, angle:angle};
-      var color = '#c9a84c', fontSize = 14, radius = 30;
+      let color = '#c9a84c', fontSize = 14, radius = 30;
       if (layer.type === 'wuxing') { color = WUXING_DATA[item] ? WUXING_DATA[item].color : '#c9a84c'; fontSize = 16; radius = 32; }
       if (layer.type === 'bagua') { color = WUXING_DATA[BAGUA_DATA[item].element] ? WUXING_DATA[BAGUA_DATA[item].element].color : '#c9a84c'; }
-      if (layer.type === 'tiangan') { var tn = item.split(':')[1]; color = WUXING_DATA[TIANGAN_DATA[tn].element] ? WUXING_DATA[TIANGAN_DATA[tn].element].color : '#c9a84c'; fontSize = 11; radius = 22; }
-      if (layer.type === 'dizhi') { var zn = item.split(':')[1]; color = WUXING_DATA[DIZHI_DATA[zn].element] ? WUXING_DATA[DIZHI_DATA[zn].element].color : '#c9a84c'; fontSize = 11; radius = 22; }
-      if (layer.type === 'qimen') { var qn = item.substring(1); var bEl = BAGUA_DATA[qn] ? BAGUA_DATA[qn].element : ''; color = bEl && WUXING_DATA[bEl] ? WUXING_DATA[bEl].color : '#c9a84c'; fontSize = 12; radius = 25; }
+      if (layer.type === 'tiangan') { let tn = item.split(':')[1]; color = WUXING_DATA[TIANGAN_DATA[tn].element] ? WUXING_DATA[TIANGAN_DATA[tn].element].color : '#c9a84c'; fontSize = 11; radius = 22; }
+      if (layer.type === 'dizhi') { let zn = item.split(':')[1]; color = WUXING_DATA[DIZHI_DATA[zn].element] ? WUXING_DATA[DIZHI_DATA[zn].element].color : '#c9a84c'; fontSize = 11; radius = 22; }
+      if (layer.type === 'qimen') { let qn = item.substring(1); let bEl = BAGUA_DATA[qn] ? BAGUA_DATA[qn].element : ''; color = bEl && WUXING_DATA[bEl] ? WUXING_DATA[bEl].color : '#c9a84c'; fontSize = 12; radius = 25; }
       html += '<circle cx="'+x+'" cy="'+y+'" r="'+radius+'" fill="rgba(20,20,30,0.9)" stroke="'+color+'" stroke-width="1.5" class="tudis-node" data-key="'+item+'" data-type="'+layer.type+'" style="cursor:pointer;transition:all .3s"/>';
-      var label = layer.type === 'bagua' ? BAGUA_DATA[item].symbol + item : item;
+      let label = layer.type === 'bagua' ? BAGUA_DATA[item].symbol + item : item;
       html += '<text x="'+x+'" y="'+(y+5)+'" text-anchor="middle" fill="'+color+'" font-size="'+fontSize+'" font-family="Noto Serif SC,serif" class="tudis-label" style="pointer-events:none">'+label+'</text>';
     });
   });
 
   // 五行相生线（绿色弧线）
-  var shengOrder = ['木','火','土','金','水'];
+  let shengOrder = ['木','火','土','金','水'];
   html += '<g class="sheng-lines">';
-  for (var i = 0; i < 5; i++) {
-    var a = shengOrder[i], b = shengOrder[(i+1)%5];
-    var pa = positions[a], pb = positions[b];
+  for (let i = 0; i < 5; i++) {
+    let a = shengOrder[i], b = shengOrder[(i+1)%5];
+    let pa = positions[a], pb = positions[b];
     html += '<line x1="'+pa.x+'" y1="'+pa.y+'" x2="'+pb.x+'" y2="'+pb.y+'" stroke="#27ae60" stroke-width="1.5" marker-end="url(#arrowG)" opacity="0.5" class="relation-line" data-from="'+a+'" data-to="'+b+'" data-rel="sheng"/>';
   }
   html += '</g>';
 
   // 五行相克线（红色弧线）
-  var kePairs = [['木','土'],['火','金'],['土','水'],['金','木'],['水','火']];
+  let kePairs = [['木','土'],['火','金'],['土','水'],['金','木'],['水','火']];
   html += '<g class="ke-lines">';
   kePairs.forEach(function(pair) {
-    var pa = positions[pair[0]], pb = positions[pair[1]];
+    let pa = positions[pair[0]], pb = positions[pair[1]];
     html += '<line x1="'+pa.x+'" y1="'+pa.y+'" x2="'+pb.x+'" y2="'+pb.y+'" stroke="#e74c3c" stroke-width="1.2" marker-end="url(#arrowR)" opacity="0.4" stroke-dasharray="6,4" class="relation-line" data-from="'+pair[0]+'" data-to="'+pair[1]+'" data-rel="ke"/>';
   });
   html += '</g>';
@@ -5392,8 +5392,8 @@ function renderTudisGraph() {
 }
 
 function highlightRelations(key, type, on) {
-  var svg = document.getElementById('tudisSvg');
-  var node = svg.querySelector('[data-key="'+key+'"]');
+  let svg = document.getElementById('tudisSvg');
+  let node = svg.querySelector('[data-key="'+key+'"]');
   if (on) {
     node.setAttribute('stroke-width', '3');
     node.setAttribute('filter', '');
@@ -5408,7 +5408,7 @@ function highlightRelations(key, type, on) {
       line.setAttribute('opacity', '1');
       line.setAttribute('stroke-width', '2.5');
     } else {
-      var origColor = line.dataset.rel === 'sheng' ? '#27ae60' : '#e74c3c';
+      let origColor = line.dataset.rel === 'sheng' ? '#27ae60' : '#e74c3c';
       line.setAttribute('stroke', origColor);
       line.setAttribute('opacity', line.dataset.rel === 'sheng' ? '0.5' : '0.4');
       line.setAttribute('stroke-width', line.dataset.rel === 'sheng' ? '1.5' : '1.2');
@@ -5417,10 +5417,10 @@ function highlightRelations(key, type, on) {
 }
 
 function showTudisDetail(key, type) {
-  var panel = document.getElementById('tudisDetail');
-  var html = '';
+  let panel = document.getElementById('tudisDetail');
+  let html = '';
   if (type === 'wuxing') {
-    var d = WUXING_DATA[key];
+    let d = WUXING_DATA[key];
     html = '<div style="color:'+d.color+';font-size:20px;font-weight:bold;margin-bottom:4px">'+key+'</div>' +
       '<div style="font-size:11px;color:#888;padding:6px 10px;background:rgba(201,168,76,.06);border-radius:4px;margin-bottom:8px">📖 '+d.source+'</div>' +
       '<p style="font-size:13px;opacity:.8;margin-bottom:8px">'+d.desc+'</p>' +
@@ -5436,8 +5436,8 @@ function showTudisDetail(key, type) {
       '<span style="color:var(--gold)">调理：</span>'+d.adjust+
       '</div>';
   } else if (type === 'bagua') {
-    var d = BAGUA_DATA[key];
-    var src = d.source || '';
+    let d = BAGUA_DATA[key];
+    let src = d.source || '';
     html = '<div style="color:var(--gold);font-size:20px;font-weight:bold;margin-bottom:4px">'+d.symbol+' '+key+'</div>' +
       (src ? '<div style="font-size:11px;color:#888;padding:6px 10px;background:rgba(201,168,76,.06);border-radius:4px;margin-bottom:8px">📖 '+src+'</div>' : '') +
       '<p style="font-size:13px;opacity:.8;margin-bottom:12px">'+d.desc+'</p>' +
@@ -5445,24 +5445,24 @@ function showTudisDetail(key, type) {
       detailItem('五行',d.element)+detailItem('方位',d.direction)+detailItem('身体',d.organ)+
       detailItem('家庭',d.family)+detailItem('自然',d.nature)+'</div>';
   } else if (type === 'tiangan') {
-    var tn = key.split(':')[1]; var d = TIANGAN_DATA[tn];
-    var src = d ? (d.source || '') : '';
+    let tn = key.split(':')[1]; let d = TIANGAN_DATA[tn];
+    let src = d ? (d.source || '') : '';
     html = '<div style="color:var(--gold);font-size:20px;font-weight:bold;margin-bottom:4px">天干 · '+tn+'</div>' +
       (src ? '<div style="font-size:11px;color:#888;padding:6px 10px;background:rgba(201,168,76,.06);border-radius:4px;margin-bottom:8px">📖 '+src+'</div>' : '') +
       '<p style="font-size:13px;opacity:.8;margin-bottom:12px">'+ (d ? d.desc : '') +'</p>' +
       '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;font-size:13px">' +
       (d ? (detailItem('五行',d.element)+detailItem('阴阳',d.yinyang)+detailItem('脏腑',d.organ)+detailItem('意象',d.nature)) : '') +'</div>';
   } else if (type === 'dizhi') {
-    var zn = key.split(':')[1]; var d = DIZHI_DATA[zn];
-    var src = d ? (d.source || '') : '';
+    let zn = key.split(':')[1]; let d = DIZHI_DATA[zn];
+    let src = d ? (d.source || '') : '';
     html = '<div style="color:var(--gold);font-size:20px;font-weight:bold;margin-bottom:4px">地支 · '+zn+'（'+ (d ? d.animal : '') +'）</div>' +
       (src ? '<div style="font-size:11px;color:#888;padding:6px 10px;background:rgba(201,168,76,.06);border-radius:4px;margin-bottom:8px">📖 '+src+'</div>' : '') +
       '<p style="font-size:13px;opacity:.8;margin-bottom:12px">'+ (d ? d.desc : '') +'</p>' +
       '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;font-size:13px">' +
       (d ? (detailItem('五行',d.element)+detailItem('生肖',d.animal)+detailItem('时辰',d.time)+detailItem('藏干',d.cang)) : '') +'</div>';
   } else if (type === 'qimen') {
-    var qn = key.substring(1); var num = parseInt(key); var d = QIMEN_DATA[num];
-    var src = d ? (d.source || '') : '';
+    let qn = key.substring(1); let num = parseInt(key); let d = QIMEN_DATA[num];
+    let src = d ? (d.source || '') : '';
     html = '<div style="color:var(--gold);font-size:20px;font-weight:bold;margin-bottom:4px">第'+num+'宫 · '+qn+'</div>' +
       (src ? '<div style="font-size:11px;color:#888;padding:6px 10px;background:rgba(201,168,76,.06);border-radius:4px;margin-bottom:8px">📖 '+src+'</div>' : '') +
       '<p style="font-size:13px;opacity:.8;margin-bottom:12px">'+ (d ? d.desc : '') +'</p>' +
@@ -5475,11 +5475,11 @@ function detailItem(k,v){return '<div style="padding:8px;background:rgba(201,168
 
 // ==================== 断事工具 ====================
 function showTool(name) {
-  var panel = document.getElementById('toolPanel');
-  var result = document.getElementById('toolResult');
+  let panel = document.getElementById('toolPanel');
+  let result = document.getElementById('toolResult');
   result.innerHTML = '';
   document.querySelectorAll('[id^=toolBtn]').forEach(function(b){b.style.borderColor='rgba(201,168,76,.08)';});
-  var btn = document.getElementById('toolBtn-'+name);
+  let btn = document.getElementById('toolBtn-'+name);
   if(btn) btn.style.borderColor='var(--gold)';
 
   if (name === 'wuxing') {
@@ -5489,7 +5489,7 @@ function showTool(name) {
       '<button onclick="calcWuxing()" style="margin-top:12px;padding:8px 24px;background:rgba(201,168,76,.15);border:1px solid var(--gold);color:var(--gold);border-radius:4px;cursor:pointer;font-size:14px">开始分析</button>' +
       '</div>';
   } else if (name === 'yiji') {
-    var today = new Date().toISOString().split('T')[0];
+    let today = new Date().toISOString().split('T')[0];
     panel.innerHTML = '<div style="padding:20px;background:rgba(201,168,76,.04);border-radius:8px">' +
       '<h5 style="color:var(--gold);margin-bottom:16px">📅 今日宜忌</h5>' +
       '<label style="font-size:13px;color:var(--paper2)">选择日期：</label>' +
@@ -5518,8 +5518,8 @@ function showTool(name) {
 }
 
 function makePillarSelect(label, prefix) {
-  var pillars = ['年柱','月柱','日柱','时柱'];
-  var html = '<p style="color:var(--paper2);font-size:14px;margin-bottom:8px">'+label+'八字：</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">';
+  let pillars = ['年柱','月柱','日柱','时柱'];
+  let html = '<p style="color:var(--paper2);font-size:14px;margin-bottom:8px">'+label+'八字：</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">';
   pillars.forEach(function(p, i) {
     html += '<div style="display:flex;gap:4px;align-items:center"><span style="font-size:12px;opacity:.6;min-width:36px">'+p+'</span>';
     html += '<select id="'+prefix+'_g'+i+'" style="flex:1;padding:4px;background:rgba(0,0,0,.3);border:1px solid rgba(201,168,76,.2);color:var(--paper1);border-radius:4px;font-size:12px">';
@@ -5533,10 +5533,10 @@ function makePillarSelect(label, prefix) {
 }
 
 function countElements(prefix) {
-  var counts = {木:0,火:0,土:0,金:0,水:0};
-  for (var i = 0; i < 4; i++) {
-    var g = document.getElementById(prefix+'_g'+i).value;
-    var z = document.getElementById(prefix+'_z'+i).value;
+  let counts = {木:0,火:0,土:0,金:0,水:0};
+  for (let i = 0; i < 4; i++) {
+    let g = document.getElementById(prefix+'_g'+i).value;
+    let z = document.getElementById(prefix+'_z'+i).value;
     if (TIANGAN_DATA[g]) counts[TIANGAN_DATA[g].element]++;
     if (DIZHI_DATA[z]) counts[DIZHI_DATA[z].element]++;
   }
@@ -5544,24 +5544,24 @@ function countElements(prefix) {
 }
 
 function calcWuxing() {
-  var counts = countElements('m');
-  var total = 0; var max = 0; var min = 99; var maxE = '', minE = '';
+  let counts = countElements('m');
+  let total = 0; let max = 0; let min = 99; let maxE = '', minE = '';
   ['木','火','土','金','水'].forEach(function(e) {
     total += counts[e];
     if (counts[e] > max) { max = counts[e]; maxE = e; }
     if (counts[e] < min) { min = counts[e]; minE = e; }
   });
-  var lack = [];
+  let lack = [];
   ['木','火','土','金','水'].forEach(function(e) { if (counts[e] <= 1) lack.push(e); });
-  var riZhu = document.getElementById('m_g2').value;
-  var riEl = TIANGAN_DATA[riZhu].element;
-  var riDesc = WUXING_DATA[riEl].desc;
+  let riZhu = document.getElementById('m_g2').value;
+  let riEl = TIANGAN_DATA[riZhu].element;
+  let riDesc = WUXING_DATA[riEl].desc;
   // Canvas chart
-  var chartHtml = '<canvas id="wuxingChart" width="400" height="200" style="display:block;margin:12px auto;max-width:100%"></canvas>';
-  var result = document.getElementById('toolResult');
-  var lackStr = lack.length > 0 ? lack.join('、') : '无';
-  var elGift = {木:'绿色饰品',火:'红色饰品',土:'黄色饰品',金:'金属饰品',水:'黑色饰品'};
-  var conclusion = lack.length > 0 ?
+  let chartHtml = '<canvas id="wuxingChart" width="400" height="200" style="display:block;margin:12px auto;max-width:100%"></canvas>';
+  let result = document.getElementById('toolResult');
+  let lackStr = lack.length > 0 ? lack.join('、') : '无';
+  let elGift = {木:'绿色饰品',火:'红色饰品',土:'黄色饰品',金:'金属饰品',水:'黑色饰品'};
+  let conclusion = lack.length > 0 ?
     '你八字'+maxE+'旺缺'+lackStr+'，'+WUXING_DATA[maxE].emotion+'有余而'+WUXING_DATA[lack[0]].emotion+'不足，建议补'+lack[0]+'（佩戴'+(elGift[lack[0]]||'')+'）。' :
     '你八字五行较均衡，'+riEl+'为日主，'+riDesc.substring(0,10)+'。';
 
@@ -5570,34 +5570,34 @@ function calcWuxing() {
     good: lack.length === 0,
     wuxing: maxE+'旺（'+max+'个），'+lackStr+(lack.length>0?'缺':'不缺'),
     xingge: '日主'+riZhu+'属'+riEl+'，'+riDesc,
-    huajie: lack.map(function(e){var elJ={木:'翡翠绿松石',火:'红玛瑙石榴石',土:'黄虎眼琥珀',金:'金银铂饰品',水:'黑曜石海蓝宝'};return '补'+e+'：佩戴'+(elJ[e]||'');}).join('；')
+    huajie: lack.map(function(e){let elJ={木:'翡翠绿松石',火:'红玛瑙石榴石',土:'黄虎眼琥珀',金:'金银铂饰品',水:'黑曜石海蓝宝'};return '补'+e+'：佩戴'+(elJ[e]||'');}).join('；')
   });
   // draw chart
   setTimeout(function(){ drawWuxingChart(counts); }, 50);
 }
 
 function drawWuxingChart(counts) {
-  var canvas = document.getElementById('wuxingChart');
+  let canvas = document.getElementById('wuxingChart');
   if (!canvas) return;
-  var dpr = window.devicePixelRatio || 1;
-  var logicalW = 400, logicalH = 200;
+  let dpr = window.devicePixelRatio || 1;
+  let logicalW = 400, logicalH = 200;
   canvas.width = logicalW * dpr;
   canvas.height = logicalH * dpr;
   canvas.style.width = logicalW + 'px';
   canvas.style.height = logicalH + 'px';
-  var ctx = canvas.getContext('2d');
+  let ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
-  var w = logicalW, h = logicalH;
+  let w = logicalW, h = logicalH;
   ctx.clearRect(0,0,w,h);
-  var els = ['木','火','土','金','水'];
-  var colors = ['#27ae60','#e74c3c','#f39c12','#bdc3c7','#3498db'];
-  var barW = 50, gap = 20, startX = (w - (barW * 5 + gap * 4)) / 2;
-  var maxVal = 0;
+  let els = ['木','火','土','金','水'];
+  let colors = ['#27ae60','#e74c3c','#f39c12','#bdc3c7','#3498db'];
+  let barW = 50, gap = 20, startX = (w - (barW * 5 + gap * 4)) / 2;
+  let maxVal = 0;
   els.forEach(function(e) { if (counts[e] > maxVal) maxVal = counts[e]; });
   maxVal = Math.max(maxVal, 1);
   els.forEach(function(e, i) {
-    var x = startX + i * (barW + gap);
-    var barH = (counts[e] / maxVal) * (h - 50);
+    let x = startX + i * (barW + gap);
+    let barH = (counts[e] / maxVal) * (h - 50);
     ctx.fillStyle = colors[i];
     ctx.fillRect(x, h - 30 - barH, barW, barH);
     ctx.fillStyle = '#c9a84c';
@@ -5609,29 +5609,29 @@ function drawWuxingChart(counts) {
 }
 
 function calcYiji() {
-  var dateStr = document.getElementById('yijiDate').value;
+  let dateStr = document.getElementById('yijiDate').value;
   if (!dateStr) return;
-  var d = new Date(dateStr);
-  var dayOfYear = Math.floor((d - new Date(d.getFullYear(),0,0)) / 86400000);
+  let d = new Date(dateStr);
+  let dayOfYear = Math.floor((d - new Date(d.getFullYear(),0,0)) / 86400000);
   // 简化计算：基于日期推算奇门值符和吉门
-  var menList = ['休门','生门','伤门','杜门','景门','死门','惊门','开门'];
-  var menJi = ['休门','生门','开门'];
-  var menXiong = ['伤门','死门','惊门'];
-  var todayMen = menList[dayOfYear % 8];
-  var isJi = menJi.indexOf(todayMen) >= 0;
+  let menList = ['休门','生门','伤门','杜门','景门','死门','惊门','开门'];
+  let menJi = ['休门','生门','开门'];
+  let menXiong = ['伤门','死门','惊门'];
+  let todayMen = menList[dayOfYear % 8];
+  let isJi = menJi.indexOf(todayMen) >= 0;
   // 吉时简化：基于日期hash
-  var shiChen = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-  var jiShi = shiChen.filter(function(_,i){return ((dayOfYear * 7 + i * 13) % 12) < 5;});
-  var xiongShi = shiChen.filter(function(_,i){return ((dayOfYear * 7 + i * 13) % 12) >= 8;});
+  let shiChen = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  let jiShi = shiChen.filter(function(_,i){return ((dayOfYear * 7 + i * 13) % 12) < 5;});
+  let xiongShi = shiChen.filter(function(_,i){return ((dayOfYear * 7 + i * 13) % 12) >= 8;});
   // 黄历宜忌简化
-  var yiList = ['祭祀','祈福','出行','移徙','入宅','开市','交易','纳财','求嗣','栽种','牧养'];
-  var jiList = ['动土','上梁','入殓','安葬','破土','伐木','作灶','安门'];
-  var todayYi = yiList.filter(function(_,i){return ((dayOfYear*3+i*7)%11)<5;});
-  var todayJi = jiList.filter(function(_,i){return ((dayOfYear*5+i*3)%8)<3;});
-  var advice = isJi ? '今日'+todayMen+'当值，利'+todayYi.slice(0,2).join('、')+'，慎'+todayJi.slice(0,2).join('、')+'。' :
+  let yiList = ['祭祀','祈福','出行','移徙','入宅','开市','交易','纳财','求嗣','栽种','牧养'];
+  let jiList = ['动土','上梁','入殓','安葬','破土','伐木','作灶','安门'];
+  let todayYi = yiList.filter(function(_,i){return ((dayOfYear*3+i*7)%11)<5;});
+  let todayJi = jiList.filter(function(_,i){return ((dayOfYear*5+i*3)%8)<3;});
+  let advice = isJi ? '今日'+todayMen+'当值，利'+todayYi.slice(0,2).join('、')+'，慎'+todayJi.slice(0,2).join('、')+'。' :
     '今日'+todayMen+'值，不宜大事，宜静不宜动。';
 
-  var result = document.getElementById('toolResult');
+  let result = document.getElementById('toolResult');
   result.innerHTML = buildConclusion({
     core: isJi ? '今日吉门当值，诸事顺遂' : '今日凶门当值，宜守不宜进',
     good: isJi,
@@ -5647,34 +5647,34 @@ function calcYiji() {
 }
 
 function calcHunyin() {
-  var countsM = countElements('m');
-  var countsF = countElements('f');
+  let countsM = countElements('m');
+  let countsF = countElements('f');
   // 年柱看祖业
-  var mYearG = document.getElementById('m_g0').value;
-  var fYearG = document.getElementById('f_g0').value;
-  var yearScore = scoreRelation(TIANGAN_DATA[mYearG].element, TIANGAN_DATA[fYearG].element);
+  let mYearG = document.getElementById('m_g0').value;
+  let fYearG = document.getElementById('f_g0').value;
+  let yearScore = scoreRelation(TIANGAN_DATA[mYearG].element, TIANGAN_DATA[fYearG].element);
   // 日柱看夫妻
-  var mDayG = document.getElementById('m_g2').value; var mDayZ = document.getElementById('m_z2').value;
-  var fDayG = document.getElementById('f_g2').value; var fDayZ = document.getElementById('f_z2').value;
-  var dayTianHe = (mDayG === '甲'&&fDayG==='己')||(mDayG==='己'&&fDayG==='甲')||
+  let mDayG = document.getElementById('m_g2').value; let mDayZ = document.getElementById('m_z2').value;
+  let fDayG = document.getElementById('f_g2').value; let fDayZ = document.getElementById('f_z2').value;
+  let dayTianHe = (mDayG === '甲'&&fDayG==='己')||(mDayG==='己'&&fDayG==='甲')||
     (mDayG==='乙'&&fDayG==='庚')||(mDayG==='庚'&&fDayG==='乙')||
     (mDayG==='丙'&&fDayG==='辛')||(mDayG==='辛'&&fDayG==='丙')||
     (mDayG==='丁'&&fDayG==='壬')||(mDayG==='壬'&&fDayG==='丁')||
     (mDayG==='戊'&&fDayG==='癸')||(mDayG==='癸'&&fDayG==='戊');
-  var dayDiHe = Math.abs(DIZHI.indexOf(mDayZ)-DIZHI.indexOf(fDayZ))===6;
-  var dayScore = (dayTianHe?30:0)+(dayDiHe?30:0)+(Math.abs(DIZHI.indexOf(mDayZ)-DIZHI.indexOf(fDayZ))%4===0?10:0);
+  let dayDiHe = Math.abs(DIZHI.indexOf(mDayZ)-DIZHI.indexOf(fDayZ))===6;
+  let dayScore = (dayTianHe?30:0)+(dayDiHe?30:0)+(Math.abs(DIZHI.indexOf(mDayZ)-DIZHI.indexOf(fDayZ))%4===0?10:0);
   // 五行互补
-  var buScore = 0;
+  let buScore = 0;
   ['木','火','土','金','水'].forEach(function(e) {
     if (countsM[e] <= 1 && countsF[e] >= 3) buScore += 5;
     if (countsF[e] <= 1 && countsM[e] >= 3) buScore += 5;
   });
-  var total = Math.min(100, yearScore + dayScore + buScore + 20);
-  var level = total >= 80 ? '上等婚，百年好合' : total >= 60 ? '中等婚，可成可不成' : '下等婚，慎入';
-  var good = total >= 60;
-  var huajie = total < 60 ? '建议找五行互补者，或佩戴对方喜用五行饰品化解。' : '保持现有五行平衡，多行善积德。';
+  let total = Math.min(100, yearScore + dayScore + buScore + 20);
+  let level = total >= 80 ? '上等婚，百年好合' : total >= 60 ? '中等婚，可成可不成' : '下等婚，慎入';
+  let good = total >= 60;
+  let huajie = total < 60 ? '建议找五行互补者，或佩戴对方喜用五行饰品化解。' : '保持现有五行平衡，多行善积德。';
 
-  var result = document.getElementById('toolResult');
+  let result = document.getElementById('toolResult');
   result.innerHTML = buildConclusion({
     core: level+'（综合评分'+total+'分）',
     good: good,
@@ -5687,34 +5687,34 @@ function calcHunyin() {
 }
 
 function scoreRelation(el1, el2) {
-  var sheng = {木:'火',火:'土',土:'金',金:'水',水:'木'};
+  let sheng = {木:'火',火:'土',土:'金',金:'水',水:'木'};
   if (sheng[el1] === el2 || sheng[el2] === el1) return 25;
   if (el1 === el2) return 20;
-  var ke = {木:'土',火:'金',土:'水',金:'木',水:'火'};
+  let ke = {木:'土',火:'金',土:'水',金:'木',水:'火'};
   if (ke[el1] === el2 || ke[el2] === el1) return 10;
   return 15;
 }
 
 function calcNaming() {
-  var counts = countElements('m');
-  var lack = [];
+  let counts = countElements('m');
+  let lack = [];
   ['木','火','土','金','水'].forEach(function(e) { if (counts[e] <= 1) lack.push(e); });
-  var gender = document.getElementById('namingGender').value;
-  var surname = document.getElementById('namingSurname').value || '';
+  let gender = document.getElementById('namingGender').value;
+  let surname = document.getElementById('namingSurname').value || '';
   // 用字库
-  var nameDB = {
+  let nameDB = {
     '木': [{w:'林',y:'繁茂',p:'lín'},{w:'森',y:'旺盛',p:'sēn'},{w:'桐',y:'高洁',p:'tóng'},{w:'楠',y:'珍贵',p:'nán'},{w:'芝',y:'灵芝',p:'zhī'},{w:'萱',y:'忘忧',p:'xuān'},{w:'芷',y:'芳香',p:'zhǐ'}],
     '火': [{w:'炎',y:'光明',p:'yán'},{w:'煜',y:'照耀',p:'yù'},{w:'烨',y:'辉煌',p:'yè'},{w:'烨',y:'光彩',p:'yè'},{w:'灿',y:'灿烂',p:'càn'},{w:'煦',y:'温暖',p:'xù'},{w:'曦',y:'晨光',p:'xī'}],
     '土': [{w:'坤',y:'大地',p:'kūn'},{w:'城',y:'坚固',p:'chéng'},{w:'垚',y:'高土',p:'yáo'},{w:'培',y:'培育',p:'péi'},{w:'韵',y:'韵味',p:'yùn'},{w:'怡',y:'和悦',p:'yí'},{w:'玥',y:'神珠',p:'yuè'}],
     '金': [{w:'铭',y:'铭记',p:'míng'},{w:'钰',y:'珍宝',p:'yù'},{w:'锦',y:'锦绣',p:'jǐn'},{w:'铮',y:'刚正',p:'zhēng'},{w:'瑞',y:'祥瑞',p:'ruì'},{w:'珊',y:'珊瑚',p:'shān'},{w:'钦',y:'敬重',p:'qīn'}],
     '水': [{w:'涵',y:'包容',p:'hán'},{w:'泽',y:'恩泽',p:'zé'},{w:'瀚',y:'浩瀚',p:'hàn'},{w:'沐',y:'润泽',p:'mù'},{w:'淼',y:'广阔',p:'miǎo'},{w:'洁',y:'纯净',p:'jié'},{w:'澜',y:'波澜',p:'lán'}]
   };
-  var avoidDB = {木:['刚','铁','锋'],火:['冰','寒','雪'],土:['风','雷','震'],金:['森','林','草'],水:['炎','烈','熔']};
-  var lackStr = lack.length > 0 ? lack.join('、') : '（五行均衡）';
-  var recommendEls = lack.length > 0 ? lack : ['木','火','土','金','水'];
-  var html = '';
+  let avoidDB = {木:['刚','铁','锋'],火:['冰','寒','雪'],土:['风','雷','震'],金:['森','林','草'],水:['炎','烈','熔']};
+  let lackStr = lack.length > 0 ? lack.join('、') : '（五行均衡）';
+  let recommendEls = lack.length > 0 ? lack : ['木','火','土','金','水'];
+  let html = '';
   recommendEls.forEach(function(e) {
-    var chars = nameDB[e];
+    let chars = nameDB[e];
     html += '<div style="margin-bottom:12px"><span style="color:'+WUXING_DATA[e].color+';font-weight:bold">【'+e+'】</span> 推荐用字：';
     chars.forEach(function(c) {
       html += '<span style="display:inline-block;padding:4px 10px;margin:4px;background:rgba(201,168,76,.06);border-radius:4px;font-size:14px" title="'+c.y+' · '+c.p+'">'+c.w+'</span>';
@@ -5722,12 +5722,12 @@ function calcNaming() {
     html += '</div>';
   });
   // 示例名字
-  var names = [];
+  let names = [];
   recommendEls.forEach(function(e, ei) {
     if (ei > 2) return;
-    var chars = nameDB[e];
-    var w1 = chars[(ei*7+3)%chars.length].w;
-    var w2 = chars[(ei*5+chars.length/2)%chars.length].w;
+    let chars = nameDB[e];
+    let w1 = chars[(ei*7+3)%chars.length].w;
+    let w2 = chars[(ei*5+chars.length/2)%chars.length].w;
     names.push((surname?surname:'') + w1 + w2);
   });
   html += '<div style="margin-top:12px;padding:12px;background:rgba(201,168,76,.06);border-radius:6px;font-size:13px">' +
@@ -5735,13 +5735,13 @@ function calcNaming() {
     '<br><strong style="color:#e74c3c;margin-top:8px;display:inline-block">⚠️ 避用字：</strong>'+(lack.map(function(e){return avoidDB[e].join('、');}).join('、')||'无明显避用') +
     '</div>';
 
-  var result = document.getElementById('toolResult');
+  let result = document.getElementById('toolResult');
   result.innerHTML = html;
 }
 
 function buildConclusion(opts) {
-  var color = opts.good ? '#27ae60' : '#e74c3c';
-  var html = '<div style="margin-top:16px;padding:20px;background:rgba(201,168,76,.04);border-left:3px solid '+color+';border-radius:0 8px 8px 0">';
+  let color = opts.good ? '#27ae60' : '#e74c3c';
+  let html = '<div style="margin-top:16px;padding:20px;background:rgba(201,168,76,.04);border-left:3px solid '+color+';border-radius:0 8px 8px 0">';
   html += '<div style="font-size:16px;color:'+color+';font-weight:bold;margin-bottom:12px">📊 综合结论</div>';
   html += '<div style="font-size:13px;line-height:2">';
   html += '【核心判断】<span style="color:'+color+'">'+opts.core+'</span><br>';

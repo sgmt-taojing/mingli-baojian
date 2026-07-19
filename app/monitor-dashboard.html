@@ -617,7 +617,7 @@ svg.ic{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;str
    ═══════════════════════════════════════════════ */
 
 // ─── 常量 ───
-var SERVICE_PORTS=[
+let SERVICE_PORTS=[
   {name:'主站前端',url:location.origin+'/',port:'web'},
   {name:'API服务器 (8900)',url:'http://127.0.0.1:8900/',port:'8900'},
   {name:'排盘引擎 (8911)',url:'http://127.0.0.1:8911/',port:'8911'},
@@ -625,19 +625,19 @@ var SERVICE_PORTS=[
   {name:'AI代理 (8900/v1)',url:'http://127.0.0.1:8900/v1/models',port:'ai'}
 ];
 
-var ENGINE_NAMES={
+let ENGINE_NAMES={
   bazi:'八字排盘',ziwei:'紫微斗数',qimen:'奇门遁甲',
   liuyao:'六爻占卜',meihua:'梅花易数',liuren:'大六壬',fengshui:'风水罗盘',
   cezi:'测字算命',yanzhi:'手机号测算',xingming:'姓名分析',jiuri:'吉日查询'
 };
 
-var PAGE_LIST=[
+let PAGE_LIST=[
   'divination-hub','admin','fengshui','i-ching','fortune-telling','knowledge-panel',
   'divination-shop','divination-membership','wechat-hub','nihaisha-knowledge',
   'shuhan-knowledge','palmistry','physiognomy','compatibility','astrology'
 ];
 
-var ROLE_DEFS=[
+let ROLE_DEFS=[
   {key:'visitor',name:'访客',icon:'👋',color:'#7f8c8d',desc:'未注册浏览者'},
   {key:'trial',name:'体验用户',icon:'🔮',color:'#5dade2',desc:'注册未付费'},
   {key:'member',name:'会员',icon:'⭐',color:'#e8cc7a',desc:'付费会员'},
@@ -646,7 +646,7 @@ var ROLE_DEFS=[
   {key:'admin',name:'管理员',icon:'⚙️',color:'#e74c3c',desc:'后台管理员'}
 ];
 
-var FLOW_STAGES=[
+let FLOW_STAGES=[
   {name:'访问首页',key:'visit'},
   {name:'选择功能',key:'select'},
   {name:'输入信息',key:'input'},
@@ -661,14 +661,14 @@ function getAdminData(){
   return JSON.parse(localStorage.getItem('mlbj_admin')||'{}');
 }
 function getEvents(){
-  var admin=getAdminData();
+  let admin=getAdminData();
   return admin.events||[];
 }
 function getUsers(){
-  var admin=getAdminData();
-  var users=admin.users||[];
+  let admin=getAdminData();
+  let users=admin.users||[];
   // 也补充 localStorage 本地用户
-  var localData=JSON.parse(localStorage.getItem('mlbj_data')||'{}');
+  let localData=JSON.parse(localStorage.getItem('mlbj_data')||'{}');
   if(localData.users){
     users=users.concat(localData.users);
   }
@@ -695,8 +695,8 @@ function switchPanel(id){
 
 // ─── 时钟 ───
 function updateClock(){
-  var d=new Date();
-  var pad=function(n){return n<10?'0'+n:n};
+  let d=new Date();
+  let pad=function(n){return n<10?'0'+n:n};
   document.getElementById('liveClock').textContent=
     d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+
     pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
@@ -706,15 +706,15 @@ updateClock();
 
 // ═══ 总览渲染 ═══
 function renderOverview(){
-  var events=getEvents();
-  var today=getTodayStr();
-  var todayEvents=events.filter(function(e){return e.time && e.time.startsWith(today)});
-  var todayUsers=new Set(todayEvents.map(function(e){return e.phone||e.user||'anon'}));
-  var todayDiv=todayEvents.filter(function(e){return e.type==='tool_usage'}).length;
-  var todayRev=todayEvents.filter(function(e){return e.type==='vip_purchase'}).reduce(function(s,e){return s+((e.data&&e.data.price)||0)},0);
+  let events=getEvents();
+  let today=getTodayStr();
+  let todayEvents=events.filter(function(e){return e.time && e.time.startsWith(today)});
+  let todayUsers=new Set(todayEvents.map(function(e){return e.phone||e.user||'anon'}));
+  let todayDiv=todayEvents.filter(function(e){return e.type==='tool_usage'}).length;
+  let todayRev=todayEvents.filter(function(e){return e.type==='vip_purchase'}).reduce(function(s,e){return s+((e.data&&e.data.price)||0)},0);
 
   // 模拟实时在线（基于事件时间分布）
-  var online=Math.max(1,Math.floor(((Date.now()/1000)%3600)/240)+3+todayEvents.length%8);
+  let online=Math.max(1,Math.floor(((Date.now()/1000)%3600)/240)+3+todayEvents.length%8);
 
   document.getElementById('ovOnline').textContent=online;
   document.getElementById('ovPVUV').textContent=todayEvents.length+' / '+todayUsers.size;
@@ -730,7 +730,7 @@ function renderOverview(){
 }
 
 function renderSvcStatus(){
-  var html='';
+  let html='';
   SERVICE_PORTS.forEach(function(s){
     html+='<div class="svc-row">'+
       '<span class="svc-dot svc-dot-unk" id="svc-dot-'+s.port+'"></span>'+
@@ -742,10 +742,10 @@ function renderSvcStatus(){
 
   // 异步检测
   SERVICE_PORTS.forEach(function(s){
-    var t0=Date.now();
-    fetch(s.url,{mode:'no-cors',signal:(function(){var c=new AbortController();setTimeout(function(){c.abort()},3000);return c.signal})()})
+    let t0=Date.now();
+    fetch(s.url,{mode:'no-cors',signal:(function(){let c=new AbortController();setTimeout(function(){c.abort()},3000);return c.signal})()})
     .then(function(){
-      var ms=Date.now()-t0;
+      let ms=Date.now()-t0;
       document.getElementById('svc-dot-'+s.port).className='svc-dot svc-dot-ok';
       document.getElementById('svc-lat-'+s.port).textContent=ms+'ms';
     })
@@ -757,13 +757,13 @@ function renderSvcStatus(){
 }
 
 function renderHealth(){
-  var events=getEvents();
-  var errCount=events.filter(function(e){return e.type==='error'}).length;
-  var total=events.length||1;
-  var errRate=(errCount/total*100).toFixed(1);
-  var healthScore=Math.max(0,100-errRate*5);
+  let events=getEvents();
+  let errCount=events.filter(function(e){return e.type==='error'}).length;
+  let total=events.length||1;
+  let errRate=(errCount/total*100).toFixed(1);
+  let healthScore=Math.max(0,100-errRate*5);
 
-  var items=[
+  let items=[
     {label:'系统健康分',value:healthScore.toFixed(0),color:healthScore>80?'var(--jade2)':healthScore>60?'var(--amber)':'var(--danger)'},
     {label:'错误事件',value:errCount,color:errCount>10?'var(--danger)':'var(--paper2)'},
     {label:'总事件数',value:total,color:'var(--cyan2)'},
@@ -777,23 +777,23 @@ function renderHealth(){
 }
 
 function renderToolRanking(){
-  var events=getEvents();
-  var counts={};
+  let events=getEvents();
+  let counts={};
   events.forEach(function(e){
     if(e.type==='tool_usage'&&e.data&&e.data.tool){
       counts[e.data.tool]=(counts[e.data.tool]||0)+1;
     }
   });
-  var sorted=Object.entries(counts).sort(function(a,b){return b[1]-a[1]}).slice(0,10);
+  let sorted=Object.entries(counts).sort(function(a,b){return b[1]-a[1]}).slice(0,10);
   if(sorted.length===0){
     // 模拟数据
     sorted=[['bazi',48],['ziwei',32],['liuyao',25],['qimen',18],['meihua',12],['fengshui',8],['cezi',5]];
     sorted.forEach(function(s){s[0]=ENGINE_NAMES[s[0]]||s[0]});
   }
-  var max=sorted[0]?sorted[0][1]:1;
-  var colors=['var(--cinn2)','var(--amber)','var(--jade2)','var(--cyan2)','var(--gold2)','var(--violet2)','var(--orange)'];
+  let max=sorted[0]?sorted[0][1]:1;
+  let colors=['var(--cinn2)','var(--amber)','var(--jade2)','var(--cyan2)','var(--gold2)','var(--violet2)','var(--orange)'];
   document.getElementById('toolRanking').innerHTML=sorted.map(function(r,i){
-    var pct=Math.round(r[1]/max*100);
+    let pct=Math.round(r[1]/max*100);
     return '<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem">'+
       '<span style="min-width:24px;color:'+(colors[i]||'var(--paper3)')+';font-weight:600">'+(i+1)+'</span>'+
       '<span style="min-width:80px;font-size:.8rem;color:var(--paper2)">'+r[0]+'</span>'+
@@ -804,23 +804,23 @@ function renderToolRanking(){
 }
 
 function renderFunnel(){
-  var events=getEvents();
-  var totalUsers=new Set(events.map(function(e){return e.phone||e.user||'anon'})).size||1;
-  var trial=events.filter(function(e){return e.type==='tool_usage'}).length;
-  var paid=events.filter(function(e){return e.type==='vip_purchase'||e.type==='vip_exchange'}).length;
+  let events=getEvents();
+  let totalUsers=new Set(events.map(function(e){return e.phone||e.user||'anon'})).size||1;
+  let trial=events.filter(function(e){return e.type==='tool_usage'}).length;
+  let paid=events.filter(function(e){return e.type==='vip_purchase'||e.type==='vip_exchange'}).length;
   if(totalUsers<2){
     // 模拟
     totalUsers=156;trial=89;paid=23;
   }
-  var stages=[
+  let stages=[
     {label:'访问用户',value:totalUsers,color:'var(--cyan2)'},
     {label:'试用功能',value:trial,color:'var(--amber)'},
     {label:'付费会员',value:paid,color:'var(--jade2)'}
   ];
-  var max=stages[0].value||1;
+  let max=stages[0].value||1;
   document.getElementById('funnelChart').innerHTML=stages.map(function(s){
-    var pct=Math.round(s.value/max*100);
-    var conv=s.value/max*100;
+    let pct=Math.round(s.value/max*100);
+    let conv=s.value/max*100;
     return '<div class="funnel-stage">'+
       '<div class="funnel-label"><span>'+s.label+'</span><span style="color:'+s.color+'">'+s.value+' ('+conv.toFixed(0)+'%)</span></div>'+
       '<div class="funnel-bar"><div class="funnel-fill" style="width:'+pct+'%;background:'+s.color+'">'+s.value+'</div></div></div>';
@@ -828,12 +828,12 @@ function renderFunnel(){
 }
 
 function renderHeatmap(){
-  var html='';
-  var now=new Date();
-  var hour=now.getHours();
+  let html='';
+  let now=new Date();
+  let hour=now.getHours();
   // 模拟 24 小时热力数据
-  for(var h=0;h<24;h++){
-    var level=0;
+  for(let h=0;h<24;h++){
+    let level=0;
     if(h>=7&&h<=9)level=2+Math.floor(Math.random()*2);
     else if(h>=11&&h<=13)level=3+Math.floor(Math.random()*2);
     else if(h>=18&&h<=22)level=4+Math.floor(Math.random()*2);
@@ -845,7 +845,7 @@ function renderHeatmap(){
 }
 
 function renderAlertList(){
-  var alerts=[
+  let alerts=[
     {level:'info',msg:'排盘引擎运行正常',time:'5分钟前'},
     {level:'warn',msg:'divination-core.js 文件较大(2.1MB)，建议拆分',time:'1小时前'},
     {level:'info',msg:'今日新增用户3人',time:'2小时前'},
@@ -853,8 +853,8 @@ function renderAlertList(){
     {level:'warn',msg:'API key 前端暴露(5处)，建议迁移后端',time:'5小时前'}
   ];
   document.getElementById('alertList').innerHTML=alerts.map(function(a){
-    var cls=a.level==='crit'?'alert-crit':a.level==='warn'?'alert-warn':'alert-info';
-    var icon=a.level==='crit'?'🔴':a.level==='warn'?'🟡':'🔵';
+    let cls=a.level==='crit'?'alert-crit':a.level==='warn'?'alert-warn':'alert-info';
+    let icon=a.level==='crit'?'🔴':a.level==='warn'?'🟡':'🔵';
     return '<div class="alert-item '+cls+'"><span>'+icon+'</span>'+
       '<div style="flex:1"><div style="color:var(--paper2)">'+a.msg+'</div>'+
       '<div style="color:var(--gray-light);font-size:.72rem">'+a.time+'</div></div></div>';
@@ -863,16 +863,16 @@ function renderAlertList(){
 
 // ═══ 性能渲染 ═══
 function renderPerformance(){
-  var perf=performance.toJSON();
-  var loadTime=Math.round(perf.timing.loadEventEnd-perf.timing.navigationStart);
+  let perf=performance.toJSON();
+  let loadTime=Math.round(perf.timing.loadEventEnd-perf.timing.navigationStart);
   if(!loadTime||loadTime<0)loadTime=Math.round(perf.now);
 
   // 资源大小
-  var entries=performance.getEntriesByType('resource');
-  var totalSize=0;
-  var resourceList=[];
+  let entries=performance.getEntriesByType('resource');
+  let totalSize=0;
+  let resourceList=[];
   entries.forEach(function(e){
-    var size=e.transferSize||e.encodedBodySize||0;
+    let size=e.transferSize||e.encodedBodySize||0;
     totalSize+=size;
     if(size>0)resourceList.push({name:e.name.split('/').pop().split('?')[0],type:e.initiatorType,size:size,duration:Math.round(e.duration)});
   });
@@ -884,7 +884,7 @@ function renderPerformance(){
   document.getElementById('perfErr').innerHTML='0<small> %</small>';
 
   // 资源表
-  var rt=document.getElementById('resourceTable');
+  let rt=document.getElementById('resourceTable');
   rt.innerHTML=resourceList.slice(0,10).map(function(r){
     return '<tr><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis">'+r.name+'</td>'+
       '<td>'+r.type+'</td>'+
@@ -893,7 +893,7 @@ function renderPerformance(){
   }).join('')||'<tr><td colspan="4" style="color:var(--gray-light)">暂无数据</td></tr>';
 
   // API 延迟表
-  var apis=[
+  let apis=[
     {name:'/api/paipan/save',avg:120,p95:250,ok:true},
     {name:'/api/order/create',avg:85,p95:180,ok:true},
     {name:'/api/feedback/submit',avg:45,p95:90,ok:true},
@@ -907,7 +907,7 @@ function renderPerformance(){
   }).join('');
 
   // 加载耗时分布
-  var stages=[
+  let stages=[
     {label:'DNS查询',value:5,max:50,color:'var(--cyan2)'},
     {label:'TCP连接',value:10,max:50,color:'var(--cyan2)'},
     {label:'请求发送',value:5,max:50,color:'var(--amber)'},
@@ -917,7 +917,7 @@ function renderPerformance(){
     {label:'资源加载',value:300,max:2000,color:'var(--violet2)'}
   ];
   document.getElementById('loadTimeChart').innerHTML=stages.map(function(s){
-    var pct=Math.min(100,s.value/s.max*100);
+    let pct=Math.min(100,s.value/s.max*100);
     return '<div style="margin-bottom:.5rem">'+
       '<div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.2rem">'+
       '<span style="color:var(--paper2)">'+s.label+'</span>'+
@@ -926,13 +926,13 @@ function renderPerformance(){
   }).join('');
 
   // 性能趋势
-  var days=['7天前','6天前','5天前','4天前','3天前','2天前','昨天','今天'];
-  var trendData=[850,920,780,860,910,750,680,loadTime];
-  var maxT=Math.max.apply(null,trendData)*1.1;
+  let days=['7天前','6天前','5天前','4天前','3天前','2天前','昨天','今天'];
+  let trendData=[850,920,780,860,910,750,680,loadTime];
+  let maxT=Math.max.apply(null,trendData)*1.1;
   document.getElementById('perfTrend').innerHTML='<div style="display:flex;align-items:flex-end;gap:.5rem;height:120px;padding-top:.5rem">'+
     trendData.map(function(v,i){
-      var h=Math.round(v/maxT*100);
-      var color=v>900?'var(--danger)':v>700?'var(--amber)':'var(--jade2)';
+      let h=Math.round(v/maxT*100);
+      let color=v>900?'var(--danger)':v>700?'var(--amber)':'var(--jade2)';
       return '<div style="flex:1;text-align:center">'+
         '<div style="height:'+h+'px;background:'+color+';border-radius:4px 4px 0 0;margin-bottom:.3rem;min-height:8px;transition:height .3s"></div>'+
         '<div style="font-size:.68rem;color:var(--gray-light)">'+days[i]+'</div>'+
@@ -941,7 +941,7 @@ function renderPerformance(){
 }
 
 // ═══ 功能渲染 ═══
-var funcFilter='all';
+let funcFilter='all';
 function filterFunc(type,btn){
   funcFilter=type;
   document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
@@ -950,31 +950,31 @@ function filterFunc(type,btn){
 }
 
 function renderFunctions(){
-  var engines=Object.keys(ENGINE_NAMES).map(function(k){
+  let engines=Object.keys(ENGINE_NAMES).map(function(k){
     return {name:ENGINE_NAMES[k],key:k,type:'engine',today:Math.floor(Math.random()*50),week:Math.floor(Math.random()*300),month:Math.floor(Math.random()*1200),retention:60+Math.floor(Math.random()*35)};
   });
-  var tools=[
+  let tools=[
     {name:'吉日查询',key:'jiuri',type:'tool',today:12,week:87,month:340,retention:45},
     {name:'手机号测算',key:'yanzhi',type:'tool',today:8,week:56,month:210,retention:38},
     {name:'姓名分析',key:'xingming',type:'tool',today:6,week:42,month:180,retention:32},
     {name:'测字算命',key:'cezi',type:'tool',today:5,week:31,month:125,retention:28}
   ];
-  var pages=PAGE_LIST.slice(0,8).map(function(p){
+  let pages=PAGE_LIST.slice(0,8).map(function(p){
     return {name:p+'.html',key:p,type:'page',today:Math.floor(Math.random()*30),week:Math.floor(Math.random()*200),month:Math.floor(Math.random()*800),retention:50+Math.floor(Math.random()*30)};
   });
-  var all=engines.concat(tools).concat(pages);
+  let all=engines.concat(tools).concat(pages);
 
   document.getElementById('funcTotal').textContent=all.length;
   document.getElementById('funcActive').textContent=all.filter(function(f){return f.today>0}).length;
   document.getElementById('funcIdle').textContent=all.filter(function(f){return f.week===0}).length;
-  var top=all.sort(function(a,b){return b.today-a.today})[0];
+  let top=all.sort(function(a,b){return b.today-a.today})[0];
   document.getElementById('funcTop').textContent=top?top.name:'--';
 
   // 引擎使用
-  var maxE=engines[0]?Math.max.apply(null,engines.map(function(e){return e.today})):1;
+  let maxE=engines[0]?Math.max.apply(null,engines.map(function(e){return e.today})):1;
   document.getElementById('engineUsage').innerHTML=engines.sort(function(a,b){return b.today-a.today}).map(function(e,i){
-    var pct=Math.round(e.today/maxE*100);
-    var colors=['var(--cinn2)','var(--amber)','var(--jade2)','var(--cyan2)','var(--gold2)','var(--violet2)','var(--orange)'];
+    let pct=Math.round(e.today/maxE*100);
+    let colors=['var(--cinn2)','var(--amber)','var(--jade2)','var(--cyan2)','var(--gold2)','var(--violet2)','var(--orange)'];
     return '<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem">'+
       '<span style="min-width:24px;font-weight:600;color:'+(colors[i]||'var(--paper3)')+'">'+(i+1)+'</span>'+
       '<span style="min-width:80px;font-size:.82rem">'+e.name+'</span>'+
@@ -989,7 +989,7 @@ function renderFunctions(){
 
   // 留存率
   document.getElementById('funcRetention').innerHTML=all.slice(0,8).map(function(f){
-    var color=f.retention>60?'var(--jade2)':f.retention>40?'var(--amber)':'var(--danger)';
+    let color=f.retention>60?'var(--jade2)':f.retention>40?'var(--amber)':'var(--danger)';
     return '<div style="margin-bottom:.5rem">'+
       '<div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.2rem">'+
       '<span style="color:var(--paper2)">'+f.name+'</span>'+
@@ -999,11 +999,11 @@ function renderFunctions(){
 }
 
 function renderFuncTable(){
-  var data=window._funcData||[];
-  var filtered=funcFilter==='all'?data:data.filter(function(f){return f.type===funcFilter});
+  let data=window._funcData||[];
+  let filtered=funcFilter==='all'?data:data.filter(function(f){return f.type===funcFilter});
   document.getElementById('funcDetailTable').innerHTML=filtered.map(function(f){
-    var trend=f.today>f.week/7?'↑':'↓';
-    var trendColor=trend==='↑'?'var(--jade2)':'var(--danger)';
+    let trend=f.today>f.week/7?'↑':'↓';
+    let trendColor=trend==='↑'?'var(--jade2)':'var(--danger)';
     return '<tr><td>'+f.name+'</td><td>'+
       (f.type==='engine'?'<span class="badge badge-gold">引擎</span>':f.type==='tool'?'<span class="badge badge-info">工具</span>':'<span class="badge badge-warn">页面</span>')+
       '</td><td>'+f.today+'</td><td>'+f.week+'</td><td>'+f.month+'</td>'+
@@ -1014,7 +1014,7 @@ function renderFuncTable(){
 // ═══ 流程渲染 ═══
 function renderFlow(){
   // 核心流程链
-  var flows=[
+  let flows=[
     {name:'排盘→分析→付费',stages:['访问首页','选择排盘','输入信息','获取结果','查看分析','付费升级'],active:5,conv:15},
     {name:'浏览→注册→体验',stages:['浏览页面','注册账号','选择功能','首次体验','留存回访'],active:4,conv:35},
     {name:'商品→下单→支付',stages:['浏览商城','选择商品','加入购物车','提交订单','支付完成','物流跟踪'],active:5,conv:22},
@@ -1023,8 +1023,8 @@ function renderFlow(){
   ];
 
   document.getElementById('flowChainList').innerHTML=flows.map(function(f){
-    var nodes=f.stages.map(function(s,i){
-      var cls=i<f.active?'active':'idle';
+    let nodes=f.stages.map(function(s,i){
+      let cls=i<f.active?'active':'idle';
       return '<span class="flow-node '+cls+'">'+s+'</span>'+
         (i<f.stages.length-1?'<span class="flow-arrow">→</span>':'');
     }).join('');
@@ -1039,7 +1039,7 @@ function renderFlow(){
   document.getElementById('flowAvgTime').innerHTML='8.3<small> min</small>';
 
   // 流程漏斗
-  var funnel=[
+  let funnel=[
     {label:'访问',value:1000,color:'var(--cyan2)'},
     {label:'选功能',value:680,color:'var(--amber)'},
     {label:'输信息',value:520,color:'var(--orange)'},
@@ -1048,16 +1048,16 @@ function renderFlow(){
     {label:'付费',value:150,color:'var(--jade2)'},
     {label:'分享',value:45,color:'var(--cinn2)'}
   ];
-  var max=funnel[0].value;
+  let max=funnel[0].value;
   document.getElementById('flowFunnel').innerHTML=funnel.map(function(f){
-    var pct=Math.round(f.value/max*100);
+    let pct=Math.round(f.value/max*100);
     return '<div class="funnel-stage">'+
       '<div class="funnel-label"><span>'+f.label+'</span><span style="color:'+f.color+'">'+f.value+' ('+(f.value/max*100).toFixed(0)+'%)</span></div>'+
       '<div class="funnel-bar"><div class="funnel-fill" style="width:'+pct+'%;background:'+f.color+'">'+f.value+'</div></div></div>';
   }).join('');
 
   // 阶段耗时
-  var stages=[
+  let stages=[
     {name:'访问首页',time:'0.5min',loss:'32%',ok:true},
     {name:'选择功能',time:'1.2min',loss:'24%',ok:true},
     {name:'输入信息',time:'2.0min',loss:'8%',ok:true},
@@ -1071,7 +1071,7 @@ function renderFlow(){
   }).join('');
 
   // 用户路径
-  var paths=[
+  let paths=[
     {path:'首页→八字排盘→分析报告→付费',count:45,pct:28},
     {path:'首页→六爻占卜→结果→分享',count:32,pct:20},
     {path:'首页→风水罗盘→商城→下单',count:25,pct:16},
@@ -1092,7 +1092,7 @@ function renderFlow(){
 }
 
 // ═══ 交易渲染 ═══
-var txFilter='all';
+let txFilter='all';
 function filterTx(type,btn){
   txFilter=type;
   document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
@@ -1101,11 +1101,11 @@ function filterTx(type,btn){
 }
 
 function renderTrade(){
-  var events=getEvents();
-  var today=getTodayStr();
-  var txEvents=events.filter(function(e){return e.type==='vip_purchase'||e.type==='order_create'});
-  var todayTx=txEvents.filter(function(e){return e.time&&e.time.startsWith(today)});
-  var todayRev=todayTx.reduce(function(s,e){return s+((e.data&&e.data.price)||0)},0);
+  let events=getEvents();
+  let today=getTodayStr();
+  let txEvents=events.filter(function(e){return e.type==='vip_purchase'||e.type==='order_create'});
+  let todayTx=txEvents.filter(function(e){return e.time&&e.time.startsWith(today)});
+  let todayRev=todayTx.reduce(function(s,e){return s+((e.data&&e.data.price)||0)},0);
   if(todayRev===0)todayRev=1286.50; // 模拟
 
   document.getElementById('tradeToday').textContent='¥'+todayRev.toFixed(2);
@@ -1114,7 +1114,7 @@ function renderTrade(){
   document.getElementById('tradeAOV').textContent='¥'+(todayRev/(todayTx.length||7)).toFixed(2);
 
   // 收入构成
-  var breakdown=[
+  let breakdown=[
     {label:'会员订阅',value:5800,pct:62,color:'var(--gold2)'},
     {label:'商品订单',value:2100,pct:22,color:'var(--jade2)'},
     {label:'课程付费',value:900,pct:10,color:'var(--cyan2)'},
@@ -1129,17 +1129,17 @@ function renderTrade(){
   }).join('');
 
   // 收入趋势
-  var days=[];
-  for(var i=29;i>=0;i--){
-    var d=new Date(Date.now()-i*86400000);
+  let days=[];
+  for(let i=29;i>=0;i--){
+    let d=new Date(Date.now()-i*86400000);
     days.push((d.getMonth()+1)+'/'+d.getDate());
   }
-  var revData=days.map(function(_,i){return Math.floor(200+Math.random()*800+i*15)});
-  var maxR=Math.max.apply(null,revData)*1.1;
+  let revData=days.map(function(_,i){return Math.floor(200+Math.random()*800+i*15)});
+  let maxR=Math.max.apply(null,revData)*1.1;
   document.getElementById('revenueTrend').innerHTML=
     '<div style="display:flex;align-items:flex-end;gap:1px;height:80px">'+
     revData.map(function(v){
-      var h=Math.round(v/maxR*100);
+      let h=Math.round(v/maxR*100);
       return '<div style="flex:1;height:'+h+'px;background:var(--gold3);border-radius:1px 1px 0 0;min-height:2px;opacity:.7" title="¥'+v+'"></div>';
     }).join('')+'</div>'+
     '<div style="display:flex;justify-content:space-between;margin-top:.3rem;font-size:.68rem;color:var(--gray-light)">'+
@@ -1159,7 +1159,7 @@ function renderTrade(){
   renderTxList();
 
   // 付费排行
-  var payers=[
+  let payers=[
     {user:'139****6666',level:'年卡会员',total:1288},
     {user:'135****5555',level:'课程学员',total:998},
     {user:'134****2222',level:'季卡会员',total:830},
@@ -1171,7 +1171,7 @@ function renderTrade(){
   }).join('');
 
   // 会员等级
-  var levels=[
+  let levels=[
     {name:'普通用户',count:1240,pct:78,color:'var(--steel)'},
     {name:'月卡会员',count:186,pct:12,color:'var(--cyan2)'},
     {name:'季卡会员',count:82,pct:5,color:'var(--amber)'},
@@ -1188,13 +1188,13 @@ function renderTrade(){
 }
 
 function renderTxList(){
-  var data=window._txData||[];
-  var filtered=txFilter==='all'?data:data.filter(function(t){return t.type===txFilter});
-  var typeMap={vip:{icon:'⭐',bg:'rgba(201,168,76,.15)',color:'var(--gold2)'},
+  let data=window._txData||[];
+  let filtered=txFilter==='all'?data:data.filter(function(t){return t.type===txFilter});
+  let typeMap={vip:{icon:'⭐',bg:'rgba(201,168,76,.15)',color:'var(--gold2)'},
     shop:{icon:'📦',bg:'rgba(39,174,96,.15)',color:'var(--jade2)'},
     course:{icon:'📚',bg:'rgba(41,128,185,.15)',color:'var(--cyan2)'}};
   document.getElementById('txList').innerHTML=filtered.map(function(t){
-    var tm=typeMap[t.type]||{icon:'💰',bg:'var(--ink)',color:'var(--paper2)'};
+    let tm=typeMap[t.type]||{icon:'💰',bg:'var(--ink)',color:'var(--paper2)'};
     return '<div class="tx-row">'+
       '<div class="tx-type" style="background:'+tm.bg+';color:'+tm.color+'">'+tm.icon+'</div>'+
       '<div class="tx-info"><div class="tx-title">'+t.title+'</div>'+
@@ -1205,16 +1205,16 @@ function renderTxList(){
 
 // ═══ 角色渲染 ═══
 function renderRoles(){
-  var users=getUsers();
-  var total=users.length||1589;
+  let users=getUsers();
+  let total=users.length||1589;
 
   document.getElementById('roleTotal').textContent=total;
   document.getElementById('roleNew').textContent=Math.floor(Math.random()*8)+2;
   document.getElementById('roleActive').textContent=Math.floor(total*0.12);
 
   // 角色卡片
-  var roleData=ROLE_DEFS.map(function(r){
-    var count=Math.floor(total*(r.key==='visitor'?0.6:r.key==='trial'?0.2:r.key==='member'?0.12:r.key==='master'?0.04:r.key==='merchant'?0.03:0.01));
+  let roleData=ROLE_DEFS.map(function(r){
+    let count=Math.floor(total*(r.key==='visitor'?0.6:r.key==='trial'?0.2:r.key==='member'?0.12:r.key==='master'?0.04:r.key==='merchant'?0.03:0.01));
     return Object.assign({},r,{count:count});
   });
 
@@ -1227,7 +1227,7 @@ function renderRoles(){
   }).join('');
 
   // 性别
-  var gender=[{label:'男',value:680,pct:43,color:'var(--cyan2)'},{label:'女',value:890,pct:56,color:'var(--cinn2)'},{label:'未设置',value:19,pct:1,color:'var(--steel)'}];
+  let gender=[{label:'男',value:680,pct:43,color:'var(--cyan2)'},{label:'女',value:890,pct:56,color:'var(--cinn2)'},{label:'未设置',value:19,pct:1,color:'var(--steel)'}];
   document.getElementById('genderDist').innerHTML=gender.map(function(g){
     return '<div style="margin-bottom:.5rem">'+
       '<div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:.2rem">'+
@@ -1237,7 +1237,7 @@ function renderRoles(){
   }).join('');
 
   // 年龄
-  var ages=[
+  let ages=[
     {label:'18-25岁',value:180,pct:11,color:'var(--cyan2)'},
     {label:'26-35岁',value:520,pct:33,color:'var(--amber)'},
     {label:'36-45岁',value:480,pct:30,color:'var(--gold2)'},
@@ -1253,7 +1253,7 @@ function renderRoles(){
   }).join('');
 
   // 角色偏好
-  var prefs=[
+  let prefs=[
     {role:'访客',f1:'八字排盘',f2:'六爻占卜',f3:'测字',daily:'2.1次',payRate:'0%'},
     {role:'体验用户',f1:'八字排盘',f2:'紫微斗数',f3:'风水罗盘',daily:'4.5次',payRate:'12%'},
     {role:'会员',f1:'八字排盘',f2:'奇门遁甲',f3:'大六壬',daily:'6.8次',payRate:'100%'},
@@ -1268,7 +1268,7 @@ function renderRoles(){
   }).join('');
 
   // 改进建议
-  var insights=[
+  let insights=[
     {icon:'💡',title:'访客转化机会',text:'60%用户为访客，建议增加首次免费排盘后的引导提示，提升注册转化率'},
     {icon:'📈',title:'会员留存重点',text:'会员日均使用6.8次，但奇门/六壬使用偏低，可推送相关内容提升兴趣'},
     {icon:'🎯',title:'命理师活跃度高',text:'命理师日均15.2次使用，可考虑增加专属工具和接单效率优化'},
@@ -1282,7 +1282,7 @@ function renderRoles(){
 }
 
 // ═══ 告警渲染 ═══
-var alertFilter='all';
+let alertFilter='all';
 function filterAlert(type,btn){
   alertFilter=type;
   document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
@@ -1291,7 +1291,7 @@ function filterAlert(type,btn){
 }
 
 function renderAlerts(){
-  var alerts=[
+  let alerts=[
     {level:'crit',msg:'TTS语音服务(8912)离线',detail:'服务无响应超过3小时，语音合成功能不可用',time:'3小时前'},
     {level:'warn',msg:'divination-core.js 文件较大(2.1MB)',detail:'影响首屏加载速度，建议拆分为按需加载模块',time:'1小时前'},
     {level:'warn',msg:'API key 前端暴露(5处)',detail:'安全风险：DeepSeek/智谱等API key 在前端JS中可见',time:'5小时前'},
@@ -1300,7 +1300,7 @@ function renderAlerts(){
     {level:'warn',msg:'localStorage 存储接近上限',detail:'部分用户反馈排盘历史记录丢失，建议迁移到后端数据库',time:'6小时前'}
   ];
 
-  var counts={crit:0,warn:0,info:0};
+  let counts={crit:0,warn:0,info:0};
   alerts.forEach(function(a){counts[a.level]++});
   document.getElementById('alertCrit').textContent=counts.crit;
   document.getElementById('alertWarn').textContent=counts.warn;
@@ -1312,7 +1312,7 @@ function renderAlerts(){
   renderAlertFullList();
 
   // 告警规则
-  var rules=[
+  let rules=[
     {name:'服务离线',threshold:'3次连续检测失败',level:'严重',enabled:true},
     {name:'API延迟超阈值',threshold:'>2000ms',level:'警告',enabled:true},
     {name:'错误率超阈值',threshold:'>5%',level:'警告',enabled:true},
@@ -1321,7 +1321,7 @@ function renderAlerts(){
     {name:'每日推送失败',threshold:'推送日志异常',level:'警告',enabled:true}
   ];
   document.getElementById('alertRulesTable').innerHTML=rules.map(function(r){
-    var lvl=r.level==='严重'?'badge-err':r.level==='警告'?'badge-warn':'badge-info';
+    let lvl=r.level==='严重'?'badge-err':r.level==='警告'?'badge-warn':'badge-info';
     return '<tr><td>'+r.name+'</td><td style="font-family:var(--font-mono);font-size:.78rem">'+r.threshold+'</td>'+
       '<td><span class="badge '+lvl+'">'+r.level+'</span></td>'+
       '<td><span class="badge '+(r.enabled?'badge-ok':'badge-warn')+'">'+(r.enabled?'启用':'停用')+'</span></td></tr>';
@@ -1329,11 +1329,11 @@ function renderAlerts(){
 }
 
 function renderAlertFullList(){
-  var data=window._alertData||[];
-  var filtered=alertFilter==='all'?data:data.filter(function(a){return a.level===alertFilter});
+  let data=window._alertData||[];
+  let filtered=alertFilter==='all'?data:data.filter(function(a){return a.level===alertFilter});
   document.getElementById('alertFullList').innerHTML=filtered.map(function(a){
-    var cls=a.level==='crit'?'alert-crit':a.level==='warn'?'alert-warn':'alert-info';
-    var icon=a.level==='crit'?'🔴':a.level==='warn'?'🟡':'🔵';
+    let cls=a.level==='crit'?'alert-crit':a.level==='warn'?'alert-warn':'alert-info';
+    let icon=a.level==='crit'?'🔴':a.level==='warn'?'🟡':'🔵';
     return '<div class="alert-item '+cls+'"><span>'+icon+'</span>'+
       '<div style="flex:1"><div style="color:var(--paper2);font-size:.85rem">'+a.msg+'</div>'+
       '<div style="color:var(--gray-light);font-size:.78rem;margin-top:.2rem">'+a.detail+'</div>'+

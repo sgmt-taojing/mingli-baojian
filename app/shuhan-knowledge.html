@@ -69,25 +69,37 @@ body{background:var(--bg);color:var(--paper);font-family:'Noto Serif SC',serif;l
 
 <div class="footer">舒晗奇门遁甲知识库 · 32节基础课+密训 · 提取自 ~/Desktop/国学学习/<br>提取时间：2026-07-18</div>
 
-<script src="../knowledge/shuhan-basic-kb.js"></script>
+<script src="../knowledge/shuhan-knowledge-base.js"></script>
 <script src="../knowledge/shuhan-mixun-tianji.js"></script>
+<script src="../knowledge/shuhan-basic-kb.js"></script>
 <script>
-var BASIC = window.SHUHAN_BASIC_KB || {};
-var MIXUN = window.SHUHAN_MIXUN_TIANJI_KB || {};
-var KB = {
+let BASIC = window.SHUHAN_KB || {};
+let MIXUN = window.SHUHAN_MIXUN_TIANJI_KB || {};
+let OCRKB = window.ShuhanBasicKB || {};
+// 合并 OCR 全量内容到 BASIC
+if (OCRKB.content) {
+  BASIC.ocrContent = OCRKB.content;
+  BASIC.ocrMixun = OCRKB.mixun;
+  BASIC.ocrQuickRef = OCRKB.quickRef;
+  BASIC.searchOcr = function(kw) { return OCRKB.search ? OCRKB.search(kw) : []; };
+  BASIC.getOcrLesson = function(n) { return OCRKB.getLesson ? OCRKB.getLesson(n) : null; };
+  BASIC.getOcrContext = function(kw, maxLen) { return OCRKB.getContext ? OCRKB.getContext(kw, maxLen) : []; };
+}
+let KB = {
   basic: BASIC,
-  mixun: MIXUN
+  mixun: MIXUN,
+  ocr: OCRKB
 };
 
 function escapeHTML(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 function renderLessonsGrid(){
-  var html = '<div class="lesson-grid">';
-  var lessons = (KB.basic && KB.basic.lessons) || {};
+  let html = '<div class="lesson-grid">';
+  let lessons = (KB.basic && KB.basic.lessons) || {};
   Object.keys(lessons).forEach(function(k){
     if(!/^\d+$/.test(k))return;
-    var n = parseInt(k);
-    var title = lessons[k];
+    let n = parseInt(k);
+    let title = lessons[k];
     html += '<div class="lesson-card" onclick="showLesson('+n+')">';
     html += '<div class="lesson-num">第 '+n+' 课</div>';
     html += '<div class="lesson-title">'+escapeHTML(title)+'</div>';
@@ -99,17 +111,17 @@ function renderLessonsGrid(){
 }
 
 function renderLessonDetail(n){
-  var c = (KB.basic && KB.basic.content && KB.basic.content['lesson_'+n]) || {};
+  let c = (KB.basic && KB.basic.content && KB.basic.content['lesson_'+n]) || {};
   if(Object.keys(c).length===0){
     return '<div class="detail-panel"><div class="detail-title">第 '+n+' 课</div><div class="detail-body"><p>课程详细内容整理中...</p></div></div>';
   }
-  var title = (KB.basic.lessons && KB.basic.lessons[n]) || ('第'+n+'课');
-  var html = '<div class="detail-panel">';
+  let title = (KB.basic.lessons && KB.basic.lessons[n]) || ('第'+n+'课');
+  let html = '<div class="detail-panel">';
   html += '<div class="detail-title">第 '+n+' 课 · '+escapeHTML(title)+'</div>';
   html += '<div class="detail-body">';
   Object.keys(c).forEach(function(k){
-    var v = c[k];
-    var keyLabel = k.replace(/_/g,' ');
+    let v = c[k];
+    let keyLabel = k.replace(/_/g,' ');
     html += '<span class="sub-title">◆ '+escapeHTML(keyLabel)+'</span>';
     if(typeof v === 'string'){
       html += '<p>'+escapeHTML(v)+'</p>';
@@ -119,7 +131,7 @@ function renderLessonDetail(n){
         if(typeof it === 'string'){
           html += '<li>'+escapeHTML(it)+'</li>';
         }else if(typeof it === 'object' && it){
-          var parts = [];
+          let parts = [];
           Object.keys(it).forEach(function(kk){
             parts.push('<b>'+kk+'：</b>'+escapeHTML(String(it[kk])));
           });
@@ -129,7 +141,7 @@ function renderLessonDetail(n){
       html += '</ul>';
     }else if(typeof v === 'object' && v){
       Object.keys(v).forEach(function(sk){
-        var sv = v[sk];
+        let sv = v[sk];
         if(typeof sv === 'string'){
           html += '<p><b>'+escapeHTML(sk)+'：</b>'+escapeHTML(sv)+'</p>';
         }
@@ -146,10 +158,10 @@ function showLesson(n){
 }
 
 function showMixun(){
-  var html = '<div class="detail-panel"><div class="detail-title">密训班内容</div><div class="detail-body">';
+  let html = '<div class="detail-panel"><div class="detail-title">密训班内容</div><div class="detail-body">';
   if(KB.mixun && KB.mixun.content){
     Object.keys(KB.mixun.content).forEach(function(k){
-      var v = KB.mixun.content[k];
+      let v = KB.mixun.content[k];
       html += '<span class="sub-title">◆ '+escapeHTML(k)+'</span>';
       if(typeof v === 'string'){
         html += '<p>'+escapeHTML(v)+'</p>';
@@ -173,10 +185,10 @@ function showMixun(){
 }
 
 function showTianji(){
-  var html = '<div class="detail-panel"><div class="detail-title">天纪系列</div><div class="detail-body">';
+  let html = '<div class="detail-panel"><div class="detail-title">天纪系列</div><div class="detail-body">';
   if(KB.mixun && KB.mixun.tianji){
     Object.keys(KB.mixun.tianji).forEach(function(k){
-      var v = KB.mixun.tianji[k];
+      let v = KB.mixun.tianji[k];
       html += '<span class="sub-title">◆ '+escapeHTML(k)+'</span>';
       if(typeof v === 'string'){
         html += '<p>'+escapeHTML(v)+'</p>';
@@ -200,10 +212,10 @@ function showTianji(){
 }
 
 function showQuickRef(){
-  var q = (KB.basic && KB.basic.quickRef) || {};
-  var html = '<div class="detail-panel"><div class="detail-title">速查表 · 经典术数体系</div><div class="detail-body">';
+  let q = (KB.basic && KB.basic.quickRef) || {};
+  let html = '<div class="detail-panel"><div class="detail-title">速查表 · 经典术数体系</div><div class="detail-body">';
   Object.keys(q).forEach(function(k){
-    var v = q[k];
+    let v = q[k];
     html += '<span class="sub-title">◆ '+escapeHTML(k)+'</span>';
     if(typeof v === 'string'){
       html += '<p>'+escapeHTML(v)+'</p>';
@@ -224,9 +236,9 @@ function showQuickRef(){
 }
 
 function showOverview(){
-  var lessonCount = (KB.basic && KB.basic.lessons) ? Object.keys(KB.basic.lessons).filter(function(k){return /^\d+$/.test(k);}).length : 0;
-  var mixunKeys = KB.mixun ? Object.keys(KB.mixun.content || {}).length : 0;
-  var tianjiKeys = KB.mixun ? Object.keys(KB.mixun.tianji || {}).length : 0;
+  let lessonCount = (KB.basic && KB.basic.lessons) ? Object.keys(KB.basic.lessons).filter(function(k){return /^\d+$/.test(k);}).length : 0;
+  let mixunKeys = KB.mixun ? Object.keys(KB.mixun.content || {}).length : 0;
+  let tianjiKeys = KB.mixun ? Object.keys(KB.mixun.tianji || {}).length : 0;
   document.getElementById('content').innerHTML = 
     '<div class="detail-panel"><div class="detail-title">📚 舒晗奇门遁甲知识库</div><div class="detail-body">'+
     '<p>本知识库整合 <b style="color:var(--gold2)">舒晗奇门遁甲基础课</b> 32 节课程内容 + <b style="color:var(--gold2)">密训班</b>专项内容 + <b style="color:var(--gold2)">天纪系列</b>。</p>'+
@@ -250,9 +262,9 @@ function showOverview(){
 }
 
 function doSearch(){
-  var q = document.getElementById('globalSearch').value.trim().toLowerCase();
+  let q = document.getElementById('globalSearch').value.trim().toLowerCase();
   if(!q){showOverview();return;}
-  var results = [];
+  let results = [];
   function searchIn(obj, path){
     if(typeof obj === 'string'){
       if(obj.toLowerCase().indexOf(q)>-1){
@@ -265,7 +277,7 @@ function doSearch(){
     }
   }
   searchIn(KB,'');
-  var html = '<div class="detail-panel"><div class="detail-title">搜索 "'+escapeHTML(q)+'" — '+results.length+' 条结果</div><div class="detail-body">';
+  let html = '<div class="detail-panel"><div class="detail-title">搜索 "'+escapeHTML(q)+'" — '+results.length+' 条结果</div><div class="detail-body">';
   if(results.length === 0){
     html += '<p>未找到匹配内容</p>';
   }else{
@@ -280,7 +292,7 @@ function doSearch(){
 
 // 初始化统计
 (function(){
-  var lessonCount = (KB.basic && KB.basic.lessons) ? Object.keys(KB.basic.lessons).filter(function(k){return /^\d+$/.test(k);}).length : 0;
+  let lessonCount = (KB.basic && KB.basic.lessons) ? Object.keys(KB.basic.lessons).filter(function(k){return /^\d+$/.test(k);}).length : 0;
   document.getElementById('statRow').innerHTML = 
     '<div class="stat-card"><div class="stat-num">'+lessonCount+'</div><div class="stat-label">基础课节数</div></div>'+
     '<div class="stat-card"><div class="stat-num">'+(KB.basic && KB.basic.lessons && KB.basic.lessons.lessons || '—')+'</div><div class="stat-label">总课次</div></div>'+
@@ -290,7 +302,7 @@ function doSearch(){
 
 // 初始化主tabs
 (function(){
-  var tabs = [
+  let tabs = [
     {id:'overview',name:'📋 总览',fn:showOverview},
     {id:'basic',name:'📚 32节基础课',fn:function(){
       document.getElementById('content').innerHTML = renderLessonsGrid();
@@ -299,9 +311,9 @@ function doSearch(){
     {id:'tianji',name:'🌟 天纪系列',fn:showTianji},
     {id:'quickref',name:'🔖 速查表',fn:showQuickRef}
   ];
-  var tabBar = document.getElementById('mainTabs');
+  let tabBar = document.getElementById('mainTabs');
   tabs.forEach(function(t){
-    var btn = document.createElement('button');
+    let btn = document.createElement('button');
     btn.className = 'tab';
     btn.textContent = t.name;
     btn.onclick = function(){

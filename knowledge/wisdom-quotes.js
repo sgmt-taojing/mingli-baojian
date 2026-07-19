@@ -6,10 +6,10 @@
  * 语录来源：论语、道德经、易经、庄子、孟子、菜根谭、了凡四训、大学、中庸等古籍经典及名人名言
  */
 
-var WisdomQuotesData = (function () {
+let WisdomQuotesData = (function () {
 
   // ========== 1. 人生智慧 ==========
-  var lifeWisdom = [
+  let lifeWisdom = [
     { text: "天行健，君子以自强不息。", source: "《易经·乾卦》", category: "人生智慧" },
     { text: "地势坤，君子以厚德载物。", source: "《易经·坤卦》", category: "人生智慧" },
     { text: "知者不惑，仁者不忧，勇者不惧。", source: "《论语·子罕》", category: "人生智慧" },
@@ -45,7 +45,7 @@ var WisdomQuotesData = (function () {
   ];
 
   // ========== 2. 处世之道 ==========
-  var worldlyWisdom = [
+  let worldlyWisdom = [
     { text: "水至清则无鱼，人至察则无徒。", source: "《大戴礼记·子张问入官》", category: "处世之道" },
     { text: "满招损，谦受益。", source: "《尚书·大禹谟》", category: "处世之道" },
     { text: "君子和而不同，小人同而不和。", source: "《论语·子路》", category: "处世之道" },
@@ -81,7 +81,7 @@ var WisdomQuotesData = (function () {
   ];
 
   // ========== 3. 情感语录 ==========
-  var emotionalQuotes = [
+  let emotionalQuotes = [
     { text: "关关雎鸠，在河之洲。窈窕淑女，君子好逑。", source: "《诗经·周南·关雎》", category: "情感语录" },
     { text: "执子之手，与子偕老。", source: "《诗经·邶风·击鼓》", category: "情感语录" },
     { text: "一日不见，如三秋兮。", source: "《诗经·王风·采葛》", category: "情感语录" },
@@ -117,7 +117,7 @@ var WisdomQuotesData = (function () {
   ];
 
   // ========== 4. 职场智慧 ==========
-  var careerWisdom = [
+  let careerWisdom = [
     { text: "工欲善其事，必先利其器。", source: "《论语·卫灵公》", category: "职场智慧" },
     { text: "凡事豫则立，不豫则废。", source: "《礼记·中庸》", category: "职场智慧" },
     { text: "不积跬步，无以至千里；不积小流，无以成江海。", source: "《荀子·劝学》", category: "职场智慧" },
@@ -153,7 +153,7 @@ var WisdomQuotesData = (function () {
   ];
 
   // ========== 5. 家庭经营 ==========
-  var familyWisdom = [
+  let familyWisdom = [
     { text: "修身、齐家、治国、平天下。", source: "《大学》", category: "家庭经营" },
     { text: "欲治其国者，先齐其家；欲齐其家者，先修其身。", source: "《大学》", category: "家庭经营" },
     { text: "孝悌也者，其为仁之本与！", source: "《论语·学而》", category: "家庭经营" },
@@ -189,7 +189,7 @@ var WisdomQuotesData = (function () {
   ];
 
   // ========== 6. 健康养生 ==========
-  var healthWisdom = [
+  let healthWisdom = [
     { text: "上医治未病，中医治欲病，下医治已病。", source: "《黄帝内经·素问》", category: "健康养生" },
     { text: "食饮有节，起居有常，不妄作劳，故能形与神俱，而尽终其天年。", source: "《黄帝内经·素问》", category: "健康养生" },
     { text: "恬淡虚无，真气从之；精神内守，病安从来？", source: "《黄帝内经·素问》", category: "健康养生" },
@@ -225,7 +225,7 @@ var WisdomQuotesData = (function () {
   ];
 
   // ========== 7. 财富思维 ==========
-  var wealthMindset = [
+  let wealthMindset = [
     { text: "君子爱财，取之有道。", source: "《增广贤文》", category: "财富思维" },
     { text: "不义而富且贵，于我如浮云。", source: "《论语·述而》", category: "财富思维" },
     { text: "富与贵，是人之所欲也；不以其道得之，不处也。", source: "《论语·里仁》", category: "财富思维" },
@@ -262,7 +262,7 @@ var WisdomQuotesData = (function () {
   ];
 
   // ========== 8. 心灵成长 ==========
-  var spiritualGrowth = [
+  let spiritualGrowth = [
     { text: "大学之道，在明明德，在亲民，在止于至善。", source: "《大学》", category: "心灵成长" },
     { text: "知止而后有定，定而后能静，静而后能安，安而后能虑，虑而后能得。", source: "《大学》", category: "心灵成长" },
     { text: "物格而后知至，知至而后意诚，意诚而后心正，心正而后身修。", source: "《大学》", category: "心灵成长" },
@@ -298,7 +298,7 @@ var WisdomQuotesData = (function () {
   ];
 
   // ========== 9. 菜根谭精选 ==========
-  var caigentan = [
+  let caigentan = [
     { text: "欲做精金美玉的人品，定从烈火中锻来；思立掀天揭地的事功，须向薄冰上履过。", source: "《菜根谭》", category: "心灵成长" },
     { text: "一念错，便觉百行皆非，防之当如城池；一念善，便觉万事皆顺，守之如保身命。", source: "《菜根谭》", category: "心灵成长" },
     { text: "业障不必外求，贪嗔痴便是；道心无须远觅，戒定慧即是。", source: "《菜根谭》", category: "心灵成长" },
@@ -354,7 +354,7 @@ var WisdomQuotesData = (function () {
   ];
 
   // ========== 10. 增广贤文精选 ==========
-  var zengguangxianwen = [
+  let zengguangxianwen = [
     { text: "昔时贤文，诲汝谆谆。集韵增广，多见多闻。", source: "《增广贤文》", category: "人生智慧" },
     { text: "酒逢知己饮，诗向会人吟。相识满天下，知心能几人。", source: "《增广贤文》", category: "情感语录" },
     { text: "相逢好似初相识，到老终无怨恨心。", source: "《增广贤文》", category: "处世之道" },
@@ -399,7 +399,7 @@ var WisdomQuotesData = (function () {
   ];
 
   // ========== 11. 围炉夜话精选 ==========
-  var weiluyehua = [
+  let weiluyehua = [
     { text: "教小儿宜严，严气足以平躁气；待小人宜敬，敬心可以化邪心。", source: "《围炉夜话》", category: "家庭经营" },
     { text: "善谋生者，但令长幼内外，勤修恒业，虽不必富，自不至贫；善用学者，但将省察克治，实下功夫，虽不必圣，自不至狂。", source: "《围炉夜话》", category: "人生智慧" },
     { text: "山水是文章化境，烟云是富贵幻形。", source: "《围炉夜话》", category: "心灵成长" },
@@ -425,7 +425,7 @@ var WisdomQuotesData = (function () {
   ];
 
   // ========== 12. 格言联璧精选 ==========
-  var geyanlianbi = [
+  let geyanlianbi = [
     { text: "静坐常思己过，闲谈莫论人非。", source: "《格言联璧》", category: "处世之道" },
     { text: "以恕己之心恕人，则全交；以责人之心责己，则寡过。", source: "《格言联璧》", category: "处世之道" },
     { text: "处事须留余地，责善切戒尽言。", source: "《格言联璧》", category: "处世之道" },
@@ -449,7 +449,7 @@ var WisdomQuotesData = (function () {
   ];
 
   // ========== 13. 庄子精选 ==========
-  var zhuangzi = [
+  let zhuangzi = [
     { text: "北冥有鱼，其名为鲲。鲲之大，不知其几千里也；化而为鸟，其名为鹏。鹏之背，不知其几千里也；怒而飞，其翼若垂天之云。", source: "《庄子·逍遥游》", category: "心灵成长" },
     { text: "且夫水之积也不厚，则其负大舟也无力。覆杯水于坳堂之上，则芥为之舟；置杯焉则胶，水浅而舟大也。", source: "《庄子·逍遥游》", category: "人生智慧" },
     { text: "蜩与学鸠笑之曰：我决起而飞，抢榆枋而止，时则不至而控于地而已矣，奚以之九万里而南为？", source: "《庄子·逍遥游》", category: "人生智慧" },
@@ -502,7 +502,7 @@ var WisdomQuotesData = (function () {
   ];
 
   // ========== 14. 了凡四训精选 ==========
-  var liaofan = [
+  let liaofan = [
     { text: "命由我作，福自己求。诗书所称，的为明训。", source: "《了凡四训》", category: "人生智慧" },
     { text: "一切福田，不离方寸；从心而觅，感无不通。", source: "《了凡四训》", category: "心灵成长" },
     { text: "人为善，福虽未至，祸已远离；人为恶，祸虽未至，福已远离。", source: "《了凡四训》", category: "处世之道" },
@@ -521,7 +521,7 @@ var WisdomQuotesData = (function () {
   ];
 
   // ========== 15. 论语补充精选 ==========
-  var lunyuExtra = [
+  let lunyuExtra = [
     { text: "学而时习之，不亦说乎？有朋自远方来，不亦乐乎？人不知而不愠，不亦君子乎？", source: "《论语·学而》", category: "心灵成长" },
     { text: "吾十有五而志于学，三十而立，四十而不惑，五十而知天命，六十而耳顺，七十而从心所欲不逾矩。", source: "《论语·为政》", category: "人生智慧" },
     { text: "温故而知新，可以为师矣。", source: "《论语·为政》", category: "职场智慧" },
@@ -571,7 +571,7 @@ var WisdomQuotesData = (function () {
   ];
 
   // ========== 论语补编 ==========
-  var lunyuMore = [
+  let lunyuMore = [
     { text: "吾十有五而志于学，三十而立，四十而不惑，五十而知天命，六十而耳顺，七十而从心所欲不逾矩。", source: "《论语·为政》", category: "人生智慧" },
     { text: "君子周而不比，小人比而不周。", source: "《论语·为政》", category: "处世之道" },
     { text: "学而不思则罔，思而不学则殆。", source: "《论语·为政》", category: "心灵成长" },
@@ -585,7 +585,7 @@ var WisdomQuotesData = (function () {
   ];
 
   // ========== 16. 人生哲理名言（扩展版）==========
-  var extendedLifeWisdom = [
+  let extendedLifeWisdom = [
     { text: "天行健，君子以自强不息。", source: "《易经·乾卦》", interpretation: "天道运行刚健有力，永不停息。君子应效法天道，自我策励，不断提升，永不懈怠。此为中华文化中自强精神的源头。", scene: "遭遇挫折时激励自己；制定个人成长计划时的座右铭；培养毅力与韧性的精神引导。", category: "人生哲理" },
     { text: "地势坤，君子以厚德载物。", source: "《易经·坤卦》", interpretation: "大地宽厚包容，承载万物生长。君子应如大地般以深厚德行包容担当。德行的厚度决定人生能承载多大的成就。", scene: "担任领导者时以此自勉；面对批评和误解时提醒自己宽容；培养人格修养的核心信条。", category: "人生哲理" },
     { text: "上善若水。水善利万物而不争，处众人之所恶，故几于道。", source: "《道德经·第八章》", interpretation: "最高的善像水一样，滋养万物却不争功居功，甘居低处。这种不争之德最接近道的境界。真正的强大来自柔韧与奉献。", scene: "职场竞争中保持谦逊姿态；人际关系中学会先人后己；面对利益时懂得不争之争。", category: "人生哲理" },
@@ -619,7 +619,7 @@ var WisdomQuotesData = (function () {
   ];
 
   // ========== 17. 处世智慧语录（扩展版）==========
-  var extendedWorldlyWisdom = [
+  let extendedWorldlyWisdom = [
     { text: "处世让一步为高，退步即进步的张本。", source: "《菜根谭》", interpretation: "为人处世懂得退让一步才是高明的，退一步往往是进一步的基础。退不是懦弱，而是为更大的前进蓄力。", scene: "谈判中先让步换取更大利益；家庭争执中主动退一步；职场中以退为进的策略。", category: "处世智慧" },
     { text: "径路窄处，留一步与人行；滋味浓的，减三分让人嗜。", source: "《菜根谭》", interpretation: "在狭窄的路上给别人留一步空间；尝到美味时分出三分给别人品尝。人生处处要懂得分享和让利。", scene: "利益分配时不独占好处；与人分享成功果实；培养宽厚待人的处世格局。", category: "处世智慧" },
     { text: "满招损，谦受益。", source: "《尚书·大禹谟》", interpretation: "自满会招来损失，谦虚会获得益处。这是宇宙间的基本法则：水满则溢，月满则亏。保持谦虚才能不断吸收不断成长。", scene: "取得成绩后提醒自己戒骄戒躁；与人交往时保持低调姿态；建立终身学习的心态。", category: "处世智慧" },
@@ -639,7 +639,7 @@ var WisdomQuotesData = (function () {
   ];
 
   // ========== 18. 修心悟道语录（扩展版）==========
-  var extendedSpiritualGrowth = [
+  let extendedSpiritualGrowth = [
     { text: "致虚极，守静笃。万物并作，吾以观复。", source: "《道德经·第十六章》", interpretation: "让心灵达到极致的虚空，守住至深的宁静。万物蓬勃生长，我从中观察它们循环往复的规律。只有内心真正安静下来，才能洞见事物的本质。", scene: "冥想或独处时体悟；遭遇纷扰时回归内心平静；决策前以静观动的智慧。", category: "修心悟道" },
     { text: "为学日益，为道日损。损之又损，以至于无为。", source: "《道德经·第四十八章》", interpretation: "做学问是天天增加知识，修道是天天减少欲望和执著。减少再减少，直至回归自然无为的状态。", scene: "在学习积累后回归简单；中年后开始做减法；从不断获取到学会放下的转变。", category: "修心悟道" },
     { text: "见素抱朴，少私寡欲。", source: "《道德经·第十九章》", interpretation: "保持纯朴的本性，减少自私之心和物质欲望。回归简单是摆脱精神困扰的根本方法。素朴不是简陋而是更高级的生活品质。", scene: "断舍离的人生整理；极简主义的哲学基础；从消费主义中解脱出来。", category: "修心悟道" },
@@ -660,7 +660,7 @@ var WisdomQuotesData = (function () {
   ];
 
   // ========== 19. 商道智慧语录（扩展版）==========
-  var extendedBusinessWisdom = [
+  let extendedBusinessWisdom = [
     { text: "君子爱财，取之有道。", source: "《增广贤文》", interpretation: "君子也爱财富，但获取财富必须遵循正确的方法和道德。求财本身不是问题，问题在于以什么方式获取。道义是财富的基石。", scene: "创业时坚守合法合规底线；投资中拒绝不正当收益；企业经营的伦理底线。", category: "商道智慧" },
     { text: "不义而富且贵，于我如浮云。", source: "《论语·述而》", interpretation: "用不正当手段获得的富贵，对我来说就像天上的浮云一样毫无价值。孔子对财富的态度非常明确：宁可清贫也不要不义之财。", scene: "面对灰色利益时的价值判断；企业家精神的道德基础；在利益诱惑前守住底线。", category: "商道智慧" },
     { text: "德者本也，财者末也。", source: "《大学》", interpretation: "德行是根本，财富是末节。如果颠倒了本末就会引发争夺混乱。有德自能聚人聚财，无德则财终将散去。", scene: "企业文化建设以德为本；选择合作伙伴时品德优先；创始人个人修养的重要性。", category: "商道智慧" },
@@ -682,12 +682,12 @@ var WisdomQuotesData = (function () {
   ];
 
   // ========== 合并所有语录 ==========
-  var allQuotes = lifeWisdom.concat(worldlyWisdom).concat(emotionalQuotes).concat(careerWisdom).concat(familyWisdom).concat(healthWisdom).concat(wealthMindset).concat(spiritualGrowth)
+  let allQuotes = lifeWisdom.concat(worldlyWisdom).concat(emotionalQuotes).concat(careerWisdom).concat(familyWisdom).concat(healthWisdom).concat(wealthMindset).concat(spiritualGrowth)
     .concat(caigentan).concat(zengguangxianwen).concat(weiluyehua).concat(geyanlianbi).concat(zhuangzi).concat(liaofan).concat(lunyuExtra).concat(lunyuMore)
     .concat(extendedLifeWisdom).concat(extendedWorldlyWisdom).concat(extendedSpiritualGrowth).concat(extendedBusinessWisdom);
 
   // ========== 分类索引 ==========
-  var categoryMap = {
+  let categoryMap = {
     "人生智慧": lifeWisdom,
     "处世之道": worldlyWisdom,
     "情感语录": emotionalQuotes,
@@ -699,7 +699,7 @@ var WisdomQuotesData = (function () {
   };
 
   // ========== 心情映射 ==========
-  var moodMap = {
+  let moodMap = {
     "开心": ["人生智慧", "情感语录", "心灵成长"],
     "平静": ["心灵成长", "人生智慧", "健康养生"],
     "迷茫": ["人生智慧", "心灵成长", "处世之道"],
@@ -720,9 +720,9 @@ var WisdomQuotesData = (function () {
    * @returns {number} 0-1 之间的浮点数
    */
   function dateHash(dateStr) {
-    var str = dateStr || "";
-    var hash = 0;
-    for (var i = 0; i < str.length; i++) {
+    let str = dateStr || "";
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
       hash = ((hash << 5) - hash + str.charCodeAt(i)) | 0;
     }
     // 取绝对值，映射到 0-1
@@ -735,54 +735,54 @@ var WisdomQuotesData = (function () {
    * @returns {Array} 1-3 条推荐语录
    */
   function getDailyQuotes(date) {
-    var dateStr;
+    let dateStr;
     if (date instanceof Date) {
-      var y = date.getFullYear();
-      var m = ("0" + (date.getMonth() + 1)).slice(-2);
-      var d = ("0" + date.getDate()).slice(-2);
+      let y = date.getFullYear();
+      let m = ("0" + (date.getMonth() + 1)).slice(-2);
+      let d = ("0" + date.getDate()).slice(-2);
       dateStr = y + "-" + m + "-" + d;
     } else if (typeof date === "string") {
       dateStr = date;
     } else {
-      var now = new Date();
-      var ny = now.getFullYear();
-      var nm = ("0" + (now.getMonth() + 1)).slice(-2);
-      var nd = ("0" + now.getDate()).slice(-2);
+      let now = new Date();
+      let ny = now.getFullYear();
+      let nm = ("0" + (now.getMonth() + 1)).slice(-2);
+      let nd = ("0" + now.getDate()).slice(-2);
       dateStr = ny + "-" + nm + "-" + nd;
     }
 
-    var h1 = dateHash(dateStr);
-    var h2 = dateHash(dateStr + "_2");
-    var h3 = dateHash(dateStr + "_3");
+    let h1 = dateHash(dateStr);
+    let h2 = dateHash(dateStr + "_2");
+    let h3 = dateHash(dateStr + "_3");
 
     // 决定返回条数：1-3条
-    var count;
+    let count;
     if (h1 < 0.25) count = 1;
     else if (h1 < 0.75) count = 2;
     else count = 3;
 
-    var results = [];
-    var usedIndexes = {};
+    let results = [];
+    let usedIndexes = {};
 
     // 选择分类
-    var categories = Object.keys(categoryMap);
-    var catIndex = Math.floor(h2 * categories.length);
-    var selectedCat = categories[catIndex];
-    var catQuotes = categoryMap[selectedCat];
+    let categories = Object.keys(categoryMap);
+    let catIndex = Math.floor(h2 * categories.length);
+    let selectedCat = categories[catIndex];
+    let catQuotes = categoryMap[selectedCat];
 
     // 第一条
-    var idx1 = Math.floor(h3 * catQuotes.length);
+    let idx1 = Math.floor(h3 * catQuotes.length);
     results.push(catQuotes[idx1]);
     usedIndexes[selectedCat + "_" + idx1] = true;
 
     // 第二条
     if (count >= 2) {
-      var catIndex2 = (catIndex + 1) % categories.length;
-      var selectedCat2 = categories[catIndex2];
-      var catQuotes2 = categoryMap[selectedCat2];
-      var h4 = dateHash(dateStr + "_4");
-      var idx2 = Math.floor(h4 * catQuotes2.length);
-      var key2 = selectedCat2 + "_" + idx2;
+      let catIndex2 = (catIndex + 1) % categories.length;
+      let selectedCat2 = categories[catIndex2];
+      let catQuotes2 = categoryMap[selectedCat2];
+      let h4 = dateHash(dateStr + "_4");
+      let idx2 = Math.floor(h4 * catQuotes2.length);
+      let key2 = selectedCat2 + "_" + idx2;
       if (!usedIndexes[key2]) {
         results.push(catQuotes2[idx2]);
         usedIndexes[key2] = true;
@@ -791,12 +791,12 @@ var WisdomQuotesData = (function () {
 
     // 第三条
     if (count >= 3) {
-      var catIndex3 = (catIndex + 2) % categories.length;
-      var selectedCat3 = categories[catIndex3];
-      var catQuotes3 = categoryMap[selectedCat3];
-      var h5 = dateHash(dateStr + "_5");
-      var idx3 = Math.floor(h5 * catQuotes3.length);
-      var key3 = selectedCat3 + "_" + idx3;
+      let catIndex3 = (catIndex + 2) % categories.length;
+      let selectedCat3 = categories[catIndex3];
+      let catQuotes3 = categoryMap[selectedCat3];
+      let h5 = dateHash(dateStr + "_5");
+      let idx3 = Math.floor(h5 * catQuotes3.length);
+      let key3 = selectedCat3 + "_" + idx3;
       if (!usedIndexes[key3]) {
         results.push(catQuotes3[idx3]);
         usedIndexes[key3] = true;
@@ -817,7 +817,7 @@ var WisdomQuotesData = (function () {
       return categoryMap[cat].slice();
     }
     // 模糊匹配
-    for (var key in categoryMap) {
+    for (let key in categoryMap) {
       if (key.indexOf(cat) >= 0 || cat.indexOf(key) >= 0) {
         return categoryMap[key].slice();
       }
@@ -832,17 +832,17 @@ var WisdomQuotesData = (function () {
    */
   function getQuotesByMood(mood) {
     if (!mood) return [];
-    var moodKey = mood;
+    let moodKey = mood;
     // 模糊匹配心情
-    var matchedKey = null;
-    for (var key in moodMap) {
+    let matchedKey = null;
+    for (let key in moodMap) {
       if (key === mood || key.indexOf(mood) >= 0 || mood.indexOf(key) >= 0) {
         matchedKey = key;
         break;
       }
     }
 
-    var cats;
+    let cats;
     if (matchedKey) {
       cats = moodMap[matchedKey];
     } else {
@@ -850,11 +850,11 @@ var WisdomQuotesData = (function () {
       cats = ["人生智慧", "心灵成长", "处世之道"];
     }
 
-    var results = [];
-    for (var i = 0; i < cats.length; i++) {
-      var catQuotes = categoryMap[cats[i]] || [];
+    let results = [];
+    for (let i = 0; i < cats.length; i++) {
+      let catQuotes = categoryMap[cats[i]] || [];
       // 每个分类取前 5 条
-      for (var j = 0; j < Math.min(5, catQuotes.length); j++) {
+      for (let j = 0; j < Math.min(5, catQuotes.length); j++) {
         results.push(catQuotes[j]);
       }
     }

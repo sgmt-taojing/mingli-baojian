@@ -3,7 +3,7 @@
 // 用途：自动关注佛道儒/名山/术数类公众号，采集内容喂给知识库自进化
 // ================================================================
 
-var GONGZHONGHAO_DB = {
+let GONGZHONGHAO_DB = {
   // ═══ 佛教名山与寺院 ═══
   buddhist: [
     // 四大名山
@@ -155,8 +155,8 @@ var GONGZHONGHAO_DB = {
 
 // 获取所有公众号列表
 function getAllGzhList(){
-  var all=[];
-  for(var cat in GONGZHONGHAO_DB){
+  let all=[];
+  for(let cat in GONGZHONGHAO_DB){
     GONGZHONGHAO_DB[cat].forEach(function(g){
       g.category=cat;
       all.push(g);
@@ -167,8 +167,8 @@ function getAllGzhList(){
 
 // 按类别统计
 function getGzhStats(){
-  var stats={total:0};
-  for(var cat in GONGZHONGHAO_DB){
+  let stats={total:0};
+  for(let cat in GONGZHONGHAO_DB){
     stats[cat]=GONGZHONGHAO_DB[cat].length;
     stats.total+=GONGZHONGHAO_DB[cat].length;
   }
@@ -177,8 +177,8 @@ function getGzhStats(){
 
 // 按地区查找
 function getGzhByRegion(region){
-  var results=[];
-  var all=getAllGzhList();
+  let results=[];
+  let all=getAllGzhList();
   all.forEach(function(g){
     if(g.region.indexOf(region)>=0 || region.indexOf(g.region)>=0){
       results.push(g);
@@ -189,8 +189,8 @@ function getGzhByRegion(region){
 
 // 按传统查找
 function getGzhByTradition(tradition){
-  var results=[];
-  var all=getAllGzhList();
+  let results=[];
+  let all=getAllGzhList();
   all.forEach(function(g){
     if(g.tradition===tradition) results.push(g);
   });
@@ -198,14 +198,14 @@ function getGzhByTradition(tradition){
 }
 
 // 内容采集记录
-var GZH_COLLECT_LOG = {
+let GZH_COLLECT_LOG = {
   // 采集记录存储在localStorage: gzh_collect_log
   // 格式: [{gzhId, date, title, category, digest, url, processed}]
   
   getLastCollect: function(gzhId){
     try{
-      var log=JSON.parse(localStorage.getItem('gzh_collect_log')||'[]');
-      var last=null;
+      let log=JSON.parse(localStorage.getItem('gzh_collect_log')||'[]');
+      let last=null;
       log.forEach(function(r){if(r.gzhId===gzhId && (!last||r.date>last.date))last=r;});
       return last;
     }catch(e){return null;}
@@ -213,7 +213,7 @@ var GZH_COLLECT_LOG = {
   
   addRecord: function(record){
     try{
-      var log=JSON.parse(localStorage.getItem('gzh_collect_log')||'[]');
+      let log=JSON.parse(localStorage.getItem('gzh_collect_log')||'[]');
       log.push(record);
       if(log.length>500) log=log.slice(-500); // 保留最近500条
       localStorage.setItem('gzh_collect_log', JSON.stringify(log));
@@ -222,14 +222,14 @@ var GZH_COLLECT_LOG = {
   
   getUnprocessed: function(){
     try{
-      var log=JSON.parse(localStorage.getItem('gzh_collect_log')||'[]');
+      let log=JSON.parse(localStorage.getItem('gzh_collect_log')||'[]');
       return log.filter(function(r){return !r.processed;});
     }catch(e){return [];}
   },
   
   markProcessed: function(gzhId, date){
     try{
-      var log=JSON.parse(localStorage.getItem('gzh_collect_log')||'[]');
+      let log=JSON.parse(localStorage.getItem('gzh_collect_log')||'[]');
       log.forEach(function(r){
         if(r.gzhId===gzhId && r.date===date) r.processed=true;
       });
@@ -239,7 +239,7 @@ var GZH_COLLECT_LOG = {
   
   getStats: function(){
     try{
-      var log=JSON.parse(localStorage.getItem('gzh_collect_log')||'[]');
+      let log=JSON.parse(localStorage.getItem('gzh_collect_log')||'[]');
       return {
         total: log.length,
         unprocessed: log.filter(function(r){return !r.processed;}).length,
@@ -252,7 +252,7 @@ var GZH_COLLECT_LOG = {
 };
 
 // 内容分类与知识库映射
-var CONTENT_KB_MAP = {
+let CONTENT_KB_MAP = {
   '法会通知': {target:'faith_festivals', action:'update_calendar', desc:'更新佛道活动日历'},
   '佛学开示': {target:'knowledge_base', action:'supplement', desc:'补充佛学知识库'},
   '道法讲座': {target:'knowledge_base', action:'supplement', desc:'补充道学知识库'},
@@ -285,11 +285,11 @@ var CONTENT_KB_MAP = {
 
 // 生成采集任务列表（用于浏览器代理）
 function generateCollectTasks(){
-  var tasks=[];
-  var all=getAllGzhList();
+  let tasks=[];
+  let all=getAllGzhList();
   all.forEach(function(g){
     g.contentTypes.forEach(function(ct){
-      var map=CONTENT_KB_MAP[ct];
+      let map=CONTENT_KB_MAP[ct];
       if(map){
         tasks.push({
           gzhId: g.id,
@@ -311,10 +311,10 @@ function generateCollectTasks(){
 
 // 渲染公众号管理面板（用于管理后台）
 function renderGzhManagePanel(){
-  var stats=getGzhStats();
-  var all=getAllGzhList();
+  let stats=getGzhStats();
+  let all=getAllGzhList();
   
-  var html='<div style="padding:20px">';
+  let html='<div style="padding:20px">';
   html+='<h3 style="color:var(--gold);margin-bottom:16px">📡 公众号关注与采集系统</h3>';
   
   // 统计卡片
@@ -323,8 +323,8 @@ function renderGzhManagePanel(){
   html+='<div style="font-size:24px;color:var(--gold);font-weight:bold">'+stats.total+'</div>';
   html+='<div style="font-size:11px;opacity:.6">关注总数</div></div>';
   
-  var cats={'buddhist':'佛教','taoist':'道教','confucian':'儒家','mountains':'名山','shushu':'术数','culture':'综合'};
-  for(var cat in cats){
+  let cats={'buddhist':'佛教','taoist':'道教','confucian':'儒家','mountains':'名山','shushu':'术数','culture':'综合'};
+  for(let cat in cats){
     if(stats[cat]){
       html+='<div style="background:rgba(155,89,182,.04);border:1px solid rgba(155,89,182,.12);border-radius:10px;padding:14px;text-align:center">';
       html+='<div style="font-size:20px;color:#9b59b6;font-weight:bold">'+stats[cat]+'</div>';
@@ -332,7 +332,7 @@ function renderGzhManagePanel(){
     }
   }
   
-  var collectStats=GZH_COLLECT_LOG.getStats();
+  let collectStats=GZH_COLLECT_LOG.getStats();
   html+='<div style="background:rgba(46,204,113,.04);border:1px solid rgba(46,204,113,.12);border-radius:10px;padding:14px;text-align:center">';
   html+='<div style="font-size:20px;color:#2ecc71;font-weight:bold">'+collectStats.total+'</div>';
   html+='<div style="font-size:11px;opacity:.6">已采集</div></div>';
@@ -349,10 +349,10 @@ function renderGzhManagePanel(){
   html+='<th style="padding:8px;text-align:left">名称</th><th>类别</th><th>地区</th><th>标签</th><th>优先级</th><th>采集内容</th><th>最后采集</th></tr>';
   
   all.forEach(function(g){
-    var last=GZH_COLLECT_LOG.getLastCollect(g.id);
-    var lastDate=last?last.date:'未采集';
-    var catLabel=cats[g.category]||g.category;
-    var stars='⭐'.repeat(g.priority>3?1:0)+(g.priority>=5?'⭐':'');
+    let last=GZH_COLLECT_LOG.getLastCollect(g.id);
+    let lastDate=last?last.date:'未采集';
+    let catLabel=cats[g.category]||g.category;
+    let stars='⭐'.repeat(g.priority>3?1:0)+(g.priority>=5?'⭐':'');
     html+='<tr style="border-bottom:1px solid rgba(255,255,255,.04)">';
     html+='<td style="padding:6px">'+g.name+'</td>';
     html+='<td style="text-align:center">'+catLabel+'</td>';

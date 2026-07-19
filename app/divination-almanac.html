@@ -584,7 +584,7 @@ body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xm
 // ===== 天干地支 =====
 
 function showToast(msg) {
-  var t = document.getElementById('toastMsg');
+  let t = document.getElementById('toastMsg');
   if (!t) {
     t = document.createElement('div');
     t.id = 'toastMsg';
@@ -1055,7 +1055,7 @@ function renderAlmanacInfo(dateStr, almanac) {
 }
 
 // ===== 真实农历计算（基于1900-2100年农历数据表） =====
-var LUNAR_INFO = [
+let LUNAR_INFO = [
   0x04bd8,0x04ae0,0x0a570,0x054d5,0x0d260,0x0d950,0x16554,0x056a0,0x09ad0,0x055d2,
   0x04ae0,0x0a5b6,0x0a4d0,0x0d250,0x1d255,0x0b540,0x0d6a0,0x0ada2,0x095b0,0x14977,
   0x04970,0x0a4b0,0x0b4b5,0x06a50,0x06d40,0x1ab54,0x02b60,0x09570,0x052f2,0x04970,
@@ -1078,18 +1078,18 @@ var LUNAR_INFO = [
   0x0e968,0x0d520,0x0daa0,0x16aa6,0x056d0,0x04ae0,0x0a9d4,0x0a2d0,0x0d150,0x0f252,
   0x0d520
 ];
-function lunarYearDays(y){var s=348;for(var i=0x8000;i>0x8;i>>=1){s+=(LUNAR_INFO[y-1900]&i)?1:0;}return s+leapDays(y);}
+function lunarYearDays(y){let s=348;for(let i=0x8000;i>0x8;i>>=1){s+=(LUNAR_INFO[y-1900]&i)?1:0;}return s+leapDays(y);}
 function leapMonth(y){return LUNAR_INFO[y-1900]&0xf;}
 function leapDays(y){if(leapMonth(y))return(LUNAR_INFO[y-1900]&0x10000)?30:29;return 0;}
 function monthDays(y,m){return(LUNAR_INFO[y-1900]&(0x10000>>m))?30:29;}
 function getSimpleLunar(date){
-  var offset=Math.floor((date-new Date(1900,0,31))/86400000);
-  var i,temp=0;
+  let offset=Math.floor((date-new Date(1900,0,31))/86400000);
+  let i,temp=0;
   for(i=1900;i<2101&&offset>0;i++){temp=lunarYearDays(i);offset-=temp;}
   if(offset<0){offset+=temp;i--;}
-  var year=i;
-  var leap=leapMonth(year);
-  var isLeap=false;
+  let year=i;
+  let leap=leapMonth(year);
+  let isLeap=false;
   for(i=1;i<13&&offset>0;i++){
     if(leap>0&&i===leap+1&&!isLeap){--i;isLeap=true;temp=leapDays(year);}
     else{temp=monthDays(year,i);}
@@ -1098,31 +1098,31 @@ function getSimpleLunar(date){
   }
   if(offset===0&&leap>0&&i===leap+1){if(isLeap)isLeap=false;else{isLeap=true;--i;}}
   if(offset<0){offset+=temp;--i;}
-  var month=i;
-  var day=offset+1;
-  var monthNames=['正','二','三','四','五','六','七','八','九','十','冬','腊'];
-  var dayNames=['初一','初二','初三','初四','初五','初六','初七','初八','初九','初十','十一','十二','十三','十四','十五','十六','十七','十八','十九','二十','廿一','廿二','廿三','廿四','廿五','廿六','廿七','廿八','廿九','三十'];
-  var mName=(isLeap?'闰':'')+monthNames[month-1]+'月';
+  let month=i;
+  let day=offset+1;
+  let monthNames=['正','二','三','四','五','六','七','八','九','十','冬','腊'];
+  let dayNames=['初一','初二','初三','初四','初五','初六','初七','初八','初九','初十','十一','十二','十三','十四','十五','十六','十七','十八','十九','二十','廿一','廿二','廿三','廿四','廿五','廿六','廿七','廿八','廿九','三十'];
+  let mName=(isLeap?'闰':'')+monthNames[month-1]+'月';
   return '农历'+year+'年 '+mName+dayNames[day-1];
 }
 
 // ===== 真实干支计算 =====
 function getGanZhi(date) {
-  var year=date.getFullYear();
-  var month=date.getMonth()+1;
-  var day=date.getDate();
-  var TG=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-  var DZ=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  let year=date.getFullYear();
+  let month=date.getMonth()+1;
+  let day=date.getDate();
+  let TG=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  let DZ=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
   // 年干支
-  var yearGzIdx=(year-4)%60;
+  let yearGzIdx=(year-4)%60;
   yearGzIdx=(yearGzIdx+60)%60;
   // 月干支：年干起月干
-  var monthStartIdx=[0,2,4,6,8,0,2,4,6,8,0,2]; // 寅月为正月
-  var monthBranch=(month+1)%12; // 正月=寅(2)
-  var yearGan=yearGzIdx%10;
-  var monthGan=(yearGan*2+month+1)%10;
+  let monthStartIdx=[0,2,4,6,8,0,2,4,6,8,0,2]; // 寅月为正月
+  let monthBranch=(month+1)%12; // 正月=寅(2)
+  let yearGan=yearGzIdx%10;
+  let monthGan=(yearGan*2+month+1)%10;
   // 日干支：1900-01-31=甲辰(index 40)
-  var dayGzIdx=((40+Math.floor((new Date(year,month-1,day)-new Date(1900,0,31))/86400000))%60+60)%60;
+  let dayGzIdx=((40+Math.floor((new Date(year,month-1,day)-new Date(1900,0,31))/86400000))%60+60)%60;
   return TG[yearGzIdx%10]+DZ[yearGzIdx%12]+'年 '+TG[monthGan]+DZ[monthBranch]+'月 '+TG[dayGzIdx%10]+DZ[dayGzIdx%12]+'日';
 }
 
@@ -1147,7 +1147,7 @@ function renderViewContent(view) {
   // 根据黄历宜忌，筛选今日适合的事
   const suitableToday = template.suitable.filter(s => {
     // 基于黄历宜项匹配
-    var yiStr=(almanac.yi||[]).join('');
+    let yiStr=(almanac.yi||[]).join('');
     return yiStr.indexOf(s.keyword||s) >= 0 || (almanac.jishen&&almanac.jishen.length>0);
   }).slice(0, 5);
   
@@ -1324,7 +1324,7 @@ function updateDailyAdvice(almanac) {
 
   // ── 节气检测（24节气天文近似日期，误差±1-2天）──
   // 节气由太阳黄经决定，此处用近10年平均日期，精度±2天
-  var JIEQI_DATA={
+  let JIEQI_DATA={
     2024:[6,20,4,19,5,20,4,19,5,20,5,21,6,22,7,23,7,23,8,23,7,22,7,22],
     2025:[5,20,3,18,5,20,4,20,5,21,5,21,7,22,7,23,7,23,8,23,7,22,7,21],
     2026:[5,20,4,19,6,21,5,20,6,21,6,21,7,23,8,23,8,23,8,24,7,22,7,22],
@@ -1333,12 +1333,12 @@ function updateDailyAdvice(almanac) {
     2029:[5,20,3,18,5,20,4,19,5,21,5,21,7,22,7,23,7,23,8,23,7,22,7,21],
     2030:[5,20,4,19,6,21,5,20,6,21,6,21,7,23,8,23,8,23,8,24,7,22,7,22]
   };
-  var JQ_NAMES=['小寒','大寒','立春','雨水','惊蛰','春分','清明','谷雨','立夏','小满','芒种','夏至','小暑','大暑','立秋','处暑','白露','秋分','寒露','霜降','立冬','小雪','大雪','冬至'];
-  var JIEQI_LIST=[];
-  var jqData=JIEQI_DATA[Y]||JIEQI_DATA[2026];
-  for(var qi=0;qi<24;qi++){JIEQI_LIST.push({name:JQ_NAMES[qi],m:Math.floor(qi/2)+1,d:jqData[qi]});}
+  let JQ_NAMES=['小寒','大寒','立春','雨水','惊蛰','春分','清明','谷雨','立夏','小满','芒种','夏至','小暑','大暑','立秋','处暑','白露','秋分','寒露','霜降','立冬','小雪','大雪','冬至'];
+  let JIEQI_LIST=[];
+  let jqData=JIEQI_DATA[Y]||JIEQI_DATA[2026];
+  for(let qi=0;qi<24;qi++){JIEQI_LIST.push({name:JQ_NAMES[qi],m:Math.floor(qi/2)+1,d:jqData[qi]});}
   let jieqi=null,jieqiWx=null;
-  for(var j=0;j<JIEQI_LIST.length;j++){if(M===JIEQI_LIST[j].m&&Math.abs(D-JIEQI_LIST[j].d)<=1){jieqi=JIEQI_LIST[j].name;break;}}
+  for(let j=0;j<JIEQI_LIST.length;j++){if(M===JIEQI_LIST[j].m&&Math.abs(D-JIEQI_LIST[j].d)<=1){jieqi=JIEQI_LIST[j].name;break;}}
   if(jieqi){jieqiWx={立春:'木',雨水:'木',惊蛰:'木',春分:'木',清明:'木',谷雨:'土',立夏:'火',小满:'火',芒种:'火',夏至:'火',小暑:'土',大暑:'土',立秋:'金',处暑:'金',白露:'金',秋分:'金',寒露:'水',霜降:'土',立冬:'水',小雪:'水',大雪:'水',冬至:'水',小寒:'土',大寒:'土'}[jieqi];}
 
   // ── 建除十二神 ──
@@ -1347,13 +1347,13 @@ function updateDailyAdvice(almanac) {
   const jianchu=JIANCHU[jianchuIdx];
 
   // ── 动态生成宜建议(基于真实宜忌+干支+节气) ──
-  var yiList=almanac.yi||[];
-  var jiList=almanac.ji||[];
-  var yiAdvice=[];
-  var jiAdvice=[];
+  let yiList=almanac.yi||[];
+  let jiList=almanac.ji||[];
+  let yiAdvice=[];
+  let jiAdvice=[];
 
   // 宜：基于黄历宜项扩展为具体行动建议
-  var yiMap={
+  let yiMap={
     '祭祀':['虔诚祭祀祖先神明，焚香祈福，心存敬意'],
     '祈福':['至寺庙或家中佛堂诚心祈愿，供灯供水'],
     '出行':['宜往东方或吉方出行，避开冲煞方位'],
@@ -1372,25 +1372,25 @@ function updateDailyAdvice(almanac) {
     '会友':['与志同道合者相聚，论道品茶'],
     '读书':['静心研读经典，晨读效果最佳']
   };
-  for(var i=0;i<yiList.length&&yiAdvice.length<3;i++){
-    var y=yiList[i],found=false;
-    for(var k in yiMap){if(y.indexOf(k)>=0){yiAdvice.push(yiMap[k]);found=true;break;}}
+  for(let i=0;i<yiList.length&&yiAdvice.length<3;i++){
+    let y=yiList[i],found=false;
+    for(let k in yiMap){if(y.indexOf(k)>=0){yiAdvice.push(yiMap[k]);found=true;break;}}
     if(!found) yiAdvice.push('宜'+y+'，顺应天时行事');
   }
   // 补充干支五行建议
-  var wxYi={木:'宜穿青绿色衣物，食绿叶蔬菜养肝',火:'宜穿红色衣物，午间小憩养心',土:'宜穿黄色衣物，食山药小米养脾胃',金:'宜穿白色衣物，深呼吸润肺',水:'宜穿黑蓝色衣物，早睡养肾'};
+  let wxYi={木:'宜穿青绿色衣物，食绿叶蔬菜养肝',火:'宜穿红色衣物，午间小憩养心',土:'宜穿黄色衣物，食山药小米养脾胃',金:'宜穿白色衣物，深呼吸润肺',水:'宜穿黑蓝色衣物，早睡养肾'};
   if(wxYi[stemWx]) yiAdvice.push(wxYi[stemWx]);
   // 补充节气建议
   if(jieqi){
-    var jqYi={立春:'立春节气，宜制定年度计划，踏青迎春',雨水:'雨水节气，宜健脾祛湿，食薏米红豆',惊蛰:'惊蛰时节，宜早起活动，敲胆经排毒',春分:'春分昼夜平，宜调和阴阳，放风筝',清明:'清明时节，宜祭祖扫墓，食青团',谷雨:'谷雨湿重，宜清淡饮食，避免久居潮湿',立夏:'立夏心火旺，宜养心安神，食苦味清心',小满:'小满湿热，宜清淡饮食，勤运动出汗',芒种:'芒种忙种，宜劳逸结合，饮酸梅汤',夏至:'夏至阳极，宜晚睡早起，艾灸关元',小暑:'小暑入伏，宜防暑降温，食绿豆汤',大暑:'大暑最热，宜静心避暑，午休必不可少',立秋:'立秋宜贴秋膘，补肺润燥食百合银耳',处暑:'处暑暑止，宜调整作息秋冻锻炼',白露:'白露秋意浓，宜润肺防燥食梨蜜藕',秋分:'秋分昼夜平，宜阴阳调和登高望远',寒露:'寒露凉起，宜添衣保暖泡脚驱寒',霜降:'霜降秋末，宜温补脾胃食柿子板栗',立冬:'立冬宜冬补，补肾藏精食黑色食物',小雪:'小雪寒冷，宜温阳御寒羊肉汤进补',大雪:'大雪隆冬，宜极致收藏室内艾灸',冬至:'冬至一阳生，宜吃饺子汤圆艾灸神阙',小寒:'小寒最冷，宜极温补当归生姜羊肉汤',大寒:'大寒岁末，宜辞旧迎新总结一年'};
+    let jqYi={立春:'立春节气，宜制定年度计划，踏青迎春',雨水:'雨水节气，宜健脾祛湿，食薏米红豆',惊蛰:'惊蛰时节，宜早起活动，敲胆经排毒',春分:'春分昼夜平，宜调和阴阳，放风筝',清明:'清明时节，宜祭祖扫墓，食青团',谷雨:'谷雨湿重，宜清淡饮食，避免久居潮湿',立夏:'立夏心火旺，宜养心安神，食苦味清心',小满:'小满湿热，宜清淡饮食，勤运动出汗',芒种:'芒种忙种，宜劳逸结合，饮酸梅汤',夏至:'夏至阳极，宜晚睡早起，艾灸关元',小暑:'小暑入伏，宜防暑降温，食绿豆汤',大暑:'大暑最热，宜静心避暑，午休必不可少',立秋:'立秋宜贴秋膘，补肺润燥食百合银耳',处暑:'处暑暑止，宜调整作息秋冻锻炼',白露:'白露秋意浓，宜润肺防燥食梨蜜藕',秋分:'秋分昼夜平，宜阴阳调和登高望远',寒露:'寒露凉起，宜添衣保暖泡脚驱寒',霜降:'霜降秋末，宜温补脾胃食柿子板栗',立冬:'立冬宜冬补，补肾藏精食黑色食物',小雪:'小雪寒冷，宜温阳御寒羊肉汤进补',大雪:'大雪隆冬，宜极致收藏室内艾灸',冬至:'冬至一阳生，宜吃饺子汤圆艾灸神阙',小寒:'小寒最冷，宜极温补当归生姜羊肉汤',大寒:'大寒岁末，宜辞旧迎新总结一年'};
     if(jqYi[jieqi]) yiAdvice.push(jqYi[jieqi]);
   }
   // 补充建除建议
-  var jcYi={建:'建日主吉，宜开创事业新局',除:'除日宜清理旧物去故迎新',满:'满日主圆满，宜祈福求财',平:'平日主平和，宜处理日常事务',定:'定日主安定，宜签约定事',执:'执日主执着，宜坚持推进计划',危:'危日宜谨慎行事，不宜冒险',成:'成日主成就，宜婚嫁开张签约',收:'收日主收成，宜收获成果纳财',开:'开日主开通，宜开业出行新开始',闭:'闭日主收敛，宜整理反思总结'};
+  let jcYi={建:'建日主吉，宜开创事业新局',除:'除日宜清理旧物去故迎新',满:'满日主圆满，宜祈福求财',平:'平日主平和，宜处理日常事务',定:'定日主安定，宜签约定事',执:'执日主执着，宜坚持推进计划',危:'危日宜谨慎行事，不宜冒险',成:'成日主成就，宜婚嫁开张签约',收:'收日主收成，宜收获成果纳财',开:'开日主开通，宜开业出行新开始',闭:'闭日主收敛，宜整理反思总结'};
   if(jcYi[jianchu]) yiAdvice.push(jcYi[jianchu]);
 
   // 忌：基于黄历忌项扩展
-  var jiMap={
+  let jiMap={
     '嫁娶':['忌婚嫁之事，恐有不谐',],
     '安葬':['忌安葬迁坟，不利亡灵安宁'],
     '动土':['忌动土修造，恐犯土煞'],
@@ -1400,9 +1400,9 @@ function updateDailyAdvice(almanac) {
     '出行':['忌远行往冲煞方向，易遇波折'],
     '安门':['忌安装门户，不利家宅气场']
   };
-  for(var i2=0;i2<jiList.length&&jiAdvice.length<3;i2++){
-    var jj=jiList[i2],jf=false;
-    for(var k2 in jiMap){if(jj.indexOf(k2)>=0){jiAdvice.push(jiMap[k2]);jf=true;break;}}
+  for(let i2=0;i2<jiList.length&&jiAdvice.length<3;i2++){
+    let jj=jiList[i2],jf=false;
+    for(let k2 in jiMap){if(jj.indexOf(k2)>=0){jiAdvice.push(jiMap[k2]);jf=true;break;}}
     if(!jf) jiAdvice.push('忌'+jj+'，避凶趋吉');
   }
   // 补充通用忌
@@ -1410,20 +1410,20 @@ function updateDailyAdvice(almanac) {
   if(almanac.chong) jiAdvice.push('忌朝'+almanac.chong.split('(')[0]+'方向行事');
 
   // ── 个人八字关系 ──
-  var userData=getUserBazi();
-  var personalSection='';
+  let userData=getUserBazi();
+  let personalSection='';
   if(userData){
-    var dayEle=userData.dayEle,dayStemName=userData.dayStem;
-    var todayGanZhi=getGanZhi(now);
-    var tGan=todayGanZhi.split(' ')[0];
-    var tEle=ELE[tGan]||'未知';
-    var rels={'木':{'木':'比助','火':'泄','土':'耗','金':'克','水':'生'},'火':{'火':'比','土':'泄','金':'耗','水':'克','木':'生'},'土':{'土':'比','金':'泄','水':'耗','木':'克','火':'生'},'金':{'金':'比','水':'泄','木':'耗','火':'克','土':'生'},'水':{'水':'比','木':'泄','火':'耗','土':'克','金':'生'}};
-    var rel=rels[dayEle]?.[tEle]||'未知';
+    let dayEle=userData.dayEle,dayStemName=userData.dayStem;
+    let todayGanZhi=getGanZhi(now);
+    let tGan=todayGanZhi.split(' ')[0];
+    let tEle=ELE[tGan]||'未知';
+    let rels={'木':{'木':'比助','火':'泄','土':'耗','金':'克','水':'生'},'火':{'火':'比','土':'泄','金':'耗','水':'克','木':'生'},'土':{'土':'比','金':'泄','水':'耗','木':'克','火':'生'},'金':{'金':'比','水':'泄','木':'耗','火':'克','土':'生'},'水':{'水':'比','木':'泄','火':'耗','土':'克','金':'生'}};
+    let rel=rels[dayEle]?.[tEle]||'未知';
     personalSection='<div class="advice-card personal-card"><h5>⭕ 本日与您八字的关系（'+dayStemName+'日主）</h5><p>今日天干：'+tGan+'（'+tEle+'）</p><p>对您的影响：<strong>'+rel+'</strong></p><p>'+getPersonalAdvice(dayEle,tEle)+'</p></div>';
   }
 
   // ── 构建输出 ──
-  var html='<h3>每日建议</h3>';
+  let html='<h3>每日建议</h3>';
   html+='<div class="advice-grid">';
   html+='<div class="advice-card yi-card"><h5>✓ 今日宜做</h5><ol>'+yiAdvice.slice(0,5).map(function(a){return '<li>'+a+'</li>';}).join('')+'</ol></div>';
   html+='<div class="advice-card ji-card"><h5>✗ 今日忌做</h5><ol>'+jiAdvice.slice(0,5).map(function(a){return '<li>'+a+'</li>';}).join('')+'</ol></div>';
@@ -1440,40 +1440,40 @@ function updateDailyAdvice(almanac) {
   html+='<div class="advice-actions"><button class="advice-btn" onclick="copyAdvice()">📋 复制建议</button></div>';
 
 // ── 彭祖百忌 ──
-  var pengzuGan={"甲":"甲不开仓财物耗散","乙":"乙不栽植千株不长","丙":"丙不修灶必见灾殃","丁":"丁不剃头头必生疮","戊":"戊不受田田主不祥","己":"己不破券二比并亡","庚":"庚不经络织机虚张","辛":"辛不合酱主人必伤","壬":"壬不泱水更难提防","癸":"癸不词讼理弱敌强"};
-  var pengzuZhi={"子":"子不问卜自惹祸殃","丑":"丑不冠带主不还乡","寅":"寅不祭祀神鬼不尝","卯":"卯不穿井水泉不香","辰":"辰不哭泣必主重丧","巳":"巳不远行财物伏藏","午":"不庖厨主无食禄","未":"不服药毒气入肠","申":"不安床鬼祟入房","酉":"不会宴醉坐颠狂","戌":"不吃犬作怪上床","亥":"不嫁娶必主分张"};
-  var pengzuText=(pengzuGan[dayStem]||'')+(pengzuZhi[dayBranch]||'');
+  let pengzuGan={"甲":"甲不开仓财物耗散","乙":"乙不栽植千株不长","丙":"丙不修灶必见灾殃","丁":"丁不剃头头必生疮","戊":"戊不受田田主不祥","己":"己不破券二比并亡","庚":"庚不经络织机虚张","辛":"辛不合酱主人必伤","壬":"壬不泱水更难提防","癸":"癸不词讼理弱敌强"};
+  let pengzuZhi={"子":"子不问卜自惹祸殃","丑":"丑不冠带主不还乡","寅":"寅不祭祀神鬼不尝","卯":"卯不穿井水泉不香","辰":"辰不哭泣必主重丧","巳":"巳不远行财物伏藏","午":"不庖厨主无食禄","未":"不服药毒气入肠","申":"不安床鬼祟入房","酉":"不会宴醉坐颠狂","戌":"不吃犬作怪上床","亥":"不嫁娶必主分张"};
+  let pengzuText=(pengzuGan[dayStem]||'')+(pengzuZhi[dayBranch]||'');
 
   // ── 喜神财神福神方位 ──
-  var xishenMap={子:'正南',丑:'东南',寅:'东北',卯:'正东',辰:'东南',巳:'正南',午:'西南',未:'正南',申:'西南',酉:'正西',戌:'西北',亥:'西北'};
-  var caishenMap={子:'正南',丑:'东北',寅:'正东',卯:'东南',辰:'正南',巳:'正南',午:'正南',未:'西南',申:'正东',酉:'正南',戌:'正北',亥:'正北'};
-  var fushenMap={子:'西北',丑:'西南',寅:'正西',卯:'正西',辰:'西北',巳:'正北',午:'正南',未:'东南',申:'正南',酉:'东南',戌:'东南',亥:'正北'};
-  var xishen=xishenMap[dayBranch]||'正南';
-  var caishen=caishenMap[dayBranch]||'正南';
-  var fushen=fushenMap[dayBranch]||'西北';
+  let xishenMap={子:'正南',丑:'东南',寅:'东北',卯:'正东',辰:'东南',巳:'正南',午:'西南',未:'正南',申:'西南',酉:'正西',戌:'西北',亥:'西北'};
+  let caishenMap={子:'正南',丑:'东北',寅:'正东',卯:'东南',辰:'正南',巳:'正南',午:'正南',未:'西南',申:'正东',酉:'正南',戌:'正北',亥:'正北'};
+  let fushenMap={子:'西北',丑:'西南',寅:'正西',卯:'正西',辰:'西北',巳:'正北',午:'正南',未:'东南',申:'正南',酉:'东南',戌:'东南',亥:'正北'};
+  let xishen=xishenMap[dayBranch]||'正南';
+  let caishen=caishenMap[dayBranch]||'正南';
+  let fushen=fushenMap[dayBranch]||'西北';
   // 出行大吉方 = 喜神方
-  var chuxingDaji=xishen;
+  let chuxingDaji=xishen;
 
   // ── 黄道黑道 ──
-  var huangdao=['建','除','满','平','定','执'];
-  var heidao=['破','危','成','收','开','闭'];
-  var isHuangdao=huangdao.includes(jianchu);
-  var huangdaoText=isHuangdao?'黄道(吉)':'黑道(凶)';
+  let huangdao=['建','除','满','平','定','执'];
+  let heidao=['破','危','成','收','开','闭'];
+  let isHuangdao=huangdao.includes(jianchu);
+  let huangdaoText=isHuangdao?'黄道(吉)':'黑道(凶)';
 
   // ── 值日星宿 ──
   const XINGXIU=['角','亢','氐','房','心','尾','箕','斗','牛','女','虚','危','室','壁','奎','娄','胃','昴','毕','觜','参','井','鬼','柳','星','张','翼','轸'];
   const xingxiuIdx=(dayGzIdx%28+28)%28;
-  var xingxiu=XINGXIU[xingxiuIdx];
+  let xingxiu=XINGXIU[xingxiuIdx];
 
   // ── 时辰吉凶 ──
-  var shichenList=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-  var shichenJiXiong='';
-  for(var si=0;si<12;si++){
-    var sc=shichenList[si];
-    var scIdx=(dayGzIdx%10+si)%10;
-    var scWx=ELE[STEMS[scIdx]]||'';
+  let shichenList=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  let shichenJiXiong='';
+  for(let si=0;si<12;si++){
+    let sc=shichenList[si];
+    let scIdx=(dayGzIdx%10+si)%10;
+    let scWx=ELE[STEMS[scIdx]]||'';
     // 简化判断: 与日干五行相生为吉,相克为凶
-    var isJi=false,isXiong=false;
+    let isJi=false,isXiong=false;
     if(stemWx==='木'){if(scWx==='水'||scWx==='木')isJi=true;if(scWx==='金'||scWx==='火')isXiong=true;}
     else if(stemWx==='火'){if(scWx==='木'||scWx==='火')isJi=true;if(scWx==='水'||scWx==='土')isXiong=true;}
     else if(stemWx==='土'){if(scWx==='火'||scWx==='土')isJi=true;if(scWx==='木'||scWx==='金')isXiong=true;}
@@ -1483,7 +1483,7 @@ function updateDailyAdvice(almanac) {
   }
 
   // ── 季节气候参考（非实时天气，如需实时天气请接入天气API）──
-  var seasonWeather={
+  let seasonWeather={
     1:{t:'-2~6°C',h:'45%',w:'北风3级',desc:'寒冬凛冽，注意保暖'},
     2:{t:'1~8°C',h:'50%',w:'东风2级',desc:'乍暖还寒，春寒料峭'},
     3:{t:'8~16°C',h:'55%',w:'南风2级',desc:'春暖花开，适宜踏青'},
@@ -1497,10 +1497,10 @@ function updateDailyAdvice(almanac) {
     11:{t:'5~14°C',h:'55%',w:'北风3级',desc:'初冬寒冷，围炉取暖'},
     12:{t:'0~8°C',h:'48%',w:'北风4级',desc:'隆冬严寒，注意防冻'}
   };
-  var weather=seasonWeather[M]||seasonWeather[5];
+  let weather=seasonWeather[M]||seasonWeather[5];
 
   // ── 穿衣指南（季节参考，实际应结合实时天气和个人体质）──
-  var clothingGuide={
+  let clothingGuide={
     1:'厚羽绒服+毛衣+保暖内衣，围巾手套必备',
     2:'薄羽绒服或棉服+毛衣，内搭保暖衣',
     3:'风衣/夹克+薄毛衣，早晚加外套',
@@ -1514,10 +1514,10 @@ function updateDailyAdvice(almanac) {
     11:'厚外套/大衣+毛衣+打底衫',
     12:'羽绒服+厚毛衣+保暖内衣全套'
   };
-  var cloth=clothingGuide[M]||clothingGuide[5];
+  let cloth=clothingGuide[M]||clothingGuide[5];
 
   // ── 今日道家智慧 ──
-  var daoistWisdom=[
+  let daoistWisdom=[
     {source:'《道德经》第一章',quote:'道可道，非常道；名可名，非常名。无名天地之始，有名万物之母。',baihua:'真正的道无法用言语完全描述。万物从无形中诞生，有形的世界源于无形的源头。生活中不必执着于名相，回归本真才是智慧。'},
     {source:'《道德经》第八章',quote:'上善若水。水善利万物而不争，处众人之所恶，故几于道。',baihua:'最高尚的品德像水一样，滋养万物却不争功。做人要像水一样谦下包容，在别人不愿做的事上用心，就接近大道了。'},
     {source:'《道德经》第十六章',quote:'致虚极，守静笃。万物并作，吾以观复。',baihua:'让内心达到极致的空灵与宁静，观察万物生长循环的规律。静能生慧，在纷扰中保持内心的平静是修行的根本。'},
@@ -1529,13 +1529,13 @@ function updateDailyAdvice(almanac) {
     {source:'《庄子·养生主》',quote:'吾生也有涯，而知也无涯。以有涯随无涯，殆已！',baihua:'生命有限而知识无穷。用有限的生命去追求无限的知识，只会让自己疲惫不堪。与其贪多求全，不如专注当下，做好眼前的事。'},
     {source:'《黄帝阴符经》',quote:'观天之道，执天之行，尽矣。',baihua:'观察自然的规律，遵循天道行事，这就是全部的智慧。天人合一不是空话，而是要求我们顺应四时节气，日出而作日入而息，与自然和谐共处。'}
   ];
-  var wisdomIdx=(Y*365+M*31+D)%daoistWisdom.length;
-  var todayDaoist=daoistWisdom[wisdomIdx];
+  let wisdomIdx=(Y*365+M*31+D)%daoistWisdom.length;
+  let todayDaoist=daoistWisdom[wisdomIdx];
 
   // ── 今日修行建议 ──
-  var practiceAdvice=[];
+  let practiceAdvice=[];
   // 基于干支的修行建议
-  var stemPractice={
+  let stemPractice={
     '甲':'今日宜行善布施，种福田。甲木主仁，宜培养慈悲心，可放生或护生。',
     '乙':'今日宜修身养性，读书明理。乙木柔和，宜静坐冥想，观照内心。',
     '丙':'今日宜光明磊落，待人真诚。丙火主礼，宜恭敬长辈，行孝道。',
@@ -1550,7 +1550,7 @@ function updateDailyAdvice(almanac) {
   practiceAdvice.push(stemPractice[dayStem]||stemPractice['甲']);
   // 基于节气的修行建议
   if(jieqi){
-    var jqPractice={
+    let jqPractice={
       '立春':'立春节气，万物复苏。宜立愿发心，制定年度修行计划。',
       '雨水':'雨水滋润万物。宜感恩天地，诵经回向众生。',
       '惊蛰':'惊蛰唤醒冬眠。宜振作精神，开始精进修行。',
@@ -1579,7 +1579,7 @@ function updateDailyAdvice(almanac) {
     if(jqPractice[jieqi]) practiceAdvice.push(jqPractice[jieqi]);
   }
   // 基于建除的修行建议
-  var jcPractice={
+  let jcPractice={
     '建':'建日宜发愿立志，开启新的修行功课。',
     '除':'除日宜忏悔业障，清除内心的烦恼习气。',
     '满':'满日宜感恩回向，将功德分享给一切众生。',
@@ -1595,13 +1595,13 @@ function updateDailyAdvice(almanac) {
   practiceAdvice.push(jcPractice[jianchu]||jcPractice['平']);
 
   // ── 今日命理知识 ──
-  var dailyKnowledge=null;
+  let dailyKnowledge=null;
   try{
     if(typeof getDailyKnowledge==='function'){
       dailyKnowledge=getDailyKnowledge(now);
     }
   }catch(e){}
-  var knowledgeHtml='';
+  let knowledgeHtml='';
   if(dailyKnowledge&&dailyKnowledge.title){
     knowledgeHtml='<div class="advice-card" style="margin-top:12px;background:linear-gradient(135deg,rgba(52,152,219,.06),rgba(155,89,182,.04));border:1px solid rgba(52,152,219,.15);border-radius:10px;padding:14px">';
     knowledgeHtml+='<h5 style="color:#3498db;margin-bottom:8px">📖 '+dailyKnowledge.tag+' · '+dailyKnowledge.title+'</h5>';
@@ -1610,19 +1610,19 @@ function updateDailyAdvice(almanac) {
   }
 
   // ── 构建完整输出 ──
-  var html='<h3>📋 每日建议</h3>';
+  let html='<h3>📋 每日建议</h3>';
 
   // 日期头部
   html+='<div class="advice-card" style="background:linear-gradient(135deg,#c9a84c08,#9b59b606);border:1px solid rgba(201,168,76,.2);border-radius:10px;padding:14px;margin-bottom:12px">';
   html+='<div style="font-size:15px;font-weight:bold;color:var(--gold);margin-bottom:6px">🌍 '+Y+'年'+M+'月'+D+'日 '+['周日','周一','周二','周三','周四','周五','周六'][now.getDay()]+'</div>';
   // 年份生肖
-  var zodiacAnimals=['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
-  var yearZodiac=zodiacAnimals[(Y-4)%12];
-  var ganZhiYear=STEMS[(Y-4)%10]+BRANCHES[(Y-4)%12];
+  let zodiacAnimals=['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
+  let yearZodiac=zodiacAnimals[(Y-4)%12];
+  let ganZhiYear=STEMS[(Y-4)%10]+BRANCHES[(Y-4)%12];
   html+='<div style="font-size:13px;color:#888">🔥 '+ganZhiYear+'年（'+yearZodiac+'年）</div>';
   // 月柱
-  var monthGan=STEMS[monthGzIdx%10];
-  var monthBranch=BRANCHES[monthGzIdx%12];
+  let monthGan=STEMS[monthGzIdx%10];
+  let monthBranch=BRANCHES[monthGzIdx%12];
   html+='<div style="font-size:13px;color:#888">🌙 '+monthGan+monthBranch+'月 · '+dayStem+dayBranch+'日</div>';
   html+='</div>';
 
@@ -1647,7 +1647,7 @@ function updateDailyAdvice(almanac) {
 
   // === 今日节气 ===
   if(jieqi){
-    var jieqiDesc={
+    let jieqiDesc={
       '立春':'阳气始生，万物萌动。宜早起迎春，踏青郊游。',
       '雨水':'冰雪融化，降雨增多。宜调养脾胃，食甘味。',
       '惊蛰':'春雷惊醒蛰虫。宜早起活动，舒展筋骨。',
@@ -1673,7 +1673,7 @@ function updateDailyAdvice(almanac) {
       '小寒':'开始进入最冷时期。宜当归生姜羊肉汤进补。',
       '大寒':'一年最后一个节气。宜辞旧迎新，总结展望。'
     };
-    var jieqiSuyu={
+    let jieqiSuyu={
       '立春':'一年之计在于春',
       '雨水':'春雨贵如油',
       '惊蛰':'春雷一声响，黄金千万两',
@@ -1766,9 +1766,9 @@ function updateDailyAdvice(almanac) {
 
 // ===== 复制建议（动态版） =====
 function copyFullDailyAdvice(){
-  var d=window._currentDynamicAdvice;
+  let d=window._currentDynamicAdvice;
   if(!d){showToast('暂无数据');return;}
-  var t='【易道智鉴·每日推荐】\n';
+  let t='【易道智鉴·每日推荐】\n';
   t+='\n🌍 '+d.date+'\n';
   t+='🔥 年柱信息\n';
   t+='🌙 月柱·日柱\n';
@@ -1814,7 +1814,7 @@ function copyFullDailyAdvice(){
   if(navigator.clipboard){
     navigator.clipboard.writeText(t).then(function(){showToast('✅ 已复制到剪贴板');});
   }else{
-    var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('✅ 已复制');
+    let ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('✅ 已复制');
   }
 }
 function copyAdvice(){copyFullDailyAdvice();}

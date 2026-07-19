@@ -1,0 +1,68 @@
+<!-- cart.wxml -->
+<view class="page">
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{isEmpty}}">
+    <view class="empty-icon">&#xe6c8;</view>
+    <view class="empty-text">购物车空空如也</view>
+    <view class="empty-sub">快去挑选心仪的命理服务吧</view>
+    <button class="empty-btn" bindtap="goShopping">去逛逛</button>
+  </view>
+
+  <!-- 购物车列表 -->
+  <view class="cart-list" wx:else>
+    <view class="cart-item" wx:for="{{cartList}}" wx:key="id" data-index="{{index}}">
+      <!-- 选中框 -->
+      <view class="checkbox-wrap" data-index="{{index}}" bindtap="toggleSelect">
+        <view class="checkbox {{item.selected ? 'checked' : ''}}">
+          <text wx:if="{{item.selected}}" class="check-icon">&#10003;</text>
+        </view>
+      </view>
+
+      <!-- 商品图片 -->
+      <view class="item-cover">
+        <image src="{{item.cover || '/images/placeholder.png'}}" mode="aspectFill" class="cover-img"></image>
+      </view>
+
+      <!-- 商品信息 -->
+      <view class="item-info">
+        <view class="item-title">{{item.title}}</view>
+        <view class="item-price">¥{{item.price}}</view>
+
+        <!-- 数量控制 -->
+        <view class="qty-control">
+          <view class="qty-btn minus" data-index="{{index}}" bindtap="decrease">
+            <text class="qty-btn-text">−</text>
+          </view>
+          <view class="qty-num">{{item.num}}</view>
+          <view class="qty-btn plus" data-index="{{index}}" bindtap="increase">
+            <text class="qty-btn-text">+</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 删除按钮 -->
+      <view class="delete-btn" data-index="{{index}}" bindtap="deleteItem">
+        <text class="delete-icon">×</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部结算栏 -->
+  <view class="checkout-bar" wx:if="{{!isEmpty}}">
+    <view class="select-all" bindtap="toggleSelectAll">
+      <view class="checkbox {{selectAll ? 'checked' : ''}}">
+        <text wx:if="{{selectAll}}" class="check-icon">&#10003;</text>
+      </view>
+      <text class="select-all-text">全选</text>
+    </view>
+
+    <view class="total-info">
+      <text class="total-label">合计：</text>
+      <text class="total-amount">¥{{totalAmount}}</text>
+    </view>
+
+    <view class="checkout-btn" bindtap="goCheckout">
+      去结算{{totalCount > 0 ? '(' + totalCount + ')' : ''}}
+    </view>
+  </view>
+</view>

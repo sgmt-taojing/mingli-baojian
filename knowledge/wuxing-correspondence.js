@@ -99,28 +99,28 @@ if (typeof window !== 'undefined') {
 
     // 获取五行主色字符串
     getColorStr: function(ele) {
-      var c = this.colors[ele];
+      let c = this.colors[ele];
       if (!c) return '';
       return c.主色.join('/');
     },
 
     // 获取五行辅色字符串
     getAuxColorStr: function(ele) {
-      var c = this.colors[ele];
+      let c = this.colors[ele];
       if (!c) return '';
       return c.辅色.join('、');
     },
 
     // 获取五行首饰字符串
     getJewelryStr: function(ele) {
-      var j = this.jewelry[ele];
+      let j = this.jewelry[ele];
       if (!j) return '';
       return j.join('·');
     },
 
     // 获取五行食物建议
     getFoodStr: function(ele) {
-      var f = this.foods[ele];
+      let f = this.foods[ele];
       if (!f) return '';
       return f.谷物.join('、') + ' | ' + f.蔬菜.join('、') + ' | ' + f.水果.join('、');
     },
@@ -132,11 +132,11 @@ if (typeof window !== 'undefined') {
 
     // 获取五行季节穿搭建议
     getSeasonalAdvice: function(ele, season) {
-      var colors = this.colors[ele];
+      let colors = this.colors[ele];
       if (!colors) return '';
-      var main = colors.主色[0] || '';
-      var aux = colors.辅色[0] || '';
-      var tip = '';
+      let main = colors.主色[0] || '';
+      let aux = colors.辅色[0] || '';
+      let tip = '';
       if (season === 'spring') tip = '春暖花开，宜浅色透气';
       else if (season === 'summer') tip = '夏日炎炎，宜轻薄明亮';
       else if (season === 'autumn') tip = '秋高气爽，宜温润柔和';
@@ -212,15 +212,15 @@ if (typeof module !== 'undefined' && module.exports) {
       相生: ['金生水','水生木','木生火','火生土','土生金'],
       相克: ['金克木','木克土','土克水','水克火','火克金']
     },
-    getColorStr: function(ele) { var c = this.colors[ele]; return c ? c.主色.join('/') : ''; },
-    getAuxColorStr: function(ele) { var c = this.colors[ele]; return c ? c.辅色.join('、') : ''; },
-    getJewelryStr: function(ele) { var j = this.jewelry[ele]; return j ? j.join('·') : ''; },
-    getFoodStr: function(ele) { var f = this.foods[ele]; return f ? f.谷物.join('、') + ' | ' + f.蔬菜.join('、') + ' | ' + f.水果.join('、') : ''; },
+    getColorStr: function(ele) { let c = this.colors[ele]; return c ? c.主色.join('/') : ''; },
+    getAuxColorStr: function(ele) { let c = this.colors[ele]; return c ? c.辅色.join('、') : ''; },
+    getJewelryStr: function(ele) { let j = this.jewelry[ele]; return j ? j.join('·') : ''; },
+    getFoodStr: function(ele) { let f = this.foods[ele]; return f ? f.谷物.join('、') + ' | ' + f.蔬菜.join('、') + ' | ' + f.水果.join('、') : ''; },
     getDirectionStr: function(ele) { return this.directions[ele] || ''; },
     getSeasonalAdvice: function(ele, season) {
-      var colors = this.colors[ele]; if (!colors) return '';
-      var main = colors.主色[0] || ''; var aux = colors.辅色[0] || '';
-      var tip = '';
+      let colors = this.colors[ele]; if (!colors) return '';
+      let main = colors.主色[0] || ''; let aux = colors.辅色[0] || '';
+      let tip = '';
       if (season === 'spring') tip = '春暖花开，宜浅色透气';
       else if (season === 'summer') tip = '夏日炎炎，宜轻薄明亮';
       else if (season === 'autumn') tip = '秋高气爽，宜温润柔和';

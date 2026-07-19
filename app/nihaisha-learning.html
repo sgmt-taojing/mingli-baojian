@@ -494,7 +494,7 @@ a{color:var(--gold2);text-decoration:none}
    structure, with expanded learning-oriented content)
    ════════════════════════════════════════════════════════════ */
 
-var KB = {
+let KB = {
   // ── 六经辨证 ──
   liujing: {
     taiyang: {
@@ -738,7 +738,7 @@ var KB = {
    ════════════════════════════════════════════════════════════ */
 
 // Load external KB if available
-var externalKB = null;
+let externalKB = null;
 try {
   if (typeof NIHAISHA_TCM_KB !== 'undefined') {
     externalKB = NIHAISHA_TCM_KB;
@@ -748,13 +748,13 @@ try {
 /* ── Navigation ── */
 function showSection(id) {
   document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
-  var el = document.getElementById('section-' + id);
+  let el = document.getElementById('section-' + id);
   if (el) el.classList.add('active');
   document.querySelectorAll('.sn-item').forEach(function(n){ n.classList.remove('active'); });
   // highlight sidebar
-  var items = document.querySelectorAll('.sn-item');
+  let items = document.querySelectorAll('.sn-item');
   items.forEach(function(it){
-    var onclick = it.getAttribute('onclick') || '';
+    let onclick = it.getAttribute('onclick') || '';
     if (onclick.indexOf(id) >= 0) it.classList.add('active');
   });
   window.scrollTo({top:0,behavior:'smooth'});
@@ -765,7 +765,7 @@ function goHome() {
 }
 
 function toggleMobileMenu() {
-  var m = document.getElementById('mobileMenu');
+  let m = document.getElementById('mobileMenu');
   if (m.classList.contains('hidden')) {
     m.classList.remove('hidden');
     m.style.display = 'block';
@@ -777,9 +777,9 @@ function toggleMobileMenu() {
 
 /* ── Six-Channel (六经) ── */
 function renderLiujing(key) {
-  var d = KB.liujing[key];
+  let d = KB.liujing[key];
   if (!d) return;
-  var fangHTML = d.fangzheng.map(function(f, i) {
+  let fangHTML = d.fangzheng.map(function(f, i) {
     return '<div class="panel"><h4>' + (i+1) + '. ' + f.name + '</h4>' +
       '<p><strong>证候：</strong>' + f.desc + '</p>' +
       '<p><strong>方剂：</strong><span class="text-gold">' + f.fang + '</span></p>' +
@@ -808,19 +808,19 @@ function switchLiujingTab(key, btn) {
 function filterLiujing(q) {
   q = (q || '').trim().toLowerCase();
   if (!q) {
-    var active = document.querySelector('#liujingTabs .tab-btn.active');
+    let active = document.querySelector('#liujingTabs .tab-btn.active');
     if (active) {
-      var key = active.getAttribute('onclick').match(/'([^']+)'/);
+      let key = active.getAttribute('onclick').match(/'([^']+)'/);
       if (key) renderLiujing(key[1]);
     }
     return;
   }
   // Search across all six channels
-  var results = '';
-  var found = false;
+  let results = '';
+  let found = false;
   Object.keys(KB.liujing).forEach(function(key) {
-    var d = KB.liujing[key];
-    var text = (d.name + d.summary + d.gang + d.chuanbian + d.jiaoji + d.mingli + d.fangzheng.map(function(f){ return f.name + f.desc + f.fang + f.theory; }).join('')).toLowerCase();
+    let d = KB.liujing[key];
+    let text = (d.name + d.summary + d.gang + d.chuanbian + d.jiaoji + d.mingli + d.fangzheng.map(function(f){ return f.name + f.desc + f.fang + f.theory; }).join('')).toLowerCase();
     if (text.indexOf(q) >= 0) {
       found = true;
       results += '<div class="result-item"><div class="ri-source">' + d.icon + ' ' + d.name + '</div>' +
@@ -838,41 +838,41 @@ function filterLiujing(q) {
 
 /* ── Fangzheng (方证) ── */
 function renderFangzhengChips() {
-  var cats = {};
+  let cats = {};
   KB.fangzheng.forEach(function(f) {
     cats[f.category] = true;
   });
-  var html = '<button class="chip active" onclick="filterFangzhengByCat(\'all\',this)">全部</button>';
+  let html = '<button class="chip active" onclick="filterFangzhengByCat(\'all\',this)">全部</button>';
   Object.keys(cats).forEach(function(c) {
     html += '<button class="chip" onclick="filterFangzhengByCat(\'' + c + '\',this)">' + c + '</button>';
   });
   document.getElementById('fangzhengChips').innerHTML = html;
 }
 
-var fzCurrentCat = 'all';
+let fzCurrentCat = 'all';
 
 function filterFangzhengByCat(cat, btn) {
   fzCurrentCat = cat;
   document.querySelectorAll('#fangzhengChips .chip').forEach(function(c){ c.classList.remove('active'); });
   if (btn) btn.classList.add('active');
-  var q = document.getElementById('fangzhengSearch').value;
+  let q = document.getElementById('fangzhengSearch').value;
   doFangzhengSearch(q);
 }
 
 function doFangzhengSearch(q) {
   q = (q || '').trim().toLowerCase();
-  var list = KB.fangzheng.filter(function(f) {
+  let list = KB.fangzheng.filter(function(f) {
     if (fzCurrentCat !== 'all' && f.category !== fzCurrentCat) return false;
     if (!q) return true;
-    var text = (f.name + f.category + f.liujing + f.zheng + f.theory + f.yangsheng + f.jiaoji).toLowerCase();
+    let text = (f.name + f.category + f.liujing + f.zheng + f.theory + f.yangsheng + f.jiaoji).toLowerCase();
     return text.indexOf(q) >= 0;
   });
   if (list.length === 0) {
     document.getElementById('fangzhengResults').innerHTML = '<div class="no-results">未找到相关方证</div>';
     return;
   }
-  var html = list.map(function(f) {
-    var isHighRisk = f.jiaoji.indexOf('高风险') >= 0 || f.jiaoji.indexOf('不能自行') >= 0 || f.jiaoji.indexOf('峻烈') >= 0;
+  let html = list.map(function(f) {
+    let isHighRisk = f.jiaoji.indexOf('高风险') >= 0 || f.jiaoji.indexOf('不能自行') >= 0 || f.jiaoji.indexOf('峻烈') >= 0;
     return '<div class="result-item">' +
       '<div class="ri-source">' + f.liujing + ' · ' + f.category + (isHighRisk ? ' · <span style="color:#e74c3c">⚠️ 高风险</span>' : '') + '</div>' +
       '<div class="ri-title">' + f.name + '</div>' +
@@ -894,7 +894,7 @@ function switchZhenjiuTab(key, btn) {
 
 function renderZhenjiu(key) {
   if (key === 'meridians') {
-    var rows = KB.zhenjiu.meridians.map(function(m) {
+    let rows = KB.zhenjiu.meridians.map(function(m) {
       return '<tr><td><strong>' + m.name + '</strong></td><td>' + m.time + '</td><td>' + m.points + '</td><td>' + m.zhuzhi + '</td></tr>';
     }).join('');
     document.getElementById('zhenjiu-content').innerHTML =
@@ -902,7 +902,7 @@ function renderZhenjiu(key) {
       '<div style="overflow-x:auto"><table class="data-table"><thead><tr><th>经络</th><th>当令时辰</th><th>主要穴位</th><th>主治</th></tr></thead><tbody>' +
       rows + '</tbody></table></div></div>';
   } else if (key === 'points') {
-    var cards = KB.zhenjiu.points.map(function(p) {
+    let cards = KB.zhenjiu.points.map(function(p) {
       return '<div class="panel"><h4>' + p.name + '</h4>' +
         '<p><strong>经络：</strong>' + p.meridian + '</p>' +
         '<p><strong>定位：</strong>' + p.location + '</p>' +
@@ -912,7 +912,7 @@ function renderZhenjiu(key) {
     }).join('');
     document.getElementById('zhenjiu-content').innerHTML = '<div class="panel"><h3>🪡 常用穴位表</h3></div>' + cards;
   } else if (key === 'ziwu') {
-    var rows2 = KB.zhenjiu.ziwu.map(function(z) {
+    let rows2 = KB.zhenjiu.ziwu.map(function(z) {
       return '<tr><td><strong>' + z.time + '</strong></td><td>' + z.meridian + '</td><td>' + z.tip + '</td></tr>';
     }).join('');
     document.getElementById('zhenjiu-content').innerHTML =
@@ -926,7 +926,7 @@ function renderZhenjiu(key) {
       '<li><strong>五脏逼毒法：</strong>发特定声音排出脏腑毒素（咝-肺、呵-心、呼-脾、嘘-肝、吹-肾）</li>' +
       '</ul></div>';
   } else if (key === 'wushu') {
-    var rows3 = KB.zhenjiu.wushu.map(function(w) {
+    let rows3 = KB.zhenjiu.wushu.map(function(w) {
       return '<tr><td><strong>' + w.name + '</strong></td><td>' + w.location + '</td><td>' + w.zhuzhi + '</td><td>' + w.example + '</td></tr>';
     }).join('');
     document.getElementById('zhenjiu-content').innerHTML =
@@ -941,32 +941,32 @@ function renderZhenjiu(key) {
 function doZhenjiuSearch(q) {
   q = (q || '').trim().toLowerCase();
   if (!q) {
-    var active = document.querySelector('#zhenjiuTabs .tab-btn.active');
+    let active = document.querySelector('#zhenjiuTabs .tab-btn.active');
     if (active) {
-      var match = active.getAttribute('onclick').match(/'([^']+)'/);
+      let match = active.getAttribute('onclick').match(/'([^']+)'/);
       if (match) renderZhenjiu(match[1]);
     }
     return;
   }
   // Search across all zhenjiu data
-  var results = '';
-  var found = false;
+  let results = '';
+  let found = false;
   KB.zhenjiu.meridians.forEach(function(m) {
-    var text = (m.name + m.time + m.points + m.zhuzhi).toLowerCase();
+    let text = (m.name + m.time + m.points + m.zhuzhi).toLowerCase();
     if (text.indexOf(q) >= 0) {
       found = true;
       results += '<div class="result-item"><div class="ri-source">🧭 经络</div><div class="ri-title">' + m.name + '（' + m.time + '）</div><div class="ri-desc">穴位：' + m.points + '</div><div class="ri-desc">主治：' + m.zhuzhi + '</div></div>';
     }
   });
   KB.zhenjiu.points.forEach(function(p) {
-    var text = (p.name + p.meridian + p.location + p.zhuzhi + p.peixue + p.note).toLowerCase();
+    let text = (p.name + p.meridian + p.location + p.zhuzhi + p.peixue + p.note).toLowerCase();
     if (text.indexOf(q) >= 0) {
       found = true;
       results += '<div class="result-item"><div class="ri-source">🪡 穴位</div><div class="ri-title">' + p.name + '（' + p.meridian + '）</div><div class="ri-desc">定位：' + p.location + '</div><div class="ri-desc">主治：' + p.zhuzhi + '</div><div class="ri-desc">配穴：' + p.peixue + '</div></div>';
     }
   });
   KB.zhenjiu.ziwu.forEach(function(z) {
-    var text = (z.time + z.meridian + z.tip).toLowerCase();
+    let text = (z.time + z.meridian + z.tip).toLowerCase();
     if (text.indexOf(q) >= 0) {
       found = true;
       results += '<div class="result-item"><div class="ri-source">🕐 子午流注</div><div class="ri-title">' + z.time + ' · ' + z.meridian + '</div><div class="ri-desc">' + z.tip + '</div></div>';
@@ -986,19 +986,19 @@ function setBeginnerInput(text) {
 }
 
 function doBeginnerSearch() {
-  var input = document.getElementById('beginnerInput').value.trim();
-  var output = document.getElementById('beginnerOutput');
+  let input = document.getElementById('beginnerInput').value.trim();
+  let output = document.getElementById('beginnerOutput');
   if (!input) {
     output.innerHTML = '';
     return;
   }
 
   // Find matching beginner map entry
-  var match = null;
-  var inputLower = input.toLowerCase();
-  for (var i = 0; i < KB.beginnerMap.length; i++) {
-    var entry = KB.beginnerMap[i];
-    for (var j = 0; j < entry.keywords.length; j++) {
+  let match = null;
+  let inputLower = input.toLowerCase();
+  for (let i = 0; i < KB.beginnerMap.length; i++) {
+    let entry = KB.beginnerMap[i];
+    for (let j = 0; j < entry.keywords.length; j++) {
       if (inputLower.indexOf(entry.keywords[j]) >= 0) {
         match = entry;
         break;
@@ -1021,7 +1021,7 @@ function doBeginnerSearch() {
     return;
   }
 
-  var wsHTML = match.watersheds.map(function(w) {
+  let wsHTML = match.watersheds.map(function(w) {
     return '<div class="qa-ws-item">' +
       '<div class="ws-q">' + w.q + '</div>' +
       '<div class="ws-a">' + w.a + '</div>' +
@@ -1029,7 +1029,7 @@ function doBeginnerSearch() {
       '</div>';
   }).join('');
 
-  var fzHTML = match.fangzheng.map(function(f) {
+  let fzHTML = match.fangzheng.map(function(f) {
     return '<span class="card-tag" style="cursor:pointer" onclick="showSection(\'fangzheng\');document.getElementById(\'fangzhengSearch\').value=\'' + f + '\';doFangzhengSearch(\'' + f + '\')">' + f + '</span>';
   }).join('');
 
@@ -1050,8 +1050,8 @@ function doBeginnerSearch() {
 
 /* ── Course Map ── */
 function renderCourseMap() {
-  var html = KB.courses.map(function(c) {
-    var tags = c.tags.map(function(t) { return '<span class="card-tag">' + t + '</span>'; }).join('');
+  let html = KB.courses.map(function(c) {
+    let tags = c.tags.map(function(t) { return '<span class="card-tag">' + t + '</span>'; }).join('');
     return '<div class="course-item" onclick="showSection(\'search\');document.getElementById(\'globalSearch\').value=\'' + c.title + '\';doGlobalSearch()">' +
       '<div class="ci-num">' + c.num + '</div>' +
       '<div class="ci-title">' + c.title + '</div>' +
@@ -1063,7 +1063,7 @@ function renderCourseMap() {
 }
 
 /* ── Global Search ── */
-var gsFilter = 'all';
+let gsFilter = 'all';
 
 function setGlobalFilter(f, btn) {
   gsFilter = f;
@@ -1073,19 +1073,19 @@ function setGlobalFilter(f, btn) {
 }
 
 function doGlobalSearch() {
-  var q = document.getElementById('globalSearch').value.trim().toLowerCase();
+  let q = document.getElementById('globalSearch').value.trim().toLowerCase();
   if (!q) {
     document.getElementById('globalSearchResults').innerHTML = '<div class="no-results">请输入搜索关键词</div>';
     return;
   }
-  var results = [];
-  var found = false;
+  let results = [];
+  let found = false;
 
   // Search 六经
   if (gsFilter === 'all' || gsFilter === 'liujing') {
     Object.keys(KB.liujing).forEach(function(key) {
-      var d = KB.liujing[key];
-      var text = (d.name + d.summary + d.gang + d.chuanbian + d.jiaoji + d.mingli + d.fangzheng.map(function(f){ return f.name + f.desc + f.fang + f.theory; }).join('')).toLowerCase();
+      let d = KB.liujing[key];
+      let text = (d.name + d.summary + d.gang + d.chuanbian + d.jiaoji + d.mingli + d.fangzheng.map(function(f){ return f.name + f.desc + f.fang + f.theory; }).join('')).toLowerCase();
       if (text.indexOf(q) >= 0) {
         found = true;
         results.push({ source:'☯️ 六经辨证', title:d.name + ' — ' + d.gang, desc:d.summary, tags:['六经：' + d.name] });
@@ -1096,7 +1096,7 @@ function doGlobalSearch() {
   // Search 方证
   if (gsFilter === 'all' || gsFilter === 'fangzheng') {
     KB.fangzheng.forEach(function(f) {
-      var text = (f.name + f.category + f.liujing + f.zheng + f.theory + f.yangsheng + f.jiaoji).toLowerCase();
+      let text = (f.name + f.category + f.liujing + f.zheng + f.theory + f.yangsheng + f.jiaoji).toLowerCase();
       if (text.indexOf(q) >= 0) {
         found = true;
         results.push({ source:'📜 方证检索', title:f.name + '（' + f.liujing + '·' + f.category + '）', desc:f.zheng, tags:['方剂：' + f.name] });
@@ -1107,14 +1107,14 @@ function doGlobalSearch() {
   // Search 针灸
   if (gsFilter === 'all' || gsFilter === 'zhenjiu') {
     KB.zhenjiu.meridians.forEach(function(m) {
-      var text = (m.name + m.time + m.points + m.zhuzhi).toLowerCase();
+      let text = (m.name + m.time + m.points + m.zhuzhi).toLowerCase();
       if (text.indexOf(q) >= 0) {
         found = true;
         results.push({ source:'🧭 针灸·经络', title:m.name + '（' + m.time + '）', desc:'穴位：' + m.points + '；主治：' + m.zhuzhi, tags:['经络'] });
       }
     });
     KB.zhenjiu.points.forEach(function(p) {
-      var text = (p.name + p.meridian + p.location + p.zhuzhi + p.peixue + p.note).toLowerCase();
+      let text = (p.name + p.meridian + p.location + p.zhuzhi + p.peixue + p.note).toLowerCase();
       if (text.indexOf(q) >= 0) {
         found = true;
         results.push({ source:'🪡 针灸·穴位', title:p.name + '（' + p.meridian + '）', desc:'定位：' + p.location + '；主治：' + p.zhuzhi, tags:['穴位：' + p.name] });
@@ -1125,7 +1125,7 @@ function doGlobalSearch() {
   // Search 课程
   if (gsFilter === 'all' || gsFilter === 'course') {
     KB.courses.forEach(function(c) {
-      var text = (c.num + c.title + c.desc + c.tags.join('')).toLowerCase();
+      let text = (c.num + c.title + c.desc + c.tags.join('')).toLowerCase();
       if (text.indexOf(q) >= 0) {
         found = true;
         results.push({ source:'🗺️ 课程地图', title:c.num + ' · ' + c.title, desc:c.desc, tags: c.tags.map(function(t){ return '课程：' + t; }) });
@@ -1138,8 +1138,8 @@ function doGlobalSearch() {
     return;
   }
 
-  var html = results.map(function(r) {
-    var tags = (r.tags || []).map(function(t) { return '<span>' + t + '</span>'; }).join('');
+  let html = results.map(function(r) {
+    let tags = (r.tags || []).map(function(t) { return '<span>' + t + '</span>'; }).join('');
     return '<div class="result-item">' +
       '<div class="ri-source">' + r.source + '</div>' +
       '<div class="ri-title">' + r.title + '</div>' +
@@ -1152,7 +1152,7 @@ function doGlobalSearch() {
 
 /* ── Back to top ── */
 window.addEventListener('scroll', function() {
-  var bt = document.getElementById('backTop');
+  let bt = document.getElementById('backTop');
   if (window.scrollY > 300) bt.classList.add('show');
   else bt.classList.remove('show');
 });

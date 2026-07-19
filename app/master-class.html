@@ -102,13 +102,13 @@ video,audio{max-width:100%;max-height:70vh}
 
 <script>
 function toggleMaster(id){
-  var el=document.getElementById('lessons-'+id);
+  let el=document.getElementById('lessons-'+id);
   el.style.display=el.style.display==='block'?'none':'block';
 }
 function playLesson(master,title,type,url){
-  var box=document.getElementById('playerBox');
-  var content=document.getElementById('playerContent');
-  var titleEl=document.getElementById('playerTitle');
+  let box=document.getElementById('playerBox');
+  let content=document.getElementById('playerContent');
+  let titleEl=document.getElementById('playerTitle');
   titleEl.textContent=title;
   if(type==='video'&&url){
     content.innerHTML='<video src="'+url+'" controls autoplay style="width:100%"></video>';
@@ -122,13 +122,13 @@ function playLesson(master,title,type,url){
   box.classList.add('show');
 }
 function closePlayer(){
-  var box=document.getElementById('playerBox');
+  let box=document.getElementById('playerBox');
   box.classList.remove('show');
   document.getElementById('playerContent').innerHTML='';
 }
 
 // 课程数据将动态加载
-var MASTER_LESSONS={
+let MASTER_LESSONS={
   shuhan:[],
   nihaisha:[]
 };
@@ -141,16 +141,16 @@ function addLesson(master,lesson){
 }
 
 function renderLessons(master){
-  var list=document.getElementById('lessons-'+master);
-  var lessons=MASTER_LESSONS[master]||[];
+  let list=document.getElementById('lessons-'+master);
+  let lessons=MASTER_LESSONS[master]||[];
   if(lessons.length===0){
     list.innerHTML='<div class="lesson-item"><div class="lesson-title">📚 课程准备中</div><div class="lesson-meta">资料整理中</div></div>';
     return;
   }
-  var html='';
+  let html='';
   lessons.forEach(function(l,i){
-    var typeClass=l.type==='video'?'type-video':l.type==='audio'?'type-audio':'type-text';
-    var typeLabel=l.type==='video'?'视频':l.type==='audio'?'音频':'文字';
+    let typeClass=l.type==='video'?'type-video':l.type==='audio'?'type-audio':'type-text';
+    let typeLabel=l.type==='video'?'视频':l.type==='audio'?'音频':'文字';
     html+='<div class="lesson-item" onclick="playLesson(\''+master+'\',\''+l.title.replace(/'/g,"\\'")+'\',\''+l.type+'\',\''+(l.url||'')+'\')">';
     html+='<div class="lesson-title">'+(i+1)+'. '+l.title+'</div>';
     html+='<div class="lesson-meta"><span class="lesson-type '+typeClass+'">'+typeLabel+'</span>'+(l.duration||'')+' · '+(l.category||'')+'</div>';
@@ -162,7 +162,7 @@ function renderLessons(master){
 
 // 学习进度记录
 function saveProgress(master, lessonIdx) {
-  var progress = JSON.parse(localStorage.getItem('masterClassProgress') || '{}');
+  let progress = JSON.parse(localStorage.getItem('masterClassProgress') || '{}');
   progress[master + '_' + lessonIdx] = { date: new Date().toISOString(), completed: true };
   localStorage.setItem('masterClassProgress', JSON.stringify(progress));
   showToast('✅ 学习进度已记录');
@@ -170,9 +170,9 @@ function saveProgress(master, lessonIdx) {
 
 // 获取学习进度
 function getProgress(master) {
-  var progress = JSON.parse(localStorage.getItem('masterClassProgress') || '{}');
-  var count = 0;
-  for (var k in progress) {
+  let progress = JSON.parse(localStorage.getItem('masterClassProgress') || '{}');
+  let count = 0;
+  for (let k in progress) {
     if (k.startsWith(master + '_')) count++;
   }
   return count;
@@ -181,7 +181,7 @@ function getProgress(master) {
 // 搜索课程
 function searchLessons(keyword) {
   if (!keyword) { renderAllLessons(); return; }
-  var results = [];
+  let results = [];
   ['shuhan','nihaisha'].forEach(function(master) {
     (MASTER_LESSONS[master]||[]).forEach(function(l, i) {
       if (l.title.indexOf(keyword) >= 0 || (l.summary||'').indexOf(keyword) >= 0 || (l.category||'').indexOf(keyword) >= 0) {
@@ -189,16 +189,16 @@ function searchLessons(keyword) {
       }
     });
   });
-  var list = document.getElementById('searchResults');
+  let list = document.getElementById('searchResults');
   if (!list) return;
   if (results.length === 0) {
     list.innerHTML = '<div style="text-align:center;color:var(--paper3);padding:20px">未找到相关课程</div>';
   } else {
-    var html = '';
+    let html = '';
     results.forEach(function(r) {
-      var masterName = r.master === 'shuhan' ? '舒晗老师' : '倪海厦老师';
-      var typeClass = r.lesson.type === 'video' ? 'type-video' : r.lesson.type === 'audio' ? 'type-audio' : 'type-text';
-      var typeLabel = r.lesson.type === 'video' ? '视频' : r.lesson.type === 'audio' ? '音频' : '文字';
+      let masterName = r.master === 'shuhan' ? '舒晗老师' : '倪海厦老师';
+      let typeClass = r.lesson.type === 'video' ? 'type-video' : r.lesson.type === 'audio' ? 'type-audio' : 'type-text';
+      let typeLabel = r.lesson.type === 'video' ? '视频' : r.lesson.type === 'audio' ? '音频' : '文字';
       html += '<div class="lesson-item" onclick="playLesson(''+r.master+'',''+r.lesson.title.replace(/'/g,"\'")+'',''+r.lesson.type+'',''+(r.lesson.url||'')+'')">';
       html += '<div class="lesson-title">' + masterName + '：' + r.lesson.title + '</div>';
       html += '<div class="lesson-meta"><span class="lesson-type '+typeClass+'">'+typeLabel+'</span>' + (r.lesson.category||'') + '</div>';
@@ -209,7 +209,7 @@ function searchLessons(keyword) {
 }
 
 function renderAllLessons() {
-  var list = document.getElementById('searchResults');
+  let list = document.getElementById('searchResults');
   if (list) list.innerHTML = '';
   ['shuhan','nihaisha'].forEach(function(m) { renderLessons(m); });
 }
@@ -217,8 +217,8 @@ function renderAllLessons() {
 // 知识要点提取（从文字课程中提取要点）
 function extractKeyPoints(text) {
   if (!text) return [];
-  var points = [];
-  var lines = text.split('\n');
+  let points = [];
+  let lines = text.split('\n');
   lines.forEach(function(line) {
     if (line.match(/^[0-9]+[.、）/]/) || line.match(/^[①②③④⑤⑥⑦⑧⑨⑩]/)) {
       points.push(line.trim());
@@ -232,19 +232,19 @@ function extractKeyPoints(text) {
 
 // 笔记功能
 function saveNote(master, lessonTitle, note) {
-  var notes = JSON.parse(localStorage.getItem('masterClassNotes') || '{}');
+  let notes = JSON.parse(localStorage.getItem('masterClassNotes') || '{}');
   notes[master + '_' + lessonTitle] = { note: note, date: new Date().toISOString() };
   localStorage.setItem('masterClassNotes', JSON.stringify(notes));
 }
 
 function getNote(master, lessonTitle) {
-  var notes = JSON.parse(localStorage.getItem('masterClassNotes') || '{}');
+  let notes = JSON.parse(localStorage.getItem('masterClassNotes') || '{}');
   return notes[master + '_' + lessonTitle] || null;
 }
 
 // 显示Toast
 function showToast(msg) {
-  var t = document.createElement('div');
+  let t = document.createElement('div');
   t.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:var(--gold2);padding:10px 20px;border-radius:20px;z-index:10000;font-size:13px';
   t.textContent = msg;
   document.body.appendChild(t);
@@ -253,9 +253,9 @@ function showToast(msg) {
 
 // 统计学习数据
 function getStudyStats() {
-  var progress = JSON.parse(localStorage.getItem('masterClassProgress') || '{}');
-  var notes = JSON.parse(localStorage.getItem('masterClassNotes') || '{}');
-  var totalLessons = 0;
+  let progress = JSON.parse(localStorage.getItem('masterClassProgress') || '{}');
+  let notes = JSON.parse(localStorage.getItem('masterClassNotes') || '{}');
+  let totalLessons = 0;
   ['shuhan','nihaisha'].forEach(function(m) { totalLessons += (MASTER_LESSONS[m]||[]).length; });
   return {
     totalLessons: totalLessons,

@@ -7,7 +7,7 @@
 (function() {
   // 注入 CSS（防止重复）
   if (document.getElementById('kb-missing-css')) return;
-  var style = document.createElement('style');
+  let style = document.createElement('style');
   style.id = 'kb-missing-css';
   style.textContent = `
     .kb-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin:16px 0}
@@ -1390,14 +1390,14 @@
   // 创建缺失的 KB section DOM 节点
   // ============================================================
   function initMissingSections() {
-    var container = document.querySelector('.container');
+    let container = document.querySelector('.container');
     if (!container) return;
 
-    var sections = ['shengxiao', 'constellation', 'jiazi', 'jieqi', 'zhouyi'];
+    let sections = ['shengxiao', 'constellation', 'jiazi', 'jieqi', 'zhouyi'];
     sections.forEach(function(id) {
-      var existing = document.getElementById('kb-' + id);
+      let existing = document.getElementById('kb-' + id);
       if (!existing) {
-        var sec = document.createElement('div');
+        let sec = document.createElement('div');
         sec.className = 'kb-section';
         sec.id = 'kb-' + id;
         container.appendChild(sec);

@@ -615,14 +615,14 @@ footer a{color:var(--gold2);margin:0 .5rem}
 if(typeof FAITH_GUIDE!=='undefined'){
   if(typeof FAITH_KNOWLEDGE==='undefined')window.FAITH_KNOWLEDGE={};
   else window.FAITH_KNOWLEDGE=FAITH_KNOWLEDGE;
-  var fg=FAITH_GUIDE;
+  let fg=FAITH_GUIDE;
   // Convert dailyPractice format: {buddhist:{morning:{title,steps},...}} → {buddhist:{schedule:[{period,practice,intention,method}]}}
-  var dpMap={buddhist:'buddhist',taoist:'taoist',confucian:'confucian'};
-  var dpAdmin={};
+  let dpMap={buddhist:'buddhist',taoist:'taoist',confucian:'confucian'};
+  let dpAdmin={};
   Object.keys(dpMap).forEach(function(k){
-    var src=fg.dailyPractice[k];
+    let src=fg.dailyPractice[k];
     if(src){
-      var schedule=[];
+      let schedule=[];
       ['morning','noon','evening'].forEach(function(t){
         if(src[t]){
           schedule.push({period:src[t].title,practice:src[t].steps.join('；'),intention:'修身养性',method:src[t].steps.slice(0,2).join('；')});
@@ -638,7 +638,7 @@ if(typeof FAITH_GUIDE!=='undefined'){
   window.FAITH_KNOWLEDGE.dailyPractices=dpAdmin;
   // Merge other guide data with correct field names for admin
   // worshipManual → also merge into worshipGuide for detailed per-faith data
-  var wm=fg.worshipManual||{};
+  let wm=fg.worshipManual||{};
   if(!window.FAITH_KNOWLEDGE.worshipGuide)window.FAITH_KNOWLEDGE.worshipGuide={};
   // Add detailed worship manual as worshipManual
   window.FAITH_KNOWLEDGE.worshipManual=wm;
@@ -646,7 +646,7 @@ if(typeof FAITH_GUIDE!=='undefined'){
   if(window.FAITH_KNOWLEDGE.worshipGuide.specificGuidance){
     Object.keys(wm).forEach(function(k){
       if(wm[k]&&wm[k].procedure){
-        var sg=window.FAITH_KNOWLEDGE.worshipGuide.specificGuidance;
+        let sg=window.FAITH_KNOWLEDGE.worshipGuide.specificGuidance;
         sg[k]=(sg[k]||'')+(sg[k]?'\n':'')+wm[k].title+'：'+wm[k].procedure.join('→');
       }
     });
@@ -654,8 +654,8 @@ if(typeof FAITH_GUIDE!=='undefined'){
   window.FAITH_KNOWLEDGE.shichenGuide=fg.shichenGuide;
   window.FAITH_KNOWLEDGE.jieqiGuide=fg.jieqiGuide;
   // Convert scriptureGuide: {buddhist:[{name,level,...}]} → {buddhist:[{name,source, intro,...}]}
-  var sg=fg.scriptureGuide||{};
-  var sgAdmin={};
+  let sg=fg.scriptureGuide||{};
+  let sgAdmin={};
   Object.keys(sg).forEach(function(k){
     if(Array.isArray(sg[k])){
       sgAdmin[k]=sg[k].map(function(s){return{name:s.name,source:s.level+'·'+s.duration,intro:s.benefit,text:s.method,usage:s.benefit,merit:s.benefit}});
@@ -663,11 +663,11 @@ if(typeof FAITH_GUIDE!=='undefined'){
   });
   window.FAITH_KNOWLEDGE.scriptures=sgAdmin;
   // Convert tabooReminders: {buddhist:[{category,items:[]}]} → {buddhist:{title,items:[{taboo,reason,severity}]}}
-  var tr=fg.tabooReminders||{};
-  var trAdmin={};
+  let tr=fg.tabooReminders||{};
+  let trAdmin={};
   Object.keys(tr).forEach(function(k){
     if(Array.isArray(tr[k])){
-      var items=[];
+      let items=[];
       tr[k].forEach(function(cat){
         if(cat.items&&Array.isArray(cat.items)){
           cat.items.forEach(function(it){items.push({taboo:typeof it==='string'?it:it.taboo||it,reason:typeof it==='string'?cat.category:it.reason||it.detail||'',severity:'中'})});
@@ -1733,7 +1733,7 @@ function filterFeedback(){
 
 function renderFeedbackAdmin(statusFilter,typeFilter,targetFilter){
   // 从各用户数据中汇总反馈
-  var allFb=[];
+  let allFb=[];
 
   // 1. 从admin events中获取
   const admin=JSON.parse(localStorage.getItem('mlbj_admin')||'{}');
@@ -1817,11 +1817,11 @@ function verifyCorrectFeedback(fid){
 
 function renderFbStats(){
   // 从当前反馈数据统计
-  var allFb=getAllFeedbackData();
-  var total=allFb.length;
-  var adopted=allFb.filter(f=>f.status==='adopted').length;
-  var pending=allFb.filter(f=>f.status==='pending').length;
-  var totalPoints=allFb.reduce(function(s,f){return s+(f.points||0)+(f.streakBonus||0);},0);
+  let allFb=getAllFeedbackData();
+  let total=allFb.length;
+  let adopted=allFb.filter(f=>f.status==='adopted').length;
+  let pending=allFb.filter(f=>f.status==='pending').length;
+  let totalPoints=allFb.reduce(function(s,f){return s+(f.points||0)+(f.streakBonus||0);},0);
 
   document.getElementById('fbStatTotal').textContent=total;
   document.getElementById('fbStatAdoption').textContent=(total>0?Math.round(adopted/total*100):0)+'%';
@@ -1830,26 +1830,26 @@ function renderFbStats(){
 }
 
 function renderFbTopIssues(){
-  var allFb=getAllFeedbackData();
-  var targetCounts={};
+  let allFb=getAllFeedbackData();
+  let targetCounts={};
   allFb.forEach(function(f){
-    var key=f.targetLabel||f.target||'其他';
+    let key=f.targetLabel||f.target||'其他';
     if(!targetCounts[key])targetCounts[key]={count:0,like:0,dislike:0,suggest:0,correct:0,samples:[]};
     targetCounts[key].count++;
     if(targetCounts[key][f.type]!==undefined)targetCounts[key][f.type]++;
     if(targetCounts[key].samples.length<2)targetCounts[key].samples.push(f.content.substring(0,40));
   });
 
-  var sorted=Object.keys(targetCounts)
+  let sorted=Object.keys(targetCounts)
     .map(function(k){return{target:k,data:targetCounts[k]};})
     .sort(function(a,b){return b.data.count-a.data.count;})
     .slice(0,5);
 
-  var el=document.getElementById('fbTopIssues');
+  let el=document.getElementById('fbTopIssues');
   if(!el)return;
   if(sorted.length===0){el.innerHTML='<div class="meta">暂无数据</div>';return}
   el.innerHTML=sorted.map(function(item){
-    var d=item.data;
+    let d=item.data;
     return '<div style="display:flex;justify-content:space-between;align-items:center;padding:.6rem;border-bottom:1px solid var(--ink3)">'+
       '<div><b style="color:var(--gold2)">'+item.target+'</b> <span style="font-size:.75rem;color:var(--gray-light)">('+d.count+'条)</span>'+
       '<br><span style="font-size:.7rem;color:var(--gray-light)">👍'+d.like+' 👎'+d.dislike+' 💡'+d.suggest+' 🔧'+d.correct+'</span></div>'+
@@ -1860,37 +1860,37 @@ function renderFbTopIssues(){
 
 function renderFbModuleWeights(){
   // 根据反馈数据展示模块权重建议
-  var allFb=getAllFeedbackData();
-  var weights={daily_push:1.0,bazi:1.0,qimen:1.0,other:1.0};
-  var counts={};
+  let allFb=getAllFeedbackData();
+  let weights={daily_push:1.0,bazi:1.0,qimen:1.0,other:1.0};
+  let counts={};
 
   allFb.forEach(function(f){
-    var key=f.target||'other';
+    let key=f.target||'other';
     if(!counts[key])counts[key]={like:0,dislike:0,suggest:0,correct:0};
     if(counts[key][f.type]!==undefined)counts[key][f.type]++;
   });
 
   Object.keys(counts).forEach(function(key){
-    var c=counts[key];
-    var adjust=c.like*0.05+c.suggest*0.03-c.dislike*0.08-c.correct*0.02;
+    let c=counts[key];
+    let adjust=c.like*0.05+c.suggest*0.03-c.dislike*0.08-c.correct*0.02;
     weights[key]=Math.max(0.5,Math.min(1.5,1.0+adjust));
   });
 
-  var labels={daily_push:'今日推送',bazi:'八字排盘',qimen:'奇门排盘',other:'其他功能'};
-  var suggestions={
+  let labels={daily_push:'今日推送',bazi:'八字排盘',qimen:'奇门排盘',other:'其他功能'};
+  let suggestions={
     daily_push:'根据点赞/点踩比例调整推送频率和内容',
     bazi:'根据反馈优化排盘算法和解读文案',
     qimen:'根据反馈优化排盘算法和解读文案',
     other:'关注用户其他功能需求'
   };
 
-  var el=document.getElementById('fbModuleWeights');
+  let el=document.getElementById('fbModuleWeights');
   if(!el)return;
   el.innerHTML=Object.keys(weights).map(function(key){
-    var w=weights[key];
-    var pct=Math.round(w*100);
-    var barColor=w>1.0?'var(--jade)':w<1.0?'var(--cinn2)':'var(--gold3)';
-    var action=w>1.1?'↑ 建议优先推送':w<0.9?'↓ 建议减少频率':'→ 维持现状';
+    let w=weights[key];
+    let pct=Math.round(w*100);
+    let barColor=w>1.0?'var(--jade)':w<1.0?'var(--cinn2)':'var(--gold3)';
+    let action=w>1.1?'↑ 建议优先推送':w<0.9?'↓ 建议减少频率':'→ 维持现状';
     return '<div style="display:flex;align-items:center;gap:.8rem;padding:.5rem 0;border-bottom:1px solid var(--ink3)">'+
       '<div style="min-width:80px;font-size:.85rem;color:var(--paper2)">'+labels[key]+'</div>'+
       '<div style="flex:1"><div style="width:100%;height:10px;background:var(--ink);border-radius:5px;overflow:hidden">'+
@@ -1902,12 +1902,12 @@ function renderFbModuleWeights(){
 }
 
 function renderFbPointsLog(){
-  var allFb=getAllFeedbackData();
-  var log=allFb.filter(f=>f.points>0).sort(function(a,b){
+  let allFb=getAllFeedbackData();
+  let log=allFb.filter(f=>f.points>0).sort(function(a,b){
     return new Date(b.time)-new Date(a.time);
   }).slice(0,20);
 
-  var el=document.getElementById('fbPointsLogBody');
+  let el=document.getElementById('fbPointsLogBody');
   if(!el)return;
   el.innerHTML=log.length===0?
     '<tr><td colspan="6" style="text-align:center;color:var(--gray-light)">暂无积分记录</td></tr>':
@@ -1925,7 +1925,7 @@ function renderFbPointsLog(){
 
 function getAllFeedbackData(){
   // 汇总所有反馈数据
-  var allFb=[];
+  let allFb=[];
   const admin=JSON.parse(localStorage.getItem('mlbj_admin')||'{}');
   const events=admin.events||[];
   events.filter(e=>e.type==='feedback').forEach(f=>{
@@ -2013,7 +2013,7 @@ function loadStats(){
 }
 
 function renderGzhPanel(){
-  var el=document.getElementById('gzhManagePanel');
+  let el=document.getElementById('gzhManagePanel');
   if(!el||typeof renderGzhManagePanel!=='function')return;
   el.innerHTML=renderGzhManagePanel();
 }

@@ -1,0 +1,251 @@
+/* cart.wxss */
+.page {
+  min-height: 100vh;
+  background: #1a1a2e;
+  padding-bottom: 140rpx;
+  box-sizing: border-box;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 280rpx;
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  color: #e6c86e;
+  opacity: 0.3;
+  margin-bottom: 30rpx;
+}
+
+.empty-text {
+  font-size: 36rpx;
+  color: #e6c86e;
+  margin-bottom: 16rpx;
+}
+
+.empty-sub {
+  font-size: 28rpx;
+  color: #94a3b8;
+  margin-bottom: 50rpx;
+}
+
+.empty-btn {
+  background: linear-gradient(135deg, #e6c86e, #d4af37);
+  color: #1a1a2e;
+  border: none;
+  border-radius: 40rpx;
+  padding: 20rpx 80rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.empty-btn::after {
+  border: none;
+}
+
+/* 购物车列表 */
+.cart-list {
+  padding: 20rpx;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  background: #16213e;
+  border-radius: 20rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  position: relative;
+}
+
+/* 复选框 */
+.checkbox-wrap {
+  padding: 10rpx;
+  flex-shrink: 0;
+}
+
+.checkbox {
+  width: 40rpx;
+  height: 40rpx;
+  border: 3rpx solid #94a3b8;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.checkbox.checked {
+  background: #e6c86e;
+  border-color: #e6c86e;
+}
+
+.check-icon {
+  color: #1a1a2e;
+  font-size: 24rpx;
+  font-weight: bold;
+}
+
+/* 商品图片 */
+.item-cover {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 12rpx;
+  overflow: hidden;
+  margin: 0 20rpx;
+  flex-shrink: 0;
+  background: #0f1629;
+}
+
+.cover-img {
+  width: 100%;
+  height: 100%;
+}
+
+/* 商品信息 */
+.item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 140rpx;
+  padding-right: 60rpx;
+}
+
+.item-title {
+  font-size: 28rpx;
+  color: #ffffff;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.item-price {
+  font-size: 34rpx;
+  color: #e6c86e;
+  font-weight: 600;
+}
+
+/* 数量控制 */
+.qty-control {
+  display: flex;
+  align-items: center;
+  align-self: flex-end;
+}
+
+.qty-btn {
+  width: 52rpx;
+  height: 52rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0f1629;
+  border-radius: 8rpx;
+}
+
+.qty-btn.plus {
+  margin-left: 4rpx;
+}
+
+.qty-btn.minus {
+  margin-right: 4rpx;
+}
+
+.qty-btn-text {
+  color: #e6c86e;
+  font-size: 36rpx;
+  line-height: 1;
+}
+
+.qty-num {
+  min-width: 64rpx;
+  text-align: center;
+  color: #ffffff;
+  font-size: 28rpx;
+  background: #0f1629;
+  height: 52rpx;
+  line-height: 52rpx;
+  border-radius: 8rpx;
+}
+
+/* 删除按钮 */
+.delete-btn {
+  position: absolute;
+  top: 20rpx;
+  right: 20rpx;
+  width: 44rpx;
+  height: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-icon {
+  color: #94a3b8;
+  font-size: 40rpx;
+  line-height: 1;
+}
+
+/* 底部结算栏 */
+.checkout-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 110rpx;
+  background: #16213e;
+  display: flex;
+  align-items: center;
+  padding: 0 24rpx;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.3);
+  z-index: 100;
+  box-sizing: border-box;
+}
+
+.select-all {
+  display: flex;
+  align-items: center;
+  padding: 10rpx;
+}
+
+.select-all-text {
+  color: #94a3b8;
+  font-size: 28rpx;
+  margin-left: 12rpx;
+}
+
+.total-info {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-right: 20rpx;
+}
+
+.total-label {
+  color: #94a3b8;
+  font-size: 28rpx;
+}
+
+.total-amount {
+  color: #e6c86e;
+  font-size: 40rpx;
+  font-weight: 700;
+}
+
+.checkout-btn {
+  background: linear-gradient(135deg, #e6c86e, #d4af37);
+  color: #1a1a2e;
+  border-radius: 40rpx;
+  padding: 22rpx 50rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  white-space: nowrap;
+}

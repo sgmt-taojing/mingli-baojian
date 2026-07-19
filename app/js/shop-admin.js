@@ -9,7 +9,7 @@
 // ==================== 密码保护 ====================
 const ADMIN_PASSWORD = 'admin123';
 
-var _authResolver = null;
+let _authResolver = null;
 function initAuth() {
   if (sessionStorage.getItem('shop_admin_authed')) return true;
   // 异步密码模态框
@@ -29,26 +29,26 @@ function initAuth() {
 }
 
 function _showPasswordModal(callback) {
-  var existing = document.getElementById('pwdModal');
+  let existing = document.getElementById('pwdModal');
   if (existing) existing.remove();
-  var overlay = document.createElement('div');
+  let overlay = document.createElement('div');
   overlay.id = 'pwdModal';
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:99999';
-  var card = document.createElement('div');
+  let card = document.createElement('div');
   card.style.cssText = 'background:#1a1f2e;border:1px solid rgba(201,168,76,.3);border-radius:14px;padding:32px 28px;max-width:360px;width:90%';
-  var title = document.createElement('h3');
+  let title = document.createElement('h3');
   title.textContent = '商城管理后台';
   title.style.cssText = 'color:#c9a84c;margin:0 0 20px;font-size:18px;text-align:center';
-  var input = document.createElement('input');
+  let input = document.createElement('input');
   input.type = 'password';
   input.placeholder = '请输入管理密码';
   input.style.cssText = 'width:100%;padding:12px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:#fff;font-size:15px;box-sizing:border-box;outline:none;margin-bottom:16px';
-  var btnRow = document.createElement('div');
+  let btnRow = document.createElement('div');
   btnRow.style.cssText = 'display:flex;gap:10px;justify-content:flex-end';
-  var cancelBtn = document.createElement('button');
+  let cancelBtn = document.createElement('button');
   cancelBtn.textContent = '取消';
   cancelBtn.style.cssText = 'padding:8px 18px;border-radius:8px;border:none;background:rgba(255,255,255,.1);color:#aaa;cursor:pointer;font-size:14px';
-  var okBtn = document.createElement('button');
+  let okBtn = document.createElement('button');
   okBtn.textContent = '确认';
   okBtn.style.cssText = 'padding:8px 18px;border-radius:8px;border:none;background:linear-gradient(135deg,#c9a84c,#d4af37);color:#1a1f2e;cursor:pointer;font-size:14px;font-weight:600';
   btnRow.appendChild(cancelBtn);
@@ -173,11 +173,11 @@ function renderProductTable() {
   products.forEach(function(p) {
     let cat = getCategoryName(p.categoryId);
     let subcat = getSubcategoryName(p.categoryId, p.subcategoryId);
-    var statusBadge = p.status === 'offline' 
+    let statusBadge = p.status === 'offline' 
       ? '<span class="badge badge-err">已下架</span>' 
       : '<span class="badge badge-ok">已上架</span>';
     let img = getProductImage(p);
-    var imgHtml = img 
+    let imgHtml = img 
       ? '<img src="' + img + '" style="width:50px;height:50px;object-fit:cover;border-radius:6px" loading="lazy" onerror="this.src=\'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 50 50%22><rect fill=%22%23333%22 width=%2250%22 height=%2250%22/><text x=%2225%22 y=%2230%22 text-anchor=%22middle%22 fill=%22%23888%22 font-size=%2220%22>' + (p.name||'?').charAt(0) + '</text></svg>\'">'
       : '<div style="width:50px;height:50px;background:var(--ink);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:20px">📦</div>';
     
@@ -468,7 +468,7 @@ function saveCategory() {
     });
   }
   
-  var catData = {
+  let catData = {
     id: editingCategoryId || 'cat-' + Date.now(),
     name: name,
     icon: icon,
@@ -536,7 +536,7 @@ function handleFiles(files) {
     
     // 找第一个空位
     const slot = -1;
-    for (var i = 0; i < 5; i++) {
+    for (let i = 0; i < 5; i++) {
       if (!imagePreviews[i]) { slot = i; break; }
     }
     if (slot < 0) { showToast('最多上传5张图片'); return; }
@@ -745,7 +745,7 @@ function bindEvents() {
 }
 
 function debounce(fn, delay) {
-  var timer;
+  let timer;
   return function() {
     let args = arguments, ctx = this;
     clearTimeout(timer);
