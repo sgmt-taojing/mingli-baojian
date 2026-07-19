@@ -1169,7 +1169,7 @@ function renderPushPlan(containerId) {
   let container = document.getElementById(containerId);
   if (!container) return;
 
-  const html = '';
+  let html = '';
 
   /* ---- 顶部标题 ---- */
   html += '<div class="push-plan-hero">';
@@ -1210,7 +1210,7 @@ function renderPushPlan(containerId) {
  * 渲染会员等级对比
  */
 function renderTierComparison() {
-  const html = '';
+  let html = '';
   html += '<div class="pp-section">';
   html += '  <h3 class="pp-section-title"><span class="pp-section-icon">👑</span> 会员等级推送对比</h3>';
   html += '  <div class="pp-tier-grid">';
@@ -1249,7 +1249,7 @@ function renderTierComparison() {
  * 渲染每日推送时间表
  */
 function renderDailySchedule() {
-  const html = '';
+  let html = '';
   html += '<div class="pp-section">';
   html += '  <h3 class="pp-section-title"><span class="pp-section-icon">⏰</span> 每日推送时间表</h3>';
   html += '  <div class="pp-schedule-grid">';
@@ -1302,7 +1302,7 @@ function renderDailySchedule() {
  * 渲染节气推送日历
  */
 function renderSolarTermsCalendar() {
-  const html = '';
+  let html = '';
   html += '<div class="pp-section">';
   html += '  <h3 class="pp-section-title"><span class="pp-section-icon">🌿</span> 二十四节气推送</h3>';
   html += '  <p class="pp-section-desc">每个节气前1天推送养生+运势提醒（年度会员+终身会员）</p>';
@@ -1345,7 +1345,7 @@ function renderSolarTermsCalendar() {
  * 渲染节日推送
  */
 function renderFestivalsList() {
-  const html = '';
+  let html = '';
   html += '<div class="pp-section">';
   html += '  <h3 class="pp-section-title"><span class="pp-section-icon">🎊</span> 传统节日专题推送</h3>';
   html += '  <p class="pp-section-desc">所有用户均可收到节日祝福，会员解锁完整专题内容</p>';
@@ -1392,7 +1392,7 @@ function renderFestivalsList() {
  * 渲染月运推送
  */
 function renderMonthlyPlan() {
-  const html = '';
+  let html = '';
   let m = PUSH_PLAN.monthly;
   html += '<div class="pp-section">';
   html += '  <h3 class="pp-section-title"><span class="pp-section-icon">🌙</span> 月运报告</h3>';
@@ -1437,7 +1437,7 @@ function renderMonthlyPlan() {
  * 渲染年度推送（含跨年）
  */
 function renderAnnualPlan() {
-  const html = '';
+  let html = '';
   html += '<div class="pp-section">';
   html += '  <h3 class="pp-section-title"><span class="pp-section-icon">🔮</span> 年度推送 · 跨年化解全流程</h3>';
   html += '  <p class="pp-section-desc">从公历12月到立春，完整的跨年化解方案推送时间线</p>';
@@ -1489,7 +1489,7 @@ function renderAnnualPlan() {
  * 渲染引流转化策略
  */
 function renderConversionStrategy() {
-  const html = '';
+  let html = '';
   let c = PUSH_PLAN.conversion;
   html += '<div class="pp-section">';
   html += '  <h3 class="pp-section-title"><span class="pp-section-icon">📈</span> 引流转化设计</h3>';

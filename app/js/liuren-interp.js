@@ -15,7 +15,7 @@ function buildLiuRenProfessionalInterpretation(keShi, name, year, month, day, ho
   let de = ELE[ds];
 
   // ═══ a) 课体总断 ═══
-  const keTiPan = '';
+  let keTiPan = '';
   keTiPan += '══════ 课体总断 ══════\n\n';
   keTiPan += '【课名】' + tg.name + '课\n';
   keTiPan += '【吉凶】' + tg.jiXiong + '\n';
@@ -29,7 +29,7 @@ function buildLiuRenProfessionalInterpretation(keShi, name, year, month, day, ho
   keTiPan += '在此' + tg.name + '课中：' + tg.advice + '\n';
 
   // ═══ b) 四课分析 ═══
-  const siKePan = '';
+  let siKePan = '';
   siKePan += '══════ 四课排列 ══════\n\n';
   siKePan += '第一课（日子阳神）：' + sk.ke1 + '（上' + sk.ke1Gan + '）\n';
   siKePan += '  日干' + ds + '寄宫于' + sk.ke1 + '，上乘之神为' + sk.ke1Gan + '。\n';
@@ -60,7 +60,7 @@ function buildLiuRenProfessionalInterpretation(keShi, name, year, month, day, ho
   else siKePan += '上下基本和谐，事可着手。\n';
 
   // ═══ c) 三传详解 ═══
-  const sanChuanPan = '';
+  let sanChuanPan = '';
   sanChuanPan += '══════ 三传详解 ══════\n\n';
   sanChuanPan += '发用之法：' + (sc.faType || '常规取法') + '\n\n';
   
@@ -102,7 +102,7 @@ function buildLiuRenProfessionalInterpretation(keShi, name, year, month, day, ho
   else sanChuanPan += '开局平稳。\n';
 
   // ═══ d) 天将分布 ═══
-  const tianJiangPan = '';
+  let tianJiangPan = '';
   tianJiangPan += '══════ 十二天将分布 ══════\n\n';
   tianJiangPan += '贵人所在：' + tj.guirenZhi + '位（' + (tj.shunPai ? '顺排' : '逆排') + '）\n\n';
   
@@ -146,7 +146,7 @@ function buildLiuRenProfessionalInterpretation(keShi, name, year, month, day, ho
   tianJiangPan += '\n《大六壬大全》论十二天将云:「贵人统十二天将之首，为至尊至贵。课中贵人得地，万事可成。」\n';
 
   // ═══ e) 神煞影响 ═══
-  const shenShaPan = '';
+  let shenShaPan = '';
   shenShaPan += '══════ 神煞影响 ══════\n\n';
   shenShaPan += '当日课中所临神煞共' + ss.length + '位：\n\n';
   
@@ -171,7 +171,7 @@ function buildLiuRenProfessionalInterpretation(keShi, name, year, month, day, ho
   }
 
   // ═══ f) 大白话结论 ═══
-  const baihuaJielun = '';
+  let baihuaJielun = '';
   baihuaJielun += '══════ 大白话解读 ══════\n\n';
   
   // 综合判断
@@ -250,7 +250,7 @@ function buildLiuRenProfessionalInterpretation(keShi, name, year, month, day, ho
   }
 
   // ═══ g) 流年推演 ═══
-  const liunianTuiyan = '';
+  let liunianTuiyan = '';
   liunianTuiyan += '══════ 流年推演 ══════\n\n';
   let currentYear = new Date().getFullYear();
   

@@ -111,11 +111,11 @@ window.mobileVoiceInput = function(targetId, opts){
   
   showListeningOverlay();
   
-  const finalText = '';
+  let finalText = '';
   let target = document.getElementById(targetId);
   
   recognition.onresult = function(event){
-    const interim = '';
+    let interim = '';
     for (let i = event.resultIndex; i < event.results.length; i++){
       if(event.results[i].isFinal){
         finalText += event.results[i][0].transcript;
@@ -239,7 +239,7 @@ window.mobileVoiceCommand = function(){
   showListeningOverlay();
   
   recognition.onresult = function(event){
-    const text = '';
+    let text = '';
     for (let i = 0; i < event.results.length; i++){
       if(event.results[i].isFinal) text += event.results[i][0].transcript;
     }
@@ -405,7 +405,7 @@ window.addEventListener('message', function(event){
       isListening = true;
       showListeningOverlay();
       r.onresult = function(e){
-        const text = '';
+        let text = '';
         for (let i = 0; i < e.results.length; i++){
           if(e.results[i].isFinal) text += e.results[i][0].transcript;
         }

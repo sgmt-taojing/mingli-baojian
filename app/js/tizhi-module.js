@@ -444,7 +444,7 @@ function tzRenderPrescriptions(){
 }
 
 function tzRenderQuestionnaire(){
-  const html = '';
+  let html = '';
   TZ_DATA.questions.forEach(function(q,idx){
     html+='<div class="tz-card-sm">'+
       '<div class="tz-text-14-text-mb10"><b class="tz-title-13-gold-plain">'+(idx+1)+'.</b> '+q.q+'</div>'+
@@ -557,7 +557,7 @@ function tzRenderFood(filter){
   document.getElementById('tzFoodList').innerHTML=html||'<div class="tz-center-muted">暂无相关食谱</div>';
   
   // 增强版：追加体质食疗方案 + 节气饮食建议
-  const extraHtml = '';
+  let extraHtml = '';
   
   // 体质食疗方案（本地库）
   if(TZ_DATA.foodTherapy && filter!=='all'){

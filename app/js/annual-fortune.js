@@ -516,7 +516,7 @@
       let yearStemIdx = getYearStemIdx(targetYear);
       let yearBranchIdx = getYearBranchIdx(targetYear);
       let yearGanZhi = getYearGanZhi(targetYear);
-      const html = '';
+      let html = '';
 
       // 标题
       html += '<div style="text-align:center;margin-bottom:20px">' +
@@ -530,7 +530,7 @@
       let birthBranchIdx = birthInfo.yearBranchIdx !== undefined ? birthInfo.yearBranchIdx : 0;
       tsInfo = getTaisuiInfo(birthBranchIdx, yearBranchIdx);
 
-      const taisuiContent = '';
+      let taisuiContent = '';
       taisuiContent += infoRow('缘主生肖', getZodiacByBranchIdx(birthBranchIdx));
       taisuiContent += infoRow('当年太岁', tsInfo.taisuiZodiac + '太岁(' + yearGanZhi + '年)');
       taisuiContent += infoRow('太岁方位', tsInfo.taisuiDirection);
@@ -548,7 +548,7 @@
 
       // 2. 流年吉位
       let dirs = getAuspiciousDirections(yearStemIdx);
-      const dirContent = '';
+      let dirContent = '';
       if (dirs.error) {
         dirContent = '<div style="color:var(--danger);font-size:13px">' + dirs.error + '</div>';
       } else {
@@ -570,7 +570,7 @@
 
       // 3. 祈福吉日
       let dates = getWorshipDates(targetYear);
-      const dateContent = '';
+      let dateContent = '';
       for (let d = 0; d < dates.length; d++) {
         let dt = dates[d];
         let priorityColor = dt.priority === 'high' ? 'var(--cinn2)' : (dt.priority === 'medium' ? 'var(--gold)' : 'var(--danger)');
@@ -585,7 +585,7 @@
       html += card('📅 祈福吉日', dateContent);
 
       // 4. 参拜指南
-      const worshipContent = '';
+      let worshipContent = '';
       worshipContent += '<div style="font-size:13px;line-height:2">';
       worshipContent += '<div style="font-weight:600;color:var(--gold);margin-bottom:6px">参拜前准备</div>';
       worshipContent += '1. 沐浴更衣，着整洁衣物，忌穿黑色<br>';
@@ -611,7 +611,7 @@
       html += card('🙏 参拜指南', worshipContent);
 
       // 5. 祈福文书模板
-      const prayerContent = '';
+      let prayerContent = '';
       let prayers = [
         {title: '拜太岁祈福文', text: PRAYER_TEMPLATES.taiSui},
         {title: '迎财神祈福文', text: PRAYER_TEMPLATES.caiShen},
@@ -626,7 +626,7 @@
       html += card('📜 祈福文书模板', prayerContent);
 
       // 6. 化煞物品清单(按生肖和八字用神)
-      const itemContent = '';
+      let itemContent = '';
       let birthZodiac = getZodiacByBranchIdx(birthBranchIdx);
       let xiEle = birthInfo.xiEle || '未知';
 
@@ -685,7 +685,7 @@
       let yearBranch = BRANCHES[yearBranchIdx];
       let yearGanZhi = yearStem + yearBranch;
       let dayStem = STEMS[birthInfo.stemIdx] || STEMS[0];
-      const html = '';
+      let html = '';
 
       // 标题
       html += '<div style="text-align:center;margin-bottom:20px">' +
@@ -712,7 +712,7 @@
       let ganRel = (relMap[dayEle] && relMap[dayEle][yearEle]) || '';
       let zhiRel = (relMap[dayEle] && relMap[dayEle][yearZhiEle]) || '';
 
-      const totalContent = '';
+      let totalContent = '';
       totalContent += infoRow('流年干支', yearGanZhi);
       totalContent += infoRow('流年天干', yearStem + '(' + yearEle + ') · ' + ganShen + ' · ' + ganRel);
       totalContent += infoRow('流年地支', yearBranch + '(' + yearZhiEle + ') · ' + zhiShen + ' · ' + zhiRel);
@@ -734,7 +734,7 @@
       html += card('🌟 流年总运', totalContent);
 
       // 2. 十二生肖运势（结合用户日主十神个性化）
-      const zodiacContent = '';
+      let zodiacContent = '';
       // 用户出生地支索引
       let userBranchIdx = birthInfo.yearBranchIdx || 0;
       let userZodiacLabel = ZODIACS[userBranchIdx];
@@ -773,7 +773,7 @@
       html += card('🐃 十二生肖运势', zodiacContent);
 
       // 3. 逐月运势
-      const monthContent = '';
+      let monthContent = '';
       let monthBranches = ['寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑']; // 正月到十二月
       const monthNames = ['正月(寅)', '二月(卯)', '三月(辰)', '四月(巳)', '五月(午)', '六月(未)', '七月(申)', '八月(酉)', '九月(戌)', '十月(亥)', '冬月(子)', '腊月(丑)'];
 
@@ -802,7 +802,7 @@
         }
 
         // 月运建议
-        const monthAdvice = '';
+        let monthAdvice = '';
         let mRel = (relMap[dayEle] && relMap[dayEle][mZhiEle]) || '';
         if (mZhiEle === xiEle) {
           monthAdvice = '此月五行' + mZhiEle + '与喜用神相合，运势较好，宜进取。';
@@ -826,7 +826,7 @@
       html += card('📆 逐月运势', monthContent);
 
       // 4. 财神方位(按月)
-      const caiContent = '';
+      let caiContent = '';
       // 月干推算: 年干×2+月支序号(寅=1)
       for (let cm = 0; cm < 12; cm++) {
         let cmBranch = monthBranches[cm];
@@ -843,7 +843,7 @@
       html += card('💰 逐月财神方位', caiContent);
 
       // 5. 重点月份预警
-      const alertContent = '';
+      let alertContent = '';
       const hasAlert = false;
 
       for (let am = 0; am < 12; am++) {
@@ -901,7 +901,7 @@
   function generateAnnualReport(birthInfo, targetYear) {
     try {
       targetYear = targetYear || new Date().getFullYear();
-      const html = '';
+      let html = '';
       let isTransition = isYearTransitionPeriod();
 
       // 报告标题

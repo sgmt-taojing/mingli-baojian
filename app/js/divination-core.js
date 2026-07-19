@@ -613,6 +613,7 @@ function _yjWxRelation(a, b) {
 }
 
 function getYijingReadingV2(guaName, yaoData, question) {
+  if (!guaName || typeof guaName !== 'string') return '<p class="error-tip">卦名无效</p>';
   if (!guaName) guaName = '乾';
   if (!question) question = '所问之事';
   
@@ -1011,6 +1012,7 @@ function _qmGetKongWang(dayGzIdx) {
 }
 
 function getQimenReadingV2(palace, panData, question, baziData) {
+  if (!palace || !panData || typeof panData !== 'object') return '<p class="error-tip">排盘数据无效</p>';
   // 如果没有panData，用基础信息构建
   if (!panData) {
     panData = {
@@ -3003,6 +3005,7 @@ function tzStep1Analyze(fileName, content, type) {
     tzRenderStep1Results(obj);
   }).catch(function(err) {
     console.error('指标分析API错误:', err);
+    showToast('指标分析出错，请重试');
     let isAuth = (err.message||'').indexOf('401')>=0 || (err.message||'').indexOf('Unauthorized')>=0 || (err.message||'').indexOf('Invalid token')>=0;
     if(isAuth){
       result.innerHTML = '<div style="padding:24px;text-align:center"><div style="font-size:48px;margin-bottom:12px">🔑</div><div style="font-size:15px;color:var(--cinn2);margin-bottom:10px;font-weight:bold">AI分析服务认证失败</div><div style="font-size:13px;color:var(--paper2);margin-bottom:16px;line-height:1.6">API代理服务的认证令牌已过期或未配置。<br>请检查 <code style="background:rgba(255,255,255,.1);padding:2px 6px;border-radius:4px">server/api-proxy-server.py</code> 的 API 配置。</div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="compute-btn" style="padding:8px 20px;font-size:12px" onclick="tzLocalFallback()">📚 使用本地知识库分析</button><button class="compute-btn" style="padding:8px 20px;font-size:12px;opacity:.5" onclick="tzStep1Analyze(\'手动输入\',\'\',\'text\')">🔄 重试</button></div></div>';
@@ -3195,6 +3198,7 @@ function tzStep2Suggestions() {
     step2Div.scrollIntoView({behavior:'smooth',block:'nearest'});
   }).catch(function(err) {
     console.error('理疗建议API错误:', err);
+    showToast('理疗建议获取出错，请重试');
     let isAuth = (err.message||'').indexOf('401')>=0 || (err.message||'').indexOf('Unauthorized')>=0;
     if(isAuth){
       step2Div.innerHTML = '<div style="padding:24px;text-align:center;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px"><div style="font-size:14px;color:var(--cinn2);margin-bottom:10px;font-weight:bold">🔑 AI服务认证失败</div><div style="font-size:12px;color:var(--paper2);margin-bottom:14px">API令牌已过期，正在使用本地知识库生成建议...</div></div>';
@@ -3708,6 +3712,7 @@ function buildTiaohouYongshenHTML(data) {
 //  大白话解读生成函数
 // ================================================================
 function generateInterpretation(data) {
+  if (!data || typeof data !== 'object') return '<p class="error-tip">数据无效</p>';
   let html = '';
   let dayMaster = data.dayMaster || '甲木';
   let dayWuxing = data.dayWuxing || '木';
@@ -5015,6 +5020,7 @@ function _computeBaziImpl() {
   document.getElementById('baziResult').scrollIntoView({ behavior: 'smooth' });
   } catch(err) {
     console.error('八字计算错误:', err);
+    showToast('八字计算出错，请重试');
     document.getElementById('loadingOverlay').classList.remove('visible');
     let errDetail = err.message || err.toString() || '未知错误';
     let errStack = err.stack || '';
@@ -7116,6 +7122,7 @@ function computeHuajie() {
   renderHuajie(hj);
  } catch(e) {
   console.error('[化解排盘错误]', e.message, e.stack);
+  showToast('化解排盘错误，请稍后重试');
   let _r = document.getElementById('hjOutput');
   if(_r) {
     _r.innerHTML = '<div style="padding:20px;margin:16px 0;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px"><h5 style="color:var(--cinn2)">❌ 化解排盘出错</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>';
@@ -7943,6 +7950,7 @@ function yjStart(mode) {
   return _yjStartImpl(mode);
  } catch(e) {
   console.error('[六爻占卜错误]', e.message, e.stack);
+  showToast('六爻占卜错误，请稍后重试');
   let _eb = document.getElementById('yjDivArea') || document.getElementById('yjResult');
   if(_eb) _eb.innerHTML = '<div style="padding:20px;margin:16px 0;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px"><h5 style="color:var(--cinn2)">❌ 六爻占卜出错</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p><p style="font-size:11px;opacity:.5;margin-top:4px">'+(e.stack||'').split("\n").slice(0,3).join("<br>")+'</p></div>';
   let _r = document.getElementById('yjResult'); if(_r){_r.classList.add('visible');_r.scrollIntoView({behavior:'smooth'});}
@@ -8016,6 +8024,7 @@ async function yjCast() {
 }
 
 function showYjResult() {
+  if (typeof HEXAGRAMS === 'undefined' || !HEXAGRAMS || HEXAGRAMS.length === 0) { showToast('卦象数据未加载'); return; }
   const gua = [[0,0,0],[0,0,0]];
   const moving = [];
   for (let i = 0; i < 6; i++) {
@@ -8499,6 +8508,7 @@ function computeQimen() {
   _computeQimenImpl();
  } catch(e) {
   console.error('[奇门排盘错误]', e.message, e.stack);
+  showToast('奇门排盘错误，请稍后重试');
   let errBox = document.getElementById('qmInterp') || document.getElementById('qmResult');
   if(errBox) errBox.innerHTML = '<div style="padding:20px;margin:16px 0;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px"><h5 style="color:var(--cinn2)">❌ 排盘出错</h5><p style="font-size:13px;opacity:.8;margin-top:8px">错误: '+e.message+'</p><p style="font-size:11px;opacity:.5;margin-top:4px">'+(e.stack||'').split('\n').slice(0,3).join('<br>')+'</p></div>';
   let r = document.getElementById('qmResult'); if(r){r.classList.add('visible');r.scrollIntoView({behavior:'smooth'});}
@@ -9743,6 +9753,7 @@ function computeZiWei() {
   return _computeZiWeiImpl();
  } catch(e) {
   console.error('[紫微斗数错误]', e.message, e.stack);
+  showToast('紫微斗数错误，请稍后重试');
   let _eb = document.getElementById('zwResult') || document.getElementById('zwResult');
   if(_eb) _eb.innerHTML = '<div style="padding:20px;margin:16px 0;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px"><h5 style="color:var(--cinn2)">❌ 紫微斗数出错</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p><p style="font-size:11px;opacity:.5;margin-top:4px">'+(e.stack||'').split("\n").slice(0,3).join("<br>")+'</p></div>';
   let _r = document.getElementById('zwResult'); if(_r){_r.classList.add('visible');_r.scrollIntoView({behavior:'smooth'});}
@@ -10573,6 +10584,7 @@ function computeMeiHua() {
   return _computeMeiHuaImpl();
  } catch(e) {
   console.error('[梅花易数错误]', e.message, e.stack);
+  showToast('梅花易数错误，请稍后重试');
   let _eb = document.getElementById('mhInterp') || document.getElementById('mhResult');
   if(_eb) _eb.innerHTML = '<div style="padding:20px;margin:16px 0;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px"><h5 style="color:var(--cinn2)">❌ 梅花易数出错</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p><p style="font-size:11px;opacity:.5;margin-top:4px">'+(e.stack||'').split("\n").slice(0,3).join("<br>")+'</p></div>';
   let _r = document.getElementById('mhResult'); if(_r){_r.classList.add('visible');_r.scrollIntoView({behavior:'smooth'});}
@@ -11606,6 +11618,7 @@ function computeLiuRen() {
   return _computeLiuRenImpl();
  } catch(e) {
   console.error('[大六壬错误]', e.message, e.stack);
+  showToast('大六壬错误，请稍后重试');
   let _eb = document.getElementById('lrInterp') || document.getElementById('lrResult');
   if(_eb) _eb.innerHTML = '<div style="padding:20px;margin:16px 0;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px"><h5 style="color:var(--cinn2)">❌ 大六壬出错</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p><p style="font-size:11px;opacity:.5;margin-top:4px">'+(e.stack||'').split("\n").slice(0,3).join("<br>")+'</p></div>';
   let _r = document.getElementById('lrResult'); if(_r){_r.classList.add('visible');_r.scrollIntoView({behavior:'smooth'});}
@@ -12532,7 +12545,7 @@ document.addEventListener('DOMContentLoaded', () => {
   try { initDailyWisdom(); } catch(e1) { console.warn('initDailyWisdom failed:', e1); }
   // 初始化今日知识推送
   setTimeout(initDailyKnowledge, 300);
-  } catch(e) { console.error('DOMContentLoaded init error:', e); }
+  } catch(e) { console.error('DOMContentLoaded init error:', e); showToast('页面初始化出错'); }
 });
 
 // ================================================================
@@ -14698,6 +14711,7 @@ function doCezi() {
   return _doCeziImpl();
  } catch(e) {
   console.error('[测字解析错误]', e.message, e.stack);
+  showToast('测字解析错误，请稍后重试');
   let _eb = document.getElementById('ceziResult') || document.getElementById('ceziResult');
   if(_eb) _eb.innerHTML = '<div style="padding:20px;margin:16px 0;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px"><h5 style="color:var(--cinn2)">❌ 测字解析出错</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p><p style="font-size:11px;opacity:.5;margin-top:4px">'+(e.stack||'').split("\n").slice(0,3).join("<br>")+'</p></div>';
   let _r = document.getElementById('ceziResult'); if(_r){_r.classList.add('visible');_r.scrollIntoView({behavior:'smooth'});}
@@ -16065,6 +16079,7 @@ function analyzeFloorPlan(imgEl) {
   document.getElementById('fsFloorResult').style.display = 'block';
   } catch(err) {
     console.error('户型图分析错误:', err);
+    showToast('户型图分析出错，请重试');
     const out = document.getElementById('fsFloorOutput');
     if (out) out.innerHTML = '<div style="padding:30px;text-align:center"><div style="font-size:48px;margin-bottom:16px">⚠️</div><h4 style="color:var(--gold);margin-bottom:12px">户型图分析失败</h4><p style="color:var(--paper2);font-size:13px">图片格式可能不支持，或图片尺寸异常。<br>请尝试上传 JPG/PNG 格式的户型图。</p></div>';
     document.getElementById('fsFloorResult').style.display = 'block';
@@ -16289,6 +16304,7 @@ function computeFengshuiPro() {
   });
  } catch(e) {
   console.error('[风水专业分析错误]', e.message, e.stack);
+  showToast('风水专业分析错误，请稍后重试');
   let _eb = document.getElementById('fsResult') || document.getElementById('fengshuiResult');
   if(_eb) _eb.innerHTML = '<div style="padding:20px;margin:16px 0;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px"><h5 style="color:var(--cinn2)">❌ 风水分析出错</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>';
   showToast('风水分析出错: ' + e.message);
@@ -16842,6 +16858,7 @@ function computeYangzhaiPro() {
     out.scrollIntoView({ behavior:'smooth' });
   } catch(err) {
     console.error('阳宅专业分析错误:', err);
+    showToast('阳宅分析出错，请重试');
     let out = document.getElementById('fsProResult');
     out.style.display = 'block';
     out.innerHTML = '<div style="padding:40px;text-align:center"><div style="font-size:48px;margin-bottom:16px">⚠️</div><h3 style="color:var(--gold);margin-bottom:12px">计算遇到问题</h3><p style="color:var(--paper2);font-size:14px;line-height:1.8">错误详情：' + (err.message||'').substring(0,120) + '</p></div>';
@@ -17159,6 +17176,7 @@ function computeFloorRecommend() {
     out.scrollIntoView({ behavior:'smooth' });
   } catch(err) {
     console.error('楼层推荐计算错误:', err);
+    showToast('楼层推荐出错，请重试');
     let out = document.getElementById('floorRecommendResult') || document.getElementById('fsProResult');
     if (out) {
       out.style.display = 'block';
@@ -19926,6 +19944,7 @@ function recommendMobileNumbers(){
   out.style.display='block';
   } catch(e) {
     console.error('recommendMobileNumbers error:', e);
+    showToast('手机号推荐出错，请重试');
     if(out) { out.innerHTML = '<div style="padding:20px;text-align:center;color:var(--cinn2)">⚠️ 生成推荐出错：' + e.message + '</div>'; out.style.display='block'; }
   } finally {
     if (recBtn) { recBtn.disabled = false; recBtn.textContent = '🍀 生成推荐'; }
@@ -20152,6 +20171,7 @@ function recommendTailNumbers(){
   out.style.display='block';
   } catch(e) {
     console.error('recommendTailNumbers error:', e);
+    showToast('尾号推荐出错，请重试');
     if(out) { out.innerHTML = '<div style="padding:20px;text-align:center;color:var(--cinn2)">⚠️ 推荐尾号出错：' + e.message + '</div>'; out.style.display='block'; }
   } finally {
     if (tailBtn) { tailBtn.disabled = false; tailBtn.textContent = '🎯 推荐尾号'; }
@@ -27256,6 +27276,7 @@ function computeSingleMemberPaipan(id) {
   } catch(e) {
     showToast('排盘失败: ' + e.message);
     console.error('[单人排盘错误]', e);
+    showToast('单人排盘错误，请稍后重试');
   }
 }
 
@@ -27442,6 +27463,7 @@ function computeFamilyPaipan() {
   } catch(e) {
     showToast('家庭排盘失败: ' + e.message);
     console.error('[家庭排盘错误]', e);
+    showToast('家庭排盘错误，请稍后重试');
   }
 }
 
@@ -34486,7 +34508,7 @@ function computeLifeIndex() {
 
     // ═══ 渲染 ═══
     let resultEl = document.getElementById('lifeIndexResult');
-    if (!resultEl) { console.error('[LifeIndex] result div not found'); return; }
+    if (!resultEl) { console.error('[LifeIndex] result div not found'); showToast('结果区域未找到，请重试'); return; }
     resultEl.style.display = 'block';
     resultEl.innerHTML = _renderLifeIndexResult(name, scores, bazi);
     resultEl.classList.add('visible');
@@ -34498,6 +34520,7 @@ function computeLifeIndex() {
     if (btn) { btn.disabled = false; btn.textContent = '🌟 开 启 命 理 全 鉴 评 估'; }
   } catch(e) {
     console.error('[命理全鉴评估错误]', e.message, e.stack);
+    showToast('命理全鉴评估错误，请稍后重试');
     let btn = document.getElementById('liBtn');
     if (btn) { btn.disabled = false; btn.textContent = '🌟 开 启 命 理 全 鉴 评 估'; }
     let _r = document.getElementById('lifeIndexResult');

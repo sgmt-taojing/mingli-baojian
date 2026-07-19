@@ -103,7 +103,7 @@ function _aiGetSanyuanContext() {
 function _aiGetPaipanDataText(type, data) {
   if (!data) return '排盘数据未获取到';
 
-  const text = '';
+  let text = '';
   try {
     switch (type) {
       case 'bazi':

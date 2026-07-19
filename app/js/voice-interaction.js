@@ -66,10 +66,10 @@ window.startVoiceInput = function(targetId, opts){
   isListening = true;
   if(btn) btn.innerHTML = '🔴';
 
-  const finalText = '';
+  let finalText = '';
 
   recognition.onresult = function(event){
-    const interim = '';
+    let interim = '';
     for (let i = event.resultIndex; i < event.results.length; i++){
       if(event.results[i].isFinal){
         finalText += event.results[i][0].transcript;
@@ -164,7 +164,7 @@ window.startVoiceCommand = function(){
   showToast('🎤 正在聆听...说出您的指令', 'info');
 
   recognition.onresult = function(event){
-    const text = '';
+    let text = '';
     for (let i = 0; i < event.results.length; i++){
       if(event.results[i].isFinal) text += event.results[i][0].transcript;
     }

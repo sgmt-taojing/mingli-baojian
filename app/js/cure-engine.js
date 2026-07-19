@@ -1257,7 +1257,7 @@ function _getMemberCureText(bazi, currentYear) {
   let dayEle = _GAN_ELE ? (_GAN_ELE[bazi.dayStem] || '木') : '木';
   let weak = bazi.weakestEle || '木';
   let xi = bazi.xiEle || '木';
-  const text = '';
+  let text = '';
   text += '1. 补' + weak + '：佩戴' + _getElementCrystal(weak) + '，多穿' + _getElementColor(weak) + '色衣物；';
   text += '2. 催' + xi + '：在' + _getElementDirection(xi) + '方位布局，增强喜用神之力；';
   text += '3. ' + currentYear + '年需注意流年太岁关系，如有犯太岁需请太岁符；';
@@ -1411,7 +1411,7 @@ function renderCureCenter() {
   let out = document.getElementById('cureCenterOutput');
   if (!out) return;
 
-  const html = '';
+  let html = '';
 
   // 化解中心标题
   html += '<div class="result-banner">';
@@ -1463,7 +1463,7 @@ function renderCureCenter() {
 function showCureCategory(catId) {
   let out = document.getElementById('cureCategoryOutput');
   if (!out) return;
-  const html = '';
+  let html = '';
 
   if (catId === 'cure-bazi') {
     html += '<h4 style="color:var(--gold);margin-bottom:12px">🌟 八字化解方案</h4>';

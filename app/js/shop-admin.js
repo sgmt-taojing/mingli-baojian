@@ -169,7 +169,7 @@ function renderProductTable() {
     return;
   }
   
-  const html = '';
+  let html = '';
   products.forEach(function(p) {
     let cat = getCategoryName(p.categoryId);
     let subcat = getSubcategoryName(p.categoryId, p.subcategoryId);
@@ -401,7 +401,7 @@ function renderCategoryList() {
     return;
   }
   
-  const html = '';
+  let html = '';
   shopData.categories.forEach(function(c) {
     let subCount = c.subcategories ? c.subcategories.length : 0;
     html += '<div class="cat-item">' +
@@ -578,7 +578,7 @@ function renderImagePreviews() {
   
   let hasImages = imagePreviews.some(function(x) { return x; });
   
-  const html = '';
+  let html = '';
   imagePreviews.forEach(function(img, i) {
     if (img) {
       html += '<div class="img-preview-item">' +

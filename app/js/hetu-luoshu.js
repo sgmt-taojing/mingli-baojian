@@ -302,7 +302,7 @@ function renderHetuLuoshuDaily() {
   let el = document.getElementById('almanacHetuLuoshu');
   if (!el) return;
   let accessPct = _hlGetAccessPercent();
-  const html = '';
+  let html = '';
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">';
   html += '<div style="background:rgba(52,152,219,0.06);border:1px solid rgba(52,152,219,0.15);border-radius:8px;padding:12px;text-align:center">';
   html += '<div style="font-size:11px;color:var(--paper2);margin-bottom:6px">🌀 今日河图数</div>';

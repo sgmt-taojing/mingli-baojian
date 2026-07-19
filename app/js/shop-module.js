@@ -164,7 +164,7 @@ function renderShopProducts() {
   }
   if (empty) empty.style.display = 'none';
   
-  const html = '';
+  let html = '';
   products.forEach(function(item) {
     let isClassic = item.categoryId === 'jingdian';
     let isMaster = item.subcategoryId === 'daoyi' || item.subcategoryId === 'foyi';
@@ -250,7 +250,7 @@ function showProductDetail(productId) {
   }).join('');
   
   let isClassic = item.categoryId === 'jingdian';
-  const html = '';
+  let html = '';
   
   // 大图
   html += '<div class="detail-img-large">'+(item.image||'📦')+'</div>';
@@ -400,7 +400,7 @@ function renderCartContent() {
     return;
   }
   
-  const html = '';
+  let html = '';
   const totalAmount = 0;
   shopCart.forEach(function(item) {
     let priceNum = parsePrice(item.price);

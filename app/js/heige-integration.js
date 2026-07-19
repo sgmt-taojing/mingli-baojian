@@ -216,7 +216,7 @@ function renderHeigeFramework(chart) {
   let geju = chart.geju || [];
   let shensha = chart.shensha || {};
   let dayun = chart.dayun || [];
-  const html = '';
+  let html = '';
 
   // 方法论标签
   html += '<div style="background:linear-gradient(135deg,var(--ink3),var(--cyan));border-radius:12px;padding:20px;margin:16px 0;border:1px solid var(--gold)">';
