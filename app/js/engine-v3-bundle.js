@@ -4129,6 +4129,10 @@ function analyzeLiuyao(params) {
     // R3.3: 应期判断
     yingqi: yingqi
   };
+  } catch(e) {
+    console.error('[EngineV3] analyzeLiuyao error:', e);
+    return null;
+  }
 }
 
 // ═══════════════════════════════════════════════
@@ -4910,6 +4914,10 @@ function analyzeMeihuaFull(params) {
     tiYong: tiYong,
     season: season
   };
+  } catch(e) {
+    console.error('[EngineV3] analyzeMeihuaFull error:', e);
+    return null;
+  }
 }
 
 /**
@@ -7306,6 +7314,10 @@ function analyzeKetiGeshi(sanChuan, zhanShi, siKe) {
     sanChuan: { fa: faZhi, zhong: zhongZhi, mo: moZhi },
     sanChuanWX: { fa: faWX, zhong: zhongWX, mo: moWX }
   };
+  } catch(e) {
+    console.error('[EngineV3] analyzeKetiGeshi error:', e);
+    return null;
+  }
 }
 
 window.LiurenV3 = {
@@ -8252,6 +8264,10 @@ function qimenCalcV3(year, month, day, hour, juType) {
     wuBuYu: wuBuYu,
     geju: geju
   };
+  } catch(e) {
+    console.error('[EngineV3] qimenCalcV3 error:', e);
+    return null;
+  }
 }
 
 // ─── 完整分析 ────────────────────────────────────────────────────
@@ -8484,6 +8500,10 @@ function analyzeQimenFull(panData) {
   } catch (e) { /* ignore */ }
   
   return result;
+  } catch(e) {
+    console.error('[EngineV3] analyzeQimenFull error:', e);
+    return null;
+  }
 }
 
 /**
@@ -8797,7 +8817,7 @@ window.QimenV3 = {
   XUN_YI: XUN_YI
 };
 
-})();
+  })();
 // ════════════════════════════════════════════════════════════════
 //  引擎 6/6: ZiweiV3
 // ════════════════════════════════════════════════════════════════
@@ -9337,6 +9357,10 @@ function ziweiCalcV3(birthYear, birthMonth, birthDay, birthHour, sex) {
     dayun, currentDayun,
     starLayout: { ziweiXi: starLayout.ziweiXi, tianfuXi: starLayout.tianfuXi }
   };
+  } catch(e) {
+    console.error('[EngineV3] ziweiCalcV3 error:', e);
+    return null;
+  }
 }
 
 /**
@@ -9620,6 +9644,10 @@ function analyzeZiweiFull(panData) {
     mingGanZhi: panData.mingGanZhi,
     shenGanZhi: panData.shenGanZhi
   };
+  } catch(e) {
+    console.error('[EngineV3] analyzeZiweiFull error:', e);
+    return null;
+  }
 }
 
 /**
@@ -11333,5 +11361,4 @@ window.ZiweiV3 = {
   STEMS,
   BRANCHES
 };
-
 })();
