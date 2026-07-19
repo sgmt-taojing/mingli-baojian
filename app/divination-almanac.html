@@ -945,13 +945,15 @@ document.addEventListener('DOMContentLoaded', () => {
   initShichenPicker();
 
   // 恢复个人八字
-  const savedBazi=getUserBazi();
-  if(savedBazi){
-    document.getElementById('userBaziStatus').textContent='已保存：'+savedBazi.dayStem+'日主（'+savedBazi.dayEle+'）';
-    if(savedBazi.date)document.getElementById('userBirthDate').value=savedBazi.date;
-    if(savedBazi.hour)document.getElementById('userBirthHour').value=savedBazi.hour;
-    if(savedBazi.sex)document.querySelector('input[name="userSex"][value="'+savedBazi.sex+'"]').checked=true;
-  }
+  try{
+    const savedBazi=getUserBazi();
+    if(savedBazi){
+      document.getElementById('userBaziStatus').textContent='已保存：'+savedBazi.dayStem+'日主（'+savedBazi.dayEle+'）';
+      if(savedBazi.date)document.getElementById('userBirthDate').value=savedBazi.date;
+      if(savedBazi.hour)document.getElementById('userBirthHour').value=savedBazi.hour;
+      if(savedBazi.sex){let _r=document.querySelector('input[name="userSex"][value="'+savedBazi.sex+'"]');if(_r)_r.checked=true;}
+    }
+  }catch(e){console.warn('恢复八字失败:',e.message);}
 });
 
 // ===== 更新黄历 =====
@@ -1192,6 +1194,7 @@ function switchView(view) {
 
 // ===== 渲染视角内容 =====
 function renderViewContent(view) {
+  try {
   const template = VIEW_TEMPLATES[view];
   const dateStr = document.getElementById('almanacDate').value;
   const almanac = getAlmanacData(dateStr);
@@ -1255,6 +1258,7 @@ function renderViewContent(view) {
   `;
   
   document.getElementById('viewContent').innerHTML = html;
+  }catch(e){console.error('[视角渲染错误]',e.message);document.getElementById('viewContent').innerHTML='<div style="padding:20px;color:var(--cinn2)">视角内容加载出错: '+e.message+'</div>';}
 }
 
 // ===== 获取修身/养生/修行建议 =====
