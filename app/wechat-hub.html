@@ -788,7 +788,7 @@ function saveUser(user) {
 }
 
 // ─── 通达 ───
-let SUPER_USERS = ['18511550189'];
+let SUPER_USERS = [];  // P0修复：超管检查移至后端API
 
 // 超管登录后显示管理入口
 function checkSuperUserUI() {
@@ -809,7 +809,10 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 function isSuperUser() {
   const user = getUser();
-  return user.phone && SUPER_USERS.indexOf(user.phone) >= 0;
+  // P0修复：优先检查后端返回的roles数组
+  if (user.roles && Array.isArray(user.roles) && user.roles.includes('super_admin')) return true;
+  if (user.isSuper === true) return true;
+  return false;
 }
 
 // ─── 会员检查 ───

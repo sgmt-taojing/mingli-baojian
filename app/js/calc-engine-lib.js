@@ -2817,7 +2817,7 @@ function submitAsk() {
     temperature: 0.7
   };
 
-  fetch('https://api.g2claw.com/v1/chat/completions', {
+  fetch('/api/ai/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer b720753afe0845f5a7611a1b56b6d77c' },
     body: JSON.stringify(payload)

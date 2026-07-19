@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>易道智鉴 - 登录</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0d1117;
+    --ink2: #161b22;
+    --ink3: #1c2330;
+    --ink4: #242d3a;
+    --paper: #e8dcc8;
+    --paper2: #c4b8a0;
+    --paper3: #8a7e6a;
+    --gold: #c9a84c;
+    --gold2: #e8cc7a;
+    --gold3: #a08030;
+    --gold-bright: #d4af37;
+    --cinn: #c0392b;
+    --danger: #dc3545;
+    --success: #27ae60;
+    --warn: #e67e22;
+    --border: rgba(201,168,76,0.15);
+    --border-gold: rgba(201,168,76,0.3);
+    --shadow: 0 4px 24px rgba(0,0,0,0.5);
+    --font-serif: 'Noto Serif SC','Source Han Serif SC','SimSun','STSong',serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-serif);
+    background: var(--ink);
+    color: var(--paper);
+    min-height: 100vh;
+    overflow-x: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* 背景纹理 */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 40% at 50% 30%, rgba(201,168,76,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* 登录卡片 */
+  .login-container {
+    position: relative;
+    z-index: 1;
+    width: 420px;
+    max-width: calc(100vw - 32px);
+    padding: 40px 36px;
+    background: linear-gradient(145deg, rgba(22,27,34,0.95), rgba(13,17,23,0.98));
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow), 0 0 40px rgba(201,168,76,0.05);
+    animation: cardEnter 0.6s ease;
+  }
+
+  @keyframes cardEnter {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* 顶部装饰 */
+  .login-header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+  .login-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle, rgba(201,168,76,0.12), transparent 70%);
+    border-radius: 50%;
+  }
+  .login-icon svg {
+    width: 36px;
+    height: 36px;
+    stroke: var(--gold);
+    stroke-width: 1.8;
+    fill: none;
+    filter: drop-shadow(0 0 8px rgba(201,168,76,0.3));
+  }
+  .login-title {
+    font-family: 'Ma Shan Zheng', serif;
+    font-size: 28px;
+    color: var(--gold);
+    letter-spacing: 8px;
+    text-shadow: 0 0 24px rgba(201,168,76,0.2);
+    margin-bottom: 6px;
+  }
+  .login-subtitle {
+    font-size: 12px;
+    color: var(--paper3);
+    letter-spacing: 4px;
+  }
+
+  /* 表单 */
+  .form-group {
+    margin-bottom: 20px;
+  }
+  .form-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--paper2);
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+  }
+  .form-label svg {
+    width: 14px;
+    height: 14px;
+    stroke: var(--gold);
+    stroke-width: 1.8;
+    fill: none;
+    flex-shrink: 0;
+  }
+
+  .input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .form-input {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(28,35,48,0.6);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--paper);
+    font-size: 15px;
+    font-family: var(--font-serif);
+    letter-spacing: 1px;
+    transition: all 0.25s ease;
+    outline: none;
+  }
+  .form-input:focus {
+    border-color: var(--gold);
+    background: rgba(28,35,48,0.9);
+    box-shadow: 0 0 0 3px rgba(201,168,76,0.08);
+  }
+  .form-input::placeholder {
+    color: var(--paper3);
+    opacity: 0.6;
+  }
+
+  /* 验证码 */
+  .code-wrapper {
+    display: flex;
+    gap: 10px;
+  }
+  .code-wrapper .form-input {
+    flex: 1;
+  }
+  .code-btn {
+    flex-shrink: 0;
+    padding: 12px 20px;
+    background: rgba(201,168,76,0.1);
+    border: 1px solid var(--border-gold);
+    border-radius: 10px;
+    color: var(--gold);
+    font-size: 13px;
+    font-family: var(--font-serif);
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .code-btn:hover:not(:disabled) {
+    background: rgba(201,168,76,0.2);
+    border-color: var(--gold);
+  }
+  .code-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .code-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    fill: none;
+  }
+
+  /* 登录按钮 */
+  .login-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--gold3), var(--gold));
+    border: none;
+    border-radius: 10px;
+    color: var(--ink);
+    font-size: 16px;
+    font-family: var(--font-serif);
+    font-weight: 600;
+    letter-spacing: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+  .login-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+  }
+  .login-btn:hover::before {
+    transform: translateX(100%);
+  }
+  .login-btn:active {
+    transform: scale(0.98);
+  }
+  .login-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  /* 底部 */
+  .login-footer {
+    margin-top: 28px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--paper3);
+    letter-spacing: 2px;
+    line-height: 1.8;
+  }
+  .login-footer a {
+    color: var(--gold);
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .login-footer a:hover {
+    opacity: 0.8;
+  }
+
+  /* 分割线 */
+  .divider {
+    display: flex;
+    align-items: center;
+    margin: 24px 0;
+    gap: 12px;
+  }
+  .divider-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+  }
+  .divider-text {
+    font-size: 11px;
+    color: var(--paper3);
+    letter-spacing: 3px;
+  }
+
+  /* Toast */
+  .toast-container {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    pointer-events: none;
+  }
+  .toast-msg {
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: var(--font-serif);
+    letter-spacing: 2px;
+    opacity: 0;
+    transform: translateY(-12px);
+    transition: all 0.3s ease;
+    margin-bottom: 8px;
+    backdrop-filter: blur(8px);
+  }
+  .toast-msg.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .toast-info {
+    background: rgba(28,35,48,0.95);
+    border: 1px solid var(--border);
+    color: var(--paper);
+  }
+  .toast-success {
+    background: rgba(39,174,96,0.15);
+    border: 1px solid rgba(39,174,96,0.4);
+    color: var(--success);
+  }
+  .toast-warn {
+    background: rgba(230,126,34,0.15);
+    border: 1px solid rgba(230,126,34,0.4);
+    color: var(--warn);
+  }
+  .toast-error {
+    background: rgba(220,53,69,0.15);
+    border: 1px solid rgba(220,53,69,0.4);
+    color: var(--danger);
+  }
+
+  /* 加载动画 */
+  .spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(13,17,23,0.3);
+    border-top-color: var(--ink);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* 快速登录 */
+  .quick-login {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .quick-login-btn {
+    flex: 1;
+    padding: 10px;
+    background: rgba(28,35,48,0.5);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--paper3);
+    font-size: 12px;
+    font-family: var(--font-serif);
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+  .quick-login-btn:hover {
+    border-color: var(--border-gold);
+    color: var(--paper2);
+  }
+
+  /* ═══ 响应式 ═══ */
+  @media (max-width: 1200px) {
+    .login-container {
+      width: 400px;
+    }
+  }
+  @media (max-width: 768px) {
+    .login-container {
+      width: calc(100vw - 24px);
+      padding: 32px 24px;
+    }
+    .login-title {
+      font-size: 24px;
+      letter-spacing: 6px;
+    }
+    .login-icon {
+      width: 48px;
+      height: 48px;
+    }
+    .login-icon svg {
+      width: 30px;
+      height: 30px;
+    }
+    .form-input {
+      padding: 11px 14px;
+      font-size: 14px;
+    }
+    .code-btn {
+      padding: 11px 16px;
+      font-size: 12px;
+    }
+    .login-btn {
+      padding: 13px;
+      font-size: 15px;
+      letter-spacing: 4px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="login-container">
+  <!-- 顶部 -->
+  <div class="login-header">
+    <div class="login-icon">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 2 L14.5 9 L22 9.5 L16 14.5 L18 22 L12 17.5 L6 22 L8 14.5 L2 9.5 L9.5 9 Z"/>
+      </svg>
+    </div>
+    <div class="login-title">易道智鉴</div>
+    <div class="login-subtitle">命理宝鉴 · 会员登录</div>
+  </div>
+
+  <!-- 表单 -->
+  <form id="loginForm" onsubmit="return false;">
+    <!-- 手机号 -->
+    <div class="form-group">
+      <label class="form-label" for="phoneInput">
+        <svg viewBox="0 0 24 24">
+          <rect x="7" y="2" width="10" height="20" rx="2"/>
+          <line x1="11" y1="18" x2="13" y2="18"/>
+        </svg>
+        <span>手机号</span>
+      </label>
+      <div class="input-wrapper">
+        <input type="tel" id="phoneInput" class="form-input" placeholder="请输入手机号" maxlength="11" autocomplete="tel"/>
+      </div>
+    </div>
+
+    <!-- 验证码 -->
+    <div class="form-group">
+      <label class="form-label" for="codeInput">
+        <svg viewBox="0 0 24 24">
+          <path d="M4 8 L4 6 Q4 4 6 4 L18 4 Q20 4 20 6 L20 8"/>
+          <rect x="4" y="8" width="16" height="12" rx="2"/>
+          <line x1="12" y1="12" x2="12" y2="16"/>
+        </svg>
+        <span>验证码</span>
+      </label>
+      <div class="code-wrapper">
+        <input type="text" id="codeInput" class="form-input" placeholder="请输入验证码" maxlength="6" autocomplete="one-time-code"/>
+        <button type="button" class="code-btn" id="codeBtn" onclick="sendCode()">
+          <svg viewBox="0 0 24 24">
+            <path d="M22 2 L11 13"/>
+            <path d="M22 2 L15 22 L11 13 L2 9 Z"/>
+          </svg>
+          <span id="codeBtnText">发送验证码</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 登录按钮 -->
+    <button type="submit" class="login-btn" id="loginBtn" onclick="doLogin()">
+      <span id="loginBtnText">登 录</span>
+    </button>
+  </form>
+
+  <!-- 分割线 -->
+  <div class="divider">
+    <div class="divider-line"></div>
+    <span class="divider-text">其他方式</span>
+    <div class="divider-line"></div>
+  </div>
+
+  <!-- 快速登录（模拟） -->
+  <div class="quick-login">
+    <button class="quick-login-btn" onclick="quickLogin('guest')">访客体验</button>
+    <button class="quick-login-btn" onclick="quickLogin('free')">普通用户</button>
+    <button class="quick-login-btn" onclick="quickLogin('vip')">VIP会员</button>
+  </div>
+
+  <!-- 底部 -->
+  <div class="login-footer">
+    登录即同意<a href="javascript:void(0)" onclick="showDisclaimer()">《用户协议》</a><br/>
+    <span style="opacity:0.6">易道智鉴 &copy; 2026 · 仅供文化交流</span>
+  </div>
+</div>
+
+<script src="js/rbac-client.js"></script>
+<script>
+  // ═══ Toast ═══
+  function showToast(msg, type) {
+    type = type || 'info';
+    var container = document.getElementById('toastContainer');
+    var el = document.createElement('div');
+    el.className = 'toast-msg toast-' + type + ' show';
+    el.textContent = msg;
+    container.appendChild(el);
+    setTimeout(function () {
+      el.classList.remove('show');
+      setTimeout(function () { el.remove(); }, 300);
+    }, 3000);
+  }
+
+  // ═══ 验证码 ═══
+  var codeCountdown = 0;
+  var codeTimer = null;
+
+  function sendCode() {
+    var phone = document.getElementById('phoneInput').value.trim();
+    if (!phone || phone.length !== 11 || !/^1\d{10}$/.test(phone)) {
+      showToast('请输入正确的11位手机号', 'warn');
+      return;
+    }
+
+    // 调用后端发送验证码（模拟）
+    // 实际接口: POST /api/user/send-code { phone }
+    showToast('验证码已发送（模拟：1234）', 'success');
+
+    // 开始倒计时
+    codeCountdown = 60;
+    var btn = document.getElementById('codeBtn');
+    var btnText = document.getElementById('codeBtnText');
+    btn.disabled = true;
+
+    codeTimer = setInterval(function () {
+      codeCountdown--;
+      if (codeCountdown <= 0) {
+        clearInterval(codeTimer);
+        btnText.textContent = '重新发送';
+        btn.disabled = false;
+      } else {
+        btnText.textContent = codeCountdown + 's';
+      }
+    }, 1000);
+  }
+
+  // ═══ 登录 ═══
+  function doLogin() {
+    var phone = document.getElementById('phoneInput').value.trim();
+    var code = document.getElementById('codeInput').value.trim();
+
+    if (!phone || phone.length !== 11 || !/^1\d{10}$/.test(phone)) {
+      showToast('请输入正确的11位手机号', 'warn');
+      return;
+    }
+    if (!code || code.length < 4) {
+      showToast('请输入验证码', 'warn');
+      return;
+    }
+
+    var btn = document.getElementById('loginBtn');
+    var btnText = document.getElementById('loginBtnText');
+    btn.disabled = true;
+    btnText.innerHTML = '<span class="spinner"></span>登录中...';
+
+    // 调用后端登录接口
+    fetch('/api/user/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: phone, code: code })
+    })
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      btn.disabled = false;
+      btnText.textContent = '登 录';
+
+      if (data.error) {
+        showToast(data.error, 'error');
+        return;
+      }
+
+      if (data.token) {
+        // 保存登录信息
+        var roles = (data.user && data.user.roles) || ['free'];
+        var userInfo = data.user || {};
+        RBAC.saveLogin(data.token, roles, userInfo);
+
+        showToast('登录成功，正在跳转...', 'success');
+
+        // 检查redirect参数
+        var params = new URLSearchParams(window.location.search);
+        var redirect = params.get('redirect');
+
+        setTimeout(function () {
+          window.location.href = redirect || RBAC.HOME_PAGE;
+        }, 800);
+      } else {
+        showToast('登录失败，请重试', 'error');
+      }
+    })
+    .catch(function (err) {
+      btn.disabled = false;
+      btnText.textContent = '登 录';
+      console.error('[login error]', err);
+      showToast('网络错误，请稍后重试', 'error');
+    });
+  }
+
+  // ═══ 快速登录（模拟，仅开发用） ═══
+  function quickLogin(type) {
+    var mockData = {
+      guest: { roles: ['guest'], user: { name: '访客', vipLevel: null } },
+      free: { roles: ['free'], user: { name: '缘主', vipLevel: 'free' } },
+      vip: { roles: ['vip', 'free'], user: { name: 'VIP会员', vipLevel: 'lifetime' } }
+    };
+
+    var mock = mockData[type];
+    if (!mock) return;
+
+    // 模拟token（payload中包含exp）
+    var header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).replace(/=/g, '');
+    var payload = btoa(JSON.stringify({
+      iss: 'mingli-baojian',
+      uid: type === 'guest' ? 0 : Date.now(),
+      roles: mock.roles,
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) + 86400
+    })).replace(/=/g, '');
+    var mockToken = header + '.' + payload + '.mock-signature';
+
+    RBAC.saveLogin(mockToken, mock.roles, mock.user);
+    showToast('已以' + (mock.user.name) + '身份登录', 'success');
+
+    setTimeout(function () {
+      window.location.href = RBAC.HOME_PAGE;
+    }, 600);
+  }
+
+  // ═══ 用户协议 ═══
+  function showDisclaimer() {
+    showToast('命理宝鉴仅供参考娱乐，不构成专业建议', 'info');
+  }
+
+  // ═══ 键盘支持 ═══
+  document.getElementById('phoneInput').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+      document.getElementById('codeInput').focus();
+    }
+  });
+  document.getElementById('codeInput').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+      doLogin();
+    }
+  });
+
+  // ═══ 已登录则跳转 ═══
+  if (RBAC.isLoggedIn()) {
+    window.location.href = RBAC.HOME_PAGE;
+  }
+</script>
+</body>
+</html>

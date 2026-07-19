@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>命理宝鉴 · 系统审计与架构优化总报告</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-card: #161b22;
+    --bg-card-hover: #1c2330;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #c9a84c;
+    --accent-light: #e0c87a;
+    --danger: #f85149;
+    --danger-bg: rgba(248,81,73,0.08);
+    --warning: #d29922;
+    --warning-bg: rgba(210,153,34,0.08);
+    --success: #3fb950;
+    --success-bg: rgba(63,185,80,0.08);
+    --info: #58a6ff;
+    --info-bg: rgba(88,166,255,0.08);
+    --radius: 8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Noto Sans CJK SC', sans-serif;
+    line-height: 1.7;
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 1.8em; color: var(--accent); margin-bottom: 8px; }
+  h2 { font-size: 1.4em; color: var(--accent-light); margin: 32px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  h3 { font-size: 1.15em; color: var(--text); margin: 20px 0 10px; }
+  h4 { font-size: 1em; color: var(--text-muted); margin: 16px 0 8px; }
+  p { margin-bottom: 12px; }
+  .meta { color: var(--text-muted); font-size: 0.9em; margin-bottom: 24px; }
+  
+  /* Metrics */
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 20px 0; }
+  .metric { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; text-align: center; }
+  .metric-value { font-size: 2em; font-weight: 700; }
+  .metric-label { color: var(--text-muted); font-size: 0.85em; margin-top: 4px; }
+  .metric.danger .metric-value { color: var(--danger); }
+  .metric.warning .metric-value { color: var(--warning); }
+  .metric.success .metric-value { color: var(--success); }
+  .metric.info .metric-value { color: var(--info); }
+  
+  /* Cards */
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin: 16px 0; }
+  .card-title { font-size: 1.1em; font-weight: 600; margin-bottom: 12px; color: var(--accent-light); }
+  
+  /* Risk badges */
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.8em; font-weight: 600; }
+  .badge-p0 { background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(248,81,73,0.3); }
+  .badge-p1 { background: var(--warning-bg); color: var(--warning); border: 1px solid rgba(210,153,34,0.3); }
+  .badge-p2 { background: var(--info-bg); color: var(--info); border: 1px solid rgba(88,166,255,0.3); }
+  .badge-p3 { background: rgba(139,148,158,0.08); color: var(--text-muted); border: 1px solid rgba(139,148,158,0.2); }
+  
+  /* Table */
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.92em; }
+  th { background: var(--bg-card); color: var(--accent-light); padding: 10px 12px; text-align: left; border-bottom: 2px solid var(--border); font-weight: 600; }
+  td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  tr:hover td { background: var(--bg-card-hover); }
+  
+  /* Timeline */
+  .timeline { margin: 20px 0; }
+  .timeline-step { display: flex; gap: 16px; margin-bottom: 20px; }
+  .timeline-marker { flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; background: var(--bg-card); border: 2px solid var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--accent); font-size: 0.9em; }
+  .timeline-body { flex: 1; }
+  .timeline-title { font-weight: 600; margin-bottom: 4px; }
+  .timeline-text { color: var(--text-muted); font-size: 0.92em; }
+  
+  /* Compare */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  .compare-col { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+  .compare-title { font-weight: 600; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  
+  /* Flow */
+  .flow { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin: 16px 0; }
+  .flow-step { padding: 8px 0; padding-left: 16px; border-left: 2px solid var(--accent); margin-left: 8px; position: relative; }
+  .flow-step::before { content: ''; position: absolute; left: -5px; top: 14px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .flow-step:last-child { border-left-color: transparent; }
+  
+  /* Architecture diagram */
+  .arch { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin: 16px 0; font-family: 'SF Mono', 'Consolas', monospace; font-size: 0.88em; white-space: pre; overflow-x: auto; }
+  
+  /* Role tags */
+  .role-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.82em; margin: 2px; }
+  .role-a { background: rgba(88,166,255,0.1); color: var(--info); border: 1px solid rgba(88,166,255,0.2); }
+  .role-b { background: rgba(201,168,76,0.1); color: var(--accent); border: 1px solid rgba(201,168,76,0.2); }
+  .role-s { background: rgba(248,81,73,0.1); color: var(--danger); border: 1px solid rgba(248,81,73,0.2); }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .metrics { grid-template-columns: repeat(2, 1fr); }
+    .compare { grid-template-columns: 1fr; }
+    table { font-size: 0.85em; }
+    th, td { padding: 6px 8px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>命理宝鉴 · 系统审计与架构优化总报告</h1>
+<p class="meta">日期：2026-07-19 ｜ 项目路径：/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/ ｜ GitHub Pages：https://sgmt-taojing.github.io/epb-assistant/</p>
+
+<h2>一、审计总览</h2>
+
+<div class="metrics">
+  <div class="metric danger"><div class="metric-value">4</div><div class="metric-label">P0 严重风险</div></div>
+  <div class="metric warning"><div class="metric-value">6</div><div class="metric-label">P1 高风险</div></div>
+  <div class="metric info"><div class="metric-value">6</div><div class="metric-label">P2 中风险</div></div>
+  <div class="metric"><div class="metric-value">5</div><div class="metric-label">P3 低风险</div></div>
+  <div class="metric success"><div class="metric-value">60</div><div class="metric-label">KB知识库文件</div></div>
+  <div class="metric info"><div class="metric-value">13.2MB</div><div class="metric-label">KB总大小</div></div>
+  <div class="metric"><div class="metric-value">43</div><div class="metric-label">HTML页面</div></div>
+  <div class="metric"><div class="metric-value">28</div><div class="metric-label">JS文件</div></div>
+</div>
+
+<h3>P0 严重风险 — 需立即修复</h3>
+<div class="card">
+<table>
+<thead><tr><th width="60">#</th><th>问题</th><th>位置</th><th width="80">级别</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>API密钥硬编码在前端JS（g2claw.com Bearer Token完整暴露）</td><td>ai-interpreter.js:37、divination-core.js:2985/3137/15956、calc-engine-lib.js:2822</td><td><span class="badge badge-p0">P0</span></td></tr>
+<tr><td>2</td><td>AES-256加密使用全零IV + 硬编码默认密钥</td><td>server/security.js:5,10,20</td><td><span class="badge badge-p0">P0</span></td></tr>
+<tr><td>3</td><td>/api/push/log 接口无认证，可伪造推送日志</td><td>server/api-server.js:304-312</td><td><span class="badge badge-p0">P0</span></td></tr>
+<tr><td>4</td><td>/api/merchant/apply 接口无认证，可批量刷垃圾</td><td>server/api-server.js:230-249</td><td><span class="badge badge-p0">P0</span></td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>P1 高风险</h3>
+<div class="card">
+<table>
+<thead><tr><th width="60">#</th><th>问题</th><th>影响</th><th width="80">级别</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>CORS全开 *</td><td>任意第三方网站可跨域调用API</td><td><span class="badge badge-p1">P1</span></td></tr>
+<tr><td>2</td><td>超管手机号前端硬编码</td><td>18511550189暴露在浏览器源码</td><td><span class="badge badge-p1">P1</span></td></tr>
+<tr><td>3</td><td>JWT签名仅64bit、有效期72h</td><td>签名强度不足，泄露窗口过长</td><td><span class="badge badge-p1">P1</span></td></tr>
+<tr><td>4</td><td>前端权限可改localStorage绕过</td><td>任意用户可升级为VIP/super</td><td><span class="badge badge-p1">P1</span></td></tr>
+<tr><td>5</td><td>无HTTPS/SSL</td><td>所有数据明文传输含手机号/八字/Token</td><td><span class="badge badge-p1">P1</span></td></tr>
+<tr><td>6</td><td>医疗病例明文存localStorage</td><td>tcm-clinic.html病例数据无加密</td><td><span class="badge badge-p1">P1</span></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>二、双平台权限架构</h2>
+
+<h3>2.1 平台关系</h3>
+<div class="arch">┌─────────────────────────────────────────────────────┐
+│                 命理宝鉴 · 统一网关                   │
+│                (API Gateway + JWT Auth)              │
+├────────────────────────┬────────────────────────────┤
+│  平台A · 国学体系       │  平台B · 周易中医诊疗        │
+│  (会员权限驱动)         │  (角色权限驱动)             │
+│  排盘/学习/商城/课程    │  病患→大师→医生→报告推送    │
+├────────────────────────┴────────────────────────────┤
+│           共享层 · 知识库 (60 JS文件 / 13.2MB)        │
+│      按角色分级：公开/会员/大师专用/病患安全           │
+├─────────────────────────────────────────────────────┤
+│           数据层 · PostgreSQL + Redis                 │
+│    平台A数据 │ 平台B数据 │ 共享KB索引 │ 用户身份      │
+└─────────────────────────────────────────────────────┘</div>
+
+<h3>2.2 角色定义</h3>
+
+<div class="compare">
+  <div class="compare-col">
+    <div class="compare-title" style="color: var(--info);">平台A · 国学体系（6级会员制）</div>
+    <table>
+      <thead><tr><th>角色</th><th>编码</th><th>获取</th></tr></thead>
+      <tbody>
+        <tr><td>游客</td><td>guest</td><td>默认</td></tr>
+        <tr><td>免费会员</td><td>free</td><td>注册</td></tr>
+        <tr><td>普通会员</td><td>mingdao</td><td>付费</td></tr>
+        <tr><td>高级会员</td><td>advanced</td><td>付费</td></tr>
+        <tr><td>VIP会员</td><td>vip</td><td>付费</td></tr>
+        <tr><td>管理员</td><td>admin_a</td><td>分配</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="compare-col">
+    <div class="compare-title" style="color: var(--accent);">平台B · 周易中医诊疗（4角色制）</div>
+    <table>
+      <thead><tr><th>角色</th><th>编码</th><th>获取</th></tr></thead>
+      <tbody>
+        <tr><td>病患</td><td>patient</td><td>实名注册</td></tr>
+        <tr><td>周易大师</td><td>master</td><td>资质审核</td></tr>
+        <tr><td>中医医生</td><td>doctor</td><td>执业医师证</td></tr>
+        <tr><td>管理员</td><td>admin_b</td><td>分配</td></tr>
+        <tr><td colspan="3" style="text-align: center; color: var(--text-muted);">— 跨平台 —</td></tr>
+        <tr><td>超级管理员</td><td>super_admin</td><td>分配</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<p><strong>角色组合规则：</strong>一个账号可同时拥有多角色（如 <span class="role-tag role-a">vip</span> + <span class="role-tag role-b">patient</span>），JWT的roles字段为数组，后端取并集校验。大师+医生双角色可同时激活（协作空间需要）。</p>
+
+<h3>2.3 平台B · API权限矩阵</h3>
+<div class="card">
+<table>
+<thead><tr><th>API端点</th><th width="60">病患</th><th width="60">大师</th><th width="60">医生</th><th width="60">管理员</th></tr></thead>
+<tbody>
+<tr><td>提交症状</td><td style="color:var(--success);">✅</td><td style="color:var(--text-muted);">❌</td><td style="color:var(--text-muted);">❌</td><td style="color:var(--info);">✅查看</td></tr>
+<tr><td>查看分配病例</td><td style="color:var(--text-muted);">❌</td><td style="color:var(--success);">✅本人</td><td style="color:var(--success);">✅关联</td><td style="color:var(--success);">✅全部</td></tr>
+<tr><td>提交周易分析</td><td style="color:var(--text-muted);">❌</td><td style="color:var(--success);">✅</td><td style="color:var(--text-muted);">❌</td><td style="color:var(--info);">✅查看</td></tr>
+<tr><td>提交诊疗方案</td><td style="color:var(--text-muted);">❌</td><td style="color:var(--text-muted);">❌</td><td style="color:var(--success);">✅</td><td style="color:var(--info);">✅查看</td></tr>
+<tr><td>推送养生报告</td><td style="color:var(--text-muted);">❌</td><td style="color:var(--text-muted);">❌</td><td style="color:var(--success);">✅</td><td style="color:var(--success);">✅</td></tr>
+<tr><td>查看本人报告</td><td style="color:var(--success);">✅</td><td style="color:var(--text-muted);">❌</td><td style="color:var(--success);">✅已发</td><td style="color:var(--success);">✅全部</td></tr>
+<tr><td>协作讨论</td><td style="color:var(--text-muted);">❌</td><td style="color:var(--success);">✅</td><td style="color:var(--success);">✅</td><td style="color:var(--success);">✅</td></tr>
+<tr><td>大师专用KB（含术语）</td><td style="color:var(--text-muted);">❌</td><td style="color:var(--success);">✅</td><td style="color:var(--text-muted);">❌</td><td style="color:var(--success);">✅</td></tr>
+<tr><td>病患安全KB（过滤后）</td><td style="color:var(--success);">✅</td><td style="color:var(--success);">✅</td><td style="color:var(--success);">✅</td><td style="color:var(--success);">✅</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>2.4 周易术语隔离流程</h3>
+<div class="flow">
+  <div class="flow-step"><strong>病患提交症状</strong> → [后端]分配给大师</div>
+  <div class="flow-step"><strong>大师查看症状 + 调用大师KB（含周易术语）</strong> → 撰写分析</div>
+  <div class="flow-step"><strong>大师提交分析</strong>（analysis_text含术语） → [后端]自动生成filtered_summary（过滤术语）</div>
+  <div class="flow-step"><strong>医生查看</strong> filtered_summary + 完整analysis_text → 撰写诊断</div>
+  <div class="flow-step"><strong>生成tcm_reports</strong>（report_text不含术语） → [后端]推送给病患</div>
+  <div class="flow-step"><strong>病患端</strong>：仅看到通俗语言报告（"体质偏木型，需注意脾胃调理"）</div>
+</div>
+
+<h2>三、数据安全方案</h2>
+
+<h3>3.1 数据分级</h3>
+<div class="card">
+<table>
+<thead><tr><th width="80">级别</th><th>存储要求</th><th>传输要求</th><th>典型数据</th></tr></thead>
+<tbody>
+<tr><td><span class="badge badge-p3">L1 公开</span></td><td>无特殊</td><td>无特殊</td><td>知识库索引、生肖文化</td></tr>
+<tr><td><span class="badge badge-p2">L2 内部</span></td><td>明文</td><td>HTTPS</td><td>会员等级、浏览历史</td></tr>
+<tr><td><span class="badge badge-p1">L3 敏感</span></td><td>AES-256加密</td><td>TLS 1.3</td><td>手机号、生辰、排盘结果</td></tr>
+<tr><td><span class="badge badge-p0">L4 高敏</span></td><td>AES-256+TDE+字段级加密</td><td>TLS 1.3+应用层加密+审计</td><td>病例、处方、大师分析</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>3.2 五层加密架构</h3>
+<div class="card">
+<div class="card-title">加密层次模型</div>
+<table>
+<thead><tr><th width="60">层级</th><th>名称</th><th>措施</th></tr></thead>
+<tbody>
+<tr><td>L5</td><td>应用层加密（字段级）</td><td>病患姓名/生辰八字/症状/方剂/大师分析均AES-256-GCM加密，密钥由KMS管理</td></tr>
+<tr><td>L4</td><td>传输层加密</td><td>HTTPS(TLS 1.3) + HSTS + API请求HMAC-SHA256签名</td></tr>
+<tr><td>L3</td><td>数据库加密（TDE）</td><td>openGauss透明数据加密，全库at-rest加密，密钥90天轮换</td></tr>
+<tr><td>L2</td><td>存储加密</td><td>对象存储SSE-S3，KB文件靠权限隔离（非加密），日志脱敏</td></tr>
+<tr><td>L1</td><td>密钥管理</td><td>主密钥KMS管理永不落盘，DEK每表/每租户独立，DEK 90天轮换，Master Key 365天轮换</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>3.3 字段级权限矩阵（平台B核心）</h3>
+<div class="card">
+<table>
+<thead><tr><th>字段</th><th>病患(本人)</th><th>大师</th><th>医生</th><th>管理员</th></tr></thead>
+<tbody>
+<tr><td>病患姓名</td><td style="color:var(--success);">✅完整</td><td style="color:var(--warning);">🔶脱敏(姓+性别)</td><td style="color:var(--success);">✅完整</td><td style="color:var(--warning);">🔶脱敏</td></tr>
+<tr><td>生辰八字</td><td style="color:var(--success);">✅完整</td><td style="color:var(--success);">✅完整</td><td style="color:var(--warning);">🔶仅五行属性</td><td style="color:var(--warning);">🔶仅五行属性</td></tr>
+<tr><td>症状描述</td><td style="color:var(--success);">✅完整</td><td style="color:var(--warning);">🔶简要版</td><td style="color:var(--success);">✅完整</td><td style="color:var(--warning);">🔶简要版</td></tr>
+<tr><td>大师八字分析</td><td style="color:var(--info);">✅医学化翻译版</td><td style="color:var(--success);">✅完整</td><td style="color:var(--success);">✅完整</td><td style="color:var(--success);">✅完整</td></tr>
+<tr><td>方剂处方</td><td style="color:var(--success);">✅完整</td><td style="color:var(--text-muted);">❌不可见</td><td style="color:var(--success);">✅完整</td><td style="color:var(--success);">✅完整</td></tr>
+<tr><td>协作讨论</td><td style="color:var(--success);">✅完整</td><td style="color:var(--success);">✅大师+医生部分</td><td style="color:var(--success);">✅大师+医生部分</td><td style="color:var(--success);">✅完整</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>3.4 知识库文件分级（60个文件 → 5级）</h3>
+<div class="metrics">
+  <div class="metric"><div class="metric-value">8</div><div class="metric-label">L1 公开（游客可见）</div></div>
+  <div class="metric"><div class="metric-value">15</div><div class="metric-label">L2 注册用户</div></div>
+  <div class="metric"><div class="metric-value">17</div><div class="metric-label">L3 付费会员</div></div>
+  <div class="metric"><div class="metric-value">7</div><div class="metric-label">L3+ 精进会员</div></div>
+  <div class="metric"><div class="metric-value">9</div><div class="metric-label">L4 大师/医生专用</div></div>
+  <div class="metric"><div class="metric-value">4</div><div class="metric-label">管理员专用</div></div>
+</div>
+
+<p><strong>访问控制方案：</strong>Nginx auth_request子请求鉴权 → JWT解析 → 角色匹配KB权限表 → 200/403。KB文件从静态目录迁移到受控路径 <code>/data/kb/{public,registered,member-basic,member-premium,professional,admin}/</code>。</p>
+
+<h2>四、大师诊断结论单独存放</h2>
+
+<div class="compare">
+  <div class="compare-col">
+    <div class="compare-title">普通病例 (medical_cases)</div>
+    <p style="color: var(--text-muted); font-size: 0.9em;">
+      · 病患自助填写<br>
+      · 简单症状记录<br>
+      · 无命理分析<br>
+      · 医生常规诊疗<br>
+      · localStorage（当前）<br>
+      · 安全级别: L3<br>
+      · 保留: 365天
+    </p>
+  </div>
+  <div class="compare-col" style="border-color: var(--accent);">
+    <div class="compare-title" style="color: var(--accent);">大师案例库 (master_cases)</div>
+    <p style="color: var(--text-muted); font-size: 0.9em;">
+      · 大师亲自分析<br>
+      · 完整八字+起卦+医学化翻译<br>
+      · 医生审核流程<br>
+      · 数据库加密存储（AES-256-GCM）<br>
+      · 支持知识蒸馏<br>
+      · 安全级别: L4<br>
+      · 保留: 5年（医疗+研究价值）
+    </p>
+  </div>
+</div>
+
+<h3>案例审核流程</h3>
+<div class="flow">
+  <div class="flow-step"><strong>草稿 (draft)</strong> ← 大师创建/编辑案例</div>
+  <div class="flow-step"><strong>待审核 (submitted)</strong> ← 大师提交，医生收到通知</div>
+  <div class="flow-step"><strong>审核中 (reviewing)</strong> ← 医生查看完整案例</div>
+  <div class="flow-step"><strong>退回修改 (revision_requested)</strong> ← 医生要求修改 → 大师修改后重新提交</div>
+  <div class="flow-step"><strong>已通过 (approved)</strong> ← 医生通过 → 最终方案生成</div>
+  <div class="flow-step"><strong>已完成 (completed)</strong> ← 推送报告给病患</div>
+  <div class="flow-step"><strong>已归档 (archived)</strong> ← 保留期满/主动归档</div>
+</div>
+
+<h2>五、知识蒸馏提取机制</h2>
+
+<h3>五步蒸馏流程</h3>
+<div class="timeline">
+  <div class="timeline-step">
+    <div class="timeline-marker">1</div>
+    <div class="timeline-body">
+      <div class="timeline-title">案例收集</div>
+      <div class="timeline-text">触发条件：每月/每季度 / 新增高质量案例≥50条 / 检测到未覆盖新模式。筛选标准：status=completed + quality_score≥7 + effectiveness≥3</div>
+    </div>
+  </div>
+  <div class="timeline-step">
+    <div class="timeline-marker">2</div>
+    <div class="timeline-body">
+      <div class="timeline-title">模式提取</div>
+      <div class="timeline-text">特征提取（五行/脏腑/卦象/体质/证候/方剂）→ 按(五行+体质+证候)分组聚类 → 统计有效率 → 置信度计算（阈值≥0.6，支持案例≥5，矛盾比例≤20%）</div>
+    </div>
+  </div>
+  <div class="timeline-step">
+    <div class="timeline-marker">3</div>
+    <div class="timeline-body">
+      <div class="timeline-title">知识验证</div>
+      <div class="timeline-text">自动验证（交叉比对+逻辑一致性+方剂匹配+去重85%）→ 人工审核（大师审周易 + 医生审中医 + 管理员审分类）→ 三方均通过才入库</div>
+    </div>
+  </div>
+  <div class="timeline-step">
+    <div class="timeline-marker">4</div>
+    <div class="timeline-body">
+      <div class="timeline-title">KB更新</div>
+      <div class="timeline-text">匹配目标KB文件（白名单7个）→ 新增/补充/修正 → 每条标注来源案例ID → 安全检查（无个人信息泄露）→ 生成diff</div>
+    </div>
+  </div>
+  <div class="timeline-step">
+    <div class="timeline-marker">5</div>
+    <div class="timeline-body">
+      <div class="timeline-title">版本管理</div>
+      <div class="timeline-text">版本号MAJOR.MINOR.PATCH（MINOR级递增）→ 快照存储+diff记录 → 管理员确认后生效 → 支持回滚到任意历史版本</div>
+    </div>
+  </div>
+</div>
+
+<h3>蒸馏白名单（7个KB文件可接受蒸馏知识）</h3>
+<div class="card">
+<table>
+<thead><tr><th>KB文件</th><th>可接受蒸馏类型</th></tr></thead>
+<tbody>
+<tr><td>bazi-knowledge-base.js</td><td>格局-证候关联</td></tr>
+<tr><td>tcm-diagnosis-kb.js</td><td>体质-证候-方剂模式</td></tr>
+<tr><td>tcm-famous-formulas-kb.js</td><td>方剂加减规律</td></tr>
+<tr><td>zhouyi-knowledge-base.js</td><td>卦象-病机关联</td></tr>
+<tr><td>nihaisha-tcm-kb.js</td><td>养生调理方案</td></tr>
+<tr><td>authoritative-knowledge-base.js</td><td>综合规律</td></tr>
+<tr><td>wuxing-correspondence.js</td><td>五行-脏腑关联</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>六、实施路线图</h2>
+
+<div class="timeline">
+  <div class="timeline-step">
+    <div class="timeline-marker" style="background: var(--danger-bg); border-color: var(--danger); color: var(--danger);">P0</div>
+    <div class="timeline-body">
+      <div class="timeline-title">第1-2周：紧急修复 + 基础认证</div>
+      <div class="timeline-text">轮换API密钥+移至后端代理 / 修复AES加密IV / 为无认证接口添加auth / 搭建后端API服务 / 用户注册登录+JWT / Redis集成</div>
+    </div>
+  </div>
+  <div class="timeline-step">
+    <div class="timeline-marker" style="background: var(--warning-bg); border-color: var(--warning); color: var(--warning);">P1</div>
+    <div class="timeline-body">
+      <div class="timeline-title">第3-4周：RBAC权限框架</div>
+      <div class="timeline-text">角色-权限映射表落地 / RBAC中间件+数据隔离中间件 / 前端路由守卫+菜单控制 / 角色切换功能</div>
+    </div>
+  </div>
+  <div class="timeline-step">
+    <div class="timeline-marker" style="background: var(--info-bg); border-color: var(--info); color: var(--info);">P2</div>
+    <div class="timeline-body">
+      <div class="timeline-title">第5-6周：平台A迁移</div>
+      <div class="timeline-text">会员等级API化 / 排盘API权限校验 / 排盘记录持久化 / 知识库API化</div>
+    </div>
+  </div>
+  <div class="timeline-step">
+    <div class="timeline-marker" style="background: var(--info-bg); border-color: var(--info); color: var(--info);">P3</div>
+    <div class="timeline-body">
+      <div class="timeline-title">第7-8周：平台B迁移</div>
+      <div class="timeline-text">tcm-clinic.html后端化 / 病例管理API+角色隔离 / 大师分析+医生诊疗工作流 / 病患报告推送</div>
+    </div>
+  </div>
+  <div class="timeline-step">
+    <div class="timeline-marker" style="background: rgba(201,168,76,0.1); border-color: var(--accent); color: var(--accent);">P4</div>
+    <div class="timeline-body">
+      <div class="timeline-title">第9-10周：知识库分级 + 蒸馏</div>
+      <div class="timeline-text">KB文件入库+访问级别标注 / KB分发API / 知识蒸馏管道 / KB版本管理</div>
+    </div>
+  </div>
+  <div class="timeline-step">
+    <div class="timeline-marker" style="background: var(--success-bg); border-color: var(--success); color: var(--success);">P5</div>
+    <div class="timeline-body">
+      <div class="timeline-title">第11-12周：安全加固</div>
+      <div class="timeline-text">审计日志系统 / 速率限制+安全HTTP头 / HTTPS强制+渗透测试 / 灾备方案</div>
+    </div>
+  </div>
+</div>
+
+<h2>七、PIPL合规清单</h2>
+<div class="card">
+<table>
+<thead><tr><th width="40">#</th><th>检查项</th><th width="80">设计覆盖</th><th width="80">实现状态</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>取得个人同意</td><td>✅ 已设计</td><td>☐ 待实现</td></tr>
+<tr><td>2</td><td>敏感信息单独同意</td><td>✅ 已设计</td><td>☐ 待实现</td></tr>
+<tr><td>3</td><td>处理目的明确</td><td>✅ 已设计</td><td>✅ 已设计</td></tr>
+<tr><td>4</td><td>最小必要原则</td><td>✅ 已设计</td><td>✅ 已设计</td></tr>
+<tr><td>5</td><td>安全保护措施</td><td>✅ 已设计</td><td>✅ 已设计</td></tr>
+<tr><td>6</td><td>境内存储</td><td>✅ 已设计</td><td>✅ 已设计</td></tr>
+<tr><td>7</td><td>查阅权</td><td>✅ 已设计</td><td>✅ 已设计</td></tr>
+<tr><td>8</td><td>更正权</td><td>✅ 已设计</td><td>☐ 待实现</td></tr>
+<tr><td>9</td><td>删除权</td><td>✅ 已设计</td><td>☐ 待实现</td></tr>
+<tr><td>10</td><td>可携带权</td><td>✅ 已设计</td><td>☐ 待实现</td></tr>
+<tr><td>11</td><td>未成年人保护</td><td>✅ 已设计</td><td>☐ 待实现</td></tr>
+<tr><td>12</td><td>医疗处方保留5年</td><td>✅ 已设计</td><td>✅ 已设计</td></tr>
+<tr><td>13</td><td>蒸馏数据匿名化</td><td>✅ 已设计</td><td>✅ 已设计</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>八、相关文档</h2>
+<div class="card">
+<table>
+<thead><tr><th>文档</th><th>路径</th><th>内容</th></tr></thead>
+<tbody>
+<tr><td>安全审计报告</td><td>.cluster/system-audit/security-audit-report.md</td><td>21个安全问题详细描述+修复建议</td></tr>
+<tr><td>RBAC权限架构设计</td><td>.cluster/permission-architecture/rbac-design.md</td><td>完整角色权限矩阵+数据模型+认证流程+实施路线图</td></tr>
+<tr><td>数据安全与知识蒸馏设计</td><td>.cluster/data-security-design/security-distillation-design.md</td><td>加密方案+案例存储+蒸馏机制+合规清单</td></tr>
+<tr><td>总报告（本文档）</td><td>docs/SYSTEM_AUDIT_AND_ARCHITECTURE.md</td><td>三份报告汇总+交叉核验</td></tr>
+</tbody>
+</table>
+</div>
+
+</body>
+</html>

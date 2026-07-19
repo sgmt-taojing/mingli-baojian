@@ -2960,7 +2960,7 @@ function tzStep1Analyze(fileName, content, type) {
   '重要：分析仅供养生参考，不构成医疗诊断。解读要专业准确通俗易懂。异常指标必须给具体可执行建议。\n\n' +
   '报告内容：' + (typeof content === 'string' ? content.substring(0, 4000) : content);
 
-  let apiBase = 'https://api.g2claw.com';
+  let apiBase = '';  // P0修复：使用后端代理
   let payload = {
     model: 'auto',
     messages: [{role: 'user', content: prompt}],
@@ -3007,7 +3007,7 @@ function tzStep1Analyze(fileName, content, type) {
     if(isAuth){
       result.innerHTML = '<div style="padding:24px;text-align:center"><div style="font-size:48px;margin-bottom:12px">🔑</div><div style="font-size:15px;color:var(--cinn2);margin-bottom:10px;font-weight:bold">AI分析服务认证失败</div><div style="font-size:13px;color:var(--paper2);margin-bottom:16px;line-height:1.6">API代理服务的认证令牌已过期或未配置。<br>请检查 <code style="background:rgba(255,255,255,.1);padding:2px 6px;border-radius:4px">server/api-proxy-server.py</code> 的 API 配置。</div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="compute-btn" style="padding:8px 20px;font-size:12px" onclick="tzLocalFallback()">📚 使用本地知识库分析</button><button class="compute-btn" style="padding:8px 20px;font-size:12px;opacity:.5" onclick="tzStep1Analyze(\'手动输入\',\'\',\'text\')">🔄 重试</button></div></div>';
     }else{
-      result.innerHTML = '<div style="padding:20px;text-align:center"><div style="font-size:14px;color:var(--cinn2);margin-bottom:12px">⚠️ 分析服务暂时不可用</div><div style="font-size:12px;color:var(--paper2);margin-bottom:16px">请确认网络正常，AI服务可用，或稍后重试</div><div style="font-size:11px;color:var(--paper3)">错误信息: ' + (err.message || err) + '</div><div style="margin-top:12px"><button class="compute-btn" style="padding:8px 20px;font-size:12px" onclick="tzLocalFallback()">📚 使用本地知识库分析</button></div></div>';
+      result.innerHTML = '<div style="padding:20px;text-align:center"><div style="font-size:14px;color:var(--cinn2);margin-bottom:12px">⚠️ 分析服务暂时不可用</div><div style="font-size:12px;color:var(--paper2);margin-bottom:16px">请确认网络正常，AI服务可用，或稍后重试</div><div style="font-size:11px;color:var(--paper3)">错误信息: ' + escapeHtml(String(err.message || err)) + '</div><div style="margin-top:12px"><button class="compute-btn" style="padding:8px 20px;font-size:12px" onclick="tzLocalFallback()">📚 使用本地知识库分析</button></div></div>';
     }
   });
 }
@@ -3132,7 +3132,7 @@ function tzStep2Suggestions() {
     temperature: 0.4
   };
 
-  fetch('https://api.g2claw.com/v1/chat/completions', {
+  fetch('/api/ai/chat', {
     method: 'POST',
     headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer b720753afe0845f5a7611a1b56b6d77c'},
     body: JSON.stringify(payload)
@@ -15951,7 +15951,7 @@ function _analyzeFloorPlanAI(imageData, context) {
   let fsAiStatus = document.getElementById('fsAiStatus');
   if (fsAiStatus) fsAiStatus.innerHTML = '<div style="padding:20px;text-align:center"><div style="font-size:24px">🔮 AI分析中...</div><p style="margin-top:12px;opacity:.6">正在解读您的户型图</p></div>';
 
-  fetch('https://api.g2claw.com/v1/chat/completions', {
+  fetch('/api/ai/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer b720753afe0845f5a7611a1b56b6d77c' },
     body: JSON.stringify({
@@ -20267,9 +20267,10 @@ function buildReportContent(resultEl, name, sex, bazi) {
   const currentYear = new Date().getFullYear();
   const nextYear = currentYear + 1;
 
-  // 获取会员信息
+  // 获取会员信息（RBAC优先，旧版fallback）
   const member = safeGetJSON('memberInfo', {});
-  const isMember = member.level && member.level !== 'free';
+  // RBAC: 通过角色判断会员身份
+  const isMember = (typeof RBAC !== 'undefined' && (RBAC.hasRole('mingdao') || RBAC.hasRole('advanced') || RBAC.hasRole('vip'))) || (member.level && member.level !== 'free');
 
   // 构建会员年度提醒
   let annualNotice = '';
@@ -26212,8 +26213,16 @@ function generateAnnualForecast(birthYear, birthMonth, birthDay, birthHour, sex,
 function getAnnualForecastWithAccess(user, forecast) {
   if (!forecast || !forecast.dimensions) return { forecast: null, visibleCount: 0, lockedCount: 0, accessLevel: 'none' };
 
-  let isSuper = user && user.isSuper;
+  // RBAC角色优先，旧版fallback
+  let isSuper = (typeof RBAC !== 'undefined' && RBAC.hasRole('super_admin')) || (user && user.isSuper);
   let vipLevel = user && user.vipLevel ? user.vipLevel : 'free';
+  // RBAC: 根据角色推导vipLevel
+  if (typeof RBAC !== 'undefined') {
+    if (RBAC.hasRole('vip')) vipLevel = 'lifetime';
+    else if (RBAC.hasRole('advanced')) vipLevel = 'yearly';
+    else if (RBAC.hasRole('mingdao')) vipLevel = 'monthly';
+    else if (RBAC.hasRole('free')) vipLevel = 'free';
+  }
 
   // 通达/终身/精进 → 全部可见
   if (isSuper || vipLevel === 'lifetime' || vipLevel === 'yearly') {
@@ -26264,14 +26273,23 @@ function checkAnnualForecastPush() {
   let message = '';
 
   // 判断用户会员等级
+  // RBAC优先：从角色推导用户等级
   let userLevel = 'free';
+  if (typeof RBAC !== 'undefined') {
+    if (RBAC.hasRole('super_admin')) userLevel = 'super';
+    else if (RBAC.hasRole('vip')) userLevel = 'lifetime';
+    else if (RBAC.hasRole('advanced')) userLevel = 'yearly';
+    else if (RBAC.hasRole('mingdao')) userLevel = 'monthly';
+  }
   try {
     let data = safeGetJSON('mlbj_data', {});
-    if (data.user && data.user.vipLevel) userLevel = data.user.vipLevel;
-    // 通达检测
-    if (data.user && data.user.phone) {
-      let SUPER_USERS_LOCAL = ['18511550189'];
-      if (SUPER_USERS_LOCAL.indexOf(data.user.phone) >= 0) userLevel = 'super';
+    // 旧版fallback
+    if (data.user && data.user.vipLevel && userLevel === 'free') userLevel = data.user.vipLevel;
+    // 通达检测（P0修复：改为检查roles数组）
+    if (data.user && data.user.roles && Array.isArray(data.user.roles) && data.user.roles.includes('super_admin')) {
+      userLevel = 'super';
+    } else if (data.user && data.user.isSuper === true) {
+      userLevel = 'super';
     }
   } catch(e) {}
 
@@ -27366,9 +27384,16 @@ function computeFamilyPaipan() {
     return;
   }
 
-  // 会员验证
+  // 会员验证（RBAC优先，旧版fallback）
   let member = safeGetJSON('memberInfo', {});
   let memberLevel = member.level || 'free';
+  // RBAC: 通过角色推导会员等级
+  if (typeof RBAC !== 'undefined') {
+    if (RBAC.hasRole('vip') || RBAC.hasRole('super_admin')) memberLevel = '明道';
+    else if (RBAC.hasRole('advanced')) memberLevel = '知命';
+    else if (RBAC.hasRole('mingdao')) memberLevel = '常修';
+    else memberLevel = 'free';
+  }
 
   if (memberLevel !== '明道') {
     let output = document.getElementById('familyResult');
