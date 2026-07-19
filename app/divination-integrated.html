@@ -6,31 +6,22 @@
   <title>易道智鉴 · 先进AI推演</title>
   <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --ink:var(--ink);--ink2:var(--ink2);--ink3:var(--ink3);--ink4:var(--ink4);
-      --paper:var(--paper);--paper2:var(--paper2);--paper3:var(--paper3);
-      --gold:var(--gold);--gold2:var(--gold2);--gold3:var(--gold3);
-      --title:var(--gold);--muted:var(--paper3);--accent:var(--gold);
-      --bg:var(--ink);--bg-card:rgba(255,255,255,0.04);
-      --card:rgba(255,255,255,0.04);--card2:rgba(255,255,255,0.06);
+        :root{
+      --ink:#080808;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;
+      --paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;
+      --gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;
+      --cinn:#c0392b;--cinn2:#e74c3c;
+      --jade:#27ae60;--jade2:#2ecc71;
+      --cyan:#2980b9;--cyan2:#5dade2;
+      --wood:#8d6e63;--earth:#a08060;--metal:#95a5a6;
+      --danger:#dc3545;--success:#2ecc71;--warn:#e67e22;
+      --title:#c9a84c;--muted:#a09080;--accent:#c9a84c;
       --border:rgba(201,168,76,.15);
+      --bg:#080808;--card:rgba(255,255,255,0.04);--card2:rgba(255,255,255,0.06);
+      --bg-card:rgba(255,255,255,0.04);
       --shadow:0 4px 24px rgba(0,0,0,.5);
-      --success:var(--success);--warn:var(--orange);--danger:var(--cinn2);
-      --text:var(--paper);--text-dim:var(--paper3);
-      --cinn:var(--cinn);--cinn2:var(--cinn2);
-      --cyan:var(--cyan);--cyan2:var(--cyan2);
-      --jade:var(--jade);--jade2:var(--success);
-      --violet:var(--violet2);--violet2:var(--violet2);
-      --orange:var(--orange);
-      --emerald:var(--emerald);
-      --steel:var(--steel);
-      --wood:var(--wood);--wood2:var(--wood2);
-      --fire:var(--cinn2);--fire2:var(--cinn);
-      --earth:var(--earth);
-      --metal:var(--metal);--metal2:var(--metal2);
-      --font-mono:'Cutive Mono','Courier New',monospace;
-      --font-serif:'Noto Serif SC','Source Han Serif SC','SimSun','STSong',serif;
-    }
+      --orange:#e67e22;--steel:#7f8c8d;--violet:#8e44ad;--violet2:#9b59b6;
+      --fire:#e74c3c;--water:#2980b9;--wood2:#a1887f;;--text:#f0e8d8;--text-dim:#a09080;--font-serif:"Noto Serif SC",serif;--font-mono:monospace}
     *{margin:0;padding:0;box-sizing:border-box}
     body{background:var(--bg);color:var(--text);font-family:var(--font-serif);min-height:100vh;line-height:1.8;overflow-x:hidden}
     .header{text-align:center;padding:30px 20px 20px;background:linear-gradient(180deg,rgba(201,168,76,0.08),rgba(8,8,8,1));border-bottom:1px solid var(--border)}
@@ -1498,6 +1489,7 @@ async function analyzeReport(){
   } catch(e) {
     clearInterval(dotsTimer);
     console.error('分析失败:', e);
+    showToast('分析失败:，请重试');
     loading.classList.remove('show');
     showToast('分析失败，请重试或手动录入');
   } finally {
@@ -1522,6 +1514,7 @@ function saveToKnowledgeBase(indicators){
     localStorage.setItem('tizhi_report_history', JSON.stringify(history));
   } catch(e) {
     console.error('保存失败:', e);
+    showToast('保存失败:，请重试');
   }
 }
 
@@ -2515,6 +2508,7 @@ async function callLLMForAnalysis(){
   } catch(err) {
     clearInterval(tipTimer);
     console.error('AI分析失败:', err);
+    showToast('AI分析失败:，请重试');
     
     document.getElementById('aiAnalyzingState').style.display='none';
     document.getElementById('aiErrorState').style.display='block';

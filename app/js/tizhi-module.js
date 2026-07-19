@@ -450,7 +450,7 @@ function tzRenderQuestionnaire(){
       '<div class="tz-text-14-text-mb10"><b class="tz-title-13-gold-plain">'+(idx+1)+'.</b> '+q.q+'</div>'+
       '<div class="tz-flex-gap8">'+
       ['没有','很少','有时','经常','总是'].forEach(function(opt,oi){
-        html+='<label style="flex:1;padding:8px;text-align:center;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:12px;color:var(--muted);transition:.2s" onclick="tzSelectAnswer('+idx+','+oi+',this)">'+
+        html+='<label class="tz-answer-label" onclick="tzSelectAnswer('+idx+','+oi+',this)">'+
           '<input type="radio" name="tzq'+idx+'" value="'+oi+'" class="">'+opt+'</label>';
       }).join('')+
       '</div></div>';
@@ -493,7 +493,7 @@ function tzCalculateResult(){
   window._tzLastResult={key:top,name:topC.name};
 
   let html='<div class="tz-card-lg">'+
-    '<h4 style="font-family:\'Ma Shan Zheng\',serif;font-size:22px;color:var(--gold);margin-bottom:16px;letter-spacing:3px;text-align:center">📊 您的体质分析结果</h4>'+
+    '<h4 class="tz-result-title">📊 您的体质分析结果</h4>'+
     '<div class="tz-flex-center-wrap">'+
       '<div style="background:rgba('+parseInt(topC.color.slice(1,3),16)+','+parseInt(topC.color.slice(3,5),16)+','+parseInt(topC.color.slice(5,7),16)+',0.1);border:2px solid '+topC.color+';border-radius:12px;padding:20px 32px;text-align:center">'+
         '<div class="tz-icon-lg">'+topC.icon+'</div>'+
@@ -506,7 +506,7 @@ function tzCalculateResult(){
         '<div class="tz-text-12-paper2-mt6">'+secondC.desc+'</div>'+
       '</div>'+
     '</div>'+
-    '<div style="background:rgba(201,168,76,0.06);border-left:3px solid var(--gold);padding:16px 20px;border-radius:0 8px 8px 0;margin-bottom:16px">'+
+    '<div class="tz-insight-box">'+
       '<div class="tz-title-14-gold-mb8">🌿 养生建议</div>'+
       '<div class="tz-text-14">'+topC.yangsheng+'</div>'+
     '</div>'+
@@ -550,7 +550,7 @@ function tzRenderFood(filter){
   if(filterEl && !filterEl.innerHTML){
     const fhtml = '<button onclick="tzFilterFood(\'all\')" class="tz-badge">全部</button>';
     TZ_DATA.constitutions.forEach(function(c){
-      fhtml+='<button onclick="tzFilterFood(\''+c.name.replace(/质$/,'')+'\')" style="padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,0.04);color:var(--muted);cursor:pointer;font-size:12px;font-family:inherit">'+c.icon+' '+c.name.replace(/质$/,'')+'</button>';
+      fhtml+='<button onclick="tzFilterFood(\''+c.name.replace(/质$/,'')+'\')" class="tz-filter-btn">'+c.icon+' '+c.name.replace(/质$/,'')+'</button>';
     });
     filterEl.innerHTML=fhtml;
   }
@@ -655,7 +655,7 @@ function tzAnalyzeBazi(){
   let wuData = TZ_DATA.wuxing[{木:'Mu',火:'Huo',土:'Tu',金:'Jin',水:'Shui'}[wu]];
 
   let html='<div class="tz-card-lg">'+
-    '<h5 style="font-family:\'Ma Shan Zheng\',serif;font-size:20px;color:var(--gold);margin-bottom:16px;text-align:center">🔮 日主'+dayStem+'('+wu+'行) 体质分析</h5>'+
+    '<h5 class="tz-result-subtitle">🔮 日主'+dayStem+'('+wu+'行) 体质分析</h5>'+
     '<div class="tz-center-mb16">'+
       '<div class="tz-icon-lg">'+wuData.icon+'</div>'+
       '<div style="font-size:20px;color:'+wuData.color+';font-weight:bold;margin-top:8px">'+wuData.name+'行 · '+wuData.organs.join('、')+'</div>'+
@@ -750,7 +750,7 @@ function tzRenderCheckin(){
     try{dData=JSON.parse(localStorage.getItem(dk)||'null');}catch(e){}
     if(dData){
       hasHistory=true;
-      html+='<div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px">'+
+      html+='<div class="tz-card-item">'+
         '<div class="tz-flex-between-mb10">'+
           '<span class="tz-title-13-gold-plain">'+dk.replace('tz_checkin_','')+'</span>'+
           '<span class="tz-success">✅ '+dData.items.length+'项</span>'+
