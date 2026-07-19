@@ -8098,12 +8098,12 @@ function showYjResult() {
     metaText += ` · 起心动念: ${qxStr}`;
   }
   document.getElementById('yjMeta').textContent = metaText;
-  document.getElementById('yjTitle').textContent = hex.name + '卦';
+  document.getElementById('yjTitle').textContent = (hex.name || '未知') + '卦';
   document.getElementById('yjPinyin').textContent = hex.pinyin;
   document.getElementById('yjSym1').textContent = hex.symbol;
-  document.getElementById('yjName1').textContent = hex.name + '卦';
+  document.getElementById('yjName1').textContent = (hex.name || '未知') + '卦';
   document.getElementById('yjPy1').textContent = hex.pinyin;
-  document.getElementById('yjJud1').textContent = hex.judgment;
+  document.getElementById('yjJud1').textContent = hex.judgment || '—';
   document.getElementById('yjMean1').textContent = hex.meaning;
 
   // Render gua lines
@@ -8137,6 +8137,7 @@ function showYjResult() {
   }
 
   // Interpretation
+  if (!hex) { showToast('卦象数据异常'); return; }
   const interp = YJ_INTERP[hexNum] || YJ_INTERP[1];
   const ctr = document.getElementById('yjInterp');
   ctr.innerHTML = '';
