@@ -405,13 +405,13 @@ window.TCM_DIAGNOSIS_KB = {};
       }
     ],
     match: function(symptoms, mingli) {
-      var tags = symptoms || [];
-      var results = [];
-      var doctors = this.doctors;
-      for (var i = 0; i < doctors.length; i++) {
-        var doc = doctors[i];
-        var score = 0;
-        for (var j = 0; j < tags.length; j++) {
+      let tags = symptoms || [];
+      let results = [];
+      let doctors = this.doctors;
+      for (let i = 0; i < doctors.length; i++) {
+        let doc = doctors[i];
+        let score = 0;
+        for (let j = 0; j < tags.length; j++) {
           if (doc.syndrome_tags.indexOf(tags[j]) !== -1) score++;
         }
         if (score > 0) {
@@ -555,10 +555,10 @@ window.TCM_DIAGNOSIS_KB = {};
       { hexagram: '丰', name: '雷火丰', element: '木/火', organ: '肝/心', disease_hint: '丰卦主丰盛过度，易致肝心火旺、阳亢风动', tcm_link: '肝火上炎/心火亢盛', formula: '天麻钩藤饮/导赤散', acupoints: ['太冲','神门','风池','心俞'], health_direction: '平肝息风，清心泻火' }
     ],
     hexagram_to_syndrome_chain: function(hexagramName) {
-      var list = this.hexagram_health;
-      for (var i = 0; i < list.length; i++) {
+      let list = this.hexagram_health;
+      for (let i = 0; i < list.length; i++) {
         if (list[i].name.indexOf(hexagramName) !== -1 || list[i].hexagram === hexagramName) {
-          var h = list[i];
+          let h = list[i];
           return {
             hexagram: h.hexagram,
             name: h.name,
@@ -680,8 +680,8 @@ window.TCM_DIAGNOSIS_KB = {};
       }
     ],
     union_diagnosis: function(tizhi, baziElement) {
-      var map = this.tizhi_mingli_map;
-      for (var i = 0; i < map.length; i++) {
+      let map = this.tizhi_mingli_map;
+      for (let i = 0; i < map.length; i++) {
         if (map[i].tizhi === tizhi) {
           return {
             tizhi: tizhi,

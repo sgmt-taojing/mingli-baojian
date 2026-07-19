@@ -1,5 +1,5 @@
 // 易道智鉴 · 测字数据库 · 500+汉字 · v2026.06.15
-var CEZI_DATABASE = {
+let CEZI_DATABASE = {
   // === 姓氏首字 ===
   "王":{kangxi:4,wuxing:"土",yin:"wáng",shape:"上下结构",meaning:"王者，天下归往。古代最高统治者称号",luck:"吉",yi:"从政、管理、领导",ji:"忌刚愎自用"},
   "李":{kangxi:7,wuxing:"木",yin:"lǐ",shape:"上下结构",meaning:"李树，果木之一。姓氏中最多使用",luck:"吉",yi:"教育、文化、农业",ji:"忌贪图小利"},

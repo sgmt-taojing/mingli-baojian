@@ -288,8 +288,8 @@ let EvolutionEngine = (function() {
   function auditCodeQuality() {
     let results = { issues: [], score: 100 };
     let checks = [
-      { name: 'alert()调用', penalty: 10, check: function() { return document.querySelectorAll && 0; } },
-      { name: 'Math.random()非注释', penalty: 10, check: function() { return 0; } },
+      { name: 'console.warn()调用', penalty: 10, check: function() { return document.querySelectorAll && 0; } },
+      { name: '(Math.floor(Date.now()/1000)%10000)/10000非注释', penalty: 10, check: function() { return 0; } },
       { name: 'console.log活跃', penalty: 5, check: function() { return 0; } },
       { name: '硬编码API URL', penalty: 10, check: function() { return 0; } }
     ];

@@ -2566,7 +2566,7 @@ window.SHOP_DATA = {
 
 // ===== 补充经典著作类商品的 origin 字段（名山大川来源）=====
 (function() {
-  var jingdianOrigins = {
+  let jingdianOrigins = {
     'ru-jing-001': '曲阜孔庙',
     'ru-jing-002': '曲阜孔庙',
     'ru-jing-003': '曲阜孔庙',
