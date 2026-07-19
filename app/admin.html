@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ink:var(--ink);--ink2:var(--ink2);--ink3:#1a1a1a;--ink4:var(--ink4);
+  --ink:var(--ink);--ink2:var(--ink2);--ink3:var(--ink3);--ink4:var(--ink4);
   --paper:var(--paper);--paper2:var(--paper2);--paper3:var(--paper3);
   --gold:var(--gold);--gold2:var(--gold2);--gold3:var(--gold3);
   --cinn:var(--cinn);--cinn2:var(--cinn2);
@@ -18,9 +18,9 @@
   --cyan:var(--cyan);--cyan2:var(--cyan2);
   --wood:var(--wood);
   --amber:var(--warn);
-  --cream:#fdf6e3;
-  --gold-bright:#D4AF37;
-  --danger:#dc3545;
+  --cream:var(--paper);
+  --gold-bright:var(--gold);
+  --danger:var(--danger);
   --gray-light:var(--paper3);--gray:var(--steel);
 }
 *{margin:0;padding:0;box-sizing:border-box}
@@ -1008,9 +1008,9 @@ function showDomainDetail(key){
     <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;font-size:.8rem;color:var(--gray-light)">
       <span>知识条目: <b style="color:var(--gold2)">${cardCount}</b></span>
       <span>总字符: <b style="color:var(--gold2)">${charCount.toLocaleString()}</b></span>
-      <span>达标(≥1000字): <b style="color:${passRate>=80?'#2ecc71':passRate>=50?'#f39c12':'#e74c3c'}">${passCount}/${cardCount} (${passRate}%)</b></span>
+      <span>达标(≥1000字): <b style="color:${passRate>=80?'var(--success)':passRate>=50?'var(--warn)':'var(--cinn2)'}">${passCount}/${cardCount} (${passRate}%)</b></span>
     </div>
-    <div class="progress-bar" style="margin-bottom:1rem"><div class="fill" style="width:${passRate}%;background:${passRate>=80?'#2ecc71':passRate>=50?'#f39c12':'#e74c3c'}"></div></div>
+    <div class="progress-bar" style="margin-bottom:1rem"><div class="fill" style="width:${passRate}%;background:${passRate>=80?'var(--success)':passRate>=50?'var(--warn)':'var(--cinn2)'}"></div></div>
     <div style="max-height:600px;overflow-y:auto">
       ${items.map(m=>{
         const preview=m.text.substring(0,120)+(m.text.length>120?'...':'');

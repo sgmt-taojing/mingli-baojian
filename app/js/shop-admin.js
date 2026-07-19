@@ -35,7 +35,7 @@ function _showPasswordModal(callback) {
   overlay.id = 'pwdModal';
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:99999';
   let card = document.createElement('div');
-  card.style.cssText = 'background:#1a1f2e;border:1px solid rgba(201,168,76,.3);border-radius:14px;padding:32px 28px;max-width:360px;width:90%';
+  card.style.cssText = 'background:var(--ink2);border:1px solid rgba(201,168,76,.3);border-radius:14px;padding:32px 28px;max-width:360px;width:90%';
   let title = document.createElement('h3');
   title.textContent = '商城管理后台';
   title.style.cssText = 'color:var(--gold);margin:0 0 20px;font-size:18px;text-align:center';
@@ -50,7 +50,7 @@ function _showPasswordModal(callback) {
   cancelBtn.style.cssText = 'padding:8px 18px;border-radius:8px;border:none;background:rgba(255,255,255,.1);color:var(--paper3);cursor:pointer;font-size:14px';
   let okBtn = document.createElement('button');
   okBtn.textContent = '确认';
-  okBtn.style.cssText = 'padding:8px 18px;border-radius:8px;border:none;background:linear-gradient(135deg,#c9a84c,#d4af37);color:#1a1f2e;cursor:pointer;font-size:14px;font-weight:600';
+  okBtn.style.cssText = 'padding:8px 18px;border-radius:8px;border:none;background:linear-gradient(135deg,var(--gold),var(--gold));color:var(--ink2);cursor:pointer;font-size:14px;font-weight:600';
   btnRow.appendChild(cancelBtn);
   btnRow.appendChild(okBtn);
   card.appendChild(title);
@@ -461,7 +461,7 @@ function saveCategory() {
         subcategories.push({
           id: parts[0].trim(),
           name: parts[1].trim(),
-          color: parts[2] ? parts[2].trim() : '#888',
+          color: parts[2] ? parts[2].trim() : 'var(--steel)',
           desc: parts[3] ? parts[3].trim() : ''
         });
       }

@@ -8318,7 +8318,7 @@ function analyzeQimenFull(panData) {
     zfzsContent += '<br><b>三奇六仪组合：</b>';
     for (let qc = 0; qc < qiYiCombos.length; qc++) {
       let c = qiYiCombos[qc];
-      let cColor = c.type === '吉' ? '#27ae60' : c.type === '凶' ? '#e74c3c' : '#f39c12';
+      let cColor = c.type === '吉' ? 'var(--jade)' : c.type === '凶' ? 'var(--cinn2)' : 'var(--warn)';
       zfzsContent += '<br><span style="color:' + cColor + '">' + c.gong + '宫 ' + c.combo + ' ' + c.name + '(' + c.type + ')：' + c.text + '</span>';
     }
   }
@@ -9546,18 +9546,18 @@ function analyzeEachGong(panData) {
   const gongOrder = ['命宫','兄弟','夫妻','子女','财帛','疾厄','迁移','交友','事业','田宅','福德','父母'];
   // 每宫对应的人生方面
   const gongAspects = {
-    '命宫': {icon:'🎯', desc:'性格特质、外貌气质、先天格局、人生基调', color:'#c9a84c'},
-    '兄弟': {icon:'👥', desc:'兄弟姐妹缘分、朋友关系、合伙运势', color:'#3498db'},
-    '夫妻': {icon:'💕', desc:'配偶特征、婚姻质量、感情运势', color:'#e74c3c'},
-    '子女': {icon:'👶', desc:'子女数量、亲子关系、生育运势', color:'#27ae60'},
-    '财帛': {icon:'💰', desc:'财运格局、理财方式、财源方向', color:'#e67e22'},
-    '疾厄': {icon:'🏥', desc:'健康状况、易患部位、体质特征', color:'#9b59b6'},
-    '迁移': {icon:'✈️', desc:'外出运势、旅行迁移、社交能力', color:'#1abc9c'},
-    '交友': {icon:'🤝', desc:'交友缘分、下属关系、人际圈层', color:'#f39c12'},
-    '事业': {icon:'💼', desc:'事业方向、工作能力、职场运势', color:'#2980b9'},
-    '田宅': {icon:'🏠', desc:'房产运势、家庭环境、资产积累', color:'#16a085'},
-    '福德': {icon:'🧘', desc:'精神世界、兴趣爱好、内心追求', color:'#8e44ad'},
-    '父母': {icon:'👴', desc:'父母缘分、长辈关系、家教背景', color:'#d35400'}
+    '命宫': {icon:'🎯', desc:'性格特质、外貌气质、先天格局、人生基调', color:'var(--gold)'},
+    '兄弟': {icon:'👥', desc:'兄弟姐妹缘分、朋友关系、合伙运势', color:'var(--cyan2)'},
+    '夫妻': {icon:'💕', desc:'配偶特征、婚姻质量、感情运势', color:'var(--cinn2)'},
+    '子女': {icon:'👶', desc:'子女数量、亲子关系、生育运势', color:'var(--jade)'},
+    '财帛': {icon:'💰', desc:'财运格局、理财方式、财源方向', color:'var(--orange)'},
+    '疾厄': {icon:'🏥', desc:'健康状况、易患部位、体质特征', color:'var(--violet)'},
+    '迁移': {icon:'✈️', desc:'外出运势、旅行迁移、社交能力', color:'var(--emerald)'},
+    '交友': {icon:'🤝', desc:'交友缘分、下属关系、人际圈层', color:'var(--warn)'},
+    '事业': {icon:'💼', desc:'事业方向、工作能力、职场运势', color:'var(--cyan)'},
+    '田宅': {icon:'🏠', desc:'房产运势、家庭环境、资产积累', color:'var(--emerald)'},
+    '福德': {icon:'🧘', desc:'精神世界、兴趣爱好、内心追求', color:'var(--violet2)'},
+    '父母': {icon:'👴', desc:'父母缘分、长辈关系、家教背景', color:'var(--cinn2)'}
   };
 
   // 主星组合释义库
@@ -9929,7 +9929,7 @@ function analyzeSihuaDetail(panData) {
     else if (type === '化科') advice = '提升学识，经营名声，考试升职有利';
     else if (type === '化忌') advice = '保守为宜，化解执念，修身养性';
 
-    let color = type === '化禄' ? '#27ae60' : type === '化权' ? '#e74c3c' : type === '化科' ? '#c9a84c' : '#8e44ad';
+    let color = type === '化禄' ? 'var(--jade)' : type === '化权' ? 'var(--cinn2)' : type === '化科' ? 'var(--gold)' : 'var(--violet2)';
 
     sihuaDetails.push({
       type: type,
@@ -9956,7 +9956,7 @@ function analyzeSihuaDetail(panData) {
         desc: '化禄入' + luGong + '与化忌入' + jiGong + '在对宫对冲',
         effect: '财运有波折，吉凶参半。化禄带来的财气被化忌冲散，需谨慎守财，不宜冒进。',
         severity: '中凶',
-        color: '#e67e22'
+        color: 'var(--orange)'
       });
     }
   }
@@ -9970,7 +9970,7 @@ function analyzeSihuaDetail(panData) {
         desc: '化禄与化权在三方四正会照',
         effect: '富贵双全。化禄主财，化权主权，二者交驰则财权双得，事业财运俱佳。',
         severity: '大吉',
-        color: '#27ae60'
+        color: 'var(--jade)'
       });
     }
   }
@@ -9999,7 +9999,7 @@ function analyzeSihuaDetail(panData) {
         desc: '化禄、化权、化科三化同会于三方四正(' + sanhuiGongs.join('、') + ')',
         effect: '大吉格局！三奇嘉会主大富贵，名利双收，事业财运名声俱达顶峰。',
         severity: '大吉',
-        color: '#2ecc71'
+        color: 'var(--success)'
       });
     }
   }
@@ -10042,7 +10042,7 @@ function analyzeSihuaDetail(panData) {
         desc: '生年化忌与大限化忌分居命宫前后两宫',
         effect: '大凶！双忌夹命主运势困顿，多波折阻碍，需谨慎行事，保守为上。',
         severity: '大凶',
-        color: '#c0392b'
+        color: 'var(--cinn)'
       });
     }
   }
@@ -10055,7 +10055,7 @@ function analyzeSihuaDetail(panData) {
       desc: '化禄与化忌同入' + sameGong + '宫',
       effect: '吉凶交织。该宫位事项有得有失，财来财去，需平衡心态，不宜过度追求。',
       severity: '中平',
-      color: '#f39c12'
+      color: 'var(--warn)'
     });
   }
 
@@ -10184,7 +10184,7 @@ function analyzeLiunian(panData, currentYear) {
     }
     let sGongName = sPos >= 0 ? getGongNameByPos(sPos, gongMap) : '未定位';
     let typeLabel = sk === 'lu' ? '化禄' : sk === 'quan' ? '化权' : sk === 'ke' ? '化科' : '化忌';
-    let color = sk === 'lu' ? '#27ae60' : sk === 'quan' ? '#e74c3c' : sk === 'ke' ? '#c9a84c' : '#8e44ad';
+    let color = sk === 'lu' ? 'var(--jade)' : sk === 'quan' ? 'var(--cinn2)' : sk === 'ke' ? 'var(--gold)' : 'var(--violet2)';
     liunianSihua.push({
       type: typeLabel,
       star: sStar,
@@ -10519,7 +10519,7 @@ function analyzeLiuyue(panData, currentMonth) {
     }
     let sGongName = sPos >= 0 ? getGongNameByPos(sPos, gongMap) : '未定位';
     let typeLabel = sk === 'lu' ? '化禄' : sk === 'quan' ? '化权' : sk === 'ke' ? '化科' : '化忌';
-    let color = sk === 'lu' ? '#27ae60' : sk === 'quan' ? '#e74c3c' : sk === 'ke' ? '#c9a84c' : '#8e44ad';
+    let color = sk === 'lu' ? 'var(--jade)' : sk === 'quan' ? 'var(--cinn2)' : sk === 'ke' ? 'var(--gold)' : 'var(--violet2)';
     liuyueSihua.push({
       type: typeLabel,
       star: sStar,

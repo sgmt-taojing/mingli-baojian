@@ -314,7 +314,7 @@ window.injectVoiceUI = function(){
     fab.id = 'voiceCommandFab';
     fab.innerHTML = '🎤';
     fab.title = '语音命令（说"打开八字"、"今日运势"、"朗读"等）';
-    fab.style.cssText = 'position:fixed;bottom:80px;right:20px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#c9a84c,#b8932f);border:none;color:#1a1e14;font-size:24px;cursor:pointer;z-index:9999;box-shadow:0 4px 16px rgba(201,168,76,.4);transition:all .25s';
+    fab.style.cssText = 'position:fixed;bottom:80px;right:20px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold3));border:none;color:var(--ink3);font-size:24px;cursor:pointer;z-index:9999;box-shadow:0 4px 16px rgba(201,168,76,.4);transition:all .25s';
     fab.onmouseover = function(){this.style.transform = 'scale(1.1)';};
     fab.onmouseout = function(){this.style.transform = 'scale(1)';};
     fab.onclick = function(){startVoiceCommand();};

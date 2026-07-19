@@ -3,18 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=5.0,user-scalable=yes">
-<meta name="theme-color" content="#080808">
+<meta name="theme-color" content="var(--ink)">
 <title>倪师中医学堂 — 易道智鉴</title>
 <style>
 /* ════ Variables & Reset ════ */
 :root{
-  --ink:var(--ink);--ink2:var(--ink2);--ink3:#1a1a1a;--ink4:var(--ink4);
+  --ink:var(--ink);--ink2:var(--ink2);--ink3:var(--ink3);--ink4:var(--ink4);
   --paper:var(--paper);--paper2:var(--paper2);--paper3:var(--paper3);
   --gold:var(--gold);--gold2:var(--gold2);--gold3:var(--gold3);
   --cinn:var(--cinn);--cinn2:var(--cinn2);
   --jade:var(--jade);--jade2:var(--success);
   --orange:var(--orange);
-  --danger:#dc3545;
+  --danger:var(--danger);
   --border:rgba(201,168,76,.15);
   --card-bg:rgba(255,255,255,.035);
   --card-bg2:rgba(255,255,255,.06);
@@ -42,9 +42,9 @@ a{color:var(--gold2);text-decoration:none}
 .container{max-width:1200px;margin:0 auto;padding:24px 20px 60px;position:relative;z-index:1}
 
 /* ════ Disclaimer Banner ════ */
-.disclaimer-banner{background:rgba(192,57,43,.07);border:1px solid rgba(192,57,43,.2);border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:13px;color:#e0a090;line-height:1.7}
+.disclaimer-banner{background:rgba(192,57,43,.07);border:1px solid rgba(192,57,43,.2);border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:13px;color:var(--gold);line-height:1.7}
 .disclaimer-banner .dis-icon{margin-right:6px}
-.disclaimer-banner strong{color:#e8a090}
+.disclaimer-banner strong{color:var(--gold)}
 
 /* ════ Section System ════ */
 .section{display:none;animation:fadeUp .4s ease}
@@ -85,8 +85,8 @@ a{color:var(--gold2);text-decoration:none}
 .panel ul li::before{content:'◆';position:absolute;left:0;color:var(--gold3);font-size:10px;top:7px}
 .panel .tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
 .panel .tag-row span{font-size:12px;padding:3px 10px;border-radius:12px;border:1px solid rgba(201,168,76,.15);color:var(--paper3)}
-.panel .warn{background:rgba(192,57,43,.06);border:1px solid rgba(192,57,43,.15);border-radius:8px;padding:10px 14px;font-size:13px;color:#e0a090;margin:10px 0}
-.panel .note{background:rgba(39,174,96,.05);border:1px solid rgba(39,174,96,.12);border-radius:8px;padding:10px 14px;font-size:13px;color:#a0d0a0;margin:10px 0}
+.panel .warn{background:rgba(192,57,43,.06);border:1px solid rgba(192,57,43,.15);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--gold);margin:10px 0}
+.panel .note{background:rgba(39,174,96,.05);border:1px solid rgba(39,174,96,.12);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--emerald);margin:10px 0}
 
 /* ════ Search ════ */
 .search-box{display:flex;gap:10px;margin-bottom:20px}
@@ -193,8 +193,8 @@ a{color:var(--gold2);text-decoration:none}
 .hidden{display:none!important}
 .text-center{text-align:center}
 .text-gold{color:var(--gold)}
-.text-warn{color:#e0a090}
-.text-jade{color:#a0d0a0}
+.text-warn{color:var(--gold)}
+.text-jade{color:var(--emerald)}
 .mt-16{margin-top:16px}
 .mt-24{margin-top:24px}
 .mb-16{margin-bottom:16px}
@@ -328,7 +328,7 @@ a{color:var(--gold2);text-decoration:none}
 
   <!-- 安全边界 -->
   <div class="panel" style="border-color:rgba(192,57,43,.2)">
-    <h3 style="color:#e0a090">🛡️ 安全学习边界</h3>
+    <h3 style="color:var(--gold)">🛡️ 安全学习边界</h3>
     <div class="warn">以下内容只能作为课程理论学习，不能自行操作：<br>
       • 附子、生附子、炮附子、四逆汤辈、白通汤等回阳救逆方<br>
       • 大承气汤、抵当汤、大陷胸汤等峻烈攻下破血方<br>
@@ -879,7 +879,7 @@ function doFangzhengSearch(q) {
       '<div class="ri-desc"><strong>方证：</strong>' + f.zheng + '</div>' +
       '<div class="ri-desc"><strong>方义：</strong>' + f.theory + '</div>' +
       (f.yangsheng && f.yangsheng !== '无' ? '<div class="ri-desc"><strong>养生提示：</strong>' + f.yangsheng + '</div>' : '') +
-      '<div class="ri-desc" style="color:#e0a090"><strong>禁忌：</strong>' + f.jiaoji + '</div>' +
+      '<div class="ri-desc" style="color:var(--gold)"><strong>禁忌：</strong>' + f.jiaoji + '</div>' +
       '</div>';
   }).join('');
   document.getElementById('fangzhengResults').innerHTML = html;

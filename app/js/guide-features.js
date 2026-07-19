@@ -10,11 +10,11 @@ if (typeof window !== 'undefined' && typeof window.showConfirm !== 'function') {
   window.showConfirm = function(msg, onOk, onCancel) {
     let overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;display:flex;align-items:center;justify-content:center';
-    overlay.innerHTML = '<div style="background:#1a1a2e;border:1px solid rgba(201,168,76,0.4);border-radius:12px;padding:24px;max-width:360px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.5)">' +
+    overlay.innerHTML = '<div style="background:var(--ink3);border:1px solid rgba(201,168,76,0.4);border-radius:12px;padding:24px;max-width:360px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.5)">' +
       '<div style="color:var(--paper);font-size:15px;line-height:1.7;margin-bottom:20px;letter-spacing:1px">' + msg + '</div>' +
       '<div style="display:flex;gap:12px;justify-content:flex-end">' +
       '<button data-act="cancel" style="padding:8px 20px;background:transparent;color:var(--steel);border:1px solid var(--paper3);border-radius:6px;cursor:pointer;font-size:13px">取消</button>' +
-      '<button data-act="ok" style="padding:8px 20px;background:linear-gradient(135deg,#c9a84c,#a08430);color:var(--paper);border:none;border-radius:6px;cursor:pointer;font-size:13px;letter-spacing:1px">确认</button>' +
+      '<button data-act="ok" style="padding:8px 20px;background:linear-gradient(135deg,var(--gold),var(--cinn));color:var(--paper);border:none;border-radius:6px;cursor:pointer;font-size:13px;letter-spacing:1px">确认</button>' +
       '</div></div>';
     document.body.appendChild(overlay);
     function close(result) {
@@ -1037,11 +1037,11 @@ function displayMobileFengshui(fengshui) {
   const bar = document.getElementById('wuxingBar');
   bar.innerHTML = '';
   const colors = {
-    '木': '#27ae60',
-    '火': '#e74c3c',
-    '土': '#e67e22',
-    '金': '#95a5a6',
-    '水': '#2980b9'
+    '木': 'var(--jade)',
+    '火': 'var(--cinn2)',
+    '土': 'var(--orange)',
+    '金': 'var(--metal)',
+    '水': 'var(--cyan)'
   };
   for (const wx in fengshui.wuxingPercent) {
     const seg = document.createElement('div');
@@ -1150,13 +1150,13 @@ function displayBaziMatchResult(result) {
   // 显示匹配结果
   const content = document.getElementById('matchResultContent');
   content.innerHTML = `
-    <p><strong>匹配度:</strong><span style="color:${result.match === '大吉' ? '#2ecc71' : result.match === '凶' ? '#e74c3c' : 'var(--gold)'};font-size:18px;">${result.match}</span></p>
+    <p><strong>匹配度:</strong><span style="color:${result.match === '大吉' ? 'var(--success)' : result.match === '凶' ? 'var(--cinn2)' : 'var(--gold)'};font-size:18px;">${result.match}</span></p>
     <p><strong>综合评分:</strong>${result.score}分</p>
     <p><strong>分析:</strong>${result.advice}</p>
     <p style="margin-top:16px;"><strong>号码五行分布:</strong></p>
     <div class="shuzi-wuxing-bar" style="margin:8px 0;">
       ${Object.entries(result.fengshui.wuxingPercent).map(([wx, pct]) => {
-        const colors = {'木':'#27ae60','火':'#e74c3c','土':'#e67e22','金':'#95a5a6','水':'#2980b9'};
+        const colors = {'木':'var(--jade)','火':'var(--cinn2)','土':'var(--orange)','金':'var(--metal)','水':'var(--cyan)'};
         return `<div style="width:${pct}%;background:${colors[wx]};height:8px;border-radius:2px;" title="${wx}:${pct}%"></div>`;
       }).join('')}
     </div>
@@ -3060,7 +3060,7 @@ function displayYuyi(yuyi) {
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px">';
     yuyi.hetuDetails.forEach(function(hd) {
       let isSheng = hd.hetuType === '生数';
-      let typeColor = isSheng ? '#e67e22' : '#2980b9';
+      let typeColor = isSheng ? 'var(--orange)' : 'var(--cyan)';
       html += '<div style="padding:12px;border-radius:8px;background:rgba(255,255,255,.02);border:1px solid '+typeColor+'20">';
       html += '<div style="font-size:15px;color:'+typeColor+';font-weight:bold;margin-bottom:4px">'+hd.char+' · '+hd.strokes+'画</div>';
       html += '<div style="font-size:12px;opacity:.7;margin-bottom:2px">'+hd.hetuName+'</div>';
@@ -3236,9 +3236,9 @@ function exportRenameResult() {
 .warn-banner{margin-bottom:24px;padding:16px;background:rgba(0,0,0,0.3);border-radius:12px;border:1px solid rgba(201,168,76,0.15)}
 .warn-banner .warn-title{font-size:14px;color:var(--gold);margin-bottom:10px;font-weight:bold;letter-spacing:2px}
 .warn-banner .warn-red,.warn-banner .warn-yellow,.warn-banner .warn-green{margin:6px 0;padding:10px 14px;border-radius:8px;font-size:13px;line-height:1.6}
-.warn-banner .warn-red{background:rgba(231,76,60,0.15);border-left:3px solid var(--cinn2);color:#f1948a}
-.warn-banner .warn-yellow{background:rgba(201,168,76,0.12);border-left:3px solid var(--gold2);color:#f9e79f}
-.warn-banner .warn-green{background:rgba(39,174,96,0.12);border-left:3px solid var(--success);color:#abebc6}
+.warn-banner .warn-red{background:rgba(231,76,60,0.15);border-left:3px solid var(--cinn2);color:var(--cinn)}
+.warn-banner .warn-yellow{background:rgba(201,168,76,0.12);border-left:3px solid var(--gold2);color:var(--gold)}
+.warn-banner .warn-green{background:rgba(39,174,96,0.12);border-left:3px solid var(--success);color:var(--emerald)}
 .xij-table{margin-bottom:24px;padding:14px;background:rgba(201,168,76,0.05);border-radius:12px;border:1px solid rgba(201,168,76,0.12)}
 .xij-table .xj-title{font-size:13px;color:var(--gold);margin-bottom:10px;letter-spacing:2px}
 .xij-table .xj-grid{display:flex;flex-wrap:wrap;gap:8px}
@@ -4347,7 +4347,7 @@ function displayCompanyNamesProEnhanced(scoredNames, industry, style, baziAnalys
     card.className = 'company-name-card';
     card.style.position = 'relative';
     card.innerHTML = `
-      ${isTop3 ? `<div style="position:absolute;top:-8px;left:-8px;background:linear-gradient(135deg,#c9a84c,#8b6914);color:var(--ink);font-size:10px;font-weight:bold;padding:3px 8px;border-radius:10px 10px 10px 0;letter-spacing:2px">🏆 TOP${index+1}</div>` : ''}
+      ${isTop3 ? `<div style="position:absolute;top:-8px;left:-8px;background:linear-gradient(135deg,var(--gold),var(--gold3));color:var(--ink);font-size:10px;font-weight:bold;padding:3px 8px;border-radius:10px 10px 10px 0;letter-spacing:2px">🏆 TOP${index+1}</div>` : ''}
       <button class="cn-save-btn" onclick="saveCompanyName('${name}')">收藏</button>
       <div class="cn-name">${name}</div>
       <div class="cn-score" style="margin-bottom:4px">
@@ -4882,7 +4882,7 @@ function renderCeziSectionResult(char) {
 
   let luckNum = (result.strokes % 81) || result.strokes;
   let luck = result.luck || (luckNum <= 30 ? '大吉' : luckNum <= 50 ? '中吉' : luckNum <= 70 ? '小吉' : luckNum <= 81 ? '吉' : '平');
-  let luckColor = luck==='吉'||luck==='大吉'?'#27ae60':luck==='中吉'||luck==='小吉'?'#f39c12':luck==='凶'||luck==='中凶'?'#e74c3c':'#95a5a6';
+  let luckColor = luck==='吉'||luck==='大吉'?'var(--jade)':luck==='中吉'||luck==='小吉'?'var(--warn)':luck==='凶'||luck==='中凶'?'var(--cinn2)':'var(--metal)';
   let luckBg = luck==='吉'||luck==='大吉'?'rgba(39,174,96,.06)':luck==='中吉'||luck==='小吉'?'rgba(243,156,18,.06)':luck==='凶'||luck==='中凶'?'rgba(231,76,60,.06)':'rgba(149,165,166,.06)';
 
   charEl.textContent = result.char;
@@ -5286,7 +5286,7 @@ function addMerit(faith, amount, reason) {
     
     // Visual feedback
     let msg = document.createElement('div');
-    msg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid var(--gold);color:var(--gold);padding:20px 30px;border-radius:14px;font-size:16px;z-index:99999;text-align:center;box-shadow:0 0 40px rgba(201,168,76,0.3)';
+    msg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(135deg,var(--ink3),var(--cyan));border:2px solid var(--gold);color:var(--gold);padding:20px 30px;border-radius:14px;font-size:16px;z-index:99999;text-align:center;box-shadow:0 0 40px rgba(201,168,76,0.3)';
     msg.innerHTML = '<div style="font-size:32px;margin-bottom:8px">🙏</div><div style="font-weight:bold">+' + amount + ' 功德</div>';
     if (reason) msg.insertAdjacentHTML("beforeend", '<div style="font-size:12px;color:var(--paper3);margin-top:6px">' + reason + '</div>');
     document.body.appendChild(msg);
@@ -5381,14 +5381,14 @@ let MERIT_ACTIONS = {
 
 // 功德等级体系
 let MERIT_LEVELS = [
-  {min:0, max:50, name:'初心善人', icon:'🌱', color:'#8bc34a'},
-  {min:51, max:200, name:'积善之人', icon:'🌿', color:'#4caf50'},
-  {min:201, max:500, name:'善知识', icon:'📖', color:'#2196f3'},
-  {min:501, max:1000, name:'贤者', icon:'🎩', color:'#9c27b0'},
-  {min:1001, max:3000, name:'大善人', icon:'⭐', color:'#ff9800'},
-  {min:3001, max:5000, name:'贤达', icon:'🌸', color:'#e91e63'},
-  {min:5001, max:10000, name:'大德', icon:'🏆', color:'#c9a84c'},
-  {min:10001, max:Infinity, name:'菩萨行者', icon:'🪷', color:'#ffd700'}
+  {min:0, max:50, name:'初心善人', icon:'🌱', color:'var(--jade)'},
+  {min:51, max:200, name:'积善之人', icon:'🌿', color:'var(--jade)'},
+  {min:201, max:500, name:'善知识', icon:'📖', color:'var(--cyan)'},
+  {min:501, max:1000, name:'贤者', icon:'🎩', color:'var(--violet)'},
+  {min:1001, max:3000, name:'大善人', icon:'⭐', color:'var(--orange)'},
+  {min:3001, max:5000, name:'贤达', icon:'🌸', color:'var(--cinn2)'},
+  {min:5001, max:10000, name:'大德', icon:'🏆', color:'var(--gold)'},
+  {min:10001, max:Infinity, name:'菩萨行者', icon:'🪷', color:'var(--gold2)'}
 ];
 
 // 获取功德等级
@@ -5533,16 +5533,16 @@ if (document.readyState !== 'loading') {
 /* selectFaith dup removed */
 // ===== 权威知识库面板函数 =====
 let KNOWLEDGE_FIELDS = [
-  {key:'bazi', icon:'🔮', name:'八字命理学', color:'#c0392b', desc:'四柱八字，洞察人生'},
-  {key:'liuyao', icon:'卦', name:'六爻预测学', color:'#2980b9', desc:'铜钱起卦，趋吉避凶'},
-  {key:'fengshui', icon:'🏔️', name:'风水学', color:'#27ae60', desc:'环境调理，藏风聚气'},
-  {key:'xingming', icon:'📝', name:'姓名学', color:'#8e44ad', desc:'名正言顺，五格剖象'},
-  {key:'tizhi', icon:'🌿', name:'中医体质学', color:'#d35400', desc:'九种体质，辨证调理'},
-  {key:'yijing', icon:'☯', name:'易经占卜', color:'#2c3e50', desc:'周易六十四卦'},
-  {key:'ziwei', icon:'⭐', name:'紫微斗数', color:'#f39c12', desc:'帝星斗数，人生棋盘'},
-  {key:'qimen', icon:'🌀', name:'奇门遁甲', color:'#e74c3c', desc:'排盘布局，运筹帷幄'},
-  {key:'meihua', icon:'🌸', name:'梅花易数', color:'#1abc9c', desc:'随时起卦，灵活多变'},
-  {key:'liuren', icon:'🕰️', name:'大六壬', color:'#9b59b6', desc:'精细预测，神课通灵'}
+  {key:'bazi', icon:'🔮', name:'八字命理学', color:'var(--cinn)', desc:'四柱八字，洞察人生'},
+  {key:'liuyao', icon:'卦', name:'六爻预测学', color:'var(--cyan)', desc:'铜钱起卦，趋吉避凶'},
+  {key:'fengshui', icon:'🏔️', name:'风水学', color:'var(--jade)', desc:'环境调理，藏风聚气'},
+  {key:'xingming', icon:'📝', name:'姓名学', color:'var(--violet2)', desc:'名正言顺，五格剖象'},
+  {key:'tizhi', icon:'🌿', name:'中医体质学', color:'var(--cinn2)', desc:'九种体质，辨证调理'},
+  {key:'yijing', icon:'☯', name:'易经占卜', color:'var(--ink3)', desc:'周易六十四卦'},
+  {key:'ziwei', icon:'⭐', name:'紫微斗数', color:'var(--warn)', desc:'帝星斗数，人生棋盘'},
+  {key:'qimen', icon:'🌀', name:'奇门遁甲', color:'var(--cinn2)', desc:'排盘布局，运筹帷幄'},
+  {key:'meihua', icon:'🌸', name:'梅花易数', color:'var(--emerald)', desc:'随时起卦，灵活多变'},
+  {key:'liuren', icon:'🕰️', name:'大六壬', color:'var(--violet)', desc:'精细预测，神课通灵'}
 ];
 
 function openAuthoritativePanel() {
@@ -6213,7 +6213,7 @@ function showConstellationDetail(sign) {
   
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">';
   html += '<div style="background:rgba(76,175,80,0.08);padding:12px;border-radius:8px">';
-  html += '<h5 style="color:#4CAF50;margin:0 0 6px 0">❤️ 喜欢</h5>';
+  html += '<h5 style="color:var(--jade);margin:0 0 6px 0">❤️ 喜欢</h5>';
   html += '<p style="margin:0;font-size:13px;color:var(--paper2)">' + info.likes + '</p></div>';
   html += '<div style="background:rgba(244,67,54,0.08);padding:12px;border-radius:8px">';
   html += '<h5 style="color:var(--cinn2);margin:0 0 6px 0">💔 不喜欢</h5>';
@@ -6380,12 +6380,12 @@ function showYangzhaiKB() {
   html += '<h4 style="color:var(--paper);font-size:14px">命卦速查表</h4>';
   html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px"><thead><tr style="background:rgba(201,168,76,0.15)"><th style="padding:8px;color:var(--gold)">命卦</th><th style="padding:8px;color:var(--gold)">类型</th><th style="padding:8px;color:var(--gold)">四吉方</th><th style="padding:8px;color:var(--gold)">四凶方</th></tr></thead><tbody>';
   kb.bazhai.mingua.table.forEach(function(row) {
-    html += '<tr style="border-bottom:1px solid rgba(201,168,76,0.1)"><td style="padding:6px;color:var(--paper)">' + row.gua + '</td><td style="padding:6px;color:' + (row.type==='东四命'?'#4CAF50':'#2196f3') + '">' + row.type + '</td><td style="padding:6px;color:var(--paper2);font-size:11px">' + row.best.join('、') + '</td><td style="padding:6px;color:var(--cinn2);font-size:11px">' + row.worst.join('、') + '</td></tr>';
+    html += '<tr style="border-bottom:1px solid rgba(201,168,76,0.1)"><td style="padding:6px;color:var(--paper)">' + row.gua + '</td><td style="padding:6px;color:' + (row.type==='东四命'?'var(--jade)':'var(--cyan)') + '">' + row.type + '</td><td style="padding:6px;color:var(--paper2);font-size:11px">' + row.best.join('、') + '</td><td style="padding:6px;color:var(--cinn2);font-size:11px">' + row.worst.join('、') + '</td></tr>';
   });
   html += '</tbody></table></div>';
   // 吉凶星
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">';
-  html += '<div style="background:rgba(76,175,80,0.08);padding:12px;border-radius:8px"><h5 style="color:#4CAF50;margin:0 0 8px">四吉星</h5>';
+  html += '<div style="background:rgba(76,175,80,0.08);padding:12px;border-radius:8px"><h5 style="color:var(--jade);margin:0 0 8px">四吉星</h5>';
   Object.keys(kb.bazhai.jixing).forEach(function(k) {
     let s = kb.bazhai.jixing[k];
     html += '<p style="margin:4px 0;font-size:12px;color:var(--paper2)"><strong style="color:var(--paper)">' + k + '</strong>：' + s.meaning + ' → ' + s.effect + '</p>';
@@ -6407,7 +6407,7 @@ function showYangzhaiKB() {
   html += '<div style="background:rgba(244,67,54,0.08);padding:16px;border-radius:8px;margin-bottom:16px"><h4 style="color:var(--gold);margin:0 0 8px">当前：' + cy.yun + '</h4>';
   html += '<p style="color:var(--paper2);margin:4px 0">当令星：' + cy.star + '（' + cy.element + '） | 旺方：' + cy.direction + '</p>';
   html += '<p style="color:var(--paper2);margin:4px 0">' + cy.meaning + '</p>';
-  html += '<p style="color:#4CAF50;margin:4px 0">布局建议：' + cy.layout_advice + '</p></div>';
+  html += '<p style="color:var(--jade);margin:4px 0">布局建议：' + cy.layout_advice + '</p></div>';
   // 九运布局
   let jl = kb.xuankong.jiuyun_layout;
   html += '<h4 style="color:var(--paper);font-size:14px">九运方位布局</h4>';
@@ -6434,7 +6434,7 @@ function showYangzhaiKB() {
     html += '<h4 style="color:var(--paper);margin:0 0 6px">' + sha.name + ' <span style="color:var(--cinn2);font-size:12px">' + sha.severity + '</span></h4>';
     html += '<p style="color:var(--paper2);font-size:13px;margin:4px 0">' + sha.description + '</p>';
     html += '<p style="color:var(--cinn2);font-size:13px;margin:4px 0">⚠️ 影响：' + sha.symptom + '</p>';
-    html += '<p style="color:#4CAF50;font-size:13px;margin:4px 0">✅ 化解：' + sha.remedy + '</p>';
+    html += '<p style="color:var(--jade);font-size:13px;margin:4px 0">✅ 化解：' + sha.remedy + '</p>';
     html += '<pre style="background:rgba(0,0,0,0.3);padding:8px;border-radius:6px;font-size:11px;color:var(--paper2);margin:8px 0 0;overflow-x:auto">' + sha.illustration + '</pre>';
     html += '</div>';
   });
@@ -6444,7 +6444,7 @@ function showYangzhaiKB() {
   html += '<div id="yk-quejiao" style="margin-bottom:30px"><h3 style="color:var(--gold);border-bottom:1px solid rgba(201,168,76,0.3);padding-bottom:8px">📐 房屋缺角与补救</h3>';
   html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:rgba(201,168,76,0.15)"><th style="padding:8px;color:var(--gold)">方位</th><th style="padding:8px;color:var(--gold)">对应成员</th><th style="padding:8px;color:var(--gold)">影响</th><th style="padding:8px;color:var(--gold)">补救</th></tr></thead><tbody>';
   kb.quejiao.directions.forEach(function(d) {
-    html += '<tr style="border-bottom:1px solid rgba(201,168,76,0.1)"><td style="padding:6px;color:var(--paper)">' + d.position + '</td><td style="padding:6px;color:var(--paper2)">' + d.member + '</td><td style="padding:6px;color:var(--cinn2);font-size:11px">' + d.effect + '</td><td style="padding:6px;color:#4CAF50;font-size:11px">' + d.remedy + '</td></tr>';
+    html += '<tr style="border-bottom:1px solid rgba(201,168,76,0.1)"><td style="padding:6px;color:var(--paper)">' + d.position + '</td><td style="padding:6px;color:var(--paper2)">' + d.member + '</td><td style="padding:6px;color:var(--cinn2);font-size:11px">' + d.effect + '</td><td style="padding:6px;color:var(--jade);font-size:11px">' + d.remedy + '</td></tr>';
   });
   html += '</tbody></table></div></div>';
   
@@ -6455,7 +6455,7 @@ function showYangzhaiKB() {
     html += '<h4 style="color:var(--paper);margin:0 0 6px">' + t.name + ' <span style="color:var(--gold);font-size:12px">' + t.rating + '</span></h4>';
     html += '<pre style="background:rgba(0,0,0,0.3);padding:8px;border-radius:6px;font-size:11px;color:var(--paper2);margin:8px 0;display:inline-block">' + t.shape + '</pre>';
     html += '<p style="color:var(--paper2);font-size:13px;margin:8px 0 4px">' + t.analysis + '</p>';
-    html += '<p style="color:#4CAF50;font-size:13px;margin:4px 0">💡 ' + t.advice + '</p>';
+    html += '<p style="color:var(--jade);font-size:13px;margin:4px 0">💡 ' + t.advice + '</p>';
     html += '</div>';
   });
   html += '</div>';
@@ -6479,7 +6479,7 @@ function showYangzhaiKB() {
   
   // 风水植物
   html += '<div id="yk-plants" style="margin-bottom:30px"><h3 style="color:var(--gold);border-bottom:1px solid rgba(201,168,76,0.3);padding-bottom:8px">🌿 阳宅风水植物</h3>';
-  html += '<h4 style="color:#4CAF50;font-size:14px">吉祥植物</h4>';
+  html += '<h4 style="color:var(--jade);font-size:14px">吉祥植物</h4>';
   kb.plants.lucky.forEach(function(p) {
     html += '<div style="background:rgba(76,175,80,0.06);padding:8px 12px;border-radius:6px;margin-bottom:4px;font-size:13px;color:var(--paper2)"><strong style="color:var(--paper)">' + p.name + '</strong>（' + p.element + '）→ ' + p.effect + ' | 摆放：' + p.placement + '</div>';
   });
@@ -6495,7 +6495,7 @@ function showYangzhaiKB() {
   html += '<div id="yk-louceng" style="margin-bottom:30px"><h3 style="color:var(--gold);border-bottom:1px solid rgba(201,168,76,0.3);padding-bottom:8px">🏢 楼层五行选择</h3>';
   html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:rgba(201,168,76,0.15)"><th style="padding:8px;color:var(--gold)">五行命</th><th style="padding:8px;color:var(--gold)">最佳楼层</th><th style="padding:8px;color:var(--gold)">避忌楼层</th></tr></thead><tbody>';
   kb.louceng.table.forEach(function(r) {
-    html += '<tr style="border-bottom:1px solid rgba(201,168,76,0.1)"><td style="padding:6px;color:var(--paper)">' + r.element + '</td><td style="padding:6px;color:#4CAF50;font-size:11px">' + r.best + '</td><td style="padding:6px;color:var(--cinn2);font-size:11px">' + r.avoid + '</td></tr>';
+    html += '<tr style="border-bottom:1px solid rgba(201,168,76,0.1)"><td style="padding:6px;color:var(--paper)">' + r.element + '</td><td style="padding:6px;color:var(--jade);font-size:11px">' + r.best + '</td><td style="padding:6px;color:var(--cinn2);font-size:11px">' + r.avoid + '</td></tr>';
   });
   html += '</tbody></table></div></div>';
   
@@ -6825,7 +6825,7 @@ function _doRecommendRename(currentName, sex, birthDate, birthHourVal, birthLoca
     return;
   }
 
-  let wuxingColor = {木:'#2ecc71',火:'#e74c3c',土:'#c9a84c',金:'#f39c12',水:'#3498db'};
+  let wuxingColor = {木:'var(--success)',火:'var(--cinn2)',土:'var(--gold)',金:'var(--warn)',水:'var(--cyan2)'};
   let wuxingEmoji = {木:'🌿',火:'🔥',土:'⛰️',金:'⚜️',水:'💧'};
   let shengMapDisplay = {木:'水',火:'木',土:'火',金:'土',水:'金'};
   let keMapDisplay = {木:'金',火:'水',土:'木',金:'火',水:'土'};
@@ -6853,9 +6853,9 @@ function _doRecommendRename(currentName, sex, birthDate, birthHourVal, birthLoca
   html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">';
   top10.forEach(function(r, idx) {
     let rankBadge = '';
-    if (idx === 0) rankBadge = '<span style="display:inline-block;background:linear-gradient(135deg,#f39c12,#e74c3c);color:var(--paper);font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px">🥇 TOP1</span>';
-    else if (idx === 1) rankBadge = '<span style="display:inline-block;background:linear-gradient(135deg,#bdc3c7,#7f8c8d);color:var(--paper);font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px">🥈 TOP2</span>';
-    else if (idx === 2) rankBadge = '<span style="display:inline-block;background:linear-gradient(135deg,#cd7f32,#a0522d);color:var(--paper);font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px">🥉 TOP3</span>';
+    if (idx === 0) rankBadge = '<span style="display:inline-block;background:linear-gradient(135deg,var(--warn),var(--cinn2));color:var(--paper);font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px">🥇 TOP1</span>';
+    else if (idx === 1) rankBadge = '<span style="display:inline-block;background:linear-gradient(135deg,var(--metal2),var(--steel));color:var(--paper);font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px">🥈 TOP2</span>';
+    else if (idx === 2) rankBadge = '<span style="display:inline-block;background:linear-gradient(135deg,var(--cinn),var(--wood));color:var(--paper);font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px">🥉 TOP3</span>';
 
     html += '<div class="rename-rec-card" style="padding:14px;background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,' + (idx < 3 ? '.25' : '.1') + ');border-radius:10px;cursor:pointer;transition:all .2s"';
     html += ' onclick="_selectRecommendedName(\'' + r.fullName + '\')"';
@@ -6865,12 +6865,12 @@ function _doRecommendRename(currentName, sex, birthDate, birthHourVal, birthLoca
     // 名字
     html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
     html += '<div style="font-family:Ma Shan Zheng,serif;font-size:22px;letter-spacing:6px;color:var(--gold)">' + r.fullName + rankBadge + '</div>';
-    html += '<div style="font-size:20px;font-weight:bold;color:' + (r.score >= 75 ? '#2ecc71' : r.score >= 60 ? 'var(--gold)' : '#e74c3c') + '">' + r.score + '</div>';
+    html += '<div style="font-size:20px;font-weight:bold;color:' + (r.score >= 75 ? 'var(--success)' : r.score >= 60 ? 'var(--gold)' : 'var(--cinn2)') + '">' + r.score + '</div>';
     html += '</div>';
     // 五行标签
     html += '<div style="display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap">';
-    html += '<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:' + (wuxingColor[r.char1.wx]||'#888') + '20;color:' + (wuxingColor[r.char1.wx]||'#888') + ';border:1px solid ' + (wuxingColor[r.char1.wx]||'#888') + '30">' + (wuxingEmoji[r.char1.wx]||'') + ' ' + r.char1.c + '(' + r.char1.wx + ')</span>';
-    html += '<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:' + (wuxingColor[r.char2.wx]||'#888') + '20;color:' + (wuxingColor[r.char2.wx]||'#888') + ';border:1px solid ' + (wuxingColor[r.char2.wx]||'#888') + '30">' + (wuxingEmoji[r.char2.wx]||'') + ' ' + r.char2.c + '(' + r.char2.wx + ')</span>';
+    html += '<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:' + (wuxingColor[r.char1.wx]||'var(--steel)') + '20;color:' + (wuxingColor[r.char1.wx]||'var(--steel)') + ';border:1px solid ' + (wuxingColor[r.char1.wx]||'var(--steel)') + '30">' + (wuxingEmoji[r.char1.wx]||'') + ' ' + r.char1.c + '(' + r.char1.wx + ')</span>';
+    html += '<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:' + (wuxingColor[r.char2.wx]||'var(--steel)') + '20;color:' + (wuxingColor[r.char2.wx]||'var(--steel)') + ';border:1px solid ' + (wuxingColor[r.char2.wx]||'var(--steel)') + '30">' + (wuxingEmoji[r.char2.wx]||'') + ' ' + r.char2.c + '(' + r.char2.wx + ')</span>';
     html += '</div>';
     // 三才
     let sancaiLuckClass = (r.sancai.luck === '大吉' || r.sancai.luck === '吉') ? 'color:var(--success)' : (r.sancai.luck === '半吉' ? 'color:var(--gold)' : 'color:var(--cinn2)');
@@ -7914,7 +7914,7 @@ function renderComprehensiveScore(result) {
   let html = '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.2);border-radius:14px;padding:24px;margin-bottom:20px">';
 
   // 总分
-  let scoreColor = result.totalScore >= 75 ? '#2ecc71' : result.totalScore >= 60 ? '#f39c12' : '#e74c3c';
+  let scoreColor = result.totalScore >= 75 ? 'var(--success)' : result.totalScore >= 60 ? 'var(--warn)' : 'var(--cinn2)';
   html += '<div style="text-align:center;margin-bottom:20px">';
   html += '<div style="font-size:48px;font-weight:bold;color:' + scoreColor + '">' + result.totalScore + '</div>';
   html += '<div style="font-size:16px;color:var(--gold);letter-spacing:4px;margin-top:4px">' + result.grade + '</div>';
@@ -7938,7 +7938,7 @@ function renderComprehensiveScore(result) {
     let d = dims[i];
     let s = result.scores[d.key] || 0;
     let pct = Math.round(s / d.max * 100);
-    let barColor = pct >= 75 ? '#2ecc71' : pct >= 50 ? '#f39c12' : '#e74c3c';
+    let barColor = pct >= 75 ? 'var(--success)' : pct >= 50 ? 'var(--warn)' : 'var(--cinn2)';
     html += '<div style="margin-bottom:10px">';
     html += '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">';
     html += '<span style="color:var(--paper2)">' + d.label + '</span>';
@@ -8225,7 +8225,7 @@ function showWugeLifeCycle(wuge) {
     let val = wuge[g.key];
     let cycle = WUGE_LIFE_CYCLE[g.name];
     let detail = getWugeLuckDetail(val);
-    let luckColor = detail.luck === '大吉' ? '#2ecc71' : detail.luck === '吉' ? '#27ae60' : detail.luck === '半吉' ? '#f39c12' : '#e74c3c';
+    let luckColor = detail.luck === '大吉' ? 'var(--success)' : detail.luck === '吉' ? 'var(--jade)' : detail.luck === '半吉' ? 'var(--warn)' : 'var(--cinn2)';
     html += '<div style="margin-bottom:8px;padding:8px;background:rgba(255,255,255,0.02);border-radius:6px">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center">';
     html += '<span style="color:var(--gold);font-size:13px">' + g.name + ' ' + val + '</span>';

@@ -219,7 +219,7 @@ function renderHeigeFramework(chart) {
   const html = '';
 
   // 方法论标签
-  html += '<div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:20px;margin:16px 0;border:1px solid var(--gold)">';
+  html += '<div style="background:linear-gradient(135deg,var(--ink3),var(--cyan));border-radius:12px;padding:20px;margin:16px 0;border:1px solid var(--gold)">';
   html += '<div style="color:var(--gold);font-size:14px;font-weight:bold;letter-spacing:2px;margin-bottom:12px">🔬 HeiGe 方法论 · 11步系统推演</div>';
   html += '<div style="display:flex;flex-wrap:wrap;gap:6px">';
   for (let i = 0; i < HEIGE_STEPS.length; i++) {
@@ -299,7 +299,7 @@ function renderHeigeFramework(chart) {
     html += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">';
     dayun.slice(0, 8).forEach(function(d) {
       let isCurrent = d.current;
-      html += '<div style="background:' + (isCurrent ? 'rgba(231,76,60,0.1)' : 'rgba(0,0,0,0.03)') + ';border:1px solid ' + (isCurrent ? '#e74c3c' : 'rgba(0,0,0,0.1)') + ';border-radius:4px;padding:4px 8px;text-align:center;min-width:70px">';
+      html += '<div style="background:' + (isCurrent ? 'rgba(231,76,60,0.1)' : 'rgba(0,0,0,0.03)') + ';border:1px solid ' + (isCurrent ? 'var(--cinn2)' : 'rgba(0,0,0,0.1)') + ';border-radius:4px;padding:4px 8px;text-align:center;min-width:70px">';
       html += '<div style="font-weight:bold;color:var(--ink)">' + d.gan + d.zhi + '</div>';
       html += '<div style="font-size:10px;color:var(--paper2)">' + d.start_age + '-' + d.end_age + '岁</div>';
       if (d.gan_shen) html += '<div style="font-size:10px;color:var(--paper2)">' + d.gan_shen + '</div>';

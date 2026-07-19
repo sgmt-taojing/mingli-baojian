@@ -286,8 +286,8 @@ function _fsProToast(msg) {
 
 /** 生成带颜色的星盘 HTML */
 function _fsProStarColor(star) {
-  let colors = { 1:'#5dade2', 2:'#e74c3c', 3:'#27ae60', 4:'#27ae60', 5:'#e74c3c', 6:'#bdc3c7', 7:'#e67e22', 8:'#f1c40f', 9:'#e74c3c' };
-  return colors[star] || '#c9a84c';
+  let colors = { 1:'var(--cyan2)', 2:'var(--cinn2)', 3:'var(--jade)', 4:'var(--jade)', 5:'var(--cinn2)', 6:'var(--metal2)', 7:'var(--orange)', 8:'var(--gold2)', 9:'var(--cinn2)' };
+  return colors[star] || 'var(--gold)';
 }
 
 // ============================================================
@@ -370,9 +370,9 @@ function getDailyFengshuiGuide() {
 
   // 三大神位
   html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">';
-  html += _fsProGodCard('💰', '财神方位', caiShenMap[dayGan], '#f1c40f', '宜面朝此方交易、谈财、摆放招财物');
-  html += _fsProGodCard('💕', '喜神方位', xiShenSimple[dayGan], '#e74c3c', '宜面朝此方婚嫁、相亲、谈判');
-  html += _fsProGodCard('🌟', '福神方位', fuShenMap[dayGan], '#27ae60', '宜面朝此方祈福、许愿、求子');
+  html += _fsProGodCard('💰', '财神方位', caiShenMap[dayGan], 'var(--gold2)', '宜面朝此方交易、谈财、摆放招财物');
+  html += _fsProGodCard('💕', '喜神方位', xiShenSimple[dayGan], 'var(--cinn2)', '宜面朝此方婚嫁、相亲、谈判');
+  html += _fsProGodCard('🌟', '福神方位', fuShenMap[dayGan], 'var(--jade)', '宜面朝此方祈福、许愿、求子');
   html += '</div>';
 
   // 今日不宜方位
@@ -465,14 +465,14 @@ function diagnoseHomeLayout() {
 
   // 八宅吉凶位说明
   let bazhaiDesc = {
-    '生气': { level: '大吉', color: '#2ecc71', desc: '生气星主丁财两旺，精力充沛，宜主卧、书房', items: '宜放发财树、水晶洞、绿色植物催旺' },
-    '天医': { level: '吉', color: '#27ae60', desc: '天医星主健康长寿，宜卧室、疗养', items: '宜放葫芦、玉器、铜制摆件' },
-    '延年': { level: '吉', color: '#f1c40f', desc: '延年星主人际和谐、姻缘，宜主卧、客厅', items: '宜放粉色水晶、和合二仙、双数摆件' },
-    '伏位': { level: '平吉', color: '#c9a84c', desc: '伏位主安定平稳，宜书房、静室', items: '宜放山水画、陶瓷制品、泰山石' },
-    '祸害': { level: '凶', color: '#e67e22', desc: '祸害星主是非、官非、口舌', items: '宜放五帝钱、黄水晶球化解' },
-    '六煞': { level: '凶', color: '#e74c3c', desc: '六煞星主感情纠纷、破财', items: '宜放黑曜石球、铜葫芦化解' },
-    '五鬼': { level: '大凶', color: '#c0392b', desc: '五鬼星主火灾、盗窃、官非', items: '宜放五帝钱、铜铃、白水晶簇化解' },
-    '绝命': { level: '大凶', color: '#dc3545', desc: '绝命星主破财、伤丁、疾病', items: '宜放五帝钱、铜葫芦、黑曜石化解' }
+    '生气': { level: '大吉', color: 'var(--success)', desc: '生气星主丁财两旺，精力充沛，宜主卧、书房', items: '宜放发财树、水晶洞、绿色植物催旺' },
+    '天医': { level: '吉', color: 'var(--jade)', desc: '天医星主健康长寿，宜卧室、疗养', items: '宜放葫芦、玉器、铜制摆件' },
+    '延年': { level: '吉', color: 'var(--gold2)', desc: '延年星主人际和谐、姻缘，宜主卧、客厅', items: '宜放粉色水晶、和合二仙、双数摆件' },
+    '伏位': { level: '平吉', color: 'var(--gold)', desc: '伏位主安定平稳，宜书房、静室', items: '宜放山水画、陶瓷制品、泰山石' },
+    '祸害': { level: '凶', color: 'var(--orange)', desc: '祸害星主是非、官非、口舌', items: '宜放五帝钱、黄水晶球化解' },
+    '六煞': { level: '凶', color: 'var(--cinn2)', desc: '六煞星主感情纠纷、破财', items: '宜放黑曜石球、铜葫芦化解' },
+    '五鬼': { level: '大凶', color: 'var(--cinn)', desc: '五鬼星主火灾、盗窃、官非', items: '宜放五帝钱、铜铃、白水晶簇化解' },
+    '绝命': { level: '大凶', color: 'var(--danger)', desc: '绝命星主破财、伤丁、疾病', items: '宜放五帝钱、铜葫芦、黑曜石化解' }
   };
 
   // 各房间诊断
@@ -616,14 +616,14 @@ function analyzeBusinessFengshui() {
   let currentStarPos = _fsProFlyingStarGrid(_fsProYearCenter(currentYear));
 
   let bazhaiDesc = {
-    '生气': { level: '大吉', color: '#2ecc71', desc: '丁财两旺', action: '宜设收银台、老板办公室' },
-    '天医': { level: '吉', color: '#27ae60', desc: '健康贵人', action: '宜休息区、财务室' },
-    '延年': { level: '吉', color: '#f1c40f', desc: '人缘和谐', action: '宜会客室、洽谈区' },
-    '伏位': { level: '平吉', color: '#c9a84c', desc: '平稳安定', action: '宜仓库、储藏' },
-    '祸害': { level: '凶', color: '#e67e22', desc: '是非口舌', action: '宜仓库、卫生间' },
-    '六煞': { level: '凶', color: '#e74c3c', desc: '破财纠纷', action: '宜卫生间、通道' },
-    '五鬼': { level: '大凶', color: '#c0392b', desc: '火灾盗窃', action: '宜卫生间、储藏' },
-    '绝命': { level: '大凶', color: '#dc3545', desc: '破财伤丁', action: '宜仓库、卫生间' }
+    '生气': { level: '大吉', color: 'var(--success)', desc: '丁财两旺', action: '宜设收银台、老板办公室' },
+    '天医': { level: '吉', color: 'var(--jade)', desc: '健康贵人', action: '宜休息区、财务室' },
+    '延年': { level: '吉', color: 'var(--gold2)', desc: '人缘和谐', action: '宜会客室、洽谈区' },
+    '伏位': { level: '平吉', color: 'var(--gold)', desc: '平稳安定', action: '宜仓库、储藏' },
+    '祸害': { level: '凶', color: 'var(--orange)', desc: '是非口舌', action: '宜仓库、卫生间' },
+    '六煞': { level: '凶', color: 'var(--cinn2)', desc: '破财纠纷', action: '宜卫生间、通道' },
+    '五鬼': { level: '大凶', color: 'var(--cinn)', desc: '火灾盗窃', action: '宜卫生间、储藏' },
+    '绝命': { level: '大凶', color: 'var(--danger)', desc: '破财伤丁', action: '宜仓库、卫生间' }
   };
 
   let areas = [
@@ -904,11 +904,11 @@ function getShaqiCatalog() {
   // 煞气图例
   html += '<div style="background:rgba(231,76,60,0.06);border:1px solid rgba(231,76,60,0.2);border-radius:10px;padding:16px;margin-bottom:20px;text-align:center">';
   html += '<p style="font-size:13px;opacity:.6;line-height:1.8">煞气共12种，以下按严重程度排列。<br>';
-  html += '<span style="color:#dc3545">大凶</span>需立即化解 · <span style="color:var(--cinn2)">凶</span>建议化解 · <span style="color:var(--orange)">中凶</span>酌情化解</p></div>';
+  html += '<span style="color:var(--danger)">大凶</span>需立即化解 · <span style="color:var(--cinn2)">凶</span>建议化解 · <span style="color:var(--orange)">中凶</span>酌情化解</p></div>';
 
   for (let i = 0; i < shaqiList.length; i++) {
     let s = shaqiList[i];
-    let sevColor = s.severity === '大凶' ? '#dc3545' : s.severity === '凶' ? '#e74c3c' : '#e67e22';
+    let sevColor = s.severity === '大凶' ? 'var(--danger)' : s.severity === '凶' ? 'var(--cinn2)' : 'var(--orange)';
 
     html += '<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(201,168,76,0.1);border-radius:10px;padding:16px;margin-bottom:16px">';
     // 标题行
@@ -1553,37 +1553,37 @@ function computeChengmenJue(xuankongData, chaoxiang) {
       
       if (isWang) {
         statusText = '城门可用（旺星到城门）';
-        statusColor = '#2ecc71';
+        statusColor = 'var(--success)';
         effectText = '当旺之星' + starName + '到' + adjDir + '方城门位，开门开窗可引入当旺之气，大吉。主速发财运，事业兴旺。';
         cureText = '宜在此方开门、开窗、设通道。若为墙壁，可常开窗通风。可放金属风铃或铜葫芦催旺。';
       } else if (isSheng) {
         statusText = '城门可用（生气星到城门）';
-        statusColor = '#2ecc71';
+        statusColor = 'var(--success)';
         effectText = '生气之星' + starName + '到' + adjDir + '方城门位，开门开窗可引入生气，吉。主渐进式发展，未来运势看涨。';
         cureText = '宜在此方开门、开窗。可放水培植物或蓝色装饰品催旺生气。';
       } else if (xiangStar === 5) {
         statusText = '城门不可用（五黄到城门）';
-        statusColor = '#e74c3c';
+        statusColor = 'var(--cinn2)';
         effectText = '五黄大凶之星到' + adjDir + '方城门位，开门开窗引入凶气，主灾祸、疾病、破财。';
         cureText = '忌在此方开门开窗。若已有门窗，宜常闭，挂六字真言铜葫芦+金属风铃化解。';
       } else if (xiangStar === 2) {
         statusText = '城门不可用（二黑到城门）';
-        statusColor = '#e74c3c';
+        statusColor = 'var(--cinn2)';
         effectText = '二黑病符星到' + adjDir + '方城门位，开门开窗引入病气，主家人健康受损、脾胃疾病。';
         cureText = '忌在此方开门开窗。若已有门窗，宜常闭，放铜葫芦+金属风铃化解。';
       } else if (xiangStar === 3) {
         statusText = '城门不宜用（三碧到城门）';
-        statusColor = '#e67e22';
+        statusColor = 'var(--orange)';
         effectText = '三碧是非星到' + adjDir + '方城门位，开门开窗易引口舌是非、官非争斗。';
         cureText = '不宜在此方开门开窗。若已有门窗，宜放红色装饰品（火泄木）化解。';
       } else if (xiangStar === 7) {
         statusText = '城门不宜用（七赤到城门）';
-        statusColor = '#e67e22';
+        statusColor = 'var(--orange)';
         effectText = '七赤破军星到' + adjDir + '方城门位，开门开窗易引破财、争斗、口舌。';
         cureText = '不宜在此方开门开窗。若已有门窗，宜放蓝色装饰品或水族箱（水泄金）化解。';
       } else {
         statusText = '城门平淡（退气之星）';
-        statusColor = '#c9a84c';
+        statusColor = 'var(--gold)';
         effectText = starName + '到' + adjDir + '方城门位，非旺非生，城门开与不开影响不大，平平淡淡。';
         cureText = '可开门窗但非必要。无需特别催旺或化解。';
       }
@@ -1894,7 +1894,7 @@ function computeFeixingCombos(xuankongData, chaoxiang) {
     html += '<div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap">';
     html += '<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(46,204,113,0.12);color:var(--success)">吉</span>';
     html += '<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(231,76,60,0.12);color:var(--cinn2)">凶</span>';
-    html += '<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(220,53,69,0.12);color:#dc3545">大凶</span>';
+    html += '<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(220,53,69,0.12);color:var(--danger)">大凶</span>';
     html += '<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(201,168,76,0.12);color:var(--gold)">平</span>';
     html += '</div>';
 
@@ -1911,7 +1911,7 @@ function computeFeixingCombos(xuankongData, chaoxiang) {
         
         for (let mi = 0; mi < allMatches.length; mi++) {
           let m = allMatches[mi];
-          let luckColor = m.combo.luck === '吉' ? '#2ecc71' : m.combo.luck === '大凶' ? '#dc3545' : m.combo.luck === '凶' ? '#e74c3c' : '#c9a84c';
+          let luckColor = m.combo.luck === '吉' ? 'var(--success)' : m.combo.luck === '大凶' ? 'var(--danger)' : m.combo.luck === '凶' ? 'var(--cinn2)' : 'var(--gold)';
           let luckBg = m.combo.luck === '吉' ? 'rgba(46,204,113,0.06)' : m.combo.luck === '大凶' ? 'rgba(220,53,69,0.06)' : m.combo.luck === '凶' ? 'rgba(231,76,60,0.06)' : 'rgba(201,168,76,0.06)';
           
           html += '<div style="background:' + luckBg + ';border:1px solid ' + luckColor + '20;border-radius:10px;padding:16px;margin-bottom:12px;border-left:3px solid ' + luckColor + '">';
@@ -1937,7 +1937,7 @@ function computeFeixingCombos(xuankongData, chaoxiang) {
     
     for (let di = 0; di < comboDB.length; di++) {
       let db = comboDB[di];
-      let lc = db.luck === '吉' ? '#2ecc71' : db.luck === '大凶' ? '#dc3545' : db.luck === '凶' ? '#e74c3c' : '#c9a84c';
+      let lc = db.luck === '吉' ? 'var(--success)' : db.luck === '大凶' ? 'var(--danger)' : db.luck === '凶' ? 'var(--cinn2)' : 'var(--gold)';
       let lbg = db.luck === '吉' ? 'rgba(46,204,113,0.04)' : db.luck === '大凶' ? 'rgba(220,53,69,0.04)' : db.luck === '凶' ? 'rgba(231,76,60,0.04)' : 'rgba(201,168,76,0.04)';
       
       html += '<div style="background:' + lbg + ';border:1px solid ' + lc + '15;border-radius:8px;padding:12px;border-left:3px solid ' + lc + '">';

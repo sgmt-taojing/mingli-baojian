@@ -3017,15 +3017,15 @@ function renderKbResults(results, total) {
   
   let html = '';
   let catColors = {
-    bazi: '#c0392b', liuyao: '#2980b9', fengshui: '#27ae60', ziwei: '#8e44ad',
-    qimen: '#d35400', meihua: '#16a085', liuren: '#2c3e50', xingming: '#e67e22',
-    tizhi: '#e74c3c', zhouyi: '#34495e', bagua: '#7f8c8d', wuxing: '#f39c12',
-    shishen: '#1abc9c', nayin: '#9b59b6', shensha: '#c0392b', hechong: '#3498db',
-    koujue: '#e74c3c', other: '#95a5a6'
+    bazi: 'var(--cinn)', liuyao: 'var(--cyan)', fengshui: 'var(--jade)', ziwei: 'var(--violet2)',
+    qimen: 'var(--cinn2)', meihua: 'var(--emerald)', liuren: 'var(--ink3)', xingming: 'var(--orange)',
+    tizhi: 'var(--cinn2)', zhouyi: 'var(--ink3)', bagua: 'var(--steel)', wuxing: 'var(--warn)',
+    shishen: 'var(--emerald)', nayin: 'var(--violet)', shensha: 'var(--cinn)', hechong: 'var(--cyan2)',
+    koujue: 'var(--cinn2)', other: 'var(--metal)'
   };
   
   results.forEach(function(e) {
-    let color = catColors[e.category] || '#95a5a6';
+    let color = catColors[e.category] || 'var(--metal)';
     let catLabel = _kbCatLabel(e.category);
     let title = e.title || e.key;
     let intro = (e.intro || '').substring(0, 120);

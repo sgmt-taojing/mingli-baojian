@@ -38,15 +38,15 @@ let HETU_LUOSHU_SYSTEM = {
       9:{name:'离宫',direction:'南方',element:'火',body:'心/眼/血液'}
     },
     nineStars: {
-      1:{name:'一白贪狼星',element:'水',luck:'吉',domain:'桃花/人缘/智慧',color:'#3498db',whenProsperous:'才华横溢，人缘极佳，姻缘美满，学业有成',whenDecline:'桃花劫，感情纠纷，肾脏问题',enhanceMethod:'养水生植物/放鱼缸/蓝色黑色物品'},
-      2:{name:'二黑巨门星',element:'土',luck:'凶',domain:'病符/健康',color:'#8B4513',whenProsperous:'地产兴旺，积累财富',whenDecline:'疾病缠身，脾胃问题，妇科问题',resolveMethod:'挂铜葫芦/六帝铜钱/金属风铃'},
-      3:{name:'三碧禄存星',element:'木',luck:'凶',domain:'是非/口舌/官非',color:'#27ae60',whenProsperous:'事业有成，竞争获胜',whenDecline:'口舌是非，官非诉讼，肝胆问题',resolveMethod:'放红色物品/火属性化解(木生火泄气)'},
-      4:{name:'四绿文曲星',element:'木',luck:'吉',domain:'文昌/学业/姻缘',color:'#2ecc71',whenProsperous:'学业优异，文采斐然，姻缘和谐',whenDecline:'抑郁寡欢，风湿骨痛',enhanceMethod:'放四支毛笔/绿色植物/文昌塔'},
-      5:{name:'五黄廉贞星',element:'土',luck:'大凶',domain:'灾煞/意外/瘟疫',color:'#c0392b',whenProsperous:'权威显赫(极少)',whenDecline:'意外灾害，破财破家，重病',resolveMethod:'挂铜铃/六帝钱/金属物品(金泄土)'},
-      6:{name:'六白武曲星',element:'金',luck:'吉',domain:'贵人/权力/武功',color:'#95a5a6',whenProsperous:'升官发财，贵人扶持，权威提升',whenDecline:'头部问题，骨骼问题',enhanceMethod:'放金属物品/黄色水晶/铜器'},
-      7:{name:'七赤破军星',element:'金',luck:'凶',domain:'贼盗/破财/口舌',color:'#e74c3c',whenProsperous:'口才出众，交际能力强',whenDecline:'盗贼破财，口腔问题，肺病',resolveMethod:'放蓝色黑色物品(水泄金)'},
-      8:{name:'八白左辅星',element:'土',luck:'吉(当旺)',domain:'财运/置业',color:'#d4a017',whenProsperous:'财运亨通，置产置业，投资获利',whenDecline:'关节问题，背部问题',enhanceMethod:'放黄色水晶/陶瓷/玉石/八白玉'},
-      9:{name:'九紫右弼星',element:'火',luck:'吉(当旺)',domain:'喜庆/姻缘/名声',color:'#e74c3c',whenProsperous:'喜庆临门，姻缘美满，名声远扬',whenDecline:'心脏问题，眼疾，血光',enhanceMethod:'放红色物品/紫色物品/鲜花/红灯'}
+      1:{name:'一白贪狼星',element:'水',luck:'吉',domain:'桃花/人缘/智慧',color:'var(--cyan2)',whenProsperous:'才华横溢，人缘极佳，姻缘美满，学业有成',whenDecline:'桃花劫，感情纠纷，肾脏问题',enhanceMethod:'养水生植物/放鱼缸/蓝色黑色物品'},
+      2:{name:'二黑巨门星',element:'土',luck:'凶',domain:'病符/健康',color:'var(--wood)',whenProsperous:'地产兴旺，积累财富',whenDecline:'疾病缠身，脾胃问题，妇科问题',resolveMethod:'挂铜葫芦/六帝铜钱/金属风铃'},
+      3:{name:'三碧禄存星',element:'木',luck:'凶',domain:'是非/口舌/官非',color:'var(--jade)',whenProsperous:'事业有成，竞争获胜',whenDecline:'口舌是非，官非诉讼，肝胆问题',resolveMethod:'放红色物品/火属性化解(木生火泄气)'},
+      4:{name:'四绿文曲星',element:'木',luck:'吉',domain:'文昌/学业/姻缘',color:'var(--success)',whenProsperous:'学业优异，文采斐然，姻缘和谐',whenDecline:'抑郁寡欢，风湿骨痛',enhanceMethod:'放四支毛笔/绿色植物/文昌塔'},
+      5:{name:'五黄廉贞星',element:'土',luck:'大凶',domain:'灾煞/意外/瘟疫',color:'var(--cinn)',whenProsperous:'权威显赫(极少)',whenDecline:'意外灾害，破财破家，重病',resolveMethod:'挂铜铃/六帝钱/金属物品(金泄土)'},
+      6:{name:'六白武曲星',element:'金',luck:'吉',domain:'贵人/权力/武功',color:'var(--metal)',whenProsperous:'升官发财，贵人扶持，权威提升',whenDecline:'头部问题，骨骼问题',enhanceMethod:'放金属物品/黄色水晶/铜器'},
+      7:{name:'七赤破军星',element:'金',luck:'凶',domain:'贼盗/破财/口舌',color:'var(--cinn2)',whenProsperous:'口才出众，交际能力强',whenDecline:'盗贼破财，口腔问题，肺病',resolveMethod:'放蓝色黑色物品(水泄金)'},
+      8:{name:'八白左辅星',element:'土',luck:'吉(当旺)',domain:'财运/置业',color:'var(--gold)',whenProsperous:'财运亨通，置产置业，投资获利',whenDecline:'关节问题，背部问题',enhanceMethod:'放黄色水晶/陶瓷/玉石/八白玉'},
+      9:{name:'九紫右弼星',element:'火',luck:'吉(当旺)',domain:'喜庆/姻缘/名声',color:'var(--cinn2)',whenProsperous:'喜庆临门，姻缘美满，名声远扬',whenDecline:'心脏问题，眼疾，血光',enhanceMethod:'放红色物品/紫色物品/鲜花/红灯'}
     }
   }
 };

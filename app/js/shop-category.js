@@ -63,18 +63,18 @@ function renderFoyiProducts() {
     card.onmouseout = function() { this.style.borderColor='rgba(147,112,219,0.2)';this.style.transform='translateY(0)' };
     card.onclick = function() { showMedicineDetail(item) };
     
-    let blessingBadge = item.blessing ? '<span style="font-size:10px;background:rgba(147,112,219,0.2);color:#9370DB;padding:2px 6px;border-radius:8px;margin-top:8px;display:inline-block">✨ 已加持</span>' : '';
+    let blessingBadge = item.blessing ? '<span style="font-size:10px;background:rgba(147,112,219,0.2);color:var(--violet);padding:2px 6px;border-radius:8px;margin-top:8px;display:inline-block">✨ 已加持</span>' : '';
     
     card.innerHTML = 
       '<div style="height:100px;background:linear-gradient(135deg,rgba(147,112,219,0.12),rgba(147,112,219,0.03));display:flex;align-items:center;justify-content:center;font-size:48px">' + item.image + '</div>' +
       '<div style="padding:16px">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
-          '<span style="font-size:14px;color:#9370DB;font-weight:bold">' + item.name + '</span>' +
-          '<span style="font-size:11px;background:rgba(147,112,219,0.15);color:#9370DB;padding:2px 8px;border-radius:10px">' + item.school + '</span>' +
+          '<span style="font-size:14px;color:var(--violet);font-weight:bold">' + item.name + '</span>' +
+          '<span style="font-size:11px;background:rgba(147,112,219,0.15);color:var(--violet);padding:2px 8px;border-radius:10px">' + item.school + '</span>' +
         '</div>' +
         '<p style="font-size:12px;color:var(--paper2);margin-bottom:10px;line-height:1.6">' + item.desc + '</p>' +
         '<div style="display:flex;justify-content:space-between;align-items:center">' +
-          '<span style="font-size:16px;color:#9370DB">¥' + item.price + '</span>' +
+          '<span style="font-size:16px;color:var(--violet)">¥' + item.price + '</span>' +
           '<span style="font-size:11px;opacity:.5">' + item.master + '</span>' +
         '</div>' +
         blessingBadge +
@@ -93,7 +93,7 @@ function renderMasters() {
     let card = document.createElement('div');
     card.className = 'master-card';
     
-    let schoolColor = m.school === '道医' ? 'var(--gold)' : (m.school === '佛医' ? '#9370DB' : 'var(--cyan)');
+    let schoolColor = m.school === '道医' ? 'var(--gold)' : (m.school === '佛医' ? 'var(--violet)' : 'var(--cyan)');
     let schoolBg = m.school === '道医' ? 'rgba(201,168,76,0.1)' : (m.school === '佛医' ? 'rgba(147,112,219,0.1)' : 'rgba(0,188,212,0.1)');
     
     card.style.cssText = 'background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:20px;transition:all .3s';
@@ -143,7 +143,7 @@ function showMedicineDetail(item) {
   
   title.textContent = item.name;
   
-  let color = item.school === '道医' ? 'var(--gold)' : '#9370DB';
+  let color = item.school === '道医' ? 'var(--gold)' : 'var(--violet)';
   
   content.innerHTML = 
     '<div style="font-size:48px;text-align:center;margin-bottom:20px">' + item.image + '</div>' +
@@ -161,10 +161,10 @@ function showMedicineDetail(item) {
       '<p style="font-size:12px;color:var(--paper2);line-height:1.6">' + item.usage + '</p>' +
     '</div>' +
     '<div style="background:rgba(255,100,100,0.05);border:1px solid rgba(255,100,100,0.2);padding:16px;border-radius:8px;margin-bottom:16px">' +
-      '<p style="font-size:13px;margin-bottom:8px;color:#ff6b6b"><b>⚠️ 注意事项:</b></p>' +
+      '<p style="font-size:13px;margin-bottom:8px;color:var(--cinn2)"><b>⚠️ 注意事项:</b></p>' +
       '<p style="font-size:12px;color:var(--paper2);line-height:1.6">' + item.caution + '</p>' +
     '</div>' +
-    (item.blessing ? '<div style="background:rgba(147,112,219,0.1);padding:16px;border-radius:8px;margin-bottom:16px"><p style="font-size:12px;color:#9370DB">✨ ' + item.blessing + '</p></div>' : '') +
+    (item.blessing ? '<div style="background:rgba(147,112,219,0.1);padding:16px;border-radius:8px;margin-bottom:16px"><p style="font-size:12px;color:var(--violet)">✨ ' + item.blessing + '</p></div>' : '') +
     '<div style="display:flex;justify-content:space-between;align-items:center;padding-top:16px;border-top:1px solid rgba(255,255,255,0.1)">' +
       '<div>' +
         '<p style="font-size:20px;color:' + color + ';font-weight:bold">¥' + item.price + '</p>' +

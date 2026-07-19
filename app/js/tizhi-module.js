@@ -2,16 +2,16 @@
 // New TZ_DATA for tizhi module - comprehensive health management
 let TZ_DATA = {
   constitutions: [
-    {key:'pinghe',name:'平和质',icon:'🌱',color:'#4CAF50',desc:'体型匀称、面色润泽、精力充沛',yangsheng:'均衡饮食，规律作息，适度运动。保持当前状态，避免偏嗜。'},
-    {key:'qixu',name:'气虚质',icon:'🌪️',color:'#9C27B0',desc:'容易疲乏、气短懒言、易出汗',yangsheng:'补气健脾，多食黄芪、党参、山药、大枣。避免过度劳累。'},
-    {key:'yangxu',name:'阳虚质',icon:'🌊',color:'#009688',desc:'畏寒怕冷、手脚冰凉、喜热饮',yangsheng:'温补阳气，多食羊肉、生姜、桂圆、韭菜。注意保暖，避免生冷。'},
-    {key:'yinxu',name:'阴虚质',icon:'🔥',color:'#FF9800',desc:'口干咽燥、手足心热、盗汗',yangsheng:'滋阴润燥，多食银耳、百合、枸杞、麦冬。避免辛辣燥热。'},
-    {key:'xueyu',name:'血虚质',icon:'🩸',color:'#F44336',desc:'面色苍白、头晕眼花、心悸失眠',yangsheng:'补血养血，多食红枣、当归、桂圆、黑芝麻。避免过度用眼。'},
-    {key:'tanshi',name:'痰湿质',icon:'💧',color:'#2196F3',desc:'体型肥胖、腹部松软、口中黏腻',yangsheng:'化痰祛湿，多食薏仁、冬瓜、陈皮、白萝卜。加强运动，少食肥甘。'},
-    {key:'shire',name:'湿热质',icon:'🌿',color:'#4CAF50',desc:'面部油光、口苦口臭、大便黏滞',yangsheng:'清热利湿，多食绿豆、苦瓜、冬瓜、薏仁。忌辛辣油腻烟酒。'},
-    {key:'xueyu2',name:'血瘀质',icon:'🟣',color:'#795548',desc:'肤色偏暗、易有瘀斑、唇色紫暗',yangsheng:'活血化瘀，多食山楂、桃仁、红花、黑木耳。加强运动促进气血运行。'},
-    {key:'qiyu',name:'气郁质',icon:'🔵',color:'#3F51B5',desc:'情绪低落、多愁善感、胸闷叹气',yangsheng:'疏肝理气，多食玫瑰、佛手、柑橘、薄荷。保持心情舒畅，多社交。'},
-    {key:'tebing',name:'特禀质',icon:'🧬',color:'#795548',desc:'易过敏、鼻敏感、对药物/食物敏感',yangsheng:'益气固表，避免过敏原。多食益气食物如黄芪、防风、白术。'}
+    {key:'pinghe',name:'平和质',icon:'🌱',color:'var(--jade)',desc:'体型匀称、面色润泽、精力充沛',yangsheng:'均衡饮食，规律作息，适度运动。保持当前状态，避免偏嗜。'},
+    {key:'qixu',name:'气虚质',icon:'🌪️',color:'var(--violet)',desc:'容易疲乏、气短懒言、易出汗',yangsheng:'补气健脾，多食黄芪、党参、山药、大枣。避免过度劳累。'},
+    {key:'yangxu',name:'阳虚质',icon:'🌊',color:'var(--emerald)',desc:'畏寒怕冷、手脚冰凉、喜热饮',yangsheng:'温补阳气，多食羊肉、生姜、桂圆、韭菜。注意保暖，避免生冷。'},
+    {key:'yinxu',name:'阴虚质',icon:'🔥',color:'var(--orange)',desc:'口干咽燥、手足心热、盗汗',yangsheng:'滋阴润燥，多食银耳、百合、枸杞、麦冬。避免辛辣燥热。'},
+    {key:'xueyu',name:'血虚质',icon:'🩸',color:'var(--cinn2)',desc:'面色苍白、头晕眼花、心悸失眠',yangsheng:'补血养血，多食红枣、当归、桂圆、黑芝麻。避免过度用眼。'},
+    {key:'tanshi',name:'痰湿质',icon:'💧',color:'var(--cyan)',desc:'体型肥胖、腹部松软、口中黏腻',yangsheng:'化痰祛湿，多食薏仁、冬瓜、陈皮、白萝卜。加强运动，少食肥甘。'},
+    {key:'shire',name:'湿热质',icon:'🌿',color:'var(--jade)',desc:'面部油光、口苦口臭、大便黏滞',yangsheng:'清热利湿，多食绿豆、苦瓜、冬瓜、薏仁。忌辛辣油腻烟酒。'},
+    {key:'xueyu2',name:'血瘀质',icon:'🟣',color:'var(--wood)',desc:'肤色偏暗、易有瘀斑、唇色紫暗',yangsheng:'活血化瘀，多食山楂、桃仁、红花、黑木耳。加强运动促进气血运行。'},
+    {key:'qiyu',name:'气郁质',icon:'🔵',color:'var(--cyan)',desc:'情绪低落、多愁善感、胸闷叹气',yangsheng:'疏肝理气，多食玫瑰、佛手、柑橘、薄荷。保持心情舒畅，多社交。'},
+    {key:'tebing',name:'特禀质',icon:'🧬',color:'var(--wood)',desc:'易过敏、鼻敏感、对药物/食物敏感',yangsheng:'益气固表，避免过敏原。多食益气食物如黄芪、防风、白术。'}
   ],
   questions: [
     {q:'您是否容易疲乏，精力不足？',scores:{qixu:2,yangxu:1}},
@@ -133,31 +133,31 @@ let TZ_DATA = {
     {name:'冥想',type:'呼吸训练',duration:15,intensity:'低',calories:15,notes:'减轻压力，改善睡眠'}
   ],
   wuxing: {
-    Mu:{name:'木',icon:'🌳',color:'#27ae60',season:'春',direction:'东',taste:'酸',organs:['肝','胆'],sense:'目',tissue:'筋',emotion:'怒',
+    Mu:{name:'木',icon:'🌳',color:'var(--jade)',season:'春',direction:'东',taste:'酸',organs:['肝','胆'],sense:'目',tissue:'筋',emotion:'怒',
       symptoms:['头痛眩晕','眼睛干涩','易怒烦躁','两肋胀痛','指甲脆弱','高血压'],
       foods:['芹菜','韭菜','绿豆','菠菜','猕猴桃','柠檬','山楂','菊花','枸杞叶'],
       herbs:['柴胡','白芍','当归','川芎','枸杞','决明子','天麻','钩藤','薄荷','茵陈'],
       regimen:'春季养肝，早睡早起，少生气。肝经当令丑时(1-3点)务必入睡。青色入肝，酸味收敛肝气。',
       avoid:'忌过度饮酒、熬夜、暴怒、油腻'},
-    Huo:{name:'火',icon:'🔥',color:'#e74c3c',season:'夏',direction:'南',taste:'苦',organs:['心','小肠'],sense:'舌',tissue:'脉',emotion:'喜',
+    Huo:{name:'火',icon:'🔥',color:'var(--cinn2)',season:'夏',direction:'南',taste:'苦',organs:['心','小肠'],sense:'舌',tissue:'脉',emotion:'喜',
       symptoms:['心悸失眠','口腔溃疡','舌尖红赤','多汗','胸闷','面色潮红'],
       foods:['苦瓜','莲子','百合','西瓜','红豆','番茄','红枣','桂圆','菊花'],
       herbs:['丹参','黄连','莲子心','酸枣仁','麦冬','五味子','柏子仁','生地','竹叶'],
       regimen:'夏季养心，午睡半小时。心经当令午时(11-13点)宜小憩。红色入心，苦味降心火。',
       avoid:'忌过量咖啡浓茶、剧烈运动出汗过多、大悲大喜'},
-    Tu:{name:'土',icon:'⛰️',color:'#f39c12',season:'长夏',direction:'中',taste:'甘',organs:['脾','胃'],sense:'口',tissue:'肉',emotion:'思',
+    Tu:{name:'土',icon:'⛰️',color:'var(--warn)',season:'长夏',direction:'中',taste:'甘',organs:['脾','胃'],sense:'口',tissue:'肉',emotion:'思',
       symptoms:['食欲不振','腹胀腹泻','面色萎黄','四肢乏力','水肿','大便稀溏'],
       foods:['小米','山药','薏仁','红枣','南瓜','土豆','扁豆','莲子','茯苓','陈皮'],
       herbs:['党参','白术','茯苓','甘草','陈皮','砂仁','苍术','黄芪','薏苡仁'],
       regimen:'长夏养脾，饮食定时定量，少吃生冷。脾经当令巳时(9-11点)进食早餐最佳。黄色入脾。',
       avoid:'忌生冷寒凉、暴饮暴食、思虑过度、久坐'},
-    Jin:{name:'金',icon:'🪙',color:'#90a4ae',season:'秋',direction:'西',taste:'辛',organs:['肺','大肠'],sense:'鼻',tissue:'皮毛',emotion:'悲',
+    Jin:{name:'金',icon:'🪙',color:'var(--cyan)',season:'秋',direction:'西',taste:'辛',organs:['肺','大肠'],sense:'鼻',tissue:'皮毛',emotion:'悲',
       symptoms:['咳嗽痰多','鼻塞流涕','皮肤干燥','咽喉肿痛','便秘','易感冒'],
       foods:['白萝卜','梨','百合','银耳','山药','杏仁','莲藕','枇杷','蜂蜜'],
       herbs:['川贝母','百合','麦冬','沙参','杏仁','桔梗','枇杷叶','桑白皮','玉竹'],
       regimen:'秋季养肺，早卧早起，多做深呼吸。肺经当令寅时(3-5点)宜深度睡眠。白色入肺。',
       avoid:'忌吸烟、辛辣过量、悲伤忧郁、空调直吹'},
-    Shui:{name:'水',icon:'💧',color:'#3498db',season:'冬',direction:'北',taste:'咸',organs:['肾','膀胱'],sense:'耳',tissue:'骨',emotion:'恐',
+    Shui:{name:'水',icon:'💧',color:'var(--cyan2)',season:'冬',direction:'北',taste:'咸',organs:['肾','膀胱'],sense:'耳',tissue:'骨',emotion:'恐',
       symptoms:['腰膝酸软','耳鸣耳聋','畏寒肢冷','夜尿频多','脱发白发','记忆力减退'],
       foods:['黑豆','黑芝麻','核桃','海参','紫菜','桑葚','板栗','羊肉','韭菜','山药'],
       herbs:['熟地黄','山药','山茱萸','枸杞子','杜仲','肉桂','淫羊藿','补骨脂','菟丝子'],
@@ -280,7 +280,7 @@ function tzSwitchTab(name){
     let btn = document.getElementById('tzTab-'+t);
     if(panel) panel.style.display = (t===name)?'block':'none';
     if(btn){
-      if(t===name){btn.style.background='var(--title)';btn.style.color='#fff';btn.style.fontWeight='600';}
+      if(t===name){btn.style.background='var(--title)';btn.style.color='var(--paper)';btn.style.fontWeight='600';}
       else{btn.style.background='transparent';btn.style.color='var(--muted)';btn.style.fontWeight='400';}
     }
   });
@@ -412,7 +412,7 @@ function tzRenderQigong(){
   // Also render exercise filters and list
   const exFilters = ['全部','有氧运动','力量训练','柔韧训练','呼吸训练'];
   let fhtml=exFilters.map(function(f,i){
-    return '<button onclick="tzFilterExercise(\''+(i===0?'all':f)+'\')" style="padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:'+(i===0?'var(--title)':'rgba(255,255,255,0.04)')+';color:'+(i===0?'#fff':'var(--muted)')+';cursor:pointer;font-size:12px;font-family:inherit">'+f+'</button>';
+    return '<button onclick="tzFilterExercise(\''+(i===0?'all':f)+'\')" style="padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:'+(i===0?'var(--title)':'rgba(255,255,255,0.04)')+';color:'+(i===0?'var(--paper)':'var(--muted)')+';cursor:pointer;font-size:12px;font-family:inherit">'+f+'</button>';
   }).join('');
   let fel = document.getElementById('tzExFilters');
   if(fel) fel.innerHTML=fhtml;
@@ -605,14 +605,14 @@ function tzRenderFood(filter){
 
 function tzFilterFood(f){
   document.querySelectorAll('#tzFoodFilters button').forEach(function(b){b.style.background='rgba(255,255,255,0.04)';b.style.color='var(--muted)';});
-  event.target.style.background='var(--title)';event.target.style.color='#fff';
+  event.target.style.background='var(--title)';event.target.style.color='var(--paper)';
   tzRenderFood(f);
 }
 
 function tzRenderExercise(filter){
   let list = TZ_DATA.exercises;
   if(filter!=='all') list=list.filter(function(e){return e.type===filter;});
-  const intColors = {'低':'#4CAF50','中':'#FF9800','高':'#f44336'};
+  const intColors = {'低':'var(--jade)','中':'var(--orange)','高':'var(--cinn2)'};
   let html=list.map(function(e){
     return '<div class="tz-card-16">'+
       '<div class="tz-flex-between">'+
@@ -630,7 +630,7 @@ function tzRenderExercise(filter){
 
 function tzFilterExercise(f){
   document.querySelectorAll('#tzExFilters button').forEach(function(b){b.style.background='rgba(255,255,255,0.04)';b.style.color='var(--muted)';});
-  event.target.style.background='var(--title)';event.target.style.color='#fff';
+  event.target.style.background='var(--title)';event.target.style.color='var(--paper)';
   tzRenderExercise(f);
 }
 
@@ -778,7 +778,7 @@ function tzRenderWxButtons(){
 function tzSelectWuxing(key){
   let d = TZ_DATA.wuxing[key];
   document.querySelectorAll('#tzWxBtns button').forEach(function(b){
-    if(b.dataset.key===key){b.style.background='var(--title)';b.style.color='#fff';b.style.borderColor='var(--gold)';}
+    if(b.dataset.key===key){b.style.background='var(--title)';b.style.color='var(--paper)';b.style.borderColor='var(--gold)';}
     else{b.style.background='rgba(255,255,255,0.04)';b.style.color='var(--muted)';b.style.borderColor='var(--border)';}
   });
   let html='<div class="tz-card-lg">'+

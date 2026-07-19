@@ -9,13 +9,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&family=Ma+Shan+Zheng&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
-  --ink: #0a0a0a; --ink-deep: #111010; --ink-mid: #1e1c1a;
+  --ink: var(--ink); --ink-deep: var(--ink2); --ink-mid: var(--ink3);
   --paper: var(--paper); --paper-dark: var(--paper2);
   --cinnabar: var(--cinn); --cinnabar-light: var(--cinn2);
   --gold: var(--gold); --gold-light: var(--gold2);
-  --jade: #4a7c59; --jade-light: #6ba873;
+  --jade: var(--jade); ;
   --cyan: var(--cyan); --cyan-light: var(--cyan2);
-  --violet: var(--violet2); --violet-light: #a569bd;
+  --violet: var(--violet2); ;
   --cloud: rgba(240,232,216,0.04); --cloud2: rgba(240,232,216,0.02);
 }
 *{margin:0;padding:0;box-sizing:border-box}
@@ -150,9 +150,9 @@ select.input-field option{background:var(--ink-deep);color:var(--paper)}
 .action-btn:hover{border-color:var(--gold);color:var(--gold);box-shadow:0 0 20px rgba(201,168,76,.1)}
 
 /* STARS COLOR */
-.star-pei{color:var(--cinn)}.star-yin{color:var(--orange)}.star-chu{color:var(--warn)}.star-fang{color:var(--success)}.star-jin{color:var(--jade)}.star-zhen{color:#1abc9c}.star-rong{color:var(--cyan2)}.star-ying{color:var(--violet)}.star-you{color:var(--violet2)}
+.star-pei{color:var(--cinn)}.star-yin{color:var(--orange)}.star-chu{color:var(--warn)}.star-fang{color:var(--success)}.star-jin{color:var(--jade)}.star-zhen{color:var(--emerald)}.star-rong{color:var(--cyan2)}.star-ying{color:var(--violet)}.star-you{color:var(--violet2)}
 .door-sheng{color:var(--jade)}.door-jin{color:var(--success)}.door-shang{color:var(--warn)}.door-jing{color:var(--orange)}.door-si{color:var(--metal)}.door-du{color:var(--steel)}.door-xin{color:var(--cinn)}.door-jing2{color:var(--cyan)}
-.god-zhi{color:var(--cyan2)}.god-nu{color:var(--violet)}.god-hu{color:var(--orange)}.god-tian{color:var(--warn)}.god-di{color:var(--success)}.god-hei{color:var(--steel)}.god-yue{color:#ecf0f1}.god-she{color:var(--cinn)}
+.god-zhi{color:var(--cyan2)}.god-nu{color:var(--violet)}.god-hu{color:var(--orange)}.god-tian{color:var(--warn)}.god-di{color:var(--success)}.god-hei{color:var(--steel)}.god-yue{color:var(--paper2)}.god-she{color:var(--cinn)}
 
 /* FOOTER NOTE */
 .footer-note{text-align:center;font-size:11px;opacity:.3;letter-spacing:2px;padding:40px 0 20px;font-weight:300}
@@ -458,14 +458,14 @@ const PALACES = {
 
 // Eight Gates (complete)
 const DOORS_FULL = {
-  sheng: {name:'生门', nature:'大吉',desc:'利于求财、创业、置产、谈判',color:'#27ae60',stem:'乙'},
-  jing:  {name:'景门', nature:'小吉',desc:'利于文书、告白、信息传递',color:'#f39c12',stem:'丙'},
-  shang: {name:'伤门', nature:'大凶',desc:'利于讨债、索命、博弈',color:'#e67e22',stem:'丁'},
-  du:    {name:'杜门', nature:'小凶',desc:'利于保密、躲藏、截路',color:'#7f8c8d',stem:'庚'},
-  si:    {name:'死门', nature:'大凶',desc:'利于丧事、捕猎、镇压',color:'#95a5a6',stem:'辛'},
-  xin:   {name:'休门', nature:'大吉',desc:'利于休养、访友、人际',color:'#c0392b',stem:'壬'},
-  kai:   {name:'开门', nature:'大吉',desc:'利于事业、升迁、远行',color:'#2980b9',stem:'癸'},
-  cun:   {name:'杜门', nature:'小凶',desc:'利于藏匿、伏兵、陷阱',color:'#7f8c8d',stem:'戊'},
+  sheng: {name:'生门', nature:'大吉',desc:'利于求财、创业、置产、谈判',color:'var(--jade)',stem:'乙'},
+  jing:  {name:'景门', nature:'小吉',desc:'利于文书、告白、信息传递',color:'var(--warn)',stem:'丙'},
+  shang: {name:'伤门', nature:'大凶',desc:'利于讨债、索命、博弈',color:'var(--orange)',stem:'丁'},
+  du:    {name:'杜门', nature:'小凶',desc:'利于保密、躲藏、截路',color:'var(--steel)',stem:'庚'},
+  si:    {name:'死门', nature:'大凶',desc:'利于丧事、捕猎、镇压',color:'var(--metal)',stem:'辛'},
+  xin:   {name:'休门', nature:'大吉',desc:'利于休养、访友、人际',color:'var(--cinn)',stem:'壬'},
+  kai:   {name:'开门', nature:'大吉',desc:'利于事业、升迁、远行',color:'var(--cyan)',stem:'癸'},
+  cun:   {name:'杜门', nature:'小凶',desc:'利于藏匿、伏兵、陷阱',color:'var(--steel)',stem:'戊'},
 };
 
 // Door rotation order
@@ -683,9 +683,9 @@ function renderQimen(qd) {
     const doorClass = getDoorClass(p?.door?.name || '');
     const godClass = getGodClass(p?.god?.symbol || '');
     const isKey = p?.isKey;
-    const starColor = p?.star?.type === '吉' ? '#27ae60' : (p?.star?.type === '大吉' ? '#2ecc71' : '#e74c3c');
-    const doorColor = p?.door?.color || '#95a5a6';
-    const godColor = '#f39c12';
+    const starColor = p?.star?.type === '吉' ? 'var(--jade)' : (p?.star?.type === '大吉' ? 'var(--success)' : 'var(--cinn2)');
+    const doorColor = p?.door?.color || 'var(--metal)';
+    const godColor = 'var(--warn)';
 
     const qiInfo = getPalaceAnalysis(p宫, p);
 
@@ -884,12 +884,12 @@ function renderQimenInterp(qd) {
     <div class="sub-grid">
       <div class="interp-item">
         <p class="item-label">九星</p>
-        <p class="item-value" style="color:${kpData?.star?.type==='吉'||kpData?.star?.type==='大吉'?'#2ecc71':'#e74c3c'}">${kpData?.star?.name || '—'}</p>
+        <p class="item-value" style="color:${kpData?.star?.type==='吉'||kpData?.star?.type==='大吉'?'var(--success)':'var(--cinn2)'}">${kpData?.star?.name || '—'}</p>
         <p class="item-desc">${kpData?.star?.desc || ''}（${kpData?.star?.nature || ''}）</p>
       </div>
       <div class="interp-item">
         <p class="item-label">八门</p>
-        <p class="item-value" style="color:${kpData?.door?.color || '#95a5a6'}">${kpData?.door?.name || '—'}门</p>
+        <p class="item-value" style="color:${kpData?.door?.color || 'var(--metal)'}">${kpData?.door?.name || '—'}门</p>
         <p class="item-desc">${kpData?.door?.desc || ''}（${kpData?.door?.nature || ''}）</p>
       </div>
       <div class="interp-item">
@@ -917,7 +917,7 @@ function renderQimenInterp(qd) {
       <div class="interp-item" style="${isKey ? 'border-color:rgba(201,168,76,.3);background:rgba(201,168,76,.03)' : ''}">
         <p class="item-label">${palInfo.name} ${isKey ? '(值使)' : ''}</p>
         <p class="item-value">${p.star?.name || ''} · ${p.door?.name || ''}门</p>
-        <p class="item-desc" style="color:${isGood?'#2ecc71':'#e74c3c'}">${isGood?'吉':'凶'}</p>
+        <p class="item-desc" style="color:${isGood?'var(--success)':'var(--cinn2)'}">${isGood?'吉':'凶'}</p>
       </div>
     `;
   }).join('');
@@ -1219,8 +1219,8 @@ async function yjCastCoins() {
     const val = (i % 2 === 0);
     coins[i].style.opacity = '1'; coins[i].style.transform = 'none';
     coins[i].textContent = val ? '字' : '背';
-    coins[i].style.color = val ? '#e8cc7a' : '#c9a84c';
-    coins[i].style.borderColor = val ? '#e8cc7a' : '#c9a84c';
+    coins[i].style.color = val ? 'var(--gold2)' : 'var(--gold)';
+    coins[i].style.borderColor = val ? 'var(--gold2)' : 'var(--gold)';
   }
   await sleep(600);
   const val = total; // 6,7,8,9
@@ -1298,8 +1298,8 @@ function showYjResult() {
     const isYang = linesGua[i];
     const isOld = yjVals[i] === 6 || yjVals[i] === 9;
     div.innerHTML = isYang
-      ? `<div style="position:absolute;left:0;right:0;top:3px;height:3px;background:${isOld?'#e74c3c':'#c9a84c'};border-radius:1px"></div>`
-      : `<div style="position:absolute;left:0;right:50%;top:3px;height:3px;background:${isOld?'#e74c3c':'#c9a84c'};border-radius:1px"></div><div style="position:absolute;left:50%;right:0;top:3px;height:3px;background:${isOld?'#e74c3c':'#c9a84c'};border-radius:1px"></div>`;
+      ? `<div style="position:absolute;left:0;right:0;top:3px;height:3px;background:${isOld?'var(--cinn2)':'var(--gold)'};border-radius:1px"></div>`
+      : `<div style="position:absolute;left:0;right:50%;top:3px;height:3px;background:${isOld?'var(--cinn2)':'var(--gold)'};border-radius:1px"></div><div style="position:absolute;left:50%;right:0;top:3px;height:3px;background:${isOld?'var(--cinn2)':'var(--gold)'};border-radius:1px"></div>`;
     pgEl.appendChild(div);
   }
 
@@ -1318,8 +1318,8 @@ function showYjResult() {
       const div = document.createElement('div');
       div.style.cssText = 'width:70px;height:8px;position:relative;margin:2px 0';
       div.innerHTML = clines[i]
-        ? `<div style="position:absolute;left:0;right:0;top:3px;height:3px;background:#4a7c59;border-radius:1px"></div>`
-        : `<div style="position:absolute;left:0;right:50%;top:3px;height:3px;background:#4a7c59;border-radius:1px"></div><div style="position:absolute;left:50%;right:0;top:3px;height:3px;background:#4a7c59;border-radius:1px"></div>`;
+        ? `<div style="position:absolute;left:0;right:0;top:3px;height:3px;background:var(--jade);border-radius:1px"></div>`
+        : `<div style="position:absolute;left:0;right:50%;top:3px;height:3px;background:var(--jade);border-radius:1px"></div><div style="position:absolute;left:50%;right:0;top:3px;height:3px;background:var(--jade);border-radius:1px"></div>`;
       cgEl.appendChild(div);
     }
   } else {

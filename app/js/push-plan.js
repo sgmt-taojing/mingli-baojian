@@ -22,7 +22,7 @@ const PUSH_PLAN = {
   tiers: {
     free: {
       name: '缘主',
-      color: '#8a7d60',
+      color: 'var(--cinn)',
       icon: '🟐',
       features: [
         '每日宜忌推送（基础版，仅3个吉时）',
@@ -42,7 +42,7 @@ const PUSH_PLAN = {
     },
     annual: {
       name: '年度会员',
-      color: '#c9a84c',
+      color: 'var(--gold)',
       icon: '🥇',
       features: [
         '每日完整推送（四板块全量）',
@@ -63,7 +63,7 @@ const PUSH_PLAN = {
     },
     lifetime: {
       name: '终身会员',
-      color: '#e74c3c',
+      color: 'var(--cinn2)',
       icon: '👑',
       features: [
         '年度会员全部内容',

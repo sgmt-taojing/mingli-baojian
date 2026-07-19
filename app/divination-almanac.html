@@ -9,13 +9,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ink:var(--ink);--ink2:var(--ink2);--ink3:#1a1a1a;--ink4:var(--ink4);
+  --ink:var(--ink);--ink2:var(--ink2);--ink3:var(--ink3);--ink4:var(--ink4);
   --paper:var(--paper);--paper2:var(--paper2);--paper3:var(--paper3);
   --gold:var(--gold);--gold2:var(--gold2);--gold3:var(--gold3);
   --cinn:var(--cinn);--cinn2:var(--cinn2);
   --cyan:var(--cyan);--cyan2:var(--cyan2);
   --jade:var(--jade);--jade2:var(--success);
-  --violet:var(--violet2);--violet2:#a569bd;
+  --violet:var(--violet2);--violet2:var(--violet2);
   --orange:var(--orange);
   --emerald:var(--emerald);
   --steel:var(--steel);
@@ -479,7 +479,7 @@ body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xm
 .toast-msg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(20,18,14,.95);border:1px solid rgba(201,168,76,.3);color:var(--paper);font-family:'Noto Serif SC',serif;font-size:14px;padding:18px 28px;letter-spacing:2px;border-radius:4px;z-index:99999;box-shadow:0 4px 32px rgba(0,0,0,.6);text-align:center;min-width:220px;opacity:0;transition:opacity .25s ease;pointer-events:none}
 .toast-msg.show{opacity:1}
 /* Feature Navigation Bar */
-.feature-nav-bar{background:#0d0b08;padding:20px 0 24px;margin-top:32px;border-top:1px solid rgba(201,168,76,.15)}
+.feature-nav-bar{background:var(--ink);padding:20px 0 24px;margin-top:32px;border-top:1px solid rgba(201,168,76,.15)}
 .feature-nav-title{text-align:center;font-size:11px;color:var(--paper3);letter-spacing:4px;margin-bottom:14px}
 .feature-nav-cards{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
 .fn-card{display:flex;flex-direction:column;align-items:center;gap:3px;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.2);border-radius:10px;padding:12px 14px;text-decoration:none;color:var(--paper);min-width:88px;transition:.2s}
@@ -1702,7 +1702,7 @@ function updateDailyAdvice(almanac) {
     };
     html+='<div class="advice-card" style="margin-bottom:12px;background:linear-gradient(135deg,rgba(46,204,113,.06),rgba(39,174,96,.04));border:1px solid rgba(46,204,113,.15);border-radius:10px;padding:14px">';
     html+='<h5 style="color:var(--jade);margin-bottom:8px">🌿 今日节气：'+jieqi+'</h5>';
-    html+='<p style="font-size:13px;line-height:1.8;color:#556">'+(jieqiDesc[jieqi]||'')+'</p>';
+    html+='<p style="font-size:13px;line-height:1.8;color:var(--ink3)">'+(jieqiDesc[jieqi]||'')+'</p>';
     html+='<p style="font-size:12px;color:var(--steel)">📖 俗语：「'+(jieqiSuyu[jieqi]||'')+'」</p>';
     html+='<p style="font-size:12px;color:var(--orange)">⚠️ 注意：'+(jqYi&&jqYi[jieqi]?jqYi[jieqi].split('。')[0]+'。':'顺应节气，保重身体。')+'</p>';
     html+='</div>';
@@ -1727,13 +1727,13 @@ function updateDailyAdvice(almanac) {
   html+='<h5 style="color:var(--violet2);margin-bottom:8px">📚 今日道家智慧</h5>';
   html+='<div style="font-size:13px;color:var(--paper3);margin-bottom:6px">「'+todayDaoist.quote+'」</div>';
   html+='<div style="font-size:12px;color:var(--paper3)">—— '+todayDaoist.source+'</div>';
-  html+='<div style="font-size:13px;line-height:1.8;color:#556;margin-top:8px">💡 白话：'+todayDaoist.baihua+'</div>';
+  html+='<div style="font-size:13px;line-height:1.8;color:var(--ink3);margin-top:8px">💡 白话：'+todayDaoist.baihua+'</div>';
   html+='</div>';
 
   // === 今日修行建议 ===
   html+='<div class="advice-card" style="margin-bottom:12px;background:linear-gradient(135deg,rgba(230,126,34,.06),rgba(211,84,0,.04));border:1px solid rgba(230,126,34,.15);border-radius:10px;padding:14px">';
   html+='<h5 style="color:var(--orange);margin-bottom:8px">🙏 今日修行建议</h5>';
-  html+=practiceAdvice.map(function(p){return '<p style="font-size:13px;line-height:1.8;color:#556">• '+p+'</p>';}).join('');
+  html+=practiceAdvice.map(function(p){return '<p style="font-size:13px;line-height:1.8;color:var(--ink3)">• '+p+'</p>';}).join('');
   html+='</div>';
 
   // === 今日命理知识 ===
@@ -1749,7 +1749,7 @@ function updateDailyAdvice(almanac) {
   html+='</div>';
 
   // 免责声明
-  html+='<div style="margin-top:12px;padding:10px;background:#fff8e1;border-left:3px solid #ffc107;border-radius:4px;font-size:11px;color:var(--steel)">⚠️ 以上内容仅供文化交流与生活参考，不构成任何法律依据。</div>';
+  html+='<div style="margin-top:12px;padding:10px;background:var(--gold);border-left:3px solid var(--warn);border-radius:4px;font-size:11px;color:var(--steel)">⚠️ 以上内容仅供文化交流与生活参考，不构成任何法律依据。</div>';
 
   document.getElementById('dailyAdvice').innerHTML=html;
 

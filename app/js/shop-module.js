@@ -541,7 +541,7 @@ function copyResultText(btn){
   navigator.clipboard.writeText(text).then(function(){
     let orig = btn.textContent;
     btn.textContent='已复制!';
-    btn.style.color='#27ae60';
+    btn.style.color='var(--jade)';
     setTimeout(function(){btn.textContent=orig;btn.style.color=''},1500);
   });
 }

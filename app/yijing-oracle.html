@@ -9,17 +9,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&family=Ma+Shan+Zheng&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
-    --ink: #0a0a0a;
-    --ink-deep: #111010;
-    --ink-mid: #1e1c1a;
+    --ink: var(--ink);
+    --ink-deep: var(--ink2);
+    --ink-mid: var(--ink3);
     --paper: var(--paper);
     --paper-dark: var(--paper2);
     --cinnabar: var(--cinn);
     --cinnabar-light: var(--cinn2);
     --gold: var(--gold);
     --gold-light: var(--gold2);
-    --jade: #4a7c59;
-    --jade-light: #6ba873;
+    --jade: var(--jade);
+    ;
     --cloud: rgba(240,232,216,0.06);
     --cloud2: rgba(240,232,216,0.03);
     --shadow: rgba(0,0,0,0.6);
@@ -1350,8 +1350,8 @@ async function castCoins() {
     const isHead = coins[i] === 2;
     coinEls[i].className = 'coin tossing revealed';
     coinEls[i].textContent = isHead ? '背' : '字';
-    coinEls[i].style.color = isHead ? '#e8cc7a' : '#c9a84c';
-    coinEls[i].style.borderColor = isHead ? '#e8cc7a' : '#c9a84c';
+    coinEls[i].style.color = isHead ? 'var(--gold2)' : 'var(--gold)';
+    coinEls[i].style.borderColor = isHead ? 'var(--gold2)' : 'var(--gold)';
   }
 
   await sleep(600);
