@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#080808">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="中医诊疗">
-<title>易道智鉴 · 命理中医诊疗</title>
+<meta name="apple-mobile-web-app-title" content="易道智鉴">
+<title>易道智鉴 · 三角色协作中医诊疗</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
@@ -19,164 +19,215 @@
   --cinn:#c0392b;--cinn2:#e74c3c;
   --jade:#27ae60;--jade2:#2ecc71;
   --cyan:#2980b9;--cyan2:#5dade2;
-  --wood:#8d6e63;--wood2:#a1887f;
-  --earth:#a08060;--metal:#95a5a6;
+  --wood:#8d6e63;--earth:#a08060;--metal:#95a5a6;
   --danger:#dc3545;--success:#2ecc71;--warn:#e67e22;
-  --orange:#e67e22;
-  --violet:#8e44ad;--violet2:#a569bd;
-  --emerald:#16a085;
-  --steel:#7f8c8d;
-  --metal2:#bdc3c7;
   --border:rgba(201,168,76,.15);
   --card:rgba(255,255,255,0.04);--card2:rgba(255,255,255,0.06);
-  --text:var(--paper);--muted:var(--paper3);--title:var(--gold);
-  --font-serif:'Noto Serif SC','Source Han Serif SC','SimSun','STSong',serif;
+  --font-serif:'Noto Serif SC','Source Han Serif SC','SimSun',serif;
 }
 *{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
 body{font-family:var(--font-serif);background:var(--ink);color:var(--paper);min-height:100vh;overflow-x:hidden}
 body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:0}
 body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(201,168,76,0.03) 0%,transparent 60%);pointer-events:none;z-index:0}
 
-/* NAV */
+/* ===== TOP NAV ===== */
 .top-nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(8,8,8,0.97);backdrop-filter:blur(12px);border-bottom:1px solid rgba(201,168,76,0.08)}
 .nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;padding:0 40px;height:64px;gap:0}
-.nav-brand{font-family:'Ma Shan Zheng',serif;font-size:22px;color:var(--gold);letter-spacing:6px;text-shadow:0 0 20px rgba(201,168,76,0.2);white-space:nowrap}
-.nav-tabs{display:flex;gap:0;margin-left:48px;flex:1;overflow-x:auto;scrollbar-width:none}
-.nav-tabs::-webkit-scrollbar{display:none}
+.nav-brand{font-family:'Ma Shan Zheng',serif;font-size:22px;color:var(--gold);letter-spacing:6px;text-shadow:0 0 20px rgba(201,168,76,0.2);white-space:nowrap;cursor:pointer}
+.role-tabs{display:flex;gap:0;margin-left:48px;flex:1;overflow-x:auto;scrollbar-width:none}
+.role-tabs::-webkit-scrollbar{display:none}
+.role-tab{padding:8px 20px;font-size:14px;letter-spacing:2px;color:var(--paper3);background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:var(--font-serif);transition:all .3s;white-space:nowrap}
+.role-tab:hover{color:var(--gold)}
+.role-tab.active{color:var(--gold);border-bottom-color:var(--gold);text-shadow:0 0 12px rgba(201,168,76,.2)}
+
+/* ===== FILE SUB-NAV ===== */
 .file-nav-bar{position:fixed;top:64px;left:0;right:0;z-index:190;background:rgba(12,12,12,0.98);backdrop-filter:blur(8px);border-bottom:1px solid rgba(201,168,76,0.1);padding:8px 0;display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
 .file-nav-btn{color:var(--paper3);text-decoration:none;font-size:12px;padding:5px 14px;border:1px solid rgba(201,168,76,0.12);border-radius:16px;transition:all .25s;font-family:var(--font-serif);letter-spacing:1px;white-space:nowrap}
 .file-nav-btn:hover{background:rgba(201,168,76,0.1);color:var(--gold);border-color:rgba(201,168,76,0.3)}
 .file-nav-btn.active{background:rgba(201,168,76,0.12);color:var(--gold);border-color:rgba(201,168,76,0.35)}
 
+/* ===== MAIN ===== */
 .main{margin-top:110px;position:relative;z-index:1;padding:0 40px 60px;max-width:1200px;margin-left:auto;margin-right:auto}
 
-/* HERO */
-.hero{text-align:center;padding:40px 0 32px}
-.hero-title{font-family:'Ma Shan Zheng',serif;font-size:clamp(36px,6vw,52px);letter-spacing:8px;color:var(--gold);text-shadow:0 0 40px rgba(201,168,76,0.15);margin-bottom:12px}
-.hero-sub{font-size:14px;color:var(--paper3);letter-spacing:3px;line-height:2}
-.hero-divider{width:1px;height:40px;background:linear-gradient(to bottom,var(--gold),transparent);margin:20px auto}
+/* ===== HERO ===== */
+.hero{text-align:center;padding:30px 0 24px}
+.hero-title{font-family:'Ma Shan Zheng',serif;font-size:clamp(28px,5vw,42px);letter-spacing:8px;color:var(--gold);text-shadow:0 0 40px rgba(201,168,76,0.15);margin-bottom:8px}
+.hero-sub{font-size:13px;color:var(--paper3);letter-spacing:3px;line-height:2}
+.hero-divider{width:1px;height:32px;background:linear-gradient(to bottom,var(--gold),transparent);margin:16px auto}
 
-/* TABS */
-.tab-bar{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;justify-content:center}
-.tab-btn{padding:10px 24px;font-size:14px;letter-spacing:2px;color:var(--paper3);background:var(--card);border:1px solid var(--border);border-radius:24px;cursor:pointer;font-family:var(--font-serif);transition:all .3s}
-.tab-btn:hover{color:var(--gold);border-color:rgba(201,168,76,0.3)}
-.tab-btn.active{color:var(--gold);background:rgba(201,168,76,0.1);border-color:rgba(201,168,76,0.35);text-shadow:0 0 12px rgba(201,168,76,.2)}
-
-/* PANELS */
+/* ===== PANELS ===== */
 .panel{display:none;animation:fadeIn .4s ease}
 .panel.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
-/* CARDS */
+/* ===== CARDS ===== */
 .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px;transition:all .3s}
 .card:hover{border-color:rgba(201,168,76,0.25)}
 .card-title{font-family:'Ma Shan Zheng',serif;font-size:20px;color:var(--gold);letter-spacing:4px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
 .card-title .icon{font-size:24px}
 .card-body{font-size:14px;line-height:1.8;color:var(--paper2)}
 
-/* SYMPTOM INPUT */
-.symptom-input-area{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px;margin-bottom:24px}
-.symptom-textarea{width:100%;min-height:120px;background:var(--ink2);border:1px solid var(--border);border-radius:8px;padding:16px;color:var(--paper);font-family:var(--font-serif);font-size:15px;line-height:1.8;resize:vertical;transition:border-color .3s}
-.symptom-textarea:focus{outline:none;border-color:var(--gold)}
-.symptom-textarea::placeholder{color:var(--paper3);opacity:0.5}
-.input-hint{font-size:12px;color:var(--paper3);margin-top:8px;letter-spacing:1px}
-.btn-row{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
+/* ===== BUTTONS ===== */
 .btn{padding:10px 28px;font-size:14px;letter-spacing:2px;border:none;border-radius:8px;cursor:pointer;font-family:var(--font-serif);transition:all .3s}
 .btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold3));color:var(--ink)}
 .btn-primary:hover{box-shadow:0 4px 20px rgba(201,168,76,0.3);transform:translateY(-1px)}
 .btn-secondary{background:var(--card2);color:var(--paper2);border:1px solid var(--border)}
 .btn-secondary:hover{border-color:rgba(201,168,76,0.3);color:var(--gold)}
+.btn-danger{background:rgba(220,53,69,0.15);color:var(--danger);border:1px solid rgba(220,53,69,0.3)}
+.btn-danger:hover{background:rgba(220,53,69,0.25)}
+.btn-sm{padding:6px 16px;font-size:12px}
+.btn-row{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
 
-/* QUICK SYMPTOMS */
-.quick-symptoms{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
-.quick-tag{padding:6px 14px;font-size:13px;background:var(--card2);border:1px solid var(--border);border-radius:20px;cursor:pointer;color:var(--paper3);transition:all .25s;font-family:var(--font-serif)}
-.quick-tag:hover{background:rgba(201,168,76,0.1);color:var(--gold);border-color:rgba(201,168,76,0.3)}
-.quick-tag.selected{background:rgba(201,168,76,0.15);color:var(--gold);border-color:var(--gold)}
+/* ===== CASE LIST ===== */
+.case-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.case-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;cursor:pointer;transition:all .3s;position:relative}
+.case-item:hover{border-color:rgba(201,168,76,0.3);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.3)}
+.case-item .case-id{font-size:11px;color:var(--paper3);letter-spacing:1px;margin-bottom:6px}
+.case-item .case-name{font-size:16px;color:var(--gold2);letter-spacing:2px;margin-bottom:8px}
+.case-item .case-symptom{font-size:13px;color:var(--paper2);line-height:1.6;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.case-item .case-meta{display:flex;gap:12px;font-size:11px;color:var(--paper3);align-items:center}
+.status-badge{padding:3px 10px;border-radius:10px;font-size:11px;letter-spacing:1px;white-space:nowrap}
+.status-pending_master{background:rgba(230,126,34,0.15);color:var(--warn);border:1px solid rgba(230,126,34,0.3)}
+.status-pending_doctor{background:rgba(41,128,185,0.15);color:var(--cyan2);border:1px solid rgba(41,128,185,0.3)}
+.status-collaborating{background:rgba(142,68,173,0.15);color:#a569bd;border:1px solid rgba(142,68,173,0.3)}
+.status-completed{background:rgba(46,204,113,0.15);color:var(--success);border:1px solid rgba(46,204,113,0.3)}
+.status-pushed{background:rgba(201,168,76,0.15);color:var(--gold);border:1px solid rgba(201,168,76,0.3)}
 
-/* DIAGNOSIS RESULT */
-.diagnosis-result{display:none;margin-top:24px}
-.result-section{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px}
-.result-section-title{font-size:16px;color:var(--gold);letter-spacing:3px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
-.syndrome-card{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px}
-.syndrome-name{font-family:'Ma Shan Zheng',serif;font-size:18px;color:var(--gold2);letter-spacing:3px;margin-bottom:8px}
-.syndrome-detail{display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;color:var(--paper2)}
-.syndrome-detail .label{color:var(--paper3);font-size:12px}
-.organs-display{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.organ-badge{padding:4px 12px;border-radius:12px;font-size:12px;letter-spacing:1px}
-.organ-wood{background:rgba(141,110,99,0.2);color:var(--wood2);border:1px solid rgba(141,110,99,0.3)}
-.organ-fire{background:rgba(231,76,60,0.15);color:var(--fire);border:1px solid rgba(231,76,60,0.3)}
-.organ-earth{background:rgba(160,128,96,0.2);color:var(--earth);border:1px solid rgba(160,128,96,0.3)}
-.organ-metal{background:rgba(149,165,166,0.15);color:var(--metal);border:1px solid rgba(149,165,166,0.3)}
-.organ-water{background:rgba(41,128,185,0.15);color:var(--cyan2);border:1px solid rgba(41,128,185,0.3)}
+/* ===== FORMS ===== */
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:13px;color:var(--paper3);letter-spacing:1px;margin-bottom:6px}
+.form-input,.form-select,.form-textarea{width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--paper);font-family:var(--font-serif);font-size:14px;transition:border-color .3s}
+.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--gold)}
+.form-textarea{min-height:80px;resize:vertical;line-height:1.8}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
-/* DOCTOR CARD */
-.doctor-card{display:flex;gap:16px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px;transition:all .3s}
-.doctor-card:hover{border-color:rgba(201,168,76,0.25)}
-.doctor-avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--gold3),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Ma Shan Zheng',serif;font-size:24px;color:var(--ink);flex-shrink:0}
-.doctor-info{flex:1}
-.doctor-name{font-size:16px;color:var(--gold2);letter-spacing:2px;margin-bottom:4px}
-.doctor-era{font-size:12px;color:var(--paper3);margin-bottom:6px}
-.doctor-specialty{font-size:13px;color:var(--paper2);line-height:1.6}
-.doctor-reason{margin-top:8px;padding:8px 12px;background:rgba(201,168,76,0.06);border-left:3px solid var(--gold);border-radius:0 6px 6px 0;font-size:12px;color:var(--paper3);line-height:1.6}
+/* ===== TAGS ===== */
+.tag{display:inline-block;padding:4px 12px;font-size:12px;background:var(--card2);border:1px solid var(--border);border-radius:16px;color:var(--paper3);margin:2px}
+.tag.selected{background:rgba(201,168,76,0.15);color:var(--gold);border-color:var(--gold)}
+.tag-wood{background:rgba(141,110,99,0.2);color:#a1887f;border:1px solid rgba(141,110,99,0.3)}
+.tag-fire{background:rgba(192,57,43,0.15);color:var(--cinn2);border:1px solid rgba(192,57,43,0.3)}
+.tag-earth{background:rgba(160,128,96,0.2);color:var(--earth);border:1px solid rgba(160,128,96,0.3)}
+.tag-metal{background:rgba(149,165,166,0.15);color:var(--metal);border:1px solid rgba(149,165,166,0.3)}
+.tag-water{background:rgba(41,128,185,0.15);color:var(--cyan2);border:1px solid rgba(41,128,185,0.3)}
 
-/* MINGLI INPUT */
-.mingli-input-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:16px}
-.mingli-input-row .input-group{display:flex;flex-direction:column;gap:4px}
-.mingli-input-row label{font-size:12px;color:var(--paper3);letter-spacing:1px}
-.mingli-input-row select,.mingli-input-row input{background:var(--ink2);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--paper);font-family:var(--font-serif);font-size:14px}
-.mingli-input-row select:focus,.mingli-input-row input:focus{outline:none;border-color:var(--gold)}
+/* ===== WUXING BARS ===== */
+.wuxing-bars{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.wuxing-bar{display:flex;align-items:center;gap:12px}
+.wuxing-bar .wx-label{width:40px;font-size:14px;color:var(--paper2);text-align:center}
+.wuxing-bar .wx-track{flex:1;height:12px;background:var(--ink2);border-radius:6px;overflow:hidden;position:relative}
+.wuxing-bar .wx-fill{height:100%;border-radius:6px;transition:width .6s ease}
+.wuxing-bar .wx-val{width:24px;font-size:12px;color:var(--paper3);text-align:right}
+.wx-wood .wx-fill{background:linear-gradient(90deg,#6d4c41,#8d6e63)}
+.wx-fire .wx-fill{background:linear-gradient(90deg,#c0392b,#e74c3c)}
+.wx-earth .wx-fill{background:linear-gradient(90deg,#8d6e63,#a08060)}
+.wx-metal .wx-fill{background:linear-gradient(90deg,#7f8c8d,#95a5a6)}
+.wx-water .wx-fill{background:linear-gradient(90deg,#2980b9,#5dade2)}
 
-/* PREDICTION RESULT */
-.prediction-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
-.risk-card{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:16px}
-.risk-card-title{font-size:14px;color:var(--gold2);letter-spacing:2px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
-.risk-level{padding:2px 10px;border-radius:10px;font-size:11px}
-.risk-high{background:rgba(220,53,69,0.15);color:var(--danger);border:1px solid rgba(220,53,69,0.3)}
-.risk-medium{background:rgba(230,126,34,0.15);color:var(--warn);border:1px solid rgba(230,126,34,0.3)}
-.risk-low{background:rgba(46,204,113,0.15);color:var(--success);border:1px solid rgba(46,204,113,0.3)}
-
-/* SOLUTION TIMELINE */
-.solution-timeline{position:relative;padding-left:32px}
-.solution-timeline::before{content:'';position:absolute;left:12px;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--gold),transparent)}
-.solution-step{position:relative;margin-bottom:24px}
-.solution-step::before{content:'';position:absolute;left:-26px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px rgba(201,168,76,0.4)}
-.solution-step-title{font-size:15px;color:var(--gold2);letter-spacing:2px;margin-bottom:8px}
-.solution-step-body{font-size:13px;color:var(--paper2);line-height:1.8}
-
-/* HEXAGRAM DISPLAY */
+/* ===== HEXAGRAM ===== */
 .hexagram-display{text-align:center;padding:20px;background:var(--card2);border:1px solid var(--border);border-radius:8px;margin-bottom:16px}
-.hexagram-lines{display:flex;flex-direction:column;gap:4px;align-items:center;margin:16px 0}
-.hexagram-line{width:120px;height:8px;background:var(--gold);border-radius:2px}
-.hexagram-line.broken{background:linear-gradient(to right,var(--gold) 45%,transparent 45%,transparent 55%,var(--gold) 55%)}
-.hexagram-name{font-family:'Ma Shan Zheng',serif;font-size:24px;color:var(--gold);letter-spacing:4px;margin-bottom:8px}
+.hexagram-lines{display:flex;flex-direction:column;gap:5px;align-items:center;margin:16px 0}
+.hexagram-line{width:100px;height:7px;background:var(--gold);border-radius:2px;position:relative}
+.hexagram-line.broken::before{content:'';position:absolute;width:42%;height:100%;background:var(--gold);left:0;border-radius:2px}
+.hexagram-line.broken::after{content:'';position:absolute;width:42%;height:100%;background:var(--gold);right:0;border-radius:2px}
+.hexagram-line.broken{background:transparent}
+.hexagram-line.moving{box-shadow:0 0 8px rgba(201,168,76,0.6)}
+.hexagram-name{font-family:'Ma Shan Zheng',serif;font-size:22px;color:var(--gold);letter-spacing:4px;margin-bottom:6px}
 .hexagram-judgment{font-size:13px;color:var(--paper3);line-height:1.8;max-width:500px;margin:0 auto}
 
-/* LOADING */
-.loading-overlay{display:none;position:fixed;inset:0;background:rgba(8,8,8,0.85);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:16px}
-.loading-overlay.active{display:flex}
-.loading-spinner{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-text{font-size:14px;color:var(--gold);letter-spacing:3px}
+/* ===== DISCUSSION ===== */
+.discussion-area{display:flex;flex-direction:column;gap:12px;max-height:400px;overflow-y:auto;padding:12px;background:var(--ink2);border-radius:8px;border:1px solid var(--border);margin-bottom:12px}
+.discussion-msg{display:flex;flex-direction:column;max-width:80%}
+.discussion-msg.role-master{align-self:flex-start}
+.discussion-msg.role-doctor{align-self:flex-end;align-items:flex-end}
+.msg-header{font-size:11px;color:var(--paper3);margin-bottom:4px;display:flex;gap:8px;align-items:center}
+.msg-role-badge{padding:2px 8px;border-radius:8px;font-size:10px;letter-spacing:1px}
+.msg-role-badge.master{background:rgba(142,68,173,0.2);color:#a569bd}
+.msg-role-badge.doctor{background:rgba(41,128,185,0.2);color:var(--cyan2)}
+.msg-body{padding:10px 14px;border-radius:10px;font-size:13px;line-height:1.6;color:var(--paper2)}
+.role-master .msg-body{background:rgba(142,68,173,0.1);border:1px solid rgba(142,68,173,0.2)}
+.role-doctor .msg-body{background:rgba(41,128,185,0.1);border:1px solid rgba(41,128,185,0.2)}
+.discussion-input{display:flex;gap:8px}
+.discussion-input select{width:100px;background:var(--ink2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--paper);font-family:var(--font-serif);font-size:13px}
+.discussion-input input{flex:1;background:var(--ink2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;color:var(--paper);font-family:var(--font-serif);font-size:13px}
+.discussion-input input:focus,.discussion-input select:focus{outline:none;border-color:var(--gold)}
 
-/* RESPONSIVE */
-@media(max-width:768px){
-  .nav-inner{padding:0 16px}
-  .nav-tabs{margin-left:16px}
-  .main{padding:0 16px 40px}
-  .mingli-input-row{grid-template-columns:1fr 1fr}
-  .prediction-grid{grid-template-columns:1fr}
-  .syndrome-detail{grid-template-columns:1fr}
-  .hero-title{font-size:32px}
-}
+/* ===== COLLAB LAYOUT ===== */
+.collab-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+.collab-col{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+.collab-col h4{font-family:'Ma Shan Zheng',serif;font-size:16px;color:var(--gold);letter-spacing:3px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.collab-middle{grid-column:1/-1;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
 
-/* EMPTY STATE */
+/* ===== QR CODE ===== */
+.qr-placeholder{width:160px;height:160px;background:var(--ink2);border:2px solid var(--gold);border-radius:12px;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);gap:2px;padding:10px;margin:0 auto 16px}
+.qr-cell{background:transparent;border-radius:1px}
+.qr-cell.filled{background:var(--gold)}
+
+/* ===== EMPTY STATE ===== */
 .empty-state{text-align:center;padding:60px 20px;color:var(--paper3)}
 .empty-state .icon{font-size:48px;margin-bottom:16px;opacity:0.3}
 .empty-state .text{font-size:14px;letter-spacing:2px;opacity:0.5}
 
-/* TOAST */
-.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--ink3);border:1px solid var(--gold);border-radius:8px;padding:12px 24px;color:var(--gold);font-size:14px;letter-spacing:2px;z-index:99999;opacity:0;transition:all .3s ease}
+/* ===== TOAST ===== */
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--ink3);border:1px solid var(--gold);border-radius:8px;padding:12px 24px;color:var(--gold);font-size:14px;letter-spacing:2px;z-index:99999;opacity:0;transition:all .3s ease;max-width:90vw;text-align:center}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* ===== SUB-TABS ===== */
+.sub-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.sub-tab{padding:8px 18px;font-size:13px;letter-spacing:1px;color:var(--paper3);background:var(--card);border:1px solid var(--border);border-radius:20px;cursor:pointer;font-family:var(--font-serif);transition:all .25s}
+.sub-tab:hover{color:var(--gold);border-color:rgba(201,168,76,0.3)}
+.sub-tab.active{color:var(--gold);background:rgba(201,168,76,0.1);border-color:rgba(201,168,76,0.35)}
+.sub-panel{display:none}
+.sub-panel.active{display:block;animation:fadeIn .3s ease}
+
+/* ===== INFO GRID ===== */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.info-item{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px}
+.info-item .label{font-size:11px;color:var(--paper3);letter-spacing:1px;margin-bottom:4px}
+.info-item .value{font-size:14px;color:var(--paper2)}
+
+/* ===== WORKSPACE LAYOUT ===== */
+.workspace{display:grid;grid-template-columns:320px 1fr;gap:20px;margin-bottom:20px}
+.workspace-left{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;height:fit-content}
+.workspace-right{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;min-height:400px}
+.workspace-right h4{font-family:'Ma Shan Zheng',serif;font-size:16px;color:var(--gold);letter-spacing:3px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.workspace-left h4{font-family:'Ma Shan Zheng',serif;font-size:16px;color:var(--gold);letter-spacing:3px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+
+/* ===== VERSION HISTORY ===== */
+.version-list{display:flex;flex-direction:column;gap:8px}
+.version-item{padding:10px 14px;background:var(--card2);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--paper3);display:flex;justify-content:space-between;align-items:center}
+.version-item .v-time{color:var(--paper2)}
+.version-item .v-summary{color:var(--gold2)}
+
+/* ===== BACK BUTTON ===== */
+.back-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 16px;font-size:13px;color:var(--paper3);background:var(--card);border:1px solid var(--border);border-radius:20px;cursor:pointer;font-family:var(--font-serif);transition:all .25s;margin-bottom:16px}
+.back-btn:hover{color:var(--gold);border-color:rgba(201,168,76,0.3)}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:1200px){
+  .workspace{grid-template-columns:280px 1fr}
+  .collab-layout{grid-template-columns:1fr}
+}
+@media(max-width:768px){
+  .nav-inner{padding:0 16px}
+  .role-tabs{margin-left:16px}
+  .main{padding:0 16px 40px}
+  .workspace{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .info-grid{grid-template-columns:1fr}
+  .case-list{grid-template-columns:1fr}
+  .hero-title{font-size:28px}
+  .discussion-msg{max-width:95%}
+}
+@media print{
+  .top-nav,.file-nav-bar,.role-tabs,.hero,.no-print{display:none!important}
+  .main{margin-top:0}
+  body{background:#fff;color:#000}
+  .card,.info-item{background:#fff;border:1px solid #ccc;color:#000}
+  .card-title,.card-title .icon{color:#333}
+  .card-body,.value{color:#333}
+  .label{color:#666}
+}
 </style>
 </head>
 <body>
@@ -184,964 +235,1224 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 <!-- TOP NAV -->
 <nav class="top-nav">
   <div class="nav-inner">
-    <div class="nav-brand">易道智鉴</div>
-    <div class="nav-tabs">
-      <a href="divination-hub.html" class="file-nav-btn">🏠 主平台</a>
-      <a href="divination-integrated.html" class="file-nav-btn">🧬 体质调理</a>
-      <a href="tcm-clinic.html" class="file-nav-btn active">🏥 中医诊疗</a>
-      <a href="divination-knowledge.html" class="file-nav-btn">📚 知识库</a>
-      <a href="nihaisha-knowledge.html" class="file-nav-btn">🪷 倪师知识库</a>
-      <a href="shuhan-knowledge.html" class="file-nav-btn">🎯 舒晗知识库</a>
+    <div class="nav-brand" onclick="switchRole('patient')">易道智鉴</div>
+    <div class="role-tabs">
+      <button class="role-tab active" onclick="switchRole('patient',this)">病患端</button>
+      <button class="role-tab" onclick="switchRole('master',this)">大师端</button>
+      <button class="role-tab" onclick="switchRole('doctor',this)">医生端</button>
+      <button class="role-tab" onclick="switchRole('collab',this)">协作空间</button>
     </div>
   </div>
 </nav>
 
+<!-- FILE SUB-NAV -->
+<div class="file-nav-bar">
+  <a href="divination-hub.html" class="file-nav-btn">🏠 主平台</a>
+  <a href="divination-integrated.html" class="file-nav-btn">🧬 体质调理</a>
+  <a href="tcm-clinic.html" class="file-nav-btn active">🏥 中医诊疗</a>
+  <a href="divination-knowledge.html" class="file-nav-btn">📚 知识库</a>
+  <a href="nihaisha-knowledge.html" class="file-nav-btn">🪷 倪师知识库</a>
+  <a href="shuhan-knowledge.html" class="file-nav-btn">🎯 舒晗知识库</a>
+</div>
+
 <div class="main">
   <!-- HERO -->
   <div class="hero">
-    <div class="hero-title">命理中医诊疗</div>
-    <div class="hero-sub">症状解读 · 证候分析 · 名医推荐 · 命理预测疾病走势 · 周易中医联合方案</div>
+    <div class="hero-title">三角色协作诊疗</div>
+    <div class="hero-sub">大师命理分析 · 医生辨证施治 · 病患养生调理</div>
     <div class="hero-divider"></div>
   </div>
 
-  <!-- TAB BAR -->
-  <div class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('symptom', this)">📝 症状描述</button>
-    <button class="tab-btn" onclick="switchTab('mingli', this)">☯️ 命理推病</button>
-    <button class="tab-btn" onclick="switchTab('yijing', this)">☰ 周易论治</button>
-    <button class="tab-btn" onclick="switchTab('tizhi', this)">🧬 体质分析</button>
+  <!-- ==================== PATIENT PANEL ==================== -->
+  <div id="panel-patient" class="panel active">
+    <!-- QR Guide -->
+    <div class="card" style="text-align:center">
+      <div class="card-title" style="justify-content:center"><span class="icon">📱</span> 关注公众号</div>
+      <div class="qr-placeholder" id="qrPlaceholder"></div>
+      <div style="font-size:14px;color:var(--paper2);letter-spacing:1px">扫码关注公众号，获取您的专属养生方案</div>
+    </div>
+
+    <!-- Report Area -->
+    <div id="patientReportArea">
+      <!-- Filled by JS -->
+    </div>
+
+    <!-- History -->
+    <div class="card" id="patientHistoryCard" style="display:none">
+      <div class="card-title"><span class="icon">📋</span> 历史报告</div>
+      <div id="patientHistoryList"></div>
+    </div>
   </div>
 
-  <!-- TAB 1: 症状描述 -->
-  <div id="tab-symptom" class="panel active">
-    <div class="symptom-input-area">
-      <div class="card-title"><span class="icon">📝</span> 描述您的症状</div>
-      <textarea class="symptom-textarea" id="symptomText" placeholder="请详细描述您的症状，包括：&#10;• 主要不适（如头痛、失眠、胃痛等）&#10;• 持续时间&#10;• 伴随症状&#10;• 加重/缓解因素&#10;• 舌象（如舌质颜色、舌苔厚薄）&#10;• 脉象（如脉浮/沉/快/慢）&#10;&#10;也可点击下方快速选择常见症状。"></textarea>
-      <div class="input-hint">提示：描述越详细，解读越精准。建议包含舌象脉象信息。</div>
-      
-      <div style="margin-top:20px">
-        <div style="font-size:13px;color:var(--paper3);letter-spacing:2px;margin-bottom:10px">快速选择症状：</div>
-        <div class="quick-symptoms" id="quickSymptoms">
-          <span class="quick-tag" onclick="toggleSymptom(this)">头痛</span>
-          <span class="quick-tag" onclick="toggleSymptom(this)">失眠</span>
-          <span class="quick-tag" onclick="toggleSymptom(this)">胸闷</span>
-          <span class="quick-tag" onclick="toggleSymptom(this)">咳嗽</span>
-          <span class="quick-tag" onclick="toggleSymptom(this)">胃痛</span>
-          <span class="quick-tag" onclick="toggleSymptom(this)">腹泻</span>
-          <span class="quick-tag" onclick="toggleSymptom(this)">便秘</span>
-          <span class="quick-tag" onclick="toggleSymptom(this)">腰痛</span>
-          <span class="quick-tag" onclick="toggleSymptom(this)">乏力</span>
-          <span class="quick-tag" onclick="toggleSymptom(this)">头晕</span>
-          <span class="quick-tag" onclick="toggleSymptom(this)">心悸</span>
-          <span class="quick-tag" onclick="toggleSymptom(this)">口干口苦</span>
-          <span class="quick-tag" onclick="toggleSymptom(this)">食欲不振</span>
-          <span class="quick-tag" onclick="toggleSymptom(this)">月经不调</span>
-          <span class="quick-tag" onclick="toggleSymptom(this)">关节疼痛</span>
-          <span class="quick-tag" onclick="toggleSymptom(this)">怕冷</span>
-          <span class="quick-tag" onclick="toggleSymptom(this)">怕热</span>
-          <span class="quick-tag" onclick="toggleSymptom(this)">自汗</span>
-          <span class="quick-tag" onclick="toggleSymptom(this)">盗汗</span>
-          <span class="quick-tag" onclick="toggleSymptom(this)">耳鸣</span>
-          <span class="quick-tag" onclick="toggleSymptom(this)">视力模糊</span>
+  <!-- ==================== MASTER PANEL ==================== -->
+  <div id="panel-master" class="panel">
+    <div id="masterListView">
+      <div class="card">
+        <div class="card-title"><span class="icon">📜</span> 待分析病例</div>
+        <div id="masterPendingList" class="case-list"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">✅</span> 已分析病例</div>
+        <div id="masterDoneList" class="case-list"></div>
+      </div>
+    </div>
+    <div id="masterWorkspaceView" style="display:none">
+      <button class="back-btn" onclick="backToMasterList()">← 返回病例列表</button>
+      <div class="workspace">
+        <div class="workspace-left">
+          <h4>病患信息</h4>
+          <div id="masterCaseInfo"></div>
+        </div>
+        <div class="workspace-right">
+          <h4>分析工作台</h4>
+          <div class="sub-tabs">
+            <button class="sub-tab active" onclick="switchSubTab(this,'master-bazi')">八字分析</button>
+            <button class="sub-tab" onclick="switchSubTab(this,'master-hexagram')">周易起卦</button>
+            <button class="sub-tab" onclick="switchSubTab(this,'master-report')">分析报告</button>
+          </div>
+          <!-- Sub: Bazi -->
+          <div id="master-bazi" class="sub-panel active">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">年柱</label>
+                <select class="form-select" id="bazi-year"></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">月柱</label>
+                <select class="form-select" id="bazi-month"></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">日柱</label>
+                <select class="form-select" id="bazi-day"></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">时柱</label>
+                <select class="form-select" id="bazi-hour"></select>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="analyzeBazi()">分析五行</button>
+            <div id="baziResult" style="margin-top:16px"></div>
+          </div>
+          <!-- Sub: Hexagram -->
+          <div id="master-hexagram" class="sub-panel">
+            <div class="sub-tabs">
+              <button class="sub-tab active" onclick="switchHexMethod(this,'time')">时间起卦</button>
+              <button class="sub-tab" onclick="switchHexMethod(this,'number')">数字起卦</button>
+              <button class="sub-tab" onclick="switchHexMethod(this,'symptom')">症状起卦</button>
+            </div>
+            <div id="hex-time" class="sub-panel active">
+              <div class="form-group">
+                <label class="form-label">当前时间卦象</label>
+                <button class="btn btn-secondary btn-sm" onclick="castHexTime()">起卦</button>
+              </div>
+            </div>
+            <div id="hex-number" class="sub-panel">
+              <div class="form-group">
+                <label class="form-label">输入三个数字</label>
+                <div class="form-row">
+                  <input class="form-input" id="hex-num1" type="number" placeholder="第一数" min="1" max="99">
+                  <input class="form-input" id="hex-num2" type="number" placeholder="第二数" min="1" max="99">
+                  <input class="form-input" id="hex-num3" type="number" placeholder="第三数" min="1" max="99">
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="castHexNumber()" style="margin-top:8px">起卦</button>
+              </div>
+            </div>
+            <div id="hex-symptom" class="sub-panel">
+              <div class="form-group">
+                <label class="form-label">基于症状起卦</label>
+                <button class="btn btn-secondary btn-sm" onclick="castHexSymptom()">起卦</button>
+              </div>
+            </div>
+            <div id="hexagramResult" style="margin-top:16px"></div>
+          </div>
+          <!-- Sub: Report -->
+          <div id="master-report" class="sub-panel">
+            <div class="form-group">
+              <label class="form-label">分析摘要（可含周易术语）</label>
+              <textarea class="form-textarea" id="masterNote" placeholder="日主癸水，生于寅月..."></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">医学化翻译建议（通俗语言，病患可见）</label>
+              <textarea class="form-textarea" id="medicalTranslation" placeholder="您的体质偏于..."></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">体质趋势判断</label>
+                <input class="form-input" id="tizhiTrend" placeholder="如：气郁质，偏肝旺">
+              </div>
+              <div class="form-group">
+                <label class="form-label">脏腑风险提示（通俗语言）</label>
+                <input class="form-input" id="organRiskInput" placeholder="如：肝胆系统需注意">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">季节调理方向</label>
+              <input class="form-input" id="seasonalAdvice" placeholder="如：春季养肝，疏肝理气">
+            </div>
+            <button class="btn btn-primary" onclick="submitMasterAnalysis()">提交给医生</button>
+          </div>
         </div>
       </div>
-
-      <div class="btn-row">
-        <button class="btn btn-primary" onclick="analyzeSymptoms()">🔍 开始解读</button>
-        <button class="btn btn-secondary" onclick="clearSymptoms()">清除</button>
-        <button class="btn btn-secondary" onclick="exportResult('symptom')">🖨️ 导出报告</button>
-      </div>
-    </div>
-
-    <div class="diagnosis-result" id="symptomResult">
-      <!-- 动态填充 -->
     </div>
   </div>
 
-  <!-- TAB 2: 命理推病 -->
-  <div id="tab-mingli" class="panel">
+  <!-- ==================== DOCTOR PANEL ==================== -->
+  <div id="panel-doctor" class="panel">
+    <div id="doctorListView">
+      <div class="card">
+        <div class="card-title"><span class="icon">🩺</span> 待诊病例</div>
+        <div id="doctorPendingList" class="case-list"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">✅</span> 已诊病例</div>
+        <div id="doctorDoneList" class="case-list"></div>
+      </div>
+    </div>
+    <div id="doctorWorkspaceView" style="display:none">
+      <button class="back-btn" onclick="backToDoctorList()">← 返回病例列表</button>
+      <div class="workspace">
+        <div class="workspace-left">
+          <h4>病患信息</h4>
+          <div id="doctorCaseInfo"></div>
+          <h4 style="margin-top:20px">大师分析报告</h4>
+          <div id="doctorMasterReport"></div>
+        </div>
+        <div class="workspace-right">
+          <h4>诊疗表单</h4>
+          <div class="form-group">
+            <label class="form-label">证候诊断</label>
+            <input class="form-input" id="doc-syndrome" list="syndromeList" placeholder="如：肝郁气滞">
+            <datalist id="syndromeList">
+              <option value="肝郁气滞"><option value="肝火上炎"><option value="心脾两虚">
+              <option value="脾胃虚寒"><option value="肾阳虚"><option value="肾阴虚">
+              <option value="气血两虚"><option value="阴虚火旺"><option value="痰湿内阻">
+              <option value="气滞血瘀"><option value="风寒感冒"><option value="风热犯肺">
+              <option value="湿热下注"><option value="脾肾阳虚"><option value="肝胃不和">
+            </datalist>
+          </div>
+          <div class="form-group">
+            <label class="form-label">治则治法</label>
+            <input class="form-input" id="doc-treatment" placeholder="如：疏肝理气，健脾和胃">
+          </div>
+          <div class="form-group">
+            <label class="form-label">推荐方剂</label>
+            <input class="form-input" id="doc-formula" placeholder="如：逍遥散加减">
+          </div>
+          <div class="form-group">
+            <label class="form-label">针灸穴位（逗号分隔）</label>
+            <input class="form-input" id="doc-acupoints" placeholder="如：太冲,阳陵泉,期门">
+          </div>
+          <div class="form-group">
+            <label class="form-label">食疗方案</label>
+            <textarea class="form-textarea" id="doc-diet" placeholder="推荐食物、禁忌食物、每日食谱建议"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">运动方案</label>
+            <input class="form-input" id="doc-exercise" placeholder="如：户外运动、登山、慢跑">
+          </div>
+          <div class="form-group">
+            <label class="form-label">起居调摄</label>
+            <textarea class="form-textarea" id="doc-lifestyle" placeholder="作息建议、情绪管理等"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">复诊日期</label>
+              <input class="form-input" id="doc-followup-date" type="date">
+            </div>
+            <div class="form-group">
+              <label class="form-label">复诊注意事项</label>
+              <input class="form-input" id="doc-followup-note" placeholder="如：一周后复诊">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">医生嘱托（给病患的留言）</label>
+            <textarea class="form-textarea" id="doc-note" placeholder="给病患的温馨提示"></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="pushToPatient()">推送给病患</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== COLLABORATION PANEL ==================== -->
+  <div id="panel-collab" class="panel">
     <div class="card">
-      <div class="card-title"><span class="icon">☯️</span> 输入八字信息</div>
-      <div class="card-body" style="margin-bottom:20px">基于缘主八字五行旺衰，推断先天体质倾向、脏腑风险、大运流年疾病触发规律。</div>
-      
-      <div class="mingli-input-row">
-        <div class="input-group">
-          <label>年柱</label>
-          <select id="mingliYear">
-            <option value="">选择天干地支</option>
-          </select>
-        </div>
-        <div class="input-group">
-          <label>月柱</label>
-          <select id="mingliMonth">
-            <option value="">选择天干地支</option>
-          </select>
-        </div>
-        <div class="input-group">
-          <label>日柱</label>
-          <select id="mingliDay">
-            <option value="">选择天干地支</option>
-          </select>
-        </div>
-        <div class="input-group">
-          <label>时柱</label>
-          <select id="mingliHour">
-            <option value="">选择天干地支</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="mingli-input-row">
-        <div class="input-group">
-          <label>性别</label>
-          <select id="mingliGender">
-            <option value="male">男</option>
-            <option value="female">女</option>
-          </select>
-        </div>
-        <div class="input-group">
-          <label>当前年龄</label>
-          <input type="number" id="mingliAge" placeholder="如：45" min="1" max="120">
-        </div>
-        <div class="input-group">
-          <label>当前症状（可选）</label>
-          <input type="text" id="mingliSymptom" placeholder="如：头痛失眠">
-        </div>
-        <div class="input-group">
-          <label>&nbsp;</label>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-primary" onclick="predictDisease()" style="margin-top:0">🔮 推断疾病走势</button>
-            <button class="btn btn-secondary" onclick="exportResult('mingli')" style="margin-top:0">🖨️</button>
-          </div>
-        </div>
+      <div class="card-title"><span class="icon">🤝</span> 协作空间</div>
+      <div class="form-group">
+        <label class="form-label">选择病例</label>
+        <select class="form-select" id="collabCaseSelect" onchange="loadCollabCase()"></select>
       </div>
     </div>
-
-    <div class="diagnosis-result" id="mingliResult">
-      <!-- 动态填充 -->
+    <div id="collabContent" style="display:none">
+      <!-- Status Tracker -->
+      <div class="card">
+        <div class="card-title"><span class="icon">📊</span> 病例状态</div>
+        <div id="collabStatusTracker" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"></div>
+      </div>
+      <!-- Shared View -->
+      <div class="collab-layout">
+        <div class="collab-col">
+          <h4>大师分析区</h4>
+          <div id="collabMasterArea"></div>
+        </div>
+        <div class="collab-col">
+          <h4>医生诊疗区</h4>
+          <div id="collabDoctorArea"></div>
+        </div>
+      </div>
+      <!-- Discussion -->
+      <div class="collab-middle">
+        <h4>讨论区</h4>
+        <div class="discussion-area" id="discussionArea"></div>
+        <div class="discussion-input">
+          <select id="discussRole">
+            <option value="master">大师</option>
+            <option value="doctor">医生</option>
+          </select>
+          <input id="discussText" placeholder="输入消息..." onkeydown="if(event.key==='Enter')sendDiscussion()">
+          <button class="btn btn-primary btn-sm" onclick="sendDiscussion()">发送</button>
+        </div>
+      </div>
+      <!-- Version History -->
+      <div class="card">
+        <div class="card-title"><span class="icon">📅</span> 版本历史</div>
+        <div id="versionHistory" class="version-list"></div>
+      </div>
     </div>
   </div>
-
-  <!-- TAB 3: 周易论治 -->
-  <div id="tab-yijing" class="panel">
-    <div class="card">
-      <div class="card-title"><span class="icon">☰</span> 周易卦象与中医论治</div>
-      <div class="card-body" style="margin-bottom:20px">
-        通过起卦获取周易卦象，结合中医理论解读疾病根源、发展趋势，给出预防与治疗的分阶段方案。
-      </div>
-      
-      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">
-        <button class="btn btn-primary" onclick="castHexagram('time')">🕐 时间起卦</button>
-        <button class="btn btn-secondary" onclick="castHexagram('number')">🔢 数字起卦</button>
-        <button class="btn btn-secondary" onclick="castHexagram('symptom')">🩺 症状起卦</button>
-        <button class="btn btn-secondary" onclick="exportResult('yijing')">🖨️ 导出报告</button>
-      </div>
-
-      <div id="numberInput" style="display:none;margin-bottom:16px">
-        <div class="mingli-input-row" style="grid-template-columns:1fr 1fr 1fr">
-          <div class="input-group">
-            <label>第一个数字</label>
-            <input type="number" id="num1" placeholder="1-99" min="1" max="99">
-          </div>
-          <div class="input-group">
-            <label>第二个数字</label>
-            <input type="number" id="num2" placeholder="1-99" min="1" max="99">
-          </div>
-          <div class="input-group">
-            <label>第三个数字（动爻）</label>
-            <input type="number" id="num3" placeholder="1-6" min="1" max="6">
-          </div>
-        </div>
-        <button class="btn btn-primary" onclick="castFromNumbers()">起卦解读</button>
-      </div>
-    </div>
-
-    <div class="diagnosis-result" id="yijingResult">
-      <!-- 动态填充 -->
-    </div>
-  </div>
-
-  <!-- TAB 4: 体质分析 -->
-  <div id="tab-tizhi" class="panel">
-    <div class="card">
-      <div class="card-title"><span class="icon">🧬</span> 体质与命理联合分析</div>
-      <div class="card-body" style="margin-bottom:20px">
-        选择您的体质类型和八字日主五行，获取双重诊断和个性化调理方案。
-      </div>
-      
-      <div class="mingli-input-row">
-        <div class="input-group">
-          <label>体质类型</label>
-          <select id="tizhiType">
-            <option value="">请选择</option>
-            <option value="pinghe">平和质</option>
-            <option value="qixu">气虚质</option>
-            <option value="yangxu">阳虚质</option>
-            <option value="yinxu">阴虚质</option>
-            <option value="tanshi">痰湿质</option>
-            <option value="shire">湿热质</option>
-            <option value="xueyu">血瘀质</option>
-            <option value="qiyu">气郁质</option>
-            <option value="tebing">特禀质</option>
-          </select>
-        </div>
-        <div class="input-group">
-          <label>日主天干</label>
-          <select id="rizhu">
-            <option value="">请选择</option>
-            <option value="jia">甲（阳木）</option>
-            <option value="yi">乙（阴木）</option>
-            <option value="bing">丙（阳火）</option>
-            <option value="ding">丁（阴火）</option>
-            <option value="wu">戊（阳土）</option>
-            <option value="ji">己（阴土）</option>
-            <option value="geng">庚（阳金）</option>
-            <option value="xin">辛（阴金）</option>
-            <option value="ren">壬（阳水）</option>
-            <option value="gui">癸（阴水）</option>
-          </select>
-        </div>
-        <div class="input-group">
-          <label>五行偏旺</label>
-          <select id="wuxingWang">
-            <option value="">请选择</option>
-            <option value="wood">木旺</option>
-            <option value="fire">火旺</option>
-            <option value="earth">土旺</option>
-            <option value="metal">金旺</option>
-            <option value="water">水旺</option>
-          </select>
-        </div>
-        <div class="input-group">
-          <label>五行偏弱</label>
-          <select id="wuxingRuo">
-            <option value="">请选择</option>
-            <option value="wood">木弱</option>
-            <option value="fire">火弱</option>
-            <option value="earth">土弱</option>
-            <option value="metal">金弱</option>
-            <option value="water">水弱</option>
-          </select>
-        </div>
-      </div>
-      
-      <button class="btn btn-primary" onclick="analyzeTizhi()">🧬 开始联合分析</button>
-      <button class="btn btn-secondary" onclick="exportResult('tizhi')" style="margin-left:8px">🖨️ 导出报告</button>
-    </div>
-
-    <div class="diagnosis-result" id="tizhiResult">
-      <!-- 动态填充 -->
-    </div>
-  </div>
-</div>
-
-<!-- LOADING -->
-<div class="loading-overlay" id="loadingOverlay">
-  <div class="loading-spinner"></div>
-  <div class="loading-text" id="loadingText">正在解读中...</div>
 </div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script src="knowledge/tcm-diagnosis-kb.js"></script>
+<script src="knowledge/tcm-famous-formulas-kb.js"></script>
 <script>
-// ═══ 全局状态 ═══
-let selectedSymptoms = [];
+/* ===== DATA LAYER ===== */
+const STORAGE_KEY = 'tcm_clinic_cases';
+const VERSION_KEY = 'tcm_clinic_versions';
 
-// ═══ 初始化八字选项 ═══
-function initMingliSelects() {
-  const tiangan = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-  const dizhi = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-  const combos = [];
-  for (let i = 0; i < 60; i++) {
-    combos.push(tiangan[i % 10] + dizhi[i % 12]);
-  }
-  ['mingliYear','mingliMonth','mingliDay','mingliHour'].forEach(id => {
-    const sel = document.getElementById(id);
-    if (!sel) return;
-    combos.forEach(c => {
-      const opt = document.createElement('option');
-      opt.value = c;
-      opt.textContent = c;
-      sel.appendChild(opt);
-    });
-  });
+const STATUS_LABELS = {
+  pending_master: '待分析',
+  pending_doctor: '待诊疗',
+  collaborating: '协作中',
+  completed: '已诊疗',
+  pushed: '已推送'
+};
+
+const STATUS_FLOW = ['pending_master','pending_doctor','collaborating','completed','pushed'];
+
+/* 60甲子 */
+const JIAZI = [];
+const TIANGAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+const DIZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+for(let i=0;i<60;i++){JIAZI.push(TIANGAN[i%10]+DIZHI[i%12])}
+
+/* 64卦 */
+const HEXAGRAMS = [
+  {name:'乾为天',lines:[1,1,1,1,1,1],organ:'肺/大肠',meaning:'刚健中正，需注意肺部及呼吸系统'},
+  {name:'坤为地',lines:[0,0,0,0,0,0],organ:'脾/胃',meaning:'柔顺承载，需注意脾胃消化系统'},
+  {name:'水雷屯',lines:[1,0,0,0,1,0],organ:'肾/肝',meaning:'初始困难，肝胆系统需调养'},
+  {name:'山水蒙',lines:[0,1,0,0,0,1],organ:'脾/心',meaning:'蒙昧待启，心脾两虚需注意'},
+  {name:'水天需',lines:[1,1,1,0,1,0],organ:'肾/肺',meaning:'等待时机，肺肾不足需温补'},
+  {name:'天水讼',lines:[0,1,0,1,1,1],organ:'肺/肾',meaning:'争讼不和，肺肾失调'},
+  {name:'地水师',lines:[0,1,0,0,0,0],organ:'脾/肾',meaning:'率师出征，脾肾气虚'},
+  {name:'水地比',lines:[0,0,0,0,1,0],organ:'肾/脾',meaning:'亲比团结，脾肾双补'},
+  {name:'风天小畜',lines:[1,1,1,1,1,0],organ:'肝/肺',meaning:'小有蓄积，肝肺气机需调畅'},
+  {name:'天泽履',lines:[0,1,1,1,1,1],organ:'肺/脾',meaning:'如履薄冰，脾肺气虚'},
+  {name:'地天泰',lines:[1,1,1,0,0,0],organ:'脾/肺',meaning:'天地交泰，气血调和为佳'},
+  {name:'天地否',lines:[0,0,0,1,1,1],organ:'脾/肺',meaning:'天地不交，气机郁滞'},
+  {name:'天火同人',lines:[1,0,1,1,1,1],organ:'肺/心',meaning:'与人和同，心肺需调'},
+  {name:'火天大有',lines:[1,1,1,1,0,1],organ:'心/肺',meaning:'大有收获，心火偏旺'},
+  {name:'地山谦',lines:[0,0,1,0,0,0],organ:'脾/脾',meaning:'谦虚卑退，脾胃虚弱'},
+  {name:'雷地豫',lines:[0,0,0,1,0,0],organ:'肝/脾',meaning:'愉悦和顺，肝脾调和'},
+  {name:'泽雷随',lines:[0,1,0,0,0,1],organ:'脾/肝',meaning:'随顺而行，肝脾需调'},
+  {name:'山风蛊',lines:[0,1,1,0,0,1],organ:'脾/肝',meaning:'积弊待治，肝脾湿热'},
+  {name:'地泽临',lines:[1,1,0,0,0,0],organ:'脾/脾',meaning:'面临对待，脾胃需温养'},
+  {name:'风地观',lines:[0,0,0,0,1,1],organ:'肝/脾',meaning:'观察审视，肝郁脾虚'},
+  {name:'火雷噬嗑',lines:[0,1,0,1,0,1],organ:'心/肝',meaning:'咬合障碍，心肝火旺'},
+  {name:'山火贲',lines:[1,0,1,0,0,1],organ:'脾/心',meaning:'文饰修饰，心脾两虚'},
+  {name:'山地剥',lines:[0,0,0,0,0,1],organ:'脾/脾',meaning:'剥落衰退，脾气大虚'},
+  {name:'地雷复',lines:[1,0,0,0,0,0],organ:'脾/肝',meaning:'一阳来复，肝脾渐调'},
+  {name:'天雷无妄',lines:[1,0,0,1,1,1],organ:'肺/肝',meaning:'无妄之灾，肝肺失调'},
+  {name:'山天大畜',lines:[1,1,1,0,0,1],organ:'脾/肺',meaning:'大有蓄积，脾肺气足'},
+  {name:'山雷颐',lines:[1,0,0,0,0,1],organ:'脾/肝',meaning:'颐养正道，肝脾需调'},
+  {name:'泽风大过',lines:[0,1,1,1,1,0],organ:'脾/肝',meaning:'大过失衡，肝脾不调'},
+  {name:'坎为水',lines:[0,1,0,0,1,0],organ:'肾/膀胱',meaning:'重险陷溺，肾阳不足'},
+  {name:'离为火',lines:[1,0,1,1,0,1],organ:'心/小肠',meaning:'光明附丽，心火偏旺'},
+  {name:'泽山咸',lines:[0,0,1,1,1,0],organ:'脾/脾',meaning:'感应相慕，脾胃调和'},
+  {name:'雷风恒',lines:[0,1,1,1,0,1],organ:'肝/肝',meaning:'恒久不变，肝气需疏'},
+  {name:'天山遁',lines:[0,0,1,1,1,1],organ:'脾/肺',meaning:'退避隐遁，肺脾两虚'},
+  {name:'雷天大壮',lines:[1,1,1,1,0,0],organ:'肝/肺',meaning:'刚壮盛旺，肝火偏旺'},
+  {name:'火地晋',lines:[0,0,0,1,0,1],organ:'心/脾',meaning:'晋升上进，心脾两虚'},
+  {name:'地火明夷',lines:[1,0,1,0,0,0],organ:'脾/心',meaning:'光明受伤，心脾不足'},
+  {name:'风火家人',lines:[1,0,1,0,1,1],organ:'肝/心',meaning:'家人内聚，肝心调和'},
+  {name:'火泽睽',lines:[1,1,0,1,0,1],organ:'心/脾',meaning:'乖违背离，心脾不调'},
+  {name:'水山蹇',lines:[0,0,1,0,1,0],organ:'肾/脾',meaning:'蹇难行阻，脾肾不足'},
+  {name:'雷水解',lines:[0,1,0,1,0,0],organ:'肝/肾',meaning:'解除困难，肝肾渐调'},
+  {name:'山泽损',lines:[1,1,0,0,0,1],organ:'脾/脾',meaning:'减损克制，脾胃需补'},
+  {name:'风雷益',lines:[1,0,0,0,1,1],organ:'肝/肝',meaning:'增益有益，肝气渐旺'},
+  {name:'泽天夬',lines:[1,1,1,1,1,0],organ:'脾/肺',meaning:'决断去除，肺脾需调'},
+  {name:'天风姤',lines:[0,1,1,1,1,1],organ:'肺/肝',meaning:'邂逅相遇，肝肺失调'},
+  {name:'泽地萃',lines:[0,0,0,1,1,0],organ:'脾/脾',meaning:'聚集合力，脾胃调和'},
+  {name:'地风升',lines:[0,1,1,0,0,0],organ:'脾/肝',meaning:'上升进取，肝脾渐旺'},
+  {name:'泽水困',lines:[0,1,0,1,1,0],organ:'脾/肾',meaning:'困穷待通，脾肾两虚'},
+  {name:'水风井',lines:[0,1,1,0,1,0],organ:'肾/肝',meaning:'井养不穷，肝肾需补'},
+  {name:'泽火革',lines:[1,0,1,1,1,0],organ:'脾/心',meaning:'变革改新，心脾需调'},
+  {name:'火风鼎',lines:[0,1,1,1,0,1],organ:'心/肝',meaning:'鼎新调和，肝心渐旺'},
+  {name:'震为雷',lines:[1,0,0,1,0,0],organ:'肝/胆',meaning:'震动奋起，肝胆火旺'},
+  {name:'艮为山',lines:[0,0,1,0,0,1],organ:'脾/胃',meaning:'静止安稳，脾胃需温'},
+  {name:'风山渐',lines:[0,0,1,0,1,1],organ:'肝/脾',meaning:'循序渐进，肝脾渐调'},
+  {name:'雷泽归妹',lines:[1,1,0,1,0,0],organ:'肝/脾',meaning:'归妹不正，肝脾失调'},
+  {name:'雷火丰',lines:[1,0,1,1,0,0],organ:'肝/心',meaning:'丰收盛大的，肝心火旺'},
+  {name:'火山旅',lines:[0,0,1,1,0,1],organ:'脾/心',meaning:'旅行在外，心脾两虚'},
+  {name:'巽为风',lines:[0,1,1,0,1,1],organ:'肝/胆',meaning:'随顺渗透，肝胆气滞'},
+  {name:'兑为泽',lines:[1,1,0,1,1,0],organ:'脾/肺',meaning:'喜悦相随，脾肺气虚'},
+  {name:'风水涣',lines:[0,1,0,0,1,1],organ:'肝/肾',meaning:'涣散流通，肝肾需补'},
+  {name:'水泽节',lines:[1,1,0,0,1,0],organ:'肾/脾',meaning:'节制有度，脾肾需调'},
+  {name:'风泽中孚',lines:[1,1,0,0,1,1],organ:'肝/脾',meaning:'诚信中正，肝脾调和'},
+  {name:'雷山小过',lines:[0,0,1,1,0,0],organ:'肝/脾',meaning:'小有过越，肝脾不调'},
+  {name:'水火既济',lines:[1,0,1,0,1,0],organ:'肾/心',meaning:'既济成功，心肾交泰'},
+  {name:'火水未济',lines:[0,1,0,1,0,1],organ:'心/肾',meaning:'未济待成，心肾不交'}
+];
+
+/* 周易术语过滤词表 */
+const FILTER_TERMS = ['八字','五行','天干','地支','卦象','大运','流年','日主','十神','七杀','正官','偏官','正印','偏印','比肩','劫财','食神','伤官','正财','偏财','甲子','乙丑','丙寅','丁卯','戊辰','己巳','庚午','辛未','壬申','癸酉','甲戌','乙亥','丙子','丁丑','戊寅','己卯','庚辰','辛巳','壬午','癸未','甲申','乙酉','丙戌','丁亥','戊子','己丑','庚寅','辛卯','壬辰','癸巳','甲午','乙未','丙申','丁酉','戊戌','己亥','庚子','辛丑','壬寅','癸卯','甲辰','乙巳','丙午','丁未','戊申','己酉','庚戌','辛亥','壬子','癸丑','甲寅','乙卯','丙辰','丁巳','戊午','己未','庚申','辛酉','壬戌','癸亥','木旺','火旺','土旺','金旺','水旺','木衰','火衰','土衰','金衰','水衰','偏盛','偏衰','乾卦','坤卦','震卦','巽卦','坎卦','离卦','艮卦','兑卦'];
+
+let currentRole = 'patient';
+let currentCaseId = null;
+let currentCollabCaseId = null;
+
+/* ===== STORAGE ===== */
+function loadCases(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return null;
 }
-initMingliSelects();
-
-// ═══ Tab切换 ═══
-function switchTab(name, btnEl) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  if(btnEl) btnEl.classList.add('active');
-  // 清空之前的结果
-  ['symptomResult','mingliResult','yijingResult','tizhiResult'].forEach(id => {
-    let el = document.getElementById(id);
-    if(el) el.style.display = 'none';
-  });
+function saveCases(cases){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(cases));
+}
+function loadVersions(){
+  try{return JSON.parse(localStorage.getItem(VERSION_KEY))||{}}catch(e){return {}}
+}
+function saveVersions(v){
+  localStorage.setItem(VERSION_KEY, JSON.stringify(v));
+}
+function addVersion(caseId, summary){
+  const v = loadVersions();
+  if(!v[caseId]) v[caseId] = [];
+  v[caseId].push({time:new Date().toISOString(),summary:summary});
+  saveVersions(v);
 }
 
-// ═══ 症状选择 ═══
-function toggleSymptom(el) {
-  el.classList.toggle('selected');
-  const name = el.textContent;
-  if (el.classList.contains('selected')) {
-    if (!selectedSymptoms.includes(name)) selectedSymptoms.push(name);
-  } else {
-    selectedSymptoms = selectedSymptoms.filter(s => s !== name);
-  }
-  // 同步到文本框
-  const textarea = document.getElementById('symptomText');
-  const existing = textarea.value.trim();
-  if (selectedSymptoms.length > 0) {
-    const symptomLine = '主要症状：' + selectedSymptoms.join('、');
-    if (existing && !existing.startsWith('主要症状：')) {
-      textarea.value = symptomLine + '\n' + existing;
-    } else if (existing.startsWith('主要症状：')) {
-      const rest = existing.split('\n').slice(1).join('\n');
-      textarea.value = symptomLine + (rest ? '\n' + rest : '');
-    } else {
-      textarea.value = symptomLine;
-    }
-  }
-}
-
-function clearSymptoms() {
-  document.getElementById('symptomText').value = '';
-  selectedSymptoms = [];
-  document.querySelectorAll('.quick-tag.selected').forEach(el => el.classList.remove('selected'));
-  document.getElementById('symptomResult').style.display = 'none';
-}
-
-// ═══ 症状分析 ═══
-function analyzeSymptoms() {
-  const text = document.getElementById('symptomText').value.trim();
-  if (!text && selectedSymptoms.length === 0) {
-    showToast('请描述症状或选择常见症状');
-    return;
-  }
-  
-  showLoading('正在解读症状...');
-  
-  setTimeout(() => {
-    const kb = window.TCM_DIAGNOSIS_KB;
-    if (!kb || !kb.symptom_engine) {
-      hideLoading();
-      showToast('知识库加载中，请稍后重试');
-      return;
-    }
-    
-    // 匹配症状
-    const matchedSymptoms = [];
-    const allSymptoms = kb.symptom_engine.symptoms || [];
-    
-    // 从文本和快速选择中提取症状
-    const checkNames = [...selectedSymptoms];
-    allSymptoms.forEach(s => {
-      if (text.includes(s.name) || selectedSymptoms.includes(s.name)) {
-        if (!checkNames.includes(s.name)) checkNames.push(s.name);
+/* ===== INIT SAMPLE DATA ===== */
+function initSampleData(){
+  if(loadCases()) return;
+  const now = new Date().toISOString();
+  const samples = [
+    {
+      id:'CASE-001',
+      createdAt:'2026-07-19T09:00:00',
+      status:'pushed',
+      patient:{name:'张先生',age:45,gender:'男',symptoms:'头痛失眠，伴随口干口苦，烦躁易怒，胸胁胀闷，舌红苔黄，脉弦数',tizhi:'气郁质'},
+      masterAnalysis:{
+        bazi:{year:'甲子',month:'丙寅',day:'癸丑',hour:'辛酉'},
+        wuxing:{木:2,火:1,土:1,金:2,水:2},
+        hexagram:{name:'水火既济',moving:3},
+        analysisNote:'日主癸水，生于寅月，木旺生火，肝木偏旺克土。八字木火通明，但木旺克土，脾胃需注意。大运戊辰，流年丙午，火气偏盛，心肝火旺。',
+        medicalTranslation:'您的体质属于气郁质，肝气偏旺，容易影响脾胃功能和睡眠质量。当前季节心火偏旺，需注意疏肝清热。',
+        organRisk:'肝胆系统需特别注意，脾胃功能偏弱，心火偏旺需清心降火',
+        seasonalAdvice:'夏季养心清热，疏肝理气，避免辛辣刺激食物',
+        tizhiTrend:'气郁质，偏肝旺',
+        submittedAt:'2026-07-19T09:30:00',
+        version:1
+      },
+      doctorDiagnosis:{
+        syndrome:'肝郁气滞',
+        treatment:'疏肝理气，清热安神',
+        formula:'逍遥散加减（柴胡10g、白芍15g、当归10g、白术10g、茯苓15g、薄荷6g、生姜3片、炙甘草6g）',
+        acupoints:['太冲','阳陵泉','期门','内关','神门'],
+        dietPlan:'推荐：玫瑰花茶、佛手柑、芹菜、苦瓜、百合粥\n禁忌：辛辣油腻、羊肉、酒类\n每日食谱：早餐百合红枣粥，午餐清炒苦瓜芹菜，晚餐玫瑰花茶配素菜',
+        exercisePlan:'户外运动、登山、慢跑，最佳时间早晨5-7点',
+        lifestyle:'保持心情舒畅，避免熬夜，23点前入睡，晨起户外散步',
+        followUpDate:'2026-07-26',
+        followUpNote:'一周后复诊，观察症状变化，调整方剂',
+        doctorNote:'注意情绪调节，配合食疗，坚持运动。症状缓解后可适当减量。',
+        completedAt:'2026-07-19T10:00:00',
+        version:1
+      },
+      discussion:[
+        {role:'master',text:'此病例八字木旺克土，脾胃需特别注意，建议方剂中加强健脾成分',time:'2026-07-19T09:35:00'},
+        {role:'doctor',text:'收到，我在逍遥散基础上加白术茯苓健脾，配合太冲期门疏肝',time:'2026-07-19T09:45:00'},
+        {role:'master',text:'好的，夏季火旺，可酌加清心药物',time:'2026-07-19T09:50:00'}
+      ],
+      patientReport:{
+        summary:'您的体质属于气郁质，肝气偏旺，建议疏肝理气、清热安神',
+        diet:'推荐：玫瑰花茶、佛手柑、芹菜、苦瓜、百合粥\n禁忌：辛辣油腻、羊肉、酒类',
+        exercise:'推荐：户外运动、登山、慢跑\n最佳时间：早晨5-7点',
+        lifestyle:'保持心情舒畅，避免熬夜，23点前入睡，晨起户外散步',
+        schedule:'下次复诊：2026年7月26日\n注意事项：一周后复诊，观察症状变化，调整方剂',
+        doctorNote:'注意情绪调节，配合食疗，坚持运动。症状缓解后可适当减量。',
+        pushedAt:'2026-07-19T10:30:00'
       }
-    });
-    
-    // 匹配知识库
-    checkNames.forEach(name => {
-      const found = allSymptoms.find(s => s.name === name);
-      if (found) matchedSymptoms.push(found);
-    });
-    
-    if (matchedSymptoms.length === 0) {
-      // 模糊匹配
-      allSymptoms.forEach(s => {
-        s.differential.forEach(d => {
-          if (text.includes(d.split('→')[0]) || text.includes(s.name.slice(0,2))) {
-            if (!matchedSymptoms.includes(s)) matchedSymptoms.push(s);
-          }
-        });
-      });
+    },
+    {
+      id:'CASE-002',
+      createdAt:'2026-07-19T10:00:00',
+      status:'pending_doctor',
+      patient:{name:'李女士',age:38,gender:'女',symptoms:'月经不调，量少色暗有块，经前乳房胀痛，情绪波动大，舌暗红有瘀点，脉弦涩',tizhi:'血瘀质'},
+      masterAnalysis:{
+        bazi:{year:'丁卯',month:'壬子',day:'乙亥',hour:'丁亥'},
+        wuxing:{木:2,火:2,土:0,金:0,水:3},
+        hexagram:{name:'坎为水',moving:2},
+        analysisNote:'日主乙木，生于子月，水旺木漂，寒凝血瘀。八字水旺泛滥，需温阳化气，健脾温肾。大运己酉，流年丙午，水火相战。',
+        medicalTranslation:'您的体质偏于血瘀质，体内寒气偏重，气血运行不畅，需要温阳散寒、活血化瘀。',
+        organRisk:'肾系统偏寒，气血运行不畅，女性生殖系统需温养',
+        seasonalAdvice:'夏季温阳散寒，活血化瘀，避免寒凉食物和冷饮',
+        tizhiTrend:'血瘀质，偏寒凝',
+        submittedAt:'2026-07-19T10:20:00',
+        version:1
+      },
+      doctorDiagnosis:null,
+      discussion:[
+        {role:'master',text:'此病例水旺寒凝，需温经散寒，建议少腹逐瘀汤方向',time:'2026-07-19T10:25:00'}
+      ],
+      patientReport:null
+    },
+    {
+      id:'CASE-003',
+      createdAt:'2026-07-19T10:30:00',
+      status:'pending_master',
+      patient:{name:'王先生',age:52,gender:'男',symptoms:'腰膝酸软，畏寒肢冷，夜尿频多，性功能减退，舌淡苔白，脉沉迟',tizhi:''},
+      masterAnalysis:null,
+      doctorDiagnosis:null,
+      discussion:[],
+      patientReport:null
     }
-    
-    hideLoading();
-    
-    const resultDiv = document.getElementById('symptomResult');
-    resultDiv.style.display = 'block';
-    
-    if (matchedSymptoms.length === 0) {
-      resultDiv.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><div class="text">未匹配到标准症状，请尝试更详细的描述</div></div>';
-      return;
-    }
-    
-    // 收集所有证候
-    const allSyndromes = [];
-    matchedSymptoms.forEach(s => {
-      s.syndromes.forEach(syn => {
-        if (!allSyndromes.includes(syn)) allSyndromes.push(syn);
-      });
-    });
-    
-    // 查找证候详情
-    const syndromeDetails = (kb.syndrome_db && kb.syndrome_db.syndromes) || [];
-    const matchedSyndromes = allSyndromes.map(name => 
-      syndromeDetails.find(s => s.name === name) || { name, treatment: '需进一步诊断', formula: '待定', acupoints: [] }
-    );
-    
-    // 查找推荐名医
-    const doctors = (kb.doctor_recommendation && kb.doctor_recommendation.doctors) || [];
-    const recommendedDoctors = doctors.filter(d => {
-      return matchedSyndromes.some(s => 
-        d.specialties && d.specialties.some(sp => s.name.includes(sp) || sp.includes(s.name))
-      );
-    }).slice(0, 5);
-    
-    // 渲染结果
-    let html = '';
-    
-    // 症状解读
-    html += '<div class="result-section"><div class="result-section-title"><span>📋</span> 症状解读</div>';
-    matchedSymptoms.forEach(s => {
-      html += `<div class="syndrome-card">
-        <div class="syndrome-name">${s.name}</div>
-        <div class="syndrome-detail">
-          <div><span class="label">涉及脏腑：</span>${s.organs.join('、')}</div>
-          <div><span class="label">五行属性：</span>${s.element}</div>
-          <div><span class="label">寒热属性：</span>${s.nature}</div>
-          <div><span class="label">严重程度：</span>${s.severity}</div>
-        </div>
-        <div class="organs-display">${s.organs.map(o => `<span class="organ-badge organ-${s.element === '木' ? 'wood' : s.element === '火' ? 'fire' : s.element === '土' ? 'earth' : s.element === '金' ? 'metal' : 'water'}">${o}</span>`).join('')}</div>
-        <div style="margin-top:10px;font-size:12px;color:var(--paper3);line-height:1.8">
-          <span class="label">鉴别诊断：</span>${s.differential.join('；')}
-        </div>
-      </div>`;
-    });
-    html += '</div>';
-    
-    // 证候分析
-    html += '<div class="result-section"><div class="result-section-title"><span>🩺</span> 证候分析</div>';
-    matchedSyndromes.forEach(s => {
-      html += `<div class="syndrome-card">
-        <div class="syndrome-name">${s.name}</div>
-        <div class="syndrome-detail">
-          <div><span class="label">治则：</span>${s.treatment || s.principle || '辨证论治'}</div>
-          <div><span class="label">推荐方剂：</span>${s.formula || s.prescription || '待定'}</div>
-          <div><span class="label">推荐穴位：</span>${(s.acupoints || []).join('、') || '待定'}</div>
-          <div><span class="label">五行归属：</span>${s.element || '待定'}</div>
-        </div>
-      </div>`;
-    });
-    html += '</div>';
-    
-    // 名医推荐
-    if (recommendedDoctors.length > 0) {
-      html += '<div class="result-section"><div class="result-section-title"><span>👨‍⚕️</span> 推荐名医</div>';
-      recommendedDoctors.forEach(d => {
-        html += `<div class="doctor-card">
-          <div class="doctor-avatar">${d.name ? d.name[0] : '医'}</div>
-          <div class="doctor-info">
-            <div class="doctor-name">${d.name}</div>
-            <div class="doctor-era">${d.era || ''} · ${d.specialties ? d.specialties.join('、') : ''}</div>
-            <div class="doctor-specialty">${d.work || d.description || ''}</div>
-            <div class="doctor-reason">推荐理由：擅长「${matchedSyndromes.map(s => s.name).join('、')}」类证候的治疗</div>
-          </div>
-        </div>`;
-      });
-      html += '</div>';
-    }
-    
-    // 综合建议
-    html += '<div class="result-section"><div class="result-section-title"><span>💡</span> 综合建议</div>';
-    html += '<div class="card-body" style="line-height:2">';
-    html += '<p>1. 以上为初步症状解读，具体诊疗请咨询专业中医师</p>';
-    html += '<p>2. 建议结合「命理推病」tab查看从八字角度的健康走势</p>';
-    html += '<p>3. 可通过「周易论治」tab获取周易卦象指导的调理方案</p>';
-    html += '<p>4. 调理需遵循：急则治标、缓则治本、标本兼治的原则</p>';
-    html += '</div></div>';
-    
-    resultDiv.innerHTML = html;
-    resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 800);
+  ];
+  saveCases(samples);
+  // Init versions
+  const v = {};
+  v['CASE-001'] = [
+    {time:'2026-07-19T09:00:00',summary:'病例创建'},
+    {time:'2026-07-19T09:30:00',summary:'大师提交分析报告 v1'},
+    {time:'2026-07-19T10:00:00',summary:'医生完成诊疗方案 v1'},
+    {time:'2026-07-19T10:30:00',summary:'报告推送给病患'}
+  ];
+  v['CASE-002'] = [
+    {time:'2026-07-19T10:00:00',summary:'病例创建'},
+    {time:'2026-07-19T10:20:00',summary:'大师提交分析报告 v1'}
+  ];
+  v['CASE-003'] = [
+    {time:'2026-07-19T10:30:00',summary:'病例创建'}
+  ];
+  saveVersions(v);
 }
 
-// ═══ 命理推病 ═══
-function predictDisease() {
-  const year = document.getElementById('mingliYear').value;
-  const month = document.getElementById('mingliMonth').value;
-  const day = document.getElementById('mingliDay').value;
-  const hour = document.getElementById('mingliHour').value;
-  const age = document.getElementById('mingliAge').value;
-  const symptom = document.getElementById('mingliSymptom').value;
-  
-  if (!year || !month || !day || !hour) {
-    showToast('请填写完整八字信息');
+/* ===== TOAST ===== */
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+/* ===== ROLE SWITCHING ===== */
+function switchRole(role,btn){
+  currentRole = role;
+  document.querySelectorAll('.role-tab').forEach(t=>t.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+role).classList.add('active');
+  // Refresh data
+  if(role==='patient') renderPatientReport();
+  if(role==='master') renderMasterList();
+  if(role==='doctor') renderDoctorList();
+  if(role==='collab') renderCollabCases();
+}
+
+/* ===== SUB-TAB SWITCH ===== */
+function switchSubTab(btn,targetId){
+  const container = btn.closest('.workspace-right')||btn.closest('.sub-panel')||document;
+  container.querySelectorAll('.sub-tab').forEach(t=>{
+    if(t.parentElement===btn.parentElement) t.classList.remove('active');
+  });
+  btn.classList.add('active');
+  // Find sibling sub-panels
+  const parent = btn.parentElement;
+  const nextSiblings = parent.nextElementSibling;
+  let node = parent.nextElementSibling;
+  while(node){
+    if(node.classList && node.classList.contains('sub-panel')){
+      node.classList.remove('active');
+    }
+    node = node.nextElementSibling;
+  }
+  // Also handle case where sub-panels are inside the same parent's siblings
+  const allSubPanels = parent.parentElement.querySelectorAll('.sub-panel');
+  allSubPanels.forEach(sp=>sp.classList.remove('active'));
+  const target = document.getElementById(targetId);
+  if(target) target.classList.add('active');
+}
+
+function switchHexMethod(btn,method){
+  btn.parentElement.querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  ['hex-time','hex-number','hex-symptom'].forEach(id=>{
+    document.getElementById(id).classList.remove('active');
+  });
+  document.getElementById('hex-'+method).classList.add('active');
+}
+
+/* ===== FILTER TERMS ===== */
+function filterTerms(text){
+  if(!text) return '';
+  let result = text;
+  FILTER_TERMS.forEach(term=>{
+    result = result.replace(new RegExp(term,'g'),'');
+  });
+  // Clean up extra spaces and punctuation
+  result = result.replace(/\s+/g,' ').replace(/[，。、]{2,}/g,m=>m[0]).trim();
+  return result;
+}
+
+/* ===== PATIENT PORTAL ===== */
+function renderPatientReport(){
+  const cases = loadCases();
+  const area = document.getElementById('patientReportArea');
+  const histCard = document.getElementById('patientHistoryCard');
+  const histList = document.getElementById('patientHistoryList');
+  if(!cases || cases.length===0){
+    area.innerHTML = '<div class="empty-state"><div class="icon">📋</div><div class="text">暂无养生报告，请等待医师审核推送</div></div>';
+    histCard.style.display = 'none';
     return;
   }
-  
-  showLoading('正在推算疾病走势...');
-  
-  setTimeout(() => {
-    const kb = window.TCM_DIAGNOSIS_KB;
-    if (!kb || !kb.mingli_disease_prediction) {
-      hideLoading();
-      showToast('知识库加载中');
-      return;
-    }
-    
-    // 分析五行
-    const wuxingCount = { 木: 0, 火: 0, 土: 0, 金: 0, 水: 0 };
-    const tianganMap = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
-    const dizhiMap = {子:'水',丑:'土',寅:'木',卯:'木',辰:'土',巳:'火',午:'火',未:'土',申:'金',酉:'金',戌:'土',亥:'水'};
-    
-    [year, month, day, hour].forEach(pillar => {
-      const tg = pillar[0];
-      const dz = pillar[1];
-      if (tianganMap[tg]) wuxingCount[tianganMap[tg]]++;
-      if (dizhiMap[dz]) wuxingCount[dizhiMap[dz]]++;
-    });
-    
-    const wuxingEntries = Object.entries(wuxingCount).sort((a,b) => b[1] - a[1]);
-    const wangWx = wuxingEntries[0];
-    const ruoWx = wuxingEntries[4];
-    
-    // 脏腑风险表
-    const organRisk = {
-      '木': { organs: '肝、胆', risk: '肝气郁结/肝火上炎/肝血不足' },
-      '火': { organs: '心、小肠', risk: '心火旺盛/心阴不足/心阳不振' },
-      '土': { organs: '脾、胃', risk: '脾胃虚弱/湿热内蕴/脾阳不足' },
-      '金': { organs: '肺、大肠', risk: '肺气不足/肺阴虚/大肠湿热' },
-      '水': { organs: '肾、膀胱', risk: '肾阳虚/肾阴虚/水湿泛滥' }
-    };
-    
-    // 日主天干
-    const rizhuTG = day[0];
-    const rizhuWx = tianganMap[rizhuTG];
-    
-    // 预测模板
-    const predictions = kb.mingli_disease_prediction.predictions || [];
-    const matchedPredictions = predictions.filter(p => {
-      return p.element && (p.element === wangWx[0] || p.element === ruoWx[0]);
-    });
-    
-    hideLoading();
-    
-    const resultDiv = document.getElementById('mingliResult');
-    resultDiv.style.display = 'block';
-    
-    let html = '';
-    
-    // 五行分析
-    html += '<div class="result-section"><div class="result-section-title"><span>☯️</span> 五行旺衰分析</div>';
-    html += '<div class="card-body" style="margin-bottom:16px">';
-    wuxingEntries.forEach(([wx, cnt]) => {
-      const pct = (cnt / 8 * 100).toFixed(0);
-      const bar = '█'.repeat(Math.round(pct / 10)) + '░'.repeat(10 - Math.round(pct / 10));
-      const cls = wx === '木' ? 'wood' : wx === '火' ? 'fire' : wx === '土' ? 'earth' : wx === '金' ? 'metal' : 'water';
-      html += `<div style="margin-bottom:6px"><span class="organ-badge organ-${cls}">${wx}</span> <span style="font-family:var(--font-mono,monospace);color:var(--paper3)">${bar}</span> ${cnt}柱 (${pct}%)</div>`;
-    });
-    html += '</div>';
-    html += `<div class="syndrome-card"><div class="syndrome-name">五行最旺：${wangWx[0]}（${wangWx[1]}柱）</div>`;
-    html += `<div class="syndrome-detail"><div><span class="label">对应脏腑：</span>${organRisk[wangWx[0]].organs}</div><div><span class="label">风险方向：</span>${organRisk[wangWx[0]].risk}</div></div></div>`;
-    html += `<div class="syndrome-card"><div class="syndrome-name">五行最弱：${ruoWx[0]}（${ruoWx[1]}柱）</div>`;
-    html += `<div class="syndrome-detail"><div><span class="label">对应脏腑：</span>${organRisk[ruoWx[0]].organs}</div><div><span class="label">风险方向：</span>${organRisk[ruoWx[0]].risk}</div></div></div>`;
-    html += '</div>';
-    
-    // 日主体质
-    html += '<div class="result-section"><div class="result-section-title"><span>🫀</span> 日主体质分析</div>';
-    html += `<div class="card-body">日主 <span style="color:var(--gold)">${rizhuTG}（${rizhuWx}）</span>，先天体质核心在 <span style="color:var(--gold)">${organRisk[rizhuWx].organs}</span>。`;
-    html += `<br>日主${wangWx[1] > 2 ? '旺相，对应脏腑功能亢进，需防实热实证' : '偏弱，对应脏腑功能不足，需防虚证'}`;
-    html += '</div></div>';
-    
-    // 脏腑风险预测
-    html += '<div class="result-section"><div class="result-section-title"><span>⚠️</span> 脏腑风险预测</div>';
-    html += '<div class="prediction-grid">';
-    const riskWang = wangWx[1] >= 3 ? 'high' : wangWx[1] >= 2 ? 'medium' : 'low';
-    const riskRuo = ruoWx[1] <= 1 ? 'high' : ruoWx[1] <= 2 ? 'medium' : 'low';
-    const riskLabels = { high: '高风险', medium: '中风险', low: '低风险' };
-    
-    html += `<div class="risk-card"><div class="risk-card-title">${wangWx[0]}系脏腑 <span class="risk-level risk-${riskWang}">${riskLabels[riskWang]}</span></div>`;
-    html += `<div style="font-size:13px;color:var(--paper2);line-height:1.8">${organRisk[wangWx[0]].risk}<br>建议：${riskWang === 'high' ? '及时调理，避免熬夜劳累，饮食清淡' : '注意保养，定期体检'}</div></div>`;
-    
-    html += `<div class="risk-card"><div class="risk-card-title">${ruoWx[0]}系脏腑 <span class="risk-level risk-${riskRuo}">${riskLabels[riskRuo]}</span></div>`;
-    html += `<div style="font-size:13px;color:var(--paper2);line-height:1.8">${organRisk[ruoWx[0]].risk}<br>建议：${riskRuo === 'high' ? '重点补益，食补药补并重' : '适度调养'}</div></div>`;
-    html += '</div>';
-    
-    // 大运流年提示
-    if (age) {
-      html += '<div class="result-section"><div class="result-section-title"><span>📅</span> 大运流年提示</div>';
-      html += `<div class="card-body">当前年龄 ${age} 岁。`;
-      const dayunStart = 8; // 简化
-      const dayunIdx = Math.floor((parseInt(age) - dayunStart) / 10);
-      html += `<br>当前大运周期约第 ${dayunIdx + 1} 步大运。`;
-      html += `<br>大运五行与命局互动：若大运逢${wangWx[0]}运则${organRisk[wangWx[0]].organs}系统需特别注意；`;
-      html += `<br>若逢${ruoWx[0]}运则${organRisk[ruoWx[0]].organs}系统得到补益，是调理的好时机。`;
-      html += '</div></div>';
-    }
-    
-    // 调理方向
-    html += '<div class="result-section"><div class="result-section-title"><span>🌿</span> 调理方向建议</div>';
-    html += '<div class="solution-timeline">';
-    html += '<div class="solution-step"><div class="solution-step-title">饮食调理</div><div class="solution-step-body">五行偏旺者泄之：' + wangWx[0] + '旺宜食' + (wangWx[0]==='木'?'酸味收敛' : wangWx[0]==='火'?'苦味清泄' : wangWx[0]==='土'?'淡味渗湿' : wangWx[0]==='金'?'辛味散之' : '咸味软坚') + '<br>五行偏弱者补之：' + ruoWx[0] + '弱宜食' + (ruoWx[0]==='木'?'绿色食物养肝' : ruoWx[0]==='火'?'红色食物补心' : ruoWx[0]==='土'?'黄色食物健脾' : ruoWx[0]==='金'?'白色食物润肺' : '黑色食物补肾') + '</div></div>';
-    html += '<div class="solution-step"><div class="solution-step-title">经络调理</div><div class="solution-step-body">重点经络：' + organRisk[ruoWx[0]].organs + '相关经络<br>按摩穴位：太冲（肝）/神门（心）/足三里（脾）/列缺（肺）/太溪（肾）</div></div>';
-    html += '<div class="solution-step"><div class="solution-step-title">起居调摄</div><div class="solution-step-body">顺应四时，春养肝、夏养心、长夏养脾、秋养肺、冬养肾<br>避免：' + (wangWx[0]==='木'?'熬夜怒气伤肝' : wangWx[0]==='火'?'焦虑急躁伤心' : wangWx[0]==='土'?'饮食不节伤脾' : wangWx[0]==='金'?'悲忧过度伤肺' : '恐惧劳累伤肾') + '</div></div>';
-    html += '<div class="solution-step"><div class="solution-step-title">周易化解</div><div class="solution-step-body">可通过「周易论治」tab起卦，获取卦象指导的具体方案</div></div>';
-    html += '</div></div>';
-    
-    // 知识库匹配的预测
-    if (matchedPredictions.length > 0) {
-      html += '<div class="result-section"><div class="result-section-title"><span>📖</span> 命理疾病预测参考</div>';
-      matchedPredictions.forEach(p => {
-        html += `<div class="syndrome-card"><div class="syndrome-name">${p.title || p.element + '系预测'}</div>`;
-        html += `<div class="card-body" style="font-size:13px;line-height:1.8">${p.analysis || p.description || ''}</div></div>`;
-      });
-      html += '</div>';
-    }
-    
-    resultDiv.innerHTML = html;
-    resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 800);
-}
-
-// ═══ 周易论治 ═══
-function castHexagram(method) {
-  if (method === 'number') {
-    document.getElementById('numberInput').style.display = 'block';
+  // Find cases with patientReport
+  const reported = cases.filter(c=>c.patientReport);
+  const pending = cases.filter(c=>!c.patientReport && c.patient);
+  if(reported.length===0){
+    area.innerHTML = '<div class="empty-state"><div class="icon">📋</div><div class="text">暂无养生报告，请等待医师审核推送</div></div>';
+    histCard.style.display = 'none';
     return;
   }
-  
-  showLoading('正在起卦...');
-  
-  setTimeout(() => {
-    let upperTrigram, lowerTrigram, movingLine;
-    
-    if (method === 'time') {
-      const now = new Date();
-      const yearNum = now.getFullYear();
-      const monthNum = now.getMonth() + 1;
-      const dayNum = now.getDate();
-      const hourNum = now.getHours();
-      
-      upperTrigram = (yearNum + monthNum + dayNum) % 8;
-      lowerTrigram = (yearNum + monthNum + dayNum + hourNum) % 8;
-      movingLine = (yearNum + monthNum + dayNum + hourNum) % 6;
-      if (movingLine === 0) movingLine = 6;
-    } else if (method === 'symptom') {
-      const text = document.getElementById('symptomText').value || '病';
-      let sum = 0;
-      for (let i = 0; i < text.length; i++) sum += text.charCodeAt(i);
-      upperTrigram = sum % 8;
-      lowerTrigram = (sum * 3) % 8;
-      movingLine = (sum * 7) % 6;
-      if (movingLine === 0) movingLine = 6;
-    }
-    
-    if (upperTrigram === 0) upperTrigram = 8;
-    if (lowerTrigram === 0) lowerTrigram = 8;
-    
-    renderHexagram(upperTrigram, lowerTrigram, movingLine, method);
-    hideLoading();
-  }, 600);
-}
-
-function castFromNumbers() {
-  const n1 = parseInt(document.getElementById('num1').value);
-  const n2 = parseInt(document.getElementById('num2').value);
-  const n3 = parseInt(document.getElementById('num3').value);
-  
-  if (!n1 || !n2 || !n3) {
-    showToast('请填写三个数字');
-    return;
+  // Show latest report
+  const latest = reported[reported.length-1];
+  const r = latest.patientReport;
+  const p = latest.patient;
+  let html = '<div class="card"><div class="card-title"><span class="icon">📊</span> 我的养生报告</div>';
+  html += '<div style="font-size:12px;color:var(--paper3);margin-bottom:16px">病例号：'+latest.id+' · 推送时间：'+formatDate(r.pushedAt)+'</div>';
+  // 体质概况
+  html += '<div class="info-item" style="margin-bottom:12px"><div class="label">体质概况</div><div class="value">'+escHtml(r.summary)+'</div></div>';
+  // 饮食建议
+  html += '<div class="info-item" style="margin-bottom:12px"><div class="label">🥗 饮食建议</div><div class="value" style="white-space:pre-line">'+escHtml(r.diet)+'</div></div>';
+  // 运动方案
+  html += '<div class="info-item" style="margin-bottom:12px"><div class="label">🏃 运动方案</div><div class="value" style="white-space:pre-line">'+escHtml(r.exercise)+'</div></div>';
+  // 起居调摄
+  html += '<div class="info-item" style="margin-bottom:12px"><div class="label">🌙 起居调摄</div><div class="value" style="white-space:pre-line">'+escHtml(r.lifestyle)+'</div></div>';
+  // 复诊日程
+  html += '<div class="info-item" style="margin-bottom:12px"><div class="label">📅 复诊日程</div><div class="value" style="white-space:pre-line">'+escHtml(r.schedule)+'</div></div>';
+  // 医生嘱托
+  html += '<div class="info-item" style="margin-bottom:12px"><div class="label">💬 医生嘱托</div><div class="value" style="white-space:pre-line">'+escHtml(r.doctorNote)+'</div></div>';
+  html += '<div class="btn-row no-print"><button class="btn btn-secondary btn-sm" onclick="window.print()">🖨️ 打印导出</button></div>';
+  html += '</div>';
+  area.innerHTML = html;
+  // History
+  if(reported.length>1){
+    histCard.style.display = 'block';
+    let hhtml = '';
+    reported.slice(0,-1).forEach(c=>{
+      hhtml += '<div class="info-item" style="margin-bottom:8px;cursor:pointer" onclick="viewHistoryReport(\''+c.id+'\')">';
+      hhtml += '<div class="label">'+c.id+' · '+formatDate(c.patientReport.pushedAt)+'</div>';
+      hhtml += '<div class="value">'+escHtml(c.patient.name)+' - '+escHtml(c.patientReport.summary.substring(0,40))+'...</div>';
+      hhtml += '</div>';
+    });
+    histList.innerHTML = hhtml;
+  }else{
+    histCard.style.display = 'none';
   }
-  
-  showLoading('正在起卦...');
-  
-  setTimeout(() => {
-    const upperTrigram = n1 % 8 || 8;
-    const lowerTrigram = n2 % 8 || 8;
-    const movingLine = n3 > 6 ? (n3 % 6 || 6) : n3;
-    
-    renderHexagram(upperTrigram, lowerTrigram, movingLine, 'number');
-    hideLoading();
-  }, 600);
 }
 
-function renderHexagram(upper, lower, moving, method) {
-  const trigrams = ['', '☰乾','☱兑','☲离','☳震','☴巽','☵坎','☶艮','☷坤'];
-  const trigramNames = ['', '乾','兑','离','震','巽','坎','艮','坤'];
-  const trigramLines = {
-    1: [1,1,1], 2: [1,1,0], 3: [1,0,1], 4: [1,0,0],
-    5: [0,1,1], 6: [0,1,0], 7: [0,0,1], 8: [0,0,0]
-  };
-  
-  // 64卦名
-  const hexagramNames = {
-    '1-1':'乾为天','1-2':'泽天夬','1-3':'火天大有','1-4':'雷天大壮','1-5':'风天小畜','1-6':'水天需','1-7':'山天大畜','1-8':'地天泰',
-    '2-1':'天泽履','2-2':'兑为泽','2-3':'火泽睽','2-4':'雷泽归妹','2-5':'风泽中孚','2-6':'水泽节','2-7':'山泽损','2-8':'地泽临',
-    '3-1':'天火同人','3-2':'泽火革','3-3':'离为火','3-4':'雷火丰','3-5':'风火家人','3-6':'水火既济','3-7':'山火贲','3-8':'地火明夷',
-    '4-1':'天雷无妄','4-2':'泽雷随','4-3':'火雷噬嗑','4-4':'震为雷','4-5':'风雷益','4-6':'水雷屯','4-7':'山雷颐','4-8':'地雷复',
-    '5-1':'天风姤','5-2':'泽风大过','5-3':'火风鼎','5-4':'雷风恒','5-5':'巽为风','5-6':'水风井','5-7':'山风蛊','5-8':'地风升',
-    '6-1':'天水讼','6-2':'泽水困','6-3':'火水未济','6-4':'雷水解','6-5':'风水涣','6-6':'坎为水','6-7':'山水蒙','6-8':'地水师',
-    '7-1':'天山遁','7-2':'泽山咸','7-3':'火山旅','7-4':'雷山小过','7-5':'风山渐','7-6':'水山蹇','7-7':'艮为山','7-8':'地山谦',
-    '8-1':'天地否','8-2':'泽地萃','8-3':'火地晋','8-4':'雷地豫','8-5':'风地观','8-6':'水地比','8-7':'山地剥','8-8':'坤为地'
-  };
-  
-  const hexKey = `${upper}-${lower}`;
-  const hexName = hexagramNames[hexKey] || '未知卦';
-  
-  // 渲染卦象
-  const upperLines = trigramLines[upper];
-  const lowerLines = trigramLines[lower];
-  const allLines = [...upperLines, ...lowerLines];
-  
-  // 卦象健康解读
-  const kb = window.TCM_DIAGNOSIS_KB;
-  const hexHealth = kb && kb.yijing_tcm_solution ? kb.yijing_tcm_solution.hexagrams : [];
-  const hexInfo = hexHealth.find(h => h.name === hexName) || {};
-  
-  const resultDiv = document.getElementById('yijingResult');
-  resultDiv.style.display = 'block';
-  
-  let html = '';
-  
-  // 卦象显示
-  html += '<div class="result-section"><div class="result-section-title"><span>☰</span> 起卦结果</div>';
-  html += '<div class="hexagram-display">';
-  html += `<div class="hexagram-name">${hexName}</div>`;
+function viewHistoryReport(caseId){
+  const cases = loadCases();
+  const c = cases.find(x=>x.id===caseId);
+  if(!c||!c.patientReport) return;
+  const r = c.patientReport;
+  let html = '<div class="card"><div class="card-title"><span class="icon">📊</span> 历史报告 · '+c.id+'</div>';
+  html += '<div style="font-size:12px;color:var(--paper3);margin-bottom:16px">推送时间：'+formatDate(r.pushedAt)+'</div>';
+  html += '<div class="info-item" style="margin-bottom:12px"><div class="label">体质概况</div><div class="value">'+escHtml(r.summary)+'</div></div>';
+  html += '<div class="info-item" style="margin-bottom:12px"><div class="label">🥗 饮食建议</div><div class="value" style="white-space:pre-line">'+escHtml(r.diet)+'</div></div>';
+  html += '<div class="info-item" style="margin-bottom:12px"><div class="label">🏃 运动方案</div><div class="value" style="white-space:pre-line">'+escHtml(r.exercise)+'</div></div>';
+  html += '<div class="info-item" style="margin-bottom:12px"><div class="label">🌙 起居调摄</div><div class="value" style="white-space:pre-line">'+escHtml(r.lifestyle)+'</div></div>';
+  html += '<div class="info-item" style="margin-bottom:12px"><div class="label">📅 复诊日程</div><div class="value" style="white-space:pre-line">'+escHtml(r.schedule)+'</div></div>';
+  html += '<div class="info-item" style="margin-bottom:12px"><div class="label">💬 医生嘱托</div><div class="value" style="white-space:pre-line">'+escHtml(r.doctorNote)+'</div></div>';
+  html += '<div class="btn-row no-print"><button class="btn btn-secondary btn-sm" onclick="renderPatientReport()">← 返回最新报告</button></div>';
+  html += '</div>';
+  document.getElementById('patientReportArea').innerHTML = html;
+}
+
+/* ===== MASTER PORTAL ===== */
+function renderMasterList(){
+  const cases = loadCases();
+  const pending = cases.filter(c=>c.status==='pending_master');
+  const done = cases.filter(c=>c.masterAnalysis);
+  // Pending
+  let phtml = '';
+  if(pending.length===0){
+    phtml = '<div class="empty-state"><div class="icon">📭</div><div class="text">暂无待分析病例</div></div>';
+  }else{
+    pending.forEach(c=>{
+      phtml += renderCaseCard(c);
+    });
+  }
+  document.getElementById('masterPendingList').innerHTML = phtml;
+  // Done
+  let dhtml = '';
+  if(done.length===0){
+    dhtml = '<div class="empty-state"><div class="icon">📭</div><div class="text">暂无已分析病例</div></div>';
+  }else{
+    done.forEach(c=>{
+      dhtml += renderCaseCard(c);
+    });
+  }
+  document.getElementById('masterDoneList').innerHTML = dhtml;
+}
+
+function openMasterWorkspace(caseId){
+  currentCaseId = caseId;
+  const cases = loadCases();
+  const c = cases.find(x=>x.id===caseId);
+  if(!c) return;
+  document.getElementById('masterListView').style.display = 'none';
+  document.getElementById('masterWorkspaceView').style.display = 'block';
+  // Case info
+  let info = '<div class="info-item" style="margin-bottom:8px"><div class="label">病例号</div><div class="value">'+c.id+'</div></div>';
+  info += '<div class="info-item" style="margin-bottom:8px"><div class="label">姓名</div><div class="value">'+escHtml(c.patient.name)+'</div></div>';
+  info += '<div class="form-row"><div class="info-item"><div class="label">年龄</div><div class="value">'+c.patient.age+'岁</div></div><div class="info-item"><div class="label">性别</div><div class="value">'+c.patient.gender+'</div></div></div>';
+  info += '<div class="info-item" style="margin-bottom:8px"><div class="label">主要症状</div><div class="value" style="white-space:pre-line">'+escHtml(c.patient.symptoms)+'</div></div>';
+  if(c.patient.tizhi) info += '<div class="info-item"><div class="label">已知体质</div><div class="value">'+escHtml(c.patient.tizhi)+'</div></div>';
+  document.getElementById('masterCaseInfo').innerHTML = info;
+  // Init bazi selects
+  initBaziSelects();
+  // Pre-fill if analysis exists
+  if(c.masterAnalysis){
+    const ma = c.masterAnalysis;
+    if(ma.bazi){
+      document.getElementById('bazi-year').value = ma.bazi.year;
+      document.getElementById('bazi-month').value = ma.bazi.month;
+      document.getElementById('bazi-day').value = ma.bazi.day;
+      document.getElementById('bazi-hour').value = ma.bazi.hour;
+    }
+    if(ma.analysisNote) document.getElementById('masterNote').value = ma.analysisNote;
+    if(ma.medicalTranslation) document.getElementById('medicalTranslation').value = ma.medicalTranslation;
+    if(ma.tizhiTrend) document.getElementById('tizhiTrend').value = ma.tizhiTrend;
+    if(ma.organRisk) document.getElementById('organRiskInput').value = ma.organRisk;
+    if(ma.seasonalAdvice) document.getElementById('seasonalAdvice').value = ma.seasonalAdvice;
+    if(ma.wuxing) renderWuxingBars(ma.wuxing,'baziResult');
+    if(ma.hexagram) renderHexagram(ma.hexagram,'hexagramResult');
+  }
+}
+
+function backToMasterList(){
+  document.getElementById('masterWorkspaceView').style.display = 'none';
+  document.getElementById('masterListView').style.display = 'block';
+  currentCaseId = null;
+}
+
+function initBaziSelects(){
+  ['bazi-year','bazi-month','bazi-day','bazi-hour'].forEach(id=>{
+    const sel = document.getElementById(id);
+    if(sel.options.length>0) return;
+    sel.innerHTML = '<option value="">选择</option>';
+    JIAZI.forEach(j=>{
+      sel.innerHTML += '<option value="'+j+'">'+j+'</option>';
+    });
+  });
+}
+
+function analyzeBazi(){
+  const y = document.getElementById('bazi-year').value;
+  const m = document.getElementById('bazi-month').value;
+  const d = document.getElementById('bazi-day').value;
+  const h = document.getElementById('bazi-hour').value;
+  if(!y||!m||!d||!h){showToast('请选择完整四柱');return}
+  // Calculate wuxing
+  const wx = {木:0,火:0,土:0,金:0,水:0};
+  const ganMap = {'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
+  const zhiMap = {'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+  [y,m,d,h].forEach(pillar=>{
+    const gan = pillar[0];
+    const zhi = pillar[1];
+    if(ganMap[gan]) wx[ganMap[gan]]++;
+    if(zhiMap[zhi]) wx[zhiMap[zhi]]++;
+  });
+  renderWuxingBars(wx,'baziResult');
+  // Store for later
+  const resultDiv = document.getElementById('baziResult');
+  resultDiv.dataset.wuxing = JSON.stringify(wx);
+  // Organ risk
+  let riskHtml = '<div style="margin-top:16px"><div style="font-size:13px;color:var(--gold2);letter-spacing:2px;margin-bottom:10px">脏腑风险预测</div>';
+  const maxEl = Object.keys(wx).reduce((a,b)=>wx[a]>wx[b]?a:b);
+  const minEl = Object.keys(wx).reduce((a,b)=>wx[a]<wx[b]?a:b);
+  const organMap = {木:'肝胆',火:'心小肠',土:'脾胃',金:'肺大肠',水:'肾膀胱'};
+  riskHtml += '<div style="font-size:13px;color:var(--paper2);line-height:1.8">';
+  riskHtml += '偏盛：'+organMap[maxEl]+'（'+maxEl+'='+wx[maxEl]+'）需注意泄其偏盛<br>';
+  riskHtml += '偏衰：'+organMap[minEl]+'（'+minEl+'='+wx[minEl]+'）需注意补其不足';
+  riskHtml += '</div></div>';
+  resultDiv.innerHTML += riskHtml;
+  // Dayun hint
+  resultDiv.innerHTML += '<div style="margin-top:12px;font-size:12px;color:var(--paper3)">大运流年提示：当前流年2026丙午年，火气偏旺，'+(maxEl==='火'?'需注意心火过盛':(minEl==='水'?'需温补肾阳':'需平衡水火'))+'</div>';
+}
+
+function renderWuxingBars(wx,targetId){
+  const max = Math.max(...Object.values(wx),1);
+  const colors = {木:'wx-wood',火:'wx-fire',土:'wx-earth',金:'wx-metal',水:'wx-water'};
+  let html = '<div style="font-size:13px;color:var(--gold2);letter-spacing:2px;margin-bottom:8px">五行旺衰分析</div>';
+  html += '<div class="wuxing-bars">';
+  Object.entries(wx).forEach(([el,val])=>{
+    const pct = (val/max)*100;
+    html += '<div class="wuxing-bar '+colors[el]+'"><div class="wx-label">'+el+'</div><div class="wx-track"><div class="wx-fill" style="width:'+pct+'%"></div></div><div class="wx-val">'+val+'</div></div>';
+  });
+  html += '</div>';
+  const target = document.getElementById(targetId);
+  target.innerHTML = html;
+  if(target.dataset.wuxing===undefined) target.dataset.wuxing = JSON.stringify(wx);
+}
+
+/* Hexagram casting */
+function castHexTime(){
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = now.getMonth()+1;
+  const d = now.getDate();
+  const h = now.getHours();
+  const upper = (y+m+d)%8;
+  const lower = (y+m+d+h)%8;
+  const moving = (y+m+d+h)%6;
+  showHexagram(upper,lower,moving);
+}
+function castHexNumber(){
+  const n1 = parseInt(document.getElementById('hex-num1').value)||1;
+  const n2 = parseInt(document.getElementById('hex-num2').value)||1;
+  const n3 = parseInt(document.getElementById('hex-num3').value)||1;
+  const upper = n1%8;
+  const lower = n2%8;
+  const moving = n3%6;
+  showHexagram(upper,lower,moving);
+}
+function castHexSymptom(){
+  const cases = loadCases();
+  const c = cases.find(x=>x.id===currentCaseId);
+  if(!c){showToast('请先选择病例');return}
+  const symptoms = c.patient.symptoms;
+  // Use symptom string length and char codes
+  let sum = 0;
+  for(let i=0;i<symptoms.length;i++){sum += symptoms.charCodeAt(i)}
+  const upper = sum%8;
+  const lower = (sum+7)%8;
+  const moving = (sum+3)%6;
+  showHexagram(upper,lower,moving);
+}
+function showHexagram(upper,lower,moving){
+  const idx = upper*8+lower;
+  const hex = HEXAGRAMS[idx%64];
+  renderHexagram({name:hex.name,lines:hex.lines,moving:moving,organ:hex.organ,meaning:hex.meaning},'hexagramResult');
+}
+function renderHexagram(hex,targetId){
+  const target = document.getElementById(targetId);
+  if(!target) return;
+  let html = '<div class="hexagram-display">';
+  html += '<div class="hexagram-name">'+escHtml(hex.name)+'</div>';
   html += '<div class="hexagram-lines">';
-  // 从上到下渲染
-  for (let i = 5; i >= 0; i--) {
-    const isMoving = (i + 1) === moving;
-    if (allLines[i] === 1) {
-      html += `<div class="hexagram-line${isMoving ? '' : ''}" style="${isMoving ? 'box-shadow:0 0 12px rgba(201,168,76,0.6)' : ''}"></div>`;
-    } else {
-      html += `<div class="hexagram-line broken" style="${isMoving ? 'box-shadow:0 0 12px rgba(201,168,76,0.6)' : ''}"></div>`;
-    }
+  const lines = hex.lines||[1,1,1,1,1,1];
+  for(let i=5;i>=0;i--){
+    const isMoving = (hex.moving!==undefined && (i+1)===hex.moving);
+    const cls = lines[i]===0?'broken':'';
+    html += '<div class="hexagram-line '+cls+(isMoving?' moving':'')+'"></div>';
   }
   html += '</div>';
-  html += `<div style="font-size:13px;color:var(--paper3)">上卦：${trigrams[upper]} | 下卦：${trigrams[lower]} | 动爻：第${moving}爻</div>`;
-  html += `<div style="font-size:12px;color:var(--paper3);margin-top:8px">起卦方式：${method === 'time' ? '时间起卦' : method === 'number' ? '数字起卦' : '症状起卦'}</div>`;
-  html += '</div></div>';
-  
-  // 卦象健康解读
-  html += '<div class="result-section"><div class="result-section-title"><span>🩺</span> 卦象健康解读</div>';
-  if (hexInfo.disease) {
-    html += `<div class="card-body" style="line-height:2">`;
-    html += `<p><strong>对应脏腑：</strong>${hexInfo.organs || '待定'}</p>`;
-    html += `<p><strong>疾病启示：</strong>${hexInfo.disease}</p>`;
-    html += `<p><strong>证候倾向：</strong>${hexInfo.syndrome || '需结合具体症状分析'}</p>`;
-    html += `<p><strong>推荐方剂：</strong>${hexInfo.formula || '辨证论治'}</p>`;
-    html += `<p><strong>推荐穴位：</strong>${hexInfo.acupoints || '待定'}</p>`;
-    html += `</div>`;
-  } else {
-    // 默认解读
-    const trigramHealth = {
-      1: { organs: '头部、大肠', element: '金', advice: '乾卦主天，对应头部和精神状态。注意心脑血管和精神压力' },
-      2: { organs: '口舌、肺', element: '金', advice: '兑卦主口，注意口腔和呼吸系统' },
-      3: { organs: '心脏、眼目', element: '火', advice: '离卦主火，对应心血管和眼睛。注意心火旺盛' },
-      4: { organs: '肝胆、神经', element: '木', advice: '震卦主雷，对应肝胆和神经系统。注意情绪波动' },
-      5: { organs: '肝胆、经络', element: '木', advice: '巽卦主风，对应肝胆和经络。注意风寒湿邪' },
-      6: { organs: '肾、泌尿', element: '水', advice: '坎卦主水，对应肾脏和泌尿系统。注意肾气不足' },
-      7: { organs: '脾胃、关节', element: '土', advice: '艮卦主山，对应脾胃和关节。注意消化系统' },
-      8: { organs: '脾胃、肌肉', element: '土', advice: '坤卦主地，对应脾胃和肌肉。注意湿气困脾' }
-    };
-    const upH = trigramHealth[upper];
-    const loH = trigramHealth[lower];
-    html += `<div class="card-body" style="line-height:2">`;
-    html += `<p><strong>上卦${trigramNames[upper]}解读：</strong>${upH.advice}</p>`;
-    html += `<p><strong>下卦${trigramNames[lower]}解读：</strong>${loH.advice}</p>`;
-    html += `<p><strong>综合判断：</strong>${hexName}卦，需关注${upH.organs}与${loH.organs}的协调。动爻在第${moving}爻，提示变化所在。</p>`;
-    html += `</div>`;
-  }
+  if(hex.organ) html += '<div style="font-size:13px;color:var(--gold2);margin-bottom:6px">对应脏腑：'+escHtml(hex.organ)+'</div>';
+  if(hex.meaning) html += '<div class="hexagram-judgment">'+escHtml(hex.meaning)+'</div>';
+  if(hex.moving!==undefined) html += '<div style="font-size:12px;color:var(--paper3);margin-top:8px">动爻：第'+hex.moving+'爻</div>';
   html += '</div>';
-  
-  // 分阶段方案
-  html += '<div class="result-section"><div class="result-section-title"><span>📋</span> 预防与治疗方案</div>';
-  html += '<div class="solution-timeline">';
-  html += '<div class="solution-step"><div class="solution-step-title">预防阶段（未病先防）</div><div class="solution-step-body">根据卦象${hexName}的提示，重点保养${(hexInfo.organs || '相关脏腑')}。调整起居饮食，顺应四时阴阳，增强正气。定期进行相关脏腑的体检筛查。</div></div>';
-  html += '<div class="solution-step"><div class="solution-step-title">治疗阶段（既病防变）</div><div class="solution-step-body">辨证论治，急则治标缓则治本。${hexInfo.formula ? '推荐参考方剂：' + hexInfo.formula : '需请中医师辨证开方'}。配合针灸调理经络，选取${hexInfo.acupoints || '相关经络穴位'}。</div></div>';
-  html += '<div class="solution-step"><div class="solution-step-title">康复阶段（瘥后防复）</div><div class="solution-step-body">病后调理重在恢复正气，食补优于药补。结合体质和命理五行喜用，制定长期养生方案。避免诱因，防止复发。</div></div>';
-  html += '<div class="solution-step"><div class="solution-step-title">周易指导</div><div class="solution-step-body">卦象${hexName}动爻在第${moving}爻，提示疾病转归的关键变化点。顺势而为，及时调理，可转危为安。</div></div>';
-  html += '</div></div>';
-  
-  resultDiv.innerHTML = html;
-  resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  target.innerHTML = html;
+  target.dataset.hexagram = JSON.stringify(hex);
 }
 
-// ═══ 体质分析 ═══
-function analyzeTizhi() {
-  const tizhi = document.getElementById('tizhiType').value;
-  const rizhu = document.getElementById('rizhu').value;
-  const wang = document.getElementById('wuxingWang').value;
-  const ruo = document.getElementById('wuxingRuo').value;
-  
-  if (!tizhi || !rizhu) {
-    showToast('请选择体质类型和日主天干');
+function submitMasterAnalysis(){
+  const cases = loadCases();
+  const c = cases.find(x=>x.id===currentCaseId);
+  if(!c){showToast('病例未找到');return}
+  const note = document.getElementById('masterNote').value.trim();
+  const translation = document.getElementById('medicalTranslation').value.trim();
+  const tizhi = document.getElementById('tizhiTrend').value.trim();
+  const organRisk = document.getElementById('organRiskInput').value.trim();
+  const seasonal = document.getElementById('seasonalAdvice').value.trim();
+  if(!note){showToast('请填写分析摘要');return}
+  if(!translation){showToast('请填写医学化翻译');return}
+  // Gather bazi & hexagram
+  const baziResult = document.getElementById('baziResult');
+  const hexResult = document.getElementById('hexagramResult');
+  const wuxing = baziResult.dataset.wuxing ? JSON.parse(baziResult.dataset.wuxing) : {木:0,火:0,土:0,金:0,水:0};
+  const hexagram = hexResult.dataset.hexagram ? JSON.parse(hexResult.dataset.hexagram) : null;
+  const y = document.getElementById('bazi-year').value;
+  const m = document.getElementById('bazi-month').value;
+  const d = document.getElementById('bazi-day').value;
+  const h = document.getElementById('bazi-hour').value;
+  const oldVersion = c.masterAnalysis ? c.masterAnalysis.version : 0;
+  c.masterAnalysis = {
+    bazi:{year:y||'',month:m||'',day:d||'',hour:h||''},
+    wuxing:wuxing,
+    hexagram:hexagram,
+    analysisNote:note,
+    medicalTranslation:translation,
+    tizhiTrend:tizhi,
+    organRisk:organRisk,
+    seasonalAdvice:seasonal,
+    submittedAt:new Date().toISOString(),
+    version:oldVersion+1
+  };
+  // Update status
+  if(c.status==='pending_master') c.status='pending_doctor';
+  else if(c.status==='completed'||c.status==='pushed') c.status=c.status; // keep
+  else c.status='collaborating';
+  saveCases(cases);
+  addVersion(c.id,'大师提交分析报告 v'+(oldVersion+1));
+  showToast('分析报告已提交给医生');
+  backToMasterList();
+  renderMasterList();
+}
+
+/* ===== DOCTOR PORTAL ===== */
+function renderDoctorList(){
+  const cases = loadCases();
+  const pending = cases.filter(c=>c.masterAnalysis && !c.doctorDiagnosis);
+  const done = cases.filter(c=>c.doctorDiagnosis);
+  let phtml = '';
+  if(pending.length===0){
+    phtml = '<div class="empty-state"><div class="icon">📭</div><div class="text">暂无待诊病例</div></div>';
+  }else{
+    pending.forEach(c=>{phtml += renderCaseCard(c)});
+  }
+  document.getElementById('doctorPendingList').innerHTML = phtml;
+  let dhtml = '';
+  if(done.length===0){
+    dhtml = '<div class="empty-state"><div class="icon">📭</div><div class="text">暂无已诊病例</div></div>';
+  }else{
+    done.forEach(c=>{dhtml += renderCaseCard(c)});
+  }
+  document.getElementById('doctorDoneList').innerHTML = dhtml;
+}
+
+function openDoctorWorkspace(caseId){
+  currentCaseId = caseId;
+  const cases = loadCases();
+  const c = cases.find(x=>x.id===caseId);
+  if(!c) return;
+  document.getElementById('doctorListView').style.display = 'none';
+  document.getElementById('doctorWorkspaceView').style.display = 'block';
+  // Case info
+  let info = '<div class="info-item" style="margin-bottom:8px"><div class="label">病例号</div><div class="value">'+c.id+'</div></div>';
+  info += '<div class="info-item" style="margin-bottom:8px"><div class="label">姓名</div><div class="value">'+escHtml(c.patient.name)+'</div></div>';
+  info += '<div class="form-row"><div class="info-item"><div class="label">年龄</div><div class="value">'+c.patient.age+'岁</div></div><div class="info-item"><div class="label">性别</div><div class="value">'+c.patient.gender+'</div></div></div>';
+  info += '<div class="info-item" style="margin-bottom:8px"><div class="label">主要症状</div><div class="value" style="white-space:pre-line">'+escHtml(c.patient.symptoms)+'</div></div>';
+  document.getElementById('doctorCaseInfo').innerHTML = info;
+  // Master report (translated)
+  let mrHtml = '';
+  if(c.masterAnalysis){
+    const ma = c.masterAnalysis;
+    mrHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">体质趋势</div><div class="value">'+escHtml(ma.tizhiTrend||'-')+'</div></div>';
+    mrHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">医学化建议</div><div class="value" style="white-space:pre-line">'+escHtml(ma.medicalTranslation||ma.analysisNote||'-')+'</div></div>';
+    mrHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">脏腑风险</div><div class="value">'+escHtml(ma.organRisk||'-')+'</div></div>';
+    mrHtml += '<div class="info-item"><div class="label">季节调理</div><div class="value">'+escHtml(ma.seasonalAdvice||'-')+'</div></div>';
+  }else{
+    mrHtml = '<div class="empty-state" style="padding:20px"><div class="text">暂无大师分析</div></div>';
+  }
+  document.getElementById('doctorMasterReport').innerHTML = mrHtml;
+  // Pre-fill if exists
+  if(c.doctorDiagnosis){
+    const d = c.doctorDiagnosis;
+    document.getElementById('doc-syndrome').value = d.syndrome||'';
+    document.getElementById('doc-treatment').value = d.treatment||'';
+    document.getElementById('doc-formula').value = d.formula||'';
+    document.getElementById('doc-acupoints').value = (d.acupoints||[]).join(',');
+    document.getElementById('doc-diet').value = d.dietPlan||'';
+    document.getElementById('doc-exercise').value = d.exercisePlan||'';
+    document.getElementById('doc-lifestyle').value = d.lifestyle||'';
+    document.getElementById('doc-followup-date').value = d.followUpDate||'';
+    document.getElementById('doc-followup-note').value = d.followUpNote||'';
+    document.getElementById('doc-note').value = d.doctorNote||'';
+  }
+}
+
+function backToDoctorList(){
+  document.getElementById('doctorWorkspaceView').style.display = 'none';
+  document.getElementById('doctorListView').style.display = 'block';
+  currentCaseId = null;
+}
+
+function pushToPatient(){
+  const cases = loadCases();
+  const c = cases.find(x=>x.id===currentCaseId);
+  if(!c){showToast('病例未找到');return}
+  const syndrome = document.getElementById('doc-syndrome').value.trim();
+  const treatment = document.getElementById('doc-treatment').value.trim();
+  const formula = document.getElementById('doc-formula').value.trim();
+  const acupoints = document.getElementById('doc-acupoints').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const diet = document.getElementById('doc-diet').value.trim();
+  const exercise = document.getElementById('doc-exercise').value.trim();
+  const lifestyle = document.getElementById('doc-lifestyle').value.trim();
+  const followUpDate = document.getElementById('doc-followup-date').value;
+  const followUpNote = document.getElementById('doc-followup-note').value.trim();
+  const doctorNote = document.getElementById('doc-note').value.trim();
+  if(!syndrome){showToast('请填写证候诊断');return}
+  if(!treatment){showToast('请填写治则治法');return}
+  const oldVersion = c.doctorDiagnosis ? c.doctorDiagnosis.version : 0;
+  c.doctorDiagnosis = {
+    syndrome:syndrome,
+    treatment:treatment,
+    formula:formula,
+    acupoints:acupoints,
+    dietPlan:diet,
+    exercisePlan:exercise,
+    lifestyle:lifestyle,
+    followUpDate:followUpDate,
+    followUpNote:followUpNote,
+    doctorNote:doctorNote,
+    completedAt:new Date().toISOString(),
+    version:oldVersion+1
+  };
+  // Generate patient report (filter terms)
+  const ma = c.masterAnalysis||{};
+  const summaryParts = [];
+  if(ma.tizhiTrend) summaryParts.push('您的体质属于'+filterTerms(ma.tizhiTrend));
+  if(syndrome) summaryParts.push('证候为'+syndrome);
+  if(treatment) summaryParts.push('治法：'+treatment);
+  c.patientReport = {
+    summary:summaryParts.join('，'),
+    diet:diet||'遵医嘱饮食',
+    exercise:exercise||'适度运动',
+    lifestyle:lifestyle||'规律作息',
+    schedule:'下次复诊：'+(followUpDate?formatDate(followUpDate):'待定')+(followUpNote?'\n注意事项：'+followUpNote:''),
+    doctorNote:doctorNote||'请遵医嘱调理',
+    pushedAt:new Date().toISOString()
+  };
+  c.status='pushed';
+  saveCases(cases);
+  addVersion(c.id,'医生完成诊疗方案 v'+(oldVersion+1)+'，报告已推送');
+  showToast('报告已推送给病患');
+  backToDoctorList();
+  renderDoctorList();
+}
+
+/* ===== COLLABORATION SPACE ===== */
+function renderCollabCases(){
+  const cases = loadCases();
+  const sel = document.getElementById('collabCaseSelect');
+  let opts = '<option value="">选择病例...</option>';
+  cases.forEach(c=>{
+    opts += '<option value="'+c.id+'">'+c.id+' · '+escHtml(c.patient.name)+' · '+STATUS_LABELS[c.status]+'</option>';
+  });
+  sel.innerHTML = opts;
+  if(currentCollabCaseId) sel.value = currentCollabCaseId;
+}
+
+function loadCollabCase(){
+  const sel = document.getElementById('collabCaseSelect');
+  const caseId = sel.value;
+  if(!caseId){
+    document.getElementById('collabContent').style.display = 'none';
     return;
   }
-  
-  showLoading('正在分析体质与命理...');
-  
-  setTimeout(() => {
-    const kb = window.TCM_DIAGNOSIS_KB;
-    
-    const tizhiMap = {
-      pinghe: { name: '平和质', desc: '阴阳气血调和，体态适中', element: '平衡' },
-      qixu: { name: '气虚质', desc: '元气不足，气短懒言', element: '土/金' },
-      yangxu: { name: '阳虚质', desc: '阳气不足，畏寒怕冷', element: '火/土' },
-      yinxu: { name: '阴虚质', desc: '阴液亏少，口干潮热', element: '水/木' },
-      tanshi: { name: '痰湿质', desc: '痰湿凝聚，体形肥胖', element: '土/水' },
-      shire: { name: '湿热质', desc: '湿热内蕴，面垢油光', element: '土/火' },
-      xueyu: { name: '血瘀质', desc: '血行不畅，肤色晦暗', element: '火/木' },
-      qiyu: { name: '气郁质', desc: '气机郁滞，情绪低落', element: '木' },
-      tebing: { name: '特禀质', desc: '先天失常，过敏体质', element: '不定' }
-    };
-    
-    const rizhuMap = {
-      jia: { name: '甲木', organ: '胆', element: '木' },
-      yi: { name: '乙木', organ: '肝', element: '木' },
-      bing: { name: '丙火', organ: '小肠', element: '火' },
-      ding: { name: '丁火', organ: '心', element: '火' },
-      wu: { name: '戊土', organ: '胃', element: '土' },
-      ji: { name: '己土', organ: '脾', element: '土' },
-      geng: { name: '庚金', organ: '大肠', element: '金' },
-      xin: { name: '辛金', organ: '肺', element: '金' },
-      ren: { name: '壬水', organ: '膀胱', element: '水' },
-      gui: { name: '癸水', organ: '肾', element: '水' }
-    };
-    
-    const wuxingMap = { wood: '木', fire: '火', earth: '土', metal: '金', water: '水' };
-    
-    const tz = tizhiMap[tizhi];
-    const rz = rizhuMap[rizhu];
-    
-    hideLoading();
-    
-    const resultDiv = document.getElementById('tizhiResult');
-    resultDiv.style.display = 'block';
-    
-    let html = '';
-    
-    // 双重诊断
-    html += '<div class="result-section"><div class="result-section-title"><span>🧬</span> 体质×命理双重诊断</div>';
-    html += `<div class="syndrome-card"><div class="syndrome-name">${tz.name} × ${rz.name}</div>`;
-    html += `<div class="syndrome-detail">`;
-    html += `<div><span class="label">体质特征：</span>${tz.desc}</div>`;
-    html += `<div><span class="label">日主脏腑：</span>${rz.organ}（${rz.element}）</div>`;
-    html += `<div><span class="label">五行偏旺：</span>${wang ? wuxingMap[wang] : '未指定'}</div>`;
-    html += `<div><span class="label">五行偏弱：</span>${ruo ? wuxingMap[ruo] : '未指定'}</div>`;
-    html += `</div></div>`;
-    
-    // 联合分析
-    html += `<div class="card-body" style="margin-top:12px;line-height:2">`;
-    html += `<p><strong>核心判断：</strong>缘主体质为${tz.name}，日主${rz.name}主${rz.organ}。`;
-    if (tz.element.includes(rz.element)) {
-      html += `体质与日主五行一致，${rz.organ}系统是健康关键。`;
-    } else {
-      html += `体质与日主五行不完全一致，需兼顾${tz.element}与${rz.element}两方面调理。`;
+  currentCollabCaseId = caseId;
+  const cases = loadCases();
+  const c = cases.find(x=>x.id===caseId);
+  if(!c) return;
+  document.getElementById('collabContent').style.display = 'block';
+  // Status tracker
+  let statusHtml = '';
+  STATUS_FLOW.forEach((s,i)=>{
+    const currentIdx = STATUS_FLOW.indexOf(c.status);
+    const cls = i<=currentIdx?'status-'+s:'';
+    const style = i<=currentIdx?'':'opacity:0.4';
+    statusHtml += '<span class="status-badge '+cls+'" style="'+style+'">'+STATUS_LABELS[s]+'</span>';
+    if(i<STATUS_FLOW.length-1) statusHtml += '<span style="color:var(--paper3)">→</span>';
+  });
+  document.getElementById('collabStatusTracker').innerHTML = statusHtml;
+  // Master area
+  let maHtml = '';
+  if(c.masterAnalysis){
+    const ma = c.masterAnalysis;
+    maHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">四柱</div><div class="value">'+ma.bazi.year+' '+ma.bazi.month+' '+ma.bazi.day+' '+ma.bazi.hour+'</div></div>';
+    if(ma.wuxing){
+      maHtml += '<div style="margin:8px 0">';
+      Object.entries(ma.wuxing).forEach(([el,val])=>{
+        maHtml += '<span class="tag tag-'+el+'" style="margin:2px">'+el+': '+val+'</span>';
+      });
+      maHtml += '</div>';
     }
-    if (wang && ruo) {
-      html += `五行${wuxingMap[wang]}旺${wuxingMap[ruo]}弱，调理以泄${wuxingMap[wang]}补${wuxingMap[ruo]}为总则。</p>`;
+    if(ma.hexagram){
+      maHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">卦象</div><div class="value">'+escHtml(ma.hexagram.name)+'</div></div>';
     }
-    html += `</div></div>`;
-    
-    // 食疗方案
-    html += '<div class="result-section"><div class="result-section-title"><span>🍵</span> 食疗方案</div>';
-    const foodAdvice = {
-      wood: '绿色蔬菜、酸味水果（柠檬、乌梅）、枸杞、菊花茶',
-      fire: '红枣、莲子、百合、苦瓜、绿豆汤',
-      earth: '山药、薏米、小米粥、南瓜、红薯',
-      metal: '银耳、雪梨、白萝卜、百合、杏仁',
-      water: '黑芝麻、核桃、黑豆、海带、紫菜'
-    };
-    html += `<div class="card-body" style="line-height:2">`;
-    html += `<p><strong>补弱（${ruo ? wuxingMap[ruo] : '弱五行'}）：</strong>${ruo ? foodAdvice[ruo] : '根据五行偏弱选择'}</p>`;
-    html += `<p><strong>泄旺（${wang ? wuxingMap[wang] : '旺五行'}）：</strong>${wang ? foodAdvice[wang] + '（适量）' : '根据五行偏旺选择'}</p>`;
-    html += `<p><strong>日主${rz.name}专调：</strong>${rz.element === '木' ? '疏肝理气：玫瑰花茶、佛手柑' : rz.element === '火' ? '养心安神：莲子心茶、酸枣仁' : rz.element === '土' ? '健脾益气：山药粥、大枣' : rz.element === '金' ? '润肺养阴：秋梨膏、麦冬' : '补肾益精：枸杞酒、黑芝麻丸'}</p>`;
-    html += `</div></div>`;
-    
-    // 运动方案
-    html += '<div class="result-section"><div class="result-section-title"><span>🏃</span> 运动方案</div>';
-    html += `<div class="card-body" style="line-height:2">`;
-    html += `<p><strong>推荐运动：</strong>${tz.name === '气虚质' ? '太极拳、八段锦（轻柔为主）' : tz.name === '阳虚质' ? '慢跑、站桩（助阳气升发）' : tz.name === '阴虚质' ? '瑜伽、散步（避免大汗）' : tz.name === '痰湿质' ? '游泳、有氧运动（化痰祛湿）' : tz.name === '气郁质' ? '户外运动、登山（疏肝解郁）' : '适量有氧运动，量力而行'}</p>`;
-    html += `<p><strong>最佳时间：</strong>${rz.element === '木' ? '清晨（寅卯时，肝胆当令）' : rz.element === '火' ? '上午（巳午时，心经当令）' : rz.element === '土' ? '饭后1小时（辰巳时，脾胃当令）' : rz.element === '金' ? '清晨（寅卯时，肺经当令）' : '傍晚（酉时，肾经当令）'}</p>`;
-    html += `</div></div>`;
-    
-    // 季节调理
-    html += '<div class="result-section"><div class="result-section-title"><span>🌸</span> 四季调理</div>';
-    html += '<div class="solution-timeline">';
-    html += '<div class="solution-step"><div class="solution-step-title">春季（木旺）</div><div class="solution-step-body">养肝为主，早睡早起，保持心情舒畅。' + (rz.element === '木' ? '日主属木，春季需防肝气过旺' : rz.element === '金' ? '金弱者春季需注意肺部' : '适量食用绿色食物') + '</div></div>';
-    html += '<div class="solution-step"><div class="solution-step-title">夏季（火旺）</div><div class="solution-step-body">养心为主，午间小憩，避免暴晒。' + (rz.element === '火' ? '日主属火，夏季需防心火过盛' : rz.element === '水' ? '水弱者夏季需注意肾气' : '适量食用苦味清心') + '</div></div>';
-    html += '<div class="solution-step"><div class="solution-step-title">秋季（金旺）</div><div class="solution-step-body">养肺为主，早睡早起，润燥养阴。' + (rz.element === '金' ? '日主属金，秋季需防肺气过燥' : rz.element === '木' ? '木弱者秋季需注意肝血' : '适量食用白色润肺食物') + '</div></div>';
-    html += '<div class="solution-step"><div class="solution-step-title">冬季（水旺）</div><div class="solution-step-body">养肾为主，早睡晚起，保暖藏精。' + (rz.element === '水' ? '日主属水，冬季需防水寒过盛' : rz.element === '火' ? '火弱者冬季需注意心阳' : '适量食用黑色补肾食物') + '</div></div>';
-    html += '</div></div>';
-    
-    resultDiv.innerHTML = html;
-    resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 800);
-}
-
-// ═══ 工具函数 ═══
-function showLoading(text) {
-  document.getElementById('loadingText').textContent = text || '处理中...';
-  document.getElementById('loadingOverlay').classList.add('active');
-}
-
-function hideLoading() {
-  document.getElementById('loadingOverlay').classList.remove('active');
-}
-
-function showToast(msg) {
-  const toast = document.getElementById('toast');
-  toast.textContent = msg;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 3000);
-}
-
-// ═══ 导出/打印功能 ═══
-function exportResult(type) {
-  let resultDiv;
-  let title;
-  switch(type) {
-    case 'symptom': resultDiv = document.getElementById('symptomResult'); title = '症状解读报告'; break;
-    case 'mingli': resultDiv = document.getElementById('mingliResult'); title = '命理推病报告'; break;
-    case 'yijing': resultDiv = document.getElementById('yijingResult'); title = '周易论治报告'; break;
-    case 'tizhi': resultDiv = document.getElementById('tizhiResult'); title = '体质分析报告'; break;
-    default: return;
+    maHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">分析笔记</div><div class="value" style="white-space:pre-line">'+escHtml(ma.analysisNote)+'</div></div>';
+    maHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">医学化翻译</div><div class="value" style="white-space:pre-line">'+escHtml(ma.medicalTranslation)+'</div></div>';
+    maHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">体质趋势</div><div class="value">'+escHtml(ma.tizhiTrend||'-')+'</div></div>';
+    maHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">脏腑风险</div><div class="value">'+escHtml(ma.organRisk||'-')+'</div></div>';
+    maHtml += '<div class="info-item"><div class="label">提交时间 / 版本</div><div class="value">'+formatDate(ma.submittedAt)+' · v'+ma.version+'</div></div>';
+  }else{
+    maHtml = '<div class="empty-state" style="padding:20px"><div class="text">大师尚未提交分析</div></div>';
   }
-  if(!resultDiv || resultDiv.style.display === 'none') {
-    showToast('请先生成分析结果');
-    return;
+  document.getElementById('collabMasterArea').innerHTML = maHtml;
+  // Doctor area
+  let daHtml = '';
+  if(c.doctorDiagnosis){
+    const d = c.doctorDiagnosis;
+    daHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">证候诊断</div><div class="value">'+escHtml(d.syndrome)+'</div></div>';
+    daHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">治则治法</div><div class="value">'+escHtml(d.treatment)+'</div></div>';
+    daHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">推荐方剂</div><div class="value" style="white-space:pre-line">'+escHtml(d.formula)+'</div></div>';
+    if(d.acupoints&&d.acupoints.length){
+      daHtml += '<div style="margin:8px 0">';
+      d.acupoints.forEach(a=>{daHtml += '<span class="tag">'+escHtml(a)+'</span>'});
+      daHtml += '</div>';
+    }
+    daHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">食疗方案</div><div class="value" style="white-space:pre-line">'+escHtml(d.dietPlan)+'</div></div>';
+    daHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">运动方案</div><div class="value">'+escHtml(d.exercisePlan)+'</div></div>';
+    daHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">起居调摄</div><div class="value" style="white-space:pre-line">'+escHtml(d.lifestyle)+'</div></div>';
+    daHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">复诊安排</div><div class="value">'+(d.followUpDate?formatDate(d.followUpDate):'待定')+' - '+escHtml(d.followUpNote||'')+'</div></div>';
+    daHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">医生嘱托</div><div class="value" style="white-space:pre-line">'+escHtml(d.doctorNote)+'</div></div>';
+    daHtml += '<div class="info-item"><div class="label">完成时间 / 版本</div><div class="value">'+formatDate(d.completedAt)+' · v'+d.version+'</div></div>';
+  }else{
+    daHtml = '<div class="empty-state" style="padding:20px"><div class="text">医生尚未完成诊疗</div></div>';
   }
-  
-  let printWin = window.open('', '_blank');
-  printWin.document.write(`
-    <!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title>
-    <style>
-    body{font-family:'Noto Serif SC',serif;max-width:800px;margin:0 auto;padding:40px;color:#333;}
-    h1{text-align:center;color:#c9a84c;border-bottom:2px solid #c9a84c;padding-bottom:12px;margin-bottom:24px;}
-    .result-section{margin-bottom:24px;page-break-inside:avoid;}
-    .result-section-title{font-size:16px;color:#c9a84c;border-bottom:1px solid #ddd;padding-bottom:8px;margin-bottom:12px;}
-    .syndrome-card{background:#f9f6f0;border:1px solid #e0d6c0;border-radius:8px;padding:16px;margin-bottom:12px;}
-    .syndrome-name{font-size:18px;color:#a08030;margin-bottom:8px;}
-    .syndrome-detail{font-size:13px;color:#555;line-height:1.8;}
-    .doctor-card{display:flex;gap:12px;border:1px solid #e0d6c0;border-radius:8px;padding:12px;margin-bottom:8px;}
-    .solution-step{margin-bottom:16px;padding-left:20px;border-left:3px solid #c9a84c;}
-    .solution-step-title{font-weight:bold;color:#a08030;margin-bottom:4px;}
-    .solution-step-body{font-size:13px;color:#555;line-height:1.8;}
-    .risk-card{border:1px solid #e0d6c0;border-radius:8px;padding:12px;margin-bottom:8px;}
-    .footer{text-align:center;margin-top:32px;padding-top:16px;border-top:1px solid #ddd;font-size:12px;color:#999;}
-    @media print{body{padding:20px;}}
-    </style></head><body>
-    <h1>🌿 ${title}</h1>
-    <p style="text-align:center;color:#888;font-size:13px;margin-bottom:24px">生成时间: ${new Date().toLocaleString('zh-CN')}</p>
-    ${resultDiv.innerHTML}
-    <div class="footer">⚠️ 本报告由易道智鉴·命理中医诊疗系统生成，仅供养生保健参考。如有特定疾病或服药中，请咨询中医师。</div>
-    </body></html>
-  `);
-  printWin.document.close();
-  setTimeout(() => { printWin.print(); }, 500);
+  document.getElementById('collabDoctorArea').innerHTML = daHtml;
+  // Discussion
+  renderDiscussion(c);
+  // Version history
+  renderVersionHistory(c.id);
 }
 
-console.log('[tcm-clinic.html] 已加载');
+function renderDiscussion(c){
+  let html = '';
+  if(!c.discussion || c.discussion.length===0){
+    html = '<div class="empty-state" style="padding:20px"><div class="text">暂无讨论消息</div></div>';
+  }else{
+    c.discussion.forEach(msg=>{
+      const roleLabel = msg.role==='master'?'大师':'医生';
+      html += '<div class="discussion-msg role-'+msg.role+'">';
+      html += '<div class="msg-header"><span class="msg-role-badge '+msg.role+'">'+roleLabel+'</span><span>'+formatDate(msg.time)+'</span></div>';
+      html += '<div class="msg-body">'+escHtml(msg.text)+'</div>';
+      html += '</div>';
+    });
+  }
+  const area = document.getElementById('discussionArea');
+  area.innerHTML = html;
+  area.scrollTop = area.scrollHeight;
+}
+
+function sendDiscussion(){
+  const role = document.getElementById('discussRole').value;
+  const text = document.getElementById('discussText').value.trim();
+  if(!text){showToast('请输入消息内容');return}
+  if(!currentCollabCaseId){showToast('请先选择病例');return}
+  const cases = loadCases();
+  const c = cases.find(x=>x.id===currentCollabCaseId);
+  if(!c) return;
+  if(!c.discussion) c.discussion = [];
+  c.discussion.push({role:role,text:text,time:new Date().toISOString()});
+  saveCases(cases);
+  document.getElementById('discussText').value = '';
+  renderDiscussion(c);
+  // Update status to collaborating if not already further
+  if(c.status==='pending_doctor') {c.status='collaborating';saveCases(cases);loadCollabCase()}
+}
+
+function renderVersionHistory(caseId){
+  const versions = loadVersions();
+  const list = versions[caseId]||[];
+  let html = '';
+  if(list.length===0){
+    html = '<div class="empty-state" style="padding:20px"><div class="text">暂无版本记录</div></div>';
+  }else{
+    list.slice().reverse().forEach(v=>{
+      html += '<div class="version-item"><span class="v-time">'+formatDate(v.time)+'</span><span class="v-summary">'+escHtml(v.summary)+'</span></div>';
+    });
+  }
+  document.getElementById('versionHistory').innerHTML = html;
+}
+
+/* ===== HELPERS ===== */
+function renderCaseCard(c){
+  let html = '<div class="case-item" onclick="';
+  if(currentRole==='master') html += 'openMasterWorkspace(\''+c.id+'\')';
+  else if(currentRole==='doctor') html += 'openDoctorWorkspace(\''+c.id+'\')';
+  else html += 'openMasterWorkspace(\''+c.id+'\')';
+  html += '">';
+  html += '<div class="case-id">'+c.id+' · '+formatDate(c.createdAt)+'</div>';
+  html += '<div class="case-name">'+escHtml(c.patient.name)+' · '+c.patient.age+'岁 · '+c.patient.gender+'</div>';
+  html += '<div class="case-symptom">'+escHtml(c.patient.symptoms)+'</div>';
+  html += '<div class="case-meta">';
+  html += '<span class="status-badge status-'+c.status+'">'+STATUS_LABELS[c.status]+'</span>';
+  if(c.masterAnalysis) html += '<span style="color:var(--gold2)">☯ 已分析</span>';
+  if(c.doctorDiagnosis) html += '<span style="color:var(--cyan2)">🩺 已诊疗</span>';
+  html += '</div>';
+  html += '</div>';
+  return html;
+}
+
+function formatDate(iso){
+  if(!iso) return '-';
+  try{
+    const d = new Date(iso);
+    const Y = d.getFullYear();
+    const M = String(d.getMonth()+1).padStart(2,'0');
+    const D = String(d.getDate()).padStart(2,'0');
+    const h = String(d.getHours()).padStart(2,'0');
+    const m = String(d.getMinutes()).padStart(2,'0');
+    return Y+'-'+M+'-'+D+' '+h+':'+m;
+  }catch(e){return iso}
+}
+
+function escHtml(s){
+  if(s==null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+/* ===== QR PLACEHOLDER ===== */
+function drawQR(){
+  const container = document.getElementById('qrPlaceholder');
+  if(!container) return;
+  // Fixed pattern (no Math.random)
+  const pattern = [
+    1,1,1,0,1,1,1,0,
+    1,0,1,1,0,1,0,1,
+    1,1,0,1,1,0,1,1,
+    0,1,1,0,0,1,1,0,
+    1,0,1,1,1,0,1,1,
+    1,1,0,0,1,1,0,1,
+    1,0,1,1,0,1,1,0,
+    0,1,1,0,1,0,1,1
+  ];
+  container.innerHTML = '';
+  pattern.forEach(v=>{
+    const cell = document.createElement('div');
+    cell.className = 'qr-cell'+(v?' filled':'');
+    container.appendChild(cell);
+  });
+}
+
+/* ===== INIT ===== */
+initSampleData();
+drawQR();
+renderPatientReport();
+
+// KB integration - use symptom data if available
+function getKBSymptoms(){
+  if(window.TCM_DIAGNOSIS_KB && TCM_DIAGNOSIS_KB.symptom_engine){
+    return TCM_DIAGNOSIS_KB.symptom_engine.symptoms || [];
+  }
+  return [];
+}
 </script>
-</div>
 </body>
 </html>
