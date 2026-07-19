@@ -357,7 +357,7 @@ app.post('/api/user/profile', auth, (req, res) => {
   if (updates.length === 0) return res.json({ error: '无更新内容' });
   
   params.push(req.userId);
-  db.prepare('UPDATE users SET ' + updates.join(', ') + ', updated_at = datetime("now","localtime") WHERE id = ?').run(...params);
+  db.prepare('UPDATE users SET ' + updates.join(', ') + ', updated_at = ' + "datetime('now','localtime')" + ' WHERE id = ?').run(...params);
   
   res.json({ ok: true, message: '更新成功' });
 });
@@ -591,7 +591,7 @@ app.get('/api/admin/config', adminAuth, (req, res) => {
 app.post('/api/admin/config', adminAuth, (req, res) => {
   const key = sec.sanitizeInput(req.body.key);
   const value = sec.sanitizeInput(req.body.value);
-  db.prepare('INSERT OR REPLACE INTO system_config (key, value, updated_at) VALUES (?, ?, datetime("now","localtime"))').run(key, value);
+  db.prepare('INSERT OR REPLACE INTO system_config (key, value, updated_at) VALUES (?, ?, ' + "datetime('now','localtime')" + ')').run(key, value);
   res.json({ ok: true });
 });
 
@@ -742,7 +742,7 @@ app.post('/api/clinic/submit-analysis', requirePermission('clinic:submit_analysi
          medicalCase.symptoms, medicalCase.constitution, sec.encrypt(analysis), filteredSummary, filteredSummary);
   
   // 更新病例状态
-  db.prepare('UPDATE medical_cases SET status = ?, assigned_master_id = ?, master_case_id = ?, updated_at = datetime("now","localtime") WHERE id = ?')
+  db.prepare('UPDATE medical_cases SET status = ?, assigned_master_id = ?, master_case_id = ?, updated_at = ' + "datetime('now','localtime')" + ' WHERE id = ?')
     .run('pending_doctor', req.userId, result.lastInsertRowid, caseId);
   
   // 记录版本
@@ -785,7 +785,7 @@ app.post('/api/clinic/submit-diagnosis', requirePermission('clinic:submit_diagno
   if (masterCase.patient_id) {
     const medicalCase = db.prepare('SELECT id FROM medical_cases WHERE master_case_id = ?').get(caseId);
     if (medicalCase) {
-      db.prepare('UPDATE medical_cases SET status = ?, assigned_doctor_id = ?, updated_at = datetime("now","localtime") WHERE id = ?')
+      db.prepare('UPDATE medical_cases SET status = ?, assigned_doctor_id = ?, updated_at = ' + "datetime('now','localtime')" + ' WHERE id = ?')
         .run('completed', req.userId, medicalCase.id);
     }
   }
@@ -828,7 +828,7 @@ app.get('/api/clinic/my-reports', requirePermission('clinic:view_own_report'), (
   
   // 标记已读
   if (reports.length > 0) {
-    db.prepare('UPDATE tcm_reports SET read_at = datetime("now","localtime") WHERE patient_id = ? AND read_at IS NULL').run(req.userId);
+    db.prepare('UPDATE tcm_reports SET read_at = ' + "datetime('now','localtime')" + ' WHERE patient_id = ? AND read_at IS NULL').run(req.userId);
   }
   
   res.json(reports);
@@ -896,7 +896,19 @@ app.get('/api/clinic/case/:id', requirePermission('clinic:view_assigned_case'), 
   res.json(response);
 });
 
-// KB路由和分级函数已移至上方（使用kb-config.js配置）
+// KB分级访问辅助函数
+function canAccessKB(roles, level) {
+  if (roles.includes('super_admin')) return true;
+  switch (level) {
+    case 'public': return true;
+    case 'registered': return roles.some(r => ['free','mingdao','advanced','vip','admin_a','admin_b','master','doctor'].includes(r));
+    case 'member': return roles.some(r => ['mingdao','advanced','vip','admin_a','admin_b','master','doctor'].includes(r));
+    case 'premium': return roles.some(r => ['advanced','vip','admin_a','admin_b','master','doctor'].includes(r));
+    case 'professional': return roles.some(r => ['master','admin_b','super_admin'].includes(r));
+    case 'admin': return roles.some(r => ['admin_a','admin_b','super_admin'].includes(r));
+    default: return false;
+  }
+}
 
 // ============================
 // KB分级访问API
