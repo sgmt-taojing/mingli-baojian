@@ -1,7 +1,5 @@
-// 倪海厦知识库全量移植 — Batch 1: 截图证据类
-// 来源: https://github.com/JuneYaooo/nihaisha-nishi-tcm
-// 本文件包含5个模块的全量内容
-// 生成时间: 2026-07-18T09:11:42.052Z
+
+
 window.NIHAISHA_BATCH1 = {
   'notes-bencao-scan-essence': {
     title: "神农本草笔记 扫描版要点补充",

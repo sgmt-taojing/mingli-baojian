@@ -1,5 +1,4 @@
-// Auto-generated from 倪海厦资料库 PDF extraction
-// 仅供学习参考，不作为医疗建议
+
 
 window.NIHAISHA_CLASSICS_KB = {
   "source": "倪海厦资料库（~/Desktop/倪海厦资料库/）",

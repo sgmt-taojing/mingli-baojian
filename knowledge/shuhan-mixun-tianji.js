@@ -1,10 +1,4 @@
-/**
- * 舒晗奇门密训 + 倪海厦天纪 结构化知识库
- * 来源：密训班PDF 8份 + 倪海厦天纪PDF（部分可读）
- * 提取时间：2026-07-18
- * 说明：密训内容来自PDF直接提取；天纪部分因部分PDF文件损坏，
- *       天机道/地脉道/人间道的框架来自可读页面+倪海厦公开教学体系
- */
+
 
 window.SHUHAN_MIXUN_TIANJI_KB = {
   source: "舒晗奇门密训 + 倪海厦天纪",
@@ -34,15 +28,11 @@ window.SHUHAN_MIXUN_TIANJI_KB = {
     note: "天纪部分基于倪海厦公开教学体系的已知框架进行整理，标注为[框架知识]。密训部分为PDF直接提取，标注为[密训原文]。"
   },
 
-  // ═════════════════════════════════════════════════
-  // 一、密训内容
-  // ═════════════════════════════════════════════════
   mixun: {
     "高级调理": {
       title: "密训高级调理秘法体系",
       source: "[密训原文] 密训导图01 + 密训班01/02/04",
 
-      // 四害化解
       sihaiHuajie: {
         title: "四害化解绝技（基础布局必备）",
         items: [
@@ -85,7 +75,6 @@ window.SHUHAN_MIXUN_TIANJI_KB = {
         ]
       },
 
-      // 催财布局
       cuiCai: {
         title: "催财布局系统",
         source: "[密训原文] 密训班01第21课 + 密训导图03",
@@ -119,7 +108,6 @@ window.SHUHAN_MIXUN_TIANJI_KB = {
         ]
       },
 
-      // 八大秘法
       badaMifa: {
         title: "奇门布局八大秘法（核心心法）",
         source: "[密训原文] 密训班01第4课 + 密训导图01",
@@ -179,7 +167,6 @@ window.SHUHAN_MIXUN_TIANJI_KB = {
         ]
       },
 
-      // 伏吟反吟化解
       fuyinFanyin: {
         title: "伏吟反吟专题化解",
         source: "[密训原文] 笔记第2课",
@@ -248,7 +235,6 @@ window.SHUHAN_MIXUN_TIANJI_KB = {
         ]
       },
 
-      // 风水调理
       fengshuiTiaoli: {
         title: "风水调理：环境与奇门联动",
         source: "[密训原文] 密训班01第28课 + 密训班02",
@@ -286,7 +272,6 @@ window.SHUHAN_MIXUN_TIANJI_KB = {
         }
       },
 
-      // 时间调理
       shijianTiaoli: {
         title: "时间调理法（择吉择时）",
         source: "[密训原文] 密训班02",
@@ -305,7 +290,6 @@ window.SHUHAN_MIXUN_TIANJI_KB = {
       title: "密训实战案例解析",
       source: "[密训原文] 密训班01/02/04",
 
-      // 商业决策
       shangye: {
         title: "商业合作决策案例",
         beijing: "某公司欲与外资合作，问前景如何",
@@ -322,7 +306,6 @@ window.SHUHAN_MIXUN_TIANJI_KB = {
         ]
       },
 
-      // 疾病调理
       jibing: {
         title: "疾病调理案例",
         beijing: "某人长期头痛失眠，西医无效",
@@ -340,7 +323,6 @@ window.SHUHAN_MIXUN_TIANJI_KB = {
         ]
       },
 
-      // 大运分析
       dayun: {
         title: "1967年丁未生人大运分析案例",
         source: "[密训原文] 密训班04",
@@ -377,7 +359,6 @@ window.SHUHAN_MIXUN_TIANJI_KB = {
         }
       },
 
-      // 命盘断盘五步法
       duanpanWubu: {
         title: "命盘断盘五步法",
         source: "[密训原文] 密训导图03",
@@ -391,7 +372,6 @@ window.SHUHAN_MIXUN_TIANJI_KB = {
         koujue: "日元定本性，值符藏内心，落宫看环境，星神细推寻，最后取用神，万事可分明"
       },
 
-      // 财运诊断
       caiyunZhenduan: {
         title: "财运断测方法（双重诊断体系）",
         source: "[密训原文] 密训导图03",
@@ -410,7 +390,6 @@ window.SHUHAN_MIXUN_TIANJI_KB = {
         }
       },
 
-      // 商战决策模型
       shangzhan: {
         title: "现代商战决策模型",
         source: "[密训原文] 密训班02",
@@ -433,7 +412,6 @@ window.SHUHAN_MIXUN_TIANJI_KB = {
       title: "密训核心秘法与心法",
       source: "[密训原文] 密训班01/02",
 
-      // 起运计算秘法
       qiyunMifa: {
         title: "起运计算秘法",
         source: "[密训原文] 密训班04",
@@ -471,7 +449,6 @@ window.SHUHAN_MIXUN_TIANJI_KB = {
         }
       },
 
-      // 用神技法
       yongshenJifa: {
         title: "用神技法（取用秘法）",
         source: "[密训原文] 密训班01/02",
@@ -512,7 +489,6 @@ window.SHUHAN_MIXUN_TIANJI_KB = {
         ]
       },
 
-      // 断局三层境界
       duanjuSanCeng: {
         title: "断局三层境界",
         source: "[密训原文] 密训班02",
@@ -523,7 +499,6 @@ window.SHUHAN_MIXUN_TIANJI_KB = {
         ]
       },
 
-      // 高级布局五维跃迁
       bujuYueqian: {
         title: "普通布局 vs 高级布局（五个维度的跃迁）",
         source: "[密训原文] 密训导图01",
@@ -536,7 +511,6 @@ window.SHUHAN_MIXUN_TIANJI_KB = {
         ]
       },
 
-      // 禁忌
       jinji: {
         title: "断卦铁律与禁忌",
         source: "[密训原文] 密训班02",
@@ -559,7 +533,6 @@ window.SHUHAN_MIXUN_TIANJI_KB = {
       }
     },
 
-    // 课程体系
     kechengTixi: {
       title: "密训32课完整脉络",
       source: "[密训原文] 密训班01",
@@ -583,7 +556,6 @@ window.SHUHAN_MIXUN_TIANJI_KB = {
       ]
     },
 
-    // 命运风水概念
     mingYunFengshui: {
       title: "命·运·风水三位一体模型",
       source: "[密训原文] 笔记第3课 + PPT01",
@@ -617,9 +589,6 @@ window.SHUHAN_MIXUN_TIANJI_KB = {
     }
   },
 
-  // ═════════════════════════════════════════════════
-  // 二、天机道·紫微斗数
-  // ═════════════════════════════════════════════════
   tianji: {
     _note: "天机道PDF文件损坏，以下为基于倪海厦公开教学体系的[框架知识]",
 
@@ -713,9 +682,6 @@ window.SHUHAN_MIXUN_TIANJI_KB = {
     }
   },
 
-  // ═════════════════════════════════════════════════
-  // 三、地脉道·风水
-  // ═════════════════════════════════════════════════
   dimai: {
     _note: "地脉道PDF文件损坏，以下为基于倪海厦公开教学体系的[框架知识]",
 
@@ -789,9 +755,6 @@ window.SHUHAN_MIXUN_TIANJI_KB = {
     }
   },
 
-  // ═════════════════════════════════════════════════
-  // 四、人间道·易经
-  // ═════════════════════════════════════════════════
   renjian: {
     _note: "人间道PDF文件可读但字体编码错误导致乱码，以下为基于倪海厦公开教学体系的[框架知识]",
 
@@ -898,9 +861,6 @@ window.SHUHAN_MIXUN_TIANJI_KB = {
     }
   },
 
-  // ═════════════════════════════════════════════════
-  // 五、相学
-  // ═════════════════════════════════════════════════
   xiangxue: {
     _note: "相学图解PDF文件损坏，以下为基于苏民峰相学体系和倪海厦天纪相学教学的[框架知识]",
 
@@ -979,7 +939,6 @@ window.SHUHAN_MIXUN_TIANJI_KB = {
     }
   },
 
-  // ==================== 基础知识课32课 ====================
   basicCourse: {
     _meta: {
       source: "舒涵奇门36节精品课PPT 1-32 + 导图",
@@ -1835,7 +1794,6 @@ window.SHUHAN_MIXUN_TIANJI_KB = {
     }
   },
 
-  // ==================== 补充资料 ====================
   supplements: {
     _meta: {
       source: "舒涵奇门基础知识课补充资料9份",

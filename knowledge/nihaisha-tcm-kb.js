@@ -1,11 +1,7 @@
-// 倪海厦中医知识库 - 全量移植版
-// 来源: https://github.com/JuneYaooo/nihaisha-nishi-tcm
-// 移植时间: 2026-07-18
-// 内容: 43个reference md文件完整内容
-// 声明: 本知识库仅供学习参考，实际诊疗请咨询专业中医师
+
 
 window.NIHAISHA_TCM_KB = {
-  // 元数据
+
   _meta: {
     source: 'https://github.com/JuneYaooo/nihaisha-nishi-tcm',
     extractedAt: '2026-07-18',
@@ -5636,7 +5632,6 @@ window.NIHAISHA_TCM_KB = {
   }
 };
 
-// 跨模块主题
 window.NIHAISHA_TCM_KB.crossModuleThemes = {
   title: '跨模块主题',
   关联引擎: '中医',
@@ -5685,7 +5680,6 @@ window.NIHAISHA_TCM_KB.crossModuleThemes = {
   ]
 };
 
-// 命理关联模块
 window.NIHAISHA_TCM_KB.mingliCorrelation = {
   title: '命理关联',
   关联引擎: '八字/紫微/中医',

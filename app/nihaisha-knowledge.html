@@ -67,20 +67,25 @@ body{background:var(--bg);color:var(--paper);font-family:'Noto Serif SC',serif;l
 </div>
 </div>
 <div class="container">
+<div id="kbLoading" style="text-align:center;padding:40px 20px;color:var(--paper3);font-size:13px">
+<div style="display:inline-block;width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:12px"></div>
+<div>正在加载KB知识库（约5MB），请稍候...</div>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
 <div class="warning">⚠️ 本知识库仅供学习参考，不作为医疗诊断、处方或治疗建议。涉及健康问题请咨询专业医师。</div>
 <div class="search-box">
 <input type="text" class="search-input" id="globalSearch" placeholder="🔍 搜索知识库（方名/症状/穴位/课次...）" onkeyup="if(event.key==='Enter')doSearch()">
 </div>
 <div id="navTabs"></div>
-<div id="content"></div>
+<div id="kbLoading" style="display:none"<div id="kbLoading" style="text-align:center;padding:40px 20px;color:var(--paper3);font-size:13px">
+<div style="display:inline-block;width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:12px"></div>
+<div>正在加载KB知识库（约5MB），请稍候...</div>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style> id="content"></div>
 </div>
 <div class="footer">倪海厦中医课程知识库 · 43个模块 · 5730行 · 全量移植自 nihaisha-nishi-tcm 仓库<br>知识提取时间：2026-07-18 · Skill已安装：~/.openclaw-autoclaw/skills/nihaisha/</div>
-<script src="../knowledge/nihaisha-tcm-kb.js"></script>
-<script src="../knowledge/nihaisha-batch1.js"></script>
-<script src="../knowledge/nihaisha-batch2.js"></script>
-<script src="../knowledge/nihaisha-batch3.js"></script>
-<script src="../knowledge/nihaisha-batch4.js"></script>
-<script src="../knowledge/nihaisha-classics-kb.js"></script>
+<script defer src="../knowledge/nihaisha-kb-combined.js"></script>
 <script>
 var KB=window.NIHAISHA_TCM_KB||{};
 // 合并全量移植batch（优先级最高，覆盖精简版）
@@ -93,6 +98,7 @@ if(window.NIHAISHA_CLASSICS_KB){
   // console.log('[倪师经典KB] 已合并', window.NIHAISHA_CLASSICS_KB._meta);
 }
 window.NIHAISHA_TCM_KB = KB;
+var _ld=document.getElementById('kbLoading');if(_ld)_ld.style.display='none';
 
 // 46个模块，按分类分组（排除_meta）
 var tabGroups=[

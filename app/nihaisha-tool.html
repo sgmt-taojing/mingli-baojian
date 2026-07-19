@@ -113,6 +113,12 @@ a{text-decoration:none}
   <h1>🪷 倪师智慧·中医课程检索<span>nihaisha-nishi-tcm · 46模块全量知识库 · 自然语言检索</span></h1>
 </div>
 <div class="container">
+<div id="kbLoading" style="text-align:center;padding:40px 20px;color:var(--paper3);font-size:13px">
+<div style="display:inline-block;width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:12px"></div>
+<div>正在加载KB知识库（约5MB），请稍候...</div>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
   <div class="warning">⚠️ 本工具仅供学习参考，不作为医疗诊断、处方或治疗建议。涉及健康问题请咨询专业医师。</div>
   <!-- 搜索框 -->
   <div class="search-box">
@@ -129,7 +135,11 @@ a{text-decoration:none}
     <button class="cat-tab" data-cat="other">🔗 其他</button>
   </div>
   <!-- 模块卡片网格 -->
-  <div class="modules" id="modulesGrid"></div>
+  <div class="modules" id="kbLoading" style="display:none"<div id="kbLoading" style="text-align:center;padding:40px 20px;color:var(--paper3);font-size:13px">
+<div style="display:inline-block;width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:12px"></div>
+<div>正在加载KB知识库（约5MB），请稍候...</div>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style> id="modulesGrid"></div>
   <!-- 搜索结果区域 -->
   <div id="searchResults"></div>
   <!-- 模块详情区域 -->
@@ -139,12 +149,7 @@ a{text-decoration:none}
   nihaisha-nishi-tcm · 46个模块 · GitHub开源项目<br>
   知识库来源：https://github.com/JuneYaooo/nihaisha-nishi-tcm · 移植时间：2026-07-18
 </div>
-<script src="../knowledge/nihaisha-tcm-kb.js"></script>
-<script src="../knowledge/nihaisha-batch1.js"></script>
-<script src="../knowledge/nihaisha-batch2.js"></script>
-<script src="../knowledge/nihaisha-batch3.js"></script>
-<script src="../knowledge/nihaisha-batch4.js"></script>
-<script src="../knowledge/nihaisha-classics-kb.js"></script>
+<script defer src="../knowledge/nihaisha-kb-combined.js"></script>
 <script>
 // 加载知识库
 let KB = window.NIHAISHA_TCM_KB || {};
@@ -153,6 +158,7 @@ let KB = window.NIHAISHA_TCM_KB || {};
 });
 if(window.NIHAISHA_CLASSICS_KB){KB._classics = window.NIHAISHA_CLASSICS_KB;}
 window.NIHAISHA_TCM_KB = KB;
+var _ld=document.getElementById('kbLoading');if(_ld)_ld.style.display='none';
 
 // 模块定义（按分类）
 let MODULES = [
