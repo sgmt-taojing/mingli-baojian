@@ -1639,6 +1639,7 @@ function computeChengmenJue(xuankongData, chaoxiang) {
     return html;
   } catch(e) {
     console.error('[城门诀分析错误]', e.message);
+    showToast('操作出错，请重试');
     return '<div style="padding:16px;color:var(--cinn2);font-size:12px">城门诀分析出错: ' + e.message + '</div>';
   }
 }
@@ -1956,6 +1957,7 @@ function computeFeixingCombos(xuankongData, chaoxiang) {
     return html;
   } catch(e) {
     console.error('[飞星组合分析错误]', e.message);
+    showToast('操作出错，请重试');
     return '<div style="padding:16px;color:var(--cinn2);font-size:12px">飞星组合分析出错: ' + e.message + '</div>';
   }
 }

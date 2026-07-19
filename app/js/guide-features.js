@@ -4244,6 +4244,7 @@ function generateCompanyNames() {
 
   } catch(e) {
     console.error('generateCompanyNames error:', e);
+    showToast('generateCompanyNames error:，请重试');
     const resultDiv = document.getElementById('companyResult');
     if (resultDiv) {
       resultDiv.style.display = 'block';
@@ -6588,6 +6589,7 @@ function recommendRename() {
       _doRecommendRename(currentName, sex, birthDate, birthHourVal, birthLocation, resideLocation, outDiv);
     } catch(e) {
       console.error('recommendRename error:', e);
+      showToast('recommendRename error:，请重试');
       outDiv.innerHTML = '<div class="result-card" style="padding:20px;text-align:center;color:var(--cinn2)">⚠️ 推荐过程出错：' + e.message + '</div>';
     } finally {
       if (recBtn) { recBtn.disabled = false; recBtn.textContent = '🤖 自动推荐名字'; }

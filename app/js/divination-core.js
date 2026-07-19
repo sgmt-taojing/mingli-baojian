@@ -29208,7 +29208,7 @@ function computeLifePlan() {
   html += '<span class="rb-tag">日主' + baziData.dayStem + '</span>';
   html += '<span class="rb-tag">喜用' + (baziData.xiEle || '') + '</span>';
   if (baziData.mingGua && baziData.mingGua.type) html += '<span class="rb-tag">' + baziData.mingGua.type + '</span>';
-  if (baziData.geju && baziData.geju.name) html += '<span class="rb-tag">' + baziData.geju.name + '</span>';
+  if (baziData.geju && (baziData.geju ? (baziData.geju.name || '') : '')) html += '<span class="rb-tag">' + (baziData.geju ? (baziData.geju.name || '') : '') + '</span>';
   if (stage) html += '<span class="rb-tag">' + (stageNames[stage] || stage) + '</span>';
   html += '</div></div>';
 
@@ -30353,7 +30353,7 @@ function computeYouthPlan() {
     html += '日主：' + baziData.dayMaster + '（' + dayEle + '）<br>';
     html += '旺衰：' + strengthLevel + '<br>';
     html += '喜用神：' + (xiEle || '未明确') + '<br>';
-    if (baziData.geju && baziData.geju.name) html += '格局：' + baziData.geju.name + '<br>';
+    if (baziData.geju && (baziData.geju ? (baziData.geju.name || '') : '')) html += '格局：' + (baziData.geju ? (baziData.geju.name || '') : '') + '<br>';
     html += '十神旺度：' + (godNameMap[topGod] || '') + '最旺（' + sortedGods[0][1] + '分）<br>';
     if (baziData.mingGua && baziData.mingGua.type) html += '命卦：' + (baziData.mingGua.guaName || '') + '（' + baziData.mingGua.type + '）';
     html += '</p></div></div>';
@@ -31166,7 +31166,7 @@ function _generateBirthReport(result, fYS, mYS) {
       // 命格评估
       html += '<div style="margin-top:10px;font-size:12px;line-height:1.8">';
       if (c.geju && c.geju.name) {
-        html += '<b>格局：</b>' + c.geju.name + '　';
+        html += '<b>格局：</b>' + (c?.geju?.name || '') + '　';
       }
       if (c.yongshen) {
         html += '<b>用神：</b>' + (c.yongshen.yongshenEle || c.yongshen.xiEle || '水') + '　';
