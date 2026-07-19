@@ -8,26 +8,26 @@
   <style>
     :root{
       --ink:#080808;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;
-      --paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;
-      --gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;
+      --paper:var(--paper);--paper2:var(--paper2);--paper3:var(--paper3);
+      --gold:var(--gold);--gold2:var(--gold2);--gold3:var(--gold3);
       --title:var(--gold);--muted:var(--paper3);--accent:var(--gold);
       --bg:var(--ink);--bg-card:rgba(255,255,255,0.04);
       --card:rgba(255,255,255,0.04);--card2:rgba(255,255,255,0.06);
       --border:rgba(201,168,76,.15);
       --shadow:0 4px 24px rgba(0,0,0,.5);
-      --success:#2ecc71;--warn:#e67e22;--danger:#e74c3c;
+      --success:var(--success);--warn:var(--orange);--danger:var(--cinn2);
       --text:var(--paper);--text-dim:var(--paper3);
-      --cinn:#c0392b;--cinn2:#e74c3c;
-      --cyan:#2980b9;--cyan2:#5dade2;
-      --jade:#27ae60;--jade2:#2ecc71;
-      --violet:#8e44ad;--violet2:#a569bd;
-      --orange:#e67e22;
-      --emerald:#16a085;
-      --steel:#7f8c8d;
-      --wood:#8d6e63;--wood2:#a1887f;
-      --fire:#e74c3c;--fire2:#c0392b;
-      --earth:#a08060;
-      --metal:#95a5a6;--metal2:#bdc3c7;
+      --cinn:var(--cinn);--cinn2:var(--cinn2);
+      --cyan:var(--cyan);--cyan2:#5dade2;
+      --jade:var(--jade);--jade2:var(--success);
+      --violet:var(--violet2);--violet2:#a569bd;
+      --orange:var(--orange);
+      --emerald:var(--emerald);
+      --steel:var(--steel);
+      --wood:var(--wood);--wood2:var(--wood2);
+      --fire:var(--cinn2);--fire2:var(--cinn);
+      --earth:var(--earth);
+      --metal:var(--metal);--metal2:var(--metal2);
       --font-mono:'Cutive Mono','Courier New',monospace;
       --font-serif:'Noto Serif SC','Source Han Serif SC','SimSun','STSong',serif;
     }
@@ -222,11 +222,11 @@
     .chain-node .cn-icon{font-size:26px;margin-bottom:4px}
     .chain-node .cn-name{font-size:13px;font-weight:700;color:var(--title)}
     .chain-node .cn-sub{font-size:10px;color:var(--muted);margin-top:2px}
-    .wuxing-color-Mu{background:rgba(39,174,96,0.1);border-left:3px solid #27ae60}
-    .wuxing-color-Huo{background:rgba(231,76,60,0.1);border-left:3px solid #e74c3c}
-    .wuxing-color-Tu{background:rgba(243,156,18,0.1);border-left:3px solid #f39c12}
+    .wuxing-color-Mu{background:rgba(39,174,96,0.1);border-left:3px solid var(--jade)}
+    .wuxing-color-Huo{background:rgba(231,76,60,0.1);border-left:3px solid var(--cinn2)}
+    .wuxing-color-Tu{background:rgba(243,156,18,0.1);border-left:3px solid var(--warn)}
     .wuxing-color-Jin{background:rgba(144,164,174,0.1);border-left:3px solid #90a4ae}
-    .wuxing-color-Shui{background:rgba(52,152,219,0.1);border-left:3px solid #3498db}
+    .wuxing-color-Shui{background:rgba(52,152,219,0.1);border-left:3px solid var(--cyan2)}
     /* Disease tags */
     .disease-tags{display:flex;flex-wrap:wrap;gap:8px}
     .disease-tag{padding:7px 14px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:20px;color:var(--muted);cursor:pointer;font-size:13px;transition:.2s}
@@ -247,8 +247,8 @@
     .fn-card{display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:12px 14px;text-decoration:none;color:var(--text);min-width:90px;transition:.2s}
     .fn-card:hover{background:rgba(201,168,76,.15);border-color:rgba(201,168,76,.5)}
     .fn-icon{font-size:22px}
-    .fn-name{font-size:13px;font-weight:700;color:#c9a84c}
-    .fn-desc{font-size:10px;color:#a09080;letter-spacing:1px}
+    .fn-name{font-size:13px;font-weight:700;color:var(--gold)}
+    .fn-desc{font-size:10px;color:var(--paper3);letter-spacing:1px}
     /* Scrollbar */
     ::-webkit-scrollbar{width:6px}
     ::-webkit-scrollbar-track{background:var(--bg)}
@@ -390,8 +390,8 @@
       <div class="chain-title">点击任一环节，查看详细解释</div>
       <div class="chain-row" id="chainRow"></div>
       <div style="text-align:center;margin-top:10px">
-        <span style="display:inline-block;width:12px;height:12px;background:#27ae60;border-radius:3px;margin:0 4px"></span><span style="color:var(--muted);font-size:12px;margin-right:14px">相生</span>
-        <span style="display:inline-block;width:12px;height:12px;background:#e74c3c;border-radius:3px;margin:0 4px"></span><span style="color:var(--muted);font-size:12px">相克</span>
+        <span style="display:inline-block;width:12px;height:12px;background:var(--jade);border-radius:3px;margin:0 4px"></span><span style="color:var(--muted);font-size:12px;margin-right:14px">相生</span>
+        <span style="display:inline-block;width:12px;height:12px;background:var(--cinn2);border-radius:3px;margin:0 4px"></span><span style="color:var(--muted);font-size:12px">相克</span>
       </div>
     </div>
     <div class="section-title">📋 五行体质对照表</div>
@@ -1237,14 +1237,14 @@ function showWuxingDetail(key){
   </div>`;
   html+=`<div class="detail-card"><h4>⚠️ 五行失衡常见表现</h4>
     <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px">${d.symptoms.map(s=>'<span class="tag tag-warn">'+s+'</span>').join('')}</div></div>`;
-  html+=`<div class="detail-card" style="border-left:3px solid #27ae60"><h4>🥗 推荐食材</h4>
+  html+=`<div class="detail-card" style="border-left:3px solid var(--jade)"><h4>🥗 推荐食材</h4>
     <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px">${d.foods.map(s=>'<span class="tag tag-success">'+s+'</span>').join('')}</div></div>`;
-  html+=`<div class="detail-card" style="border-left:3px solid #e67e22"><h4>🍲 经典药膳方</h4><ul>${d.recipes.map(r=>'<li>'+r+'</li>').join('')}</ul></div>`;
-  html+=`<div class="detail-card" style="border-left:3px solid #c0392b"><h4>💊 常用中药材（须医师处方）</h4>
+  html+=`<div class="detail-card" style="border-left:3px solid var(--orange)"><h4>🍲 经典药膳方</h4><ul>${d.recipes.map(r=>'<li>'+r+'</li>').join('')}</ul></div>`;
+  html+=`<div class="detail-card" style="border-left:3px solid var(--cinn)"><h4>💊 常用中药材（须医师处方）</h4>
     <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px">${d.herbs.map(s=>'<span class="tag tag-danger">'+s+'</span>').join('')}</div>
     <p style="color:var(--warn);font-size:13px;margin-top:10px"><strong>⚠️ 以上药材须在执业中医师辨证指导下使用，请勿自行购买服用。</strong></p></div>`;
   html+=`<div class="detail-card"><h4>🧘 养生调理要点</h4><p style="line-height:1.9">${d.regimen}</p></div>`;
-  html+=`<div class="detail-card" style="border-left:3px solid #e67e22"><h4>🚫 禁忌</h4><p style="line-height:1.9;color:var(--warn)">${d.avoid}</p></div>`;
+  html+=`<div class="detail-card" style="border-left:3px solid var(--orange)"><h4>🚫 禁忌</h4><p style="line-height:1.9;color:var(--warn)">${d.avoid}</p></div>`;
 
   document.getElementById('resultBody').innerHTML=html;
   selectedWuxing=key;
@@ -1931,7 +1931,7 @@ function analyzeByBazi(){
       <p><strong>易感问题：</strong>${d.symptoms.slice(0,5).join('、')}</p>
       <p><strong>养生关键：</strong>${d.regimen}</p>
       <p style="color:var(--warn);margin-top:4px"><strong>禁忌：</strong>${d.avoid}</p></div>
-    <div class="detail-card" style="border-left:3px solid #e74c3c"><h4 style="color:#e74c3c">⚠️ 重点调理：${weakD.name}行偏弱</h4>
+    <div class="detail-card" style="border-left:3px solid var(--cinn2)"><h4 style="color:var(--cinn2)">⚠️ 重点调理：${weakD.name}行偏弱</h4>
       <p><strong>关联脏腑：</strong><span class="highlight">${weakD.organs.join('、')}</span></p>
       <p><strong>推荐食材：</strong>${weakD.foods.slice(0,6).join('、')}</p>
       <p><strong>推荐药膳：</strong>${weakD.recipes[0]}</p></div>
@@ -1991,15 +1991,15 @@ function analyzeByDisease(){
       <p style="margin-top:8px"><strong>对应五行：</strong><span style="color:${d.color};font-size:18px">${d.icon} ${d.name}行</span></p>
       <p><strong>关联脏腑：</strong><span class="highlight">${d.organs.join('、')}</span></p>
     </div>
-    <div class="detail-card" style="border-left:3px solid #27ae60"><h4>🥗 饮食调理建议</h4>
+    <div class="detail-card" style="border-left:3px solid var(--jade)"><h4>🥗 饮食调理建议</h4>
       <p><strong>推荐食材：</strong></p>
       <div style="display:flex;flex-wrap:wrap;gap:5px;margin:8px 0">${d.foods.map(s=>'<span class="tag tag-success">'+s+'</span>').join('')}</div>
       <p><strong>推荐药膳：</strong></p><ul>${d.recipes.map(r=>'<li>'+r+'</li>').join('')}</ul></div>
-    <div class="detail-card" style="border-left:3px solid #c0392b"><h4>💊 中药材参考（须医师处方）</h4>
+    <div class="detail-card" style="border-left:3px solid var(--cinn)"><h4>💊 中药材参考（须医师处方）</h4>
       <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px">${d.herbs.map(s=>'<span class="tag tag-danger">'+s+'</span>').join('')}</div>
       <p style="color:var(--warn);font-size:13px;margin-top:10px"><strong>⚠️ 不可自行抓药服用，须经执业中医师辨证后开具处方。</strong></p></div>
     <div class="detail-card"><h4>🧘 生活调理</h4><p style="line-height:1.9">${d.regimen}</p></div>
-    <div class="detail-card" style="border-left:3px solid #e67e22"><h4>🚫 禁忌</h4><p style="line-height:1.9;color:var(--warn)">${d.avoid}</p></div>`;
+    <div class="detail-card" style="border-left:3px solid var(--orange)"><h4>🚫 禁忌</h4><p style="line-height:1.9;color:var(--warn)">${d.avoid}</p></div>`;
   selectedWuxing=match.wu;
   renderChain();
 }
@@ -2479,7 +2479,7 @@ renderExerciseLibrary();
 
 <div class="feature-nav-bar">
   <div style="max-width:1100px;margin:0 auto;padding:14px 20px">
-    <div style="font-size:12px;color:#a09080;margin-bottom:10px;letter-spacing:2px">—— 易道智鉴 · 平台功能导航 ——</div>
+    <div style="font-size:12px;color:var(--paper3);margin-bottom:10px;letter-spacing:2px">—— 易道智鉴 · 平台功能导航 ——</div>
     <div class="feature-nav-cards">
       <a class="fn-card" href="divination-hub.html">
         <span class="fn-icon">🏠</span>

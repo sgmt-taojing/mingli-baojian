@@ -66,7 +66,7 @@ function computeLiuRen() {
   console.error('[大六壬排盘错误]', e.message, e.stack);
   let _r = document.getElementById('lrResult');
   if(_r) {
-    _r.innerHTML = '<div style="padding:20px;margin:16px 0;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px"><h5 style="color:#e74c3c">❌ 大六壬排盘出错</h5><p style="font-size:13px;opacity:.8;margin-top:8px">' + e.message + '</p><p style="font-size:11px;opacity:.5;margin-top:4px">' + (e.stack||'').split("\n").slice(0,3).join("<br>") + '</p></div>';
+    _r.innerHTML = '<div style="padding:20px;margin:16px 0;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px"><h5 style="color:var(--cinn2)">❌ 大六壬排盘出错</h5><p style="font-size:13px;opacity:.8;margin-top:8px">' + e.message + '</p><p style="font-size:11px;opacity:.5;margin-top:4px">' + (e.stack||'').split("\n").slice(0,3).join("<br>") + '</p></div>';
     _r.classList.add('visible');
     _r.scrollIntoView({behavior:'smooth'});
   }

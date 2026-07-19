@@ -292,7 +292,7 @@ window.injectVoiceUI = function(){
       let speak = document.createElement('button');
       speak.id = area.id + '_speak';
       speak.innerHTML = '🔊 朗读';
-      speak.style.cssText = 'display:inline-block;padding:4px 12px;margin:4px 0;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.3);border-radius:6px;color:#c9a84c;cursor:pointer;font-size:12px;font-family:inherit';
+      speak.style.cssText = 'display:inline-block;padding:4px 12px;margin:4px 0;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.3);border-radius:6px;color:var(--gold);cursor:pointer;font-size:12px;font-family:inherit';
       speak.onclick = function(){
         let text = area.innerText.substring(0, 500);
         if(text.length > 10){
@@ -325,7 +325,7 @@ window.injectVoiceUI = function(){
   if(!document.getElementById('voiceSelector')){
     let sel = document.createElement('select');
     sel.id = 'voiceSelector';
-    sel.style.cssText = 'position:fixed;bottom:80px;right:80px;padding:4px 8px;border-radius:6px;border:1px solid rgba(201,168,76,.3);background:rgba(26,30,20,.9);color:#c9a84c;font-size:11px;z-index:9999;cursor:pointer';
+    sel.style.cssText = 'position:fixed;bottom:80px;right:80px;padding:4px 8px;border-radius:6px;border:1px solid rgba(201,168,76,.3);background:rgba(26,30,20,.9);color:var(--gold);font-size:11px;z-index:9999;cursor:pointer';
     sel.innerHTML = '<option value="female">晓晓</option><option value="male">云扬</option><option value="female2">晓辰</option><option value="female3">晓涵</option><option value="male2">云枫</option>';
     sel.onchange = function(){setVoice(this.value); showToast('声线已切换', 'success');};
     document.body.appendChild(sel);

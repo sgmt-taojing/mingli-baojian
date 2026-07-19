@@ -306,13 +306,13 @@ function renderHetuLuoshuDaily() {
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">';
   html += '<div style="background:rgba(52,152,219,0.06);border:1px solid rgba(52,152,219,0.15);border-radius:8px;padding:12px;text-align:center">';
   html += '<div style="font-size:11px;color:var(--paper2);margin-bottom:6px">🌀 今日河图数</div>';
-  html += '<div style="font-size:18px;color:#3498db;font-weight:bold">' + data.hetuSheng + ' · ' + (data.hetuCheng === 10 ? '十' : data.hetuCheng) + '</div>';
+  html += '<div style="font-size:18px;color:var(--cyan2);font-weight:bold">' + data.hetuSheng + ' · ' + (data.hetuCheng === 10 ? '十' : data.hetuCheng) + '</div>';
   html += '<div style="font-size:11px;color:var(--gold);margin-top:4px">' + data.hetuDesc + '</div>';
   html += '<div style="font-size:10px;opacity:.5;margin-top:2px">五行属' + data.stemEle + '</div>';
   html += '</div>';
   html += '<div style="background:rgba(231,76,60,0.06);border:1px solid rgba(231,76,60,0.15);border-radius:8px;padding:12px;text-align:center">';
   html += '<div style="font-size:11px;color:var(--paper2);margin-bottom:6px">🔮 今日洛书数</div>';
-  html += '<div style="font-size:18px;color:#e74c3c;font-weight:bold">' + data.luoshuPalace + ' · ' + (data.palaceInfo ? data.palaceInfo.name : '') + '</div>';
+  html += '<div style="font-size:18px;color:var(--cinn2);font-weight:bold">' + data.luoshuPalace + ' · ' + (data.palaceInfo ? data.palaceInfo.name : '') + '</div>';
   html += '<div style="font-size:10px;opacity:.5;margin-top:2px">' + (data.palaceInfo ? data.palaceInfo.direction + ' · ' + data.palaceInfo.element : '') + '</div>';
   html += '</div></div>';
   if (data.todayStarInfo) {
@@ -322,17 +322,17 @@ function renderHetuLuoshuDaily() {
     html += '<div style="font-size:14px;color:' + (s.color||'var(--gold)') + ';font-weight:bold">' + s.name + '</div>';
     html += '<div style="font-size:11px;opacity:.7;margin-top:4px">属性：' + s.element + ' | 吉凶：' + s.luck + ' | 主：' + s.domain + '</div>';
     if (accessPct >= 60) {
-      if (s.luck.indexOf('吉') >= 0) html += '<div style="font-size:11px;color:#2ecc71;margin-top:4px">✅ 旺时：' + s.whenProsperous + '</div>';
-      else html += '<div style="font-size:11px;color:#e74c3c;margin-top:4px">⚠️ 衰时：' + s.whenDecline + '</div>';
+      if (s.luck.indexOf('吉') >= 0) html += '<div style="font-size:11px;color:var(--success);margin-top:4px">✅ 旺时：' + s.whenProsperous + '</div>';
+      else html += '<div style="font-size:11px;color:var(--cinn2);margin-top:4px">⚠️ 衰时：' + s.whenDecline + '</div>';
     }
     html += '</div>';
   }
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">';
   html += '<div style="background:rgba(46,204,113,0.06);border:1px solid rgba(46,204,113,0.15);border-radius:8px;padding:10px">';
-  html += '<div style="font-size:11px;color:#2ecc71;margin-bottom:4px">✅ 河洛宜</div>';
+  html += '<div style="font-size:11px;color:var(--success);margin-bottom:4px">✅ 河洛宜</div>';
   html += '<div style="font-size:12px;color:var(--paper)">' + data.yiList.join('、') + '</div></div>';
   html += '<div style="background:rgba(231,76,60,0.06);border:1px solid rgba(231,76,60,0.15);border-radius:8px;padding:10px">';
-  html += '<div style="font-size:11px;color:#e74c3c;margin-bottom:4px">⚠️ 河洛忌</div>';
+  html += '<div style="font-size:11px;color:var(--cinn2);margin-bottom:4px">⚠️ 河洛忌</div>';
   html += '<div style="font-size:12px;color:var(--paper)">' + data.jiList.join('、') + '</div></div></div>';
   if (accessPct >= 30) {
     html += '<div style="background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.1);border-radius:8px;padding:12px;margin-bottom:12px">';

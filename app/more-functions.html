@@ -8,19 +8,19 @@
 
 :root{
   --ink:#080808;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;
-  --paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;
-  --gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;
-  --cinn:#c0392b;--cinn2:#e74c3c;
-  --cyan:#2980b9;--cyan2:#5dade2;
-  --jade:#27ae60;--jade2:#2ecc71;
-  --violet:#8e44ad;--violet2:#a569bd;
-  --orange:#e67e22;
-  --emerald:#16a085;
-  --steel:#7f8c8d;
-  --wood:#8d6e63;--wood2:#a1887f;
-  --fire:#e74c3c;--fire2:#c0392b;
-  --earth:#a08060;
-  --metal:#95a5a6;--metal2:#bdc3c7;
+  --paper:var(--paper);--paper2:var(--paper2);--paper3:var(--paper3);
+  --gold:var(--gold);--gold2:var(--gold2);--gold3:var(--gold3);
+  --cinn:var(--cinn);--cinn2:var(--cinn2);
+  --cyan:var(--cyan);--cyan2:#5dade2;
+  --jade:var(--jade);--jade2:var(--success);
+  --violet:var(--violet2);--violet2:#a569bd;
+  --orange:var(--orange);
+  --emerald:var(--emerald);
+  --steel:var(--steel);
+  --wood:var(--wood);--wood2:var(--wood2);
+  --fire:var(--cinn2);--fire2:var(--cinn);
+  --earth:var(--earth);
+  --metal:var(--metal);--metal2:var(--metal2);
   --danger:#dc3545;
   --font-serif:'Noto Serif SC','Source Han Serif SC','SimSun','STSong',serif;
   --font-mono:'Cutive Mono','Courier New',monospace;
@@ -29,7 +29,7 @@
   --bg:var(--ink);--bg-card:rgba(255,255,255,0.04);
   --card:rgba(255,255,255,0.04);--card2:rgba(255,255,255,0.06);
   --border:rgba(201,168,76,.15);--shadow:0 4px 24px rgba(0,0,0,.5);
-  --success:#2ecc71;--warn:#e67e22;
+  --success:var(--success);--warn:var(--orange);
   --text:var(--paper);--text-dim:var(--paper3);
 }
 
@@ -184,7 +184,7 @@ select.input-field option{background:var(--ink2)}
 /* FIVE ELEMENT BAR */
 .ele-bar{display:flex;height:5px;border-radius:3px;overflow:hidden;gap:2px;margin:10px 0 6px}
 .ele-seg{border-radius:2px;transition:width .6s ease}
-.ele-木{background:#27ae60}.ele-火{background:#e74c3c}.ele-土{background:#e67e22}.ele-金{background:#95a5a6}.ele-水{background:#2980b9}
+.ele-木{background:var(--jade)}.ele-火{background:var(--cinn2)}.ele-土{background:var(--orange)}.ele-金{background:var(--metal)}.ele-水{background:var(--cyan)}
 .ele-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
 .ele-l-item{font-size:11px;letter-spacing:2px;opacity:.45}
 .ele-l-item span{font-weight:600;margin-right:4px}
@@ -479,11 +479,11 @@ select.input-field option{background:var(--ink2)}
 .huajie-row{display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(201,168,76,.04);font-size:13px;line-height:1.7}
 .huajie-row:last-child{border-bottom:none}
 .huajie-tag{padding:3px 10px;border:1px solid rgba(201,168,76,.15);font-size:11px;letter-spacing:2px;border-radius:3px;display:inline-block;margin:2px 4px}
-.huajie-tag.tag-木{color:#27ae60;border-color:rgba(39,174,96,.25);background:rgba(39,174,96,.05)}
-.huajie-tag.tag-火{color:#e74c3c;border-color:rgba(231,76,60,.25);background:rgba(231,76,60,.05)}
-.huajie-tag.tag-土{color:#e67e22;border-color:rgba(230,126,34,.25);background:rgba(230,126,34,.05)}
-.huajie-tag.tag-金{color:#95a5a6;border-color:rgba(149,165,166,.25);background:rgba(149,165,166,.05)}
-.huajie-tag.tag-水{color:#2980b9;border-color:rgba(41,128,185,.25);background:rgba(41,128,185,.05)}
+.huajie-tag.tag-木{color:var(--jade);border-color:rgba(39,174,96,.25);background:rgba(39,174,96,.05)}
+.huajie-tag.tag-火{color:var(--cinn2);border-color:rgba(231,76,60,.25);background:rgba(231,76,60,.05)}
+.huajie-tag.tag-土{color:var(--orange);border-color:rgba(230,126,34,.25);background:rgba(230,126,34,.05)}
+.huajie-tag.tag-金{color:var(--metal);border-color:rgba(149,165,166,.25);background:rgba(149,165,166,.05)}
+.huajie-tag.tag-水{color:var(--cyan);border-color:rgba(41,128,185,.25);background:rgba(41,128,185,.05)}
 .huajie-checklist{list-style:none;padding:0}
 .huajie-checklist li{padding:10px 0;font-size:13px;letter-spacing:1px;opacity:.7;line-height:1.8;border-bottom:1px solid rgba(201,168,76,.04)}
 .huajie-checklist li:last-child{border-bottom:none}
@@ -492,8 +492,8 @@ select.input-field option{background:var(--ink2)}
 .huajie-alert .alert-title{font-family:'Ma Shan Zheng',serif;font-size:18px;letter-spacing:3px;color:var(--gold);margin-bottom:8px}
 .huajie-calendar{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:16px 0}
 .huajie-calendar .month-item{padding:10px;text-align:center;border:1px solid rgba(201,168,76,.08);font-size:12px;letter-spacing:2px;transition:all .2s}
-.huajie-calendar .month-good{background:rgba(39,174,96,.06);border-color:rgba(39,174,96,.2);color:#2ecc71}
-.huajie-calendar .month-bad{background:rgba(231,76,60,.06);border-color:rgba(231,76,60,.2);color:#e74c3c}
+.huajie-calendar .month-good{background:rgba(39,174,96,.06);border-color:rgba(39,174,96,.2);color:var(--success)}
+.huajie-calendar .month-bad{background:rgba(231,76,60,.06);border-color:rgba(231,76,60,.2);color:var(--cinn2)}
 .huajie-calendar .month-neutral{border-color:rgba(201,168,76,.08);opacity:.5}
 .huajie-renew-box{background:rgba(201,168,76,.03);border:1px solid rgba(201,168,76,.2);padding:20px 24px;margin:16px 0;border-radius:4px;text-align:center}
 .huajie-renew-box .renew-title{font-family:'Ma Shan Zheng',serif;font-size:22px;letter-spacing:5px;color:var(--gold);margin-bottom:8px}
@@ -527,8 +527,8 @@ select.input-field option{background:var(--ink2)}
 .ss-name{font-size:13px;letter-spacing:2px;color:var(--gold)}
 .ss-desc{font-size:11px;opacity:.5;line-height:1.6}
 .ss-tag{padding:2px 8px;font-size:10px;letter-spacing:2px;border-radius:2px;display:inline-block;margin-bottom:4px}
-.ss-he{background:rgba(39,174,96,.08);border:1px solid rgba(39,174,96,.25);color:#2ecc71}
-.ss-chong{background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.25);color:#e74c3c}
+.ss-he{background:rgba(39,174,96,.08);border:1px solid rgba(39,174,96,.25);color:var(--success)}
+.ss-chong{background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.25);color:var(--cinn2)}
 .ss-sanhe{background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.25);color:var(--gold)}
 
 /* 月份详情 */
@@ -662,18 +662,18 @@ select.input-field option{background:var(--ink2)}
 .wisdom-quote .wq-text{font-size:14px;line-height:1.9;color:var(--paper2);font-family:'Noto Serif SC',serif}
 .wisdom-quote .wq-source{font-size:11px;opacity:.4;margin-top:8px;letter-spacing:2px}
 .wisdom-quote .wq-tag{display:inline-block;background:rgba(201,168,76,.1);color:var(--gold);font-size:10px;padding:2px 10px;border-radius:20px;margin-top:8px;letter-spacing:1px}
-.wisdom-quote.dao{border-left-color:#27ae60;background:rgba(76,175,80,.04)}
-.wisdom-quote.dao:hover{border-left-color:#2ecc71}
-.wisdom-quote.dao .wq-tag{background:rgba(76,175,80,.12);color:#27ae60}
-.wisdom-quote.buddha{border-left-color:#8e44ad;background:rgba(155,89,182,.04)}
-.wisdom-quote.buddha:hover{border-left-color:#9b59b6}
-.wisdom-quote.buddha .wq-tag{background:rgba(155,89,182,.12);color:#9b59b6}
-.wisdom-quote.confucian{border-left-color:#c9a84c;background:rgba(201,168,76,.04)}
+.wisdom-quote.dao{border-left-color:var(--jade);background:rgba(76,175,80,.04)}
+.wisdom-quote.dao:hover{border-left-color:var(--success)}
+.wisdom-quote.dao .wq-tag{background:rgba(76,175,80,.12);color:var(--jade)}
+.wisdom-quote.buddha{border-left-color:var(--violet2);background:rgba(155,89,182,.04)}
+.wisdom-quote.buddha:hover{border-left-color:var(--violet)}
+.wisdom-quote.buddha .wq-tag{background:rgba(155,89,182,.12);color:var(--violet)}
+.wisdom-quote.confucian{border-left-color:var(--gold);background:rgba(201,168,76,.04)}
 .wisdom-quote.confucian:hover{border-left-color:#e0b84a}
-.wisdom-quote.confucian .wq-tag{background:rgba(201,168,76,.12);color:#c9a84c}
-.wisdom-quote.life{border-left-color:#2980b9;background:rgba(52,152,219,.04)}
-.wisdom-quote.life:hover{border-left-color:#3498db}
-.wisdom-quote.life .wq-tag{background:rgba(52,152,219,.12);color:#2980b9}
+.wisdom-quote.confucian .wq-tag{background:rgba(201,168,76,.12);color:var(--gold)}
+.wisdom-quote.life{border-left-color:var(--cyan);background:rgba(52,152,219,.04)}
+.wisdom-quote.life:hover{border-left-color:var(--cyan2)}
+.wisdom-quote.life .wq-tag{background:rgba(52,152,219,.12);color:var(--cyan)}
 
 /* ===== 手印教学 ===== */
 .mudra-section{padding:24px 0;border-top:1px solid rgba(201,168,76,.08)}
@@ -685,7 +685,7 @@ select.input-field option{background:var(--ink2)}
 .mudra-card .mc-emoji{font-size:30px;margin-bottom:10px}
 .mudra-card h4{font-size:15px;color:var(--gold);margin-bottom:8px;font-weight:500}
 .mudra-card p{font-size:13px;opacity:.75;line-height:1.8;margin-bottom:8px}
-.mudra-card .mc-use{font-size:12px;color:#27ae60;margin-top:6px;letter-spacing:1px}
+.mudra-card .mc-use{font-size:12px;color:var(--jade);margin-top:6px;letter-spacing:1px}
 .mudra-card .mc-note{font-size:11px;opacity:.4;margin-top:5px;font-style:italic}
 
 /* ===== USER CENTER (信众中心) ===== */
@@ -770,27 +770,27 @@ select.input-field option{background:var(--ink2)}
 .jiuri-cal-cell .cal-day{font-size:15px;font-family:'Ma Shan Zheng',serif;display:block}
 .jiuri-cal-cell .cal-lunar{font-size:9px;opacity:.4;display:block;margin-top:2px;letter-spacing:1px}
 .jiuri-cal-cell .cal-dot{width:4px;height:4px;border-radius:50%;position:absolute;bottom:4px;left:50%;transform:translateX(-50%)}
-.jiuri-cal-cell.best .cal-dot{background:#2ecc71}
-.jiuri-cal-cell.good .cal-dot{background:#27ae60}
-.jiuri-cal-cell.bad .cal-dot{background:#e74c3c}
-.jiuri-cal-cell.worst .cal-dot{background:#c0392b}
+.jiuri-cal-cell.best .cal-dot{background:var(--success)}
+.jiuri-cal-cell.good .cal-dot{background:var(--jade)}
+.jiuri-cal-cell.bad .cal-dot{background:var(--cinn2)}
+.jiuri-cal-cell.worst .cal-dot{background:var(--cinn)}
 .jiuri-detail-card{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.15);border-radius:12px;padding:20px;margin-bottom:16px}
 .jiuri-detail-card h4{font-family:'Ma Shan Zheng',serif;font-size:16px;letter-spacing:3px;margin-bottom:12px;color:var(--gold)}
 .jiuri-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;letter-spacing:1px;margin-right:6px}
-.jiuri-badge.great{background:rgba(39,174,96,.12);color:#2ecc71;border:1px solid rgba(39,174,96,.3)}
-.jiuri-badge.good{background:rgba(39,174,96,.06);color:#27ae60;border:1px solid rgba(39,174,96,.2)}
+.jiuri-badge.great{background:rgba(39,174,96,.12);color:var(--success);border:1px solid rgba(39,174,96,.3)}
+.jiuri-badge.good{background:rgba(39,174,96,.06);color:var(--jade);border:1px solid rgba(39,174,96,.2)}
 .jiuri-badge.ok{background:rgba(201,168,76,.06);color:var(--gold);border:1px solid rgba(201,168,76,.2)}
-.jiuri-badge.bad{background:rgba(231,76,60,.06);color:#e74c3c;border:1px solid rgba(231,76,60,.2)}
-.jiuri-badge.worst{background:rgba(192,57,43,.12);color:#c0392b;border:1px solid rgba(192,57,43,.3)}
+.jiuri-badge.bad{background:rgba(231,76,60,.06);color:var(--cinn2);border:1px solid rgba(231,76,60,.2)}
+.jiuri-badge.worst{background:rgba(192,57,43,.12);color:var(--cinn);border:1px solid rgba(192,57,43,.3)}
 .jiuri-yi-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.jiuri-yi-tag{padding:4px 10px;background:rgba(39,174,96,.06);border:1px solid rgba(39,174,96,.2);color:#2ecc71;border-radius:4px;font-size:11px;letter-spacing:1px}
-.jiuri-ji-tag{padding:4px 10px;background:rgba(231,76,60,.06);border:1px solid rgba(231,76,60,.2);color:#e74c3c;border-radius:4px;font-size:11px;letter-spacing:1px}
+.jiuri-yi-tag{padding:4px 10px;background:rgba(39,174,96,.06);border:1px solid rgba(39,174,96,.2);color:var(--success);border-radius:4px;font-size:11px;letter-spacing:1px}
+.jiuri-ji-tag{padding:4px 10px;background:rgba(231,76,60,.06);border:1px solid rgba(231,76,60,.2);color:var(--cinn2);border-radius:4px;font-size:11px;letter-spacing:1px}
 .jiuri-hours-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
 .jiuri-hour{text-align:center;padding:6px 4px;border-radius:6px;font-size:11px}
-.jiuri-hour.great{background:rgba(39,174,96,.12);color:#2ecc71;border:1px solid rgba(39,174,96,.25)}
-.jiuri-hour.good{background:rgba(39,174,96,.05);color:#27ae60;border:1px solid rgba(39,174,96,.15)}
+.jiuri-hour.great{background:rgba(39,174,96,.12);color:var(--success);border:1px solid rgba(39,174,96,.25)}
+.jiuri-hour.good{background:rgba(39,174,96,.05);color:var(--jade);border:1px solid rgba(39,174,96,.15)}
 .jiuri-hour.ok{background:rgba(201,168,76,.04);color:var(--paper2);border:1px solid rgba(201,168,76,.1)}
-.jiuri-hour.bad{background:rgba(231,76,60,.06);color:#e74c3c;border:1px solid rgba(231,76,60,.2)}
+.jiuri-hour.bad{background:rgba(231,76,60,.06);color:var(--cinn2);border:1px solid rgba(231,76,60,.2)}
 .jiuri-suggest-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:16px}
 .jiuri-suggest-card{padding:16px;border-radius:10px;border:1px solid rgba(201,168,76,.15);background:rgba(201,168,76,.03)}
 .jiuri-suggest-card .sg-rank{font-size:10px;letter-spacing:2px;opacity:.4;margin-bottom:6px}
@@ -873,8 +873,8 @@ select.input-field option{background:var(--ink2)}
 .plan-desc { font-size: 12px; opacity: .7; margin-bottom: 10px; line-height: 1.6; }
 .plan-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
 .tag { font-size: 11px; padding: 3px 8px; border-radius: 4px; letter-spacing: 1px; }
-.tag.auspicious { background: rgba(46,204,113,.12); color: #2ecc71; border: 1px solid rgba(46,204,113,.2); }
-.tag.inauspicious { background: rgba(231,76,60,.1); color: #e74c3c; border: 1px solid rgba(231,76,60,.18); }
+.tag.auspicious { background: rgba(46,204,113,.12); color: var(--success); border: 1px solid rgba(46,204,113,.2); }
+.tag.inauspicious { background: rgba(231,76,60,.1); color: var(--cinn2); border: 1px solid rgba(231,76,60,.18); }
 .plan-dimensions { margin: 12px 0; }
 .dim-bar {
   display: flex;
@@ -914,7 +914,7 @@ select.input-field option{background:var(--ink2)}
 .floor-room { background: rgba(255,255,255,.03); border: 1px solid rgba(201,168,76,.1); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px; min-height: 54px; position: relative; }
 .floor-room.吉位 { border-color: var(--jade2); }
 .floor-room.凶位 { border-color: var(--cinn2); }
-.floor-room.缺角 { border-color: #e67e22; background: rgba(230,126,34,.06); }
+.floor-room.缺角 { border-color: var(--orange); background: rgba(230,126,34,.06); }
 .room-name { font-size: 12px; letter-spacing: 2px; }
 .room-tag { font-size: 9px; opacity: .6; margin-top: 2px; }
 .room-tag.吉位 { color: var(--jade2); opacity: .9; }
@@ -929,8 +929,8 @@ select.input-field option{background:var(--ink2)}
   display: none;
 }
 .plan-match-result.show { display: block; }
-.plan-match-result.match { background: rgba(46,204,113,.1); border: 1px solid rgba(46,204,113,.2); color: #2ecc71; }
-.plan-match-result.nomatch { background: rgba(231,76,60,.08); border: 1px solid rgba(231,76,60,.15); color: #e74c3c; }
+.plan-match-result.match { background: rgba(46,204,113,.1); border: 1px solid rgba(46,204,113,.2); color: var(--success); }
+.plan-match-result.nomatch { background: rgba(231,76,60,.08); border: 1px solid rgba(231,76,60,.15); color: var(--cinn2); }
 
 /* ================================================================
    PWA MOBILE STYLES
@@ -1667,7 +1667,7 @@ input, textarea, select {
 }
 
 /* Toast Notification */
-.toast-msg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(20,18,14,.95);border:1px solid rgba(201,168,76,.3);color:#f0e8d8;font-family:'Noto Serif SC',serif;font-size:14px;padding:18px 28px;letter-spacing:2px;border-radius:4px;z-index:99999;box-shadow:0 4px 32px rgba(0,0,0,.6);text-align:center;min-width:220px;opacity:0;transition:opacity .25s ease;pointer-events:none}
+.toast-msg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(20,18,14,.95);border:1px solid rgba(201,168,76,.3);color:var(--paper);font-family:'Noto Serif SC',serif;font-size:14px;padding:18px 28px;letter-spacing:2px;border-radius:4px;z-index:99999;box-shadow:0 4px 32px rgba(0,0,0,.6);text-align:center;min-width:220px;opacity:0;transition:opacity .25s ease;pointer-events:none}
 .toast-msg.show{opacity:1}
 
 /* 大运时间轴 */
@@ -1712,9 +1712,9 @@ input, textarea, select {
 .wuge-item .wuge-value { font-family: 'Ma Shan Zheng', serif; font-size: 24px; letter-spacing: 2px; color: var(--gold); }
 .wuge-item .wuge-element { font-size: 12px; letter-spacing: 1px; opacity: .5; margin-top: 4px; }
 .wuge-item .wuge-luck { font-size: 11px; letter-spacing: 2px; margin-top: 6px; padding: 3px 8px; border-radius: 3px; display: inline-block; }
-.wuge-item .wuge-luck.lucky { background: rgba(39,174,96,.1); color: #2ecc71; border: 1px solid rgba(39,174,96,.2); }
+.wuge-item .wuge-luck.lucky { background: rgba(39,174,96,.1); color: var(--success); border: 1px solid rgba(39,174,96,.2); }
 .wuge-item .wuge-luck.neutral { background: rgba(201,168,76,.1); color: var(--gold); border: 1px solid rgba(201,168,76,.2); }
-.wuge-item .wuge-luck.unlucky { background: rgba(231,76,60,.1); color: #e74c3c; border: 1px solid rgba(231,76,60,.2); }
+.wuge-item .wuge-luck.unlucky { background: rgba(231,76,60,.1); color: var(--cinn2); border: 1px solid rgba(231,76,60,.2); }
 
 /* 三才配置 */
 .sancai-box { background: rgba(255,255,255,.02); border: 1px solid rgba(201,168,76,.1); padding: 16px 20px; margin: 12px 0; text-align: center; }
@@ -1759,7 +1759,7 @@ input, textarea, select {
 .saved-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(201,168,76,.04); }
 .saved-item:last-child { border-bottom: none; }
 .saved-item .si-name { font-family: 'Ma Shan Zheng', serif; font-size: 16px; letter-spacing: 3px; }
-.saved-item .si-remove { padding: 4px 10px; background: rgba(231,76,60,.1); border: 1px solid rgba(231,76,60,.2); color: #e74c3c; font-size: 10px; cursor: pointer; transition: all .2s; }
+.saved-item .si-remove { padding: 4px 10px; background: rgba(231,76,60,.1); border: 1px solid rgba(231,76,60,.2); color: var(--cinn2); font-size: 10px; cursor: pointer; transition: all .2s; }
 .saved-item .si-remove:hover { background: rgba(231,76,60,.2); }
 
 /* 手机号增强模块 */
@@ -2037,13 +2037,13 @@ input, textarea, select {
 .lyc-wuxing-item.wx-sheng {
   background: rgba(39,174,96,.12);
   border: 1px solid rgba(39,174,96,.25);
-  color: #2ecc71;
+  color: var(--success);
 }
 
 .lyc-wuxing-item.wx-ke {
   background: rgba(231,76,60,.1);
   border: 1px solid rgba(231,76,60,.2);
-  color: #e74c3c;
+  color: var(--cinn2);
 }
 
 .lyc-wuxing-item.wx-balance {
@@ -2074,8 +2074,8 @@ input, textarea, select {
 .liu-yue-card.risk-month { border-color: rgba(231,76,60,.3); }
 .lyc-header { display: flex; align-items: center; gap: 8px; }
 .lyc-risk { font-size: 11px; padding: 2px 8px; border-radius: 4px; margin-left: auto; }
-.lyc-risk.risk-ji { background: rgba(39,174,96,.15); color: #2ecc71; }
-.lyc-risk.risk-xiong { background: rgba(231,76,60,.15); color: #e74c3c; }
+.lyc-risk.risk-ji { background: rgba(39,174,96,.15); color: var(--success); }
+.lyc-risk.risk-xiong { background: rgba(231,76,60,.15); color: var(--cinn2); }
 .lyc-risk-box, .lyc-huajie-box, .lyc-jiri-box {
   margin-top: 10px; padding: 10px; background: rgba(255,255,255,.02); border-radius: 6px; font-size: 12px; line-height: 1.7;
 }
@@ -2085,8 +2085,8 @@ input, textarea, select {
 .lyc-risk-title, .lyc-huajie-title, .lyc-jiri-title {
   font-size: 11px; letter-spacing: 2px; margin-bottom: 6px; opacity: .7;
 }
-.lyc-risk-title { color: #e74c3c; }
-.lyc-huajie-title { color: #2ecc71; }
+.lyc-risk-title { color: var(--cinn2); }
+.lyc-huajie-title { color: var(--success); }
 .lyc-jiri-title { color: var(--gold); }
 .lyc-risk-text, .lyc-huajie-text, .lyc-jiri-text { opacity: .75; }
 
@@ -2146,11 +2146,11 @@ input, textarea, select {
   text-align: center;
 }
 
-.ln-grade.daji { background: rgba(39,174,96,.15); border: 1px solid rgba(39,174,96,.3); color: #2ecc71; }
-.ln-grade.ji { background: rgba(46,204,113,.1); border: 1px solid rgba(46,204,113,.2); color: #2ecc71; opacity: .8; }
+.ln-grade.daji { background: rgba(39,174,96,.15); border: 1px solid rgba(39,174,96,.3); color: var(--success); }
+.ln-grade.ji { background: rgba(46,204,113,.1); border: 1px solid rgba(46,204,113,.2); color: var(--success); opacity: .8; }
 .ln-grade.ping { background: rgba(201,168,76,.1); border: 1px solid rgba(201,168,76,.2); color: var(--gold); }
-.ln-grade.xiaoxiong { background: rgba(230,126,34,.1); border: 1px solid rgba(230,126,34,.2); color: #e67e22; }
-.ln-grade.xiong { background: rgba(231,76,60,.1); border: 1px solid rgba(231,76,60,.2); color: #e74c3c; }
+.ln-grade.xiaoxiong { background: rgba(230,126,34,.1); border: 1px solid rgba(230,126,34,.2); color: var(--orange); }
+.ln-grade.xiong { background: rgba(231,76,60,.1); border: 1px solid rgba(231,76,60,.2); color: var(--cinn2); }
 
 .ln-tip {
   font-size: 12px;
@@ -2215,11 +2215,11 @@ input, textarea, select {
   margin: 2px 3px;
 }
 
-.hfc-tag.tag-木 { background: rgba(39,174,96,.1); border: 1px solid rgba(39,174,96,.2); color: #27ae60; }
-.hfc-tag.tag-火 { background: rgba(231,76,60,.1); border: 1px solid rgba(231,76,60,.2); color: #e74c3c; }
-.hfc-tag.tag-土 { background: rgba(230,126,34,.1); border: 1px solid rgba(230,126,34,.2); color: #e67e22; }
-.hfc-tag.tag-金 { background: rgba(149,165,166,.1); border: 1px solid rgba(149,165,166,.2); color: #95a5a6; }
-.hfc-tag.tag-水 { background: rgba(41,128,185,.1); border: 1px solid rgba(41,128,185,.2); color: #2980b9; }
+.hfc-tag.tag-木 { background: rgba(39,174,96,.1); border: 1px solid rgba(39,174,96,.2); color: var(--jade); }
+.hfc-tag.tag-火 { background: rgba(231,76,60,.1); border: 1px solid rgba(231,76,60,.2); color: var(--cinn2); }
+.hfc-tag.tag-土 { background: rgba(230,126,34,.1); border: 1px solid rgba(230,126,34,.2); color: var(--orange); }
+.hfc-tag.tag-金 { background: rgba(149,165,166,.1); border: 1px solid rgba(149,165,166,.2); color: var(--metal); }
+.hfc-tag.tag-水 { background: rgba(41,128,185,.1); border: 1px solid rgba(41,128,185,.2); color: var(--cyan); }
 .hfc-tag.tag-default { background: rgba(201,168,76,.08); border: 1px solid rgba(201,168,76,.15); color: var(--gold); }
 
 .hfc-grid-2 {
@@ -2495,19 +2495,19 @@ input, textarea, select {
 <style>
 :root{
   --ink:#080808;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;
-  --paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;
-  --gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;
-  --cinn:#c0392b;--cinn2:#e74c3c;
-  --cyan:#2980b9;--cyan2:#5dade2;
-  --jade:#27ae60;--jade2:#2ecc71;
-  --violet:#8e44ad;--violet2:#a569bd;
-  --orange:#e67e22;
-  --emerald:#16a085;
-  --steel:#7f8c8d;
-  --wood:#8d6e63;--wood2:#a1887f;
-  --fire:#e74c3c;--fire2:#c0392b;
-  --earth:#a08060;
-  --metal:#95a5a6;--metal2:#bdc3c7;
+  --paper:var(--paper);--paper2:var(--paper2);--paper3:var(--paper3);
+  --gold:var(--gold);--gold2:var(--gold2);--gold3:var(--gold3);
+  --cinn:var(--cinn);--cinn2:var(--cinn2);
+  --cyan:var(--cyan);--cyan2:#5dade2;
+  --jade:var(--jade);--jade2:var(--success);
+  --violet:var(--violet2);--violet2:#a569bd;
+  --orange:var(--orange);
+  --emerald:var(--emerald);
+  --steel:var(--steel);
+  --wood:var(--wood);--wood2:var(--wood2);
+  --fire:var(--cinn2);--fire2:var(--cinn);
+  --earth:var(--earth);
+  --metal:var(--metal);--metal2:var(--metal2);
   --danger:#dc3545;
   --font-serif:'Noto Serif SC','Source Han Serif SC','SimSun','STSong',serif;
   --font-mono:'Cutive Mono','Courier New',monospace;
@@ -2516,7 +2516,7 @@ input, textarea, select {
   --bg:var(--ink);--bg-card:rgba(255,255,255,0.04);
   --card:rgba(255,255,255,0.04);--card2:rgba(255,255,255,0.06);
   --border:rgba(201,168,76,.15);--shadow:0 4px 24px rgba(0,0,0,.5);
-  --success:#2ecc71;--warn:#e67e22;
+  --success:var(--success);--warn:var(--orange);
   --text:var(--paper);--text-dim:var(--paper3);
 }
 
@@ -2671,7 +2671,7 @@ select.input-field option{background:var(--ink2)}
 /* FIVE ELEMENT BAR */
 .ele-bar{display:flex;height:5px;border-radius:3px;overflow:hidden;gap:2px;margin:10px 0 6px}
 .ele-seg{border-radius:2px;transition:width .6s ease}
-.ele-木{background:#27ae60}.ele-火{background:#e74c3c}.ele-土{background:#e67e22}.ele-金{background:#95a5a6}.ele-水{background:#2980b9}
+.ele-木{background:var(--jade)}.ele-火{background:var(--cinn2)}.ele-土{background:var(--orange)}.ele-金{background:var(--metal)}.ele-水{background:var(--cyan)}
 .ele-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
 .ele-l-item{font-size:11px;letter-spacing:2px;opacity:.45}
 .ele-l-item span{font-weight:600;margin-right:4px}
@@ -2966,11 +2966,11 @@ select.input-field option{background:var(--ink2)}
 .huajie-row{display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(201,168,76,.04);font-size:13px;line-height:1.7}
 .huajie-row:last-child{border-bottom:none}
 .huajie-tag{padding:3px 10px;border:1px solid rgba(201,168,76,.15);font-size:11px;letter-spacing:2px;border-radius:3px;display:inline-block;margin:2px 4px}
-.huajie-tag.tag-木{color:#27ae60;border-color:rgba(39,174,96,.25);background:rgba(39,174,96,.05)}
-.huajie-tag.tag-火{color:#e74c3c;border-color:rgba(231,76,60,.25);background:rgba(231,76,60,.05)}
-.huajie-tag.tag-土{color:#e67e22;border-color:rgba(230,126,34,.25);background:rgba(230,126,34,.05)}
-.huajie-tag.tag-金{color:#95a5a6;border-color:rgba(149,165,166,.25);background:rgba(149,165,166,.05)}
-.huajie-tag.tag-水{color:#2980b9;border-color:rgba(41,128,185,.25);background:rgba(41,128,185,.05)}
+.huajie-tag.tag-木{color:var(--jade);border-color:rgba(39,174,96,.25);background:rgba(39,174,96,.05)}
+.huajie-tag.tag-火{color:var(--cinn2);border-color:rgba(231,76,60,.25);background:rgba(231,76,60,.05)}
+.huajie-tag.tag-土{color:var(--orange);border-color:rgba(230,126,34,.25);background:rgba(230,126,34,.05)}
+.huajie-tag.tag-金{color:var(--metal);border-color:rgba(149,165,166,.25);background:rgba(149,165,166,.05)}
+.huajie-tag.tag-水{color:var(--cyan);border-color:rgba(41,128,185,.25);background:rgba(41,128,185,.05)}
 .huajie-checklist{list-style:none;padding:0}
 .huajie-checklist li{padding:10px 0;font-size:13px;letter-spacing:1px;opacity:.7;line-height:1.8;border-bottom:1px solid rgba(201,168,76,.04)}
 .huajie-checklist li:last-child{border-bottom:none}
@@ -2979,8 +2979,8 @@ select.input-field option{background:var(--ink2)}
 .huajie-alert .alert-title{font-family:'Ma Shan Zheng',serif;font-size:18px;letter-spacing:3px;color:var(--gold);margin-bottom:8px}
 .huajie-calendar{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:16px 0}
 .huajie-calendar .month-item{padding:10px;text-align:center;border:1px solid rgba(201,168,76,.08);font-size:12px;letter-spacing:2px;transition:all .2s}
-.huajie-calendar .month-good{background:rgba(39,174,96,.06);border-color:rgba(39,174,96,.2);color:#2ecc71}
-.huajie-calendar .month-bad{background:rgba(231,76,60,.06);border-color:rgba(231,76,60,.2);color:#e74c3c}
+.huajie-calendar .month-good{background:rgba(39,174,96,.06);border-color:rgba(39,174,96,.2);color:var(--success)}
+.huajie-calendar .month-bad{background:rgba(231,76,60,.06);border-color:rgba(231,76,60,.2);color:var(--cinn2)}
 .huajie-calendar .month-neutral{border-color:rgba(201,168,76,.08);opacity:.5}
 .huajie-renew-box{background:rgba(201,168,76,.03);border:1px solid rgba(201,168,76,.2);padding:20px 24px;margin:16px 0;border-radius:4px;text-align:center}
 .huajie-renew-box .renew-title{font-family:'Ma Shan Zheng',serif;font-size:22px;letter-spacing:5px;color:var(--gold);margin-bottom:8px}
@@ -3014,8 +3014,8 @@ select.input-field option{background:var(--ink2)}
 .ss-name{font-size:13px;letter-spacing:2px;color:var(--gold)}
 .ss-desc{font-size:11px;opacity:.5;line-height:1.6}
 .ss-tag{padding:2px 8px;font-size:10px;letter-spacing:2px;border-radius:2px;display:inline-block;margin-bottom:4px}
-.ss-he{background:rgba(39,174,96,.08);border:1px solid rgba(39,174,96,.25);color:#2ecc71}
-.ss-chong{background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.25);color:#e74c3c}
+.ss-he{background:rgba(39,174,96,.08);border:1px solid rgba(39,174,96,.25);color:var(--success)}
+.ss-chong{background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.25);color:var(--cinn2)}
 .ss-sanhe{background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.25);color:var(--gold)}
 
 /* 月份详情 */
@@ -3149,18 +3149,18 @@ select.input-field option{background:var(--ink2)}
 .wisdom-quote .wq-text{font-size:14px;line-height:1.9;color:var(--paper2);font-family:'Noto Serif SC',serif}
 .wisdom-quote .wq-source{font-size:11px;opacity:.4;margin-top:8px;letter-spacing:2px}
 .wisdom-quote .wq-tag{display:inline-block;background:rgba(201,168,76,.1);color:var(--gold);font-size:10px;padding:2px 10px;border-radius:20px;margin-top:8px;letter-spacing:1px}
-.wisdom-quote.dao{border-left-color:#27ae60;background:rgba(76,175,80,.04)}
-.wisdom-quote.dao:hover{border-left-color:#2ecc71}
-.wisdom-quote.dao .wq-tag{background:rgba(76,175,80,.12);color:#27ae60}
-.wisdom-quote.buddha{border-left-color:#8e44ad;background:rgba(155,89,182,.04)}
-.wisdom-quote.buddha:hover{border-left-color:#9b59b6}
-.wisdom-quote.buddha .wq-tag{background:rgba(155,89,182,.12);color:#9b59b6}
-.wisdom-quote.confucian{border-left-color:#c9a84c;background:rgba(201,168,76,.04)}
+.wisdom-quote.dao{border-left-color:var(--jade);background:rgba(76,175,80,.04)}
+.wisdom-quote.dao:hover{border-left-color:var(--success)}
+.wisdom-quote.dao .wq-tag{background:rgba(76,175,80,.12);color:var(--jade)}
+.wisdom-quote.buddha{border-left-color:var(--violet2);background:rgba(155,89,182,.04)}
+.wisdom-quote.buddha:hover{border-left-color:var(--violet)}
+.wisdom-quote.buddha .wq-tag{background:rgba(155,89,182,.12);color:var(--violet)}
+.wisdom-quote.confucian{border-left-color:var(--gold);background:rgba(201,168,76,.04)}
 .wisdom-quote.confucian:hover{border-left-color:#e0b84a}
-.wisdom-quote.confucian .wq-tag{background:rgba(201,168,76,.12);color:#c9a84c}
-.wisdom-quote.life{border-left-color:#2980b9;background:rgba(52,152,219,.04)}
-.wisdom-quote.life:hover{border-left-color:#3498db}
-.wisdom-quote.life .wq-tag{background:rgba(52,152,219,.12);color:#2980b9}
+.wisdom-quote.confucian .wq-tag{background:rgba(201,168,76,.12);color:var(--gold)}
+.wisdom-quote.life{border-left-color:var(--cyan);background:rgba(52,152,219,.04)}
+.wisdom-quote.life:hover{border-left-color:var(--cyan2)}
+.wisdom-quote.life .wq-tag{background:rgba(52,152,219,.12);color:var(--cyan)}
 
 /* ===== 手印教学 ===== */
 .mudra-section{padding:24px 0;border-top:1px solid rgba(201,168,76,.08)}
@@ -3172,7 +3172,7 @@ select.input-field option{background:var(--ink2)}
 .mudra-card .mc-emoji{font-size:30px;margin-bottom:10px}
 .mudra-card h4{font-size:15px;color:var(--gold);margin-bottom:8px;font-weight:500}
 .mudra-card p{font-size:13px;opacity:.75;line-height:1.8;margin-bottom:8px}
-.mudra-card .mc-use{font-size:12px;color:#27ae60;margin-top:6px;letter-spacing:1px}
+.mudra-card .mc-use{font-size:12px;color:var(--jade);margin-top:6px;letter-spacing:1px}
 .mudra-card .mc-note{font-size:11px;opacity:.4;margin-top:5px;font-style:italic}
 
 /* ===== USER CENTER (信众中心) ===== */
@@ -3257,27 +3257,27 @@ select.input-field option{background:var(--ink2)}
 .jiuri-cal-cell .cal-day{font-size:15px;font-family:'Ma Shan Zheng',serif;display:block}
 .jiuri-cal-cell .cal-lunar{font-size:9px;opacity:.4;display:block;margin-top:2px;letter-spacing:1px}
 .jiuri-cal-cell .cal-dot{width:4px;height:4px;border-radius:50%;position:absolute;bottom:4px;left:50%;transform:translateX(-50%)}
-.jiuri-cal-cell.best .cal-dot{background:#2ecc71}
-.jiuri-cal-cell.good .cal-dot{background:#27ae60}
-.jiuri-cal-cell.bad .cal-dot{background:#e74c3c}
-.jiuri-cal-cell.worst .cal-dot{background:#c0392b}
+.jiuri-cal-cell.best .cal-dot{background:var(--success)}
+.jiuri-cal-cell.good .cal-dot{background:var(--jade)}
+.jiuri-cal-cell.bad .cal-dot{background:var(--cinn2)}
+.jiuri-cal-cell.worst .cal-dot{background:var(--cinn)}
 .jiuri-detail-card{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.15);border-radius:12px;padding:20px;margin-bottom:16px}
 .jiuri-detail-card h4{font-family:'Ma Shan Zheng',serif;font-size:16px;letter-spacing:3px;margin-bottom:12px;color:var(--gold)}
 .jiuri-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;letter-spacing:1px;margin-right:6px}
-.jiuri-badge.great{background:rgba(39,174,96,.12);color:#2ecc71;border:1px solid rgba(39,174,96,.3)}
-.jiuri-badge.good{background:rgba(39,174,96,.06);color:#27ae60;border:1px solid rgba(39,174,96,.2)}
+.jiuri-badge.great{background:rgba(39,174,96,.12);color:var(--success);border:1px solid rgba(39,174,96,.3)}
+.jiuri-badge.good{background:rgba(39,174,96,.06);color:var(--jade);border:1px solid rgba(39,174,96,.2)}
 .jiuri-badge.ok{background:rgba(201,168,76,.06);color:var(--gold);border:1px solid rgba(201,168,76,.2)}
-.jiuri-badge.bad{background:rgba(231,76,60,.06);color:#e74c3c;border:1px solid rgba(231,76,60,.2)}
-.jiuri-badge.worst{background:rgba(192,57,43,.12);color:#c0392b;border:1px solid rgba(192,57,43,.3)}
+.jiuri-badge.bad{background:rgba(231,76,60,.06);color:var(--cinn2);border:1px solid rgba(231,76,60,.2)}
+.jiuri-badge.worst{background:rgba(192,57,43,.12);color:var(--cinn);border:1px solid rgba(192,57,43,.3)}
 .jiuri-yi-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.jiuri-yi-tag{padding:4px 10px;background:rgba(39,174,96,.06);border:1px solid rgba(39,174,96,.2);color:#2ecc71;border-radius:4px;font-size:11px;letter-spacing:1px}
-.jiuri-ji-tag{padding:4px 10px;background:rgba(231,76,60,.06);border:1px solid rgba(231,76,60,.2);color:#e74c3c;border-radius:4px;font-size:11px;letter-spacing:1px}
+.jiuri-yi-tag{padding:4px 10px;background:rgba(39,174,96,.06);border:1px solid rgba(39,174,96,.2);color:var(--success);border-radius:4px;font-size:11px;letter-spacing:1px}
+.jiuri-ji-tag{padding:4px 10px;background:rgba(231,76,60,.06);border:1px solid rgba(231,76,60,.2);color:var(--cinn2);border-radius:4px;font-size:11px;letter-spacing:1px}
 .jiuri-hours-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
 .jiuri-hour{text-align:center;padding:6px 4px;border-radius:6px;font-size:11px}
-.jiuri-hour.great{background:rgba(39,174,96,.12);color:#2ecc71;border:1px solid rgba(39,174,96,.25)}
-.jiuri-hour.good{background:rgba(39,174,96,.05);color:#27ae60;border:1px solid rgba(39,174,96,.15)}
+.jiuri-hour.great{background:rgba(39,174,96,.12);color:var(--success);border:1px solid rgba(39,174,96,.25)}
+.jiuri-hour.good{background:rgba(39,174,96,.05);color:var(--jade);border:1px solid rgba(39,174,96,.15)}
 .jiuri-hour.ok{background:rgba(201,168,76,.04);color:var(--paper2);border:1px solid rgba(201,168,76,.1)}
-.jiuri-hour.bad{background:rgba(231,76,60,.06);color:#e74c3c;border:1px solid rgba(231,76,60,.2)}
+.jiuri-hour.bad{background:rgba(231,76,60,.06);color:var(--cinn2);border:1px solid rgba(231,76,60,.2)}
 .jiuri-suggest-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:16px}
 .jiuri-suggest-card{padding:16px;border-radius:10px;border:1px solid rgba(201,168,76,.15);background:rgba(201,168,76,.03)}
 .jiuri-suggest-card .sg-rank{font-size:10px;letter-spacing:2px;opacity:.4;margin-bottom:6px}
@@ -3360,8 +3360,8 @@ select.input-field option{background:var(--ink2)}
 .plan-desc { font-size: 12px; opacity: .7; margin-bottom: 10px; line-height: 1.6; }
 .plan-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
 .tag { font-size: 11px; padding: 3px 8px; border-radius: 4px; letter-spacing: 1px; }
-.tag.auspicious { background: rgba(46,204,113,.12); color: #2ecc71; border: 1px solid rgba(46,204,113,.2); }
-.tag.inauspicious { background: rgba(231,76,60,.1); color: #e74c3c; border: 1px solid rgba(231,76,60,.18); }
+.tag.auspicious { background: rgba(46,204,113,.12); color: var(--success); border: 1px solid rgba(46,204,113,.2); }
+.tag.inauspicious { background: rgba(231,76,60,.1); color: var(--cinn2); border: 1px solid rgba(231,76,60,.18); }
 .plan-dimensions { margin: 12px 0; }
 .dim-bar {
   display: flex;
@@ -3401,7 +3401,7 @@ select.input-field option{background:var(--ink2)}
 .floor-room { background: rgba(255,255,255,.03); border: 1px solid rgba(201,168,76,.1); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px; min-height: 54px; position: relative; }
 .floor-room.吉位 { border-color: var(--jade2); }
 .floor-room.凶位 { border-color: var(--cinn2); }
-.floor-room.缺角 { border-color: #e67e22; background: rgba(230,126,34,.06); }
+.floor-room.缺角 { border-color: var(--orange); background: rgba(230,126,34,.06); }
 .room-name { font-size: 12px; letter-spacing: 2px; }
 .room-tag { font-size: 9px; opacity: .6; margin-top: 2px; }
 .room-tag.吉位 { color: var(--jade2); opacity: .9; }
@@ -3416,8 +3416,8 @@ select.input-field option{background:var(--ink2)}
   display: none;
 }
 .plan-match-result.show { display: block; }
-.plan-match-result.match { background: rgba(46,204,113,.1); border: 1px solid rgba(46,204,113,.2); color: #2ecc71; }
-.plan-match-result.nomatch { background: rgba(231,76,60,.08); border: 1px solid rgba(231,76,60,.15); color: #e74c3c; }
+.plan-match-result.match { background: rgba(46,204,113,.1); border: 1px solid rgba(46,204,113,.2); color: var(--success); }
+.plan-match-result.nomatch { background: rgba(231,76,60,.08); border: 1px solid rgba(231,76,60,.15); color: var(--cinn2); }
 
 /* ================================================================
    PWA MOBILE STYLES
@@ -4154,7 +4154,7 @@ input, textarea, select {
 }
 
 /* Toast Notification */
-.toast-msg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(20,18,14,.95);border:1px solid rgba(201,168,76,.3);color:#f0e8d8;font-family:'Noto Serif SC',serif;font-size:14px;padding:18px 28px;letter-spacing:2px;border-radius:4px;z-index:99999;box-shadow:0 4px 32px rgba(0,0,0,.6);text-align:center;min-width:220px;opacity:0;transition:opacity .25s ease;pointer-events:none}
+.toast-msg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(20,18,14,.95);border:1px solid rgba(201,168,76,.3);color:var(--paper);font-family:'Noto Serif SC',serif;font-size:14px;padding:18px 28px;letter-spacing:2px;border-radius:4px;z-index:99999;box-shadow:0 4px 32px rgba(0,0,0,.6);text-align:center;min-width:220px;opacity:0;transition:opacity .25s ease;pointer-events:none}
 .toast-msg.show{opacity:1}
 
 /* 大运时间轴 */
@@ -4199,9 +4199,9 @@ input, textarea, select {
 .wuge-item .wuge-value { font-family: 'Ma Shan Zheng', serif; font-size: 24px; letter-spacing: 2px; color: var(--gold); }
 .wuge-item .wuge-element { font-size: 12px; letter-spacing: 1px; opacity: .5; margin-top: 4px; }
 .wuge-item .wuge-luck { font-size: 11px; letter-spacing: 2px; margin-top: 6px; padding: 3px 8px; border-radius: 3px; display: inline-block; }
-.wuge-item .wuge-luck.lucky { background: rgba(39,174,96,.1); color: #2ecc71; border: 1px solid rgba(39,174,96,.2); }
+.wuge-item .wuge-luck.lucky { background: rgba(39,174,96,.1); color: var(--success); border: 1px solid rgba(39,174,96,.2); }
 .wuge-item .wuge-luck.neutral { background: rgba(201,168,76,.1); color: var(--gold); border: 1px solid rgba(201,168,76,.2); }
-.wuge-item .wuge-luck.unlucky { background: rgba(231,76,60,.1); color: #e74c3c; border: 1px solid rgba(231,76,60,.2); }
+.wuge-item .wuge-luck.unlucky { background: rgba(231,76,60,.1); color: var(--cinn2); border: 1px solid rgba(231,76,60,.2); }
 
 /* 三才配置 */
 .sancai-box { background: rgba(255,255,255,.02); border: 1px solid rgba(201,168,76,.1); padding: 16px 20px; margin: 12px 0; text-align: center; }
@@ -4246,7 +4246,7 @@ input, textarea, select {
 .saved-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(201,168,76,.04); }
 .saved-item:last-child { border-bottom: none; }
 .saved-item .si-name { font-family: 'Ma Shan Zheng', serif; font-size: 16px; letter-spacing: 3px; }
-.saved-item .si-remove { padding: 4px 10px; background: rgba(231,76,60,.1); border: 1px solid rgba(231,76,60,.2); color: #e74c3c; font-size: 10px; cursor: pointer; transition: all .2s; }
+.saved-item .si-remove { padding: 4px 10px; background: rgba(231,76,60,.1); border: 1px solid rgba(231,76,60,.2); color: var(--cinn2); font-size: 10px; cursor: pointer; transition: all .2s; }
 .saved-item .si-remove:hover { background: rgba(231,76,60,.2); }
 
 /* 手机号增强模块 */
@@ -4524,13 +4524,13 @@ input, textarea, select {
 .lyc-wuxing-item.wx-sheng {
   background: rgba(39,174,96,.12);
   border: 1px solid rgba(39,174,96,.25);
-  color: #2ecc71;
+  color: var(--success);
 }
 
 .lyc-wuxing-item.wx-ke {
   background: rgba(231,76,60,.1);
   border: 1px solid rgba(231,76,60,.2);
-  color: #e74c3c;
+  color: var(--cinn2);
 }
 
 .lyc-wuxing-item.wx-balance {
@@ -4561,8 +4561,8 @@ input, textarea, select {
 .liu-yue-card.risk-month { border-color: rgba(231,76,60,.3); }
 .lyc-header { display: flex; align-items: center; gap: 8px; }
 .lyc-risk { font-size: 11px; padding: 2px 8px; border-radius: 4px; margin-left: auto; }
-.lyc-risk.risk-ji { background: rgba(39,174,96,.15); color: #2ecc71; }
-.lyc-risk.risk-xiong { background: rgba(231,76,60,.15); color: #e74c3c; }
+.lyc-risk.risk-ji { background: rgba(39,174,96,.15); color: var(--success); }
+.lyc-risk.risk-xiong { background: rgba(231,76,60,.15); color: var(--cinn2); }
 .lyc-risk-box, .lyc-huajie-box, .lyc-jiri-box {
   margin-top: 10px; padding: 10px; background: rgba(255,255,255,.02); border-radius: 6px; font-size: 12px; line-height: 1.7;
 }
@@ -4572,8 +4572,8 @@ input, textarea, select {
 .lyc-risk-title, .lyc-huajie-title, .lyc-jiri-title {
   font-size: 11px; letter-spacing: 2px; margin-bottom: 6px; opacity: .7;
 }
-.lyc-risk-title { color: #e74c3c; }
-.lyc-huajie-title { color: #2ecc71; }
+.lyc-risk-title { color: var(--cinn2); }
+.lyc-huajie-title { color: var(--success); }
 .lyc-jiri-title { color: var(--gold); }
 .lyc-risk-text, .lyc-huajie-text, .lyc-jiri-text { opacity: .75; }
 
@@ -4633,11 +4633,11 @@ input, textarea, select {
   text-align: center;
 }
 
-.ln-grade.daji { background: rgba(39,174,96,.15); border: 1px solid rgba(39,174,96,.3); color: #2ecc71; }
-.ln-grade.ji { background: rgba(46,204,113,.1); border: 1px solid rgba(46,204,113,.2); color: #2ecc71; opacity: .8; }
+.ln-grade.daji { background: rgba(39,174,96,.15); border: 1px solid rgba(39,174,96,.3); color: var(--success); }
+.ln-grade.ji { background: rgba(46,204,113,.1); border: 1px solid rgba(46,204,113,.2); color: var(--success); opacity: .8; }
 .ln-grade.ping { background: rgba(201,168,76,.1); border: 1px solid rgba(201,168,76,.2); color: var(--gold); }
-.ln-grade.xiaoxiong { background: rgba(230,126,34,.1); border: 1px solid rgba(230,126,34,.2); color: #e67e22; }
-.ln-grade.xiong { background: rgba(231,76,60,.1); border: 1px solid rgba(231,76,60,.2); color: #e74c3c; }
+.ln-grade.xiaoxiong { background: rgba(230,126,34,.1); border: 1px solid rgba(230,126,34,.2); color: var(--orange); }
+.ln-grade.xiong { background: rgba(231,76,60,.1); border: 1px solid rgba(231,76,60,.2); color: var(--cinn2); }
 
 .ln-tip {
   font-size: 12px;
@@ -4702,11 +4702,11 @@ input, textarea, select {
   margin: 2px 3px;
 }
 
-.hfc-tag.tag-木 { background: rgba(39,174,96,.1); border: 1px solid rgba(39,174,96,.2); color: #27ae60; }
-.hfc-tag.tag-火 { background: rgba(231,76,60,.1); border: 1px solid rgba(231,76,60,.2); color: #e74c3c; }
-.hfc-tag.tag-土 { background: rgba(230,126,34,.1); border: 1px solid rgba(230,126,34,.2); color: #e67e22; }
-.hfc-tag.tag-金 { background: rgba(149,165,166,.1); border: 1px solid rgba(149,165,166,.2); color: #95a5a6; }
-.hfc-tag.tag-水 { background: rgba(41,128,185,.1); border: 1px solid rgba(41,128,185,.2); color: #2980b9; }
+.hfc-tag.tag-木 { background: rgba(39,174,96,.1); border: 1px solid rgba(39,174,96,.2); color: var(--jade); }
+.hfc-tag.tag-火 { background: rgba(231,76,60,.1); border: 1px solid rgba(231,76,60,.2); color: var(--cinn2); }
+.hfc-tag.tag-土 { background: rgba(230,126,34,.1); border: 1px solid rgba(230,126,34,.2); color: var(--orange); }
+.hfc-tag.tag-金 { background: rgba(149,165,166,.1); border: 1px solid rgba(149,165,166,.2); color: var(--metal); }
+.hfc-tag.tag-水 { background: rgba(41,128,185,.1); border: 1px solid rgba(41,128,185,.2); color: var(--cyan); }
 .hfc-tag.tag-default { background: rgba(201,168,76,.08); border: 1px solid rgba(201,168,76,.15); color: var(--gold); }
 
 .hfc-grid-2 {
@@ -5352,7 +5352,7 @@ input, textarea, select {
 /* ===== 经典著作·书卷卡片样式 ===== */
 .classic-card {
   background: linear-gradient(135deg, #f5edd6, #ebe0c4);
-  border: 1px solid #c9a84c;
+  border: 1px solid var(--gold);
   border-radius: 8px;
   overflow: hidden;
   display: flex;
@@ -5644,7 +5644,7 @@ input, textarea, select {
 .cart-item-remove {
   background: rgba(231,76,60,0.1);
   border: 1px solid rgba(231,76,60,0.2);
-  color: #e74c3c;
+  color: var(--cinn2);
   padding: 4px 10px;
   border-radius: 4px;
   font-size: 11px;
@@ -6099,11 +6099,11 @@ setTimeout(removeLoadingOverlay,5000);
       </div>
 
       <div class="cat-card" onclick="showSection('yanzhi')" style="border-color:rgba(230,126,34,.12)">
-        <span class="cc-symbol" style="color:#e67e22">💬</span>
-        <span class="cc-name" style="color:#e67e22">言值</span>
+        <span class="cc-symbol" style="color:var(--orange)">💬</span>
+        <span class="cc-name" style="color:var(--orange)">言值</span>
         <span class="cc-en">Yanzhi · Communication</span>
         <p class="cc-desc">同事·客户·夫妻·亲子，沟通有道，言值满满。让每一句话都说到心坎上</p>
-        <div class="cc-tags"><span class="cat-tag" style="border-color:rgba(230,126,34,.15);color:#e67e22">沟通</span><span class="cat-tag" style="border-color:rgba(230,126,34,.15);color:#e67e22">话术</span><span class="cat-tag" style="border-color:rgba(230,126,34,.15);color:#e67e22">关系</span></div>
+        <div class="cc-tags"><span class="cat-tag" style="border-color:rgba(230,126,34,.15);color:var(--orange)">沟通</span><span class="cat-tag" style="border-color:rgba(230,126,34,.15);color:var(--orange)">话术</span><span class="cat-tag" style="border-color:rgba(230,126,34,.15);color:var(--orange)">关系</span></div>
         <div class="cc-action" onclick="event.stopPropagation();showSection('yanzhi')">开始使用 →</div>
       </div>
 
@@ -6117,8 +6117,8 @@ setTimeout(removeLoadingOverlay,5000);
       </div>
 
       <div class="cat-card" onclick="showSection('lifeplan')" style="border-color:rgba(52,152,219,.15)">
-        <span class="cc-symbol" style="color:#3498db">🧭</span>
-        <span class="cc-name" style="color:#3498db">人生规划</span>
+        <span class="cc-symbol" style="color:var(--cyan2)">🧭</span>
+        <span class="cc-name" style="color:var(--cyan2)">人生规划</span>
         <span class="cc-en">Life Planning</span>
         <p class="cc-desc">基于八字五行十神，结合十二长生，推荐学业、职业、婚恋、城市方向，适合年龄做适合的事</p>
         <div class="cc-tags"><span class="cat-tag">学业</span><span class="cat-tag">职业</span><span class="cat-tag">婚恋</span><span class="cat-tag">十二长生</span></div>
@@ -6126,8 +6126,8 @@ setTimeout(removeLoadingOverlay,5000);
       </div>
 
       <div class="cat-card" onclick="showSection('youth')" style="border-color:rgba(46,204,113,.15)">
-        <span class="cc-symbol" style="color:#2ecc71">🧒</span>
-        <span class="cc-name" style="color:#2ecc71">青少年规划</span>
+        <span class="cc-symbol" style="color:var(--success)">🧒</span>
+        <span class="cc-name" style="color:var(--success)">青少年规划</span>
         <span class="cc-en">Youth Planning</span>
         <p class="cc-desc">按八字五行十神，为孩子推荐兴趣爱好、学业方向、中高考志愿、职业城市、性格健康全方位指引</p>
         <div class="cc-tags"><span class="cat-tag">兴趣</span><span class="cat-tag">学业</span><span class="cat-tag">志愿</span><span class="cat-tag">性格</span></div>
@@ -6135,8 +6135,8 @@ setTimeout(removeLoadingOverlay,5000);
       </div>
 
       <div class="cat-card" onclick="showSection('family')" style="border-color:rgba(231,76,60,.15)">
-        <span class="cc-symbol" style="color:#e74c3c">👨‍👩‍👧‍👦</span>
-        <span class="cc-name" style="color:#e74c3c">家庭排盘</span>
+        <span class="cc-symbol" style="color:var(--cinn2)">👨‍👩‍👧‍👦</span>
+        <span class="cc-name" style="color:var(--cinn2)">家庭排盘</span>
         <span class="cc-en">Family Chart</span>
         <p class="cc-desc">全家八字合盘分析，五行生克关系，综合化解方案，布局方位配色择日</p>
         <div class="cc-tags"><span class="cat-tag">合盘</span><span class="cat-tag">化解</span><span class="cat-tag">布局</span><span class="cat-tag">终身会员</span></div>

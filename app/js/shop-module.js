@@ -274,7 +274,7 @@ function showProductDetail(productId) {
   }
   
   // 推荐理由
-  if (item.reason) html += '<div class="detail-section" style="background:rgba(39,174,96,0.05);border:1px solid rgba(39,174,96,0.15)"><div class="detail-section-title" style="color:#2ecc71">推荐理由</div><div class="detail-section-text">'+item.reason+'</div></div>';
+  if (item.reason) html += '<div class="detail-section" style="background:rgba(39,174,96,0.05);border:1px solid rgba(39,174,96,0.15)"><div class="detail-section-title" style="color:var(--success)">推荐理由</div><div class="detail-section-text">'+item.reason+'</div></div>';
   
   // 经典著作增加阅读建议
   if (isClassic) {

@@ -29,8 +29,8 @@ function showWechatGuide(){
   guide.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px';
   guide.innerHTML = '<div style="background:linear-gradient(135deg,#2c2823,#1a1814);border:1px solid rgba(201,168,76,.3);border-radius:16px;padding:28px 24px;max-width:320px;text-align:center">'+
     '<div style="font-size:48px;margin-bottom:12px">🎤</div>'+
-    '<h3 style="color:#c9a84c;font-size:17px;margin-bottom:10px;letter-spacing:2px">语音功能需要浏览器支持</h3>'+
-    '<p style="color:#8a8275;font-size:13px;line-height:1.8;margin-bottom:16px">微信内置浏览器不支持语音识别。<br>请点击右上角 <b style="color:#c9a84c">···</b> → 选择 <b style="color:#c9a84c">在浏览器中打开</b> 即可使用语音算命功能。</p>'+
+    '<h3 style="color:var(--gold);font-size:17px;margin-bottom:10px;letter-spacing:2px">语音功能需要浏览器支持</h3>'+
+    '<p style="color:#8a8275;font-size:13px;line-height:1.8;margin-bottom:16px">微信内置浏览器不支持语音识别。<br>请点击右上角 <b style="color:var(--gold)">···</b> → 选择 <b style="color:var(--gold)">在浏览器中打开</b> 即可使用语音算命功能。</p>'+
     '<button onclick="this.parentElement.parentElement.remove()" style="background:linear-gradient(135deg,#c9a84c,#b8932f);border:none;color:#1a1e14;padding:10px 32px;border-radius:20px;font-size:14px;cursor:pointer;font-family:inherit">我知道了</button>'+
     '</div>';
   document.body.appendChild(guide);
@@ -68,7 +68,7 @@ function showPlayer(label, onReady){
   player.id = 'mobilePlayer';
   player.style.cssText = 'position:fixed;bottom:70px;left:12px;right:12px;background:linear-gradient(135deg,#2c2823,#1a1814);border:1px solid rgba(201,168,76,.3);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;z-index:9998;box-shadow:0 4px 20px rgba(0,0,0,.4)';
   player.innerHTML = '<div style="font-size:20px">🔊</div>'+
-    '<div style="flex:1;font-size:12px;color:#c9a84c;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+label+'</div>'+
+    '<div style="flex:1;font-size:12px;color:var(--gold);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+label+'</div>'+
     '<button onclick="mobileStopSpeak()" style="background:none;border:none;color:#8a8275;font-size:18px;cursor:pointer;padding:4px">✕</button>';
   document.body.appendChild(player);
   if(onReady) onReady();
@@ -170,9 +170,9 @@ function showListeningOverlay(){
   ov.id = 'voiceOverlay';
   ov.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:99997;display:flex;flex-direction:column;align-items:center;justify-content:center';
   ov.innerHTML = '<div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#c9a84c,#b8932f);display:flex;align-items:center;justify-content:center;font-size:36px;animation:pulse 1.5s infinite;margin-bottom:16px">🎤</div>'+
-    '<div id="voiceText" style="color:#c9a84c;font-size:14px;max-width:280px;text-align:center;min-height:20px">正在聆听...</div>'+
+    '<div id="voiceText" style="color:var(--gold);font-size:14px;max-width:280px;text-align:center;min-height:20px">正在聆听...</div>'+
     '<div style="color:#8a8275;font-size:12px;margin-top:12px">说出您的出生日期，如"1979年6月15日酉时"</div>'+
-    '<button onclick="window._stopMobileVoice()" style="margin-top:16px;background:none;border:1px solid rgba(201,168,76,.3);color:#c9a84c;padding:6px 20px;border-radius:16px;font-size:12px;cursor:pointer">停止</button>';
+    '<button onclick="window._stopMobileVoice()" style="margin-top:16px;background:none;border:1px solid rgba(201,168,76,.3);color:var(--gold);padding:6px 20px;border-radius:16px;font-size:12px;cursor:pointer">停止</button>';
   document.body.appendChild(ov);
   if(!document.getElementById('voicePulseStyle')){
     let s = document.createElement('style');

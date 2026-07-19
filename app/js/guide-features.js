@@ -11,7 +11,7 @@ if (typeof window !== 'undefined' && typeof window.showConfirm !== 'function') {
     let overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;display:flex;align-items:center;justify-content:center';
     overlay.innerHTML = '<div style="background:#1a1a2e;border:1px solid rgba(201,168,76,0.4);border-radius:12px;padding:24px;max-width:360px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.5)">' +
-      '<div style="color:#f0e8d8;font-size:15px;line-height:1.7;margin-bottom:20px;letter-spacing:1px">' + msg + '</div>' +
+      '<div style="color:var(--paper);font-size:15px;line-height:1.7;margin-bottom:20px;letter-spacing:1px">' + msg + '</div>' +
       '<div style="display:flex;gap:12px;justify-content:flex-end">' +
       '<button data-act="cancel" style="padding:8px 20px;background:transparent;color:#888;border:1px solid #555;border-radius:6px;cursor:pointer;font-size:13px">取消</button>' +
       '<button data-act="ok" style="padding:8px 20px;background:linear-gradient(135deg,#c9a84c,#a08430);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;letter-spacing:1px">确认</button>' +
@@ -188,7 +188,7 @@ function displayHuajieFriendly(data) {
   // 注意事项
   if (data.warnings && data.warnings.length > 0) {
     html += '<div style="background:rgba(231,76,60,0.06);border:1px solid rgba(231,76,60,0.2);border-radius:8px;padding:18px;margin-top:20px">';
-    html += '<div style="color:#e74c3c;font-size:15px;letter-spacing:2px;margin-bottom:8px;font-weight:600">⚠️ 注意事项(重要)</div>';
+    html += '<div style="color:var(--cinn2);font-size:15px;letter-spacing:2px;margin-bottom:8px;font-weight:600">⚠️ 注意事项(重要)</div>';
     html += '<div style="font-size:14px;line-height:2;opacity:0.8;letter-spacing:1px">';
     data.warnings.forEach(w => {
       html += '<p>' + w + '</p>';
@@ -2762,7 +2762,7 @@ function computeRename() {
       // 显示错误信息
       let errDiv = document.getElementById('renameResult');
       if (errDiv) {
-        errDiv.innerHTML = '<div class="result-card" style="padding:20px;text-align:center;color:#e74c3c">⚠️ ' + (analysis.message || '分析失败') + '</div>';
+        errDiv.innerHTML = '<div class="result-card" style="padding:20px;text-align:center;color:var(--cinn2)">⚠️ ' + (analysis.message || '分析失败') + '</div>';
       }
     }
   } catch(e) {
@@ -2994,10 +2994,10 @@ function displayYinlv(yinlv) {
   const allSameYunmu = yunmu.every(ym => ym === yunmu[0]);
 
   if (allSameShengmu) {
-    html += `<p style="font-size: 12px; line-height: 1.8; opacity: .7; color: #e74c3c;">⚠️ 声母全同，读起来可能拗口。</p>`;
+    html += `<p style="font-size: 12px; line-height: 1.8; opacity: .7; color: var(--cinn2);">⚠️ 声母全同，读起来可能拗口。</p>`;
   }
   if (allSameYunmu) {
-    html += `<p style="font-size: 12px; line-height: 1.8; opacity: .7; color: #e74c3c;">⚠️ 韵母全同，缺乏韵律感。</p>`;
+    html += `<p style="font-size: 12px; line-height: 1.8; opacity: .7; color: var(--cinn2);">⚠️ 韵母全同，缺乏韵律感。</p>`;
   }
   html += '</div>';
 
@@ -3102,7 +3102,7 @@ function displayXieyin(xieyin) {
     if (yinlvDiv && yinlvDiv.innerHTML) {
       // 在音律分析后面添加无谐音提示
       const noXieyinHtml = `<div style="margin-top: 12px; padding: 12px; background: rgba(39,174,96,.06); border: 1px solid rgba(39,174,96,.2); border-radius: 6px;">
-        <p style="font-size: 13px; line-height: 1.8; opacity: .8; color: #2ecc71;">✓ 经检测，此名无不良谐音，音律清雅。</p>
+        <p style="font-size: 13px; line-height: 1.8; opacity: .8; color: var(--success);">✓ 经检测，此名无不良谐音，音律清雅。</p>
         <p style="font-size: 11px; opacity: 0.6; margin-top: 8px;">📜 经典出处:《声律启蒙》云:"云对雨，雪对风，晚照对晴空。" 音律和谐，方为上名。</p>
       </div>`;
 
@@ -3117,7 +3117,7 @@ function displayXieyin(xieyin) {
 
   // 有谐音警示
   let html = '<div style="padding: 16px; background: rgba(231,76,60,.06); border: 1px solid rgba(231,76,60,.2); border-radius: 8px;">';
-  html += '<div class="xieyin-title" style="font-size: 15px; letter-spacing: 2px; color: #e74c3c; margin-bottom: 12px;">⚠️ 谐音警示</div>';
+  html += '<div class="xieyin-title" style="font-size: 15px; letter-spacing: 2px; color: var(--cinn2); margin-bottom: 12px;">⚠️ 谐音警示</div>';
 
   xieyin.forEach(x => {
     html += `<div class="xieyin-desc" style="font-size: 13px; line-height: 1.8; opacity: .8; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(231,76,60,.1);">`;
@@ -3227,18 +3227,18 @@ function exportRenameResult() {
   <meta charset="UTF-8">
   <title>改名分析报告 - ${nameOut}</title>
   <style>
-    body { font-family: 'Noto Serif SC', serif; background: #080808; color: #f0e8d8; padding: 40px; max-width: 800px; margin: 0 auto; }
-    h1 { color: #c9a84c; text-align: center; letter-spacing: 6px; }
-    h2 { color: #e8cc7a; border-bottom: 1px solid rgba(201,168,76,.2); padding-bottom: 8px; }
+    body { font-family: 'Noto Serif SC', serif; background: #080808; color: var(--paper); padding: 40px; max-width: 800px; margin: 0 auto; }
+    h1 { color: var(--gold); text-align: center; letter-spacing: 6px; }
+    h2 { color: var(--gold2); border-bottom: 1px solid rgba(201,168,76,.2); padding-bottom: 8px; }
     .result { background: rgba(255,255,255,.02); border: 1px solid rgba(201,168,76,.1); border-radius: 8px; padding: 24px; margin: 16px 0; }
   
 /* ===== 命理分析增强样式 ===== */
 .warn-banner{margin-bottom:24px;padding:16px;background:rgba(0,0,0,0.3);border-radius:12px;border:1px solid rgba(201,168,76,0.15)}
 .warn-banner .warn-title{font-size:14px;color:var(--gold);margin-bottom:10px;font-weight:bold;letter-spacing:2px}
 .warn-banner .warn-red,.warn-banner .warn-yellow,.warn-banner .warn-green{margin:6px 0;padding:10px 14px;border-radius:8px;font-size:13px;line-height:1.6}
-.warn-banner .warn-red{background:rgba(231,76,60,0.15);border-left:3px solid #e74c3c;color:#f1948a}
+.warn-banner .warn-red{background:rgba(231,76,60,0.15);border-left:3px solid var(--cinn2);color:#f1948a}
 .warn-banner .warn-yellow{background:rgba(201,168,76,0.12);border-left:3px solid var(--gold2);color:#f9e79f}
-.warn-banner .warn-green{background:rgba(39,174,96,0.12);border-left:3px solid #2ecc71;color:#abebc6}
+.warn-banner .warn-green{background:rgba(39,174,96,0.12);border-left:3px solid var(--success);color:#abebc6}
 .xij-table{margin-bottom:24px;padding:14px;background:rgba(201,168,76,0.05);border-radius:12px;border:1px solid rgba(201,168,76,0.12)}
 .xij-table .xj-title{font-size:13px;color:var(--gold);margin-bottom:10px;letter-spacing:2px}
 .xij-table .xj-grid{display:flex;flex-wrap:wrap;gap:8px}
@@ -3654,7 +3654,7 @@ function autoCalcCompanyBazi(){
   // 计算八字
   let baziInfo=analyzeFounderBazi(birthDate, birthHour);
   if(!baziInfo){
-    content.innerHTML='<div style="color:#e74c3c">八字计算失败，请检查日期格式</div>';
+    content.innerHTML='<div style="color:var(--cinn2)">八字计算失败，请检查日期格式</div>';
     el.style.display='block';
     return;
   }
@@ -3698,9 +3698,9 @@ function autoCalcCompanyBazi(){
   let dayGanWx={甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'}[baziInfo.dayGan];
   html+='<div style="padding:8px;background:rgba(255,255,255,.02);border-radius:6px"><b style="color:var(--gold)">日主：</b>'+baziInfo.dayGan+'（'+dayGanWx+'）</div>';
   html+='<div style="padding:8px;background:rgba(255,255,255,.02);border-radius:6px"><b style="color:var(--gold)">命局：</b>'+baziInfo.strength+'</div>';
-  html+='<div style="padding:8px;background:rgba(46,204,113,.04);border-radius:6px"><b style="color:#2ecc71">喜用神：</b>'+baziInfo.yongshen+'（推荐数字：'+xiNums.join('、')+'）</div>';
-  html+='<div style="padding:8px;background:rgba(231,76,60,.04);border-radius:6px"><b style="color:#e74c3c">忌神：</b>'+baziInfo.jishen+'（避免数字：'+jiNums.join('、')+'）</div>';
-  html+='<div style="padding:8px;background:rgba(155,89,182,.04);border-radius:6px"><b style="color:#9b59b6">本命佛：</b>'+fo+'</div>';
+  html+='<div style="padding:8px;background:rgba(46,204,113,.04);border-radius:6px"><b style="color:var(--success)">喜用神：</b>'+baziInfo.yongshen+'（推荐数字：'+xiNums.join('、')+'）</div>';
+  html+='<div style="padding:8px;background:rgba(231,76,60,.04);border-radius:6px"><b style="color:var(--cinn2)">忌神：</b>'+baziInfo.jishen+'（避免数字：'+jiNums.join('、')+'）</div>';
+  html+='<div style="padding:8px;background:rgba(155,89,182,.04);border-radius:6px"><b style="color:var(--violet)">本命佛：</b>'+fo+'</div>';
   html+='</div>';
   
   // 五行分布
@@ -4248,7 +4248,7 @@ function generateCompanyNames() {
     if (resultDiv) {
       resultDiv.style.display = 'block';
       const grid = document.getElementById('companyNamesGrid');
-      if (grid) grid.innerHTML = '<div style="padding:20px;text-align:center;color:#e74c3c">⚠️ 生成过程出错：' + e.message + '</div>';
+      if (grid) grid.innerHTML = '<div style="padding:20px;text-align:center;color:var(--cinn2)">⚠️ 生成过程出错：' + e.message + '</div>';
     }
   } finally {
     // 恢复按钮状态
@@ -4887,8 +4887,8 @@ function renderCeziSectionResult(char) {
 
   charEl.textContent = result.char;
   tagsEl.innerHTML = '<span style="padding:4px 12px;border-radius:20px;font-size:12px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);color:var(--gold2)">' + result.radical + '部</span>' +
-    '<span style="padding:4px 12px;border-radius:20px;font-size:12px;background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.2);color:#27ae60">' + result.wuxing + '行</span>' +
-    '<span style="padding:4px 12px;border-radius:20px;font-size:12px;background:rgba(142,68,173,0.1);border:1px solid rgba(142,68,173,0.2);color:#9b59b6">' + result.strokes + '画</span>' +
+    '<span style="padding:4px 12px;border-radius:20px;font-size:12px;background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.2);color:var(--jade)">' + result.wuxing + '行</span>' +
+    '<span style="padding:4px 12px;border-radius:20px;font-size:12px;background:rgba(142,68,173,0.1);border:1px solid rgba(142,68,173,0.2);color:var(--violet)">' + result.strokes + '画</span>' +
     '<span style="padding:4px 12px;border-radius:20px;font-size:12px;background:' + luckBg + ';border:1px solid ' + luckColor + '22;color:' + luckColor + '">' + luck + '</span>';
 
   analysisEl.innerHTML =
@@ -5001,7 +5001,7 @@ function renderCeziSectionResult(char) {
       h+='</div>';
     }
     // 注意事项
-    if(m.caution) h+='<div class="kd-section"><div class="kd-section-title">⚠️ 注意</div><div style="font-size:13px;color:#c0392b">'+m.caution+'</div></div>';
+    if(m.caution) h+='<div class="kd-section"><div class="kd-section-title">⚠️ 注意</div><div style="font-size:13px;color:var(--cinn)">'+m.caution+'</div></div>';
     if(m.tips) h+='<div class="kd-section"><div class="kd-section-title">💡 提示</div><div style="font-size:13px;color:var(--paper2)">'+m.tips+'</div></div>';
 
     h+='<div style="text-align:center;margin-top:16px"><button onclick="this.parentElement.parentElement.remove()" style="padding:8px 24px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);color:var(--gold);border-radius:8px;cursor:pointer;font-family:var(--font-serif);font-size:13px;letter-spacing:2px">收起</button></div>';
@@ -5286,7 +5286,7 @@ function addMerit(faith, amount, reason) {
     
     // Visual feedback
     let msg = document.createElement('div');
-    msg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid #c9a84c;color:#c9a84c;padding:20px 30px;border-radius:14px;font-size:16px;z-index:99999;text-align:center;box-shadow:0 0 40px rgba(201,168,76,0.3)';
+    msg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid var(--gold);color:var(--gold);padding:20px 30px;border-radius:14px;font-size:16px;z-index:99999;text-align:center;box-shadow:0 0 40px rgba(201,168,76,0.3)';
     msg.innerHTML = '<div style="font-size:32px;margin-bottom:8px">🙏</div><div style="font-weight:bold">+' + amount + ' 功德</div>';
     if (reason) msg.insertAdjacentHTML("beforeend", '<div style="font-size:12px;color:#aaa;margin-top:6px">' + reason + '</div>');
     document.body.appendChild(msg);
@@ -5856,7 +5856,7 @@ function showPsychologyWisdom() {
   if (!modal) return;
   let data = window.PSYCHOLOGY_WISDOM || {};
   let html = '<div style="padding:20px;max-height:70vh;overflow-y:auto">';
-  html += '<h2 style="text-align:center;color:#3498db;margin-bottom:20px">🧠 心灵智慧生活</h2>';
+  html += '<h2 style="text-align:center;color:var(--cyan2);margin-bottom:20px">🧠 心灵智慧生活</h2>';
   html += '<p style="text-align:center;font-size:13px;opacity:.6;margin-bottom:24px">365条智慧语录 · 心理健康指南 · 为人处事智慧 · 情绪管理工具箱</p>';
   
   // 今日智慧语录
@@ -5867,7 +5867,7 @@ function showPsychologyWisdom() {
   let todayQuote = quotes.length > 0 ? quotes[(day - 1) % quotes.length] : null;
   if (todayQuote) {
     html += '<div style="background:rgba(52,152,219,.08);border:1px solid rgba(52,152,219,.2);border-radius:12px;padding:20px;margin-bottom:20px;text-align:center">';
-    html += '<div style="font-size:12px;color:#3498db;margin-bottom:8px">📝 今日智慧语录</div>';
+    html += '<div style="font-size:12px;color:var(--cyan2);margin-bottom:8px">📝 今日智慧语录</div>';
     html += '<div style="font-size:16px;font-weight:bold;color:var(--paper);margin-bottom:8px;line-height:1.6">' + (todayQuote.text || '') + '</div>';
     html += '<div style="font-size:12px;opacity:.6">—— ' + (todayQuote.source || '') + '</div>';
     if (todayQuote.explain) html += '<div style="font-size:13px;opacity:.8;margin-top:8px">💡 ' + todayQuote.explain + '</div>';
@@ -5875,13 +5875,13 @@ function showPsychologyWisdom() {
   }
   
   // 心理健康指南
-  html += '<h3 style="color:#3498db;margin:20px 0 12px;font-size:15px">🧩 心理健康指南</h3>';
+  html += '<h3 style="color:var(--cyan2);margin:20px 0 12px;font-size:15px">🧩 心理健康指南</h3>';
   html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">';
   if (data.mentalHealth) {
     for (let key in data.mentalHealth) {
       let mh = data.mentalHealth[key];
       html += '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(52,152,219,.15);border-radius:10px;padding:16px">';
-      html += '<div style="font-weight:bold;color:#3498db;margin-bottom:8px;font-size:14px">' + (mh.name || key) + '</div>';
+      html += '<div style="font-weight:bold;color:var(--cyan2);margin-bottom:8px;font-size:14px">' + (mh.name || key) + '</div>';
       if (mh.symptoms) html += '<div style="font-size:12px;opacity:.7;margin-bottom:6px"><b>表现：</b>' + mh.symptoms.join('、') + '</div>';
       if (mh.solutions) html += '<div style="font-size:12px;opacity:.7;margin-bottom:6px"><b>调适：</b>' + mh.solutions.join('、') + '</div>';
       if (mh.wisdom) html += '<div style="font-size:12px;color:var(--gold);margin-top:8px;font-style:italic">' + mh.wisdom + '</div>';
@@ -5891,7 +5891,7 @@ function showPsychologyWisdom() {
   html += '</div>';
   
   // 为人处事智慧
-  html += '<h3 style="color:#3498db;margin:20px 0 12px;font-size:15px">💡 为人处事智慧</h3>';
+  html += '<h3 style="color:var(--cyan2);margin:20px 0 12px;font-size:15px">💡 为人处事智慧</h3>';
   if (data.lifeWisdom) {
     for (let cat in data.lifeWisdom) {
       let items = data.lifeWisdom[cat];
@@ -5906,7 +5906,7 @@ function showPsychologyWisdom() {
   }
   
   // 情绪管理工具箱
-  html += '<h3 style="color:#3498db;margin:20px 0 12px;font-size:15px">🧘 情绪管理工具箱</h3>';
+  html += '<h3 style="color:var(--cyan2);margin:20px 0 12px;font-size:15px">🧘 情绪管理工具箱</h3>';
   if (data.emotionToolkit) {
     let tk = data.emotionToolkit;
     if (tk.breathingExercises) {
@@ -6568,13 +6568,13 @@ function recommendRename() {
 
   if (!currentName) {
     outDiv.style.display = 'block';
-    outDiv.innerHTML = '<div class="result-card" style="padding:20px;text-align:center;color:#e74c3c">⚠️ 请输入当前姓名（至少需要姓氏）</div>';
+    outDiv.innerHTML = '<div class="result-card" style="padding:20px;text-align:center;color:var(--cinn2)">⚠️ 请输入当前姓名（至少需要姓氏）</div>';
     if (recBtn) { recBtn.disabled = false; recBtn.textContent = '🤖 自动推荐名字'; }
     return;
   }
   if (!birthDate) {
     outDiv.style.display = 'block';
-    outDiv.innerHTML = '<div class="result-card" style="padding:20px;text-align:center;color:#e74c3c">⚠️ 请输入出生日期以计算八字</div>';
+    outDiv.innerHTML = '<div class="result-card" style="padding:20px;text-align:center;color:var(--cinn2)">⚠️ 请输入出生日期以计算八字</div>';
     if (recBtn) { recBtn.disabled = false; recBtn.textContent = '🤖 自动推荐名字'; }
     return;
   }
@@ -6588,7 +6588,7 @@ function recommendRename() {
       _doRecommendRename(currentName, sex, birthDate, birthHourVal, birthLocation, resideLocation, outDiv);
     } catch(e) {
       console.error('recommendRename error:', e);
-      outDiv.innerHTML = '<div class="result-card" style="padding:20px;text-align:center;color:#e74c3c">⚠️ 推荐过程出错：' + e.message + '</div>';
+      outDiv.innerHTML = '<div class="result-card" style="padding:20px;text-align:center;color:var(--cinn2)">⚠️ 推荐过程出错：' + e.message + '</div>';
     } finally {
       if (recBtn) { recBtn.disabled = false; recBtn.textContent = '🤖 自动推荐名字'; }
     }
@@ -6821,7 +6821,7 @@ function _doRecommendRename(currentName, sex, birthDate, birthHourVal, birthLoca
 
   // === 10. 展示结果 ===
   if (top10.length === 0) {
-    outDiv.innerHTML = '<div class="result-card" style="padding:20px;text-align:center;color:#e74c3c">⚠️ 未找到合适名字组合，请尝试调整输入信息</div>';
+    outDiv.innerHTML = '<div class="result-card" style="padding:20px;text-align:center;color:var(--cinn2)">⚠️ 未找到合适名字组合，请尝试调整输入信息</div>';
     return;
   }
 
@@ -6873,7 +6873,7 @@ function _doRecommendRename(currentName, sex, birthDate, birthHourVal, birthLoca
     html += '<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:' + (wuxingColor[r.char2.wx]||'#888') + '20;color:' + (wuxingColor[r.char2.wx]||'#888') + ';border:1px solid ' + (wuxingColor[r.char2.wx]||'#888') + '30">' + (wuxingEmoji[r.char2.wx]||'') + ' ' + r.char2.c + '(' + r.char2.wx + ')</span>';
     html += '</div>';
     // 三才
-    let sancaiLuckClass = (r.sancai.luck === '大吉' || r.sancai.luck === '吉') ? 'color:#2ecc71' : (r.sancai.luck === '半吉' ? 'color:var(--gold)' : 'color:#e74c3c');
+    let sancaiLuckClass = (r.sancai.luck === '大吉' || r.sancai.luck === '吉') ? 'color:var(--success)' : (r.sancai.luck === '半吉' ? 'color:var(--gold)' : 'color:var(--cinn2)');
     html += '<div style="font-size:10px;opacity:.7;margin-bottom:4px">三才：' + r.sancai.tian + '→' + r.sancai.ren + '→' + r.sancai.di + ' <span style="' + sancaiLuckClass + '">' + r.sancai.luck + '</span></div>';
     // 寓意
     html += '<div style="font-size:10px;opacity:.6;line-height:1.4">📜 ' + (r.char1.meaning || '美好') + '；' + (r.char2.meaning || '美好') + '</div>';
@@ -7909,7 +7909,7 @@ function generateNameSuggestions(scores, details) {
 
 // 渲染综合评分HTML
 function renderComprehensiveScore(result) {
-  if (result.error) return '<p style="color:#e74c3c">' + result.error + '</p>';
+  if (result.error) return '<p style="color:var(--cinn2)">' + result.error + '</p>';
 
   let html = '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.2);border-radius:14px;padding:24px;margin-bottom:20px">';
 

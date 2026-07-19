@@ -9,11 +9,11 @@
 /* ════ Variables & Reset ════ */
 :root{
   --ink:#080808;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;
-  --paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;
-  --gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;
-  --cinn:#c0392b;--cinn2:#e74c3c;
-  --jade:#27ae60;--jade2:#2ecc71;
-  --orange:#e67e22;
+  --paper:var(--paper);--paper2:var(--paper2);--paper3:var(--paper3);
+  --gold:var(--gold);--gold2:var(--gold2);--gold3:var(--gold3);
+  --cinn:var(--cinn);--cinn2:var(--cinn2);
+  --jade:var(--jade);--jade2:var(--success);
+  --orange:var(--orange);
   --danger:#dc3545;
   --border:rgba(201,168,76,.15);
   --card-bg:rgba(255,255,255,.035);
@@ -874,7 +874,7 @@ function doFangzhengSearch(q) {
   let html = list.map(function(f) {
     let isHighRisk = f.jiaoji.indexOf('高风险') >= 0 || f.jiaoji.indexOf('不能自行') >= 0 || f.jiaoji.indexOf('峻烈') >= 0;
     return '<div class="result-item">' +
-      '<div class="ri-source">' + f.liujing + ' · ' + f.category + (isHighRisk ? ' · <span style="color:#e74c3c">⚠️ 高风险</span>' : '') + '</div>' +
+      '<div class="ri-source">' + f.liujing + ' · ' + f.category + (isHighRisk ? ' · <span style="color:var(--cinn2)">⚠️ 高风险</span>' : '') + '</div>' +
       '<div class="ri-title">' + f.name + '</div>' +
       '<div class="ri-desc"><strong>方证：</strong>' + f.zheng + '</div>' +
       '<div class="ri-desc"><strong>方义：</strong>' + f.theory + '</div>' +

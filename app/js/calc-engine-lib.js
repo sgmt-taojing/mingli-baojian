@@ -2384,7 +2384,7 @@ function runLiuyaoEngine() {
   } catch(e) { 
     console.error('[六爻引擎错误错误]', e.message, e.stack);
     let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
-    if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 六爻引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
+    if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:var(--cinn2)">❌ 六爻引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
     else { showToast('六爻引擎错误：'+e.message); }
   }
 }
@@ -2411,7 +2411,7 @@ function runMeihuaEngine() {
   } catch(e) { 
     console.error('[梅花引擎错误错误]', e.message, e.stack);
     let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
-    if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 梅花引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
+    if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:var(--cinn2)">❌ 梅花引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
     else { showToast('梅花引擎错误：' + e.message); }
   }
 }
@@ -2447,7 +2447,7 @@ function runQimenEngine() {
   } catch(e) { 
     console.error('[奇门引擎错误]', e.message, e.stack);
     let el = document.getElementById('qmEngineResult');
-    if(el){ el.style.display='block'; el.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px"><h5 style="color:#e74c3c">❌ 奇门引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p><p style="font-size:11px;opacity:.5;margin-top:4px">'+(e.stack||'').split("\n").slice(0,3).join("<br>")+'</p></div>'; }
+    if(el){ el.style.display='block'; el.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px"><h5 style="color:var(--cinn2)">❌ 奇门引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p><p style="font-size:11px;opacity:.5;margin-top:4px">'+(e.stack||'').split("\n").slice(0,3).join("<br>")+'</p></div>'; }
     else { showToast('奇门引擎错误：' + e.message); }
   }
 }
@@ -2471,7 +2471,7 @@ function runLiurenEngine() {
   } catch(e) { 
     console.error('[六壬引擎错误错误]', e.message, e.stack);
     let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
-    if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 六壬引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
+    if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:var(--cinn2)">❌ 六壬引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
     else { showToast('六壬引擎错误：' + e.message); }
   }
 }
@@ -2496,7 +2496,7 @@ function runZiweiEngine() {
   } catch(e) { 
     console.error('[紫微引擎错误错误]', e.message, e.stack);
     let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
-    if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 紫微引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
+    if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:var(--cinn2)">❌ 紫微引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
     else { showToast('紫微引擎错误：' + e.message); }
   }
 }
@@ -2531,7 +2531,7 @@ function runXingmingEngine() {
   } catch(e) { 
     console.error('[姓名学引擎错误错误]', e.message, e.stack);
     let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
-    if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 姓名学引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
+    if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:var(--cinn2)">❌ 姓名学引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
     else { showToast('姓名学引擎错误：' + e.message); }
   }
 }
@@ -2557,7 +2557,7 @@ function runFengshuiEngine() {
   } catch(e) { 
     console.error('[风水引擎错误错误]', e.message, e.stack);
     let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
-    if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 风水引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
+    if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:var(--cinn2)">❌ 风水引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
     else { showToast('风水引擎错误：' + e.message); }
   }
 }
@@ -2580,7 +2580,7 @@ function runZeriEngine() {
   } catch(e) { 
     console.error('[择日引擎错误错误]', e.message, e.stack);
     let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
-    if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 择日引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
+    if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:var(--cinn2)">❌ 择日引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
     else { showToast('择日引擎错误：' + e.message); }
   }
 }
@@ -2618,7 +2618,7 @@ if (typeof window !== 'undefined') {
     } catch(e) { 
     console.error('[奇门引擎错误错误]', e.message, e.stack);
     let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
-    if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 奇门引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
+    if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:var(--cinn2)">❌ 奇门引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
     else { showToast('奇门引擎错误：' + e.message); }
   }
   }
@@ -2645,7 +2645,7 @@ if (typeof window !== 'undefined') {
     } catch(e) { 
     console.error('[紫微引擎错误错误]', e.message, e.stack);
     let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
-    if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 紫微引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
+    if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:var(--cinn2)">❌ 紫微引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
     else { showToast('紫微引擎错误：' + e.message); }
   }
   }
@@ -2673,7 +2673,7 @@ if (typeof window !== 'undefined') {
     } catch(e) { 
     console.error('[梅花引擎错误错误]', e.message, e.stack);
     let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
-    if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 梅花引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
+    if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:var(--cinn2)">❌ 梅花引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
     else { showToast('梅花引擎错误：' + e.message); }
   }
   }
@@ -2700,7 +2700,7 @@ if (typeof window !== 'undefined') {
     } catch(e) { 
     console.error('[六壬引擎错误错误]', e.message, e.stack);
     let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
-    if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:#e74c3c">❌ 六壬引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
+    if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:var(--cinn2)">❌ 六壬引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
     else { showToast('六壬引擎错误：' + e.message); }
   }
   }
@@ -2835,13 +2835,13 @@ function submitAsk() {
       }).join('');
       resultContent.innerHTML = '<div style="font-size:14px;line-height:2">' + html + '</div>';
     } else {
-      resultContent.innerHTML = '<div style="padding:20px;text-align:center;color:#e74c3c">⚠️ 大师暂时无法回应，请稍后再试</div>';
+      resultContent.innerHTML = '<div style="padding:20px;text-align:center;color:var(--cinn2)">⚠️ 大师暂时无法回应，请稍后再试</div>';
     }
     btn.disabled = false;
     btn.textContent = '再 问 一次';
   }).catch(function(err) {
     console.error('名师提问API错误:', err);
-    resultContent.innerHTML = '<div style="padding:20px;text-align:center"><div style="color:#e74c3c;margin-bottom:8px">⚠️ 开示服务暂时不可用</div><div style="color:var(--paper2);font-size:12px">请确认网络正常</div></div>';
+    resultContent.innerHTML = '<div style="padding:20px;text-align:center"><div style="color:var(--cinn2);margin-bottom:8px">⚠️ 开示服务暂时不可用</div><div style="color:var(--paper2);font-size:12px">请确认网络正常</div></div>';
     btn.disabled = false;
     btn.textContent = '重 试';
   });

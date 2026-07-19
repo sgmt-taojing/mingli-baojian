@@ -377,19 +377,19 @@ function getDailyFengshuiGuide() {
 
   // 今日不宜方位
   html += '<div style="background:rgba(231,76,60,0.06);border:1px solid rgba(231,76,60,0.2);border-radius:10px;padding:16px;margin-bottom:20px">';
-  html += '<h5 style="color:#e74c3c;font-size:13px;letter-spacing:3px;margin-bottom:12px">⚠️ 今日不宜方位</h5>';
+  html += '<h5 style="color:var(--cinn2);font-size:13px;letter-spacing:3px;margin-bottom:12px">⚠️ 今日不宜方位</h5>';
   html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;font-size:12px">';
-  html += '<div><strong style="color:#e74c3c">五黄大煞（年）：</strong>' + wuhuangYear + '方 — 忌动土、久坐</div>';
-  html += '<div><strong style="color:#e74c3c">五黄大煞（月）：</strong>' + wuhuangMonth + '方 — 忌动土、装修</div>';
-  html += '<div><strong style="color:#e67e22">二黑病符（年）：</strong>' + erheiYear + '方 — 忌久卧、宜静</div>';
-  html += '<div><strong style="color:#e67e22">日煞方：</strong>' + daySha + ' — 忌出行、动土</div>';
+  html += '<div><strong style="color:var(--cinn2)">五黄大煞（年）：</strong>' + wuhuangYear + '方 — 忌动土、久坐</div>';
+  html += '<div><strong style="color:var(--cinn2)">五黄大煞（月）：</strong>' + wuhuangMonth + '方 — 忌动土、装修</div>';
+  html += '<div><strong style="color:var(--orange)">二黑病符（年）：</strong>' + erheiYear + '方 — 忌久卧、宜静</div>';
+  html += '<div><strong style="color:var(--orange)">日煞方：</strong>' + daySha + ' — 忌出行、动土</div>';
   html += '</div></div>';
 
   // 出行吉方
   html += '<div style="background:rgba(46,204,113,0.06);border:1px solid rgba(46,204,113,0.2);border-radius:10px;padding:16px;margin-bottom:20px">';
-  html += '<h5 style="color:#2ecc71;font-size:13px;letter-spacing:3px;margin-bottom:8px">🧭 今日出行吉方</h5>';
-  html += '<p style="font-size:13px;line-height:1.8;opacity:.8">首选：<strong style="color:#2ecc71">' + chuxingJi + '</strong>（喜神方）<br>';
-  html += '次选：<strong style="color:#f1c40f">' + caiShenMap[dayGan] + '</strong>（财神方）<br>';
+  html += '<h5 style="color:var(--success);font-size:13px;letter-spacing:3px;margin-bottom:8px">🧭 今日出行吉方</h5>';
+  html += '<p style="font-size:13px;line-height:1.8;opacity:.8">首选：<strong style="color:var(--success)">' + chuxingJi + '</strong>（喜神方）<br>';
+  html += '次选：<strong style="color:var(--gold2)">' + caiShenMap[dayGan] + '</strong>（财神方）<br>';
   html += '<span style="opacity:.5">出行、面试、谈生意宜面朝吉方。若不得已须向凶方，可先朝吉方行数步再转向。</span></p>';
   html += '</div>';
 
@@ -401,15 +401,15 @@ function getDailyFengshuiGuide() {
   if (daySha.indexOf('无') !== -1) {
     html += '今日无严重煞方，动土可视情况而行。';
   } else {
-    html += '日煞在' + daySha + '，此方今日<span style="color:#e74c3c">不宜动土</span>。<br>';
-    html += '年五黄在' + wuhuangYear + '方、月五黄在' + wuhuangMonth + '方，此二方<span style="color:#e74c3c">大忌动土</span>。<br>';
+    html += '日煞在' + daySha + '，此方今日<span style="color:var(--cinn2)">不宜动土</span>。<br>';
+    html += '年五黄在' + wuhuangYear + '方、月五黄在' + wuhuangMonth + '方，此二方<span style="color:var(--cinn2)">大忌动土</span>。<br>';
     html += '其余方位可酌情动土，但须避开太岁方与三煞方。';
   }
   html += '</p></div>';
 
   // 入宅搬家吉日提示
   html += '<div style="background:rgba(155,89,182,0.06);border:1px solid rgba(155,89,182,0.2);border-radius:10px;padding:16px">';
-  html += '<h5 style="color:#9b59b6;font-size:13px;letter-spacing:3px;margin-bottom:8px">🏠 入宅搬家提示</h5>';
+  html += '<h5 style="color:var(--violet);font-size:13px;letter-spacing:3px;margin-bottom:8px">🏠 入宅搬家提示</h5>';
   html += '<p style="font-size:12px;line-height:1.8;opacity:.7">入宅择日须看家主命卦与宅卦是否相配，避开五黄、二黑方位。<br>';
   html += '<span style="opacity:.6">建议使用「风水择日」功能精确查询入宅吉日。</span></p>';
   html += '<button class="compute-btn" style="margin-top:12px;padding:8px 24px;font-size:12px" onclick="showFengshuiProSub(\'fengshui-zeri-content\',document.querySelectorAll(\'#section-fengshui-pro .fs-pro-subtab\')[6])">前往风水择日 →</button>';
@@ -509,33 +509,33 @@ function diagnoseHomeLayout() {
     if (r.name === '厨房') {
       // 厨房属火，不宜在北方（水克火）
       if (r.dir === '北') {
-        special = '<div style="color:#e74c3c;font-size:12px;margin-top:6px">⚠️ 厨房在北方，水火相冲，《阳宅三要》云"灶压北方，水火既济"，宜灶台朝东或南化解</div>';
+        special = '<div style="color:var(--cinn2);font-size:12px;margin-top:6px">⚠️ 厨房在北方，水火相冲，《阳宅三要》云"灶压北方，水火既济"，宜灶台朝东或南化解</div>';
       } else if (r.dir === '南') {
-        special = '<div style="color:#e67e22;font-size:12px;margin-top:6px">⚠️ 厨房在南方，火气过旺，宜用黄色陶瓷器皿泄火气</div>';
+        special = '<div style="color:var(--orange);font-size:12px;margin-top:6px">⚠️ 厨房在南方，火气过旺，宜用黄色陶瓷器皿泄火气</div>';
       } else if (r.dir === '东南' || r.dir === '东') {
-        special = '<div style="color:#2ecc71;font-size:12px;margin-top:6px">✅ 厨房在木方，木生火，灶火旺盛，大吉</div>';
+        special = '<div style="color:var(--success);font-size:12px;margin-top:6px">✅ 厨房在木方，木生火，灶火旺盛，大吉</div>';
       }
     }
     if (r.name === '卫生间') {
       // 卫生间宜压凶方
       if (['绝命','五鬼','六煞','祸害'].includes(bPos)) {
-        special = '<div style="color:#2ecc71;font-size:12px;margin-top:6px">✅ 卫生间压凶方' + bPos + '位，以毒攻毒，符合"凶方宜压"原则</div>';
+        special = '<div style="color:var(--success);font-size:12px;margin-top:6px">✅ 卫生间压凶方' + bPos + '位，以毒攻毒，符合"凶方宜压"原则</div>';
       } else {
-        special = '<div style="color:#e74c3c;font-size:12px;margin-top:6px">⚠️ 卫生间在吉方' + bPos + '位，污秽冲吉，宜保持干燥清洁，放盐灯化解</div>';
+        special = '<div style="color:var(--cinn2);font-size:12px;margin-top:6px">⚠️ 卫生间在吉方' + bPos + '位，污秽冲吉，宜保持干燥清洁，放盐灯化解</div>';
       }
     }
     if (r.name === '大门') {
       if (['生气','天医','延年','伏位'].includes(bPos)) {
-        special = '<div style="color:#2ecc71;font-size:12px;margin-top:6px">✅ 大门开在' + bPos + '位，纳吉气入宅，大吉</div>';
+        special = '<div style="color:var(--success);font-size:12px;margin-top:6px">✅ 大门开在' + bPos + '位，纳吉气入宅，大吉</div>';
       } else {
-        special = '<div style="color:#e67e22;font-size:12px;margin-top:6px">⚠️ 大门开在' + bPos + '位，入门气不纯，宜在玄关放铜葫芦或五帝钱化解</div>';
+        special = '<div style="color:var(--orange);font-size:12px;margin-top:6px">⚠️ 大门开在' + bPos + '位，入门气不纯，宜在玄关放铜葫芦或五帝钱化解</div>';
       }
     }
     if (r.name === '主卧') {
       if (['绝命','五鬼'].includes(bPos)) {
-        special = '<div style="color:#e74c3c;font-size:12px;margin-top:6px">⚠️ 主卧在大凶位，影响健康与夫妻感情，建议换房或床头朝吉方化解</div>';
+        special = '<div style="color:var(--cinn2);font-size:12px;margin-top:6px">⚠️ 主卧在大凶位，影响健康与夫妻感情，建议换房或床头朝吉方化解</div>';
       } else if (['生气','天医','延年'].includes(bPos)) {
-        special = '<div style="color:#2ecc71;font-size:12px;margin-top:6px">✅ 主卧在吉位，利于健康与夫妻和睦</div>';
+        special = '<div style="color:var(--success);font-size:12px;margin-top:6px">✅ 主卧在吉位，利于健康与夫妻和睦</div>';
       }
     }
     if (r.name === '书房') {
@@ -543,7 +543,7 @@ function diagnoseHomeLayout() {
       let wenchangDir = '东南';
       for (let wd in currentStarPos) { if (currentStarPos[wd] === 4) wenchangDir = wd; }
       if (r.dir === wenchangDir) {
-        special = '<div style="color:#2ecc71;font-size:12px;margin-top:6px">✅ 书房在文昌位（' + wenchangDir + '），大利学业与考试</div>';
+        special = '<div style="color:var(--success);font-size:12px;margin-top:6px">✅ 书房在文昌位（' + wenchangDir + '），大利学业与考试</div>';
       }
     }
     if (r.name === '客厅') {
@@ -555,9 +555,9 @@ function diagnoseHomeLayout() {
       for (let cd in bazhai) { if (bazhai[cd] === '生气') anCaiwei = cd; }
       let caiwei = mingCaiwei || anCaiwei;
       if (r.dir === caiwei) {
-        special = '<div style="color:#2ecc71;font-size:12px;margin-top:6px">✅ 客厅在财位（' + caiwei + '方，明财位），宜放聚宝盆、黄水晶球催财</div>';
+        special = '<div style="color:var(--success);font-size:12px;margin-top:6px">✅ 客厅在财位（' + caiwei + '方，明财位），宜放聚宝盆、黄水晶球催财</div>';
       } else if (r.dir === anCaiwei) {
-        special = '<div style="color:#2ecc71;font-size:12px;margin-top:6px">✅ 客厅在暗财位（' + anCaiwei + '方，生气位），宜放貔貅、金蟾催财</div>';
+        special = '<div style="color:var(--success);font-size:12px;margin-top:6px">✅ 客厅在暗财位（' + anCaiwei + '方，生气位），宜放貔貅、金蟾催财</div>';
       } else {
         special = '<div style="font-size:12px;margin-top:6px;opacity:.5">💡 本宅明财位在' + mingCaiwei + '方，暗财位在' + anCaiwei + '方，可在此方放黄水晶球或聚宝盆</div>';
       }
@@ -646,7 +646,7 @@ function analyzeBusinessFengshui() {
     'clinic': '诊所药房'
   };
   html += '<div style="text-align:center;margin-bottom:20px;padding:16px;background:rgba(46,204,113,0.06);border:1px solid rgba(46,204,113,0.2);border-radius:10px">';
-  html += '<div style="font-size:16px;color:#2ecc71;letter-spacing:3px">🏢 ' + (shopTypeInfo[shopType] || '商铺') + '风水分析</div>';
+  html += '<div style="font-size:16px;color:var(--success);letter-spacing:3px">🏢 ' + (shopTypeInfo[shopType] || '商铺') + '风水分析</div>';
   html += '<div style="font-size:11px;opacity:.4;margin-top:4px">门朝' + doorDir + ' · ' + currentYear + '年流年飞星</div>';
   html += '</div>';
 
@@ -704,7 +704,7 @@ function analyzeBusinessFengshui() {
 
   // 招财摆件推荐
   html += '<div style="background:rgba(241,196,15,0.06);border:1px solid rgba(241,196,15,0.2);border-radius:10px;padding:16px;margin-top:12px">';
-  html += '<h5 style="color:#f1c40f;font-size:13px;letter-spacing:3px;margin-bottom:10px">🔮 招财摆件推荐</h5>';
+  html += '<h5 style="color:var(--gold2);font-size:13px;letter-spacing:3px;margin-bottom:10px">🔮 招财摆件推荐</h5>';
   html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;font-size:12px">';
   html += '<div>🤑 <strong>金蟾</strong>：嘴含铜钱，朝向室内，放收银台招财</div>';
   html += '<div>🐉 <strong>貔貅</strong>：头朝门外，放门口两侧，招财辟邪</div>';
@@ -716,7 +716,7 @@ function analyzeBusinessFengshui() {
 
   // 开业择日提示
   html += '<div style="background:rgba(155,89,182,0.06);border:1px solid rgba(155,89,182,0.2);border-radius:10px;padding:16px;margin-top:12px">';
-  html += '<h5 style="color:#9b59b6;font-size:13px;letter-spacing:3px;margin-bottom:8px">📅 开业择日提示</h5>';
+  html += '<h5 style="color:var(--violet);font-size:13px;letter-spacing:3px;margin-bottom:8px">📅 开业择日提示</h5>';
   html += '<p style="font-size:12px;opacity:.6;line-height:1.8">开业择日须结合行业五行与老板八字命卦：<br>';
   html += '· 零售餐饮宜选财星旺日（甲子、丙寅、戊辰、庚午、壬申）<br>';
   html += '· 美容美发宜选桃花旺日（甲卯、丙午、戊未）<br>';
@@ -904,7 +904,7 @@ function getShaqiCatalog() {
   // 煞气图例
   html += '<div style="background:rgba(231,76,60,0.06);border:1px solid rgba(231,76,60,0.2);border-radius:10px;padding:16px;margin-bottom:20px;text-align:center">';
   html += '<p style="font-size:13px;opacity:.6;line-height:1.8">煞气共12种，以下按严重程度排列。<br>';
-  html += '<span style="color:#dc3545">大凶</span>需立即化解 · <span style="color:#e74c3c">凶</span>建议化解 · <span style="color:#e67e22">中凶</span>酌情化解</p></div>';
+  html += '<span style="color:#dc3545">大凶</span>需立即化解 · <span style="color:var(--cinn2)">凶</span>建议化解 · <span style="color:var(--orange)">中凶</span>酌情化解</p></div>';
 
   for (let i = 0; i < shaqiList.length; i++) {
     let s = shaqiList[i];
@@ -925,18 +925,18 @@ function getShaqiCatalog() {
 
     // 危害
     html += '<div style="margin-bottom:10px">';
-    html += '<div style="font-size:12px;color:#e74c3c;margin-bottom:4px">⚠️ 危害</div>';
+    html += '<div style="font-size:12px;color:var(--cinn2);margin-bottom:4px">⚠️ 危害</div>';
     html += '<p style="font-size:12px;opacity:.7;line-height:1.7">' + s.harm + '</p>';
     html += '</div>';
 
     // 化解方案
     html += '<div style="margin-bottom:10px">';
-    html += '<div style="font-size:12px;color:#2ecc71;margin-bottom:6px">✅ 化解方案</div>';
+    html += '<div style="font-size:12px;color:var(--success);margin-bottom:6px">✅ 化解方案</div>';
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px">';
     for (let j = 0; j < s.cure.length; j++) {
       let c = s.cure[j];
       html += '<div style="background:rgba(46,204,113,0.06);border:1px solid rgba(46,204,113,0.12);border-radius:8px;padding:10px;font-size:11px;line-height:1.6">';
-      html += '<strong style="color:#2ecc71">' + c.item + '</strong><br>';
+      html += '<strong style="color:var(--success)">' + c.item + '</strong><br>';
       html += '<span style="opacity:.6">材质：' + c.material + '</span><br>';
       html += '<span style="opacity:.6">颜色：' + c.color + '</span><br>';
       html += '<span style="opacity:.6">摆放：' + c.placement + '</span><br>';
@@ -955,7 +955,7 @@ function getShaqiCatalog() {
 
   // 化煞物品购买指南
   html += '<div style="background:rgba(241,196,15,0.06);border:1px solid rgba(241,196,15,0.2);border-radius:10px;padding:16px;margin-top:12px">';
-  html += '<h5 style="color:#f1c40f;font-size:13px;letter-spacing:3px;margin-bottom:10px">🛒 化煞物品购买指南</h5>';
+  html += '<h5 style="color:var(--gold2);font-size:13px;letter-spacing:3px;margin-bottom:10px">🛒 化煞物品购买指南</h5>';
   html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;font-size:11px;line-height:1.7">';
   html += '<div><strong>八卦镜</strong>：铜制为佳，凸面挡煞、凹面吸煞、平面反射。网购约30-80元。</div>';
   html += '<div><strong>五帝钱</strong>：顺治、康熙、雍正、乾隆、嘉庆五枚铜钱。真品约200-500元，仿品30-50元。</div>';
@@ -1021,20 +1021,20 @@ function renderAnnualFlyingStars() {
 
   // 图例
   html += '<div style="display:flex;justify-content:center;gap:16px;margin-bottom:20px;flex-wrap:wrap">';
-  html += '<span style="font-size:11px;color:#2ecc71">■ 吉星</span>';
-  html += '<span style="font-size:11px;color:#e74c3c">■ 凶星</span>';
+  html += '<span style="font-size:11px;color:var(--success)">■ 吉星</span>';
+  html += '<span style="font-size:11px;color:var(--cinn2)">■ 凶星</span>';
   html += '<span style="font-size:11px;opacity:.5">方位说明：上南下北，左东右西</span>';
   html += '</div>';
 
   // 大凶方位预警
   html += '<div style="background:rgba(231,76,60,0.06);border:1px solid rgba(231,76,60,0.2);border-radius:10px;padding:16px;margin-bottom:16px">';
-  html += '<h5 style="color:#e74c3c;font-size:13px;letter-spacing:3px;margin-bottom:12px">⚠️ 大凶方位预警</h5>';
+  html += '<h5 style="color:var(--cinn2);font-size:13px;letter-spacing:3px;margin-bottom:12px">⚠️ 大凶方位预警</h5>';
   for (let d in starPos) {
     let st = starPos[d];
     if (st === 5 || st === 2 || st === 3 || st === 7) {
       let si = FS_PRO_STARS[st];
       html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">';
-      html += '<span style="color:#e74c3c;font-weight:bold;width:60px">' + d + '方</span>';
+      html += '<span style="color:var(--cinn2);font-weight:bold;width:60px">' + d + '方</span>';
       html += '<span style="color:' + _fsProStarColor(st) + '">' + st + '·' + si.name + '</span>';
       html += '<span style="opacity:.6">' + si.desc + '</span>';
       html += '</div>';
@@ -1049,13 +1049,13 @@ function renderAnnualFlyingStars() {
 
   // 大吉方位催旺
   html += '<div style="background:rgba(46,204,113,0.06);border:1px solid rgba(46,204,113,0.2);border-radius:10px;padding:16px;margin-bottom:16px">';
-  html += '<h5 style="color:#2ecc71;font-size:13px;letter-spacing:3px;margin-bottom:12px">🌟 大吉方位催旺</h5>';
+  html += '<h5 style="color:var(--success);font-size:13px;letter-spacing:3px;margin-bottom:12px">🌟 大吉方位催旺</h5>';
   for (let dg in starPos) {
     let sg = starPos[dg];
     if (sg === 8 || sg === 9 || sg === 1 || sg === 4 || sg === 6) {
       let sgi = FS_PRO_STARS[sg];
       html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">';
-      html += '<span style="color:#2ecc71;font-weight:bold;width:60px">' + dg + '方</span>';
+      html += '<span style="color:var(--success);font-weight:bold;width:60px">' + dg + '方</span>';
       html += '<span style="color:' + _fsProStarColor(sg) + '">' + sg + '·' + sgi.name + '</span>';
       html += '<span style="opacity:.6">' + sgi.desc + '</span>';
       html += '</div>';
@@ -1119,7 +1119,7 @@ function generateFamilyAnnualCure() {
 
   if (members.length === 0) {
     _fsProToast('请至少添加一位家庭成员');
-    return '<div style="text-align:center;padding:40px;color:#e74c3c">请添加家庭成员信息</div>';
+    return '<div style="text-align:center;padding:40px;color:var(--cinn2)">请添加家庭成员信息</div>';
   }
 
   // 化解方案数据
@@ -1163,19 +1163,19 @@ function generateFamilyAnnualCure() {
 
     // 流年凶方需化解
     html += '<div style="margin-bottom:12px">';
-    html += '<div style="font-size:12px;color:#e74c3c;margin-bottom:6px">⚠️ 需化解的凶方</div>';
+    html += '<div style="font-size:12px;color:var(--cinn2);margin-bottom:6px">⚠️ 需化解的凶方</div>';
     for (let d in starPos) {
       let st = starPos[d];
       if (cureItems[st]) {
         let ci = cureItems[st];
         let affectsMe = badDirs.includes(d);
         html += '<div style="background:rgba(231,76,60,0.04);border-radius:6px;padding:10px;margin-bottom:6px">';
-        html += '<div style="font-size:12px;color:#e74c3c;font-weight:bold">' + d + '方 — ' + ci.name + (affectsMe ? '（⚠️ 此方为你的凶方，重点化解）' : '') + '</div>';
+        html += '<div style="font-size:12px;color:var(--cinn2);font-weight:bold">' + d + '方 — ' + ci.name + (affectsMe ? '（⚠️ 此方为你的凶方，重点化解）' : '') + '</div>';
         html += '<div style="font-size:11px;opacity:.6;margin-top:4px">化解物品：</div>';
         for (let ii = 0; ii < ci.items.length; ii++) {
           html += '<div style="font-size:11px;opacity:.7;padding-left:12px">• ' + ci.items[ii] + '</div>';
         }
-        html += '<div style="font-size:11px;color:#e67e22;margin-top:4px">禁忌：' + ci.avoid + '</div>';
+        html += '<div style="font-size:11px;color:var(--orange);margin-top:4px">禁忌：' + ci.avoid + '</div>';
         html += '</div>';
       }
     }
@@ -1183,19 +1183,19 @@ function generateFamilyAnnualCure() {
 
     // 吉方催旺
     html += '<div style="margin-bottom:12px">';
-    html += '<div style="font-size:12px;color:#2ecc71;margin-bottom:6px">🌟 宜催旺的吉方</div>';
+    html += '<div style="font-size:12px;color:var(--success);margin-bottom:6px">🌟 宜催旺的吉方</div>';
     for (let gd in starPos) {
       let gs = starPos[gd];
       if (auspiciousCures[gs]) {
         let ac = auspiciousCures[gs];
         let goodForMe = goodDirs.includes(gd);
         html += '<div style="background:rgba(46,204,113,0.04);border-radius:6px;padding:10px;margin-bottom:6px">';
-        html += '<div style="font-size:12px;color:#2ecc71;font-weight:bold">' + gd + '方 — ' + ac.name + (goodForMe ? '（✅ 此方为你的吉方，加倍催旺）' : '') + '</div>';
+        html += '<div style="font-size:12px;color:var(--success);font-weight:bold">' + gd + '方 — ' + ac.name + (goodForMe ? '（✅ 此方为你的吉方，加倍催旺）' : '') + '</div>';
         html += '<div style="font-size:11px;opacity:.6;margin-top:4px">催旺物品：</div>';
         for (let ai = 0; ai < ac.items.length; ai++) {
           html += '<div style="font-size:11px;opacity:.7;padding-left:12px">• ' + ac.items[ai] + '</div>';
         }
-        html += '<div style="font-size:11px;color:#27ae60;margin-top:4px">提示：' + ac.tip + '</div>';
+        html += '<div style="font-size:11px;color:var(--jade);margin-top:4px">提示：' + ac.tip + '</div>';
         html += '</div>';
       }
     }
@@ -1213,7 +1213,7 @@ function generateFamilyAnnualCure() {
 
   // 分季度执行计划
   html += '<div style="background:rgba(155,89,182,0.06);border:1px solid rgba(155,89,182,0.2);border-radius:10px;padding:20px;margin-top:16px">';
-  html += '<h5 style="color:#9b59b6;font-size:14px;letter-spacing:3px;margin-bottom:14px">📅 分季度执行计划</h5>';
+  html += '<h5 style="color:var(--violet);font-size:14px;letter-spacing:3px;margin-bottom:14px">📅 分季度执行计划</h5>';
 
   let quarters = [
     { name: '第一季度（1-3月）', focus: '春季木旺，重点化解三碧是非星方位', tasks: ['春节前完成五黄、二黑方位物品布置', '三碧方放红色装饰', '开春检查所有化煞物品是否完好'] },
@@ -1225,7 +1225,7 @@ function generateFamilyAnnualCure() {
   for (let qi = 0; qi < quarters.length; qi++) {
     let q = quarters[qi];
     html += '<div style="margin-bottom:12px">';
-    html += '<div style="font-size:13px;color:#9b59b6;font-weight:bold;margin-bottom:4px">' + q.name + '</div>';
+    html += '<div style="font-size:13px;color:var(--violet);font-weight:bold;margin-bottom:4px">' + q.name + '</div>';
     html += '<div style="font-size:11px;opacity:.5;margin-bottom:4px">' + q.focus + '</div>';
     html += '<ul style="font-size:11px;opacity:.7;padding-left:20px;line-height:1.8">';
     for (let ti = 0; ti < q.tasks.length; ti++) {
@@ -1237,7 +1237,7 @@ function generateFamilyAnnualCure() {
 
   // 采购清单
   html += '<div style="background:rgba(241,196,15,0.06);border:1px solid rgba(241,196,15,0.2);border-radius:10px;padding:20px;margin-top:16px">';
-  html += '<h5 style="color:#f1c40f;font-size:14px;letter-spacing:3px;margin-bottom:14px">🛒 化解物品采购清单</h5>';
+  html += '<h5 style="color:var(--gold2);font-size:14px;letter-spacing:3px;margin-bottom:14px">🛒 化解物品采购清单</h5>';
   html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;font-size:12px">';
   html += '<div>✅ 铜葫芦 × ' + (members.length * 2) + '（每成员2个，挂于五黄/二黑方）</div>';
   html += '<div>✅ 金属风铃 × ' + (members.length * 2) + '（每成员2串）</div>';
@@ -1269,7 +1269,7 @@ function addFamilyMemberRow() {
     '<input class="input-field fm-year" type="number" placeholder="出生年" min="1930" max="2025" style="min-width:90px;flex:1">' +
     '<select class="input-field fm-sex" style="min-width:70px;flex:1">' +
     '<option value="male">男</option><option value="female">女</option></select>' +
-    '<button onclick="this.parentElement.remove()" style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;padding:8px 12px;border-radius:6px;cursor:pointer;font-size:12px">删除</button>';
+    '<button onclick="this.parentElement.remove()" style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);color:var(--cinn2);padding:8px 12px;border-radius:6px;cursor:pointer;font-size:12px">删除</button>';
   container.appendChild(row);
 }
 
@@ -1289,14 +1289,14 @@ function fengshuiZeRi() {
 
   if (!startDate || !endDate) {
     _fsProToast('请选择查询日期范围');
-    return '<div style="text-align:center;padding:40px;color:#e74c3c">请选择日期范围</div>';
+    return '<div style="text-align:center;padding:40px;color:var(--cinn2)">请选择日期范围</div>';
   }
 
   let start = new Date(startDate);
   let end = new Date(endDate);
   if (start > end) {
     _fsProToast('开始日期不能晚于结束日期');
-    return '<div style="text-align:center;padding:40px;color:#e74c3c">日期范围无效</div>';
+    return '<div style="text-align:center;padding:40px;color:var(--cinn2)">日期范围无效</div>';
   }
 
   // 限制查询范围（最多90天）
@@ -1413,41 +1413,41 @@ function fengshuiZeRi() {
   // 宜忌说明
   html += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.1);border-radius:10px;padding:14px;margin-bottom:16px">';
   html += '<div style="display:flex;gap:20px;flex-wrap:wrap;font-size:12px">';
-  html += '<span style="color:#2ecc71">✅ 宜：' + config.yi.join('日、') + '日</span>';
-  html += '<span style="color:#e74c3c">❌ 忌：' + config.ji.join('日、') + '日</span>';
+  html += '<span style="color:var(--success)">✅ 宜：' + config.yi.join('日、') + '日</span>';
+  html += '<span style="color:var(--cinn2)">❌ 忌：' + config.ji.join('日、') + '日</span>';
   html += '</div></div>';
 
   // 吉日列表
   if (goodDays.length > 0) {
     html += '<div style="background:rgba(46,204,113,0.06);border:1px solid rgba(46,204,113,0.2);border-radius:10px;padding:16px;margin-bottom:16px">';
-    html += '<h5 style="color:#2ecc71;font-size:14px;letter-spacing:3px;margin-bottom:12px">✅ 宜选吉日（共' + goodDays.length + '天）</h5>';
+    html += '<h5 style="color:var(--success);font-size:14px;letter-spacing:3px;margin-bottom:12px">✅ 宜选吉日（共' + goodDays.length + '天）</h5>';
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px">';
     for (let gi = 0; gi < goodDays.length; gi++) {
       let gd = goodDays[gi];
       let dStr = gd.date.getFullYear() + '-' + (gd.date.getMonth() + 1).toString().padStart(2, '0') + '-' + gd.date.getDate().toString().padStart(2, '0');
       html += '<div style="background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.15);border-radius:8px;padding:10px;text-align:center">';
-      html += '<div style="font-size:13px;color:#2ecc71;font-weight:bold">' + dStr + '</div>';
+      html += '<div style="font-size:13px;color:var(--success);font-weight:bold">' + dStr + '</div>';
       html += '<div style="font-size:11px;opacity:.6;margin-top:2px">' + gd.ganzhi + '日 · 星期' + gd.week + '</div>';
-      html += '<div style="font-size:11px;color:#2ecc71;margin-top:2px">' + gd.jianchu + '日</div>';
-      if (gd.tianshe) html += '<div style="font-size:10px;color:#f1c40f;margin-top:2px">⭐ 天赦日（大吉）</div>';
+      html += '<div style="font-size:11px;color:var(--success);margin-top:2px">' + gd.jianchu + '日</div>';
+      if (gd.tianshe) html += '<div style="font-size:10px;color:var(--gold2);margin-top:2px">⭐ 天赦日（大吉）</div>';
       html += '</div>';
     }
     html += '</div></div>';
   } else {
     html += '<div style="background:rgba(231,76,60,0.06);border:1px solid rgba(231,76,60,0.2);border-radius:10px;padding:16px;margin-bottom:16px;text-align:center">';
-    html += '<p style="color:#e67e22;font-size:13px">所选日期范围内暂无理想吉日，建议扩大查询范围。</p></div>';
+    html += '<p style="color:var(--orange);font-size:13px">所选日期范围内暂无理想吉日，建议扩大查询范围。</p></div>';
   }
 
   // 忌日列表
   if (badDays.length > 0) {
     html += '<div style="background:rgba(231,76,60,0.04);border:1px solid rgba(231,76,60,0.1);border-radius:10px;padding:16px">';
-    html += '<h5 style="color:#e74c3c;font-size:13px;letter-spacing:3px;margin-bottom:10px">❌ 应避开的日子（共' + badDays.length + '天）</h5>';
+    html += '<h5 style="color:var(--cinn2);font-size:13px;letter-spacing:3px;margin-bottom:10px">❌ 应避开的日子（共' + badDays.length + '天）</h5>';
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;font-size:11px">';
     for (let bi = 0; bi < Math.min(badDays.length, 20); bi++) {
       let bd = badDays[bi];
       let bdStr = bd.date.getFullYear() + '-' + (bd.date.getMonth() + 1).toString().padStart(2, '0') + '-' + bd.date.getDate().toString().padStart(2, '0');
       html += '<div style="background:rgba(231,76,60,0.06);border-radius:6px;padding:8px;text-align:center">';
-      html += '<div style="color:#e74c3c">' + bdStr + '</div>';
+      html += '<div style="color:var(--cinn2)">' + bdStr + '</div>';
       html += '<div style="opacity:.5">' + bd.ganzhi + ' · ' + bd.jianchu + '日</div>';
       html += '</div>';
     }
@@ -1609,7 +1609,7 @@ function computeChengmenJue(xuankongData, chaoxiang) {
       html += '<div><span style="opacity:.5">生气星：</span>' + starNames[shengStar] + '</div>';
       html += '</div>';
       html += '<div style="font-size:12px;opacity:.7;line-height:1.7;margin-bottom:6px">📌 <strong>影响：</strong>' + effectText + '</div>';
-      html += '<div style="font-size:12px;color:#2ecc71;line-height:1.7">🛡️ <strong>建议：</strong>' + cureText + '</div>';
+      html += '<div style="font-size:12px;color:var(--success);line-height:1.7">🛡️ <strong>建议：</strong>' + cureText + '</div>';
       html += '</div>';
     }
 
@@ -1618,14 +1618,14 @@ function computeChengmenJue(xuankongData, chaoxiang) {
     html += '<div style="background:rgba(46,204,113,0.06);border:1px solid rgba(46,204,113,0.15);border-radius:10px;padding:14px;margin-top:8px">';
     if (anyUsable) {
       let usableDirs = results.filter(function(r){return r.usable;}).map(function(r){return r.direction;}).join('、');
-      html += '<div style="font-size:13px;color:#2ecc71;line-height:1.8">✅ <strong>城门诀总结：</strong>本宅' + usableDirs + '方城门可用，宜开门开窗引入旺气。';
+      html += '<div style="font-size:13px;color:var(--success);line-height:1.8">✅ <strong>城门诀总结：</strong>本宅' + usableDirs + '方城门可用，宜开门开窗引入旺气。';
       html += '若本宅已得旺山旺向，城门为锦上添花，令宅运更旺；若非旺山旺向，城门可补救，以城门之力补向方之不足，化凶为吉。</div>';
     } else {
       let allBad = results.every(function(r) { return r.xiangStar === 5 || r.xiangStar === 2; });
       if (allBad) {
-        html += '<div style="font-size:13px;color:#e74c3c;line-height:1.8">⚠️ <strong>城门诀总结：</strong>本宅两旁城门均不可用，向方两旁均为凶星。宜封堵两旁门窗，专以向方纳气。若无旺山旺向，需以布局化煞为主，放铜葫芦、五帝钱等化解凶气。</div>';
+        html += '<div style="font-size:13px;color:var(--cinn2);line-height:1.8">⚠️ <strong>城门诀总结：</strong>本宅两旁城门均不可用，向方两旁均为凶星。宜封堵两旁门窗，专以向方纳气。若无旺山旺向，需以布局化煞为主，放铜葫芦、五帝钱等化解凶气。</div>';
       } else {
-        html += '<div style="font-size:13px;color:#c9a84c;line-height:1.8">⚪ <strong>城门诀总结：</strong>本宅两旁城门均非旺星，城门之力有限。宅运主要依靠向方及山向格局。宜以八宅布局和流年飞星化解为主，不必刻意开城门。</div>';
+        html += '<div style="font-size:13px;color:var(--gold);line-height:1.8">⚪ <strong>城门诀总结：</strong>本宅两旁城门均非旺星，城门之力有限。宅运主要依靠向方及山向格局。宜以八宅布局和流年飞星化解为主，不必刻意开城门。</div>';
       }
     }
     html += '</div>';
@@ -1639,7 +1639,7 @@ function computeChengmenJue(xuankongData, chaoxiang) {
     return html;
   } catch(e) {
     console.error('[城门诀分析错误]', e.message);
-    return '<div style="padding:16px;color:#e74c3c;font-size:12px">城门诀分析出错: ' + e.message + '</div>';
+    return '<div style="padding:16px;color:var(--cinn2);font-size:12px">城门诀分析出错: ' + e.message + '</div>';
   }
 }
 
@@ -1892,10 +1892,10 @@ function computeFeixingCombos(xuankongData, chaoxiang) {
 
     // 飞星组合图例
     html += '<div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap">';
-    html += '<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(46,204,113,0.12);color:#2ecc71">吉</span>';
-    html += '<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(231,76,60,0.12);color:#e74c3c">凶</span>';
+    html += '<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(46,204,113,0.12);color:var(--success)">吉</span>';
+    html += '<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(231,76,60,0.12);color:var(--cinn2)">凶</span>';
     html += '<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(220,53,69,0.12);color:#dc3545">大凶</span>';
-    html += '<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(201,168,76,0.12);color:#c9a84c">平</span>';
+    html += '<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(201,168,76,0.12);color:var(--gold)">平</span>';
     html += '</div>';
 
     if (combos.length > 0) {
@@ -1924,7 +1924,7 @@ function computeFeixingCombos(xuankongData, chaoxiang) {
           html += ' | 别名：' + m.combo.alias + '</div>';
           html += '<div style="font-size:12px;opacity:.7;line-height:1.7;margin-bottom:8px">📋 <strong>影响方面：</strong>' + m.combo.aspects + '</div>';
           html += '<div style="font-size:12px;opacity:.7;line-height:1.7;margin-bottom:8px">📖 <strong>详解：</strong>' + m.combo.detail + '</div>';
-          html += '<div style="font-size:12px;color:#2ecc71;line-height:1.7;margin-bottom:8px">🛡️ <strong>化解/催旺：</strong>' + m.combo.cure + '</div>';
+          html += '<div style="font-size:12px;color:var(--success);line-height:1.7;margin-bottom:8px">🛡️ <strong>化解/催旺：</strong>' + m.combo.cure + '</div>';
           html += '<div style="background:rgba(201,168,76,0.04);border-left:3px solid var(--gold);padding:6px 10px;border-radius:0 6px 6px 0;font-size:11px;opacity:.5;line-height:1.6">📜 ' + m.combo.classic + '</div>';
           html += '</div>';
         }
@@ -1947,7 +1947,7 @@ function computeFeixingCombos(xuankongData, chaoxiang) {
       html += '</div>';
       html += '<div style="font-size:11px;opacity:.5;margin-bottom:4px">' + db.alias + ' | ' + db.aspects + '</div>';
       html += '<div style="font-size:11px;opacity:.7;line-height:1.6;margin-bottom:4px">' + db.desc + '</div>';
-      html += '<div style="font-size:11px;color:#2ecc71;line-height:1.6">化解：' + db.cure + '</div>';
+      html += '<div style="font-size:11px;color:var(--success);line-height:1.6">化解：' + db.cure + '</div>';
       html += '</div>';
     }
     html += '</div></div>';
@@ -1956,7 +1956,7 @@ function computeFeixingCombos(xuankongData, chaoxiang) {
     return html;
   } catch(e) {
     console.error('[飞星组合分析错误]', e.message);
-    return '<div style="padding:16px;color:#e74c3c;font-size:12px">飞星组合分析出错: ' + e.message + '</div>';
+    return '<div style="padding:16px;color:var(--cinn2);font-size:12px">飞星组合分析出错: ' + e.message + '</div>';
   }
 }
 

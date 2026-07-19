@@ -1373,10 +1373,10 @@ function renderFestivalsList() {
       html += '<div class="pp-festival-upgrade">🔓 ' + fest.content.free.upgradeHint + '</div>';
     }
     if (fest.content.annual) {
-      html += '<div class="pp-festival-member"><span class="pp-member-badge" style="background:rgba(201,168,76,0.15);color:#c9a84c;border:1px solid rgba(201,168,76,0.3)">年度会员</span> ' + fest.content.annual.extra + '</div>';
+      html += '<div class="pp-festival-member"><span class="pp-member-badge" style="background:rgba(201,168,76,0.15);color:var(--gold);border:1px solid rgba(201,168,76,0.3)">年度会员</span> ' + fest.content.annual.extra + '</div>';
     }
     if (fest.content.lifetime) {
-      html += '<div class="pp-festival-member"><span class="pp-member-badge" style="background:rgba(231,76,60,0.15);color:#e74c3c;border:1px solid rgba(231,76,60,0.3)">终身会员</span> ' + fest.content.lifetime.extra + '</div>';
+      html += '<div class="pp-festival-member"><span class="pp-member-badge" style="background:rgba(231,76,60,0.15);color:var(--cinn2);border:1px solid rgba(231,76,60,0.3)">终身会员</span> ' + fest.content.lifetime.extra + '</div>';
     }
 
     html += '  <div class="pp-source">📖 ' + fest.source + '</div>';

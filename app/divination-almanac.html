@@ -10,18 +10,18 @@
 <style>
 :root{
   --ink:#080808;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;
-  --paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;
-  --gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;
-  --cinn:#c0392b;--cinn2:#e74c3c;
-  --cyan:#2980b9;--cyan2:#5dade2;
-  --jade:#27ae60;--jade2:#2ecc71;
-  --violet:#8e44ad;--violet2:#a569bd;
-  --orange:#e67e22;
-  --emerald:#16a085;
-  --steel:#7f8c8d;
-  --ru-color:#c9a84c;   /* 儒家 - 金色 */
-  --dao-color:#27ae60;  /* 道家 - 翠绿 */
-  --fo-color:#8e44ad;   /* 佛家 - 紫色 */
+  --paper:var(--paper);--paper2:var(--paper2);--paper3:var(--paper3);
+  --gold:var(--gold);--gold2:var(--gold2);--gold3:var(--gold3);
+  --cinn:var(--cinn);--cinn2:var(--cinn2);
+  --cyan:var(--cyan);--cyan2:#5dade2;
+  --jade:var(--jade);--jade2:var(--success);
+  --violet:var(--violet2);--violet2:#a569bd;
+  --orange:var(--orange);
+  --emerald:var(--emerald);
+  --steel:var(--steel);
+  --ru-color:var(--gold);   /* 儒家 - 金色 */
+  --dao-color:var(--jade);  /* 道家 - 翠绿 */
+  --fo-color:var(--violet2);   /* 佛家 - 紫色 */
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Noto Serif SC',serif;background:var(--ink);color:var(--paper);min-height:100vh}
@@ -476,17 +476,17 @@ body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xm
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 .fade-in{animation:fadeUp .5s ease}
 /* Toast */
-.toast-msg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(20,18,14,.95);border:1px solid rgba(201,168,76,.3);color:#f0e8d8;font-family:'Noto Serif SC',serif;font-size:14px;padding:18px 28px;letter-spacing:2px;border-radius:4px;z-index:99999;box-shadow:0 4px 32px rgba(0,0,0,.6);text-align:center;min-width:220px;opacity:0;transition:opacity .25s ease;pointer-events:none}
+.toast-msg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(20,18,14,.95);border:1px solid rgba(201,168,76,.3);color:var(--paper);font-family:'Noto Serif SC',serif;font-size:14px;padding:18px 28px;letter-spacing:2px;border-radius:4px;z-index:99999;box-shadow:0 4px 32px rgba(0,0,0,.6);text-align:center;min-width:220px;opacity:0;transition:opacity .25s ease;pointer-events:none}
 .toast-msg.show{opacity:1}
 /* Feature Navigation Bar */
 .feature-nav-bar{background:#0d0b08;padding:20px 0 24px;margin-top:32px;border-top:1px solid rgba(201,168,76,.15)}
-.feature-nav-title{text-align:center;font-size:11px;color:#a09080;letter-spacing:4px;margin-bottom:14px}
+.feature-nav-title{text-align:center;font-size:11px;color:var(--paper3);letter-spacing:4px;margin-bottom:14px}
 .feature-nav-cards{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
-.fn-card{display:flex;flex-direction:column;align-items:center;gap:3px;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.2);border-radius:10px;padding:12px 14px;text-decoration:none;color:#f0e8d8;min-width:88px;transition:.2s}
+.fn-card{display:flex;flex-direction:column;align-items:center;gap:3px;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.2);border-radius:10px;padding:12px 14px;text-decoration:none;color:var(--paper);min-width:88px;transition:.2s}
 .fn-card:hover{background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.5)}
 .fn-icon{font-size:22px}
-.fn-name{font-size:13px;font-weight:700;color:#c9a84c}
-.fn-desc{font-size:10px;color:#a09080;letter-spacing:1px}
+.fn-name{font-size:13px;font-weight:700;color:var(--gold)}
+.fn-desc{font-size:10px;color:var(--paper3);letter-spacing:1px}
 .personal-card{background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.15)}
 .personal-card h5{color:var(--gold)}
 </style>
@@ -537,7 +537,7 @@ body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xm
 </div>
 <div class="container">
   <header class="header">
-    <div style="margin-bottom:8px"><a href="divination-hub.html" style="color:#c9a84c;text-decoration:none;font-size:12px;letter-spacing:2px">← 返回主平台</a> &nbsp;|&nbsp; <a href="divination-integrated.html" style="color:#a09080;text-decoration:none;font-size:12px;letter-spacing:2px">体质</a> &nbsp;|&nbsp; <a href="divination-knowledge.html" style="color:#a09080;text-decoration:none;font-size:12px;letter-spacing:2px">知识库</a> &nbsp;|&nbsp; <a href="divination-membership.html" style="color:#a09080;text-decoration:none;font-size:12px;letter-spacing:2px">会员</a> &nbsp;|&nbsp; <a href="divination-shop.html" style="color:#a09080;text-decoration:none;font-size:12px;letter-spacing:2px">商城</a></div>
+    <div style="margin-bottom:8px"><a href="divination-hub.html" style="color:var(--gold);text-decoration:none;font-size:12px;letter-spacing:2px">← 返回主平台</a> &nbsp;|&nbsp; <a href="divination-integrated.html" style="color:var(--paper3);text-decoration:none;font-size:12px;letter-spacing:2px">体质</a> &nbsp;|&nbsp; <a href="divination-knowledge.html" style="color:var(--paper3);text-decoration:none;font-size:12px;letter-spacing:2px">知识库</a> &nbsp;|&nbsp; <a href="divination-membership.html" style="color:var(--paper3);text-decoration:none;font-size:12px;letter-spacing:2px">会员</a> &nbsp;|&nbsp; <a href="divination-shop.html" style="color:var(--paper3);text-decoration:none;font-size:12px;letter-spacing:2px">商城</a></div>
     <div class="header-brand">易道智鉴 · 先进AI推演</div>
     <h1 class="header-title">黄 历 三 视 角</h1>
     <p class="header-sub">儒 · 道 · 释 一 日 三 观</p>
@@ -1433,9 +1433,9 @@ function updateDailyAdvice(almanac) {
   html+='<div class="advice-card" style="margin-top:12px;background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(155,89,182,.04));border:1px solid rgba(201,168,76,.15);border-radius:10px;padding:14px">';
   html+='<div style="font-size:12px;color:var(--gold);margin-bottom:8px">☯️ 今日干支 · '+dayStem+dayBranch+' · '+stemWx+'日 · '+jianchu+'日'+(jieqi?' · '+jieqi+'':'')+(almanac.jishen?' · 值'+almanac.jishen.join('/'):'')+'</div>';
   html+='<div style="font-size:12px;color:#aaa;line-height:1.8">';
-  if(almanac.chong) html+='<span style="color:#e74c3c">'+almanac.chong+'</span> · ';
-  if(almanac.sha) html+='<span style="color:#e74c3c">'+almanac.sha+'</span> · ';
-  if(almanac.xiongsha&&almanac.xiongsha.length) html+='<span style="color:#e67e22">凶煞:'+almanac.xiongsha.join('/')+'</span>';
+  if(almanac.chong) html+='<span style="color:var(--cinn2)">'+almanac.chong+'</span> · ';
+  if(almanac.sha) html+='<span style="color:var(--cinn2)">'+almanac.sha+'</span> · ';
+  if(almanac.xiongsha&&almanac.xiongsha.length) html+='<span style="color:var(--orange)">凶煞:'+almanac.xiongsha.join('/')+'</span>';
   html+='</div></div>';
   html+=personalSection;
   html+='<div class="advice-actions"><button class="advice-btn" onclick="copyAdvice()">📋 复制建议</button></div>';
@@ -1605,7 +1605,7 @@ function updateDailyAdvice(almanac) {
   let knowledgeHtml='';
   if(dailyKnowledge&&dailyKnowledge.title){
     knowledgeHtml='<div class="advice-card" style="margin-top:12px;background:linear-gradient(135deg,rgba(52,152,219,.06),rgba(155,89,182,.04));border:1px solid rgba(52,152,219,.15);border-radius:10px;padding:14px">';
-    knowledgeHtml+='<h5 style="color:#3498db;margin-bottom:8px">📖 '+dailyKnowledge.tag+' · '+dailyKnowledge.title+'</h5>';
+    knowledgeHtml+='<h5 style="color:var(--cyan2);margin-bottom:8px">📖 '+dailyKnowledge.tag+' · '+dailyKnowledge.title+'</h5>';
     knowledgeHtml+='<p style="font-size:13px;line-height:1.8;color:#666">'+dailyKnowledge.summary+'</p>';
     knowledgeHtml+='</div>';
   }
@@ -1701,10 +1701,10 @@ function updateDailyAdvice(almanac) {
       '大寒':'大寒年年有，不在三九在四九'
     };
     html+='<div class="advice-card" style="margin-bottom:12px;background:linear-gradient(135deg,rgba(46,204,113,.06),rgba(39,174,96,.04));border:1px solid rgba(46,204,113,.15);border-radius:10px;padding:14px">';
-    html+='<h5 style="color:#27ae60;margin-bottom:8px">🌿 今日节气：'+jieqi+'</h5>';
+    html+='<h5 style="color:var(--jade);margin-bottom:8px">🌿 今日节气：'+jieqi+'</h5>';
     html+='<p style="font-size:13px;line-height:1.8;color:#556">'+(jieqiDesc[jieqi]||'')+'</p>';
     html+='<p style="font-size:12px;color:#888">📖 俗语：「'+(jieqiSuyu[jieqi]||'')+'」</p>';
-    html+='<p style="font-size:12px;color:#e67e22">⚠️ 注意：'+(jqYi&&jqYi[jieqi]?jqYi[jieqi].split('。')[0]+'。':'顺应节气，保重身体。')+'</p>';
+    html+='<p style="font-size:12px;color:var(--orange)">⚠️ 注意：'+(jqYi&&jqYi[jieqi]?jqYi[jieqi].split('。')[0]+'。':'顺应节气，保重身体。')+'</p>';
     html+='</div>';
   }
 
@@ -1724,7 +1724,7 @@ function updateDailyAdvice(almanac) {
 
   // === 今日道家智慧 ===
   html+='<div class="advice-card" style="margin-bottom:12px;background:linear-gradient(135deg,rgba(155,89,182,.06),rgba(142,68,173,.04));border:1px solid rgba(155,89,182,.15);border-radius:10px;padding:14px">';
-  html+='<h5 style="color:#8e44ad;margin-bottom:8px">📚 今日道家智慧</h5>';
+  html+='<h5 style="color:var(--violet2);margin-bottom:8px">📚 今日道家智慧</h5>';
   html+='<div style="font-size:13px;color:#666;margin-bottom:6px">「'+todayDaoist.quote+'」</div>';
   html+='<div style="font-size:12px;color:#999">—— '+todayDaoist.source+'</div>';
   html+='<div style="font-size:13px;line-height:1.8;color:#556;margin-top:8px">💡 白话：'+todayDaoist.baihua+'</div>';
@@ -1732,7 +1732,7 @@ function updateDailyAdvice(almanac) {
 
   // === 今日修行建议 ===
   html+='<div class="advice-card" style="margin-bottom:12px;background:linear-gradient(135deg,rgba(230,126,34,.06),rgba(211,84,0,.04));border:1px solid rgba(230,126,34,.15);border-radius:10px;padding:14px">';
-  html+='<h5 style="color:#e67e22;margin-bottom:8px">🙏 今日修行建议</h5>';
+  html+='<h5 style="color:var(--orange);margin-bottom:8px">🙏 今日修行建议</h5>';
   html+=practiceAdvice.map(function(p){return '<p style="font-size:13px;line-height:1.8;color:#556">• '+p+'</p>';}).join('');
   html+='</div>';
 

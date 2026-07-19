@@ -38,7 +38,7 @@ function _showPasswordModal(callback) {
   card.style.cssText = 'background:#1a1f2e;border:1px solid rgba(201,168,76,.3);border-radius:14px;padding:32px 28px;max-width:360px;width:90%';
   let title = document.createElement('h3');
   title.textContent = '商城管理后台';
-  title.style.cssText = 'color:#c9a84c;margin:0 0 20px;font-size:18px;text-align:center';
+  title.style.cssText = 'color:var(--gold);margin:0 0 20px;font-size:18px;text-align:center';
   let input = document.createElement('input');
   input.type = 'password';
   input.placeholder = '请输入管理密码';
@@ -152,8 +152,8 @@ function renderDashboard() {
   if (!el) return;
   el.innerHTML = 
     '<div class="card"><div class="stat">' + total + '</div><div class="meta">总商品数</div></div>' +
-    '<div class="card"><div class="stat" style="color:#2ecc71">' + active + '</div><div class="meta">已上架</div></div>' +
-    '<div class="card"><div class="stat" style="color:#e74c3c">' + offline + '</div><div class="meta">已下架</div></div>' +
+    '<div class="card"><div class="stat" style="color:var(--success)">' + active + '</div><div class="meta">已上架</div></div>' +
+    '<div class="card"><div class="stat" style="color:var(--cinn2)">' + offline + '</div><div class="meta">已下架</div></div>' +
     '<div class="card"><div class="stat" style="color:#5dade2">' + categories + '</div><div class="meta">商品分类</div></div>';
 }
 

@@ -206,7 +206,7 @@ function getSecai(wuxing) {
  * @returns {string} HTML
  */
 function renderHeigeFramework(chart) {
-  if (!chart || chart.error) return '<div style="padding:20px;color:#e74c3c">' + (chart && chart.error ? chart.error : '排盘失败') + '</div>';
+  if (!chart || chart.error) return '<div style="padding:20px;color:var(--cinn2)">' + (chart && chart.error ? chart.error : '排盘失败') + '</div>';
 
   let pillars = chart.pillars || {};
   let dayMaster = chart.day_master || '';
@@ -265,7 +265,7 @@ function renderHeigeFramework(chart) {
     Object.keys(relations).forEach(function(k) {
       let arr = relations[k];
       if (arr && arr.length > 0) {
-        html += '<span style="margin-right:8px;color:#c0392b">' + k + ': ' + (Array.isArray(arr) ? arr.join(', ') : arr) + '</span>';
+        html += '<span style="margin-right:8px;color:var(--cinn)">' + k + ': ' + (Array.isArray(arr) ? arr.join(', ') : arr) + '</span>';
       }
     });
     html += '</div>';
@@ -287,8 +287,8 @@ function renderHeigeFramework(chart) {
   let monthZhi = pillars.month ? pillars.month.charAt(1) : '';
   let th = getTiaohou(dayGan, monthZhi);
   if (th) {
-    html += '<div style="background:rgba(46,204,113,0.05);border-left:3px solid #27ae60;padding:10px 14px;margin:8px 0;border-radius:0 6px 6px 0">';
-    html += '<div style="font-size:12px;color:#27ae60"><b>调候用神：</b>' + th + '</div>';
+    html += '<div style="background:rgba(46,204,113,0.05);border-left:3px solid var(--jade);padding:10px 14px;margin:8px 0;border-radius:0 6px 6px 0">';
+    html += '<div style="font-size:12px;color:var(--jade)"><b>调候用神：</b>' + th + '</div>';
     html += '<div style="font-size:11px;color:var(--paper2);margin-top:4px">出处：穷通宝鉴 · ' + dayGan + '木生于' + monthZhi + '月</div>';
     html += '</div>';
   }
@@ -309,8 +309,8 @@ function renderHeigeFramework(chart) {
   }
 
   // 方法论提示
-  html += '<div style="background:rgba(52,152,219,0.05);border-left:3px solid #3498db;padding:10px 14px;margin:12px 0;border-radius:0 6px 6px 0;font-size:12px">';
-  html += '<b style="color:#3498db">推演指引：</b>先定旺衰用神（月令权重最高），再判格局成败，后看大运引动用神/忌神。';
+  html += '<div style="background:rgba(52,152,219,0.05);border-left:3px solid var(--cyan2);padding:10px 14px;margin:12px 0;border-radius:0 6px 6px 0;font-size:12px">';
+  html += '<b style="color:var(--cyan2)">推演指引：</b>先定旺衰用神（月令权重最高），再判格局成败，后看大运引动用神/忌神。';
   html += '每条断语需注明依据（星+宫/原局+岁运），孤证不立。趋势化表达，不铁口直断。';
   html += '</div>';
 

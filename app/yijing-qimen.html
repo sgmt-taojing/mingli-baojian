@@ -10,12 +10,12 @@
 <style>
 :root {
   --ink: #0a0a0a; --ink-deep: #111010; --ink-mid: #1e1c1a;
-  --paper: #f0e8d8; --paper-dark: #d4c9b0;
-  --cinnabar: #c0392b; --cinnabar-light: #e74c3c;
-  --gold: #c9a84c; --gold-light: #e8cc7a;
+  --paper: var(--paper); --paper-dark: var(--paper2);
+  --cinnabar: var(--cinn); --cinnabar-light: var(--cinn2);
+  --gold: var(--gold); --gold-light: var(--gold2);
   --jade: #4a7c59; --jade-light: #6ba873;
-  --cyan: #2980b9; --cyan-light: #5dade2;
-  --violet: #8e44ad; --violet-light: #a569bd;
+  --cyan: var(--cyan); --cyan-light: #5dade2;
+  --violet: var(--violet2); --violet-light: #a569bd;
   --cloud: rgba(240,232,216,0.04); --cloud2: rgba(240,232,216,0.02);
 }
 *{margin:0;padding:0;box-sizing:border-box}
@@ -150,9 +150,9 @@ select.input-field option{background:var(--ink-deep);color:var(--paper)}
 .action-btn:hover{border-color:var(--gold);color:var(--gold);box-shadow:0 0 20px rgba(201,168,76,.1)}
 
 /* STARS COLOR */
-.star-pei{color:#c0392b}.star-yin{color:#e67e22}.star-chu{color:#f39c12}.star-fang{color:#2ecc71}.star-jin{color:#27ae60}.star-zhen{color:#1abc9c}.star-rong{color:#3498db}.star-ying{color:#9b59b6}.star-you{color:#8e44ad}
-.door-sheng{color:#27ae60}.door-jin{color:#2ecc71}.door-shang{color:#f39c12}.door-jing{color:#e67e22}.door-si{color:#95a5a6}.door-du{color:#7f8c8d}.door-xin{color:#c0392b}.door-jing2{color:#2980b9}
-.god-zhi{color:#3498db}.god-nu{color:#9b59b6}.god-hu{color:#e67e22}.god-tian{color:#f39c12}.god-di{color:#2ecc71}.god-hei{color:#7f8c8d}.god-yue{color:#ecf0f1}.god-she{color:#c0392b}
+.star-pei{color:var(--cinn)}.star-yin{color:var(--orange)}.star-chu{color:var(--warn)}.star-fang{color:var(--success)}.star-jin{color:var(--jade)}.star-zhen{color:#1abc9c}.star-rong{color:var(--cyan2)}.star-ying{color:var(--violet)}.star-you{color:var(--violet2)}
+.door-sheng{color:var(--jade)}.door-jin{color:var(--success)}.door-shang{color:var(--warn)}.door-jing{color:var(--orange)}.door-si{color:var(--metal)}.door-du{color:var(--steel)}.door-xin{color:var(--cinn)}.door-jing2{color:var(--cyan)}
+.god-zhi{color:var(--cyan2)}.god-nu{color:var(--violet)}.god-hu{color:var(--orange)}.god-tian{color:var(--warn)}.god-di{color:var(--success)}.god-hei{color:var(--steel)}.god-yue{color:#ecf0f1}.god-she{color:var(--cinn)}
 
 /* FOOTER NOTE */
 .footer-note{text-align:center;font-size:11px;opacity:.3;letter-spacing:2px;padding:40px 0 20px;font-weight:300}
@@ -364,13 +364,13 @@ select.input-field option{background:var(--ink-deep);color:var(--paper)}
       </div>
       <div class="plate-card">
         <p class="plate-label">人盘 · 八门</p>
-        <p class="plate-symbol" id="renPanSymbol" style="color:#27ae60">生门</p>
+        <p class="plate-symbol" id="renPanSymbol" style="color:var(--jade)">生门</p>
         <p class="plate-name" id="renPanName">生门</p>
         <p class="plate-desc" id="renPanDesc">人盘主人事吉凶</p>
       </div>
       <div class="plate-card">
         <p class="plate-label">神盘 · 八神</p>
-        <p class="plate-symbol" id="shenPanSymbol" style="color:#f39c12">值符</p>
+        <p class="plate-symbol" id="shenPanSymbol" style="color:var(--warn)">值符</p>
         <p class="plate-name" id="shenPanName">值符</p>
         <p class="plate-desc" id="shenPanDesc">神盘为天机，不可轻泄</p>
       </div>
@@ -894,7 +894,7 @@ function renderQimenInterp(qd) {
       </div>
       <div class="interp-item">
         <p class="item-label">八神</p>
-        <p class="item-value" style="color:#f39c12">${kpData?.god?.name || '—'}</p>
+        <p class="item-value" style="color:var(--warn)">${kpData?.god?.name || '—'}</p>
         <p class="item-desc">${kpData?.god?.desc || ''}（${kpData?.god?.nature || ''}）</p>
       </div>
       <div class="interp-item">

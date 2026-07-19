@@ -12,7 +12,7 @@
         }
 
         :root {
-            --gold: #c9a84c;
+            --gold: var(--gold);
             --gold-light: #F5D57A;
             --black: #0A0A0A;
             --dark: #1A1A1A;
@@ -1054,11 +1054,11 @@
     <nav class="category-nav" style="border-bottom:1px solid rgba(212,168,67,0.15)">
         <div class="category-list" id="schoolNavList">
             <a class="category-item active" data-school="all">全部派别</a>
-            <a class="category-item" data-school="buddhist" style="color:#f39c12">🛕 佛教</a>
-            <a class="category-item" data-school="daoist" style="color:#27ae60">☯️ 道教</a>
-            <a class="category-item" data-school="confucian" style="color:#3498db">📜 儒家</a>
-            <a class="category-item" data-school="instrument" style="color:#9b59b6">🔔 法器</a>
-            <a class="category-item" data-school="health" style="color:#e67e22">💊 养生</a>
+            <a class="category-item" data-school="buddhist" style="color:var(--warn)">🛕 佛教</a>
+            <a class="category-item" data-school="daoist" style="color:var(--jade)">☯️ 道教</a>
+            <a class="category-item" data-school="confucian" style="color:var(--cyan2)">📜 儒家</a>
+            <a class="category-item" data-school="instrument" style="color:var(--violet)">🔔 法器</a>
+            <a class="category-item" data-school="health" style="color:var(--orange)">💊 养生</a>
             <a class="category-item" data-school="tea" style="color:#1abc9c">🍵 茶饮</a>
         </div>
     </nav>
@@ -2237,12 +2237,12 @@
             document.getElementById('modalContent').innerHTML = `
                 <div style="padding:2rem;max-height:70vh;overflow-y:auto">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
-                        <h2 style="color:#c9a84c;margin:0">${d.title}</h2>
+                        <h2 style="color:var(--gold);margin:0">${d.title}</h2>
                         <button onclick="closeModal()" style="background:none;border:none;color:#888;font-size:1.5rem;cursor:pointer">✕</button>
                     </div>
                     <div style="color:#ccc;line-height:1.8;font-size:0.95rem">${d.content}</div>
                     <div style="margin-top:1.5rem;padding:1rem;background:rgba(212,168,67,0.08);border-radius:8px;border:1px solid rgba(212,168,67,0.2)">
-                        <p style="color:#c9a84c;font-size:0.85rem;margin:0">⚠️ 以上方剂仅供参考，具体用药请遵医嘱。中药讲究辨证论治，一人一方，请勿自行服用。</p>
+                        <p style="color:var(--gold);font-size:0.85rem;margin:0">⚠️ 以上方剂仅供参考，具体用药请遵医嘱。中药讲究辨证论治，一人一方，请勿自行服用。</p>
                     </div>
                 </div>`;
             modal.style.display = 'flex';
@@ -2737,13 +2737,13 @@
     </script>
     <!-- 底部导航 -->
     <nav style="position:fixed;bottom:0;left:0;right:0;z-index:500;background:rgba(8,8,8,.97);border-top:1px solid rgba(201,168,76,.1);display:flex;padding-bottom:env(safe-area-inset-bottom)">
-      <a href="divination-hub.html" style="flex:1;text-align:center;padding:10px 0;color:#a09080;text-decoration:none;font-family:'Noto Serif SC',serif;font-size:10px;letter-spacing:1px"><span style="font-size:18px;display:block">🏠</span>排盘</a>
-      <a href="divination-integrated.html" style="flex:1;text-align:center;padding:10px 0;color:#a09080;text-decoration:none;font-family:'Noto Serif SC',serif;font-size:10px;letter-spacing:1px"><span style="font-size:18px;display:block">🧬</span>体质</a>
-      <a href="divination-knowledge.html" style="flex:1;text-align:center;padding:10px 0;color:#a09080;text-decoration:none;font-family:'Noto Serif SC',serif;font-size:10px;letter-spacing:1px"><span style="font-size:18px;display:block">📖</span>知识</a>
-      <a href="divination-shop.html" style="flex:1;text-align:center;padding:10px 0;color:#c9a84c;text-decoration:none;font-family:'Noto Serif SC',serif;font-size:10px;letter-spacing:1px"><span style="font-size:18px;display:block">🛍️</span>商城</a>
-      <a href="divination-membership.html" style="flex:1;text-align:center;padding:10px 0;color:#a09080;text-decoration:none;font-family:'Noto Serif SC',serif;font-size:10px;letter-spacing:1px"><span style="font-size:18px;display:block">👑</span>会员</a>
-      <a href="divination-almanac.html" style="flex:1;text-align:center;padding:10px 0;color:#a09080;text-decoration:none;font-family:'Noto Serif SC',serif;font-size:10px;letter-spacing:1px"><span style="font-size:18px;display:block">📅</span>黄历</a>
+      <a href="divination-hub.html" style="flex:1;text-align:center;padding:10px 0;color:var(--paper3);text-decoration:none;font-family:'Noto Serif SC',serif;font-size:10px;letter-spacing:1px"><span style="font-size:18px;display:block">🏠</span>排盘</a>
+      <a href="divination-integrated.html" style="flex:1;text-align:center;padding:10px 0;color:var(--paper3);text-decoration:none;font-family:'Noto Serif SC',serif;font-size:10px;letter-spacing:1px"><span style="font-size:18px;display:block">🧬</span>体质</a>
+      <a href="divination-knowledge.html" style="flex:1;text-align:center;padding:10px 0;color:var(--paper3);text-decoration:none;font-family:'Noto Serif SC',serif;font-size:10px;letter-spacing:1px"><span style="font-size:18px;display:block">📖</span>知识</a>
+      <a href="divination-shop.html" style="flex:1;text-align:center;padding:10px 0;color:var(--gold);text-decoration:none;font-family:'Noto Serif SC',serif;font-size:10px;letter-spacing:1px"><span style="font-size:18px;display:block">🛍️</span>商城</a>
+      <a href="divination-membership.html" style="flex:1;text-align:center;padding:10px 0;color:var(--paper3);text-decoration:none;font-family:'Noto Serif SC',serif;font-size:10px;letter-spacing:1px"><span style="font-size:18px;display:block">👑</span>会员</a>
+      <a href="divination-almanac.html" style="flex:1;text-align:center;padding:10px 0;color:var(--paper3);text-decoration:none;font-family:'Noto Serif SC',serif;font-size:10px;letter-spacing:1px"><span style="font-size:18px;display:block">📅</span>黄历</a>
     </nav>
-<div style="text-align:center;padding:20px;margin-top:20px;border-top:1px solid rgba(201,168,76,0.1)"><a href="merchant-apply.html" style="color:#c9a84c;font-size:13px">🏪 道观寺庙/大师入驻 →</a> &nbsp;|&nbsp; <a href="merchant-dashboard.html" style="color:#a09080;font-size:13px">商家登录</a></div>
+<div style="text-align:center;padding:20px;margin-top:20px;border-top:1px solid rgba(201,168,76,0.1)"><a href="merchant-apply.html" style="color:var(--gold);font-size:13px">🏪 道观寺庙/大师入驻 →</a> &nbsp;|&nbsp; <a href="merchant-dashboard.html" style="color:var(--paper3);font-size:13px">商家登录</a></div>
 </body>
 </html>

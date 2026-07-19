@@ -6,27 +6,27 @@
 <title>商家后台 · 易道智鉴</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Noto Serif SC',serif;background:#0a0a12;color:#f0e8d8;line-height:1.8;max-width:600px;margin:0 auto;padding:16px}
-h1{color:#c9a84c;font-size:20px;letter-spacing:3px;margin-bottom:16px}
+body{font-family:'Noto Serif SC',serif;background:#0a0a12;color:var(--paper);line-height:1.8;max-width:600px;margin:0 auto;padding:16px}
+h1{color:var(--gold);font-size:20px;letter-spacing:3px;margin-bottom:16px}
 .card{background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.12);border-radius:12px;padding:14px;margin-bottom:12px}
-.card h3{color:#c9a84c;font-size:13px;margin-bottom:10px}
-label{display:block;font-size:11px;color:#a09080;margin-bottom:3px}
-input,select,textarea{width:100%;padding:9px;background:#141428;border:1px solid rgba(201,168,76,0.15);border-radius:8px;color:#f0e8d8;font-size:12px;font-family:inherit;outline:none;margin-bottom:8px}
-input:focus{border-color:#c9a84c}
+.card h3{color:var(--gold);font-size:13px;margin-bottom:10px}
+label{display:block;font-size:11px;color:var(--paper3);margin-bottom:3px}
+input,select,textarea{width:100%;padding:9px;background:#141428;border:1px solid rgba(201,168,76,0.15);border-radius:8px;color:var(--paper);font-size:12px;font-family:inherit;outline:none;margin-bottom:8px}
+input:focus{border-color:var(--gold)}
 .btn{padding:9px 16px;background:linear-gradient(135deg,#c9a84c,#a08030);color:#0a0a12;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
 .btn:active{transform:scale(0.98)}
 .btn-sm{padding:5px 10px;font-size:11px}
-.btn-outline{background:transparent;border:1px solid #a08030;color:#c9a84c}
+.btn-outline{background:transparent;border:1px solid var(--gold3);color:var(--gold)}
 .tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto}
 .tab{padding:8px 14px;border:1px solid rgba(201,168,76,0.15);border-radius:20px;color:#8a8070;font-size:12px;cursor:pointer;white-space:nowrap}
-.tab.active{background:#c9a84c;color:#0a0a12;border-color:#c9a84c}
+.tab.active{background:var(--gold);color:#0a0a12;border-color:var(--gold)}
 .stat{display:flex;gap:10px;margin-bottom:12px}
 .stat-item{flex:1;text-align:center;padding:12px 8px;background:rgba(201,168,76,0.04);border-radius:8px}
-.stat-num{font-size:20px;font-weight:bold;color:#c9a84c}
+.stat-num{font-size:20px;font-weight:bold;color:var(--gold)}
 .stat-label{font-size:10px;color:#8a8070}
 .prod-item{display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(201,168,76,0.03);border-radius:8px;margin-bottom:6px}
-.prod-name{font-size:12px;color:#f0e8d8}
-.prod-price{font-size:12px;color:#c9a84c;font-weight:bold}
+.prod-name{font-size:12px;color:var(--paper)}
+.prod-price{font-size:12px;color:var(--gold);font-weight:bold}
 .login-box{text-align:center;padding:40px 20px}
 .row{display:flex;gap:8px}
 .row>div{flex:1}
@@ -44,7 +44,7 @@ input:focus{border-color:#c9a84c}
 <label>验证码（输入任意6位数字）</label>
 <input type="text" id="loginCode" placeholder="6位验证码" maxlength="6">
 <button class="btn" style="width:100%" onclick="merchantLogin()">登录</button>
-<p style="font-size:11px;color:#8a8070;margin-top:10px">还没入驻？<a href="merchant-apply.html" style="color:#c9a84c">申请入驻 →</a></p>
+<p style="font-size:11px;color:#8a8070;margin-top:10px">还没入驻？<a href="merchant-apply.html" style="color:var(--gold)">申请入驻 →</a></p>
 </div>
 </div>
 
@@ -65,7 +65,7 @@ input:focus{border-color:#c9a84c}
 </div>
 <div class="card">
 <h3>🏪 商家信息</h3>
-<div id="merchantInfo" style="font-size:12px;color:#a09080;line-height:2"></div>
+<div id="merchantInfo" style="font-size:12px;color:var(--paper3);line-height:2"></div>
 </div>
 </div>
 
@@ -204,13 +204,13 @@ function loadOrders(){
   var html='';
   if(orders.length===0){html='<p style="text-align:center;color:#8a8070;padding:20px">暂无订单</p>'}
   orders.forEach(function(o){
-    html+='<div class="prod-item"><div><div class="prod-name">'+o.productName+'</div><div style="font-size:10px;color:#8a8070">'+o.date+'·'+o.buyer+'</div></div><div style="text-align:right"><div class="prod-price">¥'+o.amount+'</div><div style="font-size:10px;color:#27ae60">分成¥'+(o.merchantAmount||0).toFixed(0)+'</div></div></div>';
+    html+='<div class="prod-item"><div><div class="prod-name">'+o.productName+'</div><div style="font-size:10px;color:#8a8070">'+o.date+'·'+o.buyer+'</div></div><div style="text-align:right"><div class="prod-price">¥'+o.amount+'</div><div style="font-size:10px;color:var(--jade)">分成¥'+(o.merchantAmount||0).toFixed(0)+'</div></div></div>';
   });
   document.getElementById('orderList').innerHTML=html;
   // 收入明细
   var total=orders.reduce(function(s,o){return s+(o.merchantAmount||0)},0);
   var platform=orders.reduce(function(s,o){return s+(o.platformAmount||0)},0);
-  document.getElementById('incomeDetail').innerHTML='<div style="font-size:13px;color:#f0e8d8;line-height:2.2">总订单数：'+orders.length+'<br>商家收入：¥'+total.toFixed(2)+'<br>平台分成：¥'+platform.toFixed(2)+'<br>分成比例：'+(currentMerchant.split*100)+'% / '+(100-currentMerchant.split*100)+'%<br>可提现：¥'+total.toFixed(2)+'</div><button class="btn" style="margin-top:10px" onclick="showToast(\'提现功能开发中\')">申请提现</button>';
+  document.getElementById('incomeDetail').innerHTML='<div style="font-size:13px;color:var(--paper);line-height:2.2">总订单数：'+orders.length+'<br>商家收入：¥'+total.toFixed(2)+'<br>平台分成：¥'+platform.toFixed(2)+'<br>分成比例：'+(currentMerchant.split*100)+'% / '+(100-currentMerchant.split*100)+'%<br>可提现：¥'+total.toFixed(2)+'</div><button class="btn" style="margin-top:10px" onclick="showToast(\'提现功能开发中\')">申请提现</button>';
 }
 
 function switchTab(tab,el){
