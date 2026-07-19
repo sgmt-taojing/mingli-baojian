@@ -7,6 +7,9 @@
 提供 HTTP API：
   POST /paipan  — 精确排盘（返回JSON命盘）
   POST /analyze — 排盘+分析方法论引导（返回结构化分析框架）
+  GET  /paipan  — 精确排盘（查询参数方式，同POST）
+  GET  /analyze — 排盘+分析（查询参数方式）
+  GET  /health  — 健康检查
 """
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
@@ -14,7 +17,7 @@ import json
 import os
 import sys
 import subprocess
-from urllib.parse import parse_qs
+from urllib.parse import parse_qs, urlparse
 
 PORT = 8911
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -26,17 +29,65 @@ class PaipanHandler(BaseHTTPRequestHandler):
         self._cors_headers()
         self.end_headers()
 
+    def do_GET(self):
+        parsed = urlparse(self.path)
+        path = parsed.path
+        qs = parse_qs(parsed.query)
+
+        if path == '/health':
+            self._json_ok({"status": "ok", "service": "paipan-api", "port": PORT})
+        elif path == '/paipan':
+            body = self._qs_to_body(qs)
+            if not body:
+                self._json_error(400, "缺少必要参数: year, month, day")
+                return
+            self._handle_paipan(body)
+        elif path == '/analyze':
+            body = self._qs_to_body(qs)
+            if not body:
+                self._json_error(400, "缺少必要参数: year, month, day")
+                return
+            self._handle_analyze(body)
+        else:
+            self._json_error(404, "未知路径: " + path)
+
     def do_POST(self):
         if self.path == '/paipan':
             self._handle_paipan()
         elif self.path == '/analyze':
             self._handle_analyze()
         else:
-            self.send_error(404)
+            self._json_error(404, "未知路径: " + self.path)
 
-    def _handle_paipan(self):
+    def _qs_to_body(self, qs):
+        """将URL查询参数转为排盘body字典"""
+        if not qs.get('year') or not qs.get('month') or not qs.get('day'):
+            return None
+        body = {
+            'year': int(qs['year'][0]),
+            'month': int(qs['month'][0]),
+            'day': int(qs['day'][0]),
+            'hour': int(qs.get('hour', ['12'])[0]),
+            'minute': int(qs.get('minute', ['0'])[0]),
+            'sex': qs.get('sex', ['male'])[0],
+        }
+        if qs.get('lunar'):
+            body['lunar'] = qs['lunar'][0] in ('1', 'true', 'True')
+        if qs.get('lng'):
+            body['lng'] = float(qs['lng'][0])
+        if qs.get('tz'):
+            body['tz'] = float(qs['tz'][0])
+        if qs.get('years'):
+            yrs = qs['years'][0].split(',')
+            body['years'] = [int(yrs[0]), int(yrs[1])]
+        if qs.get('zi_sect'):
+            body['zi_sect'] = int(qs['zi_sect'][0])
+        return body
+
+    def _handle_paipan(self, body=None):
         try:
-            body = self._read_json()
+            if body is None:
+                body = self._read_json()
             args = self._build_args(body)
             result = subprocess.run(
                 ['python3', PAIPAN_PY] + args + ['--json'],
@@ -50,9 +101,10 @@ class PaipanHandler(BaseHTTPRequestHandler):
         except Exception as e:
             self._json_error(500, str(e))
 
-    def _handle_analyze(self):
+    def _handle_analyze(self, body=None):
         try:
-            body = self._read_json()
+            if body is None:
+                body = self._read_json()
             args = self._build_args(body)
             result = subprocess.run(
                 ['python3', PAIPAN_PY] + args + ['--json'],
@@ -187,7 +239,7 @@ def main():
     server = HTTPServer(('0.0.0.0', PORT), PaipanHandler)
     print(f"🚀 排盘API服务已启动: http://127.0.0.1:{PORT}")
     print(f"   引擎: HeiGe-SuanMing paipan.py v1.2")
-    print(f"   端点: POST /paipan (排盘), POST /analyze (排盘+分析框架)")
+    print(f"   端点: GET/POST /paipan (排盘), GET/POST /analyze (排盘+分析框架), GET /health")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

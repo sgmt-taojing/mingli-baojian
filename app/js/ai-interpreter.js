@@ -1,5 +1,4 @@
 /**
-typeof window.escapeHtml === "function" || (window.escapeHtml = function(s) { if(!s) return ""; return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); });
  * AI智能解读模块 - 易道智鉴
  * 在规则推演基础上叠加AI能力，提供自然语言深度解读
  * 
@@ -11,6 +10,9 @@ typeof window.escapeHtml === "function" || (window.escapeHtml = function(s) { if
  * API: https://api.g2claw.com/v1/chat/completions
  * 模型: auto
  */
+
+// escapeHtml 安全转义函数
+typeof window.escapeHtml === "function" || (window.escapeHtml = function(s) { if(!s) return ""; return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); });
 
 // ════════════════════════════════════════════════════════════════
 //  API调用封装

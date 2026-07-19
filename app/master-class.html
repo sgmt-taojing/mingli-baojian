@@ -202,7 +202,7 @@ function searchLessons(keyword) {
       let masterName = r.master === 'shuhan' ? '舒晗老师' : '倪海厦老师';
       let typeClass = r.lesson.type === 'video' ? 'type-video' : r.lesson.type === 'audio' ? 'type-audio' : 'type-text';
       let typeLabel = r.lesson.type === 'video' ? '视频' : r.lesson.type === 'audio' ? '音频' : '文字';
-      html += '<div class="lesson-item" onclick="playLesson(''+r.master+'',''+r.lesson.title.replace(/'/g,"\'")+'',''+r.lesson.type+'',''+(r.lesson.url||'')+'')">';
+      html += '<div class="lesson-item" onclick="playLesson(\''+r.master+'\',\''+r.lesson.title.replace(/'/g,"\\'")+'\',\''+r.lesson.type+'\',\''+(r.lesson.url||'')+'\')">';
       html += '<div class="lesson-title">' + masterName + '：' + r.lesson.title + '</div>';
       html += '<div class="lesson-meta"><span class="lesson-type '+typeClass+'">'+typeLabel+'</span>' + (r.lesson.category||'') + '</div>';
       html += '</div>';
