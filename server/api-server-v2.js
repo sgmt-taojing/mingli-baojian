@@ -7,6 +7,8 @@ const sec = require('./security-v2.js');
 const rbac = require('./rbac-middleware.js');
 const syncRoutes = require('./sync-api');
 const distillationRoutes = require('./distillation-routes.js');
+const caseQuality = require('./case-quality.js');
+const { KB_LEVELS } = require('./kb-config.js');
 const crypto = require('crypto');
 
 const app = express();
@@ -894,11 +896,13 @@ app.get('/api/clinic/case/:id', requirePermission('clinic:view_assigned_case'), 
   res.json(response);
 });
 
+// KB路由和分级函数已移至上方（使用kb-config.js配置）
+
 // ============================
-// 知识库分级访问接口
+// KB分级访问API
 // ============================
 
-// 获取知识库文件列表（按角色过滤）
+// KB文件列表（按角色过滤）
 app.get('/api/kb/list', auth, (req, res) => {
   const fs = require('fs');
   const path = require('path');
@@ -906,12 +910,15 @@ app.get('/api/kb/list', auth, (req, res) => {
   
   try {
     const files = fs.readdirSync(kbDir).filter(f => f.endsWith('.js'));
-    
-    // 按角色过滤
     const accessibleFiles = files.filter(file => {
-      const level = getKBLevel(file);
+      const config = KB_LEVELS[file];
+      const level = config ? config.level : 'public';
       return canAccessKB(req.userRoles, level);
-    });
+    }).map(file => ({
+      filename: file,
+      level: KB_LEVELS[file] ? KB_LEVELS[file].level : 'public',
+      desc: KB_LEVELS[file] ? KB_LEVELS[file].desc : ''
+    }));
     
     res.json({ files: accessibleFiles });
   } catch (e) {
@@ -919,16 +926,16 @@ app.get('/api/kb/list', auth, (req, res) => {
   }
 });
 
-// 获取知识库文件内容（按角色鉴权）
+// KB文件内容（角色鉴权）
 app.get('/api/kb/:filename', auth, (req, res) => {
-  const filename = sec.sanitizeInput(req.params.filename);
+  const filename = req.params.filename;
   
-  // 防路径遍历
   if (filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
     return res.status(403).json({ error: 'RBAC_FORBIDDEN' });
   }
   
-  const level = getKBLevel(filename);
+  const config = KB_LEVELS[filename];
+  const level = config ? config.level : 'public';
   if (!canAccessKB(req.userRoles, level)) {
     return res.status(403).json({ error: 'RBAC_FORBIDDEN', message: '无权访问此知识库' });
   }
@@ -942,49 +949,31 @@ app.get('/api/kb/:filename', auth, (req, res) => {
   }
   
   const content = fs.readFileSync(filePath, 'utf8');
+  res.set('Cache-Control', 'public, max-age=3600');
   res.type('application/javascript').send(content);
 });
 
-// KB文件分级映射
-function getKBLevel(filename) {
-  // L4 专业级（大师/医生专用）
-  const professional = ['tcm-diagnosis-kb.js', 'tcm-famous-formulas-kb.js', 'nihaisha-tcm-kb.js', 
-                        'nisha-knowledge.js', 'shuhan-knowledge.js', 'shuhan-mixun-tianji.js',
-                        'authoritative-knowledge-base.js', 'masters-knowledge.js', 'yanzhi-part2.js'];
-  // L3+ 精进级
-  const premium = ['qimen-knowledge-base.js', 'liuren-knowledge.js', 'meihua-knowledge.js',
-                   'zhouyi-knowledge-base.js', 'bazi-advanced.js', 'ziwei-advanced.js', 'fengshui-advanced.js'];
-  // L3 会员级
-  const member = ['bazi-knowledge-base.js', 'ziwei-knowledge-base.js', 'liuyao-knowledge-base.js',
-                  'wuxing-correspondence.js', 'fengshui-knowledge-base.js', 'yangzhai-knowledge.js'];
-  
-  if (professional.includes(filename)) return 'professional';
-  if (premium.includes(filename)) return 'premium';
-  if (member.includes(filename)) return 'member';
-  return 'public';
-}
+// ============================
+// 案例质量评分API
+// ============================
 
-function canAccessKB(roles, level) {
-  if (roles.includes('super_admin')) return true;
-  
-  switch (level) {
-    case 'public': return true;
-    case 'registered': return roles.some(r => ['free', 'mingdao', 'advanced', 'vip', 'admin_a', 'admin_b'].includes(r));
-    case 'member': return roles.some(r => ['mingdao', 'advanced', 'vip', 'admin_a', 'admin_b'].includes(r));
-    case 'premium': return roles.some(r => ['advanced', 'vip', 'admin_a', 'admin_b'].includes(r));
-    case 'professional': return roles.some(r => ['master', 'admin_b'].includes(r));
-    default: return false;
-  }
-}
+app.post('/api/clinic/score-case', requirePermission('clinic:collaborate'), (req, res) => {
+  const caseId = parseInt(req.body.caseId);
+  const score = caseQuality.scoreCase(caseId, db);
+  res.json({ ok: true, score: score });
+});
+
+app.post('/api/clinic/update-effectiveness', requirePermission('clinic:collaborate'), (req, res) => {
+  const caseId = parseInt(req.body.caseId);
+  const rating = parseInt(req.body.rating);
+  caseQuality.updateEffectiveness(caseId, rating, db);
+  res.json({ ok: true, message: '疗效评级已更新' });
+});
 
 // ============================
 // 数据同步路由
 // ============================
 app.use('/api/sync', syncRoutes);
-
-// ============================
-// 知识蒸馏路由
-// ============================
 app.use('/api/distill', distillationRoutes);
 
 // === 启动服务 ===

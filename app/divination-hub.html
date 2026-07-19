@@ -3791,6 +3791,7 @@ setTimeout(removeLoadingOverlay,5000);
     <script src="../knowledge/faith-renderer.js" defer></script>
     <script src="../knowledge/knowledge-supplement.js" defer></script>
     <script src="../knowledge/koujue-database-full.js" defer></script>
+<script src="js/secure-storage.js"></script>
 </head>
 <body>
 <div>
@@ -8034,7 +8035,8 @@ function exportCurrentSection() {
   let sectionId = active.getAttribute('data-section');
   let section = document.getElementById(sectionId);
   if (!section) { showToast('未找到对应内容'); return; }
-  let html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>导出</title><style>body{font-family:sans-serif;max-width:800px;margin:0 auto;padding:20px;background:var(--ink);color:var(--paper)}h1{color:var(--gold)}</style></head><body>' + section.innerHTML + '</body></html>';
+  let html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>导出</title><style>body{font-family:sans-serif;max-width:800px;margin:0 auto;padding:20px;background:var(--ink);color:var(--paper)}h1{color:var(--gold)}</style></head><body>' + section.innerHTML + '<script src="js/rbac-client.js"></script>
+</body></html>';
   downloadBlob(html, '导出内容.html', 'text/html;charset=utf-8');
   showToast('已导出当前模块');
 }
@@ -16550,6 +16552,18 @@ function getLiuRenShenPan(fa, zhong, mo, dayStem) {
 // ================================================================
 
 document.addEventListener('DOMContentLoaded', initCompositeSections);
+
+// RBAC 登录检查（可选：首次访问引导登录，但不强制阻断）
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof RBAC !== 'undefined' && !RBAC.isLoggedIn()) {
+    // 未登录：显示访客模式提示，不强制跳转
+    console.info('[RBAC] 访客模式，建议登录获取完整功能');
+  }
+  // 应用菜单可见性
+  if (typeof RBAC !== 'undefined') {
+    RBAC.applyMenuVisibility();
+  }
+});
 document.addEventListener('DOMContentLoaded', () => {
   // 渲染六十四卦网格
   setTimeout(renderYijingGuaGrid, 200);
