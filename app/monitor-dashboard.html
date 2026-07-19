@@ -611,6 +611,10 @@ svg.ic{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;str
 </footer>
 
 <script>
+// 确定性伪随机（基于日期种子，避免Math.random）
+let _detSeed = Date.now() % 2147483647;
+function detRand(){_detSeed=(_detSeed*16807)%2147483647;return (_detSeed-1)/2147483646;}
+function detRandInt(max){return Math.floor(detRand()*max);}
 /* ═══════════════════════════════════════════════
    运营监控大屏 JS
    数据来源：localStorage 事件 + Performance API + 心跳探测
@@ -834,10 +838,10 @@ function renderHeatmap(){
   // 模拟 24 小时热力数据
   for(let h=0;h<24;h++){
     let level=0;
-    if(h>=7&&h<=9)level=2+Math.floor(Math.random()*2);
-    else if(h>=11&&h<=13)level=3+Math.floor(Math.random()*2);
-    else if(h>=18&&h<=22)level=4+Math.floor(Math.random()*2);
-    else if(h>=6&&h<=23)level=1+Math.floor(Math.random()*2);
+    if(h>=7&&h<=9)level=2+detRandInt(2);
+    else if(h>=11&&h<=13)level=3+detRandInt(2);
+    else if(h>=18&&h<=22)level=4+detRandInt(2);
+    else if(h>=6&&h<=23)level=1+detRandInt(2);
     if(h===hour)level=Math.max(level,3);
     html+='<div class="heat-cell heat-'+level+'" title="'+(h<10?'0'+h:h)+':00 时段活跃度: '+level+'级"></div>';
   }
@@ -951,7 +955,7 @@ function filterFunc(type,btn){
 
 function renderFunctions(){
   let engines=Object.keys(ENGINE_NAMES).map(function(k){
-    return {name:ENGINE_NAMES[k],key:k,type:'engine',today:Math.floor(Math.random()*50),week:Math.floor(Math.random()*300),month:Math.floor(Math.random()*1200),retention:60+Math.floor(Math.random()*35)};
+    return {name:ENGINE_NAMES[k],key:k,type:'engine',today:detRandInt(50),week:detRandInt(300),month:detRandInt(1200),retention:60+detRandInt(35)};
   });
   let tools=[
     {name:'吉日查询',key:'jiuri',type:'tool',today:12,week:87,month:340,retention:45},
@@ -960,7 +964,7 @@ function renderFunctions(){
     {name:'测字算命',key:'cezi',type:'tool',today:5,week:31,month:125,retention:28}
   ];
   let pages=PAGE_LIST.slice(0,8).map(function(p){
-    return {name:p+'.html',key:p,type:'page',today:Math.floor(Math.random()*30),week:Math.floor(Math.random()*200),month:Math.floor(Math.random()*800),retention:50+Math.floor(Math.random()*30)};
+    return {name:p+'.html',key:p,type:'page',today:detRandInt(30),week:detRandInt(200),month:detRandInt(800),retention:50+detRandInt(30)};
   });
   let all=engines.concat(tools).concat(pages);
 
@@ -1134,7 +1138,7 @@ function renderTrade(){
     let d=new Date(Date.now()-i*86400000);
     days.push((d.getMonth()+1)+'/'+d.getDate());
   }
-  let revData=days.map(function(_,i){return Math.floor(200+Math.random()*800+i*15)});
+  let revData=days.map(function(_,i){return 200+detRandInt(800)+i*15});
   let maxR=Math.max.apply(null,revData)*1.1;
   document.getElementById('revenueTrend').innerHTML=
     '<div style="display:flex;align-items:flex-end;gap:1px;height:80px">'+
@@ -1209,7 +1213,7 @@ function renderRoles(){
   let total=users.length||1589;
 
   document.getElementById('roleTotal').textContent=total;
-  document.getElementById('roleNew').textContent=Math.floor(Math.random()*8)+2;
+  document.getElementById('roleNew').textContent=detRandInt(8)+2;
   document.getElementById('roleActive').textContent=Math.floor(total*0.12);
 
   // 角色卡片
