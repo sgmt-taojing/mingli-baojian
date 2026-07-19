@@ -84,19 +84,14 @@ body{background:var(--bg);color:var(--paper);font-family:'Noto Serif SC',serif;l
 <style>@keyframes spin{to{transform:rotate(360deg)}}</style> id="content"></div>
 </div>
 <div class="footer">倪海厦中医课程知识库 · 43个模块 · 5730行 · 全量移植自 nihaisha-nishi-tcm 仓库<br>知识提取时间：2026-07-18 · Skill已安装：~/.openclaw-autoclaw/skills/nihaisha/</div>
-<script defer src="../knowledge/nihaisha-kb-combined.js"></script>
+<script defer src="../knowledge/nihaisha-kb.js"></script>
 <script>
-var KB=window.NIHAISHA_TCM_KB||{};
+var KB=window.NIHAISHA_KB||{};
 // 合并全量移植batch（优先级最高，覆盖精简版）
-['NIHAISHA_BATCH1','NIHAISHA_BATCH2','NIHAISHA_BATCH3','NIHAISHA_BATCH4'].forEach(function(k){
-  if(window[k]){Object.assign(KB, window[k]);}
-});
+// 蒸馏版KB已内置全部模块
 // 合并经典方剂KB（11份桌面PDF/87721字）
-if(window.NIHAISHA_CLASSICS_KB){
-  KB._classics = window.NIHAISHA_CLASSICS_KB;
-  // console.log('[倪师经典KB] 已合并', window.NIHAISHA_CLASSICS_KB._meta);
-}
-window.NIHAISHA_TCM_KB = KB;
+
+window.NIHAISHA_KB = KB;
 var _ld=document.getElementById('kbLoading');if(_ld)_ld.style.display='none';
 
 // 46个模块，按分类分组（排除_meta）
@@ -127,7 +122,7 @@ var tabGroups=[
 {id:'audio-collection',name:'🎧 音频合集'}
 ]},
 {group:'💊 经典与方剂',tabs:[
-{id:'_classics',name:'📜 中医经典（11份）'}
+
 ]},
 {group:'📝 笔记模块',tabs:[
 {id:'notes-shanghan',name:'📝 伤寒笔记'},
