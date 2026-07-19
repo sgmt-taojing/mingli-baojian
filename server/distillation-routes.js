@@ -12,8 +12,8 @@ const caseQuality = require('./case-quality.js');
 router.post('/scan', rbac.requirePermission('case:distill'), (req, res) => {
   try {
     let threshold = {
-      quality_score: req.body.quality_score || 7,
-      effectiveness: req.body.effectiveness || 3
+      quality_score: req.body.quality_score ?? 0,
+      effectiveness: req.body.effectiveness ?? 0
     };
     let cases = distillation.scanHighQualityCases(threshold);
     res.json({
@@ -42,8 +42,8 @@ router.post('/scan', rbac.requirePermission('case:distill'), (req, res) => {
 router.post('/extract', rbac.requirePermission('case:distill'), (req, res) => {
   try {
     let threshold = {
-      quality_score: req.body.quality_score || 7,
-      effectiveness: req.body.effectiveness || 3
+      quality_score: req.body.quality_score ?? 0,
+      effectiveness: req.body.effectiveness ?? 0
     };
     let cases = distillation.scanHighQualityCases(threshold);
     if (cases.length === 0) {
@@ -185,13 +185,13 @@ router.post('/verify/:batchId', rbac.requirePermission('clinic:collaborate'), (r
 });
 
 // === POST /api/distill/run — 一键完整蒸馏流程 ===
-router.post('/run', rbac.requirePermission('case:distill'), (req, res) => {
+router.post('/run', rbac.requirePermission('case:distill'), async (req, res) => {
   try {
     let threshold = {
-      quality_score: req.body.quality_score || 7,
-      effectiveness: req.body.effectiveness || 3
+      quality_score: req.body.quality_score ?? 0,
+      effectiveness: req.body.effectiveness ?? 0
     };
-    let result = distillation.runFullDistillation(threshold);
+    let result = await distillation.runFullDistillation(threshold);
     res.json(result);
   } catch (e) {
     console.error('蒸馏流程错误:', e.message);
@@ -303,6 +303,33 @@ router.get('/follow-up', rbac.requirePermission('clinic:collaborate'), (req, res
     res.json({ ok: true, count: cases.length, cases: cases });
   } catch (e) {
     console.error('随访查询错误:', e.message);
+    res.status(500).json({ error: 'SERVER_ERROR', message: e.message });
+  }
+});
+
+// GET /api/distill/stats — 蒸馏概览统计
+router.get('/stats', rbac.requirePermission('case:distill'), (req, res) => {
+  try {
+    const { DatabaseSync } = require('node:sqlite');
+    const db = new DatabaseSync('server/database/yidao.db');
+    const totalCases = db.prepare('SELECT COUNT(*) as c FROM medical_cases').get().c;
+    const completedCases = db.prepare("SELECT COUNT(*) as c FROM medical_cases WHERE status = 'completed'").get().c;
+    const totalBatches = db.prepare('SELECT COUNT(*) as c FROM distillation_batches').get().c;
+    const totalReports = db.prepare('SELECT COUNT(*) as c FROM tcm_reports').get().c;
+    const kbVersions = db.prepare('SELECT COUNT(*) as c FROM kb_versions').get().c;
+    db.close();
+    res.json({
+      ok: true,
+      stats: {
+        total_cases: totalCases,
+        completed_cases: completedCases,
+        distillation_batches: totalBatches,
+        tcm_reports: totalReports,
+        kb_versions: kbVersions
+      }
+    });
+  } catch (e) {
+    console.error('蒸馏统计错误:', e.message);
     res.status(500).json({ error: 'SERVER_ERROR', message: e.message });
   }
 });

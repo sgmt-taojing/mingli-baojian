@@ -37,10 +37,11 @@ function parseJSON(text, fallback) {
 // 扫描 quality_score≥7, effectiveness≥3, status=completed 的案例
 function scanHighQualityCases(threshold) {
   threshold = threshold || {};
-  const minQuality = threshold.quality_score || 7;
-  const minEffectiveness = threshold.effectiveness || 3;
+  const minQuality = threshold.quality_score || 0;
+  const minEffectiveness = threshold.effectiveness || 0;
 
-  const cases = db.prepare(`
+  // 优先从 master_cases 读取，空时 fallback 到 medical_cases
+  let cases = db.prepare(`
     SELECT id, case_uuid, master_id, patient_id,
            bazi_chart, wuxing_summary, symptoms, constitution,
            master_analysis, analysis_summary, medical_translation,
@@ -53,6 +54,23 @@ function scanHighQualityCases(threshold) {
       AND effectiveness_rating >= ?
     ORDER BY quality_score DESC, completed_at DESC
   `).all(minQuality, minEffectiveness);
+
+  // Fallback: 从 medical_cases 读取已完成案例
+  if (cases.length === 0) {
+    cases = db.prepare(`
+      SELECT mc.id, mc.patient_id, mc.assigned_master_id as master_id,
+             mc.symptoms, mc.constitution, mc.status,
+             mc.created_at, mc.updated_at as completed_at,
+             mca.bazi_chart, mca.wuxing_summary, mca.master_analysis,
+             mca.analysis_summary, mca.medical_translation,
+             mca.doctor_diagnosis, mca.final_plan,
+             mca.quality_score, mca.effectiveness_rating, mca.is_high_quality
+      FROM medical_cases mc
+      LEFT JOIN master_cases mca ON mc.master_case_id = mca.id
+      WHERE mc.status = 'completed'
+      ORDER BY mc.updated_at DESC
+    `).all();
+  }
 
   // 解密敏感字段
   return cases.map(function(c) {
