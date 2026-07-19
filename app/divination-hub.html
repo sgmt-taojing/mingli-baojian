@@ -8151,7 +8151,7 @@ function exportCurrentSection() {
   let sectionId = active.getAttribute('data-section');
   let section = document.getElementById(sectionId);
   if (!section) { showToast('未找到对应内容'); return; }
-  let html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>导出</title><style>body{font-family:sans-serif;max-width:800px;margin:0 auto;padding:20px;background:var(--ink);color:var(--paper)}h1{color:var(--gold)}</style></head><body>' + section.innerHTML + '<script src="js/rbac-client.js"></script>
+  let html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>导出</title><style>body{font-family:sans-serif;max-width:800px;margin:0 auto;padding:20px;background:var(--ink);color:var(--paper)}h1{color:var(--gold)}</style></head><body>' + section.innerHTML + '<scr'+'ipt src="js/rbac-client.js"></scr'+'ipt>
 </body></html>';
   downloadBlob(html, '导出内容.html', 'text/html;charset=utf-8');
   showToast('已导出当前模块');
@@ -12306,7 +12306,7 @@ function computeBazi() {
   });
 
   // === 核心命理指标汇总卡 ===
-  let geju = (window._currentGeju) ? window._currentGeju.name : '';
+  geju = (window._currentGeju) ? window._currentGeju.name : '';
   let coreMetrics = '';
   coreMetrics += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;margin-top:8px">';
   let _mt = mingType;
@@ -28770,7 +28770,7 @@ function showKnowledgeDetail(key, name) {
     html += '<div class="kd-section">' + window.KNOWLEDGE_DETAILS[mappedKey] + '</div>';
     
     detailEl.innerHTML = html;
-    let modal = document.getElementById('knowledgeDetailModal');
+    modal = document.getElementById('knowledgeDetailModal');
     if (modal) {
       modal.style.display = 'block';
       document.body.style.overflow = 'hidden';
@@ -28897,7 +28897,7 @@ function showKnowledgeDetail(key, name) {
     html = '<div class="kd-section">' + window.CONSTELLATION_KB.intro + '</div>';
   }
   detailEl.innerHTML = html || '<p style="color:var(--paper2);text-align:center;padding:40px 0">该领域知识正在完善中，敬请期待...</p>';
-  let modal = document.getElementById('knowledgeDetailModal');
+  modal = document.getElementById('knowledgeDetailModal');
   if (modal) {
     modal.style.display = 'block';
     document.body.style.overflow = 'hidden';
