@@ -15,29 +15,116 @@
   --bg:#080808;--card:rgba(255,255,255,0.04);--card2:rgba(255,255,255,0.06);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--paper);font-family:'Noto Serif SC',serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+body{background:var(--bg);color:var(--paper);font-family:'Noto Serif SC',serif;min-height:100vh}
 .bg-deco{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(201,168,76,0.04) 0%,transparent 60%)}
-.brand{text-align:center;margin-bottom:40px;position:relative;z-index:1}
-.brand h1{font-size:32px;color:var(--gold);letter-spacing:8px;margin-bottom:8px}
-.brand p{color:var(--paper3);font-size:13px;letter-spacing:3px;opacity:.7}
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;max-width:900px;width:100%;position:relative;z-index:1}
-.card{display:block;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px 24px;text-decoration:none;transition:all .3s;position:relative;overflow:hidden}
+.container{max-width:960px;margin:0 auto;padding:20px;position:relative;z-index:1}
+/* 顶部品牌 */
+.brand{text-align:center;margin-bottom:24px}
+.brand h1{font-size:28px;color:var(--gold);letter-spacing:8px;margin-bottom:6px}
+.brand p{color:var(--paper3);font-size:12px;letter-spacing:3px;opacity:.7}
+.brand .date{color:var(--gold3);font-size:12px;margin-top:4px}
+/* 活数据指标条 */
+.metrics{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:20px}
+.metric{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 12px;text-align:center;transition:all .3s}
+.metric:hover{border-color:rgba(201,168,76,.3);background:var(--card2)}
+.metric-val{font-size:24px;color:var(--gold);font-weight:700;line-height:1.2}
+.metric-label{font-size:11px;color:var(--paper3);margin-top:4px;letter-spacing:1px}
+.metric-sub{font-size:10px;color:var(--gold3);margin-top:2px}
+/* 卡片入口 */
+.section-title{color:var(--gold);font-size:14px;letter-spacing:3px;margin:20px 0 12px;padding-left:4px;border-left:3px solid var(--gold);padding-left:10px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.card{display:block;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px 18px;text-decoration:none;transition:all .3s;position:relative;overflow:hidden}
 .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0;transition:opacity .3s}
 .card:hover{border-color:rgba(201,168,76,.3);transform:translateY(-3px);background:var(--card2)}
 .card:hover::before{opacity:1}
-.card-icon{font-size:36px;margin-bottom:14px;line-height:1}
-.card-title{color:var(--gold);font-size:16px;font-weight:700;letter-spacing:3px;margin-bottom:6px}
-.card-desc{color:var(--paper3);font-size:12px;line-height:1.8;opacity:.7}
-.footer{margin-top:40px;color:var(--paper3);font-size:11px;opacity:.4;position:relative;z-index:1}
-@media(max-width:768px){.cards{grid-template-columns:1fr}.brand h1{font-size:24px;letter-spacing:4px}}
+.card-icon{font-size:32px;margin-bottom:10px;line-height:1}
+.card-title{color:var(--gold);font-size:15px;font-weight:700;letter-spacing:2px;margin-bottom:4px}
+.card-desc{color:var(--paper3);font-size:11px;line-height:1.6;opacity:.7}
+.card-badge{position:absolute;top:10px;right:10px;font-size:10px;padding:2px 8px;border-radius:8px;background:rgba(39,174,96,0.15);color:var(--jade)}
+/* 诊疗流程面板 */
+.flow-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px}
+.flow-panel-title{color:var(--gold);font-size:13px;letter-spacing:2px;margin-bottom:12px}
+.flow-steps{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.flow-step{flex:1;min-width:100px;text-align:center;padding:10px 8px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(201,168,76,0.08)}
+.flow-step-num{width:24px;height:24px;border-radius:50%;background:rgba(201,168,76,0.15);color:var(--gold);font-size:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 6px}
+.flow-step-title{font-size:11px;color:var(--paper);margin-bottom:2px}
+.flow-step-count{font-size:16px;color:var(--gold);font-weight:700}
+.flow-step-desc{font-size:10px;color:var(--paper3)}
+.flow-arrow{color:var(--gold3);font-size:14px}
+/* 最新动态 */
+.activity{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px}
+.activity-title{color:var(--gold);font-size:13px;letter-spacing:2px;margin-bottom:12px}
+.activity-list{list-style:none}
+.activity-item{padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:12px;color:var(--paper2);display:flex;justify-content:space-between;align-items:center}
+.activity-item:last-child{border-bottom:none}
+.activity-tag{font-size:10px;padding:2px 8px;border-radius:6px;margin-right:8px}
+.tag-completed{background:rgba(39,174,96,0.15);color:var(--jade)}
+.tag-submitted{background:rgba(201,168,76,0.15);color:var(--gold)}
+.tag-draft{background:rgba(160,144,128,0.15);color:var(--paper3)}
+/* 推送卡片 */
+.push-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px}
+.push-title{color:var(--gold);font-size:13px;letter-spacing:2px;margin-bottom:12px}
+.push-item{padding:8px 12px;background:rgba(255,255,255,0.02);border-radius:8px;margin-bottom:6px;font-size:12px;color:var(--paper2)}
+.push-item:last-child{margin-bottom:0}
+.push-type{font-size:10px;color:var(--gold3);margin-right:6px}
+/* 底部 */
+.footer{text-align:center;color:var(--paper3);font-size:11px;opacity:.4;margin-top:20px;padding:12px}
+/* 响应式 */
+@media(max-width:1200px){.container{max-width:90%}}
+@media(max-width:768px){.cards{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}.brand h1{font-size:22px;letter-spacing:4px}.flow-steps{flex-direction:column}}
 </style>
 </head>
 <body>
 <div class="bg-deco"></div>
+<div class="container">
 <div class="brand">
 <h1>☰ 命理宝鉴</h1>
 <p>易道智鉴 · 国学智慧平台</p>
+<div class="date" id="todayDate">加载中...</div>
 </div>
+
+<!-- 活数据指标条 -->
+<div class="metrics" id="metrics">
+<div class="metric"><div class="metric-val" id="m-users">-</div><div class="metric-label">注册用户</div><div class="metric-sub" id="m-vip">-</div></div>
+<div class="metric"><div class="metric-val" id="m-paipan">-</div><div class="metric-label">排盘次数</div><div class="metric-sub" id="m-paipan-trend">-</div></div>
+<div class="metric"><div class="metric-val" id="m-cases">-</div><div class="metric-label">诊疗案例</div><div class="metric-sub" id="m-cases-sub">-</div></div>
+<div class="metric"><div class="metric-val" id="m-reports">-</div><div class="metric-label">诊疗报告</div><div class="metric-sub" id="m-reports-sub">-</div></div>
+<div class="metric"><div class="metric-val" id="m-courses">-</div><div class="metric-label">在线课程</div></div>
+<div class="metric"><div class="metric-val" id="m-orders">-</div><div class="metric-label">订单总数</div><div class="metric-sub" id="m-orders-sub">-</div></div>
+</div>
+
+<!-- 诊疗流程面板 -->
+<div class="flow-panel">
+<div class="flow-panel-title">🏥 诊疗流程实时数据</div>
+<div class="flow-steps" id="flowSteps">
+<div class="flow-step"><div class="flow-step-num">1</div><div class="flow-step-title">病患提交</div><div class="flow-step-count" id="f-submit">-</div><div class="flow-step-desc">症状描述</div></div>
+<span class="flow-arrow">→</span>
+<div class="flow-step"><div class="flow-step-num">2</div><div class="flow-step-title">大师分析</div><div class="flow-step-count" id="f-master">-</div><div class="flow-step-desc">周易推演</div></div>
+<span class="flow-arrow">→</span>
+<div class="flow-step"><div class="flow-step-num">3</div><div class="flow-step-title">医生诊断</div><div class="flow-step-count" id="f-doctor">-</div><div class="flow-step-desc">处方方案</div></div>
+<span class="flow-arrow">→</span>
+<div class="flow-step"><div class="flow-step-num">4</div><div class="flow-step-title">报告推送</div><div class="flow-step-count" id="f-report">-</div><div class="flow-step-desc">病患查看</div></div>
+</div>
+</div>
+
+<!-- 最新案例动态 -->
+<div class="activity">
+<div class="activity-title">📋 最新案例动态</div>
+<ul class="activity-list" id="caseList">
+<li class="activity-item"><span class="activity-tag tag-draft">加载中</span> 正在获取数据...</li>
+</ul>
+</div>
+
+<!-- 最新推送 -->
+<div class="push-panel">
+<div class="push-title">📡 今日推送</div>
+<div id="pushList">
+<div class="push-item">加载中...</div>
+</div>
+</div>
+
+<!-- 功能入口 -->
+<div class="section-title">功能入口</div>
 <div class="cards">
 <a href="app/divination-hub.html" class="card">
 <div class="card-icon">🔮</div>
@@ -90,6 +177,84 @@ body{background:var(--bg);color:var(--paper);font-family:'Noto Serif SC',serif;m
 <div class="card-desc">会员中心·诊疗记录·个人设置</div>
 </a>
 </div>
-<div class="footer">命理宝鉴 · 易道智鉴 · 仅供学习参考</div>
+<div class="footer">命理宝鉴 · 易道智鉴 v2.1 · 仅供学习参考</div>
+</div>
+
+<script>
+// 活数据加载
+const API_BASE = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') 
+  ? 'http://127.0.0.1:8920' : '';
+
+async function loadStats() {
+  try {
+    const resp = await fetch(API_BASE + '/api/public/stats');
+    const d = await resp.json();
+    if (d.error) { console.error('stats error:', d.error); return; }
+    
+    document.getElementById('todayDate').textContent = d.date || '';
+    document.getElementById('m-users').textContent = d.users || 0;
+    document.getElementById('m-vip').textContent = `VIP ${d.vipUsers||0} · 大师 ${d.masterUsers||0} · 医生 ${d.doctorUsers||0}`;
+    document.getElementById('m-paipan').textContent = d.paipanCount || 0;
+    document.getElementById('m-paipan-trend').textContent = d.paipanTrend ? `7日${d.paipanTrend.length}次` : '';
+    document.getElementById('m-cases').textContent = d.totalCases || 0;
+    document.getElementById('m-cases-sub').textContent = `完成${d.completedCases||0} · 待处理${d.pendingCases||0}`;
+    document.getElementById('m-reports').textContent = d.totalReports || 0;
+    document.getElementById('m-reports-sub').textContent = `已读${d.readReports||0}`;
+    document.getElementById('m-courses').textContent = d.totalCourses || 0;
+    document.getElementById('m-orders').textContent = d.totalOrders || 0;
+    document.getElementById('m-orders-sub').textContent = `完成${d.completedOrders||0}`;
+    
+    // 诊疗流程
+    document.getElementById('f-submit').textContent = d.totalCases || 0;
+    document.getElementById('f-master').textContent = d.totalCases || 0;
+    document.getElementById('f-doctor').textContent = d.completedCases || 0;
+    document.getElementById('f-report').textContent = d.totalReports || 0;
+  } catch (e) {
+    console.error('loadStats:', e);
+  }
+}
+
+async function loadCases() {
+  try {
+    const resp = await fetch(API_BASE + '/api/public/recent-cases');
+    const cases = await resp.json();
+    if (!Array.isArray(cases)) return;
+    
+    const list = document.getElementById('caseList');
+    list.innerHTML = cases.slice(0, 6).map(c => {
+      const tagClass = c.status === 'completed' ? 'tag-completed' : c.status === 'submitted' ? 'tag-submitted' : 'tag-draft';
+      const tagText = c.status === 'completed' ? '已完成' : c.status === 'submitted' ? '待诊断' : '草稿';
+      const date = (c.created_at||'').slice(0,10);
+      const sym = (c.symptoms||'').slice(0, 24);
+      return `<li class="activity-item"><span><span class="activity-tag ${tagClass}">${tagText}</span>${sym}</span><span style="color:var(--paper3);font-size:11px">${date}</span></li>`;
+    }).join('');
+  } catch (e) {
+    console.error('loadCases:', e);
+  }
+}
+
+async function loadPushes() {
+  try {
+    const resp = await fetch(API_BASE + '/api/public/latest-pushes');
+    const pushes = await resp.json();
+    if (!Array.isArray(pushes)) return;
+    
+    const typeMap = { daily_fortune: '运势', health_tip: '养生', festival_reminder: '节日', case_update: '通知' };
+    const list = document.getElementById('pushList');
+    list.innerHTML = pushes.map(p => {
+      const type = typeMap[p.push_type] || p.push_type;
+      return `<div class="push-item"><span class="push-type">[${type}]</span>${p.content}</div>`;
+    }).join('');
+  } catch (e) {
+    console.error('loadPushes:', e);
+  }
+}
+
+loadStats();
+loadCases();
+loadPushes();
+// 每5分钟刷新
+setInterval(() => { loadStats(); loadCases(); loadPushes(); }, 300000);
+</script>
 </body>
 </html>

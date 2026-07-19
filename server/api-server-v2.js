@@ -975,6 +975,77 @@ app.post('/api/clinic/update-effectiveness', requirePermission('clinic:collabora
 });
 
 // ============================
+// 公开统计API（首页活数据）
+// ============================
+app.get('/api/public/stats', (req, res) => {
+  try {
+    const stats = {};
+    // 用户统计
+    stats.users = db.prepare('SELECT count(*) as c FROM users').get().c;
+    stats.vipUsers = db.prepare("SELECT count(DISTINCT user_id) as c FROM user_roles WHERE role='vip'").get().c;
+    stats.masterUsers = db.prepare("SELECT count(DISTINCT user_id) as c FROM user_roles WHERE role='master'").get().c;
+    stats.doctorUsers = db.prepare("SELECT count(DISTINCT user_id) as c FROM user_roles WHERE role='doctor'").get().c;
+    // 排盘统计
+    stats.paipanCount = db.prepare('SELECT count(*) as c FROM paipan_records').get().c;
+    // 案例统计
+    stats.totalCases = db.prepare('SELECT count(*) as c FROM master_cases').get().c;
+    stats.completedCases = db.prepare("SELECT count(*) as c FROM master_cases WHERE status='completed'").get().c;
+    stats.pendingCases = db.prepare("SELECT count(*) as c FROM master_cases WHERE status IN ('draft','submitted')").get().c;
+    // 报告统计
+    stats.totalReports = db.prepare('SELECT count(*) as c FROM tcm_reports').get().c;
+    stats.readReports = db.prepare('SELECT count(*) as c FROM tcm_reports WHERE read_at IS NOT NULL').get().c;
+    // 商品
+    stats.totalProducts = db.prepare("SELECT count(*) as c FROM merchants WHERE status='approved'").get().c;
+    // 订单
+    stats.totalOrders = db.prepare('SELECT count(*) as c FROM orders').get().c;
+    stats.completedOrders = db.prepare("SELECT count(*) as c FROM orders WHERE status='completed'").get().c;
+    // 课程
+    stats.totalCourses = db.prepare('SELECT count(*) as c FROM courses').get().c;
+    // 反馈
+    stats.totalFeedback = db.prepare('SELECT count(*) as c FROM feedback').get().c;
+    // 推送
+    stats.totalPushes = db.prepare('SELECT count(*) as c FROM push_logs').get().c;
+    // 积分
+    stats.totalPoints = db.prepare('SELECT COALESCE(SUM(total_points),0) as c FROM user_points').get().c;
+    // 今日日期
+    stats.date = new Date().toLocaleDateString('zh-CN', { year:'numeric', month:'long', day:'numeric', weekday:'long' });
+    // 近7天排盘趋势
+    stats.paipanTrend = db.prepare(`SELECT date(created_at) as d, count(*) as c FROM paipan_records GROUP BY date(created_at) ORDER BY d DESC LIMIT 7`).all();
+    // 近7天案例趋势
+    stats.caseTrend = db.prepare(`SELECT date(created_at) as d, count(*) as c FROM master_cases GROUP BY date(created_at) ORDER BY d DESC LIMIT 7`).all();
+    // 热门排盘类型
+    stats.paipanTypes = db.prepare(`SELECT type, count(*) as c FROM paipan_records GROUP BY type ORDER BY c DESC`).all();
+    res.json(stats);
+  } catch (e) {
+    res.json({ error: e.message });
+  }
+});
+
+// 公开最新案例列表（脱敏）
+app.get('/api/public/recent-cases', (req, res) => {
+  try {
+    const cases = db.prepare(`SELECT mc.id, mc.case_number, mc.status, mc.symptoms, mc.constitution, 
+      mc.created_at, mc.submitted_at, mc.completed_at, mc.quality_score,
+      u.name as master_name
+      FROM master_cases mc LEFT JOIN users u ON mc.master_id = u.id
+      ORDER BY mc.created_at DESC LIMIT 10`).all();
+    res.json(cases);
+  } catch (e) {
+    res.json({ error: e.message });
+  }
+});
+
+// 公开最新推送内容
+app.get('/api/public/latest-pushes', (req, res) => {
+  try {
+    const pushes = db.prepare(`SELECT content, push_type, push_date FROM push_logs ORDER BY created_at DESC LIMIT 5`).all();
+    res.json(pushes);
+  } catch (e) {
+    res.json({ error: e.message });
+  }
+});
+
+// ============================
 // 数据同步路由
 // ============================
 app.use('/api/sync', syncRoutes);
