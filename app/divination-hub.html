@@ -28841,7 +28841,27 @@ function showNishanKB() {
   let title = document.getElementById('knowledgeDetailTitle');
   if (!modal || !content || !title) return;
   title.textContent = '倪海厦讲堂 · 天纪人纪';
-  let html = '<style>.nishan-section h4{color:var(--gold);font-size:18px;letter-spacing:3px;margin-top:28px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,0.2)}.nishan-section p{line-height:2;margin-bottom:12px}.nishan-card{background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:14px;padding:24px;margin-bottom:20px;transition:all .3s}.nishan-card:hover{border-color:rgba(201,168,76,0.4);background:rgba(201,168,76,0.06)}.nishan-quote{background:rgba(192,57,43,0.06);border-left:3px solid var(--cinn);padding:14px 18px;margin:12px 0;border-radius:0 8px 8px 0;font-style:italic;color:var(--paper2);line-height:2}.nishan-tab{display:inline-block;padding:8px 20px;margin:4px;border:1px solid rgba(201,168,76,0.25);border-radius:20px;cursor:pointer;font-size:13px;transition:all .25s}.nishan-tab:hover,.nishan-tab.active{background:rgba(201,168,76,0.12);color:var(--gold);border-color:var(--gold)}.nishan-teacher{background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(192,57,43,0.05));border:1px solid rgba(201,168,76,0.3);border-radius:16px;padding:28px;margin-bottom:24px;text-align:center}</style>';
+  let html = '<style>.nishan-section h4{color:var(--gold);font-size:18px;letter-spacing:3px;margin-top:28px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,0.2)}.nishan-section p{line-height:2;margin-bottom:12px}.nishan-card{background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:14px;padding:24px;margin-bottom:20px;transition:all .3s}.nishan-card:hover{border-color:rgba(201,168,76,0.4);background:rgba(201,168,76,0.06)}.nishan-quote{background:rgba(192,57,43,0.06);border-left:3px solid var(--cinn);padding:14px 18px;margin:12px 0;border-radius:0 8px 8px 0;font-style:italic;color:var(--paper2);line-height:2}.nishan-tab{display:inline-block;padding:8px 20px;margin:4px;border:1px solid rgba(201,168,76,0.25);border-radius:20px;cursor:pointer;font-size:13px;transition:all .25s}.nishan-tab:hover,.nishan-tab.active{background:rgba(201,168,76,0.12);color:var(--gold);border-color:var(--gold)}.nishan-teacher{background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(192,57,43,0.05));border:1px solid rgba(201,168,76,0.3);border-radius:16px;padding:28px;margin-bottom:24px;text-align:center}
+/* === 排盘结果统一样式 === */
+.rpt-export-bar{margin-top:16px;text-align:center;display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.rpt-export-btn{font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px;font-family:inherit;transition:all .25s}
+.rpt-export-btn:hover{background:rgba(201,168,76,.1);border-color:rgba(201,168,76,.4)}
+/* 结果板块统一卡片 */
+.rpt-section{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px}
+.rpt-section-title{font-size:14px;font-weight:bold;color:var(--gold);letter-spacing:2px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+.rpt-section-body{font-size:13px;line-height:1.9;color:var(--paper);opacity:.9}
+.rpt-section-body b{color:var(--gold2)}
+/* 大白话总结统一样式 */
+.rpt-plain{margin-top:14px;padding:12px 16px;background:rgba(52,152,219,.04);border-left:3px solid var(--cyan2);border-radius:0 8px 8px 0}
+.rpt-plain-title{font-size:13px;font-weight:bold;color:var(--cyan2);margin-bottom:4px}
+.rpt-plain-body{font-size:12px;color:var(--paper);line-height:1.8}
+/* 结果指标卡 */
+.rpt-metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:12px}
+.rpt-metric{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center}
+.rpt-metric-label{font-size:10px;opacity:.5;margin-bottom:4px}
+.rpt-metric-value{font-size:16px;font-weight:bold;color:var(--gold)}
+
+</style>';
   html += '<div class="nishan-section">';
   
   if (typeof NISHAN_KNOWLEDGE !== 'undefined') {

@@ -2997,7 +2997,7 @@ function tzStep1Analyze(fileName, content, type) {
 
     if (!obj) {
       // Fallback: show raw text
-      result.innerHTML = '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px"><h4 style="font-size:15px;color:var(--gold);margin-bottom:12px">📊 指标分析结果</h4><div style="font-size:14px;color:var(--text);line-height:1.8;white-space:pre-wrap">' + escapeHtml(text) + '</div><div style="margin-top:16px;text-align:center"><button class="compute-btn" style="padding:10px 30px;font-size:14px" onclick="tzStep2Suggestions()">🌿 生成理疗建议</button></div></div>';
+      result.innerHTML = '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px"><h4 style="font-size:15px;color:var(--gold);margin-bottom:12px">📊 指标分析结果</h4><div style="font-size:14px;color:var(--text);line-height:1.8;white-space:pre-wrap">' + escapeHtml(text) + '</div><div class="rpt-export-bar"><button class="compute-btn" style="padding:10px 30px;font-size:14px" onclick="tzStep2Suggestions()">🌿 生成理疗建议</button></div></div>';
       tzLastAnalysis = {raw: text};
       return;
     }
@@ -4931,7 +4931,7 @@ function _computeBaziImpl() {
   try { document.getElementById('baziResult').insertAdjacentHTML('beforeend', generateInterpretation(baziData)); } catch(e) {}
 
   // === 复制结果按钮 ===
-  let copyBtn = '<div style="margin-top:16px;text-align:center">';
+  let copyBtn = '<div class="rpt-export-bar">';
   copyBtn += '<button onclick="copyResultText(this)" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px">📋 复制结果</button>';
   copyBtn += '</div>';
   try { document.getElementById('baziResult').insertAdjacentHTML('beforeend', copyBtn); } catch(e) {}
@@ -7316,7 +7316,7 @@ function renderHuajie(hj) {
   html += '</div>';
 
   // 导出按钮
-  html += '<div style="text-align:center;margin-top:12px"><button onclick="exportHuajieReport()" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'hjOutput\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button></div>';
+  html += '<div style="text-align:center;margin-top:12px"><button onclick="exportHuajieReport()" class="rpt-export-btn">📄 导出报告</button><button onclick="copyReportGeneric(\'hjOutput\')" class="rpt-export-btn">📋 复制结果</button></div>';
 
   // 平台理念标语（始终显示）
   html += '<div style="text-align:center;padding:16px 0 8px;border-top:1px solid rgba(201,168,76,0.1);margin-top:8px">';
@@ -8024,6 +8024,43 @@ async function yjCast() {
   yjTossing = false;
 }
 
+
+// 生成大白话总结（通用）
+function generatePlainSummary(engine, result) {
+  let title = '💬 简单说就是';
+  let body = '';
+  if (engine === 'meihua') {
+    let tiYong = result.tiYong || '体用';
+    let guaJi = result.judgment || '';
+    if (guaJi.indexOf('吉') !== -1 && guaJi.indexOf('凶') === -1) {
+      body = '体卦生用卦，事情发展对你有利，可以积极行动。但注意别用力过猛，顺势而为最好。';
+    } else if (guaJi.indexOf('凶') !== -1) {
+      body = '用卦克体卦，目前阻力较大，建议暂缓行动、积蓄力量。等时机转换后再出手。';
+    } else {
+      body = '体用比和、吉凶参半。关键在于把握分寸，宜稳不宜急，静观其变再决策。';
+    }
+  } else if (engine === 'qimen') {
+    let keyMen = result.keyMen || '开门';
+    if (keyMen.indexOf('开') !== -1 || keyMen.indexOf('生') !== -1) {
+      body = '奇门盘显示' + keyMen + '当令，格局开阔，适合主动出击、开拓新事。但逢吉门也要脚踏实地，不可冒进。';
+    } else if (keyMen.indexOf('死') !== -1 || keyMen.indexOf('惊') !== -1 || keyMen.indexOf('伤') !== -1) {
+      body = '奇门盘显示' + keyMen + '当令，目前环境不利，建议守成为主、避免大动作。保护好已有的成果。';
+    } else {
+      body = '奇门格局平稳，吉凶并存。关键看你怎么运用天时地利，审时度势、灵活应对。';
+    }
+  } else if (engine === 'liuren') {
+    let sanChuan = result.sanChuan || '';
+    if (sanChuan.indexOf('吉') !== -1 || sanChuan.indexOf('生') !== -1) {
+      body = '三传顺利、课体吉利，事情有望向好发展。把握机会、积极推进，同时保持谦虚谨慎。';
+    } else if (sanChuan.indexOf('凶') !== -1 || sanChuan.indexOf('克') !== -1) {
+      body = '三传受阻、课体不利，目前不宜强求。建议退守自保、等待时机好转。';
+    } else {
+      body = '课体平稳、吉凶参半。需结合实际灵活判断，不可固执一端。';
+    }
+  }
+  return '<div class="rpt-plain"><div class="rpt-plain-title">' + title + '</div><div class="rpt-plain-body">' + body + '</div></div>';
+}
+
 function showYjResult() {
   if (typeof HEXAGRAMS === 'undefined' || !HEXAGRAMS || HEXAGRAMS.length === 0) { showToast('卦象数据未加载'); return; }
   const gua = [[0,0,0],[0,0,0]];
@@ -8232,7 +8269,7 @@ function showYjResult() {
   if (yjReadBox) yjReadBox.innerHTML = getYijingReadingHTML(hex.name);
 
   // === 复制结果按钮 ===
-  let copyBtn = '<div style="margin-top:16px;text-align:center">';
+  let copyBtn = '<div class="rpt-export-bar">';
   copyBtn += '<button onclick="copyResultText(this)" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px">📋 复制结果</button>';
   copyBtn += '</div>';
   let yjResultEl = document.getElementById('yjResult');
@@ -8251,7 +8288,7 @@ function showYjResult() {
   document.getElementById('yjResult').scrollIntoView({ behavior: 'smooth' });
   // 导出报告按钮
   let _yjResEl = document.getElementById('yjResult');
-  if (_yjResEl) _yjResEl.insertAdjacentHTML('beforeend', '<div style="margin-top:16px);text-align:center"><button onclick="exportReportGeneric(\'yjResult\',\'六爻占卜报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button></div>');
+  if (_yjResEl) _yjResEl.insertAdjacentHTML('beforeend', '<div class="rpt-export-bar"><button onclick="exportReportGeneric(\'yjResult\',\'六爻占卜报告\')" class="rpt-export-btn">📄 导出报告</button></div>');
 }
 
 function yjReset() {
@@ -8891,7 +8928,13 @@ function _computeQimenImpl() {
   document.getElementById('qmResult').scrollIntoView({ behavior: 'smooth' });
 
   // 导出按钮
-  document.getElementById('qmResult').insertAdjacentHTML('beforeend', '<div style="margin-top:16px;text-align:center"><button onclick="exportReportGeneric(\'qmResult\',\'奇门遁甲排盘报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'qmResult\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button></div>');
+  // 大白话总结
+  try {
+    let _qmPlain = generatePlainSummary('qimen', {keyMen: ''});
+    let _qmRes1b = document.getElementById('qmResult');
+    if (_qmRes1b) _qmRes1b.insertAdjacentHTML('beforeend', _qmPlain);
+  } catch(e) {}
+  document.getElementById('qmResult').insertAdjacentHTML('beforeend', '<div class="rpt-export-bar"><button onclick="exportReportGeneric(\'qmResult\',\'奇门遁甲排盘报告\')" class="rpt-export-btn">📄 导出报告</button><button onclick="copyReportGeneric(\'qmResult\')" class="rpt-export-btn">📋 复制结果</button></div>');
 
   // ═══ 三元九运与奇门 ═══
   try {
@@ -10064,7 +10107,7 @@ function _computeZiWeiImpl() {
   document.getElementById('zwResult').scrollIntoView({ behavior: 'smooth' });
 
   // 导出按钮
-  document.getElementById('zwResult').insertAdjacentHTML('beforeend', '<div style="margin-top:16px;text-align:center"><button onclick="exportReportGeneric(\'zwResult\',\'紫微斗数排盘报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'zwResult\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button></div>');
+  document.getElementById('zwResult').insertAdjacentHTML('beforeend', '<div class="rpt-export-bar"><button onclick="exportReportGeneric(\'zwResult\',\'紫微斗数排盘报告\')" class="rpt-export-btn">📄 导出报告</button><button onclick="copyReportGeneric(\'zwResult\')" class="rpt-export-btn">📋 复制结果</button></div>');
 }
 
 // ================================================================
@@ -10850,7 +10893,13 @@ function _computeMeiHuaImpl() {
   document.getElementById('mhResult').scrollIntoView({ behavior: 'smooth' });
   // 导出/复制按钮
   let _mhRes2 = document.getElementById('mhResult');
-  if (_mhRes2) _mhRes2.insertAdjacentHTML('beforeend', '<div style="margin-top:16px);text-align:center"><button onclick="exportReportGeneric(\'mhResult\',\'梅花易数排盘报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'mhResult\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button></div>');
+  // 大白话总结
+  try {
+    let _mhPlain = generatePlainSummary('meihua', {tiYong: '', judgment: ''});
+    let _mhRes1b = document.getElementById('mhResult');
+    if (_mhRes1b) _mhRes1b.insertAdjacentHTML('beforeend', _mhPlain);
+  } catch(e) {}
+  if (_mhRes2) _mhRes2.insertAdjacentHTML('beforeend', '<div class="rpt-export-bar"><button onclick="exportReportGeneric(\'mhResult\',\'梅花易数排盘报告\')" class="rpt-export-btn">📄 导出报告</button><button onclick="copyReportGeneric(\'mhResult\')" class="rpt-export-btn">📋 复制结果</button></div>');
   if(btn){ btn.disabled=false; btn.textContent='开始排盘'; }
 }
 
@@ -11757,7 +11806,13 @@ function _computeLiuRenImpl() {
   document.getElementById('lrResult').scrollIntoView({ behavior: 'smooth' });
   // 导出/复制按钮
   let _lrRes2 = document.getElementById('lrResult');
-  if (_lrRes2) _lrRes2.insertAdjacentHTML('beforeend', '<div style="margin-top:16px);text-align:center"><button onclick="exportReportGeneric(\'lrResult\',\'大六壬排盘报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'lrResult\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button></div>');
+  // 大白话总结
+  try {
+    let _lrPlain = generatePlainSummary('liuren', {sanChuan: ''});
+    let _lrRes1b = document.getElementById('lrResult');
+    if (_lrRes1b) _lrRes1b.insertAdjacentHTML('beforeend', _lrPlain);
+  } catch(e) {}
+  if (_lrRes2) _lrRes2.insertAdjacentHTML('beforeend', '<div class="rpt-export-bar"><button onclick="exportReportGeneric(\'lrResult\',\'大六壬排盘报告\')" class="rpt-export-btn">📄 导出报告</button><button onclick="copyReportGeneric(\'lrResult\')" class="rpt-export-btn">📋 复制结果</button></div>');
 }
 
 // ═══ 构建完整六壬课式 ═══
@@ -24228,7 +24283,7 @@ function runPrecisionZeRi() {
           resultEl.insertAdjacentHTML('beforeend', _syZr);
         } catch(e) { console.warn('[三元九运择日分析块失败]', e.message); }
         // === 导出/复制按钮 ===
-        resultEl.insertAdjacentHTML('beforeend', '<div style="margin-top:16px;text-align:center"><button onclick="exportReportGeneric(\'' + resultEl.id + '\',\'择日分析报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'' + resultEl.id + '\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button></div>');
+        resultEl.insertAdjacentHTML('beforeend', '<div class="rpt-export-bar"><button onclick="exportReportGeneric(\'' + resultEl.id + '\',\'择日分析报告\')" class="rpt-export-btn">📄 导出报告</button><button onclick="copyReportGeneric(\'' + resultEl.id + '\')" class="rpt-export-btn">📋 复制结果</button></div>');
       }
     } catch(e) {
       if (resultEl) {
@@ -27459,7 +27514,7 @@ function computeFamilyPaipan() {
     _renderFamilyReport(allResults, familyEleCount, relationAnalysis, solutions);
     // 添加导出/复制按钮
     try {
-      let _famExport = '<div style="margin-top:16px;text-align:center"><button onclick="exportReportGeneric(\'familyResult\',\'家庭排盘报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'familyResult\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button></div>';
+      let _famExport = '<div class="rpt-export-bar"><button onclick="exportReportGeneric(\'familyResult\',\'家庭排盘报告\')" class="rpt-export-btn">📄 导出报告</button><button onclick="copyReportGeneric(\'familyResult\')" class="rpt-export-btn">📋 复制结果</button></div>';
       document.getElementById('familyResult').insertAdjacentHTML('beforeend', _famExport);
     } catch(_ee) {}
   } catch(e) {
@@ -29921,7 +29976,7 @@ function computeLifePlan() {
   html += '</div>';
 
   // 导出/复制按钮
-  html += '<div style="margin-top:16px;text-align:center"><button onclick="exportReportGeneric(\'lifeplanResult\',\'人生规划报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'lifeplanResult\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button></div>';
+  html += '<div class="rpt-export-bar"><button onclick="exportReportGeneric(\'lifeplanResult\',\'人生规划报告\')" class="rpt-export-btn">📄 导出报告</button><button onclick="copyReportGeneric(\'lifeplanResult\')" class="rpt-export-btn">📋 复制结果</button></div>';
 
   // 输出
   let output = document.getElementById('lifeplanResult');
@@ -32517,7 +32572,7 @@ function runJiaziCycle() {
         playSound('success');
         resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
         // 导出/复制按钮
-        resultEl.insertAdjacentHTML('beforeend', '<div style="margin-top:16px);text-align:center"><button onclick="exportReportGeneric(\'jiaziResult\',\'六十甲子周期报告\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button><button onclick="copyReportGeneric(\'jiaziResult\')" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button></div>');
+        resultEl.insertAdjacentHTML('beforeend', '<div class="rpt-export-bar"><button onclick="exportReportGeneric(\'jiaziResult\',\'六十甲子周期报告\')" class="rpt-export-btn">📄 导出报告</button><button onclick="copyReportGeneric(\'jiaziResult\')" class="rpt-export-btn">📋 复制结果</button></div>');
       }
     } catch(e) {
       if (resultEl) {
@@ -35088,8 +35143,8 @@ function _renderLifeIndexResult(name, scores, bazi) {
 
   // 导出
   html += '<div style="text-align:center;margin-top:16px">';
-  html += '<button onclick="exportLifeIndexReport()" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📄 导出报告</button>';
-  html += '<button onclick="copyLifeIndexResult()" style="font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px">📋 复制结果</button>';
+  html += '<button onclick="exportLifeIndexReport()" class="rpt-export-btn">📄 导出报告</button>';
+  html += '<button onclick="copyLifeIndexResult()" class="rpt-export-btn">📋 复制结果</button>';
   html += '</div>';
 
   html += '</div>';
