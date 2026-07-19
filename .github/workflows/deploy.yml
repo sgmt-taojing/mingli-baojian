@@ -40,18 +40,8 @@ jobs:
           if [ -d docs ]; then cp -r docs _site/docs; fi
           # 创建.nojekyll（禁用Jekyll处理，避免下划线开头文件被忽略）
           touch _site/.nojekyll
-          # 创建根目录跳转页（指向app/下的主页面）
-          printf '%s\n' \
-            '<!DOCTYPE html>' \
-            '<html lang="zh-CN">' \
-            '<head>' \
-            '<meta charset="UTF-8">' \
-            '<meta http-equiv="refresh" content="0; url=app/divination-hub.html">' \
-            '<title>命理宝鉴</title>' \
-            '<style>body{font-family:system-ui;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#1a1e14;color:#c9a84c}</style>' \
-            '</head>' \
-            '<body><div style="text-align:center"><h1>命理宝鉴</h1><p><a href="app/divination-hub.html" style="color:#c9a84c">进入主页面 →</a></p></div></body>' \
-            '</html>' > _site/index.html
+          # 复制根目录 index.html（活数据仪表盘）
+          if [ -f index.html ]; then cp index.html _site/index.html; fi
           # 创建移动端入口
           printf '%s\n' \
             '<!DOCTYPE html>' \
