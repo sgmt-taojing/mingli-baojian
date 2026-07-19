@@ -16929,6 +16929,23 @@ function computeFengshui() {
   computeFengshuiPro();
 }
 
+// 风水大白话总结
+  try {
+    let _fsScore = document.querySelector('#fsResult .fs-score-fill, #fsProResult .fs-score-fill');
+    let _score = _fsScore ? parseInt(_fsScore.style.width) : 0;
+    let _fsPlain = '<div class="rpt-plain"><div class="rpt-plain-title">💬 简单说就是</div><div class="rpt-plain-body">';
+    if (_score >= 80) {
+      _fsPlain += '您住的地方风水不错！格局方正、采光通风都好，住着舒服运势也旺。保持现状，注意定期清理杂物保持气场流通就好。';
+    } else if (_score >= 60) {
+      _fsPlain += '整体还行，有些小问题可以通过调整家具摆设、增加绿植或调整颜色来改善。重点注意大门、卧室和厨房这几个关键位置。';
+    } else {
+      _fsPlain += '目前居住环境有些风水缺陷，建议重点调整大门朝向、床位位置和厨房布局。如果条件允许，可以考虑换到更合适的房子。';
+    }
+    _fsPlain += '</div></div>';
+    let _fsEl = document.getElementById('fsResult') || document.getElementById('fsProResult');
+    if (_fsEl && _fsEl.innerHTML.indexOf('rpt-plain') === -1) _fsEl.insertAdjacentHTML('beforeend', _fsPlain);
+  } catch(e) {}
+
 function exportFengshuiReport() {
   let resultEl = document.getElementById('fsResult') || document.getElementById('fsProResult');
   if (!resultEl || !resultEl.innerHTML.trim()) { showToast('请先计算后再导出报告'); return; }
@@ -24283,7 +24300,14 @@ function runPrecisionZeRi() {
           resultEl.insertAdjacentHTML('beforeend', _syZr);
         } catch(e) { console.warn('[三元九运择日分析块失败]', e.message); }
         // === 导出/复制按钮 ===
-        resultEl.insertAdjacentHTML('beforeend', '<div class="rpt-export-bar"><button onclick="exportReportGeneric(\'' + resultEl.id + '\',\'择日分析报告\')" class="rpt-export-btn">📄 导出报告</button><button onclick="copyReportGeneric(\'' + resultEl.id + '\')" class="rpt-export-btn">📋 复制结果</button></div>');
+        // 择日大白话总结
+        try {
+          let _zeriPlain = '<div class="rpt-plain"><div class="rpt-plain-title">💬 简单说就是</div><div class="rpt-plain-body">';
+          _zeriPlain += '根据您的八字和所选事项，系统从黄历宜忌、干支五行、神煞等多维度为您筛选了最佳日期。建议优先选择标注为「吉」的日子，避开「忌」的日子。择日只是辅助，最重要的还是做好准备、把握时机。';
+          _zeriPlain += '</div></div>';
+          if (resultEl && resultEl.innerHTML.indexOf('rpt-plain') === -1) resultEl.insertAdjacentHTML('beforeend', _zeriPlain);
+        } catch(e) {}
+                resultEl.insertAdjacentHTML('beforeend', '<div class="rpt-export-bar"><button onclick="exportReportGeneric(\'' + resultEl.id + '\',\'择日分析报告\')" class="rpt-export-btn">📄 导出报告</button><button onclick="copyReportGeneric(\'' + resultEl.id + '\')" class="rpt-export-btn">📋 复制结果</button></div>');
       }
     } catch(e) {
       if (resultEl) {

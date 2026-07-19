@@ -488,6 +488,8 @@ body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xm
 .fn-desc{font-size:10px;color:var(--paper3);letter-spacing:1px}
 .personal-card{background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.15)}
 .personal-card h5{color:var(--gold)}
+.festival-item{background:rgba(201,168,76,.04)!important;border:1px solid rgba(201,168,76,.15)!important}
+.festival-item h4{color:var(--gold)!important}
 </style>
 </head>
 <style>
@@ -1051,7 +1053,40 @@ function renderAlmanacInfo(dateStr, almanac) {
     </div>
   `;
   
-  document.getElementById('almanacInfo').innerHTML = html;
+  // 查找今日节日
+  let festivalHTML = '';
+  try {
+    let FKB = window.FESTIVAL_KB || {};
+    let festivals = FKB.festivals || [];
+    let lunarMonthName = lunar.match(/([正二三四五六七八九十冬腊])月/);
+    let lunarDayName = lunar.match(/(初[一二三四五六七八九十]|廿[一二三四五六七八九]|三十)/);
+    let todayFestivals = [];
+    if (lunarMonthName && lunarDayName) {
+      let monthStr = lunarMonthName[1] + '月';
+      let dayStr = lunarDayName[1];
+      let dateStr = monthStr + dayStr;
+      festivals.forEach(function(f) {
+        if (f.lunarDate && f.lunarDate.indexOf(dateStr) > -1) {
+          todayFestivals.push(f);
+        }
+      });
+    }
+    if (todayFestivals.length > 0) {
+      festivalHTML = '<div class="almanac-item festival-item" style="grid-column:1/-1"><h4 style="color:var(--gold)">🎉 今日节日</h4>';
+      todayFestivals.forEach(function(f) {
+        festivalHTML += '<div style="margin-bottom:10px;padding:8px 12px;background:rgba(201,168,76,.06);border-radius:8px">';
+        festivalHTML += '<div style="font-size:14px;color:var(--gold);font-weight:bold">' + (f.name || '') + '</div>';
+        if (f.aliases) festivalHTML += '<span style="font-size:11px;color:var(--paper3);opacity:.6">别名：' + f.aliases.join('、') + '</span>';
+        if (f.origin) festivalHTML += '<div style="font-size:12px;margin-top:4px;opacity:.8">' + f.origin + '</div>';
+        if (f.customs) festivalHTML += '<div style="font-size:12px;margin-top:4px;color:var(--gold2)">习俗：' + f.customs.join('、') + '</div>';
+        if (f.meaning) festivalHTML += '<div style="font-size:12px;margin-top:2px;color:var(--cyan2)">寓意：' + f.meaning + '</div>';
+        if (f.food) festivalHTML += '<div style="font-size:11px;margin-top:2px;opacity:.6">饮食：' + f.food.join('、') + '</div>';
+        festivalHTML += '</div>';
+      });
+      festivalHTML += '</div>';
+    }
+  } catch(e) {}
+  document.getElementById('almanacInfo').innerHTML = html + festivalHTML;
 }
 
 // ===== 真实农历计算（基于1900-2100年农历数据表） =====
@@ -1868,5 +1903,6 @@ function pushDailyToPhone(){
   </div>
 </div>
 
+<script defer src="../knowledge/festival-knowledge-base.js"></script>
 </body>
 </html>
