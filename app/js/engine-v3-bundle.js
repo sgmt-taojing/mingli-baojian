@@ -30,7 +30,7 @@
 // ── 引擎V3报告样式注入 ──────────────────────────────────────
 (function(){
   if (typeof document !== 'undefined') {
-    var style = document.createElement('style');
+    let style = document.createElement('style');
     style.textContent = "\n    .liuren-report{font-family:'Noto Serif SC',serif;color:var(--paper,#e0d6c0);background:rgba(8,8,8,.6);border:1px solid rgba(201,168,76,.2);border-radius:10px;padding:16px}\n    .report-header{text-align:center;font-size:15px;font-weight:bold;color:var(--gold,#c9a84c);margin-bottom:12px;letter-spacing:2px}\n    .report-section{margin-bottom:10px}\n    .section-title{font-size:13px;color:var(--gold,#c9a84c);font-weight:bold;margin-bottom:4px}\n    .section-body{font-size:13px;line-height:1.8;color:var(--paper,#e0d6c0)}\n    .error-tip{color:#e74c3c;font-size:13px;padding:8px;text-align:center}\n  ";
     document.head.appendChild(style);
   }
@@ -6857,7 +6857,7 @@ function formatSanChuan(sanChuan) {
  */
 function generateReport(result) {
   if (!result || typeof result !== 'object') return '<p class="error-tip">排盘数据无效</p>';
-  var h = '<div class="liuren-report">';
+  let h = '<div class="liuren-report">';
   h += '<div class="report-header">══════ 大六壬排盘报告 V3 ══════</div>';
 
   // 四柱
@@ -6881,7 +6881,7 @@ function generateReport(result) {
     h += '<div class="report-section"><div class="section-title">【天地盘】</div>';
     h += '<div class="section-body">';
     h += '<div>月将' + (result.yueJiang?result.yueJiang.branch:'?') + '加时' + (result.hourBranch||'') + '</div>';
-    var tp = formatTianPan(result.tianPan);
+    let tp = formatTianPan(result.tianPan);
     for (var di in tp) {
       h += '<div>地盘' + di + ' → 天盘' + tp[di] + '</div>';
     }
@@ -6925,8 +6925,8 @@ function generateReport(result) {
     h += '<div>贵人: ' + (result.tianJiang.guirenZhi||'?') + ' (' + (result.tianJiang.guirenType||'?') + '), ' + (result.tianJiang.shunPai?'顺排':'逆排') + '</div>';
     if (result.tianJiang.fenbu) {
       for (var i = 0; i < 12; i++) {
-        var zhi = BRANCHES[i];
-        var god = result.tianJiang.fenbu[zhi];
+        let zhi = BRANCHES[i];
+        let god = result.tianJiang.fenbu[zhi];
         if (god) h += '<div>地盘' + zhi + ': ' + (god.name||'?') + '(' + (god.nature||'?') + ')</div>';
       }
     }
