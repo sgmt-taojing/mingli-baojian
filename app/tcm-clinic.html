@@ -543,15 +543,20 @@ function getAuthToken(){
 }
 async function apiCall(url, method, body){
   const token = getAuthToken();
-  const res = await fetch(API_BASE + url, {
-    method: method || 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? {'Authorization': 'Bearer ' + token} : {})
-    },
-    body: body ? JSON.stringify(body) : undefined
-  });
-  return res.json();
+  try {
+    const res = await fetch(API_BASE + url, {
+      method: method || 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? {'Authorization': '***' + token} : {})
+      },
+      body: body ? JSON.stringify(body) : undefined
+    });
+    if (!res.ok) return { error: 'HTTP_' + res.status };
+    return await res.json();
+  } catch(e) {
+    return { error: 'NETWORK_ERROR', message: e.message };
+  }
 }
 
 /* ===== DATA LAYER ===== */
