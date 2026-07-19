@@ -27,6 +27,15 @@
 (function() {
 'use strict';
 
+// ── 引擎V3报告样式注入 ──────────────────────────────────────
+(function(){
+  if (typeof document !== 'undefined') {
+    var style = document.createElement('style');
+    style.textContent = "\n    .liuren-report{font-family:'Noto Serif SC',serif;color:var(--paper,#e0d6c0);background:rgba(8,8,8,.6);border:1px solid rgba(201,168,76,.2);border-radius:10px;padding:16px}\n    .report-header{text-align:center;font-size:15px;font-weight:bold;color:var(--gold,#c9a84c);margin-bottom:12px;letter-spacing:2px}\n    .report-section{margin-bottom:10px}\n    .section-title{font-size:13px;color:var(--gold,#c9a84c);font-weight:bold;margin-bottom:4px}\n    .section-body{font-size:13px;line-height:1.8;color:var(--paper,#e0d6c0)}\n    .error-tip{color:#e74c3c;font-size:13px;padding:8px;text-align:center}\n  ";
+    document.head.appendChild(style);
+  }
+})();
+
 /**
  * ════════════════════════════════════════════════════════════════
  *  命理宝鉴 · 八字排盘引擎 V3
@@ -3428,6 +3437,8 @@ function judgeWXRelation(a, b) {
  * @param {string} params.topicType - 占事类型
  */
 function analyzeLiuyao(params) {
+  if (!params || !params.yjVals) return {error: '参数无效'};
+  try {
   const { yjVals, dayGan, dayZhi, topicType } = params;
 
   // 1. 起卦
@@ -4800,6 +4811,8 @@ function computeMeihuaFull(params) {
  * @returns {object} 包含完整断卦步骤的结果
  */
 function analyzeMeihuaFull(params) {
+  if (!params) return {error: '参数无效'};
+  try {
   // 先调用 computeMeihuaFull 获取基础排盘数据
   let base = computeMeihuaFull(params);
   let benGua = base.benGua;
@@ -6737,6 +6750,7 @@ function buildShenSha(dayStemIdx, dayBranchIdx, month) {
  * @returns {Object} 完整的大六壬课式数据
  */
 function computeLiuRen(year, month, day, hour) {
+  try {
   // ── 第一步：定四柱 ──
   const riGanZhi = getDayStemBranch(year, month, day);
   const dayStemIdx = riGanZhi.stemIdx;
@@ -6795,12 +6809,17 @@ function computeLiuRen(year, month, day, hour) {
     // 神煞
     shenSha
   };
+  } catch(e) {
+    console.error('[LiurenV3] computeLiuRen error:', e);
+    return null;
+  }
 }
 
 /**
  * 格式化天盘为可读形式
  */
 function formatTianPan(tianPan) {
+  if (!tianPan) return {};
   const result = {};
   for (let i = 0; i < 12; i++) {
     result[BRANCHES[i]] = BRANCHES[tianPan[i]];
@@ -6812,6 +6831,7 @@ function formatTianPan(tianPan) {
  * 格式化三传为可读形式
  */
 function formatSanChuan(sanChuan) {
+  if (!sanChuan) return {};
   return {
     method: sanChuan.method,
     初传: sanChuan.faInfo.zhi,
@@ -6828,46 +6848,95 @@ function formatSanChuan(sanChuan) {
  * 生成诊断报告
  */
 function generateReport(result) {
-  const lines = [];
-  lines.push('══════ 大六壬排盘报告 V3 ══════');
-  lines.push('');
-  lines.push(`【四柱】${result.year}年${result.month}月${result.day}日 ${result.hourStem}${result.hourBranch}时`);
-  lines.push(`  日干支: ${result.dayStem}${result.dayBranch}  (日干${result.dayStem}=${GAN_WX[result.dayStem]}, 日支${result.dayBranch}=${ZHI_WX[result.dayBranch]})`);
-  lines.push(`  时干支: ${result.hourStem}${result.hourBranch}`);
-  lines.push('');
-  lines.push(`【月将】${result.yueJiang.branch}(${result.yueJiang.name}) — 中气${result.yueJiang.zhongQi}后`);
-  lines.push('');
-  lines.push(`【天地盘】月将${result.yueJiang.branch}加时${result.hourBranch}`);
-  const tp = formatTianPan(result.tianPan);
-  for (const [di, tian] of Object.entries(tp)) {
-    lines.push(`  地盘${di} → 天盘${tian}`);
+  if (!result || typeof result !== 'object') return '<p class="error-tip">排盘数据无效</p>';
+  var h = '<div class="liuren-report">';
+  h += '<div class="report-header">══════ 大六壬排盘报告 V3 ══════</div>';
+
+  // 四柱
+  h += '<div class="report-section"><div class="section-title">【四柱】</div>';
+  h += '<div class="section-body">';
+  h += '<div>' + (result.year||'?') + '年' + (result.month||'?') + '月' + (result.day||'?') + '日 ' + (result.hourStem||'') + (result.hourBranch||'') + '时</div>';
+  h += '<div>日干支: ' + (result.dayStem||'?') + (result.dayBranch||'?') + '  (日干' + (result.dayStem||'?') + '=' + (GAN_WX[result.dayStem]||'?') + ', 日支' + (result.dayBranch||'?') + '=' + (ZHI_WX[result.dayBranch]||'?') + ')</div>';
+  h += '<div>时干支: ' + (result.hourStem||'') + (result.hourBranch||'') + '</div>';
+  h += '</div></div>';
+
+  // 月将
+  if (result.yueJiang) {
+    h += '<div class="report-section"><div class="section-title">【月将】</div>';
+    h += '<div class="section-body">';
+    h += '<div>' + (result.yueJiang.branch||'?') + '(' + (result.yueJiang.name||'?') + ') — 中气' + (result.yueJiang.zhongQi||'?') + '后</div>';
+    h += '</div></div>';
   }
-  lines.push('');
-  lines.push(`【四课】`);
-  lines.push(`  第一课: ${result.siKe.ke1}上${result.siKe.ke1Gan} (${ZHI_WX[result.siKe.ke1]})`);
-  lines.push(`  第二课: ${result.siKe.ke2}上${result.siKe.ke2Gan} (${ZHI_WX[result.siKe.ke2]})`);
-  lines.push(`  第三课: ${result.siKe.ke3}上${result.siKe.ke3Gan} (${ZHI_WX[result.siKe.ke3]})`);
-  lines.push(`  第四课: ${result.siKe.ke4}上${result.siKe.ke4Gan} (${ZHI_WX[result.siKe.ke4]})`);
-  lines.push('');
-  lines.push(`【三传】${result.sanChuan.method}`);
-  lines.push(`  初传: ${result.sanChuan.faInfo.zhi} (${ZHI_WX[result.sanChuan.faInfo.zhi]}) [${result.sanChuan.faInfo.type}]`);
-  lines.push(`  中传: ${result.sanChuan.zhongInfo.zhi} (${ZHI_WX[result.sanChuan.zhongInfo.zhi]})`);
-  lines.push(`  末传: ${result.sanChuan.moInfo.zhi} (${ZHI_WX[result.sanChuan.moInfo.zhi]})`);
-  lines.push('');
-  lines.push(`【课体】${result.keTi.name} (${result.keTi.jiXiong}) — ${result.keTi.desc}`);
-  lines.push('');
-  lines.push(`【十二天将】贵人: ${result.tianJiang.guirenZhi} (${result.tianJiang.guirenType}), ${result.tianJiang.shunPai?'顺排':'逆排'}`);
-  for (let i = 0; i < 12; i++) {
-    const zhi = BRANCHES[i];
-    const god = result.tianJiang.fenbu[zhi];
-    lines.push(`  地盘${zhi}: ${god.name}(${god.nature})`);
+
+  // 天地盘
+  if (result.tianPan) {
+    h += '<div class="report-section"><div class="section-title">【天地盘】</div>';
+    h += '<div class="section-body">';
+    h += '<div>月将' + (result.yueJiang?result.yueJiang.branch:'?') + '加时' + (result.hourBranch||'') + '</div>';
+    var tp = formatTianPan(result.tianPan);
+    for (var di in tp) {
+      h += '<div>地盘' + di + ' → 天盘' + tp[di] + '</div>';
+    }
+    h += '</div></div>';
   }
-  lines.push('');
-  lines.push(`【三传生克】`);
-  for (const r of result.chuanKe) {
-    lines.push(`  ${r}`);
+
+  // 四课
+  if (result.siKe) {
+    h += '<div class="report-section"><div class="section-title">【四课】</div>';
+    h += '<div class="section-body">';
+    h += '<div>第一课: ' + (result.siKe.ke1||'?') + '上' + (result.siKe.ke1Gan||'') + ' (' + (ZHI_WX[result.siKe.ke1]||'?') + ')</div>';
+    h += '<div>第二课: ' + (result.siKe.ke2||'?') + '上' + (result.siKe.ke2Gan||'') + ' (' + (ZHI_WX[result.siKe.ke2]||'?') + ')</div>';
+    h += '<div>第三课: ' + (result.siKe.ke3||'?') + '上' + (result.siKe.ke3Gan||'') + ' (' + (ZHI_WX[result.siKe.ke3]||'?') + ')</div>';
+    h += '<div>第四课: ' + (result.siKe.ke4||'?') + '上' + (result.siKe.ke4Gan||'') + ' (' + (ZHI_WX[result.siKe.ke4]||'?') + ')</div>';
+    h += '</div></div>';
   }
-  return lines.join('\n');
+
+  // 三传
+  if (result.sanChuan) {
+    h += '<div class="report-section"><div class="section-title">【三传】</div>';
+    h += '<div class="section-body">';
+    h += '<div>' + (result.sanChuan.method||'') + '</div>';
+    if (result.sanChuan.faInfo) h += '<div>初传: ' + (result.sanChuan.faInfo.zhi||'?') + ' (' + (ZHI_WX[result.sanChuan.faInfo.zhi]||'?') + ') [' + (result.sanChuan.faInfo.type||'') + ']</div>';
+    if (result.sanChuan.zhongInfo) h += '<div>中传: ' + (result.sanChuan.zhongInfo.zhi||'?') + ' (' + (ZHI_WX[result.sanChuan.zhongInfo.zhi]||'?') + ')</div>';
+    if (result.sanChuan.moInfo) h += '<div>末传: ' + (result.sanChuan.moInfo.zhi||'?') + ' (' + (ZHI_WX[result.sanChuan.moInfo.zhi]||'?') + ')</div>';
+    h += '</div></div>';
+  }
+
+  // 课体
+  if (result.keTi) {
+    h += '<div class="report-section"><div class="section-title">【课体】</div>';
+    h += '<div class="section-body">';
+    h += '<div>' + (result.keTi.name||'?') + ' (' + (result.keTi.jiXiong||'?') + ') — ' + (result.keTi.desc||'') + '</div>';
+    h += '</div></div>';
+  }
+
+  // 十二天将
+  if (result.tianJiang) {
+    h += '<div class="report-section"><div class="section-title">【十二天将】</div>';
+    h += '<div class="section-body">';
+    h += '<div>贵人: ' + (result.tianJiang.guirenZhi||'?') + ' (' + (result.tianJiang.guirenType||'?') + '), ' + (result.tianJiang.shunPai?'顺排':'逆排') + '</div>';
+    if (result.tianJiang.fenbu) {
+      for (var i = 0; i < 12; i++) {
+        var zhi = BRANCHES[i];
+        var god = result.tianJiang.fenbu[zhi];
+        if (god) h += '<div>地盘' + zhi + ': ' + (god.name||'?') + '(' + (god.nature||'?') + ')</div>';
+      }
+    }
+    h += '</div></div>';
+  }
+
+  // 三传生克
+  if (result.chuanKe && result.chuanKe.length) {
+    h += '<div class="report-section"><div class="section-title">【三传生克】</div>';
+    h += '<div class="section-body">';
+    for (var r of result.chuanKe) {
+      h += '<div>' + r + '</div>';
+    }
+    h += '</div></div>';
+  }
+
+  h += '</div>';
+  return h;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -6885,6 +6954,8 @@ function generateReport(result) {
  * @returns {object} 应期分析结果
  */
 function analyzeKeying(sanChuan, zhanShi) {
+  if (!sanChuan || !zhanShi) return {error: '参数无效'};
+  try {
   let faZhi = sanChuan.faInfo ? sanChuan.faInfo.zhi : '';
   let zhongZhi = sanChuan.zhongInfo ? sanChuan.zhongInfo.zhi : '';
   let moZhi = sanChuan.moInfo ? sanChuan.moInfo.zhi : '';
@@ -6956,6 +7027,10 @@ function analyzeKeying(sanChuan, zhanShi) {
     yingQi: yingQi,
     desc: yingQiDesc
   };
+  } catch(e) {
+    console.error('[LiurenV3] analyzeKeying error:', e);
+    return {error: e.message};
+  }
 }
 
 /**
@@ -6968,6 +7043,8 @@ function analyzeKeying(sanChuan, zhanShi) {
  * @returns {object} {benMing, xingNian, xingNianDetail}
  */
 function computeBenMing(birthYear, sex) {
+  if (!birthYear) return {error: '出生年份无效'};
+  try {
   // 十二地支
   let ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
   // 天干
@@ -7024,6 +7101,10 @@ function computeBenMing(birthYear, sex) {
     currentAge: currentAge,
     sex: sex
   };
+  } catch(e) {
+    console.error('[LiurenV3] computeBenMing error:', e);
+    return {error: e.message};
+  }
 }
 
 /**
@@ -7039,6 +7120,8 @@ function computeBenMing(birthYear, sex) {
  * @returns {object} { ketiType, gejuName, luck, description }
  */
 function analyzeKetiGeshi(sanChuan, zhanShi, siKe) {
+  if (!sanChuan || !zhanShi || !siKe) return {error: '参数无效'};
+  try {
   let faZhi = sanChuan.faInfo ? sanChuan.faInfo.zhi : '';
   let zhongZhi = sanChuan.zhongInfo ? sanChuan.zhongInfo.zhi : '';
   let moZhi = sanChuan.moInfo ? sanChuan.moInfo.zhi : '';
@@ -8065,6 +8148,8 @@ function getMaXing(hourZhiIdx) {
  * @return {object} 完整排盘数据
  */
 function qimenCalcV3(year, month, day, hour, juType) {
+  if (!year || !month || !day) return null;
+  try {
   juType = juType || 'auto';
   
   // 定遁局
@@ -8176,6 +8261,7 @@ function qimenCalcV3(year, month, day, hour, juType) {
  */
 function analyzeQimenFull(panData) {
   if (!panData || !panData.dipan) return null;
+  try {
   
   let result = {
     summary: '',
@@ -9135,6 +9221,8 @@ function getDayun(mingIdx, ju, yearGan, sex, birthYear) {
  * @returns {object} 完整排盘数据
  */
 function ziweiCalcV3(birthYear, birthMonth, birthDay, birthHour, sex) {
+  if (!birthYear || !birthMonth || !birthDay) return null;
+  try {
   const hourIdx = getHourIdx(birthHour);
   const yearGanIdx = mod(birthYear - 4, 10);
   const yearZhiIdx = mod(birthYear - 4, 12);
@@ -9466,6 +9554,8 @@ function hasStar(arr, star) {
  * @returns {object} 完整分析结果
  */
 function analyzeZiweiFull(panData) {
+  if (!panData) return null;
+  try {
   const sanfang = analyzeSanfang(panData);
   const gejuResult = getGeju(panData);
   const sihua = panData.sihua;
