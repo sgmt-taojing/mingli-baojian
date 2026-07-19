@@ -1315,13 +1315,9 @@ function renderViewContent(view) {
         let dateKey = lm[1] + '月' + ld[1];
         let todayF = festivals.filter(function(f) { return f.lunarDate && f.lunarDate.indexOf(dateKey) > -1; });
         if (todayF.length > 0) {
-          festivalHtml = '<div class="view-section" style="border-left:3px solid var(--gold)"><h5>🎉 今日节日</h5>';
-          todayF.forEach(function(f) {
-            festivalHtml += '<div style="margin-bottom:6px"><b style="color:var(--gold)">' + f.name + '</b>';
-            if (f.customs) festivalHtml += '<span style="font-size:11px;opacity:.6;margin-left:6px">习俗：' + f.customs.join('、') + '</span>';
-            if (member && f.origin) festivalHtml += '<div style="font-size:11px;opacity:.5;margin-top:2px">' + f.origin.substring(0, 80) + '</div>';
-            festivalHtml += '</div>';
-          });
+          festivalHtml = '<div class="view-section" style="border-left:3px solid var(--gold);padding:10px 14px"><h5 style="margin-bottom:6px">🎉 ' + todayF[0].name + '</h5>';
+          if (todayF[0].meaning) festivalHtml += '<div style="font-size:12px;opacity:.7">' + todayF[0].meaning + '</div>';
+          if (todayF.length > 1) festivalHtml += '<div style="font-size:11px;opacity:.5;margin-top:4px">另有：' + todayF.slice(1,4).map(function(f){return f.name}).join('、') + '</div>';
           festivalHtml += '</div>';
         }
       }
