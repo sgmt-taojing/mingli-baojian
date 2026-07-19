@@ -36,6 +36,8 @@ jobs:
           if [ -d js ]; then cp -r js _site/js; fi
           if [ -d knowledge ]; then cp -r knowledge _site/knowledge; fi
           if [ -d css ]; then cp -r css _site/css; fi
+          # 复制 docs/ 目录（文档+报告）
+          if [ -d docs ]; then cp -r docs _site/docs; fi
           # 创建.nojekyll（禁用Jekyll处理，避免下划线开头文件被忽略）
           touch _site/.nojekyll
           # 创建根目录跳转页（指向app/下的主页面）
