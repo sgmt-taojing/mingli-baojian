@@ -225,12 +225,35 @@ async function sendMsg(prefilled) {
     chatHistory.push({role: 'assistant', content: reply});
   } catch(e) {
     typingDiv.remove();
-    const errDiv = document.createElement('div');
-    errDiv.className = 'chat-msg chat-ai';
-    errDiv.innerHTML = '<div class="label">🤖 AI命理助手</div><span class="bubble">网络异常，请稍后重试。如果持续无法使用，可以尝试直接使用排盘功能或浏览知识库。</span>';
-    box.appendChild(errDiv);
+    // GitHub Pages无后端时，用前端本地降级响应
+    const reply = _localResponse(q, baziData);
+    const aiDiv = document.createElement('div');
+    aiDiv.className = 'chat-msg chat-ai';
+    aiDiv.innerHTML = '<div class="label">🤖 AI命理助手 <span style="font-size:10px;opacity:.5">(知识库模式)</span></div><span class="bubble">' + escapeHtml(reply) + '</span>';
+    box.appendChild(aiDiv);
     box.scrollTop = box.scrollHeight;
+    chatHistory.push({role: 'assistant', content: reply});
   }
+}
+
+// 前端本地降级响应（GitHub Pages无后端时使用）
+function _localResponse(text, bazi) {
+  if (!text) return '您好，我是易道智鉴AI助手。请告诉我您的出生年月日时，我可以为您排盘分析。';
+  const t = text.toLowerCase();
+  if (bazi && bazi.pillars) {
+    const dm = bazi.day_master || '未知';
+    const p = bazi.pillars;
+    return '根据您的排盘：日主' + dm + '，四柱 ' + (p['年']||'') + ' ' + (p['月']||'') + ' ' + (p['日']||'') + ' ' + (p['时']||'') + '\n\n（深度AI分析需连接后端服务，当前为离线模式。请在本地运行后端服务获取深度解读。）';
+  }
+  if (/八字|排盘|命理/.test(t)) return '我可以为您做八字排盘分析。请提供出生年月日时和性别。\n\n提示：在本地运行后端服务可获得完整排盘+AI深度解读功能。';
+  if (/风水|布局/.test(t)) return '风水布局建议：大门宜吉位、卧室宜安静、厨房宜凶位压煞、卫生间忌对门。\n\n如需个性化分析，请提供房屋朝向。';
+  if (/中医|养生|健康/.test(t)) return '中医养生：子时前入睡养肝胆、七分饱、适度运动、情志调达。\n\n如需针对性建议，请描述症状。';
+  if (/失眠/.test(t)) return '失眠调理：酸枣仁粥、神门穴按摩、睡前忌手机、傍晚散步。\n\n持续失眠建议就医。';
+  if (/倪海厦|倪师/.test(t)) return '倪海厦老师知识库涵盖伤寒论、金匮要略、针灸大成等46模块。请在「倪师知识库」页面浏览。';
+  if (/奇门|紫微|六爻|梅花|六壬/.test(t)) return '排盘引擎支持奇门遁甲、紫微斗数、六爻、梅花易数、大六壬。请在「主平台」排盘页面使用。';
+  if (/择日|黄历/.test(t)) return '择日择吉请访问「黄历」页面查看每日宜忌，或在排盘页面使用择日引擎。';
+  if (/你好|您好|hi|hello/.test(t)) return '您好！我是易道智鉴AI命理助手。可以帮您：\n1. 八字排盘\n2. 运势分析\n3. 风水布局\n4. 中医养生\n5. 择日择吉\n\n请告诉我您想了解什么。';
+  return '您好！您可以问我：命理排盘、运势、五行、风水、中医养生、奇门/紫微/六爻、择日、倪师知识等。\n\n或提供出生年月日时进行排盘。';
 }
 
 function clearChat() {
