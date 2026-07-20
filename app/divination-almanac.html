@@ -464,6 +464,23 @@ body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xm
 /* RESPONSIVE */
 @media(max-width:1200px){.almanac-info{max-width:960px;margin:0 auto}}
 @media(max-width:768px){
+  .view-section{padding:8px!important}
+  .almanac-info{padding:8px!important;font-size:11px!important}
+  .almanac-info h4{font-size:13px!important;margin-bottom:4px!important}
+  .almanac-info h5{font-size:12px!important;margin-bottom:3px!important}
+  .almanac-info p{font-size:11px!important;line-height:1.5!important;margin-bottom:3px!important}
+  .almanac-info div{font-size:11px!important}
+  .daily-advice{padding:6px!important;font-size:11px!important}
+  .daily-advice h4{font-size:12px!important}
+  .daily-advice h5{font-size:11px!important;margin:4px 0 2px!important}
+  .daily-advice p{font-size:10px!important;line-height:1.5!important}
+  .daily-advice div{font-size:10px!important}
+  #personalPanel{padding:0 8px!important}
+  #personalPanel details{padding:6px 8px!important}
+  #personalPanel .input-field{font-size:11px!important;padding:5px 6px!important}
+  .festival-section{padding:4px 8px!important;font-size:10px!important}
+  .view-tab{padding:4px 10px!important;font-size:10px!important}
+
   .container{padding:20px 16px 60px}
   .almanac-grid{grid-template-columns:1fr}
   .view-tabs{flex-wrap:wrap}
@@ -522,10 +539,11 @@ body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xm
 <div id="personalPanel" style="max-width:900px;margin:12px auto;padding:0 20px">
   <details style="background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.1);border-radius:8px;padding:10px 16px">
     <summary style="cursor:pointer;font-size:12px;letter-spacing:3px;color:var(--gold);opacity:.6">⭕ 录入您的八字（获取个性化黄历）</summary>
-    <div style="margin-top:10px;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">
-      <input class="input-field" type="date" id="userBirthDate" placeholder="出生日期">
-      <select class="input-field" id="userBirthHour">
-        <option value="">时辰（可选）</option>
+    <div style="margin-top:10px;display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px">
+      <input class="input-field" type="text" id="userName" placeholder="姓名" style="font-size:12px;padding:6px 8px">
+      <input class="input-field" type="date" id="userBirthDate" placeholder="出生日期" style="font-size:12px;padding:6px 8px">
+      <select class="input-field" id="userBirthHour" style="font-size:12px;padding:6px 8px">
+        <option value="">时辰</option>
         <option value="0">子时 23-1</option><option value="2">丑时 1-3</option>
         <option value="4">寅时 3-5</option><option value="6">卯时 5-7</option>
         <option value="8">辰时 7-9</option><option value="10">巳时 9-11</option>
@@ -533,14 +551,13 @@ body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xm
         <option value="16">申时 15-17</option><option value="18">酉时 17-19</option>
         <option value="20">戌时 19-21</option><option value="22">亥时 21-23</option>
       </select>
-      <label style="display:flex;align-items:center;gap:6px;font-size:11px;opacity:.5;cursor:pointer">
-        <input type="radio" name="userSex" value="male" style="accent-color:var(--gold)"> 男
-      </label>
-      <label style="display:flex;align-items:center;gap:6px;font-size:11px;opacity:.5;cursor:pointer">
-        <input type="radio" name="userSex" value="female" style="accent-color:var(--gold)"> 女
-      </label>
-      <button class="compute-btn" style="padding:6px 16px;font-size:11px" onclick="saveUserBazi()">保存</button>
-      <button class="compute-btn" style="padding:6px 16px;font-size:11px;background:rgba(255,255,255,.05)" onclick="clearUserBazi()">清除</button>
+      <label style="display:flex;align-items:center;gap:4px;font-size:11px;opacity:.6;cursor:pointer"><input type="radio" name="userSex" value="male" style="accent-color:var(--gold)">男</label>
+      <label style="display:flex;align-items:center;gap:4px;font-size:11px;opacity:.6;cursor:pointer"><input type="radio" name="userSex" value="female" style="accent-color:var(--gold)">女</label>
+      <input class="input-field" type="text" id="userBirthplace" placeholder="出生地" style="font-size:12px;padding:6px 8px">
+      <input class="input-field" type="text" id="userResidence" placeholder="现居地" style="font-size:12px;padding:6px 8px">
+      <input class="input-field" type="text" id="userOccupation" placeholder="职业/行业" style="font-size:12px;padding:6px 8px">
+      <button class="compute-btn" style="padding:6px 12px;font-size:11px" onclick="saveUserBazi()">保存</button>
+      <button class="compute-btn" style="padding:6px 12px;font-size:11px;background:rgba(255,255,255,.05)" onclick="clearUserBazi()">清除</button>
     </div>
     <div id="userBaziStatus" style="font-size:10px;opacity:.4;margin-top:6px;letter-spacing:2px"></div>
   </details>
@@ -881,6 +898,14 @@ const ELE={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'�
   '子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
 
 function saveUserBazi(){
+  const nameEl=document.getElementById('userName');
+  const bpEl=document.getElementById('userBirthplace');
+  const resEl=document.getElementById('userResidence');
+  const occEl=document.getElementById('userOccupation');
+  if(nameEl)localStorage.setItem('qianyuan_name',nameEl.value);
+  if(bpEl)localStorage.setItem('qianyuan_birthplace',bpEl.value);
+  if(resEl)localStorage.setItem('qianyuan_residence',resEl.value);
+  if(occEl)localStorage.setItem('qianyuan_occupation',occEl.value);
   const dateStr=document.getElementById('userBirthDate').value;
   if(!dateStr){showToast('请选择出生日期');return;}
   const hour=document.getElementById('userBirthHour').value;
@@ -897,6 +922,10 @@ function saveUserBazi(){
 }
 
 function clearUserBazi(){
+  localStorage.removeItem('qianyuan_name');
+  localStorage.removeItem('qianyuan_birthplace');
+  localStorage.removeItem('qianyuan_residence');
+  localStorage.removeItem('qianyuan_occupation');
   localStorage.removeItem('qianyuan_user_bazi');
   document.getElementById('userBaziStatus').textContent='未录入';
   showToast('已清除个人八字');
@@ -905,6 +934,15 @@ function clearUserBazi(){
 
 function getUserBazi(){
   try{return JSON.parse(localStorage.getItem('qianyuan_user_bazi'));}catch(e){return null;}
+}
+
+function getUserInfo(){
+  return {
+    name: localStorage.getItem('qianyuan_name')||'',
+    birthplace: localStorage.getItem('qianyuan_birthplace')||'',
+    residence: localStorage.getItem('qianyuan_residence')||'',
+    occupation: localStorage.getItem('qianyuan_occupation')||''
+  };
 }
 
 function getPersonalAdvice(dayEle,todayEle){
@@ -943,6 +981,11 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('userBaziStatus').textContent='已保存：'+savedBazi.dayStem+'日主（'+savedBazi.dayEle+'）';
       if(savedBazi.date)document.getElementById('userBirthDate').value=savedBazi.date;
       if(savedBazi.hour)document.getElementById('userBirthHour').value=savedBazi.hour;
+      var ui=getUserInfo();
+      var ne=document.getElementById('userName');if(ne&&ui.name)ne.value=ui.name;
+      var bp=document.getElementById('userBirthplace');if(bp&&ui.birthplace)bp.value=ui.birthplace;
+      var re=document.getElementById('userResidence');if(re&&ui.residence)re.value=ui.residence;
+      var oc=document.getElementById('userOccupation');if(oc&&ui.occupation)oc.value=ui.occupation;
       if(savedBazi.sex){let _r=document.querySelector('input[name="userSex"][value="'+savedBazi.sex+'"]');if(_r)_r.checked=true;}
     }
   }catch(e){console.warn('恢复八字失败:',e.message);}
