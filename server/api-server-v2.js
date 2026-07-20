@@ -455,7 +455,7 @@ app.post('/api/ai/public-chat', async (req, res) => {
   }
   
   const ip = req.ip || req.connection.remoteAddress;
-  if (!sec.rateLimit('ai_public_' + ip, 20, 60000)) return res.status(429).json({ error: 'RATE_LIMITED', message: '请求过于频繁，请稍后再试' });
+  if (!sec.rateLimit('ai_public_' + ip, 60, 60000)) return res.status(429).json({ error: 'RATE_LIMITED', message: '请求过于频繁，请稍后再试' });
   
   let sysContent = AI_SYSTEM_PROMPT;
   if (baziData) {
