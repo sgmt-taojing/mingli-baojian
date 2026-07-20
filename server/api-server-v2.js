@@ -293,7 +293,14 @@ function _aiLocalResponse(userText, baziData) {
     else if (ele === '水') eleDesc = '水主智，性格聪明灵活，善于变通';
     else if (ele === '火') eleDesc = '火主礼，性格热情外向，有领导力';
     else if (ele === '土') eleDesc = '土主信，性格稳重厚道，重承诺';
-    return '根据您的排盘数据：\n\n【四柱】' + (p['年']||'?') + ' ' + (p['月']||'?') + ' ' + (p['日']||'?') + ' ' + (p['时']||'?') + '\n【日主】' + dm + '\n【五行】金' + (wc['金']||0) + ' 木' + (wc['木']||0) + ' 水' + (wc['水']||0) + ' 火' + (wc['火']||0) + ' 土' + (wc['土']||0) + '\n【缺行】' + lack + '\n\n【性格特征】' + eleDesc + '\n【五行建议】' + ((baziData.wuxing_lack && baziData.wuxing_lack.includes('火')) ? '宜补火：多穿红色、向南方位、食温性食物' : (baziData.wuxing_lack && baziData.wuxing_lack.includes('木')) ? '宜补木：多接触绿色植物、向东方位、食酸性食物' : (baziData.wuxing_lack && baziData.wuxing_lack.includes('金')) ? '宜补金：多穿白色、向西方位、食辛性食物' : (baziData.wuxing_lack && baziData.wuxing_lack.includes('水')) ? '宜补水：多近水、向北方、食咸性食物' : (baziData.wuxing_lack && baziData.wuxing_lack.includes('土')) ? '宜补土：多穿黄色、居中位、食甘性食物' : '五行平衡，注意整体调和') + '\n\n' + (dy ? '【大运】' + dy.join(' → ') + '\n' : '') + (ss ? '【神煞】' + ss.slice(0,5).join('、') + '\n' : '') + '\n（配置AI API后可获得深度命理解读）';
+    var _lack = baziData.wuxing_lack || [];
+    var fixStr = _lack.includes('火') ? '宜补火：多穿红色、向南方位、食温性食物' : _lack.includes('木') ? '宜补木：多接触绿色植物、向东方位、食酸性食物' : _lack.includes('金') ? '宜补金：多穿白色、向西方位、食辛性食物' : _lack.includes('水') ? '宜补水：多近水、向北方、食咸性食物' : _lack.includes('土') ? '宜补土：多穿黄色、居中位、食甘性食物' : '五行平衡，注意整体调和';
+    var dirStr = _lack.includes('火')?'南方（火位）':_lack.includes('木')?'东方（木位）':_lack.includes('金')?'西方（金位）':_lack.includes('水')?'北方（水位）':'中央（土位）';
+    var colorStr = _lack.includes('火')?'红/紫/橙':_lack.includes('木')?'绿/青':_lack.includes('金')?'白/银':_lack.includes('水')?'黑/蓝':'黄/棕';
+    var industryStr = _lack.includes('火')?'电子/餐饮/能源/传媒':_lack.includes('木')?'教育/出版/农业/服装':_lack.includes('金')?'金融/机械/珠宝/法律':_lack.includes('水')?'物流/旅游/水产/通信':'房产/陶瓷/建筑/政务';
+    var dietStr = _lack.includes('火')?'多食红枣/枸杞/羊肉/生姜':_lack.includes('木')?'多食绿叶菜/酸味水果/核桃':_lack.includes('金')?'多食白萝卜/百合/银耳/梨':_lack.includes('水')?'多食黑豆/海带/鱼/豆腐':'多食山药/小米/南瓜/土豆';
+    var yearAdvice = ele==='金'?'火克金，今年压力较大，宜保守稳健，注意呼吸道健康':ele==='木'?'木生火，今年精力旺盛，宜积极进取，但防过劳':ele==='水'?'水克火，今年掌控力强，事业有成':ele==='火'?'火旺太过，宜防急躁，注意心血管':ele==='土'?'火生土，今年贵人多助，稳重行事则吉':'今年平稳，顺势而为';
+    return '根据您的排盘数据，完整分析如下：\n\n━━━ 命盘概览 ━━━\n【四柱】' + (p['年']||'?') + ' ' + (p['月']||'?') + ' ' + (p['日']||'?') + ' ' + (p['时']||'?') + '\n【日主】' + dm + '\n【五行】金' + (wc['金']||0) + ' 木' + (wc['木']||0) + ' 水' + (wc['水']||0) + ' 火' + (wc['火']||0) + ' 土' + (wc['土']||0) + '\n【缺行】' + lack + '\n\n━━━ 性格特征 ━━━\n' + eleDesc + '\n\n━━━ 五行补救方案（拿来即用）━━━\n' + fixStr + '\n【方位】' + dirStr + '\n【颜色】' + colorStr + '\n【行业】' + industryStr + '\n【饮食】' + dietStr + '\n\n' + (dy ? '【大运】' + dy.join(' → ') + '\n' : '') + (ss ? '【神煞】' + ss.slice(0,5).join('、') + '\n' : '') + '\n━━━ 年运建议 ━━━\n2026年为丙午年（火旺），' + yearAdvice + '\n\n（配置AI API后可获得更深度的大运/流年/格局分析）';
   }
   
   // 关键词匹配（按优先级）
