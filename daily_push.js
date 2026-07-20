@@ -1922,13 +1922,13 @@ function _getLuckAdvice(level, scores)  {
       advice.summary = '运势偏弱，阻力较多，宜低调保守行事';
       advice.yi = ['保守行事内修为主', '处理简单事务', '养生休息'];
       advice.ji = ['不宜决策大事', '避免冲突与争论', '不宜大额投资'];
-      advice.huajie = '佩戴护身吉祥物(黑曜石戴右手辟煞/本命佛戴脖子护身)，面向喜用神方位深呼吸，增强气场';
+      advice.huajie = '面向喜用神方位深呼吸，诵金光神咒7遍，增强气场';
       break;
     case '凶':
       advice.summary = '运势低迷，诸事不顺，需化解化解后再行大事';
       advice.yi = ['静心休养不外求', '诵经持咒修心', '化解煞气后再行动'];
       advice.ji = ['切勿决策重大事项', '避免签约合作', '不宜远行搬迁'];
-      advice.huajie = '佩戴护身符(黑曜石戴右手辟煞/本命佛戴脖子护身)，面向喜用神方位冥想，诵金光神咒7遍，避免去煞气重的地方';
+      advice.huajie = '面向喜用神方位冥想，诵金光神咒7遍，避免去煞气重的地方';
       break;
   }
   return advice;
@@ -2291,6 +2291,16 @@ function generatePersonalized(bazi, dayStem, dayBranch, dayNum)  {
   text += '❌ 缘主忌：' + advice.ji.join('、') + '\n';
   if (advice.huajie) {
     text += '🛡️ 化解：' + advice.huajie + '\n';
+    // 如果化解提到咒语，补上全文
+    var _huajieMantra = null;
+    if (advice.huajie.indexOf('金光神咒') >= 0) {
+      _huajieMantra = { name: '金光神咒', textAnnotated: '天地玄宗，万炁(qì)本根。体有金光，覆(fù)映吾身。鬼妖丧(sàng)胆，精怪亡(wáng)形。金光速现，覆(fù)护(hù)真人。', recitationCount: 7, scene: '化解护身' };
+    } else if (advice.huajie.indexOf('净心神咒') >= 0) {
+      _huajieMantra = { name: '净心神咒', textAnnotated: '太上台星，应变无停。驱(qū)邪(xié)缚(fù)魅(mèi)，保命护(hù)身。智慧明净，心神安宁。三魂永久，魄(pò)无丧(sàng)倾。', recitationCount: 7, scene: '化解净心' };
+    }
+    if (_huajieMantra) {
+      text += '📿 ' + _huajieMantra.name + '(' + _huajieMantra.recitationCount + '遍)：' + _huajieMantra.textAnnotated + '\n';
+    }
   }
   if (advice.cuiwang) {
     text += '🌟 催旺：' + advice.cuiwang + '\n';
@@ -2299,7 +2309,18 @@ function generatePersonalized(bazi, dayStem, dayBranch, dayNum)  {
   // 穿戴指南（合并：当日穿搭+常年穿搭+佩戴位+方位）
   if (zodiac) text += '🐾 生肖：' + zodiac + '\n';
   text += '👕 当日穿搭：' + luckyCloth + '(' + luckyFabric + ') 色:' + luckyColor + '\n';
-  text += '💎 饰品佩戴：' + luckyPeishi + ' | 戴' + luckyWearSide + '，本命佛/平安扣戴脖子\n';
+  // 饰品佩戴指南（按用途分左手纳福/右手辟煞/脖子护身）
+  var _leftItems = luckyPeishi; // 喜用神属性饰品（纳福聚气）
+  var _rightItems = '';
+  var _neckItems = '本命佛/平安扣';
+  // 根据运势调整：小凶/凶时加辟煞饰品
+  if (luckInfo.level === '凶' || luckInfo.level === '小凶') {
+    _rightItems = '黑曜石/虎眼石';
+  }
+  text += '💎 饰品佩戴：\n';
+  text += '   左手（纳福聚气）：' + _leftItems + '\n';
+  if (_rightItems) text += '   右手（辟邪泄煞）：' + _rightItems + '\n';
+  text += '   脖子（近心护身）：' + _neckItems + '\n';
   // 常年穿搭补充
   var _curMonth = new Date().getMonth() + 1;
   var _season = getSeasonKey(_curMonth);
@@ -2553,7 +2574,8 @@ function generate() {
   }
 
   // 天气+穿衣（合并一行）
-  text += '🌤️ ' + weather.t + ' 湿度' + weather.h + ' ' + weather.desc + (weather.real ? '' : '(估算)') + ' | ' + (cloth || CLOTHING[M] || CLOTHING[6]) + '\n';
+  var _clothStr = (cloth || CLOTHING[M] || CLOTHING[6]).replace(/\s*\|\s*色:[^|]*$/,'').replace(/\s*\|\s*饰:[^|]*$/,'').replace(/\s*\|\s*色:[^|]*$/,'');
+  text += '🌤️ ' + weather.t + ' 湿度' + weather.h + ' ' + weather.desc + (weather.real ? '' : '(估算)') + ' | ' + _clothStr + '\n';
   // 天气行不再重复色和饰（已在上文穿搭指南中）
 
   // 健康养生板块
