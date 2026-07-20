@@ -67,7 +67,7 @@ body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',-apple
 @keyframes bk{0%,100%{opacity:.2}50%{opacity:1}}
 
 /* 输入 */
-.input{border-top:2px solid rgba(201,168,76,0.15);padding:10px 14px;display:flex;gap:8px;align-items:center;background:rgba(13,17,23,0.95);backdrop-filter:blur(12px);box-shadow:0 -2px 12px rgba(0,0,0,0.3)}
+.input{border-top:2px solid rgba(201,168,76,0.15);padding:8px 14px 12px;display:flex;gap:8px;align-items:center;background:rgba(13,17,23,0.95);backdrop-filter:blur(12px);box-shadow:0 -4px 16px rgba(0,0,0,0.4);position:relative;z-index:10}
 .input input{flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:20px;padding:10px 16px;color:var(--paper);font-size:14px;font-family:inherit;outline:none;transition:all .15s}
 .input input:focus{border-color:rgba(201,168,76,0.2)}
 .input input::placeholder{color:var(--paper3);opacity:.5}
@@ -77,7 +77,7 @@ body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',-apple
 .input .send{width:38px;height:38px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--gold),var(--gold3));color:var(--ink);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s}
 .input .send:active{opacity:.7}
 .toast{position:fixed;bottom:56px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:var(--gold);padding:6px 16px;border-radius:14px;z-index:9999;font-size:11px;animation:in .2s}
-@media(max-width:768px){.app{max-width:100%}.chat{padding:12px 10px 6px}.welcome .logo{font-size:28px}.welcome h2{font-size:16px}.modules{grid-template-columns:repeat(2,1fr)}.m-user .b,.m-ai .b{font-size:12px;line-height:1.55;padding:8px 10px}.input input{font-size:14px;padding:10px 14px}.input .mic,.input .send{width:36px;height:36px}.input{padding:10px 10px}.nav a{padding:3px 8px;font-size:9px}}
+@media(max-width:768px){.app{max-width:100%}.chat{padding:12px 10px 6px}.welcome .logo{font-size:28px}.welcome h2{font-size:16px}.modules{grid-template-columns:repeat(2,1fr)}.m-user .b,.m-ai .b{font-size:12px;line-height:1.55;padding:8px 10px}.input input{font-size:14px;padding:10px 14px}.input .mic,.input .send{width:36px;height:36px}.input{padding:8px 10px 14px}.nav a{padding:3px 8px;font-size:9px}}
 </style>
 </head>
 <body>
@@ -808,29 +808,56 @@ function _paipan(y,m,d,h){
   return{day_master:dS+em[dS],pillars:{'年':yS+yB,'月':mS+mB,'日':dS+dB,'时':hS+hB},wuxing_count:wx,wuxing_lack:Object.keys(wx).filter(k=>wx[k]===0)};
 }
 
-function _mobile(m,industry,purpose){
-  const BX={'天医':{codes:['13','31','68','86','49','94','27','72'],desc:'正财/婚姻',rank:'吉',career:'金融/医疗/珠宝'},'生气':{codes:['14','41','67','76','39','93','28','82'],desc:'贵人/活力',rank:'吉',career:'服务/教育/公关'},'延年':{codes:['19','91','78','87','34','43','26','62'],desc:'领导/长寿',rank:'吉',career:'管理/军警/政治'},'伏位':{codes:['11','22','88','99','66','77','33','44'],desc:'耐心/等待',rank:'中',career:'研究/财务'},'六煞':{codes:['16','61','47','74','38','83','29','92'],desc:'桃花/情绪',rank:'中',career:'美容/娱乐'},'五鬼':{codes:['18','81','79','97','36','63','24','42'],desc:'叛逆/反复',rank:'凶',career:'技术/艺术'},'绝命':{codes:['12','21','69','96','48','84','37','73'],desc:'冲动/极端',rank:'凶',career:'投资/创业'},'祸害':{codes:['17','71','89','98','46','64','23','32'],desc:'口舌/是非',rank:'凶',career:'法律/辩论'}};
-  function gx(c){for(var n in BX){if(BX[n].codes.indexOf(c)>=0)return{n:n,d:BX[n].desc,r:BX[n].rank,ca:BX[n].career};}return{n:'普通',d:'普通',r:'中',ca:'不限'};}
-  var st=[],ji=0,xi=0;
-  for(var i=0;i<10;i+=2){var c=m.substring(i,i+2),s=gx(c);st.push({c:c,s:s.n,d:s.d,r:s.r,ca:s.ca});if(s.r==='吉')ji++;else if(s.r==='凶')xi++;}
-  var last=st[st.length-1];
-  var sc=ji*8-xi*6+20+(last.r==='吉'?5:0);sc=Math.max(0,Math.min(40,sc));
-  var lv=sc>=30?'优秀🟢':sc>=20?'中等🟡':'较差🔴';
+function _mobile(m,industry,purpose,duration,bazi){
+  const BX={'天医':{codes:['13','31','68','86','49','94','27','72'],desc:'正财·婚姻·天赋·善良',rank:'吉',career:'金融/医疗/珠宝',affect:'财运亨通，婚姻美满，心地善良'},'生气':{codes:['14','41','67','76','39','93','28','82'],desc:'贵人·乐天·活力·随缘',rank:'吉',career:'服务/教育/公关',affect:'贵人多助，乐观向上，人缘极佳'},'延年':{codes:['19','91','78','87','34','43','26','62'],desc:'领导·专业·长寿·自我',rank:'吉',career:'管理/军警/政治',affect:'领导力强，事业有成，延年益寿'},'伏位':{codes:['11','22','88','99','66','77','33','44'],desc:'耐心·潜藏·等待·被动',rank:'中',career:'研究/财务/行政',affect:'性格稳重有耐心，但需主动出击'},'六煞':{codes:['16','61','47','74','38','83','29','92'],desc:'桃花·人际·情绪·敏感',rank:'中',career:'美容/娱乐/社交',affect:'异性缘好善于交际，但情绪波动大'},'五鬼':{codes:['18','81','79','97','36','63','24','42'],desc:'才华·叛逆·反复·火线',rank:'凶',career:'技术/艺术/创新',affect:'才华横溢但波折多，事业反复不定'},'绝命':{codes:['12','21','69','96','48','84','37','73'],desc:'投资·冲动·极端·大起大落',rank:'凶',career:'投资/创业/投机',affect:'敢拼敢闯但易破财，大起大落'},'祸害':{codes:['17','71','89','98','46','64','23','32'],desc:'口舌·是非·铁齿·固执',rank:'凶',career:'法律/辩论/销售',affect:'口才好但易招是非，性格固执'}};
+  function gx(c){for(var n in BX){if(BX[n].codes.indexOf(c)>=0)return{n:n,d:BX[n].desc,r:BX[n].rank,ca:BX[n].career,af:BX[n].affect};}return{n:'普通',d:'平稳',r:'中',ca:'不限',af:'性格平稳，中规中矩'};}
+  var st=[],ji=0,xi=0,zh=0;
+  for(var i=0;i<10;i+=2){var c=m.substring(i,i+2),s=gx(c);st.push({pos:i+1,code:c,s:s.n,d:s.d,r:s.rank,ca:s.ca,af:s.af});if(s.r==='吉')ji++;else if(s.r==='凶')xi++;else zh++;}
+  var last=st[st.length-1],prev=st[st.length-2];
+  var sc=ji*8-xi*6+20+(last.r==='吉'?5:0)+(last.r==='吉'&&prev.r==='吉'?8:0);sc=Math.max(0,Math.min(40,sc));
+  var lv,emoji,rating;
+  if(sc>=35){lv='大吉';emoji='🌟🌟🌟';rating='此号码磁场极佳，强烈推荐使用';}
+  else if(sc>=28){lv='吉';emoji='🌟🌟';rating='此号码磁场良好，可以继续使用';}
+  else if(sc>=22){lv='小吉';emoji='🌟';rating='此号码磁场尚可，有改进空间';}
+  else if(sc>=15){lv='小凶';emoji='⚠️';rating='此号码磁场偏弱，建议考虑更换';}
+  else if(sc>=8){lv='凶';emoji='⚠️⚠️';rating='此号码磁场较差，建议更换';}
+  else{lv='大凶';emoji='⚠️⚠️⚠️';rating='此号码磁场极差，强烈建议更换';}
   var numWx={1:'水',6:'水',2:'火',7:'火',3:'木',8:'木',4:'金',9:'金',5:'土',0:'土'};
   var wxC={};for(var i=0;i<m.length;i++){var w=numWx[parseInt(m[i])];wxC[w]=(wxC[w]||0)+1;}
-  var lack=['金','木','水','火','土'].filter(k=>!wxC[k]);
-  var maxWx=Object.keys(wxC).reduce((a,b)=>wxC[a]>wxC[b]?a:b);
-  var r='━━━ 手机号码深度测评报告 ━━━\n\n【号码】'+m+'\n【综合评分】'+sc+'/40 '+lv+'\n【吉星】'+ji+'个 · 凶星'+xi+'个 · 中星'+(5-ji-xi)+'个\n【五行主导】'+maxWx+'旺'+(lack.length?' · 缺'+lack.join('、'):' · 五行俱全')+'\n';
-  if(industry)r+='\n【行业】'+industry+'\n';
+  var lack=['金','木','水','火','土'].filter(function(k){return !wxC[k];});
+  var maxWx=Object.keys(wxC).reduce(function(a,b){return wxC[a]>wxC[b]?a:b;});
+  
+  var r='━━━ 手机号码深度测评报告 ━━━\n\n';
+  r+='【号码】'+m+'\n';
+  r+='【评级】'+emoji+' '+lv+'（评分'+sc+'/40）\n';
+  r+='【总评】'+rating+'\n';
+  r+='【吉凶】吉星'+ji+'个 · 凶星'+xi+'个 · 中星'+zh+'个\n';
+  r+='【五行】'+maxWx+'旺（'+wxC[maxWx]+'个）'+(lack.length?' · 缺'+lack.join('、'):' · 五行俱全')+'\n';
+  if(industry)r+='【行业】'+industry+'\n';
   if(purpose)r+='【使用目的】'+purpose+'\n';
+  if(duration)r+='【使用时长】'+duration+'\n';
   r+='\n━━━ 八星磁场详细拆解 ━━━\n';
-  st.forEach(s=>{r+='第'+(st.indexOf(s)*2+1)+'-'+(st.indexOf(s)*2+2)+'位 '+s.c+' '+(s.r==='吉'?'✅':s.r==='凶'?'❌':'➖')+' '+s.s+'（'+s.r+'）'+s.d+'\n  适合行业：'+s.ca+'\n';});
-  r+='\n━━━ 尾号分析 ━━━\n尾号'+last.c+'→'+last.s+'（'+last.r+'）\n';
-  if(last.r==='吉')r+='★ 吉星结尾→收尾顺利\n';else if(last.r==='凶')r+='⚠ 凶星结尾→建议更换\n';else r+='中星结尾→平稳\n';
+  st.forEach(function(s){var icon=s.r==='吉'?'✅':s.r==='凶'?'❌':'➖';r+=icon+' '+s.code+' '+s.s+'（'+s.r+'）— '+s.af+'\n  适合行业：'+s.ca+'\n';});
+  r+='\n━━━ 尾号深度分析 ━━━\n';
+  r+='尾号'+last.code+' '+last.s+'（'+last.r+'）\n';
+  r+='影响：'+last.af+'\n';
+  if(last.r==='吉'&&prev.r==='吉')r+='★ 双吉星结尾→财运人缘双丰收\n';
+  else if(last.r==='吉')r+='★ 吉星结尾→收尾顺利，凡事善终\n';
+  else if(last.r==='凶')r+='⚠ 凶星结尾→建议更换尾号为13/31/68/86/14/41等吉星\n';
+  else r+='中星结尾→收尾平稳\n';
+  r+='\n━━━ 五行能量分析 ━━━\n';
+  r+='金'+(wxC['金']||0)+' 木'+(wxC['木']||0)+' 水'+(wxC['水']||0)+' 火'+(wxC['火']||0)+' 土'+(wxC['土']||0)+'\n';
+  var wxDesc={'金':'决断力强，重义气','木':'进取心强，有才华','水':'聪明灵活，善变通','火':'热情外向，有领导力','土':'稳重厚道，重承诺'};
+  r+='主导五行：'+maxWx+' → '+wxDesc[maxWx]+'\n';
+  if(lack.length){var fixMap={'金':'补金(尾号4/9)→增强决断','木':'补木(尾号3/8)→增强进取','水':'补水(尾号1/6)→增强灵活','火':'补火(尾号2/7)→增强热情','土':'补土(尾号5/0)→增强稳定'};r+='缺'+lack.join('、')+'：'+lack.map(function(l){return fixMap[l];}).join('；')+'\n';}
   r+='\n━━━ 综合建议 ━━━\n';
-  if(lv.includes('优'))r+='号码吉利，可继续使用。';else if(lv.includes('中'))r+='吉凶参半，注意凶星领域。';else r+='凶星较多，建议更换。优选尾号13/31/68/86/14/41等。';
-  r+='\n\n━━━ 五行能量 ━━━\n金'+(wxC['金']||0)+' 木'+(wxC['木']||0)+' 水'+(wxC['水']||0)+' 火'+(wxC['火']||0)+' 土'+(wxC['土']||0);
-  if(lack.length)r+='\n补救：尾号用'+(lack.includes('金')?'4/9':'')+(lack.includes('木')?'3/8':'')+(lack.includes('水')?'1/6':'')+(lack.includes('火')?'2/7':'')+(lack.includes('土')?'5/0':'');
+  if(sc>=28){r+='✅ 号码'+lv+'，磁场良好。吉星带来'+st.filter(function(s){return s.r==='吉';}).map(function(s){return s.s+'('+s.af+')';}).join('、')+'\n';r+='适合行业：'+st.filter(function(s){return s.r==='吉';}).map(function(s){return s.ca;}).join('、')+'\n';}
+  else if(sc>=15){r+='⚠️ 号码'+lv+'，吉凶参半。';if(xi>0)r+='注意凶星：'+st.filter(function(s){return s.r==='凶';}).map(function(s){return s.s+'('+s.af+')';}).join('；')+'\n';r+='建议：佩戴'+(lack.includes('金')?'金属':lack.includes('木')?'木质':lack.includes('水')?'水晶':lack.includes('火')?'红玛瑙':'玉石')+'饰品化解\n';}
+  else{r+='❌ 号码'+lv+'，建议更换。优选尾号：\n';r+='  天医(正财)：13/31/68/86\n  生气(贵人)：14/41/67/76\n  延年(事业)：19/91/78/87\n';r+='避免尾号：12/21(绝命) 18/81(五鬼) 17/71(祸害)\n';}
+  r+='\n━━━ 深度测评引导 ━━━\n';
+  r+='如需更深度测评，请补充：\n';
+  r+='① 行业 ② 生辰 ③ 使用目的\n';
+  r+='例：金融行业，1985年生，求财运';
   return r;
 }
 
@@ -852,7 +879,11 @@ function voice(){
   
   // 立即给视觉反馈
   b.dataset.on='1';b.classList.add('on');b.textContent='🔴';
-  toast('🎤 正在聆听...请说话');
+  b.style.transform='scale(1.2)';
+  toast('🎤 正在聆听...请对着手机说话');
+  // 在输入框显示提示
+  box.placeholder='🎤 正在聆听...';
+  box.style.borderColor='rgba(231,76,60,0.4)';
   
   const r=new SR();window._r=r;
   r.lang='zh-CN';r.continuous=false;r.interimResults=true;
@@ -873,6 +904,9 @@ function voice(){
   
   r.onerror=(e)=>{
     b.dataset.on='0';b.classList.remove('on');b.textContent='🎤';
+    b.style.transform='scale(1)';
+    box.placeholder='输入问题...';
+    box.style.borderColor='';
     var errMsg='语音识别失败';
     if(e.error==='not-allowed')errMsg='麦克风权限被拒绝，请在浏览器设置中允许';
     else if(e.error==='no-speech')errMsg='未检测到语音，请重试';
@@ -884,6 +918,9 @@ function voice(){
   
   r.onend=()=>{
     b.dataset.on='0';b.classList.remove('on');b.textContent='🎤';
+    b.style.transform='scale(1)';
+    box.placeholder='输入问题...';
+    box.style.borderColor='';
     if(ft.trim())send();
   };
   
