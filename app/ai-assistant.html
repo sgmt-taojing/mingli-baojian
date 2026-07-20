@@ -2331,6 +2331,40 @@ async function handleFaceUpload(input){
   reader.readAsDataURL(file);
 }
 
+/* TTS 朗读/停止切换 */
+function toggleTTS(){
+  if(window._ttsPlaying){stopTTS();return;}
+  const lastAI=chat.querySelector('.m-ai:last-child .b');
+  if(!lastAI){toast('暂无可朗读内容');return;}
+  const txt=lastAI.textContent.trim();
+  if(!txt){toast('内容为空');return;}
+  const btn=document.getElementById('tts-btn');
+  if(btn){btn.textContent='⏹';btn.classList.add('on');}
+  if(window.speakText){
+    window._ttsPlaying=true;
+    window.speakText(txt,function(){stopTTS();});
+  }else if('speechSynthesis' in window){
+    const u=new SpeechSynthesisUtterance(txt);u.lang='zh-CN';u.rate=1.0;
+    u.onend=function(){stopTTS();};
+    window._ttsPlaying=true;
+    window.speechSynthesis.speak(u);
+  }else{
+    toast('浏览器不支持语音朗读');
+  }
+}
+function stopTTS(){
+  window._ttsPlaying=false;
+  if(window.stopSpeak)window.stopSpeak();
+  else if('speechSynthesis' in window)window.speechSynthesis.cancel();
+  const btn=document.getElementById('tts-btn');
+  if(btn){btn.textContent='🔊';btn.classList.remove('on');}
+}
+/* 麦克风 UI 复位 */
+function resetMicUI(){
+  const b=mic;
+  if(b){b.dataset.on='0';b.classList.remove('on');b.textContent='🎤';b.style.transform='scale(1)';}
+  if(box){box.placeholder='输入问题...';box.style.borderColor='';}
+}
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/━━━/g,'<b class="sec">━━━').replace(/━━━/g,'━━━</b>').replace(/\n/g,'<br>');}
 </script>
 </body>
