@@ -389,6 +389,141 @@ async function callAI(q){
 }
 
 // === 本地降级报告生成 ===
+// === 统一化解引擎（与原排盘引擎对齐）===
+function _getHuajie(ele,lack){
+  const WX={
+    '金':{peishi:'白水晶/金饰/银饰/铂金',peishiList:['白水晶摆件','金银首饰','铂金饰品'],fangwei:'西方/西北方',yanse:'白色/银色/金色',yinshi:'白萝卜/百合/银耳/莲子/雪梨',shuzi:'4/9',hangye:'金融/机械/珠宝/法律',crystal:'白水晶球'},
+    '木':{peishi:'翡翠/绿松石/檀木手串/绿幽灵',peishiList:['翡翠手串','檀木手串','绿幽灵水晶'],fangwei:'东方/东南方',yanse:'绿色/青色',yinshi:'绿叶蔬菜/酸味水果/核桃/芹菜',shuzi:'3/8',hangye:'教育/出版/农业/服装',crystal:'绿幽灵柱'},
+    '水':{peishi:'海蓝宝/黑曜石/墨玉/蓝水晶',peishiList:['海蓝宝手链','黑曜石摆件','蓝水晶'],fangwei:'北方',yanse:'蓝色/黑色/深灰色',yinshi:'黑豆/海带/鱼类/黑芝麻',shuzi:'1/6',hangye:'物流/旅游/水产/通信',crystal:'黑曜石球'},
+    '火':{peishi:'红玛瑙/石榴石/琥珀/紫水晶',peishiList:['红玛瑙手链','紫水晶柱','石榴石吊坠'],fangwei:'南方',yanse:'红色/紫色/橙色',yinshi:'红枣/枸杞/羊肉/胡萝卜',shuzi:'2/7',hangye:'电子/餐饮/能源/传媒',crystal:'红玛瑙摆件'},
+    '土':{peishi:'黄水晶/虎眼石/和田玉/琥珀',peishiList:['黄水晶球','虎眼石手链','和田玉牌'],fangwei:'中央/西南方',yanse:'黄色/棕色/咖啡色',yinshi:'山药/小米/南瓜/土豆',shuzi:'5/10',hangye:'房产/建筑/政务/矿业',crystal:'黄玉摆件'}
+  };
+  var need=lack.includes('火')?'火':lack.includes('木')?'木':lack.includes('金')?'金':lack.includes('水')?'水':lack.includes('土')?'土':'';
+  var wx=WX[need]||WX[ele]||WX['金'];
+  var peishiName=wx.peishiList[0];
+  var dir=wx.fangwei.split('/')[0];
+  
+  // 吉祥物摆放全流程
+  var baifang='\n━━━ 吉祥物使用全流程 ━━━\n'+
+    '【选择】推荐'+peishiName+'，选天然材质、品相完好者\n'+
+    '【净化】使用前用清水冲洗3分钟，阳光下晒1小时去除杂气\n'+
+    '【开光】请到道观或寺庙请师傅开光加持（初一、十五最佳）\n'+
+    '【摆放位置】'+wx.fangwei+'方位，高度齐腰（约1米），避免地面和头顶以上\n'+
+    '【摆放者】本人亲自摆放，摆放时面朝'+dir+'，心中默念所求之事\n'+
+    '【摆放时间】择吉日吉时（天德/月德/三合日），最好在上午辰时（7-9点）\n'+
+    '【摆放时长】长期摆放，至少放置一整年（从摆放日算起）\n'+
+    '【日常养护】每月初一、十五用清水擦拭，保持洁净\n'+
+    '【到期处置】满一年后：\n'+
+    '  ① 如需继续：重新净化后继续使用\n'+
+    '  ② 如需更换：带回原寺庙谢神后，埋于干净土中或放入流水中\n'+
+    '  ③ 不可随意丢弃，不可转送他人\n'+
+    '【注意事项】忌让他人触碰、忌放在卫生间/厨房、忌用二手吉祥物\n';
+  
+  return {
+    peishi: wx.peishi,
+    peishiName: peishiName,
+    fangwei: wx.fangwei,
+    yanse: wx.yanse,
+    yinshi: wx.yinshi,
+    shuzi: wx.shuzi,
+    hangye: wx.hangye,
+    crystal: wx.crystal,
+    baifang: baifang
+  };
+}
+
+function _getTaisui(shengxiao,sex,year){
+  // 太岁化解
+  var sxMap={'子':'鼠','丑':'牛','寅':'虎','卯':'兔','辰':'龙','巳':'蛇','午':'马','未':'羊','申':'猴','酉':'鸡','戌':'狗','亥':'猪'};
+  var sxBranch=Object.keys(sxMap).find(function(k){return sxMap[k]===shengxiao;})||'';
+  var currentZhi='午'; // 2026丙午年
+  var isCrime=currentZhi===sxBranch;
+  var isClash=(sxBranch==='子');
+  var isHarm=(sxBranch==='丑');
+  var isPunish=(sxBranch==='午');
+  var isBreak=(sxBranch==='卯');
+  var isAny=isCrime||isClash||isHarm||isPunish||isBreak;
+  if(!isAny)return'2026丙午年，您未犯太岁，运势平稳。但仍可在正月初八拜太岁祈福。';
+  
+  var types=[];
+  if(isCrime)types.push('值太岁（本命年）');
+  if(isClash)types.push('冲太岁（子午冲）');
+  if(isHarm)types.push('害太岁（丑午害）');
+  if(isPunish)types.push('刑太岁（自刑）');
+  if(isBreak)types.push('破太岁（卯午破）');
+  
+  return'━━━ 太岁化解方案（2026丙午年）━━━\n'+
+    '【犯太岁类型】'+types.join('、')+'\n'+
+    '【严重程度】'+(isCrime||isClash?'较重，需积极化解':'中等，注意防范')+'\n\n'+
+    '━━━ 化解方法（拿来即用）━━━\n'+
+    '1. 佩戴太岁符：到道观请太岁符，随身佩戴一年。符袋内放自己的出生年月日时纸条\n'+
+    '   - 摆放位置：贴身佩戴（挂于胸前或腰间）\n'+
+    '   - 摆放时长：从正月初八至腊月二十四\n'+
+    '   - 到期处置：腊月二十四谢太岁，将太岁符+金纸一起焚化\n'+
+    '   - 注意事项：符不可沾水、不可让人触碰、不可压折\n\n'+
+    '2. 拜太岁：正月初八到道观拜太岁，或家中朝正南方（太岁方位）设香案祭拜\n'+
+    '   - 供品：三杯清茶、三盘水果（苹果/橙/香蕉）、三根香\n'+
+    '   - 念诵：太岁宝诰3遍，心中默念化解愿望\n\n'+
+    '3. 佩戴本命佛：'+(shengxiao==='鼠'?'千手观音':shengxiao==='牛'||shengxiao==='虎'?'虚空藏菩萨':shengxiao==='兔'?'文殊菩萨':shengxiao==='龙'||shengxiao==='蛇'?'普贤菩萨':shengxiao==='马'?'大势至菩萨':shengxiao==='羊'||shengxiao==='猴'?'大日如来':shengxiao==='鸡'?'不动尊菩萨':'阿弥陀佛')+'\n'+
+    '   - 材质：玉/金/银为佳，天然材质最好\n'+
+    '   - 摆放位置：挂于胸前或佩戴左手\n'+
+    '   - 摆放时长：全年佩戴\n\n'+
+    '4. 吉祥物摆放：朝'+({子:'北方',丑:'东北',寅:'东北',卯:'东方',辰:'东南',巳:'东南',午:'南方',未:'西南',申:'西南',酉:'西方',戌:'西北',亥:'西北'}[sxBranch]||'中央')+'方位放'+
+    ({子:'白水晶',丑:'黄玉',寅:'绿幽灵',卯:'绿幽灵',辰:'黄玉',巳:'红玛瑙',午:'红玛瑙',未:'黄玉',申:'白水晶',酉:'白水晶',戌:'黄玉',亥:'海蓝宝'}[sxBranch]||'白水晶')+'镇宅\n'+
+    '   - 摆放位置：'+({子:'正北',丑:'东北',寅:'东北',卯:'正东',辰:'东南',巳:'东南',午:'正南',未:'西南',申:'西南',酉:'正西',戌:'西北',亥:'西北'}[sxBranch]||'中央')+'位，高度约1米\n'+
+    '   - 摆放时长：全年，每月初一擦拭\n'+
+    '   - 到期处置：年底谢太岁后，可继续摆放或埋于干净土中\n\n'+
+    '5. 行为禁忌：\n'+
+    '   - 正月/七月（冲太岁月）→大事勿用\n'+
+    '   - 午月（太岁当月）→忌动土/装修\n'+
+    '   - 忌在南方（太岁方）动土、吵闹\n'+
+    '   - 忌大额投资/重大决策（可推迟至次年）\n'+
+    '   - 多行善积德：放生/捐善款/助人为乐';
+}
+
+// === 统一报告格式 ===
+function _getUnifiedReport(modId,data){
+  const d=Object.values(data);
+  if(modId==='bazi'){
+    var m=d[0].match(/(\d{4})[年\-\/](\d{1,2})[月\-\/](\d{1,2})[日]?\s*(\d{1,2})[时点]?\s*([男女])?/);
+    if(!m)return'请提供出生年月日时+性别';
+    var y=+m[1],mo=+m[2],da=+m[3],h=+m[4]||12,sex=m[5]||'male';
+    var p=_paipan(y,mo,da,h);
+    var dm=p.day_master,wc=p.wuxing_count,ele=dm.slice(-1);
+    var lack=(p.wuxing_lack&&p.wuxing_lack.length)?p.wuxing_lack.join('、'):'无（五行俱全）';
+    var pillar=p.pillars;
+    var shengxiao=p.shengxiao||((y-4)%12>=0?['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'][(y-4)%12]:'未知');
+    var hj=_getHuajie(ele,lack.split('、'));
+    var ts=_getTaisui(shengxiao,sex,y);
+    var focus=d[3]||'全面分析';
+    var yun='2026丙午年火旺，'+(ele==='金'?'火克金，宜稳健':ele==='木'?'木生火，宜进取':ele==='水'?'水克火，事业有成':ele==='火'?'火太旺，防急躁':'火生土，贵人助');
+    var seasons='春(木旺):'+(ele==='金'?'略疲':'')+(ele==='木'?'顺遂':'')+(ele==='水'?'略疲':'')+(ele==='火'?'旺盛':'')+(ele==='土'?'略疲':'')+
+      ' | 夏(火旺):'+(ele==='金'?'注意':'')+(ele==='木'?'过劳':'')+(ele==='水'?'得力':'')+(ele==='火'?'克制':'')+(ele==='土'?'贵人':'')+
+      ' | 秋(金旺):'+(ele==='金'?'顺遂':'')+(ele==='木'?'防小人':'')+(ele==='水'?'贵人':'')+(ele==='火'?'休息':'')+(ele==='土'?'略疲':'')+
+      ' | 冬(水旺):'+(ele==='金'?'略弱':'')+(ele==='木'?'顺遂':'')+(ele==='水'?'防寒':'')+(ele==='火'?'防破财':'')+(ele==='土'?'防寒':'');
+    
+    return'━━━ 八字命理综合报告 ━━━\n\n'+
+      '━━━ 壹·命盘总览 ━━━\n'+
+      '【四柱】'+pillar['年']+' '+pillar['月']+' '+pillar['日']+' '+pillar['时']+'\n'+
+      '【日主】'+dm+'（'+ele+'）【生肖】'+shengxiao+'\n'+
+      '【五行】金'+(wc['金']||0)+' 木'+(wc['木']||0)+' 水'+(wc['水']||0)+' 火'+(wc['火']||0)+' 土'+(wc['土']||0)+'【缺行】'+lack+'\n\n'+
+      '━━━ 贰·五行补救方案（拿来即用）━━━\n'+
+      '【佩戴】'+hj.peishi+'\n'+
+      '【方位】'+hj.fangwei+'\n'+
+      '【颜色】'+hj.yanse+'\n'+
+      '【数字】'+hj.shuzi+'\n'+
+      '【饮食】'+hj.yinshi+'\n'+
+      '【行业】'+hj.hangye+'\n'+
+      hj.baifang+'\n'+
+      '━━━ 叁·太岁化解（2026丙午年）━━━\n'+ts+'\n\n'+
+      '━━━ 肆·年运分析 ━━━\n'+yun+'\n\n'+
+      '━━━ 伍·四季运势 ━━━\n'+seasons+'\n\n'+
+      '（关注方向：'+focus+'）';
+  }
+  return'报告生成引擎就绪';
+}
+
+function localReport(modId,data){return _getUnifiedReport(modId,data);}
 function localReport(modId,data){
   const d=Object.values(data);
   if(modId==='bazi'){
