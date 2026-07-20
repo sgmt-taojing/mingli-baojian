@@ -280,11 +280,11 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
       <div class="input-channels" style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">
         <button class="btn btn-secondary btn-sm" onclick="startPatientVoice()" title="语音输入">🎤 语音</button>
         <button class="btn btn-secondary btn-sm" onclick="document.getElementById('symptomFile').click()" title="上传图片/文件/PDF">📎 文件</button>
-        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('symptomPhoto').click()" title="直接调用摄像头拍照">📷 拍照</button>
+        <label class="btn btn-secondary btn-sm" for="symptomPhoto" title="直接调用摄像头拍照（iOS点按弹出相机）">📷 拍照</label>
         <button class="btn btn-secondary btn-sm" onclick="switchSymptomInput('manual')" title="手动输入">⌨️ 手动</button>
       </div>
-      <input type="file" id="symptomFile" accept="image/*,audio/*,.pdf" style="display:none" onchange="handleSymptomFile(this)">
-      <input type="file" id="symptomPhoto" accept="image/*" capture="environment" style="display:none" onchange="handleSymptomPhoto(this)">
+      <input type="file" id="symptomFile" accept="image/*,audio/*,.pdf" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0,0,0,0)" onchange="handleSymptomFile(this)">
+      <input type="file" id="symptomPhoto" accept="image/*" capture="environment" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0,0,0,0)" onchange="handleSymptomPhoto(this)">
       <div id="symptomFilePreview" style="display:none;margin-top:8px;padding:8px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:8px;font-size:13px;color:var(--paper2)"></div>
       <textarea class="form-textarea" id="symptomText" rows="4" placeholder="请详细描述您的症状，例如：最近睡眠不好，白天头晕，食欲下降..." style="min-height:120px"></textarea>
       <div class="btn-row" style="margin-top:12px">
@@ -392,10 +392,10 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
             <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
               <button class="btn btn-secondary btn-sm" onclick="startMasterVoice()">🎤 语音输入</button>
               <button class="btn btn-secondary btn-sm" onclick="document.getElementById('masterFile').click()">📎 上传文件</button>
-              <button class="btn btn-secondary btn-sm" onclick="document.getElementById('masterPhoto').click()">📷 拍照</button>
+              <label class="btn btn-secondary btn-sm" for="masterPhoto" title="直接调用摄像头拍照">📷 拍照</label>
             </div>
-            <input type="file" id="masterFile" accept="image/*,.pdf" style="display:none" onchange="handleMasterFile(this)">
-            <input type="file" id="masterPhoto" accept="image/*" capture="environment" style="display:none" onchange="handleMasterPhoto(this)">
+            <input type="file" id="masterFile" accept="image/*,.pdf" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0,0,0,0)" onchange="handleMasterFile(this)">
+            <input type="file" id="masterPhoto" accept="image/*" capture="environment" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0,0,0,0)" onchange="handleMasterPhoto(this)">
             <div id="masterFilePreview" style="display:none;margin-bottom:8px;padding:8px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:8px;font-size:12px;color:var(--paper2)"></div>
             <div class="form-group">
               <label class="form-label">分析摘要（可含周易术语）</label>
@@ -453,10 +453,10 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
           <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
             <button class="btn btn-secondary btn-sm" onclick="startDoctorVoice()">🎤 语音输入</button>
             <button class="btn btn-secondary btn-sm" onclick="document.getElementById('doctorFile').click()">📎 上传文件</button>
-            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('doctorPhoto').click()">📷 拍照</button>
+            <label class="btn btn-secondary btn-sm" for="doctorPhoto" title="直接调用摄像头拍照">📷 拍照</label>
           </div>
-          <input type="file" id="doctorFile" accept="image/*,.pdf" style="display:none" onchange="handleDoctorFile(this)">
-          <input type="file" id="doctorPhoto" accept="image/*" capture="environment" style="display:none" onchange="handleDoctorPhoto(this)">
+          <input type="file" id="doctorFile" accept="image/*,.pdf" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0,0,0,0)" onchange="handleDoctorFile(this)">
+          <input type="file" id="doctorPhoto" accept="image/*" capture="environment" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0,0,0,0)" onchange="handleDoctorPhoto(this)">
           <div id="doctorFilePreview" style="display:none;margin-bottom:8px;padding:8px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:8px;font-size:12px;color:var(--paper2)"></div>
           <div class="form-group">
             <label class="form-label">证候诊断</label>

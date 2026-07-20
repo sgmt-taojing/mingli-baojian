@@ -339,7 +339,7 @@ function addAI(text,stepData){
       stepData.options.forEach(opt=>{html+='<button onclick="guideAnswer(\''+opt.replace(/'/g,"\\'")+'\')">'+opt+'</button>';});
       html+='</div>';
     }else if(stepData.hint==='upload'){
-      html+='<div class="upload-area" style="margin-top:8px"><input type="file" id="faceUpload" accept="'+(stepData.uploadAccept||'image/*')+'" capture="'+(stepData.uploadCapture||'')+'" style="display:none" onchange="handleFaceUpload(this)"><button class="upload-btn" onclick="document.getElementById(\'faceUpload\').click()" style="width:100%;padding:12px;background:rgba(201,168,76,0.06);border:1px dashed rgba(201,168,76,0.3);border-radius:10px;color:var(--gold);font-size:13px;cursor:pointer;font-family:inherit">'+(stepData.uploadText||'📷 上传照片')+'</button><div id="facePreview" style="margin-top:8px;display:none"></div></div>';
+      html+='<div class="upload-area" style="margin-top:8px"><input type="file" id="faceUpload" accept="'+(stepData.uploadAccept||'image/*')+'" '+(stepData.uploadCapture?'capture="'+stepData.uploadCapture+'" ':'')+'style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0,0,0,0)" onchange="handleFaceUpload(this)"><label for="faceUpload" class="upload-btn" style="display:block;width:100%;padding:14px;background:rgba(201,168,76,0.08);border:1px dashed rgba(201,168,76,0.4);border-radius:10px;color:var(--gold);font-size:14px;cursor:pointer;font-family:inherit;text-align:center;font-weight:500">📷 '+(stepData.uploadText||'拍照 / 上传照片')+'</label><div id="facePreview" style="margin-top:8px;display:none"></div><div style="font-size:11px;color:var(--text-muted);margin-top:4px;text-align:center">手机点按调起相机，电脑点击选择文件</div></div>';
     }else if(stepData.hint){
       html+='<div style="margin-top:4px;font-size:11px;color:var(--paper3);opacity:.6">'+stepData.hint+'</div>';
     }
@@ -2047,21 +2047,37 @@ function voice(){
   // 优先使用 voice-interaction.js 的 STT
   if (window.VoiceInteraction) {
     const vi = window.VoiceInteraction;
-    if (vi.isListening && vi.isListening()) {
-      vi.stopListening();
-      resetMicUI();
-    } else {
-      const b=mic;
-      b.dataset.on='1';b.classList.add('on');b.textContent='🔴';
+    try {
+      if (vi.isListening && vi.isListening()) {
+        vi.stopListening();
+        resetMicUI();
+        return;
+      }
+    } catch(e){ console.warn('isListening err',e); }
+    const b=mic;
+    if(b){
+      b.dataset.on='1';
+      b.classList.add('on');
+      b.textContent='🔴';
       b.style.transform='scale(1.2)';
-      box.placeholder='🎤 正在聆听...';
-      box.style.borderColor='rgba(231,76,60,0.4)';
-      // 注册结束回调确保 UI 复位
-      window.__onVoiceEnd = function(){ resetMicUI(); };
+    }
+    box.placeholder='🎤 正在聆听...';
+    box.style.borderColor='rgba(231,76,60,0.4)';
+    showToast('🎤 请允许浏览器使用麦克风...');
+    // 注册结束回调确保 UI 复位
+    window.__onVoiceEnd = function(){ resetMicUI(); };
+    try {
       vi.startListening();
+    } catch(err){
+      console.warn('startListening err', err);
+      showToast('语音启动失败，请手动输入');
+      resetMicUI();
     }
     return;
   }
+  // VoiceInteraction 未加载（常见原因：script路径错误）
+  console.warn('window.VoiceInteraction 未定义，检查 voice-interaction.js 是否加载');
+  showToast('语音模块未加载，请刷新页面');
 
   // 降级原生实现
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
