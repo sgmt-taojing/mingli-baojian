@@ -5,426 +5,292 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>AI命理助手 · 易道智鉴</title>
 <style>
-:root{--ink:#080808;--ink2:#111;--ink3:#1a1a1a;--paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;--gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;--border:rgba(201,168,76,.15);--jade:#27ae60;--cyan:#2980b9;--cinn:#c0392b;--bg2:rgba(255,255,255,0.02)}
+:root{--ink:#080808;--ink2:#111;--paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#8a7e6a;--gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;--border:rgba(201,168,76,.12);--jade:#27ae60}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',serif;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.nav-bar{position:fixed;top:0;left:0;right:0;z-index:190;background:rgba(13,17,23,0.96);backdrop-filter:blur(8px);border-bottom:1px solid rgba(201,168,76,0.12);padding:7px 0;display:flex;justify-content:center;gap:4px;flex-wrap:wrap}
-.nav-bar a{display:inline-block;padding:5px 12px;background:rgba(201,168,76,0.06);color:var(--gold);border:1px solid rgba(201,168,76,0.12);border-radius:14px;font-size:11px;text-decoration:none;letter-spacing:1px;transition:all .2s}
-.nav-bar a:hover{background:rgba(201,168,76,0.15)}
-.nav-bar a.active{background:rgba(201,168,76,0.2);border-color:var(--gold)}
-@media(max-width:768px){.nav-bar{gap:2px}.nav-bar a{padding:4px 8px;font-size:10px}}
+html,body{height:100%;overflow:hidden}
+body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',-apple-system,serif;display:flex;flex-direction:column}
 
-.main{flex:1;display:flex;flex-direction:column;max-width:780px;margin:0 auto;width:100%;padding:46px 0 0;overflow:hidden}
+/* 导航 */
+.nav{position:fixed;top:0;left:0;right:0;z-index:190;background:rgba(8,8,8,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);height:42px;display:flex;align-items:center;justify-content:center;gap:3px;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{flex-shrink:0;padding:4px 10px;background:rgba(201,168,76,0.04);color:var(--gold);border:1px solid var(--border);border-radius:12px;font-size:10px;text-decoration:none;white-space:nowrap;transition:all .15s}
+.nav a:hover{background:rgba(201,168,76,0.1)}
+.nav a.active{background:rgba(201,168,76,0.18);border-color:var(--gold)}
 
-/* 顶部排盘条 */
-.top-bar{background:rgba(255,255,255,0.02);border-bottom:1px solid var(--border);padding:6px 12px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.top-bar input,.top-bar select{background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:6px;padding:5px 6px;color:var(--paper);font-size:11px;font-family:inherit;outline:none;width:48px}
-.top-bar select{width:auto}
-.top-bar label{font-size:11px;color:var(--paper3)}
-.top-bar .pp-btn{padding:5px 12px;background:linear-gradient(135deg,var(--gold3),var(--gold));color:var(--ink);border:none;border-radius:6px;font-size:10px;cursor:pointer}
-.top-bar .pp-result{font-size:11px;color:var(--gold);margin-left:4px;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* 主体 */
+.app{flex:1;display:flex;flex-direction:column;margin-top:42px;max-width:680px;width:100%;margin-left:auto;margin-right:auto;overflow:hidden}
 
-/* 聊天区 */
-.chat-area{flex:1;overflow-y:auto;padding:8px 12px;min-height:0}
-.msg{margin-bottom:8px;animation:fadeIn .3s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.msg-user{display:flex;justify-content:flex-end}
-.msg-user .b{background:rgba(201,168,76,0.1);border-radius:10px 10px 4px 10px;padding:8px 12px;max-width:85%;font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
-.msg-ai .b{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:4px 10px 10px 10px;padding:10px 14px;max-width:92%;font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word}
-.msg-ai .b b{color:var(--gold2)}
-.msg-ai .b .section{color:var(--gold);font-weight:600;margin-top:8px;display:block}
-.msg-ai .head{font-size:10px;color:var(--gold);margin-bottom:2px;display:flex;align-items:center;gap:4px}
-.msg-ai .tag{font-size:10px;opacity:.5;margin-left:4px}
-
-/* 追问按钮 */
-.followups{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px}
-.fu-btn{padding:3px 10px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);border-radius:12px;color:var(--gold);font-size:11px;cursor:pointer;transition:all .2s}
-.fu-btn:hover{background:rgba(201,168,76,0.15);transform:translateY(-1px)}
+/* 对话区 */
+.chat{flex:1;overflow-y:auto;padding:16px 16px 8px;scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
+.chat::-webkit-scrollbar{width:3px}
+.chat::-webkit-scrollbar-thumb{background:rgba(201,168,76,0.15);border-radius:2px}
 
 /* 欢迎页 */
-.welcome{text-align:center;padding:12px 10px}
-.welcome .icon{font-size:32px;margin-bottom:6px}
-.welcome h2{color:var(--gold);font-size:16px;letter-spacing:2px;margin-bottom:4px}
-.welcome p{color:var(--paper3);font-size:11px;line-height:1.5;margin-bottom:12px}
-.welcome .quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:5px;margin:0 auto}
-.welcome .qcard{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:8px 6px;cursor:pointer;transition:all .2s;text-align:center}
-.welcome .qcard:hover{border-color:rgba(201,168,76,0.3);background:rgba(201,168,76,0.06);transform:translateY(-2px)}
-.welcome .qcard .qi{font-size:18px;margin-bottom:2px}
-.welcome .qcard .qt{font-size:11px;color:var(--paper2)}
-.welcome .qcard .qd{font-size:9px;color:var(--paper3);margin-top:1px}
+.welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:20px}
+.welcome .logo{font-size:36px;margin-bottom:8px}
+.welcome h2{color:var(--gold);font-size:18px;font-weight:600;margin-bottom:6px;letter-spacing:2px}
+.welcome .sub{color:var(--paper3);font-size:12px;margin-bottom:20px;line-height:1.6}
+.welcome .suggest{display:flex;flex-direction:column;gap:8px;width:100%;max-width:320px}
+.welcome .s-item{display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .15s;text-align:left}
+.welcome .s-item:hover{border-color:rgba(201,168,76,0.3);background:rgba(201,168,76,0.04)}
+.welcome .s-icon{font-size:18px;flex-shrink:0}
+.welcome .s-text{font-size:13px;color:var(--paper2)}
+.welcome .s-desc{font-size:10px;color:var(--paper3)}
 
-/* 打字指示 */
-.typing{display:inline-flex;gap:4px;align-items:center;padding:12px 16px}
-.typing span{width:7px;height:7px;background:var(--gold);border-radius:50%;animation:blink 1s infinite}
-.typing span:nth-child(2){animation-delay:.2s}
-.typing span:nth-child(3){animation-delay:.4s}
-@keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
+/* 消息 */
+.msg{margin-bottom:10px;animation:in .25s ease}
+@keyframes in{from{opacity:0;transform:translateY(4px)}to{opacity:1}}
+.m-user{display:flex;justify-content:flex-end}
+.m-user .b{background:rgba(201,168,76,0.08);border-radius:10px 10px 3px 10px;padding:8px 12px;max-width:80%;font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.m-ai .b{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:3px 10px 10px 10px;padding:10px 14px;font-size:13px;line-height:1.75;white-space:pre-wrap;word-break:break-word}
+.m-ai .b b{color:var(--gold2)}
+.m-ai .b .sec{color:var(--gold);font-weight:600;display:block;margin-top:6px}
 
-/* AI消息工具栏 */
-.msg-tools{margin-top:4px;display:flex;gap:6px}
-.tool-btn{font-size:10px;color:var(--paper3);cursor:pointer;padding:2px 6px;border:1px solid var(--border);border-radius:8px;background:none}
-.tool-btn:hover{color:var(--gold);border-color:rgba(201,168,76,0.3)}
-.ask-more{margin-top:4px;font-size:10px;color:var(--paper3);text-align:center;opacity:.6}
-.msg-ai .time{margin-left:auto;font-size:10px;opacity:.4}
-.msg-ai .head{display:flex;align-items:center;gap:4px}
+/* 追问（极简1行2个）*/
+.fu{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.fu button{padding:4px 12px;background:none;border:1px solid var(--border);border-radius:12px;color:var(--paper3);font-size:11px;cursor:pointer;transition:all .15s;font-family:inherit}
+.fu button:hover{color:var(--gold);border-color:rgba(201,168,76,0.25)}
 
-/* 手机端适配增强 */
-@media(max-width:768px){
-  .main{padding:48px 0 0}
-  .top-bar{padding:6px 8px;gap:4px}
-  .top-bar input{width:40px;padding:5px 4px;font-size:11px}
-  .top-bar select{padding:5px 4px;font-size:11px}
-  .top-bar label{font-size:10px}
-  .top-bar .pp-btn{padding:5px 10px;font-size:10px}
-  .top-bar .pp-result{font-size:10px;max-width:150px}
-  .chat-area{padding:6px 8px}
-  .msg-user .b{max-width:90%;font-size:13px;padding:8px 12px}
-  .msg-ai .b{max-width:95%;font-size:13px;padding:10px 12px}
-  .msg-ai .b br{line-height:1.6}
-  .welcome{padding:24px 12px}
-  .welcome h2{font-size:18px}
-  .welcome p{font-size:12px}
-  .welcome .quick{grid-template-columns:repeat(2,1fr);gap:6px}
-  .welcome .qcard{padding:10px 6px}
-  .welcome .qcard .qi{font-size:20px}
-  .welcome .qcard .qt{font-size:11px}
-  .welcome .qcard .qd{font-size:9px}
-  .followups{gap:4px}
-  .fu-btn{font-size:11px;padding:3px 10px}
-  .input-area{padding:8px 10px;gap:6px}
-  .input-area input{font-size:13px;padding:8px 14px}
-  .mic-btn,.send-btn{width:36px;height:36px;font-size:16px}
-  .footer{font-size:9px;padding:2px}
-  .tool-btn{font-size:10px;padding:2px 6px}
-}
-@media(max-width:380px){
-  .welcome .quick{grid-template-columns:1fr}
-  .top-bar input{width:34px}
-  .msg-ai .b{font-size:12px}
-}
+/* 操作行（保存+复制→收为小图标）*/
+.ops{display:flex;gap:8px;margin-top:4px;opacity:.4}
+.ops span{font-size:10px;cursor:pointer;padding:1px 4px}
+.ops span:hover{opacity:1}
+
+/* 打字 */
+.typing{display:inline-flex;gap:3px;padding:10px 14px}
+.typing i{width:5px;height:5px;background:var(--gold);border-radius:50%;animation:bk 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}
+.typing i:nth-child(3){animation-delay:.3s}
+@keyframes bk{0%,100%{opacity:.2}50%{opacity:1}}
 
 /* 输入区 */
-.input-area{background:rgba(13,17,23,0.9);border-top:1px solid var(--border);padding:8px 12px;display:flex;gap:6px;align-items:center}
-.input-area input{flex:1;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:20px;padding:8px 14px;color:var(--paper);font-size:13px;font-family:inherit;outline:none}
-.input-area input:focus{border-color:rgba(201,168,76,0.3)}
-.mic-btn{width:40px;height:40px;border-radius:50%;border:1px solid rgba(201,168,76,0.3);background:rgba(201,168,76,0.08);color:var(--gold);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.mic-btn.listening{background:rgba(231,76,60,0.2);border-color:var(--cinn);animation:pulse 1s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
-.send-btn{width:40px;height:40px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--gold),var(--gold3));color:var(--ink);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.footer{text-align:center;font-size:10px;color:var(--paper3);padding:4px;opacity:.4}
-@media(max-width:768px){.top-bar{padding:6px 10px}.top-bar input{width:44px}.chat-area{padding:12px}.welcome .quick{grid-template-columns:repeat(2,1fr)}}
+.input{border-top:1px solid var(--border);padding:8px 12px;display:flex;gap:6px;align-items:center;background:rgba(8,8,8,0.85);backdrop-filter:blur(8px)}
+.input input{flex:1;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:18px;padding:8px 14px;color:var(--paper);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
+.input input:focus{border-color:rgba(201,168,76,0.2)}
+.input input::placeholder{color:var(--paper3);opacity:.5}
+.input .mic{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:none;color:var(--paper3);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.input .mic:hover{color:var(--gold)}
+.input .mic.on{background:rgba(231,76,60,0.15);border-color:#c0392b;color:#e74c3c}
+.input .send{width:32px;height:32px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--gold),var(--gold3));color:var(--ink);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s}
+.input .send:active{opacity:.7}
+
+/* toast */
+.toast{position:fixed;bottom:56px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:var(--gold);padding:6px 16px;border-radius:14px;z-index:9999;font-size:11px;animation:in .2s}
+
+@media(max-width:768px){.app{max-width:100%}.chat{padding:12px 10px 6px}.welcome .logo{font-size:28px}.welcome h2{font-size:16px}.m-user .b,.m-ai .b{font-size:12px}.input input{font-size:12px}.nav a{padding:3px 8px;font-size:9px}}
 </style>
 </head>
 <body>
-<div class="nav-bar">
-<a href="divination-hub.html" class="file-nav-btn">🏠 主平台</a>
-<a href="divination-almanac.html" class="file-nav-btn">📅 黄历</a>
-<a href="divination-integrated.html" class="file-nav-btn">🧬 体质调理</a>
-<a href="tcm-clinic.html" class="file-nav-btn">🏥 中医诊疗</a>
-<a href="tcm-symptom.html" class="file-nav-btn">🩺 症状分析</a>
-<a href="divination-knowledge.html" class="file-nav-btn">📚 知识库</a>
-<a href="nihaisha-knowledge.html" class="file-nav-btn">🪷 倪师知识库</a>
-<a href="nihaisha-tool.html" class="file-nav-btn">🔬 倪师工具</a>
-<a href="nihaisha-learning.html" class="file-nav-btn">📖 倪师学堂</a>
-<a href="shuhan-knowledge.html" class="file-nav-btn">🎯 舒晗知识库</a>
-<a href="divination-shop.html" class="file-nav-btn">🛒 商城</a>
-<a href="divination-membership.html" class="file-nav-btn">💎 会员</a>
-<a href="wechat-hub.html" class="file-nav-btn">📱 缘主工具</a>
-<a href="ai-assistant.html" class="file-nav-btn active">🤖 AI助手</a>
-<a href="login.html" class="file-nav-btn">🔐 登录</a>
-</div>
+<nav class="nav">
+<a href="divination-hub.html">🏠 主平台</a>
+<a href="divination-almanac.html">📅 黄历</a>
+<a href="divination-integrated.html">🧬 体质</a>
+<a href="tcm-clinic.html">🏥 诊疗</a>
+<a href="tcm-symptom.html">🩺 症状</a>
+<a href="divination-knowledge.html">📚 知识库</a>
+<a href="nihaisha-knowledge.html">🪷 倪师</a>
+<a href="shuhan-knowledge.html">🎯 舒晗</a>
+<a href="divination-shop.html">🛒 商城</a>
+<a href="ai-assistant.html" class="active">🤖 AI助手</a>
+<a href="login.html">🔐 登录</a>
+</nav>
 
-<div class="main">
-<!-- 排盘条 -->
-<div class="top-bar">
-<label>📅</label>
-<input type="number" id="ppYear" placeholder="年" min="1900" max="2100">
-<input type="number" id="ppMonth" placeholder="月" min="1" max="12">
-<input type="number" id="ppDay" placeholder="日" min="1" max="31">
-<input type="number" id="ppHour" placeholder="时" min="0" max="23">
-<select id="ppSex"><option value="male">男</option><option value="female">女</option></select>
-<button class="pp-btn" onclick="doPaipan()">排盘</button>
-<span class="pp-result" id="ppResult"></span>
-</div>
-
-<!-- 聊天区 -->
-<div class="chat-area" id="chatArea">
+<div class="app">
+<div class="chat" id="chat">
 <div class="welcome" id="welcome">
-<div class="icon">🤖</div>
+<div class="logo">🤖</div>
 <h2>AI命理助手</h2>
-<p>我是您的私人命理顾问，精通八字命理、风水布局、中医养生、术数占卜<br>告诉我您想了解什么，或选择下方领域开始</p>
-<div class="quick" id="quickGrid">
-<div class="qcard" onclick="quickAsk('排盘','我想算八字排盘')"><div class="qi">📅</div><div class="qt">八字排盘</div><div class="qd">命理分析</div></div>
-<div class="qcard" onclick="quickAsk('运势','今年运势如何')"><div class="qi">🌟</div><div class="qt">运势分析</div><div class="qd">流年预测</div></div>
-<div class="qcard" onclick="quickAsk('风水','家里风水怎么布局')"><div class="qi">🏠</div><div class="qt">风水布局</div><div class="qd">环境调理</div></div>
-<div class="qcard" onclick="quickAsk('中医','中医养生建议')"><div class="qi">💊</div><div class="qt">中医养生</div><div class="qd">健康调理</div></div>
-<div class="qcard" onclick="quickAsk('手机号','分析手机号码吉凶')"><div class="qi">📱</div><div class="qt">手机号码</div><div class="qd">八星磁场</div></div>
-<div class="qcard" onclick="quickAsk('感情','感情婚姻分析')"><div class="qi">💕</div><div class="qt">感情婚姻</div><div class="qd">桃花正缘</div></div>
-<div class="qcard" onclick="quickAsk('财运','财运分析')"><div class="qi">💰</div><div class="qt">财运投资</div><div class="qd">理财方向</div></div>
-<div class="qcard" onclick="quickAsk('事业','事业方向分析')"><div class="qi">💼</div><div class="qt">事业职场</div><div class="qd">创业跳槽</div></div>
-<div class="qcard" onclick="quickAsk('姓名','姓名吉凶分析')"><div class="qi">✏️</div><div class="qt">姓名分析</div><div class="qd">三才五格</div></div>
-<div class="qcard" onclick="quickAsk('太岁','本命年犯太岁化解')"><div class="qi">🐉</div><div class="qt">太岁化解</div><div class="qd">犯太岁化煞</div></div>
-<div class="qcard" onclick="quickAsk('五行','五行缺什么怎么补')"><div class="qi">⚖️</div><div class="qt">五行分析</div><div class="qd">缺行补救</div></div>
-<div class="qcard" onclick="quickAsk('合婚','合婚配对分析')"><div class="qi">💝</div><div class="qt">合婚配对</div><div class="qd">生肖配对</div></div>
-<div class="qcard" onclick="quickAsk('开运','开运吉祥物建议')"><div class="qi">🔑</div><div class="qt">开运转运</div><div class="qd">吉祥物佩戴</div></div>
-<div class="qcard" onclick="quickAsk('梦境','梦境解读')"><div class="qi">💭</div><div class="qt">梦境解读</div><div class="qd">周公解梦</div></div>
-<div class="qcard" onclick="quickAsk('体质','体质调理方案')"><div class="qi">🧬</div><div class="qt">体质调理</div><div class="qd">五行体质</div></div>
+<div class="sub">告诉我您想了解什么<br>命理 · 风水 · 中医 · 运势 · 手机号</div>
+<div class="suggest">
+<div class="s-item" onclick="ask('我想算八字排盘')">
+<div class="s-icon">📅</div>
+<div><div class="s-text">八字排盘分析</div><div class="s-desc">提供生辰获取命理报告</div></div>
+</div>
+<div class="s-item" onclick="ask('分析我的手机号码吉凶')">
+<div class="s-icon">📱</div>
+<div><div class="s-text">手机号码测评</div><div class="s-desc">八星磁场深度分析</div></div>
+</div>
+<div class="s-item" onclick="ask('今年运势如何')">
+<div class="s-icon">🌟</div>
+<div><div class="s-text">运势分析</div><div class="s-desc">流年运势全面预测</div></div>
+</div>
 </div>
 </div>
 </div>
 
-<!-- 输入区 -->
-<div class="input-area">
-<button class="mic-btn" id="micBtn" onclick="toggleVoice()">🎤</button>
-<input type="text" id="chatInput" placeholder="输入问题或点击🎤语音..." onkeypress="if(event.key==='Enter')sendMsg()">
-<button class="send-btn" onclick="sendMsg()">➤</button>
+<div class="input">
+<button class="mic" id="mic" onclick="voice()">🎤</button>
+<input type="text" id="box" placeholder="输入问题，或试试「我想算八字」" onkeypress="if(event.key==='Enter')send()">
+<button class="send" onclick="send()">➤</button>
 </div>
-<div class="footer">AI解读仅供参考 · 请理性参考，凡事自辨自省</div>
 </div>
 
 <script>
-const API_BASE = (location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
-let chatHistory = [];
-let baziData = null;
+const API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+let hist=[],bazi=null;
 
-// === 追问建议库 ===
-const FOLLOWUPS = {
-  '排盘': ['分析五行强弱','大运走势如何？','格局层次分析','用神是什么？','流年运势预测','开运化解方案'],
-  '运势': ['事业运详细分析','财运详细分析','感情运详细分析','健康运预测','明年运势','大运交接注意'],
-  '风水': ['卧室风水讲究','财位在哪里？','化煞方法','家庭风水','楼层选择','办公室风水'],
-  '中医': ['失眠调理方案','脾胃怎么养？','湿气重怎么办？','四季养生建议','穴位按摩','体质测试'],
-  '手机号': ['换什么尾号好？','号码五行分析','选号建议','八字配号','吉星组合推荐'],
-  '感情': ['桃花星分析','正缘什么时候到？','合婚配对','感情调理方法','婚姻宫分析'],
-  '财运': ['理财方向建议','什么时候发财？','破财怎么防？','招财方位','投资时机'],
-  '事业': ['适合什么行业？','创业时机分析','跳槽建议','升职运势','合伙注意事项'],
-  '姓名': ['名字五行分析','改名建议','公司起名','三才五格详解'],
-  '太岁': ['2026年哪些生肖犯太岁？','太岁符怎么用？','拜太岁时间','犯太岁禁忌'],
-  '五行': ['金木水火土对应什么？','缺火怎么补？','五行相生相克','五行与职业'],
-  '合婚': ['生肖配对表','日柱天合地合','双方五行互补','婚姻宫分析'],
-  '开运': ['佩戴什么吉祥物？','本命佛是什么？','开运方位','颜色开运'],
-  '梦境': ['梦见水什么意思？','梦见动物解读','噩梦怎么办？','梦境与五行'],
-  '体质': ['木型体质怎么调？','体质测试','五行食疗','穴位养生'],
-  'default': ['排盘分析命理','今年运势如何','风水布局建议','中医养生建议','手机号码分析','姓名吉凶分析']
-};
+function ask(q){box.value=q;send()}
 
-function quickAsk(topic, q) { sendMsg(q); }
-
-// === 排盘 ===
-function _fePaipan(y,m,d,h) {
-  const tg=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-  const dz=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-  const yc=(m<2||(m===2&&d<4))?y-1:y;
-  const yS=tg[((yc-4)%10+10)%10],yB=dz[((yc-4)%12+12)%12];
-  const ji=Math.floor((m-1)*2+(d>=15?1:0));
-  const mB=dz[((ji+2)%12+12)%12];
-  const yI=((yc-4)%10+10)%10;
-  const mI=(yI*2+((ji+2)%12+12)%12)%10;
-  const mS=tg[mI];
-  const ep=new Date(1900,0,1),tg2=new Date(y,m-1,d);
-  const dd=Math.floor((tg2-ep)/86400000);
-  const dS=tg[((dd%10)+10)%10],dB=dz[((dd+10)%12+12)%12];
-  const hI=Math.floor((h+1)/2)%12;
-  const hB=dz[hI],hI2=(dS?tg.indexOf(dS):0);
-  const hS=tg[(hI2*2+hI)%10];
-  const wx={'金':0,'木':0,'水':0,'火':0,'土':0};
-  const em={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水','子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
-  [yS+yB,mS+mB,dS+dB,hS+hB].forEach(g=>{wx[em[g[0]]]++;wx[em[g[1]]]++;});
-  return {day_master:dS+em[dS],pillars:{'年':yS+yB,'月':mS+mB,'日':dS+dB,'时':hS+hB},wuxing_count:wx,wuxing_lack:Object.keys(wx).filter(k=>wx[k]===0)};
+async function send(pre){
+  const q=(pre||box.value).trim();if(!q)return;
+  box.value='';
+  if(hist.length===0)chat.innerHTML='';
+  add('user',q);
+  hist.push({role:'user',content:q});
+  if(hist.length>20)hist=hist.slice(-20);
+  
+  // 打字
+  const t=document.createElement('div');
+  t.className='msg m-ai';t.id='ty';
+  t.innerHTML='<div class="typing"><i></i><i></i><i></i></div>';
+  chat.appendChild(t);chat.scrollTop=chat.scrollHeight;
+  
+  try{
+    const r=await fetch(API+'/api/ai/public-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist.slice(-10),baziData:bazi})});
+    const d=await r.json();
+    const reply=(d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||'抱歉，暂时无法回答。';
+    ty.remove();aiReply(reply,q);
+  }catch(e){
+    ty.remove();aiReply(local(q),q);
+  }
 }
 
-async function doPaipan() {
-  const y=parseInt(ppYear.value),m=parseInt(ppMonth.value),d=parseInt(ppDay.value),h=parseInt(ppHour.value);
-  if(!y||!m||!d){alert('请填写年月日');return;}
-  ppResult.textContent='排盘中...';
-  let data=null;
-  const pb=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8911':'';
-  if(pb){try{const r=await fetch(pb+'/paipan?year='+y+'&month='+m+'&day='+d+'&hour='+h+'&sex='+ppSex.value);data=await r.json();if(data.error)data=null;}catch(e){data=null;}}
-  if(!data)data=_fePaipan(y,m,d,h);
-  baziData=data;
-  const p=data.pillars||{},dm=data.day_master||'?',wc=data.wuxing_count||{};
-  const lack=(data.wuxing_lack&&data.wuxing_lack.length)?data.wuxing_lack.join('、'):'无（五行俱全）';
-  ppResult.textContent='日主'+dm+' | '+(p['年']||'?')+' '+(p['月']||'?')+' '+(p['日']||'?')+' '+(p['时']||'?')+' | 缺:'+lack;
-  sendMsg('请根据我的排盘数据（日主'+dm+'，四柱'+(p['年']||'')+(p['月']||'')+(p['日']||'')+(p['时']||'')+'）分析命理特征、五行强弱、性格运势和化解方案');
+function aiReply(text,userQ){
+  add('ai',text);
+  hist.push({role:'assistant',content:text});
+  if(hist.length>20)hist=hist.slice(-20);
+  // 追问：只显示2个，沿话题方向
+  const fus=followups(userQ);
+  if(fus.length>0){
+    const f=document.createElement('div');
+    f.className='fu';
+    fus.forEach(fq=>{const b=document.createElement('button');b.textContent=fq;b.onclick=()=>ask(fq);f.appendChild(b);});
+    chat.lastElementChild.appendChild(f);
+  }
+  // 操作图标
+  const ops=document.createElement('div');
+  ops.className='ops';
+  ops.innerHTML='<span onclick="save(this)">💾</span><span onclick="copy(this)">📋</span>';
+  chat.lastElementChild.appendChild(ops);
+  chat.scrollTop=chat.scrollHeight;
 }
 
-// === 语音 ===
-function toggleVoice() {
+function add(type,text){
+  const d=document.createElement('div');
+  d.className='msg m-'+type;
+  if(type==='ai'){
+    d.innerHTML='<div class="b">'+esc(text)+'</div>';
+  }else{
+    d.innerHTML='<div class="b">'+esc(text)+'</div>';
+  }
+  chat.appendChild(d);
+  chat.scrollTop=chat.scrollHeight;
+}
+
+function followups(q){
+  const t=(q||'').toLowerCase();
+  let topic='default';
+  if(/排盘|八字|命理|四柱|日主/.test(t))topic='排盘';
+  else if(/运势|运气|今年/.test(t))topic='运势';
+  else if(/风水|布局|方位/.test(t))topic='风水';
+  else if(/中医|养生|失眠|头痛/.test(t))topic='中医';
+  else if(/手机号|号码|1[3-9]\d{9}/.test(t))topic='手机号';
+  else if(/婚姻|感情|桃花/.test(t))topic='感情';
+  else if(/财运|投资|理财/.test(t))topic='财运';
+  else if(/事业|工作|创业/.test(t))topic='事业';
+  const map={
+    '排盘':['五行强弱分析','大运走势如何'],
+    '运势':['事业运详析','财运详析'],
+    '风水':['卧室风水','财位在哪'],
+    '中医':['失眠调理','脾胃怎么养'],
+    '手机号':['换什么尾号好','号码五行分析'],
+    '感情':['桃花星分析','正缘何时到'],
+    '财运':['理财方向','破财怎么防'],
+    '事业':['适合什么行业','创业时机'],
+    'default':['排盘分析命理','今年运势如何']
+  };
+  const all=map[topic]||map.default;
+  const asked=hist.filter(m=>m.role==='user').map(m=>m.content);
+  return all.filter(f=>!asked.includes(f)).slice(0,2);
+}
+
+function save(el){
+  const t=el.closest('.m-ai').querySelector('.b').textContent;
+  const ts=new Date().toLocaleString('zh-CN');
+  const blob=new Blob(['易道智鉴AI分析报告\n'+ts+'\n\n'+t],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='命理报告.txt';a.click();
+  toast('已保存');
+}
+function copy(el){
+  const t=el.closest('.m-ai').querySelector('.b').textContent;
+  navigator.clipboard.writeText(t).then(()=>toast('已复制')).catch(()=>{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('已复制')});
+}
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),1500)}
+
+function voice(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){alert('浏览器不支持语音输入，请用Chrome或Safari');return;}
-  const btn=micBtn;
-  if(btn.dataset.l==='1'){if(window._r)window._r.stop();return;}
-  btn.dataset.l='1';btn.classList.add('listening');btn.textContent='🔴';
+  if(!SR){toast('请用Chrome或Safari');return}
+  const b=mic;
+  if(b.dataset.on==='1'){if(window._r)window._r.stop();return}
+  b.dataset.on='1';b.classList.add('on');
   const r=new SR();window._r=r;r.lang='zh-CN';r.continuous=false;r.interimResults=true;
   let ft='';
-  r.onresult=e=>{let im='';for(let i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)ft+=e.results[i][0].transcript;else im+=e.results[i][0].transcript;}chatInput.value=ft+im;};
-  r.onerror=()=>{btn.dataset.l='0';btn.classList.remove('listening');btn.textContent='🎤';};
-  r.onend=()=>{btn.dataset.l='0';btn.classList.remove('listening');btn.textContent='🎤';if(ft.trim())sendMsg();};
+  r.onresult=e=>{let im='';for(let i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)ft+=e.results[i][0].transcript;else im+=e.results[i][0].transcript;}box.value=ft+im};
+  r.onerror=()=>{b.dataset.on='0';b.classList.remove('on')};
+  r.onend=()=>{b.dataset.on='0';b.classList.remove('on');if(ft.trim())send()};
   r.start();
 }
 
-// === 发送消息 ===
-async function sendMsg(prefilled) {
-  const q=(prefilled||chatInput.value).trim();
-  if(!q)return;
-  chatInput.value='';
-  const area=chatArea;
-  if(chatHistory.length===0)area.innerHTML='';
-  // 用户气泡
-  area.innerHTML+='<div class="msg msg-user"><div class="b">'+esc(q)+'</div></div>';
-  // 打字
-  area.innerHTML+='<div class="msg msg-ai" id="typing"><div class="head">🤖 AI命理助手</div><div class="typing"><span></span><span></span><span></span></div></div>';
-  area.scrollTop=area.scrollHeight;
-  chatHistory.push({role:'user',content:q});
-  if(chatHistory.length>20)chatHistory=chatHistory.slice(-20);
-  
-  try {
-    const resp=await fetch(API_BASE+'/api/ai/public-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:chatHistory.slice(-10),baziData})});
-    const data=await resp.json();
-    const reply=(data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content)||'抱歉，暂时无法回答。';
-    document.getElementById('typing')?.remove();
-    addAI(reply,data._local,q);
-  } catch(e) {
-    document.getElementById('typing')?.remove();
-    addAI(_local(q,baziData),true,q);
-  }
-}
-
-function addAI(reply,isLocal,userQ) {
-  const area=chatArea;
-  const tag=isLocal?'<span class="tag">知识库模式</span>':'';
-  const ts=new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
-  
-  // 沿用户方向动态生成3个追问（不是全部）
-  const fuTopic=_detectTopic(userQ);
-  const allFu=FOLLOWUPS[fuTopic]||FOLLOWUPS.default;
-  // 排除用户已问过的，取3个
-  const asked=chatHistory.filter(m=>m.role==='user').map(m=>m.content);
-  const fus=allFu.filter(f=>!asked.includes(f)).slice(0,3);
-  let fuBtns='';
-  if(fus.length>0){
-    fuBtns='<div class="followups">'+fus.map(f=>'<span class="fu-btn" onclick="sendMsg(\''+f.replace(/'/g,"\\'")+'\')">'+f+'</span>').join('')+'</div>';
-  }
-  
-  // 工具栏：保存+继续
-  const tools='<div class="msg-tools"><span class="tool-btn" onclick="saveReport(this)">💾 保存</span><span class="tool-btn" onclick="copyReport(this)">📋 复制</span></div>';
-  
-  // 主动询问
-  const askMore='<div class="ask-more">还需要了解哪些内容？可以继续提问 👆</div>';
-  
-  const html='<div class="msg msg-ai"><div class="head">🤖 AI命理助手'+tag+'<span class="time">'+ts+'</span></div><div class="b" id="msg-'+Date.now()+'">'+esc(reply)+'</div>'+tools+fuBtns+askMore+'</div>';
-  area.insertAdjacentHTML('beforeend',html);
-  area.scrollTop=area.scrollHeight;
-  chatHistory.push({role:'assistant',content:reply});
-  if(chatHistory.length>20)chatHistory=chatHistory.slice(-20);
-}
-
-function saveReport(btn){
-  const msg=btn.closest('.msg-ai');
-  const content=msg.querySelector('.b').textContent;
-  const ts=new Date().toLocaleString('zh-CN');
-  const report='易道智鉴AI命理助手分析报告\n生成时间：'+ts+'\n\n'+content;
-  // 存localStorage
-  let reports=JSON.parse(localStorage.getItem('aiReports')||'[]');
-  reports.unshift({time:ts,content:report});
-  if(reports.length>20)reports=reports.slice(0,20);
-  localStorage.setItem('aiReports',JSON.stringify(reports));
-  // 导出文件
-  const blob=new Blob([report],{type:'text/plain;charset=utf-8'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='命理分析报告_'+ts.replace(/[\/\s:]/g,'')+'.txt';
-  a.click();
-  showToast('报告已保存');
-}
-
-function copyReport(btn){
-  const msg=btn.closest('.msg-ai');
-  const content=msg.querySelector('.b').textContent;
-  navigator.clipboard.writeText(content).then(()=>{
-    showToast('已复制到剪贴板');
-  }).catch(()=>{
-    // 降级
-    const ta=document.createElement('textarea');
-    ta.value=content;document.body.appendChild(ta);ta.select();
-    document.execCommand('copy');document.body.removeChild(ta);
-    showToast('已复制');
-  });
-}
-
-function showToast(msg){
-  const t=document.createElement('div');
-  t.style.cssText='position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:var(--gold);padding:8px 20px;border-radius:20px;z-index:10000;font-size:12px';
-  t.textContent=msg;document.body.appendChild(t);
-  setTimeout(()=>t.remove(),2000);
-}
-
-function _detectTopic(q) {
-  const t=q.toLowerCase();
-  if(/排盘|八字|命理|四柱|日主/.test(t))return '排盘';
-  if(/运势|运气|今年|流年/.test(t))return '运势';
-  if(/风水|布局|方位/.test(t))return '风水';
-  if(/中医|养生|健康|失眠|头痛/.test(t))return '中医';
-  if(/手机号|号码/.test(t)||/1[3-9]\d{9}/.test(q))return '手机号';
-  if(/婚姻|感情|桃花|恋爱/.test(t))return '感情';
-  if(/财运|投资|理财/.test(t))return '财运';
-  if(/事业|工作|创业/.test(t))return '事业';
-  return 'default';
-}
-
-function esc(s) {
+function esc(s){
   if(!s)return'';
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
     .replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')
-    .replace(/━━━/g,'<span class="section">━━━')
-    .replace(/━━━/g,'━━━</span>')
+    .replace(/━━━/g,'<b class="sec">━━━').replace(/━━━/g,'━━━</b>')
     .replace(/\n/g,'<br>');
 }
 
-// === 本地降级（精简版，与后端对齐）===
-function _local(text,bazi) {
-  if(!text)return'您好，请告诉我您想了解什么。';
+// 本地降级
+function local(text){
+  if(!text)return'请告诉我您想了解什么。';
   const t=text.toLowerCase();
-  var _m=text.match(/1[3-9]\d{9}/);
-  if(_m)return _feMobile(_m[0]);
+  var m=text.match(/1[3-9]\d{9}/);
+  if(m)return mobile(m[0]);
   if(bazi&&bazi.pillars){
     const dm=bazi.day_master||'?',p=bazi.pillars,wc=bazi.wuxing_count||{};
     const lack=(bazi.wuxing_lack&&bazi.wuxing_lack.length)?bazi.wuxing_lack.join('、'):'无';
     const ele=dm.slice(-1);
     const desc={'金':'金主义，刚毅果断','木':'木主仁，直爽向上','水':'水主智，聪明灵活','火':'火主礼，热情外向','土':'土主信，稳重厚道'}[ele]||'';
-    const fix=bazi.wuxing_lack&&bazi.wuxing_lack.includes('火')?'宜补火：红色/南方/温性食物':bazi.wuxing_lack&&bazi.wuxing_lack.includes('木')?'宜补木：绿色/东方/酸性食物':bazi.wuxing_lack&&bazi.wuxing_lack.includes('金')?'宜补金：白色/西方/辛性食物':bazi.wuxing_lack&&bazi.wuxing_lack.includes('水')?'宜补水：黑色/北方/咸性食物':'五行平衡';
-    return'━━━ 命盘分析 ━━━\n\n【四柱】'+(p['年']||'?')+' '+(p['月']||'?')+' '+(p['日']||'?')+' '+(p['时']||'?')+'\n【日主】'+dm+'\n【五行】金'+(wc['金']||0)+' 木'+(wc['木']||0)+' 水'+(wc['水']||0)+' 火'+(wc['火']||0)+' 土'+(wc['土']||0)+'\n【缺行】'+lack+'\n\n【性格】'+desc+'\n【补救】'+fix+'\n\n【年运】2026丙午年火旺，'+(ele==='金'?'火克金宜稳健':ele==='木'?'木生火宜进取':ele==='水'?'水克火事业有成':ele==='火'?'火太旺防急躁':ele==='土'?'火生土贵人助':'平稳顺势');
+    return'━━━ 命盘分析 ━━━\n\n【四柱】'+(p['年']||'?')+' '+(p['月']||'?')+' '+(p['日']||'?')+' '+(p['时']||'?')+'\n【日主】'+dm+'\n【五行】金'+(wc['金']||0)+' 木'+(wc['木']||0)+' 水'+(wc['水']||0)+' 火'+(wc['火']||0)+' 土'+(wc['土']||0)+'\n【缺行】'+lack+'\n\n【性格】'+desc+'\n\n需要进一步分析哪方面？可以问我五行补救、大运走势或年运建议。';
   }
-  if(/八字|排盘|命理|算命/.test(t))return'━━━ 八字排盘指南 ━━━\n\n请提供出生年月日时+性别\n例如：1985年3月22日8时 女\n\n【分析内容】\n1.日主五行 2.四柱关系 3.五行强弱 4.用神喜神\n5.大运走势 6.格局层次 7.神煞 8.流年运势\n\n请在上方填写生辰排盘。';
-  if(/运势|今年|流年/.test(t))return'━━━ 运势分析 ━━━\n\n【维度】事业/财运/感情/健康/人际\n【2026丙午年】喜火者事业腾飞·忌火者宜守·冲太岁（鼠/马/牛/兔）需化解\n\n请提供生辰分析个性化运势。';
-  if(/风水|布局|方位/.test(t))return'━━━ 风水布局 ━━━\n\n【大门】纳气之口，宜吉位\n【客厅】财位在对角线45度\n【卧室】床头靠实墙，忌横梁/镜子\n【厨房】宜凶位压煞\n【卫生间】忌对大门\n【化煞】路冲→八卦镜·横梁→葫芦\n\n请提供房屋朝向做个性化分析。';
-  if(/中医|养生|健康/.test(t))return'━━━ 中医养生 ━━━\n\n【四季】春养肝·夏养心·秋养肺·冬养肾\n【时辰】子时入睡·午时小憩\n【体质】木疏肝·火养心·土健脾·金补肺·水温肾\n【日常】子时前睡·七分饱·适度运动·情志平和\n\n请描述症状获取针对性方案。';
-  if(/失眠/.test(t))return'━━━ 失眠调理 ━━━\n\n【辨证】心脾两虚/肝郁化火/阴虚火旺\n【食疗】酸枣仁粥·百合莲子汤·小米粥\n【穴位】神门·三阴交·安眠穴·涌泉穴\n【起居】子时前睡·泡脚·忌手机\n\n持续失眠建议就诊中医。';
-  if(/婚姻|感情|桃花|恋爱/.test(t))return'━━━ 感情婚姻 ━━━\n\n【桃花】日支子午卯酉→异性缘佳\n【正缘】男看正财·女看正官\n【合婚】五行互补+日柱相生+生肖三合\n【调理】桃花位放鲜花/粉水晶\n\n请提供生辰或双方生辰做深度分析。';
-  if(/事业|工作|创业/.test(t))return'━━━ 事业分析 ━━━\n\n【官运】正官→体制·七杀→创业·正印→教育·食神→餐饮艺术\n【行业】金:金融·木:教育·水:物流·火:电子·土:房产\n【创业】大运行喜用→黄金期\n\n请提供生辰分析事业方向。';
-  if(/财运|投资|理财/.test(t))return'━━━ 财运分析 ━━━\n\n【财星】正财→工薪·偏财→投资·财库→存财\n【周期】大运行财星→十年高峰\n【破财】比劫运→忌合伙/借贷\n【招财】喜金→西·喜木→东·喜水→北·喜火→南\n\n请提供生辰分析财运走势。';
-  if(/手机号|号码/.test(t))return'请直接发送11位手机号码，我立即分析八星磁场吉凶。\n\n例如：13800138000';
-  if(/五行|缺什么/.test(t))return'━━━ 五行分析 ━━━\n\n金→肺/西方/白\n木→肝/东方/绿\n水→肾/北方/黑\n火→心/南方/红\n土→脾/中央/黄\n\n【补救】补金→西/白/金属\n补水→北/黑/水晶\n补火→南/红/玛瑙\n补木→东/绿/木质\n补土→中/黄/玉石\n\n请提供生辰分析您的五行。';
-  if(/太岁|本命年/.test(t))return'━━━ 犯太岁化解 ━━━\n\n2026丙午年：马/鼠/牛/兔犯太岁\n\n【化解】1.佩戴太岁符 2.拜太岁 3.忌大额投资 4.行善积德 5.年底谢太岁\n\n【方位】太岁在南方，忌南方动土';
-  if(/你好|您好|hi|hello|在吗/.test(t))return'您好！我是易道智鉴AI命理助手。\n\n我可以帮您：\n📅 八字排盘与命理分析\n🌟 运势预测\n🏠 风水布局\n💊 中医养生\n📱 手机号码分析\n💕 感情婚姻\n💰 财运投资\n💼 事业方向\n\n请告诉我您想了解什么，或在上方填写生辰排盘。';
-  if(/谢谢|感谢/.test(t))return'不客气！如有其他问题随时问我。';
-  if(/再见|bye/.test(t))return'再见！祝您吉祥如意。';
-  return'您好！您可以问我：\n\n📅 命理排盘 🌟 运势 🏠 风水 💊 中医\n📱 手机号 💕 感情 💰 财运 💼 事业\n⚖️ 五行 🧬 体质 🪷 倪师 📅 择日\n\n或告诉我您的出生年月日时进行排盘。';
+  if(/八字|排盘|命理|算命/.test(t))return'请提供您的出生年月日时+性别，我为您排盘分析。\n\n例如：1985年3月22日8时 女\n\n排盘后可分析：日主五行、四柱关系、五行强弱、用神、大运、格局等。';
+  if(/运势|今年|流年/.test(t))return'━━━ 运势分析 ━━━\n\n请提供生辰，我为您分析今年流年运势。\n\n包括：事业/财运/感情/健康/人际五个维度。';
+  if(/风水|布局|方位/.test(t))return'━━━ 风水布局 ━━━\n\n【大门】宜吉位\n【客厅】财位在对角线45°\n【卧室】床头靠实墙\n【厨房】宜凶位压煞\n【化煞】路冲→八卦镜·横梁→葫芦\n\n请提供房屋朝向做个性化分析。';
+  if(/中医|养生|健康/.test(t))return'━━━ 中医养生 ━━━\n\n【四季】春养肝·夏养心·秋养肺·冬养肾\n【日常】子时前睡·七分饱·适度运动\n\n请描述症状获取针对性方案。';
+  if(/失眠/.test(t))return'━━━ 失眠调理 ━━━\n\n【食疗】酸枣仁粥·百合莲子汤\n【穴位】神门·三阴交·安眠穴\n【起居】子时前睡·泡脚·忌手机';
+  if(/婚姻|感情|桃花/.test(t))return'━━━ 感情婚姻 ━━━\n\n【桃花】日支子午卯酉→异性缘佳\n【正缘】男看正财·女看正官\n【合婚】五行互补+日柱相生\n\n请提供生辰做深度分析。';
+  if(/财运|投资|理财/.test(t))return'━━━ 财运分析 ━━━\n\n【财星】正财→工薪·偏财→投资\n【破财】比劫运→忌合伙\n【招财】喜金→西·喜木→东\n\n请提供生辰分析财运走势。';
+  if(/事业|工作|创业/.test(t))return'━━━ 事业分析 ━━━\n\n【官运】正官→体制·七杀→创业\n【行业】金:金融·木:教育·水:物流·火:电子·土:房产\n\n请提供生辰分析事业方向。';
+  if(/手机号|号码/.test(t))return'请直接发送11位手机号码，我立即分析八星磁场吉凶。';
+  if(/五行|缺什么/.test(t))return'━━━ 五行分析 ━━━\n\n金→肺/西/白·木→肝/东/绿·水→肾/北/黑·火→心/南/红·土→脾/中/黄\n\n请提供生辰分析您的五行。';
+  if(/你好|您好|hi|hello/.test(t))return'您好！我是AI命理助手。\n\n我可以帮您：\n📅 排盘 🌟 运势 🏠 风水\n💊 中医 📱 手机号 💕 感情\n💰 财运 💼 事业\n\n请告诉我您想了解什么。';
+  if(/谢谢|感谢/.test(t))return'不客气！还有其他问题可以继续问我。';
+  return'您可以问我：\n\n📅 排盘 🌟 运势 🏠 风水\n💊 中医 📱 手机号 💕 感情\n💰 财运 💼 事业\n\n或告诉我您的出生年月日时进行排盘。';
 }
 
-function _feMobile(mobile) {
-  const BAXING={'天医':{codes:['13','31','68','86','49','94','27','72'],desc:'正财/婚姻',rank:'吉'},'生气':{codes:['14','41','67','76','39','93','28','82'],desc:'贵人/活力',rank:'吉'},'延年':{codes:['19','91','78','87','34','43','26','62'],desc:'领导/长寿',rank:'吉'},'伏位':{codes:['11','22','88','99','66','77','33','44'],desc:'耐心/等待',rank:'中'},'六煞':{codes:['16','61','47','74','38','83','29','92'],desc:'桃花/情绪',rank:'中'},'五鬼':{codes:['18','81','79','97','36','63','24','42'],desc:'叛逆/反复',rank:'凶'},'绝命':{codes:['12','21','69','96','48','84','37','73'],desc:'冲动/极端',rank:'凶'},'祸害':{codes:['17','71','89','98','46','64','23','32'],desc:'口舌/是非',rank:'凶'}};
-  function gx(code){for(var n in BAXING){if(BAXING[n].codes.indexOf(code)>=0)return{name:n,desc:BAXING[n].desc,rank:BAXING[n].rank};}return{name:'普通',desc:'普通',rank:'中'};}
-  var stars=[],ji=0,xi=0,zh=0;
-  for(var i=0;i<10;i+=2){var c=mobile.substring(i,i+2),s=gx(c);stars.push({pos:i+1,code:c,s:s.name,d:s.desc,r:s.rank});if(s.rank==='吉')ji++;else if(s.rank==='凶')xi++;else zh++;}
-  var last=stars[stars.length-1];
+function mobile(m){
+  const BX={'天医':['13','31','68','86','49','94','27','72'],'生气':['14','41','67','76','39','93','28','82'],'延年':['19','91','78','87','34','43','26','62'],'伏位':['11','22','88','99','66','77','33','44'],'六煞':['16','61','47','74','38','83','29','92'],'五鬼':['18','81','79','97','36','63','24','42'],'绝命':['12','21','69','96','48','84','37','73'],'祸害':['17','71','89','98','46','64','23','32']};
+  const rk={'天医':'吉','生气':'吉','延年':'吉','伏位':'中','六煞':'中','五鬼':'凶','绝命':'凶','祸害':'凶'};
+  function gx(c){for(var n in BX){if(BX[n].indexOf(c)>=0)return{n:n,r:rk[n]};}return{n:'普通',r:'中'};}
+  var st=[],ji=0,xi=0;
+  for(var i=0;i<10;i+=2){var c=m.substring(i,i+2),s=gx(c);st.push({c:c,s:s.n,r:s.r});if(s.r==='吉')ji++;else if(s.r==='凶')xi++;}
+  var last=st[st.length-1];
   var sc=ji*8-xi*6+20+(last.r==='吉'?5:0);sc=Math.max(0,Math.min(40,sc));
   var lv=sc>=30?'优🟢':sc>=20?'中🟡':'差🔴';
-  var r='━━━ 手机号码分析 ━━━\n\n【号码】'+mobile+'\n【评分】'+sc+'/40 '+lv+'\n【吉星】'+ji+'·凶星'+xi+'·中星'+zh+'\n\n━━━ 八星拆解 ━━━\n';
-  stars.forEach(s=>{var ic=s.r==='吉'?'✅':s.r==='凶'?'❌':'➖';r+='第'+s.pos+'-'+(s.pos+1)+'位 '+s.code+' '+ic+' '+s.s+'（'+s.r+'）'+s.d+'\n';});
-  r+='\n━━━ 尾号 ━━━\n尾号'+last.code+'→'+last.s+'（'+last.r+'）\n';
-  if(last.r==='凶')r+='尾号凶星→建议更换\n';else if(last.r==='吉')r+='尾号吉星→收尾顺利\n';
-  r+='\n━━━ 建议 ━━━\n';
-  if(lv.includes('优'))r+='号码吉利，可继续使用。';else if(lv.includes('中'))r+='吉凶参半，注意凶星领域。';else r+='凶星较多，建议更换。优选尾号13/31/68/86/14/41等吉星。';
+  var r='━━━ 手机号分析 ━━━\n\n【号码】'+m+'\n【评分】'+sc+'/40 '+lv+'\n【吉】'+ji+'·凶'+xi+'\n\n━━━ 八星拆解 ━━━\n';
+  st.forEach(s=>{r+=s.c+' '+(s.r==='吉'?'✅':s.r==='凶'?'❌':'➖')+' '+s.s+'（'+s.r+'）\n';});
+  r+='\n尾号'+last.c+'→'+last.s+'（'+last.r+'）\n\n';
+  if(lv.includes('优'))r+='号码吉利，可继续使用。';else if(lv.includes('中'))r+='吉凶参半，注意凶星领域。';else r+='凶星较多，建议更换。优选尾号13/31/68/86等。';
+  r+='\n\n如需深度测评，请补充：行业/生辰/使用目的';
   return r;
 }
 </script>
