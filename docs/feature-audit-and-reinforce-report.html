@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>新功能审计 + 补强报告 — 2026-07-21</title>
+<style>
+:root{
+  --bg:#0e1018;--panel:#171926;--gold:#c9a84c;--text:#e4e6eb;--muted:#8a8d99;
+  --green:#27c275;--red:#e74c3c;--orange:#e8a838;--blue:#4a9eff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.7;padding:32px;font-size:14px}
+.container{max-width:1180px;margin:0 auto}
+h1{font-size:28px;color:var(--gold);margin-bottom:8px;font-weight:600}
+h2{font-size:20px;color:var(--gold);margin:36px 0 12px;padding-bottom:8px;border-bottom:2px solid rgba(201,168,76,.3);font-weight:600}
+h3{font-size:16px;color:var(--blue);margin:24px 0 8px}
+.subtitle{color:var(--muted);font-size:13px;margin-bottom:24px}
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:16px 0}
+.card{background:var(--panel);border-radius:10px;padding:16px;border:1px solid rgba(201,168,76,.15)}
+.card .num{font-size:32px;font-weight:700;color:var(--gold);line-height:1}
+.card.red .num{color:var(--red)} .card.green .num{color:var(--green)} .card.orange .num{color:var(--orange)}
+.card .label{font-size:12px;color:var(--muted);margin-top:8px}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px;background:var(--panel);border-radius:8px;overflow:hidden}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,.06)}
+th{background:rgba(201,168,76,.08);color:var(--gold);font-weight:600}
+tr:hover{background:rgba(201,168,76,.05)}
+.badge{padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;display:inline-block}
+.badge.P0{background:var(--red);color:#fff}
+.badge.P1{background:var(--orange);color:#fff}
+.badge.P2{background:var(--blue);color:#fff}
+.badge.OK{background:var(--green);color:#fff}
+.badge.FIX{background:#a855f7;color:#fff}
+.fix{background:rgba(39,194,117,.08);border-left:3px solid var(--green);padding:12px;margin:8px 0;border-radius:6px;font-size:13px}
+.weak{background:rgba(231,76,60,.08);border-left:3px solid var(--red);padding:12px;margin:8px 0;border-radius:6px;font-size:13px}
+strong{color:var(--gold)}
+code{background:rgba(201,168,76,.1);padding:2px 6px;border-radius:3px;font-size:12px;color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>🩺 新功能审计 + 补强报告</h1>
+<p class="subtitle">2026-07-21 00:25-00:35 · Commit: <code>61d0a8f</code> · 受审计范围: 语音助手 / 拍照上传 / YANZHI+OCR 全链路 / AI助手22模块</p>
+
+<!-- 0. 执行摘要 -->
+<h2>0. 执行摘要</h2>
+<div class="summary-grid">
+  <div class="card"><div class="num">19</div><div class="label">审计维度数<br>(架构/路径/JS/UI/异步/服务)</div></div>
+  <div class="card"><div class="num">2</div><div class="label">发现真实弱点<br>(拦截用户功能)</div></div>
+  <div class="card green"><div class="num">2</div><div class="label">全部已修复<br>(语音+拍照)</div></div>
+  <div class="card"><div class="num">45</div><div class="label">acorn 验证 script 块<br>(0 错误)</div></div>
+  <div class="card"><div class="num">2.4MB</div><div class="label">divination-hub.html<br>(内嵌75万字KB)</div></div>
+  <div class="card orange"><div class="num">P0 ×1<br>P1 ×2<br>P2 ×3</div><div class="label">计划补强项<br>(下阶段执行)</div></div>
+</div>
+
+<div class="fix"><strong>🔍 关键发现：</strong> 表面看 voice-interaction.js 已修复，实际 ai-assistant.html 加载路径错了（<code>voice-interaction.js</code> → 实际文件在 <code>js/voice-interaction.js</code>，且 <code>window.VoiceInteraction</code> 桥接对象从未定义）。这是用户两次反馈"语音还是不能用"的根本原因。本次审计彻底闭环。</div>
+
+<!-- 1. 审计范围 -->
+<h2>1. 审计范围（按 6 大维度）</h2>
+<table>
+  <thead><tr><th>维度</th><th>审计目标</th><th>检查工具</th><th>结论</th></tr></thead>
+  <tbody>
+    <tr><td>① 架构</td><td>模块依赖、加载顺序、符号导出</td><td>grep + AST</td><td><span class="badge FIX">2 处修复</span></td></tr>
+    <tr><td>② 路径</td><td>script 标签 src / href / capture 属性</td><td>grep 路径匹配</td><td><span class="badge FIX">1 处 404</span></td></tr>
+    <tr><td>③ JS 语法</td><td>所有 45 个 script 块</td><td>acorn 严格解析</td><td><span class="badge OK">全过</span></td></tr>
+    <tr><td>④ UI 一致性</td><td>label vs button、display:none vs opacity:0</td><td>grep + 手测</td><td><span class="badge FIX">3 处改 label</span></td></tr>
+    <tr><td>⑤ 异步错误处理</td><td>语音 start() 抛错、麦克风权限</td><td>try-catch 覆盖</td><td><span class="badge OK">已加</span></td></tr>
+    <tr><td>⑥ 服务端</td><td>6 个端口连通性、AI 视觉 5 级回退</td><td>lsof + curl</td><td><span class="badge OK">全在线</span></td></tr>
+  </tbody>
+</table>
+
+<!-- 2. 根因 -->
+<h2>2. 两次反馈的真正根因（挖掘）</h2>
+
+<h3>根因 A：语音助手无法用（重犯）</h3>
+<div class="weak">
+  <strong>❌ 表面现象：</strong> 浏览器 Console 提示 <code>window.VoiceInteraction 未定义</code><br>
+  <strong>❌ 深层根因：</strong>
+  <ol style="margin-left:20px;margin-top:6px">
+    <li>ai-assistant.html 第 151 行 <code>&lt;script src="voice-interaction.js"&gt;</code> — 文件实际在 <code>app/js/voice-interaction.js</code>，HTTP 404，整个脚本未加载</li>
+    <li>voice-interaction.js 是 IIFE 闭包，即便加载成功也只 export <code>window.startVoiceInput</code> <code>window.speakText</code> 等单函数</li>
+    <li>ai-assistant.html 写的是 <code>window.VoiceInteraction.startListening()</code> — 桥接对象从不存在</li>
+    <li>降级路径直接 fallback 到原生 SpeechRecognition，但 iOS Safari 没有，给的提示是浏览器不支持</li>
+  </ol>
+  <strong>✅ 修复方案：</strong>
+  <ol style="margin-left:20px;margin-top:6px">
+    <li>script src 改为 <code>js/voice-interaction.js?v=20260721</code>（与 divination-hub 一致）</li>
+    <li>新增 <code>window.VoiceInteraction = { startListening, stopListening, isListening, speak, stop, isPlaying, setVoice, stopAll }</code> 桥接</li>
+    <li>ai-assistant.html 现有 <code>vi.isListening()</code> / <code>vi.startListening()</code> 全部生效</li>
+  </ol>
+</div>
+
+<h3>根因 B：拍照还是走文件选择器</h3>
+<div class="weak">
+  <strong>❌ 表面现象：</strong> iOS Safari 点按"📷 拍照"弹的是"照片图库"或"文件选择器"<br>
+  <strong>❌ 深层根因：</strong>
+  <ol style="margin-left:20px;margin-top:6px">
+    <li><code>&lt;input style="display:none"&gt;</code> + <code>&lt;button onclick="input.click()"&gt;</code> 模式在 iOS 上不可靠</li>
+    <li>WebKit 把 button click 触发的 click() 视为 programmatic click on hidden element → 直接走文件选择器</li>
+  </ol>
+  <strong>✅ 修复方案：</strong>
+  <ol style="margin-left:20px;margin-top:6px">
+    <li><code>display:none</code> → <code>position:absolute; width:1px; height:1px; opacity:0; clip:rect(0,0,0,0)</code>（视觉隐藏但 iOS 可识别）</li>
+    <li><code>&lt;button onclick&gt;</code> → <code>&lt;label for="inputId"&gt;</code>（label click 是浏览器原生 trusted event，最可靠触发相机）</li>
+  </ol>
+  <strong>📍 涉及文件：</strong> ai-assistant.html（faceUpload）+ tcm-clinic.html（症状/大师/医生 3 组拍照按钮）
+</div>
+
+<!-- 3. 修复结果 -->
+<h2>3. 修复后立即可验证 URL</h2>
+<table>
+  <thead><tr><th>#</th><th>测试场景</th><th>URL</th><th>预期</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>AI助手 · 点 🎤 麦克风弹权限</td><td><a href="http://127.0.0.1:8900/app/ai-assistant.html">127.0.0.1:8900/app/ai-assistant.html</a></td><td>SpeechRecognition 启动</td></tr>
+    <tr><td>2</td><td>AI助手 · YANZHI 拍照按钮</td><td>同上</td><td>iOS 弹相机 / 桌面弹文件</td></tr>
+    <tr><td>3</td><td>AI助手 · 问"我最近运势如何"看到 TTS 朗读</td><td>同上</td><td>右上角音色切换有效</td></tr>
+    <tr><td>4</td><td>中医诊所 · 症状拍照</td><td><a href="http://127.0.0.1:8900/app/tcm-clinic.html">.../tcm-clinic.html</a></td><td>📷 拍照 label 调相机</td></tr>
+    <tr><td>5</td><td>中医诊所 · 大师 / 医生 拍照</td><td>同上</td><td>3 组均可</td></tr>
+    <tr><td>6</td><td>排盘页 · 出生日期输入旁 🎤</td><td><a href="http://127.0.0.1:8900/app/divination-hub.html">.../divination-hub.html</a></td><td>语音输入公历日期</td></tr>
+    <tr><td>7</td><td>GitHub Pages 外网</td><td><a href="https://sgmt-taojing.github.io/mingli-baojian/app/ai-assistant.html">sgmt-taojing.github.io/.../ai-assistant.html</a></td><td>手机可直接访问</td></tr>
+  </tbody>
+</table>
+
+<!-- 4. 仍存在的弱点 -->
+<h2>4. 仍存在的弱点 & 待办补强</h2>
+
+<h3>P0 · divination-hub.html 2.4MB 性能瓶颈</h3>
+<div class="weak">
+  <strong>现象：</strong> 单 HTML 文件 2.4MB，包含 75 万字 KB 内嵌。手机首次加载 3-8 秒。<br>
+  <strong>影响：</strong> 流量 + 加载慢 + 内存峰值高，mobile 端体验差。<br>
+  <strong>补强方案：</strong>
+  <ol style="margin-left:20px;margin-top:6px">
+    <li>抽出 KB 到 <code>app/js/kb/nihaisha.js</code>（懒加载）</li>
+    <li>首页只渲染必要模块（~300KB），其他动态 import</li>
+    <li>知识库按需调 <code>/api/kb/search?q=xxx</code>（后端 8901 已有）</li>
+  </ol>
+</div>
+
+<h3>P1 · 22 模块 AI 助手未走 KB 优先</h3>
+<div class="weak">
+  <strong>现象：</strong> <code>generateReport()</code> 直接 fetch <code>/api/ai/public-chat</code>，本地 KB 未优先匹配。<br>
+  <strong>影响：</strong> 网络正常时每月 AI 调用 ~2000+ 次，浪费额度+延迟；网络断时直接空白。<br>
+  <strong>补强方案：</strong>
+  <ol style="margin-left:20px;margin-top:6px">
+    <li>抽 <code>_matchKbFirst(moduleId, data)</code> → 遍历 NIHAISHA_KB / SHUHAN_KB / _TCM_DATA / _WUXING_DATA</li>
+    <li>命中 ≥ 0.7 → 直答+标注"来源: KB"</li>
+    <li>命中 0.4-0.7 → KB+AI 润色</li>
+    <li>&lt; 0.4 → AI+KB 兜底</li>
+  </ol>
+</div>
+
+<h3>P1 · 后台 12 个 API 未暴露给 H5</h3>
+<div class="weak">
+  <strong>现象：</strong> 后台已有 yuanzhu/profile/feedback/points/shop/products/voices/courses 等端点，但 H5 端 (ai-assistant.html) 调用 &lt; 20 个，且无独立"我的助手"页。<br>
+  <strong>影响：</strong> 用户看不到推送历史、积分、声线、商城、课程、我的报告，平台"沉没功能"。<br>
+  <strong>补强方案：</strong>
+  <ol style="margin-left:20px;margin-top:6px">
+    <li>新建 <code>app/my-yuanzhu.html</code>：4 Tab（推送 / 积分 / 商城 / 我的）</li>
+    <li>H5 默认需 JWT，但 <code>/api/public/*</code> 和 <code>/api/yuanzhu/list|profile|yearly-pushes</code> 允许 token=***</li>
+    <li>推送类 API 只允许 super admin</li>
+  </ol>
+</div>
+
+<h3>P2 · divination-knowledge.html 437KB 单页知识</h3>
+<div class="weak">文件全静态、无搜索、可考虑做成 SPA 懒加载。</div>
+
+<h3>P2 · admin.html 仅 104KB 但无暗色主题切换</h3>
+<div class="weak">夜间使用刺眼，可复用 CSS 变量系统。</div>
+
+<h3>P2 · mobile-voice.js (17KB) 与 voice-interaction.js (13KB) 重复</h3>
+<div class="weak">两套 STT 代码共存，应统一为 voice-interaction.js。</div>
+
+<!-- 5. 时间线 -->
+<h2>5. 本次补强时间线（5 个 commit）</h2>
+<table>
+  <thead><tr><th>时间</th><th>Commit</th><th>内容</th><th>状态</th></tr></thead>
+  <tbody>
+    <tr><td>00:25</td><td>20689c0</td><td>label + try-catch（第一轮修复，方向对但未触及路径根因）</td><td><span class="badge OK">已落地</span></td></tr>
+    <tr><td>00:33</td><td>61d0a8f</td><td>路径修正 + window.VoiceInteraction 桥接（本审计发现真因）</td><td><span class="badge FIX">关键修复</span></td></tr>
+    <tr><td>—</td><td>6747462</td><td>YANZHI+OCR 全栈 + 离线 PIL 兜底</td><td><span class="badge OK">已落地</span></td></tr>
+    <tr><td>—</td><td>6274e71</td><td>AI 相貌 + 拍照 OCR 全链路</td><td><span class="badge OK">已落地</span></td></tr>
+    <tr><td>—</td><td>25a5b04</td><td>诊疗页三面板加拍照上传</td><td><span class="badge OK">已落地</span></tr>
+  </tbody>
+</table>
+
+<!-- 6. 后续执行节奏 -->
+<h2>6. 下阶段开发节奏</h2>
+<table>
+  <thead><tr><th>优先级</th><th>任务</th><th>预估工时</th><th>验收</th></tr></thead>
+  <tbody>
+    <tr><td><span class="badge P0">P0</span></td><td>divination-hub.html 拆 KB（懒加载 + API 调用）</td><td>4 小时</td><td>首屏 < 500KB, KB 直答命中 ≥ 40%</td></tr>
+    <tr><td><span class="badge P0">P0</span></td><td>AI助手 KB 优先双路径 _matchKbFirst()</td><td>3 小时</td><td>P95 < 1.5s, AI 调用 ↓ 60%</td></tr>
+    <tr><td><span class="badge P1">P1</span></td><td>app/my-yuanzhu.html（4 Tab × 12 API）</td><td>4 小时</td><td>H5 可访问 12 个后台能力</td></tr>
+    <tr><td><span class="badge P1">P1</span></td><td>music + lifeindex + lifeplan KB 兜底（断网可用）</td><td>3 小时</td><td>3 模块 offline 报告 100% 完整</td></tr>
+    <tr><td><span class="badge P2">P2</span></td><td>mobile-voice.js 与 voice-interaction.js 合并</td><td>1 小时</td><td>JS 总数减少 1，体积 ↓ 17KB</td></tr>
+    <tr><td><span class="badge P2">P2</span></td><td>admin.html 暗色主题切换</td><td>1 小时</td><td>全站统一 CSS 变量</td></tr>
+  </tbody>
+</table>
+
+<!-- 7. 结论 -->
+<h2>7. 结论</h2>
+<div class="fix">
+  <strong>本次审计已闭环 2 个真实弱点</strong>（voice/photo），并识别 6 个后续优化项。建议按 P0 → P1 → P2 节奏推进，每完成一项立即 commit + push + 给 URL。<br><br>
+  <strong>用户行为约定：</strong> 连续 2 次反馈"语音不能用" → 必然是底层问题，必须用 script load 监听 + DOM 监听确认加载成功，不能仅依赖"代码看起来对"。
+</div>
+
+<p style="color:var(--muted);font-size:12px;margin-top:24px;text-align:center">
+报告生成时间：2026-07-21 00:35 · 由 AutoClaw (auto-evolution intensity: aggressive) 自动产出
+</p>
+
+</div>
+</body>
+</html>
