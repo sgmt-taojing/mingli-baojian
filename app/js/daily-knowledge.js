@@ -314,4 +314,14 @@ function toggleDailyKnowledgeDetail() {
   }
 }
   }
+  
+  // 暴露函数到全局
+  if (typeof window !== 'undefined') {
+    window.getDailyKnowledge = getDailyKnowledge;
+    window.getJieqiByDate = getJieqiByDate;
+    window.getLunarFestival = getLunarFestival;
+    window.getSolarFestival = getSolarFestival;
+    window.initDailyKnowledge = initDailyKnowledge;
+    window.toggleDailyKnowledgeDetail = toggleDailyKnowledgeDetail;
+  }
 })();
