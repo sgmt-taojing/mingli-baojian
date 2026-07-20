@@ -2487,7 +2487,8 @@ function generate() {
   }
 
   // ===== 构建输出：分析→解决→学习 =====
-  let text = '🪷 易道智鉴·每日宜忌\n';
+  let _fullTitle = (typeof isTomorrow !== 'undefined' && isTomorrow) ? '🪷 易道智鉴·明日宜忌\n' : '🪷 易道智鉴·每日宜忌\n';
+  let text = _fullTitle;
   var _lunarStrTop = solarToLunarStr(Y, M, D);
   // 推送时间放最上面，阳历农历同时显示
   var _pushTime = new Date();
@@ -3445,7 +3446,8 @@ function generatePublic() {
 
   // 构建小作文
   var essay = '';
-  essay += '🌿 今日黄历·' + Y + '年' + M + '月' + D + '日\n\n';
+  var _pubTitle = (typeof isTomorrow !== 'undefined' && isTomorrow) ? '🌿 明日黄历·' : '🌿 今日黄历·';
+  essay += _pubTitle + Y + '年' + M + '月' + D + '日\n\n';
   essay += '周' + WEEKDAYS[now.getDay()] + '·' + (lunarStr || '') + '\n';
   essay += dayGanZhi + '日·' + monthGan + monthZhi + '月·' + yearGan + yearZhi + yearZodiac + '年\n';
   // 声明变量(供后面使用) 
@@ -3785,7 +3787,8 @@ function generateSimple() {
 
   var _colorMap = {木:"绿色/青色",火:"红色/紫色",土:"黄色/棕色",金:"白色/金色",水:"黑色/蓝色"};
 
-  var t = "🧧 今日黄历·吉言\n";
+  var _simpleTitle = (typeof isTomorrow !== 'undefined' && isTomorrow) ? '明日黄历·吉言' : '今日黄历·吉言';
+  var t = "🧧 " + _simpleTitle + "\n";
   t += Y + "年" + M + "月" + D + "日(周" + WEEKDAYS[now.getDay()] + ")\n";
   t += (_lunarStr||"") + " | " + dayGanZhi + "日 | " + (yearGan+yearZhi) + "年(" + yearZodiac + ")\n";
   t += (_dailyKnowledge[dayStem]||"") + "\n";

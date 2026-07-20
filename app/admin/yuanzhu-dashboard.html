@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>年度推送大盘 · 管理员 · 命理保健</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+:root{--c-primary:#7b4d2e;--c-bg:#faf6f0;--c-card:#fff;--c-text:#3d2c1f;--c-muted:#8a7a68;--c-line:#e8dfd0;--c-accent:#c8553d;--c-success:#3d7e44;--c-danger:#a13c2e;}
+*{box-sizing:border-box;}
+body{margin:0;font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:var(--c-bg);color:var(--c-text);}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:#fff;border-bottom:1px solid var(--c-line);box-shadow:0 1px 3px rgba(0,0,0,.04);}
+.brand{font-size:18px;font-weight:600;color:var(--c-primary);}
+.nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.nav a{padding:6px 14px;border-radius:16px;font-size:13px;color:var(--c-text);text-decoration:none;background:var(--c-bg);}
+.nav a.active{background:var(--c-primary);color:#fff;}
+.user-tag{padding:4px 12px;border-radius:12px;font-size:12px;background:var(--c-line);color:var(--c-muted);}
+.container{max-width:1240px;margin:24px auto;padding:0 16px;}
+.header-row{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:18px;}
+.header-row h2{margin:0;color:var(--c-primary);}
+.action-row{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+.btn{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:500;transition:.15s;}
+.btn-primary{background:var(--c-primary);color:#fff;}
+.btn-primary:hover{background:#5e3a23;}
+.btn-secondary{background:#fff;color:var(--c-primary);border:1px solid var(--c-primary);}
+.btn-secondary:hover{background:var(--c-bg);}
+.btn-danger{background:var(--c-danger);color:#fff;}
+.year-selector{display:flex;gap:8px;align-items:center;padding:6px 14px;background:#fff;border-radius:10px;border:1px solid var(--c-line);}
+.year-selector input{width:80px;padding:6px 10px;border:1px solid var(--c-line);border-radius:6px;font-size:14px;}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.stat-card{background:#fff;padding:18px 22px;border-radius:12px;box-shadow:0 2px 6px rgba(0,0,0,.05);text-align:center;}
+.stat-card .num{font-size:32px;font-weight:600;color:var(--c-primary);line-height:1;}
+.stat-card .num.success{color:var(--c-success);}
+.stat-card .num.danger{color:var(--c-danger);}
+.stat-card .label{font-size:13px;color:var(--c-muted);margin-top:8px;}
+.stat-card .sub{font-size:11px;color:var(--c-muted);margin-top:4px;}
+.section{background:#fff;border-radius:12px;padding:20px 24px;margin-bottom:18px;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+.section h3{margin:0 0 14px;color:var(--c-primary);font-size:16px;}
+.section .section-meta{font-size:12px;color:var(--c-muted);margin-bottom:10px;}
+.byYear-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--c-line);}
+.byYear-row:last-child{border-bottom:none;}
+.byYear-row .year{font-weight:600;color:var(--c-primary);width:60px;}
+.byYear-row .bar-bg{flex:1;height:8px;background:#f0e5d3;border-radius:4px;overflow:hidden;}
+.byYear-row .bar-fill{height:100%;background:var(--c-primary);transition:.3s;}
+.byYear-row .count{font-size:13px;color:var(--c-muted);min-width:50px;text-align:right;}
+table.profile-list{width:100%;border-collapse:collapse;font-size:13px;}
+table.profile-list th{text-align:left;padding:8px 10px;color:var(--c-muted);border-bottom:2px solid var(--c-line);font-weight:500;font-size:12px;}
+table.profile-list td{padding:10px;border-bottom:1px dashed var(--c-line);}
+table.profile-list tr:hover td{background:#fdfaf4;}
+table.profile-list .btn-row{display:flex;gap:6px;}
+table.profile-list .mini-btn{padding:3px 10px;border-radius:6px;border:none;font-size:12px;cursor:pointer;}
+table.profile-list .mini-btn.primary{background:var(--c-primary);color:#fff;}
+table.profile-list .mini-btn.secondary{background:#fff;color:var(--c-primary);border:1px solid var(--c-primary);}
+.status-tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;}
+.status-tag.pushed{background:#e8f4ea;color:var(--c-success);}
+.status-tag.pending{background:#fff3e0;color:#b06a1a;}
+.status-tag.optout{background:#f5e1dd;color:var(--c-danger);}
+.toast{position:fixed;top:24px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);color:#fff;padding:10px 20px;border-radius:8px;z-index:9999;font-size:13px;transition:.25s;opacity:0;pointer-events:none;}
+.toast.show{opacity:1;}
+.loading{text-align:center;padding:30px;color:var(--c-muted);}
+.empty-state{text-align:center;padding:40px;color:var(--c-muted);}
+@media(max-width:1200px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:768px){.container{margin:14px auto;}.stats-grid{grid-template-columns:1fr;}.section{padding:14px;}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">📊 管理员 · 年度推送大盘</div>
+  <div class="nav">
+    <a href="monitor-dashboard.html">监控</a>
+    <a href="merchant-dashboard.html">商户</a>
+    <a href="yuanzhu-dashboard.html" class="active">推送大盘</a>
+  </div>
+  <div class="user-tag" id="userTag">未登录</div>
+</div>
+
+<div class="container">
+  <div class="header-row">
+    <h2>年度推送运营大盘</h2>
+    <span class="hint">基于排盘累积画像 · 推送幂等 · 自动已读</span>
+  </div>
+
+  <div class="action-row">
+    <div class="year-selector">
+      <span>目标年度：</span>
+      <input type="number" id="targetYear" value="2026" min="2024" max="2050">
+    </div>
+    <button class="btn btn-secondary" onclick="dryRun()">📋 预览</button>
+    <button class="btn btn-primary" onclick="pushYearly()">🚀 一键推送</button>
+    <button class="btn btn-secondary" onclick="loadStats()">🔄 刷新</button>
+  </div>
+
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card"><div class="num" id="sTotal">-</div><div class="label">总画像数</div><div class="sub">已排盘≥1</div></div>
+    <div class="stat-card"><div class="num success" id="sOptIn">-</div><div class="label">订阅推送</div><div class="sub">opt_in=1</div></div>
+    <div class="stat-card"><div class="num" id="sPushed">-</div><div class="label">本年度已推</div><div class="sub" id="sCoverage">-</div></div>
+    <div class="stat-card"><div class="num" id="sUnread">-</div><div class="label">总推送留痕</div><div class="sub">含历史年度</div></div>
+  </div>
+
+  <div class="section">
+    <h3>📅 年度推送分布</h3>
+    <div class="section-meta">按 push_year 分组统计</div>
+    <div id="byYearBox"><div class="loading">加载中...</div></div>
+  </div>
+
+  <div class="section">
+    <h3>👥 缘主画像列表</h3>
+    <div class="section-meta">点击「推送」可对单个用户单独推送</div>
+    <table class="profile-list">
+      <thead><tr>
+        <th>UID</th><th>昵称</th><th>日主</th><th>生肖</th><th>喜用</th>
+        <th>排盘</th><th>订阅</th><th>本年度</th><th>操作</th>
+      </tr></thead>
+      <tbody id="profileTableBody"><tr><td colspan="9" class="loading">加载中...</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h3>📬 未读 Top 10</h3>
+    <div class="section-meta">用户未读推送排行</div>
+    <table class="profile-list">
+      <thead><tr><th>UID</th><th>未读数</th><th>操作</th></tr></thead>
+      <tbody id="unreadTableBody"><tr><td colspan="3" class="loading">加载中...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+const token = localStorage.getItem('mlbj_token') || '';
+const user = JSON.parse(localStorage.getItem('mlbj_user') || '{}');
+const userTagEl = document.getElementById('userTag');
+
+if (!token) {
+  userTagEl.textContent = '未登录';
+  document.querySelector('.container').innerHTML = '<div class="empty-state"><h3>🔒 请使用管理员账号登录</h3><p><a href="../login.html" style="color:var(--c-primary);">前往登录</a></p></div>';
+  return;
+}
+userTagEl.textContent = (user.name || 'admin') + ' · 管理员';
+
+let allStats = null;
+let allProfiles = [];
+
+window.showToast = function(msg, dur){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=> t.classList.remove('show'), dur || 2400);
+};
+
+async function api(path, opts) {
+  opts = opts || {};
+  opts.headers = opts.headers || {};
+  opts.headers['Authorization'] = 'Bearer ' + token;
+  if (opts.body && typeof opts.body === 'object') {
+    opts.headers['Content-Type'] = 'application/json';
+    opts.body = JSON.stringify(opts.body);
+  }
+  const r = await fetch(path, opts);
+  return await r.json();
+}
+
+window.loadStats = async function() {
+  const d = await api('/api/admin/yuanzhu/push-stats');
+  if (!d.ok) {
+    showToast('加载失败：' + (d.message || '未知'));
+    return;
+  }
+  allStats = d;
+  const s = d.stats;
+  document.getElementById('sTotal').textContent = s.totalProfiles;
+  document.getElementById('sOptIn').textContent = s.optIn;
+  document.getElementById('sPushed').textContent = s.pushedThisYear;
+  document.getElementById('sUnread').textContent = s.totalPushes;
+  document.getElementById('sCoverage').textContent = '覆盖率 ' + (s.coverage || 0) + '%';
+
+  // byYear
+  const byYearBox = document.getElementById('byYearBox');
+  if (!s.byYear || s.byYear.length === 0) {
+    byYearBox.innerHTML = '<div class="empty-state">暂无推送记录</div>';
+  } else {
+    const maxC = Math.max(...s.byYear.map(b => b.c));
+    byYearBox.innerHTML = s.byYear.map(b => `
+      <div class="byYear-row">
+        <div class="year">${b.push_year}</div>
+        <div class="bar-bg"><div class="bar-fill" style="width:${(b.c/maxC*100).toFixed(1)}%"></div></div>
+        <div class="count">${b.c} 条</div>
+      </div>
+    `).join('');
+  }
+
+  // unread top 10
+  const unreadBody = document.getElementById('unreadTableBody');
+  if (!s.unreadByUser || s.unreadByUser.length === 0) {
+    unreadBody.innerHTML = '<tr><td colspan="3" class="empty-state">无未读推送</td></tr>';
+  } else {
+    unreadBody.innerHTML = s.unreadByUser.map(u => `
+      <tr><td>${u.user_id}</td><td>${u.unread}</td><td><button class="mini-btn secondary" onclick="pushSingle(${u.user_id})">补推</button></td></tr>
+    `).join('');
+  }
+
+  await loadProfiles();
+};
+
+async function loadProfiles() {
+  const d = await api('/api/admin/yuanzhu/list');
+  if (!d.ok) {
+    document.getElementById('profileTableBody').innerHTML = '<tr><td colspan="9" class="empty-state">加载失败</td></tr>';
+    return;
+  }
+  allProfiles = d.items || [];
+  const body = document.getElementById('profileTableBody');
+  if (allProfiles.length === 0) {
+    body.innerHTML = '<tr><td colspan="9" class="empty-state">尚无画像，请等待用户排盘</td></tr>';
+    return;
+  }
+  body.innerHTML = allProfiles.map(p => {
+    const optTag = p.push_opt_in === 1
+      ? '<span class="status-tag pushed">订阅</span>'
+      : '<span class="status-tag optout">退订</span>';
+    const yearTag = p.push_year === parseInt(document.getElementById('targetYear').value)
+      ? `<span class="status-tag pushed">已推</span>`
+      : `<span class="status-tag pending">未推</span>`;
+    return `
+      <tr>
+        <td>${p.user_id}</td>
+        <td>${p.display_name || '缘主'}</td>
+        <td>${p.day_master || '-'}</td>
+        <td>${p.zodiac || '-'}</td>
+        <td>${p.xi_ele || '-'}</td>
+        <td>${p.paipan_count || 0}</td>
+        <td>${optTag}</td>
+        <td>${yearTag}</td>
+        <td class="btn-row">
+          <button class="mini-btn primary" onclick="pushSingle(${p.user_id})">推送</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+window.pushSingle = async function(userId) {
+  const year = parseInt(document.getElementById('targetYear').value);
+  if (!confirm(`确认对用户 ${userId} 推送 ${year} 年度报告？`)) return;
+  const d = await api(`/api/admin/yuanzhu/${userId}/push-yearly`, { method:'POST', body:{ year } });
+  if (d.ok) {
+    showToast(`✅ 用户 ${userId} ${year}年推送成功（content ${d.content.length} 字）`, 3500);
+    await loadStats();
+  } else if (d.already_pushed) {
+    showToast(`⚠️ 用户 ${userId} ${year}年已推送过`, 2800);
+  } else {
+    showToast('❌ 推送失败：' + (d.message || '未知'));
+  }
+};
+
+window.dryRun = async function() {
+  const year = parseInt(document.getElementById('targetYear').value);
+  showToast('生成预览中...');
+  const d = await api('/api/admin/yuanzhu/push-yearly', { method:'POST', body:{ year, dryRun: true } });
+  if (!d.ok) { showToast('预览失败：' + (d.message || '未知')); return; }
+  showToast(`📋 ${year}年 将推送 ${d.total} 人（含 ${d.skipped} 已推 + ${d.errors} 错误）`, 4000);
+};
+
+window.pushYearly = async function() {
+  const year = parseInt(document.getElementById('targetYear').value);
+  if (!confirm(`确认对所有订阅用户推送 ${year} 年度报告？\n已推送过会跳过，可放心多次执行。`)) return;
+  const d = await api('/api/admin/yuanzhu/push-yearly', { method:'POST', body:{ year, dryRun: false } });
+  if (!d.ok) { showToast('批量推送失败：' + (d.message || '未知')); return; }
+  showToast(`✅ 批量完成：推送 ${d.sent} 人 / 跳过 ${d.skipped} / 错误 ${d.errors}`, 4500);
+  await loadStats();
+};
+
+loadStats();
+})();
+</script>
+</body>
+</html>

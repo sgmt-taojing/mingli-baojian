@@ -240,6 +240,7 @@ initRBACTables();
 // ============================
 const auth = rbac.auth;
 const adminAuth = rbac.adminAuth;
+const yzProfile = require('./yuanzhu-profile.js');
 const requirePermission = rbac.requirePermission;
 
 // ============================
@@ -643,23 +644,279 @@ app.post('/api/user/check-super', rbac.auth, (req, res) => {
 });
 
 // ============================
-// 排盘记录接口
+// 排盘记录接口（自动同步画像）
 // ============================
 app.post('/api/paipan/save', auth, (req, res) => {
-  const type = sec.sanitizeInput(req.body.type);
+  const type = sec.sanitizeInput(req.body.type || 'unknown');
   const inputData = JSON.stringify(req.body.inputData || {});
   const resultData = JSON.stringify(req.body.resultData || {}).substring(0, 50000);
-  
-  db.prepare('INSERT INTO paipan_records (user_id, type, input_data, result_data) VALUES (?, ?, ?, ?)')
-    .run(req.userId, type, inputData, resultData);
-  
-  res.json({ ok: true, message: '排盘记录已保存' });
+  const rawQuery = sec.sanitizeInput(req.body.rawQuery || '');
+  // 同步尝试从 resultData 抽取的画像信号
+  let parsed = {};
+  try{ parsed = JSON.parse(resultData); }catch(_){}
+  const focusArr = Array.isArray(parsed.focus_areas) ? parsed.focus_areas.slice(0, 8).join(',') : '';
+  const kwArr = Array.isArray(parsed.concern_keywords) ? parsed.concern_keywords.slice(0, 12).join(',') : '';
+
+  const r = db.prepare('INSERT INTO paipan_records (user_id, type, input_data, result_data, focus_areas, concern_keywords) VALUES (?, ?, ?, ?, ?, ?)')
+    .run(req.userId, type, inputData, resultData, focusArr, kwArr);
+  const recordId = r.lastInsertRowid;
+
+  // ★ 触发画像合并（每次排盘都更新）
+  const profileResult = yzProfile.mergeProfile(db, req.userId, type, parsed, parsed, rawQuery);
+
+  res.json({ ok: true, message: '排盘记录已保存', recordId, profileUpdated: profileResult.ok !== false, profile: profileResult });
 });
 
 app.get('/api/paipan/history', auth, (req, res) => {
-  const records = db.prepare('SELECT id, type, input_data, created_at FROM paipan_records WHERE user_id = ? ORDER BY created_at DESC LIMIT 50').all(req.userId);
+  const records = db.prepare('SELECT id, type, input_data, created_at, focus_areas, concern_keywords FROM paipan_records WHERE user_id = ? ORDER BY created_at DESC LIMIT 50').all(req.userId);
   res.json(records);
 });
+
+// ============================
+// 缘主画像接口
+// ============================
+// 管理员视角：拉取所有缘主画像概览（用于画像推送大盘 + 推荐回访名单）
+app.get('/api/yuanzhu/list', auth, (req, res) => {
+  // 仅管理员可访问（依赖 JWT roles 数组，避免硬编码超管手机号）
+  if(!req.user||!(req.user.roles||[]).includes('admin')&&req.user.role!=='admin'){
+    return res.status(403).json({ok:false,message:'仅管理员可访问'});
+  }
+  const q = String(req.query.q||'').trim();
+  const sortBy = String(req.query.sort||'last_paipan_at').replace(/[^a-z_]/gi,'');
+  const limit = Math.min(parseInt(req.query.limit)||50, 200);
+  let sql = `SELECT user_id, display_name, day_master, xi_ele, ji_ele, lack_wuxing, zodiac,
+                    focus_areas, concern_keywords, mod_stats,
+                    paipan_count, push_year, push_priority, push_opt_in,
+                    first_paipan_at, last_paipan_at, created_at, updated_at
+             FROM yuanzhu_profile`;
+  const args = [];
+  if(q){
+    sql += ` WHERE display_name LIKE ? OR zodiac LIKE ? OR day_master LIKE ?`;
+    args.push('%'+q+'%','%'+q+'%','%'+q+'%');
+  }
+  sql += ` ORDER BY ${sortBy} DESC NULLS LAST LIMIT ?`;
+  args.push(limit);
+  const rows = db.prepare(sql).all(...args);
+  const out = rows.map(r=>{
+    let focus=[],kw=[],stats={};
+    try{focus=JSON.parse(r.focus_areas||'[]');}catch(_){}
+    try{kw=JSON.parse(r.concern_keywords||'[]');}catch(_){}
+    try{stats=JSON.parse(r.mod_stats||'{}');}catch(_){}
+    return {
+      user_id:r.user_id, display_name:r.display_name,
+      day_master:r.day_master, xi_ele:r.xi_ele, ji_ele:r.ji_ele,
+      lack_wuxing:r.lack_wuxing, zodiac:r.zodiac,
+      focus_areas:focus, concern_keywords:kw, mod_stats:stats,
+      paipan_count:r.paipan_count, push_year:r.push_year,
+      push_priority:r.push_priority, push_opt_in:r.push_opt_in===1,
+      first_paipan_at:r.first_paipan_at, last_paipan_at:r.last_paipan_at,
+      updated_at:r.updated_at
+    };
+  });
+  res.json({ok:true, total:out.length, items:out});
+});
+
+app.get('/api/yuanzhu/profile', auth, (req, res) => {
+  const p = db.prepare('SELECT * FROM yuanzhu_profile WHERE user_id=?').get(req.userId);
+  if(!p){
+    return res.json({ ok:false, empty:true, message:'尚未形成画像，请先进行一次排盘' });
+  }
+  let focus=[], kw=[], modStats={};
+  try{ focus = JSON.parse(p.focus_areas||'[]'); }catch(_){}
+  try{ kw = JSON.parse(p.concern_keywords||'[]'); }catch(_){}
+  try{ modStats = JSON.parse(p.mod_stats||'{}'); }catch(_){}
+  // 仅返回公开字段（勿包含敏感推测）
+  res.json({
+    ok:true,
+    profile:{
+      user_id: p.user_id,
+      day_master: p.day_master,
+      xi_ele: p.xi_ele,
+      ji_ele: p.ji_ele,
+      lack_wuxing: p.lack_wuxing,
+      zodiac: p.zodiac,
+      focus_areas: focus,
+      concern_keywords: kw,
+      mod_stats: modStats,
+      paipan_count: p.paipan_count,
+      first_paipan_at: p.first_paipan_at,
+      last_paipan_at: p.last_paipan_at,
+      push_priority: p.push_priority,
+      push_year: p.push_year,
+      push_opt_in: p.push_opt_in === 1
+    }
+  });
+});
+
+// 更新推送偏好
+app.post('/api/yuanzhu/preference', auth, (req, res) => {
+  const opt = req.body.opt_in === false ? 0 : 1;
+  db.prepare('UPDATE yuanzhu_profile SET push_opt_in=?, updated_at=datetime(\'now\',\'localtime\') WHERE user_id=?').run(opt, req.userId);
+  res.json({ ok:true, opt_in: opt===1 });
+});
+
+// 预览年度推送（不推送，仅生成草稿；已推过则返回历史版）
+app.get('/api/yuanzhu/preview-push', auth, (req, res) => {
+  const year = parseInt(req.query.year) || new Date().getFullYear();
+  const p = db.prepare('SELECT * FROM yuanzhu_profile WHERE user_id=?').get(req.userId);
+  if(!p) return res.json({ ok:false, empty:true, message:'画像未生成，请先完成至少一次排盘' });
+  const existed = yzProfile.hasPushed(db, req.userId, year);
+  if(existed){
+    return res.json({ ok:true, year, content: existed.content, sent_at: existed.sent_at, status: existed.status, alreadySent: true });
+  }
+  // 生成草稿（不入库）
+  const draft = yzProfile.generateYearlyPush(p, year);
+  res.json({ ok:true, year, content: draft, sent_at: null, status: 'draft', alreadySent: false });
+});
+
+// 确认发送（入库 + 防重）
+app.post('/api/yuanzhu/send-push', auth, (req, res) => {
+  const year = parseInt(req.body.year || req.query.year) || new Date().getFullYear();
+  const p = db.prepare('SELECT * FROM yuanzhu_profile WHERE user_id=?').get(req.userId);
+  if(!p) return res.json({ ok:false, message:'画像未生成' });
+  if(p.push_opt_in===0) return res.json({ ok:false, message:'您已关闭推送' });
+  const content = yzProfile.generateYearlyPush(p, year);
+  const snapshot = JSON.stringify({
+    day_master:p.day_master, xi_ele:p.xi_ele, lack:p.lack_wuxing, zodiac:p.zodiac,
+    focus_areas:p.focus_areas, concern_keywords:p.concern_keywords, mod_stats:p.mod_stats, paipan_count:p.paipan_count
+  });
+  const r = yzProfile.savePush(db, req.userId, year, content, snapshot);
+  if(!r.ok) return res.status(500).json({ ok:false, message: r.error });
+  // 更新用户画像 push_year
+  db.prepare('UPDATE yuanzhu_profile SET push_year=?, updated_at=datetime(\'now\',\'localtime\') WHERE user_id=?').run(year, req.userId);
+  res.json({ ok:true, year, content, updated: r.updated, id: r.id });
+});
+
+// === 缺失端点：推送系统补全（admin 全员/单用户，用户收件箱，admin 大盘统计） ===
+
+function _autoPushRanThisYear(year){
+  const r = db.prepare(`SELECT id FROM push_logs WHERE push_type='auto_yearly' AND push_date=? AND status='sent' LIMIT 1`).get(String(year));
+  return !!r;
+}
+
+// 1. admin 全员推送（按年度，未订阅则跳过）
+app.post('/api/admin/yuanzhu/push-yearly', adminAuth, (req, res) => {
+  const year = parseInt(req.body.year || new Date().getFullYear());
+  const dryRun = req.body.dryRun === true;
+  const profiles = db.prepare(`SELECT * FROM yuanzhu_profile WHERE push_opt_in=1 AND paipan_count>=1`).all();
+  const result = { total: profiles.length, sent: 0, skipped: 0, errors: 0, items: [] };
+  for (const p of profiles) {
+    try {
+      if (yzProfile.hasPushed(db, p.user_id, year)) {
+        result.skipped++;
+        result.items.push({ user_id: p.user_id, status: 'already_pushed' });
+        continue;
+      }
+      const content = yzProfile.generateYearlyPush(p, year);
+      const snapshot = JSON.stringify({
+        day_master:p.day_master, xi_ele:p.xi_ele, lack:p.lack_wuxing, zodiac:p.zodiac,
+        focus_areas:p.focus_areas, concern_keywords:p.concern_keywords, mod_stats:p.mod_stats, paipan_count:p.paipan_count
+      });
+      if (!dryRun) {
+        const r = yzProfile.savePush(db, p.user_id, year, content, snapshot);
+        if (r.ok) {
+          db.prepare(`UPDATE yuanzhu_profile SET push_year=?, updated_at=datetime('now','localtime') WHERE user_id=?`).run(year, p.user_id);
+          db.prepare(`INSERT INTO push_logs (user_id, push_type, push_date, status) VALUES (?, 'admin_yearly', ?, 'sent')`).run(p.user_id, String(year));
+          result.sent++;
+          result.items.push({ user_id: p.user_id, status: 'sent', id: r.id });
+        } else {
+          result.errors++;
+          result.items.push({ user_id: p.user_id, status: 'error', error: r.error });
+        }
+      } else {
+        result.items.push({ user_id: p.user_id, status: 'dryrun_preview', preview: content.substring(0, 80) });
+      }
+    } catch(e) {
+      result.errors++;
+      result.items.push({ user_id: p.user_id, status: 'exception', error: e.message });
+    }
+  }
+  res.json({ ok:true, year, dryRun, ...result });
+});
+
+// 2. admin 单用户推送
+app.post('/api/admin/yuanzhu/:userId/push-yearly', adminAuth, (req, res) => {
+  const userId = parseInt(req.params.userId);
+  const year = parseInt(req.body.year || new Date().getFullYear());
+  const p = db.prepare(`SELECT * FROM yuanzhu_profile WHERE user_id=?`).get(userId);
+  if(!p) return res.status(404).json({ ok:false, message:'画像不存在' });
+  if (yzProfile.hasPushed(db, userId, year)) {
+    return res.json({ ok:false, message:year + '年已推送过', already_pushed: true });
+  }
+  const content = yzProfile.generateYearlyPush(p, year);
+  const snapshot = JSON.stringify({
+    day_master:p.day_master, xi_ele:p.xi_ele, lack:p.lack_wuxing, zodiac:p.zodiac,
+    focus_areas:p.focus_areas, concern_keywords:p.concern_keywords, mod_stats:p.mod_stats, paipan_count:p.paipan_count
+  });
+  const r = yzProfile.savePush(db, userId, year, content, snapshot);
+  if(!r.ok) return res.status(500).json({ ok:false, message: r.error });
+  db.prepare(`UPDATE yuanzhu_profile SET push_year=?, updated_at=datetime('now','localtime') WHERE user_id=?`).run(year, userId);
+  db.prepare(`INSERT INTO push_logs (user_id, push_type, push_date, status) VALUES (?, 'admin_yearly_single', ?, 'sent')`).run(userId, String(year));
+  res.json({ ok:true, year, user_id: userId, content, id: r.id });
+});
+
+// 3. 用户收件箱（自动标记已读）
+app.get('/api/yuanzhu/yearly-pushes', auth, (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit) || 20, 100);
+  const rows = db.prepare(`
+    SELECT id, push_year, push_type, content, profile_snapshot, sent_at, read_at, created_at
+    FROM yuanzhu_yearly_push
+    WHERE user_id=?
+    ORDER BY push_year DESC, created_at DESC
+    LIMIT ?
+  `).all(req.userId, limit);
+  db.prepare(`UPDATE yuanzhu_yearly_push SET read_at=datetime('now','localtime') WHERE user_id=? AND read_at IS NULL`).run(req.userId);
+  res.json({ ok:true, items: rows.map(r => ({
+    id: r.id, year: r.push_year, type: r.push_type, content: r.content,
+    sent_at: r.sent_at, read_at: r.read_at, created_at: r.created_at, is_read: !!r.read_at
+  })) });
+});
+
+// 4. admin 推送大盘统计
+app.get('/api/admin/yuanzhu/push-stats', adminAuth, (req, res) => {
+  const currentYear = new Date().getFullYear();
+  const totalProfiles = db.prepare(`SELECT COUNT(*) AS c FROM yuanzhu_profile WHERE paipan_count>=1`).get().c;
+  const optIn = db.prepare(`SELECT COUNT(*) AS c FROM yuanzhu_profile WHERE push_opt_in=1`).get().c;
+  const pushedThisYear = db.prepare(`SELECT COUNT(DISTINCT user_id) AS c FROM yuanzhu_yearly_push WHERE push_year=?`).get(currentYear).c;
+  const totalPushes = db.prepare(`SELECT COUNT(*) AS c FROM yuanzhu_yearly_push`).get().c;
+  const byYear = db.prepare(`SELECT push_year, COUNT(*) AS c FROM yuanzhu_yearly_push GROUP BY push_year ORDER BY push_year DESC LIMIT 10`).all();
+  const unreadByUser = db.prepare(`
+    SELECT user_id, COUNT(*) AS unread FROM yuanzhu_yearly_push WHERE read_at IS NULL GROUP BY user_id ORDER BY unread DESC LIMIT 10
+  `).all();
+  res.json({ ok:true, currentYear, stats: {
+    totalProfiles, optIn, pushedThisYear, totalPushes,
+    coverage: totalProfiles ? Math.round(pushedThisYear / totalProfiles * 100) : 0,
+    byYear, unreadByUser
+  } });
+});
+
+// 5. cron 触发器（手动调用，adminAuth 保护；launchd 可拉这个端点做定时）
+app.post('/api/admin/cron/yearly-push', adminAuth, (req, res) => {
+  const year = parseInt(req.body.year || new Date().getFullYear());
+  if (_autoPushRanThisYear(year)) {
+    return res.json({ ok:false, message:year + '年自动推送已执行过，跳过', skip: true });
+  }
+  const profiles = db.prepare(`SELECT * FROM yuanzhu_profile WHERE push_opt_in=1 AND paipan_count>=1`).all();
+  let sent = 0, errors = 0;
+  for (const p of profiles) {
+    try {
+      if (yzProfile.hasPushed(db, p.user_id, year)) continue;
+      const content = yzProfile.generateYearlyPush(p, year);
+      const snapshot = JSON.stringify({
+        day_master:p.day_master, xi_ele:p.xi_ele, lack:p.lack_wuxing, zodiac:p.zodiac,
+        focus_areas:p.focus_areas, concern_keywords:p.concern_keywords, mod_stats:p.mod_stats, paipan_count:p.paipan_count
+      });
+      const r = yzProfile.savePush(db, p.user_id, year, content, snapshot);
+      if (r.ok) {
+        db.prepare(`UPDATE yuanzhu_profile SET push_year=?, updated_at=datetime('now','localtime') WHERE user_id=?`).run(year, p.user_id);
+        sent++;
+      } else { errors++; }
+    } catch(_) { errors++; }
+  }
+  db.prepare(`INSERT INTO push_logs (user_id, push_type, push_date, status) VALUES (0, 'auto_yearly', ?, 'sent')`).run(String(year));
+  res.json({ ok:true, year, sent, errors, total: profiles.length });
+});
+
 
 // ============================
 // 商城接口

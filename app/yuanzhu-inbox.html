@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的年度推送 · 命理保健</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+:root{--c-primary:#7b4d2e;--c-bg:#faf6f0;--c-card:#fff;--c-text:#3d2c1f;--c-muted:#8a7a68;--c-line:#e8dfd0;--c-accent:#c8553d;}
+*{box-sizing:border-box;}
+body{margin:0;font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:var(--c-bg);color:var(--c-text);}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:#fff;border-bottom:1px solid var(--c-line);box-shadow:0 1px 3px rgba(0,0,0,.04);}
+.brand{font-size:18px;font-weight:600;color:var(--c-primary);}
+.nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.nav a{padding:6px 14px;border-radius:16px;font-size:13px;color:var(--c-text);text-decoration:none;background:var(--c-bg);}
+.nav a.active{background:var(--c-primary);color:#fff;}
+.user-tag{padding:4px 12px;border-radius:12px;font-size:12px;background:var(--c-line);color:var(--c-muted);}
+.container{max-width:920px;margin:24px auto;padding:0 16px;}
+.header-row{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:18px;}
+.header-row h2{margin:0;color:var(--c-primary);}
+.header-row .hint{font-size:13px;color:var(--c-muted);}
+.inbox-card{background:var(--c-card);border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);padding:22px 26px;margin-bottom:18px;border-left:4px solid var(--c-primary);transition:.2s;}
+.inbox-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.1);transform:translateY(-1px);}
+.inbox-card.read{border-left-color:var(--c-line);opacity:.78;}
+.year-tag{display:inline-block;padding:4px 12px;border-radius:12px;background:var(--c-primary);color:#fff;font-size:13px;font-weight:600;margin-right:10px;}
+.read-flag{display:inline-block;padding:2px 8px;border-radius:10px;background:#f0e5d3;color:var(--c-muted);font-size:11px;margin-left:6px;}
+.read-flag.is-read{background:#e8f4ea;color:#3d7e44;}
+.push-meta{font-size:12px;color:var(--c-muted);margin:8px 0 14px;}
+.push-content{line-height:1.85;font-size:14.5px;white-space:pre-wrap;background:#fdfaf4;padding:16px 18px;border-radius:8px;border:1px dashed var(--c-line);}
+.empty-state{text-align:center;padding:60px 20px;color:var(--c-muted);}
+.empty-state .icon{font-size:48px;margin-bottom:12px;}
+.loading{text-align:center;padding:40px;color:var(--c-muted);}
+.filter-row{display:flex;gap:10px;margin-bottom:20px;align-items:center;}
+.filter-row .pill{padding:6px 14px;border-radius:16px;background:#fff;border:1px solid var(--c-line);cursor:pointer;font-size:13px;transition:.15s;}
+.filter-row .pill.active{background:var(--c-primary);color:#fff;border-color:var(--c-primary);}
+.stats-bar{display:flex;gap:18px;margin-bottom:20px;}
+.stats-bar .stat{background:#fff;padding:12px 18px;border-radius:10px;flex:1;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+.stats-bar .stat .num{font-size:24px;font-weight:600;color:var(--c-primary);}
+.stats-bar .stat .label{font-size:12px;color:var(--c-muted);margin-top:4px;}
+@media(max-width:768px){.container{margin:14px auto;}.inbox-card{padding:18px;}.stats-bar{flex-direction:column;gap:10px;}.topbar{flex-direction:column;gap:10px;}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">📮 我的年度推送</div>
+  <div class="nav" id="navBar">
+    <a href="divination-hub.html">排盘</a>
+    <a href="yuanzhu-inbox.html" class="active">收件箱</a>
+    <a href="index.html">首页</a>
+  </div>
+  <div class="user-tag" id="userTag">未登录</div>
+</div>
+
+<div class="container">
+  <div class="header-row">
+    <h2>年度运势推送</h2>
+    <span class="hint">按年度自动归档 · 已读自动标记</span>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat"><div class="num" id="statTotal">-</div><div class="label">总推送</div></div>
+    <div class="stat"><div class="num" id="statYears">-</div><div class="label">覆盖年度</div></div>
+    <div class="stat"><div class="num" id="statUnread">-</div><div class="label">未读</div></div>
+  </div>
+
+  <div class="filter-row">
+    <span class="pill active" data-filter="all">全部</span>
+    <span class="pill" data-filter="unread">未读</span>
+    <span class="pill" data-filter="year">本年度</span>
+  </div>
+
+  <div id="content">
+    <div class="loading">加载中...</div>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+const token = localStorage.getItem('mlbj_token') || '';
+const user = JSON.parse(localStorage.getItem('mlbj_user') || '{}');
+const userTagEl = document.getElementById('userTag');
+
+if (!token) {
+  // 访客模式：提示登录
+  userTagEl.textContent = '未登录 · 访客模式';
+} else {
+  userTagEl.textContent = (user.name || '缘主') + ' · ' + (user.isSuper ? '管理员' : (user.vipLevel || 'free'));
+}
+
+let allItems = [];
+let currentFilter = 'all';
+
+async function loadInbox() {
+  const content = document.getElementById('content');
+  content.innerHTML = '<div class="loading">加载中...</div>';
+  if (!token) {
+    content.innerHTML = '<div class="empty-state"><div class="icon">🔒</div><h3>请先登录</h3><p>登录后查看您的年度推送</p><p style="margin-top:14px;"><a href="login.html" style="color:var(--c-primary);">前往登录</a></p></div>';
+    return;
+  }
+  try {
+    const r = await fetch('/api/yuanzhu/yearly-pushes?limit=50', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const d = await r.json();
+    if (!d.ok) {
+      content.innerHTML = '<div class="empty-state"><div class="icon">⚠️</div><h3>加载失败</h3><p>' + (d.message || '未知错误') + '</p></div>';
+      return;
+    }
+    allItems = d.items || [];
+    render();
+  } catch (e) {
+    content.innerHTML = '<div class="empty-state"><div class="icon">❌</div><h3>网络错误</h3><p>' + e.message + '</p></div>';
+  }
+}
+
+function render() {
+  const currentYear = new Date().getFullYear();
+  let filtered = allItems;
+  if (currentFilter === 'unread') filtered = allItems.filter(it => !it.is_read);
+  else if (currentFilter === 'year') filtered = allItems.filter(it => it.year === currentYear);
+
+  // stats
+  const years = [...new Set(allItems.map(it => it.year))];
+  document.getElementById('statTotal').textContent = allItems.length;
+  document.getElementById('statYears').textContent = years.length;
+  document.getElementById('statUnread').textContent = allItems.filter(it => !it.is_read).length;
+
+  const content = document.getElementById('content');
+  if (filtered.length === 0) {
+    content.innerHTML = '<div class="empty-state"><div class="icon">📭</div><h3>暂无推送</h3><p>' + (currentFilter === 'unread' ? '没有未读推送' : (currentFilter === 'year' ? '本年度还未推送' : '请先完成一次排盘，将自动累积年度推送')) + '</p></div>';
+    return;
+  }
+  content.innerHTML = filtered.map(it => {
+    const yearLabel = it.year + ' 年';
+    const readClass = it.is_read ? 'read' : '';
+    const readBadge = it.is_read ? '<span class="read-flag is-read">已读</span>' : '<span class="read-flag">未读</span>';
+    const sentAt = it.sent_at || it.created_at || '';
+    return `
+      <div class="inbox-card ${readClass}" data-id="${it.id}">
+        <div>
+          <span class="year-tag">${yearLabel}</span>
+          ${readBadge}
+          <span style="color:var(--c-muted);font-size:12px;">${sentAt}</span>
+        </div>
+        <div class="push-content">${escapeHtml(it.content)}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function escapeHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+
+// filter pills
+document.querySelectorAll('.filter-row .pill').forEach(p => {
+  p.addEventListener('click', () => {
+    document.querySelectorAll('.filter-row .pill').forEach(x => x.classList.remove('active'));
+    p.classList.add('active');
+    currentFilter = p.dataset.filter;
+    render();
+  });
+});
+
+loadInbox();
+})();
+</script>
+</body>
+</html>
