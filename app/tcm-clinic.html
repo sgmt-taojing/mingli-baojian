@@ -1610,11 +1610,40 @@ function _photoFileHandler(input,previewId,prefix){
   const preview=document.getElementById(previewId);
   if(!preview)return;
   preview.style.display='block';
-  preview.innerHTML='📷 '+escHtml(f.name)+' （'+Math.round(f.size/1024)+'KB）';
+  preview.innerHTML='📷 '+escHtml(f.name)+' （'+Math.round(f.size/1024)+'KB）<span class="ocr-status" style="font-size:11px;color:var(--gold,#c9a84c);margin-left:8px">⏳ OCR识别中…</span>';
   if(f.type.startsWith('image/')){
     const reader=new FileReader();
-    reader.onload=e=>{
+    reader.onload=async e=>{
       preview.innerHTML+='<img src="'+e.target.result+'" style="max-width:100%;max-height:200px;margin-top:8px;border-radius:6px;display:block">';
+      // 【新增】拍照后自动调后端 OCR 提取文字（中医病历模式）
+      try{
+        const apiBase=(window.API_BASE||'');
+        const targetApi=(apiBase||(location.hostname==='localhost'||location.hostname==='127.0.0.1'?'http://127.0.0.1:8920':''))+'/api/ocr/tcm';
+        const ocrResp=await fetch(targetApi,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:e.target.result})}).then(r=>r.json());
+        const statusEl=preview.querySelector('.ocr-status');
+        if(ocrResp&&ocrResp.ok&&ocrResp.text){
+          if(statusEl){statusEl.textContent='✅ OCR识别完成（'+ocrResp.engine+'）';statusEl.style.color='#5acf88';}
+          // 自动写入文本框：缩徻到前 1500 字
+          const textIdMap={'symptomFilePreview':'symptomText'};
+          const txtId=textIdMap[previewId];
+          if(txtId){
+            const txt=document.getElementById(txtId);
+            if(txt){
+              const cur=txt.value.trim();
+              const ocrTxt=ocrResp.text.length>1500?(ocrResp.text.slice(0,1500)+'…[已截断]'):ocrResp.text;
+              const add='【拍照OCR】'+ocrTxt;
+              if(!cur.includes(ocrTxt)) txt.value=(cur?cur+'\n\n':'')+add;
+              showToast('OCR已提取 '+ocrResp.text.length+' 字到文本框');
+            }
+          }
+        } else {
+          if(statusEl){statusEl.textContent='⚠️ OCR未可用（'+ (ocrResp&&ocrResp.engine||'unknown') +'）';statusEl.style.color='#e87a5a';}
+        }
+      }catch(err){
+        console.warn('OCR 调用失败',err);
+        const statusEl=preview.querySelector('.ocr-status');
+        if(statusEl){statusEl.textContent='⚠️ OCR服务不可达';statusEl.style.color='#e87a5a';}
+      }
     };
     reader.readAsDataURL(f);
   }

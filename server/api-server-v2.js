@@ -1569,10 +1569,127 @@ app.get('/api/public/latest-pushes', (req, res) => {
 });
 
 // ============================
+// TTS 语音合成代理（转发到 8912 Python TTS 服务）
+// ============================
+const http = require('http');
+const TTS_PROXY_HOST = '127.0.0.1';
+const TTS_PROXY_PORT = 8912;
+
+app.get('/api/tts', (req, res) => {
+  const qs = req.url.split('?')[1] || '';
+  const opts = {
+    hostname: TTS_PROXY_HOST,
+    port: TTS_PROXY_PORT,
+    path: '/api/tts?' + qs,
+    method: 'GET',
+    headers: { 'Accept': 'audio/mpeg' },
+    timeout: 15000
+  };
+  const proxyReq = http.request(opts, proxyRes => {
+    res.writeHead(proxyRes.statusCode, {
+      'Content-Type': proxyRes.headers['content-type'] || 'audio/mpeg',
+      'Cache-Control': 'public, max-age=3600',
+      'Access-Control-Allow-Origin': '*'
+    });
+    proxyRes.pipe(res);
+  });
+  proxyReq.on('error', e => {
+    console.error('[TTS Proxy] 后端不可用:', e.message);
+    if (!res.headersSent) {
+      res.status(503).json({ error: 'TTS服务暂不可用', detail: e.message });
+    }
+  });
+  proxyReq.on('timeout', () => {
+    proxyReq.destroy();
+    if (!res.headersSent) {
+      res.status(504).json({ error: 'TTS合成超时' });
+    }
+  });
+  proxyReq.end();
+});
+
+app.get('/api/voices', (req, res) => {
+  const opts = {
+    hostname: TTS_PROXY_HOST,
+    port: TTS_PROXY_PORT,
+    path: '/api/voices',
+    method: 'GET',
+    timeout: 5000
+  };
+  const proxyReq = http.request(opts, proxyRes => {
+    res.writeHead(proxyRes.statusCode, {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    });
+    proxyRes.pipe(res);
+  });
+  proxyReq.on('error', e => {
+    if (!res.headersSent) {
+      res.status(503).json({ error: '语音列表暂不可用', voices: [] });
+    }
+  });
+  proxyReq.end();
+});
+
+// ============================
 // 数据同步路由
 // ============================
 app.use('/api/sync', syncRoutes);
 app.use('/api/distill', distillationRoutes);
+
+// ============================
+// Face / OCR 视觉代理（转发到 face-ocr-server.py 8913）
+// ============================
+const FACE_OCR_BASE = process.env.FACE_OCR_BASE || 'http://127.0.0.1:8913';
+
+async function _proxyFaceOCR(path, body) {
+  try {
+    const r = await fetch(FACE_OCR_BASE + path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(60000)
+    });
+    return await r.json();
+  } catch (e) {
+    return { ok: false, error: 'face_ocr_unreachable', detail: e.message };
+  }
+}
+
+// AI 相貌分析（拍照上传后调用）
+app.post('/api/face/analyze', async (req, res) => {
+  if (!req.body || !req.body.image) return res.json({ ok: false, error: 'missing_image' });
+  const out = await _proxyFaceOCR('/api/face/analyze', {
+    image: req.body.image,
+    prompt: req.body.prompt || null
+  });
+  res.json(out);
+});
+
+// 通用 OCR
+app.post('/api/ocr/recognize', async (req, res) => {
+  if (!req.body || !req.body.image) return res.json({ ok: false, error: 'missing_image' });
+  const out = await _proxyFaceOCR('/api/ocr/recognize', { image: req.body.image });
+  res.json(out);
+});
+
+// 中医病历 OCR（拍照识别报告）
+app.post('/api/ocr/tcm', async (req, res) => {
+  if (!req.body || !req.body.image) return res.json({ ok: false, error: 'missing_image' });
+  const out = await _proxyFaceOCR('/api/ocr/tcm', { image: req.body.image });
+  res.json(out);
+});
+
+// Face/OCR 服务健康检查
+app.get('/api/face/health', async (req, res) => {
+  try {
+    const r = await fetch(FACE_OCR_BASE + '/health', { signal: AbortSignal.timeout(3000) });
+    const data = await r.json();
+    res.json({ ok: true, proxy: 'face-ocr-server', ...data });
+  } catch (e) {
+    res.json({ ok: false, error: 'face_ocr_unreachable', detail: e.message, base: FACE_OCR_BASE });
+  }
+});
 
 // === 启动服务 ===
 app.listen(PORT, () => {
