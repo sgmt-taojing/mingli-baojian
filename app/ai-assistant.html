@@ -134,6 +134,50 @@ const API_BASE = (location.hostname === '127.0.0.1' || location.hostname === 'lo
 let chatHistory = [];
 let baziData = null;
 
+// 简易前端排盘（不依赖后端API）
+function _fePaipan(y, m, d, h) {
+  const tg = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  const dz = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  // 年柱（以立春为界，简化用2月4日）
+  const yc = (m < 2 || (m === 2 && d < 4)) ? y - 1 : y;
+  const yStem = tg[(yc - 4) % 10];
+  const yBranch = dz[(yc - 4) % 12];
+  // 月柱
+  const jieIdx = Math.floor((m - 1) * 2 + (d >= 15 ? 1 : 0));
+  const monthBranch = dz[(jieIdx + 2) % 12];
+  const yStemIdx = (yc - 4) % 10;
+  const mStemIdx = (yStemIdx * 2 + Math.floor((jieIdx + 2) % 12)) % 10;
+  const mStem = tg[mStemIdx];
+  // 日柱（1900年1月1日=甲戌，甲子日序=0）
+  const epoch = new Date(1900, 0, 1);
+  const target = new Date(y, m - 1, d);
+  const daysDiff = Math.floor((target - epoch) / 86400000);
+  const dStemIdx = (daysDiff + 0) % 10;  // 1900-1-1=甲戌=stem0
+  const dBranchIdx = (daysDiff + 10) % 12;  // 戌=idx10
+  const dStem = tg[dStemIdx];
+  const dBranch = dz[dBranchIdx];
+  // 时柱
+  const hIdx = Math.floor((h + 1) / 2) % 12;
+  const hBranch = dz[hIdx];
+  const hStemIdx = (dStemIdx * 2 + hIdx) % 10;
+  const hStem = tg[hStemIdx];
+  // 五行统计
+  const wuxing = {'金':0,'木':0,'水':0,'火':0,'土':0};
+  const eleMap = {'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水','子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+  [yStem+yBranch, mStem+monthBranch, dStem+dBranch, hStem+hBranch].forEach(function(gz){
+    wuxing[eleMap[gz[0]]]++; wuxing[eleMap[gz[1]]]++;
+  });
+  const lack = Object.keys(wuxing).filter(function(k){return wuxing[k]===0;});
+  return {
+    day_master: dStem + eleMap[dStem],
+    pillars: {'年': yStem+yBranch, '月': mStem+monthBranch, '日': dStem+dBranch, '时': hStem+hBranch},
+    wuxing_count: wuxing,
+    wuxing_lack: lack,
+    dayun: [],
+    shensha: {}
+  };
+}
+
 // 排盘
 async function doPaipan() {
   const y = parseInt(document.getElementById('ppYear').value);
@@ -147,12 +191,22 @@ async function doPaipan() {
   result.innerHTML = '排盘中...';
   result.classList.add('show');
   
+  // 先尝试后端API（本地环境），失败用前端简易排盘
+  const paipanBase = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? 'http://127.0.0.1:8911' : '';
+  let data = null;
+  if (paipanBase) {
+    try {
+      const resp = await fetch(paipanBase + '/paipan?year=' + y + '&month=' + m + '&day=' + d + '&hour=' + h + '&sex=' + sex);
+      data = await resp.json();
+      if (data.error) data = null;
+    } catch(e) { data = null; }
+  }
+  // 后端不可用时用前端简易排盘
+  if (!data) {
+    data = _fePaipan(y, m, d, h);
+  }
+  
   try {
-    const paipanBase = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? 'http://127.0.0.1:8911' : '';
-    const resp = await fetch(paipanBase + '/paipan?year=' + y + '&month=' + m + '&day=' + d + '&hour=' + h + '&sex=' + sex);
-    const data = await resp.json();
-    if (data.error) { result.innerHTML = '排盘失败: ' + data.error; return; }
-    
     baziData = data;
     const p = data.pillars || {};
     const dm = data.day_master || '?';
