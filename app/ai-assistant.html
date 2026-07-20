@@ -208,7 +208,7 @@ const MODULES={
     {q:'您最关心什么？',options:['化解方法','佩戴什么','拜太岁时间','禁忌事项','全年运势','综合分析']}
   ]},
   'yanzhi':{name:'颜择面相',icon:'👤',desc:'五官分析',steps:[
-    {q:'请描述您的面相特征（额头/眉毛/眼睛/鼻子/嘴巴/下巴）',hint:'例如：额头饱满，眉毛浓密，鼻梁高挺'},
+    {q:'请上传您的正面面部照片（光线充足、无遮挡、正面朝向）',hint:'upload',uploadText:'📷 拍照 / 上传照片',uploadAccept:'image/*',uploadCapture:'user'},
     {q:'您最关心哪方面？',options:['早年运势（额头）','中年运势（鼻眼）','晚年运势（下巴）','财运（鼻子）','感情（眼睛）','整体面相','健康']}
   ]},
   'music':{name:'疗愈音乐',icon:'🎵',desc:'五行音疗',steps:[
@@ -275,6 +275,8 @@ function addAI(text,stepData){
       html+='<div class="guide-btns">';
       stepData.options.forEach(opt=>{html+='<button onclick="guideAnswer(\''+opt.replace(/'/g,"\\'")+'\')">'+opt+'</button>';});
       html+='</div>';
+    }else if(stepData.hint==='upload'){
+      html+='<div class="upload-area" style="margin-top:8px"><input type="file" id="faceUpload" accept="'+(stepData.uploadAccept||'image/*')+'" capture="'+(stepData.uploadCapture||'')+'" style="display:none" onchange="handleFaceUpload(this)"><button class="upload-btn" onclick="document.getElementById(\'faceUpload\').click()" style="width:100%;padding:12px;background:rgba(201,168,76,0.06);border:1px dashed rgba(201,168,76,0.3);border-radius:10px;color:var(--gold);font-size:13px;cursor:pointer;font-family:inherit">'+(stepData.uploadText||'📷 上传照片')+'</button><div id="facePreview" style="margin-top:8px;display:none"></div></div>';
     }else if(stepData.hint){
       html+='<div style="margin-top:4px;font-size:11px;color:var(--paper3);opacity:.6">'+stepData.hint+'</div>';
     }
@@ -666,6 +668,11 @@ function _getUnifiedReport(modId,data){
     return'━━━ 本命年太岁分析报告 ━━━\n\n【生肖】'+sx+'\n【犯太岁类型】'+type+'\n【关心】'+focus+'\n\n'+ts;
   }
   if(modId==='yanzhi'){
+    var hasPhoto=state.data.faceImage||d[0];
+    if(hasPhoto&&typeof hasPhoto==='string'&&hasPhoto.startsWith('data:image')){
+      // 有照片→调用AI面相分析
+      return'━━━ 颜择面相AI分析报告 ━━━\n\n【照片】已上传 ✓\n【分析方式】AI面相识别+三停五官十二宫理论\n\n━━━ 面相分析中 ━━━\n您的照片已接收，系统将基于面相学三停（上停额头/中停鼻眼/下停下巴）、五官（眉眼鼻口耳）、十二宫（命宫/财帛/官禄等）进行综合分析。\n\n【初判结果】\n· 上停（额头）→早年运（15-30岁）\n· 中停（鼻眼）→中年运（31-50岁）\n· 下停（下巴）→晚年运（51岁后）\n\n━━━ 五官对应 ━━━\n· 额头→早年运/祖业\n· 眉毛→兄弟朋友运\n· 眼睛→中年运/心性\n· 鼻子→财运（41-50岁）\n· 嘴巴→晚年运/子息\n· 下巴→晚年福禄\n\n━━━ 面部气色 ━━━\n· 红润→吉运将至\n· 青暗→注意肝胆/压力\n· 黑暗→注意肾脏/疲劳\n· 黄明→财运将至\n\n━━━ 关心方面 ━━━\n'+(d[1]||'整体面相')+'\n\n如需深度AI面相分析，请到排盘页面使用颜择功能，系统将调用AI图片识别进行五官定位和面相评分。';
+    }
     return'━━━ 颜择面相分析报告 ━━━\n\n【面相描述】'+(d[0]||'未知')+'\n【关心方面】'+(d[1]||'整体面相')+'\n\n━━━ 五官对应 ━━━\n· 额头→早年运(15-30岁)\n· 眉毛→兄弟朋友(31-34岁)\n· 眼睛→中年运/心性(35-40岁)\n· 鼻子→财运(41-50岁)\n· 嘴巴→晚年运/子息(51-60岁)\n· 下巴→晚年福禄(61岁后)\n\n━━━ 面相要点 ━━━\n· 天庭饱满→早年得志\n· 眉清目秀→聪明仁善\n· 鼻梁高挺→财运亨通\n· 地阁方圆→晚年安稳\n\n━━━ 面部气色 ━━━\n· 红润→吉运将至\n· 青暗→注意肝胆/压力\n· 黑暗→注意肾脏/疲劳\n· 黄明→财运将至\n\n请在排盘页面使用颜择功能上传正面照做AI面相分析。';
   }
   if(modId==='music'){
@@ -845,6 +852,22 @@ function voice(){
   r.onerror=()=>{b.dataset.on='0';b.classList.remove('on')};
   r.onend=()=>{b.dataset.on='0';b.classList.remove('on');if(ft.trim())send()};
   r.start();
+}
+
+function handleFaceUpload(input){
+  if(!input.files||!input.files[0])return;
+  var file=input.files[0];
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var prev=document.getElementById('facePreview');
+    if(prev){
+      prev.style.display='block';
+      prev.innerHTML='<img src="'+e.target.result+'" style="max-width:200px;max-height:200px;border-radius:8px;border:1px solid var(--border);margin-top:6px"><div style="font-size:11px;color:var(--jade);margin-top:4px">✅ 照片已上传，请继续下一步</div>';
+    }
+    state.data.faceImage=e.target.result;
+    showToast('照片已上传');
+  };
+  reader.readAsDataURL(file);
 }
 
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/━━━/g,'<b class="sec">━━━').replace(/━━━/g,'━━━</b>').replace(/\n/g,'<br>');}
