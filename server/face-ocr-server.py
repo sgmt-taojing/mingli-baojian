@@ -554,7 +554,9 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
-        body = json.dumps(payload, ensure_ascii=False).encode('utf-8')
+        # strict JSON: ensure_ascii=False 保留中文；allow_nan=False 禁止 NaN/Infinity
+        # 注意 json.dumps 默认会把字符串内的 \n 转义为 \\n，无需手动处理
+        body = json.dumps(payload, ensure_ascii=False, allow_nan=False).encode('utf-8')
         self.send_header('Content-Length', str(len(body)))
         self.end_headers()
         self.wfile.write(body)

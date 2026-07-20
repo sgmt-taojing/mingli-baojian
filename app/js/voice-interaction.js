@@ -120,6 +120,34 @@ window.stopVoiceInput = function(){
 
 window.isVoiceListening = function(){return isListening;};
 
+// ========== VoiceInteraction 桥接对象 ==========
+// 统一接口：ai-assistant.html 等页面通过 window.VoiceInteraction 调用
+window.VoiceInteraction = {
+  // STT：开始语音聆听
+  startListening: function(targetId, opts){
+    if(typeof targetId === 'string'){
+      window.startVoiceInput(targetId, opts);
+    } else {
+      // 无目标 → 语音命令模式
+      startVoiceCommand();
+    }
+  },
+  // STT：停止语音聆听
+  stopListening: function(){ window.stopVoiceInput(); },
+  // STT：是否正在聆听
+  isListening: function(){ return isListening; },
+  // TTS：朗读文字
+  speak: function(text, opts){ return window.speakText(text, opts); },
+  // TTS：停止朗读
+  stop: function(){ window.stopSpeak(); },
+  // TTS：是否正在播放
+  isPlaying: function(){ return currentAudio !== null; },
+  // TTS：设置声线
+  setVoice: function(v){ window.setVoice(v); },
+  // 停止所有（语音+TTS）
+  stopAll: function(){ window.stopVoiceInput(); window.stopSpeak(); }
+};
+
 // ========== 语音日期解析 ==========
 function parseVoiceDate(text){
   if(!text) return null;
