@@ -8153,6 +8153,8 @@ function exportCurrentSection() {
   let section = document.getElementById(sectionId);
   if (!section) { showToast('未找到对应内容'); return; }
   let html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>导出</title><style>body{font-family:sans-serif;max-width:800px;margin:0 auto;padding:20px;background:var(--ink);color:var(--paper)}h1{color:var(--gold)}</style></head><body>' + section.innerHTML + '<scr'+'ipt src="js/rbac-client.js"></scr'+'ipt>
+<!-- AI助手浮动按钮 -->
+<a href="ai-assistant.html" style="position:fixed;bottom:20px;right:20px;z-index:9999;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold3));display:flex;align-items:center;justify-content:center;font-size:24px;text-decoration:none;box-shadow:0 4px 16px rgba(201,168,76,0.3);transition:all .3s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">🤖</a>
 </body></html>';
   downloadBlob(html, '导出内容.html', 'text/html;charset=utf-8');
   showToast('已导出当前模块');

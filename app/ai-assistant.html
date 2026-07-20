@@ -106,6 +106,12 @@ body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',serif;
 <p>引导提问 · 语音输入 · 排盘解读 · 知识问答</p>
 </div>
 
+<!-- 今日黄历推送 -->
+<div class="paipan-box" id="almanacCard" style="border-color:rgba(201,168,76,0.2)">
+<div class="paipan-title">📅 今日黄历 · 每日推送</div>
+<div id="almanacContent" style="font-size:12px;line-height:1.8;color:var(--paper2)">加载中...</div>
+</div>
+
 <!-- 排盘区 -->
 <div class="paipan-box">
 <div class="paipan-title">🔮 生辰排盘（填写后AI可深度分析您的命理）</div>
@@ -479,8 +485,28 @@ function _localResponse(text, bazi) {
   return '您好！您可以问我：\n\n📅 命理排盘（需提供生辰）\n🌟 运势分析\n⚖️ 五行分析\n🏠 风水布局\n💊 中医养生\n🔮 奇门/紫微/六爻/梅花\n📅 择日择吉\n🪷 倪师中医\n\n或直接告诉我您的出生年月日时进行排盘。';
 }
 
+// 加载今日黄历
+async function loadAlmanac() {
+  const ab = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? 'http://127.0.0.1:8920' : '';
+  try {
+    const resp = await fetch(ab + '/api/public/latest-pushes');
+    const pushes = await resp.json();
+    if (Array.isArray(pushes) && pushes.length > 0) {
+      const typeMap = { daily_fortune: '运势', health_tip: '养生', festival_reminder: '节日', case_update: '通知' };
+      var html = pushes.slice(0, 3).map(function(p) {
+        return '<span style="color:var(--gold)">[' + (typeMap[p.push_type]||p.push_type) + ']</span> ' + p.content;
+      }).join('<br>');
+      document.getElementById('almanacContent').innerHTML = html;
+      return;
+    }
+  } catch(e) {}
+  // 降级
+  document.getElementById('almanacContent').innerHTML = '<span style="color:var(--gold)">[运势]</span> 今日宜祭祀、祈福<br><span style="color:var(--gold)">[养生]</span> 顺应四时，子时前入睡<br><span style="color:var(--gold)">[提醒]</span> 可填写下方生辰排盘获取个性化运势';
+}
+
 // 初始化
 renderGuideTags();
+loadAlmanac();
 </script>
 </body>
 </html>
