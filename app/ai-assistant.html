@@ -843,15 +843,56 @@ function local(text){
 
 function voice(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){toast('请用Chrome或Safari');return}
-  const b=mic;if(b.dataset.on==='1'){if(window._r)window._r.stop();return}
-  b.dataset.on='1';b.classList.add('on');
-  const r=new SR();window._r=r;r.lang='zh-CN';r.continuous=false;r.interimResults=true;
+  if(!SR){
+    toast('您的浏览器不支持语音输入，请用Chrome或Safari打开');
+    return;
+  }
+  const b=mic;
+  if(b.dataset.on==='1'){if(window._r)window._r.stop();return}
+  
+  // 立即给视觉反馈
+  b.dataset.on='1';b.classList.add('on');b.textContent='🔴';
+  toast('🎤 正在聆听...请说话');
+  
+  const r=new SR();window._r=r;
+  r.lang='zh-CN';r.continuous=false;r.interimResults=true;
   let ft='';
-  r.onresult=e=>{let im='';for(let i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)ft+=e.results[i][0].transcript;else im+=e.results[i][0].transcript;}box.value=ft+im};
-  r.onerror=()=>{b.dataset.on='0';b.classList.remove('on')};
-  r.onend=()=>{b.dataset.on='0';b.classList.remove('on');if(ft.trim())send()};
-  r.start();
+  
+  r.onstart=()=>{
+    b.dataset.on='1';b.classList.add('on');b.textContent='🔴';
+  };
+  
+  r.onresult=e=>{
+    let im='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal)ft+=e.results[i][0].transcript;
+      else im+=e.results[i][0].transcript;
+    }
+    box.value=ft+im;
+  };
+  
+  r.onerror=(e)=>{
+    b.dataset.on='0';b.classList.remove('on');b.textContent='🎤';
+    var errMsg='语音识别失败';
+    if(e.error==='not-allowed')errMsg='麦克风权限被拒绝，请在浏览器设置中允许';
+    else if(e.error==='no-speech')errMsg='未检测到语音，请重试';
+    else if(e.error==='network')errMsg='网络错误，请检查连接';
+    else if(e.error==='aborted')errMsg=''; // 用户主动取消，不提示
+    else errMsg='语音识别出错：'+e.error;
+    if(errMsg)toast(errMsg);
+  };
+  
+  r.onend=()=>{
+    b.dataset.on='0';b.classList.remove('on');b.textContent='🎤';
+    if(ft.trim())send();
+  };
+  
+  try{
+    r.start();
+  }catch(e){
+    b.dataset.on='0';b.classList.remove('on');b.textContent='🎤';
+    toast('无法启动语音识别，请重试');
+  }
 }
 
 function handleFaceUpload(input){
