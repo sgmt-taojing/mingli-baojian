@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="theme-color" content="#080808">
+<title>我的助手 · 易道智鉴</title>
+<style>
+:root{--ink:#080808;--ink2:#111;--paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;--gold:#c9a84c;--gold2:#e8cc7a;--jade:#27ae60;--cyan:#2980b9;--cinn:#c0392b;--border:rgba(201,168,76,.15)}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow-x:hidden;font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--ink);color:var(--paper)}
+.top{position:sticky;top:0;background:rgba(8,8,8,0.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 18px;display:flex;align-items:center;gap:12px;z-index:10}
+.top h1{font-size:18px;color:var(--gold);letter-spacing:4px}
+.tabs{display:flex;background:var(--ink2);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:14px 18px;color:var(--paper3);font-size:13px;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+.tab.on{color:var(--gold);border-bottom-color:var(--gold)}
+.body{padding:18px;max-width:760px;margin:0 auto}
+.card{background:var(--ink2);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+.card h3{font-size:15px;color:var(--gold);margin-bottom:10px;letter-spacing:1px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.row:last-child{border-bottom:none}
+.row .label{color:var(--paper3)}
+.row .val{color:var(--paper);font-weight:500}
+.btn{padding:8px 18px;font-size:13px;border:1px solid var(--gold);border-radius:8px;background:transparent;color:var(--gold);cursor:pointer}
+.btn:hover{background:var(--gold);color:var(--ink)}
+.empty{text-align:center;padding:40px 20px;color:var(--paper3);font-size:13px}
+.point{font-size:32px;color:var(--gold);font-weight:600;text-align:center;padding:20px}
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.stat-grid .s{background:var(--ink2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.stat-grid .s .n{font-size:24px;color:var(--gold);font-weight:600}
+.stat-grid .s .l{font-size:11px;color:var(--paper3);margin-top:4px}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--ink2);color:var(--paper);padding:10px 20px;border-radius:10px;border:1px solid var(--gold);z-index:1000;animation:slideUp .3s}
+@keyframes slideUp{from{opacity:0;transform:translate(-50%,20px)}to{opacity:1;transform:translate(-50%,0)}}
+.loading{text-align:center;padding:20px;color:var(--paper3);font-size:12px}
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>我的助手</h1>
+  <div style="flex:1"></div>
+  <a href="ai-assistant.html" style="font-size:12px;color:var(--gold);text-decoration:none">🤖 AI 助手</a>
+</div>
+
+<div class="tabs">
+  <div class="tab on" data-tab="profile">👤 个人</div>
+  <div class="tab" data-tab="yuanzhu">🧙 助手</div>
+  <div class="tab" data-tab="push">📨 推送</div>
+  <div class="tab" data-tab="points">🎯 积分</div>
+  <div class="tab" data-tab="reports">📋 病历</div>
+  <div class="tab" data-tab="shop">🛍️ 商城</div>
+  <div class="tab" data-tab="kb">📚 知识</div>
+</div>
+
+<div class="body">
+  <div id="content"><div class="loading">加载中...</div></div>
+</div>
+
+<script>
+const API = (location.hostname==='127.0.0.1'||location.hostname==='localhost') ? 'http://127.0.0.1:8920' : '';
+let token = localStorage.getItem('mlbj_token') || '';
+let user = null;
+
+function toast(msg){
+  const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2000);
+}
+
+async function api(path, opts={}){
+  const hdr = Object.assign({'Content-Type':'application/json'}, opts.headers||{});
+  if(token) hdr['Authorization'] = '***' + token;
+  try{
+    const r = await fetch(API + path, Object.assign({method:'GET',headers:hdr}, opts));
+    return await r.json();
+  }catch(e){return {error:e.message};}
+}
+
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on', t.dataset.tab===name));
+  loadTab(name);
+}
+
+async function loadTab(name){
+  const c = document.getElementById('content');
+  c.innerHTML = '<div class="loading">加载中...</div>';
+  switch(name){
+    case 'profile': return renderProfile(c);
+    case 'yuanzhu': return renderYuanzhu(c);
+    case 'push': return renderPush(c);
+    case 'points': return renderPoints(c);
+    case 'reports': return renderReports(c);
+    case 'shop': return renderShop(c);
+    case 'kb': return renderKb(c);
+  }
+}
+
+async function renderProfile(c){
+  if(!token){
+    c.innerHTML = `<div class="card"><h3>👤 登录</h3>
+      <input id="phone" placeholder="手机号" style="width:100%;padding:10px;background:var(--ink3);border:1px solid var(--border);border-radius:8px;color:var(--paper);margin-bottom:10px">
+      <button class="btn" style="width:100%" onclick="login()">登录 / 注册</button></div>`;
+    return;
+  }
+  const r = await api('/api/yuanzhu/profile');
+  if(r.error){c.innerHTML = `<div class="empty">${r.error}</div>`;return;}
+  user = r;
+  c.innerHTML = `
+    <div class="card"><h3>👤 个人中心</h3>
+      <div class="row"><span class="label">手机号</span><span class="val">${r.phone||'-'}</span></div>
+      <div class="row"><span class="label">昵称</span><span class="val">${r.nickname||'-'}</span></div>
+      <div class="row"><span class="label">角色</span><span class="val">${(r.roles||[]).join(',')||'用户'}</span></div>
+      <div class="row"><span class="label">积分</span><span class="val">${r.points||0}</span></div>
+      <div class="row"><span class="label">注册时间</span><span class="val">${r.createdAt?new Date(r.createdAt).toLocaleDateString('zh-CN'):'-'}</span></div>
+    </div>
+    <button class="btn" style="width:100%" onclick="logout()">退出登录</button>
+  `;
+}
+
+async function renderYuanzhu(c){
+  const r = await api('/api/yuanzhu/list');
+  if(r.error || !r.list){c.innerHTML = `<div class="empty">未登录或接口未开放</div>`;return;}
+  const list = r.list || [];
+  if(!list.length){c.innerHTML = `<div class="empty">暂无专属助手，<a href="ai-assistant.html" style="color:var(--gold)">先去 AI 助手创建</a></div>`;return;}
+  c.innerHTML = `<div class="card"><h3>🧙 我的助手 (${list.length})</h3>` +
+    list.map(y=>`<div class="row"><span class="label">${y.name}</span><span class="val">${y.style||''}</span></div>`).join('') +
+    `</div>`;
+}
+
+async function renderPush(c){
+  const r = await api('/api/yuanzhu/yearly-pushes');
+  if(r.error){c.innerHTML = `<div class="empty">${r.error}</div>`;return;}
+  const list = (r.pushes||[]).slice(0,20);
+  if(!list.length){
+    // 公开接口
+    const pub = await api('/api/public/latest-pushes');
+    if(pub && pub.pushes){
+      c.innerHTML = `<div class="card"><h3>📨 最新推送</h3>` +
+        pub.pushes.slice(0,10).map(p=>`<div class="row"><span class="label">${(p.title||'').substring(0,30)}</span><span class="val">${p.date||''}</span></div>`).join('') +
+        `</div>`;
+      return;
+    }
+    c.innerHTML = `<div class="empty">暂无推送</div>`;
+    return;
+  }
+  c.innerHTML = `<div class="card"><h3>📨 我的年度推送 (${list.length})</h3>` +
+    list.map(p=>`<div class="row"><span class="label">${(p.title||'').substring(0,30)}</span><span class="val">${(p.createdAt||'').substring(0,10)}</span></div>`).join('') +
+    `</div>`;
+}
+
+async function renderPoints(c){
+  const r = await api('/api/feedback/points');
+  c.innerHTML = `
+    <div class="card">
+      <div class="point">${(r&&r.total)||0}</div>
+      <div style="text-align:center;color:var(--paper3);font-size:12px">总积分</div>
+    </div>
+    <div class="stat-grid">
+      <div class="s"><div class="n">${(r&&r.today)||0}</div><div class="l">今日获得</div></div>
+      <div class="s"><div class="n">${(r&&r.week)||0}</div><div class="l">本周获得</div></div>
+      <div class="s"><div class="n">${(r&&r.month)||0}</div><div class="l">本月获得</div></div>
+      <div class="s"><div class="n">${(r&&r.history)||0}</div><div class="l">历史提交</div></div>
+    </div>
+  `;
+}
+
+async function renderReports(c){
+  const r = await api('/api/clinic/my-reports');
+  if(r.error){c.innerHTML = `<div class="empty">${r.error==='未登录'?'请先登录':'暂无病历'}，<a href="tcm-clinic.html" style="color:var(--gold)">去中医诊所</a></div>`;return;}
+  const list = r.reports || [];
+  if(!list.length){c.innerHTML = `<div class="empty">暂无病历报告，<a href="tcm-clinic.html" style="color:var(--gold)">提交一份</a></div>`;return;}
+  c.innerHTML = `<div class="card"><h3>📋 我的病历报告 (${list.length})</h3>` +
+    list.slice(0,10).map(rep=>`<div class="row"><span class="label">${(rep.diagnosis||rep.title||'').substring(0,30)}</span><span class="val">${(rep.createdAt||'').substring(0,10)}</span></div>`).join('') +
+    `</div>`;
+}
+
+async function renderShop(c){
+  const r = await api('/api/shop/products');
+  const list = (r&&r.products)||[];
+  if(!list.length){c.innerHTML = `<div class="empty">商城暂未开放</div>`;return;}
+  c.innerHTML = `<div class="card"><h3>🛍️ 商品列表 (${list.length})</h3>` +
+    list.slice(0,20).map(p=>`<div class="row"><span class="label">${p.name}</span><span class="val">¥${p.price||0}</span></div>`).join('') +
+    `</div>`;
+}
+
+async function renderKb(c){
+  const r = await api('/api/kb/list');
+  if(r.error){
+    // 兜底：直接列出项目 KB
+    const fallback = [
+      {name:'倪海厦中医课程',modules:34,chars:151135},
+      {name:'舒晗奇门遁甲课程',modules:32,chars:151135},
+      {name:'中医诊断',modules:'-',chars:'-'},
+      {name:'中医名方',modules:'-',chars:'-'},
+    ];
+    c.innerHTML = `<div class="card"><h3>📚 知识库（${fallback.length} 套）</h3>` +
+      fallback.map(k=>`<div class="row"><span class="label">${k.name}</span><span class="val">${k.modules} 模块</span></div>`).join('') +
+      `</div>`;
+    return;
+  }
+  const list = r.kb || [];
+  c.innerHTML = `<div class="card"><h3>📚 知识库（${list.length} 套）</h3>` +
+    list.map(k=>`<div class="row"><span class="label">${k.name}</span><span class="val">${k.modules||'-'} 模块</span></div>`).join('') +
+    `</div>`;
+}
+
+async function login(){
+  const phone = document.getElementById('phone').value.trim();
+  if(phone.length<11){toast('手机号不正确');return;}
+  const r = await api('/api/user/login', {method:'POST', body:JSON.stringify({phone})});
+  if(r && r.token){token=r.token;localStorage.setItem('mlbj_token',token);toast('登录成功');loadTab('profile');}
+  else{toast((r&&r.error)||'登录失败');}
+}
+
+function logout(){localStorage.removeItem('mlbj_token');token='';loadTab('profile');toast('已退出');}
+
+// 绑定 tabs
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>switchTab(t.dataset.tab)));
+
+// 启动
+loadTab('profile');
+</script>
+</body>
+</html>

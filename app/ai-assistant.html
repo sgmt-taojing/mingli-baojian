@@ -155,6 +155,81 @@ let hist=[];
 let state={module:null,step:0,data:{},reporting:false};
 
 // === 模块定义 ===
+
+// ═══════════════════════════════════════════════
+// KB 优先双路径（P0-任务1）
+// 命中分 ≥ 0.7 → KB 直答；0.4-0.7 → KB+AI 润色；< 0.4 → AI+KB 兜底
+// ═══════════════════════════════════════════════
+const KB_SOURCES = [
+  {name:'NIHAISHA_KB', obj:()=>window.NIHAISHA_KB, mods:['zhongyi','lifeindex','lifeplan'], weight:1.0},
+  {name:'SHUHAN_KB', obj:()=>window.SHUHAN_KB, mods:['bazi','qimen','fengshui','yunshi','caiyun','shiye','ganqing'], weight:1.0},
+  {name:'YANZHI_KB', obj:()=>window.YANZHI_KB, mods:['yanzhi'], weight:1.0},
+  {name:'TCM_KB', obj:()=>window.TCM_KB, mods:['zhongyi'], weight:0.8},
+];
+
+function _kbScore(moduleId, data){
+  // 计算每个 KB 源的命中分
+  let best = {source:null, score:0, snippet:''};
+  for(const src of KB_SOURCES){
+    if(!src.mods.includes(moduleId)) continue;
+    const kb = src.obj();
+    if(!kb) continue;
+    // 收集用户输入文本
+    const userInput = Object.values(data||{}).join(' ').toLowerCase();
+    if(!userInput) continue;
+    // 在 KB 中搜索匹配关键词
+    let hits = 0;
+    let snippet = '';
+    const keywords = userInput.split(/[\s,，。、；;：:（）()\[\]\-]+/).filter(s=>s.length>=2);
+    // 遍历 KB 顶层模块
+    function walk(obj, path){
+      if(typeof obj === 'string'){
+        let matched = 0;
+        for(const kw of keywords){
+          if(obj.includes(kw)) matched++;
+        }
+        if(matched > hits){
+          hits = matched;
+          snippet = obj.substring(0, 2000);
+        }
+      } else if(typeof obj === 'object' && obj !== null && path.length < 4){
+        for(const k in obj){
+          if(k.startsWith('_') || k === 'meta') continue;
+          walk(obj[k], path.concat(k));
+        }
+      }
+    }
+    walk(kb, []);
+    // 命中分 = (命中关键词数 / 总关键词数) * weight
+    const score = Math.min(1.0, (hits / Math.max(1, keywords.length)) * 1.5) * src.weight;
+    if(score > best.score){
+      best = {source:src.name, score:Math.round(score*100)/100, snippet};
+    }
+  }
+  return best;
+}
+
+function _kbHitCount(moduleId){
+  const key = '_kb_hit_count/' + moduleId;
+  const n = parseInt(localStorage.getItem(key) || '0') + 1;
+  localStorage.setItem(key, String(n));
+  return n;
+}
+
+function _kbTodayCount(){
+  const today = new Date().toDateString();
+  const key = '_kb_hit_today';
+  const data = JSON.parse(localStorage.getItem(key) || '{}');
+  if(data.date !== today){
+    data.date = today;
+    data.count = 0;
+  }
+  data.count++;
+  localStorage.setItem(key, JSON.stringify(data));
+  return data.count;
+}
+
+
 const MODULES={
   'bazi':{name:'八字排盘',icon:'📅',desc:'命理分析',steps:[
     {q:'请提供您的出生年月日时和性别',hint:'例如：1985年3月22日8时 女'},
@@ -316,7 +391,14 @@ function showWelcome(){
   chat.innerHTML='';
   let html='<div class="welcome"><div class="logo">🤖</div><h2>AI命理助手</h2><div class="sub">选择您想咨询的领域，我将通过对话收集信息后给出专业分析报告</div><div class="modules">';
   ALL_MODS.forEach(m=>{html+='<div class="mod" onclick="startModule(\''+m.id+'\')"><div class="mi">'+m.icon+'</div><div class="mt">'+m.name+'</div></div>';});
-  html+='</div></div>';
+  html+='</div>';
+  // 显示今日 KB 直答数
+  const todayKey='_kb_hit_today';
+  const td=JSON.parse(localStorage.getItem(todayKey)||'{}');
+  if(td.date===new Date().toDateString()&&td.count>0){
+    html+='<div style="text-align:center;margin-top:8px;font-size:11px;color:var(--paper3)">📊 今日 KB 直答 '+td.count+' 次</div>';
+  }
+  html+='</div>';
   chat.innerHTML=html;
 }
 
@@ -446,25 +528,46 @@ async function typing(){
 async function generateReport(){
   const mod=MODULES[state.module];
   const collected=Object.values(state.data);
-  
-  // 调用后端AI生成报告
-  const prompt='用户选择了「'+mod.name+'」模块，通过对话收集了以下信息：'+collected.join('；')+'。请基于以上信息给出专业、丰富、详实的分析评估报告，报告要拿来即用，包含具体建议。';
-  
+
+  // ① KB 优先：先查本地知识库
+  const kbHit = _kbScore(state.module, state.data);
+  _kbHitCount(state.module);
+  _kbTodayCount();
+
+  if(kbHit.score >= 0.7){
+    // KB 直答
+    const kbReport = '【来源：本地知识库（'+kbHit.source+'，命中分 '+kbHit.score+'）】\n\n' + kbHit.snippet.substring(0, 4000);
+    showReport(kbReport);
+    autoSavePaipan(kbReport);
+    return;
+  }
+
+  // ② KB 摘要 + AI 润色（命中分 0.4-0.7）
+  let promptExtra = '';
+  if(kbHit.score >= 0.4){
+    promptExtra = '\n\n【本地知识库参考材料（'+kbHit.source+'）】\n' + kbHit.snippet.substring(0, 1500);
+  }
+
+  // ③ 调用后端 AI
+  const prompt='用户选择了「'+mod.name+'」模块，通过对话收集了以下信息：'+collected.join('；')+'。请基于以上信息给出专业、丰富、详实的分析评估报告，报告要拿来即用，包含具体建议。'+promptExtra;
+
   try{
     const r=await fetch(API+'/api/ai/public-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[...hist.slice(-8),{role:'user',content:prompt}]})});
     const d=await r.json();
     const reply=(d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||'';
     if(reply.length>50){
-      showReport(reply);
-      autoSavePaipan(reply);
+      const tagged = kbHit.score >= 0.4 ? '【来源：KB+AI 润色（'+kbHit.source+'）】\n\n'+reply : reply;
+      showReport(tagged);
+      autoSavePaipan(tagged);
       return;
     }
   }catch(e){}
 
-  // 降级：本地生成报告
+  // ④ 降级：本地生成报告
   const local=localReport(state.module,state.data);
-  showReport(local);
-  autoSavePaipan(local);
+  const fallback = '【来源：本地引擎】\n\n' + local;
+  showReport(fallback);
+  autoSavePaipan(fallback);
 }
 
 // 自动将本次排盘同步到后端画像(静默失败，不影响前端体验)
