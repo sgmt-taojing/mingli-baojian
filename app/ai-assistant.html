@@ -119,6 +119,13 @@ body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',serif;
 <div class="qcard" onclick="quickAsk('感情','感情婚姻分析')"><div class="qi">💕</div><div class="qt">感情婚姻</div><div class="qd">桃花正缘</div></div>
 <div class="qcard" onclick="quickAsk('财运','财运分析')"><div class="qi">💰</div><div class="qt">财运投资</div><div class="qd">理财方向</div></div>
 <div class="qcard" onclick="quickAsk('事业','事业方向分析')"><div class="qi">💼</div><div class="qt">事业职场</div><div class="qd">创业跳槽</div></div>
+<div class="qcard" onclick="quickAsk('姓名','姓名吉凶分析')"><div class="qi">✏️</div><div class="qt">姓名分析</div><div class="qd">三才五格</div></div>
+<div class="qcard" onclick="quickAsk('太岁','本命年犯太岁化解')"><div class="qi">🐉</div><div class="qt">太岁化解</div><div class="qd">犯太岁化煞</div></div>
+<div class="qcard" onclick="quickAsk('五行','五行缺什么怎么补')"><div class="qi">⚖️</div><div class="qt">五行分析</div><div class="qd">缺行补救</div></div>
+<div class="qcard" onclick="quickAsk('合婚','合婚配对分析')"><div class="qi">💝</div><div class="qt">合婚配对</div><div class="qd">生肖配对</div></div>
+<div class="qcard" onclick="quickAsk('开运','开运吉祥物建议')"><div class="qi">🔑</div><div class="qt">开运转运</div><div class="qd">吉祥物佩戴</div></div>
+<div class="qcard" onclick="quickAsk('梦境','梦境解读')"><div class="qi">💭</div><div class="qt">梦境解读</div><div class="qd">周公解梦</div></div>
+<div class="qcard" onclick="quickAsk('体质','体质调理方案')"><div class="qi">🧬</div><div class="qt">体质调理</div><div class="qd">五行体质</div></div>
 </div>
 </div>
 </div>
@@ -139,15 +146,22 @@ let baziData = null;
 
 // === 追问建议库 ===
 const FOLLOWUPS = {
-  '排盘': ['分析五行强弱','大运走势如何？','格局层次分析','用神是什么？','流年运势预测'],
-  '运势': ['事业运详细分析','财运详细分析','感情运详细分析','健康运预测','明年运势'],
-  '风水': ['卧室风水讲究','财位在哪里？','化煞方法','办公室风水','楼层选择'],
-  '中医': ['失眠调理方案','脾胃怎么养？','湿气重怎么办？','四季养生建议','穴位按摩'],
-  '手机号': ['换什么尾号好？','号码五行分析','选号建议','八字配号'],
-  '感情': ['桃花星分析','正缘什么时候到？','合婚配对','感情调理方法'],
-  '财运': ['理财方向建议','什么时候发财？','破财怎么防？','招财方位'],
-  '事业': ['适合什么行业？','创业时机分析','跳槽建议','升职运势'],
-  'default': ['排盘分析命理','今年运势如何','风水布局建议','中医养生建议','手机号码分析']
+  '排盘': ['分析五行强弱','大运走势如何？','格局层次分析','用神是什么？','流年运势预测','开运化解方案'],
+  '运势': ['事业运详细分析','财运详细分析','感情运详细分析','健康运预测','明年运势','大运交接注意'],
+  '风水': ['卧室风水讲究','财位在哪里？','化煞方法','家庭风水','楼层选择','办公室风水'],
+  '中医': ['失眠调理方案','脾胃怎么养？','湿气重怎么办？','四季养生建议','穴位按摩','体质测试'],
+  '手机号': ['换什么尾号好？','号码五行分析','选号建议','八字配号','吉星组合推荐'],
+  '感情': ['桃花星分析','正缘什么时候到？','合婚配对','感情调理方法','婚姻宫分析'],
+  '财运': ['理财方向建议','什么时候发财？','破财怎么防？','招财方位','投资时机'],
+  '事业': ['适合什么行业？','创业时机分析','跳槽建议','升职运势','合伙注意事项'],
+  '姓名': ['名字五行分析','改名建议','公司起名','三才五格详解'],
+  '太岁': ['2026年哪些生肖犯太岁？','太岁符怎么用？','拜太岁时间','犯太岁禁忌'],
+  '五行': ['金木水火土对应什么？','缺火怎么补？','五行相生相克','五行与职业'],
+  '合婚': ['生肖配对表','日柱天合地合','双方五行互补','婚姻宫分析'],
+  '开运': ['佩戴什么吉祥物？','本命佛是什么？','开运方位','颜色开运'],
+  '梦境': ['梦见水什么意思？','梦见动物解读','噩梦怎么办？','梦境与五行'],
+  '体质': ['木型体质怎么调？','体质测试','五行食疗','穴位养生'],
+  'default': ['排盘分析命理','今年运势如何','风水布局建议','中医养生建议','手机号码分析','姓名吉凶分析']
 };
 
 function quickAsk(topic, q) { sendMsg(q); }
