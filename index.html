@@ -5,73 +5,77 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>命理宝鉴 · 易道智鉴</title>
 <style>
-:root{
-  --ink:#080808;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;
-  --paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;
-  --gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;
-  --cinn:#c0392b;--cinn2:#e74c3c;
-  --jade:#27ae60;--cyan:#2980b9;--cyan2:#5dade2;
-  --border:rgba(201,168,76,.15);
-  --bg:#080808;--card:rgba(255,255,255,0.04);--card2:rgba(255,255,255,0.06);
-}
+:root{--ink:#080808;--ink2:#111;--ink3:#1a1a1a;--paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;--gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;--border:rgba(201,168,76,.15);--bg:#080808;--card:rgba(255,255,255,0.04);--card2:rgba(255,255,255,0.06);--jade:#27ae60}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--paper);font-family:'Noto Serif SC',serif;min-height:100vh}
 .bg-deco{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(201,168,76,0.04) 0%,transparent 60%)}
 .container{max-width:960px;margin:0 auto;padding:20px;position:relative;z-index:1}
-/* 顶部品牌 */
-.brand{text-align:center;margin-bottom:24px}
+.brand{text-align:center;margin-bottom:20px}
 .brand h1{font-size:28px;color:var(--gold);letter-spacing:8px;margin-bottom:6px}
 .brand p{color:var(--paper3);font-size:12px;letter-spacing:3px;opacity:.7}
 .brand .date{color:var(--gold3);font-size:12px;margin-top:4px}
-/* 活数据指标条 */
-.metrics{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:20px}
-.metric{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 12px;text-align:center;transition:all .3s}
-.metric:hover{border-color:rgba(201,168,76,.3);background:var(--card2)}
-.metric-val{font-size:24px;color:var(--gold);font-weight:700;line-height:1.2}
-.metric-label{font-size:11px;color:var(--paper3);margin-top:4px;letter-spacing:1px}
-.metric-sub{font-size:10px;color:var(--gold3);margin-top:2px}
+
+/* AI对话窗口——首页内嵌 */
+.ai-window{background:var(--card);border:1px solid var(--border);border-radius:16px;margin-bottom:20px;overflow:hidden;max-width:600px;margin-left:auto;margin-right:auto}
+.ai-header{background:rgba(201,168,76,0.06);padding:12px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
+.ai-header .ai-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold3));display:flex;align-items:center;justify-content:center;font-size:16px}
+.ai-header .ai-name{font-size:14px;color:var(--gold);font-weight:600}
+.ai-header .ai-status{font-size:10px;color:var(--jade);margin-left:auto;display:flex;align-items:center;gap:4px}
+.ai-header .ai-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--jade);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.ai-chat{height:320px;overflow-y:auto;padding:16px;scroll-behavior:smooth}
+.ai-chat::-webkit-scrollbar{width:4px}
+.ai-chat::-webkit-scrollbar-thumb{background:rgba(201,168,76,0.2);border-radius:2px}
+.ai-welcome{text-align:center;padding:30px 12px}
+.ai-welcome .emoji{font-size:36px;margin-bottom:8px}
+.ai-welcome .title{font-size:15px;color:var(--gold);margin-bottom:4px}
+.ai-welcome .desc{font-size:12px;color:var(--paper3);line-height:1.6}
+.ai-msg{margin-bottom:12px;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.ai-msg-user{display:flex;justify-content:flex-end}
+.ai-msg-user .b{background:rgba(201,168,76,0.1);border-radius:12px 12px 4px 12px;padding:8px 14px;max-width:85%;font-size:13px;line-height:1.7;white-space:pre-wrap}
+.ai-msg-bot .head{font-size:11px;color:var(--gold);margin-bottom:3px}
+.ai-msg-bot .b{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:4px 12px 12px 12px;padding:10px 14px;max-width:90%;font-size:13px;line-height:1.8;white-space:pre-wrap;word-break:break-word}
+.ai-msg-bot .b b{color:var(--gold2)}
+.ai-msg-bot .tools{margin-top:6px;display:flex;gap:6px;flex-wrap:wrap}
+.ai-msg-bot .tools button{font-size:10px;color:var(--paper3);cursor:pointer;padding:2px 8px;border:1px solid var(--border);border-radius:10px;background:none}
+.ai-msg-bot .tools button:hover{color:var(--gold)}
+.ai-msg-bot .fu{margin-top:6px;display:flex;gap:4px;flex-wrap:wrap}
+.ai-msg-bot .fu span{padding:3px 10px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.12);border-radius:12px;color:var(--gold);font-size:11px;cursor:pointer}
+.ai-msg-bot .fu span:hover{background:rgba(201,168,76,0.15)}
+.ai-msg-bot .more{margin-top:6px;font-size:11px;color:var(--paper3);text-align:center;opacity:.6}
+.typing{display:inline-flex;gap:3px;align-items:center;padding:8px}
+.typing span{width:6px;height:6px;background:var(--gold);border-radius:50%;animation:blink 1s infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
+.ai-input{border-top:1px solid var(--border);padding:10px 12px;display:flex;gap:8px;align-items:center;background:rgba(0,0,0,0.15)}
+.ai-input input{flex:1;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:20px;padding:9px 14px;color:var(--paper);font-size:13px;font-family:inherit;outline:none}
+.ai-input input:focus{border-color:rgba(201,168,76,0.3)}
+.ai-input input::placeholder{color:var(--paper3);opacity:.6}
+.ai-input .send{width:36px;height:36px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--gold),var(--gold3));color:var(--ink);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ai-services{padding:6px 12px 10px;display:flex;gap:4px;flex-wrap:wrap;border-top:1px solid rgba(201,168,76,0.06)}
+.ai-svc{font-size:10px;color:var(--paper3);padding:2px 8px;background:rgba(255,255,255,0.02);border-radius:8px;cursor:pointer;transition:all .2s}
+.ai-svc:hover{color:var(--gold);background:rgba(201,168,76,0.06)}
+
+/* 指标条 */
+.metrics{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-bottom:16px}
+.metric{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center}
+.metric-val{font-size:20px;color:var(--gold);font-weight:700}
+.metric-label{font-size:10px;color:var(--paper3);margin-top:2px}
+.metric-sub{font-size:9px;color:var(--gold3);margin-top:1px}
+
 /* 卡片入口 */
-.section-title{color:var(--gold);font-size:14px;letter-spacing:3px;margin:20px 0 12px;padding-left:4px;border-left:3px solid var(--gold);padding-left:10px}
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
-.card{display:block;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px 18px;text-decoration:none;transition:all .3s;position:relative;overflow:hidden}
-.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0;transition:opacity .3s}
-.card:hover{border-color:rgba(201,168,76,.3);transform:translateY(-3px);background:var(--card2)}
-.card:hover::before{opacity:1}
-.card-icon{font-size:32px;margin-bottom:10px;line-height:1}
-.card-title{color:var(--gold);font-size:15px;font-weight:700;letter-spacing:2px;margin-bottom:4px}
-.card-desc{color:var(--paper3);font-size:11px;line-height:1.6;opacity:.7}
-.card-badge{position:absolute;top:10px;right:10px;font-size:10px;padding:2px 8px;border-radius:8px;background:rgba(39,174,96,0.15);color:var(--jade)}
-/* 诊疗流程面板 */
-.flow-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px}
-.flow-panel-title{color:var(--gold);font-size:13px;letter-spacing:2px;margin-bottom:12px}
-.flow-steps{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.flow-step{flex:1;min-width:100px;text-align:center;padding:10px 8px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(201,168,76,0.08)}
-.flow-step-num{width:24px;height:24px;border-radius:50%;background:rgba(201,168,76,0.15);color:var(--gold);font-size:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 6px}
-.flow-step-title{font-size:11px;color:var(--paper);margin-bottom:2px}
-.flow-step-count{font-size:16px;color:var(--gold);font-weight:700}
-.flow-step-desc{font-size:10px;color:var(--paper3)}
-.flow-arrow{color:var(--gold3);font-size:14px}
-/* 最新动态 */
-.activity{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px}
-.activity-title{color:var(--gold);font-size:13px;letter-spacing:2px;margin-bottom:12px}
-.activity-list{list-style:none}
-.activity-item{padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:12px;color:var(--paper2);display:flex;justify-content:space-between;align-items:center}
-.activity-item:last-child{border-bottom:none}
-.activity-tag{font-size:10px;padding:2px 8px;border-radius:6px;margin-right:8px}
-.tag-completed{background:rgba(39,174,96,0.15);color:var(--jade)}
-.tag-submitted{background:rgba(201,168,76,0.15);color:var(--gold)}
-.tag-draft{background:rgba(160,144,128,0.15);color:var(--paper3)}
-/* 推送卡片 */
-.push-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px}
-.push-title{color:var(--gold);font-size:13px;letter-spacing:2px;margin-bottom:12px}
-.push-item{padding:8px 12px;background:rgba(255,255,255,0.02);border-radius:8px;margin-bottom:6px;font-size:12px;color:var(--paper2)}
-.push-item:last-child{margin-bottom:0}
-.push-type{font-size:10px;color:var(--gold3);margin-right:6px}
-/* 底部 */
-.footer{text-align:center;color:var(--paper3);font-size:11px;opacity:.4;margin-top:20px;padding:12px}
-/* 响应式 */
-@media(max-width:1200px){.container{max-width:90%}}
-@media(max-width:768px){.cards{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}.brand h1{font-size:22px;letter-spacing:4px}.flow-steps{flex-direction:column}}
+.section-title{color:var(--gold);font-size:13px;letter-spacing:2px;margin:16px 0 10px;padding-left:10px;border-left:3px solid var(--gold)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.card{display:block;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px 14px;text-decoration:none;transition:all .3s}
+.card:hover{border-color:rgba(201,168,76,.3);transform:translateY(-2px);background:var(--card2)}
+.card-icon{font-size:28px;margin-bottom:8px}
+.card-title{color:var(--gold);font-size:14px;font-weight:700;margin-bottom:3px}
+.card-desc{color:var(--paper3);font-size:10px;line-height:1.5;opacity:.7}
+.footer{text-align:center;color:var(--paper3);font-size:10px;opacity:.4;margin-top:16px;padding:8px}
+@media(max-width:768px){.container{padding:12px}.brand h1{font-size:22px;letter-spacing:4px}.metrics{grid-template-columns:repeat(3,1fr);gap:6px}.metric{padding:8px 4px}.metric-val{font-size:16px}.cards{grid-template-columns:repeat(2,1fr);gap:8px}.card{padding:14px 10px}.card-icon{font-size:22px}.card-title{font-size:12px}.ai-window{max-width:100%}.ai-chat{height:280px}.ai-input input{font-size:12px;padding:8px 12px}.ai-svc{font-size:9px;padding:2px 6px}}
+@media(max-width:380px){.metrics{grid-template-columns:repeat(2,1fr)}.cards{grid-template-columns:1fr}.ai-chat{height:240px}}
 </style>
 </head>
 <body>
@@ -83,193 +87,196 @@ body{background:var(--bg);color:var(--paper);font-family:'Noto Serif SC',serif;m
 <div class="date" id="todayDate">加载中...</div>
 </div>
 
+<!-- AI对话窗口（首页内嵌）-->
+<div class="ai-window">
+<div class="ai-header">
+<div class="ai-avatar">🤖</div>
+<div class="ai-name">AI命理助手</div>
+<div class="ai-status">在线</div>
+</div>
+<div class="ai-chat" id="aiChat">
+<div class="ai-welcome">
+<div class="emoji">🤖</div>
+<div class="title">您好！我是AI命理助手</div>
+<div class="desc">告诉我您想了解什么<br>命理·风水·中医·运势·手机号·姓名·感情·财运</div>
+</div>
+</div>
+<div class="ai-services" id="aiServices">
+<span class="ai-svc" onclick="aiAsk('我想算八字排盘')">📅 八字排盘</span>
+<span class="ai-svc" onclick="aiAsk('今年运势如何')">🌟 运势</span>
+<span class="ai-svc" onclick="aiAsk('风水布局建议')">🏠 风水</span>
+<span class="ai-svc" onclick="aiAsk('中医养生建议')">💊 中医</span>
+<span class="ai-svc" onclick="aiAsk('分析手机号码')">📱 手机号</span>
+<span class="ai-svc" onclick="aiAsk('感情婚姻分析')">💕 感情</span>
+<span class="ai-svc" onclick="aiAsk('财运分析')">💰 财运</span>
+<span class="ai-svc" onclick="aiAsk('事业方向')">💼 事业</span>
+<span class="ai-svc" onclick="aiAsk('五行缺什么')">⚖️ 五行</span>
+<span class="ai-svc" onclick="aiAsk('开运吉祥物')">🔑 开运</span>
+</div>
+<div class="ai-input">
+<input type="text" id="aiInput" placeholder="输入您的问题..." onkeypress="if(event.key==='Enter')aiSend()">
+<button class="send" onclick="aiSend()">➤</button>
+</div>
+</div>
+
 <!-- 活数据指标条 -->
 <div class="metrics" id="metrics">
-<div class="metric"><div class="metric-val" id="m-users">-</div><div class="metric-label">注册用户</div><div class="metric-sub" id="m-vip">-</div></div>
-<div class="metric"><div class="metric-val" id="m-paipan">-</div><div class="metric-label">排盘次数</div><div class="metric-sub" id="m-paipan-trend">-</div></div>
-<div class="metric"><div class="metric-val" id="m-cases">-</div><div class="metric-label">诊疗案例</div><div class="metric-sub" id="m-cases-sub">-</div></div>
-<div class="metric"><div class="metric-val" id="m-reports">-</div><div class="metric-label">诊疗报告</div><div class="metric-sub" id="m-reports-sub">-</div></div>
-<div class="metric"><div class="metric-val" id="m-courses">-</div><div class="metric-label">在线课程</div></div>
-<div class="metric"><div class="metric-val" id="m-orders">-</div><div class="metric-label">订单总数</div><div class="metric-sub" id="m-orders-sub">-</div></div>
-</div>
-
-<!-- 诊疗流程面板 -->
-<div class="flow-panel">
-<div class="flow-panel-title">🏥 诊疗流程实时数据</div>
-<div class="flow-steps" id="flowSteps">
-<div class="flow-step"><div class="flow-step-num">1</div><div class="flow-step-title">病患提交</div><div class="flow-step-count" id="f-submit">-</div><div class="flow-step-desc">症状描述</div></div>
-<span class="flow-arrow">→</span>
-<div class="flow-step"><div class="flow-step-num">2</div><div class="flow-step-title">大师分析</div><div class="flow-step-count" id="f-master">-</div><div class="flow-step-desc">周易推演</div></div>
-<span class="flow-arrow">→</span>
-<div class="flow-step"><div class="flow-step-num">3</div><div class="flow-step-title">医生诊断</div><div class="flow-step-count" id="f-doctor">-</div><div class="flow-step-desc">处方方案</div></div>
-<span class="flow-arrow">→</span>
-<div class="flow-step"><div class="flow-step-num">4</div><div class="flow-step-title">报告推送</div><div class="flow-step-count" id="f-report">-</div><div class="flow-step-desc">病患查看</div></div>
-</div>
-</div>
-
-<!-- 最新案例动态 -->
-<div class="activity">
-<div class="activity-title">📋 最新案例动态</div>
-<ul class="activity-list" id="caseList">
-<li class="activity-item"><span class="activity-tag tag-draft">加载中</span> 正在获取数据...</li>
-</ul>
-</div>
-
-<!-- 最新推送 -->
-<div class="push-panel">
-<div class="push-title">📡 今日推送</div>
-<div id="pushList">
-<div class="push-item">加载中...</div>
-</div>
+<div class="metric"><div class="metric-val" id="m-users">-</div><div class="metric-label">用户</div><div class="metric-sub" id="m-vip">-</div></div>
+<div class="metric"><div class="metric-val" id="m-paipan">-</div><div class="metric-label">排盘</div><div class="metric-sub" id="m-paipan-trend">-</div></div>
+<div class="metric"><div class="metric-val" id="m-cases">-</div><div class="metric-label">案例</div><div class="metric-sub" id="m-cases-sub">-</div></div>
+<div class="metric"><div class="metric-val" id="m-reports">-</div><div class="metric-label">报告</div><div class="metric-sub" id="m-reports-sub">-</div></div>
+<div class="metric"><div class="metric-val" id="m-courses">-</div><div class="metric-label">课程</div></div>
+<div class="metric"><div class="metric-val" id="m-orders">-</div><div class="metric-label">订单</div><div class="metric-sub" id="m-orders-sub">-</div></div>
 </div>
 
 <!-- 功能入口 -->
 <div class="section-title">功能入口</div>
 <div class="cards">
-<a href="app/divination-hub.html" class="card">
-<div class="card-icon">🔮</div>
-<div class="card-title">命理排盘</div>
-<div class="card-desc">八字·紫微·六壬·奇门·梅花·风水·六爻</div>
-</a>
-<a href="app/tcm-symptom.html" class="card">
-<div class="card-icon">🩺</div>
-<div class="card-title">症状分析</div>
-<div class="card-desc">症状描述·证候分析·名医推荐·命理预测</div>
-</a>
-<a href="app/tcm-clinic.html" class="card">
-<div class="card-icon">🏥</div>
-<div class="card-title">中医诊疗</div>
-<div class="card-desc">三角色协作·大师分析·医生诊疗·病患报告</div>
-</a>
-<a href="app/divination-integrated.html" class="card">
-<div class="card-icon">🧬</div>
-<div class="card-title">体质调理</div>
-<div class="card-desc">五行体质·个性化养生方案</div>
-</a>
-<a href="app/divination-almanac.html" class="card">
-<div class="card-icon">📅</div>
-<div class="card-title">黄历</div>
-<div class="card-desc">每日宜忌·节气·吉时方位</div>
-</a>
-<a href="app/nihaisha-knowledge.html" class="card">
-<div class="card-icon">🪷</div>
-<div class="card-title">倪师知识库</div>
-<div class="card-desc">46模块·伤寒金匮·针灸本草·天纪心法</div>
-</a>
-<a href="app/nihaisha-tool.html" class="card">
-<div class="card-icon">🔬</div>
-<div class="card-title">倪师工具</div>
-<div class="card-desc">症状检索·方证对应·穴位查询</div>
-</a>
-<a href="app/shuhan-knowledge.html" class="card">
-<div class="card-icon">🎯</div>
-<div class="card-title">舒晗知识库</div>
-<div class="card-desc">命理秘笈·实战心法·进阶课程</div>
-</a>
-<a href="app/divination-knowledge.html" class="card">
-<div class="card-icon">📚</div>
-<div class="card-title">知识库</div>
-<div class="card-desc">综合国学·权威典籍·口诀汇编</div>
-</a>
-<a href="app/ai-assistant.html" class="card">
-<div class="card-icon">🤖</div>
-<div class="card-title">AI命理助手</div>
-<div class="card-desc">知识库问答·排盘解读·引导提问</div>
-</a>
-<a href="app/login.html" class="card">
-<div class="card-icon">🔐</div>
-<div class="card-title">登录</div>
-<div class="card-desc">会员中心·诊疗记录·个人设置</div>
-</a>
+<a href="app/divination-hub.html" class="card"><div class="card-icon">🔮</div><div class="card-title">命理排盘</div><div class="card-desc">八字·紫微·六壬·奇门·梅花·风水</div></a>
+<a href="app/tcm-symptom.html" class="card"><div class="card-icon">🩺</div><div class="card-title">症状分析</div><div class="card-desc">症状·证候·名医·命理预测</div></a>
+<a href="app/tcm-clinic.html" class="card"><div class="card-icon">🏥</div><div class="card-title">中医诊疗</div><div class="card-desc">三角色协作·大师分析</div></a>
+<a href="app/divination-integrated.html" class="card"><div class="card-icon">🧬</div><div class="card-title">体质调理</div><div class="card-desc">五行体质·个性化养生</div></a>
+<a href="app/divination-almanac.html" class="card"><div class="card-icon">📅</div><div class="card-title">黄历</div><div class="card-desc">每日宜忌·节气·吉时方位</div></a>
+<a href="app/nihaisha-knowledge.html" class="card"><div class="card-icon">🪷</div><div class="card-title">倪师知识库</div><div class="card-desc">伤寒金匮·针灸本草·天纪</div></a>
+<a href="app/nihaisha-tool.html" class="card"><div class="card-icon">🔬</div><div class="card-title">倪师工具</div><div class="card-desc">症状检索·方证对应</div></a>
+<a href="app/shuhan-knowledge.html" class="card"><div class="card-icon">🎯</div><div class="card-title">舒晗知识库</div><div class="card-desc">命理秘笈·实战心法</div></a>
+<a href="app/ai-assistant.html" class="card"><div class="card-icon">🤖</div><div class="card-title">AI助手(完整版)</div><div class="card-desc">排盘·语音·全量功能</div></a>
+<a href="app/login.html" class="card"><div class="card-icon">🔐</div><div class="card-title">登录</div><div class="card-desc">会员中心·诊疗记录</div></a>
 </div>
-<div class="footer">命理宝鉴 · 易道智鉴 v2.1 · 仅供学习参考</div>
+<div class="footer">命理宝鉴 · 易道智鉴 v2.2 · 仅供学习参考</div>
 </div>
 
 <script>
-// 静态快照数据（GitHub Pages无后端时降级使用）
-const FALLBACK_STATS = {"users":10,"vipUsers":1,"masterUsers":1,"doctorUsers":1,"paipanCount":6,"totalCases":8,"completedCases":5,"pendingCases":3,"totalReports":5,"readReports":4,"totalProducts":6,"totalOrders":5,"completedOrders":2,"totalCourses":5,"totalFeedback":5,"totalPushes":8,"totalPoints":510,"date":""};
-const FALLBACK_CASES = [{"id":6,"status":"completed","symptoms":"胃痛反酸","constitution":"土湿","created_at":"2026-07-19","master_name":"李道明"},{"id":1,"status":"completed","symptoms":"头痛、失眠、口干、心烦易怒","constitution":"木火体质","created_at":"2026-07-14","master_name":"李道明"},{"id":2,"status":"completed","symptoms":"腰膝酸软、畏寒怕冷、夜尿频多","constitution":"水寒体质","created_at":"2026-07-13","master_name":"李道明"},{"id":3,"status":"completed","symptoms":"胃脘胀痛、食欲不振、大便溏稀","constitution":"土湿体质","created_at":"2026-07-12","master_name":"李道明"},{"id":7,"status":"submitted","symptoms":"咳嗽痰多胸闷","constitution":"金燥","created_at":"2026-07-19","master_name":"李道明"},{"id":8,"status":"submitted","symptoms":"心悸失眠多梦","constitution":"火虚","created_at":"2026-07-19","master_name":"李道明"}];
-const FALLBACK_PUSHES = [{"content":"今日宜动土、嫁娶；忌出行、安葬","push_type":"daily_fortune"},{"content":"秋分时节，注意润肺养阴，多食银耳百合","push_type":"health_tip"},{"content":"明日中秋佳节，记得与家人团聚","push_type":"festival_reminder"},{"content":"您的诊疗报告已生成，请查看","push_type":"case_update"},{"content":"今日桃花星入命，社交运旺盛","push_type":"daily_fortune"}];
+// === 静态快照 ===
+const FALLBACK_STATS={"users":10,"vipUsers":1,"masterUsers":1,"doctorUsers":1,"paipanCount":6,"totalCases":8,"completedCases":5,"pendingCases":3,"totalReports":5,"readReports":4,"totalCourses":5,"totalOrders":5,"completedOrders":2,"date":""};
+const API_BASE=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+const HAS_API=!!API_BASE;
+let aiHistory=[];
 
-// 活数据加载
-const API_BASE = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? 'http://127.0.0.1:8920' : '';
-const HAS_API = !!API_BASE; // GitHub Pages无后端API
+// === 活数据 ===
+function renderStats(d){document.getElementById('todayDate').textContent=d.date||new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'});document.getElementById('m-users').textContent=d.users||0;document.getElementById('m-vip').textContent=`V${d.vipUsers||0}·师${d.masterUsers||0}·医${d.doctorUsers||0}`;document.getElementById('m-paipan').textContent=d.paipanCount||0;document.getElementById('m-paipan-trend').textContent=d.paipanTrend?`${d.paipanTrend.length}次`:'';document.getElementById('m-cases').textContent=d.totalCases||0;document.getElementById('m-cases-sub').textContent=`完${d.completedCases||0}`;document.getElementById('m-reports').textContent=d.totalReports||0;document.getElementById('m-reports-sub').textContent=`读${d.readReports||0}`;document.getElementById('m-courses').textContent=d.totalCourses||0;document.getElementById('m-orders').textContent=d.totalOrders||0;document.getElementById('m-orders-sub').textContent=`完${d.completedOrders||0}`}
+async function loadStats(){if(!HAS_API){renderStats(FALLBACK_STATS);return}try{const r=await fetch(API_BASE+'/api/public/stats');const d=await r.json();renderStats(d.error?FALLBACK_STATS:d)}catch(e){renderStats(FALLBACK_STATS)}}
+loadStats();if(HAS_API)setInterval(loadStats,300000);
 
-function renderStats(d) {
-  document.getElementById('todayDate').textContent = d.date || new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
-  document.getElementById('m-users').textContent = d.users || 0;
-  document.getElementById('m-vip').textContent = `VIP ${d.vipUsers||0} · 大师 ${d.masterUsers||0} · 医生 ${d.doctorUsers||0}`;
-  document.getElementById('m-paipan').textContent = d.paipanCount || 0;
-  document.getElementById('m-paipan-trend').textContent = d.paipanTrend ? `7日${d.paipanTrend.length}次` : '';
-  document.getElementById('m-cases').textContent = d.totalCases || 0;
-  document.getElementById('m-cases-sub').textContent = `完成${d.completedCases||0} · 待处理${d.pendingCases||0}`;
-  document.getElementById('m-reports').textContent = d.totalReports || 0;
-  document.getElementById('m-reports-sub').textContent = `已读${d.readReports||0}`;
-  document.getElementById('m-courses').textContent = d.totalCourses || 0;
-  document.getElementById('m-orders').textContent = d.totalOrders || 0;
-  document.getElementById('m-orders-sub').textContent = `完成${d.completedOrders||0}`;
-  document.getElementById('f-submit').textContent = d.totalCases || 0;
-  document.getElementById('f-master').textContent = d.totalCases || 0;
-  document.getElementById('f-doctor').textContent = d.completedCases || 0;
-  document.getElementById('f-report').textContent = d.totalReports || 0;
+// === AI对话 ===
+function aiAsk(q){aiInput.value=q;aiSend()}
+
+async function aiSend(){
+  const q=aiInput.value.trim();
+  if(!q)return;
+  aiInput.value='';
+  const chat=aiChat;
+  if(aiHistory.length===0)chat.innerHTML='';
+  // 用户消息
+  chat.insertAdjacentHTML('beforeend','<div class="ai-msg ai-msg-user"><div class="b">'+esc(q)+'</div></div>');
+  // 打字
+  chat.insertAdjacentHTML('beforeend','<div class="ai-msg ai-msg-bot" id="tp"><div class="head">🤖 AI命理助手</div><div class="typing"><span></span><span></span><span></span></div></div>');
+  chat.scrollTop=chat.scrollHeight;
+  aiHistory.push({role:'user',content:q});
+  if(aiHistory.length>20)aiHistory=aiHistory.slice(-20);
+  
+  try{
+    const r=await fetch(API_BASE+'/api/ai/public-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:aiHistory.slice(-10)})});
+    const d=await r.json();
+    const reply=(d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||'抱歉，暂时无法回答。';
+    tp.remove();addBot(reply,d._local,q);
+  }catch(e){
+    tp.remove();addBot(_localReply(q),true,q);
+  }
 }
 
-function renderCases(cases) {
-  if (!Array.isArray(cases)) return;
-  const list = document.getElementById('caseList');
-  list.innerHTML = cases.slice(0, 6).map(c => {
-    const tagClass = c.status === 'completed' ? 'tag-completed' : c.status === 'submitted' ? 'tag-submitted' : 'tag-draft';
-    const tagText = c.status === 'completed' ? '已完成' : c.status === 'submitted' ? '待诊断' : '草稿';
-    const date = (c.created_at||'').slice(0,10);
-    const sym = (c.symptoms||'').slice(0, 24);
-    return `<li class="activity-item"><span><span class="activity-tag ${tagClass}">${tagText}</span>${sym}</span><span style="color:var(--paper3);font-size:11px">${date}</span></li>`;
-  }).join('');
+function addBot(reply,isLocal,userQ){
+  const chat=aiChat;
+  const tag=isLocal?'<span style="font-size:9px;opacity:.5;margin-left:4px">知识库</span>':'';
+  // 动态追问3个
+  const fu=_getFollowups(userQ).map(f=>'<span onclick="aiAsk(\''+f.replace(/'/g,"\\'")+'\')">'+f+'</span>').join('');
+  const fuHtml=fu?'<div class="fu">'+fu+'</div>':'';
+  const tools='<div class="tools"><button onclick="aiSave(this)">💾保存</button><button onclick="aiCopy(this)">📋复制</button></div>';
+  const more='<div class="more">还需要了解哪些内容？👆</div>';
+  chat.insertAdjacentHTML('beforeend','<div class="ai-msg ai-msg-bot"><div class="head">🤖 AI命理助手'+tag+'</div><div class="b">'+esc(reply)+'</div>'+tools+fuHtml+more+'</div>');
+  chat.scrollTop=chat.scrollHeight;
+  aiHistory.push({role:'assistant',content:reply});
+  if(aiHistory.length>20)aiHistory=aiHistory.slice(-20);
 }
 
-function renderPushes(pushes) {
-  if (!Array.isArray(pushes)) return;
-  const typeMap = { daily_fortune: '运势', health_tip: '养生', festival_reminder: '节日', case_update: '通知' };
-  const list = document.getElementById('pushList');
-  list.innerHTML = pushes.map(p => {
-    const type = typeMap[p.push_type] || p.push_type;
-    return `<div class="push-item"><span class="push-type">[${type}]</span>${p.content}</div>`;
-  }).join('');
+const FU_MAP={
+  '排盘':['五行强弱分析','大运走势','格局层次','用神喜神'],
+  '运势':['事业运','财运','感情运','健康运'],
+  '风水':['卧室风水','财位在哪','化煞方法','楼层选择'],
+  '中医':['失眠调理','脾胃怎么养','湿气重','穴位按摩'],
+  '手机号':['换什么尾号好','号码五行','选号建议'],
+  '感情':['桃花星分析','正缘何时到','合婚配对'],
+  '财运':['理财方向','什么时候发财','破财怎么防'],
+  '事业':['适合什么行业','创业时机','跳槽建议'],
+  'default':['排盘分析','今年运势','风水布局','中医养生']
+};
+function _getFollowups(q){
+  const t=(q||'').toLowerCase();
+  let topic='default';
+  if(/排盘|八字|命理|四柱/.test(t))topic='排盘';
+  else if(/运势|运气|今年/.test(t))topic='运势';
+  else if(/风水|布局|方位/.test(t))topic='风水';
+  else if(/中医|养生|健康|失眠/.test(t))topic='中医';
+  else if(/手机号|号码|1[3-9]\d{9}/.test(t))topic='手机号';
+  else if(/婚姻|感情|桃花/.test(t))topic='感情';
+  else if(/财运|投资|理财/.test(t))topic='财运';
+  else if(/事业|工作|创业/.test(t))topic='事业';
+  const all=FU_MAP[topic]||FU_MAP.default;
+  const asked=aiHistory.filter(m=>m.role==='user').map(m=>m.content);
+  return all.filter(f=>!asked.includes(f)).slice(0,3);
 }
 
-async function loadStats() {
-  if (!HAS_API) { renderStats(FALLBACK_STATS); return; }
-  try {
-    const resp = await fetch(API_BASE + '/api/public/stats');
-    const d = await resp.json();
-    if (d.error) { renderStats(FALLBACK_STATS); return; }
-    renderStats(d);
-  } catch (e) { renderStats(FALLBACK_STATS); }
+function aiSave(btn){
+  const b=btn.closest('.ai-msg-bot').querySelector('.b').textContent;
+  const ts=new Date().toLocaleString('zh-CN');
+  const blob=new Blob(['易道智鉴AI分析报告\n'+ts+'\n\n'+b],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='命理报告.txt';a.click();
+  showToast('已保存');
+}
+function aiCopy(btn){
+  const b=btn.closest('.ai-msg-bot').querySelector('.b').textContent;
+  navigator.clipboard.writeText(b).then(()=>showToast('已复制')).catch(()=>{const t=document.createElement('textarea');t.value=b;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);showToast('已复制')});
+}
+function showToast(msg){const t=document.createElement('div');t.style.cssText='position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:var(--gold);padding:6px 16px;border-radius:16px;z-index:9999;font-size:11px';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),1800)}
+
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/━━━/g,'<b style="color:var(--gold)">━━━').replace(/━━━/g,'━━━</b>').replace(/\n/g,'<br>')}
+
+// === 本地降级 ===
+function _localReply(text){
+  if(!text)return'您好，请告诉我您想了解什么。';
+  const t=text.toLowerCase();
+  var m=text.match(/1[3-9]\d{9}/);
+  if(m)return _mobile(m[0]);
+  if(/八字|排盘|命理|算命/.test(t))return'━━━ 八字排盘指南 ━━━\n\n请提供出生年月日时+性别\n例如：1985年3月22日8时 女\n\n【分析内容】\n1.日主五行 2.四柱关系 3.五行强弱 4.用神\n5.大运走势 6.格局层次 7.神煞 8.流年\n\n请在上方点击或输入生辰。';
+  if(/运势|今年|流年/.test(t))return'━━━ 运势分析 ━━━\n\n【维度】事业/财运/感情/健康/人际\n【2026丙午年】喜火者事业腾飞·忌火者宜守\n\n请提供生辰分析个性化运势。';
+  if(/风水|布局|方位/.test(t))return'━━━ 风水布局 ━━━\n\n【大门】宜吉位\n【客厅】财位在对角线45度\n【卧室】床头靠实墙，忌横梁\n【厨房】宜凶位压煞\n【化煞】路冲→八卦镜·横梁→葫芦\n\n请提供房屋朝向做个性化分析。';
+  if(/中医|养生|健康/.test(t))return'━━━ 中医养生 ━━━\n\n【四季】春养肝·夏养心·秋养肺·冬养肾\n【时辰】子时入睡·午时小憩\n【日常】七分饱·适度运动·情志平和\n\n请描述症状获取针对性方案。';
+  if(/失眠/.test(t))return'━━━ 失眠调理 ━━━\n\n【辨证】心脾两虚/肝郁化火\n【食疗】酸枣仁粥·百合莲子汤\n【穴位】神门·三阴交·安眠穴\n【起居】子时前睡·泡脚·忌手机';
+  if(/婚姻|感情|桃花/.test(t))return'━━━ 感情婚姻 ━━━\n\n【桃花】日支子午卯酉→异性缘佳\n【正缘】男看正财·女看正官\n【合婚】五行互补+日柱相生+生肖三合\n\n请提供生辰做深度分析。';
+  if(/财运|投资|理财/.test(t))return'━━━ 财运分析 ━━━\n\n【财星】正财→工薪·偏财→投资\n【破财】比劫运→忌合伙\n【招财】喜金→西·喜木→东·喜水→北\n\n请提供生辰分析财运走势。';
+  if(/事业|工作|创业/.test(t))return'━━━ 事业分析 ━━━\n\n【官运】正官→体制·七杀→创业·正印→教育\n【行业】金:金融·木:教育·水:物流·火:电子·土:房产\n【创业】大运行喜用→黄金期\n\n请提供生辰分析事业方向。';
+  if(/手机号|号码/.test(t))return'请直接发送11位手机号码，我立即分析八星磁场吉凶。';
+  if(/五行|缺什么/.test(t))return'━━━ 五行分析 ━━━\n\n金→肺/西/白·木→肝/东/绿·水→肾/北/黑·火→心/南/红·土→脾/中/黄\n\n【补救】补金→西/白/金属·补水→北/黑/水晶·补火→南/红/玛瑙·补木→东/绿/木质·补土→中/黄/玉石\n\n请提供生辰分析您的五行。';
+  if(/你好|您好|hi|hello/.test(t))return'您好！我是易道智鉴AI命理助手。\n\n我可以帮您：\n📅 八字排盘 🌟 运势 🏠 风水\n💊 中医 📱 手机号 💕 感情\n💰 财运 💼 事业 ⚖️ 五行\n\n请告诉我您想了解什么。';
+  if(/谢谢|感谢/.test(t))return'不客气！如有其他问题随时问我。';
+  return'您好！您可以问我：\n\n📅 命理排盘 🌟 运势 🏠 风水\n💊 中医 📱 手机号 💕 感情\n💰 财运 💼 事业 ⚖️ 五行\n🔑 开运 📅 择日 🪷 倪师\n\n或告诉我您的出生年月日时进行排盘。';
 }
 
-async function loadCases() {
-  if (!HAS_API) { renderCases(FALLBACK_CASES); return; }
-  try {
-    const resp = await fetch(API_BASE + '/api/public/recent-cases');
-    const cases = await resp.json();
-    if (!Array.isArray(cases)) { renderCases(FALLBACK_CASES); return; }
-    renderCases(cases);
-  } catch (e) { renderCases(FALLBACK_CASES); }
+function _mobile(mobile){
+  const BX={'天医':['13','31','68','86','49','94','27','72'],'生气':['14','41','67','76','39','93','28','82'],'延年':['19','91','78','87','34','43','26','62'],'伏位':['11','22','88','99','66','77','33','44'],'六煞':['16','61','47','74','38','83','29','92'],'五鬼':['18','81','79','97','36','63','24','42'],'绝命':['12','21','69','96','48','84','37','73'],'祸害':['17','71','89','98','46','64','23','32']};
+  const rk={'天医':'吉','生气':'吉','延年':'吉','伏位':'中','六煞':'中','五鬼':'凶','绝命':'凶','祸害':'凶'};
+  function gx(c){for(var n in BX){if(BX[n].indexOf(c)>=0)return{n:n,r:rk[n]};}return{n:'普通',r:'中'};}
+  var st=[],ji=0,xi=0;
+  for(var i=0;i<10;i+=2){var c=mobile.substring(i,i+2),s=gx(c);st.push({c:c,s:s.n,r:s.r});if(s.r==='吉')ji++;else if(s.r==='凶')xi++;}
+  var last=st[st.length-1];
+  var sc=ji*8-xi*6+20+(last.r==='吉'?5:0);sc=Math.max(0,Math.min(40,sc));
+  var lv=sc>=30?'优🟢':sc>=20?'中🟡':'差🔴';
+  var r='━━━ 手机号码分析 ━━━\n\n【号码】'+mobile+'\n【评分】'+sc+'/40 '+lv+'\n【吉】'+ji+'·凶'+xi+'\n\n━━━ 八星拆解 ━━━\n';
+  st.forEach(s=>{r+='第'+(st.indexOf(s)*2+1)+'-'+(st.indexOf(s)*2+2)+'位 '+s.c+' '+(s.r==='吉'?'✅':s.r==='凶'?'❌':'➖')+' '+s.s+'（'+s.r+'）\n';});
+  r+='\n尾号'+last.c+'→'+last.s+'（'+last.r+'）\n\n';
+  if(lv.includes('优'))r+='号码吉利，可继续使用。';else if(lv.includes('中'))r+='吉凶参半，注意凶星领域。';else r+='凶星较多，建议更换。优选尾号13/31/68/86/14/41等吉星。';
+  return r;
 }
-
-async function loadPushes() {
-  if (!HAS_API) { renderPushes(FALLBACK_PUSHES); return; }
-  try {
-    const resp = await fetch(API_BASE + '/api/public/latest-pushes');
-    const pushes = await resp.json();
-    if (!Array.isArray(pushes)) { renderPushes(FALLBACK_PUSHES); return; }
-    renderPushes(pushes);
-  } catch (e) { renderPushes(FALLBACK_PUSHES); }
-}
-
-loadStats();
-loadCases();
-loadPushes();
-if (HAS_API) setInterval(() => { loadStats(); loadCases(); loadPushes(); }, 300000);
 </script>
 </body>
 </html>
