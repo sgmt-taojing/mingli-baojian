@@ -273,10 +273,76 @@ const AI_GUIDE_PROMPTS = [
   '请提供您的出生信息（年-月-日-时-性别），我可以为您做深度命理分析'
 ];
 
+// === 手机号八星磁场分析 ===
+function _analyzeMobile(mobile) {
+  const BAXING = {
+    '天医': { codes: ['13','31','68','86','49','94','27','72'], desc: '正财、婚姻、天赋、善良', rank: '吉' },
+    '生气': { codes: ['14','41','67','76','39','93','28','82'], desc: '贵人、乐天、活力、随缘', rank: '吉' },
+    '延年': { codes: ['19','91','78','87','34','43','26','62'], desc: '领导力、专业、长寿', rank: '吉' },
+    '伏位': { codes: ['11','22','88','99','66','77','33','44'], desc: '耐心、潜藏、等待', rank: '中' },
+    '六煞': { codes: ['16','61','47','74','38','83','29','92'], desc: '桃花、人际、情绪', rank: '中' },
+    '五鬼': { codes: ['18','81','79','97','36','63','24','42'], desc: '才华、叛逆、反复', rank: '凶' },
+    '绝命': { codes: ['12','21','69','96','48','84','37','73'], desc: '投资、冲动、极端', rank: '凶' },
+    '祸害': { codes: ['17','71','89','98','46','64','23','32'], desc: '口舌、是非、固执', rank: '凶' }
+  };
+  function _getBX(code) {
+    for (var name in BAXING) { if (BAXING[name].codes.indexOf(code) >= 0) return {name:name, desc:BAXING[name].desc, rank:BAXING[name].rank}; }
+    return {name:'普通', desc:'普通数字组合', rank:'中'};
+  }
+  var stars = [];
+  var ji = 0, xiong = 0, zhong = 0;
+  for (var i = 0; i < 10; i += 2) {
+    var code = mobile.substring(i, i + 2);
+    var s = _getBX(code);
+    stars.push({pos:i+1, code:code, star:s.name, desc:s.desc, rank:s.rank});
+    if (s.rank === '吉') ji++; else if (s.rank === '凶') xiong++; else zhong++;
+  }
+  var lastStar = stars[stars.length-1];
+  var score = ji * 8 - xiong * 6 + 20 + (lastStar.rank === '吉' ? 5 : 0);
+  score = Math.max(0, Math.min(40, score));
+  var level = score >= 30 ? '优' : score >= 20 ? '中' : '差';
+  var emoji = level === '优' ? '🟢' : level === '中' ? '🟡' : '🔴';
+  
+  var report = '━━━ 手机号码分析报告 ━━━\n\n';
+  report += '【号码】' + mobile + '\n';
+  report += '【评分】' + score + '/40 ' + emoji + ' ' + level + '\n';
+  report += '【吉星】' + ji + '个 · 凶星' + xiong + '个 · 中星' + zhong + '个\n\n';
+  report += '━━━ 八星磁场拆解 ━━━\n';
+  stars.forEach(function(s) {
+    var icon = s.rank === '吉' ? '✅' : s.rank === '凶' ? '❌' : '➖';
+    report += '第' + s.pos + '-' + (s.pos+1) + '位 ' + s.code + ' → ' + icon + ' ' + s.star + '（' + s.rank + '）' + s.desc + '\n';
+  });
+  report += '\n━━━ 尾号分析 ━━━\n';
+  report += '尾号' + lastStar.code + '→' + lastStar.star + '（' + lastStar.rank + '）\n';
+  if (lastStar.rank === '吉') report += '尾号吉星→收尾顺利，财运人际关系佳\n';
+  else if (lastStar.rank === '凶') report += '尾号凶星→收尾不利，建议更换尾号\n';
+  else report += '尾号中星→收尾平稳，中规中矩\n';
+  report += '\n━━━ 五行数字统计 ━━━\n';
+  var numWx = {1:'水',6:'水',2:'火',7:'火',3:'木',8:'木',4:'金',9:'金',5:'土',0:'土'};
+  var wxCount = {};
+  for (var i = 0; i < mobile.length; i++) { var w = numWx[parseInt(mobile[i])]; wxCount[w] = (wxCount[w]||0)+1; }
+  report += '金' + (wxCount['金']||0) + ' 木' + (wxCount['木']||0) + ' 水' + (wxCount['水']||0) + ' 火' + (wxCount['火']||0) + ' 土' + (wxCount['土']||0) + '\n';
+  var lack = ['金','木','水','火','土'].filter(function(k){return !wxCount[k];});
+  if (lack.length) report += '缺：' + lack.join('、') + '\n';
+  report += '\n━━━ 选号建议 ━━━\n';
+  if (level === '优') report += '此号码整体吉利，可继续使用。吉星多主财运/贵人/事业顺遂。\n';
+  else if (level === '中') report += '此号码吉凶参半，使用中注意凶星对应领域（投资/口舌/情绪）。\n';
+  else report += '此号码凶星较多，建议考虑更换。优先选尾号为13/31/68/86/14/41/19/91等吉星组合。\n';
+  report += '\n【八星吉凶参考】\n';
+  report += '吉星：天医(正财/婚姻)、生气(贵人/活力)、延年(领导/长寿)\n';
+  report += '中星：伏位(耐心/等待)、六煞(桃花/情绪)\n';
+  report += '凶星：绝命(冲动/极端)、五鬼(叛逆/反复)、祸害(口舌/是非)\n';
+  return report;
+}
+
 // === AI本地降级响应（关键词匹配+排盘数据）===
 function _aiLocalResponse(userText, baziData) {
   if (!userText) return '您好，我是易道智鉴AI助手。请告诉我您的出生年月日时，我可以为您排盘分析。';
   const text = userText.toLowerCase();
+  
+  // 手机号识别+分析（优先级最高）
+  var _mobileMatch = userText.match(/1[3-9]\d{9}/);
+  if (_mobileMatch) return _analyzeMobile(_mobileMatch[0]);
   
   // 有排盘数据时优先用排盘数据回答
   if (baziData && baziData.pillars) {
