@@ -60,6 +60,49 @@ body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',serif;
 .typing span:nth-child(3){animation-delay:.4s}
 @keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
 
+/* AI消息工具栏 */
+.msg-tools{margin-top:6px;display:flex;gap:8px}
+.tool-btn{font-size:11px;color:var(--paper3);cursor:pointer;padding:2px 8px;border:1px solid var(--border);border-radius:10px;background:none}
+.tool-btn:hover{color:var(--gold);border-color:rgba(201,168,76,0.3)}
+.ask-more{margin-top:8px;font-size:12px;color:var(--paper3);text-align:center;opacity:.7}
+.msg-ai .time{margin-left:auto;font-size:10px;opacity:.4}
+.msg-ai .head{display:flex;align-items:center;gap:4px}
+
+/* 手机端适配增强 */
+@media(max-width:768px){
+  .main{padding:48px 0 0}
+  .top-bar{padding:6px 8px;gap:4px}
+  .top-bar input{width:40px;padding:5px 4px;font-size:11px}
+  .top-bar select{padding:5px 4px;font-size:11px}
+  .top-bar label{font-size:10px}
+  .top-bar .pp-btn{padding:5px 10px;font-size:10px}
+  .top-bar .pp-result{font-size:10px;max-width:150px}
+  .chat-area{padding:10px 8px;min-height:calc(100vh - 120px)}
+  .msg-user .b{max-width:90%;font-size:13px;padding:8px 12px}
+  .msg-ai .b{max-width:95%;font-size:13px;padding:10px 12px}
+  .msg-ai .b br{line-height:1.6}
+  .welcome{padding:24px 12px}
+  .welcome h2{font-size:18px}
+  .welcome p{font-size:12px}
+  .welcome .quick{grid-template-columns:repeat(2,1fr);gap:6px}
+  .welcome .qcard{padding:10px 6px}
+  .welcome .qcard .qi{font-size:20px}
+  .welcome .qcard .qt{font-size:11px}
+  .welcome .qcard .qd{font-size:9px}
+  .followups{gap:4px}
+  .fu-btn{font-size:11px;padding:3px 10px}
+  .input-area{padding:8px 10px;gap:6px}
+  .input-area input{font-size:13px;padding:8px 14px}
+  .mic-btn,.send-btn{width:36px;height:36px;font-size:16px}
+  .footer{font-size:9px;padding:2px}
+  .tool-btn{font-size:10px;padding:2px 6px}
+}
+@media(max-width:380px){
+  .welcome .quick{grid-template-columns:1fr}
+  .top-bar input{width:34px}
+  .msg-ai .b{font-size:12px}
+}
+
 /* 输入区 */
 .input-area{background:rgba(13,17,23,0.9);border-top:1px solid var(--border);padding:10px 16px;display:flex;gap:8px;align-items:center}
 .input-area input{flex:1;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:22px;padding:10px 18px;color:var(--paper);font-size:14px;font-family:inherit;outline:none}
@@ -249,18 +292,70 @@ async function sendMsg(prefilled) {
 function addAI(reply,isLocal,userQ) {
   const area=chatArea;
   const tag=isLocal?'<span class="tag">知识库模式</span>':'';
+  const ts=new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
   
-  // 获取追问建议
-  let fuBtns='';
+  // 沿用户方向动态生成3个追问（不是全部）
   const fuTopic=_detectTopic(userQ);
-  const fus=(FOLLOWUPS[fuTopic]||FOLLOWUPS.default).slice(0,4);
-  fuBtns='<div class="followups">'+fus.map(f=>'<span class="fu-btn" onclick="sendMsg(\''+f.replace(/'/g,"\\'")+'\')">'+f+'</span>').join('')+'</div>';
+  const allFu=FOLLOWUPS[fuTopic]||FOLLOWUPS.default;
+  // 排除用户已问过的，取3个
+  const asked=chatHistory.filter(m=>m.role==='user').map(m=>m.content);
+  const fus=allFu.filter(f=>!asked.includes(f)).slice(0,3);
+  let fuBtns='';
+  if(fus.length>0){
+    fuBtns='<div class="followups">'+fus.map(f=>'<span class="fu-btn" onclick="sendMsg(\''+f.replace(/'/g,"\\'")+'\')">'+f+'</span>').join('')+'</div>';
+  }
   
-  const html='<div class="msg msg-ai"><div class="head">🤖 AI命理助手'+tag+'</div><div class="b">'+esc(reply)+'</div>'+fuBtns+'</div>';
+  // 工具栏：保存+继续
+  const tools='<div class="msg-tools"><span class="tool-btn" onclick="saveReport(this)">💾 保存</span><span class="tool-btn" onclick="copyReport(this)">📋 复制</span></div>';
+  
+  // 主动询问
+  const askMore='<div class="ask-more">还需要了解哪些内容？可以继续提问 👆</div>';
+  
+  const html='<div class="msg msg-ai"><div class="head">🤖 AI命理助手'+tag+'<span class="time">'+ts+'</span></div><div class="b" id="msg-'+Date.now()+'">'+esc(reply)+'</div>'+tools+fuBtns+askMore+'</div>';
   area.insertAdjacentHTML('beforeend',html);
   area.scrollTop=area.scrollHeight;
   chatHistory.push({role:'assistant',content:reply});
   if(chatHistory.length>20)chatHistory=chatHistory.slice(-20);
+}
+
+function saveReport(btn){
+  const msg=btn.closest('.msg-ai');
+  const content=msg.querySelector('.b').textContent;
+  const ts=new Date().toLocaleString('zh-CN');
+  const report='易道智鉴AI命理助手分析报告\n生成时间：'+ts+'\n\n'+content;
+  // 存localStorage
+  let reports=JSON.parse(localStorage.getItem('aiReports')||'[]');
+  reports.unshift({time:ts,content:report});
+  if(reports.length>20)reports=reports.slice(0,20);
+  localStorage.setItem('aiReports',JSON.stringify(reports));
+  // 导出文件
+  const blob=new Blob([report],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='命理分析报告_'+ts.replace(/[\/\s:]/g,'')+'.txt';
+  a.click();
+  showToast('报告已保存');
+}
+
+function copyReport(btn){
+  const msg=btn.closest('.msg-ai');
+  const content=msg.querySelector('.b').textContent;
+  navigator.clipboard.writeText(content).then(()=>{
+    showToast('已复制到剪贴板');
+  }).catch(()=>{
+    // 降级
+    const ta=document.createElement('textarea');
+    ta.value=content;document.body.appendChild(ta);ta.select();
+    document.execCommand('copy');document.body.removeChild(ta);
+    showToast('已复制');
+  });
+}
+
+function showToast(msg){
+  const t=document.createElement('div');
+  t.style.cssText='position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:var(--gold);padding:8px 20px;border-radius:20px;z-index:10000;font-size:12px';
+  t.textContent=msg;document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2000);
 }
 
 function _detectTopic(q) {
