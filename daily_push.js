@@ -839,8 +839,8 @@ const NAYIN_TABLE = {
 };
 
 const STEM_KNOWLEDGE = {
-  甲:{tag:'天干',title:'甲木 -- 参天大树,刚直不阿',summary:'今日为甲日。甲木为阳木,象征参天大树,刚直不阿,有领导力。今日宜:开创新事、承担责任、帮助弱者。忌:过于刚直、不知变通。'},
-  乙:{tag:'天干',title:'乙木 -- 花草藤萝,柔韧变通',summary:'今日为乙日。乙木为阴木,象征花草藤蔓,柔韧有生命力,善于借力。今日宜:社交应酬、学习充电、灵活变通。忌:优柔寡断、随波逐流。'},
+  甲:{tag:'天干',title:'甲木 -- 参天大树,刚直不阿',summary:'今日为甲日。甲木为阳木,象征参天大树,刚直不阿,有领导力。'},
+  乙:{tag:'天干',title:'乙木 -- 花草藤萝,柔韧变通',summary:'今日为乙日。乙木为阴木,象征花草藤蔓,柔韧有生命力,善于借力。'},
   丙:{tag:'天干',title:'今日丙火日 -- 光明磊落,礼德为先',summary:'丙火为太阳之火,主礼。今日宜光明磊落行事,待人真诚有礼。适合做决策、举办活动、社交应酬。忌阴暗行事,易招是非。'},
   丁:{tag:'天干',title:'今日丁火日 -- 星光点点,温文尔雅',summary:'丁火为灯烛之火,主礼之温柔面。今日宜细致谨慎,以柔克刚。适合精耕细作、艺术创作。忌急功近利,欲速不达。'},
   戊:{tag:'天干',title:'今日戊土日 -- 稳重如山,诚信为本',summary:'戊土为城墙之土,主信。今日宜稳重行事,信守承诺。适合规划长远事务、奠基开工。忌冒进草率,失信于人。'},
@@ -1921,7 +1921,7 @@ function _getLuckAdvice(level, scores)  {
     case '小凶':
       advice.summary = '运势偏弱，阻力较多，宜低调保守行事';
       advice.yi = ['保守行事内修为主', '处理简单事务', '养生休息'];
-      advice.ji = ['不宜决策大事', '避免冲突与争论', '不宜远行投资'];
+      advice.ji = ['不宜决策大事', '避免冲突与争论', '不宜大额投资'];
       advice.huajie = '佩戴护身吉祥物(黑曜石戴右手辟煞/本命佛戴脖子护身)，面向喜用神方位深呼吸，增强气场';
       break;
     case '凶':
@@ -2270,67 +2270,56 @@ function generatePersonalized(bazi, dayStem, dayBranch, dayNum)  {
   text += '💡 运势概述：' + advice.summary + '\n';
   text += '\n';
 
-  // 10维度评分明细
-  text += '━━━ 【📊 十维度命理评分】 ━━━\n';
+  // 综合评分摘要（原十维度明细精简）
+  text += '━━━ 【📊 命理综合评分】 ━━━\n';
   var dimNames = {
     wangshuai: '日主旺衰', ganRel: '天干生克', zhiRel: '地支关系',
     yongshen: '用神状态', dayun: '大运走势', changsheng: '十二长生',
     shensha: '神煞吉凶', jianchu: '建除十二神', chongsha: '冲煞', huangdao: '黄黑道'
   };
+  // 计算各维度最高分和最低分
+  var _maxDim = '', _maxSc = 0, _minDim = '', _minSc = 10;
   for (var dk in dimNames) {
     if (scores[dk]) {
       var sc = scores[dk].score;
-      text += '  ' + dimNames[dk] + ' ' + sc + '/10 ' + scores[dk].detail + '\n';
+      if (sc > _maxSc) { _maxSc = sc; _maxDim = dimNames[dk]; }
+      if (sc < _minSc) { _minSc = sc; _minDim = dimNames[dk]; }
     }
   }
+  // 综合评分已在上方显示，此处只显示最强最弱项
+  text += '最强项：' + _maxDim + ' ' + _maxSc + '/10 | 最弱项：' + _minDim + ' ' + _minSc + '/10\n';
   text += '\n';
 
-  // 宜/忌
-  text += '✅ 宜：' + advice.yi.join('、') + '\n';
-  text += '❌ 忌：' + advice.ji.join('、') + '\n';
-
-  // 化解/催旺建议
+  // 宜/忌（缘主个人运势）
+  text += '✅ 缘主宜：' + advice.yi.join('、') + '\n';
+  text += '❌ 缘主忌：' + advice.ji.join('、') + '\n';
   if (advice.huajie) {
-    text += '🛡️ 化解建议：' + advice.huajie + '\n';
+    text += '🛡️ 化解：' + advice.huajie + '\n';
   }
   if (advice.cuiwang) {
-    text += '🌟 催旺建议：' + advice.cuiwang + '\n';
+    text += '🌟 催旺：' + advice.cuiwang + '\n';
   }
 
+  // 穿戴指南（合并：当日穿搭+常年穿搭+佩戴位+方位）
   if (zodiac) text += '🐾 生肖：' + zodiac + '\n';
-  text += '👕 穿衣配色：' + luckyCloth + '(' + luckyFabric + ') 色彩:' + luckyColor + '\n';
-  text += '💎 幸运饰：' + luckyPeishi + ' | 💍 首饰材：' + luckyJewelry + '\n';
-  text += '📿 佩戴位：' + luckyWearSide + ' | 本命佛/平安扣戴脖子\n';
-  text += '🧭 幸运方：' + luckyDir + '\n';
+  text += '👕 当日穿搭：' + luckyCloth + '(' + luckyFabric + ') 色:' + luckyColor + '\n';
+  text += '💎 饰品佩戴：' + luckyPeishi + ' | 戴' + luckyWearSide + '，本命佛/平安扣戴脖子\n';
+  // 常年穿搭补充
+  var _curMonth = new Date().getMonth() + 1;
+  var _season = getSeasonKey(_curMonth);
+  var _xiColors = {木:'绿色/青色/翠色',火:'红色/紫色/橙色',土:'黄色/棕色/喁色',金:'白色/银色/金色',水:'黑色/蓝色/灰色'};
+  var _xiJewelry = {木:'桓木·菩提·翡翠(绿)·绿幽灵',火:'红玛瑙·石榴石·紫水晶',土:'黄水晶·琥珀·蜜蜡·和田玉',金:'黄金·白金·银饰·钻石',水:'黑曜石·海蓝宝·蓝水晶'};
+  var _seasonTip = {spring:'春季宜浅色透气，棉麻材质为佳',summer:'夏季宜轻薄明亮，丝缎光泽面料',autumn:'秋季宜温润柔和，羊毛灯芯绒',winter:'冬季宜深色保暖，厚重面料为佳'};
+  var _xiDir = {木:'东方/东南',火:'南方',土:'中央/东北/西南',金:'西方/西北',水:'北方'};
+  text += '👔 常年穿搭(用神' + (xiEle||'金') + ')：主色:' + (_xiColors[xiEle] || _xiColors['金']) + ' | 辅色:' + (colorMap[dayEle] || '') + ' | ' + (_seasonTip[_season] || '') + '\n';
+  text += '🧭 旺运方位：' + luckyDir + (xiEle ? '（喜神' + (_xiDir[xiEle]||'') + '）' : '') + '\n';
 
-  // 正念训练(基于命理匹配) 
-  var _mf = getMindfulMatch(stemRel, branchRel, total / 20, dayEle, userDayEle, xiEle, null, isHuangdao);
-  if (luckInfo.level === '凶' || luckInfo.level === '小凶') {
-    text += '\n🧘 今日正念·' + _mf.method + '(3分钟)：\n';
-    text += '  1 ' + annotateRare(_mf.steps) + '\n';
-    text += '  2 默念：「' + annotateRare(_mf.mantra) + '」\n';
-    text += '  📜 ' + annotateRare(_mf.principle) + '\n';
-  } else if (luckInfo.level === '中吉' || luckInfo.level === '平') {
+  // （正念训练移至第三板块统一展示）
+  if (luckInfo.level === '中吉' || luckInfo.level === '平') {
     text += '\n🧘 今日小贴士：' + _mf.method + '—' + annotateRare(_mf.mantra) + '\n';
   }
 
-  // 常年穿搭建议
-  var _curMonth = new Date().getMonth() + 1;
-  var _season = getSeasonKey(_curMonth);
-  var _xiColors = {木:'绿色/青色/翠色',火:'红色/紫色/橙色',土:'黄色/棕色/咖色',金:'白色/银色/金色',水:'黑色/蓝色/灰色'};
-  var _xiJewelry = {木:'檀木·菩提·翡翠(绿)·绿幽灵',火:'红玛瑙·石榴石·紫水晶',土:'黄水晶·琥珀·蜜蜡·和田玉',金:'黄金·白金·银饰·钻石',水:'黑曜石·海蓝宝·蓝水晶'};
-  var _seasonTip = {
-    spring: '春季宜浅色透气，棉麻材质为佳',
-    summer: '夏季宜轻薄明亮，丝缎光泽面料',
-    autumn: '秋季宜温润柔和，羊毛灯芯绒',
-    winter: '冬季宜深色保暖，厚重面料为佳'
-  };
-  text += '\n👔 常年穿搭建议(用神' + (xiEle||'金') + ')：';
-  text += '主色调:' + (_xiColors[xiEle] || _xiColors['金']) + ' | 辅色:' + (colorMap[dayEle] || '') + ' | 首饰:' + (_xiJewelry[xiEle] || _xiJewelry['金']) + ' | ' + (_seasonTip[_season] || '') + '\n  · 佩戴位置：手串/手链戴' + luckyWearSide + '，吊坠/本命佛/平安扣戴脖子';
-  if (xiEle) {
-    var _xiDir = {木:'东方/东南',火:'南方',土:'中央/东北/西南',金:'西方/西北',水:'北方'};
-    text += '\n  · 旺运方位：' + (_xiDir[xiEle] || '西方');
-  }
+  // （常年穿搭已合并到上方穿戴指南）
 
   // IM精简版
   var imText = '👤 缘主(' + userDayStem + stemEleName + ') ' + total + '/100 ' + luckInfo.stars + ' ' + luckInfo.level;
@@ -2517,7 +2506,7 @@ function generate() {
       else _huaReason = '运势向好·';
     }
     if (_lifeStage && _lifeStage.dyLabel && _lifeStage.dyLabel.indexOf('忌') >= 0) _huaReason += _lifeStage.dyLabel + '·';
-    text += '🛡️ ' + _huaReason + '化解：' + _pishi + '·面向' + _pdir + '\n';
+    // 化解信息已在缘主宜忌后显示
   }
 
   // --- 趋吉避凶板块 ---
@@ -2567,9 +2556,28 @@ function generate() {
     text += '   俗语：「' + (JIEQI_SUYU[jieqi] || '') + '」\n';
   }
 
-  // 天气
-  text += '🌤️ 气温：' + weather.t + ' 湿度：' + weather.h + ' ' + weather.desc + (weather.real ? '' : '(季节推算)') + '\n';
-  text += '👕 穿衣：' + (cloth || CLOTHING[M] || CLOTHING[6]) + '\n';
+  // 天气+穿衣（合并一行）
+  text += '🌤️ ' + weather.t + ' 湿度' + weather.h + ' ' + weather.desc + (weather.real ? '' : '(估算)') + ' | ' + (cloth || CLOTHING[M] || CLOTHING[6]) + '\n';
+  // 天气行不再重复色和饰（已在上文穿搭指南中）
+
+  // 健康养生板块
+  var _dayEleHealth = ELE[dayStem] || '土';
+  var _xiEleHealth = (_userBazi && _userBazi.xiEle) ? _userBazi.xiEle : '金';
+  var _jiEleHealth = (_userBazi && _userBazi.jiEle) ? _userBazi.jiEle : '土';
+  var _foodMapH = {木:'绿叶菜/酸味果/绿茶/芹菜',火:'红枣/红豆/枸杞/番茄',土:'山药/小米/南瓜/红薯',金:'白萝卜/银耳/百合/雪梨',水:'黑豆/海带/海参/核桃'};
+  var _jiFoodMapH = {木:'少食酸/少饮绿茶',火:'少食辣/少饮酒',土:'少食甜/少食面食',金:'少食辛/少食蒜',水:'少食咸/少食寒凉'};
+  var _organMapH = {木:'肝胆·眼·筋·指甲',火:'心·血管·舌·血压',土:'脾·胃·口腔·肌肉',金:'肺·呼吸·鼻·皮肤',水:'肾·膀胱·耳·骨'};
+  var _acupointMapH = {木:'太冲·阳陵泉',火:'内关·神门',土:'足三里·中脘',金:'列缺·肺俞',水:'涌泉·太溪'};
+  var _organCareH = {木:'疏肝理气·忌怒伤肝·宜早睡·忌过劳',火:'养心安神·忌躁扰心·宜午休·忌熬夜',土:'健脾和胃·忌忧思·忌生冷·忌暴饮暴食',金:'润肺养皮·忌悲伤肺·忌干燥·忌寒凉',水:'补肾固本·忌恐伤肾·忌寒·忌纵欲'};
+  var _seasonFoodH = {1:'温补·羊肉/红枣',2:'升阳·韭菜/菠菜',3:'养肝·枸杞/菊花',4:'祛湿·薏米/冬瓜',5:'清心·绿豆/莲子',6:'健脾·山药/小米',7:'消暑·西瓜/绿豆',8:'润肺·雪梨/银耳',9:'滋阴·百合/莲藕',10:'温胃·生姜/桂皮',11:'补肾·黑豆/核桃',12:'御寒·羊肉/当归'};
+  var _monthFoodH = _seasonFoodH[M] || '';
+  var _foodPartsH = [_foodMapH[_xiEleHealth], _monthFoodH];
+  if (_dayEleHealth !== _xiEleHealth) _foodPartsH.splice(1, 0, _foodMapH[_dayEleHealth]);
+  text += '🍚 宜食(补' + _xiEleHealth + '疏' + _jiEleHealth + '):' + _foodPartsH.join('|') + '\n';
+  text += '🚫 忌食:' + (_jiFoodMapH[_jiEleHealth] || '少食生冷') + '\n';
+  text += '🌿 五行养生：' + _xiEleHealth + '(' + (_organMapH[_xiEleHealth]||'') + ')需补益·' + _jiEleHealth + '(' + (_organMapH[_jiEleHealth]||'') + ')需养护\n';
+  text += '💆 穴位保健：' + (_acupointMapH[_xiEleHealth]||'足三里') + '(补' + _xiEleHealth + ')·' + (_acupointMapH[_jiEleHealth]||'中脘') + '(护' + _jiEleHealth + ')\n';
+  text += '⚠️ 养护要点：' + (_organCareH[_xiEleHealth]||'') + ' | ' + (_organCareH[_jiEleHealth]||'') + '\n';
 
   // --- 学习板块 ---
   text += '━━━ 【📿 修己安人·明心见性】 ━━━\n';
@@ -2732,7 +2740,7 @@ function generateMindfulness(baziData, dayStem, dayBranch)  {
       type: '补充',
       method: '补气养神·内观法',
       practice: '仰卧或端坐，双手叠于丹田。腹式呼吸：吸气鼓腹5秒→呼气收腹7秒，循环9轮',
-      incantation: { name: '药师佛心咒', text: '唵·鞞杀逝·鞞杀逝·鞞杀社·三没揭帝·娑诃', pinyin: 'ōng·pí shā shì·pí shā shì·pí shā shè·sān mó jié dì·suō hē', recitationCount: 21 },
+      incantation: { name: '药师佛心咒', text: '唵·鞞杀逝·鞞杀逝·鞞杀社·三没揭帝·娑诃', textAnnotated: '唵(ōng)·鞞(pí)杀(shā)逝(shì)·鞞(pí)杀(shā)逝(shì)·鞞(pí)杀(shā)社(shè)·三(sān)没(mó)揭(jié)帝(dì)·娑(suō)诃(hē)', pinyin: 'ōng·pí shā shì·pí shā shì·pí shā shè·sān mó jié dì·suō hē', recitationCount: 21 },
       guidance: '今日泄气耗能，精气神为三宝。诵药师佛心咒21遍，养气即养命。'
     };
   }
@@ -2951,7 +2959,7 @@ function generateIM() {
       else _huaReason = '运势向好·';
     }
     if (_lifeStage && _lifeStage.dyLabel && _lifeStage.dyLabel.indexOf('忌') >= 0) _huaReason += _lifeStage.dyLabel + '·';
-    text += '🛡️ ' + _huaReason + '化解：' + _pishi + '·面向' + _pdir + '\n';
+    // 化解信息已在缘主宜忌后显示
   }
 
   // --- 趋吉避凶板块 ---

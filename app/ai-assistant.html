@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AI命理助手 · 易道智鉴</title>
+<style>
+:root{--ink:#080808;--ink2:#111;--ink3:#1a1a1a;--paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;--gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;--border:rgba(201,168,76,.15);--jade:#27ae60;--cyan:#2980b9}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',serif;min-height:100vh}
+.nav-bar{position:fixed;top:0;left:0;right:0;z-index:190;background:rgba(13,17,23,0.96);backdrop-filter:blur(8px);border-bottom:1px solid rgba(201,168,76,0.12);padding:7px 0;display:flex;justify-content:center;gap:4px;flex-wrap:wrap}
+.nav-bar a{display:inline-block;padding:5px 12px;background:rgba(201,168,76,0.06);color:var(--gold);border:1px solid rgba(201,168,76,0.12);border-radius:14px;font-size:11px;text-decoration:none;letter-spacing:1px;transition:all .2s}
+.nav-bar a:hover{background:rgba(201,168,76,0.15)}
+.nav-bar a.active{background:rgba(201,168,76,0.2);border-color:var(--gold)}
+@media(max-width:768px){.nav-bar{gap:2px}.nav-bar a{padding:4px 8px;font-size:10px}}
+.container{max-width:800px;margin:0 auto;padding:60px 16px 20px}
+.header{text-align:center;margin-bottom:20px}
+.header h1{font-size:24px;color:var(--gold);letter-spacing:4px;margin-bottom:6px}
+.header p{font-size:12px;color:var(--paper3)}
+/* 排盘输入区 */
+.paipan-box{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.paipan-title{font-size:13px;color:var(--gold);margin-bottom:10px;letter-spacing:2px}
+.paipan-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.paipan-row label{font-size:12px;color:var(--paper3);min-width:50px}
+.paipan-row input,.paipan-row select{background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--paper);font-size:13px;font-family:inherit;outline:none}
+.paipan-row input{width:70px}
+.paipan-btn{padding:8px 20px;background:linear-gradient(135deg,var(--gold3),var(--gold));color:var(--ink);border:none;border-radius:8px;font-size:12px;cursor:pointer;letter-spacing:2px}
+.paipan-btn:hover{opacity:.9}
+.paipan-result{margin-top:10px;padding:10px;background:rgba(201,168,76,0.04);border-radius:8px;font-size:12px;display:none}
+.paipan-result.show{display:block}
+/* 引导提问 */
+.guide-box{margin-bottom:12px}
+.guide-btn{display:inline-block;padding:6px 14px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.15);border-radius:16px;color:var(--gold);font-size:12px;cursor:pointer;margin:4px 4px;transition:all .2s}
+.guide-btn:hover{background:rgba(201,168,76,0.15)}
+/* 聊天区 */
+.chat-box{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:12px;padding:16px;min-height:300px;max-height:500px;overflow-y:auto;margin-bottom:12px}
+.chat-msg{margin-bottom:12px;line-height:1.8;font-size:14px;white-space:pre-wrap;word-break:break-word}
+.chat-user{color:var(--paper)}
+.chat-user .bubble{background:rgba(201,168,76,0.08);border-radius:12px 12px 4px 12px;padding:10px 14px;margin-left:auto;max-width:85%;display:inline-block;float:right;clear:both}
+.chat-ai{color:var(--paper2)}
+.chat-ai .label{font-size:11px;color:var(--gold);margin-bottom:4px}
+.chat-ai .bubble{background:rgba(255,255,255,0.03);border-radius:12px 12px 12px 4px;padding:10px 14px;max-width:85%;display:inline-block}
+.chat-welcome{text-align:center;color:var(--paper3);padding:40px 0;font-size:14px}
+.chat-welcome .emoji{font-size:32px;margin-bottom:10px}
+.chat-welcome .hint{font-size:11px;margin-top:6px}
+.typing{display:inline-block;width:8px;height:8px;background:var(--gold);border-radius:50%;margin:0 2px;animation:blink 1s infinite}
+.typing:nth-child(2){animation-delay:.2s}
+.typing:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
+/* 输入区 */
+.input-box{display:flex;gap:8px;align-items:center}
+.input-box input{flex:1;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:20px;padding:10px 16px;color:var(--paper);font-size:14px;font-family:inherit;outline:none}
+.input-box input:focus{border-color:rgba(201,168,76,0.3)}
+.input-box button{flex-shrink:0;width:40px;height:40px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--gold),var(--gold3));color:var(--ink);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.input-box button:hover{opacity:.9}
+.footer{text-align:center;font-size:11px;color:var(--paper3);margin-top:12px;opacity:.5}
+@media(max-width:768px){.container{padding:56px 12px 16px}.header h1{font-size:20px}.paipan-row input{width:60px}}
+</style>
+</head>
+<body>
+<div class="nav-bar">
+<a href="divination-hub.html">🏠 主平台</a>
+<a href="divination-almanac.html">📅 黄历</a>
+<a href="divination-integrated.html">🧬 体质调理</a>
+<a href="tcm-clinic.html">🏥 中医诊疗</a>
+<a href="tcm-symptom.html">🩺 症状分析</a>
+<a href="divination-knowledge.html">📚 知识库</a>
+<a href="nihaisha-knowledge.html">🪷 倪师知识库</a>
+<a href="nihaisha-tool.html">🔬 倪师工具</a>
+<a href="nihaisha-learning.html">📖 倪师学堂</a>
+<a href="shuhan-knowledge.html">🎯 舒晗知识库</a>
+<a href="divination-shop.html">🛒 商城</a>
+<a href="divination-membership.html">💎 会员</a>
+<a href="wechat-hub.html">📱 缘主工具</a>
+<a href="login.html">🔐 登录</a>
+</div>
+<div class="container">
+<div class="header">
+<h1>🤖 AI命理助手</h1>
+<p>知识库问答 · 排盘解读 · 引导提问</p>
+</div>
+
+<!-- 排盘输入 -->
+<div class="paipan-box">
+<div class="paipan-title">🔮 生辰排盘（可选，填写后AI可深度分析）</div>
+<div class="paipan-row">
+<label>年</label><input type="number" id="ppYear" placeholder="1985" min="1900" max="2100">
+<label>月</label><input type="number" id="ppMonth" placeholder="3" min="1" max="12">
+<label>日</label><input type="number" id="ppDay" placeholder="22" min="1" max="31">
+<label>时</label><input type="number" id="ppHour" placeholder="8" min="0" max="23">
+<label>性别</label>
+<select id="ppSex"><option value="male">男</option><option value="female">女</option></select>
+<button class="paipan-btn" onclick="doPaipan()">排盘</button>
+</div>
+<div class="paipan-result" id="paipanResult"></div>
+</div>
+
+<!-- 引导提问 -->
+<div class="guide-box" id="guideBox">
+<span class="guide-btn" onclick="askGuide('您可以告诉我您的出生年月日时，我来为您排盘分析')">📅 提供生辰</span>
+<span class="guide-btn" onclick="askGuide('我今年运势如何？')">🌟 今年运势</span>
+<span class="guide-btn" onclick="askGuide('我的五行属什么？')">⚖️ 五行分析</span>
+<span class="guide-btn" onclick="askGuide('家里风水怎么布置？')">🏠 风水布局</span>
+<span class="guide-btn" onclick="askGuide('最近失眠怎么调理？')">💤 养生调理</span>
+<span class="guide-btn" onclick="askGuide('倪海厦老师有什么中医建议？')">🪷 倪师中医</span>
+<span class="guide-btn" onclick="askGuide('什么是奇门遁甲？')">🔮 奇门遁甲</span>
+</div>
+
+<!-- 聊天区 -->
+<div class="chat-box" id="chatBox">
+<div class="chat-welcome">
+<div class="emoji">🤖</div>
+<div>您好！我是易道智鉴AI命理助手</div>
+<div class="hint">可以问我命理、风水、中医、养生等问题<br>填写生辰后排盘可获得深度分析</div>
+</div>
+</div>
+
+<!-- 输入区 -->
+<div class="input-box">
+<input type="text" id="chatInput" placeholder="输入问题..." onkeypress="if(event.key==='Enter')sendMsg()">
+<button onclick="sendMsg()">➤</button>
+</div>
+<div class="footer">AI解读仅供参考 · 请理性参考，凡事自辨自省</div>
+</div>
+
+<script>
+const API_BASE = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? 'http://127.0.0.1:8920' : '';
+let chatHistory = [];
+let baziData = null;
+
+// 排盘
+async function doPaipan() {
+  const y = parseInt(document.getElementById('ppYear').value);
+  const m = parseInt(document.getElementById('ppMonth').value);
+  const d = parseInt(document.getElementById('ppDay').value);
+  const h = parseInt(document.getElementById('ppHour').value);
+  const sex = document.getElementById('ppSex').value;
+  if (!y || !m || !d) { alert('请填写年月日'); return; }
+  
+  const result = document.getElementById('paipanResult');
+  result.innerHTML = '排盘中...';
+  result.classList.add('show');
+  
+  try {
+    const paipanBase = API_BASE || 'http://127.0.0.1:8911';
+    const resp = await fetch(paipanBase.replace(':8920',':8911') + '/paipan?year=' + y + '&month=' + m + '&day=' + d + '&hour=' + h + '&sex=' + sex);
+    const data = await resp.json();
+    if (data.error) { result.innerHTML = '排盘失败: ' + data.error; return; }
+    
+    baziData = data;
+    const p = data.pillars || {};
+    const dm = data.day_master || '?';
+    const wc = data.wuxing_count || {};
+    const lack = data.wuxing_lack ? data.wuxing_lack.join('、') : '无';
+    
+    result.innerHTML = '日主：<b style="color:var(--gold)">' + dm + '</b> | 四柱：' + 
+      (p['年']||'?') + ' ' + (p['月']||'?') + ' ' + (p['日']||'?') + ' ' + (p['时']||'?') + 
+      ' | 五行：金' + (wc['金']||0) + ' 木' + (wc['木']||0) + ' 水' + (wc['水']||0) + ' 火' + (wc['火']||0) + ' 土' + (wc['土']||0) + 
+      ' | 缺：' + lack;
+    
+    // 自动发送排盘数据给AI分析
+    sendMsg('请根据我的排盘数据（日主' + dm + '，四柱' + (p['年']||'') + (p['月']||'') + (p['日']||'') + (p['时']||'') + '）分析我的命理特征');
+  } catch(e) {
+    result.innerHTML = '排盘服务暂不可用，您可以直接提问';
+  }
+}
+
+// 引导提问
+function askGuide(q) {
+  document.getElementById('chatInput').value = q;
+  sendMsg();
+}
+
+// 发送消息
+async function sendMsg(prefilled) {
+  const input = document.getElementById('chatInput');
+  const q = (prefilled || input.value).trim();
+  if (!q) return;
+  input.value = '';
+  
+  const box = document.getElementById('chatBox');
+  // 清空欢迎语
+  if (chatHistory.length === 0) box.innerHTML = '';
+  
+  // 用户消息
+  const userDiv = document.createElement('div');
+  userDiv.className = 'chat-msg chat-user';
+  userDiv.innerHTML = '<span class="bubble">' + escapeHtml(q) + '</span>';
+  box.appendChild(userDiv);
+  box.scrollTop = box.scrollHeight;
+  
+  // 打字指示
+  const typingDiv = document.createElement('div');
+  typingDiv.className = 'chat-msg chat-ai';
+  typingDiv.id = 'typing';
+  typingDiv.innerHTML = '<div class="label">🤖 AI命理助手</div><span class="bubble"><span class="typing"></span><span class="typing"></span><span class="typing"></span></span>';
+  box.appendChild(typingDiv);
+  box.scrollTop = box.scrollHeight;
+  
+  chatHistory.push({role: 'user', content: q});
+  
+  try {
+    const resp = await fetch(API_BASE + '/api/ai/public-chat', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        messages: chatHistory.slice(-10),
+        baziData: baziData
+      })
+    });
+    const data = await resp.json();
+    const reply = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '抱歉，暂时无法回答，请稍后再试。';
+    
+    typingDiv.remove();
+    
+    const aiDiv = document.createElement('div');
+    aiDiv.className = 'chat-msg chat-ai';
+    aiDiv.innerHTML = '<div class="label">🤖 AI命理助手' + (data._local ? ' <span style="font-size:10px;opacity:.5">(知识库模式)</span>' : '') + '</div><span class="bubble">' + escapeHtml(reply) + '</span>';
+    box.appendChild(aiDiv);
+    box.scrollTop = box.scrollHeight;
+    
+    chatHistory.push({role: 'assistant', content: reply});
+  } catch(e) {
+    typingDiv.remove();
+    const errDiv = document.createElement('div');
+    errDiv.className = 'chat-msg chat-ai';
+    errDiv.innerHTML = '<div class="label">🤖 AI命理助手</div><span class="bubble">网络异常，请稍后重试。如果持续无法使用，可以尝试直接使用排盘功能或浏览知识库。</span>';
+    box.appendChild(errDiv);
+    box.scrollTop = box.scrollHeight;
+  }
+}
+
+function escapeHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+</script>
+</body>
+</html>

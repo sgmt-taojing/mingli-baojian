@@ -248,39 +248,113 @@ const requirePermission = rbac.requirePermission;
 const AI_API_BASE = process.env.AI_API_BASE || 'https://api.g2claw.com';
 const AI_API_KEY = process.env.G2CLAW_API_KEY || '';
 
+// === AI系统提示词（含知识库上下文）===
+const AI_SYSTEM_PROMPT = `你是「易道智鉴」AI命理助手，精通八字命理、紫微斗数、奇门遁甲、六爻占卜、梅花易数、大六壬、风水布局、中医养生、周易易经等传统文化。
+
+你的职责：
+1. 为缘主提供命理排盘解读（需缘主提供出生年月日时）
+2. 为信众解答风水、运势、养生、择日等问题
+3. 为内部人员（大师/医生）提供专业知识支持
+4. 引导不会提问的缘主：先问生辰→再问关心领域→给出针对性解答
+
+回答规范：
+- 语言简洁易懂，避免过多术语，必要时用大白话解释
+- 涉及健康建议时提醒"仅供参考，不替代专业医疗"
+- 涉及命理预测时提醒"理性参考，凡事自辨自省"
+- 如果用户提供了生辰八字，主动分析五行强弱、日主旺衰、用神取向
+- 如果用户没提供生辰但问了命理问题，先引导提供出生年月日时
+
+知识库覆盖：八字命理、倪海厦中医（伤寒金匮针灸本草）、舒晗命理实战、风水布局、节日养生、奇门遁甲、紫微斗数、六爻梅花等。`;
+
+const AI_GUIDE_PROMPTS = [
+  '您可以告诉我您的出生年月日时（公历或农历），我来为您排盘分析',
+  '您想了解哪方面？比如：八字命理、运势走向、风水布局、中医养生、择日择吉？',
+  '如果您不确定问什么，可以试试：\n1. 我今年运势如何？\n2. 我的五行属什么？\n3. 家里风水怎么布置？\n4. 最近失眠怎么调理？',
+  '请提供您的出生信息（年-月-日-时-性别），我可以为您做深度命理分析'
+];
+
+// === AI本地降级响应===
+function _aiLocalResponse(userText, baziData) {
+  if (!userText) return '您好，我是易道智鉴AI助手。请告诉我您的出生年月日时，我可以为您排盘分析。';
+  const text = userText.toLowerCase();
+  if (baziData && baziData.pillars) {
+    const dm = baziData.day_master || '未知';
+    const p = baziData.pillars;
+    return '根据您的排盘数据：\n日主：' + dm + '\n四柱：' + (p['年']||'?') + ' ' + (p['月']||'?') + ' ' + (p['日']||'?') + ' ' + (p['时']||'?') + '\n\n五行分析：' + JSON.stringify(baziData.wuxing_count||{}) + '\n' + (baziData.wuxing_lack ? '缺'+baziData.wuxing_lack.join('、') : '五行俱全') + '\n\n（AI深度分析服务暂不可用，以上为基础排盘数据。如需深度解读，请稍后重试。）';
+  }
+  if (/八字|排盘|命理|运势/.test(text)) return '我可以为您做八字排盘分析。请提供您的出生年月日时（公历或农历）和性别，例如："1985年3月22日8时 女"。';
+  if (/风水|布局|方位/.test(text)) return '风水布局建议关注：大门方位（纳气）、卧室位置（安神）、厨房位置（火气）、卫生间（排污）。如需个性化分析，请提供房屋朝向和户型。';
+  if (/中医|养生|健康|失眠|头痛/.test(text)) return '中医养生建议：\n1. 子时前入睡，养肝胆\n2. 饮食有节，七分饱\n3. 适度运动，气血流通\n4. 情志调达，少怒少虑\n\n如需针对性建议，请描述具体症状。';
+  if (/倪海厦|倪师/.test(text)) return '倪海厦老师知识库涵盖：伤寒论、金匮要略、针灸大成、神农本草经、黄帝内经等46个模块。请在「倪师知识库」页面浏览，或告诉我具体想了解的内容。';
+  if (/你好|您好|hi|hello/.test(text)) return '您好！我是易道智鉴AI助手。我可以帮您：\n1. 八字排盘与命理分析\n2. 运势预测与建议\n3. 风水布局指导\n4. 中医养生咨询\n5. 择日择吉\n\n请告诉我您想了解什么，或提供出生年月日时进行排盘。';
+  return '您好！我是易道智鉴AI助手。您可以问我：\n- 命理排盘（需提供生辰）\n- 运势分析\n- 风水布局\n- 中医养生\n- 择日择吉\n\n或者直接告诉我您的出生年月日时，我为您排盘分析。';
+}
+
+// === AI聊天（认证用户，高速率）===
 app.post('/api/ai/chat', auth, async (req, res) => {
   const messages = req.body.messages;
   const model = req.body.model || 'auto';
-  
-  if (!messages || !Array.isArray(messages)) {
-    return res.json({ error: '参数错误' });
-  }
-  
-  if (!AI_API_KEY) {
-    return res.json({ error: 'AI服务未配置' });
-  }
-  
-  // 速率限制
-  if (!sec.rateLimit('ai_chat_' + req.userId, 20, 60000)) {
-    return res.status(429).json({ error: 'RATE_LIMITED', message: '请求过于频繁' });
-  }
-  
+  if (!messages || !Array.isArray(messages)) return res.json({ error: '参数错误' });
+  if (!AI_API_KEY) return res.json({ error: 'AI服务未配置' });
+  if (!sec.rateLimit('ai_chat_' + req.userId, 20, 60000)) return res.status(429).json({ error: 'RATE_LIMITED', message: '请求过于频繁' });
+  const sysMsg = { role: 'system', content: AI_SYSTEM_PROMPT };
   try {
     const response = await fetch(AI_API_BASE + '/v1/chat/completions', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + AI_API_KEY
-      },
-      body: JSON.stringify({ model, messages, max_tokens: 4096 })
+      headers: { 'Content-Type': 'application/json', 'Authorization': '***' + AI_API_KEY },
+      body: JSON.stringify({ model, messages: [sysMsg, ...messages], max_tokens: 4096 })
     });
-    
     const data = await response.json();
     res.json(data);
   } catch (e) {
     console.error('AI API错误:', e.message);
     res.json({ error: 'AI服务暂时不可用' });
   }
+});
+
+// === AI聊天（公开，无需认证，低速率+本地降级）===
+app.post('/api/ai/public-chat', async (req, res) => {
+  let messages = req.body.messages;
+  const model = req.body.model || 'auto';
+  const baziData = req.body.baziData || null;
+  if (!messages || !Array.isArray(messages)) return res.json({ error: '参数错误' });
+  
+  if (!AI_API_KEY) {
+    const lastMsg = messages.filter(m => m.role === 'user').pop();
+    return res.json({ choices: [{ message: { content: _aiLocalResponse(lastMsg ? lastMsg.content : '', baziData) } }], _local: true });
+  }
+  
+  const ip = req.ip || req.connection.remoteAddress;
+  if (!sec.rateLimit('ai_public_' + ip, 5, 60000)) return res.status(429).json({ error: 'RATE_LIMITED', message: '请求过于频繁，请稍后再试' });
+  
+  let sysContent = AI_SYSTEM_PROMPT;
+  if (baziData) {
+    sysContent += '\n\n【用户排盘数据】\n' + JSON.stringify(baziData, null, 2) + '\n请基于以上排盘数据回答用户问题。';
+  }
+  
+  try {
+    const response = await fetch(AI_API_BASE + '/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': '***' + AI_API_KEY },
+      body: JSON.stringify({ model, messages: [{ role: 'system', content: sysContent }, ...messages], max_tokens: 2048, temperature: 0.7 })
+    });
+    const data = await response.json();
+    if (data.error) {
+      const lastMsg = messages.filter(m => m.role === 'user').pop();
+      return res.json({ choices: [{ message: { content: _aiLocalResponse(lastMsg ? lastMsg.content : '', baziData) } }], _local: true });
+    }
+    res.json(data);
+  } catch (e) {
+    console.error('AI API错误:', e.message);
+    const lastMsg = messages.filter(m => m.role === 'user').pop();
+    res.json({ choices: [{ message: { content: _aiLocalResponse(lastMsg ? lastMsg.content : '', baziData) } }], _local: true });
+  }
+});
+
+// === AI引导提问 ===
+app.get('/api/ai/guide', (req, res) => {
+  const idx = parseInt(req.query.idx) || 0;
+  res.json({ guide: AI_GUIDE_PROMPTS[idx % AI_GUIDE_PROMPTS.length], all: AI_GUIDE_PROMPTS });
 });
 
 // ============================
