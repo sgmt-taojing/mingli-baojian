@@ -8144,21 +8144,26 @@ function downloadBlob(content, filename, mimeType) {
 }
 
 function exportCurrentSection() {
-  let btns = document.querySelectorAll('.nav-btn');
-  let active = null;
-  for (let i = 0; i < btns.length; i++) { if (btns[i].classList.contains('active')) { active = btns[i]; break; } }
+  let active = document.querySelector('.nav-btn.active');
   if (!active) { showToast('请先选择一个功能模块'); return; }
   let sectionId = active.getAttribute('data-section');
   let section = document.getElementById(sectionId);
   if (!section) { showToast('未找到对应内容'); return; }
-  let html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>导出</title><style>body{font-family:sans-serif;max-width:800px;margin:0 auto;padding:20px;background:var(--ink);color:var(--paper)}h1{color:var(--gold)}</style></head><body>' + section.innerHTML + '<scr'+'ipt src="js/rbac-client.js"></scr'+'ipt>
-<!-- AI助手浮动按钮 -->
-<a href="ai-assistant.html" style="position:fixed;bottom:20px;right:20px;z-index:9999;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold3));display:flex;align-items:center;justify-content:center;font-size:24px;text-decoration:none;box-shadow:0 4px 16px rgba(201,168,76,0.3);transition:all .3s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">🤖</a>
-</body></html>';
-  downloadBlob(html, '导出内容.html', 'text/html;charset=utf-8');
+  let html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + (active.textContent||'导出') + '</title>' +
+    '<style>body{font-family:sans-serif;max-width:800px;margin:0 auto;padding:20px;background:#1a1a1a;color:#eee}' +
+    'h1,h2,h3{color:#c9a84c}pre{background:#222;padding:12px;border-radius:8px;overflow:auto}</style>' +
+    '</head><body>' + section.innerHTML + 
+    '<script src="js/rbac-client.js"><\/script>' +
+    '</body></html>';
+  let blob = new Blob([html], {type: 'text/html;charset=utf-8'});
+  let url = URL.createObjectURL(blob);
+  let a = document.createElement('a');
+  a.href = url;
+  a.download = (active.textContent || 'export') + '.html';
+  a.click();
+  URL.revokeObjectURL(url);
   showToast('已导出当前模块');
-}
-</script>
+}</script>
 <script>
 // ===== 商城分类切换 =====
 function showShopCategory(name, btn) {
@@ -28959,7 +28964,7 @@ function showNishanKB() {
   let title = document.getElementById('knowledgeDetailTitle');
   if (!modal || !content || !title) return;
   title.textContent = '倪海厦讲堂 · 天纪人纪';
-  let html = '<style>.nishan-section h4{color:var(--gold);font-size:18px;letter-spacing:3px;margin-top:28px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,0.2)}.nishan-section p{line-height:2;margin-bottom:12px}.nishan-card{background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:14px;padding:24px;margin-bottom:20px;transition:all .3s}.nishan-card:hover{border-color:rgba(201,168,76,0.4);background:rgba(201,168,76,0.06)}.nishan-quote{background:rgba(192,57,43,0.06);border-left:3px solid var(--cinn);padding:14px 18px;margin:12px 0;border-radius:0 8px 8px 0;font-style:italic;color:var(--paper2);line-height:2}.nishan-tab{display:inline-block;padding:8px 20px;margin:4px;border:1px solid rgba(201,168,76,0.25);border-radius:20px;cursor:pointer;font-size:13px;transition:all .25s}.nishan-tab:hover,.nishan-tab.active{background:rgba(201,168,76,0.12);color:var(--gold);border-color:var(--gold)}.nishan-teacher{background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(192,57,43,0.05));border:1px solid rgba(201,168,76,0.3);border-radius:16px;padding:28px;margin-bottom:24px;text-align:center}
+  let html = `<style>.nishan-section h4{color:var(--gold);font-size:18px;letter-spacing:3px;margin-top:28px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,0.2)}.nishan-section p{line-height:2;margin-bottom:12px}.nishan-card{background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:14px;padding:24px;margin-bottom:20px;transition:all .3s}.nishan-card:hover{border-color:rgba(201,168,76,0.4);background:rgba(201,168,76,0.06)}.nishan-quote{background:rgba(192,57,43,0.06);border-left:3px solid var(--cinn);padding:14px 18px;margin:12px 0;border-radius:0 8px 8px 0;font-style:italic;color:var(--paper2);line-height:2}.nishan-tab{display:inline-block;padding:8px 20px;margin:4px;border:1px solid rgba(201,168,76,0.25);border-radius:20px;cursor:pointer;font-size:13px;transition:all .25s}.nishan-tab:hover,.nishan-tab.active{background:rgba(201,168,76,0.12);color:var(--gold);border-color:var(--gold)}.nishan-teacher{background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(192,57,43,0.05));border:1px solid rgba(201,168,76,0.3);border-radius:16px;padding:28px;margin-bottom:24px;text-align:center}
 /* === 排盘结果统一样式 === */
 .rpt-export-bar{margin-top:16px;text-align:center;display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
 .rpt-export-btn{font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;margin:0 4px;font-family:inherit;transition:all .25s}
@@ -28979,7 +28984,7 @@ function showNishanKB() {
 .rpt-metric-label{font-size:10px;opacity:.5;margin-bottom:4px}
 .rpt-metric-value{font-size:16px;font-weight:bold;color:var(--gold)}
 
-</style>';
+</style>`;
   html += '<div class="nishan-section">';
   
   if (typeof NISHAN_KNOWLEDGE !== 'undefined') {

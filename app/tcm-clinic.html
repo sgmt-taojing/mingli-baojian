@@ -274,11 +274,24 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 
   <!-- ==================== PATIENT PANEL ==================== -->
   <div id="panel-patient" class="panel active">
-    <!-- QR Guide -->
-    <div class="card" style="text-align:center">
-      <div class="card-title" style="justify-content:center"><span class="icon">📱</span> 关注公众号</div>
-      <div class="qr-placeholder" id="qrPlaceholder"></div>
-      <div style="font-size:14px;color:var(--paper2);letter-spacing:1px">扫码关注公众号，获取您的专属养生方案</div>
+    <!-- Symptom Input -->
+    <div class="card" id="symptomInputCard">
+      <div class="card-title"><span class="icon">📝</span> 描述您的症状</div>
+      <div class="input-channels" style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="btn btn-secondary btn-sm" onclick="startPatientVoice()" title="语音输入">🎤 语音</button>
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('symptomFile').click()" title="上传图片/文件/PDF">📎 文件</button>
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('symptomPhoto').click()" title="直接调用摄像头拍照">📷 拍照</button>
+        <button class="btn btn-secondary btn-sm" onclick="switchSymptomInput('manual')" title="手动输入">⌨️ 手动</button>
+      </div>
+      <input type="file" id="symptomFile" accept="image/*,audio/*,.pdf" style="display:none" onchange="handleSymptomFile(this)">
+      <input type="file" id="symptomPhoto" accept="image/*" capture="environment" style="display:none" onchange="handleSymptomPhoto(this)">
+      <div id="symptomFilePreview" style="display:none;margin-top:8px;padding:8px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:8px;font-size:13px;color:var(--paper2)"></div>
+      <textarea class="form-textarea" id="symptomText" rows="4" placeholder="请详细描述您的症状，例如：最近睡眠不好，白天头晕，食欲下降..." style="min-height:120px"></textarea>
+      <div class="btn-row" style="margin-top:12px">
+        <button class="btn btn-primary btn-sm" onclick="submitSymptom()">📨 提交给专家</button>
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('symptomText').value='';document.getElementById('symptomFilePreview').style.display='none'">清空</button>
+      </div>
+      <div id="voiceStatus" style="display:none;margin-top:8px;padding:8px;background:rgba(201,168,76,0.06);border-radius:6px;font-size:13px;color:var(--gold)"></div>
     </div>
 
     <!-- Report Area -->
@@ -376,9 +389,18 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
           </div>
           <!-- Sub: Report -->
           <div id="master-report" class="sub-panel">
+            <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+              <button class="btn btn-secondary btn-sm" onclick="startMasterVoice()">🎤 语音输入</button>
+              <button class="btn btn-secondary btn-sm" onclick="document.getElementById('masterFile').click()">📎 上传文件</button>
+              <button class="btn btn-secondary btn-sm" onclick="document.getElementById('masterPhoto').click()">📷 拍照</button>
+            </div>
+            <input type="file" id="masterFile" accept="image/*,.pdf" style="display:none" onchange="handleMasterFile(this)">
+            <input type="file" id="masterPhoto" accept="image/*" capture="environment" style="display:none" onchange="handleMasterPhoto(this)">
+            <div id="masterFilePreview" style="display:none;margin-bottom:8px;padding:8px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:8px;font-size:12px;color:var(--paper2)"></div>
             <div class="form-group">
               <label class="form-label">分析摘要（可含周易术语）</label>
               <textarea class="form-textarea" id="masterNote" placeholder="日主癸水，生于寅月..."></textarea>
+            <div id="masterVoiceStatus" style="display:none;margin-top:6px;padding:6px;background:rgba(201,168,76,0.06);border-radius:6px;font-size:12px;color:var(--gold)"></div>
             </div>
             <div class="form-group">
               <label class="form-label">医学化翻译建议（通俗语言，病患可见）</label>
@@ -428,6 +450,14 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
         </div>
         <div class="workspace-right">
           <h4>诊疗表单</h4>
+          <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+            <button class="btn btn-secondary btn-sm" onclick="startDoctorVoice()">🎤 语音输入</button>
+            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('doctorFile').click()">📎 上传文件</button>
+            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('doctorPhoto').click()">📷 拍照</button>
+          </div>
+          <input type="file" id="doctorFile" accept="image/*,.pdf" style="display:none" onchange="handleDoctorFile(this)">
+          <input type="file" id="doctorPhoto" accept="image/*" capture="environment" style="display:none" onchange="handleDoctorPhoto(this)">
+          <div id="doctorFilePreview" style="display:none;margin-bottom:8px;padding:8px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:8px;font-size:12px;color:var(--paper2)"></div>
           <div class="form-group">
             <label class="form-label">证候诊断</label>
             <input class="form-input" id="doc-syndrome" list="syndromeList" placeholder="如：肝郁气滞">
@@ -454,6 +484,7 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
           <div class="form-group">
             <label class="form-label">食疗方案</label>
             <textarea class="form-textarea" id="doc-diet" placeholder="推荐食物、禁忌食物、每日食谱建议"></textarea>
+          <div id="doctorVoiceStatus" style="display:none;margin-top:6px;padding:6px;background:rgba(201,168,76,0.06);border-radius:6px;font-size:12px;color:var(--gold)"></div>
           </div>
           <div class="form-group">
             <label class="form-label">运动方案</label>
@@ -1531,6 +1562,205 @@ function formatDate(iso){
 function escHtml(s){
   if(s==null) return '';
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+/* ===== PATIENT INPUT CHANNELS ===== */
+function _genericVoiceStart(targetId,statusId){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const status=statusId?document.getElementById(statusId):null;
+  if(status){status.style.display='block';status.textContent='🎤 正在准备...';}
+  if(!SR){
+    if(status)status.textContent='您的浏览器不支持语音输入，请在 Chrome 或 Safari 中打开，或使用手动输入';
+    return;
+  }
+  const r=new SR();
+  r.lang='zh-CN';r.continuous=false;r.interimResults=true;
+  let ft='';
+  r.onstart=()=>{if(status)status.textContent='🎤 正在聆听，请说话...';};
+  r.onresult=e=>{
+    let im='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal)ft+=e.results[i][0].transcript;
+      else im+=e.results[i][0].transcript;
+    }
+    const t=document.getElementById(targetId);
+    if(t) t.value=ft+im;
+  };
+  r.onerror=e=>{
+    if(status)status.textContent='语音识别出错：'+e.error+'（请使用手动输入）';
+  };
+  r.onend=()=>{
+    if(status){
+      status.textContent=ft.trim()?'✅ 录音完成：'+ft.length+'字':'录音未检测到声音';
+      setTimeout(()=>{if(status)status.style.display='none';},5000);
+    }
+  };
+  try{r.start();}catch(e){
+    if(status)status.textContent='无法启动语音识别';
+  }
+}
+function startMasterVoice(){_genericVoiceStart('masterNote','masterVoiceStatus')}
+function startDoctorVoice(){_genericVoiceStart('doc-diet','doctorVoiceStatus')}
+
+function handleSymptomPhoto(input){_photoFileHandler(input,'symptomFilePreview','【拍照附件】')}
+function handleMasterPhoto(input){_photoFileHandler(input,'masterFilePreview','【拍照附件】')}
+function handleDoctorPhoto(input){_photoFileHandler(input,'doctorFilePreview','【拍照附件】')}
+function _photoFileHandler(input,previewId,prefix){
+  const f=input.files[0];if(!f)return;
+  const preview=document.getElementById(previewId);
+  if(!preview)return;
+  preview.style.display='block';
+  preview.innerHTML='📷 '+escHtml(f.name)+' （'+Math.round(f.size/1024)+'KB）';
+  if(f.type.startsWith('image/')){
+    const reader=new FileReader();
+    reader.onload=e=>{
+      preview.innerHTML+='<img src="'+e.target.result+'" style="max-width:100%;max-height:200px;margin-top:8px;border-radius:6px;display:block">';
+    };
+    reader.readAsDataURL(f);
+  }
+  /* 自动写入对应文本框（如有）*/
+  const textIdMap={'symptomFilePreview':'symptomText'};
+  const txtId=textIdMap[previewId];
+  if(txtId){
+    const txt=document.getElementById(txtId);
+    if(txt){
+      const cur=txt.value.trim();
+      const add=prefix+f.name;
+      if(!cur.includes(add)) txt.value=(cur?cur+'\n\n':'')+add;
+    }
+  }
+  showToast('已添加照片：'+f.name+'（'+Math.round(f.size/1024)+'KB）');
+  /* 清空 input 以便下次拍照同名文件也能触发 change */
+  setTimeout(()=>{input.value='';},1500);
+}
+
+function _genericFileHandler(input,previewId){
+  const f=input.files[0];if(!f)return;
+  const preview=document.getElementById(previewId);
+  if(!preview)return;
+  preview.style.display='block';
+  preview.innerHTML='📎 '+escHtml(f.name)+' （'+Math.round(f.size/1024)+'KB）';
+  if(f.type.startsWith('image/')){
+    const reader=new FileReader();
+    reader.onload=e=>{
+      preview.innerHTML+='<img src="'+e.target.result+'" style="max-width:100%;max-height:150px;margin-top:6px;border-radius:4px">';
+    };
+    reader.readAsDataURL(f);
+  }
+}
+function handleMasterFile(input){_genericFileHandler(input,'masterFilePreview')}
+function handleDoctorFile(input){_genericFileHandler(input,'doctorFilePreview')}
+function startPatientVoice(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const status=document.getElementById('voiceStatus');
+  if(status){status.style.display='block';status.textContent='🎤 正在准备...';}
+  if(!SR){
+    if(status)status.innerHTML='您的浏览器不支持语音输入，请手动输入或在浏览器设置中启用麦克风权限';
+    return;
+  }
+  const r=new SR();
+  r.lang='zh-CN';r.continuous=false;r.interimResults=true;
+  let ft='';
+  r.onstart=()=>{if(status)status.textContent='🎤 正在聆听，请说话...';};
+  r.onresult=e=>{
+    let im='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal)ft+=e.results[i][0].transcript;
+      else im+=e.results[i][0].transcript;
+    }
+    document.getElementById('symptomText').value=ft+im;
+  };
+  r.onerror=e=>{
+    if(status)status.textContent='语音识别出错：'+e.error+'（请使用手动输入）';
+  };
+  r.onend=()=>{
+    if(status){
+      status.textContent=ft.trim()?'✅ 录音完成：'+ft.length+'字':'录音未检测到声音';
+    }
+  };
+  try{r.start();}catch(e){
+    if(status)status.textContent='无法启动语音识别，请使用手动输入';
+  }
+}
+
+function handleSymptomFile(input){
+  const f=input.files[0];
+  if(!f) return;
+  const preview=document.getElementById('symptomFilePreview');
+  preview.style.display='block';
+  preview.innerHTML='📎 '+escHtml(f.name)+' （'+Math.round(f.size/1024)+'KB）';
+  /* 可选：读取为base64 预览 */
+  if(f.type.startsWith('image/')){
+    const reader=new FileReader();
+    reader.onload=e=>{
+      preview.innerHTML+='<img src="'+e.target.result+'" style="max-width:100%;max-height:200px;margin-top:8px;border-radius:6px">';
+    };
+    reader.readAsDataURL(f);
+  }
+  /* 自动在文本框补充文件描述 */
+  const txt=document.getElementById('symptomText');
+  const cur=txt.value.trim();
+  const add='【附件】'+f.name;
+  if(!cur.includes(add)) txt.value=(cur?cur+'\n\n':'')+add;
+  showToast('文件已添加，点击「提交给专家」上传');
+}
+
+function switchSymptomInput(mode){
+  if(mode==='manual'){
+    document.getElementById('symptomText').focus();
+    showToast('请手动输入症状描述');
+  }
+}
+
+async function submitSymptom(){
+  const text=document.getElementById('symptomText').value.trim();
+  const file=document.getElementById('symptomFile').files[0];
+  if(!text && !file){
+    showToast('请输入症状描述或上传文件');
+    return;
+  }
+  const btn=event.target;
+  btn.disabled=true;btn.textContent='提交中...';
+  try{
+    /* 如果有文件，用 FormData；否则 JSON */
+    let resp;
+    if(file){
+      const fd=new FormData();
+      fd.append('text',text);
+      fd.append('file',file);
+      const headers={};
+      const token=localStorage.getItem('ml_token');
+      if(token) headers['Authorization']='Bearer '+token;
+      const r=await fetch(API_BASE+'/api/clinic/submit-symptom',{method:'POST',headers,body:fd});
+      resp=await r.json();
+    }else{
+      resp=await apiCall('/api/clinic/submit-symptom','POST',{text,attachments:[]});
+    }
+    if(resp && resp.success){
+      showToast('✅ 已提交，专家正在分析中');
+      document.getElementById('symptomText').value='';
+      document.getElementById('symptomFile').value='';
+      document.getElementById('symptomFilePreview').style.display='none';
+      /* 本地缓存 */
+      const cases=loadCases();
+      cases.unshift({
+        id:'case_'+Date.now(),
+        role:'patient',status:'pending',
+        text,time:new Date().toISOString(),
+        attachments:file?[file.name]:[]
+      });
+      saveCases(cases);
+    }else{
+      showToast('提交成功（本地保存）');
+      const cases=loadCases();
+      cases.unshift({id:'case_'+Date.now(),role:'patient',status:'pending',text,time:new Date().toISOString()});
+      saveCases(cases);
+    }
+  }catch(e){
+    showToast('已保存到本地');
+  }finally{
+    btn.disabled=false;btn.textContent='📨 提交给专家';
+  }
 }
 
 /* ===== QR PLACEHOLDER ===== */
