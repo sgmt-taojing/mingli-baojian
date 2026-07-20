@@ -5,81 +5,71 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>AI命理助手 · 易道智鉴</title>
 <style>
-:root{--ink:#080808;--ink2:#111;--ink3:#1a1a1a;--paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;--gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;--border:rgba(201,168,76,.15);--jade:#27ae60;--cyan:#2980b9;--cinn:#c0392b}
+:root{--ink:#080808;--ink2:#111;--ink3:#1a1a1a;--paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;--gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;--border:rgba(201,168,76,.15);--jade:#27ae60;--cyan:#2980b9;--cinn:#c0392b;--bg2:rgba(255,255,255,0.02)}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',serif;min-height:100vh}
+body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',serif;min-height:100vh;display:flex;flex-direction:column}
 .nav-bar{position:fixed;top:0;left:0;right:0;z-index:190;background:rgba(13,17,23,0.96);backdrop-filter:blur(8px);border-bottom:1px solid rgba(201,168,76,0.12);padding:7px 0;display:flex;justify-content:center;gap:4px;flex-wrap:wrap}
 .nav-bar a{display:inline-block;padding:5px 12px;background:rgba(201,168,76,0.06);color:var(--gold);border:1px solid rgba(201,168,76,0.12);border-radius:14px;font-size:11px;text-decoration:none;letter-spacing:1px;transition:all .2s}
 .nav-bar a:hover{background:rgba(201,168,76,0.15)}
 .nav-bar a.active{background:rgba(201,168,76,0.2);border-color:var(--gold)}
 @media(max-width:768px){.nav-bar{gap:2px}.nav-bar a{padding:4px 8px;font-size:10px}}
-.container{max-width:820px;margin:0 auto;padding:56px 16px 20px}
-.header{text-align:center;margin-bottom:16px}
-.header h1{font-size:22px;color:var(--gold);letter-spacing:4px;margin-bottom:4px}
-.header p{font-size:12px;color:var(--paper3)}
 
-/* 排盘区 */
-.paipan-box{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px}
-.paipan-title{font-size:13px;color:var(--gold);margin-bottom:8px;letter-spacing:2px}
-.paipan-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:6px}
-.paipan-row label{font-size:12px;color:var(--paper3);min-width:40px}
-.paipan-row input,.paipan-row select{background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--paper);font-size:13px;font-family:inherit;outline:none}
-.paipan-row input{width:64px}
-.paipan-btn{padding:8px 18px;background:linear-gradient(135deg,var(--gold3),var(--gold));color:var(--ink);border:none;border-radius:8px;font-size:12px;cursor:pointer;letter-spacing:2px}
-.paipan-btn:hover{opacity:.9}
-.paipan-result{margin-top:8px;padding:10px;background:rgba(201,168,76,0.04);border-radius:8px;font-size:12px;display:none}
-.paipan-result.show{display:block}
+.main{flex:1;display:flex;flex-direction:column;max-width:820px;margin:0 auto;width:100%;padding:52px 0 0}
 
-/* 场景选择 */
-.scene-box{margin-bottom:14px}
-.scene-title{font-size:12px;color:var(--paper3);margin-bottom:8px;text-align:center}
-.scene-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px}
-.scene-card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .2s}
-.scene-card:hover{border-color:rgba(201,168,76,0.3);background:rgba(201,168,76,0.06)}
-.scene-card.active{border-color:var(--gold);background:rgba(201,168,76,0.1)}
-.scene-icon{font-size:24px;margin-bottom:4px}
-.scene-name{font-size:11px;color:var(--paper2)}
-
-/* 引导问题 */
-.guide-box{margin-bottom:12px;display:none}
-.guide-box.show{display:block}
-.guide-title{font-size:12px;color:var(--paper3);margin-bottom:6px}
-.guide-tags{display:flex;flex-wrap:wrap;gap:6px}
-.guide-tag{display:inline-block;padding:6px 12px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.15);border-radius:16px;color:var(--gold);font-size:12px;cursor:pointer;transition:all .2s}
-.guide-tag:hover{background:rgba(201,168,76,0.15);transform:translateY(-1px)}
+/* 顶部排盘条 */
+.top-bar{background:rgba(255,255,255,0.02);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.top-bar input,.top-bar select{background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:8px;padding:6px 8px;color:var(--paper);font-size:12px;font-family:inherit;outline:none;width:54px}
+.top-bar select{width:auto}
+.top-bar label{font-size:11px;color:var(--paper3)}
+.top-bar .pp-btn{padding:6px 14px;background:linear-gradient(135deg,var(--gold3),var(--gold));color:var(--ink);border:none;border-radius:8px;font-size:11px;cursor:pointer}
+.top-bar .pp-result{font-size:11px;color:var(--gold);margin-left:4px;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* 聊天区 */
-.chat-box{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:12px;padding:14px;min-height:280px;max-height:480px;overflow-y:auto;margin-bottom:10px}
-.chat-msg{margin-bottom:10px;line-height:1.8;font-size:14px;white-space:pre-wrap;word-break:break-word}
-.chat-user{display:flex;justify-content:flex-end}
-.chat-user .bubble{background:rgba(201,168,76,0.08);border-radius:12px 12px 4px 12px;padding:10px 14px;max-width:85%}
-.chat-ai .label{font-size:11px;color:var(--gold);margin-bottom:4px;display:flex;align-items:center;gap:4px}
-.chat-ai .bubble{background:rgba(255,255,255,0.03);border-radius:12px 12px 12px 4px;padding:10px 14px;max-width:85%;display:inline-block}
-.chat-ai .bubble b{color:var(--gold2)}
-.chat-welcome{text-align:center;color:var(--paper3);padding:30px 0}
-.chat-welcome .emoji{font-size:36px;margin-bottom:8px}
-.chat-welcome .title{font-size:15px;color:var(--gold);margin-bottom:6px}
-.chat-welcome .hint{font-size:12px;line-height:1.8}
-.typing{display:inline-block;width:7px;height:7px;background:var(--gold);border-radius:50%;margin:0 2px;animation:blink 1s infinite}
-.typing:nth-child(2){animation-delay:.2s}
-.typing:nth-child(3){animation-delay:.4s}
+.chat-area{flex:1;overflow-y:auto;padding:16px;min-height:calc(100vh - 140px)}
+.msg{margin-bottom:14px;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg-user{display:flex;justify-content:flex-end}
+.msg-user .b{background:rgba(201,168,76,0.1);border-radius:12px 12px 4px 12px;padding:10px 14px;max-width:85%;font-size:14px;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.msg-ai .b{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:4px 12px 12px 12px;padding:12px 16px;max-width:90%;font-size:14px;line-height:1.8;white-space:pre-wrap;word-break:break-word}
+.msg-ai .b b{color:var(--gold2)}
+.msg-ai .b .section{color:var(--gold);font-weight:600;margin-top:8px;display:block}
+.msg-ai .head{font-size:11px;color:var(--gold);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.msg-ai .tag{font-size:10px;opacity:.5;margin-left:4px}
+
+/* 追问按钮 */
+.followups{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}
+.fu-btn{padding:4px 12px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);border-radius:14px;color:var(--gold);font-size:12px;cursor:pointer;transition:all .2s}
+.fu-btn:hover{background:rgba(201,168,76,0.15);transform:translateY(-1px)}
+
+/* 欢迎页 */
+.welcome{text-align:center;padding:40px 20px}
+.welcome .icon{font-size:42px;margin-bottom:12px}
+.welcome h2{color:var(--gold);font-size:20px;letter-spacing:3px;margin-bottom:8px}
+.welcome p{color:var(--paper3);font-size:13px;line-height:1.8;margin-bottom:20px}
+.welcome .quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;max-width:500px;margin:0 auto}
+.welcome .qcard{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;transition:all .2s;text-align:center}
+.welcome .qcard:hover{border-color:rgba(201,168,76,0.3);background:rgba(201,168,76,0.06);transform:translateY(-2px)}
+.welcome .qcard .qi{font-size:22px;margin-bottom:4px}
+.welcome .qcard .qt{font-size:12px;color:var(--paper2)}
+.welcome .qcard .qd{font-size:10px;color:var(--paper3);margin-top:2px}
+
+/* 打字指示 */
+.typing{display:inline-flex;gap:4px;align-items:center;padding:12px 16px}
+.typing span{width:7px;height:7px;background:var(--gold);border-radius:50%;animation:blink 1s infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
 @keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
 
 /* 输入区 */
-.input-box{display:flex;gap:8px;align-items:center}
-.input-box input{flex:1;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:20px;padding:10px 16px;color:var(--paper);font-size:14px;font-family:inherit;outline:none}
-.input-box input:focus{border-color:rgba(201,168,76,0.3)}
-.mic-btn{flex-shrink:0;width:40px;height:40px;border-radius:50%;border:1px solid rgba(201,168,76,0.3);background:rgba(201,168,76,0.08);color:var(--gold);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
-.mic-btn:hover{background:rgba(201,168,76,0.15)}
+.input-area{background:rgba(13,17,23,0.9);border-top:1px solid var(--border);padding:10px 16px;display:flex;gap:8px;align-items:center}
+.input-area input{flex:1;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:22px;padding:10px 18px;color:var(--paper);font-size:14px;font-family:inherit;outline:none}
+.input-area input:focus{border-color:rgba(201,168,76,0.3)}
+.mic-btn{width:40px;height:40px;border-radius:50%;border:1px solid rgba(201,168,76,0.3);background:rgba(201,168,76,0.08);color:var(--gold);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .mic-btn.listening{background:rgba(231,76,60,0.2);border-color:var(--cinn);animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
-.send-btn{flex-shrink:0;width:40px;height:40px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--gold),var(--gold3));color:var(--ink);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.send-btn:hover{opacity:.9}
-.toolbar{text-align:center;margin-top:6px}
-.toolbar button{background:none;border:1px solid var(--border);border-radius:12px;padding:3px 10px;color:var(--paper3);font-size:11px;cursor:pointer;margin:0 4px}
-.toolbar button:hover{color:var(--gold)}
-.footer{text-align:center;font-size:11px;color:var(--paper3);margin-top:10px;opacity:.5}
-@media(max-width:768px){.container{padding:54px 12px 16px}.header h1{font-size:18px}.paipan-row input{width:54px}.scene-grid{grid-template-columns:repeat(3,1fr)}.chat-box{min-height:240px}}
+.send-btn{width:40px;height:40px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--gold),var(--gold3));color:var(--ink);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.footer{text-align:center;font-size:10px;color:var(--paper3);padding:4px;opacity:.4}
+@media(max-width:768px){.top-bar{padding:6px 10px}.top-bar input{width:44px}.chat-area{padding:12px}.welcome .quick{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -100,413 +90,234 @@ body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',serif;
 <a href="ai-assistant.html" class="file-nav-btn active">🤖 AI助手</a>
 <a href="login.html" class="file-nav-btn">🔐 登录</a>
 </div>
-<div class="container">
-<div class="header">
-<h1>🤖 AI命理助手</h1>
-<p>引导提问 · 语音输入 · 排盘解读 · 知识问答</p>
-</div>
 
-<!-- 今日黄历推送 -->
-<div class="paipan-box" id="almanacCard" style="border-color:rgba(201,168,76,0.2)">
-<div class="paipan-title">📅 今日黄历 · 每日推送</div>
-<div id="almanacContent" style="font-size:12px;line-height:1.8;color:var(--paper2)">加载中...</div>
-</div>
-
-<!-- 排盘区 -->
-<div class="paipan-box">
-<div class="paipan-title">🔮 生辰排盘（填写后AI可深度分析您的命理）</div>
-<div class="paipan-row">
-<label>年</label><input type="number" id="ppYear" placeholder="1985" min="1900" max="2100">
-<label>月</label><input type="number" id="ppMonth" placeholder="3" min="1" max="12">
-<label>日</label><input type="number" id="ppDay" placeholder="22" min="1" max="31">
-<label>时</label><input type="number" id="ppHour" placeholder="8" min="0" max="23">
-<label>性别</label>
+<div class="main">
+<!-- 排盘条 -->
+<div class="top-bar">
+<label>📅</label>
+<input type="number" id="ppYear" placeholder="年" min="1900" max="2100">
+<input type="number" id="ppMonth" placeholder="月" min="1" max="12">
+<input type="number" id="ppDay" placeholder="日" min="1" max="31">
+<input type="number" id="ppHour" placeholder="时" min="0" max="23">
 <select id="ppSex"><option value="male">男</option><option value="female">女</option></select>
-<button class="paipan-btn" onclick="doPaipan()">排盘</button>
-</div>
-<div class="paipan-result" id="paipanResult"></div>
-</div>
-
-<!-- 场景选择 -->
-<div class="scene-box">
-<div class="scene-title">选择您想咨询的领域</div>
-<div class="scene-grid" id="sceneGrid">
-<div class="scene-card active" onclick="selectScene('all',this)"><div class="scene-icon">🌟</div><div class="scene-name">全部</div></div>
-<div class="scene-card" onclick="selectScene('mingli',this)"><div class="scene-icon">📅</div><div class="scene-name">命理排盘</div></div>
-<div class="scene-card" onclick="selectScene('yunshi',this)"><div class="scene-icon">🌟</div><div class="scene-name">运势分析</div></div>
-<div class="scene-card" onclick="selectScene('fengshui',this)"><div class="scene-icon">🏠</div><div class="scene-name">风水布局</div></div>
-<div class="scene-card" onclick="selectScene('zhongyi',this)"><div class="scene-icon">💊</div><div class="scene-name">中医养生</div></div>
-<div class="scene-card" onclick="selectScene('shushu',this)"><div class="scene-icon">🔮</div><div class="scene-name">术数占卜</div></div>
-<div class="scene-card" onclick="selectScene('zeri',this)"><div class="scene-icon">📋</div><div class="scene-name">择日择吉</div></div>
-<div class="scene-card" onclick="selectScene('nihaisha',this)"><div class="scene-icon">🪷</div><div class="scene-name">倪师中医</div></div>
-<div class="scene-card" onclick="selectScene('life',this)"><div class="scene-icon">📱</div><div class="scene-name">生活应用</div></div>
-</div>
-</div>
-
-<!-- 引导问题（根据场景动态显示）-->
-<div class="guide-box show" id="guideBox">
-<div class="guide-title">💡 您可以点选以下问题，或直接输入/语音描述您的需求</div>
-<div class="guide-tags" id="guideTags"></div>
+<button class="pp-btn" onclick="doPaipan()">排盘</button>
+<span class="pp-result" id="ppResult"></span>
 </div>
 
 <!-- 聊天区 -->
-<div class="chat-box" id="chatBox">
-<div class="chat-welcome">
-<div class="emoji">🤖</div>
-<div class="title">您好！我是易道智鉴AI命理助手</div>
-<div class="hint">选择领域 → 点选问题或自由提问 → 获取专业解答<br>填写生辰排盘后可获得个性化命理分析</div>
+<div class="chat-area" id="chatArea">
+<div class="welcome" id="welcome">
+<div class="icon">🤖</div>
+<h2>AI命理助手</h2>
+<p>我是您的私人命理顾问，精通八字命理、风水布局、中医养生、术数占卜<br>告诉我您想了解什么，或选择下方领域开始</p>
+<div class="quick" id="quickGrid">
+<div class="qcard" onclick="quickAsk('排盘','我想算八字排盘')"><div class="qi">📅</div><div class="qt">八字排盘</div><div class="qd">命理分析</div></div>
+<div class="qcard" onclick="quickAsk('运势','今年运势如何')"><div class="qi">🌟</div><div class="qt">运势分析</div><div class="qd">流年预测</div></div>
+<div class="qcard" onclick="quickAsk('风水','家里风水怎么布局')"><div class="qi">🏠</div><div class="qt">风水布局</div><div class="qd">环境调理</div></div>
+<div class="qcard" onclick="quickAsk('中医','中医养生建议')"><div class="qi">💊</div><div class="qt">中医养生</div><div class="qd">健康调理</div></div>
+<div class="qcard" onclick="quickAsk('手机号','分析手机号码吉凶')"><div class="qi">📱</div><div class="qt">手机号码</div><div class="qd">八星磁场</div></div>
+<div class="qcard" onclick="quickAsk('感情','感情婚姻分析')"><div class="qi">💕</div><div class="qt">感情婚姻</div><div class="qd">桃花正缘</div></div>
+<div class="qcard" onclick="quickAsk('财运','财运分析')"><div class="qi">💰</div><div class="qt">财运投资</div><div class="qd">理财方向</div></div>
+<div class="qcard" onclick="quickAsk('事业','事业方向分析')"><div class="qi">💼</div><div class="qt">事业职场</div><div class="qd">创业跳槽</div></div>
+</div>
 </div>
 </div>
 
 <!-- 输入区 -->
-<div class="input-box">
-<button class="mic-btn" id="micBtn" onclick="toggleVoice()" title="语音输入">🎤</button>
-<input type="text" id="chatInput" placeholder="输入问题或点击🎤语音输入..." onkeypress="if(event.key==='Enter')sendMsg()">
-<button class="send-btn" onclick="sendMsg()" title="发送">➤</button>
-</div>
-<div class="toolbar">
-<button onclick="clearChat()">🗑 清空</button>
-<button onclick="scrollChat()">⬇ 最新</button>
+<div class="input-area">
+<button class="mic-btn" id="micBtn" onclick="toggleVoice()">🎤</button>
+<input type="text" id="chatInput" placeholder="输入问题或点击🎤语音..." onkeypress="if(event.key==='Enter')sendMsg()">
+<button class="send-btn" onclick="sendMsg()">➤</button>
 </div>
 <div class="footer">AI解读仅供参考 · 请理性参考，凡事自辨自省</div>
 </div>
 
 <script>
-const API_BASE = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? 'http://127.0.0.1:8920' : '';
+const API_BASE = (location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
 let chatHistory = [];
 let baziData = null;
-let currentScene = 'all';
 
-// === 场景引导问题库 ===
-const SCENE_QUESTIONS = {
-  all: ['我想算八字排盘','今年运势如何？','五行缺什么？怎么补？','家里风水怎么布局？','失眠怎么调理？','手机号码吉凶分析','姓名吉凶分析','择日搬家吉日','倪海厦中医建议','大运走势分析','开运化解方案','流年运势预测'],
-  mingli: ['我想算八字排盘','我的日主是什么五行？','五行缺什么？怎么补？','四柱关系分析','格局层次分析','用神喜神是什么？','大运走势如何？','流年影响分析','胎元命宫身宫','神煞有哪些？','开运化解方案','年运分析'],
-  yunshi: ['今年运势如何？','财运怎么样？','事业运分析','感情/婚姻运','健康运预测','明年运势','大运交接年注意什么？','流年太岁影响','月运走势','跨年运势过渡'],
-  fengshui: ['家里风水怎么布局？','卧室风水讲究','办公室风水','大门朝向注意什么？','厨房和卫生间位置','财位在哪里？','化煞方法','家庭风水（全家）','八宅方位','玄空飞星','楼层选择建议'],
-  zhongyi: ['失眠怎么调理？','头痛什么原因？','脾胃不好怎么养？','气血不足怎么补？','湿气重怎么办？','四季养生建议','穴位按摩推荐','体质测试调理','食疗药膳推荐','节气养生'],
-  shushu: ['六爻占卜起卦','梅花易数起卦','奇门遁甲排盘','大六壬起课','紫微斗数排盘','河图洛书分析','哪种占卜适合我？','占卜结果解读'],
-  zeri: ['择日搬家吉日','结婚择日方法','开业吉日怎么选？','动土注意事项','黄历宜忌怎么看？','搬家择日要考虑什么？','每日吉时方位'],
-  nihaisha: ['倪海厦伤寒论方剂','倪师针灸穴位','神农本草经药材','黄帝内经养生智慧','倪师经方实战案例','倪师讲糖尿病治疗','倪师讲心脏病治疗','倪师针灸大成'],
-  life: ['手机号码吉凶分析','姓名吉凶分析','颜择面相分析','选号建议','改名建议','每日运势推送','疗愈音乐推荐','生命指数分析']
+// === 追问建议库 ===
+const FOLLOWUPS = {
+  '排盘': ['分析五行强弱','大运走势如何？','格局层次分析','用神是什么？','流年运势预测'],
+  '运势': ['事业运详细分析','财运详细分析','感情运详细分析','健康运预测','明年运势'],
+  '风水': ['卧室风水讲究','财位在哪里？','化煞方法','办公室风水','楼层选择'],
+  '中医': ['失眠调理方案','脾胃怎么养？','湿气重怎么办？','四季养生建议','穴位按摩'],
+  '手机号': ['换什么尾号好？','号码五行分析','选号建议','八字配号'],
+  '感情': ['桃花星分析','正缘什么时候到？','合婚配对','感情调理方法'],
+  '财运': ['理财方向建议','什么时候发财？','破财怎么防？','招财方位'],
+  '事业': ['适合什么行业？','创业时机分析','跳槽建议','升职运势'],
+  'default': ['排盘分析命理','今年运势如何','风水布局建议','中医养生建议','手机号码分析']
 };
 
-// === 渲染引导问题 ===
-function selectScene(scene, el) {
-  currentScene = scene;
-  document.querySelectorAll('.scene-card').forEach(function(c){c.classList.remove('active')});
-  el.classList.add('active');
-  renderGuideTags();
-}
-
-function renderGuideTags() {
-  const tags = SCENE_QUESTIONS[currentScene] || SCENE_QUESTIONS.all;
-  const box = document.getElementById('guideTags');
-  box.innerHTML = tags.map(function(q){
-    return '<span class="guide-tag" onclick="askGuide(\'' + q.replace(/'/g,'\\\'') + '\')">' + q + '</span>';
-  }).join('');
-}
-
-function askGuide(q) {
-  document.getElementById('chatInput').value = q;
-  sendMsg();
-}
-
-// === 前端简易排盘 ===
-function _fePaipan(y, m, d, h) {
-  const tg = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-  const dz = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-  const yc = (m < 2 || (m === 2 && d < 4)) ? y - 1 : y;
-  const yStem = tg[((yc - 4) % 10 + 10) % 10];
-  const yBranch = dz[((yc - 4) % 12 + 12) % 12];
-  const jieIdx = Math.floor((m - 1) * 2 + (d >= 15 ? 1 : 0));
-  const monthBranch = dz[((jieIdx + 2) % 12 + 12) % 12];
-  const yStemIdx = ((yc - 4) % 10 + 10) % 10;
-  const mStemIdx = (yStemIdx * 2 + ((jieIdx + 2) % 12 + 12) % 12) % 10;
-  const mStem = tg[mStemIdx];
-  const epoch = new Date(1900, 0, 1);
-  const target = new Date(y, m - 1, d);
-  const daysDiff = Math.floor((target - epoch) / 86400000);
-  const dStemIdx = ((daysDiff % 10) + 10) % 10;
-  const dBranchIdx = ((daysDiff + 10) % 12 + 12) % 12;
-  const dStem = tg[dStemIdx];
-  const dBranch = dz[dBranchIdx];
-  const hIdx = Math.floor((h + 1) / 2) % 12;
-  const hBranch = dz[hIdx];
-  const hStemIdx = (dStemIdx * 2 + hIdx) % 10;
-  const hStem = tg[hStemIdx];
-  const wuxing = {'金':0,'木':0,'水':0,'火':0,'土':0};
-  const eleMap = {'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水','子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
-  [yStem+yBranch, mStem+monthBranch, dStem+dBranch, hStem+hBranch].forEach(function(gz){
-    wuxing[eleMap[gz[0]]]++; wuxing[eleMap[gz[1]]]++;
-  });
-  const lack = Object.keys(wuxing).filter(function(k){return wuxing[k]===0;});
-  return {
-    day_master: dStem + eleMap[dStem],
-    pillars: {'年': yStem+yBranch, '月': mStem+monthBranch, '日': dStem+dBranch, '时': hStem+hBranch},
-    wuxing_count: wuxing,
-    wuxing_lack: lack,
-    dayun: [],
-    shensha: {}
-  };
-}
+function quickAsk(topic, q) { sendMsg(q); }
 
 // === 排盘 ===
-async function doPaipan() {
-  const y = parseInt(document.getElementById('ppYear').value);
-  const m = parseInt(document.getElementById('ppMonth').value);
-  const d = parseInt(document.getElementById('ppDay').value);
-  const h = parseInt(document.getElementById('ppHour').value);
-  if (!y || !m || !d) { alert('请填写年月日'); return; }
-  
-  const result = document.getElementById('paipanResult');
-  result.innerHTML = '排盘中...';
-  result.classList.add('show');
-  
-  const paipanBase = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? 'http://127.0.0.1:8911' : '';
-  let data = null;
-  if (paipanBase) {
-    try {
-      const resp = await fetch(paipanBase + '/paipan?year=' + y + '&month=' + m + '&day=' + d + '&hour=' + h + '&sex=' + document.getElementById('ppSex').value);
-      data = await resp.json();
-      if (data.error) data = null;
-    } catch(e) { data = null; }
-  }
-  if (!data) data = _fePaipan(y, m, d, h);
-  
-  baziData = data;
-  const p = data.pillars || {};
-  const dm = data.day_master || '?';
-  const wc = data.wuxing_count || {};
-  const lack = (data.wuxing_lack && data.wuxing_lack.length > 0) ? data.wuxing_lack.join('、') : '无（五行俱全）';
-  const dy = data.dayun && data.dayun.length > 0 ? data.dayun.slice(0,3).map(function(d){return (d.ganzhi||d.gz||'幼运')+'('+d.start_age+'岁起)'}).join(' ') : '';
-  
-  result.innerHTML = '日主：<b style="color:var(--gold)">' + dm + '</b> | 四柱：' + (p['年']||'?') + ' ' + (p['月']||'?') + ' ' + (p['日']||'?') + ' ' + (p['时']||'?') + ' | 五行：金' + (wc['金']||0) + ' 木' + (wc['木']||0) + ' 水' + (wc['水']||0) + ' 火' + (wc['火']||0) + ' 土' + (wc['土']||0) + ' | 缺：' + lack + (dy ? ' | 大运：' + dy : '');
-  
-  // 自动触发AI分析
-  sendMsg('请根据我的排盘数据（日主' + dm + '，四柱' + (p['年']||'') + (p['月']||'') + (p['日']||'') + (p['时']||'') + '）分析我的命理特征、五行强弱和性格运势');
+function _fePaipan(y,m,d,h) {
+  const tg=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  const dz=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  const yc=(m<2||(m===2&&d<4))?y-1:y;
+  const yS=tg[((yc-4)%10+10)%10],yB=dz[((yc-4)%12+12)%12];
+  const ji=Math.floor((m-1)*2+(d>=15?1:0));
+  const mB=dz[((ji+2)%12+12)%12];
+  const yI=((yc-4)%10+10)%10;
+  const mI=(yI*2+((ji+2)%12+12)%12)%10;
+  const mS=tg[mI];
+  const ep=new Date(1900,0,1),tg2=new Date(y,m-1,d);
+  const dd=Math.floor((tg2-ep)/86400000);
+  const dS=tg[((dd%10)+10)%10],dB=dz[((dd+10)%12+12)%12];
+  const hI=Math.floor((h+1)/2)%12;
+  const hB=dz[hI],hI2=(dS?tg.indexOf(dS):0);
+  const hS=tg[(hI2*2+hI)%10];
+  const wx={'金':0,'木':0,'水':0,'火':0,'土':0};
+  const em={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水','子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+  [yS+yB,mS+mB,dS+dB,hS+hB].forEach(g=>{wx[em[g[0]]]++;wx[em[g[1]]]++;});
+  return {day_master:dS+em[dS],pillars:{'年':yS+yB,'月':mS+mB,'日':dS+dB,'时':hS+hB},wuxing_count:wx,wuxing_lack:Object.keys(wx).filter(k=>wx[k]===0)};
 }
 
-// === 语音输入 ===
+async function doPaipan() {
+  const y=parseInt(ppYear.value),m=parseInt(ppMonth.value),d=parseInt(ppDay.value),h=parseInt(ppHour.value);
+  if(!y||!m||!d){alert('请填写年月日');return;}
+  ppResult.textContent='排盘中...';
+  let data=null;
+  const pb=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8911':'';
+  if(pb){try{const r=await fetch(pb+'/paipan?year='+y+'&month='+m+'&day='+d+'&hour='+h+'&sex='+ppSex.value);data=await r.json();if(data.error)data=null;}catch(e){data=null;}}
+  if(!data)data=_fePaipan(y,m,d,h);
+  baziData=data;
+  const p=data.pillars||{},dm=data.day_master||'?',wc=data.wuxing_count||{};
+  const lack=(data.wuxing_lack&&data.wuxing_lack.length)?data.wuxing_lack.join('、'):'无（五行俱全）';
+  ppResult.textContent='日主'+dm+' | '+(p['年']||'?')+' '+(p['月']||'?')+' '+(p['日']||'?')+' '+(p['时']||'?')+' | 缺:'+lack;
+  sendMsg('请根据我的排盘数据（日主'+dm+'，四柱'+(p['年']||'')+(p['月']||'')+(p['日']||'')+(p['时']||'')+'）分析命理特征、五行强弱、性格运势和化解方案');
+}
+
+// === 语音 ===
 function toggleVoice() {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { alert('您的浏览器不支持语音输入，请使用Chrome或Safari'); return; }
-  
-  const micBtn = document.getElementById('micBtn');
-  if (micBtn.dataset.listening === '1') {
-    if (window._recog) window._recog.stop();
-    return;
-  }
-  
-  micBtn.dataset.listening = '1';
-  micBtn.classList.add('listening');
-  micBtn.innerHTML = '🔴';
-  
-  const r = new SR();
-  window._recog = r;
-  r.lang = 'zh-CN';
-  r.continuous = false;
-  r.interimResults = true;
-  let finalText = '';
-  const input = document.getElementById('chatInput');
-  
-  r.onresult = function(e) {
-    let interim = '';
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      if (e.results[i].isFinal) finalText += e.results[i][0].transcript;
-      else interim += e.results[i][0].transcript;
-    }
-    input.value = finalText + interim;
-  };
-  r.onerror = function() {
-    micBtn.dataset.listening = '0';
-    micBtn.classList.remove('listening');
-    micBtn.innerHTML = '🎤';
-  };
-  r.onend = function() {
-    micBtn.dataset.listening = '0';
-    micBtn.classList.remove('listening');
-    micBtn.innerHTML = '🎤';
-    if (finalText.trim()) sendMsg();
-  };
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert('浏览器不支持语音输入，请用Chrome或Safari');return;}
+  const btn=micBtn;
+  if(btn.dataset.l==='1'){if(window._r)window._r.stop();return;}
+  btn.dataset.l='1';btn.classList.add('listening');btn.textContent='🔴';
+  const r=new SR();window._r=r;r.lang='zh-CN';r.continuous=false;r.interimResults=true;
+  let ft='';
+  r.onresult=e=>{let im='';for(let i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)ft+=e.results[i][0].transcript;else im+=e.results[i][0].transcript;}chatInput.value=ft+im;};
+  r.onerror=()=>{btn.dataset.l='0';btn.classList.remove('listening');btn.textContent='🎤';};
+  r.onend=()=>{btn.dataset.l='0';btn.classList.remove('listening');btn.textContent='🎤';if(ft.trim())sendMsg();};
   r.start();
 }
 
 // === 发送消息 ===
 async function sendMsg(prefilled) {
-  const input = document.getElementById('chatInput');
-  const q = (prefilled || input.value).trim();
-  if (!q) return;
-  input.value = '';
-  
-  const box = document.getElementById('chatBox');
-  if (chatHistory.length === 0) box.innerHTML = '';
-  
+  const q=(prefilled||chatInput.value).trim();
+  if(!q)return;
+  chatInput.value='';
+  const area=chatArea;
+  if(chatHistory.length===0)area.innerHTML='';
   // 用户气泡
-  const userDiv = document.createElement('div');
-  userDiv.className = 'chat-msg chat-user';
-  userDiv.innerHTML = '<span class="bubble">' + escapeHtml(q) + '</span>';
-  box.appendChild(userDiv);
-  
-  // 打字指示
-  const typingDiv = document.createElement('div');
-  typingDiv.className = 'chat-msg chat-ai';
-  typingDiv.id = 'typing';
-  typingDiv.innerHTML = '<div class="label">🤖 AI命理助手</div><span class="bubble"><span class="typing"></span><span class="typing"></span><span class="typing"></span></span>';
-  box.appendChild(typingDiv);
-  box.scrollTop = box.scrollHeight;
-  
-  chatHistory.push({role: 'user', content: q});
-  if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
+  area.innerHTML+='<div class="msg msg-user"><div class="b">'+esc(q)+'</div></div>';
+  // 打字
+  area.innerHTML+='<div class="msg msg-ai" id="typing"><div class="head">🤖 AI命理助手</div><div class="typing"><span></span><span></span><span></span></div></div>';
+  area.scrollTop=area.scrollHeight;
+  chatHistory.push({role:'user',content:q});
+  if(chatHistory.length>20)chatHistory=chatHistory.slice(-20);
   
   try {
-    const resp = await fetch(API_BASE + '/api/ai/public-chat', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ messages: chatHistory.slice(-10), baziData: baziData })
-    });
-    const data = await resp.json();
-    const reply = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '抱歉，暂时无法回答，请稍后再试。';
-    
-    typingDiv.remove();
-    addAiBubble(reply, data._local);
+    const resp=await fetch(API_BASE+'/api/ai/public-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:chatHistory.slice(-10),baziData})});
+    const data=await resp.json();
+    const reply=(data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content)||'抱歉，暂时无法回答。';
+    document.getElementById('typing')?.remove();
+    addAI(reply,data._local,q);
   } catch(e) {
-    typingDiv.remove();
-    const reply = _localResponse(q, baziData);
-    addAiBubble(reply, true);
+    document.getElementById('typing')?.remove();
+    addAI(_local(q,baziData),true,q);
   }
 }
 
-function addAiBubble(reply, isLocal) {
-  const box = document.getElementById('chatBox');
-  const aiDiv = document.createElement('div');
-  aiDiv.className = 'chat-msg chat-ai';
-  const label = isLocal ? '🤖 AI命理助手 <span style="font-size:10px;opacity:.5">(知识库模式)</span>' : '🤖 AI命理助手';
-  aiDiv.innerHTML = '<div class="label">' + label + '</div><span class="bubble">' + escapeHtml(reply) + '</span>';
-  box.appendChild(aiDiv);
-  box.scrollTop = box.scrollHeight;
-  chatHistory.push({role: 'assistant', content: reply});
-  if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
-}
-
-function clearChat() {
-  chatHistory = [];
-  baziData = null;
-  document.getElementById('chatBox').innerHTML = '<div class="chat-welcome"><div class="emoji">🤖</div><div class="title">您好！我是易道智鉴AI命理助手</div><div class="hint">选择领域 → 点选问题或自由提问 → 获取专业解答<br>填写生辰排盘后可获得个性化命理分析</div></div>';
-  document.getElementById('paipanResult').classList.remove('show');
-}
-
-function scrollChat() {
-  const box = document.getElementById('chatBox');
-  box.scrollTop = box.scrollHeight;
-}
-
-function escapeHtml(s) {
-  if (!s) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>');
-}
-
-// === 前端本地降级响应 ===
-function _localResponse(text, bazi) {
-  if (!text) return '您好，我是易道智鉴AI助手。请告诉我您的出生年月日时，我可以为您排盘分析。';
-  const t = text.toLowerCase();
+function addAI(reply,isLocal,userQ) {
+  const area=chatArea;
+  const tag=isLocal?'<span class="tag">知识库模式</span>':'';
   
-  // 手机号识别+分析
-  var _mobMatch = text.match(/1[3-9]\d{9}/);
-  if (_mobMatch) return _feAnalyzeMobile(_mobMatch[0]);
-  if (bazi && bazi.pillars) {
-    const dm = bazi.day_master || '未知';
-    const p = bazi.pillars;
-    const wc = bazi.wuxing_count || {};
-    const lack = (bazi.wuxing_lack && bazi.wuxing_lack.length > 0) ? bazi.wuxing_lack.join('、') : '无（五行俱全）';
-    const ele = dm.slice(-1);
-    let desc = '';
-    if (ele==='金') desc='金主义，性格刚毅果断，重情重义';
-    else if (ele==='木') desc='木主仁，性格直爽向上，有进取心';
-    else if (ele==='水') desc='水主智，性格聪明灵活，善于变通';
-    else if (ele==='火') desc='火主礼，性格热情外向，有领导力';
-    else if (ele==='土') desc='土主信，性格稳重厚道，重承诺';
-    let fix = '';
-    if (bazi.wuxing_lack && bazi.wuxing_lack.includes('火')) fix='宜补火：多穿红色、向南方位、食温性食物';
-    else if (bazi.wuxing_lack && bazi.wuxing_lack.includes('木')) fix='宜补木：多接触绿色植物、向东方位、食酸性食物';
-    else if (bazi.wuxing_lack && bazi.wuxing_lack.includes('金')) fix='宜补金：多穿白色、向西方位、食辛性食物';
-    else if (bazi.wuxing_lack && bazi.wuxing_lack.includes('水')) fix='宜补水：多近水、向北方、食咸性食物';
-    else if (bazi.wuxing_lack && bazi.wuxing_lack.includes('土')) fix='宜补土：多穿黄色、居中位、食甘性食物';
-    else fix='五行平衡，注意整体调和';
-    let monthLuck = '';
-    const monthEle = {'寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水','子':'水','丑':'土'}[(p['月']||'').slice(1,2)] || '';
-    if (monthEle && ele) {
-      const rel = {'金木':'金克木','水火':'水克火','木土':'木克土','火金':'火克金','土水':'土克水'};
-      const key = ele+monthEle;
-      if (rel[key]) monthLuck = '\n【月运提示】本月'+monthEle+'旺，日主'+ele+rel[key]+'，注意'+(ele==='金'?'呼吸系统':ele==='木'?'肝胆情绪':ele==='水'?'肾脏泌尿':ele==='火'?'心血管':ele==='土'?'脾胃消化':'整体健康');
-    }
-    return '根据您的排盘数据，完整分析如下：\n\n━━━ 命盘概览 ━━━\n【四柱】'+(p['年']||'?')+' '+(p['月']||'?')+' '+(p['日']||'?')+' '+(p['时']||'?')+'\n【日主】'+dm+'\n【五行】金'+(wc['金']||0)+' 木'+(wc['木']||0)+' 水'+(wc['水']||0)+' 火'+(wc['火']||0)+' 土'+(wc['土']||0)+'\n【缺行】'+lack+'\n\n━━━ 性格特征 ━━━\n'+desc+'\n\n━━━ 五行补救方案（拿来即用）━━━\n'+fix+'\n【方位】'+(bazi.wuxing_lack&&bazi.wuxing_lack.includes('火')?'南方（火位）':bazi.wuxing_lack&&bazi.wuxing_lack.includes('木')?'东方（木位）':bazi.wuxing_lack&&bazi.wuxing_lack.includes('金')?'西方（金位）':bazi.wuxing_lack&&bazi.wuxing_lack.includes('水')?'北方（水位）':'中央（土位）')+'\n【颜色】'+(bazi.wuxing_lack&&bazi.wuxing_lack.includes('火')?'红/紫/橙':bazi.wuxing_lack&&bazi.wuxing_lack.includes('木')?'绿/青':bazi.wuxing_lack&&bazi.wuxing_lack.includes('金')?'白/银':bazi.wuxing_lack&&bazi.wuxing_lack.includes('水')?'黑/蓝':'黄/棕')+'\n【行业】'+(bazi.wuxing_lack&&bazi.wuxing_lack.includes('火')?'电子/餐饮/能源/传媒':bazi.wuxing_lack&&bazi.wuxing_lack.includes('木')?'教育/出版/农业/服装':bazi.wuxing_lack&&bazi.wuxing_lack.includes('金')?'金融/机械/珠宝/法律':bazi.wuxing_lack&&bazi.wuxing_lack.includes('水')?'物流/旅游/水产/通信':'房产/陶瓷/建筑/政务')+'\n【饮食】'+(bazi.wuxing_lack&&bazi.wuxing_lack.includes('火')?'多食红枣/枸杞/羊肉/生姜':bazi.wuxing_lack&&bazi.wuxing_lack.includes('木')?'多食绿叶菜/酸味水果/核桃':bazi.wuxing_lack&&bazi.wuxing_lack.includes('金')?'多食白萝卜/百合/银耳/梨':bazi.wuxing_lack&&bazi.wuxing_lack.includes('水')?'多食黑豆/海带/鱼/豆腐':'多食山药/小米/南瓜/土豆')+monthLuck+'\n\n━━━ 年运建议 ━━━\n2026年为丙午年（火旺），'+(ele==='金'?'火克金，今年压力较大，宜保守稳健，注意呼吸道健康':ele==='木'?'木生火，今年精力旺盛，宜积极进取，但防过劳':ele==='水'?'水克火，今年掌控力强，事业有成':ele==='火'?'火旺太过，宜防急躁，注意心血管':ele==='土'?'火生土，今年贵人多助，稳重行事则吉':'今年平稳，顺势而为')+'\n\n（配置AI API后可获得更深度的大运/流年/格局分析）';
+  // 获取追问建议
+  let fuBtns='';
+  const fuTopic=_detectTopic(userQ);
+  const fus=(FOLLOWUPS[fuTopic]||FOLLOWUPS.default).slice(0,4);
+  fuBtns='<div class="followups">'+fus.map(f=>'<span class="fu-btn" onclick="sendMsg(\''+f.replace(/'/g,"\\'")+'\')">'+f+'</span>').join('')+'</div>';
+  
+  const html='<div class="msg msg-ai"><div class="head">🤖 AI命理助手'+tag+'</div><div class="b">'+esc(reply)+'</div>'+fuBtns+'</div>';
+  area.insertAdjacentHTML('beforeend',html);
+  area.scrollTop=area.scrollHeight;
+  chatHistory.push({role:'assistant',content:reply});
+  if(chatHistory.length>20)chatHistory=chatHistory.slice(-20);
+}
+
+function _detectTopic(q) {
+  const t=q.toLowerCase();
+  if(/排盘|八字|命理|四柱|日主/.test(t))return '排盘';
+  if(/运势|运气|今年|流年/.test(t))return '运势';
+  if(/风水|布局|方位/.test(t))return '风水';
+  if(/中医|养生|健康|失眠|头痛/.test(t))return '中医';
+  if(/手机号|号码/.test(t)||/1[3-9]\d{9}/.test(q))return '手机号';
+  if(/婚姻|感情|桃花|恋爱/.test(t))return '感情';
+  if(/财运|投资|理财/.test(t))return '财运';
+  if(/事业|工作|创业/.test(t))return '事业';
+  return 'default';
+}
+
+function esc(s) {
+  if(!s)return'';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')
+    .replace(/━━━/g,'<span class="section">━━━')
+    .replace(/━━━/g,'━━━</span>')
+    .replace(/\n/g,'<br>');
+}
+
+// === 本地降级（精简版，与后端对齐）===
+function _local(text,bazi) {
+  if(!text)return'您好，请告诉我您想了解什么。';
+  const t=text.toLowerCase();
+  var _m=text.match(/1[3-9]\d{9}/);
+  if(_m)return _feMobile(_m[0]);
+  if(bazi&&bazi.pillars){
+    const dm=bazi.day_master||'?',p=bazi.pillars,wc=bazi.wuxing_count||{};
+    const lack=(bazi.wuxing_lack&&bazi.wuxing_lack.length)?bazi.wuxing_lack.join('、'):'无';
+    const ele=dm.slice(-1);
+    const desc={'金':'金主义，刚毅果断','木':'木主仁，直爽向上','水':'水主智，聪明灵活','火':'火主礼，热情外向','土':'土主信，稳重厚道'}[ele]||'';
+    const fix=bazi.wuxing_lack&&bazi.wuxing_lack.includes('火')?'宜补火：红色/南方/温性食物':bazi.wuxing_lack&&bazi.wuxing_lack.includes('木')?'宜补木：绿色/东方/酸性食物':bazi.wuxing_lack&&bazi.wuxing_lack.includes('金')?'宜补金：白色/西方/辛性食物':bazi.wuxing_lack&&bazi.wuxing_lack.includes('水')?'宜补水：黑色/北方/咸性食物':'五行平衡';
+    return'━━━ 命盘分析 ━━━\n\n【四柱】'+(p['年']||'?')+' '+(p['月']||'?')+' '+(p['日']||'?')+' '+(p['时']||'?')+'\n【日主】'+dm+'\n【五行】金'+(wc['金']||0)+' 木'+(wc['木']||0)+' 水'+(wc['水']||0)+' 火'+(wc['火']||0)+' 土'+(wc['土']||0)+'\n【缺行】'+lack+'\n\n【性格】'+desc+'\n【补救】'+fix+'\n\n【年运】2026丙午年火旺，'+(ele==='金'?'火克金宜稳健':ele==='木'?'木生火宜进取':ele==='水'?'水克火事业有成':ele==='火'?'火太旺防急躁':ele==='土'?'火生土贵人助':'平稳顺势');
   }
-  if (/八字|排盘|命理|算命|算卦|占卜/.test(t)) return '━━━ 八字排盘分析指南 ━━━\n\n【什么是八字】\n八字又称四柱命理，以出生年月日时对应的天干地支推算人生运势。\n\n【排盘需要】\n请提供：出生年-月-日-时-性别\n例如：1985年3月22日8时 女\n\n【分析内容】\n1.日主五行 2.四柱关系 3.五行强弱 4.用神喜神\n5.大运走势 6.格局层次 7.神煞 8.流年运势\n\n【化解建议】\n根据五行缺行给出方位/颜色/行业/饮食/佩戴全方位调理\n\n请在上方填写生辰，点击排盘即可获得完整分析报告。';
-  if (/运势|运气|今年|流年/.test(t)) return '━━━ 运势分析报告 ━━━\n\n【分析维度】\n1.事业运 2.财运 3.感情运 4.健康运 5.人际运\n\n【2026丙午年要点】\n- 喜火者：事业腾飞\n- 忌火者：宜守不宜攻\n- 冲太岁（鼠/马/牛/兔）：需化解\n\n【月运参考】\n正月木旺·四五月火旺·七八月金旺·十月十一月水旺\n\n请提供生辰，可分析个性化流年运势。';
-  if (/五行|缺什么|属什么/.test(t)) return '五行分析需要您的生辰信息。请提供出生年月日时，我可以排盘后告诉您：\n1. 日主五行属性\n2. 五行强弱分布\n3. 缺什么五行\n4. 补救建议（方位/颜色/饮食/行业）';
-  if (/风水|布局|方位|房子|家居/.test(t)) return '━━━ 风水布局分析报告 ━━━\n\n【大门】纳气之口，宜吉位，忌对电梯/镜子\n【客厅】财位在对角线45度，宜放招财植物\n【卧室】床头靠实墙，忌横梁/镜子对床\n【厨房】宜凶位压煞，灶台忌对水槽\n【卫生间】宜凶位，忌对大门\n【化煞】路冲→八卦镜·缺角→水晶·横梁→葫芦\n\n如需个性化分析，请提供房屋朝向。';
-  if (/中医|养生|健康/.test(t)) return '中医养生建议：\n\n1.【起居】子时前入睡，养肝胆\n2.【饮食】七分饱，少生冷\n3.【运动】适度运动，气血流通\n4.【情志】少怒少虑，心态平和\n5.【四季】春养肝、夏养心、秋养肺、冬养肾\n\n如需针对性建议，请描述症状。';
-  if (/失眠|睡不着|睡眠/.test(t)) return '━━━ 失眠调理方案 ━━━\n\n【辨证】心脾两虚/肝郁化火/阴虚火旺/痰热扰心/心胆气虚\n【食疗】酸枣仁粥·百合莲子汤·小米粥·桂圆红枣茶\n【穴位】神门·三阴交·安眠穴·涌泉穴\n【起居】子时前睡·睡前泡脚·忌手机·忌咖啡\n【运动】傍晚散步·太极八段锦\n\n持续失眠超过2周建议就诊中医。';
-  if (/头痛|头晕/.test(t)) return '头痛调理建议：\n\n【分型】\n- 胀痛→肝阳上亢\n- 隐痛→气血不足\n- 刺痛→瘀血阻络\n- 重痛→痰湿内阻\n\n【穴位】太阳穴、风池、合谷\n\n持续头痛请就医。';
-  if (/倪海厦|倪师/.test(t)) return '倪海厦老师知识库涵盖46个模块：\n\n【经方】伤寒论、金匮要略\n【针灸】针灸大成\n【本草】神农本草经\n【经典】黄帝内经\n【命理】天纪、人纪\n\n请在「倪师知识库」页面浏览。';
-  if (/舒晗/.test(t)) return '舒晗老师知识库包含：命理秘笈、实战心法、进阶课程等。请在「舒晗知识库」页面浏览。';
-  if (/奇门|遁甲/.test(t)) return '奇门遁甲是古代最高层预测学，被誉为「帝王之学」。\n\n【构成】天盘九星+地盘八门+八神+三奇六仪\n【用途】预测吉凶、择日择吉、战略决策\n\n请在排盘页面使用奇门引擎。';
-  if (/紫微|斗数/.test(t)) return '紫微斗数以出生年月日时排盘，用十二宫位分析人生各维度。\n\n【十二宫】命宫、兄弟、夫妻、子女、财帛、疾厄等\n\n请在排盘页面使用紫微引擎。';
-  if (/六爻|占卜|起卦/.test(t)) return '六爻占卜通过起卦预测吉凶。\n\n【方法】三枚铜钱摇六次\n【分析】世应关系、六亲配六神\n\n请在排盘页面使用六爻引擎。';
-  if (/梅花|易数/.test(t)) return '梅花易数以时间或数字起卦，简便快捷。\n\n【起卦法】时间、数字、方位起卦\n【分析】体用关系、互卦变卦\n\n请在排盘页面使用梅花引擎。';
-  if (/六壬/.test(t)) return '大六壬与奇门遁甲、太乙神数并称三式。\n\n【构成】四课三传+天将+神煞\n【用途】预测失物、行人、婚姻、事业\n\n请在排盘页面使用六壬引擎。';
-  if (/择日|择吉|吉日/.test(t)) return '择日择吉根据黄历选择吉日。\n\n【原则】避开岁破、月破；选择天德、月德、三合\n【用途】婚嫁、搬家、开业、动土\n\n请访问「黄历」页面或排盘页面。';
-  if (/黄历|宜忌/.test(t)) return '黄历包含每日宜忌、吉时方位、节气信息等。\n\n请访问「黄历」页面查看今日详情。';
-  if (/体质|调理/.test(t)) return '体质调理根据五行体质定制方案。\n\n【五型】木型疏肝、火型养心、土型健脾、金型补肺、水型温肾\n\n请访问「体质调理」页面做体质测试。';
-  if (/婚姻|感情|桃花|恋爱|对象|单身/.test(t)) return '感情婚姻分析：\n\n【桃花星】子午卯酉为桃花，日支带桃花者异性缘佳\n【正缘】男看正财、女看正官，流年引动则姻缘至\n【合婚】双方八字五行互补、日柱相生为佳\n\n请提供双方生辰，可做深度合婚分析。也可在排盘页面查看个人桃花星。';
-  if (/子女|孩子|怀孕|生育/.test(t)) return '子女分析：\n\n【子女星】男以官杀为子女、女以食伤为子女\n【子女宫】时柱为子女宫，时柱逢冲则子女缘薄\n【备孕】择吉年吉月生养，子女八字与父母相生为佳\n\n请提供您的生辰，可分析子女缘深浅。';
-  if (/事业|工作|职场|创业|跳槽/.test(t)) return '事业分析：\n\n【官运】正官为正职、七杀为偏职/创业\n【适合行业】以日主五行喜用选行业（如喜火→电子/餐饮）\n【创业时机】大运行喜用神运时创业易成\n\n请提供生辰，可分析您的事业方向和创业时机。';
-  if (/财运|投资|理财|赚钱|破财/.test(t)) return '━━━ 财运分析报告 ━━━\n\n【财星】正财→工薪·偏财→投资·财库→能存财\n【周期】大运行财星→十年高峰·流年比劫→当年破财\n【理财】正财为主→稳健·偏财为主→适度投资\n【破财预警】比劫运年→忌借贷/合伙\n【招财方位】喜金→西·喜木→东·喜水→北·喜火→南·喜土→中\n\n请提供生辰，可分析财运走势。';
-  if (/健康|疾病|体检|长寿/.test(t)) return '健康分析：\n\n【五行对应】金→肺/呼吸、木→肝胆、水→肾/泌尿、火→心/血、土→脾/胃\n【缺行预警】缺某五行→对应脏腑偏弱，需重点养护\n【大运健康】行忌神运时注意对应脏腑疾病\n\n请提供生辰，可分析您的健康弱点和养护建议。';
-  if (/搬家|出行|迁徙|出差/.test(t)) return '出行搬家建议：\n\n【搬家择日】宜天德/月德/三合/六合日，忌岁破/月破\n【出行方位】向喜用神方位出行大吉\n【迁徙方向】迁向喜用方发展事业/财运更佳\n\n请在排盘页面使用择日引擎，或告诉我您的目标方向。';
-  if (/学业|考试|升学|考研/.test(t)) return '学业考试分析：\n\n【印星】正印/偏印代表学习，印星为喜用则学业有成\n【文昌】日干见文昌星者聪慧好学\n【考试运】流年行印星运时考试顺利\n\n请提供生辰，可分析学业潜力和考试运势。';
-  if (/人际|社交|贵人|小人/.test(t)) return '人际关系分析：\n\n【贵人】天乙贵人/天德贵人/月德贵人，命中带贵人者遇难呈祥\n【小人】七杀/伤官旺易招小人，宜低调行事\n【社交】比肩/劫财多者朋友多但易破财\n\n请提供生辰，可分析您的贵人和人际运。';
-  if (/开运|吉祥物|佩戴|转运/.test(t)) return '开运吉祥物建议：\n\n【五行补缺】缺金戴金属饰品、缺木戴木质手串、缺水戴水晶、缺火戴红色玛瑙、缺土戴玉石\n【生肖吉祥物】本命佛/三合生肖贵人\n【方位】办公/睡觉朝喜用神方位\n\n请提供生辰，可知您的喜用神和开运方向。商城有相应吉祥物。';
-  if (/合婚|配对|匹配/.test(t)) return '合婚分析：\n\n【五行互补】男方喜神为女方八字所含、反之亦然\n【日柱关系】日柱天合地合为上婚、相生为中婚、相克为下婚\n【生肖】三合/六合为佳，六冲/三刑为忌\n\n请提供双方生辰，可做深度合婚配对分析。';
-  if (/本命年|犯太岁|太岁/.test(t)) return '本命年/犯太岁化解：\n\n【太岁】本命年值太岁，冲太岁、刑太岁、害太岁均需化解\n【化解方法】\n1. 佩戴太岁符/本命佛\n2. 拜太岁（正月初八）\n3. 年底谢太岁\n4. 避免大额投资/重大变动\n5. 多做善事积德\n\n2026年丙午年：马/鼠/牛/兔犯太岁，需提前化解。';
-  if (/梦境|做梦|梦到/.test(t)) return '梦境解读：\n\n梦境在命理中与日主五行、十神意象相关。\n【水梦】梦水→智慧/财运暗示\n【火梦】梦火→事业/名声变化\n【动物梦】梦龙→贵人、梦蛇→财运、梦虎→权力\n\n请描述您的梦境内容，我为您解读。';
-  if (/性格|心理|脾气/.test(t)) return '性格心理分析：\n\n【日主五行】\n- 金：刚毅果断，重义气\n- 木：直爽向上，有进取心\n- 水：聪明灵活，善变通\n- 火：热情外向，有领导力\n- 土：稳重厚道，重承诺\n\n【十神影响】正官守规矩、七杀果断、正印善良、偏印敏感、食神乐观、伤官叛逆\n\n请提供生辰，可做深度性格分析。';
-  if (/公司起名|品牌起名|店铺起名/.test(t)) return '公司/品牌起名建议：\n\n【五行】公司名宜补法人八字喜用神\n【数理】总格/人格数理宜吉祥（如24、31、35）\n【行业】行业五行与名称五行相生为佳\n\n请提供法人生辰和行业类型，可给出起名建议。';
-  if (/每日运势|今日运势|今天运势/.test(t)) return '每日运势请查看「黄历」页面，包含：\n\n1. 今日宜忌\n2. 吉时方位\n3. 节气养生\n4. 今日命理知识\n5. 三视角功法\n\n如需个性化每日运势，请先排盘（填写生辰），AI可根据您的日主五行分析当日运势。';
-  if (/你好|您好|hi|hello|在吗/.test(t)) return '您好！我是易道智鉴AI命理助手。我可以帮您：\n\n1.📅 八字排盘与命理分析\n2.🌟 运势预测\n3.🏠 风水布局\n4.💊 中医养生\n5.🔮 奇门/紫微/六爻/梅花\n6.📅 择日择吉\n7.🪷 倪师中医\n\n请选择上方领域，或直接告诉我您的需求。';
-  if (/谢谢|感谢|thanks/.test(t)) return '不客气！如有其他问题随时问我。祝您一切顺利！';
-  if (/再见|bye|拜拜/.test(t)) return '再见！祝您吉祥如意。随时欢迎回来提问。';
-  var _mobileMatch = text.match(/1[3-9]\d{9}/);
-  if (_mobileMatch) { return _feAnalyzeMobile(_mobileMatch[0]); }
-  if (/手机号|号码|选号/.test(t)) return '请直接发送您的11位手机号码，我立即为您分析八星磁场吉凶。\n\n例如：18511550189';
-  if (/姓名|改名|名字/.test(t)) return '姓名学分析基于三才五格（天格/地格/人格/外格/总格）+八字喜用神。\n\n请告诉我您的姓名（和可选的出生信息），我为您分析吉凶。\n\n提示：好名字应补八字所缺五行，三才相生，五格数理吉祥。';
-  if (/黄历|今日宜忌|今天/.test(t)) return '今日黄历请访问「黄历」页面，包含：\n1. 每日宜忌\n2. 吉时方位\n3. 节气养生\n4. 三视角功法\n5. 今日命理知识\n6. 节日文化';
-  return '您好！您可以问我：\n\n📅 命理排盘（需提供生辰）\n🌟 运势分析\n⚖️ 五行分析\n🏠 风水布局\n💊 中医养生\n🔮 奇门/紫微/六爻/梅花\n📅 择日择吉\n🪷 倪师中医\n\n或直接告诉我您的出生年月日时进行排盘。';
+  if(/八字|排盘|命理|算命/.test(t))return'━━━ 八字排盘指南 ━━━\n\n请提供出生年月日时+性别\n例如：1985年3月22日8时 女\n\n【分析内容】\n1.日主五行 2.四柱关系 3.五行强弱 4.用神喜神\n5.大运走势 6.格局层次 7.神煞 8.流年运势\n\n请在上方填写生辰排盘。';
+  if(/运势|今年|流年/.test(t))return'━━━ 运势分析 ━━━\n\n【维度】事业/财运/感情/健康/人际\n【2026丙午年】喜火者事业腾飞·忌火者宜守·冲太岁（鼠/马/牛/兔）需化解\n\n请提供生辰分析个性化运势。';
+  if(/风水|布局|方位/.test(t))return'━━━ 风水布局 ━━━\n\n【大门】纳气之口，宜吉位\n【客厅】财位在对角线45度\n【卧室】床头靠实墙，忌横梁/镜子\n【厨房】宜凶位压煞\n【卫生间】忌对大门\n【化煞】路冲→八卦镜·横梁→葫芦\n\n请提供房屋朝向做个性化分析。';
+  if(/中医|养生|健康/.test(t))return'━━━ 中医养生 ━━━\n\n【四季】春养肝·夏养心·秋养肺·冬养肾\n【时辰】子时入睡·午时小憩\n【体质】木疏肝·火养心·土健脾·金补肺·水温肾\n【日常】子时前睡·七分饱·适度运动·情志平和\n\n请描述症状获取针对性方案。';
+  if(/失眠/.test(t))return'━━━ 失眠调理 ━━━\n\n【辨证】心脾两虚/肝郁化火/阴虚火旺\n【食疗】酸枣仁粥·百合莲子汤·小米粥\n【穴位】神门·三阴交·安眠穴·涌泉穴\n【起居】子时前睡·泡脚·忌手机\n\n持续失眠建议就诊中医。';
+  if(/婚姻|感情|桃花|恋爱/.test(t))return'━━━ 感情婚姻 ━━━\n\n【桃花】日支子午卯酉→异性缘佳\n【正缘】男看正财·女看正官\n【合婚】五行互补+日柱相生+生肖三合\n【调理】桃花位放鲜花/粉水晶\n\n请提供生辰或双方生辰做深度分析。';
+  if(/事业|工作|创业/.test(t))return'━━━ 事业分析 ━━━\n\n【官运】正官→体制·七杀→创业·正印→教育·食神→餐饮艺术\n【行业】金:金融·木:教育·水:物流·火:电子·土:房产\n【创业】大运行喜用→黄金期\n\n请提供生辰分析事业方向。';
+  if(/财运|投资|理财/.test(t))return'━━━ 财运分析 ━━━\n\n【财星】正财→工薪·偏财→投资·财库→存财\n【周期】大运行财星→十年高峰\n【破财】比劫运→忌合伙/借贷\n【招财】喜金→西·喜木→东·喜水→北·喜火→南\n\n请提供生辰分析财运走势。';
+  if(/手机号|号码/.test(t))return'请直接发送11位手机号码，我立即分析八星磁场吉凶。\n\n例如：13800138000';
+  if(/五行|缺什么/.test(t))return'━━━ 五行分析 ━━━\n\n金→肺/西方/白\n木→肝/东方/绿\n水→肾/北方/黑\n火→心/南方/红\n土→脾/中央/黄\n\n【补救】补金→西/白/金属\n补水→北/黑/水晶\n补火→南/红/玛瑙\n补木→东/绿/木质\n补土→中/黄/玉石\n\n请提供生辰分析您的五行。';
+  if(/太岁|本命年/.test(t))return'━━━ 犯太岁化解 ━━━\n\n2026丙午年：马/鼠/牛/兔犯太岁\n\n【化解】1.佩戴太岁符 2.拜太岁 3.忌大额投资 4.行善积德 5.年底谢太岁\n\n【方位】太岁在南方，忌南方动土';
+  if(/你好|您好|hi|hello|在吗/.test(t))return'您好！我是易道智鉴AI命理助手。\n\n我可以帮您：\n📅 八字排盘与命理分析\n🌟 运势预测\n🏠 风水布局\n💊 中医养生\n📱 手机号码分析\n💕 感情婚姻\n💰 财运投资\n💼 事业方向\n\n请告诉我您想了解什么，或在上方填写生辰排盘。';
+  if(/谢谢|感谢/.test(t))return'不客气！如有其他问题随时问我。';
+  if(/再见|bye/.test(t))return'再见！祝您吉祥如意。';
+  return'您好！您可以问我：\n\n📅 命理排盘 🌟 运势 🏠 风水 💊 中医\n📱 手机号 💕 感情 💰 财运 💼 事业\n⚖️ 五行 🧬 体质 🪷 倪师 📅 择日\n\n或告诉我您的出生年月日时进行排盘。';
 }
 
-// 加载今日黄历
-async function loadAlmanac() {
-  const ab = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? 'http://127.0.0.1:8920' : '';
-  try {
-    const resp = await fetch(ab + '/api/public/latest-pushes');
-    const pushes = await resp.json();
-    if (Array.isArray(pushes) && pushes.length > 0) {
-      const typeMap = { daily_fortune: '运势', health_tip: '养生', festival_reminder: '节日', case_update: '通知' };
-      var html = pushes.slice(0, 3).map(function(p) {
-        return '<span style="color:var(--gold)">[' + (typeMap[p.push_type]||p.push_type) + ']</span> ' + p.content;
-      }).join('<br>');
-      document.getElementById('almanacContent').innerHTML = html;
-      return;
-    }
-  } catch(e) {}
-  // 降级
-  document.getElementById('almanacContent').innerHTML = '<span style="color:var(--gold)">[运势]</span> 今日宜祭祀、祈福<br><span style="color:var(--gold)">[养生]</span> 顺应四时，子时前入睡<br><span style="color:var(--gold)">[提醒]</span> 可填写下方生辰排盘获取个性化运势';
+function _feMobile(mobile) {
+  const BAXING={'天医':{codes:['13','31','68','86','49','94','27','72'],desc:'正财/婚姻',rank:'吉'},'生气':{codes:['14','41','67','76','39','93','28','82'],desc:'贵人/活力',rank:'吉'},'延年':{codes:['19','91','78','87','34','43','26','62'],desc:'领导/长寿',rank:'吉'},'伏位':{codes:['11','22','88','99','66','77','33','44'],desc:'耐心/等待',rank:'中'},'六煞':{codes:['16','61','47','74','38','83','29','92'],desc:'桃花/情绪',rank:'中'},'五鬼':{codes:['18','81','79','97','36','63','24','42'],desc:'叛逆/反复',rank:'凶'},'绝命':{codes:['12','21','69','96','48','84','37','73'],desc:'冲动/极端',rank:'凶'},'祸害':{codes:['17','71','89','98','46','64','23','32'],desc:'口舌/是非',rank:'凶'}};
+  function gx(code){for(var n in BAXING){if(BAXING[n].codes.indexOf(code)>=0)return{name:n,desc:BAXING[n].desc,rank:BAXING[n].rank};}return{name:'普通',desc:'普通',rank:'中'};}
+  var stars=[],ji=0,xi=0,zh=0;
+  for(var i=0;i<10;i+=2){var c=mobile.substring(i,i+2),s=gx(c);stars.push({pos:i+1,code:c,s:s.name,d:s.desc,r:s.rank});if(s.rank==='吉')ji++;else if(s.rank==='凶')xi++;else zh++;}
+  var last=stars[stars.length-1];
+  var sc=ji*8-xi*6+20+(last.r==='吉'?5:0);sc=Math.max(0,Math.min(40,sc));
+  var lv=sc>=30?'优🟢':sc>=20?'中🟡':'差🔴';
+  var r='━━━ 手机号码分析 ━━━\n\n【号码】'+mobile+'\n【评分】'+sc+'/40 '+lv+'\n【吉星】'+ji+'·凶星'+xi+'·中星'+zh+'\n\n━━━ 八星拆解 ━━━\n';
+  stars.forEach(s=>{var ic=s.r==='吉'?'✅':s.r==='凶'?'❌':'➖';r+='第'+s.pos+'-'+(s.pos+1)+'位 '+s.code+' '+ic+' '+s.s+'（'+s.r+'）'+s.d+'\n';});
+  r+='\n━━━ 尾号 ━━━\n尾号'+last.code+'→'+last.s+'（'+last.r+'）\n';
+  if(last.r==='凶')r+='尾号凶星→建议更换\n';else if(last.r==='吉')r+='尾号吉星→收尾顺利\n';
+  r+='\n━━━ 建议 ━━━\n';
+  if(lv.includes('优'))r+='号码吉利，可继续使用。';else if(lv.includes('中'))r+='吉凶参半，注意凶星领域。';else r+='凶星较多，建议更换。优选尾号13/31/68/86/14/41等吉星。';
+  return r;
 }
-
-// 初始化
-renderGuideTags();
-loadAlmanac();
 </script>
 </body>
 </html>
