@@ -120,6 +120,9 @@ body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',serif;
 <input type="text" id="chatInput" placeholder="输入问题..." onkeypress="if(event.key==='Enter')sendMsg()">
 <button onclick="sendMsg()">➤</button>
 </div>
+<div style="text-align:center;margin-top:8px">
+<button onclick="clearChat()" style="background:none;border:1px solid var(--border);border-radius:12px;padding:4px 12px;color:var(--paper3);font-size:11px;cursor:pointer">🗑 清空对话</button>
+</div>
 <div class="footer">AI解读仅供参考 · 请理性参考，凡事自辨自省</div>
 </div>
 
@@ -142,8 +145,8 @@ async function doPaipan() {
   result.classList.add('show');
   
   try {
-    const paipanBase = API_BASE || 'http://127.0.0.1:8911';
-    const resp = await fetch(paipanBase.replace(':8920',':8911') + '/paipan?year=' + y + '&month=' + m + '&day=' + d + '&hour=' + h + '&sex=' + sex);
+    const paipanBase = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? 'http://127.0.0.1:8911' : '';
+    const resp = await fetch(paipanBase + '/paipan?year=' + y + '&month=' + m + '&day=' + d + '&hour=' + h + '&sex=' + sex);
     const data = await resp.json();
     if (data.error) { result.innerHTML = '排盘失败: ' + data.error; return; }
     
@@ -228,6 +231,13 @@ async function sendMsg(prefilled) {
     box.appendChild(errDiv);
     box.scrollTop = box.scrollHeight;
   }
+}
+
+function clearChat() {
+  chatHistory = [];
+  baziData = null;
+  document.getElementById('chatBox').innerHTML = '<div class="chat-welcome"><div class="emoji">🤖</div><div>您好！我是易道智鉴AI命理助手</div><div class="hint">可以问我命理、风水、中医、养生等问题<br>填写生辰后排盘可获得深度分析</div></div>';
+  document.getElementById('paipanResult').classList.remove('show');
 }
 
 function escapeHtml(s) {
