@@ -39019,6 +39019,28 @@ tzSwitchTab = function(name) {
   if (name === 'encyclopedia') tzRenderEncyclopedia();
 };
 
+
+// === URL Hash自动跳转 ===
+(function(){
+  var hash = window.location.hash;
+  if(hash){
+    var secId = hash.replace('#',''); // section-bazi
+    var sec = document.getElementById(secId);
+    if(sec){
+      // 提取section名
+      var secName = secId.replace('section-','');
+      if(typeof showSection === 'function'){
+        setTimeout(function(){ showSection(secName); }, 100);
+      }
+    }
+  }
+  // 检查URL参数中的sub
+  var params = new URLSearchParams(window.location.search);
+  var sub = params.get('sub');
+  if(sub && typeof showZhanbuSub === 'function'){
+    setTimeout(function(){ showZhanbuSub(sub); }, 200);
+  }
+})();
 </script>
 
 </html>
