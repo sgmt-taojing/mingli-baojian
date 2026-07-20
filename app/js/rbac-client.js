@@ -516,4 +516,30 @@
   // 自动初始化
   init();
 
+
+  // 暴露函数到全局
+  if (typeof window !== 'undefined') {
+    window.decodeJwtPayload = decodeJwtPayload;
+    window.safeGetJSON = safeGetJSON;
+    window.toast = toast;
+    window.getToken = getToken;
+    window.getRoles = getRoles;
+    window.getUser = getUser;
+    window.isTokenValid = isTokenValid;
+    window.isLoggedIn = isLoggedIn;
+    window.hasRole = hasRole;
+    window.hasAnyRole = hasAnyRole;
+    window.hasPermission = hasPermission;
+    window.getRoleWeight = getRoleWeight;
+    window.getMaxWeight = getMaxWeight;
+    window.requireAuth = requireAuth;
+    window.requireRole = requireRole;
+    window.requireAnyRole = requireAnyRole;
+    window.isMenuVisible = isMenuVisible;
+    window.applyMenuVisibility = applyMenuVisibility;
+    window.saveLogin = saveLogin;
+    window.logout = logout;
+    window.authFetch = authFetch;
+    window.init = init;
+  }
 })(typeof window !== 'undefined' ? window : this);
