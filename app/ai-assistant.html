@@ -121,6 +121,8 @@ body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',serif;
 <span class="guide-btn" onclick="askGuide('最近失眠怎么调理？')">💤 养生调理</span>
 <span class="guide-btn" onclick="askGuide('倪海厦老师有什么中医建议？')">🪷 倪师中医</span>
 <span class="guide-btn" onclick="askGuide('什么是奇门遁甲？')">🔮 奇门遁甲</span>
+<span class="guide-btn" onclick="askGuide('大六壬是什么？')">📜 大六壬</span>
+<span class="guide-btn" onclick="askGuide('我的体质怎么调理？')">🧬 体质调理</span>
 </div>
 
 <!-- 聊天区 -->
@@ -173,10 +175,14 @@ async function doPaipan() {
     const wc = data.wuxing_count || {};
     const lack = data.wuxing_lack ? data.wuxing_lack.join('、') : '无';
     
+    const dy = data.dayun ? data.dayun.slice(0,3).map(function(d){return d.gz+'('+d.start_age+'岁起)'}).join(' ') : '';
+    const shensha = data.shensha ? Object.keys(data.shensha).length + '个' : '0个';
     result.innerHTML = '日主：<b style="color:var(--gold)">' + dm + '</b> | 四柱：' + 
       (p['年']||'?') + ' ' + (p['月']||'?') + ' ' + (p['日']||'?') + ' ' + (p['时']||'?') + 
       ' | 五行：金' + (wc['金']||0) + ' 木' + (wc['木']||0) + ' 水' + (wc['水']||0) + ' 火' + (wc['火']||0) + ' 土' + (wc['土']||0) + 
-      ' | 缺：' + lack;
+      ' | 缺：' + lack +
+      (dy ? ' | 大运：' + dy : '') +
+      ' | 神煞：' + shensha;
     
     // 自动发送排盘数据给AI分析
     sendMsg('请根据我的排盘数据（日主' + dm + '，四柱' + (p['年']||'') + (p['月']||'') + (p['日']||'') + (p['时']||'') + '）分析我的命理特征');
@@ -219,6 +225,7 @@ async function sendMsg(prefilled) {
   box.scrollTop = box.scrollHeight;
   
   chatHistory.push({role: 'user', content: q});
+  if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
   
   try {
     const resp = await fetch(API_BASE + '/api/ai/public-chat', {
@@ -313,7 +320,10 @@ function clearChat() {
 
 function escapeHtml(s) {
   if (!s) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')
+    .replace(/\n/g,'<br>');
 }
 </script>
 </body>
