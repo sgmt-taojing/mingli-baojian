@@ -391,6 +391,7 @@ function _aiLocalResponse(userText, baziData) {
   // 手机号识别+分析（优先级最高）
   var _mobileMatch = userText.match(/1[3-9]\d{9}/);
   if (_mobileMatch) return _analyzeMobile(_mobileMatch[0]);
+  if (/手机号|号码|选号|手机分析/.test(text)) return '请直接发送您的11位手机号码，我立即分析八星磁场吉凶。\n\n例如：13800138000\n\n分析内容：八星磁场拆解+评分+五行能量+尾号分析+选号建议+行业匹配。';
   
   // 有排盘数据时优先用排盘数据回答
   if (baziData && baziData.pillars) {

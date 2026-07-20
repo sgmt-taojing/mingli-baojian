@@ -3710,6 +3710,70 @@ function generatePublic() {
 }
 
 
+// === 大众简易版（手机一屏显示）===
+function generateSimple() {
+  var now = new Date();
+  var Y = now.getFullYear(), M = now.getMonth() + 1, D = now.getDate();
+  var WEEKDAYS = ['日','一','二','三','四','五','六'];
+  var baseDate = new Date(1900, 0, 31);
+  var daysDiff = Math.floor((new Date(Y, M-1, D) - baseDate) / 86400000);
+  var dayGzIdx = ((40 + daysDiff) % 60 + 60) % 60;
+  var dayStem = STEMS[dayGzIdx % 10], dayBranch = BRANCHES[dayGzIdx % 12];
+  var dayGanZhi = dayStem + dayBranch;
+  var yearGan = STEMS[(Y-4)%10], yearZhi = BRANCHES[(Y-4)%12];
+  var yearZodiac = ZODIACS[(Y-4)%12];
+  var monthGzIdx = getMonthGzIdx(Y, M, D);
+  var monthGan = STEMS[monthGzIdx % 10], monthZhi = BRANCHES[monthGzIdx % 12];
+  var jianchuIdx = (dayGzIdx % 12 - monthGzIdx % 12 + 12) % 12;
+  var jianchu = JIANCHU[jianchuIdx];
+  var isHuangdao = HUANGDAO.includes(jianchu);
+  var stemWx = ELE[dayStem] || '土';
+  var chongZhi = BRANCHES[(BRANCHES.indexOf(dayBranch) + 6) % 12];
+  var chongZodiac = CHONG_ZODIAC[chongZhi] || '';
+  var caishen = CAISHEN[dayStem] || '正南';
+  var xishen = XISHEN[dayStem] || '正南';
+  var _yj = getYiJi(jianchu, 4, 3);
+  var yiList = _yj.yi, jiList = _yj.ji;
+  var _lunarStr = solarToLunarStr(Y, M, D);
+  var memorial = getFestival(Y, M, D);
+  var jieqi = null;
+  for (const jq of JIEQI) { if (M === jq.m && Math.abs(D - jq.d) <= 1) { jieqi = jq.name; break; } }
+  var _dailyKnowledge = {'甲':'甲木·参天大树·主仁','乙':'乙木·花草藤蔓·主仁','丙':'丙火·太阳之火·主礼','丁':'丁火·灯烛之火·主礼','戊':'戊土·城墙之土·主信','己':'己土·田园之土·主信','庚':'庚金·刀剑之金·主义','辛':'辛金·珠玉之金·主义','壬':'壬水·江河之水·主智','癸':'癸水·雨露之水·主智'};
+  var JIANCHU_BAIHUA_S = {'建':'建日','除':'除日','满':'满日','平':'平日','定':'定日','执':'执日','破':'破日','危':'危日','成':'成日','收':'收日','开':'开日','闭':'闭日'};
+
+  // 吉祥话库
+  var _luckyWords = {
+    '黄道': ['🌟 黄道吉日，诸事顺遂，福气满满！','🌟 今日黄道当头，万事如意，心想事成！'],
+    '黑道': ['🌙 今日宜静养蓄势，韬光养晦，明日更佳'],
+    '建': ['🌱 建日万物始生，新的开始，前程似锦！'],
+    '成': ['🎉 成日圆满成就，所求皆遂，好运连连！'],
+    '开': ['🔓 开日开门见喜，好运开启，蒸蒸日上！'],
+    '定': ['安定如意，心平气和，步步生莲！'],
+    '满': ['圆满丰盈，福气满堂，喜气洋洋！'],
+    '收': ['收获满满，财源广进，盆满钵满！'],
+  };
+  var _luckyWord = '';
+  if (isHuangdao && _luckyWords[jianchu]) _luckyWord = _luckyWords[jianchu][0];
+  else if (isHuangdao) _luckyWord = _luckyWords['黄道'][0];
+  else _luckyWord = _luckyWords['黑道'][0];
+
+  var t = '🧧 今日吉言\n';
+  t += Y + '年' + M + '月' + D + '日(周' + WEEKDAYS[now.getDay()] + ')\n';
+  t += (_lunarStr||'') + ' | ' + dayGanZhi + '日\n';
+  t += (_dailyKnowledge[dayStem]||'') + '\n';
+  t += JIANCHU_BAIHUA_S[jianchu] + '·' + (isHuangdao ? '黄道✅' : '黑道') + '·冲' + (chongZodiac||'无') + '\n';
+  t += '✅ 宜：' + yiList.join('、') + '\n';
+  t += '❌ 忌：' + jiList.join('、') + '\n';
+  if (memorial) t += '🎉 ' + memorial.name + '\n';
+  if (jieqi) t += '🌿 ' + jieqi + '\n';
+  var _colorMap = {木:'绿色/青色',火:'红色/紫色',土:'黄色/棕色',金:'白色/金色',水:'黑色/蓝色'};
+  t += '🎨 幸运色：' + (_colorMap[stemWx]||'黄色') + ' | 💰 财神' + caishen + ' | 🧭 喜神' + xishen + '\n';
+  t += _luckyWord + '\n';
+  t += '🙏 愿今日顺遂，身心安泰，福慧双增！\n';
+  t += '—— 🌱 易道智鉴·播种善念·传播智慧';
+  return t;
+}
+
 function generateGzh() {
   const now = new Date();
   const Y = now.getFullYear(), M = now.getMonth() + 1, D = now.getDate();
@@ -4134,6 +4198,8 @@ if (format === 'im') {
   console.log(generateIM() );
 } else if (format === 'public') {
   console.log(generatePublic() );
+} else if (format === 'simple') {
+  console.log(generateSimple() );
 } else if (format === 'tomorrow') {
   // 明日推送
   console.log(generateTomorrow() );
