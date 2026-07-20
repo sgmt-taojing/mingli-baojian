@@ -11435,7 +11435,7 @@ function tzStep1Analyze(fileName, content, type) {
     } else {
       result.innerHTML = '<div style="padding:20px;text-align:center"><div style="font-size:14px;color:var(--cinn2);margin-bottom:12px">⚠️ 分析服务暂时不可用</div><div style="font-size:12px;color:var(--paper2);margin-bottom:16px">请确认API代理服务（端口8900）正在运行，或稍后重试</div><div style="font-size:11px;color:var(--paper3)">错误信息: ' + (err.message || err) + '</div></div>';
     }
-  });
+  }).catch(function(err){ showToast('AI服务暂不可用，请稍后重试'); });
 }
 
 function tzRenderStep1Results(obj) {
@@ -11638,7 +11638,7 @@ function tzStep2Suggestions() {
     html += '</div>';
     step2Div.innerHTML = html;
     step2Div.scrollIntoView({behavior:'smooth',block:'nearest'});
-  });
+  }).catch(function(err){ showToast('AI服务暂不可用，请稍后重试'); });
 }
 
 // 添加手动输入指标字段
@@ -19522,7 +19522,7 @@ function _analyzeFloorPlanAI(imageData, context) {
       localHtml += '</div>';
       fsAiResult.innerHTML = localHtml;
     }
-  });
+  }).catch(function(err){ showToast('AI服务暂不可用，请稍后重试'); });
 }
 
 // 上传户型图分析
@@ -30236,7 +30236,7 @@ function tzGeneratePlan(){
     html2 += '<div style="background:rgba(231,76,60,0.04);border:1px solid rgba(231,76,60,0.15);border-radius:8px;padding:12px 16px;margin-top:12px"><div style="font-size:12px;color:var(--cinn2);line-height:1.6">⚠️ <b>温馨提示：</b>本方案根据体质特征本地生成，仅供养生保健参考。如有特定疾病或服药中，请咨询中医师调整方案。</div></div>';
     html2 += '</div>';
     result.innerHTML = html2;
-  });
+  }).catch(function(err){ showToast('AI服务暂不可用，请稍后重试'); });
 }
 
 function tzRenderQigong(){
@@ -37686,7 +37686,7 @@ function submitAsk() {
     resultContent.innerHTML = '<div style="font-size:14px;line-height:2">' + localAnswer + '</div>';
     btn.disabled = false;
     btn.textContent = '再 问 一次';
-  });
+  }).catch(function(err){ showToast('AI服务暂不可用，请稍后重试'); });
 }
 
 // ===== 知识库检索功能 =====

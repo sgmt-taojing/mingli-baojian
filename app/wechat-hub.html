@@ -2111,7 +2111,7 @@ async function aiSendMsg(){
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer sk-g2claw-default'},
       body:JSON.stringify({model:'auto',messages:[sysMsg].concat(ctx),max_tokens:800,temperature:0.7})
-    });
+    }).catch(function(err){ showToast('AI服务暂不可用'); return {ok:false,status:0}; });
     
     if(!resp.ok) throw new Error('API '+resp.status);
     let data = await resp.json();
@@ -2290,7 +2290,7 @@ async function aiSendMsgWithContext(ctx){
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'***'},
       body:JSON.stringify({model:'auto',messages:[sysMsg].concat(chatCtx),max_tokens:800,temperature:0.7})
-    });
+    }).catch(function(err){ showToast('AI服务暂不可用'); return {ok:false,status:0}; });
     
     if(!resp.ok) throw new Error('API '+resp.status);
     let data = await resp.json();

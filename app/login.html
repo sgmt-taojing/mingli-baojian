@@ -562,8 +562,29 @@
     }, 1000);
   }
 
+  // API地址判断
+  var LOGIN_API_BASE = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? 'http://127.0.0.1:8920' : '';
+  var HAS_LOGIN_API = !!LOGIN_API_BASE;
+
   // ═══ 登录 ═══
   function doLogin() {
+    // GitHub Pages无后端API时，用模拟登录
+    if (!HAS_LOGIN_API) {
+      var phone = document.getElementById('phoneInput').value.trim();
+      var roles = ['free'];
+      if (phone === '13700000000') roles = ['free','super_admin'];
+      else if (phone === '13700000001') roles = ['free','master'];
+      else if (phone === '13700000002') roles = ['free','doctor'];
+      else if (phone === '13700000003') roles = ['free','patient'];
+      else if (phone === '13700000005') roles = ['free','vip'];
+      var fakeToken = 'demo_' + btoa(phone + '_' + Date.now());
+      RBAC.saveLogin(fakeToken, roles, {name: phone, phoneMasked: phone.slice(0,3)+'****'+phone.slice(7)});
+      showToast('登录成功（演示模式），正在跳转...', 'success');
+      var params = new URLSearchParams(window.location.search);
+      var redirect = params.get('redirect');
+      setTimeout(function() { window.location.href = redirect || RBAC.HOME_PAGE; }, 800);
+      return;
+    }
     var phone = document.getElementById('phoneInput').value.trim();
     var code = document.getElementById('codeInput').value.trim();
 
@@ -582,7 +603,7 @@
     btnText.innerHTML = '<span class="spinner"></span>登录中...';
 
     // 调用后端登录接口
-    fetch('/api/user/login', {
+    fetch(LOGIN_API_BASE + '/api/user/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ phone: phone, code: code })
