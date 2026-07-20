@@ -283,9 +283,9 @@ function _aiLocalResponse(userText, baziData) {
     const dm = baziData.day_master || '未知';
     const p = baziData.pillars;
     const wc = baziData.wuxing_count || {};
-    const lack = baziData.wuxing_lack ? baziData.wuxing_lack.join('、') : '无';
+    const lack = (baziData.wuxing_lack && baziData.wuxing_lack.length > 0) ? baziData.wuxing_lack.join('、') : '无（五行俱全）';
     const ele = dm.slice(-1);
-    const dy = baziData.dayun ? baziData.dayun.slice(0,4).map(function(d){return (d.gz||'?')+'('+d.start_age+'岁)'}) : null;
+    const dy = baziData.dayun ? baziData.dayun.slice(0,4).map(function(d){return (d.ganzhi||d.gz||'幼运')+'('+d.start_age+'岁起)'}) : null;
     const ss = baziData.shensha ? Object.keys(baziData.shensha) : null;
     let eleDesc = '';
     if (ele === '金') eleDesc = '金主义，性格刚毅果断，重情重义';
@@ -293,7 +293,7 @@ function _aiLocalResponse(userText, baziData) {
     else if (ele === '水') eleDesc = '水主智，性格聪明灵活，善于变通';
     else if (ele === '火') eleDesc = '火主礼，性格热情外向，有领导力';
     else if (ele === '土') eleDesc = '土主信，性格稳重厚道，重承诺';
-    return '根据您的排盘数据：\n\n【四柱】' + (p['年']||'?') + ' ' + (p['月']||'?') + ' ' + (p['日']||'?') + ' ' + (p['时']||'?') + '\n【日主】' + dm + '\n【五行】金' + (wc['金']||0) + ' 木' + (wc['木']||0) + ' 水' + (wc['水']||0) + ' 火' + (wc['火']||0) + ' 土' + (wc['土']||0) + '\n【缺行】' + lack + '\n\n【性格特征】' + eleDesc + '\n【五行建议】' + (lack.includes('火') ? '宜补火：多穿红色、向南方位、食温性食物' : lack.includes('木') ? '宜补木：多接触绿色植物、向东方位、食酸性食物' : lack.includes('金') ? '宜补金：多穿白色、向西方位、食辛性食物' : lack.includes('水') ? '宜补水：多近水、向北方、食咸性食物' : lack.includes('土') ? '宜补土：多穿黄色、居中位、食甘性食物' : '五行平衡，注意整体调和') + '\n\n' + (dy ? '【大运】' + dy.join(' → ') + '\n' : '') + (ss ? '【神煞】' + ss.slice(0,5).join('、') + '\n' : '') + '\n（配置AI API后可获得深度命理解读）';
+    return '根据您的排盘数据：\n\n【四柱】' + (p['年']||'?') + ' ' + (p['月']||'?') + ' ' + (p['日']||'?') + ' ' + (p['时']||'?') + '\n【日主】' + dm + '\n【五行】金' + (wc['金']||0) + ' 木' + (wc['木']||0) + ' 水' + (wc['水']||0) + ' 火' + (wc['火']||0) + ' 土' + (wc['土']||0) + '\n【缺行】' + lack + '\n\n【性格特征】' + eleDesc + '\n【五行建议】' + ((baziData.wuxing_lack && baziData.wuxing_lack.includes('火')) ? '宜补火：多穿红色、向南方位、食温性食物' : (baziData.wuxing_lack && baziData.wuxing_lack.includes('木')) ? '宜补木：多接触绿色植物、向东方位、食酸性食物' : (baziData.wuxing_lack && baziData.wuxing_lack.includes('金')) ? '宜补金：多穿白色、向西方位、食辛性食物' : (baziData.wuxing_lack && baziData.wuxing_lack.includes('水')) ? '宜补水：多近水、向北方、食咸性食物' : (baziData.wuxing_lack && baziData.wuxing_lack.includes('土')) ? '宜补土：多穿黄色、居中位、食甘性食物' : '五行平衡，注意整体调和') + '\n\n' + (dy ? '【大运】' + dy.join(' → ') + '\n' : '') + (ss ? '【神煞】' + ss.slice(0,5).join('、') + '\n' : '') + '\n（配置AI API后可获得深度命理解读）';
   }
   
   // 关键词匹配（按优先级）

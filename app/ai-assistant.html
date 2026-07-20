@@ -59,22 +59,6 @@ body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',serif;
 </head>
 <body>
 <div class="nav-bar">
-<a href="divination-hub.html">🏠 主平台</a>
-<a href="divination-almanac.html">📅 黄历</a>
-<a href="divination-integrated.html">🧬 体质调理</a>
-<a href="tcm-clinic.html">🏥 中医诊疗</a>
-<a href="tcm-symptom.html">🩺 症状分析</a>
-<a href="divination-knowledge.html">📚 知识库</a>
-<a href="nihaisha-knowledge.html">🪷 倪师知识库</a>
-<a href="nihaisha-tool.html">🔬 倪师工具</a>
-<a href="nihaisha-learning.html">📖 倪师学堂</a>
-<a href="shuhan-knowledge.html">🎯 舒晗知识库</a>
-<a href="divination-shop.html">🛒 商城</a>
-<a href="divination-membership.html">💎 会员</a>
-<a href="wechat-hub.html">📱 缘主工具</a>
-<a href="login.html">🔐 登录</a>
-</div>
-<div class="nav-bar">
 <a href="divination-hub.html" class="file-nav-btn">🏠 主平台</a>
 <a href="divination-almanac.html" class="file-nav-btn">📅 黄历</a>
 <a href="divination-integrated.html" class="file-nav-btn">🧬 体质调理</a>
@@ -270,7 +254,7 @@ function _localResponse(text, bazi) {
     const dm = bazi.day_master || '未知';
     const p = bazi.pillars;
     const wc = bazi.wuxing_count || {};
-    const lack = bazi.wuxing_lack ? bazi.wuxing_lack.join('、') : '无';
+    const lack = (bazi.wuxing_lack && bazi.wuxing_lack.length > 0) ? bazi.wuxing_lack.join('、') : '无（五行俱全）';
     const ele = dm.slice(-1);
     let desc = '';
     if (ele==='金') desc='金主义，性格刚毅果断，重情重义';
@@ -279,11 +263,11 @@ function _localResponse(text, bazi) {
     else if (ele==='火') desc='火主礼，性格热情外向，有领导力';
     else if (ele==='土') desc='土主信，性格稳重厚道，重承诺';
     let fix = '';
-    if (lack.includes('火')) fix='宜补火：多穿红色、向南方位、食温性食物';
-    else if (lack.includes('木')) fix='宜补木：多接触绿色植物、向东方位、食酸性食物';
-    else if (lack.includes('金')) fix='宜补金：多穿白色、向西方位、食辛性食物';
-    else if (lack.includes('水')) fix='宜补水：多近水、向北方、食咸性食物';
-    else if (lack.includes('土')) fix='宜补土：多穿黄色、居中位、食甘性食物';
+    if (bazi.wuxing_lack && bazi.wuxing_lack.includes('火')) fix='宜补火：多穿红色、向南方位、食温性食物';
+    else if (bazi.wuxing_lack && bazi.wuxing_lack.includes('木')) fix='宜补木：多接触绿色植物、向东方位、食酸性食物';
+    else if (bazi.wuxing_lack && bazi.wuxing_lack.includes('金')) fix='宜补金：多穿白色、向西方位、食辛性食物';
+    else if (bazi.wuxing_lack && bazi.wuxing_lack.includes('水')) fix='宜补水：多近水、向北方、食咸性食物';
+    else if (bazi.wuxing_lack && bazi.wuxing_lack.includes('土')) fix='宜补土：多穿黄色、居中位、食甘性食物';
     else fix='五行平衡，注意整体调和';
     return '根据您的排盘数据：\n\n【四柱】'+(p['年']||'?')+' '+(p['月']||'?')+' '+(p['日']||'?')+' '+(p['时']||'?')+'\n【日主】'+dm+'\n【五行】金'+(wc['金']||0)+' 木'+(wc['木']||0)+' 水'+(wc['水']||0)+' 火'+(wc['火']||0)+' 土'+(wc['土']||0)+'\n【缺行】'+lack+'\n\n【性格特征】'+desc+'\n【五行建议】'+fix+'\n\n（深度AI解读需连接后端服务，当前为离线模式。）';
   }

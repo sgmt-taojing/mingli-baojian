@@ -2268,16 +2268,12 @@ function generatePersonalized(bazi, dayStem, dayBranch, dayNum)  {
   var text = '👤 缘主今日运势(' + '缘主' + ' · 日主' + userDayStem + stemEleName + ')\n';
   text += '📊 运势评分：' + total + '/100 ' + luckInfo.stars + ' ' + luckInfo.level + '\n';
   text += '💡 运势概述：' + advice.summary + '\n';
-  text += '\n';
-
-  // 综合评分摘要（原十维度明细精简）
-  text += '━━━ 【📊 命理综合评分】 ━━━\n';
+  // 最强最弱项
   var dimNames = {
     wangshuai: '日主旺衰', ganRel: '天干生克', zhiRel: '地支关系',
     yongshen: '用神状态', dayun: '大运走势', changsheng: '十二长生',
     shensha: '神煞吉凶', jianchu: '建除十二神', chongsha: '冲煞', huangdao: '黄黑道'
   };
-  // 计算各维度最高分和最低分
   var _maxDim = '', _maxSc = 0, _minDim = '', _minSc = 10;
   for (var dk in dimNames) {
     if (scores[dk]) {
@@ -2286,8 +2282,8 @@ function generatePersonalized(bazi, dayStem, dayBranch, dayNum)  {
       if (sc < _minSc) { _minSc = sc; _minDim = dimNames[dk]; }
     }
   }
-  // 综合评分已在上方显示，此处只显示最强最弱项
-  text += '最强项：' + _maxDim + ' ' + _maxSc + '/10 | 最弱项：' + _minDim + ' ' + _minSc + '/10\n';
+  text += '📈 最强：' + _maxDim + ' ' + _maxSc + '/10 | 最弱：' + _minDim + ' ' + _minSc + '/10\n';
+  text += '\n';
   text += '\n';
 
   // 宜/忌（缘主个人运势）
