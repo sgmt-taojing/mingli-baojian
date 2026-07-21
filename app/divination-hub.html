@@ -19,32 +19,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
 <style>
-:root{
-  --ink:var(--ink);--ink2:var(--ink2);--ink3:var(--ink3);--ink4:var(--ink4);
-  --paper:var(--paper);--paper2:var(--paper2);--paper3:var(--paper3);
-  --gold:var(--gold);--gold2:var(--gold2);--gold3:var(--gold3);
-  --cinn:var(--cinn);--cinn2:var(--cinn2);
-  --cyan:var(--cyan);--cyan2:var(--cyan2);
-  --jade:var(--jade);--jade2:var(--success);
-  --violet:var(--violet2);--violet2:var(--violet2);
-  --orange:var(--orange);
-  --emerald:var(--emerald);
-  --steel:var(--steel);
-  --wood:var(--wood);--wood2:var(--wood2);
-  --fire:var(--cinn2);--fire2:var(--cinn);
-  --earth:var(--earth);
-  --metal:var(--metal);--metal2:var(--metal2);
-  --danger:var(--danger);
-  --font-serif:'Noto Serif SC','Source Han Serif SC','SimSun','STSong',serif;
-  --font-mono:'Cutive Mono','Courier New',monospace;
-  /* Aliases for cross-page compatibility */
-  --title:var(--gold);--muted:var(--paper3);--accent:var(--gold);
-  --bg:var(--ink);--bg-card:rgba(255,255,255,0.04);
-  --card:rgba(255,255,255,0.04);--card2:rgba(255,255,255,0.06);
-  --border:rgba(201,168,76,.15);--shadow:0 4px 24px rgba(0,0,0,.5);
-  --success:var(--success);--warn:var(--orange);
-  --text:var(--paper);--text-dim:var(--paper3);;--bg-dark:#060608;--blue:#2980b9;--gold-dim:rgba(201,168,76,.4);--green:#27ae60;--paper1:#f0e8d8;--purple:#8e44ad;--red:#e74c3c;--text-light:#f0e8d8}
-
 /* 全局动画 */
 @keyframes pageEnter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes cardFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
@@ -31230,11 +31204,13 @@ function tzSelectWuxing(key){
             let k2 = el2.id.replace('section-','');
             if(!lazySections[k2]) lazySections[k2] = {el: el2, src: el2.getAttribute('data-lazy'), loaded: false};
           });
-          // 执行内联脚本
-          let scripts = html.match(/<script[\s\S]*?<\/script>/g);
+          // 执行内联脚本（避免 script 闭合标签被 HTML parser 提前结束）
+          let openTag = '<' + 'script[^>]*>';
+          let closeTag = '<' + '/script>';
+          let scripts = html.match(new RegExp(openTag + '[\\s\\S]*?' + closeTag, 'g'));
           if(scripts){
             scripts.forEach(function(s){
-              let code = s.replace(/<script[^>]*>/,'').replace(/<\/script>/,'');
+              let code = s.replace(new RegExp(openTag, ''), '').replace(new RegExp(closeTag, ''), '');
               try{ (new Function(code))() }catch(e){console.warn('[懒加载脚本]',e)}
             });
           }
@@ -39175,6 +39151,13 @@ function toggleCompassLegend(){
 
 /* addFamilyMember stub 已移除 — 使用 divination-core.js 的 addFamilyPaipanMember() (20260721) */
 
+/* 成年人专属规划（lifeplan 8 阶段模板，20260721 修复） */
+function computeAdultLifePlan(){
+  var btn = event && event.target;
+  if(btn){btn.disabled=true; btn.textContent='⏳ 规划生成中...';}
+  setTimeout(function(){
+    var html = '<div style="padding:14px;background:rgba(201,168,76,.04);border-radius:10px;line-height:1.9">';
+    html += '<h4 style="margin:0 0 10px;color:var(--gold)">🧭 成年人专属规划（8 阶段全周期）</h4>';
     var stages = [
       ['🎓 学龄前 (0-6)', '培养好奇心+体能基础'],
       ['📚 小学中学 (7-18)', '学科基础+兴趣挖掘'],
