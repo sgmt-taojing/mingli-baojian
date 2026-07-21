@@ -77,7 +77,7 @@ body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',-apple
 .input .send{width:38px;height:38px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--gold),var(--gold3));color:var(--ink);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s}
 .input .send:active{opacity:.7}
 .toast{position:fixed;bottom:56px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:var(--gold);padding:6px 16px;border-radius:14px;z-index:9999;font-size:11px;animation:in .2s}
-@media(max-width:768px){.app{max-width:100%}.chat{padding:12px 10px 6px}.welcome .logo{font-size:28px}.welcome h2{font-size:16px}.modules{grid-template-columns:repeat(2,1fr)}.m-user .b,.m-ai .b{font-size:12px;line-height:1.55;padding:8px 10px}.input input{font-size:14px;padding:10px 14px}.input .mic,.input .send{width:36px;height:36px}.input{padding:8px 10px 14px}.nav a{padding:3px 8px;font-size:9px}}
+@media(max-width:768px){.app{max-width:100%}.chat{padding:12px 10px 6px}.welcome .logo{font-size:28px}.welcome h2{font-size:16px}.modules{grid-template-columns:repeat(2,1fr)}.m-user .b,.m-ai .b{font-size:12px;line-height:1.55;padding:8px 10px}.input input{font-size:14px;padding:10px 14px}.input .mic,.input .send{width:36px;height:36px}.input{padding:8px 10px 14px}.nav a{padding:3px 8px;font-size:9px}.msg-turn-sum{font-size:11px;color:var(--paper3);opacity:.7;padding:4px 8px;margin:4px 0;border-left:2px solid rgba(201,168,76,.25);cursor:pointer;display:flex;gap:8px;align-items:center;line-height:1.5;transition:opacity .15s}.msg-turn-sum:hover{opacity:1;background:rgba(201,168,76,.04)}.msg-turn-sum .ts-tag{background:rgba(201,168,76,.12);color:var(--gold);padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600;flex-shrink:0}.msg-turn-sum .ts-q{flex:0 1 auto;color:var(--paper2);opacity:.75;max-width:50%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.msg-turn-sum .ts-a{flex:0 1 auto;opacity:.6;max-width:40%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.msg-turn-sum.open{background:rgba(201,168,76,.06);border-left-color:var(--gold)}
 .tts-btn{background:none;border:1px solid rgba(201,168,76,0.2);border-radius:50%;width:34px;height:34px;font-size:15px;cursor:pointer;color:#c9a84c;transition:all .15s;flex-shrink:0}
 .tts-btn:hover{background:rgba(201,168,76,0.1)}
 .tts-btn.playing{background:rgba(201,168,76,0.2);border-color:#c9a84c;animation:voice-pulse 1s infinite}
@@ -522,12 +522,15 @@ function detectModule(text){
 async function processAnswer(ans){
   const mod=MODULES[state.module];
   if(!mod)return;
-  
+
   // 记录数据
   const stepKey='s'+state.step;
   state.data[stepKey]=ans;
   state.step++;
-  
+
+  // 长引导UX折叠：把上一轮（AI问题+用户回答）压缩为一行摘要，避免屏幕堆叠
+  _collapseLastTurn();
+
   // 还有引导步骤
   if(state.step<mod.steps.length){
     const nextStep=mod.steps[state.step];
@@ -536,11 +539,42 @@ async function processAnswer(ans){
     addAI(nextStep.q,nextStep);
     return;
   }
-  
+
   // 所有要素收集完→生成报告
   state.reporting=true;
   await typing();
   await generateReport();
+}
+
+// 长引导折叠：把刚回答完的那对（AI问题+用户答案）变为可展开的紧凑摘要
+function _collapseLastTurn(){
+  try{
+    const turns=chat.querySelectorAll('.msg.m-user');
+    if(turns.length<1)return;
+    // 找最后一个未折叠的 .m-user
+    const lastUser=turns[turns.length-1];
+    if(!lastUser || lastUser.dataset.folded==='1')return;
+    const prevAi=lastUser.previousElementSibling;
+    if(!prevAi || !prevAi.classList.contains('m-ai'))return;
+    // 抓文本
+    const qText=prevAi.querySelector('.b')?prevAi.querySelector('.b').textContent.trim().slice(0,40):'前一个问题';
+    const aText=lastUser.querySelector('.b')?lastUser.querySelector('.b').textContent.trim():ans;
+    // 创建摘要条
+    const sum=document.createElement('div');
+    sum.className='msg-turn-sum';
+    sum.innerHTML='<span class="ts-tag">已答</span><span class="ts-q">'+esc(qText)+(qText.length>=40?'…':'')+'</span><span class="ts-a">'+esc(aText.slice(0,30))+(aText.length>=30?'…':'')+'</span>';
+    sum.title='点击展开/收起原始对话';
+    // 替换原始对
+    prevAi.replaceWith(sum);
+    lastUser.remove();
+    sum.dataset.folded='1';
+    sum.onclick=function(){
+      const expanded=this.dataset.expanded==='1';
+      // 这里只控制样式展开，恢复不可逆——简化：点击只折叠/展开 sum 本身
+      this.classList.toggle('open',!expanded);
+      this.dataset.expanded=expanded?'':'1';
+    };
+  }catch(_){/* 安全保护 */}
 }
 
 async function typing(){
