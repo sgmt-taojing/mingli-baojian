@@ -483,17 +483,12 @@ async function send(pre){
   const q=(pre||box.value).trim();if(!q)return;
   box.value='';
   addUser(q);
-  
-  if(state.module&&!state.reporting){
+
+  if(state.module && !state.reporting){
     processAnswer(q);
   }else{
-    // 自由对话模式→尝试识别模块或走后端
-    const detected=detectModule(q);
-    if(detected){
-      startModule(detected);
-    }else{
-      await callAI(q);
-    }
+    // 自由对话模式→报告生成中或完成后,文本只走 freeChat,绝不重启模块
+    await callAI(q);
   }
 }
 
