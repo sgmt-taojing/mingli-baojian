@@ -4582,6 +4582,10 @@ setTimeout(removeLoadingOverlay,5000);
     </div>
     <p class="input-hint">出生日期为公历。时辰不填则按中午12:00计算。经度用于真太阳时校正。</p>
     <button class="compute-btn" onclick="playSound('success');computeBazi()" id="baziBtn">排 盘 演 命</button>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:8px;flex-wrap:wrap">
+      <button class="compute-btn" style="background:linear-gradient(135deg,#7c4dff,#5e35b1);font-size:14px;padding:10px 22px" onclick="runBaziEnhancedFortune()">🌟 运势 + 健康 深度增强（年度精解+企业视角）</button>
+    </div>
+    <div style="text-align:center;margin-top:6px;font-size:11px;color:var(--fg3)">📌 排盘后点击此按钮，生成今年/明年运势、健康专题、当日运势、企业主视角</div>
   </div>
 
   <div class="result" id="baziResult">
@@ -4832,6 +4836,14 @@ setTimeout(removeLoadingOverlay,5000);
       </div>
       <div class="annual-notice-content" id="annualNoticeContent"></div>
     </div>
+
+    <!-- 排盘增强报告：运势 + 健康 + 企业主视角 -->
+    <div id="baziEnhancedResult" class="result" style="margin-top:18px">
+      <div style="padding:24px;text-align:center;color:var(--fg3);font-size:13px">
+        🌟 <b>点击上方"运势+健康 深度增强"按钮</b>生成今年/明年运势精解、健康专题、当日运势、企业主视角判读
+      </div>
+    </div>
+    <div id="baziHealthContainer" style="margin-top:14px"></div>
 </section>
 
 <!-- ===== ZHANBU (占卜) COMPOSITE SECTION ===== -->
