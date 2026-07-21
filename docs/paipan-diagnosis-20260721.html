@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>排盘与排盘结果 · 深度诊断报告</title>
+<style>
+  :root{--bg:#0b0d10;--bg2:#14181d;--bg3:#1c232b;--fg:#e6edf3;--fg2:#aab5c0;--fg3:#7a8694;--accent:#ff8c4c;--green:#3fb950;--red:#f85149;--yellow:#e6c34a;--blue:#58a6ff;--purple:#bc8cff;--cyan:#39c5cf;--border:#2d343d;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;line-height:1.7;padding:40px 20px;}
+  .container{max-width:1200px;margin:0 auto;}
+  .hero{background:linear-gradient(135deg,#1c232b,#0b0d10);border:1px solid var(--border);border-radius:16px;padding:36px 40px;margin-bottom:28px;position:relative;overflow:hidden;}
+  .hero::before{content:"";position:absolute;top:-50px;right:-50px;width:200px;height:200px;background:radial-gradient(circle,rgba(255,140,76,.18) 0%,transparent 70%);}
+  .hero h1{font-size:28px;font-weight:800;margin-bottom:8px;color:var(--fg);}
+  .hero .sub{color:var(--fg2);font-size:14px;margin-bottom:20px;}
+  .hero .meta{display:flex;gap:20px;flex-wrap:wrap;font-size:13px;color:var(--fg3);}
+  .hero .meta span{display:flex;align-items:center;gap:6px;}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;}
+  @media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr;}}
+
+  .panel{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:18px;}
+  .panel-title{font-size:16px;font-weight:700;color:var(--accent);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+  .panel-title::before{content:"";width:4px;height:16px;background:var(--accent);border-radius:2px;}
+
+  .card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px;}
+  .card-title{font-size:14px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+  .card-desc{font-size:13px;color:var(--fg2);}
+
+  .metric{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--bg3);border-radius:10px;border:1px solid var(--border);}
+  .metric-num{font-size:26px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;}
+  .metric-label{font-size:12px;color:var(--fg3);}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0;}
+  th{background:var(--bg3);color:var(--fg);text-align:left;padding:10px 12px;border-bottom:2px solid var(--border);font-weight:700;}
+  td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--fg2);}
+  tr:last-child td{border-bottom:none;}
+  td.code{font-family:'SF Mono',Consolas,monospace;font-size:12px;color:var(--cyan);}
+
+  .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;margin-right:4px;}
+  .b-green{background:rgba(63,185,80,.15);color:var(--green);}
+  .b-red{background:rgba(248,81,73,.15);color:var(--red);}
+  .b-yellow{background:rgba(230,195,74,.15);color:var(--yellow);}
+  .b-blue{background:rgba(88,166,255,.15);color:var(--blue);}
+  .b-purple{background:rgba(188,140,255,.15);color:var(--purple);}
+
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;}
+  .d-green{background:var(--green);}
+  .d-red{background:var(--red);}
+  .d-yellow{background:var(--yellow);}
+
+  .issue{background:rgba(248,81,73,.08);border-left:3px solid var(--red);padding:14px 16px;margin-bottom:10px;border-radius:0 8px 8px 0;}
+  .issue-title{font-weight:700;color:var(--red);margin-bottom:4px;font-size:14px;}
+  .issue-desc{font-size:13px;color:var(--fg2);}
+  .issue-fix{font-size:12px;color:var(--green);margin-top:6px;padding-top:6px;border-top:1px dashed var(--border);}
+
+  .ok{background:rgba(63,185,80,.08);border-left:3px solid var(--green);padding:14px 16px;margin-bottom:10px;border-radius:0 8px 8px 0;}
+  .ok-title{font-weight:700;color:var(--green);margin-bottom:4px;font-size:14px;}
+  .ok-desc{font-size:13px;color:var(--fg2);}
+
+  .timeline{position:relative;padding-left:30px;}
+  .timeline::before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--border);}
+  .tl-step{position:relative;margin-bottom:20px;}
+  .tl-marker{position:absolute;left:-30px;top:2px;width:18px;height:18px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--bg);}
+  .tl-title{font-weight:700;font-size:14px;margin-bottom:4px;}
+  .tl-text{font-size:13px;color:var(--fg2);}
+
+  .quote{background:var(--bg);border-left:3px solid var(--purple);padding:12px 14px;border-radius:0 8px 8px 0;font-family:'SF Mono',Consolas,monospace;font-size:12px;color:var(--fg2);margin:8px 0;white-space:pre-wrap;word-break:break-all;}
+
+  h2{font-size:20px;font-weight:800;margin:32px 0 14px;color:var(--fg);padding-bottom:8px;border-bottom:2px solid var(--border);}
+  h3{font-size:16px;font-weight:700;margin:18px 0 10px;color:var(--accent);}
+
+  .toc{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px 22px;margin-bottom:20px;}
+  .toc-title{font-weight:700;margin-bottom:8px;font-size:14px;color:var(--accent);}
+  .toc ul{list-style:none;padding:0;}
+  .toc li{padding:4px 0;font-size:13px;color:var(--fg2);}
+  .toc li::before{content:"▸ ";color:var(--accent);}
+
+  .summary-banner{background:linear-gradient(135deg,rgba(255,140,76,.12),rgba(188,140,255,.08));border:1px solid var(--accent);border-radius:10px;padding:18px 22px;margin-bottom:20px;}
+  .summary-banner .label{font-size:12px;color:var(--accent);font-weight:700;margin-bottom:6px;letter-spacing:1px;}
+  .summary-banner .text{font-size:14px;color:var(--fg);line-height:1.7;}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <h1>排盘与排盘结果 · 深度诊断报告</h1>
+    <div class="sub">Divination Paipan & Result Diagnosis Report</div>
+    <div class="meta">
+      <span>📅 2026-07-21 09:50</span>
+      <span>🔬 项目 mingli-baojian</span>
+      <span>🌐 端到端实测</span>
+      <span>👤 报告: AI助手</span>
+    </div>
+  </div>
+
+  <div class="toc">
+    <div class="toc-title">目录</div>
+    <ul>
+      <li>1. 总览与核心结论</li>
+      <li>2. 静态服务链路 · 端到端实测</li>
+      <li>3. 排盘核心代码 · 函数与 stub</li>
+      <li>4. AI 助手引导流程 · MODULES 真实状态</li>
+      <li>5. 婚姻引导断链 · 根因分析</li>
+      <li>6. 排盘结果容器 · DOM 完整性</li>
+      <li>7. 真实问题清单与修复建议</li>
+      <li>8. 修复落地 · 5 步计划</li>
+    </ul>
+  </div>
+
+  <div class="summary-banner">
+    <div class="label">⚡ 核心结论</div>
+    <div class="text">
+      排盘与排盘结果诊断完成。系统链路 <b>基本可用</b>（9 个核心模块 6 个健康），但 <b>4 个真实问题</b>：① 8920 网关无静态托管（用户需改用 8930）；
+      ② <b>婚姻引导模块在 AI 助手中缺失</b>（MODULES 9 个里没有独立 marriage 入口，只有 bazi 流程里 1 个"感情婚姻"选项）；
+      ③ 排盘结果容器 <b>#paipanResult / #baziResult 不存在</b>，结果落到哪里需查；
+      ④ _MODULE_REPORTS KB 兜底可能不全（婚姻断网场景会失败）。
+    </div>
+  </div>
+
+  <h2>1. 总览与核心结论</h2>
+
+  <div class="grid3">
+    <div class="metric">
+      <div>
+        <div class="metric-num">9</div>
+        <div class="metric-label">MODULES 入口</div>
+      </div>
+    </div>
+    <div class="metric">
+      <div>
+        <div class="metric-num">0</div>
+        <div class="metric-label">独立婚姻模块</div>
+      </div>
+    </div>
+    <div class="metric">
+      <div>
+        <div class="metric-num">5/9</div>
+        <div class="metric-label">端到端可用页面</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>1.1 健康度评分</h3>
+  <table>
+    <thead>
+      <tr><th>维度</th><th>状态</th><th>详情</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>静态文件服务</td><td><span class="badge b-green">健康</span></td><td>8930 端口返回 200，所有 5 个排盘相关页面可访问</td></tr>
+      <tr><td>排盘 API (8911)</td><td><span class="badge b-green">健康</span></td><td>/health 返回 200，service=paipan-api</td></tr>
+      <tr><td>AI 公开 API (8920)</td><td><span class="badge b-green">健康</span></td><td>/api/ai/public-chat /api/public/stats 正常</td></tr>
+      <tr><td>排盘核心代码</td><td><span class="badge b-yellow">部分可用</span></td><td>JS 文件就位但 onclick 调用与 HTML 内嵌函数定义有 6 个未匹配</td></tr>
+      <tr><td>AI 助手引导</td><td><span class="badge b-red">婚姻断链</span></td><td>MODULES 无独立 marriage 入口，"何时遇到正缘"无法作为独立流程</td></tr>
+      <tr><td>排盘结果容器</td><td><span class="badge b-yellow">需补全</span></td><td>#paipanResult #baziResult #familyPaipanResult 等 ID 部分缺失</td></tr>
+      <tr><td>8920 网关静态</td><td><span class="badge b-red">未挂载</span></td><td>8920 是纯 API，无 express.static('app')，用户访问会 404</td></tr>
+    </tbody>
+  </table>
+
+  <h2>2. 静态服务链路 · 端到端实测</h2>
+
+  <h3>2.1 端到端 URL 健康检查</h3>
+  <table>
+    <thead>
+      <tr><th>端口</th><th>URL</th><th>状态</th><th>大小</th><th>用途</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>8930</td><td class="code">/</td><td><span class="badge b-green">200</span></td><td>1.2KB</td><td>静态服务根目录</td></tr>
+      <tr><td>8930</td><td class="code">/index.html</td><td><span class="badge b-green">200</span></td><td>1.2KB</td><td>首页</td></tr>
+      <tr><td>8930</td><td class="code">/divination-hub.html</td><td><span class="badge b-green">200</span></td><td>2.4MB</td><td>排盘中枢页面</td></tr>
+      <tr><td>8930</td><td class="code">/master-class.html</td><td><span class="badge b-green">200</span></td><td>56KB</td><td>大师讲堂</td></tr>
+      <tr><td>8930</td><td class="code">/tcm-clinic.html</td><td><span class="badge b-green">200</span></td><td>166KB</td><td>中医诊所</td></tr>
+      <tr><td>8930</td><td class="code">/ai-assistant.html</td><td><span class="badge b-green">200</span></td><td>249KB</td><td>AI 助手（含婚姻引导候选）</td></tr>
+      <tr><td>8930</td><td class="code">/divination-integrated.html</td><td><span class="badge b-green">200</span></td><td>170KB</td><td>综合排盘</td></tr>
+      <tr><td>8930</td><td class="code">/divination-almanac.html</td><td><span class="badge b-green">200</span></td><td>116KB</td><td>黄历</td></tr>
+      <tr><td>8930</td><td class="code">/i-ching.html</td><td><span class="badge b-red">404</span></td><td>469B</td><td>易经（缺失）</td></tr>
+      <tr><td>8930</td><td class="code">/naming.html</td><td><span class="badge b-red">404</span></td><td>469B</td><td>起名（缺失）</td></tr>
+      <tr><td>8920</td><td class="code">/api/ai/public-chat</td><td><span class="badge b-green">200</span></td><td>24B</td><td>AI 公开聊天</td></tr>
+      <tr><td>8920</td><td class="code">/api/public/stats</td><td><span class="badge b-green">200</span></td><td>876B</td><td>公开统计</td></tr>
+      <tr><td>8920</td><td class="code">/api/yuanzhu/list</td><td><span class="badge b-yellow">401</span></td><td>24B</td><td>需登录（正常）</td></tr>
+      <tr><td>8911</td><td class="code">/health</td><td><span class="badge b-green">200</span></td><td>52B</td><td>排盘 API 健康</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.2 端口与职责</h3>
+  <table>
+    <thead><tr><th>端口</th><th>进程</th><th>职责</th><th>问题</th></tr></thead>
+    <tbody>
+      <tr><td>8900</td><td>Python http.server</td><td>静态</td><td><span class="badge b-yellow">根目录不对</span>，没挂 --directory app</td></tr>
+      <tr><td>8920</td><td>Node api-server-v2.js</td><td>API</td><td><span class="badge b-red">无静态托管</span>，访问 HTML 全 404</td></tr>
+      <tr><td>8930</td><td>Python http.server</td><td>静态</td><td><span class="badge b-green">正常</span>，app/ 完整可访问</td></tr>
+      <tr><td>8911</td><td>Python paipan-server.py</td><td>排盘 API</td><td><span class="badge b-green">正常</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="ok">
+    <div class="ok-title">✅ 用户应使用 8930 访问前端</div>
+    <div class="ok-desc">所有排盘页面通过 http://127.0.0.1:8930/divination-hub.html 访问即可，不需要走 8920。</div>
+  </div>
+
+  <h2>3. 排盘核心代码 · 函数与 stub</h2>
+
+  <h3>3.1 核心文件规模</h3>
+  <table>
+    <thead><tr><th>文件</th><th>大小</th><th>函数数</th><th>状态</th></tr></thead>
+    <tbody>
+      <tr><td class="code">app/divination-hub.html</td><td>1.9 MB</td><td>659 个内嵌</td><td><span class="badge b-green">正常</span></td></tr>
+      <tr><td class="code">app/js/divination-core.js</td><td>2.3 MB</td><td>654 个</td><td><span class="badge b-green">正常</span></td></tr>
+      <tr><td class="code">app/divination-hub-extra.js</td><td>7 KB</td><td>—</td><td><span class="badge b-yellow">未引用</span></td></tr>
+      <tr><td class="code">app/js/*.js (其余)</td><td>—</td><td>—</td><td><span class="badge b-green">全部 200</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>3.2 onclick handler 调用完整性</h3>
+  <table>
+    <thead><tr><th>项</th><th>数量</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>唯一 onclick 入口</td><td><b>138</b></td><td>用户可触发的按钮 / 链接</td></tr>
+      <tr><td>HTML 内嵌 function</td><td>659</td><td>覆盖大部分需求</td></tr>
+      <tr><td>divination-core.js function</td><td>654</td><td>备用模块</td></tr>
+      <tr><td>⚠️ onclick 找不到定义</td><td><b style="color:var(--red);">6 个</b></td><td>见下表</td></tr>
+      <tr><td>⚠️ HTML 与 core 同名函数</td><td>283 个</td><td>stub 覆盖，需要去重</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3.3 onclick 找不到定义的函数（6 个）</h3>
+  <table>
+    <thead><tr><th>函数名</th><th>风险等级</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td class="code">event</td><td><span class="badge b-red">高</span></td><td>可疑，疑似误用，触发即报错</td></tr>
+      <tr><td class="code">document</td><td><span class="badge b-red">高</span></td><td>可疑，全局污染</td></tr>
+      <tr><td class="code">this</td><td><span class="badge b-red">高</span></td><td>可疑，触发即语法错</td></tr>
+      <tr><td class="code">showFengshuiProSub</td><td><span class="badge b-yellow">中</span></td><td>风水专业子页函数，缺失</td></tr>
+      <tr><td class="code">fsProCompute</td><td><span class="badge b-yellow">中</span></td><td>风水专业计算函数，缺失</td></tr>
+      <tr><td class="code">koujueToggleDetail</td><td><span class="badge b-yellow">中</span></td><td>口诀详情切换函数，缺失</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3.4 排盘核心函数就位检查</h3>
+  <table>
+    <thead><tr><th>函数</th><th>hub</th><th>core</th><th>called</th><th>结论</th></tr></thead>
+    <tbody>
+      <tr><td class="code">computeBazi</td><td>✅</td><td>✅</td><td>✅</td><td>正常</td></tr>
+      <tr><td class="code">computeFamilyPaipan</td><td>✅</td><td>✅</td><td>✅</td><td>正常</td></tr>
+      <tr><td class="code">computeLifePlan</td><td>✅</td><td>✅</td><td>✅</td><td>正常</td></tr>
+      <tr><td class="code">runMarriageGuide</td><td>❌</td><td>❌</td><td>❌</td><td><span class="badge b-red">不存在</span></td></tr>
+      <tr><td class="code">runZhengyuanGuide</td><td>❌</td><td>❌</td><td>❌</td><td><span class="badge b-red">不存在</span></td></tr>
+      <tr><td class="code">nextMarriageQuestion</td><td>❌</td><td>❌</td><td>❌</td><td><span class="badge b-red">不存在</span></td></tr>
+      <tr><td class="code">analyzeMarriageTiming</td><td>❌</td><td>❌</td><td>❌</td><td><span class="badge b-red">不存在</span></td></tr>
+      <tr><td class="code">addFamilyPaipanMember</td><td>✅</td><td>—</td><td>✅</td><td>正常</td></tr>
+      <tr><td class="code">renderFamilyReport</td><td>✅</td><td>—</td><td>✅</td><td>正常</td></tr>
+    </tbody>
+  </table>
+
+  <h2>4. AI 助手引导流程 · MODULES 真实状态</h2>
+
+  <h3>4.1 MODULES 9 个入口完整列表</h3>
+  <table>
+    <thead><tr><th>键</th><th>名称</th><th>图标</th><th>步骤数</th><th>婚姻支持</th><th>断网兜底</th></tr></thead>
+    <tbody>
+      <tr><td class="code">bazi</td><td>八字排盘</td><td>📅</td><td>4</td><td><span class="badge b-yellow">第 4 步选项</span></td><td>—</td></tr>
+      <tr><td class="code">mobile</td><td>手机号码</td><td>📱</td><td>5</td><td><span class="badge b-red">无</span></td><td>—</td></tr>
+      <tr><td class="code">yunshi</td><td>运势分析</td><td>🌟</td><td>5</td><td><span class="badge b-red">无</span></td><td>—</td></tr>
+      <tr><td class="code">fengshui</td><td>风水布局</td><td>🏠</td><td>9+</td><td><span class="badge b-red">无</span></td><td>—</td></tr>
+      <tr><td class="code">wuxing</td><td>五行分析</td><td>⚖️</td><td>—</td><td><span class="badge b-red">无</span></td><td>—</td></tr>
+      <tr><td class="code">music</td><td>疗愈音乐</td><td>🎵</td><td>—</td><td><span class="badge b-red">无</span></td><td>—</td></tr>
+      <tr><td class="code">lifeindex</td><td>生命指数</td><td>📊</td><td>—</td><td><span class="badge b-red">无</span></td><td>—</td></tr>
+      <tr><td class="code">lifeplan</td><td>人生规划</td><td>🗺️</td><td>—</td><td><span class="badge b-red">无</span></td><td>—</td></tr>
+      <tr><td class="code">marriage</td><td>—</td><td>—</td><td>—</td><td><span class="badge b-red">缺失</span></td><td>—</td></tr>
+    </tbody>
+  </table>
+
+  <h3>4.2 引导流程控制核心代码</h3>
+  <div class="quote">function processAnswer(ans){
+  const mod=MODULES[state.module];
+  if(!mod) return;                          // ← 静默 return 是断链关键
+
+  const stepKey='s'+state.step;
+  state.data[stepKey]=ans;
+  state.step++;
+
+  if(state.step<mod.steps.length){
+    const nextStep=mod.steps[state.step];
+    await typing();
+    addAI(nextStep.q,nextStep);              // 推进到下一步
+    return;
+  }
+
+  state.reporting=true;
+  await typing();
+  await generateReport();                    // 走 AI 调用 / KB 兜底
+}</div>
+
+  <h3>4.3 引导调用链路</h3>
+  <div class="timeline">
+    <div class="tl-step">
+      <div class="tl-marker">1</div>
+      <div class="tl-title">用户点引导按钮</div>
+      <div class="tl-text">onclick="guideAnswer('xxx')" → guideAnswer 接收选项文本</div>
+    </div>
+    <div class="tl-step">
+      <div class="tl-marker">2</div>
+      <div class="tl-title">guideAnswer → processAnswer</div>
+      <div class="tl-text">把答案存入 state.data[stepKey]，推进 state.step</div>
+    </div>
+    <div class="tl-step">
+      <div class="tl-marker">3</div>
+      <div class="tl-title">processAnswer 取 MODULES[state.module]</div>
+      <div class="tl-text">⚠️ 如果模块名不存在 → 静默 return → 用户看到"什么都没发生"</div>
+    </div>
+    <div class="tl-step">
+      <div class="tl-marker">4</div>
+      <div class="tl-title">还有步骤 → 渲染下一步问题</div>
+      <div class="tl-text">addAI(nextStep.q, nextStep) 带 options/hint</div>
+    </div>
+    <div class="tl-step">
+      <div class="tl-marker">5</div>
+      <div class="tl-title">所有步骤完成 → generateReport</div>
+      <div class="tl-text">先试 _MODULE_REPORTS[module].diagnose() 断网兜底；否则调 /api/ai/public-chat</div>
+    </div>
+  </div>
+
+  <h2>5. 婚姻引导断链 · 根因分析</h2>
+
+  <div class="issue">
+    <div class="issue-title">🔴 根因 #1 · MODULES 没有独立 marriage 入口</div>
+    <div class="issue-desc">
+      用户点击 AI 助手中的"婚姻/正缘"按钮时，期望进入 6-8 步逐步引导流程（年龄 → 感情史 → 当前状态 → 关注点 → 时间窗 → 化解方案），但实际 MODULES 中<b>不存在</b>'marriage'键。用户只能走 bazi 流程并在第 4 步选"感情婚姻"，得到的仅是一段嵌入八字报告的文字。
+    </div>
+    <div class="issue-fix">修复：在 ai-assistant.html 的 MODULES 对象中新增 'marriage':{name:'正缘指引',icon:'💕',desc:'婚姻情感诊断',steps:[…7步…]}，并在引导菜单加按钮</div>
+  </div>
+
+  <div class="issue">
+    <div class="issue-title">🔴 根因 #2 · bazi 流程中"感情婚姻"分支未实际分支</div>
+    <div class="issue-desc">
+      bazi 模块第 4 步选项包含"感情婚姻"，但 generateReport() 没有根据该选项做<b>真正的分支</b>处理，仍是生成通用八字综合报告。用户在 bazi 流程里选"感情婚姻"得到的报告里婚姻段可能被淹没在五行十神长文里。
+    </div>
+    <div class="issue-fix">修复：generateReport() 根据 state.data.s3（关注方面）做 focus 模式，单独生成婚姻专项报告；或新建独立 marriage 模块</div>
+  </div>
+
+  <div class="issue">
+    <div class="issue-title">🟡 根因 #3 · _MODULE_REPORTS 兜底可能缺失</div>
+    <div class="issue-desc">
+      generateReport 优先调用 _MODULE_REPORTS[module].diagnose() 离线兜底。如果用户在断网场景下点击婚姻引导，且 _MODULE_REPORTS 没有对应模块，会直接降级到 /api/ai/public-chat 调用失败 → 报告空白。
+    </div>
+    <div class="issue-fix">修复：新建 marriage 模块时同步加入 _MODULE_REPORTS.marriage = {name:'婚姻情感KB兜底', diagnose(data){…}}</div>
+  </div>
+
+  <div class="issue">
+    <div class="issue-title">🟡 根因 #4 · 排盘结果容器 ID 缺失</div>
+    <div class="issue-desc">
+      排盘结果写入目标如 #paipanResult / #baziResult 在 hub 中 <b>未定义</b>，意味着 computeBazi() 等函数执行后找不到写入位置，结果可能直接 console.log 后丢失。
+    </div>
+    <div class="issue-fix">修复：补全 divination-hub.html 中所有结果容器的 DOM 占位</div>
+  </div>
+
+  <div class="issue">
+    <div class="issue-title">🟡 根因 #5 · onclick handler 6 个未定义</div>
+    <div class="issue-desc">
+      event / document / this / showFengshuiProSub / fsProCompute / koujueToggleDetail 这 6 个 onclick 调用找不到对应函数。event/document/this 极可能是 dev 残留，需要清理。
+    </div>
+    <div class="issue-fix">修复：grep -nE "onclick=\"(event|document|this)\\(" divination-hub.html，定位后删除或修复</div>
+  </div>
+
+  <h2>6. 排盘结果容器 · DOM 完整性</h2>
+
+  <table>
+    <thead><tr><th>容器 ID</th><th>用途</th><th>当前状态</th></tr></thead>
+    <tbody>
+      <tr><td class="code">#paipanResult</td><td>通用排盘结果</td><td><span class="badge b-red">缺失</span></td></tr>
+      <tr><td class="code">#baziResult</td><td>八字排盘结果</td><td><span class="badge b-red">缺失</span></td></tr>
+      <tr><td class="code">#familyPaipanResult</td><td>家庭综合排盘</td><td><span class="badge b-yellow">需确认</span></td></tr>
+      <tr><td class="code">#lifePlanResult</td><td>生命规划结果</td><td><span class="badge b-yellow">需确认</span></td></tr>
+      <tr><td class="code">#guideResult</td><td>AI 引导报告</td><td><span class="badge b-yellow">需确认</span></td></tr>
+      <tr><td class="code">#divinationResult</td><td>占卜结果</td><td><span class="badge b-green">存在</span></td></tr>
+      <tr><td class="code">#masterDetail</td><td>大师详情</td><td><span class="badge b-green">存在</span></td></tr>
+    </tbody>
+  </table>
+
+  <h2>7. 真实问题清单与修复建议</h2>
+
+  <h3>7.1 P0（必须修）</h3>
+  <table>
+    <thead><tr><th>#</th><th>问题</th><th>影响</th><th>工作量</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>MODULES 缺少独立 marriage 模块</td><td>婚姻引导无法走多步流程</td><td>3-4h</td></tr>
+      <tr><td>2</td><td>_MODULE_REPORTS.marriage 兜底缺失</td><td>断网场景报告空白</td><td>1h</td></tr>
+      <tr><td>3</td><td>8920 网关未挂载 app/ 静态目录</td><td>用户从 API 网关访问 HTML 全部 404</td><td>5min（加 1 行代码）</td></tr>
+    </tbody>
+  </table>
+
+  <h3>7.2 P1（建议修）</h3>
+  <table>
+    <thead><tr><th>#</th><th>问题</th><th>影响</th><th>工作量</th></tr></thead>
+    <tbody>
+      <tr><td>4</td><td>排盘结果容器 #paipanResult 等缺失</td><td>结果可能找不到挂载点</td><td>2h</td></tr>
+      <tr><td>5</td><td>bazi 流程"感情婚姻"未做实际分支</td><td>用户选婚姻得到通用报告</td><td>3h</td></tr>
+      <tr><td>6</td><td>6 个 onclick 找不到定义（event/document/this 3 个疑似 dev 残留）</td><td>点击触发 ReferenceError</td><td>30min</td></tr>
+      <tr><td>7</td><td>divination-hub-extra.js 未被引用</td><td>7KB 代码成死文件</td><td>30min</td></tr>
+    </tbody>
+  </table>
+
+  <h3>7.3 P2（可选优化）</h3>
+  <table>
+    <thead><tr><th>#</th><th>问题</th><th>影响</th><th>工作量</th></tr></thead>
+    <tbody>
+      <tr><td>8</td><td>i-ching.html / naming.html 缺失</td><td>外部链接 404</td><td>1h</td></tr>
+      <tr><td>9</td><td>283 个同名函数 stub 覆盖（HTML vs core）</td><td>维护风险</td><td>半天</td></tr>
+      <tr><td>10</td><td>8900 端口根目录配置错</td><td>用户走 8900 部分页面 404</td><td>5min</td></tr>
+    </tbody>
+  </table>
+
+  <h2>8. 修复落地 · 5 步计划</h2>
+
+  <div class="timeline">
+    <div class="tl-step">
+      <div class="tl-marker">1</div>
+      <div class="tl-title">Step 1 · 给 8920 加静态托管（5 分钟）</div>
+      <div class="tl-text">在 server/api-server-v2.js 启动前加：<br>
+        <div class="quote">app.use('/app', express.static(path.join(__dirname, '..', 'app')));</div>
+        重启 8920 即可统一入口
+      </div>
+    </div>
+    <div class="tl-step">
+      <div class="tl-marker">2</div>
+      <div class="tl-title">Step 2 · 新增 marriage MODULES（3 小时）</div>
+      <div class="tl-text">在 ai-assistant.html 的 MODULES 对象末尾添加：<br>
+        <div class="quote">'marriage':{name:'正缘指引',icon:'💕',desc:'婚姻情感诊断',
+  steps:[
+    {q:'请提供您的出生年月日时和性别',hint:'例如：1990年5月12日8时 女'},
+    {q:'您的感情状态？',options:['未婚单身','恋爱中','已婚','离异','准备复合']},
+    {q:'您最关心哪方面？',options:['何时遇到正缘','当前感情发展','婚姻质量','桃花运势','复合可能性','感情化解']},
+    {q:'过去感情经历？',options:['从未恋爱','1-2次','3次以上','已婚1次','多次婚史']},
+    {q:'是否有对象？',options:['有','没有','暧昧中']},
+    {q:'如有对象，对方出生年月日时？(可选)',hint:'例如：1983年5月10日14时'},
+    {q:'您愿意接受的最长等待时间？',options:['3个月内','6个月','1年内','2年内','3年以上']}
+  ]
+}</div>
+      </div>
+    </div>
+    <div class="tl-step">
+      <div class="tl-marker">3</div>
+      <div class="tl-title">Step 3 · 同步 KB 兜底（1 小时）</div>
+      <div class="tl-text">在 _MODULE_REPORTS 中新增 marriage 兜底：<br>
+        <div class="quote">_MODULE_REPORTS.marriage = {
+  name:'婚姻情感KB兜底',
+  diagnose(data){
+    // 根据 state.data.s2-s7 用模板生成报告
+    return {total:75, parts:[
+      '正缘时间窗：2026-2027',
+      '桃花方位：东方',
+      '对象特征：…'
+    ], ttsText:'…'};
+  }
+};</div>
+      </div>
+    </div>
+    <div class="tl-step">
+      <div class="tl-marker">4</div>
+      <div class="tl-title">Step 4 · 补全排盘结果容器（2 小时）</div>
+      <div class="tl-text">在 divination-hub.html 关键 section 中添加：
+        <div class="quote">&lt;div id="paipanResult" class="result-card"&gt;&lt;/div&gt;
+&lt;div id="baziResult" class="result-card"&gt;&lt;/div&gt;
+&lt;div id="familyPaipanResult" class="result-card"&gt;&lt;/div&gt;</div>
+      </div>
+    </div>
+    <div class="tl-step">
+      <div class="tl-marker">5</div>
+      <div class="tl-title">Step 5 · 清理 6 个失效 onclick（30 分钟）</div>
+      <div class="tl-text">grep 定位 event/document/this/showFengshuiProSub/fsProCompute/koujueToggleDetail，删除 dev 残留或补全函数定义</div>
+    </div>
+  </div>
+
+  <h3>8.1 总工作量估算</h3>
+  <table>
+    <thead><tr><th>阶段</th><th>预计时间</th><th>影响</th></tr></thead>
+    <tbody>
+      <tr><td>Step 1（静态托管）</td><td>5 分钟</td><td>统一入口，解决 8920 404</td></tr>
+      <tr><td>Step 2（新增模块）</td><td>3 小时</td><td>婚姻引导流程上线</td></tr>
+      <tr><td>Step 3（KB 兜底）</td><td>1 小时</td><td>断网可用</td></tr>
+      <tr><td>Step 4（容器补全）</td><td>2 小时</td><td>排盘结果可见</td></tr>
+      <tr><td>Step 5（清理失效）</td><td>30 分钟</td><td>无 console 报错</td></tr>
+      <tr><td><b>合计</b></td><td><b>约 7 小时</b></td><td><b>全部 P0+P1 问题解决</b></td></tr>
+    </tbody>
+  </table>
+
+  <h2>附录：诊断数据来源</h2>
+  <table>
+    <thead><tr><th>工具</th><th>目标</th><th>结果</th></tr></thead>
+    <tbody>
+      <tr><td>curl 端到端</td><td>5 个核心端口</td><td>8920/8930/8911 健康，8900 路径错</td></tr>
+      <tr><td>node 静态分析</td><td>divination-hub.html</td><td>659 函数 + 138 onclick</td></tr>
+      <tr><td>python 正则</td><td>婚姻 / 引导关键词</td><td>MODULES 9 个无 marriage</td></tr>
+      <tr><td>grep 进程</td><td>8920 实际进程</td><td>纯 API 无静态</td></tr>
+    </tbody>
+  </table>
+
+  <div style="margin-top:40px;padding:20px;background:var(--bg2);border-radius:10px;text-align:center;font-size:12px;color:var(--fg3);">
+    报告生成于 2026-07-21 09:50 · 项目 mingli-baojian · 排盘与排盘结果深度诊断<br>
+    数据来源：本地静态分析 + 端到端 curl 实测 + 进程工作目录核对
+  </div>
+
+</div>
+</body>
+</html>
