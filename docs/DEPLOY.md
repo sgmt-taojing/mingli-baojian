@@ -52,7 +52,7 @@ node -e "const {DatabaseSync}=require('node:sqlite');const db=new DatabaseSync('
 MINGLI_ENCRYPT_KEY=your_key MINGLI_JWT_SECRET=your_secret node server/api-server-v2.js
 
 # 启动前端（另一个终端）
-python3 -m http.server 8900
+python3 -m http.server 8930  # 2026-07-21 修正：原 8900 已被环保平台占用，迁移至 8930
 ```
 
 ## 安全配置
@@ -120,7 +120,7 @@ server {
 │           用户浏览器 / 微信              │
 │  ┌──────────┐  ┌──────────┐            │
 │  │ 前端页面  │  │ 登录页面  │            │
-│  │ (8900)   │  │ login.html│            │
+│  │ (8930)   │  │ login.html│   # 2026-07-21 端口迁移注
 │  └─────┬────┘  └─────┬────┘            │
 │        │              │                  │
 │  ┌─────┴──────────────┴──────────┐     │

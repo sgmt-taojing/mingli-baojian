@@ -2,7 +2,7 @@
 
 > **日期：** 2026-07-19
 > **项目路径：** `/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/`
-> **GitHub Pages:** https://sgmt-taojing.github.io/epb-assistant/
+> **GitHub Pages:** https://sgmt-taojing.github.io/mingli-baojian/app/index.html  # 2026-07-21 修正
 
 ---
 
