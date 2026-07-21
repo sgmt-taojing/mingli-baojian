@@ -40802,3 +40802,143 @@ function runBaziEnhancedFortune() {
 }
 
 try { window.runBaziEnhancedFortune = runBaziEnhancedFortune; } catch(e) {}
+
+/**
+ * _analyzeSixDimensions — 6维度综合评分引擎
+ * 维度：运势·健康·婚姻·孩子·同事·父母
+ * 返回 { scores:{}, levels:{}, advice:{}, summary }
+ */
+function _analyzeSixDimensions(birthYear, birthMonth, birthDay, birthHour, sex) {
+  sex = sex || '男';
+  if (!birthYear || birthYear < 1900 || birthYear > 2100) return null;
+
+  // 排盘
+  var p = computePaipan(birthYear, birthMonth, birthDay, birthHour);
+  if (!p) return null;
+  var dm = p.day_master || '木';
+  var ele = dm.slice(-1);
+  var sx = p.shengxiao || '';
+  var pillars = p.pillars || [];
+  var wc = p.wuxing_count || {金:1,木:1,水:1,火:1,土:1};
+  var lack = p.wuxing_lack || []
+  var yearGAN = (birthYear - 4) % 10;
+  var yearZHI = (birthYear - 4) % 12;
+  var stemNames = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  var branchNames = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  var yearGan = stemNames[yearGAN];
+  var yearZhi = branchNames[yearZHI];
+
+  // === 评分算法（百分制）===
+
+  // 1. 运势 score = (流年天干与日主生克关系) + 基础值
+  var yunshiScore = 70;
+  var yunshiRel = _getWuXingRelation(ele, yearGan.slice(-1));
+  if (yunshiRel === '生' || yunshiRel === '同') yunshiScore += 15;
+  else if (yunshiRel === '克') yunshiScore -= 15;
+  else yunshiScore += 5;
+  if (lack.indexOf(ele) >= 0) yunshiScore -= 8;
+  yunshiScore = Math.max(35, Math.min(98, yunshiScore));
+
+  // 2. 健康 score = 基础 - 五行偏枯惩罚
+  var healthScore = 75;
+  var minWx = Math.min(wc['金']||0, wc['木']||0, wc['水']||0, wc['火']||0, wc['土']||0);
+  var maxWx = Math.max(wc['金']||0, wc['木']||0, wc['水']||0, wc['火']||0, wc['土']||0);
+  if (maxWx - minWx >= 3) healthScore -= 18;
+  else if (maxWx - minWx >= 2) healthScore -= 8;
+  if (ele === '火' && (wc['水']||0) >= 3) healthScore -= 10;
+  if (ele === '金' && (wc['火']||0) >= 3) healthScore -= 10;
+  if (ele === '木' && (wc['金']||0) >= 3) healthScore -= 10;
+  healthScore = Math.max(40, Math.min(95, healthScore));
+
+  // 3. 婚姻 score = 日主 + 桃花位 + 夫妻宫
+  var marriageScore = 68;
+  var dayBranch = pillars[2] ? pillars[2].branch : '';
+  var peachMap = {亥卯未:'子',申子辰:'酉',寅午戌:'卯',巳酉丑:'午'};
+  var dayBranchGroup = Object.keys(peachMap).find(function(g){return g.indexOf(dayBranch)>=0;});
+  var peachStar = dayBranchGroup ? peachMap[dayBranchGroup] : '';
+  if (peachStar && yearZhi === peachStar) marriageScore += 12;
+  if (yunshiRel === '生') marriageScore += 8;
+  if (lack.indexOf(ele) >= 0 && ele === '水') marriageScore -= 10;
+  marriageScore = Math.max(35, Math.min(95, marriageScore));
+
+  // 4. 孩子 score = 食伤星 + 子女宫
+  var childScore = 65;
+  var shishen = _getShiShen(stemNames[(birthYear-4)%10], yearGan);
+  if (shishen === '食神' || shishen === '伤官') childScore += 18;
+  if (yunshiRel === '生') childScore += 6;
+  if (lack.indexOf('水') >= 0 && ele === '火') childScore -= 8; // 火旺水枯
+  childScore = Math.max(30, Math.min(92, childScore));
+
+  // 5. 同事 score = 比劫 + 官杀 平衡
+  var colleagueScore = 70;
+  var shiShenYear = _getShiShen(yearGan, dm.charAt(0));
+  if (shiShenYear === '比肩' || shiShenYear === '劫财') colleagueScore += 10;
+  else if (shiShenYear === '正官' || shiShenYear === '七杀') colleagueScore += 8;
+  else if (shiShenYear === '正印' || shiShenYear === '偏印') colleagueScore += 4;
+  else colleagueScore -= 5;
+  if (lack.indexOf('金') >= 0 && ele !== '金') colleagueScore -= 6;
+  colleagueScore = Math.max(35, Math.min(90, colleagueScore));
+
+  // 6. 父母 score = 印星 + 年柱
+  var parentScore = 72;
+  var parentRel = _getWuXingRelation(ele, yearGan.slice(-1));
+  if (parentRel === '生') parentScore += 12;
+  else if (parentRel === '克') parentScore -= 10;
+  else parentScore += 3;
+  if (lack.indexOf('土') >= 0) parentScore -= 5;
+  parentScore = Math.max(38, Math.min(94, parentScore));
+
+  // === 分级 ===
+  function level(s) { return s >= 70 ? 'good' : s >= 55 ? 'mid' : 'low'; }
+
+  // === 建议 ===
+  var adviceMap = {
+    yunshi: {
+      good: '运势正佳，把握时机推进重要计划，大胆决策。',
+      mid: '运势平稳，稳中求进，不宜过度冒险。',
+      low: '运势偏低，宜守不宜攻，韬光养晦等待转机。'
+    },
+    health: {
+      good: '健康状态良好，保持规律作息和适度运动。',
+      mid: '健康状况一般，注意' + (ele === '金' ? '呼吸道/肺部' : ele === '木' ? '肝胆/情绪' : ele === '水' ? '肾脏/泌尿' : ele === '火' ? '心脏/血液' : '脾胃/消化') + '保养。',
+      low: '需重点关注健康，建议定期体检，' + (ele === '金' ? '少食辛辣，多润肺' : ele === '木' ? '少熬夜，疏肝理气' : ele === '水' ? '注意保暖，少冷饮' : ele === '火' ? '清淡饮食，控情绪' : '规律饮食，健脾胃') + '。'
+    },
+    marriage: {
+      good: '婚姻感情运势佳，单身者有机会遇到正缘，已婚者关系和睦。',
+      mid: '感情运势平稳，需要主动沟通和经营。',
+      low: '感情方面可能有波折，耐心等待缘分，已婚者注意包容。'
+    },
+    child: {
+      good: '子女运佳，有子女者关系融洽，求子者机会较大。',
+      mid: '子女运平稳，顺其自然。',
+      low: '子女运较弱，注意与子女的沟通方式，不可过于严厉。'
+    },
+    colleague: {
+      good: '人际关系良好，贵人多助，适合团队合作。',
+      mid: '人际关系一般，主动拓展人脉，注意职场沟通。',
+      low: '人际关系有压力，低调行事，避免冲突，提升自身实力。'
+    },
+    parent: {
+      good: '父母运佳，家庭和睦，长辈关爱。',
+      mid: '与父母关系正常，多关心长辈健康。',
+      low: '父母缘较薄，多主动联系关心，珍惜相处时光。'
+    }
+  };
+
+  var scores = { yunshi: yunshiScore, health: healthScore, marriage: marriageScore, child: childScore, colleague: colleagueScore, parent: parentScore };
+  var levels = {};
+  var advice = {};
+  Object.keys(scores).forEach(function(k) {
+    levels[k] = level(scores[k]);
+    advice[k] = adviceMap[k][levels[k]];
+  });
+
+  return {
+    scores: scores,
+    levels: levels,
+    advice: advice,
+    meta: { dayMaster: dm, element: ele, shengxiao: sx, yearGan: yearGan, yearZhi: yearZhi, lack: lack }
+  };
+}
+
+try { window._analyzeSixDimensions = _analyzeSixDimensions; } catch(e) {}

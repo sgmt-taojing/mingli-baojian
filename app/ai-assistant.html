@@ -2531,7 +2531,8 @@ window._MODULE_REPORTS = {
   yunshi: {
     name: '运势分析',
     diagnose: function(data){
-      const ele = ['金','木','水','火','土'][Math.floor(Math.random()*5)];
+      const seed = (data && data.s0) ? data.s0.length : 0;
+      const ele = ['金','木','水','火','土'][seed % 5];
       const SD = {'金':68,'木':75,'水':80,'火':85,'土':82};
       const six = {yunshi: SD[ele], jiankang: SD[ele]+2, hunyin: SD[ele]-1, haizi: SD[ele]+1, tongshi: SD[ele]+3, fumu: SD[ele]+5};
       return {
@@ -2546,7 +2547,8 @@ window._MODULE_REPORTS = {
   caiyun: {
     name: '财运分析',
     diagnose: function(data){
-      const ele = ['金','木','水','火','土'][Math.floor(Math.random()*5)];
+      const seed = (data && data.s0) ? data.s0.length : 1;
+      const ele = ['金','木','水','火','土'][seed % 5];
       const SD = {'金':65,'木':72,'水':85,'火':55,'土':80};
       const six = {yunshi: SD[ele]-3, jiankang: SD[ele]+5, hunyin: SD[ele], haizi: SD[ele]+2, tongshi: SD[ele]+4, fumu: SD[ele]+6};
       return {
@@ -2561,7 +2563,8 @@ window._MODULE_REPORTS = {
   ganqing: {
     name: '感情婚姻',
     diagnose: function(data){
-      const ele = ['金','木','水','火','土'][Math.floor(Math.random()*5)];
+      const seed = (data && data.s0) ? data.s0.length : 2;
+      const ele = ['金','木','水','火','土'][seed % 5];
       const SD = {'金':62,'木':78,'水':82,'火':75,'土':80};
       const six = {yunshi: SD[ele], jiankang: SD[ele]+3, hunyin: SD[ele]+5, haizi: SD[ele]+2, tongshi: SD[ele]+1, fumu: SD[ele]+4};
       return {
