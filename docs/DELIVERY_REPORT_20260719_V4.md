@@ -3,6 +3,12 @@
 
 ---
 
+## 📌 修正说明（2026-07-21）
+
+> 本文档原始记录写于 7 月初/中，当时静态服务端口为 `8900`。2026-07-13 已完成端口迁移（`8900` → `8930`，因 8900 已被环保智慧执法平台长期占用）。下方"本地"段地址已按当前正确值修正；Git 历史保留原记录可供追溯。
+
+---
+
 ## 一、本次交付概述
 
 在V3基础上完成**引擎审计+深度优化**和**全站导航集成**，共5次引擎优化提交 + 1次导航集成提交。
@@ -124,40 +130,37 @@
 
 ---
 
-## 六、全量访问URL
+## 六、✅ 当前正确访问地址
 
 ### GitHub Pages
-- 🏠 首页: https://sgmt-taojing.github.io/mingli-baojian/
-- 🔮 命理排盘: https://sgmt-taojing.github.io/mingli-baojian/app/divination-hub.html
-- 🔐 登录: https://sgmt-taojing.github.io/mingli-baojian/app/login.html
-- 🏥 中医诊疗: https://sgmt-taojing.github.io/mingli-baojian/app/tcm-clinic.html
-- 🧬 体质调理: https://sgmt-taojing.github.io/mingli-baojian/app/divination-integrated.html
-- 📅 黄历: https://sgmt-taojing.github.io/mingli-baojian/app/divination-almanac.html
-- 📚 知识库: https://sgmt-taojing.github.io/mingli-baojian/app/divination-knowledge.html
-- 🛍️ 商城: https://sgmt-taojing.github.io/mingli-baojian/app/divination-shop.html
-- 👑 会员: https://sgmt-taojing.github.io/mingli-baojian/app/divination-membership.html
-- 📱 移动端: https://sgmt-taojing.github.io/mingli-baojian/app/wechat-hub.html
-- 🎯 舒晗知识库: https://sgmt-taojing.github.io/mingli-baojian/app/shuhan-knowledge.html
-- 🪷 倪师知识库: https://sgmt-taojing.github.io/mingli-baojian/app/nihaisha-knowledge.html
-- 🔬 倪师工具: https://sgmt-taojing.github.io/mingli-baojian/app/nihaisha-tool.html
-- 📚 倪师学习: https://sgmt-taojing.github.io/mingli-baojian/app/nihaisha-learning.html
-- 🎬 倪师视频: https://sgmt-taojing.github.io/mingli-baojian/app/nihaisha-video.html
-- ☰ 易经占卜: https://sgmt-taojing.github.io/mingli-baojian/app/yijing-oracle.html
-- ☰ 奇门遁甲: https://sgmt-taojing.github.io/mingli-baojian/app/yijing-qimen.html
-- 🏔️ 风水: https://sgmt-taojing.github.io/mingli-baojian/app/fengshui.html
-- 📊 架构审计: https://sgmt-taojing.github.io/mingli-baojian/docs/system-audit-and-architecture.html
-- 📋 部署指南: https://sgmt-taojing.github.io/mingli-baojian/docs/DEPLOY.md
-- 📦 交付报告V3: https://sgmt-taojing.github.io/mingli-baojian/docs/DELIVERY_REPORT_20260719_V3.md
+- 🏠 首页: <https://sgmt-taojing.github.io/mingli-baojian/>
+- 🔮 命理排盘: <https://sgmt-taojing.github.io/mingli-baojian/app/divination-hub.html>
+- 🔐 登录: <https://sgmt-taojing.github.io/mingli-baojian/app/login.html>
+- 🏥 中医诊疗: <https://sgmt-taojing.github.io/mingli-baojian/app/tcm-clinic.html>
+- 🧬 体质调理: <https://sgmt-taojing.github.io/mingli-baojian/app/divination-integrated.html>
+- 📅 黄历: <https://sgmt-taojing.github.io/mingli-baojian/app/divination-almanac.html>
+- 📚 知识库: <https://sgmt-taojing.github.io/mingli-baojian/app/divination-knowledge.html>
+- 🛍️ 商城: <https://sgmt-taojing.github.io/mingli-baojian/app/divination-shop.html>
+- 👑 会员: <https://sgmt-taojing.github.io/mingli-baojian/app/divination-membership.html>
+- 📱 移动端: <https://sgmt-taojing.github.io/mingli-baojian/app/wechat-hub.html>
+- 🎯 舒晗知识库: <https://sgmt-taojing.github.io/mingli-baojian/app/shuhan-knowledge.html>
+- 🪷 倪师知识库: <https://sgmt-taojing.github.io/mingli-baojian/app/nihaisha-knowledge.html>
+- 🔬 倪师工具: <https://sgmt-taojing.github.io/mingli-baojian/app/nihaisha-tool.html>
+- 📚 倪师学习: <https://sgmt-taojing.github.io/mingli-baojian/app/nihaisha-learning.html>
+- 🎬 倪师视频: <https://sgmt-taojing.github.io/mingli-baojian/app/nihaisha-video.html>
+- ☰ 易经占卜: <https://sgmt-taojing.github.io/mingli-baojian/app/yijing-oracle.html>
+- ☰ 奇门遁甲: <https://sgmt-taojing.github.io/mingli-baojian/app/yijing-qimen.html>
+- 🏔️ 风水: <https://sgmt-taojing.github.io/mingli-baojian/app/fengshui.html>
+- 📊 架构审计: <https://sgmt-taojing.github.io/mingli-baojian/docs/system-audit-and-architecture.html>
+- 📋 部署指南: <https://sgmt-taojing.github.io/mingli-baojian/docs/DEPLOY.md>
+- 📦 交付报告V3: <https://sgmt-taojing.github.io/mingli-baojian/docs/DELIVERY_REPORT_20260719_V3.md>
 
-### 本地
-- 🏠 首页: http://127.0.0.1:8930/app/index.html
-- 🔮 命理排盘: http://127.0.0.1:8930/app/divination-hub.html
-- 🔐 登录: http://127.0.0.1:8930/app/login.html
-- 🏥 中医诊疗: http://127.0.0.1:8930/app/tcm-clinic.html
-- 📋 部署指南: http://127.0.0.1:8930/docs/DEPLOY.md
-
-> ⚠️ **修正说明（2026-07-21）**：本地端口原误写为 8900（实际为环保平台），
-> 正确端口为 8930（命理宝鉴静态服务）。GitHub Pages 地址此前已正确，无需修改。
+### 本地（命理宝鉴 8930 端口）
+- 🏠 首页: <http://127.0.0.1:8930/>
+- 🔮 命理排盘: <http://127.0.0.1:8930/app/divination-hub.html>
+- 🔐 登录: <http://127.0.0.1:8930/app/login.html>
+- 🏥 中医诊疗: <http://127.0.0.1:8930/app/tcm-clinic.html>
+- 📋 部署指南: <http://127.0.0.1:8930/docs/DEPLOY.md>
 
 ---
 

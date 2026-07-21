@@ -1,5 +1,9 @@
 # 交付报告 2026-07-19 12:30
 
+## 📌 修正说明（2026-07-21）
+
+> 本文档原始记录写于 7 月初，当时仓库名为 `epb-assistant`、静态服务端口为 `8900`。2026-07-13 已完成仓库重命名（`epb-assistant` → `mingli-baojian`）和端口迁移（`8900` → `8930`，因 8900 已被环保智慧执法平台长期占用）。下方地址段已按当前正确值修正；Git 历史保留原记录可供追溯。
+
 ## 本轮交付总结
 
 ### Git提交链
@@ -81,27 +85,27 @@ main + gh-pages 同步至 `f2d977e`
 - div平衡: 全部 ✅
 - HTTP测试: 7/7 → 200 ✅
 
-### 访问地址
-**GitHub Pages:**
-- 首页: https://sgmt-taojing.github.io/mingli-baojian/app/index.html
-- 登录页: https://sgmt-taojing.github.io/mingli-baojian/app/login.html
-- 中医诊疗: https://sgmt-taojing.github.io/mingli-baojian/app/tcm-clinic.html
-- 审计报告: https://sgmt-taojing.github.io/mingli-baojian/docs/system-audit-and-architecture.html
+### ✅ 当前正确访问地址
 
-**本地:**
-- 首页: http://127.0.0.1:8930/app/index.html
-- 登录页: http://127.0.0.1:8930/app/login.html
-- 中医诊疗: http://127.0.0.1:8930/app/tcm-clinic.html
-- 主功能: http://127.0.0.1:8930/app/divination-hub.html
-- 审计报告: http://127.0.0.1:8930/docs/system-audit-and-architecture.html
-- 安全存储: http://127.0.0.1:8930/app/js/secure-storage.js
-- RBAC客户端: http://127.0.0.1:8930/app/js/rbac-client.js
-- 后端API: http://127.0.0.1:8920/api/admin/stats
+**GitHub Pages：**
+- 首页: <https://sgmt-taojing.github.io/mingli-baojian/>
+- 登录页: <https://sgmt-taojing.github.io/mingli-baojian/app/login.html>
+- 中医诊疗: <https://sgmt-taojing.github.io/mingli-baojian/app/tcm-clinic.html>
+- 审计报告: <https://sgmt-taojing.github.io/mingli-baojian/docs/system-audit-and-architecture.html>
+
+**本地（命理宝鉴 8930 端口）：**
+- 首页: <http://127.0.0.1:8930/>
+- 登录页: <http://127.0.0.1:8930/app/login.html>
+- 中医诊疗: <http://127.0.0.1:8930/app/tcm-clinic.html>
+- 主功能: <http://127.0.0.1:8930/app/divination-hub.html>
+- 审计报告: <http://127.0.0.1:8930/docs/system-audit-and-architecture.html>
+- 安全存储: <http://127.0.0.1:8930/app/js/secure-storage.js>
+- RBAC客户端: <http://127.0.0.1:8930/app/js/rbac-client.js>
+- 后端API: <http://127.0.0.1:8920/api/admin/stats>
 
 ### 本地服务状态
-- 8930 (命理宝鉴Web): 运行中 ✅
+- **8930 (命理宝鉴Web)**: 运行中 ✅（旧记录 8900 已迁移）
+- 3004 (数智工坊 / 独立项目): 运行中 ✅
 - 8911 (排盘API): 未启动
-- 8920 (后端API): 需要配置.env后启动
-
-> ⚠️ **修正说明（2026-07-21）**：原文将 GitHub Pages 地址误写为 `epb-assistant`（环保智慧执法平台），
-> 本地端口误写为 8900（实际 8900 = 环保平台，8930 = 命理宝鉴）。已全部修正。
+- 8912 (TTS): 未启动
+- 8920 (后端API): 需要配置 .env 后启动
