@@ -380,9 +380,46 @@ function _analyzeMobile(mobile) {
   return r;
 }
 
+// === 异步排盘：将前端问卷原始数据 → 排盘API → 结构化命盘 ===
+async function _autoPaipanFromSurvey(baziData) {
+  if (!baziData) return null;
+  // 如果已经有完整排盘结果（pillars/day_master）直接返回
+  if (baziData.pillars && baziData.day_master) return baziData;
+  // 否则认为是问卷原始数据：{s1,s2,s3,s4,s5,...}
+  const s = baziData.s1 || baziData.birth_date || '';
+  const m = (s.match(/(\d{4})-(\d{1,2})-(\d{1,2})/) || []);
+  if (m.length < 4) return baziData; // 没有日期就别排
+  const year = +m[1], month = +m[2], day = +m[3];
+  // 时间：s5 可能是 HH:MM 或字段 time/hour
+  let hour = 12, minute = 0;
+  const tStr = baziData.s5 || baziData.birth_time || '';
+  const tm = tStr.match(/(\d{1,2}):?(\d{0,2})/);
+  if (tm) { hour = +tm[1]; minute = +(tm[2] || 0); }
+  // 性别
+  const sexRaw = baziData.s3 || baziData.sex || 'male';
+  const gender = /女|female/i.test(sexRaw) ? 'female' : 'male';
+  // 经度（s2 是城市名，简化为东经 120）
+  const lng = 120;
+  try {
+    const r = await fetch('http://127.0.0.1:8911/paipan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ year, month, day, hour, minute, gender, lng, tz: 8 })
+    });
+    if (!r.ok) return baziData;
+    const paipan = await r.json();
+    return Object.assign({}, baziData, paipan); // 合并：原问卷 + 排盘结果
+  } catch (e) {
+    console.warn('[auto-paipan]', e.message);
+    return baziData;
+  }
+}
+
 // === AI本地降级响应（关键词匹配+排盘数据）===
-function _aiLocalResponse(userText, baziData) {
+async function _aiLocalResponse(userText, baziData) {
   if (!userText) return '您好，我是易道智鉴AI助手。请告诉我您的出生年月日时，我可以为您排盘分析。';
+  // 异步排盘（如需）
+  baziData = await _autoPaipanFromSurvey(baziData);
   const text = userText.toLowerCase();
   
   // 手机号识别+分析（优先级最高）
@@ -497,7 +534,7 @@ app.post('/api/ai/public-chat', async (req, res) => {
   
   if (!AI_API_KEY) {
     const lastMsg = messages.filter(m => m.role === 'user').pop();
-    return res.json({ choices: [{ message: { content: _aiLocalResponse(lastMsg ? lastMsg.content : '', baziData) } }], _local: true });
+    return res.json({ choices: [{ message: { content: await _aiLocalResponse(lastMsg ? lastMsg.content : '', baziData) } }], _local: true });
   }
   
   const ip = req.ip || req.connection.remoteAddress;
@@ -517,13 +554,13 @@ app.post('/api/ai/public-chat', async (req, res) => {
     const data = await response.json();
     if (data.error) {
       const lastMsg = messages.filter(m => m.role === 'user').pop();
-      return res.json({ choices: [{ message: { content: _aiLocalResponse(lastMsg ? lastMsg.content : '', baziData) } }], _local: true });
+      return res.json({ choices: [{ message: { content: await _aiLocalResponse(lastMsg ? lastMsg.content : '', baziData) } }], _local: true });
     }
     res.json(data);
   } catch (e) {
     console.error('AI API错误:', e.message);
     const lastMsg = messages.filter(m => m.role === 'user').pop();
-    res.json({ choices: [{ message: { content: _aiLocalResponse(lastMsg ? lastMsg.content : '', baziData) } }], _local: true });
+    res.json({ choices: [{ message: { content: await _aiLocalResponse(lastMsg ? lastMsg.content : '', baziData) } }], _local: true });
   }
 });
 
