@@ -1,0 +1,216 @@
+/* ===== PRO-FIELDS PANEL ===== */
+.pro-expand-toggle{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 14px;
+  border:1px dashed rgba(201,168,76,.45);
+  border-radius:20px;
+  font-size:12px;
+  color:var(--paper2);
+  cursor:pointer;
+  user-select:none;
+  transition:all .2s;
+  background:rgba(201,168,76,.04);
+}
+.pro-expand-toggle:hover{
+  background:rgba(201,168,76,.12);
+  border-color:var(--gold);
+  color:var(--gold2);
+}
+.pro-expand-toggle.open{
+  background:rgba(201,168,76,.15);
+  border-style:solid;
+  border-color:var(--gold);
+  color:var(--gold);
+}
+.pro-expand-toggle .toggle-icon{
+  font-size:10px;
+  transition:transform .25s;
+}
+.pro-expand-toggle.open .toggle-icon{transform:rotate(180deg);}
+.pro-expand-toggle .pro-progress-text{
+  font-size:10px;
+  color:var(--gold);
+  font-weight:600;
+  background:rgba(201,168,76,.12);
+  padding:1px 7px;
+  border-radius:8px;
+}
+
+.pro-panel{
+  max-height:0;
+  overflow:hidden;
+  transition:max-height .35s ease,opacity .25s;
+  opacity:0;
+  margin-top:0;
+}
+.pro-panel.show{
+  max-height:2400px;
+  opacity:1;
+  margin-top:12px;
+}
+
+.pro-progress{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:8px 12px;
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  margin-bottom:14px;
+}
+.pro-progress-bar{
+  flex:1;
+  height:8px;
+  background:var(--ink2);
+  border-radius:4px;
+  overflow:hidden;
+}
+.pro-progress-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--gold3),var(--gold),var(--gold2));
+  transition:width .35s;
+}
+.pro-progress-text{
+  font-size:11px;
+  color:var(--gold);
+  font-weight:600;
+  min-width:32px;
+  text-align:right;
+}
+
+.pro-section-title{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:13px;
+  color:var(--gold);
+  font-weight:600;
+  margin:14px 0 8px;
+  padding-bottom:4px;
+  border-bottom:1px dashed rgba(201,168,76,.3);
+}
+.pro-section-title .sec-icon{
+  font-size:14px;
+}
+
+.pro-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:8px;
+  margin-bottom:6px;
+}
+.pro-field{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+}
+.pro-field label{
+  font-size:10px;
+  color:var(--paper3);
+  font-weight:500;
+}
+.pf-input{
+  width:100%;
+  padding:6px 8px;
+  font-size:12px;
+  background:var(--ink2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  color:var(--paper);
+  font-family:inherit;
+  outline:none;
+  transition:border-color .15s;
+}
+.pf-input:focus{
+  border-color:var(--gold);
+  background:var(--ink3);
+}
+
+.pro-concerns{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-bottom:6px;
+}
+.pro-concern{
+  padding:4px 12px;
+  font-size:11px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  color:var(--paper2);
+  cursor:pointer;
+  user-select:none;
+  transition:all .15s;
+  background:transparent;
+}
+.pro-concern:hover{border-color:var(--gold);}
+.pro-concern.active{
+  background:var(--gold);
+  color:var(--ink);
+  border-color:var(--gold);
+  font-weight:600;
+}
+.pro-hint{
+  font-size:10px;
+  color:var(--paper3);
+  margin:2px 0 8px;
+  line-height:1.5;
+}
+
+.pro-btns{
+  display:flex;
+  gap:8px;
+  margin-top:14px;
+  padding-top:12px;
+  border-top:1px dashed rgba(201,168,76,.2);
+  flex-wrap:wrap;
+}
+.pro-btn{
+  flex:1;
+  min-width:120px;
+  padding:8px 12px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  font-size:12px;
+  font-family:inherit;
+  cursor:pointer;
+  transition:all .15s;
+}
+.pro-btn-primary{
+  background:var(--gold);
+  color:var(--ink);
+  border-color:var(--gold);
+  font-weight:600;
+}
+.pro-btn-primary:hover{
+  background:var(--gold2);
+  border-color:var(--gold2);
+}
+.pro-btn-secondary{
+  background:var(--card2);
+  color:var(--paper2);
+}
+.pro-btn-secondary:hover{
+  background:var(--ink3);
+  border-color:var(--gold);
+  color:var(--gold);
+}
+
+.pro-saved-tip{
+  text-align:center;
+  font-size:12px;
+  color:var(--jade);
+  margin-top:8px;
+  padding:4px 0;
+  opacity:0;
+  transition:opacity .2s;
+}
+.pro-saved-tip.show{opacity:1;}
+
+@media(max-width:768px){
+  .pro-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));}
+  .pro-expand-toggle{font-size:11px;padding:5px 10px;}
+}

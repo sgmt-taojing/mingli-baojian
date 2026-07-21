@@ -15,6 +15,7 @@
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='36' fill='%23080808'/><text x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-size='100' font-family='serif'>☰</text></svg>">
 <title>易道智鉴 · 先进AI推演</title>
 <link rel="stylesheet" href="css/divination-hub.css?t=1783071892">
+<link rel="stylesheet" href="css/pro-panel.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
@@ -122,7 +123,44 @@ select.input-field option{background:var(--ink2)}
 .input-hint{text-align:center;font-size:11px;opacity:.3;letter-spacing:2px;margin-top:12px;font-weight:300}
 .compute-btn{padding:12px 40px;background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:'Noto Serif SC',serif;font-size:14px;letter-spacing:5px;cursor:pointer;transition:all .35s;display:block;margin:16px auto 0;border-radius:6px;position:relative;overflow:hidden}
 .compute-btn:hover:not(:disabled){background:var(--gold);color:var(--ink);box-shadow:0 0 30px rgba(201,168,76,.25)}
-.compute-btn:disabled{opacity:.35;cursor:not-allowed}
+.compute-btn:disabled{opacity:.35;cursor:not-all}
+
+/* === PRO-FIELDS EXPAND PANEL === */
+.pro-expand-toggle{display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:var(--gold);font-size:12px;padding:6px 12px;border:1px dashed rgba(201,168,76,.25);border-radius:20px;margin:8px auto;transition:all .3s;user-select:none}
+.pro-expand-toggle:hover{border-color:var(--gold);background:rgba(201,168,76,.06)}
+.pro-expand-toggle .toggle-icon{transition:transform .3s;font-size:10px}
+.pro-expand-toggle.open .toggle-icon{transform:rotate(180deg)}
+.pro-panel{display:none;max-width:720px;margin:0 auto 16px;padding:16px 18px;background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.1);border-radius:10px}
+.pro-panel.show{display:block;animation:fadeIn .25s}
+.pro-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-bottom:12px}
+.pro-grid.wide{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+.pro-field{display:flex;flex-direction:column;gap:3px}
+.pro-field label{font-size:10px;color:var(--paper3);letter-spacing:1px;opacity:.7;text-transform:uppercase}
+.pro-field .pf-input{background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.1);color:var(--paper);font-size:12px;padding:7px 10px;border-radius:6px;outline:none;width:100%}
+.pro-field .pf-input:focus{border-color:var(--gold)}
+.pro-field .pf-input::placeholder{opacity:.2}
+.pro-section-title{font-family:'Ma Shan Zheng',serif;font-size:13px;color:var(--gold);letter-spacing:3px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid rgba(201,168,76,.1)}
+.pro-section-title .sec-icon{margin-right:4px}
+.pro-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:4px}
+.pro-row .pf-input{flex:1;min-width:120px}
+.pro-concerns{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.pro-concern{font-size:10px;padding:3px 8px;border:1px solid rgba(201,168,76,.2);border-radius:10px;color:var(--paper3);cursor:pointer;transition:all .2s;user-select:none}
+.pro-concern.active{background:rgba(201,168,76,.15);border-color:var(--gold);color:var(--gold)}
+.pro-concern:hover{border-color:var(--gold)}
+.pro-hint{font-size:10px;color:var(--paper3);opacity:.4;margin-top:4px;line-height:1.5}
+.pro-btns{display:flex;gap:8px;justify-content:center;margin-top:12px}
+.pro-btn{padding:6px 16px;font-size:11px;border-radius:6px;cursor:pointer;border:1px solid;letter-spacing:1px}
+.pro-btn-primary{background:var(--gold);color:var(--ink);border-color:var(--gold)}
+.pro-btn-secondary{background:transparent;color:var(--paper3);border-color:rgba(201,168,76,.2)}
+.pro-btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
+.pro-saved-tip{font-size:10px;color:var(--jade);text-align:center;margin-top:6px;opacity:0;transition:opacity .3s}
+.pro-saved-tip.show{opacity:1}
+.pro-progress{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.pro-progress-bar{flex:1;height:4px;background:rgba(201,168,76,.12);border-radius:2px;overflow:hidden}
+.pro-progress-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .3s}
+.pro-progress-text{font-size:10px;color:var(--paper3)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@media(max-width:480px){.pro-grid{grid-template-columns:1fr}.pro-grid.wide{grid-template-columns:1fr}}
 .back-top{position:fixed;bottom:80px;right:16px;width:40px;height:40px;border-radius:50%;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);color:var(--gold);font-size:18px;display:none;align-items:center;justify-content:center;cursor:pointer;z-index:999;transition:all .3s;backdrop-filter:blur(4px)}
 .back-top:hover{background:rgba(201,168,76,.3);transform:translateY(-2px)}
 .back-top.show{display:flex}
@@ -3858,7 +3896,24 @@ window.addEventListener('load',function(){
   let bar=document.getElementById('load-bar');
   if(bar) bar.style.width='100%';
   setTimeout(removeLoadingOverlay,300);
+  // 同步缘主档案状态到入口卡片
+  setTimeout(_syncProfileEntry, 200);
 });
+
+function _syncProfileEntry(){
+  if(!window.MLBJ_USER) return;
+  const s = window.MLBJ_USER.getSummary();
+  const c = window.MLBJ_USER.getCompleteness();
+  const hint = document.getElementById('profileEntryHint');
+  const badge = document.getElementById('profileEntryBadge');
+  if(badge){
+    if(c >= 70){ badge.textContent = c+'% 完整'; badge.style.background = 'rgba(39,174,96,0.2)'; badge.style.color = '#2ecc71'; }
+    else if(c >= 30){ badge.textContent = c+'% 完整'; badge.style.background = 'rgba(201,168,76,0.18)'; badge.style.color = 'var(--gold)'; }
+    else if(c > 0){ badge.textContent = c+'%'; badge.style.background = 'rgba(201,168,76,0.18)'; badge.style.color = 'var(--gold)'; }
+    else { badge.textContent = '未填写'; badge.style.background = 'rgba(192,57,43,0.18)'; badge.style.color = '#e74c3c'; }
+  }
+  if(hint && s.name){ hint.textContent = `${s.name} · ${s.gender||'-'} · ${c}% 完整 · 点此补充档案`; }
+}
 // 超时保底：5秒后强制移除遮罩层，防止外部JS加载失败阻塞所有点击
 setTimeout(removeLoadingOverlay,5000);
 
@@ -3880,6 +3935,7 @@ setTimeout(removeLoadingOverlay,5000);
     <script src="../knowledge/knowledge-supplement.js" defer></script>
     <script src="../knowledge/koujue-database-full.js" defer></script>
 <script src="js/secure-storage.js"></script>
+<script src="js/user-profile.js"></script>
 </head>
 <body>
 <div>
@@ -3999,6 +4055,17 @@ setTimeout(removeLoadingOverlay,5000);
       <div id="daily-knowledge-summary" style="font-size:13px;color:var(--paper2);line-height:1.7;opacity:0.75"></div>
       <div id="daily-knowledge-detail" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid rgba(201,168,76,0.1);font-size:13px;color:var(--paper);line-height:1.9;white-space:pre-line"></div>
       <div style="font-size:11px;color:var(--gold);opacity:0.4;margin-top:8px;text-align:right">点击展开详情 ↓</div>
+    </div>
+
+    <!-- 📋 缘主专业档案 · 一次填写全局复用 -->
+    <div id="profileEntry" onclick="window.MLBJ_USER&&window.MLBJ_USER.openProfileWizard()" style="max-width:680px;margin:0 auto 24px;padding:16px 20px;background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.02));border:1px solid rgba(201,168,76,0.25);border-radius:12px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:all .3s ease">
+      <span style="font-size:28px;line-height:1">📋</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-family:'Ma Shan Zheng',serif;font-size:16px;color:var(--gold);letter-spacing:3px;margin-bottom:4px">缘主专业档案</div>
+        <div style="font-size:12px;color:var(--paper3);line-height:1.5" id="profileEntryHint">点击填写完整档案 一次性输入 八字/六壬/紫微全局复用 专业全覆盖</div>
+      </div>
+      <span class="rich-badge" id="profileEntryBadge" style="background:rgba(201,168,76,0.18);color:var(--gold);font-size:11px;padding:3px 10px;flex-shrink:0">未填写</span>
+      <span style="color:var(--gold);font-size:18px;flex-shrink:0">→</span>
     </div>
 
     <!-- 分组标题：排盘预测 -->
@@ -4554,6 +4621,117 @@ setTimeout(removeLoadingOverlay,5000);
       <input type="text" class="input-field" id="baziBirthplace" placeholder="出生地(可选,如北京)" maxlength="20" style="width:160px">
       <input type="text" class="input-field" id="baziResidence" placeholder="居住地(可选,如上海)" maxlength="20" style="width:160px">
     </div>
+
+    <!-- 📋 专业全量信息折叠面板 (统一档案 · 跨模块共用) -->
+    <div style="text-align:center;margin-top:6px">
+      <span class="pro-expand-toggle" id="proExpandToggle" onclick="toggleProPanel()">
+        <span class="rich-icon" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--gold)"></span>
+        📋 专业全量信息（22 模块共用）
+        <span id="proProgressInline" class="pro-progress-text">0%</span>
+        <span class="toggle-icon">▼</span>
+      </span>
+    </div>
+    <div class="pro-panel" id="proPanel">
+      <div class="pro-progress">
+        <div class="pro-progress-bar"><div class="pro-progress-fill" id="proProgressFill" style="width:0"></div></div>
+        <span class="pro-progress-text" id="proProgressText">0%</span>
+      </div>
+
+      <div class="pro-section-title"><span class="sec-icon">⌚</span> 时辰精确化</div>
+      <div class="pro-grid">
+        <div class="pro-field"><label>是否时辰不详</label><select class="pf-input" id="pf_timeUnknown"><option value="0">否</option><option value="1">是（按中天 12:00）</option></select></div>
+        <div class="pro-field"><label>出生分钟（精确起运）</label><input class="pf-input" id="pf_minute" type="number" placeholder="如 28" min="0" max="59"></div>
+        <div class="pro-field"><label>地方时（24h）</label><input class="pf-input" id="pf_realTime" placeholder="自动算出"></div>
+      </div>
+
+      <div class="pro-section-title"><span class="sec-icon">📍</span> 出生地理</div>
+      <div class="pro-grid">
+        <div class="pro-field"><label>出生地（完整行政区）</label><input class="pf-input" id="pf_bpFull" placeholder="如：北京市朝阳区国贸"></div>
+        <div class="pro-field"><label>出生省份</label><input class="pf-input" id="pf_bpProvince" placeholder="如：北京"></div>
+        <div class="pro-field"><label>出生城市</label><input class="pf-input" id="pf_bpCity" placeholder="如：朝阳"></div>
+        <div class="pro-field"><label>经度（真太阳时）</label><input class="pf-input" id="pf_bpLng" type="number" step="0.01" placeholder="如 116.46"></div>
+        <div class="pro-field"><label>纬度（五行方位）</label><input class="pf-input" id="pf_bpLat" type="number" step="0.01" placeholder="如 39.92"></div>
+        <div class="pro-field"><label>海拔（胎息体质）</label><input class="pf-input" id="pf_bpAlt" type="number" placeholder="米"></div>
+      </div>
+
+      <div class="pro-section-title"><span class="sec-icon">🏠</span> 现居地（流年方位）</div>
+      <div class="pro-grid">
+        <div class="pro-field"><label>现居完整地址</label><input class="pf-input" id="pf_rsFull" placeholder="如：上海市浦东新区世纪大道"></div>
+        <div class="pro-field"><label>现居省份/直辖市</label><input class="pf-input" id="pf_rsProvince" placeholder="如：上海"></div>
+        <div class="pro-field"><label>迁居年份</label><input class="pf-input" id="pf_rsMovedAt" type="number" placeholder="如 2024"></div>
+      </div>
+
+      <div class="pro-section-title"><span class="sec-icon">👨‍👩‍👧</span> 家庭（合盘/家庭排盘）</div>
+      <div class="pro-grid">
+        <div class="pro-field"><label>父亲姓名</label><input class="pf-input" id="pf_faName" placeholder="姓氏"></div>
+        <div class="pro-field"><label>父亲生日（合盘）</label><input class="pf-input" id="pf_faDate" type="date"></div>
+        <div class="pro-field"><label>母亲姓名</label><input class="pf-input" id="pf_moName" placeholder="姓氏"></div>
+        <div class="pro-field"><label>母亲生日（合盘）</label><input class="pf-input" id="pf_moDate" type="date"></div>
+        <div class="pro-field"><label>配偶姓名</label><input class="pf-input" id="pf_spName" placeholder="姓氏"></div>
+        <div class="pro-field"><label>配偶生日（合盘）</label><input class="pf-input" id="pf_spDate" type="date"></div>
+      </div>
+
+      <div class="pro-section-title"><span class="sec-icon">💼</span> 职业（企业视角）</div>
+      <div class="pro-grid">
+        <div class="pro-field"><label>所属行业</label>
+          <select class="pf-input" id="pf_industry">
+            <option value="">-- 请选择 --</option>
+            <option value="互联网/IT">互联网/IT</option>
+            <option value="金融">金融</option>
+            <option value="制造">制造</option>
+            <option value="教育">教育</option>
+            <option value="医疗">医疗</option>
+            <option value="法律">法律</option>
+            <option value="传媒">传媒</option>
+            <option value="服务">服务</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+        <div class="pro-field"><label>岗位</label><input class="pf-input" id="pf_position" placeholder="如：产品经理"></div>
+        <div class="pro-field"><label>是否创业者</label><select class="pf-input" id="pf_isEntrepreneur"><option value="0">否</option><option value="1">是</option></select></div>
+      </div>
+
+      <div class="pro-section-title"><span class="sec-icon">🌿</span> 健康（中医/体质）</div>
+      <div class="pro-grid">
+        <div class="pro-field"><label>中医体质</label>
+          <select class="pf-input" id="pf_tizhi">
+            <option value="">-- 未测过 --</option>
+            <option value="平和">平和质</option>
+            <option value="气虚">气虚质</option>
+            <option value="阳虚">阳虚质</option>
+            <option value="阴虚">阴虚质</option>
+            <option value="痰湿">痰湿质</option>
+            <option value="湿热">湿热质</option>
+            <option value="血瘀">血瘀质</option>
+            <option value="气郁">气郁质</option>
+            <option value="特禀">特禀质</option>
+          </select>
+        </div>
+        <div class="pro-field"><label>身高（cm）</label><input class="pf-input" id="pf_height" type="number" placeholder="175"></div>
+        <div class="pro-field"><label>体重（kg）</label><input class="pf-input" id="pf_weight" type="number" placeholder="68"></div>
+        <div class="pro-field" style="grid-column:1/-1"><label>慢性病/过敏（逗号分隔）</label><input class="pf-input" id="pf_chronic" placeholder="如：高血压,青霉素过敏"></div>
+      </div>
+
+      <div class="pro-section-title"><span class="sec-icon">✍️</span> 起名（姓名学）</div>
+      <div class="pro-grid">
+        <div class="pro-field"><label>姓氏（用于起名）</label><input class="pf-input" id="pf_surname" placeholder="如：李"></div>
+        <div class="pro-field"><label>辈分字</label><input class="pf-input" id="pf_genChar" placeholder="如：弘"></div>
+        <div class="pro-field"><label>是否复姓</label><select class="pf-input" id="pf_isCompound"><option value="0">否</option><option value="1">是（如欧阳）</option></select></div>
+        <div class="pro-field"><label>避讳字</label><input class="pf-input" id="pf_avoidChars" placeholder="如：梓,梓"></div>
+      </div>
+
+      <div class="pro-section-title"><span class="sec-icon">🎯</span> 关心维度（多选）</div>
+      <div class="pro-concerns" id="pf_concerns"></div>
+      <p class="pro-hint">选中的关心维度会同步调整各模块的报告重点（如健康、运业、婚姻）。</p>
+
+      <div class="pro-btns">
+        <button class="pro-btn pro-btn-secondary" onclick="loadProFields()">↻ 从档案载入</button>
+        <button class="pro-btn pro-btn-primary" onclick="saveProFields()">💾 保存全量信息</button>
+        <button class="pro-btn pro-btn-secondary" onclick="applyPro2Bazi()">↪ 录入八字段</button>
+      </div>
+      <div class="pro-saved-tip" id="proSavedTip">✅ 已保存到本地档案</div>
+    </div>
+
     <p class="input-hint">出生日期为公历。时辰不填则按中午12:00计算。经度用于真太阳时校正。</p>
     <button class="compute-btn" onclick="playSound('success');computeBazi()" id="baziBtn">排 盘 演 命</button>
     <div style="display:flex;gap:10px;justify-content:center;margin-top:8px;flex-wrap:wrap">
@@ -22271,6 +22449,134 @@ function onLiCalModeChange() {
   }
 }
 
+/* === PRO-FIELDS PANEL LOGIC === */
+function _pfGet(id){const el=document.getElementById(id);return el?el.value.trim():'';}
+function _pfSet(id,v){const el=document.getElementById(id);if(el)el.value=v||'';}
+
+function toggleProPanel(){
+  const p=document.getElementById('proPanel');
+  const t=document.getElementById('proExpandToggle');
+  if(!p||!t)return;
+  if(p.classList.contains('show')){p.classList.remove('show');t.classList.remove('open');}
+  else{p.classList.add('show');t.classList.add('open');renderProConcerns();updateProProgress();}
+}
+
+function renderProConcerns(){
+  const box=document.getElementById('pf_concerns');
+  if(!box)return;
+  if(box.dataset.rendered==='1')return;
+  const list=(window.MLBJ_USER&&window.MLBJ_USER.ALL_CONCERNS)||['运势','健康','婚姻','事业','财运','学业','风物'];
+  box.innerHTML=list.map(c=>`<span class="pro-concern" data-c="${c}">${c}</span>`).join('');
+  box.querySelectorAll('.pro-concern').forEach(el=>{
+    el.addEventListener('click',()=>{el.classList.toggle('active');});
+  });
+  box.dataset.rendered='1';
+}
+
+function updateProProgress(){
+  const p=window.MLBJ_USER?window.MLBJ_USER.getCompleteness():0;
+  const fill=document.getElementById('proProgressFill');
+  const text=document.getElementById('proProgressText');
+  const inline=document.getElementById('proProgressInline');
+  if(fill)fill.style.width=p+'%';
+  if(text)text.textContent=p+'%';
+  if(inline)inline.textContent=p+'%';
+}
+
+function loadProFields(){
+  if(!window.MLBJ_USER){console.warn('MLBJ_USER 未加载');return;}
+  const p=window.MLBJ_USER.load();
+  _pfSet('pf_timeUnknown',p.birth.timeUnknown?'1':'0');
+  _pfSet('pf_minute',p.birth.minute);
+  _pfSet('pf_realTime',''); /* 实时计算不在此处 */
+  _pfSet('pf_bpFull',p.birthplace.fullName);
+  _pfSet('pf_bpProvince',p.birthplace.province);
+  _pfSet('pf_bpCity',p.birthplace.city);
+  _pfSet('pf_bpLng',p.birthplace.lng);
+  _pfSet('pf_bpLat',p.birthplace.lat);
+  _pfSet('pf_bpAlt',p.birthplace.altitude);
+  _pfSet('pf_rsFull',p.residence.fullName);
+  _pfSet('pf_rsProvince',p.residence.province);
+  _pfSet('pf_rsMovedAt',p.residence.movedAt);
+  _pfSet('pf_faName',p.family.father.name);
+  _pfSet('pf_faDate',p.family.father.birth.year?`${p.family.father.birth.year}-${String(p.family.father.birth.month).padStart(2,'0')}-${String(p.family.father.birth.day).padStart(2,'0')}`:'');
+  _pfSet('pf_moName',p.family.mother.name);
+  _pfSet('pf_moDate',p.family.mother.birth.year?`${p.family.mother.birth.year}-${String(p.family.mother.birth.month).padStart(2,'0')}-${String(p.family.mother.birth.day).padStart(2,'0')}`:'');
+  _pfSet('pf_spName',p.family.spouse.name);
+  _pfSet('pf_spDate',p.family.spouse.birth.year?`${p.family.spouse.birth.year}-${String(p.family.spouse.birth.month).padStart(2,'0')}-${String(p.family.spouse.birth.day).padStart(2,'0')}`:'');
+  _pfSet('pf_industry',p.occupation.industry);
+  _pfSet('pf_position',p.occupation.position);
+  _pfSet('pf_isEntrepreneur',p.occupation.isEntrepreneur?'1':'0');
+  _pfSet('pf_tizhi',p.health.tizhi);
+  _pfSet('pf_height',p.health.height);
+  _pfSet('pf_weight',p.health.weight);
+  _pfSet('pf_chronic',(p.health.chronicDiseases||[]).join(','));
+  _pfSet('pf_surname',p.naming.surname);
+  _pfSet('pf_genChar',p.naming.generationChar);
+  _pfSet('pf_isCompound',p.naming.isCompoundSurname?'1':'0');
+  _pfSet('pf_avoidChars',p.naming.avoidChars);
+  /* 关切 */
+  renderProConcerns();
+  setTimeout(()=>{
+    const box=document.getElementById('pf_concerns');
+    if(!box)return;
+    box.querySelectorAll('.pro-concern').forEach(el=>{
+      if(p.concerns.indexOf(el.dataset.c)>=0)el.classList.add('active');
+    });
+  },50);
+  updateProProgress();
+  showProTip('已从档案载入','var(--gold)');
+}
+
+function saveProFields(){
+  if(!window.MLBJ_USER){console.warn('MLBJ_USER 未加载');return;}
+  window.MLBJ_USER.mergeBirth({timeUnknown:_pfGet('pf_timeUnknown')==='1',minute:_pfGet('pf_minute')});
+  window.MLBJ_USER.mergeBirthplace({fullName:_pfGet('pf_bpFull'),province:_pfGet('pf_bpProvince'),city:_pfGet('pf_bpCity'),lng:_pfGet('pf_bpLng'),lat:_pfGet('pf_bpLat'),altitude:_pfGet('pf_bpAlt')});
+  window.MLBJ_USER.mergeResidence({fullName:_pfGet('pf_rsFull'),province:_pfGet('pf_rsProvince'),movedAt:_pfGet('pf_rsMovedAt')});
+  const fa=_pfGet('pf_faDate').split('-');const mo=_pfGet('pf_moDate').split('-');const sp=_pfGet('pf_spDate').split('-');
+  window.MLBJ_USER.mergeFamily({father:{name:_pfGet('pf_faName'),birth:{year:fa[0]||'',month:fa[1]||'',day:fa[2]||''}},mother:{name:_pfGet('pf_moName'),birth:{year:mo[0]||'',month:mo[1]||'',day:mo[2]||''}},spouse:{name:_pfGet('pf_spName'),birth:{year:sp[0]||'',month:sp[1]||'',day:sp[2]||''}}});
+  window.MLBJ_USER.mergeOccupation({industry:_pfGet('pf_industry'),position:_pfGet('pf_position'),isEntrepreneur:_pfGet('pf_isEntrepreneur')==='1'});
+  window.MLBJ_USER.mergeHealth({tizhi:_pfGet('pf_tizhi'),height:_pfGet('pf_height'),weight:_pfGet('pf_weight'),chronicDiseases:_pfGet('pf_chronic').split(/[,,]/).map(s=>s.trim()).filter(Boolean)});
+  window.MLBJ_USER.mergeNaming({surname:_pfGet('pf_surname'),generationChar:_pfGet('pf_genChar'),isCompoundSurname:_pfGet('pf_isCompound')==='1',avoidChars:_pfGet('pf_avoidChars')});
+  const box=document.getElementById('pf_concerns');
+  const concerns=box?Array.from(box.querySelectorAll('.pro-concern.active')).map(el=>el.dataset.c):[];
+  if(concerns.length)window.MLBJ_USER.mergeConcerns(concerns);
+  updateProProgress();
+  showProTip('✅ 已保存到本地档案','var(--jade)');
+}
+
+function applyPro2Bazi(){
+  if(!window.MLBJ_USER){console.warn('MLBJ_USER 未加载');return;}
+  const p=window.MLBJ_USER.fillBaziForm('bazi');
+  if(p.birthplace.fullName||p.birthplace.city){
+    _pfSet('baziBirthplace',p.birthplace.fullName||p.birthplace.city);
+    _pfSet('baziLng',p.birthplace.lng);
+  }
+  if(p.residence.fullName||p.residence.city){
+    _pfSet('baziResidence',p.residence.fullName||p.residence.city);
+  }
+  showProTip('✅ 八字段已录入','var(--jade)');
+}
+
+let _proTipTimer=null;
+function showProTip(msg,color){
+  const t=document.getElementById('proSavedTip');
+  if(!t)return;
+  t.textContent=msg;
+  t.style.color=color||'var(--jade)';
+  t.classList.add('show');
+  clearTimeout(_proTipTimer);
+  _proTipTimer=setTimeout(()=>t.classList.remove('show'),1800);
+}
+
+/* 页面加载后默认渲染进度与面板状态 */
+window.addEventListener('DOMContentLoaded',()=>{
+  setTimeout(()=>{
+    renderProConcerns();
+    updateProProgress();
+  },200);
+});
+
 function onShichenChange() {
   const hourVal = document.getElementById('baziHour').value;
   if (!hourVal) return;
@@ -31762,6 +32068,7 @@ if (typeof window.SHOP_DATA !== 'undefined') {
 <script src="../js/cure-engine.js?v=20260714" defer></script>
 <script src="../js/annual-fortune.js?v=20260714" defer></script>
 <script src="../js/voice-interaction.js?v=20260721" defer></script>
+<script src="../js/user-profile.js?v=20260721" defer></script>
 
 
 <!-- 页脚 -->
