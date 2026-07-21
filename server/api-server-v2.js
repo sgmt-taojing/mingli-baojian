@@ -1756,6 +1756,30 @@ console.log('[v1] 公共端点别名 +10 条');
 
 console.log('[v1] 标准别名已注册（共 44 条，与 legacy 双轨运行）');
 
+/* ===== 全局错误兜底（Express error middleware） ===== */
+app.use((err, req, res, next) => {
+  const status = err.status || err.statusCode || 500;
+  const code = err.code || ('INTERNAL_' + status);
+  console.error('[unhandled]', req.method, req.path, '->', err.message);
+  if (res.headersSent) return next(err);
+  res.status(status).json({
+    ok: false,
+    error: code,
+    message: status === 500 ? '服务器内部错误' : err.message,
+    path: req.path,
+    ts: Date.now()
+  });
+});
+/* ===== 404 兜底（任何未匹配路由） ===== */
+app.use((req, res) => {
+  res.status(404).json({
+    ok: false,
+    error: 'NOT_FOUND',
+    message: req.method + ' ' + req.path,
+    ts: Date.now()
+  });
+});
+
 app.listen(PORT, () => {
   console.log('═══════════════════════════════════════');
   console.log('  命理宝鉴 API服务 v2 已启动');
