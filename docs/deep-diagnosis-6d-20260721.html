@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>6 维度全覆盖深度诊断报告 v2026.07.21 — 排盘引擎·报告引擎·AI助手引导·AI语音助手</title>
+<style>
+:root{
+  --primary:#1f3a8a;--accent:#7c3aed;--success:#16a34a;--warn:#d97706;--danger:#dc2626;
+  --bg:#f5f7fb;--card:#ffffff;--border:#e2e8f0;--text:#1e293b;--muted:#64748b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'PingFang SC',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:24px 16px}
+.wrap{max-width:1100px;margin:0 auto}
+header{background:linear-gradient(135deg,#1f3a8a,#7c3aed);color:#fff;padding:32px;border-radius:16px;margin-bottom:24px;box-shadow:0 10px 30px rgba(31,58,138,.25)}
+header h1{font-size:28px;margin-bottom:8px}
+header .meta{opacity:.85;font-size:14px}
+header .tag{display:inline-block;background:rgba(255,255,255,.18);padding:4px 12px;border-radius:20px;font-size:12px;margin-right:8px}
+
+section{background:var(--card);border-radius:14px;padding:24px;margin-bottom:18px;box-shadow:0 2px 10px rgba(15,23,42,.04)}
+h2{font-size:22px;color:var(--primary);margin-bottom:14px;border-left:4px solid var(--accent);padding-left:10px}
+h3{font-size:18px;color:var(--accent);margin:18px 0 10px}
+h4{font-size:15px;color:var(--text);margin:14px 0 8px;font-weight:600}
+
+.rich-card{border:1px solid var(--border);border-radius:10px;padding:16px;margin:12px 0;background:#fafbfd}
+.rich-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:12px 0}
+.metric{background:#fafbfd;border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center}
+.metric .v{font-size:28px;font-weight:700;color:var(--primary)}
+.metric .l{font-size:12px;color:var(--muted);margin-top:4px}
+
+.rich-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0}
+.grid-cell{border:1px solid var(--border);border-radius:8px;padding:14px;background:#fafbfd}
+.grid-cell h4{margin:0 0 6px;color:var(--accent)}
+.grid-cell .score{display:inline-block;padding:2px 8px;border-radius:10px;font-size:12px;background:#fef3c7;color:#92400e;font-weight:600}
+
+.rich-compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:14px 0}
+.compare-cell{border:1px solid var(--border);border-radius:8px;padding:14px}
+.compare-cell.bad{border-left:4px solid var(--danger);background:#fef2f2}
+.compare-cell.good{border-left:4px solid var(--success);background:#f0fdf4}
+
+.rich-timeline{position:relative;padding-left:32px;margin:14px 0}
+.rich-timeline::before{content:'';position:absolute;left:14px;top:0;bottom:0;width:2px;background:var(--border)}
+.tl-item{position:relative;margin-bottom:14px;padding:10px 14px;background:#fafbfd;border-radius:8px;border:1px solid var(--border)}
+.tl-item::before{content:'';position:absolute;left:-23px;top:14px;width:14px;height:14px;border-radius:50%;background:var(--accent);border:3px solid #fff}
+.tl-time{font-size:12px;color:var(--muted);font-weight:600}
+
+code{background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:13px;font-family:'SF Mono',Consolas,monospace}
+pre{background:#0f172a;color:#e2e8f0;padding:14px;border-radius:8px;overflow-x:auto;font-size:12px;margin:10px 0;line-height:1.5}
+
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+th,td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left}
+th{background:#f1f5f9;font-weight:600;color:var(--primary)}
+tr:hover{background:#fafbfd}
+
+.badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:12px;font-weight:600;margin-right:4px}
+.badge-red{background:#fee2e2;color:#991b1b}
+.badge-amber{background:#fef3c7;color:#92400e}
+.badge-green{background:#dcfce7;color:#166534}
+.badge-blue{background:#dbeafe;color:#1e40af}
+
+ul,ol{margin-left:24px;margin-bottom:12px}
+li{margin:6px 0}
+
+.kpi-row{display:flex;gap:14px;flex-wrap:wrap;margin:14px 0}
+.kpi{background:#fafbfd;border:1px solid var(--border);border-radius:10px;padding:14px 18px;min-width:160px;flex:1}
+
+@media (max-width:768px){
+  .rich-compare{grid-template-columns:1fr}
+  header{padding:20px}
+  section{padding:18px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>🔬 6 维度全覆盖深度诊断报告</h1>
+  <div class="meta">v2026.07.21 · 排盘引擎 · 报告引擎 · AI助手引导 · AI语音助手</div>
+  <div style="margin-top:12px">
+    <span class="tag">4 大子系统</span>
+    <span class="tag">6 维度全覆盖</span>
+    <span class="tag">三端联动</span>
+    <span class="tag">KB 兜底</span>
+  </div>
+</header>
+
+<!-- 概览 -->
+<section>
+  <h2>一、诊断总览</h2>
+  <p>本次诊断覆盖 <strong>4 大子系统</strong>，重点是 <strong>6 大维度全方位拉通</strong>：<span class="badge badge-blue">运势</span><span class="badge badge-blue">健康</span><span class="badge badge-blue">婚姻</span><span class="badge badge-blue">孩子</span><span class="badge badge-blue">同事</span><span class="badge badge-blue">父母</span></p>
+  
+  <div class="rich-metrics">
+    <div class="metric"><div class="v">4</div><div class="l">诊断子系统</div></div>
+    <div class="metric"><div class="v">22</div><div class="l">AI 助手模块</div></div>
+    <div class="metric"><div class="v">40805</div><div class="l">排盘引擎行数</div></div>
+    <div class="metric"><div class="v">6+</div><div class="l">覆盖维度</div></div>
+  </div>
+
+  <div class="rich-card">
+    <h3>核心目标</h3>
+    <ul>
+      <li>排盘结论 <strong>首段必须是运势 + 健康</strong>，突出婚姻 / 孩子 / 同事 / 父母这 4 大关系维度</li>
+      <li>AI 助手 <strong>全部 22 个模块</strong> 通过问题引导全覆盖 6 维度，断网可用</li>
+      <li>语音助手 <strong>双文件合并</strong>，单一权威路径，三端联动</li>
+      <li><strong>多端联动</strong>：Web (ai-assistant.html / divination-hub.html) + H5 + 小程序共用一份数据 schema</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 第二章：服务健康 -->
+<section>
+  <h2>二、服务健康快照</h2>
+  <div class="rich-grid">
+    <div class="grid-cell"><h4>8930 静态服务</h4><span class="score">100/100</span><p>ai-assistant 200 / divination-hub 200 / tcm-clinic 200</p></div>
+    <div class="grid-cell"><h4>8911 排盘 API</h4><span class="score">100/100</span><p>/health 200，常驻 Python 排盘后端</p></div>
+    <div class="grid-cell"><h4>8920 API 网关</h4><span class="score">70/100</span><p>工作正常，⚠️ 无 /app 静态托管</p></div>
+    <div class="grid-cell"><h4>8920 /api/yuanzhu/list</h4><span class="score">需 token</span><p>401 = 鉴权正常，非故障</p></div>
+  </div>
+</section>
+
+<!-- 第三章：排盘引擎诊断 -->
+<section>
+  <h2>三、排盘引擎诊断（divination-core.js）</h2>
+  
+  <div class="rich-metrics">
+    <div class="metric"><div class="v">40805</div><div class="l">总行数</div></div>
+    <div class="metric"><div class="v">654</div><div class="l">函数定义</div></div>
+    <div class="metric"><div class="v">✅</div><div class="l">acorn 语法</div></div>
+    <div class="metric"><div class="v">12</div><div class="l">增强函数</div></div>
+  </div>
+
+  <h3>核心函数可追溯性</h3>
+  <table>
+    <tr><th>函数</th><th>行号</th><th>签名</th><th>状态</th></tr>
+    <tr><td><code>computeBaziCore</code></td><td>L3370</td><td>(year,month,day,hour) → pillars</td><td><span class="badge badge-green">OK</span></td></tr>
+    <tr><td><code>computeDayun</code></td><td>L6861</td><td>(pillars,sex,y,m,d,h,dayStemIdx,dayMasterEle) → dayuns</td><td><span class="badge badge-green">OK</span></td></tr>
+    <tr><td><code>getLiunian</code></td><td>L6980</td><td>(birthY, birthM, birthD, span, dayStemIdx) → liunian[]</td><td><span class="badge badge-green">OK</span></td></tr>
+    <tr><td><code>_getShiShen</code></td><td>L40293</td><td>(dayGan, targetGan) → shishen</td><td><span class="badge badge-green">OK</span></td></tr>
+    <tr><td><code>_getWuXingRelation</code></td><td>L40349</td><td>(wxA, wxB) → relation</td><td><span class="badge badge-green">OK</span></td></tr>
+    <tr><td><code>_analyzeYearlyFortune</code></td><td>L40246</td><td>12 个月精解 + 流年 + 配偶星</td><td><span class="badge badge-green">OK</span></td></tr>
+    <tr><td><code>_analyzeDailyFortune</code></td><td>L40650</td><td>当日 88 分大吉推算</td><td><span class="badge badge-green">OK</span></td></tr>
+    <tr><td><code>_analyzeEnterpriseFortune</code></td><td>L40720</td><td>企业主视角行业契合</td><td><span class="badge badge-green">OK</span></td></tr>
+    <tr><td><code>computeDayunJianChu</code></td><td>L37239</td><td>(dayun,liunian,monthBranchIdx) → 交脱</td><td><span class="badge badge-green">OK</span></td></tr>
+  </table>
+
+  <h3>已增强函数（commit 220b756）</h3>
+  <div class="rich-card">
+    <p>✅ <strong>运势健康优先</strong>：12 个新函数已就位，11:20 commit 后实测通过（1990-5-12 8:00 男 2026 年度评分 70/100）</p>
+    <p>✅ <strong>月日精度</strong>：年度运势精确到 24 节气，月度细分到日</p>
+    <p>✅ <strong>企业主视角</strong>：独立企业排盘分支，行业契合度 45/100 → 🔴慎入</p>
+  </div>
+
+  <div class="rich-compare">
+    <div class="compare-cell bad">
+      <h4>⚠️ 缺陷 1：6 维度未在排盘结果中突出</h4>
+      <p>当前增强函数聚焦"运势 + 健康"，<strong>婚姻 / 孩子 / 同事 / 父母</strong> 维度<strong>未被独立评估</strong>。</p>
+      <p>用户原话："重点突出运势健康婚姻孩子同事父母"→ 需要 _analyzeYearlyFortune 扩展 6 维度，配偶宫 + 子女宫 + 父母宫 + 同事宫分别推算。</p>
+    </div>
+    <div class="compare-cell good">
+      <h4>✅ 修复方向：扩展 _analyzeYearlyFortune</h4>
+      <p>新增 <code>_analyzeLiuNianRelations</code>（流年六亲关系评分）+ <code>_analyzeFamilyDimensions</code>（6 维度全评分），运行时回写到 divination-core.js 末尾。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 第四章：报告引擎诊断 -->
+<section>
+  <h2>四、报告引擎诊断（_getUnifiedReport / _MODULE_REPORTS）</h2>
+  
+  <div class="rich-metrics">
+    <div class="metric"><div class="v">22</div><div class="l">模块入口</div></div>
+    <div class="metric"><div class="v">3</div><div class="l">KB 兜底</div></div>
+    <div class="metric"><div class="v">14</div><div class="l">_getUnifiedReport case</div></div>
+    <div class="metric"><div class="v">8</div><div class="l">章节/报告</div></div>
+  </div>
+
+  <h3>模块覆盖矩阵</h3>
+  <table>
+    <tr><th>模块</th><th>_getUnifiedReport</th><th>_MODULE_REPORTS</th><th>6 维度覆盖</th><th>状态</th></tr>
+    <tr><td>bazi</td><td>✅ 12 章节</td><td>❌ 无</td><td>5/6（缺孩子）</td><td><span class="badge badge-amber">需补孩子</span></td></tr>
+    <tr><td>ganqing</td><td>✅ 已实现</td><td>❌ 无</td><td>2/6（仅婚姻）</td><td><span class="badge badge-amber">6 维度需扩展</span></td></tr>
+    <tr><td>yunshi</td><td>✅</td><td>❌</td><td>4/6</td><td><span class="badge badge-amber">需补婚姻</span></td></tr>
+    <tr><td>caiyun / shiye</td><td>✅</td><td>❌</td><td>3/6</td><td><span class="badge badge-amber">缺婚姻/孩子</span></td></tr>
+    <tr><td>music / lifeindex / lifeplan</td><td>❌ case</td><td>✅ KB 兜底</td><td>6/6</td><td><span class="badge badge-green">OK</span></td></tr>
+    <tr><td>其他 14 模块</td><td>✅/部分</td><td>❌</td><td>2-4/6</td><td><span class="badge badge-amber">需扩展</span></td></tr>
+  </table>
+
+  <h3>真实根因（用户反馈"何时遇到正缘就断"）</h3>
+  <div class="rich-card">
+    <p>实际验证：<code>_getUnifiedReport</code> 中 <code>ganqing</code> 模块<strong>已经存在且实现完整</strong>（单身/恋爱/已婚/困惑/复合分支齐全）。</p>
+    <p>但<strong>报告第①段是桃花星分析</strong>，不是<strong>运势 + 健康</strong>，缺少婚姻深度和孩子维度。用户感受到"断"是因为：</p>
+    <ul>
+      <li>报告没有按用户期望的 6 维度顺序输出</li>
+      <li>孩子 / 同事 / 父母维度缺失</li>
+      <li>流年对孩子学业宫、同事宫、父母健康宫没有评分</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 第五章：AI助手引导全面性 -->
+<section>
+  <h2>五、AI 助手引导全面性诊断</h2>
+  
+  <h3>22 个模块引导步骤盘点</h3>
+  <table>
+    <tr><th>模块</th><th>步骤</th><th>是否覆盖 6 维度</th><th>问题引导完整性</th></tr>
+    <tr><td>bazi</td><td>5</td><td>运势✅ 健康✅ 婚姻✅ 同事✅ 父母✅ 孩子❌</td><td><span class="badge badge-green">5/6</span></td></tr>
+    <tr><td>yunshi</td><td>5</td><td>综合运势运势✅ 健康✅</td><td><span class="badge badge-amber">2/6</span></td></tr>
+    <tr><td>ganqing</td><td>4</td><td>婚姻✅</td><td><span class="badge badge-amber">1/6</span></td></tr>
+    <tr><td>zhongyi</td><td>5</td><td>健康✅</td><td><span class="badge badge-green">1/6深度</span></td></tr>
+    <tr><td>caiyun / shiye</td><td>5-6</td><td>财运✅ 事业✅</td><td><span class="badge badge-amber">2/6</span></td></tr>
+    <tr><td>fengshui</td><td>7</td><td>运势✅</td><td><span class="badge badge-amber">1/6</span></td></tr>
+    <tr><td>wuxing / music / lifeindex</td><td>2</td><td>单维度</td><td><span class="badge badge-red">需扩</span></td></tr>
+    <tr><td>qimen / ziwei / liuyao / meihua / liuren</td><td>2-5</td><td>问事类</td><td><span class="badge badge-amber">按问事项</span></td></tr>
+    <tr><td>xingming / zerì / huangli / taisui / yanzhi / lifeplan</td><td>2-4</td><td>单维度</td><td><span class="badge badge-amber">需扩展</span></td></tr>
+  </table>
+
+  <h3>断点检测</h3>
+  <div class="rich-card">
+    <p><strong>processAnswer()</strong> 处理流程：</p>
+    <pre>if(state.step &lt; mod.steps.length){
+  await typing();
+  addAI(nextStep.q);  // 推进下一步
+  return;
+}
+// 走完所有步骤 → generateReport
+state.reporting=true;
+await generateReport();</pre>
+    <p class="badge badge-green">✅ 没有 `if(!mod) return;` 静默退出问题（之前诊断误判）</p>
+    <p class="badge badge-amber">⚠️ 但用户选"何时遇到正缘"后，第 4 步是对方出生信息（可选）→ 用户没填 → 报告走 _getUnifiedReport('ganqing', data)，第①段是桃花星（不是运势健康），用户感觉不"准"</p>
+  </div>
+
+  <h3>引导完整性建议</h3>
+  <div class="rich-card">
+    <p><strong>P0 必修</strong>：ganqing 模块第②步（关心什么）选"何时遇到正缘"后，<strong>引导补全</strong>：是否单身 → 偏好画像（外貌/性格/年龄/方位）→ 个人特征 → 时机推算 → 行动建议</p>
+    <p><strong>P1 强烈推荐</strong>：所有包含"生辰"的模块，引导完后<strong>补一题</strong>「您最关心以下哪个维度？运势 / 健康 / 婚姻 / 孩子 / 同事 / 父母」→ 6 维度独立展开</p>
+  </div>
+</section>
+
+<!-- 第六章：AI 语音助手诊断 -->
+<section>
+  <h2>六、AI 语音助手诊断</h2>
+  
+  <h3>双文件风险（最高优先级）</h3>
+  <div class="rich-card" style="border-left:4px solid var(--danger);background:#fef2f2">
+    <p><strong>🔴 关键风险</strong>：发现 <code>app/voice-interaction.js</code>(旧 16033字节)与 <code>app/js/voice-interaction.js</code>(新 14054字节) <strong>MD5 不同</strong>同时存在：</p>
+    <table>
+      <tr><th>文件</th><th>大小</th><th>MD5</th><th>引用页面</th></tr>
+      <tr><td>app/voice-interaction.js</td><td>16033</td><td>a14e856d...</td><td>app/voice-interaction.js.bak.2257 残留</td></tr>
+      <tr><td>app/js/voice-interaction.js</td><td>14054</td><td>11d600c5...</td><td>ai-assistant.html (v=20260721) + divination-hub.html (v=20260718 ⚠️过期)</td></tr>
+    </table>
+    <p>⚠️ divination-hub.html 引用 <code>js/voice-interaction.js?v=20260718</code>，版本号过期可能加载旧文件</p>
+  </div>
+
+  <h3>语音能力</h3>
+  <div class="rich-grid">
+    <div class="grid-cell"><h4>🔊 TTS</h4><span class="score">通过 Python 8912 代理</span><p>需求：开/关/暂停/恢复/语速</p></div>
+    <div class="grid-cell"><h4>🎙️ STT</h4><span class="score">Web Speech API</span><p>需用户授权麦克风，兼容 Chrome/Safari</p></div>
+    <div class="grid-cell"><h4>💬 对话流</h4><span class="score">VoiceInteraction 模块</span><p>STT → LLM → TTS 闭环</p></div>
+    <div class="grid-cell"><h4>📱 移动端</h4><span class="score">需 iOS Safari 适配</span><p>iOS 拍照/录音受安全限制</p></div>
+  </div>
+</section>
+
+<!-- 第七章：6 大维度全覆盖改造方案 -->
+<section>
+  <h2>七、6 大维度全覆盖改造方案</h2>
+  
+  <div class="rich-card" style="border-left:4px solid var(--success);background:#f0fdf4">
+    <h3>🎯 用户原话："重点突出运势健康婚姻孩子同事父母"</h3>
+    <p>本次核心交付：<strong>全部排盘 / AI 模块</strong> 在生成报告时，<strong>首段必须是 6 维度评分卡</strong>，各模块再展开独特维度。</p>
+  </div>
+
+  <h3>新增统一渲染函数</h3>
+  <pre>// 在 ai-assistant.html generateReport 入口处插入
+function _renderSixDimensions(birthY, birthM, birthD, birthH, sex, currentYear){
+  var pillars = _paipan(birthY, birthM, birthD, birthH);
+  var liunian = getLiunian(birthY, birthM, birthD, 5, pillars.dayStemIdx);
+  var targetLiunian = liunian.find(l => l.stem + l.zhi === (currentYear + '').slice(-2) || true) || liunian[0];
+  
+  return {
+    yunshi:    _scoreYunshi(targetLiunian, pillars.dayEle),     // 运势
+    jiankang:  _scoreJiankang(targetLiunian, pillars.dayEle),   // 健康
+    hunyin:    _scoreHunyin(pillars, targetLiunian, sex),      // 婚姻
+    haizi:     _scoreHaizi(targetLiunian, pillars),             // 孩子
+    tongshi:   _scoreTongshi(pillars, targetLiunian),           // 同事
+    fumu:      _scoreFumu(pillars, targetLiunian)               // 父母
+  };
+}
+
+function render6DimsCard(dims){
+  return `
+    <div class="rich-metrics six-dim-card">
+      <div class="metric"><div class="v">${dims.yunshi}</div><div class="l">🌟 运势</div></div>
+      <div class="metric"><div class="v">${dims.jiankang}</div><div class="l">💊 健康</div></div>
+      <div class="metric"><div class="v">${dims.hunyin}</div><div class="l">💕 婚姻</div></div>
+      <div class="metric"><div class="v">${dims.haizi}</div><div class="l">👶 孩子</div></div>
+      <div class="metric"><div class="v">${dims.tongshi}</div><div class="l">👥 同事</div></div>
+      <div class="metric"><div class="v">${dims.fumu}</div><div class="l">👨‍👩‍👧 父母</div></div>
+    </div>
+  `;
+}</pre>
+
+  <h3>修改清单（按用户价值排序）</h3>
+  <ol>
+    <li><strong>[P0] ganqing 模块加 6D 卡片 + 7 步专属正缘推算</strong>（30min）</li>
+    <li><strong>[P0] bazi / yunshi / caiyun / shiye 模块报告首段插入 6D 卡片</strong>（1.5h）</li>
+    <li><strong>[P0] voice-interaction.js 双文件合并</strong>（20min）：删除 app/voice-interaction.js，统一 app/js/voice-interaction.js，更新 divination-hub.html 版本号 v=20260721</li>
+    <li><strong>[P1] divination-core.js 末尾新增 _analyzeSixDimensions 函数</strong>（2h）</li>
+    <li><strong>[P1] 所有 22 模块引导补"关心维度"问题</strong>（3h）</li>
+    <li><strong>[P1] 三端联动：localStorage 共享 m1bj_user_profile</strong>（1h）</li>
+    <li><strong>[P2] ai-assistant.html 添加 6D 概览顶部 Tab</strong>（1h）</li>
+  </ol>
+</section>
+
+<!-- 第八章：验收清单与时间轴 -->
+<section>
+  <h2>八、实施时间轴 & 验收清单</h2>
+  
+  <div class="rich-timeline">
+    <div class="tl-item">
+      <div class="tl-time">T0 现在 · 17min 前</div>
+      <strong>深度诊断报告</strong>：本文件已落盘 docs/deep-diagnosis-6d-20260721.html
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">T1 0-30min · ganqing 模块深度优化</div>
+      <strong>立即修复</strong>：ganqing 加 6D 卡片，扩 7 步正缘专属推算
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">T2 30min-1h · 6D 卡片植入 bazi / yunshi / caiyun / shiye</div>
+      <strong>首段统一</strong>：4 个核心模块报告首段加 6 维度评分卡
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">T3 1h-1.5h · voice-interaction.js 双文件合并</div>
+      <strong>单一权威</strong>：删除旧文件，统一引用路径 v=20260721
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">T4 1.5h-3.5h · divination-core.js 新增 _analyzeSixDimensions</div>
+      <strong>引擎扩展</strong>：6 维度评分底层函数，支持所有模块调用
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">T5 3.5h-6h · 22 模块引导补"关心维度"</div>
+      <strong>引导深度</strong>：每个模块末补一题，让用户选择 6 维度之一深挖
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">T6 6h-7h · 三端联动 localStorage</div>
+      <strong>数据互通</strong>：Web / H5 / 小程序共用 m1bj_user_profile
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">T7 7h+ · 推送 + 全量测试</div>
+      <strong>验收</strong>：commit + push + GitHub Pages + URL 通知
+    </div>
+  </div>
+
+  <h3>验收清单</h3>
+  <div class="rich-card">
+    <ul>
+      <li>☐ ganqing 模块选"何时遇到正缘" → 6D 卡片首段显示 + 7 步专属推算</li>
+      <li>☐ bazi / yunshi / caiyun / shiye 报告首段都有 6D 卡片</li>
+      <li>☐ voice-interaction.js 单一权威路径，divination-hub.html 版本号一致</li>
+      <li>☐ divination-core.js acorn 语法 OK（截止 40805 行）</li>
+      <li>☐ 22 模块引导补"关心维度"问题</li>
+      <li>☐ localStorage m1bj_user_profile 三端共享</li>
+      <li>☐ commit + push + gh-pages 同步</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 第九章：参考资料 -->
+<section>
+  <h2>九、参考资料</h2>
+  <table>
+    <tr><th>路径</th><th>说明</th></tr>
+    <tr><td><code>/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/app/ai-assistant.html</code></td><td>AI 助手主页面（含 MODULES / generateReport / _getUnifiedReport）</td></tr>
+    <tr><td><code>/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/app/js/divination-core.js</code></td><td>排盘引擎（40805 行）</td></tr>
+    <tr><td><code>/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/app/divination-hub.html</code></td><td>排盘中心（含 bazi section + 增强按钮）</td></tr>
+    <tr><td><code>/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/app/voice-interaction.js</code></td><td>旧版语音（待删除）</td></tr>
+    <tr><td><code>/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/app/js/voice-interaction.js</code></td><td>新版语音（单一权威）</td></tr>
+    <tr><td><code>/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/docs/paipan-diagnosis-20260721.html</code></td><td>本轮第一阶段排盘深度诊断</td></tr>
+    <tr><td><code>/Users/tom/.openclaw-autoclaw/workspace/memory/2026-07-21.md</code></td><td>本轮 memory flush 锚点</td></tr>
+  </table>
+</section>
+
+<footer style="text-align:center;padding:24px;color:var(--muted);font-size:13px">
+  6 维度全覆盖深度诊断报告 · v2026.07.21 · mingli-baojian
+</footer>
+
+</div>
+</body>
+</html>
