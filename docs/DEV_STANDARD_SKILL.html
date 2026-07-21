@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>命理宝鉴 · 全栈开发规范 Skill</title>
+<style>
+  :root {
+    --primary: #b8945f;
+    --primary-dark: #8c6e44;
+    --accent: #c9a961;
+    --bg: #faf7f2;
+    --bg-card: #ffffff;
+    --text: #2c2417;
+    --text-muted: #6b5e4d;
+    --border: #e5dcc8;
+    --success: #4caf7e;
+    --warning: #e09c4a;
+    --danger: #c75050;
+    --info: #5a8fb0;
+    --purple: #8b6bb5;
+    --code-bg: #2c2417;
+    --code-text: #f0e9d6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 32px 24px;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  .header {
+    text-align: center;
+    padding: 32px 0 24px;
+    border-bottom: 2px solid var(--primary);
+    margin-bottom: 32px;
+  }
+  .header h1 {
+    font-size: 30px;
+    color: var(--primary-dark);
+    margin-bottom: 8px;
+  }
+  .header .meta {
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+  .header .badge-row {
+    margin-top: 16px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .badge {
+    background: var(--primary);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .badge.p0 { background: var(--danger); }
+  .badge.p1 { background: var(--warning); }
+  .badge.p2 { background: var(--info); }
+  .badge.green { background: var(--success); }
+
+  h2 {
+    color: var(--primary-dark);
+    font-size: 22px;
+    margin: 40px 0 16px;
+    padding-left: 16px;
+    border-left: 4px solid var(--primary);
+  }
+  h3 {
+    color: var(--primary-dark);
+    font-size: 17px;
+    margin: 24px 0 12px;
+  }
+  h4 {
+    color: var(--text);
+    font-size: 15px;
+    margin: 16px 0 8px;
+    font-weight: 600;
+  }
+
+  /* tier cards */
+  .tier-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .tier-card {
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .tier-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+  }
+  .tier-card.t1::before { background: #5a8fb0; }
+  .tier-card.t2::before { background: var(--success); }
+  .tier-card.t3::before { background: var(--purple); }
+  .tier-card.t4::before { background: var(--primary); }
+  .tier-card h4 {
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .tier-card .target {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .tier-card .url {
+    font-size: 12px;
+    background: var(--bg);
+    padding: 6px 8px;
+    border-radius: 6px;
+    color: var(--primary-dark);
+    font-family: "SF Mono", Consolas, monospace;
+    margin-top: 8px;
+  }
+  .tier-tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+  }
+  .tier-tag.t1 { background: #5a8fb0; }
+  .tier-tag.t2 { background: var(--success); }
+  .tier-tag.t3 { background: var(--purple); }
+  .tier-tag.t4 { background: var(--primary); }
+
+  /* table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    background: var(--bg-card);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    font-size: 14px;
+  }
+  thead {
+    background: var(--primary);
+    color: white;
+  }
+  th, td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  th { font-weight: 600; }
+  tbody tr:hover { background: #fdfaf2; }
+  td code, .code-inline {
+    background: var(--bg);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: 13px;
+    color: var(--primary-dark);
+  }
+
+  /* spec panel */
+  .spec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .spec-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+  }
+  .spec-card.p0 { border-left: 4px solid var(--danger); }
+  .spec-card.p1 { border-left: 4px solid var(--warning); }
+  .spec-card.p2 { border-left: 4px solid var(--info); }
+  .spec-card h4 {
+    margin-top: 0;
+    color: var(--primary-dark);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .spec-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+  }
+  .spec-tag.p0 { background: var(--danger); }
+  .spec-tag.p1 { background: var(--warning); }
+  .spec-tag.p2 { background: var(--info); }
+  .spec-card ul {
+    padding-left: 18px;
+    margin: 8px 0;
+    font-size: 14px;
+  }
+  .spec-card li {
+    margin: 4px 0;
+  }
+
+  /* components demo */
+  .demo-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 16px 0;
+  }
+  .demo-section h4 {
+    margin-top: 0;
+    color: var(--primary-dark);
+  }
+
+  .rich-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin: 12px 0;
+  }
+  .rich-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .rich-card-title {
+    font-weight: 600;
+    color: var(--primary-dark);
+    margin-bottom: 6px;
+  }
+
+  .rich-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin: 12px 0;
+  }
+  .rich-metric {
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+  }
+  .rich-metric-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+  .rich-metric-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  .rich-timeline {
+    margin: 16px 0;
+  }
+  .rich-step {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-left: 2px dashed var(--border);
+    margin-left: 14px;
+    padding-left: 18px;
+    position: relative;
+  }
+  .rich-step-marker {
+    position: absolute;
+    left: -14px;
+    top: 8px;
+    width: 28px;
+    height: 28px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .rich-step-body { flex: 1; }
+  .rich-step-title {
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .rich-step-text {
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  .rich-compare {
+    margin: 12px 0;
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 12px;
+  }
+  .rich-compare-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 8px 0;
+  }
+  .rich-compare-row > div {
+    background: var(--bg-card);
+    padding: 10px 12px;
+    border-radius: 6px;
+    border-left: 3px solid var(--primary);
+    font-size: 13px;
+  }
+
+  .rich-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--primary);
+    color: white;
+  }
+  .rich-badge.green { background: var(--success); }
+  .rich-badge.red { background: var(--danger); }
+  .rich-badge.amber { background: var(--warning); }
+  .rich-badge.blue { background: var(--info); }
+  .rich-badge.purple { background: var(--purple); }
+
+  .rich-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .rich-dot-blue { background: var(--info); }
+  .rich-dot-green { background: var(--success); }
+  .rich-dot-red { background: var(--danger); }
+  .rich-dot-amber { background: var(--warning); }
+
+  .rich-icon-check::before {
+    content: '✓';
+    color: var(--success);
+    font-weight: 700;
+    margin-right: 4px;
+  }
+  .rich-muted {
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  /* code block */
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    border-radius: 8px;
+    padding: 14px;
+    overflow-x: auto;
+    font-size: 13px;
+    margin: 10px 0;
+    line-height: 1.5;
+  }
+  code {
+    font-family: "SF Mono", Consolas, Monaco, monospace;
+  }
+
+  /* checklist */
+  .checklist {
+    background: var(--bg-card);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 12px 0;
+    border: 1px solid var(--border);
+  }
+  .checklist .check-item {
+    padding: 4px 0;
+    font-size: 14px;
+  }
+  .checklist .check-item::before {
+    content: '☐';
+    margin-right: 8px;
+    color: var(--text-muted);
+    font-weight: 700;
+  }
+
+  .footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  .highlight {
+    background: linear-gradient(180deg, transparent 60%, rgba(184, 148, 95, 0.2) 60%);
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>命理宝鉴 · 全栈开发规范 Skill</h1>
+  <div class="meta">2026-07-21 v1.0 · 剩余平台开发统一遵循</div>
+  <div class="badge-row">
+    <span class="badge">四层分级</span>
+    <span class="badge green">三端差异化</span>
+    <span class="badge p0">P0 ×3</span>
+    <span class="badge p1">P1 ×4</span>
+    <span class="badge p2">P2 ×4</span>
+    <span class="badge">11 标准</span>
+  </div>
+</div>
+
+<h2>一、四层专业分级体系</h2>
+
+<p>按<span class="highlight">用户专业程度 + 服务深度</span>分为 4 层，每层有独立的报告生成逻辑、引导深度和交付物：</p>
+
+<div class="tier-grid">
+  <div class="tier-card t1">
+    <h4><span class="tier-tag t1">T1</span> AI 助手 · 大众层</h4>
+    <p class="target"><strong>目标用户</strong>：零知识普通用户</p>
+    <p><strong>报告逻辑</strong>：自然语言 → 8-15 题友好引导 → KB 双路径 → 完整报告</p>
+    <div class="url">app/ai-assistant.html</div>
+  </div>
+  <div class="tier-card t2">
+    <h4><span class="tier-tag t2">T2</span> 排盘引擎 · 爱好者层</h4>
+    <p class="target"><strong>目标用户</strong>：有学习兴趣/专业用户</p>
+    <p><strong>报告逻辑</strong>：生辰 + 选引擎 → 8 大引擎排盘 → 命盘/十宫/流年/化解</p>
+    <div class="url">app/divination-hub.html</div>
+  </div>
+  <div class="tier-card t3">
+    <h4><span class="tier-tag t3">T3</span> 易+医 · 高端层</h4>
+    <p class="target"><strong>目标用户</strong>：高端客户</p>
+    <p><strong>报告逻辑</strong>：排盘 + 症状 + AI 面相（智能眼镜）→ 命理+中医双轨</p>
+    <div class="url">app/tcm-clinic.html</div>
+  </div>
+  <div class="tier-card t4">
+    <h4><span class="tier-tag t4">T4</span> 后台管理 · 专业层</h4>
+    <p class="target"><strong>目标用户</strong>：管理员/大师/医师/代理商</p>
+    <p><strong>报告逻辑</strong>：数据汇总 → KPI/审计/预警/导出</p>
+    <div class="url">app/admin.html</div>
+  </div>
+</div>
+
+<h3>1.1 三端差异铁律</h3>
+
+<div class="demo-section">
+  <h4><span class="rich-icon-check"></span>核心原则</h4>
+  <p><strong>PC 和移动端无功能差异</strong>，只在使用场景不同：</p>
+  <div class="rich-compare">
+    <div class="rich-compare-row">
+      <div><strong>PC 后台</strong><br>admin.html 104KB 大屏办公</div>
+      <div><strong>移动端</strong><br>H5 全部响应式适配</div>
+    </div>
+    <div class="rich-compare-row">
+      <div><strong>后端统一</strong><br>8920 端口</div>
+      <div><strong>三端共享</strong><br>API + DTO 数据契约层</div>
+    </div>
+  </div>
+</div>
+
+<h3>1.2 端访问差异（按访问路径区分）</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>访问端</th>
+      <th>入口</th>
+      <th>鉴权</th>
+      <th>DTO 形态</th>
+      <th>推送渠道</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>H5 浏览器（PC）</td>
+      <td><code>app/*.html</code></td>
+      <td>JWT + 角色</td>
+      <td>标准 JSON</td>
+      <td>站内 + 邮件</td>
+    </tr>
+    <tr>
+      <td>H5 浏览器（移动）</td>
+      <td><code>app/*.html</code>（响应式）</td>
+      <td>JWT + 角色</td>
+      <td>精简 JSON（hide phone 末 4 位）</td>
+      <td>站内 + IM</td>
+    </tr>
+    <tr>
+      <td>小程序</td>
+      <td><code>miniprogram/pages/</code></td>
+      <td>wx.login + 角色</td>
+      <td>微信 DTO 转换层</td>
+      <td>微信订阅消息</td>
+    </tr>
+    <tr>
+      <td>微信 H5</td>
+      <td><code>app/wechat-h5.html</code></td>
+      <td>公众号 OAuth</td>
+      <td>微信字段补全</td>
+      <td>公众号模板</td>
+    </tr>
+    <tr>
+      <td>后台 PC</td>
+      <td><code>app/admin.html</code></td>
+      <td>JWT + RBAC 严格</td>
+      <td>完整 JSON（带审计字段）</td>
+      <td>站内</td>
+    </tr>
+    <tr>
+      <td><strong>智能眼镜 🥽</strong></td>
+      <td><code>app/glass-console.html</code>（待开发）</td>
+      <td>设备 token</td>
+      <td>流式 JSON + 音视频</td>
+      <td>HUD + 推送</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>二、11 项开发规范</h2>
+
+<div class="spec-grid">
+  <div class="spec-card p0">
+    <h4><span class="spec-tag p0">P0-1</span> API 设计规范</h4>
+    <p class="rich-muted">URL <code>/api/v{1,2,...}/</code> 前缀 + 复数名词 + kebab-case</p>
+    <ul>
+      <li>必须用 <code>apiResp()</code> 统一响应壳</li>
+      <li>动作走子路径：<code>/yuanzhus/:id/push-yearly</code></li>
+      <li>旧路径保留 6 个月 + <code>Deprecation</code> 响应头</li>
+    </ul>
+  </div>
+
+  <div class="spec-card p0">
+    <h4><span class="spec-tag p0">P0-2</span> 前端组件库规范</h4>
+    <p class="rich-muted">强制使用受控 HTML 组件，禁止裸写</p>
+    <ul>
+      <li><code>rich-card</code> / <code>rich-grid</code> / <code>rich-panel</code></li>
+      <li><code>rich-table</code> / <code>rich-badge</code> / <code>rich-dot</code></li>
+      <li><code>rich-timeline</code> / <code>rich-metrics</code> / <code>rich-compare</code></li>
+    </ul>
+  </div>
+
+  <div class="spec-card p0">
+    <h4><span class="spec-tag p0">P0-3</span> 错误处理与降级规范</h4>
+    <p class="rich-muted">三级错误码 + 前端 ERROR_HANDLERS 强制实现</p>
+    <ul>
+      <li><code>400xxx</code> 参数 / <code>401xxx</code> 鉴权 / <code>5xxxxx</code> 服务</li>
+      <li><code>401001</code> → 跳登录 / <code>429001</code> → 30s 倒计时</li>
+      <li><code>503001</code> → KB 兜底 / <code>5xxxxx</code> → 一键重试</li>
+    </ul>
+  </div>
+
+  <div class="spec-card p1">
+    <h4><span class="spec-tag p1">P1-4</span> 性能基线与预算规范</h4>
+    <p class="rich-muted">5 项性能指标 + Lighthouse CI + bundle 检查</p>
+    <ul>
+      <li>API P95 ≤ 500ms / H5 首屏 ≤ 3s</li>
+      <li>JS bundle ≤ 1.2MB / CSS ≤ 300KB</li>
+      <li>图片 ≤ 1MB/张</li>
+    </ul>
+  </div>
+
+  <div class="spec-card p1">
+    <h4><span class="spec-tag p1">P1-5</span> 可观测性规范</h4>
+    <p class="rich-muted">5 类 25 指标 + 5 告警规则</p>
+    <ul>
+      <li>HTTP / 引擎 / DB / KB / AI 五维指标</li>
+      <li><code>SLOW_REQUEST</code> / <code>HTTP_5XX</code> / <code>ENGINE_ERROR</code></li>
+      <li>告警去重 1 分钟内同 key 不重复</li>
+    </ul>
+  </div>
+
+  <div class="spec-card p1">
+    <h4><span class="spec-tag p1">P1-6</span> 测试规范</h4>
+    <p class="rich-muted">金字塔 4 层测试</p>
+    <ul>
+      <li>单测 ≥ 80% / 集成 ≥ 60%</li>
+      <li>E2E：9 大流程 26/26 已通过</li>
+      <li>压测：autocannon P95 ≤ 500ms</li>
+    </ul>
+  </div>
+
+  <div class="spec-card p1">
+    <h4><span class="spec-tag p1">P1-7</span> 国际化与文案规范</h4>
+    <p class="rich-muted">所有用户可见中文字符串迁 i18n 字典</p>
+    <ul>
+      <li><code>app/i18n/zh-CN.json</code> + <code>en-US.json</code></li>
+      <li>错误文案从 <code>ERROR_COPYWRITING.md</code> 抄</li>
+    </ul>
+  </div>
+
+  <div class="spec-card p2">
+    <h4><span class="spec-tag p2">P2-8</span> 可访问性 a11y 规范</h4>
+    <p class="rich-muted">WCAG 2.1 AA</p>
+    <ul>
+      <li>颜色对比度 ≥ 4.5:1</li>
+      <li>键盘可导航 + <code>aria-label</code> 完整</li>
+    </ul>
+  </div>
+
+  <div class="spec-card p2">
+    <h4><span class="spec-tag p2">P2-9</span> 隐私与合规规范</h4>
+    <p class="rich-muted">PII 加密 + GDPR 式接口</p>
+    <ul>
+      <li>手机号 SHA256 + 后 4 位明文</li>
+      <li>身份证 AES-256 / 地址模糊到区/县</li>
+      <li>用户匿名化 + 账户删除 + 审计日志</li>
+    </ul>
+  </div>
+
+  <div class="spec-card p2">
+    <h4><span class="spec-tag p2">P2-10</span> 变更与发布规范</h4>
+    <p class="rich-muted">分支策略 + 版本号 + CHANGELOG</p>
+    <ul>
+      <li>main 受保护 / gh-pages 部署</li>
+      <li>版本号 <code>vYYYY.MM.DD-patch</code></li>
+      <li>CHANGELOG 按版本号分章节</li>
+    </ul>
+  </div>
+
+  <div class="spec-card p2">
+    <h4><span class="spec-tag p2">P2-11</span> 文档即代码规范</h4>
+    <p class="rich-muted">每次 P0 完成 → 更新 <code>docs/index.html</code> + CHANGELOG</p>
+    <ul>
+      <li>架构 / API / 数据 / 部署 / 报告 / 索引</li>
+      <li>强制按四要素起草：现状 + 要点 + 验收 + 节奏</li>
+    </ul>
+  </div>
+</div>
+
+<h2>三、受控 HTML 组件 Demo</h2>
+
+<p>所有 UI 组件必须用这套积木，不准裸写 div+style：</p>
+
+<h4>3.1 卡片 / 网格</h4>
+<div class="rich-grid">
+  <div class="rich-card">
+    <div class="rich-card-title">命理概要</div>
+    <p>五行分析 + 大运推演 + 流年建议</p>
+    <span class="rich-badge green">已生成</span>
+  </div>
+  <div class="rich-card">
+    <div class="rich-card-title">中医辨证</div>
+    <p>八纲 + 六经 + 三焦辨证</p>
+    <span class="rich-badge amber">待审核</span>
+  </div>
+  <div class="rich-card">
+    <div class="rich-card-title">化解建议</div>
+    <p>风水 + 咒语 + 经方</p>
+    <span class="rich-badge blue">已推送</span>
+  </div>
+</div>
+
+<h4>3.2 指标块</h4>
+<div class="rich-metrics">
+  <div class="rich-metric">
+    <div class="rich-metric-value">1746</div>
+    <div class="rich-metric-label">KB 正式条目</div>
+  </div>
+  <div class="rich-metric">
+    <div class="rich-metric-value">17</div>
+    <div class="rich-metric-label">知识模型</div>
+  </div>
+  <div class="rich-metric">
+    <div class="rich-metric-value">56</div>
+    <div class="rich-metric-label">API 端点</div>
+  </div>
+  <div class="rich-metric">
+    <div class="rich-metric-value">26/26</div>
+    <div class="rich-metric-label">流程测试通过</div>
+  </div>
+</div>
+
+<h4>3.3 时间线</h4>
+<div class="rich-timeline">
+  <div class="rich-step">
+    <span class="rich-step-marker">1</span>
+    <div class="rich-step-body">
+      <div class="rich-step-title">确认 T 层级</div>
+      <div class="rich-step-text">开发前先判断任务属于 T1-T4 哪一层，定位报告逻辑</div>
+    </div>
+  </div>
+  <div class="rich-step">
+    <span class="rich-step-marker">2</span>
+    <div class="rich-step-body">
+      <div class="rich-step-title">阅读相关规范</div>
+      <div class="rich-step-text">API / UI / Error 三套规范 + 受控 HTML 组件 demo</div>
+    </div>
+  </div>
+  <div class="rich-step">
+    <span class="rich-step-marker">3</span>
+    <div class="rich-step-body">
+      <div class="rich-step-title">开发与自检</div>
+      <div class="rich-step-text">JS 语法 + HTML 闭合 + API 响应壳 + 错误码 + 组件复用</div>
+    </div>
+  </div>
+  <div class="rich-step">
+    <span class="rich-step-marker">4</span>
+    <div class="rich-step-body">
+      <div class="rich-step-title">双分支同步</div>
+      <div class="rich-step-text">main + gh-pages + CHANGELOG 更新</div>
+    </div>
+  </div>
+</div>
+
+<h4>3.4 状态点 / 徽章</h4>
+<p>
+  <span class="rich-dot rich-dot-blue"></span>规划中
+  <span class="rich-dot rich-dot-green"></span>已上线
+  <span class="rich-dot rich-dot-amber"></span>开发中
+  <span class="rich-dot rich-dot-red"></span>阻塞
+</p>
+<p>
+  <span class="rich-badge">默认</span>
+  <span class="rich-badge blue">P1</span>
+  <span class="rich-badge amber">P0</span>
+  <span class="rich-badge green">已通过</span>
+  <span class="rich-badge purple">HIGH</span>
+</p>
+
+<h2>四、开发流程铁律</h2>
+
+<div class="checklist">
+  <div class="check-item">多轮迭代：一轮完成自动进入下一轮</div>
+  <div class="check-item">任务范围：拆成 5-10 分钟小任务，避免超时</div>
+  <div class="check-item">交付前自检：JS / HTML / API / DB schema 全检</div>
+  <div class="check-item">路径铁律：绝对路径 + 人话链接 + 端口 8920/8930</div>
+  <div class="check-item">KB 学习：必须分 8 轮提取，单轮正则不够</div>
+  <div class="check-item">git commit：符合 <code>&lt;type&gt;(&lt;scope&gt;): &lt;subject&gt;</code> 格式</div>
+</div>
+
+<h2>五、检查清单（开发前/后必看）</h2>
+
+<h4>5.1 开发前</h4>
+<div class="checklist">
+  <div class="check-item">确认任务属于哪个 T 层级（T1-T4）</div>
+  <div class="check-item">确认目标端（H5 / 小程序 / 微信 H5 / PC 后台 / 智能眼镜）</div>
+  <div class="check-item">阅读相关规范文档（API_STANDARD / UI_COMPONENT / ERROR_HANDLING）</div>
+  <div class="check-item">检查是否复用既有组件（rich-card / grid / timeline 等）</div>
+</div>
+
+<h4>5.2 开发后</h4>
+<div class="checklist">
+  <div class="check-item">JS 语法 <code>node --check</code> 通过</div>
+  <div class="check-item">HTML 标签闭合，HTMLParser 验证通过</div>
+  <div class="check-item">API 走统一响应壳 <code>apiResp()</code></div>
+  <div class="check-item">错误码从 ERROR_CODES 常量引用</div>
+  <div class="check-item">受控 HTML 组件使用正确（rich-* 类名）</div>
+  <div class="check-item">文件路径绝对路径 + 人话链接文字</div>
+</div>
+
+<h4>5.3 提交前</h4>
+<div class="checklist">
+  <div class="check-item">Git commit 信息符合格式</div>
+  <div class="check-item">双分支同步：main + gh-pages</div>
+  <div class="check-item">CHANGELOG 更新</div>
+  <div class="check-item">关键报告归档到 <code>docs/</code></div>
+</div>
+
+<h2>六、平台规模速览</h2>
+
+<div class="rich-metrics">
+  <div class="rich-metric">
+    <div class="rich-metric-value">48</div>
+    <div class="rich-metric-label">前端 H5 页面</div>
+  </div>
+  <div class="rich-metric">
+    <div class="rich-metric-value">19</div>
+    <div class="rich-metric-label">小程序页面</div>
+  </div>
+  <div class="rich-metric">
+    <div class="rich-metric-value">56</div>
+    <div class="rich-metric-label">API 端点</div>
+  </div>
+  <div class="rich-metric">
+    <div class="rich-metric-value">25+</div>
+    <div class="rich-metric-label">数据库表</div>
+  </div>
+  <div class="rich-metric">
+    <div class="rich-metric-value">17</div>
+    <div class="rich-metric-label">KB 模型</div>
+  </div>
+  <div class="rich-metric">
+    <div class="rich-metric-value">12</div>
+    <div class="rich-metric-label">RBAC 角色</div>
+  </div>
+  <div class="rich-metric">
+    <div class="rich-metric-value">8</div>
+    <div class="rich-metric-label">排盘引擎</div>
+  </div>
+  <div class="rich-metric">
+    <div class="rich-metric-value">11</div>
+    <div class="rich-metric-label">开发规范</div>
+  </div>
+</div>
+
+<div class="footer">
+  命理宝鉴 · mingli-baojian · 全栈开发规范 v1.0 · 2026-07-21<br>
+  下一步：按此规范启动剩余平台开发（智能眼镜 / IM / API 拆分）
+</div>
+
+</body>
+</html>

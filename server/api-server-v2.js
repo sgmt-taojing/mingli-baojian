@@ -13,6 +13,7 @@ const { KB_LEVELS } = require('./kb-config.js');
 const crypto = require('crypto');
 
 const kbRoutes = require('./kb-routes.js');
+const exportRoutes = require('./export-routes.js');
 
 const app = express();
 const PORT = parseInt(process.env.API_PORT || '8920');
@@ -1695,8 +1696,90 @@ app.get('/api/face/health', async (req, res) => {
 
 // === KB 管理路由 ===
 app.use('/api/kb', kbRoutes);
+app.use('/api/export', exportRoutes);
 
 // === 启动服务 ===
+
+// === 智能眼镜 HUD 路由（PLATFORM_FULL_CLASSIFICATION：7 子路由） ===
+const glassRoutes = require('./glass-routes');
+
+const imRoutes = require('./im-routes');
+app.use('/api/v1/im', imRoutes);
+app.use('/api/im', imRoutes);  // legacy 兼容
+app.use('/api/v1/glass', glassRoutes);
+app.use('/api/glass', glassRoutes);  // legacy 兼容
+
+// === v1 标准别名（API_V1_MIGRATION：与 legacy 双轨运行） ===
+// 思路：把 legacy 路径的所有现有路由，挂在同一个 Router 上，再用同一份 Router 注册到 /api/v1/...
+// 为了零侵入：使用 Express "redirect" 重定向 v1 → legacy，保持逻辑单一来源。
+const _v1Redir = (legacy) => (req, res) => {
+  // 把 params 拼回原路径
+  let target = legacy;
+  for (const k of Object.keys(req.params||{})) target = target.replace(':'+k, encodeURIComponent(req.params[k]));
+  // query 透传
+  const qs = require('querystring').stringify(req.query||{});
+  res.redirect(307, target + (qs ? ('?'+qs) : ''));
+};
+const _v1 = (legacy, method='get') => app[method](legacy.replace('/api/', '/api/v1/'), _v1Redir(legacy));
+const _v1p = (legacy) => _v1(legacy, 'post');
+
+// 主要业务路径 v1 别名（按当前 legacy 全量）
+[
+  '/api/yuanzhu/list','/api/yuanzhu/profile','/api/yuanzhu/preview-push','/api/yuanzhu/yearly-pushes',
+  '/api/paipan/history','/api/shop/products','/api/courses','/api/voices','/api/tts',
+  '/api/kb/list','/api/feedback/points','/api/clinic/my-reports','/api/clinic/assigned-cases',
+  '/api/merchant/list','/api/user/profile','/api/face/health','/api/ai/guide'
+].forEach(p=>_v1(p));
+[
+  '/api/yuanzhu/preference','/api/yuanzhu/send-push','/api/paipan/save','/api/courses/add',
+  '/api/feedback/submit','/api/merchant/apply','/api/merchant/approve','/api/user/login',
+  '/api/user/check-super','/api/user/profile','/api/face/analyze','/api/ocr/recognize',
+  '/api/ocr/tcm','/api/order/create','/api/push/log','/api/ai/chat','/api/ai/public-chat',
+  '/api/clinic/discuss','/api/clinic/push-report','/api/clinic/score-case',
+  '/api/clinic/submit-analysis','/api/clinic/submit-diagnosis','/api/clinic/submit-symptom',
+  '/api/clinic/update-effectiveness'
+].forEach(p=>_v1p(p));
+// 带参数路由
+app.get('/api/v1/clinic/case/:id', _v1Redir('/api/clinic/case/:id'));
+app.get('/api/v1/clinic/discussions/:caseId', _v1Redir('/api/clinic/discussions/:caseId'));
+app.get('/api/v1/kb/:filename', _v1Redir('/api/kb/:filename'));
+
+const _v1Pub = (legacy) => app.get('/api/v1/public'+legacy, _v1Redir('/api/public'+legacy));
+['/stats','/latest-pushes','/recent-cases'].forEach(s=>_v1Pub(s));
+// 顶层公共端点
+app.get('/api/v1/health', (req,res)=>res.json({ok:true,ts:Date.now(),v1:true}));
+app.get('/api/v1/distill', _v1Redir('/api/distill'));
+app.get('/api/v1/export', _v1Redir('/api/export'));
+app.get('/api/v1/admin/stats', _v1Redir('/api/admin/stats'));
+app.post('/api/v1/sync', _v1Redir('/api/sync'));
+console.log('[v1] 公共端点别名 +10 条');
+
+console.log('[v1] 标准别名已注册（共 44 条，与 legacy 双轨运行）');
+
+/* ===== 全局错误兜底（Express error middleware） ===== */
+app.use((err, req, res, next) => {
+  const status = err.status || err.statusCode || 500;
+  const code = err.code || ('INTERNAL_' + status);
+  console.error('[unhandled]', req.method, req.path, '->', err.message);
+  if (res.headersSent) return next(err);
+  res.status(status).json({
+    ok: false,
+    error: code,
+    message: status === 500 ? '服务器内部错误' : err.message,
+    path: req.path,
+    ts: Date.now()
+  });
+});
+/* ===== 404 兜底（任何未匹配路由） ===== */
+app.use((req, res) => {
+  res.status(404).json({
+    ok: false,
+    error: 'NOT_FOUND',
+    message: req.method + ' ' + req.path,
+    ts: Date.now()
+  });
+});
+
 app.listen(PORT, () => {
   console.log('═══════════════════════════════════════');
   console.log('  命理宝鉴 API服务 v2 已启动');
