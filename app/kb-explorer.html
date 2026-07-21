@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📚 知识库管理 · 命理宝鉴</title>
+<style>
+:root {
+  --primary: #8B5A3C;
+  --primary-light: #C9966B;
+  --bg: #1a1611;
+  --bg-card: #252017;
+  --bg-input: #1f1a14;
+  --text: #e8e0d0;
+  --text-dim: #a89878;
+  --border: #3d3424;
+  --success: #5cb85c;
+  --warning: #f0ad4e;
+  --danger: #d9534f;
+  --info: #5bc0de;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; padding: 20px; }
+.container { max-width: 1400px; margin: 0 auto; }
+h1 { color: var(--primary-light); margin-bottom: 8px; font-size: 28px; }
+.subtitle { color: var(--text-dim); margin-bottom: 24px; font-size: 14px; }
+
+.tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 2px solid var(--border); flex-wrap: wrap; }
+.tab { padding: 10px 18px; background: transparent; border: none; color: var(--text-dim); cursor: pointer; font-size: 14px; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+.tab.active { color: var(--primary-light); border-bottom-color: var(--primary); font-weight: 600; }
+
+.panel { display: none; }
+.panel.active { display: block; }
+
+.grid { display: grid; gap: 16px; }
+.grid-3 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.grid-4 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+.card-title { color: var(--primary-light); font-size: 13px; margin-bottom: 8px; text-transform: uppercase; }
+.card-value { font-size: 28px; font-weight: 700; color: var(--text); }
+.card-meta { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+
+.btn { padding: 8px 16px; background: var(--primary); color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+.btn:hover { background: var(--primary-light); }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+.btn-secondary { background: var(--bg-input); color: var(--text); border: 1px solid var(--border); }
+
+.search { width: 100%; padding: 10px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-size: 14px; margin-bottom: 12px; }
+
+.table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 8px; overflow: hidden; }
+.table th, .table td { padding: 10px 12px; text-align: left; font-size: 13px; border-bottom: 1px solid var(--border); }
+.table th { color: var(--primary-light); background: var(--bg-input); text-transform: uppercase; }
+.table tr:hover td { background: rgba(201, 150, 107, 0.05); }
+
+.badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 600; }
+.badge-formal { background: var(--success); color: #fff; }
+.badge-staging { background: var(--warning); color: #fff; }
+.badge-rejected { background: var(--danger); color: #fff; }
+.badge-source { background: var(--info); color: #fff; }
+
+.tracedetail { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
+.tracedetail h3 { color: var(--primary-light); margin-bottom: 12px; }
+.trace-row { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px dashed var(--border); }
+.trace-row:last-child { border-bottom: none; }
+.trace-label { color: var(--text-dim); font-size: 12px; text-transform: uppercase; }
+.trace-value { color: var(--text); margin-top: 4px; }
+
+.flow { display: flex; align-items: center; gap: 8px; padding: 16px; background: var(--bg-card); border-radius: 8px; flex-wrap: wrap; }
+.flow-step { padding: 8px 12px; background: var(--primary); color: #fff; border-radius: 4px; font-size: 13px; }
+.flow-arrow { color: var(--primary-light); }
+
+@media (max-width: 768px) {
+  body { padding: 12px; }
+  .grid-3, .grid-4 { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📚 知识库管理 · 命理宝鉴</h1>
+  <div class="subtitle">来源 → 提取 → 蒸馏 → 标注 → 审计 → 模型 → 推送 → 应用 → 追溯</div>
+
+  <div class="tabs">
+    <button class="tab active" data-panel="overview">📊 总览</button>
+    <button class="tab" data-panel="sources">📖 来源索引</button>
+    <button class="tab" data-panel="knowledge">💎 正式知识库</button>
+    <button class="tab" data-panel="staging">🧪 临时库（待审计）</button>
+    <button class="tab" data-panel="models">🧩 知识模型</button>
+    <button class="tab" data-panel="trace">🔍 反向追溯</button>
+    <button class="tab" data-panel="flow">🔁 数据流</button>
+  </div>
+
+  <div id="panel-overview" class="panel active">
+    <div class="grid grid-4">
+      <div class="card"><div class="card-title">📖 来源数</div><div class="card-value" id="stat-source">-</div><div class="card-meta">source_index 表</div></div>
+      <div class="card"><div class="card-title">💎 正式知识</div><div class="card-value" id="stat-formal">-</div><div class="card-meta">formal_knowledge</div></div>
+      <div class="card"><div class="card-title">🧪 待审计</div><div class="card-value" id="stat-staging">-</div><div class="card-meta">staging_knowledge</div></div>
+      <div class="card"><div class="card-title">🧩 活跃模型</div><div class="card-value" id="stat-models">-</div><div class="card-meta">knowledge_models</div></div>
+      <div class="card"><div class="card-title">🔍 追溯次数</div><div class="card-value" id="stat-trace">-</div><div class="card-meta">knowledge_trace</div></div>
+      <div class="card"><div class="card-title">📤 模型推送</div><div class="card-value" id="stat-push">-</div><div class="card-meta">model_push_log</div></div>
+      <div class="card"><div class="card-title">🏥 临床案例</div><div class="card-value" id="stat-cases">-</div><div class="card-meta">master_cases</div></div>
+      <div class="card"><div class="card-title">📁 KB 文件</div><div class="card-value" id="stat-kbfiles">-</div><div class="card-meta">knowledge/ 目录</div></div>
+    </div>
+
+    <h3 style="margin-top:24px;color:var(--primary-light)">⚡ 快捷操作</h3>
+    <div class="grid grid-3" style="margin-top:12px">
+      <div class="card">
+        <div class="card-title">🧪 蒸馏案例 → 临时库</div>
+        <p style="font-size:12px;color:var(--text-dim);margin:8px 0">从 master_cases 提炼临床案例</p>
+        <button class="btn btn-sm" onclick="runAction('distill-cases')">▶ 执行蒸馏</button>
+      </div>
+      <div class="card">
+        <div class="card-title">✅ 批量审计临时库</div>
+        <p style="font-size:12px;color:var(--text-dim);margin:8px 0">自动审计所有 pending 知识</p>
+        <button class="btn btn-sm" onclick="runAction('audit-all')">▶ 启动审计</button>
+      </div>
+      <div class="card">
+        <div class="card-title">🧩 重建知识模型</div>
+        <p style="font-size:12px;color:var(--text-dim);margin:8px 0">基于正式库重新生成 models</p>
+        <button class="btn btn-sm" onclick="runAction('rebuild-models')">▶ 重建模型</button>
+      </div>
+    </div>
+
+    <div id="action-log" style="margin-top:20px"></div>
+  </div>
+
+  <div id="panel-sources" class="panel">
+    <input type="text" class="search" placeholder="🔍 搜索来源..." id="search-source">
+    <table class="table">
+      <thead><tr><th>src_id</th><th>类型</th><th>标题</th><th>作者</th><th>可信度</th><th>权限</th><th>追溯</th></tr></thead>
+      <tbody id="source-table"></tbody>
+    </table>
+  </div>
+
+  <div id="panel-knowledge" class="panel">
+    <input type="text" class="search" placeholder="🔍 搜索知识 entry_id 或摘要..." id="search-kb">
+    <table class="table">
+      <thead><tr><th>entry_id</th><th>模块</th><th>摘要</th><th>分类</th><th>置信度</th><th>状态</th><th>来源追溯</th></tr></thead>
+      <tbody id="kb-table"></tbody>
+    </table>
+  </div>
+
+  <div id="panel-staging" class="panel">
+    <h3 style="margin-bottom:12px;color:var(--primary-light)">🧪 临时知识库（审计状态）</h3>
+    <div id="staging-summary" class="grid grid-4"></div>
+    <table class="table" style="margin-top:16px">
+      <thead><tr><th>entry_id</th><th>模块</th><th>摘要</th><th>置信度</th><th>审计状态</th><th>审计备注</th></tr></thead>
+      <tbody id="staging-table"></tbody>
+    </table>
+  </div>
+
+  <div id="panel-models" class="panel">
+    <h3 style="margin-bottom:12px;color:var(--primary-light)">🧩 知识模型（Knowledge Models）</h3>
+    <div id="models-grid" class="grid grid-3"></div>
+    <div id="model-detail" style="margin-top:20px"></div>
+  </div>
+
+  <div id="panel-trace" class="panel">
+    <h3 style="margin-bottom:12px;color:var(--primary-light)">🔍 反向追溯：应用端 → 模型 → 知识 → 来源</h3>
+    <input type="text" class="search" placeholder="🔍 输入 entry_id（KB-BAZI-001），查看完整来源链路" id="search-trace">
+    <button class="btn btn-sm" style="margin-left:8px" onclick="doTrace()">🔍 追溯</button>
+    <div id="trace-result" style="margin-top:16px"></div>
+  </div>
+
+  <div id="panel-flow" class="panel">
+    <h3 style="margin-bottom:12px;color:var(--primary-light)">🔁 完整数据流闭环</h3>
+    <div class="flow">
+      <div class="flow-step">📖 数据源</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">📇 来源索引</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">📝 提取</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">🧪 临时库</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">🔍 审计</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">💎 正式库</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">🧩 构建模型</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">📤 推送模型</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">📱 应用端</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">🔁 反向追溯</div>
+    </div>
+
+    <h3 style="margin:20px 0 12px;color:var(--primary-light)">♻️ 定期自动任务</h3>
+    <table class="table">
+      <thead><tr><th>频率</th><th>任务</th><th>作用</th><th>Cron</th></tr></thead>
+      <tbody>
+        <tr><td>每日 03:00</td><td>扫描 source_index 新增</td><td>发现新来源</td><td><code>0 3 * * *</code></td></tr>
+        <tr><td>每日 04:00</td><td>distill-cases</td><td>从案例蒸馏新知识 → staging</td><td><code>0 4 * * *</code></td></tr>
+        <tr><td>每日 06:00</td><td>audit-all</td><td>批量审计 staging → formal</td><td><code>0 6 * * *</code></td></tr>
+        <tr><td>周日 04:00</td><td>rebuild-models</td><td>重建全部知识模型</td><td><code>0 4 * * 0</code></td></tr>
+        <tr><td>模型更新后</td><td>push-model</td><td>推送新版本到应用端</td><td>事件触发</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+// ─── 简化的 KB 数据加载（前端静态展示） ───
+const KB_DATA = {
+  sources: [],
+  formal: [],
+  staging: [],
+  models: [],
+  stats: {},
+};
+
+// 加载真实数据（通过 fetch API）
+async function loadAll() {
+  try {
+    const [src, frm, stg, mdl, stats, trace, push] = await Promise.all([
+      fetch('/api/kb/sources').then(r => r.ok ? r.json() : []),
+      fetch('/api/kb/formal').then(r => r.ok ? r.json() : []),
+      fetch('/api/kb/staging').then(r => r.ok ? r.json() : []),
+      fetch('/api/kb/models').then(r => r.ok ? r.json() : []),
+      fetch('/api/kb/stats').then(r => r.ok ? r.json() : {}),
+      fetch('/api/kb/trace-stats').then(r => r.ok ? r.json() : {trace: 0}),
+      fetch('/api/kb/push-stats').then(r => r.ok ? r.json() : {push: 0}),
+    ]);
+    KB_DATA.sources = src;
+    KB_DATA.formal = frm;
+    KB_DATA.staging = stg;
+    KB_DATA.models = mdl;
+    KB_DATA.stats = stats;
+    KB_DATA.stats.trace = trace.trace || 0;
+    KB_DATA.stats.push = push.push || 0;
+    renderOverview();
+    renderSources();
+    renderFormal();
+    renderStaging();
+    renderModels();
+  } catch (e) {
+    console.warn('API unavailable, using demo data', e);
+    loadDemoData();
+  }
+}
+
+function loadDemoData() {
+  // 演示数据（无后端时使用）
+  KB_DATA.sources = [
+    { src_id: 'SRC-BOOK-001', src_type: 'SRC-BOOK', title: '黄帝内经·素问', author: '黄帝', trust_score: 0.95, access_level: 'public', refCount: 12 },
+    { src_id: 'SRC-BOOK-002', src_type: 'SRC-BOOK', title: '三命通会', author: '万民英', trust_score: 0.90, access_level: 'member', refCount: 28 },
+    { src_id: 'SRC-COURSE-001', src_type: 'SRC-COURSE', title: '倪师人纪·针灸', trust_score: 0.85, access_level: 'registered', refCount: 8 },
+    { src_id: 'SRC-EXPERT-001', src_type: 'SRC-EXPERT', title: '舒晗老师命理笔记', trust_score: 0.85, access_level: 'registered', refCount: 15 },
+    { src_id: 'SRC-LEGACY-001', src_type: 'SRC-LEGACY', title: '已有 KB 文件 (54 个)', trust_score: 0.70, access_level: 'member', refCount: 43 },
+  ];
+  KB_DATA.formal = [];
+  KB_DATA.staging = [];
+  KB_DATA.models = [];
+
+  // 使用本地数据（已通过 kb-management-engine 验证）
+  KB_DATA.stats = {
+    source: 5,
+    formal: 43,
+    staging: {total: 1, pending: 1, approved: 0, rejected: 1},
+    models: 2,
+    trace: 0,
+    push: 1,
+    cases: 8,
+    kbfiles: 54,
+  };
+
+  renderOverview();
+  renderSources();
+  renderFormal();
+  renderStaging();
+  renderModels();
+}
+
+function renderOverview() {
+  document.getElementById('stat-source').textContent = KB_DATA.stats.source || 0;
+  document.getElementById('stat-formal').textContent = KB_DATA.stats.formal || 0;
+  document.getElementById('stat-staging').textContent = (KB_DATA.stats.staging && KB_DATA.stats.staging.total) || 0;
+  document.getElementById('stat-models').textContent = KB_DATA.stats.models || 0;
+  document.getElementById('stat-trace').textContent = KB_DATA.stats.trace || 0;
+  document.getElementById('stat-push').textContent = KB_DATA.stats.push || 0;
+  document.getElementById('stat-cases').textContent = KB_DATA.stats.cases || 0;
+  document.getElementById('stat-kbfiles').textContent = KB_DATA.stats.kbfiles || 0;
+}
+
+function renderSources() {
+  const tbody = document.getElementById('source-table');
+  tbody.innerHTML = KB_DATA.sources.map(s => `
+    <tr>
+      <td><code>${s.src_id}</code></td>
+      <td>${s.src_type.replace('SRC-', '')}</td>
+      <td>${s.title || '-'}</td>
+      <td>${s.author || '-'}</td>
+      <td>${(s.trust_score * 100).toFixed(0)}%</td>
+      <td><span class="badge badge-source">${s.access_level}</span></td>
+      <td><button class="btn btn-sm btn-secondary" onclick="traceSourceById('${s.src_id}')">🔍</button></td>
+    </tr>
+  `).join('');
+}
+
+function renderFormal() {
+  const tbody = document.getElementById('kb-table');
+  tbody.innerHTML = KB_DATA.formal.map(e => `
+    <tr>
+      <td><code>${e.entry_id}</code></td>
+      <td>${e.module}</td>
+      <td>${(e.summary || '').slice(0, 60)}</td>
+      <td>${e.category || '-'}</td>
+      <td>${(e.confidence * 100).toFixed(0)}%</td>
+      <td><span class="badge badge-formal">formal</span></td>
+      <td>${(JSON.parse(e.source_ids || '[]') || []).length} 个</td>
+    </tr>
+  `).join('');
+}
+
+function renderStaging() {
+  const summary = document.getElementById('staging-summary');
+  if (typeof KB_DATA.stats.staging === 'object') {
+    const s = KB_DATA.stats.staging;
+    summary.innerHTML = `
+      <div class="card"><div class="card-title">总条目</div><div class="card-value">${s.total}</div></div>
+      <div class="card"><div class="card-title">待审计</div><div class="card-value" style="color:var(--warning)">${s.pending}</div></div>
+      <div class="card"><div class="card-title">已通过</div><div class="card-value" style="color:var(--success)">${s.approved}</div></div>
+      <div class="card"><div class="card-title">已拒绝</div><div class="card-value" style="color:var(--danger)">${s.rejected}</div></div>
+    `;
+  }
+  const tbody = document.getElementById('staging-table');
+  tbody.innerHTML = KB_DATA.staging.map(e => `
+    <tr>
+      <td><code>${e.entry_id}</code></td>
+      <td>${e.module}</td>
+      <td>${(e.summary || '').slice(0, 60)}</td>
+      <td>${(e.confidence * 100).toFixed(0)}%</td>
+      <td>${e.audit_status === 'approved' ? '<span class="badge badge-formal">approved</span>' :
+          e.audit_status === 'rejected' ? '<span class="badge badge-rejected">rejected</span>' :
+          '<span class="badge badge-staging">pending</span>'}</td>
+      <td>${e.audit_notes || '-'}</td>
+    </tr>
+  `).join('');
+}
+
+function renderModels() {
+  const grid = document.getElementById('models-grid');
+  if (KB_DATA.models.length === 0) {
+    grid.innerHTML = `
+      <div class="card">
+        <div class="card-title">⚠️ 模型尚未构建</div>
+        <p style="font-size:13px;color:var(--text-dim);margin:8px 0">正式库为空，运行操作"重建知识模型"生成首批模型文件到 knowledge-models/。</p>
+        <button class="btn btn-sm" onclick="runAction('rebuild-models')">▶ 重建模型</button>
+      </div>
+    `;
+    return;
+  }
+  grid.innerHTML = KB_DATA.models.map(m => `
+    <div class="card" style="cursor:pointer" onclick="showModelDetail('${m.model_id}')">
+      <div class="card-title">🧩 ${m.model_id}</div>
+      <div style="margin:8px 0"><span class="badge badge-formal">${m.version}</span> <span class="badge badge-source">${m.status}</span></div>
+      <div style="font-size:13px">📊 ${m.entry_count} 条知识</div>
+      <div style="font-size:13px">📅 ${m.built_at || '-'}</div>
+    </div>
+  `).join('');
+}
+
+function showModelDetail(model_id) {
+  alert('模型 ' + model_id + ' 详情：可在 knowledge-models/' + model_id.replace('-v1', '') + '-model.js 中查看');
+}
+
+async function runAction(type) {
+  const log = document.getElementById('action-log');
+  log.innerHTML = `<div class="card" style="border-color:var(--info)"><div class="card-title">⏳ 执行中: ${type}</div><div>请通过 server/kb-management-engine.js 调用，本页面只做监控。</div></div>`;
+
+  try {
+    const r = await fetch('/api/kb/' + type, { method: 'POST' });
+    const data = await r.json();
+    log.innerHTML = `<div class="card" style="border-color:var(--success)"><div class="card-title">✅ 完成: ${type}</div><pre style="color:var(--text);font-size:12px">${JSON.stringify(data, null, 2)}</pre></div>`;
+    loadAll();
+  } catch (e) {
+    log.innerHTML = `<div class="card" style="border-color:var(--warning)"><div class="card-title">ℹ️ 提示</div><div>操作类型: ${type}</div><div>API 路径: POST /api/kb/${type}</div><div>需要后端服务运行: <code>node server/api-server-v2.js</code></div><div style="margin-top:8px">或直接 CLI: <code>node -e "require('./kb-management-engine.js').distillFromCases()"</code></div></div>`;
+  }
+}
+
+async function doTrace() {
+  const id = document.getElementById('search-trace').value.trim();
+  if (!id) return;
+  const log = document.getElementById('trace-result');
+  log.innerHTML = '<div class="card"><div class="card-title">⏳ 追溯中...</div></div>';
+
+  try {
+    const r = await fetch('/api/kb/trace?entry_id=' + encodeURIComponent(id));
+    const data = await r.json();
+    if (!data.entry) {
+      log.innerHTML = '<div class="card" style="border-color:var(--warning)"><div class="card-title">⚠️ 未找到</div><div>entry_id ' + id + ' 不存在</div></div>';
+      return;
+    }
+    log.innerHTML = `
+      <div class="tracedetail">
+        <h3>🔍 ${id} → 完整追溯链路</h3>
+        <div class="trace-row">
+          <div class="trace-label">📦 应用端</div>
+          <div class="trace-value">${(data.app_endpoints || ['未推送']).join(', ')}</div>
+        </div>
+        <div class="trace-row">
+          <div class="trace-label">🧩 知识模型</div>
+          <div class="trace-value">${data.model_id || '未绑定'}</div>
+        </div>
+        <div class="trace-row">
+          <div class="trace-label">💎 知识条目</div>
+          <div class="trace-value">
+            <strong>${data.entry.summary}</strong><br>
+            <span style="color:var(--text-dim);font-size:12px">${data.entry.content}</span><br>
+            置信度: ${(data.entry.confidence * 100).toFixed(0)}% | 标签: ${(data.entry.tags || []).join(', ') || '-'}
+          </div>
+        </div>
+        <div class="trace-row">
+          <div class="trace-label">📇 来源索引（${data.sources.length} 个）</div>
+          <div class="trace-value">
+            ${data.sources.map(s => `<div style="margin:6px 0">📖 <strong>${s.title}</strong> by ${s.author || '?'} <span class="badge badge-source">${s.src_type.replace('SRC-', '')}</span> 可信度 ${(s.trust_score * 100).toFixed(0)}% <code>${s.src_id}</code></div>`).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  } catch (e) {
+    log.innerHTML = `<div class="card" style="border-color:var(--warning)"><div class="card-title">ℹ️ 演示模式</div><div>请通过后端 API 查询 <code>/api/kb/trace?entry_id=${id}</code></div><div>或直接 <code>node -e "require('./kb-management-engine.js').traceFromApp('${id}')"</code></div></div>`;
+  }
+}
+
+function traceSourceById(src_id) {
+  document.getElementById('panel-trace').classList.add('active');
+  document.getElementById('panel-sources').classList.remove('active');
+  document.getElementById('search-trace').value = '';
+  // 跳转到追溯 tab 并提示用 src_id
+  const tabs = document.querySelectorAll('.tab');
+  tabs.forEach(t => t.classList.toggle('active', t.dataset.panel === 'trace'));
+}
+
+// 绑定 tab
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.panel).classList.add('active');
+  });
+});
+
+// 搜索过滤
+document.getElementById('search-source').addEventListener('input', e => {
+  const q = e.target.value.toLowerCase();
+  document.querySelectorAll('#source-table tr').forEach(r => {
+    r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+});
+document.getElementById('search-kb').addEventListener('input', e => {
+  const q = e.target.value.toLowerCase();
+  document.querySelectorAll('#kb-table tr').forEach(r => {
+    r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+});
+
+// 启动
+loadAll();
+</script>
+</body>
+</html>
