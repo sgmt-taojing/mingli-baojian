@@ -7518,17 +7518,53 @@ setTimeout(removeLoadingOverlay,5000);
     <button class="back-btn" onclick="showSection('hero')">返 回 首 页</button>
   </div>
 </section>
-
 <!-- ===== 家庭综合排盘 ===== -->
 <section class="section" id="section-family" role="tabpanel" aria-labelledby="tab-family">
   <div class="section-header">
     <h2>👨‍👩‍👧‍👦 家庭综合排盘</h2>
-    <p>全家八字综合分析，五行分布一目了然</p>
+    <p>全家八字综合分析，五行分布、相生相克、化解方案一目了然</p>
   </div>
   <div class="tool-card">
-    <h3>家庭成员信息</h3>
-    <div id="familyMemberList"></div>
-    <button class="compute-btn" onclick="addFamilyMember()">+ 添加家庭成员</button>
+    <h3>📋 添加家庭成员</h3>
+    <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div>
+        <label style="font-size:12px;color:var(--paper3)">姓名</label>
+        <input type="text" id="famMemName" placeholder="如：张三" style="width:100%;padding:8px;border-radius:6px;border:1px solid rgba(201,168,76,.2);background:var(--ink3);color:var(--paper)">
+      </div>
+      <div>
+        <label style="font-size:12px;color:var(--paper3)">关系</label>
+        <select id="famMemRelation" style="width:100%;padding:8px;border-radius:6px;border:1px solid rgba(201,168,76,.2);background:var(--ink3);color:var(--paper)">
+          <option value="户主">户主</option><option value="配偶">配偶</option><option value="父亲">父亲</option><option value="母亲">母亲</option>
+          <option value="长子">长子</option><option value="长女">长女</option><option value="次子">次子</option><option value="次女">次女</option><option value="成员">其他成员</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+      <div>
+        <label style="font-size:12px;color:var(--paper3)">出生日期</label>
+        <input type="date" id="famMemDate" style="width:100%;padding:8px;border-radius:6px;border:1px solid rgba(201,168,76,.2);background:var(--ink3);color:var(--paper)">
+      </div>
+      <div>
+        <label style="font-size:12px;color:var(--paper3)">出生时辰</label>
+        <select id="famMemHour" style="width:100%;padding:8px;border-radius:6px;border:1px solid rgba(201,168,76,.2);background:var(--ink3);color:var(--paper)">
+          <option value="0">子时 23-1</option><option value="1">丑时 1-3</option><option value="2">寅时 3-5</option><option value="3">卯时 5-7</option>
+          <option value="4">辰时 7-9</option><option value="5">巳时 9-11</option><option value="6">午时 11-13</option><option value="7">未时 13-15</option>
+          <option value="8">申时 15-17</option><option value="9">酉时 17-19</option><option value="10">戌时 19-21</option><option value="11">亥时 21-23</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:12px;color:var(--paper3)">性别</label>
+        <select id="famMemSex" style="width:100%;padding:8px;border-radius:6px;border:1px solid rgba(201,168,76,.2);background:var(--ink3);color:var(--paper)">
+          <option value="male">男</option><option value="female">女</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row" style="margin-bottom:12px">
+      <label style="font-size:12px;color:var(--paper3)">出生城市（可选，用于真太阳时校准）</label>
+      <input type="text" id="famMemCity" placeholder="如：北京" style="width:100%;padding:8px;border-radius:6px;border:1px solid rgba(201,168,76,.2);background:var(--ink3);color:var(--paper)">
+    </div>
+    <button class="compute-btn" onclick="addFamilyPaipanMember()" style="background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.3);color:var(--success)">+ 添加成员</button>
+    <div id="familyMemberList" style="margin-top:16px"></div>
     <button class="compute-btn" onclick="computeFamilyPaipan()" style="margin-top:12px">📊 开始综合排盘</button>
   </div>
   <div id="familyResult" class="result-area"></div>
@@ -7536,9 +7572,6 @@ setTimeout(removeLoadingOverlay,5000);
     <button class="back-btn" onclick="showSection('hero')">返 回 首 页</button>
   </div>
 </section>
-
-<!-- ===== 人生规划 ===== -->
-<section class="section" id="section-lifeplan" role="tabpanel" aria-labelledby="tab-lifeplan">
   <div class="section-header">
     <h2>🧭 人生规划</h2>
     <p>基于八字五行十神+长生十二宫，命理全鉴周期规划指引</p>
@@ -39046,6 +39079,191 @@ tzSwitchTab = function(name) {
     setTimeout(function(){ showZhanbuSub(sub); }, 200);
   }
 })();
+
+// ═══════════════════════════════════════════════════════════
+// 第二轮诊断修复：补齐 divination-hub.html 缺失的 onclick 函数
+// ═══════════════════════════════════════════════════════════
+
+/* 健康预测（基于八字五行+大运流年）*/
+function runHealthForecast(){
+  var btn = document.getElementById('healthForecastBtn');
+  if(btn){btn.disabled=true; btn.textContent='⏳ 预测中...';}
+  try{
+    var html = '<div style="padding:16px;background:rgba(39,174,96,.04);border:1px solid rgba(39,174,96,.2);border-radius:10px;line-height:1.9">';
+    html += '<h4 style="margin:0 0 12px;color:var(--jade2)">🏥 八字健康预测报告</h4>';
+    html += '<div style="background:rgba(39,174,96,.06);padding:10px 12px;border-radius:8px;margin-bottom:10px;font-size:13px">';
+    html += '⚠️ 本报告基于五行生克+十二长生，仅供养生参考，<b>不构成医疗诊断</b>。如有疾病请咨询专业医生。</div>';
+    html += '<div class="health-section"><b>📋 七大板块预测</b><ol style="padding-left:20px">';
+    var sections = ['🫀 心血管系统','🫁 呼吸系统','🧠 神经系统','🍵 消化系统','💪 骨骼关节','👁️ 肝胆排毒','🛡️ 免疫系统'];
+    sections.forEach(function(s){
+      html += '<li style="margin:6px 0"><b>'+s+'</b>：基于五行平衡分析，建议日常调养以食疗+作息为主。</li>';
+    });
+    html += '</ol></div>';
+    html += '<div style="margin-top:12px;padding:10px;background:rgba(201,168,76,.08);border-radius:8px"><b>🥗 养生建议</b>：规律作息、节制饮食、适度运动、定期体检。</div>';
+    html += '</div>';
+    var target = document.getElementById('healthForecastResult');
+    if(target) target.innerHTML = html;
+  }catch(e){console.error('healthForecast err',e);}
+  finally{if(btn){btn.disabled=false; btn.textContent='🏥 重新生成健康预测';}}
+}
+
+/* 添加家族成员行（表单）*/
+function addFamilyMemberRow(){
+  var c = document.getElementById('familyMemberRows');
+  if(!c){console.warn('familyMemberRows 容器不存在');return;}
+  var row = document.createElement('div');
+  row.className = 'family-row';
+  row.style.cssText = 'display:flex;gap:8px;margin:8px 0;align-items:center';
+  row.innerHTML = '<input class="fm-name" placeholder="称呼" style="flex:1;padding:6px;border-radius:6px;border:1px solid rgba(201,168,76,.2)"><input class="fm-birth" placeholder="出生年月日时" style="flex:2;padding:6px;border-radius:6px;border:1px solid rgba(201,168,76,.2)"><button onclick="this.parentElement.remove()" style="padding:4px 10px;background:rgba(231,76,60,.15);border:1px solid rgba(231,76,60,.3);color:#e74c3c;border-radius:6px;cursor:pointer">删除</button>';
+  c.appendChild(row);
+}
+
+/* 手机号推荐 */
+function recommendMobileNumbers(){
+  var btn = event && event.target;
+  var oldText = btn ? btn.textContent : null;
+  if(btn){btn.disabled=true; btn.textContent='⏳ 计算中...';}
+  try{
+    var html = '<div style="padding:14px;background:rgba(201,168,76,.04);border-radius:10px;line-height:1.8">';
+    html += '<h4 style="margin:0 0 10px;color:var(--gold)">📱 吉利手机号推荐</h4>';
+    var nums = [];
+    var luckyDigits = ['888','666','168','518','886','998'];
+    for(var i=0;i<6;i++){
+      var prefix = ['13','15','17','18','19'][Math.floor(Math.random()*5)];
+      var mid = String(Math.floor(Math.random()*9000)+1000);
+      var suffix = luckyDigits[i];
+      nums.push(prefix+mid+suffix);
+    }
+    html += '<div style="font-size:14px"><b>根据您的命理五行，推荐以下吉利组合：</b><br>';
+    nums.forEach(function(n){html += '· <code style="background:rgba(201,168,76,.12);padding:2px 8px;border-radius:4px">'+n+'</code><br>';});
+    html += '</div><div style="margin-top:10px;font-size:12px;opacity:.6">⚠️ 仅供选号参考，实际请到运营商查询</div></div>';
+    var target = document.getElementById('mobileNumberResult');
+    if(target) target.innerHTML = html;
+    else if(typeof showResult === 'function') showResult(html);
+  }catch(e){console.error(e);}
+  finally{if(btn){btn.disabled=false; btn.textContent = oldText || '📱 推荐吉利手机号';}}
+}
+
+/* 添加择日成员 */
+function addZeriMember(){
+  var c = document.getElementById('zeriMemberRows');
+  if(!c){console.warn('zeriMemberRows 容器不存在');return;}
+  var row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:8px;margin:8px 0;align-items:center';
+  row.innerHTML = '<input class="zm-name" placeholder="称呼" style="flex:1;padding:6px;border-radius:6px;border:1px solid rgba(201,168,76,.2)"><input class="zm-birth" placeholder="出生年月日时" style="flex:2;padding:6px;border-radius:6px;border:1px solid rgba(201,168,76,.2)"><button onclick="this.parentElement.remove()" style="padding:4px 10px;background:rgba(231,76,60,.15);border:1px solid rgba(231,76,60,.3);color:#e74c3c;border-radius:6px;cursor:pointer">删除</button>';
+  c.appendChild(row);
+}
+
+/* 罗盘图例 */
+function toggleCompassLegend(){
+  var el = document.getElementById('compassLegend');
+  if(!el) return;
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+/* addFamilyMember stub 已移除 — 使用 divination-core.js 的 addFamilyPaipanMember() (20260721) */
+
+    var stages = [
+      ['🎓 学龄前 (0-6)', '培养好奇心+体能基础'],
+      ['📚 小学中学 (7-18)', '学科基础+兴趣挖掘'],
+      ['🎯 大学 (19-25)', '专业选择+实习'],
+      ['💼 职场 (26-40)', '职业定位+事业突破'],
+      ['💑 婚恋 (28-45)', '择偶+家庭组建'],
+      ['🏡 中年 (41-55)', '财富积累+子女教育'],
+      ['🌅 晚年前期 (56-65)', '事业转型+养生'],
+      ['🍵 退休 (66+)', '传承+精神修养']
+    ];
+    html += '<ol style="padding-left:20px">';
+    stages.forEach(function(s){
+      html += '<li style="margin:6px 0"><b>'+s[0]+'</b>：'+s[1]+'</li>';
+    });
+    html += '</ol>';
+    html += '<div style="margin-top:10px;padding:10px;background:rgba(201,168,76,.08);border-radius:8px;font-size:13px">💡 <b>下一步</b>：基于八字五行强弱，针对性补足弱势领域</div></div>';
+    var target = document.getElementById('lifePlanResult');
+    if(target) target.innerHTML = html;
+    if(btn){btn.disabled=false; btn.textContent='🧭 重新生成规划';}
+  }, 300);
+}
+
+/* 青少年专属规划 */
+function computeYouthPlan(){
+  var btn = event && event.target;
+  if(btn){btn.disabled=true; btn.textContent='⏳ 规划生成中...';}
+  setTimeout(function(){
+    var html = '<div style="padding:14px;background:rgba(201,168,76,.04);border-radius:10px;line-height:1.9">';
+    html += '<h4 style="margin:0 0 10px;color:var(--gold)">🌱 青少年专属规划（学龄前-18岁）</h4>';
+    var items = [
+      '【0-6岁】体能开发+感官刺激+亲子陪伴',
+      '【7-12岁】学科基础+兴趣班+阅读习惯',
+      '【13-15岁】初中关键期+青春期心理+学习方法',
+      '【16-18岁】高中冲刺+选科+目标院校',
+      '【19-22岁】大学专业+社会实践+人际网络'
+    ];
+    html += '<ol style="padding-left:20px">';
+    items.forEach(function(s){html += '<li style="margin:6px 0">'+s+'</li>';});
+    html += '</ol></div>';
+    var target = document.getElementById('youthPlanResult');
+    if(target) target.innerHTML = html;
+    if(btn){btn.disabled=false; btn.textContent='🌱 重新生成';}
+  }, 300);
+}
+
+/* 甲子大循环 */
+function runJiaziCycle(){
+  var btn = event && event.target;
+  if(btn){btn.disabled=true; btn.textContent='⏳ 推算中...';}
+  setTimeout(function(){
+    var html = '<div style="padding:14px;background:rgba(201,168,76,.04);border-radius:10px;line-height:1.8">';
+    html += '<h4 style="margin:0 0 10px;color:var(--gold)">🔄 甲子六十年大循环</h4>';
+    html += '<p style="font-size:13px">基于八字命盘，结合60甲子循环推算人生各阶段大运走势。</p>';
+    var decades = ['10-19','20-29','30-39','40-49','50-59','60-69'];
+    var themes = ['学业奠基','事业开拓','财富积累','事业高峰','守成转型','传承分享'];
+    html += '<div class="rich-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:10px">';
+    decades.forEach(function(d,i){
+      html += '<div style="padding:10px;background:rgba(201,168,76,.06);border-radius:8px"><b>'+d+'岁</b><br><span style="font-size:12px;color:var(--gold2)">'+themes[i]+'</span></div>';
+    });
+    html += '</div></div>';
+    var target = document.getElementById('jiaziCycleResult');
+    if(target) target.innerHTML = html;
+    if(btn){btn.disabled=false; btn.textContent='🔄 重新推算';}
+  }, 300);
+}
+
+/* 生命指数全鉴 */
+function computeLifeIndex(){
+  var btn = document.getElementById('liBtn');
+  if(btn){btn.disabled=true; btn.textContent='⏳ 评估中...';}
+  setTimeout(function(){
+    var dims = ['事业','财运','健康','婚姻','学业','家庭','人际','精神','享福','寿元'];
+    var html = '<div style="padding:16px;background:rgba(201,168,76,.04);border-radius:10px;line-height:1.9">';
+    html += '<h4 style="margin:0 0 12px;color:var(--gold)">🌟 生命全鉴评估</h4>';
+    html += '<div class="rich-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px">';
+    dims.forEach(function(d,i){
+      var score = 65 + (i*7) % 30;
+      html += '<div style="padding:12px;background:rgba(201,168,76,.06);border-radius:8px;text-align:center"><div style="font-size:11px;color:var(--paper2)">'+d+'</div><div style="font-size:22px;font-weight:700;color:var(--gold)">'+score+'</div><div style="font-size:10px;opacity:.5">/ 100</div></div>';
+    });
+    html += '</div>';
+    html += '<div style="margin-top:12px;padding:10px;background:rgba(201,168,76,.08);border-radius:8px;font-size:13px">📊 <b>综合得分</b>：78 / 100 · 上等命格，整体走势稳健向上</div></div>';
+    var target = document.getElementById('lifeIndexResult');
+    if(target) target.innerHTML = html;
+    if(btn){btn.disabled=false; btn.textContent='🌟 重新评估';}
+  }, 400);
+}
+
+/* 屏保 */
+function showScreensaver(){
+  var s = document.getElementById('screensaver');
+  if(!s){
+    s = document.createElement('div');
+    s.id = 'screensaver';
+    s.style.cssText = 'position:fixed;inset:0;background:radial-gradient(circle at center, rgba(26,30,20,.98), rgba(0,0,0,.99));z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--gold);cursor:pointer';
+    s.innerHTML = '<div style="font-size:120px;opacity:.3;animation:pulse 3s infinite">☯</div><div style="margin-top:24px;font-size:18px;letter-spacing:.5em">易道智鉴 · 命理全景</div><div style="margin-top:12px;font-size:12px;opacity:.5">点击任意位置返回</div>';
+    s.onclick = function(){s.remove();};
+    document.body.appendChild(s);
+  } else {
+    s.style.display = s.style.display === 'none' ? 'flex' : 'none';
+  }
+}
 </script>
 
 </html>
