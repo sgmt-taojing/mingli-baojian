@@ -83,23 +83,25 @@ main + gh-pages 同步至 `f2d977e`
 
 ### 访问地址
 **GitHub Pages:**
-- 首页: https://sgmt-taojing.github.io/epb-assistant/
-- 登录页: https://sgmt-taojing.github.io/epb-assistant/app/login.html
-- 中医诊疗: https://sgmt-taojing.github.io/epb-assistant/app/tcm-clinic.html
-- 审计报告: https://sgmt-taojing.github.io/epb-assistant/docs/system-audit-and-architecture.html
+- 首页: https://sgmt-taojing.github.io/mingli-baojian/app/index.html
+- 登录页: https://sgmt-taojing.github.io/mingli-baojian/app/login.html
+- 中医诊疗: https://sgmt-taojing.github.io/mingli-baojian/app/tcm-clinic.html
+- 审计报告: https://sgmt-taojing.github.io/mingli-baojian/docs/system-audit-and-architecture.html
 
 **本地:**
-- 首页: http://127.0.0.1:8900/
-- 登录页: http://127.0.0.1:8900/app/login.html
-- 中医诊疗: http://127.0.0.1:8900/app/tcm-clinic.html
-- 主功能: http://127.0.0.1:8900/app/divination-hub.html
-- 审计报告: http://127.0.0.1:8900/docs/system-audit-and-architecture.html
-- 安全存储: http://127.0.0.1:8900/app/js/secure-storage.js
-- RBAC客户端: http://127.0.0.1:8900/app/js/rbac-client.js
+- 首页: http://127.0.0.1:8930/app/index.html
+- 登录页: http://127.0.0.1:8930/app/login.html
+- 中医诊疗: http://127.0.0.1:8930/app/tcm-clinic.html
+- 主功能: http://127.0.0.1:8930/app/divination-hub.html
+- 审计报告: http://127.0.0.1:8930/docs/system-audit-and-architecture.html
+- 安全存储: http://127.0.0.1:8930/app/js/secure-storage.js
+- RBAC客户端: http://127.0.0.1:8930/app/js/rbac-client.js
 - 后端API: http://127.0.0.1:8920/api/admin/stats
 
 ### 本地服务状态
-- 8900 (命理宝鉴Web): 运行中 ✅
-- 3004 (数造工坊): 运行中 ✅
+- 8930 (命理宝鉴Web): 运行中 ✅
 - 8911 (排盘API): 未启动
 - 8920 (后端API): 需要配置.env后启动
+
+> ⚠️ **修正说明（2026-07-21）**：原文将 GitHub Pages 地址误写为 `epb-assistant`（环保智慧执法平台），
+> 本地端口误写为 8900（实际 8900 = 环保平台，8930 = 命理宝鉴）。已全部修正。

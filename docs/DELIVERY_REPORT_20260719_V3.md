@@ -61,22 +61,25 @@
 ## 全量访问URL
 
 ### GitHub Pages
-- 🏠 https://sgmt-taojing.github.io/epb-assistant/
-- 🔐 https://sgmt-taojing.github.io/epb-assistant/app/login.html
-- 🏥 https://sgmt-taojing.github.io/epb-assistant/app/tcm-clinic.html
-- 🔮 https://sgmt-taojing.github.io/epb-assistant/app/divination-hub.html
-- 📊 https://sgmt-taojing.github.io/epb-assistant/docs/system-audit-and-architecture.html
-- 📋 https://sgmt-taojing.github.io/epb-assistant/docs/DEPLOY.md
+- 🏠 https://sgmt-taojing.github.io/mingli-baojian/app/index.html
+- 🔐 https://sgmt-taojing.github.io/mingli-baojian/app/login.html
+- 🏥 https://sgmt-taojing.github.io/mingli-baojian/app/tcm-clinic.html
+- 🔮 https://sgmt-taojing.github.io/mingli-baojian/app/divination-hub.html
+- 📊 https://sgmt-taojing.github.io/mingli-baojian/docs/system-audit-and-architecture.html
+- 📋 https://sgmt-taojing.github.io/mingli-baojian/docs/DEPLOY.md
 
 ### 本地
-- 🏠 http://127.0.0.1:8900/
-- 🔐 http://127.0.0.1:8900/app/login.html
-- 🏥 http://127.0.0.1:8900/app/tcm-clinic.html
-- 🔮 http://127.0.0.1:8900/app/divination-hub.html
-- 📊 http://127.0.0.1:8900/docs/system-audit-and-architecture.html
-- 📋 http://127.0.0.1:8900/docs/DEPLOY.md
-- 🛡️ http://127.0.0.1:8900/app/js/secure-storage.js
-- 🔑 http://127.0.0.1:8900/app/js/rbac-client.js
+- 🏠 http://127.0.0.1:8930/app/index.html
+- 🔐 http://127.0.0.1:8930/app/login.html
+- 🏥 http://127.0.0.1:8930/app/tcm-clinic.html
+- 🔮 http://127.0.0.1:8930/app/divination-hub.html
+- 📊 http://127.0.0.1:8930/docs/system-audit-and-architecture.html
+- 📋 http://127.0.0.1:8930/docs/DEPLOY.md
+- 🛡️ http://127.0.0.1:8930/app/js/secure-storage.js
+- 🔑 http://127.0.0.1:8930/app/js/rbac-client.js
+
+> ⚠️ **修正说明（2026-07-21）**：原文将 GitHub Pages 误写为 `epb-assistant`（环保智慧执法平台），
+> 本地端口误写为 8900（实际 8900 = 环保平台，8930 = 命理宝鉴）。已全部修正。
 - ⚙️ http://127.0.0.1:8920/api/shop/products
 
 ## 后续待办（需外部依赖）

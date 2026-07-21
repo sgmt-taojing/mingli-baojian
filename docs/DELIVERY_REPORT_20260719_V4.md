@@ -150,11 +150,14 @@
 - 📦 交付报告V3: https://sgmt-taojing.github.io/mingli-baojian/docs/DELIVERY_REPORT_20260719_V3.md
 
 ### 本地
-- 🏠 首页: http://127.0.0.1:8900/
-- 🔮 命理排盘: http://127.0.0.1:8900/app/divination-hub.html
-- 🔐 登录: http://127.0.0.1:8900/app/login.html
-- 🏥 中医诊疗: http://127.0.0.1:8900/app/tcm-clinic.html
-- 📋 部署指南: http://127.0.0.1:8900/docs/DEPLOY.md
+- 🏠 首页: http://127.0.0.1:8930/app/index.html
+- 🔮 命理排盘: http://127.0.0.1:8930/app/divination-hub.html
+- 🔐 登录: http://127.0.0.1:8930/app/login.html
+- 🏥 中医诊疗: http://127.0.0.1:8930/app/tcm-clinic.html
+- 📋 部署指南: http://127.0.0.1:8930/docs/DEPLOY.md
+
+> ⚠️ **修正说明（2026-07-21）**：本地端口原误写为 8900（实际为环保平台），
+> 正确端口为 8930（命理宝鉴静态服务）。GitHub Pages 地址此前已正确，无需修改。
 
 ---
 
