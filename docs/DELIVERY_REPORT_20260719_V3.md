@@ -1,5 +1,9 @@
 # 命理宝鉴 · 交付报告 v3 (2026-07-19)
 
+## 📌 修正说明（2026-07-21）
+
+> 本文档原始记录写于 7 月初，当时仓库名为 `epb-assistant`、静态服务端口为 `8900`。2026-07-13 已完成仓库重命名（`epb-assistant` → `mingli-baojian`）和端口迁移（`8900` → `8930`）。下方全量访问 URL 段已按当前正确值修正；Git 历史保留原记录可供追溯。
+
 ## 总览
 
 8次Git提交完成全部安全修复+架构优化+API对接+蒸馏引擎验证。
@@ -58,29 +62,29 @@
 | 大运乙丑 | (清除) |
 | 土旺克水 | 体质偏燥，需润燥养阴 |
 
-## 全量访问URL
+## ✅ 当前正确访问地址
 
 ### GitHub Pages
-- 🏠 https://sgmt-taojing.github.io/epb-assistant/
-- 🔐 https://sgmt-taojing.github.io/epb-assistant/app/login.html
-- 🏥 https://sgmt-taojing.github.io/epb-assistant/app/tcm-clinic.html
-- 🔮 https://sgmt-taojing.github.io/epb-assistant/app/divination-hub.html
-- 📊 https://sgmt-taojing.github.io/epb-assistant/docs/system-audit-and-architecture.html
-- 📋 https://sgmt-taojing.github.io/epb-assistant/docs/DEPLOY.md
+- 🏠 <https://sgmt-taojing.github.io/mingli-baojian/>
+- 🔐 <https://sgmt-taojing.github.io/mingli-baojian/app/login.html>
+- 🏥 <https://sgmt-taojing.github.io/mingli-baojian/app/tcm-clinic.html>
+- 🔮 <https://sgmt-taojing.github.io/mingli-baojian/app/divination-hub.html>
+- 📊 <https://sgmt-taojing.github.io/mingli-baojian/docs/system-audit-and-architecture.html>
+- 📋 <https://sgmt-taojing.github.io/mingli-baojian/docs/DEPLOY.md>
 
-### 本地
-- 🏠 http://127.0.0.1:8900/
-- 🔐 http://127.0.0.1:8900/app/login.html
-- 🏥 http://127.0.0.1:8900/app/tcm-clinic.html
-- 🔮 http://127.0.0.1:8900/app/divination-hub.html
-- 📊 http://127.0.0.1:8900/docs/system-audit-and-architecture.html
-- 📋 http://127.0.0.1:8900/docs/DEPLOY.md
-- 🛡️ http://127.0.0.1:8900/app/js/secure-storage.js
-- 🔑 http://127.0.0.1:8900/app/js/rbac-client.js
-- ⚙️ http://127.0.0.1:8920/api/shop/products
+### 本地（命理宝鉴 8930 端口）
+- 🏠 <http://127.0.0.1:8930/>
+- 🔐 <http://127.0.0.1:8930/app/login.html>
+- 🏥 <http://127.0.0.1:8930/app/tcm-clinic.html>
+- 🔮 <http://127.0.0.1:8930/app/divination-hub.html>
+- 📊 <http://127.0.0.1:8930/docs/system-audit-and-architecture.html>
+- 📋 <http://127.0.0.1:8930/docs/DEPLOY.md>
+- 🛡️ <http://127.0.0.1:8930/app/js/secure-storage.js>
+- 🔑 <http://127.0.0.1:8930/app/js/rbac-client.js>
+- ⚙️ <http://127.0.0.1:8920/api/shop/products>
 
 ## 后续待办（需外部依赖）
-1. 配置.env正式密钥并启动8920后端
+1. 配置.env正式密钥并启动 8920 后端
 2. HTTPS配置（Nginx SSL证书）
 3. KB文件迁移执行（server/migrate-kb.py）
 4. 病例数据迁移（server/migrate-cases.py）
