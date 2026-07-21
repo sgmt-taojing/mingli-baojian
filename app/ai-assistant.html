@@ -549,7 +549,7 @@ async function typing(){
   t.innerHTML='<div class="typing"><i></i><i></i><i></i></div>';
   chat.appendChild(t);chat.scrollTop=chat.scrollHeight;
   await new Promise(r=>setTimeout(r,600));
-  ty.remove();
+  try{ t.remove(); }catch(_){ /* 安全保护,避免 ReferenceError 中断 processAnswer */ }
 }
 
 async function generateReport(){
@@ -716,8 +716,8 @@ async function callAI(q){
     const r=await fetch(API+'/api/ai/public-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist.slice(-10)})});
     const d=await r.json();
     const reply=(d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||'抱歉，暂时无法回答。';
-    ty.remove();addAI(reply);
-  }catch(e){ty.remove();addAI(local(q));}
+    try{ t.remove(); }catch(_){} addAI(reply);
+  }catch(e){ try{ t.remove(); }catch(_){} addAI(local(q)); }
 }
 
 // === 本地降级报告生成 ===
