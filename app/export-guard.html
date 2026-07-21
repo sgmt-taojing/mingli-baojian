@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>数据安全导出 · 命理宝鉴</title>
+<link rel="stylesheet" href="css/common.css">
+<style>
+  body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#faf7f0;color:#3c2a1e;margin:0;padding:0}
+  .wrap{max-width:1100px;margin:24px auto;padding:0 16px}
+  h1{font-size:22px;color:#8b5a3c;border-bottom:2px solid #d4a574;padding-bottom:8px}
+  h2{font-size:16px;color:#6b4226;margin-top:24px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:16px 0}
+  .card{background:#fff;border:1px solid #e8d9c0;border-radius:8px;padding:14px;box-shadow:0 2px 4px rgba(139,90,60,.08)}
+  .card b{display:block;color:#8b5a3c;font-size:14px;margin-bottom:6px}
+  .card .v{font-size:20px;font-weight:600}
+  .card.warn{border-color:#c66}
+  table{width:100%;border-collapse:collapse;background:#fff;margin-top:12px;border-radius:8px;overflow:hidden;font-size:13px}
+  th{background:#8b5a3c;color:#fff;text-align:left;padding:10px 12px}
+  td{padding:8px 12px;border-bottom:1px solid #f0e6d2}
+  tr:hover td{background:#fff8ec}
+  button{background:#8b5a3c;color:#fff;border:0;border-radius:6px;padding:8px 16px;cursor:pointer;font-size:13px;margin:2px}
+  button:hover{background:#6b4226}
+  button.danger{background:#c66}
+  button.danger:hover{background:#a44}
+  button.secondary{background:#fff;color:#8b5a3c;border:1px solid #8b5a3c}
+  select,input,textarea{width:100%;padding:8px;border:1px solid #d4a574;border-radius:6px;font-size:13px;margin:4px 0;box-sizing:border-box}
+  textarea{min-height:60px;resize:vertical}
+  .pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;background:#e8d9c0;color:#6b4226;margin:2px}
+  .pill.lvl-3{background:#ffd5d5;color:#a33}
+  .pill.lvl-2{background:#ffe8c0;color:#a55}
+  .pill.lvl-1{background:#fff0c0;color:#885}
+  .pill.lvl-0{background:#e0e8e0;color:#585}
+  pre{background:#2d2520;color:#f0e0c8;padding:12px;border-radius:6px;overflow-x:auto;font-size:12px;line-height:1.5}
+  .toast{position:fixed;top:20px;right:20px;background:#8b5a3c;color:#fff;padding:10px 16px;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:9999;display:none}
+  .toast.err{background:#c33}
+  .toast.show{display:block;animation:slide .3s}
+  @keyframes slide{from{transform:translateX(120%)}to{transform:translateX(0)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🔒 数据安全导出 · 管理面板</h1>
+  <p style="color:#6b4226">所有导出操作均经 4 道防线：字段脱敏 / 角色鉴权 / 审计水印 / 加密归档。详细规范见 <a href="docs/DATA_SECURITY_STANDARD.md" target="_blank">DATA_SECURITY_STANDARD.md</a></p>
+
+  <div class="grid">
+    <div class="card"><b>我的角色</b><span class="v" id="roleBadge">未登录</span></div>
+    <div class="card"><b>可导出表数</b><span class="v" id="tblCnt">--</span></div>
+    <div class="card"><b>本月导出次数</b><span class="v" id="expCnt">--</span></div>
+    <div class="card warn"><b>本月解锁申请</b><span class="v" id="unlockCnt">--</span></div>
+  </div>
+
+  <h2>① 字段脱敏预览（输入示例数据看脱敏效果）</h2>
+  <div class="card">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        <label>原手机号：</label><input id="iptPhone" value="13800138000">
+        <label>原姓名：</label><input id="iptName" value="张三丰">
+        <label>身份证号：</label><input id="iptID" value="110101199003078888">
+        <label>地址：</label><input id="iptAddr" value="广东省深圳市南山区科苑路100号">
+        <label>病例正文：</label><textarea id="iptText">患者13800138000主诉失眠，邮箱 zhang@example.com，详见 110101199003078888。需健脾祛湿。</textarea>
+      </div>
+      <div>
+        <label>脱敏后手机号：</label><input id="outPhone" readonly>
+        <label>脱敏后姓名：</label><input id="outName" readonly>
+        <label>脱敏后身份证：</label><input id="outID" readonly>
+        <label>脱敏后地址：</label><input id="outAddr" readonly>
+        <label>脱敏后病例：</label><textarea id="outText" readonly></textarea>
+        <button onclick="previewMask()">🔍 立即脱敏预览</button>
+      </div>
+    </div>
+  </div>
+
+  <h2>② 导出 CSV / JSON</h2>
+  <div class="card">
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px">
+      <div>
+        <label>选择表：</label>
+        <select id="selTable">
+          <option value="users">users（缘主档案）</option>
+          <option value="merchants">merchants（商户）— 需 admin</option>
+          <option value="master_cases">master_cases（大师病例）— 需 master</option>
+          <option value="tcm_reports">tcm_reports（中医报告）— 需 master</option>
+          <option value="feedback">feedback（用户反馈）</option>
+          <option value="medical_cases">medical_cases（诊疗病例）— 需 master</option>
+        </select>
+      </div>
+      <div>
+        <label>格式：</label>
+        <select id="selFmt"><option value="csv">CSV</option><option value="json">JSON（含水印）</option></select>
+      </div>
+      <div>
+        <label>用途：</label>
+        <input id="iptPurpose" placeholder="月度统计 / 审计回溯 ...">
+      </div>
+    </div>
+    <button onclick="doExport('csv')">📥 导出 CSV</button>
+    <button onclick="doExport('json')" class="secondary">📥 导出 JSON</button>
+    <span id="expHint" style="margin-left:8px;font-size:12px;color:#888"></span>
+  </div>
+
+  <h2>③ 加密归档（仅 super_admin）</h2>
+  <div class="card" id="archivePanel">
+    <p style="color:#a33">⚠ 仅 super_admin 可见。明文数据将 AES-256-GCM 加密，存入安全介质。</p>
+    <div style="display:grid;grid-template-columns:1fr 2fr;gap:12px">
+      <div>
+        <label>表 + ID：</label>
+        <select id="archTable"><option value="master_cases">master_cases</option><option value="tcm_reports">tcm_reports</option></select>
+        <label>ID 列表（逗号分隔）：</label><input id="archIds" value="1,2,3">
+        <label>归档原因（必填）：</label><input id="archReason" placeholder="法律合规归档">
+      </div>
+      <div>
+        <label>加密结果：</label>
+        <textarea id="archResult" readonly style="min-height:140px"></textarea>
+        <button onclick="doArchive()" class="danger">🔐 加密归档</button>
+        <button onclick="doDecrypt()" class="secondary">🔓 解密回看</button>
+      </div>
+    </div>
+  </div>
+
+  <h2>④ 审计日志（最近 50 条）</h2>
+  <div class="card">
+    <button onclick="loadAudit()">🔄 刷新日志</button>
+    <table id="auditTbl">
+      <thead><tr><th>时间</th><th>用户ID</th><th>动作</th><th>表/目标</th><th>行数</th><th>IP</th><th>用途</th></tr></thead>
+      <tbody id="auditBody"><tr><td colspan="7" style="text-align:center;color:#888">点击刷新加载</td></tr></tbody>
+    </table>
+  </div>
+
+  <h2>⑤ 解锁令牌申请</h2>
+  <div class="card">
+    <p>高级字段临时解锁需说明原因，审计留痕</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">
+      <input id="unlockTbl" placeholder="表名">
+      <input id="unlockIds" placeholder="目标 ID">
+      <input id="unlockTTL" placeholder="TTL (小时)" value="1">
+      <input id="unlockReason" placeholder="原因">
+    </div>
+    <button onclick="applyUnlock()">🎫 申请解锁令牌</button>
+    <pre id="unlockResult" style="margin-top:8px"></pre>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = location.hostname === 'localhost' || location.hostname === '127.0.0.1'
+  ? 'http://127.0.0.1:8920' : '';
+const TOKEN = localStorage.getItem('mlbj_token') || '';
+
+function toast(msg, type){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+(type||'');setTimeout(()=>t.className='toast',2400)}
+function authH(){return TOKEN ? {'Authorization':'Bearer '+TOKEN,'Content-Type':'application/json'} : {'Content-Type':'application/json'}}
+
+async function api(path, opts){
+  const r = await fetch(API+path, Object.assign({headers:authH()}, opts||{}));
+  if(r.status===401){toast('未登录','err');return null}
+  if(r.status===403){toast('权限不足','err');return null}
+  const ct = r.headers.get('content-type')||'';
+  if(ct.includes('json')) return await r.json();
+  return await r.text();
+}
+
+// ① 脱敏预览（前端内置镜像）
+function previewMask(){
+  const m = (s,n=3,k=4)=>!s?s:s.length<n+k?s.substring(0,n)+'****':s.substring(0,n)+'****'+s.substring(s.length-k);
+  const maskName = s=>!s?s:s.length<=1?s:s.length===2?s[0]+'*':s[0]+'*'.repeat(s.length-2)+s[s.length-1];
+  const maskID = s=>!s?s:s.length<8?'****':s.substring(0,4)+'*'.repeat(s.length-8)+s.substring(s.length-4);
+  document.getElementById('outPhone').value = m(document.getElementById('iptPhone').value);
+  document.getElementById('outName').value = maskName(document.getElementById('iptName').value);
+  document.getElementById('outID').value = maskID(document.getElementById('iptID').value);
+  document.getElementById('outAddr').value = (document.getElementById('iptAddr').value||'').substring(0,2)+'****';
+  let t = document.getElementById('iptText').value;
+  t = t.replace(/1[3-9]\d{9}/g, x=>x.substring(0,3)+'****'+x.substring(7));
+  t = t.replace(/\d{17}[\dXx]/g, x=>x.substring(0,4)+'***********'+x.substring(15));
+  t = t.replace(/[\w.-]+@[\w.-]+/g, x=>x.split('@')[0].substring(0,1)+'***@'+x.split('@')[1]);
+  document.getElementById('outText').value = t;
+  toast('已脱敏');
+}
+
+// ② 导出
+async function doExport(fmt){
+  const table = document.getElementById('selTable').value;
+  const purpose = document.getElementById('iptPurpose').value || '未说明';
+  const r = await fetch(API+'/api/export/'+fmt, {method:'POST',headers:authH(),body:JSON.stringify({table,purpose})});
+  if(r.status===401){toast('请先登录','err');return}
+  if(r.status===403){toast('权限不足: '+table,'err');return}
+  if(!r.ok){const e=await r.json();toast(e.error||'导出失败','err');return}
+  const blob = await r.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const cd = r.headers.get('content-disposition')||'';
+  const m = cd.match(/filename="([^"]+)"/);
+  a.href = url; a.download = m ? m[1] : `${table}-${Date.now()}.${fmt}`;
+  a.click(); URL.revokeObjectURL(url);
+  toast('已导出（含水印 + 审计）');
+}
+
+// ③ 加密归档
+async function doArchive(){
+  const table = document.getElementById('archTable').value;
+  const ids = (document.getElementById('archIds').value||'').split(',').map(x=>parseInt(x.trim())).filter(Boolean);
+  const reason = document.getElementById('archReason').value;
+  if(!reason){toast('必须填写归档原因','err');return}
+  const r = await api('/api/export/archive',{method:'POST',body:JSON.stringify({table,ids,reason})});
+  if(!r) return;
+  if(r.success){
+    document.getElementById('archResult').value = JSON.stringify(r,null,2);
+    toast('归档成功（密文已生成）');
+  } else toast(r.error||'失败','err');
+}
+async function doDecrypt(){
+  let payload;
+  try { payload = JSON.parse(document.getElementById('archResult').value).encrypted_payload; }
+  catch(e){ toast('请先加密归档','err'); return; }
+  const r = await api('/api/export/decrypt',{method:'POST',body:JSON.stringify({encrypted_payload:payload,reason:'审计回溯'})});
+  if(!r) return;
+  document.getElementById('archResult').value = JSON.stringify(r,null,2);
+  toast('已解密（明文仅 super_admin 可见，已审计）');
+}
+
+// ④ 审计日志
+async function loadAudit(){
+  const r = await api('/api/export/audit-log?limit=50');
+  if(!r||!r.log){document.getElementById('auditBody').innerHTML='<tr><td colspan="7" style="text-align:center;color:#888">仅 super_admin 可查看</td></tr>';return}
+  const html = r.log.map(row=>{
+    const d = row.detail || {};
+    return `<tr><td>${row.created_at||''}</td><td>${row.user_id||0}</td><td><span class="pill">${row.action||''}</span></td><td>${d.target_table||'-'}</td><td>${d.rows_count||d.original_count||'-'}</td><td style="font-size:11px;color:#888">${d.ip||'-'}</td><td style="font-size:11px">${d.purpose||d.reason||'-'}</td></tr>`;
+  }).join('');
+  document.getElementById('auditBody').innerHTML = html || '<tr><td colspan="7" style="text-align:center;color:#888">暂无记录</td></tr>';
+  toast('已加载 '+r.count+' 条');
+}
+
+// ⑤ 解锁令牌
+async function applyUnlock(){
+  const body = {
+    table: document.getElementById('unlockTbl').value,
+    target_ids: (document.getElementById('unlockIds').value||'').split(',').map(x=>parseInt(x.trim())).filter(Boolean),
+    ttl_hours: parseInt(document.getElementById('unlockTTL').value)||1,
+    reason: document.getElementById('unlockReason').value
+  };
+  const r = await api('/api/export/unlock',{method:'POST',body:JSON.stringify(body)});
+  if(!r) return;
+  document.getElementById('unlockResult').textContent = JSON.stringify(r,null,2);
+  toast('已生成令牌（审计已留痕）');
+}
+
+// 初始化
+window.addEventListener('DOMContentLoaded', ()=>{
+  if(!TOKEN){toast('未登录：请先到 AI 助手 / 用户中心 登录','err');document.getElementById('roleBadge').textContent='未登录'}
+  else{try{const p=JSON.parse(atob(TOKEN.split('.')[1]));document.getElementById('roleBadge').textContent=(p.roles||['free']).join(', ')}catch(e){document.getElementById('roleBadge').textContent='token 解析失败'}}
+  previewMask();
+});
+</script>
+</body>
+</html>
