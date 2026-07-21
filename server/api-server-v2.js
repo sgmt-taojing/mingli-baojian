@@ -12,6 +12,8 @@ const caseQuality = require('./case-quality.js');
 const { KB_LEVELS } = require('./kb-config.js');
 const crypto = require('crypto');
 
+const kbRoutes = require('./kb-routes.js');
+
 const app = express();
 const PORT = parseInt(process.env.API_PORT || '8920');
 
@@ -1690,6 +1692,9 @@ app.get('/api/face/health', async (req, res) => {
     res.json({ ok: false, error: 'face_ocr_unreachable', detail: e.message, base: FACE_OCR_BASE });
   }
 });
+
+// === KB 管理路由 ===
+app.use('/api/kb', kbRoutes);
 
 // === 启动服务 ===
 app.listen(PORT, () => {
