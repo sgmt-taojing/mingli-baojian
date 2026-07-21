@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>命理宝鉴 · 智能眼镜控制台 (HUD)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --hud-bg: rgba(8, 12, 18, 0.72);
+    --hud-card: rgba(16, 22, 32, 0.85);
+    --hud-border: rgba(120, 200, 240, 0.35);
+    --hud-primary: #78c8f0;
+    --hud-accent: #f0c878;
+    --hud-success: #6ad47a;
+    --hud-warn: #f0a050;
+    --hud-danger: #f06060;
+    --hud-text: #e8eef4;
+    --hud-muted: rgba(232, 238, 244, 0.55);
+    --hud-pad: 10px 14px;
+  }
+  html, body {
+    width: 100%; height: 100%;
+    background: #000;
+    color: var(--hud-text);
+    font-family: "PingFang SC", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, sans-serif;
+    overflow: hidden;
+    user-select: none;
+  }
+  /* HUD 模拟显示器（类似眼镜投影效果） */
+  .hud-stage {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at center,
+        rgba(8, 22, 38, 0.85) 0%,
+        rgba(0, 0, 0, 0.95) 70%);
+    overflow: hidden;
+  }
+  /* 顶部状态栏 */
+  .hud-top {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    padding: var(--hud-pad);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--hud-bg);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--hud-border);
+    font-size: 13px;
+    z-index: 10;
+  }
+  .hud-top .brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--hud-primary);
+    font-weight: 600;
+  }
+  .hud-top .brand::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--hud-success);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--hud-success);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  .hud-top .stats {
+    display: flex;
+    gap: 14px;
+    color: var(--hud-muted);
+    font-size: 12px;
+  }
+  .hud-top .stats span strong {
+    color: var(--hud-accent);
+    margin-left: 4px;
+    font-weight: 600;
+  }
+
+  /* 中央主视图 */
+  .hud-main {
+    position: absolute;
+    top: 48px;
+    left: 0; right: 0; bottom: 0;
+    overflow-y: auto;
+    padding: 14px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* 模式选择卡片 */
+  .mode-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .mode-card {
+    background: var(--hud-card);
+    border: 1px solid var(--hud-border);
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .mode-card.active {
+    border-color: var(--hud-primary);
+    box-shadow: 0 0 16px rgba(120, 200, 240, 0.4);
+  }
+  .mode-card .icon {
+    font-size: 24px;
+    margin-bottom: 6px;
+  }
+  .mode-card .name {
+    font-size: 13px;
+    color: var(--hud-text);
+    font-weight: 600;
+  }
+
+  /* 摄像头预览 */
+  .camera-preview {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px dashed var(--hud-border);
+    border-radius: 12px;
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .camera-preview video {
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .camera-preview .placeholder {
+    text-align: center;
+    color: var(--hud-muted);
+    font-size: 13px;
+  }
+  .camera-preview .placeholder .icon-big {
+    font-size: 48px;
+    margin-bottom: 8px;
+    opacity: 0.4;
+  }
+  .camera-preview .reticle {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    border: 2px solid var(--hud-accent);
+    border-radius: 50%;
+    pointer-events: none;
+    display: none;
+  }
+  .camera-preview.capturing .reticle {
+    display: block;
+    animation: reticle-pulse 1.2s infinite;
+  }
+  @keyframes reticle-pulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    50% { transform: translate(-50%, -50%) scale(1.15); opacity: 0.5; }
+  }
+
+  /* OCR 结果面板 */
+  .ocr-result {
+    background: var(--hud-card);
+    border: 1px solid var(--hud-border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    display: none;
+  }
+  .ocr-result.show { display: block; }
+  .ocr-result .ocr-title {
+    color: var(--hud-accent);
+    font-size: 12px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .ocr-result .ocr-title::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--hud-accent);
+    border-radius: 50%;
+  }
+  .ocr-result .ocr-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--hud-text);
+  }
+  .ocr-result .ocr-confidence {
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--hud-muted);
+  }
+
+  /* 命盘/中医双面板 */
+  .duo-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .duo-card {
+    background: var(--hud-card);
+    border: 1px solid var(--hud-border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+  .duo-card .duo-title {
+    font-size: 12px;
+    color: var(--hud-primary);
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+  .duo-card .duo-value {
+    font-size: 14px;
+    color: var(--hud-text);
+    font-weight: 600;
+  }
+  .duo-card .duo-meta {
+    margin-top: 4px;
+    color: var(--hud-muted);
+    font-size: 11px;
+  }
+
+  /* 操作按钮 */
+  .action-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0; right: 0;
+    padding: 12px 14px;
+    background: var(--hud-bg);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--hud-border);
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+  }
+  .hud-btn {
+    flex: 1;
+    padding: 12px 0;
+    border: 1px solid var(--hud-border);
+    background: var(--hud-card);
+    color: var(--hud-text);
+    border-radius: 10px;
+    font-size: 13px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+  }
+  .hud-btn:active { transform: scale(0.96); }
+  .hud-btn.primary {
+    background: var(--hud-primary);
+    color: #000;
+    border-color: var(--hud-primary);
+    font-weight: 600;
+  }
+  .hud-btn.danger {
+    border-color: var(--hud-danger);
+    color: var(--hud-danger);
+  }
+
+  /* TTS 播放状态 */
+  .tts-indicator {
+    position: absolute;
+    top: 56px;
+    right: 14px;
+    background: var(--hud-card);
+    border: 1px solid var(--hud-border);
+    border-radius: 20px;
+    padding: 4px 10px 4px 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--hud-primary);
+    display: none;
+  }
+  .tts-indicator.show { display: flex; }
+  .tts-indicator::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--hud-primary);
+    border-radius: 50%;
+    animation: pulse 1s infinite;
+  }
+
+  /* 历史记录 */
+  .history-list {
+    margin-bottom: 14px;
+  }
+  .history-item {
+    background: var(--hud-card);
+    border-left: 3px solid var(--hud-primary);
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    font-size: 12px;
+  }
+  .history-item .h-time {
+    color: var(--hud-muted);
+    font-size: 10px;
+  }
+  .history-item .h-content {
+    color: var(--hud-text);
+    margin-top: 2px;
+  }
+
+  /* 错误提示 */
+  .toast {
+    position: fixed;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--hud-danger);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    z-index: 100;
+    display: none;
+  }
+  .toast.show { display: block; animation: fadein 0.2s; }
+  @keyframes fadein {
+    from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="hud-stage">
+  <!-- 顶部状态栏 -->
+  <div class="hud-top">
+    <div class="brand">
+      <span>🥽 命理宝鉴 HUD</span>
+    </div>
+    <div class="stats">
+      <span>电量 <strong id="battery">87%</strong></span>
+      <span>网络 <strong id="network">5G</strong></span>
+      <span id="device-id" style="color: var(--hud-muted);">GL-...</span>
+    </div>
+  </div>
+
+  <!-- TTS 播放指示器 -->
+  <div class="tts-indicator" id="tts-indicator">语音播报中</div>
+
+  <!-- 错误 toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- 中央主视图 -->
+  <div class="hud-main">
+
+    <!-- 模式选择 -->
+    <div class="mode-grid">
+      <div class="mode-card active" data-mode="paipan">
+        <div class="icon">☯</div>
+        <div class="name">排盘</div>
+      </div>
+      <div class="mode-card" data-mode="tcm">
+        <div class="icon">🌿</div>
+        <div class="name">中医</div>
+      </div>
+      <div class="mode-card" data-mode="face">
+        <div class="icon">👁</div>
+        <div class="name">面相</div>
+      </div>
+    </div>
+
+    <!-- 摄像头预览 -->
+    <div class="camera-preview" id="camera-preview">
+      <div class="placeholder">
+        <div class="icon-big">📷</div>
+        <div>点击"拍照分析"启动摄像头</div>
+      </div>
+      <div class="reticle"></div>
+    </div>
+
+    <!-- OCR 识别结果 -->
+    <div class="ocr-result" id="ocr-result">
+      <div class="ocr-title">OCR 识别结果</div>
+      <div class="ocr-text" id="ocr-text">等待识别...</div>
+      <div class="ocr-confidence" id="ocr-confidence">置信度: --</div>
+    </div>
+
+    <!-- 命盘 + 中医 双面板 -->
+    <div class="duo-panel">
+      <div class="duo-card">
+        <div class="duo-title">今日运势</div>
+        <div class="duo-value" id="fortune-value">--</div>
+        <div class="duo-meta" id="fortune-meta">点击刷新</div>
+      </div>
+      <div class="duo-card">
+        <div class="duo-title">健康提示</div>
+        <div class="duo-value" id="health-value">--</div>
+        <div class="duo-meta" id="health-meta">点击刷新</div>
+      </div>
+    </div>
+
+    <!-- 历史记录 -->
+    <div class="history-list" id="history-list"></div>
+
+  </div>
+
+  <!-- 底部操作栏 -->
+  <div class="action-bar">
+    <div class="hud-btn" id="btn-history">📜 历史</div>
+    <div class="hud-btn primary" id="btn-capture">📸 拍照分析</div>
+    <div class="hud-btn danger" id="btn-stop">⏹ 停止</div>
+  </div>
+</div>
+
+<script>
+const API_BASE = location.origin.includes(':8920') ? '' : 'http://localhost:8920';
+const DEVICE_TOKEN = localStorage.getItem('glass-device-token') || generateDeviceToken();
+
+function generateDeviceToken() {
+  const t = 'GL-' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+  localStorage.setItem('glass-device-token', t);
+  return t;
+}
+
+document.getElementById('device-id').textContent = DEVICE_TOKEN.slice(0, 12);
+
+let currentMode = 'paipan';
+let mediaStream = null;
+let history = [];
+
+// 模式选择
+document.querySelectorAll('.mode-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    currentMode = card.dataset.mode;
+    showToast(`已切换到${card.querySelector('.name').textContent}模式`);
+  });
+});
+
+// 拍照分析
+document.getElementById('btn-capture').addEventListener('click', async () => {
+  const preview = document.getElementById('camera-preview');
+  if (!mediaStream) {
+    try {
+      mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: 1280, height: 720 }
+      });
+      const video = document.createElement('video');
+      video.autoplay = true;
+      video.muted = true;
+      video.srcObject = mediaStream;
+      preview.innerHTML = '';
+      preview.appendChild(video);
+      const reticle = document.createElement('div');
+      reticle.className = 'reticle';
+      preview.appendChild(reticle);
+    } catch (e) {
+      showToast('摄像头启动失败: ' + e.message);
+      return;
+    }
+  }
+  preview.classList.add('capturing');
+
+  // 截取当前帧
+  const video = preview.querySelector('video');
+  if (!video) return;
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  const imageData = canvas.toDataURL('image/jpeg', 0.7);
+
+  // 上传 OCR
+  try {
+    const resp = await fetch(`${API_BASE}/api/v1/glass/ocr`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Device-Token': DEVICE_TOKEN,
+        'X-Stream-Mode': 'json'
+      },
+      body: JSON.stringify({
+        image: imageData,
+        mode: currentMode,
+        timestamp: Date.now()
+      })
+    });
+    const json = await resp.json();
+    if (json.code === 0) {
+      const data = json.data || {};
+      const ocrEl = document.getElementById('ocr-result');
+      document.getElementById('ocr-text').textContent = data.text || '(无文字)';
+      document.getElementById('ocr-confidence').textContent = `置信度: ${(data.confidence || 0).toFixed(2)}`;
+      ocrEl.classList.add('show');
+      addHistory('OCR', data.text);
+      // TTS 播报
+      if (data.text) speakText(data.text.slice(0, 60));
+    } else {
+      showToast('识别失败: ' + json.message);
+    }
+  } catch (e) {
+    showToast('网络错误: ' + e.message);
+  } finally {
+    setTimeout(() => preview.classList.remove('capturing'), 1200);
+  }
+});
+
+// 停止
+document.getElementById('btn-stop').addEventListener('click', () => {
+  if (mediaStream) {
+    mediaStream.getTracks().forEach(t => t.stop());
+    mediaStream = null;
+    const preview = document.getElementById('camera-preview');
+    preview.innerHTML = '<div class="placeholder"><div class="icon-big">📷</div><div>点击"拍照分析"启动摄像头</div></div>';
+  }
+  window.speechSynthesis?.cancel();
+  document.getElementById('tts-indicator').classList.remove('show');
+  showToast('已停止');
+});
+
+// 历史记录
+document.getElementById('btn-history').addEventListener('click', () => {
+  const list = document.getElementById('history-list');
+  list.scrollIntoView({ behavior: 'smooth' });
+});
+
+function addHistory(type, content) {
+  history.unshift({
+    type, content,
+    time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+  });
+  if (history.length > 5) history = history.slice(0, 5);
+  const list = document.getElementById('history-list');
+  list.innerHTML = history.map(h => `
+    <div class="history-item">
+      <div class="h-time">${h.time} · ${h.type}</div>
+      <div class="h-content">${(h.content || '').slice(0, 80)}</div>
+    </div>
+  `).join('');
+}
+
+// TTS 播放
+function speakText(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'zh-CN';
+  utter.rate = 1.1;
+  utter.onstart = () => document.getElementById('tts-indicator').classList.add('show');
+  utter.onend = () => document.getElementById('tts-indicator').classList.remove('show');
+  window.speechSynthesis.speak(utter);
+}
+
+// Toast
+let toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+// 启动加载运势 + 健康
+async function loadDaily() {
+  try {
+    const [fortune, health] = await Promise.all([
+      fetch(`${API_BASE}/api/v1/glass/fortune-today`, {
+        headers: { 'X-Device-Token': DEVICE_TOKEN }
+      }).then(r => r.json()),
+      fetch(`${API_BASE}/api/v1/glass/health-tips`, {
+        headers: { 'X-Device-Token': DEVICE_TOKEN }
+      }).then(r => r.json())
+    ]);
+    if (fortune.code === 0) {
+      document.getElementById('fortune-value').textContent = fortune.data?.summary || '宜静待';
+      document.getElementById('fortune-meta').textContent = fortune.data?.detail || '点击刷新获取详情';
+    }
+    if (health.code === 0) {
+      document.getElementById('health-value').textContent = health.data?.tip || '注意作息';
+      document.getElementById('health-meta').textContent = health.data?.detail || '点击刷新获取详情';
+    }
+  } catch (e) {
+    document.getElementById('fortune-value').textContent = '离线';
+    document.getElementById('health-meta').textContent = '网络异常';
+  }
+}
+loadDaily();
+
+// 心跳上报（每 30 秒）
+setInterval(async () => {
+  try {
+    await fetch(`${API_BASE}/api/v1/glass/heartbeat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Device-Token': DEVICE_TOKEN },
+      body: JSON.stringify({ battery: 87, network: '5G', timestamp: Date.now() })
+    });
+  } catch {}
+}, 30000);
+</script>
+
+</body>
+</html>

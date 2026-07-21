@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>命理宝鉴 · 整体架构优化方案 v1.0</title>
+<style>
+  :root {
+    --primary: #b8945f;
+    --primary-dark: #8c6e44;
+    --accent: #c9a961;
+    --bg: #faf7f2;
+    --bg-card: #ffffff;
+    --text: #2c2417;
+    --text-muted: #6b5e4d;
+    --border: #e5dcc8;
+    --success: #4caf7e;
+    --warning: #e09c4a;
+    --danger: #c75050;
+    --info: #5a8fb0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 32px 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .header {
+    text-align: center;
+    padding: 32px 0 24px;
+    border-bottom: 2px solid var(--primary);
+    margin-bottom: 32px;
+  }
+  .header h1 {
+    font-size: 32px;
+    color: var(--primary-dark);
+    margin-bottom: 8px;
+  }
+  .header .meta {
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+  .header .badge-row {
+    margin-top: 16px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .badge {
+    background: var(--primary);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+  }
+  .badge.green { background: var(--success); }
+  .badge.blue { background: var(--info); }
+  .badge.amber { background: var(--warning); }
+
+  h2 {
+    color: var(--primary-dark);
+    font-size: 22px;
+    margin: 40px 0 16px;
+    padding-left: 16px;
+    border-left: 4px solid var(--primary);
+  }
+  h3 {
+    color: var(--primary-dark);
+    font-size: 17px;
+    margin: 24px 0 12px;
+  }
+
+  /* metric cards */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .metric-card {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 6px rgba(140, 110, 68, 0.05);
+  }
+  .metric-card .value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 4px;
+  }
+  .metric-card .label {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .metric-card.green .value { color: var(--success); }
+  .metric-card.amber .value { color: var(--warning); }
+  .metric-card.red .value { color: var(--danger); }
+
+  /* architecture diagram */
+  .arch-diagram {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid var(--border);
+    margin: 24px 0;
+    overflow-x: auto;
+  }
+  .arch-layer {
+    margin: 8px 0;
+  }
+  .arch-row {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+  .arch-box {
+    flex: 1;
+    min-width: 110px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    font-size: 13px;
+  }
+  .arch-box.endpoint {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+  .arch-box.gateway {
+    background: var(--accent);
+    color: var(--text);
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+  .arch-box.middleware {
+    background: #f0e9d6;
+  }
+  .arch-box.data {
+    background: #e6f0e8;
+  }
+  .arch-arrow {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 18px;
+    margin: 2px 0;
+  }
+
+  /* table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    background: var(--bg-card);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  thead {
+    background: var(--primary);
+    color: white;
+  }
+  th, td {
+    padding: 12px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  th {
+    font-weight: 600;
+  }
+  tbody tr:hover {
+    background: #fdfaf2;
+  }
+  .pill {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .pill-ok { background: #e8f5ed; color: var(--success); }
+  .pill-warn { background: #fcf2e0; color: var(--warning); }
+  .pill-err { background: #f9e3e3; color: var(--danger); }
+
+  /* timeline */
+  .timeline {
+    margin: 24px 0;
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid var(--border);
+  }
+  .timeline-item {
+    display: flex;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px dashed var(--border);
+  }
+  .timeline-item:last-child {
+    border-bottom: none;
+  }
+  .timeline-num {
+    flex: 0 0 40px;
+    height: 40px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+  }
+  .timeline-content {
+    flex: 1;
+  }
+  .timeline-content h4 {
+    color: var(--primary-dark);
+    margin-bottom: 4px;
+    font-size: 16px;
+  }
+  .timeline-content p {
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+  .timeline-tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    margin-right: 8px;
+  }
+  .timeline-tag.p0 { background: #f9e3e3; color: var(--danger); }
+  .timeline-tag.p1 { background: #fcf2e0; color: var(--warning); }
+  .timeline-tag.p2 { background: #e8f0f5; color: var(--info); }
+
+  /* module grid */
+  .modules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin: 16px 0;
+  }
+  .module-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+  }
+  .module-card h4 {
+    color: var(--primary-dark);
+    font-size: 16px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .module-card .icon {
+    width: 28px;
+    height: 28px;
+    background: var(--primary);
+    color: white;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+  .module-card ul {
+    margin: 8px 0;
+    padding-left: 20px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .module-card li {
+    margin: 4px 0;
+  }
+
+  /* kpi grid */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .kpi {
+    background: var(--bg-card);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .kpi-now, .kpi-target {
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .kpi-now { color: var(--text-muted); text-decoration: line-through; }
+  .kpi-target { color: var(--success); }
+  .kpi-arrow {
+    font-size: 14px;
+    color: var(--primary);
+    margin: 4px 0;
+  }
+  .kpi-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* code block */
+  pre {
+    background: #2c2417;
+    color: #f0e9d6;
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+    font-size: 13px;
+    margin: 12px 0;
+    line-height: 1.5;
+  }
+  code {
+    font-family: "SF Mono", Consolas, Monaco, monospace;
+  }
+
+  .footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>命理宝鉴 · 整体架构优化方案</h1>
+  <div class="meta">2026-07-21 v1.0 · 按规范标准进行诊断 + 设计 + 开发 + 测试</div>
+  <div class="badge-row">
+    <span class="badge">后台管理</span>
+    <span class="badge">后台服务</span>
+    <span class="badge green">性能监控</span>
+    <span class="badge blue">角色权限</span>
+    <span class="badge">多端协同</span>
+    <span class="badge amber">站内沟通</span>
+    <span class="badge">流程规范</span>
+  </div>
+</div>
+
+<h2>一、整体规模（现状摸底）</h2>
+
+<div class="metrics-grid">
+  <div class="metric-card">
+    <div class="value">1710</div>
+    <div class="label">API server 入口行数</div>
+  </div>
+  <div class="metric-card">
+    <div class="value">56+</div>
+    <div class="label">现有 admin 路由</div>
+  </div>
+  <div class="metric-card amber">
+    <div class="value">10</div>
+    <div class="label">RBAC 角色</div>
+  </div>
+  <div class="metric-card red">
+    <div class="value">0</div>
+    <div class="label">性能监控点</div>
+  </div>
+  <div class="metric-card red">
+    <div class="value">0</div>
+    <div class="label">站内沟通能力</div>
+  </div>
+  <div class="metric-card green">
+    <div class="value">26/26</div>
+    <div class="label">9 大流程测试通过</div>
+  </div>
+</div>
+
+<h2>二、整体架构图</h2>
+
+<div class="arch-diagram">
+  <div class="arch-layer">
+    <div class="arch-row">
+      <div class="arch-box endpoint">H5 端</div>
+      <div class="arch-box endpoint">小程序</div>
+      <div class="arch-box endpoint">后台</div>
+      <div class="arch-box endpoint">Admin</div>
+      <div class="arch-box endpoint">Monitor</div>
+      <div class="arch-box endpoint">IM</div>
+      <div class="arch-box endpoint">SDK</div>
+    </div>
+  </div>
+  <div class="arch-arrow">↓</div>
+  <div class="arch-layer">
+    <div class="arch-row">
+      <div class="arch-box gateway">API Gateway (Express + RBAC)</div>
+    </div>
+    <div class="arch-row" style="margin-top: 8px;">
+      <div class="arch-box middleware">/api/v1/yuanzhus</div>
+      <div class="arch-box middleware">/api/v1/admin/...</div>
+      <div class="arch-box middleware">/api/v1/monitor/...</div>
+      <div class="arch-box middleware">/api/v1/messages/...</div>
+    </div>
+    <div style="text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 8px;">旧路径兼容 6 个月 · Deprecation 响应头</div>
+  </div>
+  <div class="arch-arrow">↓</div>
+  <div class="arch-layer">
+    <div class="arch-row">
+      <div class="arch-box">鉴权</div>
+      <div class="arch-box">RBAC</div>
+      <div class="arch-box">监控埋点</div>
+      <div class="arch-box">消息总线</div>
+      <div class="arch-box">限流</div>
+    </div>
+  </div>
+  <div class="arch-arrow">↓</div>
+  <div class="arch-layer">
+    <div class="arch-row">
+      <div class="arch-box">排盘 8 引擎</div>
+      <div class="arch-box">KB 管理</div>
+      <div class="arch-box">数据安全</div>
+      <div class="arch-box">推送</div>
+    </div>
+  </div>
+  <div class="arch-arrow">↓</div>
+  <div class="arch-layer">
+    <div class="arch-row">
+      <div class="arch-box data">SQLite · yidao.db · 31 表（yuanzhu/clinic/kb/admin/message/monitor）</div>
+    </div>
+  </div>
+</div>
+
+<h2>三、八大子系统 · 改造要点</h2>
+
+<div class="modules-grid">
+  <div class="module-card">
+    <h4><span class="icon">①</span>后台管理</h4>
+    <p style="font-size: 13px; color: var(--text-muted);">admin.html 104KB 单体 → 拆 7 模块</p>
+    <ul>
+      <li>仪表盘 / 缘主 / 排盘审计</li>
+      <li>KB 管理 / 数据导出</li>
+      <li>推送管理 / 系统审计</li>
+    </ul>
+  </div>
+  <div class="module-card">
+    <h4><span class="icon">②</span>后台服务</h4>
+    <p style="font-size: 13px; color: var(--text-muted);">routes 拆分 + middleware 抽取</p>
+    <ul>
+      <li>api-server-v2.js 1710 → 600 行</li>
+      <li>12 个 routes/*.js 分包</li>
+      <li>4 个 middleware/*.js 复用</li>
+    </ul>
+  </div>
+  <div class="module-card">
+    <h4><span class="icon">③</span>性能监控</h4>
+    <p style="font-size: 13px; color: var(--text-muted);">5 类 25 指标 + 5 告警</p>
+    <ul>
+      <li>HTTP / 引擎 / DB / KB / AI</li>
+      <li>monitor.* 5 端点</li>
+      <li>钉钉 + 邮件告警</li>
+    </ul>
+  </div>
+  <div class="module-card">
+    <h4><span class="icon">④</span>RBAC 权限</h4>
+    <p style="font-size: 13px; color: var(--text-muted);">10 → 12 角色 + 行级隔离</p>
+    <ul>
+      <li>doctor_assistant / merchant 新增</li>
+      <li>三端 token 统一</li>
+      <li>每操作 audit_log</li>
+    </ul>
+  </div>
+  <div class="module-card">
+    <h4><span class="icon">⑤</span>多端协同</h4>
+    <p style="font-size: 13px; color: var(--text-muted);">H5/小程序/IM 三端一致</p>
+    <ul>
+      <li>DTO 数据契约层</li>
+      <li>统一 user_id 共享档案</li>
+      <li>platform header 差异化</li>
+    </ul>
+  </div>
+  <div class="module-card">
+    <h4><span class="icon">⑥</span>站内沟通 IM</h4>
+    <p style="font-size: 13px; color: var(--text-muted);">4 类消息 + 实时 WS</p>
+    <ul>
+      <li>system / case / consult / broadcast</li>
+      <li>4 表 + 7 端点 + WebSocket</li>
+      <li>im.html 收件箱</li>
+    </ul>
+  </div>
+  <div class="module-card">
+    <h4><span class="icon">⑦</span>流程规范</h4>
+    <p style="font-size: 13px; color: var(--text-muted);">6 大 SOP + 轻量 BPM</p>
+    <ul>
+      <li>新用户引导 / 诊疗协作</li>
+      <li>KB 新源 / 数据导出</li>
+      <li>推送发布 / 权限变更</li>
+    </ul>
+  </div>
+  <div class="module-card">
+    <h4><span class="icon">⑧</span>测试质量</h4>
+    <p style="font-size: 13px; color: var(--text-muted);">金字塔 4 层</p>
+    <ul>
+      <li>单元 80%+ / 集成 60%+</li>
+      <li>端到端 9 流程 26/26 已通</li>
+      <li>性能 P95 ≤ 500ms</li>
+    </ul>
+  </div>
+</div>
+
+<h2>四、关键验收指标</h2>
+
+<div class="kpi-grid">
+  <div class="kpi">
+    <div class="kpi-now">未测</div>
+    <div class="kpi-arrow">↓</div>
+    <div class="kpi-target">≤500ms</div>
+    <div class="kpi-label">API P95</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-now">56</div>
+    <div class="kpi-arrow">↓</div>
+    <div class="kpi-target">80+</div>
+    <div class="kpi-label">路由数</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-now">10</div>
+    <div class="kpi-arrow">↓</div>
+    <div class="kpi-target">12</div>
+    <div class="kpi-label">角色数</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-now">0</div>
+    <div class="kpi-arrow">↓</div>
+    <div class="kpi-target">25</div>
+    <div class="kpi-label">监控指标</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-now">0</div>
+    <div class="kpi-arrow">↓</div>
+    <div class="kpi-target">5</div>
+    <div class="kpi-label">告警规则</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-now">0%</div>
+    <div class="kpi-arrow">↓</div>
+    <div class="kpi-target">80%</div>
+    <div class="kpi-label">测试覆盖率</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-now">0</div>
+    <div class="kpi-arrow">↓</div>
+    <div class="kpi-target">6</div>
+    <div class="kpi-label">SOP 流程数</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-now">0</div>
+    <div class="kpi-arrow">↓</div>
+    <div class="kpi-target">全员</div>
+    <div class="kpi-label">IM 用户</div>
+  </div>
+</div>
+
+<h2>五、实施路线图</h2>
+
+<div class="timeline">
+  <div class="timeline-item">
+    <div class="timeline-num">1</div>
+    <div class="timeline-content">
+      <h4>Week 1 · P0 关键改造 <span class="timeline-tag p0">P0</span></h4>
+      <p>routes 拆分（10 个 routes/*.js） + middleware/monitor 性能埋点 + monitor 子系统 5 端点 + IM 4 表 7 端点 + admin/index.html 升级 + IM 前端</p>
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-num">2</div>
+    <div class="timeline-content">
+      <h4>Week 2 · P1 强化 <span class="timeline-tag p1">P1</span></h4>
+      <p>RBAC 12 角色 + 行级隔离 + 三端 token 统一 + 6 流程引擎 + test 覆盖率提升</p>
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-num">3</div>
+    <div class="timeline-content">
+      <h4>Week 3 · P2 完善 <span class="timeline-tag p2">P2</span></h4>
+      <p>workflow 可视化 + 告警 webhook + 性能压测脚本 + 文档即代码</p>
+    </div>
+  </div>
+</div>
+
+<h2>六、风险与回退</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>风险</th>
+      <th>概率</th>
+      <th>影响</th>
+      <th>回退方案</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>routes 拆分引入循环依赖</td>
+      <td><span class="pill pill-warn">中</span></td>
+      <td><span class="pill pill-err">高</span></td>
+      <td>留单文件副本 + 灰度切换</td>
+    </tr>
+    <tr>
+      <td>monitor 埋点影响 P95</td>
+      <td><span class="pill pill-ok">低</span></td>
+      <td><span class="pill pill-warn">中</span></td>
+      <td>异步落盘 + 采样（10%）</td>
+    </tr>
+    <tr>
+      <td>IM WebSocket 兼容性</td>
+      <td><span class="pill pill-warn">中</span></td>
+      <td><span class="pill pill-warn">中</span></td>
+      <td>轮询 fallback（5s 间隔）</td>
+    </tr>
+    <tr>
+      <td>RBAC 行级数据漏防</td>
+      <td><span class="pill pill-warn">中</span></td>
+      <td><span class="pill pill-err">高</span></td>
+      <td>默认 deny + audit 抽样检查</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>七、典型代码示例</h2>
+
+<h3>7.1 性能埋点中间件</h3>
+<pre><code>// middleware/monitor.js
+function trackRequest(req, res, next) {
+  const start = process.hrtime.bigint();
+  res.on('finish', () => {
+    const dur = Number(process.hrtime.bigint() - start) / 1e6;
+    monitorStore.insert({
+      type: 'http',
+      method: req.method,
+      path: req.path,
+      status: res.statusCode,
+      duration_ms: dur,
+      role: req.auth?.role,
+      timestamp: Date.now()
+    });
+  });
+  next();
+}</code></pre>
+
+<h3>7.2 RBAC 行级隔离</h3>
+<pre><code>// routes/clinic-routes.js
+router.get('/cases', auth, requireRole(['doctor', 'master']), (req, res) => {
+  const cases = db.prepare(`SELECT * FROM medical_cases
+    WHERE assigned_doctor_id = ? OR assigned_master_id = ?
+    ORDER BY created_at DESC`).all(req.user.id, req.user.id);
+  res.json(apiResp(0, 'ok', cases));
+});</code></pre>
+
+<h3>7.3 三端 DTO</h3>
+<pre><code>// dto/yuanzhu.dto.js
+function yuanzhuDTO(row, viewerRole) {
+  return {
+    id: row.id,
+    name: row.name,
+    bazi: row.bazi ? summary(row.bazi) : null,
+    phone: row.phone ? mask(row.phone, viewerRole) : null,
+    latest_report_id: row.latest_report_id,
+    updated_at: row.updated_at
+  };
+}</code></pre>
+
+<div class="footer">
+  命理宝鉴 · mingli-baojian · docs/PLATFORM_OPTIMIZATION_PLAN_V1.md<br>
+  下一步：按 P0 顺序，先 routes 拆分 + monitor 埋点，保留 1 周回退窗口
+</div>
+
+</body>
+</html>

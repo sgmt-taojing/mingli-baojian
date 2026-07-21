@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>智能眼镜 · 审核工作台 · 命理宝鉴</title>
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--line:#334155;--text:#e2e8f0;--muted:#94a3b8;--accent:#f59e0b;--ok:#10b981;--warn:#ef4444}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'PingFang SC',sans-serif;background:var(--bg);color:var(--text);padding:20px;line-height:1.6}
+h1{font-size:22px;margin-bottom:16px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+.card.pending{border-left:4px solid var(--warn)}
+.card.approved{border-left:4px solid var(--ok)}
+.meta{font-size:12px;color:var(--muted);margin-bottom:6px}
+.title{font-weight:600;margin-bottom:8px}
+.actions{display:flex;gap:8px;margin-top:10px}
+button{padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-size:13px}
+.btn-approve{background:var(--ok);color:#fff}
+.btn-reject{background:var(--warn);color:#fff}
+</style>
+</head>
+<body>
+<h1>🔮 智能眼镜 · 审核工作台</h1>
+<div class="panel">
+<div style="display:flex;gap:12px;align-items:center">
+<span class="meta">设备会话：</span>
+<select id="filter" style="padding:6px;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:6px">
+<option value="pending">待审核</option><option value="approved">已通过</option><option value="rejected">已驳回</option>
+</select>
+<button onclick="load()" style="background:var(--accent);color:#000;padding:6px 14px">刷新</button>
+</div>
+</div>
+<div id="list" class="list"></div>
+
+<script>
+const API = (path) => fetch('/api' + path, {credentials:'include'}).then(r=>r.json());
+async function load(){
+  const status = document.getElementById('filter').value;
+  const r = await API('/admin/glass/list?status=' + status);
+  const items = (r.data||{}).items||[];
+  document.getElementById('list').innerHTML = items.map(it => `
+    <div class="card ${status}">
+      <div class="meta">📅 ${new Date(it.ts).toLocaleString('zh-CN')}</div>
+      <div class="title">${it.title||'未命名会话'}</div>
+      <div style="font-size:13px;color:var(--muted)">${it.summary||''}</div>
+      <div class="actions">
+        ${status==='pending'?`<button class="btn-approve" onclick="decide('${it.id}','approve')">通过</button><button class="btn-reject" onclick="decide('${it.id}','reject')">驳回</button>`:`<span class="meta">审核人：${it.reviewer||'-'} · ${it.reviewedAt||''}</span>`}
+      </div>
+    </div>`).join('') || '<div class="meta">无数据</div>';
+}
+async function decide(id, action){
+  await fetch('/api/admin/glass/decide', {method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include', body:JSON.stringify({id,action})});
+  load();
+}
+load();
+setInterval(load, 30000);
+</script>
+</body>
+</html>

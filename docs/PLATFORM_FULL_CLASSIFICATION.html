@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>命理宝鉴 · 全平台专业架构 · 三端分级 + 智能眼镜方案</title>
+<style>
+  :root {
+    --primary: #b8945f;
+    --primary-dark: #8c6e44;
+    --accent: #c9a961;
+    --bg: #faf7f2;
+    --bg-card: #ffffff;
+    --text: #2c2417;
+    --text-muted: #6b5e4d;
+    --border: #e5dcc8;
+    --success: #4caf7e;
+    --warning: #e09c4a;
+    --danger: #c75050;
+    --info: #5a8fb0;
+    --purple: #8b6bb5;
+    --glass-bg: #f0f4f8;
+    --glass-border: #c8d6e5;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 32px 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .header {
+    text-align: center;
+    padding: 32px 0 24px;
+    border-bottom: 2px solid var(--primary);
+    margin-bottom: 32px;
+  }
+  .header h1 {
+    font-size: 28px;
+    color: var(--primary-dark);
+    margin-bottom: 8px;
+  }
+  .header .meta {
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  h2 {
+    color: var(--primary-dark);
+    font-size: 22px;
+    margin: 40px 0 16px;
+    padding-left: 16px;
+    border-left: 4px solid var(--primary);
+  }
+  h3 {
+    color: var(--primary-dark);
+    font-size: 17px;
+    margin: 24px 0 12px;
+  }
+
+  /* tier cards */
+  .tiers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin: 24px 0;
+  }
+  .tier-card {
+    background: var(--bg-card);
+    border-radius: 14px;
+    padding: 22px;
+    border: 2px solid var(--border);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .tier-card h3 {
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .tier-badge {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+  }
+  .tier-badge.t1 { background: #5a8fb0; }
+  .tier-badge.t2 { background: #4caf7e; }
+  .tier-badge.t3 { background: #8b6bb5; }
+  .tier-badge.t4 { background: var(--primary); }
+  .tier-card ul {
+    padding-left: 18px;
+    font-size: 14px;
+    margin: 10px 0;
+  }
+  .tier-card li { margin: 4px 0; }
+  .tier-card .urls {
+    font-size: 12px;
+    color: var(--text-muted);
+    background: #fdfaf2;
+    border-radius: 6px;
+    padding: 8px;
+    margin-top: 10px;
+  }
+  .tier-card .urls a {
+    color: var(--primary-dark);
+    text-decoration: none;
+  }
+
+  /* module table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    background: var(--bg-card);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    font-size: 14px;
+  }
+  thead {
+    background: var(--primary);
+    color: white;
+  }
+  th, td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  th { font-weight: 600; }
+  tbody tr:hover { background: #fdfaf2; }
+  .pill {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .pill-ok { background: #e8f5ed; color: var(--success); }
+  .pill-warn { background: #fcf2e0; color: var(--warning); }
+  .pill-err { background: #f9e3e3; color: var(--danger); }
+  .pill-blue { background: #e6f0f5; color: var(--info); }
+  .pill-purple { background: #f0eaf5; color: var(--purple); }
+
+  /* glass panel */
+  .glass-panel {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 16px 0;
+  }
+  .glass-panel h4 {
+    color: #3a5a80;
+    font-size: 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .glass-panel ul {
+    padding-left: 20px;
+    font-size: 14px;
+  }
+  .glass-panel li { margin: 5px 0; }
+
+  /* timeline */
+  .timeline {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid var(--border);
+    margin: 16px 0;
+  }
+  .timeline-item {
+    display: flex;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px dashed var(--border);
+  }
+  .timeline-item:last-child { border-bottom: none; }
+  .timeline-num {
+    flex: 0 0 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    font-size: 16px;
+  }
+  .timeline-num.t1 { background: #5a8fb0; }
+  .timeline-num.t2 { background: #4caf7e; }
+  .timeline-num.t3 { background: #8b6bb5; }
+  .timeline-num.t4 { background: var(--primary); }
+  .timeline-num.glass { background: linear-gradient(135deg, #667eea, #764ba2); }
+  .timeline-content { flex: 1; }
+  .timeline-content h4 {
+    color: var(--text);
+    margin-bottom: 4px;
+    font-size: 15px;
+  }
+  .timeline-content p {
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+  .timeline-tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    margin-right: 6px;
+    font-weight: 600;
+  }
+  .timeline-tag.new { background: #f9e3e3; color: var(--danger); }
+  .timeline-tag.exist { background: #e8f5ed; color: var(--success); }
+  .timeline-tag.planned { background: #fcf2e0; color: var(--warning); }
+
+  /* gaps */
+  .gap-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .gap-item {
+    background: var(--bg-card);
+    border-radius: 10px;
+    padding: 14px;
+    border-left: 4px solid var(--warning);
+    font-size: 14px;
+  }
+  .gap-item.critical { border-left-color: var(--danger); }
+  .gap-item.enhance { border-left-color: var(--info); }
+  .gap-item .gap-title {
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .gap-item .gap-desc {
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+  .gap-item .gap-url {
+    font-size: 12px;
+    color: var(--primary-dark);
+    margin-top: 4px;
+  }
+
+  /* architecture diagram */
+  .arch-diagram {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid var(--border);
+    margin: 16px 0;
+    overflow-x: auto;
+  }
+  .arch-layer { margin: 6px 0; }
+  .arch-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .arch-box {
+    flex: 1;
+    min-width: 100px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    font-size: 13px;
+  }
+  .arch-box.client {
+    background: linear-gradient(135deg, #e8f0f5, #f0e8f5);
+    border-color: #c8d0e0;
+  }
+  .arch-box.gateway {
+    background: var(--accent);
+    color: var(--text);
+    font-weight: 600;
+    border-color: var(--accent);
+  }
+  .arch-box.service {
+    background: #f0e9d6;
+    border-color: var(--border);
+  }
+  .arch-box.data {
+    background: #e6f0e8;
+    border-color: #c0d8c8;
+  }
+  .arch-box.new {
+    border: 2px dashed var(--info);
+    background: #f5fafc;
+  }
+  .arch-box.glass {
+    background: linear-gradient(135deg, #f0f4f8, #e8f0f8);
+    border-color: var(--glass-border);
+    border-style: dashed;
+  }
+  .arch-arrow { text-align: center; color: var(--text-muted); font-size: 16px; margin: 2px 0; }
+
+  .footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  /* URL table */
+  .url-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 12px 0;
+  }
+  .url-table td, .url-table th {
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+  .url-table td:first-child {
+    width: 200px;
+    color: var(--primary-dark);
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>命理宝鉴 · 全平台专业架构</h1>
+  <div class="meta">2026-07-21 · 三端全量报告分级 + 智能眼镜方案 + 缺口补全</div>
+</div>
+
+<h2>一、四层专业分级体系</h2>
+
+<p style="font-size:14px; color:var(--text-muted); margin-bottom:16px;">
+  平台按<strong>用户专业程度</strong>和<strong>服务深度</strong>分为 4 层，每层有独立的报告生成逻辑、引导深度和完整报告输出。
+</p>
+
+<div class="tiers-grid">
+  <div class="tier-card">
+    <h3><span class="tier-badge t1">T1</span>AI 助手 · 大众层</h3>
+    <p style="font-size:13px;color:var(--text-muted);">面向<strong>零专业知识</strong>用户。用友好对话全量引导，引导完毕给出<strong>完整报告</strong>。</p>
+    <ul>
+      <li>问题引导：一步步问，不假设用户懂术语</li>
+      <li>引导深度：8-15 题，覆盖基础信息 + 核心关切</li>
+      <li>报告：AI 助手全量报告（命理概要 + 建议 + 行动清单）</li>
+      <li>端：H5 + 小程序 + 微信 H5 均可</li>
+    </ul>
+    <div class="urls">
+      <strong>核心 URL</strong>：<br>
+      <a href="/app/ai-assistant.html">ai-assistant.html</a> — AI 全引导 + 报告<br>
+      <a href="/app/my-yuanzhu.html">my-yuanzhu.html</a> — 我的助手/推送/积分<br>
+      <a href="/m/yuanzhu-inbox.html">yuanzhu-inbox.html</a> — 消息收件箱<br>
+      <strong>后端</strong>：<code>/api/ai/chat</code> · <code>/api/ai/guide</code>
+    </div>
+  </div>
+
+  <div class="tier-card">
+    <h3><span class="tier-badge t2">T2</span>排盘引擎 · 爱好者层</h3>
+    <p style="font-size:13px;color:var(--text-muted);">面向<strong>有学习兴趣或专业知识</strong>的用户。8 大引擎排盘后给出<strong>完整专业报告</strong>。</p>
+    <ul>
+      <li>八字 · 紫微 · 奇门 · 大六壬 · 六爻 · 梅花 · 风水 · 易卦</li>
+      <li>用户可自选引擎、自定义参数</li>
+      <li>报告：结构化命盘 + 十宫分析 + 流年推演 + 化解建议</li>
+      <li>端：H5 大屏 + 小程序 + 微信 H5</li>
+    </ul>
+    <div class="urls">
+      <strong>核心 URL</strong>：<br>
+      <a href="/app/divination-hub.html">divination-hub.html</a> — 排盘主入口（2.4MB 核心）<br>
+      <a href="/app/yijing-qimen.html">yijing-qimen.html</a> — 奇门专项<br>
+      <a href="/app/yijing-oracle.html">yijing-oracle.html</a> — 易经卜卦<br>
+      <a href="/app/fengshui.html">fengshui.html</a> — 风水<br>
+      <a href="/app/divination-almanac.html">divination-almanac.html</a> — 黄历<br>
+      <strong>后端</strong>：<code>/api/paipan/*</code> · <code>/api/paipan/history</code>
+    </div>
+  </div>
+
+  <div class="tier-card">
+    <h3><span class="tier-badge t3">T3</span>易+医 · 高端层</h3>
+    <p style="font-size:13px;color:var(--text-muted);">面向<strong>高端客户</strong>。命理 + 中医双轨并行，AI + 真人医师/大师联合服务。</p>
+    <ul>
+      <li>排盘诊断 → 体质辨识 → 中医方案 → 跟踪随访</li>
+      <li>AI 辅助 + 大师/医师审核确认</li>
+      <li>报告：命理报告 + 中医诊疗方案（电子病历）</li>
+      <li>端：H5（移动/PC 均可）+ 小程序</li>
+    </ul>
+    <div class="urls">
+      <strong>核心 URL</strong>：<br>
+      <a href="/app/tcm-clinic.html">tcm-clinic.html</a> — 中医诊疗 + AI 面相<br>
+      <a href="/app/tcm-symptom.html">tcm-symptom.html</a> — 症状采集<br>
+      <a href="/app/nihaisha-learning.html">nihaisha-learning.html</a> — 倪师经典学习<br>
+      <a href="/app/shuhan-knowledge.html">shuhan-knowledge.html</a> — 舒晗知识库<br>
+      <a href="/app/master-class.html">master-class.html</a> — 大师讲堂<br>
+      <strong>后端</strong>：<code>/api/clinic/*</code> · <code>/api/face/*</code> · <code>/api/courses</code>
+    </div>
+  </div>
+
+  <div class="tier-card">
+    <h3><span class="tier-badge t4">T4</span>后台管理 · 专业层</h3>
+    <p style="font-size:13px;color:var(--text-muted);">面向<strong>管理员 / 大师 / 医师 / 代理商</strong>。数据管理、审计、推送、审核一站式。</p>
+    <ul>
+      <li>12 角色 RBAC 分级权限</li>
+      <li>缘主档案、排盘审计、KB 管理、推送管理</li>
+      <li>数据安全导出 + 全操作审计日志</li>
+      <li>端：PC 后台（大屏办公）</li>
+    </ul>
+    <div class="urls">
+      <strong>核心 URL</strong>：<br>
+      <a href="/app/admin.html">admin.html</a> — 主后台（104KB）<br>
+      <a href="/app/admin-shop.html">admin-shop.html</a> — 商城管理<br>
+      <a href="/app/admin/yuanzhu-dashboard.html">yuanzhu-dashboard.html</a> — 缘主仪表盘<br>
+      <a href="/app/merchant-dashboard.html">merchant-dashboard.html</a> — 代理商<br>
+      <a href="/app/merchant-apply.html">merchant-apply.html</a> — 商户申请<br>
+      <a href="/app/monitor-dashboard.html">monitor-dashboard.html</a> — 监控大屏<br>
+      <a href="/app/kb-explorer.html">kb-explorer.html</a> — KB 浏览器<br>
+      <strong>后端</strong>：<code>/api/admin/*</code> · <code>/api/export/*</code>
+    </div>
+  </div>
+</div>
+
+<h2>二、完整 URL 目录</h2>
+
+<p style="font-size:14px;color:var(--text-muted);">按端 + 功能分门别类，共 <strong>48 个页面</strong> + <strong>56 个 API 端点</strong>。</p>
+
+<h3>2.1 前端页面（H5 · app/）</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>功能域</th>
+      <th>页面</th>
+      <th>URL</th>
+      <th>大小</th>
+      <th>状态</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td rowspan="2" style="font-weight:600;">T1 · AI 助手</td><td>AI 助手主入口</td><td>/app/ai-assistant.html</td><td>249KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>我的助手/推送/积分</td><td>/app/my-yuanzhu.html</td><td>11KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td rowspan="8" style="font-weight:600;">T2 · 排盘引擎</td><td>排盘主入口（ hub）</td><td>/app/divination-hub.html</td><td>2455KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>紫微斗数</td><td>/app/divination-knowledge.html</td><td>442KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>奇门遁甲</td><td>/app/yijing-qimen.html</td><td>86KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>易经卜卦</td><td>/app/yijing-oracle.html</td><td>95KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>风水堪舆</td><td>/app/fengshui.html</td><td>252KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>黄历</td><td>/app/divination-almanac.html</td><td>115KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>综合排盘</td><td>/app/divination-integrated.html</td><td>169KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>工具集</td><td>/app/divination-tools.html</td><td>4KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td rowspan="6" style="font-weight:600;">T3 · 易+医</td><td>中医诊疗 + AI 面相</td><td>/app/tcm-clinic.html</td><td>165KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>症状采集</td><td>/app/tcm-symptom.html</td><td>27KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>倪师学习</td><td>/app/nihaisha-learning.html</td><td>78KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>舒晗知识</td><td>/app/shuhan-knowledge.html</td><td>18KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>大师讲堂</td><td>/app/master-class.html</td><td>56KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>课程集锦</td><td>/app/knowledge-panel.html</td><td>17KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td rowspan="6" style="font-weight:600;">知识库</td><td>倪师知识卡片</td><td>/app/nihaisha-knowledge.html</td><td>15KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>KB 浏览器</td><td>/app/kb-explorer.html</td><td>22KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>知识面板</td><td>/app/knowledge-panel.html</td><td>17KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>倪师工具</td><td>/app/nihaisha-tool.html</td><td>24KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>经方展示</td><td>/app/koujue-gallery.html</td><td>5KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>功过格</td><td>/app/merit-system.html</td><td>6KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td rowspan="6" style="font-weight:600;">商城</td><td>商城首页</td><td>/app/divination-shop.html</td><td>107KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>会员体系</td><td>/app/divination-membership.html</td><td>65KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>商户申请</td><td>/app/merchant-apply.html</td><td>7KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>商户仪表盘</td><td>/app/merchant-dashboard.html</td><td>12KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>后台商城管理</td><td>/app/admin-shop.html</td><td>20KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>订单</td><td>/app/divination-shop.html（子功能）</td><td>—</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td rowspan="5" style="font-weight:600;">后台管理</td><td>主后台</td><td>/app/admin.html</td><td>104KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>缘主仪表盘</td><td>/app/admin/yuanzhu-dashboard.html</td><td>—</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>监控大屏</td><td>/app/monitor-dashboard.html</td><td>66KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>报告配置</td><td>/app/report-config.html</td><td>11KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>报告示例</td><td>/app/report-sample-bazi.html</td><td>15KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td rowspan="5" style="font-weight:600;">辅助</td><td>登录</td><td>/app/login.html</td><td>20KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>数据安全导出</td><td>/app/export-guard.html</td><td>13KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>微信 H5</td><td>/app/wechat-h5.html</td><td>37KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>微信 Hub</td><td>/app/wechat-hub.html</td><td>141KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td>更多功能</td><td>/app/more-functions.html</td><td>261KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+    <tr><td style="font-weight:600;">入口</td><td>首页</td><td>/app/index.html</td><td>1KB</td><td><span class="pill pill-ok">已上线</span></td></tr>
+  </tbody>
+</table>
+
+<h3>2.2 小程序端（miniprogram/）</h3>
+<table>
+  <thead>
+    <tr><th>功能</th><th>页面</th><th>状态</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>首页</td><td>pages/index/</td><td><span class="pill pill-ok">已有</span></td></tr>
+    <tr><td>排盘</td><td>pages/paipan/（5 术数）</td><td><span class="pill pill-ok">已有</span></td></tr>
+    <tr><td>黄历</td><td>pages/almanac/</td><td><span class="pill pill-ok">已有</span></td></tr>
+    <tr><td>知识库</td><td>pages/knowledge/</td><td><span class="pill pill-ok">已有</span></td></tr>
+    <tr><td>我的</td><td>pages/mine/</td><td><span class="pill pill-ok">已有</span></td></tr>
+    <tr><td>商城</td><td>pages/shop/</td><td><span class="pill pill-warn">开发中</span></td></tr>
+  </tbody>
+</table>
+
+<h3>2.3 后端 API（56 端点）</h3>
+<table>
+  <thead>
+    <tr><th>分类</th><th>端点</th><th>数</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>鉴权</td><td>/api/user/login · /api/ai/chat · /api/ai/guide · /api/ai/public-chat</td><td>4</td></tr>
+    <tr><td>排盘</td><td>/api/paipan/* · /api/paipan/history · /api/paipan/save</td><td>5</td></tr>
+    <tr><td>AI 助手</td><td>/api/ai/*</td><td>3</td></tr>
+    <tr><td>知识库</td><td>/api/kb · /api/kb/list · /api/kb/:filename</td><td>3</td></tr>
+    <tr><td>中医诊疗</td><td>/api/clinic/*（9 子端点）</td><td>9</td></tr>
+    <tr><td>面相/OCR</td><td>/api/face/analyze · /api/face/health · /api/ocr/*</td><td>3</td></tr>
+    <tr><td>商城</td><td>/api/shop/products · /api/order/create</td><td>2</td></tr>
+    <tr><td>反馈</td><td>/api/feedback/*</td><td>2</td></tr>
+    <tr><td>推送</td><td>/api/push/log · /api/public/latest-pushes · /api/admin/cron/yearly-push</td><td>3</td></tr>
+    <tr><td>管理</td><td>/api/admin/*（7 子端点）</td><td>7</td></tr>
+    <tr><td>商户</td><td>/api/merchant/apply · /api/merchant/approve · /api/merchant/list</td><td>3</td></tr>
+    <tr><td>数据导出</td><td>/api/export/*（6 子端点）</td><td>6</td></tr>
+    <tr><td>课程</td><td>/api/courses · /api/courses/add</td><td>2</td></tr>
+    <tr><td>蒸馏</td><td>/api/distill</td><td>1</td></tr>
+    <tr><td>TTS</td><td>/api/tts</td><td>1</td></tr>
+    <tr><td>公开</td><td>/api/public/stats · /api/public/recent-cases</td><td>2</td></tr>
+  </tbody>
+</table>
+
+<h2>三、智能眼镜集成方案（新需求）</h2>
+
+<div class="glass-panel">
+  <h4><span style="font-size:20px;">🥽</span>智能眼镜 · AI 辅助对话引导系统</h4>
+  <p style="font-size:14px;color:var(--text-muted);">智能眼镜作为<strong>AI 数据采集入口</strong>，实时采集视频/音频 → 后端 AI 分析 → 指导授权角色（周易大师/医师）与信众对话 → 对话完毕自动形成方案 → 审核后推送。</p>
+
+  <h4 style="margin-top:16px;">3.1 数据流</h4>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-num glass">1</div>
+      <div class="timeline-content">
+        <h4>眼镜采集</h4>
+        <p>智能眼镜实时采集视频 + 音频流，通过 WebSocket 或 RTSP 推送到后端 <code>/api/glass/stream</code></p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-num glass">2</div>
+      <div class="timeline-content">
+        <h4>AI 实时分析</h4>
+        <p>后端 AI 引擎（g2claw / GLM-4V）分析视频内容 + 语音转文字 → 提取关键信息 + 对话上下文</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-num glass">3</div>
+      <div class="timeline-content">
+        <h4>智能提示</h4>
+        <p>AI 生成<strong>对话引导建议</strong>（3-5 条），实时推送到授权角色（大师/医师）的眼镜 HUD 或手机端</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-num glass">4</div>
+      <div class="timeline-content">
+        <h4>对话执行</h4>
+        <p>授权角色按引导与信众对话，采集信息，眼镜全程录制</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-num glass">5</div>
+      <div class="timeline-content">
+        <h4>方案自动生成</h4>
+        <p>对话完毕，AI 自动生成完整方案（命理报告 + 中医建议），写入待审核队列</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-num glass">6</div>
+      <div class="timeline-content">
+        <h4>审核 + 推送</h4>
+        <p>大师/医师审核确认 → 推送至信众/患者 H5 + 小程序 + IM</p>
+      </div>
+    </div>
+  </div>
+
+  <h4 style="margin-top:16px;">3.2 新增后端端点</h4>
+  <table>
+    <thead><tr><th>端点</th><th>用途</th><th>权限</th></tr></thead>
+    <tbody>
+      <tr><td><code>POST /api/glass/stream</code></td><td>接收眼镜音视频流</td><td>授权角色</td></tr>
+      <tr><td><code>GET /api/glass/analysis/:id</code></td><td>获取 AI 分析结果</td><td>授权角色</td></tr>
+      <tr><td><code>POST /api/glass/guide</code></td><td>AI 生成对话引导</td><td>系统</td></tr>
+      <tr><td><code>POST /api/glass/session</code></td><td>创建/结束眼镜会话</td><td>授权角色</td></tr>
+      <tr><td><code>GET /api/glass/history</code></td><td>历史会话查询</td><td>admin</td></tr>
+      <tr><td><code>POST /api/glass/report/generate</code></td><td>自动生成方案草稿</td><td>系统</td></tr>
+      <tr><td><code>POST /api/glass/report/approve</code></td><td>审核确认推送</td><td>大师/医师</td></tr>
+    </tbody>
+  </table>
+
+  <h4 style="margin-top:16px;">3.3 新增前端页面</h4>
+  <table class="url-table">
+    <tr><td>眼镜控制台</td><td>/app/glass-console.html — 授权角色眼镜操作面板</td></tr>
+    <tr><td>会话历史</td><td>/app/glass-history.html — 历史会话回放</td></tr>
+    <tr><td>方案审核</td><td>/app/glass-approve.html — 大师/医师审核队列</td></tr>
+  </table>
+
+  <h4 style="margin-top:16px;">3.4 数据库表</h4>
+  <pre style="background:#2c2417;color:#f0e9d6;border-radius:8px;padding:12px;font-size:13px;margin-top:8px;">CREATE TABLE glass_sessions (
+  id INTEGER PRIMARY KEY,
+  master_id INTEGER,           -- 授权角色
+  patient_id INTEGER,          -- 信众/患者
+  stream_url TEXT,             -- 音视频流地址
+  transcript TEXT,             -- 对话转写
+  ai_analysis TEXT,            -- AI 分析 JSON
+  guide_suggestions TEXT,      -- 引导建议 JSON
+  auto_report TEXT,            -- 自动生成的方案草稿
+  status TEXT DEFAULT 'active', -- active/ended/approved/rejected
+  created_at TEXT DEFAULT (datetime('now','localtime'))
+);</pre>
+</div>
+
+<h2>四、三端全量报告逻辑</h2>
+
+<div class="timeline">
+  <div class="timeline-item">
+    <div class="timeline-num t1">T1</div>
+    <div class="timeline-content">
+      <h4>AI 助手报告流程（大众层）</h4>
+      <p><strong>输入</strong>：自然语言问题<br>
+      <strong>引导</strong>：AI 友好提问（8-15 题，覆盖基础信息 + 关切点）<br>
+      <strong>引擎</strong>：KB 优先双路径（命中≥0.7 直答，0.4-0.7 AI+KB 润色，<0.4 AI 兜底）<br>
+      <strong>输出</strong>：完整报告（基础信息 / 现状分析 / 优势 / 风险 / 建议 / 时机 / 化解 / 总结 + 行动清单）<br>
+      <strong>端点</strong>：<code>/api/ai/chat</code> · <code>/api/ai/guide</code></p>
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div div class="timeline-num t2">T2</div>
+    <div class="timeline-content">
+      <h4>排盘报告流程（爱好者层）</h4>
+      <p><strong>输入</strong>：生辰八字 + 选引擎<br>
+      <strong>排盘</strong>：8 大引擎专业排盘（八字/紫微/奇门/六壬/六爻/梅花/风水/易卦）<br>
+      <strong>分析</strong>：引擎输出命盘 + 十宫分析 + 流年推演<br>
+      <strong>输出</strong>：完整专业报告（命盘 / 格局 / 大运 / 流年 / 化解建议）<br>
+      <strong>端点</strong>：<code>/api/paipan/*</code></p>
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-num t3">T3</div>
+    <div class="timeline-content">
+      <h4>易+医报告流程（高端层）</h4>
+      <p><strong>输入</strong>：排盘结果 + 症状描述 + AI 面相/舌苔（智能眼镜）<br>
+      <strong>诊断</strong>：命理分析 + 中医辨证（八纲/六经/三焦）<br>
+      <strong>方案</strong>：命理建议 + 中医处方 + 食疗 + 穴位 + 经方<br>
+      <strong>审核</strong>：AI 草稿 → 大师/医师审核确认<br>
+      <strong>输出</strong>：双轨报告（命理 + 中医）<br>
+      <strong>端点</strong>：<code>/api/clinic/*</code> · <code>/api/face/*</code> · <code>/api/glass/report/*</code></p>
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-num t4">T4</div>
+    <div class="timeline-content">
+      <h4>后台报告流程（专业层）</h4>
+      <p><strong>输入</strong>：全平台数据汇总<br>
+      <strong>审计</strong>：运营数据 / 排盘质量 / 推送效果 / KB 命中率<br>
+      <strong>输出</strong>：管理报告（KPI 仪表盘 + 异常告警 + 数据导出）<br>
+      <strong>端点</strong>：<code>/api/admin/*</code> · <code>/api/monitor/*</code></p>
+    </div>
+  </div>
+</div>
+
+<h2>五、完整架构总览图</h2>
+
+<div class="arch-diagram">
+  <div class="arch-layer">
+    <div style="font-weight:600;color:var(--primary-dark);margin-bottom:6px;">用户层 · 5 端</div>
+    <div class="arch-row">
+      <div class="arch-box client">H5 SPA<br>48 页面</div>
+      <div class="arch-box client">小程序<br>19 页面</div>
+      <div class="arch-box client">微信 H5<br>6 菜单</div>
+      <div class="arch-box client">Admin 后台<br>PC 办公</div>
+      <div class="arch-box glass">🥽 智能眼镜<br><span style="font-size:11px;">NEW</span></div>
+    </div>
+  </div>
+  <div class="arch-arrow">↓ HTTPS / WS</div>
+  <div class="arch-layer">
+    <div style="font-weight:600;color:var(--primary-dark);margin-bottom:6px;">API 网关层 · 8920 端口</div>
+    <div class="arch-row">
+      <div class="arch-box gateway">Express + RBAC + RateLimit + CORS</div>
+      <div class="arch-box gateway">JWT / Token 鉴权</div>
+      <div class="arch-box gateway">审计日志</div>
+    </div>
+    <div style="margin-top:8px;font-size:12px;color:var(--text-muted);">56 个端点 · 单文件 1710 行 → 待拆分 routes/</div>
+  </div>
+  <div class="arch-arrow">↓</div>
+  <div class="arch-layer">
+    <div style="font-weight:600;color:var(--primary-dark);margin-bottom:6px;">服务层 · 8 子系统</div>
+    <div class="arch-row">
+      <div class="arch-box service">排盘引擎<br>8 个</div>
+      <div class="arch-box service">AI 助手<br>KB 双路径</div>
+      <div class="arch-box service">中医诊疗<br>clinic + face-ocr</div>
+      <div class="arch-box service new">🥽 智能眼镜<br>NEW</div>
+      <div class="arch-box service">推送引擎<br>cron + 公众号</div>
+      <div class="arch-box service">数据安全<br>export-guard</div>
+      <div class="arch-box service">商城系统<br>shop + order</div>
+      <div class="arch-box service">监控系统<br>monitor-dashboard</div>
+    </div>
+  </div>
+  <div class="arch-arrow">↓</div>
+  <div class="arch-layer">
+    <div style="font-weight:600;color:var(--primary-dark);margin-bottom:6px;">数据层 · SQLite yidao.db</div>
+    <div class="arch-row">
+      <div class="arch-box data">yuanzhu · 用户 + 缘主<br>clinic · 诊疗案例<br>medical_cases · 病历<br>paipan_history · 排盘记录</div>
+      <div class="arch-box data">knowledge_models · 17 模型<br>kb_formal · 1746 条<br>kb_staging · 2535 条<br>source_index · 109 来源</div>
+      <div class="arch-box data">shop_orders · 商城订单<br>shop_items · 商品<br>push_log · 推送台账<br>audit_logs · 审计流水</div>
+      <div class="arch-box data new">glass_sessions · 眼镜会话<br><span style="font-size:11px;">NEW</span><br>message_* · IM 4 表<br><span style="font-size:11px;">NEW</span></div>
+    </div>
+  </div>
+</div>
+
+<h2>六、从完整运营角度看 · 还缺什么</h2>
+
+<div class="gap-list">
+  <div class="gap-item critical">
+    <div class="gap-title">🔴 智能眼镜全链路</div>
+    <div class="gap-desc">后端 7 端点 + 前端 3 页面 + 数据库表 + AI 分析引擎</div>
+    <div class="gap-url">新增：glass-console.html · glass-history.html · glass-approve.html · /api/glass/*</div>
+  </div>
+  <div class="gap-item critical">
+    <div class="gap-title">🔴 站内沟通 IM 系统</div>
+    <div class="gap-desc">管理员 ↔ 大师 ↔ 医师 ↔ 信众 实时沟通，4 类消息 + WebSocket</div>
+    <div class="gap-url">新增：im.html · /api/messages/* · message_* 4 表</div>
+  </div>
+  <div class="gap-item critical">
+    <div class="gap-title">🔴 API 模块化拆分</div>
+    <div class="gap-desc">1710 行单文件 → 12 个 routes/*.js，可维护性差，阻塞新功能接入</div>
+    <div class="gap-url">改造：server/routes/*.js · server/middleware/*.js</div>
+  </div>
+  <div class="gap-item critical">
+    <div class="gap-title">🔴 三端报告一致性</div>
+    <div class="gap-desc">H5/小程序/微信 H5 报告格式不统一，需定义 DTO 数据契约层</div>
+    <div class="gap-url">新增：dto/*.js · report-renderer.js</div>
+  </div>
+  <div class="gap-item enhance">
+    <div class="gap-title">🟡 性能监控深度化</div>
+    <div class="gap-desc">monitor-dashboard.html 已有界面，但后端埋点只覆盖 HTTP，缺引擎/DB/KB/AI 专项</div>
+    <div class="gap-url">增强：middleware/monitor.js → trackEngine/trackKB + 5 告警规则</div>
+  </div>
+  <div class="gap-item enhance">
+    <div class="gap-title">🟡 流程引擎（BPM）</div>
+    <div class="gap-desc">6 大 SOP 无可视化流程引擎，诊疗协作/推送发布/权限变更等流程纯手动</div>
+    <div class="gap-url">新增：workflow/lightweight-bpm.js · /admin/workflow 可视化</div>
+  </div>
+  <div class="gap-item enhance">
+    <div class="gap-title">🟡 AI 面相结合排盘</div>
+    <div class="gap-desc">face-ocr 已有基础能力，但未与排盘结果联动生成"面相+命理"双报告</div>
+    <div class="gap-url">增强：tcm-clinic.html 新增"面相+命理"双轨报告模板</div>
+  </div>
+  <div class="gap-item enhance">
+    <div class="gap-title">🟡 小程序 AI 助手</div>
+    <div class="gap-desc">小程序有知识库和排盘，但缺 AI 助手引导层（H5 版已实现）</div>
+    <div class="gap-url">新增：miniprogram/pages/ai-assistant/</div>
+  </div>
+  <div class="gap-item">
+    <div class="gap-title">🟢 数据安全合规</div>
+    <div class="gap-desc">export-guard.html 已有数据导出闸门，但缺 GDPR 式用户数据删除/匿名化</div>
+    <div class="gap-url">新增：/api/export/anonymize · /api/export/delete-account</div>
+  </div>
+  <div class="gap-item">
+    <div class="gap-title">🟢 测试覆盖率</div>
+    <div class="gap-desc">9 流程 26/26 通过，但缺单元测试 + 集成测试 + 性能压测</div>
+    <div class="gap-url">新增：test/*.test.js · autocannon 压测脚本</div>
+  </div>
+</div>
+
+<h2>七、实施优先级（按完整运营需求排序）</h2>
+
+<div class="timeline">
+  <div class="timeline-item">
+    <div class="timeline-num" style="background:var(--danger);">P0</div>
+    <div class="timeline-content">
+      <h4>智能眼镜全链路 <span class="timeline-tag new">NEW</span></h4>
+      <p>7 后端端点 + 3 前端页面 + 数据库表 + AI 分析 → 眼镜会话 → 方案生成 → 审核推送</p>
+      <p style="font-size:13px;color:var(--text-muted);">这是新增高端能力，也是"易+医"的核心差异化</p>
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-num" style="background:var(--danger);">P0</div>
+    <div class="timeline-content">
+      <h4>站内 IM 系统 <span class="timeline-tag new">NEW</span></h4>
+      <p>4 表 + 7 端点 + WebSocket + im.html 前端 → 后台沟通能力补全</p>
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-num" style="background:var(--danger);">P0</div>
+    <div class="timeline-content">
+      <h4>API routes 拆分 <span class="timeline-tag planned">重构</span></h4>
+      <p>1710 行单文件 → 12 个 routes/*.js → 所有新功能接入的前提</p>
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-num" style="background:var(--warning);">P1</div>
+    <div class="timeline-content">
+      <h4>三端报告 DTO 统一 <span class="timeline-tag planned">增强</span></h4>
+      <p>定义 DTO 层 → H5/小程序/微信 H5 报告格式一致 → 可分享/可打印</p>
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-num" style="background:var(--warning);">P1</div>
+    <div class="timeline-content">
+      <h4>性能监控深度化 <span class="timeline-tag planned">增强</span></h4>
+      <p>trackEngine/trackKB + 5 告警 → 已有界面补后端数据</p>
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-num" style="background:var(--warning);">P1</div>
+    <div class="timeline-content">
+      <h4>轻量 BPM 流程引擎 <span class="timeline-tag new">NEW</span></h4>
+      <p>6 大 SOP 可视化 → 诊疗协作/推送发布/权限变更自动流转</p>
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-num" style="background:var(--info);">P2</div>
+    <div class="timeline-content">
+      <h4>AI 面相结合排盘 <span class="timeline-tag planned">增强</span></h4>
+      <p>面相+命理 双轨报告 → tcm-clinic.html 升级</p>
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-num" style="background:var(--info);">P2</div>
+    <div class="timeline-content">
+      <h4>小程序 AI 助手 <span class="timeline-tag planned">新增</span></h4>
+      <p>miniprogram/pages/ai-assistant/ → 小程序端 AI 引导</p>
+    </div>
+  </div>
+</div>
+
+<h2>八、四层报告输出规范</h2>
+
+<table>
+  <thead>
+    <tr><th>维度</th><th>T1 AI 助手（大众）</th><th>T2 排盘（爱好者）</th><th>T3 易+医（高端）</th><th>T4 后台（专业）</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>目标用户</strong></td><td>零知识普通用户</td><td>有基础/专业用户</td><td>高端客户</td><td>管理员/大师/医师</td></tr>
+    <tr><td><strong>输入方式</strong></td><td>自然语言对话引导</td><td>生辰 + 选引擎</td><td>排盘 + 症状 + 面相</td><td>数据汇总</td></tr>
+    <tr><td><strong>引导深度</strong></td><td>8-15 题友好引导</td><td>参数表单</td><td>AI + 真人对话（眼镜）</td><td>无</td></tr>
+    <tr><td><strong>核心报告</strong></td><td>命理概要 + 建议 + 行动清单</td><td>命盘 + 十宫 + 流年 + 化解</td><td>命理 + 中医双轨方案</td><td>KPI + 审计 + 预警</td></tr>
+    <tr><td><strong>后端端点</strong></td><td>/api/ai/chat · /api/ai/guide</td><td>/api/paipan/*</td><td>/api/clinic/* · /api/glass/*</td><td>/api/admin/* · /api/monitor/*</td></tr>
+    <tr><td><strong>前端页面</strong></td><td>ai-assistant.html</td><td>divination-hub.html</td><td>tcm-clinic.html · glass-console.html</td><td>admin.html · monitor-dashboard.html</td></tr>
+    <tr><td><strong>推送渠道</strong></td><td>H5 + 小程序 + 微信</td><td>H5 + 小程序</td><td>H5 + 小程序 + IM + 眼镜 HUD</td><td>后台查看 + 导出</td></tr>
+    <tr><td><strong>审核机制</strong></td><td>无</td><td>无</td><td>大师/医师审核确认</td><td>admin 审批</td></tr>
+  </tbody>
+</table>
+
+<div class="footer">
+  命理宝鉴 · 全平台专业架构 · 2026-07-21<br>
+  下一阶段：按 P0 顺序 → 智能眼镜 → IM → API 拆分
+</div>
+
+</body>
+</html>
