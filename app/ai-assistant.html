@@ -672,7 +672,8 @@ function showReport(text){
   // 报告操作
   const ops=document.createElement('div');
   ops.className='report-ops';
-  ops.innerHTML='<button class="btn-save" onclick="saveReport(this)">💾 保存报告</button><button class="btn-copy" onclick="copyReport(this)">📋 复制</button>';
+  var _repEsc=esc(text).replace(/"/g,'&quot;');
+  ops.innerHTML='<button class="btn-save" data-report="'+_repEsc+'" onclick="saveReport(this)">💾 保存报告</button><button class="btn-copy" data-report="'+_repEsc+'" onclick="copyReport(this)">📋 复制</button>';
   d.appendChild(ops);
   
   // 闭环：询问+推送
@@ -696,14 +697,14 @@ function showReport(text){
 }
 
 function saveReport(el){
-  const t=el.closest('.m-ai').querySelector('.b').textContent;
+  const t=el.dataset.report||el.closest('.m-ai').querySelector('.b').textContent;
   const ts=new Date().toLocaleString('zh-CN');
   const blob=new Blob(['易道智鉴AI分析报告\n生成时间：'+ts+'\n\n'+t],{type:'text/plain;charset=utf-8'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='命理分析报告.txt';a.click();
   toast('报告已保存');
 }
 function copyReport(el){
-  const t=el.closest('.m-ai').querySelector('.b').textContent;
+  const t=el.dataset.report||el.closest('.m-ai').querySelector('.b').textContent;
   navigator.clipboard.writeText(t).then(()=>toast('已复制')).catch(()=>{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('已复制')});
 }
 function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),1500)}
