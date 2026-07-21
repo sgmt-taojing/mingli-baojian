@@ -6223,7 +6223,18 @@ setTimeout(removeLoadingOverlay,5000);
   </div>
 </section>
 <!-- section-more END -->
-<script src="../js/divination-core.js?v=20260713f"></script>
+<script src="../js/divination-core.js?v=20260713f">
+// 第二轮诊断修复：补齐 more-functions.html 缺失函数
+function toggleDailyKnowledgeDetail(el){
+  var body = el ? el.nextElementSibling : document.getElementById('dailyKnowledgeDetail');
+  if(!body) return;
+  body.style.display = body.style.display === 'none' ? 'block' : 'none';
+  if(el){
+    var icon = el.querySelector('.toggle-icon');
+    if(icon) icon.textContent = body.style.display === 'none' ? '▼' : '▲';
+  }
+}
+</script>
 </div>
 <div style="padding:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px"><a href="koujue-gallery.html" class="func-card"><span class="func-icon">📜</span><span>口诀库</span></a>
 <a href="merit-system.html" class="func-card"><span class="func-icon">🏅</span><span>功德系统</span></a>

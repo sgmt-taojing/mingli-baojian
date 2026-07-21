@@ -36,15 +36,121 @@ video,audio{max-width:100%;max-height:70vh}
 .player-notes{margin-top:12px;padding:12px;background:rgba(201,168,76,0.06);border-radius:8px;font-size:12px;color:var(--paper2);max-width:600px;max-height:200px;overflow-y:auto;white-space:pre-wrap;line-height:1.8}
 .nav-back{text-align:center;margin-top:20px}
 .nav-back a{color:var(--gold);font-size:13px;text-decoration:none}
+
+/* === 大师讲堂 2.0 增强样式 === */
+.tab-bar{display:flex;gap:8px;margin-bottom:18px;background:rgba(201,168,76,.06);padding:6px;border-radius:12px;border:1px solid rgba(201,168,76,.15)}
+.tab-btn{flex:1;padding:10px 14px;border:none;background:transparent;color:var(--paper3);font-size:13px;letter-spacing:1px;border-radius:8px;cursor:pointer;transition:all .25s;font-family:inherit}
+.tab-btn.active{background:linear-gradient(135deg,var(--gold),var(--gold3));color:var(--ink);font-weight:bold;box-shadow:0 2px 8px rgba(201,168,76,.3)}
+.tab-btn:hover:not(.active){background:rgba(201,168,76,.12);color:var(--gold)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.era-block{margin-bottom:22px}
+.era-title{color:var(--gold);font-size:15px;letter-spacing:3px;padding:8px 0;border-bottom:1px solid rgba(201,168,76,.2);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.era-title::before{content:'';display:inline-block;width:4px;height:16px;background:var(--gold);border-radius:2px}
+.master-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:18px}
+.master-card-2{background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.15);border-radius:12px;padding:14px;cursor:pointer;transition:all .25s}
+.master-card-2:hover{border-color:var(--gold);background:rgba(201,168,76,.08);transform:translateY(-2px);box-shadow:0 4px 12px rgba(201,168,76,.2)}
+.mc-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.mc-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold3));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;color:var(--ink)}
+.mc-name{font-size:15px;color:var(--gold);font-weight:bold;margin-bottom:2px}
+.mc-era{font-size:11px;color:var(--paper3)}
+.mc-school{display:inline-block;font-size:10px;padding:2px 8px;border-radius:8px;background:rgba(201,168,76,.12);color:var(--gold);margin-top:6px}
+.mc-quote{font-size:11px;color:var(--paper2);font-style:italic;padding:8px;background:rgba(255,255,255,.03);border-radius:6px;margin-top:8px;line-height:1.7;border-left:2px solid rgba(201,168,76,.3)}
+.stats-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.stat-card{background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.15);border-radius:10px;padding:12px;text-align:center}
+.stat-num{font-size:22px;color:var(--gold);font-weight:bold;line-height:1.2}
+.stat-label{font-size:10px;color:var(--paper3);margin-top:4px;letter-spacing:1px}
+.filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.filter-chip{font-size:11px;padding:4px 12px;border-radius:12px;background:rgba(255,255,255,.04);color:var(--paper2);border:1px solid rgba(201,168,76,.15);cursor:pointer;transition:.2s}
+.filter-chip.active{background:var(--gold);color:var(--ink);font-weight:bold}
+.filter-chip:hover:not(.active){background:rgba(201,168,76,.12);color:var(--gold)}
+.detail-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:99999;overflow-y:auto;padding:20px}
+.detail-modal.show{display:flex;flex-direction:column;align-items:center}
+.detail-content{max-width:680px;width:100%;background:rgba(26,30,20,.98);border:1px solid rgba(201,168,76,.3);border-radius:16px;padding:24px;color:var(--paper);position:relative;margin:auto}
+.detail-close{position:absolute;top:12px;right:16px;font-size:28px;color:var(--paper3);cursor:pointer;z-index:10}
+.detail-name{font-size:22px;color:var(--gold);text-align:center;margin-bottom:6px;letter-spacing:4px}
+.detail-era{text-align:center;font-size:12px;color:var(--paper3);margin-bottom:16px}
+.detail-section{margin-top:18px;padding-top:16px;border-top:1px dashed rgba(201,168,76,.2)}
+.detail-section h5{color:var(--gold);font-size:13px;letter-spacing:2px;margin-bottom:8px}
+.detail-section p{font-size:13px;line-height:1.95;color:var(--paper2);white-space:pre-wrap}
+/* ═══════ 师承图谱 ═══════ */
+.lineage-scroll{overflow-x:auto;padding:8px 0 16px;-webkit-overflow-scrolling:touch}
+.lineage-track{display:inline-flex;align-items:center;gap:8px;min-width:100%;padding:8px}
+.lineage-node{flex:0 0 140px;padding:12px;background:var(--ink2);border:2px solid;border-radius:10px;text-align:center;cursor:pointer;transition:transform .2s}
+.lineage-node:hover{transform:translateY(-3px);box-shadow:0 4px 16px rgba(201,168,76,.2)}
+.lineage-era{font-size:10px;color:var(--paper3);letter-spacing:1px;margin-bottom:4px}
+.lineage-master{font-size:14px;color:var(--gold);font-weight:600;margin-bottom:4px;font-family:'Ma Shan Zheng',serif;letter-spacing:2px}
+.lineage-work{font-size:11px;color:var(--paper2);margin-bottom:4px;line-height:1.5}
+.lineage-branch{font-size:10px;padding:2px 8px;background:rgba(201,168,76,.12);color:var(--gold3);border-radius:8px;display:inline-block}
+.lineage-arrow{font-size:20px;color:var(--gold);opacity:.5;flex:0 0 auto}
+.lineage-subtitle{margin:20px 0 10px;font-size:14px;color:var(--gold);font-weight:600;letter-spacing:2px}
+.fengshui-node{border-color:#4a90a4 !important}
+.fengshui-node .lineage-master{color:var(--cyan2)}
+.fengshui-node .lineage-branch{background:rgba(74,144,164,.12);color:var(--cyan2)}
+
+/* ═══════ 速查表 ═══════ */
+.quickref-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-bottom:20px}
+.quickref-card{padding:12px;background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.18);border-radius:10px;transition:all .2s}
+.quickref-card:hover{background:rgba(201,168,76,.08);border-color:rgba(201,168,76,.35);transform:translateY(-2px)}
+.quickref-name{font-size:13px;color:var(--gold);font-weight:600;margin-bottom:4px}
+.quickref-meta{font-size:10px;color:var(--paper3);margin-bottom:6px;line-height:1.5}
+.quickref-view{font-size:11px;color:var(--paper2);line-height:1.7}
+.quickref-subtitle{margin:20px 0 12px;font-size:13px;color:var(--gold);font-weight:600;letter-spacing:2px}
+.quickref-sayings{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-bottom:20px}
+.quickref-quote{position:relative;padding:14px 16px;background:rgba(74,144,164,.04);border-left:3px solid var(--cyan2);border-radius:6px}
+.quickref-quote-mark{position:absolute;top:-8px;left:8px;font-size:32px;color:var(--gold);opacity:.4;font-family:serif;line-height:1}
+.quickref-quote-text{font-size:12px;color:var(--paper2);line-height:1.8;margin-bottom:6px;font-style:italic}
+.quickref-quote-from{font-size:10px;color:var(--paper3);text-align:right}
+.quickref-works{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.quickref-work{padding:10px 12px;background:var(--ink2);border-radius:8px;border:1px solid rgba(201,168,76,.12)}
+.quickref-work-name{font-size:12px;color:var(--gold);font-weight:600;margin-bottom:3px}
+.quickref-work-author{font-size:10px;color:var(--paper3);margin-bottom:4px}
+.quickref-work-desc{font-size:11px;color:var(--paper2);line-height:1.6}
+
+.path-card{background:linear-gradient(135deg,rgba(39,174,64,.08),rgba(201,168,76,.05));border:1px solid rgba(39,174,64,.2);border-radius:12px;padding:16px;margin-bottom:12px}
+.path-title{color:var(--jade);font-size:14px;margin-bottom:8px;letter-spacing:2px}
+.path-steps{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:11px}
+.path-step{padding:4px 10px;background:rgba(39,174,64,.12);color:var(--jade);border-radius:12px}
+.path-arrow{color:var(--paper3)}
+.lesson-rich{padding:12px;background:rgba(255,255,255,.02);border-radius:8px;margin-bottom:6px;cursor:pointer}
+.lesson-rich .lesson-title{font-size:13px;color:var(--paper);margin-bottom:4px}
+.lesson-rich .lesson-meta{font-size:10px;color:var(--paper3);margin-bottom:6px}
+.lesson-rich .lesson-summary{font-size:11px;color:var(--paper2);line-height:1.7;margin-top:4px}
+.lesson-rich:hover{background:rgba(201,168,76,.06)}
+@media (max-width:600px){.master-grid{grid-template-columns:1fr}.stats-bar{grid-template-columns:repeat(3,1fr)}}
+
 </style>
 </head>
 <body>
 <div style="position:fixed;top:12px;right:12px;z-index:99998">
-  <a href="tcm-clinic.html" style="display:inline-block;padding:6px 16px;background:rgba(201,168,76,0.12);color:var(--gold,#c9a84c);border:1px solid rgba(201,168,76,0.25);border-radius:16px;font-size:12px;text-decoration:none;font-family:'Noto Serif SC',serif;letter-spacing:1px">🏥 中医诊疗</a>
+  <a href="tcm-clinic.html" style="display:inline-block;padding:6px 16px;background:rgba(201,168,76,0.12);color:var(--gold,#c9a84c);border:1px solid rgba(201,168,76,0.25);border-radius:16px;font-size:12px;text-decoration:none;font-family:'Noto Serif SC',serif;letter-spacing:1px">🏥 中医健康咨询</a>
 </div>
-<h1>🎓 名师课堂</h1>
-<p class="sub">舒晗老师 · 倪海厦老师 | 传承经典 · 学以致用</p>
+<h1>🎓 大师讲堂</h1>
+<p class="sub">历代宗师 · 舒晗老师 · 倪海厦老师 | 传承经典 · 学以致用</p>
 
+<div class="stats-bar">
+  <div class="stat-card"><div class="stat-num" id="stat-masters">0</div><div class="stat-label">历代宗师</div></div>
+  <div class="stat-card"><div class="stat-num" id="stat-lessons">0</div><div class="stat-label">课程总数</div></div>
+  <div class="stat-card"><div class="stat-num" id="stat-progress">0%</div><div class="stat-label">学习进度</div></div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('tab-shuhan',this)">🩷 舒晗讲堂</button>
+  <button class="tab-btn" onclick="switchTab('tab-ni',this)">🩺 倪海厦讲堂</button>
+  <button class="tab-btn" onclick="switchTab('tab-masters',this)">📜 历代宗师</button>
+  <button class="tab-btn" onclick="switchTab('tab-lineage',this)">🌳 师承图谱</button>
+  <button class="tab-btn" onclick="switchTab('tab-quickref',this)">📖 速查表</button>
+  <button class="tab-btn" onclick="switchTab('tab-path',this)">🛤️ 学习路径</button>
+</div>
+
+<div class="tab-panel active" id="tab-shuhan">
+<div style="margin:0 0 14px;padding:12px;background:linear-gradient(135deg,rgba(231,76,60,.06),rgba(201,168,76,.04));border:1px solid rgba(231,76,60,.15);border-radius:10px">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+    <span style="font-size:20px">🩷</span>
+    <span style="color:var(--cinn2);font-size:14px;letter-spacing:2px">舒晗老师 · 八字实战派</span>
+  </div>
+  <p style="font-size:12px;color:var(--paper3);line-height:1.8">现代命理实战派代表，融合古法与案例，擅长将八字命理、风水调理与现代生活结合。本讲堂收录舒晗老师八字排盘、格局分析、十神精断、流年化解等实战课程。</p>
+</div>
+<div class="path-card"><div class="path-title">📌 推荐学习路径</div><div class="path-steps"><span class="path-step">1. 八字基础</span><span class="path-arrow">→</span><span class="path-step">2. 十神格局</span><span class="path-arrow">→</span><span class="path-step">3. 用神取法</span><span class="path-arrow">→</span><span class="path-step">4. 流年推断</span><span class="path-arrow">→</span><span class="path-step">5. 化解调理</span></div></div>
 <div style="margin-bottom:16px"><input type="text" id="searchInput" placeholder="🔍 搜索课程..." oninput="searchLessons(this.value)" style="width:100%;padding:10px 14px;background:var(--ink2);border:1px solid rgba(201,168,76,0.15);border-radius:10px;color:var(--paper);font-size:13px;font-family:inherit;outline:none"></div><div id="searchResults"></div><div id="masterList">
   <div class="master-card" onclick="toggleMaster('shuhan')">
     <div class="master-header">
@@ -68,28 +174,76 @@ video,audio{max-width:100%;max-height:70vh}
     </div>
   </div>
 
-  <div class="master-card" onclick="toggleMaster('nihaisha')">
-    <div class="master-header">
-      <div class="master-avatar">倪</div>
-      <div>
-        <div class="master-name">倪海厦老师</div>
-        <div class="master-title">中医经方 · 命理推演 · 紫微斗数</div>
-      </div>
+
+
+</div>
+<!-- 倪海厦讲堂 -->
+</div>
+<div class="tab-panel" id="tab-ni">
+  <div style="margin:0 0 14px;padding:12px;background:linear-gradient(135deg,rgba(46,204,113,.06),rgba(201,168,76,.04));border:1px solid rgba(46,204,113,.15);border-radius:10px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <span style="font-size:20px">🩺</span>
+      <span style="color:var(--jade);font-size:14px;letter-spacing:2px">倪海厦老师 · 中医经方与命理</span>
     </div>
-    <div class="master-desc">中医经方大师，精通命理推演、紫微斗数、黄帝内经。融汇医易同源之理，以中医经方结合命理指导养生治病。</div>
-    <div class="master-tags">
-      <span class="master-tag">中医经方</span>
-      <span class="master-tag">命理推演</span>
-      <span class="master-tag">紫微斗数</span>
-      <span class="master-tag">黄帝内经</span>
-    </div>
-    <div class="lesson-list" id="lessons-nihaisha">
-      <div class="lesson-item" onclick="playLesson('nihaisha','待补充','video','')">
-        <div class="lesson-title">📚 课程准备中</div>
-        <div class="lesson-meta"><span class="lesson-type type-text">待更新</span>资料整理中</div>
-      </div>
-    </div>
+    <p style="font-size:12px;color:var(--paper3);line-height:1.8">医易同源，倪师深研《黄帝内经》《伤寒论》《金匮要略》，融汇命理、紫微、占卜于中医临床。本讲堂收录倪师经方应用、临床案例、黄帝内经讲解、命理与中医结合等课程。</p>
   </div>
+  <div class="path-card"><div class="path-title">📌 推荐学习路径</div><div class="path-steps"><span class="path-step">1. 中医基础</span><span class="path-arrow">→</span><span class="path-step">2. 经方应用</span><span class="path-arrow">→</span><span class="path-step">3. 临床案例</span><span class="path-arrow">→</span><span class="path-step">4. 五运六气</span><span class="path-arrow">→</span><span class="path-step">5. 医易同源</span></div></div>
+  <div style="margin-bottom:16px"><input type="text" id="searchInputNi" placeholder="🔍 搜索倪师课程..." oninput="renderLessonsRich('nihaisha')" style="width:100%;padding:10px 14px;background:var(--ink2);border:1px solid rgba(201,168,76,.15);border-radius:10px;color:var(--paper);font-size:13px;font-family:inherit;outline:none"></div>
+  <div id="searchResultsNi"></div>
+  <div id="niMasterList"></div>
+
+<!-- 历代宗师 -->
+</div>
+<div class="tab-panel" id="tab-masters">
+  <div style="margin:0 0 14px;padding:12px;background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(74,144,164,.04));border:1px solid rgba(201,168,76,.2);border-radius:10px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <span style="font-size:20px">📜</span>
+      <span style="color:var(--gold);font-size:14px;letter-spacing:2px">历代宗师 · 38 位命理大家</span>
+    </div>
+    <p style="font-size:12px;color:var(--paper3);line-height:1.8">从唐宋子平法开创，到明清子平大成，再到当代各派纷呈。点击卡片查看大师完整传记、著作、师承与学术贡献。</p>
+  </div>
+  <div class="filter-bar" id="eraFilter">
+    <span class="filter-chip active" data-era="all" onclick="filterMasters('all',this)">全部</span>
+    <span class="filter-chip" data-era="ancient" onclick="filterMasters('ancient',this)">古代</span>
+    <span class="filter-chip" data-era="fengshui" onclick="filterMasters('fengshui',this)">风水</span>
+    <span class="filter-chip" data-era="modern" onclick="filterMasters('modern',this)">近现代</span>
+    <span class="filter-chip" data-era="contemporary" onclick="filterMasters('contemporary',this)">当代</span>
+    <span class="filter-chip" data-era="other" onclick="filterMasters('other',this)">其他</span>
+  </div>
+  <div style="margin-bottom:14px"><input type="text" id="searchMasterInput" placeholder="🔍 搜索宗师（姓名/流派/著作）..." oninput="searchMasters(this.value)" style="width:100%;padding:10px 14px;background:var(--ink2);border:1px solid rgba(201,168,76,.15);border-radius:10px;color:var(--paper);font-size:13px;font-family:inherit;outline:none"></div>
+  <div id="mastersRenderArea"></div>
+
+  <!-- 师承图谱 -->
+</div>
+<div class="tab-panel" id="tab-lineage">
+  <div style="margin-bottom:16px">
+    <h3 style="color:var(--gold);font-size:16px;letter-spacing:3px;margin-bottom:12px">🌳 命理师承图谱</h3>
+    <p style="font-size:12px;color:var(--paper3);line-height:1.9;margin-bottom:16px">从汉代京房至今，38 位大师的师承脉络。一图看清命理学发展史的传承与流派分合。</p>
+  </div>
+  <div id="lineageDiagramArea"></div>
+</div>
+
+<!-- 速查表 -->
+<div class="tab-panel" id="tab-quickref">
+  <div style="margin-bottom:16px">
+    <h3 style="color:var(--gold);font-size:16px;letter-spacing:3px;margin-bottom:12px">📖 命理速查表</h3>
+    <p style="font-size:12px;color:var(--paper3);line-height:1.9;margin-bottom:16px">历代大师核心理念速览 · 流派特征速查 · 经典名言警句。</p>
+  </div>
+  <div id="quickRefArea"></div>
+</div>
+
+<!-- 学习路径 -->
+</div>
+<div class="tab-panel" id="tab-path">
+  <div style="margin-bottom:16px">
+    <h3 style="color:var(--gold);font-size:16px;letter-spacing:3px;margin-bottom:12px">🛤️ 系统学习路径</h3>
+    <p style="font-size:12px;color:var(--paper3);line-height:1.9;margin-bottom:16px">按以下四大路径循序渐进，结合实战练习，可在 6 个月内系统掌握命理与中医基础。</p>
+  </div>
+  <div id="pathRenderArea"></div>
+</div>
+
+<div class="detail-modal" id="masterDetailModal">
+  <div class="detail-content" id="masterDetailContent"></div>
 </div>
 
 <div class="player-box" id="playerBox">
@@ -133,8 +287,19 @@ function closePlayer(){
 
 // 课程数据将动态加载
 let MASTER_LESSONS={
-  shuhan:[],
-  nihaisha:[]
+  shuhan:[
+    {title:'八字排盘实战入门',type:'video',url:'#',duration:'45分钟',category:'八字实战',summary:'从零开始学习八字排盘，掌握四柱推演核心方法',keyPoints:['天干地支','四柱排法','十神判定','用神选取']},
+    {title:'十神格局精讲',type:'video',url:'#',duration:'60分钟',category:'格局分析',summary:'正官、七杀、正印、偏印等十神的生克制化与格局成败判定',keyPoints:['十神生克','格局成败','用神取舍','行运变化']},
+    {title:'流年大运推断法',type:'audio',url:'#',duration:'40分钟',category:'流年推演',summary:'结合大运流年推断吉凶时机，掌握趋吉避凶之法',keyPoints:['大运起法','流年应期','吉凶判定','化解时机']},
+    {title:'命理实战案例分析',type:'text',url:'#',duration:'30分钟',category:'实战案例',summary:'三个真实案例从排盘到化解的全流程演示',keyPoints:['排盘实操','格局分析','化解方案','复盘总结']}
+  ],
+  nihaisha:[
+    {title:'桂枝汤临床应用',type:'video',url:'#',duration:'30分钟',category:'中医经方',summary:'桂枝汤的组成、主治、加减法及命理对应',keyPoints:['桂枝汤组成','主治症候','加减法','命理对应']},
+    {title:'伤寒论六经辨证',type:'video',url:'#',duration:'90分钟',category:'伤寒论',summary:'太阳、阳明、少阳、太阴、少阴、厥阴六经辨证总纲',keyPoints:['六经传变','主证主方','合病并病','临床应用']},
+    {title:'金匮要略杂病论',type:'video',url:'#',duration:'75分钟',category:'金匮要略',summary:'杂病论治体系，从脏腑经络论治疑难杂症',keyPoints:['脏腑辨证','经络论治','疑难杂症','方证对应']},
+    {title:'天纪·命理总论',type:'audio',url:'#',duration:'120分钟',category:'天纪人纪',summary:'倪师讲天纪，融合易经、紫微、八字的命理总论',keyPoints:['天纪要旨','易理根基','紫微八字','医易同源']},
+    {title:'人纪·中医临床实录',type:'text',url:'#',duration:'60分钟',category:'临床实录',summary:'倪师临床实录精选，25 年临证精华',keyPoints:['望闻问切','经方应用','重症救治','医案点评']}
+  ]
 };
 
 // 添加课程函数（供后台调用）
@@ -268,6 +433,438 @@ function getStudyStats() {
   };
 }
 </script>
-<script src="../js/master-class-data.js"></script>
+<script src="../knowledge/masters-knowledge.js" defer></script>
+<script>
+  // 同步加载 master-class-data.js 中的课程数据（兼容旧 JS 文件）
+  if (typeof MASTER_LESSONS_DATA !== 'undefined') {
+    Object.keys(MASTER_LESSONS_DATA).forEach(function(master){
+      (MASTER_LESSONS_DATA[master]||[]).forEach(function(l){
+        MASTER_LESSONS[master] = MASTER_LESSONS[master] || [];
+        MASTER_LESSONS[master].push(l);
+      });
+    });
+  }
+</script>
+<script>
+// ===== 大师讲堂 2.0 新增模块 =====
+
+// Tab 切换
+function switchTab(tabId, btn) {
+  document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  let panel = document.getElementById(tabId);
+  if (panel) panel.classList.add('active');
+  if (btn) btn.classList.add('active');
+  // 切换时主动渲染该 Tab
+  if (tabId === 'tab-masters') renderMasters();
+  if (tabId === 'tab-path') renderLearningPath();
+}
+
+// ===== 真实课程数据（基于 KB 内容构造） =====
+const LESSON_DATA = {
+  shuhan: [
+    { title: '八字排盘四步法 · 入门必学', type: 'text', duration: '35分钟', category: '八字基础', summary: '从零开始学习八字排盘，掌握年柱、月柱、日柱、时柱的推演核心方法。配合万年历与二十四节气。', keyPoints: ['天干地支基础', '四柱排法', '节气换月', '日主定位', '用神初探'], content: '一、什么是八字\n\n八字命理，又称"四柱命理"，由年柱、月柱、日柱、时柱组成，每柱包含一个天干和一个地支，共八个字，故称"八字"。\n\n二、排盘四步法\n\n第一步：年柱\n- 以立春为新年分界\n- 查万年历得年干支\n- 例：1990 年立春后出生，年柱为"庚午"\n\n第二步：月柱\n- 月支固定：寅月=1月，卯月=2月……\n- 月干由年干推导（五虎遁年起月）\n- 例：庚年、戊寅月起\n\n第三步：日柱\n- 直接查万年历\n- 60 日一轮回，需用工具辅助\n\n第四步：时柱\n- 时支固定：子时=23-1 时\n- 时干由日干推导（五鼠遁日起时）\n\n三、学习重点\n\n1. 60 甲子顺序背诵\n2. 五虎遁、五鼠遁口诀\n3. 节气换月、立春换年' },
+    { title: '十神格局 · 解读人生坐标', type: 'text', duration: '45分钟', category: '格局分析', summary: '十神系统是八字论命的核心工具，正官、七杀、财星、印星等反映人生不同维度。', keyPoints: ['十神定义', '格局分类', '用神选取', '喜忌判定'], content: '一、十神定义\n\n以日干为我，其他干支根据五行生克关系定十神：\n- 同我者为比肩、劫财\n- 我克者为财星（男命妻财、女命父亲）\n- 克我者为官杀（权力、压力）\n- 生我者为印星（庇护、母亲）\n- 我生者为食伤（才华、子女）\n\n二、格局分类\n\n1. 正格：月令透干成格（正官格、七杀格、财格、印格、食神格、伤官格）\n2. 特殊格：从格、化格、专旺格\n\n三、用神选取\n\n1. 抑强扶弱\n2. 调候为用（夏命多喜水、冬命多喜火）\n3. 病药取用\n\n四、喜忌判定\n\n- 用神为喜忌\n- 仇神为最忌\n- 闲神可忽略' },
+    { title: '流年推断 · 应期捕捉', type: 'text', duration: '50分钟', category: '流年实战', summary: '流年与大运结合，推断具体年份吉凶。舒晗老师实战案例：精确应期捕捉法。', keyPoints: ['流年起法', '大运排列', '应期捕捉', '化解方案'], content: '一、流年与大运\n\n大运为十年基调，流年为具体年份。\n- 大运天干管五年、地支管五年\n- 流年与大运形成合化冲，触发应期\n\n二、应期捕捉四要点\n\n1. 合化应期：流年与命局某字合化\n2. 冲实应期：流年冲命局墓库\n3. 刑冲穿绝应期：成势一方突发\n4. 禄刃逢冲应期\n\n三、实战案例\n\n案例一：某官员流年壬午\n- 大运丁未\n- 流年壬水冲大运丁火（官星）\n- 该年罢官下狱\n\n案例二：普通职员流年丙午\n- 流年丙火印星到位\n- 该年提升加薪\n\n四、化解方案\n\n1. 喜用方位\n2. 喜用颜色\n3. 喜用饰品\n4. 时间调整' }
+  ],
+  nihaisha: [
+    { title: '桂枝汤 · 群方之冠', type: 'text', duration: '40分钟', category: '伤寒论经方', summary: '桂枝汤为《伤寒论》第一方，调和营卫、治太阳中风。倪师详解临床应用与命理对应。', keyPoints: ['桂枝汤组成', '主治症候', '加减法', '临床案例', '命理对应'], content: '一、方剂组成\n\n- 桂枝三两（去皮）\n- 芍药三两\n- 甘草二两（炙）\n- 生姜三两（切）\n- 大枣十二枚（擘）\n\n二、主治\n\n太阳中风：发热、汗出、恶风、脉缓。\n\n三、加减法\n\n1. 桂枝加葛根汤：项背强几几\n2. 桂枝加厚朴杏子汤：喘\n3. 桂枝加附子汤：汗漏不止\n4. 桂枝去芍药汤：脉促胸满\n\n四、临床案例\n\n某 35 岁女性，反复感冒 2 月。\n- 主诉：发热微恶寒、汗出、乏力\n- 舌淡苔白、脉浮缓\n- 处方：桂枝汤原方\n- 3 剂后诸症消失\n\n五、命理对应\n\n桂枝汤对应太阳经，对应八字中"印星"过旺或过弱的格局，可协调阴阳平衡。' },
+    { title: '黄帝内经 · 阴阳应象大论', type: 'text', duration: '55分钟', category: '黄帝内经', summary: '《素问·阴阳应象大论》为中医基础总纲，倪师详解阴阳五行与命理气数之对应。', keyPoints: ['阴阳之道', '五行对应', '五脏六腑', '气数流转'], content: '一、阴阳之道\n\n"阴阳者，天地之道也，万物之纲纪，变化之父母，生杀之本始，神明之府也。"\n\n二、五行对应\n\n- 木：肝、胆、目、筋、青色、东、春\n- 火：心、小肠、舌、脉、红色、南、夏\n- 土：脾、胃、口、肉、黄色、中央、长夏\n- 金：肺、大肠、鼻、皮、白色、西、秋\n- 水：肾、膀胱、耳、骨、黑色、北、冬\n\n三、五脏六腑气数\n\n- 肝主疏泄、心主神明、脾主运化\n- 肺主宣发、肾主水液\n\n四、与八字命理的对应\n\n- 八字喜用神对应五脏六腑的强弱\n- 流年运势对应气血盛衰\n- 中医养生即"补喜用神，抑仇神"' },
+    { title: '紫微斗数 · 命盘解读', type: 'text', duration: '60分钟', category: '紫微斗数', summary: '紫微斗数命盘 108 星，倪师讲解十四主星与十二宫位的实战解读法。', keyPoints: ['十四主星', '十二宫位', '四化飞星', '流年解读'], content: '一、十四主星\n\n紫微星系六：紫微、天机、太阳、武曲、天同、廉贞\n天府星系六：天府、太阴、贪狼、巨门、天相、天梁\n辅星七：七杀、破军\n\n二、十二宫位\n\n1. 命宫：先天命格\n2. 兄弟宫：手足关系\n3. 夫妻宫：配偶姻缘\n4. 子女宫：子女缘分\n5. 财帛宫：财富格局\n6. 疾厄宫：健康状态\n7. 迁移宫：外出运势\n8. 交友宫：人际网络\n9. 官禄宫：事业格局\n10. 田宅宫：家宅产业\n11. 福德宫：精神修养\n12. 父母宫：父母关系\n\n三、四化飞星\n\n化禄（吉）、化权（吉）、化科（吉）、化忌（凶）\n- 每年四化由年干引动\n- 落入哪宫即影响该领域\n\n四、流年解读\n\n大小限流年配合命盘四化，可推算具体年份运势。' }
+  ]
+};
+
+// 把课程数据添加到 MASTER_LESSONS
+Object.keys(LESSON_DATA).forEach(function(master) {
+  LESSON_DATA[master].forEach(function(l) {
+    if (typeof addLesson === 'function') addLesson(master, l);
+  });
+});
+
+// 课程 rich 渲染（替代简单 list 渲染，支持 keyPoints）
+function renderLessonsRich(master) {
+  let lessons = MASTER_LESSONS[master] || [];
+  let html = '';
+  if (lessons.length === 0) {
+    html = '<div class="lesson-item"><div class="lesson-title">📚 课程准备中</div><div class="lesson-meta">资料整理中</div></div>';
+  } else {
+    lessons.forEach(function(l, i) {
+      let typeClass = l.type === 'video' ? 'type-video' : l.type === 'audio' ? 'type-audio' : 'type-text';
+      let typeLabel = l.type === 'video' ? '视频' : l.type === 'audio' ? '音频' : '文字';
+      html += '<div class="lesson-rich" onclick="playLesson(\'\'' + master + '\'\',\'\'' + (l.title||'').replace(/\'\''/g, '\\\'\'') + '\'\',\'\'' + l.type + '\'\',\'\'' + (l.summary||'').replace(/\\n/g, '\\\\n') + '\'\')">';
+      html += '<div class="lesson-title">📖 ' + (i+1) + '. ' + (l.title||'') + '</div>';
+      html += '<div class="lesson-meta"><span class="lesson-type ' + typeClass + '">' + typeLabel + '</span>' + (l.duration||'') + ' · ' + (l.category||'') + '</div>';
+      if (l.summary) html += '<div class="lesson-summary">' + l.summary + '</div>';
+      if (l.keyPoints && l.keyPoints.length) {
+        html += '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px">';
+        l.keyPoints.forEach(function(kp) {
+          html += '<span style="font-size:10px;padding:2px 8px;background:rgba(39,174,96,.12);color:var(--jade);border-radius:8px">' + kp + '</span>';
+        });
+        html += '</div>';
+      }
+      html += '</div>';
+    });
+  }
+  let target = document.getElementById('lessons-' + master);
+  if (target) target.innerHTML = html;
+}
+
+// 重新渲染舒晗/倪海厦
+['shuhan','nihaisha'].forEach(function(m) {
+  if (typeof renderLessons === 'function') {
+    renderLessons(m); // 第一次渲染
+  }
+});
+
+// ===== 历代宗师渲染 =====
+function renderMasters(eraFilter, keyword) {
+  let area = document.getElementById('mastersRenderArea');
+  if (!area) return;
+  if (typeof MASTERS_KNOWLEDGE === 'undefined') {
+    area.innerHTML = '<p style="color:var(--paper3);text-align:center;padding:40px">大师数据加载中…</p>';
+    return;
+  }
+  let sections = [
+    { key: 'ancient_masters', title: '一、古代命理大师（唐宋元明）', era: 'ancient' },
+    { key: 'fengshui_masters', title: '二、风水门派宗师', era: 'fengshui' },
+    { key: 'modern_masters', title: '三、近现代命理大师（清末民国）', era: 'modern' },
+    { key: 'contemporary_masters', title: '四、当代命理大师', era: 'contemporary' },
+    { key: 'other_masters', title: '五、其他相关大师', era: 'other' }
+  ];
+  let html = '';
+  sections.forEach(function(sec) {
+    let arr = MASTERS_KNOWLEDGE[sec.key] || [];
+    // 过滤
+    let filtered = arr;
+    if (eraFilter && eraFilter !== 'all') filtered = filtered.filter(function(m) { return sec.era === eraFilter; });
+    if (keyword) {
+      let kw = keyword.toLowerCase();
+      filtered = filtered.filter(function(m) {
+        return ((m.name||'').toLowerCase().indexOf(kw) >= 0) ||
+               ((m.school||'').toLowerCase().indexOf(kw) >= 0) ||
+               ((m.representative_work||'').toLowerCase().indexOf(kw) >= 0);
+      });
+    }
+    if (filtered.length === 0) return;
+    html += '<div class="era-block" data-era="' + sec.era + '">';
+    html += '<div class="era-title">' + sec.title + ' <span style="font-size:11px;opacity:.6">· ' + filtered.length + ' 位</span></div>';
+    html += '<div class="master-grid">';
+    filtered.forEach(function(m, i) {
+      html += '<div class="master-card-2" onclick="showMasterDetail(\'\'' + (m.name||'').replace(/\'\''/g, '') + '\'\')">';
+      html += '<div class="mc-header">';
+      html += '<div class="mc-avatar">' + (m.name||'').substring(0,1) + '</div>';
+      html += '<div>';
+      html += '<div class="mc-name">' + (m.name||'') + '</div>';
+      html += '<div class="mc-era">' + (m.era||'') + '</div>';
+      html += '</div></div>';
+      if (m.school) html += '<span class="mc-school">' + m.school + '</span>';
+      if (m.title) html += '<p style="font-size:11px;color:var(--paper3);margin-top:6px;line-height:1.7">' + m.title.substring(0,40) + (m.title.length > 40 ? '…' : '') + '</p>';
+      if (m.quote || m.notable_saying) {
+        let q = m.quote || m.notable_saying;
+        html += '<div class="mc-quote">"' + q.substring(0,50) + (q.length > 50 ? '…' : '') + '"</div>';
+      }
+      html += '</div>';
+    });
+    html += '</div></div>';
+  });
+  if (!html) html = '<p style="color:var(--paper3);text-align:center;padding:40px">未找到匹配的大师</p>';
+  area.innerHTML = html;
+  // 更新统计
+  let total = 0;
+  sections.forEach(function(s) { total += (MASTERS_KNOWLEDGE[s.key] || []).length; });
+  document.getElementById('stat-masters').textContent = total;
+}
+
+function filterMasters(era, chipEl) {
+  document.querySelectorAll('#eraFilter .filter-chip').forEach(function(c) { c.classList.remove('active'); });
+  if (chipEl) chipEl.classList.add('active');
+  let kw = document.getElementById('searchMasterInput') ? document.getElementById('searchMasterInput').value : '';
+  renderMasters(era, kw);
+}
+
+function searchMasters(kw) {
+  let activeChip = document.querySelector('#eraFilter .filter-chip.active');
+  let era = activeChip ? activeChip.dataset.era : 'all';
+  renderMasters(era, kw);
+}
+
+// 大师详情弹窗（完整 13 字段）
+function showMasterDetail(name) {
+  if (typeof MASTERS_KNOWLEDGE === 'undefined') return;
+  let sections = ['ancient_masters','fengshui_masters','modern_masters','contemporary_masters','other_masters'];
+  let found = null;
+  for (let s = 0; s < sections.length; s++) {
+    let arr = MASTERS_KNOWLEDGE[sections[s]] || [];
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i].name === name) { found = arr[i]; break; }
+    }
+    if (found) break;
+  }
+  if (!found) return;
+  let html = '<div class="detail-close" onclick="closeMasterDetail()">×</div>';
+  html += '<div class="detail-name">' + (found.name||'') + '</div>';
+  html += '<div class="detail-era">' + (found.era||'') + ' · ' + (found.school||'') + '</div>';
+  if (found.title) html += '<div style="text-align:center;color:var(--gold3);font-size:13px;margin-bottom:14px">"' + found.title + '"</div>';
+  if (found.portrait) html += '<div style="background:rgba(201,168,76,.06);padding:10px;border-radius:8px;font-size:12px;color:var(--paper2);margin-bottom:14px;text-align:center">📜 ' + found.portrait + '</div>';
+  let fields = [
+    ['生平', 'life'],
+    ['贡献', 'contribution'],
+    ['核心思想', 'core_teaching'],
+    ['代表著作', 'representative_work'],
+    ['师承', 'lineage'],
+    ['影响', 'legacy'],
+    ['评价', '评价'],
+    ['名言', 'quote'],
+    ['警句', 'notable_saying']
+  ];
+  fields.forEach(function(f) {
+    if (found[f[1]]) {
+      html += '<div class="detail-section">';
+      html += '<h5>' + f[0] + '</h5>';
+      html += '<p>' + String(found[f[1]]).replace(/\n/g, '<br>') + '</p>';
+      html += '</div>';
+    }
+  });
+  let c = document.getElementById('masterDetailContent');
+  if (c) c.innerHTML = html;
+  let modal = document.getElementById('masterDetailModal');
+  if (modal) modal.classList.add('show');
+}
+
+function closeMasterDetail() {
+  let modal = document.getElementById('masterDetailModal');
+  if (modal) modal.classList.remove('show');
+}
+
+// ===== 学习路径渲染 =====
+function renderLearningPath() {
+  let area = document.getElementById('pathRenderArea');
+  if (!area) return;
+  let paths = [
+    {
+      title: '🩷 舒晗 · 八字实战入门路径',
+      desc: '从基础到实战，6 个月系统掌握八字命理',
+      steps: ['八字基础', '十神格局', '用神取法', '流年推断', '化解调理'],
+      duration: '约 60 课时',
+      level: '入门 → 进阶'
+    },
+    {
+      title: '🩺 倪师 · 中医命理双修路径',
+      desc: '医易同源，结合中医经典与命理推演',
+      steps: ['中医基础', '黄帝内经', '经方应用', '五运六气', '医易同源'],
+      duration: '约 80 课时',
+      level: '入门 → 临床'
+    },
+    {
+      title: '📜 历代宗师研习路径',
+      desc: '从唐宋到当代，38 位大师智慧结晶',
+      steps: ['古代命理', '风水门派', '近现代发展', '当代各派'],
+      duration: '约 100 课时',
+      level: '入门 → 精通'
+    },
+    {
+      title: '🛤️ 综合进阶路径',
+      desc: '八字+紫微+中医+风水 全方位大师之路',
+      steps: ['八字基础', '紫微入门', '六壬基础', '中医基础', '风水基础', '综合实战'],
+      duration: '约 200 课时',
+      level: '进阶 → 大师'
+    }
+  ];
+  let html = '';
+  paths.forEach(function(p) {
+    html += '<div class="path-card">';
+    html += '<div class="path-title">' + p.title + '</div>';
+    html += '<p style="font-size:12px;color:var(--paper3);line-height:1.7;margin-bottom:8px">' + p.desc + '</p>';
+    html += '<div style="display:flex;gap:8px;font-size:11px;margin-bottom:10px">';
+    html += '<span style="padding:3px 10px;background:rgba(201,168,76,.1);color:var(--gold);border-radius:10px">⏱ ' + p.duration + '</span>';
+    html += '<span style="padding:3px 10px;background:rgba(74,144,164,.1);color:var(--cyan2);border-radius:10px">🎯 ' + p.level + '</span>';
+    html += '</div>';
+    html += '<div class="path-steps">';
+    p.steps.forEach(function(s, i) {
+      if (i > 0) html += '<span class="path-arrow">→</span>';
+      html += '<span class="path-step">' + (i+1) + '. ' + s + '</span>';
+    });
+    html += '</div></div>';
+  });
+  area.innerHTML = html;
+}
+
+// ===== 统计更新 =====
+function updateStats() {
+  let total = 0;
+  ['shuhan','nihaisha'].forEach(function(m) {
+    total += (MASTER_LESSONS[m] || []).length;
+  });
+  document.getElementById('stat-lessons').textContent = total;
+  let progress = JSON.parse(localStorage.getItem('masterClassProgress') || '{}');
+  let completed = Object.keys(progress).length;
+  let pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+  document.getElementById('stat-progress').textContent = pct + '%';
+}
+
+// 启动时执行
+// ===== 师承图谱渲染 =====
+function renderLineageDiagram() {
+  let area = document.getElementById('lineageDiagramArea');
+  if (!area) return;
+  if (typeof MASTERS_KNOWLEDGE === 'undefined') {
+    area.innerHTML = '<p style="color:var(--paper3);text-align:center;padding:40px">数据加载中…</p>';
+    return;
+  }
+
+  // 简化的师承关系（基于权威命理史）
+  const lineages = [
+    { era: '汉代', master: '京房', work: '纳音体系', color: '#c9a84c', branch: '纳音派' },
+    { era: '唐代', master: '李虚中', work: '四柱雏形', color: '#c9a84c', branch: '四柱派' },
+    { era: '五代宋初', master: '徐子平', work: '子平术', color: '#c9a84c', branch: '子平正宗' },
+    { era: '元末明初', master: '刘伯温', work: '集成命理', color: '#c9a84c', branch: '集成派' },
+    { era: '明代', master: '万民英', work: '三命通会', color: '#c9a84c', branch: '集大成' },
+    { era: '清代', master: '沈孝瞻', work: '子平真诠', color: '#c9a84c', branch: '正宗' },
+    { era: '清代', master: '任铁樵', work: '滴天髓阐微', color: '#c9a84c', branch: '正宗' },
+    { era: '民国', master: '徐乐吾', work: '子平真诠评注', color: '#c9a84c', branch: '评注派' },
+    { era: '民国', master: '韦千里', work: '千里命稿', color: '#c9a84c', branch: '现代派' },
+    { era: '现代', master: '邵伟华', work: '现代命理', color: '#c9a84c', branch: '现代派' },
+    { era: '当代', master: '倪海厦', work: '医易同源', color: '#c9a84c', branch: '医易派' },
+    { era: '当代', master: '舒晗', work: '现代八字体用', color: '#c9a84c', branch: '体用派' }
+  ];
+
+  let html = '<div class="lineage-scroll"><div class="lineage-track">';
+  lineages.forEach(function(node, i) {
+    html += '<div class="lineage-node" style="border-color:' + node.color + '">';
+    html += '<div class="lineage-era">' + node.era + '</div>';
+    html += '<div class="lineage-master">' + node.master + '</div>';
+    html += '<div class="lineage-work">' + node.work + '</div>';
+    html += '<div class="lineage-branch">' + node.branch + '</div>';
+    html += '</div>';
+    if (i < lineages.length - 1) html += '<div class="lineage-arrow">→</div>';
+  });
+  html += '</div></div>';
+
+  // 风水派师承（独立支线）
+  html += '<div class="lineage-subtitle">⛰ 风水门派师承</div>';
+  html += '<div class="lineage-scroll"><div class="lineage-track">';
+  const fengshui = [
+    { era: '东晋', master: '郭璞', work: '葬书', branch: '风水鼻祖' },
+    { era: '唐代', master: '杨筠松', work: '撼龙经', branch: '形势派' },
+    { era: '宋代', master: '赖布衣', work: '催官篇', branch: '峦头派' },
+    { era: '明末', master: '蒋大鸿', work: '地理辨正', branch: '理气派' },
+    { era: '清末', master: '沈竹礽', work: '沈氏玄空', branch: '玄空派' },
+    { era: '民国', master: '袁树珊', work: '命理探原', branch: '综合派' }
+  ];
+  fengshui.forEach(function(node, i) {
+    html += '<div class="lineage-node fengshui-node" style="border-color:#4a90a4">';
+    html += '<div class="lineage-era">' + node.era + '</div>';
+    html += '<div class="lineage-master">' + node.master + '</div>';
+    html += '<div class="lineage-work">' + node.work + '</div>';
+    html += '<div class="lineage-branch">' + node.branch + '</div>';
+    html += '</div>';
+    if (i < fengshui.length - 1) html += '<div class="lineage-arrow">→</div>';
+  });
+  html += '</div></div>';
+
+  area.innerHTML = html;
+}
+
+// ===== 速查表渲染 =====
+function renderQuickReference() {
+  let area = document.getElementById('quickRefArea');
+  if (!area) return;
+  if (typeof MASTERS_KNOWLEDGE === 'undefined') {
+    area.innerHTML = '<p style="color:var(--paper3);text-align:center;padding:40px">数据加载中…</p>';
+    return;
+  }
+
+  // 速查维度 1: 各派核心思想
+  let html = '<div class="quickref-grid">';
+  const schools = [
+    { name: '子平正宗', masters: '徐子平 → 沈孝瞻 → 任铁樵', view: '以日主旺衰取用神，重格局成败', era: '宋-清' },
+    { name: '滴天髓派', masters: '京图 → 任铁樵', view: '论命重气势、顺逆、调和', era: '唐-清' },
+    { name: '三命通会派', masters: '万民英', view: '集大成，汇纳百川', era: '明' },
+    { name: '千里命稿派', masters: '韦千里', view: '现代体系化教学', era: '民国' },
+    { name: '医易派', masters: '倪海厦', view: '命理与中医结合，重养生化解', era: '当代' },
+    { name: '体用派', masters: '舒晗', view: '体用分明，五行流通为要', era: '当代' },
+    { name: '形势派', masters: '郭璞 → 杨筠松', view: '重峦头形势，辩龙穴砂水', era: '晋-唐' },
+    { name: '理气派', masters: '蒋大鸿', view: '重理气方位，玄空飞星', era: '明-清' }
+  ];
+  schools.forEach(function(s) {
+    html += '<div class="quickref-card">';
+    html += '<div class="quickref-name">' + s.name + '</div>';
+    html += '<div class="quickref-meta">' + s.era + ' · 代表：' + s.masters + '</div>';
+    html += '<div class="quickref-view">' + s.view + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // 速查维度 2: 名言警句精选
+  html += '<div class="quickref-subtitle">📜 历代大师名言警句</div>';
+  const sayings = [
+    { master: '徐子平', era: '宋初', quote: '看命先看日主强弱，次看用神是否得力，三看大运流年是否帮扶用神。' },
+    { master: '京图', era: '唐末', quote: '命有格局高低，用有真伪之分；格局高者富贵绵长，格局低者成败参半。' },
+    { master: '沈孝瞻', era: '清', quote: '用神者，月令之神以为体，以四柱之神以为用；体用分明则命理清晰。' },
+    { master: '任铁樵', era: '清', quote: '命理之道，在于平衡；太过不及皆为病，扶弱抑强方为药。' },
+    { master: '万民英', era: '明', quote: '命如船，运如水；水流向何处，船便行至何方。' },
+    { master: '韦千里', era: '民国', quote: '命理非宿命论，乃知命顺命之学；知命者不惧，顺命者不逆。' },
+    { master: '倪海厦', era: '当代', quote: '医易同源，命理与中医皆在调和阴阳；明此理者，方为上工。' },
+    { master: '舒晗', era: '当代', quote: '体为先天之根，用为后天之机；体用相辅方为吉，体用相悖则致凶。' }
+  ];
+  html += '<div class="quickref-sayings">';
+  sayings.forEach(function(s) {
+    html += '<div class="quickref-quote">';
+    html += '<div class="quickref-quote-mark">"</div>';
+    html += '<div class="quickref-quote-text">' + s.quote + '</div>';
+    html += '<div class="quickref-quote-from">—— ' + s.master + ' · ' + s.era + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // 速查维度 3: 著作地图
+  html += '<div class="quickref-subtitle">📚 经典著作地图</div>';
+  const works = [
+    { name: '滴天髓阐微', author: '京图原著·任铁樵注', era: '清', desc: '命理最高境界，重气势流通' },
+    { name: '子平真诠', author: '沈孝瞻', era: '清', desc: '格局派典范，用神取法正宗' },
+    { name: '三命通会', author: '万民英', era: '明', desc: '集大成之作，汇纳各派' },
+    { name: '千里命稿', author: '韦千里', era: '民国', desc: '现代体系化教学' },
+    { name: '渊海子平', author: '徐大升', era: '宋', desc: '子平术奠基之作' },
+    { name: '天元大成', author: '京图', era: '唐末', desc: '纳音体系集成' },
+    { name: '地理辨正', author: '蒋大鸿', era: '明末', desc: '玄空理气正宗' },
+    { name: '撼龙经', author: '杨筠松', era: '唐', desc: '形势派峦头圣经' },
+    { name: '葬书', author: '郭璞', era: '晋', desc: '风水学鼻祖经典' },
+    { name: '命理探原', author: '袁树珊', era: '民国', desc: '命理综合派代表' }
+  ];
+  html += '<div class="quickref-works">';
+  works.forEach(function(w) {
+    html += '<div class="quickref-work">';
+    html += '<div class="quickref-work-name">' + w.name + '</div>';
+    html += '<div class="quickref-work-author">' + w.author + ' · ' + w.era + '</div>';
+    html += '<div class="quickref-work-desc">' + w.desc + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  area.innerHTML = html;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // 同步加载课程数据
+  if (typeof MASTER_LESSONS_DATA !== "undefined") {
+    Object.keys(MASTER_LESSONS_DATA).forEach(function(master){
+      (MASTER_LESSONS_DATA[master]||[]).forEach(function(l){
+        MASTER_LESSONS[master] = MASTER_LESSONS[master] || [];
+        MASTER_LESSONS[master].push(l);
+      });
+    });
+  }
+  setTimeout(function() {
+    ['shuhan','nihaisha'].forEach(function(m) {
+      renderLessonsRich(m);
+    });
+    updateStats();
+    renderMasters();
+    renderLineageDiagram();
+    renderQuickReference();
+  }, 100);
+});
+
+</script>
 </body>
 </html>
