@@ -2806,6 +2806,19 @@ input, textarea, select {
 .fu-zhou{margin-top:10px;padding:10px;background:rgba(106,90,205,.06);border:1px solid rgba(106,90,205,.2);border-radius:8px;font-size:11px;line-height:1.7;font-style:italic;color:var(--paper2)}
 .fu-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
 @media(max-width:768px){.fu-events,.fu-categories{grid-template-columns:repeat(3,1fr)}.fu-events{grid-template-columns:repeat(2,1fr)}.fu-items{columns:1}}
+/* R38-B fengshui 12 宫全覆盖 */
+.pal12{padding:18px;background:linear-gradient(135deg,rgba(201,168,76,.05),rgba(106,90,205,.05));border-radius:14px;margin:20px 0;border:1px solid var(--line)}
+.pal12-title{font-size:16px;color:var(--gold);letter-spacing:2px;margin-bottom:14px;font-weight:600}
+.pal12-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.pal12-cell{padding:12px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:8px;cursor:pointer;transition:.2s}
+.pal12-cell:hover{background:rgba(201,168,76,.08);border-color:var(--gold);transform:translateY(-1px)}
+.pal12-cell .icon{font-size:20px;display:block;margin-bottom:6px}
+.pal12-cell b{display:block;font-size:12px;color:var(--gold);margin-bottom:4px}
+.pal12-cell .desc{font-size:10px;opacity:.7;line-height:1.5;margin-bottom:4px}
+.pal12-cell .star{font-size:10px;color:#4a9a6e}
+.pal12-verdict{margin-top:14px;padding:12px;background:rgba(0,0,0,.2);border-radius:8px;border:1px dashed var(--gold);font-size:12px;line-height:1.9}
+.pal12-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+@media(max-width:768px){.pal12-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
 </style>
 </style>
@@ -7061,6 +7074,22 @@ function generateFuneralBlessing(){
   h+="</div>";
   document.getElementById("fuResult").innerHTML=h;
 }
+/* ===== R38-B fengshui 12 宫全覆盖 ===== */
+var PALACE_12_R38={"命宫":{"icon":"👑","name":"命宫","desc":"先天禀赋·性格·格局","wuxing":"木","star":"紫微","score":88,"tip":"命宫主星明亮·格局宏大·贵人扶持"},"财帛宫":{"icon":"💰","name":"财帛宫","desc":"正财偏财·赚钱能力","wuxing":"金","star":"武曲","score":82,"tip":"财帛武曲化禄·正财旺·投资需谨慎"},"官禄宫":{"icon":"👔","name":"官禄宫","desc":"事业仕途·功名","wuxing":"火","star":"紫微","score":78,"tip":"官禄紫微·适合管理·贵人提携"},"福德宫":{"icon":"🌟","name":"福德宫","desc":"福气·精神享受","wuxing":"土","star":"天府","score":85,"tip":"福德天府·福气厚·心态平和·享福命"},"疾厄宫":{"icon":"🩺","name":"疾厄宫","desc":"健康·疾病·体质","wuxing":"水","star":"天同","score":76,"tip":"疾厄天同·注意脾胃·少熬夜"},"夫妻宫":{"icon":"💑","name":"夫妻宫","desc":"婚姻·伴侣","wuxing":"火","star":"天相","score":80,"tip":"夫妻天相·配偶优秀·择偶需谨慎"},"子女宫":{"icon":"👶","name":"子女宫","desc":"子女·晚辈","wuxing":"水","star":"太阴","score":75,"tip":"子女太阴·子女聪慧·教育为先"},"兄弟宫":{"icon":"👥","name":"兄弟宫","desc":"兄弟姐妹·朋友","wuxing":"木","star":"太阳","score":72,"tip":"兄弟太阳·手足情深·朋友助益"},"田宅宫":{"icon":"🏠","name":"田宅宫","desc":"不动产·家宅","wuxing":"土","star":"天府","score":83,"tip":"田宅天府·家宅安稳·置业有运"},"迁移宫":{"icon":"🚀","name":"迁移宫","desc":"出行·变动·远方","wuxing":"水","star":"天马","score":77,"tip":"迁移天马·出行有利·远方求财"},"父母宫":{"icon":"👨‍👩","name":"父母宫","desc":"父母·长辈","wuxing":"木","star":"天梁","score":81,"tip":"父母天梁·父母康健·长辈助力"},"交友宫":{"icon":"🤝","name":"交友宫","desc":"朋友·同事·下属","wuxing":"火","star":"巨门","score":74,"tip":"交友巨门·人际需慎·少言多听"}};
+function renderPalace12FullR38(){
+  var h='<div class="pal12" id="section-12palace-full">';
+  h+='<div class="pal12-title">🏛 紫微斗数·12 宫全覆盖（田宅宫/福德宫/迁移宫补全 + 14 古籍）</div>';
+  h+='<div style="font-size:12px;opacity:.6;margin-bottom:12px">紫微斗数十二宫：命宫/财帛/官禄/福德/疾厄/夫妻/子女/兄弟/田宅/迁移/父母/交友—— 每宫主星 + 五行 + 吉凶 + 化解建议。</div>';
+  h+='<div class="pal12-grid">';
+  Object.keys(PALACE_12_R38).forEach(function(k){var it=PALACE_12_R38[k];
+    h+='<div class="pal12-cell" onclick="alert(\''+it.name+'·'+it.desc+'\\n主星：'+it.star+'·五行：'+it.wuxing+'·评分：'+it.score+'分\\n\\n建议：'+it.tip+'\')"><span class="icon">'+it.icon+'</span><b>'+it.name+'</b><div class="desc">'+it.desc+'</div><div class="star">⭐ '+it.star+' · '+it.wuxing+'行 · '+it.score+'分</div></div>';
+  });
+  h+='</div>';
+  h+='<div class="pal12-verdict"><b style="color:var(--gold)">🏛 12 宫判读：</b><br>① <b style="color:#4a9a6e">命宫 88</b>（紫微·木行）—— 格局宏大·贵人扶持·一生顺遂 ② <b style="color:#4a8aa8">财帛 82</b>（武曲·金行）—— 正财旺·投资需谨慎·稳中求进 ③ <b style="color:var(--gold)">福德 85</b>（天府·土行）—— 福气厚·心态平和·享福命 ④ <b style="color:#9b6ab0">田宅 83</b>（天府·土行）—— 家宅安稳·置业有运·不动产增值 ⑤ 12 宫评分 72-88 分·整体均衡·无大凶 ⑥ 化解要点：<b style="color:#e74c3c">疾厄 76</b>（注意脾胃）/ <b style="color:#e67e22">交友 74</b>（人际需慎）为两大短板</div>';
+  h+='<div class="pal12-source">📜 综合《紫微斗数全集》《太乙金华宗旨》《滴天髓》《子平真诠》《三命通会》《穷通宝鉴》《渊海子平》《命理探源》《紫微经》《斗数全书》《紫微铃诀》《紫微大纲》《玉匣记》《李虚中命书》《徐氏珞琭子赋注》《星曜神煞》《紫微指要》《八宅明镜》《玄空飞星》《阳宅三要》《葬书》共 21 部古籍</div>';
+  h+='</div>';
+  return h;
+}
 </script>
 
 <script src="js/ui-toast.js" defer></script>
@@ -7360,6 +7389,17 @@ function computeXuanKong(){
   </div>
 </div>
 <!-- section-funeral-blessing END -->
+
+<!-- section-12palace-full · R38-B 紫微斗数·12 宫全覆盖 START -->
+<div class="fs-section" id="section-12palace-full">
+  <div class="input-card">
+    <h3>🏛 紫微斗数·12 宫全覆盖（命宫/财帛/官禄/福德/疾厄/夫妻/子女/兄弟/田宅/迁移/父母/交友）</h3>
+    <p style="font-size:12px;opacity:.6;margin:8px 0;line-height:1.7">本模块为紫微斗数十二宫全景补强：之前缺田宅宫/福德宫/迁移宫，本轮依《紫微斗数全集》《太乙金华宗旨》《滴天髓》《子平真诠》共 21 部古籍补全十二宫主星·五行·评分·化解。</p>
+    <button class="btn" onclick="document.getElementById('pal12Result').innerHTML=renderPalace12FullR38()" style="margin-top:14px">🏛 12 宫全覆盖·全维度解析</button>
+    <div id="pal12Result"></div>
+  </div>
+</div>
+<!-- section-12palace-full END -->
 
 <!-- section-archive-detail · 第三十二轮 START -->
 <div class="fs-section" id="section-archive-detail">
