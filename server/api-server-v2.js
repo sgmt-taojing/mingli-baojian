@@ -536,6 +536,57 @@ app.post('/api/ai/chat', auth, async (req, res) => {
 });
 
 // === AI聊天（公开，无需认证，低速率+本地降级）===
+// R40-E AI KB 命中落库端点
+app.post('/api/ai/kb-hit-log', async (req, res) => {
+  try {
+    const { query, hits, source, responseTime } = req.body || {};
+    if (!query) return res.json({ error: '参数错误' });
+    const db = getDb();
+    if (!db) return res.json({ error: '数据库未就绪' });
+    
+    // 检查表是否存在
+    const tblExists = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='kb_hit_log'").get();
+    if (!tblExists) {
+      db.exec(`CREATE TABLE IF NOT EXISTS kb_hit_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        query TEXT NOT NULL,
+        hits INTEGER DEFAULT 0,
+        source TEXT,
+        response_time INTEGER DEFAULT 0,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+      )`);
+    }
+    
+    db.prepare(`INSERT INTO kb_hit_log (query, hits, source, response_time) VALUES (?, ?, ?, ?)`).run(
+      String(query).substring(0, 500),
+      parseInt(hits) || 0,
+      String(source || 'unknown').substring(0, 50),
+      parseInt(responseTime) || 0
+    );
+    
+    res.json({ ok: true, logged: true });
+  } catch (e) {
+    res.json({ error: e.message });
+  }
+});
+
+app.get('/api/ai/kb-hit-stats', async (req, res) => {
+  try {
+    const db = getDb();
+    if (!db) return res.json({ error: '数据库未就绪' });
+    
+    const total = db.prepare('SELECT COUNT(*) as cnt FROM kb_hit_log').get().cnt || 0;
+    const today = db.prepare(`SELECT COUNT(*) as cnt FROM kb_hit_log WHERE DATE(created_at) = DATE('now', 'localtime')`).get().cnt || 0;
+    const topQueries = db.prepare(`SELECT query, COUNT(*) as cnt FROM kb_hit_log GROUP BY query ORDER BY cnt DESC LIMIT 10`).all();
+    const bySource = db.prepare(`SELECT source, COUNT(*) as cnt FROM kb_hit_log GROUP BY source ORDER BY cnt DESC`).all();
+    
+    res.json({ ok: true, total, today, topQueries, bySource });
+  } catch (e) {
+    res.json({ total: 0, today: 0, error: e.message });
+  }
+});
+
+
 app.post('/api/ai/public-chat', async (req, res) => {
   let messages = req.body.messages;
   const model = req.body.model || (AI_PROVIDER === "ollama" ? OLLAMA_MODEL : "auto");
