@@ -3093,5 +3093,33 @@ console.log('✅ _MODULE_REPORTS loaded (14 modules KB-fallback: bazi/yunshi/cai
 <script src="knowledge-models/yijing-model.js"></script>
 <script src="knowledge-models/ziwei-model.js"></script>
 <script src="knowledge-models/zodiac-model.js"></script>
+
+<!-- R39-C 双核 KB 集成 -->
+<script src="../knowledge/r39-dual-core-kb.js" defer></script>
+<script>
+// R39-C 双核 KB 命中辅助函数
+function r39DualKBMatch(query){
+  if(!window.R39_DUAL_CORE_KB) return null;
+  var q = String(query||'').toLowerCase();
+  var best = null;
+  var bestScore = 0;
+  for(var i=0;i<R39_DUAL_CORE_KB.length;i++){
+    var e = R39_DUAL_CORE_KB[i];
+    var titleMatch = e.title.toLowerCase().indexOf(q)>=0?0.5:0;
+    var tagMatch = (e.tags||[]).some(function(t){return q.indexOf(t.toLowerCase())>=0;})?0.3:0;
+    var dimMatch = (e.dimension||e.palace||e.domain||'').toLowerCase().indexOf(q)>=0?0.4:0;
+    var score = titleMatch + tagMatch + dimMatch;
+    if(score > bestScore){ bestScore = score; best = e; }
+  }
+  return bestScore >= 0.4 ? best : null;
+}
+function r39DualKBReply(query){
+  var hit = r39DualKBMatch(query);
+  if(!hit) return null;
+  return '【KB R39-B 双核】'+hit.title+'\n\n'+hit.content+'\n\n📜 古籍: '+hit.sources.join('、')+'\n📊 评分: '+hit.score;
+}
+console.log('[R39-C] 双核 KB 命中辅助函数已挂载');
+</script>
+
 </body>
 </html>
