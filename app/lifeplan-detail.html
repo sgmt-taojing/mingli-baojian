@@ -136,7 +136,39 @@ textarea{min-height:60px;resize:vertical}
 .kb-source{font-size:10px;opacity:.45;margin-top:8px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
 
 @media print{body{background:#fff;color:#000;padding:10px}.card,.banner,.tl-row,.fy-row,.dom{background:#fafafa !important;color:#000 !important;border:1px solid #ccc !important}.btn,.tools,#input{display:none !important}.banner .age,.card h2,.dom .num{color:#000 !important}h1{color:#000}}
+
+<style>
+/* ===== 第二十四轮·流月流日 ===== */
+.ly-track{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;margin:12px 0;padding:8px;background:rgba(0,0,0,.15);border-radius:6px}
+.ly-cell{aspect-ratio:1;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;cursor:pointer;transition:transform .2s}
+.ly-cell:hover{transform:scale(1.1);z-index:2}
+.ly-cell .ly-m{font-size:11px;font-weight:600}
+.ly-cell .ly-s{font-size:9px;opacity:.75}
+.ly-cell.lg-up{background:rgba(39,174,96,.35);border:1px solid rgba(39,174,96,.6)}
+.ly-cell.lg-flat{background:rgba(201,168,76,.25);border:1px solid rgba(201,168,76,.5)}
+.ly-cell.lg-down{background:rgba(192,57,43,.35);border:1px solid rgba(192,57,43,.6)}
+.ly-cell.lg-now{box-shadow:0 0 0 2px var(--gold);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+.ly-legend{display:flex;gap:12px;font-size:10px;margin-top:6px;opacity:.7;flex-wrap:wrap}
+.ly-legend div{display:flex;align-items:center;gap:3px}
+.ly-legend .dot{width:10px;height:10px;border-radius:2px}
+.lr-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;margin:12px 0;padding:8px;background:rgba(0,0,0,.15);border-radius:6px}
+@media(max-width:768px){.lr-grid{grid-template-columns:repeat(5,1fr)}}
+.lr-cell{aspect-ratio:1;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;cursor:pointer;transition:transform .15s}
+.lr-cell:hover{transform:scale(1.15);z-index:2}
+.lr-cell .lr-d{font-size:11px;font-weight:600}
+.lr-cell .lr-x{font-size:8px;opacity:.65}
+.lr-cell.lg-up{background:rgba(39,174,96,.35);border:1px solid rgba(39,174,96,.6)}
+.lr-cell.lg-flat{background:rgba(201,168,76,.25);border:1px solid rgba(201,168,76,.5)}
+.lr-cell.lg-down{background:rgba(192,57,43,.35);border:1px solid rgba(192,57,43,.6)}
+.lr-cell.lg-today{box-shadow:0 0 0 2px var(--gold)}
+.ly-summary{margin-top:14px;padding:12px;background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.02));border-radius:8px;border-left:3px solid var(--gold);font-size:11px;line-height:1.7}
+.ly-summary b{color:var(--gold)}
+.lr-summary{margin-top:14px;padding:12px;background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.02));border-radius:8px;border-left:3px solid var(--gold);font-size:11px;line-height:1.7}
+.lr-summary b{color:var(--gold)}
+.lf-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
 </style>
+
 </head>
 <body>
 <div class="wrap">
@@ -366,7 +398,109 @@ function render(d){
   }
 
   // ===== 趋吉避凶引擎（依《穷通宝鉴》《三命通会》《月谈赋》） =====
-  function calcTrendAdvice(dayuns, shichen){
+  
+/* ===== 第二十四轮·流月流日引擎 ===== */
+function calcLiuyueScore(currentAge, dayStem, dayEle){
+  const MONTH_ZHI = ['寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑'];
+  const now = new Date();
+  const curMonth = now.getMonth();
+  const STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  // 五虎遁年起月
+  const TIGER_MAP = {0:2,5:2, 1:4,6:4, 2:6,7:6, 3:8,8:8, 4:0,9:0};
+  const yr = now.getFullYear();
+  const yrStemIdx = (yr - 4) % 10;
+  const startStemIdx = TIGER_MAP[yrStemIdx];
+  const SHENG_MAP = {木:'火',火:'土',土:'金',金:'水',水:'木'};
+  const KE_MAP = {木:'土',火:'金',土:'水',金:'木',水:'火'};
+  const ELE_BY_STEM = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
+  const ZHI_WX = {子:'水',丑:'土',寅:'木',卯:'木',辰:'土',巳:'火',午:'火',未:'土',申:'金',酉:'金',戌:'土',亥:'水'};
+  const MONTH_NAMES = ['正月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+
+  return MONTH_ZHI.map((zhi, i)=>{
+    const stemIdx = (startStemIdx + i) % 10;
+    const stem = STEMS[stemIdx];
+    const stemEle = ELE_BY_STEM[stem];
+    const zhiEle = ZHI_WX[zhi];
+
+    let score = 60;
+    let relation = '平';
+    if(stemEle === dayEle){ score += 10; relation='比肩'; }
+    else if(SHENG_MAP[dayEle] === stemEle){ score += 22; relation='印绶（吉）'; }
+    else if(stemEle === SHENG_MAP[dayEle]){ score += 18; relation='食伤（泄秀）'; }
+    else if(KE_MAP[dayEle] === stemEle){ score -= 15; relation='财星（破耗）'; }
+    else if(stemEle === KE_MAP[dayEle]){ score -= 22; relation='官杀（压力）'; }
+    if(zhiEle === dayEle) score += 5;
+
+    score = Math.max(20, Math.min(99, score));
+    const level = score >= 70 ? '吉' : (score < 55 ? '凶' : '平');
+    const advice = score >= 70 ? '可谋大事·进取有功' : (score < 55 ? '宜守不宜攻·修身养性' : '稳中求进·顺势而为');
+
+    return {
+      monthName: MONTH_NAMES[i],
+      stem, branch: zhi,
+      score, level, relation,
+      reason: monthReasons(i),
+      advice,
+      isNow: i === curMonth
+    };
+  });
+}
+
+function monthReasons(idx){
+  const r = ['寅月木旺·正月建生','卯月木极·仲春生气','辰月土湿·季春库开','巳月火初·孟夏火苗','午月火极·仲夏阳盛','未月土燥·季夏养金','申月金锐·孟秋肃杀','酉月金极·仲秋收成','戌月土藏·季秋库收','亥月水生·孟冬阳藏','子月水极·仲冬阴盛','丑月土冻·季冬守藏'];
+  return r[idx] || '月令转换';
+}
+
+function calcLiuriScore(dayStem, dayEle){
+  const now = new Date();
+  const STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  const ZHIS = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  const SHENG_MAP = {木:'火',火:'土',土:'金',金:'水',水:'木'};
+  const KE_MAP = {木:'土',火:'金',土:'水',金:'木',水:'火'};
+  const ELE_BY_STEM = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
+  const ZHI_WX = {子:'水',丑:'土',寅:'木',卯:'木',辰:'土',巳:'火',午:'火',未:'土',申:'金',酉:'金',戌:'土',亥:'水'};
+
+  const baseStemIdx = 0; // 2026-07-22 = 甲辰
+  const baseZhiIdx = 4;
+  const baseDate = new Date('2026-07-22');
+
+  const out = [];
+  for(let i=0;i<30;i++){
+    const d = new Date(baseDate);
+    d.setDate(baseDate.getDate() + i);
+    const stemIdx = (baseStemIdx + i) % 10;
+    const zhiIdx = (baseZhiIdx + i) % 12;
+    const stem = STEMS[stemIdx];
+    const zhi = ZHIS[zhiIdx];
+    const stemEle = ELE_BY_STEM[stem];
+    const zhiEle = ZHI_WX[zhi];
+
+    let score = 60;
+    let relation = '平';
+    if(stemEle === dayEle){ score += 10; relation='比肩'; }
+    else if(SHENG_MAP[dayEle] === stemEle){ score += 22; relation='印绶（吉）'; }
+    else if(stemEle === SHENG_MAP[dayEle]){ score += 18; relation='食伤（泄秀）'; }
+    else if(KE_MAP[dayEle] === stemEle){ score -= 15; relation='财星（破耗）'; }
+    else if(stemEle === KE_MAP[dayEle]){ score -= 22; relation='官杀（压力）'; }
+    if(zhiEle === dayEle) score += 5;
+
+    score = Math.max(20, Math.min(99, score));
+    const level = score >= 70 ? '吉' : (score < 55 ? '凶' : '平');
+    const event = score >= 70 ? '签约·求财·婚嫁' : (score < 55 ? '远行·签约·动土' : '守常·小事可谋');
+
+    out.push({
+      day: d.getDate(),
+      date: d.toISOString().slice(5,10),
+      stem, branch: zhi,
+      score, level, relation, event,
+      advice: score >= 70 ? '把握良机·果断进取' : (score < 55 ? '静观其变·内省守成' : '顺势而为·稳中求进'),
+      isToday: d.toDateString() === now.toDateString()
+    });
+  }
+  return out;
+}
+
+function calcTrendAdvice(dayuns, shichen){
     const now = dayuns.find(x=>x.isNow);
     if(!now) return '';
     const ups = dayuns.filter(x=>x.score>=70);
@@ -396,6 +530,49 @@ function render(d){
   const dayuns = calcDayunFluctuation(d.age);
   const shichen = calcShichenBoost(dayEle);
   const trend = calcTrendAdvice(dayuns, shichen);
+
+
+  // ===== 第二十四轮·R24·流月流日精度补强 =====
+  const liuyue = calcLiuyueScore(d.age, dayStem, dayEle);
+  const liuri = calcLiuriScore(dayStem, dayEle);
+  h+='<div class="card"><h2>🌙 流月起伏图（12 月·年内节奏）</h2>';
+  h+='<div class="ly-track">';
+  liuyue.forEach(m=>{
+    const cls = m.isNow?'lg-now':(m.score>=70?'lg-up':(m.score<55?'lg-down':'lg-flat'));
+    h+='<div class="ly-cell '+cls+'" title="'+m.monthName+'·'+m.stem+m.branch+'·'+m.score+'分·'+m.reason+'"><div class="ly-m">'+m.monthName+'</div><div class="ly-s">'+m.score+'</div></div>';
+  });
+  h+='</div>';
+  h+='<div class="ly-legend"><div><div class="dot" style="background:rgba(39,174,96,.5)"></div>吉月 ≥70</div><div><div class="dot" style="background:rgba(201,168,76,.4)"></div>平月 55-69</div><div><div class="dot" style="background:rgba(192,57,43,.5)"></div>凶月 <55</div><div><div class="dot" style="background:var(--gold)"></div>本月</div></div>';
+  const curMonth = liuyue.find(m=>m.isNow) || liuyue[0];
+  h+='<div class="ly-summary"><b>当前月：'+curMonth.monthName+'（'+curMonth.stem+curMonth.branch+'月）</b><br>';
+  h+='· 月评分：<b>'+curMonth.score+'</b>/100（'+curMonth.level+'）<br>';
+  h+='· 月干 '+curMonth.stem+' 与日主 '+dayStem+'：<b>'+curMonth.relation+'</b><br>';
+  h+='· 月令：'+curMonth.reason+'<br>';
+  h+='· 趋吉：'+curMonth.advice+'</div>';
+  h+='</div>';
+
+  h+='<div class="card"><h2>📅 流日吉凶（30 日·短期决策）</h2>';
+  h+='<div class="lr-grid">';
+  liuri.forEach(r=>{
+    const cls = r.isToday?'lg-today':(r.score>=70?'lg-up':(r.score<55?'lg-down':'lg-flat'));
+    h+='<div class="lr-cell '+cls+'" title="'+r.date+'·'+r.stem+r.branch+'·'+r.score+'分·'+r.event+'"><div class="lr-d">'+r.day+'</div><div class="lr-x">'+r.score+'</div></div>';
+  });
+  h+='</div>';
+  h+='<div class="ly-legend"><div><div class="dot" style="background:rgba(39,174,96,.5)"></div>吉日 ≥70</div><div><div class="dot" style="background:rgba(201,168,76,.4)"></div>平日 55-69</div><div><div class="dot" style="background:rgba(192,57,43,.5)"></div>凶日 <55</div><div><div class="dot" style="background:var(--gold)"></div>今日</div></div>';
+  const curDay = liuri.find(r=>r.isToday) || liuri[0];
+  h+='<div class="lr-summary"><b>今日：'+curDay.date+'（'+curDay.stem+curDay.branch+'日）</b><br>';
+  h+='· 日评分：<b>'+curDay.score+'</b>/100（'+curDay.level+'）<br>';
+  h+='· 日干 '+curDay.stem+' 与日主 '+dayStem+'：<b>'+curDay.relation+'</b><br>';
+  h+='· 适宜：<b>'+curDay.event+'</b><br>';
+  h+='· 提醒：'+curDay.advice+'<br>';
+  h+='· 未来 3 日：';
+  for(let i=1;i<=3;i++){
+    const nx = liuri[(liuri.indexOf(curDay)+i)%liuri.length];
+    h+=nx.day+'日 <b>'+nx.score+'</b>分（'+nx.event+'）· ';
+  }
+  h+='</div>';
+  h+='<div class="lf-source">📜《穷通宝鉴》《三命通会·流月篇》《流日篇》《子平真诠》《神峰通考》《卜筮正宗·流日》</div>';
+  h+='</div>';
 
   // 大运起伏图
   h+='<div class="card"><h2>📈 大运流年起伏图（10 段·每段 10 年）</h2>';
