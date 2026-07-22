@@ -1710,6 +1710,41 @@ app.get('/api/public/kb-query', (req, res) => {
   }
 });
 
+app.get('/api/public/kb-search', (req, res) => {
+  try {
+    const query = String(req.query.q || '').trim();
+    const limit = Math.min(parseInt(req.query.limit || '20'), 50);
+    if (!query || query.length < 2) {
+      return res.json({ error: '查询字符串至少 2 字', results: [], count: 0 });
+    }
+    // 全文检索（无 module 限定）—— 跨模块知识库检索，供 AI 助手 v2 chat 兜底
+    // const db = getDb(); -- use module-level `db`
+    const likeQ = `%${query}%`;
+    const sql = `SELECT entry_id, module, source_ids, title, content
+      FROM kb_formal WHERE (title LIKE ? OR content LIKE ?)
+      LIMIT ?`;
+    const stmt = db.prepare(sql);
+    const rows = stmt.all(likeQ, likeQ, limit);
+    // 计算匹配得分：标题命中 10 分 + 内容命中 1 分 / 出现次数
+    const results = rows.map(r => {
+      const titleHit = (r.title || '').includes(query) ? 10 : 0;
+      const contentCount = ((r.content || '').match(new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
+      return {
+        entry_id: r.entry_id,
+        module: r.module,
+        source_ids: r.source_ids,
+        title: r.title,
+        snippet: (r.content || '').slice(0, 200),
+        score: titleHit + contentCount
+      };
+    });
+    results.sort((a,b) => b.score - a.score);
+    res.json({ error: null, query, count: results.length, results });
+  } catch (e) {
+    res.json({ error: e.message, results: [], count: 0 });
+  }
+});
+
 app.get('/api/public/kb-topic-search', (req, res) => {
   try {
     const group = String(req.query.group || '').trim();

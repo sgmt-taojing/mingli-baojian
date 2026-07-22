@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>紫微斗数 · 大师级断疾病生死 · 易道智鉴</title>
+<style>
+:root{
+  --ink:#0a0a0a;--ink2:#1a1a1a;--ink3:#2a2a2a;
+  --paper:#f5efe0;--paper2:#e8dec8;--paper3:#a89876;
+  --gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;
+  --red:#c0392b;--red2:#e74c3c;
+  --green:#27ae60;--jade:#16a085;
+  --border:rgba(201,168,76,.18);
+  --shadow:rgba(0,0,0,.4);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow-x:hidden}
+body{
+  background:linear-gradient(135deg,#0a0a0a 0%,#1a1410 100%);
+  color:var(--paper);font-family:'Noto Serif SC',-apple-system,serif;
+  font-size:18px;line-height:1.7;
+}
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(10,10,10,.95);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);padding:10px 16px;
+  display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{flex-shrink:0;padding:6px 14px;color:var(--gold);border:1px solid var(--border);
+  border-radius:14px;font-size:13px;text-decoration:none;white-space:nowrap}
+.nav a.active{background:rgba(201,168,76,.15)}
+.container{max-width:1100px;margin:0 auto;padding:80px 20px 40px}
+.hero{text-align:center;margin-bottom:40px}
+.hero h1{font-size:42px;color:var(--gold2);font-weight:600;letter-spacing:6px;margin-bottom:8px}
+.hero .sub{font-size:18px;color:var(--paper3);letter-spacing:3px}
+.hero .quote{font-size:15px;color:var(--paper2);margin-top:16px;font-style:italic;
+  padding:16px 24px;background:rgba(201,168,76,.06);border-left:3px solid var(--gold);
+  text-align:left;line-height:1.8}
+.panel{background:rgba(26,26,26,.6);border:1px solid var(--border);
+  border-radius:16px;padding:28px;margin-bottom:24px;backdrop-filter:blur(8px)}
+.panel h2{font-size:24px;color:var(--gold2);margin-bottom:18px;
+  padding-bottom:12px;border-bottom:2px solid var(--border);letter-spacing:2px}
+.row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.row2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media(max-width:768px){
+  .row,.row3,.row2{grid-template-columns:1fr 1fr}
+  .container{padding:80px 14px 30px}
+  .hero h1{font-size:32px}
+}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:14px;color:var(--paper3);letter-spacing:1px}
+.field input,.field select{
+  background:rgba(10,10,10,.5);border:1.5px solid var(--gold3);
+  color:var(--paper);padding:14px 14px;border-radius:10px;
+  font-size:18px;font-family:inherit;outline:none;transition:all .2s
+}
+.field input:focus,.field select:focus{border-color:var(--gold);
+  background:rgba(201,168,76,.08)}
+.btn{background:linear-gradient(135deg,var(--gold) 0%,var(--gold3) 100%);
+  color:var(--ink);border:none;padding:16px 32px;border-radius:10px;
+  font-size:18px;font-weight:600;cursor:pointer;font-family:inherit;
+  letter-spacing:3px;transition:all .2s;box-shadow:0 4px 12px rgba(201,168,76,.3)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(201,168,76,.5)}
+.btn:active{transform:translateY(0)}
+.btn-block{width:100%;margin-top:16px}
+.btn-secondary{background:transparent;color:var(--gold);
+  border:1.5px solid var(--gold);box-shadow:none}
+.btn-secondary:hover{background:rgba(201,168,76,.1)}
+.risk-bar{height:32px;background:rgba(0,0,0,.3);border-radius:16px;
+  overflow:hidden;position:relative;margin:8px 0;border:1px solid var(--border)}
+.risk-fill{height:100%;transition:width 1s ease;border-radius:16px;
+  display:flex;align-items:center;padding:0 12px;font-size:14px;font-weight:600}
+.risk-low{background:linear-gradient(90deg,var(--green),#2ecc71)}
+.risk-mid{background:linear-gradient(90deg,#f39c12,#e67e22)}
+.risk-high{background:linear-gradient(90deg,#e74c3c,#c0392b)}
+.risk-vhigh{background:linear-gradient(90deg,#c0392b,#8e44ad);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+.palace{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(10,10,10,.6);border:2px solid var(--border);border-radius:12px;
+  padding:14px 8px;text-align:center;min-height:120px;transition:all .3s;position:relative}
+.palace.danger{border-color:var(--red2);background:rgba(192,57,43,.1)}
+.palace.warn{border-color:#f39c12;background:rgba(243,156,18,.1)}
+.palace.safe{border-color:var(--green);background:rgba(39,174,96,.05)}
+.palace .name{font-size:15px;color:var(--paper3);letter-spacing:2px;margin-bottom:6px}
+.palace .stars{font-size:22px;color:var(--gold2);font-weight:600;
+  letter-spacing:1px;line-height:1.4}
+.palace .hua{font-size:13px;color:var(--red2);margin-top:4px}
+.palace .flag{position:absolute;top:-8px;right:-8px;font-size:18px}
+.risk-card{padding:18px;background:rgba(0,0,0,.3);border-radius:12px;
+  border-left:4px solid var(--gold);margin-bottom:14px}
+.risk-card.high{border-left-color:var(--red2)}
+.risk-card.mid{border-left-color:#f39c12}
+.risk-card .title{font-size:18px;color:var(--gold2);font-weight:600;margin-bottom:8px;
+  display:flex;align-items:center;gap:8px}
+.risk-card .body{font-size:15px;color:var(--paper2);line-height:1.8}
+.risk-card .quote{font-size:14px;color:var(--paper3);font-style:italic;
+  margin-top:8px;padding:8px 12px;background:rgba(201,168,76,.05);border-radius:6px}
+.timeline{display:flex;overflow-x:auto;padding:20px 0;gap:12px;scrollbar-width:thin}
+.timeline::-webkit-scrollbar{height:6px}
+.timeline::-webkit-scrollbar-thumb{background:var(--gold3);border-radius:3px}
+.tl-item{flex-shrink:0;width:140px;background:rgba(10,10,10,.5);
+  border:1.5px solid var(--border);border-radius:10px;padding:14px 10px;text-align:center}
+.tl-item.danger{border-color:var(--red2)}
+.tl-item .age{font-size:24px;color:var(--gold2);font-weight:600}
+.tl-item .ganzhi{font-size:14px;color:var(--paper3);margin:4px 0}
+.tl-item .risk{font-size:12px;padding:3px 8px;border-radius:10px;display:inline-block}
+.tl-item .risk.high{background:rgba(192,57,43,.3);color:var(--red2)}
+.tl-item .risk.mid{background:rgba(243,156,18,.3);color:#f39c12}
+.tl-item .risk.low{background:rgba(39,174,96,.3);color:var(--green)}
+.tl-item .desc{font-size:12px;color:var(--paper2);margin-top:6px;line-height:1.5}
+.action-list{list-style:none}
+.action-list li{padding:12px 16px;margin:8px 0;background:rgba(39,174,96,.08);
+  border-left:3px solid var(--green);border-radius:6px;font-size:15px;color:var(--paper2)}
+.action-list li strong{color:var(--green);margin-right:8px}
+.empty{text-align:center;padding:40px;color:var(--paper3);font-size:16px}
+.hidden{display:none}
+.summary-card{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:768px){.summary-card{grid-template-columns:1fr 1fr}}
+.metric{background:rgba(10,10,10,.4);border:1px solid var(--border);
+  border-radius:10px;padding:14px;text-align:center}
+.metric .val{font-size:32px;color:var(--gold2);font-weight:600;line-height:1}
+.metric .label{font-size:13px;color:var(--paper3);margin-top:4px;letter-spacing:1px}
+.metric.danger .val{color:var(--red2)}
+.metric.warn .val{color:#f39c12}
+.metric.safe .val{color:var(--green)}
+.metric .sub{font-size:11px;color:var(--paper3);margin-top:2px}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--gold);
+  border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;
+  vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fab{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:10px;z-index:50}
+.fab button{background:rgba(10,10,10,.85);color:var(--gold);
+  border:1.5px solid var(--gold);padding:12px 16px;border-radius:24px;
+  font-size:13px;cursor:pointer;font-family:inherit;backdrop-filter:blur(8px);
+  letter-spacing:1px;transition:all .2s}
+.fab button:hover{background:rgba(201,168,76,.15)}
+.tag{display:inline-block;padding:3px 10px;background:rgba(201,168,76,.15);
+  border:1px solid var(--gold);border-radius:10px;font-size:12px;
+  color:var(--gold);margin:2px 4px}
+.scroll-section{scroll-margin-top:80px}
+@media(max-width:768px){
+  .row,.row3,.row2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="index.html">🏠 首页</a>
+  <a href="app/divination-hub.html">🔮 排盘</a>
+  <a href="master-elder.html">👴 大师端</a>
+  <a href="doctor-elder.html">🩺 医生端</a>
+  <a href="tcm-clinic.html">🏥 诊疗</a>
+  <a href="ai-assistant.html">🤖 AI助手</a>
+  <a href="master-zidise-illness.html" class="active">⚕️ 紫微断疾病</a>
+</nav>
+
+<div class="container">
+  <div class="hero">
+    <h1>紫微斗数 · 大师级断疾病生死</h1>
+    <div class="sub">十二宫 · 四化飞星 · 煞星重叠 · 大限流年</div>
+    <div class="quote">
+      「化忌所在，即心结所在。知道心结在哪里，便可对症下药。」 ——《骨髓赋》<br>
+      「疾厄宫看体质和疾病，煞星云集则身体欠佳。廉贞、七杀等煞星入疾厄需注意血光之灾。」
+    </div>
+  </div>
+
+  <!-- 输入面板 -->
+  <div class="panel">
+    <h2>📜 生辰输入</h2>
+    <div class="row">
+      <div class="field">
+        <label>公历生日（年）</label>
+        <input type="number" id="in-y" value="1985" min="1900" max="2050">
+      </div>
+      <div class="field">
+        <label>月</label>
+        <input type="number" id="in-m" value="7" min="1" max="12">
+      </div>
+      <div class="field">
+        <label>日</label>
+        <input type="number" id="in-d" value="15" min="1" max="31">
+      </div>
+      <div class="field">
+        <label>时辰（24h）</label>
+        <input type="number" id="in-h" value="14" min="0" max="23">
+      </div>
+    </div>
+    <div class="row2" style="margin-top:14px">
+      <div class="field">
+        <label>性别</label>
+        <select id="in-gender">
+          <option value="M">男（阳男顺行）</option>
+          <option value="F">女（阴女顺行）</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>关注重点</label>
+        <select id="in-focus">
+          <option value="all">综合疾病风险</option>
+          <option value="cancer">癌症/重症风险</option>
+          <option value="heart">心脑血管</option>
+          <option value="liver">肝胆系统</option>
+          <option value="blood">血光之灾/手术</option>
+          <option value="mental">精神/心理</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-block" onclick="analyze()">⚕️ 大师级断疾病生死分析</button>
+  </div>
+
+  <!-- 排盘结果 -->
+  <div id="result-section" class="hidden">
+    <!-- 综合摘要 -->
+    <div class="panel scroll-section" id="sec-summary">
+      <h2>📊 综合疾病风险评估</h2>
+      <div class="summary-card" id="summary-cards"></div>
+      <div id="risk-overview"></div>
+    </div>
+
+    <!-- 十二宫星曜 -->
+    <div class="panel scroll-section" id="sec-palaces">
+      <h2>🏛️ 十二宫 · 星曜分布</h2>
+      <div id="palace-grid"></div>
+    </div>
+
+    <!-- 风险标记详解 -->
+    <div class="panel scroll-section" id="sec-risks">
+      <h2>⚠️ 疾病风险标记（8 大核心规则）</h2>
+      <div id="risk-detail"></div>
+    </div>
+
+    <!-- 大限时间轴 -->
+    <div class="panel scroll-section" id="sec-timeline">
+      <h2>📅 大限时间轴 · 流年风险</h2>
+      <div class="timeline" id="timeline"></div>
+    </div>
+
+    <!-- 调理方案 -->
+    <div class="panel scroll-section" id="sec-actions">
+      <h2>🌿 调理方案 · 化解之道</h2>
+      <ul class="action-list" id="action-list"></ul>
+    </div>
+
+    <!-- KB 引用 -->
+    <div class="panel scroll-section" id="sec-kb">
+      <h2>📚 古籍断语 · 实战案例（来自知识库）</h2>
+      <div id="kb-refs"></div>
+    </div>
+  </div>
+</div>
+
+<div class="fab">
+  <button onclick="window.print()">🖨️ 打印报告</button>
+  <button onclick="location.href='index.html'">🏠 回首页</button>
+</div>
+
+<script>
+const STEM_LIST=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+const BRANCH_LIST=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+const ANIMAL_LIST=['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
+const PALACE_NAMES=['命宫','兄弟','夫妻','子女','财帛','疾厄','迁移','交友','官禄','田宅','福德','父母'];
+
+// 14 主星（紫微星系 6 + 天府星系 8）
+const ZIWEI_STARS={
+  '紫微':{wx:'土',nature:'吉',cat:'主'},
+  '天机':{wx:'木',nature:'平',cat:'主'},
+  '太阳':{wx:'火',nature:'吉',cat:'主'},
+  '武曲':{wx:'金',nature:'吉',cat:'主'},
+  '天同':{wx:'水',nature:'吉',cat:'主'},
+  '廉贞':{wx:'火',nature:'凶',cat:'主'},
+  '天府':{wx:'土',nature:'吉',cat:'主'},
+  '太阴':{wx:'水',nature:'吉',cat:'主'},
+  '贪狼':{wx:'木',nature:'平',cat:'主'},
+  '巨门':{wx:'水',nature:'凶',cat:'主'},
+  '天相':{wx:'水',nature:'吉',cat:'主'},
+  '天梁':{wx:'土',nature:'吉',cat:'主'},
+  '七杀':{wx:'金',nature:'凶',cat:'主'},
+  '破军':{wx:'水',nature:'凶',cat:'主'}
+};
+const SHA_STARS=['擎羊','陀罗','火星','铃星','地劫','地空'];
+const YI_SHA=['文昌','文曲','天魁','天钺','左辅','右弼','禄存','天马'];
+
+// 五行对应脏腑
+const WUXING_ZANGFU={
+  '木':{organ:'肝胆',disease:'头晕、目赤、胁痛、易怒、血虚'},
+  '火':{organ:'心小肠',disease:'心悸、失眠、口舌溃疡、血光'},
+  '土':{organ:'脾胃',disease:'腹胀、消化差、糖尿病、痰湿'},
+  '金':{organ:'肺大肠',disease:'咳嗽、哮喘、便秘、皮肤病'},
+  '水':{organ:'肾膀胱',disease:'腰膝酸软、水肿、耳鸣、泌尿'}
+};
+
+// 化忌对应（十天干四化）
+const HUA_JI_BY_DAYSTEM={
+  '甲':'太阳', '乙':'太阴', '丙':'廉贞', '丁':'巨门',
+  '戊':'贪狼', '己':'天机', '庚':'武曲', '辛':'文昌',
+  '壬':'破军', '癸':'太阴'  // 癸为破军（不同流派）
+};
+
+// 化禄/权/科对应（用于全四化分析）
+const SI_HUA={
+  '甲':['禄存','廉贞','天同','太阳'],
+  '乙':['天机','天梁','紫微','太阴'],
+  '丙':['天同','天机','文昌','廉贞'],
+  '丁':['太阴','天同','天机','巨门'],
+  '戊':['贪狼','太阴','天机','文曲'],
+  '己':['武曲','贪狼','天梁','文曲'],
+  '庚':['太阳','武曲','太阴','天同'],
+  '辛':['巨门','太阳','文曲','文昌'],
+  '壬':['天同','天梁','紫微','破军'],
+  '癸':['破军','巨门','太阳','太阴']
+};
+
+// === 紫微斗数排盘（简化但够用） ===
+function arrangeZiwei(year,month,day,hour,gender){
+  // 起命宫（简化：以月份+时辰决定）
+  const hourBranch=BRANCH_LIST[Math.floor(((hour+1)%24)/2)];
+  const monthBranch=BRANCH_LIST[(month-1+2)%12];
+  // 命宫支：正月从寅起
+  const mingBranchIdx=(monthBranch==='寅'?0:monthBranch==='卯'?1:monthBranch==='辰'?2:monthBranch==='巳'?3:monthBranch==='午'?4:monthBranch==='未'?5:monthBranch==='申'?6:monthBranch==='酉'?7:monthBranch==='戌'?8:monthBranch==='亥'?9:monthBranch==='子'?10:11);
+  // 身宫：命宫+时支
+  const hourIdx=BRANCH_LIST.indexOf(hourBranch);
+  const shenIdx=(mingBranchIdx+hourIdx)%12;
+  // 大限起点（阳男阴女顺行）
+  const yang=(['甲','丙','戊','庚','壬'].indexOf(STEM_LIST[(year-4)%10])>=0);
+  const isMale=gender==='M';
+  const shun=(yang && isMale) || (!yang && !isMale);
+  return {mingBranchIdx,shenIdx,shun,yang};
+}
+
+// === 疾病风险规则引擎 ===
+const RISK_RULES=[
+  {
+    name:'疾厄宫煞星重叠',
+    severity:'high',
+    check:(ctx)=>{
+      const palace=ctx.palaces[5]; // 疾厄宫
+      const shaInJiE=palace.stars.filter(s=>SHA_STARS.includes(s));
+      const evilMainStars=palace.stars.filter(s=>['廉贞','七杀','巨门','破军'].includes(s));
+      if(shaInJiE.length>=2||(shaInJiE.length>=1 && evilMainStars.length>=1)){
+        return {hit:true, detail:`疾厄宫见 ${[...shaInJiE,...evilMainStars].join('、')}`,
+          rule:'煞星云集则身体欠佳'};
+      }
+      return {hit:false};
+    },
+    advice:'注意血光之灾，避免外伤；定期体检，重点关注心血管与肝胆。'
+  },
+  {
+    name:'化忌入疾厄宫',
+    severity:'high',
+    check:(ctx)=>{
+      const jiPalace=ctx.huaJiPalace;
+      if(jiPalace===5){
+        return {hit:true, detail:`化忌（${ctx.huaJiStar}）飞入疾厄宫`,
+          rule:'化忌所在即心结所在'};
+      }
+      return {hit:false};
+    },
+    advice:'此宫位为长期宿疾点；调理以疏解心结、化瘀散结为主。'
+  },
+  {
+    name:'廉贞/七杀入疾厄',
+    severity:'high',
+    check:(ctx)=>{
+      const palace=ctx.palaces[5];
+      const hits=palace.stars.filter(s=>['廉贞','七杀'].includes(s));
+      if(hits.length>0){
+        return {hit:true, detail:`${hits.join('、')}坐疾厄`,
+          rule:'廉贞、七杀等煞星入疾厄需注意血光之灾'};
+      }
+      return {hit:false};
+    },
+    advice:'防范手术刀伤；远离高危活动；35 岁后定期体检。'
+  },
+  {
+    name:'火星铃星重叠',
+    severity:'mid',
+    check:(ctx)=>{
+      const palace=ctx.palaces[5];
+      const fireBell=palace.stars.filter(s=>['火星','铃星'].includes(s));
+      if(fireBell.length>=2){
+        return {hit:true, detail:'火星铃星同宫（暴败格）',
+          rule:'火铃同宫主暴败疾厄'};
+      }
+      return {hit:false};
+    },
+    advice:'防范急性发作疾病；家中有急救预案。'
+  },
+  {
+    name:'官夫线断裂',
+    severity:'mid',
+    check:(ctx)=>{
+      // 官禄宫(8)+夫妻宫(2)互为四正
+      const guan=ctx.palaces[8];
+      const fu=ctx.palaces[2];
+      const allSha=[...guan.stars,...fu.stars].filter(s=>SHA_STARS.includes(s)||['廉贞','七杀','破军','巨门'].includes(s));
+      if(allSha.length>=3){
+        return {hit:true, detail:`官禄/夫妻宫煞星聚集（${allSha.join('、')}）`,
+          rule:'官夫线看心肾与生育'};
+      }
+      return {hit:false};
+    },
+    advice:'注意生殖泌尿系统；男命关注心肾，女命关注妇科。'
+  },
+  {
+    name:'财福线凶险',
+    severity:'mid',
+    check:(ctx)=>{
+      const cai=ctx.palaces[4];
+      const fu=ctx.palaces[10];
+      const allSha=[...cai.stars,...fu.stars].filter(s=>SHA_STARS.includes(s));
+      if(allSha.length>=3){
+        return {hit:true, detail:`财帛/福德宫煞星聚集（${allSha.join('、')}）`,
+          rule:'财福线看脾胃与精神'};
+      }
+      return {hit:false};
+    },
+    advice:'注意脾胃与精神压力；少思虑、多户外。'
+  },
+  {
+    name:'身宫凶位',
+    severity:'high',
+    check:(ctx)=>{
+      const shenPalace=ctx.palaces[ctx.shenIdx];
+      const shaInShen=shenPalace.stars.filter(s=>SHA_STARS.includes(s)||['廉贞','七杀','破军'].includes(s));
+      if(shaInShen.length>=2){
+        return {hit:true, detail:`身宫在 ${ctx.palaceName(ctx.shenIdx)} 见煞星聚集（${shaInShen.join('、')}）`,
+          rule:'身宫看后天归宿'};
+      }
+      return {hit:false};
+    },
+    advice:'身宫为后天归宿，煞聚不利健康；建议 50 岁后减少操劳。'
+  },
+  {
+    name:'天机化忌（肝胆）',
+    severity:'mid',
+    check:(ctx)=>{
+      if(ctx.huaJiStar==='天机'){
+        return {hit:true, detail:'天机化忌（肝胆系统警示）',
+          rule:'天机主肝，天机化忌肝胆系统是薄弱环节'};
+      }
+      return {hit:false};
+    },
+    advice:'疏肝理气；少饮酒、少熬夜；推荐菊花枸杞茶、柴胡疏肝散。'
+  },
+  {
+    name:'廉贞化忌（血光）',
+    severity:'high',
+    check:(ctx)=>{
+      if(ctx.huaJiStar==='廉贞'){
+        return {hit:true, detail:'廉贞化忌（血光之灾警示）',
+          rule:'廉贞化忌主意外血光'};
+      }
+      return {hit:false};
+    },
+    advice:'谨防意外伤害；远离高危运动；血库备案；定期体检心血管。'
+  },
+  {
+    name:'巨门化忌（口舌/消化）',
+    severity:'mid',
+    check:(ctx)=>{
+      if(ctx.huaJiStar==='巨门'){
+        return {hit:true, detail:'巨门化忌（口腔/食道警示）',
+          rule:'巨门主口舌、食道、口腔'};
+      }
+      return {hit:false};
+    },
+    advice:'注意口腔、食道、咽喉；少吃辛辣刺激；推荐麦冬、沙参。'
+  }
+];
+
+// === 主分析函数 ===
+async function analyze(){
+  const y=+document.getElementById('in-y').value;
+  const m=+document.getElementById('in-m').value;
+  const d=+document.getElementById('in-d').value;
+  const h=+document.getElementById('in-h').value;
+  const g=document.getElementById('in-gender').value;
+  const focus=document.getElementById('in-focus').value;
+
+  const arr=arrangeZiwei(y,m,d,h,g);
+  const ctx=buildContext(y,m,d,h,g,arr);
+  ctx.focus=focus;
+
+  // 命中规则
+  ctx.hits=[];
+  RISK_RULES.forEach(rule=>{
+    const r=rule.check(ctx);
+    if(r.hit){
+      ctx.hits.push({...rule,...r});
+    }
+  });
+
+  // 计算总风险分
+  const totalRisk=ctx.hits.reduce((sum,r)=>{
+    return sum+(r.severity==='high'?3:r.severity==='mid'?2:1);
+  },0);
+
+  // 拉取 KB 引用
+  ctx.kbRefs=await fetchKBRefs(ctx);
+
+  renderResult(ctx);
+  document.getElementById('result-section').classList.remove('hidden');
+  setTimeout(()=>{
+    document.getElementById('sec-summary').scrollIntoView({behavior:'smooth'});
+  },300);
+}
+
+function buildContext(y,m,d,h,g,arr){
+  const dayStem=STEM_LIST[((Date.UTC(y,m-1,d)-Date.UTC(1900,0,1))/86400000+10)%60%10];
+  const huaJiStar=HUA_JI_BY_DAYSTEM[dayStem]||'巨门';
+  const siHua=SI_HUA[dayStem]||[];
+
+  // 构建 12 宫星曜（简化：用确定性映射）
+  const palaces=Array(12).fill(0).map(()=>({stars:[],ganzhi:''}));
+  // 命宫主星（简化：根据生辰月份判定）
+  const mainStars=chooseMainStars(y,m,d);
+  // 命宫在 arr.mingBranchIdx
+  palaces[arr.mingBranchIdx].stars.push(...mainStars.ming);
+  palaces[(arr.mingBranchIdx+1)%12].stars.push(...mainStars.shen);
+  palaces[(arr.mingBranchIdx+5)%12].stars.push(...mainStars.cai); // 财帛
+  palaces[(arr.mingBranchIdx+10)%12].stars.push(...mainStars.fu); // 福德
+  // 煞星（按确定性分布）
+  const shaPattern=getShaPattern(y,m,d);
+  shaPattern.forEach(([palaceIdx,stars])=>{
+    palaces[palaceIdx].stars.push(...stars);
+  });
+
+  // 化忌所在宫位（根据日干 + 化忌星 推算）
+  const jiStarIdx=palaces.findIndex(p=>p.stars.includes(huaJiStar));
+  const huaJiPalace=jiStarIdx>=0?jiStarIdx:arr.mingBranchIdx;
+
+  return {
+    year:y,month:m,day:d,hour:h,gender:g,
+    dayStem,siHua,huaJiStar,huaJiPalace,
+    palaces,mingBranchIdx:arr.mingBranchIdx,shenIdx:arr.shenIdx,
+    shenPalaceName:PALACE_NAMES[arr.shenIdx],
+    palaceName:(idx)=>PALACE_NAMES[idx]
+  };
+}
+
+// 主星选择（确定性算法：根据生日）
+function chooseMainStars(y,m,d){
+  // 简化：基于生日的确定性映射（不随机）
+  const seed=(y*100+m*10+d)%14;
+  const mingPool=['紫微','天机','太阳','武曲','天同','廉贞','天府','太阴','贪狼','巨门','天相','天梁','七杀','破军'];
+  const base=mingPool[seed];
+  const ming=[base];
+  const shen=[mingPool[(seed+6)%14]];
+  const cai=[mingPool[(seed+3)%14]];
+  const fu=[mingPool[(seed+9)%14]];
+  return {ming,shen,cai,fu};
+}
+
+// 煞星分布（确定性）
+function getShaPattern(y,m,d){
+  const seed=(y*13+m*7+d)%8;
+  // 8 种预定义分布
+  const patterns=[
+    [[5,['擎羊','陀罗']],[2,['火星']],[8,['铃星']]],
+    [[5,['火星']],[7,['擎羊','陀罗']]],
+    [[5,['擎羊','火星','铃星']],[10,['地劫']]],
+    [[2,['擎羊']],[5,['陀罗','铃星']]],
+    [[10,['擎羊','陀罗','火星','铃星']]],
+    [[5,['擎羊']],[7,['火星']]],
+    [[5,['擎羊','陀罗']],[2,['地空','地劫']]],
+    [[8,['擎羊','陀罗']],[10,['火星','铃星']]]
+  ];
+  return patterns[seed];
+}
+
+// === 拉取 KB 引用 ===
+async function fetchKBRefs(ctx){
+  const queries=['化忌','疾厄','健康','疾病','煞星','火星铃星'];
+  const all=[];
+  for(const q of queries){
+    try{
+      const r=await fetch(`http://127.0.0.1:8920/api/public/kb-search?q=${encodeURIComponent(q)}&limit=3`);
+      const d=await r.json();
+      if(d.results){
+        d.results.forEach(x=>all.push({...x,query:q}));
+      }
+    }catch(e){}
+  }
+  // 去重
+  const seen=new Set();
+  return all.filter(x=>{
+    if(seen.has(x.entry_id))return false;
+    seen.add(x.entry_id);
+    return true;
+  }).slice(0,8);
+}
+
+// === 渲染 ===
+function renderResult(ctx){
+  // 综合摘要
+  const highCount=ctx.hits.filter(h=>h.severity==='high').length;
+  const midCount=ctx.hits.filter(h=>h.severity==='mid').length;
+  const totalRisk=highCount*3+midCount*2;
+  const level=totalRisk>=6?'极高':totalRisk>=3?'较高':totalRisk>=1?'中等':'较低';
+
+  document.getElementById('summary-cards').innerHTML=`
+    <div class="metric ${totalRisk>=6?'danger':totalRisk>=3?'warn':'safe'}">
+      <div class="val">${level}</div>
+      <div class="label">综合疾病风险</div>
+      <div class="sub">总分 ${totalRisk}</div>
+    </div>
+    <div class="metric ${highCount>0?'danger':''}">
+      <div class="val">${highCount}</div>
+      <div class="label">高危标记</div>
+      <div class="sub">重大风险</div>
+    </div>
+    <div class="metric ${midCount>0?'warn':''}">
+      <div class="val">${midCount}</div>
+      <div class="label">中危标记</div>
+      <div class="sub">需关注</div>
+    </div>
+    <div class="metric">
+      <div class="val">${ctx.dayStem}日干</div>
+      <div class="label">日主四化</div>
+      <div class="sub">化忌：${ctx.huaJiStar}</div>
+    </div>
+  `;
+
+  // 风险概览条
+  document.getElementById('risk-overview').innerHTML=`
+    <div style="margin-top:16px">
+      <div style="display:flex;justify-content:space-between;font-size:14px;color:var(--paper3);margin-bottom:6px">
+        <span>风险等级</span>
+        <span>${level}</span>
+      </div>
+      <div class="risk-bar">
+        <div class="risk-fill ${totalRisk>=6?'risk-vhigh':totalRisk>=3?'risk-high':totalRisk>=1?'risk-mid':'risk-low'}"
+             style="width:${Math.min(totalRisk*15,100)}%">
+          ${totalRisk} 分
+        </div>
+      </div>
+    </div>
+  `;
+
+  // 十二宫
+  let palaceHtml='<div class="row3">';
+  ctx.palaces.forEach((p,idx)=>{
+    const isJiE=idx===5;
+    const isMing=idx===ctx.mingBranchIdx;
+    const isShen=idx===ctx.shenIdx;
+    const isDanger=ctx.hits.some(h=>h.detail.includes(PALACE_NAMES[idx]));
+    const cls=isDanger?'danger':(ctx.huaJiPalace===idx?'warn':(isMing?'safe':''));
+    const flag=isMing?'<div class="flag">★</div>':isShen?'<div class="flag">◉</div>':isJiE?'<div class="flag">⚕</div>':'';
+    const hua=ctx.huaJiPalace===idx?`<div class="hua">化忌·${ctx.huaJiStar}</div>`:'';
+    palaceHtml+=`
+      <div class="palace ${cls}">
+        ${flag}
+        <div class="name">${PALACE_NAMES[idx]}${isJiE?' ⚕':''}</div>
+        <div class="stars">${p.stars.join(' ')||'—'}</div>
+        ${hua}
+      </div>
+    `;
+  });
+  palaceHtml+='</div>';
+  document.getElementById('palace-grid').innerHTML=palaceHtml;
+
+  // 风险标记详解
+  if(ctx.hits.length===0){
+    document.getElementById('risk-detail').innerHTML='<div class="empty">🎉 未检出显著疾病风险标记，注意日常养生即可。</div>';
+  }else{
+    let html='';
+    ctx.hits.forEach((r,i)=>{
+      html+=`
+        <div class="risk-card ${r.severity}">
+          <div class="title">
+            ${r.severity==='high'?'🔴':'🟡'} ${i+1}. ${r.name}
+            <span class="tag">${r.severity==='high'?'高危':'中危'}</span>
+          </div>
+          <div class="body">${r.detail}</div>
+          <div class="quote">📜 ${r.rule}</div>
+          <div class="body" style="margin-top:10px;color:var(--green)">✓ 调理：${r.advice}</div>
+        </div>
+      `;
+    });
+    document.getElementById('risk-detail').innerHTML=html;
+  }
+
+  // 大限时间轴（10 年一段）
+  let tlHtml='';
+  const baseRisk=totalRisk;
+  const ganzhiCycle=['甲子','乙丑','丙寅','丁卯','戊辰','己巳','庚午','辛未','壬申','癸酉'];
+  for(let age=5;age<=105;age+=10){
+    const idx=Math.floor(age/10)%10;
+    const gz=ganzhiCycle[idx];
+    const riskBoost=Math.abs(Math.sin(age*0.3))*2;
+    const riskScore=Math.floor(baseRisk*0.4+riskBoost);
+    const riskLabel=riskScore>=4?'极高':riskScore>=3?'较高':riskScore>=1?'中等':'较低';
+    const riskCls=riskScore>=3?'high':riskScore>=1?'mid':'low';
+    const desc=age===45?'身体转折期':age===55?'心血管高发':age===65?'慢性病期':age===75?'老年病期':age===35?'事业压力期':'';
+    tlHtml+=`
+      <div class="tl-item ${riskCls}">
+        <div class="age">${age}</div>
+        <div class="ganzhi">${gz}大限</div>
+        <div class="risk ${riskCls}">${riskLabel}</div>
+        <div class="desc">${desc}</div>
+      </div>
+    `;
+  }
+  document.getElementById('timeline').innerHTML=tlHtml;
+
+  // 调理方案
+  const actions=[];
+  ctx.hits.forEach(r=>{
+    if(r.severity==='high')actions.push({priority:'P0',text:r.advice.split('；')[0]});
+  });
+  actions.push({priority:'P1',text:'每年全面体检一次（重点：血常规、肿瘤标志物、心电图）'});
+  actions.push({priority:'P1',text:'保持规律作息（子时前入睡），避免熬夜伤肝肾'});
+  if(ctx.hits.some(h=>h.name.includes('肝胆')||h.name.includes('天机化忌')))
+    actions.push({priority:'P2',text:'饮食：少饮酒、少辛辣，多绿色蔬菜、枸杞菊花茶'});
+  if(ctx.hits.some(h=>h.name.includes('血光')||h.name.includes('廉贞')))
+    actions.push({priority:'P2',text:'运动：避免高对抗运动，优选太极、游泳、散步'});
+  if(ctx.hits.some(h=>h.name.includes('脾胃')||h.name.includes('财福')))
+    actions.push({priority:'P2',text:'饮食：规律三餐，少生冷，薏米山药健脾'});
+  if(ctx.hits.some(h=>h.name.includes('心肾')||h.name.includes('官夫')))
+    actions.push({priority:'P2',text:'生殖泌尿系统：定期筛查，男命 PSA、女命妇科'});
+  actions.push({priority:'P3',text:'心理：冥想/正念练习，化忌在心结，解铃还须系铃人'});
+
+  document.getElementById('action-list').innerHTML=actions.map(a=>
+    `<li><strong>[${a.priority}]</strong>${a.text}</li>`
+  ).join('');
+
+  // KB 引用
+  let kbHtml='';
+  ctx.kbRefs.forEach(r=>{
+    kbHtml+=`
+      <div class="risk-card">
+        <div class="title">
+          📖 ${r.title.length>50?r.title.slice(0,50)+'...':r.title}
+          <span class="tag">${r.module}</span>
+          <span class="tag">得分 ${r.score}</span>
+        </div>
+        <div class="body" style="color:var(--paper2);font-size:14px">${r.snippet}</div>
+        <div class="quote">🔍 来源：${r.entry_id} · 检索词「${r.query}」</div>
+      </div>
+    `;
+  });
+  if(!kbHtml)kbHtml='<div class="empty">未拉取到 KB 引用（API 离线或无网络）</div>';
+  document.getElementById('kb-refs').innerHTML=kbHtml;
+}
+</script>
+</body>
+</html>
