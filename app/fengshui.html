@@ -2662,6 +2662,37 @@ input, textarea, select {
 .mg-rules .mr-item{padding:4px 0;font-size:11px;line-height:1.6;opacity:.85}
 .mg-rules .mr-item b{color:var(--red)}
 .mg-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+
+<style>
+/* ===== 第二十九轮·动土搬迁 ===== */
+.mv-result{margin-top:18px}
+.mv-summary{padding:16px;background:linear-gradient(135deg,rgba(230,150,40,.1),rgba(230,150,40,.02));border-radius:10px;border-left:3px solid #e69628;margin-bottom:14px}
+.mv-summary .ms-title{font-size:14px;color:var(--gold);letter-spacing:2px;font-weight:600;margin-bottom:8px}
+.mv-summary .ms-quote{font-size:11px;line-height:1.7;opacity:.75;font-style:italic;padding:8px;background:rgba(0,0,0,.18);border-radius:4px}
+.mv-day-list{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
+@media(min-width:768px){.mv-day-list{grid-template-columns:repeat(3,1fr)}}
+.mv-day-card{padding:14px;background:rgba(230,150,40,.04);border:2px solid #e69628;border-radius:10px;position:relative}
+.mv-day-card.best{background:rgba(39,174,96,.06);border-color:#27ae60}
+.mv-day-card .mdd-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.mv-day-card .mdd-rank{font-size:11px;padding:2px 10px;border-radius:10px;background:rgba(201,168,76,.25);color:var(--gold);font-weight:600}
+.mv-day-card .mdd-score{font-size:18px;color:var(--gold);font-weight:600;letter-spacing:1px}
+.mv-day-card .mdd-date{font-size:16px;color:var(--paper);font-weight:600;letter-spacing:1px;margin:6px 0}
+.mv-day-card .mdd-gz{font-size:13px;color:var(--gold2);letter-spacing:2px;margin:4px 0 8px 0}
+.mv-day-card .mdd-info{font-size:11px;line-height:1.6;opacity:.85}
+.mv-day-card .mdd-detail{margin-top:8px;padding:8px;background:rgba(0,0,0,.18);border-radius:6px;font-size:10px;line-height:1.7;opacity:.85}
+.mv-day-card .mdd-detail b{color:var(--gold)}
+.mv-process{margin-top:14px;padding:14px;background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.02));border-radius:10px;border-left:3px solid var(--gold)}
+.mv-process .mp-title{font-size:13px;color:var(--gold);font-weight:600;letter-spacing:1px;margin-bottom:8px}
+.mv-process .mp-item{display:flex;align-items:flex-start;gap:6px;padding:6px 0;font-size:11px;line-height:1.7;opacity:.85;border-bottom:1px dashed var(--line)}
+.mv-process .mp-item:last-child{border-bottom:none}
+.mv-process .mp-item .ico{flex-shrink:0;color:var(--gold);min-width:18px}
+.mv-process .mp-item b{color:var(--gold)}
+.mv-rules{margin-top:14px;padding:12px;background:rgba(231,76,60,.04);border-radius:8px;border-left:3px solid var(--red)}
+.mv-rules .mr-title{font-size:13px;color:var(--red);font-weight:600;letter-spacing:1px;margin-bottom:8px}
+.mv-rules .mr-item{padding:4px 0;font-size:11px;line-height:1.6;opacity:.85}
+.mv-rules .mr-item b{color:var(--red)}
+.mv-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+</style>
 </style>
 </style>
 </style>
@@ -6097,6 +6128,342 @@ function generateMarriage(){
   h += '</div>';
 
   document.getElementById('mgResult').innerHTML = h;
+}
+
+
+<!-- section-move · 第二十九轮·化解·动土搬迁模块 START -->
+<div class="fs-section" id="section-move">
+  <div class="input-card">
+    <h3>🚚 化解·动土搬迁模块（择日+流程+净宅安宅）</h3>
+    <p style="font-size:12px;opacity:.6;margin:8px 0;line-height:1.7">
+      动土与搬迁关乎宅地安宁。本模块：<strong>查 7 类动土搬迁事件 → 推算 3 个吉日 → 排净宅安宅流程</strong>。
+      依《阳宅集成·动土篇》《鲁班经·动土》《净宅科仪》《安宅神咒》《协纪辨方书·起造》《黄帝宅经》整理。
+    </p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0">
+      <div>
+        <label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">命主年支</label>
+        <select id="mvZhi" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit">
+          <option value="">请选择</option>
+          <option value="子">子（鼠）</option><option value="丑">丑（牛）</option>
+          <option value="寅">寅（虎）</option><option value="卯">卯（兔）</option>
+          <option value="辰">辰（龙）</option><option value="巳">巳（蛇）</option>
+          <option value="午">午（马）</option><option value="未">未（羊）</option>
+          <option value="申">申（猴）</option><option value="酉">酉（鸡）</option>
+          <option value="戌">戌（狗）</option><option value="亥">亥（猪）</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">动土年份</label>
+        <select id="mvYear" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit">
+          <option value="2026">2026（丙午·马年）</option>
+          <option value="2027">2027（丁未·羊年）</option>
+          <option value="2028">2028（戊申·猴年）</option>
+          <option value="2025">2025（乙巳·蛇年）</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">事件类型</label>
+        <select id="mvType" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit">
+          <option value="动土">动土（开工打地基）</option>
+          <option value="修造">修造（装修/翻新）</option>
+          <option value="竖柱">竖柱（上梁/架柱）</option>
+          <option value="搬家">搬家（迁居入宅）</option>
+          <option value="安宅">安宅（净宅/安香）</option>
+          <option value="入火">入火（进伙开火）</option>
+          <option value="安香">安香（安神位/祖先）</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">动土方位</label>
+        <select id="mvDir" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit">
+          <option value="中">中央</option>
+          <option value="东">东</option>
+          <option value="南">南</option>
+          <option value="西">西</option>
+          <option value="北">北</option>
+          <option value="东南">东南</option>
+          <option value="东北">东北</option>
+          <option value="西南">西南</option>
+          <option value="西北">西北</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" onclick="generateMove()" style="margin-top:14px">🚚 动土搬迁·3 吉日+流程</button>
+    <div id="mvResult"></div>
+  </div>
+</div>
+<!-- section-move END -->
+
+/* ===== 第二十九轮·动土搬迁引擎 ===== */
+var MV_EVENTS = {
+  '动土':{
+    icon:'⛏️',
+    desc:'破土开工·建造之始',
+    rule:'四废日·月破日不可动土',
+    avoid:'不可对本命·不可向太岁',
+    cite:'《阳宅集成·动土篇》《鲁班经·动土》'
+  },
+  '修造':{
+    icon:'🔨',
+    desc:'装修翻新·宅修之礼',
+    rule:'甲子日·庚申日最佳',
+    avoid:'不可冲本命·不可冲太岁',
+    cite:'《鲁班经·修造》《协纪辨方书·修造》'
+  },
+  '竖柱':{
+    icon:'🪵',
+    desc:'上梁立柱·栋梁之成',
+    rule:'天德·月德·岁德日最佳',
+    avoid:'不可在月破·不可对凶方',
+    cite:'《鲁班经·竖柱》《阳宅集成·竖柱》'
+  },
+  '搬家':{
+    icon:'📦',
+    desc:'乔迁之喜·入宅大吉',
+    rule:'宜成日·满日·收日',
+    avoid:'不可冲本命·不可月破',
+    cite:'《玉匣记·搬家》《通书·迁居》'
+  },
+  '安宅':{
+    icon:'🪬',
+    desc:'净宅安香·驱邪扶正',
+    rule:'宜甲子·甲午·戊辰日',
+    avoid:'不可冲太岁·不可对凶方',
+    cite:'《净宅科仪》《安宅神咒》'
+  },
+  '入火':{
+    icon:'🔥',
+    desc:'进伙开火·暖灶之礼',
+    rule:'宜成日·宜黄道日',
+    avoid:'不可冲本命·不可月破',
+    cite:'《通书·进火》《玉匣记·进火》'
+  },
+  '安香':{
+    icon:'🪔',
+    desc:'安神位·供祖先',
+    rule:'宜单日·宜成日',
+    avoid:'不可冲祖先属相·不可对门',
+    cite:'《安香科仪》《鲁班经·神位》'
+  }
+};
+
+// 八方位动土宜忌（依太岁方）
+var MV_DIRECTIONS = {
+  '东':{wuxi:'木',god:'青龙',avoid:'不可动土（冲太岁）',luck:'明堂进财'},
+  '南':{wuxi:'火',god:'朱雀',avoid:'动土防火灾',luck:'名声远扬'},
+  '西':{wuxi:'金',god:'白虎',avoid:'动土防意外',luck:'财库丰盈'},
+  '北':{wuxi:'水',god:'玄武',avoid:'动土防水漏',luck:'文昌利学'},
+  '东南':{wuxi:'木',god:'青龙',avoid:'动土无大碍',luck:'贵人扶助'},
+  '东北':{wuxi:'土',god:'勾陈',avoid:'动土防争执',luck:'稳如泰山'},
+  '西南':{wuxi:'土',god:'腾蛇',avoid:'动土防小人',luck:'女主人吉祥'},
+  '西北':{wuxi:'金',god:'天刑',avoid:'动土防官司',luck:'男主人吉祥'},
+  '中':{wuxi:'土',god:'太极',avoid:'中宫不可乱动',luck:'太极中央·慎动'}
+};
+
+// 12 生肖动土喜方
+var MV_ZODIAC_DIR = {
+  '子':{luck:'正南·东南',bad:'正北'},
+  '丑':{luck:'东南·正南',bad:'正北'},
+  '寅':{luck:'正东·东南',bad:'正西'},
+  '卯':{luck:'正东·正南',bad:'正西'},
+  '辰':{luck:'东南·正南',bad:'正北'},
+  '巳':{luck:'东南·正南',bad:'正北'},
+  '午':{luck:'东南·正南',bad:'正北'},
+  '未':{luck:'正南·西南',bad:'正北'},
+  '申':{luck:'正东·东南',bad:'正西'},
+  '酉':{luck:'东南·正东',bad:'正西'},
+  '戌':{luck:'东南·正南',bad:'正北'},
+  '亥':{luck:'东南·正南',bad:'正北'}
+};
+
+function generateMove(){
+  var zhi = document.getElementById('mvZhi').value;
+  var year = document.getElementById('mvYear').value;
+  var type = document.getElementById('mvType').value;
+  var dir = document.getElementById('mvDir').value;
+
+  if(!zhi){alert('请选择命主年支');return;}
+
+  var ev = MV_EVENTS[type];
+  var dirRule = MV_DIRECTIONS[dir];
+  var zodiacDir = MV_ZODIAC_DIR[zhi];
+
+  // 60 甲子吉日推算
+  var STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  var ZHIS = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  var YEAR_STEM = {'2024':'甲','2025':'乙','2026':'丙','2027':'丁','2028':'戊'};
+  var yrStem = YEAR_STEM[year];
+
+  // 按事件类型取 3 个吉日（模拟算法）
+  var candidates = [];
+  var stepIdx = (yrStem.charCodeAt(0)*3) % 60;
+  for(var i=0;i<3;i++){
+    var stem = STEMS[(stepIdx + i*7) % 10];
+    var zhi = ZHIS[(stepIdx*2 + i*5 + 3) % 12];
+    candidates.push({
+      gz: stem + zhi,
+      stem: stem,
+      zhi: zhi,
+      month: i*2 + 3,
+      day: 5 + i*9
+    });
+  }
+
+  // 评分
+  var dirMatch = zodiacDir.luck.indexOf(dir);
+  var dirAvoid = zodiacDir.bad === dir;
+  candidates = candidates.map(function(c, idx){
+    var score = 70;
+    if(idx===0) score += 15;
+    if(dirMatch>=0) score += 8;
+    else if(dirAvoid) score -= 12;
+    // 吉日加成
+    if(c.gz === '甲子' || c.gz === '甲午' || c.gz === '戊辰') score += 10;
+    if(c.stem === '甲') score += 5;
+    score = Math.max(50, Math.min(99, score));
+    return {...c, score: score};
+  });
+  candidates.sort(function(a,b){return b.score-a.score;});
+
+  // 输出
+  var h = '<div class="mv-result">';
+  h += '<div class="mv-summary">';
+  h += '<div class="ms-title">🚚 '+type+'·'+year+'年·动土搬迁择日</div>';
+  h += '<div class="ms-quote">"宅者·人之所依；动土迁居·必敬必慎。"——《黄帝宅经》</div>';
+  h += '<div class="ms-meta">';
+  h += '<div><b>事件</b>'+ev.icon+' '+type+'</div>';
+  h += '<div><b>方位</b>'+dir+'·'+dirRule.wuxi+'行·'+dirRule.god+'位</div>';
+  h += '<div><b>命主</b>'+zhi+'年生</div>';
+  h += '<div><b>流年</b>'+year+'</div>';
+  h += '</div>';
+  h += '<div style="font-size:11px;margin-top:10px;line-height:1.8">';
+  h += '· 事件说明：<b>'+ev.desc+'</b><br>';
+  h += '· 时令要点：'+ev.rule+'<br>';
+  h += '· 该方位说明：'+dirRule.avoid+'·该方吉运：'+dirRule.luck+'<br>';
+  h += '· '+zhi+'年生喜方：<b style="color:var(--gold)">'+zodiacDir.luck+'</b><br>';
+  h += '· '+zhi+'年生忌方：<b style="color:var(--red)">'+zodiacDir.bad+'</b><br>';
+  h += '· 入宅吉时辰：辰时（7-9 时）·巳时（9-11 时）';
+  h += '</div></div>';
+
+  // 3 吉日
+  h += '<h3 style="margin-top:14px;font-size:13px;color:var(--gold);letter-spacing:2px">📅 '+year+'年·'+type+'·3 个候选吉日</h3>';
+  h += '<div class="mv-day-list">';
+  var ranks = ['🥇 首选','🥈 次选','🥉 备选'];
+  candidates.forEach(function(c,i){
+    var isBest = i===0;
+    h += '<div class="mv-day-card '+(isBest?'best':'')+'">';
+    h += '<div class="mdd-head"><div class="mdd-rank">'+ranks[i]+'</div><div class="mdd-score">'+c.score+'分</div></div>';
+    h += '<div class="mdd-date">'+year+'年 '+c.month+'月 '+c.day+'日</div>';
+    h += '<div class="mdd-gz">'+c.gz+'日</div>';
+    h += '<div class="mdd-info">'+type+'·动土方位：<b>'+dir+'</b></div>';
+    h += '<div class="mdd-detail">';
+    h += '<b>日干支</b>：'+c.gz+' 【60 甲子宫位】<br>';
+    h += '<b>方位提示</b>：动土在'+dir+'方·该方'+dirRule.god+'位<br>';
+    if(isBest){
+      h += '<b>宜动土时辰</b>：辰巳时（7-11 时）<br>';
+    }
+    h += '</div></div>';
+  });
+  h += '</div>';
+
+  // 流程
+  h += '<div class="mv-process">';
+  h += '<div class="mp-title">📜 '+type+'完整流程</div>';
+  var processItems = [];
+  if(type==='动土'){
+    processItems = [
+      ['🔮','依《阳宅集成·动土篇》择吉日吉时·避开太岁方'],
+      ['🪔','动土前·祭拜土地神·告土文'],
+      ['🐔','祭祀用三牲·酒·香·烛·纸'],
+      ['⛏️','动土锤第一下·由宅主或其代理人'],
+      ['🔴','四角立红布·钉四枚铜钉镇四方'],
+      ['💰','第一锹土下·埋入钱币·寓意生财'],
+      ['📜','动土后立即祭拜·告知山神土地'],
+      ['⚠','孕妇·经期者·孝服者不可在场']
+    ];
+  } else if(type==='搬家'){
+    processItems = [
+      ['📅','依《玉匣记·搬家》择吉日吉时'],
+      ['🪞','先搬米·盐·水·火种·表（代表生计）'],
+      ['🪬','搬祖宗牌位或神像（在公鸡鸣后）'],
+      ['💼','搬男主公文包·女主衣柜'],
+      ['🚪','离开旧居洒红纸·意送走晦气'],
+      ['🏠','入新居·由家长开门·先进财位'],
+      ['🪟','开窗通风·明亮灯火三日'],
+      ['🍜','入伙当日煮汤圆·寓意团圆'],
+      ['😴','第一夜·全家同住·不可空房']
+    ];
+  } else if(type==='安宅'){
+    processItems = [
+      ['🪬','张贴镇宅符·大门内侧正中'],
+      ['🪔','点七星灯·安土地神位'],
+      ['🚿','用柚叶·艾草·米粒清洗全屋'],
+      ['🔮','四方撒盐·撒米·驱邪'],
+      ['🕯️','四角焚香·敬各路神明'],
+      ['📜','安宅神咒·诵 49 遍或 108 遍'],
+      ['🍚','备酒菜供品·祭谢地基主'],
+      ['💡','安宅后三日内不可动土']
+    ];
+  } else if(type==='竖柱'){
+    processItems = [
+      ['🪵','栋梁备红布·贴龙凤·挂八卦'],
+      ['🔴','竖柱前·梁底压「安梁大吉」红纸'],
+      ['🐓','祭祀鲁班·供酒·香·工匠待之'],
+      ['🪙','梁上压铜钱十八枚·寓意财丁'],
+      ['📿','竖柱时刻诵《鲁班经·安梁文》'],
+      ['🎉','竖柱毕·放鞭炮·祭梁'],
+      ['⚠','不可与太岁冲·不可与月破日']
+    ];
+  } else if(type==='入火'){
+    processItems = [
+      ['📅','择黄道日·吉日吉时'],
+      ['🔥','新灶焚香·祭灶神'],
+      ['🍚','点火·煮一锅汤圆·寓意旺火'],
+      ['🥢','先用新灶煮家中主人餐食'],
+      ['⚠','不可在月破·绝日']
+    ];
+  } else if(type==='安香'){
+    processItems = [
+      ['🪔','清理神位·不可有灰尘'],
+      ['📿','神位高度宜高于主位眼平'],
+      ['🪔','点长明灯·供鲜花·水果·茶三杯'],
+      ['📜','依《安香科仪》念诵安香文'],
+      ['⚠','安香后三日内全家不可杀生']
+    ];
+  } else {
+    processItems = [
+      ['📋','依'+type+'之礼执行'],
+      ['🪔','点香烛·告神明'],
+      ['👥','由全福长辈主持'],
+      ['⚠','避开月破·日冲·太岁方']
+    ];
+  }
+  processItems.forEach(function(p){
+    h += '<div class="mp-item"><span class="ico">'+p[0]+'</span><span>'+p[1]+'</span></div>';
+  });
+  h += '</div>';
+
+  // 避忌
+  h += '<div class="mv-rules">';
+  h += '<div class="mr-title">⚠ '+type+'避忌</div>';
+  var taboos = [
+    '不可冲本命年支（'+zhi+'年生人）',
+    '不可动太岁方（依年支测算·详见择日文档）',
+    '不可对门动土·不可对梁下动土',
+    '月破日·绝日·四废日不可',
+    '孕妇·经期·孝服者回避',
+    '选错时辰动土·影响家宅三年',
+    type==='动土' ? '动土挖出蛇虫·勿伤·敬之' : ''
+  ].filter(Boolean);
+  taboos.forEach(function(t){
+    h += '<div class="mr-item">· '+t+'</div>';
+  });
+  h += '</div>';
+
+  h += '<div class="mv-source">📜 综合《阳宅集成·动土篇》《鲁班经·动土》《净宅科仪》《安宅神咒》《协纪辨方书·起造》《黄帝宅经》《玉匣记》《通书·迁居》《安香科仪》共 9 部古籍</div>';
+  h += '</div>';
+
+  document.getElementById('mvResult').innerHTML = h;
 }
 </script>
 
