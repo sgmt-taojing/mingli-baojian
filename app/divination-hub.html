@@ -4650,7 +4650,46 @@ function exportHTML() {
 .life-action-list li{margin-bottom:6px;font-size:12px;line-height:1.6;list-style:none}
 .life-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
 @media(max-width:768px){.life-dual-core{grid-template-columns:1fr}.life-12matrix{grid-template-columns:repeat(2,1fr)}}
-</style></head><body>';
+</style>
+/* R41-A divination-hub 化解 4 宫 CSS */
+.dh-qianyi-section { background: linear-gradient(135deg, #1a2332 0%, #0f1820 100%); border: 1px solid rgba(255,180,77,0.3); border-radius: 12px; padding: 20px; margin: 16px 0; }
+.dh-qianyi-title { color: #ffb44d; font-size: 18px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.dh-qianyi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.dh-qianyi-card { background: rgba(255,180,77,0.08); border: 1px solid rgba(255,180,77,0.2); border-radius: 8px; padding: 12px; }
+.dh-qianyi-card-title { color: #ffb44d; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.dh-qianyi-card-content { color: #c5d1de; font-size: 13px; line-height: 1.6; }
+.dh-qianyi-tag { display: inline-block; padding: 2px 8px; background: rgba(255,180,77,0.15); border-radius: 4px; font-size: 11px; margin-right: 4px; margin-top: 4px; }
+
+.dh-fude-section { background: linear-gradient(135deg, #2a1f3a 0%, #1a0f25 100%); border: 1px solid rgba(192,132,252,0.3); border-radius: 12px; padding: 20px; margin: 16px 0; }
+.dh-fude-title { color: #c084fc; font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+.dh-fude-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.dh-fude-card { background: rgba(192,132,252,0.08); border: 1px solid rgba(192,132,252,0.2); border-radius: 8px; padding: 12px; }
+.dh-fude-card-title { color: #c084fc; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.dh-fude-card-content { color: #c5d1de; font-size: 13px; line-height: 1.6; }
+
+.dh-xiongdi-section { background: linear-gradient(135deg, #1f2a1f 0%, #0f1a0f 100%); border: 1px solid rgba(120,200,120,0.3); border-radius: 12px; padding: 20px; margin: 16px 0; }
+.dh-xiongdi-title { color: #78c878; font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+.dh-xiongdi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.dh-xiongdi-card { background: rgba(120,200,120,0.08); border: 1px solid rgba(120,200,120,0.2); border-radius: 8px; padding: 12px; }
+.dh-xiongdi-card-title { color: #78c878; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.dh-xiongdi-card-content { color: #c5d1de; font-size: 13px; line-height: 1.6; }
+
+.dh-tianzhai-section { background: linear-gradient(135deg, #2a1a1f 0%, #1a0f15 100%); border: 1px solid rgba(248,113,113,0.3); border-radius: 12px; padding: 20px; margin: 16px 0; }
+.dh-tianzhai-title { color: #f87171; font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+.dh-tianzhai-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.dh-tianzhai-card { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.2); border-radius: 8px; padding: 12px; }
+.dh-tianzhai-card-title { color: #f87171; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.dh-tianzhai-card-content { color: #c5d1de; font-size: 13px; line-height: 1.6; }
+
+.dh-huajie-stats { display: flex; justify-content: space-around; gap: 12px; margin: 16px 0; padding: 12px; background: rgba(99,179,237,0.05); border-radius: 8px; }
+.dh-huajie-stat { text-align: center; }
+.dh-huajie-stat-value { color: #63b3ed; font-size: 24px; font-weight: 700; }
+.dh-huajie-stat-label { color: #8a9bb0; font-size: 12px; margin-top: 4px; }
+
+.dh-huajie-search { background: rgba(99,179,237,0.08); border-radius: 8px; padding: 12px; margin: 16px 0; }
+.dh-huajie-search-input { width: 100%; padding: 8px 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(99,179,237,0.3); border-radius: 6px; color: #fff; font-size: 13px; }
+.dh-huajie-search-result { color: #c5d1de; font-size: 12px; margin-top: 8px; padding: 8px; background: rgba(99,179,237,0.05); border-radius: 4px; }
+</head><body>';
   html += '<h1>'+name+'</h1>';
   if (meta) html += '<p style="text-align:center;color:var(--steel);margin-top:-16px">'+meta+'</p>';
 
@@ -4774,6 +4813,141 @@ function exportCurrentSection() {
 <script src="knowledge-models/yijing-model.js"></script>
 <script src="knowledge-models/ziwei-model.js"></script>
 <script src="knowledge-models/zodiac-model.js"></script>
+
+<!-- R41-A divination-hub 化解 4 宫 HTML -->
+<div id="dh-huajie-stats" class="dh-huajie-stats"></div>
+<div class="dh-huajie-search">
+  <input type="text" class="dh-huajie-search-input" placeholder="🔍 搜索化解建议（如搬迁、装修、合伙、冥想）..." oninput="window.searchDH4Gong && window.searchDH4Gong(this.value)">
+  <div id="dh-huajie-search-result" class="dh-huajie-search-result"></div>
+</div>
+<div id="section-dh-qianyi"></div>
+<div id="section-dh-fude"></div>
+<div id="section-dh-xiongdi"></div>
+<div id="section-dh-tianzhai"></div>
+<script>
+// 搜索功能
+window.searchDH4Gong = function(q) {
+  q = (q || '').trim();
+  const result = document.getElementById('dh-huajie-search-result');
+  if (!q) { result.textContent = ''; return; }
+  if (!window.DH_HUAJIE_4GONG) { result.textContent = '请先加载化解数据'; return; }
+  let hits = [];
+  Object.entries(window.DH_HUAJIE_4GONG).forEach(([k, g]) => {
+    g.modules.forEach(m => {
+      if (m.title.includes(q) || m.content.includes(q) || m.tag.includes(q)) {
+        hits.push('[' + g.name + '] ' + m.title + ' · ' + m.content.substring(0, 40) + '...');
+      }
+    });
+  });
+  result.textContent = hits.length ? '命中 ' + hits.length + ' 条: ' + hits.slice(0, 3).join(' | ') : '未命中';
+};
+</script>
+
+/* R41-A divination-hub 化解 4 宫 JS - 迁移+福德+兄弟+田宅 */
+(function(){
+  // 化解 4 宫数据（每宫 8 模块 = 32 模块 R41-A）
+  window.DH_HUAJIE_4GONG = {
+    qianyi: { // 迁移宫
+      name: "迁移宫",
+      desc: "出行、搬迁、外派人际、出国发展、对外形象",
+      emoji: "🚶",
+      color: "#ffb44d",
+      modules: [
+        { id: "qy-yuandi", title: "远地出行", content: "出远门前查看当日凶神方位与驿马星位置，避免冲突日。可佩戴蓝色或黑色衣物化解路途不顺。", tag: "出行", level: "high" },
+        { id: "qy-bianqian", title: "搬迁入宅", content: "搬迁前查黄历择吉日吉时，入宅前在门槛处放置七宝或硬币稳住气场。新房内 24 小时内开灯、烧水、煮饭为「暖灶」。", tag: "搬迁", level: "high" },
+        { id: "qy-waipai", title: "外派常驻", content: "外派前选与本命年命相合的方向，外派期间每月初一、十五保持与家人的线上连线稳定情感。", tag: "外派", level: "mid" },
+        { id: "qy-chuguor", title: "出国发展", content: "出国前看流年驿马+天乙贵人方向，选定登机时辰与座位朝向。携带故土之水和米稳定气场。", tag: "出国", level: "mid" },
+        { id: "qy-duiwai", title: "对外形象", content: "塑造对外形象时,着装颜色与本命五行契合,常用色为补益五行色。如金命多用白色、银色,木命多用绿色、青色。", tag: "形象", level: "mid" },
+        { id: "qy-jiaoyou", title: "外部人际", content: "对外社交应选择与日主合多的朋友,远离日主相冲、相克之人。出门见贵人方位,东、南、西、北各有宜忌。", tag: "人际", level: "high" },
+        { id: "qy-lvyou", title: "旅游安宅", content: "旅游前查目的地五行,选择与本命互补的目的地最佳。住宿选择与本命合的方向房间。", tag: "旅游", level: "low" },
+        { id: "qy-yijian", title: "异地置业", content: "异地买房看当地风水+本命方位,选在吉星飞临之方,避开五黄、二黑方位。建议请专业人士实地勘察。", tag: "置业", level: "high" }
+      ]
+    },
+    fude: { // 福德宫
+      name: "福德宫",
+      desc: "精神、内心、信仰、修养、福气、祖荫",
+      emoji: "🙏",
+      color: "#c084fc",
+      modules: [
+        { id: "fd-xiuxin", title: "修养心性", content: "日日静坐冥想 15 分钟,培养内心的平静与觉察。忌长期焦虑、压抑情绪,定期做心理咨询或与信任的人倾诉。", tag: "心性", level: "high" },
+        { id: "fd-xinyang", title: "信仰寄托", content: "建立健康的信仰或精神寄托,如佛教、基督教、瑜伽、禅修。忌迷信邪教、盲目崇拜、过度依赖算命而失主动。", tag: "信仰", level: "high" },
+        { id: "fd-yulu", title: "冥想静坐", content: "每日冥想 15-30 分钟,选择东方或东南方位,穿着宽松衣物。晨起、睡前最佳,可稳定情绪、提升觉察力。", tag: "冥想", level: "high" },
+        { id: "fd-shuji", title: "读书养心", content: "每周读 1-2 本滋养心灵的书籍,如儒释道经典、心理学著作、哲学入门。忌读凶杀、淫秽、负面信息过多之书。", tag: "阅读", level: "mid" },
+        { id: "fd-yinyue", title: "音乐调心", content: "根据五行选曲调养:角(木)宫音养肝、徵(火)羽音养心、宫(土)音养脾、商(金)音养肺、羽(水)音养肾。", tag: "音乐", level: "mid" },
+        { id: "fd-zuyin", title: "祖德荫庇", content: "清明、冬至祭祖,慎终追远。每月初一、十五给祖先上香,传承家风。忌数典忘祖、辱没先人。", tag: "祖德", level: "mid" },
+        { id: "fd-cibei", title: "慈悲布施", content: "力行布施:财布施(捐款)、法布施(授业)、无畏布施(放生)。小善日积,大善年累,可化解灾祸、积聚福德。", tag: "布施", level: "high" },
+        { id: "fd-funiu", title: "福禄绵长", content: "行善不求回报,自然感召福气。多施恩于人,少计较得失。忌损人利己、忘恩负义、怨天尤人。", tag: "福气", level: "high" }
+      ]
+    },
+    xiongdi: { // 兄弟宫
+      name: "兄弟宫",
+      desc: "兄弟姐妹、同事同行、合作伙伴、邻里关系",
+      emoji: "🤝",
+      color: "#78c878",
+      modules: [
+        { id: "xd-jiejie", title: "兄弟姐妹", content: "与兄弟姐妹保持适度距离,各自成家后尊重边界。经济往来亲兄弟明算账,忌因金钱伤感情。", tag: "手足", level: "mid" },
+        { id: "xd-tongshi", title: "同事关系", content: "与同事保持专业关系,合作但不结私党。忌办公室恋情、过度卷入办公室政治。", tag: "同事", level: "high" },
+        { id: "xd-hehuo", title: "合作伙伴", content: "合伙前签详细协议,约定股权、分工、退出机制。选与本命合多的合作伙伴,忌合伙人性情不定、反复无常。", tag: "合伙", level: "high" },
+        { id: "xd-lingli", title: "邻里和睦", content: "远亲不如近邻,与邻居保持友好关系,见面微笑打招呼。遇矛盾主动化解,忌结怨、记仇。", tag: "邻里", level: "mid" },
+        { id: "xd-jituan", title: "社团参与", content: "选择有共同价值观的社团参加,扩展同好圈层。忌参与黄赌毒、传销、邪教等不良团体。", tag: "社团", level: "mid" },
+        { id: "xd-tongmen", title: "同门师友", content: "重视同门之谊,定期聚会联络感情。师门传承有序,忌欺师灭祖、争名夺利。", tag: "师友", level: "mid" },
+        { id: "xd-banghui", title: "行业协会", content: "加入本行业协会,扩展行业视野。忌只顾私利、不参与行业公共事务。", tag: "行业", level: "low" },
+        { id: "xd-aihao", title: "爱好同好", content: "发展与本命相合的爱好,加入同好社群。如金命人爱音乐、木命人爱书法、水命人爱茶道、火命人爱运动、土命人爱收藏。", tag: "爱好", level: "high" }
+      ]
+    },
+    tianzhai: { // 田宅宫
+      name: "田宅宫",
+      desc: "家宅、房产、田产、不动产、家庭环境",
+      emoji: "🏠",
+      color: "#f87171",
+      modules: [
+        { id: "tz-jiage", title: "家宅平安", content: "家是避风港,保持家中整洁有序、气场流通。每周大扫除,定期开窗通风。忌家中杂乱、堆放垃圾。", tag: "家宅", level: "high" },
+        { id: "tz-fangchan", title: "房产购置", content: "买房前看地段、户型、采光、风水。选与本命五行相生的方位,避开五黄、二黑方位。签合同前请律师把关。", tag: "买房", level: "high" },
+        { id: "tz-zhuangxiu", title: "装修布局", content: "装修根据本命五行选主色调:木命用绿、火命用红、土命用黄、金命用白、水命用黑蓝。客厅宽敞、卧室温馨、厨房整洁。", tag: "装修", level: "high" },
+        { id: "tz-yanghu", title: "住宅养护", content: "定期检查水电、燃气、防盗。屋顶不漏水、墙面不霉变、管道不堵塞。忌长期不维护导致小问题成大隐患。", tag: "养护", level: "mid" },
+        { id: "tz-jiazu", title: "家祠传承", content: "有祠堂者定期祭祀,无祠堂者可设家中祖先牌位。传承家风、家训、家规,让后代有根可循。", tag: "传承", level: "mid" },
+        { id: "tz-tudi", title: "田产管理", content: "有田产者按时令耕作,无田产者可阳台种菜养花。土生万物,接触土地可稳定气场。", tag: "田产", level: "low" },
+        { id: "tz-budongchan", title: "不动产投资", content: "不动产投资看地段、政策、回报率。忌盲目追高、贷款过重。建议保留 6 个月月供的应急资金。", tag: "投资", level: "mid" },
+        { id: "tz-zufang", title: "租房安宅", content: "租客选与本命合的方位房间,入住前简单净化(撒盐、焚香)。忌租住凶宅、阴暗潮湿、嘈杂混乱之处。", tag: "租房", level: "high" }
+      ]
+    }
+  };
+  // 渲染 4 宫
+  function renderDH4Gong() {
+    const sections = ['qianyi','fude','xiongdi','tianzhai'];
+    sections.forEach(sec => {
+      const data = window.DH_HUAJIE_4GONG[sec];
+      const container = document.getElementById('section-dh-' + sec);
+      if (!container || !data) return;
+      let html = '<div class="dh-' + sec + '-section">';
+      html += '<div class="dh-' + sec + '-title">' + data.emoji + ' ' + data.name + '·' + data.desc + '</div>';
+      html += '<div class="dh-' + sec + '-grid">';
+      data.modules.forEach(m => {
+        html += '<div class="dh-' + sec + '-card">';
+        html += '<div class="dh-' + sec + '-card-title">' + m.title + ' <span style="color:#8a9bb0;font-size:11px;font-weight:400">[' + m.tag + ']</span></div>';
+        html += '<div class="dh-' + sec + '-card-content">' + m.content + '</div>';
+        html += '<div style="margin-top:6px"><span class="dh-qianyi-tag">重要度:' + m.level + '</span></div>';
+        html += '</div>';
+      });
+      html += '</div></div>';
+      container.innerHTML = html;
+    });
+    // 统计
+    const statsEl = document.getElementById('dh-huajie-stats');
+    if (statsEl) {
+      const total = Object.values(window.DH_HUAJIE_4GONG).reduce((s, g) => s + g.modules.length, 0);
+      statsEl.innerHTML = '<div class="dh-huajie-stat"><div class="dh-huajie-stat-value">4</div><div class="dh-huajie-stat-label">化解宫位</div></div><div class="dh-huajie-stat"><div class="dh-huajie-stat-value">' + total + '</div><div class="dh-huajie-stat-label">化解模块</div></div><div class="dh-huajie-stat"><div class="dh-huajie-stat-value">24</div><div class="dh-huajie-stat-label">累计化解</div></div>';
+    }
+  }
+  // 暴露
+  window.renderDH4Gong = renderDH4Gong;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderDH4Gong);
+  } else {
+    setTimeout(renderDH4Gong, 100);
+  }
+})();
+
 </body></html>';
   let blob = new Blob([html], {type: 'text/html;charset=utf-8'});
   let url = URL.createObjectURL(blob);
