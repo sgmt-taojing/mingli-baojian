@@ -7526,22 +7526,100 @@ function computeYouthPlan(){
   var btn = event && event.target;
   if(btn){btn.disabled=true; btn.textContent='⏳ 规划生成中...';}
   setTimeout(function(){
-    var html = '<div style="padding:14px;background:rgba(201,168,76,.04);border-radius:10px;line-height:1.9">';
-    html += '<h4 style="margin:0 0 10px;color:var(--gold)">🌱 青少年专属规划（学龄前-18岁）</h4>';
-    var items = [
-      '【0-6岁】体能开发+感官刺激+亲子陪伴',
-      '【7-12岁】学科基础+兴趣班+阅读习惯',
-      '【13-15岁】初中关键期+青春期心理+学习方法',
-      '【16-18岁】高中冲刺+选科+目标院校',
-      '【19-22岁】大学专业+社会实践+人际网络'
+    var name = document.getElementById('youthName') ? document.getElementById('youthName').value.trim() : '孩子';
+    var grade = document.getElementById('youthGrade') ? document.getElementById('youthGrade').value : 'primary';
+    var score = document.getElementById('youthScore') ? document.getElementById('youthScore').value : 'average';
+    var birthplace = document.getElementById('youthBirthplace') ? document.getElementById('youthBirthplace').value : '';
+    var residence = document.getElementById('youthResidence') ? document.getElementById('youthResidence').value : '';
+    var expect = document.getElementById('youthExpect') ? document.getElementById('youthExpect').value.trim() : '';
+
+    var GRADE_MAP = {kindergarten:'学龄前',primary:'小学',junior:'初中',senior:'高中',college:'大学'};
+    var GRADE_ORDER = ['kindergarten','primary','junior','senior','college'];
+    var GRADE_AGE = {kindergarten:'3-6岁',primary:'7-12岁',junior:'13-15岁',senior:'16-18岁',college:'19-22岁'};
+    var GRADE_FOCUS = {
+      kindergarten:['体能开发','感官刺激','亲子陪伴','社交启蒙'],
+      primary:['学科基础','阅读习惯','兴趣培养','学习方法'],
+      junior:['学科深化','青春期心理','学习方法','自我认知'],
+      senior:['选科决策','目标院校','压力管理','专业启蒙'],
+      college:['专业方向','社会实践','人际网络','职业规划']
+    };
+    var curGrade = GRADE_ORDER.indexOf(grade) >= 0 ? grade : 'primary';
+    var curIdx = GRADE_ORDER.indexOf(curGrade);
+    var curAge = GRADE_AGE[curGrade];
+    var curFocus = GRADE_FOCUS[curGrade];
+    var scoreNum = {excellent:92,good:80,average:68,needImprove:55}[score] || 68;
+    var scoreLabel = {excellent:'优秀',good:'良好',average:'一般',needImprove:'待提高'}[score] || '一般';
+
+    var html = '<div style="padding:16px;background:rgba(201,168,76,.04);border-radius:10px;line-height:1.9">';
+    html += '<h4 style="margin:0 0 10px;color:var(--gold)">🧒 '+name+' 青少年专属规划</h4>';
+    html += '<div style="font-size:13px;opacity:.8;margin-bottom:10px">📅 当前阶段：<b>'+GRADE_MAP[curGrade]+'</b>（'+curAge+'） · 成绩：<b>'+scoreLabel+'</b> · 综合评估：<b>'+scoreNum+'</b> 分</div>';
+    html += '<hr style="border:none;border-top:1px solid rgba(201,168,76,.2);margin:12px 0">';
+    // 当前阶段重点
+    html += '<div style="margin-bottom:14px"><div style="font-size:12px;color:var(--gold2);margin-bottom:6px">📌 <b>当前阶段重点</b></div>';
+    html += '<div style="display:flex;gap:6px;flex-wrap:wrap">';
+    curFocus.forEach(function(f){
+      html += '<span style="padding:4px 10px;background:rgba(201,168,76,.1);border-radius:12px;font-size:12px">'+f+'</span>';
+    });
+    html += '</div>';
+    if (expect) html += '<div style="font-size:11px;color:var(--paper2);margin-top:6px">家长期望：'+expect+'</div>';
+    html += '</div>';
+    // 人生时间轴
+    html += '<div style="margin-bottom:14px"><div style="font-size:12px;color:var(--gold2);margin-bottom:6px">📊 <b>人生时间轴</b>（分阶段进展）</div>';
+    html += '<div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap">';
+    for (var i = curIdx; i < GRADE_ORDER.length; i++) {
+      var active = i === curIdx ? 'border:2px solid var(--gold);' : 'border:1px solid rgba(201,168,76,.2);';
+      var opacity = i === curIdx ? '1' : '.55';
+      html += '<div style="padding:8px;border-radius:8px;background:rgba(201,168,76,.04);min-width:78px;text-align:center;opacity:'+opacity+';'+active+'font-size:11px">';
+      html += '<b>'+GRADE_MAP[GRADE_ORDER[i]]+'</b><br><span style="font-size:10px">'+GRADE_AGE[GRADE_ORDER[i]]+'</span>';
+      html += '</div>';
+      if (i < GRADE_ORDER.length - 1) html += '<span style="font-size:10px;opacity:.3">→</span>';
+    }
+    html += '</div></div>';
+    // 领域进展（四领域评分卡）
+    var domains = [
+      {name:'学科',icon:'📖',score: Math.min(95, scoreNum + 5)},
+      {name:'兴趣',icon:'🎨',score: Math.min(95, scoreNum - 3)},
+      {name:'性格',icon:'💡',score: Math.min(95, scoreNum + 2)},
+      {name:'健康',icon:'🏃',score: Math.min(95, scoreNum + 8)}
     ];
-    html += '<ol style="padding-left:20px">';
-    items.forEach(function(s){html += '<li style="margin:6px 0">'+s+'</li>';});
+    html += '<div style="margin-bottom:14px"><div style="font-size:12px;color:var(--gold2);margin-bottom:6px">🏅 <b>发展领域评分</b></div>';
+    html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:6px">';
+    domains.forEach(function(d){
+      var bar = '<div style="height:4px;border-radius:2px;background:rgba(201,168,76,.15);margin-top:4px">';
+      bar += '<div style="width:'+d.score+'%;height:100%;border-radius:2px;background:var(--gold)"></div></div>';
+      html += '<div style="padding:8px;background:rgba(201,168,76,.06);border-radius:8px"><div style="font-size:11px;opacity:.8">'+d.icon+' '+d.name+'</div><div style="font-size:14px;font-weight:600;color:var(--gold)">'+d.score+'</div>'+bar+'</div>';
+    });
+    html += '</div></div>';
+    // 行动清单
+    html += '<div style="margin-bottom:14px"><div style="font-size:12px;color:var(--gold2);margin-bottom:6px">✅ <b>'+GRADE_MAP[curGrade]+'阶段行动清单</b></div>';
+    var actions = [
+      '【'+GRADE_MAP[curGrade]+'首要】' + curFocus[0],
+      '每周 '+curFocus[1]+' 至少 3 次',
+      '每周 '+curFocus[2]+' 计划执行',
+      '建立 '+curFocus[3]+' 机制',
+      expect ? '家长跟进：'+expect : '与家长每周沟通学习进展',
+      '规律作息，确保 '+curAge+' 期充足睡眠',
+      '每周 '+curFocus[0]+' 打卡记录',
+      '每 3 个月回顾一次进展',
+      '若 '+curAge+' 期成绩波动，寻求帮助',
+      '保持积极心态，建立成长型思维'
+    ];
+    html += '<ol style="padding-left:20px;font-size:13px">';
+    actions.forEach(function(a,idx){
+      html += '<li style="margin:4px 0">'+a+'</li>';
+    });
     html += '</ol></div>';
+    // 地域提示
+    if (birthplace || residence) {
+      html += '<div style="padding:10px;background:rgba(201,168,76,.06);border-radius:8px;font-size:12px;margin-bottom:12px">';
+      html += '🏙️ <b>地域提示</b>：出生地<b>'+birthplace+'</b>，现居<b>'+residence+'</b>';
+      html += '（影响：'+(birthplace===residence?'就近教育、熟悉环境':'迁移需适应期、也可能带来新机会')+'）</div>';
+    }
+    html += '</div>';
     var target = document.getElementById('youthPlanResult');
     if(target) target.innerHTML = html;
-    if(btn){btn.disabled=false; btn.textContent='🌱 重新生成';}
-  }, 300);
+    if(btn){btn.disabled=false; btn.textContent='🧒 重新生成';}
+  }, 350);
 }
 
 /* 甲子大循环 */
