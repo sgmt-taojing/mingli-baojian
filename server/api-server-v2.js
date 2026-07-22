@@ -544,7 +544,24 @@ async function _aiLocalResponse(userText, baziData) {
   if (/谢谢|感谢|thanks/.test(text)) return '不客气！如果您还有其他问题，随时可以问我。祝您一切顺利！';
   if (/再见|bye|拜拜/.test(text)) return '再见！祝您吉祥如意，凡事顺遂。随时欢迎回来提问。';
   
-  // 默认：列出可问领域
+  // 默认兜底：强制 KB 搜索（命中即返回真实内容，否则返回可问领域）
+  try {
+    const kw = userText.replace(/[\s\?？!！,。.\-_—\-\u3000]/g, ' ').split(/\s+/).filter(w => w.length >= 2).slice(0, 3);
+    if (kw.length > 0) {
+      const conds = kw.map(() => '(title LIKE ? OR content LIKE ?)').join(' OR ');
+      const params = kw.flatMap(w => ['%'+w+'%', '%'+w+'%']);
+      const rows = db.prepare(`SELECT module, title, substr(content,1,500) as excerpt, trust_score FROM kb_formal WHERE (${conds}) ORDER BY trust_score DESC, hit_count DESC LIMIT 2`).all(...params);
+      if (rows.length) {
+        let r = '📚 知识库为您检索到相关条目：\n\n';
+        rows.forEach((x, i) => { r += (i+1)+'. 【'+x.title+'】\n'+x.excerpt+'...\n\n'; });
+        try {
+          rows.forEach(x => db.prepare(`UPDATE kb_formal SET hit_count = hit_count + 1, last_hit = CURRENT_TIMESTAMP WHERE title = ? AND module = ?`).run(x.title, x.module));
+        } catch(e){}
+        return r + '——来源: KB 全局兜底';
+      }
+    }
+  } catch(e){}
+
   return '您好！我是易道智鉴AI命理助手。您可以问我：\n\n📅 命理排盘（需提供生辰）\n🌟 运势分析\n⚖️ 五行分析\n🏠 风水布局\n💊 中医养生\n🔮 奇门/紫微/六爻/梅花\n📅 择日择吉\n🪷 倪师中医\n\n或者直接告诉我您的出生年月日时，我为您排盘分析。';
 }
 
@@ -2055,6 +2072,30 @@ app.post('/api/public/kb-manager/bump', (req, res) => {
       for (const it of items) upd.run(newScore, it.entry_id);
     }
     res.json({ matched: items.length, sample: items.slice(0,5), dryRun, newScore });
+  } catch (e) {
+    res.json({ error: String(e.message) });
+  }
+});
+
+// KB 直答命中率统计（公共免 JWT）
+app.get('/api/public/kb-manager/hit-rate', (req, res) => {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const todayHits = db.prepare(`SELECT COUNT(*) as c FROM kb_formal WHERE last_hit >= ?`).get(today).c;
+    const totalHits = db.prepare(`SELECT COALESCE(SUM(hit_count),0) as c FROM kb_formal`).get().c;
+    const totalKb = db.prepare(`SELECT COUNT(*) as c FROM kb_formal`).get().c;
+    const top = db.prepare(`SELECT module, SUM(hit_count) as hits FROM kb_formal WHERE last_hit >= ? GROUP BY module ORDER BY hits DESC LIMIT 6`).all(today);
+    // 7天趋势（每天命中条目数）
+    const trend = db.prepare(`SELECT substr(last_hit,1,10) as day, COUNT(*) as entries FROM kb_formal WHERE last_hit IS NOT NULL AND last_hit >= date('now','-6 days') GROUP BY day ORDER BY day`).all();
+    res.json({
+      today,
+      today_hits: todayHits,
+      total_hits: totalHits,
+      total_kb: totalKb,
+      hit_rate: totalKb > 0 ? Math.min(100, todayHits * 100 / totalKb).toFixed(2) : 0,
+      top_modules: top,
+      trend_7d: trend
+    });
   } catch (e) {
     res.json({ error: String(e.message) });
   }
