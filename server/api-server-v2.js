@@ -916,6 +916,66 @@ app.post('/api/yuanzhu/send-push', auth, (req, res) => {
   const year = parseInt(req.body.year || req.query.year) || new Date().getFullYear();
   const p = db.prepare('SELECT * FROM yuanzhu_profile WHERE user_id=?').get(req.userId);
   if(!p) return res.json({ ok:false, message:'画像未生成' });
+
+
+// ============== R43-F 智能眼镜 HTTP Bridge ==============
+// 设备端基地址 (GLASS_BASE_URL, 默认: http://127.0.0.1:8787)
+const GLASS_BASE_URL = process.env.GLASS_BASE_URL || 'http://127.0.0.1:8787';
+async function glassProxy(path, opts = {}) {
+  try {
+    const r = await fetch(GLASS_BASE_URL + path, {
+      method: opts.method || 'GET',
+      headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) },
+      body: opts.body ? JSON.stringify(opts.body) : undefined,
+      signal: AbortSignal.timeout(5000)
+    });
+    if (!r.ok) return { error: 'GLASS_UPSTREAM_' + r.status, status: r.status };
+    return await r.json();
+  } catch (e) {
+    return { error: 'GLASS_OFFLINE', message: '智能眼镜未连接（' + (e.message || 'timeout') + '）' };
+  }
+}
+// 1. 设备状态
+app.get('/api/glass/status', async (req, res) => {
+  const data = await glassProxy('/status');
+  res.json(data);
+});
+// 2. 实时心率/体温/步数
+app.get('/api/glass/vitals', async (req, res) => {
+  const data = await glassProxy('/vitals');
+  res.json(data);
+});
+// 3. 语音指令（推送到眼镜 TTS）
+app.post('/api/glass/speak', async (req, res) => {
+  const { text, urgency = 'normal' } = req.body || {};
+  if (!text) return res.json({ error: '参数错误' });
+  const data = await glassProxy('/speak', { method: 'POST', body: { text, urgency } });
+  res.json(data);
+});
+// 4. 看相/识人
+app.post('/api/glass/face-scan', async (req, res) => {
+  const data = await glassProxy('/face-scan', { method: 'POST', body: req.body || {} });
+  res.json(data);
+});
+// 5. 流年推送（命主→眼镜）
+app.post('/api/glass/yearly-push', async (req, res) => {
+  const { userId, year, summary } = req.body || {};
+  if (!userId || !year) return res.json({ error: '参数错误' });
+  const data = await glassProxy('/yearly-push', { method: 'POST', body: { userId, year, summary } });
+  res.json(data);
+});
+// 6. 离线模式（断网 fallback）
+app.get('/api/glass/capabilities', async (req, res) => {
+  res.json({
+    online: false,
+    baseUrl: GLASS_BASE_URL,
+    features: ['vitals', 'speak', 'face-scan', 'yearly-push', 'offline-kb'],
+    fallback: 'kb-first 离线模式已就绪',
+    note: '启动眼镜 HTTP bridge 后访问 /status 验证设备在线'
+  });
+});
+console.log('[init] R43-F 智能眼镜 HTTP bridge 已挂载 (base=' + GLASS_BASE_URL + ')');
+
   if(p.push_opt_in===0) return res.json({ ok:false, message:'您已关闭推送' });
   const content = yzProfile.generateYearlyPush(p, year);
   const snapshot = JSON.stringify({
@@ -928,6 +988,65 @@ app.post('/api/yuanzhu/send-push', auth, (req, res) => {
   db.prepare('UPDATE yuanzhu_profile SET push_year=?, updated_at=datetime(\'now\',\'localtime\') WHERE user_id=?').run(year, req.userId);
   res.json({ ok:true, year, content, updated: r.updated, id: r.id });
 });
+
+// ============== R43-F 智能眼镜 HTTP Bridge ==============
+// 设备端基地址 (GLASS_BASE_URL, 默认: http://127.0.0.1:8787)
+const GLASS_BASE_URL = process.env.GLASS_BASE_URL || 'http://127.0.0.1:8787';
+async function glassProxy(path, opts = {}) {
+  try {
+    const r = await fetch(GLASS_BASE_URL + path, {
+      method: opts.method || 'GET',
+      headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) },
+      body: opts.body ? JSON.stringify(opts.body) : undefined,
+      signal: AbortSignal.timeout(5000)
+    });
+    if (!r.ok) return { error: 'GLASS_UPSTREAM_' + r.status, status: r.status };
+    return await r.json();
+  } catch (e) {
+    return { error: 'GLASS_OFFLINE', message: '智能眼镜未连接（' + (e.message || 'timeout') + '）' };
+  }
+}
+// 1. 设备状态
+app.get('/api/glass/status', async (req, res) => {
+  const data = await glassProxy('/status');
+  res.json(data);
+});
+// 2. 实时心率/体温/步数
+app.get('/api/glass/vitals', async (req, res) => {
+  const data = await glassProxy('/vitals');
+  res.json(data);
+});
+// 3. 语音指令（推送到眼镜 TTS）
+app.post('/api/glass/speak', async (req, res) => {
+  const { text, urgency = 'normal' } = req.body || {};
+  if (!text) return res.json({ error: '参数错误' });
+  const data = await glassProxy('/speak', { method: 'POST', body: { text, urgency } });
+  res.json(data);
+});
+// 4. 看相/识人
+app.post('/api/glass/face-scan', async (req, res) => {
+  const data = await glassProxy('/face-scan', { method: 'POST', body: req.body || {} });
+  res.json(data);
+});
+// 5. 流年推送（命主→眼镜）
+app.post('/api/glass/yearly-push', async (req, res) => {
+  const { userId, year, summary } = req.body || {};
+  if (!userId || !year) return res.json({ error: '参数错误' });
+  const data = await glassProxy('/yearly-push', { method: 'POST', body: { userId, year, summary } });
+  res.json(data);
+});
+// 6. 离线模式（断网 fallback）
+app.get('/api/glass/capabilities', async (req, res) => {
+  res.json({
+    online: false,
+    baseUrl: GLASS_BASE_URL,
+    features: ['vitals', 'speak', 'face-scan', 'yearly-push', 'offline-kb'],
+    fallback: 'kb-first 离线模式已就绪',
+    note: '启动眼镜 HTTP bridge 后访问 /status 验证设备在线'
+  });
+});
+console.log('[init] R43-F 智能眼镜 HTTP bridge 已挂载 (base=' + GLASS_BASE_URL + ')');
+
 
 // === 缺失端点：推送系统补全（admin 全员/单用户，用户收件箱，admin 大盘统计） ===
 
