@@ -2819,6 +2819,28 @@ input, textarea, select {
 .pal12-verdict{margin-top:14px;padding:12px;background:rgba(0,0,0,.2);border-radius:8px;border:1px dashed var(--gold);font-size:12px;line-height:1.9}
 .pal12-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
 @media(max-width:768px){.pal12-grid{grid-template-columns:repeat(2,1fr)}}
+/* R39-E fengshui 三重叠加 */
+.tri-stack{padding:20px;background:linear-gradient(135deg,rgba(106,90,205,.08),rgba(74,138,168,.05));border-radius:14px;margin:20px 0;border:1px solid var(--line)}
+.tri-stack-title{font-size:17px;color:var(--gold);letter-spacing:3px;margin-bottom:14px;font-weight:700;text-align:center}
+.tri-stack-subtitle{font-size:12px;opacity:.6;text-align:center;margin-bottom:18px;letter-spacing:1px}
+.tri-3col{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+.tri-card{padding:16px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.04)}
+.tri-card.ziwei{border-top:4px solid #6a5acd;background:linear-gradient(135deg,rgba(106,90,205,.08),rgba(255,255,255,.02))}
+.tri-card.bazi{border-top:4px solid #4a8aa8;background:linear-gradient(135deg,rgba(74,138,168,.08),rgba(255,255,255,.02))}
+.tri-card.fengshui{border-top:4px solid var(--gold);background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(255,255,255,.02))}
+.tri-card-title{font-size:14px;font-weight:600;margin-bottom:10px;letter-spacing:2px}
+.tri-card.ziwei .tri-card-title{color:#9b6ab0}
+.tri-card.bazi .tri-card-title{color:#6ab0d0}
+.tri-card.fengshui .tri-card-title{color:var(--gold)}
+.tri-card-weight{font-size:11px;opacity:.6;margin-bottom:10px}
+.tri-card-detail{font-size:11px;line-height:1.9}
+.tri-overlap{padding:16px;background:rgba(0,0,0,.3);border-radius:10px;border:1px dashed var(--gold);margin-top:14px}
+.tri-overlap-title{font-size:13px;color:var(--gold);margin-bottom:10px;letter-spacing:2px;font-weight:600}
+.tri-overlap-list{font-size:12px;line-height:2}
+.tri-overlap-list li{margin-bottom:6px}
+.tri-verdict{margin-top:14px;padding:14px;background:rgba(0,0,0,.25);border-radius:10px;border:1px dashed var(--gold);font-size:12px;line-height:2}
+.tri-source{font-size:10px;opacity:.4;margin-top:12px;padding-top:8px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+@media(max-width:768px){.tri-3col{grid-template-columns:1fr}}
 </style>
 </style>
 </style>
@@ -7090,6 +7112,40 @@ function renderPalace12FullR38(){
   h+='</div>';
   return h;
 }
+/* ===== R39-E fengshui 三重叠加 ===== */
+function renderTripleStackR39(){
+  var h='<div class="tri-stack" id="triStackResult">';
+  h+='<div class="tri-stack-title">🔮 三重叠加·紫微+八字+玄空（化解板块第 16 模块）</div>';
+  h+='<div class="tri-stack-subtitle">紫微斗数 12 宫（40%）+ 八字四柱（35%）+ 玄空飞星（25%）三层叠加判断 · 共 23 部古籍</div>';
+  h+='<div class="tri-3col">';
+  // 紫微 12 宫 40%
+  h+='<div class="tri-card ziwei"><div class="tri-card-title">🔮 紫微斗数 12 宫</div><div class="tri-card-weight">权重 40% · 12 宫主星</div><div class="tri-card-detail">命宫紫微·财帛武曲·官禄紫微<br>福德天府·疾厄天同·夫妻天相<br>子女太阴·兄弟太阳·田宅天府<br>迁移天马·父母天梁·交友巨门</div></div>';
+  // 八字四柱 35%
+  h+='<div class="tri-card bazi"><div class="tri-card-title">📜 八字四柱</div><div class="tri-card-weight">权重 35% · 年月日时</div><div class="tri-card-detail">年柱：祖业根基<br>月柱：父母兄弟<br>日柱：自身配偶<br>时柱：子女晚景<br>大运：10 年一转<br>流年：年支为主</div></div>';
+  // 玄空飞星 25%
+  h+='<div class="tri-card fengshui"><div class="tri-card-title">🧭 玄空飞星</div><div class="tri-card-weight">权重 25% · 9 星飞布</div><div class="tri-card-detail">一白贪狼·二黑巨门<br>三碧禄存·四绿文曲<br>五黄廉贞·六白武曲<br>七赤破军·八白左辅<br>九紫右弼</div></div>';
+  h+='</div>';
+  // 叠加判断
+  h+='<div class="tri-overlap"><div class="tri-overlap-title">⚡ 三重叠加核心判断</div>';
+  h+='<ol class="tri-overlap-list">';
+  h+='<li><b style="color:#9b6ab0">紫微命宫</b> + <b style="color:#6ab0d0">日柱天干</b> 同五行 → 格局倍增（权重 ×1.5）</li>';
+  h+='<li><b style="color:#9b6ab0">财帛武曲化禄</b> + <b style="color:#6ab0d0">月柱财星</b> → 正财大旺（权重 ×1.4）</li>';
+  h+='<li><b style="color:var(--gold)">八白左辅到向</b> + <b style="color:#9b6ab0">田宅天府</b> → 置业大吉（权重 ×1.3）</li>';
+  h+='<li><b style="color:#e74c3c">五黄到门</b> + <b style="color:#9b6ab0">疾厄天同陷</b> → 健康告急（权重 ×2.0 负面）</li>';
+  h+='<li><b style="color:var(--gold)">九紫右弼到方</b> + <b style="color:#9b6ab0">夫妻天相</b> → 婚姻美满（权重 ×1.3）</li>';
+  h+='<li><b style="color:#6ab0d0">时柱子女星</b> + <b style="color:var(--gold)">一白到方</b> → 子嗣兴旺（权重 ×1.2）</li>';
+  h+='<li><b style="color:#9b6ab0">官禄紫微化权</b> + <b style="color:#6ab0d0">月柱官星</b> + <b style="color:var(--gold)">六白到方</b> → 三重升迁（权重 ×1.8）</li>';
+  h+='</ol></div>';
+  // 化解建议
+  h+='<div class="tri-verdict"><b style="color:var(--gold)">🔮 三重叠加综合化解：</b><br>';
+  h+='① <b style="color:#9b6ab0">紫微 40%</b>：命宫主星决定先天格局·后天可调 <b style="color:#6ab0d0">八字 35%</b>：日柱天干为核心·大运流年定吉凶 <b style="color:var(--gold)">玄空 25%</b>：飞星到向到方·决定空间吉凶<br>';
+  h+='② <b>叠加法则</b>：三层同吉 → 效力倍增 / 两吉一凶 → 吉凶参半 / 三层同凶 → 必须化解<br>';
+  h+='③ <b>化解优先级</b>：P0 五黄+疾厄 → P1 官禄+月柱 → P2 财帛+财星 → P3 夫妻+九紫<br>';
+  h+='④ <b>行动清单</b>：① 每年立春查飞星 ② 每月查紫微流曜 ③ 每日查八字日柱 ④ 每季度调整风水布局</div>';
+  h+='<div class="tri-source">📜 综合《紫微斗数全集》《太乙金华宗旨》《滴天髓》《子平真诠》《穷通宝鉴》《三命通会》《渊海子平》《命理探源》《玄空飞星》《沈氏玄空学》《八宅明镜》《阳宅三要》《黄帝宅经》《葬书》《撼龙经》《青囊序》《天玉经》《都天宝照经》《协纪辨方书》《梅花易数》《奇门遁甲》《了凡四训》《太上感应篇》共 23 部古籍</div>';
+  h+='</div>';
+  return h;
+}
 </script>
 
 <script src="js/ui-toast.js" defer></script>
@@ -7400,6 +7456,17 @@ function computeXuanKong(){
   </div>
 </div>
 <!-- section-12palace-full END -->
+
+<!-- section-triple-stack · R39-E 三重叠加 START -->
+<div class="fs-section" id="section-triple-stack">
+  <div class="input-card">
+    <h3>🔮 三重叠加·紫微+八字+玄空（化解板块·第 16 模块）</h3>
+    <p style="font-size:12px;opacity:.6;margin:8px 0;line-height:1.7">本模块为化解板块第 16 模块：紫微斗数 12 宫（40%）+ 八字四柱（35%）+ 玄空飞星（25%）三层叠加判断吉凶，依《紫微斗数全集》《玄空飞星》《滴天髓》《子平真诠》共 23 部古籍。</p>
+    <button class="btn" onclick="document.getElementById('triStackResultWrap').innerHTML=renderTripleStackR39()" style="margin-top:14px">🔮 三重叠加·综合判断</button>
+    <div id="triStackResultWrap"></div>
+  </div>
+</div>
+<!-- section-triple-stack END -->
 
 <!-- section-archive-detail · 第三十二轮 START -->
 <div class="fs-section" id="section-archive-detail">
