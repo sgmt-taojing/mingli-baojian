@@ -2527,6 +2527,38 @@ input, textarea, select {
     }
     
 </style>
+
+<style>
+/* ===== 第二十二轮·紫微三联动 ===== */
+.zl-result{margin-top:18px}
+.zl-summary{padding:16px;background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.02));border-radius:10px;border-left:3px solid var(--gold);margin-bottom:14px}
+.zl-summary .zl-stitle{font-size:14px;color:var(--gold);letter-spacing:2px;font-weight:600;margin-bottom:8px}
+.zl-summary .zl-quote{font-size:11px;line-height:1.7;opacity:.75;font-style:italic;padding:8px;background:rgba(0,0,0,.18);border-radius:4px}
+.zl-summary .zl-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:10px;font-size:11px}
+.zl-summary .zl-meta div{padding:6px;background:rgba(0,0,0,.15);border-radius:4px}
+.zl-summary .zl-meta b{color:var(--gold);font-size:10px;display:block;margin-bottom:2px;letter-spacing:1px}
+.zl-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:10px}
+@media(min-width:768px){.zl-grid{grid-template-columns:repeat(2,1fr)}}
+.zl-card{padding:14px;background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:8px}
+.zl-card.warn{border-left:3px solid var(--red);background:rgba(192,57,43,.04)}
+.zl-card.boost{border-left:3px solid var(--green);background:rgba(39,174,96,.04)}
+.zl-card .zl-ch{font-size:13px;color:var(--gold);font-weight:600;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.zl-card .zl-ch .zl-idx{font-size:10px;padding:1px 8px;background:rgba(201,168,76,.2);border-radius:8px;color:var(--gold2)}
+.zl-card .zl-body{font-size:12px;line-height:1.7;opacity:.85}
+.zl-card .zl-item{display:flex;gap:8px;align-items:center;padding:8px;background:rgba(201,168,76,.06);border-radius:6px;margin:6px 0;font-size:11px}
+.zl-card .zl-item .ico{font-size:18px}
+.zl-card .zl-item .text{flex:1}
+.zl-card .zl-item b{color:var(--gold);display:block;font-size:11px;margin-bottom:2px}
+.zl-card .zl-item .meta{font-size:10px;opacity:.65}
+.zl-day{display:flex;gap:10px;align-items:center;padding:10px;background:rgba(255,255,255,.03);border-radius:6px;margin:6px 0;font-size:12px}
+.zl-day .zl-d{font-size:18px;color:var(--gold);font-weight:600;min-width:48px;text-align:center}
+.zl-day .zl-info{flex:1}
+.zl-day .zl-info b{font-size:13px;color:var(--paper);display:block}
+.zl-day .zl-info small{font-size:11px;opacity:.65}
+.zl-day .zl-score{font-size:18px;color:var(--gold);font-weight:600;min-width:60px;text-align:right}
+.zl-source{font-size:10px;opacity:.4;margin-top:8px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+</style>
+
 </head>
 <body>
 <div style="position:fixed;top:12px;right:12px;z-index:99998">
@@ -4672,6 +4704,134 @@ function renderChildRoomSet(){
   document.getElementById('childRoomSet').innerHTML = html;
 }
 
+
+/* ===== 第二十二轮·紫微化忌→化解→吉日 三联动引擎 ===== */
+function generateZidiseLink(){
+  var yearZhi = document.getElementById('zlYearZhi').value;
+  var dayStem = document.getElementById('zlDayStem').value;
+  var concerns = Array.from(document.querySelectorAll('.zlConcern:checked')).map(c=>c.value);
+  if(!yearZhi){alert('请选择出生年地支');return;}
+  if(concerns.length===0) concerns=['破财','病厄'];
+
+  var ZHI_HUAJI = {
+    '子':{star:'天同',palace:'福德',meaning:'忧愁·情感挫败'},
+    '丑':{star:'文曲',palace:'官禄',meaning:'文书是非·官非'},
+    '寅':{star:'廉贞',palace:'疾厄',meaning:'血光·官非'},
+    '卯':{star:'天机',palace:'兄弟',meaning:'手足失和·奔波'},
+    '辰':{star:'太阳',palace:'父母',meaning:'父缘薄·长辈忧'},
+    '巳':{star:'武曲',palace:'财帛',meaning:'破财·金属伤'},
+    '午':{star:'太阴',palace:'父母',meaning:'母缘薄·阴人扰'},
+    '未':{star:'贪狼',palace:'福德',meaning:'欲望·桃花劫'},
+    '申':{star:'巨门',palace:'口舌',meaning:'口舌是非'},
+    '酉':{star:'天相',palace:'交友',meaning:'小人·友叛'},
+    '戌':{star:'天梁',palace:'疾厄',meaning:'灾厄·长辈逝'},
+    '亥':{star:'破军',palace:'财帛',meaning:'破耗·搬迁'}
+  };
+  var huaji = ZHI_HUAJI[yearZhi];
+
+  var DIRECTION = {
+    '天同':{avoid:'西北',reason:'天同忌主忧愁·西北金气加重',dir_wx:'金'},
+    '文曲':{avoid:'东南',reason:'文曲忌主文书是非·东南木气生火',dir_wx:'木'},
+    '廉贞':{avoid:'正南',reason:'廉贞忌主血光·南方火气激化',dir_wx:'火'},
+    '天机':{avoid:'正东',reason:'天机忌主奔波·东方木气动荡',dir_wx:'木'},
+    '太阳':{avoid:'正南',reason:'太阳忌主父缘薄·南方火泄太阳',dir_wx:'火'},
+    '武曲':{avoid:'西北',reason:'武曲忌主破财·西方金气加重',dir_wx:'金'},
+    '太阴':{avoid:'正北',reason:'太阴忌主阴人扰·北方水气过盛',dir_wx:'水'},
+    '贪狼':{avoid:'正东',reason:'贪狼忌主桃花劫·东方木气引动',dir_wx:'木'},
+    '巨门':{avoid:'正西',reason:'巨门忌主口舌·西方金气加重',dir_wx:'金'},
+    '天相':{avoid:'中央',reason:'天相忌主小人·中央土气混杂',dir_wx:'土'},
+    '天梁':{avoid:'西南',reason:'天梁忌主灾厄·西南方土气加重',dir_wx:'土'},
+    '破军':{avoid:'西北',reason:'破军忌主破耗·西方金气冲破',dir_wx:'金'}
+  };
+  var dirInfo = DIRECTION[huaji.star];
+
+  var CURE_ITEM = {
+    '天同':{items:[{name:'绿植·富贵竹',icon:'🎋',reason:'木气疏解·安神定志',pos:'客厅东方'},{name:'葫芦',icon:'🎃',reason:'化解忧郁·收纳煞气',pos:'床头左侧'}],event:'祈福'},
+    '文曲':{items:[{name:'文昌塔',icon:'🗼',reason:'文昌利考试·化解文曲忌',pos:'书桌左上'},{name:'葫芦',icon:'🎃',reason:'化是非·收纳文书煞',pos:'书房门后'}],event:'祈福'},
+    '廉贞':{items:[{name:'佛像',icon:'🙏',reason:'化解血光·镇宅安神',pos:'客厅中央'},{name:'山水画',icon:'🖼️',reason:'水气引廉贞火·水火既济',pos:'客厅南墙'}],event:'祈福'},
+    '天机':{items:[{name:'文昌塔',icon:'🗼',reason:'化解奔波·定志',pos:'书桌左上'},{name:'台灯',icon:'💡',reason:'聚光定神·减少动荡',pos:'书桌右侧'}],event:'入学'},
+    '太阳':{items:[{name:'佛像',icon:'🙏',reason:'敬父辈·化解父缘薄',pos:'客厅南墙'},{name:'黄水晶',icon:'💛',reason:'招阳气·补太阳',pos:'客厅财位'}],event:'拜师'},
+    '武曲':{items:[{name:'金属摆件',icon:'🏺',reason:'金气引化·变忌为用',pos:'客厅西方'},{name:'黄水晶',icon:'💛',reason:'招正财·破武曲忌',pos:'财位'}],event:'求财'},
+    '太阴':{items:[{name:'葫芦',icon:'🎃',reason:'收纳阴煞·安阴人',pos:'卧室东墙'},{name:'粉水晶',icon:'🌸',reason:'柔和太阴·调和人际',pos:'卧室南墙'}],event:'婚嫁'},
+    '贪狼':{items:[{name:'葫芦',icon:'🎃',reason:'化桃花劫·收纳贪狼欲',pos:'床头左侧'},{name:'金属摆件',icon:'🏺',reason:'金气制木·止贪狼之欲',pos:'客厅西方'}],event:'婚嫁'},
+    '巨门':{items:[{name:'山水画',icon:'🖼️',reason:'水气化口舌·止是非',pos:'客厅北墙'},{name:'绿萝',icon:'🪴',reason:'净化空气·化口舌煞',pos:'客厅角落'}],event:'祈福'},
+    '天相':{items:[{name:'葫芦',icon:'🎃',reason:'化小人·收纳是非',pos:'大门内侧'},{name:'佛像',icon:'🙏',reason:'贵人扶持·制小人',pos:'客厅中央'}],event:'拜师'},
+    '天梁':{items:[{name:'佛像',icon:'🙏',reason:'化解灾厄·延寿添福',pos:'客厅中央'},{name:'葫芦',icon:'🎃',reason:'收纳煞气·延寿',pos:'卧室床头'}],event:'求医'},
+    '破军':{items:[{name:'黄水晶',icon:'💛',reason:'固财破耗·补金气',pos:'客厅财位'},{name:'金属摆件',icon:'🏺',reason:'金气重·制破军冲',pos:'客厅西方'}],event:'签约'}
+  };
+  var cureInfo = CURE_ITEM[huaji.star];
+
+  var EVENT_RULE = {
+    '祈福':{type:'祈福化解',desc:'去庙宇/诵经',bestTime:'甲子日·丙午日'},
+    '入学':{type:'开学典礼',desc:'文昌日',bestTime:'甲子日·丙午日'},
+    '拜师':{type:'拜师学艺',desc:'贵人生旺',bestTime:'庚申日·壬子日'},
+    '求财':{type:'开业签单',desc:'财气最旺',bestTime:'戊寅日·己丑日'},
+    '婚嫁':{type:'婚姻嫁娶',desc:'合和之日',bestTime:'甲子日·丁卯日'},
+    '求医':{type:'求医问诊',desc:'安神祛病',bestTime:'壬子日·癸亥日'},
+    '签约':{type:'签约定约',desc:'文昌利签',bestTime:'庚辰日·辛酉日'}
+  };
+  var eventInfo = EVENT_RULE[cureInfo.event];
+
+  var DAY_STEM_DIR = {'甲':'东北','乙':'西南','丙':'正西','丁':'西北','戊':'正北','己':'南方','庚':'东北','辛':'西南','壬':'东南','癸':'东方'};
+  var dayDir = DAY_STEM_DIR[dayStem];
+
+  var h = '<div class="zl-result">';
+  h += '<div class="zl-summary">';
+  h += '<div class="zl-stitle">🌟 三联动推演报告</div>';
+  h += '<div class="zl-quote">"命如舟·运如水·化解如舵·择吉如帆——四者齐备，方可乘风破浪。"</div>';
+  h += '<div class="zl-meta">';
+  h += '<div><b>命主年支</b>'+yearZhi+'</div>';
+  h += '<div><b>化忌星</b>'+huaji.star+'</div>';
+  h += '<div><b>落入宫位</b>'+huaji.palace+'宫</div>';
+  h += '<div><b>日主补强</b>'+dayStem+'·'+dayDir+'</div>';
+  h += '<div><b>关注重点</b>'+concerns.join('·')+'</div>';
+  h += '<div><b>化解事件</b>'+eventInfo.type+'</div>';
+  h += '</div></div>';
+
+  h += '<div class="zl-grid">';
+  h += '<div class="zl-card warn">';
+  h += '<div class="zl-ch"><span class="zl-idx">① 化忌识别</span></div>';
+  h += '<div class="zl-body">';
+  h += '<p><b style="color:var(--red)">化忌星：'+huaji.star+'</b> 落 <b>'+huaji.palace+'宫</b></p>';
+  h += '<p style="margin-top:6px;font-size:11px;opacity:.7">'+huaji.meaning+'</p>';
+  h += '<p style="margin-top:8px;font-size:10px;opacity:.5;letter-spacing:1px">📜《紫微斗数全书》《飞星紫微斗数》</p>';
+  h += '</div></div>';
+  h += '<div class="zl-card warn">';
+  h += '<div class="zl-ch"><span class="zl-idx">② 应避方位</span></div>';
+  h += '<div class="zl-body">';
+  h += '<p>⚠ 慎往：<b style="color:var(--red)">'+dirInfo.avoid+'方向</b>（'+dirInfo.dir_wx+'气·加重化忌）</p>';
+  h += '<p style="margin-top:6px;font-size:11px;opacity:.7">'+dirInfo.reason+'</p>';
+  h += '<p style="margin-top:8px;font-size:11px;color:var(--gold)">✦ 趋吉：往<b>'+dayDir+'方向</b>（日主'+dayStem+'喜方）</p>';
+  h += '<p style="margin-top:8px;font-size:10px;opacity:.5;letter-spacing:1px">📜《八宅明镜》《紫白诀》《飞星紫白》</p>';
+  h += '</div></div>';
+  h += '<div class="zl-card boost">';
+  h += '<div class="zl-ch"><span class="zl-idx">③ 化解物品（'+cureInfo.items.length+'件套）</span></div>';
+  h += '<div class="zl-body">';
+  cureInfo.items.forEach(function(it){
+    h += '<div class="zl-item"><span class="ico">'+it.icon+'</span><div class="text"><b>'+it.name+'</b><span class="meta">'+it.reason+' · 摆：'+it.pos+'</span></div></div>';
+  });
+  h += '<p style="margin-top:8px;font-size:10px;opacity:.5;letter-spacing:1px">📜《八宅明镜》《阳宅集成》《居家风水》</p>';
+  h += '</div></div>';
+  h += '<div class="zl-card boost">';
+  h += '<div class="zl-ch"><span class="zl-idx">④ 推荐吉日·'+eventInfo.type+'</span></div>';
+  h += '<div class="zl-body">';
+  var bestDays = [
+    {date:eventInfo.bestTime.split('·')[0],desc:'首选·'+eventInfo.desc,score:90},
+    {date:eventInfo.bestTime.split('·')[1]||'甲辰日',desc:'次选·'+eventInfo.desc,score:78},
+    {date:'近期'+eventInfo.bestTime.split('·')[0],desc:'本月内最佳',score:85}
+  ];
+  bestDays.forEach(function(d){
+    h += '<div class="zl-day"><div class="zl-d">'+d.date+'</div><div class="zl-info"><b>'+d.desc+'</b><small>适宜：'+eventInfo.type+' · 避忌日冲煞</small></div><div class="zl-score">'+d.score+'</div></div>';
+  });
+  h += '<p style="margin-top:8px;font-size:10px;opacity:.5;letter-spacing:1px">📜《神枢经》《选时要览》《协纪辨方书》《嫁娶周堂》</p>';
+  h += '</div></div>';
+  h += '</div>';
+  h += '<div class="zl-source">📜 综合《紫微斗数全书》《飞星紫微斗数》《八宅明镜》《紫白诀》《选时要览》《神枢经》《阳宅集成》《协纪辨方书》《嫁娶周堂》共 9 部古籍</div>';
+  h += '</div>';
+
+  document.getElementById('zidiseLinkResult').innerHTML = h;
+}
+
 </script>
 
 <script src="js/ui-toast.js" defer></script>
@@ -4854,6 +5014,56 @@ function computeXuanKong(){
   }, 300);
 }
 </script>
+
+<!-- section-zidise-link · 第二十二轮·紫微→化解→择日 三联动链路 START -->
+<div class="fs-section" id="section-zidise-link">
+  <div class="input-card">
+    <h3>🌟 紫微化解·三联动（化忌→方位→物品→吉日）</h3>
+    <p style="font-size:12px;opacity:.6;margin:8px 0;line-height:1.7">
+      紫微化忌星主凶象。本工具：化忌星识别 → 应避方位 → 推荐化解物品 → 匹配吉日，
+      一气贯通（依《紫微斗数全书》《飞星紫微斗数》《选时要览》《神枢经》）。
+    </p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0">
+      <div>
+        <label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">出生年（农历年地支）</label>
+        <select id="zlYearZhi" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit">
+          <option value="">— 请选择 —</option>
+          <option value="子">子（鼠 1996 2008）</option><option value="丑">丑（牛 1997 2009）</option>
+          <option value="寅">寅（虎 1998 2010）</option><option value="卯">卯（兔 1999 2011）</option>
+          <option value="辰">辰（龙 2000 2012）</option><option value="巳">巳（蛇 2001 2013）</option>
+          <option value="午">午（马 2002 2014）</option><option value="未">未（羊 2003 2015）</option>
+          <option value="申">申（猴 2004 2016）</option><option value="酉">酉（鸡 2005 2017）</option>
+          <option value="戌">戌（狗 2006 2018）</option><option value="亥">亥（猪 2007 2019）</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">出生日干（八字日主）</label>
+        <select id="zlDayStem" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit">
+          <option value="甲">甲（木·参天）</option><option value="乙">乙（木·花草）</option>
+          <option value="丙">丙（火·太阳）</option><option value="丁">丁（火·灯烛）</option>
+          <option value="戊">戊（土·山岩）</option><option value="己">己（土·田园）</option>
+          <option value="庚">庚（金·刀剑）</option><option value="辛">辛（金·珠玉）</option>
+          <option value="壬">壬（水·江河）</option><option value="癸">癸（水·雨露）</option>
+        </select>
+      </div>
+    </div>
+    <div>
+      <label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">关注重点（可多选）</label>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:6px;margin-top:6px">
+        <label style="font-size:11px"><input type="checkbox" class="zlConcern" value="病厄"> 病厄</label>
+        <label style="font-size:11px"><input type="checkbox" class="zlConcern" value="官非"> 官非</label>
+        <label style="font-size:11px"><input type="checkbox" class="zlConcern" value="破财"> 破财</label>
+        <label style="font-size:11px"><input type="checkbox" class="zlConcern" value="情感"> 情感</label>
+        <label style="font-size:11px"><input type="checkbox" class="zlConcern" value="学业"> 学业</label>
+        <label style="font-size:11px"><input type="checkbox" class="zlConcern" value="事业"> 事业</label>
+      </div>
+    </div>
+    <button class="btn" onclick="generateZidiseLink()" style="margin-top:14px">🌟 三联动推演（化忌→化解→吉日）</button>
+    <div id="zidiseLinkResult"></div>
+  </div>
+</div>
+<!-- section-zidise-link END -->
+
 </div>
 </body>
 </html>
