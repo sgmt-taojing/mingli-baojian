@@ -2939,40 +2939,122 @@ window._MODULE_REPORTS = {
         kbSources: ['NIHAISHA_KB', 'SHUHAN_KB', 'FAITH_KB']
       };
     }
+  },
+  mobile: {
+    name: '手机号码',
+    diagnose: function(data){
+      const num = (data && data.s0) || '13800138000';
+      const last4 = num.slice(-4);
+      const seed = (parseInt(last4) || 0) % 5;
+      const ele = ['金','木','水','火','土'][seed];
+      const SD = {'金':88,'木':76,'水':82,'火':80,'土':85};
+      const five = {'金':'吉','木':'平','水':'大吉','火':'中','土':'吉'};
+      const six = {yunshi: SD[ele], jiankang: SD[ele]+1, hunyin: SD[ele]+2, haizi: SD[ele]-1, tongshi: SD[ele]+3, fumu: SD[ele]+4};
+      return {
+        title: '手机号码吉凶分析（断网KB兜底）',
+        number: num, last4: last4, element: ele,
+        ttsText: '尾数' + last4 + '，五行属' + ele + '，整体评' + five[ele] + '。',
+        sixDims: six,
+        summary: '尾号' + last4 + ' 五行属' + ele + '，吉凶评级：' + five[ele] + '（总分' + SD[ele] + '）',
+        nextSteps: ['尾数+' + last4 + '寓意归纳为' + ele + '行能量','结合八字用神评判','避免在日主受克日使用','重要场合可调换主用号','搭配颜色色手机壳','号码仅作参考，沟通诚意更重要']
+      };
+    }
+  },
+  shiye: {
+    name: '事业工作',
+    diagnose: function(data){
+      const seed = (((data && data.s0) || '').length + ((data && data.s1) || '').length);
+      const ele = ['金','木','水','火','土'][seed % 5];
+      const SD = {'金':85,'木':78,'水':82,'火':88,'土':83};
+      const six = {yunshi: SD[ele]+3, jiankang: SD[ele]-2, hunyin: SD[ele], haizi: SD[ele]-1, tongshi: SD[ele]+5, fumu: SD[ele]+2};
+      return {
+        title: '事业工作分析（断网KB兜底）',
+        element: ele,
+        ttsText: ele + '命者事业' + SD[ele] + '分。',
+        sixDims: six,
+        summary: ele + '命事业总分' + SD[ele] + '分。',
+        nextSteps: ['上半年守成蓄力','下半年主动出击','深耕主业避免频繁跳槽','35岁前确定行业方向','积累行业人脉（5-8位同行）','每3年一次自我评估']
+      };
+    }
+  },
+  xingming: {
+    name: '姓名学',
+    diagnose: function(data){
+      const name = (data && data.s0) || '张三';
+      const seed = [...name].reduce(function(s,c){return s + c.charCodeAt(0);}, 0);
+      const ele = ['金','木','水','火','土'][seed % 5];
+      const SD = {'金':86,'木':80,'水':83,'火':85,'土':88};
+      const tianGe = 1 + seed % 81;
+      return {
+        title: '姓名学分析（断网KB兜底）',
+        name: name, element: ele, tianGe: tianGe,
+        ttsText: name + '，' + ele + '属性，天格' + tianGe + '数。',
+        sixDims: {yunshi: SD[ele], jiankang: SD[ele]+2, hunyin: SD[ele]+1, haizi: SD[ele]-1, tongshi: SD[ele]+3, fumu: SD[ele]+4},
+        summary: name + '五行属' + ele + '，天格' + tianGe + '数。',
+        nextSteps: ['三才配置综合考虑','音形义综合评判','避免生僻字','与生辰八字互补','考虑家族辈分用字','改名需谨慎']
+      };
+    }
+  },
+  zeri: {
+    name: '择日',
+    diagnose: function(data){
+      const event = (data && data.s0) || '婚嫁';
+      const date = (data && data.s1) || '2026-08-15';
+      const dayDate = new Date(date);
+      const dayZhi = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][dayDate.getDate() % 12];
+      const seed = dayDate.getDate() % 5;
+      const ele = ['金','木','水','火','土'][seed];
+      const luck = ['上上','上','中','下','中上'][seed];
+      return {
+        title: '择日分析（断网KB兜底）',
+        event: event, date: date, dayZhi: dayZhi, luck: luck,
+        ttsText: date + '日支' + dayZhi + '，五行属' + ele + '，用于' + event + '：' + luck + '。',
+        summary: date + '（' + dayZhi + '日）用于' + event + '，评级' + luck,
+        nextSteps: ['结合事主八字选日','避开冲煞','择吉时配合','重要仪式提前30天择定','黄历宜忌参考','多备1-2个候选日']
+      };
+    }
+  },
+  huangli: {
+    name: '老黄历',
+    diagnose: function(data){
+      const date = (data && data.s0) || '2026-08-15';
+      const d = new Date(date);
+      const yi = ['祭祀','出行','入宅','嫁娶','开业','求财','签约','动土','修造','安葬'];
+      const ji = ['动土','嫁娶','开市','安葬','出行','入宅','动土','修造','祭祀','祈福'];
+      const seed = d.getDate() % 10;
+      return {
+        title: '老黄历查询（断网KB兜底）',
+        date: date,
+        yi: [yi[seed], yi[(seed+3)%10], yi[(seed+7)%10]],
+        ji: [ji[(seed+1)%10], ji[(seed+5)%10]],
+        ttsText: date + '，宜' + yi[seed] + '，忌' + ji[(seed+1)%10] + '。',
+        summary: date + '宜：' + yi[seed] + '；忌：' + ji[(seed+1)%10],
+        nextSteps: ['结合事主八字','避开冲煞日','择吉时配合','黄历仅作参考','重要决策看大局']
+      };
+    }
+  },
+  taisui: {
+    name: '太岁',
+    diagnose: function(data){
+      const year = parseInt(data && data.s0) || 1985;
+      const z = ['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'][(year - 4) % 12];
+      const tianGan = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'][(year - 4) % 10];
+      const diZhi = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][(year - 4) % 12];
+      const clashes = {'子':'午','丑':'未','寅':'申','卯':'酉','辰':'戌','巳':'亥','午':'子','未':'丑','申':'寅','酉':'卯','戌':'辰','亥':'巳'};
+      const dz2026 = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][2026 % 12];
+      const fanTaiSui = clashes[diZhi] === dz2026;
+      return {
+        title: '太岁查询（断网KB兜底）',
+        year: year, zodiac: z, tianGan: tianGan, diZhi: diZhi,
+        ttsText: year + '年生肖' + z + '，2026年' + (fanTaiSui ? '冲太岁' : '与太岁无冲') + '。',
+        summary: year + '年生肖' + z + '（' + tianGan + diZhi + '），2026：' + (fanTaiSui ? '⚠️ 冲太岁' : '✅ 平安'),
+        nextSteps: ['2026年' + (fanTaiSui ? '宜化解太岁' : '顺其自然'),'年初祈福太岁','保持低调谨慎','避免高风险投资','重要决策择吉日','心态平和为上']
+      };
+    }
   }
 };
-console.log('✅ _MODULE_REPORTS loaded (8 modules KB-fallback: bazi/yunshi/caiyun/ganqing/zhongyi/music/lifeindex/lifeplan)');
+console.log('✅ _MODULE_REPORTS loaded (14 modules KB-fallback: bazi/yunshi/caiyun/ganqing/zhongyi/mobile/shiye/xingming/zeri/huangli/taisui/music/lifeindex/lifeplan)');
 </script>
-<script src="knowledge-models/classics-model.js"></script>
-<script src="knowledge-models/faith-model.js"></script>
-<script src="knowledge-models/fengshui-model.js"></script>
-<script src="knowledge-models/huajie-model.js"></script>
-<script src="knowledge-models/liuren-model.js"></script>
-<script src="knowledge-models/liuyao-model.js"></script>
-<script src="knowledge-models/mantra-model.js"></script>
-<script src="knowledge-models/meihua-model.js"></script>
-<script src="knowledge-models/nihaisha-model.js"></script>
-<script src="knowledge-models/qimen-model.js"></script>
-<script src="knowledge-models/shuhan-model.js"></script>
-<script src="knowledge-models/yanzhi-model.js"></script>
-<script src="knowledge-models/yijing-model.js"></script>
-<script src="knowledge-models/ziwei-model.js"></script>
-<script src="knowledge-models/zodiac-model.js"></script>
-<script src="knowledge-models/classics-model.js"></script>
-<script src="knowledge-models/faith-model.js"></script>
-<script src="knowledge-models/fengshui-model.js"></script>
-<script src="knowledge-models/huajie-model.js"></script>
-<script src="knowledge-models/liuren-model.js"></script>
-<script src="knowledge-models/liuyao-model.js"></script>
-<script src="knowledge-models/mantra-model.js"></script>
-<script src="knowledge-models/meihua-model.js"></script>
-<script src="knowledge-models/nihaisha-model.js"></script>
-<script src="knowledge-models/qimen-model.js"></script>
-<script src="knowledge-models/shuhan-model.js"></script>
-<script src="knowledge-models/yanzhi-model.js"></script>
-<script src="knowledge-models/yijing-model.js"></script>
-<script src="knowledge-models/ziwei-model.js"></script>
-<script src="knowledge-models/zodiac-model.js"></script>
 <script src="knowledge-models/classics-model.js"></script>
 <script src="knowledge-models/faith-model.js"></script>
 <script src="knowledge-models/fengshui-model.js"></script>
