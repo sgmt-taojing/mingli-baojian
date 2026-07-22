@@ -60,6 +60,81 @@ textarea{min-height:60px;resize:vertical}
 .tools{display:flex;gap:8px;margin:18px 0}
 .tools button{flex:1;padding:10px;font:inherit;font-size:13px;background:rgba(255,255,255,.05);color:var(--paper);border:1px solid var(--line);border-radius:6px;cursor:pointer}
 .tools button:hover{background:rgba(201,168,76,.1);border-color:var(--gold)}
+
+/* ===== 第二十一轮·大运流年起伏图 ===== */
+.dyun-track{position:relative;margin:14px 0;padding:14px 6px 28px;background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:8px;overflow-x:auto;white-space:nowrap}
+.dyun-track::-webkit-scrollbar{height:5px}
+.dyun-track::-webkit-scrollbar-thumb{background:var(--gold);border-radius:3px}
+.dyun-row{display:inline-flex;gap:6px;align-items:flex-end;height:130px;padding:0 4px}
+.dyun-bar{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;cursor:pointer;min-width:34px;transition:all .2s}
+.dyun-bar:hover{transform:scale(1.08)}
+.dyun-bar .b{width:26px;border-radius:4px 4px 0 0;transition:all .2s}
+.dyun-bar.up .b{background:linear-gradient(180deg,var(--gold),var(--bronze))}
+.dyun-bar.down .b{background:linear-gradient(180deg,#c0392b,#7b241c)}
+.dyun-bar.flat .b{background:linear-gradient(180deg,#7f8c8d,#566573)}
+.dyun-bar.now .b{box-shadow:0 0 12px var(--gold);border:1px solid var(--paper)}
+.dyun-bar .a{font-size:10px;color:var(--gold);margin-top:4px;letter-spacing:1px}
+.dyun-bar .n{font-size:9px;opacity:.6;margin-top:2px}
+.dyun-legend{display:flex;gap:14px;font-size:10px;opacity:.65;margin-top:6px;justify-content:center}
+.dyun-legend .lg{display:flex;align-items:center;gap:4px}
+.dyun-legend .lgs{width:10px;height:10px;border-radius:2px}
+.dyun-legend .lg-up .lgs{background:var(--gold)}
+.dyun-legend .lg-down .lgs{background:#c0392b}
+.dyun-legend .lg-flat .lgs{background:#7f8c8d}
+
+/* 当前大运详情 */
+.dyun-now{padding:14px;background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(201,168,76,.04));border-radius:8px;border-left:3px solid var(--gold);margin-top:14px}
+.dyun-now .dn-title{font-size:14px;color:var(--gold);font-weight:600;letter-spacing:2px;margin-bottom:6px}
+.dyun-now .dn-score{font-size:24px;color:var(--gold);font-weight:600;letter-spacing:2px}
+.dyun-now .dn-desc{font-size:12px;line-height:1.7;opacity:.85;margin-top:8px}
+.dyun-now .dn-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.dyun-now .dn-tag{font-size:10px;padding:3px 10px;border-radius:12px;background:rgba(201,168,76,.15);border:1px solid var(--line);letter-spacing:1px}
+.dyun-now .dn-tag.warn{background:rgba(192,57,43,.12);border-color:rgba(192,57,43,.3);color:#e8a8a0}
+
+/* 未来 5 年预警 */
+.future5{padding:10px;background:rgba(255,255,255,.03);border-radius:6px;border-left:2px solid var(--bronze);margin-bottom:6px}
+.future5.warn{border-left-color:#c0392b;background:rgba(192,57,43,.06)}
+.future5.great{border-left-color:var(--gold);background:rgba(201,168,76,.08)}
+.future5 .fy-t{font-size:13px;color:var(--paper);font-weight:600}
+.future5 .fy-d{font-size:11px;opacity:.7;margin-top:3px}
+.future5 .fy-a{font-size:11px;color:var(--gold);margin-top:5px;letter-spacing:1px}
+
+/* ===== 第二十一轮·12 时辰补强引擎 ===== */
+.shichen-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+@media(max-width:480px){.shichen-grid{grid-template-columns:repeat(2,1fr)}}
+.shichen-cell{padding:12px;background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:8px;text-align:center;transition:all .2s;position:relative}
+.shichen-cell:hover{border-color:var(--gold);background:rgba(201,168,76,.06)}
+.shichen-cell.weak{background:rgba(192,57,43,.05);border-color:rgba(192,57,43,.3)}
+.shichen-cell.boost{background:rgba(39,174,96,.06);border-color:rgba(39,174,96,.3)}
+.shichen-cell .sc-time{font-size:12px;color:var(--gold);letter-spacing:2px;font-weight:600}
+.shichen-cell .sc-zhi{font-size:18px;color:var(--paper);margin:4px 0;font-family:'Ma Shan Zheng',serif}
+.shichen-cell .sc-wx{font-size:10px;opacity:.5;letter-spacing:1px}
+.shichen-cell .sc-tag{position:absolute;top:6px;right:6px;font-size:9px;padding:1px 6px;border-radius:8px}
+.shichen-cell.weak .sc-tag{background:#c0392b;color:#fff}
+.shichen-cell.boost .sc-tag{background:#27ae60;color:#fff}
+.shichen-cell .sc-method{font-size:10px;margin-top:8px;padding:6px;background:rgba(0,0,0,.2);border-radius:4px;line-height:1.5;color:var(--gold2);text-align:left}
+
+/* 时辰补强汇总表 */
+.shichen-summary{padding:14px;background:rgba(255,255,255,.02);border-radius:8px;margin-top:12px}
+.shichen-summary .ss-title{font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px;font-weight:600}
+.shichen-summary .ss-item{display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px dashed var(--line);font-size:12px}
+.shichen-summary .ss-item:last-child{border-bottom:none}
+.shichen-summary .ss-time{color:var(--gold);font-weight:600;min-width:80px}
+.shichen-summary .ss-ability{color:var(--paper);flex:1;padding:0 10px}
+.shichen-summary .ss-method{color:var(--gold2);font-size:11px;flex:1.5;text-align:right}
+
+/* ===== 第二十一轮·趋吉避凶总评 ===== */
+.trend-summary{padding:16px;background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.02));border-radius:8px;border:1px solid var(--line);margin-top:12px}
+.trend-summary .ts-title{font-size:14px;color:var(--gold);letter-spacing:3px;margin-bottom:10px;font-weight:600}
+.trend-summary .ts-quote{font-size:12px;line-height:1.8;opacity:.8;font-style:italic;padding:10px;background:rgba(0,0,0,.15);border-left:2px solid var(--gold);border-radius:4px;margin-bottom:10px}
+.trend-summary .ts-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media(max-width:480px){.trend-summary .ts-grid{grid-template-columns:1fr}}
+.trend-summary .ts-item{padding:8px 10px;background:rgba(255,255,255,.03);border-radius:6px;font-size:11px;line-height:1.6}
+.trend-summary .ts-item b{color:var(--gold);display:block;margin-bottom:3px;font-size:11px;letter-spacing:1px}
+
+/* 来源标记 */
+.kb-source{font-size:10px;opacity:.45;margin-top:8px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+
 @media print{body{background:#fff;color:#000;padding:10px}.card,.banner,.tl-row,.fy-row,.dom{background:#fafafa !important;color:#000 !important;border:1px solid #ccc !important}.btn,.tools,#input{display:none !important}.banner .age,.card h2,.dom .num{color:#000 !important}h1{color:#000}}
 </style>
 </head>
@@ -212,6 +287,202 @@ function render(d){
 
   // 总评
   h+='<div class="card"><h2>📜 总评</h2><div class="summary">'+summary+'</div></div>';
+
+
+  // ===== 第二十一轮·R3·大运流年 + 时辰补强 + 趋吉避凶 =====
+  const userBaziForLife = (()=>{try{return JSON.parse(localStorage.getItem('qianyuan_user_bazi'));}catch(e){return null;}})();
+  const dayEle = userBaziForLife?.dayEle || '土';
+  const dayStem = userBaziForLife?.dayStem || '戊';
+  const shengMap={'木':'火','火':'土','土':'金','金':'水','水':'木'};
+  const keMap={'木':'土','土':'水','水':'火','火':'金','金':'木'};
+  const ELE_LOC={'木':'东','火':'南','土':'中央','金':'西','水':'北'};
+
+  // ===== 大运流年起伏引擎（依《三命通会》《滴天髓》《子平真诠》） =====
+  function calcDayunFluctuation(currentAge){
+    // 起运年龄简算：男阳/女阴=出生日到节令天数÷3，女阳/男阴相反
+    const sex = d.sex;
+    const startYunAge = 3; // 简化为 3 岁起运
+    const dayuns = [];
+    let curStem = dayStem;
+    const STEMS=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+    const ELE_BY_STEM={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
+    for(let i=0;i<10;i++){
+      const ageStart = startYunAge + i*10;
+      if(ageStart > currentAge + 50) break;
+      const ageEnd = ageStart + 9;
+      // 简化：每 10 年天干顺延一位
+      curStem = STEMS[(STEMS.indexOf(curStem)+1)%10];
+      const dayunStem = curStem;
+      const dayunEle = ELE_BY_STEM[dayunStem];
+      // 大运评分：与命主日干的关系
+      let score = 60;
+      const rel = [];
+      if(dayunEle === dayEle){score += 10; rel.push('比肩·稳健');}
+      else if(shengMap[dayEle]===dayunEle){score += 18; rel.push('食伤·生旺·宜进');}
+      else if(shengMap[dayunEle]===dayEle){score += 22; rel.push('印绶·贵人·宜学');}
+      else if(keMap[dayEle]===dayunEle){score -= 15; rel.push('财星·破耗·慎财');}
+      else if(keMap[dayunEle]===dayEle){score -= 22; rel.push('官杀·压力·宜稳');}
+      // 大运阶段额外加权
+      if(ageStart>=18 && ageStart<=40 && score>=70) score += 5;
+      if(ageStart>=50 && score<55) score -= 5;
+      score = Math.max(15, Math.min(95, score));
+      dayuns.push({ageStart,ageEnd,stem:dayunStem,ele:dayunEle,score,rel,isNow:currentAge>=ageStart&&currentAge<=ageEnd});
+    }
+    return dayuns;
+  }
+
+  // ===== 12 时辰补强引擎（依《十二时辰养生》《黄帝内经》《易经·十二辟卦》） =====
+  function calcShichenBoost(currentEle){
+    const shengMap={'木':'火','火':'土','土':'金','金':'水','水':'木'};
+    const keMap={'木':'土','土':'水','水':'火','火':'金','金':'木'};
+    const ZHI_WX={'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+    const ZHI_TIME={'子':'23-01','丑':'01-03','寅':'03-05','卯':'05-07','辰':'07-09','巳':'09-11','午':'11-13','未':'13-15','申':'15-17','酉':'17-19','戌':'19-21','亥':'21-23'};
+    const ZHI_METHOD={
+      '子':{ability:'思考·决断',method:'宜静思·定计划·忌争吵·喝温水'},
+      '丑':{ability:'脾胃·深睡',method:'深度睡眠·修复脾胃·避免熬夜'},
+      '寅':{ability:'肺活·起步',method:'起床深呼吸·叩齿吞津·晨练太极'},
+      '卯':{ability:'肝血·专注',method:'高强度工作·阅读·避免饮酒'},
+      '辰':{ability:'脾胃·早餐',method:'温热早餐·慢咀嚼·忌冷饮'},
+      '巳':{ability:'心脑·高效',method:'重要会议·决策·效率巅峰·午休小憩'},
+      '午':{ability:'心火·社交',method:'人际交往·签约·午饭七分饱·午睡'},
+      '未':{ability:'脾胃·分养',method:'茶饮·阅读·忌油腻·散步助消化'},
+      '申':{ability:'肺气·表达',method:'演讲·谈判·运动·呼吸训练'},
+      '酉':{ability:'肺肾·收藏',method:'晚饭清淡·散步·冥想·收纳整理'},
+      '戌':{ability:'心包·愉悦',method:'家庭聚会·阅读·忌剧烈运动'},
+      '亥':{ability:'三焦·休眠',method:'准备入睡·泡脚·听轻音乐·忌看手机'}
+    };
+    const cells=[];
+    Object.entries(ZHI_WX).forEach(([zhi,wx])=>{
+      const time = ZHI_TIME[zhi];
+      let status='flat',tag='',rel='';
+      if(wx === currentEle){status='boost';tag='同气';rel='同我·平顺';}
+      else if(shengMap[currentEle]===wx){status='boost';tag='我生';rel='食伤·释放能量';}
+      else if(shengMap[wx]===currentEle){status='boost';tag='生我';rel='印绶·贵人·补强';}
+      else if(keMap[currentEle]===wx){status='weak';tag='我克';rel='财星·耗我·慎决';}
+      else if(keMap[wx]===currentEle){status='weak';tag='克我';rel='官杀·压力·守势';}
+      cells.push({time,zhi,wx,status,tag,rel,ability:ZHI_METHOD[zhi].ability,method:ZHI_METHOD[zhi].method});
+    });
+    return cells;
+  }
+
+  // ===== 趋吉避凶引擎（依《穷通宝鉴》《三命通会》《月谈赋》） =====
+  function calcTrendAdvice(dayuns, shichen){
+    const now = dayuns.find(x=>x.isNow);
+    if(!now) return '';
+    const ups = dayuns.filter(x=>x.score>=70);
+    const downs = dayuns.filter(x=>x.score<55);
+    const avgScore = Math.round(dayuns.reduce((s,x)=>s+x.score,0)/dayuns.length);
+    const curScore = now.score;
+    let trend = '';
+    let phase = '';
+    if(curScore>=75) {trend='大运当头，宜大展宏图'; phase='吉期·进取';}
+    else if(curScore>=65) {trend='运势稳健，宜守成扩展'; phase='平顺·守成';}
+    else if(curScore>=55) {trend='运程偏弱，宜守不妄动'; phase='潜伏·蛰伏';}
+    else {trend='运程低伏，宜静修化煞'; phase='低谷·化解';}
+    // 建议方向
+    const goodDir = ELE_LOC[shengMap[dayEle]] || '东方';
+    const badDir = ELE_LOC[keMap[dayEle]] || '西方';
+    // 化煞物品（从 R20 联动）
+    const itemMap={'木':'🗼 文昌塔 / 🌿 绿植','火':'🖼️ 山水画 / 🐯 老虎画','土':'🎃 葫芦 / 🙏 佛像','金':'🪞 镜子 / 🏺 金属摆件','水':'🐟 鱼缸 / 🧊 冰箱'};
+    return {
+      trend, phase, avgScore, curScore, goodDir, badDir,
+      upsCount:ups.length, downsCount:downs.length,
+      recItem:itemMap[dayEle],
+      recommendAge:dayuns.reduce((best,x)=>x.score>best.score?x:best,dayuns[0])
+    };
+  }
+
+  // ===== 渲染大运 + 时辰 + 趋吉避凶 =====
+  const dayuns = calcDayunFluctuation(d.age);
+  const shichen = calcShichenBoost(dayEle);
+  const trend = calcTrendAdvice(dayuns, shichen);
+
+  // 大运起伏图
+  h+='<div class="card"><h2>📈 大运流年起伏图（10 段·每段 10 年）</h2>';
+  h+='<div class="dyun-track"><div class="dyun-row">';
+  dayuns.forEach(u=>{
+    const cls = u.isNow?'dyun-bar now':(u.score>=70?'dyun-bar up':(u.score<55?'dyun-bar down':'dyun-bar flat'));
+    const height = Math.max(20, u.score*1.2);
+    h+='<div class="'+cls+'"><div class="b" style="height:'+height+'px"></div><div class="a">'+u.ageStart+'</div><div class="n">'+u.stem+'</div></div>';
+  });
+  h+='</div></div>';
+  h+='<div class="dyun-legend"><div class="lg lg-up"><div class="lgs"></div>大吉运 ≥70</div><div class="lg lg-flat"><div class="lgs"></div>平运 55-69</div><div class="lg lg-down"><div class="lgs"></div>低谷 <55</div></div>';
+  // 当前大运详情
+  const now = dayuns.find(x=>x.isNow);
+  if(now){
+    h+='<div class="dyun-now"><div class="dn-title">⚡ 当前大运：'+now.ageStart+'-'+now.ageEnd+' 岁（'+now.stem+'运·'+now.ele+'）</div>';
+    h+='<div class="dn-score">'+now.score+' <span style="font-size:13px;opacity:.6">分</span></div>';
+    h+='<div class="dn-desc">'+now.rel.join(' · ')+'</div>';
+    h+='<div class="dn-tags">';
+    if(now.score>=70) h+='<span class="dn-tag">✦ 大运当头</span><span class="dn-tag">宜大展宏图</span><span class="dn-tag">顺势而上</span>';
+    else if(now.score>=65) h+='<span class="dn-tag">⚖ 稳健期</span><span class="dn-tag">守成扩展</span>';
+    else if(now.score>=55) h+='<span class="dn-tag">🔄 潜伏期</span><span class="dn-tag">守势不妄</span>';
+    else h+='<span class="dn-tag warn">⚠ 低谷期</span><span class="dn-tag warn">静修化煞</span>';
+    h+='</div></div>';
+  }
+  h+='<div class="kb-source">📜 《三命通会》《滴天髓》《子平真诠》</div></div>';
+
+  // 12 时辰补强
+  h+='<div class="card"><h2>⏰ 12 时辰补强引擎（命主 '+dayStem+'日主·'+dayEle+'）</h2>';
+  h+='<p style="font-size:11px;opacity:.6;margin:8px 0">基于命主五行喜忌·各时辰与命主关系·给出"何时做事+何时守势"建议</p>';
+  h+='<div class="shichen-grid">';
+  shichen.forEach(s=>{
+    h+='<div class="shichen-cell '+s.status+'">';
+    h+='<div class="sc-time">'+s.time+'</div>';
+    h+='<div class="sc-zhi">'+s.zhi+'</div>';
+    h+='<div class="sc-wx">'+s.wx+'行·'+s.rel+'</div>';
+    if(s.tag) h+='<div class="sc-tag">'+s.tag+'</div>';
+    h+='<div class="sc-method">'+s.method+'</div>';
+    h+='</div>';
+  });
+  h+='</div>';
+  h+='<div class="shichen-summary">';
+  h+='<div class="ss-title">🎯 关键时辰运用</div>';
+  h+='<div class="ss-item"><span class="ss-time">巳时（9-11）</span><span class="ss-ability">高效决策·开会</span><span class="ss-method">火气旺·思维敏捷</span></div>';
+  h+='<div class="ss-item"><span class="ss-time">午时（11-13）</span><span class="ss-ability">社交·签约</span><span class="ss-method">心火旺·人际活跃</span></div>';
+  h+='<div class="ss-item"><span class="ss-time">申时（15-17）</span><span class="ss-ability">表达·谈判</span><span class="ss-method">金气肃·言辞利</span></div>';
+  h+='<div class="ss-item"><span class="ss-time">酉时（17-19）</span><span class="ss-ability">收纳·整理</span><span class="ss-method">收藏之气·准备归家</span></div>';
+  h+='</div>';
+  h+='<div class="kb-source">📜 《黄帝内经·十二时辰养生》《易经·十二辟卦》</div></div>';
+
+  // 未来 5 年起伏（按当前大运 + 流年计算）
+  const currentYear = new Date().getFullYear();
+  h+='<div class="card"><h2>🔮 未来 5 年起伏预警</h2>';
+  for(let i=0;i<5;i++){
+    const y = currentYear + i;
+    const yearGan = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'][(y-4)%10];
+    const yearZhi = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][(y-4)%12];
+    const yearEle = {'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'}[yearGan];
+    let yScore = 60, yLevel='', yTips='';
+    if(shengMap[dayEle]===yearEle){yScore+=15;yLevel='great';yTips='流年生我·贵人运旺';}
+    else if(shengMap[yearEle]===dayEle){yScore+=10;yLevel='good';yTips='流年与我和谐·宜稳进';}
+    else if(keMap[yearEle]===dayEle){yScore-=12;yLevel='warn';yTips='流年克我·守势化煞';}
+    else if(keMap[dayEle]===yearEle){yScore-=8;yLevel='warn';yTips='流年我克·财耗慎决';}
+    else if(yearEle===dayEle){yLevel='good';yTips='流年比肩·平稳';}
+    yScore = Math.max(15, Math.min(95, yScore));
+    h+='<div class="future5 '+yLevel+'">';
+    h+='<div class="fy-t">'+y+' 年（'+yearGan+yearZhi+' · '+yearEle+'年）</div>';
+    h+='<div class="fy-d">'+yTips+'</div>';
+    h+='<div class="fy-a">运势评分：<b style="color:var(--gold)">'+yScore+'</b>/100</div>';
+    h+='</div>';
+  }
+  h+='<div class="kb-source">📜 《三命通会·流年篇》《神峰通考》《穷通宝鉴》</div></div>';
+
+  // 趋吉避凶总评
+  if(trend){
+    h+='<div class="trend-summary">';
+    h+='<div class="ts-title">🛡️ 趋吉避凶总评（'+trend.phase+'）</div>';
+    h+='<div class="ts-quote">"'+trend.trend+'——大运流年起伏如潮，知进退、明取舍，方为智者。"</div>';
+    h+='<div class="ts-grid">';
+    h+='<div class="ts-item"><b>📈 当前大运</b>'+now.ageStart+'-'+now.ageEnd+'岁·'+now.score+'分·'+now.rel[0]+'</div>';
+    h+='<div class="ts-item"><b>📊 平均运势</b>'+trend.avgScore+'分/100（10 段大运）</div>';
+    h+='<div class="ts-item"><b>📅 最佳十年</b>'+trend.recommendAge.ageStart+'-'+trend.recommendAge.ageEnd+'岁·'+trend.recommendAge.score+'分·'+trend.recommendAge.stem+'运</div>';
+    h+='<div class="ts-item"><b>🎯 吉方</b>'+trend.goodDir+'（生旺命主）</div>';
+    h+='<div class="ts-item"><b>⚠ 慎方</b>'+trend.badDir+'（克泄命主·慎往）</div>';
+    h+='<div class="ts-item"><b>🎁 化煞物</b>'+trend.recItem+'</div>';
+    h+='</div></div>';
+    h+='<div class="kb-source">📜 综合《三命通会》《穷通宝鉴》《月谈赋》《卜筮正宗》</div>';
+  }
 
   // 工具
   h+='<div class="tools"><button onclick="shareUrl()">🔗 分享链接</button><button onclick="window.print()">🖨️ 打印/保存 PDF</button><button onclick="copyTxt()">📋 复制文本</button></div>';
