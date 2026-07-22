@@ -197,6 +197,19 @@ textarea{min-height:60px;resize:vertical}
 .lp-verdict{margin-top:14px;padding:12px;background:rgba(0,0,0,.2);border-radius:8px;border:1px dashed var(--gold);font-size:12px;line-height:1.9}
 .lp-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
 @media(max-width:768px){.lp-dash-dual{grid-template-columns:1fr}.lp-8grid,.lp-stage{grid-template-columns:repeat(2,1fr)}}
+
+<style>
+.lp-12-domain-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:10px 0 14px}
+.lp-12-domain-card{background:linear-gradient(135deg,rgba(212,175,55,.06),rgba(74,138,168,.04));border:1px solid rgba(212,175,55,.2);border-radius:8px;padding:10px 8px;text-align:center;transition:.2s}
+.lp-12-domain-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(212,175,55,.15)}
+.lp-12-domain-name{font-size:12px;font-weight:600;color:var(--paper);margin-bottom:4px}
+.lp-12-domain-score{font-size:22px;font-weight:bold;margin:4px 0}
+.lp-12-domain-tip{font-size:10.5px;opacity:.65;line-height:1.5}
+.lp-stage-block{margin-bottom:24px;padding-bottom:18px;border-bottom:1px dashed rgba(212,175,55,.15)}
+@media(max-width:768px){.lp-12-domain-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.lp-12-domain-grid{grid-template-columns:1fr}}
+</style>
+
 </style>
 /* R41-B lifeplan-detail 4 阶段深度补强 CSS */
 .lp-stage-section { background: linear-gradient(135deg, #1a2332 0%, #0f1820 100%); border: 1px solid rgba(99,179,237,0.3); border-radius: 12px; padding: 20px; margin: 16px 0; }
@@ -795,6 +808,96 @@ function renderLifeplanDashboardR38(){
   h+='</div></div>';
   h+='</div>';
   h+='<div class="lp-verdict"><b style="color:var(--gold)">📅 人生规划总纲：</b><br>① 健康 '+hS+' 分·事业 '+cS+' 分—— 双核均衡者，人生稳步上扬 ② 4 阶段顺序不可颠倒：<b>学龄前筑基 → 中小学塑型 → 大学精进 → 职场婚恋</b> ③ 每阶段健康+事业双线并行，不可偏废 ④ 化解要点：<b style="color:#4a9a6e">健康打底</b>·<b style="color:#4a8aa8">事业领跑</b>·家业传承·终身学习</div>';
+
+/* R41-B 12领域矩阵 */
+var LP_12_DOMAIN_R41 = {
+  "学龄前":{
+    domains:[
+      {n:"先天禀赋",score:85,tip:"遗传+孕期养护"},
+      {n:"亲子陪伴",score:90,tip:"0-3岁关键期"},
+      {n:"体质筑基",score:78,tip:"饮食起居"},
+      {n:"语言开发",score:82,tip:"2-3岁爆发"},
+      {n:"艺术启蒙",score:75,tip:"音乐美术"},
+      {n:"社交萌芽",score:72,tip:"同伴互动"},
+      {n:"性格雏形",score:80,tip:"安全感建立"},
+      {n:"兴趣发现",score:77,tip:"观察引导"},
+      {n:"体质偏弱",score:68,tip:"脾胃养护"},
+      {n:"学前准备",score:70,tip:"幼小衔接"},
+      {n:"家教家风",score:88,tip:"耳濡目染"},
+      {n:"健康档案",score:75,tip:"建立台账"}
+    ]
+  },
+  "中小学":{
+    domains:[
+      {n:"学业基础",score:82,tip:"小学奠基"},
+      {n:"品德塑造",score:88,tip:"三观形成"},
+      {n:"特长培养",score:78,tip:"艺体科技"},
+      {n:"志愿规划",score:72,tip:"升学方向"},
+      {n:"心理疏导",score:75,tip:"青春期"},
+      {n:"社交能力",score:80,tip:"同学关系"},
+      {n:"健康运动",score:83,tip:"近视肥胖"},
+      {n:"家校协作",score:85,tip:"共同教育"},
+      {n:"兴趣深耕",score:77,tip:"一技之长"},
+      {n:"阅读习惯",score:86,tip:"终生受益"},
+      {n:"自理能力",score:79,tip:"生活独立"},
+      {n:"升学目标",score:74,tip:"中考高考"}
+    ]
+  },
+  "大学":{
+    domains:[
+      {n:"专业精进",score:85,tip:"专业排名"},
+      {n:"实习历练",score:78,tip:"职场初探"},
+      {n:"人脉拓展",score:82,tip:"同学师长"},
+      {n:"考证考级",score:75,tip:"职业资格"},
+      {n:"出国交换",score:70,tip:"国际视野"},
+      {n:"科研参与",score:73,tip:"学术入门"},
+      {n:"创业试水",score:68,tip:"校园孵化"},
+      {n:"毕业去向",score:80,tip:"考研就业"},
+      {n:"健康管理",score:76,tip:"作息规律"},
+      {n:"理财起步",score:65,tip:"记账预算"},
+      {n:"婚姻萌芽",score:60,tip:"校园恋情"},
+      {n:"毕业储备",score:77,tip:"求职准备"}
+    ]
+  },
+  "职场婚恋":{
+    domains:[
+      {n:"事业精进",score:82,tip:"升迁加薪"},
+      {n:"择偶成家",score:75,tip:"婚恋时机"},
+      {n:"理财规划",score:78,tip:"资产配置"},
+      {n:"家庭建设",score:85,tip:"夫妻关系"},
+      {n:"子女教育",score:80,tip:"言传身教"},
+      {n:"健康维护",score:72,tip:"中年养生"},
+      {n:"父母赡养",score:83,tip:"孝道责任"},
+      {n:"职场瓶颈",score:68,tip:"二次创业"},
+      {n:"退休规划",score:65,tip:"老有所为"},
+      {n:"社会贡献",score:78,tip:"公益传承"},
+      {n:"家业传承",score:72,tip:"家训家风"},
+      {n:"精神修养",score:77,tip:"心斋坐忘"}
+    ]
+  }
+};
+
+function renderLP_12Domain_R41(){
+  var h = '';
+  Object.keys(LP_12_DOMAIN_R41).forEach(function(stage){
+    var sd = LP_12_DOMAIN_R41[stage];
+    var avg = Math.round(sd.domains.reduce(function(s,x){return s+x.score;},0)/sd.domains.length);
+    h += '<div class="lp-stage-block">';
+    h += '<h3 style="color:var(--gold);font-size:16px;margin:16px 0 10px;border-left:3px solid var(--gold);padding-left:10px">📊 '+stage+'·12领域矩阵（均分 '+avg+'）</h3>';
+    h += '<div class="lp-12-domain-grid">';
+    sd.domains.forEach(function(d){
+      var color = d.score>=80?'#4a9a6e':(d.score>=70?'#d4af37':'#d45050');
+      h += '<div class="lp-12-domain-card">';
+      h += '<div class="lp-12-domain-name">'+d.n+'</div>';
+      h += '<div class="lp-12-domain-score" style="color:'+color+'">'+d.score+'</div>';
+      h += '<div class="lp-12-domain-tip">'+d.tip+'</div>';
+      h += '</div>';
+    });
+    h += '</div></div>';
+  });
+  return h;
+}
+
   h+='<div class="lp-source">📜 综合《滴天髓》《子平真诠》《穷通宝鉴》《三命通会》《紫微斗数全集》《太乙金华宗旨》《黄帝内经》《千金要方》《伤寒杂病论》《本草纲目》《了凡四训》《阴骘文》《太上感应篇》《玉历宝钞》《葬书》《撼龙经》《八宅明镜》《玄空飞星》《阳宅三要》《协纪辨方书》《天星择日》《三世因果经》共 22 部古籍</div>';
   h+='</div>';
   return h;
@@ -804,6 +907,7 @@ function renderLifeplanDashboardR38(){
 <!-- R41-B lifeplan-detail 4 阶段 HTML -->
 <h2 style="color:#63b3ed;margin:24px 0 12px">📅 人生四阶段时间轴</h2>
 <div id="lp-stage-timeline" class="lp-stage-timeline"></div>
+<script>document.getElementById("lp-stage-timeline").innerHTML += renderLP_12Domain_R41();</script>
 <h2 style="color:#63b3ed;margin:24px 0 12px">🎯 四阶段·十二领域深度规划</h2>
 <div id="section-lp-children"></div>
 <div id="section-lp-teen"></div>
