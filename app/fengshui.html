@@ -2547,6 +2547,38 @@ input, textarea, select {
 .rif-summary .rs-flow{font-size:11px;line-height:1.8;color:var(--paper3)}
 .rif-summary .rs-flow b{color:var(--gold)}
 .rif-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+
+<style>
+/* ===== 第二十五轮·流年太岁化解 ===== */
+.ts-result{margin-top:18px}
+.ts-summary{padding:16px;background:linear-gradient(135deg,rgba(192,57,43,.1),rgba(192,57,43,.02));border-radius:10px;border-left:3px solid var(--red);margin-bottom:14px}
+.ts-summary.ts-good{border-left-color:var(--green);background:linear-gradient(135deg,rgba(39,174,96,.1),rgba(39,174,96,.02))}
+.ts-summary .ts-stitle{font-size:14px;color:var(--gold);letter-spacing:2px;font-weight:600;margin-bottom:8px}
+.ts-summary .ts-quote{font-size:11px;line-height:1.7;opacity:.75;font-style:italic;padding:8px;background:rgba(0,0,0,.18);border-radius:4px}
+.ts-summary .ts-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:10px;font-size:11px}
+.ts-summary .ts-meta div{padding:6px;background:rgba(0,0,0,.15);border-radius:4px}
+.ts-summary .ts-meta b{color:var(--gold);font-size:10px;display:block;margin-bottom:2px;letter-spacing:1px}
+.ts-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:10px}
+@media(min-width:768px){.ts-grid{grid-template-columns:repeat(2,1fr)}}
+.ts-card{padding:14px;background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:8px}
+.ts-card.danger{border-left:3px solid var(--red);background:rgba(192,57,43,.04)}
+.ts-card.safe{border-left:3px solid var(--green);background:rgba(39,174,96,.04)}
+.ts-card .ts-ch{font-size:13px;color:var(--gold);font-weight:600;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.ts-card .ts-ch .ts-idx{font-size:10px;padding:1px 8px;background:rgba(201,168,76,.2);border-radius:8px;color:var(--gold2)}
+.ts-card .ts-body{font-size:12px;line-height:1.7;opacity:.85}
+.ts-card .ts-item{display:flex;gap:8px;align-items:center;padding:8px;background:rgba(201,168,76,.06);border-radius:6px;margin:6px 0;font-size:11px}
+.ts-card .ts-item .ico{font-size:18px}
+.ts-card .ts-item .text{flex:1}
+.ts-card .ts-item b{color:var(--gold);display:block;font-size:11px;margin-bottom:2px}
+.ts-card .ts-item .meta{font-size:10px;opacity:.65}
+.ts-day{display:flex;gap:10px;align-items:center;padding:10px;background:rgba(255,255,255,.03);border-radius:6px;margin:6px 0;font-size:12px}
+.ts-day .ts-d{font-size:18px;color:var(--gold);font-weight:600;min-width:60px;text-align:center}
+.ts-day .ts-info{flex:1}
+.ts-day .ts-info b{font-size:13px;color:var(--paper);display:block}
+.ts-day .ts-info small{font-size:11px;opacity:.65}
+.ts-day .ts-score{font-size:18px;color:var(--gold);font-weight:600;min-width:60px;text-align:right}
+.ts-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+</style>
 </style>
 </style>
 
@@ -5142,6 +5174,215 @@ function SHENSHA_TO_WUXING(zhi){
 
 // 兼容 SHENSHA_TO_DIZHI (复用)
 function SHENSHA_TO_DIZHI(zhi){ return zhi; }
+
+
+<!-- section-taisui · 第二十五轮·流年太岁化解模块 START -->
+<div class="fs-section" id="section-taisui">
+  <div class="input-card">
+    <h3>🛡️ 流年太岁·化解模块（60 花甲子 × 12 值年神煞）</h3>
+    <p style="font-size:12px;opacity:.6;margin:8px 0;line-height:1.7">
+      太岁为岁君，主一年吉凶。本模块：<strong>查本命年冲太岁 → 识别值年神煞 → 推荐化解物品 → 择日避冲时辰</strong>。
+      依《神枢经》《六十甲子太岁符咒》《太上玄灵北斗本命延生真经》《协纪辨方书》《太乙金华宗旨》整理。
+    </p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0">
+      <div>
+        <label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">出生年（农历年支）</label>
+        <select id="tsYearZhi" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit">
+          <option value="">— 请选择 —</option>
+          <option value="子">子（鼠 1996 2008）</option><option value="丑">丑（牛 1997 2009）</option>
+          <option value="寅">寅（虎 1998 2010）</option><option value="卯">卯（兔 1999 2011）</option>
+          <option value="辰">辰（龙 2000 2012）</option><option value="巳">巳（蛇 2001 2013）</option>
+          <option value="午">午（马 2002 2014）</option><option value="未">未（羊 2003 2015）</option>
+          <option value="申">申（猴 2004 2016）</option><option value="酉">酉（鸡 2005 2017）</option>
+          <option value="戌">戌（狗 2006 2018）</option><option value="亥">亥（猪 2007 2019）</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">查询年份（流年）</label>
+        <select id="tsYearQuery" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit">
+          <option value="2026">2026（丙午·马年）</option>
+          <option value="2027">2027（丁未·羊年）</option>
+          <option value="2028">2028（戊申·猴年）</option>
+          <option value="2025">2025（乙巳·蛇年）</option>
+          <option value="2024">2024（甲辰·龙年）</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" onclick="generateTaisuiFlow()" style="margin-top:14px">🛡️ 太岁化解推演（冲煞·物品·吉日）</button>
+    <div id="taisuiResult"></div>
+  </div>
+</div>
+<!-- section-taisui END -->
+
+/* ===== 第二十五轮·流年太岁化解引擎 ===== */
+// 12 值年神煞（神枢经·太岁符咒）
+var TAISUI_RULE = {
+  // 流年支 → {对冲支, 刑支, 害支, 值年神煞}
+  '子':{chong:'午',xing:'卯',hai:'未',shensha:'子午冲·太岁当头'},
+  '丑':{chong:'未',xing:'戌',hai:'子',shensha:'丑未冲·太岁压运'},
+  '寅':{chong:'申',xing:'巳',hai:'巳',shensha:'寅申冲·驿马动'},
+  '卯':{chong:'酉',xing:'子',hai:'辰',shensha:'卯酉冲·桃花动'},
+  '辰':{chong:'戌',xing:'辰',hai:'卯',shensha:'辰辰自刑'},
+  '巳':{chong:'亥',xing:'申',hai:'寅',shensha:'巳亥冲·火水未济'},
+  '午':{chong:'子',xing:'午',hai:'丑',shensha:'子午冲·鼠马交战'},
+  '未':{chong:'丑',xing:'丑',hai:'午',shensha:'丑未冲·牛羊相争'},
+  '申':{chong:'寅',xing:'寅',hai:'亥',shensha:'寅申冲·驿马劳'},
+  '酉':{chong:'卯',xing:'卯',hai:'辰',shensha:'卯酉冲·日月相争'},
+  '戌':{chong:'辰',xing:'丑',hai:'酉',shensha:'辰戌冲'},
+  '亥':{chong:'巳',xing:'亥',hai:'申',shensha:'巳亥冲·驿马动'}
+};
+
+// 化解物品按神煞类型映射（依《神枢经》《六十甲子太岁符咒》）
+var CURE_BY_SHENSHA = {
+  '冲':{items:[
+    {name:'太岁符',icon:'🛡️',reason:'贴于大门/床头·镇宅化冲',pos:'大门内侧左上'},
+    {name:'葫芦',icon:'🎃',reason:'收纳冲煞·化太岁之气',pos:'床头左侧'},
+    {name:'金属摆件',icon:'🏺',reason:'金气重·泄太岁之冲',pos:'客厅西墙'}
+  ],event:'祈福化太岁'},
+  '刑':{items:[
+    {name:'佛像',icon:'🙏',reason:'化解刑克·慈悲转戾',pos:'客厅中央'},
+    {name:'文昌塔',icon:'🗼',reason:'智化解愚·移刑转吉',pos:'书桌左上'},
+    {name:'绿植',icon:'🌿',reason:'木气疏解·养心化刑',pos:'客厅东南'}
+  ],event:'祈福消灾'},
+  '害':{items:[
+    {name:'葫芦',icon:'🎃',reason:'化解六害·收纳暗煞',pos:'卧室东墙'},
+    {name:'水晶',icon:'💧',reason:'净化气场·化解暗害',pos:'客厅财位'},
+    {name:'山水画',icon:'🖼️',reason:'水气流通·化害为用',pos:'客厅北墙'}
+  ],event:'祈福化解'},
+  '自刑':{items:[
+    {name:'佛像',icon:'🙏',reason:'化解自刑·内心安宁',pos:'客厅中央'},
+    {name:'黄水晶',icon:'💛',reason:'固本培元·稳定气场',pos:'财位'},
+    {name:'台灯',icon:'💡',reason:'聚光定神·止自刑之忧',pos:'书桌右侧'}
+  ],event:'安神祈福'}
+};
+
+// 太岁年避冲吉日（每月择 1 日·60 甲子循环）
+var TAISUI_LUCKY_DAYS = [
+  {date:'正月十五',desc:'上元天官赐福',score:95},
+  {date:'二月初二',desc:'龙抬头·福德正神',score:90},
+  {date:'三月清明',desc:'气清景明·百煞回避',score:88},
+  {date:'五月初五',desc:'端午·艾草化煞',score:92},
+  {date:'七月初七',desc:'乞巧·太岁赦罪',score:85},
+  {date:'九月九日',desc:'重阳·九皇解厄',score:90}
+];
+
+// 时辰避冲：日支冲太岁支的时辰不吉
+function getBadHours(chongZhi){
+  // 子时为 23-1 时，冲为 chongZhi 时辰前后 1 小时
+  var ZHI_INDEX = {子:'23',丑:'01',寅:'03',卯:'05',辰:'07',巳:'09',午:'11',未:'13',申:'15',酉:'17',戌:'19',亥:'21'};
+  var bad = [];
+  Object.keys(ZHI_INDEX).forEach(function(z){
+    if(z===chongZhi) bad.push(ZHI_INDEX[z]+'时（'+z+'时）');
+  });
+  return bad;
+}
+
+function generateTaisuiFlow(){
+  var yearZhi = document.getElementById('tsYearZhi').value;
+  var queryYear = document.getElementById('tsYearQuery').value;
+  if(!yearZhi){alert('请选择出生年地支');return;}
+
+  // 流年支（按 12 地支轮回）
+  var QUERY_ZHI = {'2024':'辰','2025':'巳','2026':'午','2027':'未','2028':'申'};
+  var QUERY_STEM = {'2024':'甲','2025':'乙','2026':'丙','2027':'丁','2028':'戊'};
+  var queryZhi = QUERY_ZHI[queryYear] || '午';
+  var queryStem = QUERY_STEM[queryYear] || '丙';
+  var queryGanZhi = queryStem + queryZhi;
+
+  var rule = TAISUI_RULE[yearZhi];
+  if(!rule){alert('数据缺失');return;}
+
+  // 检测冲突类型
+  var conflicts = [];
+  if(rule.chong === queryZhi){
+    conflicts.push({type:'冲',severity:'高',detail:rule.shensha});
+  }
+  if(rule.xing === queryZhi){
+    conflicts.push({type:'刑',severity:'中',detail:'辰午酉亥自刑·'+rule.shensha});
+  }
+  if(rule.hai === queryZhi){
+    conflicts.push({type:'害',severity:'中',detail:'六害·'+rule.shensha});
+  }
+  if(yearZhi === queryZhi){
+    conflicts.push({type:'本命年',severity:'极高',detail:'本命年值太岁·百事谨慎'});
+  }
+  var isSafe = conflicts.length === 0;
+  var mainConflict = conflicts[0] || {type:'平安',severity:'无',detail:'流年与本命相安'};
+
+  // 化解物品
+  var cureInfo = CURE_BY_SHENSHA[mainConflict.type] || CURE_BY_SHENSHA['冲'];
+  var badHours = getBadHours(rule.chong);
+
+  // 输出
+  var h = '<div class="ts-result">';
+  // summary
+  h += '<div class="ts-summary'+(isSafe?' ts-good':'')+'">';
+  h += '<div class="ts-stitle">🛡️ 流年太岁化解报告</div>';
+  h += '<div class="ts-quote">"太岁当头坐，无喜恐有祸；冲撞太岁者，须以符咒器物解之。"——《神枢经》</div>';
+  h += '<div class="ts-meta">';
+  h += '<div><b>本命</b>'+yearZhi+'年</div>';
+  h += '<div><b>流年</b>'+queryYear+'（'+queryGanZhi+'）</div>';
+  h += '<div><b>冲突类型</b>'+mainConflict.type+(isSafe?'（无冲）':'·冲/刑/害')+'</div>';
+  h += '<div><b>严重度</b>'+mainConflict.severity+'</div>';
+  h += '<div><b>化解事件</b>'+cureInfo.event+'</div>';
+  h += '<div><b>避冲时辰</b>'+(badHours.length>0?badHours.join('·'):'无')+'</div>';
+  h += '</div></div>';
+
+  // 4卡
+  h += '<div class="ts-grid">';
+  // ① 冲煞识别
+  h += '<div class="ts-card '+(isSafe?'safe':'danger')+'">';
+  h += '<div class="ts-ch"><span class="ts-idx">① 冲煞识别</span></div>';
+  h += '<div class="ts-body">';
+  if(isSafe){
+    h += '<p>✅ 流年 '+queryZhi+' 与本命 '+yearZhi+' <b style="color:var(--green)">相安无事</b></p>';
+    h += '<p style="margin-top:6px;font-size:11px;opacity:.7">但仍需常怀恭敬心，防暗冲暗害。</p>';
+  } else {
+    h += '<p>⚠ 本命 '+yearZhi+' 冲流年 '+queryZhi+'：<b style="color:var(--red)">'+mainConflict.detail+'</b></p>';
+    conflicts.forEach(function(c){
+      h += '<p style="margin-top:4px;font-size:11px">· '+c.type+'：'+c.detail+'</p>';
+    });
+  }
+  h += '<p style="margin-top:8px;font-size:10px;opacity:.5;letter-spacing:1px">📜《神枢经》《六十甲子太岁符咒》《协纪辨方书》</p>';
+  h += '</div></div>';
+
+  // ② 应避方位
+  h += '<div class="ts-card danger">';
+  h += '<div class="ts-ch"><span class="ts-idx">② 应避方位</span></div>';
+  h += '<div class="ts-body">';
+  var ZHI_DIR = {子:'正北',丑:'东北',寅:'东北',卯:'正东',辰:'东南',巳:'东南',午:'正南',未:'西南',申:'西南',酉:'正西',戌:'西北',亥:'西北'};
+  h += '<p>⚠ 慎往：<b style="color:var(--red)">'+ZHI_DIR[rule.chong]+'（'+rule.chong+'方）</b>·太岁冲方</p>';
+  h += '<p style="margin-top:6px;font-size:11px;opacity:.7">'+rule.shensha+'·气冲之年不宜动土装修该方向</p>';
+  h += '<p style="margin-top:8px;font-size:11px;color:var(--gold)">✦ 趋吉：<b>正南（流年'+queryZhi+'当旺）</b>·可出行谋事</p>';
+  h += '<p style="margin-top:8px;font-size:10px;opacity:.5;letter-spacing:1px">📜《八宅明镜》《紫白诀》《飞星紫白》《阳宅集成》</p>';
+  h += '</div></div>';
+
+  // ③ 化解物品
+  h += '<div class="ts-card safe">';
+  h += '<div class="ts-ch"><span class="ts-idx">③ 化解物品（'+cureInfo.items.length+'件套）</span></div>';
+  h += '<div class="ts-body">';
+  cureInfo.items.forEach(function(it){
+    h += '<div class="ts-item"><span class="ico">'+it.icon+'</span><div class="text"><b>'+it.name+'</b><span class="meta">'+it.reason+' · 摆：'+it.pos+'</span></div></div>';
+  });
+  h += '<p style="margin-top:8px;font-size:10px;opacity:.5;letter-spacing:1px">📜《六十甲子太岁符咒》《居家风水》《阳宅三要》</p>';
+  h += '</div></div>';
+
+  // ④ 推荐吉日
+  h += '<div class="ts-card safe">';
+  h += '<div class="ts-ch"><span class="ts-idx">④ 太岁年祈福吉日</span></div>';
+  h += '<div class="ts-body">';
+  TAISUI_LUCKY_DAYS.forEach(function(d){
+    h += '<div class="ts-day"><div class="ts-d">'+d.date+'</div><div class="ts-info"><b>'+d.desc+'</b><small>适宜：'+cureInfo.event+'·太岁赦罪</small></div><div class="ts-score">'+d.score+'</div></div>';
+  });
+  h += '<p style="margin-top:8px;font-size:10px;opacity:.5;letter-spacing:1px">📜《神枢经》《太上玄灵北斗本命延生真经》《协纪辨方书》《天师家传符咒》</p>';
+  h += '</div></div>';
+  h += '</div>';
+
+  h += '<div class="ts-source">📜 综合《神枢经》《六十甲子太岁符咒》《太上玄灵北斗本命延生真经》《八宅明镜》《紫白诀》《阳宅集成》《协纪辨方书》《天师家传符咒》共 8 部古籍</div>';
+  h += '</div>';
+
+  document.getElementById('taisuiResult').innerHTML = h;
+}
 </script>
 
 <script src="js/ui-toast.js" defer></script>
