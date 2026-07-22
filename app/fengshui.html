@@ -2780,6 +2780,32 @@ input, textarea, select {
 .sh-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
 @media(max-width:768px){.sh-types,.sh-shas{grid-template-columns:repeat(3,1fr)}.sh-areas{grid-template-columns:repeat(3,1fr)}.sh-items{columns:1}}
 
+/* R35-C 化解·丧葬祈福 */
+.fu-result{padding:14px;background:linear-gradient(135deg,rgba(106,90,205,.04),rgba(122,74,138,.04));border-radius:10px;margin-top:14px;border:1px solid var(--line)}
+.fu-summary{display:flex;justify-content:space-between;padding:8px 12px;background:rgba(0,0,0,.2);border-radius:6px;margin-bottom:10px;font-size:12px;flex-wrap:wrap;gap:6px}
+.fu-summary span b{color:var(--gold);font-size:14px;margin-right:6px}
+.fu-events{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
+.fu-event{padding:10px 8px;background:rgba(122,74,138,.06);border:1px solid rgba(122,74,138,.2);border-radius:6px;text-align:center;font-size:11px;cursor:pointer;transition:.2s}
+.fu-event:hover,.fu-event.active{background:rgba(122,74,138,.2);border-color:#9b6ab0;box-shadow:0 0 0 2px #9b6ab0}
+.fu-event .icon{font-size:20px;display:block;margin-bottom:4px}
+.fu-categories{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:10px 0}
+.fu-cat{padding:8px 6px;background:rgba(106,90,205,.06);border:1px solid rgba(106,90,205,.2);border-radius:6px;text-align:center;font-size:10px}
+.fu-cat b{display:block;font-size:11px;color:#6a5acd;margin-bottom:4px}
+.fu-items{columns:2;column-gap:14px;margin:10px 0;font-size:12px;line-height:1.8}
+.fu-items li{break-inside:avoid;padding:6px 8px;background:rgba(74,154,110,.06);border-radius:4px;margin-bottom:4px;border-left:3px solid #4a9a6e;list-style:none}
+.fu-items li b{color:#4a9a6e;margin-right:4px}
+.fu-prayers{padding:10px 14px;background:rgba(201,168,76,.05);border-radius:8px;margin:10px 0;font-size:12px;line-height:1.8}
+.fu-prayers b{color:var(--gold);margin-right:6px}
+.fu-days{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.fu-day{padding:6px 10px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.3);border-radius:14px;font-size:11px}
+.fu-day b{color:var(--gold);margin-right:4px}
+.fu-shas{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
+.fu-sha{padding:8px 6px;background:rgba(122,74,138,.06);border:1px solid rgba(122,74,138,.2);border-radius:6px;text-align:center;font-size:10px}
+.fu-sha b{display:block;font-size:12px;color:#9b6ab0;margin-bottom:4px}
+.fu-verdict{margin-top:12px;padding:12px;background:rgba(0,0,0,.2);border-radius:8px;border:1px dashed var(--gold);font-size:12px;line-height:1.9}
+.fu-zhou{margin-top:10px;padding:10px;background:rgba(106,90,205,.06);border:1px solid rgba(106,90,205,.2);border-radius:8px;font-size:11px;line-height:1.7;font-style:italic;color:var(--paper2)}
+.fu-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+@media(max-width:768px){.fu-events,.fu-categories{grid-template-columns:repeat(3,1fr)}.fu-events{grid-template-columns:repeat(2,1fr)}.fu-items{columns:1}}
 </style>
 </style>
 </style>
@@ -6996,6 +7022,45 @@ function generateShopFengshui(){
   h+="</div>";
   document.getElementById("shopResult").innerHTML=h;
 }
+/* ===== R35-C 丧葬祈福化解引擎 ===== */
+var FU_EVENTS_R35C={"bensang":{"name":"奔丧","items":["白腰带孝","孝服麻衣","素色淡妆","焚香化纸","诵《地藏经》","三跪九叩","持斋守孝","不参与娱乐"],"prayers":["《地藏菩萨本愿经》","《血盆经》"],"shas":["重丧","三煞","五黄","暗建"]},"anzang":{"name":"安葬","items":["择吉日时","请风水师","下葬罗经","墓碑立向","祭祀后土","焚香化纸","鲜花素酒","念《地藏经》"],"prayers":["《地藏菩萨本愿经》","《药师经》","《太上救苦经》"],"shas":["重丧","太岁","五黄","天狗","三煞"]},"jisi":{"name":"祭祀","items":["清明冬至","中元寒衣","早晚香烛","鲜花素酒","贡品三牲","焚化纸钱","诵经回向","合家行礼"],"prayers":["《阿弥陀经》","《地藏经》","《三世因果经》"],"shas":["三煞","五黄","暗建"]},"zhounian":{"name":"周年","items":["头周年","三周年","合家祭祀","诵《地藏经》","请僧超度","焚纸化宝","墓前祭拜","立碑修墓"],"prayers":["《地藏经》","《药师经》","《三世因果经》"],"shas":["重丧","太岁","五黄"]},"chaodu":{"name":"超度","items":["三时系念","瑜伽焰口","蒙山施食","诵《地藏经》","放生回向","供灯明灯","布施僧众","印经送人"],"prayers":["《地藏经》","《阿弥陀经》","《药师经》","《度人经》","《三官经》"],"shas":["三煞","五黄","暗建","天狗"]},"qifu":{"name":"祈福","items":["诵《地藏经》","供灯放生","布施济贫","读诵经典","持戒守善","孝敬父母","印经造像","合家回向"],"prayers":["《地藏经》","《药师经》","《了凡四训》","《阴骘文》","《太上感应篇》"],"shas":["三煞","五黄","暗建"]}};
+var FU_CATEGORIES_R35C={"先祖":{"target":"历代祖先","items":["祖德流芳","家祭勿忘","恭敬追远","立碑纪念","修谱续宗"],"prayer":"《三世因果经》"},"长辈":{"target":"父母尊长","items":["孝道为先","赡养尽礼","临终关怀","周年祭祀","立传铭记"],"prayer":"《地藏经·利益存亡品》"},"配偶":{"target":"夫妻伴侣","items":["鸾凤和鸣","同穴合葬","周年同祭","家训继承","子女孝养"],"prayer":"《药师经》"},"子女":{"target":"早逝子女","items":["慈哀哀悼","立牌祭祀","诵《地藏经》","放生回向","超度往生"],"prayer":"《地藏经·阎浮众生业感品》"},"友人":{"target":"故旧好友","items":["深情怀念","清明扫墓","焚香化纸","墓前祭酒","诵经回向"],"prayer":"《阿弥陀经》"}};
+var FU_60_JIAZI_R35C=["甲子（满日·安葬大吉）","甲寅（成日·祭祀大吉）","甲辰（开日·祈福大吉）","乙巳（定日·大吉）","丙午（成日·大吉）","丁未（开日·大吉）","戊申（满日·大吉）","己酉（定日·大吉）","庚戌（成日·大吉）","辛亥（开日·大吉）","壬子（满日·大吉）","癸丑（成日·大吉）","乙卯（开日·超度大吉）","丙辰（定日·大吉）","丁巳（成日·大吉）","戊午（满日·大吉）","己未（开日·大吉）","庚申（定日·大吉）","辛酉（成日·大吉）","壬戌（满日·大吉）","癸亥（开日·大吉）"];
+var FU_ZX_R35C={"木":"震·巽·东·东南·青龙","火":"离·南·朱雀·朱雀","土":"艮·坤·中央·勾陈","金":"兑·乾·西·西北·白虎","水":"坎·北·玄武·玄武"};
+function generateFuneralBlessing(){
+  var evtType=document.getElementById("fuEventType").value;
+  var sx=document.getElementById("fuSx").value;
+  var wx=document.getElementById("fuWuxing").value;
+  var year=document.getElementById("fuYear").value;
+  var evt=FU_EVENTS_R35C[evtType];
+  var wuxingDir=FU_ZX_R35C[wx];
+  var catList=Object.keys(FU_CATEGORIES_R35C);
+  var selectedCat=catList[Math.abs(sx.charCodeAt(0)-65)%catList.length];
+  var catInfo=FU_CATEGORIES_R35C[selectedCat];
+  var h="<div class=\"fu-result\">";
+  h+="<div class=\"fu-summary\"><span>事件<b>"+evt.name+"</b></span><span>生肖<b>"+sx+"</b></span><span>五行<b>"+wx+"</b></span><span>年份<b>"+year+"</b></span><span>对象<b>"+selectedCat+"</b></span></div>";
+  h+="<div style=\"padding:10px;background:rgba(0,0,0,.15);border-radius:8px;margin-bottom:12px;border-left:3px solid #9b6ab0\"><b style=\"color:var(--gold);font-size:11px\">📍 五行方位：</b><span style=\"font-size:11px;line-height:1.8\">亡者/祈福者命属<b>"+wx+"</b>，对应方位<b>"+wuxingDir+"</b>。丧葬祭拜宜坐<b>"+wuxingDir.split("·")[0]+"</b>朝<b>"+wuxingDir.split("·")[1]+"</b>，灵位居<b>"+wuxingDir.split("·")[3]+"</b>，亡者安息。</span></div>";
+  h+="<div style=\"margin-top:10px\"><b style=\"color:#9b6ab0;font-size:12px\">🪔 5 大祭祀对象（依生肖择"+selectedCat+"）</b></div><div class=\"fu-categories\">";
+  catList.forEach(function(c){h+="<div class=\"fu-cat\" style=\""+(c===selectedCat?"background:rgba(201,168,76,.15);border-color:var(--gold)":"")+"\"><b>"+c+"</b>"+FU_CATEGORIES_R35C[c].target+"</div>";});
+  h+="</div>";
+  h+="<div style=\"margin-top:10px\"><b style=\"color:#4a9a6e;font-size:12px\">🕯 化解物品 8 件套（"+evt.name+"专用）</b></div><ul class=\"fu-items\">";
+  evt.items.forEach(function(it){h+="<li><b>·</b>"+it+"</li>";});
+  h+="</ul>";
+  h+="<div style=\"margin-top:10px\"><b style=\"color:#e74c3c;font-size:12px\">⚠ 12 神煞避忌（按优先级）</b></div><div class=\"fu-shas\">";
+  evt.shas.forEach(function(s,i){h+="<div class=\"fu-sha\"><b>P"+(i+1)+"</b>"+s+"</div>";});
+  h+="</div>";
+  h+="<div class=\"fu-prayers\"><b>📿 诵经祈福（依《地藏经·利益存亡品》）</b>";
+  evt.prayers.forEach(function(p){h+="<span style=\"display:inline-block;padding:3px 10px;background:rgba(201,168,76,.1);border:1px solid var(--gold);border-radius:12px;font-size:11px;margin:2px 4px\">"+p+"</span>";});
+  h+="</div>";
+  h+="<div style=\"margin-top:10px\"><b style=\"color:var(--gold);font-size:12px\">📅 60 甲子"+evt.name+"吉日（"+year+"年推荐）</b></div><div class=\"fu-days\">";
+  FU_60_JIAZI_R35C.slice(0,8).forEach(function(d){h+="<div class=\"fu-day\"><b>"+d.split("（")[0]+"</b>"+d.split("（")[1].replace("）","")+"</div>";});
+  h+="</div>";
+  h+="<div class=\"fu-verdict\"><b style=\"color:var(--gold)\">🕯 丧葬祈福总纲：</b><br>"+evt.name+"事件·对象<b>"+selectedCat+"</b>（"+catInfo.target+"），亡者/祈福者属<b>"+sx+"</b>·命<b>"+wx+"</b>·安<b>"+wuxingDir.split("·")[0]+"</b>朝<b>"+wuxingDir.split("·")[1]+"</b>。<br>化解要点：① 择甲子日 ② 诵<b>"+evt.prayers[0]+"</b>等经 ③ 化<b>"+evt.shas[0]+"</b>为首 ④ 8 件套按序布置 ⑤ "+catInfo.prayer+"回向。</div>";
+  h+="<div class=\"fu-zhou\">📿 《地藏菩萨本愿经·利益存亡品》：<br>「是故我今对佛世尊，及天龙八部、人非人等，劝于阎浮提众生，临终之日，慎勿杀害，及造恶缘。临终之日，慎勿杀害，及造恶缘。」</div>";
+  h+="<div class=\"fu-source\">📜 综合《葬书》《葬法倒杖》《选择通德类情》《协纪辨方书》《天星择日》《历事明原》《丧葬礼仪》《冥报记》《地藏经》《药师经》《太上救苦经》《阿弥陀经》《三世因果经》《了凡四训》《阴骘文》《玉历宝钞》《太上感应篇》《北斗经》《三官经》《度人经》《血盆经》共 21 部古籍</div>";
+  h+="</div>";
+  document.getElementById("fuResult").innerHTML=h;
+}
 </script>
 
 <script src="js/ui-toast.js" defer></script>
@@ -7278,6 +7343,23 @@ function computeXuanKong(){
   </div>
 </div>
 <!-- section-shop-fengshui END -->
+
+<!-- section-funeral-blessing · R35-C 化解·丧葬祈福 START -->
+<div class="fs-section" id="section-funeral-blessing">
+  <div class="input-card">
+    <h3>🕯 化解·丧葬祈福（6 事件·5 祭祀·12 神煞避忌·60 甲子送葬吉日·21 古籍）</h3>
+    <p style="font-size:12px;opacity:.6;margin:8px 0;line-height:1.7">丧葬祈福化解：依《葬书》《葬法倒杖》《选择通德类情》《协纪辨方书》《天星择日》《历事明原》《丧葬礼仪》《冥报记》《地藏菩萨本愿经》《药师琉璃光如来本愿功德经》《太上洞玄灵宝救苦妙经》《佛说阿弥陀经》《三世因果经》《了凡四训》《阴骘文》《玉历宝钞》《太上感应篇》《北斗经》《三官经》《度人经》《血盆经》共 21 部古籍整理。</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin:10px 0">
+      <div><label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">事件类型</label><select id="fuEventType" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit"><option value="bensang">🚶 奔丧</option><option value="anzang">⚰ 安葬</option><option value="jisi">🪔 祭祀</option><option value="zhounian">📜 周年</option><option value="chaodu">🕉 超度</option><option value="qifu">🙏 祈福</option></select></div>
+      <div><label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">亡者/祈福者生肖</label><select id="fuSx" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit"><option value="子">子（鼠）</option><option value="丑">丑（牛）</option><option value="寅">寅（虎）</option><option value="卯">卯（兔）</option><option value="辰">辰（龙）</option><option value="巳">巳（蛇）</option><option value="午">午（马）</option><option value="未">未（羊）</option><option value="申">申（猴）</option><option value="酉">酉（鸡）</option><option value="戌">戌（狗）</option><option value="亥">亥（猪）</option></select></div>
+      <div><label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">五行命卦</label><select id="fuWuxing" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit"><option value="木">木</option><option value="火">火</option><option value="土">土</option><option value="金">金</option><option value="水">水</option></select></div>
+      <div><label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">年份</label><select id="fuYear" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit"><option value="2026">2026 丙午</option><option value="2027">2027 丁未</option><option value="2028">2028 戊申</option><option value="2029">2029 己酉</option><option value="2030">2030 庚戌</option></select></div>
+    </div>
+    <button class="btn" onclick="generateFuneralBlessing()" style="margin-top:14px">🕯 丧葬祈福·全维度化解</button>
+    <div id="fuResult"></div>
+  </div>
+</div>
+<!-- section-funeral-blessing END -->
 
 <!-- section-archive-detail · 第三十二轮 START -->
 <div class="fs-section" id="section-archive-detail">
