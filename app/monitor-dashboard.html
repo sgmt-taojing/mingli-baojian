@@ -191,6 +191,7 @@ svg.ic{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;str
     <a onclick="switchPanel('flow')">流程</a>
     <a onclick="switchPanel('trade')">交易</a>
     <a onclick="switchPanel('roles')">角色</a>
+    <a onclick="switchPanel('kb')">📚 KB体系</a>
     <a onclick="switchPanel('alerts')">告警</a>
   </div>
   <div class="live-clock" id="liveClock">--:--:--</div>
@@ -557,6 +558,56 @@ svg.ic{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;str
 </div>
 
 <!-- ═══════════════════════════════════════════════ -->
+<!-- Panel: KB 体系监控 -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="panel" id="panel-kb">
+  <div class="card-grid cols-4" style="margin-bottom:1rem">
+    <div class="card" style="text-align:center">
+      <h3>📚 KB 体系</h3>
+      <div class="stat" id="kbModels">--</div>
+      <div class="meta">已对齐知识模型</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>📝 正式条目</h3>
+      <div class="stat" id="kbFormal" style="color:var(--gold2)">--</div>
+      <div class="meta">kb_formal</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>🔍 追溯率</h3>
+      <div class="stat" id="kbTrace" style="color:var(--jade2)">--%</div>
+      <div class="meta">source_ids 完整度</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>⚖️ 对齐状态</h3>
+      <div class="stat" id="kbAligned" style="color:var(--jade2)">--</div>
+      <div class="meta">17 模型 100% 对账</div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>📊 知识库数据全链路</h3>
+    <div id="kbPipeline" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.8rem;padding:1rem">
+      <div class="kb-step"><h4>来源 source_index</h4><div class="stat" id="kbSrc">--</div></div>
+      <div class="kb-step"><h4>暂存 kb_staging</h4><div class="stat" id="kbStg">--</div></div>
+      <div class="kb-step"><h4>正式 kb_formal</h4><div class="stat" id="kbFmt">--</div></div>
+      <div class="kb-step"><h4>审计 kb_audit</h4><div class="stat" id="kbAud">--</div></div>
+      <div class="kb-step"><h4>版本 kb_versions</h4><div class="stat" id="kbVer">--</div></div>
+      <div class="kb-step"><h4>命中 knowledge_trace</h4><div class="stat" id="kbHits">--</div></div>
+      <div class="kb-step"><h4>推送 model_push_log</h4><div class="stat" id="kbPush">--</div></div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>🔧 公开端点健康（8 条）</h3>
+    <table class="data-table" id="kbEndpoints">
+      <thead>
+        <tr><th>端点</th><th>方法</th><th>状态</th><th>用途</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
 <!-- Panel: 告警 -->
 <!-- ═══════════════════════════════════════════════ -->
 <div class="panel" id="panel-alerts">
@@ -698,6 +749,7 @@ function switchPanel(id){
   if(id==='trade')renderTrade();
   if(id==='roles')renderRoles();
   if(id==='alerts')renderAlerts();
+  if(id==='kb')renderKB();
 }
 
 // ─── 时钟 ───
@@ -868,6 +920,63 @@ function renderAlertList(){
   }).join('');
 }
 
+
+// ═══ KB 体系渲染 ═══
+function renderKB(){
+  fetch('/api/public/kb-stats').then(function(r){return r.json()}).then(function(s){
+    function set(id,v){var el=document.getElementById(id); if(el) el.textContent=v;}
+    set('kbModels', s.models || 0);
+    set('kbFormal', s.formal || 0);
+    set('kbTrace', (s.trace_rate || 0) + '%');
+    set('kbAligned', s.aligned ? '✅ 对齐' : '⚠️ 待对账');
+    set('kbSrc', s.sources || 0);
+    set('kbStg', s.staging || 0);
+    set('kbFmt', s.formal || 0);
+    set('kbAud', s.audit || 0);
+    set('kbVer', s.versions || 0);
+    set('kbHits', s.hits || 0);
+    set('kbPush', s.pushes || 0);
+  }).catch(function(){
+    var el = document.getElementById('kbAligned');
+    if (el) { el.textContent = '❌ API不可达'; el.style.color = 'var(--danger)'; }
+  });
+
+  var endpoints = [
+    ['/api/public/stats','GET','系统统计'],
+    ['/api/public/recent-cases','GET','最近案例'],
+    ['/api/public/latest-pushes','GET','最新推送'],
+    ['/api/public/kb-list','GET','KB 条目'],
+    ['/api/public/feedback-points','GET','反馈积分'],
+    ['/api/public/kb-stats','GET','KB 统计'],
+    ['/api/public/kb-hit','POST','KB 命中累加'],
+    ['/api/ai/public-chat','POST','AI 公共聊天']
+  ];
+  var tbody = document.querySelector('#kbEndpoints tbody');
+  if (!tbody) return;
+  var done = 0, rows = [];
+  endpoints.forEach(function(ep){
+    var path = ep[0], method = ep[1], use = ep[2];
+    var startT = Date.now();
+    var init = { method: method, mode: 'cors' };
+    if (method === 'POST') {
+      init.headers = {'Content-Type':'application/json'};
+      init.body = JSON.stringify({});
+    }
+    fetch(path, init).then(function(r){
+      var ms = Date.now() - startT;
+      return { ok: r.ok, status: r.status, ms: ms };
+    }).catch(function(){ return { ok: false, status: '×', ms: 0 }; })
+    .then(function(res){
+      var c = res.ok ? 'var(--jade2)' : 'var(--danger)';
+      var t = res.ok ? '✅ '+res.status : '❌ '+res.status;
+      rows.push('<tr><td><code>'+path+'</code></td><td>'+method+'</td>'+
+                '<td style="color:'+c+'">'+t+'</td>'+
+                '<td><small>'+res.ms+'ms</small> '+use+'</td></tr>');
+      done++;
+      if (done === endpoints.length) tbody.innerHTML = rows.join('');
+    });
+  });
+}
 // ═══ 性能渲染 ═══
 function renderPerformance(){
   let perf=performance.toJSON();
