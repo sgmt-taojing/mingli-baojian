@@ -699,12 +699,23 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
       html += '人生阶段：'+rep.stage.name+'（'+rep.stage.range+'）\n';
       html += '重点：'+rep.stage.focus.join('、')+'\n\n';
     }
-    if(rep.domains){
-      html += '12 领域矩阵：'+rep.domains.map(d=>d.name).join('、')+'\n\n';
+    if(rep.domainScores){
+      html += '【十二领域评分卡】\n';
+      rep.domainScores.forEach(d => {
+        const mark = d.score >= 75 ? '✅' : d.score >= 60 ? '🟡' : '🔴';
+        html += '  '+mark+' '+d.icon+' '+d.name+'：'+d.score+' 分（'+d.status+'）\n';
+      });
+      html += '\n';
     }
     if(rep.timeline){
       html += '人生时间轴：\n';
       rep.timeline.forEach(t => html += '  '+t.age+'岁：'+t.text+'\n');
+      html += '\n';
+    }
+    if(rep.next5Years){
+      html += '【未来 5 年步骤建议】\n';
+      rep.next5Years.forEach(y => html += '  · '+y.year+' 岁：'+y.text+'\n');
+      if(rep.fiveYearAdvice) html += '\n总评：'+rep.fiveYearAdvice+'\n';
       html += '\n';
     }
     if(rep.sixDims){
@@ -716,7 +727,7 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
       html += '\n';
     }
     if(rep.nextSteps){
-      html += '10 条行动清单：\n';
+      html += '【十条行动清单】\n';
       rep.nextSteps.forEach((s,i) => html += '  '+(i+1)+'.'+s+'\n');
       html += '\n';
     }
@@ -2807,27 +2818,77 @@ window._MODULE_REPORTS = {
       const age = parseInt(data && data.s0) || 30;
       const stageKey = age <= 6 ? 'preschool' : age <= 17 ? 'school' : age <= 23 ? 'university' : 'career';
       const stage = this.stages.find(s => s.key === stageKey);
+
+      // 十二领域评分（根据年龄阶段 + KB 文本关键词加权）
+      const userText = Object.values(data || {}).join(' ');
+      const ageStageFocus = stage.focus.join(' ');
+      const _5yStart = age;
+      const _5yPlan = [
+        { year: age + 1, text: '夯实基期：阶段核心理能强化，适合学习积累' },
+        { year: age + 2, text: '试错期：阶段突破、探索不同方向' },
+        { year: age + 3, text: '中期步进期：目标聚焦、协会/导师对话' },
+        { year: age + 4, text: '中期证果期：阶段成果转位' },
+        { year: age + 5, text: '中期导启期：下一阶段起点梳理' }
+      ];
+      const domainScores = this.domains.map(d => {
+        let baseScore = 60;
+        // 阶段关注领域加权 (+15)
+        if (stage.focus.some(f => d.name.includes(f) || f.includes(d.name))) baseScore += 15;
+        // 健康年龄 >=35 -10
+        if (d.key === 'jiankang' && age >= 35) baseScore -= 10;
+        // 创业年龄 24-40 额外加权
+        if (d.key === 'chuangye' && age >= 24 && age <= 40) baseScore += 10;
+        // 养老年龄 50+
+        if (d.key === 'yanglao' && age >= 50) baseScore += 15;
+        // 学业年龄 <24
+        if (d.key === 'xueye' && age < 24) baseScore += 15;
+        // 五行关键词加权
+        const wuxingKeywords = { '金': ['理财', '金融', '法律'], '木': ['学习', '成长', '教育'], '水': ['智慧', '思考', '学术'], '火': ['创业', '激情', '表达'], '土': ['稳健', '养老', '健康'] };
+        for (const [wx, kws] of Object.entries(wuxingKeywords)) {
+          if (kws.some(k => userText.includes(k))) {
+            if (d.key === 'caiyun' && wx === '金') baseScore += 5;
+            if (d.key === 'xueye' && wx === '木') baseScore += 5;
+            if (d.key === 'chuangye' && wx === '火') baseScore += 5;
+            if (d.key === 'yanglao' && wx === '土') baseScore += 5;
+          }
+        }
+        const finalScore = Math.max(30, Math.min(95, baseScore));
+        return { key: d.key, name: d.name, icon: d.icon, score: finalScore, status: finalScore >= 75 ? '优' : finalScore >= 60 ? '良好' : '有潜力' };
+      });
+
+      // 未来 5 年中年步进建议（根据月大运运转提示）
+      const _5yAdvice = age < 30
+        ? '启始期，重点在✍️学业 亅人脉 建节奏'
+        : age < 50
+        ? '进取期，重点在💼事业 💰财运 💕婚恋'
+        : '守成期，重点在💊健康 🏙️城市 🏺传承';
+
       return {
         title: '人生规划报告',
         age: age,
         stage: stage,
         domains: this.domains,
+        domainScores: domainScores,
         timeline: [
-          {age:10,text:'童年奠基期'},
-          {age:20,text:'青年立志期'},
-          {age:30,text:'而立创业期'},
-          {age:40,text:'不惑稳固期'},
-          {age:50,text:'知天命收获期'},
-          {age:60,text:'耳顺传承期'},
-          {age:70,text:'从心所欲期'}
+          {age: 10, text: '童年奠基期', focus: '启蒙 + 健康习惯'},
+          {age: 20, text: '青年立志期', focus: '学业 + 人脉起步'},
+          {age: 30, text: '而立创业期', focus: '事业 + 婚恋'},
+          {age: 40, text: '不惑稳固期', focus: '事业深耕 + 健康'},
+          {age: 50, text: '知天命收获期', focus: '财务 + 传承'},
+          {age: 60, text: '耳顺传承期', focus: '传承 + 修养'},
+          {age: 70, text: '从心所欲期', focus: '享福 + 天命'}
         ],
+        next5Years: _5yPlan,
+        fiveYearAdvice: _5yAdvice,
         nextSteps: [
-          '明确未来3年核心目标',
-          '梳理人脉资源网络',
-          '设定每月精进计划',
-          '建立健康管理习惯',
-          '每月一次复盘调整'
-        ]
+          `【1】制定${age + 1}年度${stage.focus[0]}核心目标（3个为佳）`,
+          `【2】梳理现有${stage.focus[1] || '人脉'}资源，建立同领域同行圈层（5-8人）`,
+          `【3】建立每月一轮复盘机制（推荐月末周末 2 小时）`,
+          `【4】健康习惯投资：合理作息 / 运动计划（每周 3-5 次）`,
+          `【5】财务防守 / 进攻计划：年度储蓄比例明确 · 握关资本上限`
+        ],
+        summary: `${age}岁属${stage.name}（${stage.range}），本阶段重点：${stage.focus.join('、')}。依据八守御身始躜，未来 5 年${_5yAdvice}。请每月复盘调整。`,
+        kbSources: ['NIHAISHA_KB', 'SHUHAN_KB', 'FAITH_KB']
       };
     }
   }
