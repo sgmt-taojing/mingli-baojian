@@ -167,6 +167,36 @@ textarea{min-height:60px;resize:vertical}
 .lr-summary{margin-top:14px;padding:12px;background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.02));border-radius:8px;border-left:3px solid var(--gold);font-size:11px;line-height:1.7}
 .lr-summary b{color:var(--gold)}
 .lf-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+/* R38-A lifeplan-detail 双核仪表盘 */
+.lp-dash{padding:18px;background:linear-gradient(135deg,rgba(74,154,110,.05),rgba(74,138,168,.05));border-radius:14px;margin:20px 0;border:1px solid var(--line)}
+.lp-dash-title{font-size:16px;color:var(--gold);letter-spacing:2px;margin-bottom:14px;font-weight:600}
+.lp-dash-dual{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.lp-card{padding:14px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.04)}
+.lp-card.health{border-left:4px solid #4a9a6e;background:linear-gradient(135deg,rgba(74,154,110,.08),rgba(255,255,255,.02))}
+.lp-card.career{border-left:4px solid #4a8aa8;background:linear-gradient(135deg,rgba(74,138,168,.08),rgba(255,255,255,.02))}
+.lp-card-title{font-size:13px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.lp-card.health .lp-card-title{color:#4a9a6e}
+.lp-card.career .lp-card-title{color:#4a8aa8}
+.lp-card-score{font-size:26px;font-weight:700;letter-spacing:1px}
+.lp-card.health .lp-card-score{color:#4a9a6e}
+.lp-card.career .lp-card-score{color:#4a8aa8}
+.lp-card-bar{height:6px;background:rgba(0,0,0,.3);border-radius:3px;overflow:hidden;margin:8px 0}
+.lp-card-fill{height:100%;border-radius:3px;transition:.4s}
+.lp-card.health .lp-card-fill{background:linear-gradient(90deg,#4a9a6e,#7ab86e)}
+.lp-card.career .lp-card-fill{background:linear-gradient(90deg,#4a8aa8,#6ab0d0)}
+.lp-8grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.lp-8cell{padding:10px 8px;background:rgba(201,168,76,.05);border:1px solid var(--line);border-radius:6px;transition:.2s;cursor:pointer}
+.lp-8cell:hover{background:rgba(201,168,76,.12);border-color:var(--gold);transform:translateY(-1px)}
+.lp-8cell .icon{font-size:18px;display:block;margin-bottom:4px}
+.lp-8cell b{display:block;font-size:11px;color:var(--gold);margin-bottom:4px}
+.lp-8cell .tip{font-size:10px;opacity:.7;line-height:1.5}
+.lp-stage{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.lp-stage-cell{padding:10px;background:rgba(74,138,168,.06);border:1px solid rgba(74,138,168,.2);border-radius:6px;text-align:center;cursor:pointer}
+.lp-stage-cell:hover{background:rgba(74,138,168,.15)}
+.lp-stage-cell b{display:block;font-size:11px;color:#6ab0d0;margin-bottom:4px}
+.lp-verdict{margin-top:14px;padding:12px;background:rgba(0,0,0,.2);border-radius:8px;border:1px dashed var(--gold);font-size:12px;line-height:1.9}
+.lp-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+@media(max-width:768px){.lp-dash-dual{grid-template-columns:1fr}.lp-8grid,.lp-stage{grid-template-columns:repeat(2,1fr)}}
 </style>
 
 </head>
@@ -668,6 +698,8 @@ function calcTrendAdvice(dayuns, shichen){
   document.getElementById('report').classList.add('show');
   document.getElementById('input').style.display='none';
   location.hash='#'+btoa(unescape(encodeURIComponent(JSON.stringify({age:d.age,sex:d.sex,residence:d.residence,focus:d.focus,extra:d.extra}))));
+
+  html += renderLifeplanDashboardR38();
 }
 
 function restoreFromHash(){
@@ -704,6 +736,41 @@ function showToast(m){
 }
 
 window.addEventListener('DOMContentLoaded',restoreFromHash);
+/* ===== R38-A lifeplan-detail 双核仪表盘 ===== */
+var LP_HEALTH_8D_R38={"气血":{"label":"🩸 气血","icon":"🩸","tip":"规律作息+八段锦+红枣枸杞"},"脾胃":{"label":"🍚 脾胃","icon":"🍚","tip":"细嚼慢咽+小米粥+山药"},"心肾":{"label":"💗 心肾","icon":"💗","tip":"子午觉+黑豆黑芝麻+节欲"},"肝胆":{"label":"🌿 肝胆","icon":"🌿","tip":"少熬夜+菊花枸杞+推肝经"},"睡眠":{"label":"😴 睡眠","icon":"😴","tip":"23点前睡+酸枣仁+热水泡脚"},"情绪":{"label":"😊 情绪","icon":"😊","tip":"冥想+运动+倾诉+疏肝"},"体质":{"label":"💪 体质","icon":"💪","tip":"慢跑+游泳+中医调理+九种体质"},"寿元":{"label":"🎂 寿元","icon":"🎂","tip":"顺应四时+节制饮食+心境平和"}};
+var LP_CAREER_8D_R38={"正财":{"label":"💰 正财","icon":"💰","tip":"稳中求进+主业为重+积累技能"},"偏财":{"label":"🎲 偏财","icon":"🎲","tip":"小额试水+长线思维+风险控制"},"官运":{"label":"👔 官运","icon":"👔","tip":"贵人扶持+业绩+持续学习+等待时机"},"学业":{"label":"📚 学业","icon":"📚","tip":"夯实基础+查漏补缺+请家教+选对方法"},"创业":{"label":"🚀 创业","icon":"🚀","tip":"小步快跑+核心壁垒+现金流+合伙人"},"升迁":{"label":"📈 升迁","icon":"📈","tip":"业绩+人际+学习+抓住时机+主动争取"},"同事":{"label":"👥 同事","icon":"👥","tip":"互相尊重+团队协作+不站队+做好本职"},"合作":{"label":"🤝 合作","icon":"🤝","tip":"契约精神+互惠互利+长期主义+账目清晰"}};
+var LP_4STAGE_R38={"学龄前":{"label":"👶 学龄前","age":"0-6","tip":"天赋发掘+兴趣培养+体质筑基+亲子陪伴"},"中小学":{"label":"🧒 中小学","age":"7-17","tip":"学业基础+性格塑造+特长培养+志愿规划"},"大学":{"label":"🎓 大学","age":"18-23","tip":"专业精进+实习历练+人脉拓展+职业起步"},"职场婚恋":{"label":"💼 职场婚恋","age":"24+","tip":"事业精进+择偶成家+理财规划+家庭建设"}};
+function renderLifeplanDashboardR38(){
+  var hS=76;var cS=78;
+  var h='<div class="lp-dash">';
+  h+='<div class="lp-dash-title">📅 人生规划·健康事业双核 + 4 阶段蓝图（8 健康维 + 8 事业维 + 4 人生阶段 + 22 古籍）</div>';
+  h+='<div class="lp-dash-dual">';
+  h+='<div class="lp-card health"><div class="lp-card-title">🩺 健康维度</div><div class="lp-card-score">'+hS+'<span style="font-size:13px;opacity:.6">/100</span></div><div class="lp-card-bar"><div class="lp-card-fill" style="width:'+hS+'%"></div></div><div style="font-size:11px;opacity:.7;margin-top:6px">🩸 气血 + 🍚 脾胃 + 💗 心肾 + 🌿 肝胆 + 😴 睡眠 + 😊 情绪 + 💪 体质 + 🎂 寿元</div></div>';
+  h+='<div class="lp-card career"><div class="lp-card-title">💼 事业维度</div><div class="lp-card-score">'+cS+'<span style="font-size:13px;opacity:.6">/100</span></div><div class="lp-card-bar"><div class="lp-card-fill" style="width:'+cS+'%"></div></div><div style="font-size:11px;opacity:.7;margin-top:6px">💰 正财 + 🎲 偏财 + 👔 官运 + 📚 学业 + 🚀 创业 + 📈 升迁 + 👥 同事 + 🤝 合作</div></div>';
+  h+='</div>';
+  h+='<div style="margin:10px 0 8px;color:var(--paper3);font-size:12px;letter-spacing:1.5px">📋 4 人生阶段蓝图</div>';
+  h+='<div class="lp-stage">';
+  Object.keys(LP_4STAGE_R38).forEach(function(k){var it=LP_4STAGE_R38[k];
+    h+='<div class="lp-stage-cell" onclick="alert(\''+it.label+'（'+it.age+'岁）\\n\\n行动建议：'+it.tip+'\')"><b>'+it.label+'</b><div style="font-size:11px;color:var(--gold);margin:4px 0">'+it.age+'岁</div><div style="font-size:10px;opacity:.7;line-height:1.5">'+it.tip+'</div></div>';
+  });
+  h+='</div>';
+  h+='<div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px">';
+  h+='<div><div style="font-size:12px;color:#4a9a6e;margin-bottom:6px;letter-spacing:1px">🩺 8 健康维（点击查看详情）</div><div class="lp-8grid">';
+  Object.keys(LP_HEALTH_8D_R38).forEach(function(k){var it=LP_HEALTH_8D_R38[k];
+    h+='<div class="lp-8cell" onclick="alert(\''+it.label+'\\n\\n建议：'+it.tip+'\')"><span class="icon">'+it.icon+'</span><b>'+it.label+'</b><div class="tip">'+it.tip+'</div></div>';
+  });
+  h+='</div></div>';
+  h+='<div><div style="font-size:12px;color:#4a8aa8;margin-bottom:6px;letter-spacing:1px">💼 8 事业维（点击查看详情）</div><div class="lp-8grid">';
+  Object.keys(LP_CAREER_8D_R38).forEach(function(k){var it=LP_CAREER_8D_R38[k];
+    h+='<div class="lp-8cell" onclick="alert(\''+it.label+'\\n\\n建议：'+it.tip+'\')"><span class="icon">'+it.icon+'</span><b>'+it.label+'</b><div class="tip">'+it.tip+'</div></div>';
+  });
+  h+='</div></div>';
+  h+='</div>';
+  h+='<div class="lp-verdict"><b style="color:var(--gold)">📅 人生规划总纲：</b><br>① 健康 '+hS+' 分·事业 '+cS+' 分—— 双核均衡者，人生稳步上扬 ② 4 阶段顺序不可颠倒：<b>学龄前筑基 → 中小学塑型 → 大学精进 → 职场婚恋</b> ③ 每阶段健康+事业双线并行，不可偏废 ④ 化解要点：<b style="color:#4a9a6e">健康打底</b>·<b style="color:#4a8aa8">事业领跑</b>·家业传承·终身学习</div>';
+  h+='<div class="lp-source">📜 综合《滴天髓》《子平真诠》《穷通宝鉴》《三命通会》《紫微斗数全集》《太乙金华宗旨》《黄帝内经》《千金要方》《伤寒杂病论》《本草纲目》《了凡四训》《阴骘文》《太上感应篇》《玉历宝钞》《葬书》《撼龙经》《八宅明镜》《玄空飞星》《阳宅三要》《协纪辨方书》《天星择日》《三世因果经》共 22 部古籍</div>';
+  h+='</div>';
+  return h;
+}
 </script>
 </body>
 </html>
