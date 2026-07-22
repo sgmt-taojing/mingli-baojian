@@ -2692,6 +2692,34 @@ input, textarea, select {
 .mv-rules .mr-item{padding:4px 0;font-size:11px;line-height:1.6;opacity:.85}
 .mv-rules .mr-item b{color:var(--red)}
 .mv-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+
+<style>
+/* ===== 第三十轮·符咒念诵 ===== */
+.fz-result{margin-top:18px}
+.fz-summary{padding:16px;background:linear-gradient(135deg,rgba(180,130,200,.1),rgba(180,130,200,.02));border-radius:10px;border-left:3px solid #b482c8;margin-bottom:14px}
+.fz-summary .ms-title{font-size:14px;color:var(--gold);letter-spacing:2px;font-weight:600;margin-bottom:8px}
+.fz-summary .ms-quote{font-size:11px;line-height:1.7;opacity:.75;font-style:italic;padding:8px;background:rgba(0,0,0,.18);border-radius:4px}
+.fz-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
+@media(min-width:768px){.fz-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1200px){.fz-grid{grid-template-columns:repeat(3,1fr)}}
+.fz-card{padding:12px;background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:8px}
+.fz-card.cat-化解{border-left:3px solid #e74c3c;background:rgba(231,76,60,.04)}
+.fz-card.cat-护身{border-left:3px solid #b16aff;background:rgba(177,106,255,.04)}
+.fz-card.cat-招财{border-left:3px solid #f1c40f;background:rgba(241,196,15,.04)}
+.fz-card.cat-安宅{border-left:3px solid #e8a04a;background:rgba(232,160,74,.04)}
+.fz-card.cat-姻缘{border-left:3px solid #ff7eb9;background:rgba(255,126,185,.04)}
+.fz-card .fc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.fz-card .fc-title{font-size:13px;color:var(--gold);font-weight:600;letter-spacing:1px;font-family:serif}
+.fz-card .fc-cat{font-size:9px;padding:2px 8px;background:rgba(201,168,76,.2);border-radius:8px;color:var(--gold2)}
+.fz-card .fc-body{font-size:11px;line-height:1.6;opacity:.85}
+.fz-card .fc-spell{margin:8px 0;padding:8px 10px;background:rgba(0,0,0,.25);border-radius:6px;font-family:'STKaiti','楷体',serif;font-size:13px;line-height:1.9;letter-spacing:3px;color:#fff;border-left:2px solid var(--gold);text-align:center}
+.fz-card .fc-info{font-size:11px;line-height:1.7;opacity:.85}
+.fz-card .fc-meta{display:grid;grid-template-columns:repeat(2,1fr);gap:4px;margin-top:6px;font-size:10px}
+.fz-card .fc-meta div{padding:4px 6px;background:rgba(0,0,0,.12);border-radius:4px}
+.fz-card .fc-meta b{color:var(--gold);margin-right:3px}
+.fz-card .fc-tip{margin-top:6px;padding:6px 8px;background:rgba(231,76,60,.08);border-radius:4px;font-size:10px;opacity:.75;color:#faa}
+.fz-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+</style>
 </style>
 </style>
 </style>
@@ -6464,6 +6492,164 @@ function generateMove(){
   h += '</div>';
 
   document.getElementById('mvResult').innerHTML = h;
+}
+
+
+<!-- section-fuzhou · 第三十轮·化解·符咒念诵仪轨模块 START -->
+<div class="fs-section" id="section-fuzhou">
+  <div class="input-card">
+    <h3>🪬 化解·符咒念诵仪轨（24 符分类·念诵仪轨·禁忌）</h3>
+    <p style="font-size:12px;opacity:.6;margin:8px 0;line-height:1.7">
+      符咒为道教正法。本模块：<strong>查 24 类符咒 → 推荐适用场景 → 念诵仪轨 → 禁忌</strong>。
+      依《万法归宗》《符咒全书》《梵天秘笈》《神霄天箓》《上清天书》《天师家传符咒》《女青天律》整理。
+    </p>
+    <div style="display:flex;gap:6px;margin:10px 0;flex-wrap:wrap">
+      <button class="btn-mini" onclick="filterFzCat('all')">全部 24 符</button>
+      <button class="btn-mini" onclick="filterFzCat('化解')">化解类</button>
+      <button class="btn-mini" onclick="filterFzCat('护身')">护身类</button>
+      <button class="btn-mini" onclick="filterFzCat('招财')">招财类</button>
+      <button class="btn-mini" onclick="filterFzCat('安宅')">安宅类</button>
+      <button class="btn-mini" onclick="filterFzCat('姻缘')">姻缘类</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0">
+      <div>
+        <label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">适用场景</label>
+        <select id="fzScene" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit">
+          <option value="太岁冲">太岁冲（年度化解）</option>
+          <option value="噩梦">噩梦（夜不安）</option>
+          <option value="小人">小人（防是非）</option>
+          <option value="破财">破财（守财）</option>
+          <option value="婚恋">婚恋（桃花）</option>
+          <option value="考场">考场（求功名）</option>
+          <option value="动土">动土（施工期）</option>
+          <option value="出行">出行（远行）</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">念诵时间</label>
+        <select id="fzTime" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit">
+          <option value="晨">晨时（5-9 时）</option>
+          <option value="午">午时（11-13 时）</option>
+          <option value="暮">暮时（17-19 时）</option>
+          <option value="子">子时（23-1 时）</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" onclick="generateFuzhou()" style="margin-top:14px">🪬 24 符分类·念诵仪轨</button>
+    <div id="fzResult"></div>
+  </div>
+</div>
+<!-- section-fuzhou END -->
+
+/* ===== 第三十轮·符咒 24 分类 ===== */
+var FU_24 = [
+  // 化解类 8 符
+  {id:1,cat:'化解',name:'太岁符',spell:'太上老君·急急如律令·奉敕收摄',use:'贴大门/床头·镇太岁',when:'正月初一·吉日祭',taboo:'不可毁损·不可置污处',cite:'《六十甲子太岁符咒》《万法归宗》'},
+  {id:2,cat:'化解',name:'化煞符',spell:'九凤破秽·邪祟悉消·谨请南斗六星·降福消灾',use:'冲煞方位·贴墙',when:'冲日·初一十五',taboo:'不可对厕所·不可对门',cite:'《符咒全书》《女青天律》'},
+  {id:3,cat:'化解',name:'解厄符',spell:'解厄延生·玉皇敕命·北辰护身',use:'本命年·随身佩',when:'本命年生日·真君诞',taboo:'不可近污秽·不可女污',cite:'《太上玄灵北斗本命延生真经》《神霄天箓》'},
+  {id:4,cat:'化解',name:'镇宅符',spell:'唵·阿弥·钵喇·婆·耶·萨婆·诃',use:'大门正上方',when:'动土前·安宅时',taboo:'不可潮湿·不可压匾',cite:'《万法归宗》《梵天秘笈》'},
+  {id:5,cat:'化解',name:'辟邪符',spell:'龙虎日·月星辰·万邪回避',use:'卧室·小孩房',when:'亥子时·小儿夜啼',taboo:'不可对镜·不可残破',cite:'《符咒全书》《天师家传符咒》'},
+  {id:6,cat:'化解',name:'五雷符',spell:'五雷都司·律令驱邪·千里至·万里来',use:'驱邪·对小人',when:'庚申日·雷祖诞',taboo:'不可心怀恶念·不可戏用',cite:'《万法归宗》《神霄天箓》'},
+  {id:7,cat:'化解',name:'退煞符',spell:'北方壬癸·煞气退散·急急如律令',use:'动土·惊蛰',when:'冲日·动土前',taboo:'不可对自家门·不可毁',cite:'《女青天律》《协纪辨方书》'},
+  {id:8,cat:'化解',name:'祛病符',spell:'药王菩萨·慈悲救苦·百病消除',use:'病床前·床头',when:'疾病·初一十五',taboo:'不可对厕所·不可压',cite:'《梵天秘笈》《上清天书》'},
+
+  // 护身类 5 符
+  {id:9,cat:'护身',name:'护身符',spell:'金光罩·内蕴三魂·万邪不入',use:'随身佩·贴身',when:'本命年·远行',taboo:'不可近杀业·不可毁',cite:'《万法归宗》《上清天书》'},
+  {id:10,cat:'护身',name:'出行平安符',spell:'行神·路神·与神同行·路途平安',use:'远行前佩·贴车镜',when:'出行日早晨',taboo:'不可对秽物·不可丢失',cite:'《符咒全书》《天师家传符咒》'},
+  {id:11,cat:'护身',name:'夜啼符',spell:'天皇皇·地皇皇·小儿夜啼·请勿惊慌',use:'幼儿床·小儿颈佩',when:'夜啼时·哭夜时',taboo:'不可沾血·不可对镜',cite:'《万法归宗》《梵天秘笈》'},
+  {id:12,cat:'护身',name:'孕妇安产符',spell:'送子娘娘·催生保产·母子平安',use:'产房挂·贴身佩',when:'产前三个月',taboo:'不可对冲·不可污染',cite:'《梵天秘笈》《上清天书》'},
+  {id:13,cat:'护身',name:'六壬神符',spell:'六壬六甲·扫荡瘟疫·百煞消亡',use:'瘟疫年·家门口',when:'岁末·年终祭',taboo:'不可残破·不可污',cite:'《神霄天箓》《符咒全书》'},
+
+  // 招财类 4 符
+  {id:14,cat:'招财',name:'财神符',spell:'财帛星君·招财进宝·日进斗金',use:'财位贴·年节贴',when:'正月初五·财神诞',taboo:'不可对厕所·不可贴床尾',cite:'《财神经》《符咒全书》'},
+  {id:15,cat:'招财',name:'金玉满堂符',spell:'金玉满堂·富贵临门·财源广进',use:'店铺·客厅财位',when:'正月初七·人日',taboo:'不可对门·不可倒贴',cite:'《万法归宗》《梵天秘笈》'},
+  {id:16,cat:'招财',name:'守财符',spell:'钱财归我·煞气外挡·金锁银库',use:'保险柜·存钱处',when:'得财时·财库满时',taboo:'不可让外人见·不可失',cite:'《财神经》《符咒全书》'},
+  {id:17,cat:'招财',name:'开市大吉符',spell:'开市大吉·日进斗金·万事亨通',use:'店铺开业·开市',when:'开业前一日贴门',taboo:'不可对门·不可撕',cite:'《万法归宗》《符咒全书》'},
+
+  // 安宅类 4 符
+  {id:18,cat:'安宅',name:'安宅神咒符',spell:'太上安宅·四神护卫·百煞回避',use:'大门内侧正中',when:'搬家前·安宅日',taboo:'不可潮湿·不可压门楣',cite:'《净宅科仪》《安宅神咒》'},
+  {id:19,cat:'安宅',name:'地基主符',spell:'宅神护佑·地基安宁·日日顺昌',when:'新屋落成·动土后',use:'地基位·灶下',taboo:'不可扰动·不可污',cite:'《净宅科仪》《鲁班经》'},
+  {id:20,cat:'安宅',name:'门神符',spell:'左门神·秦琼；右门神·敬德；镇压一切凶煞',use:'大门两侧',when:'正月初一更新',taboo:'不可残破·不可揭',cite:'《符咒全书》《天师家传符咒》'},
+  {id:21,cat:'安宅',name:'井泉符',spell:'井泉龙王·出水甘冽·饮者安康',use:'水井·饮用水器旁',when:'清明·冬至前',taboo:'不可污染水源·不可忘祭',cite:'《万法归宗》《神霄天箓》'},
+
+  // 姻缘类 3 符
+  {id:22,cat:'姻缘',name:'和合符',spell:'天喜红鸾·和合二仙·永结同心',use:'新房·床头',when:'婚前·桃花位',taboo:'不可让外人见·不可污',cite:'《万法归宗》《梵天秘笈》'},
+  {id:23,cat:'姻缘',name:'月老符',spell:'月下老人·千里姻缘·一线牵成',use:'单身者佩·贴枕下',when:'七夕·桃花旺日',taboo:'不可乱情人·不可污',cite:'《梵天秘笈》《上清天书》'},
+  {id:24,cat:'姻缘',name:'安胎符',spell:'送子娘娘·安胎护产·母子双全',use:'孕妇佩·贴床头',when:'孕期·每月初一',taboo:'不可动胎气·不可污',cite:'《梵天秘笈》《女青天律》'}
+];
+
+function filterFzCat(cat){
+  var cards = document.querySelectorAll('.fz-card');
+  cards.forEach(function(c){
+    if(cat==='all' || c.classList.contains('cat-'+cat)){
+      c.style.display='';
+    } else {
+      c.style.display='none';
+    }
+  });
+}
+
+function generateFuzhou(){
+  var scene = document.getElementById('fzScene').value;
+  var time = document.getElementById('fzTime').value;
+
+  // 按场景筛符
+  var SCENE_MAP = {
+    '太岁冲':['化解','护身'],
+    '噩梦':['护身','化解'],
+    '小人':['化解','护身'],
+    '破财':['招财','化解'],
+    '婚恋':['姻缘','护身'],
+    '考场':['护身','招财'],
+    '动土':['安宅','化解'],
+    '出行':['护身','化解']
+  };
+  var cats = SCENE_MAP[scene] || ['化解','护身','招财','安宅','姻缘'];
+
+  var items = FU_24.filter(function(it){return cats.indexOf(it.cat)>=0;});
+  // 取前 12 符优先
+  if(items.length > 12) items = items.slice(0,12);
+
+  // 时辰适配（每时吉符）
+  var HOUR_TIPS = {
+    '晨':'阳气初升·诵太岁/护身符最吉',
+    '午':'阳气正盛·诵招财/姻缘符最吉',
+    '暮':'日落收官·诵安宅/化解符最吉',
+    '子':'阴极阳生·诵护身/解厄符最吉'
+  };
+
+  var catCount = {};
+  items.forEach(function(it){catCount[it.cat] = (catCount[it.cat]||0)+1;});
+
+  var h = '<div class="fz-result">';
+  h += '<div class="fz-summary">';
+  h += '<div class="ms-title">🪬 符咒念诵仪轨·场景：'+scene+'·时辰：'+time+'时</div>';
+  h += '<div class="ms-quote">"符者·天地之文；咒者·神灵之名。心持戒意·身佩善德·符咒自应。"——《万法归宗》</div>';
+  h += '<div style="font-size:11px;margin-top:10px;line-height:1.8">';
+  h += '· 适用场景：<b>'+scene+'</b><br>';
+  h += '· 念诵时辰：<b>'+time+'时</b>·'+HOUR_TIPS[time]+'<br>';
+  h += '· 涵盖类别：'+(Object.keys(catCount).map(function(k){return k+' '+catCount[k]+'符';}).join(' · '))+'<br>';
+  h += '· 总计：<b>'+items.length+'</b> 符·每符可单用·可组合用';
+  h += '</div></div>';
+
+  h += '<div class="fz-grid">';
+  items.forEach(function(it){
+    h += '<div class="fz-card cat-'+it.cat+'">';
+    h += '<div class="fc-head"><div class="fc-title">📜 '+it.name+'</div><div class="fc-cat">'+it.cat+'</div></div>';
+    h += '<div class="fc-body">'+it.use+'</div>';
+    h += '<div class="fc-spell">'+it.spell+'</div>';
+    h += '<div class="fc-info">📌 念诵：'+it.when+'</div>';
+    h += '<div class="fc-meta"><div><b>使用</b>'+it.use+'</div><div><b>最佳</b>'+it.when+'</div></div>';
+    h += '<div class="fc-tip">⚠ '+it.taboo+'</div>';
+    h += '<div style="opacity:.5;font-size:9px;letter-spacing:1px;margin-top:4px">📜 '+it.cite+'</div>';
+    h += '</div>';
+  });
+  h += '</div>';
+
+  h += '<div class="fz-source">📜 综合《万法归宗》《符咒全书》《梵天秘笈》《神霄天箓》《上清天书》《天师家传符咒》《女青天律》《六十甲子太岁符咒》《太上玄灵北斗本命延生真经》《净宅科仪》共 10 部古籍</div>';
+  h += '</div>';
+
+  document.getElementById('fzResult').innerHTML = h;
 }
 </script>
 
