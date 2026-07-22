@@ -1586,6 +1586,29 @@ app.get('/api/public/stats', (req, res) => {
 });
 
 // === KB 命中上报（公开，无需认证，前端 _kbHitCount 上报用）===
+// === KB 模型统计公开别名（追溯链状态，H5 用）===
+app.get('/api/public/kb-stats', (req, res) => {
+  try {
+    const sources = db.prepare('SELECT COUNT(*) as cnt FROM source_index').get().cnt;
+    const staging = db.prepare('SELECT COUNT(*) as cnt FROM kb_staging').get().cnt;
+    const formal = db.prepare('SELECT COUNT(*) as cnt FROM kb_formal').get().cnt;
+    const audit = db.prepare('SELECT COUNT(*) as cnt FROM kb_audit').get().cnt;
+    const versions = db.prepare('SELECT COUNT(*) as cnt FROM kb_versions').get().cnt;
+    const models = db.prepare("SELECT COUNT(*) as cnt FROM knowledge_models WHERE status='active'").get().cnt;
+    const hits = db.prepare('SELECT COUNT(*) as cnt FROM knowledge_trace').get().cnt;
+    const pushes = db.prepare('SELECT COUNT(*) as cnt FROM model_push_log').get().cnt;
+    const formalWithSrc = db.prepare("SELECT COUNT(*) as cnt FROM kb_formal WHERE source_ids != '[]' AND source_ids IS NOT NULL AND source_ids != ''").get().cnt;
+    res.json({
+      sources, staging, formal, audit, versions, models, hits, pushes,
+      trace_rate: formal ? Math.round(formalWithSrc * 1000 / formal) / 10 : 0,
+      aligned: formalWithSrc === formal,
+      public: true
+    });
+  } catch (e) {
+    res.json({ error: e.message });
+  }
+});
+
 // === KB 列表公开别名（无需认证，H5 公开页面用）===
 app.get('/api/public/kb-list', (req, res) => {
   const fs = require('fs');
