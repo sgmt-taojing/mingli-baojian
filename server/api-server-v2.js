@@ -467,10 +467,36 @@ async function _aiLocalResponse(userText, baziData) {
   if (/运势|运气|今年|流年/.test(text)) return '━━━ 运势分析报告 ━━━\n\n【分析维度】\n1. 事业运——官星/七杀+流年太岁关系\n2. 财运——正财/偏财+流年财星触发\n3. 感情运——日支/桃花星+流年合冲\n4. 健康运——五行失衡+流年冲克预警\n5. 人际运——贵人星/小人星+流年引动\n\n【流年要点】\n2026丙午年（火旺）：\n- 喜火者：事业腾飞，贵人多助\n- 忌火者：压力增大，宜守不宜攻\n- 冲太岁（鼠/马/牛/兔）：需化解太岁\n\n【月运参考】\n寅月(正月)木旺·卯月(二月)木旺·辰月(三月)土旺\n巳月(四月)火旺·午月(五月)火旺·未月(六月)土旺\n申月(七月)金旺·酉月(八月)金旺·戌月(九月)土旺\n亥月(十月)水旺·子月(十一月)水旺·丑月(十二月)土旺\n\n请提供生辰，可分析您的个性化流年运势。';
   if (/五行|缺什么|属什么/.test(text)) return '━━━ 五行分析报告 ━━━\n\n【五行对应】\n- 金→肺/呼吸/西方/白色/金属\n- 木→肝胆/东方/绿色/植物\n- 水→肾/泌尿/北方/黑色/液体\n- 火→心/血/南方/红色/光热\n- 土→脾/胃/中央/黄色/土壤\n\n【五行生克】\n- 相生：金生水→水生木→木生火→火生土→土生金\n- 相克：金克木→木克土→土克水→水克火→火克金\n\n【五行强弱判断】\n- 得令（月令五行）→旺\n- 得地（地支有根）→强\n- 得生（有生扶）→强\n- 失令失地→弱\n\n【五行缺行影响】\n- 缺金→呼吸道弱/决断力差\n- 缺木→肝胆弱/进取心不足\n- 缺水→肾弱/灵活性差\n- 缺火→心血管弱/热情不足\n- 缺土→脾胃弱/稳定性差\n\n【五行补救（拿来即用）】\n- 补金→西方/白色/金属饰品/辛味食物\n- 补木→东方/绿色/木质饰品/酸味食物\n- 补水→北方/黑色/水晶/咸味食物\n- 补火→南方/红色/玛瑙/苦味食物\n- 补土→中央/黄色/玉石/甘味食物\n\n请提供生辰，可分析您的五行分布和补救方案。';
   if (/风水|布局|方位|房子|家居/.test(text)) return '━━━ 风水布局分析报告 ━━━\n\n【大门风水】\n- 纳气之口，决定全屋气场\n- 宜在吉位：生气（旺丁）/天医（健康）/延年（旺财）\n- 忌对电梯/楼梯/镜子/厕所\n- 门口宜整洁明亮，忌堆放杂物\n\n【客厅风水】\n- 明堂聚气，宜宽敞明亮\n- 沙发宜靠实墙（有靠山）\n- 财位：进门对角线45度位置\n- 财位宜放：招财植物/貔貅/水晶\n- 忌：横梁压顶/镜子对沙发\n\n【卧室风水】\n- 床头宜靠实墙，忌悬空\n- 忌横梁压顶/吊灯压床\n- 镜子忌对床\n- 床头忌靠卫生间墙\n- 方位：东四命宜东/东南/南/北；西四命宜西/西南/西北/东北\n\n【厨房风水】\n- 火气之源，宜在凶位压煞\n- 灶台忌对门/对水槽（水火相冲）\n\n【卫生间风水】\n- 排污之所，宜在凶位\n- 忌正对大门/卧室门/厨房门\n\n【化煞方法】\n- 路冲→八卦镜/泰山石\n- 缺角→补角水晶/植物\n- 横梁→葫芦/五帝钱\n- 对门→屏风/珠帘\n\n如需个性化分析，请提供房屋朝向和户型。';
-  if (/中医|养生|健康/.test(text)) return '中医养生建议：\n\n1. 【起居】子时（23:00）前入睡，养肝胆\n2. 【饮食】七分饱，少生冷，多温热\n3. 【运动】适度运动，气血流通，忌大汗\n4. 【情志】少怒少虑，心态平和\n5. 【四季】春养肝、夏养心、秋养肺、冬养肾\n\n如需针对性建议，请描述您的具体症状或体质。也可使用「症状分析」功能获取周易+中医联合方案。';
-  if (/失眠|睡不着|睡眠/.test(text)) return '━━━ 失眠调理方案 ━━━\n\n【中医辨证分型】\n1. 心脾两虚→多梦易醒，心悸健忘\n2. 肝郁化火→辗转难眠，急躁易怒\n3. 阴虚火旺→心烦不眠，潮热盗汗\n4. 痰热扰心→睡眠不安，胸闷痰多\n5. 心胆气虚→惊恐不眠，易惊醒\n\n【食疗方案】\n- 酸枣仁粥→养心安神（酸枣仁15g+大米50g）\n- 百合莲子汤→清心安神\n- 小米粥→健脾安眠\n- 桂圆红枣茶→补心脾\n- 温牛奶→助眠\n\n【穴位按摩】\n- 神门穴→手腕横纹尺侧\n- 三阴交→内踝上3寸\n- 安眠穴→耳垂后凹陷处\n- 涌泉穴→脚底前1/3凹陷\n每穴按揉3-5分钟，睡前操作\n\n【起居调理】\n1. 子时(23:00)前入睡，顺应胆经\n2. 睡前1小时忌手机/电视\n3. 卧室宜暗宜静，温度适宜\n4. 睡前泡脚15分钟（40度温水）\n5. 忌浓茶/咖啡/辛辣（下午3点后）\n\n【运动建议】\n- 傍晚散步30分钟\n- 太极拳/八段锦\n- 忌睡前剧烈运动\n\n【五行调理】\n- 心火旺→穿白色衣物降火\n- 肝郁→穿绿色衣物疏肝\n- 脾虚→穿黄色衣物健脾\n\n如持续失眠超过2周，建议就诊中医。';
+  if (/中医|养生|健康/.test(text)) {
+    const kw = userText.replace(/中医|养生|健康|如何|怎么办|怎么/g, '').trim().slice(0, 30) || '养生';
+    const rows = db.prepare(`SELECT title, substr(content, 1, 500) as excerpt FROM kb_formal WHERE module IN ('tcm','tcm-fangji','nihaixia') AND (title LIKE ? OR content LIKE ?) ORDER BY trust_score DESC LIMIT 2`).all('%'+kw+'%', '%'+kw+'%');
+    if (rows.length) {
+      let r = '💊 中医养生（KB 真实内容）：\n\n';
+      rows.forEach((x, i) => { r += (i+1)+'. 【'+x.title+'】\n'+x.excerpt+'...\n\n'; });
+      return r + '\n完整内容请见「倪师知识库」页面。';
+    }
+    return '💊 中医养生建议：\n1. 子时前入睡；2. 七分饱，少生冷；3. 适度运动；4. 心态平和；5. 顺应四时。\n请描述具体症状或访问「倪师知识库」查阅方剂。';
+  }
+  if (/失眠|睡不着|睡眠/.test(text)) {
+    const rows = db.prepare(`SELECT title, substr(content, 1, 800) as excerpt FROM kb_formal WHERE module IN ('tcm','tcm-fangji','nihaixia') AND (title LIKE '%失眠%' OR content LIKE '%失眠%' OR title LIKE '%睡眠%' OR content LIKE '%睡眠%' OR title LIKE '%安神%' OR content LIKE '%安神%') ORDER BY trust_score DESC LIMIT 2`).all();
+    if (rows.length) {
+      let r = '🌙 失眠调理（KB 真实内容）：\n\n';
+      rows.forEach((x, i) => { r += (i+1)+'. 【'+x.title+'】\n'+x.excerpt+'...\n\n'; });
+      return r + '\n如持续失眠超过2周，建议就诊中医。';
+    }
+    return '🌙 失眠调理：\n1. 心脾两虚→归脾汤；2. 肝郁化火→龙胆泻肝汤；3. 阴虚火旺→黄连阿胶汤；\n4. 痰热扰心→温胆汤；5. 心胆气虚→安神定志丸。\n请访问「倪师知识库」查方剂详情。';
+  }
   if (/头痛|头晕/.test(text)) return '头痛调理建议：\n\n【分型】\n- 胀痛→肝阳上亢，宜平肝潜阳\n- 隐痛→气血不足，宜益气养血\n- 刺痛→瘀血阻络，宜活血化瘀\n- 重痛→痰湿内阻，宜化痰祛湿\n\n【穴位】太阳穴、风池、合谷\n【建议】如持续头痛请就医，可使用「中医诊疗」功能获取专业方案。';
-  if (/倪海厦|倪师/.test(text)) return '倪海厦老师知识库涵盖46个模块：\n\n【经方】伤寒论、金匮要略\n【针灸】针灸大成\n【本草】神农本草经\n【经典】黄帝内经\n【命理】天纪、人纪\n\n您可以在「倪师知识库」页面浏览详细内容，或告诉我具体想了解哪个方面。';
+  if (/倪海厦|倪师/.test(text)) {
+    const kw = text.replace(/倪海厦|倪师/g, '').trim().slice(0, 40) || userText.slice(0, 40);
+    const rows = db.prepare(`SELECT title, substr(content, 1, 600) as excerpt FROM kb_formal WHERE module IN ('nihaixia','tcm','tcm-fangji','bazi') AND (title LIKE ? OR content LIKE ?) ORDER BY trust_score DESC LIMIT 3`).all('%'+kw+'%', '%'+kw+'%');
+    if (rows.length) {
+      let r = '🪷 倪海厦老师知识库（真实内容）：\n\n';
+      rows.forEach((x, i) => { r += (i+1)+'. 【'+x.title+'】\n'+x.excerpt+'...\n\n'; });
+      return r;
+    }
+    return '🪷 倪海厦老师知识库涵盖：经方、针灸、本草、经典、命理。\n请告诉我具体想了解哪个方面（如：方剂、针灸、养生、八字等）。';
+  }
   if (/舒晗/.test(text)) return '━━━ 舒晗老师知识库 ━━━\n\n【知识库内容】\n- 命理秘笈：八字实战心法/格局判断秘诀/用神选取技巧\n- 风水布局：阳宅三要/八宅明镜/玄空飞星实战\n- 进阶课程：大运流年推演/六亲断法/事业财运断\n- 实战案例：婚姻/财运/事业/健康命例解析\n\n【核心理论】\n- 合冲刑害精要：天干五合/地支三合六合六冲三刑\n- 十神精要：正官/七杀/正印/偏印/食神/伤官/比肩/劫财/正财/偏财\n- 用神选取：扶抑/调候/通关/病药/从格顺势\n- 格局层次：正官格/七杀格/正印格/食神格/伤官格等\n\n【实战要点】\n- 断命先看日主旺衰→再定用神→后看大运流年\n- 婚姻看日支+流年引动\n- 财运看财星+大运行运\n- 事业看官星+格局高低\n\n请访问「舒晗知识库」页面浏览完整内容。';
   if (/奇门|遁甲/.test(text)) return '━━━ 奇门遁甲分析报告 ━━━\n\n【什么是奇门遁甲】\n古代最高层预测学，被誉为「帝王之学」，与太乙神数、大六壬并称三式。\n\n【构成】\n- 天盘九星：天蓬/天芮/天冲/天辅/天禽/天心/天柱/天任/天英\n- 地盘八门：休/生/伤/杜/景/死/惊/开\n- 八神：直符/腾蛇/太阴/六合/白虎/玄武/九地/九天\n- 三奇六仪：乙/丙/丁（三奇）+戊/己/庚/辛/壬/癸（六仪）\n\n【用途】\n1. 预测吉凶→百事可测\n2. 择日择吉→选最佳时机\n3. 战略决策→商业/军事\n4. 风水调理→方位选择\n\n【排盘需要】\n请提供：年月日时+预测事项\n例如：2026年7月20日10时 求测事业\n\n【吉格参考】\n吉门（休/生/开）+吉星+吉神→大吉\n凶门（死/惊/伤）+凶星→大凶\n\n请在排盘页面使用奇门遁甲引擎排盘。';
   if (/紫微|斗数/.test(text)) return '━━━ 紫微斗数分析报告 ━━━\n\n【什么是紫微斗数】\n以出生年月日时排盘，用十二宫位分析人生各维度，被誉为「天下第一神数」。\n\n【十二宫位】\n1. 命宫→性格/格局/一生总论\n2. 兄弟宫→兄弟姐妹关系\n3. 夫妻宫→配偶特征/婚姻质量\n4. 子女宫→子女缘分/教育\n5. 财帛宫→财运/理财方式\n6. 疾厄宫→健康/体质\n7. 迁移宫→外出/旅行/变迁\n8. 奴仆宫→下属/朋友\n9. 官禄宫→事业/学业\n10. 田宅宫→房产/家庭环境\n11. 福德宫→精神生活/兴趣爱好\n12. 父母宫→父母关系/长辈缘\n\n【十四主星】\n紫微/天机/太阳/武曲/天同/廉贞/天府/太阴/贪狼/巨门/天相/天梁/七杀/破军\n\n【排盘需要】\n请提供出生年月日时+性别\n\n请在排盘页面使用紫微引擎排盘。';
@@ -479,7 +505,16 @@ async function _aiLocalResponse(userText, baziData) {
   if (/六壬/.test(text)) return '━━━ 大六壬分析报告 ━━━\n\n【什么是大六壬】\n与奇门遁甲、太乙神数并称三式，擅长预测具体人事吉凶。\n\n【构成】\n- 四课→从日辰推演出的四个课\n- 三传→初传/中传/末传，事态发展脉络\n- 天将→十二天将（贵人/腾蛇/朱雀等）\n- 神煞→各种吉凶标志\n\n【用途】\n1. 失物→能否找回/方位\n2. 行人→是否回归/时间\n3. 婚姻→成败/对方特征\n4. 事业→升降/时机\n5. 疾病→轻重/预后\n6. 官司→胜败/过程\n\n【排盘需要】\n请提供：年月日时+预测事项\n\n请在排盘页面使用六壬引擎起课。';
   if (/择日|择吉|吉日/.test(text)) return '━━━ 择日择吉分析报告 ━━━\n\n【择日原则】\n- 宜：天德/月德/三合/六合/天赦/黄道吉日\n- 忌：岁破/月破/四废/往亡/劫煞/灾煞\n\n【各类择日】\n1. 搬家→宜移徙日，忌月破/三煞方\n2. 结婚→宜天喜/三合/天德合，忌孤辰寡宿\n3. 开业→宜开日/满日/成日，忌收日/闭日\n4. 动土→宜土符/三合，忌土府/五黄\n5. 出行→宜驿马/天马，忌往亡/归忌\n\n【每日宜忌】\n建→宜上任/忌动土\n除→宜治病/忌出行\n满→宜祈福/忌安葬\n平→宜修造/忌动土\n定→宜安床/忌诉讼\n执→宜捕捉/忌开池\n破→宜求医/忌嫁娶\n危→宜祭祀/忌登山\n成→宜结婚/忌诉讼\n收→宜收纳/忌出行\n开→宜开业/忌安葬\n闭→宜筑堤/忌开仓\n\n请访问「黄历」页面查看每日宜忌，或在排盘页面使用择日引擎。';
   if (/黄历|宜忌|老黄历/.test(text)) return '━━━ 黄历宜忌分析报告 ━━━\n\n【黄历内容】\n1. 每日宜忌→当日适合/忌讳的事项\n2. 吉时方位→当日吉时/喜神方位/财神方位\n3. 干支→年柱/月柱/日柱/时柱\n4. 节气→二十四节气养生提示\n5. 冲煞→当日冲什么生肖/煞什么方位\n\n【十二值日】\n建/除/满/平/定/执/破/危/成/收/开/闭\n各有宜忌，影响当日运势\n\n【二十八星宿】\n每日对应一个星宿，影响吉凶\n吉宿：角/房/尾/斗/女/虚/危/室/壁/奎/胃/毕/参/井/柳/星\n凶宿：亢/氐/心/牛/危/昴/觜/鬼/轸\n\n【三视角养生】\n- 儒家→修身养德/读书明理\n- 道家→吐纳导引/内丹修炼\n- 佛家→禅修念佛/慈悲行善\n\n【今日命理知识】\n基于当日干支，推送桃花/驿马/纳音等知识点\n\n请访问「黄历」页面查看今日完整黄历。';
-  if (/体质|调理/.test(text)) return '━━━ 体质调理分析报告 ━━━\n\n【五型体质特征】\n- 木型→面色青/身长/性格直，肝气偏旺\n- 火型→面色红/尖脸/性急，心火偏旺\n- 土型→面色黄/圆润/稳重，脾胃偏弱\n- 金型→面色白/方正/刚毅，肺气偏弱\n- 水型→面色黑/圆润/聪明，肾气偏弱\n\n【各型养生方案】\n木型（疏肝理气）\n- 食疗：绿色蔬菜/枸杞/菊花茶\n- 穴位：太冲/阳陵泉\n- 忌：怒/酸/久坐\n\n火型（养心安神）\n- 食疗：莲子/百合/绿豆\n- 穴位：神门/内关\n- 忌：燥/苦/熬夜\n\n土型（健脾祛湿）\n- 食疗：山药/薏仁/小米\n- 穴位：足三里/阴陵泉\n- 忌：冷/甜/久卧\n\n金型（补肺益气）\n- 食疗：白萝卜/银耳/百合\n- 穴位：太渊/肺俞\n- 忌：悲/辛/久卧\n\n水型（温补肾阳）\n- 食疗：黑豆/核桃/羊肉\n- 穴位：肾俞/太溪\n- 忌：寒/咸/久立\n\n请访问「体质调理」页面做体质测试，或提供生辰分析您的五行体质。';
+  if (/体质|调理/.test(text)) {
+    const kw = userText.replace(/体质|调理|怎么|什么|如何/g, '').trim().slice(0, 30);
+    const rows = db.prepare(`SELECT title, substr(content, 1, 600) as excerpt FROM kb_formal WHERE module IN ('tcm','nihaixia','bazi') AND (title LIKE ? OR content LIKE ?) ORDER BY trust_score DESC LIMIT 2`).all('%'+kw+'%', '%'+kw+'%');
+    if (rows.length) {
+      let r = '🧬 体质调理（KB 真实内容）：\n\n';
+      rows.forEach((x, i) => { r += (i+1)+'. 【'+x.title+'】\n'+x.excerpt+'...\n\n'; });
+      return r + '\n完整方案请见「体质调理」页面。';
+    }
+    return '🧬 体质分类：木/火/土/金/水 五型，各有饮食+穴位+忌宜。\n请提供生辰进行个性化分析，访问「体质调理」页面。';
+  }
   if (/婚姻|感情|桃花|恋爱|对象|单身/.test(text)) return '━━━ 感情婚姻分析报告 ━━━\n\n【桃花星分析】\n- 日支带子午卯酉→天生桃花旺，异性缘佳\n- 桃花逢合→感情顺利\n- 桃花逢冲→感情波折\n\n【正缘判断】\n- 男命：正财星为妻，流年引正财则婚至\n- 女命：正官星为夫，流年引正官则嫁期\n- 日柱天合地合→夫妻恩爱\n\n【合婚要点】\n1. 五行互补→双方八字五行互相补缺为上婚\n2. 日柱相生→天干相生地支相合为中婚\n3. 生肖三合/六合→鼠龙猴/牛蛇鸡/虎马狗/兔羊猪\n4. 忌六冲→子午冲/丑未冲/寅申冲/卯酉冲/辰戌冲/巳亥冲\n\n【感情调理】\n- 桃花位：卧室桃花位放鲜花（生肖对应方位）\n- 粉水晶：增旺人缘桃花\n- 红绳：左手佩戴招正缘\n\n请提供生辰（或双方生辰），可做深度感情/合婚分析。';
   if (/子女|孩子|怀孕|生育/.test(text)) return '━━━ 子女缘分分析报告 ━━━\n\n【子女星】\n- 男命：官杀为子女星，七杀为儿子、正官为女儿\n- 女命：食伤为子女星，食神为女儿、伤官为儿子\n- 子女星为喜用→子女孝顺有出息\n- 子女星为忌神→子女操心费力\n\n【子女宫】\n- 时柱为子女宫\n- 时柱逢冲→子女缘薄或远离\n- 时柱逢合→子女孝顺在身边\n- 时柱空亡→子女缘淡\n\n【备孕择时】\n- 选流年行食伤/官杀运时怀孕→子女八字好\n- 避开冲时柱的年份怀孕\n- 孕期宜安胎（宜静不宜动）\n\n【子女教育】\n- 金型孩子→刚毅，宜军警/体育\n- 木型孩子→向上，宜教育/文化\n- 水型孩子→聪明，宜科研/艺术\n- 火型孩子→热情，宜管理/表演\n- 土型孩子→稳重，宜房产/政务\n\n请提供生辰，可分析您的子女缘深浅和子女方向。';
   if (/事业|工作|职场|创业|跳槽/.test(text)) return '━━━ 事业分析报告 ━━━\n\n【官运判断】\n- 正官旺→适合体制内/大企业管理\n- 七杀旺→适合创业/军警/竞争性行业\n- 正印旺→适合教育/研究/文化\n- 食神旺→适合餐饮/艺术/创意\n- 伤官旺→适合技术/设计/自由职业\n- 比劫旺→适合合伙/体育/销售\n- 正财旺→适合金融/财务/经商\n- 偏财旺→适合投资/投机/贸易\n\n【行业五行对照】\n金：金融/机械/珠宝/法律/IT硬件\n木：教育/出版/农业/服装/家具\n水：物流/旅游/水产/通信/贸易\n火：电子/餐饮/能源/传媒/美容\n土：房产/陶瓷/建筑/政务/矿业\n\n【创业时机】\n- 大运行喜用神运→创业黄金期\n- 流年触发财官→升职加薪\n- 忌比劫运→不宜合伙，防破财\n\n【跳槽建议】\n- 流年冲官星→宜变动\n- 流年合官星→宜稳定\n\n请提供生辰，可分析您的事业方向和最佳创业时机。';
@@ -613,11 +648,78 @@ app.get('/api/admin/kb/search', (req, res) => {
   } catch(e){ res.json({ error: e.message }); }
 });
 
+// === 公共 KB 统计（免 JWT）===
+app.get('/api/public/kb/stats', (req, res) => {
+  try {
+    if (!db) return res.json({ error: '数据库未就绪' });
+    const total = db.prepare('SELECT COUNT(*) as c FROM kb_formal').get().c;
+    const hi = db.prepare('SELECT COUNT(*) as c FROM kb_formal WHERE trust_score>=0.7').get().c;
+    const hits = db.prepare('SELECT COALESCE(SUM(hit_count),0) as c FROM kb_formal').get().c;
+    const topModules = db.prepare(`SELECT module, COUNT(*) as cnt, COALESCE(SUM(hit_count),0) as hits FROM kb_formal GROUP BY module ORDER BY hits DESC LIMIT 8`).all();
+    res.json({ total, hi_trust: hi, total_hits: hits, top_modules: topModules });
+  } catch(e){ res.json({ total: 0, hi_trust: 0, total_hits: 0, top_modules: [], error: e.message }); }
+});
+
+// === 公共 KB 直答命中统计（按模块） ===
+app.get('/api/public/kb/hits', (req, res) => {
+  try {
+    if (!db) return res.json({ error: '数据库未就绪' });
+    const today = new Date().toISOString().slice(0, 10);
+    const rows = db.prepare(`SELECT module, COUNT(*) as hits FROM kb_formal WHERE last_hit >= ? GROUP BY module ORDER BY hits DESC`).all(today);
+    const total = rows.reduce((s, r) => s + r.hits, 0);
+    res.json({ date: today, total, modules: rows });
+  } catch(e){ res.json({ date: '', total: 0, modules: [], error: e.message }); }
+});
+
+// === 公共 KB 检索（免 JWT，限频）===
+app.get('/api/public/kb/search', (req, res) => {
+  try {
+    if (!db) return res.json({ error: '数据库未就绪' });
+    const q = (req.query.q || '').trim();
+    if (!q) return res.json({ results: [] });
+    const ip = req.ip || req.connection.remoteAddress;
+    if (!sec.rateLimit("kb_pub_" + ip, 30, 60000)) return res.status(429).json({ error: 'RATE_LIMITED' });
+    const rows = db.prepare(`SELECT module, title, substr(content, 1, 320) as snippet, trust_score, hit_count FROM kb_formal WHERE (title LIKE ? OR content LIKE ?) AND trust_score >= 0.5 ORDER BY trust_score DESC, hit_count DESC LIMIT 8`).all('%'+q+'%', '%'+q+'%');
+    // 打点
+    if (rows.length) {
+      try {
+        rows.forEach(r => db.prepare(`UPDATE kb_formal SET hit_count = hit_count + 1, last_hit = CURRENT_TIMESTAMP WHERE title = ? AND module = ?`).run(r.title, r.module));
+        db.prepare(`INSERT INTO kb_hit_log (q, module, src, ts) VALUES (?, ?, 'public-search', datetime('now','localtime'))`).run(q, rows[0].module);
+      } catch(e){}
+    }
+    res.json({ results: rows });
+  } catch(e){ res.json({ results: [], error: e.message }); }
+});
+
 app.post('/api/ai/public-chat', async (req, res) => {
   let messages = req.body.messages;
   const model = req.body.model || (AI_PROVIDER === "ollama" ? OLLAMA_MODEL : "auto");
   const baziData = req.body.baziData || null;
   if (!messages || !Array.isArray(messages)) return res.json({ error: "参数错误" });
+
+  // === R49-B KB 优先：命中分 ≥ 0.85 直接 KB 直答（省 AI 调用）===
+  const lastUserMsg = messages.filter(m => m.role === "user").pop();
+  if (lastUserMsg && db) {
+    const q = String(lastUserMsg.content || "").trim();
+    if (q.length >= 2 && q.length <= 200) {
+      try {
+        const kw = q.split(/\s+/).filter(w => w.length >= 2).slice(0, 3);
+        if (kw.length === 0) throw new Error('no keyword');
+        const conds = kw.map(() => '(title LIKE ? OR content LIKE ?)').join(' OR ');
+        const params = kw.flatMap(w => ['%'+w+'%', '%'+w+'%']);
+        const topKb = db.prepare(`SELECT entry_id, module, title, substr(content, 1, 600) as excerpt, trust_score FROM kb_formal WHERE (${conds}) AND trust_score >= 0.8 ORDER BY trust_score DESC, hit_count DESC LIMIT 1`).all(...params);
+        if (topKb.length && topKb[0].trust_score >= 0.8) {
+          db.prepare(`UPDATE kb_formal SET hit_count = hit_count + 1, last_hit = CURRENT_TIMESTAMP WHERE entry_id = ?`).run(topKb[0].entry_id);
+          const mod = topKb[0].module;
+          const modLabel = {nihaixia:'🪷 倪海厦',tcm:'💊 中医',bazi:'📜 八字',shuhan:'🎓 舒晗',ziwei:'⭐ 紫微',qimen:'🌀 奇门',fengshui:'🏠 风水',faith:'🙏 信仰',huajie:'⚖️ 化解',mantra:'📿 咒语',yijing:'☯ 易经'}[mod] || ('📚 '+mod);
+          return res.json({
+            choices: [{ message: { content: modLabel + '知识库（直答）\n\n【'+topKb[0].title+'】\n'+topKb[0].excerpt+'\n\n——来源: KB 命中（高置信度 ' + topKb[0].trust_score + '）' } }],
+            _local: true, _kb_hit: true, kb_module: mod, kb_score: topKb[0].trust_score
+          });
+        }
+      } catch(e) {}
+    }
+  }
 
   // === Ollama 路径无需 API key，直接走 ===
   if (AI_PROVIDER === "ollama") {
@@ -1900,6 +2002,77 @@ app.get('/api/public/kb-list', (req, res) => {
     res.json({ files, public: true });
   } catch (e) {
     res.json({ files: [] });
+  }
+});
+
+// === R49-B 全局 KB 管理端点（查询/统计/入库/批量提分）===
+app.get('/api/public/kb-manager/stats', (req, res) => {
+  try {
+    const byModule = db.prepare(`SELECT module, COUNT(*) as cnt, ROUND(AVG(trust_score),3) as avg_score FROM kb_formal GROUP BY module ORDER BY cnt DESC`).all();
+    const byScore = db.prepare(`SELECT CASE WHEN trust_score >= 0.9 THEN 'A-权威(>=0.9)' WHEN trust_score >= 0.8 THEN 'B-高(0.8-0.9)' WHEN trust_score >= 0.7 THEN 'C-中(0.7-0.8)' ELSE 'D-低(<0.7)' END as grade, COUNT(*) as cnt FROM kb_formal GROUP BY grade ORDER BY grade`).all();
+    const byCat = db.prepare(`SELECT category, COUNT(*) as cnt FROM kb_formal GROUP BY category ORDER BY cnt DESC`).all();
+    const total = db.prepare(`SELECT COUNT(*) as cnt FROM kb_formal`).get().cnt;
+    const totalHit = db.prepare(`SELECT COALESCE(SUM(hit_count),0) as h FROM kb_formal`).get().h;
+    const r48Count = db.prepare(`SELECT COUNT(*) as cnt FROM kb_formal WHERE entry_id LIKE '%r48%'`).get().cnt;
+    res.json({ total, totalHit, r48Count, byModule, byScore, byCat, ts: Date.now() });
+  } catch (e) {
+    res.json({ error: String(e.message) });
+  }
+});
+
+// 按模块查 KB（带 trust_score 过滤）
+app.get('/api/public/kb-manager/list', (req, res) => {
+  try {
+    const { module, minScore = 0, limit = 50 } = req.query;
+    let sql = 'SELECT entry_id, module, category, title, substr(content,1,120) as preview, trust_score, hit_count, version, status FROM kb_formal WHERE trust_score >= ?';
+    const params = [parseFloat(minScore)];
+    if (module) { sql += ' AND module = ?'; params.push(module); }
+    sql += ' ORDER BY trust_score DESC, hit_count DESC LIMIT ?';
+    params.push(parseInt(limit));
+    const items = db.prepare(sql).all(...params);
+    res.json({ items, count: items.length });
+  } catch (e) {
+    res.json({ error: String(e.message), items: [] });
+  }
+});
+
+// 批量提升 trust_score（按 module 或 pattern）
+app.post('/api/public/kb-manager/bump', (req, res) => {
+  try {
+    const { module, pattern, newScore = 0.85, dryRun = true } = req.body;
+    if (!module && !pattern) return res.json({ error: '需 module 或 pattern' });
+    let sql, params;
+    if (pattern) {
+      sql = 'SELECT entry_id, trust_score FROM kb_formal WHERE entry_id LIKE ?';
+      params = [pattern];
+    } else {
+      sql = 'SELECT entry_id, trust_score FROM kb_formal WHERE module = ?';
+      params = [module];
+    }
+    const items = db.prepare(sql).all(...params);
+    if (!dryRun) {
+      const upd = db.prepare('UPDATE kb_formal SET trust_score = ? WHERE entry_id = ?');
+      for (const it of items) upd.run(newScore, it.entry_id);
+    }
+    res.json({ matched: items.length, sample: items.slice(0,5), dryRun, newScore });
+  } catch (e) {
+    res.json({ error: String(e.message) });
+  }
+});
+
+// KB 全局搜索（title+content，限模块）
+app.get('/api/public/kb-manager/search', (req, res) => {
+  try {
+    const { q, module, limit = 10 } = req.query;
+    if (!q || q.length < 2) return res.json({ items: [] });
+    let sql = `SELECT entry_id, module, title, substr(content,1,200) as preview, trust_score, hit_count FROM kb_formal WHERE (title LIKE ? OR content LIKE ?)`;
+    const params = ['%'+q+'%', '%'+q+'%'];
+    if (module) { sql += ' AND module = ?'; params.push(module); }
+    sql += ' ORDER BY trust_score DESC LIMIT ?';
+    params.push(parseInt(limit));
+    res.json({ items: db.prepare(sql).all(...params) });
+  } catch (e) {
+    res.json({ error: String(e.message), items: [] });
   }
 });
 

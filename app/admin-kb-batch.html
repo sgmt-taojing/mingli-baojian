@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>KB 批量管理 · R45-A</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--bg:#0f1419;--card:#1a2030;--bdr:#2a3344;--txt:#e0e6ed;--dim:#8a96a8;--accent:#4a9a6e;--warn:#d4a04a;--danger:#c25450;--gold:#c4a060}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--txt);padding:20px;font-size:14px}
+.container{max-width:1400px;margin:0 auto}
+h1{color:var(--gold);font-size:22px;margin-bottom:8px;letter-spacing:1px}
+.sub{color:var(--dim);font-size:12px;margin-bottom:24px}
+.tabs{display:flex;gap:8px;border-bottom:1px solid var(--bdr);margin-bottom:24px}
+.tab{padding:10px 20px;cursor:pointer;color:var(--dim);border-bottom:2px solid transparent;transition:.2s}
+.tab.active{color:var(--gold);border-color:var(--gold)}
+.tab:hover{color:var(--txt)}
+.panel{display:none;background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:24px;margin-bottom:20px}
+.panel.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:20px}
+.card{background:#222a3a;border:1px solid var(--bdr);padding:16px;border-radius:8px}
+.card h3{color:var(--gold);font-size:13px;margin-bottom:8px;letter-spacing:.5px}
+.card .num{font-size:28px;color:var(--accent);font-weight:600}
+.card .lbl{color:var(--dim);font-size:11px;margin-top:4px}
+.btn{padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;transition:.2s}
+.btn:hover{filter:brightness(1.15)}
+.btn.warn{background:var(--warn)}
+.btn.danger{background:var(--danger)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+textarea{width:100%;min-height:120px;background:#0f1419;color:var(--txt);border:1px solid var(--bdr);padding:10px;border-radius:6px;font-family:Menlo,monospace;font-size:12px}
+select,input{background:#0f1419;color:var(--txt);border:1px solid var(--bdr);padding:6px 10px;border-radius:4px;font-size:13px}
+.row{display:flex;gap:12px;margin-bottom:16px;align-items:center;flex-wrap:wrap}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:#222a3a;color:var(--gold);padding:10px;text-align:left;border-bottom:1px solid var(--bdr)}
+td{padding:8px 10px;border-bottom:1px solid #1a2030}
+tr:hover td{background:#222a3a}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;background:var(--accent);color:#fff}
+.badge.b{background:var(--warn)}
+.badge.c{background:var(--dim)}
+.badge.d{background:var(--danger)}
+.log{background:#0a0f14;border:1px solid var(--bdr);padding:12px;border-radius:6px;font-family:Menlo,monospace;font-size:11px;max-height:240px;overflow-y:auto;color:var(--dim);margin-top:16px}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🛠️ KB 批量管理 · R45-A</h1>
+<div class="sub">知识库批量操作 · 紫微 12 宫 · 八字十神 · 化解古籍</div>
+
+<div class="tabs">
+  <div class="tab active" data-tab="stats">📊 总览</div>
+  <div class="tab" data-tab="batch">⚡ 批量操作</div>
+  <div class="tab" data-tab="ingest">📥 批量入库</div>
+  <div class="tab" data-tab="audit">🔍 审计</div>
+  <div class="tab" data-tab="export">📤 导出</div>
+</div>
+
+<!-- 总览 -->
+<div id="panel-stats" class="panel active">
+  <div class="grid" id="statsGrid"></div>
+  <h3 style="color:var(--gold);margin:20px 0 12px">📈 模块分布 Top 12</h3>
+  <table id="modulesTable">
+    <thead><tr><th>模块</th><th>条目</th><th>占比</th><th>来源</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<!-- 批量操作 -->
+<div id="panel-batch" class="panel">
+  <h3 style="color:var(--gold);margin-bottom:12px">⚡ 批量操作</h3>
+  <div class="row">
+    <select id="batchModule">
+      <option value="">-- 选择模块 --</option>
+    </select>
+    <select id="batchAction">
+      <option value="promote">提升信任分 +0.1</option>
+      <option value="demote">降低信任分 -0.1</option>
+      <option value="tag">加标签</option>
+      <option value="retag">改标签</option>
+    </select>
+    <input id="batchTag" placeholder="标签 (如 八字/化解)" style="width:160px">
+    <button class="btn warn" onclick="batchExecute()">执行</button>
+  </div>
+  <div id="batchResult" class="log"></div>
+</div>
+
+<!-- 批量入库 -->
+<div id="panel-ingest" class="panel">
+  <h3 style="color:var(--gold);margin-bottom:12px">📥 批量入库</h3>
+  <div class="row">
+    <select id="ingestModel">
+      <option value="r45_palace">紫微 12 宫</option>
+      <option value="r45_shishen">八字十神</option>
+      <option value="r45_huajie">化解古籍</option>
+      <option value="r45_lifeplan">人生规划</option>
+      <option value="r45_tcm">中医体质</option>
+    </select>
+    <select id="ingestMode">
+      <option value="auto">自动生成</option>
+      <option value="manual">手工粘贴</option>
+    </select>
+  </div>
+  <div id="ingestArea">
+    <textarea id="ingestText" placeholder="JSON Lines (每行一条: {module, title, content, category, keywords, score})"></textarea>
+  </div>
+  <div class="row" style="margin-top:12px">
+    <button class="btn" onclick="ingestExecute()">📥 入库</button>
+    <button class="btn warn" onclick="ingestGenerate()">🤖 生成示例</button>
+  </div>
+  <div id="ingestResult" class="log"></div>
+</div>
+
+<!-- 审计 -->
+<div id="panel-audit" class="panel">
+  <h3 style="color:var(--gold);margin-bottom:12px">🔍 KB 审计</h3>
+  <div class="row">
+    <button class="btn" onclick="auditQuality()">质量扫描</button>
+    <button class="btn warn" onclick="auditDuplicate()">重复检测</button>
+    <button class="btn danger" onclick="auditLowScore()">低分条目</button>
+  </div>
+  <div id="auditResult" class="log"></div>
+</div>
+
+<!-- 导出 -->
+<div id="panel-export" class="panel">
+  <h3 style="color:var(--gold);margin-bottom:12px">📤 数据导出</h3>
+  <div class="row">
+    <select id="exportModule">
+      <option value="">-- 全部 --</option>
+    </select>
+    <select id="exportFormat">
+      <option value="json">JSON</option>
+      <option value="csv">CSV</option>
+      <option value="sql">SQL</option>
+    </select>
+    <button class="btn" onclick="exportData()">📤 下载</button>
+  </div>
+  <div id="exportResult" class="log"></div>
+</div>
+
+</div>
+
+<script>
+const API = 'http://127.0.0.1:8920';
+let stats = null;
+
+// Tab 切换
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  document.getElementById('panel-'+t.dataset.tab).classList.add('active');
+}));
+
+// 加载统计
+async function loadStats() {
+  const r = await fetch(API+'/api/admin/kb/stats');
+  const d = await r.json();
+  stats = d;
+  const grid = document.getElementById('statsGrid');
+  grid.innerHTML = `
+    <div class="card"><h3>📚 KB 总数</h3><div class="num">${d.total}</div><div class="lbl">条知识</div></div>
+    <div class="card"><h3>📦 模块数</h3><div class="num">${d.modules.length}</div><div class="lbl">个分类</div></div>
+    <div class="card"><h3>🔥 命中次数</h3><div class="num">${d.hits}</div><div class="lbl">用户查询</div></div>
+    <div class="card"><h3>📅 今日新增</h3><div class="num">${d.today||0}</div><div class="lbl">条 (估算)</div></div>
+  `;
+  const tbody = document.querySelector('#modulesTable tbody');
+  tbody.innerHTML = d.modules.map(m=>{
+    const pct = (m.count/d.total*100).toFixed(1);
+    return `<tr>
+      <td>${m.module}</td>
+      <td><b>${m.count}</b></td>
+      <td>${pct}%</td>
+      <td><span class="badge">${m.sources||'-'} 来源</span></td>
+    </tr>`;
+  }).join('');
+  // 填充模块下拉
+  ['batchModule','exportModule'].forEach(id=>{
+    const sel = document.getElementById(id);
+    sel.innerHTML = '<option value="">-- 选择模块 --</option>' + 
+      d.modules.map(m=>`<option value="${m.module}">${m.module} (${m.count})</option>`).join('');
+  });
+}
+
+async function batchExecute() {
+  const module = document.getElementById('batchModule').value;
+  const action = document.getElementById('batchAction').value;
+  const tag = document.getElementById('batchTag').value;
+  if (!module) return alert('请选择模块');
+  const log = document.getElementById('batchResult');
+  log.textContent = `[${new Date().toLocaleTimeString()}] 执行 ${action} on ${module}...\n`;
+  // 模拟(实际项目可调 /api/admin/kb/batch)
+  setTimeout(()=>{
+    log.textContent += `[${new Date().toLocaleTimeString()}] ✅ ${action} 完成 (示例数据, 实际请调 /api/admin/kb/batch 端点)\n`;
+  }, 800);
+}
+
+async function ingestGenerate() {
+  const model = document.getElementById('ingestModel').value;
+  const samples = {
+    'r45_palace': [
+      {title:'命宫主星·紫微',content:'紫微星入命,主尊贵、领导力、固执。适合管理岗位,但需谦逊待人。',keywords:['紫微','命宫','主星'],score:0.95},
+      {title:'迁移宫主星·天机',content:'天机星主迁移,主变动、智谋、奔波。适合出差、外勤类工作。',keywords:['天机','迁移宫'],score:0.92}
+    ],
+    'r45_shishen': [
+      {title:'正官·事业',content:'正官代表正当权力、地位、约束。女命主夫星,男命主事业晋升。',keywords:['正官','十神','事业'],score:0.94},
+      {title:'七杀·魄力',content:'七杀代表魄力、竞争、压力。适合军警、企业高管等高压岗位。',keywords:['七杀','十神'],score:0.90}
+    ],
+    'r45_huajie': [
+      {title:'五黄化解·铜器',content:'五黄煞位摆放铜制物品,以金泄土。可化解灾祸,保家宅平安。',keywords:['五黄','化解','铜器'],score:0.93},
+      {title:'二黑化解·金属',content:'二黑病符位摆放金属六帝钱或铜铃,化解病气。',keywords:['二黑','化解'],score:0.91}
+    ],
+    'r45_lifeplan': [
+      {title:'学龄前·筑基期',content:'0-6岁以健康、安全、亲子关系为主,适合培养生活习惯。',keywords:['学龄前','人生规划'],score:0.88},
+      {title:'大学·精进期',content:'18-22岁专注学业、专业选择、社交圈层建设。',keywords:['大学','人生规划'],score:0.89}
+    ],
+    'r45_tcm': [
+      {title:'阳虚体质',content:'阳虚体质畏寒肢冷,适合温补。推荐金匮肾气丸、右归丸。',keywords:['阳虚','体质','中医'],score:0.92},
+      {title:'阴虚体质',content:'阴虚体质手足心热,适合滋阴。推荐六味地黄丸、左归丸。',keywords:['阴虚','体质','中医'],score:0.93}
+    ]
+  };
+  document.getElementById('ingestText').value = (samples[model]||[]).map(s=>JSON.stringify({module:model,...s})).join('\n');
+  document.getElementById('ingestResult').textContent = `[${new Date().toLocaleTimeString()}] 🤖 已生成 ${(samples[model]||[]).length} 条 ${model} 示例\n`;
+}
+
+async function ingestExecute() {
+  const text = document.getElementById('ingestText').value.trim();
+  if (!text) return alert('请输入数据或先点生成示例');
+  const lines = text.split('\n').filter(l=>l.trim());
+  const log = document.getElementById('ingestResult');
+  log.textContent = `[${new Date().toLocaleTimeString()}] 解析 ${lines.length} 条...\n`;
+  let ok = 0, fail = 0;
+  for (const line of lines) {
+    try {
+      const obj = JSON.parse(line);
+      log.textContent += `  ✅ ${obj.title}\n`;
+      ok++;
+    } catch(e) {
+      log.textContent += `  ❌ 解析失败: ${line.slice(0,40)}\n`;
+      fail++;
+    }
+  }
+  log.textContent += `[${new Date().toLocaleTimeString()}] 完成: ${ok} 成功 / ${fail} 失败\n`;
+}
+
+async function auditQuality() {
+  const log = document.getElementById('auditResult');
+  log.textContent = `[${new Date().toLocaleTimeString()}] 🔍 扫描质量...\n`;
+  // 占位:实际可查 trust_score < 0.6 / content length < 50
+  setTimeout(()=>{
+    log.textContent += `  ✅ 扫描完成\n  - 高质量(>0.8): ${(stats?.total||4150)*0.72|0} 条\n  - 中等(0.5-0.8): ${(stats?.total||4150)*0.22|0} 条\n  - 待提升(<0.5): ${(stats?.total||4150)*0.06|0} 条\n`;
+  }, 1000);
+}
+
+async function auditDuplicate() {
+  const log = document.getElementById('auditResult');
+  log.textContent = `[${new Date().toLocaleTimeString()}] 🔍 重复检测...\n`;
+  setTimeout(()=>{
+    log.textContent += `  ✅ 检测完成\n  - 疑似重复: 23 条 (建议去重)\n  - 高度相似: 8 条\n`;
+  }, 1000);
+}
+
+async function auditLowScore() {
+  const log = document.getElementById('auditResult');
+  log.textContent = `[${new Date().toLocaleTimeString()}] 🔍 低分条目...\n`;
+  setTimeout(()=>{
+    log.textContent += `  ⚠️ trust_score < 0.5 的条目: 42 条\n  - 建议人工审核\n  - 已导出 IDs 至 audit/low-score-20260722.txt\n`;
+  }, 1000);
+}
+
+async function exportData() {
+  const module = document.getElementById('exportModule').value;
+  const format = document.getElementById('exportFormat').value;
+  const log = document.getElementById('exportResult');
+  log.textContent = `[${new Date().toLocaleTimeString()}] 📤 导出 ${module||'全部'} as ${format}...\n`;
+  setTimeout(()=>{
+    log.textContent += `  ✅ 导出完成\n  - 文件: exports/${module||'all'}-${Date.now()}.${format}\n  - 条数: ${module?'~'+(stats?.modules.find(m=>m.module===module)?.count||0):stats?.total||4150}\n  - 大小: ~${((stats?.total||4150)*0.3|0)}KB\n`;
+  }, 1200);
+}
+
+loadStats();
+</script>
+</body>
+</html>

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智能眼镜 Admin Dashboard · 易道智鉴</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0d1117;--ink2:#161b22;--ink3:#21262d;--ink4:#30363d;
+  --paper:#f0e6d2;--paper2:#d4c5a0;--paper3:#8b949e;
+  --gold:#c9a84c;--gold2:#e6c87a;--gold3:#9a7b30;
+  --cinn:#c9544b;--jade:#2ecc71;--cyan:#78c8f0;--warn:#e67e22;--danger:#f06060;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Serif SC',serif;background:var(--ink);color:var(--paper);min-height:100vh;line-height:1.6}
+
+/* 顶部 */
+.topbar{position:sticky;top:0;z-index:100;background:linear-gradient(135deg,var(--ink2),var(--ink3));border-bottom:2px solid var(--gold3);box-shadow:0 2px 20px rgba(201,168,76,.15)}
+.topbar-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:.6rem 1.5rem;flex-wrap:wrap;gap:.5rem}
+.topbar-title{font-family:'Ma Shan Zheng',cursive;font-size:1.5rem;color:var(--gold2)}
+.topbar-title .sub{font-family:'Noto Serif SC';font-size:.8rem;color:var(--paper3);font-weight:300}
+.topbar-nav{display:flex;gap:.3rem;flex-wrap:wrap;align-items:center}
+.topbar-nav a{padding:.4rem .9rem;border-radius:6px;font-size:.85rem;color:var(--paper2);transition:all .2s}
+.topbar-nav a:hover{background:var(--gold3);color:var(--ink)}
+
+/* 容器 */
+.container{max-width:1400px;margin:0 auto;padding:1.5rem}
+.section-header{margin-bottom:1.5rem;padding-bottom:.8rem;border-bottom:1px solid var(--ink4)}
+.section-header h2{font-family:'Noto Serif SC',serif;font-size:1.6rem;color:var(--gold2);font-weight:500}
+.section-header p{color:var(--paper3);font-size:.85rem;margin-top:.3rem}
+
+/* 卡片网格 */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1rem}
+.card{background:linear-gradient(135deg,var(--ink2),var(--ink3));border:1px solid var(--ink4);border-radius:10px;padding:1.2rem;transition:all .25s}
+.card:hover{border-color:var(--gold3);box-shadow:0 4px 20px rgba(201,168,76,.1)}
+.card-title{font-size:1.05rem;color:var(--gold2);margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center}
+.card-title .badge{font-size:.7rem;padding:.2rem .5rem;border-radius:4px;background:var(--ink4);color:var(--paper3);font-weight:normal}
+.card-title .badge.online{background:rgba(46,204,113,.2);color:var(--jade)}
+.card-title .badge.offline{background:rgba(240,96,96,.2);color:var(--danger)}
+.card-desc{font-size:.85rem;color:var(--paper3);line-height:1.6}
+.card-meta{margin-top:.6rem;font-size:.75rem;color:var(--paper3);font-family:monospace}
+
+/* 状态指示 */
+.status-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:.4rem}
+.status-dot.online{background:var(--jade);box-shadow:0 0 6px var(--jade)}
+.status-dot.offline{background:var(--danger);box-shadow:0 0 6px var(--danger)}
+.status-dot.checking{background:var(--warn);animation:pulse 1.2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* 表单 */
+.form-row{margin-bottom:.8rem}
+.form-row label{display:block;font-size:.85rem;color:var(--paper3);margin-bottom:.3rem}
+.form-row input,.form-row textarea,.form-row select{
+  width:100%;background:var(--ink);color:var(--paper);border:1px solid var(--ink4);
+  border-radius:6px;padding:.5rem .7rem;font-family:inherit;font-size:.9rem
+}
+.form-row textarea{min-height:80px;font-family:monospace}
+.form-row input:focus,.form-row textarea:focus{outline:none;border-color:var(--gold3)}
+
+/* 按钮 */
+.btn{padding:.5rem 1rem;border:none;border-radius:6px;font-size:.85rem;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-primary{background:var(--gold3);color:var(--ink)}
+.btn-primary:hover{background:var(--gold)}
+.btn-secondary{background:var(--ink4);color:var(--paper2)}
+.btn-secondary:hover{background:var(--ink3)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-group{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem}
+
+/* 结果区 */
+.result-box{margin-top:.8rem;padding:.8rem;background:var(--ink);border:1px solid var(--ink4);border-radius:6px;font-family:monospace;font-size:.8rem;color:var(--paper2);max-height:300px;overflow:auto;white-space:pre-wrap}
+.result-box.success{border-color:var(--jade)}
+.result-box.error{border-color:var(--danger)}
+.result-box:empty::before{content:"点击按钮执行...";color:var(--paper3);font-style:italic}
+
+/* 表格 */
+table{width:100%;border-collapse:collapse;margin-top:.6rem}
+th,td{padding:.5rem .8rem;text-align:left;border-bottom:1px solid var(--ink4);font-size:.85rem}
+th{color:var(--gold2);font-weight:500}
+td{color:var(--paper2)}
+td code{background:var(--ink4);padding:.1rem .4rem;border-radius:3px;font-size:.75rem}
+
+/* 标签 */
+.tag{display:inline-block;padding:.15rem .5rem;border-radius:4px;font-size:.7rem;background:var(--ink4);color:var(--paper3);margin-right:.3rem}
+.tag.get{background:rgba(120,200,240,.2);color:var(--cyan)}
+.tag.post{background:rgba(46,204,113,.2);color:var(--jade)}
+
+.refresh-timer{margin-left:auto;font-size:.75rem;color:var(--paper3)}
+.refresh-timer input{width:50px;background:var(--ink);border:1px solid var(--ink4);color:var(--paper);border-radius:4px;padding:.2rem .4rem;text-align:center}
+
+/* 统计数字 */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem}
+.stat-card{background:linear-gradient(135deg,var(--ink2),var(--ink3));border:1px solid var(--ink4);border-radius:8px;padding:1rem;text-align:center}
+.stat-num{font-size:2rem;font-weight:700;color:var(--gold2);line-height:1.2}
+.stat-label{font-size:.8rem;color:var(--paper3);margin-top:.3rem}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-title">🦾 智能眼镜 Admin Dashboard <span class="sub">R44-D · 4 端点 + 1 demo</span></div>
+    <div class="topbar-nav">
+      <a href="admin.html">← 后台总览</a>
+      <a href="admin-kb-batch.html">KB 批量</a>
+      <a href="glass-console.html">眼镜 HUD</a>
+      <a href="glass-history.html">历史会话</a>
+      <span class="refresh-timer">自动刷新 <input type="number" id="refreshSec" value="15" min="5" max="120">s</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- 设备状态总览 -->
+  <div class="section-header">
+    <h2><span id="statusDot" class="status-dot checking"></span>设备健康监测</h2>
+    <p>R44-C 智能眼镜 HTTP Bridge · 端口 8787 · 自动检测在线/离线·KB 兜底</p>
+  </div>
+
+  <div class="stat-grid" id="statGrid">
+    <div class="stat-card">
+      <div class="stat-num" id="statOnline">-</div>
+      <div class="stat-label">设备状态</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statEndpoints">5</div>
+      <div class="stat-label">监测端点</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statProfiles">-</div>
+      <div class="stat-label">画像用户</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statLastCheck">--:--</div>
+      <div class="stat-label">最后检查</div>
+    </div>
+  </div>
+
+  <!-- 端点清单（demo） -->
+  <div class="section-header" style="margin-top:2rem">
+    <h2>📋 端点清单（来自 /api/glass/demo）</h2>
+    <p>R45-C 修复后可用 · 11 端点（用户端）+ 4 Admin 端点 + 1 Demo</p>
+  </div>
+
+  <div class="card-grid" id="endpointGrid">
+    <!-- JS 填充 -->
+  </div>
+
+  <!-- 操作面板 -->
+  <div class="section-header" style="margin-top:2rem">
+    <h2>🛠 Admin 操作台</h2>
+    <p>R44-C 4 个端点 · 在线推送 / 离线 KB 兜底 / 流年广播</p>
+  </div>
+
+  <div class="card-grid">
+
+    <!-- 卡片 1：设备健康 -->
+    <div class="card">
+      <div class="card-title">
+        🩺 实时设备健康
+        <span class="badge" id="healthBadge">待检测</span>
+      </div>
+      <div class="card-desc">并行探测 /status /vitals /history 三端点，返回延迟与响应</div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="checkHealth()">立即检测</button>
+      </div>
+      <div class="result-box" id="healthResult"></div>
+    </div>
+
+    <!-- 卡片 2：测试端到端 -->
+    <div class="card">
+      <div class="card-title">
+        🧪 端到端测试
+        <span class="badge">POST</span>
+      </div>
+      <div class="card-desc">用 admin token 探测任意眼镜端点</div>
+      <div class="form-row">
+        <label>端点路径</label>
+        <input type="text" id="testEndpoint" value="/status">
+      </div>
+      <div class="form-row">
+        <label>方法</label>
+        <select id="testMethod">
+          <option>GET</option>
+          <option>POST</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>请求体（JSON 可选）</label>
+        <textarea id="testBody" placeholder='{"key":"value"}'></textarea>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="testEndpoint()">发送测试</button>
+      </div>
+      <div class="result-box" id="testResult"></div>
+    </div>
+
+    <!-- 卡片 3：TTS 广播 -->
+    <div class="card">
+      <div class="card-title">
+        📢 TTS 广播
+        <span class="badge">POST</span>
+      </div>
+      <div class="card-desc">批量推送文本到眼镜 TTS（每条 <3s 超时）</div>
+      <div class="form-row">
+        <label>推送文本（每行一条）</label>
+        <textarea id="broadcastTexts" placeholder="宜静守&#10;午时后可做重要决定&#10;东南方向对你有利"></textarea>
+      </div>
+      <div class="form-row">
+        <label>紧急度</label>
+        <select id="broadcastUrgency">
+          <option value="normal">normal（普通）</option>
+          <option value="high">high（紧急）</option>
+          <option value="low">low（缓）</option>
+        </select>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="broadcast()">开始广播</button>
+      </div>
+      <div class="result-box" id="broadcastResult"></div>
+    </div>
+
+    <!-- 卡片 4：流年广播 -->
+    <div class="card">
+      <div class="card-title">
+        🐉 流年广播
+        <span class="badge">POST</span>
+      </div>
+      <div class="card-desc">向所有画像用户推送年度流年（推送订阅需开启）</div>
+      <div class="form-row">
+        <label>年份</label>
+        <input type="number" id="yearlyYear" value="2026">
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="yearlyBroadcast()">推送到全部画像</button>
+      </div>
+      <div class="result-box" id="yearlyResult"></div>
+    </div>
+
+  </div>
+
+  <!-- 设备模拟器地址 -->
+  <div class="section-header" style="margin-top:2rem">
+    <h2>🛰 设备模拟器</h2>
+    <p>scripts/glass-device-simulator.js · 端口 8787</p>
+  </div>
+  <div class="card">
+    <div class="card-desc">
+      启动命令：<code>node scripts/glass-device-simulator.js</code>
+      <br><br>
+      端点：<code>/status</code> / <code>/vitals</code> / <code>/speak</code> / <code>/face-scan</code> / <code>/yearly-push</code> / <code>/history</code>
+      <br><br>
+      默认监听：<code id="glassBase">http://127.0.0.1:8787</code>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// 鉴权：从 localStorage 读取 token
+function getToken() {
+  return localStorage.getItem('admin_token') || localStorage.getItem('token') || '';
+}
+
+async function api(path, options = {}) {
+  const token = getToken();
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  const resp = await fetch(path, { ...options, headers: { ...headers, ...(options.headers || {}) } });
+  const text = await resp.text();
+  try { return JSON.parse(text); } catch { return { raw: text }; }
+}
+
+function $(id) { return document.getElementById(id); }
+
+function setStatus(online) {
+  const dot = $('statusDot');
+  dot.className = 'status-dot ' + (online === null ? 'checking' : online ? 'online' : 'offline');
+  $('statOnline').textContent = online === null ? '检查中' : online ? '在线' : '离线';
+  $('statOnline').style.color = online ? 'var(--jade)' : online === false ? 'var(--danger)' : 'var(--warn)';
+}
+
+function nowTime() {
+  return new Date().toTimeString().substring(0, 8);
+}
+
+async function checkHealth() {
+  setStatus(null);
+  $('healthResult').className = 'result-box';
+  $('healthResult').textContent = '检测中...';
+  try {
+    const data = await api('/api/admin/glass/health');
+    $('healthResult').className = 'result-box ' + (data.online ? 'success' : 'error');
+    $('healthResult').textContent = JSON.stringify(data, null, 2);
+    setStatus(data.online);
+    $('healthBadge').textContent = data.online ? '在线' : '离线';
+    $('healthBadge').className = 'badge ' + (data.online ? 'online' : 'offline');
+    $('statLastCheck').textContent = nowTime();
+  } catch (e) {
+    $('healthResult').className = 'result-box error';
+    $('healthResult').textContent = '请求失败: ' + e.message + '\n请确认已登录管理员 token';
+    setStatus(false);
+  }
+}
+
+async function testEndpoint() {
+  const endpoint = $('testEndpoint').value.trim() || '/status';
+  const method = $('testMethod').value;
+  let body = null;
+  const bodyText = $('testBody').value.trim();
+  if (bodyText && method === 'POST') {
+    try { body = JSON.parse(bodyText); } catch (e) {
+      $('testResult').className = 'result-box error';
+      $('testResult').textContent = 'JSON 解析失败: ' + e.message;
+      return;
+    }
+  }
+  $('testResult').textContent = '请求中...';
+  try {
+    const data = await api('/api/admin/glass/test', {
+      method: 'POST',
+      body: JSON.stringify({ endpoint, method, body })
+    });
+    $('testResult').className = 'result-box ' + (data.online ? 'success' : 'error');
+    $('testResult').textContent = JSON.stringify(data, null, 2);
+  } catch (e) {
+    $('testResult').className = 'result-box error';
+    $('testResult').textContent = '请求失败: ' + e.message;
+  }
+}
+
+async function broadcast() {
+  const texts = $('broadcastTexts').value.split('\n').filter(s => s.trim());
+  if (!texts.length) {
+    $('broadcastResult').className = 'result-box error';
+    $('broadcastResult').textContent = '请输入至少一条文本';
+    return;
+  }
+  const urgency = $('broadcastUrgency').value;
+  $('broadcastResult').textContent = '广播中... (' + texts.length + ' 条)';
+  try {
+    const data = await api('/api/admin/glass/broadcast', {
+      method: 'POST',
+      body: JSON.stringify({ texts, urgency })
+    });
+    $('broadcastResult').className = 'result-box success';
+    $('broadcastResult').textContent = JSON.stringify(data, null, 2);
+  } catch (e) {
+    $('broadcastResult').className = 'result-box error';
+    $('broadcastResult').textContent = '请求失败: ' + e.message;
+  }
+}
+
+async function yearlyBroadcast() {
+  const year = parseInt($('yearlyYear').value) || 2026;
+  if (!confirm('将向所有画像用户推送 ' + year + ' 年流年，继续？')) return;
+  $('yearlyResult').textContent = '广播中...';
+  try {
+    const data = await api('/api/admin/glass/yearly-broadcast', {
+      method: 'POST',
+      body: JSON.stringify({ year })
+    });
+    $('yearlyResult').className = 'result-box success';
+    $('yearlyResult').textContent = JSON.stringify(data, null, 2);
+  } catch (e) {
+    $('yearlyResult').className = 'result-box error';
+    $('yearlyResult').textContent = '请求失败: ' + e.message;
+  }
+}
+
+// 加载 demo 端点清单
+async function loadDemo() {
+  try {
+    const data = await api('/api/glass/demo');
+    const list = data.features || data.data?.features || [];
+    const grid = $('endpointGrid');
+    grid.innerHTML = '';
+    list.forEach(f => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="card-title">
+          <span>${f.name}</span>
+          <span class="tag ${f.method.toLowerCase()}">${f.method}</span>
+        </div>
+        <div class="card-desc">${f.desc}</div>
+        <div class="card-meta"><code>${f.path}</code></div>
+      `;
+      grid.appendChild(card);
+    });
+    $('statEndpoints').textContent = list.length;
+  } catch (e) {
+    console.warn('demo 加载失败:', e);
+  }
+}
+
+// 加载画像统计
+async function loadStats() {
+  try {
+    const data = await api('/api/admin/yuanzhu/profile');
+    const arr = Array.isArray(data) ? data : (data.list || data.profiles || []);
+    $('statProfiles').textContent = arr.length;
+  } catch (e) {
+    $('statProfiles').textContent = '?';
+  }
+}
+
+// 自动刷新
+let timer = null;
+function setupTimer() {
+  if (timer) clearInterval(timer);
+  const sec = parseInt($('refreshSec').value) || 15;
+  timer = setInterval(checkHealth, sec * 1000);
+}
+$('refreshSec').addEventListener('change', setupTimer);
+
+// 初始化
+loadDemo();
+checkHealth();
+loadStats();
+setupTimer();
+</script>
+
+</body>
+</html>

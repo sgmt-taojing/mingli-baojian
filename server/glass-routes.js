@@ -188,7 +188,6 @@ router.get('/devices', deviceAuth, async (req, res) => {
   }
 });
 
-module.exports = router;
 // === Glass 历史会话（按设备 token 查） ===
 router.get('/history', deviceAuth, async (req, res) => {
   try {
@@ -244,3 +243,34 @@ router.post('/history', deviceAuth, async (req, res) => {
     return fail(res, 500001, '历史会话保存失败: ' + e.message);
   }
 });
+
+// === Glass demo 端点（R45-C 修复） ===
+router.get('/demo', (req, res) => {
+  try {
+    return ok(res, {
+      mode: 'demo',
+      features: [
+        { name: 'fortune-today', desc: '今日运势', method: 'GET', path: '/api/glass/fortune-today' },
+        { name: 'health-tips', desc: '健康提示', method: 'GET', path: '/api/glass/health-tips' },
+        { name: 'ai-suggestions', desc: 'AI 引导建议', method: 'GET', path: '/api/glass/ai-suggestions' },
+        { name: 'devices', desc: '设备列表', method: 'GET', path: '/api/glass/devices' },
+        { name: 'ocr', desc: 'OCR 识别', method: 'POST', path: '/api/glass/ocr' },
+        { name: 'heartbeat', desc: '心跳', method: 'POST', path: '/api/glass/heartbeat' },
+        { name: 'upload-audio', desc: '上传音频', method: 'POST', path: '/api/glass/upload-audio' },
+        { name: 'analyze', desc: '上下文分析', method: 'POST', path: '/api/glass/analyze' },
+        { name: 'stream', desc: '流式对话(SSE)', method: 'GET', path: '/api/glass/stream/:sessionId' },
+        { name: 'history', desc: '历史会话查询', method: 'GET', path: '/api/glass/history' },
+        { name: 'history-save', desc: '历史会话保存', method: 'POST', path: '/api/glass/history' }
+      ],
+      total: 11,
+      deviceTokenFormat: 'GL-XXXX prefix required',
+      sampleToken: 'GL-DEMO1234',
+      note: '演示模式，无需鉴权即可查看端点清单',
+      generatedAt: new Date().toISOString()
+    }, 'Glass demo 端点清单');
+  } catch (e) {
+    return fail(res, 500001, 'demo 异常: ' + e.message);
+  }
+});
+
+module.exports = router;
