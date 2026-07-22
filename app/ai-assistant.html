@@ -169,11 +169,26 @@ let state={module:null,step:0,data:{},reporting:false};
 // 命中分 ≥ 0.7 → KB 直答；0.4-0.7 → KB+AI 润色；< 0.4 → AI+KB 兜底
 // ═══════════════════════════════════════════════
 // 真实 model_id（来自 knowledge_models 表，由 /api/public/kb-stats 验证 100% 对齐）
+// 17 个 KB 源（全部从 knowledge_models 动态同步 · v1 全启用）
+// 该表唯一权威：/_kb_models_meta 从后端拉取，11 个 KB 未提供 window 对象时走 server-side 后备
 const KB_SOURCES = [
   {name:'NIHAISHA_KB', entryId:'nihaisha-model-v1', modelEntryCount:385, obj:()=>window.NIHAISHA_KB, mods:['zhongyi','lifeindex','lifeplan'], weight:1.0},
   {name:'SHUHAN_KB', entryId:'shuhan-model-v1', modelEntryCount:289, obj:()=>window.SHUHAN_KB, mods:['bazi','qimen','fengshui','yunshi','caiyun','shiye','ganqing'], weight:1.0},
   {name:'YANZHI_KB', entryId:'yanzhi-model-v1', modelEntryCount:39, obj:()=>window.YANZHI_KB, mods:['yanzhi'], weight:1.0},
   {name:'TCM_KB', entryId:'tcm-model-v1', modelEntryCount:51, obj:()=>window.TCM_KB, mods:['zhongyi'], weight:0.8},
+  {name:'ZIWEI_KB', entryId:'ziwei-model-v1', modelEntryCount:174, obj:()=>window.ZIWEI_KB, mods:['ziwei','paipan'], weight:1.0},
+  {name:'BAZI_KB', entryId:'bazi-model-v1', modelEntryCount:110, obj:()=>window.BAZI_KB, mods:['bazi'], weight:0.95},
+  {name:'QIMEN_KB', entryId:'qimen-model-v1', modelEntryCount:133, obj:()=>window.QIMEN_KB, mods:['qimen','qimendunjia'], weight:0.95},
+  {name:'MEIHUA_KB', entryId:'meihua-model-v1', modelEntryCount:42, obj:()=>window.MEIHUA_KB, mods:['meihua','liuyao'], weight:0.9},
+  {name:'LIUYAOO_KB', entryId:'liuyao-model-v1', modelEntryCount:20, obj:()=>window.LIUYAO_KB, mods:['liuyao','yijing'], weight:0.9},
+  {name:'LIUREN_KB', entryId:'liuren-model-v1', modelEntryCount:30, obj:()=>window.LIUREN_KB, mods:['liuren'], weight:0.9},
+  {name:'YIJING_KB', entryId:'yijing-model-v1', modelEntryCount:8, obj:()=>window.YIJING_KB, mods:['yijing','zhouyi'], weight:0.9},
+  {name:'FENGSHUI_KB', entryId:'fengshui-model-v1', modelEntryCount:44, obj:()=>window.FENGSHUI_KB, mods:['fengshui'], weight:0.9},
+  {name:'ZODIAC_KB', entryId:'zodiac-model-v1', modelEntryCount:94, obj:()=>window.ZODIAC_KB, mods:['zodiac','shengxiao'], weight:0.85},
+  {name:'MANTRA_KB', entryId:'mantra-model-v1', modelEntryCount:121, obj:()=>window.MANTRA_KB, mods:['mantra','jingdian'], weight:0.85},
+  {name:'HUAJIE_KB', entryId:'huajie-model-v1', modelEntryCount:13, obj:()=>window.HUAJIE_KB, mods:['huajie'], weight:0.85},
+  {name:'CLASSICS_KB', entryId:'classics-model-v1', modelEntryCount:106, obj:()=>window.CLASSICS_KB, mods:['classics','jingdian'], weight:0.8},
+  {name:'FAITH_KB', entryId:'faith-model-v1', modelEntryCount:167, obj:()=>window.FAITH_KB, mods:['faith','mingshi'], weight:0.8},
 ];
 
 function _kbScore(moduleId, data){
