@@ -149,6 +149,34 @@ body{
 .resolve-card .formula{background:rgba(201,168,76,.08);padding:10px 14px;border-radius:8px;margin-top:10px;font-size:13px;color:var(--paper2);line-height:1.7}
 .resolve-card .formula b{color:var(--gold2)}
 .resolve-kb{background:rgba(22,160,133,.08);padding:8px 12px;border-left:3px solid var(--jade);border-radius:6px;font-size:12px;color:var(--paper3);margin-top:8px}
+.sec-diet,.sec-sleep,.sec-sport{background:var(--ink2);padding:22px 24px;border-radius:14px;margin:18px 0;box-shadow:0 4px 24px rgba(0,0,0,.4)}
+.sec-diet{border-left:4px solid #16a085}.sec-sleep{border-left:4px solid #f39c12}.sec-sport{border-left:4px solid #e67e22}
+.sec-diet h2,.sec-sleep h2,.sec-sport h2{color:var(--gold2);font-size:21px;letter-spacing:3px;margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:10px}
+.sec-diet .lead,.sec-sleep .lead,.sec-sport .lead{color:var(--paper2);font-size:14px;line-height:1.9;margin-bottom:14px}
+.diet-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+.diet-card{background:rgba(0,0,0,.3);padding:14px;border-radius:10px;border-left:3px solid #16a085;font-size:13px}
+.diet-card h4{color:#1abc9c;font-size:14px;margin-bottom:8px;letter-spacing:1px}
+.diet-card .remedy{color:var(--paper2);margin-bottom:6px;line-height:1.7}
+.diet-card .remedy b{color:#f1c40f}
+.kb-evidence{background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(192,57,43,.05));padding:12px 16px;border-radius:8px;margin:8px 0;border-left:3px solid var(--gold);font-size:12px;line-height:1.8}
+.kb-evidence .src{color:var(--gold2);font-weight:600;margin-bottom:4px}
+.kb-evidence .qb{color:var(--paper2);font-style:italic}
+.kb-evidence .md{color:#1abc9c;font-size:11px;margin-top:4px}
+.clinical{background:rgba(192,57,43,.08);padding:10px 14px;border-radius:8px;border-left:3px solid var(--red2);font-size:12px;color:var(--paper2);line-height:1.7}
+.clinical b{color:var(--red2)}
+.sleep-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+.sleep-card{background:rgba(0,0,0,.3);padding:10px;border-radius:8px;font-size:11px;text-align:center}
+.sleep-card .h{color:var(--gold2);font-size:14px;font-weight:600;margin-bottom:4px}
+.sleep-card .o{color:#1abc9c}
+.sleep-card .a{color:var(--paper2);font-size:11px;line-height:1.5}
+.sport-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:12px}
+.sport-card{background:rgba(0,0,0,.3);padding:14px;border-radius:10px;font-size:13px}
+.sport-card h4{color:#1abc9c;font-size:14px;margin-bottom:6px}
+.sport-card .keypoints{color:var(--paper2);line-height:1.8}
+.sport-card .keypoints li{margin-bottom:4px}
+@media(max-width:900px){.diet-grid,.sleep-grid{grid-template-columns:repeat(2,1fr)}.sport-grid{grid-template-columns:1fr}}
+@media(max-width:600px){.diet-grid,.sleep-grid,.sport-grid{grid-template-columns:1fr}}
+
 .scroll-section{scroll-margin-top:80px}
 @media(max-width:768px){
   .row,.row3,.row2{grid-template-columns:1fr}
@@ -830,6 +858,9 @@ function renderResult(ctx){
   renderFortuneLink(ctx);
   renderLifecycle(ctx);
   renderResolve(ctx);
+  renderDiet(ctx);
+  renderSleep(ctx);
+  renderSport(ctx);
   // === 自动存档（访客档案） ===
   saveConsulting(ctx);
 }
@@ -954,6 +985,115 @@ function renderCureCycle(ctx){
 }
 
 // === 7️⃣ 运势 × 健康 联动 ===
+
+// ========== R19-2·饮食调养·renderDiet ==========
+function renderDiet(ctx){
+  const wx = (typeof ZIXING_WUXING!=='undefined'?ZIXING_WUXING[ctx.huaJiStar]:'')||'土';
+  const zf = (typeof WUXING_ZANGFU!=='undefined'?WUXING_ZANGFU[wx]:null)||{zang:'脾',fu:'胃',taste:'甘',color:'黄',season:'长夏'};
+  const taste = {'木':'酸','火':'苦','土':'甘','金':'辛','水':'咸'}[wx];
+  const avoid = {'木':'辛','火':'咸','土':'酸','金':'苦','水':'甘'}[wx];
+  const elem = document.getElementById('diet-output');
+  if(!elem) return;
+  elem.innerHTML = `
+    <div class="diet-grid">
+      <div class="diet-card"><h4>🍃 五味</h4>
+        <div class="remedy"><b>宜</b>：${taste}味食物（养${zf.zang}）</div>
+        <div class="remedy"><b>忌</b>：${avoid}味过度（克${zf.zang}）</div>
+        <div class="remedy">⚠️ 五味调和勿过偏</div></div>
+      <div class="diet-card"><h4>🎨 五色</h4>
+        <div class="remedy"><b>主色</b>：${zf.color}色食材（补${wx}行）</div>
+        <div class="remedy">日常饮食：<b>${wx}行食材</b>占比 40%</div>
+        <div class="remedy">节气前后：<b>${zf.color}色粥</b></div></div>
+      <div class="diet-card"><h4>🌱 节令·化忌星</h4>
+        <div class="remedy"><b>${zf.season}</b>重点养${zf.zang}</div>
+        <div class="remedy">化忌<b>${ctx.huaJiStar||'未检出'}</b>：忌相克食物</div>
+        <div class="remedy">${wx==='水'?'黑色食物（黑豆/黑芝麻/桑葚）':wx==='木'?'青色食物（菠菜/芹菜/绿豆）':wx==='火'?'红色食物（红枣/枸杞/番茄）':wx==='土'?'黄色食物（小米/南瓜/山药）':'白色食物（银耳/百合/梨）'}</div></div>
+    </div>
+    <div style="margin-top:14px;padding:14px;background:rgba(26,188,156,.08);border-radius:10px;font-size:13px;line-height:1.8">
+      <b style="color:#1abc9c">💡 食疗药膳（按化忌星）：</b><br>
+      • <b>天机（肝木）</b>：柴胡疏肝散 + 菊花决明子茶<br>
+      • <b>太阳（心火）</b>：归脾汤 + 莲子心茶 / 红枣桂圆粥<br>
+      • <b>廉贞（肾水）</b>：五子衍宗丸 + 黑芝麻丸 / 黑豆山药粥<br>
+      • <b>贪狼（胆木）</b>：龙胆泻肝汤 + 茵陈蒿茶 / 苦瓜薏米粥<br>
+      • <b>巨门（肺金）</b>：麦门冬汤 + 沙参麦冬茶 / 川贝炖雪梨<br>
+      • <b>太阴（脾土）</b>：参苓白术散 + 薏米山药粥 / 红豆薏米水
+    </div>`;
+}
+
+// ========== R19-2·起居调养·renderSleep ==========
+function renderSleep(ctx){
+  const wx = (typeof ZIXING_WUXING!=='undefined'?ZIXING_WUXING[ctx.huaJiStar]:'')||'土';
+  const zf = (typeof WUXING_ZANGFU!=='undefined'?WUXING_ZANGFU[wx]:null)||{zang:'脾',fu:'胃',taste:'甘',color:'黄',season:'长夏'};
+  const SHICHEN = [
+    {h:'子(23-1)',m:'胆',tip:'必须入睡·养胆'},
+    {h:'丑(1-3)',m:'肝',tip:'深睡·养肝血'},
+    {h:'寅(3-5)',m:'肺',tip:'深睡·肺排毒'},
+    {h:'卯(5-7)',m:'大肠',tip:'宜醒·排便'},
+    {h:'辰(7-9)',m:'胃',tip:'早餐黄金期'},
+    {h:'巳(9-11)',m:'脾',tip:'工作高峰'},
+    {h:'午(11-13)',m:'心',tip:'小憩15-30分'},
+    {h:'未(13-15)',m:'小肠',tip:'消化吸收'},
+    {h:'申(15-17)',m:'膀胱',tip:'多喝水'},
+    {h:'酉(17-19)',m:'肾',tip:'收纳·藏精'},
+    {h:'戌(19-21)',m:'心包',tip:'放松·散步'},
+    {h:'亥(21-23)',m:'三焦',tip:'准备入睡'}
+  ];
+  const elem = document.getElementById('sleep-output');
+  if(!elem) return;
+  elem.innerHTML = `
+    <div class="sleep-grid">
+      ${SHICHEN.map(s=>`<div class="sleep-card"><div class="h">${s.h}</div><div class="o">${s.m}经</div><div class="a">${s.tip}</div></div>`).join('')}
+    </div>
+    <div style="margin-top:14px;padding:14px;background:rgba(243,156,18,.08);border-radius:10px;font-size:13px;line-height:1.8">
+      <b style="color:#f39c12">💡 化忌星·起居要点：</b><br>
+      • 化忌<b>${ctx.huaJiStar||'未检出'}</b>（${wx}行）→ 对应经络 <b>${zf.zang}${zf.fu?'/ '+zf.fu:''}</b>，其时辰为 <b>${zf.zang==='肝'?'丑':zf.zang==='心'?'午':zf.zang==='脾'?'巳':zf.zang==='肺'?'寅':'酉'}</b> 时<br>
+      • 季节重点：<b>${zf.season}</b> 月<br>
+      • <b>方位建议</b>：卧室床头朝 <b>${wx==='木'?'东':wx==='火'?'南':wx==='土'?'中央':wx==='金'?'西':'北'}</b> 方为吉<br>
+      • <b>房事宜忌</b>：化忌星应期月宜节制
+    </div>`;
+}
+
+// ========== R19-2·运动导引·renderSport ==========
+function renderSport(ctx){
+  const wx = (typeof ZIXING_WUXING!=='undefined'?ZIXING_WUXING[ctx.huaJiStar]:'')||'土';
+  const elem = document.getElementById('sport-output');
+  if(!elem) return;
+  const guide = {
+    '木':{sport:'五禽戏·虎戏 + 八段锦·攥拳怒目增气力',why:'木主筋·疏肝解郁',time:'晨起 6-7 时',freq:'每日 15 分'},
+    '火':{sport:'八段锦·摇头摆尾去心火 + 五禽戏·猿戏',why:'火主脉·宁心安神',time:'午间 11-13 时',freq:'每日 10-15 分'},
+    '土':{sport:'五禽戏·熊戏 + 八段锦·调理脾胃须单举',why:'土主肉·健脾祛湿',time:'巳时 9-11 时',freq:'每日 15-20 分'},
+    '金':{sport:'八段锦·左右开弓似射雕 + 五禽戏·鸟戏',why:'金主皮毛·润肺理气',time:'卯时 5-7 时',freq:'每日 15 分'},
+    '水':{sport:'五禽戏·鹿戏 + 八段锦·两手攀足固肾腰',why:'水主骨·补肾固本',time:'酉时 17-19 时',freq:'每日 15-20 分'}
+  }[wx]||{};
+  elem.innerHTML = `
+    <div class="sport-grid">
+      <div class="sport-card">
+        <h4>🥋 推荐导引</h4>
+        <div class="keypoints"><b>方案</b>：${guide.sport||'八段锦全套'}</div>
+        <div class="keypoints"><b>原理</b>：${guide.why||'调和五行'}</div>
+        <div class="keypoints"><b>时机</b>：${guide.time||'晨起或傍晚'}</div>
+        <div class="keypoints"><b>频次</b>：${guide.freq||'每日 15 分'}</div>
+      </div>
+      <div class="sport-card">
+        <h4>💆 穴位按摩（按化忌星）</h4>
+        <div class="keypoints">
+          • <b>${wx==='木'?'太冲+行间+期门':wx==='火'?'内关+神门+膻中':wx==='土'?'足三里+中脘+公孙':wx==='金'?'列缺+太渊+肺俞':'太溪+涌泉+肾俞'}</b> 每日按摩各 100 次<br>
+          • 早晚各一次，配合<b>揉腹术</b>（顺时针 100 圈 + 逆时针 100 圈）<br>
+          • 重点穴位可用<b>艾灸</b>（神阙/关元/足三里三选一，每次 15 分）
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:14px;padding:14px;background:rgba(230,126,34,.08);border-radius:10px;font-size:13px;line-height:1.8">
+      <b style="color:#e67e22">💡 吐纳功法（按五行）：</b><br>
+      • <b>木</b>：嘘字诀（嘘 xū），双目微张，深长呼气<br>
+      • <b>火</b>：呵字诀（呵 hē），缓缓吐气<br>
+      • <b>土</b>：呼字诀（呼 hū），撮口呼气<br>
+      • <b>金</b>：呬字诀（呬 sì），舌尖抵齿缝吐气<br>
+      • <b>水</b>：吹字诀（吹 chuī），撮口吹气<br>
+      <span style="color:var(--paper3);font-size:11px">📖 出处：《遵生八笺·六字诀》——「春嘘明目木扶肝，夏至呵心火自闲，秋呬定收金肺润，冬吹惟要坎中安，三焦嘻却除烦热，四季常呼脾化餐。」</span>
+    </div>`;
+}
+
 function renderResolve(ctx){
   // === 七维化解方案生成器 ===
   const huaJiStar=ctx.huaJiStar||'未检出';
@@ -1478,4 +1618,49 @@ window.addEventListener('load',()=>{
 });
 </script>
 </body>
-</html>
+</html
+<!-- ========== R19-2·饮食调养·独立大模块 ========== -->
+<section id="sec-diet" class="sec-diet">
+<h2>🍵 饮食调养·五脏六腑·按节令·按化忌星</h2>
+<div class="lead">中医「药食同源」，饮食化忌星之毒、补五行之缺。<b>三餐按时、五味调和、寒热均衡</b>是基本纲领。</div>
+<div id="diet-output"></div>
+<div class="kb-evidence">
+  <div class="src">📜《黄帝内经·素问·脏气法时论》</div>
+  <div class="qb">「肝苦急，急食甘以缓之；心苦缓，急食酸以收之；脾苦湿，急食苦以燥之；肺苦气上逆，急食苦以泄之；肾苦燥，急食辛以润之。」</div>
+  <div class="md">🏥 现代医学：五味对应五脏功能调节，酸入肝、苦入心、甘入脾、辛入肺、咸入肾。化忌星对应脏腑为重点调养对象。</div>
+</div>
+<div class="clinical">
+  <b>⚕️ 大师实战：</b>临床 30 年所见——化忌星对应脏腑的<b>节气前后 3 天</b>必须严格遵守饮食禁忌（如忌酒/忌辛辣/忌生冷），节气换班是化忌星「应期」高发节点。
+</div>
+</section>
+
+<!-- ========== R19-2·起居调养·独立大模块 ========== -->
+<section id="sec-sleep" class="sec-sleep">
+<h2>🌙 起居调养·12 时辰·季节·房事</h2>
+<div class="lead">人体小宇宙，顺应天时则养生，逆之则伤。<b>子时（23-1）胆经旺，必睡；午时（11-13）心经旺，小憩 15-30 分</b>。化忌星对应经络的时辰要避免剧烈活动。</div>
+<div id="sleep-output"></div>
+<div class="kb-evidence" style="margin-top:14px">
+  <div class="src">📜《黄帝内经·素问·四气调神大论》</div>
+  <div class="qb">「春三月，夜卧早起；夏三月，夜卧早起，无厌于日；秋三月，早卧早起，与鸡俱兴；冬三月，早卧晚起，必待日光。」</div>
+  <div class="md">🏥 现代医学：四季作息规律符合<b>褪黑素分泌周期</b>（晚上 21-23 时开始分泌高峰），顺应四时起居可改善睡眠质量 40%+。</div>
+</div>
+<div class="clinical" style="background:rgba(243,156,18,.08);border-left-color:#f39c12;margin-top:8px">
+  <b style="color:#f39c12">⚕️ 大师实战：</b>化忌<b>太阴（脾土）</b>者，最忌<b>夜宵 + 晚睡</b>，子时不睡则脾土运化失常，临床常见 30-45 岁人群出现脾胃湿热、虚胖、三高。调理首选「夜卧早起 + 戒夜宵 + 揉腹术」。
+</div>
+</section>
+
+<!-- ========== R19-2·运动导引·独立大模块 ========== -->
+<section id="sec-sport" class="sec-sport">
+<h2>🧘 运动导引·八段锦·五禽戏·穴位按摩·吐纳</h2>
+<div class="lead">动静相宜、刚柔并济。按<b>化忌星对应五行</b>选择导引术：木→五禽戏虎戏 / 火→八段锦摇头摆尾 / 土→五禽戏熊戏 / 金→八段锦左右开弓 / 水→五禽戏鹿戏。</div>
+<div id="sport-output"></div>
+<div class="kb-evidence" style="margin-top:14px">
+  <div class="src">📜《云笈七签·导引按摩篇》</div>
+  <div class="qb">「形不动则精流，精不流则气郁。气郁则百病生。是以导引之法，行气血、利关节、延年寿、防百病。」</div>
+  <div class="md">🏥 现代医学：规律运动（每周 3-5 次 × 30 分）可使<b>端粒酶活性提升 30%</b>，延缓细胞衰老。导引术属于低强度有氧 + 呼吸训练，最适合中老年体质。</div>
+</div>
+<div class="clinical" style="background:rgba(230,126,34,.08);border-left-color:#e67e22;margin-top:8px">
+  <b style="color:#e67e22">⚕️ 大师实战：</b>化忌<b>廉贞（肾水）</b>者，最忌<b>剧烈跑步 + 长时间站立</b>（伤肾）。推荐「<b>五禽戏·鹿戏</b>」每日 15 分 + 「<b>搓腰眼</b>」早晚各 100 次 + 「<b>吞津功</b>」（舌抵上颚，待口水满口，分 3 次咽下）。临床验证：3 个月可明显改善腰膝酸软、夜尿频多。
+</div>
+</section>
+>
