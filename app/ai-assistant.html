@@ -103,6 +103,7 @@ body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',-apple
 <a href="javascript:void(0)" onclick="openKBPanel()">📚 KB</a>
 <a href="javascript:void(0)" onclick="openHistoryPanel()">📜 历史</a>
 <a href="javascript:void(0)" onclick="openFeedback()">💬 反馈</a>
+<a href="im.html" style="background:rgba(6,182,212,.08);border-color:rgba(6,182,212,.3);color:#22d3ee">💬 站内消息</a>
 <a href="login.html">🔐 登录</a>
 </nav>
 <div class="app">
@@ -167,11 +168,12 @@ let state={module:null,step:0,data:{},reporting:false};
 // KB 优先双路径（P0-任务1）
 // 命中分 ≥ 0.7 → KB 直答；0.4-0.7 → KB+AI 润色；< 0.4 → AI+KB 兜底
 // ═══════════════════════════════════════════════
+// 真实 model_id（来自 knowledge_models 表，由 /api/public/kb-stats 验证 100% 对齐）
 const KB_SOURCES = [
-  {name:'NIHAISHA_KB', obj:()=>window.NIHAISHA_KB, mods:['zhongyi','lifeindex','lifeplan'], weight:1.0},
-  {name:'SHUHAN_KB', obj:()=>window.SHUHAN_KB, mods:['bazi','qimen','fengshui','yunshi','caiyun','shiye','ganqing'], weight:1.0},
-  {name:'YANZHI_KB', obj:()=>window.YANZHI_KB, mods:['yanzhi'], weight:1.0},
-  {name:'TCM_KB', obj:()=>window.TCM_KB, mods:['zhongyi'], weight:0.8},
+  {name:'NIHAISHA_KB', entryId:'nihaisha-model-v1', modelEntryCount:385, obj:()=>window.NIHAISHA_KB, mods:['zhongyi','lifeindex','lifeplan'], weight:1.0},
+  {name:'SHUHAN_KB', entryId:'shuhan-model-v1', modelEntryCount:289, obj:()=>window.SHUHAN_KB, mods:['bazi','qimen','fengshui','yunshi','caiyun','shiye','ganqing'], weight:1.0},
+  {name:'YANZHI_KB', entryId:'yanzhi-model-v1', modelEntryCount:39, obj:()=>window.YANZHI_KB, mods:['yanzhi'], weight:1.0},
+  {name:'TCM_KB', entryId:'tcm-model-v1', modelEntryCount:51, obj:()=>window.TCM_KB, mods:['zhongyi'], weight:0.8},
 ];
 
 function _kbScore(moduleId, data){
@@ -210,17 +212,38 @@ function _kbScore(moduleId, data){
     // 命中分 = (命中关键词数 / 总关键词数) * weight
     const score = Math.min(1.0, (hits / Math.max(1, keywords.length)) * 1.5) * src.weight;
     if(score > best.score){
-      best = {source:src.name, score:Math.round(score*100)/100, snippet};
+      best = {source:src.name, score:Math.round(score*100)/100, snippet, entryId:src.entryId || null};
     }
   }
   return best;
 }
 
-function _kbHitCount(moduleId){
+function _kbHitCount(moduleId, kbEntryId){
   const key = '_kb_hit_count/' + moduleId;
   const n = parseInt(localStorage.getItem(key) || '0') + 1;
   localStorage.setItem(key, String(n));
+  // 异步上报后端 kb_formal.hit_count（公网白名单 + 失败静默）
+  if (kbEntryId) {
+    try {
+      fetch(API + '/api/public/kb-hit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ entry_id: kbEntryId, app_endpoint: 'ai-assistant', user_query: (state.data?.s1 || '') + ' ' + (state.data?.s2 || '') })
+      }).catch(() => {});
+    } catch (e) {}
+  }
   return n;
+}
+
+// === 问卷 + 排盘结果自动落库（公网公开端点）===
+function _saveSurvey(module, data, baziData){
+  try {
+    fetch(API + '/api/public/save-survey', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ module, data, baziData: baziData || null, source: 'ai-assistant' })
+    }).catch(() => {});
+  } catch (e) {}
 }
 
 function _kbTodayCount(){
@@ -590,6 +613,10 @@ async function generateReport(){
   const mod=MODULES[state.module];
   const collected=Object.values(state.data);
 
+  // 0. 问卷 + 排盘落库（公网公开端点，失败静默）
+  const _baziForSave = (state.module==='bazi' || state.module==='name' || state.module==='number' || state.module==='face') ? state.data : null;
+  _saveSurvey(state.module, state.data, _baziForSave);
+
   // ③ 模块 KB 兜底（music/lifeindex/lifeplan 三大模块断网可用）
 if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
   try {
@@ -644,12 +671,14 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
 
 // ① KB 优先：先查本地知识库
   const kbHit = _kbScore(state.module, state.data);
-  _kbHitCount(state.module);
+  _kbHitCount(state.module, kbHit.entryId);
   _kbTodayCount();
+  // 问卷 + 排盘结果落库（公开端点，失败静默）
+  _saveSurvey(state.module, state.data, _baziForSave);
 
   if(kbHit.score >= 0.7){
     // KB 直答
-    const kbReport = '【来源：本地知识库（'+kbHit.source+'，命中分 '+kbHit.score+'）】\n\n' + kbHit.snippet.substring(0, 4000);
+    const kbReport = '【来源：本地知识库（'+kbHit.source+' · '+kbHit.entryId+'，命中分 '+kbHit.score+'）】\n\n' + kbHit.snippet.substring(0, 4000);
     showReport(kbReport);
     autoSavePaipan(kbReport);
     return;
@@ -663,9 +692,11 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
 
   // ③ 调用后端 AI
   const prompt='用户选择了「'+mod.name+'」模块，通过对话收集了以下信息：'+collected.join('；')+'。请基于以上信息给出专业、丰富、详实的分析评估报告，报告要拿来即用，包含具体建议。'+promptExtra;
+  // 把用户结构化数据（八字/姓名/数字/生辰...）作为 baziData 传给后端，让 AI 能基于真实数据回答而非通用模板
+  const baziData = (state.module==='bazi' || state.module==='name' || state.module==='number' || state.module==='face') ? state.data : null;
 
   try{
-    const r=await fetch(API+'/api/ai/public-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[...hist.slice(-8),{role:'user',content:prompt}]})});
+    const r=await fetch(API+'/api/ai/public-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[...hist.slice(-8),{role:'user',content:prompt}], baziData})});
     const d=await r.json();
     const reply=(d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||'';
     if(reply.length>50){
