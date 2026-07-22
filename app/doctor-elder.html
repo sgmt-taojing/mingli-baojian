@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="theme-color"="#1a3a5c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>中医临床端 · 医生工作站</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* 医生端风格：医疗蓝白 · 临床严谨 · 大字号 */
+:root{
+  --ink:#1a3a5c;       /* 医疗深蓝 */
+  --ink2:#2c5282;
+  --paper:#f0f4f8;     /* 冷白 */
+  --paper2:#e2e8f0;
+  --paper3:#94a3b8;
+  --accent:#0ea5e9;    /* 强调青蓝 */
+  --accent2:#06b6d4;
+  --jade:#10b981;
+  --cinn:#dc2626;
+  --warn:#f59e0b;
+  --font:'Noto Serif SC','Source Han Serif SC','SimSun',serif;
+  --fs-body:18px;       /* 医生端略小（专业） */
+  --fs-title:24px;
+  --fs-h1:32px;
+  --fs-btn:18px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:var(--fs-body)}
+body{
+  font-family:var(--font);
+  background:var(--paper);
+  color:var(--ink);
+  min-height:100vh;
+  line-height:1.6;
+}
+.top{
+  background:linear-gradient(135deg,var(--ink) 0%,var(--ink2) 100%);
+  color:#fff;
+  padding:20px 24px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 12px rgba(26,58,92,0.3);
+}
+.top h1{font-size:var(--fs-h1);font-weight:700;letter-spacing:4px}
+.top .meta{font-size:14px;color:#cbd5e1;text-align:right}
+.top .meta b{color:var(--accent);font-size:16px}
+
+/* Tab 切换 */
+.tabs{
+  display:flex;
+  background:#fff;
+  border-bottom:2px solid var(--paper2);
+  position:sticky;top:80px;z-index:90;
+}
+.tab{
+  flex:1;
+  padding:16px;
+  background:none;
+  border:none;
+  font-size:18px;
+  font-family:var(--font);
+  color:var(--paper3);
+  cursor:pointer;
+  border-bottom:4px solid transparent;
+  letter-spacing:2px;
+  transition:all .2s;
+}
+.tab:hover{color:var(--ink2)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:700}
+
+/* 主区 */
+.main{max-width:1400px;margin:0 auto;padding:24px}
+/* 双栏布局 */
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:1024px){.layout{grid-template-columns:1fr}}
+.col{
+  background:#fff;
+  border-radius:12px;
+  padding:24px;
+  box-shadow:0 2px 8px rgba(26,58,92,0.08);
+  border:1px solid var(--paper2);
+}
+.col h2{
+  font-size:var(--fs-title);
+  color:var(--ink);
+  margin-bottom:16px;
+  padding-bottom:12px;
+  border-bottom:2px solid var(--accent);
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.col h2 .num{
+  background:var(--accent);
+  color:#fff;
+  width:36px;height:36px;
+  border-radius:50%;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  font-weight:700;
+}
+/* 字段 */
+.f-row{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;margin:12px 0}
+.f-row label{font-weight:700;color:var(--ink2);font-size:16px}
+.f-row .v{
+  font-size:18px;
+  padding:8px 12px;
+  background:var(--paper);
+  border-radius:6px;
+  border:1px solid var(--paper2);
+}
+.f-row .v input{
+  border:none;background:none;
+  font-size:18px;width:100%;
+  font-family:var(--font);color:var(--ink);
+}
+.f-row .v input:focus{outline:2px solid var(--accent)}
+/* 大输入 */
+.input-big{
+  width:100%;min-height:48px;
+  padding:12px 16px;
+  font-size:18px;
+  font-family:var(--font);
+  background:#fff;
+  border:2px solid var(--paper2);
+  border-radius:8px;
+  color:var(--ink);
+}
+.input-big:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(14,165,233,0.15)}
+textarea.input-big{min-height:100px;resize:vertical;line-height:1.6}
+/* 按钮 */
+.btn{
+  padding:12px 24px;
+  font-size:var(--fs-btn);
+  font-family:var(--font);
+  font-weight:700;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  letter-spacing:2px;
+  transition:all .15s;
+  margin:4px;
+}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2)}
+.btn-primary:active{transform:translateY(1px)}
+.btn-secondary{background:var(--paper);color:var(--ink);border:2px solid var(--ink2)}
+.btn-danger{background:var(--cinn);color:#fff}
+.btn-success{background:var(--jade);color:#fff}
+.btn-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+/* 报告区 */
+.report{
+  background:linear-gradient(180deg,#f0f9ff 0%,#e0f2fe 100%);
+  border:2px solid var(--accent);
+  border-radius:12px;
+  padding:20px;
+  margin:16px 0;
+}
+.report h3{
+  font-size:20px;
+  color:var(--ink);
+  margin:16px 0 8px;
+  padding-bottom:6px;
+  border-bottom:1px dashed var(--accent);
+}
+.report p{font-size:16px;margin:6px 0}
+.report table{width:100%;border-collapse:collapse;margin:12px 0;font-size:15px}
+.report th{background:var(--ink);color:#fff;padding:10px;font-size:15px}
+.report td{padding:8px 10px;border-bottom:1px solid var(--paper2)}
+.report .wuxing-bar{display:flex;gap:4px;align-items:end;height:60px;margin:12px 0}
+.report .wuxing-bar .bar{
+  flex:1;
+  background:var(--accent);
+  border-radius:4px 4px 0 0;
+  position:relative;
+  transition:all .5s;
+}
+.report .wuxing-bar .bar span{
+  position:absolute;
+  bottom:-22px;left:50%;transform:translateX(-50%);
+  font-size:14px;font-weight:700;
+}
+/* 患者列表 */
+.patient-list{
+  background:#fff;
+  border-radius:12px;
+  margin:16px 0;
+  border:1px solid var(--paper2);
+  max-height:300px;
+  overflow-y:auto;
+}
+.patient-row{
+  display:grid;
+  grid-template-columns:60px 1fr auto auto;
+  gap:12px;
+  padding:12px 16px;
+  border-bottom:1px solid var(--paper2);
+  align-items:center;
+  cursor:pointer;
+  transition:all .15s;
+}
+.patient-row:hover{background:var(--paper)}
+.patient-row .id{color:var(--paper3);font-size:14px}
+.patient-row .name{font-weight:700;font-size:16px}
+.patient-row .meta{font-size:13px;color:var(--paper3)}
+.patient-row .badge{
+  padding:2px 10px;
+  border-radius:12px;
+  font-size:12px;
+  font-weight:700;
+}
+.badge-warn{background:#fef3c7;color:#92400e}
+.badge-ok{background:#d1fae5;color:#065f46}
+.badge-err{background:#fee2e2;color:#991b1b}
+/* 五行健康度评分 */
+.health-score{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  padding:16px;
+  background:#fff;
+  border-radius:8px;
+  margin:8px 0;
+  border:1px solid var(--paper2);
+}
+.health-score .label{font-weight:700;font-size:16px;width:80px}
+.health-score .bar{flex:1;height:24px;background:var(--paper2);border-radius:12px;overflow:hidden;position:relative}
+.health-score .bar .fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .5s;border-radius:12px}
+.health-score .score{font-weight:900;font-size:20px;color:var(--accent);width:60px;text-align:right}
+/* 浮动操作 */
+.float-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  background:#fff;
+  padding:12px 24px;
+  border-top:2px solid var(--paper2);
+  display:flex;gap:8px;justify-content:flex-end;
+  z-index:90;
+  box-shadow:0 -2px 8px rgba(26,58,92,0.08);
+}
+/* tab 隐藏 */
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+/* 警告 */
+.alert{
+  padding:12px 16px;
+  border-radius:8px;
+  margin:8px 0;
+  font-size:15px;
+}
+.alert-warn{background:#fef3c7;color:#92400e;border:1px solid #f59e0b}
+.alert-info{background:#dbeafe;color:#1e40af;border:1px solid #3b82f6}
+.alert-err{background:#fee2e2;color:#991b1b;border:1px solid #dc2626}
+/* modal */
+.modal{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.5);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:200;
+}
+.modal.show{display:flex}
+.modal-content{
+  background:#fff;
+  border-radius:16px;
+  padding:32px;
+  max-width:600px;
+  width:90%;
+  max-height:80vh;
+  overflow-y:auto;
+}
+.modal-content h3{font-size:24px;color:var(--ink);margin-bottom:16px}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1>⚕ 中医临床工作站</h1>
+  <div class="meta">
+    <div>当前医生：<b>主任医师</b></div>
+    <div id="clock"></div>
+  </div>
+</div>
+
+<!-- Tab 切换 -->
+<div class="tabs">
+  <button class="tab active" data-tab="consult">📋 接诊</button>
+  <button class="tab" data-tab="patients">👥 患者</button>
+  <button class="tab" data-tab="prescription">💊 开方</button>
+  <button class="tab" data-tab="knowledge">📚 知识</button>
+</div>
+
+<div class="main">
+
+  <!-- Tab 1: 接诊 -->
+  <section class="tab-panel active" data-tab="consult">
+
+    <div class="layout">
+      <!-- 左：患者基本信息 -->
+      <div class="col">
+        <h2><span class="num">1</span> 患者基本信息</h2>
+        <div class="f-row">
+          <label>姓名</label>
+          <div class="v"><input type="text" id="pt-name" placeholder="请输入姓名"></div>
+        </div>
+        <div class="f-row">
+          <label>性别</label>
+          <div class="v">
+            <select id="pt-gender" class="input-big" style="min-height:auto;padding:8px">
+              <option value="">请选择</option>
+              <option value="male">男</option>
+              <option value="female">女</option>
+            </select>
+          </div>
+        </div>
+        <div class="f-row">
+          <label>年龄</label>
+          <div class="v"><input type="number" id="pt-age" placeholder="岁" min="0" max="150"></div>
+        </div>
+        <div class="f-row">
+          <label>电话</label>
+          <div class="v"><input type="tel" id="pt-phone" placeholder="11位手机号"></div>
+        </div>
+        <div class="f-row">
+          <label>主诉</label>
+          <div class="v"><input type="text" id="pt-chief" placeholder="如：头晕、失眠1月"></div>
+        </div>
+
+        <h3 style="margin-top:24px;font-size:18px;color:var(--ink2)">📅 生辰八字（可选）</h3>
+        <div class="f-row"><label>出生年</label><div class="v"><input type="number" id="b-year" placeholder="YYYY"></div></div>
+        <div class="f-row"><label>出生月</label><div class="v"><input type="number" id="b-month" placeholder="MM" min="1" max="12"></div></div>
+        <div class="f-row"><label>出生日</label><div class="v"><input type="number" id="b-day" placeholder="DD" min="1" max="31"></div></div>
+        <div class="f-row"><label>出生时</label><div class="v"><input type="number" id="b-hour" placeholder="HH(0-23)" min="0" max="23"></div></div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="consult()">🔍 开始接诊分析</button>
+          <button class="btn btn-secondary" onclick="savePatient()">💾 保存患者</button>
+        </div>
+      </div>
+
+      <!-- 右：诊断报告 -->
+      <div class="col">
+        <h2><span class="num">2</span> 诊断分析报告</h2>
+        <div id="consult-result">
+          <div class="alert alert-info">
+            ℹ️ 请填写左侧患者信息后点击"开始接诊分析"。
+            <br>系统将根据生辰八字进行五行旺衰分析，并结合主诉给出疾病倾向与中药建议。
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Tab 2: 患者列表 -->
+  <section class="tab-panel" data-tab="patients">
+    <div class="col" style="max-width:1200px;margin:0 auto">
+      <h2><span class="num">3</span> 患者档案</h2>
+      <div class="alert alert-info">
+        全部本地存储（localStorage），可离线使用。点击行查看详情。
+      </div>
+      <div class="patient-list" id="patient-list">
+        <div style="padding:24px;text-align:center;color:var(--paper3)">暂无患者档案</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tab 3: 开方 -->
+  <section class="tab-panel" data-tab="prescription">
+    <div class="col" style="max-width:900px;margin:0 auto">
+      <h2><span class="num">4</span> 中药处方</h2>
+      <div class="f-row"><label>方剂名</label><div class="v"><input type="text" id="rx-name" placeholder="如：六味地黄丸加减"></div></div>
+      <div class="f-row"><label>主病机</label><div class="v"><input type="text" id="rx-pattern" placeholder="如：肾阴虚"></div></div>
+      <div class="f-row" style="grid-template-columns:1fr">
+        <div>
+          <label style="display:block;font-weight:700;color:var(--ink2);margin-bottom:8px">处方组成</label>
+          <textarea class="input-big" id="rx-herbs" placeholder="如：&#10;熟地黄 24g&#10;山药 12g&#10;山茱萸 12g&#10;茯苓 9g"></textarea>
+        </div>
+      </div>
+      <div class="f-row" style="grid-template-columns:1fr">
+        <div>
+          <label style="display:block;font-weight:700;color:var(--ink2);margin-bottom:8px">用法用量</label>
+          <textarea class="input-big" id="rx-usage" placeholder="水煎服，每日1剂，分2次温服。"></textarea>
+        </div>
+      </div>
+      <div class="f-row" style="grid-template-columns:1fr">
+        <div>
+          <label style="display:block;font-weight:700;color:var(--ink2);margin-bottom:8px">医嘱</label>
+          <textarea class="input-big" id="rx-note" placeholder="忌食生冷辛辣；按时复诊；不适随诊。"></textarea>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-success" onclick="savePrescription()">💾 保存处方</button>
+        <button class="btn btn-primary" onclick="printRx()">🖨️ 打印</button>
+        <button class="btn btn-secondary" onclick="clearRx()">🔄 清空</button>
+      </div>
+
+      <h3 style="margin-top:32px;font-size:18px;color:var(--ink2)">📋 历史处方</h3>
+      <div id="rx-history"></div>
+    </div>
+  </section>
+
+  <!-- Tab 4: 知识库 -->
+  <section class="tab-panel" data-tab="knowledge">
+    <div class="col" style="max-width:1100px;margin:0 auto">
+      <h2><span class="num">5</span> 中医知识速查</h2>
+      <input type="text" class="input-big" id="kb-search" placeholder="搜索：柴胡、肝阳上亢、六味地黄丸..." style="margin-bottom:16px">
+      <div id="kb-results"></div>
+
+      <h3 style="margin-top:32px;font-size:18px;color:var(--ink2)">🌿 常用中药</h3>
+      <div id="herb-list"></div>
+    </div>
+  </section>
+
+</div>
+
+<!-- 浮动操作 -->
+<div class="float-bar">
+  <button class="btn btn-secondary" onclick="location.href='index.html'">🏠 回首页</button>
+  <button class="btn btn-secondary" onclick="location.href='master-elder.html'">☯ 大师端</button>
+  <button class="btn btn-primary" onclick="location.href='ai-assistant.html'">🤖 AI 助手</button>
+</div>
+
+<script>
+/* ========== 五行-脏腑-中药数据库 ========== */
+const WUXING_DB = {
+  '木': {
+    organ:'肝胆', color:'#10b981', emoji:'🌳',
+    herbs:['柴胡','白芍','枸杞','菊花','决明子','当归','川芎','香附'],
+    formulas:['逍遥散','柴胡疏肝散','龙胆泻肝汤','天麻钩藤饮'],
+    pattern:'肝郁气滞、肝阳上亢、肝血不足、肝火旺',
+    highSymptoms:['头晕胀痛','目赤肿痛','胁肋胀满','易怒','口苦','耳鸣'],
+    lowSymptoms:['头晕目眩','视物模糊','肢体麻木','月经量少','爪甲淡白']
+  },
+  '火': {
+    organ:'心·小肠', color:'#dc2626', emoji:'🔥',
+    herbs:['丹参','麦冬','黄连','栀子','淡竹叶','生地','酸枣仁','远志'],
+    formulas:['天王补心丹','导赤散','黄连温胆汤','安宫牛黄丸'],
+    pattern:'心火亢盛、心阴虚、心血瘀阻、心神不宁',
+    highSymptoms:['心烦失眠','口舌生疮','舌尖红','小便短赤','狂躁'],
+    lowSymptoms:['心悸健忘','失眠多梦','面色苍白','畏寒肢冷']
+  },
+  '土': {
+    organ:'脾胃', color:'#f59e0b', emoji:'⛰️',
+    herbs:['山药','薏苡仁','白术','茯苓','陈皮','党参','砂仁','半夏'],
+    formulas:['参苓白术散','补中益气汤','归脾汤','二陈汤'],
+    pattern:'脾胃气虚、脾虚湿困、食积停滞、痰湿内阻',
+    highSymptoms:['腹胀纳差','痰多','水肿','嗜睡','大便黏腻'],
+    lowSymptoms:['食欲不振','倦怠乏力','腹胀便溏','消瘦','气血不足']
+  },
+  '金': {
+    organ:'肺·大肠', color:'#94a3b8', emoji:'⚙️',
+    herbs:['百合','麦冬','杏仁','川贝','沙参','桔梗','紫苏','百部'],
+    formulas:['百合固金汤','清燥救肺汤','止嗽散','桑菊饮'],
+    pattern:'肺气虚、肺阴虚、风寒/风热犯肺、大肠津亏',
+    highSymptoms:['咳嗽痰多','哮喘','皮肤干燥','便秘','咽喉炎'],
+    lowSymptoms:['气短懒言','易感冒','自汗','皮肤过敏']
+  },
+  '水': {
+    organ:'肾·膀胱', color:'#1e3a8a', emoji:'💧',
+    herbs:['熟地黄','山药','枸杞','杜仲','五味子','金樱子','菟丝子','鹿茸'],
+    formulas:['六味地黄丸','金匮肾气丸','左归丸','右归丸','五子衍宗丸'],
+    pattern:'肾阴虚、肾阳虚、肾气不固、肾精不足',
+    highSymptoms:['腰膝酸软','水肿','耳鸣','尿频','畏寒'],
+    lowSymptoms:['腰膝冷痛','阳痿遗精','五更泄泻','小便清长','不孕']
+  }
+};
+
+const STEM_WUXING = { '甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水' };
+const BRANCH_WUXING = { '子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水' };
+const STEM_LIST = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+const BRANCH_LIST = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+
+/* ========== 工具函数 ========== */
+function $(s){ return document.querySelector(s); }
+function $$(s){ return document.querySelectorAll(s); }
+
+function showToast(msg, type='info'){
+  const el = document.createElement('div');
+  el.style.cssText = 'position:fixed;top:80px;right:24px;background:var(--accent);color:#fff;padding:14px 24px;border-radius:8px;z-index:300;font-size:16px;box-shadow:0 4px 12px rgba(0,0,0,0.2);max-width:400px';
+  if(type==='err')el.style.background='var(--cinn)';
+  if(type==='ok')el.style.background='var(--jade)';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(), 3000);
+}
+
+/* Tab 切换 */
+$$('.tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    $$('.tab').forEach(t=>t.classList.remove('active'));
+    $$('.tab-panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelector('[data-tab="'+tab.dataset.tab+'"].tab-panel').classList.add('active');
+    if(tab.dataset.tab==='patients') renderPatientList();
+    if(tab.dataset.tab==='knowledge') renderKb();
+  });
+});
+
+/* 时钟 */
+function tick(){
+  const d = new Date();
+  const s = d.toLocaleString('zh-CN', { hour12:false });
+  $('#clock').textContent = s;
+}
+setInterval(tick, 1000); tick();
+
+/* ========== 八字算法（从大师端复用） ========== */
+function computeBazi(year, month, day, hour){
+  const y = +year, m = +month, d = +day, h = +hour;
+  const yearStem = STEM_LIST[((y - 4) % 10 + 10) % 10];
+  const yearBranch = BRANCH_LIST[((y - 4) % 12 + 12) % 12];
+  const yearAnimal = ['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'][(y - 4) % 12 >= 0 ? (y - 4) % 12 : ((y - 4) % 12 + 12) % 12];
+  const monthStem = STEM_LIST[((y - 4) % 5 * 2 + (m - 1) + 1 + 10) % 10];
+  const monthBranch = BRANCH_LIST[(m + 1) % 12];
+  const baseDate = new Date(1900, 0, 1);
+  const targetDate = new Date(y, m-1, d);
+  const diffDays = Math.floor((targetDate - baseDate) / 86400000);
+  const dayIdx = (10 + diffDays + 6000) % 60;
+  const dayStem = STEM_LIST[dayIdx % 10];
+  const dayBranch = BRANCH_LIST[dayIdx % 12];
+  const hBranch = BRANCH_LIST[Math.floor(((h+1)%24)/2)];
+  const dayStemIdx = dayIdx % 10;
+  const hStem = STEM_LIST[((dayStemIdx % 5) * 2 + Math.floor(h/2) + 1 + 10) % 10];
+  return { year:{stem:yearStem,branch:yearBranch,animal:yearAnimal}, month:{stem:monthStem,branch:monthBranch}, day:{stem:dayStem,branch:dayBranch}, hour:{stem:hStem,branch:hBranch} };
+}
+function computeWuxingScore(bazi){
+  const score = { 木:0, 火:0, 土:0, 金:0, 水:0 };
+  ['year','month','day','hour'].forEach(p=>{
+    score[STEM_WUXING[bazi[p].stem]]++;
+    score[BRANCH_WUXING[bazi[p].branch]]++;
+  });
+  return score;
+}
+
+/* ========== 接诊分析 ========== */
+function consult(){
+  const name = $('#pt-name').value || '患者';
+  const age = +$('#pt-age').value;
+  const gender = $('#pt-gender').value;
+  const chief = $('#pt-chief').value;
+  const y = +$('#b-year').value, m = +$('#b-month').value, d = +$('#b-day').value, h = +$('#b-hour').value;
+
+  if(!chief){ showToast('请填写主诉', 'err'); return; }
+
+  let html = `<div class="report"><h3>📋 接诊记录</h3>`;
+  html += `<p><b>患者：</b>${name} | <b>性别：</b>${gender==='male'?'男':gender==='female'?'女':'-'} | <b>年龄：</b>${age || '-'}</p>`;
+  html += `<p><b>主诉：</b>${chief}</p>`;
+
+  // 八字分析（如果有）
+  if(y && m && d && (h || h===0)){
+    try{
+      const bazi = computeBazi(y, m, d, h);
+      const ws = computeWuxingScore(bazi);
+      const max = Math.max(...Object.values(ws));
+      const sorted = Object.entries(ws).sort((a,b)=>b[1]-a[1]);
+      const maxWx = sorted[0][0];
+      const minWx = sorted[sorted.length-1][0];
+
+      html += `<h3>📅 八字排盘</h3>`;
+      html += `<p style="font-size:24px;color:var(--ink);text-align:center;font-weight:900;letter-spacing:6px">${bazi.year.stem}${bazi.year.branch} · ${bazi.month.stem}${bazi.month.branch} · ${bazi.day.stem}${bazi.day.branch} · ${bazi.hour.stem}${bazi.hour.branch}</p>`;
+      html += `<p style="text-align:center">属相：<b>${bazi.year.animal}</b>　日主：<b>${bazi.day.stem}</b>（${WUXING_DB[STEM_WUXING[bazi.day.stem]].organ}）</p>`;
+
+      // 五行分布柱状图
+      const maxScore = Math.max(...Object.values(ws));
+      html += `<h3>🌳 五行分布</h3>`;
+      html += `<div class="wuxing-bar">`;
+      for(const wx in ws){
+        const info = WUXING_DB[wx];
+        const h = (ws[wx]/maxScore*100);
+        html += `<div class="bar" style="height:${h}%;background:${info.color};min-height:8px"><span>${wx}(${ws[wx]})</span></div>`;
+      }
+      html += `</div>`;
+
+      // 健康评分
+      html += `<h3>⚕ 健康度评分</h3>`;
+      const avg = Object.values(ws).reduce((a,b)=>a+b,0)/5;
+      for(const wx in ws){
+        const info = WUXING_DB[wx];
+        const s = ws[wx];
+        const score = Math.min(100, Math.max(0, Math.round(s/avg*50)));
+        let level = 'ok';
+        if(s < avg-0.5) level = 'err';
+        if(s > avg+0.5) level = 'warn';
+        html += `<div class="health-score">
+          <div class="label" style="color:${info.color}">${info.emoji} ${wx}</div>
+          <div class="bar"><div class="fill" style="width:${score}%;background:${info.color}"></div></div>
+          <div class="score">${score}</div>
+        </div>`;
+      }
+
+      // 病机分析
+      html += `<h3>🔬 病机分析</h3>`;
+      html += `<div class="alert alert-${avg>1.5?'warn':'info'}">`;
+      html += `<b>五行最旺：</b>${WUXING_DB[maxWx].emoji}${maxWx}（${WUXING_DB[maxWx].organ}）<br>`;
+      html += `<b>五行最弱：</b>${WUXING_DB[minWx].emoji}${minWx}（${WUXING_DB[minWx].organ}）<br>`;
+      html += `<b>主要病机：</b>${WUXING_DB[minWx].pattern}`;
+      html += `</div>`;
+
+      // 症状关联
+      html += `<h3>📝 症状关联</h3>`;
+      html += `<table><tr><th>五行</th><th>脏腑</th><th>高表现</th><th>低表现</th></tr>`;
+      for(const wx in ws){
+        const info = WUXING_DB[wx];
+        const flag = ws[wx] > avg+0.5 ? '⬆️过旺' : ws[wx] < avg-0.5 ? '⬇️偏弱' : '✅ 平衡';
+        html += `<tr><td><b style="color:${info.color}">${info.emoji}${wx} ${flag}</b></td><td>${info.organ}</td><td>${info.highSymptoms.slice(0,2).join('、')}</td><td>${info.lowSymptoms.slice(0,2).join('、')}</td></tr>`;
+      }
+      html += `</table>`;
+
+      // 推荐处方
+      html += `<h3>💊 推荐处方</h3>`;
+      html += `<div class="alert alert-warn">⚠️ 以下为基于五行分析的建议处方，最终用药须由您根据望闻问切综合判断。</div>`;
+      html += `<table><tr><th>病机</th><th>推荐方剂</th><th>主要药物</th></tr>`;
+      [minWx, maxWx].forEach(wx=>{
+        const info = WUXING_DB[wx];
+        const flag = ws[wx] > avg+0.5 ? '过旺' : '偏弱';
+        html += `<tr>
+          <td>${wx}${flag}<br>(${info.organ})</td>
+          <td>${info.formulas.slice(0,2).join(' / ')}</td>
+          <td>${info.herbs.slice(0,4).join('、')}</td>
+        </tr>`;
+      });
+      html += `</table>`;
+      html += `<div class="btn-row">
+        <button class="btn btn-success" onclick="autoFillRx('${minWx}')">📝 自动填充主方到开方Tab</button>
+      </div>`;
+    } catch(e){
+      html += `<div class="alert alert-err">八字计算异常：${e.message}</div>`;
+    }
+  } else {
+    html += `<div class="alert alert-info">未填写生辰八字，仅基于主诉进行通用分析。</div>`;
+    html += `<h3>📋 主诉分析</h3>`;
+    html += `<p>主诉"${chief}"，建议：</p>`;
+    html += `<ul style="margin-left:24px;font-size:16px">
+      <li>详细询问病史、诱因、伴随症状</li>
+      <li>望闻问切四诊合参</li>
+      <li>必要时配合现代医学检查</li>
+      <li>辨证论治，对症下药</li>
+    </ul>`;
+  }
+
+  html += `</div>`;
+  $('#consult-result').innerHTML = html;
+  showToast('接诊分析完成', 'ok');
+}
+
+/* ========== 患者管理 ========== */
+function savePatient(){
+  const pt = {
+    id: Date.now(),
+    name: $('#pt-name').value,
+    gender: $('#pt-gender').value,
+    age: $('#pt-age').value,
+    phone: $('#pt-phone').value,
+    chief: $('#pt-chief').value,
+    bazi: {
+      y: $('#b-year').value,
+      m: $('#b-month').value,
+      d: $('#b-day').value,
+      h: $('#b-hour').value
+    },
+    createdAt: new Date().toISOString()
+  };
+  if(!pt.name){ showToast('请填写姓名', 'err'); return; }
+  const list = JSON.parse(localStorage.getItem('mlbj_doctor_patients')||'[]');
+  list.unshift(pt);
+  localStorage.setItem('mlbj_doctor_patients', JSON.stringify(list.slice(0,100)));
+  showToast('患者已保存', 'ok');
+}
+
+function renderPatientList(){
+  const list = JSON.parse(localStorage.getItem('mlbj_doctor_patients')||'[]');
+  const el = $('#patient-list');
+  if(!list.length){
+    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--paper3)">暂无患者档案，请到「接诊」Tab 创建</div>';
+    return;
+  }
+  el.innerHTML = list.map(p=>`
+    <div class="patient-row" onclick="loadPatient(${p.id})">
+      <div class="id">#${String(p.id).slice(-6)}</div>
+      <div>
+        <div class="name">${p.name} ${p.gender==='male'?'♂':p.gender==='female'?'♀':'·'}</div>
+        <div class="meta">${p.age||'?'}岁 · ${p.phone||'无电话'} · ${p.createdAt.slice(0,10)}</div>
+        <div class="meta">主诉：${p.chief || '-'}</div>
+      </div>
+      <div><span class="badge badge-ok">${p.bazi.y?'📅八字':'📝简易'}</span></div>
+      <div><button class="btn btn-secondary" onclick="event.stopPropagation();delPatient(${p.id})">删除</button></div>
+    </div>
+  `).join('');
+}
+
+function loadPatient(id){
+  const list = JSON.parse(localStorage.getItem('mlbj_doctor_patients')||'[]');
+  const p = list.find(x=>x.id===id);
+  if(!p)return;
+  $('#pt-name').value=p.name||'';
+  $('#pt-gender').value=p.gender||'';
+  $('#pt-age').value=p.age||'';
+  $('#pt-phone').value=p.phone||'';
+  $('#pt-chief').value=p.chief||'';
+  $('#b-year').value=p.bazi.y||'';
+  $('#b-month').value=p.bazi.m||'';
+  $('#b-day').value=p.bazi.d||'';
+  $('#b-hour').value=p.bazi.h||'';
+  // 切到接诊 Tab
+  $$('.tab')[0].click();
+  showToast('患者档案已加载', 'ok');
+}
+
+function delPatient(id){
+  if(!confirm('确定删除此患者档案？'))return;
+  let list = JSON.parse(localStorage.getItem('mlbj_doctor_patients')||'[]');
+  list = list.filter(p=>p.id!==id);
+  localStorage.setItem('mlbj_doctor_patients', JSON.stringify(list));
+  renderPatientList();
+  showToast('已删除', 'ok');
+}
+
+/* ========== 处方管理 ========== */
+function autoFillRx(wx){
+  const info = WUXING_DB[wx];
+  if(!info)return;
+  $('#rx-name').value = info.formulas[0] || (wx+'虚方');
+  $('#rx-pattern').value = wx+'虚（'+info.organ+'）';
+  $('#rx-herbs').value = info.herbs.slice(0,8).map(h=>h+' 9g').join('\n');
+  $('#rx-usage').value = '水煎服，每日1剂，分2次温服。';
+  $('#rx-note').value = '忌食生冷辛辣；按时复诊；不适随诊。';
+  $$('.tab')[2].click();
+  showToast('已自动填充主方，请审方调整', 'ok');
+}
+
+function savePrescription(){
+  const rx = {
+    id: Date.now(),
+    name: $('#rx-name').value,
+    pattern: $('#rx-pattern').value,
+    herbs: $('#rx-herbs').value,
+    usage: $('#rx-usage').value,
+    note: $('#rx-note').value,
+    createdAt: new Date().toISOString()
+  };
+  if(!rx.name){ showToast('请填写方剂名', 'err'); return; }
+  const list = JSON.parse(localStorage.getItem('mlbj_doctor_rx')||'[]');
+  list.unshift(rx);
+  localStorage.setItem('mlbj_doctor_rx', JSON.stringify(list.slice(0,100)));
+  showToast('处方已保存', 'ok');
+  renderRxHistory();
+}
+
+function renderRxHistory(){
+  const list = JSON.parse(localStorage.getItem('mlbj_doctor_rx')||'[]');
+  const el = $('#rx-history');
+  if(!list.length){ el.innerHTML='<div class="alert alert-info">暂无历史处方</div>'; return; }
+  el.innerHTML = list.slice(0,10).map(r=>`
+    <div class="report" style="margin:8px 0">
+      <h3>📜 ${r.name}</h3>
+      <p><b>病机：</b>${r.pattern || '-'}</p>
+      <pre style="font-family:var(--font);font-size:15px;line-height:1.8">${r.herbs}</pre>
+      <p><b>用法：</b>${r.usage||'-'}</p>
+      <p><b>医嘱：</b>${r.note||'-'}</p>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="loadRx(${r.id})">加载</button>
+        <button class="btn btn-secondary" onclick="delRx(${r.id})">删除</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function loadRx(id){
+  const list = JSON.parse(localStorage.getItem('mlbj_doctor_rx')||'[]');
+  const r = list.find(x=>x.id===id);
+  if(!r)return;
+  $('#rx-name').value=r.name;
+  $('#rx-pattern').value=r.pattern;
+  $('#rx-herbs').value=r.herbs;
+  $('#rx-usage').value=r.usage;
+  $('#rx-note').value=r.note;
+  showToast('已加载', 'ok');
+}
+
+function delRx(id){
+  if(!confirm('确定删除此处方？'))return;
+  let list = JSON.parse(localStorage.getItem('mlbj_doctor_rx')||'[]');
+  list = list.filter(r=>r.id!==id);
+  localStorage.setItem('mlbj_doctor_rx', JSON.stringify(list));
+  renderRxHistory();
+}
+
+function clearRx(){
+  ['rx-name','rx-pattern','rx-herbs','rx-usage','rx-note'].forEach(id=>$('#'+id).value='');
+}
+
+function printRx(){
+  const w = window.open('', '_blank');
+  const name = $('#rx-name').value||'处方';
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${name}</title>
+    <style>body{font-family:'Noto Serif SC',serif;padding:40px;line-height:1.8;font-size:18px}
+    h1{text-align:center;font-size:32px;border-bottom:3px solid #000;padding-bottom:20px}
+    .field{margin:12px 0;font-size:18px}
+    .label{font-weight:700;display:inline-block;width:100px}
+    pre{font-family:inherit;white-space:pre-wrap;font-size:18px;line-height:2}
+    .sig{margin-top:60px;text-align:right}
+    </style></head><body>
+    <h1>中 药 处 方 笺</h1>
+    <div class="field"><span class="label">方剂名：</span>${$('#rx-name').value}</div>
+    <div class="field"><span class="label">主病机：</span>${$('#rx-pattern').value}</div>
+    <div class="field"><span class="label">处方：</span></div>
+    <pre>${$('#rx-herbs').value}</pre>
+    <div class="field"><span class="label">用法：</span>${$('#rx-usage').value}</div>
+    <div class="field"><span class="label">医嘱：</span>${$('#rx-note').value}</div>
+    <div class="field"><span class="label">日期：</span>${new Date().toLocaleDateString('zh-CN')}</div>
+    <div class="sig">医师签名：____________</div>
+    </body></html>`;
+  w.document.write(html);
+  w.document.close();
+  w.print();
+}
+
+/* ========== 知识库 ========== */
+function renderKb(){
+  const html = Object.entries(WUXING_DB).map(([wx, info])=>`
+    <div class="report" style="margin-bottom:16px">
+      <h3 style="color:${info.color}">${info.emoji} ${wx}（${info.organ}）</h3>
+      <p><b>常见病机：</b>${info.pattern}</p>
+      <p><b>推荐方剂：</b>${info.formulas.join('、')}</p>
+      <p><b>常用中药：</b>${info.herbs.join('、')}</p>
+      <table style="margin-top:8px">
+        <tr><th>过旺表现</th><th>偏弱表现</th></tr>
+        <tr><td>${info.highSymptoms.join('、')}</td><td>${info.lowSymptoms.join('、')}</td></tr>
+      </table>
+    </div>
+  `).join('');
+  $('#kb-results').innerHTML = '<div class="alert alert-info">点击上方 Tab 可快速查看五行对应脏腑、方剂、中药。</div>' + html;
+
+  // 全部中药列表
+  const allHerbs = new Set();
+  Object.values(WUXING_DB).forEach(d=>d.herbs.forEach(h=>allHerbs.add(h)));
+  $('#herb-list').innerHTML = [...allHerbs].sort().map(h=>{
+    const wx = Object.entries(WUXING_DB).find(([k,v])=>v.herbs.includes(h));
+    return `<div style="display:inline-block;margin:4px;padding:6px 14px;background:${wx?wx[1].color:'#94a3b8'};color:#fff;border-radius:16px;font-size:14px;font-weight:700">${h}</div>`;
+  }).join('');
+}
+
+/* KB 搜索 */
+$('#kb-search').addEventListener('input', e=>{
+  const q = e.target.value.trim().toLowerCase();
+  if(!q){ renderKb(); return; }
+  const matches = [];
+  Object.entries(WUXING_DB).forEach(([wx, info])=>{
+    if(wx.includes(q) || info.organ.toLowerCase().includes(q) || info.herbs.some(h=>h.includes(q)) || info.formulas.some(f=>f.toLowerCase().includes(q)) || info.pattern.toLowerCase().includes(q)){
+      matches.push({wx, info});
+    }
+  });
+  if(!matches.length){
+    $('#kb-results').innerHTML = '<div class="alert alert-warn">未找到匹配项</div>';
+    return;
+  }
+  $('#kb-results').innerHTML = matches.map(({wx, info})=>`
+    <div class="report">
+      <h3 style="color:${info.color}">${info.emoji} ${wx}（${info.organ}）</h3>
+      <p><b>方剂：</b>${info.formulas.join('、')}</p>
+      <p><b>中药：</b>${info.herbs.join('、')}</p>
+    </div>
+  `).join('');
+});
+
+/* ========== 初始化 ========== */
+renderKb();
+renderRxHistory();
+console.log('[doctor-elder] 中医临床工作站 v0.1 loaded');
+
+// 暴露供测试
+window.computeBazi = computeBazi;
+window.computeWuxingScore = computeWuxingScore;
+</script>
+</body>
+</html>
