@@ -2578,6 +2578,34 @@ input, textarea, select {
 .ts-day .ts-info small{font-size:11px;opacity:.65}
 .ts-day .ts-score{font-size:18px;color:var(--gold);font-weight:600;min-width:60px;text-align:right}
 .ts-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+
+<style>
+/* ===== 第二十六轮·儿童房专区 ===== */
+.kids-result{margin-top:18px}
+.kids-summary{padding:14px;background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.02));border-radius:10px;border-left:3px solid var(--gold);margin-bottom:14px}
+.kids-summary .ks-title{font-size:14px;color:var(--gold);letter-spacing:2px;font-weight:600;margin-bottom:8px}
+.kids-summary .ks-quote{font-size:11px;line-height:1.7;opacity:.75;font-style:italic;padding:8px;background:rgba(0,0,0,.18);border-radius:4px}
+.kids-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
+@media(min-width:768px){.kids-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1200px){.kids-grid{grid-template-columns:repeat(3,1fr)}}
+.kids-card{padding:12px;background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:8px}
+.kids-card.dim-学习{border-left:3px solid #4a90e2;background:rgba(74,144,226,.04)}
+.kids-card.dim-健康{border-left:3px solid #5cb85c;background:rgba(92,184,92,.04)}
+.kids-card.dim-安全{border-left:3px solid #e8a04a;background:rgba(232,160,74,.04)}
+.kids-card.dim-品德{border-left:3px solid #b16aff;background:rgba(177,106,255,.04)}
+.kids-card .kc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.kids-card .kc-title{font-size:12px;color:var(--gold);font-weight:600;letter-spacing:1px}
+.kids-card .kc-dim{font-size:9px;padding:2px 8px;background:rgba(201,168,76,.2);border-radius:8px;color:var(--gold2)}
+.kids-card .kc-body{font-size:11px;line-height:1.6;opacity:.85}
+.kids-card .kc-tip{margin-top:6px;padding:6px 8px;background:rgba(0,0,0,.15);border-radius:4px;font-size:10px;opacity:.75}
+.kids-card .kc-ico{font-size:24px;margin-bottom:6px;display:block}
+.kids-card .kc-meta{display:grid;grid-template-columns:repeat(2,1fr);gap:4px;margin-top:6px;font-size:10px}
+.kids-card .kc-meta div{padding:4px 6px;background:rgba(0,0,0,.12);border-radius:4px}
+.kids-card .kc-meta b{color:var(--gold);margin-right:3px}
+.btn-mini{padding:6px 10px;background:rgba(201,168,76,.15);border:1px solid var(--line);border-radius:5px;color:var(--paper);font-size:11px;cursor:pointer}
+.btn-mini:hover{background:rgba(201,168,76,.25)}
+.kids-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+</style>
 </style>
 </style>
 </style>
@@ -5382,6 +5410,157 @@ function generateTaisuiFlow(){
   h += '</div>';
 
   document.getElementById('taisuiResult').innerHTML = h;
+}
+
+
+<!-- section-kids · 第二十六轮·化解·儿童房专区 START -->
+<div class="fs-section" id="section-kids">
+  <div class="input-card">
+    <h3>👶 化解·儿童房专区（24 件套·学习/健康/安全/品德）</h3>
+    <p style="font-size:12px;opacity:.6;margin:8px 0;line-height:1.7">
+      儿童房风水主：<strong>学习启智·健康少病·安全少灾·品德端正</strong>。
+      24 件套按维度分类，依《阳宅三要·童房篇》《鲁班经·童床》《居家风水·儿童》《神相全编·童相篇》《小儿药证直诀》整理。
+    </p>
+    <div style="display:flex;gap:6px;margin:10px 0;flex-wrap:wrap">
+      <button class="btn-mini" onclick="filterKidsDim('all')">全部</button>
+      <button class="btn-mini" onclick="filterKidsDim('学习')">📚 学习启智</button>
+      <button class="btn-mini" onclick="filterKidsDim('健康')">💪 健康少病</button>
+      <button class="btn-mini" onclick="filterKidsDim('安全')">🛡️ 安全少灾</button>
+      <button class="btn-mini" onclick="filterKidsDim('品德')">🌟 品德端正</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0">
+      <div>
+        <label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">儿童年龄</label>
+        <select id="kidsAge" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit">
+          <option value="0-3">0-3 岁（婴幼儿）</option>
+          <option value="4-6">4-6 岁（学龄前）</option>
+          <option value="7-12" selected>7-12 岁（小学）</option>
+          <option value="13-17">13-17 岁（中学）</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">儿童年支</label>
+        <select id="kidsZhi" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit">
+          <option value="">未选择</option>
+          <option value="子">子（鼠）</option><option value="丑">丑（牛）</option>
+          <option value="寅">寅（虎）</option><option value="卯">卯（兔）</option>
+          <option value="辰">辰（龙）</option><option value="巳">巳（蛇）</option>
+          <option value="午">午（马）</option><option value="未">未（羊）</option>
+          <option value="申">申（猴）</option><option value="酉">酉（鸡）</option>
+          <option value="戌">戌（狗）</option><option value="亥">亥（猪）</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" onclick="generateKidsRoom()" style="margin-top:14px">👶 24 件套·儿童房专项推荐</button>
+    <div id="kidsResult"></div>
+  </div>
+</div>
+<!-- section-kids END -->
+
+/* ===== 第二十六轮·儿童房 24 件套引擎 ===== */
+var KIDS_24 = [
+  // 学习启智 8 件
+  {id:1,dim:'学习',ico:'🗼',name:'文昌塔',why:'镇书桌·文昌位·启智',pos:'书桌左上角',mat:'铜质/水晶',color:'金色/紫色',age:'4-17',tip:'塔尖朝门·不可对厕所',cite:'《阳宅三要·童房篇》《文昌帝君阴骘文》'},
+  {id:2,dim:'学习',ico:'📚',name:'书架·多层',why:'收纳书籍·气聚文昌',pos:'书桌左侧墙',mat:'实木·浅色',color:'原木色/米白',age:'4-17',tip:'不可正对窗·背有靠山',cite:'《鲁班经·童床》《阳宅三要》'},
+  {id:3,dim:'学习',ico:'💡',name:'台灯·聚光',why:'聚光定神·减少眼疲劳',pos:'书桌右上角',mat:'陶瓷/木质',color:'暖黄光',age:'4-17',tip:'光向左手·避免手影',cite:'《居家风水·儿童》'},
+  {id:4,dim:'学习',ico:'🌍',name:'地球仪',why:'开眼看世界·拓展思维',pos:'书桌左侧',mat:'木质/金属',color:'原色',age:'7-17',tip:'不宜过大·占据视野',cite:'《居家风水·儿童》'},
+  {id:5,dim:'学习',ico:'⏰',name:'时钟',why:'守时养性·规划时间',pos:'书桌正前方墙',mat:'实木/金属',color:'米白/原木',age:'6-17',tip:'不可正对门·方形为佳',cite:'《居家风水·儿童》'},
+  {id:6,dim:'学习',ico:'📖',name:'字典/辞海',why:'知识的根·文字的力量',pos:'书架最上层',mat:'精装书',color:'红色封面',age:'7-17',tip:'红色辟邪·助学运',cite:'《文昌帝君阴骘文》'},
+  {id:7,dim:'学习',ico:'🎨',name:'美术画架',why:'激发创造力·平衡左右脑',pos:'书桌旁·靠窗',mat:'实木',color:'原木/白',age:'4-12',tip:'不可放卧室正中·靠墙为佳',cite:'《居家风水·儿童》'},
+  {id:8,dim:'学习',ico:'🖼️',name:'山水字画',why:'开阔胸襟·潜移默化',pos:'书桌对面墙上',mat:'宣纸/绢画',color:'水墨淡彩',age:'7-17',tip:'不可挂凶兽·山水朝内为佳',cite:'《阳宅集成·童房》'},
+
+  // 健康少病 6 件
+  {id:9,dim:'健康',ico:'🛏️',name:'实木儿童床',why:'木气养生·脊柱发育',pos:'靠墙·不见横梁',mat:'松木/橡木',color:'原木淡黄',age:'0-17',tip:'床头不可对门·不可对镜',cite:'《鲁班经·童床》《阳宅三要·童房篇》'},
+  {id:10,dim:'健康',ico:'🎋',name:'绿植·小型',why:'生气润肺·舒缓眼疲',pos:'书桌/窗台',mat:'陶盆',color:'绿色',age:'4-17',tip:'不可放卧室·夜间移出',cite:'《居家风水·儿童》《园艺风水》'},
+  {id:11,dim:'健康',ico:'🪟',name:'窗帘·双层',why:'遮阳防光·保护视力',pos:'窗户',mat:'棉麻',color:'浅蓝/米白',age:'0-17',tip:'不可全黑·午睡遮光即可',cite:'《居家风水·儿童》'},
+  {id:12,dim:'健康',ico:'🧸',name:'玩偶·木制',why:'陪伴养心·不过敏',pos:'床头/沙发',mat:'实木/棉布',color:'暖色',age:'0-10',tip:'定期日晒·不可堆满床',cite:'《居家风水·儿童》《小儿药证直诀》'},
+  {id:13,dim:'健康',ico:'🌿',name:'艾草香囊',why:'驱虫避秽·中医古法',pos:'床头/衣柜',mat:'布包',color:'绿/黄',age:'0-12',tip:'不可挂床头正中·挂侧墙',cite:'《本草纲目·艾》《神农本草经》'},
+  {id:14,dim:'健康',ico:'🐟',name:'小型金鱼缸',why:'水气润室·静心养性',pos:'窗台·东南角',mat:'玻璃缸',color:'透明',age:'6-17',tip:'不可放卧室·不可对门',cite:'《居家风水·儿童》'},
+
+  // 安全少灾 5 件
+  {id:15,dim:'安全',ico:'🪞',name:'穿衣镜·圆角',why:'整理仪容·圆角防撞',pos:'衣柜内侧门',mat:'玻璃·磨圆角',color:'透明',age:'4-17',tip:'不可对床·不可对门',cite:'《居家风水·儿童》《鲁班经》'},
+  {id:16,dim:'安全',ico:'🛡️',name:'防撞条',why:'防磕碰·保护幼小',pos:'家具边角',mat:'硅胶',color:'透明/浅色',age:'0-6',tip:'定期更换·保持清洁',cite:'《居家风水·儿童》《小儿药证直诀》'},
+  {id:17,dim:'安全',ico:'🚪',name:'门挡/门吸',why:'防夹手·防风猛关',pos:'房门底部',mat:'橡胶/硅胶',color:'任意',age:'0-10',tip:'不可阻挡通道',cite:'《居家风水·儿童》'},
+  {id:18,dim:'安全',ico:'💡',name:'夜灯·柔和',why:'起夜安全·不惧黑暗',pos:'床头/走廊',mat:'LED暖光',color:'暖黄',age:'0-10',tip:'不可直射眼睛·不可太强',cite:'《居家风水·儿童》'},
+  {id:19,dim:'安全',ico:'🛐',name:'佛像/观音',why:'慈悲观音·护童平安',pos:'客厅/书房·东南角',mat:'陶瓷/木质',color:'米白',age:'0-17',tip:'不可对卧室门·不可对厕所',cite:'《佛说大乘造像功德经》《神相全编·童相篇》'},
+
+  // 品德端正 5 件
+  {id:20,dim:'品德',ico:'📜',name:'家训字画',why:'潜移默化·家风传承',pos:'书桌对面墙',mat:'宣纸/木框',color:'黑字白底',age:'6-17',tip:'字画内容正面·不可血腥',cite:'《朱子家训》《颜氏家训》'},
+  {id:21,dim:'品德',ico:'🪑',name:'实木书桌椅',why:'坐姿端正·脊柱正直',pos:'靠墙·书桌左上',mat:'实木·人体工学',color:'原木色',age:'4-17',tip:'不可摇晃·高度匹配身高',cite:'《鲁班经·童床》《居家风水·儿童》'},
+  {id:22,dim:'品德',ico:'🏆',name:'奖状/荣誉墙',why:'正向激励·荣誉感',pos:'书房/客厅墙',mat:'木框装裱',color:'红框金边',age:'6-17',tip:'不可炫耀·不可贴满',cite:'《居家风水·儿童》《颜氏家训》'},
+  {id:23,dim:'品德',ico:'📔',name:'日记本',why:'记录成长·自省习惯',pos:'书架·随手可取',mat:'真皮/布面',color:'蓝/黑',age:'8-17',tip:'隐私尊重·不可偷看',cite:'《居家风水·儿童》《朱子家训》'},
+  {id:24,dim:'品德',ico:'🌱',name:'盆栽·小树苗',why:'陪伴成长·生命教育',pos:'阳台/窗台',mat:'陶盆',color:'绿色',age:'4-17',tip:'孩子亲自浇水·培养责任',cite:'《居家风水·儿童》《小儿药证直诀》'}
+];
+
+function filterKidsDim(dim){
+  var cards = document.querySelectorAll('.kids-card');
+  cards.forEach(function(c){
+    if(dim==='all' || c.classList.contains('dim-'+dim)){
+      c.style.display='';
+    } else {
+      c.style.display='none';
+    }
+  });
+}
+
+function generateKidsRoom(){
+  var age = document.getElementById('kidsAge').value;
+  var zhi = document.getElementById('kidsZhi').value;
+
+  // 按年龄筛选
+  var items = KIDS_24.filter(function(it){
+    var ages = it.age.split('-').map(Number);
+    var min = ages[0], max = ages[1];
+    var ageMap = {'0-3':1.5,'4-6':5,'7-12':10,'13-17':15};
+    var a = ageMap[age];
+    return a >= min && a <= max;
+  });
+
+  // 属相禁忌（依传统）
+  var ZODIAC_TABOO = {
+    子:{忌:'鱼缸不可过大',宜:'绿植·文昌塔'},
+    丑:{忌:'镜对床',宜:'实木·佛像'},
+    寅:{忌:'老虎画',宜:'山水画·书架'},
+    卯:{忌:'尖锐物品',宜:'绿植·字典'},
+    辰:{忌:'龙形摆件',宜:'山水·实木床'},
+    巳:{忌:'蛇形玩偶',宜:'佛像·台灯'},
+    午:{忌:'马形摆件',宜:'山水·实木'},
+    未:{忌:'羊形玩偶',宜:'山水·时钟'},
+    申:{忌:'猴形摆件',宜:'山水·字典'},
+    酉:{忌:'鸡形摆件',宜:'山水·绿植'},
+    戌:{忌:'狗形摆件',宜:'山水·实木'},
+    亥:{忌:'猪形摆偶',宜:'山水·绿植'}
+  };
+
+  var h = '<div class="kids-result">';
+  h += '<div class="kids-summary">';
+  h += '<div class="ks-title">👶 儿童房'+age.replace('岁','')+'岁·专项推荐（'+items.length+' 件）</div>';
+  h += '<div class="ks-quote">"童蒙养正·端蒙养德·端心养身。"——《小学·童蒙须知》</div>';
+  h += '<div style="font-size:11px;margin-top:8px;line-height:1.7">· 年龄段：<b>'+age+'</b> · 共筛 '+items.length+' 件专属化解物<br>';
+  if(zhi){
+    var t = ZODIAC_TABOO[zhi];
+    h += '· 属相 <b>'+zhi+'</b> 禁忌：'+t.忌+' · 喜用：'+t.宜+'<br>';
+  }
+  h += '· 4 维度覆盖：学习启智 '+items.filter(function(i){return i.dim==='学习';}).length+' 件 · 健康少病 '+items.filter(function(i){return i.dim==='健康';}).length+' 件 · 安全少灾 '+items.filter(function(i){return i.dim==='安全';}).length+' 件 · 品德端正 '+items.filter(function(i){return i.dim==='品德';}).length+' 件</div>';
+  h += '</div>';
+
+  h += '<div class="kids-grid">';
+  items.forEach(function(it){
+    h += '<div class="kids-card dim-'+it.dim+'">';
+    h += '<span class="kc-ico">'+it.ico+'</span>';
+    h += '<div class="kc-head"><div class="kc-title">'+it.name+'</div><div class="kc-dim">'+it.dim+'</div></div>';
+    h += '<div class="kc-body">'+it.why+'</div>';
+    h += '<div class="kc-meta"><div><b>位置</b>'+it.pos+'</div><div><b>材质</b>'+it.mat+'</div><div><b>色彩</b>'+it.color+'</div><div><b>适用</b>'+it.age+' 岁</div></div>';
+    h += '<div class="kc-tip">⚠ '+it.tip+'</div>';
+    h += '<div class="kc-tip" style="opacity:.5;font-size:9px;letter-spacing:1px">📜 '+it.cite+'</div>';
+    h += '</div>';
+  });
+  h += '</div>';
+
+  h += '<div class="kids-source">📜 综合《阳宅三要·童房篇》《鲁班经·童床》《居家风水·儿童》《神相全编·童相篇》《小儿药证直诀》《文昌帝君阴骘文》《佛说大乘造像功德经》《本草纲目》《朱子家训》《颜氏家训》共 10 部古籍</div>';
+  h += '</div>';
+
+  document.getElementById('kidsResult').innerHTML = h;
 }
 </script>
 
