@@ -288,6 +288,17 @@ body{
       <h2>🧬 人生全面分析·过去 现在 未来</h2>
       <div id="lifecycle-output"></div>
     </div>
+
+    <!-- 访客档案（大师专属） -->
+    <div class="panel scroll-section" id="sec-archive">
+      <h2>📁 访客档案中心</h2>
+      <div style="background:rgba(201,168,76,.05);padding:14px;border-radius:10px;margin-bottom:14px;font-size:14px;color:var(--paper3)">
+        💡 所有咨询过的访客都会自动入库。包含生辰、风险等级、化忌星、命中规则、调理方案、访问历史。
+      </div>
+      <div id="archive-list">
+        <div class="empty"><span class="spinner"></span>正在加载...</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -789,6 +800,8 @@ function renderResult(ctx){
   renderCureCycle(ctx);
   renderFortuneLink(ctx);
   renderLifecycle(ctx);
+  // === 自动存档（访客档案） ===
+  saveConsulting(ctx);
 }
 
 // === 流年 60 甲子表 ===
@@ -1084,6 +1097,181 @@ function renderHistory(){
   });
   document.getElementById('history-output').innerHTML=html;
 }
+
+// === 🔟 自动存档 · 给所有访客建档 ===
+async function saveConsulting(ctx){
+  try{
+    const actions=Array.from(document.querySelectorAll('#action-list li')).map(li=>({
+      priority:(li.textContent.match(/\[P[0-9]\]/)||['',''])[0].replace(/[\[\]]/g,'')||'P2',
+      text:li.textContent.replace(/\[P[0-9]\]\s*/,'')
+    }));
+    const body={
+      birth:{year:ctx.year,month:ctx.month,day:ctx.day,hour:ctx.hour},
+      gender:ctx.gender,
+      focus:ctx.focus||'all',
+      source:'master-zidise',
+      guest_name:'访客'+ctx.year+ctx.month+'.'+ctx.day,
+      hits:ctx.hits.map(h=>({name:h.name,severity:h.severity,detail:h.detail,rule:h.rule})),
+      actions:actions,
+      snapshot:{huaJiStar:ctx.huaJiStar,migrationPalace:ctx.huaJiPalace,palaces:ctx.palaces.map(p=>p.stars)}
+    };
+    const r=await fetch('http://127.0.0.1:8920/api/public/consulting-save',{
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)
+    });
+    const d=await r.json();
+    if(d.ok){
+      ctx.savedGuestId=d.guest_id;
+      // 在右上角液浮提示
+      const tip=document.createElement('div');
+      tip.style.cssText='position:fixed;top:80px;right:20px;background:rgba(39,174,96,.95);color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,.3)';
+      tip.innerHTML='✅ 档案已保存·访客 '+d.action==='created'?'[新]':'[复访第'+d.visit_count+'次]'+'<br><span style="font-size:11px;opacity:.9">ID: '+d.guest_id+'</span>';
+      document.body.appendChild(tip);
+      setTimeout(()=>tip.remove(),3000);
+    }
+  }catch(e){
+    console.warn('[saveConsulting]',e.message);
+  }
+}
+
+// === 1️⃣1️⃣ 访客档案列表（大师专属）===
+async function renderArchive(){
+  const box=document.getElementById('archive-list');
+  if(!box)return;
+  box.innerHTML='<div class="empty"><span class="spinner"></span>正在加载访客档案...</div>';
+  try{
+    const r=await fetch('http://127.0.0.1:8920/api/public/consulting-list?limit=100');
+    const d=await r.json();
+    if(!d.ok||d.count===0){
+      box.innerHTML='<div class="empty">暂无访客档案。首例分析后将自动入库。</div>';
+      return;
+    }
+    // 顶部统计
+    const s=d.stats;
+    let html=`<div class="summary-card">
+      <div class="metric"><div class="val">${s.total}</div><div class="label">访客总数</div></div>
+      <div class="metric danger"><div class="val">${s.extreme||0}</div><div class="label">极高风险</div></div>
+      <div class="metric warn"><div class="val">${s.high||0}</div><div class="label">较高风险</div></div>
+      <div class="metric"><div class="val">${s.total_visits}</div><div class="label">累计访问</div></div>
+    </div>`;
+    // 筛选器
+    html+=`<div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+      <input type="text" id="archive-q" placeholder="🔍 按姓名 / 生辰 / ID 搜索" style="flex:1;min-width:200px;background:rgba(10,10,10,.5);border:1.5px solid var(--gold3);color:var(--paper);padding:10px;border-radius:8px;font-size:14px">
+      <select id="archive-risk" style="background:rgba(10,10,10,.5);border:1.5px solid var(--gold3);color:var(--paper);padding:10px;border-radius:8px;font-size:14px">
+        <option value="">全部风险</option><option value="极高">🚨 极高</option><option value="较高">🟠 较高</option><option value="中等">🟡 中等</option><option value="较低">🟢 较低</option>
+      </select>
+      <button class="btn btn-secondary" onclick="filterArchive()">过滤</button>
+      <button class="btn btn-secondary" onclick="renderArchive()">刷新</button>
+    </div>`;
+    // 列表
+    html+='<div id="archive-rows">';
+    d.results.forEach(r=>{
+      const color=r.risk_level==='极高'?'var(--red2)':r.risk_level==='较高'?'#f39c12':r.risk_level==='中等'?'var(--gold2)':'var(--green)';
+      const flag=r.risk_level==='极高'?'🚨':r.risk_level==='较高'?'🟠':r.risk_level==='中等'?'🟡':'🟢';
+      html+=`<div class="risk-card" style="cursor:pointer;transition:all .2s" onclick="showGuestDetail('${r.guest_id}')" onmouseenter="this.style.background='rgba(201,168,76,.1)'" onmouseleave="this.style.background='rgba(0,0,0,.3)'">
+        <div class="title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+          <div>${flag} <b style="color:${color}">${r.guest_name}</b> <span class="tag">${r.risk_level}</span> <span class="tag">${r.focus_area}</span></div>
+          <div style="font-size:12px;color:var(--paper3)">${r.last_visit} · 访问 ${r.visit_count} 次</div>
+        </div>
+        <div class="body" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px">
+          <div><span style="color:var(--paper3);font-size:11px">生辰</span><br><b>${r.birth_year}-${String(r.birth_month).padStart(2,'0')}-${String(r.birth_day).padStart(2,'0')} ${String(r.birth_hour||0).padStart(2,'0')}时</b></div>
+          <div><span style="color:var(--paper3);font-size:11px">风险分</span><br><b style="color:${color}">${r.risk_score} 分</b></div>
+          <div><span style="color:var(--paper3);font-size:11px">化忌星</span><br><b>${r.hua_ji_star||'-'}</b></div>
+          <div><span style="color:var(--paper3);font-size:11px">性别</span><br><b>${r.gender==='M'?'男':'女'}</b></div>
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+    box.innerHTML=html;
+    // 全局保存供筛选
+    window.__archiveData=d.results;
+  }catch(e){
+    box.innerHTML='<div class="empty">⚠️ API 不可达：'+e.message+'</div>';
+  }
+}
+
+function filterArchive(){
+  const q=document.getElementById('archive-q').value.toLowerCase();
+  const risk=document.getElementById('archive-risk').value;
+  const rows=document.getElementById('archive-rows');
+  if(!window.__archiveData)return;
+  const filtered=window.__archiveData.filter(r=>{
+    if(risk && r.risk_level!==risk)return false;
+    if(q && !(r.guest_name.toLowerCase().includes(q)||(r.birth_year+'-'+String(r.birth_month).padStart(2,'0')+'-'+String(r.birth_day).padStart(2,'0')).includes(q)||r.guest_id.toLowerCase().includes(q)))return false;
+    return true;
+  });
+  let html='';
+  filtered.forEach(r=>{
+    const color=r.risk_level==='极高'?'var(--red2)':r.risk_level==='较高'?'#f39c12':r.risk_level==='中等'?'var(--gold2)':'var(--green)';
+    const flag=r.risk_level==='极高'?'🚨':r.risk_level==='较高'?'🟠':r.risk_level==='中等'?'🟡':'🟢';
+    html+=`<div class="risk-card" style="cursor:pointer;transition:all .2s" onclick="showGuestDetail('${r.guest_id}')" onmouseenter="this.style.background='rgba(201,168,76,.1)'" onmouseleave="this.style.background='rgba(0,0,0,.3)'">
+      <div class="title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div>${flag} <b style="color:${color}">${r.guest_name}</b> <span class="tag">${r.risk_level}</span></div>
+        <div style="font-size:12px;color:var(--paper3)">${r.last_visit} · ${r.visit_count}次</div>
+      </div>
+      <div class="body" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px;font-size:13px">
+        <div>生辰：<b>${r.birth_year}-${String(r.birth_month).padStart(2,'0')}-${String(r.birth_day).padStart(2,'0')}</b></div>
+        <div>风险：<b style="color:${color}">${r.risk_score} 分</b></div>
+        <div>化忌：<b>${r.hua_ji_star||'-'}</b></div>
+        <div>性别：<b>${r.gender==='M'?'男':'女'}</b></div>
+      </div>
+    </div>`;
+  });
+  rows.innerHTML=html||'<div class="empty">无匹配档案</div>';
+}
+
+async function showGuestDetail(guestId){
+  const modal=document.createElement('div');
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto';
+  modal.onclick=(e)=>{if(e.target===modal)modal.remove()};
+  modal.innerHTML='<div style="background:#1a1410;border:2px solid var(--gold);border-radius:16px;padding:30px;max-width:600px;width:100%;max-height:90vh;overflow:auto;color:var(--paper)"><div class="spinner"></div> 加载档案...</div>';
+  document.body.appendChild(modal);
+  try{
+    const r=await fetch('http://127.0.0.1:8920/api/public/consulting-detail?guest_id='+encodeURIComponent(guestId));
+    const d=await r.json();
+    if(!d.ok){modal.querySelector('div>div').innerHTML='❌ '+d.error;return;}
+    const p=d.record;
+    const v=d.visits||[];
+    let html=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h2 style="color:var(--gold2);font-size:22px">📁 ${p.guest_name}</h2>
+      <button class="btn btn-secondary" onclick="this.closest('[style*=fixed]').remove()">✕ 关闭</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;font-size:14px">
+      <div><span style="color:var(--paper3)">生辰</span><br><b>${p.birth_year}-${String(p.birth_month).padStart(2,'0')}-${String(p.birth_day).padStart(2,'0')} ${String(p.birth_hour||0).padStart(2,'0')}时</b></div>
+      <div><span style="color:var(--paper3)">性别</span><br><b>${p.gender==='M'?'男':'女'}</b></div>
+      <div><span style="color:var(--paper3)">风险等级</span><br><b style="color:var(--red2)">${p.risk_level}（${p.risk_score}分）</b></div>
+      <div><span style="color:var(--paper3)">化忌星</span><br><b>${p.hua_ji_star||'-'}</b></div>
+      <div><span style="color:var(--paper3)">总访问</span><br><b>${p.visit_count} 次</b></div>
+      <div><span style="color:var(--paper3)">首次咨询</span><br><b>${p.created_at}</b></div>
+    </div>
+    <h3 style="color:var(--gold2);font-size:16px;margin:16px 0 8px">📌 命中规则（${(p.hits||[]).length}条）</h3>`;
+    (p.hits||[]).forEach(h=>{
+      const sev=h.severity==='high'?'🔴高危':'🟡中危';
+      html+=`<div style="padding:8px;background:rgba(0,0,0,.3);border-radius:6px;margin-bottom:6px;font-size:13px"><b>${sev} ${h.name}</b><br><span style="color:var(--paper2)">${h.detail||''}</span></div>`;
+    });
+    html+=`<h3 style="color:var(--gold2);font-size:16px;margin:16px 0 8px">🌿 调理方案（${(p.actions||[]).length}条）</h3>`;
+    (p.actions||[]).forEach(a=>{
+      html+=`<div style="padding:6px 10px;background:rgba(39,174,96,.1);border-left:3px solid var(--green);border-radius:4px;margin-bottom:4px;font-size:13px">[${a.priority||'P2'}] ${a.text||''}</div>`;
+    });
+    html+=`<h3 style="color:var(--gold2);font-size:16px;margin:16px 0 8px">📚 访问历史（${v.length}次）</h3>`;
+    if(v.length){
+      html+='<div style="font-size:12px">';
+      v.forEach(vis=>{
+        html+=`<div style="padding:8px;background:rgba(0,0,0,.3);border-radius:6px;margin-bottom:6px"><b>${vis.visit_time}</b> · ${vis.source} · <span style="color:var(--red2)">${vis.risk_level}</span>（${vis.risk_score||0}分）<br><span style="color:var(--paper3)">${vis.summary||''}</span></div>`;
+      });
+      html+='</div>';
+    }else{
+      html+='<div style="color:var(--paper3);font-size:13px">仅本次</div>';
+    }
+    modal.querySelector('div>div').innerHTML=html;
+  }catch(e){
+    modal.querySelector('div>div').innerHTML='❌ '+e.message;
+  }
+}
+
+// 页面加载时自动拉档案
+window.addEventListener('load',()=>{
+  setTimeout(renderArchive,500);
+});
 </script>
 </body>
 </html>

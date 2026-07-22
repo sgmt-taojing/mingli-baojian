@@ -1745,6 +1745,122 @@ app.get('/api/public/kb-search', (req, res) => {
   }
 });
 
+/* ===== 咨询档案：自动给每个人建档 ===== */
+// POST /api/public/consulting-save
+//   body: { birth:{year,month,day,hour}, gender, focus, guest_name?, analysis } 
+//   effect: upsert consulting_records + insert consulting_visits snapshot
+// GET /api/public/consulting-list?limit=&risk=&q=
+//   list recent guests, optional filter by risk or birth search
+// GET /api/public/consulting-detail?guest_id=
+//   full record + visit history (master archive page)
+app.post('/api/public/consulting-save', (req, res) => {
+  try {
+    const b = req.body || {};
+    const birth = b.birth || {};
+    const year = parseInt(birth.year)||0;
+    const month = parseInt(birth.month)||0;
+    const day = parseInt(birth.day)||0;
+    const hour = parseInt(birth.hour)||0;
+    if(!year || !month || !day){
+      return res.json({ ok:false, error:'生辰不完整' });
+    }
+    // guest_id = 生辰唯一定位（千万人不重复）
+    const guest_id = b.guest_id || `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}-${String(hour).padStart(2,'0')}-${b.gender||'M'}`;
+    const hits = b.hits || [];
+    const actions = b.actions || [];
+    const snapshot = b.snapshot || {};
+    // 计算风险分
+    const score = hits.reduce((s,h)=>s+(h.severity==='high'?3:h.severity==='mid'?2:1),0);
+    const level = score>=6?'极高':score>=3?'较高':score>=1?'中等':'较低';
+
+    // 查重访
+    const existing = db.prepare('SELECT id, visit_count FROM consulting_records WHERE guest_id=?').get(guest_id);
+    if(existing){
+      db.prepare(`UPDATE consulting_records SET
+        last_visit=datetime('now','localtime'),
+        visit_count=visit_count+1,
+        risk_level=?, risk_score=?, hua_ji_star=?, focus_area=?,
+        hits_json=?, actions_json=?, snapshot_json=?,
+        guest_name=COALESCE(NULLIF(?,''),guest_name)
+        WHERE guest_id=?`).run(
+          level, score, snapshot.huaJiStar||'', b.focus||'',
+          JSON.stringify(hits), JSON.stringify(actions), JSON.stringify(snapshot),
+          b.guest_name||'', guest_id);
+      db.prepare(`INSERT INTO consulting_visits(guest_id, source, risk_level, risk_score, summary, snapshot_json)
+        VALUES(?,?,?,?,?,?)`).run(
+          guest_id, b.source||'master-zidise', level, score,
+          `复访：${level}风险 / 命中 ${hits.length} 条 / 化忌 ${snapshot.huaJiStar||''}`,
+          JSON.stringify(snapshot));
+      return res.json({ ok:true, action:'updated', guest_id, visit_count: existing.visit_count+1, risk_level: level });
+    } else {
+      db.prepare(`INSERT INTO consulting_records(
+        guest_id, guest_name, birth_year, birth_month, birth_day, birth_hour,
+        gender, focus_area, risk_level, risk_score, hua_ji_star,
+        hits_json, actions_json, snapshot_json)
+        VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(
+        guest_id, b.guest_name||`访客${year}年${month}月${day}日`,
+        year, month, day, hour,
+        b.gender||'M', b.focus||'', level, score, snapshot.huaJiStar||'',
+        JSON.stringify(hits), JSON.stringify(actions), JSON.stringify(snapshot));
+      db.prepare(`INSERT INTO consulting_visits(guest_id, source, risk_level, risk_score, summary, snapshot_json)
+        VALUES(?,?,?,?,?,?)`).run(
+        guest_id, b.source||'master-zidise', level, score,
+        `首访：${level}风险 / 命中 ${hits.length} 条 / 化忌 ${snapshot.huaJiStar||''}`,
+        JSON.stringify(snapshot));
+      return res.json({ ok:true, action:'created', guest_id, visit_count: 1, risk_level: level });
+    }
+  } catch(e){
+    console.error('[consulting-save]', e.message);
+    res.status(500).json({ ok:false, error:e.message });
+  }
+});
+
+app.get('/api/public/consulting-list', (req, res) => {
+  try {
+    const limit = Math.min(parseInt(req.query.limit)||50, 200);
+    const risk = String(req.query.risk||'').trim();
+    const q = String(req.query.q||'').trim();
+    let sql = `SELECT id, guest_id, guest_name, birth_year, birth_month, birth_day, birth_hour,
+        gender, focus_area, risk_level, risk_score, hua_ji_star, visit_count,
+        last_visit FROM consulting_records WHERE 1=1`;
+    const args=[];
+    if(risk){ sql += ' AND risk_level=?'; args.push(risk); }
+    if(q){
+      sql += ' AND (guest_name LIKE ? OR CAST(birth_year AS TEXT)||\'-\'||printf(\'%02d\',birth_month)||\'-\'||printf(\'%02d\',birth_day) LIKE ? OR guest_id LIKE ?)';
+      const qq = '%'+q+'%'; args.push(qq,qq,qq);
+    }
+    sql += ' ORDER BY last_visit DESC LIMIT ?';
+    args.push(limit);
+    const rows = db.prepare(sql).all(...args);
+    const stats = db.prepare(`SELECT
+      COUNT(*) AS total,
+      SUM(CASE WHEN risk_level='极高' THEN 1 ELSE 0 END) AS extreme,
+      SUM(CASE WHEN risk_level='较高' THEN 1 ELSE 0 END) AS high,
+      SUM(CASE WHEN risk_level='中等' THEN 1 ELSE 0 END) AS mid,
+      SUM(CASE WHEN risk_level='较低' THEN 1 ELSE 0 END) AS low,
+      SUM(visit_count) AS total_visits
+      FROM consulting_records`).get();
+    res.json({ ok:true, error:null, count: rows.length, results: rows, stats });
+  } catch(e){
+    res.json({ ok:false, error:e.message, results: [] });
+  }
+});
+
+app.get('/api/public/consulting-detail', (req, res) => {
+  try {
+    const guest_id = String(req.query.guest_id||'').trim();
+    if(!guest_id) return res.json({ ok:false, error:'guest_id 必填' });
+    const row = db.prepare('SELECT * FROM consulting_records WHERE guest_id=?').get(guest_id);
+    if(!row) return res.json({ ok:false, error:'访客档案不存在' });
+    const visits = db.prepare('SELECT id, visit_time, source, risk_level, risk_score, summary FROM consulting_visits WHERE guest_id=? ORDER BY visit_time DESC LIMIT 20').all(guest_id);
+    try { row.hits = JSON.parse(row.hits_json||'[]'); row.actions = JSON.parse(row.actions_json||'[]'); row.snapshot = JSON.parse(row.snapshot_json||'{}'); } catch(e){ row.hits=[]; row.actions=[]; row.snapshot={}; }
+    delete row.hits_json; delete row.actions_json; delete row.snapshot_json;
+    res.json({ ok:true, error:null, record: row, visits });
+  } catch(e){
+    res.json({ ok:false, error:e.message });
+  }
+});
+
 app.get('/api/public/kb-topic-search', (req, res) => {
   try {
     const group = String(req.query.group || '').trim();
