@@ -193,11 +193,10 @@ const KB_SOURCES = [
 
 function _kbScore(moduleId, data){
   // 计算每个 KB 源的命中分
-  let best = {source:null, score:0, snippet:''};
+  let best = {source:null, score:0, snippet:'', fallback:false};
   for(const src of KB_SOURCES){
     if(!src.mods.includes(moduleId)) continue;
     const kb = src.obj();
-    if(!kb) continue;
     // 收集用户输入文本
     const userInput = Object.values(data||{}).join(' ').toLowerCase();
     if(!userInput) continue;
@@ -223,12 +222,59 @@ function _kbScore(moduleId, data){
         }
       }
     }
-    walk(kb, []);
+    if (kb) {
+      walk(kb, []);
+    } else {
+      // fallback: window.XXX_KB 未提供 → 标记让后续走服务端
+      continue;
+    }
     // 命中分 = (命中关键词数 / 总关键词数) * weight
     const score = Math.min(1.0, (hits / Math.max(1, keywords.length)) * 1.5) * src.weight;
     if(score > best.score){
       best = {source:src.name, score:Math.round(score*100)/100, snippet, entryId:src.entryId || null};
     }
+  }
+  // 若所有本地 KB 都没命中 → 走服务端 /api/public/kb-query fallback
+  if (!best.source) {
+    const matchedSrc = KB_SOURCES.find(s => s.mods.includes(moduleId));
+    if (matchedSrc) {
+      best = {
+        source: matchedSrc.name,
+        score: 0.5,
+        snippet: '[fallback] 调用服务端 KB 检索中…',
+        entryId: matchedSrc.entryId,
+        fallback: true,
+        module: moduleId,
+        query: (data && (data.s1 || data.s2 || data.q)) || ''
+      };
+    }
+  }
+  return best;
+}
+
+// 服务端 KB fallback 异步检索（被 _kbScore 标记为 fallback 后调用）
+async function _kbQueryFallback(best) {
+  if (!best.fallback) return best;
+  try {
+    const qs = new URLSearchParams({
+      module: best.module || '',
+      q: (best.query || '').slice(0, 60),
+      limit: '5'
+    });
+    const r = await fetch(API + '/api/public/kb-query?' + qs, { method: 'GET' });
+    const j = await r.json();
+    if (j && j.results && j.results.length > 0) {
+      best.snippet = j.results.map(x => '【' + x.entry_id + '】' + x.title + '\n' + (x.snippet || '').slice(0, 200)).join('\n\n');
+      best.score = Math.max(best.score, 0.65);
+      best.results = j.results;
+      best.sourceCount = j.count;
+    } else {
+      best.snippet = '[fallback] 未找到匹配 KB';
+      best.score = 0.3;
+    }
+  } catch (e) {
+    best.snippet = '[fallback] 失败: ' + e.message;
+    best.score = 0.2;
   }
   return best;
 }
@@ -685,7 +731,15 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
 }
 
 // ① KB 优先：先查本地知识库
-  const kbHit = _kbScore(state.module, state.data);
+  let kbHit = _kbScore(state.module, state.data);
+  if (kbHit.fallback) {
+    // 异步走服务端 /api/public/kb-query fallback
+    try {
+      kbHit = await _kbQueryFallback(kbHit);
+    } catch (e) {
+      console.warn('[kb fallback]', e);
+    }
+  }
   _kbHitCount(state.module, kbHit.entryId);
   _kbTodayCount();
   // 问卷 + 排盘结果落库（公开端点，失败静默）

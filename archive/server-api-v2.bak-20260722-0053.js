@@ -14,7 +14,6 @@ const crypto = require('crypto');
 
 const kbRoutes = require('./kb-routes.js');
 const exportRoutes = require('./export-routes.js');
-const kbMgmt = require('./kb-management-engine.js'); // KB 命中入库（新）
 
 const app = express();
 const PORT = parseInt(process.env.API_PORT || '8920');
@@ -250,18 +249,9 @@ const requirePermission = rbac.requirePermission;
 // ============================
 // AI API 代理（密钥不再暴露在前端）
 // ============================
-// === AI provider 三轨：g2claw > 智谱 ZAI > 本地 Ollama ===
-const G2CLAW_API_KEY = process.env.G2CLAW_API_KEY || "";
-const ZAI_API_KEY = process.env.ZAI_API_KEY || "";
-const OLLAMA_BASE = process.env.OLLAMA_BASE || "http://127.0.0.1:11434";
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "qwen2.5:7b";
-const AI_API_KEY = G2CLAW_API_KEY || ZAI_API_KEY || "";
-// 选 base：G2CLAW > ZAI > Ollama
-const _useZai = ZAI_API_KEY && !G2CLAW_API_KEY;
-const _useOllama = !G2CLAW_API_KEY && !ZAI_API_KEY && OLLAMA_BASE;
-const AI_API_BASE = process.env.AI_API_BASE ||
-  (_useZai ? "https://open.bigmodel.cn/api/paas/v4" : _useOllama ? OLLAMA_BASE + "/v1" : "https://api.g2claw.com");
-const AI_PROVIDER = _useOllama ? "ollama" : (_useZai ? "zai" : "g2claw");
+const AI_API_BASE = process.env.AI_API_BASE || 'https://api.g2claw.com';
+const AI_API_KEY = process.env.G2CLAW_API_KEY || '';
+
 // === AI系统提示词（含知识库上下文）===
 const AI_SYSTEM_PROMPT = `你是「易道智鉴」AI命理助手，精通八字命理、紫微斗数、奇门遁甲、六爻占卜、梅花易数、大六壬、风水布局、中医养生、周易易经等传统文化。
 
@@ -538,66 +528,51 @@ app.post('/api/ai/chat', auth, async (req, res) => {
 // === AI聊天（公开，无需认证，低速率+本地降级）===
 app.post('/api/ai/public-chat', async (req, res) => {
   let messages = req.body.messages;
-  const model = req.body.model || (AI_PROVIDER === "ollama" ? OLLAMA_MODEL : "auto");
+  const model = req.body.model || 'auto';
   const baziData = req.body.baziData || null;
-  if (!messages || !Array.isArray(messages)) return res.json({ error: "参数错误" });
-
-  // === Ollama 路径无需 API key，直接走 ===
-  if (AI_PROVIDER === "ollama") {
-    const ip = req.ip || req.connection.remoteAddress;
-    if (!sec.rateLimit("ai_public_" + ip, 60, 60000)) return res.status(429).json({ error: "RATE_LIMITED" });
-    let sysContent = AI_SYSTEM_PROMPT;
-    if (baziData) sysContent += String.fromCharCode(10) + String.fromCharCode(10) + '【用户排盘数据】' + String.fromCharCode(10) + JSON.stringify(baziData, null, 2);
-    try {
-      const r = await fetch(AI_API_BASE + "/chat/completions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model, messages: [{ role: "system", content: sysContent }, ...messages], max_tokens: 2048, temperature: 0.7 })
-      });
-      const data = await r.json();
-      if (data.choices) return res.json(data);
-      if (data.error) {
-        const lastMsg = messages.filter(m => m.role === "user").pop();
-        return res.json({ choices: [{ message: { content: await _aiLocalResponse(lastMsg ? lastMsg.content : "", baziData) } }], _local: true, ollama_error: data.error.message });
-      }
-      return res.json({ choices: [{ message: { content: await _aiLocalResponse("", baziData) } }], _local: true });
-    } catch (e) {
-      const lastMsg = messages.filter(m => m.role === "user").pop();
-      return res.json({ choices: [{ message: { content: await _aiLocalResponse(lastMsg ? lastMsg.content : "", baziData) } }], _local: true, error: e.message });
-    }
-  }
-
-  // === G2CLAW/ZAI 路径需要 API key ===
+  if (!messages || !Array.isArray(messages)) return res.json({ error: '参数错误' });
+  
   if (!AI_API_KEY) {
-    const lastMsg = messages.filter(m => m.role === "user").pop();
-    return res.json({ choices: [{ message: { content: await _aiLocalResponse(lastMsg ? lastMsg.content : "", baziData) } }], _local: true });
+    const lastMsg = messages.filter(m => m.role === 'user').pop();
+    return res.json({ choices: [{ message: { content: await _aiLocalResponse(lastMsg ? lastMsg.content : '', baziData) } }], _local: true });
   }
-
+  
   const ip = req.ip || req.connection.remoteAddress;
-  if (!sec.rateLimit("ai_public_" + ip, 60, 60000)) return res.status(429).json({ error: "RATE_LIMITED" });
-
+  if (!sec.rateLimit('ai_public_' + ip, 60, 60000)) return res.status(429).json({ error: 'RATE_LIMITED', message: '请求过于频繁，请稍后再试' });
+  
   let sysContent = AI_SYSTEM_PROMPT;
-    if (baziData) sysContent += String.fromCharCode(10) + String.fromCharCode(10) + '【用户排盘数据】' + String.fromCharCode(10) + JSON.stringify(baziData, null, 2);
-
+  if (baziData) {
+    sysContent += '\n\n【用户排盘数据】\n' + JSON.stringify(baziData, null, 2) + '\n请基于以上排盘数据回答用户问题。';
+  }
+  
   try {
-    const url = AI_PROVIDER === "zai" ? AI_API_BASE + "/chat/completions" : AI_API_BASE + "/v1/chat/completions";
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + AI_API_KEY },
-      body: JSON.stringify({ model, messages: [{ role: "system", content: sysContent }, ...messages], max_tokens: 2048, temperature: 0.7 })
+    const response = await fetch(AI_API_BASE + '/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': '***' + AI_API_KEY },
+      body: JSON.stringify({ model, messages: [{ role: 'system', content: sysContent }, ...messages], max_tokens: 2048, temperature: 0.7 })
     });
     const data = await response.json();
     if (data.error) {
-      const lastMsg = messages.filter(m => m.role === "user").pop();
-      return res.json({ choices: [{ message: { content: await _aiLocalResponse(lastMsg ? lastMsg.content : "", baziData) } }], _local: true, provider_error: data.error.message });
+      const lastMsg = messages.filter(m => m.role === 'user').pop();
+      return res.json({ choices: [{ message: { content: await _aiLocalResponse(lastMsg ? lastMsg.content : '', baziData) } }], _local: true });
     }
     res.json(data);
   } catch (e) {
-    console.error("AI API错误:", e.message);
-    const lastMsg = messages.filter(m => m.role === "user").pop();
-    res.json({ choices: [{ message: { content: await _aiLocalResponse(lastMsg ? lastMsg.content : "", baziData) } }], _local: true, error: e.message });
+    console.error('AI API错误:', e.message);
+    const lastMsg = messages.filter(m => m.role === 'user').pop();
+    res.json({ choices: [{ message: { content: await _aiLocalResponse(lastMsg ? lastMsg.content : '', baziData) } }], _local: true });
   }
 });
+
+// === AI引导提问 ===
+app.get('/api/ai/guide', (req, res) => {
+  const idx = parseInt(req.query.idx) || 0;
+  res.json({ guide: AI_GUIDE_PROMPTS[idx % AI_GUIDE_PROMPTS.length], all: AI_GUIDE_PROMPTS });
+});
+
+// ============================
+// 用户接口
+// ============================
 
 // 注册/登录（手机号）
 app.post('/api/user/login', (req, res) => {
@@ -1609,218 +1584,6 @@ app.get('/api/public/stats', (req, res) => {
   }
 });
 
-// === KB 命中上报（公开，无需认证，前端 _kbHitCount 上报用）===
-// === KB 模型统计公开别名（追溯链状态，H5 用）===
-app.get('/api/public/kb-stats', (req, res) => {
-  try {
-    const sources = db.prepare('SELECT COUNT(*) as cnt FROM source_index').get().cnt;
-    const staging = db.prepare('SELECT COUNT(*) as cnt FROM kb_staging').get().cnt;
-    const formal = db.prepare('SELECT COUNT(*) as cnt FROM kb_formal').get().cnt;
-    const audit = db.prepare('SELECT COUNT(*) as cnt FROM kb_audit').get().cnt;
-    const versions = db.prepare('SELECT COUNT(*) as cnt FROM kb_versions').get().cnt;
-    const models = db.prepare("SELECT COUNT(*) as cnt FROM knowledge_models WHERE status='active'").get().cnt;
-    const hits = db.prepare('SELECT COUNT(*) as cnt FROM knowledge_trace').get().cnt;
-    const pushes = db.prepare('SELECT COUNT(*) as cnt FROM model_push_log').get().cnt;
-    const formalWithSrc = db.prepare("SELECT COUNT(*) as cnt FROM kb_formal WHERE source_ids != '[]' AND source_ids IS NOT NULL AND source_ids != ''").get().cnt;
-    res.json({
-      sources, staging, formal, audit, versions, models, hits, pushes,
-      trace_rate: formal ? Math.round(formalWithSrc * 1000 / formal) / 10 : 0,
-      aligned: formalWithSrc === formal,
-      public: true
-    });
-  } catch (e) {
-    res.json({ error: e.message });
-  }
-});
-
-// === KB 列表公开别名（无需认证，H5 公开页面用）===
-app.get('/api/public/kb-list', (req, res) => {
-  const fs = require('fs');
-  const path = require('path');
-  const kbDir = path.join(__dirname, '..', 'knowledge');
-  try {
-    const files = fs.readdirSync(kbDir).filter(f => f.endsWith('.js')).map(file => ({
-      filename: file,
-      level: KB_LEVELS[file] ? KB_LEVELS[file].level : 'public',
-      desc: KB_LEVELS[file] ? KB_LEVELS[file].desc : ''
-    }));
-    res.json({ files, public: true });
-  } catch (e) {
-    res.json({ files: [] });
-  }
-});
-
-// === 反馈积分公开别名（无需认证，只读 demo 数据）===
-app.get('/api/public/feedback-points', (req, res) => {
-  try {
-    const data = db.prepare('SELECT AVG(total_points) as avgPoints, MAX(total_points) as maxPoints, MAX(streak_days) as maxStreak, COUNT(*) as userCount FROM user_points').get();
-    res.json({
-      public: true,
-      avgPoints: Math.round(data.avgPoints || 510),
-      maxPoints: data.maxPoints || 1200,
-      maxStreak: data.maxStreak || 7,
-      userCount: data.userCount || 14
-    });
-  } catch (e) {
-    res.json({ public: true, avgPoints: 510, maxPoints: 1200, maxStreak: 7, userCount: 14 });
-  }
-});
-
-// KB topic group 检索（公开 · 免认证）
-// 用于支持 ai-assistant 中 `?[caibo]` `?[chuangye]` 等 topic 触发
-// 实现方式：从 kb_formal 按 tags LIKE 检索，限制 module='ziwei' 与分组
-const KB_TOPIC_GROUPS = {
-  caibo:    { tag: '财帛宫', desc: '财帛宫×星耀含义矩阵', title: '💰 财帛宫·星耀含义', matchField: 'tags', priorityPrefix: 'KB-zixing-caibo' },
-  chuangye: { tag: '创业',   desc: '创业副业专题',           title: '🚀 创业副业专题',     matchField: 'tags', priorityPrefix: 'KB-ziwei-chuangye' },
-  flow:     { tag: '飞星',   desc: '路总飞星 1616 四层结构', title: '🌊 飞星 1616 专题',    matchField: 'content', priorityPrefix: 'KB-ZIWEI-COURSE' },
-  sandaida: { tag: '路总独创', desc: '三代四化方法论',         title: '🌀 三代四化专题',    matchField: 'tags', priorityPrefix: 'KB-ZIWEI-COURSE' },
-};
-
-// KB 通用检索（公开 · 免认证）
-// 用于前端 KB_SOURCES fallback：当 window.XXX_KB 缺失时调用
-// 参数: ?module=ziwei&q=武曲&limit=3
-app.get('/api/public/kb-query', (req, res) => {
-  try {
-    const moduleId = String(req.query.module || '').trim();
-    const q = String(req.query.q || '').trim();
-    const limit = Math.min(parseInt(req.query.limit) || 5, 20);
-    if (!moduleId) {
-      return res.json({ error: 'MISSING_MODULE', results: [] });
-    }
-    // 纯 SQL 检索（不用 trace 表）
-    let rows;
-    if (q) {
-      const like = '%' + q + '%';
-      rows = db.prepare(`SELECT entry_id, title, substr(content,1,400) AS snippet, tags, trust_score
-        FROM kb_formal
-        WHERE module=? AND status='formal'
-          AND (title LIKE ? OR content LIKE ? OR tags LIKE ?)
-        ORDER BY trust_score DESC, hit_count DESC
-        LIMIT ?`).all(moduleId, like, like, like, limit);
-    } else {
-      rows = db.prepare(`SELECT entry_id, title, substr(content,1,400) AS snippet, tags, trust_score
-        FROM kb_formal
-        WHERE module=? AND status='formal'
-        ORDER BY trust_score DESC, hit_count DESC
-        LIMIT ?`).all(moduleId, limit);
-    }
-    res.json({ module: moduleId, q, count: rows.length, results: rows, public: true, fallback: true });
-  } catch (e) {
-    res.json({ error: e.message, results: [] });
-  }
-});
-
-app.get('/api/public/kb-topic-search', (req, res) => {
-  try {
-    const group = String(req.query.group || '').trim();
-    const query = String(req.query.query || '').trim();
-    const limit = Math.min(parseInt(req.query.limit) || 10, 50);
-    const cfg = KB_TOPIC_GROUPS[group];
-    if (!cfg) return res.json({ error: 'unknown group', available: Object.keys(KB_TOPIC_GROUPS) });
-
-    // 构造检索 SQL：按 tags LIKE 命中或 content LIKE 命中，AND module='ziwei'
-    let sql, params;
-    if (cfg.matchField === 'tags') {
-      // tags 是 JSON 数组字符串，LIKE '%"财帛宫"%' 最稳
-      // 用 CASE 优先排序 priorityPrefix 开头的 entry
-      sql = `SELECT entry_id, title, substr(content, 1, 320) AS snippet, tags, src_id, trust_score, hit_count,
-             (CASE WHEN entry_id LIKE ? THEN 10 ELSE 0 END) AS priority
-             FROM kb_formal
-             WHERE module='ziwei' AND status='formal'
-               AND (tags LIKE ? OR title LIKE ? OR content LIKE ?)
-             ORDER BY priority DESC, trust_score DESC, hit_count DESC
-             LIMIT ?`;
-      const like = '%' + cfg.tag + '%';
-      const pre = (cfg.priorityPrefix || '') + '%';
-      params = [pre, like, like, like, limit];
-    } else {
-      // content
-      sql = `SELECT entry_id, title, substr(content, 1, 320) AS snippet, tags, src_id, trust_score, hit_count,
-             (CASE WHEN entry_id LIKE ? THEN 10 ELSE 0 END) AS priority
-             FROM kb_formal
-             WHERE module='ziwei' AND status='formal'
-               AND content LIKE ?
-             ORDER BY priority DESC, trust_score DESC, hit_count DESC
-             LIMIT ?`;
-      const pre = (cfg.priorityPrefix || '') + '%';
-      params = [pre, '%' + cfg.tag + '%', limit];
-    }
-
-    // 如果带 query 参数，进一步按 query LIKE 精排
-    if (query) {
-      sql = `SELECT entry_id, title, substr(content, 1, 320) AS snippet, tags, src_id, trust_score, hit_count,
-             (CASE WHEN entry_id LIKE ? THEN 10 ELSE 0 END) +
-             (CASE WHEN title LIKE ? THEN 3 WHEN content LIKE ? THEN 2 WHEN tags LIKE ? THEN 1 ELSE 0 END) AS priority
-             FROM kb_formal
-             WHERE module='ziwei' AND status='formal'
-               AND (title LIKE ? OR content LIKE ? OR tags LIKE ?)
-             ORDER BY priority DESC, trust_score DESC, hit_count DESC
-             LIMIT ?`;
-      const ql = '%' + query + '%';
-      const pre = (cfg.priorityPrefix || '') + '%';
-      params = [pre, ql, ql, ql, ql, ql, ql, limit];
-    }
-
-    const rows = db.prepare(sql).all(...params);
-    res.json({
-      group, query, title: cfg.title, desc: cfg.desc,
-      count: rows.length, entries: rows,
-      public: true,
-    });
-  } catch (e) {
-    res.json({ error: e.message, public: false });
-  }
-});
-
-app.post('/api/public/kb-hit', (req, res) => {
-  try {
-    const { entry_id, app_endpoint, user_query } = req.body || {};
-    if (!entry_id) return res.json({ error: 'entry_id required' });
-    if (typeof kbMgmt.recordHit === 'function') {
-      kbMgmt.recordHit(String(entry_id), app_endpoint || 'ai-assistant', user_query || '');
-    } else {
-      // 兜底：直接 +1 hit_count
-      try {
-        db.prepare(`UPDATE kb_formal SET hit_count = hit_count + 1, last_hit = CURRENT_TIMESTAMP WHERE entry_id = ?`).run(String(entry_id));
-      } catch (e) {}
-    }
-    res.json({ ok: true, entry_id });
-  } catch (e) {
-    res.json({ error: e.message });
-  }
-});
-
-// === 问卷/档案自动落库（公开，无需认证）===
-app.post('/api/public/save-survey', (req, res) => {
-  try {
-    const { module, data, baziData, source } = req.body || {};
-    if (!module) return res.json({ error: 'module required' });
-    const id = 'SUR-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
-    db.prepare(`INSERT INTO ai_survey_logs (id, module, data_json, has_paipan, source, created_at)
-      VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`).run(
-      id, module, JSON.stringify(data || {}), baziData ? 1 : 0, source || 'ai-assistant'
-    );
-    res.json({ ok: true, id });
-  } catch (e) {
-    // 表不存在时建表兜底
-    if (e.message.includes('no such table')) {
-      try {
-        db.exec(`CREATE TABLE IF NOT EXISTS ai_survey_logs (
-          id TEXT PRIMARY KEY, module TEXT, data_json TEXT,
-          has_paipan INTEGER DEFAULT 0, source TEXT,
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP)`);
-        const id = 'SUR-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
-        db.prepare(`INSERT INTO ai_survey_logs (id, module, data_json, has_paipan, source) VALUES (?, ?, ?, ?, ?)`).run(
-          id, module, JSON.stringify(data || {}), baziData ? 1 : 0, source || 'ai-assistant');
-        return res.json({ ok: true, id, _tableCreated: true });
-      } catch (e2) {
-        return res.json({ error: e2.message });
-      }
-    }
-    res.json({ error: e.message });
-  }
-});
-
 // 公开最新案例列表（脱敏）
 app.get('/api/public/recent-cases', (req, res) => {
   try {
@@ -1843,53 +1606,6 @@ app.get('/api/public/latest-pushes', (req, res) => {
   } catch (e) {
     res.json({ error: e.message });
   }
-});
-
-// 公开课程列表（脱敏，去除 url 字段）
-app.get('/api/public/courses', (req, res) => {
-  try {
-    const courses = db.prepare(`SELECT id, master, title, type, duration, category, summary, sort_order FROM courses ORDER BY sort_order ASC, id ASC`).all();
-    // 解码 summary 中的转义
-    const safe = courses.map(c => ({
-      ...c,
-      summary: c.summary ? c.summary.replace(/\\n/g, ' ').slice(0, 120) : ''
-    }));
-    res.json({ count: safe.length, courses: safe, public: true });
-  } catch (e) {
-    res.json({ error: e.message });
-  }
-});
-
-// 公开中医诊室报告（filtered_text 已脱敏）
-app.get('/api/public/clinic-reports', (req, res) => {
-  try {
-    const reports = db.prepare(`SELECT id, case_id, patient_id, doctor_id, filtered_text, pushed_at, read_at FROM tcm_reports ORDER BY pushed_at DESC LIMIT 10`).all();
-    res.json({ count: reports.length, reports, public: true });
-  } catch (e) {
-    res.json({ error: e.message });
-  }
-});
-
-// 公开 TTS 音色列表（从 tts-server.py 配置中静态枚举，避免硬编码 8912 端口）
-app.get('/api/public/voices', (req, res) => {
-  res.json({
-    count: 11,
-    voices: [
-      { id: 'zh-CN-XiaoxiaoNeural', name: '晓晓', gender: 'female', lang: 'zh-CN', style: '温柔' },
-      { id: 'zh-CN-YunxiNeural', name: '云希', gender: 'male', lang: 'zh-CN', style: '青年' },
-      { id: 'zh-CN-YunjianNeural', name: '云健', gender: 'male', lang: 'zh-CN', style: '主播' },
-      { id: 'zh-CN-XiaoyiNeural', name: '晓伊', gender: 'female', lang: 'zh-CN', style: '情感' },
-      { id: 'zh-CN-YunyangNeural', name: '云扬', gender: 'male', lang: 'zh-CN', style: '新闻' },
-      { id: 'zh-CN-XiaomengNeural', name: '晓梦', gender: 'female', lang: 'zh-CN', style: '儿童' },
-      { id: 'zh-CN-XiaomoNeural', name: '晓墨', gender: 'female', lang: 'zh-CN', style: '文学' },
-      { id: 'zh-CN-XiaoxuanNeural', name: '晓萱', gender: 'female', lang: 'zh-CN', style: '甜美' },
-      { id: 'zh-CN-XiaoruiNeural', name: '晓睿', gender: 'female', lang: 'zh-CN', style: '客服' },
-      { id: 'zh-CN-YunfengNeural', name: '云枫', gender: 'male', lang: 'zh-CN', style: '温暖' },
-      { id: 'zh-CN-YunzeNeural', name: '云泽', gender: 'male', lang: 'zh-CN', style: '稳重' }
-    ],
-    public: true,
-    source: 'edge-tts'
-  });
 });
 
 // ============================
@@ -2066,7 +1782,7 @@ app.get('/api/v1/clinic/discussions/:caseId', _v1Redir('/api/clinic/discussions/
 app.get('/api/v1/kb/:filename', _v1Redir('/api/kb/:filename'));
 
 const _v1Pub = (legacy) => app.get('/api/v1/public'+legacy, _v1Redir('/api/public'+legacy));
-['/stats','/latest-pushes','/recent-cases','/courses','/clinic-reports','/voices','/kb-query'].forEach(s=>_v1Pub(s));
+['/stats','/latest-pushes','/recent-cases'].forEach(s=>_v1Pub(s));
 // 顶层公共端点
 app.get('/api/v1/health', (req,res)=>res.json({ok:true,ts:Date.now(),v1:true}));
 app.get('/api/v1/distill', _v1Redir('/api/distill'));

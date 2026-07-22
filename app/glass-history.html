@@ -3,25 +3,83 @@
 <head>
 <meta charset="UTF-8"><title>智能眼镜 · 历史回溯</title>
 <style>
-:root{--bg:#0f172a;--card:#1e293b;--line:#334155;--text:#e2e8f0;--muted:#94a3b8;--accent:#06b6d4}
+:root{--bg:#0f172a;--card:#1e293b;--line:#334155;--text:#e2e8f0;--muted:#94a3b8;--accent:#06b6d4;--ok:#10b981;--warn:#f59e0b}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,sans-serif;background:var(--bg);color:var(--text);padding:20px}
-h1{font-size:22px;margin-bottom:16px}
+body{font-family:-apple-system,sans-serif;background:var(--bg);color:var(--text);padding:20px;max-width:720px;margin:0 auto}
+h1{font-size:22px;margin-bottom:6px}
+.sub{font-size:13px;color:var(--muted);margin-bottom:16px}
+.toolbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.toolbar button,.toolbar a{background:var(--card);color:var(--text);border:1px solid var(--line);padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer;text-decoration:none}
+.toolbar button:hover,.toolbar a:hover{border-color:var(--accent)}
 .list{display:flex;flex-direction:column;gap:10px}
-.row{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;justify-content:space-between;align-items:center}
-.meta{font-size:12px;color:var(--muted)}
+.row{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;transition:.2s}
+.row:hover{border-color:var(--accent);transform:translateY(-1px)}
+.row-title{font-weight:600;font-size:15px}
+.row-meta{font-size:12px;color:var(--muted);margin-top:2px}
+.row-status{padding:3px 10px;border-radius:12px;font-size:11px}
+.s-active{background:rgba(16,185,129,.18);color:var(--ok)}
+.s-closed{background:rgba(245,158,11,.18);color:var(--warn)}
+.s-other{background:rgba(148,163,184,.18);color:var(--muted)}
+.empty,.err{color:var(--muted);text-align:center;padding:40px 20px;font-size:13px}
+.err{color:var(--warn)}
+.summary{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.4;max-width:480px}
 </style></head><body>
 <h1>📜 历史会话</h1>
-<div id="list" class="list"></div>
+<div class="sub">查看智能眼镜设备的历次会话记录（仅本设备可见）</div>
+<div class="toolbar">
+  <button onclick="load()">🔄 刷新</button>
+  <a href="/glass-console.html">⬅ 返回控制台</a>
+  <span id="count" class="sub" style="margin-left:auto;align-self:center"></span>
+</div>
+<div id="list" class="list">
+  <div class="empty">加载中...</div>
+</div>
+
 <script>
+const $ = id => document.getElementById(id);
+function esc(s){return String(s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+
 async function load(){
-  const r = await fetch('/api/v1/glass/history?token=' + (localStorage.token||''), {credentials:'include'}).then(r=>r.json());
-  const items = (r.data||{}).list||[];
-  document.getElementById('list').innerHTML = items.map(it=>`
-    <div class="row">
-      <div><div style="font-weight:600">${it.title}</div><div class="meta">${new Date(it.ts).toLocaleString('zh-CN')}</div></div>
-      <span class="meta">${it.status}</span>
-    </div>`).join('') || '<div class="meta">无历史</div>';
+  const el = $('list');
+  el.innerHTML = '<div class="empty">加载中...</div>';
+  const token = localStorage.token;
+  if (!token) {
+    el.innerHTML = '<div class="err">⚠ 未登录，请先登录获取 token</div>';
+    return;
+  }
+  // ★ 安全：token 放 header，不放 URL
+  const r = await fetch('/api/v1/glass/history', {
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'X-Device-Token': token.startsWith('GL-') ? token : 'GL-DEMO-DEVICE'
+    },
+    credentials:'include'
+  }).then(r=>r.json()).catch(e=>({error:true,message:e.message}));
+  if (r.error || r.code !== 0) {
+    el.innerHTML = '<div class="err">⚠ 加载失败：' + esc((r.message||r.error||'未知错误')) + '</div>';
+    return;
+  }
+  const items = (r.data && r.data.list) || [];
+  $('count').textContent = '共 ' + items.length + ' 条';
+  if (!items.length) {
+    el.innerHTML = '<div class="empty">暂无历史会话<br><br><a href="/glass-console.html" style="color:var(--accent)">去控制台发起一次会话 →</a></div>';
+    return;
+  }
+  el.innerHTML = items.map(it => {
+    const status = it.status || 'unknown';
+    const sClass = status === 'active' ? 's-active' : status === 'closed' ? 's-closed' : 's-other';
+    const ts = it.updated_at ? new Date(it.updated_at).toLocaleString('zh-CN') : '';
+    return `<div class="row">
+      <div style="flex:1;min-width:0">
+        <div class="row-title">${esc(it.title)}</div>
+        ${it.summary ? `<div class="summary">${esc(it.summary)}</div>` : ''}
+        <div class="row-meta">🕐 ${esc(ts)} · #${esc(it.id)}</div>
+      </div>
+      <span class="row-status ${sClass}">${esc(status)}</span>
+    </div>`;
+  }).join('');
 }
+
 load();
-</script></body></html>
+</script>
+</body></html>
