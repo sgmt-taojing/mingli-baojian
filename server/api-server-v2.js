@@ -541,8 +541,6 @@ app.post('/api/ai/kb-hit-log', async (req, res) => {
   try {
     const { query, hits, source, responseTime } = req.body || {};
     if (!query) return res.json({ error: '参数错误' });
-    const db = getDb();
-    if (!db) return res.json({ error: '数据库未就绪' });
     
     // 检查表是否存在
     const tblExists = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='kb_hit_log'").get();
@@ -572,9 +570,17 @@ app.post('/api/ai/kb-hit-log', async (req, res) => {
 
 app.get('/api/ai/kb-hit-stats', async (req, res) => {
   try {
-    const db = getDb();
     if (!db) return res.json({ error: '数据库未就绪' });
-    
+    // auto-create
+    db.exec(`CREATE TABLE IF NOT EXISTS kb_hit_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      query TEXT,
+      hits INTEGER DEFAULT 0,
+      module TEXT,
+      source TEXT,
+      response_time INTEGER,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )`);
     const total = db.prepare('SELECT COUNT(*) as cnt FROM kb_hit_log').get().cnt || 0;
     const today = db.prepare(`SELECT COUNT(*) as cnt FROM kb_hit_log WHERE DATE(created_at) = DATE('now', 'localtime')`).get().cnt || 0;
     const topQueries = db.prepare(`SELECT query, COUNT(*) as cnt FROM kb_hit_log GROUP BY query ORDER BY cnt DESC LIMIT 10`).all();
@@ -586,6 +592,26 @@ app.get('/api/ai/kb-hit-stats', async (req, res) => {
   }
 });
 
+
+
+app.get('/api/admin/kb/stats', (req, res) => {
+  try {
+    if (!db) return res.json({ error: '数据库未就绪' });
+    const rows = db.prepare(`SELECT module, COUNT(*) as cnt, SUM(CASE WHEN trust_score>=0.7 THEN 1 ELSE 0 END) as hi FROM kb_formal GROUP BY module ORDER BY cnt DESC`).all();
+    const total = db.prepare('SELECT COUNT(*) as cnt FROM kb_formal').get().cnt;
+    const hits = db.prepare('SELECT COUNT(*) as cnt FROM kb_hit_log').get().cnt;
+    res.json({ total, hits, modules: rows.map(r=>({ module:r.module, count:r.cnt, sources:r.hi, hit_rate: total ? Math.min(100, r.cnt*100/total) : 0 })) });
+  } catch(e){ res.json({ error: e.message }); }
+});
+
+app.get('/api/admin/kb/search', (req, res) => {
+  try {
+    if (!db) return res.json({ error: '数据库未就绪' });
+    const q = '%'+(req.query.q||'')+'%';
+    const rows = db.prepare(`SELECT module, title, content, category, trust_score as score FROM kb_formal WHERE title LIKE ? OR content LIKE ? OR keywords LIKE ? LIMIT 50`).all(q, q, q);
+    res.json({ results: rows });
+  } catch(e){ res.json({ error: e.message }); }
+});
 
 app.post('/api/ai/public-chat', async (req, res) => {
   let messages = req.body.messages;
