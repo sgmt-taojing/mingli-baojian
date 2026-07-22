@@ -646,7 +646,7 @@ app.get('/api/ai/kb-hit-stats', async (req, res) => {
 
 
 
-app.get('/api/admin/kb/stats', (req, res) => {
+app.get('/api/admin/kb/stats', adminAuth, (req, res) => {
   try {
     if (!db) return res.json({ error: '数据库未就绪' });
     const rows = db.prepare(`SELECT module, COUNT(*) as cnt, SUM(CASE WHEN trust_score>=0.7 THEN 1 ELSE 0 END) as hi FROM kb_formal GROUP BY module ORDER BY cnt DESC`).all();
@@ -656,13 +656,83 @@ app.get('/api/admin/kb/stats', (req, res) => {
   } catch(e){ res.json({ error: e.message }); }
 });
 
-app.get('/api/admin/kb/search', (req, res) => {
+app.get('/api/admin/kb/search', adminAuth, (req, res) => {
   try {
     if (!db) return res.json({ error: '数据库未就绪' });
     const q = '%'+(req.query.q||'')+'%';
     const rows = db.prepare(`SELECT module, title, content, category, trust_score as score FROM kb_formal WHERE title LIKE ? OR content LIKE ? OR keywords LIKE ? LIMIT 50`).all(q, q, q);
     res.json({ results: rows });
   } catch(e){ res.json({ error: e.message }); }
+});
+// === R51-B · /api/admin/kb/ingest（批量入库 admin 端点）===
+app.post('/api/admin/kb/ingest', adminAuth, async (req, res) => {
+  try {
+    if (!db) return res.json({ error: '数据库未就绪' });
+    const { entries } = req.body || {};
+    if (!Array.isArray(entries) || entries.length === 0) return res.json({ ok: 0, error: 'entries 必须是非空数组' });
+    if (entries.length > 500) return res.json({ ok: 0, error: '单次最多 500 条' });
+
+    // schema 探测
+    const tblCols = db.prepare("PRAGMA table_info(kb_formal)").all().map(c => c.name);
+    const hasContent = tblCols.includes('content');
+    const hasKeywords = tblCols.includes('keywords');
+    const hasCategory = tblCols.includes('category');
+    const hasSrcId = tblCols.includes('src_id');
+    const hasEntryId = tblCols.includes('entry_id');
+
+    const insert = db.prepare(`INSERT INTO kb_formal (${hasEntryId?'entry_id,':''}${hasSrcId?'src_id,':''}module, title, ${hasContent?'content,':''}${hasKeywords?'keywords,':''}${hasCategory?'category,':''}trust_score, hit_count, last_hit) VALUES (${hasEntryId?'?,':''}${hasSrcId?'?,':''}?, ?, ${hasContent?'?,':''}${hasKeywords?'?,':''}${hasCategory?'?,':''}?, 0, NULL)`);
+
+    let ok = 0, fail = 0, errors = [];
+    for (const e of entries) {
+      try {
+        if (!e || !e.title || !e.module) { fail++; continue; }
+        const params = [];
+        if (hasEntryId) {
+          let eid = e.entry_id || ('KB-admin-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8));
+          // 检查 entry_id 重复
+          const dup = db.prepare('SELECT 1 FROM kb_formal WHERE entry_id = ?').get(eid);
+          if (dup) eid = eid + '-' + Math.random().toString(36).slice(2, 6);
+          params.push(eid);
+        }
+        if (hasSrcId) {
+          const sid = e.src_id || 'SRC-LEGACY-001';
+          // 检查 src_id 是否在 source_index 里，否则用兜底
+          const srcExists = db.prepare('SELECT 1 FROM source_index WHERE src_id = ?').get(sid);
+          params.push(srcExists ? sid : 'SRC-LEGACY-001');
+        }
+        params.push(String(e.module));
+        params.push(String(e.title));
+        if (hasContent) params.push(String(e.content || ''));
+        if (hasKeywords) params.push(Array.isArray(e.keywords) ? e.keywords.join(',') : (e.keywords || ''));
+        if (hasCategory) params.push(e.category || '');
+        params.push(Math.max(0, Math.min(1, Number(e.trust_score || e.score) || 0.7)));
+        insert.run(...params);
+        ok++;
+      } catch(err) {
+        fail++;
+        errors.push((e && e.title || '?') + ': ' + err.message);
+      }
+    }
+
+    res.json({ ok, fail, total: entries.length, errors: errors.slice(0, 5), ingested_at: new Date().toISOString() });
+  } catch(e) {
+    res.json({ ok: 0, error: e.message });
+  }
+});
+
+// === R51-B · /api/admin/kb/audit-quality（trust_score < 0.5 扫描）===
+app.get('/api/admin/kb/audit-quality', adminAuth, (req, res) => {
+  try {
+    if (!db) return res.json({ error: '数据库未就绪' });
+    const low = db.prepare("SELECT COUNT(*) as c FROM kb_formal WHERE trust_score < 0.5").get().c;
+    const mid = db.prepare("SELECT COUNT(*) as c FROM kb_formal WHERE trust_score >= 0.5 AND trust_score < 0.8").get().c;
+    const hi = db.prepare("SELECT COUNT(*) as c FROM kb_formal WHERE trust_score >= 0.8").get().c;
+    const short = db.prepare("SELECT COUNT(*) as c FROM kb_formal WHERE length(content) < 50").get().c;
+    const empty = db.prepare("SELECT COUNT(*) as c FROM kb_formal WHERE content IS NULL OR length(content) = 0").get().c;
+    res.json({ low, mid, hi, short, empty, total: low + mid + hi });
+  } catch(e) {
+    res.json({ error: e.message });
+  }
 });
 
 // === 公共 KB 统计（免 JWT）===

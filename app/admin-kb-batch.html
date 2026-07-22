@@ -228,43 +228,86 @@ async function ingestExecute() {
   const lines = text.split('\n').filter(l=>l.trim());
   const log = document.getElementById('ingestResult');
   log.textContent = `[${new Date().toLocaleTimeString()}] 解析 ${lines.length} 条...\n`;
-  let ok = 0, fail = 0;
+  let entries = [], parseFail = 0;
   for (const line of lines) {
     try {
-      const obj = JSON.parse(line);
-      log.textContent += `  ✅ ${obj.title}\n`;
-      ok++;
+      entries.push(JSON.parse(line));
     } catch(e) {
-      log.textContent += `  ❌ 解析失败: ${line.slice(0,40)}\n`;
-      fail++;
+      parseFail++;
+      log.textContent += `  ❌ 解析失败: ${line.slice(0,50)}\n`;
     }
   }
-  log.textContent += `[${new Date().toLocaleTimeString()}] 完成: ${ok} 成功 / ${fail} 失败\n`;
+  if (!entries.length) { log.textContent += '⚠️ 无有效条目\n'; return; }
+  log.textContent += `  → POST /api/admin/kb/ingest (${entries.length} 条)\n`;
+  const token = localStorage.getItem('admin_token') || '';
+  try {
+    const r = await fetch(API+'/api/admin/kb/ingest', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({entries})
+    });
+    const d = await r.json();
+    if (d.error) { log.textContent += `  ❌ ${d.error}\n`; return; }
+    log.textContent += `  ✅ 入库成功 ${d.ok} 条 / ${d.fail} 失败 / ${d.total} 处理\n`;
+    (d.errors||[]).forEach(e => log.textContent += `  ⚠️ ${e}\n`);
+    log.textContent += `  📅 ${d.ingested_at}\n`;
+    // 刷新统计
+    setTimeout(loadStats, 500);
+  } catch(e) {
+    log.textContent += `  ❌ 网络错误: ${e.message}\n`;
+  }
 }
 
 async function auditQuality() {
   const log = document.getElementById('auditResult');
   log.textContent = `[${new Date().toLocaleTimeString()}] 🔍 扫描质量...\n`;
-  // 占位:实际可查 trust_score < 0.6 / content length < 50
-  setTimeout(()=>{
-    log.textContent += `  ✅ 扫描完成\n  - 高质量(>0.8): ${(stats?.total||4150)*0.72|0} 条\n  - 中等(0.5-0.8): ${(stats?.total||4150)*0.22|0} 条\n  - 待提升(<0.5): ${(stats?.total||4150)*0.06|0} 条\n`;
-  }, 1000);
+  const token = localStorage.getItem('admin_token') || '';
+  try {
+    const r = await fetch(API+'/api/admin/kb/audit-quality', {headers:{'Authorization':'Bearer '+token}});
+    const d = await r.json();
+    if (d.error) { log.textContent += `  ❌ ${d.error}\n`; return; }
+    log.textContent += `  ✅ 扫描完成 (总计 ${d.total} 条)\n`;
+    log.textContent += `  - 高质量(≥0.8): ${d.hi} 条 (${(d.hi*100/d.total).toFixed(1)}%)\n`;
+    log.textContent += `  - 中等(0.5-0.8): ${d.mid} 条 (${(d.mid*100/d.total).toFixed(1)}%)\n`;
+    log.textContent += `  - 待提升(<0.5): ${d.low} 条 (${(d.low*100/d.total).toFixed(1)}%)\n`;
+    log.textContent += `  - 短内容(<50字): ${d.short} 条\n`;
+    log.textContent += `  - 空内容: ${d.empty} 条\n`;
+  } catch(e) {
+    log.textContent += `  ❌ 网络错误: ${e.message}\n`;
+  }
 }
 
 async function auditDuplicate() {
   const log = document.getElementById('auditResult');
-  log.textContent = `[${new Date().toLocaleTimeString()}] 🔍 重复检测...\n`;
-  setTimeout(()=>{
-    log.textContent += `  ✅ 检测完成\n  - 疑似重复: 23 条 (建议去重)\n  - 高度相似: 8 条\n`;
-  }, 1000);
+  log.textContent = `[${new Date().toLocaleTimeString()}] 🔍 重复扫描...\n`;
+  const token = localStorage.getItem('admin_token') || '';
+  try {
+    // 抽样热门 module 的高频词搜，看 title 重复
+    const words = ['化解','体质','紫微','八宅','流年','纳音','十天干'];
+    let total = 0;
+    for (const w of words) {
+      const r = await fetch(API+`/api/admin/kb/search?q=${encodeURIComponent(w)}`, {headers:{'Authorization':'Bearer '+token}});
+      const d = await r.json();
+      total += (d.results||[]).length;
+    }
+    log.textContent += `  ✅ 抽样扫描完成\n  - 抽样词 ${words.length} 个 / 检索结果 ${total} 条\n  - 提示：真实去重需要 SQL `title`+`module` 复合索引\n`;
+  } catch(e) {
+    log.textContent += `  ❌ 扫描失败: ${e.message}\n`;
+  }
 }
 
 async function auditLowScore() {
   const log = document.getElementById('auditResult');
-  log.textContent = `[${new Date().toLocaleTimeString()}] 🔍 低分条目...\n`;
-  setTimeout(()=>{
-    log.textContent += `  ⚠️ trust_score < 0.5 的条目: 42 条\n  - 建议人工审核\n  - 已导出 IDs 至 audit/low-score-20260722.txt\n`;
-  }, 1000);
+  log.textContent = `[${new Date().toLocaleTimeString()}] 🔍 低分条目扫描...\n`;
+  const token = localStorage.getItem('admin_token') || '';
+  try {
+    const r = await fetch(API+'/api/admin/kb/audit-quality', {headers:{'Authorization':'Bearer '+token}});
+    const d = await r.json();
+    if (d.error) { log.textContent += `  ❌ ${d.error}\n`; return; }
+    log.textContent += `  ⚠️ trust_score < 0.5 的条目: ${d.low} 条\n  - 建议人工审核\n  - 短内容(<50字): ${d.short} 条需扩容\n`;
+  } catch(e) {
+    log.textContent += `  ❌ 网络错误: ${e.message}\n`;
+  }
 }
 
 async function exportData() {
@@ -277,6 +320,34 @@ async function exportData() {
   }, 1200);
 }
 
+
+// === Token 持久化 ===
+function saveToken(){const t=document.getElementById('tokenInput').value.trim();if(t){localStorage.setItem('admin_token',t);document.getElementById('tokenStatus').textContent='✓ 已保存'}}
+function loadToken(){const t=localStorage.getItem('admin_token')||'';document.getElementById('tokenInput').value=t;document.getElementById('tokenStatus').textContent=t?'✓ 已加载':'⚠️ 未登录'}
+
+// === 真实 KB 检索 ===
+async function doSearch(){
+  const q=document.getElementById('searchInput').value.trim();
+  if(!q||q.length<2){document.getElementById('searchResult').textContent='⚠️ 请输入至少 2 字';return}
+  document.getElementById('searchResult').textContent='🔍 检索中...';
+  const token=localStorage.getItem('admin_token')||'';
+  try{
+    const r=await fetch(API+'/api/admin/kb/search?q='+encodeURIComponent(q),{headers:{'Authorization':'Bearer '+token}});
+    const d=await r.json();
+    const rs=d.results||[];
+    if(d.error){document.getElementById('searchResult').textContent='❌ '+d.error;return}
+    if(!rs.length){document.getElementById('searchResult').textContent='未找到匹配条目';return}
+    let html=`找到 ${rs.length} 条:\n\n`;
+    rs.slice(0,15).forEach((r,i)=>{
+      html+=`${i+1}. [${r.module||'?'}] ${r.title}\n   ⭐ trust=${r.score||'?'}\n\n`;
+    });
+    document.getElementById('searchResult').textContent=html;
+  }catch(e){document.getElementById('searchResult').textContent='❌ '+e.message}
+}
+
+document.getElementById('searchInput').addEventListener('keypress',e=>{if(e.key==='Enter')doSearch()});
+
+loadToken();
 loadStats();
 </script>
 </body>
