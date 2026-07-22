@@ -2841,6 +2841,20 @@ input, textarea, select {
 .tri-verdict{margin-top:14px;padding:14px;background:rgba(0,0,0,.25);border-radius:10px;border:1px dashed var(--gold);font-size:12px;line-height:2}
 .tri-source{font-size:10px;opacity:.4;margin-top:12px;padding-top:8px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
 @media(max-width:768px){.tri-3col{grid-template-columns:1fr}}
+/* R40-A fengshui 化解 4 宫深度补强 */
+.qh-palace{padding:18px;background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(0,0,0,.2));border-radius:12px;margin:12px 0;border:1px dashed var(--gold);position:relative;overflow:hidden}
+.qh-palace::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.6}
+.qh-palace-title{font-size:15px;color:var(--gold);letter-spacing:3px;margin-bottom:10px;font-weight:700;display:flex;align-items:center;gap:8px}
+.qh-palace-title .icon{font-size:24px}
+.qh-palace-subtitle{font-size:11px;opacity:.6;margin-bottom:12px;letter-spacing:1px}
+.qh-palace-detail{font-size:12px;line-height:2;color:var(--paper);margin-bottom:12px}
+.qh-palace-detail b{color:var(--gold);font-weight:600}
+.qh-palace-detail .action{display:inline-block;padding:2px 8px;background:rgba(201,168,76,.15);border-radius:4px;margin:2px;font-size:11px;color:var(--gold)}
+.qh-palace-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:8px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+.qh-palace-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.qh-palace-cell{padding:12px;background:rgba(0,0,0,.25);border-radius:8px;border:1px solid var(--line);font-size:11px;line-height:1.8}
+.qh-palace-cell .label{color:var(--gold);font-size:11px;letter-spacing:1.5px;margin-bottom:6px;font-weight:600}
+@media(max-width:768px){.qh-palace-grid{grid-template-columns:1fr}}
 </style>
 </style>
 </style>
@@ -7146,6 +7160,109 @@ function renderTripleStackR39(){
   h+='</div>';
   return h;
 }
+/* ===== R40-A fengshui 化解 4 宫深度补强 ===== */
+// 17. 迁移宫化解
+function renderQianyiHuajieR40(){
+  var h='<div class="qh-palace">';
+  h+='<div class="qh-palace-title"><span class="icon">🚀</span> 迁移宫化解（化解板块·第 17 模块）</div>';
+  h+='<div class="qh-palace-subtitle">紫微迁移宫主外出、出行、搬迁、外缘、驿马</div>';
+  h+='<div class="qh-palace-detail">';
+  h+='【化解原则】<br>';
+  h+='① <b>迁新居</b>：先查流年太岁方位 + 配合命主吉方<br>';
+  h+='② <b>出行</b>：避开五黄煞方 + 选择吉日吉时出发<br>';
+  h+='③ <b>长途搬迁</b>：选天德月德日 + 黄道吉日<br>';
+  h+='④ <b>出行佩戴</b>：本命太岁符 + 平安扣<br>';
+  h+='⑤ <b>家居布局</b>：先理气后布局 + 罗盘定向<br>';
+  h+='⑥ <b>风水调整</b>：需大师审核 + 因人而异<br>';
+  h+='</div>';
+  h+='<div class="qh-palace-grid">';
+  h+='<div class="qh-palace-cell"><div class="label">📍 出行方位</div>东南（巽）大吉·西北（乾）小凶<br>东（木）贵人·南（火）驿马</div>';
+  h+='<div class="qh-palace-cell"><div class="label">📅 择日</div>天德日·月德日·黄道吉日<br>避开岁破日·五毒日</div>';
+  h+='<div class="qh-palace-cell"><div class="label">🕐 时辰</div>巳时（9-11）·午时（11-13）<br>申时（15-17）出行大吉</div>';
+  h+='<div class="qh-palace-cell"><div class="label">🎒 佩戴</div>本命太岁符·平安扣·车挂<br>朱砂七星挂件</div>';
+  h+='</div>';
+  h+='<div class="qh-palace-source">📜 《紫微斗数全集》《迁都论》《协纪辨方书》《天星择日》《奇门遁甲》《梅花易数》共 6 部古籍</div>';
+  h+='</div>';
+  return h;
+}
+
+// 18. 福德宫化解
+function renderFudeHuajieR40(){
+  var h='<div class="qh-palace">';
+  h+='<div class="qh-palace-title"><span class="icon">🌟</span> 福德宫化解（化解板块·第 18 模块）</div>';
+  h+='<div class="qh-palace-subtitle">紫微福德宫主精神修养、内心安宁、阴骘、因果</div>';
+  h+='<div class="qh-palace-detail">';
+  h+='【化解原则】<br>';
+  h+='① <b>每日打坐</b>：静坐 30 分钟 + 调息 + 冥想<br>';
+  h+='② <b>日行一善</b>：念《阴骘文》+ 积德 + 不求回报<br>';
+  h+='③ <b>抄经</b>：抄《道德经》一章 + 静心 + 启智<br>';
+  h+='④ <b>参禅礼拜</b>：选寺庙 + 静心 + 远离尘嚣<br>';
+  h+='⑤ <b>亲近自然</b>：每周爬山 + 听水声 + 看星空<br>';
+  h+='⑥ <b>远离负能量</b>：远离是非 + 远离戾气 + 远离小人<br>';
+  h+='</div>';
+  h+='<div class="qh-palace-grid">';
+  h+='<div class="qh-palace-cell"><div class="label">🧘 静修法门</div>打坐·冥想·禅修<br>抄经·念经·持咒</div>';
+  h+='<div class="qh-palace-cell"><div class="label">📖 经典研读</div>《道德经》《金刚经》《阴骘文》<br>《太上感应篇》《了凡四训》</div>';
+  h+='<div class="qh-palace-cell"><div class="label">🌿 亲近自然</div>每周爬山·每月远足<br>每年 1 次长途旅行</div>';
+  h+='<div class="qh-palace-cell"><div class="label">💝 积德行善</div>日行一善·月行一义<br>年行一功·终身行仁</div>';
+  h+='</div>';
+  h+='<div class="qh-palace-source">📜 《太乙金华宗旨》《道德经》《金刚经》《六祖坛经》《楞严经》《阴骘文》共 6 部古籍</div>';
+  h+='</div>';
+  return h;
+}
+
+// 19. 兄弟宫化解
+function renderXiongdiHuajieR40(){
+  var h='<div class="qh-palace">';
+  h+='<div class="qh-palace-title"><span class="icon">👥</span> 兄弟宫化解（化解板块·第 19 模块）</div>';
+  h+='<div class="qh-palace-subtitle">紫微兄弟宫主平辈关系、兄弟姐妹、朋友、同事</div>';
+  h+='<div class="qh-palace-detail">';
+  h+='【化解原则】<br>';
+  h+='① <b>财务分明</b>：兄弟之间财务要分明 + 不混账<br>';
+  h+='② <b>大额借贷</b>：立字为据 + 写借条 + 留凭证<br>';
+  h+='③ <b>合伙做生意</b>：白纸黑字 + 股权清晰 + 退出机制<br>';
+  h+='④ <b>不与亲属员工</b>：避免亲属任职财务关键岗<br>';
+  h+='⑤ <b>兄弟合伙</b>：选对位置 + 明确分工 + 定期对账<br>';
+  h+='⑥ <b>家族会议</b>：每季度开一次 + 讨论大事<br>';
+  h+='</div>';
+  h+='<div class="qh-palace-grid">';
+  h+='<div class="qh-palace-cell"><div class="label">💰 财务规则</div>AA 制·账目清晰<br>借据齐全·定期核对</div>';
+  h+='<div class="qh-palace-cell"><div class="label">🤝 合伙原则</div>股权清晰·分工明确<br>决策机制·退出条款</div>';
+  h+='<div class="qh-palace-cell"><div class="label">👔 亲属员工</div>避免财务关键岗<br>同等考核·不特殊</div>';
+  h+='<div class="qh-palace-cell"><div class="label">📅 家族会议</div>每季度一次<br>大事共议·小事自理</div>';
+  h+='</div>';
+  h+='<div class="qh-palace-source">📜 《紫微斗数全集》《太上感应篇》《了凡四训》《论语》《颜氏家训》共 5 部古籍</div>';
+  h+='</div>';
+  return h;
+}
+
+// 20. 田宅宫化解
+function renderTianzhaiHuajieR40(){
+  var h='<div class="qh-palace">';
+  h+='<div class="qh-palace-title"><span class="icon">🏠</span> 田宅宫化解（化解板块·第 20 模块）</div>';
+  h+='<div class="qh-palace-subtitle">紫微田宅宫主家宅、置业、不动产、居住环境</div>';
+  h+='<div class="qh-palace-detail">';
+  h+='【化解原则】<br>';
+  h+='① <b>购置家宅</b>：先查宅命 + 配合命主 + 五行相合<br>';
+  h+='② <b>装修</b>：择吉日动土 + 避开太岁方<br>';
+  h+='③ <b>动土前</b>：祭拜土地公 + 安土地神位<br>';
+  h+='④ <b>入住</b>：选吉日吉时 + 燃香 + 安神位<br>';
+  h+='⑤ <b>风水布局</b>：需合命主五行 + 因人而异<br>';
+  h+='⑥ <b>每年立春</b>：调整布局 + 添置吉祥物<br>';
+  h+='⑦ <b>家宅禁忌</b>：忌开门见墓 + 忌横梁压顶 + 忌镜对床<br>';
+  h+='</div>';
+  h+='<div class="qh-palace-grid">';
+  h+='<div class="qh-palace-cell"><div class="label">🏡 购房择日</div>天德日·月德日<br>黄道吉日·避开岁破</div>';
+  h+='<div class="qh-palace-cell"><div class="label">🔨 装修动土</div>祭土地公·安神位<br>选吉日·避太岁</div>';
+  h+='<div class="qh-palace-cell"><div class="label">🛋 室内布局</div>玄空飞星·八宅明镜<br>五行相配·动静分明</div>';
+  h+='<div class="qh-palace-cell"><div class="label">⚠️ 禁忌</div>门见墓·梁压顶·镜对床<br>厕中门·床下炉</div>';
+  h+='</div>';
+  h+='<div class="qh-palace-source">📜 《黄帝宅经》《八宅明镜》《阳宅三要》《玄空飞星》《天星择日》《沈氏玄空学》《地理正宗》共 7 部古籍</div>';
+  h+='</div>';
+  return h;
+}
+
+console.log('[R40-A] fengshui 化解 4 宫函数已加载（迁移/福德/兄弟/田宅）');
 </script>
 
 <script src="js/ui-toast.js" defer></script>
@@ -7467,6 +7584,50 @@ function computeXuanKong(){
   </div>
 </div>
 <!-- section-triple-stack END -->
+
+<!-- section-qianyi-huajie · R40-A 迁移宫化解 START -->
+<div class="fs-section" id="section-qianyi-huajie">
+  <div class="input-card">
+    <h3>🚀 迁移宫化解（化解板块·第 17 模块）</h3>
+    <p style="font-size:12px;opacity:.6;margin:8px 0;line-height:1.7">紫微迁移宫主外出/出行/搬迁/外缘/驿马。综合 6 部古籍制定化解方案。</p>
+    <button class="btn" onclick="document.getElementById('qh-qianyi-wrap').innerHTML=renderQianyiHuajieR40()" style="margin-top:10px">🚀 迁移宫化解方案</button>
+    <div id="qh-qianyi-wrap"></div>
+  </div>
+</div>
+<!-- section-qianyi-huajie END -->
+
+<!-- section-fude-huajie · R40-A 福德宫化解 START -->
+<div class="fs-section" id="section-fude-huajie">
+  <div class="input-card">
+    <h3>🌟 福德宫化解（化解板块·第 18 模块）</h3>
+    <p style="font-size:12px;opacity:.6;margin:8px 0;line-height:1.7">紫微福德宫主精神修养/内心安宁/阴骘/因果。综合 6 部古籍制定化解方案。</p>
+    <button class="btn" onclick="document.getElementById('qh-fude-wrap').innerHTML=renderFudeHuajieR40()" style="margin-top:10px">🌟 福德宫化解方案</button>
+    <div id="qh-fude-wrap"></div>
+  </div>
+</div>
+<!-- section-fude-huajie END -->
+
+<!-- section-xiongdi-huajie · R40-A 兄弟宫化解 START -->
+<div class="fs-section" id="section-xiongdi-huajie">
+  <div class="input-card">
+    <h3>👥 兄弟宫化解（化解板块·第 19 模块）</h3>
+    <p style="font-size:12px;opacity:.6;margin:8px 0;line-height:1.7">紫微兄弟宫主平辈关系/兄弟姐妹/朋友/同事。综合 5 部古籍制定化解方案。</p>
+    <button class="btn" onclick="document.getElementById('qh-xiongdi-wrap').innerHTML=renderXiongdiHuajieR40()" style="margin-top:10px">👥 兄弟宫化解方案</button>
+    <div id="qh-xiongdi-wrap"></div>
+  </div>
+</div>
+<!-- section-xiongdi-huajie END -->
+
+<!-- section-tianzhai-huajie · R40-A 田宅宫化解 START -->
+<div class="fs-section" id="section-tianzhai-huajie">
+  <div class="input-card">
+    <h3>🏠 田宅宫化解（化解板块·第 20 模块）</h3>
+    <p style="font-size:12px;opacity:.6;margin:8px 0;line-height:1.7">紫微田宅宫主家宅/置业/不动产/居住环境。综合 7 部古籍制定化解方案。</p>
+    <button class="btn" onclick="document.getElementById('qh-tianzhai-wrap').innerHTML=renderTianzhaiHuajieR40()" style="margin-top:10px">🏠 田宅宫化解方案</button>
+    <div id="qh-tianzhai-wrap"></div>
+  </div>
+</div>
+<!-- section-tianzhai-huajie END -->
 
 <!-- section-archive-detail · 第三十二轮 START -->
 <div class="fs-section" id="section-archive-detail">
