@@ -224,6 +224,25 @@ select.input option{background:var(--ink);color:var(--paper)}
 }
 .toast.show{display:block;animation:in .3s}
 @keyframes in{from{opacity:0;transform:translate(-50%,-40%)}to{opacity:1;transform:translate(-50%,-50%)}}
+/* R40-B master-disease 双核 + 事业 */
+.mdd-career{padding:18px;background:linear-gradient(135deg,rgba(74,138,168,.08),rgba(0,0,0,.2));border-radius:12px;margin:14px 0;border:1px dashed #4a8aa8}
+.mdd-career-title{font-size:15px;color:#4a8aa8;letter-spacing:3px;margin-bottom:10px;font-weight:700;display:flex;align-items:center;gap:8px}
+.mdd-career-subtitle{font-size:11px;opacity:.6;margin-bottom:12px;letter-spacing:1px}
+.mdd-career-8grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.mdd-career-cell{padding:12px 10px;background:rgba(74,138,168,.08);border-radius:8px;border:1px solid var(--line);font-size:11px;line-height:1.8;text-align:center;transition:.2s}
+.mdd-career-cell:hover{background:rgba(74,138,168,.18);border-color:#4a8aa8;transform:translateY(-2px)}
+.mdd-career-cell .icon{font-size:22px;display:block;margin-bottom:4px}
+.mdd-career-cell b{font-size:11px;color:#4a8aa8;display:block;margin-bottom:4px;letter-spacing:1.5px}
+.mdd-career-cell .tip{font-size:10px;opacity:.7;line-height:1.7}
+.mdd-career-verdict{margin-top:14px;padding:12px;background:rgba(0,0,0,.3);border-radius:8px;border:1px dashed #4a8aa8;font-size:12px;line-height:2}
+.mdd-career-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:8px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+.mdd-career .health-section{margin-top:18px;padding:14px;background:rgba(74,154,110,.08);border-radius:10px;border:1px dashed #4a9a6e}
+.mdd-career .health-title{font-size:14px;color:#4a9a6e;letter-spacing:2px;margin-bottom:10px;font-weight:600}
+.mdd-career .health-8grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.mdd-career .health-cell{padding:8px;background:rgba(74,154,110,.06);border-radius:6px;border:1px solid var(--line);font-size:10px;text-align:center}
+.mdd-career .health-cell .icon{font-size:16px;display:block;margin-bottom:2px}
+.mdd-career .health-cell b{font-size:10px;color:#4a9a6e;display:block}
+@media(max-width:768px){.mdd-career-8grid,.mdd-career .health-8grid{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -1140,5 +1159,58 @@ window.addEventListener('DOMContentLoaded', ()=>{
 });
 </script>
 
+/* ===== R40-B master-disease 双核 + 事业 ===== */
+var MDD_HEALTH_8D_R40 = {
+  "气血":{icon:"🩸",tip:"规律作息+八段锦+红枣枸杞"},
+  "脾胃":{icon:"🍚",tip:"细嚼慢咽+小米粥+山药"},
+  "心肾":{icon:"💗",tip:"子午觉+黑豆黑芝麻+节欲"},
+  "肝胆":{icon:"🌿",tip:"少熬夜+菊花枸杞+推肝经"},
+  "睡眠":{icon:"😴",tip:"23点前睡+酸枣仁+泡脚"},
+  "情绪":{icon:"😊",tip:"冥想+运动+倾诉+疏肝"},
+  "体质":{icon:"💪",tip:"慢跑+游泳+中医调理"},
+  "寿元":{icon:"🎂",tip:"顺应四时+节制饮食+体检"}
+};
+var MDD_CAREER_8D_R40 = {
+  "正财":{icon:"💰",tip:"稳中求进+主业为重+积累技能"},
+  "偏财":{icon:"🎲",tip:"小额试水+长线思维+风险控制"},
+  "官运":{icon:"👔",tip:"贵人扶持+业绩+持续学习"},
+  "学业":{icon:"📚",tip:"夯实基础+查漏补缺+刷题"},
+  "创业":{icon:"🚀",tip:"小步快跑+核心壁垒+现金流"},
+  "升迁":{icon:"📈",tip:"业绩+人际+学习+抓住时机"},
+  "同事":{icon:"👥",tip:"互相尊重+团队协作+不站队"},
+  "合作":{icon:"🤝",tip:"契约精神+互惠互利+长期主义"}
+};
+
+function renderDiseaseHealthCareerR40(){
+  var h='<div class="mdd-career">';
+  h+='<div class="mdd-career-title">🩺💼 病大师·健康事业双核（化解板块·第 21 模块·复用 R38-C）</div>';
+  h+='<div class="mdd-career-subtitle">病大师专属：8 健康维 + 8 事业维 + 紫微疾厄宫联动 · 25 部古籍</div>';
+  // 健康 8 维
+  h+='<div class="health-section"><div class="health-title">🩺 健康 8 维</div><div class="health-8grid">';
+  Object.keys(MDD_HEALTH_8D_R40).forEach(function(k){
+    var it=MDD_HEALTH_8D_R40[k];
+    h+='<div class="health-cell"><span class="icon">'+it.icon+'</span><b>'+k+'</b><div style="opacity:.6;margin-top:4px">'+it.tip+'</div></div>';
+  });
+  h+='</div></div>';
+  // 事业 8 维
+  h+='<div style="margin-top:18px;font-size:14px;color:#4a8aa8;letter-spacing:2px;margin-bottom:10px;font-weight:600">💼 事业 8 维</div>';
+  h+='<div class="mdd-career-8grid">';
+  Object.keys(MDD_CAREER_8D_R40).forEach(function(k){
+    var it=MDD_CAREER_8D_R40[k];
+    h+='<div class="mdd-career-cell"><span class="icon">'+it.icon+'</span><b>'+k+'</b><div class="tip">'+it.tip+'</div></div>';
+  });
+  h+='</div>';
+  // 综合判读
+  h+='<div class="mdd-career-verdict"><b style="color:#4a9a6e">🎯 病大师综合判读：</b><br>';
+  h+='① <b style="color:#4a9a6e">健康 8 维</b>：以气血+脾胃+睡眠为根基，调养为辅 ② <b style="color:#4a8aa8">事业 8 维</b>：以正财+官运+合作为核心，避开偏财风险 ③ <b style="color:#9b6ab0">紫微疾厄宫</b>：紫微化禄 → 健康基础稳固；化权 → 事业领跑 ④ 化解要点：病时正财、愈后官运、长期合作<br>';
+  h+='⑤ 病大师特别建议：<b style="color:#4a9a6e">身心同调</b> + <b style="color:#4a8aa8">事业稳进</b> + 顺应天时</div>';
+  h+='<div class="mdd-career-source">📜 《滴天髓》《紫微斗数全集》《子平真诠》《黄帝内经》《千金要方》《了凡四训》《阴骘文》《奇门遁甲》《梅花易数》《玉历宝钞》《协纪辨方书》《天星择日》《黄帝宅经》《八宅明镜》《玄空飞星》《阳宅三要》《葬书》《撼龙经》《太上感应篇》《三世因果经》《地藏经》《药师经》《太乙金华宗旨》《命理探源》《三命通会》共 25 部古籍</div>';
+  h+='</div>';
+  return h;
+}
+
+console.log('[R40-B] master-disease 双核函数已加载');
+<div id="r40DiseaseDashboard"></div>
+<script>setTimeout(function(){var el=document.getElementById("r40DiseaseDashboard");if(el)el.innerHTML=renderDiseaseHealthCareerR40();},500);</script>
 </body>
 </html>
