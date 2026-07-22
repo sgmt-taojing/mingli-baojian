@@ -1811,6 +1811,53 @@ app.get('/api/public/latest-pushes', (req, res) => {
   }
 });
 
+// 公开课程列表（脱敏，去除 url 字段）
+app.get('/api/public/courses', (req, res) => {
+  try {
+    const courses = db.prepare(`SELECT id, master, title, type, duration, category, summary, sort_order FROM courses ORDER BY sort_order ASC, id ASC`).all();
+    // 解码 summary 中的转义
+    const safe = courses.map(c => ({
+      ...c,
+      summary: c.summary ? c.summary.replace(/\\n/g, ' ').slice(0, 120) : ''
+    }));
+    res.json({ count: safe.length, courses: safe, public: true });
+  } catch (e) {
+    res.json({ error: e.message });
+  }
+});
+
+// 公开中医诊室报告（filtered_text 已脱敏）
+app.get('/api/public/clinic-reports', (req, res) => {
+  try {
+    const reports = db.prepare(`SELECT id, case_id, patient_id, doctor_id, filtered_text, pushed_at, read_at FROM tcm_reports ORDER BY pushed_at DESC LIMIT 10`).all();
+    res.json({ count: reports.length, reports, public: true });
+  } catch (e) {
+    res.json({ error: e.message });
+  }
+});
+
+// 公开 TTS 音色列表（从 tts-server.py 配置中静态枚举，避免硬编码 8912 端口）
+app.get('/api/public/voices', (req, res) => {
+  res.json({
+    count: 11,
+    voices: [
+      { id: 'zh-CN-XiaoxiaoNeural', name: '晓晓', gender: 'female', lang: 'zh-CN', style: '温柔' },
+      { id: 'zh-CN-YunxiNeural', name: '云希', gender: 'male', lang: 'zh-CN', style: '青年' },
+      { id: 'zh-CN-YunjianNeural', name: '云健', gender: 'male', lang: 'zh-CN', style: '主播' },
+      { id: 'zh-CN-XiaoyiNeural', name: '晓伊', gender: 'female', lang: 'zh-CN', style: '情感' },
+      { id: 'zh-CN-YunyangNeural', name: '云扬', gender: 'male', lang: 'zh-CN', style: '新闻' },
+      { id: 'zh-CN-XiaomengNeural', name: '晓梦', gender: 'female', lang: 'zh-CN', style: '儿童' },
+      { id: 'zh-CN-XiaomoNeural', name: '晓墨', gender: 'female', lang: 'zh-CN', style: '文学' },
+      { id: 'zh-CN-XiaoxuanNeural', name: '晓萱', gender: 'female', lang: 'zh-CN', style: '甜美' },
+      { id: 'zh-CN-XiaoruiNeural', name: '晓睿', gender: 'female', lang: 'zh-CN', style: '客服' },
+      { id: 'zh-CN-YunfengNeural', name: '云枫', gender: 'male', lang: 'zh-CN', style: '温暖' },
+      { id: 'zh-CN-YunzeNeural', name: '云泽', gender: 'male', lang: 'zh-CN', style: '稳重' }
+    ],
+    public: true,
+    source: 'edge-tts'
+  });
+});
+
 // ============================
 // TTS 语音合成代理（转发到 8912 Python TTS 服务）
 // ============================
@@ -1985,7 +2032,7 @@ app.get('/api/v1/clinic/discussions/:caseId', _v1Redir('/api/clinic/discussions/
 app.get('/api/v1/kb/:filename', _v1Redir('/api/kb/:filename'));
 
 const _v1Pub = (legacy) => app.get('/api/v1/public'+legacy, _v1Redir('/api/public'+legacy));
-['/stats','/latest-pushes','/recent-cases'].forEach(s=>_v1Pub(s));
+['/stats','/latest-pushes','/recent-cases','/courses','/clinic-reports','/voices'].forEach(s=>_v1Pub(s));
 // 顶层公共端点
 app.get('/api/v1/health', (req,res)=>res.json({ok:true,ts:Date.now(),v1:true}));
 app.get('/api/v1/distill', _v1Redir('/api/distill'));
