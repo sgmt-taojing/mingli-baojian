@@ -2526,6 +2526,28 @@ input, textarea, select {
       box-shadow: 0 6px 24px rgba(201,168,76,0.15);
     }
     
+
+<style>
+/* ===== 第二十三轮·化解物品全流程 ===== */
+.rif-timeline{display:grid;grid-template-columns:1fr;gap:8px;margin-top:14px}
+@media(min-width:768px){.rif-timeline{grid-template-columns:repeat(2,1fr)}}
+.rif-step{padding:14px;background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:8px;border-left:3px solid var(--gold)}
+.rif-step .rif-num{font-size:11px;padding:1px 8px;background:rgba(201,168,76,.2);border-radius:8px;color:var(--gold);display:inline-block;margin-right:6px;font-weight:600}
+.rif-step .rif-title{font-size:13px;color:var(--gold);font-weight:600;letter-spacing:1px;margin-bottom:6px}
+.rif-step .rif-body{font-size:11px;line-height:1.7;opacity:.85}
+.rif-step .rif-body b{color:var(--gold2);font-size:11px}
+.rif-step .rif-meta{font-size:10px;color:var(--paper3);margin-top:6px;padding:4px 8px;background:rgba(0,0,0,.18);border-radius:4px;letter-spacing:1px}
+.rif-step .rif-warn{font-size:10px;color:#e8a8a0;margin-top:6px;padding:4px 8px;background:rgba(192,57,43,.12);border-radius:4px}
+.rif-step .rif-good{font-size:10px;color:#a8e8c0;margin-top:6px;padding:4px 8px;background:rgba(39,174,96,.12);border-radius:4px}
+.rif-step .rif-pick{display:grid;grid-template-columns:repeat(2,1fr);gap:4px;margin-top:6px;font-size:10px}
+.rif-step .rif-pick div{padding:4px 6px;background:rgba(201,168,76,.06);border-radius:4px}
+.rif-step .rif-pick b{color:var(--gold);margin-right:3px}
+.rif-summary{padding:14px;background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.02));border-radius:10px;border-left:3px solid var(--gold);margin-top:14px}
+.rif-summary .rs-title{font-size:13px;color:var(--gold);letter-spacing:2px;font-weight:600;margin-bottom:8px}
+.rif-summary .rs-flow{font-size:11px;line-height:1.8;color:var(--paper3)}
+.rif-summary .rs-flow b{color:var(--gold)}
+.rif-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+</style>
 </style>
 
 <style>
@@ -4266,6 +4288,56 @@ input, textarea, select {
     </div>
   </div>
 
+
+  <!-- 🌿 第二十三轮·R23·化解物品全流程规则库（购买→摆放→周期处置） -->
+  <div class="fs-section" id="section-items-full">
+    <div class="input-card">
+      <h3>🌿 化解物品 · 全流程处置规则库</h3>
+      <p style="font-size:12px;opacity:.6;margin:8px 0;line-height:1.7">
+        化解物品须遵循<strong>购买→择日→摆放时辰→方位→属相→材质→周期→处置</strong>全流程。
+        任一环节失当，反招其咎。依《八宅明镜》《阳宅三要》《鲁班经》《风水物件大全》《居家风水》《符咒全书》整理。
+      </p>
+      <div style="display:flex;gap:6px;margin:10px 0;flex-wrap:wrap">
+        <label style="font-size:11px"><input type="checkbox" class="rifItem" value="wenchangta"> 🗼 文昌塔</label>
+        <label style="font-size:11px"><input type="checkbox" class="rifItem" value="hulu"> 🎃 葫芦</label>
+        <label style="font-size:11px"><input type="checkbox" class="rifItem" value="shanshui"> 🖼️ 山水画</label>
+        <label style="font-size:11px"><input type="checkbox" class="rifItem" value="lvzhi"> 🌿 绿植</label>
+        <label style="font-size:11px"><input type="checkbox" class="rifItem" value="foxiang"> 🙏 佛像</label>
+        <label style="font-size:11px"><input type="checkbox" class="rifItem" value="jinshu"> 🏺 金属摆件</label>
+        <label style="font-size:11px"><input type="checkbox" class="rifItem" value="jingzi"> 🪞 镜子</label>
+        <label style="font-size:11px"><input type="checkbox" class="rifItem" value="yu"> 🐟 鱼缸</label>
+        <label style="font-size:11px"><input type="checkbox" class="rifItem" value="shuishui"> 💧 水晶</label>
+        <label style="font-size:11px"><input type="checkbox" class="rifItem" value="laohu"> 🐯 老虎画</label>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:10px 0">
+        <div>
+          <label style="display:block;font-size:11px;opacity:.7;margin-bottom:4px">命主年支（决定属相禁忌）</label>
+          <select id="rifYearZhi" style="width:100%;padding:6px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit">
+            <option value="">未选择</option>
+            <option value="子">子（鼠）</option><option value="丑">丑（牛）</option>
+            <option value="寅">寅（虎）</option><option value="卯">卯（兔）</option>
+            <option value="辰">辰（龙）</option><option value="巳">巳（蛇）</option>
+            <option value="午">午（马）</option><option value="未">未（羊）</option>
+            <option value="申">申（猴）</option><option value="酉">酉（鸡）</option>
+            <option value="戌">戌（狗）</option><option value="亥">亥（猪）</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block;font-size:11px;opacity:.7;margin-bottom:4px">启动场景</label>
+          <select id="rifScene" style="width:100%;padding:6px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit">
+            <option value="化煞">化煞</option>
+            <option value="招财">招财</option>
+            <option value="旺文">旺文</option>
+            <option value="求姻">求姻</option>
+            <option value="镇宅">镇宅</option>
+            <option value="延寿">延寿</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn" onclick="generateItemsFullFlow()" style="margin-top:14px">🌿 全流程规则推演</button>
+      <div id="itemsFullResult"></div>
+    </div>
+  </div>
   <!-- 🎯 第二十轮·R3·化解吉祥物品 24 类摆放 -->
   <div class="fs-section" id="section-items">
     <div class="input-card">
@@ -4832,6 +4904,244 @@ function generateZidiseLink(){
   document.getElementById('zidiseLinkResult').innerHTML = h;
 }
 
+
+/* ===== 第二十三轮·化解物品全流程规则引擎 ===== */
+var ITEM_FULL_RULE = {
+  'wenchangta':{
+    name:'文昌塔',icon:'🗼',
+    buy:{'吉日':'甲子日·丙午日·丁未日','时辰':'巳时（9-11）','场所':'香烛店/佛具店','价位':'铜质>陶瓷>木质','数量':'1座/7层/9层为佳','禁忌':'二手·破损'},
+    display:{'方位':'书桌左上（青龙位）','高度':'与眉平齐（约110cm）','朝向':'塔尖朝门/朝文曲位','五行':'木火•后天八卦 离位'},
+    material:{'木命':'木质塔','火命':'铜质塔','土命':'陶瓷塔','金命':'铜质镶玉','水命':'黑曜石塔'},
+    shensha:{'避冲':'属鼠人不可用','避对':'正对厕所/镜子','避压':'梁下不放'},
+    cycle:{'更换':'每3年（开运过气）','净化':'每月初一十五香薰','加持':'每年文昌日诵《文昌帝君阴骘文》'},
+    dispose:{'旧塔':'不可丢弃！寺庙回收/用红布包好埋净处','破损':'金缮修复或送庙','功德':'以旧换新 续人慧命'}
+  },
+  'hulu':{
+    name:'天然葫芦',icon:'🎃',
+    buy:{'吉日':'甲子日·壬午日','时辰':'午时（11-13）阳气盛','场所':'中药铺/葫芦专卖店','价位':'天然>铜制>木雕','规格':'肚大腰细 8-12cm','禁忌':'化工漆面/仿品'},
+    display:{'方位':'床头·大门内侧（视煞方定）','高度':'横梁之上吸煞','开口':'朝向煞气来方','特征':'内藏铜钱+朱砂'},
+    material:{'木命':'天然桃木葫芦','火命':'红皮葫芦','土命':'黄皮葫芦','金命':'白皮铜盖','水命':'黑皮水养'},
+    shensha:{'避冲':'属狗人不可摆床','避对':'不可对门（反冲）','避压':'不挂卧室横梁下'},
+    cycle:{'更换':'每年（吸煞过满）','净化':'端午午时晒 1时辰','加持':'装仓米+茶叶 七宝'},
+    dispose:{'旧葫':'不可当垃圾！装满朱砂埋土·或送寺庙','破损':'金缮修补可续用','功德':'置于十字路口 渡化煞气'}
+  },
+  'shanshui':{
+    name:'山水画',icon:'🖼️',
+    buy:{'吉日':'壬子日·癸亥日','时辰':'辰时（7-9）','场所':'字画店/画家定制','规格':'山环水抱•不见日落','禁忌':'瀑布/断崖/枯树'},
+    display:{'方位':'客厅南墙（背有靠山）','朝向':'山在左（水流入）','高度':'人平视（150-170cm）','五行':'正南•火•采光足'},
+    material:{'木命':'水墨山松','火命':'日出朝霞','土命':'山河壮阔','金命':'秋山红叶','水命':'雨后烟云'},
+    shensha:{'避冲':'忌正对大门（漏财）','避压':'横梁压画=压运','避冲':'属牛人不可挂西墙'},
+    cycle:{'更换':'每5年（画气老旧）','净化':'每年春分后轻擦拭','加持':'请画家题字•印鉴'},
+    dispose:{'旧画':'不可撕毁！裱好供奉后再收','破损':'金缮修复','功德':'捐赠图书馆/学校'}
+  },
+  'lvzhi':{
+    name:'生气绿植',icon:'🌿',
+    buy:{'吉日':'寅日•卯日（木日）','时辰':'卯时（5-7）太阳初升','场所':'花市•非医院门口','数量':'1/3/5盆（单数阳）','禁忌':'假花•带刺（仙人掌外）'},
+    display:{'方位':'客厅•书房•阳台（见光）','高度':'高于眼平 生气上扬','朝向':'向东南（木方）','五行':'木气•东南'},
+    material:{'木命':'富贵竹•万年青','火命':'红花•朱顶红','土命':'多肉•芦荟','金命':'白花•茉莉','水命':'水生•铜钱草'},
+    shensha:{'避冲':'卧室可放•但不可放凶方','避对':'不可对神位','避压':'不可在梁下'},
+    cycle:{'更换':'每2年（土气耗）','净化':'每月修剪•换盆','加持':'初一十五浇水'},
+    dispose:{'枯植':'不可乱丢！整株埋土•或晒干焚香','落叶':'作堆肥','功德':'移植回归自然'}
+  },
+  'foxiang':{
+    name:'佛像/神像',icon:'🙏',
+    buy:{'吉日':'初一•十五•佛诞日','时辰':'卯时（清晨敬）','场所':'寺庙请•正规开光','规格':'庄严•非工艺品','禁忌':'二手•非卖品'},
+    display:{'方位':'客厅中央•或财位东墙','高度':'高于人平视（200cm+）','朝向':'坐北朝南','五行':'土气厚德'},
+    material:{'木命':'木雕•沉香','火命':'铜雕•红木','土命':'陶瓷•黄土','金命':'铜鎏金','水命':'黑檀'},
+    shensha:{'避冲':'卧室可供奉观音','避对':'不可对厕所/厨房','避压':'不可夹杂物'},
+    cycle:{'更换':'长期供奉','净化':'每日香•每周茶','加持':'请僧人定期诵经'},
+    dispose:{'旧像':'不可丢弃！送寺庙•或焚化','破损':'金缮/送寺庙','功德':'续请圣像·法布施'}
+  },
+  'jinshu':{
+    name:'金属摆件',icon:'🏺',
+    buy:{'吉日':'庚日•辛日','时辰':'申时（15-17）','场所':'金铺•吉日开业','规格':'实心•厚重','禁忌':'二手'},
+    display:{'方位':'西方•西北方（金位）','高度':'与胸齐平','朝向':'开口朝内','五行':'金气收敛'},
+    material:{'木命':'铜•木柄金器','火命':'黄铜','土命':'金玉','金命':'纯金','水命':'锡器'},
+    shensha:{'避冲':'不可对尖角','避对':'不可对门窗冲','避压':'不可堆杂物'},
+    cycle:{'更换':'每3年','净化':'每月擦金布','加持':'初一十五敬茶'},
+    dispose:{'旧器':'回炉重造•或赠金铺','破损':'可修复续用','功德':'捐资助学'}
+  },
+  'jingzi':{
+    name:'八卦镜/凸镜',icon:'🪞',
+    buy:{'吉日':'丁卯日','时辰':'午时','场所':'佛具店','规格':'凸镜化煞•凹镜纳吉','禁忌':'二手'},
+    display:{'方位':'户门外•或煞气来方','高度':'1.5米以上','朝向':'反煞反凶','五行':'金水反照'},
+    material:{'木命':'铜镜','火命':'红铜镜','土命':'陶镜','金命':'水晶镜','水命':'黑曜石镜'},
+    shensha:{'避冲':'不可对自家门窗','避对':'不可对邻居','避压':'不可横梁压'},
+    cycle:{'更换':'每3年','净化':'每月初一十五擦净','加持':'道观开光'},
+    dispose:{'旧镜':'送寺庙/道观•或红布包埋','破损':'镜碎有凶•须送化','功德':'另请新镜取代'}
+  },
+  'yu':{
+    name:'鱼缸',icon:'🐟',
+    buy:{'吉日':'壬日•癸日','时辰':'卯时','场所':'水族店（开业吉日）','规格':'长方形•忌圆','数量':'1/4/9条（单数）','禁忌':'凶鱼•大型鱼'},
+    display:{'方位':'明堂位（客厅进门对角）','高度':'低于地平面','朝向':'鱼头朝内（招财）','五行':'水气•北方'},
+    material:{'木命':'绿水草缸','火命':'红鱼缸','土命':'黄沙缸','金命':'白缸','水命':'黑缸'},
+    shensha:{'避冲':'不可对灶台','避对':'不可正对神位','避压':'不可在沙发后'},
+    cycle:{'更换':'每3年换缸','净化':'每周换水1/4','加持':'初一十五点灯'},
+    dispose:{'死鱼':'不可丢弃！念经•埋土•或河放生','旧缸':'送水族店/转赠','功德':'物归有水族馆'}
+  },
+  'shuishui':{
+    name:'水晶/灵石',icon:'💧',
+    buy:{'吉日':'壬日','时辰':'午时（光照足）','场所':'水晶专卖店','规格':'通灵净体','禁忌':'二手•裂痕'},
+    display:{'方位':'财位/书桌','高度':'与胸齐平','朝向':'尖朝煞气方','五行':'水/火'},
+    material:{'木命':'绿幽灵','火命':'红玛瑙','土命':'黄水晶','金命':'白水晶','水命':'黑曜石'},
+    shensha:{'避冲':'不可对镜','避对':'不可对门','避压':'不可沾油烟'},
+    cycle:{'更换':'每3年','净化':'每月海盐净化','加持':'请僧道开光'},
+    dispose:{'旧晶':'碎晶：海盐埋净处','破损':'可修复续用','功德':'回赠水晶店/磨粉'}
+  },
+  'laohu':{
+    name:'老虎画/虎摆件',icon:'🐯',
+    buy:{'吉日':'寅日','时辰':'卯时','场所':'画店/木雕店','规格':'下山虎（平视）•不可笑虎','禁忌':'上山虎（伤主）'},
+    display:{'方位':'客厅西墙（白虎位镇宅）','高度':'高于人平视','朝向':'虎头朝门外（向外镇）','五行':'木气•震位'},
+    material:{'木命':'木雕虎','火命':'铜雕虎','土命':'陶瓷虎','金命':'铜鎏金','水命':'黑曜石'},
+    shensha:{'避冲':'属虎人不可摆','避对':'不可对卧室门','避压':'不可在梁下'},
+    cycle:{'更换':'每3年','净化':'每月初一十五擦净','加持':'请画家题字•挂红'},
+    dispose:{'旧虎':'送寺庙/道观•或埋净处','破损':'可修复续用','功德':'赠动物园/博物馆'}
+  }
+};
+
+function generateItemsFullFlow(){
+  var yearZhi = document.getElementById('rifYearZhi').value;
+  var scene = document.getElementById('rifScene').value;
+  var items = Array.from(document.querySelectorAll('.rifItem:checked')).map(c=>c.value);
+  if(items.length===0){
+    // 默认至少选1个
+    items=['wenchangta'];
+    alert('请至少选择1个化解物品（默认选中文昌塔）');
+  }
+
+  // === 属相禁忌匹配（12属相 × 物品冲）===
+  var SHENSHA_RULE = {
+    'wenchangta':'鼠（子）不可用，犯太岁相冲',
+    'hulu':'狗（戌）不可摆床，冲太岁',
+    'shanshui':'牛（丑）不可挂西墙，艮坤冲',
+    'lvzhi':'无属相禁忌（绿植普适）',
+    'foxiang':'无属相禁忌（观音普度）',
+    'jinshu':'猴（申）慎用，申金过旺',
+    'jingzi':'无属相禁忌（镜反煞）',
+    'yu':'无属相禁忌（水主财）',
+    'shuishui':'无属相禁忌',
+    'laohu':'虎（寅）不可用，伏吟反噬'
+  };
+
+  // === 时辰吉位 ===
+  var SHICHEN_POS = {
+    '子':'正北', '丑':'东北', '寅':'东北', '卯':'正东',
+    '辰':'东南', '巳':'东南', '午':'正南', '未':'西南',
+    '申':'西南', '酉':'正西', '戌':'西北', '亥':'西北'
+  };
+  var zhiNow = '巳'; // 当前默认推荐巳时启动
+  if(yearZhi) zhiNow = (scene==='招财')?'辰':(scene==='化煞')?'午':'卯';
+  var bestPos = SHICHEN_POS[zhiNow];
+
+  // === 全流程5阶段：购买/择日/摆放/周期/处置 ===
+  var stageNames = ['① 购买阶段','② 择日择时','③ 摆放（位•向•高•材）','④ 周期维护','⑤ 周期后处置'];
+  var h = '<div class="rif-timeline">';
+  items.forEach(function(key){
+    var rule = ITEM_FULL_RULE[key];
+    if(!rule) return;
+    var warns = [];
+    if(yearZhi && SHENSHA_RULE[key] && SHENSHA_RULE[key].indexOf(yearZhi+'不可')>=0){
+      warns.push('⚠ '+SHENSHA_RULE[key]);
+    }
+    h += '<div class="rif-step">';
+    // 卡头
+    h += '<div class="rif-title">'+rule.icon+' '+rule.name+'-'+scene+'套</div>';
+    h += '<div class="rif-body">';
+    // 阶段1：购买
+    h += '<div style="margin-top:10px"><span class="rif-num">①</span><strong>购买阶段</strong></div>';
+    h += '<div class="rif-pick" style="margin-top:6px">';
+    h += '<div><b>吉日</b>'+rule.buy.吉日+'</div>';
+    h += '<div><b>时辰</b>'+rule.buy.时辰+'</div>';
+    h += '<div><b>场所</b>'+rule.buy.场所+'</div>';
+    h += '<div><b>规格</b>'+rule.buy.规格+'</div>';
+    h += '<div><b>数量</b>'+(rule.buy.数量||'1件')+'</div>';
+    h += '<div><b>价位</b>'+rule.buy.价位+'</div>';
+    h += '</div>';
+    if(rule.buy.禁忌) h += '<div class="rif-warn">⚠ 禁忌：'+rule.buy.禁忌+'</div>';
+    // 阶段2：择日择时
+    h += '<div style="margin-top:10px"><span class="rif-num">②</span><strong>择日择时</strong></div>';
+    h += '<div style="font-size:11px;line-height:1.7;margin-top:4px">推荐启用：'+zhiNow+'时（'+bestPos+'方）· '+rule.buy.时辰+'·配合 '+rule.buy.吉日+' 较为理想</div>';
+    h += '<div class="rif-good">✦ 最佳时辰：'+bestPos+'方 '+zhiNow+'时（依场景推算：'+(scene==='招财'?'辰时财位':scene==='化煞'?'午时阳盛':'卯时木生')+'）</div>';
+    // 阶段3：摆放
+    h += '<div style="margin-top:10px"><span class="rif-num">③</span><strong>摆放（位•向•高•材）</strong></div>';
+    h += '<div class="rif-pick" style="margin-top:6px">';
+    h += '<div><b>方位</b>'+rule.display.方位+'</div>';
+    h += '<div><b>朝向</b>'+rule.display.朝向+'</div>';
+    h += '<div><b>高度</b>'+rule.display.高度+'</div>';
+    h += '<div><b>五行</b>'+rule.display.五行+'</div>';
+    h += '</div>';
+    if(yearZhi){
+      var matName = rule.material[SHENSHA_TO_DIZHI(yearZhi)] || '通用';
+    }
+    h += '<div class="rif-good">✦ 命主属'+yearZhi+'喜：'+rule.material[SHENSHA_TO_WUXING(yearZhi)]||'通用'+'</div>';
+    // 阶段4：周期维护
+    h += '<div style="margin-top:10px"><span class="rif-num">④</span><strong>周期维护</strong></div>';
+    h += '<div class="rif-pick" style="margin-top:6px">';
+    h += '<div><b>更换</b>'+rule.cycle.更换+'</div>';
+    h += '<div><b>净化</b>'+rule.cycle.净化+'</div>';
+    h += '<div><b>加持</b>'+rule.cycle.加持+'</div>';
+    h += '</div>';
+    if(rule.shensha){
+      h += '<div class="rif-warn">⚠ 神煞：';
+      if(rule.shensha.避冲) h+='避冲：'+rule.shensha.避冲+' ';
+      if(rule.shensha.避对) h+='避对：'+rule.shensha.避对+' ';
+      if(rule.shensha.避压) h+='避压：'+rule.shensha.避压;
+      h += '</div>';
+    }
+    // 阶段5：周期后处置
+    h += '<div style="margin-top:10px"><span class="rif-num">⑤</span><strong>周期后处置</strong></div>';
+    // 兼容 3 字段（过气/破损/功德）+ 4 字段（绿植 枯植/落叶/破损/功德 / 鱼 死鱼/旧缸/破损/功德）
+    var disposeVals = Object.keys(rule.dispose).filter(function(k){return k!=='破损'&&k!=='功德';});
+    var overVal = disposeVals.map(function(k){return rule.dispose[k];}).join(' · ');
+    var brokenVal = rule.dispose.破损 || rule.dispose.死鱼 || '可修复续用';
+    h += '<div style="font-size:11px;line-height:1.7;margin-top:4px">';
+    h += '<b>过气：</b>'+overVal;
+    h += '<br><b>破损：</b>'+brokenVal;
+    h += '<br><b>功德：</b>'+rule.dispose.功德;
+    h += '</div>';
+    h += '<div class="rif-meta">📜 '+scence_books(key)+'</div>';
+    h += '</div></div>'; // body / step
+  });
+  h += '</div>';
+
+  // 总结
+  h += '<div class="rif-summary">';
+  h += '<div class="rs-title">🌿 全流程摘要（'+items.length+' 件物·'+scene+'套）</div>';
+  h += '<div class="rs-flow">';
+  h += '<b>① 购买</b> → 选吉日 '+ITEM_FULL_RULE[items[0]].buy.吉日+' · '+ITEM_FULL_RULE[items[0]].buy.时辰+' · '+ITEM_FULL_RULE[items[0]].buy.场所+'<br>';
+  h += '<b>② 摆放</b> → '+ITEM_FULL_RULE[items[0]].display.方位+' · '+ITEM_FULL_RULE[items[0]].display.高度+' · '+ITEM_FULL_RULE[items[0]].display.朝向+'<br>';
+  h += '<b>③ 周期</b> → '+ITEM_FULL_RULE[items[0]].cycle.更换+' · '+ITEM_FULL_RULE[items[0]].cycle.净化+' · '+ITEM_FULL_RULE[items[0]].cycle.加持+'<br>';
+  h += '<b>④ 处置</b> → 依《阳宅集成》《鲁班经》《居家风水》'+items.length+'件物处置规则，七分诚实恭敬心三分形式仪轨。</div>';
+  h += '</div>';
+  h += '<div class="rif-source">📜 综合《八宅明镜》《阳宅三要》《鲁班经》《风水物件大全》《居家风水》《符咒全书》《梵天秘笈》《万法归宗》8 部古籍</div>';
+
+  document.getElementById('itemsFullResult').innerHTML = h;
+}
+
+function scence_books(key){
+  var m = {
+    'wenchangta':'《阳宅三要》《文昌帝君阴骘文》《居家风水》',
+    'hulu':'《八宅明镜》《鲁班经》《居家风水》',
+    'shanshui':'《阳宅集成》《山水纯全集》《画论》',
+    'lvzhi':'《居家风水》《园艺风水》',
+    'foxiang':'《佛说大乘造像功德经》《居家风水》',
+    'jinshu':'《八宅明镜》《金属工艺风水》',
+    'jingzi':'《鲁班经》《八宅明镜》《居家风水》',
+    'yu':'《居家风水》《鱼缸风水》',
+    'shuishui':'《水晶结晶体风水》《居家风水》',
+    'laohu':'《居家风水》《猛虎下山图考》'
+  };
+  return m[key]||'《居家风水》';
+}
+
+// 属相 → 五行
+function SHENSHA_TO_WUXING(zhi){
+  var m={'子':'水','亥':'水','寅':'木','卯':'木','巳':'火','午':'火','申':'金','酉':'金','辰':'土','丑':'土','未':'土','戌':'土'};
+  return m[zhi]||'土';
+}
+
+// 兼容 SHENSHA_TO_DIZHI (复用)
+function SHENSHA_TO_DIZHI(zhi){ return zhi; }
 </script>
 
 <script src="js/ui-toast.js" defer></script>
