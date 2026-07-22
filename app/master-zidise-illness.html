@@ -138,6 +138,17 @@ body{
 .tag{display:inline-block;padding:3px 10px;background:rgba(201,168,76,.15);
   border:1px solid var(--gold);border-radius:10px;font-size:12px;
   color:var(--gold);margin:2px 4px}
+.legend{margin:10px 0 18px;display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--paper2)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+.dot-r{background:#e74c3c;box-shadow:0 0 6px rgba(231,76,60,.6)}
+.resolve-card{background:rgba(10,10,10,.4);border-radius:12px;padding:18px;margin-bottom:14px;border:1px solid var(--border);border-left:3px solid var(--gold)}
+.resolve-card .rc-title{color:var(--gold2);font-size:17px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.resolve-card .rc-title .rtag{padding:3px 10px;border-radius:10px;font-size:11px;background:rgba(201,168,76,.2);color:var(--gold2)}
+.resolve-card ul{margin:8px 0 8px 24px;color:var(--paper2);font-size:14px;line-height:1.9}
+.resolve-card ul li{margin-bottom:4px}
+.resolve-card .formula{background:rgba(201,168,76,.08);padding:10px 14px;border-radius:8px;margin-top:10px;font-size:13px;color:var(--paper2);line-height:1.7}
+.resolve-card .formula b{color:var(--gold2)}
+.resolve-kb{background:rgba(22,160,133,.08);padding:8px 12px;border-left:3px solid var(--jade);border-radius:6px;font-size:12px;color:var(--paper3);margin-top:8px}
 .scroll-section{scroll-margin-top:80px}
 @media(max-width:768px){
   .row,.row3,.row2{grid-template-columns:1fr}
@@ -277,6 +288,21 @@ body{
       <div id="cure-output"></div>
     </div>
 
+    <!-- 化解方案（七维系统） -->
+    <div class="panel scroll-section" id="sec-resolve">
+      <h2>🪷 化解方案·七维系统</h2>
+      <div class="legend">
+        <span class="dot dot-r"></span> 风水
+        <span class="dot dot-r"></span> 五行补救
+        <span class="dot dot-r"></span> 符咒
+        <span class="dot dot-r"></span> 宗教
+        <span class="dot dot-r"></span> 饮食
+        <span class="dot dot-r"></span> 起居
+        <span class="dot dot-r"></span> 运动
+      </div>
+      <div id="resolve-output"></div>
+    </div>
+
     <!-- 运势联动（财官疾厄线） -->
     <div class="panel scroll-section" id="sec-fortune">
       <h2>🌟 运势×健康 联动判断</h2>
@@ -341,6 +367,9 @@ const WUXING_ZANGFU={
   '金':{organ:'肺大肠',disease:'咳嗽、哮喘、便秘、皮肤病'},
   '水':{organ:'肾膀胱',disease:'腰膝酸软、水肿、耳鸣、泌尿'}
 };
+
+// 紫微主星对应五行
+const ZIXING_WUXING={'紫微':'土','天机':'木','太阳':'火','武曲':'金','天同':'水','廉贞':'火','天府':'土','太阴':'水','贪狼':'木','巨门':'水','天相':'水','天梁':'土','七杀':'金','破军':'水'};
 
 // 化忌对应（十天干四化）
 const HUA_JI_BY_DAYSTEM={
@@ -800,6 +829,7 @@ function renderResult(ctx){
   renderCureCycle(ctx);
   renderFortuneLink(ctx);
   renderLifecycle(ctx);
+  renderResolve(ctx);
   // === 自动存档（访客档案） ===
   saveConsulting(ctx);
 }
@@ -924,6 +954,180 @@ function renderCureCycle(ctx){
 }
 
 // === 7️⃣ 运势 × 健康 联动 ===
+function renderResolve(ctx){
+  // === 七维化解方案生成器 ===
+  const huaJiStar=ctx.huaJiStar||'未检出';
+  const huaJiPalace=ctx.huaJiPalace||5;
+  const gender=ctx.gender||'M';
+  const hits=ctx.hits||[];
+  const wuxing=ZIXING_WUXING[huaJiStar]||'土';
+  const zangfu=WUXING_ZANGFU[wuxing]||{organ:'脾胃',sense:'口',emotion:'思',season:'四季末',color:'黄'};
+  const highHits=hits.filter(h=>h.severity==='high');
+  const palaceCN=PALACE_NAMES[huaJiPalace]||'疾厄';
+  
+  // KB 检索：化解相关
+  const kbQuery=async(q)=>{
+    try{
+      const r=await fetch('http://127.0.0.1:8920/api/public/kb-search?q='+encodeURIComponent(q)+'&limit=2');
+      const d=await r.json();
+      return d.results||[];
+    }catch(e){return [];}
+  };
+
+  // 同步执行 3 个最相关查询
+  let kbHTML='';
+  Promise.all([
+    kbQuery('化解'),
+    kbQuery('风水'),
+    kbQuery(zangfu.organ)
+  ]).then(ress=>{
+    const seen=new Set();
+    let kbTxt='';
+    [...ress[0],...ress[1],...ress[2]].forEach(r=>{
+      if(!seen.has(r.entry_id)&&kbTxt.length<500){
+        seen.add(r.entry_id);
+        kbTxt+=`<div class="resolve-kb"><b style="color:var(--jade)">[${r.entry_id}]</b> ${r.title.slice(0,40)}：<span style="color:var(--paper3)">${r.snippet.slice(0,80)}...</span></div>`;
+      }
+    });
+    if(kbTxt){
+      const box=document.querySelector('#resolve-output .kb-anchor');
+      if(box)box.innerHTML='<h3 style="font-size:16px;color:var(--gold2);margin:18px 0 10px">📚 化解古籍摘录（KB 引用）</h3>'+kbTxt;
+    }
+  });
+
+  // === 化解方案七维度 ===
+  const cards=[
+    // 1. 风水化解
+    {
+      title:'🧭 1. 风水化解·方位调整',
+      tag:'环境',
+      tint:'#e74c3c',
+      ul:[
+        `床头宜朝 <b style="color:var(--gold2)">${zangfu.color}色</b> 方（${zangfu.organ==='心'||zangfu.organ==='小肠'?'南方离位':zangfu.organ==='肝'||zangfu.organ==='胆'?'东方震位':zangfu.organ==='脾'||zangfu.organ==='胃'?'中央':zangfu.organ==='肺'||zangfu.organ==='大肠'?'西方兑位':'北方坎位'}），忌对门窗`,
+        `书桌/办公桌朝 <b style="color:var(--gold2)">${zangfu.color}色</b> 方，背后有实墙靠山`,
+        `${gender==='M'?'灶位':'主卧'} 避开 <b style="color:var(--red2)">病符位</b>（本命 ${huaJiPalace===5?'疾厄':'煞方'}）`,
+        `增加 <b style="color:var(--gold2)">${zangfu.color}色</b> 装饰（${zangfu.color==='红'?'地毯/抱枕':zangfu.color==='绿'?'绿植/挂画':zangfu.color==='黄'?'沙发/窗帘':'金属摆件'}），忌全屋黑白`,
+        `玄关挂 <b style="color:var(--gold2)">山海镇</b> 或 <b>八卦镜</b>，挡外煞`
+      ],
+      formula:`<b>核心原则：</b>五行通关 — 所喜五行得位，所忌五行避之。<br><b>适宜颜色：</b>${zangfu.color}色及其衍生色<br><b>适宜材质：</b>${wuxing==='木'?'绿植/木质':wuxing==='火'?'红花/陶瓷':wuxing==='土'?'陶瓷/玉石':wuxing==='金'?'金属/水晶':'水种/玻璃'}`
+    },
+    // 2. 五行补救
+    {
+      title:'🎨 2. 五行补救·颜色/材质/数字',
+      tag:'平衡',
+      tint:'#f39c12',
+      ul:[
+        `着装：日主喜 <b style="color:var(--gold2)">${wuxing}</b> 行，多穿 <b style="color:var(--gold2)">${zangfu.color}</b> 系`,
+        `配饰：${wuxing==='木'?'翡翠/绿松石':wuxing==='火'?'红玛瑙/石榴石':wuxing==='土'?'黄玉/蜜蜡':wuxing==='金'?'白水晶/银饰':'黑曜石/海蓝宝'}`,
+        `吉数：${wuxing==='木'?'3、8':wuxing==='火'?'2、7':wuxing==='土'?'5、0':wuxing==='金'?'4、9':'1、6'}（手机尾号/楼层/工位）`,
+        `车牌/楼层/房号：尽量配上述吉数`,
+        `若命中 ${highHits.length?'极高风险位（如血光/手术位）':'中风险位'}，建议当年内避免重大决策`
+      ],
+      formula:`<b>所喜五行：</b>${wuxing}<br><b>对应季节：</b>${zangfu.season}<br><b>建议节令：</b>春季（2-4月）补 ${wuxing} 行最佳`
+    },
+    // 3. 符咒护身
+    {
+      title:'🔮 3. 符咒护身·道家化解',
+      tag:'护佑',
+      tint:'#9b59b6',
+      ul:[
+        `化解太岁：本命年/冲太岁年（${ctx.year+1} 乙巳年，${gender==='M'?'属虎/猴':'属蛇/猪'} 需拜太岁）`,
+        `请 <b style="color:var(--gold2)">太岁符</b>（年初道观请，贴于客厅或随身携带）`,
+        `请 <b style="color:var(--gold2)">平安符</b>（白玉蟾祖师、吕祖、观音等），贴身佩戴`,
+        `化煞摆件：${highHits.length>=2?'黑曜石手链 + 桃木剑 / 铜葫芦':'水晶洞 + 黄玉貔貅'}（避邪化煞）`,
+        `床头贴 <b style="color:var(--gold2)">六字大明咒</b> 或 <b>南无阿弥陀佛</b>`
+      ],
+      formula:`<b>适用情境：</b>${highHits.length?'风险等级高，强烈建议请符':'风险中等，可选'}
+<br><b>祈请地点：</b>本地正规道观/佛教寺院
+<br><b>佩戴时间：</b>${ctx.year}年立春后第一个吉日`
+    },
+    // 4. 宗教仪式
+    {
+      title:'🛕 4. 宗教仪式·祈福消业',
+      tag:'法会',
+      tint:'#3498db',
+      ul:[
+        `年初/年初九参加 <b style="color:var(--gold2)">顺星拜太岁</b> 道教法会`,
+        `${gender==='M'?'关帝庙祈福拜文昌':'妈祖庙祈福拜观音'} 消灾延寿`,
+        `每月农历 <b style="color:var(--gold2)">初一、十五</b> 放生（鱼/鸟/龟），积德回向`,
+        `${highHits.length?'家中供 <b style="color:var(--gold2)">药师佛/地藏王菩萨</b>一尊，每日一炷香':'定期到寺庙供花果'}，连续 49 天`,
+        `印经/抄经：《药师经》《地藏经》《心经》，各 49 遍`
+      ],
+      formula:`<b>最佳日期：</b>农历每月初一、十五，或本人八字喜用神日
+<br><b>配合事项：</b>持斋、放生、诵经
+<br><b>功德回向：</b>愿以此功德，庄严佛净土，上报四重恩，下济三途苦`
+    },
+    // 5. 饮食化解
+    {
+      title:'🍵 5. 饮食化解·药膳/食疗',
+      tag:'饮食',
+      tint:'#16a085',
+      ul:[
+        `多食 <b style="color:var(--gold2)">${zangfu.organ}</b> 之味：${zangfu.organ==='心'?'苦味（莲子心、苦瓜）+ 红豆、枣':zangfu.organ==='肝'?'酸味（山楂、乌梅）+ 菠菜、木耳':zangfu.organ==='脾'?'甘味（山药、莲子、薏米）+ 黄豆、南瓜':zangfu.organ==='肺'?'辛味（生姜、葱白）+ 银耳、百合':'咸味（海带、紫菜）+ 黑豆、桑葚'}`,
+        `节令饮食：${zangfu.season} 多吃 <b style="color:var(--gold2)">${zangfu.color}</b> 色食物`,
+        `每日上午 9-11 时（脾经当令）进 <b style="color:var(--gold2)">五谷粥</b>（山药+莲子+薏米+红枣+小米）`,
+        `禁忌：忌 <b style="color:var(--red2)">${zangfu.organ==='心'?'过咸、过辣':zangfu.organ==='肝'?'酒、熬夜':zangfu.organ==='脾'?'生冷、油腻':zangfu.organ==='肺'?'烟、燥热':'过咸、寒凉'}</b>之物`,
+        `体质偏颇者：每年 <b style="color:var(--gold2)">春分/秋分</b> 各服一次 <b style="color:var(--gold2)">${huaJiStar==='天机'?'柴胡疏肝散':huaJiStar==='廉贞'?'五子衍宗丸':huaJiStar==='贪狼'?'龙胆泻肝汤':huaJiStar==='巨门'?'麦门冬汤':'归脾汤'}</b>`
+      ],
+      formula:`<b>节令调养：</b>${zangfu.season} 重点调 ${zangfu.organ}<br><b>体质判定：</b>${ctx.hits.length>2?'平和体质偏颇明显':'平和体质为主'}<br><b>服药前：</b>咨询当地中医辨证，避免盲目进补`
+    },
+    // 6. 起居化解
+    {
+      title:'🌙 6. 起居化解·时辰/季节',
+      tag:'作息',
+      tint:'#7f8c8d',
+      ul:[
+        `睡眠时辰：<b style="color:var(--gold2)">亥时（21-23时）</b> 必须就寝 — 三焦经当令，最养元气`,
+        `起床时辰：<b style="color:var(--gold2)">卯时（5-7时）</b> 大肠经当令，自然醒最佳`,
+        `子时（23-1时）胆经养，<b style="color:var(--red2)">熬夜等同杀生</b>，必须避免`,
+        `季节调摄：${zangfu.season} 多到 <b style="color:var(--gold2)">${zangfu.color}色</b> 方位活动 / 旅游（${zangfu.organ==='心'?'南方/阳光充足处':zangfu.organ==='肝'?'东方/森林':'北方/水边'}）`,
+        `沐浴水温：忌冰冷浴，<b>温水 38-40℃</b> 最佳（养 ${zangfu.organ}）`,
+        `着装：四时合宜，<b style="color:var(--gold2)">${zangfu.color}</b> 系为主，<b style="color:var(--red2)">忌全黑/全白</b> 长时间`
+      ],
+      formula:`<b>十二时辰养生表：</b><br>• 23-1 时：胆经（必须入睡）<br>• 1-3 时：肝经（养血）<br>• 5-7 时：肺经（深呼吸最佳）<br>• 7-9 时：胃经（早餐温热）<br>• 21-23 时：三焦经（准备入睡）`
+    },
+    // 7. 运动导引
+    {
+      title:'🧘 7. 运动导引·八段锦/穴位/吐纳',
+      tag:'运动',
+      tint:'#27ae60',
+      ul:[
+        `每日清晨 <b style="color:var(--gold2)">八段锦</b>（国家体育总局版），重点做 <b style="color:var(--gold2)">${huaJiStar==='天机'?'左右开弓似射雕（疏肝）':huaJiStar==='廉贞'?'双手托天理三焦 + 调理脾胃须单举':'两手攀足固肾腰（固本）'}</b>`,
+        `每周 3 次 <b style="color:var(--gold2)">${wuxing==='木'?'五禽戏·鹤戏（疏肝）':wuxing==='火'?'导引按跷·心包经拍打':wuxing==='土'?'易筋经·韦驮献杵':'六字诀·吹字诀（固肾）'}</b>`,
+        `<b>穴位按摩：</b>每日按 ${zangfu.organ==='心'?'内关+膻中':zangfu.organ==='肝'?'太冲+期门':zangfu.organ==='脾'?'足三里+中脘':zangfu.organ==='肺'?'太渊+中府':'涌泉+太溪'} 各 3 分钟`,
+        `<b>吐纳：</b>腹式呼吸，深吸慢呼，1 日 3 次，每次 5 分钟（养元气）`,
+        `<b>禁忌：</b>忌夜间剧烈运动、忌大汗淋漓、忌 ${huaJiStar==='天机'?'贪凉饮冷':'空腹剧烈运动'}`
+      ],
+      formula:`<b>五行导引对照：</b><br>• 木行→五禽戏·鹤戏<br>• 火行→导引按跷<br>• 土行→易筋经<br>• 金行→六字诀·呬字<br>• 水行→六字诀·吹字<br><b>最佳时辰：</b>卯时（5-7时）大肠经当令，运动最佳`
+    }
+  ];
+
+  let html='';
+  cards.forEach(c=>{
+    html+=`<div class="resolve-card" style="border-left-color:${c.tint}">
+      <div class="rc-title">${c.title}<span class="rtag">${c.tag}</span></div>
+      <ul>${c.ul.map(u=>'<li>'+u+'</li>').join('')}</ul>
+      <div class="formula">${c.formula}</div>
+    </div>`;
+  });
+
+  // KB 引用锚点
+  html+='<div class="kb-anchor"></div>';
+
+  // 大师总结
+  html+=`<div style="margin-top:18px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(22,160,133,.1));border-radius:12px;border:1px solid var(--gold)">
+    <div style="font-size:17px;color:var(--gold2);font-weight:600;margin-bottom:10px">🎯 化解大师总结</div>
+    <div style="font-size:14px;color:var(--paper);line-height:1.9">
+      针对你 <b style="color:var(--gold2)">${ctx.huaJiStar}化忌入${ctx.palaceCN}</b> 的命盘，建议<strong>七维化解并举</strong>：
+      <br><b style="color:var(--gold2)">急则治标</b>（就医 + 服药 + 食疗）、<b style="color:var(--gold2)">缓则治本</b>（运动 + 起居 + 五行补救）、
+      <b style="color:var(--gold2)">本则治神</b>（风水 + 符咒 + 宗教）。
+      <br>其中 <b style="color:var(--red2)">【${zangfu.organ}】</b> 为重点调养对象（七维都围绕此脏腑），化忌所在 <b>${ctx.palaceCN}</b> 之疾厄已有 ${hits.length} 条命中，<b>必须</b>按上 7 维同时进行，方得五行圆融、身心安泰。
+    </div>
+  </div>`;
+
+  document.getElementById('resolve-output').innerHTML=html;
+}
+
 function renderFortuneLink(ctx){
   // 官禄（8）· 财帛（4）· 疾厄（5）联动判断
   const guan=ctx.palaces[8];
