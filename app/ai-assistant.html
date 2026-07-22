@@ -3120,6 +3120,64 @@ function r39DualKBReply(query){
 }
 console.log('[R39-C] 双核 KB 命中辅助函数已挂载');
 </script>
+<!-- R41-E KB 命中 UI 升级 -->
+<script>(function(){
+  if (window.__r41_e_kb) return; window.__r41_e_kb = true;
+  
+  // 拦截 fetch 调用 API 时显示 KB 命中信息
+  var origFetch = window.fetch;
+  window.fetch = function(url, opts) {
+    if (typeof url === 'string' && url.indexOf('/api/ai/') >= 0 && opts && opts.body) {
+      try {
+        var body = JSON.parse(opts.body);
+        if (body.messages) {
+          var lastMsg = body.messages.filter(function(m){return m.role==='user'}).pop();
+          if (lastMsg && lastMsg.content) {
+            // 计算 KB 命中分
+            var kbScore = 0;
+            var kbSource = '';
+            if (window.NIHAISHA_KB) {
+              var k = Object.keys(window.NIHAISHA_KB).find(function(key){
+                return lastMsg.content.indexOf(key) >= 0;
+              });
+              if (k) { kbScore = 0.85; kbSource = '倪师'; }
+            }
+            if (window.SHUHAN_KB && kbScore < 0.7) {
+              var k2 = Object.keys(window.SHUHAN_KB).find(function(key){
+                return lastMsg.content.indexOf(key) >= 0;
+              });
+              if (k2) { kbScore = 0.75; kbSource = '舒晗'; }
+            }
+            // 显示 KB 命中标识
+            if (kbScore >= 0.7) {
+              setTimeout(function(){
+                showKBHitBadge(kbScore, kbSource, lastMsg.content);
+              }, 200);
+            }
+          }
+        }
+      } catch(e){}
+    }
+    return origFetch.apply(this, arguments);
+  };
+  
+  function showKBHitBadge(score, source, query) {
+    var badge = document.createElement('div');
+    badge.className = 'kb-hit-badge';
+    badge.innerHTML = '<span class="kb-hit-score">'+score.toFixed(2)+'</span> KB命中·'+source+'·来源古籍';
+    badge.style.cssText = 'position:fixed;top:80px;right:20px;background:linear-gradient(135deg,rgba(201,168,76,.95),rgba(184,134,11,.95));color:#1a1a1a;padding:8px 14px;border-radius:20px;font-size:12px;font-weight:600;z-index:99999;box-shadow:0 4px 16px rgba(0,0,0,.3);animation:kbHitPop 0.4s ease';
+    if (!document.getElementById('kbHitStyle')) {
+      var s = document.createElement('style');
+      s.id = 'kbHitStyle';
+      s.textContent = '@keyframes kbHitPop{0%{transform:scale(0.6);opacity:0}50%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}';
+      document.head.appendChild(s);
+    }
+    document.body.appendChild(badge);
+    setTimeout(function(){ badge.style.opacity='0'; badge.style.transition='opacity 0.4s'; }, 2500);
+    setTimeout(function(){ badge.remove(); }, 3000);
+  }
+})();
+</script>
 
 </body>
 </html>
