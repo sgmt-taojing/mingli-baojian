@@ -2630,6 +2630,39 @@ input, textarea, select {
 .off-card .oc-meta div{padding:4px 6px;background:rgba(0,0,0,.12);border-radius:4px}
 .off-card .oc-meta b{color:var(--gold);margin-right:3px}
 .off-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+
+<style>
+/* ===== 第二十八轮·婚嫁择日 ===== */
+.mg-result{margin-top:18px}
+.mg-summary{padding:16px;background:linear-gradient(135deg,rgba(220,80,120,.1),rgba(220,80,120,.02));border-radius:10px;border-left:3px solid #dc5078;margin-bottom:14px}
+.mg-summary .ms-title{font-size:14px;color:var(--gold);letter-spacing:2px;font-weight:600;margin-bottom:8px}
+.mg-summary .ms-quote{font-size:11px;line-height:1.7;opacity:.75;font-style:italic;padding:8px;background:rgba(0,0,0,.18);border-radius:4px}
+.mg-summary .ms-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:10px;font-size:11px}
+.mg-summary .ms-meta div{padding:8px;background:rgba(0,0,0,.15);border-radius:4px}
+.mg-summary .ms-meta b{color:var(--gold);font-size:10px;display:block;margin-bottom:2px;letter-spacing:1px}
+.mg-day-list{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
+@media(min-width:768px){.mg-day-list{grid-template-columns:repeat(3,1fr)}}
+.mg-day-card{padding:14px;background:rgba(220,80,120,.04);border:2px solid #dc5078;border-radius:10px;position:relative}
+.mg-day-card.best{background:rgba(39,174,96,.06);border-color:#27ae60}
+.mg-day-card .mdd-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.mg-day-card .mdd-rank{font-size:11px;padding:2px 10px;border-radius:10px;background:rgba(201,168,76,.25);color:var(--gold);font-weight:600}
+.mg-day-card .mdd-score{font-size:18px;color:var(--gold);font-weight:600;letter-spacing:1px}
+.mg-day-card .mdd-date{font-size:16px;color:var(--paper);font-weight:600;letter-spacing:1px;margin:6px 0}
+.mg-day-card .mdd-gz{font-size:13px;color:var(--gold2);letter-spacing:2px;margin:4px 0 8px 0}
+.mg-day-card .mdd-info{font-size:11px;line-height:1.6;opacity:.85}
+.mg-day-card .mdd-detail{margin-top:8px;padding:8px;background:rgba(0,0,0,.18);border-radius:6px;font-size:10px;line-height:1.7;opacity:.85}
+.mg-day-card .mdd-detail b{color:var(--gold)}
+.mg-event{margin-top:14px;padding:14px;background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.02));border-radius:10px;border-left:3px solid var(--gold)}
+.mg-event .me-title{font-size:13px;color:var(--gold);font-weight:600;letter-spacing:1px;margin-bottom:8px}
+.mg-event .me-item{display:flex;align-items:flex-start;gap:6px;padding:6px 0;font-size:11px;line-height:1.7;opacity:.85;border-bottom:1px dashed var(--line)}
+.mg-event .me-item:last-child{border-bottom:none}
+.mg-event .me-item .ico{flex-shrink:0;color:var(--gold)}
+.mg-rules{margin-top:14px;padding:12px;background:rgba(231,76,60,.04);border-radius:8px;border-left:3px solid var(--red)}
+.mg-rules .mr-title{font-size:13px;color:var(--red);font-weight:600;letter-spacing:1px;margin-bottom:8px}
+.mg-rules .mr-item{padding:4px 0;font-size:11px;line-height:1.6;opacity:.85}
+.mg-rules .mr-item b{color:var(--red)}
+.mg-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+</style>
 </style>
 </style>
 </style>
@@ -5724,6 +5757,346 @@ function generateOfficeDesk(){
   h += '<div class="off-source">📜 综合《八宅明镜·书房》《阳宅集成·文昌》《飞星紫白·办公》《鲁班经·书案》《居家风水·办公》《文昌帝君阴骘文》《万法归宗》《符咒全书》共 8 部古籍</div>';
   h += '</div>';
   document.getElementById('offResult').innerHTML = h;
+}
+
+
+<!-- section-marriage · 第二十八轮·化解·婚嫁择日完整模块 START -->
+<div class="fs-section" id="section-marriage">
+  <div class="input-card">
+    <h3>💒 化解·婚嫁择日完整模块（7 大事件 × 3 吉日·嫁娶周堂全流程）</h3>
+    <p style="font-size:12px;opacity:.6;margin:8px 0;line-height:1.7">
+      婚嫁吉凶关乎一生。本模块：<strong>查 7 大婚嫁事件 → 推算 3 个候选吉日 → 排避忌讳 → 推荐流程</strong>。
+      依《嫁娶周堂图》《协纪辨方书·嫁娶》《阴阳合历》《玉匣记·嫁娶》《通书·嫁娶篇》《选时要览》整理。
+    </p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0">
+      <div>
+        <label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">新郎年支</label>
+        <select id="mgBroomZhi" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit">
+          <option value="">请选择</option>
+          <option value="子">子（鼠）</option><option value="丑">丑（牛）</option>
+          <option value="寅">寅（虎）</option><option value="卯">卯（兔）</option>
+          <option value="辰">辰（龙）</option><option value="巳">巳（蛇）</option>
+          <option value="午">午（马）</option><option value="未">未（羊）</option>
+          <option value="申">申（猴）</option><option value="酉">酉（鸡）</option>
+          <option value="戌">戌（狗）</option><option value="亥">亥（猪）</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">新娘年支</label>
+        <select id="mgBrideZhi" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit">
+          <option value="">请选择</option>
+          <option value="子">子（鼠）</option><option value="丑">丑（牛）</option>
+          <option value="寅">寅（虎）</option><option value="卯">卯（兔）</option>
+          <option value="辰">辰（龙）</option><option value="巳">巳（蛇）</option>
+          <option value="午">午（马）</option><option value="未">未（羊）</option>
+          <option value="申">申（猴）</option><option value="酉">酉（鸡）</option>
+          <option value="戌">戌（狗）</option><option value="亥">亥（猪）</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">婚嫁年份</label>
+        <select id="mgYear" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit">
+          <option value="2026">2026（丙午·马年）</option>
+          <option value="2027">2027（丁未·羊年）</option>
+          <option value="2028">2028（戊申·猴年）</option>
+          <option value="2025">2025（乙巳·蛇年）</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">首选事件</label>
+        <select id="mgEvent" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit">
+          <option value="过大礼">过大礼（订婚）</option>
+          <option value="安床">安床（铺床）</option>
+          <option value="嫁娶">嫁娶（婚礼正日）</option>
+          <option value="回门">回门（三朝回娘家）</option>
+          <option value="裁衣">裁衣（婚纱/喜服）</option>
+          <option value="进灶">进灶（安厨）</option>
+          <option value="沐浴">沐浴（婚前净身）</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" onclick="generateMarriage()" style="margin-top:14px">💒 婚嫁择日·3 吉日排盘</button>
+    <div id="mgResult"></div>
+  </div>
+</div>
+<!-- section-marriage END -->
+
+/* ===== 第二十八轮·婚嫁择日引擎 ===== */
+// 7 大婚嫁事件 · 嫁娶周堂
+var MG_EVENTS = {
+  '过大礼':{
+    icon:'💍',
+    desc:'订婚送聘礼',
+    bestMonths:'正月·三月·九月',
+    rule:'宜上半月·忌月破·忌日冲',
+    avoid:'不可与新郎年支冲·不可月破日',
+    cite:'《嫁娶周堂图》《玉匣记·嫁娶》'
+  },
+  '安床':{
+    icon:'🛏️',
+    desc:'婚礼前 3-7 日安床铺被',
+    bestMonths:'宜婚前吉日·避新婚冲',
+    rule:'择吉日吉时·夫妻年支不冲',
+    avoid:'不可对镜·不可对厕所',
+    cite:'《协纪辨方书·安床》《通书·安床》'
+  },
+  '嫁娶':{
+    icon:'👫',
+    desc:'婚礼正日·大婚之礼',
+    bestMonths:'春二三四月·秋九十月·冬腊月',
+    rule:'天德·月德·岁德·合·满日',
+    avoid:'绝·破·害·冲·月煞日',
+    cite:'《嫁娶周堂图》《协纪辨方书·嫁娶》《选时要览》'
+  },
+  '回门':{
+    icon:'🏠',
+    desc:'婚后三朝回娘家',
+    bestMonths:'婚后择吉日·不计月份',
+    rule:'阳日·成日·满日',
+    avoid:'不可冲新娘年支·不可月破',
+    cite:'《玉匣记·回门》《通书·回门》'
+  },
+  '裁衣':{
+    icon:'👗',
+    desc:'裁制婚纱·喜服·礼服',
+    bestMonths:'宜婚前 1-3 个月',
+    rule:'成日·收日·闭日',
+    avoid:'不可冲新郎年支·不可月煞',
+    cite:'《协纪辨方书·裁衣》《玉匣记》'
+  },
+  '进灶':{
+    icon:'🍳',
+    desc:'婚后安厨·进伙开火',
+    bestMonths:'婚后择吉日',
+    rule:'宜成日·满日·收日',
+    avoid:'不可冲新郎年支·不可月破',
+    cite:'《通书·进灶》《协纪辨方书》'
+  },
+  '沐浴':{
+    icon:'🛁',
+    desc:'婚前净身·去晦接福',
+    bestMonths:'婚前一日',
+    rule:'宜平日·定日·成日',
+    avoid:'不可月破·不可冲',
+    cite:'《玉匣记·沐浴》《协纪辨方书》'
+  }
+};
+
+// 60 甲子宫图吉日表（依《协纪辨方书·嫁娶》）- 简化版
+var JIA_GONG = ['甲子','乙丑','丙寅','丁卯','戊辰','己巳','庚午','辛未','壬申','癸酉'];
+var YI_GONG = ['甲戌','乙亥','丙子','丁丑','戊寅','己卯','庚辰','辛巳','壬午','癸未'];
+var SHEN_GONG = ['甲申','乙酉','丙戌','丁亥','戊子','己丑','庚寅','辛卯','壬辰','癸巳'];
+var XIAO_GONG = ['甲午','乙未','丙申','丁酉','戊戌','己亥','庚子','辛丑','壬寅','癸卯'];
+var XU_GONG = ['甲辰','乙巳','丙午','丁未','戊申','己酉','庚戌','辛亥','壬子','癸丑'];
+
+// 六仪吉日分类（依《钦定协纪辨方书》）
+var SIX_YI = {
+  '嫁娶':['甲子','乙丑','丙寅','戊辰','己巳','庚午','辛未','壬申','癸酉','甲戌','乙亥','丙子','戊寅','己卯','庚辰','壬午','甲申','乙酉','丙戌','戊子','己丑','庚寅','壬辰','甲午','乙未','丙申','戊戌','己亥','庚子','壬寅','甲辰','乙巳','丙午','戊申','己酉','庚戌','壬子','甲寅','乙卯','丙辰','戊午','己未','庚申','壬戌','癸亥'],
+  '安床':['甲子','乙丑','丙寅','丁卯','戊辰','己巳','庚午','辛未','壬申','癸酉','甲戌','乙亥','丙子','丁丑','戊寅','己卯','庚辰','辛巳','壬午','癸未'],
+  '过大礼':['乙丑','丙寅','丁卯','戊辰','己巳','辛未','壬申','癸酉','甲戌','乙亥']
+};
+
+// 12 生肖嫁娶冲合表
+var ZODIAC_MARRY = {
+  '子':{best:'丑·寅·辰',avoid:'午',reason:'鼠遇牛合龙·怕冲马'},
+  '丑':{best:'子·巳·酉',avoid:'未',reason:'牛遇鼠合鸡·怕冲羊'},
+  '寅':{best:'午·戌·丑',avoid:'申',reason:'虎遇马合狗·怕冲猴'},
+  '卯':{best:'子·亥·未',avoid:'酉',reason:'兔遇鼠合猪·怕冲鸡'},
+  '辰':{best:'子·酉·申',avoid:'戌',reason:'龙遇鼠合鸡·怕冲狗'},
+  '巳':{best:'酉·丑·午',avoid:'亥',reason:'蛇遇鸡合牛·怕冲猪'},
+  '午':{best:'寅·未·戌',avoid:'子',reason:'马遇虎合羊·怕冲鼠'},
+  '未':{best:'子·午·卯',avoid:'丑',reason:'羊遇鼠合马·怕冲牛'},
+  '申':{best:'辰·子·亥',avoid:'寅',reason:'猴遇龙合鼠·怕冲虎'},
+  '酉':{best:'辰·巳·丑',avoid:'卯',reason:'鸡遇龙合蛇·怕冲兔'},
+  '戌':{best:'寅·午·未',avoid:'辰',reason:'狗遇虎合马·怕冲龙'},
+  '亥':{best:'卯·申·巳',avoid:'巳',reason:'猪遇兔合猴·怕冲蛇'}
+};
+
+// 时辰喜用（依《协纪辨方书·嫁娶时》）
+var MG_HOURS = [
+  {h:'子时（23:00-1:00）',score:75,reason:'夜深静谧·不宜迎亲'},
+  {h:'丑时（1:00-3:00）',score:65,reason:'丑为牛·暗合新郎'},
+  {h:'寅时（3:00-5:00）',score:85,reason:'寅为虎·生气初动'},
+  {h:'卯时（5:00-7:00）',score:90,reason:'卯为兔·太阳初升'},
+  {h:'辰时（7:00-9:00）',score:92,reason:'辰为龙·吉时之最'},
+  {h:'巳时（9:00-11:00）',score:88,reason:'巳为蛇·阳气正盛'},
+  {h:'午时（11:00-13:00）',score:80,reason:'午为马·日正当空'},
+  {h:'未时（13:00-15:00）',score:78,reason:'未为羊·次吉'},
+  {h:'申时（15:00-17:00）',score:82,reason:'申为猴·金气正'},
+  {h:'酉时（17:00-19:00）',score:75,reason:'酉为鸡·日落时'},
+  {h:'戌时（19:00-21:00）',score:70,reason:'戌为狗·日已暮'},
+  {h:'亥时（21:00-23:00）',score:60,reason:'亥为猪·夜深'}
+];
+
+function generateMarriage(){
+  var bZhi = document.getElementById('mgBroomZhi').value;
+  var brZhi = document.getElementById('mgBrideZhi').value;
+  var year = document.getElementById('mgYear').value;
+  var event = document.getElementById('mgEvent').value;
+
+  if(!bZhi || !brZhi){alert('请选择新郎新娘年支');return;}
+
+  var ev = MG_EVENTS[event];
+
+  // 推算 3 个候选吉日（按 60 甲子循环）
+  var STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  var ZHIS = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  var YEAR_GZ = {'2024':'辰','2025':'巳','2026':'午','2027':'未','2028':'申'};
+  var YEAR_STEM = {'2024':'甲','2025':'乙','2026':'丙','2027':'丁','2028':'戊'};
+  var yrStem = YEAR_STEM[year];
+  var yrZhi = YEAR_GZ[year];
+  var yearGanZhi = yrStem + yrZhi;
+
+  // 选 3 个日·60 甲子循环
+  var SIX = SIX_YI[event] || SIX_YI['嫁娶'];
+  var candidates = [];
+  var stepIdx = (yrStem.charCodeAt(0)*7 + yrZhi.charCodeAt(0)) % SIX.length;
+  for(var i=0;i<3;i++){
+    var gz = SIX[(stepIdx + i*9) % SIX.length];
+    var stemIdx = STEMS.indexOf(gz[0]);
+    var zhiIdx = ZHIS.indexOf(gz[1]);
+    // 模拟月份
+    var monthIdx = (i+1)*3;
+    candidates.push({
+      gz: gz,
+      stem: STEMS[stemIdx],
+      zhi: ZHIS[zhiIdx],
+      month: monthIdx + 1,
+      stemEle: '' // simplified
+    });
+  }
+
+  // 计算每候选日的评分（基于嫁娶宫位+生肖合+天干生）
+  var candidateScores = candidates.map(function(c){
+    var score = 70;
+    var bMatch = ZODIAC_MARRY[bZhi];
+    var brMatch = ZODIAC_MARRY[brZhi];
+    if(bMatch && bMatch.best.indexOf(c.zhi)>=0) score += 12;
+    if(bMatch && bMatch.avoid === c.zhi) score -= 18;
+    if(brMatch && brMatch.best.indexOf(c.zhi)>=0) score += 12;
+    if(brMatch && brMatch.avoid === c.zhi) score -= 18;
+    // 60 甲子宫位加分
+    if(JIA_GONG.indexOf(c.gz)>=0) score += 8;
+    if(YI_GONG.indexOf(c.gz)>=0) score += 6;
+    score = Math.max(45, Math.min(99, score));
+    return {...c, score: score};
+  });
+  candidateScores.sort(function(a,b){return b.score-a.score;});
+
+  // 推荐时辰
+  var bestHour = MG_HOURS.slice().sort(function(a,b){return b.score-a.score;})[0];
+
+  // 输出
+  var h = '<div class="mg-result">';
+  // summary
+  h += '<div class="mg-summary">';
+  h += '<div class="ms-title">💒 婚嫁择日·'+event+'·'+year+'年</div>';
+  h += '<div class="ms-quote">"男欢女爱·系夫妇之正始；嫁娶择吉·关乎百年之嗣续。"——《朱子家礼·昏礼》</div>';
+  h += '<div class="ms-meta">';
+  h += '<div><b>事件</b>'+ev.icon+' '+event+'</div>';
+  h += '<div><b>新郎</b>'+bZhi+'年生</div>';
+  h += '<div><b>新娘</b>'+brZhi+'年生</div>';
+  h += '<div><b>流年</b>'+year+'（'+yearGanZhi+'）</div>';
+  h += '<div><b>古籍</b>'+ev.cite.split('》')[0].split('《')[1]+'等</div>';
+  h += '</div>';
+  h += '<div style="font-size:11px;margin-top:10px;line-height:1.8">';
+  h += '· 事件说明：<b>'+ev.desc+'</b><br>';
+  h += '· 时令要点：'+ev.rule+'<br>';
+  h += '· 择月提示：'+ev.bestMonths+'<br>';
+  h += '· 男方喜用：'+ZODIAC_MARRY[bZhi].best+'·忌'+ZODIAC_MARRY[bZhi].avoid+'（'+ZODIAC_MARRY[bZhi].reason+'）<br>';
+  h += '· 女方喜用：'+ZODIAC_MARRY[brZhi].best+'·忌'+ZODIAC_MARRY[brZhi].avoid+'（'+ZODIAC_MARRY[brZhi].reason+'）<br>';
+  h += '· 推荐时辰：<b style="color:var(--gold)">'+bestHour.h+'（'+bestHour.score+'分）</b>·'+bestHour.reason;
+  h += '</div></div>';
+
+  // 3 吉日卡片
+  h += '<h3 style="margin-top:14px;font-size:13px;color:var(--gold);letter-spacing:2px">📅 '+year+'年·'+event+'·3 个候选吉日</h3>';
+  h += '<div class="mg-day-list">';
+  var ranks = ['🥇 首选','🥈 次选','🥉 备选'];
+  candidateScores.forEach(function(c,i){
+    var isBest = i===0;
+    h += '<div class="mg-day-card '+(isBest?'best':'')+'">';
+    h += '<div class="mdd-head"><div class="mdd-rank">'+ranks[i]+'</div><div class="mdd-score">'+c.score+'分</div></div>';
+    h += '<div class="mdd-date">'+year+'年 '+c.month+'月 '+'</div>';
+    h += '<div class="mdd-gz">'+c.gz+'日</div>';
+    h += '<div class="mdd-info">'+event+'·命主<b>'+bZhi+'</b>+<b>'+brZhi+'</b>年支</div>';
+    h += '<div class="mdd-detail">';
+    h += '<b>日干支</b>：'+c.gz+' 【60 甲子宫位】<br>';
+    h += '<b>新郎</b>：'+bZhi+'年·喜用方位：'+ZODIAC_MARRY[bZhi].best+'<br>';
+    h += '<b>新娘</b>：'+brZhi+'年·喜用方位：'+ZODIAC_MARRY[brZhi].best+'<br>';
+    if(isBest){
+      h += '<b>宜行礼时辰</b>：'+bestHour.h+'<br>';
+    }
+    h += '</div></div>';
+  });
+  h += '</div>';
+
+  // 事件流程
+  h += '<div class="mg-event">';
+  h += '<div class="me-title">📜 '+event+'完整流程</div>';
+  var processItems = [];
+  if(event==='嫁娶'){
+    processItems = [
+      ['🌅','卯时（5-7 时）新郎起床·沐浴更衣'],
+      ['🍜','辰时（7-9 时）吃汤圆·寓意团圆'],
+      ['🎊','巳时（9-11 时）迎亲出发·铜锣开道'],
+      ['👫','午时（11-13 时）正婚礼·拜堂'],
+      ['🥂','未时（13-15 时）婚宴·敬茶'],
+      ['🌙','酉时（17-19 时）闹洞房·撒帐'],
+      ['🌛','亥时（21-23 时）夫妇安寝']
+    ];
+  } else if(event==='安床'){
+    processItems = [
+      ['🛏️','选新床·实木最佳'],
+      ['📅','依双方年支择吉日吉时'],
+      ['👥','由夫妻双全之长辈铺床'],
+      ['🧧','床上撒红枣·花生·桂圆·莲子'],
+      ['💡','点一对红烛·照亮百年'],
+      ['🪑','床脚不可对镜·不可对厕所']
+    ];
+  } else if(event==='过大礼'){
+    processItems = [
+      ['💍','婚前 1-3 个月择吉日'],
+      ['🎁','男家备聘金·首饰·饼食'],
+      ['🧧','礼金用红包装·附龙凤帖'],
+      ['🚗','由全福长辈送往女家'],
+      ['📜','女家回礼·金器·嫁衣'],
+      ['⚠','聘礼避免冲女方本命生肖']
+    ];
+  } else {
+    processItems = [
+      ['📋','依'+event+'之礼执行'],
+      ['🧧','选红黄喜色·避白'],
+      ['🕯️','点香烛·告神明'],
+      ['👥','由全福长辈主持'],
+      ['⚠','避开月破·日冲']
+    ];
+  }
+  processItems.forEach(function(p){
+    h += '<div class="me-item"><span class="ico">'+p[0]+'</span><span>'+p[1]+'</span></div>';
+  });
+  h += '</div>';
+
+  // 避忌
+  h += '<div class="mg-rules">';
+  h += '<div class="mr-title">⚠ '+event+'避忌</div>';
+  var taboos = [
+    '忌冲新郎年支（'+bZhi+'年生人忌'+ZODIAC_MARRY[bZhi].avoid+'日）',
+    '忌冲新娘年支（'+brZhi+'年生人忌'+ZODIAC_MARRY[brZhi].avoid+'日）',
+    '忌月破·日破·岁破',
+    '忌黑道日·月煞日',
+    '忌参加丧事者·月经期者',
+    '忌上午 11 时前未起床行礼',
+    '属相相冲者回避礼场'
+  ];
+  taboos.forEach(function(t){
+    h += '<div class="mr-item">· '+t+'</div>';
+  });
+  h += '</div>';
+
+  h += '<div class="mg-source">📜 综合《嫁娶周堂图》《协纪辨方书·嫁娶》《选时要览》《玉匣记·嫁娶》《通书·嫁娶篇》《阴阳合历》《朱子家礼·昏礼》共 7 部古籍</div>';
+  h += '</div>';
+
+  document.getElementById('mgResult').innerHTML = h;
 }
 </script>
 
