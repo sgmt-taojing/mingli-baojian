@@ -198,6 +198,34 @@ textarea{min-height:60px;resize:vertical}
 .lp-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
 @media(max-width:768px){.lp-dash-dual{grid-template-columns:1fr}.lp-8grid,.lp-stage{grid-template-columns:repeat(2,1fr)}}
 </style>
+/* R41-B lifeplan-detail 4 阶段深度补强 CSS */
+.lp-stage-section { background: linear-gradient(135deg, #1a2332 0%, #0f1820 100%); border: 1px solid rgba(99,179,237,0.3); border-radius: 12px; padding: 20px; margin: 16px 0; }
+.lp-stage-title { color: #63b3ed; font-size: 18px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.lp-stage-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.lp-stage-card { background: rgba(99,179,237,0.08); border: 1px solid rgba(99,179,237,0.2); border-radius: 8px; padding: 12px; }
+.lp-stage-card-title { color: #63b3ed; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.lp-stage-card-content { color: #c5d1de; font-size: 13px; line-height: 1.6; }
+.lp-stage-tag { display: inline-block; padding: 2px 8px; background: rgba(99,179,237,0.15); border-radius: 4px; font-size: 11px; margin-right: 4px; margin-top: 4px; }
+
+.lp-stage-children { border-left: 4px solid #ffb44d; }
+.lp-stage-teen { border-left: 4px solid #c084fc; }
+.lp-stage-young { border-left: 4px solid #78c878; }
+.lp-stage-mid { border-left: 4px solid #f87171; }
+
+.lp-stage-timeline { display: flex; justify-content: space-between; margin: 20px 0; padding: 16px; background: rgba(99,179,237,0.05); border-radius: 8px; position: relative; }
+.lp-stage-timeline::before { content: ''; position: absolute; top: 50%; left: 5%; right: 5%; height: 2px; background: rgba(99,179,237,0.3); z-index: 0; }
+.lp-stage-timeline-item { text-align: center; position: relative; z-index: 1; background: rgba(26,35,50,0.95); padding: 8px; border-radius: 6px; min-width: 100px; }
+.lp-stage-timeline-age { color: #63b3ed; font-size: 16px; font-weight: 700; }
+.lp-stage-timeline-name { color: #8a9bb0; font-size: 11px; margin-top: 4px; }
+
+.lp-12-domain-matrix { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin: 16px 0; }
+.lp-12-domain { background: rgba(255,255,255,0.03); border: 1px solid rgba(99,179,237,0.15); border-radius: 6px; padding: 10px; text-align: center; }
+.lp-12-domain-name { color: #63b3ed; font-size: 12px; font-weight: 600; }
+.lp-12-domain-score { font-size: 20px; font-weight: 700; margin-top: 4px; }
+.lp-12-domain-score.good { color: #78c878; }
+.lp-12-domain-score.mid { color: #ffb44d; }
+.lp-12-domain-score.bad { color: #f87171; }
+
 
 </head>
 <body>
@@ -772,5 +800,145 @@ function renderLifeplanDashboardR38(){
   return h;
 }
 </script>
+
+<!-- R41-B lifeplan-detail 4 阶段 HTML -->
+<h2 style="color:#63b3ed;margin:24px 0 12px">📅 人生四阶段时间轴</h2>
+<div id="lp-stage-timeline" class="lp-stage-timeline"></div>
+<h2 style="color:#63b3ed;margin:24px 0 12px">🎯 四阶段·十二领域深度规划</h2>
+<div id="section-lp-children"></div>
+<div id="section-lp-teen"></div>
+<div id="section-lp-young"></div>
+<div id="section-lp-mid"></div>
+
+/* R41-B lifeplan-detail 4 阶段深度补强 JS */
+(function(){
+  window.LP_4STAGES = {
+    children: { // 学龄前 0-6 岁
+      name: "学龄前·孕育奠基",
+      emoji: "🍼",
+      ageRange: "0-6 岁",
+      color: "#ffb44d",
+      domains: {
+        study: { score: 60, tip: "天赋萌芽期,以游戏和感知探索为主,忌过早知识灌输" },
+        career: { score: 30, tip: "无职业概念,主要是亲子陪伴与早期启蒙" },
+        wealth: { score: 50, tip: "父母财力决定,孩子无直接财富关联" },
+        marriage: { score: 40, tip: "无婚姻概念,但父母关系深刻影响未来亲密关系模式" },
+        health: { score: 80, tip: "先天体质培育期,母乳喂养、规律作息、充足睡眠是关键" },
+        city: { score: 50, tip: "城市选择影响教育资源,但 6 岁前影响有限" },
+        culture: { score: 60, tip: "家庭文化氛围熏陶期,父母言行举止是最直接的文化输入" },
+        cultivation: { score: 70, tip: "性情养成期,关键期,性格底色基本在这一阶段奠定" },
+        network: { score: 50, tip: "亲子关系是首要关系,扩展与同龄玩伴初步社交" },
+        venture: { score: 20, tip: "无创业概念,父母可适度培养财商意识" },
+        elderly: { score: 50, tip: "无养老概念,但祖辈陪伴可建立家族情感纽带" },
+        legacy: { score: 60, tip: "家风、家训的耳濡目染期,耳濡目染胜过言传" }
+      },
+      advice: "这一阶段最重要的是:1. 充足的爱与安全感;2. 健康的体魄;3. 规律的生活节奏;4. 父母以身作则;5. 远离电子产品;6. 多接触自然。忌:过度早教、暴力教育、忽视陪伴、隔代抚养完全替代亲子关系。"
+    },
+    teen: { // 小学中学 6-18 岁
+      name: "小学中学·性格塑型",
+      emoji: "📚",
+      ageRange: "6-18 岁",
+      color: "#c084fc",
+      domains: {
+        study: { score: 85, tip: "学业核心期,学习方法、习惯养成、兴趣培养是关键。应试与素质并重。" },
+        career: { score: 40, tip: "开始有理想萌芽,可参加职业体验日、社会实践活动" },
+        wealth: { score: 30, tip: "无独立财富,但应建立零花钱管理与储蓄习惯" },
+        marriage: { score: 30, tip: "青春期对异性有朦胧好感,但应引导正确婚恋观,忌早恋影响学业" },
+        health: { score: 75, tip: "身高发育、近视防控、心理健康三大重点。保证睡眠、加强运动" },
+        city: { score: 60, tip: "城市教育资源差异开始显现,小升初、初升高是关键节点" },
+        culture: { score: 70, tip: "文化课与艺术修养并行,培养 1-2 项长期爱好" },
+        cultivation: { score: 75, tip: "三观形成期,父母与老师的引导至关重要。阅读经典、亲近自然" },
+        network: { score: 70, tip: "同学关系是重要人际关系,学会合作、分享、解决冲突" },
+        venture: { score: 40, tip: "可参加青少年创业大赛、科技创新活动,培养创新思维" },
+        elderly: { score: 50, tip: "开始理解生死与家族传承,可适度参与祖辈养老活动" },
+        legacy: { score: 65, tip: "明确家训、家规、家族故事,孩子建立家族认同感" }
+      },
+      advice: "这一阶段最重要的是:1. 培养独立学习能力;2. 建立 1-2 项运动爱好;3. 重视心理健康;4. 引导正确婚恋观;5. 培养时间管理与自律;6. 拓宽视野(旅行、阅读、社会实践)。忌:唯分数论、过度补课、忽视体育、沉迷游戏、家长控制欲过强。"
+    },
+    young: { // 大学/职场新人 18-28 岁
+      name: "大学职场·定位起步",
+      emoji: "🎓",
+      ageRange: "18-28 岁",
+      color: "#78c878",
+      domains: {
+        study: { score: 80, tip: "大学专业选择影响职业起点,但兴趣与天赋比热门更重要。可辅修、跨专业、考研" },
+        career: { score: 85, tip: "职业定位关键期。前 3 份工作决定职业方向。选对行业、跟对师傅、持续学习" },
+        wealth: { score: 60, tip: "开始有独立收入。理财第一课:储蓄、保险、必要基金。忌月光、过度消费" },
+        marriage: { score: 50, tip: "恋爱黄金期,但 28 岁前不应急婚。择偶看人品、上进心、原生家庭" },
+        health: { score: 70, tip: "身体巅峰期,但要警惕熬夜、饮食不规律、缺乏运动。年度体检必备" },
+        city: { score: 75, tip: "城市选择影响视野与机会。一线城市机会多但压力大,新一线性价比高" },
+        culture: { score: 70, tip: "深度阅读、专业考证、跨学科学习。专业+通识是核心竞争力" },
+        cultivation: { score: 75, tip: "世界观、价值观成熟期。多与高人交往,远离负能量圈子" },
+        network: { score: 75, tip: "弱关系决定机会。同学、同事、兴趣圈、行业社群都要经营" },
+        venture: { score: 70, tip: "创业尝试期。可副业起步,小成本试错,不宜过早All in" },
+        elderly: { score: 40, tip: "赡养祖辈是美德,也是家族情感纽带" },
+        legacy: { score: 60, tip: "思考人生意义,初步规划 5-10 年方向" }
+      },
+      advice: "这一阶段最重要的是:1. 选对行业与第一份工作;2. 建立深度专业能力;3. 储蓄与投资意识起步;4. 健康生活习惯固化;5. 拓展高质量人脉;6. 恋爱但不急婚;7. 持续学习+跨界视野。忌:频繁跳槽(每份<1年)、盲目创业、攀比消费、远离父母、拒绝学习。"
+    },
+    mid: { // 30-50 岁 中年成熟
+      name: "中年成熟·事业家庭双成",
+      emoji: "🏛️",
+      ageRange: "30-50 岁",
+      color: "#f87171",
+      domains: {
+        study: { score: 70, tip: "持续学习避免被淘汰。MBA、行业认证、新技能培训" },
+        career: { score: 90, tip: "事业黄金期,深耕行业或转型创业。35 岁前确定方向,40 岁前建立护城河" },
+        wealth: { score: 85, tip: "财富积累高峰期。资产配置:房产+股票+基金+保险+应急金。避免过度加杠杆" },
+        marriage: { score: 80, tip: "婚姻经营关键期。夫妻沟通、共同成长、保持新鲜感、处理好双方家庭关系" },
+        health: { score: 60, tip: "健康开始走下坡路。年度体检必备,警惕三高、颈椎、心理问题。坚持运动+饮食控制" },
+        city: { score: 70, tip: "可考虑置换改善型住房,或为子女教育换城市" },
+        culture: { score: 75, tip: "成为行业意见领袖,著书立说、传承经验" },
+        cultivation: { score: 85, tip: "精神成熟期。修身、齐家、参与公益、回馈社会" },
+        network: { score: 85, tip: "高端人脉变现期。同学会、行业大会、私董会,人脉即钱脉" },
+        venture: { score: 75, tip: "创业或投资的最佳年龄。资源、人脉、经验、胆识都到位" },
+        elderly: { score: 70, tip: "赡养父母是责任,也是给孩子做榜样。关注父母身心健康" },
+        legacy: { score: 80, tip: "传承家业、家风、家训。培养子女接班或独立,留下家族精神财富" }
+      },
+      advice: "这一阶段最重要的是:1. 事业护城河+财务自由;2. 婚姻保鲜+亲子教育;3. 健康管理+定期体检;4. 父母赡养+家风传承;5. 人脉深耕+跨界合作;6. 公益参与+社会贡献;7. 培养接班人+资产配置。忌:事业家庭失衡、过度投资、忽视健康、婚姻破裂、亲子关系淡漠。"
+    }
+  };
+
+  function renderLP4Stages() {
+    Object.entries(window.LP_4STAGES).forEach(([key, stage]) => {
+      const container = document.getElementById('section-lp-' + key);
+      if (!container) return;
+      let html = '<div class="lp-stage-section">';
+      html += '<div class="lp-stage-title">' + stage.emoji + ' ' + stage.name + ' (' + stage.ageRange + ')</div>';
+      html += '<div class="lp-stage-grid">';
+      Object.entries(stage.domains).forEach(([dk, dv]) => {
+        const scoreClass = dv.score >= 75 ? 'good' : dv.score >= 50 ? 'mid' : 'bad';
+        const domainNames = { study:'学业', career:'事业', wealth:'财运', marriage:'婚姻', health:'健康', city:'城市', culture:'文化', cultivation:'修养', network:'人脉', venture:'创业', elderly:'养老', legacy:'传承' };
+        html += '<div class="lp-stage-card">';
+        html += '<div class="lp-stage-card-title">' + (domainNames[dk] || dk) + ' <span class="lp-' + key + '-tag lp-stage-tag" style="color:' + stage.color + '">' + dv.score + '分</span></div>';
+        html += '<div class="lp-stage-card-content">' + dv.tip + '</div>';
+        html += '</div>';
+      });
+      html += '</div>';
+      html += '<div style="margin-top:16px;padding:12px;background:rgba(99,179,237,0.05);border-radius:8px;color:#c5d1de;font-size:13px;line-height:1.8"><strong style="color:' + stage.color + '">本阶段总纲:</strong> ' + stage.advice + '</div>';
+      html += '</div>';
+      container.innerHTML = html;
+    });
+    // 渲染时间轴
+    const timelineEl = document.getElementById('lp-stage-timeline');
+    if (timelineEl) {
+      let html = '';
+      const order = ['children','teen','young','mid'];
+      const ages = ['0-6 岁','6-18 岁','18-28 岁','30-50 岁'];
+      order.forEach((k, i) => {
+        const s = window.LP_4STAGES[k];
+        html += '<div class="lp-stage-timeline-item"><div class="lp-stage-timeline-age">' + s.emoji + ' ' + ages[i] + '</div><div class="lp-stage-timeline-name">' + s.name + '</div></div>';
+      });
+      timelineEl.innerHTML = html;
+    }
+  }
+  window.renderLP4Stages = renderLP4Stages;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderLP4Stages);
+  } else {
+    setTimeout(renderLP4Stages, 100);
+  }
+})();
+
 </body>
 </html>
