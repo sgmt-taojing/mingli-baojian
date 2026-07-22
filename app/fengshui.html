@@ -2605,6 +2605,32 @@ input, textarea, select {
 .btn-mini{padding:6px 10px;background:rgba(201,168,76,.15);border:1px solid var(--line);border-radius:5px;color:var(--paper);font-size:11px;cursor:pointer}
 .btn-mini:hover{background:rgba(201,168,76,.25)}
 .kids-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+
+<style>
+/* ===== 第二十七轮·办公位专区 ===== */
+.off-result{margin-top:18px}
+.off-summary{padding:14px;background:linear-gradient(135deg,rgba(74,144,226,.1),rgba(74,144,226,.02));border-radius:10px;border-left:3px solid #4a90e2;margin-bottom:14px}
+.off-summary .os-title{font-size:14px;color:var(--gold);letter-spacing:2px;font-weight:600;margin-bottom:8px}
+.off-summary .os-quote{font-size:11px;line-height:1.7;opacity:.75;font-style:italic;padding:8px;background:rgba(0,0,0,.18);border-radius:4px}
+.off-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
+@media(min-width:768px){.off-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1200px){.off-grid{grid-template-columns:repeat(3,1fr)}}
+.off-card{padding:12px;background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:8px}
+.off-card.dim-事业{border-left:3px solid #e8a04a;background:rgba(232,160,74,.04)}
+.off-card.dim-贵人{border-left:3px solid #b16aff;background:rgba(177,106,255,.04)}
+.off-card.dim-健康{border-left:3px solid #5cb85c;background:rgba(92,184,92,.04)}
+.off-card.dim-防小{border-left:3px solid #e74c3c;background:rgba(231,76,60,.04)}
+.off-card .oc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.off-card .oc-title{font-size:12px;color:var(--gold);font-weight:600;letter-spacing:1px}
+.off-card .oc-dim{font-size:9px;padding:2px 8px;background:rgba(201,168,76,.2);border-radius:8px;color:var(--gold2)}
+.off-card .oc-ico{font-size:24px;margin-bottom:6px;display:block}
+.off-card .oc-body{font-size:11px;line-height:1.6;opacity:.85}
+.off-card .oc-tip{margin-top:6px;padding:6px 8px;background:rgba(0,0,0,.15);border-radius:4px;font-size:10px;opacity:.75}
+.off-card .oc-meta{display:grid;grid-template-columns:repeat(2,1fr);gap:4px;margin-top:6px;font-size:10px}
+.off-card .oc-meta div{padding:4px 6px;background:rgba(0,0,0,.12);border-radius:4px}
+.off-card .oc-meta b{color:var(--gold);margin-right:3px}
+.off-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+</style>
 </style>
 </style>
 </style>
@@ -5561,6 +5587,143 @@ function generateKidsRoom(){
   h += '</div>';
 
   document.getElementById('kidsResult').innerHTML = h;
+}
+
+
+<!-- section-office · 第二十七轮·化解·办公位专区 START -->
+<div class="fs-section" id="section-office">
+  <div class="input-card">
+    <h3>💼 化解·办公位专区（16 件套·事业/贵人/健康/防小人）</h3>
+    <p style="font-size:12px;opacity:.6;margin:8px 0;line-height:1.7">
+      办公位风水主：<strong>事业晋升·贵人相助·身体健康·远离是非</strong>。
+      16 件套按维度分类，依《八宅明镜·书房》《阳宅集成·文昌》《飞星紫白·办公》《鲁班经·书案》整理。
+    </p>
+    <div style="display:flex;gap:6px;margin:10px 0;flex-wrap:wrap">
+      <button class="btn-mini" onclick="filterOffDim('all')">全部</button>
+      <button class="btn-mini" onclick="filterOffDim('事业')">🚀 事业晋升</button>
+      <button class="btn-mini" onclick="filterOffDim('贵人')">🤝 贵人相助</button>
+      <button class="btn-mini" onclick="filterOffDim('健康')">💪 健康护脊</button>
+      <button class="btn-mini" onclick="filterOffDim('防小')">🛡️ 防小人</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0">
+      <div>
+        <label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">职业类型</label>
+        <select id="offJob" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit">
+          <option value="管理">管理岗（领导/主管）</option>
+          <option value="业务">业务岗（销售/市场）</option>
+          <option value="技术">技术岗（研发/工程）</option>
+          <option value="文创">文创岗（设计/编辑）</option>
+          <option value="运营">运营岗（运营/客服）</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">命主年支</label>
+        <select id="offZhi" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit">
+          <option value="">未选择</option>
+          <option value="子">子（鼠）</option><option value="丑">丑（牛）</option>
+          <option value="寅">寅（虎）</option><option value="卯">卯（兔）</option>
+          <option value="辰">辰（龙）</option><option value="巳">巳（蛇）</option>
+          <option value="午">午（马）</option><option value="未">未（羊）</option>
+          <option value="申">申（猴）</option><option value="酉">酉（鸡）</option>
+          <option value="戌">戌（狗）</option><option value="亥">亥（猪）</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" onclick="generateOfficeDesk()" style="margin-top:14px">💼 16 件套·办公位专项推荐</button>
+    <div id="offResult"></div>
+  </div>
+</div>
+<!-- section-office END -->
+
+/* ===== 第二十七轮·办公位 16 件套引擎 ===== */
+var OFFICE_16 = [
+  {id:1,dim:'事业',ico:'🗼',name:'文昌塔·铜',why:'助事业·启智慧·镇文昌',pos:'书桌左上角',mat:'纯铜',color:'铜本色/金色',tip:'塔尖朝门·不可对厕所',cite:'《八宅明镜·书房》《文昌帝君阴骘文》'},
+  {id:2,dim:'事业',ico:'🏔️',name:'山水画·靠山',why:'背后有靠·事业稳固',pos:'座椅后方墙上',mat:'宣纸/绢画',color:'水墨·山为主体',tip:'山高于人·不可有水流向门外',cite:'《阳宅集成·文昌》《飞星紫白·办公》'},
+  {id:3,dim:'事业',ico:'🏆',name:'奖杯/荣誉',why:'正向激励·荣誉感召',pos:'书桌右上角',mat:'金属/水晶',color:'金色',tip:'不可太多·3 件以内',cite:'《阳宅集成·文昌》'},
+  {id:4,dim:'事业',ico:'🐎',name:'吉祥物·马',why:'马到成功·事业腾达',pos:'书桌左侧',mat:'铜/陶瓷',color:'红/金色',tip:'马头朝门·不可对厕所',cite:'《鲁班经·书案》《阳宅三要》'},
+  {id:5,dim:'事业',ico:'💰',name:'财神像·小',why:'招财进宝·事业亨通',pos:'办公位财位',mat:'陶瓷/铜',color:'金色',tip:'不可对厕所·不可对门',cite:'《财神经》《居家风水》'},
+  {id:6,dim:'贵人',ico:'🐢',name:'龙龟·铜',why:'贵人相助·长寿化煞',pos:'书桌左上',mat:'纯铜',color:'铜色',tip:'龟头朝门·不可对厕所',cite:'《八宅明镜·书房》《鲁班经》'},
+  {id:7,dim:'贵人',ico:'🐉',name:'玉如意',why:'事事如意·贵人扶助',pos:'书桌中央',mat:'玉/翡翠',color:'翠绿/白玉',tip:'不可摆放过高·平视为佳',cite:'《阳宅集成·文昌》'},
+  {id:8,dim:'贵人',ico:'🌸',name:'桃花/红花',why:'人缘和气·上下和谐',pos:'书桌右侧',mat:'鲜花/仿真花',color:'红/粉色',tip:'不可枯萎·定期更换',cite:'《居家风水·办公》'},
+  {id:9,dim:'贵人',ico:'📱',name:'手机座·圆',why:'沟通顺畅·贵人音讯',pos:'书桌前方·触手可及',mat:'木质/陶瓷',color:'原木/米白',tip:'不可放床·不可对厕所',cite:'《居家风水·办公》'},
+  {id:10,dim:'健康',ico:'🪑',name:'人体工学椅',why:'护脊养身·久坐不累',pos:'座椅',mat:'网布+钢架',color:'黑色/灰色',tip:'腰靠要紧贴·脚可平放',cite:'《鲁班经·书案》《居家风水·办公》'},
+  {id:11,dim:'健康',ico:'💻',name:'显示器架',why:'视线平·颈椎正',pos:'桌面·中央',mat:'金属/木质',color:'黑色',tip:'屏幕顶与眼平·不可侧对窗',cite:'《居家风水·办公》'},
+  {id:12,dim:'健康',ico:'🪴',name:'绿植·小',why:'生气润肺·舒缓眼疲',pos:'窗台/书桌角',mat:'陶盆',color:'绿色',tip:'不可放正对门·不可挡光',cite:'《居家风水·办公》《园艺风水》'},
+  {id:13,dim:'健康',ico:'💧',name:'保温杯',why:'常喝水·护肾养身',pos:'书桌右手边',mat:'不锈钢/陶瓷',color:'任意',tip:'不可空杯·随时补水',cite:'《居家风水·办公》《千金方·养肾》'},
+  {id:14,dim:'防小',ico:'⚔️',name:'铜剑·桃木',why:'镇煞防小人·辟邪',pos:'书桌左上·刀刃朝外',mat:'铜/桃木',color:'铜色/木色',tip:'不可对人·不可对门',cite:'《万法归宗》《符咒全书》'},
+  {id:15,dim:'防小',ico:'🪞',name:'小圆镜',why:'化煞防是非·照破暗箭',pos:'书桌右侧',mat:'玻璃·圆形',color:'透明',tip:'不可对门·不可对同事',cite:'《八宅明镜·书房》《阳宅集成》'},
+  {id:16,dim:'防小',ico:'🔔',name:'风铃·金属',why:'化煞泄负能量·动气流通',pos:'门框上方·窗边',mat:'金属',color:'金色',tip:'不可对床·不可对门内',cite:'《鲁班经·书案》《阳宅集成·文昌》'}
+];
+
+function filterOffDim(dim){
+  var cards = document.querySelectorAll('.off-card');
+  cards.forEach(function(c){
+    if(dim==='all' || c.classList.contains('dim-'+dim)){
+      c.style.display='';
+    } else {
+      c.style.display='none';
+    }
+  });
+}
+
+function generateOfficeDesk(){
+  var job = document.getElementById('offJob').value;
+  var zhi = document.getElementById('offZhi').value;
+  var jobDimPriority = {
+    '管理':['事业','贵人','健康','防小'],
+    '业务':['贵人','事业','防小','健康'],
+    '技术':['健康','事业','贵人','防小'],
+    '文创':['贵人','事业','健康','防小'],
+    '运营':['防小','贵人','事业','健康']
+  };
+  var order = jobDimPriority[job];
+  var items = OFFICE_16.slice().sort(function(a,b){
+    return order.indexOf(a.dim) - order.indexOf(b.dim);
+  });
+  var ZODIAC_OFFICE = {
+    子:{忌:'大型鱼缸·水太盛',宜:'金属·文昌塔'},
+    丑:{忌:'马形摆件',宜:'牛形·铜器'},
+    寅:{忌:'老虎画·刀剑',宜:'山水·绿植'},
+    卯:{忌:'尖锐物·桃花过盛',宜:'绿植·玉器'},
+    辰:{忌:'龙形摆件·金属过多',宜:'山水·陶瓷'},
+    巳:{忌:'蛇形玩偶·红色过多',宜:'佛像·铜器'},
+    午:{忌:'马形·镜对门',宜:'山水·木器'},
+    未:{忌:'羊形·桃木过多',宜:'山水·铜器'},
+    申:{忌:'猴形·金属过多',宜:'山水·木器'},
+    酉:{忌:'鸡形·镜太多',宜:'山水·绿植'},
+    戌:{忌:'狗形·金刃过多',宜:'山水·铜器'},
+    亥:{忌:'猪形·水过盛',宜:'山水·木器'}
+  };
+  var dimCount = {};
+  items.forEach(function(it){ dimCount[it.dim] = (dimCount[it.dim]||0)+1; });
+
+  var h = '<div class="off-result">';
+  h += '<div class="off-summary">';
+  h += '<div class="os-title">💼 '+job+'岗·办公位'+items.length+' 件套专项</div>';
+  h += '<div class="os-quote">"君子居之·何陋之有。办公之位·关乎一生成败。"——《鲁班经·书案》</div>';
+  h += '<div style="font-size:11px;margin-top:8px;line-height:1.7">· 职业：<b>'+job+'</b> · 已按职业优先级排序<br>';
+  h += '· 4 维度：事业 '+dimCount['事业']+' · 贵人 '+dimCount['贵人']+' · 健康 '+dimCount['健康']+' · 防小 '+dimCount['防小']+'<br>';
+  if(zhi){
+    var t = ZODIAC_OFFICE[zhi];
+    h += '· 属相 <b>'+zhi+'</b> 办公室忌：'+t.忌+' · 喜：'+t.宜+'<br>';
+  }
+  h += '· 摆放总则：背后有靠 · 前面开阔 · 左青龙 · 右白虎 · 门不直冲</div>';
+  h += '</div>';
+  h += '<div class="off-grid">';
+  items.forEach(function(it){
+    h += '<div class="off-card dim-'+it.dim+'">';
+    h += '<span class="oc-ico">'+it.ico+'</span>';
+    h += '<div class="oc-head"><div class="oc-title">'+it.name+'</div><div class="oc-dim">'+it.dim+'</div></div>';
+    h += '<div class="oc-body">'+it.why+'</div>';
+    h += '<div class="oc-meta"><div><b>位置</b>'+it.pos+'</div><div><b>材质</b>'+it.mat+'</div></div>';
+    h += '<div class="oc-tip">⚠ '+it.tip+'</div>';
+    h += '<div class="oc-tip" style="opacity:.5;font-size:9px;letter-spacing:1px">📜 '+it.cite+'</div>';
+    h += '</div>';
+  });
+  h += '</div>';
+  h += '<div class="off-source">📜 综合《八宅明镜·书房》《阳宅集成·文昌》《飞星紫白·办公》《鲁班经·书案》《居家风水·办公》《文昌帝君阴骘文》《万法归宗》《符咒全书》共 8 部古籍</div>';
+  h += '</div>';
+  document.getElementById('offResult').innerHTML = h;
 }
 </script>
 
