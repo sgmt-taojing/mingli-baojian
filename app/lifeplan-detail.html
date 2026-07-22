@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" var(--ink)>
+<title>人生规划蓝图 · 易道智鉴</title>
+<meta name="description" content="人生规划蓝图：年龄阶段/12 领域矩阵/未来 5 年/行动清单。可分享、可打印。">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#0a0a0a;--paper:#f5f1e8;--gold:#c9a84c;--gold2:#a07c2a;--bronze:#8c6a30;--line:rgba(201,168,76,.2);--r:10px}
+body{font-family:'Noto Serif SC',serif;background:linear-gradient(135deg,#0a0a0a,#1a1208);color:var(--paper);min-height:100vh;padding:20px;line-height:1.7}
+.wrap{max-width:680px;margin:0 auto}
+header{text-align:center;padding:24px 0 16px;border-bottom:1px solid var(--line);margin-bottom:24px}
+h1{font-size:24px;font-weight:500;color:var(--gold);letter-spacing:4px;margin-bottom:6px}
+header p{font-size:12px;opacity:.55;letter-spacing:1px}
+.card{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.card h2{font-size:14px;color:var(--gold);font-weight:500;border-left:3px solid var(--gold);padding-left:10px;margin-bottom:12px;letter-spacing:1px}
+label{display:block;font-size:12px;opacity:.7;margin-bottom:4px;margin-top:10px}
+input,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit;font-size:14px;outline:none}
+input:focus,textarea:focus{border-color:var(--gold)}
+textarea{min-height:60px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:480px){.row{grid-template-columns:1fr 1fr}}
+.btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),var(--bronze));color:#0a0a0a;font:inherit;font-size:15px;font-weight:600;border:none;border-radius:var(--r);cursor:pointer;letter-spacing:4px;margin-top:8px}
+.btn:hover:not(:disabled){box-shadow:0 6px 18px rgba(201,168,76,.3)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.report{display:none}
+.report.show{display:block;animation:fadein .4s}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.banner{text-align:center;padding:20px 16px;margin:18px 0;background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(201,168,76,.04));border-radius:var(--r);border:1px solid var(--line)}
+.banner .age{font-size:32px;color:var(--gold);font-weight:600;letter-spacing:4px}
+.banner .stage{font-size:14px;color:var(--gold2);margin-top:4px}
+.banner .focus{font-size:12px;opacity:.7;margin-top:6px}
+/* 12 领域 */
+.doms{display:grid;grid-template-columns:repeat(auto-fit,minmax(95px,1fr));gap:6px;margin-top:10px}
+.dom{padding:10px;background:rgba(201,168,76,.05);border-radius:8px;text-align:center}
+.dom .ico{font-size:18px}
+.dom .nm{font-size:11px;opacity:.75;margin:2px 0}
+.dom .num{font-size:17px;color:var(--gold);font-weight:600}
+.dom .bar{height:4px;border-radius:2px;background:rgba(201,168,76,.15);margin-top:5px;overflow:hidden}
+.dom .bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--bronze));transition:width .8s}
+.dom .st{font-size:10px;margin-top:3px;color:var(--gold2)}
+/* 时间轴 */
+.tl{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.tl-row{display:flex;gap:12px;align-items:flex-start;padding:10px;background:rgba(201,168,76,.04);border-radius:8px;border-left:3px solid var(--gold)}
+.tl-age{font-size:18px;color:var(--gold);font-weight:600;flex-shrink:0;min-width:36px}
+.tl-info b{font-size:14px;color:var(--paper);display:block}
+.tl-info small{font-size:12px;opacity:.65}
+/* 5 年 */
+.fy{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.fy-row{display:flex;gap:10px;padding:8px 12px;background:rgba(201,168,76,.04);border-radius:6px;align-items:center}
+.fy-y{font-size:13px;color:var(--gold);font-weight:600;min-width:50px}
+/* 行动 */
+.ol{padding-left:24px;font-size:14px}
+.ol li{margin:8px 0;line-height:1.6}
+.summary{font-size:13px;opacity:.85;padding:12px;background:rgba(201,168,76,.05);border-radius:8px;margin-top:10px}
+.tools{display:flex;gap:8px;margin:18px 0}
+.tools button{flex:1;padding:10px;font:inherit;font-size:13px;background:rgba(255,255,255,.05);color:var(--paper);border:1px solid var(--line);border-radius:6px;cursor:pointer}
+.tools button:hover{background:rgba(201,168,76,.1);border-color:var(--gold)}
+@media print{body{background:#fff;color:#000;padding:10px}.card,.banner,.tl-row,.fy-row,.dom{background:#fafafa !important;color:#000 !important;border:1px solid #ccc !important}.btn,.tools,#input{display:none !important}.banner .age,.card h2,.dom .num{color:#000 !important}h1{color:#000}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>人生规划蓝图</h1>
+    <p>8 阶段 / 12 领域 / 5 年步进 · 易道智鉴</p>
+  </header>
+  <div class="card" id="input">
+    <h2>📋 基础信息</h2>
+    <div class="row">
+      <div><label>年龄</label><input id="lAge" type="number" min="1" max="120" value="28"></div>
+      <div><label>性别</label><select id="lSex"><option value="male">男</option><option value="female">女</option></select></div>
+      <div><label>现居地</label><input id="lResidence" placeholder="例：上海"></div>
+    </div>
+    <label>关注领域（逗号分隔）</label>
+    <input id="lFocus" placeholder="例：事业、财运、健康">
+    <label>补充情况（可选，影响领域加权）</label>
+    <textarea id="lExtra" placeholder="例：计划 30 岁前完成理财布局，金融行业从业5年"></textarea>
+    <button class="btn" id="genBtn" onclick="generate()">✨ 生成蓝图</button>
+  </div>
+  <div class="report" id="report"></div>
+  <p style="text-align:center;font-size:11px;opacity:.4;margin:24px 0;letter-spacing:1px">易道智鉴 · 仅供参考 · 命数只占 30%，努力占 70%</p>
+</div>
+<script>
+const STAGES = [
+  {key:'preschool',name:'学龄前',range:'0-6岁',focus:['先天','亲子','健康']},
+  {key:'school',name:'小学中学',range:'7-17岁',focus:['学习','品德','兴趣']},
+  {key:'university',name:'大学',range:'18-23岁',focus:['专业','社交','实践']},
+  {key:'career',name:'职场+婚恋',range:'24-65岁',focus:['事业','婚恋','健康']}
+];
+const DOMAINS = [
+  {key:'xueye',name:'学业',icon:'📚'},
+  {key:'zhiye',name:'职业',icon:'💼'},
+  {key:'caiyun',name:'财运',icon:'💰'},
+  {key:'hunyin',name:'婚姻',icon:'💕'},
+  {key:'jiankang',name:'健康',icon:'💊'},
+  {key:'chengshi',name:'城市',icon:'🏙️'},
+  {key:'xiuyang',name:'修养',icon:'🎋'},
+  {key:'renmai',name:'人脉',icon:'🤝'},
+  {key:'chuangye',name:'创业',icon:'🚀'},
+  {key:'yanglao',name:'养老',icon:'🌳'},
+  {key:'chuancheng',name:'传承',icon:'🎁'},
+  {key:'jiangxiu',name:'享福',icon:'🌸'}
+];
+const WUXING_KW = {'金':['理财','金融','法律'],'木':['学习','成长','教育'],'水':['智慧','思考','学术'],'火':['创业','激情','表达'],'土':['稳健','养老','健康']};
+
+function generate(){
+  const btn=document.getElementById('genBtn');
+  btn.disabled=true; btn.textContent='⏳ 生成中...';
+  setTimeout(()=>{
+    try{
+      const age=parseInt(document.getElementById('lAge').value)||30;
+      const sex=document.getElementById('lSex').value;
+      const residence=document.getElementById('lResidence').value.trim();
+      const focus=(document.getElementById('lFocus').value||'').trim();
+      const extra=(document.getElementById('lExtra').value||'').trim();
+      const userText = extra+' '+focus;
+      const stageKey = age<=6?'preschool':age<=17?'school':age<=23?'university':'career';
+      const stage = STAGES.find(s=>s.key===stageKey);
+
+      const domainScores = DOMAINS.map(d=>{
+        let base=60;
+        if(stage.focus.some(f=>d.name.includes(f)||f.includes(d.name))) base+=15;
+        if(d.key==='jiankang'&&age>=35) base-=10;
+        if(d.key==='chuangye'&&age>=24&&age<=40) base+=10;
+        if(d.key==='yanglao'&&age>=50) base+=15;
+        if(d.key==='xueye'&&age<24) base+=15;
+        for(const [wx,kws] of Object.entries(WUXING_KW)){
+          if(kws.some(k=>userText.includes(k))){
+            if(d.key==='caiyun'&&wx==='金') base+=5;
+            if(d.key==='xueye'&&wx==='木') base+=5;
+            if(d.key==='chuangye'&&wx==='火') base+=5;
+            if(d.key==='yanglao'&&wx==='土') base+=5;
+          }
+        }
+        const final=Math.max(30,Math.min(95,base));
+        return {key:d.key,name:d.name,icon:d.icon,score:final,status:final>=75?'优':final>=60?'良好':'有潜力'};
+      });
+
+      const next5 = [
+        {y:age+1,t:'夯实基期：阶段核心理能强化，适合学习积累'},
+        {y:age+2,t:'试错期：阶段突破、探索不同方向'},
+        {y:age+3,t:'中期步进期：目标聚焦、协会/导师对话'},
+        {y:age+4,t:'中期证果期：阶段成果转位'},
+        {y:age+5,t:'中期导启期：下一阶段起点梳理'}
+      ];
+      const fiveYearAdvice = age<30?'启始期，重点在✍️学业 🤝人脉 建节奏':age<50?'进取期，重点在💼事业 💰财运 💕婚恋':'守成期，重点在💊健康 🏙️城市 🎁传承';
+
+      render({age,sex,residence,focus,extra,stage,domainScores,next5,fiveYearAdvice});
+      btn.disabled=false; btn.textContent='🔄 重新生成';
+    }catch(e){
+      alert('生成失败：'+e.message);
+      btn.disabled=false; btn.textContent='✨ 生成蓝图';
+    }
+  }, 250);
+}
+
+function render(d){
+  const summary = `${d.age}岁属${d.stage.name}（${d.stage.range}），本阶段重点：${d.stage.focus.join('、')}。依据命数起步，未来 5 年${d.fiveYearAdvice}。请每月复盘调整。`;
+  let h='<div class="banner"><div class="age">'+d.age+'</div><div class="stage">'+d.stage.name+' · '+d.stage.range+'</div><div class="focus">重点：'+d.stage.focus.join(' · ')+'</div></div>';
+
+  // 12 领域
+  h+='<div class="card"><h2>🎯 12 领域矩阵</h2><div class="doms">';
+  d.domainScores.forEach(s=>{
+    h+='<div class="dom"><div class="ico">'+s.icon+'</div><div class="nm">'+s.name+'</div><div class="num">'+s.score+'</div><div class="bar"><div class="bar-fill" style="width:'+s.score+'%"></div></div><div class="st">'+s.status+'</div></div>';
+  });
+  h+='</div></div>';
+
+  // 时间轴
+  h+='<div class="card"><h2>📅 人生时间轴</h2><div class="tl">';
+  const ts=[
+    {a:10,t:'童年奠基期',f:'启蒙 + 健康习惯'},
+    {a:20,t:'青年立志期',f:'学业 + 人脉起步'},
+    {a:30,t:'而立创业期',f:'事业 + 婚恋'},
+    {a:40,t:'不惑稳固期',f:'事业深耕 + 健康'},
+    {a:50,t:'知天命收获期',f:'财务 + 传承'},
+    {a:60,t:'耳顺传承期',f:'传承 + 修养'},
+    {a:70,t:'从心所欲期',f:'享福 + 天命'}
+  ];
+  ts.forEach(t=>{
+    h+='<div class="tl-row"><div class="tl-age">'+t.a+'</div><div class="tl-info"><b>'+t.t+'</b><small>'+t.f+'</small></div></div>';
+  });
+  h+='</div></div>';
+
+  // 未来 5 年
+  h+='<div class="card"><h2>🔮 未来 5 年步进</h2><div class="fy">';
+  d.next5.forEach(p=>{
+    h+='<div class="fy-row"><span class="fy-y">'+p.y+' 岁</span><span>'+p.t+'</span></div>';
+  });
+  h+='<div class="summary">'+d.fiveYearAdvice+'</div></div>';
+
+  // 行动清单
+  const ns=[
+    `【1】制定${d.age+1}年度${d.stage.focus[0]}核心目标（3个为佳）`,
+    `【2】梳理现有${d.stage.focus[1]||'人脉'}资源，建立同领域同行圈层（5-8人）`,
+    `【3】建立每月一轮复盘机制（推荐月末周末 2 小时）`,
+    `【4】健康习惯投资：合理作息 + 运动计划（每周 3-5 次）`,
+    `【5】财务防守 / 进攻计划：年度储蓄比例明确`,
+    `【6】婚恋 / 家庭节奏同步：与伴侣每季沟通一次`,
+    `【7】学习充电：每年读 4 本相关领域书籍`,
+    `【8】拓展视野：每年 1 次长途旅行或海外学习`,
+    `【9】建立财务护城河：应急金≥6个月支出`,
+    `【10】每年年度复盘 + 下一年 OKR 设定`
+  ];
+  h+='<div class="card"><h2>✅ 行动清单（10 条）</h2><ol class="ol">';
+  ns.forEach(s=>h+='<li>'+s+'</li>');
+  h+='</ol></div>';
+
+  // 总评
+  h+='<div class="card"><h2>📜 总评</h2><div class="summary">'+summary+'</div></div>';
+
+  // 工具
+  h+='<div class="tools"><button onclick="shareUrl()">🔗 分享链接</button><button onclick="window.print()">🖨️ 打印/保存 PDF</button><button onclick="copyTxt()">📋 复制文本</button></div>';
+
+  document.getElementById('report').innerHTML=h;
+  document.getElementById('report').classList.add('show');
+  document.getElementById('input').style.display='none';
+  location.hash='#'+btoa(unescape(encodeURIComponent(JSON.stringify({age:d.age,sex:d.sex,residence:d.residence,focus:d.focus,extra:d.extra}))));
+}
+
+function restoreFromHash(){
+  const h=location.hash.slice(1);
+  if(!h) return;
+  try{
+    const d=JSON.parse(decodeURIComponent(escape(atob(h))));
+    if(d.age) document.getElementById('lAge').value=d.age;
+    if(d.sex) document.getElementById('lSex').value=d.sex;
+    if(d.residence) document.getElementById('lResidence').value=d.residence;
+    if(d.focus) document.getElementById('lFocus').value=d.focus;
+    if(d.extra) document.getElementById('lExtra').value=d.extra;
+    generate();
+  }catch(e){}
+}
+
+function shareUrl(){
+  const url=location.href;
+  if(navigator.share){navigator.share({title:'人生规划蓝图',url}).catch(()=>{});}
+  else if(navigator.clipboard){navigator.clipboard.writeText(url).then(()=>showToast('链接已复制'));}
+  else prompt('复制链接分享：',url);
+}
+
+function copyTxt(){
+  if(navigator.clipboard){navigator.clipboard.writeText(document.getElementById('report').innerText).then(()=>showToast('已复制'));}
+}
+
+function showToast(m){
+  const t=document.createElement('div');
+  t.textContent=m;
+  t.style.cssText='position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:rgba(201,168,76,.9);color:#0a0a0a;padding:10px 24px;border-radius:8px;font-size:14px;z-index:1000';
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),1800);
+}
+
+window.addEventListener('DOMContentLoaded',restoreFromHash);
+</script>
+</body>
+</html>
