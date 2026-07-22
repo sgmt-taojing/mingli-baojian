@@ -2719,6 +2719,42 @@ input, textarea, select {
 .fz-card .fc-meta b{color:var(--gold);margin-right:3px}
 .fz-card .fc-tip{margin-top:6px;padding:6px 8px;background:rgba(231,76,60,.08);border-radius:4px;font-size:10px;opacity:.75;color:#faa}
 .fz-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+<style>
+/* ===== 第三十一轮·紫微+八字双盘叠加 ===== */
+.dp-result{margin-top:18px}
+.dp-summary{padding:16px;background:linear-gradient(135deg,rgba(155,89,182,.1),rgba(155,89,182,.02));border-radius:10px;border-left:3px solid #9b59b6;margin-bottom:14px}
+.dp-summary .ms-title{font-size:14px;color:var(--gold);letter-spacing:2px;font-weight:600;margin-bottom:8px}
+.dp-summary .ms-quote{font-size:11px;line-height:1.7;opacity:.75;font-style:italic;padding:8px;background:rgba(0,0,0,.18);border-radius:4px}
+.dp-dual{display:grid;grid-template-columns:1fr;gap:14px;margin-top:14px}
+@media(min-width:768px){.dp-dual{grid-template-columns:1fr 1fr}}
+.dp-pan-card{padding:14px;border-radius:10px;border:2px solid var(--line);position:relative}
+.dp-pan-card.ziwei{border-color:#9b59b6;background:rgba(155,89,182,.04)}
+.dp-pan-card.bazi{border-color:#e8a04a;background:rgba(232,160,74,.04)}
+.dp-pan-card .dp-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.dp-pan-card .dp-title{font-size:14px;font-weight:600;letter-spacing:1px}
+.dp-pan-card.ziwei .dp-title{color:#9b59b6}
+.dp-pan-card.bazi .dp-title{color:#e8a04a}
+.dp-pan-card .dp-palace{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:10px}
+.dp-pan-card .dp-cell{padding:8px 4px;background:rgba(0,0,0,.18);border-radius:4px;text-align:center;font-size:10px}
+.dp-pan-card .dp-cell b{display:block;font-size:11px;color:var(--gold);margin-bottom:2px}
+.dp-pan-card .dp-cell.hl{border:1px solid var(--gold);background:rgba(201,168,76,.15)}
+.dp-pan-card .dp-cell.warn{border:1px solid var(--red);background:rgba(231,76,60,.12)}
+.dp-cross{margin-top:14px;padding:14px;background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.02));border-radius:10px;border-left:3px solid var(--gold)}
+.dp-cross .dx-title{font-size:13px;color:var(--gold);font-weight:600;letter-spacing:1px;margin-bottom:10px}
+.dp-cross .dx-item{display:flex;gap:10px;padding:8px;border-bottom:1px dashed var(--line);font-size:11px;line-height:1.7}
+.dp-cross .dx-item:last-child{border-bottom:none}
+.dp-cross .dx-item .dx-area{flex:0 0 80px;color:var(--gold);font-weight:600}
+.dp-cross .dx-item .dx-zw{flex:1}
+.dp-cross .dx-item .dx-bz{flex:1}
+.dp-cross .dx-item .dx-result{flex:1;color:var(--red)}
+.dp-cross .dx-item.best .dx-result{color:var(--gold2)}
+.dp-verdict{margin-top:14px;padding:14px;border-radius:10px;border-left:3px solid var(--gold)}
+.dp-verdict.warn{background:rgba(231,76,60,.04);border-color:var(--red)}
+.dp-verdict.good{background:rgba(39,174,96,.06);border-color:#27ae60}
+.dp-verdict .dv-title{font-size:14px;font-weight:600;letter-spacing:1px;margin-bottom:8px}
+.dp-verdict .dv-score{font-size:32px;color:var(--gold);font-weight:600;text-align:center;margin:8px 0}
+.dp-verdict .dv-detail{font-size:11px;line-height:1.8;opacity:.85}
+.dp-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
 </style>
 </style>
 </style>
@@ -6651,6 +6687,96 @@ function generateFuzhou(){
 
   document.getElementById('fzResult').innerHTML = h;
 }
+/* ===== 第三十一轮·紫微+八字双盘叠加引擎 ===== */
+var ZW_STARS_R31={"紫微":{nature:"土",kw:"领导·尊贵·孤高",ls:4,cs:5,hs:3,vs:3,ws:4},"天府":{nature:"土",kw:"稳健·理财·保守",ls:5,cs:4,hs:4,vs:4,ws:5},"太阳":{nature:"火",kw:"博爱·光明",ls:4,cs:5,hs:3,vs:3,ws:4},"太阴":{nature:"水",kw:"母性·柔和",ls:4,cs:3,hs:4,vs:5,ws:4},"武曲":{nature:"金",kw:"决断·财星",ls:3,cs:5,hs:3,vs:3,ws:5},"天同":{nature:"水",kw:"福星·和顺",ls:5,cs:3,hs:4,vs:4,ws:3},"廉贞":{nature:"火",kw:"刚烈·囚星",ls:3,cs:4,hs:3,vs:3,ws:3},"天机":{nature:"木",kw:"智星·谋略",ls:4,cs:4,hs:4,vs:4,ws:3},"贪狼":{nature:"木水",kw:"才艺·交际",ls:3,cs:4,hs:3,vs:5,ws:4},"巨门":{nature:"水",kw:"口舌·暗昧",ls:3,cs:3,hs:3,vs:2,ws:3},"天相":{nature:"水",kw:"印星·辅佐",ls:5,cs:4,hs:4,vs:4,ws:4},"天梁":{nature:"土",kw:"荫星·化解",ls:5,cs:4,hs:5,vs:3,ws:4},"七杀":{nature:"金",kw:"将星·孤克",ls:3,cs:5,hs:3,vs:2,ws:4},"破军":{nature:"水",kw:"变革·开创",ls:3,cs:5,hs:3,vs:3,ws:4}};
+var BAZI_SHISHEN_R31={same:"比肩·劫财",produce:"食神·伤官",control:"偏财·正财",restrain:"七杀·正官",restrainMe:"偏印·正印"};
+var DP_AREAS_R31=[{key:"career",name:"事业",zwA:"官禄宫",bzA:"官杀·七杀/正官"},{key:"wealth",name:"财帛",zwA:"财帛宫",bzA:"财星·偏财/正财"},{key:"love",name:"姻缘",zwA:"夫妻宫",bzA:"桃花·正官/七杀"},{key:"health",name:"健康",zwA:"疾厄宫",bzA:"调候·用神"},{key:"family",name:"父母",zwA:"父母宫",bzA:"印星·偏印/正印"},{key:"children",name:"子女",zwA:"子女宫",bzA:"食神·伤官"},{key:"friend",name:"交友",zwA:"交友宫",bzA:"比劫·比肩/劫财"},{key:"migrate",name:"迁移",zwA:"迁移宫",bzA:"驿马·动星"}];
+var STEM_ELEM_R31={"甲":"木","乙":"木","丙":"火","丁":"火","戊":"土","己":"土","庚":"金","辛":"金","壬":"水","癸":"水"};
+var ZHI_ELEM_R31={"子":"水","丑":"土","寅":"木","卯":"木","辰":"土","巳":"火","午":"火","未":"土","申":"金","酉":"金","戌":"土","亥":"水"};
+var WX_LIST_R31=["金","水","木","火","土"];
+function shengR31(a,b){return (a==="金"&&b==="水")||(a==="水"&&b==="木")||(a==="木"&&b==="火")||(a==="火"&&b==="土")||(a==="土"&&b==="金");}
+function keR31(a,b){return (a==="金"&&b==="木")||(a==="木"&&b==="土")||(a==="土"&&b==="水")||(a==="水"&&b==="火")||(a==="火"&&b==="金");}
+function generateDoublePan(){
+  var zhi=document.getElementById("dpZhi").value;
+  var dayStem=document.getElementById("dpDayStem").value;
+  var mingGong=document.getElementById("dpMingGong").value;
+  var yongShen=document.getElementById("dpYongShen").value;
+  if(!zhi||!dayStem){alert("请选择命主年支与日主天干");return;}
+  var zw=ZW_STARS_R31[mingGong];
+  var ZW_GONGS=["命宫","兄弟","夫妻","子女","财帛","疾厄","迁移","交友","官禄","田宅","福德","父母"];
+  var zwScores={};
+  ZW_GONGS.forEach(function(g,i){var b=zw.ls*5;if(g==="命宫")b=zw.ls*10;else if(g==="财帛宫"||g==="官禄宫")b=zw.cs*8;else if(g==="疾厄宫")b=zw.hs*8;else if(g==="夫妻宫")b=zw.vs*8;else b=zw.ls*5+i;zwScores[g]=Math.min(95,Math.max(35,b));});
+  var dayElem=STEM_ELEM_R31[dayStem];
+  var zhiElem=ZHI_ELEM_R31[zhi];
+  var bzScores={};
+  DP_AREAS_R31.forEach(function(a){var b=70;if(dayElem===yongShen)b+=15;else if(shengR31(yongShen,dayElem))b+=10;else if(keR31(dayElem,yongShen))b-=10;if(zhiElem===yongShen)b+=5;bzScores[a.key]=Math.min(95,Math.max(35,b));});
+  var cross={};
+  var zwGongMap={career:"官禄宫",wealth:"财帛宫",love:"夫妻宫",health:"疾厄宫",family:"父母宫",children:"子女宫",friend:"交友宫",migrate:"迁移宫"};
+  DP_AREAS_R31.forEach(function(a){var zws=zwScores[zwGongMap[a.key]]||60;var bzs=bzScores[a.key];var f=Math.round(zws*0.6+bzs*0.4);cross[a.key]={zwScore:zws,bzScore:bzs,final:f,name:a.name};});
+  var total=Math.round(Object.values(cross).reduce(function(s,c){return s+c.final;},0)/DP_AREAS_R31.length);
+  var verdictClass=total>=75?"good":(total<=55?"warn":"");
+  var verdictText=total>=85?"🟢 双盘合一·大吉":(total>=75?"🟡 双盘调和·小吉":(total>=65?"🟠 双盘波动·中性":(total>=55?"🔴 双盘欠合·需化解":"⛔ 双盘相冲·大凶")));
+  var ZW_REL={"金":["金","水","木","火","土"],"水":["水","木","火","土","金"],"木":["木","火","土","金","水"],"火":["火","土","金","水","木"],"土":["土","金","水","木","火"]};
+  var dayIdx=WX_LIST_R31.indexOf(dayElem);
+  var yShengIdx=ZW_REL[yongShen].indexOf(yongShen);
+  var ysR=yongShen===dayElem?"扶助":(shengR31(yongShen,dayElem)?"相生":(keR31(dayElem,yongShen)?"日主克用神":(shengR31(dayElem,yongShen)?"日主生用神":"用神克日主")));
+  var h="<div class=\"dp-result\">";
+  h+="<div class=\"dp-summary\">";
+  h+="<div class=\"ms-title\">🌌 紫微+八字双盘叠加·"+mingGong+"命宫 + "+dayStem+"日主</div>";
+  h+="<div class=\"ms-quote\">\"紫微观宫·八字论柱·双盘合一·其命可知。\"——《紫微斗数全集·序》</div>";
+  h+="<div style=\"font-size:11px;margin-top:10px;line-height:1.8\">";
+  h+="· 命主："+zhi+"年生·日主<b style=\"color:#e8a04a\">"+dayStem+"</b>（五行属<b style=\"color:var(--gold)\">"+dayElem+"</b>）<br>";
+  h+="· 紫微命宫：<b style=\"color:#9b59b6\">"+mingGong+"</b>（"+zw.nature+"性·"+zw.kw+"）<br>";
+  h+="· 八字用神：<b style=\"color:#e8a04a\">"+yongShen+"</b>（与日主关系：<b>"+ysR+"</b>）<br>";
+  h+="· 综合判定：<b style=\"color:"+(verdictClass==="good"?"#27ae60":(verdictClass==="warn"?"#e74c3c":"var(--gold)"))+"\">"+verdictText+"</b>";
+  h+="</div></div>";
+  h+="<div class=\"dp-dual\">";
+  h+="<div class=\"dp-pan-card ziwei\">";
+  h+="<div class=\"dp-head\"><div class=\"dp-title\">🌌 紫微盘·"+mingGong+"命宫</div><div style=\"font-size:10px;opacity:.6\">《紫微斗数全集》</div></div>";
+  h+="<div style=\"font-size:11px;line-height:1.7;margin-bottom:8px\">十二宫位气数·显示人际缘分</div>";
+  h+="<div class=\"dp-palace\">";
+  ZW_GONGS.forEach(function(g){var s=zwScores[g];var cls=s>=75?"hl":(s<=55?"warn":"");h+="<div class=\"dp-cell "+cls+"\">"+g+"<b>"+s+"分</b></div>";});
+  h+="</div>";
+  h+="<div style=\"font-size:10px;line-height:1.7;margin-top:10px;opacity:.8\">";
+  h+="· 命宫气质："+zw.kw+"<br>";
+  h+="· 五行属性："+zw.nature+"<br>";
+  h+="· 主星特质：化禄/化权/化科/化忌四化推演</div>";
+  h+="</div>";
+  h+="<div class=\"dp-pan-card bazi\">";
+  h+="<div class=\"dp-head\"><div class=\"dp-title\">📜 八字盘·"+dayStem+"日主</div><div style=\"font-size:10px;opacity:.6\">《滴天髓》《穷通宝鉴》</div></div>";
+  h+="<div style=\"font-size:11px;line-height:1.7;margin-bottom:8px\">四柱气运·显示吉凶起伏</div>";
+  h+="<div style=\"display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px\">";
+  h+="<div class=\"dp-cell\">年柱<b>"+zhi+"支</b></div>";
+  h+="<div class=\"dp-cell\">日主<b>"+dayStem+"干</b></div>";
+  h+="<div class=\"dp-cell\">五行<b>"+dayElem+"</b></div>";
+  h+="<div class=\"dp-cell\">用神<b>"+yongShen+"</b></div>";
+  h+="</div>";
+  h+="<div style=\"font-size:10px;line-height:1.7;margin-top:10px;opacity:.8\">";
+  h+="· 比劫："+BAZI_SHISHEN_R31.same+"<br>";
+  h+="· 印星："+BAZI_SHISHEN_R31.restrainMe+"<br>";
+  h+="· 官杀："+BAZI_SHISHEN_R31.restrain+"<br>";
+  h+="· 财星："+BAZI_SHISHEN_R31.control+"<br>";
+  h+="· 食伤："+BAZI_SHISHEN_R31.produce+"</div>";
+  h+="</div></div>";
+  h+="<div class=\"dp-cross\">";
+  h+="<div class=\"dx-title\">🔀 8 大领域双盘交叉验证</div>";
+  DP_AREAS_R31.forEach(function(a){var c=cross[a.key];var status=c.final>=75?"best":"";h+="<div class=\"dx-item "+status+"\"><div class=\"dx-area\">"+a.name+"</div><div class=\"dx-zw\">紫微 "+a.zwA+"<b style=\"color:#9b59b6\">"+c.zwScore+"分</b></div><div class=\"dx-bz\">八字 "+a.bzA+"<b style=\"color:#e8a04a\">"+c.bzScore+"分</b></div><div class=\"dx-result\">"+c.final+"分"+(c.final>=75?" ✅ 两盘相合":(c.final>=60?" ⚠ 小有波折":" ❌ 两盘相背"))+"</div></div>";});
+  h+="</div>";
+  h+="<div class=\"dp-verdict "+verdictClass+"\">";
+  h+="<div class=\"dv-title\">📊 综合判定·"+verdictText+"</div>";
+  h+="<div class=\"dv-score\">"+total+"分</div>";
+  var bestArea=DP_AREAS_R31.reduce(function(p,c){return cross[c.key].final>cross[p.key].final?c:p;});
+  var worstArea=DP_AREAS_R31.reduce(function(p,c){return cross[c.key].final<cross[p.key].final?c:p;});
+  h+="<div class=\"dv-detail\">";
+  h+="· 双盘综合分："+total+"分<br>";
+  h+="· 最强领域：<b style=\"color:#27ae60\">"+bestArea.name+" "+cross[bestArea.key].final+"分</b><br>";
+  h+="· 最弱领域：<b style=\"color:#e74c3c\">"+worstArea.name+" "+cross[worstArea.key].final+"分</b><br>";
+  h+="· 双盘互参：紫微主·八字主·形气合一</div>";
+  h+="<div class=\"dp-source\">📜 综合《紫微斗数全集》《太乙金华宗旨》《滴天髓》《穷通宝鉴》《子平真诠》《三命通会》共 6 部古籍</div>";
+  h+="</div></div>";
+  document.getElementById("dpResult").innerHTML=h;
+}
+
 </script>
 
 <script src="js/ui-toast.js" defer></script>
@@ -6882,6 +7008,23 @@ function computeXuanKong(){
   </div>
 </div>
 <!-- section-zidise-link END -->
+
+<!-- section-double-pan · 第三十一轮 START -->
+<div class="fs-section" id="section-double-pan">
+  <div class="input-card">
+    <h3>🌌 化解·紫微+八字双盘叠加（双盘合一·交叉验证）</h3>
+    <p style="font-size:12px;opacity:.6;margin:8px 0;line-height:1.7">紫微主<strong>十二宫气数</strong>，八字主<strong>四柱气运</strong>。双盘叠加：交叉验证 8 大领域。依《紫微斗数全集》《滴天髓》《穷通宝鉴》《子平真诠》《三命通会》整理。</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0">
+      <div><label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">命主年支</label><select id="dpZhi" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit"><option value="">请选择</option><option value="子">子（鼠）</option><option value="丑">丑（牛）</option><option value="寅">寅（虎）</option><option value="卯">卯（兔）</option><option value="辰">辰（龙）</option><option value="巳">巳（蛇）</option><option value="午">午（马）</option><option value="未">未（羊）</option><option value="申">申（猴）</option><option value="酉">酉（鸡）</option><option value="戌">戌（狗）</option><option value="亥">亥（猪）</option></select></div>
+      <div><label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">日主天干</label><select id="dpDayStem" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit"><option value="">请选择</option><option value="甲">甲（木）</option><option value="乙">乙（木）</option><option value="丙">丙（火）</option><option value="丁">丁（火）</option><option value="戊">戊（土）</option><option value="己">己（土）</option><option value="庚">庚（金）</option><option value="辛">辛（金）</option><option value="壬">壬（水）</option><option value="癸">癸（水）</option></select></div>
+      <div><label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">紫微命宫主星</label><select id="dpMingGong" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit"><option value="紫微">紫微（帝星）</option><option value="天府">天府（财星）</option><option value="太阳">太阳（父星）</option><option value="太阴">太阴（母星）</option><option value="武曲">武曲（财星）</option><option value="天同">天同（福星）</option><option value="廉贞">廉贞（囚星）</option><option value="天机">天机（智星）</option><option value="贪狼">贪狼（才星）</option><option value="巨门">巨门（暗星）</option><option value="天相">天相（印星）</option><option value="天梁">天梁（荫星）</option><option value="七杀">七杀（将星）</option><option value="破军">破军（耗星）</option></select></div>
+      <div><label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">八字用神</label><select id="dpYongShen" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit"><option value="金">金</option><option value="木">木</option><option value="水">水</option><option value="火">火</option><option value="土">土</option></select></div>
+    </div>
+    <button class="btn" onclick="generateDoublePan()" style="margin-top:14px">🌌 双盘叠加·交叉验证</button>
+    <div id="dpResult"></div>
+  </div>
+</div>
+<!-- section-double-pan END -->
 
 </div>
 </body>
