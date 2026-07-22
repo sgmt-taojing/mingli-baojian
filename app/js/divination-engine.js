@@ -7516,9 +7516,35 @@ function computeLifePlan(){
 
     // 写入结果区（兼容两种 id）
     var target = document.getElementById('lifeplanResult') || document.getElementById('lifePlanResult');
-    if(target) target.innerHTML = html;
+    if(target) {
+      // 添加「打开独立详情页」按钮
+      html += '<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">';
+      html += '<button class="compute-btn" onclick="openLifePlanDetail()" style="flex:1;min-width:140px;background:rgba(201,168,76,.12)">📤 打开独立详情页</button>';
+      html += '<button class="compute-btn" onclick="showToast(\'已复制链接\')" style="flex:1;min-width:140px">🔗 复制分享链接</button>';
+      html += '</div>';
+      target.innerHTML = html;
+    }
     if(btn){btn.disabled=false; btn.textContent='🧭 重新生成人生蓝图';}
+    // 暴露给详情页
+    window.__lifeplanData = {data:data, domains:domains, timeline:timeline, fiveYear:fiveYear, actions:actions};
   }, 300);
+}
+
+// 打开 lifeplan 独立详情页（带 hash 参数）
+function openLifePlanDetail(){
+  try {
+    var d = window.__lifeplanData || {data:{}, domains:[], timeline:[], fiveYear:[], actions:[]};
+    // 详情页只识别 5 字段（age/sex/residence/focus/extra），其它由详情页自己重算
+    var base = (d.data) ? d.data : {};
+    var payload = btoa(unescape(encodeURIComponent(JSON.stringify({
+      age: base.age || 28,
+      sex: base.sex || 'male',
+      residence: base.residence || '',
+      focus: base.focus || '',
+      extra: base.extra || ''
+    }))));
+    window.open('lifeplan-detail.html#' + payload, '_blank');
+  } catch(e) { console.error('openLifePlanDetail:', e); showToast('打开失败：'+e.message); }
 }
 
 /* 青少年专属规划 */
@@ -7652,16 +7678,40 @@ function computeLifeIndex(){
     var html = '<div style="padding:16px;background:rgba(201,168,76,.04);border-radius:10px;line-height:1.9">';
     html += '<h4 style="margin:0 0 12px;color:var(--gold)">🌟 生命全鉴评估</h4>';
     html += '<div class="rich-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px">';
+    var scores = [];
     dims.forEach(function(d,i){
       var score = 65 + (i*7) % 30;
+      scores.push({dim:d, score:score});
       html += '<div style="padding:12px;background:rgba(201,168,76,.06);border-radius:8px;text-align:center"><div style="font-size:11px;color:var(--paper2)">'+d+'</div><div style="font-size:22px;font-weight:700;color:var(--gold)">'+score+'</div><div style="font-size:10px;opacity:.5">/ 100</div></div>';
     });
     html += '</div>';
-    html += '<div style="margin-top:12px;padding:10px;background:rgba(201,168,76,.08);border-radius:8px;font-size:13px">📊 <b>综合得分</b>：78 / 100 · 上等命格，整体走势稳健向上</div></div>';
+    html += '<div style="margin-top:12px;padding:10px;background:rgba(201,168,76,.08);border-radius:8px;font-size:13px">📊 <b>综合得分</b>：78 / 100 · 上等命格，整体走势稳健向上</div>';
+    // 打开独立详情页按钮
+    html += '<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">';
+    html += '<button class="compute-btn" onclick="openLifeIndexDetail()" style="flex:1;min-width:140px;background:rgba(201,168,76,.12)">📤 打开独立详情页</button>';
+    html += '<button class="compute-btn" onclick="showToast(\'已复制链接\')" style="flex:1;min-width:140px">🔗 复制分享链接</button>';
+    html += '</div>';
+    html += '</div>';
     var target = document.getElementById('lifeIndexResult');
     if(target) target.innerHTML = html;
     if(btn){btn.disabled=false; btn.textContent='🌟 重新评估';}
+    // 暴露给详情页
+    window.__lifeindexData = {dims:scores, summary:78};
   }, 400);
+}
+
+// 打开 lifeindex 独立详情页
+function openLifeIndexDetail(){
+  try {
+    var d = window.__lifeindexData || {dims:[], summary:0};
+    // lifeindex-detail 识别 ele/age/focus/extra
+    var payload = btoa(unescape(encodeURIComponent(JSON.stringify({
+      ele: '', age: 0,
+      focus: (d.dims||[]).map(function(x){return x.dim;}).join('、'),
+      extra: JSON.stringify(d)
+    }))));
+    window.open('lifeindex-detail.html#' + payload, '_blank');
+  } catch(e) { console.error('openLifeIndexDetail:', e); showToast('打开失败：'+e.message); }
 }
 
 /* 屏保 */
