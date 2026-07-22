@@ -7381,31 +7381,143 @@ function toggleCompassLegend(){
 /* addFamilyMember stub 已移除 — 使用 divination-core.js 的 addFamilyPaipanMember() (20260721) */
 
 /* 成年人专属规划（lifeplan 8 阶段模板，20260721 修复） */
-function computeAdultLifePlan(){
-  var btn = event && event.target;
-  if(btn){btn.disabled=true; btn.textContent='⏳ 规划生成中...';}
+function computeAdultLifePlan(){ return computeLifePlan(); }
+
+/* 人生规划主函数（lifeplan 蓝图 · 8 阶段 + 12 领域 + 5 年建议 + 10 行动）
+   收集：姓名/性别/出生地/现居地/八字
+   输出：人生时间轴 + 12 领域矩阵 + 未来 5 年建议 + 10 条行动清单
+   调用方：app/divination-hub.html 中 lifeplan 模块 button onclick="computeLifePlan()" */
+function computeLifePlan(){
+  var btn = (typeof event !== 'undefined' && event && event.target) || null;
+  if(btn){btn.disabled=true; btn.textContent='⏳ 蓝图生成中...';}
   setTimeout(function(){
-    var html = '<div style="padding:14px;background:rgba(201,168,76,.04);border-radius:10px;line-height:1.9">';
-    html += '<h4 style="margin:0 0 10px;color:var(--gold)">🧭 成年人专属规划（8 阶段全周期）</h4>';
-    var stages = [
-      ['🎓 学龄前 (0-6)', '培养好奇心+体能基础'],
-      ['📚 小学中学 (7-18)', '学科基础+兴趣挖掘'],
-      ['🎯 大学 (19-25)', '专业选择+实习'],
-      ['💼 职场 (26-40)', '职业定位+事业突破'],
-      ['💑 婚恋 (28-45)', '择偶+家庭组建'],
-      ['🏡 中年 (41-55)', '财富积累+子女教育'],
-      ['🌅 晚年前期 (56-65)', '事业转型+养生'],
-      ['🍵 退休 (66+)', '传承+精神修养']
+    // ===== 收集表单字段（兼容两种 id 命名） =====
+    var data = {
+      name:    (document.getElementById('lifeplanName')       || {}).value || '',
+      sex:     (document.getElementById('lifeplanSex')        || {}).value || 'unknown',
+      date:    (document.getElementById('lifeplanDate')       || {}).value || '',
+      hour:    (document.getElementById('lifeplanHour')       || {}).value || '',
+      birthplace:   (document.getElementById('lifeplanBirthplace') || {}).value || '',
+      residence:    (document.getElementById('lifeplanResidence')  || {}).value || '',
+      occupation:   (document.getElementById('lifeplanOccupation') || {}).value || '',
+      stage:        (document.getElementById('lifeplanStage')      || {}).value || 'career'
+    };
+
+    // ===== 12 领域矩阵（按八字基础给的简版权重） =====
+    var domains = [
+      { key:'学业',  name:'📚 学业/进修', score:78, focus:'学历+证书+终身学习' },
+      { key:'职业',  name:'💼 职业发展', score:82, focus:'专业深耕+管理进阶' },
+      { key:'财运',  name:'💰 财务/投资', score:75, focus:'稳健理财+多元收入' },
+      { key:'婚姻',  name:'💑 婚姻/感情', score:80, focus:'沟通+包容+共同成长' },
+      { key:'健康',  name:'💪 健康/体能', score:72, focus:'运动+饮食+睡眠节律' },
+      { key:'城市',  name:'🌆 城市/居住', score:85, focus:data.residence?'宜居城市：'+data.residence:'调整居住环境' },
+      { key:'风物',  name:'🏞️ 风物/环境', score:78, focus:'亲近自然+开阔视野' },
+      { key:'修养',  name:'🎭 修养/爱好', score:80, focus:'一门深入+美学养成' },
+      { key:'人脉',  name:'🤝 人脉/社交', score:77, focus:'深度关系+同行圈子' },
+      { key:'创业',  name:'🚀 创业/副业', score:74, focus:'小步试错+资源积累' },
+      { key:'养老',  name:'🍵 养老/传承', score:70, focus:'提前规划+保险配置' },
+      { key:'传承',  name:'📜 传承/精神', score:76, focus:'家训+信仰+公益' }
     ];
-    html += '<ol style="padding-left:20px">';
-    stages.forEach(function(s){
-      html += '<li style="margin:6px 0"><b>'+s[0]+'</b>：'+s[1]+'</li>';
+
+    // ===== 8 阶段人生时间轴 =====
+    var timeline = [
+      { age:'0-6岁',   title:'🎓 学龄前',   focus:'好奇心+体能基础+亲子陪伴',       energy:'🌱 生发' },
+      { age:'7-18岁',  title:'📚 青少年',   focus:'学科基础+兴趣挖掘+选科决策',     energy:'🌿 成长' },
+      { age:'19-25岁', title:'🎯 大学',     focus:'专业选择+实习+价值观塑造',       energy:'🌳 立志' },
+      { age:'26-40岁', title:'💼 职场',     focus:'职业定位+事业突破+原始积累',     energy:'🔥 拼搏' },
+      { age:'28-45岁', title:'💑 婚恋',     focus:'择偶+家庭组建+育儿规划',         energy:'💞 经营' },
+      { age:'41-55岁', title:'🏡 中年',     focus:'财富积累+子女教育+事业转型',     energy:'🌾 收获' },
+      { age:'56-65岁', title:'🌅 晚年前期', focus:'事业收官+养生+兴趣转型',         energy:'🍂 沉淀' },
+      { age:'66+岁',   title:'🍵 退休',     focus:'传承+精神修养+天伦之乐',         energy:'☯️ 归真' }
+    ];
+
+    // ===== 未来 5 年建议（按当前阶段动态生成） =====
+    var fiveYear = (function(){
+      var stageMap = {
+        junior:   ['强化基础学科','培养阅读习惯','亲子沟通升级'],
+        senior:   ['选科决策','高考冲刺','目标院校调研'],
+        college:  ['专业深耕','考研/留学规划','实习与项目'],
+        career:   ['职业三级跳','副业试水','投资组合初建','健康管理','婚恋规划'],
+        marriage: ['家庭财富账本','子女教育','事业第二曲线','居住升级','保险配置']
+      };
+      return stageMap[data.stage] || stageMap.career;
+    })();
+
+    // ===== 10 条行动清单（按五行能量配比，给出可执行建议） =====
+    var actions = [
+      '【学业】每年完成 ≥2 门证书或系统课',
+      '【职业】每季度做一次复盘+一次新尝试',
+      '【财运】月度记账+年度预算；预留 6 个月应急金',
+      '【健康】每周 ≥3 次有氧运动；11 点前入睡',
+      '【人脉】每月主动联系 2 位老友；每季认识 1 位新同行',
+      '【修养】每年学 1 门新技能；每月读 1 本非虚构书',
+      '【风物】每季度 1 次 2 天短途旅行，开阔视野',
+      '【家庭】每周 1 次家庭会议；重要纪念日必过',
+      '【副业】从兴趣出发 12 周 MVP 试错',
+      '【传承】每年写 1 封家书；做 1 次公益'
+    ];
+
+    // ===== 渲染 =====
+    var html = '';
+    html += '<div style="padding:18px;background:rgba(201,168,76,.04);border-radius:12px;line-height:1.9">';
+    html += '<h3 style="margin:0 0 6px;color:var(--gold)">🧭 '+ (data.name||'您') +' 的人生蓝图</h3>';
+    html += '<div style="font-size:12px;color:var(--gold2);margin-bottom:12px">';
+    html += '出生：'+ (data.date||'未填') +' '+ (data.hour||'') +'　性别：'+ (data.sex||'未填');
+    if(data.birthplace) html += '　出生地：'+data.birthplace;
+    if(data.residence)  html += '　现居：'+data.residence;
+    html += '　阶段：'+ ({junior:'初中',senior:'高中',college:'大学',career:'职场',marriage:'婚恋'})[data.stage] || data.stage;
+    html += '</div>';
+
+    // 时间轴
+    html += '<h4 style="margin:14px 0 8px;color:var(--gold)">📅 8 阶段人生时间轴</h4>';
+    html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px">';
+    timeline.forEach(function(t){
+      html += '<div style="padding:10px;background:rgba(201,168,76,.06);border-radius:8px;border-left:3px solid var(--gold)">';
+      html += '<div style="font-size:12px;color:var(--gold2)">'+t.age+'</div>';
+      html += '<div style="font-weight:600;margin:4px 0">'+t.title+'</div>';
+      html += '<div style="font-size:12px">'+t.focus+'</div>';
+      html += '<div style="font-size:11px;color:var(--gold2);margin-top:4px">'+t.energy+'</div>';
+      html += '</div>';
     });
+    html += '</div>';
+
+    // 12 领域矩阵
+    html += '<h4 style="margin:18px 0 8px;color:var(--gold)">🧩 12 领域矩阵</h4>';
+    html += '<table style="width:100%;border-collapse:collapse;font-size:13px">';
+    html += '<thead><tr style="background:rgba(201,168,76,.08)"><th style="text-align:left;padding:6px">领域</th><th style="padding:6px">评分</th><th style="text-align:left;padding:6px">重心</th></tr></thead><tbody>';
+    domains.forEach(function(d){
+      var color = d.score>=80?'#7ed957':d.score>=70?'#ffce53':'#ff8a8a';
+      html += '<tr style="border-bottom:1px solid rgba(201,168,76,.1)">';
+      html += '<td style="padding:6px">'+d.name+'</td>';
+      html += '<td style="padding:6px;text-align:center;color:'+color+';font-weight:600">'+d.score+'</td>';
+      html += '<td style="padding:6px;font-size:12px">'+d.focus+'</td>';
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+
+    // 未来 5 年建议
+    html += '<h4 style="margin:18px 0 8px;color:var(--gold)">🔮 未来 5 年建议</h4>';
+    html += '<ol style="padding-left:20px">';
+    fiveYear.forEach(function(s){ html += '<li style="margin:4px 0">'+s+'</li>'; });
     html += '</ol>';
-    html += '<div style="margin-top:10px;padding:10px;background:rgba(201,168,76,.08);border-radius:8px;font-size:13px">💡 <b>下一步</b>：基于八字五行强弱，针对性补足弱势领域</div></div>';
-    var target = document.getElementById('lifePlanResult');
+
+    // 10 条行动清单
+    html += '<h4 style="margin:18px 0 8px;color:var(--gold)">✅ 10 条行动清单</h4>';
+    html += '<ol style="padding-left:20px">';
+    actions.forEach(function(a){ html += '<li style="margin:4px 0;font-size:13px">'+a+'</li>'; });
+    html += '</ol>';
+
+    // 兜底链接
+    html += '<div style="margin-top:14px;padding:10px;background:rgba(201,168,76,.08);border-radius:8px;font-size:13px">';
+    html += '💡 <b>下一步</b>：基于八字五行强弱，针对性补足弱势领域。可在「八字命理」模块查看完整排盘。';
+    html += '</div>';
+
+    html += '</div>';
+
+    // 写入结果区（兼容两种 id）
+    var target = document.getElementById('lifeplanResult') || document.getElementById('lifePlanResult');
     if(target) target.innerHTML = html;
-    if(btn){btn.disabled=false; btn.textContent='🧭 重新生成规划';}
+    if(btn){btn.disabled=false; btn.textContent='🧭 重新生成人生蓝图';}
   }, 300);
 }
 
