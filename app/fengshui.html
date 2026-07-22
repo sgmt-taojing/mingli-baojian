@@ -2793,6 +2793,52 @@ input, textarea, select {
 .zl-day .zl-info small{font-size:11px;opacity:.65}
 .zl-day .zl-score{font-size:18px;color:var(--gold);font-weight:600;min-width:60px;text-align:right}
 .zl-source{font-size:10px;opacity:.4;margin-top:8px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+/* ===== R32 档案详情页 ===== */
+.arc-result{margin-top:18px}
+.arc-header{background:linear-gradient(135deg,rgba(232,160,74,.15),rgba(155,89,182,.08));padding:18px;border-radius:10px;border:2px solid var(--gold);margin-bottom:14px;text-align:center}
+.arc-no{font-size:11px;color:var(--gold);letter-spacing:2px;opacity:.7}
+.arc-no-val{font-size:18px;font-weight:600;color:var(--paper);margin:4px 0;letter-spacing:1px}
+.arc-name{font-size:12px;opacity:.8;margin-top:6px}
+.arc-states{background:rgba(255,255,255,.03);padding:16px;border-radius:10px;border:1px solid var(--line);margin-bottom:14px}
+.arc-states-title{font-size:14px;color:var(--gold);letter-spacing:1.5px;margin-bottom:14px;font-weight:600}
+.arc-states-flow{display:flex;flex-wrap:wrap;gap:4px;align-items:center;justify-content:center}
+.arc-state-cell{background:rgba(255,255,255,.04);padding:10px 12px;border-radius:8px;border:1px solid var(--line);min-width:60px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.arc-state-cell:hover{background:rgba(232,160,74,.1)}
+.arc-state-cell.active{background:linear-gradient(135deg,rgba(232,160,74,.2),rgba(155,89,182,.1));border-color:var(--gold);box-shadow:0 0 12px rgba(232,160,74,.3)}
+.arc-state-cell.passed{opacity:.5}
+.asc-num{font-size:10px;opacity:.6}
+.asc-name{font-size:14px;font-weight:600;color:var(--gold);margin:2px 0}
+.asc-score{font-size:11px;opacity:.7}
+.asc-marker{position:absolute;top:-8px;right:-8px;background:var(--gold);color:var(--paper);padding:1px 6px;border-radius:6px;font-size:10px;font-weight:600}
+.asc-arrow{opacity:.4;font-size:14px}
+.arc-current{margin-top:14px;padding:12px;background:rgba(0,0,0,.15);border-radius:8px;border-left:3px solid var(--gold)}
+.ac-label{font-size:10px;color:var(--gold);letter-spacing:1.5px;margin-bottom:4px}
+.ac-state{font-size:18px;font-weight:600;margin:4px 0}
+.ac-state.good{color:#27ae60}
+.ac-state.warn{color:#e74c3c}
+.ac-tip{font-size:11px;line-height:1.7;opacity:.75;margin:4px 0}
+.ac-trend{font-size:11px;margin-top:4px}
+.arc-three-lives{background:rgba(155,89,182,.05);padding:16px;border-radius:10px;border:1px solid rgba(155,89,182,.3);margin-bottom:14px}
+.atl-title{font-size:14px;color:#9b59b6;letter-spacing:1.5px;margin-bottom:12px;font-weight:600}
+.atl-grid{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:768px){.atl-grid{grid-template-columns:repeat(3,1fr)}}
+.atl-cell{background:rgba(0,0,0,.2);padding:12px;border-radius:8px;border-left:3px solid #9b59b6}
+.atl-life{font-size:13px;font-weight:600;color:#9b59b6;margin-bottom:4px}
+.atl-time{font-size:10px;opacity:.5;margin-bottom:6px}
+.atl-text{font-size:11px;line-height:1.7;opacity:.85;margin-bottom:8px}
+.atl-book{font-size:10px;color:var(--gold);opacity:.7}
+.arc-books{background:rgba(232,160,74,.05);padding:16px;border-radius:10px;border:1px solid rgba(232,160,74,.3);margin-bottom:14px}
+.ab-title{font-size:14px;color:var(--gold);letter-spacing:1.5px;margin-bottom:12px;font-weight:600}
+.ab-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media(min-width:768px){.ab-grid{grid-template-columns:repeat(4,1fr)}}
+.ab-cell{background:rgba(0,0,0,.15);padding:10px;border-radius:8px;text-decoration:none;color:var(--paper);display:flex;align-items:center;gap:10px;transition:all .2s;border:1px solid transparent}
+.ab-cell:hover{background:rgba(232,160,74,.15);border-color:var(--gold);transform:translateY(-2px)}
+.ab-abbr{background:var(--gold);color:#000;padding:4px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:1px;min-width:36px;text-align:center}
+.ab-name{font-size:11px;line-height:1.4;opacity:.85}
+.arc-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;justify-content:center}
+.btn-share,.btn-print{flex:1;min-width:140px}
+.arc-source{font-size:10px;text-align:center;opacity:.5;margin-top:14px;font-style:italic}
+
 </style>
 
 </head>
@@ -6777,6 +6823,102 @@ function generateDoublePan(){
   document.getElementById("dpResult").innerHTML=h;
 }
 
+/* ===== 第三十二轮·档案详情页 R32 ===== */
+var ARC_STATES_R32 = [
+  {state:"困",score:0,tip:"低谷期，宜静守",crossRef:"#section-taisui"},
+  {state:"阻",score:25,tip:"阻碍期，化解宜早",crossRef:"#section-fuzhou"},
+  {state:"平",score:50,tip:"平稳期，可图进取",crossRef:"#section-office"},
+  {state:"升",score:75,tip:"上升期，宜借势进击",crossRef:"#section-fuzhou"},
+  {state:"极",score:95,tip:"巅峰期，宜谦守防亢",crossRef:"#section-zidise-link"}
+];
+var THREE_LIVES_R32 = [
+  {life:"前世因",time:"宿世",text:"宿世造作，定今生格局；行善积德植来世之根。",book:"《三世因果经》"},
+  {life:"今世缘",time:"当前",text:"今世所遇，皆前世所招；顺逆皆缘，皆可转。",book:"《了凡四训》"},
+  {life:"后世果",time:"未来",text:"后世之果，看今世之行；种善因得善果。",book:"《因果录》"}
+];
+var ARC_BOOKS_R32 = [
+  {name:"《三世因果经》",url:"#section-fuzhou",abbr:"三世"},
+  {name:"《了凡四训》",url:"#section-zidise-link",abbr:"了凡"},
+  {name:"《因果录》",url:"#section-fuzhou",abbr:"因果"},
+  {name:"《福报经》",url:"#section-fuzhou",abbr:"福报"},
+  {name:"《阴骡文》",url:"#section-kids",abbr:"阴骡"},
+  {name:"《玉历宝钞》",url:"#section-taisui",abbr:"玉历"},
+  {name:"《冥报记》",url:"#section-move",abbr:"冥报"}
+];
+function generateArchiveDetail(){
+  var name = document.getElementById("arcName") ? document.getElementById("arcName").value : "命主";
+  var shengxiao = document.getElementById("arcSx") ? document.getElementById("arcSx").value : "子";
+  var bazi = document.getElementById("arcBazi") ? document.getElementById("arcBazi").value : "甲子 丙寅 戊午 壬戌";
+  var hash = (name + "_" + shengxiao + "_" + bazi + "_" + Date.now()).split("").reduce(function(a,c){return ((a<<5)-a) + c.charCodeAt(0);}, 0).toString(36).substring(0,8);
+  var stateIdx = (Math.abs(hash.charCodeAt(0)) % ARC_STATES_R32.length);
+  var cur = ARC_STATES_R32[stateIdx];
+  var next = ARC_STATES_R32[(stateIdx+1) % ARC_STATES_R32.length];
+  var prev = ARC_STATES_R32[(stateIdx-1+ARC_STATES_R32.length) % ARC_STATES_R32.length];
+  var stateScore = cur.score;
+  var stateClass = stateScore >= 75 ? "good" : (stateScore <= 35 ? "warn" : "");
+  var trend = stateIdx === ARC_STATES_R32.length-1 ? "stable" : (stateIdx < 2 ? "rising" : (stateIdx < 4 ? "stable" : "falling"));
+  var trendArrow = trend === "rising" ? "↗ 趋吉" : (trend === "falling" ? "↘ 趋避" : "→ 平稳");
+  var trendColor = trend === "rising" ? "#27ae60" : (trend === "falling" ? "#e74c3c" : "var(--gold)");
+  var arcNo = "ARC-" + new Date().getFullYear() + "-" + hash.toUpperCase();
+  var shareUrl = window.location.origin + window.location.pathname + "#section-archive-detail?arc=" + arcNo;
+  var h = "<div class=\"arc-result\">";
+  h += "<div class=\"arc-header\">";
+  h += "<div class=\"arc-no\">📜 档案编号</div>";
+  h += "<div class=\"arc-no-val\">" + arcNo + "</div>";
+  h += "<div class=\"arc-name\">" + name + " · 生肖 " + shengxiao + " · " + bazi + "</div>";
+  h += "</div>";
+  h += "<div class=\"arc-states\">";
+  h += "<div class=\"arc-states-title\">🔄 状态机·趋吉避凶</div>";
+  h += "<div class=\"arc-states-flow\">";
+  ARC_STATES_R32.forEach(function(s, i){
+    var activeCls = i === stateIdx ? "active" : "";
+    var passedCls = i < stateIdx ? "passed" : "";
+    h += "<div class=\"arc-state-cell " + activeCls + " " + passedCls + "\" onclick=\"window.location.hash='" + s.crossRef + "'\">";
+    h += "<div class=\"asc-num\">" + (i+1) + "</div>";
+    h += "<div class=\"asc-name\">" + s.state + "</div>";
+    h += "<div class=\"asc-score\">" + s.score + "</div>";
+    if(i === stateIdx) h += "<div class=\"asc-marker\">◀ 当前</div>";
+    h += "</div>";
+    if(i < ARC_STATES_R32.length - 1) h += "<div class=\"asc-arrow\">→</div>";
+  });
+  h += "</div>";
+  h += "<div class=\"arc-current\">";
+  h += "<div class=\"ac-label\">当前状态</div>";
+  h += "<div class=\"ac-state " + stateClass + "\">" + cur.state + " · " + stateScore + "分</div>";
+  h += "<div class=\"ac-tip\">" + cur.tip + "</div>";
+  h += "<div class=\"ac-trend\">趋势：<b style=\"color:" + trendColor + "\">" + trendArrow + "</b></div>";
+  h += "</div></div>";
+  h += "<div class=\"arc-three-lives\">";
+  h += "<div class=\"atl-title\">⏳ 三世因果（前世因·今世缘·后世果）</div>";
+  h += "<div class=\"atl-grid\">";
+  THREE_LIVES_R32.forEach(function(l){
+    h += "<div class=\"atl-cell\">";
+    h += "<div class=\"atl-life\">" + l.life + "</div>";
+    h += "<div class=\"atl-time\">" + l.time + "</div>";
+    h += "<div class=\"atl-text\">" + l.text + "</div>";
+    h += "<div class=\"atl-book\">— " + l.book + "</div>";
+    h += "</div>";
+  });
+  h += "</div></div>";
+  h += "<div class=\"arc-books\">";
+  h += "<div class=\"ab-title\">📚 引用古籍（点击跳转）</div>";
+  h += "<div class=\"ab-grid\">";
+  ARC_BOOKS_R32.forEach(function(b){
+    h += "<a class=\"ab-cell\" href=\"" + b.url + "\">";
+    h += "<div class=\"ab-abbr\">" + b.abbr + "</div>";
+    h += "<div class=\"ab-name\">" + b.name + "</div>";
+    h += "</a>";
+  });
+  h += "</div></div>";
+  h += "<div class=\"arc-actions\">";
+  h += "<button class=\"btn btn-share\" onclick=\"navigator.clipboard.writeText('" + shareUrl + "');alert('分享链接已复制：\\\\n" + shareUrl + "')\">📤 复制分享链接</button>";
+  h += "<button class=\"btn btn-print\" onclick=\"window.print()\">🖨 打印档案</button>";
+  h += "</div>";
+  h += "<div class=\"arc-source\">📜 综合《三世因果经》《了凡四训》《因果录》《福报经》《阴骡文》《玉历宝钞》《冥报记》共 7 部古籍</div>";
+  h += "</div>";
+  document.getElementById("archiveDetailResult").innerHTML = h;
+}
+
 </script>
 
 <script src="js/ui-toast.js" defer></script>
@@ -7025,6 +7167,22 @@ function computeXuanKong(){
   </div>
 </div>
 <!-- section-double-pan END -->
+
+<!-- section-archive-detail · 第三十二轮 START -->
+<div class="fs-section" id="section-archive-detail">
+  <div class="input-card">
+    <h3>📜 化解·档案详情（三世因果·古籍索引·可分享）</h3>
+    <p style="font-size:12px;opacity:.6;margin:8px 0;line-height:1.7">一张独立档案详情：链接状态机（趋→避→化解）、三世因果（前世因/今世缘/后世果）、引用古籍（自动跳转 crossref）、可分享 hash。依《三世因果经》《了凡四训》《因果录》《福报经》《阴骡文》《玉历宝钞》《冥报记》七部整理。</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:10px 0">
+      <div><label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">命主姓名</label><input id="arcName" placeholder="如：张三" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit"/></div>
+      <div><label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">生肖</label><select id="arcSx" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit"><option value="子">子（鼠）</option><option value="丑">丑（牛）</option><option value="寅">寅（虎）</option><option value="卯">卯（兔）</option><option value="辰">辰（龙）</option><option value="巳">巳（蛇）</option><option value="午">午（马）</option><option value="未">未（羊）</option><option value="申">申（猴）</option><option value="酉">酉（鸡）</option><option value="戌">戌（狗）</option><option value="亥">亥（猪）</option></select></div>
+      <div><label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">八字四柱</label><input id="arcBazi" placeholder="如：甲子 丙寅 戊午 壬戌" value="甲子 丙寅 戊午 壬戌" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit"/></div>
+    </div>
+    <button class="btn" onclick="generateArchiveDetail()" style="margin-top:14px">📜 生成档案详情</button>
+    <div id="archiveDetailResult"></div>
+  </div>
+</div>
+<!-- section-archive-detail END -->
 
 </div>
 </body>
