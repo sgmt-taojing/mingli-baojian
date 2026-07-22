@@ -1666,6 +1666,78 @@ app.get('/api/public/feedback-points', (req, res) => {
   }
 });
 
+// KB topic group 检索（公开 · 免认证）
+// 用于支持 ai-assistant 中 `?[caibo]` `?[chuangye]` 等 topic 触发
+// 实现方式：从 kb_formal 按 tags LIKE 检索，限制 module='ziwei' 与分组
+const KB_TOPIC_GROUPS = {
+  caibo:    { tag: '财帛宫', desc: '财帛宫×星耀含义矩阵', title: '💰 财帛宫·星耀含义', matchField: 'tags', priorityPrefix: 'KB-zixing-caibo' },
+  chuangye: { tag: '创业',   desc: '创业副业专题',           title: '🚀 创业副业专题',     matchField: 'tags', priorityPrefix: 'KB-ziwei-chuangye' },
+  flow:     { tag: '飞星',   desc: '路总飞星 1616 四层结构', title: '🌊 飞星 1616 专题',    matchField: 'content', priorityPrefix: 'KB-ZIWEI-COURSE' },
+  sandaida: { tag: '路总独创', desc: '三代四化方法论',         title: '🌀 三代四化专题',    matchField: 'tags', priorityPrefix: 'KB-ZIWEI-COURSE' },
+};
+
+app.get('/api/public/kb-topic-search', (req, res) => {
+  try {
+    const group = String(req.query.group || '').trim();
+    const query = String(req.query.query || '').trim();
+    const limit = Math.min(parseInt(req.query.limit) || 10, 50);
+    const cfg = KB_TOPIC_GROUPS[group];
+    if (!cfg) return res.json({ error: 'unknown group', available: Object.keys(KB_TOPIC_GROUPS) });
+
+    // 构造检索 SQL：按 tags LIKE 命中或 content LIKE 命中，AND module='ziwei'
+    let sql, params;
+    if (cfg.matchField === 'tags') {
+      // tags 是 JSON 数组字符串，LIKE '%"财帛宫"%' 最稳
+      // 用 CASE 优先排序 priorityPrefix 开头的 entry
+      sql = `SELECT entry_id, title, substr(content, 1, 320) AS snippet, tags, src_id, trust_score, hit_count,
+             (CASE WHEN entry_id LIKE ? THEN 10 ELSE 0 END) AS priority
+             FROM kb_formal
+             WHERE module='ziwei' AND status='formal'
+               AND (tags LIKE ? OR title LIKE ? OR content LIKE ?)
+             ORDER BY priority DESC, trust_score DESC, hit_count DESC
+             LIMIT ?`;
+      const like = '%' + cfg.tag + '%';
+      const pre = (cfg.priorityPrefix || '') + '%';
+      params = [pre, like, like, like, limit];
+    } else {
+      // content
+      sql = `SELECT entry_id, title, substr(content, 1, 320) AS snippet, tags, src_id, trust_score, hit_count,
+             (CASE WHEN entry_id LIKE ? THEN 10 ELSE 0 END) AS priority
+             FROM kb_formal
+             WHERE module='ziwei' AND status='formal'
+               AND content LIKE ?
+             ORDER BY priority DESC, trust_score DESC, hit_count DESC
+             LIMIT ?`;
+      const pre = (cfg.priorityPrefix || '') + '%';
+      params = [pre, '%' + cfg.tag + '%', limit];
+    }
+
+    // 如果带 query 参数，进一步按 query LIKE 精排
+    if (query) {
+      sql = `SELECT entry_id, title, substr(content, 1, 320) AS snippet, tags, src_id, trust_score, hit_count,
+             (CASE WHEN entry_id LIKE ? THEN 10 ELSE 0 END) +
+             (CASE WHEN title LIKE ? THEN 3 WHEN content LIKE ? THEN 2 WHEN tags LIKE ? THEN 1 ELSE 0 END) AS priority
+             FROM kb_formal
+             WHERE module='ziwei' AND status='formal'
+               AND (title LIKE ? OR content LIKE ? OR tags LIKE ?)
+             ORDER BY priority DESC, trust_score DESC, hit_count DESC
+             LIMIT ?`;
+      const ql = '%' + query + '%';
+      const pre = (cfg.priorityPrefix || '') + '%';
+      params = [pre, ql, ql, ql, ql, ql, ql, limit];
+    }
+
+    const rows = db.prepare(sql).all(...params);
+    res.json({
+      group, query, title: cfg.title, desc: cfg.desc,
+      count: rows.length, entries: rows,
+      public: true,
+    });
+  } catch (e) {
+    res.json({ error: e.message, public: false });
+  }
+});
+
 app.post('/api/public/kb-hit', (req, res) => {
   try {
     const { entry_id, app_endpoint, user_query } = req.body || {};
