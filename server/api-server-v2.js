@@ -976,17 +976,134 @@ app.post('/api/glass/yearly-push', async (req, res) => {
   const data = await glassProxy('/yearly-push', { method: 'POST', body: { userId, year, summary } });
   res.json(data);
 });
-// 6. 离线模式（断网 fallback）
+// 6. 设备能力（实时探测设备在线状态）
 app.get('/api/glass/capabilities', async (req, res) => {
+  // 实时探测设备是否在线 (尝试一次 /status)
+  let online = false, deviceInfo = null, lastError = null;
+  try {
+    const r = await fetch(GLASS_BASE_URL + '/status', {
+      method: 'GET',
+      signal: AbortSignal.timeout(2000)
+    });
+    if (r.ok) {
+      online = true;
+      try { deviceInfo = await r.json(); } catch {}
+    } else {
+      lastError = 'HTTP_' + r.status;
+    }
+  } catch (e) {
+    lastError = (e.message || 'timeout').includes('timeout') ? 'TIMEOUT' : 'OFFLINE';
+  }
   res.json({
-    online: false,
+    online,
     baseUrl: GLASS_BASE_URL,
+    device: deviceInfo ? { name: deviceInfo.device, firmware: deviceInfo.firmware, battery: deviceInfo.battery_pct, uptime: deviceInfo.uptime_sec } : null,
     features: ['vitals', 'speak', 'face-scan', 'yearly-push', 'offline-kb'],
-    fallback: 'kb-first 离线模式已就绪',
-    note: '启动眼镜 HTTP bridge 后访问 /status 验证设备在线'
+    fallback: online ? null : 'kb-first 离线模式已就绪（设备不在线，自动落本地 KB 兜底）',
+    lastError,
+    checkedAt: new Date().toISOString()
   });
 });
 console.log('[init] R43-F 智能眼镜 HTTP bridge 已挂载 (base=' + GLASS_BASE_URL + ')');
+
+// ============== R44-C 智能眼镜 Admin 端点 ==============
+// 1. admin 测试玻璃端到端 (在线/离线/真实/兜底)
+app.post('/api/admin/glass/test', adminAuth, async (req, res) => {
+  const { endpoint = '/status', method = 'GET', body = null } = req.body || {};
+  const result = { endpoint, method, online: false, response: null, error: null, latency_ms: 0, ts: new Date().toISOString() };
+  const start = Date.now();
+  try {
+    const r = await fetch(GLASS_BASE_URL + endpoint, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: body ? JSON.stringify(body) : undefined,
+      signal: AbortSignal.timeout(5000)
+    });
+    result.online = r.ok;
+    result.status = r.status;
+    try { result.response = await r.json(); } catch { result.response = null; }
+    if (!r.ok) result.error = 'HTTP_' + r.status;
+  } catch (e) {
+    result.error = 'GLASS_OFFLINE: ' + (e.message || 'timeout');
+  }
+  result.latency_ms = Date.now() - start;
+  res.json(result);
+});
+
+// 2. admin 实时设备健康
+app.get('/api/admin/glass/health', adminAuth, async (req, res) => {
+  const checks = {};
+  const endpoints = ['/status', '/vitals', '/history'];
+  await Promise.all(endpoints.map(async ep => {
+    const start = Date.now();
+    try {
+      const r = await fetch(GLASS_BASE_URL + ep, { signal: AbortSignal.timeout(2000) });
+      checks[ep] = {
+        ok: r.ok,
+        status: r.status,
+        latency_ms: Date.now() - start,
+        body: r.ok ? await r.json().catch(() => null) : null
+      };
+    } catch (e) {
+      checks[ep] = { ok: false, error: 'OFFLINE: ' + (e.message || 'timeout'), latency_ms: Date.now() - start };
+    }
+  }));
+  const online = checks['/status']?.ok || false;
+  res.json({
+    online,
+    baseUrl: GLASS_BASE_URL,
+    checks,
+    summary: online ? '设备在线' : '设备离线·KB 兜底已激活',
+    ts: new Date().toISOString()
+  });
+});
+
+// 3. admin 推送 TTS 到眼镜（支持批量）
+app.post('/api/admin/glass/broadcast', adminAuth, async (req, res) => {
+  const { texts, urgency = 'normal' } = req.body || {};
+  if (!Array.isArray(texts) || texts.length === 0) return res.json({ error: '参数错误' });
+  const results = [];
+  for (const text of texts) {
+    const start = Date.now();
+    try {
+      const r = await fetch(GLASS_BASE_URL + '/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, urgency }),
+        signal: AbortSignal.timeout(3000)
+      });
+      results.push({ text: text.substring(0,30), ok: r.ok, latency_ms: Date.now() - start, response: r.ok ? await r.json().catch(()=>null) : null });
+    } catch (e) {
+      results.push({ text: text.substring(0,30), ok: false, error: e.message, latency_ms: Date.now() - start });
+    }
+  }
+  res.json({ ok: true, total: texts.length, sent: results.filter(r=>r.ok).length, results });
+});
+
+// 4. admin 推送流年到所有画像用户
+app.post('/api/admin/glass/yearly-broadcast', adminAuth, async (req, res) => {
+  const year = parseInt(req.body.year || new Date().getFullYear());
+  const profiles = db.prepare(`SELECT user_id, day_master, focus_areas FROM yuanzhu_profile WHERE push_opt_in=1 AND paipan_count>=1 LIMIT 100`).all();
+  const results = [];
+  for (const p of profiles) {
+    const summary = `${year}年流年已生成 (日主${p.day_master||'?'}·关注${p.focus_areas||'全面'})`;
+    const start = Date.now();
+    try {
+      const r = await fetch(GLASS_BASE_URL + '/yearly-push', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: p.user_id, year, summary }),
+        signal: AbortSignal.timeout(3000)
+      });
+      results.push({ user_id: p.user_id, ok: r.ok, latency_ms: Date.now() - start });
+    } catch (e) {
+      results.push({ user_id: p.user_id, ok: false, error: e.message });
+    }
+  }
+  res.json({ ok: true, year, total: profiles.length, sent: results.filter(r=>r.ok).length, results });
+});
+
+console.log('[init] R44-C 智能眼镜 Admin 端点已挂载 (4 端点)');
 
 // === 缺失端点：推送系统补全（admin 全员/单用户，用户收件箱，admin 大盘统计） ===
 
