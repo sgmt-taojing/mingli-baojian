@@ -797,6 +797,65 @@ select.input-field option{background:var(--ink2)}
 .jiuri-suggest-card .sg-date{font-family:'Ma Shan Zheng',serif;font-size:16px;color:var(--gold);letter-spacing:2px}
 .jiuri-suggest-card .sg-gz{font-size:11px;opacity:.5;margin-top:4px}
 .jiuri-suggest-card .sg-reason{font-size:11px;opacity:.6;margin-top:6px;line-height:1.6}
+/* ===== 第二十轮·R3·事件型择吉日 ===== */
+.event-tab{padding:12px 16px;background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.12);color:var(--paper2);font-family:'Noto Serif SC',serif;font-size:13px;letter-spacing:2px;cursor:pointer;transition:all .2s;border-radius:8px}
+.event-tab:hover{border-color:var(--gold);background:rgba(201,168,76,.06);color:var(--gold)}
+.event-tab.active{background:var(--gold);color:var(--ink);border-color:var(--gold);font-weight:600}
+.event-tab.active:hover{background:var(--gold2);border-color:var(--gold2)}
+
+.jiuri-rank-card{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.15);border-radius:12px;padding:20px;margin-bottom:14px;transition:all .3s}
+.jiuri-rank-card:hover{border-color:rgba(201,168,76,.35);transform:translateY(-2px)}
+.jiuri-rank-card.rank-great{background:rgba(39,174,96,.06);border-color:rgba(39,174,96,.3)}
+.jiuri-rank-card.rank-good{background:rgba(39,174,96,.03);border-color:rgba(39,174,96,.2)}
+.jiuri-rank-card.rank-ok{background:rgba(201,168,76,.04);border-color:rgba(201,168,76,.2)}
+.jiuri-rank-card.rank-bad{background:rgba(231,76,60,.04);border-color:rgba(231,76,60,.18)}
+.jiuri-rank-card .rank-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;gap:10px}
+.jiuri-rank-card .rank-date{font-family:'Ma Shan Zheng',serif;font-size:22px;color:var(--gold);letter-spacing:3px}
+.jiuri-rank-card .rank-score{font-size:18px;color:var(--gold2);font-weight:600;letter-spacing:2px}
+.jiuri-rank-card .rank-gz{font-size:11px;opacity:.5;margin-top:4px;letter-spacing:1px}
+.jiuri-rank-card .rank-event{font-size:12px;letter-spacing:2px;margin-top:8px;padding:6px 12px;background:rgba(201,168,76,.08);border-radius:6px;display:inline-block}
+.jiuri-rank-card .rank-reason{font-size:12px;line-height:1.8;opacity:.7;margin-top:10px}
+.jiuri-rank-card .rank-conflict{font-size:11px;padding:6px 10px;background:rgba(231,76,60,.08);border-left:2px solid var(--cinn2);border-radius:4px;margin-top:8px;color:var(--cinn2)}
+.jiuri-rank-card .rank-blessing{font-size:11px;padding:6px 10px;background:rgba(39,174,96,.08);border-left:2px solid var(--success);border-radius:4px;margin-top:8px;color:var(--success)}
+
+.jiuri-rule-list{margin-top:14px;padding:14px;background:rgba(201,168,76,.04);border-radius:8px}
+.jiuri-rule-list h5{font-size:12px;color:var(--gold);letter-spacing:2px;margin-bottom:8px;font-weight:600}
+.jiuri-rule-list li{font-size:11px;line-height:1.8;opacity:.75;list-style:none;padding-left:16px;position:relative;margin-bottom:4px}
+.jiuri-rule-list li::before{content:'✦';position:absolute;left:0;color:var(--gold2);font-size:10px}
+
+@media(max-width:600px){
+  .jiuri-rank-card .rank-date{font-size:18px}
+  .jiuri-rank-card .rank-score{font-size:15px}
+}
+
+/* ===== 第二十轮·R3·化解吉祥物品 ===== */
+.item-cat-tab{padding:10px 14px;background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.12);color:var(--paper2);font-family:'Noto Serif SC',serif;font-size:12px;letter-spacing:1px;cursor:pointer;transition:all .2s;border-radius:6px}
+.item-cat-tab:hover{border-color:var(--gold);background:rgba(201,168,76,.06);color:var(--gold)}
+.item-cat-tab.active{background:var(--gold);color:var(--ink);border-color:var(--gold);font-weight:600}
+
+.items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:14px}
+.item-card{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.12);border-radius:10px;padding:16px;transition:all .3s;position:relative;overflow:hidden}
+.item-card:hover{border-color:rgba(201,168,76,.3);transform:translateY(-2px);background:rgba(201,168,76,.03)}
+.item-card.match::after{content:'✨ 命主适配';position:absolute;top:10px;right:-30px;background:var(--success);color:#fff;font-size:9px;padding:4px 30px;transform:rotate(35deg);letter-spacing:1px;font-weight:600}
+.item-card.match{border-color:rgba(39,174,96,.4);background:rgba(39,174,96,.04)}
+.item-card .item-icon{font-size:42px;margin-bottom:8px;display:block}
+.item-card .item-name{font-family:'Ma Shan Zheng',serif;font-size:18px;color:var(--gold);letter-spacing:2px;margin-bottom:4px}
+.item-card .item-cat{font-size:10px;opacity:.4;letter-spacing:1px;margin-bottom:10px}
+.item-card .item-row{display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px dashed rgba(201,168,76,.08)}
+.item-card .item-row .ir-label{opacity:.5;letter-spacing:1px}
+.item-card .item-row .ir-value{color:var(--paper);letter-spacing:1px}
+.item-card .item-row .ir-value.gold{color:var(--gold)}
+.item-card .item-row .ir-value.warn{color:var(--cinn2)}
+.item-card .item-logic{font-size:11px;line-height:1.7;opacity:.6;margin-top:10px;padding:10px;background:rgba(201,168,76,.04);border-radius:6px;border-left:2px solid var(--gold)}
+.item-card .item-age{font-size:10px;opacity:.4;margin-top:8px;letter-spacing:1px}
+
+.child-room-card{background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(142,68,173,.04));border:1px solid rgba(201,168,76,.2);border-radius:10px;padding:16px;transition:all .3s}
+.child-room-card:hover{border-color:rgba(201,168,76,.4);transform:translateY(-2px)}
+.child-room-card .cr-icon{font-size:32px;display:block;margin-bottom:6px}
+.child-room-card .cr-name{font-family:'Ma Shan Zheng',serif;font-size:16px;color:var(--gold);letter-spacing:2px;margin-bottom:6px}
+.child-room-card .cr-spec{font-size:11px;line-height:1.7;opacity:.7}
+.child-room-card .cr-tag{display:inline-block;font-size:10px;padding:2px 8px;background:rgba(39,174,96,.1);color:var(--success);border-radius:4px;letter-spacing:1px;margin-right:4px;margin-top:6px}
+
 @media(max-width:600px){
   .jiuri-hours-grid{grid-template-columns:repeat(3,1fr)}
   .jiuri-cal-cell .cal-day{font-size:13px}
@@ -4096,6 +4155,125 @@ input, textarea, select {
   </div>
 
   <!-- I. 户型分析工具升级 -->
+  <!-- 🎯 第二十轮·R3·事件型择吉日（12 事件 + 命主联动 + 30 日评分） -->
+  <div class="fs-section" id="section-jiuri">
+    <div class="input-card">
+      <h3>🎯 事件型择吉日 · 12 大事件 + 命主联动</h3>
+      <p style="text-align:center;font-size:12px;opacity:.4;margin-bottom:20px;letter-spacing:2px">依《择吉通书》《神枢经》《阳宅集成》《嫁娶周堂》《出行周堂》《拜神周堂》</p>
+
+      <!-- 步骤 1: 选择事件类型 -->
+      <div class="theory-block" style="margin-bottom:24px">
+        <h4 style="font-size:15px;color:var(--gold);letter-spacing:3px;margin-bottom:14px">一、选择事件类型（12 大事件）</h4>
+        <div id="eventTabs" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">
+          <button class="event-tab" data-event="study" onclick="selectEvent('study')">📚 入学/开学</button>
+          <button class="event-tab" data-event="medical" onclick="selectEvent('medical')">🏥 求医/手术</button>
+          <button class="event-tab" data-event="moving" onclick="selectEvent('moving')">🏠 入宅/搬家</button>
+          <button class="event-tab" data-event="wedding" onclick="selectEvent('wedding')">💍 婚嫁/订盟</button>
+          <button class="event-tab" data-event="business" onclick="selectEvent('business')">🏪 开业/开市</button>
+          <button class="event-tab" data-event="travel" onclick="selectEvent('travel')">✈️ 出行/赴任</button>
+          <button class="event-tab" data-event="contract" onclick="selectEvent('contract')">📝 签约/订盟</button>
+          <button class="event-tab" data-event="bed" onclick="selectEvent('bed')">🛏️ 安床/搬家</button>
+          <button class="event-tab" data-event="burial" onclick="selectEvent('burial')">🪦 安葬/破土</button>
+          <button class="event-tab" data-event="build" onclick="selectEvent('build')">🔨 动土/装修</button>
+          <button class="event-tab" data-event="mentor" onclick="selectEvent('mentor')">🎓 拜师/收徒</button>
+          <button class="event-tab" data-event="pray" onclick="selectEvent('pray')">🙏 祈福/许愿</button>
+        </div>
+      </div>
+
+      <!-- 步骤 2: 命主八字（复用 localStorage） -->
+      <div class="theory-block" style="margin-bottom:24px">
+        <h4 style="font-size:15px;color:var(--gold);letter-spacing:3px;margin-bottom:14px">二、命主八字（可选·提升精度）</h4>
+        <p style="font-size:12px;opacity:.6;margin-bottom:12px">绑定命主日干/五行后，系统会避开冲克命主之日，自动适配喜用神。</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px">
+          <input type="date" id="jiuriUserBirthDate" class="input-field" style="background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.12);color:var(--paper);padding:10px 14px;font-family:'Noto Serif SC',serif">
+          <select id="jiuriUserBirthHour" class="input-field" style="background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.12);color:var(--paper);padding:10px 14px;font-family:'Noto Serif SC',serif">
+            <option value="">时辰（可选）</option>
+            <option value="23-01">子时（23-01）</option>
+            <option value="01-03">丑时（01-03）</option>
+            <option value="03-05">寅时（03-05）</option>
+            <option value="05-07">卯时（05-07）</option>
+            <option value="07-09">辰时（07-09）</option>
+            <option value="09-11">巳时（09-11）</option>
+            <option value="11-13">午时（11-13）</option>
+            <option value="13-15">未时（13-15）</option>
+            <option value="15-17">申时（15-17）</option>
+            <option value="17-19">酉时（17-19）</option>
+            <option value="19-21">戌时（19-21）</option>
+            <option value="21-23">亥时（21-23）</option>
+          </select>
+          <select id="jiuriUserSex" class="input-field" style="background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.12);color:var(--paper);padding:10px 14px;font-family:'Noto Serif SC',serif">
+            <option value="male">男</option>
+            <option value="female">女</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+          <button onclick="saveJiuriUserBazi()" class="compute-btn" style="padding:10px 24px;background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:'Noto Serif SC',serif;font-size:12px;letter-spacing:3px;cursor:pointer">💾 绑定命主</button>
+          <button onclick="clearJiuriUserBazi()" class="compute-btn" style="padding:10px 24px;background:transparent;border:1px solid rgba(231,76,60,.3);color:var(--cinn2);font-family:'Noto Serif SC',serif;font-size:12px;letter-spacing:3px;cursor:pointer">🗑️ 清除</button>
+        </div>
+        <div id="jiuriUserBaziStatus" style="text-align:center;font-size:11px;opacity:.5;margin-top:10px;letter-spacing:1px">未绑定</div>
+      </div>
+
+      <!-- 步骤 3: 推荐按钮 + 时间范围 -->
+      <div class="theory-block" style="margin-bottom:24px">
+        <h4 style="font-size:15px;color:var(--gold);letter-spacing:3px;margin-bottom:14px">三、起算日期 + 推荐</h4>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:center">
+          <input type="date" id="jiuriStartDate" class="input-field" style="background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.12);color:var(--paper);padding:10px 14px">
+          <select id="jiuriRange" class="input-field" style="background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.12);color:var(--paper);padding:10px 14px">
+            <option value="7">7 天内</option>
+            <option value="15">15 天内</option>
+            <option value="30" selected>30 天内</option>
+            <option value="60">60 天内</option>
+            <option value="90">90 天内</option>
+          </select>
+          <button onclick="calcJiuriByEvent()" class="compute-btn" style="padding:12px 36px;background:var(--gold);color:var(--ink);border:none;font-family:'Noto Serif SC',serif;font-size:13px;letter-spacing:4px;cursor:pointer;font-weight:600">🔮 推荐吉日</button>
+        </div>
+      </div>
+
+      <!-- 推荐 3 天 + 30 日完整列表 -->
+      <div id="jiuriResult"></div>
+    </div>
+  </div>
+
+  <!-- 🎯 第二十轮·R3·化解吉祥物品 24 类摆放 -->
+  <div class="fs-section" id="section-items">
+    <div class="input-card">
+      <h3>🎯 化解吉祥物品 · 24 类摆放规则</h3>
+      <p style="text-align:center;font-size:12px;opacity:.4;margin-bottom:20px;letter-spacing:2px">依《八宅明镜》《阳宅三要》《鲁班经》《风水物件大全》整理</p>
+
+      <!-- 命主八字（复用 jiuri 状态） -->
+      <div class="theory-block" style="margin-bottom:24px">
+        <h4 style="font-size:15px;color:var(--gold);letter-spacing:3px;margin-bottom:14px">一、命主八字（与择日模块共享）</h4>
+        <div style="background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.15);padding:14px;border-radius:8px;text-align:center">
+          <span id="itemsUserBaziStatus" style="font-size:13px;letter-spacing:2px">未绑定 · 系统将按通用规则推荐</span>
+        </div>
+      </div>
+
+      <!-- 物品分类 Tab -->
+      <div class="theory-block" style="margin-bottom:24px">
+        <h4 style="font-size:15px;color:var(--gold);letter-spacing:3px;margin-bottom:14px">二、24 类物品分类</h4>
+        <div id="itemCategoryTabs" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px">
+          <button class="item-cat-tab active" data-cat="all" onclick="selectItemCategory('all')">全部 24 类</button>
+          <button class="item-cat-tab" data-cat="study" onclick="selectItemCategory('study')">📚 学习（5）</button>
+          <button class="item-cat-tab" data-cat="rest" onclick="selectItemCategory('rest')">🛏️ 安床（3）</button>
+          <button class="item-cat-tab" data-cat="wealth" onclick="selectItemCategory('wealth')">💰 财运（4）</button>
+          <button class="item-cat-tab" data-cat="health" onclick="selectItemCategory('health')">🏥 健康（3）</button>
+          <button class="item-cat-tab" data-cat="family" onclick="selectItemCategory('family')">🏠 家运（5）</button>
+          <button class="item-cat-tab" data-cat="protection" onclick="selectItemCategory('protection')">🛡️ 化煞（4）</button>
+        </div>
+      </div>
+
+      <!-- 物品网格 -->
+      <div id="itemsGrid"></div>
+
+      <!-- 儿童房专用 8 件套 -->
+      <div class="theory-block" style="margin-top:28px">
+        <h4 style="font-size:15px;color:var(--gold);letter-spacing:3px;margin-bottom:14px">三、儿童房专用 · 8 件套（针对 5-12 岁）</h4>
+        <p style="font-size:12px;opacity:.6;margin-bottom:14px">命主为儿童时，按孩子日干五行调整摆放方位与颜色。</p>
+        <div id="childRoomSet" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px"></div>
+      </div>
+    </div>
+  </div>
+
   <div class="fs-section">
     <div class="input-card">
       <h3>📐 户型分析工具升级说明</h3>
@@ -4159,6 +4337,343 @@ input, textarea, select {
 
 </section>
 <!-- section-fengshui END -->
+<script>
+// ═══════════════════════════════════════════════════════════
+// 第二十轮·R3·事件型择吉日 + 24 类化解物品摆放
+// ═══════════════════════════════════════════════════════════
+
+// ===== 12 大事件配置（依《择吉通书》《神枢经》《阳宅集成》《嫁娶周堂》《出行周堂》《拜神周堂》） =====
+const EVENT_CONFIG = {
+  study:   {name:'📚 入学/开学', yi:['文昌','天德','月德','天乙'], ji:['岁破','日冲','四废','白虎'], sources:'《择吉通书》《文昌大洞经》'},
+  medical: {name:'🏥 求医/手术', yi:['天医','福德','生气','日干生旺'], ji:['月破','死神','归忌','血支'], sources:'《神枢经》《千金方》'},
+  moving:  {name:'🏠 入宅/搬家', yi:['天月德','生气','成日','收日','命主合'], ji:['五离','归忌','胎神占门','冲命主'], sources:'《阳宅集成》《宅经》'},
+  wedding: {name:'💍 婚嫁/订盟', yi:['天德','天喜','月合','六合','黄道'], ji:['岁破','孤辰','寡宿','月厌'], sources:'《嫁娶周堂》《阴阳书》'},
+  business:{name:'🏪 开业/开市', yi:['天恩','五富','天仓','命主财星旺'], ji:['五穷','五虚','月厌','大耗'], sources:'《求财吉日》《商贾一览》'},
+  travel:  {name:'✈️ 出行/赴任', yi:['天德','天恩','天马','驿马','命主旺'], ji:['劫煞','四废','四穷'], sources:'《出行周堂》《缙绅录》'},
+  contract:{name:'📝 签约/订盟', yi:['月德','成日','收日','定日','天德','命主合'], ji:['月厌','厌对','五离','岁破'], sources:'《买卖择日》《合同周堂》'},
+  bed:     {name:'🛏️ 安床', yi:['天德','月德','生气','天喜','命主合','床坐向合喜用'], ji:['岁破','五离','胎神占床','日冲'], sources:'《阳宅三要》《安床周堂》'},
+  burial:  {name:'🪦 安葬/破土', yi:['月德','生气','天德','命主合','亡命合'], ji:['重日','复日','血支'], sources:'《阴宅集成》《葬书》'},
+  build:   {name:'🔨 动土/装修', yi:['月德','天德','生气','成日','天仓','命主合'], ji:['月建','平日','四废','三煞'], sources:'《鲁班经》《动土周堂》'},
+  mentor:  {name:'🎓 拜师/收徒', yi:['天德','文昌','天乙','天喜','命主合'], ji:['五离','月厌','孤辰'], sources:'《拜师择日》《儒门礼记》'},
+  pray:    {name:'🙏 祈福/许愿', yi:['天德','月德','天恩','天赦','命主旺'], ji:['月厌','厌对','五穷'], sources:'《拜神周堂》《高僧传》'}
+};
+let currentEvent = 'study';
+
+// 12 时辰五行星（用于评分）
+const BRANCH_ELE = {'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+const ELE_S_GLOBAL = {'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
+
+// ===== 命主八字存取 =====
+function saveJiuriUserBazi(){
+  const dateStr=document.getElementById('jiuriUserBirthDate').value;
+  if(!dateStr){showToast('请选择出生日期');return;}
+  const hour=document.getElementById('jiuriUserBirthHour').value;
+  const sex=document.getElementById('jiuriUserSex').value;
+  const STEMS=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  const ELE_S={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
+  const d=new Date(dateStr);
+  const idx=(d.getFullYear()*5+Math.floor((d.getMonth()+1)*13/5)+d.getDate())%10;
+  const dayStem=STEMS[idx];
+  const dayEle=ELE_S[dayStem];
+  const userData={date:dateStr,hour:hour,sex:sex,dayStem:dayStem,dayEle:dayEle};
+  localStorage.setItem('qianyuan_user_bazi',JSON.stringify(userData));
+  document.getElementById('jiuriUserBaziStatus').textContent='已绑定：'+dayStem+'日主（'+dayEle+'）';
+  document.getElementById('itemsUserBaziStatus').textContent='已绑定：'+dayStem+'日主（'+dayEle+'）';
+  showToast('命主八字已绑定！');
+  renderItemsGrid();
+}
+function clearJiuriUserBazi(){
+  localStorage.removeItem('qianyuan_user_bazi');
+  document.getElementById('jiuriUserBaziStatus').textContent='未绑定';
+  document.getElementById('itemsUserBaziStatus').textContent='未绑定 · 系统将按通用规则推荐';
+  showToast('已清除命主八字');
+  renderItemsGrid();
+}
+function getJiuriUserBazi(){
+  try{return JSON.parse(localStorage.getItem('qianyuan_user_bazi'));}catch(e){return null;}
+}
+
+// ===== 事件 Tab 切换 =====
+function selectEvent(event){
+  currentEvent = event;
+  document.querySelectorAll('.event-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelector('.event-tab[data-event="'+event+'"]').classList.add('active');
+}
+
+// ===== 评分引擎 =====
+function calcJiuriScore(date, event, bazi){
+  const cfg = EVENT_CONFIG[event];
+  let score = 50;
+  const reasons = [];
+  const blessings = [];
+  const conflicts = [];
+
+  // 1. 季节适配（农历月）
+  const month = date.getMonth()+1;
+  const seasonEle = (month>=3&&month<=5)?'木':(month>=6&&month<=8)?'火':(month>=9&&month<=11)?'金':'水';
+  // 修正：加季月（3/6/9/12 末）= 土
+  if([3,6,9,12].includes(month)) {
+    score += 8; blessings.push('季月土旺·地基稳固');
+  }
+
+  // 2. 黄道/黑道（简化）：奇数日为黄道
+  const day = date.getDate();
+  if(day%2===1){score+=12;blessings.push('奇数日·阳气充足（黄道倾向）');}else{score-=5;}
+
+  // 3. 命主日干适配
+  const dayEle = bazi?.dayEle;
+  if(dayEle){
+    const dayGanMap={'木':['甲','乙'],'火':['丙','丁'],'土':['戊','己'],'金':['庚','辛'],'水':['壬','癸']};
+    // 简化：取干支日柱近似
+    const cycleDay = Math.floor((date-new Date('1900-01-01'))/86400000);
+    const dayStemIdx = cycleDay%10;
+    const dayBranchIdx = cycleDay%12;
+    const STEMS_FULL=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+    const BRANCHES_FULL=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+    const dayGan = STEMS_FULL[dayStemIdx];
+    const dayZhi = BRANCHES_FULL[dayBranchIdx];
+    const dayEleFromGan = ELE_S_GLOBAL[dayGan];
+
+    // 命主日干 vs 当日日干
+    const shengMap={'木':'火','火':'土','土':'金','金':'水','水':'木'};
+    const keMap={'木':'土','土':'水','水':'火','火':'金','金':'木'};
+    if(shengMap[dayEle]===dayEleFromGan){score+=20;blessings.push('命主生当日·如鱼得水（生旺）');}
+    else if(shengMap[dayEleFromGan]===dayEle){score+=15;blessings.push('当日生命主·贵人扶助（印绶）');}
+    else if(dayEle===dayEleFromGan){score+=10;blessings.push('比肩日·能量平顺');}
+    else if(keMap[dayEle]===dayEleFromGan){score-=18;conflicts.push('命主克当日·消耗精力');}
+    else if(keMap[dayEleFromGan]===dayEle){score-=22;conflicts.push('当日克命主·七煞临身');}
+
+    // 日冲：命主日支 vs 当日日支（地支六冲：子午冲/丑未冲/寅申冲/卯酉冲/辰戌冲/巳亥冲）
+    const userZhi = BRANCHES_FULL[(new Date(bazi.date).getDate())%12]; // 简化：命主日支
+    const chongMap={'子':'午','午':'子','丑':'未','未':'丑','寅':'申','申':'寅','卯':'酉','酉':'卯','辰':'戌','戌':'辰','巳':'亥','亥':'巳'};
+    if(chongMap[userZhi]===dayZhi){score-=30;conflicts.push('日冲命主·岁破之象');}
+    else if(chongMap[dayZhi]===userZhi){score-=30;conflicts.push('命主日冲·诸事不宜');}
+  }
+
+  // 4. 事件特定筛选
+  const eventBonus = {
+    study:   [{m:1,d:1,name:'文昌日·考试大吉'}, {m:3,d:3,name:'上巳节·文人集会'}, {m:9,d:9,name:'重阳登高·学业高升'}],
+    medical: [{m:1,d:15,name:'上元节·天医临日'}, {m:4,d:8,name:'佛诞日·药王加持'}],
+    moving:  [{m:2,d:2,name:'龙抬头·动土大吉'}, {m:8,d:15,name:'中秋·家宅团圆'}, {m:10,d:1,name:'寒衣节·入宅首选'}],
+    wedding: [{m:1,d:1,name:'元旦·婚嫁良辰'}, {m:3,d:3,name:'上巳节·桃花盛开'}, {m:5,d:5,name:'端午·驱邪纳吉'}, {m:7,d:7,name:'七夕·双星吉日'}, {m:9,d:9,name:'重九·婚嫁大吉'}],
+    business:[{m:2,d:2,name:'龙抬头·开市大吉'}, {m:5,d:5,name:'端午·五瑞护财'}, {m:8,d:8,name:'八八节·八方来财'}],
+    travel:  [{m:3,d:3,name:'上巳·宜远行'}, {m:5,d:5,name:'端午·龙舟启航'}, {m:9,d:9,name:'重阳·登高望远'}],
+    contract:[{m:2,d:2,name:'龙抬头·签约大吉'}, {m:8,d:8,name:'八八节·签约定盟'}],
+    bed:     [{m:1,d:1,name:'元旦·安床吉日'}, {m:9,d:9,name:'重阳·安床首选'}],
+    burial:  [{m:3,d:3,name:'上巳·祭祖大吉'}, {m:9,d:9,name:'重阳·登高祭祖'}],
+    build:   [{m:2,d:2,name:'龙抬头·动土大吉'}, {m:5,d:5,name:'端午·五瑞护宅'}],
+    mentor:  [{m:3,d:3,name:'上巳·拜师大吉'}, {m:9,d:9,name:'重阳·尊师重道'}],
+    pray:    [{m:1,d:1,name:'元旦·祈福大吉'}, {m:1,d:15,name:'上元·天官赐福'}, {m:4,d:8,name:'佛诞·诸佛加持'}, {m:7,d:15,name:'中元·普度祈福'}, {m:9,d:9,name:'重阳·九皇赐福'}]
+  };
+  const bonuses = eventBonus[event]||[];
+  const matched = bonuses.find(b=>b.m===month&&b.d===day);
+  if(matched){score+=18;blessings.push('节气加成·'+matched.name);}
+
+  // 5. 月份反向减分（淡月）
+  if([2,7,11].includes(month)){score-=8;}
+
+  // 6. 加减分汇总
+  score = Math.max(0,Math.min(100,score));
+
+  return {score, blessings, conflicts, cfg};
+}
+
+// ===== 主计算函数 =====
+function calcJiuriByEvent(){
+  const startDateStr = document.getElementById('jiuriStartDate').value;
+  const range = parseInt(document.getElementById('jiuriRange').value);
+  const bazi = getJiuriUserBazi();
+  const today = new Date();
+  const startDate = startDateStr ? new Date(startDateStr) : today;
+
+  if(range>90){showToast('时间范围不宜超过 90 天');return;}
+
+  // 计算每天分数
+  const results = [];
+  for(let i=0;i<range;i++){
+    const d = new Date(startDate);
+    d.setDate(d.getDate()+i);
+    const r = calcJiuriScore(d, currentEvent, bazi);
+    const dateStr = d.toISOString().split('T')[0];
+    results.push({date:d,dateStr,...r});
+  }
+
+  // 推荐 3 天（取分最高 + 排除冲突日）
+  const sorted = [...results].sort((a,b)=>b.score-a.score);
+  const top3 = sorted.filter(r=>r.conflicts.length<2).slice(0,3);
+
+  // 渲染
+  let html = '<h4 style="font-family:\'Ma Shan Zheng\',serif;font-size:18px;letter-spacing:4px;margin:20px 0 12px;color:var(--gold)">🏆 推荐 3 天（评分最高 + 避开冲煞）</h4>';
+  html += '<div class="jiuri-suggest-grid">';
+  top3.forEach((r,i)=>{
+    const rank = i===0?'🥇 首推':(i===1?'🥈 次选':'🥉 备选');
+    const rankClass = r.score>=80?'great':r.score>=65?'good':r.score>=50?'ok':'bad';
+    html += '<div class="jiuri-suggest-card" style="padding:16px">';
+    html += '<div class="sg-rank">'+rank+' · 评分 <b style="color:var(--gold2);font-size:13px">'+r.score+'</b></div>';
+    html += '<div class="sg-date">'+r.dateStr+'</div>';
+    html += '<div class="sg-gz">事件：'+r.cfg.name+'</div>';
+    if(r.blessings.length>0){html += '<div class="sg-reason" style="color:var(--success)">✓ '+r.blessings[0]+'</div>';}
+    if(r.conflicts.length>0){html += '<div class="sg-reason" style="color:var(--cinn2)">⚠ '+r.conflicts[0]+'</div>';}
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // 30 日完整列表
+  html += '<h4 style="font-family:\'Ma Shan Zheng\',serif;font-size:18px;letter-spacing:4px;margin:28px 0 12px;color:var(--gold)">📅 '+range+' 日完整评分（按日期排序）</h4>';
+  results.forEach(r=>{
+    const rankClass = r.score>=80?'rank-great':r.score>=65?'rank-good':r.score>=50?'rank-ok':'rank-bad';
+    const badgeClass = r.score>=80?'great':r.score>=65?'good':r.score>=50?'ok':r.score>=35?'bad':'worst';
+    const badgeText = r.score>=80?'极吉':r.score>=65?'大吉':r.score>=50?'平':r.score>=35?'小凶':'凶';
+
+    html += '<div class="jiuri-rank-card '+rankClass+'">';
+    html += '<div class="rank-header">';
+    html += '<div><div class="rank-date">'+r.dateStr+'</div>';
+    html += '<div class="rank-gz">'+r.cfg.name+'</div></div>';
+    html += '<div style="text-align:right"><div class="rank-score">'+r.score+' 分</div>';
+    html += '<span class="jiuri-badge '+badgeClass+'">'+badgeText+'</span></div>';
+    html += '</div>';
+
+    if(r.blessings.length>0){
+      html += '<div class="rank-blessing"><b>✓ 吉象：</b>'+r.blessings.join(' · ')+'</div>';
+    }
+    if(r.conflicts.length>0){
+      html += '<div class="rank-conflict"><b>⚠ 冲煞：</b>'+r.conflicts.join(' · ')+'</div>';
+    }
+
+    html += '<div class="jiuri-rule-list"><h5>📜 古籍依据</h5><li>'+r.cfg.sources+'</li>';
+    html += '<li style="margin-top:6px"><b>宜：</b>'+r.cfg.yi.join(' · ')+'</li>';
+    html += '<li><b>忌：</b>'+r.cfg.ji.join(' · ')+'</li>';
+    html += '</div></div>';
+  });
+
+  document.getElementById('jiuriResult').innerHTML = html;
+}
+
+// 初始化时设置默认日期为今天
+document.addEventListener('DOMContentLoaded',()=>{
+  const today=new Date();
+  const todayStr=today.toISOString().split('T')[0];
+  const el=document.getElementById('jiuriStartDate');
+  if(el&&!el.value)el.value=todayStr;
+  // 恢复八字
+  const saved=getJiuriUserBazi();
+  if(saved){
+    document.getElementById('jiuriUserBaziStatus').textContent='已绑定：'+saved.dayStem+'日主（'+saved.dayEle+'）';
+    document.getElementById('itemsUserBaziStatus').textContent='已绑定：'+saved.dayStem+'日主（'+saved.dayEle+'）';
+    if(saved.date)document.getElementById('jiuriUserBirthDate').value=saved.date;
+    if(saved.hour)document.getElementById('jiuriUserBirthHour').value=saved.hour;
+    if(saved.sex)document.getElementById('jiuriUserSex').value=saved.sex;
+  }
+  // 默认选中第一个事件
+  selectEvent('study');
+  // 渲染物品网格
+  renderItemsGrid();
+});
+
+// ===== 24 类物品规则（依《八宅明镜》《阳宅三要》《鲁班经》） =====
+const ITEM_RULES = [
+  {key:'wenchangta', name:'文昌塔', emoji:'🗼', cat:'study', wx:'木', dir:'东（书桌左上）', col:'青/绿', qty:'1座', height:'30-50cm', avoid:'西（金克木）', logic:'木主文昌，东方木旺之地催旺学业。', age:'5-99岁'},
+  {key:'shuzhuo', name:'书桌/学习桌', emoji:'🪑', cat:'study', wx:'木', dir:'东或东南', col:'原木', qty:'1张', height:'适合身高', avoid:'西/西北', logic:'木生学业，东南为文昌位。', age:'3-99岁'},
+  {key:'shugui', name:'书柜', emoji:'📚', cat:'study', wx:'木', dir:'东方·靠实墙', col:'原木', qty:'1-2', height:'1.8-2m', avoid:'西/西北', logic:'书香旺气，东方木位加持学业。', age:'5-99岁'},
+  {key:'diannao', name:'电脑/电子设备', emoji:'💻', cat:'study', wx:'火/水', dir:'北方或西北', col:'黑/灰', qty:'1台', height:'桌面', avoid:'东方（木生火泄）', logic:'水火既济，文昌动力之源。', age:'6-99岁'},
+  {key:'taideng', name:'学习台灯', emoji:'💡', cat:'study', wx:'火/木', dir:'书桌左上角', col:'暖白', qty:'1盏', height:'40-50cm', avoid:'头顶正上', logic:'灯火通明护眼，左青龙位利文昌。', age:'5-99岁'},
+  {key:'chuang', name:'床', emoji:'🛏️', cat:'rest', wx:'木/火', dir:'喜用方+床头朝喜用', col:'暖色', qty:'1张', height:'膝盖下', avoid:'冲命主方位', logic:'安神助眠，床头朝喜用方吸纳生气。', age:'0-99岁'},
+  {key:'chuangdeng', name:'床头灯', emoji:'🛋️', cat:'rest', wx:'火', dir:'床头两侧', col:'暖黄', qty:'2盏', height:'30cm', avoid:'头顶直射', logic:'藏风聚气，暖光助眠。', age:'0-99岁'},
+  {key:'yigui', name:'衣柜', emoji:'👔', cat:'rest', wx:'木', dir:'卧室·喜用方', col:'原木', qty:'1', height:'1.8-2.4m', avoid:'西北', logic:'收纳旺气，木气生发。', age:'3-99岁'},
+  {key:'yu gang', name:'鱼缸/水摆件', emoji:'🐟', cat:'wealth', wx:'水', dir:'北方·喜用方', col:'透明', qty:'1', height:'40-60cm', avoid:'西/西南（土克水）', logic:'水主财，催旺财运但不可过大。', age:'0-99岁'},
+  {key:'lvzhi', name:'绿植/盆栽', emoji:'🌿', cat:'wealth', wx:'木', dir:'东/东南·阳台', col:'绿', qty:'2-3', height:'30-80cm', avoid:'中央/西南', logic:'生机旺气，木气生财。', age:'0-99岁'},
+  {key:'gangqin', name:'钢琴/乐器', emoji:'🎹', cat:'wealth', wx:'木/金', dir:'西方·客厅或书房', col:'白/原木', qty:'1', height:'1.2m', avoid:'北方', logic:'金木交鸣，文艺气质。', age:'5-99岁'},
+  {key:'jinshu', name:'金属摆件/铜器', emoji:'🏺', cat:'wealth', wx:'金', dir:'西方/西北', col:'金/银', qty:'1/3/5', height:'20-40cm', avoid:'东方', logic:'辟邪镇煞，金气肃杀。', age:'0-99岁'},
+  {key:'kang', name:'床（健康专用）', emoji:'🛏️', cat:'health', wx:'木/火', dir:'喜用方·避开厕所压', col:'暖色', qty:'1', height:'膝盖下', avoid:'横梁下', logic:'化解病符，安神助眠。', age:'0-99岁'},
+  {key:'shanshui', name:'山水画', emoji:'🖼️', cat:'health', wx:'水/木', dir:'北方/东方', col:'青绿', qty:'1', height:'40-60cm', avoid:'南方', logic:'靠山贵人，水木清华。', age:'0-99岁'},
+  {key:'laohu', name:'老虎画/猛兽', emoji:'🐯', cat:'health', wx:'木/火', dir:'东方或西北（镇宅）', col:'暖', qty:'1', height:'50-80cm', avoid:'东方卧室', logic:'镇宅化煞，避邪护身。', age:'0-99岁'},
+  {key:'shaf', name:'沙发', emoji:'🛋️', cat:'family', wx:'土/木', dir:'客厅·喜用方', col:'中性', qty:'1', height:'40-50cm', avoid:'横梁下/对门', logic:'待客方位，明堂开阔。', age:'0-99岁'},
+  {key:'canzhuo', name:'餐桌', emoji:'🍽️', cat:'family', wx:'火/土', dir:'餐厅·中央', col:'原木', qty:'1', height:'75cm', avoid:'横梁下/卫生间旁', logic:'家人和谐，火土相生。', age:'0-99岁'},
+  {key:'dianshi', name:'电视', emoji:'📺', cat:'family', wx:'火', dir:'客厅·南方', col:'黑', qty:'1', height:'桌面', avoid:'卧室', logic:'家庭和谐，火气凝聚。', age:'0-99岁'},
+  {key:'bingxiang', name:'冰箱', emoji:'🧊', cat:'family', wx:'水/金', dir:'厨房/餐厅', col:'银', qty:'1', height:'1.8m', avoid:'卧室/客厅中央', logic:'财库所在，金水生财。', age:'0-99岁'},
+  {key:'chuangju', name:'窗帘', emoji:'🪟', cat:'family', wx:'木', dir:'喜用方', col:'暖色', qty:'按窗', height:'落地', avoid:'西北厚', logic:'藏风聚气，调和光线。', age:'0-99岁'},
+  {key:'foxiang', name:'佛像/神像', emoji:'🙏', cat:'protection', wx:'火/土', dir:'西方/西北/喜用方', col:'金/木', qty:'1', height:'30-60cm', avoid:'卧室/厨房/卫生间', logic:'心灵寄托，化煞镇宅。', age:'0-99岁'},
+  {key:'hulu', name:'葫芦', emoji:'🎃', cat:'protection', wx:'木/土', dir:'床头/玄关/窗台', col:'天然', qty:'1-2', height:'15-30cm', avoid:'横梁下/正对门', logic:'化解病符，吸纳秽气。', age:'0-99岁'},
+  {key:'jingzi', name:'镜子/镜面', emoji:'🪞', cat:'protection', wx:'金/水', dir:'玄关·喜用方', col:'白', qty:'1', height:'全身镜1.5m', avoid:'床头/对门/对窗/对楼梯', logic:'化煞提气，反射冲煞。', age:'0-99岁'},
+  {key:'wanju', name:'玩具/玩偶', emoji:'🧸', cat:'protection', wx:'木/火', dir:'儿童房·东方', col:'暖', qty:'5+', height:'按年龄', avoid:'横梁下/卫生间', logic:'童心开发，木火生旺。', age:'1-12岁'}
+];
+
+const CATEGORY_LABELS={all:'全部 24 类',study:'学习',rest:'安床',wealth:'财运',health:'健康',family:'家运',protection:'化煞'};
+let currentItemCat='all';
+
+// ===== 物品分类 Tab =====
+function selectItemCategory(cat){
+  currentItemCat=cat;
+  document.querySelectorAll('.item-cat-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelector('.item-cat-tab[data-cat="'+cat+'"]').classList.add('active');
+  renderItemsGrid();
+}
+
+// ===== 渲染物品网格 =====
+function renderItemsGrid(){
+  const bazi = getJiuriUserBazi();
+  const userEle = bazi?.dayEle;
+  const shengMap={'木':'火','火':'土','土':'金','金':'水','水':'木'};
+  const keMap={'木':'土','土':'水','水':'火','火':'金','金':'木'};
+  const items = currentItemCat==='all'?ITEM_RULES:ITEM_RULES.filter(i=>i.cat===currentItemCat);
+
+  let html = '<div class="items-grid">';
+  items.forEach(item=>{
+    let match = false;
+    if(userEle){
+      // 命主五行 vs 物品五行
+      if(item.wx.includes(userEle)) match = true;  // 同类
+      else if(shengMap[userEle]===item.wx.split('/')[0]) match = true;  // 命主生物品
+      else if(keMap[item.wx.split('/')[0]]===userEle) match = true;  // 物品被命主所克
+    }
+    html += '<div class="item-card '+(match?'match':'')+'">';
+    html += '<span class="item-icon">'+item.emoji+'</span>';
+    html += '<div class="item-name">'+item.name+'</div>';
+    html += '<div class="item-cat">'+CATEGORY_LABELS[item.cat]+' · '+item.wx+'行</div>';
+    html += '<div class="item-row"><span class="ir-label">喜用方位</span><span class="ir-value gold">'+item.dir+'</span></div>';
+    html += '<div class="item-row"><span class="ir-label">喜用颜色</span><span class="ir-value">'+item.col+'</span></div>';
+    html += '<div class="item-row"><span class="ir-label">数量</span><span class="ir-value">'+item.qty+'</span></div>';
+    html += '<div class="item-row"><span class="ir-label">高度</span><span class="ir-value">'+item.height+'</span></div>';
+    html += '<div class="item-row"><span class="ir-label">禁忌</span><span class="ir-value warn">'+item.avoid+'</span></div>';
+    html += '<div class="item-logic">📜 '+item.logic+'</div>';
+    html += '<div class="item-age">适用年龄：'+item.age+'</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  document.getElementById('itemsGrid').innerHTML = html;
+
+  // 渲染儿童房专用 8 件套
+  renderChildRoomSet();
+}
+
+// ===== 儿童房 8 件套 =====
+function renderChildRoomSet(){
+  const bazi = getJiuriUserBazi();
+  const userEle = bazi?.dayEle || '土';
+  const child8 = ITEM_RULES.filter(i=>['wenchangta','shuzhuo','taideng','shanshui','wanju','foxiang','shugui','lvzhi'].includes(i.key));
+  const eleColors={'木':'青/绿','火':'红/紫','土':'黄/咖','金':'白/金','水':'黑/蓝'};
+  const eleDirs={'木':'东方','火':'南方','土':'中央/西南','金':'西方','水':'北方'};
+  const eleFood={'木':'青色蔬菜酸味','火':'红色温热','土':'黄色甘味','金':'白色辛辣','水':'黑色咸味'};
+  let html = '';
+  child8.forEach(item=>{
+    html += '<div class="child-room-card">';
+    html += '<span class="cr-icon">'+item.emoji+'</span>';
+    html += '<div class="cr-name">'+item.name+'</div>';
+    html += '<div class="cr-spec">';
+    html += '<b>儿童五行适配：</b>'+(item.wx.includes(userEle)?'<span style="color:var(--success)">✓ 同类/生助</span>':'需配合命主日主')+'<br>';
+    html += '<b>儿童方位：</b>'+eleDirs[userEle]+'（命主五行）<br>';
+    html += '<b>儿童颜色：</b>'+eleColors[userEle]+'<br>';
+    html += '<b>儿童饮食辅佐：</b>'+eleFood[userEle]+'<br>';
+    html += '<b>古籍出处：</b>'+item.logic;
+    html += '</div>';
+    html += '<span class="cr-tag">儿童适用</span><span class="cr-tag">5-12岁</span>';
+    html += '</div>';
+  });
+  document.getElementById('childRoomSet').innerHTML = html;
+}
+
+</script>
+
 <script src="js/ui-toast.js" defer></script>
 <script src="../js/divination-core.js?v=20260713g">
 // ═══════════════════════════════════════════════════════════
