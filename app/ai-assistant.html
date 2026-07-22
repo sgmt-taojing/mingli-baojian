@@ -686,13 +686,28 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
     let html = '【模块KB兜底 · '+mr.name+'】\n\n';
     if(rep.ttsText) html += '🔊 朗读：'+rep.ttsText+'\n\n';
     if(rep.total !== undefined) html += '综合指数：'+rep.total+' 分\n\n';
+    if(rep.element) html += '主导五行：'+rep.element+' 行\n';
+    if(rep.summary) html += '📊 '+rep.summary+'\n\n';
     if(rep.fiveElement){
       html += '推荐五行：'+rep.fiveElement+'\n';
       if(rep.recommend) html += '特质：'+rep.recommend.feel+'\n\n';
     }
     if(rep.dimensions){
-      html += '分项评估：\n';
-      rep.dimensions.forEach(d => html += '  · '+d.name+'：'+d.score+' 分\n');
+      html += '【十维度评分卡】\n';
+      rep.dimensions.forEach(d => {
+        const mark = d.score >= 85 ? '✅' : d.score >= 75 ? '🟢' : d.score >= 60 ? '🟡' : '🔴';
+        html += '  '+mark+' '+ (d.icon||'•') + ' '+d.name+'：'+d.score+' 分（'+ (d.status||'') +'）· '+ (d.focus||'')+'\n';
+      });
+      html += '\n';
+    }
+    if(rep.next5Years){
+      html += '【未来 5 年节奏建议】\n';
+      rep.next5Years.forEach((y,i) => html += '  第'+ (i+1) +'年：'+y.text+'\n');
+      html += '\n';
+    }
+    if(rep.actions){
+      html += '【十条行动清单】\n';
+      rep.actions.slice(0,10).forEach((s,i) => html += '  '+(i+1)+'.'+s+'\n');
       html += '\n';
     }
     if(rep.stage){
@@ -2767,29 +2782,62 @@ window._MODULE_REPORTS = {
   lifeindex: {
     name: '生命指数',
     dimensions: [
-      {key:'shiye',name:'事业',weight:0.20},
-      {key:'caiyun',name:'财运',weight:0.15},
-      {key:'jiankang',name:'健康',weight:0.20},
-      {key:'hunyin',name:'婚姻',weight:0.15},
-      {key:'xueye',name:'学业',weight:0.10},
-      {key:'jiating',name:'家庭',weight:0.05},
-      {key:'renji',name:'人际',weight:0.05},
-      {key:'jingshen',name:'精神',weight:0.05},
-      {key:'xiangfu',name:'享福',weight:0.03},
-      {key:'shouyuan',name:'寿元',weight:0.02}
+      {key:'shiye',name:'事业',icon:'💼',weight:0.20,focus:'职业三跳+管理进阶'},
+      {key:'caiyun',name:'财运',icon:'💰',weight:0.15,focus:'稳健理财+多元收入'},
+      {key:'jiankang',name:'健康',icon:'💪',weight:0.20,focus:'运动+饮食+作息'},
+      {key:'hunyin',name:'婚姻',icon:'💑',weight:0.15,focus:'沟通+包容+共同成长'},
+      {key:'xueye',name:'学业',icon:'📚',weight:0.10,focus:'学历+证书+终身学习'},
+      {key:'jiating',name:'家庭',icon:'🏡',weight:0.05,focus:'子女教育+亲情'},
+      {key:'renji',name:'人际',icon:'🤝',weight:0.05,focus:'深度关系+同行圈子'},
+      {key:'jingshen',name:'精神',icon:'🎭',weight:0.05,focus:'信仰+哲学+艺术'},
+      {key:'xiangfu',name:'享福',icon:'🌸',weight:0.03,focus:'体验+旅行+生活品质'},
+      {key:'shouyuan',name:'寿元',icon:'🍵',weight:0.02,focus:'养生+保健+定期体检'}
     ],
     diagnose: function(data){
       const WX_SCORE = {'金':85,'木':78,'水':82,'火':88,'土':90};
+      const WX_FOCUS = {'金':'锐进+决策+果断','木':'生发+成长+学习','水':'智慧+灵活+沉浸','火':'表达+热情+领导','土':'稳重+承担+储蓄'};
       const ele = (data && data.s0) || '金';
       const base = WX_SCORE[ele] || 85;
-      const result = this.dimensions.map(d => ({
-        name: d.name,
-        key: d.key,
-        score: Math.round(base + (Math.sin(d.key.length*7) * 8)),
-        weight: d.weight
-      }));
+      const userText = ((data && (data.s1||'')) + ' ' + ((data && data.s2)||'')).trim();
+      // 五行关键词加权
+      const WX_KEYS = {'金':['金','银','金融','财','金属','锐','商业'],'木':['木','林','学','教育','书','生长','花'],'水':['水','海','智慧','智','流动','冥想'],'火':['火','光','表演','演讲','热','能量'],'土':['土','建筑','稳','田','地产','山']};
+      let boost = 0;
+      (WX_KEYS[ele]||[]).forEach(k => { if(userText.includes(k)) boost += 3; });
+      const result = this.dimensions.map(d => {
+        // 五行能量优势领域加权
+        let bias = 0;
+        if (ele === '金' && ['caiyun','shiye'].includes(d.key)) bias += 8;
+        if (ele === '木' && ['xueye','jingshen'].includes(d.key)) bias += 8;
+        if (ele === '水' && ['renji','jingshen'].includes(d.key)) bias += 8;
+        if (ele === '火' && ['renji','xiangfu'].includes(d.key)) bias += 8;
+        if (ele === '土' && ['jiating','shouyuan'].includes(d.key)) bias += 8;
+        const score = Math.max(40, Math.min(95, Math.round(base + (Math.sin(d.key.length*7) * 8) + bias + boost)));
+        const status = score >= 85 ? '优' : score >= 75 ? '良' : score >= 60 ? '中' : '有潜力';
+        return { name: d.name, key: d.key, icon: d.icon, score, weight: d.weight, status, focus: d.focus };
+      });
       const total = Math.round(result.reduce((s,d) => s + d.score * d.weight, 0));
-      return {title:'生命指数报告', total:total, dimensions:result, element:ele};
+      // 五行能量画像
+      const top3 = [...result].sort((a,b) => b.score - a.score).slice(0, 3).map(d => d.name);
+      const bot2 = [...result].sort((a,b) => a.score - b.score).slice(0, 2).map(d => d.name);
+      const summary = `${ele}行主导（${WX_FOCUS[ele]}），总分${total}。优势：${top3.join('、')}；待加强：${bot2.join('、')}`;
+      // 10 条行动清单（按加权后劣势领域给针对性建议）
+      const actions = [];
+      result.filter(d => d.score < 75).sort((a,b) => a.score - b.score).slice(0, 3).forEach(d => {
+        actions.push('【'+d.name+'】'+d.focus+'（得分'+d.score+'）');
+      });
+      result.filter(d => d.score >= 85).slice(0, 3).forEach(d => {
+        actions.push('【'+d.name+'】优势保持：'+d.focus);
+      });
+      while (actions.length < 10) actions.push('【平衡】五行调合：'+ele+'行能量配比优化');
+      // 5 年节奏
+      const next5Years = [
+        {year:1, text:'扬长：强化优势领域（'+top3[0]+'）'+(top3[1]?'+'+top3[1]:'')+'主键能力'},
+        {year:2, text:'补短：针对性提升'+bot2[0]+'领域'},
+        {year:3, text:'人生换挡期：尝试差异化路径'},
+        {year:4, text:'中段汇总：成果性不陶丝'},
+        {year:5, text:'中期锁势：进入下个五年计划'}
+      ];
+      return { title:'生命指数报告', total, dimensions:result, element:ele, top3, bot2, summary, actions, next5Years };
     }
   },
   lifeplan: {
