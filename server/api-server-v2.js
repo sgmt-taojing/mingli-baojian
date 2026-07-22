@@ -250,9 +250,18 @@ const requirePermission = rbac.requirePermission;
 // ============================
 // AI API 代理（密钥不再暴露在前端）
 // ============================
-const AI_API_BASE = process.env.AI_API_BASE || 'https://api.g2claw.com';
-const AI_API_KEY = process.env.G2CLAW_API_KEY || '';
-
+// === AI provider 三轨：g2claw > 智谱 ZAI > 本地 Ollama ===
+const G2CLAW_API_KEY = process.env.G2CLAW_API_KEY || "";
+const ZAI_API_KEY = process.env.ZAI_API_KEY || "";
+const OLLAMA_BASE = process.env.OLLAMA_BASE || "http://127.0.0.1:11434";
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "qwen2.5:7b";
+const AI_API_KEY = G2CLAW_API_KEY || ZAI_API_KEY || "";
+// 选 base：G2CLAW > ZAI > Ollama
+const _useZai = ZAI_API_KEY && !G2CLAW_API_KEY;
+const _useOllama = !G2CLAW_API_KEY && !ZAI_API_KEY && OLLAMA_BASE;
+const AI_API_BASE = process.env.AI_API_BASE ||
+  (_useZai ? "https://open.bigmodel.cn/api/paas/v4" : _useOllama ? OLLAMA_BASE + "/v1" : "https://api.g2claw.com");
+const AI_PROVIDER = _useOllama ? "ollama" : (_useZai ? "zai" : "g2claw");
 // === AI系统提示词（含知识库上下文）===
 const AI_SYSTEM_PROMPT = `你是「易道智鉴」AI命理助手，精通八字命理、紫微斗数、奇门遁甲、六爻占卜、梅花易数、大六壬、风水布局、中医养生、周易易经等传统文化。
 
@@ -529,51 +538,66 @@ app.post('/api/ai/chat', auth, async (req, res) => {
 // === AI聊天（公开，无需认证，低速率+本地降级）===
 app.post('/api/ai/public-chat', async (req, res) => {
   let messages = req.body.messages;
-  const model = req.body.model || 'auto';
+  const model = req.body.model || (AI_PROVIDER === "ollama" ? OLLAMA_MODEL : "auto");
   const baziData = req.body.baziData || null;
-  if (!messages || !Array.isArray(messages)) return res.json({ error: '参数错误' });
-  
+  if (!messages || !Array.isArray(messages)) return res.json({ error: "参数错误" });
+
+  // === Ollama 路径无需 API key，直接走 ===
+  if (AI_PROVIDER === "ollama") {
+    const ip = req.ip || req.connection.remoteAddress;
+    if (!sec.rateLimit("ai_public_" + ip, 60, 60000)) return res.status(429).json({ error: "RATE_LIMITED" });
+    let sysContent = AI_SYSTEM_PROMPT;
+    if (baziData) sysContent += String.fromCharCode(10) + String.fromCharCode(10) + '【用户排盘数据】' + String.fromCharCode(10) + JSON.stringify(baziData, null, 2);
+    try {
+      const r = await fetch(AI_API_BASE + "/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ model, messages: [{ role: "system", content: sysContent }, ...messages], max_tokens: 2048, temperature: 0.7 })
+      });
+      const data = await r.json();
+      if (data.choices) return res.json(data);
+      if (data.error) {
+        const lastMsg = messages.filter(m => m.role === "user").pop();
+        return res.json({ choices: [{ message: { content: await _aiLocalResponse(lastMsg ? lastMsg.content : "", baziData) } }], _local: true, ollama_error: data.error.message });
+      }
+      return res.json({ choices: [{ message: { content: await _aiLocalResponse("", baziData) } }], _local: true });
+    } catch (e) {
+      const lastMsg = messages.filter(m => m.role === "user").pop();
+      return res.json({ choices: [{ message: { content: await _aiLocalResponse(lastMsg ? lastMsg.content : "", baziData) } }], _local: true, error: e.message });
+    }
+  }
+
+  // === G2CLAW/ZAI 路径需要 API key ===
   if (!AI_API_KEY) {
-    const lastMsg = messages.filter(m => m.role === 'user').pop();
-    return res.json({ choices: [{ message: { content: await _aiLocalResponse(lastMsg ? lastMsg.content : '', baziData) } }], _local: true });
+    const lastMsg = messages.filter(m => m.role === "user").pop();
+    return res.json({ choices: [{ message: { content: await _aiLocalResponse(lastMsg ? lastMsg.content : "", baziData) } }], _local: true });
   }
-  
+
   const ip = req.ip || req.connection.remoteAddress;
-  if (!sec.rateLimit('ai_public_' + ip, 60, 60000)) return res.status(429).json({ error: 'RATE_LIMITED', message: '请求过于频繁，请稍后再试' });
-  
+  if (!sec.rateLimit("ai_public_" + ip, 60, 60000)) return res.status(429).json({ error: "RATE_LIMITED" });
+
   let sysContent = AI_SYSTEM_PROMPT;
-  if (baziData) {
-    sysContent += '\n\n【用户排盘数据】\n' + JSON.stringify(baziData, null, 2) + '\n请基于以上排盘数据回答用户问题。';
-  }
-  
+    if (baziData) sysContent += String.fromCharCode(10) + String.fromCharCode(10) + '【用户排盘数据】' + String.fromCharCode(10) + JSON.stringify(baziData, null, 2);
+
   try {
-    const response = await fetch(AI_API_BASE + '/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': '***' + AI_API_KEY },
-      body: JSON.stringify({ model, messages: [{ role: 'system', content: sysContent }, ...messages], max_tokens: 2048, temperature: 0.7 })
+    const url = AI_PROVIDER === "zai" ? AI_API_BASE + "/chat/completions" : AI_API_BASE + "/v1/chat/completions";
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + AI_API_KEY },
+      body: JSON.stringify({ model, messages: [{ role: "system", content: sysContent }, ...messages], max_tokens: 2048, temperature: 0.7 })
     });
     const data = await response.json();
     if (data.error) {
-      const lastMsg = messages.filter(m => m.role === 'user').pop();
-      return res.json({ choices: [{ message: { content: await _aiLocalResponse(lastMsg ? lastMsg.content : '', baziData) } }], _local: true });
+      const lastMsg = messages.filter(m => m.role === "user").pop();
+      return res.json({ choices: [{ message: { content: await _aiLocalResponse(lastMsg ? lastMsg.content : "", baziData) } }], _local: true, provider_error: data.error.message });
     }
     res.json(data);
   } catch (e) {
-    console.error('AI API错误:', e.message);
-    const lastMsg = messages.filter(m => m.role === 'user').pop();
-    res.json({ choices: [{ message: { content: await _aiLocalResponse(lastMsg ? lastMsg.content : '', baziData) } }], _local: true });
+    console.error("AI API错误:", e.message);
+    const lastMsg = messages.filter(m => m.role === "user").pop();
+    res.json({ choices: [{ message: { content: await _aiLocalResponse(lastMsg ? lastMsg.content : "", baziData) } }], _local: true, error: e.message });
   }
 });
-
-// === AI引导提问 ===
-app.get('/api/ai/guide', (req, res) => {
-  const idx = parseInt(req.query.idx) || 0;
-  res.json({ guide: AI_GUIDE_PROMPTS[idx % AI_GUIDE_PROMPTS.length], all: AI_GUIDE_PROMPTS });
-});
-
-// ============================
-// 用户接口
-// ============================
 
 // 注册/登录（手机号）
 app.post('/api/user/login', (req, res) => {
