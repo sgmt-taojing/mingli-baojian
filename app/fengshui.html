@@ -2755,6 +2755,31 @@ input, textarea, select {
 .dp-verdict .dv-score{font-size:32px;color:var(--gold);font-weight:600;text-align:center;margin:8px 0}
 .dp-verdict .dv-detail{font-size:11px;line-height:1.8;opacity:.85}
 .dp-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+/* R34-C 化解·门店招财 */
+.sh-result{padding:14px;background:linear-gradient(135deg,rgba(231,76,60,.04),rgba(201,168,76,.04));border-radius:10px;margin-top:14px;border:1px solid var(--line)}
+.sh-summary{display:flex;justify-content:space-between;padding:8px 12px;background:rgba(0,0,0,.2);border-radius:6px;margin-bottom:10px;font-size:12px}
+.sh-summary span b{color:var(--gold);font-size:14px;margin-right:6px}
+.sh-types{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
+.sh-type{padding:10px 8px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2);border-radius:6px;text-align:center;font-size:11px;cursor:pointer;transition:.2s}
+.sh-type:hover{background:rgba(201,168,76,.15);border-color:var(--gold)}
+.sh-type.active{background:rgba(201,168,76,.25);border-color:var(--gold);box-shadow:0 0 0 2px var(--gold)}
+.sh-type .icon{font-size:20px;display:block;margin-bottom:4px}
+.sh-areas{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:10px 0}
+.sh-area{padding:8px 6px;background:rgba(155,89,182,.06);border:1px solid rgba(155,89,182,.2);border-radius:6px;text-align:center;font-size:10px}
+.sh-area b{display:block;font-size:11px;color:#9b59b6;margin-bottom:4px}
+.sh-items{columns:2;column-gap:14px;margin:10px 0;font-size:12px;line-height:1.8}
+.sh-items li{break-inside:avoid;padding:6px 8px;background:rgba(39,174,96,.06);border-radius:4px;margin-bottom:4px;border-left:3px solid #27ae60;list-style:none}
+.sh-items li b{color:#27ae60;margin-right:4px}
+.sh-shas{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:10px 0}
+.sh-sha{padding:8px 6px;background:rgba(231,76,60,.06);border:1px solid rgba(231,76,60,.2);border-radius:6px;text-align:center;font-size:10px}
+.sh-sha b{display:block;font-size:12px;color:#e74c3c;margin-bottom:4px}
+.sh-days{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.sh-day{padding:6px 10px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.3);border-radius:14px;font-size:11px}
+.sh-day b{color:var(--gold);margin-right:4px}
+.sh-verdict{margin-top:12px;padding:12px;background:rgba(0,0,0,.2);border-radius:8px;border:1px dashed var(--gold);font-size:12px;line-height:1.8}
+.sh-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+@media(max-width:768px){.sh-types,.sh-shas{grid-template-columns:repeat(3,1fr)}.sh-areas{grid-template-columns:repeat(3,1fr)}.sh-items{columns:1}}
+
 </style>
 </style>
 </style>
@@ -6935,6 +6960,42 @@ function generateArchiveDetail(){
   document.getElementById("archiveDetailResult").innerHTML = h;
 }
 
+/* ===== R34-C 门店招财化解引擎 ===== */
+var SHOP_TYPES_R34C={"catering":{"name":"餐饮","areas":["收银台","迎客位","厨房","仓库","卫生间"],"items":["收银台摆财神","门口摆貔貅","收银后挂五帝钱","吧台摆招财树","厨房挂辟邪图","墙面挂红辣椒串","餐桌摆红色桌布","灯用暖黄"],"shas":["穿堂","厨房压","油烟冲","异味冲","反光"],"priority":["穿堂","油烟冲","反光","厨房压","异味冲"]},"retail":{"name":"零售","areas":["收银台","迎客位","试衣间","仓库","卫生间"],"items":["收银台水晶球","迎客位招财猫","入口摆流水","货架摆红地毯","试衣间圆镜","仓库挂红灯","墙面摆鲜花","门口地毯红"],"shas":["穿堂","门冲","楼梯压","墙角尖","反弓"],"priority":["穿堂","门冲","楼梯压","反弓","墙角尖"]},"beauty":{"name":"美容","areas":["收银台","迎客位","护理室","仓库","卫生间"],"items":["迎客位摆香水瓶","收银台圆镜","护理室摆桃花","墙上挂芙蓉图","梳妆台摆粉晶","灯用柔光","桌布粉色","门挂珠帘"],"shas":["穿堂","门冲","梁压","反光","镜对门"],"priority":["穿堂","梁压","镜对门","门冲","反光"]},"medical":{"name":"医美","areas":["收银台","迎客位","诊室","手术室","卫生间"],"items":["诊室摆白水晶","迎客位圆镜","手术室清净","墙挂天使图","桌摆白百合","门口地毯白","灯白光","桌布白"],"shas":["穿堂","门冲","梁压","反光","镜对门"],"priority":["穿堂","梁压","镜对门","门冲","反光"]},"education":{"name":"教育","areas":["收银台","迎客位","教室","办公室","卫生间"],"items":["迎客位摆文昌塔","教室摆书架","收银台摆绿植","墙上挂孔子像","教室挂旭日东升图","门口摆地毯","灯用白光","桌布蓝"],"shas":["穿堂","门冲","楼梯压","反弓","梁压"],"priority":["穿堂","楼梯压","梁压","门冲","反弓"]},"service":{"name":"服务","areas":["收银台","迎客位","工位","仓库","卫生间"],"items":["工位摆文昌塔","迎客位摆铜像","收银台摆水晶","墙上挂山水","门口挂红灯","工位后挂靠山图","灯白光","桌布深蓝"],"shas":["穿堂","门冲","楼梯压","反弓","梁压"],"priority":["穿堂","楼梯压","梁压","门冲","反弓"]},"online":{"name":"网店","areas":["工作室","迎客服","打包区","库存","卫生间"],"items":["工作室摆文昌塔","电脑后挂山水","桌面摆铜貔貅","墙上挂财神图","灯用白光","桌布绿","门口地毯红","绿植摆东南"],"shas":["穿堂","门冲","梁压","反弓","墙角尖"],"priority":["穿堂","门冲","梁压","反弓","墙角尖"]},"mixed":{"name":"混合","areas":["收银台","迎客位","主营业区","辅助区","卫生间"],"items":["收银台摆招财猫","迎客位摆流水","主营业区摆水晶","墙上挂财神图","门口挂红灯","灯用暖光","地毯红黄","绿植东南"],"shas":["穿堂","门冲","楼梯压","反弓","梁压"],"priority":["穿堂","楼梯压","梁压","门冲","反弓"]}};
+var SX_FACE_R34C={"子":{"best":"南","good":"东南","avoid":"北","bad":"西南"},"丑":{"best":"东北","good":"南","avoid":"南","bad":"西南"},"寅":{"best":"东南","good":"东北","avoid":"北","bad":"西南"},"卯":{"best":"东","good":"东南","avoid":"西","bad":"西北"},"辰":{"best":"南","good":"东南","avoid":"北","bad":"西"},"巳":{"best":"东南","good":"南","avoid":"北","bad":"西南"},"午":{"best":"南","good":"东南","avoid":"北","bad":"西南"},"未":{"best":"南","good":"东南","avoid":"北","bad":"西南"},"申":{"best":"东南","good":"南","avoid":"东北","bad":"西"},"酉":{"best":"西","good":"西北","avoid":"东","bad":"东南"},"戌":{"best":"南","good":"东南","avoid":"东北","bad":"西"},"亥":{"best":"北","good":"东北","avoid":"南","bad":"西"}};
+var SHOP_60_JIAZI_R34C=["甲子（满日·大吉）","甲寅（成日·大吉）","甲辰（开日·大吉）","乙巳（定日·大吉）","丙午（成日·大吉）","丁未（开日·大吉）","戊申（满日·大吉）","己酉（定日·大吉）","庚戌（成日·大吉）","辛亥（开日·大吉）","壬子（满日·大吉）","癸丑（成日·大吉）","乙卯（开日·大吉）","丙辰（定日·大吉）","丁巳（成日·大吉）","戊午（满日·大吉）","己未（开日·大吉）","庚申（定日·大吉）","辛酉（成日·大吉）","壬戌（满日·大吉）","癸亥（开日·大吉）"];
+var SHOP_EVENT_R34C={"开业":["甲子","甲寅","甲辰","戊申"],"促销":["乙巳","丁未","己酉","辛亥"],"装修":["丙午","庚戌","壬子","癸丑"]};
+function generateShopFengshui(){
+  var shopType=document.getElementById("shopType").value;
+  var sx=document.getElementById("shopSx").value;
+  var face=document.getElementById("shopFacing").value;
+  var year=document.getElementById("shopYear").value;
+  var conf=SHOP_TYPES_R34C[shopType];
+  var sxFace=SX_FACE_R34C[sx];
+  var directionScore=face===sxFace.best?95:(face===sxFace.good?85:(face===sxFace.avoid?55:75));
+  var directionClass=directionScore>=85?"good":(directionScore<=60?"warn":"");
+  var directionText=directionScore>=90?"🟢 极佳":(directionScore>=75?"🟡 良":(directionScore>=60?"🟠 中":"🔴 欠佳"));
+  var eventDays=SHOP_EVENT_R34C["开业"];
+  var h="<div class=\"sh-result\">";
+  h+="<div class=\"sh-summary\"><span>营业类型<b>"+conf.name+"</b></span><span>掌柜生肖<b>"+sx+"</b></span><span>坐向<b>"+face+"</b></span><span>年份<b>"+year+"</b></span></div>";
+  h+="<div style=\"padding:10px;background:rgba(0,0,0,.15);border-radius:8px;margin-bottom:12px;border-left:3px solid "+directionClass==="good"?"#27ae60":(directionClass==="warn"?"#e74c3c":"var(--gold)")+"\"><div style=\"font-size:11px;line-height:1.8\"><b style=\"color:var(--gold)\">📍 方位判定：</b>掌柜坐向<b style=\"color:"+(directionClass==="good"?"#27ae60":(directionClass==="warn"?"#e74c3c":"var(--gold)"))+"\">"+face+"</b>方 · 与生肖<b>"+sx+"</b>本命关系：<b>"+(face===sxFace.best?"最吉":(face===sxFace.good?"小吉":(face===sxFace.avoid?"欠吉":(face===sxFace.bad?"大凶":"中性"))))+"</b>（"+directionText+" · "+directionScore+"分）<br><span style=\"opacity:.7\">· 本命最吉：<b>"+sxFace.best+"</b> 方 · 小吉：<b>"+sxFace.good+"</b> 方 · 欠吉：<b>"+sxFace.avoid+"</b> 方 · 大凶：<b>"+sxFace.bad+"</b> 方</span></div></div>";
+  h+="<div style=\"margin-top:10px\"><b style=\"color:#9b59b6;font-size:12px\">🏪 5 大化区布局（"+conf.name+"专属）</b></div><div class=\"sh-areas\">";
+  conf.areas.forEach(function(a){h+="<div class=\"sh-area\"><b>"+a+"</b>需"+(a==="收银台"?"聚财":(a==="迎客位"?"纳气":(a==="厨房"?"避煞":(a==="仓库"?"藏财":"避污"))))+"</div>";});
+  h+="</div>";
+  h+="<div style=\"margin-top:10px\"><b style=\"color:#27ae60;font-size:12px\">💰 招财 8 件套（依《阳宅三要》）</b></div><ul class=\"sh-items\">";
+  conf.items.forEach(function(it){h+="<li><b>·</b>"+it+"</li>";});
+  h+="</ul>";
+  h+="<div style=\"margin-top:10px\"><b style=\"color:#e74c3c;font-size:12px\">⚠ 化煞 5 类（按优先级排序）</b></div><div class=\"sh-shas\">";
+  conf.priority.forEach(function(s,i){h+="<div class=\"sh-sha\"><b>P"+(i+1)+"</b>"+s+"</div>";});
+  h+="</div>";
+  h+="<div style=\"margin-top:10px\"><b style=\"color:var(--gold);font-size:12px\">📅 60 甲子开业吉日（"+year+"年"+conf.name+"推荐）</b></div><div class=\"sh-days\">";
+  SHOP_60_JIAZI_R34C.slice(0,8).forEach(function(d){h+="<div class=\"sh-day\"><b>"+d.split("（")[0]+"</b>"+d.split("（")[1].replace("）","")+"</div>";});
+  h+="</div>";
+  h+="<div class=\"sh-verdict\"><b style=\"color:var(--gold)\">🏪 门店化解总纲：</b><br>"+conf.name+"门店坐<b>"+face+"</b>方，掌柜属<b>"+sx+"</b>，本命吉位为<b>"+sxFace.best+"</b>。综合判定：<b style=\"color:"+(directionScore>=85?"#27ae60":(directionScore<=60?"#e74c3c":"var(--gold)"))+"\">"+directionText+"</b>（"+directionScore+"分）。<br>化解要点：① 收银台守财位 ② 迎客位纳吉气 ③ 化煞以<b>"+conf.priority[0]+"</b>为首 ④ 开业择<b>"+eventDays[0]+"</b>等 4 个甲子日 ⑤ 招财 8 件套择日布置。</div>";
+  h+="<div class=\"sh-source\">📜 综合《阳宅三要》《八宅明镜》《玄空飞星》《天星择日》《黄帝宅经》《鲁班经》《协纪辨方书》《择日玄机》共 8 部古籍</div>";
+  h+="</div>";
+  document.getElementById("shopResult").innerHTML=h;
+}
 </script>
 
 <script src="js/ui-toast.js" defer></script>
@@ -7200,6 +7261,23 @@ function computeXuanKong(){
   </div>
 </div>
 <!-- section-double-pan END -->
+
+<!-- section-shop-fengshui · R34-C 化解·门店招财 START -->
+<div class="fs-section" id="section-shop-fengshui">
+  <div class="input-card">
+    <h3>🏪 化解·门店招财（8 类营业·5 大化区·招财 8 件套·60 甲子开业吉日）</h3>
+    <p style="font-size:12px;opacity:.6;margin:8px 0;line-height:1.7">门店招财化解：依《阳宅三要》《八宅明镜》《玄空飞星》《天星择日》《黄帝宅经》《鲁班经》《协纪辨方书》《择日玄机》八部古籍整理。涵盖 8 类营业形态、5 大化区布局、招财 8 件套、化煞 5 类、12 生肖×8 方位适配、60 甲子开业吉日。</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin:10px 0">
+      <div><label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">营业类型</label><select id="shopType" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit"><option value="catering">🍴 餐饮</option><option value="retail">🛍 零售</option><option value="beauty">💇 美容</option><option value="medical">💉 医美</option><option value="education">📚 教育</option><option value="service">🔧 服务</option><option value="online">💻 网店</option><option value="mixed">🏬 混合</option></select></div>
+      <div><label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">掌柜生肖</label><select id="shopSx" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit"><option value="子">子（鼠）</option><option value="丑">丑（牛）</option><option value="寅">寅（虎）</option><option value="卯">卯（兔）</option><option value="辰">辰（龙）</option><option value="巳">巳（蛇）</option><option value="午">午（马）</option><option value="未">未（羊）</option><option value="申">申（猴）</option><option value="酉">酉（鸡）</option><option value="戌">戌（狗）</option><option value="亥">亥（猪）</option></select></div>
+      <div><label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">坐向方位</label><select id="shopFacing" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit"><option value="东">东</option><option value="南">南</option><option value="西">西</option><option value="北">北</option><option value="东南">东南</option><option value="东北">东北</option><option value="西南">西南</option><option value="西北">西北</option></select></div>
+      <div><label style="display:block;font-size:12px;opacity:.7;margin-bottom:4px">开业年份</label><select id="shopYear" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit"><option value="2026">2026 丙午</option><option value="2027">2027 丁未</option><option value="2028">2028 戊申</option><option value="2029">2029 己酉</option><option value="2030">2030 庚戌</option></select></div>
+    </div>
+    <button class="btn" onclick="generateShopFengshui()" style="margin-top:14px">🏪 门店招财·全维度化解</button>
+    <div id="shopResult"></div>
+  </div>
+</div>
+<!-- section-shop-fengshui END -->
 
 <!-- section-archive-detail · 第三十二轮 START -->
 <div class="fs-section" id="section-archive-detail">
