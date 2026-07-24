@@ -376,6 +376,8 @@
 </style>
 <script src="js/ui-toast.js" defer></script>
 <script src="js/secure-storage.js"></script>
+<script src="components/toast.js"></script>
+<script src="components/tab.js"></script>
 </head>
 <style>
 /* 跨文件导航栏 */
@@ -422,20 +424,9 @@
 
 <div class="container">
 
-  <!-- ====== 养生篇Tab系统 ====== -->
-  <div class="tab-bar">
-    <button class="tab-btn" onclick="switchTab('overview')">📐 五行总览</button>
-    <button class="tab-btn active" onclick="switchTab('report')">📤 上传报告</button>
-    <button class="tab-btn" onclick="switchTab('ai')">🤖 AI解读</button>
-    <button class="tab-btn" onclick="switchTab('food')">🌿 食疗配方</button>
-    <button class="tab-btn" onclick="switchTab('exercise')">🏃 运动调理</button>
-    <button class="tab-btn" onclick="switchTab('checkin')">✅ 每日打卡</button>
-    <button class="tab-btn" onclick="switchTab('bazi')">🔮 八字分析</button>
-    <button class="tab-btn" onclick="switchTab('symptom')">🔍 症状查询</button>
-  </div>
-
-  <!-- ====== Tab1: 五行总览 ====== -->
-  <div class="tab-panel active" id="tab-overview">
+  <!-- ====== 养生篇Tab系统（已迁移到 <ml-tab> Web Component） ====== -->
+  <ml-tab id="mainTab" active="1">
+    <ml-tab-pane label="📐 五行总览" id="tab-overview">
     <div class="section-title">📐 五行 → 人体 → 调理 关系总览</div>
     <div class="chain-container">
       <div class="chain-title">点击任一环节，查看详细解释</div>
@@ -447,10 +438,8 @@
     </div>
     <div class="section-title">📋 五行体质对照表</div>
     <div class="detail-grid" id="detailGrid"></div>
-  </div>
-
-  <!-- ====== Tab2: 上传报告 ====== -->
-  <div class="tab-panel" id="tab-report">
+    </ml-tab-pane>
+    <ml-tab-pane label="📤 上传报告" id="tab-report">
     
     <!-- ====== 🤖 AI智能解读卡片 ====== -->
     <div class="ai-interpret-card" id="aiInterpretCard">
@@ -551,10 +540,49 @@
 
     <!-- 报告解读结果 -->
     <div class="report-result" id="reportResult"></div>
-  </div>
-
-  <!-- ====== Tab3: 食疗配方 ====== -->
-  <div class="tab-panel" id="tab-food">
+    </ml-tab-pane>
+    <ml-tab-pane label="🤖 AI解读" id="tab-ai">
+    <div class="ai-interpret-card" style="margin-top:20px">
+      <div class="ant-badge">对标蚂蚁阿福专业水准</div>
+      <h2>🤖 AI智能解读体检报告</h2>
+      <p class="subtitle">上传体检报告图片，获取AI大模型专业解读（对标蚂蚁阿福App水准）</p>
+      
+      <div style="background:rgba(20,18,14,0.95);color:var(--text);border-radius:14px;padding:24px;margin-top:20px">
+        <div style="display:flex;gap:20px;flex-wrap:wrap">
+          <div style="flex:1;min-width:280px">
+            <h4 style="color:var(--title);margin-bottom:12px;font-size:16px">📋 使用说明</h4>
+            <div style="font-size:14px;line-height:2;color:var(--muted)">
+              <p>1️⃣ <strong>上传报告</strong>：拖拽或点击上传体检报告图片</p>
+              <p>2️⃣ <strong>自动分析</strong>：AI大模型自动解读，无需手动操作</p>
+              <p>3️⃣ <strong>查看结果</strong>：直接查看专业解读报告和调理方案</p>
+            </div>
+          </div>
+          <div style="flex:1;min-width:280px">
+            <h4 style="color:var(--title);margin-bottom:12px;font-size:16px">✨ 专业解读包含</h4>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <span class="tag tag-primary">📋 报告解读摘要</span>
+              <span class="tag tag-primary">🔬 各项指标解读</span>
+              <span class="tag tag-primary">🌿 中医体质辨识</span>
+              <span class="tag tag-success">🍲 食疗调理方案</span>
+              <span class="tag tag-success">🏃 运动调理方案</span>
+              <span class="tag tag-warn">📋 21天打卡计划</span>
+              <span class="tag tag-danger">⚠️ 就医建议</span>
+            </div>
+            <div style="margin-top:16px;padding:14px;background:rgba(102,126,234,.06);border-radius:10px;border-left:3px solid var(--cyan2)">
+              <p style="font-size:13px;color:var(--muted);line-height:1.7">
+                <strong style="color:var(--title)">💡 提示：</strong>上传图片后AI将自动分析，无需手动操作。本功能调用本地大模型API，需确保本机AI服务正在运行。如遇网络错误，请检查OpenClaw服务状态。
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div style="margin-top:20px;text-align:center">
+          <button class="btn" onclick="switchTab('report')" style="background:linear-gradient(135deg,var(--cyan2),var(--violet));color:var(--paper);font-size:16px;padding:14px 36px">📤 前往上传报告，开始AI解读</button>
+        </div>
+      </div>
+    </div>
+    </ml-tab-pane>
+    <ml-tab-pane label="🌿 食疗配方" id="tab-food">
     <div class="mod-banner">
       <div class="mod-banner-icon">🌿</div>
       <div>
@@ -593,10 +621,45 @@
         <button class="btn-outline" onclick="applyWeeklyPlan()">📋 一键导入本周食谱至今日打卡</button>
       </div>
     </div>
-  </div>
-
-  <!-- ====== Tab4: 每日打卡 ====== -->
-  <div class="tab-panel" id="tab-checkin">
+    </ml-tab-pane>
+    <ml-tab-pane label="🏃 运动调理" id="tab-exercise">
+    <div class="exercise-module">
+      <div class="mod-header">
+        <div class="mod-icon">🏃</div>
+        <div>
+          <h2 class="mod-title">运动调理方案</h2>
+          <p style="font-size:13px;color:var(--muted);margin-top:2px">根据体质定制每周运动计划，附推荐运动库与禁忌提示</p>
+        </div>
+        <span class="ant-badge">对标蚂蚁阿福专业水准</span>
+      </div>
+      
+      <!-- 每周运动计划 -->
+      <div style="margin-bottom:24px">
+        <h4 style="color:var(--title);font-size:16px;margin-bottom:14px;display:flex;align-items:center;gap:8px">📅 本周运动计划表</h4>
+        <div class="exercise-week-grid" id="exerciseWeekGrid"></div>
+      </div>
+      
+      <!-- 推荐运动库 -->
+      <div style="margin-bottom:24px">
+        <h4 style="color:var(--title);font-size:16px;margin-bottom:14px;display:flex;align-items:center;gap:8px">📦 推荐运动类型库</h4>
+        <div class="exercise-library" id="exerciseLibrary"></div>
+      </div>
+      
+      <!-- 运动禁忌 -->
+      <div style="background:rgba(230,126,34,.06);border:1px solid rgba(230,126,34,.2);border-radius:12px;padding:18px">
+        <h4 style="color:var(--warn);font-size:15px;margin-bottom:10px;display:flex;align-items:center;gap:8px">⚠️ 运动禁忌（根据报告异常指标自动提示）</h4>
+        <div id="exerciseWarnings" style="font-size:13px;color:var(--muted);line-height:1.8">
+          <p>📤 请先上传体检报告或完成AI解读，系统将根据您的指标自动提示运动禁忌。</p>
+        </div>
+      </div>
+      
+      <!-- 导入打卡按钮 -->
+      <div style="margin-top:20px;text-align:center">
+        <button class="btn btn-success" onclick="importExerciseToCheckin()">📋 将本周运动计划导入今日打卡</button>
+      </div>
+    </div>
+    </ml-tab-pane>
+    <ml-tab-pane label="✅ 每日打卡" id="tab-checkin">
     <div class="mod-banner">
       <div class="mod-banner-icon">✅</div>
       <div>
@@ -653,92 +716,8 @@
         <button class="btn-outline btn-sm" style="border-color:var(--danger);color:var(--danger)" onclick="clearHistory()">🗑️ 清空历史</button>
       </div>
     </div>
-  </div>
-
-  <!-- ====== Tab: 🤖 AI解读 ====== -->
-  <div class="tab-panel" id="tab-ai">
-    <div class="ai-interpret-card" style="margin-top:20px">
-      <div class="ant-badge">对标蚂蚁阿福专业水准</div>
-      <h2>🤖 AI智能解读体检报告</h2>
-      <p class="subtitle">上传体检报告图片，获取AI大模型专业解读（对标蚂蚁阿福App水准）</p>
-      
-      <div style="background:rgba(20,18,14,0.95);color:var(--text);border-radius:14px;padding:24px;margin-top:20px">
-        <div style="display:flex;gap:20px;flex-wrap:wrap">
-          <div style="flex:1;min-width:280px">
-            <h4 style="color:var(--title);margin-bottom:12px;font-size:16px">📋 使用说明</h4>
-            <div style="font-size:14px;line-height:2;color:var(--muted)">
-              <p>1️⃣ <strong>上传报告</strong>：拖拽或点击上传体检报告图片</p>
-              <p>2️⃣ <strong>自动分析</strong>：AI大模型自动解读，无需手动操作</p>
-              <p>3️⃣ <strong>查看结果</strong>：直接查看专业解读报告和调理方案</p>
-            </div>
-          </div>
-          <div style="flex:1;min-width:280px">
-            <h4 style="color:var(--title);margin-bottom:12px;font-size:16px">✨ 专业解读包含</h4>
-            <div style="display:flex;flex-wrap:wrap;gap:8px">
-              <span class="tag tag-primary">📋 报告解读摘要</span>
-              <span class="tag tag-primary">🔬 各项指标解读</span>
-              <span class="tag tag-primary">🌿 中医体质辨识</span>
-              <span class="tag tag-success">🍲 食疗调理方案</span>
-              <span class="tag tag-success">🏃 运动调理方案</span>
-              <span class="tag tag-warn">📋 21天打卡计划</span>
-              <span class="tag tag-danger">⚠️ 就医建议</span>
-            </div>
-            <div style="margin-top:16px;padding:14px;background:rgba(102,126,234,.06);border-radius:10px;border-left:3px solid var(--cyan2)">
-              <p style="font-size:13px;color:var(--muted);line-height:1.7">
-                <strong style="color:var(--title)">💡 提示：</strong>上传图片后AI将自动分析，无需手动操作。本功能调用本地大模型API，需确保本机AI服务正在运行。如遇网络错误，请检查OpenClaw服务状态。
-              </p>
-            </div>
-          </div>
-        </div>
-        
-        <div style="margin-top:20px;text-align:center">
-          <button class="btn" onclick="switchTab('report')" style="background:linear-gradient(135deg,var(--cyan2),var(--violet));color:var(--paper);font-size:16px;padding:14px 36px">📤 前往上传报告，开始AI解读</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== Tab: 🏃 运动调理 ====== -->
-  <div class="tab-panel" id="tab-exercise">
-    <div class="exercise-module">
-      <div class="mod-header">
-        <div class="mod-icon">🏃</div>
-        <div>
-          <h2 class="mod-title">运动调理方案</h2>
-          <p style="font-size:13px;color:var(--muted);margin-top:2px">根据体质定制每周运动计划，附推荐运动库与禁忌提示</p>
-        </div>
-        <span class="ant-badge">对标蚂蚁阿福专业水准</span>
-      </div>
-      
-      <!-- 每周运动计划 -->
-      <div style="margin-bottom:24px">
-        <h4 style="color:var(--title);font-size:16px;margin-bottom:14px;display:flex;align-items:center;gap:8px">📅 本周运动计划表</h4>
-        <div class="exercise-week-grid" id="exerciseWeekGrid"></div>
-      </div>
-      
-      <!-- 推荐运动库 -->
-      <div style="margin-bottom:24px">
-        <h4 style="color:var(--title);font-size:16px;margin-bottom:14px;display:flex;align-items:center;gap:8px">📦 推荐运动类型库</h4>
-        <div class="exercise-library" id="exerciseLibrary"></div>
-      </div>
-      
-      <!-- 运动禁忌 -->
-      <div style="background:rgba(230,126,34,.06);border:1px solid rgba(230,126,34,.2);border-radius:12px;padding:18px">
-        <h4 style="color:var(--warn);font-size:15px;margin-bottom:10px;display:flex;align-items:center;gap:8px">⚠️ 运动禁忌（根据报告异常指标自动提示）</h4>
-        <div id="exerciseWarnings" style="font-size:13px;color:var(--muted);line-height:1.8">
-          <p>📤 请先上传体检报告或完成AI解读，系统将根据您的指标自动提示运动禁忌。</p>
-        </div>
-      </div>
-      
-      <!-- 导入打卡按钮 -->
-      <div style="margin-top:20px;text-align:center">
-        <button class="btn btn-success" onclick="importExerciseToCheckin()">📋 将本周运动计划导入今日打卡</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== Tab5: 八字分析 ====== -->
-  <div class="tab-panel" id="tab-bazi">
+    </ml-tab-pane>
+    <ml-tab-pane label="🔮 八字分析" id="tab-bazi">
     <div class="mod-banner">
       <div class="mod-banner-icon">🔮</div>
       <div>
@@ -775,10 +754,8 @@
       </div>
     </div>
     <div class="result-area" id="resultAreaBazi" style="display:none"></div>
-  </div>
-
-  <!-- ====== Tab6: 症状查询 ====== -->
-  <div class="tab-panel" id="tab-symptom">
+    </ml-tab-pane>
+    <ml-tab-pane label="🔍 症状查询" id="tab-symptom">
     <div class="mod-banner">
       <div class="mod-banner-icon">🔍</div>
       <div>
@@ -795,8 +772,8 @@
       <div class="disease-tags" id="diseaseTags"></div>
     </div>
     <div class="result-area" id="resultAreaSymptom" style="display:none"></div>
-  </div>
-
+    </ml-tab-pane>
+  </ml-tab>
 </div>
 
 <!-- 通用结果展示区（八字+症状） -->
@@ -812,8 +789,6 @@
   <div class="section-title">📋 五行体质对照表</div>
   <div class="detail-grid" id="detailGrid2"></div>
 </div>
-
-<div class="toast" id="toast"></div>
 
 <script>
 // ═══════════════════════════════════════════════
@@ -2361,11 +2336,10 @@ function analyzeByDisease(){
 // ═══════════════════════════════════════════════
 // Toast
 // ═══════════════════════════════════════════════
+const __toast=document.getElementById('appToast');
 function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2800);
+  if(__toast&&__toast.info){__toast.info(msg);}
+  else{console.log('[toast]',msg);}
 }
 
 // ═══════════════════════════════════════════════
@@ -2787,28 +2761,32 @@ function importExerciseToCheckin(){
 // Tab切换（更新版）
 // ═══════════════════════════════════════════════
 function switchTab(name){
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  
-  const tabOrder=['overview','report','ai','food','exercise','checkin','bazi','symptom'];
-  document.querySelectorAll('.tab-btn').forEach((b,i)=>{if(tabOrder[i]===name){b.classList.add('active')}});
-  
-  const panel=document.getElementById('tab-'+name);
-  if(panel) panel.classList.add('active');
-  
-  // Show/hide shared result
-  const showShared = ['bazi','symptom'].includes(name);
-  const sharedEl=document.getElementById('sharedResult');
-  if(sharedEl) sharedEl.style.display = showShared ? 'block' : 'none';
-  
-  const detailEl=document.getElementById('detailSection');
-  if(detailEl) detailEl.style.display = showShared ? 'none' : 'block';
-  
-  if(name==='checkin'){renderCheckin();}
-  if(name==='food'){renderRecipeLibrary();renderWeeklyPlan();}
-  if(name==='exercise'){renderExerciseWeekGrid();renderExerciseLibrary();}
-  if(name==='ai'){/* AI解读Tab已渲染 */}
+  const tab=document.getElementById('mainTab');
+  if(!tab) return;
+  const idx=['overview','report','ai','food','exercise','checkin','bazi','symptom'].indexOf(name);
+  if(idx<0) return;
+  tab.setActive(idx);
+  // 副作用全部交给 tab-change 事件监听器统一处理（避免双调）
 }
+// ml-tab change 事件监听：处理 show/hide + render 副作用
+document.addEventListener('DOMContentLoaded',function(){
+  const tab=document.getElementById('mainTab');
+  if(tab){
+    tab.addEventListener('tab-change',function(e){
+      var labels=['overview','report','ai','food','exercise','checkin','bazi','symptom'];
+      var name=labels[e.detail.index];
+      if(!name) return;
+      var showShared=['bazi','symptom'].includes(name);
+      var sharedEl=document.getElementById('sharedResult');
+      if(sharedEl) sharedEl.style.display=showShared?'block':'none';
+      var detailEl=document.getElementById('detailSection');
+      if(detailEl) detailEl.style.display=showShared?'none':'block';
+      if(name==='checkin'){renderCheckin();}
+      if(name==='food'){renderRecipeLibrary();renderWeeklyPlan();}
+      if(name==='exercise'){renderExerciseWeekGrid();renderExerciseLibrary();}
+    });
+  }
+});
 
 // ═══════════════════════════════════════════════
 // API 网关（统一走 8920 后端代理，不直接调外网）
@@ -2837,7 +2815,7 @@ renderExerciseLibrary();
   五、孕妇、哺乳期女性、婴幼儿、慢性病及重症患者<strong>严禁</strong>参照本平台建议自行调理。
 </div>
 
-<div class="toast" id="toast"></div>
+<ml-toast id="appToast" position="top"></ml-toast>
 
 <div class="feature-nav-bar">
   <div style="max-width:1100px;margin:0 auto;padding:14px 20px">

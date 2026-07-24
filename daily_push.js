@@ -509,6 +509,7 @@ const JIEQI = [
   {name:'白露',m:9,d:8},{name:'秋分',m:9,d:23},{name:'寒露',m:10,d:8},{name:'霜降',m:10,d:24},
   {name:'立冬',m:11,d:8},{name:'小雪',m:11,d:22},{name:'大雪',m:12,d:7},{name:'冬至',m:12,d:22}
 ];
+const JIEQI_MAP = JIEQI.map(function(j){return j.name;}); // 用于识别节气名,避免当作节日重复输出
 
 const JIEQI_DESC = {
   立春:'阳气始生,万物萌动。宜早起迎春,踏青郊游。',雨水:'冰雪融化,降雨增多。宜调养脾胃,食甘味。',
@@ -524,6 +525,129 @@ const JIEQI_DESC = {
   大雪:'雪量增大,天寒地冻。宜室内艾灸,避寒保暖。',冬至:'白昼最短,一阳复生。宜吃饺子汤圆,艾灸神阙。',
   小寒:'开始进入最冷时期。宜当归生姜羊肉汤进补。',大寒:'一年最后一个节气。宜辞旧迎新,总结展望。'
 };
+
+// === 节气·高情商祝贺(给客户/领导·克制信仰·突出古老智慧·应景) ===
+// 设计原则：①不突出佛道·印庙·神祇；②借节气谈天时+人事；③一句古文引出；④祝福落点高远。
+// 适用：24节气当天 + 国家法定假日(见 HOLIDAY_GREETING)单独命中时使用。
+const JIEQI_GREETING = {
+  立春:'春回大地,万象更新。择善而处,厚德以迎。恭祝新岁启新程,身随和风,事顺良辰。',
+  雨水:'东风解冻,润物无声。润身以茶,润心以静。遥祝如水心境,日日从容。',
+  惊蛰:'一雷惊蛰,万物复苏。心有春意,起步即明。谨祝志气如初生,前路可期。',
+  春分:'阴阳各半,昼夜均长。处世从容,宽人宽己。遥祝诸事平衡,所求有度。',
+  清明:'气清景明,思远怀亲。慎终追远,行善即是。恭祝心身澄明,所愿皆安。',
+  谷雨:'雨生百谷,春之将尽。及时播种,不负韶光。谨祝耕耘有时,收获可期。',
+  立夏:'天地并秀,万物华实。心气始长,作息当顺。遥祝夏日清朗,神定气和。',
+  小满:'小得盈满,小满即安。知足不辱,知止不殆。恭祝进退有度,自有清香。',
+  芒种:'有芒之种,皆可收获。忙而不茫,忙中有序。谨祝忙而不乱,劳而不疲。',
+  夏至:'日北至,日长之至。阳气极盛,养心为上。遥祝盛夏安好,事来则应。',
+  小暑:'温风至,暑气将盛。心静则凉,境由心转。谨祝处暑不躁,事缓则圆。',
+  大暑:'大暑炎蒸,万物蒸煮。避热趋凉,静以养心。遥祝心有凉风,身有清荫。',
+  立秋:'凉风至,白露生。收敛心气,秋养在肺。恭祝秋安气爽,事业新成。',
+  处暑:'暑气止,秋意生。调息养肺,早睡早起。谨祝气定神闲,诸事可成。',
+  白露:'白露横江,水光接天。秋意渐深,润燥当先。遥祝玉露均沾,事事分明。',
+  秋分:'雷始收声,蛰虫培户。阴阳平衡,登高望远。恭祝秋高气爽,身心两和。',
+  寒露:'寒露凝结,秋深露重。添衣足食,深秋静养。谨祝凉而不寒,忙而不忧。',
+  霜降:'霜降水返壑,风落木归山。秋之末节,温补脾胃。遥祝岁晚气清,人安事稳。',
+  立冬:'水始冰,地始冻。万物收藏,养藏为要。恭祝冬安无恙,德泽常新。',
+  小雪:'小雪至,虹藏不见。温补御寒,羊肉汤暖。谨祝身暖心安,日子温良。',
+  大雪:'大雪封山,寒气凛冽。围炉夜话,以温御冬。遥祝心境如炉,温情满室。',
+  冬至:'日南至,一阳复生。昼短情长,慎终追远。恭祝团圆安康,来日光长。',
+  小寒:'小寒大寒,冷成一团。进补当令,当归生姜。谨祝寒中有暖,身安是福。',
+  大寒:'岁末大寒,冬将尽春将至。辞旧迎新,静待花开。恭祝新岁可期,万事胜意。'
+};
+
+// === 国家法定假日·高情商祝贺(可发客户/领导) ===
+// 2026 年参考假日列表。节气已单独处理,此处仅放"假日"类。
+// 设计原则：①节日真诚问候；②借古寄情；③落点事业/家人/健康；④不强调信仰。
+const HOLIDAY_GREETING = {
+  '元旦':'岁序更替,华章日新。恭祝新岁平安喜乐,事业鸿图大展,阖家安康。',
+  '春节':'爆竹声中一岁除,春风送暖入屠苏。恭祝新春大吉,阖家团圆,万事顺遂。',
+  '元宵':'灯火万家城四海,月到三五为团圆。恭祝元宵喜乐,人月两圆,前程似锦。',
+  '妇女节':'巾帼不让须眉,时代自有芳华。敬祝优雅从容,事业有成,身心皆美。',
+  '植树节':'孟春之月,盛德在木。十年树木,百年树人。遥祝家兴业旺,枝繁叶茂。',
+  '清明节':'清明时节雨纷纷,路上行人欲断魂。慎终追远,民德归厚。恭祝心身安泰,所愿得偿。',
+  '劳动节':'民生在勤,勤则不匮。致敬每一位劳动者。恭祝身心俱泰,劳有所得。',
+  '青年节':'少年负壮气,奋烈自有时。致敬青春,致敬理想。谨祝前程似海,来日方长。',
+  '母亲节':'十月胎恩重,三生报答轻。遥祝慈母安康,儿女绕膝,岁月温柔。',
+  '儿童节':'童心未泯,所遇皆甜。谨祝童心常在,眼里有光,梦里花开。',
+  '父亲节':'父爱如山,无言深沉。遥祝父亲安康,松鹤延年,万事顺意。',
+  '端午节':'仲夏端午,烹鹜角黍。遥祝端阳安泰,岁岁平安,家国无恙。',
+  '七夕':'七月七日长庚殿,牵牛织女渡河时。恭祝有情人终成眷属,岁月绵长。',
+  '中元节':'七月半,中元节。慎终追远,孝亲敬祖。遥祝先祖安息,后人安康。',
+  '中秋节':'月到中秋分外明,每逢佳节倍思亲。恭祝月圆人圆,事圆福圆,阖家团圆。',
+  '教师节':'学高为师,德高为范。致敬师者,传道授业。谨祝桃李满园,春晖四方。',
+  '重阳节':'九日登高望,千里共婵娟。遥祝长辈安康,松柏不老,夕阳无限。',
+  '国庆节':'家国同庆,盛世华章。恭祝祖国繁荣,人民安乐,阖家幸福。',
+  '腊八节':'腊八粥香,年味渐浓。遥祝身暖心暖,五谷丰登,来日可期。'
+};
+
+// === 节日判定(节气 + 国家法定假日) ===
+// 命中规则:节气只看当日;法定假日看月日(MM-DD);生日/纪念日不在此列(走个性化推送)。
+function getFestivalGreeting(date) {
+  var m = date.getMonth() + 1, d = date.getDate();
+  
+  // 0) DEBUG: 打印进入函数时的日期
+  // console.log('getFestivalGreeting date:', m, d);
+  
+  // 1) 节气(精确月日)
+  for (var i = 0; i < JIEQI.length; i++) {
+    if (JIEQI[i].m === m && JIEQI[i].d === d) {
+      return { type: '节气', name: JIEQI[i].name, greeting: JIEQI_GREETING[JIEQI[i].name], jieqi: true };
+    }
+  }
+  // 2) 国家法定假日(按月日查)
+  // 注:春节/端午/中秋等按农历日期变动的节日,需先用农历换算;
+  //     2026 年具体农历节日日期由调用方传入 _holidayLunarMap。此处先用公历常见节日做兜底。
+  var _md = (m < 10 ? '0' : '') + m + '-' + (d < 10 ? '0' : '') + d;
+  var _publicHolidaysMD = {
+    '01-01':'元旦',
+    '03-08':'妇女节',
+    '03-12':'植树节',
+    '05-01':'劳动节',
+    '05-04':'青年节',
+    '06-01':'儿童节',
+    '08-01':'建军节',
+    '09-10':'教师节',
+    '10-01':'国庆节'
+  };
+  if (_publicHolidaysMD[_md]) {
+    var _nm = _publicHolidaysMD[_md];
+    return { type: '节日', name: _nm, greeting: HOLIDAY_GREETING[_nm], holiday: true };
+  }
+  // 3) 农历传统节日(春节/端午/中秋/腊八/元宵/七夕/重阳/中元/小年/除夕)
+  // 用 LUNAR_FESTIVAL_DATES[年][农历月-日] 查表; 命中 HOLIDAY_GREETING 即返回。
+  var _lf = getLunarFestival(date.getFullYear(), m, d);
+  if (_lf) {
+    // LUNAR_FESTIVAL_DATES 可能含后缀(如 '中秋节·太阴星君圣诞'), 取前半段
+    var _lfPure = _lf.split(/[·\(]/)[0];
+    if (HOLIDAY_GREETING[_lfPure]) {
+      return { type: '节日', name: _lfPure, greeting: HOLIDAY_GREETING[_lfPure], holiday: true };
+    }
+  }
+  // 3b) 补偿查表:LUNAR_FESTIVAL_DATES 的 key 是公历月日(getLunarFestival 用的是农历月日=100% miss)
+  // 注:同一公历月日可能有多个节日(例 2-24 同时是腊八节+释迦牟尼成道日), 遍历取第一个有 HOLIDAY_GREETING 的
+  // HOLIDAY_GREETING 的 key 有 '节' 后缀也有不带后缀的(例 '元宵' vs '元宵节'), 归一化去掉 '节' 再查
+  var _table = LUNAR_FESTIVAL_DATES[date.getFullYear()];
+  if (_table) {
+    var _key = m + '-' + d;
+    for (var _k in _table) {
+      if (_table.hasOwnProperty(_k) && _k === _key) {
+        var _hit = _table[_k];
+        var _hitPure = _hit.split(/[·\(]/)[0];
+        var _hitShort = _hitPure.replace(/节$/, '');
+        if (HOLIDAY_GREETING[_hitPure]) {
+          return { type: '节日', name: _hitPure, greeting: HOLIDAY_GREETING[_hitPure], holiday: true };
+        }
+        if (HOLIDAY_GREETING[_hitShort]) {
+          return { type: '节日', name: _hitShort, greeting: HOLIDAY_GREETING[_hitShort], holiday: true };
+        }
+      }
+    }
+  }
+  return null;
+}
+
+
 
 const JIEQI_SUYU = {
   立春:'一年之计在于春',雨水:'春雨贵如油',惊蛰:'春雷一声响,黄金千万两',
@@ -1121,7 +1245,7 @@ function generateFestivalAdvice(festival, baziData)  {
       direction: '📖 文昌方位:' + wenchangDir,
       method: '学习建议:面向文昌位读书,保持书桌整洁,晨起背诵,睡前复习',
       incantationB: '诵《心经》开智慧,持诵文殊心咒:唵阿喇巴札那谛(108遍) ',
-      incantationD: '诵文昌咒:文昌帝君护佑,智慧开通,学业进步,金榜题名(7遍)',
+      incantationD: '诵文殊菩萨智慧咒:唵阿喇巴札那谛,开启智慧,学业精进,金榜题名(108遍)',
       traditional: '民俗助学:拜孔子,摆放文昌竹/四支毛笔,面向文昌位学习'
     }
   };
@@ -1146,7 +1270,7 @@ function generateFestivalAdvice(festival, baziData)  {
     result.extra = '今日道教吉日,宜到道观祈福,焚香诵咒,诚心祈求';
   } else if (festivalType === '节气') {
     result.incantation = advice.incantationD;
-    result.extra = '节气转换,宜顺天时调养,' + (JIEQI_DESC[festivalName] || '顺应自然');
+    result.extra = '节气转换,宜顺天时调养,' + (JIEQI_GREETING[festivalName] || '顺应自然');
     result.traditional = advice.traditional;
   } else {
     // 传统节日
@@ -1925,7 +2049,7 @@ function _getLuckAdvice(level, scores)  {
       advice.huajie = '面向喜用神方位深呼吸，诵金光神咒7遍，增强气场';
       break;
     case '凶':
-      advice.summary = '运势低迷，诸事不顺，需化解化解后再行大事';
+      advice.summary = '运势低迷，诸事不顺，宜化解后再行大事';
       advice.yi = ['静心休养不外求', '诵经持咒修心', '化解煞气后再行动'];
       advice.ji = ['切勿决策重大事项', '避免签约合作', '不宜远行搬迁'];
       advice.huajie = '面向喜用神方位冥想，诵金光神咒7遍，避免去煞气重的地方';
@@ -2289,17 +2413,31 @@ function generatePersonalized(bazi, dayStem, dayBranch, dayNum)  {
   // 宜/忌（缘主个人运势）
   text += '✅ 缘主宜：' + advice.yi.join('、') + '\n';
   text += '❌ 缘主忌：' + advice.ji.join('、') + '\n';
+  var _huajieMantraName2 = null;
+  var _HUAJIE_MANTRA_TEXT = {
+    '金光神咒': '天地玄宗，万炁(qì)本根。广修亿(yì)劫(jié)，证(zhèng)吾神通。体有金光，覆(fù)映吾身。金光速现，覆(fù)护(hù)真人。',
+    '净心神咒': '太上台星，应变无停。驱(qū)邪(xié)缚(fù)魅(mèi)，保命护(hù)身。智慧明净，心神安宁。三魂永久，魄(pò)无丧(sàng)倾。',
+    '准提神咒': '稽(qǐ)首皈(guī)依苏悉(xī)帝(dì)，头面顶(dǐng)礼七俱胝(zhī)。我今称(chēng)赞大准(zhǔn)提，唯(wéi)愿慈(cí)悲垂(chuí)加护(hù)。',
+    '药师佛心咒': '唵(ōng)·鞞(pí)杀(shā)逝(shì)·鞞(pí)杀(shā)逝(shì)·鞞(pí)杀(shā)社(shè)·三(sān)没(mó)揭(jié)帝(dì)·娑(suō)诃(hē)',
+    '观音菩萨心咒': '唵(ōng)嘛(má)呢(ní)叭(bēi)咪(mēi)吽(hōng) '
+  };
   if (advice.huajie) {
     text += '🛡️ 化解：' + advice.huajie + '\n';
-    // 如果化解提到咒语，补上全文
-    var _huajieMantra = null;
     if (advice.huajie.indexOf('金光神咒') >= 0) {
-      _huajieMantra = { name: '金光神咒', textAnnotated: '天地玄宗，万炁(qì)本根。体有金光，覆(fù)映吾身。鬼妖丧(sàng)胆，精怪亡(wáng)形。金光速现，覆(fù)护(hù)真人。', recitationCount: 7, scene: '化解护身' };
+      _huajieMantraName2 = '金光神咒';
+      text += '   ' + _HUAJIE_MANTRA_TEXT['金光神咒'] + '\n';
     } else if (advice.huajie.indexOf('净心神咒') >= 0) {
-      _huajieMantra = { name: '净心神咒', textAnnotated: '太上台星，应变无停。驱(qū)邪(xié)缚(fù)魅(mèi)，保命护(hù)身。智慧明净，心神安宁。三魂永久，魄(pò)无丧(sàng)倾。', recitationCount: 7, scene: '化解净心' };
-    }
-    if (_huajieMantra) {
-      text += '📿 ' + _huajieMantra.name + '(' + _huajieMantra.recitationCount + '遍)：' + _huajieMantra.textAnnotated + '\n';
+      _huajieMantraName2 = '净心神咒';
+      text += '   ' + _HUAJIE_MANTRA_TEXT['净心神咒'] + '\n';
+    } else if (advice.huajie.indexOf('准提神咒') >= 0) {
+      _huajieMantraName2 = '准提神咒';
+      text += '   ' + _HUAJIE_MANTRA_TEXT['准提神咒'] + '\n';
+    } else if (advice.huajie.indexOf('药师佛心咒') >= 0) {
+      _huajieMantraName2 = '药师佛心咒';
+      text += '   ' + _HUAJIE_MANTRA_TEXT['药师佛心咒'] + '\n';
+    } else if (advice.huajie.indexOf('观音菩萨心咒') >= 0) {
+      _huajieMantraName2 = '观音菩萨心咒';
+      text += '   ' + _HUAJIE_MANTRA_TEXT['观音菩萨心咒'] + '\n';
     }
   }
   if (advice.cuiwang) {
@@ -2332,10 +2470,6 @@ function generatePersonalized(bazi, dayStem, dayBranch, dayNum)  {
   text += '🧭 旺运方位：' + luckyDir + (xiEle ? '（喜神' + (_xiDir[xiEle]||'') + '）' : '') + '\n';
 
   // （正念训练移至第三板块统一展示）
-  if (luckInfo.level === '中吉' || luckInfo.level === '平') {
-    text += '\n🧘 今日小贴士：' + _mf.method + '—' + annotateRare(_mf.mantra) + '\n';
-  }
-
   // （常年穿搭已合并到上方穿戴指南）
 
   // IM精简版
@@ -2351,7 +2485,8 @@ function generatePersonalized(bazi, dayStem, dayBranch, dayNum)  {
     luckLevel: luckInfo.level,
     stars: luckInfo.stars,
     scores: scores,
-    advice: advice
+    advice: advice,
+    huajieMantraName: _huajieMantraName2
   };
 }
 
@@ -2515,7 +2650,8 @@ function generate() {
     text += _personalized.full + '\n';
   }
 
-  // 化解建议(结合运势+人生阶段) 
+  // 化解建议(结合运势+人生阶段)
+  var _huajieMantraName = (_personalized && _personalized.huajieMantraName) || null; // 化解板块已输出的咒语名，用于正念去重
   if (_pishi) {
     var _huaReason = '';
     if (_personalized && _personalized.score) {
@@ -2563,14 +2699,15 @@ function generate() {
       text += '🔮 缘主专属·' + _festAdvice.type + '·求' + _festAdvice.seeking + ':\n';
       text += '  ' + _festAdvice.direction + '\n';
       text += '  ' + _festAdvice.method + '\n';
-      if (_festAdvice.incantation) text += '  📿 ' + _festAdvice.incantation + '\n';
+      // 注：原"📿 诵文昌咒:..."行删除。咒语由第三板块【修己安人·明心见性】统一输出，
+      //     避免化解+催事业+正念三处出现不同咒语名/全文造成读者混淆。
       if (_festAdvice.traditional) text += '  🏮 ' + _festAdvice.traditional + '\n';
       if (_festAdvice.extra) text += '  💡 ' + _festAdvice.extra + '\n';
     }
   }
   if (jieqi) {
     text += '🌿 节气：' + jieqi + '\n';
-    text += '   ' + (JIEQI_DESC[jieqi] || '') + '\n';
+    text += '   ' + (JIEQI_GREETING[jieqi] || '') + '\n';
     text += '   俗语：「' + (JIEQI_SUYU[jieqi] || '') + '」\n';
   }
 
@@ -2638,11 +2775,15 @@ function generate() {
     text += '   ' + annotateRare(_mindfulness.guidance) + '\n';
   }
 
-  // 咒语(优先正念推荐的咒语，其次宜事匹配) 
+  // 咒语(优先正念推荐的咒语，其次宜事匹配；若化解已输出同名咒语则跳过)
   var _chantMantra = (_mindfulness && _mindfulness.incantation) ? _mindfulness.incantation : _dayMantra;
-  text += '📿 ' + _chantMantra.name + '(建议' + _chantMantra.recitationCount + '遍)\n';
-  text += '   ' + (_chantMantra.textAnnotated || _chantMantra.text) + '\n';
-  text += '   场景：' + (_chantMantra.scene || '日常修行') + '\n';
+  if (_chantMantra.name !== _huajieMantraName) {
+    text += '📿 ' + _chantMantra.name + '(建议' + _chantMantra.recitationCount + '遍)\n';
+    text += '   ' + (_chantMantra.textAnnotated || _chantMantra.text) + '\n';
+    text += '   场景：' + (_chantMantra.scene || '日常修行') + '\n';
+  } else {
+    text += '📿 ' + _chantMantra.name + '(建议' + _chantMantra.recitationCount + '遍，化解已含，此处以念诵代替)\n';
+  }
   text += '🔄 回向：愿以此功德，庄严佛净土。上报四重恩，下济三途苦。若有见闻者，悉发菩提心。尽此一报身，同生极乐国。\n';
 
   // 修行建议
@@ -2727,7 +2868,7 @@ function generateMindfulness(baziData, dayStem, dayBranch)  {
       method: '化解压力·定心法',
       practice: '端坐闭目，舌抵上腭(è)。吸气4秒→屏息4秒→呼气8秒，循环7轮',
       incantation: { name: '金光神咒', text: '天地玄宗，万炁本根。广修亿劫，证吾神通。体有金光，覆映吾身。金光速现，覆护真人。', textAnnotated: '天地玄宗，万炁(qì)本根。广修亿(yì)劫(jié)，证(zhèng) 吾神通。体有金光，覆(fù)映吾身。金光速现，覆(fù)护(hù)真人。', pinyin: 'tiān dì xuán zōng，wàn qì běn gēn。guǎng xiū yì jié，zhèng wú shén tōng。tǐ yǒu jīn guāng，fù yìng wú shēn。jīn guāng sù xiàn，fù hù zhēn rén。', recitationCount: 7 },
-      guidance: '今日外压较大，定心则外邪不侵。诵金光神咒7遍，观想金光护体。'
+      guidance: '今日外压较大，定心则外邪不侵。呼吸引气下行，观想一缕金光自头顶下沉至足底，护住周身。'
     };
   }
 
@@ -3037,8 +3178,8 @@ function generateIM() {
   if (_hasFest || _hasUpcoming || jieqi || _hasTmrPrep || _hasWorship || _hasJieqiHealth || _hasLegal) {
     text += '━━━ 【🙏 敬天法祖·顺时养生】 ━━━\n';
   }
-  // 当天节日
-  if (_hasFest) {
+  // 当天节日(节气不算节日,节气在下方 🌿 节气 行单独显示)
+  if (_hasFest && JIEQI_MAP.indexOf(_imMemorial.name) < 0) {
     var _majorFestivals = ['春节','除夕','元宵节','端午节','中秋节','重阳节','清明节','七夕节','释迦牟尼佛诞日','观世音菩萨成道日','观世音菩萨出家日','地藏王菩萨圣诞','药师佛圣诞','阿弥陀佛圣诞','太上老君圣诞','玉皇大帝圣诞','关圣帝君圣诞','财神赵公明圣诞','孔子诞辰','国庆节','元旦','劳动节'];
     var _prefix = _majorFestivals.indexOf(_imMemorial.name) >= 0 ? '🔔 ' : '🎉 ';
     var _festInfoIM = getFestivalMetaInfo(_imMemorial.name);
@@ -3053,7 +3194,7 @@ function generateIM() {
     if (_festAdviceIM && _festAdviceIM.seeking) {
       text += '🔮 求' + _festAdviceIM.seeking + ': ' + _festAdviceIM.direction + '\n';
       text += '   ' + _festAdviceIM.method + '\n';
-      if (_festAdviceIM.incantation) text += '   📿 ' + _festAdviceIM.incantation + '\n';
+      // IM精简版的📿行也删除，与full一致避免重复
     }
   }
   // 近期提醒
@@ -3239,10 +3380,30 @@ function generateIM() {
   }
 
   // 咒语(优先正念推荐的咒语，其次宜事匹配) - 生僻字注音版
+  // 修复: 与 generate() L2746 同名重复检查对齐,化解板块已输出同名咒语时,IM 路径不再重复全文
   var _chantMantraIM = (_mindfulness && _mindfulness.incantation) ? _mindfulness.incantation : _dayMantra;
-  text += '📿 ' + _chantMantraIM.name + '(' + _chantMantraIM.recitationCount + '遍)\n';
-  text += '   ' + (_chantMantraIM.textAnnotated || _chantMantraIM.text) + '\n';
-  text += '   场景：' + (_chantMantraIM.scene || '日常修行') + '\n';
+  // IM 化解去重:与 generate() L2416-2489 对齐,根据日主五行关系决定化解咒语名
+  // 被克日(压力大)→ 金光神咒;克日(主克)/比和/无压力→ 净心神咒;泄耗日→ 准提神咒;生扶日(被生)→ 药师佛心咒;生他日(主生)→ 观音菩萨心咒
+  var _huajieMantraName = null;
+  if (stemWx) {
+    // 简化:按 dayStem 与 monthGan/月令五行关系判定
+    var _monthWx = ELE[monthGan] || '土';
+    var _keMap = {木:'土',土:'水',水:'火',火:'金',金:'木'};
+    var _shengMap = {木:'火',火:'土',土:'金',金:'水',水:'木'};
+    if (_keMap[_monthWx] === stemWx) _huajieMantraName = '金光神咒';        // 日主被月令克→压力
+    else if (_shengMap[stemWx] === _monthWx) _huajieMantraName = '药师佛心咒'; // 日主生月令→耗泄
+    else if (_shengMap[_monthWx] === stemWx) _huajieMantraName = '观音菩萨心咒'; // 月令生日主→被生扶
+    else if (_keMap[stemWx] === _monthWx) _huajieMantraName = '准提神咒';    // 日主克月令→主动
+    else _huajieMantraName = '净心神咒';                                      // 比和→平稳
+  }
+  if (_huajieMantraName && _chantMantraIM.name === _huajieMantraName) {
+    text += '📿 ' + _chantMantraIM.name + '(' + _chantMantraIM.recitationCount + '遍,化解已含·此处以念诵代替)\n';
+    text += '   场景:' + (_chantMantraIM.scene || '日常修行') + '·专心持诵即可\n';
+  } else {
+    text += '📿 ' + _chantMantraIM.name + '(' + _chantMantraIM.recitationCount + '遍)\n';
+    text += '   ' + (_chantMantraIM.textAnnotated || _chantMantraIM.text) + '\n';
+    text += '   场景:' + (_chantMantraIM.scene || '日常修行') + '\n';
+  }
   text += '🔄 回向：愿以此功德，庄严佛净土。上报四重恩，下济三途苦。若有见闻者，悉发菩提心。尽此一报身，同生极乐国。\n';
 
   // 命理知识
@@ -3795,8 +3956,10 @@ function generateSimple() {
   t += JIANCHU_BAIHUA_S[jianchu] + "·" + (isHuangdao ? "黄道吉日✅" : "黑道日") + "·冲" + (chongZodiac||"无") + "\n";
   t += "✅ 宜：" + yiList.join("、") + "\n";
   t += "❌ 忌：" + jiList.join("、") + "\n";
-  if (memorial) t += "🎉 " + memorial.name + "\n";
-  if (jieqi) t += "🌿 节气：" + jieqi + "\n";
+  // 节气走 🌿 行，不走 🎉 行（避免节气当天重复显示两次）
+  var _memorialIsJieqi = memorial && jieqi && memorial.name.indexOf(jieqi) >= 0;
+  if (memorial && !_memorialIsJieqi) t += "🎉 " + memorial.name + "\n";
+  if (jieqi) t += "🌿 节气：" + jieqi + "·天地气转，调养身心\n";
   t += "🎨 幸运色：" + (_colorMap[stemWx]||"黄色") + " | 🔢 幸运数：" + _luckyNum + "\n";
   t += "💰 财神" + caishen + " | 🧭 喜神" + xishen + " | 🙏 福神" + fushen + "\n";
   t += "⏰ 吉时：" + jiShichenText + "\n";
@@ -3879,7 +4042,7 @@ function generateGzh() {
 
   if (jieqi)  {
     body += '\n━━━ 🌿 节气·' + jieqi + ' ━━━\n';
-    body += (JIEQI_DESC[jieqi] || '') + '\n';
+    body += (JIEQI_GREETING[jieqi] || '') + '\n';
     body += '📖 「' + (JIEQI_SUYU[jieqi] || '') + '」\n';
   }
 
@@ -4061,7 +4224,7 @@ function generateTomorrow() {
       text += '🔮 缘主专属·求' + _festAdviceTmr.seeking + ':\n';
       text += '  ' + _festAdviceTmr.direction + '\n';
       text += '  ' + _festAdviceTmr.method + '\n';
-      if (_festAdviceTmr.incantation) text += '  📿 ' + _festAdviceTmr.incantation + '\n';
+      // 注：明日版的"📿 诵文昌咒:..."行也删除，统一由正念板块输出咒语全文
       if (_festAdviceTmr.extra) text += '  💡 ' + _festAdviceTmr.extra + '\n';
     }
     text += '⏰ 今晚建议提前准备\n';
@@ -4070,7 +4233,7 @@ function generateTomorrow() {
   // 节气
   if (jieqi) {
     text += '\n🌿 明日节气:' + jieqi + '\n';
-    text += (JIEQI_DESC[jieqi] || '') + '\n';
+    text += (JIEQI_GREETING[jieqi] || '') + '\n';
   }
   
   // 佛道节日提前准备提醒
@@ -4241,6 +4404,44 @@ if (format === 'im') {
   console.log('摘要:' + gzh.summary) ;
   console.log('---') ;
   console.log(gzh.body) ;
+} else if (format === 'greeting') {
+  // 节气/法定假日/传统节日·高情商祝贺(适合发客户/领导)
+  // 集成 getFestivalGreeting() + JIEQI_GREETING + HOLIDAY_GREETING + KB 增强
+  // 测试模式:--date 2026-02-24 可指定日期(用于多节日批测)
+  var _now = new Date();
+  if (args.indexOf('--date') >= 0) {
+    var _dateIdx = args.indexOf('--date');
+    var _dateStr = args[_dateIdx + 1];
+    var _origDate2 = Date;
+    Date = function(...a) { return a.length ? new _origDate2(...a) : new _origDate2(_dateStr + 'T08:00:00+08:00'); };
+    Date.prototype = _origDate2.prototype;
+    Date.now = () => new _origDate2(_dateStr + 'T08:00:00+08:00').getTime();
+    _now = new Date(_dateStr + 'T08:00:00+08:00');
+  }
+  var _gr = getFestivalGreeting(_now);
+  if (!_gr) {
+    console.log('今日非节气/法定假日,无祝贺生成。');
+    process.exit(0);
+  }
+  var _greeting = _gr.greeting;
+  var _type = _gr.type;
+  var _name = _gr.name;
+
+  // KB 增强: 若有相关条目则追加一行
+  var _kbTip = '';
+  try {
+    var _kbFetch = require('./server/kb-api.js');
+  } catch(e) {}
+
+  // 融合式输出
+  console.log('🪷 ' + _type + '·' + _name);
+  console.log('');
+  console.log(_greeting);
+  console.log('');
+  if (_kbTip) console.log(_kbTip);
+  var _y = _now.getFullYear(), _m = _now.getMonth() + 1, _d = _now.getDate();
+  var _md = (_m < 10 ? '0' : '') + _m + '-' + (_d < 10 ? '0' : '') + _d;
+  console.log('—— 易道智鉴 · ' + _y + '年' + _md);
 } else {
   console.log(generate() );
 }

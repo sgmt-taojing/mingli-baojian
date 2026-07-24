@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>命理宝鉴 · 前端组件库 Demo</title>
+<style>
+/* ═══════════════ 深色主题 CSS 变量（与 divination-hub.html 一致） ═══════════════ */
+:root{
+  --bg-dark:        #1a1a2e;
+  --bg-card:        #16213e;
+  --bg-card-hover:  #1c2a4a;
+  --ink:            #eee;
+  --ink-dim:        #b0b0c0;
+  --paper3:         #8a8a9a;
+  --gold:           #c9a84c;
+  --gold-dim:       #a08838;
+  --gold-bright:    #e0c060;
+  --border:         rgba(201,168,76,.2);
+  --border-strong:  rgba(201,168,76,.4);
+  --success:        #10b981;
+  --error:          #ef4444;
+  --warn:           #f59e0b;
+  --info:           #3b82f6;
+  --ml-bg:          rgba(0,0,0,.6);
+  --ml-panel:       #16213e;
+  --ml-ink:         #eee;
+  --ml-border:      rgba(201,168,76,.2);
+  --ml-primary:     #c9a84c;
+  --ml-muted:       #8a8a9a;
+  --ml-ink-on-primary: #1a1a2e;
+  --ml-success:     #10b981;
+  --ml-error:       #ef4444;
+  --ml-warn:        #f59e0b;
+  --ml-info:        #3b82f6;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+body{
+  background:var(--bg-dark);
+  color:var(--ink);
+  font-family:"Noto Serif SC",-apple-system,"PingFang SC",serif;
+  line-height:1.7;
+  min-height:100vh;
+  padding:0;
+}
+
+/* ═══════════════ 顶部 Banner ═══════════════ */
+.hero{
+  background:linear-gradient(135deg,#0f0f23 0%,#1a1a2e 50%,#16213e 100%);
+  border-bottom:1px solid var(--border-strong);
+  padding:40px 24px 28px;
+  text-align:center;
+}
+.hero h1{
+  font-size:28px;
+  color:var(--gold);
+  letter-spacing:3px;
+  margin-bottom:8px;
+  font-weight:600;
+}
+.hero h1 .badge{
+  display:inline-block;
+  background:var(--gold);
+  color:var(--bg-dark);
+  font-size:12px;
+  padding:2px 8px;
+  border-radius:4px;
+  vertical-align:middle;
+  margin-left:8px;
+  letter-spacing:0;
+}
+.hero .subtitle{
+  color:var(--ink-dim);
+  font-size:14px;
+  letter-spacing:1px;
+}
+.hero .meta{
+  margin-top:10px;
+  font-size:12px;
+  color:var(--paper3);
+}
+
+/* ═══════════════ 布局 ═══════════════ */
+.container{
+  max-width:960px;
+  margin:0 auto;
+  padding:24px 20px 60px;
+}
+
+/* ═══════════════ 说明文档区块 ═══════════════ */
+.docs{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:24px 28px;
+  margin-bottom:28px;
+}
+.docs h2{
+  color:var(--gold);
+  font-size:18px;
+  letter-spacing:2px;
+  margin-bottom:14px;
+  padding-bottom:10px;
+  border-bottom:1px solid var(--border);
+}
+.docs h3{
+  color:var(--gold-bright);
+  font-size:15px;
+  margin:18px 0 8px;
+  letter-spacing:1px;
+}
+.docs table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+}
+.docs table th,
+.docs table td{
+  border:1px solid var(--border);
+  padding:6px 10px;
+  text-align:left;
+}
+.docs table th{
+  background:rgba(201,168,76,.08);
+  color:var(--gold);
+  font-weight:600;
+}
+.docs table td:first-child{
+  color:var(--gold-bright);
+  white-space:nowrap;
+}
+.docs code{
+  background:rgba(201,168,76,.1);
+  color:var(--gold-bright);
+  padding:1px 5px;
+  border-radius:3px;
+  font-size:12px;
+  font-family:"SF Mono","Fira Code",monospace;
+}
+.docs .note{
+  background:rgba(59,130,246,.08);
+  border-left:3px solid var(--info);
+  padding:8px 14px;
+  margin:10px 0;
+  font-size:13px;
+  color:var(--ink-dim);
+  border-radius:0 6px 6px 0;
+}
+.docs .compat{
+  background:rgba(16,185,129,.06);
+  border-left:3px solid var(--success);
+  padding:8px 14px;
+  margin:10px 0;
+  font-size:13px;
+  color:var(--ink-dim);
+  border-radius:0 6px 6px 0;
+}
+
+/* ═══════════════ 演示区块 ═══════════════ */
+.demo-section{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:24px 28px;
+  margin-bottom:24px;
+}
+.demo-section h2{
+  color:var(--gold);
+  font-size:18px;
+  letter-spacing:2px;
+  margin-bottom:6px;
+}
+.demo-section .desc{
+  color:var(--paper3);
+  font-size:13px;
+  margin-bottom:18px;
+}
+
+/* ═══════════════ 按钮样式 ═══════════════ */
+.btn-grid{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:14px;
+}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:10px 20px;
+  border:1px solid var(--border-strong);
+  border-radius:8px;
+  background:transparent;
+  color:var(--ink);
+  font-size:14px;
+  font-family:inherit;
+  cursor:pointer;
+  transition:all .2s;
+}
+.btn:hover{
+  background:rgba(201,168,76,.1);
+  border-color:var(--gold);
+  color:var(--gold-bright);
+  transform:translateY(-1px);
+}
+.btn:active{ transform:translateY(0); }
+
+.btn-success{ border-color:var(--success); color:var(--success); }
+.btn-success:hover{ background:rgba(16,185,129,.12); }
+.btn-error  { border-color:var(--error);   color:var(--error); }
+.btn-error:hover  { background:rgba(239,68,68,.12); }
+.btn-warn   { border-color:var(--warn);    color:var(--warn); }
+.btn-warn:hover   { background:rgba(245,158,11,.12); }
+.btn-info   { border-color:var(--info);    color:var(--info); }
+.btn-info:hover   { background:rgba(59,130,246,.12); }
+
+.btn-primary{
+  background:var(--gold);
+  color:var(--bg-dark);
+  border-color:var(--gold);
+  font-weight:600;
+}
+.btn-primary:hover{
+  background:var(--gold-bright);
+  color:var(--bg-dark);
+}
+
+/* ═══════════════ Tab 内容演示 ═══════════════ */
+.tab-demo-content{
+  padding:16px 0;
+}
+.tab-demo-content h4{
+  color:var(--gold);
+  font-size:15px;
+  margin-bottom:8px;
+}
+.tab-demo-content p{
+  color:var(--ink-dim);
+  font-size:14px;
+  margin-bottom:8px;
+}
+.tab-demo-content ul{
+  padding-left:20px;
+  color:var(--ink-dim);
+  font-size:13px;
+}
+.tab-demo-content li{ margin-bottom:4px; }
+
+/* ═══════════════ Modal 内容 ═══════════════ */
+.modal-content{
+  padding:8px 0;
+}
+.modal-content p{
+  color:var(--ink-dim);
+  font-size:14px;
+  margin-bottom:10px;
+}
+.modal-content .field{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:10px;
+}
+.modal-content .field label{
+  min-width:70px;
+  color:var(--gold);
+  font-size:13px;
+}
+.modal-content .field input,
+.modal-content .field select{
+  flex:1;
+  padding:8px 12px;
+  background:var(--bg-dark);
+  border:1px solid var(--border);
+  border-radius:6px;
+  color:var(--ink);
+  font-size:14px;
+  font-family:inherit;
+}
+.modal-content .field input:focus{
+  outline:none;
+  border-color:var(--gold);
+}
+
+/* ═══════════════ 事件日志 ═══════════════ */
+.event-log{
+  background:var(--bg-dark);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:12px 16px;
+  margin-top:14px;
+  min-height:60px;
+  max-height:160px;
+  overflow-y:auto;
+  font-family:"SF Mono","Fira Code",monospace;
+  font-size:12px;
+  color:var(--success);
+}
+.event-log .log-entry{
+  padding:2px 0;
+  border-bottom:1px solid rgba(201,168,76,.06);
+}
+.event-log .log-entry:last-child{ border-bottom:0; }
+.event-log .log-time{ color:var(--paper3); margin-right:8px; }
+
+/* ═══════════════ 底部 ═══════════════ */
+.footer{
+  text-align:center;
+  padding:20px;
+  color:var(--paper3);
+  font-size:12px;
+  letter-spacing:1px;
+}
+.footer a{
+  color:var(--gold-dim);
+  text-decoration:none;
+}
+.footer a:hover{ color:var(--gold); }
+
+/* ═══════════════ 响应式 ═══════════════ */
+@media(max-width:640px){
+  .hero h1{ font-size:22px; }
+  .container{ padding:16px 12px 40px; }
+  .docs, .demo-section{ padding:16px; }
+  .btn{ padding:8px 14px; font-size:13px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  顶部 Banner                                                       -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="hero">
+  <h1>☰ 命理宝鉴 · 前端组件库 <span class="badge">v1.0</span></h1>
+  <div class="subtitle">Web Components 封装演示 · toast / modal / tab 三件套</div>
+  <div class="meta">深色主题 · 向后兼容 · 零依赖 · Custom Elements v1</div>
+</div>
+
+<div class="container">
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  使用说明文档                                                      -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="docs">
+  <h2>📖 使用说明</h2>
+
+  <!-- ─── ml-toast ─── -->
+  <h3>① &lt;ml-toast&gt; — 轻量消息提示</h3>
+  <table>
+    <tr><th>属性</th><th>类型</th><th>默认</th><th>说明</th></tr>
+    <tr><td>type</td><td><code>success|error|warn|info</code></td><td><code>info</code></td><td>提示类型（背景色随之变化）</td></tr>
+    <tr><td>duration</td><td>number (ms)</td><td><code>2400</code></td><td>自动关闭延时</td></tr>
+    <tr><td>position</td><td><code>top|bottom|center</code></td><td><code>top</code></td><td>屏幕位置</td></tr>
+  </table>
+  <p style="margin-top:8px;font-size:13px;color:var(--ink-dim)">
+    <b>方法：</b><code>show(msg, type)</code> · <code>success(msg)</code> · <code>error(msg)</code> · <code>warn(msg)</code> · <code>info(msg)</code> · <code>hide()</code><br>
+    <b>CSS 变量：</b><code>--ml-bg</code> · <code>--ml-ink</code> · <code>--ml-success</code> · <code>--ml-error</code> · <code>--ml-warn</code> · <code>--ml-info</code>
+  </p>
+  <div class="compat">
+    <b>旧 API 兼容：</b>引入 <code>toast.js</code> 后自动创建全局 <code>window.toast</code> 对象，
+    支持 <code>toast.show(msg, type)</code> / <code>toast.success()</code> 等链式调用；
+    同时兼容 <code>shToast(msg)</code> 旧函数名。旧页面无需改动即可生效。
+  </div>
+
+  <!-- ─── ml-modal ─── -->
+  <h3>② &lt;ml-modal&gt; — 模态弹窗</h3>
+  <table>
+    <tr><th>属性</th><th>类型</th><th>默认</th><th>说明</th></tr>
+    <tr><td>title</td><td>string</td><td>—</td><td>弹窗标题（不设则隐藏标题栏）</td></tr>
+    <tr><td>open</td><td><code>true|false</code></td><td><code>false</code></td><td>是否打开</td></tr>
+    <tr><td>size</td><td><code>sm|md|lg</code></td><td><code>md</code></td><td>弹窗宽度（420/640/840px）</td></tr>
+    <tr><td>close-on-backdrop</td><td><code>true|false</code></td><td><code>true</code></td><td>点击遮罩是否关闭</td></tr>
+  </table>
+  <p style="margin-top:8px;font-size:13px;color:var(--ink-dim)">
+    <b>方法：</b><code>open()</code> · <code>close(source?)</code><br>
+    <b>事件：</b><code>open</code>（detail: <code>{}</code>） · <code>close</code>（detail: <code>{source:'x'|'backdrop'|'escape'|'api'}</code>）<br>
+    <b>CSS 变量：</b><code>--ml-bg</code> · <code>--ml-panel</code> · <code>--ml-ink</code> · <code>--ml-border</code>
+  </p>
+  <div class="compat">
+    <b>旧 API 兼容：</b>自动检测 <code>.modal</code> / <code>.modal-overlay</code> / <code>[id$="Modal"]</code>
+    元素并升级为 <code>&lt;ml-modal&gt;</code>，旧代码 <code>display='flex'/'none'</code> 仍可工作。
+    暴露 <code>window.MlModal</code> 和 <code>window.__mlModalUpgrade()</code> 辅助。
+  </div>
+
+  <!-- ─── ml-tab ─── -->
+  <h3>③ &lt;ml-tab&gt; + &lt;ml-tab-pane&gt; — 标签页切换</h3>
+  <table>
+    <tr><th>属性</th><th>宿主元素</th><th>类型 / 默认</th><th>说明</th></tr>
+    <tr><td>active</td><td>ml-tab</td><td>number / <code>0</code></td><td>当前激活面板索引</td></tr>
+    <tr><td>position</td><td>ml-tab</td><td><code>top|bottom</code> / <code>top</code></td><td>标签栏位置</td></tr>
+    <tr><td>align</td><td>ml-tab</td><td><code>left|center|right</code> / <code>left</code></td><td>标签栏对齐</td></tr>
+    <tr><td>label</td><td>ml-tab-pane</td><td>string</td><td>按钮文字（必填）</td></tr>
+    <tr><td>icon</td><td>ml-tab-pane</td><td>emoji/string</td><td>图标前缀，与 label 拼接</td></tr>
+    <tr><td>disabled</td><td>ml-tab-pane</td><td><code>true</code></td><td>禁用该标签</td></tr>
+  </table>
+  <p style="margin-top:8px;font-size:13px;color:var(--ink-dim)">
+    <b>方法：</b><code>setActive(index)</code> · <code>activeIndex</code>（getter）<br>
+    <b>事件：</b><code>tab-change</code>（detail: <code>{index, label, prevIndex}</code>）<br>
+    <b>CSS 变量：</b><code>--ml-primary</code> · <code>--ml-muted</code> · <code>--ml-bg</code> · <code>--ml-border</code> · <code>--ml-ink-on-primary</code>
+  </p>
+  <div class="compat">
+    <b>旧 API 兼容：</b>若页面不存在 <code>window.switchTab</code>，自动注册一个兜底版本，
+    兼容旧式 <code>.tab-btn</code> + <code>.tab-panel</code> 模式。
+    暴露 <code>window.MlTab</code> 和 <code>window.MlTabPane</code>。
+  </div>
+
+  <div class="note">
+    💡 <b>通用规则：</b>所有组件采用 Custom Elements v1 规范，Shadow DOM 封装样式，
+    支持全局 CSS 变量覆盖主题。引入对应 JS 文件即自动注册，无需额外初始化。
+    旧代码通过 polyfill 层自动兼容，无需改动业务逻辑。
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  Toast 演示                                                        -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="demo-section">
+  <h2>🍞 ml-toast 演示</h2>
+  <p class="desc">点击下方按钮触发 4 种类型的 toast 消息提示，观察顶部弹出的自动消失效果。</p>
+  <div class="btn-grid">
+    <button class="btn btn-success" onclick="demoToast('success')">✅ Success 成功</button>
+    <button class="btn btn-error"   onclick="demoToast('error')">❌ Error 错误</button>
+    <button class="btn btn-warn"    onclick="demoToast('warn')">⚠️ Warn 警告</button>
+    <button class="btn btn-info"    onclick="demoToast('info')">ℹ️ Info 信息</button>
+  </div>
+  <div class="btn-grid">
+    <button class="btn" onclick="demoToastChain()">🔗 链式调用演示</button>
+    <button class="btn" onclick="demoToastPosition()">📍 位置切换 (bottom)</button>
+    <button class="btn" onclick="demoOldToast()">🔄 旧 API (shToast)</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  Modal 演示                                                        -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="demo-section">
+  <h2>🪟 ml-modal 演示</h2>
+  <p class="desc">点击按钮打开不同 size 的模态弹窗。支持遮罩点击关闭、ESC 键关闭、自定义内容。</p>
+  <div class="btn-grid">
+    <button class="btn" onclick="openModalSm()">📐 Small (420px)</button>
+    <button class="btn" onclick="openModalMd()">📐 Medium (640px)</button>
+    <button class="btn" onclick="openModalLg()">📐 Large (840px)</button>
+  </div>
+  <div class="btn-grid">
+    <button class="btn" onclick="openModalForm()">📝 含表单的弹窗</button>
+    <button class="btn" onclick="openModalNoBackdrop()">🚫 禁止遮罩关闭</button>
+  </div>
+
+  <!-- Modal 1: Small -->
+  <ml-modal id="modalSm" title="确认操作" size="sm">
+    <div class="modal-content">
+      <p>这是一个 <b style="color:var(--gold)">Small (420px)</b> 尺寸的弹窗，适合简短确认对话。</p>
+      <p>确定要执行此操作吗？此操作不可撤销。</p>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+        <button class="btn" onclick="document.getElementById('modalSm').close()">取消</button>
+        <button class="btn btn-primary" onclick="document.getElementById('modalSm').close();demoToast('success')">确认</button>
+      </div>
+    </div>
+  </ml-modal>
+
+  <!-- Modal 2: Medium -->
+  <ml-modal id="modalMd" title="向大师提问" size="md">
+    <div class="modal-content">
+      <p>这是一个 <b style="color:var(--gold)">Medium (640px)</b> 尺寸的弹窗。适合展示详细内容或表单。</p>
+      <p>命理宝鉴的 AI 助手可以回答关于八字、六爻、风水、紫微斗数等方面的问题。请在下方输入您的问题。</p>
+      <div class="field">
+        <label>问题：</label>
+        <input type="text" placeholder="例如：我的事业运势如何？">
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+        <button class="btn" onclick="document.getElementById('modalMd').close()">关闭</button>
+        <button class="btn btn-primary" onclick="document.getElementById('modalMd').close();demoToast('success')">提交问题</button>
+      </div>
+    </div>
+  </ml-modal>
+
+  <!-- Modal 3: Large -->
+  <ml-modal id="modalLg" title="命理报告详情" size="lg">
+    <div class="modal-content">
+      <p>这是一个 <b style="color:var(--gold)">Large (840px)</b> 尺寸的弹窗。适合展示复杂报表、长文本或多媒体内容。</p>
+      <h4 style="color:var(--gold);margin:14px 0 8px;font-size:15px">📊 五行分析摘要</h4>
+      <table style="width:100%;font-size:13px;border-collapse:collapse">
+        <tr style="color:var(--gold)">
+          <th style="border:1px solid var(--border);padding:6px 10px;text-align:left">五行</th>
+          <th style="border:1px solid var(--border);padding:6px 10px;text-align:left">强度</th>
+          <th style="border:1px solid var(--border);padding:6px 10px;text-align:left">建议</th>
+        </tr>
+        <tr><td style="border:1px solid var(--border);padding:6px 10px">木</td><td style="border:1px solid var(--border);padding:6px 10px">★★★★☆</td><td style="border:1px solid var(--border);padding:6px 10px">旺·主仁·宜读书学习</td></tr>
+        <tr><td style="border:1px solid var(--border);padding:6px 10px">火</td><td style="border:1px solid var(--border);padding:6px 10px">★★★☆☆</td><td style="border:1px solid var(--border);padding:6px 10px">中·主礼·宜社交拓展</td></tr>
+        <tr><td style="border:1px solid var(--border);padding:6px 10px">土</td><td style="border:1px solid var(--border);padding:6px 10px">★★☆☆☆</td><td style="border:1px solid var(--border);padding:6px 10px">弱·主信·宜稳健守成</td></tr>
+        <tr><td style="border:1px solid var(--border);padding:6px 10px">金</td><td style="border:1px solid var(--border);padding:6px 10px">★★★☆☆</td><td style="border:1px solid var(--border);padding:6px 10px">中·主义·宜果决执行</td></tr>
+        <tr><td style="border:1px solid var(--border);padding:6px 10px">水</td><td style="border:1px solid var(--border);padding:6px 10px">★★★★☆</td><td style="border:1px solid var(--border);padding:6px 10px">旺·主智·宜灵活思考</td></tr>
+      </table>
+      <p style="margin-top:14px;font-size:12px;color:var(--paper3)">
+        💡 数据来源：《滴天髓》《子平真诠》《穷通宝鉴》三书互参·基于您提供的八字排盘。
+      </p>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+        <button class="btn" onclick="document.getElementById('modalLg').close()">关闭</button>
+        <button class="btn btn-primary" onclick="document.getElementById('modalLg').close();demoToast('info','报告已保存')">保存报告</button>
+      </div>
+    </div>
+  </ml-modal>
+
+  <!-- Modal 4: Form -->
+  <ml-modal id="modalForm" title="新建命例" size="md">
+    <div class="modal-content">
+      <p>请填写完整的八字信息以生成排盘报告。所有字段必填。</p>
+      <div class="field">
+        <label>姓名：</label>
+        <input type="text" placeholder="请输入姓名">
+      </div>
+      <div class="field">
+        <label>性别：</label>
+        <select>
+          <option>男（乾造）</option>
+          <option>女（坤造）</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>出生年：</label>
+        <input type="number" placeholder="公历年份" min="1900" max="2100">
+      </div>
+      <div class="field">
+        <label>出生月：</label>
+        <input type="number" placeholder="1-12" min="1" max="12">
+      </div>
+      <div class="field">
+        <label>出生日：</label>
+        <input type="number" placeholder="1-31" min="1" max="31">
+      </div>
+      <div class="field">
+        <label>出生时：</label>
+        <select>
+          <option>子时 (23:00-01:00)</option>
+          <option>丑时 (01:00-03:00)</option>
+          <option>寅时 (03:00-05:00)</option>
+          <option>卯时 (05:00-07:00)</option>
+          <option>辰时 (07:00-09:00)</option>
+          <option>巳时 (09:00-11:00)</option>
+          <option>午时 (11:00-13:00)</option>
+          <option>未时 (13:00-15:00)</option>
+          <option>申时 (15:00-17:00)</option>
+          <option>酉时 (17:00-19:00)</option>
+          <option>戌时 (19:00-21:00)</option>
+          <option>亥时 (21:00-23:00)</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+        <button class="btn" onclick="document.getElementById('modalForm').close()">取消</button>
+        <button class="btn btn-primary" onclick="document.getElementById('modalForm').close();demoToast('success','命例已创建')">创建</button>
+      </div>
+    </div>
+  </ml-modal>
+
+  <!-- Modal 5: No backdrop close -->
+  <ml-modal id="modalNoBackdrop" title="重要提示" size="sm" close-on-backdrop="false">
+    <div class="modal-content">
+      <p>此弹窗<b style="color:var(--warn)">禁止点击遮罩关闭</b>，必须点击底部按钮。</p>
+      <p>适合重要确认场景（如支付确认、隐私协议等）。</p>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+        <button class="btn btn-primary" onclick="document.getElementById('modalNoBackdrop').close()">我已知晓</button>
+      </div>
+    </div>
+  </ml-modal>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  Tab 演示                                                          -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="demo-section">
+  <h2>📑 ml-tab 演示</h2>
+  <p class="desc">点击下方标签切换不同面板内容，监听 <code>tab-change</code> 事件查看实时日志。</p>
+
+  <ml-tab id="demoTab" active="0">
+    <ml-tab-pane label="📐 五行总览" icon="📐">
+      <div class="tab-demo-content">
+        <h4>五行关系总览</h4>
+        <p>金木水火土五行相生相克，构成命理分析的基础框架。</p>
+        <ul>
+          <li><b>相生：</b>金→水→木→火→土→金</li>
+          <li><b>相克：</b>金→木→土→水→火→金</li>
+          <li><b>日主强弱：</b>需综合月令、得气、得势三方面判断</li>
+          <li><b>用神选取：</b>扶抑、调候、通关、专旺四法</li>
+        </ul>
+      </div>
+    </ml-tab-pane>
+    <ml-tab-pane label="📤 上传报告" icon="📤">
+      <div class="tab-demo-content">
+        <h4>上传命例报告</h4>
+        <p>支持上传以下格式：</p>
+        <ul>
+          <li>📄 TXT 文本报告</li>
+          <li>📊 JSON 结构化数据</li>
+          <li>🖼 PNG/JPG 截图（自动 OCR 识别）</li>
+          <li>📋 PDF 文档（自动解析）</li>
+        </ul>
+        <p style="margin-top:10px;color:var(--gold-dim)">最大 10MB，识别准确率 ≥ 95%。</p>
+      </div>
+    </ml-tab-pane>
+    <ml-tab-pane label="🤖 AI 解读" icon="🤖">
+      <div class="tab-demo-content">
+        <h4>AI 智能解读</h4>
+        <p>基于 KB 知识库 + LLM 大模型，提供个性化命理建议。</p>
+        <ul>
+          <li>🧠 已加载 200+ 古籍（《滴天髓》《子平真诠》《穷通宝鉴》等）</li>
+          <li>⚡ P95 响应 ≤ 1.5s</li>
+          <li>🎯 KB 直答命中率 ≥ 40%</li>
+          <li>💬 支持多轮对话 + 上下文记忆</li>
+        </ul>
+      </div>
+    </ml-tab-pane>
+  </ml-tab>
+
+  <div class="btn-grid" style="margin-top:14px">
+    <button class="btn" onclick="programmaticSwitch(0)">→ 切到第 1 个</button>
+    <button class="btn" onclick="programmaticSwitch(1)">→ 切到第 2 个</button>
+    <button class="btn" onclick="programmaticSwitch(2)">→ 切到第 3 个</button>
+  </div>
+
+  <h4 style="margin-top:14px;color:var(--gold);font-size:14px">📜 事件日志（tab-change / modal open+close）</h4>
+  <div class="event-log" id="eventLog">
+    <div class="log-entry"><span class="log-time">[系统]</span>事件监听已就绪…</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  总结                                                              -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="docs">
+  <h2>🎯 总结</h2>
+  <p>本组件库封装了项目中最常用的 3 类 UI 元素：</p>
+  <ul style="padding-left:20px;color:var(--ink-dim);margin-top:8px">
+    <li>📦 <b>21 处 toast</b> + <b>21 处 tab</b> + <b>3 处 modal</b> 散落代码 → 统一封装为 Web Components</li>
+    <li>🔌 零依赖（不引入任何第三方库），纯 Custom Elements v1 实现</li>
+    <li>🎨 通过 CSS 变量兼容深色/浅色主题</li>
+    <li>♻️ 向后兼容：旧代码无需修改即可继续工作</li>
+    <li>📚 完整 JSDoc 注释，便于 IDE 智能提示</li>
+  </ul>
+  <div class="note">
+    💡 <b>下一步：</b>节点 4 将逐步替换业务页面中的旧 toast/tab/modal 实现为新组件；
+    节点 5 将补充单元测试；节点 6 将发布为 <code>@mingli-baojian/components</code> 内部 npm 包。
+  </div>
+</div>
+
+</div><!-- /.container -->
+
+<div class="footer">
+  命理宝鉴 · 前端组件库 v1.0 · Made with ☕️ + 📜 · <a href="../divination-hub.html">返回首页</a>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  引入 3 个 Web Components                                          -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<script src="toast.js"></script>
+<script src="modal.js"></script>
+<script src="tab.js"></script>
+
+<script>
+/* ──────────────── Toast 演示逻辑 ──────────────── */
+function demoToast(type){
+  const t = document.getElementById('mlToast') || (()=>{
+    const el = document.createElement('ml-toast');
+    document.body.appendChild(el);
+    return el;
+  })();
+  const messages = {
+    success: '✅ 操作成功，已保存到本地',
+    error:   '❌ 网络异常，请稍后重试',
+    warn:    '⚠️ 命例数据不完整，请补充',
+    info:    'ℹ️ AI 助手正在解析您的命盘…'
+  };
+  t.show(messages[type] || 'Hello toast', type);
+  addLog('toast.show', type, messages[type]);
+}
+
+function demoToastChain(){
+  const t = document.getElementById('mlToast') || (()=>{
+    const el = document.createElement('ml-toast');
+    document.body.appendChild(el);
+    return el;
+  })();
+  t.success('第一步完成').then?.(()=>{});
+  addLog('toast.chain', 'success', '第一步完成');
+  setTimeout(()=> t.warn('第二步警告'), 600);
+  setTimeout(()=> t.info('第三步提示'), 1200);
+  setTimeout(()=> t.error('第四步失败'), 1800);
+}
+
+function demoToastPosition(){
+  const t = document.getElementById('mlToast') || (()=>{
+    const el = document.createElement('ml-toast');
+    document.body.appendChild(el);
+    return el;
+  })();
+  // 切换位置：临时改为 bottom
+  const orig = t.getAttribute('position') || 'top';
+  t.setAttribute('position', orig === 'top' ? 'bottom' : 'top');
+  t.show(`位置已切换到 ${t.getAttribute('position')}`, 'info');
+  addLog('toast.position', t.getAttribute('position'), '位置切换');
+}
+
+function demoOldToast(){
+  // 测试旧 API shToast 全局函数
+  if (typeof shToast === 'function'){
+    shToast('这是通过旧 API shToast() 触发的提示', 'success');
+    addLog('shToast (旧API)', 'success', '通过 window.shToast() 调用');
+  } else {
+    demoToast('warn');
+    addLog('shToast (旧API)', 'warn', 'shToast 未定义，已降级为 demoToast');
+  }
+}
+
+/* ──────────────── Modal 演示逻辑 ──────────────── */
+function openModalSm(){
+  document.getElementById('modalSm').open();
+  addLog('modal.open', 'sm', '打开 Small 弹窗');
+}
+function openModalMd(){
+  document.getElementById('modalMd').open();
+  addLog('modal.open', 'md', '打开 Medium 弹窗');
+}
+function openModalLg(){
+  document.getElementById('modalLg').open();
+  addLog('modal.open', 'lg', '打开 Large 弹窗');
+}
+function openModalForm(){
+  document.getElementById('modalForm').open();
+  addLog('modal.open', 'form', '打开含表单的弹窗');
+}
+function openModalNoBackdrop(){
+  document.getElementById('modalNoBackdrop').open();
+  addLog('modal.open', 'no-backdrop', '打开禁止遮罩关闭的弹窗');
+}
+
+/* 监听所有 modal 的 close 事件 */
+['modalSm','modalMd','modalLg','modalForm','modalNoBackdrop'].forEach(id=>{
+  const m = document.getElementById(id);
+  if (m){
+    m.addEventListener('close', e=>{
+      addLog('modal.close', id, '来源: ' + (e.detail?.source || 'api'));
+    });
+  }
+});
+
+/* ──────────────── Tab 演示逻辑 ──────────────── */
+let tabBound = false;
+function bindTab(){
+  if (tabBound) return;
+  tabBound = true;
+  const tab = document.getElementById('demoTab');
+  if (!tab) return;
+  tab.addEventListener('tab-change', e=>{
+    console.log('[tab-change]', e.detail);
+    addLog('tab-change', 'index=' + e.detail.index, '从 ' + e.detail.prevIndex + ' → ' + e.detail.index + '（' + e.detail.label + '）');
+  });
+}
+function programmaticSwitch(idx){
+  const tab = document.getElementById('demoTab');
+  if (tab) tab.setActive(idx);
+  // setActive 已经会触发 tab-change 事件，无需手动 addLog
+}
+
+/* ──────────────── 事件日志 ──────────────── */
+function addLog(type, meta, msg){
+  const log = document.getElementById('eventLog');
+  if (!log) return;
+  const ts = new Date().toLocaleTimeString('zh-CN', {hour12:false});
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  entry.innerHTML = `<span class="log-time">[${ts}]</span><b style="color:var(--gold)">${type}</b> <span style="color:var(--paper3)">${meta||''}</span> — <span style="color:var(--ink-dim)">${msg||''}</span>`;
+  log.appendChild(entry);
+  // 自动滚动到底部
+  log.scrollTop = log.scrollHeight;
+  // 限制最多保留 30 条
+  while (log.children.length > 30){
+    log.removeChild(log.firstChild);
+  }
+}
+
+/* ──────────────── 初始化 ──────────────── */
+document.addEventListener('DOMContentLoaded', ()=>{
+  bindTab();
+  addLog('init', 'ready', '3 个组件已加载，点击按钮开始体验');
+});
+// 如果 DOM 已经加载完毕
+if (document.readyState !== 'loading'){
+  bindTab();
+  addLog('init', 'ready', '3 个组件已加载（延迟初始化）');
+}
+</script>
+
+</body>
+</html>

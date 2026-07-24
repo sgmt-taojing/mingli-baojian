@@ -12,6 +12,9 @@ const caseQuality = require('./case-quality.js');
 const { KB_LEVELS } = require('./kb-config.js');
 const crypto = require('crypto');
 
+// 统一响应壳（P0 #2 节点3：API 设计规范落地）
+const { apiResp, ERROR_CODES } = require('./api-response.js');
+
 const kbRoutes = require('./kb-routes.js');
 const exportRoutes = require('./export-routes.js');
 const kbMgmt = require('./kb-management-engine.js'); // KB 命中入库（新）
@@ -246,6 +249,7 @@ const auth = rbac.auth;
 const adminAuth = rbac.adminAuth;
 const yzProfile = require('./yuanzhu-profile.js');
 const requirePermission = rbac.requirePermission;
+const optionalAuth = rbac.optionalAuth;
 
 // ============================
 // AI API 代理（密钥不再暴露在前端）
@@ -569,9 +573,9 @@ async function _aiLocalResponse(userText, baziData) {
 app.post('/api/ai/chat', auth, async (req, res) => {
   const messages = req.body.messages;
   const model = req.body.model || 'auto';
-  if (!messages || !Array.isArray(messages)) return res.json({ error: '参数错误' });
-  if (!AI_API_KEY) return res.json({ error: 'AI服务未配置' });
-  if (!sec.rateLimit('ai_chat_' + req.userId, 20, 60000)) return res.status(429).json({ error: 'RATE_LIMITED', message: '请求过于频繁' });
+  if (!messages || !Array.isArray(messages)) return apiResp(res, ERROR_CODES.PARAM_INVALID, null, '参数错误');
+  if (!AI_API_KEY) return apiResp(res, ERROR_CODES.AI_UNAVAILABLE, null, 'AI服务未配置');
+  if (!sec.rateLimit('ai_chat_' + req.userId, 20, 60000)) return apiResp(res, ERROR_CODES.RATE_LIMIT_GLOBAL, null, '请求过于频繁');
   const sysMsg = { role: 'system', content: AI_SYSTEM_PROMPT };
   try {
     const response = await fetch(AI_API_BASE + '/v1/chat/completions', {
@@ -580,19 +584,21 @@ app.post('/api/ai/chat', auth, async (req, res) => {
       body: JSON.stringify({ model, messages: [sysMsg, ...messages], max_tokens: 4096 })
     });
     const data = await response.json();
-    res.json(data);
+    return apiResp(res, ERROR_CODES.SUCCESS, data, 'ok');
   } catch (e) {
     console.error('AI API错误:', e.message);
-    res.json({ error: 'AI服务暂时不可用' });
+    return apiResp(res, ERROR_CODES.AI_UNAVAILABLE, null, 'AI服务暂时不可用');
   }
 });
 
 // === AI聊天（公开，无需认证，低速率+本地降级）===
 // R40-E AI KB 命中落库端点
+// v1 alias
+app.post('/api/v1/ai/kb-hit-log', (req, res) => res.redirect(308, '/api/ai/kb-hit-log'));
 app.post('/api/ai/kb-hit-log', async (req, res) => {
   try {
     const { query, hits, source, responseTime } = req.body || {};
-    if (!query) return res.json({ error: '参数错误' });
+    if (!query) return apiResp(res, ERROR_CODES.SUCCESS, { error: '参数错误' }, 'ok');
     
     // 检查表是否存在
     const tblExists = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='kb_hit_log'").get();
@@ -614,15 +620,17 @@ app.post('/api/ai/kb-hit-log', async (req, res) => {
       parseInt(responseTime) || 0
     );
     
-    res.json({ ok: true, logged: true });
+    apiResp(res, ERROR_CODES.SUCCESS, { ok: true, logged: true }, 'ok');
   } catch (e) {
-    res.json({ error: e.message });
+    apiResp(res, ERROR_CODES.SUCCESS, { error: e.message }, 'ok');
   }
 });
 
+// v1 alias
+app.get('/api/v1/ai/kb-hit-stats', (req, res) => res.redirect(308, '/api/ai/kb-hit-stats'));
 app.get('/api/ai/kb-hit-stats', async (req, res) => {
   try {
-    if (!db) return res.json({ error: '数据库未就绪' });
+    if (!db) return apiResp(res, ERROR_CODES.DB_UNAVAILABLE, null, '数据库未就绪');
     // auto-create
     db.exec(`CREATE TABLE IF NOT EXISTS kb_hit_log (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -638,39 +646,45 @@ app.get('/api/ai/kb-hit-stats', async (req, res) => {
     const topQueries = db.prepare(`SELECT query, COUNT(*) as cnt FROM kb_hit_log GROUP BY query ORDER BY cnt DESC LIMIT 10`).all();
     const bySource = db.prepare(`SELECT source, COUNT(*) as cnt FROM kb_hit_log GROUP BY source ORDER BY cnt DESC`).all();
     
-    res.json({ ok: true, total, today, topQueries, bySource });
+    apiResp(res, ERROR_CODES.SUCCESS, { ok: true, total, today, topQueries, bySource }, 'ok');
   } catch (e) {
-    res.json({ total: 0, today: 0, error: e.message });
+    apiResp(res, ERROR_CODES.SUCCESS, { total: 0, today: 0, error: e.message }, 'ok');
   }
 });
 
 
 
+// v1 alias
+app.get('/api/v1/admin/kb/stats', (req, res) => res.redirect(308, '/api/admin/kb/stats'));
 app.get('/api/admin/kb/stats', adminAuth, (req, res) => {
   try {
-    if (!db) return res.json({ error: '数据库未就绪' });
+    if (!db) return apiResp(res, ERROR_CODES.DB_UNAVAILABLE, null, '数据库未就绪');
     const rows = db.prepare(`SELECT module, COUNT(*) as cnt, SUM(CASE WHEN trust_score>=0.7 THEN 1 ELSE 0 END) as hi FROM kb_formal GROUP BY module ORDER BY cnt DESC`).all();
     const total = db.prepare('SELECT COUNT(*) as cnt FROM kb_formal').get().cnt;
     const hits = db.prepare('SELECT COUNT(*) as cnt FROM kb_hit_log').get().cnt;
-    res.json({ total, hits, modules: rows.map(r=>({ module:r.module, count:r.cnt, sources:r.hi, hit_rate: total ? Math.min(100, r.cnt*100/total) : 0 })) });
-  } catch(e){ res.json({ error: e.message }); }
+    apiResp(res, ERROR_CODES.SUCCESS, { total, hits, modules: rows.map(r=>({ module:r.module, count:r.cnt, sources:r.hi, hit_rate: total ? Math.min(100, r.cnt*100/total) : 0 })) }, 'ok');
+  } catch(e){ apiResp(res, ERROR_CODES.SERVER_ERROR, null, e.message); }
 });
 
+// v1 alias
+app.get('/api/v1/admin/kb/search', (req, res) => res.redirect(308, '/api/admin/kb/search'));
 app.get('/api/admin/kb/search', adminAuth, (req, res) => {
   try {
-    if (!db) return res.json({ error: '数据库未就绪' });
+    if (!db) return apiResp(res, ERROR_CODES.DB_UNAVAILABLE, null, '数据库未就绪');
     const q = '%'+(req.query.q||'')+'%';
     const rows = db.prepare(`SELECT module, title, content, category, trust_score as score FROM kb_formal WHERE title LIKE ? OR content LIKE ? OR keywords LIKE ? LIMIT 50`).all(q, q, q);
-    res.json({ results: rows });
-  } catch(e){ res.json({ error: e.message }); }
+    apiResp(res, ERROR_CODES.SUCCESS, { results: rows }, 'ok');
+  } catch(e){ apiResp(res, ERROR_CODES.SERVER_ERROR, null, e.message); }
 });
 // === R51-B · /api/admin/kb/ingest（批量入库 admin 端点）===
+// v1 alias
+app.post('/api/v1/admin/kb/ingest', (req, res) => res.redirect(308, '/api/admin/kb/ingest'));
 app.post('/api/admin/kb/ingest', adminAuth, async (req, res) => {
   try {
-    if (!db) return res.json({ error: '数据库未就绪' });
+    if (!db) return apiResp(res, ERROR_CODES.DB_UNAVAILABLE, null, '数据库未就绪');
     const { entries } = req.body || {};
-    if (!Array.isArray(entries) || entries.length === 0) return res.json({ ok: 0, error: 'entries 必须是非空数组' });
-    if (entries.length > 500) return res.json({ ok: 0, error: '单次最多 500 条' });
+    if (!Array.isArray(entries) || entries.length === 0) return apiResp(res, ERROR_CODES.SUCCESS, { ok: 0, error: 'entries 必须是非空数组' }, 'ok');
+    if (entries.length > 500) return apiResp(res, ERROR_CODES.SUCCESS, { ok: 0, error: '单次最多 500 条' }, 'ok');
 
     // schema 探测
     const tblCols = db.prepare("PRAGMA table_info(kb_formal)").all().map(c => c.name);
@@ -714,56 +728,64 @@ app.post('/api/admin/kb/ingest', adminAuth, async (req, res) => {
       }
     }
 
-    res.json({ ok, fail, total: entries.length, errors: errors.slice(0, 5), ingested_at: new Date().toISOString() });
+    apiResp(res, ERROR_CODES.SUCCESS, { ok, fail, total: entries.length, errors: errors.slice(0, 5), ingested_at: new Date().toISOString() }, 'ok');
   } catch(e) {
-    res.json({ ok: 0, error: e.message });
+    apiResp(res, ERROR_CODES.SUCCESS, { ok: 0, error: e.message }, 'ok');
   }
 });
 
 // === R51-B · /api/admin/kb/audit-quality（trust_score < 0.5 扫描）===
+// v1 alias
+app.get('/api/v1/admin/kb/audit-quality', (req, res) => res.redirect(308, '/api/admin/kb/audit-quality'));
 app.get('/api/admin/kb/audit-quality', adminAuth, (req, res) => {
   try {
-    if (!db) return res.json({ error: '数据库未就绪' });
+    if (!db) return apiResp(res, ERROR_CODES.DB_UNAVAILABLE, null, '数据库未就绪');
     const low = db.prepare("SELECT COUNT(*) as c FROM kb_formal WHERE trust_score < 0.5").get().c;
     const mid = db.prepare("SELECT COUNT(*) as c FROM kb_formal WHERE trust_score >= 0.5 AND trust_score < 0.8").get().c;
     const hi = db.prepare("SELECT COUNT(*) as c FROM kb_formal WHERE trust_score >= 0.8").get().c;
     const short = db.prepare("SELECT COUNT(*) as c FROM kb_formal WHERE length(content) < 50").get().c;
     const empty = db.prepare("SELECT COUNT(*) as c FROM kb_formal WHERE content IS NULL OR length(content) = 0").get().c;
-    res.json({ low, mid, hi, short, empty, total: low + mid + hi });
+    apiResp(res, ERROR_CODES.SUCCESS, { low, mid, hi, short, empty, total: low + mid + hi }, 'ok');
   } catch(e) {
-    res.json({ error: e.message });
+    apiResp(res, ERROR_CODES.SUCCESS, { error: e.message }, 'ok');
   }
 });
 
 // === 公共 KB 统计（免 JWT）===
+// v1 alias
+app.get('/api/v1/public/kb/stats', (req, res) => res.redirect(308, '/api/public/kb/stats'));
 app.get('/api/public/kb/stats', (req, res) => {
   try {
-    if (!db) return res.json({ error: '数据库未就绪' });
+    if (!db) return apiResp(res, ERROR_CODES.DB_UNAVAILABLE, null, '数据库未就绪');
     const total = db.prepare('SELECT COUNT(*) as c FROM kb_formal').get().c;
     const hi = db.prepare('SELECT COUNT(*) as c FROM kb_formal WHERE trust_score>=0.7').get().c;
     const hits = db.prepare('SELECT COALESCE(SUM(hit_count),0) as c FROM kb_formal').get().c;
     const topModules = db.prepare(`SELECT module, COUNT(*) as cnt, COALESCE(SUM(hit_count),0) as hits FROM kb_formal GROUP BY module ORDER BY hits DESC LIMIT 8`).all();
-    res.json({ total, hi_trust: hi, total_hits: hits, top_modules: topModules });
-  } catch(e){ res.json({ total: 0, hi_trust: 0, total_hits: 0, top_modules: [], error: e.message }); }
+    apiResp(res, ERROR_CODES.SUCCESS, { total, hi_trust: hi, total_hits: hits, top_modules: topModules }, 'ok');
+  } catch(e){ apiResp(res, ERROR_CODES.SUCCESS, { total: 0, hi_trust: 0, total_hits: 0, top_modules: [], error: e.message }, 'ok'); }
 });
 
 // === 公共 KB 直答命中统计（按模块） ===
+// v1 alias
+app.get('/api/v1/public/kb/hits', (req, res) => res.redirect(308, '/api/public/kb/hits'));
 app.get('/api/public/kb/hits', (req, res) => {
   try {
-    if (!db) return res.json({ error: '数据库未就绪' });
+    if (!db) return apiResp(res, ERROR_CODES.DB_UNAVAILABLE, null, '数据库未就绪');
     const today = new Date().toISOString().slice(0, 10);
     const rows = db.prepare(`SELECT module, COUNT(*) as hits FROM kb_formal WHERE last_hit >= ? GROUP BY module ORDER BY hits DESC`).all(today);
     const total = rows.reduce((s, r) => s + r.hits, 0);
-    res.json({ date: today, total, modules: rows });
-  } catch(e){ res.json({ date: '', total: 0, modules: [], error: e.message }); }
+    apiResp(res, ERROR_CODES.SUCCESS, { date: today, total, modules: rows }, 'ok');
+  } catch(e){ apiResp(res, ERROR_CODES.SUCCESS, { date: '', total: 0, modules: [], error: e.message }, 'ok'); }
 });
 
 // === 公共 KB 检索（免 JWT，限频）===
+// v1 alias
+app.get('/api/v1/public/kb/search', (req, res) => res.redirect(308, '/api/public/kb/search'));
 app.get('/api/public/kb/search', (req, res) => {
   try {
-    if (!db) return res.json({ error: '数据库未就绪' });
+    if (!db) return apiResp(res, ERROR_CODES.DB_UNAVAILABLE, null, '数据库未就绪');
     const q = (req.query.q || '').trim();
-    if (!q) return res.json({ results: [] });
+    if (!q) return apiResp(res, ERROR_CODES.SUCCESS, { results: [] }, 'ok');
     const ip = req.ip || req.connection.remoteAddress;
     if (!sec.rateLimit("kb_pub_" + ip, 30, 60000)) return res.status(429).json({ error: 'RATE_LIMITED' });
     const rows = db.prepare(`SELECT module, title, substr(content, 1, 320) as snippet, trust_score, hit_count FROM kb_formal WHERE (title LIKE ? OR content LIKE ?) AND trust_score >= 0.5 ORDER BY trust_score DESC, hit_count DESC LIMIT 8`).all('%'+q+'%', '%'+q+'%');
@@ -774,8 +796,8 @@ app.get('/api/public/kb/search', (req, res) => {
         db.prepare(`INSERT INTO kb_hit_log (q, module, src, ts) VALUES (?, ?, 'public-search', datetime('now','localtime'))`).run(q, rows[0].module);
       } catch(e){}
     }
-    res.json({ results: rows });
-  } catch(e){ res.json({ results: [], error: e.message }); }
+    apiResp(res, ERROR_CODES.SUCCESS, { results: rows }, 'ok');
+  } catch(e){ apiResp(res, ERROR_CODES.SUCCESS, { results: [], error: e.message }, 'ok'); }
 });
 
 app.post('/api/ai/public-chat', async (req, res) => {
@@ -995,7 +1017,7 @@ app.post('/api/paipan/save', auth, (req, res) => {
   // ★ 触发画像合并（每次排盘都更新）
   const profileResult = yzProfile.mergeProfile(db, req.userId, type, parsed, parsed, rawQuery);
 
-  res.json({ ok: true, message: '排盘记录已保存', recordId, profileUpdated: profileResult.ok !== false, profile: profileResult });
+  apiResp(res, ERROR_CODES.SUCCESS, { ok: true, recordId, profileUpdated: profileResult.ok !== false, profile: profileResult }, '排盘记录已保存');
 });
 
 app.get('/api/paipan/history', auth, (req, res) => {
@@ -1010,7 +1032,7 @@ app.get('/api/paipan/history', auth, (req, res) => {
 app.get('/api/yuanzhu/list', auth, (req, res) => {
   // 仅管理员可访问（依赖 JWT roles 数组，避免硬编码超管手机号）
   if(!req.user||!(req.user.roles||[]).includes('admin')&&req.user.role!=='admin'){
-    return res.status(403).json({ok:false,message:'仅管理员可访问'});
+    return apiResp(res, ERROR_CODES.FORBIDDEN, null, '仅管理员可访问');
   }
   const q = String(req.query.q||'').trim();
   const sortBy = String(req.query.sort||'last_paipan_at').replace(/[^a-z_]/gi,'');
@@ -1044,20 +1066,20 @@ app.get('/api/yuanzhu/list', auth, (req, res) => {
       updated_at:r.updated_at
     };
   });
-  res.json({ok:true, total:out.length, items:out});
+  apiResp(res, ERROR_CODES.SUCCESS, { ok:true, total:out.length, items:out }, 'ok');
 });
 
 app.get('/api/yuanzhu/profile', auth, (req, res) => {
   const p = db.prepare('SELECT * FROM yuanzhu_profile WHERE user_id=?').get(req.userId);
   if(!p){
-    return res.json({ ok:false, empty:true, message:'尚未形成画像，请先进行一次排盘' });
+    return apiResp(res, ERROR_CODES.SUCCESS, { ok:false, empty:true }, '尚未形成画像，请先进行一次排盘');
   }
   let focus=[], kw=[], modStats={};
   try{ focus = JSON.parse(p.focus_areas||'[]'); }catch(_){}
   try{ kw = JSON.parse(p.concern_keywords||'[]'); }catch(_){}
   try{ modStats = JSON.parse(p.mod_stats||'{}'); }catch(_){}
   // 仅返回公开字段（勿包含敏感推测）
-  res.json({
+  apiResp(res, ERROR_CODES.SUCCESS, {
     ok:true,
     profile:{
       user_id: p.user_id,
@@ -1076,7 +1098,7 @@ app.get('/api/yuanzhu/profile', auth, (req, res) => {
       push_year: p.push_year,
       push_opt_in: p.push_opt_in === 1
     }
-  });
+  }, 'ok');
 });
 
 // 更新推送偏好
@@ -1937,7 +1959,9 @@ function canAccessKB(roles, level) {
 // ============================
 
 // KB文件列表（按角色过滤）
-app.get('/api/kb/list', auth, (req, res) => {
+// v1 alias
+app.get('/api/v1/kb/list', (req, res) => res.redirect(308, '/api/kb/list'));
+app.get('/api/kb/list', optionalAuth, (req, res) => {
   const fs = require('fs');
   const path = require('path');
   const kbDir = path.join(__dirname, '..', 'knowledge');
@@ -1954,34 +1978,35 @@ app.get('/api/kb/list', auth, (req, res) => {
       desc: KB_LEVELS[file] ? KB_LEVELS[file].desc : ''
     }));
     
-    res.json({ files: accessibleFiles });
+    apiResp(res, ERROR_CODES.SUCCESS, { files: accessibleFiles }, 'ok');
   } catch (e) {
-    res.json({ files: [] });
+    apiResp(res, ERROR_CODES.SERVER_ERROR, { files: [] }, e.message || '服务异常');
   }
 });
 
 // KB文件内容（角色鉴权）
-app.get('/api/kb/:filename', auth, (req, res) => {
+app.get('/api/kb/:filename', optionalAuth, (req, res) => {
   const filename = req.params.filename;
-  
+
   if (filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
-    return res.status(403).json({ error: 'RBAC_FORBIDDEN' });
+    return apiResp(res, ERROR_CODES.FORBIDDEN, null, 'RBAC_FORBIDDEN');
   }
-  
+
   const config = KB_LEVELS[filename];
   const level = config ? config.level : 'public';
   if (!canAccessKB(req.userRoles, level)) {
-    return res.status(403).json({ error: 'RBAC_FORBIDDEN', message: '无权访问此知识库' });
+    return apiResp(res, ERROR_CODES.FORBIDDEN, null, '无权访问此知识库');
   }
-  
+
   const fs = require('fs');
   const path = require('path');
   const filePath = path.join(__dirname, '..', 'knowledge', filename);
-  
+
   if (!fs.existsSync(filePath)) {
-    return res.status(404).json({ error: '文件不存在' });
+    return apiResp(res, ERROR_CODES.NOT_FOUND, null, '文件不存在');
   }
-  
+
+  // 成功路径：直接返回 KB 文件内容（保持 .js 资源原样下发，不走 json 壳）
   const content = fs.readFileSync(filePath, 'utf8');
   res.set('Cache-Control', 'public, max-age=3600');
   res.type('application/javascript').send(content);
@@ -2053,6 +2078,8 @@ app.get('/api/public/stats', (req, res) => {
 
 // === KB 命中上报（公开，无需认证，前端 _kbHitCount 上报用）===
 // === KB 模型统计公开别名（追溯链状态，H5 用）===
+// v1 alias
+app.get('/api/v1/public/kb-stats', (req, res) => res.redirect(308, '/api/public/kb-stats'));
 app.get('/api/public/kb-stats', (req, res) => {
   try {
     const sources = db.prepare('SELECT COUNT(*) as cnt FROM source_index').get().cnt;
@@ -2064,18 +2091,20 @@ app.get('/api/public/kb-stats', (req, res) => {
     const hits = db.prepare('SELECT COUNT(*) as cnt FROM knowledge_trace').get().cnt;
     const pushes = db.prepare('SELECT COUNT(*) as cnt FROM model_push_log').get().cnt;
     const formalWithSrc = db.prepare("SELECT COUNT(*) as cnt FROM kb_formal WHERE source_ids != '[]' AND source_ids IS NOT NULL AND source_ids != ''").get().cnt;
-    res.json({
+    apiResp(res, ERROR_CODES.SUCCESS, {
       sources, staging, formal, audit, versions, models, hits, pushes,
       trace_rate: formal ? Math.round(formalWithSrc * 1000 / formal) / 10 : 0,
       aligned: formalWithSrc === formal,
       public: true
-    });
+    }, 'ok');
   } catch (e) {
-    res.json({ error: e.message });
+    apiResp(res, ERROR_CODES.SUCCESS, { error: e.message }, 'ok');
   }
 });
 
 // === KB 列表公开别名（无需认证，H5 公开页面用）===
+// v1 alias
+app.get('/api/v1/public/kb-list', (req, res) => res.redirect(308, '/api/public/kb-list'));
 app.get('/api/public/kb-list', (req, res) => {
   const fs = require('fs');
   const path = require('path');
@@ -2086,13 +2115,15 @@ app.get('/api/public/kb-list', (req, res) => {
       level: KB_LEVELS[file] ? KB_LEVELS[file].level : 'public',
       desc: KB_LEVELS[file] ? KB_LEVELS[file].desc : ''
     }));
-    res.json({ files, public: true });
+    apiResp(res, ERROR_CODES.SUCCESS, { files, public: true }, 'ok');
   } catch (e) {
-    res.json({ files: [] });
+    apiResp(res, ERROR_CODES.SUCCESS, { files: [] }, 'ok');
   }
 });
 
 // === R49-B 全局 KB 管理端点（查询/统计/入库/批量提分）===
+// v1 alias
+app.get('/api/v1/public/kb-manager/stats', (req, res) => res.redirect(308, '/api/public/kb-manager/stats'));
 app.get('/api/public/kb-manager/stats', (req, res) => {
   try {
     const byModule = db.prepare(`SELECT module, COUNT(*) as cnt, ROUND(AVG(trust_score),3) as avg_score FROM kb_formal GROUP BY module ORDER BY cnt DESC`).all();
@@ -2101,13 +2132,15 @@ app.get('/api/public/kb-manager/stats', (req, res) => {
     const total = db.prepare(`SELECT COUNT(*) as cnt FROM kb_formal`).get().cnt;
     const totalHit = db.prepare(`SELECT COALESCE(SUM(hit_count),0) as h FROM kb_formal`).get().h;
     const r48Count = db.prepare(`SELECT COUNT(*) as cnt FROM kb_formal WHERE entry_id LIKE '%r48%'`).get().cnt;
-    res.json({ total, totalHit, r48Count, byModule, byScore, byCat, ts: Date.now() });
+    apiResp(res, ERROR_CODES.SUCCESS, { total, totalHit, r48Count, byModule, byScore, byCat, ts: Date.now() }, 'ok');
   } catch (e) {
-    res.json({ error: String(e.message) });
+    apiResp(res, ERROR_CODES.SUCCESS, { error: String(e.message) }, 'ok');
   }
 });
 
 // 按模块查 KB（带 trust_score 过滤）
+// v1 alias
+app.get('/api/v1/public/kb-manager/list', (req, res) => res.redirect(308, '/api/public/kb-manager/list'));
 app.get('/api/public/kb-manager/list', (req, res) => {
   try {
     const { module, minScore = 0, limit = 50 } = req.query;
@@ -2117,17 +2150,19 @@ app.get('/api/public/kb-manager/list', (req, res) => {
     sql += ' ORDER BY trust_score DESC, hit_count DESC LIMIT ?';
     params.push(parseInt(limit));
     const items = db.prepare(sql).all(...params);
-    res.json({ items, count: items.length });
+    apiResp(res, ERROR_CODES.SUCCESS, { items, count: items.length }, 'ok');
   } catch (e) {
-    res.json({ error: String(e.message), items: [] });
+    apiResp(res, ERROR_CODES.SUCCESS, { error: String(e.message), items: [] }, 'ok');
   }
 });
 
 // 批量提升 trust_score（按 module 或 pattern）
+// v1 alias
+app.post('/api/v1/public/kb-manager/bump', (req, res) => res.redirect(308, '/api/public/kb-manager/bump'));
 app.post('/api/public/kb-manager/bump', (req, res) => {
   try {
     const { module, pattern, newScore = 0.85, dryRun = true } = req.body;
-    if (!module && !pattern) return res.json({ error: '需 module 或 pattern' });
+    if (!module && !pattern) return apiResp(res, ERROR_CODES.SUCCESS, { error: '需 module 或 pattern' }, 'ok');
     let sql, params;
     if (pattern) {
       sql = 'SELECT entry_id, trust_score FROM kb_formal WHERE entry_id LIKE ?';
@@ -2141,13 +2176,15 @@ app.post('/api/public/kb-manager/bump', (req, res) => {
       const upd = db.prepare('UPDATE kb_formal SET trust_score = ? WHERE entry_id = ?');
       for (const it of items) upd.run(newScore, it.entry_id);
     }
-    res.json({ matched: items.length, sample: items.slice(0,5), dryRun, newScore });
+    apiResp(res, ERROR_CODES.SUCCESS, { matched: items.length, sample: items.slice(0,5), dryRun, newScore }, 'ok');
   } catch (e) {
-    res.json({ error: String(e.message) });
+    apiResp(res, ERROR_CODES.SUCCESS, { error: String(e.message) }, 'ok');
   }
 });
 
 // KB 直答命中率统计（公共免 JWT）
+// v1 alias
+app.get('/api/v1/public/kb-manager/hit-rate', (req, res) => res.redirect(308, '/api/public/kb-manager/hit-rate'));
 app.get('/api/public/kb-manager/hit-rate', (req, res) => {
   try {
     const today = new Date().toISOString().slice(0, 10);
@@ -2157,7 +2194,7 @@ app.get('/api/public/kb-manager/hit-rate', (req, res) => {
     const top = db.prepare(`SELECT module, SUM(hit_count) as hits FROM kb_formal WHERE last_hit >= ? GROUP BY module ORDER BY hits DESC LIMIT 6`).all(today);
     // 7天趋势（每天命中条目数）
     const trend = db.prepare(`SELECT substr(last_hit,1,10) as day, COUNT(*) as entries FROM kb_formal WHERE last_hit IS NOT NULL AND last_hit >= date('now','-6 days') GROUP BY day ORDER BY day`).all();
-    res.json({
+    apiResp(res, ERROR_CODES.SUCCESS, {
       today,
       today_hits: todayHits,
       total_hits: totalHits,
@@ -2165,25 +2202,27 @@ app.get('/api/public/kb-manager/hit-rate', (req, res) => {
       hit_rate: totalKb > 0 ? Math.min(100, todayHits * 100 / totalKb).toFixed(2) : 0,
       top_modules: top,
       trend_7d: trend
-    });
+    }, 'ok');
   } catch (e) {
-    res.json({ error: String(e.message) });
+    apiResp(res, ERROR_CODES.SUCCESS, { error: String(e.message) }, 'ok');
   }
 });
 
 // KB 全局搜索（title+content，限模块）
+// v1 alias
+app.get('/api/v1/public/kb-manager/search', (req, res) => res.redirect(308, '/api/public/kb-manager/search'));
 app.get('/api/public/kb-manager/search', (req, res) => {
   try {
     const { q, module, limit = 10 } = req.query;
-    if (!q || q.length < 2) return res.json({ items: [] });
+    if (!q || q.length < 2) return apiResp(res, ERROR_CODES.SUCCESS, { items: [] }, 'ok');
     let sql = `SELECT entry_id, module, title, substr(content,1,200) as preview, trust_score, hit_count FROM kb_formal WHERE (title LIKE ? OR content LIKE ?)`;
     const params = ['%'+q+'%', '%'+q+'%'];
     if (module) { sql += ' AND module = ?'; params.push(module); }
     sql += ' ORDER BY trust_score DESC LIMIT ?';
     params.push(parseInt(limit));
-    res.json({ items: db.prepare(sql).all(...params) });
+    apiResp(res, ERROR_CODES.SUCCESS, { items: db.prepare(sql).all(...params) }, 'ok');
   } catch (e) {
-    res.json({ error: String(e.message), items: [] });
+    apiResp(res, ERROR_CODES.SUCCESS, { error: String(e.message), items: [] }, 'ok');
   }
 });
 
@@ -2216,13 +2255,15 @@ const KB_TOPIC_GROUPS = {
 // KB 通用检索（公开 · 免认证）
 // 用于前端 KB_SOURCES fallback：当 window.XXX_KB 缺失时调用
 // 参数: ?module=ziwei&q=武曲&limit=3
+// v1 alias
+app.get('/api/v1/public/kb-query', (req, res) => res.redirect(308, '/api/public/kb-query'));
 app.get('/api/public/kb-query', (req, res) => {
   try {
     const moduleId = String(req.query.module || '').trim();
     const q = String(req.query.q || '').trim();
     const limit = Math.min(parseInt(req.query.limit) || 5, 20);
     if (!moduleId) {
-      return res.json({ error: 'MISSING_MODULE', results: [] });
+      return apiResp(res, ERROR_CODES.SUCCESS, { error: 'MISSING_MODULE', results: [] }, 'ok');
     }
     // 纯 SQL 检索（不用 trace 表）
     let rows;
@@ -2241,18 +2282,20 @@ app.get('/api/public/kb-query', (req, res) => {
         ORDER BY trust_score DESC, hit_count DESC
         LIMIT ?`).all(moduleId, limit);
     }
-    res.json({ module: moduleId, q, count: rows.length, results: rows, public: true, fallback: true });
+    apiResp(res, ERROR_CODES.SUCCESS, { module: moduleId, q, count: rows.length, results: rows, public: true, fallback: true }, 'ok');
   } catch (e) {
-    res.json({ error: e.message, results: [] });
+    apiResp(res, ERROR_CODES.SUCCESS, { error: e.message, results: [] }, 'ok');
   }
 });
 
+// v1 alias
+app.get('/api/v1/public/kb-search', (req, res) => res.redirect(308, '/api/public/kb-search'));
 app.get('/api/public/kb-search', (req, res) => {
   try {
     const query = String(req.query.q || '').trim();
     const limit = Math.min(parseInt(req.query.limit || '20'), 50);
     if (!query || query.length < 2) {
-      return res.json({ error: '查询字符串至少 2 字', results: [], count: 0 });
+      return apiResp(res, ERROR_CODES.SUCCESS, { error: '查询字符串至少 2 字', results: [], count: 0 }, 'ok');
     }
     // 全文检索（无 module 限定）—— 跨模块知识库检索，供 AI 助手 v2 chat 兜底
     // const db = getDb(); -- use module-level `db`
@@ -2276,9 +2319,9 @@ app.get('/api/public/kb-search', (req, res) => {
       };
     });
     results.sort((a,b) => b.score - a.score);
-    res.json({ error: null, query, count: results.length, results });
+    apiResp(res, ERROR_CODES.SUCCESS, { error: null, query, count: results.length, results }, 'ok');
   } catch (e) {
-    res.json({ error: e.message, results: [], count: 0 });
+    apiResp(res, ERROR_CODES.SUCCESS, { error: e.message, results: [], count: 0 }, 'ok');
   }
 });
 
@@ -2398,13 +2441,15 @@ app.get('/api/public/consulting-detail', (req, res) => {
   }
 });
 
+// v1 alias
+app.get('/api/v1/public/kb-topic-search', (req, res) => res.redirect(308, '/api/public/kb-topic-search'));
 app.get('/api/public/kb-topic-search', (req, res) => {
   try {
     const group = String(req.query.group || '').trim();
     const query = String(req.query.query || '').trim();
     const limit = Math.min(parseInt(req.query.limit) || 10, 50);
     const cfg = KB_TOPIC_GROUPS[group];
-    if (!cfg) return res.json({ error: 'unknown group', available: Object.keys(KB_TOPIC_GROUPS) });
+    if (!cfg) return apiResp(res, ERROR_CODES.SUCCESS, { error: 'unknown group', available: Object.keys(KB_TOPIC_GROUPS, 'ok') });
 
     // 构造检索 SQL：按 tags LIKE 命中或 content LIKE 命中，AND module='ziwei'
     let sql, params;
@@ -2450,20 +2495,22 @@ app.get('/api/public/kb-topic-search', (req, res) => {
     }
 
     const rows = db.prepare(sql).all(...params);
-    res.json({
+    apiResp(res, ERROR_CODES.SUCCESS, {
       group, query, title: cfg.title, desc: cfg.desc,
       count: rows.length, entries: rows,
       public: true,
-    });
+    }, 'ok');
   } catch (e) {
-    res.json({ error: e.message, public: false });
+    apiResp(res, ERROR_CODES.SUCCESS, { error: e.message, public: false }, 'ok');
   }
 });
 
+// v1 alias
+app.post('/api/v1/public/kb-hit', (req, res) => res.redirect(308, '/api/public/kb-hit'));
 app.post('/api/public/kb-hit', (req, res) => {
   try {
     const { entry_id, app_endpoint, user_query } = req.body || {};
-    if (!entry_id) return res.json({ error: 'entry_id required' });
+    if (!entry_id) return apiResp(res, ERROR_CODES.SUCCESS, { error: 'entry_id required' }, 'ok');
     if (typeof kbMgmt.recordHit === 'function') {
       kbMgmt.recordHit(String(entry_id), app_endpoint || 'ai-assistant', user_query || '');
     } else {
@@ -2472,9 +2519,9 @@ app.post('/api/public/kb-hit', (req, res) => {
         db.prepare(`UPDATE kb_formal SET hit_count = hit_count + 1, last_hit = CURRENT_TIMESTAMP WHERE entry_id = ?`).run(String(entry_id));
       } catch (e) {}
     }
-    res.json({ ok: true, entry_id });
+    apiResp(res, ERROR_CODES.SUCCESS, { ok: true, entry_id }, 'ok');
   } catch (e) {
-    res.json({ error: e.message });
+    apiResp(res, ERROR_CODES.SUCCESS, { error: e.message }, 'ok');
   }
 });
 
