@@ -21,6 +21,7 @@ const { apiResp, ok, ERROR_CODES } = require('./api-response.js');
 const kbRoutes = require('./kb-routes.js');
 const exportRoutes = require('./export-routes.js');
 const kbMgmt = require('./kb-management-engine.js'); // KB 命中入库（新）
+const privacy = require('./privacy-compliance.js');   // 隐私合规（GDPR/PIPL，节点 10.2）
 
 const app = express();
 const PORT = parseInt(process.env.API_PORT || '8920');
@@ -251,6 +252,7 @@ function initRBACTables() {
 }
 
 initRBACTables();
+privacy.initSchema();
 
 // ============================
 // 认证中间件（使用RBAC版）
@@ -3086,6 +3088,49 @@ app.get('/api/v1/admin/metrics', adminAuth, async (req, res) => {
     logger.error({ module: 'metrics', err: e.message }, 'metrics endpoint error');
     res.status(500).json({ ok: false, error: 'METRICS_ERROR', message: e.message });
   }
+});
+
+/* ===== 隐私合规路由（节点 10.2 · GDPR/PIPL） ===== */
+// 数据导出（GDPR 第 20 条 / PIPL 第 45 条）
+app.get('/api/v1/user/export', auth, (req, res) => {
+  privacy.apiExportHandler(req, res, apiResp);
+});
+
+// 软删除（注销 + 30 天宽限期）
+app.post('/api/v1/user/delete', auth, (req, res) => {
+  privacy.apiSoftDeleteHandler(req, res, apiResp);
+});
+
+// 撤销软删除（30 天内恢复）
+app.post('/api/v1/user/restore', auth, (req, res) => {
+  privacy.apiCancelSoftDeleteHandler(req, res, apiResp);
+});
+
+// 查询当前同意记录
+app.get('/api/v1/user/consents', auth, (req, res) => {
+  const userId = req.userId || (req.user && req.user.id);
+  if (!userId) return apiResp(res, 401, null, '未登录');
+  const consents = privacy.getConsents(userId);
+  return apiResp(res, 200, { consents }, 'ok');
+});
+
+// 记录同意 / 拒绝
+app.post('/api/v1/user/consents', auth, (req, res) => {
+  const userId = req.userId || (req.user && req.user.id);
+  if (!userId) return apiResp(res, 401, null, '未登录');
+  const { consentType, granted, version } = req.body || {};
+  if (!consentType || !version) {
+    return apiResp(res, 400, null, 'consentType 和 version 必填');
+  }
+  privacy.recordConsent({
+    userId,
+    consentType,
+    granted: !!granted,
+    version,
+    ip: req.ip,
+    userAgent: req.headers['user-agent'],
+  });
+  return apiResp(res, 200, { ok: true }, 'consent recorded');
 });
 
 /* ===== 404 兜底（任何未匹配路由） ===== */
