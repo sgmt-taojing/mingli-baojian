@@ -40,8 +40,10 @@ tr:hover td{background:#222a3a}
 .badge.d{background:var(--danger)}
 .log{background:#0a0f14;border:1px solid var(--bdr);padding:12px;border-radius:6px;font-family:Menlo,monospace;font-size:11px;max-height:240px;overflow-y:auto;color:var(--dim);margin-top:16px}
 </style>
+  <link rel="stylesheet" href="css/a11y-fix.css">
 </head>
 <body>
+  <a class="skip-link" href="#main-content">跳到主内容</a>
 <div class="container">
 <h1>🛠️ KB 批量管理 · R45-A</h1>
 <div class="sub">知识库批量操作 · 紫微 12 宫 · 八字十神 · 化解古籍</div>
@@ -290,7 +292,7 @@ async function auditDuplicate() {
       const d = await r.json();
       total += (d.results||[]).length;
     }
-    log.textContent += `  ✅ 抽样扫描完成\n  - 抽样词 ${words.length} 个 / 检索结果 ${total} 条\n  - 提示：真实去重需要 SQL `title`+`module` 复合索引\n`;
+    log.textContent += `  ✅ 抽样扫描完成\n  - 抽样词 ${words.length} 个 / 检索结果 ${total} 条\n  - 提示：真实去重需要 SQL 'title'+'module' 复合索引\n`;
   } catch(e) {
     log.textContent += `  ❌ 扫描失败: ${e.message}\n`;
   }
@@ -350,5 +352,6 @@ document.getElementById('searchInput').addEventListener('keypress',e=>{if(e.key=
 loadToken();
 loadStats();
 </script>
-</body>
+  <script src="js/a11y-divination-hub.js" defer></script>
+  </body>
 </html>

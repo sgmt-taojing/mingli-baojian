@@ -303,8 +303,10 @@ textarea.input-big{min-height:100px;resize:vertical;line-height:1.6}
 .dr-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
 @media(max-width:768px){.dr-dash-dual{grid-template-columns:1fr}.dr-6grid{grid-template-columns:repeat(2,1fr)}}
 </style>
+  <link rel="stylesheet" href="css/a11y-fix.css">
 </head>
 <body>
+  <a class="skip-link" href="#main-content">跳到主内容</a>
 
 <div class="top">
   <h1>⚕ 中医临床工作站</h1>
@@ -452,7 +454,7 @@ textarea.input-big{min-height:100px;resize:vertical;line-height:1.6}
   <button class="btn btn-primary" onclick="location.href='ai-assistant.html'">🤖 AI 助手</button>
 </div>
 
-<script>
+\x3cscript>
 /* ========== 五行-脏腑-中药数据库 ========== */
 const WUXING_DB = {
   '木': {
@@ -841,7 +843,8 @@ function printRx(){
     <div class="field"><span class="label">医嘱：</span>${$('#rx-note').value}</div>
     <div class="field"><span class="label">日期：</span>${new Date().toLocaleDateString('zh-CN')}</div>
     <div class="sig">医师签名：____________</div>
-    </body></html>`;
+      \x3cscript src="js/a11y-divination-hub.js" defer></script>
+  </body></html>`;
   w.document.write(html);
   w.document.close();
   w.print();
@@ -903,6 +906,7 @@ console.log('[doctor-elder] 中医临床工作站 v0.1 loaded');
 // 暴露供测试
 window.computeBazi = computeBazi;
 window.computeWuxingScore = computeWuxingScore;
+</script>
 <script>
 /* ===== R37-B doctor-elder 双核仪表盘 ===== */
 function renderElderDashboardR37(){
@@ -925,7 +929,6 @@ function renderElderDashboardR37(){
   h+='</div>';
   return h;
 }
-</script>
 </script>
 
 <script>renderElderDashboardR37_inject()</script>

@@ -89,8 +89,10 @@ textarea.form-input{min-height:100px;resize:vertical;line-height:1.8}
 @media(max-width:1200px){.container{max-width:960px}}
 @media(max-width:768px){.container{padding:16px 12px}.symptom-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr))}.step-indicator{min-width:100px;font-size:11px}}
 </style>
+  <link rel="stylesheet" href="css/a11y-fix.css">
 </head>
 <body>
+  <a class="skip-link" href="#main-content">跳到主内容</a>
 <div class="nav-bar">
   <a href="divination-hub.html" class="file-nav-btn">🏠 主平台</a>
   <a href="divination-almanac.html" class="file-nav-btn">📅 黄历</a>
@@ -535,7 +537,8 @@ function exportReport() {
       html += el.querySelector('.result-body').innerHTML;
     }
   });
-  html += '</body></html>';
+  html += '  <script src="js/a11y-divination-hub.js" defer></script>
+  </body></html>';
   var blob = new Blob([html], {type: 'text/html'});
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
