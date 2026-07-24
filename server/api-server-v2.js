@@ -2263,32 +2263,59 @@ const KB_TOPIC_GROUPS = {
 // 参数: ?module=ziwei&q=武曲&limit=3
 // v1 alias
 app.get('/api/v1/public/kb-query', (req, res) => res.redirect(308, '/api/public/kb-query'));
+// 前端模块名 → 后端 kb_formal.module 别名映射
+const MODULE_ALIASES = {
+  'zhongyi': ['nihaisha-structured', 'nihaisha', 'nihaixia', 'tcm', 'tcm-fangji', 'shanghan-lun', 'jinkui', 'huangdi-neijing', 'shennong-bencao', 'acupuncture'],
+  'qimen': ['qimen'],
+  'fengshui': ['fengshui'],
+  'jingdian': ['classics', 'mantra', 'faith'],
+  'bazi': ['bazi'],
+  'ziwei': ['ziwei'],
+  'meihua': ['meihua'],
+  'liuyao': ['liuyao'],
+  'liuren': ['liuren'],
+  'yijing': ['classics'],
+  'shengxiao': ['zodiac'],
+  'zodiac': ['zodiac'],
+  'yanzhi': ['huajie'],
+  'mantra': ['mantra', 'faith'],
+  'lifeindex': ['nihaisha-structured', 'tcm', 'faith'],
+  'lifeplan': ['nihaisha-structured', 'bazi', 'tcm'],
+  'yunshi': ['zodiac', 'classics', 'nihaisha-structured'],
+  'caiyun': ['bazi', 'nihaisha-structured'],
+  'shiye': ['bazi', 'ziwei'],
+  'ganqing': ['faith', 'nihaisha-structured'],
+};
+
 app.get('/api/public/kb-query', (req, res) => {
   try {
-    const moduleId = String(req.query.module || '').trim();
+    let moduleId = String(req.query.module || '').trim();
     const q = String(req.query.q || '').trim();
     const limit = Math.min(parseInt(req.query.limit) || 5, 20);
     if (!moduleId) {
       return apiResp(res, ERROR_CODES.SUCCESS, { error: 'MISSING_MODULE', results: [] }, 'ok');
     }
+    // 别名展开：zhongyi → [nihaisha, tcm, ...]
+    const modules = MODULE_ALIASES[moduleId] || [moduleId];
+    const placeholders = modules.map(()=>'?').join(',');
     // 纯 SQL 检索（不用 trace 表）
     let rows;
     if (q) {
       const like = '%' + q + '%';
-      rows = db.prepare(`SELECT entry_id, title, substr(content,1,400) AS snippet, tags, trust_score
+      rows = db.prepare(`SELECT entry_id, title, substr(content,1,400) AS snippet, tags, trust_score, module
         FROM kb_formal
-        WHERE module=? AND status='formal'
+        WHERE module IN (${placeholders}) AND status='formal'
           AND (title LIKE ? OR content LIKE ? OR tags LIKE ?)
         ORDER BY trust_score DESC, hit_count DESC
-        LIMIT ?`).all(moduleId, like, like, like, limit);
+        LIMIT ?`).all(...modules, like, like, like, limit);
     } else {
-      rows = db.prepare(`SELECT entry_id, title, substr(content,1,400) AS snippet, tags, trust_score
+      rows = db.prepare(`SELECT entry_id, title, substr(content,1,400) AS snippet, tags, trust_score, module
         FROM kb_formal
-        WHERE module=? AND status='formal'
+        WHERE module IN (${placeholders}) AND status='formal'
         ORDER BY trust_score DESC, hit_count DESC
-        LIMIT ?`).all(moduleId, limit);
+        LIMIT ?`).all(...modules, limit);
     }
-    apiResp(res, ERROR_CODES.SUCCESS, { module: moduleId, q, count: rows.length, results: rows, public: true, fallback: true }, 'ok');
+    apiResp(res, ERROR_CODES.SUCCESS, { module: moduleId, mappedModules: modules, q, count: rows.length, results: rows, public: true, fallback: true }, 'ok');
   } catch (e) {
     apiResp(res, ERROR_CODES.SUCCESS, { error: e.message, results: [] }, 'ok');
   }

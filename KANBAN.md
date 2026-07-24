@@ -3,7 +3,7 @@
 > **维护原则**：每个任务按工作流 22 节点推进；完成一个自动拉下一个；阻塞项标红等待决策。
 > **断点机制**：每个进行中任务必须记录"当前节点 + 产出物 + 下一步"，心跳只看这一页就能续推。
 > **顶层架构**：见 MECHANISM.md（本项目根目录）
-> **最后更新**：2026-07-24 11:35
+> **最后更新**：2026-07-24 13:32
 
 ---
 
@@ -15,11 +15,12 @@
 |------|---|
 | 优先级 | P0 |
 | 规范引用 | F-9（Web Components 优先） |
-| 节点进度 | 3/6（**3 demo 页面完成**） |
-| 当前节点 | 4-业务页面替换（已完成迁移指南；下一步执行首页面替换） |
-| 已产出 | 调研：21 个 toast / 21 个 tab / 3 个 modal 分散在 45 个文件；~12 小时总工作量；**节点 2**：`app/components/toast.js`（153 行）+ `modal.js`（195 行）+ `tab.js`（198 行）；**节点 3**：`app/components/demo.html`（795 行）；**节点 4**：迁移文档 `docs/COMPONENTS.md`（6825 行），含 7 项 ADR + 10 文件替换清单 + 验证清单 |
-| 下一步动作 | 迁移 `divination-integrated.html`（P0，14 switchTab + 8 面板）为首个替换页面；次选 `wechat-hub.html`（23 个 modal）
-| 备注 | 替换后验证功能不变；保留旧 API 兼容层 |
+| 节点进度 | 4/6（**2 Worker 迁移中**） |
+| 当前节点 | 4-业务页面替换：已确认 divination-integrated.html + wechat-hub.html 已迁；派 2 Worker 并行迁 divination-membership.html + master-class.html |
+| 已产出 | 调研 21 toast / 21 tab / 3 modal；3 组件 + demo.html（795 行）+ docs/COMPONENTS.md；**已迁** divination-integrated.html（`<ml-tab>`+`<ml-toast>`）+ wechat-hub.html（`<ml-modal>`） |
+| 下一步动作 | Worker 完成 → 浏览器验证 → 更新节点 → 迁剩余 3 页（kb-explorer / merchant-dashboard / my-yuanzhu） |
+| Worker | `migrate-divination-membership`（runId 87a34b8c）+`migrate-master-class`（runId 869fd6f1）并行执行中 |
+| 备注 | KANBAN 描述与现实有偏差（已修）；保留旧 API 兼容层 |
 
 ### ~~#2 · API 设计规范落地 · 完成~~ 2026-07-24
 

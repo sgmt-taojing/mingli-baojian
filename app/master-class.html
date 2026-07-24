@@ -38,11 +38,6 @@ video,audio{max-width:100%;max-height:70vh}
 .nav-back a{color:var(--gold);font-size:13px;text-decoration:none}
 
 /* === 大师讲堂 2.0 增强样式 === */
-.tab-bar{display:flex;gap:8px;margin-bottom:18px;background:rgba(201,168,76,.06);padding:6px;border-radius:12px;border:1px solid rgba(201,168,76,.15)}
-.tab-btn{flex:1;padding:10px 14px;border:none;background:transparent;color:var(--paper3);font-size:13px;letter-spacing:1px;border-radius:8px;cursor:pointer;transition:all .25s;font-family:inherit}
-.tab-btn.active{background:linear-gradient(135deg,var(--gold),var(--gold3));color:var(--ink);font-weight:bold;box-shadow:0 2px 8px rgba(201,168,76,.3)}
-.tab-btn:hover:not(.active){background:rgba(201,168,76,.12);color:var(--gold)}
-.tab-panel{display:none}.tab-panel.active{display:block}
 .era-block{margin-bottom:22px}
 .era-title{color:var(--gold);font-size:15px;letter-spacing:3px;padding:8px 0;border-bottom:1px solid rgba(201,168,76,.2);margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .era-title::before{content:'';display:inline-block;width:4px;height:16px;background:var(--gold);border-radius:2px}
@@ -133,15 +128,8 @@ video,audio{max-width:100%;max-height:70vh}
   <div class="stat-card"><div class="stat-num" id="stat-progress">0%</div><div class="stat-label">学习进度</div></div>
 </div>
 
-<div class="tab-bar">
-  <button class="tab-btn active" onclick="switchTab('tab-shuhan',this)">🩷 舒晗讲堂</button>
-  <button class="tab-btn" onclick="switchTab('tab-ni',this)">🩺 倪海厦讲堂</button>
-  <button class="tab-btn" onclick="switchTab('tab-masters',this)">📜 历代宗师</button>
-  <button class="tab-btn" onclick="switchTab('tab-lineage',this)">🌳 师承图谱</button>
-  <button class="tab-btn" onclick="switchTab('tab-quickref',this)">📖 速查表</button>
-  <button class="tab-btn" onclick="switchTab('tab-path',this)">🛤️ 学习路径</button>
-</div>
-
+<ml-tab id="clsTab" active="0">
+  <ml-tab-pane label="🩷 舒晗讲堂" id="tab-shuhan">
 <div class="tab-panel active" id="tab-shuhan">
 <div style="margin:0 0 14px;padding:12px;background:linear-gradient(135deg,rgba(231,76,60,.06),rgba(201,168,76,.04));border:1px solid rgba(231,76,60,.15);border-radius:10px">
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
@@ -177,9 +165,9 @@ video,audio{max-width:100%;max-height:70vh}
 
 
 </div>
-<!-- 倪海厦讲堂 -->
-</div>
-<div class="tab-panel" id="tab-ni">
+  </ml-tab-pane>
+  <ml-tab-pane label="🩺 倪海厦讲堂" id="tab-ni">
+  <div class="tab-panel" id="tab-ni">
   <div style="margin:0 0 14px;padding:12px;background:linear-gradient(135deg,rgba(46,204,113,.06),rgba(201,168,76,.04));border:1px solid rgba(46,204,113,.15);border-radius:10px">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
       <span style="font-size:20px">🩺</span>
@@ -194,7 +182,9 @@ video,audio{max-width:100%;max-height:70vh}
 
 <!-- 历代宗师 -->
 </div>
-<div class="tab-panel" id="tab-masters">
+  </ml-tab-pane>
+  <ml-tab-pane label="📜 历代宗师" id="tab-masters">
+  <div class="tab-panel" id="tab-masters">
   <div style="margin:0 0 14px;padding:12px;background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(74,144,164,.04));border:1px solid rgba(201,168,76,.2);border-radius:10px">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
       <span style="font-size:20px">📜</span>
@@ -215,32 +205,35 @@ video,audio{max-width:100%;max-height:70vh}
 
   <!-- 师承图谱 -->
 </div>
-<div class="tab-panel" id="tab-lineage">
+  </ml-tab-pane>
+  <ml-tab-pane label="🌳 师承图谱" id="tab-lineage">
+  <div class="tab-panel" id="tab-lineage">
   <div style="margin-bottom:16px">
     <h3 style="color:var(--gold);font-size:16px;letter-spacing:3px;margin-bottom:12px">🌳 命理师承图谱</h3>
     <p style="font-size:12px;color:var(--paper3);line-height:1.9;margin-bottom:16px">从汉代京房至今，38 位大师的师承脉络。一图看清命理学发展史的传承与流派分合。</p>
   </div>
   <div id="lineageDiagramArea"></div>
 </div>
-
-<!-- 速查表 -->
-<div class="tab-panel" id="tab-quickref">
+  </ml-tab-pane>
+  <ml-tab-pane label="📖 速查表" id="tab-quickref">
+  <div class="tab-panel" id="tab-quickref">
   <div style="margin-bottom:16px">
     <h3 style="color:var(--gold);font-size:16px;letter-spacing:3px;margin-bottom:12px">📖 命理速查表</h3>
     <p style="font-size:12px;color:var(--paper3);line-height:1.9;margin-bottom:16px">历代大师核心理念速览 · 流派特征速查 · 经典名言警句。</p>
   </div>
   <div id="quickRefArea"></div>
 </div>
-
-<!-- 学习路径 -->
-</div>
-<div class="tab-panel" id="tab-path">
+  </ml-tab-pane>
+  <ml-tab-pane label="🛤️ 学习路径" id="tab-path">
+  <div class="tab-panel" id="tab-path">
   <div style="margin-bottom:16px">
     <h3 style="color:var(--gold);font-size:16px;letter-spacing:3px;margin-bottom:12px">🛤️ 系统学习路径</h3>
     <p style="font-size:12px;color:var(--paper3);line-height:1.9;margin-bottom:16px">按以下四大路径循序渐进，结合实战练习，可在 6 个月内系统掌握命理与中医基础。</p>
   </div>
   <div id="pathRenderArea"></div>
 </div>
+  </ml-tab-pane>
+</ml-tab>
 
 <div class="detail-modal" id="masterDetailModal">
   <div class="detail-content" id="masterDetailContent"></div>
@@ -257,6 +250,7 @@ video,audio{max-width:100%;max-height:70vh}
   <a href="divination-hub.html">← 返回主页</a>
 </div>
 
+<script type="module" src="components/tab.js"></script>
 <script src="js/ui-toast.js" defer></script>
 <script>
 function toggleMaster(id){
@@ -448,13 +442,13 @@ function getStudyStats() {
 <script>
 // ===== 大师讲堂 2.0 新增模块 =====
 
-// Tab 切换
-function switchTab(tabId, btn) {
-  document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
-  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
-  let panel = document.getElementById(tabId);
-  if (panel) panel.classList.add('active');
-  if (btn) btn.classList.add('active');
+// Tab 切换（迁移到 <ml-tab> 后，active 切换由组件自动管理）
+const CLS_TAB_ORDER = ['tab-shuhan','tab-ni','tab-masters','tab-lineage','tab-quickref','tab-path'];
+function switchTab(tabId) {
+  const idx = CLS_TAB_ORDER.indexOf(tabId);
+  if (idx < 0) return;
+  const clsTab = document.getElementById('clsTab');
+  if (clsTab && typeof clsTab.setActive === 'function') clsTab.setActive(idx);
   // 切换时主动渲染该 Tab
   if (tabId === 'tab-masters') renderMasters();
   if (tabId === 'tab-path') renderLearningPath();
