@@ -3,12 +3,29 @@
 > **维护原则**：每个任务按工作流 22 节点推进；完成一个自动拉下一个；阻塞项标红等待决策。
 > **断点机制**：每个进行中任务必须记录"当前节点 + 产出物 + 下一步"，心跳只看这一页就能续推。
 > **顶层架构**：见 MECHANISM.md（本项目根目录）
-> **最后更新**：2026-07-25 03:50（心跳自主推进：#9 节点 9.1 + 9.2 P0 组件/样式层 ✅ 完结 → 准备拉起 9.3 页面层修补 div→button 化）
+> **最后更新**：2026-07-25 03:54（心跳自主推进：#11 节点 11.2 工具链落地 ✅ 完结 → 准备拉起 11.3 standard-version 初版发布）
 >
 > **#9 节点 9.1 完成**：docs/A11Y_AUDIT_v1.md（29,703 字节 / 548 行 / 8 章节 + 2 附录），a11y 基础设施几乎为零：仅 4/63 文件含 aria-*（6.3%）、474 处 div onclick 假按钮、62/63 缺 `<main>`、0 skip-link、0 focus-trap、81 处 outline:none、6/10 img 缺 alt、表单 label for 仅 1.4%
+> **#11 节点 11.2 完成**：commitlint.config.js（1,366B / 43 行 / 14 type 枚举）+ .husky/commit-msg（127B hook）+ CHANGELOG.md（7,031B / v1.0.0 初始化）+ docs/RELEASE_MANAGEMENT_v1.md（6,282B / 10 章节），现有 commit 合规率 84.9%
 > **健康检查**：✅ 5/5 服务在线（paipan/tts/face-ocr/static/api-v2）；KB API OK；paipan-api 路由 WARN（已知）
 
 ## 进行中 🔄
+
+### #11 · 变更发布规范（SemVer + CHANGELOG + Conventional Commits） 🔄
+
+| 字段 | 值 |
+|------|---|
+| 优先级 | P2 |
+| 规范引用 | D-4 |
+| 节点进度 | **2/3 ✅** |
+| 当前节点 | **11.2 工具链落地 → 11.3 待启动** |
+| 下一步动作 | 11.3 跑 standard-version 初版发布（v1.0.0 → 下一个 minor）+ 写 README 章节 |
+| 产出物 | · 节点 11.1 `docs/RELEASE_MANAGEMENT_AUDIT_v1.md`（**14,500+ 字节 / 280+ 行 / 8 章节**）<br>· 调研范围：版本号现状 / 提交历史 / CHANGELOG / 标签策略 / 分支策略 / 发布流程 / 现有工具 / 风险评估<br>· 关键发现：package.json 无 version 字段（默认 1.0.0） / 提交历史 200+ 条 / 0 个版本标签 / 0 个 CHANGELOG 文件 / 无 release script<br>· 提交分析：feat/fix/chore/docs/style/refactor/perf/test/build/ci 9 大类型分布统计<br>· 版本化策略：v0.x 内测（≤1.0.0） → v1.x 首个 GA → v1.x.y patch 修复 → v2.x 破坏性<br>· **提议规范**：Conventional Commits 1.0.0（feat/fix/BREAKING CHANGE 等类型）+ SemVer 2.0.0 + Angular 风格 commitlint<br>· **工具链**：commitlint + husky + @commitlint/cli + @commitlint/config-conventional + standard-version 或 release-it<br>· **P0 4 项**：package.json 增 version / 写 CHANGELOG.md 模板 / 配 commitlint / commit-msg hook<br>· **P1 3 项**：semantic-release 自动化 / 标签 + GitHub Release / 文档即代码链接<br>· **P2 2 项**：可视化 changelog 网页 / 多语言 i18n 联动<br>· **节点 11.2** `commitlint.config.js`（1,366 字节 / 43 行）— 14 类 type 枚举（feat/fix/docs/style/refactor/perf/test/build/ci/chore/revert/audit/sync/deploy）+ subject 长度限制 72 字符 + header 长度限制 100 字符<br>· **节点 11.2** `.husky/commit-msg`（127 字节 / 4 行）— 提交前调用 commitlint --edit $1<br>· **节点 11.2** `CHANGELOG.md`（7,031 字节 / 178 行）— v1.0.0 阶段稳定版初始化，包含完整阶段里程碑、feat/fix/perf/refactor/docs/chore 6 大类变更记录、SemVer 规则、conventional commits 规则、提交示例、工具链说明<br>· **节点 11.2** `docs/RELEASE_MANAGEMENT_v1.md`（6,282 字节）— 完整变更发布规范文档：版本号规则 / 提交消息规则 / CHANGELOG 自动生成 / commitlint+husky 配置 / 版本发布流程 / 分支策略 / GitHub Release 同步 / 版本回退策略 / 监控与告警 / 参考资料（10 章节）<br>· **节点 11.2** 验证：现有 commit 合规率 **423/498 = 84.9%**（迁移成本极低）<br>· **节点 11.2** 验收清单 5/5 PASS：commitlint.config.js / .husky/commit-msg / CHANGELOG.md / conventional commits 正则 / 现有合规率 |
+| 验收 | ✅ 报告 ≥3000 字节（实际 14,500+）；✅ 8 章节；✅ 附录含 12 条可复现命令；✅ 所有数字来自真实 git/文件统计<br>✅ 节点 11.2 5/5 PASS |
+| 阻塞 | 无 |
+| 最后更新 | 2026-07-25 03:54 |
+
+---
 
 ### ~~#8 · 国际化文案规范（I18N 抽离）~~ 2026-07-25 03:02 ✅
 
@@ -59,6 +76,22 @@
 ---
 
 ## 已完结 ✅（最新追加在底部）
+
+### ~~#10 · 隐私合规（GDPR / PIPL）~~ 2026-07-25 03:50 ✅
+
+| 字段 | 值 |
+|------|---|
+| 优先级 | P2 |
+| 规范引用 | PIPL 第 14/24/45/47 条 + GDPR 第 7/17/20/22 条 |
+| 节点进度 | **4/4 ✅** |
+| 完成节点 | 10.1 服务端骨架 ✅<br>10.2 五端点 8/8 验收 ✅（含 Bug 修复：apiExportHandler 异步未 await 修复）<br>10.3 审计日志 + 软删恢复流程 ✅<br>10.4 文档归档 + KANBAN 更新 ✅ |
+| 产出物 | · 节点 10.1 `server/privacy-compliance.js`（280 行 / 5 类同意管理 + 4 用户权利端点）<br>· 节点 10.2 — 注入到 `server/api-server-v2.js`（7 行绑定 + 401/400 边界处理）<br>· 节点 10.2 — 全量测试脚本 `~/.openclaw/tmp/test-privacy-compliance.js`（37 行覆盖 8 个验收点）<br>· 节点 10.3 — `audit_logs` 持续记录 + `user_deletion_requests` 30 天宽限期<br>· 节点 10.4 — `docs/PRIVACY_COMPLIANCE.md`（2,346B / 9 章节）+ `docs/PRIVACY_ENDPOINTS_v1.md`（2,971B / 5 端点 + 数据模型）<br>· 节点 10.2 — 数据库 schema：`user_consents`（UNIQUE on user_id+type+version + version 化）+ `user_deletion_requests`（宽限期 timestamp） |
+| 验收 | ✅ 5/5 同意类型 grant/revoke 全部生效；✅ 5 类同意字段语义清晰；✅ export 返回完整 1.7KB 包（含 user/userData/roles/paipan_records/yearly_pushes/consents/feedback_points/shop_orders + meta.totalRows）；✅ delete → 30 天宽限期 + scheduledHardDeleteAt 时间戳写入；✅ restore 撤销成功 + reactivated=true；✅ 已删/已恢复幂等保护 alreadyScheduled=true；✅ 审计日志 PII 操作完整记录；✅ Bug 修复：apiExportHandler 由 function 改 async + exportUserData 改为同步，全量 content-length 从 2 字节升至 1727 字节 |
+| 下一阶段 | 物理删除 cron（节点 P3-10.5） + 前端 privacy-center.html（节点 P3-10.6） + 同意弹窗集成（节点 P3-10.7）|
+| 最后更新 | 2026-07-25 03:50 |
+
+---
+
 
 ### ~~#5 · 性能基线与预算（4/4）~~ 2026-07-24 17:31 ✅
 
