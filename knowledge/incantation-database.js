@@ -368,6 +368,80 @@ window.INCANTATION_DB = {
       recitationCount: 3,
       level: '进阶',
       notes: '度人经为道教灵宝派核心经典'
+    },
+
+    // —— 宝诰 ——
+    {
+      name: '雷祖宝诰',
+      text: '九天应元府，无上玉清王。化形十方界，普济度群生。三九扬风出，三五呼雷鸣。驱邪诛恶逆，济死度超生。大慈大悲，大愿大力。九天应元雷声普化天尊。',
+      pinyin: 'jiǔ tiān yìng yuán fǔ，wú shàng yù qīng wáng。huà xíng shí fāng jiè，pǔ jì dù qún shēng。sān jiǔ yáng fēng chū，sān wǔ hū léi míng。qū xié zhū è nì，jì sǐ dù chāo shēng。dà cí dà bēi，dà yuàn dà lì。jiǔ tiān yìng yuán léi shēng pǔ huà tiān zūn。',
+      source: '《道藏·九天应元雷声普化天尊玉枢宝经》',
+      purpose: '赞颂雷祖功德，驱邪镇煞，祈求雷祖庇佑',
+      usage: '雷祖圣诞（八月十五）、驱邪法事、日常祈福时诵念',
+      method: '面南而立，焚香三炷，叩齿三十六通，诵念三遍',
+      school: '神霄派/全真道',
+      recitationCount: 3,
+      level: '进阶',
+      notes: '宝诰为赞颂神明功德之文，雷祖即九天应元雷声普化天尊，统御万雷',
+      level_tag: '经典✅'
+    },
+    {
+      name: '天蓬咒',
+      text: '天蓬天蓬，九元煞童。五丁都司，高刁北翁。七政八灵，太上浩凶。长颅巨兽，手把帝钟。素枭三神，严驾夔龙。威剑神王，斩邪灭踪。紫炁乘天，丹霞赫冲。吞魔食鬼，横身饮风。苍舌绿齿，四目老翁。天丁力士，威南御凶。天驺激戾，威北衔锋。三十万兵，卫我九重。辟除死籍，注上长生。万鬼消灭，所向成功。急急如律令。',
+      pinyin: 'tiān péng tiān péng，jiǔ yuán shà tóng。wǔ dīng dū sī，gāo diāo běi wēng。qī zhèng bā líng，tài shàng hào xiōng。cháng lú jù shòu，shǒu bǎ dì zhōng。sù xiāo sān shén，yán jià kuí lóng。wēi jiàn shén wáng，zhǎn xié miè zōng。zǐ qì chéng tiān，dān xiá hè chōng。tūn mó shí guǐ，héng shēn yǐn fēng。cāng shé lǜ chǐ，sì mù lǎo wēng。tiān dīng lì shì，wēi nán yù xiōng。tiān zōu jī lì，wēi běi xián fēng。sān shí wàn bīng，wèi wǒ jiǔ chóng。pì chú sǐ jí，zhù shàng cháng shēng。wàn guǐ xiāo miè，suǒ xiàng chéng gōng。jí jí rú lǜ lìng。',
+      source: '《道藏·天蓬经》',
+      purpose: '辟邪驱魔，斩妖灭踪，护身保命',
+      usage: '驱邪法事、夜间出行、感觉不祥时诵念',
+      method: '面北而立，结天蓬印，观想天蓬元帅领三十万兵将护身，诵念三遍至七遍',
+      school: '神霄派',
+      recitationCount: 3,
+      level: '高阶',
+      notes: '天蓬咒为道教护法咒之首，天蓬元帅即北斗第九星化身',
+      level_tag: '经典✅'
+    },
+    {
+      name: '太乙救苦天尊宝诰',
+      text: '青华长乐界，东极妙严宫。七宝芳骞林，九色莲花座。万真环拱内，百亿瑞光中。玉清灵宝尊，应化玄元始。浩劫垂慈济，大千普度门。化身如恒沙，寻声来救苦。天人师大慈悲，十方救苦太乙天尊。',
+      pinyin: 'qīng huá cháng lè jiè，dōng jí miào yán gōng。qī bǎo fāng qiān lín，jiǔ sè lián huā zuò。wàn zhēn huán gǒng nèi，bǎi yì ruì guāng zhōng。yù qīng líng bǎo zūn，yìng huà xuán yuán shǐ。hào jié chuí cí jì，dà qiān pǔ dù mén。huà shēn rú héng shā，xún shēng lái jiù kǔ。tiān rén shī dà cí bēi，shí fāng jiù kǔ tài yǐ tiān zūn。',
+      source: '《道藏·太乙救苦护身妙经》',
+      purpose: '赞颂太乙救苦天尊功德，超度亡魂，救苦救难',
+      usage: '超度法会、济幽科仪、消灾解厄时诵念',
+      method: '面东焚香，双手合十，诵念三遍',
+      school: '正一道/全真道',
+      recitationCount: 3,
+      level: '进阶',
+      notes: '太乙救苦天尊为道教救苦主神，寻声救苦如观音菩萨',
+      level_tag: '经典✅'
+    },
+    {
+      name: '三官大帝宝诰',
+      text: '唯三圣人，乃一太极。昔受符图于虚无自然，因结盟誓于三元之始。天官赐福，地官赦罪，水官解厄。一百二十之曹僚，三十六之考校。上元一品赐福天官紫微大帝，中元二品赦罪地官清虚大帝，下元三品解厄水官洞阴大帝。三元品帝，三官大帝，感应无穷。',
+      pinyin: 'wéi sān shèng rén，nǎi yī tài jí。xī shòu fú tú yú xū wú zì rán，yīn jié méng shì yú sān yuán zhī shǐ。tiān guān cì fú，dì guān shè zuì，shuǐ guān jiě è。yī bǎi èr shí zhī cáo liáo，sān shí liù zhī kǎo jiào。shàng yuán yī pǐn cì fú tiān guān zǐ wēi dà dì，zhōng yuán èr pǐn shè zuì dì guān qīng xū dà dì，xià yuán sān pǐn jiě è shuǐ guān dòng yīn dà dì。sān yuán pǐn dì，sān guān dà dì，gǎn yìng wú qióng。',
+      source: '《道藏·三元品诫经》',
+      purpose: '赞颂三官大帝功德，天官赐福、地官赦罪、水官解厄',
+      usage: '三元节（上元正月十五/中元七月十五/下元十月十五）、祈福消灾时诵念',
+      method: '焚香三炷，面南三叩首，诵念三遍',
+      school: '正一道/全真道',
+      recitationCount: 3,
+      level: '入门',
+      notes: '三官大帝为道教最高神格之一，总管人间祸福，宝诰为赞颂之文',
+      level_tag: '经典✅'
+    },
+
+    // —— 补缺：财神类 ——
+    {
+      name: '文财神咒',
+      text: '文财神在上，弟子虔诚祈请。比干丞相，忠心赤胆，无心无私，公正明察。范蠡陶朱公，三聚三散，通晓天道，善理财源。弟子诚心奉文财神，正财广进，事业亨通。忠信待人，勤俭致富。急急如律令。',
+      pinyin: 'wén cái shén zài shàng，dì zǐ chéng xīn qí qǐng。bǐ gàn chéng xiàng，zhōng xīn chì dǎn，wú xīn wú sī，gōng zhèng míng chá。fàn lí táo zhū gōng，sān jù sān sàn，tōng xiǎo tiān dào，shàn lǐ cái yuán。dì zǐ chéng xīn fèng wén cái shén，zhèng cái guǎng jìn，shì yè hēng tōng。zhōng xìn dài rén，qín jiǎn zhì fù。jí jí rú lǜ lìng。',
+      source: '民间传统/道教财神信仰',
+      purpose: '祈求正财运，事业顺利，合法合规之财源广进',
+      usage: '每日清晨、开店营业前、事业祈愿时诵念',
+      method: '面财神方位焚香三炷，双手合十，诵念七遍',
+      school: '正一道/民间法教',
+      recitationCount: 7,
+      level: '入门',
+      notes: '文财神指比干（公正无私）与范蠡（陶朱公，善理财），主正财',
+      level_tag: '实践📘'
     }
   ],
 
@@ -624,8 +698,125 @@ window.INCANTATION_DB = {
       usage: '日常观修，遇执著时诵念',
       method: '静坐观想，诵念三遍',
       notes: '金刚经中最为人知的偈颂',
-      recitationCount: 3,
-      level: '入门'
+      level_tag: '经典✅'
+    },
+
+    // —— 净业真言 ——
+    {
+      name: '净口业真言',
+      text: '修唎修唎·摩诃修唎·修修唎·萨婆诃',
+      pinyin: 'xiū lì xiū lì·mó hē xiū lì·xiū xiū lì·sà pó hē',
+      source: '《大佛顶首楞严经》',
+      purpose: '净化口业，清除口中秽气，使口舌清正',
+      merit: '诵持此真言，能灭口四业（妄言、绮语、两舌、恶口），令口业清净',
+      usage: '诵经前、念咒前、斋前诵念',
+      method: '合掌诵念三遍或七遍',
+      recitationCount: 7,
+      level: '入门',
+      notes: '与道教净口神咒功能类似，为佛教诵经前行',
+      level_tag: '经典✅'
+    },
+    {
+      name: '净身业真言',
+      text: '唵·修多唎·修多唎·摩诃修多唎·修修唎·萨婆诃',
+      pinyin: 'ōng·xiū duō lì·xiū duō lì·mó hē xiū duō lì·xiū xiū lì·sà pó hē',
+      source: '《大佛顶首楞严经》',
+      purpose: '净化身业，清除身三业（杀、盗、淫），使身业清净',
+      merit: '诵持此真言，能灭身三业，令身体清净',
+      usage: '诵经前、修法前诵念',
+      method: '合掌诵念三遍或七遍',
+      recitationCount: 7,
+      level: '入门',
+      notes: '与道教净身神咒功能类似，为佛教修法前行',
+      level_tag: '经典✅'
+    },
+    {
+      name: '净心业真言',
+      text: '唵·嚩曰啰·怛诃·斛',
+      pinyin: 'ōng·wá rì là·dá hē·hōng',
+      source: '《大佛顶首楞严经》',
+      purpose: '净化心业，清除意三业（贪、瞋、痴），使心念清净',
+      merit: '诵持此真言，能灭意三业，令心念清净，智慧明朗',
+      usage: '诵经前、修法前、静坐前诵念',
+      method: '合掌诵念三遍或七遍',
+      recitationCount: 7,
+      level: '入门',
+      notes: '与道教净心神咒功能类似，为佛教修心前行',
+      level_tag: '经典✅'
+    },
+    {
+      name: '净三业真言',
+      text: '唵·娑嚩婆嚩秫驮·娑嚩达摩·娑嚩婆嚩秫度憾',
+      pinyin: 'ōng·suō wá pó wá shù tuó·suō wá dá mó·suō wá pó wá shù dù hàn',
+      source: '《大毗卢遮那成佛神变加持经》',
+      purpose: '清净身口意三业，总持三业清净',
+      merit: '诵持此真言，能同时清净身口意三业，为修法之总前行',
+      usage: '密法修持前、诵经前诵念',
+      method: '合掌观想三业清净，诵念三遍或七遍',
+      recitationCount: 7,
+      level: '入门',
+      notes: '此真言总摄三业清净，为密宗修法前行之一',
+      level_tag: '经典✅'
+    },
+
+    // —— 心咒补缺 ——
+    {
+      name: '大悲咒心咒',
+      text: '唵·摩尼·罚摩啰·穆帝隶·娑婆诃',
+      pinyin: 'ōng·mó ní·fá mó là·mù dì lì·suō pó hē',
+      source: '《大悲心陀罗尼经》',
+      purpose: '大悲咒之心中心咒，速得观音感应',
+      merit: '诵持此心咒，如诵大悲咒全文之功德，速得观世音菩萨感应',
+      usage: '时间紧追时、日常持诵时',
+      method: '合掌观想观世音菩萨，诵念二十一遍或一百零八遍',
+      recitationCount: 21,
+      level: '入门',
+      notes: '大悲咒心咒为大悲咒精要，适合忙碌者日常持诵',
+      level_tag: '经典✅'
+    },
+    {
+      name: '华佗神医咒',
+      text: '神医华佗在上，弟子虔诚祈请。妙手回春，药到病除。仙师传妙方，神针除疾苦。弟子虔诚求健康，祛病消灾复安康。急急如律令。',
+      pinyin: 'shén yī huà tuó zài shàng，dì zǐ chéng xīn qí qǐng。miào shǒu huí chūn，yào dào bìng chú。xiān shī chuán miào fāng，shén zhēn chú jí kǔ。dì zǐ chéng xīn qiú jiàn kāng，qū bìng xiāo zāi fù ān kāng。jí jí rú lǜ lìng。',
+      source: '民间传统/道教医神信仰',
+      purpose: '治病康健，祛除疾苦',
+      merit: '诵持此咒，祈求华佗仙师加持，祛病康复',
+      usage: '生病时、服药前、祈福健康时诵念',
+      method: '面南焚香，双手叠于患处或丹田，诵念二十一遍',
+      recitationCount: 21,
+      level: '入门',
+      notes: '华佗为民间尊奉之神医，道教奉为医神',
+      level_tag: '实践📘'
+    },
+
+    // —— 发愿与回向 ——
+    {
+      name: '通用发愿文',
+      text: '众生无边誓愿度，烦恼无尽誓愿断，法门无量誓愿学，佛道无上誓愿成。愿以此功德，普及于一切。我等与众生，皆共成佛道。愿消三障诸烦恼，愿得智慧真明了，普愿罪障悉消除，世世常行菩萨道。',
+      pinyin: 'zhòng shēng wú biān shì yuàn dù，fán nǎo wú jìn shì yuàn duàn，fǎ mén wú liàng shì yuàn xué，fó dào wú shàng shì yuàn chéng。yuàn yǐ cǐ gōng dé，pǔ jí yú yī qiè。wǒ děng yǔ zhòng shēng，jiē gòng chéng fó dào。',
+      source: '《华严经·普贤行愿品》',
+      purpose: '发菩提心，立四弘誓愿',
+      merit: '发愿为修行之始，能引发行愿之力，功德无量',
+      usage: '诵经持咒前发愿，或日常修行时诵念',
+      method: '合掌至诚诵念一遍或三遍',
+      recitationCount: 1,
+      level: '入门',
+      notes: '四弘誓愿为汉传佛教通用发愿文，可根据需要增减',
+      level_tag: '经典✅'
+    },
+    {
+      name: '回向偈',
+      text: '愿以此功德，普及于一切。我等与众生，皆共成佛道。愿生西方净土中，九品莲花为父母。花开见佛悟无生，不退菩萨为伴侣。愿消三障诸烦恼，愿得智慧真明了。普愿罪障悉消除，世世常行菩萨道。',
+      pinyin: 'yuàn yǐ cǐ gōng dé，pǔ jí yú yī qiè。wǒ děng yǔ zhòng shēng，jiē gòng chéng fó dào。yuàn shēng xī fāng jìng tǔ zhōng，jiǔ pǐn lián huā wèi fù mǔ。huā kāi jiàn fó wù wú shēng，bù tuì pú sà wèi bàn lǚ。',
+      source: '《华严经·普贤行愿品》/《观无量寿经》',
+      purpose: '诵经持咒后回向功德，将功德分享一切众生',
+      merit: '回向能令功德增广，如一滴水入大海永不枯竭',
+      usage: '诵经持咒完毕后诵念',
+      method: '合掌至诚诵念一遍或三遍',
+      recitationCount: 1,
+      level: '入门',
+      notes: '回向为佛教修行之收尾，将功德回向一切众生',
+      level_tag: '经典✅'
     }
   ],
 

@@ -665,9 +665,8 @@ body{font-family:var(--font);background:var(--ink);color:var(--paper);line-heigh
 </ml-modal>
 
 <!-- Push Settings Modal -->
-<div class="modal-mask" id="pushSettingsModal" style="align-items:flex-start;padding:20px 12px;overflow-y:auto">
-  <div class="modal-box" style="max-width:400px;text-align:left;padding:20px 16px">
-    <h3 style="text-align:center">⚙️ 推送设置</h3>
+<!-- Push Settings Modal -->
+<ml-modal id="pushSettingsModal" title="⚙️ 推送设置" size="sm">
     <p style="font-size:12px;color:var(--paper3);text-align:center;margin-bottom:12px">定制每日推送内容，取消勾选则不推送该模块</p>
     
     <!-- 推送开关 -->
@@ -707,9 +706,7 @@ body{font-family:var(--font);background:var(--ink);color:var(--paper);line-heigh
     
     <button class="btn" onclick="savePushSettings()">💾 保存设置</button>
     <button class="btn btn-outline" onclick="resetPushSettings()" style="margin-top:6px">恢复默认</button>
-    <div class="modal-close" onclick="closeModal('pushSettingsModal')">✕</div>
-  </div>
-</div>
+</ml-modal>
 
 <script src="../js/divination-core.js"></script>
 <script src="components/modal.js"></script>
@@ -949,7 +946,7 @@ function ensurePhone() {
   if (user.phone) return true;
   // 首次/未设手机时弹窗一次，用户可跳过
   if (!localStorage.getItem('phone_modal_dismissed')) {
-    document.getElementById('phoneModal').classList.add('show');
+    document.getElementById('phoneModal').open();
   }
   return false;
 }
@@ -989,7 +986,7 @@ function openTool(toolKey) {
     } else {
       document.getElementById('limitMsg').innerHTML = config.name + '今日免费次数已用完。<br>开通会员即可不限次使用全部工具。';
     }
-    document.getElementById('limitModal').classList.add('show');
+    document.getElementById('limitModal').open();
     return;
   }
   
@@ -1139,7 +1136,7 @@ function doCheckin() {
 
 // ─── 会员购买 ───
 function showVipModal() {
-  document.getElementById('vipModal').classList.add('show');
+  document.getElementById('vipModal').open();
 }
 
 function buyVip(plan) {
@@ -1170,7 +1167,7 @@ function buyVip(plan) {
 function showExchangeModal() {
   const user = getUser();
   document.getElementById('exchangePoints').textContent = user.points || 0;
-  document.getElementById('exchangeModal').classList.add('show');
+  document.getElementById('exchangeModal').open();
 }
 
 function doExchange(plan, neededPoints) {
@@ -1199,7 +1196,7 @@ function doExchange(plan, neededPoints) {
 
 // ─── 建议反馈 ───
 function showFeedback() {
-  document.getElementById('feedbackModal').classList.add('show');
+  document.getElementById('feedbackModal').open();
   document.getElementById('fbResult').style.display = 'none';
 }
 
@@ -1288,7 +1285,7 @@ function showHistory() {
         '<span style="color:var(--paper3);float:right">' + timeStr + '</span></div>';
     }).join('');
   }
-  document.getElementById('historyModal').classList.add('show');
+  document.getElementById('historyModal').open();
 }
 
 // ─── 我的功德 ───
@@ -1337,7 +1334,7 @@ function shareToFriend() {
 
 // ─── Modal 工具 ───
 function closeModal(id) {
-  document.getElementById(id).classList.remove('show');
+  document.getElementById(id).close();
 }
 
 // ─── 推送设置 ───
@@ -1367,7 +1364,7 @@ function showPushSettings() {
   let faithEl = document.getElementById('psFaith');
   faithEl.value = (settings && settings.faith) ? settings.faith : '全部';
   
-  document.getElementById('pushSettingsModal').classList.add('show');
+  document.getElementById('pushSettingsModal').open();
 }
 
 function updateToggleStyle(checkbox) {
@@ -1422,9 +1419,9 @@ function resetPushSettings() {
 }
 
 function showResult(title, msg) {
-  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultModal').setAttribute('title', title);
   document.getElementById('resultMsg').textContent = msg;
-  document.getElementById('resultModal').classList.add('show');
+  document.getElementById('resultModal').open();
 }
 
 function showTip(msg) {
@@ -2334,7 +2331,7 @@ openTool = function(toolKey) {
     } else {
       document.getElementById('limitMsg').innerHTML = config.name + '今日免费次数已用完。<br>开通会员即可不限次使用全部工具。';
     }
-    document.getElementById('limitModal').classList.add('show');
+    document.getElementById('limitModal').open();
     return;
   }
   
