@@ -8,6 +8,7 @@ const { DatabaseSync } = require('node:sqlite');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const logger = require('./logger.js');
 
 const DB_PATH = path.join(__dirname, 'database', 'yidao.db');
 const KB_DIR = path.join(__dirname, '..', 'knowledge');
@@ -111,7 +112,7 @@ function extractFromKBFile(filename, module, write) {
   if (write === undefined) write = true;
   const filepath = path.join(KB_DIR, filename);
   if (!fs.existsSync(filepath)) {
-    console.warn(`[KB] 文件不存在: ${filepath}`);
+    logger.warn({ module: 'kb-management-engine', filepath }, '文件不存在');
     return [];
   }
 
@@ -154,7 +155,7 @@ function extractFromKBFile(filename, module, write) {
     for (const e of entries) {
       if (writeToStaging(e)) written++;
     }
-    console.log(`[KB] 提取 ${filename}: ${entries.length} 条，写入 staging: ${written} 条`);
+    logger.info({ module: 'kb-management-engine', filename, entries: entries.length, written }, '提取完成');
   }
 
   return entries;
@@ -285,7 +286,7 @@ function distillFromCases(opts) {
   for (const e of extracted) {
     if (writeToStaging(e)) written++;
   }
-  console.log(`[KB] 蒸馏 ${cases.length} 个案例: 提取 ${extracted.length} 条，写入 staging: ${written} 条`);
+  logger.info({ module: 'kb-management-engine', cases: cases.length, extracted: extracted.length, written }, '蒸馏完成');
 
   return extracted;
 }

@@ -7,6 +7,7 @@ const rbac = require('./rbac-middleware.js');
 const sec = require('./security-v2.js');
 const distillation = require('./distillation-engine.js');
 const caseQuality = require('./case-quality.js');
+const logger = require('./logger.js');
 
 // === POST /api/distill/scan — 扫描可蒸馏案例 ===
 router.post('/scan', rbac.requirePermission('case:distill'), (req, res) => {
@@ -33,7 +34,7 @@ router.post('/scan', rbac.requirePermission('case:distill'), (req, res) => {
       })
     });
   } catch (e) {
-    console.error('蒸馏扫描错误:', e.message);
+    logger.error({ module: 'distillation-routes', err: e }, '蒸馏扫描错误');
     res.status(500).json({ error: 'SERVER_ERROR', message: e.message });
   }
 });
@@ -75,7 +76,7 @@ router.post('/extract', rbac.requirePermission('case:distill'), (req, res) => {
       })
     });
   } catch (e) {
-    console.error('模式提取错误:', e.message);
+    logger.error({ module: 'distillation-routes', err: e }, '模式提取错误');
     res.status(500).json({ error: 'SERVER_ERROR', message: e.message });
   }
 });
@@ -118,7 +119,7 @@ router.post('/validate', rbac.requirePermission('case:distill'), (req, res) => {
       })
     });
   } catch (e) {
-    console.error('验证错误:', e.message);
+    logger.error({ module: 'distillation-routes', err: e }, '验证错误');
     res.status(500).json({ error: 'SERVER_ERROR', message: e.message });
   }
 });
@@ -145,7 +146,7 @@ router.post('/apply', rbac.requirePermission('case:distill'), (req, res) => {
     let result = distillation.applyDistillation(batchId, req.userId);
     res.json(result);
   } catch (e) {
-    console.error('应用蒸馏错误:', e.message);
+    logger.error({ module: 'distillation-routes', err: e }, '应用蒸馏错误');
     res.status(500).json({ error: 'SERVER_ERROR', message: e.message });
   }
 });
@@ -179,7 +180,7 @@ router.post('/verify/:batchId', rbac.requirePermission('clinic:collaborate'), (r
       res.json({ ok: true, message: '已拒绝', role: role });
     }
   } catch (e) {
-    console.error('审核错误:', e.message);
+    logger.error({ module: 'distillation-routes', err: e }, '审核错误');
     res.status(500).json({ error: 'SERVER_ERROR', message: e.message });
   }
 });
@@ -194,7 +195,7 @@ router.post('/run', rbac.requirePermission('case:distill'), async (req, res) => 
     let result = await distillation.runFullDistillation(threshold);
     res.json(result);
   } catch (e) {
-    console.error('蒸馏流程错误:', e.message);
+    logger.error({ module: 'distillation-routes', err: e }, '蒸馏流程错误');
     res.status(500).json({ error: 'SERVER_ERROR', message: e.message });
   }
 });
@@ -206,7 +207,7 @@ router.get('/batches', rbac.requirePermission('case:distill'), (req, res) => {
     let batches = distillation.getBatches(limit);
     res.json({ ok: true, batches: batches });
   } catch (e) {
-    console.error('获取批次列表错误:', e.message);
+    logger.error({ module: 'distillation-routes', err: e }, '获取批次列表错误');
     res.status(500).json({ error: 'SERVER_ERROR', message: e.message });
   }
 });
@@ -218,7 +219,7 @@ router.get('/batch/:id', rbac.requirePermission('case:distill'), (req, res) => {
     if (!batch) return res.json({ error: '批次不存在' });
     res.json({ ok: true, batch: batch });
   } catch (e) {
-    console.error('获取批次详情错误:', e.message);
+    logger.error({ module: 'distillation-routes', err: e }, '获取批次详情错误');
     res.status(500).json({ error: 'SERVER_ERROR', message: e.message });
   }
 });
@@ -230,7 +231,7 @@ router.post('/rollback/:versionId', rbac.requirePermission('system:super'), (req
     let result = distillation.rollbackVersion(versionId);
     res.json(result);
   } catch (e) {
-    console.error('回滚错误:', e.message);
+    logger.error({ module: 'distillation-routes', err: e }, '回滚错误');
     res.status(500).json({ error: 'SERVER_ERROR', message: e.message });
   }
 });
@@ -242,7 +243,7 @@ router.get('/kb-versions', rbac.requirePermission('case:distill'), (req, res) =>
     let versions = distillation.getKBVersions(kbFile);
     res.json({ ok: true, versions: versions });
   } catch (e) {
-    console.error('获取版本历史错误:', e.message);
+    logger.error({ module: 'distillation-routes', err: e }, '获取版本历史错误');
     res.status(500).json({ error: 'SERVER_ERROR', message: e.message });
   }
 });
@@ -256,7 +257,7 @@ router.post('/score/:caseId', rbac.requirePermission('case:distill'), (req, res)
     let result = caseQuality.scoreCase(caseId);
     res.json(result);
   } catch (e) {
-    console.error('案例评分错误:', e.message);
+    logger.error({ module: 'distillation-routes', err: e }, '案例评分错误');
     res.status(500).json({ error: 'SERVER_ERROR', message: e.message });
   }
 });
@@ -267,7 +268,7 @@ router.post('/score-all', rbac.requirePermission('case:distill'), (req, res) => 
     let result = caseQuality.scoreAllCases();
     res.json(result);
   } catch (e) {
-    console.error('批量评分错误:', e.message);
+    logger.error({ module: 'distillation-routes', err: e }, '批量评分错误');
     res.status(500).json({ error: 'SERVER_ERROR', message: e.message });
   }
 });
@@ -280,7 +281,7 @@ router.post('/effectiveness/:caseId', rbac.requirePermission('clinic:collaborate
     let result = caseQuality.updateEffectiveness(caseId, rating);
     res.json(result);
   } catch (e) {
-    console.error('更新疗效评级错误:', e.message);
+    logger.error({ module: 'distillation-routes', err: e }, '更新疗效评级错误');
     res.status(500).json({ error: 'SERVER_ERROR', message: e.message });
   }
 });
@@ -291,7 +292,7 @@ router.get('/quality-stats', rbac.requirePermission('case:distill'), (req, res) 
     let stats = caseQuality.getQualityStats();
     res.json({ ok: true, stats: stats });
   } catch (e) {
-    console.error('质量统计错误:', e.message);
+    logger.error({ module: 'distillation-routes', err: e }, '质量统计错误');
     res.status(500).json({ error: 'SERVER_ERROR', message: e.message });
   }
 });
@@ -302,7 +303,7 @@ router.get('/follow-up', rbac.requirePermission('clinic:collaborate'), (req, res
     let cases = caseQuality.getCasesNeedingFollowUp();
     res.json({ ok: true, count: cases.length, cases: cases });
   } catch (e) {
-    console.error('随访查询错误:', e.message);
+    logger.error({ module: 'distillation-routes', err: e }, '随访查询错误');
     res.status(500).json({ error: 'SERVER_ERROR', message: e.message });
   }
 });
@@ -329,7 +330,7 @@ router.get('/stats', rbac.requirePermission('case:distill'), (req, res) => {
       }
     });
   } catch (e) {
-    console.error('蒸馏统计错误:', e.message);
+    logger.error({ module: 'distillation-routes', err: e }, '蒸馏统计错误');
     res.status(500).json({ error: 'SERVER_ERROR', message: e.message });
   }
 });

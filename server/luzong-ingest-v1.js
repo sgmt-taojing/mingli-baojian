@@ -1,5 +1,6 @@
 // 直接 SQL 写入路总流年班 45 KB 条目
 const { DatabaseSync } = require('node:sqlite');
+const logger = require('./logger.js');
 
 const DB_PATH = '/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db';
 const SRC_ID = 'SRC-COURSE-LUZONG-LIUNIAN-2025';
@@ -75,7 +76,7 @@ const entries = [
   ['KB-ZIWEI-COURSE-045', 'ziwei', '解盘建议话术', '先讲先天格局、再讲大限处境、再讲流年触发、最后给行动建议。忌一上来就讲吉凶、断事太死。', ['解盘', '话术'], '看盘规范'],
 ];
 
-console.log(`准备写入 ${entries.length} 条 KB 条目`);
+logger.info({ module: 'luzong-ingest-v1', count: entries.length }, '准备写入 KB 条目');
 
 // 2. 清理旧条目
 db.prepare(`DELETE FROM kb_formal WHERE entry_id LIKE 'KB-ZIWEI-COURSE-%'`).run();
@@ -125,16 +126,16 @@ try {
     okTrace++;
   }
   db.prepare('COMMIT').run();
-  console.log(`✅ 成功:`);
-  console.log(`   kb_staging: ${okStaging} 条`);
-  console.log(`   kb_formal:  ${okFormal} 条`);
-  console.log(`   kb_audit:   ${okAudit} 条`);
-  console.log(`   knowledge_trace: ${okTrace} 条`);
-  console.log(`   source:     1 (${SRC_ID})`);
+  logger.info({ module: 'luzong-ingest-v1' }, '✅ 成功:');
+  logger.info({ module: 'luzong-ingest-v1', staging: okStaging }, 'kb_staging 写入完成');
+  logger.info({ module: 'luzong-ingest-v1', formal: okFormal }, 'kb_formal 写入完成');
+  logger.info({ module: 'luzong-ingest-v1', audit: okAudit }, 'kb_audit 写入完成');
+  logger.info({ module: 'luzong-ingest-v1', trace: okTrace }, 'knowledge_trace 写入完成');
+  logger.info({ module: 'luzong-ingest-v1', srcId: SRC_ID }, 'source 注册完成');
 } catch (e) {
   db.prepare('ROLLBACK').run();
-  console.error('❌ TX 失败:', e.message);
-  console.error('当前 entry_id 可能:', entries[okFormal] && entries[okFormal][0]);
+  logger.error({ module: 'luzong-ingest-v1', err: e }, '❌ TX 失败');
+  logger.error({ module: 'luzong-ingest-v1', entryId: entries[okFormal] && entries[okFormal][0] }, '当前 entry_id 可能');
   process.exit(1);
 }
 
@@ -144,13 +145,13 @@ const vStaging = db.prepare(`SELECT COUNT(*) AS c FROM kb_staging WHERE module='
 const vAll = db.prepare(`SELECT COUNT(*) AS c FROM kb_formal`).get();
 const vSrc = db.prepare(`SELECT entries_extracted FROM source_index WHERE src_id = ?`).get(SRC_ID);
 
-console.log(`\n📊 验证:`);
-console.log(`   kb_formal 总数:  ${vAll.c}`);
-console.log(`   kb_formal ziwei: ${vFormal.c} 条 (升级前 94 → 升级后 ${vFormal.c})`);
-console.log(`   kb_staging ziwei: ${vStaging.c} 条`);
-console.log(`   ${SRC_ID}.entries_extracted: ${vSrc && vSrc.entries_extracted}`);
+logger.info({ module: 'luzong-ingest-v1' }, '📊 验证:');
+logger.info({ module: 'luzong-ingest-v1', total: vAll.c }, 'kb_formal 总数');
+logger.info({ module: 'luzong-ingest-v1', ziwei: vFormal.c }, 'kb_formal ziwei');
+logger.info({ module: 'luzong-ingest-v1', staging: vStaging.c }, 'kb_staging ziwei');
+logger.info({ module: 'luzong-ingest-v1', srcId: SRC_ID, entriesExtracted: vSrc && vSrc.entries_extracted }, 'source entries_extracted');
 
 // 5. 列出新条目 title
 const sample = db.prepare(`SELECT entry_id, title FROM kb_formal WHERE entry_id LIKE 'KB-ZIWEI-COURSE-%' ORDER BY entry_id LIMIT 5`).all();
-console.log(`\n📝 前 5 条新 KB 条目:`);
-for (const s of sample) console.log(`   ${s.entry_id}: ${s.title}`);
+logger.info({ module: 'luzong-ingest-v1' }, '📝 前 5 条新 KB 条目:');
+for (const s of sample) logger.info({ module: 'luzong-ingest-v1', entryId: s.entry_id, title: s.title }, 'KB 条目');

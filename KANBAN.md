@@ -3,23 +3,23 @@
 > **维护原则**：每个任务按工作流 22 节点推进；完成一个自动拉下一个；阻塞项标红等待决策。
 > **断点机制**：每个进行中任务必须记录"当前节点 + 产出物 + 下一步"，心跳只看这一页就能续推。
 > **顶层架构**：见 MECHANISM.md（本项目根目录）
-> **最后更新**：2026-07-25 00:04（Worker 完成 #7 节点 7.2 + 7.3）
+> **最后更新**：2026-07-25 00:35（心跳自主推进：#7 节点 7.4 + 7.5 完成 → 6/6 ✅）
 > **健康检查**：✅ 5/5 服务在线（paipan/tts/face-ocr/static/api-v2）；KB API OK；paipan-api 路由 WARN（已知）
 
 ## 进行中 🔄
 
-### #7 · 测试规范补齐（单元测试 ≥60% + Pact 契约测试）
+### ~~#7 · 测试规范补齐（单元测试 ≥60% + Pact 契约测试）~~ 2026-07-25 00:35 ✅
 
 | 字段 | 值 |
 |------|---|
 | 优先级 | P1 |
 | 规范引用 | T-1/T-2 |
-| 节点进度 | **3/6** |
-| 当前节点 | 7.4 — 集成测试（supertest 端到端 API 测试） |
-| 下一步动作 | 安装 supertest，为 api-server-v2 核心路由写端到端集成测试；补充测试覆盖率到 ≥65% |
-| 产出物 | · `jest.config.js`（testEnvironment=node, testMatch=tests/**/*.test.js, collectCoverage, 排除 api-server-v2.js 和 kb-store/**, maxWorkers=1 防 SQLite 并发锁）<br>· `tests/smoke.test.js` 扩展（新增 api-response 成功/错误格式验证 + logger 导出验证 + error-aggregator recordError 导出验证）<br>· `tests/unit/api-response.test.js`（9 测试）<br>· `tests/unit/logger.test.js`（7 测试）<br>· `tests/unit/error-aggregator.test.js`（5 测试）<br>· **节点 7.2**：22 个单元测试套件全通过（472 测试），覆盖率 Statements 64.04% / Lines 63.74% / Functions 73.88% / Branches 59.88%，均 ≥60% ✅<br>· **节点 7.2**：修复 coverage 模式 flaky 测试 — jest.config.js 添加 `maxWorkers: 1` 解决 SQLite "database is locked" 并发问题<br>· **节点 7.3**：安装 `@pact-foundation/pact` v17.0.1（devDependency）<br>· **节点 7.3**：`tests/contract/api-contract.test.js`（4 个 PactV3 消费者契约测试：GET /api/v1/health + GET /api/kb/list + GET /api/kb/:filename + GET /api/v1/kb/list 308 重定向）<br>· **节点 7.3**：`pacts/mingli-baojian-h5-mingli-baojian-api.json`（契约文件自动生成） |
-| 阻塞 | 无 |
-| 最后更新 | 2026-07-25 00:04 |
+| 节点进度 | **6/6 ✅** |
+| 完成节点 | 7.6 — 任务完结 + 覆盖率报告归档 ✅ |
+| 产出物 | · `jest.config.js`（testEnvironment=node, testMatch=tests/**/*.test.js, collectCoverage, 排除 api-server-v2.js 和 kb-store/**, maxWorkers=1 防 SQLite 并发锁）<br>· `tests/smoke.test.js` 扩展（新增 api-response 成功/错误格式验证 + logger 导出验证 + error-aggregator recordError 导出验证）<br>· `tests/unit/api-response.test.js`（9 测试）<br>· `tests/unit/logger.test.js`（7 测试）<br>· `tests/unit/error-aggregator.test.js`（5 测试）<br>· **节点 7.2**：22 个单元测试套件全通过（472 测试），覆盖率 Statements 64.04% / Lines 63.74% / Functions 73.88% / Branches 59.88%，均 ≥60% ✅<br>· **节点 7.2**：修复 coverage 模式 flaky 测试 — jest.config.js 添加 `maxWorkers: 1` 解决 SQLite "database is locked" 并发问题<br>· **节点 7.3**：安装 `@pact-foundation/pact` v17.0.1（devDependency）<br>· **节点 7.3**：`tests/contract/api-contract.test.js`（4 个 PactV3 消费者契约测试：GET /api/v1/health + GET /api/kb/list + GET /api/kb/:filename + GET /api/v1/kb/list 308 重定向）<br>· **节点 7.3**：`pacts/mingli-baojian-h5-mingli-baojian-api.json`（契约文件自动生成）<br>· **节点 7.4**：`tests/integration/api-endpoints.test.js`（28 个 supertest 端到端测试：health/kb-list/kb-file/路径穿越/log-error/sync-404/public-kb-query/CORS/api-response 9 函数）<br>· **节点 7.4**：supertest 7.2.2 已安装；28/28 全通过；首跑 0.469s<br>· **节点 7.5**：覆盖率验收 — Statements **71.73%** / Branches **63.50%** / Functions **79.75%** / 24 套件 / 504 测试（全部维度 ≥60% ✅，Statements/Function 比目标 +10pp 以上）<br>· **节点 7.6**：`docs/TEST_COVERAGE_REPORT_v1.md`（4,267B / 7 章节）+ `.openclaw/tmp/coverage-summary-7.4.txt`（覆盖率快照）<br>· **节点 7.6**：8 文件覆盖率 < 70% 已记入延后清单（export-routes / distillation-engine 等），等 #9+ 补齐 |
+| 验收 | ✅ `npx jest` 全绿 504/504；✅ 集成 28/28 + 契约 4/4；✅ Statements 71.73 / Branches 63.50 / Functions 79.75 / Lines 71.73；✅ 排除清单合理（api-server-v2 巨型单一入口） |
+| 阻塞 | 无（已完结） |
+| 最后更新 | 2026-07-25 00:35 |
 
 ---
 
@@ -91,15 +91,15 @@
 | ~~3~~ | ~~前端组件库封装（Web Components 替换内联 toast/modal/tab）~~（6/6 完成 2026-07-24 14:35） | F-9 | 6 | ~~#2 完成~~ |
 | ~~4~~ | ~~错误处理规范（统一 try-catch + 错误码表 + 前端拦截器）~~（5/5 完成 2026-07-24 16:56） | S-2/T-3 | 5 | #2 完成 |
 
-### P1（下周启动）
+### P1（启动）
 
-| # | 任务 | 规范引用 | 预估节点数 | 阻塞 |
-|---|------|---------|-----------|------|
-| ~~5~~ | ~~性能基线与预算~~（4/4 完成 2026-07-24 17:31） | P-1/P-2 | 4 | - |
-| ~~6~~ | ~~可观测性规范（结构化日志 + 关键事件打点）~~（4/4 完成 2026-07-24 21:01） | P-3/P-4 | 4 | - |
+| # | 任务 | 规范引用 | 预估节点数 | 阻塞 | 启动 |
+|---|------|---------|-----------|------|------|
+| ~~5~~ | ~~性能基线与预算~~（4/4 完成 2026-07-24 17:31） | P-1/P-2 | 4 | - | - |
+| ~~6~~ | ~~可观测性规范（结构化日志 + 关键事件打点）~~（4/4 完成 2026-07-24 21:01） | P-3/P-4 | 4 | - | - |
 > **#6 完结**：6.1 ✅ 规范文档 · 6.2 ✅ pino 集成 + console 全量替换（server/*.js = 0，kb-store/* 为前端数据文件不在范围） · 6.3 ✅ 12 事件埋点 + error-aggregator · 6.4 ✅ GET /api/v1/admin/metrics 端点 + app/admin/dashboard.html 仪表盘页面
-| 7 | 测试规范补齐（单元测试 ≥60% + Pact 契约测试） | T-1/T-2 | 6 | - |
-| 8 | 国际化文案规范（I18N 抽离） | - | 3 | - |
+| ~~7~~ | ~~测试规范补齐~~（6/6 完成 2026-07-25 00:35） | T-1/T-2 | 6 | ~~-~~ | - |
+| **8** | **国际化文案规范（I18N 抽离）** | **-** | **3** | **#7 完成 ✅** | **🟢 启动** |
 
 ### P2（下月）
 
@@ -170,3 +170,7 @@
 | **#4 完结** | **错误处理规范 5/5 完成** | **2026-07-24 16:56** | error-interceptor.js + ERROR_COPYWRITING.md + INTERCEPTOR_v2.md + POST /api/log/error |
 | **#6 完结** | **可观测性规范 4/4 完成** | **2026-07-24 21:01** | logger.js + pino-http + error-aggregator.js + 12 事件埋点 + /api/v1/admin/metrics + admin/dashboard.html |
 | **#X 完结** | **穿戴 SDK 落地总规划 (R11-W)** | **2026-07-25 00:25** | docs/WEARABLE_XIANZHI_PLAN.md（382 行 / 7 章）+ SMART_GLASS_INTEGRATION.md v2.0（R11-W 增强 §8）+ HEARTBEAT.md（穿戴监控）+ 9 个 SDK 文件本地 8914 + GH Pages 全 200（含 5 路摄像头 / 4 麦 / 骨传导 / NPU / 32GB 硬件清单 + 28 舌象 + 36 面诊 + 子午流注 + 医易联动 + 多品牌路线图） |
+| 7.4 | supertest 集成测试 | 2026-07-25 00:30 | tests/integration/api-endpoints.test.js（341 行 / 28 测试） |
+| 7.5 | 整体覆盖率验收 ≥60% | 2026-07-25 00:33 | Stmts 71.73% / Br 63.50% / Fn 79.75% / 24 套件 / 504 测试 |
+| 7.6 | 测试报告归档 + 任务完结 | 2026-07-25 00:35 | docs/TEST_COVERAGE_REPORT_v1.md（4,267B）+ coverage-summary-7.4.txt |
+| **#7 完结** | **测试规范补齐 6/6 完成** | **2026-07-25 00:35** | 22 单测 + 1 集成 + 1 契约 + 1 冒烟 = 504 测试，4 维度均达标 |

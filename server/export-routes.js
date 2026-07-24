@@ -15,6 +15,7 @@ const { DatabaseSync } = require('node:sqlite');
 const path = require('path');
 const guard = require('./data-export-guard.js');
 const { auth, adminAuth } = require('./rbac-middleware.js');
+const logger = require('./logger.js');
 
 const db = new DatabaseSync(path.join(__dirname, 'database', 'yidao.db'));
 
@@ -88,9 +89,11 @@ router.post('/csv', auth, (req, res) => {
 
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
     res.setHeader('Content-Disposition', `attachment; filename="${table}-${export_id}.csv"`);
-    res.send('\uFEFF' + csv); // BOM 头，Excel 直接打开 UTF-8
+    const csvOut = '\uFEFF' + csv;
+    req.log.info({ module: 'export', event: 'report.export', format: 'csv', sizeBytes: Buffer.byteLength(csvOut), targetTable: table }, 'export csv');
+    res.send(csvOut); // BOM 头，Excel 直接打开 UTF-8
   } catch (e) {
-    console.error('[export/csv]', e);
+    logger.error({ module: 'export-routes', err: e }, '[export/csv]');
     res.status(500).json({ error: e.message });
   }
 });
@@ -133,6 +136,7 @@ router.post('/json', auth, (req, res) => {
 
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('Content-Disposition', `attachment; filename="${table}-${export_id}.json"`);
+    req.log.info({ module: 'export', event: 'report.export', format: 'json', sizeBytes: Buffer.byteLength(json), targetTable: table }, 'export json');
     res.send(json);
   } catch (e) {
     res.status(500).json({ error: e.message });

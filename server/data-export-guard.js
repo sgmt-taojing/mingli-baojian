@@ -20,6 +20,7 @@ const { DatabaseSync } = require('node:sqlite');
 const crypto = require('crypto');
 const path = require('path');
 const sec = require('./security-v2.js');
+const logger = require('./logger.js');
 
 const DB_PATH = path.join(__dirname, 'database', 'yidao.db');
 const db = new DatabaseSync(DB_PATH);
@@ -235,7 +236,7 @@ function logExport({ user_id, user_roles, action, target_table, target_ids, rows
     );
     return export_id;
   } catch (e) {
-    console.error('[export-guard] audit write failed:', e.message);
+    logger.error({ module: 'data-export-guard', err: e }, 'audit write failed');
     return null;
   }
 }
