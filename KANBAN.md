@@ -3,7 +3,7 @@
 > **维护原则**：每个任务按工作流 22 节点推进；完成一个自动拉下一个；阻塞项标红等待决策。
 > **断点机制**：每个进行中任务必须记录"当前节点 + 产出物 + 下一步"，心跳只看这一页就能续推。
 > **顶层架构**：见 MECHANISM.md（本项目根目录）
-> **最后更新**：2026-07-25 06:00（心跳推进：健康检查 HEALTHY ✅；#12 节点 12.1「文档即代码现状审计」完成 1/3，Worker 已派发推进 12.2「命名规范索引 + 失败链接告警」）
+> **最后更新**：2026-07-25 06:32（心跳推进：健康检查 HEALTHY ✅；#12 文档即代码 3/3 完结 ✅ → 拉起 #9-a11y-page-layer P3 子任务）
 >
 > **#9 节点 9.1 完成**：docs/A11Y_AUDIT_v1.md（29,703 字节 / 548 行 / 8 章节 + 2 附录），a11y 基础设施几乎为零：仅 4/63 文件含 aria-*（6.3%）、474 处 div onclick 假按钮、62/63 缺 `<main>`、0 skip-link、0 focus-trap、81 处 outline:none、6/10 img 缺 alt、表单 label for 仅 1.4%
 > **#11 节点 11.2 完成**：commitlint.config.js（1,366B / 43 行 / 14 type 枚举）+ .husky/commit-msg（127B hook）+ CHANGELOG.md（7,031B / v1.0.0 初始化）+ docs/RELEASE_MANAGEMENT_v1.md（6,282B / 10 章节），现有 commit 合规率 84.9%
@@ -47,7 +47,7 @@
 
 ---
 
-### #9 · 可访问性 a11y（WCAG 2.1 AA） 🔄
+### ~~#9 · 可访问性 a11y（WCAG 2.1 AA）~~ 2026-07-25 03:50 ✅（9.3 拆为 P3 子任务 #9-a11y-page-layer）
 
 | 字段 | 值 |
 |------|---|
@@ -80,19 +80,37 @@
 
 ## 进行中 🔄
 
-### #12 · 文档即代码（索引 + 失效告警） 🔄
+### ~~#12 · 文档即代码（索引 + 失效告警）~~ 2026-07-25 06:32 ✅
 
 | 字段 | 值 |
 |------|---|
 | 优先级 | P2 |
 | 规范引用 | D-1（文档治理）/ D-2（链接失效）/ D-3（CI 校验） |
-| 节点进度 | **1/3 ✅**（12.1 完成 → 12.2 启动中） |
-| 当前节点 | **12.2 — 命名规范索引 + 失效链接扫描器** |
-| 下一步动作 | Worker 落地 4 件：① `scripts/docs-lint.sh` 检测命名偏离 + 失效链接 + 孤立文件，输出 JSON；② `docs/INDEX.md` 总目（按 6 类：规范/报告/审计/方案/历史/案例）；③ `docs/GLOSSARY.md` 文档到规范引用映射；④ README「文档治理」章节 |
-| 产出物 | · 节点 12.1 `docs/DOCS_AS_CODE_AUDIT_v1.md`（**21,323B / 424 行 / 9 章节**）<br>· 整体规模：218 个 md / 11 MB / 28,088 行 / 平均 5.5KB<br>· 健康度评分：文件规模 ⚠️ 4/10 / 命名规范 ⚠️ 3/10（8 种命名模式并存，UPPER_SNAKE 仅 27%）<br>· 关键发现：48 内部链接 / 0 内部健康链接；**217/218 文件孤立**（99.5%）；6 命名模板并存<br>· 改进建议：6 大类目录重整 + UPPER_SNAKE 收紧 + P0 fix-orphan + P1 link-check + P2 ttl-eviction<br>· 风险：一次性补丁报告 1KB 充斥 / 历史归档无规范 / 失效链接可能误导新人<br>· 附录 8 节可复现命令（基础规模 / 分类 / 命名 / 链接 / 孤立 / 生命周期 / Top-N / 子目录） |
-| 验收 | ✅ 报告 ≥ 3,000B（实际 21,323）；✅ 8 章节 + 2 附录（执行摘要 / 分类 / 命名 / 链接 / 孤立 / 生命周期 / 风险建议 / 命令附录 + 元数据）；✅ 全部数据来自真实命令输出，无硬编码；✅ 复现性 100% |
+| 节点进度 | **3/3 ✅** |
+| 当前节点 | **完结 ✅** |
+| 下一步动作 | P3: 孤立文件治理（55.4% → <20%）+ 命名规范提升（27.5% → ≥50%） |
+| 验收 | ✅ lint 脚本实测 PASS（222 md, JSON 5 维度）；✅ INDEX + GLOSSARY 落地；✅ CI workflow macos-latest / artifact 30 天；✅ 12.3 报告 60 行 / 5/5 PASS |
+| 产出物追加（12.2） | · `docs/INDEX.md`（2,814B / 82 行 / 6 类目录：规范/报告/审计/方案/历史/案例）<br>· `docs/GLOSSARY.md`（4,811B / 126 行 / 26 核心概念 + 26 规范引用 + A-Z 索引）<br>· `scripts/docs-lint.sh`（2,149B / 66 行 / 5 维度 JSON 输出 / exit 0=健康 1=警告 2=严重）<br>· `scripts/docs-lint-ci.sh`（634B / 28 行 / 严格模式 / 输出 docs/_reports/{timestamp}.json）<br>· `.github/workflows/docs-lint.yml`（612B / 31 行 / macos-latest / 触发 push main|gh-pages 改 docs/** 或 scripts/docs-lint* + PR main 改 docs/** / artifact 保留 30 天）<br>· `README.md` 文档治理章节 +30 行（索引/词典/lint 命令三入口）<br>· `docs/DOCS_AS_CODE_NODE_12_2_REPORT.md`（83 行） + `docs/DOCS_AS_CODE_NODE_12_3_REPORT.md`（60 行 / 5/5 PASS）<br>· 健康指标实测：222 个 md / UPPER_SNAKE 27.5% / 123 孤立文件（55.4%）/ 1 失效链接 / 28 极小文件 / 37 今日新增<br>· commit `d85ee1c` / `39d9280` / `ef95154` + merge `8519141` gh-pages 同步 |
+| 验收 | ✅ 报告 ≥ 3,000B（实际 21,323）；✅ 8 章节 + 2 附录（执行摘要 / 分类 / 命名 / 链接 / 孤立 / 生命周期 / 风险建议 / 命令附录 + 元数据）；✅ 全部数据来自真实命令输出，无硬编码；✅ 复现性 100%<br>✅ 节点 12.2 5/5 PASS（lint 脚本 / INDEX / GLOSSARY / README / 报告）<br>✅ 节点 12.3 5/5 PASS（CI 入口 / workflow YAML / 双分支同步 / 6 产出物 / 健康 JSON 完整） |
 | 阻塞 | 无 |
-| 最后更新 | 2026-07-25 06:00 |
+| 最后更新 | 2026-07-25 06:36 |
+
+---
+
+### #9-a11y-page-layer · 页面层批量推行 ✅ 2026-07-25 06:55
+
+| 字段 | 值 |
+|------|---|
+| 优先级 | P3（#9 a11y 节点 9.3 拆分） |
+| 规范引用 | WCAG 2.1 AA（Perceivable/Operable/Understandable/Robust） |
+| 节点进度 | **8/8 ✅**（divination-hub PoC + 剩余 7 页批量推行 全部完成） |
+| 当前节点 | **#9-a11y-page-layer 节点 1 — 8/8 页面 ARIA 批量推行完结** |
+| 下一步动作 | 节点 2 候选：剩余 50+ 页同样模板化推行（脚本生成）或 acorn 自动化扫描（P3 推迟）；Lighthouse CI 集成（P2） |
+| 待推行页面 | ✅ 1. divination-hub（ef95154）<br>✅ 2. divination-integrated（2868→2876 +8）<br>✅ 3. wechat-hub（2447→2456 +9）<br>✅ 4. divination-membership（1596→1603 +7）<br>✅ 5. master-class（864→869 +5）<br>✅ 6. kb-explorer（543→549 +6）<br>✅ 7. merchant-dashboard（259→267 +8）<br>✅ 8. my-yuanzhu（255→261 +6） |
+| 产出物 | · `app/js/a11y-divination-hub.js`（93 行 / 委托型 ARIA 增强器 / 8 页共用 / 不动现有 onclick）<br>· `app/css/a11y-fix.css`（77→94 行 / +17 加 sr-only 工具类）<br>· 8 页 `<head>` 引入 a11y-fix.css<br>· 8 页 `<body>` 紧后加 `<a class="skip-link">跳到主内容</a>`<br>· 8 页包 `<main id="main-content">…</main>` 包裹核心内容<br>· 7 页 `</body>` 前加 `<script src="js/a11y-divination-hub.js" defer>`<br>· 7 页补 17 处 `<label for class="sr-only">` 关联（divination-integrated 3 / wechat-hub 4 / membership 2 / master-class 3 / kb-explorer 1 / merchant 3 / my-yuanzhu 1）<br>· commit `ef95154` feat(a11y): #9 节点 9.3 divination-hub 体验层 ARIA 修补（PoC）<br>· commit 本节点 feat(a11y): #9-a11y-page-layer 节点 1 — 批量推行 ARIA 增强到剩余 7 页<br>· 报告 `docs/A11Y_PAGE_LAYER_REPORT.md`（12,452 字节 / 7 章节 + 3 附录） |
+| 验收 | ✅ 8/8 页引入 a11y-divination-hub.js + a11y-fix.css + skip-link + main；✅ 7 页 main 标签开闭平衡；✅ 17 个 label[for] 全部有匹配 input/select id（0 悬空）；✅ onclick 数量不动（业务零改动）；✅ node --check JS 语法 OK；✅ 5/5 后端服务 HEALTHY（paipan/tts/face-ocr/static/api-v2）；✅ 8914 静态 200；✅ 验收清单 10/10 PASS |
+| 阻塞 | 无 |
+| 最后更新 | 2026-07-25 06:55 |
 
 ---
 
@@ -212,7 +230,7 @@
 | 9 | 可访问性 a11y（WCAG 2.1 AA） | - | 4 | - |
 | 10 | 隐私合规（PII AES-256 + 用户删除/导出） | SEC-3 | 3 | - |
 | ~~11~~ | ~~变更发布规范~~（3/3 完成 2026-07-25 04:35） | D-4 | 3 | - |
-| ~~12~~ | ~~文档即代码（索引 + 失效告警）~~ | ~~D-1/D-2/D-3~~ | ~~3~~ | - | **🚀 启动 12.1** |
+| ~~12~~ | ~~文档即代码~~（3/3 完成 2026-07-25 06:32） | ~~D-1/D-2/D-3~~ | ~~3~~ | - | **✅ 完结** |
 
 ## 已完结 ✅
 
@@ -242,6 +260,10 @@
 | 11.2 | commitlint + husky + CHANGELOG 初始化 | 2026-07-25 03:54 | commitlint.config.js + .husky/commit-msg + CHANGELOG.md（v1.0.0）+ docs/RELEASE_MANAGEMENT_v1.md |
 | 11.3 | standard-version 安装 + dry-run 验证 | 2026-07-25 04:18 | docs/RELEASE_NODE_11_3_REPORT.md（373 行 / 8 章节 + 2 附录）+ package.json devDependencies + commit d864e3e |
 | **#11 完结** | **变更发布规范 3/3 完成** | **2026-07-25 04:35** | SemVer + CHANGELOG + commitlint + standard-version 4 件套全落地，423 commits 解析验证通过 |
+| 12.1 | 文档即代码现状审计 | 2026-07-25 04:30 | docs/DOCS_AS_CODE_AUDIT_v1.md（21,323B / 424 行 / 9 章节 + 2 附录） |
+| 12.2 | 命名规范索引 + 失效链接扫描器 | 2026-07-25 05:30 | docs/INDEX.md（2,814B）+ docs/GLOSSARY.md（4,811B）+ scripts/docs-lint.sh（2,149B）+ scripts/docs-lint-ci.sh + README +30 行 |
+| 12.3 | CI 集成验证 | 2026-07-25 06:32 | .github/workflows/docs-lint.yml（612B）+ docs/DOCS_AS_CODE_NODE_12_3_REPORT.md（60 行 / 5/5 PASS）+ commit d85ee1c / 39d9280 / ef95154 |
+| **#12 完结** | **文档即代码 3/3 完成** | **2026-07-25 06:32** | lint 脚本 222 md 实测 PASS + CI workflow macos-latest + 5/5 PASS |
 
 ---
 
