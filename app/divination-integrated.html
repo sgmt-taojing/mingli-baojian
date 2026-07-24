@@ -2334,11 +2334,11 @@ function analyzeByDisease(){
 }
 
 // ═══════════════════════════════════════════════
-// Toast
+// Toast（迁移至 ml-toast Web Component · 组件库已在 L379 加载）
 // ═══════════════════════════════════════════════
-const __toast=document.getElementById('appToast');
 function showToast(msg){
-  if(__toast&&__toast.info){__toast.info(msg);}
+  if(window.toast&&window.toast.show){window.toast.show(msg);}
+  else if(window.__toastLegacy&&window.__toastLegacy.info){window.__toastLegacy.info(msg);}
   else{console.log('[toast]',msg);}
 }
 
