@@ -90,10 +90,23 @@ body{background:var(--bg);color:var(--paper);font-family:-apple-system,BlinkMacS
 <button onclick="doSearch()">🔍 搜索</button>
 </div>
 
-<div class="kbe-tabs">
-<button class="kbe-tab active" data-tab="search" onclick="switchTab('search')">🔍 检索结果</button>
-<button class="kbe-tab" data-tab="modules" onclick="switchTab('modules')">📂 模块分布</button>
-<button class="kbe-tab" data-tab="hits" onclick="switchTab('hits')">🎯 命中统计</button>
+<!-- 业务页面替换（F-9 Web Components）：tab 容器 -->
+<ml-tab active="0" id="kbeTab" align="left">
+  <ml-tab-pane label="🔍 检索结果" data-tab="search">
+    <!-- 原 .kbe-tabs 内联按钮已迁移到 <ml-tab>；保留 .kbe-tab 样式作为兼容垫片 -->
+    <div class="kbe-tabs" hidden>
+      <button class="kbe-tab active" data-tab="search" onclick="switchTab('search')">🔍 检索结果</button>
+      <button class="kbe-tab" data-tab="modules" onclick="switchTab('modules')">📂 模块分布</button>
+      <button class="kbe-tab" data-tab="hits" onclick="switchTab('hits')">🎯 命中统计</button>
+    </div>
+  </ml-tab-pane>
+  <ml-tab-pane label="📂 模块分布" data-tab="modules"></ml-tab-pane>
+  <ml-tab-pane label="🎯 命中统计" data-tab="hits"></ml-tab-pane>
+</ml-tab>
+<div class="kbe-tabs" id="legacyKbeTabs">
+  <button class="kbe-tab active" data-tab="search" onclick="switchTab('search')">🔍 检索结果</button>
+  <button class="kbe-tab" data-tab="modules" onclick="switchTab('modules')">📂 模块分布</button>
+  <button class="kbe-tab" data-tab="hits" onclick="switchTab('hits')">🎯 命中统计</button>
 </div>
 
 <div class="kbe-panel" id="tabPanel">
@@ -262,6 +275,28 @@ document.getElementById('qInput').addEventListener('keypress', e=>{
 (async function init(){
   await fetchStats();
   await fetchModules();
+})();
+</script>
+<!-- F-9 Web Components：toast + tab（已就绪） -->
+<script src="components/toast.js"></script>
+<script src="components/tab.js"></script>
+<ml-toast id="kbeToast" position="top"></ml-toast>
+<script>
+// ml-tab 与自定义 switchTab 双向桥接：兼容旧 onclick="switchTab('xx')"
+(function(){
+  const mlTab = document.getElementById('kbeTab');
+  if (!mlTab) return;
+  const tabMap = {search:0, modules:1, hits:2};
+  mlTab.addEventListener('tab-change', (e)=>{
+    const label = e.detail.label || '';
+    let name = 'search';
+    if (label.includes('模块')) name = 'modules';
+    else if (label.includes('命中')) name = 'hits';
+    if (typeof switchTab === 'function') switchTab(name);
+  });
+  window.__kbeSetTab = function(name){
+    if (typeof tabMap[name] === 'number') mlTab.setActive(tabMap[name]);
+  };
 })();
 </script>
 </body>
