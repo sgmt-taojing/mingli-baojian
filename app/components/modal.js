@@ -192,4 +192,10 @@
   //    （不强行绑定到具体函数名，由各页自己实现；这里只暴露 helper）
   window.MlModal = MlModal;
   window.__mlModalUpgrade = upgradeLegacyModal;
+
+  // ─────────────────────────────────────────────
+  // Global compat helpers (openModal / closeModal)
+  // ─────────────────────────────────────────────
+  window.openModal = (id) => { const el = document.getElementById(id); if(el) el.open(); };
+  window.closeModal = (id) => { const el = document.getElementById(id); if(el) el.close(); };
 })();
