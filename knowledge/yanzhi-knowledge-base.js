@@ -1,8 +1,11 @@
 
+// ========== 颜痣知识库 ==========
+window.YANZHI_KNOWLEDGE = window.YANZHI_KNOWLEDGE || {};
+
 // ========== 新增场景 9-16 ==========
 
 // 动态扩展新场景
-YANZHI_KNOWLEDGE.crossCulture = {
+window.YANZHI_KNOWLEDGE.crossCulture = {
   title: '跨文化沟通', icon: '🌍',
   desc: '不同文化有不同的沟通密码。理解差异才能跨越障碍。',
   tags: ['霍夫斯泰德','高低语境','文化维度'],
@@ -37,7 +40,7 @@ YANZHI_KNOWLEDGE.crossCulture = {
   tips: ['💡 文化没有优劣只有差异','💡 多问少猜确认理解','💡 保持开放不预设立场']
 };
 
-YANZHI_KNOWLEDGE.online = {
+window.YANZHI_KNOWLEDGE.online = {
   title: '网络沟通', icon: '💻',
   desc: '文字沟通没有语气和表情，更容易被误读。谨慎措辞，明确表达。',
   tags: ['邮件礼仪','视频会议','文字沟通'],
@@ -72,7 +75,7 @@ YANZHI_KNOWLEDGE.online = {
   tips: ['💡 邮件主题是门面','💡 发消息前想三秒会不会被误解','💡 视频会议也需礼仪']
 };
 
-YANZHI_KNOWLEDGE.crisis = {
+window.YANZHI_KNOWLEDGE.crisis = {
   title: '危机沟通', icon: '🚨',
   desc: '危机公关5S原则：承担责任、真诚沟通、速度第一、系统运行、权威证实。',
   tags: ['5S原则','舆情应对','危机公关'],
@@ -109,7 +112,7 @@ YANZHI_KNOWLEDGE.crisis = {
   tips: ['💡 承认错误比辩解恢复信任快60%','💡 黄金4小时定生死','💡 真诚是危机沟通的唯一策略']
 };
 
-YANZHI_KNOWLEDGE.social = {
+window.YANZHI_KNOWLEDGE.social = {
   title: '社交破冰', icon: '🤝',
   desc: '社交恐惧的解药不是勇气而是方法。掌握技巧陌生人也能变朋友。',
   tags: ['陌生人交流','社交恐惧','small talk'],
@@ -146,7 +149,7 @@ YANZHI_KNOWLEDGE.social = {
   tips: ['💡 人们最感兴趣的话题是他们自己','💡 暴露适度脆弱性反而能拉近距离','💡 准备3-5个万能破冰问题随时用']
 };
 
-YANZHI_KNOWLEDGE.interview = {
+window.YANZHI_KNOWLEDGE.interview = {
   title: '面试沟通', icon: '📋',
   desc: 'STAR行为面试法+薪资谈判技巧，助你拿下理想Offer。',
   tags: ['STAR面试法','薪资谈判','行为面试'],
@@ -182,7 +185,7 @@ YANZHI_KNOWLEDGE.interview = {
   tips: ['💡 面试前准备5-7个STAR故事','💡 薪资谈判让面试官先出价','💡 面试是双向选择你也在评估公司']
 };
 
-YANZHI_KNOWLEDGE.teacher = {
+window.YANZHI_KNOWLEDGE.teacher = {
   title: '师生沟通', icon: '🎓',
   desc: '亲其师而信其道。良好的师生关系孕育巨大的教育合力。',
   tags: ['教育沟通','学术讨论','师生关系'],
@@ -218,7 +221,7 @@ YANZHI_KNOWLEDGE.teacher = {
   tips: ['💡 亲其师信其道——关系是教育的前提','💡 用「我们」代替「你们」减少对立','💡 倾听比说教重要']
 };
 
-YANZHI_KNOWLEDGE.medical = {
+window.YANZHI_KNOWLEDGE.medical = {
   title: '医患沟通', icon: '🏥',
   desc: '共情是医患信任的基础。患者感受到共情后对医生专业评价提升40%。',
   tags: ['医患沟通模型','共情表达','医患关系'],
@@ -254,7 +257,7 @@ YANZHI_KNOWLEDGE.medical = {
   tips: ['💡 把「您听清楚了吗」改为「我说清楚了吗」','💡 共情可使专业评价提升40%','💡 患者的叙述是最重要的诊断线索']
 };
 
-YANZHI_KNOWLEDGE.sales = {
+window.YANZHI_KNOWLEDGE.sales = {
   title: '销售话术', icon: '💰',
   desc: 'FABE法则+SPIN提问+痛点营销，用方法论武装每一句话术。',
   tags: ['FABE法则','SPIN提问','痛点营销'],
@@ -295,7 +298,7 @@ YANZHI_KNOWLEDGE.sales = {
   tips: ['💡 不诊断就开方是耍流氓','💡 成交不是结束是关系的开始','💡 不要逼单要引导决策']
 };
 
-YANZHI_KNOWLEDGE.family = {
+window.YANZHI_KNOWLEDGE.family = {
   title: '家庭沟通', icon: '🏠',
   desc: '家不是讲理的地方，是讲爱的地方。家庭沟通的核心是情绪共鸣而非逻辑对错。',
   tags: ['夫妻沟通','亲子沟通','婆媳关系','家庭冲突'],
@@ -343,7 +346,7 @@ YANZHI_KNOWLEDGE.family = {
   tips: ['💡 家不是讲理的地方是讲爱的地方','💡 夫妻吵架不翻旧账不伤自尊','103个家庭99个能靠沟通解决']
 };
 
-YANZHI_KNOWLEDGE.history = {
+window.YANZHI_KNOWLEDGE.history = {
   title: '历史名人沟通案例', icon: '📜',
   desc: '以史为鉴可以知兴替。历史名人的沟通智慧跨越千年仍闪耀光芒。',
   tags: ['鬼谷子','战国策','三国','世说新语'],
@@ -397,7 +400,7 @@ YANZHI_KNOWLEDGE.history = {
 // 引用经典：《测字秘牒》《字触》《姓名学精要》《测字汇考》
 // ═══════════════════════════════════════════════════════
 
-YANZHI_KNOWLEDGE.ceziSystem = {
+window.YANZHI_KNOWLEDGE.ceziSystem = {
   title: '测字术完整体系', icon: '🔤',
   desc: '测字术又称拆字、相字、破字，是中国传统占卜术中通过分析汉字字形、字音、字义推断吉凶的术数体系。源远流长，与《周易》八卦、阴阳五行学说紧密关联。',
   tags: ['测字术','拆字','字形分析法','字音分析法','八卦取象','五行配字'],
@@ -495,7 +498,7 @@ YANZHI_KNOWLEDGE.ceziSystem = {
 // 81数理详解
 // ═══════════════════════════════════════════════════════
 
-YANZHI_KNOWLEDGE.shuli81 = {
+window.YANZHI_KNOWLEDGE.shuli81 = {
   title: '81数理详解', icon: '🔢',
   desc: '1至81每个数都有其特定的吉凶含义。姓名学的81数理来源于《易经》，每个数字对应特定的五行属性和吉凶判断。天格、人格、地格、外格、总格五格数理综合判断一个姓名的整体吉凶。',
   tags: ['81数理','五格','天格','人格','地格','外格','总格'],
@@ -596,7 +599,7 @@ YANZHI_KNOWLEDGE.shuli81 = {
 // 测字11种问事方向
 // ═══════════════════════════════════════════════════════
 
-YANZHI_KNOWLEDGE.ceziDirections = {
+window.YANZHI_KNOWLEDGE.ceziDirections = {
   title: '测字11种问事方向', icon: '🎯',
   desc: '测字术可根据问事方向不同，针对性地分析字形、字义和五行属性。每种方向有其独特的取象方法和判断标准。',
   tags: ['事业','婚姻','财运','健康','考试','出行','失物','官非','子嗣','家宅','流年'],
@@ -622,7 +625,7 @@ YANZHI_KNOWLEDGE.ceziDirections = {
 // 常见字形测断案例（50字详解）
 // ═══════════════════════════════════════════════════════
 
-YANZHI_KNOWLEDGE.ceziCases = {
+window.YANZHI_KNOWLEDGE.ceziCases = {
   title: '常见字形测断案例', icon: '📝',
   desc: '精选50个常用汉字的详细测断分析，涵盖字形拆解、卦象配属、五行属性和吉凶断语。参考《测字秘牒》《字触》中的经典案例。',
   tags: ['测字案例','字形分析','拆字','吉凶断语'],
@@ -734,7 +737,7 @@ YANZHI_KNOWLEDGE.ceziCases = {
 // 姓名学五格剖象法完整体系
 // ═══════════════════════════════════════════════════════
 
-YANZHI_KNOWLEDGE.namexueWuge = {
+window.YANZHI_KNOWLEDGE.namexueWuge = {
   title: '姓名学五格剖象法', icon: '📛',
   desc: '五格剖象法是根据《易经》象数理论，将姓名笔画数理分为天格、人格、地格、外格、总格五格，分别判断命运各个方面的吉凶。此法起源于日本熊崎健翁，后经杨坤明等学者引入中国并融入五行八字理论。',
   tags: ['五格剖象法','姓名学','天格','人格','地格','外格','总格','三才配置'],
@@ -758,7 +761,7 @@ YANZHI_KNOWLEDGE.namexueWuge = {
 // 三才配置吉凶表
 // ═══════════════════════════════════════════════════════
 
-YANZHI_KNOWLEDGE.sancai = {
+window.YANZHI_KNOWLEDGE.sancai = {
   title: '三才配置吉凶表', icon: '☯',
   desc: '天格、人格、地格的五行组合称为三才配置。三才相生则一生顺利，相克则多遇阻碍。三才配置比单格数理更重要，它反映天地人三者的和谐程度。',
   tags: ['三才配置','五行生克','天格','人格','地格'],
