@@ -88,6 +88,7 @@
       scrollbar-width:none;
     }
     .section-tabs::-webkit-scrollbar { display:none; }
+    /* .tab-btn / .tab-panel 已迁移到 <ml-tab> Web Component，以下仅保留兼容 fallback 主题色 */
     .tab-btn {
       padding:10px 24px;
       background:transparent;
@@ -108,8 +109,8 @@
     }
     /* 内容区 */
     .content { max-width:1200px; margin:0 auto; padding:32px 16px 80px; }
-    .tab-panel { display:none; }
-    .tab-panel.active { display:block; animation:fadeIn 0.4s ease; }
+    .tab-panel { display:none; animation:fadeIn 0.4s ease; }
+    .tab-panel.active { display:block; }
     @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
     /* 标题装饰 */
     .section-title {
@@ -674,6 +675,7 @@
 .toast-msg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(20,18,14,.95);border:1px solid rgba(201,168,76,.3);color:var(--paper);font-family:'Noto Serif SC',serif;font-size:14px;padding:18px 28px;letter-spacing:2px;border-radius:4px;z-index:99999;box-shadow:0 4px 32px rgba(0,0,0,.6);text-align:center;min-width:220px;opacity:0;transition:opacity .25s ease;pointer-events:none}
 .toast-msg.show{opacity:1}
   </style>
+<script type="module" src="components/tab.js"></script>
 </head>
 <style>
 /* 跨文件导航栏 */
@@ -719,20 +721,13 @@
   </div>
 </nav>
 
-<!-- Tab 导航 -->
-<div class="section-tabs">
-  <button class="tab-btn active" data-tab="membership">会员等级</button>
-  <button class="tab-btn" data-tab="payment">支付开通</button>
-  <button class="tab-btn" data-tab="orders">订单记录</button>
-  <button class="tab-btn" data-tab="push">每日推送</button>
-  <button class="tab-btn" data-tab="booking">预约大师</button>
-</div>
-
-<!-- 主内容 -->
+<!-- ====== 会员Tab系统（已迁移到 <ml-tab> Web Component） ====== -->
 <div class="content">
+<ml-tab id="memTab" active="0">
+  <ml-tab-pane label="会员等级">
 
   <!-- ============ 会员等级 ============ -->
-  <div id="tab-membership" class="tab-panel active">
+  <div class="tab-panel active">
     <h2 class="section-title">缘·定此生</h2>
     <p class="section-subtitle">天命有定，缘有深浅，尊卑由心</p>
 
@@ -839,9 +834,11 @@
       </table>
     </div>
   </div>
+  </ml-tab-pane>
 
   <!-- ============ 支付开通 ============ -->
-  <div id="tab-payment" class="tab-panel">
+  <ml-tab-pane label="支付开通">
+  <div class="tab-panel">
     <h2 class="section-title">开通会员</h2>
     <p class="section-subtitle">承此善缘，得天机之佑</p>
 
@@ -940,9 +937,11 @@
       <button style="margin-left:auto;padding:10px 20px;background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:'Noto Serif SC',serif;font-size:13px;cursor:pointer;border-radius:2px;white-space:nowrap;">查看年费</button>
     </div>
   </div>
+  </ml-tab-pane>
 
   <!-- ============ 订单记录 ============ -->
-  <div id="tab-orders" class="tab-panel">
+  <ml-tab-pane label="订单记录">
+  <div class="tab-panel">
     <h2 class="section-title">缘起账目</h2>
     <p class="section-subtitle">每一笔皆是天定之缘</p>
 
@@ -1002,9 +1001,11 @@
       <div class="empty-text">— 更早的记录已归档 —</div>
     </div>
   </div>
+  </ml-tab-pane>
 
   <!-- ============ 每日推送 ============ -->
-  <div id="tab-push" class="tab-panel">
+  <ml-tab-pane label="每日推送">
+  <div class="tab-panel">
     <h2 class="section-title">天机推送</h2>
     <p class="section-subtitle">日日有机，时时有应</p>
 
@@ -1157,9 +1158,11 @@
       </div>
     </div>
   </div>
+  </ml-tab-pane>
 
   <!-- ============ 预约大师 ============ -->
-  <div id="tab-booking" class="tab-panel">
+  <ml-tab-pane label="预约大师">
+  <div class="tab-panel">
     <h2 class="section-title">预约大师</h2>
     <p class="section-subtitle">真人面命，直指天机</p>
 
@@ -1329,7 +1332,8 @@
       </div>
     </div>
   </div>
-
+  </ml-tab-pane>
+</ml-tab>
 </div>
 
 <!-- 底部 -->
@@ -1391,15 +1395,17 @@ function showToast(msg) {
   t._tid = setTimeout(function() { t.classList.remove('show'); }, 2500);
 }
 
-// Tab 切换
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-  });
-});
+// ====== Tab 切换（已迁移到 <ml-tab> Web Component） ======
+// ml-tab polyfill 自动处理旧 .tab-btn[data-tab] 点击兼容
+// 保留 switchTab 供编程调用
+function switchTab(name) {
+  const tab = document.getElementById('memTab');
+  if (!tab) return;
+  const labels = ['membership', 'payment', 'orders', 'push', 'booking'];
+  const idx = labels.indexOf(name);
+  if (idx < 0) return;
+  tab.setActive(idx);
+}
 
 // 会员卡点击购买 → 跳转支付
 let selectedTier = null;
