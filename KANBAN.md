@@ -104,3 +104,5 @@
 | label-studio vs sky-gateway 8080 冲突 | 共用端口 | label-studio 是否迁走 |
 | paipan API 路径 | `/api/paipan` 返回"未知路径"，路由表需对齐 | 改前端调用路径 vs 改后端路由 |
 | 服务器选型 | 三个候选机型 | ThinkStation P3 vs Dell 3680 vs HP Z2 |
+
+| #11 | KB API 暴露 (118 条结构化条目 + R10 修复) | ✅ 已完成 6/6 | 2026-07-24 13:02 |
