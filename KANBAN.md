@@ -132,6 +132,7 @@
 | 3.2 | 抽 3 个 Web Components | 2026-07-24 10:55 | `app/components/toast.js`(153) + `modal.js`(195) + `tab.js`(198)；旧 API 全兼容 |
 | 3.3 | 业务页迁移 7 页 | 2026-07-24 13:50 | divination-integrated + wechat-hub + divination-membership + master-class + kb-explorer + merchant-dashboard + my-yuanzhu |
 | 3.4 | demo.html + docs/COMPONENTS.md | 2026-07-24 14:00 | F-9 文档化 |
+| 3.4b | v2 扩展：5 组件 + loader + 7 章节文档 | 2026-07-25 00:30 | card.js(242) + accordion.js(216) + components-loader.js(167) + components-demo.html(633) + COMPONENTS.md 扩 234→873 行 |
 | **#3 完结** | **前端组件库封装 6/6 完成** | **2026-07-24 14:35** | 7 页迁移 + 3 组件 + demo + docs + e2e 验证 PASS |
 
 ---
