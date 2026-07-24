@@ -13,7 +13,7 @@ const { KB_LEVELS } = require('./kb-config.js');
 const crypto = require('crypto');
 
 // 统一响应壳（P0 #2 节点3：API 设计规范落地）
-const { apiResp, ERROR_CODES } = require('./api-response.js');
+const { apiResp, ok, ERROR_CODES } = require('./api-response.js');
 
 const kbRoutes = require('./kb-routes.js');
 const exportRoutes = require('./export-routes.js');
@@ -2859,6 +2859,37 @@ app.use((err, req, res, next) => {
     ts: Date.now()
   });
 });
+/* ===== 前端错误上报（5xxxxx + 网络层） ===== */
+app.post('/api/log/error', (req, res) => {
+  const entry = req.body || {};
+  const code = entry.code;
+  const report = {
+    code: code,
+    message: (entry.message || '').slice(0, 500),
+    url: (entry.url || '').slice(0, 500),
+    stack: (entry.stack || '').slice(0, 2000),
+    ua: (entry.ua || '').slice(0, 500),
+    context: entry.context || {},
+    ts: entry.ts || Date.now(),
+    ip: req.ip,
+    userAgent: req.get('user-agent') || ''
+  };
+  // 服务端日志（无认证，尽量轻量）
+  console.warn('[client-error]', JSON.stringify(report));
+  // 本地存储（future: 可改为写入 PG 表 error_reports）
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    const dir = path.join(__dirname, '..', 'data', 'error-reports');
+    fs.mkdirSync(dir, { recursive: true });
+    const file = path.join(dir, new Date().toISOString().slice(0, 10) + '.jsonl');
+    fs.appendFileSync(file, JSON.stringify(report) + '\n');
+  } catch (e) {
+    // 磁盘写失败不影响接口响应
+  }
+  ok(res, { received: true, traceId: report.code + '-' + Date.now() }, '错误已记录');
+});
+
 /* ===== 404 兜底（任何未匹配路由） ===== */
 app.use((req, res) => {
   res.status(404).json({
