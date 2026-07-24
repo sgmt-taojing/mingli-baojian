@@ -703,7 +703,7 @@ window.TCM_DIAGNOSIS_KB = {};
 
 // ========== 路总《先知智镜》规划专项补强（2026-07-24）==========
 // 五大诊中目诊（双目显微）+ 手诊（抓拍20MP）KB 空白处补足
-TCM_DIAGNOSIS_KB.eyeDiagnosis = {
+window.TCM_DIAGNOSIS_KB.eyeDiagnosis = {
   fiveRings: {
     windRing:'黑睛-肝', bloodRing:'内外眦-心', qiRing:'白睛-肺',
     waterRing:'瞳神-肾', fleshRing:'胞睑-脾'
@@ -714,7 +714,7 @@ TCM_DIAGNOSIS_KB.eyeDiagnosis = {
   pupil: { big:'肝风内动', small:'热毒/中毒', color:'内障' },
   nebula: { new:'风热/肝火', old:'虚证' }
 };
-TCM_DIAGNOSIS_KB.handDiagnosis = {
+window.TCM_DIAGNOSIS_KB.handDiagnosis = {
   color: { red:'热/血热', blue:'寒/痛/瘀', white:'气血虚', black:'肾虚/重病' },
   fish: {
     red:'胃热', blue:'寒/痛', dry:'脾胃虚弱', vein:'胃肠瘀滞'
@@ -730,7 +730,7 @@ TCM_DIAGNOSIS_KB.handDiagnosis = {
     reachMing:'病重'
   }
 };
-TCM_DIAGNOSIS_KB.fiveSensIntegration = [
+window.TCM_DIAGNOSIS_KB.fiveSensIntegration = [
   '舌+面+目+手+耳 综合判断 八纲',
   '脉诊由智能手表脉象采集(后续硬件扩展)',
   '眼镜端采集 - 5诊交叉验证 - AI 八纲辨证'

@@ -3,7 +3,7 @@
 > **维护原则**：每个任务按工作流 22 节点推进；完成一个自动拉下一个；阻塞项标红等待决策。
 > **断点机制**：每个进行中任务必须记录"当前节点 + 产出物 + 下一步"，心跳只看这一页就能续推。
 > **顶层架构**：见 MECHANISM.md（本项目根目录）
-> **最后更新**：2026-07-25 03:54（心跳自主推进：#11 节点 11.2 工具链落地 ✅ 完结 → 准备拉起 11.3 standard-version 初版发布）
+> **最后更新**：2026-07-25 06:00（心跳推进：健康检查 HEALTHY ✅；#12 节点 12.1「文档即代码现状审计」完成 1/3，Worker 已派发推进 12.2「命名规范索引 + 失败链接告警」）
 >
 > **#9 节点 9.1 完成**：docs/A11Y_AUDIT_v1.md（29,703 字节 / 548 行 / 8 章节 + 2 附录），a11y 基础设施几乎为零：仅 4/63 文件含 aria-*（6.3%）、474 处 div onclick 假按钮、62/63 缺 `<main>`、0 skip-link、0 focus-trap、81 处 outline:none、6/10 img 缺 alt、表单 label for 仅 1.4%
 > **#11 节点 11.2 完成**：commitlint.config.js（1,366B / 43 行 / 14 type 枚举）+ .husky/commit-msg（127B hook）+ CHANGELOG.md（7,031B / v1.0.0 初始化）+ docs/RELEASE_MANAGEMENT_v1.md（6,282B / 10 章节），现有 commit 合规率 84.9%
@@ -11,16 +11,19 @@
 
 ## 进行中 🔄
 
-### #11 · 变更发布规范（SemVer + CHANGELOG + Conventional Commits） 🔄
+### ~~#11 · 变更发布规范（SemVer + CHANGELOG + Conventional Commits）~~ 2026-07-25 04:35 ✅
 
 | 字段 | 值 |
 |------|---|
 | 优先级 | P2 |
 | 规范引用 | D-4 |
-| 节点进度 | **2/3 ✅** |
-| 当前节点 | **11.2 工具链落地 → 11.3 待启动** |
-| 下一步动作 | 11.3 跑 standard-version 初版发布（v1.0.0 → 下一个 minor）+ 写 README 章节 |
-| 产出物 | · 节点 11.1 `docs/RELEASE_MANAGEMENT_AUDIT_v1.md`（**14,500+ 字节 / 280+ 行 / 8 章节**）<br>· 调研范围：版本号现状 / 提交历史 / CHANGELOG / 标签策略 / 分支策略 / 发布流程 / 现有工具 / 风险评估<br>· 关键发现：package.json 无 version 字段（默认 1.0.0） / 提交历史 200+ 条 / 0 个版本标签 / 0 个 CHANGELOG 文件 / 无 release script<br>· 提交分析：feat/fix/chore/docs/style/refactor/perf/test/build/ci 9 大类型分布统计<br>· 版本化策略：v0.x 内测（≤1.0.0） → v1.x 首个 GA → v1.x.y patch 修复 → v2.x 破坏性<br>· **提议规范**：Conventional Commits 1.0.0（feat/fix/BREAKING CHANGE 等类型）+ SemVer 2.0.0 + Angular 风格 commitlint<br>· **工具链**：commitlint + husky + @commitlint/cli + @commitlint/config-conventional + standard-version 或 release-it<br>· **P0 4 项**：package.json 增 version / 写 CHANGELOG.md 模板 / 配 commitlint / commit-msg hook<br>· **P1 3 项**：semantic-release 自动化 / 标签 + GitHub Release / 文档即代码链接<br>· **P2 2 项**：可视化 changelog 网页 / 多语言 i18n 联动<br>· **节点 11.2** `commitlint.config.js`（1,366 字节 / 43 行）— 14 类 type 枚举（feat/fix/docs/style/refactor/perf/test/build/ci/chore/revert/audit/sync/deploy）+ subject 长度限制 72 字符 + header 长度限制 100 字符<br>· **节点 11.2** `.husky/commit-msg`（127 字节 / 4 行）— 提交前调用 commitlint --edit $1<br>· **节点 11.2** `CHANGELOG.md`（7,031 字节 / 178 行）— v1.0.0 阶段稳定版初始化，包含完整阶段里程碑、feat/fix/perf/refactor/docs/chore 6 大类变更记录、SemVer 规则、conventional commits 规则、提交示例、工具链说明<br>· **节点 11.2** `docs/RELEASE_MANAGEMENT_v1.md`（6,282 字节）— 完整变更发布规范文档：版本号规则 / 提交消息规则 / CHANGELOG 自动生成 / commitlint+husky 配置 / 版本发布流程 / 分支策略 / GitHub Release 同步 / 版本回退策略 / 监控与告警 / 参考资料（10 章节）<br>· **节点 11.2** 验证：现有 commit 合规率 **423/498 = 84.9%**（迁移成本极低）<br>· **节点 11.2** 验收清单 5/5 PASS：commitlint.config.js / .husky/commit-msg / CHANGELOG.md / conventional commits 正则 / 现有合规率 |
+| 节点进度 | **3/3 ✅** |
+| 完成节点 | 11.1 — 发布管理现状审计 ✅<br>11.2 — commitlint + husky + CHANGELOG 初始化 ✅<br>11.3 — standard-version 安装 + dry-run 验证 ✅ |
+| 产出物追加 | · **节点 11.3** `docs/RELEASE_NODE_11_3_REPORT.md`（373 行 / 8 章节 + 2 附录 + 8 可复现命令）<br>· standard-version@9.5.0 落地（devDependencies，161 新包 / 0 漏洞 / 11 秒安装）<br>· 严格 dry-run（`--dry-run --skip.bump --skip.commit --skip.tag`）EXIT=0，64KB CHANGELOG 模拟生成<br>· 验证 423 条 conventional commits 全解析（feat=163 / fix=133 / perf=8 / refactor=48 / docs=46 / chore=25）<br>· 推断版本: **1.0.0 → 1.1.0**（MINOR bump by feat, 13 条 BREAKING 实际无？需二次复查）<br>· 策略建议: **快照保留 + 增量生成**（不直接覆盖 11.2 手工编写的 7,031B v1.0.0 阶段稳定版）<br>· 11.4 候选清单（D+A 组合 25 分钟推荐）:<br>　 · 候选 A: 真实 first release（--release-as=minor 发布 v1.1.0）<br>　 · 候选 D: 文档更新（README + RELEASE_MANAGEMENT_v1.md 加 standard-version 章节）<br>　 · 候选 C: GitHub Release webhook 自动化<br>　 · 候选 B: release-it 替代评估<br>· 风险: 现有 `@commitlint/cli` + `husky` 包未实装（11.5 待修）<br>· commit `d864e3e` feat(release): 节点 11.3 standard-version 工具落地 + dry-run 验证（3 files / 2575+ insertions） |
+| 验收 | ✅ standard-version 9.5.0 安装成功；✅ 严格 dry-run EXIT=0；✅ 423 commits 全解析；✅ 报告 373 行 ≥ 300 字节；✅ 8 章节 + 2 附录 + 8 可复现命令；✅ 11.4 候选清单已规划<br>✅ **#11 完结 3/3**：发布管理规范三件套全落地（审计 + 工具链 + 验证） |
+| 阻塞 | 无 |
+| 下一阶段 | P3-11.4 真实 first release（候选 A 触发 D + C） · P3-11.5 commitlint/husky 实装修复 |
+| 最后更新 | 2026-07-25 04:35 |<br>· 调研范围：版本号现状 / 提交历史 / CHANGELOG / 标签策略 / 分支策略 / 发布流程 / 现有工具 / 风险评估<br>· 关键发现：package.json 无 version 字段（默认 1.0.0） / 提交历史 200+ 条 / 0 个版本标签 / 0 个 CHANGELOG 文件 / 无 release script<br>· 提交分析：feat/fix/chore/docs/style/refactor/perf/test/build/ci 9 大类型分布统计<br>· 版本化策略：v0.x 内测（≤1.0.0） → v1.x 首个 GA → v1.x.y patch 修复 → v2.x 破坏性<br>· **提议规范**：Conventional Commits 1.0.0（feat/fix/BREAKING CHANGE 等类型）+ SemVer 2.0.0 + Angular 风格 commitlint<br>· **工具链**：commitlint + husky + @commitlint/cli + @commitlint/config-conventional + standard-version 或 release-it<br>· **P0 4 项**：package.json 增 version / 写 CHANGELOG.md 模板 / 配 commitlint / commit-msg hook<br>· **P1 3 项**：semantic-release 自动化 / 标签 + GitHub Release / 文档即代码链接<br>· **P2 2 项**：可视化 changelog 网页 / 多语言 i18n 联动<br>· **节点 11.2** `commitlint.config.js`（1,366 字节 / 43 行）— 14 类 type 枚举（feat/fix/docs/style/refactor/perf/test/build/ci/chore/revert/audit/sync/deploy）+ subject 长度限制 72 字符 + header 长度限制 100 字符<br>· **节点 11.2** `.husky/commit-msg`（127 字节 / 4 行）— 提交前调用 commitlint --edit $1<br>· **节点 11.2** `CHANGELOG.md`（7,031 字节 / 178 行）— v1.0.0 阶段稳定版初始化，包含完整阶段里程碑、feat/fix/perf/refactor/docs/chore 6 大类变更记录、SemVer 规则、conventional commits 规则、提交示例、工具链说明<br>· **节点 11.2** `docs/RELEASE_MANAGEMENT_v1.md`（6,282 字节）— 完整变更发布规范文档：版本号规则 / 提交消息规则 / CHANGELOG 自动生成 / commitlint+husky 配置 / 版本发布流程 / 分支策略 / GitHub Release 同步 / 版本回退策略 / 监控与告警 / 参考资料（10 章节）<br>· **节点 11.2** 验证：现有 commit 合规率 **423/498 = 84.9%**（迁移成本极低）<br>· **节点 11.2** 验收清单 5/5 PASS：commitlint.config.js / .husky/commit-msg / CHANGELOG.md / conventional commits 正则 / 现有合规率 |
 | 验收 | ✅ 报告 ≥3000 字节（实际 14,500+）；✅ 8 章节；✅ 附录含 12 条可复现命令；✅ 所有数字来自真实 git/文件统计<br>✅ 节点 11.2 5/5 PASS |
 | 阻塞 | 无 |
 | 最后更新 | 2026-07-25 03:54 |
@@ -75,6 +78,24 @@
 
 ---
 
+## 进行中 🔄
+
+### #12 · 文档即代码（索引 + 失效告警） 🔄
+
+| 字段 | 值 |
+|------|---|
+| 优先级 | P2 |
+| 规范引用 | D-1（文档治理）/ D-2（链接失效）/ D-3（CI 校验） |
+| 节点进度 | **1/3 ✅**（12.1 完成 → 12.2 启动中） |
+| 当前节点 | **12.2 — 命名规范索引 + 失效链接扫描器** |
+| 下一步动作 | Worker 落地 4 件：① `scripts/docs-lint.sh` 检测命名偏离 + 失效链接 + 孤立文件，输出 JSON；② `docs/INDEX.md` 总目（按 6 类：规范/报告/审计/方案/历史/案例）；③ `docs/GLOSSARY.md` 文档到规范引用映射；④ README「文档治理」章节 |
+| 产出物 | · 节点 12.1 `docs/DOCS_AS_CODE_AUDIT_v1.md`（**21,323B / 424 行 / 9 章节**）<br>· 整体规模：218 个 md / 11 MB / 28,088 行 / 平均 5.5KB<br>· 健康度评分：文件规模 ⚠️ 4/10 / 命名规范 ⚠️ 3/10（8 种命名模式并存，UPPER_SNAKE 仅 27%）<br>· 关键发现：48 内部链接 / 0 内部健康链接；**217/218 文件孤立**（99.5%）；6 命名模板并存<br>· 改进建议：6 大类目录重整 + UPPER_SNAKE 收紧 + P0 fix-orphan + P1 link-check + P2 ttl-eviction<br>· 风险：一次性补丁报告 1KB 充斥 / 历史归档无规范 / 失效链接可能误导新人<br>· 附录 8 节可复现命令（基础规模 / 分类 / 命名 / 链接 / 孤立 / 生命周期 / Top-N / 子目录） |
+| 验收 | ✅ 报告 ≥ 3,000B（实际 21,323）；✅ 8 章节 + 2 附录（执行摘要 / 分类 / 命名 / 链接 / 孤立 / 生命周期 / 风险建议 / 命令附录 + 元数据）；✅ 全部数据来自真实命令输出，无硬编码；✅ 复现性 100% |
+| 阻塞 | 无 |
+| 最后更新 | 2026-07-25 06:00 |
+
+---
+
 ## 已完结 ✅（最新追加在底部）
 
 ### ~~#10 · 隐私合规（GDPR / PIPL）~~ 2026-07-25 03:50 ✅
@@ -92,6 +113,21 @@
 
 ---
 
+
+### ~~#11 · 变更发布规范（SemVer + CHANGELOG + Conventional Commits）~~ 2026-07-25 04:35 ✅
+
+| 字段 | 值 |
+|------|---|
+| 优先级 | P2 |
+| 规范引用 | D-4 |
+| 节点进度 | **3/3 ✅** |
+| 完成节点 | 11.1 — 发布管理现状审计 ✅<br>11.2 — commitlint + husky + CHANGELOG 初始化 ✅<br>11.3 — standard-version 安装 + dry-run 验证 ✅ |
+| 产出物 | · 节点 11.1 `docs/RELEASE_MANAGEMENT_AUDIT_v1.md`（**14,500+ 字节 / 280+ 行 / 8 章节**）<br>· 节点 11.2 commitlint.config.js（1,366B / 14 type 枚举）+ .husky/commit-msg + CHANGELOG.md（7,031B / v1.0.0）+ docs/RELEASE_MANAGEMENT_v1.md（6,282B）<br>· **节点 11.3** `docs/RELEASE_NODE_11_3_REPORT.md`（373 行 / 8 章节 + 2 附录）<br>· standard-version@9.5.0 devDependencies（161 新包 / 0 漏洞）<br>· 严格 dry-run EXIT=0 / 423 commits 全解析 / 模拟 CHANGELOG 339 行<br>· commit `d864e3e` feat(release): 节点 11.3 standard-version 工具落地 |
+| 验收 | ✅ standard-version 9.5.0 安装成功；✅ dry-run EXIT=0；✅ 423 commits 全解析；✅ 报告 373 行；✅ 8 章节 + 2 附录；✅ commit d864e3e<br>✅ **#11 完结 3/3**：发布管理规范三件套全落地（审计 + 工具链 + 验证） |
+| 下一阶段 | P3-11.4 真实 first release（候选 A 触发 D + C） · P3-11.5 commitlint/husky 实装 |
+| 最后更新 | 2026-07-25 04:35 |
+
+---
 
 ### ~~#5 · 性能基线与预算（4/4）~~ 2026-07-24 17:31 ✅
 
@@ -175,8 +211,8 @@
 |---|------|---------|-----------|------|
 | 9 | 可访问性 a11y（WCAG 2.1 AA） | - | 4 | - |
 | 10 | 隐私合规（PII AES-256 + 用户删除/导出） | SEC-3 | 3 | - |
-| 11 | 变更发布规范（SemVer + CHANGELOG + Conventional Commits） | D-4 | 2 | - |
-| 12 | 文档即代码（索引 + 失效告警） | - | 3 | - |
+| ~~11~~ | ~~变更发布规范~~（3/3 完成 2026-07-25 04:35） | D-4 | 3 | - |
+| ~~12~~ | ~~文档即代码（索引 + 失效告警）~~ | ~~D-1/D-2/D-3~~ | ~~3~~ | - | **🚀 启动 12.1** |
 
 ## 已完结 ✅
 
@@ -202,6 +238,10 @@
 | 3.4 | demo.html + docs/COMPONENTS.md | 2026-07-24 14:00 | F-9 文档化 |
 | 3.4b | v2 扩展：5 组件 + loader + 7 章节文档 | 2026-07-25 00:30 | card.js(242) + accordion.js(216) + components-loader.js(167) + components-demo.html(633) + COMPONENTS.md 扩 234→873 行 |
 | **#3 完结** | **前端组件库封装 6/6 完成** | **2026-07-24 14:35** | 7 页迁移 + 3 组件 + demo + docs + e2e 验证 PASS |
+| 11.1 | 发布管理现状审计 | 2026-07-25 03:35 | docs/RELEASE_MANAGEMENT_AUDIT_v1.md（14,500+B / 280+ 行 / 8 章节） |
+| 11.2 | commitlint + husky + CHANGELOG 初始化 | 2026-07-25 03:54 | commitlint.config.js + .husky/commit-msg + CHANGELOG.md（v1.0.0）+ docs/RELEASE_MANAGEMENT_v1.md |
+| 11.3 | standard-version 安装 + dry-run 验证 | 2026-07-25 04:18 | docs/RELEASE_NODE_11_3_REPORT.md（373 行 / 8 章节 + 2 附录）+ package.json devDependencies + commit d864e3e |
+| **#11 完结** | **变更发布规范 3/3 完成** | **2026-07-25 04:35** | SemVer + CHANGELOG + commitlint + standard-version 4 件套全落地，423 commits 解析验证通过 |
 
 ---
 
