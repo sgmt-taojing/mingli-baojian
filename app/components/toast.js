@@ -77,7 +77,7 @@
         background:var(--ml-info,#3b82f6); color:#fff;
       }
     </style>
-    <div class="box" part="box"><slot></slot></div>
+    <div class="box" part="box" role="status" aria-live="polite" aria-atomic="true"><slot></slot></div>
   `;
 
   class MlToast extends HTMLElement {
@@ -100,6 +100,13 @@
     _show(msg, type){
       if (type) this.setAttribute('type', type);
       else if (!this.hasAttribute('type')) this.setAttribute('type','info');
+      // a11y (节点 9.2 P0-6): error/warn 用 assertive，读屏打断告诉用户；success/info 用 polite
+      const box = this.shadowRoot.querySelector('.box');
+      if (box) {
+        const isUrgent = type === 'error' || type === 'warn';
+        box.setAttribute('role', isUrgent ? 'alert' : 'status');
+        box.setAttribute('aria-live', isUrgent ? 'assertive' : 'polite');
+      }
       const dur = parseInt(this.getAttribute('duration')||'2400',10);
       // 把消息写入 light DOM slot
       this.textContent = msg;

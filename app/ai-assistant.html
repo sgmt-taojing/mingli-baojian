@@ -88,8 +88,10 @@ body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',-apple
 .msg.m-ai .b::after{content:' 🔊';font-size:11px;color:#c9a84c;opacity:0;transition:opacity .15s}
 .msg.m-ai:hover .b::after{opacity:.6}
 </style>
+<link rel="stylesheet" href="css/a11y-fix.css">
 </head>
 <body>
+<a href="#main-content" class="skip-link">跳到主要内容</a>
 <nav class="nav">
 <a href="divination-hub.html">🏠 主平台</a>
 <a href="divination-almanac.html">📅 黄历</a>
@@ -901,7 +903,7 @@ function showReport(text){
     push.className='msg m-ai';
     let html='<div class="mod-push"><div class="mp-title">✨ 您还可以体验</div><div class="mp-items">';
     ALL_MODS.filter(m=>m.id!==state.module).slice(0,8).forEach(m=>{
-      html+='<span class="mp-item" onclick="startModule(\''+m.id+'\')">'+m.icon+' '+m.name+'</span>';
+      html+='<button type="button" class="mp-item" onclick="startModule(\''+m.id+'\')">'+m.icon+' '+m.name+'</span>';
     });
     html+='</div></div>';
     push.innerHTML=html;

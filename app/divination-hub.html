@@ -274,8 +274,10 @@ setTimeout(removeLoadingOverlay,5000);
     <script src="../knowledge/koujue-database-full.js" defer></script>
 <script src="js/secure-storage.js"></script>
 <script src="js/user-profile.js"></script>
+<link rel="stylesheet" href="css/a11y-fix.css">
 </head>
 <body>
+<a href="#main-content" class="skip-link">跳到主要内容</a>
 <div>
 
 <!-- LOADING OVERLAY -->
@@ -368,7 +370,7 @@ setTimeout(removeLoadingOverlay,5000);
 
 
 <!-- MAIN -->
-<main class="main">
+<main id="main-content" class="main">
 
 <!-- ===== 首页 HERO ===== -->
 <section class="section active" id="section-hero" role="tabpanel" aria-labelledby="tab-hero">
@@ -967,7 +969,7 @@ setTimeout(removeLoadingOverlay,5000);
 
     <!-- 📋 专业全量信息折叠面板 (统一档案 · 跨模块共用) -->
     <div style="text-align:center;margin-top:6px">
-      <span class="pro-expand-toggle" id="proExpandToggle" onclick="toggleProPanel()">
+      <button type="button" class="pro-expand-toggle" id="proExpandToggle" onclick="toggleProPanel()">
         <span class="rich-icon" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--gold)"></span>
         📋 专业全量信息（22 模块共用）
         <span id="proProgressInline" class="pro-progress-text">0%</span>
@@ -26071,9 +26073,9 @@ function showNishanKB() {
     
     // 选项卡
     html += '<div style="text-align:center;margin:20px 0">';
-    html += '<span class="nishan-tab active" onclick="document.getElementById(\'nishan-tianji\').style.display=\'block\';document.getElementById(\'nishan-renji\').style.display=\'none\';document.getElementById(\'nishan-cases\').style.display=\'none\';this.classList.add(\'active\');this.nextSibling.classList.remove(\'active\');this.nextSibling.nextSibling.classList.remove(\'active\')">🔮 天纪（命理）</span>';
-    html += '<span class="nishan-tab" onclick="document.getElementById(\'nishan-tianji\').style.display=\'none\';document.getElementById(\'nishan-renji\').style.display=\'block\';document.getElementById(\'nishan-cases\').style.display=\'none\';this.classList.add(\'active\');this.previousSibling.classList.remove(\'active\');this.nextSibling.classList.remove(\'active\')">💊 人纪（中医）</span>';
-    html += '<span class="nishan-tab" onclick="document.getElementById(\'nishan-tianji\').style.display=\'none\';document.getElementById(\'nishan-renji\').style.display=\'none\';document.getElementById(\'nishan-cases\').style.display=\'block\';this.classList.add(\'active\');this.previousSibling.classList.remove(\'active\');this.previousSibling.previousSibling.classList.remove(\'active\')">📋 临床实战</span>';
+    html += '<button type="button" class="nishan-tab active" onclick="document.getElementById(\'nishan-tianji\').style.display=\'block\';document.getElementById(\'nishan-renji\').style.display=\'none\';document.getElementById(\'nishan-cases\').style.display=\'none\';this.classList.add(\'active\');this.nextSibling.classList.remove(\'active\');this.nextSibling.nextSibling.classList.remove(\'active\')">🔮 天纪（命理）</span>';
+    html += '<button type="button" class="nishan-tab" onclick="document.getElementById(\'nishan-tianji\').style.display=\'none\';document.getElementById(\'nishan-renji\').style.display=\'block\';document.getElementById(\'nishan-cases\').style.display=\'none\';this.classList.add(\'active\');this.previousSibling.classList.remove(\'active\');this.nextSibling.classList.remove(\'active\')">💊 人纪（中医）</span>';
+    html += '<button type="button" class="nishan-tab" onclick="document.getElementById(\'nishan-tianji\').style.display=\'none\';document.getElementById(\'nishan-renji\').style.display=\'none\';document.getElementById(\'nishan-cases\').style.display=\'block\';this.classList.add(\'active\');this.previousSibling.classList.remove(\'active\');this.previousSibling.previousSibling.classList.remove(\'active\')">📋 临床实战</span>';
     html += '</div>';
     
     // 天纪

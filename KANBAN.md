@@ -3,7 +3,7 @@
 > **维护原则**：每个任务按工作流 22 节点推进；完成一个自动拉下一个；阻塞项标红等待决策。
 > **断点机制**：每个进行中任务必须记录"当前节点 + 产出物 + 下一步"，心跳只看这一页就能续推。
 > **顶层架构**：见 MECHANISM.md（本项目根目录）
-> **最后更新**：2026-07-25 03:36（心跳自主推进：#9 节点 9.1 a11y 现状调研 ✅ 完结 → 准备拉起 9.2 P0 必修清单）
+> **最后更新**：2026-07-25 03:50（心跳自主推进：#9 节点 9.1 + 9.2 P0 组件/样式层 ✅ 完结 → 准备拉起 9.3 页面层修补 div→button 化）
 >
 > **#9 节点 9.1 完成**：docs/A11Y_AUDIT_v1.md（29,703 字节 / 548 行 / 8 章节 + 2 附录），a11y 基础设施几乎为零：仅 4/63 文件含 aria-*（6.3%）、474 处 div onclick 假按钮、62/63 缺 `<main>`、0 skip-link、0 focus-trap、81 处 outline:none、6/10 img 缺 alt、表单 label for 仅 1.4%
 > **健康检查**：✅ 5/5 服务在线（paipan/tts/face-ocr/static/api-v2）；KB API OK；paipan-api 路由 WARN（已知）
@@ -33,9 +33,9 @@
 |------|---|
 | 优先级 | P1 |
 | 规范引用 | WCAG 2.1 AA（Perceivable/Operable/Understandable/Robust） |
-| 节点进度 | **1/4 🔄**（节点 9.1 完成 ✅，9.2 待派单） |
-| 当前节点 | **9.1 — a11y 现状调研报告 ✅** |
-| 下一步动作 | 派 9.2 P0 必修清单（6 项：div→button 化 / 表单 label / skip-link / 修 6 个错 role / ml-modal focus-trap / ml-toast aria-live）→ 9.3 组件库适配 + 9.4 验收报告 |
+| 节点进度 | **2/4 🔄**（节点 9.1 ✅ + 9.2 组件/样式层 ✅，剩 9.3 页面层 + 9.4 验收） |
+| 当前节点 | **9.2 — 组件层 + 样式层 P0 修补 ✅ 完成，剩 9.3 页面层 div→button 化 / label 补全** |
+| 下一步动作 | 节点 9.3 页面层修补：先 admin.html / login.html 做 PoC 验证 div→button 安全，再批量推；节点 9.4 验收报告 |
 | 产出物 | · 节点 9.1 `docs/A11Y_AUDIT_v1.md`（**29,703 字节 / 548 行 / 8 章节 + 2 附录**）<br>· 调研范围：app/*.html 全量 63 + app/js 36 + app/components 5 + 表单 + 图像 alt + 键盘 + ARIA + 颜色对比<br>· 关键数据：104 个文件 / 191,262 行 / 10.86 MB；aria-* 总属性仅 67 处（80% 集中在 divination-hub.html 单页）<br>· **ARIA 覆盖**：仅 4/63 文件（6.3%）含 aria-*；aria-hidden 0 / aria-describedby 0 / aria-required 0 / aria-invalid 0 / aria-busy 0<br>· **6 个错误 role**：im.html `role="user/master/doctor/ai/agent/admin"` 不是合法 ARIA role<br>· **语义标签**：`<button>` 937 / `<nav>` 16 / `<main>` **1** / `<article>` **0** / `<aside>` **0** / `<form>` **1**<br>· **474 处 `<div onclick>` 反模式** + 19 `<span onclick>` = **493 处假按钮**，不可键盘聚焦<br>· **标题层级**：divination-hub.html 含 **6 个 `<h1>`**（含 JS 字符串模板 3 处）违反 WCAG H42<br>· **表单**：426 input / 411 label 但 `<label for>` 仅 **6 处**（1.4%）405 个 label 无 id 关联<br>· **键盘**：tabindex **0** / skip-link **0** / focus-trap **0** / focus-visible **0** / `outline:none` **81 处**<br>· **图像**：10 img 中 4 有 alt（40%）；6 缺 alt（含 3 处 innerHTML 动态插入：ai-assistant/tcm-clinic/wechat-h5）<br>· **错误可访问**：toast/feedback/error-render 0 个 aria-live/role=alert；ml-toast **完全无 a11y**（0 分）<br>· **组件 a11y 自审**：ml-modal 60 / ml-accordion 60 / ml-tab 50 / ml-card 0 / ml-toast 0<br>· **WCAG AA 50 条**：明确不达标 ≥15 条 + 部分不达标 10+ 条；Perceivable 6/11、Operable 8/11、Understandable 5/9、Robust 3/3<br>· **P0 6 项**：div→button 化（474 处）/ 表单 label for 补全 / skip-link（63 处）/ 修 6 错 role / ml-modal focus-trap / ml-toast aria-live<br>· **P1 5 项**：h1 收敛 / outline:none 加 focus-visible / img alt 补全 / `<main>` 包裹 / aria-required+invalid<br>· **P2 4 项**：颜色对比实测 / 移动端 reflow / `<title>` 结构化 / `<a>` 加 href<br>· **节点 9.2 草图**：app/components/toast.js（+5 行 aria-live）+ modal.js（+30 行 focus-trap + 自动聚焦）+ divination-hub.html（L297 nav-tab 加 tabindex=0 + 全页 outline:none 加 focus-visible）+ login.html（form 包裹已存在，补 label for 全部 input）<br>· 风险高：命理类用户 50+ 占比高 + 视障/色弱/读屏用户基本无法使用关键功能 |
 | 验收 | ✅ 报告 ≥3000 字节（实际 29,703）；✅ 8 章节（执行摘要/整体规模/ARIA密度/语义标签/键盘/图像/WCAG对照/P0P1P2）；✅ 附录含 16 条可复现命令 + 50 条 WCAG AA 对照表；✅ 所有数字来自真实命令输出（无硬编码）；✅ 4 大原则全对照 |
 | 阻塞 | 无 |
