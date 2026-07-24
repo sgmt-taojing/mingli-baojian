@@ -3,31 +3,54 @@
 > **维护原则**：每个任务按工作流 22 节点推进；完成一个自动拉下一个；阻塞项标红等待决策。
 > **断点机制**：每个进行中任务必须记录"当前节点 + 产出物 + 下一步"，心跳只看这一页就能续推。
 > **顶层架构**：见 MECHANISM.md（本项目根目录）
-> **最后更新**：2026-07-24 17:14
+> **最后更新**：2026-07-25 00:04（Worker 完成 #7 节点 7.2 + 7.3）
+> **健康检查**：✅ 5/5 服务在线（paipan/tts/face-ocr/static/api-v2）；KB API OK；paipan-api 路由 WARN（已知）
 
----
+## 进行中 🔄
 
-## 进行中 🔵
-
-### #5 · 性能基线与预算（Lighthouse CI + bundle 上限 300KB）
+### #7 · 测试规范补齐（单元测试 ≥60% + Pact 契约测试）
 
 | 字段 | 值 |
 |------|---|
 | 优先级 | P1 |
-| 规范引用 | P-1/P-2 |
-| 节点进度 | **3/4 ✅** |
-| 当前节点 | 5.3 — 收尾验证（7/7 PASS 全部达成） |
-| 产出物 | · 节点 5.1 `docs/PERFORMANCE_BUDGET.md`（7,311B）+ `lighthouserc.json`（1,345B）<br>· 节点 5.2.5 gzip 静态服务：`server/static-gzip.py`（6,366B / Range + Cache-Control + Vary 全支持）<br>· 节点 5.2.5 启动脚本：`server/start-static-gzip.sh`（2,234B）<br>· 节点 5.2.5 文档：`docs/STATIC_GZIP_SERVICE_v1.md`（9,609B → 11,851B v1.1 +Range） |
-| 验收 7/7 | ✅ gzip 1.8MB→521KB；✅ 小文件不压；✅ Cache-Control max-age=3600；✅ Vary Accept-Encoding；✅ Range 206 全段/末段；✅ 启动脚本就绪；✅ 服务存活 |
-| 下一步动作 | 节点 5.4 — `docs/PERFORMANCE_BASELINE_v1.md` 实测报告（Lighthouse + bundle + 缓存命中率） |
+| 规范引用 | T-1/T-2 |
+| 节点进度 | **3/6** |
+| 当前节点 | 7.4 — 集成测试（supertest 端到端 API 测试） |
+| 下一步动作 | 安装 supertest，为 api-server-v2 核心路由写端到端集成测试；补充测试覆盖率到 ≥65% |
+| 产出物 | · `jest.config.js`（testEnvironment=node, testMatch=tests/**/*.test.js, collectCoverage, 排除 api-server-v2.js 和 kb-store/**, maxWorkers=1 防 SQLite 并发锁）<br>· `tests/smoke.test.js` 扩展（新增 api-response 成功/错误格式验证 + logger 导出验证 + error-aggregator recordError 导出验证）<br>· `tests/unit/api-response.test.js`（9 测试）<br>· `tests/unit/logger.test.js`（7 测试）<br>· `tests/unit/error-aggregator.test.js`（5 测试）<br>· **节点 7.2**：22 个单元测试套件全通过（472 测试），覆盖率 Statements 64.04% / Lines 63.74% / Functions 73.88% / Branches 59.88%，均 ≥60% ✅<br>· **节点 7.2**：修复 coverage 模式 flaky 测试 — jest.config.js 添加 `maxWorkers: 1` 解决 SQLite "database is locked" 并发问题<br>· **节点 7.3**：安装 `@pact-foundation/pact` v17.0.1（devDependency）<br>· **节点 7.3**：`tests/contract/api-contract.test.js`（4 个 PactV3 消费者契约测试：GET /api/v1/health + GET /api/kb/list + GET /api/kb/:filename + GET /api/v1/kb/list 308 重定向）<br>· **节点 7.3**：`pacts/mingli-baojian-h5-mingli-baojian-api.json`（契约文件自动生成） |
 | 阻塞 | 无 |
-| 最后更新 | 2026-07-24 17:14 |
+| 最后更新 | 2026-07-25 00:04 |
 
 ---
 
 ## 已完结 ✅（最新追加在底部）
 
-### ~~#5 · 性能基线与预算（4/4）~~ 2026-07-24 17:14 ✅
+### ~~#5 · 性能基线与预算（4/4）~~ 2026-07-24 17:31 ✅
+
+| 字段 | 值 |
+|------|---|
+| 优先级 | P1 |
+| 规范引用 | P-1/P-2 |
+| 节点进度 | **4/4 ✅** |
+| 完成节点 | 5.4 — 性能基线实测报告 ✅ |
+| 产出物 | · 节点 5.1 `docs/PERFORMANCE_BUDGET.md`（7,311B）+ `lighthouserc.json`（1,345B）<br>· 节点 5.2.5 gzip 静态服务：`server/static-gzip.py`（6,366B / Range + Cache-Control + Vary 全支持）<br>· 节点 5.2.5 启动脚本：`server/start-static-gzip.sh`（2,234B）<br>· 节点 5.2.5 文档：`docs/STATIC_GZIP_SERVICE_v1.md`<br>· 节点 5.4 实测报告：`docs/PERFORMANCE_BASELINE_v1.md`（9,966B） |
+| 验收 | ✅ gzip 1.8MB→521KB（72% 压缩率）；✅ 小文件不压缩；✅ Cache-Control max-age=3600；✅ Vary Accept-Encoding；✅ Range 206；✅ API /api/kb/list P95 1.7ms；✅ /api/v1/health P95 0.9ms；✅ 基线报告含 bundle/API/gzip/缓存/Web Vitals 全维度 |
+| 结论 | gzip 服务达标✅；bundle 严重超标（JS 4.5x/HTML 9x/文件数 12x）→ Phase 1 拆分优先 |
+| 最后更新 | 2026-07-24 17:31 |
+
+---
+
+### ~~#6 · 可观测性规范（P-3 / P-4）~~ 2026-07-24 21:01 ✅
+
+| 字段 | 值 |
+|------|---|
+| 优先级 | P1 |
+| 规范引用 | P-3/P-4 |
+| 节点进度 | **4/4 ✅** |
+| 完成节点 | 6.4 — metrics 接口 + dashboard 页面 ✅ |
+| 产出物 | · 节点 6.1 `docs/OBSERVABILITY_STANDARD.md`（规范文档 v1.0）<br>· 节点 6.2 `server/logger.js`（pino 实例 + pino-pretty 开发 + pino-roll 生产轮转）+ `server/api-server-v2.js` console.* 全量替换（0 残留）+ kb-store/* 前端数据文件说明<br>· 节点 6.3 `server/error-aggregator.js`（5 分钟滚动窗口 + 12 事件埋点：kb.hit/miss/partial + ai.invoke/error + report.generate/export + push.deliver + auth.login/fail + tts.synthesize + ocr.recognize）<br>· 节点 6.4 `GET /api/v1/admin/metrics?range=7d` 端点（8 指标 JSON 返回 + adminAuth 保护）+ `app/admin/dashboard.html`（8 指标卡片 + CSS 柱状图 + 模块排行 + 每日趋势 + 错误 TOP 5 表格） |
+| 验收 | ✅ `grep -rn "console\.(log|warn|error)" server/*.js` = 0；✅ kb-store/* 前端文件说明写入 OBSERVABILITY_STANDARD.md；✅ metrics 端点 adminAuth 保护；✅ dashboard.html 存在；✅ 8 指标全覆盖 |
+| 最后更新 | 2026-07-24 21:01 |
 
 ---
 
@@ -72,8 +95,9 @@
 
 | # | 任务 | 规范引用 | 预估节点数 | 阻塞 |
 |---|------|---------|-----------|------|
-| ~~5~~ | ~~性能基线与预算~~（进行中 1/4） | P-1/P-2 | 4 | - |
-| 6 | 可观测性规范（结构化日志 + 关键事件打点） | P-3/P-4 | 4 | - |
+| ~~5~~ | ~~性能基线与预算~~（4/4 完成 2026-07-24 17:31） | P-1/P-2 | 4 | - |
+| ~~6~~ | ~~可观测性规范（结构化日志 + 关键事件打点）~~（4/4 完成 2026-07-24 21:01） | P-3/P-4 | 4 | - |
+> **#6 完结**：6.1 ✅ 规范文档 · 6.2 ✅ pino 集成 + console 全量替换（server/*.js = 0，kb-store/* 为前端数据文件不在范围） · 6.3 ✅ 12 事件埋点 + error-aggregator · 6.4 ✅ GET /api/v1/admin/metrics 端点 + app/admin/dashboard.html 仪表盘页面
 | 7 | 测试规范补齐（单元测试 ≥60% + Pact 契约测试） | T-1/T-2 | 6 | - |
 | 8 | 国际化文案规范（I18N 抽离） | - | 3 | - |
 
@@ -143,3 +167,5 @@
 | 4.1 | ERROR_HANDLING_STANDARD.md 主规范发布 | 2026-07-24 15:03 | docs/ERROR_HANDLING_STANDARD.md（4127 字节 v1.0） |
 | 4.2 | 服务端 try/catch 全量审计 PASS | 2026-07-24 16:05 | docs/ERROR_HANDLING_AUDIT_v1.md（5 路由 100% 配对） |
 | **#4 完结** | **错误处理规范 5/5 完成** | **2026-07-24 16:56** | error-interceptor.js + ERROR_COPYWRITING.md + INTERCEPTOR_v2.md + POST /api/log/error |
+| **#6 完结** | **可观测性规范 4/4 完成** | **2026-07-24 21:01** | logger.js + pino-http + error-aggregator.js + 12 事件埋点 + /api/v1/admin/metrics + admin/dashboard.html |
+| **#X 完结** | **穿戴 SDK 落地总规划 (R11-W)** | **2026-07-25 00:25** | docs/WEARABLE_XIANZHI_PLAN.md（382 行 / 7 章）+ SMART_GLASS_INTEGRATION.md v2.0（R11-W 增强 §8）+ HEARTBEAT.md（穿戴监控）+ 9 个 SDK 文件本地 8914 + GH Pages 全 200（含 5 路摄像头 / 4 麦 / 骨传导 / NPU / 32GB 硬件清单 + 28 舌象 + 36 面诊 + 子午流注 + 医易联动 + 多品牌路线图） |
