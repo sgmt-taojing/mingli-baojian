@@ -1,0 +1,31 @@
+name: docs-lint
+
+on:
+  push:
+    branches: [main, gh-pages]
+    paths:
+      - 'docs/**/*.md'
+      - 'scripts/docs-lint.sh'
+      - 'scripts/docs-lint-ci.sh'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'docs/**/*.md'
+
+jobs:
+  docs-lint:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run docs-lint
+        run: bash scripts/docs-lint-ci.sh
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-lint-report
+          path: docs/_reports/
+          retention-days: 30
