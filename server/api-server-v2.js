@@ -11,6 +11,9 @@ const distillationRoutes = require('./distillation-routes.js');
 const caseQuality = require('./case-quality.js');
 const { KB_LEVELS } = require('./kb-config.js');
 const crypto = require('crypto');
+const pinoHttp = require('pino-http');
+const logger = require('./logger.js');
+const { recordError } = require('./error-aggregator.js');
 
 // 统一响应壳（P0 #2 节点3：API 设计规范落地）
 const { apiResp, ok, ERROR_CODES } = require('./api-response.js');
@@ -21,6 +24,13 @@ const kbMgmt = require('./kb-management-engine.js'); // KB 命中入库（新）
 
 const app = express();
 const PORT = parseInt(process.env.API_PORT || '8920');
+
+// === pino-http 请求日志 ===
+app.use(pinoHttp({
+  logger,
+  genReqId: () => `r-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`,
+}));
+app.locals.logger = logger;
 
 // === CORS 白名单 ===
 const CORS_ORIGINS = (process.env.CORS_ORIGINS || 'http://127.0.0.1:8900,http://localhost:8900,https://sgmt-taojing.github.io').split(',');
@@ -424,7 +434,7 @@ async function _autoPaipanFromSurvey(baziData) {
     const paipan = await r.json();
     return Object.assign({}, baziData, paipan); // 合并：原问卷 + 排盘结果
   } catch (e) {
-    console.warn('[auto-paipan]', e.message);
+    logger.warn({ module: 'api-server-v2', err: e }, '[auto-paipan]');
     return baziData;
   }
 }
@@ -577,6 +587,7 @@ app.post('/api/ai/chat', auth, async (req, res) => {
   if (!AI_API_KEY) return apiResp(res, ERROR_CODES.AI_UNAVAILABLE, null, 'AI服务未配置');
   if (!sec.rateLimit('ai_chat_' + req.userId, 20, 60000)) return apiResp(res, ERROR_CODES.RATE_LIMIT_GLOBAL, null, '请求过于频繁');
   const sysMsg = { role: 'system', content: AI_SYSTEM_PROMPT };
+  const _aiAuthStart = Date.now();
   try {
     const response = await fetch(AI_API_BASE + '/v1/chat/completions', {
       method: 'POST',
@@ -584,9 +595,10 @@ app.post('/api/ai/chat', auth, async (req, res) => {
       body: JSON.stringify({ model, messages: [sysMsg, ...messages], max_tokens: 4096 })
     });
     const data = await response.json();
+    req.log.info({ module: 'ai', event: 'ai.invoke', provider: AI_PROVIDER, tokensIn: JSON.stringify(messages).length, tokensOut: JSON.stringify(data).length, durationMs: Date.now() - _aiAuthStart }, 'AI invoke complete');
     return apiResp(res, ERROR_CODES.SUCCESS, data, 'ok');
   } catch (e) {
-    console.error('AI API错误:', e.message);
+    logger.error({ module: 'ai', event: 'ai.error', provider: AI_PROVIDER, errorCode: 'AI_UNAVAILABLE', errMsg: e.message }, 'AI API错误');
     return apiResp(res, ERROR_CODES.AI_UNAVAILABLE, null, 'AI服务暂时不可用');
   }
 });
@@ -821,14 +833,23 @@ app.post('/api/ai/public-chat', async (req, res) => {
           db.prepare(`UPDATE kb_formal SET hit_count = hit_count + 1, last_hit = CURRENT_TIMESTAMP WHERE entry_id = ?`).run(topKb[0].entry_id);
           const mod = topKb[0].module;
           const modLabel = {nihaixia:'🪷 倪海厦',tcm:'💊 中医',bazi:'📜 八字',shuhan:'🎓 舒晗',ziwei:'⭐ 紫微',qimen:'🌀 奇门',fengshui:'🏠 风水',faith:'🙏 信仰',huajie:'⚖️ 化解',mantra:'📿 咒语',yijing:'☯ 易经'}[mod] || ('📚 '+mod);
+          req.log.info({ module: 'kb', event: 'kb.hit', moduleId: mod, score: topKb[0].trust_score, source: 'kb_formal' }, 'KB direct hit');
           return res.json({
             choices: [{ message: { content: modLabel + '知识库（直答）\n\n【'+topKb[0].title+'】\n'+topKb[0].excerpt+'\n\n——来源: KB 命中（高置信度 ' + topKb[0].trust_score + '）' } }],
             _local: true, _kb_hit: true, kb_module: mod, kb_score: topKb[0].trust_score
           });
         }
+        // KB partial: trust_score 0.4-0.8 → KB 摘要 + AI 润色
+        const partialKb = db.prepare(`SELECT entry_id, module, title, substr(content, 1, 400) as excerpt, trust_score FROM kb_formal WHERE (${conds}) AND trust_score >= 0.4 AND trust_score < 0.8 ORDER BY trust_score DESC, hit_count DESC LIMIT 1`).all(...params);
+        if (partialKb.length) {
+          req.log.info({ module: 'kb', event: 'kb.partial', moduleId: partialKb[0].module, score: partialKb[0].trust_score, aiRefined: true }, 'KB partial hit, AI refine');
+        }
       } catch(e) {}
     }
   }
+
+  // KB 未直答，走 AI 路径 — 记录 kb.miss
+  req.log.info({ module: 'kb', event: 'kb.miss', moduleId: 'unknown', score: 0, fallback: 'ai' }, 'KB miss, fallback to AI');
 
   // === Ollama 路径无需 API key，直接走 ===
   if (AI_PROVIDER === "ollama") {
@@ -837,12 +858,14 @@ app.post('/api/ai/public-chat', async (req, res) => {
     let sysContent = AI_SYSTEM_PROMPT;
     if (baziData) sysContent += String.fromCharCode(10) + String.fromCharCode(10) + '【用户排盘数据】' + String.fromCharCode(10) + JSON.stringify(baziData, null, 2);
     try {
+      const _ollamaStart = Date.now();
       const r = await fetch(AI_API_BASE + "/chat/completions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ model, messages: [{ role: "system", content: sysContent }, ...messages], max_tokens: 2048, temperature: 0.7 })
       });
       const data = await r.json();
+      req.log.info({ module: 'ai', event: 'ai.invoke', provider: 'ollama', tokensIn: JSON.stringify(messages).length, tokensOut: JSON.stringify(data).length, durationMs: Date.now() - _ollamaStart }, 'AI invoke complete');
       if (data.choices) return res.json(data);
       if (data.error) {
         const lastMsg = messages.filter(m => m.role === "user").pop();
@@ -850,6 +873,7 @@ app.post('/api/ai/public-chat', async (req, res) => {
       }
       return res.json({ choices: [{ message: { content: await _aiLocalResponse("", baziData) } }], _local: true });
     } catch (e) {
+      logger.error({ module: 'ai', event: 'ai.error', provider: 'ollama', errorCode: 'OLLAMA_UNAVAILABLE', errMsg: e.message }, 'AI ollama error');
       const lastMsg = messages.filter(m => m.role === "user").pop();
       return res.json({ choices: [{ message: { content: await _aiLocalResponse(lastMsg ? lastMsg.content : "", baziData) } }], _local: true, error: e.message });
     }
@@ -868,6 +892,7 @@ app.post('/api/ai/public-chat', async (req, res) => {
     if (baziData) sysContent += String.fromCharCode(10) + String.fromCharCode(10) + '【用户排盘数据】' + String.fromCharCode(10) + JSON.stringify(baziData, null, 2);
 
   try {
+    const _aiPubStart = Date.now();
     const url = AI_PROVIDER === "zai" ? AI_API_BASE + "/chat/completions" : AI_API_BASE + "/v1/chat/completions";
     const response = await fetch(url, {
       method: "POST",
@@ -880,8 +905,9 @@ app.post('/api/ai/public-chat', async (req, res) => {
       return res.json({ choices: [{ message: { content: await _aiLocalResponse(lastMsg ? lastMsg.content : "", baziData) } }], _local: true, provider_error: data.error.message });
     }
     res.json(data);
+    req.log.info({ module: 'ai', event: 'ai.invoke', provider: AI_PROVIDER, tokensIn: JSON.stringify(messages).length, tokensOut: JSON.stringify(data).length, durationMs: Date.now() - _aiPubStart }, 'AI invoke complete');
   } catch (e) {
-    console.error("AI API错误:", e.message);
+    logger.error({ module: 'ai', event: 'ai.error', provider: AI_PROVIDER, errorCode: 'AI_PUBLIC_UNAVAILABLE', errMsg: e.message }, 'AI API错误');
     const lastMsg = messages.filter(m => m.role === "user").pop();
     res.json({ choices: [{ message: { content: await _aiLocalResponse(lastMsg ? lastMsg.content : "", baziData) } }], _local: true, error: e.message });
   }
@@ -889,10 +915,15 @@ app.post('/api/ai/public-chat', async (req, res) => {
 
 // 注册/登录（手机号）
 app.post('/api/user/login', (req, res) => {
+  const _loginStart = Date.now();
   let phone = sec.sanitizeInput(req.body.phone);
-  if (!phone || phone.length < 11) return res.json({ error: '请输入正确的手机号' });
+  if (!phone || phone.length < 11) {
+    logger.warn({ module: 'auth', event: 'auth.fail', method: 'phone', reason: 'invalid_phone', ip: req.ip }, 'login fail');
+    return res.json({ error: '请输入正确的手机号' });
+  }
   
   if (!sec.rateLimit('login_' + phone, 5, 60000)) {
+    logger.warn({ module: 'auth', event: 'auth.fail', method: 'phone', reason: 'rate_limited', ip: req.ip }, 'login fail');
     return res.json({ error: '请求过于频繁，请稍后再试' });
   }
   
@@ -927,6 +958,8 @@ app.post('/api/user/login', (req, res) => {
   
   db.prepare('INSERT INTO audit_logs (user_id, action, detail) VALUES (?, ?, ?)')
     .run(user.id, 'login', '手机号登录');
+  
+  req.log.info({ module: 'auth', event: 'auth.login', userId: user.id, method: 'phone', durationMs: Date.now() - _loginStart }, 'login success');
   
   res.json({
     token: token,
@@ -1000,6 +1033,7 @@ app.post('/api/user/check-super', rbac.auth, (req, res) => {
 // 排盘记录接口（自动同步画像）
 // ============================
 app.post('/api/paipan/save', auth, (req, res) => {
+  const _reportStart = Date.now();
   const type = sec.sanitizeInput(req.body.type || 'unknown');
   const inputData = JSON.stringify(req.body.inputData || {});
   const resultData = JSON.stringify(req.body.resultData || {}).substring(0, 50000);
@@ -1017,8 +1051,12 @@ app.post('/api/paipan/save', auth, (req, res) => {
   // ★ 触发画像合并（每次排盘都更新）
   const profileResult = yzProfile.mergeProfile(db, req.userId, type, parsed, parsed, rawQuery);
 
+  req.log.info({ module: 'paipan', event: 'report.generate', reportType: type, durationMs: Date.now() - _reportStart }, 'report generated');
+
   apiResp(res, ERROR_CODES.SUCCESS, { ok: true, recordId, profileUpdated: profileResult.ok !== false, profile: profileResult }, '排盘记录已保存');
 });
+
+// R52: report.generate 事件埋点在上方 paipan/save 路由内完成
 
 app.get('/api/paipan/history', auth, (req, res) => {
   const records = db.prepare('SELECT id, type, input_data, created_at, focus_areas, concern_keywords FROM paipan_records WHERE user_id = ? ORDER BY created_at DESC LIMIT 50').all(req.userId);
@@ -1215,7 +1253,7 @@ app.get('/api/glass/capabilities', async (req, res) => {
     checkedAt: new Date().toISOString()
   });
 });
-console.log('[init] R43-F 智能眼镜 HTTP bridge 已挂载 (base=' + GLASS_BASE_URL + ')');
+logger.info({ module: 'api-server-v2', baseUrl: GLASS_BASE_URL }, '[init] R43-F 智能眼镜 HTTP bridge 已挂载');
 
 // ============== R44-C 智能眼镜 Admin 端点 ==============
 // 1. admin 测试玻璃端到端 (在线/离线/真实/兜底)
@@ -1314,7 +1352,7 @@ app.post('/api/admin/glass/yearly-broadcast', adminAuth, async (req, res) => {
   res.json({ ok: true, year, total: profiles.length, sent: results.filter(r=>r.ok).length, results });
 });
 
-console.log('[init] R44-C 智能眼镜 Admin 端点已挂载 (4 端点)');
+logger.info({ module: 'api-server-v2' }, '[init] R44-C 智能眼镜 Admin 端点已挂载 (4 端点)');
 
 // === 缺失端点：推送系统补全（admin 全员/单用户，用户收件箱，admin 大盘统计） ===
 
@@ -1602,6 +1640,7 @@ app.post('/api/push/log', auth, (req, res) => {
   db.prepare('INSERT INTO push_logs (user_id, push_type, push_date, content, delivered) VALUES (?, ?, ?, ?, 1)')
     .run(userId, pushType, new Date().toISOString().slice(0,10), content);
   
+  req.log.info({ module: 'push', event: 'push.deliver', channel: 'in-app', success: true, userId: userId }, 'push delivered');
   res.json({ ok: true });
 });
 
@@ -2423,7 +2462,7 @@ app.post('/api/public/consulting-save', (req, res) => {
       return res.json({ ok:true, action:'created', guest_id, visit_count: 1, risk_level: level });
     }
   } catch(e){
-    console.error('[consulting-save]', e.message);
+    logger.error({ module: 'api-server-v2', err: e }, '[consulting-save]');
     res.status(500).json({ ok:false, error:e.message });
   }
 });
@@ -2668,6 +2707,7 @@ const TTS_PROXY_HOST = '127.0.0.1';
 const TTS_PROXY_PORT = 8912;
 
 app.get('/api/tts', (req, res) => {
+  const _ttsStart = Date.now();
   const qs = req.url.split('?')[1] || '';
   const opts = {
     hostname: TTS_PROXY_HOST,
@@ -2683,10 +2723,14 @@ app.get('/api/tts', (req, res) => {
       'Cache-Control': 'public, max-age=3600',
       'Access-Control-Allow-Origin': '*'
     });
+    // 解析 text 参数用于统计字符数
+    const urlParams = new URLSearchParams(qs);
+    const textLen = (urlParams.get('text') || '').length;
+    logger.info({ module: 'tts', event: 'tts.synthesize', engine: 'edge-tts', chars: textLen, durationMs: Date.now() - _ttsStart }, 'TTS synthesize complete');
     proxyRes.pipe(res);
   });
   proxyReq.on('error', e => {
-    console.error('[TTS Proxy] 后端不可用:', e.message);
+    logger.error({ module: 'api-server-v2', err: e }, '[TTS Proxy] 后端不可用');
     if (!res.headersSent) {
       res.status(503).json({ error: 'TTS服务暂不可用', detail: e.message });
     }
@@ -2761,7 +2805,10 @@ app.post('/api/face/analyze', async (req, res) => {
 // 通用 OCR
 app.post('/api/ocr/recognize', async (req, res) => {
   if (!req.body || !req.body.image) return res.json({ ok: false, error: 'missing_image' });
+  const _ocrStart = Date.now();
   const out = await _proxyFaceOCR('/api/ocr/recognize', { image: req.body.image });
+  const faces = Array.isArray(out.faces) ? out.faces.length : (out.ok ? 1 : 0);
+  req.log.info({ module: 'ocr', event: 'ocr.recognize', engine: out.engine || 'face-ocr-server', faces, durationMs: Date.now() - _ocrStart }, 'OCR recognize complete');
   res.json(out);
 });
 
@@ -2841,15 +2888,16 @@ app.get('/api/v1/distill', _v1Redir('/api/distill'));
 app.get('/api/v1/export', _v1Redir('/api/export'));
 app.get('/api/v1/admin/stats', _v1Redir('/api/admin/stats'));
 app.post('/api/v1/sync', _v1Redir('/api/sync'));
-console.log('[v1] 公共端点别名 +10 条');
+logger.info({ module: 'api-server-v2' }, '[v1] 公共端点别名 +10 条');
 
-console.log('[v1] 标准别名已注册（共 44 条，与 legacy 双轨运行）');
+logger.info({ module: 'api-server-v2' }, '[v1] 标准别名已注册（共 44 条，与 legacy 双轨运行）');
 
 /* ===== 全局错误兜底（Express error middleware） ===== */
 app.use((err, req, res, next) => {
   const status = err.status || err.statusCode || 500;
   const code = err.code || ('INTERNAL_' + status);
-  console.error('[unhandled]', req.method, req.path, '->', err.message);
+  logger.error({ module: 'api-server-v2', method: req.method, path: req.path, err: err.message }, '[unhandled]');
+  recordError(code, req.method, req.path);
   if (res.headersSent) return next(err);
   res.status(status).json({
     ok: false,
@@ -2875,7 +2923,7 @@ app.post('/api/log/error', (req, res) => {
     userAgent: req.get('user-agent') || ''
   };
   // 服务端日志（无认证，尽量轻量）
-  console.warn('[client-error]', JSON.stringify(report));
+  logger.warn({ module: 'api-server-v2', report }, '[client-error]');
   // 本地存储（future: 可改为写入 PG 表 error_reports）
   try {
     const fs = require('fs');
@@ -2890,6 +2938,156 @@ app.post('/api/log/error', (req, res) => {
   ok(res, { received: true, traceId: report.code + '-' + Date.now() }, '错误已记录');
 });
 
+/* ===== GET /api/v1/admin/metrics — 可观测性指标 ===== */
+app.get('/api/v1/admin/metrics', adminAuth, async (req, res) => {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    const logsDir = path.join(__dirname, '..', 'logs');
+
+    // 解析 range 参数（默认 7d）
+    const range = req.query.range || '7d';
+    const dayMap = { '1d': 1, '3d': 3, '7d': 7, '14d': 14, '30d': 30 };
+    const days = dayMap[range] || 7;
+    const now = Date.now();
+    const since = now - days * 86400000;
+
+    // 收集日志文件
+    let logFiles = [];
+    try {
+      const entries = fs.readdirSync(logsDir);
+      logFiles = entries.filter(f => f.endsWith('.log')).map(f => path.join(logsDir, f));
+    } catch (e) {
+      // logs 目录可能还不存在
+    }
+
+    // 读取并解析日志行
+    const events = [];
+    for (const file of logFiles) {
+      try {
+        const stat = fs.statSync(file);
+        if (stat.mtime.getTime() < since - 86400000) continue; // 跳过太旧的文件
+        const content = fs.readFileSync(file, 'utf8');
+        for (const line of content.split('\n')) {
+          if (!line.trim()) continue;
+          try {
+            const obj = JSON.parse(line);
+            if (obj.time) {
+              const ts = new Date(obj.time).getTime();
+              if (ts >= since) events.push(obj);
+            }
+          } catch (_) {}
+        }
+      } catch (_) {}
+    }
+
+    // 指标1: 每日活跃报告数 (report.generate 事件按天去重)
+    const dailyReports = {};
+    // 指标2: 模块使用排行
+    const moduleCount = {};
+    // 指标3: KB 直答占比
+    let kbHit = 0, kbPartial = 0, kbMiss = 0;
+    // 指标4: AI 调用次数/天
+    const dailyAiCalls = {};
+    // 指标5: 推送送达率
+    let pushTotal = 0, pushSuccess = 0;
+    // 指标6: P95 响应延迟 (pino-http 的 durationMs 或事件中的 durationMs)
+    const durations = [];
+    // 指标7: 错误率 TOP 5
+    const errorGroups = {};
+    // 指标8: TTS 成功率
+    let ttsTotal = 0, ttsSuccess = 0;
+
+    for (const ev of events) {
+      const event = ev.event || '';
+      const day = ev.time ? ev.time.slice(0, 10) : 'unknown';
+
+      // report.generate
+      if (event === 'report.generate') {
+        dailyReports[day] = (dailyReports[day] || 0) + 1;
+        const mod = ev.module || ev.reportType || 'unknown';
+        moduleCount[mod] = (moduleCount[mod] || 0) + 1;
+      }
+
+      // KB 事件
+      if (event === 'kb.hit') kbHit++;
+      else if (event === 'kb.partial') kbPartial++;
+      else if (event === 'kb.miss') kbMiss++;
+
+      // AI 调用
+      if (event === 'ai.invoke') {
+        dailyAiCalls[day] = (dailyAiCalls[day] || 0) + 1;
+      }
+
+      // 推送
+      if (event === 'push.deliver') {
+        pushTotal++;
+        if (ev.success === true || ev.success === 'true') pushSuccess++;
+      }
+
+      // durationMs 收集（从事件或响应日志）
+      if (ev.durationMs != null) {
+        durations.push(ev.durationMs);
+      }
+
+      // 错误聚合
+      if (ev.level === 'error' || event.startsWith('error.')) {
+        const key = ev.groupKey || (ev.module + '::' + (ev.path || ev.method || ''));
+        errorGroups[key] = (errorGroups[key] || 0) + 1;
+      }
+
+      // TTS
+      if (event === 'tts.synthesize') {
+        ttsTotal++;
+        // 如果没有 error 字段，算成功
+        if (!ev.errorCode) ttsSuccess++;
+      }
+    }
+
+    // P95 计算
+    durations.sort((a, b) => a - b);
+    const p95Idx = Math.floor(durations.length * 0.95);
+    const p95 = durations.length > 0 ? durations[p95Idx] || durations[durations.length - 1] : 0;
+
+    // 错误 TOP 5
+    const errorTop5 = Object.entries(errorGroups)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([key, count]) => ({ groupKey: key, count }));
+
+    // 模块排行
+    const moduleRanking = Object.entries(moduleCount)
+      .sort((a, b) => b[1] - a[1])
+      .map(([mod, count]) => ({ module: mod, count }));
+
+    const kbTotal = kbHit + kbPartial + kbMiss;
+    const metrics = {
+      range,
+      days,
+      generatedAt: new Date().toISOString(),
+      totalEvents: events.length,
+      metrics: {
+        dailyReports: Object.entries(dailyReports).map(([date, count]) => ({ date, count })).sort((a, b) => a.date.localeCompare(b.date)),
+        moduleRanking,
+        kbDirectRate: kbTotal > 0 ? +(kbHit / kbTotal * 100).toFixed(1) : 0,
+        kbBreakdown: { hit: kbHit, partial: kbPartial, miss: kbMiss, total: kbTotal },
+        dailyAiCalls: Object.entries(dailyAiCalls).map(([date, count]) => ({ date, count })).sort((a, b) => a.date.localeCompare(b.date)),
+        pushDeliveryRate: pushTotal > 0 ? +(pushSuccess / pushTotal * 100).toFixed(1) : 0,
+        pushBreakdown: { success: pushSuccess, total: pushTotal },
+        p95LatencyMs: p95,
+        errorTop5,
+        ttsSuccessRate: ttsTotal > 0 ? +(ttsSuccess / ttsTotal * 100).toFixed(1) : 0,
+        ttsBreakdown: { success: ttsSuccess, total: ttsTotal }
+      }
+    };
+
+    ok(res, metrics, 'metrics retrieved');
+  } catch (e) {
+    logger.error({ module: 'metrics', err: e.message }, 'metrics endpoint error');
+    res.status(500).json({ ok: false, error: 'METRICS_ERROR', message: e.message });
+  }
+});
+
 /* ===== 404 兜底（任何未匹配路由） ===== */
 app.use((req, res) => {
   res.status(404).json({
@@ -2900,12 +3098,12 @@ app.use((req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log('═══════════════════════════════════════');
-  console.log('  命理宝鉴 API服务 v2 已启动');
-  console.log('  端口: ' + PORT);
-  console.log('  数据库: server/database/yidao.db');
-  console.log('  CORS: ' + CORS_ORIGINS.join(', '));
-  console.log('  安全: AES-256-GCM + JWT-HS256 + RBAC');
-  console.log('═══════════════════════════════════════');
-});
+// 仅当作为入口文件执行时启动监听（被 require / 测试时跳过）
+if (require.main === module) {
+  app.listen(PORT, () => {
+    logger.info({ module: 'api-server-v2', port: PORT, db: 'server/database/yidao.db', cors: CORS_ORIGINS.join(', ') }, '命理宝鉴 API服务 v2 已启动');
+  });
+}
+
+// 暴露 app 供集成测试（supertest）使用
+module.exports = app;
