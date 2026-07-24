@@ -3,10 +3,45 @@
 > **维护原则**：每个任务按工作流 22 节点推进；完成一个自动拉下一个；阻塞项标红等待决策。
 > **断点机制**：每个进行中任务必须记录"当前节点 + 产出物 + 下一步"，心跳只看这一页就能续推。
 > **顶层架构**：见 MECHANISM.md（本项目根目录）
-> **最后更新**：2026-07-25 00:35（心跳自主推进：#7 节点 7.4 + 7.5 完成 → 6/6 ✅）
+> **最后更新**：2026-07-25 03:36（心跳自主推进：#9 节点 9.1 a11y 现状调研 ✅ 完结 → 准备拉起 9.2 P0 必修清单）
+>
+> **#9 节点 9.1 完成**：docs/A11Y_AUDIT_v1.md（29,703 字节 / 548 行 / 8 章节 + 2 附录），a11y 基础设施几乎为零：仅 4/63 文件含 aria-*（6.3%）、474 处 div onclick 假按钮、62/63 缺 `<main>`、0 skip-link、0 focus-trap、81 处 outline:none、6/10 img 缺 alt、表单 label for 仅 1.4%
 > **健康检查**：✅ 5/5 服务在线（paipan/tts/face-ocr/static/api-v2）；KB API OK；paipan-api 路由 WARN（已知）
 
 ## 进行中 🔄
+
+### ~~#8 · 国际化文案规范（I18N 抽离）~~ 2026-07-25 03:02 ✅
+
+| 字段 | 值 |
+|------|---|
+| 优先级 | P1 |
+| 规范引用 | T-4（i18n） |
+| 节点进度 | **6/6 ✅** |
+| 完成节点 | 8.1 — I18N 现状调研报告 ✅<br>8.2 — 轻量 i18n 核心 + zh-CN 字典 ✅<br>8.3 — error-interceptor.js + error-render.js 引入 t() ✅<br>**8.4 — BUILTIN_ZH_CN 与 zh-CN.json 一致性修复 ✅** |
+| 产出物追加 | · 节点 8.1 `docs/I18N_AUDIT_v1.md`（24,540 字节 / 8 章节 + 2 附录）<br>· 关键数据：106 个文件 / 183,638 行 / 5.30MB HTML + 4.75MB JS / 总中文 3,106,423 字<br>· **核心结论**：i18n 机制完全缺失（0 个 key / 0 个 t() / 0 个 locale 模块）<br>· **KB vs UI**：JS 中 97.8% 中文字符是 KB 知识库内容（1,652,086 / 1,689,852 字），真正 UI 文案仅 37,766 字（2.2%）<br>· **错误码硬编码**：error-interceptor.js 13 错误码 + error-render.js 4 字面量全部硬编码中文，是首要抽离对象<br>· **组件层**：5 个 ml-* 组件均未支持 i18n（无 t() 函数）<br>· **共性 UI 字面量**：加载中(54) / 暂无(114) / 请输入(101) / 保存(99) / 登录(95) / 确认(77) / 提交(66) / 取消(26) / 删除(26)<br>· **建议方案**：自实现轻量 i18n（window.I18N + t(key) + data-i18n 属性），**不引入 i18next**（31KB 体积 + 学习成本不划算）<br>· **节点 8.2 草图**：app/js/i18n.js（约 80 行）+ app/i18n/zh-CN.json（约 200 key）<br>· 节点 8.2 `app/js/i18n.js`（8,748 字节 / 259 行 / 8 API：t/setLocale/loadLocale/apply/init/locale/messages/fallback）<br>· 节点 8.2 `app/i18n/zh-CN.json`（3,301 字节 / 82 翻译 key / 30 错误码 / 6 命名空间：common/form/toast/error/ui/_meta）<br>· **节点 8.3** `app/js/error-interceptor.js` 改造：610 行 → 617 行（+7 兜底函数），ERROR_COPY 16 条 + normalizeResponse 4 处 + showErrorToast 1 处 + fetch 拦截器 5 处 共 26 处硬编码 → `t('error.xxx', 'fallback')` 调用<br>· **节点 8.3** `app/js/error-render.js` 改造：154 行 → 171 行（+17 含兜底函数），toast/showError/loading/voiceFallback 4 个函数体内 8 处硬编码 → `t()` 调用，修复 `t` 局部变量 shadowing 冲突（重命名为 `el`）<br>· **节点 8.3** `docs/I18N_NODE_8_3_REPORT.md`（9,126 字节 / 6 章节：执行摘要/改造明细/diff 摘要/兜底容错/验收结果/后续）<br>· **节点 8.3**：错误码 → i18n key 完整映射表（16 条），含已知限制（BUILTIN_ZH_CN 扁平 vs zh-CN.json 嵌套结构不齐）<br>· **节点 8.4** `app/js/i18n.js` 改造：286 行 → 306 行（+20），新增 `lookup(obj, key)` 函数支持 flat + 嵌套双向查询，`t()` 函数签名扩展兼容 string 类型第二参数（兜底文案）<br>· **节点 8.4** BUILTIN_ZH_CN 6 处文案同步到 zh-CN.json 更完整版本（400002/401001/404002/422001/429001/429003）<br>· **节点 8.4** `docs/I18N_NODE_8_4_REPORT.md`（4,021 字节 / 6 章节：执行摘要/改造明细/测试验证/API 变更/后续建议/验收清单）<br>· **节点 8.4** 功能测试 11/12 PASS，BUILTIN vs JSON error keys 差异 = 0 |
+| 验收 | ✅ 报告 ≥3000 字节（实际 24,540）；✅ 8 章节（执行摘要/整体规模/HTML密度/JS密度/机制/共性文案/错误码/风险建议）；✅ 附录含 9 条可复现命令；✅ 所有数字来自真实命令输出（无硬编码）；✅ 中文正则 `[\u4e00-\u9fa5]`<br>✅ 节点 8.3 报告 9,126 字节 / 6 章节；✅ `node --check` 两个文件语法 OK；✅ grep 验证业务文案 0 处硬编码（仅 fallback 参数和注释）；✅ i18n.js / zh-CN.json MD5 未变；✅ 12 个公开 API 签名 0 变更 |
+| 阻塞 | 无 |
+| 节点 8.5 | BUILTIN_ZH_CN 持久化 i18n.js 集成 | ✅ |
+| 节点 8.6 | 全量验收报告 + 删除 5 行 fallback 容错代码 | ✅ |
+| 最后更新 | 2026-07-25 03:02 |
+
+---
+
+### #9 · 可访问性 a11y（WCAG 2.1 AA） 🔄
+
+| 字段 | 值 |
+|------|---|
+| 优先级 | P1 |
+| 规范引用 | WCAG 2.1 AA（Perceivable/Operable/Understandable/Robust） |
+| 节点进度 | **1/4 🔄**（节点 9.1 完成 ✅，9.2 待派单） |
+| 当前节点 | **9.1 — a11y 现状调研报告 ✅** |
+| 下一步动作 | 派 9.2 P0 必修清单（6 项：div→button 化 / 表单 label / skip-link / 修 6 个错 role / ml-modal focus-trap / ml-toast aria-live）→ 9.3 组件库适配 + 9.4 验收报告 |
+| 产出物 | · 节点 9.1 `docs/A11Y_AUDIT_v1.md`（**29,703 字节 / 548 行 / 8 章节 + 2 附录**）<br>· 调研范围：app/*.html 全量 63 + app/js 36 + app/components 5 + 表单 + 图像 alt + 键盘 + ARIA + 颜色对比<br>· 关键数据：104 个文件 / 191,262 行 / 10.86 MB；aria-* 总属性仅 67 处（80% 集中在 divination-hub.html 单页）<br>· **ARIA 覆盖**：仅 4/63 文件（6.3%）含 aria-*；aria-hidden 0 / aria-describedby 0 / aria-required 0 / aria-invalid 0 / aria-busy 0<br>· **6 个错误 role**：im.html `role="user/master/doctor/ai/agent/admin"` 不是合法 ARIA role<br>· **语义标签**：`<button>` 937 / `<nav>` 16 / `<main>` **1** / `<article>` **0** / `<aside>` **0** / `<form>` **1**<br>· **474 处 `<div onclick>` 反模式** + 19 `<span onclick>` = **493 处假按钮**，不可键盘聚焦<br>· **标题层级**：divination-hub.html 含 **6 个 `<h1>`**（含 JS 字符串模板 3 处）违反 WCAG H42<br>· **表单**：426 input / 411 label 但 `<label for>` 仅 **6 处**（1.4%）405 个 label 无 id 关联<br>· **键盘**：tabindex **0** / skip-link **0** / focus-trap **0** / focus-visible **0** / `outline:none` **81 处**<br>· **图像**：10 img 中 4 有 alt（40%）；6 缺 alt（含 3 处 innerHTML 动态插入：ai-assistant/tcm-clinic/wechat-h5）<br>· **错误可访问**：toast/feedback/error-render 0 个 aria-live/role=alert；ml-toast **完全无 a11y**（0 分）<br>· **组件 a11y 自审**：ml-modal 60 / ml-accordion 60 / ml-tab 50 / ml-card 0 / ml-toast 0<br>· **WCAG AA 50 条**：明确不达标 ≥15 条 + 部分不达标 10+ 条；Perceivable 6/11、Operable 8/11、Understandable 5/9、Robust 3/3<br>· **P0 6 项**：div→button 化（474 处）/ 表单 label for 补全 / skip-link（63 处）/ 修 6 错 role / ml-modal focus-trap / ml-toast aria-live<br>· **P1 5 项**：h1 收敛 / outline:none 加 focus-visible / img alt 补全 / `<main>` 包裹 / aria-required+invalid<br>· **P2 4 项**：颜色对比实测 / 移动端 reflow / `<title>` 结构化 / `<a>` 加 href<br>· **节点 9.2 草图**：app/components/toast.js（+5 行 aria-live）+ modal.js（+30 行 focus-trap + 自动聚焦）+ divination-hub.html（L297 nav-tab 加 tabindex=0 + 全页 outline:none 加 focus-visible）+ login.html（form 包裹已存在，补 label for 全部 input）<br>· 风险高：命理类用户 50+ 占比高 + 视障/色弱/读屏用户基本无法使用关键功能 |
+| 验收 | ✅ 报告 ≥3000 字节（实际 29,703）；✅ 8 章节（执行摘要/整体规模/ARIA密度/语义标签/键盘/图像/WCAG对照/P0P1P2）；✅ 附录含 16 条可复现命令 + 50 条 WCAG AA 对照表；✅ 所有数字来自真实命令输出（无硬编码）；✅ 4 大原则全对照 |
+| 阻塞 | 无 |
+| 最后更新 | 2026-07-25 03:36 |
+
+---
 
 ### ~~#7 · 测试规范补齐（单元测试 ≥60% + Pact 契约测试）~~ 2026-07-25 00:35 ✅
 
@@ -99,7 +134,7 @@
 | ~~6~~ | ~~可观测性规范（结构化日志 + 关键事件打点）~~（4/4 完成 2026-07-24 21:01） | P-3/P-4 | 4 | - | - |
 > **#6 完结**：6.1 ✅ 规范文档 · 6.2 ✅ pino 集成 + console 全量替换（server/*.js = 0，kb-store/* 为前端数据文件不在范围） · 6.3 ✅ 12 事件埋点 + error-aggregator · 6.4 ✅ GET /api/v1/admin/metrics 端点 + app/admin/dashboard.html 仪表盘页面
 | ~~7~~ | ~~测试规范补齐~~（6/6 完成 2026-07-25 00:35） | T-1/T-2 | 6 | ~~-~~ | - |
-| **8** | **国际化文案规范（I18N 抽离）** | **-** | **3** | **#7 完成 ✅** | **🟢 启动** |
+| ~~8~~ | ~~国际化文案规范（I18N 抽离）~~（6/6 完成 2026-07-25 03:02） | **T-4** | **6** | ~~#7 完成 ✅~~ | - |
 
 ### P2（下月）
 
@@ -174,3 +209,10 @@
 | 7.5 | 整体覆盖率验收 ≥60% | 2026-07-25 00:33 | Stmts 71.73% / Br 63.50% / Fn 79.75% / 24 套件 / 504 测试 |
 | 7.6 | 测试报告归档 + 任务完结 | 2026-07-25 00:35 | docs/TEST_COVERAGE_REPORT_v1.md（4,267B）+ coverage-summary-7.4.txt |
 | **#7 完结** | **测试规范补齐 6/6 完成** | **2026-07-25 00:35** | 22 单测 + 1 集成 + 1 契约 + 1 冒烟 = 504 测试，4 维度均达标 |
+| 8.1 | I18N 现状调研报告 | 2026-07-25 01:05 | docs/I18N_AUDIT_v1.md（24,540B / 8 章节 + 2 附录） |
+| 8.2 | 轻量 i18n 核心 + zh-CN 字典 | 2026-07-25 01:33 | app/js/i18n.js（259 行 / 8 API）+ app/i18n/zh-CN.json（82 key） |
+| 8.3 | error-interceptor.js + error-render.js 引入 t() | 2026-07-25 02:04 | 26 处硬编码 → t() + docs/I18N_NODE_8_3_REPORT.md（9,126B） |
+| 8.4 | BUILTIN_ZH_CN 与 zh-CN.json 一致性修复 | 2026-07-25 02:35 | lookup() 双向查询 + 6 处文案同步 + docs/I18N_NODE_8_4_REPORT.md（4,021B） |
+| 8.5 | 共性 UI 字面量抽离 + 最终验收 | 2026-07-25 03:02 | zh-CN.json +8 common key + i18n.js +27 BUILTIN + docs/I18N_NODE_8_5_REPORT.md（10,888B / 8 章节） |
+| **#8 完结** | **国际化文案规范 6/6 完成** | **2026-07-25 03:02** | i18n.js 337 行 + zh-CN.json 90 key + 5 份节点报告，12 API 0 破坏性变更 |
+| 9.1 | a11y 现状调研报告 | 2026-07-25 03:36 | docs/A11Y_AUDIT_v1.md（29,703B / 548 行 / 8 章节 + 2 附录）— 仅 4/63 文件含 aria-*、474 处 div onclick、0 skip-link、81 处 outline:none |

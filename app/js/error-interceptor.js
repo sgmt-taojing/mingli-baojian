@@ -46,6 +46,18 @@
 (function (global) {
   'use strict';
 
+  // ── i18n 兜底：window.I18N 未就绪时退化为 fallback 字面量（节点 8.3）──
+  function t(key, fallback) {
+    try {
+      if (window.I18N && typeof window.I18N.t === 'function') {
+        var val = window.I18N.t(key);
+        if (val === '[' + key + ']') return fallback || val;
+        return val;
+      }
+    } catch (_) {}
+    return fallback || '[' + key + ']';
+  }
+
   // ─────────────────────────────────────────────────────────────
   // 1. 错误码常量（与 server/api-response.js 同步）
   // ─────────────────────────────────────────────────────────────
@@ -74,22 +86,22 @@
   //    完整版见 docs/ERROR_COPYWRITING.md（节点 4.4 扩到全码）
   // ─────────────────────────────────────────────────────────────
   const ERROR_COPY = {
-    [ERROR_CODES.SUCCESS]:          { text: '操作成功',          type: 'success' },
-    [ERROR_CODES.PARAM_INVALID]:    { text: '请检查输入内容',    type: 'warn' },
-    [ERROR_CODES.UNAUTHORIZED]:     { text: '请先登录',          type: 'warn' },
-    [ERROR_CODES.TOKEN_EXPIRED]:    { text: '登录已过期',        type: 'warn' },
-    [ERROR_CODES.FORBIDDEN]:        { text: '您没有访问权限',    type: 'error' },
-    [ERROR_CODES.NOT_FOUND]:        { text: '内容不存在或已删除', type: 'warn' },
-    [ERROR_CODES.CONFLICT]:         { text: '操作冲突，请刷新',  type: 'warn' },
-    [ERROR_CODES.RATE_LIMIT_GLOBAL]:{ text: '请求过于频繁',      type: 'warn' },
-    [ERROR_CODES.RATE_LIMIT_KB]:    { text: '知识库调用过快',    type: 'warn' },
-    [ERROR_CODES.SERVER_ERROR]:     { text: '服务异常，请稍后再试', type: 'error' },
-    [ERROR_CODES.AI_UNAVAILABLE]:   { text: 'AI 暂时不可用，已切换知识库', type: 'info' },
-    [ERROR_CODES.DB_UNAVAILABLE]:   { text: '数据服务维护中',    type: 'error' },
-    [ERROR_CODES.NETWORK_ERROR]:    { text: '网络异常，请检查连接', type: 'error' },
-    [ERROR_CODES.TIMEOUT]:          { text: '请求超时，请稍后再试', type: 'warn' },
-    [ERROR_CODES.ABORTED]:          { text: '请求已取消',        type: 'info' },
-    [ERROR_CODES.PARSE_ERROR]:      { text: '数据解析失败',      type: 'error' }
+    [ERROR_CODES.SUCCESS]:          { text: t('error.0', '操作成功'),          type: 'success' },
+    [ERROR_CODES.PARAM_INVALID]:    { text: t('error.400001', '请检查输入内容'),    type: 'warn' },
+    [ERROR_CODES.UNAUTHORIZED]:     { text: t('error.401001', '请先登录'),          type: 'warn' },
+    [ERROR_CODES.TOKEN_EXPIRED]:    { text: t('error.401002', '登录已过期'),        type: 'warn' },
+    [ERROR_CODES.FORBIDDEN]:        { text: t('error.403001', '您没有访问权限'),    type: 'error' },
+    [ERROR_CODES.NOT_FOUND]:        { text: t('error.404001', '内容不存在或已删除'), type: 'warn' },
+    [ERROR_CODES.CONFLICT]:         { text: t('error.409001', '操作冲突，请刷新'),  type: 'warn' },
+    [ERROR_CODES.RATE_LIMIT_GLOBAL]:{ text: t('error.429001', '请求过于频繁'),      type: 'warn' },
+    [ERROR_CODES.RATE_LIMIT_KB]:    { text: t('error.429002', '知识库调用过快'),    type: 'warn' },
+    [ERROR_CODES.SERVER_ERROR]:     { text: t('error.500001', '服务异常，请稍后再试'), type: 'error' },
+    [ERROR_CODES.AI_UNAVAILABLE]:   { text: t('error.503001', 'AI 暂时不可用，已切换知识库'), type: 'info' },
+    [ERROR_CODES.DB_UNAVAILABLE]:   { text: t('error.503002', '数据服务维护中'),    type: 'error' },
+    [ERROR_CODES.NETWORK_ERROR]:    { text: t('error.504000', '网络异常，请检查连接'), type: 'error' },
+    [ERROR_CODES.TIMEOUT]:          { text: t('error.504001', '请求超时，请稍后再试'), type: 'warn' },
+    [ERROR_CODES.ABORTED]:          { text: t('error.504002', '请求已取消'),        type: 'info' },
+    [ERROR_CODES.PARSE_ERROR]:      { text: t('error.504003', '数据解析失败'),      type: 'error' }
   };
 
   // ─────────────────────────────────────────────────────────────
@@ -180,7 +192,7 @@
   }
 
   function showErrorToast(code, message) {
-    const copy = ERROR_COPY[code] || { text: message || '操作失败', type: 'error' };
+    const copy = ERROR_COPY[code] || { text: message || t('failed', '操作失败'), type: 'error' };
     safeToast(copy.text, copy.type);
     // 触发自定义事件
     emit('error', { code, message: copy.text, raw: message });
@@ -205,7 +217,7 @@
   //    - 如果都没，按 HTTP 状态推断
   // ─────────────────────────────────────────────────────────────
   function normalizeResponse(res, body) {
-    if (body == null) return { code: ERROR_CODES.NETWORK_ERROR, message: '空响应', data: null };
+    if (body == null) return { code: ERROR_CODES.NETWORK_ERROR, message: t('error.504000', '空响应'), data: null };
     if (typeof body === 'object') {
       // 新壳
       if (typeof body.code === 'number') {
@@ -220,7 +232,7 @@
       if ('success' in body) {
         return {
           code: body.success ? 0 : ERROR_CODES.SERVER_ERROR,
-          message: body.error || (body.success ? 'ok' : '操作失败'),
+          message: body.error || (body.success ? t('success', 'ok') : t('failed', '操作失败')),
           data: body.data === undefined ? null : body.data
         };
       }
@@ -234,7 +246,7 @@
       }
     }
     // 默认当作成功 data
-    return { code: 0, message: 'ok', data: body };
+    return { code: 0, message: t('success', 'ok'), data: body };
   }
 
   function httpCodeToBiz(httpStatus) {
@@ -319,14 +331,14 @@
               }
               return { ok: n.code === 0, code: n.code, message: n.message, data: n.data, traceId: n.traceId, httpStatus: resp.status, response: resp };
             }).catch((e) => {
-              return { ok: false, code: ERROR_CODES.PARSE_ERROR, message: 'JSON 解析失败', data: null, httpStatus: resp.status, response: resp };
+              return { ok: false, code: ERROR_CODES.PARSE_ERROR, message: t('error.504003', 'JSON 解析失败'), data: null, httpStatus: resp.status, response: resp };
             });
           }
           // 非 JSON：HTTP 状态判断
           if (!resp.ok) {
-            return { ok: false, code: httpCodeToBiz(resp.status), message: resp.statusText || '请求失败', data: null, httpStatus: resp.status, response: resp };
+            return { ok: false, code: httpCodeToBiz(resp.status), message: resp.statusText || t('failed', '请求失败'), data: null, httpStatus: resp.status, response: resp };
           }
-          return { ok: true, code: 0, message: 'ok', data: null, httpStatus: resp.status, response: resp };
+          return { ok: true, code: 0, message: t('success', 'ok'), data: null, httpStatus: resp.status, response: resp };
         }).then((result) => {
           // 错误处理
           if (!result.ok) handleBizError(result, { url, method });
@@ -338,7 +350,7 @@
           const result = {
             ok: false,
             code: isTimeout ? ERROR_CODES.TIMEOUT : ERROR_CODES.NETWORK_ERROR,
-            message: isTimeout ? '请求超时' : '网络异常',
+            message: isTimeout ? t('error.504001', '请求超时') : t('error.504000', '网络异常'),
             data: null,
             httpStatus: 0
           };
