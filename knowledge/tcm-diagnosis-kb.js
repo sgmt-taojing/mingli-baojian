@@ -700,3 +700,38 @@ window.TCM_DIAGNOSIS_KB = {};
 
   console.log('[tcm-diagnosis-kb.js] 已加载');
 })();
+
+// ========== 路总《先知智镜》规划专项补强（2026-07-24）==========
+// 五大诊中目诊（双目显微）+ 手诊（抓拍20MP）KB 空白处补足
+TCM_DIAGNOSIS_KB.eyeDiagnosis = {
+  fiveRings: {
+    windRing:'黑睛-肝', bloodRing:'内外眦-心', qiRing:'白睛-肺',
+    waterRing:'瞳神-肾', fleshRing:'胞睑-脾'
+  },
+  redEyes: { shiRe:'肝火/风热', xuRe:'阴虚火旺', jiang:'热入营血' },
+  yellowEyes: { bright:'阳黄(湿热)', dark:'阴黄(寒湿)' },
+  corner: { chiLan:'心火', danBai:'血虚' },
+  pupil: { big:'肝风内动', small:'热毒/中毒', color:'内障' },
+  nebula: { new:'风热/肝火', old:'虚证' }
+};
+TCM_DIAGNOSIS_KB.handDiagnosis = {
+  color: { red:'热/血热', blue:'寒/痛/瘀', white:'气血虚', black:'肾虚/重病' },
+  fish: {
+    red:'胃热', blue:'寒/痛', dry:'脾胃虚弱', vein:'胃肠瘀滞'
+  },
+  nail: {
+    white:'血虚/气血虚', red:'热', blue:'寒/痛', yellow:'黄疸',
+    pressWhiteRed:'气血流畅(正常)', pressWhiteStuck:'气血瘀滞'
+  },
+  childFinger: {
+    threeGuan:['风关(食指第一节)','气关(第二节)','命关(第三节)'],
+    fuChen:'浮表沉里',
+    redPurple:'热', blueBlack:'惊风/寒',
+    reachMing:'病重'
+  }
+};
+TCM_DIAGNOSIS_KB.fiveSensIntegration = [
+  '舌+面+目+手+耳 综合判断 八纲',
+  '脉诊由智能手表脉象采集(后续硬件扩展)',
+  '眼镜端采集 - 5诊交叉验证 - AI 八纲辨证'
+];

@@ -342,6 +342,16 @@
     to { opacity: 1; transform: translateX(-50%) translateY(0); }
   }
 </style>
+
+<!-- 先知智镜 · 可穿戴设备接入层（路总 2026-07-24 规划）-->
+<script src="../js/wearable/rokid-bridge.js"></script>
+<script src="../js/wearable/rokid-camera.js"></script>
+<script src="../js/wearable/rokid-audio.js"></script>
+<script src="../js/wearable/rokid-voice.js"></script>
+<script src="../js/wearable/rokid-motion.js"></script>
+<script src="../js/wearable/rokid-storage.js"></script>
+<script src="../js/wearable/rokid-glass.js"></script>
+<script src="../js/wearable/device-provider.js"></script>
 </head>
 <body>
 
@@ -355,6 +365,7 @@
       <span>电量 <strong id="battery">87%</strong></span>
       <span>网络 <strong id="network">5G</strong></span>
       <span id="device-id" style="color: var(--hud-muted);">GL-...</span>
+      <span id="wearable-status" style="color: var(--hud-warn);">📱 检测中...</span>
     </div>
   </div>
 
@@ -612,6 +623,44 @@ setInterval(async () => {
     });
   } catch {}
 }, 30000);
+</script>
+
+<!-- 先知智镜 · 可穿戴设备联动入口（路总 2026-07-24 规划）-->
+<script>
+(function(){
+  const el = document.getElementById('wearable-status');
+  if (!window.deviceProvider) {
+    el.textContent = '📱 PC浏览器模式'; el.style.color = 'var(--hud-muted)';
+    return;
+  }
+  const brand = deviceProvider.detect();
+  const caps  = deviceProvider.capabilities;
+  const isGlass = deviceProvider.isGlass();
+  el.textContent = isGlass
+    ? '🥽 ' + brand + ' · ' + (caps.hasCamera?'舌诊':'') + (caps.hasAudio?'/音频':'') + (caps.hasMotion?'/姿态':'')
+    : '💻 PC浏览器 / ' + brand + ' 桥接';
+  el.style.color = isGlass ? 'var(--hud-good)' : 'var(--hud-warn)';
+
+  // 镜腿点击 → 触发 OCR 抓拍
+  if (window.rokidMotion) {
+    rokidMotion.on?.((evt) => {
+      if (evt.type === 'tap') {
+        if (window.rokidCamera?.capture) {
+          rokidCamera.capture().then(blob => {
+            const r = new FileReader();
+            r.onload = () => window.dispatchEvent(new CustomEvent('wearable-capture', { detail: r.result }));
+            r.readAsDataURL(blob);
+          }).catch(() => {});
+        }
+      }
+    });
+  }
+  // 唤醒词联动 AI 助手
+  if (window.rokidVoice?.once) {
+    // 静默接入：语音可启动，触发同一窗口内的 askAI
+    window.__wearableVoice = rokidVoice;
+  }
+})();
 </script>
 
 </body>
