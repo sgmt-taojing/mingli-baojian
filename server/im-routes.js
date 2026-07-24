@@ -83,10 +83,28 @@ const ROLES = ['admin','master','doctor','agent','user','ai'];
 function now(){ return Date.now(); }
 
 function getUserFromReq(req){
-  // 简单身份：headers X-User-Id / X-User-Role；生产应替换为 JWT 中间件
+  // 优先 Bearer JWT（解 uid/roles），fallback 到 X-User-* / guest
+  const auth = (req.headers['authorization'] || '').replace(/^Bearer\s+/i, '').trim();
+  if (auth && auth.includes('.')) {
+    try {
+      const parts = auth.split('.');
+      const payload = parts[1] + '='.repeat((4 - parts[1].length % 4) % 4);
+      const obj = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'));
+      const uid = obj.uid != null ? String(obj.uid) : (obj.userId != null ? String(obj.userId) : 'guest');
+      const roles = Array.isArray(obj.roles) ? obj.roles : (obj.role ? [obj.role] : ['user']);
+      // 最高权限角色
+      const top = roles.includes('super_admin') || roles.includes('admin') ? 'admin'
+                : roles.includes('master') ? 'master'
+                : roles.includes('doctor') ? 'doctor'
+                : roles.includes('agent') ? 'agent'
+                : roles.includes('ai') ? 'ai' : 'user';
+      return { id: uid, role: top, roles };
+    } catch(e) { /* fallthrough */ }
+  }
   return {
     id: (req.headers['x-user-id'] || 'guest').toString(),
     role: (req.headers['x-user-role'] || 'user').toString(),
+    roles: [],
   };
 }
 
@@ -160,7 +178,16 @@ router.get('/directory', (req, res) => {
 router.get('/sessions', (req, res) => {
   try{
     const me = getUserFromReq(req);
-    const rows = db.prepare(`
+    const rolesArr = me.roles || [];
+    const isAdmin = me.role === 'admin' || me.role === 'super_admin'
+                 || rolesArr.includes('admin') || rolesArr.includes('super_admin');
+    const rows = isAdmin ? db.prepare(`
+      SELECT s.*, NULL AS last_read_at,
+             COALESCE((SELECT SUM(unread_count) FROM im_unread WHERE session_id=s.id), 0) AS unread
+      FROM im_sessions s
+      ORDER BY s.last_msg_at DESC
+      LIMIT 500
+    `).all() : db.prepare(`
       SELECT s.*, p.last_read_at,
              COALESCE(u.unread_count, 0) AS unread
       FROM im_sessions s
@@ -245,6 +272,58 @@ router.get('/sessions/:id/messages', (req, res) => {
 });
 
 // 发消息
+
+// ============ Admin 监控聚合（避免前端 N+1） ============
+router.get('/admin/stats', (req, res) => {
+  const me = getUserFromReq(req);
+  const isAdmin = me.role === 'admin' || me.role === 'super_admin' || (me.roles||[]).includes('admin') || (me.roles||[]).includes('super_admin');
+  if (!isAdmin) return res.status(403).json({ ok:false, error:'需要管理员权限' });
+
+  const totalSessions = db.prepare(`SELECT COUNT(*) c FROM im_sessions`).get().c;
+  const groupCount = db.prepare(`SELECT COUNT(*) c FROM im_sessions WHERE is_group=1`).get().c;
+  const directCount = totalSessions - groupCount;
+  const totalMessages = db.prepare(`SELECT COUNT(*) c FROM im_messages`).get().c;
+  const totalUnread = db.prepare(`SELECT COALESCE(SUM(unread_count),0) c FROM im_unread`).get().c;
+
+  // 角色分布
+  const roleDist = db.prepare(`
+    SELECT p.role AS role, COUNT(DISTINCT p.session_id) AS session_count, COUNT(*) AS participant_count
+    FROM im_participants p
+    GROUP BY p.role
+    ORDER BY participant_count DESC
+  `).all();
+
+  // 活跃 Top10（基于消息发送）
+  const active = db.prepare(`
+    SELECT sender_id AS user_id, sender_role AS role, COUNT(*) AS msg_count, MAX(created_at) AS last_active
+    FROM im_messages
+    GROUP BY sender_id
+    ORDER BY msg_count DESC, last_active DESC
+    LIMIT 10
+  `).all();
+
+  // 每个会话的消息数（Top 50）
+  const perSession = db.prepare(`
+    SELECT s.id, s.title, s.is_group, s.last_msg_at,
+           COALESCE((SELECT COUNT(*) FROM im_messages WHERE session_id=s.id), 0) AS msg_count,
+           (SELECT COUNT(*) FROM im_participants WHERE session_id=s.id) AS part_count
+    FROM im_sessions s
+    ORDER BY s.last_msg_at DESC
+    LIMIT 50
+  `).all();
+
+  res.json({
+    ok: true,
+    stats: {
+      totalSessions, groupCount, directCount, totalMessages, totalUnread,
+    },
+    roleDist,
+    active,
+    perSession,
+    ts: Date.now(),
+  });
+});
+
 router.post('/sessions/:id/messages', express.json(), (req, res) => {
   try{
     const me = getUserFromReq(req);

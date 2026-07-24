@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>KB 知识库管理面板 - 数智工坊</title>
+<style>
+body { font-family: -apple-system, sans-serif; background: #1a1a1a; color: #e0e0e0; padding: 20px; margin: 0; }
+h1 { color: #c9a84c; border-bottom: 2px solid #c9a84c; padding-bottom: 12px; }
+.kb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 20px; }
+.kb-card { background: rgba(255,255,255,.05); border: 1px solid rgba(201,168,76,.3); border-radius: 12px; padding: 16px; transition: transform .2s; }
+.kb-card:hover { transform: translateY(-2px); border-color: #c9a84c; }
+.kb-card h3 { margin: 0 0 8px; color: #c9a84c; font-size: 16px; }
+.kb-stat { font-size: 28px; font-weight: 700; margin: 8px 0; }
+.kb-meta { font-size: 12px; opacity: .6; }
+.search-box { width: 100%; padding: 12px; background: rgba(0,0,0,.3); border: 1px solid #c9a84c; border-radius: 8px; color: #fff; font-size: 14px; margin: 12px 0; }
+.search-box:focus { outline: none; border-color: #fff; }
+.tabs { display: flex; gap: 8px; margin: 16px 0; }
+.tab { padding: 8px 16px; background: rgba(255,255,255,.05); border: 1px solid #444; border-radius: 6px; cursor: pointer; }
+.tab.active { background: #c9a84c; color: #1a1a1a; border-color: #c9a84c; }
+</style>
+</head>
+<body>
+<h1>📚 KB 知识库管理面板</h1>
+<p class="kb-meta">实时统计 · 自动同步 · 命中追踪</p>
+<div class="tabs">
+  <div class="tab active" onclick="loadStats()">总览</div>
+  <div class="tab" onclick="loadSearch()">搜索</div>
+  <div class="tab" onclick="loadHits()">命中统计</div>
+</div>
+<input id="searchBox" class="search-box" placeholder="搜索 KB 条目..." style="display:none">
+<div id="statsPanel">
+  <div class="kb-grid" id="kbGrid">加载中...</div>
+</div>
+<div id="searchPanel" style="display:none"></div>
+<div id="hitsPanel" style="display:none"></div>
+<script>
+const API = window.location.origin;
+async function loadStats() {
+  document.getElementById('statsPanel').style.display='block';
+  document.getElementById('searchPanel').style.display='none';
+  document.getElementById('hitsPanel').style.display='none';
+  document.getElementById('searchBox').style.display='none';
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===0));
+  try {
+    const r = await fetch(API + '/api/admin/kb/stats', {credentials:'include'});
+    const d = await r.json();
+    if (d.error) { document.getElementById('kbGrid').innerHTML = '⚠️ '+d.error; return; }
+    document.getElementById('kbGrid').innerHTML = (d.modules||[]).map(m=>`
+      <div class="kb-card">
+        <h3>${m.module||m.name}</h3>
+        <div class="kb-stat">${m.count}</div>
+        <div class="kb-meta">📦 ${m.sources||0} 来源 · ⭐ 命中率 ${(m.hit_rate||0).toFixed(1)}%</div>
+      </div>
+    `).join('');
+  } catch(e){ document.getElementById('kbGrid').innerHTML = '❌ '+e.message; }
+}
+async function loadSearch() {
+  document.getElementById('statsPanel').style.display='none';
+  document.getElementById('searchPanel').style.display='block';
+  document.getElementById('hitsPanel').style.display='none';
+  document.getElementById('searchBox').style.display='block';
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===1));
+}
+document.getElementById('searchBox').addEventListener('input', async (e)=>{
+  const q = e.target.value.trim();
+  if (q.length<2) return;
+  try {
+    const r = await fetch(API + '/api/admin/kb/search?q='+encodeURIComponent(q), {credentials:'include'});
+    const d = await r.json();
+    document.getElementById('searchPanel').innerHTML = (d.results||[]).slice(0,20).map(x=>`
+      <div class="kb-card">
+        <h3>${x.title||x.key}</h3>
+        <div class="kb-meta">${x.module} · ${x.category||''} · ⭐${x.score||0.5}</div>
+        <div style="margin-top:8px;font-size:13px;opacity:.85">${(x.content||x.summary||'').slice(0,200)}...</div>
+      </div>
+    `).join('');
+  } catch(e){ document.getElementById('searchPanel').innerHTML='❌ '+e.message; }
+});
+async function loadHits() {
+  document.getElementById('statsPanel').style.display='none';
+  document.getElementById('searchPanel').style.display='none';
+  document.getElementById('hitsPanel').style.display='block';
+  document.getElementById('searchBox').style.display='none';
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===2));
+  try {
+    const r = await fetch(API + '/api/ai/kb-hit-stats', {credentials:'include'});
+    const d = await r.json();
+    document.getElementById('hitsPanel').innerHTML = '<h3>KB 命中统计</h3><div class="kb-card"><div class="kb-stat">'+(d.total_hits||0)+'</div><div class="kb-meta">累计命中次数</div></div>'+(d.by_module||[]).map(m=>`<div class="kb-card"><h3>${m.module}</h3><div class="kb-stat">${m.hits}</div></div>`).join('');
+  } catch(e){ document.getElementById('hitsPanel').innerHTML='❌ '+e.message; }
+}
+loadStats();
+</script>
+</body>
+</html>

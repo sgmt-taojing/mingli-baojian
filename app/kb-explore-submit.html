@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>材料探索台 - 数智工坊 KB 知识库</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  color: #e8e8e8; min-height: 100vh; padding: 24px; line-height: 1.6;
+}
+.container { max-width: 1200px; margin: 0 auto; }
+
+.hero {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 16px; padding: 32px; margin-bottom: 24px;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; top: -50%; right: -10%;
+  width: 400px; height: 400px; background: radial-gradient(circle, rgba(201,168,76,0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero h1 { font-size: 28px; color: #c9a84c; margin-bottom: 8px; }
+.hero p { color: #b8b8b8; font-size: 15px; max-width: 720px; }
+.hero .badges { margin-top: 16px; display: flex; gap: 8px; flex-wrap: wrap; }
+.badge {
+  padding: 4px 12px; border-radius: 16px; font-size: 12px;
+  background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.4);
+  color: #c9a84c;
+}
+
+/* 4 路并进卡片 */
+.path-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+  margin-bottom: 24px;
+}
+@media (max-width: 768px) { .path-grid { grid-template-columns: 1fr; } }
+
+.path-card {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px; padding: 20px; cursor: pointer;
+  transition: all 0.2s; position: relative;
+}
+.path-card:hover {
+  border-color: #c9a84c; transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(201,168,76,0.15);
+}
+.path-card.active { border-color: #c9a84c; background: rgba(201,168,76,0.08); }
+.path-card .icon { font-size: 32px; margin-bottom: 8px; }
+.path-card .title { font-size: 17px; font-weight: 600; color: #c9a84c; margin-bottom: 4px; }
+.path-card .desc { font-size: 13px; color: #b8b8b8; }
+.path-card .meta { font-size: 11px; color: #888; margin-top: 8px; }
+
+/* 表单区 */
+.form-panel {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px; padding: 24px; margin-bottom: 24px; display: none;
+}
+.form-panel.active { display: block; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+@media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } }
+.form-row.full { grid-template-columns: 1fr; }
+
+label { display: block; font-size: 13px; color: #c9a84c; margin-bottom: 6px; font-weight: 500; }
+input, select, textarea {
+  width: 100%; padding: 10px 14px; background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.15); border-radius: 8px;
+  color: #fff; font-size: 14px; font-family: inherit;
+  transition: border-color 0.2s;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: #c9a84c; box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
+}
+textarea { min-height: 140px; resize: vertical; }
+.file-drop {
+  border: 2px dashed rgba(201,168,76,0.4); border-radius: 8px; padding: 32px;
+  text-align: center; cursor: pointer; transition: all 0.2s;
+}
+.file-drop:hover, .file-drop.dragover {
+  border-color: #c9a84c; background: rgba(201,168,76,0.05);
+}
+.file-drop .icon-big { font-size: 48px; margin-bottom: 8px; }
+.file-drop .hint { font-size: 12px; color: #888; margin-top: 8px; }
+
+/* 按钮 */
+.btn {
+  padding: 10px 20px; border: none; border-radius: 8px;
+  font-size: 14px; font-weight: 500; cursor: pointer;
+  transition: all 0.2s; font-family: inherit;
+}
+.btn-primary { background: #c9a84c; color: #1a1a2e; }
+.btn-primary:hover { background: #d4b558; transform: translateY(-1px); }
+.btn-primary:disabled { background: #555; color: #888; cursor: not-allowed; transform: none; }
+.btn-secondary { background: rgba(255,255,255,0.08); color: #e8e8e8; border: 1px solid rgba(255,255,255,0.2); }
+.btn-secondary:hover { background: rgba(255,255,255,0.12); }
+
+/* 结果区 */
+.result-panel {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px; padding: 20px; margin-top: 16px; display: none;
+}
+.result-panel.show { display: block; }
+
+.score-circle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 80px; height: 80px; border-radius: 50%; font-size: 24px; font-weight: 700;
+  margin-right: 20px;
+}
+.score-hi { background: rgba(76,175,80,0.2); border: 2px solid #4caf50; color: #4caf50; }
+.score-mid { background: rgba(255,193,7,0.2); border: 2px solid #ffc107; color: #ffc107; }
+.score-lo { background: rgba(244,67,54,0.2); border: 2px solid #f44336; color: #f44336; }
+
+.checks { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; margin: 16px 0; }
+.check-item {
+  padding: 10px; background: rgba(0,0,0,0.3); border-radius: 6px; border-left: 3px solid #4caf50;
+  font-size: 12px;
+}
+.check-item.warn { border-left-color: #f44336; }
+
+.message-box {
+  padding: 16px; border-radius: 8px; margin: 12px 0;
+}
+.message-box.success { background: rgba(76,175,80,0.15); border: 1px solid #4caf50; color: #81c784; }
+.message-box.warning { background: rgba(255,193,7,0.15); border: 1px solid #ffc107; color: #ffd54f; }
+.message-box.info { background: rgba(33,150,243,0.15); border: 1px solid #2196f3; color: #64b5f6; }
+
+.discover-suggestion {
+  padding: 12px; background: rgba(201,168,76,0.08); border-radius: 6px;
+  margin: 8px 0; border-left: 3px solid #c9a84c;
+}
+
+/* Tab 切换 */
+.tab-bar { display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
+.tab-btn {
+  padding: 8px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px; cursor: pointer; color: #b8b8b8; font-size: 13px;
+}
+.tab-btn.active { background: rgba(201,168,76,0.15); border-color: #c9a84c; color: #c9a84c; }
+
+/* 已有 KB 区 */
+.kb-list { max-height: 320px; overflow-y: auto; }
+.kb-item {
+  padding: 10px 12px; background: rgba(0,0,0,0.2); border-radius: 6px;
+  margin-bottom: 6px; font-size: 13px;
+}
+.kb-item .title { color: #c9a84c; font-weight: 500; }
+.kb-item .snippet { color: #888; font-size: 11px; margin-top: 4px; }
+
+/* Loading */
+.spinner {
+  display: inline-block; width: 16px; height: 16px; border: 2px solid #c9a84c;
+  border-top-color: transparent; border-radius: 50%;
+  animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 8px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.action-bar { display: flex; gap: 8px; margin-top: 16px; align-items: center; flex-wrap: wrap; }
+.action-bar .info { color: #888; font-size: 12px; margin-left: auto; }
+
+/* 进度条 */
+.progress {
+  height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin: 12px 0; overflow: hidden;
+}
+.progress-bar {
+  height: 100%; background: linear-gradient(90deg, #c9a84c, #e8c468);
+  width: 0%; transition: width 0.3s;
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- Hero -->
+<div class="hero">
+  <h1>🧭 材料探索台</h1>
+  <p>寻找、提交、鉴别、补充 KB 知识库的标准入口。所有提交均通过 <strong>5 维真伪审计</strong>（factual / sensitive / completeness / sources / consistency），高分自动入库，低分进入待审区。</p>
+  <div class="badges">
+    <span class="badge">📚 多源接入</span>
+    <span class="badge">🔍 大模型鉴别</span>
+    <span class="badge">⚖️ 5 维审计</span>
+    <span class="badge">⚡ 自动入库</span>
+    <span class="badge">📊 命中追踪</span>
+  </div>
+</div>
+
+<!-- 路径选择 -->
+<div class="path-grid">
+  <div class="path-card" data-path="manual">
+    <div class="icon">✍️</div>
+    <div class="title">手动文本</div>
+    <div class="desc">摘录、笔记、读书心得直接录入</div>
+    <div class="meta">最快 · 适合已有内容</div>
+  </div>
+  <div class="path-card" data-path="file">
+    <div class="icon">📁</div>
+    <div class="title">上传文件</div>
+    <div class="desc">PDF / DOC / TXT 自动抽文本 + 入库</div>
+    <div class="meta">支持批量 · 自动解析</div>
+  </div>
+  <div class="path-card" data-path="url">
+    <div class="icon">🔗</div>
+    <div class="title">在线链接</div>
+    <div class="desc">粘贴 URL 自动抓取网页正文</div>
+    <div class="meta">在线资源 · 自动去标签</div>
+  </div>
+  <div class="path-card" data-path="discover">
+    <div class="icon">🤖</div>
+    <div class="title">大模型寻找</div>
+    <div class="desc">调用大模型联网搜索 + 真伪鉴别</div>
+    <div class="meta">智能补全 · 防重复</div>
+  </div>
+</div>
+
+<!-- 模块 / 大类选择 -->
+<div class="form-panel active" id="metaPanel" style="display: block;">
+  <div class="tab-bar" id="moduleTabs">
+    <div class="tab-btn active" data-module="bazi">八字命理</div>
+    <div class="tab-btn" data-module="ziwei">紫微斗数</div>
+    <div class="tab-btn" data-module="tcm">中医经典</div>
+    <div class="tab-btn" data-module="acupuncture">针灸</div>
+    <div class="tab-btn" data-module="shanghan">伤寒论</div>
+    <div class="tab-btn" data-module="fengshui">风水</div>
+    <div class="tab-btn" data-module="general">通用基础</div>
+  </div>
+</div>
+
+<!-- 路径 A: 手动文本 -->
+<div class="form-panel" id="path-manual">
+  <h3 style="color: #c9a84c; margin-bottom: 16px;">✍️ 手动文本录入</h3>
+  <div class="form-row full">
+    <div>
+      <label>条目标题 *</label>
+      <input id="m-title" placeholder="例：十神格局中正官格详解">
+    </div>
+  </div>
+  <div class="form-row full">
+    <div>
+      <label>内容正文 *</label>
+      <textarea id="m-content" placeholder="直接粘贴或录入文本（至少 50 字）..."></textarea>
+    </div>
+  </div>
+  <div class="form-row full">
+    <div>
+      <label>补充说明（可选）</label>
+      <input id="m-notes" placeholder="来源、上下文、备注...">
+    </div>
+  </div>
+  <div class="action-bar">
+    <button class="btn btn-primary" onclick="submitManual()">📥 提交并审计</button>
+    <span class="info">将自动进行 5 维真伪审计 + 写入 KB 待审区</span>
+  </div>
+</div>
+
+<!-- 路径 B: 文件上传 -->
+<div class="form-panel" id="path-file">
+  <h3 style="color: #c9a84c; margin-bottom: 16px;">📁 文件上传</h3>
+  <div class="form-row">
+    <div>
+      <label>条目标题 *</label>
+      <input id="f-title" placeholder="例：黄帝内经·素问·上古天真论">
+    </div>
+    <div>
+      <label>所属模块</label>
+      <input id="f-module" placeholder="从上方选择" readonly>
+    </div>
+  </div>
+  <div class="file-drop" id="fileDrop">
+    <div class="icon-big">📄</div>
+    <div>点击或拖拽文件到此处</div>
+    <div class="hint">支持 PDF / DOCX / TXT（≤ 30 MB），自动抽取文本</div>
+    <input type="file" id="fileInput" accept=".pdf,.docx,.txt,.md" style="display:none">
+  </div>
+  <div id="fileInfo" style="margin-top: 12px; display: none;">
+    <span style="color: #4caf50;">✅ 已选文件：</span>
+    <span id="fileName"></span> (<span id="fileSize"></span>)
+  </div>
+  <div class="action-bar">
+    <button class="btn btn-primary" id="uploadBtn" onclick="submitFile()" disabled>📥 上传并审计</button>
+    <span class="info">文件处理后立即销毁，仅保留抽取的文本</span>
+  </div>
+</div>
+
+<!-- 路径 C: URL -->
+<div class="form-panel" id="path-url">
+  <h3 style="color: #c9a84c; margin-bottom: 16px;">🔗 在线链接抓取</h3>
+  <div class="form-row full">
+    <div>
+      <label>条目标题 *</label>
+      <input id="u-title" placeholder="例：紫微斗数十四主星详解">
+    </div>
+  </div>
+  <div class="form-row full">
+    <div>
+      <label>网页 URL *</label>
+      <input id="u-url" placeholder="https://...">
+    </div>
+  </div>
+  <div class="form-row full">
+    <div>
+      <label>补充说明（可选）</label>
+      <input id="u-notes" placeholder="为什么这个链接值得收录...">
+    </div>
+  </div>
+  <div class="action-bar">
+    <button class="btn btn-primary" onclick="submitUrl()">📥 抓取并审计</button>
+    <span class="info">自动去除 HTML 标签，提取正文文本</span>
+  </div>
+</div>
+
+<!-- 路径 D: 大模型发现 -->
+<div class="form-panel" id="path-discover">
+  <h3 style="color: #c9a84c; margin-bottom: 16px;">🤖 大模型发现 + 真伪鉴别</h3>
+  <div class="form-row">
+    <div>
+      <label>目标模块 *</label>
+      <input id="d-module" placeholder="从上方选择" readonly>
+    </div>
+    <div>
+      <label>寻找主题 *</label>
+      <input id="d-query" placeholder="例：六经辨证的传变规律">
+    </div>
+  </div>
+  <div class="action-bar">
+    <button class="btn btn-primary" onclick="discoverOnline()">🔍 分析 KB 缺口 + 建议方向</button>
+    <span class="info">系统将检查现有 KB 避免重复，给出寻找建议，再由大模型搜索</span>
+  </div>
+
+  <div id="discoverResult" class="result-panel">
+    <h4 style="color: #c9a84c; margin-bottom: 12px;">📊 分析结果</h4>
+    <div id="discoverContent"></div>
+  </div>
+</div>
+
+<!-- 提交结果展示 -->
+<div class="result-panel" id="submitResult">
+  <h3 style="color: #c9a84c; margin-bottom: 16px;">📋 审计结果</h3>
+  <div style="display: flex; align-items: center; margin-bottom: 16px;">
+    <div class="score-circle" id="scoreCircle">--</div>
+    <div>
+      <div style="font-size: 16px; color: #c9a84c;" id="entryId">--</div>
+      <div style="font-size: 13px; color: #b8b8b8;" id="statusText">--</div>
+    </div>
+  </div>
+  <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+  <div class="checks" id="checksList"></div>
+  <div class="message-box" id="finalMessage" style="display:none"></div>
+  <div class="action-bar">
+    <button class="btn btn-secondary" onclick="resetForm()">➕ 继续提交</button>
+    <button class="btn btn-secondary" onclick="window.location.href='/admin-kb-panel.html'">📚 查看 KB</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+const API = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? 'http://127.0.0.1:8920' : location.origin;
+let currentModule = 'bazi';
+let selectedFile = null;
+let currentPath = null;
+
+// 路径切换
+document.querySelectorAll('.path-card').forEach(card => {
+  card.addEventListener('click', () => {
+    const path = card.dataset.path;
+    currentPath = path;
+    document.querySelectorAll('.path-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('path-' + path).classList.add('active');
+    document.getElementById('submitResult').classList.remove('show');
+    if (path === 'file' || path === 'discover') {
+      document.getElementById(path === 'file' ? 'f-module' : 'd-module').value = currentModule;
+    }
+  });
+});
+
+// 模块切换
+document.querySelectorAll('#moduleTabs .tab-btn').forEach(tab => {
+  tab.addEventListener('click', () => {
+    currentModule = tab.dataset.module;
+    document.querySelectorAll('#moduleTabs .tab-btn').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    if (currentPath === 'file') document.getElementById('f-module').value = currentModule;
+    if (currentPath === 'discover') document.getElementById('d-module').value = currentModule;
+  });
+});
+
+// 文件拖拽
+const fileDrop = document.getElementById('fileDrop');
+const fileInput = document.getElementById('fileInput');
+fileDrop.addEventListener('click', () => fileInput.click());
+fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.classList.add('dragover'); });
+fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('dragover'));
+fileDrop.addEventListener('drop', e => {
+  e.preventDefault(); fileDrop.classList.remove('dragover');
+  if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', e => {
+  if (e.target.files.length) handleFile(e.target.files[0]);
+});
+
+function handleFile(f) {
+  selectedFile = f;
+  if (f.size > 30 * 1024 * 1024) { alert('文件过大（' + (f.size/1024/1024).toFixed(1) + ' MB），请 ≤ 30 MB'); return; }
+  document.getElementById('fileName').textContent = f.name;
+  document.getElementById('fileSize').textContent = (f.size/1024).toFixed(1) + ' KB';
+  document.getElementById('fileInfo').style.display = 'block';
+  document.getElementById('uploadBtn').disabled = false;
+  if (!document.getElementById('f-title').value) {
+    document.getElementById('f-title').value = f.name.replace(/\.[^.]+$/, '');
+  }
+}
+
+function fileToB64(f) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result.split(',')[1]);
+    r.onerror = reject;
+    r.readAsDataURL(f);
+  });
+}
+
+async function submitManual() {
+  const title = document.getElementById('m-title').value.trim();
+  const content = document.getElementById('m-content').value.trim();
+  const notes = document.getElementById('m-notes').value.trim();
+  if (!title) return alert('请填写标题');
+  if (!content || content.length < 50) return alert('内容至少 50 字（当前 ' + content.length + ' 字）');
+  await submit({ source_type: 'manual', title, content, module: currentModule, notes });
+}
+
+async function submitFile() {
+  if (!selectedFile) return alert('请先选择文件');
+  const title = document.getElementById('f-title').value.trim();
+  if (!title) return alert('请填写标题');
+  const b64 = await fileToB64(selectedFile);
+  await submit({
+    source_type: 'file', title, module: currentModule,
+    file_b64: b64, file_name: selectedFile.name,
+    notes: '文件类型: ' + selectedFile.name.split('.').pop()
+  });
+}
+
+async function submitUrl() {
+  const title = document.getElementById('u-title').value.trim();
+  const url = document.getElementById('u-url').value.trim();
+  const notes = document.getElementById('u-notes').value.trim();
+  if (!title || !url) return alert('请填写标题和 URL');
+  if (!url.match(/^https?:\/\//)) return alert('URL 必须以 http:// 或 https:// 开头');
+  await submit({ source_type: 'url', title, url, module: currentModule, notes });
+}
+
+async function submit(payload) {
+  const btns = document.querySelectorAll('.btn-primary');
+  btns.forEach(b => { b.disabled = true; b.innerHTML = '<span class="spinner"></span>处理中...'; });
+  try {
+    const r = await fetch(API + '/api/kb/submit-material', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      credentials: 'include', body: JSON.stringify(payload)
+    });
+    const d = await r.json();
+    showResult(d);
+  } catch (e) {
+    alert('提交失败：' + e.message);
+  } finally {
+    btns.forEach(b => { b.disabled = false; b.innerHTML = b.innerHTML.replace(/<[^>]+>/g, '').trim(); });
+  }
+}
+
+function showResult(d) {
+  if (!d || !d.ok) {
+    alert('提交失败：' + (d?.error || '未知错误'));
+    return;
+  }
+  const panel = document.getElementById('submitResult');
+  panel.classList.add('show');
+  panel.scrollIntoView({ behavior: 'smooth' });
+
+  const score = d.audit?.trust_score || 0;
+  document.getElementById('scoreCircle').textContent = score.toFixed(2);
+  const cls = score >= 0.85 ? 'score-hi' : (score >= 0.5 ? 'score-mid' : 'score-lo');
+  document.getElementById('scoreCircle').className = 'score-circle ' + cls;
+  document.getElementById('progressBar').style.width = (score * 100) + '%';
+
+  document.getElementById('entryId').textContent = 'Entry: ' + d.entry_id;
+  document.getElementById('statusText').textContent = d.message;
+
+  // 5 维审计明细
+  const checks = d.audit?.checks || {};
+  document.getElementById('checksList').innerHTML = Object.entries(checks).map(([k, v]) => {
+    const cls = v.safe ? '' : 'warn';
+    return `<div class="check-item ${cls}">
+      <strong>${dimLabel(k)}：</strong>${v.safe ? '✅ 通过' : '⚠️ 警告'}<br>
+      <span style="color: #888;">${v.notes || ''} · 分数 ${v.score.toFixed(2)}</span>
+    </div>`;
+  }).join('');
+
+  // 最终消息
+  const msg = document.getElementById('finalMessage');
+  msg.style.display = 'block';
+  msg.className = 'message-box ' + (d.auto_approved ? 'success' : (d.final_status === 'rejected' ? 'warning' : 'info'));
+  msg.innerHTML = d.message + (d.promoted_to_formal ? '（已写入 kb_formal）' : '（已写入 kb_staging ' + d.final_status + '）');
+}
+
+function dimLabel(k) {
+  return ({factual:'事实准确性',sensitive:'敏感词检测',completeness:'内容完整性',sources:'来源可信度',consistency:'一致性'})[k] || k;
+}
+
+function resetForm() {
+  document.getElementById('submitResult').classList.remove('show');
+  ['m-title','m-content','m-notes','f-title','u-title','u-url','u-notes'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  selectedFile = null;
+  document.getElementById('fileInfo').style.display = 'none';
+  document.getElementById('uploadBtn').disabled = true;
+}
+
+async function discoverOnline() {
+  const query = document.getElementById('d-query').value.trim();
+  if (!query) return alert('请填写寻找主题');
+  const btn = event.target;
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>分析中...';
+  try {
+    const r = await fetch(API + '/api/kb/discover-online', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      credentials: 'include', body: JSON.stringify({ module: currentModule, query })
+    });
+    const d = await r.json();
+    showDiscover(d);
+  } catch (e) {
+    alert('分析失败：' + e.message);
+  } finally {
+    btn.disabled = false; btn.innerHTML = '🔍 分析 KB 缺口 + 建议方向';
+  }
+}
+
+function showDiscover(d) {
+  if (!d.ok) { alert('失败：' + d.error); return; }
+  const panel = document.getElementById('discoverResult');
+  const content = document.getElementById('discoverContent');
+  panel.classList.add('show');
+  let html = '<div class="message-box info">' + (d.hint || '') + '</div>';
+  if (d.kb_already_has?.length) {
+    html += '<h5 style="color: #c9a84c; margin: 12px 0 8px;">📚 KB 已有相关条目（建议先查阅）</h5>';
+    html += '<div class="kb-list">' + d.kb_already_has.map(x =>
+      `<div class="kb-item"><div class="title">${x.title}</div><div class="snippet">${x.snippet}</div></div>`
+    ).join('') + '</div>';
+  } else {
+    html += '<div class="message-box success">✅ KB 内无重复，可放心寻找新材料</div>';
+  }
+  if (d.suggestions?.length) {
+    html += '<h5 style="color: #c9a84c; margin: 16px 0 8px;">💡 建议寻找方向</h5>';
+    html += d.suggestions.map(s =>
+      `<div class="discover-suggestion"><strong>${s.keyword}</strong><br><span style="color: #888; font-size: 12px;">${s.reason}</span></div>`
+    ).join('');
+  }
+  html += '<div class="message-box warning" style="margin-top: 16px;">⚠️ 找到内容后，请通过「手动文本 / URL / 文件」三个路径提交，系统会自动审计真伪并入库。</div>';
+  content.innerHTML = html;
+}
+</script>
+</body>
+</html>

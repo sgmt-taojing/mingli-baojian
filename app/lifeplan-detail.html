@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" var(--ink)>
+<title>人生规划蓝图 · 易道智鉴</title>
+<meta name="description" content="人生规划蓝图：年龄阶段/12 领域矩阵/未来 5 年/行动清单。可分享、可打印。">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#0a0a0a;--paper:#f5f1e8;--gold:#c9a84c;--gold2:#a07c2a;--bronze:#8c6a30;--line:rgba(201,168,76,.2);--r:10px}
+body{font-family:'Noto Serif SC',serif;background:linear-gradient(135deg,#0a0a0a,#1a1208);color:var(--paper);min-height:100vh;padding:20px;line-height:1.7}
+.wrap{max-width:680px;margin:0 auto}
+header{text-align:center;padding:24px 0 16px;border-bottom:1px solid var(--line);margin-bottom:24px}
+h1{font-size:24px;font-weight:500;color:var(--gold);letter-spacing:4px;margin-bottom:6px}
+header p{font-size:12px;opacity:.55;letter-spacing:1px}
+.card{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.card h2{font-size:14px;color:var(--gold);font-weight:500;border-left:3px solid var(--gold);padding-left:10px;margin-bottom:12px;letter-spacing:1px}
+label{display:block;font-size:12px;opacity:.7;margin-bottom:4px;margin-top:10px}
+input,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit;font-size:14px;outline:none}
+input:focus,textarea:focus{border-color:var(--gold)}
+textarea{min-height:60px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:480px){.row{grid-template-columns:1fr 1fr}}
+.btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),var(--bronze));color:#0a0a0a;font:inherit;font-size:15px;font-weight:600;border:none;border-radius:var(--r);cursor:pointer;letter-spacing:4px;margin-top:8px}
+.btn:hover:not(:disabled){box-shadow:0 6px 18px rgba(201,168,76,.3)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.report{display:none}
+.report.show{display:block;animation:fadein .4s}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.banner{text-align:center;padding:20px 16px;margin:18px 0;background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(201,168,76,.04));border-radius:var(--r);border:1px solid var(--line)}
+.banner .age{font-size:32px;color:var(--gold);font-weight:600;letter-spacing:4px}
+.banner .stage{font-size:14px;color:var(--gold2);margin-top:4px}
+.banner .focus{font-size:12px;opacity:.7;margin-top:6px}
+/* 12 领域 */
+.doms{display:grid;grid-template-columns:repeat(auto-fit,minmax(95px,1fr));gap:6px;margin-top:10px}
+.dom{padding:10px;background:rgba(201,168,76,.05);border-radius:8px;text-align:center}
+.dom .ico{font-size:18px}
+.dom .nm{font-size:11px;opacity:.75;margin:2px 0}
+.dom .num{font-size:17px;color:var(--gold);font-weight:600}
+.dom .bar{height:4px;border-radius:2px;background:rgba(201,168,76,.15);margin-top:5px;overflow:hidden}
+.dom .bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--bronze));transition:width .8s}
+.dom .st{font-size:10px;margin-top:3px;color:var(--gold2)}
+/* 时间轴 */
+.tl{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.tl-row{display:flex;gap:12px;align-items:flex-start;padding:10px;background:rgba(201,168,76,.04);border-radius:8px;border-left:3px solid var(--gold)}
+.tl-age{font-size:18px;color:var(--gold);font-weight:600;flex-shrink:0;min-width:36px}
+.tl-info b{font-size:14px;color:var(--paper);display:block}
+.tl-info small{font-size:12px;opacity:.65}
+/* 5 年 */
+.fy{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.fy-row{display:flex;gap:10px;padding:8px 12px;background:rgba(201,168,76,.04);border-radius:6px;align-items:center}
+.fy-y{font-size:13px;color:var(--gold);font-weight:600;min-width:50px}
+/* 行动 */
+.ol{padding-left:24px;font-size:14px}
+.ol li{margin:8px 0;line-height:1.6}
+.summary{font-size:13px;opacity:.85;padding:12px;background:rgba(201,168,76,.05);border-radius:8px;margin-top:10px}
+.tools{display:flex;gap:8px;margin:18px 0}
+.tools button{flex:1;padding:10px;font:inherit;font-size:13px;background:rgba(255,255,255,.05);color:var(--paper);border:1px solid var(--line);border-radius:6px;cursor:pointer}
+.tools button:hover{background:rgba(201,168,76,.1);border-color:var(--gold)}
+
+/* ===== 第二十一轮·大运流年起伏图 ===== */
+.dyun-track{position:relative;margin:14px 0;padding:14px 6px 28px;background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:8px;overflow-x:auto;white-space:nowrap}
+.dyun-track::-webkit-scrollbar{height:5px}
+.dyun-track::-webkit-scrollbar-thumb{background:var(--gold);border-radius:3px}
+.dyun-row{display:inline-flex;gap:6px;align-items:flex-end;height:130px;padding:0 4px}
+.dyun-bar{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;cursor:pointer;min-width:34px;transition:all .2s}
+.dyun-bar:hover{transform:scale(1.08)}
+.dyun-bar .b{width:26px;border-radius:4px 4px 0 0;transition:all .2s}
+.dyun-bar.up .b{background:linear-gradient(180deg,var(--gold),var(--bronze))}
+.dyun-bar.down .b{background:linear-gradient(180deg,#c0392b,#7b241c)}
+.dyun-bar.flat .b{background:linear-gradient(180deg,#7f8c8d,#566573)}
+.dyun-bar.now .b{box-shadow:0 0 12px var(--gold);border:1px solid var(--paper)}
+.dyun-bar .a{font-size:10px;color:var(--gold);margin-top:4px;letter-spacing:1px}
+.dyun-bar .n{font-size:9px;opacity:.6;margin-top:2px}
+.dyun-legend{display:flex;gap:14px;font-size:10px;opacity:.65;margin-top:6px;justify-content:center}
+.dyun-legend .lg{display:flex;align-items:center;gap:4px}
+.dyun-legend .lgs{width:10px;height:10px;border-radius:2px}
+.dyun-legend .lg-up .lgs{background:var(--gold)}
+.dyun-legend .lg-down .lgs{background:#c0392b}
+.dyun-legend .lg-flat .lgs{background:#7f8c8d}
+
+/* 当前大运详情 */
+.dyun-now{padding:14px;background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(201,168,76,.04));border-radius:8px;border-left:3px solid var(--gold);margin-top:14px}
+.dyun-now .dn-title{font-size:14px;color:var(--gold);font-weight:600;letter-spacing:2px;margin-bottom:6px}
+.dyun-now .dn-score{font-size:24px;color:var(--gold);font-weight:600;letter-spacing:2px}
+.dyun-now .dn-desc{font-size:12px;line-height:1.7;opacity:.85;margin-top:8px}
+.dyun-now .dn-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.dyun-now .dn-tag{font-size:10px;padding:3px 10px;border-radius:12px;background:rgba(201,168,76,.15);border:1px solid var(--line);letter-spacing:1px}
+.dyun-now .dn-tag.warn{background:rgba(192,57,43,.12);border-color:rgba(192,57,43,.3);color:#e8a8a0}
+
+/* 未来 5 年预警 */
+.future5{padding:10px;background:rgba(255,255,255,.03);border-radius:6px;border-left:2px solid var(--bronze);margin-bottom:6px}
+.future5.warn{border-left-color:#c0392b;background:rgba(192,57,43,.06)}
+.future5.great{border-left-color:var(--gold);background:rgba(201,168,76,.08)}
+.future5 .fy-t{font-size:13px;color:var(--paper);font-weight:600}
+.future5 .fy-d{font-size:11px;opacity:.7;margin-top:3px}
+.future5 .fy-a{font-size:11px;color:var(--gold);margin-top:5px;letter-spacing:1px}
+
+/* ===== 第二十一轮·12 时辰补强引擎 ===== */
+.shichen-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+@media(max-width:480px){.shichen-grid{grid-template-columns:repeat(2,1fr)}}
+.shichen-cell{padding:12px;background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:8px;text-align:center;transition:all .2s;position:relative}
+.shichen-cell:hover{border-color:var(--gold);background:rgba(201,168,76,.06)}
+.shichen-cell.weak{background:rgba(192,57,43,.05);border-color:rgba(192,57,43,.3)}
+.shichen-cell.boost{background:rgba(39,174,96,.06);border-color:rgba(39,174,96,.3)}
+.shichen-cell .sc-time{font-size:12px;color:var(--gold);letter-spacing:2px;font-weight:600}
+.shichen-cell .sc-zhi{font-size:18px;color:var(--paper);margin:4px 0;font-family:'Ma Shan Zheng',serif}
+.shichen-cell .sc-wx{font-size:10px;opacity:.5;letter-spacing:1px}
+.shichen-cell .sc-tag{position:absolute;top:6px;right:6px;font-size:9px;padding:1px 6px;border-radius:8px}
+.shichen-cell.weak .sc-tag{background:#c0392b;color:#fff}
+.shichen-cell.boost .sc-tag{background:#27ae60;color:#fff}
+.shichen-cell .sc-method{font-size:10px;margin-top:8px;padding:6px;background:rgba(0,0,0,.2);border-radius:4px;line-height:1.5;color:var(--gold2);text-align:left}
+
+/* 时辰补强汇总表 */
+.shichen-summary{padding:14px;background:rgba(255,255,255,.02);border-radius:8px;margin-top:12px}
+.shichen-summary .ss-title{font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px;font-weight:600}
+.shichen-summary .ss-item{display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px dashed var(--line);font-size:12px}
+.shichen-summary .ss-item:last-child{border-bottom:none}
+.shichen-summary .ss-time{color:var(--gold);font-weight:600;min-width:80px}
+.shichen-summary .ss-ability{color:var(--paper);flex:1;padding:0 10px}
+.shichen-summary .ss-method{color:var(--gold2);font-size:11px;flex:1.5;text-align:right}
+
+/* ===== 第二十一轮·趋吉避凶总评 ===== */
+.trend-summary{padding:16px;background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.02));border-radius:8px;border:1px solid var(--line);margin-top:12px}
+.trend-summary .ts-title{font-size:14px;color:var(--gold);letter-spacing:3px;margin-bottom:10px;font-weight:600}
+.trend-summary .ts-quote{font-size:12px;line-height:1.8;opacity:.8;font-style:italic;padding:10px;background:rgba(0,0,0,.15);border-left:2px solid var(--gold);border-radius:4px;margin-bottom:10px}
+.trend-summary .ts-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media(max-width:480px){.trend-summary .ts-grid{grid-template-columns:1fr}}
+.trend-summary .ts-item{padding:8px 10px;background:rgba(255,255,255,.03);border-radius:6px;font-size:11px;line-height:1.6}
+.trend-summary .ts-item b{color:var(--gold);display:block;margin-bottom:3px;font-size:11px;letter-spacing:1px}
+
+/* 来源标记 */
+.kb-source{font-size:10px;opacity:.45;margin-top:8px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+
+@media print{body{background:#fff;color:#000;padding:10px}.card,.banner,.tl-row,.fy-row,.dom{background:#fafafa !important;color:#000 !important;border:1px solid #ccc !important}.btn,.tools,#input{display:none !important}.banner .age,.card h2,.dom .num{color:#000 !important}h1{color:#000}}
+
+<style>
+/* ===== 第二十四轮·流月流日 ===== */
+.ly-track{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;margin:12px 0;padding:8px;background:rgba(0,0,0,.15);border-radius:6px}
+.ly-cell{aspect-ratio:1;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;cursor:pointer;transition:transform .2s}
+.ly-cell:hover{transform:scale(1.1);z-index:2}
+.ly-cell .ly-m{font-size:11px;font-weight:600}
+.ly-cell .ly-s{font-size:9px;opacity:.75}
+.ly-cell.lg-up{background:rgba(39,174,96,.35);border:1px solid rgba(39,174,96,.6)}
+.ly-cell.lg-flat{background:rgba(201,168,76,.25);border:1px solid rgba(201,168,76,.5)}
+.ly-cell.lg-down{background:rgba(192,57,43,.35);border:1px solid rgba(192,57,43,.6)}
+.ly-cell.lg-now{box-shadow:0 0 0 2px var(--gold);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+.ly-legend{display:flex;gap:12px;font-size:10px;margin-top:6px;opacity:.7;flex-wrap:wrap}
+.ly-legend div{display:flex;align-items:center;gap:3px}
+.ly-legend .dot{width:10px;height:10px;border-radius:2px}
+.lr-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;margin:12px 0;padding:8px;background:rgba(0,0,0,.15);border-radius:6px}
+@media(max-width:768px){.lr-grid{grid-template-columns:repeat(5,1fr)}}
+.lr-cell{aspect-ratio:1;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;cursor:pointer;transition:transform .15s}
+.lr-cell:hover{transform:scale(1.15);z-index:2}
+.lr-cell .lr-d{font-size:11px;font-weight:600}
+.lr-cell .lr-x{font-size:8px;opacity:.65}
+.lr-cell.lg-up{background:rgba(39,174,96,.35);border:1px solid rgba(39,174,96,.6)}
+.lr-cell.lg-flat{background:rgba(201,168,76,.25);border:1px solid rgba(201,168,76,.5)}
+.lr-cell.lg-down{background:rgba(192,57,43,.35);border:1px solid rgba(192,57,43,.6)}
+.lr-cell.lg-today{box-shadow:0 0 0 2px var(--gold)}
+.ly-summary{margin-top:14px;padding:12px;background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.02));border-radius:8px;border-left:3px solid var(--gold);font-size:11px;line-height:1.7}
+.ly-summary b{color:var(--gold)}
+.lr-summary{margin-top:14px;padding:12px;background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.02));border-radius:8px;border-left:3px solid var(--gold);font-size:11px;line-height:1.7}
+.lr-summary b{color:var(--gold)}
+.lf-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+/* R38-A lifeplan-detail 双核仪表盘 */
+.lp-dash{padding:18px;background:linear-gradient(135deg,rgba(74,154,110,.05),rgba(74,138,168,.05));border-radius:14px;margin:20px 0;border:1px solid var(--line)}
+.lp-dash-title{font-size:16px;color:var(--gold);letter-spacing:2px;margin-bottom:14px;font-weight:600}
+.lp-dash-dual{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.lp-card{padding:14px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.04)}
+.lp-card.health{border-left:4px solid #4a9a6e;background:linear-gradient(135deg,rgba(74,154,110,.08),rgba(255,255,255,.02))}
+.lp-card.career{border-left:4px solid #4a8aa8;background:linear-gradient(135deg,rgba(74,138,168,.08),rgba(255,255,255,.02))}
+.lp-card-title{font-size:13px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.lp-card.health .lp-card-title{color:#4a9a6e}
+.lp-card.career .lp-card-title{color:#4a8aa8}
+.lp-card-score{font-size:26px;font-weight:700;letter-spacing:1px}
+.lp-card.health .lp-card-score{color:#4a9a6e}
+.lp-card.career .lp-card-score{color:#4a8aa8}
+.lp-card-bar{height:6px;background:rgba(0,0,0,.3);border-radius:3px;overflow:hidden;margin:8px 0}
+.lp-card-fill{height:100%;border-radius:3px;transition:.4s}
+.lp-card.health .lp-card-fill{background:linear-gradient(90deg,#4a9a6e,#7ab86e)}
+.lp-card.career .lp-card-fill{background:linear-gradient(90deg,#4a8aa8,#6ab0d0)}
+.lp-8grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.lp-8cell{padding:10px 8px;background:rgba(201,168,76,.05);border:1px solid var(--line);border-radius:6px;transition:.2s;cursor:pointer}
+.lp-8cell:hover{background:rgba(201,168,76,.12);border-color:var(--gold);transform:translateY(-1px)}
+.lp-8cell .icon{font-size:18px;display:block;margin-bottom:4px}
+.lp-8cell b{display:block;font-size:11px;color:var(--gold);margin-bottom:4px}
+.lp-8cell .tip{font-size:10px;opacity:.7;line-height:1.5}
+.lp-stage{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.lp-stage-cell{padding:10px;background:rgba(74,138,168,.06);border:1px solid rgba(74,138,168,.2);border-radius:6px;text-align:center;cursor:pointer}
+.lp-stage-cell:hover{background:rgba(74,138,168,.15)}
+.lp-stage-cell b{display:block;font-size:11px;color:#6ab0d0;margin-bottom:4px}
+.lp-verdict{margin-top:14px;padding:12px;background:rgba(0,0,0,.2);border-radius:8px;border:1px dashed var(--gold);font-size:12px;line-height:1.9}
+.lp-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+@media(max-width:768px){.lp-dash-dual{grid-template-columns:1fr}.lp-8grid,.lp-stage{grid-template-columns:repeat(2,1fr)}}
+
+<style>
+.lp-12-domain-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:10px 0 14px}
+.lp-12-domain-card{background:linear-gradient(135deg,rgba(212,175,55,.06),rgba(74,138,168,.04));border:1px solid rgba(212,175,55,.2);border-radius:8px;padding:10px 8px;text-align:center;transition:.2s}
+.lp-12-domain-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(212,175,55,.15)}
+.lp-12-domain-name{font-size:12px;font-weight:600;color:var(--paper);margin-bottom:4px}
+.lp-12-domain-score{font-size:22px;font-weight:bold;margin:4px 0}
+.lp-12-domain-tip{font-size:10.5px;opacity:.65;line-height:1.5}
+.lp-stage-block{margin-bottom:24px;padding-bottom:18px;border-bottom:1px dashed rgba(212,175,55,.15)}
+@media(max-width:768px){.lp-12-domain-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.lp-12-domain-grid{grid-template-columns:1fr}}
+</style>
+
+</style>
+/* R41-B lifeplan-detail 4 阶段深度补强 CSS */
+.lp-stage-section { background: linear-gradient(135deg, #1a2332 0%, #0f1820 100%); border: 1px solid rgba(99,179,237,0.3); border-radius: 12px; padding: 20px; margin: 16px 0; }
+.lp-stage-title { color: #63b3ed; font-size: 18px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.lp-stage-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.lp-stage-card { background: rgba(99,179,237,0.08); border: 1px solid rgba(99,179,237,0.2); border-radius: 8px; padding: 12px; }
+.lp-stage-card-title { color: #63b3ed; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.lp-stage-card-content { color: #c5d1de; font-size: 13px; line-height: 1.6; }
+.lp-stage-tag { display: inline-block; padding: 2px 8px; background: rgba(99,179,237,0.15); border-radius: 4px; font-size: 11px; margin-right: 4px; margin-top: 4px; }
+
+.lp-stage-children { border-left: 4px solid #ffb44d; }
+.lp-stage-teen { border-left: 4px solid #c084fc; }
+.lp-stage-young { border-left: 4px solid #78c878; }
+.lp-stage-mid { border-left: 4px solid #f87171; }
+
+.lp-stage-timeline { display: flex; justify-content: space-between; margin: 20px 0; padding: 16px; background: rgba(99,179,237,0.05); border-radius: 8px; position: relative; }
+.lp-stage-timeline::before { content: ''; position: absolute; top: 50%; left: 5%; right: 5%; height: 2px; background: rgba(99,179,237,0.3); z-index: 0; }
+.lp-stage-timeline-item { text-align: center; position: relative; z-index: 1; background: rgba(26,35,50,0.95); padding: 8px; border-radius: 6px; min-width: 100px; }
+.lp-stage-timeline-age { color: #63b3ed; font-size: 16px; font-weight: 700; }
+.lp-stage-timeline-name { color: #8a9bb0; font-size: 11px; margin-top: 4px; }
+
+.lp-12-domain-matrix { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin: 16px 0; }
+.lp-12-domain { background: rgba(255,255,255,0.03); border: 1px solid rgba(99,179,237,0.15); border-radius: 6px; padding: 10px; text-align: center; }
+.lp-12-domain-name { color: #63b3ed; font-size: 12px; font-weight: 600; }
+.lp-12-domain-score { font-size: 20px; font-weight: 700; margin-top: 4px; }
+.lp-12-domain-score.good { color: #78c878; }
+.lp-12-domain-score.mid { color: #ffb44d; }
+.lp-12-domain-score.bad { color: #f87171; }
+
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>人生规划蓝图</h1>
+    <p>8 阶段 / 12 领域 / 5 年步进 · 易道智鉴</p>
+  </header>
+  <div class="card" id="input">
+    <h2>📋 基础信息</h2>
+    <div class="row">
+      <div><label>年龄</label><input id="lAge" type="number" min="1" max="120" value="28"></div>
+      <div><label>性别</label><select id="lSex"><option value="male">男</option><option value="female">女</option></select></div>
+      <div><label>现居地</label><input id="lResidence" placeholder="例：上海"></div>
+    </div>
+    <label>关注领域（逗号分隔）</label>
+    <input id="lFocus" placeholder="例：事业、财运、健康">
+    <label>补充情况（可选，影响领域加权）</label>
+    <textarea id="lExtra" placeholder="例：计划 30 岁前完成理财布局，金融行业从业5年"></textarea>
+    <button class="btn" id="genBtn" onclick="generate()">✨ 生成蓝图</button>
+  </div>
+  <div class="report" id="report"></div>
+  <p style="text-align:center;font-size:11px;opacity:.4;margin:24px 0;letter-spacing:1px">易道智鉴 · 仅供参考 · 命数只占 30%，努力占 70%</p>
+</div>
+<script>
+const STAGES = [
+  {key:'preschool',name:'学龄前',range:'0-6岁',focus:['先天','亲子','健康']},
+  {key:'school',name:'小学中学',range:'7-17岁',focus:['学习','品德','兴趣']},
+  {key:'university',name:'大学',range:'18-23岁',focus:['专业','社交','实践']},
+  {key:'career',name:'职场+婚恋',range:'24-65岁',focus:['事业','婚恋','健康']}
+];
+const DOMAINS = [
+  {key:'xueye',name:'学业',icon:'📚'},
+  {key:'zhiye',name:'职业',icon:'💼'},
+  {key:'caiyun',name:'财运',icon:'💰'},
+  {key:'hunyin',name:'婚姻',icon:'💕'},
+  {key:'jiankang',name:'健康',icon:'💊'},
+  {key:'chengshi',name:'城市',icon:'🏙️'},
+  {key:'xiuyang',name:'修养',icon:'🎋'},
+  {key:'renmai',name:'人脉',icon:'🤝'},
+  {key:'chuangye',name:'创业',icon:'🚀'},
+  {key:'yanglao',name:'养老',icon:'🌳'},
+  {key:'chuancheng',name:'传承',icon:'🎁'},
+  {key:'jiangxiu',name:'享福',icon:'🌸'}
+];
+const WUXING_KW = {'金':['理财','金融','法律'],'木':['学习','成长','教育'],'水':['智慧','思考','学术'],'火':['创业','激情','表达'],'土':['稳健','养老','健康']};
+
+function generate(){
+  const btn=document.getElementById('genBtn');
+  btn.disabled=true; btn.textContent='⏳ 生成中...';
+  setTimeout(()=>{
+    try{
+      const age=parseInt(document.getElementById('lAge').value)||30;
+      const sex=document.getElementById('lSex').value;
+      const residence=document.getElementById('lResidence').value.trim();
+      const focus=(document.getElementById('lFocus').value||'').trim();
+      const extra=(document.getElementById('lExtra').value||'').trim();
+      const userText = extra+' '+focus;
+      const stageKey = age<=6?'preschool':age<=17?'school':age<=23?'university':'career';
+      const stage = STAGES.find(s=>s.key===stageKey);
+
+      const domainScores = DOMAINS.map(d=>{
+        let base=60;
+        if(stage.focus.some(f=>d.name.includes(f)||f.includes(d.name))) base+=15;
+        if(d.key==='jiankang'&&age>=35) base-=10;
+        if(d.key==='chuangye'&&age>=24&&age<=40) base+=10;
+        if(d.key==='yanglao'&&age>=50) base+=15;
+        if(d.key==='xueye'&&age<24) base+=15;
+        for(const [wx,kws] of Object.entries(WUXING_KW)){
+          if(kws.some(k=>userText.includes(k))){
+            if(d.key==='caiyun'&&wx==='金') base+=5;
+            if(d.key==='xueye'&&wx==='木') base+=5;
+            if(d.key==='chuangye'&&wx==='火') base+=5;
+            if(d.key==='yanglao'&&wx==='土') base+=5;
+          }
+        }
+        const final=Math.max(30,Math.min(95,base));
+        return {key:d.key,name:d.name,icon:d.icon,score:final,status:final>=75?'优':final>=60?'良好':'有潜力'};
+      });
+
+      const next5 = [
+        {y:age+1,t:'夯实基期：阶段核心理能强化，适合学习积累'},
+        {y:age+2,t:'试错期：阶段突破、探索不同方向'},
+        {y:age+3,t:'中期步进期：目标聚焦、协会/导师对话'},
+        {y:age+4,t:'中期证果期：阶段成果转位'},
+        {y:age+5,t:'中期导启期：下一阶段起点梳理'}
+      ];
+      const fiveYearAdvice = age<30?'启始期，重点在✍️学业 🤝人脉 建节奏':age<50?'进取期，重点在💼事业 💰财运 💕婚恋':'守成期，重点在💊健康 🏙️城市 🎁传承';
+
+      render({age,sex,residence,focus,extra,stage,domainScores,next5,fiveYearAdvice});
+      btn.disabled=false; btn.textContent='🔄 重新生成';
+    }catch(e){
+      alert('生成失败：'+e.message);
+      btn.disabled=false; btn.textContent='✨ 生成蓝图';
+    }
+  }, 250);
+}
+
+function render(d){
+  const summary = `${d.age}岁属${d.stage.name}（${d.stage.range}），本阶段重点：${d.stage.focus.join('、')}。依据命数起步，未来 5 年${d.fiveYearAdvice}。请每月复盘调整。`;
+  let h='<div class="banner"><div class="age">'+d.age+'</div><div class="stage">'+d.stage.name+' · '+d.stage.range+'</div><div class="focus">重点：'+d.stage.focus.join(' · ')+'</div></div>';
+
+  // 12 领域
+  h+='<div class="card"><h2>🎯 12 领域矩阵</h2><div class="doms">';
+  d.domainScores.forEach(s=>{
+    h+='<div class="dom"><div class="ico">'+s.icon+'</div><div class="nm">'+s.name+'</div><div class="num">'+s.score+'</div><div class="bar"><div class="bar-fill" style="width:'+s.score+'%"></div></div><div class="st">'+s.status+'</div></div>';
+  });
+  h+='</div></div>';
+
+  // 时间轴
+  h+='<div class="card"><h2>📅 人生时间轴</h2><div class="tl">';
+  const ts=[
+    {a:10,t:'童年奠基期',f:'启蒙 + 健康习惯'},
+    {a:20,t:'青年立志期',f:'学业 + 人脉起步'},
+    {a:30,t:'而立创业期',f:'事业 + 婚恋'},
+    {a:40,t:'不惑稳固期',f:'事业深耕 + 健康'},
+    {a:50,t:'知天命收获期',f:'财务 + 传承'},
+    {a:60,t:'耳顺传承期',f:'传承 + 修养'},
+    {a:70,t:'从心所欲期',f:'享福 + 天命'}
+  ];
+  ts.forEach(t=>{
+    h+='<div class="tl-row"><div class="tl-age">'+t.a+'</div><div class="tl-info"><b>'+t.t+'</b><small>'+t.f+'</small></div></div>';
+  });
+  h+='</div></div>';
+
+  // 未来 5 年
+  h+='<div class="card"><h2>🔮 未来 5 年步进</h2><div class="fy">';
+  d.next5.forEach(p=>{
+    h+='<div class="fy-row"><span class="fy-y">'+p.y+' 岁</span><span>'+p.t+'</span></div>';
+  });
+  h+='<div class="summary">'+d.fiveYearAdvice+'</div></div>';
+
+  // 行动清单
+  const ns=[
+    `【1】制定${d.age+1}年度${d.stage.focus[0]}核心目标（3个为佳）`,
+    `【2】梳理现有${d.stage.focus[1]||'人脉'}资源，建立同领域同行圈层（5-8人）`,
+    `【3】建立每月一轮复盘机制（推荐月末周末 2 小时）`,
+    `【4】健康习惯投资：合理作息 + 运动计划（每周 3-5 次）`,
+    `【5】财务防守 / 进攻计划：年度储蓄比例明确`,
+    `【6】婚恋 / 家庭节奏同步：与伴侣每季沟通一次`,
+    `【7】学习充电：每年读 4 本相关领域书籍`,
+    `【8】拓展视野：每年 1 次长途旅行或海外学习`,
+    `【9】建立财务护城河：应急金≥6个月支出`,
+    `【10】每年年度复盘 + 下一年 OKR 设定`
+  ];
+  h+='<div class="card"><h2>✅ 行动清单（10 条）</h2><ol class="ol">';
+  ns.forEach(s=>h+='<li>'+s+'</li>');
+  h+='</ol></div>';
+
+  // 总评
+  h+='<div class="card"><h2>📜 总评</h2><div class="summary">'+summary+'</div></div>';
+
+
+  // ===== 第二十一轮·R3·大运流年 + 时辰补强 + 趋吉避凶 =====
+  const userBaziForLife = (()=>{try{return JSON.parse(localStorage.getItem('qianyuan_user_bazi'));}catch(e){return null;}})();
+  const dayEle = userBaziForLife?.dayEle || '土';
+  const dayStem = userBaziForLife?.dayStem || '戊';
+  const shengMap={'木':'火','火':'土','土':'金','金':'水','水':'木'};
+  const keMap={'木':'土','土':'水','水':'火','火':'金','金':'木'};
+  const ELE_LOC={'木':'东','火':'南','土':'中央','金':'西','水':'北'};
+
+  // ===== 大运流年起伏引擎（依《三命通会》《滴天髓》《子平真诠》） =====
+  function calcDayunFluctuation(currentAge){
+    // 起运年龄简算：男阳/女阴=出生日到节令天数÷3，女阳/男阴相反
+    const sex = d.sex;
+    const startYunAge = 3; // 简化为 3 岁起运
+    const dayuns = [];
+    let curStem = dayStem;
+    const STEMS=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+    const ELE_BY_STEM={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
+    for(let i=0;i<10;i++){
+      const ageStart = startYunAge + i*10;
+      if(ageStart > currentAge + 50) break;
+      const ageEnd = ageStart + 9;
+      // 简化：每 10 年天干顺延一位
+      curStem = STEMS[(STEMS.indexOf(curStem)+1)%10];
+      const dayunStem = curStem;
+      const dayunEle = ELE_BY_STEM[dayunStem];
+      // 大运评分：与命主日干的关系
+      let score = 60;
+      const rel = [];
+      if(dayunEle === dayEle){score += 10; rel.push('比肩·稳健');}
+      else if(shengMap[dayEle]===dayunEle){score += 18; rel.push('食伤·生旺·宜进');}
+      else if(shengMap[dayunEle]===dayEle){score += 22; rel.push('印绶·贵人·宜学');}
+      else if(keMap[dayEle]===dayunEle){score -= 15; rel.push('财星·破耗·慎财');}
+      else if(keMap[dayunEle]===dayEle){score -= 22; rel.push('官杀·压力·宜稳');}
+      // 大运阶段额外加权
+      if(ageStart>=18 && ageStart<=40 && score>=70) score += 5;
+      if(ageStart>=50 && score<55) score -= 5;
+      score = Math.max(15, Math.min(95, score));
+      dayuns.push({ageStart,ageEnd,stem:dayunStem,ele:dayunEle,score,rel,isNow:currentAge>=ageStart&&currentAge<=ageEnd});
+    }
+    return dayuns;
+  }
+
+  // ===== 12 时辰补强引擎（依《十二时辰养生》《黄帝内经》《易经·十二辟卦》） =====
+  function calcShichenBoost(currentEle){
+    const shengMap={'木':'火','火':'土','土':'金','金':'水','水':'木'};
+    const keMap={'木':'土','土':'水','水':'火','火':'金','金':'木'};
+    const ZHI_WX={'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+    const ZHI_TIME={'子':'23-01','丑':'01-03','寅':'03-05','卯':'05-07','辰':'07-09','巳':'09-11','午':'11-13','未':'13-15','申':'15-17','酉':'17-19','戌':'19-21','亥':'21-23'};
+    const ZHI_METHOD={
+      '子':{ability:'思考·决断',method:'宜静思·定计划·忌争吵·喝温水'},
+      '丑':{ability:'脾胃·深睡',method:'深度睡眠·修复脾胃·避免熬夜'},
+      '寅':{ability:'肺活·起步',method:'起床深呼吸·叩齿吞津·晨练太极'},
+      '卯':{ability:'肝血·专注',method:'高强度工作·阅读·避免饮酒'},
+      '辰':{ability:'脾胃·早餐',method:'温热早餐·慢咀嚼·忌冷饮'},
+      '巳':{ability:'心脑·高效',method:'重要会议·决策·效率巅峰·午休小憩'},
+      '午':{ability:'心火·社交',method:'人际交往·签约·午饭七分饱·午睡'},
+      '未':{ability:'脾胃·分养',method:'茶饮·阅读·忌油腻·散步助消化'},
+      '申':{ability:'肺气·表达',method:'演讲·谈判·运动·呼吸训练'},
+      '酉':{ability:'肺肾·收藏',method:'晚饭清淡·散步·冥想·收纳整理'},
+      '戌':{ability:'心包·愉悦',method:'家庭聚会·阅读·忌剧烈运动'},
+      '亥':{ability:'三焦·休眠',method:'准备入睡·泡脚·听轻音乐·忌看手机'}
+    };
+    const cells=[];
+    Object.entries(ZHI_WX).forEach(([zhi,wx])=>{
+      const time = ZHI_TIME[zhi];
+      let status='flat',tag='',rel='';
+      if(wx === currentEle){status='boost';tag='同气';rel='同我·平顺';}
+      else if(shengMap[currentEle]===wx){status='boost';tag='我生';rel='食伤·释放能量';}
+      else if(shengMap[wx]===currentEle){status='boost';tag='生我';rel='印绶·贵人·补强';}
+      else if(keMap[currentEle]===wx){status='weak';tag='我克';rel='财星·耗我·慎决';}
+      else if(keMap[wx]===currentEle){status='weak';tag='克我';rel='官杀·压力·守势';}
+      cells.push({time,zhi,wx,status,tag,rel,ability:ZHI_METHOD[zhi].ability,method:ZHI_METHOD[zhi].method});
+    });
+    return cells;
+  }
+
+  // ===== 趋吉避凶引擎（依《穷通宝鉴》《三命通会》《月谈赋》） =====
+  
+/* ===== 第二十四轮·流月流日引擎 ===== */
+function calcLiuyueScore(currentAge, dayStem, dayEle){
+  const MONTH_ZHI = ['寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑'];
+  const now = new Date();
+  const curMonth = now.getMonth();
+  const STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  // 五虎遁年起月
+  const TIGER_MAP = {0:2,5:2, 1:4,6:4, 2:6,7:6, 3:8,8:8, 4:0,9:0};
+  const yr = now.getFullYear();
+  const yrStemIdx = (yr - 4) % 10;
+  const startStemIdx = TIGER_MAP[yrStemIdx];
+  const SHENG_MAP = {木:'火',火:'土',土:'金',金:'水',水:'木'};
+  const KE_MAP = {木:'土',火:'金',土:'水',金:'木',水:'火'};
+  const ELE_BY_STEM = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
+  const ZHI_WX = {子:'水',丑:'土',寅:'木',卯:'木',辰:'土',巳:'火',午:'火',未:'土',申:'金',酉:'金',戌:'土',亥:'水'};
+  const MONTH_NAMES = ['正月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+
+  return MONTH_ZHI.map((zhi, i)=>{
+    const stemIdx = (startStemIdx + i) % 10;
+    const stem = STEMS[stemIdx];
+    const stemEle = ELE_BY_STEM[stem];
+    const zhiEle = ZHI_WX[zhi];
+
+    let score = 60;
+    let relation = '平';
+    if(stemEle === dayEle){ score += 10; relation='比肩'; }
+    else if(SHENG_MAP[dayEle] === stemEle){ score += 22; relation='印绶（吉）'; }
+    else if(stemEle === SHENG_MAP[dayEle]){ score += 18; relation='食伤（泄秀）'; }
+    else if(KE_MAP[dayEle] === stemEle){ score -= 15; relation='财星（破耗）'; }
+    else if(stemEle === KE_MAP[dayEle]){ score -= 22; relation='官杀（压力）'; }
+    if(zhiEle === dayEle) score += 5;
+
+    score = Math.max(20, Math.min(99, score));
+    const level = score >= 70 ? '吉' : (score < 55 ? '凶' : '平');
+    const advice = score >= 70 ? '可谋大事·进取有功' : (score < 55 ? '宜守不宜攻·修身养性' : '稳中求进·顺势而为');
+
+    return {
+      monthName: MONTH_NAMES[i],
+      stem, branch: zhi,
+      score, level, relation,
+      reason: monthReasons(i),
+      advice,
+      isNow: i === curMonth
+    };
+  });
+}
+
+function monthReasons(idx){
+  const r = ['寅月木旺·正月建生','卯月木极·仲春生气','辰月土湿·季春库开','巳月火初·孟夏火苗','午月火极·仲夏阳盛','未月土燥·季夏养金','申月金锐·孟秋肃杀','酉月金极·仲秋收成','戌月土藏·季秋库收','亥月水生·孟冬阳藏','子月水极·仲冬阴盛','丑月土冻·季冬守藏'];
+  return r[idx] || '月令转换';
+}
+
+function calcLiuriScore(dayStem, dayEle){
+  const now = new Date();
+  const STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  const ZHIS = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  const SHENG_MAP = {木:'火',火:'土',土:'金',金:'水',水:'木'};
+  const KE_MAP = {木:'土',火:'金',土:'水',金:'木',水:'火'};
+  const ELE_BY_STEM = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
+  const ZHI_WX = {子:'水',丑:'土',寅:'木',卯:'木',辰:'土',巳:'火',午:'火',未:'土',申:'金',酉:'金',戌:'土',亥:'水'};
+
+  const baseStemIdx = 0; // 2026-07-22 = 甲辰
+  const baseZhiIdx = 4;
+  const baseDate = new Date('2026-07-22');
+
+  const out = [];
+  for(let i=0;i<30;i++){
+    const d = new Date(baseDate);
+    d.setDate(baseDate.getDate() + i);
+    const stemIdx = (baseStemIdx + i) % 10;
+    const zhiIdx = (baseZhiIdx + i) % 12;
+    const stem = STEMS[stemIdx];
+    const zhi = ZHIS[zhiIdx];
+    const stemEle = ELE_BY_STEM[stem];
+    const zhiEle = ZHI_WX[zhi];
+
+    let score = 60;
+    let relation = '平';
+    if(stemEle === dayEle){ score += 10; relation='比肩'; }
+    else if(SHENG_MAP[dayEle] === stemEle){ score += 22; relation='印绶（吉）'; }
+    else if(stemEle === SHENG_MAP[dayEle]){ score += 18; relation='食伤（泄秀）'; }
+    else if(KE_MAP[dayEle] === stemEle){ score -= 15; relation='财星（破耗）'; }
+    else if(stemEle === KE_MAP[dayEle]){ score -= 22; relation='官杀（压力）'; }
+    if(zhiEle === dayEle) score += 5;
+
+    score = Math.max(20, Math.min(99, score));
+    const level = score >= 70 ? '吉' : (score < 55 ? '凶' : '平');
+    const event = score >= 70 ? '签约·求财·婚嫁' : (score < 55 ? '远行·签约·动土' : '守常·小事可谋');
+
+    out.push({
+      day: d.getDate(),
+      date: d.toISOString().slice(5,10),
+      stem, branch: zhi,
+      score, level, relation, event,
+      advice: score >= 70 ? '把握良机·果断进取' : (score < 55 ? '静观其变·内省守成' : '顺势而为·稳中求进'),
+      isToday: d.toDateString() === now.toDateString()
+    });
+  }
+  return out;
+}
+
+function calcTrendAdvice(dayuns, shichen){
+    const now = dayuns.find(x=>x.isNow);
+    if(!now) return '';
+    const ups = dayuns.filter(x=>x.score>=70);
+    const downs = dayuns.filter(x=>x.score<55);
+    const avgScore = Math.round(dayuns.reduce((s,x)=>s+x.score,0)/dayuns.length);
+    const curScore = now.score;
+    let trend = '';
+    let phase = '';
+    if(curScore>=75) {trend='大运当头，宜大展宏图'; phase='吉期·进取';}
+    else if(curScore>=65) {trend='运势稳健，宜守成扩展'; phase='平顺·守成';}
+    else if(curScore>=55) {trend='运程偏弱，宜守不妄动'; phase='潜伏·蛰伏';}
+    else {trend='运程低伏，宜静修化煞'; phase='低谷·化解';}
+    // 建议方向
+    const goodDir = ELE_LOC[shengMap[dayEle]] || '东方';
+    const badDir = ELE_LOC[keMap[dayEle]] || '西方';
+    // 化煞物品（从 R20 联动）
+    const itemMap={'木':'🗼 文昌塔 / 🌿 绿植','火':'🖼️ 山水画 / 🐯 老虎画','土':'🎃 葫芦 / 🙏 佛像','金':'🪞 镜子 / 🏺 金属摆件','水':'🐟 鱼缸 / 🧊 冰箱'};
+    return {
+      trend, phase, avgScore, curScore, goodDir, badDir,
+      upsCount:ups.length, downsCount:downs.length,
+      recItem:itemMap[dayEle],
+      recommendAge:dayuns.reduce((best,x)=>x.score>best.score?x:best,dayuns[0])
+    };
+  }
+
+  // ===== 渲染大运 + 时辰 + 趋吉避凶 =====
+  const dayuns = calcDayunFluctuation(d.age);
+  const shichen = calcShichenBoost(dayEle);
+  const trend = calcTrendAdvice(dayuns, shichen);
+
+
+  // ===== 第二十四轮·R24·流月流日精度补强 =====
+  const liuyue = calcLiuyueScore(d.age, dayStem, dayEle);
+  const liuri = calcLiuriScore(dayStem, dayEle);
+  h+='<div class="card"><h2>🌙 流月起伏图（12 月·年内节奏）</h2>';
+  h+='<div class="ly-track">';
+  liuyue.forEach(m=>{
+    const cls = m.isNow?'lg-now':(m.score>=70?'lg-up':(m.score<55?'lg-down':'lg-flat'));
+    h+='<div class="ly-cell '+cls+'" title="'+m.monthName+'·'+m.stem+m.branch+'·'+m.score+'分·'+m.reason+'"><div class="ly-m">'+m.monthName+'</div><div class="ly-s">'+m.score+'</div></div>';
+  });
+  h+='</div>';
+  h+='<div class="ly-legend"><div><div class="dot" style="background:rgba(39,174,96,.5)"></div>吉月 ≥70</div><div><div class="dot" style="background:rgba(201,168,76,.4)"></div>平月 55-69</div><div><div class="dot" style="background:rgba(192,57,43,.5)"></div>凶月 <55</div><div><div class="dot" style="background:var(--gold)"></div>本月</div></div>';
+  const curMonth = liuyue.find(m=>m.isNow) || liuyue[0];
+  h+='<div class="ly-summary"><b>当前月：'+curMonth.monthName+'（'+curMonth.stem+curMonth.branch+'月）</b><br>';
+  h+='· 月评分：<b>'+curMonth.score+'</b>/100（'+curMonth.level+'）<br>';
+  h+='· 月干 '+curMonth.stem+' 与日主 '+dayStem+'：<b>'+curMonth.relation+'</b><br>';
+  h+='· 月令：'+curMonth.reason+'<br>';
+  h+='· 趋吉：'+curMonth.advice+'</div>';
+  h+='</div>';
+
+  h+='<div class="card"><h2>📅 流日吉凶（30 日·短期决策）</h2>';
+  h+='<div class="lr-grid">';
+  liuri.forEach(r=>{
+    const cls = r.isToday?'lg-today':(r.score>=70?'lg-up':(r.score<55?'lg-down':'lg-flat'));
+    h+='<div class="lr-cell '+cls+'" title="'+r.date+'·'+r.stem+r.branch+'·'+r.score+'分·'+r.event+'"><div class="lr-d">'+r.day+'</div><div class="lr-x">'+r.score+'</div></div>';
+  });
+  h+='</div>';
+  h+='<div class="ly-legend"><div><div class="dot" style="background:rgba(39,174,96,.5)"></div>吉日 ≥70</div><div><div class="dot" style="background:rgba(201,168,76,.4)"></div>平日 55-69</div><div><div class="dot" style="background:rgba(192,57,43,.5)"></div>凶日 <55</div><div><div class="dot" style="background:var(--gold)"></div>今日</div></div>';
+  const curDay = liuri.find(r=>r.isToday) || liuri[0];
+  h+='<div class="lr-summary"><b>今日：'+curDay.date+'（'+curDay.stem+curDay.branch+'日）</b><br>';
+  h+='· 日评分：<b>'+curDay.score+'</b>/100（'+curDay.level+'）<br>';
+  h+='· 日干 '+curDay.stem+' 与日主 '+dayStem+'：<b>'+curDay.relation+'</b><br>';
+  h+='· 适宜：<b>'+curDay.event+'</b><br>';
+  h+='· 提醒：'+curDay.advice+'<br>';
+  h+='· 未来 3 日：';
+  for(let i=1;i<=3;i++){
+    const nx = liuri[(liuri.indexOf(curDay)+i)%liuri.length];
+    h+=nx.day+'日 <b>'+nx.score+'</b>分（'+nx.event+'）· ';
+  }
+  h+='</div>';
+  h+='<div class="lf-source">📜《穷通宝鉴》《三命通会·流月篇》《流日篇》《子平真诠》《神峰通考》《卜筮正宗·流日》</div>';
+  h+='</div>';
+
+  // 大运起伏图
+  h+='<div class="card"><h2>📈 大运流年起伏图（10 段·每段 10 年）</h2>';
+  h+='<div class="dyun-track"><div class="dyun-row">';
+  dayuns.forEach(u=>{
+    const cls = u.isNow?'dyun-bar now':(u.score>=70?'dyun-bar up':(u.score<55?'dyun-bar down':'dyun-bar flat'));
+    const height = Math.max(20, u.score*1.2);
+    h+='<div class="'+cls+'"><div class="b" style="height:'+height+'px"></div><div class="a">'+u.ageStart+'</div><div class="n">'+u.stem+'</div></div>';
+  });
+  h+='</div></div>';
+  h+='<div class="dyun-legend"><div class="lg lg-up"><div class="lgs"></div>大吉运 ≥70</div><div class="lg lg-flat"><div class="lgs"></div>平运 55-69</div><div class="lg lg-down"><div class="lgs"></div>低谷 <55</div></div>';
+  // 当前大运详情
+  const now = dayuns.find(x=>x.isNow);
+  if(now){
+    h+='<div class="dyun-now"><div class="dn-title">⚡ 当前大运：'+now.ageStart+'-'+now.ageEnd+' 岁（'+now.stem+'运·'+now.ele+'）</div>';
+    h+='<div class="dn-score">'+now.score+' <span style="font-size:13px;opacity:.6">分</span></div>';
+    h+='<div class="dn-desc">'+now.rel.join(' · ')+'</div>';
+    h+='<div class="dn-tags">';
+    if(now.score>=70) h+='<span class="dn-tag">✦ 大运当头</span><span class="dn-tag">宜大展宏图</span><span class="dn-tag">顺势而上</span>';
+    else if(now.score>=65) h+='<span class="dn-tag">⚖ 稳健期</span><span class="dn-tag">守成扩展</span>';
+    else if(now.score>=55) h+='<span class="dn-tag">🔄 潜伏期</span><span class="dn-tag">守势不妄</span>';
+    else h+='<span class="dn-tag warn">⚠ 低谷期</span><span class="dn-tag warn">静修化煞</span>';
+    h+='</div></div>';
+  }
+  h+='<div class="kb-source">📜 《三命通会》《滴天髓》《子平真诠》</div></div>';
+
+  // 12 时辰补强
+  h+='<div class="card"><h2>⏰ 12 时辰补强引擎（命主 '+dayStem+'日主·'+dayEle+'）</h2>';
+  h+='<p style="font-size:11px;opacity:.6;margin:8px 0">基于命主五行喜忌·各时辰与命主关系·给出"何时做事+何时守势"建议</p>';
+  h+='<div class="shichen-grid">';
+  shichen.forEach(s=>{
+    h+='<div class="shichen-cell '+s.status+'">';
+    h+='<div class="sc-time">'+s.time+'</div>';
+    h+='<div class="sc-zhi">'+s.zhi+'</div>';
+    h+='<div class="sc-wx">'+s.wx+'行·'+s.rel+'</div>';
+    if(s.tag) h+='<div class="sc-tag">'+s.tag+'</div>';
+    h+='<div class="sc-method">'+s.method+'</div>';
+    h+='</div>';
+  });
+  h+='</div>';
+  h+='<div class="shichen-summary">';
+  h+='<div class="ss-title">🎯 关键时辰运用</div>';
+  h+='<div class="ss-item"><span class="ss-time">巳时（9-11）</span><span class="ss-ability">高效决策·开会</span><span class="ss-method">火气旺·思维敏捷</span></div>';
+  h+='<div class="ss-item"><span class="ss-time">午时（11-13）</span><span class="ss-ability">社交·签约</span><span class="ss-method">心火旺·人际活跃</span></div>';
+  h+='<div class="ss-item"><span class="ss-time">申时（15-17）</span><span class="ss-ability">表达·谈判</span><span class="ss-method">金气肃·言辞利</span></div>';
+  h+='<div class="ss-item"><span class="ss-time">酉时（17-19）</span><span class="ss-ability">收纳·整理</span><span class="ss-method">收藏之气·准备归家</span></div>';
+  h+='</div>';
+  h+='<div class="kb-source">📜 《黄帝内经·十二时辰养生》《易经·十二辟卦》</div></div>';
+
+  // 未来 5 年起伏（按当前大运 + 流年计算）
+  const currentYear = new Date().getFullYear();
+  h+='<div class="card"><h2>🔮 未来 5 年起伏预警</h2>';
+  for(let i=0;i<5;i++){
+    const y = currentYear + i;
+    const yearGan = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'][(y-4)%10];
+    const yearZhi = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][(y-4)%12];
+    const yearEle = {'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'}[yearGan];
+    let yScore = 60, yLevel='', yTips='';
+    if(shengMap[dayEle]===yearEle){yScore+=15;yLevel='great';yTips='流年生我·贵人运旺';}
+    else if(shengMap[yearEle]===dayEle){yScore+=10;yLevel='good';yTips='流年与我和谐·宜稳进';}
+    else if(keMap[yearEle]===dayEle){yScore-=12;yLevel='warn';yTips='流年克我·守势化煞';}
+    else if(keMap[dayEle]===yearEle){yScore-=8;yLevel='warn';yTips='流年我克·财耗慎决';}
+    else if(yearEle===dayEle){yLevel='good';yTips='流年比肩·平稳';}
+    yScore = Math.max(15, Math.min(95, yScore));
+    h+='<div class="future5 '+yLevel+'">';
+    h+='<div class="fy-t">'+y+' 年（'+yearGan+yearZhi+' · '+yearEle+'年）</div>';
+    h+='<div class="fy-d">'+yTips+'</div>';
+    h+='<div class="fy-a">运势评分：<b style="color:var(--gold)">'+yScore+'</b>/100</div>';
+    h+='</div>';
+  }
+  h+='<div class="kb-source">📜 《三命通会·流年篇》《神峰通考》《穷通宝鉴》</div></div>';
+
+  // 趋吉避凶总评
+  if(trend){
+    h+='<div class="trend-summary">';
+    h+='<div class="ts-title">🛡️ 趋吉避凶总评（'+trend.phase+'）</div>';
+    h+='<div class="ts-quote">"'+trend.trend+'——大运流年起伏如潮，知进退、明取舍，方为智者。"</div>';
+    h+='<div class="ts-grid">';
+    h+='<div class="ts-item"><b>📈 当前大运</b>'+now.ageStart+'-'+now.ageEnd+'岁·'+now.score+'分·'+now.rel[0]+'</div>';
+    h+='<div class="ts-item"><b>📊 平均运势</b>'+trend.avgScore+'分/100（10 段大运）</div>';
+    h+='<div class="ts-item"><b>📅 最佳十年</b>'+trend.recommendAge.ageStart+'-'+trend.recommendAge.ageEnd+'岁·'+trend.recommendAge.score+'分·'+trend.recommendAge.stem+'运</div>';
+    h+='<div class="ts-item"><b>🎯 吉方</b>'+trend.goodDir+'（生旺命主）</div>';
+    h+='<div class="ts-item"><b>⚠ 慎方</b>'+trend.badDir+'（克泄命主·慎往）</div>';
+    h+='<div class="ts-item"><b>🎁 化煞物</b>'+trend.recItem+'</div>';
+    h+='</div></div>';
+    h+='<div class="kb-source">📜 综合《三命通会》《穷通宝鉴》《月谈赋》《卜筮正宗》</div>';
+  }
+
+  // 工具
+  h+='<div class="tools"><button onclick="shareUrl()">🔗 分享链接</button><button onclick="window.print()">🖨️ 打印/保存 PDF</button><button onclick="copyTxt()">📋 复制文本</button></div>';
+
+  document.getElementById('report').innerHTML=h;
+  document.getElementById('report').classList.add('show');
+  document.getElementById('input').style.display='none';
+  location.hash='#'+btoa(unescape(encodeURIComponent(JSON.stringify({age:d.age,sex:d.sex,residence:d.residence,focus:d.focus,extra:d.extra}))));
+
+  html += renderLifeplanDashboardR38();
+}
+
+function restoreFromHash(){
+  const h=location.hash.slice(1);
+  if(!h) return;
+  try{
+    const d=JSON.parse(decodeURIComponent(escape(atob(h))));
+    if(d.age) document.getElementById('lAge').value=d.age;
+    if(d.sex) document.getElementById('lSex').value=d.sex;
+    if(d.residence) document.getElementById('lResidence').value=d.residence;
+    if(d.focus) document.getElementById('lFocus').value=d.focus;
+    if(d.extra) document.getElementById('lExtra').value=d.extra;
+    generate();
+  }catch(e){}
+}
+
+function shareUrl(){
+  const url=location.href;
+  if(navigator.share){navigator.share({title:'人生规划蓝图',url}).catch(()=>{});}
+  else if(navigator.clipboard){navigator.clipboard.writeText(url).then(()=>showToast('链接已复制'));}
+  else prompt('复制链接分享：',url);
+}
+
+function copyTxt(){
+  if(navigator.clipboard){navigator.clipboard.writeText(document.getElementById('report').innerText).then(()=>showToast('已复制'));}
+}
+
+function showToast(m){
+  const t=document.createElement('div');
+  t.textContent=m;
+  t.style.cssText='position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:rgba(201,168,76,.9);color:#0a0a0a;padding:10px 24px;border-radius:8px;font-size:14px;z-index:1000';
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),1800);
+}
+
+window.addEventListener('DOMContentLoaded',restoreFromHash);
+/* ===== R38-A lifeplan-detail 双核仪表盘 ===== */
+var LP_HEALTH_8D_R38={"气血":{"label":"🩸 气血","icon":"🩸","tip":"规律作息+八段锦+红枣枸杞"},"脾胃":{"label":"🍚 脾胃","icon":"🍚","tip":"细嚼慢咽+小米粥+山药"},"心肾":{"label":"💗 心肾","icon":"💗","tip":"子午觉+黑豆黑芝麻+节欲"},"肝胆":{"label":"🌿 肝胆","icon":"🌿","tip":"少熬夜+菊花枸杞+推肝经"},"睡眠":{"label":"😴 睡眠","icon":"😴","tip":"23点前睡+酸枣仁+热水泡脚"},"情绪":{"label":"😊 情绪","icon":"😊","tip":"冥想+运动+倾诉+疏肝"},"体质":{"label":"💪 体质","icon":"💪","tip":"慢跑+游泳+中医调理+九种体质"},"寿元":{"label":"🎂 寿元","icon":"🎂","tip":"顺应四时+节制饮食+心境平和"}};
+var LP_CAREER_8D_R38={"正财":{"label":"💰 正财","icon":"💰","tip":"稳中求进+主业为重+积累技能"},"偏财":{"label":"🎲 偏财","icon":"🎲","tip":"小额试水+长线思维+风险控制"},"官运":{"label":"👔 官运","icon":"👔","tip":"贵人扶持+业绩+持续学习+等待时机"},"学业":{"label":"📚 学业","icon":"📚","tip":"夯实基础+查漏补缺+请家教+选对方法"},"创业":{"label":"🚀 创业","icon":"🚀","tip":"小步快跑+核心壁垒+现金流+合伙人"},"升迁":{"label":"📈 升迁","icon":"📈","tip":"业绩+人际+学习+抓住时机+主动争取"},"同事":{"label":"👥 同事","icon":"👥","tip":"互相尊重+团队协作+不站队+做好本职"},"合作":{"label":"🤝 合作","icon":"🤝","tip":"契约精神+互惠互利+长期主义+账目清晰"}};
+var LP_4STAGE_R38={"学龄前":{"label":"👶 学龄前","age":"0-6","tip":"天赋发掘+兴趣培养+体质筑基+亲子陪伴"},"中小学":{"label":"🧒 中小学","age":"7-17","tip":"学业基础+性格塑造+特长培养+志愿规划"},"大学":{"label":"🎓 大学","age":"18-23","tip":"专业精进+实习历练+人脉拓展+职业起步"},"职场婚恋":{"label":"💼 职场婚恋","age":"24+","tip":"事业精进+择偶成家+理财规划+家庭建设"}};
+function renderLifeplanDashboardR38(){
+  var hS=76;var cS=78;
+  var h='<div class="lp-dash">';
+  h+='<div class="lp-dash-title">📅 人生规划·健康事业双核 + 4 阶段蓝图（8 健康维 + 8 事业维 + 4 人生阶段 + 22 古籍）</div>';
+  h+='<div class="lp-dash-dual">';
+  h+='<div class="lp-card health"><div class="lp-card-title">🩺 健康维度</div><div class="lp-card-score">'+hS+'<span style="font-size:13px;opacity:.6">/100</span></div><div class="lp-card-bar"><div class="lp-card-fill" style="width:'+hS+'%"></div></div><div style="font-size:11px;opacity:.7;margin-top:6px">🩸 气血 + 🍚 脾胃 + 💗 心肾 + 🌿 肝胆 + 😴 睡眠 + 😊 情绪 + 💪 体质 + 🎂 寿元</div></div>';
+  h+='<div class="lp-card career"><div class="lp-card-title">💼 事业维度</div><div class="lp-card-score">'+cS+'<span style="font-size:13px;opacity:.6">/100</span></div><div class="lp-card-bar"><div class="lp-card-fill" style="width:'+cS+'%"></div></div><div style="font-size:11px;opacity:.7;margin-top:6px">💰 正财 + 🎲 偏财 + 👔 官运 + 📚 学业 + 🚀 创业 + 📈 升迁 + 👥 同事 + 🤝 合作</div></div>';
+  h+='</div>';
+  h+='<div style="margin:10px 0 8px;color:var(--paper3);font-size:12px;letter-spacing:1.5px">📋 4 人生阶段蓝图</div>';
+  h+='<div class="lp-stage">';
+  Object.keys(LP_4STAGE_R38).forEach(function(k){var it=LP_4STAGE_R38[k];
+    h+='<div class="lp-stage-cell" onclick="alert(\''+it.label+'（'+it.age+'岁）\\n\\n行动建议：'+it.tip+'\')"><b>'+it.label+'</b><div style="font-size:11px;color:var(--gold);margin:4px 0">'+it.age+'岁</div><div style="font-size:10px;opacity:.7;line-height:1.5">'+it.tip+'</div></div>';
+  });
+  h+='</div>';
+  h+='<div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px">';
+  h+='<div><div style="font-size:12px;color:#4a9a6e;margin-bottom:6px;letter-spacing:1px">🩺 8 健康维（点击查看详情）</div><div class="lp-8grid">';
+  Object.keys(LP_HEALTH_8D_R38).forEach(function(k){var it=LP_HEALTH_8D_R38[k];
+    h+='<div class="lp-8cell" onclick="alert(\''+it.label+'\\n\\n建议：'+it.tip+'\')"><span class="icon">'+it.icon+'</span><b>'+it.label+'</b><div class="tip">'+it.tip+'</div></div>';
+  });
+  h+='</div></div>';
+  h+='<div><div style="font-size:12px;color:#4a8aa8;margin-bottom:6px;letter-spacing:1px">💼 8 事业维（点击查看详情）</div><div class="lp-8grid">';
+  Object.keys(LP_CAREER_8D_R38).forEach(function(k){var it=LP_CAREER_8D_R38[k];
+    h+='<div class="lp-8cell" onclick="alert(\''+it.label+'\\n\\n建议：'+it.tip+'\')"><span class="icon">'+it.icon+'</span><b>'+it.label+'</b><div class="tip">'+it.tip+'</div></div>';
+  });
+  h+='</div></div>';
+  h+='</div>';
+  h+='<div class="lp-verdict"><b style="color:var(--gold)">📅 人生规划总纲：</b><br>① 健康 '+hS+' 分·事业 '+cS+' 分—— 双核均衡者，人生稳步上扬 ② 4 阶段顺序不可颠倒：<b>学龄前筑基 → 中小学塑型 → 大学精进 → 职场婚恋</b> ③ 每阶段健康+事业双线并行，不可偏废 ④ 化解要点：<b style="color:#4a9a6e">健康打底</b>·<b style="color:#4a8aa8">事业领跑</b>·家业传承·终身学习</div>';
+
+/* R41-B 12领域矩阵 */
+var LP_12_DOMAIN_R41 = {
+  "学龄前":{
+    domains:[
+      {n:"先天禀赋",score:85,tip:"遗传+孕期养护"},
+      {n:"亲子陪伴",score:90,tip:"0-3岁关键期"},
+      {n:"体质筑基",score:78,tip:"饮食起居"},
+      {n:"语言开发",score:82,tip:"2-3岁爆发"},
+      {n:"艺术启蒙",score:75,tip:"音乐美术"},
+      {n:"社交萌芽",score:72,tip:"同伴互动"},
+      {n:"性格雏形",score:80,tip:"安全感建立"},
+      {n:"兴趣发现",score:77,tip:"观察引导"},
+      {n:"体质偏弱",score:68,tip:"脾胃养护"},
+      {n:"学前准备",score:70,tip:"幼小衔接"},
+      {n:"家教家风",score:88,tip:"耳濡目染"},
+      {n:"健康档案",score:75,tip:"建立台账"}
+    ]
+  },
+  "中小学":{
+    domains:[
+      {n:"学业基础",score:82,tip:"小学奠基"},
+      {n:"品德塑造",score:88,tip:"三观形成"},
+      {n:"特长培养",score:78,tip:"艺体科技"},
+      {n:"志愿规划",score:72,tip:"升学方向"},
+      {n:"心理疏导",score:75,tip:"青春期"},
+      {n:"社交能力",score:80,tip:"同学关系"},
+      {n:"健康运动",score:83,tip:"近视肥胖"},
+      {n:"家校协作",score:85,tip:"共同教育"},
+      {n:"兴趣深耕",score:77,tip:"一技之长"},
+      {n:"阅读习惯",score:86,tip:"终生受益"},
+      {n:"自理能力",score:79,tip:"生活独立"},
+      {n:"升学目标",score:74,tip:"中考高考"}
+    ]
+  },
+  "大学":{
+    domains:[
+      {n:"专业精进",score:85,tip:"专业排名"},
+      {n:"实习历练",score:78,tip:"职场初探"},
+      {n:"人脉拓展",score:82,tip:"同学师长"},
+      {n:"考证考级",score:75,tip:"职业资格"},
+      {n:"出国交换",score:70,tip:"国际视野"},
+      {n:"科研参与",score:73,tip:"学术入门"},
+      {n:"创业试水",score:68,tip:"校园孵化"},
+      {n:"毕业去向",score:80,tip:"考研就业"},
+      {n:"健康管理",score:76,tip:"作息规律"},
+      {n:"理财起步",score:65,tip:"记账预算"},
+      {n:"婚姻萌芽",score:60,tip:"校园恋情"},
+      {n:"毕业储备",score:77,tip:"求职准备"}
+    ]
+  },
+  "职场婚恋":{
+    domains:[
+      {n:"事业精进",score:82,tip:"升迁加薪"},
+      {n:"择偶成家",score:75,tip:"婚恋时机"},
+      {n:"理财规划",score:78,tip:"资产配置"},
+      {n:"家庭建设",score:85,tip:"夫妻关系"},
+      {n:"子女教育",score:80,tip:"言传身教"},
+      {n:"健康维护",score:72,tip:"中年养生"},
+      {n:"父母赡养",score:83,tip:"孝道责任"},
+      {n:"职场瓶颈",score:68,tip:"二次创业"},
+      {n:"退休规划",score:65,tip:"老有所为"},
+      {n:"社会贡献",score:78,tip:"公益传承"},
+      {n:"家业传承",score:72,tip:"家训家风"},
+      {n:"精神修养",score:77,tip:"心斋坐忘"}
+    ]
+  }
+};
+
+function renderLP_12Domain_R41(){
+  var h = '';
+  Object.keys(LP_12_DOMAIN_R41).forEach(function(stage){
+    var sd = LP_12_DOMAIN_R41[stage];
+    var avg = Math.round(sd.domains.reduce(function(s,x){return s+x.score;},0)/sd.domains.length);
+    h += '<div class="lp-stage-block">';
+    h += '<h3 style="color:var(--gold);font-size:16px;margin:16px 0 10px;border-left:3px solid var(--gold);padding-left:10px">📊 '+stage+'·12领域矩阵（均分 '+avg+'）</h3>';
+    h += '<div class="lp-12-domain-grid">';
+    sd.domains.forEach(function(d){
+      var color = d.score>=80?'#4a9a6e':(d.score>=70?'#d4af37':'#d45050');
+      h += '<div class="lp-12-domain-card">';
+      h += '<div class="lp-12-domain-name">'+d.n+'</div>';
+      h += '<div class="lp-12-domain-score" style="color:'+color+'">'+d.score+'</div>';
+      h += '<div class="lp-12-domain-tip">'+d.tip+'</div>';
+      h += '</div>';
+    });
+    h += '</div></div>';
+  });
+  return h;
+}
+
+  h+='<div class="lp-source">📜 综合《滴天髓》《子平真诠》《穷通宝鉴》《三命通会》《紫微斗数全集》《太乙金华宗旨》《黄帝内经》《千金要方》《伤寒杂病论》《本草纲目》《了凡四训》《阴骘文》《太上感应篇》《玉历宝钞》《葬书》《撼龙经》《八宅明镜》《玄空飞星》《阳宅三要》《协纪辨方书》《天星择日》《三世因果经》共 22 部古籍</div>';
+  h+='</div>';
+  return h;
+}
+</script>
+
+<!-- R41-B lifeplan-detail 4 阶段 HTML -->
+<h2 style="color:#63b3ed;margin:24px 0 12px">📅 人生四阶段时间轴</h2>
+<div id="lp-stage-timeline" class="lp-stage-timeline"></div>
+<script>document.getElementById("lp-stage-timeline").innerHTML += renderLP_12Domain_R41();</script>
+<h2 style="color:#63b3ed;margin:24px 0 12px">🎯 四阶段·十二领域深度规划</h2>
+<div id="section-lp-children"></div>
+<div id="section-lp-teen"></div>
+<div id="section-lp-young"></div>
+<div id="section-lp-mid"></div>
+
+/* R41-B lifeplan-detail 4 阶段深度补强 JS */
+(function(){
+  window.LP_4STAGES = {
+    children: { // 学龄前 0-6 岁
+      name: "学龄前·孕育奠基",
+      emoji: "🍼",
+      ageRange: "0-6 岁",
+      color: "#ffb44d",
+      domains: {
+        study: { score: 60, tip: "天赋萌芽期,以游戏和感知探索为主,忌过早知识灌输" },
+        career: { score: 30, tip: "无职业概念,主要是亲子陪伴与早期启蒙" },
+        wealth: { score: 50, tip: "父母财力决定,孩子无直接财富关联" },
+        marriage: { score: 40, tip: "无婚姻概念,但父母关系深刻影响未来亲密关系模式" },
+        health: { score: 80, tip: "先天体质培育期,母乳喂养、规律作息、充足睡眠是关键" },
+        city: { score: 50, tip: "城市选择影响教育资源,但 6 岁前影响有限" },
+        culture: { score: 60, tip: "家庭文化氛围熏陶期,父母言行举止是最直接的文化输入" },
+        cultivation: { score: 70, tip: "性情养成期,关键期,性格底色基本在这一阶段奠定" },
+        network: { score: 50, tip: "亲子关系是首要关系,扩展与同龄玩伴初步社交" },
+        venture: { score: 20, tip: "无创业概念,父母可适度培养财商意识" },
+        elderly: { score: 50, tip: "无养老概念,但祖辈陪伴可建立家族情感纽带" },
+        legacy: { score: 60, tip: "家风、家训的耳濡目染期,耳濡目染胜过言传" }
+      },
+      advice: "这一阶段最重要的是:1. 充足的爱与安全感;2. 健康的体魄;3. 规律的生活节奏;4. 父母以身作则;5. 远离电子产品;6. 多接触自然。忌:过度早教、暴力教育、忽视陪伴、隔代抚养完全替代亲子关系。"
+    },
+    teen: { // 小学中学 6-18 岁
+      name: "小学中学·性格塑型",
+      emoji: "📚",
+      ageRange: "6-18 岁",
+      color: "#c084fc",
+      domains: {
+        study: { score: 85, tip: "学业核心期,学习方法、习惯养成、兴趣培养是关键。应试与素质并重。" },
+        career: { score: 40, tip: "开始有理想萌芽,可参加职业体验日、社会实践活动" },
+        wealth: { score: 30, tip: "无独立财富,但应建立零花钱管理与储蓄习惯" },
+        marriage: { score: 30, tip: "青春期对异性有朦胧好感,但应引导正确婚恋观,忌早恋影响学业" },
+        health: { score: 75, tip: "身高发育、近视防控、心理健康三大重点。保证睡眠、加强运动" },
+        city: { score: 60, tip: "城市教育资源差异开始显现,小升初、初升高是关键节点" },
+        culture: { score: 70, tip: "文化课与艺术修养并行,培养 1-2 项长期爱好" },
+        cultivation: { score: 75, tip: "三观形成期,父母与老师的引导至关重要。阅读经典、亲近自然" },
+        network: { score: 70, tip: "同学关系是重要人际关系,学会合作、分享、解决冲突" },
+        venture: { score: 40, tip: "可参加青少年创业大赛、科技创新活动,培养创新思维" },
+        elderly: { score: 50, tip: "开始理解生死与家族传承,可适度参与祖辈养老活动" },
+        legacy: { score: 65, tip: "明确家训、家规、家族故事,孩子建立家族认同感" }
+      },
+      advice: "这一阶段最重要的是:1. 培养独立学习能力;2. 建立 1-2 项运动爱好;3. 重视心理健康;4. 引导正确婚恋观;5. 培养时间管理与自律;6. 拓宽视野(旅行、阅读、社会实践)。忌:唯分数论、过度补课、忽视体育、沉迷游戏、家长控制欲过强。"
+    },
+    young: { // 大学/职场新人 18-28 岁
+      name: "大学职场·定位起步",
+      emoji: "🎓",
+      ageRange: "18-28 岁",
+      color: "#78c878",
+      domains: {
+        study: { score: 80, tip: "大学专业选择影响职业起点,但兴趣与天赋比热门更重要。可辅修、跨专业、考研" },
+        career: { score: 85, tip: "职业定位关键期。前 3 份工作决定职业方向。选对行业、跟对师傅、持续学习" },
+        wealth: { score: 60, tip: "开始有独立收入。理财第一课:储蓄、保险、必要基金。忌月光、过度消费" },
+        marriage: { score: 50, tip: "恋爱黄金期,但 28 岁前不应急婚。择偶看人品、上进心、原生家庭" },
+        health: { score: 70, tip: "身体巅峰期,但要警惕熬夜、饮食不规律、缺乏运动。年度体检必备" },
+        city: { score: 75, tip: "城市选择影响视野与机会。一线城市机会多但压力大,新一线性价比高" },
+        culture: { score: 70, tip: "深度阅读、专业考证、跨学科学习。专业+通识是核心竞争力" },
+        cultivation: { score: 75, tip: "世界观、价值观成熟期。多与高人交往,远离负能量圈子" },
+        network: { score: 75, tip: "弱关系决定机会。同学、同事、兴趣圈、行业社群都要经营" },
+        venture: { score: 70, tip: "创业尝试期。可副业起步,小成本试错,不宜过早All in" },
+        elderly: { score: 40, tip: "赡养祖辈是美德,也是家族情感纽带" },
+        legacy: { score: 60, tip: "思考人生意义,初步规划 5-10 年方向" }
+      },
+      advice: "这一阶段最重要的是:1. 选对行业与第一份工作;2. 建立深度专业能力;3. 储蓄与投资意识起步;4. 健康生活习惯固化;5. 拓展高质量人脉;6. 恋爱但不急婚;7. 持续学习+跨界视野。忌:频繁跳槽(每份<1年)、盲目创业、攀比消费、远离父母、拒绝学习。"
+    },
+    mid: { // 30-50 岁 中年成熟
+      name: "中年成熟·事业家庭双成",
+      emoji: "🏛️",
+      ageRange: "30-50 岁",
+      color: "#f87171",
+      domains: {
+        study: { score: 70, tip: "持续学习避免被淘汰。MBA、行业认证、新技能培训" },
+        career: { score: 90, tip: "事业黄金期,深耕行业或转型创业。35 岁前确定方向,40 岁前建立护城河" },
+        wealth: { score: 85, tip: "财富积累高峰期。资产配置:房产+股票+基金+保险+应急金。避免过度加杠杆" },
+        marriage: { score: 80, tip: "婚姻经营关键期。夫妻沟通、共同成长、保持新鲜感、处理好双方家庭关系" },
+        health: { score: 60, tip: "健康开始走下坡路。年度体检必备,警惕三高、颈椎、心理问题。坚持运动+饮食控制" },
+        city: { score: 70, tip: "可考虑置换改善型住房,或为子女教育换城市" },
+        culture: { score: 75, tip: "成为行业意见领袖,著书立说、传承经验" },
+        cultivation: { score: 85, tip: "精神成熟期。修身、齐家、参与公益、回馈社会" },
+        network: { score: 85, tip: "高端人脉变现期。同学会、行业大会、私董会,人脉即钱脉" },
+        venture: { score: 75, tip: "创业或投资的最佳年龄。资源、人脉、经验、胆识都到位" },
+        elderly: { score: 70, tip: "赡养父母是责任,也是给孩子做榜样。关注父母身心健康" },
+        legacy: { score: 80, tip: "传承家业、家风、家训。培养子女接班或独立,留下家族精神财富" }
+      },
+      advice: "这一阶段最重要的是:1. 事业护城河+财务自由;2. 婚姻保鲜+亲子教育;3. 健康管理+定期体检;4. 父母赡养+家风传承;5. 人脉深耕+跨界合作;6. 公益参与+社会贡献;7. 培养接班人+资产配置。忌:事业家庭失衡、过度投资、忽视健康、婚姻破裂、亲子关系淡漠。"
+    }
+  };
+
+  function renderLP4Stages() {
+    Object.entries(window.LP_4STAGES).forEach(([key, stage]) => {
+      const container = document.getElementById('section-lp-' + key);
+      if (!container) return;
+      let html = '<div class="lp-stage-section">';
+      html += '<div class="lp-stage-title">' + stage.emoji + ' ' + stage.name + ' (' + stage.ageRange + ')</div>';
+      html += '<div class="lp-stage-grid">';
+      Object.entries(stage.domains).forEach(([dk, dv]) => {
+        const scoreClass = dv.score >= 75 ? 'good' : dv.score >= 50 ? 'mid' : 'bad';
+        const domainNames = { study:'学业', career:'事业', wealth:'财运', marriage:'婚姻', health:'健康', city:'城市', culture:'文化', cultivation:'修养', network:'人脉', venture:'创业', elderly:'养老', legacy:'传承' };
+        html += '<div class="lp-stage-card">';
+        html += '<div class="lp-stage-card-title">' + (domainNames[dk] || dk) + ' <span class="lp-' + key + '-tag lp-stage-tag" style="color:' + stage.color + '">' + dv.score + '分</span></div>';
+        html += '<div class="lp-stage-card-content">' + dv.tip + '</div>';
+        html += '</div>';
+      });
+      html += '</div>';
+      html += '<div style="margin-top:16px;padding:12px;background:rgba(99,179,237,0.05);border-radius:8px;color:#c5d1de;font-size:13px;line-height:1.8"><strong style="color:' + stage.color + '">本阶段总纲:</strong> ' + stage.advice + '</div>';
+      html += '</div>';
+      container.innerHTML = html;
+    });
+    // 渲染时间轴
+    const timelineEl = document.getElementById('lp-stage-timeline');
+    if (timelineEl) {
+      let html = '';
+      const order = ['children','teen','young','mid'];
+      const ages = ['0-6 岁','6-18 岁','18-28 岁','30-50 岁'];
+      order.forEach((k, i) => {
+        const s = window.LP_4STAGES[k];
+        html += '<div class="lp-stage-timeline-item"><div class="lp-stage-timeline-age">' + s.emoji + ' ' + ages[i] + '</div><div class="lp-stage-timeline-name">' + s.name + '</div></div>';
+      });
+      timelineEl.innerHTML = html;
+    }
+  }
+  window.renderLP4Stages = renderLP4Stages;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderLP4Stages);
+  } else {
+    setTimeout(renderLP4Stages, 100);
+  }
+})();
+
+</body>
+</html>

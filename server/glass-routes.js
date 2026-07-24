@@ -188,4 +188,89 @@ router.get('/devices', deviceAuth, async (req, res) => {
   }
 });
 
+// === Glass 历史会话（按设备 token 查） ===
+router.get('/history', deviceAuth, async (req, res) => {
+  try {
+    const { DatabaseSync } = require('node:sqlite');
+    const path = require('path');
+    const db = new DatabaseSync(path.join(__dirname, 'database', 'yidao.db'));
+    db.exec(`CREATE TABLE IF NOT EXISTS glass_sessions (
+      id            INTEGER PRIMARY KEY AUTOINCREMENT,
+      device_token  TEXT NOT NULL,
+      title         TEXT NOT NULL,
+      status        TEXT NOT NULL DEFAULT 'active',
+      summary       TEXT,
+      created_at    INTEGER NOT NULL,
+      updated_at    INTEGER NOT NULL
+    )`);
+    db.exec(`CREATE INDEX IF NOT EXISTS idx_glass_hist ON glass_sessions(device_token, updated_at DESC)`);
+    const token = req.deviceToken;
+    const rows = db.prepare(
+      `SELECT id, title, status, summary, created_at, updated_at
+       FROM glass_sessions WHERE device_token = ?
+       ORDER BY updated_at DESC LIMIT 50`
+    ).all(token);
+    return ok(res, { list: rows, total: rows.length }, '历史会话获取成功');
+  } catch (e) {
+    return fail(res, 500001, '历史会话获取失败: ' + e.message);
+  }
+});
+
+// === Glass 保存历史会话（前端主动写入） ===
+router.post('/history', deviceAuth, async (req, res) => {
+  try {
+    const { DatabaseSync } = require('node:sqlite');
+    const path = require('path');
+    const db = new DatabaseSync(path.join(__dirname, 'database', 'yidao.db'));
+    db.exec(`CREATE TABLE IF NOT EXISTS glass_sessions (
+      id            INTEGER PRIMARY KEY AUTOINCREMENT,
+      device_token  TEXT NOT NULL,
+      title         TEXT NOT NULL,
+      status        TEXT NOT NULL DEFAULT 'active',
+      summary       TEXT,
+      created_at    INTEGER NOT NULL,
+      updated_at    INTEGER NOT NULL
+    )`);
+    const { title, status='active', summary='' } = req.body || {};
+    if (!title) return bad(res, '缺少 title 字段');
+    const now = Date.now();
+    const r = db.prepare(
+      `INSERT INTO glass_sessions(device_token, title, status, summary, created_at, updated_at)
+       VALUES(?, ?, ?, ?, ?, ?)`
+    ).run(req.deviceToken, title, status, summary, now, now);
+    return ok(res, { id: r.lastInsertRowid }, '历史会话保存成功');
+  } catch (e) {
+    return fail(res, 500001, '历史会话保存失败: ' + e.message);
+  }
+});
+
+// === Glass demo 端点（R45-C 修复） ===
+router.get('/demo', (req, res) => {
+  try {
+    return ok(res, {
+      mode: 'demo',
+      features: [
+        { name: 'fortune-today', desc: '今日运势', method: 'GET', path: '/api/glass/fortune-today' },
+        { name: 'health-tips', desc: '健康提示', method: 'GET', path: '/api/glass/health-tips' },
+        { name: 'ai-suggestions', desc: 'AI 引导建议', method: 'GET', path: '/api/glass/ai-suggestions' },
+        { name: 'devices', desc: '设备列表', method: 'GET', path: '/api/glass/devices' },
+        { name: 'ocr', desc: 'OCR 识别', method: 'POST', path: '/api/glass/ocr' },
+        { name: 'heartbeat', desc: '心跳', method: 'POST', path: '/api/glass/heartbeat' },
+        { name: 'upload-audio', desc: '上传音频', method: 'POST', path: '/api/glass/upload-audio' },
+        { name: 'analyze', desc: '上下文分析', method: 'POST', path: '/api/glass/analyze' },
+        { name: 'stream', desc: '流式对话(SSE)', method: 'GET', path: '/api/glass/stream/:sessionId' },
+        { name: 'history', desc: '历史会话查询', method: 'GET', path: '/api/glass/history' },
+        { name: 'history-save', desc: '历史会话保存', method: 'POST', path: '/api/glass/history' }
+      ],
+      total: 11,
+      deviceTokenFormat: 'GL-XXXX prefix required',
+      sampleToken: 'GL-DEMO1234',
+      note: '演示模式，无需鉴权即可查看端点清单',
+      generatedAt: new Date().toISOString()
+    }, 'Glass demo 端点清单');
+  } catch (e) {
+    return fail(res, 500001, 'demo 异常: ' + e.message);
+  }
+});
+
 module.exports = router;

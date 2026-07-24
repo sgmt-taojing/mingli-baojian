@@ -109,6 +109,24 @@ function requirePermission(permission) {
   };
 }
 
+// === 可选鉴权中间件（无 token 当 GUEST；用于 KB 列表等公开浏览接口） ===
+function optionalAuth(req, res, next) {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (token) {
+    const payload = sec.verifyToken(token);
+    if (payload) {
+      req.userId = payload.uid;
+      req.userRoles = payload.roles || ['guest'];
+      req.userPayload = payload;
+      return next();
+    }
+  }
+  req.userId = null;
+  req.userRoles = ['guest'];
+  req.userPayload = null;
+  next();
+}
+
 // === 兼容旧版auth中间件 ===
 function auth(req, res, next) {
   const token = req.headers.authorization?.replace('Bearer ', '');
@@ -241,6 +259,7 @@ module.exports = {
   PERMISSIONS,
   requirePermission,
   auth,
+  optionalAuth,
   adminAuth,
   filterZhouyiTerms,
   // 重新导出security-v2的工具

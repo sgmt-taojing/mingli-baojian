@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" var(--ink)>
+<title>生命指数全鉴 · 易道智鉴</title>
+<meta name="description" content="10 维度生命指数评估：事业/财运/健康/婚姻/学业/家庭/人际/精神/享福/寿元。可分享、可打印。">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#0a0a0a;--paper:#f5f1e8;--gold:#c9a84c;--gold2:#a07c2a;--bronze:#8c6a30;--line:rgba(201,168,76,.2);--r:10px}
+body{font-family:'Noto Serif SC',serif;background:linear-gradient(135deg,#0a0a0a,#1a1208);color:var(--paper);min-height:100vh;padding:20px;line-height:1.7}
+.wrap{max-width:680px;margin:0 auto}
+header{text-align:center;padding:24px 0 16px;border-bottom:1px solid var(--line);margin-bottom:24px}
+h1{font-size:24px;font-weight:500;color:var(--gold);letter-spacing:4px;margin-bottom:6px}
+header p{font-size:12px;opacity:.55;letter-spacing:1px}
+.card{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.card h2{font-size:14px;color:var(--gold);font-weight:500;border-left:3px solid var(--gold);padding-left:10px;margin-bottom:12px;letter-spacing:1px}
+label{display:block;font-size:12px;opacity:.7;margin-bottom:4px;margin-top:10px}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit;font-size:14px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--gold)}
+textarea{min-height:60px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:480px){.row{grid-template-columns:1fr}}
+.btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),var(--bronze));color:#0a0a0a;font:inherit;font-size:15px;font-weight:600;border:none;border-radius:var(--r);cursor:pointer;letter-spacing:4px;margin-top:8px}
+.btn:hover:not(:disabled){box-shadow:0 6px 18px rgba(201,168,76,.3)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.report{display:none}
+.report.show{display:block;animation:fadein .4s}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.banner{text-align:center;padding:22px 16px;margin:18px 0;background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(201,168,76,.04));border-radius:var(--r);border:1px solid var(--line)}
+.banner .ele{font-size:42px;color:var(--gold);font-weight:600;letter-spacing:6px;font-family:'Noto Serif SC',serif}
+.banner .total{font-size:24px;color:var(--gold2);margin-top:4px;font-weight:600}
+.banner .total small{font-size:14px;opacity:.6;font-weight:400}
+.banner .grade{font-size:13px;opacity:.75;margin-top:6px}
+.banner .focus{font-size:12px;color:var(--gold2);margin-top:8px;letter-spacing:1px}
+.ele-tag{display:inline-block;padding:4px 12px;background:rgba(201,168,76,.15);border-radius:14px;font-size:12px;color:var(--gold2);margin:2px}
+/* 维度表 */
+.dims{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+@media(max-width:480px){.dims{grid-template-columns:1fr}}
+.dim{padding:10px 12px;background:rgba(201,168,76,.04);border-radius:8px;border-left:3px solid var(--gold);display:flex;align-items:center;gap:10px}
+.dim .ico{font-size:22px;flex-shrink:0}
+.dim .info{flex:1;min-width:0}
+.dim .nm{font-size:13px;opacity:.85;display:flex;justify-content:space-between}
+.dim .focus{font-size:10px;opacity:.55;margin-top:2px}
+.dim .num{font-size:17px;color:var(--gold);font-weight:600;flex-shrink:0;margin-left:8px}
+/* 高低 */
+.top-bot{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:480px){.top-bot{grid-template-columns:1fr}}
+.tb-card{padding:14px;border-radius:8px;border:1px solid var(--line)}
+.tb-card.top{background:rgba(116,200,108,.05);border-color:rgba(116,200,108,.2)}
+.tb-card.bot{background:rgba(220,120,108,.05);border-color:rgba(220,120,108,.2)}
+.tb-card h3{font-size:12px;margin-bottom:8px;font-weight:600;letter-spacing:1px}
+.tb-card.top h3{color:#74c86c}
+.tb-card.bot h3{color:#dc786c}
+.tb-card ul{list-style:none;padding:0}
+.tb-card li{font-size:12px;padding:4px 0;opacity:.85}
+/* 行动清单 */
+.ol{padding-left:24px;font-size:14px}
+.ol li{margin:8px 0;line-height:1.6}
+/* 5年 */
+.fy{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.fy-row{display:flex;gap:10px;padding:8px 12px;background:rgba(201,168,76,.04);border-radius:6px;align-items:center}
+.fy-y{font-size:13px;color:var(--gold);font-weight:600;min-width:60px}
+/* 总结 */
+.summary{font-size:13px;opacity:.9;padding:14px;background:rgba(201,168,76,.05);border-radius:8px;margin-top:10px;line-height:1.8}
+.tools{display:flex;gap:8px;margin:18px 0}
+.tools button{flex:1;padding:10px;font:inherit;font-size:13px;background:rgba(255,255,255,.05);color:var(--paper);border:1px solid var(--line);border-radius:6px;cursor:pointer}
+.tools button:hover{background:rgba(201,168,76,.1);border-color:var(--gold)}
+@media print{body{background:#fff;color:#000;padding:10px}.card,.banner,.dim,.tb-card,.fy-row{background:#fafafa !important;color:#000 !important;border:1px solid #ccc !important}.btn,.tools,#input{display:none !important}.banner .ele,.banner .total,.card h2,.dim .num{color:#000 !important}h1{color:#000}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>生命指数全鉴</h1>
+    <p>10 维度 · 五行偏重 · 易道智鉴</p>
+  </header>
+  <div class="card" id="input">
+    <h2>📋 基础信息</h2>
+    <div class="row">
+      <div><label>五行主属</label>
+        <select id="liEle">
+          <option value="金">金 · 锐进果断</option>
+          <option value="木">木 · 生发学习</option>
+          <option value="水">水 · 智慧灵活</option>
+          <option value="火">火 · 热情表达</option>
+          <option value="土">土 · 稳重承担</option>
+        </select>
+      </div>
+      <div><label>年龄</label><input id="liAge" type="number" min="1" max="120" value="32"></div>
+    </div>
+    <label>关注方向（影响关键词加权）</label>
+    <input id="liFocus" placeholder="例：金融、理财、稳定">
+    <label>补充情况（可选，影响领域细节）</label>
+    <textarea id="liExtra" placeholder="例：金融行业从业5年，已婚一孩，今年开始关注健康"></textarea>
+    <button class="btn" id="genBtn" onclick="generate()">✨ 生成生命指数</button>
+  </div>
+  <div class="report" id="report"></div>
+  <p style="text-align:center;font-size:11px;opacity:.4;margin:24px 0;letter-spacing:1px">易道智鉴 · 仅供参考 · 命数只占 30%，努力占 70%</p>
+</div>
+<script>
+const ELEMENTS = {'金':85,'木':78,'水':82,'火':88,'土':90};
+const ELE_FOCUS = {'金':'锐进+决策+果断','木':'生发+成长+学习','水':'智慧+灵活+沉浸','火':'表达+热情+领导','土':'稳重+承担+储蓄'};
+const ELE_KEYS = {
+  '金':['金','银','金融','财','金属','锐','商业','理财'],
+  '木':['木','林','学','教育','书','生长','花','成长'],
+  '水':['水','海','智慧','智','流动','冥想','灵活'],
+  '火':['火','光','表演','演讲','热','能量','表达'],
+  '土':['土','建筑','稳','田','地产','山','健康','承担']
+};
+const DIMS = [
+  {key:'shiye',name:'事业',icon:'💼',weight:0.20,focus:'职业三跳+管理进阶'},
+  {key:'caiyun',name:'财运',icon:'💰',weight:0.15,focus:'稳健理财+多元收入'},
+  {key:'jiankang',name:'健康',icon:'💪',weight:0.20,focus:'运动+饮食+作息'},
+  {key:'hunyin',name:'婚姻',icon:'💑',weight:0.15,focus:'沟通+包容+共同成长'},
+  {key:'xueye',name:'学业',icon:'📚',weight:0.10,focus:'学历+证书+终身学习'},
+  {key:'jiating',name:'家庭',icon:'🏡',weight:0.05,focus:'子女教育+亲情'},
+  {key:'renji',name:'人际',icon:'🤝',weight:0.05,focus:'深度关系+同行圈子'},
+  {key:'jingshen',name:'精神',icon:'🎭',weight:0.05,focus:'信仰+哲学+艺术'},
+  {key:'xiangfu',name:'享福',icon:'🌸',weight:0.03,focus:'体验+旅行+生活品质'},
+  {key:'shouyuan',name:'寿元',icon:'🍵',weight:0.02,focus:'养生+保健+定期体检'}
+];
+
+function generate(){
+  const btn=document.getElementById('genBtn');
+  btn.disabled=true; btn.textContent='⏳ 生成中...';
+  setTimeout(()=>{
+    try{
+      const ele=document.getElementById('liEle').value;
+      const age=parseInt(document.getElementById('liAge').value)||32;
+      const focus=document.getElementById('liFocus').value.trim();
+      const extra=document.getElementById('liExtra').value.trim();
+      const userText=(focus+' '+extra).trim();
+      const base=ELEMENTS[ele]||85;
+      let boost=0;
+      (ELE_KEYS[ele]||[]).forEach(k=>{ if(userText.includes(k)) boost+=3; });
+      const result=DIMS.map(d=>{
+        let bias=0;
+        if(ele==='金'&&['caiyun','shiye'].includes(d.key)) bias+=8;
+        if(ele==='木'&&['xueye','jingshen'].includes(d.key)) bias+=8;
+        if(ele==='水'&&['renji','jingshen'].includes(d.key)) bias+=8;
+        if(ele==='火'&&['renji','xiangfu'].includes(d.key)) bias+=8;
+        if(ele==='土'&&['jiankang','shouyuan'].includes(d.key)) bias+=8;
+        if(d.weight<=0.05) bias-=3;
+        const noise=Math.floor(Math.abs(Math.sin(d.key.charCodeAt(0)*age))*8)-4;
+        const score=Math.max(30,Math.min(99,Math.round(base*0.7+d.weight*100+boost+bias+noise)));
+        return {...d,score,bias:bias>0?`+${bias}`:bias<0?`${bias}`:''};
+      });
+      const total=Math.round(result.reduce((s,d)=>s+d.score*d.weight,0));
+      const sorted=[...result].sort((a,b)=>b.score-a.score);
+      const top3=sorted.slice(0,3).map(d=>d.name);
+      const bot2=sorted.slice(-2).map(d=>d.name);
+      let grade=total>=85?'上等命格':total>=75?'中上命格':total>=65?'中等等格':total>=55?'中下等格':'下等命格';
+      const actions=[
+        `【扬长】强化${top3[0]}与${top3[1]||top3[0]}领域，每周投入 5 小时专项`,
+        `【补短】针对性提升${bot2[0]}维度，建立月度复盘`,
+        `【节奏】建立每周一次自我审视，每月一次关键关系回顾`,
+        `【健康】每周运动 ≥ 3 次，作息固定 11 点前入睡`,
+        `【财务】月度预算 + 季度资产盘点，年度投资复盘`,
+        `【精神】每月 1 次深度阅读/艺术/冥想，滋养精神空间`,
+        `【人际】每年新增 5 位高质量同行者，深度关系维护`,
+        `【学习】每年 2 本专业书 + 1 项新技能认证`,
+        `【家庭】每周家庭日固定，每月至少 1 次家庭出行`,
+        `【规划】每季度 OKR 设定 + 年度战略回顾`
+      ];
+      const next5=[
+        {y:1,t:`扬长：强化优势领域（${top3[0]}${top3[1]?'+'+top3[1]:''}）主键能力`},
+        {y:2,t:`补短：针对性提升${bot2[0]}领域`},
+        {y:3,t:'人生换挡期：尝试差异化路径'},
+        {y:4,t:'中段汇总：成果回顾'},
+        {y:5,t:'中期锁势：进入下个五年计划'}
+      ];
+      const summary=`${age}岁，五行属${ele}（${ELE_FOCUS[ele]}），生命指数综合 ${total} 分，${grade}。优势区：${top3.join('、')}。待提升：${bot2.join('、')}。建议聚焦扬长 + 补短并行。`;
+      render({ele,age,total,grade,result,top3,bot2,actions,next5,summary,focus,extra});
+      btn.disabled=false; btn.textContent='🔄 重新生成';
+    }catch(e){
+      alert('生成失败：'+e.message);
+      btn.disabled=false; btn.textContent='✨ 生成生命指数';
+    }
+  }, 250);
+}
+
+function render(d){
+  let h='<div class="banner"><div class="ele">'+d.ele+' · '+d.age+'</div>';
+  h+='<div class="total">'+d.total+' <small>/ 100</small></div>';
+  h+='<div class="grade">'+d.grade+'</div>';
+  h+='<div class="focus">'+ELE_FOCUS[d.ele]+'</div>';
+  h+='<div style="margin-top:10px"><span class="ele-tag">'+d.ele+'主属</span></div></div>';
+
+  h+='<div class="card"><h2>📊 10 维度评分</h2><div class="dims">';
+  d.result.forEach(r=>{
+    h+='<div class="dim"><div class="ico">'+r.icon+'</div><div class="info"><div class="nm"><b>'+r.name+'</b><span style="opacity:.5;font-size:10px">'+r.bias+'</span></div><div class="focus">'+r.focus+'</div></div><div class="num">'+r.score+'</div></div>';
+  });
+  h+='</div></div>';
+
+  h+='<div class="card"><h2>🎯 优势 vs 待提升</h2><div class="top-bot">';
+  h+='<div class="tb-card top"><h3>✅ 优势 Top3</h3><ul>';
+  d.top3.forEach(n=>h+='<li>• '+n+'</li>');
+  h+='</ul></div>';
+  h+='<div class="tb-card bot"><h3>⚠️ 待提升</h3><ul>';
+  d.bot2.forEach(n=>h+='<li>• '+n+'</li>');
+  h+='</ul></div></div></div>';
+
+  h+='<div class="card"><h2>🔮 未来 5 年步进</h2><div class="fy">';
+  d.next5.forEach(p=>h+='<div class="fy-row"><span class="fy-y">第 '+p.y+' 年</span><span>'+p.t+'</span></div>');
+  h+='</div></div>';
+
+  h+='<div class="card"><h2>✅ 行动清单（10 条）</h2><ol class="ol">';
+  d.actions.forEach(a=>h+='<li>'+a+'</li>');
+  h+='</ol></div>';
+
+  h+='<div class="card"><h2>📜 总评</h2><div class="summary">'+d.summary+'</div></div>';
+
+  h+='<div class="tools"><button onclick="shareUrl()">🔗 分享链接</button><button onclick="window.print()">🖨️ 打印/保存 PDF</button><button onclick="copyTxt()">📋 复制文本</button></div>';
+
+  document.getElementById('report').innerHTML=h;
+  document.getElementById('report').classList.add('show');
+  document.getElementById('input').style.display='none';
+  location.hash='#'+btoa(unescape(encodeURIComponent(JSON.stringify({ele:d.ele,age:d.age,focus:d.focus,extra:d.extra}))));
+}
+
+function restoreFromHash(){
+  const h=location.hash.slice(1);
+  if(!h) return;
+  try{
+    const d=JSON.parse(decodeURIComponent(escape(atob(h))));
+    if(d.ele) document.getElementById('liEle').value=d.ele;
+    if(d.age) document.getElementById('liAge').value=d.age;
+    if(d.focus) document.getElementById('liFocus').value=d.focus;
+    if(d.extra) document.getElementById('liExtra').value=d.extra;
+    generate();
+  }catch(e){}
+}
+
+function shareUrl(){
+  const url=location.href;
+  if(navigator.share){navigator.share({title:'生命指数全鉴',url}).catch(()=>{});}
+  else if(navigator.clipboard){navigator.clipboard.writeText(url).then(()=>showToast('链接已复制'));}
+  else prompt('复制链接分享：',url);
+}
+
+function copyTxt(){
+  if(navigator.clipboard){navigator.clipboard.writeText(document.getElementById('report').innerText).then(()=>showToast('已复制'));}
+}
+
+function showToast(m){
+  const t=document.createElement('div');
+  t.textContent=m;
+  t.style.cssText='position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:rgba(201,168,76,.9);color:#0a0a0a;padding:10px 24px;border-radius:8px;font-size:14px;z-index:1000';
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),1800);
+}
+
+window.addEventListener('DOMContentLoaded',restoreFromHash);
+</script>
+</body>
+</html>

@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KB 查漏补缺审计 · 倪师智慧结晶 · A+C 执行报告</title>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --fg: #111;
+    --fg2: #3a3a36;
+    --hairline: rgba(0,0,0,.12);
+    --hairline-strong: rgba(0,0,0,.4);
+    --accent: #6b3410;
+    --accent-soft: rgba(107,52,16,.06);
+    --warn: #8a2a1a;
+    --good: #2d6a4f;
+    --muted: #6b6b65;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, "PingFang SC", "Noto Serif SC", "Source Han Serif SC", serif;
+    font-size: 16px;
+    line-height: 1.65;
+    padding: 64px 0 96px;
+  }
+  .container { max-width: 1180px; margin: 0 auto; padding: 0 56px; }
+  .rule { height: 1px; background: var(--hairline); margin: 32px 0; }
+  .rule-strong { height: 1px; background: var(--hairline-strong); margin: 48px 0; }
+
+  /* Header */
+  header {
+    border-bottom: 1px solid var(--hairline-strong);
+    padding-bottom: 32px;
+    margin-bottom: 64px;
+  }
+  .kicker {
+    font-family: "SF Mono", "Menlo", monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  h1 {
+    font-size: 56px;
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+    color: var(--fg);
+  }
+  .subtitle {
+    font-size: 20px;
+    color: var(--fg2);
+    max-width: 760px;
+    line-height: 1.5;
+    font-weight: 400;
+  }
+  .meta {
+    margin-top: 32px;
+    font-family: "SF Mono", "Menlo", monospace;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    display: flex;
+    gap: 32px;
+  }
+
+  /* Section */
+  section { margin-bottom: 80px; }
+  h2 {
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin-bottom: 24px;
+    padding-top: 8px;
+  }
+  h2 .num {
+    font-family: "SF Mono", "Menlo", monospace;
+    font-size: 13px;
+    color: var(--accent);
+    margin-right: 12px;
+    letter-spacing: 0.04em;
+  }
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 32px 0 12px;
+    color: var(--fg);
+  }
+  p { margin-bottom: 16px; color: var(--fg2); max-width: 760px; }
+  .lead {
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--fg);
+    margin-bottom: 32px;
+  }
+
+  /* KPI strip — used as table-like list, not as cards */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline);
+    margin: 32px 0;
+  }
+  .stat { padding: 24px 16px; border-right: 1px solid var(--hairline); }
+  .stat:last-child { border-right: none; }
+  .stat-num { font-size: 36px; font-weight: 600; letter-spacing: -0.02em; color: var(--fg); }
+  .stat-num small { font-size: 16px; color: var(--muted); margin-left: 4px; font-weight: 400; }
+  .stat-label {
+    font-family: "SF Mono", "Menlo", monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* Module bar chart — pure CSS, no card */
+  .mod-list { border-top: 1px solid var(--hairline); margin-top: 24px; }
+  .mod-row {
+    display: grid;
+    grid-template-columns: 200px 1fr 80px;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--hairline);
+    gap: 16px;
+    font-size: 14px;
+  }
+  .mod-name { font-family: "SF Mono", "Menlo", monospace; color: var(--fg2); font-size: 13px; }
+  .mod-bar-bg { background: rgba(107,52,16,.06); height: 16px; position: relative; }
+  .mod-bar {
+    background: var(--accent);
+    height: 100%;
+    position: absolute;
+    top: 0; left: 0;
+  }
+  .mod-bar.new { background: var(--good); }
+  .mod-cnt { font-family: "SF Mono", "Menlo", monospace; font-size: 13px; color: var(--fg); text-align: right; font-weight: 500; }
+
+  /* Quality table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px;
+    font-size: 14px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  th {
+    font-family: "SF Mono", "Menlo", monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--hairline-strong);
+    font-weight: 500;
+  }
+  td.num { font-family: "SF Mono", "Menlo", monospace; text-align: right; }
+  td.type { font-family: "SF Mono", "Menlo", monospace; font-size: 12px; color: var(--warn); }
+
+  /* Entry list — acupuncture */
+  .entry-list { list-style: none; }
+  .entry-list li {
+    padding: 10px 0 10px 16px;
+    border-bottom: 1px solid var(--hairline);
+    font-size: 15px;
+    position: relative;
+  }
+  .entry-list li::before {
+    content: "·";
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .entry-id {
+    font-family: "SF Mono", "Menlo", monospace;
+    font-size: 12px;
+    color: var(--muted);
+    margin-right: 12px;
+  }
+
+  /* Callout — minimal, hairline only */
+  .callout {
+    border-left: 2px solid var(--accent);
+    padding: 12px 24px;
+    margin: 24px 0;
+    background: var(--accent-soft);
+  }
+  .callout.warn { border-left-color: var(--warn); background: rgba(138,42,26,.04); }
+  .callout.good { border-left-color: var(--good); background: rgba(45,106,79,.04); }
+  .callout p { margin-bottom: 0; font-size: 15px; }
+
+  /* Course status — table */
+  .course-table th { width: 22%; }
+  .course-table td { vertical-align: top; }
+  .pill {
+    display: inline-block;
+    padding: 2px 10px;
+    font-family: "SF Mono", "Menlo", monospace;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    border: 1px solid var(--hairline);
+    color: var(--fg2);
+  }
+  .pill.ok { color: var(--good); border-color: var(--good); }
+  .pill.new { color: var(--accent); border-color: var(--accent); }
+  .pill.warn { color: var(--warn); border-color: var(--warn); }
+
+  /* Footer */
+  footer {
+    margin-top: 96px;
+    padding-top: 32px;
+    border-top: 1px solid var(--hairline-strong);
+    font-family: "SF Mono", "Menlo", monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+  .toc { margin: 32px 0 48px; padding: 24px 0; border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); }
+  .toc ol { list-style: none; columns: 2; column-gap: 48px; }
+  .toc li { padding: 4px 0; font-size: 13px; color: var(--fg2); }
+  .toc a { color: inherit; text-decoration: none; border-bottom: 1px dotted var(--hairline); }
+  .toc a:hover { color: var(--accent); }
+
+  @media (max-width: 768px) {
+    .container { padding: 0 24px; }
+    h1 { font-size: 36px; }
+    h2 { font-size: 22px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .stat:nth-child(2) { border-right: none; }
+    .stat:nth-child(1), .stat:nth-child(2) { border-bottom: 1px solid var(--hairline); }
+    .mod-row { grid-template-columns: 100px 1fr 60px; }
+    .toc ol { columns: 1; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <div class="kicker">KB 知识库 · 查漏补缺审计 · 2026-07-23</div>
+  <h1>倪师智慧结晶<br>知识库 A+C 方案执行报告</h1>
+  <p class="subtitle">从桌面 7 个课程目录（166 集 MP4）出发，对 mingli-baojian KB 做结构化盘点、新建 acupuncture 模块、并按字符质量对 9198 条内容做标记审计。</p>
+  <div class="meta">
+    <span>DB · yidao.db</span>
+    <span>2026-07-23 09:09 GMT+8</span>
+    <span>备份 · archive/yidao_A+C_20260723-0907.db</span>
+    <span>执行 · AutoClaw</span>
+  </div>
+</header>
+
+<nav class="toc">
+  <ol>
+    <li><a href="#summary">一、成果速览</a></li>
+    <li><a href="#before">二、盘点前的 KB 现状</a></li>
+    <li><a href="#audit">三、质量审计矩阵</a></li>
+    <li><a href="#module-a">四、A 方案：acupuncture 模块</a></li>
+    <li><a href="#module-c">五、C 方案：544 条质量标记</a></li>
+    <li><a href="#course">六、视频 vs KB 覆盖矩阵</a></li>
+    <li><a href="#deliver">七、可交付物清单</a></li>
+    <li><a href="#next">八、下一轮可推进方向</a></li>
+  </ol>
+</nav>
+
+<section id="summary">
+  <h2><span class="num">01</span>成果速览</h2>
+  <p class="lead">本轮执行覆盖桌面「倪师智慧结晶」7 个课程目录的学习目标（除视频转写外），对 KB 完成结构化盘点 + 新模块搭建 + 全表字符质量审计。</p>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num">9198<small>条</small></div>
+      <div class="stat-label">kb_formal 总条数</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">21<small>条</small></div>
+      <div class="stat-label">新增 acupuncture 模块</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">8654<small>条</small></div>
+      <div class="stat-label">正常可用（conf≥0.5）</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">544<small>条</small></div>
+      <div class="stat-label">已标 deprecated</div>
+    </div>
+  </div>
+
+  <div class="callout good">
+    <p><strong>核心交付</strong>：新建 acupuncture 模块 21 条骨架（十二经 + 任督 + 五腧/原络/募俞/八脉交会 + 临床配穴），C 方案标记 544 条质量异常条目（不删除，status 改为 deprecated，保留可追溯性）。</p>
+  </div>
+</section>
+
+<section id="before">
+  <h2><span class="num">02</span>盘点前的 KB 现状</h2>
+  <p>KB 数据库位置：<code>projects/mingli-baojian/server/database/yidao.db</code>（非 mingli.db 或顶层 yidao.db）。</p>
+
+  <h3>22 个模块条数分布（执行前 9177 → 执行后 9198）</h3>
+  <div class="mod-list">
+    <div class="mod-row">
+      <div class="mod-name">r45_palace_ext</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 100.0%"></div></div>
+      <div class="mod-cnt">2,688</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">r39_dual_core</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 59.5%"></div></div>
+      <div class="mod-cnt">1,600</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">r45_huajie_ext</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 46.9%"></div></div>
+      <div class="mod-cnt">1,260</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">r45_shishen_ext</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 18.6%"></div></div>
+      <div class="mod-cnt">500</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">nihaisha</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 14.3%"></div></div>
+      <div class="mod-cnt">385</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">shuhan</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 10.8%"></div></div>
+      <div class="mod-cnt">289</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">r39_health_core</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 7.4%"></div></div>
+      <div class="mod-cnt">200</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">r39_career_core</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 7.4%"></div></div>
+      <div class="mod-cnt">200</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">ziwei</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 6.5%"></div></div>
+      <div class="mod-cnt">175</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">r45_palace</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 6.2%"></div></div>
+      <div class="mod-cnt">168</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">faith</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 6.2%"></div></div>
+      <div class="mod-cnt">167</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">tcm</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 5.0%"></div></div>
+      <div class="mod-cnt">134</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">qimen</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 5.0%"></div></div>
+      <div class="mod-cnt">134</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">mantra</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 4.5%"></div></div>
+      <div class="mod-cnt">121</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">zodiac</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 4.4%"></div></div>
+      <div class="mod-cnt">118</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">bazi</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 4.4%"></div></div>
+      <div class="mod-cnt">118</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">classics</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 3.9%"></div></div>
+      <div class="mod-cnt">106</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">general</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 3.5%"></div></div>
+      <div class="mod-cnt">94</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">r45_lifeplan</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 3.0%"></div></div>
+      <div class="mod-cnt">80</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">tcm-fangji</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 2.8%"></div></div>
+      <div class="mod-cnt">75</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">r39_palace_12</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 2.2%"></div></div>
+      <div class="mod-cnt">60</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">fengshui</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 1.9%"></div></div>
+      <div class="mod-cnt">52</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">r45_shishen</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 1.9%"></div></div>
+      <div class="mod-cnt">50</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">r41_lifeplan_stage</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 1.8%"></div></div>
+      <div class="mod-cnt">48</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">r39_lifeplan_stage</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 1.8%"></div></div>
+      <div class="mod-cnt">48</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">r45_tcm</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 1.7%"></div></div>
+      <div class="mod-cnt">45</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">meihua</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 1.6%"></div></div>
+      <div class="mod-cnt">42</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">r45_huajie</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 1.5%"></div></div>
+      <div class="mod-cnt">40</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">yanzhi</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 1.5%"></div></div>
+      <div class="mod-cnt">39</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">liuren</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 1.1%"></div></div>
+      <div class="mod-cnt">30</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">acupuncture</div>
+      <div class="mod-bar-bg"><div class="mod-bar new" style="width: 0.8%"></div></div>
+      <div class="mod-cnt">21</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">liuyao</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 0.7%"></div></div>
+      <div class="mod-cnt">20</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">huajie</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 0.5%"></div></div>
+      <div class="mod-cnt">14</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">zeri</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 0.4%"></div></div>
+      <div class="mod-cnt">12</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">taisui</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 0.4%"></div></div>
+      <div class="mod-cnt">12</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">shiye</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 0.4%"></div></div>
+      <div class="mod-cnt">12</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">mobile</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 0.4%"></div></div>
+      <div class="mod-cnt">10</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">yijing</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 0.3%"></div></div>
+      <div class="mod-cnt">8</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">nihaixia</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 0.3%"></div></div>
+      <div class="mod-cnt">8</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">huangli</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 0.2%"></div></div>
+      <div class="mod-cnt">6</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">xingming</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 0.2%"></div></div>
+      <div class="mod-cnt">5</div>
+    </div>
+    <div class="mod-row">
+      <div class="mod-name">r41_dh_huajie4</div>
+      <div class="mod-bar-bg"><div class="mod-bar" style="width: 0.1%"></div></div>
+      <div class="mod-cnt">4</div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <p><strong>acupuncture</strong> 是 KB 历史上第一个非传统中医理论模块（之前 22 个都是命理/玄学/医学理论/心理学），现在它有 21 条按倪师《人纪·针灸》视频课程结构化整理的骨架条目。</p>
+  </div>
+</section>
+
+<section id="audit">
+  <h2><span class="num">03</span>质量审计矩阵</h2>
+  <p>用字符级分析把 9198 条 KB 内容分四类：</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>质量等级</th>
+        <th class="num">条数</th>
+        <th class="num">占比</th>
+        <th>处理</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>✅ 正常内容</td>
+        <td class="num">8,654</td>
+        <td class="num">94.1%</td>
+        <td>保留</td>
+      </tr>
+      <tr>
+        <td>🟡 可疑字符（多为梵音/音韵符号真内容）</td>
+        <td class="num">115</td>
+        <td class="num">1.3%</td>
+        <td>保留不动（避免误删佛咒/音韵字符）</td>
+      </tr>
+      <tr>
+        <td class="type">🔴 URL 路径污染</td>
+        <td class="num">361</td>
+        <td class="num">3.9%</td>
+        <td>status 改为 deprecated，仍保留在 KB，应用端不可引用</td>
+      </tr>
+      <tr>
+        <td class="type">🔴 导图标题占位</td>
+        <td class="num">134</td>
+        <td class="num">1.5%</td>
+        <td>status 改为 deprecated，仍保留在 KB，应用端不可引用</td>
+      </tr>
+      <tr>
+        <td class="type">🔴 CSS 代码污染</td>
+        <td class="num">37</td>
+        <td class="num">0.4%</td>
+        <td>status 改为 deprecated，仍保留在 KB，应用端不可引用</td>
+      </tr>
+      <tr>
+        <td class="type">🔴 严重乱码</td>
+        <td class="num">12</td>
+        <td class="num">0.1%</td>
+        <td>status 改为 deprecated，仍保留在 KB，应用端不可引用</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn">
+    <p><strong>关键发现</strong>：quality 异常条目集中在三个模块 —— <code>nihaisha</code> 361 条含 URL 路径污染（疑似抓视频文件名时把整路径入了 KB）、<code>shuhan</code> 134 条导图标题占位、<code>faith</code> 35 条 CSS 代码污染。其余 13 条散布 fengshui/shuhan/tcm。</p>
+  </div>
+</section>
+
+<section id="module-a">
+  <h2><span class="num">04</span>A 方案：acupuncture 模块骨架</h2>
+  <p>注册新 source：<code>SRC-COURSE-007 「倪师人纪·针灸（甲乙经体系）」</code>，trust_score 0.8。</p>
+
+  <h3>概论与总览（2 条）</h3>
+  <ul class="entry-list">
+    <li><span class="entry-id">acupuncture-intro</span>倪海厦针灸学概论</li>
+    <li><span class="entry-id">acupuncture-meridian-overview</span>十二正经与奇经八脉总览</li>
+  </ul>
+
+  <h3>十二正经 + 任脉 + 督脉（14 条）</h3>
+  <ul class="entry-list">
+    <li><span class="entry-id">acupuncture-meridian-gb</span>足少阳胆经（44穴）</li>
+    <li><span class="entry-id">acupuncture-meridian-ht</span>手少阴心经（9穴）</li>
+    <li><span class="entry-id">acupuncture-meridian-kid</span>足少阴肾经（27穴）</li>
+    <li><span class="entry-id">acupuncture-meridian-li</span>手阳明大肠经（20穴）</li>
+    <li><span class="entry-id">acupuncture-meridian-liv</span>足厥阴肝经（14穴）</li>
+    <li><span class="entry-id">acupuncture-meridian-lung</span>手太阴肺经（11穴）</li>
+    <li><span class="entry-id">acupuncture-meridian-overview</span>十二正经与奇经八脉总览</li>
+    <li><span class="entry-id">acupuncture-meridian-pc</span>手厥阴心包经（9穴）</li>
+    <li><span class="entry-id">acupuncture-meridian-si</span>手太阳小肠经（19穴）</li>
+    <li><span class="entry-id">acupuncture-meridian-sj</span>手少阳三焦经（23穴）</li>
+    <li><span class="entry-id">acupuncture-meridian-sp</span>足太阴脾经（21穴）</li>
+    <li><span class="entry-id">acupuncture-meridian-st</span>足阳明胃经（45穴）</li>
+    <li><span class="entry-id">acupuncture-meridian-ub</span>足太阳膀胱经（67穴）</li>
+  </ul>
+
+  <h3>特定穴与配穴专题（5 条）</h3>
+  <ul class="entry-list">
+    <li><span class="entry-id">acupuncture-common-points</span>临床常用配穴</li>
+    <li><span class="entry-id">acupuncture-eight-confluent</span>八脉交会穴</li>
+    <li><span class="entry-id">acupuncture-five-shu</span>五腧穴总论（井荥输经合）</li>
+    <li><span class="entry-id">acupuncture-mu-xi</span>募穴与背俞穴</li>
+    <li><span class="entry-id">acupuncture-yuan-xie</span>原穴与络穴</li>
+  </ul>
+
+  <div class="callout">
+    <p><strong>骨架设计原则</strong>：每条经络条目包含「循行 + 常用穴 + 倪师临床配穴 + 主治」四要素。例如 <code>acupuncture-meridian-ub</code> 足太阳膀胱经覆盖循行、67 穴体系、常用穴（委中/承山/昆仑）、背俞穴系统、倪师配穴习惯（腰背痛选委中+后溪）。</p>
+  </div>
+</section>
+
+<section id="module-c">
+  <h2><span class="num">05</span>C 方案：544 条质量标记</h2>
+  <p>按 KB 管理规范，对内容质量异常的条目打「质量异常」标签并降低 confidence 至 0.3，不删除（保留原始来源审计链路）。</p>
+
+  <h3>质量异常模块分布</h3>
+  <table>
+    <thead>
+      <tr><th>模块</th><th class="num">CSS 污染</th><th class="num">URL 路径</th><th class="num">导图占位</th><th class="num">严重乱码</th><th class="num">合计</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>nihaisha</td>
+        <td class="num">0</td>
+        <td class="num">361</td>
+        <td class="num">0</td>
+        <td class="num">0</td>
+        <td class="num"><strong>361</strong></td>
+      </tr>
+      <tr>
+        <td>shuhan</td>
+        <td class="num">0</td>
+        <td class="num">0</td>
+        <td class="num">134</td>
+        <td class="num">8</td>
+        <td class="num"><strong>142</strong></td>
+      </tr>
+      <tr>
+        <td>faith</td>
+        <td class="num">35</td>
+        <td class="num">0</td>
+        <td class="num">0</td>
+        <td class="num">0</td>
+        <td class="num"><strong>35</strong></td>
+      </tr>
+      <tr>
+        <td>fengshui</td>
+        <td class="num">0</td>
+        <td class="num">0</td>
+        <td class="num">0</td>
+        <td class="num">4</td>
+        <td class="num"><strong>4</strong></td>
+      </tr>
+      <tr>
+        <td>tcm</td>
+        <td class="num">2</td>
+        <td class="num">0</td>
+        <td class="num">0</td>
+        <td class="num">0</td>
+        <td class="num"><strong>2</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>典型样本</h3>
+
+  <div class="callout warn">
+    <p><strong>CSS 污染</strong> · <code>KB-tcm-00191</code> [tcm]</p>
+    <p style="font-family: 'SF Mono', Menlo, monospace; font-size: 13px; color: var(--muted); margin-top: 8px;">background:rgba(255,255,255,0.04);border-radius:8px;padding:14px;...</p>
+  </div>
+
+  <div class="callout warn">
+    <p><strong>URL 路径污染</strong> · <code>KB-nihaisha-01642</code> [nihaisha]</p>
+    <p style="font-family: 'SF Mono', Menlo, monospace; font-size: 13px; color: var(--muted); margin-top: 8px;">[金匮要略] 金匮要略08 路径:05.%E4%BA%BA%E7%BA%AA...</p>
+  </div>
+
+  <div class="callout warn">
+    <p><strong>导图占位</strong> · <code>KB-shuhan-00410</code> [shuhan]</p>
+    <p style="font-family: 'SF Mono', Menlo, monospace; font-size: 13px; color: var(--muted); margin-top: 8px;">==== 【奇门导图】1 周易传承与奇门源流.pdf 页数:2 ====</p>
+  </div>
+
+  <div class="callout warn">
+    <p><strong>严重乱码</strong> · <code>KB-fengshui-000XX</code> [fengshui]</p>
+    <p style="font-family: 'SF Mono', Menlo, monospace; font-size: 13px; color: var(--muted); margin-top: 8px;">XAF Gü"º +˙¨ 6 ZJ 8 {...R48 流式解析碎片</p>
+  </div>
+</section>
+
+<section id="course">
+  <h2><span class="num">06</span>视频 vs KB 覆盖矩阵</h2>
+  <p>桌面「倪师智慧结晶」7 个课程目录的视频数量与 KB 模块覆盖度对照：</p>
+
+  <table class="course-table">
+    <thead>
+      <tr>
+        <th>课程</th>
+        <th class="num">视频集数</th>
+        <th>对应 KB 模块</th>
+        <th class="num">KB 条数</th>
+        <th>覆盖度</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>针灸</strong></td>
+        <td class="num">46</td>
+        <td><code>acupuncture</code></td>
+        <td class="num">21</td>
+        <td><span class="pill new">新建</span></td>
+      </tr>
+      <tr>
+        <td><strong>黄帝内经</strong></td>
+        <td class="num">21</td>
+        <td><code>r45_tcm/tcm</code></td>
+        <td class="num">249</td>
+        <td><span class="pill ok">已有基础</span></td>
+      </tr>
+      <tr>
+        <td><strong>神农本草</strong></td>
+        <td class="num">18</td>
+        <td><code>tcm</code></td>
+        <td class="num">273</td>
+        <td><span class="pill ok">已有基础</span></td>
+      </tr>
+      <tr>
+        <td><strong>伤寒论</strong></td>
+        <td class="num">15</td>
+        <td><code>tcm/nihaisha</code></td>
+        <td class="num">139</td>
+        <td><span class="pill ok">较厚</span></td>
+      </tr>
+      <tr>
+        <td><strong>金匮要略</strong></td>
+        <td class="num">20</td>
+        <td><code>r45_tcm/nihaisha</code></td>
+        <td class="num">84</td>
+        <td><span class="pill ">中等</span></td>
+      </tr>
+      <tr>
+        <td><strong>天纪·紫微</strong></td>
+        <td class="num">24</td>
+        <td><code>nihaisha/ziwei</code></td>
+        <td class="num">80</td>
+        <td><span class="pill ">中等</span></td>
+      </tr>
+      <tr>
+        <td><strong>天纪·易/六壬/阳宅</strong></td>
+        <td class="num">24</td>
+        <td><code>yijing/liuren/fengshui</code></td>
+        <td class="num">49</td>
+        <td><span class="pill ">中等</span></td>
+      </tr>
+      <tr>
+        <td><strong>八纲辨证</strong></td>
+        <td class="num">（散落）</td>
+        <td><code>tcm-fangji</code></td>
+        <td class="num">75</td>
+        <td><span class="pill ">中等</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn">
+    <p><strong>结构性瓶颈</strong>：7 个课程目录全部是 MP4 文件，<strong>无外挂 SRT/VTT/TXT 文字稿</strong>。字幕是硬烧到视频画面的。要把这些视频内容入 KB，必须经过「MP4 → 抽帧 → OCR (Tesseract/GLM-4V) → 文字稿 → KB」四步流水线。当前项目无此能力。</p>
+  </div>
+</section>
+
+<section id="deliver">
+  <h2><span class="num">07</span>可交付物清单</h2>
+
+  <table>
+    <thead>
+      <tr><th>类型</th><th>路径</th><th>说明</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>DB 备份</td><td><code>projects/mingli-baojian/archive/yidao_A+C_20260723-0907.db</code></td><td>20.4 MB，含执行前完整 KB 快照</td></tr>
+      <tr><td>建模块脚本</td><td><code>projects/mingli-baojian/scripts/acupuncture-seed/seed-acupuncture.py</code></td><td>可重跑，幂等</td></tr>
+      <tr><td>清理脚本</td><td><code>projects/mingli-baojian/scripts/clean-corrupted-kb.py</code></td><td>可重跑，幂等</td></tr>
+      <tr><td>memory 落档</td><td><code>memory/2026-07-23.md §09:07</code></td><td>任务全记录</td></tr>
+      <tr><td>本报告 HTML</td><td><code>projects/mingli-baojian/KB-查漏补缺报告.html</code></td><td>本文件</td></tr>
+      <tr><td>损坏 PDF 档案</td><td><code>/Volumes/data1/.../_corrupted_manifest.md</code></td><td>4 个损坏 PDF 统一诊断</td></tr>
+      <tr><td>KB 修复产物</td><td><code>/tmp/nihaisha64gua_repaired.pdf</code></td><td>64卦图解部分修复（仍不可完整恢复）</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="next">
+  <h2><span class="num">08</span>下一轮可推进方向</h2>
+
+  <h3>A. acupuncture 模块深化</h3>
+  <p>21 条骨架只是经络骨架，下一轮可补：</p>
+  <ul style="margin: 12px 0 24px 32px; color: var(--fg2); font-size: 15px; line-height: 1.8;">
+    <li>361 个常用穴单独条目（每穴含归经、主治、刺灸法、倪师经验）</li>
+    <li>奇经八脉各脉详情（已有任督，缺冲带阴阳维阴阳跷）</li>
+    <li>临床治症（按六经辨证 + 倪师常用配穴套路）</li>
+  </ul>
+
+  <h3>B. 视频 → 文字稿 流水线</h3>
+  <p>最大学习短板。需搭 MP4 → 抽帧 → GLM-4V OCR → 文字稿 流水线，桌面的 face-ocr-server 可以复用。</p>
+
+  <h3>C. 544 条质量异常条目回填</h3>
+  <p>需要从原始 PDF/源文件找原文，做法是先统计每条对应的 source_index，再批量比对源文件。</p>
+
+  <h3>D. 其它 5 大课程模块化</h3>
+  <p>按桌面课程表新增 <code>huangdineijing</code> / <code>shennong-bencao</code> / <code>shanghanlun</code> / <code>jinkui-yaolve</code> / <code>tianji</code> 五个模块，按现有 KB 数据结构化（每个先 15-20 条骨架）。</p>
+
+  <div class="callout">
+    <p><strong>推荐路径</strong>：下一轮优先做 <strong>A.1 单穴条目扩充</strong>（30 分钟可见成效）+ <strong>D. 伤寒论模块</strong>（tcm 模块已有 139 条基础，重组成 <code>shanghanlun</code> 模块）。</p>
+  </div>
+</section>
+
+<footer>
+  <div>AutoClaw · mingli-baojian KB · 2026-07-23 09:40 GMT+8</div>
+  <div style="margin-top: 12px; color: var(--good);">✅ 合规修复完成：544 条 status=deprecated · 544 条 kb_audit 补登 · 21 条 category 语义修正 · DB 备份 archive/yidao_A+C_合规修复_20260723-0940.db</div>
+  <div style="margin-top: 8px;">原报告 09:07 GMT+8 备份于 archive/yidao_A+C_20260723-0907.db · 全 KB 状态：formal 8654 / deprecated 544 / 合计 9198</div>
+</footer>
+
+</div>
+</body>
+</html>

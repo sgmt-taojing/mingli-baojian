@@ -6241,5 +6241,33 @@ function toggleDailyKnowledgeDetail(el){
 <a href="wechat-h5.html" class="func-card"><span class="func-icon">💬</span><span>微信公众号</span></a>
 <a href="yijing-oracle.html" class="func-card"><span class="func-icon">☯️</span><span>易经人盘事盘</span></a>
 <a href="yijing-qimen.html" class="func-card"><span class="func-icon">☰</span><span>易经奇门</span></a></div>
+
+<!-- R40-D H5 5 页面双核速查最小注入 -->
+<script src="../knowledge/r39-dual-core-kb.js"></script>
+<div class="r40-mini" style="padding:14px;background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(0,0,0,.2));border:1px dashed var(--gold);border-radius:10px;margin:20px">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+    <span style="font-size:18px">🩺💼</span>
+    <b style="font-size:12px;color:var(--gold);letter-spacing:2px">双核速查（R40-D）</b>
+    <span style="font-size:10px;opacity:.5">基于 R39-B 双核 KB（2108 条）</span>
+  </div>
+  <div style="display:flex;gap:6px;margin-bottom:10px">
+    <input type="text" id="r40MiniQuery" placeholder="输入关键词，如：气血、正财、紫微、田宅" style="flex:1;padding:6px 10px;background:rgba(0,0,0,.3);color:var(--paper);border:1px solid var(--line);border-radius:6px;font-size:12px">
+    <button onclick="r40MiniSearch()" style="padding:6px 14px;background:var(--gold);color:#000;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600">查询</button>
+  </div>
+  <div id="r40MiniResult" style="font-size:11px;line-height:1.8;min-height:30px"></div>
+</div>
+<script>
+function r40MiniSearch(){
+  var q=document.getElementById('r40MiniQuery').value.trim();
+  if(!q){alert('请输入查询关键词');return;}
+  if(!window.R39_DUAL_CORE_KB){document.getElementById('r40MiniResult').innerHTML='<span style="opacity:.5">KB 加载中...</span>';return;}
+  var results=r39SearchKB(q);
+  var html='<div style="margin-bottom:6px;opacity:.6">命中 <b style="color:var(--gold)">'+results.length+'</b> 条 / 总 '+R39_DUAL_CORE_KB.length+' 条</div>';
+  results.slice(0,4).forEach(function(e){
+    html+='<div style="margin:6px 0;padding:8px;background:rgba(0,0,0,.25);border-radius:6px;border-left:3px solid var(--gold)"><b style="color:var(--gold);font-size:12px">'+e.title+'</b><div style="opacity:.7;margin-top:4px;line-height:1.7">'+e.content.substring(0,120)+'...</div></div>';
+  });
+  document.getElementById('r40MiniResult').innerHTML=html;
+}
+</script>
 </body>
 </html>

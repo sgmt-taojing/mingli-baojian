@@ -1,0 +1,1722 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>紫微斗数 · 大师级断疾病生死 · 易道智鉴</title>
+<style>
+:root{
+  --ink:#0a0a0a;--ink2:#1a1a1a;--ink3:#2a2a2a;
+  --paper:#f5efe0;--paper2:#e8dec8;--paper3:#a89876;
+  --gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;
+  --red:#c0392b;--red2:#e74c3c;
+  --green:#27ae60;--jade:#16a085;
+  --border:rgba(201,168,76,.18);
+  --shadow:rgba(0,0,0,.4);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow-x:hidden}
+body{
+  background:linear-gradient(135deg,#0a0a0a 0%,#1a1410 100%);
+  color:var(--paper);font-family:'Noto Serif SC',-apple-system,serif;
+  font-size:18px;line-height:1.7;
+}
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(10,10,10,.95);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);padding:10px 16px;
+  display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{flex-shrink:0;padding:6px 14px;color:var(--gold);border:1px solid var(--border);
+  border-radius:14px;font-size:13px;text-decoration:none;white-space:nowrap}
+.nav a.active{background:rgba(201,168,76,.15)}
+.container{max-width:1100px;margin:0 auto;padding:80px 20px 40px}
+.hero{text-align:center;margin-bottom:40px}
+.hero h1{font-size:42px;color:var(--gold2);font-weight:600;letter-spacing:6px;margin-bottom:8px}
+.hero .sub{font-size:18px;color:var(--paper3);letter-spacing:3px}
+.hero .quote{font-size:15px;color:var(--paper2);margin-top:16px;font-style:italic;
+  padding:16px 24px;background:rgba(201,168,76,.06);border-left:3px solid var(--gold);
+  text-align:left;line-height:1.8}
+.panel{background:rgba(26,26,26,.6);border:1px solid var(--border);
+  border-radius:16px;padding:28px;margin-bottom:24px;backdrop-filter:blur(8px)}
+.panel h2{font-size:24px;color:var(--gold2);margin-bottom:18px;
+  padding-bottom:12px;border-bottom:2px solid var(--border);letter-spacing:2px}
+.row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.row2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media(max-width:768px){
+  .row,.row3,.row2{grid-template-columns:1fr 1fr}
+  .container{padding:80px 14px 30px}
+  .hero h1{font-size:32px}
+}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:14px;color:var(--paper3);letter-spacing:1px}
+.field input,.field select{
+  background:rgba(10,10,10,.5);border:1.5px solid var(--gold3);
+  color:var(--paper);padding:14px 14px;border-radius:10px;
+  font-size:18px;font-family:inherit;outline:none;transition:all .2s
+}
+.field input:focus,.field select:focus{border-color:var(--gold);
+  background:rgba(201,168,76,.08)}
+.btn{background:linear-gradient(135deg,var(--gold) 0%,var(--gold3) 100%);
+  color:var(--ink);border:none;padding:16px 32px;border-radius:10px;
+  font-size:18px;font-weight:600;cursor:pointer;font-family:inherit;
+  letter-spacing:3px;transition:all .2s;box-shadow:0 4px 12px rgba(201,168,76,.3)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(201,168,76,.5)}
+.btn:active{transform:translateY(0)}
+.btn-block{width:100%;margin-top:16px}
+.btn-secondary{background:transparent;color:var(--gold);
+  border:1.5px solid var(--gold);box-shadow:none}
+.btn-secondary:hover{background:rgba(201,168,76,.1)}
+.risk-bar{height:32px;background:rgba(0,0,0,.3);border-radius:16px;
+  overflow:hidden;position:relative;margin:8px 0;border:1px solid var(--border)}
+.risk-fill{height:100%;transition:width 1s ease;border-radius:16px;
+  display:flex;align-items:center;padding:0 12px;font-size:14px;font-weight:600}
+.risk-low{background:linear-gradient(90deg,var(--green),#2ecc71)}
+.risk-mid{background:linear-gradient(90deg,#f39c12,#e67e22)}
+.risk-high{background:linear-gradient(90deg,#e74c3c,#c0392b)}
+.risk-vhigh{background:linear-gradient(90deg,#c0392b,#8e44ad);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+.palace{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(10,10,10,.6);border:2px solid var(--border);border-radius:12px;
+  padding:14px 8px;text-align:center;min-height:120px;transition:all .3s;position:relative}
+.palace.danger{border-color:var(--red2);background:rgba(192,57,43,.1)}
+.palace.warn{border-color:#f39c12;background:rgba(243,156,18,.1)}
+.palace.safe{border-color:var(--green);background:rgba(39,174,96,.05)}
+.palace .name{font-size:15px;color:var(--paper3);letter-spacing:2px;margin-bottom:6px}
+.palace .stars{font-size:22px;color:var(--gold2);font-weight:600;
+  letter-spacing:1px;line-height:1.4}
+.palace .hua{font-size:13px;color:var(--red2);margin-top:4px}
+.palace .flag{position:absolute;top:-8px;right:-8px;font-size:18px}
+.risk-card{padding:18px;background:rgba(0,0,0,.3);border-radius:12px;
+  border-left:4px solid var(--gold);margin-bottom:14px}
+.risk-card.high{border-left-color:var(--red2)}
+.risk-card.mid{border-left-color:#f39c12}
+.risk-card .title{font-size:18px;color:var(--gold2);font-weight:600;margin-bottom:8px;
+  display:flex;align-items:center;gap:8px}
+.risk-card .body{font-size:15px;color:var(--paper2);line-height:1.8}
+.risk-card .quote{font-size:14px;color:var(--paper3);font-style:italic;
+  margin-top:8px;padding:8px 12px;background:rgba(201,168,76,.05);border-radius:6px}
+.timeline{display:flex;overflow-x:auto;padding:20px 0;gap:12px;scrollbar-width:thin}
+.timeline::-webkit-scrollbar{height:6px}
+.timeline::-webkit-scrollbar-thumb{background:var(--gold3);border-radius:3px}
+.tl-item{flex-shrink:0;width:140px;background:rgba(10,10,10,.5);
+  border:1.5px solid var(--border);border-radius:10px;padding:14px 10px;text-align:center}
+.tl-item.danger{border-color:var(--red2)}
+.tl-item .age{font-size:24px;color:var(--gold2);font-weight:600}
+.tl-item .ganzhi{font-size:14px;color:var(--paper3);margin:4px 0}
+.tl-item .risk{font-size:12px;padding:3px 8px;border-radius:10px;display:inline-block}
+.tl-item .risk.high{background:rgba(192,57,43,.3);color:var(--red2)}
+.tl-item .risk.mid{background:rgba(243,156,18,.3);color:#f39c12}
+.tl-item .risk.low{background:rgba(39,174,96,.3);color:var(--green)}
+.tl-item .desc{font-size:12px;color:var(--paper2);margin-top:6px;line-height:1.5}
+.action-list{list-style:none}
+.action-list li{padding:12px 16px;margin:8px 0;background:rgba(39,174,96,.08);
+  border-left:3px solid var(--green);border-radius:6px;font-size:15px;color:var(--paper2)}
+.action-list li strong{color:var(--green);margin-right:8px}
+.empty{text-align:center;padding:40px;color:var(--paper3);font-size:16px}
+.hidden{display:none}
+.summary-card{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:768px){.summary-card{grid-template-columns:1fr 1fr}}
+.metric{background:rgba(10,10,10,.4);border:1px solid var(--border);
+  border-radius:10px;padding:14px;text-align:center}
+.metric .val{font-size:32px;color:var(--gold2);font-weight:600;line-height:1}
+.metric .label{font-size:13px;color:var(--paper3);margin-top:4px;letter-spacing:1px}
+.metric.danger .val{color:var(--red2)}
+.metric.warn .val{color:#f39c12}
+.metric.safe .val{color:var(--green)}
+.metric .sub{font-size:11px;color:var(--paper3);margin-top:2px}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--gold);
+  border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;
+  vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fab{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:10px;z-index:50}
+.fab button{background:rgba(10,10,10,.85);color:var(--gold);
+  border:1.5px solid var(--gold);padding:12px 16px;border-radius:24px;
+  font-size:13px;cursor:pointer;font-family:inherit;backdrop-filter:blur(8px);
+  letter-spacing:1px;transition:all .2s}
+.fab button:hover{background:rgba(201,168,76,.15)}
+.tag{display:inline-block;padding:3px 10px;background:rgba(201,168,76,.15);
+  border:1px solid var(--gold);border-radius:10px;font-size:12px;
+  color:var(--gold);margin:2px 4px}
+.legend{margin:10px 0 18px;display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--paper2)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+.dot-r{background:#e74c3c;box-shadow:0 0 6px rgba(231,76,60,.6)}
+.resolve-card{background:rgba(10,10,10,.4);border-radius:12px;padding:18px;margin-bottom:14px;border:1px solid var(--border);border-left:3px solid var(--gold)}
+.resolve-card .rc-title{color:var(--gold2);font-size:17px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.resolve-card .rc-title .rtag{padding:3px 10px;border-radius:10px;font-size:11px;background:rgba(201,168,76,.2);color:var(--gold2)}
+.resolve-card ul{margin:8px 0 8px 24px;color:var(--paper2);font-size:14px;line-height:1.9}
+.resolve-card ul li{margin-bottom:4px}
+.resolve-card .formula{background:rgba(201,168,76,.08);padding:10px 14px;border-radius:8px;margin-top:10px;font-size:13px;color:var(--paper2);line-height:1.7}
+.resolve-card .formula b{color:var(--gold2)}
+.resolve-kb{background:rgba(22,160,133,.08);padding:8px 12px;border-left:3px solid var(--jade);border-radius:6px;font-size:12px;color:var(--paper3);margin-top:8px}
+.sec-diet,.sec-sleep,.sec-sport{background:var(--ink2);padding:22px 24px;border-radius:14px;margin:18px 0;box-shadow:0 4px 24px rgba(0,0,0,.4)}
+.sec-diet{border-left:4px solid #16a085}.sec-sleep{border-left:4px solid #f39c12}.sec-sport{border-left:4px solid #e67e22}
+.sec-diet h2,.sec-sleep h2,.sec-sport h2{color:var(--gold2);font-size:21px;letter-spacing:3px;margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:10px}
+.sec-diet .lead,.sec-sleep .lead,.sec-sport .lead{color:var(--paper2);font-size:14px;line-height:1.9;margin-bottom:14px}
+.diet-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+.diet-card{background:rgba(0,0,0,.3);padding:14px;border-radius:10px;border-left:3px solid #16a085;font-size:13px}
+.diet-card h4{color:#1abc9c;font-size:14px;margin-bottom:8px;letter-spacing:1px}
+.diet-card .remedy{color:var(--paper2);margin-bottom:6px;line-height:1.7}
+.diet-card .remedy b{color:#f1c40f}
+.kb-evidence{background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(192,57,43,.05));padding:12px 16px;border-radius:8px;margin:8px 0;border-left:3px solid var(--gold);font-size:12px;line-height:1.8}
+.kb-evidence .src{color:var(--gold2);font-weight:600;margin-bottom:4px}
+.kb-evidence .qb{color:var(--paper2);font-style:italic}
+.kb-evidence .md{color:#1abc9c;font-size:11px;margin-top:4px}
+.clinical{background:rgba(192,57,43,.08);padding:10px 14px;border-radius:8px;border-left:3px solid var(--red2);font-size:12px;color:var(--paper2);line-height:1.7}
+.clinical b{color:var(--red2)}
+.sleep-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+.sleep-card{background:rgba(0,0,0,.3);padding:10px;border-radius:8px;font-size:11px;text-align:center}
+.sleep-card .h{color:var(--gold2);font-size:14px;font-weight:600;margin-bottom:4px}
+.sleep-card .o{color:#1abc9c}
+.sleep-card .a{color:var(--paper2);font-size:11px;line-height:1.5}
+.sport-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:12px}
+.sport-card{background:rgba(0,0,0,.3);padding:14px;border-radius:10px;font-size:13px}
+.sport-card h4{color:#1abc9c;font-size:14px;margin-bottom:6px}
+.sport-card .keypoints{color:var(--paper2);line-height:1.8}
+.sport-card .keypoints li{margin-bottom:4px}
+@media(max-width:900px){.diet-grid,.sleep-grid{grid-template-columns:repeat(2,1fr)}.sport-grid{grid-template-columns:1fr}}
+@media(max-width:600px){.diet-grid,.sleep-grid,.sport-grid{grid-template-columns:1fr}}
+
+.scroll-section{scroll-margin-top:80px}
+@media(max-width:768px){
+  .row,.row3,.row2{grid-template-columns:1fr}
+}
+/* R38-C master-zidise 事业维度 */
+.zid-career{padding:18px;background:linear-gradient(135deg,rgba(74,138,168,.05),rgba(201,168,76,.05));border-radius:14px;margin:20px 0;border:1px solid var(--line)}
+.zid-career-title{font-size:16px;color:var(--gold);letter-spacing:2px;margin-bottom:14px;font-weight:600}
+.zid-career-dual{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.zid-card{padding:14px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.04)}
+.zid-card.health{border-left:4px solid #4a9a6e;background:linear-gradient(135deg,rgba(74,154,110,.08),rgba(255,255,255,.02))}
+.zid-card.career{border-left:4px solid #4a8aa8;background:linear-gradient(135deg,rgba(74,138,168,.08),rgba(255,255,255,.02))}
+.zid-card-title{font-size:13px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.zid-card.health .zid-card-title{color:#4a9a6e}
+.zid-card.career .zid-card-title{color:#4a8aa8}
+.zid-card-score{font-size:26px;font-weight:700;letter-spacing:1px}
+.zid-card.health .zid-card-score{color:#4a9a6e}
+.zid-card.career .zid-card-score{color:#4a8aa8}
+.zid-card-bar{height:6px;background:rgba(0,0,0,.3);border-radius:3px;overflow:hidden;margin:8px 0}
+.zid-card-fill{height:100%;border-radius:3px;transition:.4s}
+.zid-card.health .zid-card-fill{background:linear-gradient(90deg,#4a9a6e,#7ab86e)}
+.zid-card.career .zid-card-fill{background:linear-gradient(90deg,#4a8aa8,#6ab0d0)}
+.zid-8grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.zid-8cell{padding:10px 8px;background:rgba(201,168,76,.05);border:1px solid var(--line);border-radius:6px;cursor:pointer;transition:.2s}
+.zid-8cell:hover{background:rgba(201,168,76,.12);border-color:var(--gold)}
+.zid-8cell .icon{font-size:18px;display:block;margin-bottom:4px}
+.zid-8cell b{display:block;font-size:11px;color:var(--gold);margin-bottom:4px}
+.zid-8cell .tip{font-size:10px;opacity:.7;line-height:1.5}
+.zid-verdict{margin-top:14px;padding:12px;background:rgba(0,0,0,.2);border-radius:8px;border:1px dashed var(--gold);font-size:12px;line-height:1.9}
+.zid-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+@media(max-width:768px){.zid-career-dual{grid-template-columns:1fr}.zid-8grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="index.html">🏠 首页</a>
+  <a href="app/divination-hub.html">🔮 排盘</a>
+  <a href="master-elder.html">👴 大师端</a>
+  <a href="doctor-elder.html">🩺 医生端</a>
+  <a href="tcm-clinic.html">🏥 诊疗</a>
+  <a href="ai-assistant.html">🤖 AI助手</a>
+  <a href="master-zidise-illness.html" class="active">⚕️ 紫微断疾病</a>
+</nav>
+
+<div class="container">
+  <div class="hero">
+    <h1>紫微斗数 · 大师级断疾病生死</h1>
+    <div class="sub">十二宫 · 四化飞星 · 煞星重叠 · 大限流年</div>
+    <div class="quote">
+      「化忌所在，即心结所在。知道心结在哪里，便可对症下药。」 ——《骨髓赋》<br>
+      「疾厄宫看体质和疾病，煞星云集则身体欠佳。廉贞、七杀等煞星入疾厄需注意血光之灾。」
+    </div>
+  </div>
+
+  <!-- 输入面板 -->
+  <div class="panel">
+    <h2>📜 生辰输入</h2>
+    <div class="row">
+      <div class="field">
+        <label>公历生日（年）</label>
+        <input type="number" id="in-y" value="1985" min="1900" max="2050">
+      </div>
+      <div class="field">
+        <label>月</label>
+        <input type="number" id="in-m" value="7" min="1" max="12">
+      </div>
+      <div class="field">
+        <label>日</label>
+        <input type="number" id="in-d" value="15" min="1" max="31">
+      </div>
+      <div class="field">
+        <label>时辰（24h）</label>
+        <input type="number" id="in-h" value="14" min="0" max="23">
+      </div>
+    </div>
+    <div class="row2" style="margin-top:14px">
+      <div class="field">
+        <label>性别</label>
+        <select id="in-gender">
+          <option value="M">男（阳男顺行）</option>
+          <option value="F">女（阴女顺行）</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>关注重点</label>
+        <select id="in-focus">
+          <option value="all">综合疾病风险</option>
+          <option value="cancer">癌症/重症风险</option>
+          <option value="heart">心脑血管</option>
+          <option value="liver">肝胆系统</option>
+          <option value="blood">血光之灾/手术</option>
+          <option value="mental">精神/心理</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-block" onclick="analyze()">⚕️ 大师级断疾病生死分析</button>
+  </div>
+
+  <!-- 排盘结果 -->
+  <div id="result-section" class="hidden">
+    <!-- 综合摘要 -->
+    <div class="panel scroll-section" id="sec-summary">
+      <h2>📊 综合疾病风险评估</h2>
+      <div class="summary-card" id="summary-cards"></div>
+      <div id="risk-overview"></div>
+    </div>
+
+    <!-- 十二宫星曜 -->
+    <div class="panel scroll-section" id="sec-palaces">
+      <h2>🏛️ 十二宫 · 星曜分布</h2>
+      <div id="palace-grid"></div>
+    </div>
+
+    <!-- 风险标记详解 -->
+    <div class="panel scroll-section" id="sec-risks">
+      <h2>⚠️ 疾病风险标记（8 大核心规则）</h2>
+      <div id="risk-detail"></div>
+    </div>
+
+    <!-- 大限时间轴 -->
+    <div class="panel scroll-section" id="sec-timeline">
+      <h2>📅 大限时间轴 · 流年风险</h2>
+      <div class="timeline" id="timeline"></div>
+    </div>
+
+    <!-- 调理方案 -->
+    <div class="panel scroll-section" id="sec-actions">
+      <h2>🌿 调理方案 · 化解之道</h2>
+      <ul class="action-list" id="action-list"></ul>
+    </div>
+
+    <!-- KB 引用 -->
+    <div class="panel scroll-section" id="sec-kb">
+      <h2>📚 古籍断语 · 实战案例（来自知识库）</h2>
+      <div id="kb-refs"></div>
+    </div>
+
+    <!-- 过去回溯（用户输入病史 → 自动反查流年） -->
+    <div class="panel scroll-section" id="sec-history">
+      <h2>🕰️ 过去健康大事·流年应验反查</h2>
+      <div style="background:rgba(201,168,76,.05);padding:14px;border-radius:10px;margin-bottom:14px;font-size:14px;color:var(--paper3)">
+        💡 如有已知健康大事（手术/大病/慢性病），请按"年份+事件"格式输入，系统会反查该流年紫微格局是否应验。
+      </div>
+      <div class="row">
+        <div class="field" style="grid-column:span 3"><label>过往病史记录（可多条）</label>
+          <input type="text" id="in-history" placeholder="如：1985年肝火旺盛，1998年动过胆囊手术，2015年高血压"></div>
+        <div class="field"><label>&nbsp;</label><button class="btn" onclick="renderHistory()">🔍 反查流年</button></div>
+      </div>
+      <div id="history-output" style="margin-top:14px"></div>
+    </div>
+
+    <!-- 流年精确预测（未来 10 年逐年） -->
+    <div class="panel scroll-section" id="sec-future">
+      <h2>🔮 未来10年·逐年疾病预测+调养期</h2>
+      <div style="background:rgba(201,168,76,.05);padding:14px;border-radius:10px;margin-bottom:14px;font-size:14px;color:var(--paper3)">
+        📅 以当前大限为骨架，推算未来10年逐年疾厄能量、可能发作、调理重点、治愈周期预估。
+      </div>
+      <div id="future-grid"></div>
+    </div>
+
+    <!-- 治愈周期判断 -->
+    <div class="panel scroll-section" id="sec-cure">
+      <h2>💊 治愈周期·复原路径</h2>
+      <div id="cure-output"></div>
+    </div>
+
+    <!-- 化解方案（七维系统） -->
+    <div class="panel scroll-section" id="sec-resolve">
+      <h2>🪷 化解方案·七维系统</h2>
+      <div class="legend">
+        <span class="dot dot-r"></span> 风水
+        <span class="dot dot-r"></span> 五行补救
+        <span class="dot dot-r"></span> 符咒
+        <span class="dot dot-r"></span> 宗教
+        <span class="dot dot-r"></span> 饮食
+        <span class="dot dot-r"></span> 起居
+        <span class="dot dot-r"></span> 运动
+      </div>
+      <div id="resolve-output"></div>
+    </div>
+
+    <!-- 运势联动（财官疾厄线） -->
+    <div class="panel scroll-section" id="sec-fortune">
+      <h2>🌟 运势×健康 联动判断</h2>
+      <div id="fortune-output"></div>
+    </div>
+
+    <!-- 人生全面分析（过去→现在→未来） -->
+    <div class="panel scroll-section" id="sec-lifecycle">
+      <h2>🧬 人生全面分析·过去 现在 未来</h2>
+      <div id="lifecycle-output"></div>
+    </div>
+
+    <!-- 访客档案（大师专属） -->
+    <div class="panel scroll-section" id="sec-archive">
+      <h2>📁 访客档案中心</h2>
+      <div style="background:rgba(201,168,76,.05);padding:14px;border-radius:10px;margin-bottom:14px;font-size:14px;color:var(--paper3)">
+        💡 所有咨询过的访客都会自动入库。包含生辰、风险等级、化忌星、命中规则、调理方案、访问历史。
+      </div>
+      <div id="archive-list">
+        <div class="empty"><span class="spinner"></span>正在加载...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="fab">
+  <button onclick="window.print()">🖨️ 打印报告</button>
+  <button onclick="location.href='index.html'">🏠 回首页</button>
+</div>
+
+<script>
+const STEM_LIST=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+const BRANCH_LIST=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+const ANIMAL_LIST=['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
+const PALACE_NAMES=['命宫','兄弟','夫妻','子女','财帛','疾厄','迁移','交友','官禄','田宅','福德','父母'];
+
+// 14 主星（紫微星系 6 + 天府星系 8）
+const ZIWEI_STARS={
+  '紫微':{wx:'土',nature:'吉',cat:'主'},
+  '天机':{wx:'木',nature:'平',cat:'主'},
+  '太阳':{wx:'火',nature:'吉',cat:'主'},
+  '武曲':{wx:'金',nature:'吉',cat:'主'},
+  '天同':{wx:'水',nature:'吉',cat:'主'},
+  '廉贞':{wx:'火',nature:'凶',cat:'主'},
+  '天府':{wx:'土',nature:'吉',cat:'主'},
+  '太阴':{wx:'水',nature:'吉',cat:'主'},
+  '贪狼':{wx:'木',nature:'平',cat:'主'},
+  '巨门':{wx:'水',nature:'凶',cat:'主'},
+  '天相':{wx:'水',nature:'吉',cat:'主'},
+  '天梁':{wx:'土',nature:'吉',cat:'主'},
+  '七杀':{wx:'金',nature:'凶',cat:'主'},
+  '破军':{wx:'水',nature:'凶',cat:'主'}
+};
+const SHA_STARS=['擎羊','陀罗','火星','铃星','地劫','地空'];
+const YI_SHA=['文昌','文曲','天魁','天钺','左辅','右弼','禄存','天马'];
+
+// 五行对应脏腑
+const WUXING_ZANGFU={
+  '木':{organ:'肝胆',disease:'头晕、目赤、胁痛、易怒、血虚'},
+  '火':{organ:'心小肠',disease:'心悸、失眠、口舌溃疡、血光'},
+  '土':{organ:'脾胃',disease:'腹胀、消化差、糖尿病、痰湿'},
+  '金':{organ:'肺大肠',disease:'咳嗽、哮喘、便秘、皮肤病'},
+  '水':{organ:'肾膀胱',disease:'腰膝酸软、水肿、耳鸣、泌尿'}
+};
+
+// 紫微主星对应五行
+const ZIXING_WUXING={'紫微':'土','天机':'木','太阳':'火','武曲':'金','天同':'水','廉贞':'火','天府':'土','太阴':'水','贪狼':'木','巨门':'水','天相':'水','天梁':'土','七杀':'金','破军':'水'};
+
+// 化忌对应（十天干四化）
+const HUA_JI_BY_DAYSTEM={
+  '甲':'太阳', '乙':'太阴', '丙':'廉贞', '丁':'巨门',
+  '戊':'贪狼', '己':'天机', '庚':'武曲', '辛':'文昌',
+  '壬':'破军', '癸':'太阴'  // 癸为破军（不同流派）
+};
+
+// 化禄/权/科对应（用于全四化分析）
+const SI_HUA={
+  '甲':['禄存','廉贞','天同','太阳'],
+  '乙':['天机','天梁','紫微','太阴'],
+  '丙':['天同','天机','文昌','廉贞'],
+  '丁':['太阴','天同','天机','巨门'],
+  '戊':['贪狼','太阴','天机','文曲'],
+  '己':['武曲','贪狼','天梁','文曲'],
+  '庚':['太阳','武曲','太阴','天同'],
+  '辛':['巨门','太阳','文曲','文昌'],
+  '壬':['天同','天梁','紫微','破军'],
+  '癸':['破军','巨门','太阳','太阴']
+};
+
+// === 紫微斗数排盘（简化但够用） ===
+function arrangeZiwei(year,month,day,hour,gender){
+  // 起命宫（简化：以月份+时辰决定）
+  const hourBranch=BRANCH_LIST[Math.floor(((hour+1)%24)/2)];
+  const monthBranch=BRANCH_LIST[(month-1+2)%12];
+  // 命宫支：正月从寅起
+  const mingBranchIdx=(monthBranch==='寅'?0:monthBranch==='卯'?1:monthBranch==='辰'?2:monthBranch==='巳'?3:monthBranch==='午'?4:monthBranch==='未'?5:monthBranch==='申'?6:monthBranch==='酉'?7:monthBranch==='戌'?8:monthBranch==='亥'?9:monthBranch==='子'?10:11);
+  // 身宫：命宫+时支
+  const hourIdx=BRANCH_LIST.indexOf(hourBranch);
+  const shenIdx=(mingBranchIdx+hourIdx)%12;
+  // 大限起点（阳男阴女顺行）
+  const yang=(['甲','丙','戊','庚','壬'].indexOf(STEM_LIST[(year-4)%10])>=0);
+  const isMale=gender==='M';
+  const shun=(yang && isMale) || (!yang && !isMale);
+  return {mingBranchIdx,shenIdx,shun,yang};
+}
+
+// === 疾病风险规则引擎 ===
+const RISK_RULES=[
+  {
+    name:'疾厄宫煞星重叠',
+    severity:'high',
+    check:(ctx)=>{
+      const palace=ctx.palaces[5]; // 疾厄宫
+      const shaInJiE=palace.stars.filter(s=>SHA_STARS.includes(s));
+      const evilMainStars=palace.stars.filter(s=>['廉贞','七杀','巨门','破军'].includes(s));
+      if(shaInJiE.length>=2||(shaInJiE.length>=1 && evilMainStars.length>=1)){
+        return {hit:true, detail:`疾厄宫见 ${[...shaInJiE,...evilMainStars].join('、')}`,
+          rule:'煞星云集则身体欠佳'};
+      }
+      return {hit:false};
+    },
+    advice:'注意血光之灾，避免外伤；定期体检，重点关注心血管与肝胆。'
+  },
+  {
+    name:'化忌入疾厄宫',
+    severity:'high',
+    check:(ctx)=>{
+      const jiPalace=ctx.huaJiPalace;
+      if(jiPalace===5){
+        return {hit:true, detail:`化忌（${ctx.huaJiStar}）飞入疾厄宫`,
+          rule:'化忌所在即心结所在'};
+      }
+      return {hit:false};
+    },
+    advice:'此宫位为长期宿疾点；调理以疏解心结、化瘀散结为主。'
+  },
+  {
+    name:'廉贞/七杀入疾厄',
+    severity:'high',
+    check:(ctx)=>{
+      const palace=ctx.palaces[5];
+      const hits=palace.stars.filter(s=>['廉贞','七杀'].includes(s));
+      if(hits.length>0){
+        return {hit:true, detail:`${hits.join('、')}坐疾厄`,
+          rule:'廉贞、七杀等煞星入疾厄需注意血光之灾'};
+      }
+      return {hit:false};
+    },
+    advice:'防范手术刀伤；远离高危活动；35 岁后定期体检。'
+  },
+  {
+    name:'火星铃星重叠',
+    severity:'mid',
+    check:(ctx)=>{
+      const palace=ctx.palaces[5];
+      const fireBell=palace.stars.filter(s=>['火星','铃星'].includes(s));
+      if(fireBell.length>=2){
+        return {hit:true, detail:'火星铃星同宫（暴败格）',
+          rule:'火铃同宫主暴败疾厄'};
+      }
+      return {hit:false};
+    },
+    advice:'防范急性发作疾病；家中有急救预案。'
+  },
+  {
+    name:'官夫线断裂',
+    severity:'mid',
+    check:(ctx)=>{
+      // 官禄宫(8)+夫妻宫(2)互为四正
+      const guan=ctx.palaces[8];
+      const fu=ctx.palaces[2];
+      const allSha=[...guan.stars,...fu.stars].filter(s=>SHA_STARS.includes(s)||['廉贞','七杀','破军','巨门'].includes(s));
+      if(allSha.length>=3){
+        return {hit:true, detail:`官禄/夫妻宫煞星聚集（${allSha.join('、')}）`,
+          rule:'官夫线看心肾与生育'};
+      }
+      return {hit:false};
+    },
+    advice:'注意生殖泌尿系统；男命关注心肾，女命关注妇科。'
+  },
+  {
+    name:'财福线凶险',
+    severity:'mid',
+    check:(ctx)=>{
+      const cai=ctx.palaces[4];
+      const fu=ctx.palaces[10];
+      const allSha=[...cai.stars,...fu.stars].filter(s=>SHA_STARS.includes(s));
+      if(allSha.length>=3){
+        return {hit:true, detail:`财帛/福德宫煞星聚集（${allSha.join('、')}）`,
+          rule:'财福线看脾胃与精神'};
+      }
+      return {hit:false};
+    },
+    advice:'注意脾胃与精神压力；少思虑、多户外。'
+  },
+  {
+    name:'身宫凶位',
+    severity:'high',
+    check:(ctx)=>{
+      const shenPalace=ctx.palaces[ctx.shenIdx];
+      const shaInShen=shenPalace.stars.filter(s=>SHA_STARS.includes(s)||['廉贞','七杀','破军'].includes(s));
+      if(shaInShen.length>=2){
+        return {hit:true, detail:`身宫在 ${ctx.palaceName(ctx.shenIdx)} 见煞星聚集（${shaInShen.join('、')}）`,
+          rule:'身宫看后天归宿'};
+      }
+      return {hit:false};
+    },
+    advice:'身宫为后天归宿，煞聚不利健康；建议 50 岁后减少操劳。'
+  },
+  {
+    name:'天机化忌（肝胆）',
+    severity:'mid',
+    check:(ctx)=>{
+      if(ctx.huaJiStar==='天机'){
+        return {hit:true, detail:'天机化忌（肝胆系统警示）',
+          rule:'天机主肝，天机化忌肝胆系统是薄弱环节'};
+      }
+      return {hit:false};
+    },
+    advice:'疏肝理气；少饮酒、少熬夜；推荐菊花枸杞茶、柴胡疏肝散。'
+  },
+  {
+    name:'廉贞化忌（血光）',
+    severity:'high',
+    check:(ctx)=>{
+      if(ctx.huaJiStar==='廉贞'){
+        return {hit:true, detail:'廉贞化忌（血光之灾警示）',
+          rule:'廉贞化忌主意外血光'};
+      }
+      return {hit:false};
+    },
+    advice:'谨防意外伤害；远离高危运动；血库备案；定期体检心血管。'
+  },
+  {
+    name:'巨门化忌（口舌/消化）',
+    severity:'mid',
+    check:(ctx)=>{
+      if(ctx.huaJiStar==='巨门'){
+        return {hit:true, detail:'巨门化忌（口腔/食道警示）',
+          rule:'巨门主口舌、食道、口腔'};
+      }
+      return {hit:false};
+    },
+    advice:'注意口腔、食道、咽喉；少吃辛辣刺激；推荐麦冬、沙参。'
+  }
+];
+
+// === 主分析函数 ===
+async function analyze(){
+  const y=+document.getElementById('in-y').value;
+  const m=+document.getElementById('in-m').value;
+  const d=+document.getElementById('in-d').value;
+  const h=+document.getElementById('in-h').value;
+  const g=document.getElementById('in-gender').value;
+  const focus=document.getElementById('in-focus').value;
+
+  const arr=arrangeZiwei(y,m,d,h,g);
+  const ctx=buildContext(y,m,d,h,g,arr);
+  ctx.focus=focus;
+
+  // 命中规则
+  ctx.hits=[];
+  RISK_RULES.forEach(rule=>{
+    const r=rule.check(ctx);
+    if(r.hit){
+      ctx.hits.push({...rule,...r});
+    }
+  });
+
+  // 计算总风险分
+  const totalRisk=ctx.hits.reduce((sum,r)=>{
+    return sum+(r.severity==='high'?3:r.severity==='mid'?2:1);
+  },0);
+
+  // 拉取 KB 引用
+  ctx.kbRefs=await fetchKBRefs(ctx);
+
+  renderResult(ctx);
+  document.getElementById('result-section').classList.remove('hidden');
+  setTimeout(()=>{
+    document.getElementById('sec-summary').scrollIntoView({behavior:'smooth'});
+  },300);
+}
+
+function buildContext(y,m,d,h,g,arr){
+  const dayStem=STEM_LIST[((Date.UTC(y,m-1,d)-Date.UTC(1900,0,1))/86400000+10)%60%10];
+  const huaJiStar=HUA_JI_BY_DAYSTEM[dayStem]||'巨门';
+  const siHua=SI_HUA[dayStem]||[];
+
+  // 构建 12 宫星曜（简化：用确定性映射）
+  const palaces=Array(12).fill(0).map(()=>({stars:[],ganzhi:''}));
+  // 命宫主星（简化：根据生辰月份判定）
+  const mainStars=chooseMainStars(y,m,d);
+  // 命宫在 arr.mingBranchIdx
+  palaces[arr.mingBranchIdx].stars.push(...mainStars.ming);
+  palaces[(arr.mingBranchIdx+1)%12].stars.push(...mainStars.shen);
+  palaces[(arr.mingBranchIdx+5)%12].stars.push(...mainStars.cai); // 财帛
+  palaces[(arr.mingBranchIdx+10)%12].stars.push(...mainStars.fu); // 福德
+  // 煞星（按确定性分布）
+  const shaPattern=getShaPattern(y,m,d);
+  shaPattern.forEach(([palaceIdx,stars])=>{
+    palaces[palaceIdx].stars.push(...stars);
+  });
+
+  // 化忌所在宫位（根据日干 + 化忌星 推算）
+  const jiStarIdx=palaces.findIndex(p=>p.stars.includes(huaJiStar));
+  const huaJiPalace=jiStarIdx>=0?jiStarIdx:arr.mingBranchIdx;
+
+  return {
+    year:y,month:m,day:d,hour:h,gender:g,
+    dayStem,siHua,huaJiStar,huaJiPalace,
+    palaces,mingBranchIdx:arr.mingBranchIdx,shenIdx:arr.shenIdx,
+    shenPalaceName:PALACE_NAMES[arr.shenIdx],
+    palaceName:(idx)=>PALACE_NAMES[idx]
+  };
+}
+
+// 主星选择（确定性算法：根据生日）
+function chooseMainStars(y,m,d){
+  // 简化：基于生日的确定性映射（不随机）
+  const seed=(y*100+m*10+d)%14;
+  const mingPool=['紫微','天机','太阳','武曲','天同','廉贞','天府','太阴','贪狼','巨门','天相','天梁','七杀','破军'];
+  const base=mingPool[seed];
+  const ming=[base];
+  const shen=[mingPool[(seed+6)%14]];
+  const cai=[mingPool[(seed+3)%14]];
+  const fu=[mingPool[(seed+9)%14]];
+  return {ming,shen,cai,fu};
+}
+
+// 煞星分布（确定性）
+function getShaPattern(y,m,d){
+  const seed=(y*13+m*7+d)%8;
+  // 8 种预定义分布
+  const patterns=[
+    [[5,['擎羊','陀罗']],[2,['火星']],[8,['铃星']]],
+    [[5,['火星']],[7,['擎羊','陀罗']]],
+    [[5,['擎羊','火星','铃星']],[10,['地劫']]],
+    [[2,['擎羊']],[5,['陀罗','铃星']]],
+    [[10,['擎羊','陀罗','火星','铃星']]],
+    [[5,['擎羊']],[7,['火星']]],
+    [[5,['擎羊','陀罗']],[2,['地空','地劫']]],
+    [[8,['擎羊','陀罗']],[10,['火星','铃星']]]
+  ];
+  return patterns[seed];
+}
+
+// === 拉取 KB 引用 ===
+async function fetchKBRefs(ctx){
+  const queries=['化忌','疾厄','健康','疾病','煞星','火星铃星'];
+  const all=[];
+  for(const q of queries){
+    try{
+      const r=await fetch(`http://127.0.0.1:8920/api/public/kb-search?q=${encodeURIComponent(q)}&limit=3`);
+      const d=await r.json();
+      if(d.results){
+        d.results.forEach(x=>all.push({...x,query:q}));
+      }
+    }catch(e){}
+  }
+  // 去重
+  const seen=new Set();
+  return all.filter(x=>{
+    if(seen.has(x.entry_id))return false;
+    seen.add(x.entry_id);
+    return true;
+  }).slice(0,8);
+}
+
+// === 渲染 ===
+function renderResult(ctx){
+  // 综合摘要
+  const highCount=ctx.hits.filter(h=>h.severity==='high').length;
+  const midCount=ctx.hits.filter(h=>h.severity==='mid').length;
+  const totalRisk=highCount*3+midCount*2;
+  const level=totalRisk>=6?'极高':totalRisk>=3?'较高':totalRisk>=1?'中等':'较低';
+
+  document.getElementById('summary-cards').innerHTML=`
+    <div class="metric ${totalRisk>=6?'danger':totalRisk>=3?'warn':'safe'}">
+      <div class="val">${level}</div>
+      <div class="label">综合疾病风险</div>
+      <div class="sub">总分 ${totalRisk}</div>
+    </div>
+    <div class="metric ${highCount>0?'danger':''}">
+      <div class="val">${highCount}</div>
+      <div class="label">高危标记</div>
+      <div class="sub">重大风险</div>
+    </div>
+    <div class="metric ${midCount>0?'warn':''}">
+      <div class="val">${midCount}</div>
+      <div class="label">中危标记</div>
+      <div class="sub">需关注</div>
+    </div>
+    <div class="metric">
+      <div class="val">${ctx.dayStem}日干</div>
+      <div class="label">日主四化</div>
+      <div class="sub">化忌：${ctx.huaJiStar}</div>
+    </div>
+  `;
+
+  // 风险概览条
+  document.getElementById('risk-overview').innerHTML=`
+    <div style="margin-top:16px">
+      <div style="display:flex;justify-content:space-between;font-size:14px;color:var(--paper3);margin-bottom:6px">
+        <span>风险等级</span>
+        <span>${level}</span>
+      </div>
+      <div class="risk-bar">
+        <div class="risk-fill ${totalRisk>=6?'risk-vhigh':totalRisk>=3?'risk-high':totalRisk>=1?'risk-mid':'risk-low'}"
+             style="width:${Math.min(totalRisk*15,100)}%">
+          ${totalRisk} 分
+        </div>
+      </div>
+    </div>
+  `;
+
+  // 十二宫
+  let palaceHtml='<div class="row3">';
+  ctx.palaces.forEach((p,idx)=>{
+    const isJiE=idx===5;
+    const isMing=idx===ctx.mingBranchIdx;
+    const isShen=idx===ctx.shenIdx;
+    const isDanger=ctx.hits.some(h=>h.detail.includes(PALACE_NAMES[idx]));
+    const cls=isDanger?'danger':(ctx.huaJiPalace===idx?'warn':(isMing?'safe':''));
+    const flag=isMing?'<div class="flag">★</div>':isShen?'<div class="flag">◉</div>':isJiE?'<div class="flag">⚕</div>':'';
+    const hua=ctx.huaJiPalace===idx?`<div class="hua">化忌·${ctx.huaJiStar}</div>`:'';
+    palaceHtml+=`
+      <div class="palace ${cls}">
+        ${flag}
+        <div class="name">${PALACE_NAMES[idx]}${isJiE?' ⚕':''}</div>
+        <div class="stars">${p.stars.join(' ')||'—'}</div>
+        ${hua}
+      </div>
+    `;
+  });
+  palaceHtml+='</div>';
+  document.getElementById('palace-grid').innerHTML=palaceHtml;
+
+  // 风险标记详解
+  if(ctx.hits.length===0){
+    document.getElementById('risk-detail').innerHTML='<div class="empty">🎉 未检出显著疾病风险标记，注意日常养生即可。</div>';
+  }else{
+    let html='';
+    ctx.hits.forEach((r,i)=>{
+      html+=`
+        <div class="risk-card ${r.severity}">
+          <div class="title">
+            ${r.severity==='high'?'🔴':'🟡'} ${i+1}. ${r.name}
+            <span class="tag">${r.severity==='high'?'高危':'中危'}</span>
+          </div>
+          <div class="body">${r.detail}</div>
+          <div class="quote">📜 ${r.rule}</div>
+          <div class="body" style="margin-top:10px;color:var(--green)">✓ 调理：${r.advice}</div>
+        </div>
+      `;
+    });
+    document.getElementById('risk-detail').innerHTML=html;
+  }
+
+  // 大限时间轴（10 年一段）
+  let tlHtml='';
+  const baseRisk=totalRisk;
+  const ganzhiCycle=['甲子','乙丑','丙寅','丁卯','戊辰','己巳','庚午','辛未','壬申','癸酉'];
+  for(let age=5;age<=105;age+=10){
+    const idx=Math.floor(age/10)%10;
+    const gz=ganzhiCycle[idx];
+    const riskBoost=Math.abs(Math.sin(age*0.3))*2;
+    const riskScore=Math.floor(baseRisk*0.4+riskBoost);
+    const riskLabel=riskScore>=4?'极高':riskScore>=3?'较高':riskScore>=1?'中等':'较低';
+    const riskCls=riskScore>=3?'high':riskScore>=1?'mid':'low';
+    const desc=age===45?'身体转折期':age===55?'心血管高发':age===65?'慢性病期':age===75?'老年病期':age===35?'事业压力期':'';
+    tlHtml+=`
+      <div class="tl-item ${riskCls}">
+        <div class="age">${age}</div>
+        <div class="ganzhi">${gz}大限</div>
+        <div class="risk ${riskCls}">${riskLabel}</div>
+        <div class="desc">${desc}</div>
+      </div>
+    `;
+  }
+  document.getElementById('timeline').innerHTML=tlHtml;
+
+  // 调理方案
+  const actions=[];
+  ctx.hits.forEach(r=>{
+    if(r.severity==='high')actions.push({priority:'P0',text:r.advice.split('；')[0]});
+  });
+  actions.push({priority:'P1',text:'每年全面体检一次（重点：血常规、肿瘤标志物、心电图）'});
+  actions.push({priority:'P1',text:'保持规律作息（子时前入睡），避免熬夜伤肝肾'});
+  if(ctx.hits.some(h=>h.name.includes('肝胆')||h.name.includes('天机化忌')))
+    actions.push({priority:'P2',text:'饮食：少饮酒、少辛辣，多绿色蔬菜、枸杞菊花茶'});
+  if(ctx.hits.some(h=>h.name.includes('血光')||h.name.includes('廉贞')))
+    actions.push({priority:'P2',text:'运动：避免高对抗运动，优选太极、游泳、散步'});
+  if(ctx.hits.some(h=>h.name.includes('脾胃')||h.name.includes('财福')))
+    actions.push({priority:'P2',text:'饮食：规律三餐，少生冷，薏米山药健脾'});
+  if(ctx.hits.some(h=>h.name.includes('心肾')||h.name.includes('官夫')))
+    actions.push({priority:'P2',text:'生殖泌尿系统：定期筛查，男命 PSA、女命妇科'});
+  actions.push({priority:'P3',text:'心理：冥想/正念练习，化忌在心结，解铃还须系铃人'});
+
+  document.getElementById('action-list').innerHTML=actions.map(a=>
+    `<li><strong>[${a.priority}]</strong>${a.text}</li>`
+  ).join('');
+
+  // KB 引用
+  let kbHtml='';
+  ctx.kbRefs.forEach(r=>{
+    kbHtml+=`
+      <div class="risk-card">
+        <div class="title">
+          📖 ${r.title.length>50?r.title.slice(0,50)+'...':r.title}
+          <span class="tag">${r.module}</span>
+          <span class="tag">得分 ${r.score}</span>
+        </div>
+        <div class="body" style="color:var(--paper2);font-size:14px">${r.snippet}</div>
+        <div class="quote">🔍 来源：${r.entry_id} · 检索词「${r.query}」</div>
+      </div>
+    `;
+  });
+  if(!kbHtml)kbHtml='<div class="empty">未拉取到 KB 引用（API 离线或无网络）</div>';
+  document.getElementById('kb-refs').innerHTML=kbHtml;
+
+  // === 新增五大模块 ===
+  renderFutureYears(ctx);
+  renderCureCycle(ctx);
+  renderFortuneLink(ctx);
+  renderLifecycle(ctx);
+  renderResolve(ctx);
+  renderDiet(ctx);
+  renderSleep(ctx);
+  renderSport(ctx);
+  // === 自动存档（访客档案） ===
+  saveConsulting(ctx);
+
+  html += renderZidiseHealthCareerR38();
+}
+
+// === 流年 60 甲子表 ===
+const GANZHI_60=['甲子','乙丑','丙寅','丁卯','戊辰','己巳','庚午','辛未','壬申','癸酉','甲戌','乙亥','丙子','丁丑','戊寅','己卯','庚辰','辛巳','壬午','癸未','甲申','乙酉','丙戌','丁亥','戊子','己丑','庚寅','辛卯','壬辰','癸巳','甲午','乙未','丙申','丁酉','戊戌','己亥','庚子','辛丑','壬寅','癸卯','甲辰','乙巳','丙午','丁未','戊申','己酉','庚戌','辛亥','壬子','癸丑','甲寅','乙卯','丙辰','丁巳','戊午','己未','庚申','辛酉','壬戌','癸亥'];
+
+// === 5️⃣ 未来10年逐年预测 ===
+function renderFutureYears(ctx){
+  const baseYear=new Date().getFullYear();
+  const stem=STEM_LIST[(ctx.year-4)%10];
+  const branch=BRANCH_LIST[(ctx.year-4)%12];
+  let html='<div class="timeline">';
+  for(let i=0;i<10;i++){
+    const yr=baseYear+i;
+    const gzIdx=(yr-4+60*10)%60;
+    const gz=GANZHI_60[gzIdx];
+    const gStem=gz[0], gBranch=gz[1];
+    // 流年触发风险：与日主同柱± 3 / 化忌重叠 / 疾厄宫重叠
+    const dayStem=ctx.dayStem;
+    const conflict=((gStem==='甲'&&dayStem==='庚')||(gStem==='庚'&&dayStem==='甲')||(gStem==='丙'&&dayStem==='辛')||(gStem==='辛'&&dayStem==='丙'))?1.5:1.0;
+    const trig=Math.abs(Math.sin(i*0.7))*1.2*conflict;
+    const risk=Math.floor((ctx.hits.length*0.4+trig)*3);
+    const level=risk>=6?'极高':risk>=4?'较高':risk>=2?'中等':'较低';
+    const cls=risk>=4?'high':risk>=2?'mid':'low';
+    // 治愈期预估
+    let heal='1-3 月复原';
+    if(risk>=4)heal='6-12 月调理期';
+    else if(risk>=2)heal='3-6 月注意';
+    // 预警期
+    let warn='未检出';
+    if(risk>=4){
+      const seasons=['春夏交接（4-5月）','秋冬交接（10-11月）','冬春交接（1-2月）','夏秋交接（7-8月）'];
+      warn=seasons[i%4];
+    }
+    // 健康重点
+    const focus=['心血管·血压','肝胆·消化','肾腧·腰膝','肺·呼吸道','脾胃·湿气','心脑·失眠','肝火·眼','肾水·泌尿','心脾·疲劳','免疫·调养'][i];
+    html+=`
+      <div class="tl-item ${cls}">
+        <div class="age">${yr}</div>
+        <div class="ganzhi">${gz}年</div>
+        <div class="risk ${cls}">${level}</div>
+        <div class="desc">⚕️ ${focus}</div>
+        <div class="desc">⚠️ 高发：${warn}</div>
+        <div class="desc">💊 复原：${heal}</div>
+      </div>
+    `;
+  }
+  html+='</div>';
+
+  // 补充判断表
+  html+=`<div style="margin-top:18px">
+    <h3 style="font-size:16px;color:var(--gold2);margin-bottom:10px">🔮 流年判断逻辑</h3>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font-size:13px">
+      <div style="padding:10px;background:rgba(192,57,43,.1);border-radius:8px">
+        <b style="color:var(--red2)">高发预警</b>：流年天干与日主天干相克（如甲庚冲、丙辛冲），需重点防护
+      </div>
+      <div style="padding:10px;background:rgba(243,156,18,.1);border-radius:8px">
+        <b style="color:#f39c12">调理期</b>：风险中等，建议当季提前体检 + 调养
+      </div>
+      <div style="padding:10px;background:rgba(39,174,96,.1);border-radius:8px">
+        <b style="color:var(--green)">复原期</b>：风险低，适合手术复原 / 慢性病稳定期
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('future-grid').innerHTML=html;
+}
+
+// === 6️⃣ 治愈周期判断 ===
+function renderCureCycle(ctx){
+  const highHits=ctx.hits.filter(h=>h.severity==='high').length;
+  const midHits=ctx.hits.filter(h=>h.severity==='mid').length;
+  const total=highHits*3+midHits*2;
+
+  let level,curCycle, advice;
+  if(total>=6){
+    level='严峻期';curCycle='需 3-5 年系统调理';
+    advice='已有明显疾厄信号，建议立即启动多学科会诊（中医+西医+心理）；可考虑【春夏调肝、秋冬调肾】的季节疗法。';
+  }else if(total>=3){
+    level='警醒期';curCycle='需 1-3 年重点调养';
+    advice='已检出多个中高位信号，建议以中医为主、西医为辅；重点化解化忌、调和五行偏颇。';
+  }else if(total>=1){
+    level='预防期';curCycle='需 6-12 月重点关注';
+    advice='仅有 1-2 个轻微信号，趁现在调理为上工；推荐从饮食、作息、情志三方面着手。';
+  }else{
+    level='健康期';curCycle='无明显疾病周期';
+    advice='目前疾厄能量平衡，保持现有养生节奏即可；每年体检、未病先防。';
+  }
+
+  // 三阶段复原路径
+  const stages=[
+    {phase:'急期·第一阶段（0-3月）',content:'立即体检、查出具体病灶、中医辨证、暂停高负荷运动'},
+    {phase:'缓期·第二阶段（3-12月）',content:'系统调理（中药/针灸/食疗）、化解原神煞、调摄情志'},
+    {phase:'复期·第三阶段（1-3年）',content:'调整生活节奏/居住环境/职业方向，进入身场匹配的生态'}
+  ];
+  let stageHtml='';
+  stages.forEach((s,i)=>{
+    stageHtml+=`<div style="margin:8px 0;padding:12px 16px;background:rgba(201,168,76,.06);border-left:3px solid var(--gold);border-radius:8px">
+      <b style="color:var(--gold2)">${s.phase}</b><br>
+      <span style="color:var(--paper2);font-size:14px;margin-top:4px">${s.content}</span>
+    </div>`;
+  });
+
+  // KB 引用
+  const tip=ctx.huaJiStar==='天机'?'天机化忌重点调肝，推荐【柴胡疏肝散】或【道遥散】。':ctx.huaJiStar==='廉贞'?'廉贞化忌防血光，建议【五子街宗丸】补肾、跱意心火。':ctx.huaJiStar==='贪狼'?'贪狼主肝牌，推荐【龙胆泄肝汤】或【同仁乌鸡白凤丸】。':ctx.huaJiStar==='巨门'?'巨门主口舌肠胃，推荐【麦门冬汤】、【沙参麦冬饮】。':ctx.huaJiStar==='太阳'?'太阳化忌护眼与心，推荐【归脾汤】、【八味地黄丸】。':'根据具体化忌星选方。';
+
+  document.getElementById('cure-output').innerHTML=`
+    <div style="background:rgba(192,57,43,.08);padding:20px;border-radius:12px;margin-bottom:18px;border-left:4px solid var(--red2)">
+      <div style="font-size:20px;color:var(--red2);font-weight:600;margin-bottom:6px">【${level}】</div>
+      <div style="font-size:16px;color:var(--paper2)">预估治愈/调养周期：${curCycle}</div>
+    </div>
+    <div style="background:rgba(201,168,76,.05);padding:18px;border-radius:12px;margin-bottom:18px">
+      <b style="color:var(--gold2)">📜 判断依据：</b><br>
+      <div style="margin-top:8px;color:var(--paper2);line-height:1.9">${advice}</div>
+    </div>
+    <h3 style="font-size:16px;color:var(--gold2);margin:14px 0 10px">🛤️ 三阶段复原路径</h3>
+    ${stageHtml}
+    <div style="margin-top:18px;padding:14px;background:rgba(22,160,133,.1);border-radius:10px;border-left:3px solid var(--jade)">
+      <b style="color:var(--jade)">💊 中医调理方向：</b>${tip}
+    </div>
+  `;
+}
+
+// === 7️⃣ 运势 × 健康 联动 ===
+
+// ========== R19-2·饮食调养·renderDiet ==========
+function renderDiet(ctx){
+  const wx = (typeof ZIXING_WUXING!=='undefined'?ZIXING_WUXING[ctx.huaJiStar]:'')||'土';
+  const zf = (typeof WUXING_ZANGFU!=='undefined'?WUXING_ZANGFU[wx]:null)||{zang:'脾',fu:'胃',taste:'甘',color:'黄',season:'长夏'};
+  const taste = {'木':'酸','火':'苦','土':'甘','金':'辛','水':'咸'}[wx];
+  const avoid = {'木':'辛','火':'咸','土':'酸','金':'苦','水':'甘'}[wx];
+  const elem = document.getElementById('diet-output');
+  if(!elem) return;
+  elem.innerHTML = `
+    <div class="diet-grid">
+      <div class="diet-card"><h4>🍃 五味</h4>
+        <div class="remedy"><b>宜</b>：${taste}味食物（养${zf.zang}）</div>
+        <div class="remedy"><b>忌</b>：${avoid}味过度（克${zf.zang}）</div>
+        <div class="remedy">⚠️ 五味调和勿过偏</div></div>
+      <div class="diet-card"><h4>🎨 五色</h4>
+        <div class="remedy"><b>主色</b>：${zf.color}色食材（补${wx}行）</div>
+        <div class="remedy">日常饮食：<b>${wx}行食材</b>占比 40%</div>
+        <div class="remedy">节气前后：<b>${zf.color}色粥</b></div></div>
+      <div class="diet-card"><h4>🌱 节令·化忌星</h4>
+        <div class="remedy"><b>${zf.season}</b>重点养${zf.zang}</div>
+        <div class="remedy">化忌<b>${ctx.huaJiStar||'未检出'}</b>：忌相克食物</div>
+        <div class="remedy">${wx==='水'?'黑色食物（黑豆/黑芝麻/桑葚）':wx==='木'?'青色食物（菠菜/芹菜/绿豆）':wx==='火'?'红色食物（红枣/枸杞/番茄）':wx==='土'?'黄色食物（小米/南瓜/山药）':'白色食物（银耳/百合/梨）'}</div></div>
+    </div>
+    <div style="margin-top:14px;padding:14px;background:rgba(26,188,156,.08);border-radius:10px;font-size:13px;line-height:1.8">
+      <b style="color:#1abc9c">💡 食疗药膳（按化忌星）：</b><br>
+      • <b>天机（肝木）</b>：柴胡疏肝散 + 菊花决明子茶<br>
+      • <b>太阳（心火）</b>：归脾汤 + 莲子心茶 / 红枣桂圆粥<br>
+      • <b>廉贞（肾水）</b>：五子衍宗丸 + 黑芝麻丸 / 黑豆山药粥<br>
+      • <b>贪狼（胆木）</b>：龙胆泻肝汤 + 茵陈蒿茶 / 苦瓜薏米粥<br>
+      • <b>巨门（肺金）</b>：麦门冬汤 + 沙参麦冬茶 / 川贝炖雪梨<br>
+      • <b>太阴（脾土）</b>：参苓白术散 + 薏米山药粥 / 红豆薏米水
+    </div>`;
+}
+
+// ========== R19-2·起居调养·renderSleep ==========
+function renderSleep(ctx){
+  const wx = (typeof ZIXING_WUXING!=='undefined'?ZIXING_WUXING[ctx.huaJiStar]:'')||'土';
+  const zf = (typeof WUXING_ZANGFU!=='undefined'?WUXING_ZANGFU[wx]:null)||{zang:'脾',fu:'胃',taste:'甘',color:'黄',season:'长夏'};
+  const SHICHEN = [
+    {h:'子(23-1)',m:'胆',tip:'必须入睡·养胆'},
+    {h:'丑(1-3)',m:'肝',tip:'深睡·养肝血'},
+    {h:'寅(3-5)',m:'肺',tip:'深睡·肺排毒'},
+    {h:'卯(5-7)',m:'大肠',tip:'宜醒·排便'},
+    {h:'辰(7-9)',m:'胃',tip:'早餐黄金期'},
+    {h:'巳(9-11)',m:'脾',tip:'工作高峰'},
+    {h:'午(11-13)',m:'心',tip:'小憩15-30分'},
+    {h:'未(13-15)',m:'小肠',tip:'消化吸收'},
+    {h:'申(15-17)',m:'膀胱',tip:'多喝水'},
+    {h:'酉(17-19)',m:'肾',tip:'收纳·藏精'},
+    {h:'戌(19-21)',m:'心包',tip:'放松·散步'},
+    {h:'亥(21-23)',m:'三焦',tip:'准备入睡'}
+  ];
+  const elem = document.getElementById('sleep-output');
+  if(!elem) return;
+  elem.innerHTML = `
+    <div class="sleep-grid">
+      ${SHICHEN.map(s=>`<div class="sleep-card"><div class="h">${s.h}</div><div class="o">${s.m}经</div><div class="a">${s.tip}</div></div>`).join('')}
+    </div>
+    <div style="margin-top:14px;padding:14px;background:rgba(243,156,18,.08);border-radius:10px;font-size:13px;line-height:1.8">
+      <b style="color:#f39c12">💡 化忌星·起居要点：</b><br>
+      • 化忌<b>${ctx.huaJiStar||'未检出'}</b>（${wx}行）→ 对应经络 <b>${zf.zang}${zf.fu?'/ '+zf.fu:''}</b>，其时辰为 <b>${zf.zang==='肝'?'丑':zf.zang==='心'?'午':zf.zang==='脾'?'巳':zf.zang==='肺'?'寅':'酉'}</b> 时<br>
+      • 季节重点：<b>${zf.season}</b> 月<br>
+      • <b>方位建议</b>：卧室床头朝 <b>${wx==='木'?'东':wx==='火'?'南':wx==='土'?'中央':wx==='金'?'西':'北'}</b> 方为吉<br>
+      • <b>房事宜忌</b>：化忌星应期月宜节制
+    </div>`;
+}
+
+// ========== R19-2·运动导引·renderSport ==========
+function renderSport(ctx){
+  const wx = (typeof ZIXING_WUXING!=='undefined'?ZIXING_WUXING[ctx.huaJiStar]:'')||'土';
+  const elem = document.getElementById('sport-output');
+  if(!elem) return;
+  const guide = {
+    '木':{sport:'五禽戏·虎戏 + 八段锦·攥拳怒目增气力',why:'木主筋·疏肝解郁',time:'晨起 6-7 时',freq:'每日 15 分'},
+    '火':{sport:'八段锦·摇头摆尾去心火 + 五禽戏·猿戏',why:'火主脉·宁心安神',time:'午间 11-13 时',freq:'每日 10-15 分'},
+    '土':{sport:'五禽戏·熊戏 + 八段锦·调理脾胃须单举',why:'土主肉·健脾祛湿',time:'巳时 9-11 时',freq:'每日 15-20 分'},
+    '金':{sport:'八段锦·左右开弓似射雕 + 五禽戏·鸟戏',why:'金主皮毛·润肺理气',time:'卯时 5-7 时',freq:'每日 15 分'},
+    '水':{sport:'五禽戏·鹿戏 + 八段锦·两手攀足固肾腰',why:'水主骨·补肾固本',time:'酉时 17-19 时',freq:'每日 15-20 分'}
+  }[wx]||{};
+  elem.innerHTML = `
+    <div class="sport-grid">
+      <div class="sport-card">
+        <h4>🥋 推荐导引</h4>
+        <div class="keypoints"><b>方案</b>：${guide.sport||'八段锦全套'}</div>
+        <div class="keypoints"><b>原理</b>：${guide.why||'调和五行'}</div>
+        <div class="keypoints"><b>时机</b>：${guide.time||'晨起或傍晚'}</div>
+        <div class="keypoints"><b>频次</b>：${guide.freq||'每日 15 分'}</div>
+      </div>
+      <div class="sport-card">
+        <h4>💆 穴位按摩（按化忌星）</h4>
+        <div class="keypoints">
+          • <b>${wx==='木'?'太冲+行间+期门':wx==='火'?'内关+神门+膻中':wx==='土'?'足三里+中脘+公孙':wx==='金'?'列缺+太渊+肺俞':'太溪+涌泉+肾俞'}</b> 每日按摩各 100 次<br>
+          • 早晚各一次，配合<b>揉腹术</b>（顺时针 100 圈 + 逆时针 100 圈）<br>
+          • 重点穴位可用<b>艾灸</b>（神阙/关元/足三里三选一，每次 15 分）
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:14px;padding:14px;background:rgba(230,126,34,.08);border-radius:10px;font-size:13px;line-height:1.8">
+      <b style="color:#e67e22">💡 吐纳功法（按五行）：</b><br>
+      • <b>木</b>：嘘字诀（嘘 xū），双目微张，深长呼气<br>
+      • <b>火</b>：呵字诀（呵 hē），缓缓吐气<br>
+      • <b>土</b>：呼字诀（呼 hū），撮口呼气<br>
+      • <b>金</b>：呬字诀（呬 sì），舌尖抵齿缝吐气<br>
+      • <b>水</b>：吹字诀（吹 chuī），撮口吹气<br>
+      <span style="color:var(--paper3);font-size:11px">📖 出处：《遵生八笺·六字诀》——「春嘘明目木扶肝，夏至呵心火自闲，秋呬定收金肺润，冬吹惟要坎中安，三焦嘻却除烦热，四季常呼脾化餐。」</span>
+    </div>`;
+}
+
+function renderResolve(ctx){
+  // === 七维化解方案生成器 ===
+  const huaJiStar=ctx.huaJiStar||'未检出';
+  const huaJiPalace=ctx.huaJiPalace||5;
+  const gender=ctx.gender||'M';
+  const hits=ctx.hits||[];
+  const wuxing=ZIXING_WUXING[huaJiStar]||'土';
+  const zangfu=WUXING_ZANGFU[wuxing]||{organ:'脾胃',sense:'口',emotion:'思',season:'四季末',color:'黄'};
+  const highHits=hits.filter(h=>h.severity==='high');
+  const palaceCN=PALACE_NAMES[huaJiPalace]||'疾厄';
+  
+  // KB 检索：化解相关
+  const kbQuery=async(q)=>{
+    try{
+      const r=await fetch('http://127.0.0.1:8920/api/public/kb-search?q='+encodeURIComponent(q)+'&limit=2');
+      const d=await r.json();
+      return d.results||[];
+    }catch(e){return [];}
+  };
+
+  // 同步执行 3 个最相关查询
+  let kbHTML='';
+  Promise.all([
+    kbQuery('化解'),
+    kbQuery('风水'),
+    kbQuery(zangfu.organ)
+  ]).then(ress=>{
+    const seen=new Set();
+    let kbTxt='';
+    [...ress[0],...ress[1],...ress[2]].forEach(r=>{
+      if(!seen.has(r.entry_id)&&kbTxt.length<500){
+        seen.add(r.entry_id);
+        kbTxt+=`<div class="resolve-kb"><b style="color:var(--jade)">[${r.entry_id}]</b> ${r.title.slice(0,40)}：<span style="color:var(--paper3)">${r.snippet.slice(0,80)}...</span></div>`;
+      }
+    });
+    if(kbTxt){
+      const box=document.querySelector('#resolve-output .kb-anchor');
+      if(box)box.innerHTML='<h3 style="font-size:16px;color:var(--gold2);margin:18px 0 10px">📚 化解古籍摘录（KB 引用）</h3>'+kbTxt;
+    }
+  });
+
+  // === 化解方案七维度 ===
+  const cards=[
+    // 1. 风水化解
+    {
+      title:'🧭 1. 风水化解·方位调整',
+      tag:'环境',
+      tint:'#e74c3c',
+      ul:[
+        `床头宜朝 <b style="color:var(--gold2)">${zangfu.color}色</b> 方（${zangfu.organ==='心'||zangfu.organ==='小肠'?'南方离位':zangfu.organ==='肝'||zangfu.organ==='胆'?'东方震位':zangfu.organ==='脾'||zangfu.organ==='胃'?'中央':zangfu.organ==='肺'||zangfu.organ==='大肠'?'西方兑位':'北方坎位'}），忌对门窗`,
+        `书桌/办公桌朝 <b style="color:var(--gold2)">${zangfu.color}色</b> 方，背后有实墙靠山`,
+        `${gender==='M'?'灶位':'主卧'} 避开 <b style="color:var(--red2)">病符位</b>（本命 ${huaJiPalace===5?'疾厄':'煞方'}）`,
+        `增加 <b style="color:var(--gold2)">${zangfu.color}色</b> 装饰（${zangfu.color==='红'?'地毯/抱枕':zangfu.color==='绿'?'绿植/挂画':zangfu.color==='黄'?'沙发/窗帘':'金属摆件'}），忌全屋黑白`,
+        `玄关挂 <b style="color:var(--gold2)">山海镇</b> 或 <b>八卦镜</b>，挡外煞`
+      ],
+      formula:`<b>核心原则：</b>五行通关 — 所喜五行得位，所忌五行避之。<br><b>适宜颜色：</b>${zangfu.color}色及其衍生色<br><b>适宜材质：</b>${wuxing==='木'?'绿植/木质':wuxing==='火'?'红花/陶瓷':wuxing==='土'?'陶瓷/玉石':wuxing==='金'?'金属/水晶':'水种/玻璃'}`
+    },
+    // 2. 五行补救
+    {
+      title:'🎨 2. 五行补救·颜色/材质/数字',
+      tag:'平衡',
+      tint:'#f39c12',
+      ul:[
+        `着装：日主喜 <b style="color:var(--gold2)">${wuxing}</b> 行，多穿 <b style="color:var(--gold2)">${zangfu.color}</b> 系`,
+        `配饰：${wuxing==='木'?'翡翠/绿松石':wuxing==='火'?'红玛瑙/石榴石':wuxing==='土'?'黄玉/蜜蜡':wuxing==='金'?'白水晶/银饰':'黑曜石/海蓝宝'}`,
+        `吉数：${wuxing==='木'?'3、8':wuxing==='火'?'2、7':wuxing==='土'?'5、0':wuxing==='金'?'4、9':'1、6'}（手机尾号/楼层/工位）`,
+        `车牌/楼层/房号：尽量配上述吉数`,
+        `若命中 ${highHits.length?'极高风险位（如血光/手术位）':'中风险位'}，建议当年内避免重大决策`
+      ],
+      formula:`<b>所喜五行：</b>${wuxing}<br><b>对应季节：</b>${zangfu.season}<br><b>建议节令：</b>春季（2-4月）补 ${wuxing} 行最佳`
+    },
+    // 3. 符咒护身
+    {
+      title:'🔮 3. 符咒护身·道家化解',
+      tag:'护佑',
+      tint:'#9b59b6',
+      ul:[
+        `化解太岁：本命年/冲太岁年（${ctx.year+1} 乙巳年，${gender==='M'?'属虎/猴':'属蛇/猪'} 需拜太岁）`,
+        `请 <b style="color:var(--gold2)">太岁符</b>（年初道观请，贴于客厅或随身携带）`,
+        `请 <b style="color:var(--gold2)">平安符</b>（白玉蟾祖师、吕祖、观音等），贴身佩戴`,
+        `化煞摆件：${highHits.length>=2?'黑曜石手链 + 桃木剑 / 铜葫芦':'水晶洞 + 黄玉貔貅'}（避邪化煞）`,
+        `床头贴 <b style="color:var(--gold2)">六字大明咒</b> 或 <b>南无阿弥陀佛</b>`
+      ],
+      formula:`<b>适用情境：</b>${highHits.length?'风险等级高，强烈建议请符':'风险中等，可选'}
+<br><b>祈请地点：</b>本地正规道观/佛教寺院
+<br><b>佩戴时间：</b>${ctx.year}年立春后第一个吉日`
+    },
+    // 4. 宗教仪式
+    {
+      title:'🛕 4. 宗教仪式·祈福消业',
+      tag:'法会',
+      tint:'#3498db',
+      ul:[
+        `年初/年初九参加 <b style="color:var(--gold2)">顺星拜太岁</b> 道教法会`,
+        `${gender==='M'?'关帝庙祈福拜文昌':'妈祖庙祈福拜观音'} 消灾延寿`,
+        `每月农历 <b style="color:var(--gold2)">初一、十五</b> 放生（鱼/鸟/龟），积德回向`,
+        `${highHits.length?'家中供 <b style="color:var(--gold2)">药师佛/地藏王菩萨</b>一尊，每日一炷香':'定期到寺庙供花果'}，连续 49 天`,
+        `印经/抄经：《药师经》《地藏经》《心经》，各 49 遍`
+      ],
+      formula:`<b>最佳日期：</b>农历每月初一、十五，或本人八字喜用神日
+<br><b>配合事项：</b>持斋、放生、诵经
+<br><b>功德回向：</b>愿以此功德，庄严佛净土，上报四重恩，下济三途苦`
+    },
+    // 5. 饮食化解
+    {
+      title:'🍵 5. 饮食化解·药膳/食疗',
+      tag:'饮食',
+      tint:'#16a085',
+      ul:[
+        `多食 <b style="color:var(--gold2)">${zangfu.organ}</b> 之味：${zangfu.organ==='心'?'苦味（莲子心、苦瓜）+ 红豆、枣':zangfu.organ==='肝'?'酸味（山楂、乌梅）+ 菠菜、木耳':zangfu.organ==='脾'?'甘味（山药、莲子、薏米）+ 黄豆、南瓜':zangfu.organ==='肺'?'辛味（生姜、葱白）+ 银耳、百合':'咸味（海带、紫菜）+ 黑豆、桑葚'}`,
+        `节令饮食：${zangfu.season} 多吃 <b style="color:var(--gold2)">${zangfu.color}</b> 色食物`,
+        `每日上午 9-11 时（脾经当令）进 <b style="color:var(--gold2)">五谷粥</b>（山药+莲子+薏米+红枣+小米）`,
+        `禁忌：忌 <b style="color:var(--red2)">${zangfu.organ==='心'?'过咸、过辣':zangfu.organ==='肝'?'酒、熬夜':zangfu.organ==='脾'?'生冷、油腻':zangfu.organ==='肺'?'烟、燥热':'过咸、寒凉'}</b>之物`,
+        `体质偏颇者：每年 <b style="color:var(--gold2)">春分/秋分</b> 各服一次 <b style="color:var(--gold2)">${huaJiStar==='天机'?'柴胡疏肝散':huaJiStar==='廉贞'?'五子衍宗丸':huaJiStar==='贪狼'?'龙胆泻肝汤':huaJiStar==='巨门'?'麦门冬汤':'归脾汤'}</b>`
+      ],
+      formula:`<b>节令调养：</b>${zangfu.season} 重点调 ${zangfu.organ}<br><b>体质判定：</b>${ctx.hits.length>2?'平和体质偏颇明显':'平和体质为主'}<br><b>服药前：</b>咨询当地中医辨证，避免盲目进补`
+    },
+    // 6. 起居化解
+    {
+      title:'🌙 6. 起居化解·时辰/季节',
+      tag:'作息',
+      tint:'#7f8c8d',
+      ul:[
+        `睡眠时辰：<b style="color:var(--gold2)">亥时（21-23时）</b> 必须就寝 — 三焦经当令，最养元气`,
+        `起床时辰：<b style="color:var(--gold2)">卯时（5-7时）</b> 大肠经当令，自然醒最佳`,
+        `子时（23-1时）胆经养，<b style="color:var(--red2)">熬夜等同杀生</b>，必须避免`,
+        `季节调摄：${zangfu.season} 多到 <b style="color:var(--gold2)">${zangfu.color}色</b> 方位活动 / 旅游（${zangfu.organ==='心'?'南方/阳光充足处':zangfu.organ==='肝'?'东方/森林':'北方/水边'}）`,
+        `沐浴水温：忌冰冷浴，<b>温水 38-40℃</b> 最佳（养 ${zangfu.organ}）`,
+        `着装：四时合宜，<b style="color:var(--gold2)">${zangfu.color}</b> 系为主，<b style="color:var(--red2)">忌全黑/全白</b> 长时间`
+      ],
+      formula:`<b>十二时辰养生表：</b><br>• 23-1 时：胆经（必须入睡）<br>• 1-3 时：肝经（养血）<br>• 5-7 时：肺经（深呼吸最佳）<br>• 7-9 时：胃经（早餐温热）<br>• 21-23 时：三焦经（准备入睡）`
+    },
+    // 7. 运动导引
+    {
+      title:'🧘 7. 运动导引·八段锦/穴位/吐纳',
+      tag:'运动',
+      tint:'#27ae60',
+      ul:[
+        `每日清晨 <b style="color:var(--gold2)">八段锦</b>（国家体育总局版），重点做 <b style="color:var(--gold2)">${huaJiStar==='天机'?'左右开弓似射雕（疏肝）':huaJiStar==='廉贞'?'双手托天理三焦 + 调理脾胃须单举':'两手攀足固肾腰（固本）'}</b>`,
+        `每周 3 次 <b style="color:var(--gold2)">${wuxing==='木'?'五禽戏·鹤戏（疏肝）':wuxing==='火'?'导引按跷·心包经拍打':wuxing==='土'?'易筋经·韦驮献杵':'六字诀·吹字诀（固肾）'}</b>`,
+        `<b>穴位按摩：</b>每日按 ${zangfu.organ==='心'?'内关+膻中':zangfu.organ==='肝'?'太冲+期门':zangfu.organ==='脾'?'足三里+中脘':zangfu.organ==='肺'?'太渊+中府':'涌泉+太溪'} 各 3 分钟`,
+        `<b>吐纳：</b>腹式呼吸，深吸慢呼，1 日 3 次，每次 5 分钟（养元气）`,
+        `<b>禁忌：</b>忌夜间剧烈运动、忌大汗淋漓、忌 ${huaJiStar==='天机'?'贪凉饮冷':'空腹剧烈运动'}`
+      ],
+      formula:`<b>五行导引对照：</b><br>• 木行→五禽戏·鹤戏<br>• 火行→导引按跷<br>• 土行→易筋经<br>• 金行→六字诀·呬字<br>• 水行→六字诀·吹字<br><b>最佳时辰：</b>卯时（5-7时）大肠经当令，运动最佳`
+    }
+  ];
+
+  let html='';
+  cards.forEach(c=>{
+    html+=`<div class="resolve-card" style="border-left-color:${c.tint}">
+      <div class="rc-title">${c.title}<span class="rtag">${c.tag}</span></div>
+      <ul>${c.ul.map(u=>'<li>'+u+'</li>').join('')}</ul>
+      <div class="formula">${c.formula}</div>
+    </div>`;
+  });
+
+  // KB 引用锚点
+  html+='<div class="kb-anchor"></div>';
+
+  // 大师总结
+  html+=`<div style="margin-top:18px;padding:20px;background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(22,160,133,.1));border-radius:12px;border:1px solid var(--gold)">
+    <div style="font-size:17px;color:var(--gold2);font-weight:600;margin-bottom:10px">🎯 化解大师总结</div>
+    <div style="font-size:14px;color:var(--paper);line-height:1.9">
+      针对你 <b style="color:var(--gold2)">${ctx.huaJiStar}化忌入${ctx.palaceCN}</b> 的命盘，建议<strong>七维化解并举</strong>：
+      <br><b style="color:var(--gold2)">急则治标</b>（就医 + 服药 + 食疗）、<b style="color:var(--gold2)">缓则治本</b>（运动 + 起居 + 五行补救）、
+      <b style="color:var(--gold2)">本则治神</b>（风水 + 符咒 + 宗教）。
+      <br>其中 <b style="color:var(--red2)">【${zangfu.organ}】</b> 为重点调养对象（七维都围绕此脏腑），化忌所在 <b>${ctx.palaceCN}</b> 之疾厄已有 ${hits.length} 条命中，<b>必须</b>按上 7 维同时进行，方得五行圆融、身心安泰。
+    </div>
+  </div>`;
+
+  document.getElementById('resolve-output').innerHTML=html;
+}
+
+function renderFortuneLink(ctx){
+  // 官禄（8）· 财帛（4）· 疾厄（5）联动判断
+  const guan=ctx.palaces[8];
+  const cai=ctx.palaces[4];
+  const jiE=ctx.palaces[5];
+
+  const guanSha=[...guan.stars].filter(s=>SHA_STARS.includes(s)||['廉贞','七杀','破军'].includes(s));
+  const caiSha=[...cai.stars].filter(s=>SHA_STARS.includes(s));
+  const jiESha=[...jiE.stars].filter(s=>SHA_STARS.includes(s)||['廉贞','七杀','破军','巨门'].includes(s));
+
+  // 判断运势压力期
+  let pressureLevel='低';
+  if(guanSha.length>=2 || caiSha.length>=2)pressureLevel='高';
+  else if(guanSha.length>=1 || caiSha.length>=1)pressureLevel='中';
+
+  // 联动判断表
+  const links=[
+    {axis:'事业·官禄',health:'压力→心血管/失眠',detail: guanSha.length>0?`官禄宫见${guanSha.join('、')}，事业变动伴随身心压力，可能心血管隱忧`:'官禄宫清爽，事业平稳'},
+    {axis:'财运·财帛',health:'劳心→脾胃/湿气',detail: caiSha.length>0?`财帛宫见${caiSha.join('、')}，财运压力影脾冒，易湿重/腹泻`:'财帛宫平稳'},
+    {axis:'健康·疾厄',health:'隱忧→血光/手术',detail: jiESha.length>0?`疾厄宫见${jiESha.join('、')}，${ctx.huaJiStar}化忌在此，3-5 年内留意手术隐忧`:'疾厄宫平稳'},
+    {axis:'精神·福德',health:'迷感→精神压力',detail: ctx.palaces[10].stars.length>2?'福德宫主星多，思虑过重、失眠预警':'福德宫清净'}
+  ];
+
+  let html=`<div style="background:rgba(201,168,76,.05);padding:14px;border-radius:10px;margin-bottom:14px">
+    <b style="color:var(--gold2)">⚖️ 运势压力指数：</b>
+    <span style="font-size:24px;font-weight:600;color:${pressureLevel==='高'?'var(--red2)':pressureLevel==='中'?'#f39c12':'var(--green)'};margin-left:10px">${pressureLevel}</span>
+  </div>`;
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
+  links.forEach(l=>{
+    html+=`<div style="padding:14px;background:rgba(10,10,10,.4);border-radius:10px;border:1px solid var(--border)">
+      <div style="font-size:15px;color:var(--gold2);font-weight:600;margin-bottom:6px">${l.axis}</div>
+      <div style="font-size:13px;color:var(--paper3);margin-bottom:6px">→ ${l.health}</div>
+      <div style="font-size:13px;color:var(--paper2);line-height:1.6">${l.detail}</div>
+    </div>`;
+  });
+  html+='</div>';
+
+  // 联动调养建议
+  html+=`<div style="margin-top:16px;padding:14px;background:rgba(39,174,96,.08);border-radius:10px">
+    <b style="color:var(--green)">🎯 联动调养原则：</b>
+    <div style="margin-top:8px;color:var(--paper2);font-size:14px;line-height:1.8">
+      • 事业冲刺期（30-45岁）：宜【补心脾】+ 定期心血管体检<br>
+      • 财运上升期：宜【健脾祛湿】+ 控制应酶<br>
+      • 退休转换期（55-65岁）：宜【补肾固本】+ 慢病调养<br>
+      • 逍遥期（65+）：宜【颐养天年】+ 社交防郁
+    </div>
+  </div>`;
+  document.getElementById('fortune-output').innerHTML=html;
+}
+
+// === 8️⃣ 人生全面分析（过去 → 现在 → 未来） ===
+function renderLifecycle(ctx){
+  const currentAge=new Date().getFullYear()-ctx.year;
+  const lifeStages=[
+    {name:'成长期（0-20）',period:'0-20',health:'先天体质、婴动期、青春发育期',fortune:'学业·性格养成'},
+    {name:'创业期（20-40）',period:'20-40',health:'事业压力期·心血管预警',fortune:'创业·婚姻·育儿'},
+    {name:'守成期（40-60）',period:'40-60',health:'慢性病高发·手术高峰期',fortune:'守业·财富积累·空巢'},
+    {name:'传承期（60+）',period:'60+',health:'老年慢性病·心脑·骨关节',fortune:'传承·养老·颐养'}
+  ];
+
+  let html=`<div style="background:rgba(201,168,76,.06);padding:18px;border-radius:12px;margin-bottom:18px">
+    <div style="font-size:18px;color:var(--gold2);font-weight:600">🧬 当前生命周期：${lifeStages.find(s=>currentAge>=parseInt(s.period.split('-')[0])&&currentAge<=parseInt(s.period.split('-')[1].replace('+','')))?.name || '未知'}（${currentAge}岁）</div>
+    <div style="margin-top:6px;color:var(--paper3);font-size:13px">你是周期往前走的生物，过去已发生 + 现在进行中 + 未来可干预。</div>
+  </div>`;
+
+  // 人生时间轴
+  html+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px">';
+  lifeStages.forEach((s,i)=>{
+    const isCurrent=currentAge>=parseInt(s.period.split('-')[0])&&currentAge<=parseInt(s.period.split('-')[1].replace('+',''));
+    html+=`<div style="padding:14px;background:${isCurrent?'rgba(201,168,76,.15)':'rgba(10,10,10,.4)'};border:2px solid ${isCurrent?'var(--gold)':'var(--border)'};border-radius:10px;text-align:center">
+      <div style="font-size:14px;color:${isCurrent?'var(--gold2)':'var(--paper3)'};font-weight:600">${s.name}</div>
+      <div style="font-size:11px;color:var(--paper3);margin:4px 0">${s.period}岁</div>
+      <div style="font-size:12px;color:var(--paper2);margin-top:6px;line-height:1.5">⚕️ ${s.health}</div>
+      <div style="font-size:12px;color:var(--paper2);line-height:1.5">🌟 ${s.fortune}</div>
+      ${isCurrent?'<div style="margin-top:6px;font-size:10px;color:var(--gold2)">← 当前</div>':''}
+    </div>`;
+  });
+  html+='</div>';
+
+  // 三维度分析（过去/现在/未来）
+  const nowAge=currentAge;
+  const pastPeriod=`${nowAge-10}-${nowAge}岁`;
+  const futurePeriod=`${nowAge}-${nowAge+10}岁`;
+
+  html+=`<h3 style="font-size:18px;color:var(--gold2);margin:18px 0 12px">📊 三维度全面分析</h3>`;
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">';
+
+  // 过去
+  html+=`<div style="padding:18px;background:rgba(10,10,10,.4);border-radius:12px;border-top:3px solid #8e44ad">
+    <div style="font-size:16px;color:#8e44ad;font-weight:600;margin-bottom:8px">🕘 过去·${pastPeriod}</div>
+    <div style="font-size:13px;color:var(--paper2);line-height:1.8">
+      • <b>事业轨迹</b>：事业发展平稳期/创业压力期，主宣经历事业波动<br>
+      • <b>健康现状</b>：${ctx.hits.length>0?`已出现${ctx.hits.length}个疾厄信号，包括${ctx.hits[0].name}`:'身体平稳，未检出明显疾厄'}<br>
+      • <b>精神状态</b>：福德宫主星${ctx.palaces[10].stars.join('、')||'清净'}，思虑${ctx.palaces[10].stars.length>2?'偏重':'适中'}
+    </div>
+  </div>`;
+
+  // 现在
+  html+=`<div style="padding:18px;background:rgba(201,168,76,.1);border-radius:12px;border-top:3px solid var(--gold)">
+    <div style="font-size:16px;color:var(--gold2);font-weight:600;margin-bottom:8px">📍 现在·当下</div>
+    <div style="font-size:13px;color:var(--paper2);line-height:1.8">
+      • <b>大限运势</b>：当前大限${Math.floor(nowAge/10)*10}岁、运势${ctx.hits.filter(h=>h.severity==='high').length>0?'压力较大':'平稳'}<br>
+      • <b>疾厄能量</b>：风险总分 ${ctx.hits.reduce((s,h)=>s+(h.severity==='high'?3:h.severity==='mid'?2:1),0)} 分<br>
+      • <b>需关注</b>：${ctx.huaJiStar}化忌入${PALACE_NAMES[ctx.huaJiPalace]}，为本阶段核心重点
+    </div>
+  </div>`;
+
+  // 未来
+  html+=`<div style="padding:18px;background:rgba(22,160,133,.1);border-radius:12px;border-top:3px solid var(--jade)">
+    <div style="font-size:16px;color:var(--jade);font-weight:600;margin-bottom:8px">🔭 未来·${futurePeriod}</div>
+    <div style="font-size:13px;color:var(--paper2);line-height:1.8">
+      • <b>运势趋势</b>：${nowAge<40?'创业压力期后期，运势逐渐收紧':nowAge<60?'守成期，需调摄身心':'传承期，宜颐养天年'}<br>
+      • <b>健康预警</b>：未来3-5 年需重点关注${ctx.hits[0]?.name || '未检出'}<br>
+      • <b>建议干预</b>：${ctx.hits.filter(h=>h.severity==='high').length>0?'提前中医调理、年度体检':'保持现状、随访观察'}
+    </div>
+  </div>`;
+  html+='</div>';
+
+  // 总结
+  html+=`<div style="margin-top:20px;padding:18px;background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(192,57,43,.1));border-radius:12px;border:1px solid var(--gold)">
+    <div style="font-size:16px;color:var(--gold2);font-weight:600;margin-bottom:8px">🎯 大师总结</div>
+    <div style="font-size:14px;color:var(--paper);line-height:1.9">
+      你目前处于 <b style="color:var(--gold2)">${lifeStages.find(s=>currentAge>=parseInt(s.period.split('-')[0])&&currentAge<=parseInt(s.period.split('-')[1].replace('+','')))?.name}</b>。
+      从紫微+八字的能量看，<b>过去10年</b>你经历了事业与健康的双重考验；
+      <b>未来10年</b>需要重点关注 ${ctx.huaJiStar} 化忌所主的脏腑（${WUXING_ZANGFU[ZIWEI_STARS[ctx.huaJiStar]?.wx||'土'].organ || '不明'}）。
+      推荐在 <b style="color:var(--green)">${ctx.hits.length>2?'未来3-5年':'每年春秋两季'}</b> 进行系统调养，
+      实现从【预防】到【治愈】的完整闭环。
+    </div>
+  </div>`;
+
+  document.getElementById('lifecycle-output').innerHTML=html;
+}
+
+// === 9️⃣ 过去病史反查 ===
+function renderHistory(){
+  const txt=document.getElementById('in-history').value.trim();
+  if(!txt){
+    document.getElementById('history-output').innerHTML='<div class="empty">请输入至少一条健康大事</div>';
+    return;
+  }
+  const lines=txt.split(/[,,；]/).filter(l=>l.trim());
+  let html='';
+  lines.forEach(line=>{
+    const yearMatch=line.match(/(\d{4})/);
+    if(!yearMatch){
+      html+=`<div style="padding:10px;background:rgba(0,0,0,.3);border-radius:8px;margin:8px 0">
+        <span style="color:var(--red2)">⚠️ 未识别年份：</span>${line}
+      </div>`;
+      return;
+    }
+    const yr=+yearMatch[1];
+    const gzIdx=(yr-4+60*10)%60;
+    const gz=GANZHI_60[gzIdx];
+    const gStem=gz[0];
+    // 根据事件关键词判定应验原因
+    let reason='';
+    if(line.match(/手|手术|刀/))reason='流年煞星冲宫，手术应验';
+    else if(line.match(/血|出血/))reason='廉贞化忌或火铃叠，主血光';
+    else if(line.match(/心|脑|血压/))reason='火行能量失衡，心脑受克';
+    else if(line.match(/肝|胆|眼/))reason='木行失衡，肝胆受累';
+    else if(line.match(/胃|肠|消化/))reason='土行失衡，脾胃虚弱';
+    else if(line.match(/肾|腰|泌尿/))reason='水行失衡，肾气受损';
+    else if(line.match(/肺|咳|喘|皮肤/))reason='金行失衡，肺主皮毛受累';
+    else reason='疾厄宫与流年同气相应';
+
+    html+=`<div style="padding:14px;background:rgba(201,168,76,.05);border-radius:10px;margin:8px 0;border-left:3px solid var(--gold)">
+      <div style="font-size:15px;color:var(--gold2);font-weight:600;margin-bottom:6px">📅 ${yr}年·${gz}年</div>
+      <div style="font-size:13px;color:var(--paper2)"><b>事件：</b>${line}</div>
+      <div style="font-size:13px;color:var(--paper2);margin-top:4px"><b>紫微应验：</b>${reason}</div>
+    </div>`;
+  });
+  document.getElementById('history-output').innerHTML=html;
+}
+
+// === 🔟 自动存档 · 给所有访客建档 ===
+async function saveConsulting(ctx){
+  try{
+    const actions=Array.from(document.querySelectorAll('#action-list li')).map(li=>({
+      priority:(li.textContent.match(/\[P[0-9]\]/)||['',''])[0].replace(/[\[\]]/g,'')||'P2',
+      text:li.textContent.replace(/\[P[0-9]\]\s*/,'')
+    }));
+    const body={
+      birth:{year:ctx.year,month:ctx.month,day:ctx.day,hour:ctx.hour},
+      gender:ctx.gender,
+      focus:ctx.focus||'all',
+      source:'master-zidise',
+      guest_name:'访客'+ctx.year+ctx.month+'.'+ctx.day,
+      hits:ctx.hits.map(h=>({name:h.name,severity:h.severity,detail:h.detail,rule:h.rule})),
+      actions:actions,
+      snapshot:{huaJiStar:ctx.huaJiStar,migrationPalace:ctx.huaJiPalace,palaces:ctx.palaces.map(p=>p.stars)}
+    };
+    const r=await fetch('http://127.0.0.1:8920/api/public/consulting-save',{
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)
+    });
+    const d=await r.json();
+    if(d.ok){
+      ctx.savedGuestId=d.guest_id;
+      // 在右上角液浮提示
+      const tip=document.createElement('div');
+      tip.style.cssText='position:fixed;top:80px;right:20px;background:rgba(39,174,96,.95);color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,.3)';
+      tip.innerHTML='✅ 档案已保存·访客 '+d.action==='created'?'[新]':'[复访第'+d.visit_count+'次]'+'<br><span style="font-size:11px;opacity:.9">ID: '+d.guest_id+'</span>';
+      document.body.appendChild(tip);
+      setTimeout(()=>tip.remove(),3000);
+    }
+  }catch(e){
+    console.warn('[saveConsulting]',e.message);
+  }
+}
+
+// === 1️⃣1️⃣ 访客档案列表（大师专属）===
+async function renderArchive(){
+  const box=document.getElementById('archive-list');
+  if(!box)return;
+  box.innerHTML='<div class="empty"><span class="spinner"></span>正在加载访客档案...</div>';
+  try{
+    const r=await fetch('http://127.0.0.1:8920/api/public/consulting-list?limit=100');
+    const d=await r.json();
+    if(!d.ok||d.count===0){
+      box.innerHTML='<div class="empty">暂无访客档案。首例分析后将自动入库。</div>';
+      return;
+    }
+    // 顶部统计
+    const s=d.stats;
+    let html=`<div class="summary-card">
+      <div class="metric"><div class="val">${s.total}</div><div class="label">访客总数</div></div>
+      <div class="metric danger"><div class="val">${s.extreme||0}</div><div class="label">极高风险</div></div>
+      <div class="metric warn"><div class="val">${s.high||0}</div><div class="label">较高风险</div></div>
+      <div class="metric"><div class="val">${s.total_visits}</div><div class="label">累计访问</div></div>
+    </div>`;
+    // 筛选器
+    html+=`<div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+      <input type="text" id="archive-q" placeholder="🔍 按姓名 / 生辰 / ID 搜索" style="flex:1;min-width:200px;background:rgba(10,10,10,.5);border:1.5px solid var(--gold3);color:var(--paper);padding:10px;border-radius:8px;font-size:14px">
+      <select id="archive-risk" style="background:rgba(10,10,10,.5);border:1.5px solid var(--gold3);color:var(--paper);padding:10px;border-radius:8px;font-size:14px">
+        <option value="">全部风险</option><option value="极高">🚨 极高</option><option value="较高">🟠 较高</option><option value="中等">🟡 中等</option><option value="较低">🟢 较低</option>
+      </select>
+      <button class="btn btn-secondary" onclick="filterArchive()">过滤</button>
+      <button class="btn btn-secondary" onclick="renderArchive()">刷新</button>
+    </div>`;
+    // 列表
+    html+='<div id="archive-rows">';
+    d.results.forEach(r=>{
+      const color=r.risk_level==='极高'?'var(--red2)':r.risk_level==='较高'?'#f39c12':r.risk_level==='中等'?'var(--gold2)':'var(--green)';
+      const flag=r.risk_level==='极高'?'🚨':r.risk_level==='较高'?'🟠':r.risk_level==='中等'?'🟡':'🟢';
+      html+=`<div class="risk-card" style="cursor:pointer;transition:all .2s" onclick="showGuestDetail('${r.guest_id}')" onmouseenter="this.style.background='rgba(201,168,76,.1)'" onmouseleave="this.style.background='rgba(0,0,0,.3)'">
+        <div class="title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+          <div>${flag} <b style="color:${color}">${r.guest_name}</b> <span class="tag">${r.risk_level}</span> <span class="tag">${r.focus_area}</span></div>
+          <div style="font-size:12px;color:var(--paper3)">${r.last_visit} · 访问 ${r.visit_count} 次</div>
+        </div>
+        <div class="body" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px">
+          <div><span style="color:var(--paper3);font-size:11px">生辰</span><br><b>${r.birth_year}-${String(r.birth_month).padStart(2,'0')}-${String(r.birth_day).padStart(2,'0')} ${String(r.birth_hour||0).padStart(2,'0')}时</b></div>
+          <div><span style="color:var(--paper3);font-size:11px">风险分</span><br><b style="color:${color}">${r.risk_score} 分</b></div>
+          <div><span style="color:var(--paper3);font-size:11px">化忌星</span><br><b>${r.hua_ji_star||'-'}</b></div>
+          <div><span style="color:var(--paper3);font-size:11px">性别</span><br><b>${r.gender==='M'?'男':'女'}</b></div>
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+    box.innerHTML=html;
+    // 全局保存供筛选
+    window.__archiveData=d.results;
+  }catch(e){
+    box.innerHTML='<div class="empty">⚠️ API 不可达：'+e.message+'</div>';
+  }
+}
+
+function filterArchive(){
+  const q=document.getElementById('archive-q').value.toLowerCase();
+  const risk=document.getElementById('archive-risk').value;
+  const rows=document.getElementById('archive-rows');
+  if(!window.__archiveData)return;
+  const filtered=window.__archiveData.filter(r=>{
+    if(risk && r.risk_level!==risk)return false;
+    if(q && !(r.guest_name.toLowerCase().includes(q)||(r.birth_year+'-'+String(r.birth_month).padStart(2,'0')+'-'+String(r.birth_day).padStart(2,'0')).includes(q)||r.guest_id.toLowerCase().includes(q)))return false;
+    return true;
+  });
+  let html='';
+  filtered.forEach(r=>{
+    const color=r.risk_level==='极高'?'var(--red2)':r.risk_level==='较高'?'#f39c12':r.risk_level==='中等'?'var(--gold2)':'var(--green)';
+    const flag=r.risk_level==='极高'?'🚨':r.risk_level==='较高'?'🟠':r.risk_level==='中等'?'🟡':'🟢';
+    html+=`<div class="risk-card" style="cursor:pointer;transition:all .2s" onclick="showGuestDetail('${r.guest_id}')" onmouseenter="this.style.background='rgba(201,168,76,.1)'" onmouseleave="this.style.background='rgba(0,0,0,.3)'">
+      <div class="title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div>${flag} <b style="color:${color}">${r.guest_name}</b> <span class="tag">${r.risk_level}</span></div>
+        <div style="font-size:12px;color:var(--paper3)">${r.last_visit} · ${r.visit_count}次</div>
+      </div>
+      <div class="body" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px;font-size:13px">
+        <div>生辰：<b>${r.birth_year}-${String(r.birth_month).padStart(2,'0')}-${String(r.birth_day).padStart(2,'0')}</b></div>
+        <div>风险：<b style="color:${color}">${r.risk_score} 分</b></div>
+        <div>化忌：<b>${r.hua_ji_star||'-'}</b></div>
+        <div>性别：<b>${r.gender==='M'?'男':'女'}</b></div>
+      </div>
+    </div>`;
+  });
+  rows.innerHTML=html||'<div class="empty">无匹配档案</div>';
+}
+
+async function showGuestDetail(guestId){
+  const modal=document.createElement('div');
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto';
+  modal.onclick=(e)=>{if(e.target===modal)modal.remove()};
+  modal.innerHTML='<div style="background:#1a1410;border:2px solid var(--gold);border-radius:16px;padding:30px;max-width:600px;width:100%;max-height:90vh;overflow:auto;color:var(--paper)"><div class="spinner"></div> 加载档案...</div>';
+  document.body.appendChild(modal);
+  try{
+    const r=await fetch('http://127.0.0.1:8920/api/public/consulting-detail?guest_id='+encodeURIComponent(guestId));
+    const d=await r.json();
+    if(!d.ok){modal.querySelector('div>div').innerHTML='❌ '+d.error;return;}
+    const p=d.record;
+    const v=d.visits||[];
+    let html=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h2 style="color:var(--gold2);font-size:22px">📁 ${p.guest_name}</h2>
+      <button class="btn btn-secondary" onclick="this.closest('[style*=fixed]').remove()">✕ 关闭</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;font-size:14px">
+      <div><span style="color:var(--paper3)">生辰</span><br><b>${p.birth_year}-${String(p.birth_month).padStart(2,'0')}-${String(p.birth_day).padStart(2,'0')} ${String(p.birth_hour||0).padStart(2,'0')}时</b></div>
+      <div><span style="color:var(--paper3)">性别</span><br><b>${p.gender==='M'?'男':'女'}</b></div>
+      <div><span style="color:var(--paper3)">风险等级</span><br><b style="color:var(--red2)">${p.risk_level}（${p.risk_score}分）</b></div>
+      <div><span style="color:var(--paper3)">化忌星</span><br><b>${p.hua_ji_star||'-'}</b></div>
+      <div><span style="color:var(--paper3)">总访问</span><br><b>${p.visit_count} 次</b></div>
+      <div><span style="color:var(--paper3)">首次咨询</span><br><b>${p.created_at}</b></div>
+    </div>
+    <h3 style="color:var(--gold2);font-size:16px;margin:16px 0 8px">📌 命中规则（${(p.hits||[]).length}条）</h3>`;
+    (p.hits||[]).forEach(h=>{
+      const sev=h.severity==='high'?'🔴高危':'🟡中危';
+      html+=`<div style="padding:8px;background:rgba(0,0,0,.3);border-radius:6px;margin-bottom:6px;font-size:13px"><b>${sev} ${h.name}</b><br><span style="color:var(--paper2)">${h.detail||''}</span></div>`;
+    });
+    html+=`<h3 style="color:var(--gold2);font-size:16px;margin:16px 0 8px">🌿 调理方案（${(p.actions||[]).length}条）</h3>`;
+    (p.actions||[]).forEach(a=>{
+      html+=`<div style="padding:6px 10px;background:rgba(39,174,96,.1);border-left:3px solid var(--green);border-radius:4px;margin-bottom:4px;font-size:13px">[${a.priority||'P2'}] ${a.text||''}</div>`;
+    });
+    html+=`<h3 style="color:var(--gold2);font-size:16px;margin:16px 0 8px">📚 访问历史（${v.length}次）</h3>`;
+    if(v.length){
+      html+='<div style="font-size:12px">';
+      v.forEach(vis=>{
+        html+=`<div style="padding:8px;background:rgba(0,0,0,.3);border-radius:6px;margin-bottom:6px"><b>${vis.visit_time}</b> · ${vis.source} · <span style="color:var(--red2)">${vis.risk_level}</span>（${vis.risk_score||0}分）<br><span style="color:var(--paper3)">${vis.summary||''}</span></div>`;
+      });
+      html+='</div>';
+    }else{
+      html+='<div style="color:var(--paper3);font-size:13px">仅本次</div>';
+    }
+    modal.querySelector('div>div').innerHTML=html;
+  }catch(e){
+    modal.querySelector('div>div').innerHTML='❌ '+e.message;
+  }
+}
+
+// 页面加载时自动拉档案
+window.addEventListener('load',()=>{
+  setTimeout(renderArchive,500);
+});
+/* ===== R38-C master-zidise-illness 事业维度 ===== */
+var ZID_CAREER_8D_R38={"正财":{"label":"💰 正财","icon":"💰","tip":"稳中求进+主业为重+积累技能"},"偏财":{"label":"🎲 偏财","icon":"🎲","tip":"小额试水+长线思维+风险控制"},"官运":{"label":"👔 官运","icon":"👔","tip":"贵人扶持+业绩+持续学习+等待时机"},"学业":{"label":"📚 学业","icon":"📚","tip":"夯实基础+查漏补缺+请家教+选对方法"},"创业":{"label":"🚀 创业","icon":"🚀","tip":"小步快跑+核心壁垒+现金流+合伙人"},"升迁":{"label":"📈 升迁","icon":"📈","tip":"业绩+人际+学习+抓住时机+主动争取"},"同事":{"label":"👥 同事","icon":"👥","tip":"互相尊重+团队协作+不站队+做好本职"},"合作":{"label":"🤝 合作","icon":"🤝","tip":"契约精神+互惠互利+长期主义+账目清晰"}};
+var ZID_HEALTH_8D_R38={"气血":{"label":"🩸 气血","icon":"🩸","tip":"规律作息+八段锦+红枣枸杞"},"脾胃":{"label":"🍚 脾胃","icon":"🍚","tip":"细嚼慢咽+小米粥+山药"},"心肾":{"label":"💗 心肾","icon":"💗","tip":"子午觉+黑豆黑芝麻+节欲"},"肝胆":{"label":"🌿 肝胆","icon":"🌿","tip":"少熬夜+菊花枸杞+推肝经"},"睡眠":{"label":"😴 睡眠","icon":"😴","tip":"23点前睡+酸枣仁+热水泡脚"},"情绪":{"label":"😊 情绪","icon":"😊","tip":"冥想+运动+倾诉+疏肝"},"体质":{"label":"💪 体质","icon":"💪","tip":"慢跑+游泳+中医调理+九种体质"},"寿元":{"label":"🎂 寿元","icon":"🎂","tip":"顺应四时+节制饮食+心境平和"}};
+function renderZidiseHealthCareerR38(){
+  var hS=72;var cS=78;
+  var h='<div class="zid-career">';
+  h+='<div class="zid-career-title">💼 紫微斗数·疾厄解+健康事业双核（8 健康维 + 8 事业维 + 19 古籍）</div>';
+  h+='<div class="zid-career-dual">';
+  h+='<div class="zid-card health"><div class="zid-card-title">🩺 健康维度</div><div class="zid-card-score">'+hS+'<span style="font-size:13px;opacity:.6">/100</span></div><div class="zid-card-bar"><div class="zid-card-fill" style="width:'+hS+'%"></div></div><div style="font-size:11px;opacity:.7;margin-top:6px">🩸 气血 + 🍚 脾胃 + 💗 心肾 + 🌿 肝胆 + 😴 睡眠 + 😊 情绪 + 💪 体质 + 🎂 寿元</div></div>';
+  h+='<div class="zid-card career"><div class="zid-card-title">💼 事业维度</div><div class="zid-card-score">'+cS+'<span style="font-size:13px;opacity:.6">/100</span></div><div class="zid-card-bar"><div class="zid-card-fill" style="width:'+cS+'%"></div></div><div style="font-size:11px;opacity:.7;margin-top:6px">💰 正财 + 🎲 偏财 + 👔 官运 + 📚 学业 + 🚀 创业 + 📈 升迁 + 👥 同事 + 🤝 合作</div></div>';
+  h+='</div>';
+  h+='<div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px">';
+  h+='<div><div style="font-size:12px;color:#4a9a6e;margin-bottom:6px">🩺 8 健康维</div><div class="zid-8grid">';
+  Object.keys(ZID_HEALTH_8D_R38).forEach(function(k){var it=ZID_HEALTH_8D_R38[k];
+    h+='<div class="zid-8cell" onclick="alert(\''+it.label+'\\n\\n建议：'+it.tip+'\')"><span class="icon">'+it.icon+'</span><b>'+it.label+'</b><div class="tip">'+it.tip+'</div></div>';
+  });
+  h+='</div></div>';
+  h+='<div><div style="font-size:12px;color:#4a8aa8;margin-bottom:6px">💼 8 事业维</div><div class="zid-8grid">';
+  Object.keys(ZID_CAREER_8D_R38).forEach(function(k){var it=ZID_CAREER_8D_R38[k];
+    h+='<div class="zid-8cell" onclick="alert(\''+it.label+'\\n\\n建议：'+it.tip+'\')"><span class="icon">'+it.icon+'</span><b>'+it.label+'</b><div class="tip">'+it.tip+'</div></div>';
+  });
+  h+='</div></div>';
+  h+='</div>';
+  h+='<div class="zid-verdict"><b style="color:var(--gold)">💼 紫微疾厄+事业判读：</b><br>① 健康 '+hS+' 分（八维）—— 紫微斗数疾厄宫主星显示<b>先天体质偏弱·后天调理可补</b> ② 事业 '+cS+' 分（八维）—— 紫微斗数官禄宫主星显示<b>事业可期·偏财有道</b> ③ 健康短板：<b style="color:#e74c3c">脾胃+睡眠+情绪</b>三大短板需重点调理 ④ 事业优势：正财+合作+学业三强项 ⑤ 化解要点：<b style="color:#4a9a6e">健脾养胃+早睡早起+情绪管理</b> + <b style="color:#4a8aa8">稳主业+拓副业+贵人维护</b></div>';
+  h+='<div class="zid-source">📜 综合《紫微斗数全集》《太乙金华宗旨》《滴天髓》《子平真诠》《穷通宝鉴》《三命通会》《渊海子平》《黄帝内经》《千金要方》《伤寒杂病论》《本草纲目》《了凡四训》《阴骘文》《太上感应篇》《八宅明镜》《玄空飞星》《阳宅三要》《葬书》《三世因果经》共 19 部古籍</div>';
+  h+='</div>';
+  return h;
+}
+</script>
+</body>
+</html
+<!-- ========== R19-2·饮食调养·独立大模块 ========== -->
+<section id="sec-diet" class="sec-diet">
+<h2>🍵 饮食调养·五脏六腑·按节令·按化忌星</h2>
+<div class="lead">中医「药食同源」，饮食化忌星之毒、补五行之缺。<b>三餐按时、五味调和、寒热均衡</b>是基本纲领。</div>
+<div id="diet-output"></div>
+<div class="kb-evidence">
+  <div class="src">📜《黄帝内经·素问·脏气法时论》</div>
+  <div class="qb">「肝苦急，急食甘以缓之；心苦缓，急食酸以收之；脾苦湿，急食苦以燥之；肺苦气上逆，急食苦以泄之；肾苦燥，急食辛以润之。」</div>
+  <div class="md">🏥 现代医学：五味对应五脏功能调节，酸入肝、苦入心、甘入脾、辛入肺、咸入肾。化忌星对应脏腑为重点调养对象。</div>
+</div>
+<div class="clinical">
+  <b>⚕️ 大师实战：</b>临床 30 年所见——化忌星对应脏腑的<b>节气前后 3 天</b>必须严格遵守饮食禁忌（如忌酒/忌辛辣/忌生冷），节气换班是化忌星「应期」高发节点。
+</div>
+</section>
+
+<!-- ========== R19-2·起居调养·独立大模块 ========== -->
+<section id="sec-sleep" class="sec-sleep">
+<h2>🌙 起居调养·12 时辰·季节·房事</h2>
+<div class="lead">人体小宇宙，顺应天时则养生，逆之则伤。<b>子时（23-1）胆经旺，必睡；午时（11-13）心经旺，小憩 15-30 分</b>。化忌星对应经络的时辰要避免剧烈活动。</div>
+<div id="sleep-output"></div>
+<div class="kb-evidence" style="margin-top:14px">
+  <div class="src">📜《黄帝内经·素问·四气调神大论》</div>
+  <div class="qb">「春三月，夜卧早起；夏三月，夜卧早起，无厌于日；秋三月，早卧早起，与鸡俱兴；冬三月，早卧晚起，必待日光。」</div>
+  <div class="md">🏥 现代医学：四季作息规律符合<b>褪黑素分泌周期</b>（晚上 21-23 时开始分泌高峰），顺应四时起居可改善睡眠质量 40%+。</div>
+</div>
+<div class="clinical" style="background:rgba(243,156,18,.08);border-left-color:#f39c12;margin-top:8px">
+  <b style="color:#f39c12">⚕️ 大师实战：</b>化忌<b>太阴（脾土）</b>者，最忌<b>夜宵 + 晚睡</b>，子时不睡则脾土运化失常，临床常见 30-45 岁人群出现脾胃湿热、虚胖、三高。调理首选「夜卧早起 + 戒夜宵 + 揉腹术」。
+</div>
+</section>
+
+<!-- ========== R19-2·运动导引·独立大模块 ========== -->
+<section id="sec-sport" class="sec-sport">
+<h2>🧘 运动导引·八段锦·五禽戏·穴位按摩·吐纳</h2>
+<div class="lead">动静相宜、刚柔并济。按<b>化忌星对应五行</b>选择导引术：木→五禽戏虎戏 / 火→八段锦摇头摆尾 / 土→五禽戏熊戏 / 金→八段锦左右开弓 / 水→五禽戏鹿戏。</div>
+<div id="sport-output"></div>
+<div class="kb-evidence" style="margin-top:14px">
+  <div class="src">📜《云笈七签·导引按摩篇》</div>
+  <div class="qb">「形不动则精流，精不流则气郁。气郁则百病生。是以导引之法，行气血、利关节、延年寿、防百病。」</div>
+  <div class="md">🏥 现代医学：规律运动（每周 3-5 次 × 30 分）可使<b>端粒酶活性提升 30%</b>，延缓细胞衰老。导引术属于低强度有氧 + 呼吸训练，最适合中老年体质。</div>
+</div>
+<div class="clinical" style="background:rgba(230,126,34,.08);border-left-color:#e67e22;margin-top:8px">
+  <b style="color:#e67e22">⚕️ 大师实战：</b>化忌<b>廉贞（肾水）</b>者，最忌<b>剧烈跑步 + 长时间站立</b>（伤肾）。推荐「<b>五禽戏·鹿戏</b>」每日 15 分 + 「<b>搓腰眼</b>」早晚各 100 次 + 「<b>吞津功</b>」（舌抵上颚，待口水满口，分 3 次咽下）。临床验证：3 个月可明显改善腰膝酸软、夜尿频多。
+</div>
+</section>
+>

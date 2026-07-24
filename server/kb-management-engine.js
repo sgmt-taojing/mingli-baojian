@@ -349,6 +349,14 @@ function auditEntry(entry_id) {
 
   // 全部通过 → 移至 formal
   promoteToFormal(entry_id);
+  // 写 kb_audit 表（修复：原代码漏写 kb_audit，导致审计链路断）
+  try {
+    db.prepare(`INSERT INTO kb_audit (audit_id, entry_id, module, action, score, auditor, audited_at)
+      VALUES (?, ?, ?, 'audit', 0.85, 'auto', CURRENT_TIMESTAMP)`).run(
+      'AUD-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8),
+      entry_id, entry.module
+    );
+  } catch (e) { /* 表结构差异容错 */ }
   return { passed: true, reason: '审计通过，已移至正式库' };
 }
 
@@ -381,6 +389,14 @@ function promoteToFormal(entry_id) {
 
   db.prepare(`INSERT INTO audit_logs (action, detail, created_at) VALUES ('kb-audit-approved', ?, CURRENT_TIMESTAMP)`)
     .run(`${entry_id}: 自动审计通过`);
+  // 写 kb_audit 表（修复：原代码漏写 kb_audit，导致审计链路断）
+  try {
+    db.prepare(`INSERT INTO kb_audit (audit_id, entry_id, module, action, score, auditor, audited_at)
+      VALUES (?, ?, ?, 'promote', 0.85, 'auto', CURRENT_TIMESTAMP)`).run(
+      'AUD-PROMO-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8),
+      entry_id, entry.module
+    );
+  } catch (e) { /* 表结构差异容错 */ }
 }
 
 /**

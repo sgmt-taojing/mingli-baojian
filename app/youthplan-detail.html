@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" var(--ink)>
+<title>青少年专属规划 · 易道智鉴</title>
+<meta name="description" content="青少年定制化成长规划引擎：分阶段重点 / 学科兴趣性格健康评分 / 时间轴 / 行动清单。可分享、可打印。">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0a0a0a; --paper:#f5f1e8; --paper2:#e8e0d0;
+  --gold:#c9a84c; --gold2:#a07c2a; --bronze:#8c6a30;
+  --line:rgba(201,168,76,.2); --soft:rgba(255,255,255,.04);
+  --r:10px;
+}
+body{
+  font-family:'Noto Serif SC',serif;
+  background:linear-gradient(135deg,#0a0a0a,#1a1208);
+  color:var(--paper); min-height:100vh; padding:20px;
+  line-height:1.7;
+}
+.wrap{max-width:680px;margin:0 auto}
+header{
+  text-align:center; padding:24px 0 16px;
+  border-bottom:1px solid var(--line); margin-bottom:24px;
+}
+h1{font-size:24px;font-weight:500;color:var(--gold);letter-spacing:4px;margin-bottom:6px}
+header p{font-size:12px;opacity:.55;letter-spacing:1px}
+.card{
+  background:rgba(255,255,255,.03); border:1px solid var(--line);
+  border-radius:var(--r); padding:18px; margin-bottom:14px;
+}
+.card h2{
+  font-size:14px; color:var(--gold); font-weight:500;
+  border-left:3px solid var(--gold); padding-left:10px;
+  margin-bottom:12px; letter-spacing:1px;
+}
+label{display:block;font-size:12px;opacity:.7;margin-bottom:4px;margin-top:10px}
+label:first-child{margin-top:0}
+input,select,textarea{
+  width:100%; padding:10px 12px; border:1px solid var(--line);
+  border-radius:6px; background:rgba(255,255,255,.05);
+  color:var(--paper); font:inherit; font-size:14px;
+  outline:none; transition:border-color .2s;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--gold)}
+textarea{min-height:60px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:480px){.row{grid-template-columns:1fr}}
+.btn{
+  display:block; width:100%; padding:14px;
+  background:linear-gradient(135deg,var(--gold),var(--bronze));
+  color:#0a0a0a; font:inherit; font-size:15px; font-weight:600;
+  border:none; border-radius:var(--r); cursor:pointer;
+  letter-spacing:4px; margin-top:8px;
+  transition:transform .15s,box-shadow .2s;
+}
+.btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 18px rgba(201,168,76,.3)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* 报告渲染 */
+.report{display:none}
+.report.show{display:block;animation:fadein .4s}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.banner{
+  text-align:center; padding:20px 16px; margin:18px 0;
+  background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(201,168,76,.04));
+  border-radius:var(--r); border:1px solid var(--line);
+}
+.banner .name{font-size:22px;color:var(--gold);font-weight:600;letter-spacing:2px}
+.banner .meta{font-size:12px;opacity:.7;margin-top:6px}
+
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{
+  padding:5px 12px; background:rgba(201,168,76,.1);
+  border-radius:16px; font-size:12px; color:var(--gold2);
+}
+
+/* 时间轴 */
+.timeline{display:flex;gap:4px;align-items:center;overflow-x:auto;padding:6px 2px 10px}
+.tl-node{
+  flex-shrink:0; padding:10px 8px; border-radius:8px;
+  background:rgba(201,168,76,.04); text-align:center;
+  font-size:11px; min-width:80px;
+  border:1px solid rgba(201,168,76,.2);
+}
+.tl-node.active{
+  border:2px solid var(--gold); background:rgba(201,168,76,.08);
+  color:var(--gold); font-weight:500;
+}
+.tl-node small{display:block;opacity:.5;font-size:10px;margin-top:2px}
+.tl-arrow{font-size:10px;opacity:.3;flex-shrink:0}
+
+/* 评分卡 */
+.domains{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
+  gap:8px; margin-top:10px;
+}
+.dom{
+  padding:10px; background:rgba(201,168,76,.05); border-radius:8px;
+  text-align:center;
+}
+.dom .ico{font-size:18px}
+.dom .nm{font-size:11px;opacity:.7;margin:2px 0}
+.dom .num{font-size:18px;color:var(--gold);font-weight:600}
+.dom .bar{height:4px;border-radius:2px;background:rgba(201,168,76,.15);margin-top:6px;overflow:hidden}
+.dom .bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--bronze));border-radius:2px;transition:width .8s}
+
+/* 行动清单 */
+.ol{padding-left:24px;font-size:14px}
+.ol li{margin:8px 0}
+
+/* 地域提示 */
+.loc{
+  padding:12px; background:rgba(201,168,76,.05);
+  border-left:3px solid var(--gold); border-radius:4px;
+  font-size:13px;
+}
+
+/* 工具栏 */
+.tools{
+  display:flex; gap:8px; margin:18px 0;
+}
+.tools button{
+  flex:1; padding:10px; font:inherit; font-size:13px;
+  background:rgba(255,255,255,.05); color:var(--paper);
+  border:1px solid var(--line); border-radius:6px; cursor:pointer;
+}
+.tools button:hover{background:rgba(201,168,76,.1);border-color:var(--gold)}
+
+/* 打印样式 */
+@media print{
+  body{background:#fff;color:#000;padding:10px}
+  .card,.banner,.tl-node,.dom{background:#fafafa !important;color:#000 !important;border:1px solid #ccc !important}
+  .btn,.tools,#input{display:none !important}
+  .report{page-break-inside:avoid}
+  .banner .name,.card h2,.dom .num{color:#000 !important}
+  h1{color:#000}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>青少年专属规划</h1>
+    <p>分阶段成长引擎 · 易道智鉴</p>
+  </header>
+
+  <!-- 输入区 -->
+  <div class="card" id="input">
+    <h2>📋 孩子信息</h2>
+    <label>姓名/昵称</label>
+    <input id="yName" placeholder="例：小明" value="">
+    <div class="row">
+      <div>
+        <label>当前学段</label>
+        <select id="yGrade">
+          <option value="kindergarten">学龄前（3-6岁）</option>
+          <option value="primary" selected>小学（7-12岁）</option>
+          <option value="junior">初中（13-15岁）</option>
+          <option value="senior">高中（16-18岁）</option>
+          <option value="college">大学（19-22岁）</option>
+        </select>
+      </div>
+      <div>
+        <label>学业表现</label>
+        <select id="yScore">
+          <option value="excellent">优秀（前 10%）</option>
+          <option value="good">良好（前 30%）</option>
+          <option value="average" selected>一般（中等）</option>
+          <option value="needImprove">待提高</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>出生地（可选）</label>
+        <input id="yBirthplace" placeholder="例：北京">
+      </div>
+      <div>
+        <label>现居地（可选）</label>
+        <input id="yResidence" placeholder="例：上海">
+      </div>
+    </div>
+    <label>家长期望（可选）</label>
+    <textarea id="yExpect" placeholder="例：希望培养数学思维 + 体魄健壮"></textarea>
+    <button class="btn" id="genBtn" onclick="generate()">✨ 生成专属规划</button>
+  </div>
+
+  <!-- 报告区 -->
+  <div class="report" id="report"></div>
+
+  <!-- footer -->
+  <p style="text-align:center;font-size:11px;opacity:.4;margin:24px 0;letter-spacing:1px">易道智鉴 · 仅供参考 · 命数只占 30%，努力占 70%</p>
+</div>
+
+<script>
+const GRADE_MAP = {kindergarten:'学龄前',primary:'小学',junior:'初中',senior:'高中',college:'大学'};
+const GRADE_AGE = {kindergarten:'3-6岁',primary:'7-12岁',junior:'13-15岁',senior:'16-18岁',college:'19-22岁'};
+const GRADE_ORDER = ['kindergarten','primary','junior','senior','college'];
+const GRADE_FOCUS = {
+  kindergarten:['体能开发','感官刺激','亲子陪伴','社交启蒙'],
+  primary:['学科基础','阅读习惯','兴趣培养','学习方法'],
+  junior:['学科深化','青春期心理','学习方法','自我认知'],
+  senior:['选科决策','目标院校','压力管理','专业启蒙'],
+  college:['专业方向','社会实践','人际网络','职业规划']
+};
+const SCORE_MAP = {excellent:['优秀',92],good:['良好',80],average:['一般',68],needImprove:['待提高',55]};
+
+function generate(){
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true; btn.textContent = '⏳ 生成中...';
+  setTimeout(() => {
+    try {
+      const name = document.getElementById('yName').value.trim() || '孩子';
+      const grade = document.getElementById('yGrade').value;
+      const scoreKey = document.getElementById('yScore').value;
+      const birthplace = document.getElementById('yBirthplace').value.trim();
+      const residence = document.getElementById('yResidence').value.trim();
+      const expect = document.getElementById('yExpect').value.trim();
+      render(name, grade, scoreKey, birthplace, residence, expect);
+      btn.disabled = false; btn.textContent = '🔄 重新生成';
+    } catch(e) {
+      alert('生成失败：' + e.message);
+      btn.disabled = false; btn.textContent = '✨ 生成专属规划';
+    }
+  }, 250);
+}
+
+function render(name, grade, scoreKey, birthplace, residence, expect){
+  const curIdx = GRADE_ORDER.indexOf(grade);
+  const curGrade = GRADE_MAP[grade];
+  const curAge = GRADE_AGE[grade];
+  const curFocus = GRADE_FOCUS[grade];
+  const [scoreLabel, scoreNum] = SCORE_MAP[scoreKey];
+  const domains = [
+    {name:'学科',icon:'📖',score:Math.min(95, scoreNum + 5)},
+    {name:'兴趣',icon:'🎨',score:Math.max(50, scoreNum - 3)},
+    {name:'性格',icon:'💡',score:Math.min(95, scoreNum + 2)},
+    {name:'健康',icon:'🏃',score:Math.min(95, scoreNum + 8)}
+  ];
+  const actions = [
+    `【${curGrade}首要】${curFocus[0]}`,
+    `每周 ${curFocus[1]} 至少 3 次`,
+    `每周 ${curFocus[2]} 计划执行`,
+    `建立 ${curFocus[3]} 机制`,
+    expect ? `家长跟进：${expect}` : `与家长每周沟通学习进展`,
+    `规律作息，确保 ${curAge} 充足睡眠`,
+    `每周 ${curFocus[0]} 打卡记录`,
+    `每 3 个月回顾一次进展`,
+    `若 ${curAge} 期成绩波动，及时寻求帮助`,
+    `保持积极心态，建立成长型思维`
+  ];
+
+  let h = '<div class="banner"><div class="name">🧒 '+name+' 青少年专属规划</div><div class="meta">当前阶段：<b>'+curGrade+'</b>（'+curAge+'）· 学业：<b>'+scoreLabel+'</b> · 评估：<b>'+scoreNum+'</b> 分</div></div>';
+
+  // 当前重点
+  h += '<div class="card"><h2>📌 当前阶段重点</h2><div class="tags">';
+  curFocus.forEach(f => h += '<span class="tag">'+f+'</span>');
+  h += '</div>';
+  if (expect) h += '<p style="font-size:12px;opacity:.7;margin-top:8px">💬 家长期望：'+expect+'</p>';
+  h += '</div>';
+
+  // 时间轴
+  h += '<div class="card"><h2>📊 人生时间轴</h2><div class="timeline">';
+  GRADE_ORDER.forEach((g, i) => {
+    if (i < curIdx) return;  // 跳过早于当前的
+    const isActive = i === curIdx;
+    h += '<div class="tl-node'+(isActive?' active':'')+'">'+GRADE_MAP[g]+'<small>'+GRADE_AGE[g]+'</small></div>';
+    if (i < GRADE_ORDER.length - 1) h += '<span class="tl-arrow">→</span>';
+  });
+  h += '</div></div>';
+
+  // 领域评分
+  h += '<div class="card"><h2>🏅 发展领域评分</h2><div class="domains">';
+  domains.forEach(d => {
+    h += '<div class="dom"><div class="ico">'+d.icon+'</div><div class="nm">'+d.name+'</div><div class="num">'+d.score+'</div><div class="bar"><div class="bar-fill" style="width:'+d.score+'%"></div></div></div>';
+  });
+  h += '</div></div>';
+
+  // 行动清单
+  h += '<div class="card"><h2>✅ '+curGrade+'阶段行动清单</h2><ol class="ol">';
+  actions.forEach(a => h += '<li>'+a+'</li>');
+  h += '</ol></div>';
+
+  // 地域
+  if (birthplace || residence) {
+    h += '<div class="card"><h2>🏙️ 地域提示</h2><div class="loc">';
+    h += '出生地 <b>'+birthplace+'</b> · 现居 <b>'+residence+'</b>';
+    if (birthplace && residence) {
+      h += '<br>'+(birthplace===residence ? '✅ 就近教育、熟悉环境' : '⚡ 迁移需适应期、也可能带来新机会');
+    }
+    h += '</div></div>';
+  }
+
+  // 工具
+  h += '<div class="tools" id="tools">';
+  h += '<button onclick="shareUrl()">🔗 分享链接</button>';
+  h += '<button onclick="window.print()">🖨️ 打印/保存 PDF</button>';
+  h += '<button onclick="copyTxt()">📋 复制文本</button>';
+  h += '</div>';
+
+  document.getElementById('report').innerHTML = h;
+  document.getElementById('report').classList.add('show');
+  document.getElementById('input').style.display = 'none';
+  buildShareUrl({n:name, g:grade, s:scoreKey, b:birthplace, r:residence, e:expect});
+  location.hash = '#'+btoa(unescape(encodeURIComponent(JSON.stringify({n:name, g:grade, s:scoreKey, b:birthplace, r:residence, e:expect}))));
+}
+
+function buildShareUrl(d){
+  const hash = location.hash || '#'+btoa(unescape(encodeURIComponent(JSON.stringify(d))));
+  if (!location.hash) history.replaceState(null,'','#'+btoa(unescape(encodeURIComponent(JSON.stringify(d)))));
+}
+
+function restoreFromHash(){
+  const h = location.hash.slice(1);
+  if (!h) return;
+  try {
+    const d = JSON.parse(decodeURIComponent(escape(atob(h))));
+    if (d.n) document.getElementById('yName').value = d.n;
+    if (d.g) document.getElementById('yGrade').value = d.g;
+    if (d.s) document.getElementById('yScore').value = d.s;
+    if (d.b) document.getElementById('yBirthplace').value = d.b;
+    if (d.r) document.getElementById('yResidence').value = d.r;
+    if (d.e) document.getElementById('yExpect').value = d.e;
+    generate();
+  } catch(e) { console.warn('hash parse fail', e); }
+}
+
+function shareUrl(){
+  const url = location.href;
+  if (navigator.share) {
+    navigator.share({title:'青少年专属规划',url:url}).catch(()=>{});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(()=>{showToast('链接已复制')});
+  } else {
+    prompt('复制此链接分享：', url);
+  }
+}
+
+function copyTxt(){
+  const r = document.getElementById('report');
+  let txt = r.innerText;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(txt).then(()=>showToast('报告已复制'));
+  }
+}
+
+function showToast(msg){
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText='position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:rgba(201,168,76,.9);color:#0a0a0a;padding:10px 24px;border-radius:8px;font-size:14px;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,.3)';
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 1800);
+}
+
+// 加载时尝试恢复 hash
+window.addEventListener('DOMContentLoaded', restoreFromHash);
+</script>
+</body>
+</html>

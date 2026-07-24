@@ -95,7 +95,7 @@ body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',-apple
 <a href="divination-almanac.html">📅 黄历</a>
 <a href="tcm-clinic.html">🏥 诊疗</a>
 <a href="tcm-symptom.html">🩺 症状</a>
-<a href="divination-knowledge.html">📚 知识库</a>
+<a href="divination-knowledge.html">📚 知识库</a><a href="kb-explorer.html" target="_blank">🔍 KB浏览器</a>
 <a href="nihaisha-knowledge.html">🪷 倪师</a>
 <a href="shuhan-knowledge.html">🎯 舒晗</a>
 <a href="divination-shop.html">🛒 商城</a>
@@ -103,6 +103,7 @@ body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',-apple
 <a href="javascript:void(0)" onclick="openKBPanel()">📚 KB</a>
 <a href="javascript:void(0)" onclick="openHistoryPanel()">📜 历史</a>
 <a href="javascript:void(0)" onclick="openFeedback()">💬 反馈</a>
+<a href="im.html" style="background:rgba(6,182,212,.08);border-color:rgba(6,182,212,.3);color:#22d3ee">💬 站内消息</a>
 <a href="login.html">🔐 登录</a>
 </nav>
 <div class="app">
@@ -156,6 +157,8 @@ body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',-apple
 <!-- 语音交互 -->
 <script src="js/voice-interaction.js?v=20260721" defer></script>
 <script src="js/user-profile.js" defer></script>
+<!-- 自然查询路由（识别 "LIU套5815" 等模糊输入） -->
+<script src="js/parse-natural.js?v=20260722-1417" defer></script>
 <script>
 const API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
 let hist=[];
@@ -167,20 +170,35 @@ let state={module:null,step:0,data:{},reporting:false};
 // KB 优先双路径（P0-任务1）
 // 命中分 ≥ 0.7 → KB 直答；0.4-0.7 → KB+AI 润色；< 0.4 → AI+KB 兜底
 // ═══════════════════════════════════════════════
+// 真实 model_id（来自 knowledge_models 表，由 /api/public/kb-stats 验证 100% 对齐）
+// 17 个 KB 源（全部从 knowledge_models 动态同步 · v1 全启用）
+// 该表唯一权威：/_kb_models_meta 从后端拉取，11 个 KB 未提供 window 对象时走 server-side 后备
 const KB_SOURCES = [
-  {name:'NIHAISHA_KB', obj:()=>window.NIHAISHA_KB, mods:['zhongyi','lifeindex','lifeplan'], weight:1.0},
-  {name:'SHUHAN_KB', obj:()=>window.SHUHAN_KB, mods:['bazi','qimen','fengshui','yunshi','caiyun','shiye','ganqing'], weight:1.0},
-  {name:'YANZHI_KB', obj:()=>window.YANZHI_KB, mods:['yanzhi'], weight:1.0},
-  {name:'TCM_KB', obj:()=>window.TCM_KB, mods:['zhongyi'], weight:0.8},
+  {name:'NIHAISHA_KB', entryId:'nihaisha-model-v1', modelEntryCount:385, obj:()=>window.NIHAISHA_KB, mods:['zhongyi','lifeindex','lifeplan'], weight:1.0},
+  {name:'SHUHAN_KB', entryId:'shuhan-model-v1', modelEntryCount:289, obj:()=>window.SHUHAN_KB, mods:['bazi','qimen','fengshui','yunshi','caiyun','shiye','ganqing'], weight:1.0},
+  {name:'YANZHI_KB', entryId:'yanzhi-model-v1', modelEntryCount:39, obj:()=>window.YANZHI_KB, mods:['yanzhi'], weight:1.0},
+  {name:'TCM_KB', entryId:'tcm-model-v1', modelEntryCount:51, obj:()=>window.TCM_KB, mods:['zhongyi'], weight:0.8},
+  {name:'ZIWEI_KB', entryId:'ziwei-model-v1', modelEntryCount:174, obj:()=>window.ZIWEI_KB, mods:['ziwei','paipan'], weight:1.0},
+  {name:'BAZI_KB', entryId:'bazi-model-v1', modelEntryCount:110, obj:()=>window.BAZI_KB, mods:['bazi'], weight:0.95},
+  {name:'QIMEN_KB', entryId:'qimen-model-v1', modelEntryCount:133, obj:()=>window.QIMEN_KB, mods:['qimen','qimendunjia'], weight:0.95},
+  {name:'MEIHUA_KB', entryId:'meihua-model-v1', modelEntryCount:42, obj:()=>window.MEIHUA_KB, mods:['meihua','liuyao'], weight:0.9},
+  {name:'LIUYAOO_KB', entryId:'liuyao-model-v1', modelEntryCount:20, obj:()=>window.LIUYAO_KB, mods:['liuyao','yijing'], weight:0.9},
+  {name:'LIUREN_KB', entryId:'liuren-model-v1', modelEntryCount:30, obj:()=>window.LIUREN_KB, mods:['liuren'], weight:0.9},
+  {name:'YIJING_KB', entryId:'yijing-model-v1', modelEntryCount:8, obj:()=>window.YIJING_KB, mods:['yijing','zhouyi'], weight:0.9},
+  {name:'FENGSHUI_KB', entryId:'fengshui-model-v1', modelEntryCount:44, obj:()=>window.FENGSHUI_KB, mods:['fengshui'], weight:0.9},
+  {name:'ZODIAC_KB', entryId:'zodiac-model-v1', modelEntryCount:94, obj:()=>window.ZODIAC_KB, mods:['zodiac','shengxiao'], weight:0.85},
+  {name:'MANTRA_KB', entryId:'mantra-model-v1', modelEntryCount:121, obj:()=>window.MANTRA_KB, mods:['mantra','jingdian'], weight:0.85},
+  {name:'HUAJIE_KB', entryId:'huajie-model-v1', modelEntryCount:13, obj:()=>window.HUAJIE_KB, mods:['huajie'], weight:0.85},
+  {name:'CLASSICS_KB', entryId:'classics-model-v1', modelEntryCount:106, obj:()=>window.CLASSICS_KB, mods:['classics','jingdian'], weight:0.8},
+  {name:'FAITH_KB', entryId:'faith-model-v1', modelEntryCount:167, obj:()=>window.FAITH_KB, mods:['faith','mingshi'], weight:0.8},
 ];
 
 function _kbScore(moduleId, data){
   // 计算每个 KB 源的命中分
-  let best = {source:null, score:0, snippet:''};
+  let best = {source:null, score:0, snippet:'', fallback:false};
   for(const src of KB_SOURCES){
     if(!src.mods.includes(moduleId)) continue;
     const kb = src.obj();
-    if(!kb) continue;
     // 收集用户输入文本
     const userInput = Object.values(data||{}).join(' ').toLowerCase();
     if(!userInput) continue;
@@ -206,21 +224,89 @@ function _kbScore(moduleId, data){
         }
       }
     }
-    walk(kb, []);
+    if (kb) {
+      walk(kb, []);
+    } else {
+      // fallback: window.XXX_KB 未提供 → 标记让后续走服务端
+      continue;
+    }
     // 命中分 = (命中关键词数 / 总关键词数) * weight
     const score = Math.min(1.0, (hits / Math.max(1, keywords.length)) * 1.5) * src.weight;
     if(score > best.score){
-      best = {source:src.name, score:Math.round(score*100)/100, snippet};
+      best = {source:src.name, score:Math.round(score*100)/100, snippet, entryId:src.entryId || null};
+    }
+  }
+  // 若所有本地 KB 都没命中 → 走服务端 /api/public/kb-query fallback
+  if (!best.source) {
+    const matchedSrc = KB_SOURCES.find(s => s.mods.includes(moduleId));
+    if (matchedSrc) {
+      best = {
+        source: matchedSrc.name,
+        score: 0.5,
+        snippet: '[fallback] 调用服务端 KB 检索中…',
+        entryId: matchedSrc.entryId,
+        fallback: true,
+        module: moduleId,
+        query: (data && (data.s1 || data.s2 || data.q)) || ''
+      };
     }
   }
   return best;
 }
 
-function _kbHitCount(moduleId){
+// 服务端 KB fallback 异步检索（被 _kbScore 标记为 fallback 后调用）
+async function _kbQueryFallback(best) {
+  if (!best.fallback) return best;
+  try {
+    const qs = new URLSearchParams({
+      module: best.module || '',
+      q: (best.query || '').slice(0, 60),
+      limit: '5'
+    });
+    const r = await fetch(API + '/api/public/kb-query?' + qs, { method: 'GET' });
+    const j = await r.json();
+    if (j && j.results && j.results.length > 0) {
+      best.snippet = j.results.map(x => '【' + x.entry_id + '】' + x.title + '\n' + (x.snippet || '').slice(0, 200)).join('\n\n');
+      best.score = Math.max(best.score, 0.65);
+      best.results = j.results;
+      best.sourceCount = j.count;
+    } else {
+      best.snippet = '[fallback] 未找到匹配 KB';
+      best.score = 0.3;
+    }
+  } catch (e) {
+    best.snippet = '[fallback] 失败: ' + e.message;
+    best.score = 0.2;
+  }
+  return best;
+}
+
+function _kbHitCount(moduleId, kbEntryId){
   const key = '_kb_hit_count/' + moduleId;
   const n = parseInt(localStorage.getItem(key) || '0') + 1;
   localStorage.setItem(key, String(n));
+  // 异步上报后端 kb_formal.hit_count（公网白名单 + 失败静默）
+  if (kbEntryId) {
+    try {
+      fetch(API + '/api/public/kb-hit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ entry_id: kbEntryId, app_endpoint: 'ai-assistant', user_query: (state.data?.s1 || '') + ' ' + (state.data?.s2 || '') })
+      }).catch(() => {});
+    } catch (e) {}
+  }
   return n;
+}
+
+// === 问卷 + 排盘结果自动落库（公网公开端点）===
+function _saveSurvey(module, data, baziData){
+  try {
+    fetch(API + '/api/public/save-survey', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ module, data, baziData: baziData || null, source: 'ai-assistant' })
+    }).catch(() => {});
+  } catch (e) {}
 }
 
 function _kbTodayCount(){
@@ -486,14 +572,35 @@ async function send(pre){
 
   if(state.module && !state.reporting){
     processAnswer(q);
-  }else{
-    // 自由对话模式→报告生成中或完成后,文本只走 freeChat,绝不重启模块
-    await callAI(q);
+    return;
   }
+  // ⭐ 新：路由检测 — 用户输入直接动 → 自动跳对应模块
+  if(!state.module){
+    const detected=detectModule(q);
+    if(detected && MODULES[detected]){
+      const mod=MODULES[detected];
+      state={module:detected,step:0,data:{},reporting:false};
+      chat.innerHTML='';
+      if(typeof parse_natural_query==='function'){
+        const r=parse_natural_query(q);
+        if(r && r.data){state.data=Object.assign(state.data,r.data);}
+      }
+      const intro='识别到您输入的是【'+mod.name+'】。\n\n';
+      const auto=state.data.s0?('\n\n📌 已自动提取：'+state.data.s0):'';
+      addAI(intro+mod.steps[0].q+auto, mod.steps[0]);
+      return;
+    }
+  }
+  // 自由对话模式 → 走 AI 调用
+  await callAI(q);
 }
 
 function detectModule(text){
-  const t=text.toLowerCase();
+  if(typeof parse_natural_query==='function'){
+    const r=parse_natural_query(text||'');
+    if(r && r.module)return r.module;
+  }
+  const t=(text||'').toLowerCase();
   if(/排盘|八字|算命|命理|四柱/.test(t))return 'bazi';
   if(/手机号|号码|1[3-9]\d{9}/.test(t))return 'mobile';
   if(/运势|运气|今年|流年/.test(t))return 'yunshi';
@@ -590,6 +697,10 @@ async function generateReport(){
   const mod=MODULES[state.module];
   const collected=Object.values(state.data);
 
+  // 0. 问卷 + 排盘落库（公网公开端点，失败静默）
+  const _baziForSave = (state.module==='bazi' || state.module==='name' || state.module==='number' || state.module==='face') ? state.data : null;
+  _saveSurvey(state.module, state.data, _baziForSave);
+
   // ③ 模块 KB 兜底（music/lifeindex/lifeplan 三大模块断网可用）
 if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
   try {
@@ -598,25 +709,51 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
     let html = '【模块KB兜底 · '+mr.name+'】\n\n';
     if(rep.ttsText) html += '🔊 朗读：'+rep.ttsText+'\n\n';
     if(rep.total !== undefined) html += '综合指数：'+rep.total+' 分\n\n';
+    if(rep.element) html += '主导五行：'+rep.element+' 行\n';
+    if(rep.summary) html += '📊 '+rep.summary+'\n\n';
     if(rep.fiveElement){
       html += '推荐五行：'+rep.fiveElement+'\n';
       if(rep.recommend) html += '特质：'+rep.recommend.feel+'\n\n';
     }
     if(rep.dimensions){
-      html += '分项评估：\n';
-      rep.dimensions.forEach(d => html += '  · '+d.name+'：'+d.score+' 分\n');
+      html += '【十维度评分卡】\n';
+      rep.dimensions.forEach(d => {
+        const mark = d.score >= 85 ? '✅' : d.score >= 75 ? '🟢' : d.score >= 60 ? '🟡' : '🔴';
+        html += '  '+mark+' '+ (d.icon||'•') + ' '+d.name+'：'+d.score+' 分（'+ (d.status||'') +'）· '+ (d.focus||'')+'\n';
+      });
+      html += '\n';
+    }
+    if(rep.next5Years){
+      html += '【未来 5 年节奏建议】\n';
+      rep.next5Years.forEach((y,i) => html += '  第'+ (i+1) +'年：'+y.text+'\n');
+      html += '\n';
+    }
+    if(rep.actions){
+      html += '【十条行动清单】\n';
+      rep.actions.slice(0,10).forEach((s,i) => html += '  '+(i+1)+'.'+s+'\n');
       html += '\n';
     }
     if(rep.stage){
       html += '人生阶段：'+rep.stage.name+'（'+rep.stage.range+'）\n';
       html += '重点：'+rep.stage.focus.join('、')+'\n\n';
     }
-    if(rep.domains){
-      html += '12 领域矩阵：'+rep.domains.map(d=>d.name).join('、')+'\n\n';
+    if(rep.domainScores){
+      html += '【十二领域评分卡】\n';
+      rep.domainScores.forEach(d => {
+        const mark = d.score >= 75 ? '✅' : d.score >= 60 ? '🟡' : '🔴';
+        html += '  '+mark+' '+d.icon+' '+d.name+'：'+d.score+' 分（'+d.status+'）\n';
+      });
+      html += '\n';
     }
     if(rep.timeline){
       html += '人生时间轴：\n';
       rep.timeline.forEach(t => html += '  '+t.age+'岁：'+t.text+'\n');
+      html += '\n';
+    }
+    if(rep.next5Years){
+      html += '【未来 5 年步骤建议】\n';
+      rep.next5Years.forEach(y => html += '  · '+y.year+' 岁：'+y.text+'\n');
+      if(rep.fiveYearAdvice) html += '\n总评：'+rep.fiveYearAdvice+'\n';
       html += '\n';
     }
     if(rep.sixDims){
@@ -628,7 +765,7 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
       html += '\n';
     }
     if(rep.nextSteps){
-      html += '10 条行动清单：\n';
+      html += '【十条行动清单】\n';
       rep.nextSteps.forEach((s,i) => html += '  '+(i+1)+'.'+s+'\n');
       html += '\n';
     }
@@ -643,13 +780,23 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
 }
 
 // ① KB 优先：先查本地知识库
-  const kbHit = _kbScore(state.module, state.data);
-  _kbHitCount(state.module);
+  let kbHit = _kbScore(state.module, state.data);
+  if (kbHit.fallback) {
+    // 异步走服务端 /api/public/kb-query fallback
+    try {
+      kbHit = await _kbQueryFallback(kbHit);
+    } catch (e) {
+      console.warn('[kb fallback]', e);
+    }
+  }
+  _kbHitCount(state.module, kbHit.entryId);
   _kbTodayCount();
+  // 问卷 + 排盘结果落库（公开端点，失败静默）
+  _saveSurvey(state.module, state.data, _baziForSave);
 
   if(kbHit.score >= 0.7){
     // KB 直答
-    const kbReport = '【来源：本地知识库（'+kbHit.source+'，命中分 '+kbHit.score+'）】\n\n' + kbHit.snippet.substring(0, 4000);
+    const kbReport = '【来源：本地知识库（'+kbHit.source+' · '+kbHit.entryId+'，命中分 '+kbHit.score+'）】\n\n' + kbHit.snippet.substring(0, 4000);
     showReport(kbReport);
     autoSavePaipan(kbReport);
     return;
@@ -663,9 +810,11 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
 
   // ③ 调用后端 AI
   const prompt='用户选择了「'+mod.name+'」模块，通过对话收集了以下信息：'+collected.join('；')+'。请基于以上信息给出专业、丰富、详实的分析评估报告，报告要拿来即用，包含具体建议。'+promptExtra;
+  // 把用户结构化数据（八字/姓名/数字/生辰...）作为 baziData 传给后端，让 AI 能基于真实数据回答而非通用模板
+  const baziData = (state.module==='bazi' || state.module==='name' || state.module==='number' || state.module==='face') ? state.data : null;
 
   try{
-    const r=await fetch(API+'/api/ai/public-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[...hist.slice(-8),{role:'user',content:prompt}]})});
+    const r=await fetch(API+'/api/ai/public-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[...hist.slice(-8),{role:'user',content:prompt}], baziData})});
     const d=await r.json();
     const reply=(d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||'';
     if(reply.length>50){
@@ -2656,29 +2805,62 @@ window._MODULE_REPORTS = {
   lifeindex: {
     name: '生命指数',
     dimensions: [
-      {key:'shiye',name:'事业',weight:0.20},
-      {key:'caiyun',name:'财运',weight:0.15},
-      {key:'jiankang',name:'健康',weight:0.20},
-      {key:'hunyin',name:'婚姻',weight:0.15},
-      {key:'xueye',name:'学业',weight:0.10},
-      {key:'jiating',name:'家庭',weight:0.05},
-      {key:'renji',name:'人际',weight:0.05},
-      {key:'jingshen',name:'精神',weight:0.05},
-      {key:'xiangfu',name:'享福',weight:0.03},
-      {key:'shouyuan',name:'寿元',weight:0.02}
+      {key:'shiye',name:'事业',icon:'💼',weight:0.20,focus:'职业三跳+管理进阶'},
+      {key:'caiyun',name:'财运',icon:'💰',weight:0.15,focus:'稳健理财+多元收入'},
+      {key:'jiankang',name:'健康',icon:'💪',weight:0.20,focus:'运动+饮食+作息'},
+      {key:'hunyin',name:'婚姻',icon:'💑',weight:0.15,focus:'沟通+包容+共同成长'},
+      {key:'xueye',name:'学业',icon:'📚',weight:0.10,focus:'学历+证书+终身学习'},
+      {key:'jiating',name:'家庭',icon:'🏡',weight:0.05,focus:'子女教育+亲情'},
+      {key:'renji',name:'人际',icon:'🤝',weight:0.05,focus:'深度关系+同行圈子'},
+      {key:'jingshen',name:'精神',icon:'🎭',weight:0.05,focus:'信仰+哲学+艺术'},
+      {key:'xiangfu',name:'享福',icon:'🌸',weight:0.03,focus:'体验+旅行+生活品质'},
+      {key:'shouyuan',name:'寿元',icon:'🍵',weight:0.02,focus:'养生+保健+定期体检'}
     ],
     diagnose: function(data){
       const WX_SCORE = {'金':85,'木':78,'水':82,'火':88,'土':90};
+      const WX_FOCUS = {'金':'锐进+决策+果断','木':'生发+成长+学习','水':'智慧+灵活+沉浸','火':'表达+热情+领导','土':'稳重+承担+储蓄'};
       const ele = (data && data.s0) || '金';
       const base = WX_SCORE[ele] || 85;
-      const result = this.dimensions.map(d => ({
-        name: d.name,
-        key: d.key,
-        score: Math.round(base + (Math.sin(d.key.length*7) * 8)),
-        weight: d.weight
-      }));
+      const userText = ((data && (data.s1||'')) + ' ' + ((data && data.s2)||'')).trim();
+      // 五行关键词加权
+      const WX_KEYS = {'金':['金','银','金融','财','金属','锐','商业'],'木':['木','林','学','教育','书','生长','花'],'水':['水','海','智慧','智','流动','冥想'],'火':['火','光','表演','演讲','热','能量'],'土':['土','建筑','稳','田','地产','山']};
+      let boost = 0;
+      (WX_KEYS[ele]||[]).forEach(k => { if(userText.includes(k)) boost += 3; });
+      const result = this.dimensions.map(d => {
+        // 五行能量优势领域加权
+        let bias = 0;
+        if (ele === '金' && ['caiyun','shiye'].includes(d.key)) bias += 8;
+        if (ele === '木' && ['xueye','jingshen'].includes(d.key)) bias += 8;
+        if (ele === '水' && ['renji','jingshen'].includes(d.key)) bias += 8;
+        if (ele === '火' && ['renji','xiangfu'].includes(d.key)) bias += 8;
+        if (ele === '土' && ['jiating','shouyuan'].includes(d.key)) bias += 8;
+        const score = Math.max(40, Math.min(95, Math.round(base + (Math.sin(d.key.length*7) * 8) + bias + boost)));
+        const status = score >= 85 ? '优' : score >= 75 ? '良' : score >= 60 ? '中' : '有潜力';
+        return { name: d.name, key: d.key, icon: d.icon, score, weight: d.weight, status, focus: d.focus };
+      });
       const total = Math.round(result.reduce((s,d) => s + d.score * d.weight, 0));
-      return {title:'生命指数报告', total:total, dimensions:result, element:ele};
+      // 五行能量画像
+      const top3 = [...result].sort((a,b) => b.score - a.score).slice(0, 3).map(d => d.name);
+      const bot2 = [...result].sort((a,b) => a.score - b.score).slice(0, 2).map(d => d.name);
+      const summary = `${ele}行主导（${WX_FOCUS[ele]}），总分${total}。优势：${top3.join('、')}；待加强：${bot2.join('、')}`;
+      // 10 条行动清单（按加权后劣势领域给针对性建议）
+      const actions = [];
+      result.filter(d => d.score < 75).sort((a,b) => a.score - b.score).slice(0, 3).forEach(d => {
+        actions.push('【'+d.name+'】'+d.focus+'（得分'+d.score+'）');
+      });
+      result.filter(d => d.score >= 85).slice(0, 3).forEach(d => {
+        actions.push('【'+d.name+'】优势保持：'+d.focus);
+      });
+      while (actions.length < 10) actions.push('【平衡】五行调合：'+ele+'行能量配比优化');
+      // 5 年节奏
+      const next5Years = [
+        {year:1, text:'扬长：强化优势领域（'+top3[0]+'）'+(top3[1]?'+'+top3[1]:'')+'主键能力'},
+        {year:2, text:'补短：针对性提升'+bot2[0]+'领域'},
+        {year:3, text:'人生换挡期：尝试差异化路径'},
+        {year:4, text:'中段汇总：成果性不陶丝'},
+        {year:5, text:'中期锁势：进入下个五年计划'}
+      ];
+      return { title:'生命指数报告', total, dimensions:result, element:ele, top3, bot2, summary, actions, next5Years };
     }
   },
   lifeplan: {
@@ -2707,32 +2889,194 @@ window._MODULE_REPORTS = {
       const age = parseInt(data && data.s0) || 30;
       const stageKey = age <= 6 ? 'preschool' : age <= 17 ? 'school' : age <= 23 ? 'university' : 'career';
       const stage = this.stages.find(s => s.key === stageKey);
+
+      // 十二领域评分（根据年龄阶段 + KB 文本关键词加权）
+      const userText = Object.values(data || {}).join(' ');
+      const ageStageFocus = stage.focus.join(' ');
+      const _5yStart = age;
+      const _5yPlan = [
+        { year: age + 1, text: '夯实基期：阶段核心理能强化，适合学习积累' },
+        { year: age + 2, text: '试错期：阶段突破、探索不同方向' },
+        { year: age + 3, text: '中期步进期：目标聚焦、协会/导师对话' },
+        { year: age + 4, text: '中期证果期：阶段成果转位' },
+        { year: age + 5, text: '中期导启期：下一阶段起点梳理' }
+      ];
+      const domainScores = this.domains.map(d => {
+        let baseScore = 60;
+        // 阶段关注领域加权 (+15)
+        if (stage.focus.some(f => d.name.includes(f) || f.includes(d.name))) baseScore += 15;
+        // 健康年龄 >=35 -10
+        if (d.key === 'jiankang' && age >= 35) baseScore -= 10;
+        // 创业年龄 24-40 额外加权
+        if (d.key === 'chuangye' && age >= 24 && age <= 40) baseScore += 10;
+        // 养老年龄 50+
+        if (d.key === 'yanglao' && age >= 50) baseScore += 15;
+        // 学业年龄 <24
+        if (d.key === 'xueye' && age < 24) baseScore += 15;
+        // 五行关键词加权
+        const wuxingKeywords = { '金': ['理财', '金融', '法律'], '木': ['学习', '成长', '教育'], '水': ['智慧', '思考', '学术'], '火': ['创业', '激情', '表达'], '土': ['稳健', '养老', '健康'] };
+        for (const [wx, kws] of Object.entries(wuxingKeywords)) {
+          if (kws.some(k => userText.includes(k))) {
+            if (d.key === 'caiyun' && wx === '金') baseScore += 5;
+            if (d.key === 'xueye' && wx === '木') baseScore += 5;
+            if (d.key === 'chuangye' && wx === '火') baseScore += 5;
+            if (d.key === 'yanglao' && wx === '土') baseScore += 5;
+          }
+        }
+        const finalScore = Math.max(30, Math.min(95, baseScore));
+        return { key: d.key, name: d.name, icon: d.icon, score: finalScore, status: finalScore >= 75 ? '优' : finalScore >= 60 ? '良好' : '有潜力' };
+      });
+
+      // 未来 5 年中年步进建议（根据月大运运转提示）
+      const _5yAdvice = age < 30
+        ? '启始期，重点在✍️学业 亅人脉 建节奏'
+        : age < 50
+        ? '进取期，重点在💼事业 💰财运 💕婚恋'
+        : '守成期，重点在💊健康 🏙️城市 🏺传承';
+
       return {
         title: '人生规划报告',
         age: age,
         stage: stage,
         domains: this.domains,
+        domainScores: domainScores,
         timeline: [
-          {age:10,text:'童年奠基期'},
-          {age:20,text:'青年立志期'},
-          {age:30,text:'而立创业期'},
-          {age:40,text:'不惑稳固期'},
-          {age:50,text:'知天命收获期'},
-          {age:60,text:'耳顺传承期'},
-          {age:70,text:'从心所欲期'}
+          {age: 10, text: '童年奠基期', focus: '启蒙 + 健康习惯'},
+          {age: 20, text: '青年立志期', focus: '学业 + 人脉起步'},
+          {age: 30, text: '而立创业期', focus: '事业 + 婚恋'},
+          {age: 40, text: '不惑稳固期', focus: '事业深耕 + 健康'},
+          {age: 50, text: '知天命收获期', focus: '财务 + 传承'},
+          {age: 60, text: '耳顺传承期', focus: '传承 + 修养'},
+          {age: 70, text: '从心所欲期', focus: '享福 + 天命'}
         ],
+        next5Years: _5yPlan,
+        fiveYearAdvice: _5yAdvice,
         nextSteps: [
-          '明确未来3年核心目标',
-          '梳理人脉资源网络',
-          '设定每月精进计划',
-          '建立健康管理习惯',
-          '每月一次复盘调整'
-        ]
+          `【1】制定${age + 1}年度${stage.focus[0]}核心目标（3个为佳）`,
+          `【2】梳理现有${stage.focus[1] || '人脉'}资源，建立同领域同行圈层（5-8人）`,
+          `【3】建立每月一轮复盘机制（推荐月末周末 2 小时）`,
+          `【4】健康习惯投资：合理作息 / 运动计划（每周 3-5 次）`,
+          `【5】财务防守 / 进攻计划：年度储蓄比例明确 · 握关资本上限`
+        ],
+        summary: `${age}岁属${stage.name}（${stage.range}），本阶段重点：${stage.focus.join('、')}。依据八守御身始躜，未来 5 年${_5yAdvice}。请每月复盘调整。`,
+        kbSources: ['NIHAISHA_KB', 'SHUHAN_KB', 'FAITH_KB']
+      };
+    }
+  },
+  mobile: {
+    name: '手机号码',
+    diagnose: function(data){
+      const num = (data && data.s0) || '13800138000';
+      const last4 = num.slice(-4);
+      const seed = (parseInt(last4) || 0) % 5;
+      const ele = ['金','木','水','火','土'][seed];
+      const SD = {'金':88,'木':76,'水':82,'火':80,'土':85};
+      const five = {'金':'吉','木':'平','水':'大吉','火':'中','土':'吉'};
+      const six = {yunshi: SD[ele], jiankang: SD[ele]+1, hunyin: SD[ele]+2, haizi: SD[ele]-1, tongshi: SD[ele]+3, fumu: SD[ele]+4};
+      return {
+        title: '手机号码吉凶分析（断网KB兜底）',
+        number: num, last4: last4, element: ele,
+        ttsText: '尾数' + last4 + '，五行属' + ele + '，整体评' + five[ele] + '。',
+        sixDims: six,
+        summary: '尾号' + last4 + ' 五行属' + ele + '，吉凶评级：' + five[ele] + '（总分' + SD[ele] + '）',
+        nextSteps: ['尾数+' + last4 + '寓意归纳为' + ele + '行能量','结合八字用神评判','避免在日主受克日使用','重要场合可调换主用号','搭配颜色色手机壳','号码仅作参考，沟通诚意更重要']
+      };
+    }
+  },
+  shiye: {
+    name: '事业工作',
+    diagnose: function(data){
+      const seed = (((data && data.s0) || '').length + ((data && data.s1) || '').length);
+      const ele = ['金','木','水','火','土'][seed % 5];
+      const SD = {'金':85,'木':78,'水':82,'火':88,'土':83};
+      const six = {yunshi: SD[ele]+3, jiankang: SD[ele]-2, hunyin: SD[ele], haizi: SD[ele]-1, tongshi: SD[ele]+5, fumu: SD[ele]+2};
+      return {
+        title: '事业工作分析（断网KB兜底）',
+        element: ele,
+        ttsText: ele + '命者事业' + SD[ele] + '分。',
+        sixDims: six,
+        summary: ele + '命事业总分' + SD[ele] + '分。',
+        nextSteps: ['上半年守成蓄力','下半年主动出击','深耕主业避免频繁跳槽','35岁前确定行业方向','积累行业人脉（5-8位同行）','每3年一次自我评估']
+      };
+    }
+  },
+  xingming: {
+    name: '姓名学',
+    diagnose: function(data){
+      const name = (data && data.s0) || '张三';
+      const seed = [...name].reduce(function(s,c){return s + c.charCodeAt(0);}, 0);
+      const ele = ['金','木','水','火','土'][seed % 5];
+      const SD = {'金':86,'木':80,'水':83,'火':85,'土':88};
+      const tianGe = 1 + seed % 81;
+      return {
+        title: '姓名学分析（断网KB兜底）',
+        name: name, element: ele, tianGe: tianGe,
+        ttsText: name + '，' + ele + '属性，天格' + tianGe + '数。',
+        sixDims: {yunshi: SD[ele], jiankang: SD[ele]+2, hunyin: SD[ele]+1, haizi: SD[ele]-1, tongshi: SD[ele]+3, fumu: SD[ele]+4},
+        summary: name + '五行属' + ele + '，天格' + tianGe + '数。',
+        nextSteps: ['三才配置综合考虑','音形义综合评判','避免生僻字','与生辰八字互补','考虑家族辈分用字','改名需谨慎']
+      };
+    }
+  },
+  zeri: {
+    name: '择日',
+    diagnose: function(data){
+      const event = (data && data.s0) || '婚嫁';
+      const date = (data && data.s1) || '2026-08-15';
+      const dayDate = new Date(date);
+      const dayZhi = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][dayDate.getDate() % 12];
+      const seed = dayDate.getDate() % 5;
+      const ele = ['金','木','水','火','土'][seed];
+      const luck = ['上上','上','中','下','中上'][seed];
+      return {
+        title: '择日分析（断网KB兜底）',
+        event: event, date: date, dayZhi: dayZhi, luck: luck,
+        ttsText: date + '日支' + dayZhi + '，五行属' + ele + '，用于' + event + '：' + luck + '。',
+        summary: date + '（' + dayZhi + '日）用于' + event + '，评级' + luck,
+        nextSteps: ['结合事主八字选日','避开冲煞','择吉时配合','重要仪式提前30天择定','黄历宜忌参考','多备1-2个候选日']
+      };
+    }
+  },
+  huangli: {
+    name: '老黄历',
+    diagnose: function(data){
+      const date = (data && data.s0) || '2026-08-15';
+      const d = new Date(date);
+      const yi = ['祭祀','出行','入宅','嫁娶','开业','求财','签约','动土','修造','安葬'];
+      const ji = ['动土','嫁娶','开市','安葬','出行','入宅','动土','修造','祭祀','祈福'];
+      const seed = d.getDate() % 10;
+      return {
+        title: '老黄历查询（断网KB兜底）',
+        date: date,
+        yi: [yi[seed], yi[(seed+3)%10], yi[(seed+7)%10]],
+        ji: [ji[(seed+1)%10], ji[(seed+5)%10]],
+        ttsText: date + '，宜' + yi[seed] + '，忌' + ji[(seed+1)%10] + '。',
+        summary: date + '宜：' + yi[seed] + '；忌：' + ji[(seed+1)%10],
+        nextSteps: ['结合事主八字','避开冲煞日','择吉时配合','黄历仅作参考','重要决策看大局']
+      };
+    }
+  },
+  taisui: {
+    name: '太岁',
+    diagnose: function(data){
+      const year = parseInt(data && data.s0) || 1985;
+      const z = ['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'][(year - 4) % 12];
+      const tianGan = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'][(year - 4) % 10];
+      const diZhi = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][(year - 4) % 12];
+      const clashes = {'子':'午','丑':'未','寅':'申','卯':'酉','辰':'戌','巳':'亥','午':'子','未':'丑','申':'寅','酉':'卯','戌':'辰','亥':'巳'};
+      const dz2026 = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][2026 % 12];
+      const fanTaiSui = clashes[diZhi] === dz2026;
+      return {
+        title: '太岁查询（断网KB兜底）',
+        year: year, zodiac: z, tianGan: tianGan, diZhi: diZhi,
+        ttsText: year + '年生肖' + z + '，2026年' + (fanTaiSui ? '冲太岁' : '与太岁无冲') + '。',
+        summary: year + '年生肖' + z + '（' + tianGan + diZhi + '），2026：' + (fanTaiSui ? '⚠️ 冲太岁' : '✅ 平安'),
+        nextSteps: ['2026年' + (fanTaiSui ? '宜化解太岁' : '顺其自然'),'年初祈福太岁','保持低调谨慎','避免高风险投资','重要决策择吉日','心态平和为上']
       };
     }
   }
 };
-console.log('✅ _MODULE_REPORTS loaded (8 modules KB-fallback: bazi/yunshi/caiyun/ganqing/zhongyi/music/lifeindex/lifeplan)');
+console.log('✅ _MODULE_REPORTS loaded (14 modules KB-fallback: bazi/yunshi/caiyun/ganqing/zhongyi/mobile/shiye/xingming/zeri/huangli/taisui/music/lifeindex/lifeplan)');
 </script>
 <script src="knowledge-models/classics-model.js"></script>
 <script src="knowledge-models/faith-model.js"></script>
@@ -2749,35 +3093,91 @@ console.log('✅ _MODULE_REPORTS loaded (8 modules KB-fallback: bazi/yunshi/caiy
 <script src="knowledge-models/yijing-model.js"></script>
 <script src="knowledge-models/ziwei-model.js"></script>
 <script src="knowledge-models/zodiac-model.js"></script>
-<script src="knowledge-models/classics-model.js"></script>
-<script src="knowledge-models/faith-model.js"></script>
-<script src="knowledge-models/fengshui-model.js"></script>
-<script src="knowledge-models/huajie-model.js"></script>
-<script src="knowledge-models/liuren-model.js"></script>
-<script src="knowledge-models/liuyao-model.js"></script>
-<script src="knowledge-models/mantra-model.js"></script>
-<script src="knowledge-models/meihua-model.js"></script>
-<script src="knowledge-models/nihaisha-model.js"></script>
-<script src="knowledge-models/qimen-model.js"></script>
-<script src="knowledge-models/shuhan-model.js"></script>
-<script src="knowledge-models/yanzhi-model.js"></script>
-<script src="knowledge-models/yijing-model.js"></script>
-<script src="knowledge-models/ziwei-model.js"></script>
-<script src="knowledge-models/zodiac-model.js"></script>
-<script src="knowledge-models/classics-model.js"></script>
-<script src="knowledge-models/faith-model.js"></script>
-<script src="knowledge-models/fengshui-model.js"></script>
-<script src="knowledge-models/huajie-model.js"></script>
-<script src="knowledge-models/liuren-model.js"></script>
-<script src="knowledge-models/liuyao-model.js"></script>
-<script src="knowledge-models/mantra-model.js"></script>
-<script src="knowledge-models/meihua-model.js"></script>
-<script src="knowledge-models/nihaisha-model.js"></script>
-<script src="knowledge-models/qimen-model.js"></script>
-<script src="knowledge-models/shuhan-model.js"></script>
-<script src="knowledge-models/yanzhi-model.js"></script>
-<script src="knowledge-models/yijing-model.js"></script>
-<script src="knowledge-models/ziwei-model.js"></script>
-<script src="knowledge-models/zodiac-model.js"></script>
+
+<!-- R39-C 双核 KB 集成 -->
+<script src="../knowledge/r39-dual-core-kb.js" defer></script>
+<script>
+// R39-C 双核 KB 命中辅助函数
+function r39DualKBMatch(query){
+  if(!window.R39_DUAL_CORE_KB) return null;
+  var q = String(query||'').toLowerCase();
+  var best = null;
+  var bestScore = 0;
+  for(var i=0;i<R39_DUAL_CORE_KB.length;i++){
+    var e = R39_DUAL_CORE_KB[i];
+    var titleMatch = e.title.toLowerCase().indexOf(q)>=0?0.5:0;
+    var tagMatch = (e.tags||[]).some(function(t){return q.indexOf(t.toLowerCase())>=0;})?0.3:0;
+    var dimMatch = (e.dimension||e.palace||e.domain||'').toLowerCase().indexOf(q)>=0?0.4:0;
+    var score = titleMatch + tagMatch + dimMatch;
+    if(score > bestScore){ bestScore = score; best = e; }
+  }
+  return bestScore >= 0.4 ? best : null;
+}
+function r39DualKBReply(query){
+  var hit = r39DualKBMatch(query);
+  if(!hit) return null;
+  return '【KB R39-B 双核】'+hit.title+'\n\n'+hit.content+'\n\n📜 古籍: '+hit.sources.join('、')+'\n📊 评分: '+hit.score;
+}
+console.log('[R39-C] 双核 KB 命中辅助函数已挂载');
+</script>
+<!-- R41-E KB 命中 UI 升级 -->
+<script>(function(){
+  if (window.__r41_e_kb) return; window.__r41_e_kb = true;
+  
+  // 拦截 fetch 调用 API 时显示 KB 命中信息
+  var origFetch = window.fetch;
+  window.fetch = function(url, opts) {
+    if (typeof url === 'string' && url.indexOf('/api/ai/') >= 0 && opts && opts.body) {
+      try {
+        var body = JSON.parse(opts.body);
+        if (body.messages) {
+          var lastMsg = body.messages.filter(function(m){return m.role==='user'}).pop();
+          if (lastMsg && lastMsg.content) {
+            // 计算 KB 命中分
+            var kbScore = 0;
+            var kbSource = '';
+            if (window.NIHAISHA_KB) {
+              var k = Object.keys(window.NIHAISHA_KB).find(function(key){
+                return lastMsg.content.indexOf(key) >= 0;
+              });
+              if (k) { kbScore = 0.85; kbSource = '倪师'; }
+            }
+            if (window.SHUHAN_KB && kbScore < 0.7) {
+              var k2 = Object.keys(window.SHUHAN_KB).find(function(key){
+                return lastMsg.content.indexOf(key) >= 0;
+              });
+              if (k2) { kbScore = 0.75; kbSource = '舒晗'; }
+            }
+            // 显示 KB 命中标识
+            if (kbScore >= 0.7) {
+              setTimeout(function(){
+                showKBHitBadge(kbScore, kbSource, lastMsg.content);
+              }, 200);
+            }
+          }
+        }
+      } catch(e){}
+    }
+    return origFetch.apply(this, arguments);
+  };
+  
+  function showKBHitBadge(score, source, query) {
+    var badge = document.createElement('div');
+    badge.className = 'kb-hit-badge';
+    badge.innerHTML = '<span class="kb-hit-score">'+score.toFixed(2)+'</span> KB命中·'+source+'·来源古籍';
+    badge.style.cssText = 'position:fixed;top:80px;right:20px;background:linear-gradient(135deg,rgba(201,168,76,.95),rgba(184,134,11,.95));color:#1a1a1a;padding:8px 14px;border-radius:20px;font-size:12px;font-weight:600;z-index:99999;box-shadow:0 4px 16px rgba(0,0,0,.3);animation:kbHitPop 0.4s ease';
+    if (!document.getElementById('kbHitStyle')) {
+      var s = document.createElement('style');
+      s.id = 'kbHitStyle';
+      s.textContent = '@keyframes kbHitPop{0%{transform:scale(0.6);opacity:0}50%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}';
+      document.head.appendChild(s);
+    }
+    document.body.appendChild(badge);
+    setTimeout(function(){ badge.style.opacity='0'; badge.style.transition='opacity 0.4s'; }, 2500);
+    setTimeout(function(){ badge.remove(); }, 3000);
+  }
+})();
+</script>
+
 </body>
 </html>

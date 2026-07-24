@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>自然查询路由测试 · mlbj-v18</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e);color:#eee;min-height:100vh;padding:20px;max-width:800px;margin:0 auto}
+h1{color:#c9a84c;margin-bottom:8px;font-size:24px}
+.sub{color:#888;font-size:13px;margin-bottom:20px}
+.box{background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.3);border-radius:12px;padding:16px;margin:12px 0}
+input{width:100%;padding:12px;border:1px solid #c9a84c;background:rgba(0,0,0,.3);color:#fff;border-radius:8px;font-size:14px;margin:8px 0}
+button{padding:10px 16px;background:#c9a84c;color:#000;border:none;border-radius:8px;font-size:14px;cursor:pointer}
+.row{padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.1);font-family:monospace;font-size:13px}
+.row b{color:#c9a84c}
+.row .ok{color:#7ad97a}
+.row .miss{color:#ff6b6b}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:12px 0}
+.grid button{font-size:12px;padding:8px}
+</style>
+</head>
+<body>
+<h1>🔍 自然查询路由测试</h1>
+<div class="sub">识别模糊输入 → 自动路由到对应模块 (mlbj-v18 / parse-natural.js)</div>
+
+<div class="box">
+  <label>输入测试：</label>
+  <input id="in" placeholder="试试：LIU套5815 / 13800138000 / 京A12345 / 刘青云 13579 / 算八字 / 犯太岁" value="LIU套5815">
+  <button onclick="runtest()">分析</button>
+  <div class="grid">
+    <button onclick="document.getElementById('in').value='LIU套5815';runtest()">LIU套5815</button>
+    <button onclick="document.getElementById('in').value='13800138000';runtest()">13800138000</button>
+    <button onclick="document.getElementById('in').value='京A12345';runtest()">京A12345</button>
+    <button onclick="document.getElementById('in').value='刘青云 13579';runtest()">刘青云 13579</button>
+    <button onclick="document.getElementById('in').value='算八字';runtest()">算八字</button>
+    <button onclick="document.getElementById('in').value='犯太岁';runtest()">犯太岁</button>
+  </div>
+</div>
+
+<div class="box" id="result"></div>
+
+<div class="box">
+  <h3 style="color:#c9a84c;font-size:14px;margin-bottom:8px">📊 批量测试 (15 用例)</h3>
+  <div id="batch"></div>
+  <div style="margin-top:8px;font-size:12px;color:#888">总命中：<span id="hitCount">0</span> / 15</div>
+</div>
+
+<script src="js/parse-natural.js?v=20260722-1417"></script>
+<script>
+function runtest(){
+  const text = document.getElementById('in').value.trim();
+  if(!text)return;
+  const r = parse_natural_query(text);
+  const html = `<div style="margin-bottom:8px">输入：<b>${text}</b></div>
+    <div>模块：<b>${r.module || '⚠️ 未识别'}</b></div>
+    <div>命中分：${r.confidence}</div>
+    <div>提取：<code>${JSON.stringify(r.data)}</code></div>
+    <div style="margin-top:8px;color:${r.module?'#7ad97a':'#ff6b6b'}">
+      ${r.module?'✅ 已路由到「'+r.module+'」模块':'❌ 需引导用户明确意图'}
+    </div>`;
+  document.getElementById('result').innerHTML = html;
+}
+
+const cases = [
+  'LIU套5815','刘师傅测一下','我的手机13800138000怎么样',
+  '车牌京A12345好不好','我想算八字','我要择日结婚','起名王小明',
+  '我的事业','犯太岁如何化解','2026年运势','刘青云 13579',
+  '测算风水布局','紫微命盘','六爻排卦','奇门遁甲'
+];
+
+let hits = 0;
+const batch = document.getElementById('batch');
+cases.forEach(t => {
+  const r = parse_natural_query(t);
+  const ok = r.module !== null;
+  if(ok)hits++;
+  const row = document.createElement('div');
+  row.className = 'row';
+  row.innerHTML = `${ok?'<span class="ok">✅</span>':'<span class="miss">⚠️</span>'} <b>${t.padEnd(20)}</b> → ${r.module || 'null'} (conf:${r.confidence})`;
+  batch.appendChild(row);
+});
+document.getElementById('hitCount').textContent = hits;
+runtest();
+</script>
+</body>
+</html>

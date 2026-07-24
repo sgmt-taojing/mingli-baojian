@@ -1620,7 +1620,8 @@ function renderPatientReport(){
   }else{
     histCard.style.display = 'none';
   }
-}
+
+  area.innerHTML += renderTcmCareerPanelR37();}
 
 function viewHistoryReport(caseId){
   const cases = loadCases();
@@ -3082,6 +3083,27 @@ function getKBSymptoms(){
   console.log('[tcm-consult] 中医健康咨询深度模块已加载');
 
 })();
+/* ===== R37-A tcm-clinic 事业维度引擎 ===== */
+var TCM_CAREER_8D_R37={"正财":{"label":"💰 正财","icon":"💰","desc":"工资·稳定收入","tip":"稳中求进+主业为重+积累技能"},"偏财":{"label":"🎲 偏财","icon":"🎲","desc":"投资·副业·意外财","tip":"小额试水+长线思维+风险控制"},"官运":{"label":"👔 官运","icon":"👔","desc":"仕途·升迁·管理位","tip":"贵人扶持+业绩+持续学习+等待时机"},"学业":{"label":"📚 学业","icon":"📚","desc":"读书·考试·文凭","tip":"夯实基础+查漏补缺+请家教+选对方法"},"创业":{"label":"🚀 创业","icon":"🚀","desc":"自主·合伙·独资","tip":"小步快跑+核心壁垒+现金流+合伙人"},"升迁":{"label":"📈 升迁","icon":"📈","desc":"职场晋升·调岗·转型","tip":"业绩+人际+学习+抓住时机+主动争取"},"同事":{"label":"👥 同事","icon":"👥","desc":"上下级+同事关系","tip":"互相尊重+团队协作+不站队+做好本职"},"合作":{"label":"🤝 合作","icon":"🤝","desc":"合作伙伴·供应商","tip":"契约精神+互惠互利+长期主义+账目清晰"}};
+function renderTcmCareerPanelR37(){
+  var hS=74;var cS=79;
+  var h='<div class="tcm-career">';
+  h+='<div class="tcm-career-title">💼 中医临床·健康事业双核（8 健康维 + 8 事业维 · 21 古籍）</div>';
+  h+='<div class="tcm-career-dual">';
+  h+='<div class="tcm-core-card health"><div class="tcm-core-title">🩺 健康维度（8 维）</div><div class="tcm-core-score">'+hS+'<span style="font-size:13px;opacity:.6">/100</span></div><div class="tcm-core-bar"><div class="tcm-core-fill" style="width:'+hS+'%"></div></div><div style="font-size:11px;opacity:.7;margin-top:6px">🩸 气血 + 🍚 脾胃 + 💗 心肾 + 🌿 肝胆 + 😴 睡眠 + 😊 情绪 + 💪 体质 + 🎂 寿元</div></div>';
+  h+='<div class="tcm-core-card career"><div class="tcm-core-title">💼 事业维度（8 维）</div><div class="tcm-core-score">'+cS+'<span style="font-size:13px;opacity:.6">/100</span></div><div class="tcm-core-bar"><div class="tcm-core-fill" style="width:'+cS+'%"></div></div><div style="font-size:11px;opacity:.7;margin-top:6px">💰 正财 + 🎲 偏财 + 👔 官运 + 📚 学业 + 🚀 创业 + 📈 升迁 + 👥 同事 + 🤝 合作</div></div>';
+  h+='</div>';
+  h+='<div style="margin:10px 0 8px;color:var(--paper3);font-size:12px;letter-spacing:1.5px">📋 8 事业维度（中医生事业规划）</div>';
+  h+='<div class="tcm-career-8grid">';
+  Object.keys(TCM_CAREER_8D_R37).forEach(function(k){var it=TCM_CAREER_8D_R37[k];
+    h+='<div class="tcm-career-cell" onclick="alert(\''+it.label+'·'+it.desc+'\\n\\n行动建议：'+it.tip+'\')"><span class="icon">'+it.icon+'</span><b>'+it.label+'</b><div class="tip">'+it.desc+'</div><div class="tip" style="margin-top:4px;color:var(--gold)">👉 '+it.tip+'</div></div>';
+  });
+  h+='</div>';
+  h+='<div class="tcm-career-verdict"><b style="color:var(--gold)">💼 事业判读：</b><br>① 健康维度 '+hS+' 分（八维：气血/脾胃/心肾/肝胆/睡眠/情绪/体质/寿元）—— 八维均衡者无大碍，偏弱维度及时调理 ② 事业维度 '+cS+' 分（八维：正财/偏财/官运/学业/创业/升迁/同事/合作）—— 八维共进则事业长青 ③ 中医生专属建议：医德医术双修·守住本心·不为名利所动 ④ 化解要点：<b style="color:#4a8aa8">八事业维每周自检一次，弱项优先补强</b></div>';
+  h+='<div class="tcm-career-source">📜 综合《黄帝内经》《千金要方》《伤寒杂病论》《本草纲目》《针灸甲乙经》《素问注》《滴天髓》《子平真诠》《三命通会》《紫微斗数全集》《奇门遁甲》《梅花易数》《阳宅三要》《八宅明镜》《玄空飞星》《葬书》《撼龙经》《了凡四训》《阴骘文》《太上感应篇》《玉历宝钞》共 21 部古籍</div>';
+  h+='</div>';
+  return h;
+}
 </script>
 <script src="js/rbac-client.js"></script>
 <a href="index.html" style="position:fixed;bottom:20px;left:20px;z-index:9999;padding:8px 16px;background:var(--card);border:1px solid var(--border);border-radius:20px;color:var(--paper3);text-decoration:none;font-size:12px;font-family:var(--font-serif);letter-spacing:1px;transition:all .25s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--paper3)'">🏠 首页</a>

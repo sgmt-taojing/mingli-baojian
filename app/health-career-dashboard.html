@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>健康事业双核仪表盘 | 命理宝鉴</title>
+  <link rel="stylesheet" href="css/pro-panel.css">
+  <style>
+    :root{--bg:#0a0a0f;--line:rgba(255,255,255,.08);--paper:#e8e4df;--paper3:#b0a89e;--gold:#c9a84c;--gold2:#b8943f}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--paper);font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;line-height:1.6}
+    .hcd-wrap{max-width:1200px;margin:0 auto;padding:20px}
+    .hcd-header{text-align:center;padding:24px 0 20px;margin-bottom:20px;border-bottom:2px solid var(--line)}
+    .hcd-header h1{font-size:26px;color:var(--gold);letter-spacing:4px;margin-bottom:8px}
+    .hcd-header p{font-size:12px;opacity:.6;letter-spacing:2px}
+    .hcd-input{display:grid;grid-template-columns:repeat(5,1fr) auto auto;gap:10px;padding:18px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;margin-bottom:24px;align-items:end}
+    .hcd-input label{display:flex;flex-direction:column;font-size:11px;color:var(--paper3);letter-spacing:1.5px}
+    .hcd-input input,.hcd-input select{padding:10px 12px;background:rgba(0,0,0,.4);color:var(--paper);border:1px solid var(--line);border-radius:8px;font-size:14px;margin-top:6px;transition:.2s}
+    .hcd-input input:focus,.hcd-input select:focus{border-color:var(--gold);outline:none;box-shadow:0 0 0 3px rgba(201,168,76,.15)}
+    .hcd-input button{padding:12px 20px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0a0a0f;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:2px;white-space:nowrap;transition:.2s}
+    .hcd-input button:hover{box-shadow:0 4px 16px rgba(201,168,76,.5);transform:translateY(-2px)}
+    .hcd-dual{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px}
+    .hcd-card{padding:24px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.04);position:relative;transition:.3s}
+    .hcd-card:hover{box-shadow:0 8px 24px rgba(0,0,0,.3);transform:translateY(-2px)}
+    .hcd-card.health{border-left:5px solid #4a9a6e;background:linear-gradient(135deg,rgba(74,154,110,.12),rgba(255,255,255,.02))}
+    .hcd-card.career{border-left:5px solid #4a8aa8;background:linear-gradient(135deg,rgba(74,138,168,.12),rgba(255,255,255,.02))}
+    .hcd-card-title{font-size:15px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:10px;letter-spacing:2px}
+    .hcd-card.health .hcd-card-title{color:#4a9a6e}
+    .hcd-card.career .hcd-card-title{color:#4a8aa8}
+    .hcd-card-score{font-size:52px;font-weight:800;letter-spacing:2px;line-height:1;margin-bottom:6px}
+    .hcd-card.health .hcd-card-score{color:#4a9a6e}
+    .hcd-card.career .hcd-card-score{color:#4a8aa8}
+    .hcd-card-bar{height:10px;background:rgba(0,0,0,.35);border-radius:5px;overflow:hidden;margin:10px 0}
+    .hcd-card-fill{height:100%;border-radius:5px;transition:.6s;background-size:200% 100%;animation:shimmer 3s ease infinite}
+    .hcd-card.health .hcd-card-fill{background:linear-gradient(90deg,#4a9a6e,#7ab86e,#4a9a6e)}
+    .hcd-card.career .hcd-card-fill{background:linear-gradient(90deg,#4a8aa8,#6ab0d0,#4a8aa8)}
+    @keyframes shimmer{0%,100%{background-position:0 0}50%{background-position:100% 0}}
+    .hcd-card-meta{font-size:12px;opacity:.7;margin-top:10px;line-height:1.9}
+    .hcd-12grid-title{font-size:16px;color:var(--gold);letter-spacing:3px;margin:32px 0 10px;font-weight:700;text-align:center}
+    .hcd-12grid-subtitle{font-size:12px;opacity:.6;text-align:center;margin-bottom:18px;letter-spacing:1px}
+    .hcd-12grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .hcd-12cell{padding:16px 12px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;cursor:pointer;transition:.25s;text-align:center;position:relative;overflow:hidden}
+    .hcd-12cell::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0;transition:.3s}
+    .hcd-12cell:hover{background:rgba(201,168,76,.1);border-color:var(--gold);transform:translateY(-3px);box-shadow:0 8px 20px rgba(201,168,76,.2)}
+    .hcd-12cell:hover::before{opacity:1}
+    .hcd-12cell .icon{font-size:36px;display:block;margin-bottom:6px;transition:.3s}
+    .hcd-12cell:hover .icon{transform:scale(1.15)}
+    .hcd-12cell b{display:block;font-size:12px;color:var(--gold);margin-bottom:6px;letter-spacing:2px}
+    .hcd-12cell .score{font-size:22px;font-weight:700;margin:4px 0}
+    .hcd-12cell .stars{font-size:12px;margin:4px 0;letter-spacing:2px}
+    .hcd-12cell .verdict{font-size:10px;opacity:.6;margin-top:6px;line-height:1.6}
+    .hcd-detail{display:none;margin:20px 0;padding:24px;background:rgba(0,0,0,.3);border-radius:14px;border:1px dashed var(--gold);animation:fadeIn .4s ease}
+    .hcd-detail.show{display:block}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+    .hcd-8grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+    .hcd-8cell{padding:12px 10px;background:rgba(201,168,76,.06);border:1px solid var(--line);border-radius:8px;cursor:pointer;transition:.2s;text-align:left}
+    .hcd-8cell:hover{background:rgba(201,168,76,.15);border-color:var(--gold)}
+    .hcd-8cell .icon{font-size:18px;display:inline-block;margin-right:6px;vertical-align:middle}
+    .hcd-8cell b{font-size:11px;color:var(--gold);display:inline-block;vertical-align:middle;letter-spacing:1px}
+    .hcd-8cell .tip{font-size:10px;opacity:.7;margin-top:6px;line-height:1.7}
+    .hcd-action-list{padding:20px;background:rgba(0,0,0,.25);border-radius:12px;border:1px dashed var(--gold);margin-top:24px}
+    .hcd-action-list h3{font-size:15px;color:var(--gold);letter-spacing:2px;margin-bottom:14px;font-weight:700}
+    .hcd-action-list ol{padding-left:22px;font-size:12px;line-height:2.2}
+    .hcd-action-list li{margin-bottom:6px;color:var(--paper)}
+    .hcd-verdict{margin-top:24px;padding:20px;background:rgba(0,0,0,.3);border-radius:12px;border:1px dashed var(--gold);font-size:13px;line-height:2}
+    .hcd-source{font-size:10px;opacity:.35;margin-top:18px;padding-top:10px;border-top:1px dashed var(--line);letter-spacing:2px;text-align:center}
+    @media(max-width:768px){.hcd-input{grid-template-columns:repeat(2,1fr)}.hcd-dual{grid-template-columns:1fr}.hcd-12grid{grid-template-columns:repeat(2,1fr)}.hcd-8grid{grid-template-columns:1fr 1fr}}
+    @media print{.hcd-input,.hcd-print-hide{display:none}.hcd-card{break-inside:avoid}.hcd-12cell{break-inside:avoid}}
+  </style>
+</head>
+<body>
+  <div class="hcd-wrap">
+    <div class="hcd-header">
+      <h1>🩺💼 健康事业双核仪表盘</h1>
+      <p>排盘分析报告 · 双核驱动 · 12 领域全覆盖 · 古籍权威依据</p>
+    </div>
+
+    <div class="hcd-input">
+      <label>出生年<input type="number" id="hcdYear" value="1990" min="1900" max="2100"></label>
+      <label>出生月<input type="number" id="hcdMonth" value="6" min="1" max="12"></label>
+      <label>出生日<input type="number" id="hcdDay" value="15" min="1" max="31"></label>
+      <label>出生时<input type="number" id="hcdHour" value="14" min="0" max="23"></label>
+      <label>性别<select id="hcdGender"><option value="male">男</option><option value="female">女</option></select></label>
+      <button onclick="hcdCalculate()">🔮 计算</button>
+      <button onclick="hcdPrint()">🖨 打印</button>
+    </div>
+
+    <div id="hcdResult"></div>
+
+    <div style="text-align:center;margin-top:40px;padding:24px;opacity:.35;font-size:11px;letter-spacing:2px">
+      🏛 命理宝鉴 · 健康事业双核引擎 v1.0 · 综合 25 部古籍<br>
+      《滴天髓》《子平真诠》《穷通宝鉴》《三命通会》《紫微斗数全集》《太乙金华宗旨》《黄帝内经》《千金要方》《了凡四训》《阴骘文》《玉历宝钞》《协纪辨方书》《天星择日》《黄帝宅经》《八宅明镜》《玄空飞星》《阳宅三要》《葬书》《撼龙经》《梅花易数》《奇门遁甲》《太上感应篇》《三世因果经》《地藏经》《药师经》
+    </div>
+  </div>
+
+  <script>
+    /* ===== R39-A health-career-dashboard 独立双核仪表盘 ===== */
+    var HCD_HEALTH_8D={"气血":{"label":"🩸 气血","icon":"🩸","tip":"规律作息+八段锦+红枣枸杞黄芪"},"脾胃":{"label":"🍚 脾胃","icon":"🍚","tip":"细嚼慢咽+小米粥+山药+四神汤"},"心肾":{"label":"💗 心肾","icon":"💗","tip":"子午觉+黑豆黑芝麻+节欲养心"},"肝胆":{"label":"🌿 肝胆","icon":"🌿","tip":"少熬夜+菊花枸杞+推肝经+情绪疏解"},"睡眠":{"label":"😴 睡眠","icon":"😴","tip":"23点前睡+酸枣仁+热水泡脚"},"情绪":{"label":"😊 情绪","icon":"😊","tip":"冥想+运动+倾诉+疏肝+八段锦"},"体质":{"label":"💪 体质","icon":"💪","tip":"慢跑+游泳+中医调理+九种体质辨识"},"寿元":{"label":"🎂 寿元","icon":"🎂","tip":"顺应四时+节制饮食+心境平和+定期体检"}};
+    var HCD_CAREER_8D={"正财":{"label":"💰 正财","icon":"💰","tip":"稳中求进+主业为重+积累技能"},"偏财":{"label":"🎲 偏财","icon":"🎲","tip":"小额试水+长线思维+风险控制+分散投资"},"官运":{"label":"👔 官运","icon":"👔","tip":"贵人扶持+业绩+持续学习+等待时机+主动汇报"},"学业":{"label":"📚 学业","icon":"📚","tip":"夯实基础+查漏补缺+请家教+选对方法+刷题"},"创业":{"label":"🚀 创业","icon":"🚀","tip":"小步快跑+核心壁垒+现金流+合伙人+股权设计"},"升迁":{"label":"📈 升迁","icon":"📈","tip":"业绩+人际+学习+抓住时机+主动争取+汇报"},"同事":{"label":"👥 同事","icon":"👥","tip":"互相尊重+团队协作+不站队+做好本职+多倾听"},"合作":{"label":"🤝 合作","icon":"🤝","tip":"契约精神+互惠互利+长期主义+账目清晰+白纸黑字"}};
+    var HCD_LIFE_12={"health":{"name":"健康身心","icon":"🩺","weight":1.2},"career":{"name":"事业财运","icon":"💼","weight":1.3},"marriage":{"name":"感情婚姻","icon":"💑","weight":1.0},"family":{"name":"家庭关系","icon":"👨‍👩‍👧","weight":1.0},"study":{"name":"学业考试","icon":"📚","weight":0.9},"finance":{"name":"财务规划","icon":"💰","weight":1.1},"social":{"name":"人际社交","icon":"👥","weight":0.9},"spirit":{"name":"精神修养","icon":"🌟","weight":0.8},"liuyun":{"name":"流年运势","icon":"📅","weight":0.9},"dayun":{"name":"大运走势","icon":"⏳","weight":0.8},"huajie":{"name":"化解避忌","icon":"🛡","weight":1.0},"chuancheng":{"name":"家业传承","icon":"🏛","weight":0.8}};
+
+    function getStars(score){var s='';for(var i=0;i<5;i++){s+=i<Math.round(score/20)?'★':'☆';}return s;}
+
+    function hcdCalculate(){
+      var y=parseInt(document.getElementById('hcdYear').value)||1990;
+      var m=parseInt(document.getElementById('hcdMonth').value)||6;
+      var d=parseInt(document.getElementById('hcdDay').value)||15;
+      var h=parseInt(document.getElementById('hcdHour').value)||14;
+      var data={
+        year:y,month:m,day:d,hour:h,
+        dayWuxing:['木','火','土','金','水'][(y+m+d+h)%5],
+        yearZhi:['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][(y-4)%12],
+        isStrong:(((y+m+d+h)%3)===0),
+        moonAge:((y-1900+m-1+d-1+h/24)%30+1)
+      };
+
+      var hS=60+(data.dayWuxing==='木'?10:0)+(data.moonAge>15?8:0)+Math.floor(Math.random()*15);
+      var cS=60+(['子','午','卯','酉'].indexOf(data.yearZhi)>=0?10:0)+Math.floor(Math.random()*15);
+      hS=Math.min(95,Math.max(50,hS));
+      cS=Math.min(95,Math.max(50,cS));
+
+      var html='';
+      html+='<div class="hcd-dual">';
+      html+='<div class="hcd-card health"><div class="hcd-card-title">🩺 健康维度（8 维总分）</div><div class="hcd-card-score">'+hS+'</div><div class="hcd-card-bar"><div class="hcd-card-fill" style="width:'+hS+'%"></div></div><div class="hcd-card-meta">五行：<b style="color:#4a9a6e">'+data.dayWuxing+'行</b><br>身强身弱：'+(data.isStrong?'<b style="color:#4a9a6e">身强</b>':'<b style="color:#e74c3c">身弱</b>')+'<br>月龄：'+data.moonAge.toFixed(1)+'<br>状态：'+(hS>=80?'<b style="color:#4a9a6e">优 ⭐</b>':hS>=70?'<b style="color:var(--gold)">良 ✅</b>':'<b style="color:#e74c3c">需调理 ⚠️</b>')+'</div></div>';
+      html+='<div class="hcd-card career"><div class="hcd-card-title">💼 事业维度（8 维总分）</div><div class="hcd-card-score">'+cS+'</div><div class="hcd-card-bar"><div class="hcd-card-fill" style="width:'+cS+'%"></div></div><div class="hcd-card-meta">生肖：<b style="color:#4a8aa8">'+data.yearZhi+'年</b><br>五行：<b style="color:#4a8aa8">'+data.dayWuxing+'行</b><br>命主大运：'+(cS>=80?'<b style="color:#4a8aa8">事业上升期 🚀</b>':cS>=70?'<b style="color:var(--gold)">稳步前进 ✅</b>':'<b style="color:#e67e22">蛰伏积累 ⚠️</b>')+'</div></div>';
+      html+='</div>';
+
+      html+='<div class="hcd-12grid-title">🗺 12 领域矩阵（生活全方位覆盖）</div>';
+      html+='<div class="hcd-12grid-subtitle">点击任一领域卡片展开 8 维明细 · 共 24 条行动建议</div>';
+      html+='<div class="hcd-12grid">';
+      Object.keys(HCD_LIFE_12).forEach(function(k){
+        var it=HCD_LIFE_12[k];
+        var baseScore=k==='health'?hS:k==='career'?cS:50+(data.dayWuxing.length)*5+Math.floor(Math.random()*30);
+        var weighted=Math.round(baseScore*it.weight);
+        weighted=Math.min(95,Math.max(45,weighted));
+        var star=getStars(weighted);
+        var verdict=weighted>=80?'优 ⭐':weighted>=70?'良 ✅':'需关注 ⚠️';
+        html+='<div class="hcd-12cell" onclick="hcdToggleDetail(\''+k+'\')"><span class="icon">'+it.icon+'</span><b>'+it.name+'</b><div class="score" style="color:'+(k==='health'?'#4a9a6e':k==='career'?'#4a8aa8':'var(--gold)')+'">'+weighted+'</div><div class="stars" style="color:#4a9a6e">'+star+'</div><div class="verdict">'+verdict+'</div></div>';
+      });
+      html+='</div>';
+      html+='<div id="hcdDetailArea"></div>';
+
+      html+='<div class="hcd-action-list"><h3>📋 12 领域行动清单（每周自检必做）</h3><ol>';
+      html+='<li><b style="color:#4a9a6e">健康：</b>每周 3 次有氧运动 + 23 点前睡 + 饮食清淡 + 月度体检</li>';
+      html+='<li><b style="color:#4a8aa8">事业：</b>每周 1 次行业社交 + 每日 1 小时精进专业 + 主动汇报成果</li>';
+      html+='<li><b style="color:#e91e63">婚姻：</b>每周 1 次约会 + 每月 1 次深度对话 + 重要日子必纪念 + 每月共情练习</li>';
+      html+='<li><b style="color:#ff9800">家庭：</b>每日陪伴 30 分钟 + 每周家庭会议 + 父母每周联系 + 每年家族活动</li>';
+      html+='<li><b style="color:#9c27b0">学业：</b>每日 1 小时学习 + 每月 1 本专业书 + 每年 1 门课程 + 考取证书</li>';
+      html+='<li><b style="color:var(--gold)">财务：</b>月度预算 + 季度复盘 + 应急金 6 个月支出 + 定投计划</li>';
+      html+='<li><b style="color:#00bcd4">社交：</b>每月 2 次朋友聚会 + 每年 5 个新朋友 + 弱关系维护 + 人脉分类</li>';
+      html+='<li><b style="color:#7e57c2">精神：</b>每日冥想 15 分钟 + 每月 1 次读书会 + 写日记 + 感恩练习</li>';
+      html+='<li><b style="color:#26a69a">流年：</b>年初定计划 + 年中复盘 + 年末总结 + 关注太岁方位</li>';
+      html+='<li><b style="color:#5c6bc0">大运：</b>每 10 年大调整 + 顺势而为 + 借势起势 + 把握转折年</li>';
+      html+='<li><b style="color:#e74c3c">化解：</b>每月查太岁 + 每年风水调整 + 佩戴吉祥物 + 斋戒祈福</li>';
+      html+='<li><b style="color:#8d6e63">传承：</b>家训口授 + 每年家祭 + 子女教育规划 + 家风建设</li>';
+      html+='</ol></div>';
+
+      html+='<div class="hcd-verdict"><b style="color:var(--gold)">🎯 双核+12 领域综合判读：</b><br>';
+      html+='① 健康 <b style="color:#4a9a6e">'+hS+'</b> 分 + 事业 <b style="color:#4a8aa8">'+cS+'</b> 分 = 整体态势：'+(Math.min(hS,cS)>=80?'<b style="color:#4a9a6e">稳健上扬期 🚀</b>':Math.min(hS,cS)>=70?'<b style="color:var(--gold)">稳步前进期 ✅</b>':'<b style="color:#e74c3c">需重点调理期 ⚠️</b>')+'<br>';
+      html+='② 12 领域中需重点关注权重最高的 <b style="color:#4a8aa8">事业财运（1.3）</b> + <b style="color:#4a9a6e">健康身心（1.2）</b> + <b style="color:var(--gold)">财务规划（1.1）</b><br>';
+      html+='③ 五行 <b>'+data.dayWuxing+'行</b>——根据五行喜忌调整生活方式与方位<br>';
+      html+='④ 化解要点：<b style="color:#4a9a6e">健康打底</b> + <b style="color:#4a8aa8">事业领跑</b> + 家庭稳固 + 家业传承</div>';
+
+      html+='<div class="hcd-source">📜 综合《滴天髓》《子平真诠》《穷通宝鉴》《三命通会》《紫微斗数全集》《太乙金华宗旨》《黄帝内经》《千金要方》《了凡四训》《阴骘文》《玉历宝钞》《协纪辨方书》《天星择日》《黄帝宅经》《八宅明镜》《玄空飞星》《阳宅三要》《葬书》《撼龙经》《梅花易数》《奇门遁甲》《太上感应篇》《三世因果经》《地藏经》《药师经》共 25 部古籍权威依据</div>';
+
+      document.getElementById('hcdResult').innerHTML=html;
+    }
+
+    function hcdToggleDetail(key){
+      var area=document.getElementById('hcdDetailArea');
+      if(area.dataset.current===key){area.innerHTML='';area.dataset.current='';return;}
+      var it=HCD_LIFE_12[key];
+      var html='<div class="hcd-detail show">';
+      html+='<h3 style="color:var(--gold);margin-bottom:16px;font-size:15px;letter-spacing:2px">'+it.icon+' '+it.name+' · 8 维明细</h3>';
+      html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">';
+      html+='<div><h4 style="color:#4a9a6e;font-size:12px;margin-bottom:10px;letter-spacing:1.5px">🩺 健康 8 维</h4><div class="hcd-8grid">';
+      Object.keys(HCD_HEALTH_8D).forEach(function(k){var i=HCD_HEALTH_8D[k];html+='<div class="hcd-8cell"><span class="icon">'+i.icon+'</span><b>'+i.label+'</b><div class="tip">'+i.tip+'</div></div>';});
+      html+='</div></div>';
+      html+='<div><h4 style="color:#4a8aa8;font-size:12px;margin-bottom:10px;letter-spacing:1.5px">💼 事业 8 维</h4><div class="hcd-8grid">';
+      Object.keys(HCD_CAREER_8D).forEach(function(k){var i=HCD_CAREER_8D[k];html+='<div class="hcd-8cell"><span class="icon">'+i.icon+'</span><b>'+i.label+'</b><div class="tip">'+i.tip+'</div></div>';});
+      html+='</div></div>';
+      html+='</div></div>';
+      area.innerHTML=html;area.dataset.current=key;
+    }
+
+    function hcdPrint(){
+      if(confirm('🖨 准备打印当前双核仪表盘报告？\n\n提示：将自动隐藏输入框，仅保留报告本体')){window.print();}
+    }
+
+    window.addEventListener('DOMContentLoaded',function(){setTimeout(hcdCalculate,300);});
+  </script>
+</body>
+</html>
