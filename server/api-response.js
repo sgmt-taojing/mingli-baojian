@@ -4,6 +4,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 // 错误码表 (节选，完整版见 docs/ERROR_CODE_TABLE.md)
+const logger = require('./logger.js');
 const ERROR_CODES = {
   SUCCESS: 0,
   PARAM_INVALID: 400001,
@@ -64,7 +65,7 @@ const forbid = (res, msg = '没有权限') => apiResp(res, 403001, null, msg);
 const notFound = (res, msg = '资源不存在') => apiResp(res, 404001, null, msg);
 const rateLimit = (res) => apiResp(res, 429001, null, '请求过于频繁，请稍后再试');
 const serverErr = (res, e) => {
-  console.error('[apiResp 500]', e);
+  logger.error({ module: 'api-response', err: e }, '[apiResp 500]');
   return apiResp(res, 500001, null, '服务异常，请稍后再试');
 };
 const aiFallback = (res, data) => apiResp(res, 503001, data, 'AI 暂时不可用，已为您切换知识库模式');

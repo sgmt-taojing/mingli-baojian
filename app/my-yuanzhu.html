@@ -69,6 +69,8 @@ html,body{height:100%;overflow-x:hidden;font-family:'PingFang SC','Microsoft YaH
 <script src="js/ui-toast.js" defer></script>
 <!-- F-9 Web Components：toast + tab（已迁移；保留旧 ui-toast 以兼容） -->
 <script src="components/toast.js"></script>
+<!-- F-9/S-2 错误拦截器（节点 #4.3） -->
+<script src="js/error-interceptor.js?v=20260724-1"></script>
 <script src="components/tab.js"></script>
 <!-- 自然查询路由（识别 "LIU套5815" 等模糊输入） -->
 <script src="js/parse-natural.js?v=20260722-1417" defer></script>
@@ -85,9 +87,10 @@ function toast(msg){
 async function api(path, opts={}){
   const hdr = Object.assign({'Content-Type':'application/json'}, opts.headers||{});
   if(token) hdr['Authorization'] = '***' + token;
+  // 节点 #4.3：优先走 apiCall（统一拦截器），不改业务调用语义
   try{
-    const r = await fetch(API + path, Object.assign({method:'GET',headers:hdr}, opts));
-    return await r.json();
+    const result = await window.apiClient.get(API + path, Object.assign({headers:hdr}, opts));
+    return result.ok ? result.data : { error: result.message, code: result.code, data: result.data };
   }catch(e){return {error:e.message};}
 }
 

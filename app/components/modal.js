@@ -143,11 +143,79 @@
     }
     _enter(){
       document.addEventListener('keydown', this._escHandler);
+      // ── a11y: focus management（节点 9.2 P0-5）──
+      // 记录打开前的活动元素，以便关闭时恢复
+      try { this._previouslyFocused = document.activeElement; } catch(_) {}
+      // focus-trap：拦截 Tab/Shift+Tab 限制焦点在 modal 内循环
+      document.addEventListener('keydown', this._trapHandler = (e)=> {
+        if (e.key !== 'Tab') return;
+        if (this.getAttribute('open') !== 'true') return;
+        const root = this.shadowRoot.querySelector('.panel');
+        if (!root) return;
+        const focusables = this._getFocusable(root);
+        if (focusables.length === 0) {
+          // modal 内无可聚焦元素时，将焦点放到容器本身
+          e.preventDefault();
+          root.setAttribute('tabindex','-1');
+          root.focus();
+          return;
+        }
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        const active = this.shadowRoot.activeElement || document.activeElement;
+        if (e.shiftKey) {
+          if (active === first || !this.contains(active)) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (active === last || !this.contains(active)) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      });
+      // 初始聚焦：先聚焦面板本身（读屏宣告），再聚焦第一个可聚焦元素
+      requestAnimationFrame(()=> {
+        const root = this.shadowRoot.querySelector('.panel');
+        if (root) {
+          root.setAttribute('tabindex','-1');
+          root.focus({preventScroll:true});
+        }
+        const focusables = root ? this._getFocusable(root) : [];
+        if (focusables.length > 0) {
+          focusables[0].focus({preventScroll:true});
+        }
+      });
       this.dispatchEvent(new CustomEvent('open', {detail:{}, bubbles:true, composed:true}));
     }
     _leave(){
       document.removeEventListener('keydown', this._escHandler);
+      // a11y: 解除 focus-trap + 恢复之前的焦点
+      if (this._trapHandler) {
+        document.removeEventListener('keydown', this._trapHandler);
+        this._trapHandler = null;
+      }
+      if (this._previouslyFocused && typeof this._previouslyFocused.focus === 'function') {
+        try { this._previouslyFocused.focus({preventScroll:true}); } catch(_) {}
+        this._previouslyFocused = null;
+      }
       this.dispatchEvent(new CustomEvent('close', {detail:{source:'api'}, bubbles:true, composed:true}));
+    }
+
+    /**
+     * 获取容器内可聚焦元素（按 tab 顺序）
+     * a11y: focus-trap 需要精确知道哪些元素是 tab stops
+     */
+    _getFocusable(root){
+      const sel = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]), [contenteditable="true"]';
+      const nodes = Array.from(root.querySelectorAll(sel));
+      // 过滤掉不可见的
+      return nodes.filter(n => {
+        if (n.offsetWidth === 0 && n.offsetHeight === 0) return false;
+        if (getComputedStyle(n).visibility === 'hidden') return false;
+        return true;
+      });
     }
     open(){ this.setAttribute('open','true'); return this; }
     close(source){

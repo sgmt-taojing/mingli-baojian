@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>可观测性仪表盘 · 命理宝鉴后台</title>
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--line:#334155;--text:#e2e8f0;--muted:#94a3b8;--accent:#06b6d4;--accent2:#22d3ee;--warn:#f59e0b;--danger:#ef4444;--good:#10b981;--purple:#a78bfa}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"PingFang SC",sans-serif;background:var(--bg);color:var(--text);padding:20px;min-height:100vh}
+header{display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+h1{font-size:22px;color:var(--accent2)}
+.range-bar{display:flex;gap:8px;align-items:center;margin-left:auto}
+.range-bar select{background:var(--card);border:1px solid var(--line);color:var(--text);padding:6px 12px;border-radius:6px;font-size:13px;cursor:pointer}
+.range-bar button{background:var(--accent);color:#fff;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:13px}
+.range-bar button:hover{background:var(--accent2)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--accent)}
+.card.good::before{background:var(--good)}
+.card.warn::before{background:var(--warn)}
+.card.danger::before{background:var(--danger)}
+.card.purple::before{background:var(--purple)}
+.card .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.card .value{font-size:32px;font-weight:700;margin:8px 0 4px;color:var(--accent2)}
+.card .value.good{color:var(--good)}
+.card .value.warn{color:var(--warn)}
+.card .value.danger{color:var(--danger)}
+.card .sub{font-size:11px;color:var(--muted)}
+.card .sub-bar{height:6px;background:var(--bg);border-radius:3px;margin-top:8px;overflow:hidden}
+.card .sub-bar-fill{height:100%;border-radius:3px;transition:width .4s ease}
+
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:16px}
+.panel-title{font-size:14px;color:var(--accent2);margin-bottom:12px;border-bottom:1px solid var(--line);padding-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.panel-title .badge{font-size:11px;color:var(--muted);font-weight:400}
+
+.bar-list{display:flex;flex-direction:column;gap:8px}
+.bar-row{display:flex;align-items:center;gap:10px;font-size:13px}
+.bar-row .name{min-width:100px;color:var(--text);text-align:right}
+.bar-row .bar-bg{flex:1;height:22px;background:var(--bg);border-radius:4px;overflow:hidden;position:relative}
+.bar-row .bar-fill{height:100%;background:var(--accent);border-radius:4px;transition:width .4s ease;display:flex;align-items:center;padding-left:8px;font-size:11px;color:#fff;font-weight:600}
+.bar-row .num{min-width:50px;color:var(--muted);font-size:12px}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px;color:var(--muted);border-bottom:1px solid var(--line);font-weight:600;font-size:12px}
+td{padding:8px;border-bottom:1px solid var(--line)}
+tr:hover td{background:rgba(6,182,212,.05)}
+
+.loading{text-align:center;padding:40px;color:var(--muted)}
+.error-msg{background:rgba(239,68,68,.1);border:1px solid var(--danger);border-radius:8px;padding:12px;color:var(--danger);margin-bottom:16px}
+.empty{color:var(--muted);font-style:italic;text-align:center;padding:20px}
+
+.refresh-info{font-size:11px;color:var(--muted);text-align:right;margin-top:10px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📊 可观测性仪表盘</h1>
+  <div class="range-bar">
+    <select id="rangeSelect">
+      <option value="1d">最近 1 天</option>
+      <option value="3d">最近 3 天</option>
+      <option value="7d" selected>最近 7 天</option>
+      <option value="14d">最近 14 天</option>
+      <option value="30d">最近 30 天</option>
+    </select>
+    <button onclick="loadMetrics()">刷新</button>
+  </div>
+</header>
+
+<div id="errorBox" style="display:none" class="error-msg"></div>
+
+<!-- 8 指标卡片 -->
+<div class="grid" id="metricsGrid">
+  <div class="card">
+    <div class="label">每日活跃报告数</div>
+    <div class="value" id="m-reports">—</div>
+    <div class="sub" id="m-reports-sub">report.generate 事件</div>
+  </div>
+  <div class="card purple">
+    <div class="label">KB 直答占比</div>
+    <div class="value" id="m-kb">—</div>
+    <div class="sub" id="m-kb-sub">hit / (hit+partial+miss)</div>
+    <div class="sub-bar"><div class="sub-bar-fill" id="m-kb-bar" style="width:0%;background:var(--purple)"></div></div>
+  </div>
+  <div class="card">
+    <div class="label">AI 调用次数/天（均值）</div>
+    <div class="value" id="m-ai">—</div>
+    <div class="sub" id="m-ai-sub">ai.invoke 事件</div>
+  </div>
+  <div class="card good">
+    <div class="label">推送送达率</div>
+    <div class="value good" id="m-push">—</div>
+    <div class="sub" id="m-push-sub">push.deliver success/total</div>
+    <div class="sub-bar"><div class="sub-bar-fill" id="m-push-bar" style="width:0%;background:var(--good)"></div></div>
+  </div>
+  <div class="card warn">
+    <div class="label">P95 响应延迟</div>
+    <div class="value warn" id="m-p95">—</div>
+    <div class="sub">pino-http durationMs</div>
+  </div>
+  <div class="card danger">
+    <div class="label">错误 TOP 5（总条目）</div>
+    <div class="value danger" id="m-errors">—</div>
+    <div class="sub">error.aggregate.* 事件</div>
+  </div>
+  <div class="card good">
+    <div class="label">TTS 成功率</div>
+    <div class="value good" id="m-tts">—</div>
+    <div class="sub" id="m-tts-sub">tts.synthesize 事件</div>
+    <div class="sub-bar"><div class="sub-bar-fill" id="m-tts-bar" style="width:0%;background:var(--good)"></div></div>
+  </div>
+  <div class="card">
+    <div class="label">总事件数</div>
+    <div class="value" id="m-total">—</div>
+    <div class="sub" id="m-range-sub">选定时间范围内</div>
+  </div>
+</div>
+
+<!-- 模块使用排行 -->
+<div class="panel">
+  <div class="panel-title">📈 模块使用排行 <span class="badge" id="module-count">0 个模块</span></div>
+  <div class="bar-list" id="moduleRanking">
+    <div class="empty">加载中...</div>
+  </div>
+</div>
+
+<!-- 每日报告趋势 -->
+<div class="panel">
+  <div class="panel-title">📅 每日报告趋势 <span class="badge" id="report-days">0 天</span></div>
+  <div class="bar-list" id="dailyReports">
+    <div class="empty">加载中...</div>
+  </div>
+</div>
+
+<!-- AI 调用趋势 -->
+<div class="panel">
+  <div class="panel-title">🤖 每日 AI 调用趋势 <span class="badge" id="ai-days">0 天</span></div>
+  <div class="bar-list" id="dailyAiCalls">
+    <div class="empty">加载中...</div>
+  </div>
+</div>
+
+<!-- 错误 TOP 5 明细 -->
+<div class="panel">
+  <div class="panel-title">⚠️ 错误率 TOP 5 <span class="badge">按 groupKey 聚合</span></div>
+  <table id="errorTop5">
+    <thead><tr><th>#</th><th>错误组</th><th>次数</th></tr></thead>
+    <tbody><tr><td colspan="3" class="empty">加载中...</td></tr></tbody>
+  </table>
+</div>
+
+<div class="refresh-info" id="refreshInfo">未加载</div>
+
+<script>
+// 从 localStorage 获取 token
+function getToken() {
+  return localStorage.getItem('admin_token') || localStorage.getItem('token') || '';
+}
+
+function getApiBase() {
+  // 8920 = Node API 网关
+  const host = location.hostname || '127.0.0.1';
+  return 'http://' + host + ':8920';
+}
+
+async function loadMetrics() {
+  const range = document.getElementById('rangeSelect').value;
+  const errorBox = document.getElementById('errorBox');
+  errorBox.style.display = 'none';
+
+  try {
+    const url = getApiBase() + '/api/v1/admin/metrics?range=' + range;
+    const token = getToken();
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+
+    const resp = await fetch(url, { headers });
+    if (resp.status === 401 || resp.status === 403) {
+      errorBox.textContent = '鉴权失败：请确保已登录管理员账号（token 存于 localStorage admin_token 或 token）';
+      errorBox.style.display = 'block';
+      return;
+    }
+    if (!resp.ok) {
+      errorBox.textContent = '请求失败：HTTP ' + resp.status;
+      errorBox.style.display = 'block';
+      return;
+    }
+
+    const json = await resp.json();
+    if (!json.ok) {
+      errorBox.textContent = '接口返回错误：' + (json.message || json.error || 'unknown');
+      errorBox.style.display = 'block';
+      return;
+    }
+
+    renderMetrics(json.data);
+  } catch (e) {
+    errorBox.textContent = '网络错误：' + e.message + '（确保 API 服务运行在 8920 端口）';
+    errorBox.style.display = 'block';
+  }
+}
+
+function renderMetrics(data) {
+  const m = data.metrics;
+  const total = data.totalEvents;
+  const range = data.range;
+
+  // 指标卡片
+  const reportDays = m.dailyReports.length;
+  const reportTotal = m.dailyReports.reduce((s, d) => s + d.count, 0);
+  document.getElementById('m-reports').textContent = reportTotal;
+  document.getElementById('m-reports-sub').textContent = reportDays + ' 天内，日均 ' + (reportDays > 0 ? Math.round(reportTotal / reportDays) : 0);
+
+  document.getElementById('m-kb').textContent = m.kbDirectRate + '%';
+  document.getElementById('m-kb-sub').textContent = 'hit:' + m.kbBreakdown.hit + ' partial:' + m.kbBreakdown.partial + ' miss:' + m.kbBreakdown.miss;
+  document.getElementById('m-kb-bar').style.width = m.kbDirectRate + '%';
+
+  const aiDays = m.dailyAiCalls.length;
+  const aiTotal = m.dailyAiCalls.reduce((s, d) => s + d.count, 0);
+  document.getElementById('m-ai').textContent = aiDays > 0 ? Math.round(aiTotal / aiDays) : 0;
+  document.getElementById('m-ai-sub').textContent = '总计 ' + aiTotal + ' 次，' + aiDays + ' 天';
+
+  document.getElementById('m-push').textContent = m.pushDeliveryRate + '%';
+  document.getElementById('m-push-sub').textContent = 'success:' + m.pushBreakdown.success + ' / total:' + m.pushBreakdown.total;
+  document.getElementById('m-push-bar').style.width = m.pushDeliveryRate + '%';
+
+  document.getElementById('m-p95').textContent = m.p95LatencyMs + 'ms';
+
+  const errorCount = m.errorTop5.reduce((s, e) => s + e.count, 0);
+  document.getElementById('m-errors').textContent = errorCount;
+
+  document.getElementById('m-tts').textContent = m.ttsSuccessRate + '%';
+  document.getElementById('m-tts-sub').textContent = 'success:' + m.ttsBreakdown.success + ' / total:' + m.ttsBreakdown.total;
+  document.getElementById('m-tts-bar').style.width = m.ttsSuccessRate + '%';
+
+  document.getElementById('m-total').textContent = total;
+  document.getElementById('m-range-sub').textContent = '最近 ' + data.days + ' 天';
+
+  // 模块排行
+  renderBarList('moduleRanking', m.moduleRanking, 'module', 'count');
+  document.getElementById('module-count').textContent = m.moduleRanking.length + ' 个模块';
+
+  // 每日报告
+  renderBarList('dailyReports', m.dailyReports, 'date', 'count');
+  document.getElementById('report-days').textContent = reportDays + ' 天';
+
+  // AI 调用
+  renderBarList('dailyAiCalls', m.dailyAiCalls, 'date', 'count');
+  document.getElementById('ai-days').textContent = aiDays + ' 天';
+
+  // 错误 TOP 5
+  const tbody = document.querySelector('#errorTop5 tbody');
+  if (m.errorTop5.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="3" class="empty">🎉 无错误记录</td></tr>';
+  } else {
+    tbody.innerHTML = m.errorTop5.map((e, i) =>
+      '<tr><td>' + (i + 1) + '</td><td style="word-break:break-all">' + escapeHtml(e.groupKey) + '</td><td>' + e.count + '</td></tr>'
+    ).join('');
+  }
+
+  document.getElementById('refreshInfo').textContent = '生成时间：' + data.generatedAt + ' | 范围：' + range;
+}
+
+function renderBarList(containerId, items, nameKey, valKey) {
+  const container = document.getElementById(containerId);
+  if (!items || items.length === 0) {
+    container.innerHTML = '<div class="empty">暂无数据</div>';
+    return;
+  }
+  const maxVal = Math.max(...items.map(i => i[valKey]), 1);
+  container.innerHTML = items.map(item => {
+    const pct = (item[valKey] / maxVal * 100).toFixed(1);
+    return '<div class="bar-row">' +
+      '<span class="name">' + escapeHtml(String(item[nameKey])) + '</span>' +
+      '<div class="bar-bg"><div class="bar-fill" style="width:' + pct + '%">' + item[valKey] + '</div></div>' +
+      '<span class="num">' + item[valKey] + '</span>' +
+    '</div>';
+  }).join('');
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// 初始加载
+loadMetrics();
+</script>
+</body>
+</html>

@@ -14,16 +14,28 @@
 (function(global){
   'use strict';
 
+  // ── i18n 兜底：window.I18N 未就绪时退化为 fallback 字面量（节点 8.3）──
+  function t(key, fallback) {
+    try {
+      if (window.I18N && typeof window.I18N.t === 'function') {
+        var val = window.I18N.t(key);
+        if (val === '[' + key + ']') return fallback || val;
+        return val;
+      }
+    } catch (_) {}
+    return fallback || '[' + key + ']';
+  }
+
   // ═══════════════════════════════════════════════
   // 1. 统一 toast 提示（顶部居中弹窗）
   // ═══════════════════════════════════════════════
   function toast(msg, type){
     type = type || 'info'; // info | success | warn | error
-    const t = document.createElement('div');
-    t.className = 'er-toast er-toast-' + type;
-    t.textContent = msg;
-    document.body.appendChild(t);
-    setTimeout(function(){ t.remove(); }, 1800);
+    const el = document.createElement('div');
+    el.className = 'er-toast er-toast-' + type;
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(function(){ el.remove(); }, 1800);
   }
 
   // ═══════════════════════════════════════════════
@@ -32,11 +44,12 @@
   function showError(element, message, retryFn, options){
     options = options || {};
     const showRetry = options.retry !== false && typeof retryFn === 'function';
+    var retryText = t('ui.retry_button', '🔄 重试');
     const html =
       '<div class="er-error">' +
         '<div class="er-error-icon">⚠️</div>' +
-        '<div class="er-error-msg">' + esc(message || '出错了') + '</div>' +
-        (showRetry ? '<button class="er-error-retry">🔄 重试</button>' : '') +
+        '<div class="er-error-msg">' + esc(message || t('ui.error_default', '出错了')) + '</div>' +
+        (showRetry ? '<button class="er-error-retry">' + esc(retryText) + '</button>' : '') +
       '</div>';
     element.innerHTML = html;
     const btn = element.querySelector('.er-error-retry');
@@ -47,7 +60,7 @@
   // 3. 行内 loading 占位
   // ═══════════════════════════════════════════════
   function loading(text){
-    text = text || '加载中…';
+    text = text || t('loading', '加载中…');
     return '<div class="er-loading"><span class="er-loading-dot"></span><span class="er-loading-dot"></span><span class="er-loading-dot"></span> ' + esc(text) + '</div>';
   }
 
@@ -55,7 +68,7 @@
   // 4. 语音降级面板（无 mic 权限 / 浏览器不支持时）
   // ═══════════════════════════════════════════════
   function voiceFallback(onSubmit, placeholder){
-    placeholder = placeholder || '请在此输入您的问题...';
+    placeholder = placeholder || t('ui.voice_input_placeholder', '请在此输入您的问题...');
     // 已有则切换显隐
     let panel = document.getElementById('erVoiceFallback');
     if(panel){ panel.style.display = panel.style.display === 'none' ? 'block' : 'none'; return; }
@@ -63,12 +76,15 @@
     panel = document.createElement('div');
     panel.id = 'erVoiceFallback';
     panel.className = 'er-voice-fallback';
+    var titleText = t('ui.voice_input_title', '语音输入（文本模式）');
+    var cancelText = t('cancel', '取消');
+    var sendText = t('ui.voice_send', '发送');
     panel.innerHTML =
-      '<div class="er-vf-title">🎤 语音输入（文本模式）</div>' +
+      '<div class="er-vf-title">🎤 ' + esc(titleText) + '</div>' +
       '<textarea id="erVoiceText" placeholder="' + esc(placeholder) + '"></textarea>' +
       '<div class="er-vf-actions">' +
-        '<button class="er-vf-cancel">取消</button>' +
-        '<button class="er-vf-send">发送</button>' +
+        '<button class="er-vf-cancel">' + esc(cancelText) + '</button>' +
+        '<button class="er-vf-send">' + esc(sendText) + '</button>' +
       '</div>';
     document.body.appendChild(panel);
 

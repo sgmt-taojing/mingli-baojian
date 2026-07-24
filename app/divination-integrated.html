@@ -377,6 +377,8 @@
 <script src="js/ui-toast.js" defer></script>
 <script src="js/secure-storage.js"></script>
 <script src="components/toast.js"></script>
+<!-- F-9/S-2 错误拦截器（节点 #4.3） -->
+<script src="js/error-interceptor.js?v=20260724-1"></script>
 <script src="components/tab.js"></script>
 </head>
 <style>
@@ -2278,7 +2280,7 @@ const DISEASE_LIST=Object.keys(DISEASE_MAP);
 function renderDiseaseTags(filter){
   const wrap=document.getElementById('diseaseTags');
   const list=filter?DISEASE_LIST.filter(x=>x.includes(filter)):DISEASE_LIST;
-  wrap.innerHTML=list.map(d=>`<span class="disease-tag" onclick="selectDisease('${d}')" id="dt-${d}">${d}</span>`).join('');
+  wrap.innerHTML=list.map(d=>`<button type="button" class="disease-tag" onclick="selectDisease('${d}')" id="dt-${d}">${d}</button>`).join('');
 }
 
 function selectDisease(name){

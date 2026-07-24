@@ -1,6 +1,7 @@
 // ═══ 命理宝鉴 · RBAC权限中间件 ═══
 // 双平台角色权限控制
 const sec = require('./security-v2.js');
+const logger = require('./logger.js');
 
 // === 角色定义 ===
 const ROLES = {
@@ -86,7 +87,7 @@ function requirePermission(permission) {
     // 检查权限
     const allowedRoles = PERMISSIONS[permission];
     if (!allowedRoles) {
-      console.error('未知权限:', permission);
+      logger.error({ module: 'rbac-middleware', permission }, '未知权限');
       return res.status(500).json({ error: 'SERVER_ERROR' });
     }
     

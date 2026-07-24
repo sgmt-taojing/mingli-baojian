@@ -1,6 +1,7 @@
 // ═══ 命理宝鉴 · 安全工具模块 v2 ═══
 // 修复：随机IV、环境变量密钥、HMAC-SHA256完整签名、Token短有效期
 const crypto = require('crypto');
+const logger = require('./logger.js');
 const path = require('path');
 
 // === 密钥管理 ===
@@ -14,7 +15,7 @@ function getKey() {
   if (!ENCRYPT_KEY || ENCRYPT_KEY.length < 32) {
     // 开发模式：生成临时密钥并警告
     if (process.env.NODE_ENV !== 'production') {
-      console.warn('⚠️  MINGLI_ENCRYPT_KEY 未设置或不足32字符，使用开发模式临时密钥');
+    logger.warn({ module: 'security-v2' }, 'MINGLI_ENCRYPT_KEY 未设置或不足32字符，使用开发模式临时密钥');
       return crypto.scryptSync('dev-key-mingli', 'salt-dev', 32);
     }
     throw new Error('MINGLI_ENCRYPT_KEY 必须设置且至少32字符');
@@ -25,7 +26,7 @@ function getKey() {
 function getJwtSecret() {
   if (!JWT_SECRET || JWT_SECRET.length < 32) {
     if (process.env.NODE_ENV !== 'production') {
-      console.warn('⚠️  MINGLI_JWT_SECRET 未设置或不足32字符，使用开发模式临时密钥');
+      logger.warn({ module: 'security-v2' }, 'MINGLI_JWT_SECRET 未设置或不足32字符，使用开发模式临时密钥');
       return crypto.scryptSync('dev-jwt-secret-mingli', 'salt-jwt', 32);
     }
     throw new Error('MINGLI_JWT_SECRET 必须设置且至少32字符');
@@ -80,7 +81,7 @@ function decryptLegacy(encryptedText) {
     decrypted += decipher.final('utf8');
     return decrypted;
   } catch (e) {
-    console.error('旧格式解密失败:', e.message);
+    logger.error({ module: 'security-v2', err: e }, '旧格式解密失败');
     return null;
   }
 }

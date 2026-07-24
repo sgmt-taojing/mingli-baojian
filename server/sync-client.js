@@ -38,9 +38,11 @@
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
-  // ──────────────────────────────────────
-  //  环境检测
-  // ──────────────────────────────────────
+  // ── pino logger (Node context only) ──
+  let pinoLogger = null;
+  try { pinoLogger = require('./logger.js'); } catch(e) {}
+  function _log(level, obj, msg) { if (pinoLogger) pinoLogger[level](obj, msg); else console[level === 'warn' ? 'warn' : level === 'error' ? 'error' : 'log']('[' + (obj.module || 'sync-client') + ']', msg, obj); }
+
   let isWx = (typeof wx !== 'undefined') && (typeof wx.getStorageSync === 'function');
   let isBrowser = (typeof window !== 'undefined') && (typeof localStorage !== 'undefined');
 
@@ -65,7 +67,7 @@
         }
         return null;
       } catch (e) {
-        console.warn('[SyncClient] storage.get failed:', key, e);
+        _log('warn', { module: 'sync-client', key, err: e }, 'storage.get failed');
         return null;
       }
     },
@@ -84,7 +86,7 @@
           localStorage.setItem(key, value);
         }
       } catch (e) {
-        console.warn('[SyncClient] storage.set failed:', key, e);
+        _log('warn', { module: 'sync-client', key, err: e }, 'storage.set failed');
       }
     },
 
@@ -100,7 +102,7 @@
           localStorage.removeItem(key);
         }
       } catch (e) {
-        console.warn('[SyncClient] storage.remove failed:', key, e);
+        _log('warn', { module: 'sync-client', key, err: e }, 'storage.remove failed');
       }
     },
 
@@ -129,7 +131,7 @@
       try {
         this.set(key, JSON.stringify(value));
       } catch (e) {
-        console.warn('[SyncClient] storage.setJSON failed:', key, e);
+        _log('warn', { module: 'sync-client', key, err: e }, 'storage.setJSON failed');
       }
     }
   };
@@ -282,9 +284,7 @@
           storage.get('userToken') ||
           null;
       }
-      console.log('[SyncClient] 初始化完成, apiBase=' + this.apiBase +
-        ', token=' + (this.token ? '已设置' : '未设置') +
-        ', 环境=' + (isWx ? '小程序' : '浏览器'));
+      _log('info', { module: 'sync-client', apiBase: this.apiBase, hasToken: !!this.token, env: isWx ? '小程序' : '浏览器' }, '初始化完成');
       return this;
     },
 
@@ -361,14 +361,14 @@
      */
     push: function () {
       if (!this.token) {
-        console.warn('[SyncClient] push 跳过: 无 token');
+        _log('warn', { module: 'sync-client' }, 'push 跳过: 无 token');
         return Promise.resolve({ skipped: true, reason: 'no-token' });
       }
 
       let localData = this._collectLocalData();
       let self = this;
 
-      console.log('[SyncClient] 开始上传数据, keys=' + Object.keys(localData).join(','));
+      _log('info', { module: 'sync-client', keys: Object.keys(localData).join(',') }, '开始上传数据');
 
       return request({
         method: 'POST',
@@ -376,13 +376,13 @@
         header: this._authHeader(),
         data: { data: localData }
       }).then(function (res) {
-        console.log('[SyncClient] push 成功:', res);
+        _log('info', { module: 'sync-client', res }, 'push 成功');
         // 记录同步时间
         storage.set(LAST_SYNC_KEY, String(Date.now()));
         self._retryCount = 0;
         return res;
       }).catch(function (err) {
-        console.error('[SyncClient] push 失败:', err.message);
+        _log('error', { module: 'sync-client', err: err.message }, 'push 失败');
         throw err;
       });
     },
@@ -394,20 +394,20 @@
      */
     pull: function () {
       if (!this.token) {
-        console.warn('[SyncClient] pull 跳过: 无 token');
+        _log('warn', { module: 'sync-client' }, 'pull 跳过: 无 token');
         return Promise.resolve({ skipped: true, reason: 'no-token' });
       }
 
       let self = this;
 
-      console.log('[SyncClient] 开始拉取数据');
+      _log('info', { module: 'sync-client' }, '开始拉取数据');
 
       return request({
         method: 'GET',
         url: this.apiBase + '/api/sync/pull',
         header: this._authHeader()
       }).then(function (res) {
-        console.log('[SyncClient] pull 成功');
+        _log('info', { module: 'sync-client' }, 'pull 成功');
         if (res && res.data) {
           self._applyRemoteData(res.data);
         } else if (res && typeof res === 'object') {
@@ -419,7 +419,7 @@
         self._retryCount = 0;
         return res;
       }).catch(function (err) {
-        console.error('[SyncClient] pull 失败:', err.message);
+        _log('error', { module: 'sync-client', err: err.message }, 'pull 失败');
         throw err;
       });
     },
@@ -489,7 +489,7 @@
 
         return 'in-sync';
       }).catch(function (err) {
-        console.error('[SyncClient] checkSync 失败:', err.message);
+        _log('error', { module: 'sync-client', err: err.message }, 'checkSync 失败');
         // 检查失败时不阻断流程，返回 in-sync 跳过本次
         return 'in-sync';
       });
@@ -502,14 +502,14 @@
      */
     autoSync: function () {
       if (!this.token) {
-        console.log('[SyncClient] autoSync 跳过: 无 token');
+        _log('info', { module: 'sync-client' }, 'autoSync 跳过: 无 token');
         return Promise.resolve('skipped:no-token');
       }
 
       let self = this;
 
       return this.checkSync().then(function (status) {
-        console.log('[SyncClient] 同步状态:', status);
+        _log('info', { module: 'sync-client', status }, '同步状态');
 
         switch (status) {
           case 'push':
@@ -530,7 +530,7 @@
 
           case 'conflict':
             // 冲突策略：以本地为准 push（可扩展为合并策略）
-            console.warn('[SyncClient] 检测到冲突，以本地数据为准上传');
+            _log('warn', { module: 'sync-client' }, '检测到冲突，以本地数据为准上传');
             return self.push().then(function () {
               return 'conflict-resolved:push';
             }).catch(function (err) {
@@ -545,7 +545,7 @@
             return 'unknown:' + status;
         }
       }).catch(function (err) {
-        console.error('[SyncClient] autoSync 异常:', err.message);
+        _log('error', { module: 'sync-client', err: err.message }, 'autoSync 异常');
         return 'error:' + err.message;
       });
     },
@@ -557,13 +557,13 @@
     _handleRetry: function (operation) {
       let self = this;
       if (this._retryCount >= this._maxRetries) {
-        console.warn('[SyncClient] ' + operation + ' 重试次数已达上限 (' + this._maxRetries + ')，停止重试');
+        _log('warn', { module: 'sync-client', operation, maxRetries: this._maxRetries }, '重试次数已达上限，停止重试');
         this._retryCount = 0;
         return;
       }
 
       this._retryCount++;
-      console.log('[SyncClient] ' + operation + ' 将在 ' + (this._retryDelay / 1000) + 's 后重试 (第 ' + this._retryCount + ' 次)');
+      _log('info', { module: 'sync-client', operation, retryCount: this._retryCount, delaySec: this._retryDelay / 1000 }, '将在指定秒后重试');
 
       setTimeout(function () {
         self.autoSync().then(function (result) {
@@ -583,7 +583,7 @@
      */
     startAutoSync: function () {
       if (this._timerId) {
-        console.log('[SyncClient] 定时同步已在运行');
+        _log('info', { module: 'sync-client' }, '定时同步已在运行');
         return;
       }
 
@@ -594,12 +594,12 @@
       this._timerId = setInterval(function () {
         self.autoSync().then(function (result) {
           if (result !== 'in-sync' && result !== 'skipped:no-token') {
-            console.log('[SyncClient] 定时同步完成:', result);
+            _log('info', { module: 'sync-client', result }, '定时同步完成');
           }
         });
       }, interval);
 
-      console.log('[SyncClient] 定时同步已启动, 间隔=' + (interval / 1000 / 60) + '分钟');
+      _log('info', { module: 'sync-client', intervalMin: interval / 1000 / 60 }, '定时同步已启动');
     },
 
     /**
@@ -609,7 +609,7 @@
       if (this._timerId) {
         clearInterval(this._timerId);
         this._timerId = null;
-        console.log('[SyncClient] 定时同步已停止');
+        _log('info', { module: 'sync-client' }, '定时同步已停止');
       }
     },
 
@@ -694,7 +694,7 @@
       this.token = null;
       storage.remove('authToken');
       storage.remove(LAST_SYNC_KEY);
-      console.log('[SyncClient] 已登出, 同步状态已清理');
+      _log('info', { module: 'sync-client' }, '已登出, 同步状态已清理');
     },
 
     /**

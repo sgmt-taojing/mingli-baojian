@@ -1,0 +1,39 @@
+{
+  "ci": {
+    "collect": {
+      "url": [
+        "http://127.0.0.1:8914/divination-hub.html",
+        "http://127.0.0.1:8914/fengshui.html",
+        "http://127.0.0.1:8914/divination-knowledge.html",
+        "http://127.0.0.1:8914/ai-assistant.html",
+        "http://127.0.0.1:8914/divination-integrated.html"
+      ],
+      "numberOfRuns": 1,
+      "settings": {
+        "preset": "desktop",
+        "throttling": {
+          "rttMs": 40,
+          "throughputKbps": 10240,
+          "cpuSlowdownMultiplier": 1
+        }
+      }
+    },
+    "assert": {
+      "assertions": {
+        "categories:performance": ["error", { "minScore": 0.5 }],
+        "categories:accessibility": ["warn", { "minScore": 0.8 }],
+        "categories:best-practices": ["warn", { "minScore": 0.8 }],
+        "categories:seo": ["warn", { "minScore": 0.7 }],
+        "resource-summary:script:size": ["error", { "maxNumericValue": 307200 }],
+        "largest-contentful-paint": ["warn", { "maxNumericValue": 5000 }],
+        "cumulative-layout-shift": ["warn", { "maxNumericValue": 0.1 }],
+        "total-blocking-time": ["warn", { "maxNumericValue": 600 }]
+      }
+    },
+    "upload": {
+      "target": "filesystem",
+      "outputDir": ".openclaw/tmp/lighthouse-reports",
+      "reportFilenamePattern": "lh-%%PATHNAME%%-%%DATETIME%%-report.%%EXTENSION%%"
+    }
+  }
+}

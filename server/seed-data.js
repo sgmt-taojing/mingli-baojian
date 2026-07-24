@@ -21,6 +21,7 @@
 const { DatabaseSync } = require('node:sqlite');
 const sec = require('./security-v2.js');
 const crypto = require('crypto');
+const logger = require('./logger.js');
 
 const db = new DatabaseSync('server/database/yidao.db');
 const now = () => new Date().toISOString().replace('T', ' ').slice(0, 19);
@@ -36,7 +37,7 @@ function id(seed) { return Math.floor(detRand(seed) * 9000) + 1000; }
 // ═══════════════════════════════════════════
 // 1. 用户 + 角色
 // ═══════════════════════════════════════════
-console.log('1. 创建用户...');
+logger.info({ module: 'seed-data' }, '1. 创建用户...');
 const users = [
   { phone: '13700000001', name: '李道明', role: 'master',     title: '易经大师' },
   { phone: '13700000002', name: '张医生', role: 'doctor',     title: '中医师' },
@@ -67,13 +68,13 @@ for (const u of users) {
     db.prepare('INSERT OR IGNORE INTO user_roles (user_id, role) VALUES (?, ?)').run(uid, 'free');
   }
   userIdMap[u.role] = uid;
-  console.log(`  #${uid} ${u.name} [${u.role}]`);
+  logger.info({ module: 'seed-data', uid, name: u.name, role: u.role }, '用户创建');
 }
 
 // ═══════════════════════════════════════════
 // 2. 排盘记录 — 模拟会员排盘
 // ═══════════════════════════════════════════
-console.log('2. 排盘记录...');
+logger.info({ module: 'seed-data' }, '2. 排盘记录...');
 const paipanTypes = ['bazi', 'ziwei', 'qimen', 'meihua', 'liuren', 'liuyao', 'fengshui', 'zeri'];
 const paipanNames = ['八字排盘', '紫微斗数', '奇门遁甲', '梅花易数', '大六壬', '六爻占卜', '风水布局', '择日择吉'];
 const paipanData = [
@@ -99,12 +100,12 @@ for (let i = 0; i < paipanData.length; i++) {
   db.prepare(`INSERT INTO paipan_records (user_id, type, input_data, result_data, created_at) VALUES (?,?,?,?,?)`)
     .run(uid, paipanTypes[typeIdx], JSON.stringify(p), chartData, daysAgo(i));
 }
-console.log(`  ${paipanData.length}条排盘记录`);
+logger.info({ module: 'seed-data', count: paipanData.length }, '排盘记录创建');
 
 // ═══════════════════════════════════════════
 // 3. 大师案例 — 完整流程：病患提交→大师分析→医生诊断→推送
 // ═══════════════════════════════════════════
-console.log('3. 大师案例（完整诊疗流程）...');
+logger.info({ module: 'seed-data' }, '3. 大师案例（完整诊疗流程）...');
 const caseTemplates = [
   {
     symptoms: '头痛、失眠、口干、心烦易怒',
@@ -187,12 +188,12 @@ for (let i = 0; i < caseTemplates.length; i++) {
       .run(i + 4, patientId, doctorId, sec.encrypt(c.finalPlan), c.finalPlan, daysAgo(i), daysAgo(i - 1));
   }
 }
-console.log(`  ${caseTemplates.length}条案例（3条已完成全流程）`);
+logger.info({ module: 'seed-data', count: caseTemplates.length }, '案例创建（3条已完成全流程）');
 
 // ═══════════════════════════════════════════
 // 4. 商品 + 订单
 // ═══════════════════════════════════════════
-console.log('4. 商品...');
+logger.info({ module: 'seed-data' }, '4. 商品...');
 // 产品用 merchants 表存（schema: name,school,type,boss,phone,master,license,cert,split_rate,status,created_at）
 // 改为存入 merchants 表
 const products = [
@@ -209,7 +210,7 @@ for (let i = 0; i < products.length; i++) {
   db.prepare(`INSERT INTO merchants (name, school, type, boss, phone, master, license, cert, split_rate, status, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)`)
     .run(p.name, p.school, p.type, '孙商家', '13700000006', '', '', '', 0.1, 'approved', daysAgo(i + 2));
 }
-console.log(`  ${products.length}个商品`);
+logger.info({ module: 'seed-data', count: products.length }, '商品创建');
 
 // 订单
 // orders schema: user_id, merchant_id, product_id, product_name, amount, merchant_amount, platform_amount, status, created_at
@@ -223,12 +224,12 @@ for (let i = 0; i < 5; i++) {
   db.prepare(`INSERT INTO orders (user_id, merchant_id, product_id, product_name, amount, merchant_amount, platform_amount, status, created_at) VALUES (?,?,?,?,?,?,?,?,?)`)
     .run(buyerId, userIdMap.merchant, i + 1, p.name, amount, merchantAmount, platformAmount, orderStatuses[i], daysAgo(i + 1));
 }
-console.log(`  5条订单`);
+logger.info({ module: 'seed-data', count: 5 }, '订单创建');
 
 // ═══════════════════════════════════════════
 // 5. 课程
 // ═══════════════════════════════════════════
-console.log('5. 课程...');
+logger.info({ module: 'seed-data' }, '5. 课程...');
 // courses schema: master, title, type, url, duration, category, summary, key_points, sort_order, created_at
 const courses = [
   { title: '八字入门十讲', teacher: '舒晗老师', price: 0, category: '命理', desc: '从零开始学习八字命理', students: 156 },
@@ -242,12 +243,12 @@ for (let i = 0; i < courses.length; i++) {
   db.prepare(`INSERT INTO courses (master, title, type, url, duration, category, summary, key_points, sort_order, created_at) VALUES (?,?,?,?,?,?,?,?,?,?)`)
     .run(c.teacher, c.title, c.price > 0 ? 'paid' : 'free', '', '60min', c.category, c.desc, c.desc, i + 1, daysAgo(3));
 }
-console.log(`  ${courses.length}门课程`);
+logger.info({ module: 'seed-data', count: courses.length }, '课程创建');
 
 // ═══════════════════════════════════════════
 // 6. 反馈
 // ═══════════════════════════════════════════
-console.log('6. 反馈...');
+logger.info({ module: 'seed-data' }, '6. 反馈...');
 // feedback schema: user_id, type, target, content, points_awarded, created_at
 const feedbacks = [
   { user: userIdMap.vip, type: 'suggestion', content: '希望增加紫微斗数详解功能', reply: '感谢建议，已列入开发计划' },
@@ -261,12 +262,12 @@ for (let i = 0; i < feedbacks.length; i++) {
   db.prepare(`INSERT INTO feedback (user_id, type, target, content, points_awarded, created_at) VALUES (?,?,?,?,?,?)`)
     .run(f.user, f.type, 'system', f.content, 10, daysAgo(i + 1));
 }
-console.log(`  ${feedbacks.length}条反馈`);
+logger.info({ module: 'seed-data', count: feedbacks.length }, '反馈创建');
 
 // ═══════════════════════════════════════════
 // 7. 推送日志
 // ═══════════════════════════════════════════
-console.log('7. 推送日志...');
+logger.info({ module: 'seed-data' }, '7. 推送日志...');
 // push_logs schema: user_id, push_type, push_date, content, delivered, created_at
 const pushTypes = ['daily_fortune', 'health_tip', 'festival_reminder', 'case_update'];
 const pushContents = [
@@ -284,12 +285,12 @@ for (let i = 0; i < pushContents.length; i++) {
   db.prepare(`INSERT INTO push_logs (user_id, push_type, push_date, content, delivered, created_at) VALUES (?,?,?,?,?,?)`)
     .run(uid, pushTypes[i % pushTypes.length], daysAgo(i), pushContents[i], 1, daysAgo(i));
 }
-console.log(`  ${pushContents.length}条推送`);
+logger.info({ module: 'seed-data', count: pushContents.length }, '推送创建');
 
 // ═══════════════════════════════════════════
 // 8. 积分记录
 // ═══════════════════════════════════════════
-console.log('8. 积分记录...');
+logger.info({ module: 'seed-data' }, '8. 积分记录...');
 // user_points schema: user_id, total_points, exchanged_points, streak_days, last_feedback_date, created_at
 const pointActions = [
   { user: userIdMap.vip, points: 50, action: 'daily_login', desc: '每日登录' },
@@ -308,12 +309,12 @@ for (let i = 0; i < pointActions.length; i++) {
     ON CONFLICT(user_id) DO UPDATE SET total_points=total_points+?, streak_days=streak_days+1`)
     .run(a.user, a.points, 0, 1, daysAgo(i), daysAgo(i), a.points);
 }
-console.log(`  ${pointActions.length}条积分`);
+logger.info({ module: 'seed-data', count: pointActions.length }, '积分创建');
 
 // ═══════════════════════════════════════════
 // 9. 审计日志
 // ═══════════════════════════════════════════
-console.log('9. 审计日志...');
+logger.info({ module: 'seed-data' }, '9. 审计日志...');
 const auditActions = [
   { user: 7, action: 'login', detail: '超级管理员登录' },
   { user: userIdMap.master, action: 'case_submit', detail: '提交案例 #MC20261000' },
@@ -329,12 +330,12 @@ for (let i = 0; i < auditActions.length; i++) {
   db.prepare(`INSERT INTO audit_logs (user_id, action, detail, created_at) VALUES (?,?,?,?)`)
     .run(a.user, a.action, a.detail, daysAgo(i));
 }
-console.log(`  ${auditActions.length}条审计日志`);
+logger.info({ module: 'seed-data', count: auditActions.length }, '审计日志创建');
 
 // ═══════════════════════════════════════════
 // 10. 系统配置
 // ═══════════════════════════════════════════
-console.log('10. 系统配置...');
+logger.info({ module: 'seed-data' }, '10. 系统配置...');
 db.prepare(`INSERT OR REPLACE INTO system_config (key, value, updated_at) VALUES (?,?,?)`).run('site_name', '命理宝鉴·易道智鉴', now());
 db.prepare(`INSERT OR REPLACE INTO system_config (key, value, updated_at) VALUES (?,?,?)`).run('version', '2.1.0', now());
 db.prepare(`INSERT OR REPLACE INTO system_config (key, value, updated_at) VALUES (?,?,?)`).run('last_seed', now(), now());
@@ -342,7 +343,7 @@ db.prepare(`INSERT OR REPLACE INTO system_config (key, value, updated_at) VALUES
 // ═══════════════════════════════════════════
 // 统计
 // ═══════════════════════════════════════════
-console.log('\n=== 种子数据统计 ===');
+logger.info({ module: 'seed-data' }, '=== 种子数据统计 ===');
 const stats = [
   ['users', '用户'], ['user_roles', '角色'], ['paipan_records', '排盘记录'],
   ['master_cases', '大师案例'], ['case_discussions', '案例讨论'],
@@ -353,7 +354,7 @@ const stats = [
 for (const [table, label] of stats) {
   try {
     const c = db.prepare(`SELECT count(*) as c FROM ${table}`).get();
-    console.log(`  ${label}: ${c.c}条`);
+    logger.info({ module: 'seed-data', label, count: c.c }, '统计');
   } catch (e) { /* skip */ }
 }
-console.log('\n✅ 种子数据生成完成!');
+logger.info({ module: 'seed-data' }, '✅ 种子数据生成完成!');

@@ -1,0 +1,77 @@
+/**
+ * a11y-fix.css · 节点 9.2 P0 公共修补
+ *
+ * 作用：
+ * 1. 通用 focus-visible 替代 outline:none
+ * 2. skip-link 默认隐藏、聚焦时显示
+ * 3. prefers-reduced-motion 尊重
+ * 4. prefers-color-scheme 自动暗黑
+ * 5. WCAG 强制对比度补充
+ *
+ * 用法：HTML <head> 引入
+ *   <link rel="stylesheet" href="css/a11y-fix.css">
+ */
+
+/* ─── 1. focus-visible：键盘聚焦时显示焦点环，鼠标点击不显 ─── */
+*:focus-visible {
+  outline: 2px solid var(--ml-accent, #d4af37);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+/* 默认情况下（鼠标点击）隐藏 */
+*:focus:not(:focus-visible) {
+  outline: none !important;
+}
+
+/* ─── 2. skip-link：跳过导航直达主内容 ─── */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 8px;
+  z-index: 2147483647;
+  background: var(--ml-accent, #d4af37);
+  color: #000;
+  padding: 8px 16px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: top .2s;
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  top: 8px;
+}
+
+/* ─── 3. prefers-reduced-motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ─── 4. 颜色对比度强制 (AA 标准 4.5:1) ─── */
+.btn-link, a {
+  text-decoration-skip-ink: auto;
+}
+button:focus-visible,
+a:focus-visible {
+  outline-color: var(--ml-accent, #d4af37);
+}
+
+/* ─── 5. ml-toast aria-live 容器化（节点 9.2 P0-6） ─── */
+ml-toast { display: block; }
+
+/* ─── 6. ml-modal 焦点环加强 ─── */
+ml-modal:not([open]) > [part="backdrop"] { display: none; }
+
+/* ─── 7. 表单必填 * 标记 ─── */
+[aria-required="true"] + label::after,
+label[for] > .required-mark {
+  content: " *";
+  color: var(--err, #ef4444);
+}

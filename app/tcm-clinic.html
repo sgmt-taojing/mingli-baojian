@@ -297,8 +297,10 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 </style>
 <script src="js/ui-toast.js" defer></script>
 <script src="js/secure-storage.js"></script>
+<link rel="stylesheet" href="css/a11y-fix.css">
 </head>
 <body>
+<a href="#main-content" class="skip-link">跳到主要内容</a>
 <div class="nav-bar">
   <a href="divination-hub.html" class="file-nav-btn">🏠 主平台</a>
   <a href="divination-almanac.html" class="file-nav-btn">📅 黄历</a>
@@ -458,6 +460,7 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
             <button class="sub-tab active" onclick="switchSubTab(this,'master-bazi')">八字分析</button>
             <button class="sub-tab" onclick="switchSubTab(this,'master-hexagram')">周易起卦</button>
             <button class="sub-tab" onclick="switchSubTab(this,'master-report')">分析报告</button>
+            <button class="sub-tab" onclick="switchSubTab(this,'master-mingxiang')">命相同参</button>
           </div>
           <!-- Sub: Bazi -->
           <div id="master-bazi" class="sub-panel active">
@@ -548,6 +551,70 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
               <input class="form-input" id="seasonalAdvice" placeholder="如：春季养肝，疏肝理气">
             </div>
             <button class="btn btn-primary" onclick="submitMasterAnalysis()">提交给医生</button>
+          </div>
+          <!-- Sub: 命相同参 -->
+          <div id="master-mingxiang" class="sub-panel">
+            <div class="card-title" style="font-size:14px;color:var(--gold2);letter-spacing:2px;margin-bottom:12px">🩺 命相同参（面相×八字交叉分析）</div>
+            <div style="font-size:12px;color:var(--paper3);margin-bottom:12px;line-height:1.7">路总理念：「命相同参是最准的判断。面相是「活」的反映近期状态，八字是「定」的反映先天格局，两者交叉验证准确率更高。」</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">八字输入（请选择四柱）</label>
+                <div class="form-row">
+                  <select class="form-select" id="mx-year">
+                    <option value="">年柱</option>
+                  </select>
+                  <select class="form-select" id="mx-month">
+                    <option value="">月柱</option>
+                  </select>
+                </div>
+                <div class="form-row" style="margin-top:6px">
+                  <select class="form-select" id="mx-day">
+                    <option value="">日柱</option>
+                  </select>
+                  <select class="form-select" id="mx-hour">
+                    <option value="">时柱</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">面诊症状（可多选）</label>
+                <select class="form-select" id="mx-face-symptom" multiple size="6" style="min-height:120px">
+                  <option value="面青">面青</option>
+                  <option value="面赤">面赤</option>
+                  <option value="面黄">面黄</option>
+                  <option value="面白">面白</option>
+                  <option value="面黑">面黑</option>
+                  <option value="印堂发红">印堂发红</option>
+                  <option value="鼻头红赤">鼻头红赤</option>
+                  <option value="法令纹深">法令纹深</option>
+                  <option value="山根低陷">山根低陷</option>
+                  <option value="面部斑点">面部斑点</option>
+                  <option value="眼袋浮肿">眼袋浮肿</option>
+                  <option value="泪堂凹陷">泪堂凹陷</option>
+                  <option value="毛发稀疏">毛发稀疏</option>
+                  <option value="唇色暗紫">唇色暗紫</option>
+                  <option value="颧骨高露">颧骨高露</option>
+                  <option value="颧骨有肉">颧骨有肉</option>
+                  <option value="眉骨突出">眉骨突出</option>
+                  <option value="耳大有垂">耳大有垂</option>
+                  <option value="人中深长">人中深长</option>
+                </select>
+                <div style="font-size:11px;color:var(--paper3);margin-top:4px">按住 Ctrl/Command 多选</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">关注脏腑（单选）</label>
+              <select class="form-select" id="mx-focus">
+                <option value="综合">综合判断</option>
+                <option value="肝胆">肝胆</option>
+                <option value="心小肠">心小肠</option>
+                <option value="脾胃">脾胃</option>
+                <option value="肺大肠">肺大肠</option>
+                <option value="肾膀胱">肾膀胱</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" onclick="analyzeMingxiang()">🩺 开始交叉分析</button>
+            <div id="mingxiangResult" style="margin-top:16px"></div>
           </div>
         </div>
       </div>
@@ -694,6 +761,7 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 
 <script src="../knowledge/tcm-diagnosis-kb.js"></script>
 <script src="../knowledge/tcm-famous-formulas-kb.js"></script>
+<script src="../knowledge/mingxiang-cross-kb.js"></script>
 <script>
 // API辅助
 const API_BASE = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' ? 'http://127.0.0.1:8920' : '';
@@ -1712,11 +1780,24 @@ function backToMasterList(){
 function initBaziSelects(){
   ['bazi-year','bazi-month','bazi-day','bazi-hour'].forEach(id=>{
     const sel = document.getElementById(id);
-    if(sel.options.length>0) return;
-    sel.innerHTML = '<option value="">选择</option>';
-    JIAZI.forEach(j=>{
-      sel.innerHTML += '<option value="'+j+'">'+j+'</option>';
-    });
+    if(sel && sel.options.length>0) return;
+    if(sel){
+      sel.innerHTML = '<option value="">选择</option>';
+      JIAZI.forEach(j=>{
+        sel.innerHTML += '<option value="'+j+'">'+j+'</option>';
+      });
+    }
+  });
+  // 命相同参 - 同样初始化
+  ['mx-year','mx-month','mx-day','mx-hour'].forEach(id=>{
+    const sel = document.getElementById(id);
+    if(sel && sel.options.length>0) return;
+    if(sel){
+      sel.innerHTML = '<option value="">选择</option>';
+      JIAZI.forEach(j=>{
+        sel.innerHTML += '<option value="'+j+'">'+j+'</option>';
+      });
+    }
   });
 }
 
@@ -1767,6 +1848,82 @@ function renderWuxingBars(wx,targetId){
   const target = document.getElementById(targetId);
   target.innerHTML = html;
   if(target.dataset.wuxing===undefined) target.dataset.wuxing = JSON.stringify(wx);
+}
+
+/* ===== 命相同参（面相×八字交叉分析）===== */
+function analyzeMingxiang(){
+  const y = document.getElementById('mx-year').value;
+  const m = document.getElementById('mx-month').value;
+  const d = document.getElementById('mx-day').value;
+  const h = document.getElementById('mx-hour').value;
+  const faceSelect = document.getElementById('mx-face-symptom');
+  const faceSymptoms = Array.from(faceSelect.selectedOptions).map(o=>o.value);
+  const focus = document.getElementById('mx-focus').value;
+  const resultDiv = document.getElementById('mingxiangResult');
+  if(!y||!m||!d||!h){showToast('请选择完整四柱');return}
+  if(faceSymptoms.length===0){showToast('请至少选择一项面诊症状');return}
+  // 计算八字五行
+  const wx = {木:0,火:0,土:0,金:0,水:0};
+  const ganMap = {'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
+  const zhiMap = {'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+  [y,m,d,h].forEach(pillar=>{
+    if(!pillar)return;
+    const gan = pillar[0];
+    const zhi = pillar[1];
+    if(ganMap[gan]) wx[ganMap[gan]]++;
+    if(zhiMap[zhi]) wx[zhiMap[zhi]]++;
+  });
+  // 五行强弱 (本项目使用 >=3 为偏盛)
+  const dominantEl = Object.entries(wx).sort((a,b)=>b[1]-a[1])[0][0];
+  const weakEl = Object.entries(wx).sort((a,b)=>a[1]-b[1])[0][0];
+  // 拼接查询文本 - 输入给 KB 检索
+  const query = faceSymptoms.join(' ') + ' ' + dominantEl + '旺 ' + weakEl + '弱 ' + focus;
+  let html = '<div class="card-title" style="font-size:13px;color:var(--gold2);letter-spacing:2px">🩺 命相同参交叉分析结果</div>';
+  // 八字部分
+  html += '<div style="margin-top:12px;font-size:13px;color:var(--paper2);line-height:1.8">';
+  html += '<strong>八字：</strong>'+y+' '+m+' '+d+' '+h+'　';
+  html += '<strong>五行：</strong>木'+wx['木']+' 火'+wx['火']+' 土'+wx['土']+' 金'+wx['金']+' 水'+wx['水']+'<br>';
+  html += '<strong>偏盛：</strong>'+dominantEl+'　<strong>偏衰：</strong>'+weakEl;
+  html += '</div>';
+  // 面诊部分
+  html += '<div style="margin-top:8px;font-size:13px;color:var(--paper2)"><strong>面诊：</strong>'+faceSymptoms.join('、')+'</div>';
+  // 命中 KB
+  if(window.MINGXIANG_CROSS_KB && window.MINGXIANG_CROSS_KB.rules){
+    const rules = window.MINGXIANG_CROSS_KB.rules;
+    const userInput = query.toLowerCase();
+    const keywords = userInput.split(/[\s，。、；;：:（）()\[\]\-]+/).filter(s=>s.length>=1);
+    const scored = rules.map(rule=>{
+      let hits = 0;
+      const text = (rule.face + rule.bazi + rule.name + (rule.keywords||[]).join(' ') + rule.category).toLowerCase();
+      keywords.forEach(kw=>{ if(text.includes(kw.toLowerCase())) hits++; });
+      return { rule, hits, score: hits / Math.max(1, keywords.length) };
+    }).filter(x=>x.hits>0).sort((a,b)=>b.hits-a.hits).slice(0,5);
+    if(scored.length > 0){
+      html += '<div style="margin-top:14px;font-size:13px;color:var(--gold2);letter-spacing:2px">📚 命中交叉规则</div>';
+      scored.forEach(s=>{
+        const r = s.rule;
+        html += '<div style="margin-top:10px;padding:10px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:8px;font-size:12px;color:var(--paper2);line-height:1.7">';
+        html += '<div style="font-size:13px;color:var(--gold);font-weight:600">【'+r.id+'】'+escHtml(r.name)+' <span style="font-size:11px;color:var(--paper3);font-weight:400">· '+escHtml(r.source)+' · '+escHtml(r.category)+'</span></div>';
+        html += '<div style="margin-top:4px"><strong>面相：</strong>'+escHtml(r.face)+'</div>';
+        html += '<div><strong>八字：</strong>'+escHtml(r.bazi)+'</div>';
+        html += '<div style="margin-top:4px;color:var(--gold2)"><strong>交叉判断：</strong>'+escHtml(r.cross)+'</div>';
+        html += '<div style="margin-top:4px;color:var(--paper3)"><strong>调理：</strong>'+escHtml(r.remedy)+'</div>';
+        html += '</div>';
+      });
+    } else {
+      html += '<div style="margin-top:14px;font-size:13px;color:var(--paper3)">未命中具体规则，提示：'+dominantEl+'旺'+weakEl+'弱 体质倾向需重点关注对应脏腑。</div>';
+    }
+  } else {
+    html += '<div style="margin-top:14px;font-size:13px;color:var(--paper3)">⚠️ KB 未加载，请检查 knowledge/mingxiang-cross-kb.js 是否引入。</div>';
+  }
+  // 五行脏腑建议
+  const organMap = {木:'肝胆',火:'心小肠',土:'脾胃',金:'肺大肠',水:'肾膀胱'};
+  html += '<div style="margin-top:14px;font-size:13px;color:var(--gold2);letter-spacing:2px">⚖️ 五行体质建议</div>';
+  html += '<div style="margin-top:8px;font-size:12px;color:var(--paper2);line-height:1.8">';
+  html += '偏盛脏腑：<strong style="color:var(--gold)">'+organMap[dominantEl]+'</strong>（'+dominantEl+'）需注意泄其偏盛<br>';
+  html += '偏衰脏腑：<strong style="color:var(--gold)">'+organMap[weakEl]+'</strong>（'+weakEl+'）需注意补其不足';
+  html += '</div>';
+  resultDiv.innerHTML = html;
 }
 
 /* Hexagram casting */

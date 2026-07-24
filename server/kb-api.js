@@ -17,6 +17,7 @@ const crypto = require('crypto');
 
 const { KB_LEVELS, LEVEL_TO_DIR, LEVEL_TO_PERMISSION, LEVEL_PRIORITY } = require('./kb-config');
 const { auth, ROLES } = require('./rbac-middleware');
+const logger = require('./logger.js');
 
 const router = express.Router();
 
@@ -255,7 +256,7 @@ router.get('/:filename', auth, (req, res) => {
   try {
     content = fs.readFileSync(filePath, 'utf-8');
   } catch (e) {
-    console.error(`[KB-API] 读取文件失败: ${filename}`, e);
+    logger.error({ module: 'kb-api', filename, err: e }, '读取文件失败');
     return res.status(500).json({ error: 'KB_READ_ERROR', message: '读取知识库文件失败' });
   }
 
@@ -281,7 +282,7 @@ router.get('/:filename', auth, (req, res) => {
 // 错误处理
 // ═══════════════════════════════════════════════════════════════
 router.use((err, req, res, next) => {
-  console.error('[KB-API] 未捕获错误:', err);
+  logger.error({ module: 'kb-api', err }, '未捕获错误');
   res.status(500).json({ error: 'KB_INTERNAL_ERROR', message: '知识库服务内部错误' });
 });
 

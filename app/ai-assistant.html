@@ -88,8 +88,10 @@ body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',-apple
 .msg.m-ai .b::after{content:' 🔊';font-size:11px;color:#c9a84c;opacity:0;transition:opacity .15s}
 .msg.m-ai:hover .b::after{opacity:.6}
 </style>
+<link rel="stylesheet" href="css/a11y-fix.css">
 </head>
 <body>
+<a href="#main-content" class="skip-link">跳到主要内容</a>
 <nav class="nav">
 <a href="divination-hub.html">🏠 主平台</a>
 <a href="divination-almanac.html">📅 黄历</a>
@@ -153,6 +155,7 @@ body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',-apple
 <script src="../knowledge/nihaisha-kb.js" defer></script>
 <script src="../knowledge/nihaisha-structured-kb.js" defer></script>
 <script src="../knowledge/shuhan-kb-combined.js" defer></script>
+<script src="../knowledge/mingxiang-cross-kb.js" defer></script>
 <!-- 公共 toast + esc -->
 <script src="js/ui-toast.js" defer></script>
 <!-- 语音交互 -->
@@ -193,6 +196,7 @@ const KB_SOURCES = [
   {name:'CLASSICS_KB', entryId:'classics-model-v1', modelEntryCount:106, obj:()=>window.CLASSICS_KB, mods:['classics','jingdian'], weight:0.8},
   {name:'NIHAISHA_STRUCTURED_KB', entryId:'nihaisha-structured-v1', modelEntryCount:118, obj:()=>window.NIHAISHA_STRUCTURED_KB, mods:['zhongyi','qimen','fengshui','jingdian'], weight:1.2},
   {name:'FAITH_KB', entryId:'faith-model-v1', modelEntryCount:167, obj:()=>window.FAITH_KB, mods:['faith','mingshi'], weight:0.8},
+  {name:'MINGXIANG_CROSS_KB', entryId:'mingxiang-cross-v1', modelEntryCount:28, obj:()=>window.MINGXIANG_CROSS_KB, mods:['mingxiang','cross','mingxiang-cross'], weight:0.85},
 ];
 
 function _kbScore(moduleId, data){
@@ -458,6 +462,12 @@ const MODULES={
     {q:'您目前处于哪个阶段？',options:['学龄前','小学','初中','高中','大学','职场','婚恋期','不清楚']},
     {q:'您的现居地和期望发展方向？(城市/领域)',hint:'例如：北京，想了解适合的行业'},
     {q:'您目前最关心的方向？',options:['学业规划','职业方向','财运分析','感情婚姻','健康管理','城市选择','全面规划']}
+  ]},
+  'mingxiang':{name:'命相同参',icon:'🩺',desc:'面相×八字交叉分析',steps:[
+    {q:'请提供您的出生年月日时和性别（用于八字排盘）',hint:'例如：1985年3月22日8时 女'},
+    {q:'请描述您观察到的面相特征（面色、五官、痣斑等）',hint:'例如：面色偏黄、鼻头偏大、有法令纹'},
+    {q:'您当前主要关注的健康/运势方向？',options:['肝胆问题','心血管健康','脾胃消化','呼吸系统','肾脏泌尿','整体综合']},
+    {q:'近期是否有明显的生活或运势变化？',options:['工作变动','感情变化','搬家迁居','健康波动','财务变化','没有明显变化']}
   ]}
 };
 
@@ -484,7 +494,8 @@ const ALL_MODS=[
   {id:'yanzhi',name:'颜择面相',icon:'👤'},
   {id:'music',name:'疗愈音乐',icon:'🎵'},
   {id:'lifeindex',name:'生命指数',icon:'📊'},
-  {id:'lifeplan',name:'人生规划',icon:'🗺️'}
+  {id:'lifeplan',name:'人生规划',icon:'🗺️'},
+  {id:'mingxiang',name:'命相同参',icon:'🩺', kb:'MINGXIANG_CROSS_KB', mods:['mingxiang','cross','mingxiang-cross'], weight:0.85}
 ];
 
 // === P1: 统一追加"关心维度"步骤到核心模块 ===
@@ -892,7 +903,7 @@ function showReport(text){
     push.className='msg m-ai';
     let html='<div class="mod-push"><div class="mp-title">✨ 您还可以体验</div><div class="mp-items">';
     ALL_MODS.filter(m=>m.id!==state.module).slice(0,8).forEach(m=>{
-      html+='<span class="mp-item" onclick="startModule(\''+m.id+'\')">'+m.icon+' '+m.name+'</span>';
+      html+='<button type="button" class="mp-item" onclick="startModule(\''+m.id+'\')">'+m.icon+' '+m.name+'</span>';
     });
     html+='</div></div>';
     push.innerHTML=html;
