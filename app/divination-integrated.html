@@ -2280,7 +2280,7 @@ const DISEASE_LIST=Object.keys(DISEASE_MAP);
 function renderDiseaseTags(filter){
   const wrap=document.getElementById('diseaseTags');
   const list=filter?DISEASE_LIST.filter(x=>x.includes(filter)):DISEASE_LIST;
-  wrap.innerHTML=list.map(d=>`<span class="disease-tag" onclick="selectDisease('${d}')" id="dt-${d}">${d}</span>`).join('');
+  wrap.innerHTML=list.map(d=>`<button type="button" class="disease-tag" onclick="selectDisease('${d}')" id="dt-${d}">${d}</button>`).join('');
 }
 
 function selectDisease(name){
