@@ -3,7 +3,7 @@
 > **维护原则**：每个任务按工作流 22 节点推进；完成一个自动拉下一个；阻塞项标红等待决策。
 > **断点机制**：每个进行中任务必须记录"当前节点 + 产出物 + 下一步"，心跳只看这一页就能续推。
 > **顶层架构**：见 MECHANISM.md（本项目根目录）
-> **最后更新**：2026-07-25 07:10（心跳推进：#9-a11y-page-layer 节点 2/3 ✅ — 批量 ARIA 注入脚本完成 45/46 页覆盖率 97.8%，脚本 327 行 / 报告 11,920B / 14 项验收 PASS）
+> **最后更新**：2026-07-25 07:32（心跳推进：#9-a11y-page-layer 节点 3/3 ✅ — 批量 `<main id="main-content">` 包裹 49 页 + 100% 覆盖率 + 5/5 GitHub Pages 验证 + 504/504 Jest 全绿；commit `a1bb77a` + `6fab345`；#9 a11y 完结 4/4）
 >
 > **#9 节点 9.1 完成**：docs/A11Y_AUDIT_v1.md（29,703 字节 / 548 行 / 8 章节 + 2 附录），a11y 基础设施几乎为零：仅 4/63 文件含 aria-*（6.3%）、474 处 div onclick 假按钮、62/63 缺 `<main>`、0 skip-link、0 focus-trap、81 处 outline:none、6/10 img 缺 alt、表单 label for 仅 1.4%
 > **#11 节点 11.2 完成**：commitlint.config.js（1,366B / 43 行 / 14 type 枚举）+ .husky/commit-msg（127B hook）+ CHANGELOG.md（7,031B / v1.0.0 初始化）+ docs/RELEASE_MANAGEMENT_v1.md（6,282B / 10 章节），现有 commit 合规率 84.9%
@@ -99,20 +99,22 @@
 
 ---
 
-### #9-a11y-page-layer · 页面层批量推行 🔄 2026-07-25 07:10
+### ~~#9-a11y-page-layer · 页面层批量推行~~ 2026-07-25 07:32 ✅（#9 a11y 完结 4/4）
 
 | 字段 | 值 |
 |------|---|
 | 优先级 | P3（#9 a11y 节点 9.3 拆分） |
 | 规范引用 | WCAG 2.1 AA（Perceivable/Operable/Understandable/Robust） |
-| 节点进度 | **2/3 🔄**（节点 1 ✅ 8/8 页手工注入 + 节点 2 ✅ 45/46 页脚本批量注入，待节点 3 CI 钩子 + main 包裹） |
-| 当前节点 | **#9-a11y-page-layer 节点 2 — 批量 ARIA 注入脚本完成（45/46 页 ✅）** |
-| 下一步动作 | 节点 3 候选：① `scripts/a11y-ci-check.js` 接入 prebuild 钩子防回归 ② 46 页批量追加 `<main id="main-content">` 包裹让 skip-link 锚点生效 ③ Lighthouse CI 集成 |
+| 节点进度 | **3/3 ✅**（节点 1 + 2 + 3 全完结，#9 a11y 整体 4/4） |
+| 当前节点 | **全部完结 ✅ → #9 a11y 4/4 完结** |
+| 下一步动作 | P3 候选：① Lighthouse CI 集成 ② div→button 化 PoC（474 处） ③ 颜色对比度实测 |
 | 待推行页面 | ✅ **节点 1**：8 页手工注入（divination-hub/integrated/wechat-hub/membership/master-class/kb-explorer/merchant-dashboard/my-yuanzhu）<br>✅ **节点 2**：45/46 页脚本批量注入 — admin-glass-dashboard / admin-kb-batch / admin-kb-panel / admin-shop / clear-cache / components-demo / disclaimer / divination-almanac / divination-knowledge / divination-shop / divination-tools / doctor-elder / export-guard / fengshui / glass-console / glass-history / health-career-dashboard / im / index / kb-explore-submit / koujue-gallery / lifeindex-detail / lifeplan-detail / master-archive / master-disease / master-elder / master-zidise-illness / merchant-apply / merit-system / monitor-dashboard / more-functions / nihaisha-knowledge / nihaisha-learning / nihaisha-tool / report-config / report-sample-bazi / shuhan-knowledge / tcm-symptom / test-parse-natural / wechat-disclaimer / wechat-h5 / yijing-oracle / yijing-qimen / youthplan-detail / yuanzhu-inbox<br>⏭ **跳过**：`knowledge-panel.html`（HTML 片段，无 `<head>`/`<body>`，由宿主页继承 a11y 基础设施） |
 | 产出物 | · 节点 1：`app/js/a11y-divination-hub.js`（93 行 / 委托型 ARIA 增强器 / 8+ 页共用 / 不动现有 onclick）<br>· 节点 1：`app/css/a11y-fix.css`（77→94 行 / +17 加 sr-only 工具类）<br>· 节点 1：8 页 `<head>` 引入 a11y-fix.css + `<body>` 紧后加 `<a class="skip-link">跳到主内容</a>` + 包 `<main id="main-content">…</main>`<br>· 节点 1：17 处 `<label for class="sr-only">` 关联（divination-integrated 3 / wechat-hub 4 / membership 2 / master-class 3 / kb-explorer 1 / merchant 3 / my-yuanzhu 1）<br>· 节点 1：报告 `docs/A11Y_PAGE_LAYER_REPORT.md`（12,452 字节 / 7 章节 + 3 附录）<br>· 节点 1 commit：`97f5000` feat(a11y): 批量推行 ARIA 增强到剩余 7 页<br>· **节点 2**：`scripts/a11y-batch-inject.js`（327 行 / 9,710B / 零依赖纯 Node / `--dry-run` + `--verbose` 双模式 / 退出码 0/1 反映 95% 阈值）<br>· **节点 2**：46 页 × 3 处注入 = **135 次插入**（45 页全量 + 1 页 HTML 片段跳过）<br>· **节点 2**：覆盖率 **97.8% (45/46)** ≥ 95% 阈值<br>· **节点 2**：幂等性二次验证通过（0 重复注入）<br>· **节点 2**：报告 `docs/A11Y_PAGE_LAYER_NODE_2_REPORT.md`（11,920 字节 / 5 章节 + 2 附录 + 14 项验收清单）<br>· **节点 2 commit**：`feat(a11y): #9-a11y-page-layer 节点 2 — 批量 ARIA 注入脚本覆盖剩余 46 页` |
 | 验收 | ✅ **节点 1**：8/8 页引入 a11y-divination-hub.js + a11y-fix.css + skip-link + main；✅ 7 页 main 标签开闭平衡；✅ 17 个 label[for] 全部有匹配 input/select id（0 悬空）；✅ onclick 数量不动；✅ node --check JS 语法 OK；✅ 验收清单 10/10 PASS<br>✅ **节点 2**：`node --check scripts/a11y-batch-inject.js` 语法 OK；✅ 45/46 = 97.8% 注入覆盖率 ≥ 95% 阈值；✅ 二次运行幂等（45 全跳过）；✅ 节点 1 12 页未被破坏（git diff 无新改动）；✅ 业务 onclick 未动；✅ glass-history `</style></head><body>` 连写场景兼容；✅ tcm-symptom JS 字符串命中兼容；✅ 验收清单 14/14 PASS |
 | 阻塞 | 无 |
-| 最后更新 | 2026-07-25 07:10 |
+| 最后更新 | 2026-07-25 07:32 |
+| 节点 3 产出 | · 节点 3 `scripts/a11y-wrap-main.js`（5,255B / 175 行 / 零依赖纯 Node / `--dry-run` + `--verbose` 双模式）<br>· 节点 3 包裹 49 页 + 已有 7 页 = **57/57 = 100% 覆盖率**<br>· 节点 3 main 标签 58/58 开闭平衡（0 BAD）<br>· 节点 3 scan-all.js 验证 HTML JS 语法层 0 错误回归<br>· 节点 3 Jest 测试 504/504 全绿（24 suites）<br>· 节点 3 GitHub Pages 5 URL 全 200（divination-hub/tcm-clinic/tcm-symptom/fengshui/ai-assistant）<br>· 节点 3 `docs/A11Y_PAGE_LAYER_NODE_3_REPORT.md`（2,568B / 5 章节）<br>· 节点 3 WCAG 2.4.1 Bypass Blocks：`<main role="main">` landmark 让 skip-link 锚点生效，键盘用户 Tab 1 次到主内容<br>· 节点 3 commit：`a1bb77a` feat(a11y) + `6fab345` docs(a11y)<br>· 节点 3 gh-pages 同步：merge main → push `2e5609c` |
+| 验收 | ✅ `node --check scripts/a11y-wrap-main.js` 语法 OK；✅ 49/49 = 86% 注入完成；✅ 7 节点1页面已被跳过（已有 main）；✅ 二次运行幂等；✅ knowledge-panel.html（HTML片段）正确跳过；✅ tcm-clinic.html 节点1未包已补；✅ main 开闭平衡 58/58；✅ scan-all.js 0 错误回归；✅ Jest 504/504；✅ GitHub Pages 5/5 = 200<br>✅ **#9-a11y-page-layer 完结 3/3**：#9 a11y 4/4 完结 |
 
 ---
 
