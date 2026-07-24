@@ -5,7 +5,7 @@
 const BAZI_MODEL = {
   module: "bazi",
   version: "v1",
-  updated_at: "2026-07-24T16:32:49.131Z",
+  updated_at: "2026-07-24T23:35:10.570Z",
 
   entries: {
   "KB-bazi-00001": {

@@ -141,17 +141,55 @@ async function renderProfile(c){
 
 async function renderYuanzhu(c){
   const r = await api('/api/yuanzhu/list');
-  if(r.error || !r.list){c.innerHTML = `<div class="empty">未登录或接口未开放</div>`;return;}
+  // 公开近期案例（节点 #4.11）：脱敏列表展示
+  let casesHtml = '';
+  try {
+    const cs = await api('/api/public/recent-cases');
+    if(Array.isArray(cs) && cs.length){
+      casesHtml = `<div class="card"><h3>📜 近期案例 (${cs.length})</h3>` +
+        cs.slice(0,8).map(cc=>{
+          const sym = (cc.symptoms||'').replace(/[\\\"]/g,'').slice(0,40) || '（已脱敏）';
+          const master = cc.master_name || '大师';
+          const date = (cc.created_at||'').slice(0,10);
+          return `<div class="row"><span class="label">${sym}</span><span class="val">${master} · ${date}</span></div>`;
+        }).join('') +
+        `</div>`;
+    }
+  } catch(e){ /* 静默兜底 */ }
+  if(r.error || !r.list){
+    c.innerHTML = `<div class="empty">未登录或接口未开放</div>` + casesHtml;
+    return;
+  }
   const list = r.list || [];
-  if(!list.length){c.innerHTML = `<div class="empty">暂无专属助手，<a href="ai-assistant.html" style="color:var(--gold)">先去 AI 助手创建</a></div>`;return;}
+  if(!list.length){
+    c.innerHTML = `<div class="empty">暂无专属助手，<a href="ai-assistant.html" style="color:var(--gold)">先去 AI 助手创建</a></div>` + casesHtml;
+    return;
+  }
   c.innerHTML = `<div class="card"><h3>🧙 我的助手 (${list.length})</h3>` +
     list.map(y=>`<div class="row"><span class="label">${y.name}</span><span class="val">${y.style||''}</span></div>`).join('') +
-    `</div>`;
+    `</div>` + casesHtml;
 }
 
 async function renderPush(c){
   const r = await api('/api/yuanzhu/yearly-pushes');
-  if(r.error){c.innerHTML = `<div class="empty">${r.error}</div>`;return;}
+  // 语音列表（节点 #4.13）：辅助展示可选声音
+  let voicesHtml = '';
+  try {
+    const vs = await api('/api/voices');
+    if(vs && Array.isArray(vs.voices) && vs.voices.length){
+      voicesHtml = `<div class="card"><h3>🎤 语音选择 (${vs.voices.length})</h3>` +
+        vs.voices.slice(0,12).map(v=>{
+          const gender = v.gender==='female' ? '👩' : v.gender==='male' ? '👨' : '🎙️';
+          return `<div class="row"><span class="label">${gender} ${v.name}·${v.style||''}</span><span class="val">${v.id.replace('zh-CN-','')}</span></div>`;
+        }).join('') +
+        `</div>`;
+    }
+  } catch(e){ /* 静默兜底 */ }
+
+  if(r.error){
+    c.innerHTML = `<div class="empty">${r.error}</div>` + voicesHtml;
+    return;
+  }
   const list = (r.pushes||[]).slice(0,20);
   if(!list.length){
     // 公开接口
@@ -159,19 +197,39 @@ async function renderPush(c){
     if(pub && pub.pushes){
       c.innerHTML = `<div class="card"><h3>📨 最新推送</h3>` +
         pub.pushes.slice(0,10).map(p=>`<div class="row"><span class="label">${(p.title||'').substring(0,30)}</span><span class="val">${p.date||''}</span></div>`).join('') +
-        `</div>`;
+        `</div>` + voicesHtml;
       return;
     }
-    c.innerHTML = `<div class="empty">暂无推送</div>`;
+    c.innerHTML = `<div class="empty">暂无推送</div>` + voicesHtml;
     return;
   }
   c.innerHTML = `<div class="card"><h3>📨 我的年度推送 (${list.length})</h3>` +
     list.map(p=>`<div class="row"><span class="label">${(p.title||'').substring(0,30)}</span><span class="val">${(p.createdAt||'').substring(0,10)}</span></div>`).join('') +
-    `</div>`;
+    `</div>` + voicesHtml;
 }
 
 async function renderPoints(c){
   const r = await api('/api/feedback/points');
+  // 公开统计（节点 #4.10）：辅助展示平台总量
+  let stats = null;
+  try {
+    const s = await api('/api/public/stats');
+    if(s && !s.error){ stats = s; }
+  } catch(e){ /* 静默兜底 */ }
+  const statsHtml = stats ? `
+    <div class="card"><h3>📊 平台总览</h3>
+      <div class="stat-grid">
+        <div class="s"><div class="n">${stats.users||0}</div><div class="l">总用户</div></div>
+        <div class="s"><div class="n">${stats.vipUsers||0}</div><div class="l">VIP</div></div>
+        <div class="s"><div class="n">${stats.paipanCount||0}</div><div class="l">排盘总数</div></div>
+        <div class="s"><div class="n">${stats.totalCases||0}</div><div class="l">案例总数</div></div>
+        <div class="s"><div class="n">${stats.totalReports||0}</div><div class="l">中医报告</div></div>
+        <div class="s"><div class="n">${stats.totalCourses||0}</div><div class="l">课程</div></div>
+        <div class="s"><div class="n">${stats.totalPushes||0}</div><div class="l">推送</div></div>
+        <div class="s"><div class="n">${stats.totalPoints||0}</div><div class="l">积分池</div></div>
+      </div>
+    </div>
+  ` : '';
   c.innerHTML = `
     <div class="card">
       <div class="point">${(r&&r.total)||0}</div>
@@ -183,6 +241,7 @@ async function renderPoints(c){
       <div class="s"><div class="n">${(r&&r.month)||0}</div><div class="l">本月获得</div></div>
       <div class="s"><div class="n">${(r&&r.history)||0}</div><div class="l">历史提交</div></div>
     </div>
+    ${statsHtml}
   `;
 }
 
@@ -207,6 +266,25 @@ async function renderShop(c){
 
 async function renderKb(c){
   const r = await api('/api/kb/list');
+  // 课程列表（节点 #4.12）：辅助展示
+  let coursesHtml = '';
+  try {
+    const cs = await api('/api/courses');
+    if(Array.isArray(cs) && cs.length){
+      coursesHtml = `<div class="card"><h3>🎓 推荐课程 (${cs.length})</h3>` +
+        cs.slice(0,12).map(co=>{
+          const master = co.master || '-';
+          const title = (co.title||'').slice(0,24);
+          const dur = co.duration || '';
+          const cat = co.category || '';
+          return `<div class="row"><span class="label">${master}·${title}</span><span class="val">${cat}${dur?'·'+dur:''}</span></div>`;
+        }).join('') +
+        `</div>`;
+    } else if(cs && cs.error){
+      coursesHtml = '';
+    }
+  } catch(e){ /* 静默兜底 */ }
+
   if(r.error){
     // 兜底：直接列出项目 KB
     const fallback = [
@@ -217,13 +295,13 @@ async function renderKb(c){
     ];
     c.innerHTML = `<div class="card"><h3>📚 知识库（${fallback.length} 套）</h3>` +
       fallback.map(k=>`<div class="row"><span class="label">${k.name}</span><span class="val">${k.modules} 模块</span></div>`).join('') +
-      `</div>`;
+      `</div>` + coursesHtml;
     return;
   }
   const list = r.kb || [];
   c.innerHTML = `<div class="card"><h3>📚 知识库（${list.length} 套）</h3>` +
     list.map(k=>`<div class="row"><span class="label">${k.name}</span><span class="val">${k.modules||'-'} 模块</span></div>`).join('') +
-    `</div>`;
+    `</div>` + coursesHtml;
 }
 
 async function login(){
