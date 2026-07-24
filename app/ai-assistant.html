@@ -284,20 +284,25 @@ async function _kbQueryFallback(best) {
 }
 
 function _kbHitCount(moduleId, kbEntryId){
-  const key = '_kb_hit_count/' + moduleId;
-  const n = parseInt(localStorage.getItem(key) || '0') + 1;
-  localStorage.setItem(key, String(n));
-  // 异步上报后端 kb_formal.hit_count（公网白名单 + 失败静默）
-  if (kbEntryId) {
-    try {
-      fetch(API + '/api/public/kb-hit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ entry_id: kbEntryId, app_endpoint: 'ai-assistant', user_query: (state.data?.s1 || '') + ' ' + (state.data?.s2 || '') })
-      }).catch(() => {});
-    } catch (e) {}
-  }
-  return n;
+  try{
+    const key = '_kb_hit_count/' + moduleId;
+    const n = parseInt(localStorage.getItem(key) || '0') + 1;
+    localStorage.setItem(key, String(n));
+    // 累计总命中
+    const total = parseInt(localStorage.getItem('_kb_hit_count/_total') || '0') + 1;
+    localStorage.setItem('_kb_hit_count/_total', String(total));
+    // 异步上报后端 kb_formal.hit_count（公网白名单 + 失败静默）
+    if (kbEntryId) {
+      try {
+        fetch(API + '/api/public/kb-hit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ entry_id: kbEntryId, app_endpoint: 'ai-assistant', user_query: (state.data?.s1 || '') + ' ' + (state.data?.s2 || '') })
+        }).catch(() => {});
+      } catch (e) {}
+    }
+    return n;
+  }catch(e){ /* localStorage 隐私模式静默 */ return 0; }
 }
 
 // === 问卷 + 排盘结果自动落库（公网公开端点）===
@@ -503,11 +508,27 @@ function showWelcome(){
   let html='<div class="welcome"><div class="logo">🤖</div><h2>AI命理助手</h2><div class="sub">选择您想咨询的领域，我将通过对话收集信息后给出专业分析报告</div><div class="modules">';
   ALL_MODS.forEach(m=>{html+='<div class="mod" onclick="startModule(\''+m.id+'\')"><div class="mi">'+m.icon+'</div><div class="mt">'+m.name+'</div></div>';});
   html+='</div>';
-  // 显示今日 KB 直答数
-  const todayKey='_kb_hit_today';
-  const td=JSON.parse(localStorage.getItem(todayKey)||'{}');
-  if(td.date===new Date().toDateString()&&td.count>0){
-    html+='<div style="text-align:center;margin-top:8px;font-size:11px;color:var(--paper3)">📊 今日 KB 直答 '+td.count+' 次</div>';
+  // 显示今日 / 累计 KB 直答统计 + 最强模块
+  let todayN = 0, totalN = 0, topMod = null, topCnt = 0;
+  const fmt = (n)=> n>=1000 ? (n/1000).toFixed(1).replace(/\.0$/,'')+'K' : String(n).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  try{
+    const td=JSON.parse(localStorage.getItem('_kb_hit_today')||'{}');
+    todayN = (td.date===new Date().toDateString()) ? (td.count||0) : 0;
+    for(let i=0;i<localStorage.length;i++){
+      const k = localStorage.key(i);
+      if(!k || !k.startsWith('_kb_hit_count/')) continue;
+      const sub = k.substring('_kb_hit_count/'.length);
+      if(sub==='_total'){
+        totalN = parseInt(localStorage.getItem(k) || '0');
+      } else if(!sub.startsWith('_daily_')){
+        const c = parseInt(localStorage.getItem(k) || '0');
+        if(c > topCnt){ topCnt = c; topMod = sub; }
+      }
+    }
+  }catch(e){ /* 隐私模式静默 */ }
+  if(todayN>0 || totalN>0){
+    const topTxt = topMod ? ' · 最强：'+topMod+'('+fmt(topCnt)+')' : '';
+    html+='<div style="text-align:center;margin-top:8px;font-size:11px;color:var(--paper3)">📊 今日 KB 直答 '+fmt(todayN)+' / 累计 '+fmt(totalN)+' 次'+topTxt+'</div>';
   }
   // 显示用户档案摘要
   if(window.MLBJ_USER){
@@ -791,8 +812,11 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
       console.warn('[kb fallback]', e);
     }
   }
-  _kbHitCount(state.module, kbHit.entryId);
-  _kbTodayCount();
+  // 只有 KB 命中（score >= 0.4）才算 hit，避免 fallback 0.3 假阳
+  if (kbHit.score >= 0.4) {
+    _kbHitCount(state.module, kbHit.entryId);
+    _kbTodayCount();
+  }
   // 问卷 + 排盘结果落库（公开端点，失败静默）
   _saveSurvey(state.module, state.data, _baziForSave);
 
