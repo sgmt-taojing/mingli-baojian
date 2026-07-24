@@ -15,6 +15,34 @@
 | `.openclaw/tmp/health-check.sh` | 健康检查脚本 |
 | `.openclaw/tmp/watchdog.sh` | 失声检测脚本 |
 
+## 📚 文档治理（docs-as-code）
+
+**所有 docs/*.md 必须遵循 UPPER_SNAKE_CASE_v{主版本}.md 命名规范。**
+
+| 资源 | 作用 |
+|------|------|
+| [`docs/INDEX.md`](docs/INDEX.md) | **文档总目**（按 6 大类：规范/报告/审计/方案/历史/案例） |
+| [`docs/GLOSSARY.md`](docs/GLOSSARY.md) | **概念 → 文档映射词典**（含 M-1/T-1/D-1 等规范引用体系） |
+| [`scripts/docs-lint.sh`](scripts/docs-lint.sh) | **文档规范检查器**（命名一致性 + 失效链接 + 孤立文件 → JSON） |
+
+### 运行文档 lint
+
+```bash
+bash scripts/docs-lint.sh
+```
+
+### 健康指标（§06:18 实测）
+| 指标 | 值 | 健康阈值 |
+|------|-----|---------|
+| UPPER_SNAKE 占比 | **26.5%** | ≥70%（P1 重整） |
+| 孤立文件率 | **56.6%** | ≤10%（P0 通过 INDEX.md 治理） |
+| 失效链接 | 1 | 0（自动检测 + 人工确认） |
+
+### 维护节奏
+- **新增文档**：必须 UPPER_SNAKE_CASE_v{N}.md，并在 docs/INDEX.md 注册
+- **每周五**：心跳自动跑 `docs-lint.sh` 输出报告
+- **每周日晚**：人工 review 孤立文件 → rename / archive / delete
+
 ## 你的手动指令
 
 `推进 #X` / `看 KANBAN` / `插队 #X：描述` / `跳过 #X` / `加速` / `减速` / `暂停` / `恢复`
