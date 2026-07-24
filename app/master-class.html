@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>名师课堂 · 易道智鉴</title>
+<link rel="stylesheet" href="css/a11y-fix.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--gold:var(--gold);--gold2:var(--gold2);--ink:var(--ink);--ink2:var(--cyan);--paper:var(--paper);--paper3:var(--paper3);--font:'Noto Serif SC',serif;--cyan:#4a90a4;--cinn2:#e74c3c;--cyan2:#5dade2;--gold3:#a08030;--jade:#27ae60;--paper2:#d4c9b0}
@@ -116,6 +117,8 @@ video,audio{max-width:100%;max-height:70vh}
 </style>
 </head>
 <body>
+<a href="#main-content" class="skip-link">跳到主内容</a>
+<main id="main-content">
 <div style="position:fixed;top:12px;right:12px;z-index:99998">
   <a href="tcm-clinic.html" style="display:inline-block;padding:6px 16px;background:rgba(201,168,76,0.12);color:var(--gold,#c9a84c);border:1px solid rgba(201,168,76,0.25);border-radius:16px;font-size:12px;text-decoration:none;font-family:'Noto Serif SC',serif;letter-spacing:1px">🏥 中医健康咨询</a>
 </div>
@@ -139,7 +142,7 @@ video,audio{max-width:100%;max-height:70vh}
   <p style="font-size:12px;color:var(--paper3);line-height:1.8">现代命理实战派代表，融合古法与案例，擅长将八字命理、风水调理与现代生活结合。本讲堂收录舒晗老师八字排盘、格局分析、十神精断、流年化解等实战课程。</p>
 </div>
 <div class="path-card"><div class="path-title">📌 推荐学习路径</div><div class="path-steps"><span class="path-step">1. 八字基础</span><span class="path-arrow">→</span><span class="path-step">2. 十神格局</span><span class="path-arrow">→</span><span class="path-step">3. 用神取法</span><span class="path-arrow">→</span><span class="path-step">4. 流年推断</span><span class="path-arrow">→</span><span class="path-step">5. 化解调理</span></div></div>
-<div style="margin-bottom:16px"><input type="text" id="searchInput" placeholder="🔍 搜索课程..." oninput="searchLessons(this.value)" style="width:100%;padding:10px 14px;background:var(--ink2);border:1px solid rgba(201,168,76,0.15);border-radius:10px;color:var(--paper);font-size:13px;font-family:inherit;outline:none"></div><div id="searchResults"></div><div id="masterList">
+<div style="margin-bottom:16px"><label for="searchInput" class="sr-only">搜索课程</label><input type="text" id="searchInput" placeholder="🔍 搜索课程..." oninput="searchLessons(this.value)" style="width:100%;padding:10px 14px;background:var(--ink2);border:1px solid rgba(201,168,76,0.15);border-radius:10px;color:var(--paper);font-size:13px;font-family:inherit;outline:none"></div><div id="searchResults"></div><div id="masterList">
   <div class="master-card" onclick="toggleMaster('shuhan')">
     <div class="master-header">
       <div class="master-avatar">舒</div>
@@ -176,7 +179,7 @@ video,audio{max-width:100%;max-height:70vh}
     <p style="font-size:12px;color:var(--paper3);line-height:1.8">医易同源，倪师深研《黄帝内经》《伤寒论》《金匮要略》，融汇命理、紫微、占卜于中医临床。本讲堂收录倪师经方应用、临床案例、黄帝内经讲解、命理与中医结合等课程。</p>
   </div>
   <div class="path-card"><div class="path-title">📌 推荐学习路径</div><div class="path-steps"><span class="path-step">1. 中医基础</span><span class="path-arrow">→</span><span class="path-step">2. 经方应用</span><span class="path-arrow">→</span><span class="path-step">3. 临床案例</span><span class="path-arrow">→</span><span class="path-step">4. 五运六气</span><span class="path-arrow">→</span><span class="path-step">5. 医易同源</span></div></div>
-  <div style="margin-bottom:16px"><input type="text" id="searchInputNi" placeholder="🔍 搜索倪师课程..." oninput="renderLessonsRich('nihaisha')" style="width:100%;padding:10px 14px;background:var(--ink2);border:1px solid rgba(201,168,76,.15);border-radius:10px;color:var(--paper);font-size:13px;font-family:inherit;outline:none"></div>
+  <div style="margin-bottom:16px"><label for="searchInputNi" class="sr-only">搜索倪师课程</label><input type="text" id="searchInputNi" placeholder="🔍 搜索倪师课程..." oninput="renderLessonsRich('nihaisha')" style="width:100%;padding:10px 14px;background:var(--ink2);border:1px solid rgba(201,168,76,.15);border-radius:10px;color:var(--paper);font-size:13px;font-family:inherit;outline:none"></div>
   <div id="searchResultsNi"></div>
   <div id="niMasterList"></div>
 
@@ -200,7 +203,7 @@ video,audio{max-width:100%;max-height:70vh}
     <span class="filter-chip" data-era="contemporary" onclick="filterMasters('contemporary',this)">当代</span>
     <span class="filter-chip" data-era="other" onclick="filterMasters('other',this)">其他</span>
   </div>
-  <div style="margin-bottom:14px"><input type="text" id="searchMasterInput" placeholder="🔍 搜索宗师（姓名/流派/著作）..." oninput="searchMasters(this.value)" style="width:100%;padding:10px 14px;background:var(--ink2);border:1px solid rgba(201,168,76,.15);border-radius:10px;color:var(--paper);font-size:13px;font-family:inherit;outline:none"></div>
+  <div style="margin-bottom:14px"><label for="searchMasterInput" class="sr-only">搜索宗师</label><input type="text" id="searchMasterInput" placeholder="🔍 搜索宗师（姓名/流派/著作）..." oninput="searchMasters(this.value)" style="width:100%;padding:10px 14px;background:var(--ink2);border:1px solid rgba(201,168,76,.15);border-radius:10px;color:var(--paper);font-size:13px;font-family:inherit;outline:none"></div>
   <div id="mastersRenderArea"></div>
 
   <!-- 师承图谱 -->
@@ -860,5 +863,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 </script>
+</main>
+<script src="js/a11y-divination-hub.js" defer></script>
 </body>
 </html>

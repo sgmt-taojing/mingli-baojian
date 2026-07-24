@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>知识库浏览器 | 命理宝鉴</title>
 <link rel="stylesheet" href="css/pro-panel.css">
+<link rel="stylesheet" href="css/a11y-fix.css">
 <style>
 :root{--bg:#0a0a0f;--line:rgba(255,255,255,.08);--paper:#e8e4df;--paper3:#b0a89e;--gold:#c9a84c;--gold2:#b8943f;--green:#5cb878;--red:#d76060;--blue:#5b9bd5}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -101,6 +102,8 @@ body{background:var(--bg);color:var(--paper);font-family:-apple-system,BlinkMacS
 </style>
 </head>
 <body>
+<a href="#main-content" class="skip-link">跳到主内容</a>
+<main id="main-content">
 <div class="kbe-wrap">
 <div class="kbe-header">
 <h1>📚 知识库浏览器</h1>
@@ -116,6 +119,7 @@ body{background:var(--bg);color:var(--paper);font-family:-apple-system,BlinkMacS
 </div>
 
 <div class="kbe-search">
+<label for="qInput" class="sr-only">知识库关键词搜索</label>
 <input type="text" id="qInput" placeholder="搜中医、八字、倪海厦、失眠、风水...（2字以上）" autocomplete="off">
 <select id="modFilter"><option value="">全部模块</option></select>
 <button onclick="doSearch()">🔍 搜索</button>
@@ -539,5 +543,7 @@ document.getElementById('qInput').addEventListener('keypress', e=>{
   };
 })();
 </script>
+</main>
+<script src="js/a11y-divination-hub.js" defer></script>
 </body>
 </html>

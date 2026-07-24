@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>易道智鉴 · 先进AI推演</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/a11y-fix.css">
   <style>
     :root {
       --gold: var(--gold);
@@ -685,6 +686,8 @@
 .file-nav-btn.active{background:rgba(201,168,76,0.12);color:var(--gold);border-color:rgba(201,168,76,0.35)}
 </style>
 <body>
+<a href="#main-content" class="skip-link">跳到主内容</a>
+<main id="main-content">
 <div class="nav-bar">
   <a href="divination-hub.html" class="file-nav-btn">🏠 主平台</a>
   <a href="divination-almanac.html" class="file-nav-btn">📅 黄历</a>
@@ -887,6 +890,7 @@
         <div style="margin-top:24px;">
           <div style="font-size:14px;color:var(--gold);margin-bottom:12px;">✦ 优惠码</div>
           <div class="promo-input-wrap">
+            <label for="promo-input" class="sr-only">优惠码</label>
             <input type="text" class="promo-input" placeholder="输入折扣码" id="promo-input">
             <button class="promo-btn" onclick="applyPromo()">使用</button>
           </div>
@@ -1574,6 +1578,7 @@ renderCalendar();
     <span style="font-size:10px;opacity:.5">基于 R39-B 双核 KB（2108 条）</span>
   </div>
   <div style="display:flex;gap:6px;margin-bottom:10px">
+    <label for="r40MiniQuery" class="sr-only">R40 双核速查关键词</label>
     <input type="text" id="r40MiniQuery" placeholder="输入关键词，如：气血、正财、紫微、田宅" style="flex:1;padding:6px 10px;background:rgba(0,0,0,.3);color:var(--paper);border:1px solid var(--line);border-radius:6px;font-size:12px">
     <button onclick="r40MiniSearch()" style="padding:6px 14px;background:var(--gold);color:#000;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600">查询</button>
   </div>
@@ -1592,5 +1597,7 @@ function r40MiniSearch(){
   document.getElementById('r40MiniResult').innerHTML=html;
 }
 </script>
+</main>
+<script src="js/a11y-divination-hub.js" defer></script>
 </body>
 </html>

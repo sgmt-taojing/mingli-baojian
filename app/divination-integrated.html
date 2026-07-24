@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>易道智鉴 · 先进AI推演</title>
   <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/a11y-fix.css">
   <style>
         :root{
       --ink:#080808;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;
@@ -389,6 +390,8 @@
 .file-nav-btn.active{background:rgba(201,168,76,0.12);color:var(--gold);border-color:rgba(201,168,76,0.35)}
 </style>
 <body>
+<a href="#main-content" class="skip-link">跳到主内容</a>
+<main id="main-content">
 <div class="nav-bar">
   <a href="divination-hub.html" class="file-nav-btn">🏠 主平台</a>
   <a href="divination-almanac.html" class="file-nav-btn">📅 黄历</a>
@@ -451,6 +454,7 @@
       
       <!-- 上传区域 -->
       <div class="ai-upload-zone" id="aiUploadZone" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleAIDrop(event)">
+        <label for="aiReportFile" class="sr-only">上传报告图片或 PDF（AI 解读用）</label>
         <input type="file" accept="image/*,.pdf" id="aiReportFile" onchange="handleAIFileSelect(event)">
         <div class="ai-upload-icon">🩺</div>
         <div class="ai-upload-text"><strong>拖拽报告图片到此处</strong> 或 <strong>点击上传</strong></div>
@@ -508,6 +512,7 @@
     <!-- 上传区 -->
     <div class="card">
       <div class="upload-zone" id="uploadZone" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleDrop(event)">
+        <label for="reportFile" class="sr-only">上传报告图片</label>
         <input type="file" accept="image/*" id="reportFile" onchange="handleFileSelect(event)">
         <div class="upload-icon">🩺</div>
         <div class="upload-text"><strong>拖拽图片到此处</strong> 或 <strong>点击上传</strong></div>
@@ -767,6 +772,7 @@
     </div>
     <div class="card">
       <div class="search-wrap" style="margin-bottom:14px">
+        <label for="diseaseSearch" class="sr-only">症状关键词搜索</label>
         <input type="text" id="diseaseSearch" placeholder="如：失眠、头痛、胃胀、咳嗽…" onkeyup="filterDiseaseTags()">
         <button class="btn" onclick="analyzeByDisease()">查询</button>
       </div>
@@ -2864,5 +2870,7 @@ renderExerciseLibrary();
 
 </div>
 <script src="js/rbac-client.js"></script>
+</main>
+<script src="js/a11y-divination-hub.js" defer></script>
 </body>
 </html>

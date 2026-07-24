@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <meta name="theme-color" content="#080808">
 <title>我的助手 · 易道智鉴</title>
+<link rel="stylesheet" href="css/a11y-fix.css">
 <style>
 :root{--ink:#080808;--ink2:#111;--paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;--gold:#c9a84c;--gold2:#e8cc7a;--jade:#27ae60;--cyan:#2980b9;--cinn:#c0392b;--border:rgba(201,168,76,.15)}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -36,6 +37,8 @@ html,body{height:100%;overflow-x:hidden;font-family:'PingFang SC','Microsoft YaH
 </style>
 </head>
 <body>
+<a href="#main-content" class="skip-link">跳到主内容</a>
+<main id="main-content">
 <div class="top">
   <h1>我的助手</h1>
   <div style="flex:1"></div>
@@ -116,6 +119,7 @@ async function loadTab(name){
 async function renderProfile(c){
   if(!token){
     c.innerHTML = `<div class="card"><h3>👤 登录</h3>
+      <label for="phone" class="sr-only">登录手机号</label>
       <input id="phone" placeholder="手机号" style="width:100%;padding:10px;background:var(--ink3);border:1px solid var(--border);border-radius:8px;color:var(--paper);margin-bottom:10px">
       <button class="btn" style="width:100%" onclick="login()">登录 / 注册</button></div>`;
     return;
@@ -251,5 +255,7 @@ loadTab('profile');
   });
 })();
 </script>
+</main>
+<script src="js/a11y-divination-hub.js" defer></script>
 </body>
 </html>

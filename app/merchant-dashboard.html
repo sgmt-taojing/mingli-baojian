@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>商家后台 · 易道智鉴</title>
+<link rel="stylesheet" href="css/a11y-fix.css">
 <style>
 :root{--ink:#080808;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;--paper:#f0e8d8;--paper1:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;--gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;--cinn:#c0392b;--cinn2:#e74c3c;--jade:#27ae60;--jade2:#2ecc71;--cyan:#2980b9;--cyan2:#5dade2;--wood:#8d6e63;--earth:#a08060;--metal:#95a5a6;--metal2:#bdc3c7;--danger:#dc3545;--success:#2ecc71;--warn:#e67e22;--orange:#e67e22;--border:rgba(201,168,76,.15);--bg:#080808;--card:rgba(255,255,255,0.04);--card2:rgba(255,255,255,0.06);--shadow:0 4px 24px rgba(0,0,0,.5);--steel:#7f8c8d;--violet:#8e44ad;--violet2:#9b59b6;--violet-light:#bb8fce;--jade-light:#2ecc71;--emerald:#27ae60;--fire:#e74c3c;--water:#2980b9;--red:#e74c3c;--green:#27ae60;--blue:#2980b9;--purple:#8e44ad;--gray:#7f8c8d;--text:#f0e8d8;--text-light:#f0e8d8;--text-dim:#a09080;--text-muted:#a09080;--muted:#a09080;--accent:#c9a84c;--title:#c9a84c;--bg-dark:#060608;--bg-modal:rgba(0,0,0,.7);--gold-dim:rgba(201,168,76,.4);--card-bg:rgba(255,255,255,0.04);--card-bg2:rgba(255,255,255,0.06);--wood2:#a1887f;--ink2-rgb:17,17,17;--gold-rgb:201,168,76}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -35,6 +36,8 @@ input:focus{border-color:var(--gold)}
 </style>
 </head>
 <body>
+<a href="#main-content" class="skip-link">跳到主内容</a>
+<main id="main-content">
 <div style="position:fixed;top:12px;right:12px;z-index:99998">
   <a href="tcm-clinic.html" style="display:inline-block;padding:6px 16px;background:rgba(201,168,76,0.12);color:var(--gold,#c9a84c);border:1px solid rgba(201,168,76,0.25);border-radius:16px;font-size:12px;text-decoration:none;font-family:'Noto Serif SC',serif;letter-spacing:1px">🏥 中医诊疗</a>
 </div>
@@ -44,8 +47,10 @@ input:focus{border-color:var(--gold)}
 <div class="card" style="max-width:360px;margin:20px auto">
 <h3>📱 商家登录</h3>
 <label>手机号</label>
+<label for="loginPhone" class="sr-only">登录手机号</label>
 <input type="tel" id="loginPhone" placeholder="入驻时填写的手机号">
 <label>验证码（输入任意6位数字）</label>
+<label for="loginCode" class="sr-only">登录验证码</label>
 <input type="text" id="loginCode" placeholder="6位验证码" maxlength="6">
 <button class="btn" style="width:100%" onclick="merchantLogin()">登录</button>
 <p style="font-size:11px;color:var(--paper3);margin-top:10px">还没入驻？<a href="merchant-apply.html" style="color:var(--gold)">申请入驻 →</a></p>
@@ -85,6 +90,7 @@ input:focus{border-color:var(--gold)}
 <div id="addProductForm" class="card hidden">
 <h3>新增商品</h3>
 <label>商品名称</label>
+<label for="pName" class="sr-only">商品名称</label>
 <input type="text" id="pName" placeholder="如：五台山开光貔貅">
 <div class="row">
 <div><label>结缘价</label><input type="text" id="pPrice" placeholder="如：结缘 168"></div>
@@ -255,5 +261,7 @@ function switchTab(tab,el){
   });
 })();
 </script>
+</main>
+<script src="js/a11y-divination-hub.js" defer></script>
 </body>
 </html>
