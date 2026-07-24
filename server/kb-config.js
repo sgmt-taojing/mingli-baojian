@@ -73,6 +73,7 @@ const KB_LEVELS = {
   'nihaisha-batch3.js':               { level: 'professional', desc: '倪海厦知识库 Batch3（课程+笔记类）' },
   'nihaisha-batch4.js':               { level: 'professional', desc: '倪海厦知识库 Batch4（小文件）' },
   'nihaisha-classics-kb.js':          { level: 'professional', desc: '倪海厦典籍知识库（PDF提取）' },
+  'nihaisha-structured-kb.js':        { level: 'professional', desc: '倪海厦知识库结构化条目（118条·自动从33模块切分·R10审计产物）' },
   'nihaisha-tcm-kb.js':               { level: 'professional', desc: '倪海厦中医知识库全量移植版' },
   'nishan-knowledge.js':              { level: 'professional', desc: '倪海厦讲堂知识库（天纪命理+人纪中医）' },
   'tcm-diagnosis-kb.js':              { level: 'professional', desc: '中医诊疗知识库（症状→证候映射）' },

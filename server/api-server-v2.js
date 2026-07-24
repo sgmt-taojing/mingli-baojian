@@ -2000,10 +2000,16 @@ app.get('/api/kb/:filename', optionalAuth, (req, res) => {
 
   const fs = require('fs');
   const path = require('path');
-  const filePath = path.join(__dirname, '..', 'knowledge', filename);
-
+  // 优先读 knowledge/，fallback 到 server/kb-store/{level}/
+  let filePath = path.join(__dirname, '..', 'knowledge', filename);
   if (!fs.existsSync(filePath)) {
-    return apiResp(res, ERROR_CODES.NOT_FOUND, null, '文件不存在');
+    const level = (KB_LEVELS[filename] && KB_LEVELS[filename].level) || 'public';
+    const altPath = path.join(__dirname, 'kb-store', level, filename);
+    if (fs.existsSync(altPath)) {
+      filePath = altPath;
+    } else {
+      return apiResp(res, ERROR_CODES.NOT_FOUND, null, '文件不存在');
+    }
   }
 
   // 成功路径：直接返回 KB 文件内容（保持 .js 资源原样下发，不走 json 壳）
