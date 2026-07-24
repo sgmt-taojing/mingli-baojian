@@ -54,7 +54,14 @@ input:focus{border-color:var(--gold)}
 
 <div id="dashboard" class="hidden">
 <h1 id="dashTitle">🏪 商家后台</h1>
-<div class="tabs">
+<!-- 业务页面替换（F-9 Web Components）：tab 容器 -->
+<ml-tab active="0" id="merchantTab" align="left">
+  <ml-tab-pane label="📊 概览" data-tab="overview"></ml-tab-pane>
+  <ml-tab-pane label="📦 商品" data-tab="products"></ml-tab-pane>
+  <ml-tab-pane label="📋 订单" data-tab="orders"></ml-tab-pane>
+  <ml-tab-pane label="💰 收入" data-tab="income"></ml-tab-pane>
+</ml-tab>
+<div class="tabs" id="legacyMerchantTabs">
 <div class="tab active" onclick="switchTab('overview',this)">📊 概览</div>
 <div class="tab" onclick="switchTab('products',this)">📦 商品</div>
 <div class="tab" onclick="switchTab('orders',this)">📋 订单</div>
@@ -110,6 +117,9 @@ input:focus{border-color:var(--gold)}
 
 <script src="js/ui-toast.js" defer></script>
 <script src="js/toast-helper.js"></script>
+<!-- F-9 Web Components：toast + tab（已迁移；旧 ui-toast/toast-helper 保留兼容） -->
+<script src="components/toast.js"></script>
+<script src="components/tab.js"></script>
 <script>
 var currentMerchant=null;
 var currentTab='overview';
@@ -221,11 +231,29 @@ function loadOrders(){
 function switchTab(tab,el){
   currentTab=tab;
   document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
-  el.classList.add('active');
+  if(el) el.classList.add('active');
   ['overview','products','orders','income'].forEach(function(t){
     document.getElementById('tab-'+t).classList.toggle('hidden',t!==tab);
   });
+  // 同步 ml-tab
+  var idx = {overview:0,products:1,orders:2,income:3}[tab];
+  var mlTab = document.getElementById('merchantTab');
+  if(mlTab && typeof idx==='number') mlTab.setActive(idx);
 }
+</script>
+<ml-toast id="merchantToast" position="top"></ml-toast>
+<script>
+// ml-tab ↔ switchTab 桥接
+(function(){
+  var mlTab = document.getElementById('merchantTab');
+  if (!mlTab) return;
+  var labels = ['overview','products','orders','income'];
+  mlTab.addEventListener('tab-change', function(e){
+    var name = labels[e.detail.index] || 'overview';
+    var el = document.querySelectorAll('#legacyMerchantTabs .tab')[e.detail.index];
+    if (typeof switchTab === 'function') switchTab(name, el);
+  });
+})();
 </script>
 </body>
 </html>

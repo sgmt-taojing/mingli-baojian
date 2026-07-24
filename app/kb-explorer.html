@@ -66,7 +66,38 @@ body{background:var(--bg);color:var(--paper);font-family:-apple-system,BlinkMacS
 .kbe-hits-bar-val{flex:0 0 60px;text-align:right;font-size:13px;color:var(--gold);font-weight:600}
 .kbe-footnav{margin-top:30px;text-align:center;padding:20px;font-size:12px;opacity:.4;border-top:1px solid var(--line)}
 .kbe-footnav a{color:var(--gold);text-decoration:none;margin:0 8px}
-@media(max-width:768px){.kbe-stats{grid-template-columns:repeat(2,1fr)}.kbe-search{flex-direction:column;align-items:stretch}.kbe-modules{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}.kbe-engine{position:static;text-align:center;margin-top:10px}}
+/* ───────── R11-H2 倪师课程 tab ───────── */
+.kbe-nh-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:14px 16px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;margin-bottom:14px}
+.kbe-nh-toolbar .kbe-nh-label{font-size:12px;color:var(--paper3);letter-spacing:1px;margin-right:6px}
+.kbe-nh-chip{padding:6px 12px;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:16px;color:var(--paper3);font-size:12px;cursor:pointer;transition:.2s;user-select:none}
+.kbe-nh-chip:hover{border-color:var(--gold);color:var(--paper)}
+.kbe-nh-chip.active{background:rgba(201,168,76,.18);border-color:var(--gold);color:var(--gold);font-weight:600}
+.kbe-nh-grid{display:grid;gap:12px}
+.kbe-nh-card{padding:16px 18px;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:10px;transition:.2s;cursor:pointer;border-left:3px solid var(--gold)}
+.kbe-nh-card:hover{border-color:var(--gold);background:rgba(201,168,76,.06);transform:translateX(4px)}
+.kbe-nh-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.kbe-nh-id{font-size:11px;color:var(--paper3);opacity:.6;font-family:'SF Mono',Menlo,Consolas,monospace}
+.kbe-nh-source{padding:3px 10px;background:rgba(91,155,213,.15);color:var(--blue);border-radius:12px;font-size:11px;font-weight:600;letter-spacing:.5px}
+.kbe-nh-title{font-size:15px;color:var(--paper);font-weight:600;flex:1;line-height:1.4}
+.kbe-nh-snippet{font-size:13px;color:var(--paper3);line-height:1.7;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:6px}
+.kbe-nh-meta{display:flex;gap:14px;font-size:11px;color:var(--paper3);opacity:.6;margin-top:10px;flex-wrap:wrap}
+.kbe-nh-meta b{color:var(--gold);font-weight:600}
+.kbe-nh-pager{display:flex;justify-content:center;align-items:center;gap:8px;padding:18px 0 6px}
+.kbe-nh-pager button{min-width:36px;height:36px;padding:0 12px;background:rgba(255,255,255,.04);color:var(--paper);border:1px solid var(--line);border-radius:8px;font-size:13px;cursor:pointer;transition:.2s}
+.kbe-nh-pager button:hover:not(:disabled){border-color:var(--gold);background:rgba(201,168,76,.1)}
+.kbe-nh-pager button:disabled{opacity:.3;cursor:not-allowed}
+.kbe-nh-pager button.cur{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0a0a0f;border-color:var(--gold);font-weight:700}
+.kbe-nh-pager .kbe-nh-pinfo{margin:0 10px;font-size:12px;color:var(--paper3);letter-spacing:1px}
+.kbe-nh-empty{text-align:center;padding:60px 20px;color:var(--paper3);opacity:.5}
+.kbe-nh-empty-icon{font-size:50px;margin-bottom:14px;opacity:.3}
+.kbe-nh-summary{margin-bottom:14px;padding:12px 16px;background:rgba(201,168,76,.08);border:1px solid var(--gold);border-radius:8px;font-size:12px;color:var(--paper3);display:flex;gap:18px;flex-wrap:wrap}
+.kbe-nh-summary b{color:var(--gold)}
+.kbe-nh-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:999;display:none;align-items:center;justify-content:center;padding:20px}
+.kbe-nh-modal.open{display:flex}
+.kbe-nh-modal-body{background:var(--bg);border:1px solid var(--gold);border-radius:12px;max-width:780px;width:100%;max-height:82vh;overflow-y:auto;padding:24px}
+.kbe-nh-modal-body pre{white-space:pre-wrap;word-break:break-word;font-family:-apple-system,'PingFang SC',sans-serif;font-size:13px;line-height:1.8;color:var(--paper)}
+.kbe-nh-modal-close{float:right;background:transparent;border:none;color:var(--gold);font-size:22px;cursor:pointer}
+@media(max-width:768px){.kbe-stats{grid-template-columns:repeat(2,1fr)}.kbe-search{flex-direction:column;align-items:stretch}.kbe-modules{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}.kbe-engine{position:static;text-align:center;margin-top:10px}.kbe-nh-toolbar{flex-direction:column;align-items:stretch}.kbe-nh-pager{flex-wrap:wrap}}
 </style>
 </head>
 <body>
@@ -81,7 +112,7 @@ body{background:var(--bg);color:var(--paper);font-family:-apple-system,BlinkMacS
 <div class="kbe-stat"><div class="kbe-stat-label">📚 总条目</div><div class="kbe-stat-num" id="statTotal">—</div><div class="kbe-stat-sub">kb_formal</div></div>
 <div class="kbe-stat blue"><div class="kbe-stat-label">⭐ 高置信度</div><div class="kbe-stat-num" id="statHi">—</div><div class="kbe-stat-sub">trust ≥ 0.7</div></div>
 <div class="kbe-stat green"><div class="kbe-stat-label">🎯 总命中</div><div class="kbe-stat-num" id="statHits">—</div><div class="kbe-stat-sub">累计 hit_count</div></div>
-<div class="kbe-stat red"><div class="kbe-stat-label">📂 模块数</div><div class="kbe-stat-num" id="statMod">—</div><div class="kbe-stat-sub">多领域知识</div></div>
+<div class="kbe-stat red"><div class="kbe-stat-label">🩺 倪师条目</div><div class="kbe-stat-num" id="statNh">—</div><div class="kbe-stat-sub">倪海厦课程KB</div></div>
 </div>
 
 <div class="kbe-search">
@@ -90,10 +121,29 @@ body{background:var(--bg);color:var(--paper);font-family:-apple-system,BlinkMacS
 <button onclick="doSearch()">🔍 搜索</button>
 </div>
 
-<div class="kbe-tabs">
-<button class="kbe-tab active" data-tab="search" onclick="switchTab('search')">🔍 检索结果</button>
-<button class="kbe-tab" data-tab="modules" onclick="switchTab('modules')">📂 模块分布</button>
-<button class="kbe-tab" data-tab="hits" onclick="switchTab('hits')">🎯 命中统计</button>
+<!-- 业务页面替换（F-9 Web Components）：tab 容器 -->
+<ml-tab active="0" id="kbeTab" align="left">
+  <ml-tab-pane label="🔍 检索结果" data-tab="search">
+    <!-- 原 .kbe-tabs 内联按钮已迁移到 <ml-tab>；保留 .kbe-tab 样式作为兼容垫片 -->
+    <div class="kbe-tabs" hidden>
+      <button class="kbe-tab active" data-tab="search" onclick="switchTab('search')">🔍 检索结果</button>
+      <button class="kbe-tab" data-tab="modules" onclick="switchTab('modules')">📂 模块分布</button>
+      <button class="kbe-tab" data-tab="hits" onclick="switchTab('hits')">🎯 命中统计</button>
+    </div>
+  </ml-tab-pane>
+  <ml-tab-pane label="📂 模块分布" data-tab="modules"></ml-tab-pane>
+  <ml-tab-pane label="🎯 命中统计" data-tab="hits"></ml-tab-pane>
+  <ml-tab-pane label="🩺 倪师课程" data-tab="nihaisha">
+    <div id="nihaishaPanel">
+      <div class="kbe-loading">正在加载倪师课程 KB...</div>
+    </div>
+  </ml-tab-pane>
+</ml-tab>
+<div class="kbe-tabs" id="legacyKbeTabs">
+  <button class="kbe-tab active" data-tab="search" onclick="switchTab('search')">🔍 检索结果</button>
+  <button class="kbe-tab" data-tab="modules" onclick="switchTab('modules')">📂 模块分布</button>
+  <button class="kbe-tab" data-tab="hits" onclick="switchTab('hits')">🎯 命中统计</button>
+  <button class="kbe-tab" data-tab="nihaisha" onclick="switchTab('nihaisha')">🩺 倪师课程</button>
 </div>
 
 <div class="kbe-panel" id="tabPanel">
@@ -121,6 +171,12 @@ const API = (location.hostname === 'localhost' || location.hostname === '127.0.0
   ? 'http://127.0.0.1:8920' : '';
 let allModules = [];
 let currentTab = 'search';
+let nhList = [];
+let nhFilterSource = '全部';
+let nhFilterQ = '';
+let nhPage = 1;
+const NH_PAGE_SIZE = 12;
+const nhModalId = 'nhModal';
 
 function fmtNum(n){ return Number(n||0).toLocaleString('zh-CN'); }
 
@@ -131,13 +187,23 @@ async function fetchStats(){
     document.getElementById('statTotal').textContent = fmtNum(d.total);
     document.getElementById('statHi').textContent = fmtNum(d.hi_trust);
     document.getElementById('statHits').textContent = fmtNum(d.total_hits);
-    document.getElementById('statMod').textContent = (d.top_modules || []).length || 41;
+    const sm = document.getElementById('statMod'); if(sm) sm.textContent = (d.top_modules || []).length || 41;
     return d;
   }catch(e){
     document.getElementById('statTotal').textContent = '9173';
     document.getElementById('statHi').textContent = '—';
     document.getElementById('statHits').textContent = '—';
-    document.getElementById('statMod').textContent = '41';
+    const sm = document.getElementById('statMod'); if(sm) sm.textContent = '41';
+  }
+  await fetchNhCount();
+}
+
+async function fetchNhCount(){
+  try{
+    if(!nhList.length) await fetchNihaishaAll();
+    document.getElementById('statNh').textContent = fmtNum(nhList.length);
+  }catch(e){
+    document.getElementById('statNh').textContent = '—';
   }
 }
 
@@ -164,6 +230,186 @@ async function fetchHits(){
     const d = await r.json();
     return d;
   }catch(e){ return null; }
+}
+
+// ───────── R11-H2 倪师课程 KB ─────────
+function nhKbUrl(){
+  // 倪师结构化 118 条 KB（生产路径走 API 网关）
+  return API + '/api/kb/nihaisha-structured-entries.js';
+}
+
+async function fetchNihaishaAll(){
+  if(nhList.length) return nhList;
+  try{
+    // 加载脚本（设置 window.NIHAISHA_STRUCTURED）
+    await new Promise((resolve, reject)=>{
+      const s = document.createElement('script');
+      s.src = nhKbUrl();
+      s.async = false;
+      s.onload = ()=>resolve(true);
+      s.onerror = ()=>reject(new Error('加载倪师KB脚本失败'));
+      document.head.appendChild(s);
+    });
+    const data = window.NIHAISHA_STRUCTURED || [];
+    nhList = Array.isArray(data) ? data : [];
+    document.getElementById('statNh') && (document.getElementById('statNh').textContent = fmtNum(nhList.length));
+  }catch(e){
+    nhList = [];
+  }
+  return nhList;
+}
+
+function nhSourceList(){
+  const map = new Map();
+  nhList.forEach(it=>{
+    const s = it.source || '未知';
+    map.set(s, (map.get(s)||0)+1);
+  });
+  return Array.from(map.entries()).sort((a,b)=>b[1]-a[1]);
+}
+
+function nhFiltered(){
+  const q = (nhFilterQ||'').trim().toLowerCase();
+  return nhList.filter(it=>{
+    if(nhFilterSource !== '全部' && it.source !== nhFilterSource) return false;
+    if(!q) return true;
+    const blob = (it.name + ' ' + (it.source||'') + ' ' + (it.content||'')).toLowerCase();
+    return blob.indexOf(q) !== -1;
+  });
+}
+
+function setNhFilterSource(s){
+  nhFilterSource = s;
+  nhPage = 1;
+  renderNihaisha();
+}
+
+function setNhFilterQ(v){
+  nhFilterQ = v || '';
+  nhPage = 1;
+  renderNihaisha();
+}
+
+function setNhPage(p){
+  nhPage = p;
+  renderNihaisha();
+  // 滚到面板顶部
+  document.getElementById('nihaishaPanel')?.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function nhOpenModal(id){
+  const it = nhList.find(x=>x.id===id);
+  if(!it) return;
+  const html = `
+    <div class="kbe-nh-modal open" id="${nhModalId}" onclick="if(event.target===this)nhCloseModal()">
+      <div class="kbe-nh-modal-body">
+        <button class="kbe-nh-modal-close" onclick="nhCloseModal()">×</button>
+        <div style="margin-bottom:14px">
+          <div class="kbe-nh-id">${it.id}</div>
+          <div style="font-size:18px;color:var(--gold);font-weight:600;margin:6px 0">${escapeHtml(it.name||'')}</div>
+          <span class="kbe-nh-source">${escapeHtml(it.source||'')}</span>
+          <span class="kbe-mod-badge" style="margin-left:8px">${escapeHtml(it.level||'')}</span>
+        </div>
+        <pre>${escapeHtml(it.content||'')}</pre>
+      </div>
+    </div>`;
+  const wrap = document.createElement('div');
+  wrap.innerHTML = html;
+  document.body.appendChild(wrap.firstChild);
+}
+
+function nhCloseModal(){
+  const el = document.getElementById(nhModalId);
+  if(el) el.remove();
+}
+
+function escapeHtml(s){
+  return String(s==null?'':s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function renderNihaisha(){
+  const panel = document.getElementById('nihaishaPanel');
+  if(!panel) return;
+  if(!nhList.length){
+    panel.innerHTML = '<div class="kbe-loading">加载中…</div>';
+    fetchNihaishaAll().then(renderNihaisha);
+    return;
+  }
+  const sources = nhSourceList();
+  const filtered = nhFiltered();
+  const total = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total / NH_PAGE_SIZE));
+  if(nhPage > totalPages) nhPage = totalPages;
+  const startIdx = (nhPage-1) * NH_PAGE_SIZE;
+  const pageItems = filtered.slice(startIdx, startIdx + NH_PAGE_SIZE);
+
+  // 头部 summary
+  let html = '';
+  html += `<div class="kbe-nh-summary">
+    <span>📚 总条目：<b>${fmtNum(nhList.length)}</b></span>
+    <span>🎯 当前筛选：<b>${fmtNum(total)}</b></span>
+    <span>📂 来源分布：<b>${sources.length}</b> 个课程</span>
+    <span>📄 第 <b>${nhPage}</b> / ${totalPages} 页</span>
+  </div>`;
+
+  // 过滤工具条
+  html += '<div class="kbe-nh-toolbar">';
+  html += '<span class="kbe-nh-label">课程</span>';
+  html += `<span class="kbe-nh-chip ${nhFilterSource==='全部'?'active':''}" onclick="setNhFilterSource('全部')">全部 (${nhList.length})</span>`;
+  sources.forEach(([s, c])=>{
+    html += `<span class="kbe-nh-chip ${nhFilterSource===s?'active':''}" onclick="setNhFilterSource('${escapeHtml(s)}')">${escapeHtml(s)} (${c})</span>`;
+  });
+  html += '<span class="kbe-nh-label" style="margin-left:auto">🔍 搜索</span>';
+  html += `<input id="nhQInput" type="text" placeholder="输入关键词过滤…" value="${escapeHtml(nhFilterQ)}" style="padding:6px 10px;background:rgba(0,0,0,.4);color:var(--paper);border:1px solid var(--line);border-radius:6px;font-size:12px;width:160px" oninput="setNhFilterQ(this.value)" />`;
+  html += '</div>';
+
+  if(!total){
+    html += '<div class="kbe-nh-empty"><div class="kbe-nh-empty-icon">🩺</div><div>未找到匹配的倪师课程条目</div><div style="margin-top:14px;font-size:12px;opacity:.6">试试其他关键词或点击"全部"</div></div>';
+    panel.innerHTML = html;
+    return;
+  }
+
+  // 卡片列表
+  html += '<div class="kbe-nh-grid">';
+  pageItems.forEach(it=>{
+    const snippet = (it.content || '').slice(0, 220).replace(/\s+/g, ' ');
+    html += `<div class="kbe-nh-card" onclick="nhOpenModal('${it.id}')">
+      <div class="kbe-nh-head">
+        <span class="kbe-nh-id">${it.id}</span>
+        <span class="kbe-nh-source">${escapeHtml(it.source||'')}</span>
+        <span class="kbe-mod-badge">${escapeHtml(it.level||'实践')}</span>
+      </div>
+      <div class="kbe-nh-title">${escapeHtml(it.name||'')}</div>
+      <div class="kbe-nh-snippet">${escapeHtml(snippet)}</div>
+      <div class="kbe-nh-meta">
+        <span>📏 内容长度 <b>${fmtNum((it.content||'').length)}</b> 字</span>
+        <span>📑 来源：${escapeHtml(it.source||'')}</span>
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+
+  // 分页
+  if(totalPages > 1){
+    html += '<div class="kbe-nh-pager">';
+    html += `<button onclick="setNhPage(1)" ${nhPage===1?'disabled':''}>« 首页</button>`;
+    html += `<button onclick="setNhPage(${Math.max(1, nhPage-1)})" ${nhPage===1?'disabled':''}>‹ 上一页</button>`;
+    const winSize = 5;
+    let winStart = Math.max(1, nhPage - Math.floor(winSize/2));
+    let winEnd = Math.min(totalPages, winStart + winSize - 1);
+    if(winEnd - winStart < winSize - 1) winStart = Math.max(1, winEnd - winSize + 1);
+    for(let p = winStart; p <= winEnd; p++){
+      html += `<button class="${p===nhPage?'cur':''}" onclick="setNhPage(${p})">${p}</button>`;
+    }
+    html += `<button onclick="setNhPage(${Math.min(totalPages, nhPage+1)})" ${nhPage===totalPages?'disabled':''}>下一页 ›</button>`;
+    html += `<button onclick="setNhPage(${totalPages})" ${nhPage===totalPages?'disabled':''}>末页 »</button>`;
+    html += `<span class="kbe-nh-pinfo">第 ${startIdx+1}–${Math.min(startIdx+NH_PAGE_SIZE, total)} 条 / 共 ${total} 条</span>`;
+    html += '</div>';
+  }
+
+  panel.innerHTML = html;
 }
 
 async function doSearch(){
@@ -210,6 +456,11 @@ async function doSearch(){
 function switchTab(tab){
   currentTab = tab;
   document.querySelectorAll('.kbe-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
+  if(tab === 'nihaisha'){
+    document.getElementById('panelTitle').innerHTML = '倪师课程 <span class="panel-en">Nihaisha TCM KB</span>';
+    renderNihaisha();
+    return;
+  }
   const title = tab === 'search' ? '检索结果' : tab === 'modules' ? '模块分布' : '命中统计';
   const titleEn = tab === 'search' ? 'Search Results' : tab === 'modules' ? 'Modules' : 'Hit Stats';
   document.getElementById('panelTitle').innerHTML = title + ' <span class="panel-en">' + titleEn + '</span>';
@@ -261,7 +512,31 @@ document.getElementById('qInput').addEventListener('keypress', e=>{
 
 (async function init(){
   await fetchStats();
+  await fetchNihaishaAll();
   await fetchModules();
+})();
+</script>
+<!-- F-9 Web Components：toast + tab（已就绪） -->
+<script src="components/toast.js"></script>
+<script src="components/tab.js"></script>
+<ml-toast id="kbeToast" position="top"></ml-toast>
+<script>
+// ml-tab 与自定义 switchTab 双向桥接：兼容旧 onclick="switchTab('xx')"
+(function(){
+  const mlTab = document.getElementById('kbeTab');
+  if (!mlTab) return;
+  const tabMap = {search:0, modules:1, hits:2, nihaisha:3};
+  mlTab.addEventListener('tab-change', (e)=>{
+    const label = e.detail.label || '';
+    let name = 'search';
+    if (label.includes('模块')) name = 'modules';
+    else if (label.includes('命中')) name = 'hits';
+    else if (label.includes('倪师') || label.includes('🩺')) name = 'nihaisha';
+    if (typeof switchTab === 'function') switchTab(name);
+  });
+  window.__kbeSetTab = function(name){
+    if (typeof tabMap[name] === 'number') mlTab.setActive(tabMap[name]);
+  };
 })();
 </script>
 </body>
