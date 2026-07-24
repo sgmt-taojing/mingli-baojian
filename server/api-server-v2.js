@@ -597,7 +597,16 @@ app.post('/api/ai/chat', auth, async (req, res) => {
       body: JSON.stringify({ model, messages: [sysMsg, ...messages], max_tokens: 4096 })
     });
     const data = await response.json();
-    req.log.info({ module: 'ai', event: 'ai.invoke', provider: AI_PROVIDER, tokensIn: JSON.stringify(messages).length, tokensOut: JSON.stringify(data).length, durationMs: Date.now() - _aiAuthStart }, 'AI invoke complete');
+    // 剥离 reasoning_content（GLM / DeepSeek 类思考模型返回）—— 否则前端会把它当 content 回灌 hist
+    if (data && data.choices && Array.isArray(data.choices)) {
+      data.choices.forEach(c => {
+        if (c && c.message && c.message.reasoning_content) {
+          c.message.reasoning_content = undefined; // 不暴露给前端
+          delete c.message.reasoning_content;
+        }
+      });
+    }
+    req.log.info({ module: 'ai', event: 'ai.invoke', provider: AI_PROVIDER, tokensIn: data.usage?.prompt_tokens || 0, tokensOut: data.usage?.completion_tokens || 0, durationMs: Date.now() - _aiAuthStart }, 'AI invoke complete');
     return apiResp(res, ERROR_CODES.SUCCESS, data, 'ok');
   } catch (e) {
     logger.error({ module: 'ai', event: 'ai.error', provider: AI_PROVIDER, errorCode: 'AI_UNAVAILABLE', errMsg: e.message }, 'AI API错误');
@@ -902,12 +911,20 @@ app.post('/api/ai/public-chat', async (req, res) => {
       body: JSON.stringify({ model, messages: [{ role: "system", content: sysContent }, ...messages], max_tokens: 2048, temperature: 0.7 })
     });
     const data = await response.json();
+    // 剥离 reasoning_content —— 前端 hist 不能带思考过程
+    if (data && data.choices && Array.isArray(data.choices)) {
+      data.choices.forEach(c => {
+        if (c && c.message && c.message.reasoning_content) {
+          delete c.message.reasoning_content;
+        }
+      });
+    }
     if (data.error) {
       const lastMsg = messages.filter(m => m.role === "user").pop();
       return res.json({ choices: [{ message: { content: await _aiLocalResponse(lastMsg ? lastMsg.content : "", baziData) } }], _local: true, provider_error: data.error.message });
     }
     res.json(data);
-    req.log.info({ module: 'ai', event: 'ai.invoke', provider: AI_PROVIDER, tokensIn: JSON.stringify(messages).length, tokensOut: JSON.stringify(data).length, durationMs: Date.now() - _aiPubStart }, 'AI invoke complete');
+    req.log.info({ module: 'ai', event: 'ai.invoke', provider: AI_PROVIDER, tokensIn: data.usage?.prompt_tokens || 0, tokensOut: data.usage?.completion_tokens || 0, durationMs: Date.now() - _aiPubStart }, 'AI invoke complete');
   } catch (e) {
     logger.error({ module: 'ai', event: 'ai.error', provider: AI_PROVIDER, errorCode: 'AI_PUBLIC_UNAVAILABLE', errMsg: e.message }, 'AI API错误');
     const lastMsg = messages.filter(m => m.role === "user").pop();

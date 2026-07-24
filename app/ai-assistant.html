@@ -595,8 +595,8 @@ function addUser(text){
   d.innerHTML='<div class="b">'+esc(text)+'</div>';
   chat.appendChild(d);
   chat.scrollTop=chat.scrollHeight;
-  hist.push({role:'user',content:text});
-  if(hist.length>30)hist=hist.slice(-30);
+  hist.push({role:'user',content:text.substring(0,300)});
+  if(hist.length>20)hist=hist.slice(-20);
 }
 
 async function send(pre){
@@ -936,8 +936,12 @@ async function callAI(q){
   try{
     const r=await fetch(API+'/api/ai/public-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist.slice(-10)})});
     const d=await r.json();
-    const reply=(d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||'抱歉，暂时无法回答。';
+    const msg=d.choices&&d.choices[0]&&d.choices[0].message;
+    const reply=(msg&&msg.content)||'抱歉，暂时无法回答。';
     try{ t.remove(); }catch(_){} addAI(reply);
+    // hist 只存 content（不存 reasoning_content），并截断单条长度
+    hist.push({role:'assistant',content:reply.substring(0,500)});
+    if(hist.length>20)hist=hist.slice(-20);
   }catch(e){ try{ t.remove(); }catch(_){} addAI(local(q)); }
 }
 
