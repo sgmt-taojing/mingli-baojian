@@ -668,10 +668,24 @@ app.get('/api/ai/kb-hit-stats', async (req, res) => {
     const today = db.prepare(`SELECT COUNT(*) as cnt FROM kb_hit_log WHERE DATE(created_at) = DATE('now', 'localtime')`).get().cnt || 0;
     const topQueries = db.prepare(`SELECT query, COUNT(*) as cnt FROM kb_hit_log GROUP BY query ORDER BY cnt DESC LIMIT 10`).all();
     const bySource = db.prepare(`SELECT source, COUNT(*) as cnt FROM kb_hit_log GROUP BY source ORDER BY cnt DESC`).all();
-    
-    apiResp(res, ERROR_CODES.SUCCESS, { ok: true, total, today, topQueries, bySource }, 'ok');
+
+    // === #15 扩展：range / byModule / avgMs / hourlyHits ===
+    const range = String(req.query.range || '7d');
+    const rangeHours = range === '24h' ? 24 : range === '30d' ? 24 * 30 : 24 * 7;
+    const rangeClause = range === '24h'
+      ? `created_at >= datetime('now','localtime','-24 hours')`
+      : `created_at >= datetime('now','localtime','-${rangeHours} hours')`;
+    const byModule = db.prepare(`SELECT COALESCE(module,'(未分类)') as module, COUNT(*) as cnt FROM kb_hit_log WHERE ${rangeClause} GROUP BY module ORDER BY cnt DESC`).all();
+    const avgMsRow = db.prepare(`SELECT AVG(COALESCE(response_time,0)) as a, COUNT(response_time) as n FROM kb_hit_log WHERE ${rangeClause}`).get();
+    const avgMs = avgMsRow && avgMsRow.n > 0 ? Math.round(avgMsRow.a) : 0;
+    // 24h 小时桶（仅 range=24h 时填充为 24 项；其它 range 仍填充 24 桶但反映最近 24h）
+    const hourlyRows = db.prepare(`SELECT strftime('%H', created_at, 'localtime') as hh, COUNT(*) as cnt FROM kb_hit_log WHERE created_at >= datetime('now','localtime','-24 hours') GROUP BY hh`).all();
+    const hourlyMap = Object.fromEntries(hourlyRows.map(r => [r.hh, r.cnt]));
+    const hourlyHits = Array.from({length:24}, (_,i) => ({ hour: String(i).padStart(2,'0'), count: hourlyMap[String(i).padStart(2,'0')] || 0 }));
+
+    apiResp(res, ERROR_CODES.SUCCESS, { ok: true, total, today, topQueries, bySource, range, rangeHours, byModule, avgMs, hourlyHits }, 'ok');
   } catch (e) {
-    apiResp(res, ERROR_CODES.SUCCESS, { total: 0, today: 0, error: e.message }, 'ok');
+    apiResp(res, ERROR_CODES.SUCCESS, { total: 0, today: 0, byModule: [], avgMs: 0, hourlyHits: [], error: e.message }, 'ok');
   }
 });
 
