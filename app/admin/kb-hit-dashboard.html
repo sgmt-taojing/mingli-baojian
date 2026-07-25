@@ -71,6 +71,11 @@ tr:hover td{background:rgba(6,182,212,.05)}
       <option value="7d">最近 7 天</option>
       <option value="30d">最近 30 天</option>
     </select>
+    <label style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px">
+      时段
+      <input type="range" id="hourRange" min="0" max="4" value="4" step="1" style="width:100px;accent-color:var(--accent)">
+      <span id="hourRangeLabel" style="min-width:60px;font-size:11px;color:var(--accent2)">全天</span>
+    </label>
     <button onclick="loadData()">刷新</button>
     <button onclick="exportJSON()" style="background:var(--card);border:1px solid var(--line)">导出 JSON</button>
   </div>
@@ -204,13 +209,24 @@ function render(d) {
     chart.innerHTML = '<div class="empty">暂无数据</div>';
     labels.innerHTML = '';
   } else {
+    const hr = getHourRange();
+    const filtered = hr ? hh.filter(h => {
+      const hour = parseInt(h.hour, 10);
+      return hour >= hr[0] && hour < hr[1];
+    }) : hh;
+    const maxF = Math.max(1, ...filtered.map(h => h.count));
     chart.innerHTML = hh.map(h => {
-      const pct = Math.round(h.count * 100 / max);
-      const cls = h.count === 0 ? 'bar zero' : 'bar';
-      return '<div class="' + cls + '" style="height:' + Math.max(2, pct) + '%" title="' + h.hour + ':00 — ' + h.count + ' 次">' +
+      const hour = parseInt(h.hour, 10);
+      const inRange = !hr || (hour >= hr[0] && hour < hr[1]);
+      const pct = inRange ? Math.round(h.count * 100 / maxF) : 0;
+      const cls = !inRange ? 'bar zero' : (h.count === 0 ? 'bar zero' : 'bar');
+      const opacity = inRange ? '' : 'opacity:0.25;';
+      return '<div class="' + cls + '" style="height:' + Math.max(2, pct) + '%;' + opacity + '" title="' + h.hour + ':00 — ' + h.count + ' 次">' +
              '<span class="tip">' + h.hour + ':00 · ' + h.count + ' 次</span></div>';
     }).join('');
     labels.innerHTML = hh.map(h => '<span>' + (h.hour % 6 === 0 ? h.hour : '') + '</span>').join('');
+    const filteredTotal = filtered.reduce((s, h) => s + h.count, 0);
+    document.getElementById('hourly-badge').textContent = filteredTotal + ' 次' + (hr ? ' (' + hr[0] + ':00-' + hr[1] + ':00)' : '');
   }
 }
 
@@ -224,6 +240,20 @@ function exportJSON() {
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+
+function getHourRange() {
+  const v = parseInt(document.getElementById('hourRange').value, 10);
+  const ranges = {0:[0,6], 1:[6,12], 2:[12,18], 3:[18,24]};
+  return ranges[v] || null; // 4 = all
+}
+function updateHourRangeLabel() {
+  const v = parseInt(document.getElementById('hourRange').value, 10);
+  const labels = ['0:00-6:00', '6:00-12:00', '12:00-18:00', '18:00-24:00', '全天'];
+  document.getElementById('hourRangeLabel').textContent = labels[v];
+  // re-render chart without refetch
+  if (lastData) render(lastData);
+}
+document.getElementById('hourRange').addEventListener('input', updateHourRangeLabel);
 
 // auto-load
 loadData();
