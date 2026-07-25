@@ -170,17 +170,47 @@ async function renderYuanzhu(c){
     `</div>` + casesHtml;
 }
 
+// #13 节点 3：分页状态（push / reports / kb 共享分页器）
+const _pg = { push:{limit:10,offset:0}, reports:{limit:10,offset:0}, kb:{limit:10,offset:0,q:''} };
+function _pagerHtml(key, total){
+  const p=_pg[key]; const totalPages = Math.max(1, Math.ceil((total||0)/p.limit));
+  const cur = Math.floor(p.offset/p.limit)+1;
+  return `<div style="display:flex;gap:8px;justify-content:center;margin-top:10px">
+    <button class="btn" style="padding:4px 10px;font-size:12px" onclick="(function(){if(_pg.${key}.offset>0){_pg.${key}.offset-=_pg.${key}.limit;loadTab('${key==='push'?'push':key==='reports'?'reports':'kb'});}})()" ${cur<=1?'disabled':''}>‹ 上一页</button>
+    <span style="font-size:12px;color:var(--paper3);align-self:center">第 ${cur}/${totalPages} 页（${total||0} 条）</span>
+    <button class="btn" style="padding:4px 10px;font-size:12px" onclick="(function(){if(_pg.${key}.offset+_pg.${key}.limit<${total||0}){_pg.${key}.offset+=_pg.${key}.limit;loadTab('${key==='push'?'push':key==='reports'?'reports':'kb'}');}})()" ${cur>=totalPages?'disabled':''}>下一页 ›</button>
+  </div>`;
+}
+
+// #13 节点 3：TTS 试听（节点 4.13 voices → 调 /api/tts 试听 1 句）
+async function _ttsPreview(voiceId, name){
+  if(!voiceId) return;
+  toast('🔊 试听 '+name+'…');
+  try {
+    const text = encodeURIComponent('你好，我是'+name+'。欢迎使用命理宝鉴。');
+    const url = '/api/tts?text='+text+'&voice='+encodeURIComponent(voiceId);
+    const audio = new Audio(url);
+    audio.volume = 0.8;
+    audio.onended = ()=>toast('✅ 试听完成');
+    audio.onerror = ()=>toast('⚠️ TTS 服务不可用');
+    await audio.play();
+  } catch(e){ toast('⚠️ TTS 不可用: '+e.message); }
+}
+// 暴露给 inline onclick
+window._ttsPreview = _ttsPreview;
+
 async function renderPush(c){
-  const r = await api('/api/yuanzhu/yearly-pushes');
-  // 语音列表（节点 #4.13）：辅助展示可选声音
+  const p = _pg.push;
+  const r = await api('/api/yuanzhu/yearly-pushes?limit='+p.limit+'&offset='+p.offset);
+  // 语音列表（节点 #4.13）：辅助展示可选声音 + TTS 试听
   let voicesHtml = '';
   try {
     const vs = await api('/api/voices');
     if(vs && Array.isArray(vs.voices) && vs.voices.length){
-      voicesHtml = `<div class="card"><h3>🎤 语音选择 (${vs.voices.length})</h3>` +
-        vs.voices.slice(0,12).map(v=>{
+      voicesHtml = `<div class="card"><h3>🎤 语音试听 (${vs.voices.length})</h3>` +
+        vs.voices.slice(0,8).map(v=>{
           const gender = v.gender==='female' ? '👩' : v.gender==='male' ? '👨' : '🎙️';
-          return `<div class="row"><span class="label">${gender} ${v.name}·${v.style||''}</span><span class="val">${v.id.replace('zh-CN-','')}</span></div>`;
+          return `<div class="row"><span class="label">${gender} ${v.name}·${v.style||''}</span><span class="val"><button class="btn" style="padding:3px 10px;font-size:11px" onclick="_ttsPreview('${v.id}','${(v.name||'').replace(/'/g,'’')}')">▶ 试听</button></span></div>`;
         }).join('') +
         `</div>`;
     }
@@ -190,22 +220,23 @@ async function renderPush(c){
     c.innerHTML = `<div class="empty">${r.error}</div>` + voicesHtml;
     return;
   }
-  const list = (r.pushes||[]).slice(0,20);
+  const total = r.total || (r.pushes||[]).length;
+  const list = (r.pushes||[]).slice(0, p.limit);
   if(!list.length){
     // 公开接口
     const pub = await api('/api/public/latest-pushes');
     if(pub && pub.pushes){
       c.innerHTML = `<div class="card"><h3>📨 最新推送</h3>` +
-        pub.pushes.slice(0,10).map(p=>`<div class="row"><span class="label">${(p.title||'').substring(0,30)}</span><span class="val">${p.date||''}</span></div>`).join('') +
+        pub.pushes.slice(0,p.limit).map(p=>`<div class="row"><span class="label">${(p.title||'').substring(0,30)}</span><span class="val">${p.date||''}</span></div>`).join('') +
         `</div>` + voicesHtml;
       return;
     }
     c.innerHTML = `<div class="empty">暂无推送</div>` + voicesHtml;
     return;
   }
-  c.innerHTML = `<div class="card"><h3>📨 我的年度推送 (${list.length})</h3>` +
+  c.innerHTML = `<div class="card"><h3>📨 我的年度推送 (${total})</h3>` +
     list.map(p=>`<div class="row"><span class="label">${(p.title||'').substring(0,30)}</span><span class="val">${(p.createdAt||'').substring(0,10)}</span></div>`).join('') +
-    `</div>` + voicesHtml;
+    `</div>` + voicesHtml + _pagerHtml('push', total);
 }
 
 async function renderPoints(c){
@@ -246,13 +277,15 @@ async function renderPoints(c){
 }
 
 async function renderReports(c){
-  const r = await api('/api/clinic/my-reports');
+  const p = _pg.reports;
+  const r = await api('/api/clinic/my-reports?limit='+p.limit+'&offset='+p.offset);
   if(r.error){c.innerHTML = `<div class="empty">${r.error==='未登录'?'请先登录':'暂无病历'}，<a href="tcm-clinic.html" style="color:var(--gold)">去中医诊所</a></div>`;return;}
-  const list = r.reports || [];
+  const total = r.total || (r.reports||[]).length;
+  const list = (r.reports||[]).slice(0, p.limit);
   if(!list.length){c.innerHTML = `<div class="empty">暂无病历报告，<a href="tcm-clinic.html" style="color:var(--gold)">提交一份</a></div>`;return;}
-  c.innerHTML = `<div class="card"><h3>📋 我的病历报告 (${list.length})</h3>` +
-    list.slice(0,10).map(rep=>`<div class="row"><span class="label">${(rep.diagnosis||rep.title||'').substring(0,30)}</span><span class="val">${(rep.createdAt||'').substring(0,10)}</span></div>`).join('') +
-    `</div>`;
+  c.innerHTML = `<div class="card"><h3>📋 我的病历报告 (${total})</h3>` +
+    list.map(rep=>`<div class="row"><span class="label">${(rep.diagnosis||rep.title||'').substring(0,30)}</span><span class="val">${(rep.createdAt||'').substring(0,10)}</span></div>`).join('') +
+    `</div>` + _pagerHtml('reports', total);
 }
 
 async function renderShop(c){
@@ -260,12 +293,27 @@ async function renderShop(c){
   const list = (r&&r.products)||[];
   if(!list.length){c.innerHTML = `<div class="empty">商城暂未开放</div>`;return;}
   c.innerHTML = `<div class="card"><h3>🛍️ 商品列表 (${list.length})</h3>` +
-    list.slice(0,20).map(p=>`<div class="row"><span class="label">${p.name}</span><span class="val">¥${p.price||0}</span></div>`).join('') +
+    list.slice(0,20).map(p=>{
+      const pid = (p.id||'').replace(/'/g,"’");
+      const pname = (p.name||'').replace(/'/g,"’");
+      return `<div class="row"><span class="label">${p.name} <small style="color:var(--paper3)">·${p.merchant||''}</small></span><span class="val"><b style="color:var(--gold)">¥${p.price||0}</b> <button class="btn" style="padding:3px 10px;font-size:11px" onclick="_buy('${pid}','${pname}',${p.price||0})" ${token?'':'disabled title="请先登录"'}>购买</button></span></div>`;
+    }).join('') +
     `</div>`;
 }
 
+// #13 节点 3：购买流程（调 /api/order/create，依赖登录态）
+async function _buy(productId, productName, amount){
+  if(!token){ toast('请先登录后再购买'); switchTab('profile'); return; }
+  if(!confirm(`确认下单：\n\n商品：${productName}\n金额：¥${amount}\n\n继续？`)) return;
+  try {
+    const r = await api('/api/order/create', { method:'POST', body: JSON.stringify({ productId, productName, amount, merchantId: 0 }) });
+    if(r && r.ok){ toast('✅ '+r.message); }
+    else { toast('⚠️ 下单失败: '+(r&&r.error||'未知错误')); }
+  } catch(e){ toast('⚠️ 网络异常: '+e.message); }
+}
+window._buy = _buy;
+
 async function renderKb(c){
-  const r = await api('/api/kb/list');
   // 课程列表（节点 #4.12）：辅助展示
   let coursesHtml = '';
   try {
@@ -285,24 +333,57 @@ async function renderKb(c){
     }
   } catch(e){ /* 静默兜底 */ }
 
+  // #13 节点 3：KB 搜索（输入关键字调 /api/public/kb/search?q=...）
+  const p = _pg.kb;
+  if(p.q){
+    const sr = await api('/api/public/kb/search?q='+encodeURIComponent(p.q)+'&limit='+p.limit+'&offset='+p.offset);
+    const results = (sr && sr.results) || [];
+    c.innerHTML = `<div class="card"><h3>🔍 搜索 “${p.q}” (${results.length})</h3>
+      <input id="kbSearchInput" placeholder="搜索关键字（例：肝火、失眠、奇门）" value="${(p.q||'').replace(/"/g,'&quot;')}" style="width:100%;padding:8px;background:var(--ink3);border:1px solid var(--border);border-radius:8px;color:var(--paper);margin-bottom:10px">
+      <button class="btn" style="width:100%;margin-bottom:12px" onclick="_kbSearchGo()">搜索</button>
+      ${results.length===0?'<div class="empty">无匹配结果</div>':results.map(r=>`<div style="padding:10px;border-bottom:1px solid var(--border);font-size:12px"><div style="color:var(--gold);margin-bottom:4px">${r.module}·${r.title}</div><div style="color:var(--paper3);line-height:1.5">${(r.snippet||'').replace(/</g,'&lt;').substring(0,160)}…</div><div style="color:var(--paper3);font-size:10px;margin-top:4px">trust ${r.trust_score}·hit ${r.hit_count||0}</div></div>`).join('')}
+      </div>` + _pagerHtml('kb', sr && sr.total || results.length);
+    const inp = document.getElementById('kbSearchInput');
+    if(inp){ inp.addEventListener('keydown', e=>{ if(e.key==='Enter') _kbSearchGo(); }); }
+    return;
+  }
+
+  const r = await api('/api/kb/list');
   if(r.error){
-    // 兜底：直接列出项目 KB
     const fallback = [
       {name:'倪海厦中医课程',modules:34,chars:151135},
       {name:'舒晗奇门遁甲课程',modules:32,chars:151135},
       {name:'中医诊断',modules:'-',chars:'-'},
       {name:'中医名方',modules:'-',chars:'-'},
     ];
-    c.innerHTML = `<div class="card"><h3>📚 知识库（${fallback.length} 套）</h3>` +
+    c.innerHTML = `<div class="card"><h3>📚 知识库（${fallback.length} 套）</h3>
+      <input id="kbSearchInput" placeholder="搜索关键字（例：肝火、失眠、奇门）" style="width:100%;padding:8px;background:var(--ink3);border:1px solid var(--border);border-radius:8px;color:var(--paper);margin-bottom:10px">
+      <button class="btn" style="width:100%;margin-bottom:12px" onclick="_kbSearchGo()">搜索</button>` +
       fallback.map(k=>`<div class="row"><span class="label">${k.name}</span><span class="val">${k.modules} 模块</span></div>`).join('') +
       `</div>` + coursesHtml;
+    const inp = document.getElementById('kbSearchInput');
+    if(inp){ inp.addEventListener('keydown', e=>{ if(e.key==='Enter') _kbSearchGo(); }); }
     return;
   }
   const list = r.kb || [];
-  c.innerHTML = `<div class="card"><h3>📚 知识库（${list.length} 套）</h3>` +
+  c.innerHTML = `<div class="card"><h3>📚 知识库（${list.length} 套）</h3>
+    <input id="kbSearchInput" placeholder="搜索关键字（例：肝火、失眠、奇门）" style="width:100%;padding:8px;background:var(--ink3);border:1px solid var(--border);border-radius:8px;color:var(--paper);margin-bottom:10px">
+    <button class="btn" style="width:100%;margin-bottom:12px" onclick="_kbSearchGo()">搜索</button>` +
     list.map(k=>`<div class="row"><span class="label">${k.name}</span><span class="val">${k.modules||'-'} 模块</span></div>`).join('') +
     `</div>` + coursesHtml;
+  const inp = document.getElementById('kbSearchInput');
+  if(inp){ inp.addEventListener('keydown', e=>{ if(e.key==='Enter') _kbSearchGo(); }); }
 }
+
+// #13 节点 3：KB 搜索触发
+function _kbSearchGo(){
+  const inp = document.getElementById('kbSearchInput');
+  const v = (inp && inp.value || '').trim();
+  _pg.kb.q = v;
+  _pg.kb.offset = 0;
+  loadTab('kb');
+}
+window._kbSearchGo = _kbSearchGo;
 
 async function login(){
   const phone = document.getElementById('phone').value.trim();
