@@ -3,7 +3,9 @@
 > **维护原则**：每个任务按工作流 22 节点推进；完成一个自动拉下一个；阻塞项标红等待决策。
 > **断点机制**：每个进行中任务必须记录"当前节点 + 产出物 + 下一步"，心跳只看这一页就能续推。
 > **顶层架构**：见 MECHANISM.md（本项目根目录）
-> **最后更新**：2026-07-25 09:12（R15 KB 6 模块补强终态 ✅ — 4 路 subagent 并行完成 + 2 路前置 worker：acupuncture 304 / tcm 405 / tcm-fangji 326 / shanghan-lun 307 / tcm-zhongfu 100 / shuhan 541 = 1983 条；KB 总 11,648→12,538 / 49→52 模块 / r15-* 890 条；commit `2236ee7` + 同步 gh-pages；验收脚本 scripts/r15-verify.sh 7 维度全绿；Jest 504/504 绿；acorn 60+ HTML 0 errors）
+> **最后更新**：2026-07-25 10:05（#13 节点 3 my-yuanzhu 4 项增强落地 ✅ — commit `839d8a2`）
+
+> **R15 KB 补强终态（2026-07-25 09:12）**：
 
 > **R15 KB 补强终态（2026-07-25 09:12）**：
 > - **4 路 subagent 派工完成**：Worker 1 tcm-fangji 82→326 / Worker 2 tcm 296→405 / Worker 3 tcm-zhongfu 0→100 / Worker 4 shanghan-lun 162→307
@@ -100,18 +102,19 @@
 
 ## 进行中 🔄
 
-### #13 · H5 API 暴露给前端（≥12 个）· 2026-07-25 08:00 🚀
+### #13 · H5 API 暴露给前端（≥12 个）· 2026-07-25 10:05 ✅
 
 | 字段 | 值 |
 |------|---|
 | 优先级 | P0（AGENTS.md 强化任务 P0-任务2） |
 | 规范引用 | AGENTS.md / 后端 api-server-v2.js |
-| 节点进度 | **1/N 进行中**（节点 1 审计） |
-| 当前节点 | **13.1 H5 API 暴露现状审计** |
-| 下一步动作 | 节点 1 Worker 已派（childSessionKey `1a093be2-7b5d-4133-82fb-6e0541632bed`）→ 审计后端路由表 + 12 API 对照 + my-yuanzhu.html 现状 + H5 调用矩阵 |
+| 节点进度 | **3/3 ✅**（节点 1 + 2 + 3 全完结） |
+| 当前节点 | **完结 ✅ → 启动下一 P0 候选** |
+| 下一步动作 | **拉下一 P0 候选**：① music/lifeindex/lifeplan 断网 KB 兜底（P1-任务3） ② lifeplan 蓝图化（P1-任务4） ③ 暴露后台 API 增强迭代 |
 | 目标 12 API | yuanzhu/list / profile / yearly-pushes / public/latest-pushes / feedback/points / public/stats / public/recent-cases / shop/products / voices / kb/list / courses / clinic/my-reports |
+| 完成节点 | **13.1 — H5 API 暴露现状审计 ✅**（docs/H5_API_EXPOSURE_AUDIT_v1.md 504 行 / 24,622B / 130 路由审计 / 12 API 缺口分析）<br>**13.2 — API 缺口修补 + H5 my-yuanzhu.html 落地 ✅**（commit `21b9124` + docs/H5_API_NODE_2_REPORT.md 271 行 / 10,560B / 新增 `GET /api/admin/yuanzhu/profile` 路由 / 13/13 端点全可达）<br>**13.3 — H5 my-yuanzhu.html 4 项增强 ✅**（commit `839d8a2`：购买 + KB 搜索 + 分页 + TTS 试听 / 420 行 +100/-19 / 2 个 inline 脚本块 Function 语法 OK / HTTP 200） |
 | 阻塞 | 无 |
-| 最后更新 | 2026-07-25 08:00 |
+| 最后更新 | 2026-07-25 10:05 |
 
 ### ~~#12 · 文档即代码（索引 + 失效告警）~~ 2026-07-25 06:32 ✅
 
