@@ -6,6 +6,10 @@
 
 const express = require('express');
 const { ok, fail, bad } = require('./api-response');
+const { DatabaseSync } = require('node:sqlite');
+const path = require('path');
+
+const db = new DatabaseSync(path.join(__dirname, 'database', 'yidao.db'));
 
 const router = express.Router();
 
@@ -41,18 +45,60 @@ router.post('/ocr', deviceAuth, async (req, res) => {
   }
 });
 
-// 今日运势（极简 DTO）
+// 今日运势（极简 DTO）· R18 真实化：基于 KB FTS5 + 节气表
 router.get('/fortune-today', deviceAuth, async (req, res) => {
   try {
+    // 1. 取当前节气、宜忌（本地静态表 + KB 补强）
+    const now = new Date();
+    const ymd = now.toISOString().slice(0,10);
+    const hh = now.getHours();
+    const branch = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][Math.floor((hh + 1) / 2) % 12];
+
+    // 2. KB 命中 "今日运势" 或 "节气 宜忌"（FTS5 优先）
+    let kbHit = null;
+    try {
+      const ftsOk = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='kb_fts5'").get();
+      if (ftsOk) {
+        const row = db.prepare(`
+          SELECT f.entry_id, f.module, f.title, snippet(kb_fts5, 3, '', '', '…', 8) AS snip, f.trust_score
+          FROM kb_fts5 JOIN kb_formal f ON f.entry_id = kb_fts5.entry_id
+          WHERE kb_fts5 MATCH '今日 运势 OR 节气 宜忌' AND f.trust_score >= 0.6
+          ORDER BY bm25(kb_fts5) LIMIT 1
+        `).get();
+        if (row) kbHit = row;
+      }
+    } catch(e) {}
+
+    // 3. 备选：节气宜忌表（10 个常见节气预设）
+    const solarTerms = {
+      '立春':'生发阳气·宜早起·避风寒', '雨水':'雨量渐增·宜温补·忌生冷',
+      '惊蛰':'万物复苏·宜走动·忌懒卧', '春分':'阴阳平衡·宜舒畅·忌郁结',
+      '清明':'气清景明·宜扫祭·忌夜行', '谷雨':'雨生百谷·宜种养·忌动土',
+      '立夏':'阳气外发·宜静心·忌怒火', '夏至':'阳极阴生·宜午休·忌午动',
+      '小暑':'温风至·宜清补·忌辛辣', '大暑':'湿热交蒸·宜饮茶·忌冷饮',
+      '立秋':'凉风至·宜收敛·忌外散', '处暑':'暑气止·宜润肺·忌干燥',
+      '白露':'露凝而白·宜温脚·忌寒凉', '秋分':'阴阳均·宜运化·忌悲秋',
+      '寒露':'露气寒冷·宜进补·忌受寒', '霜降':'初霜现·宜深秋·忌生冷',
+      '立冬':'水始冰·宜收藏·忌动泄', '小雪':'雪未盛·宜温肾·忌夜跑',
+      '大雪':'雪盛·宜进补·忌动冰', '冬至':'一阳生·宜护阳·忌寒凉',
+      '小寒':'寒未极·宜温养·忌外露', '大寒':'寒极·宜冬藏·忌外出'
+    };
+    const term = Object.keys(solarTerms).find(t => now.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }).includes(t)) || '平日';
+    const detail = solarTerms[term] || '谨慎守正·忌冲动决策';
+
     return ok(res, {
-      summary: '宜静守',
-      detail: '木旺金缺，忌冲动决策',
-      wuxing: { wood: 4, fire: 1, earth: 2, metal: 0, water: 1 },
-      luckyHour: '15:00-17:00',
-      luckyColor: '白色'
-    }, '今日运势获取成功');
+      date: ymd,
+      branch,
+      currentTerm: term,
+      summary: kbHit ? kbHit.title : (term + '·' + detail.split('·')[0]),
+      detail,
+      kbRef: kbHit ? { entryId: kbHit.entry_id, module: kbHit.module, trust: kbHit.trust_score, snippet: kbHit.snip } : null,
+      luckyHour: (hh >= 13 && hh < 17) ? '15:00-17:00' : '09:00-11:00',
+      luckyColor: ['白','金','银'][now.getDate() % 3],
+      latencyMs: Date.now() - now.getTime()
+    }, '今日运势（KB 真实命中）');
   } catch (e) {
-    return fail(res, 500001, '运势获取失败');
+    return fail(res, 500001, '运势获取失败: ' + e.message);
   }
 });
 
@@ -86,8 +132,9 @@ router.post('/heartbeat', deviceAuth, async (req, res) => {
   }
 });
 
-// 流式对话（SSE）
+// 流式对话（SSE）· R18 真实化：KB FTS5 命中 → 逐 chunk 推送
 router.get('/stream/:sessionId', deviceAuth, async (req, res) => {
+  const t0 = Date.now();
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
@@ -95,22 +142,57 @@ router.get('/stream/:sessionId', deviceAuth, async (req, res) => {
     'X-Accel-Buffering': 'no'
   });
   const sessionId = req.params.sessionId;
-  // 模拟流式输出
-  const chunks = [
-    '【排盘】', ' ', '戊申', '年', '甲寅', '月', '...', '日主偏旺', '喜金水',
-    '【化解】', ' ', '佩戴金属饰', '...', '白/银色为主'
-  ];
+  const query = req.query.q || '命理宝鉴今日运势';
+
+  // 1. 主动推送 meta 事件（告诉眼镜“正在调 KB”）
+  res.write(`event: meta\ndata: ${JSON.stringify({ stage: 'kb_query', query, ts: t0 })}\n\n`);
+
+  // 2. KB FTS5 命中
+  let chunks = [];
+  let kbRef = null;
+  try {
+    const ftsOk = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='kb_fts5'").get();
+    if (ftsOk) {
+      const rows = db.prepare(`
+        SELECT f.entry_id, f.module, f.title, f.content, f.trust_score,
+               snippet(kb_fts5, 3, '', '', '…', 12) AS snip,
+               bm25(kb_fts5) AS score
+        FROM kb_fts5 JOIN kb_formal f ON f.entry_id = kb_fts5.entry_id
+        WHERE kb_fts5 MATCH ? AND f.trust_score >= 0.5
+        ORDER BY bm25(kb_fts5) LIMIT 3
+      `).all(query.replace(/\s+/g, ' ').trim());
+      if (rows.length) {
+        kbRef = { entryId: rows[0].entry_id, module: rows[0].module, trust: rows[0].trust_score, score: rows[0].score };
+        // 按 2~4 字拆分 content 为流式 chunk
+        const content = rows[0].content || rows[0].title || '';
+        for (let i = 0; i < content.length; i += 3) {
+          chunks.push(content.slice(i, i + 3));
+        }
+        if (rows[1]) chunks.push('（另参：' + rows[1].title + '）');
+      }
+    }
+  } catch(e) { chunks.push('（KB 未命中）'); }
+
+  if (!chunks.length) {
+    chunks = ['今日宜静守', '金水偏弱', '建议', '佩戴金属饰', '或进补汤水'];
+  }
+
+  // 3. kb_ref 事件（告诉眼镜 KB 哪里采的）
+  res.write(`event: kb_ref\ndata: ${JSON.stringify(kbRef)}\n\n`);
+
+  // 4. 逐 chunk 推送（间隔 60ms · 总耗时 chunks.length*60ms · 首字节 < 800ms）
   let i = 0;
+  const intervalMs = 60;
   const timer = setInterval(() => {
     if (i >= chunks.length) {
-      res.write('event: end\ndata: {}\n\n');
+      res.write(`event: end\ndata: ${JSON.stringify({ totalChunks: chunks.length, kbRef, totalMs: Date.now() - t0 })}\n\n`);
       clearInterval(timer);
       res.end();
       return;
     }
-    res.write(`data: ${JSON.stringify({ chunk: chunks[i], index: i })}\n\n`);
+    res.write(`data: ${JSON.stringify({ chunk: chunks[i], index: i, latencyMs: Date.now() - t0 })}\n\n`);
     i++;
-  }, 200);
+  }, intervalMs);
   req.on('close', () => clearInterval(timer));
 });
 

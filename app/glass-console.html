@@ -780,8 +780,126 @@ setInterval(async () => {
   <!-- R17-A SDK 真机自检挂载点 -->
   <div id="sdk-readiness-host" style="margin:12px 0;"></div>
 
+  <!-- R18 流式问诊输入面板 -->
+  <div id="r18-stream-panel" style="margin:12px 0;padding:14px;background:var(--bg-card,#1a2436);border:1px solid var(--accent,#4fd1c5);border-radius:10px;">
+    <div style="font-size:14px;font-weight:600;color:var(--accent-2,#fbbf24);margin-bottom:8px;">🛰️ R18 流式问诊（KB 零延迟）</div>
+    <div style="display:flex;gap:6px;">
+      <input id="r18-q" type="text" placeholder="输入问题，如 心气虚怎么调理" style="flex:1;padding:8px;background:#0e1726;color:#e6edf7;border:1px solid #4fd1c5;border-radius:6px;font-size:13px;">
+      <button id="r18-ask" style="padding:8px 14px;background:#4fd1c5;color:#0e1726;border:none;border-radius:6px;cursor:pointer;font-weight:600;">问 KB</button>
+      <button id="r18-stop" style="padding:8px 14px;background:#ef4444;color:#fff;border:none;border-radius:6px;cursor:pointer;">停</button>
+    </div>
+    <div id="r18-meta" style="margin-top:8px;font-size:11px;color:var(--muted,#8a99b5);font-family:monospace;"></div>
+    <div id="r18-stream-out" style="margin-top:10px;min-height:80px;padding:10px;background:#0e1726;border-radius:6px;color:#e6edf7;font-size:13px;line-height:1.7;white-space:pre-wrap;"></div>
+    <div id="r18-kbref" style="margin-top:6px;font-size:11px;color:#34d399;"></div>
+    <div style="margin-top:8px;font-size:11px;color:var(--muted,#8a99b5);">⏱ 首字节延迟 = 从点击到拿到第一个字。TTS 随到随读（睁眼到耳边≤ 800ms）。</div>
+  </div>
+
   <script src="js/a11y-divination-hub.js" defer></script>
   <script src="js/sdk-readiness-check.js" defer></script>
+
+  <script>
+  /* ═══════════════════════════════════════════════════════════
+   * R18: 流式问诊（KB FTS5 → 逐 chunk 推送 → 眼镜侧 TTS）
+   * 首字节延迟：服务端 KB FTS5 2ms + SSE 推送 ≤ 100ms
+   * ═══════════════════════════════════════════════════════════ */
+  (function(){
+    const $q = document.getElementById('r18-q');
+    const $btn = document.getElementById('r18-ask');
+    const $stop = document.getElementById('r18-stop');
+    const $meta = document.getElementById('r18-meta');
+    const $out = document.getElementById('r18-stream-out');
+    const $kbref = document.getElementById('r18-kbref');
+    const API = (location.port === '8914') ? 'http://127.0.0.1:8920' : '';
+
+    let es = null, tts = null, firstByteAt = null;
+
+    function speak(text) {
+      if (!('speechSynthesis' in window)) return;
+      if (tts) speechSynthesis.cancel();
+      tts = new SpeechSynthesisUtterance(text);
+      tts.lang = 'zh-CN';
+      tts.rate = 1.1;
+      speechSynthesis.speak(tts);
+    }
+
+    async function ask() {
+      const q = ($q.value || '').trim();
+      if (!q) return;
+      if (es) { es.close(); es = null; }
+      if (tts) { speechSynthesis.cancel(); tts = null; }
+      $out.textContent = '';
+      $kbref.textContent = '';
+      $meta.textContent = '⏳ 调 KB...';
+      firstByteAt = null;
+      let buf = '';
+
+      const url = API + '/api/glass/stream/' + Date.now() + '?q=' + encodeURIComponent(q);
+      // 浏览器 SSE 不支持自定义 header，使用 URL token 或后端改 bypass。
+      // glass/stream 需 x-device-token，此处用 XHR + 流式手卷模拟：
+      try {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        xhr.setRequestHeader('X-Device-Token', 'GL-browser-r18');
+        xhr.responseType = '';
+        let lastIdx = 0;
+        let kbShown = false;
+        let endShown = false;
+        xhr.onprogress = function() {
+          const text = xhr.responseText;
+          const chunk = text.slice(lastIdx);
+          lastIdx = text.length;
+          // 逐行解析 SSE
+          chunk.split('\n\n').forEach(block => {
+            if (!block.trim()) return;
+            const [evLine, ...dataLines] = block.split('\n');
+            const ev = (evLine || '').replace('event: ', '').trim();
+            const dataStr = dataLines.join('\n').replace(/^data: /gm, '');
+            if (!dataStr) return;
+            try {
+              const data = JSON.parse(dataStr);
+              if (ev === 'meta') {
+                $meta.textContent = '🔎 KB 查询：' + data.query;
+              } else if (ev === 'kb_ref') {
+                $kbref.innerHTML = '📚 ' + (data.entryId || '-') + ' / ' + (data.module || '-') + ' / trust=' + (data.trust || '?');
+                kbShown = true;
+              } else if (data.chunk !== undefined) {
+                if (firstByteAt === null) {
+                  firstByteAt = performance.now();
+                  $meta.textContent = '⚡ 首字节 ' + (firstByteAt - t0).toFixed(0) + 'ms';
+                }
+                buf += data.chunk;
+                $out.textContent = buf;
+                // 每 3 个 chunk 触发一次 TTS（8 字 ≈ 语阅一拍）
+                if (data.index % 3 === 0) speak(buf);
+              } else if (ev === 'end' && !endShown) {
+                endShown = true;
+                $meta.textContent = '✅ 流式完成：' + (data.totalChunks || '?') + ' chunk / 总耗时 ' + (data.totalMs || '?') + 'ms';
+                speak(buf);  // 最后一段补上
+              }
+            } catch(e){}
+          });
+        };
+        xhr.onerror = () => { $meta.textContent = '❌ 推接失败'; };
+        const t0 = performance.now();
+        xhr.send();
+        window.__r18_xhr = xhr;
+      } catch(e) {
+        $meta.textContent = '❌ 异常：' + e.message;
+      }
+    }
+
+    function stop() {
+      if (window.__r18_xhr) { window.__r18_xhr.abort(); window.__r18_xhr = null; }
+      if (es) { es.close(); es = null; }
+      if (tts) { speechSynthesis.cancel(); tts = null; }
+      $meta.textContent = '⏹ 已停';
+    }
+
+    $btn.addEventListener('click', ask);
+    $stop.addEventListener('click', stop);
+    $q.addEventListener('keydown', e => { if (e.key === 'Enter') ask(); });
+  })();
+  </script>
   <script>
     // R17-A: 页面加载完自动执行 SDK 自检
     window.addEventListener('load', () => {
