@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <meta name="theme-color" var(--ink)>
 <title>疗愈音乐诊断 · 易道智鉴</title>
+<script src="js/wx-dim-bias.js" defer></script>
 <meta name="description" content="五行音乐诊断：情志+五行→推荐调性+5 段播放列表+7 日疗程。可分享、可打印、Edge-TTS 试听。">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -129,8 +130,8 @@ audio{width:100%;margin-top:10px;display:none}
 </div>
 
 <script>
-// 五行→五音映射（与 ai-assistant._MODULE_REPORTS.music 对齐）
-const WX_MUSIC = {
+// R41-DR1：WX_MUSIC 由 wx-dim-bias.js 共享（15 详脈同源）— 本页需 music 补充字段（key/feel/suitable/ttsText）
+const WX_MUSIC = window.WX_MUSIC || {
   '金':{key:'商音',feel:'清亮高远',suitable:['愤怒','急躁'],ttsText:'商音清亮高远，主金主肺。适合愤怒急躁时听，有助于收敛心神。'},
   '木':{key:'角音',feel:'生机盎然',suitable:['疲劳','低沉'],ttsText:'角音生机盎然，主木主肝。适合疲劳低沉时听，能生发阳气。'},
   '水':{key:'羽音',feel:'悠远深邃',suitable:['焦虑','失眠','多梦'],ttsText:'羽音悠远深邃，主水主肾。适合焦虑失眠多梦时听，能滋阴降火。'},

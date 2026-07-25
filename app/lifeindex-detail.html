@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <meta name="theme-color" var(--ink)>
 <title>生命指数全鉴 · 易道智鉴</title>
+<script src="js/wx-dim-bias.js"></script>
 <meta name="description" content="10 维度生命指数评估：事业/财运/健康/婚姻/学业/家庭/人际/精神/享福/寿元。可分享、可打印。">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -112,7 +113,7 @@ textarea{min-height:60px;resize:vertical}
 <script>
 const ELEMENTS = {'金':85,'木':78,'水':82,'火':88,'土':90};
 const ELE_FOCUS = {'金':'锐进+决策+果断','木':'生发+成长+学习','水':'智慧+灵活+沉浸','火':'表达+热情+领导','土':'稳重+承担+储蓄'};
-const ELE_KEYS = {
+const ELE_KEYS = window.WX_KEYS || {
   '金':['金','银','金融','财','金属','锐','商业','理财'],
   '木':['木','林','学','教育','书','生长','花','成长'],
   '水':['水','海','智慧','智','流动','冥想','灵活'],
@@ -134,8 +135,8 @@ const DIMS = [
   {key:'xiuyang',name:'修养',icon:'🎋',weight:0.02,focus:'禅·茶·琴·书·静心修习'}
 ];
 
-// R41-B：12 维度五行权重偏差（与 ai-assistant 的 WX_DIM_BIAS 对齐）
-const WX_DIM_BIAS = {
+// R41-DR1：12 维度五行权重偏差已提取到 app/js/wx-dim-bias.js 共享
+const WX_DIM_BIAS = window.WX_DIM_BIAS || {
   '金':{shiye:+6,caiyun:+8,jiankang:+2,hunyin:+1,xueye:+1,jiating:0,renji:+1,jingshen:0,xiangfu:+1,shouyuan:+1,fengwu:+1,xiuyang:+1},
   '木':{shiye:+2,caiyun:+2,jiankang:+2,hunyin:+1,xueye:+8,jiating:+1,renji:+2,jingshen:+6,xiangfu:+2,shouyuan:+2,fengwu:+5,xiuyang:+5},
   '水':{shiye:+2,caiyun:+2,jiankang:+1,hunyin:+2,xueye:+6,jiating:0,renji:+6,jingshen:+7,xiangfu:+1,shouyuan:+2,fengwu:+2,xiuyang:+6},

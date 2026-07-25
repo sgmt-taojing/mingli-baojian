@@ -159,6 +159,8 @@ body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',-apple
 <script src="../knowledge/mingxiang-cross-kb.js" defer></script>
 <!-- 公共 toast + esc -->
 <script src="js/ui-toast.js" defer></script>
+<!-- R41-DR1：五行×12 维度权重偏差共享（lifeindex/music/lifeplan 三模块同源） -->
+<script src="js/wx-dim-bias.js" defer></script>
 <!-- 语音交互 -->
 <script src="js/voice-interaction.js?v=20260721" defer></script>
 <script src="js/user-profile.js" defer></script>
@@ -2933,8 +2935,9 @@ window._MODULE_REPORTS = {
     diagnose: function(data){
       const WX_SCORE = {'金':85,'木':78,'水':82,'火':88,'土':90};
       const WX_FOCUS = {'金':'锐进+决策+果断','木':'生发+成长+学习','水':'智慧+灵活+沉浸','火':'表达+热情+领导','土':'稳重+承担+储蓄'};
-      // 12 维度五行生克权重
-      const WX_DIM_BIAS = {
+      // R41-DR1：12 维度五行生克权重偏差已提取到 js/wx-dim-bias.js 共享
+      // 修正：以前 key 是 renmai 人脉 / chuangye 创业（与 12 维表不一致），现统一为 renji 人际
+      const WX_DIM_BIAS = window.WX_DIM_BIAS || {
         '金':{'caiyun':8,'shiye':6,'renmai':4},
         '木':{'xueye':8,'jingshen':6,'chuangye':4},
         '水':{'renji':8,'jingshen':6,'zhiye':4},
