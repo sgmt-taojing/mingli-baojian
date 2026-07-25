@@ -772,6 +772,14 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
       html += '人生阶段：'+rep.stage.name+'（'+rep.stage.range+'）\n';
       html += '重点：'+rep.stage.focus.join('、')+'\n\n';
     }
+    if(rep.stageTemplate){
+      html += '【本阶段 12 领域细化 48 子项】\n';
+      Object.entries(rep.stageTemplate).forEach(([k, v]) => {
+        const dom = rep.domains && rep.domains.find(d => d.key === k);
+        html += '  · '+(dom?dom.icon:'•')+' '+ (dom?dom.name:k) +'：'+ v +'\n';
+      });
+      html += '\n';
+    }
     if(rep.domainScores){
       html += '【十二领域评分卡】\n';
       rep.domainScores.forEach(d => {
@@ -805,9 +813,13 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
       html += '\n';
     }
     if(rep.playList){
-      html += '🎵 推荐播放：\n';
-      rep.playList.forEach(p => html += '  · '+p.name+'（'+p.duration+' 秒）\n');
+      html += '🎵 推荐播放列表：\n';
+      rep.playList.forEach((p,i) => html += '  '+(i+1)+'. '+p.name+'（'+p.duration+' 秒）'+(p.ttsText?' \n     ↳ '+p.ttsText:'')+'\n');
+      html += '\n';
     }
+    if(rep.intro){ html += '📝 '+rep.intro+'\n\n'; }
+    if(rep.cycleText){ html += rep.cycleText+'\n\n'; }
+    if(rep.compatible){ html += rep.compatible+'\n\n'; }
     showReport(html);
     autoSavePaipan(html);
     return;
@@ -2836,11 +2848,16 @@ window._MODULE_REPORTS = {
         recommend: five,
         emotion: emo,
         ttsText: five.ttsText,
+        intro: `根据您“${emo}”的情志状态，结合“${ele}”行能量，为您推荐${five.key}（${five.feel}）。${five.ttsText}建议每日聆听 30 分钟，连续 7 天一个疗程。`,
         playList: [
-          {name:'五行'+five.key+'音',duration:600},
-          {name:'古琴'+e+'调',duration:900},
-          {name:'颂钵'+five.key+'音',duration:1200}
-        ]
+          {name:'五行'+five.key+'音·开篇引导',duration:120,ttsText:'欢迎聆听'+five.key+'音乐疗愈。'+five.ttsText},
+          {name:'古琴'+e+'调·净心曲',duration:600,ttsText:'接下来为您演奏古琴'+e+'调，'+five.feel+'音律，静心始然。'},
+          {name:'五行'+five.key+'音·主曲',duration:600,ttsText:'进入主曲阶段。'+five.ttsText},
+          {name:'颂钵'+five.key+'音·收束',duration:300,ttsText:'请深吸一口气，与'+five.key+'共鸣。闭眼，静听。'},
+          {name:'轻推荐·同类补充',duration:480,ttsText:'可考虑'+five.suitable.slice(0,3).join('、')+'类情境中继续聆听。'}
+        ],
+        cycleText: '【7 日疗程】第1-2 天适应·第3-4 天深化·第5-6 天内化·第7 天总结。',
+        compatible: WX[e] ? '同源推荐：'+WX[e]+'音系列。' : ''
       };
     }
   },
@@ -2920,6 +2937,65 @@ window._MODULE_REPORTS = {
       {key:'university',name:'大学',range:'18-23岁',focus:['专业','社交','实践'],ttsText:'大学阶段聚焦专业深耕、社交圈拓展与社会实践。'},
       {key:'career',name:'职场+婚恋',range:'24岁+',focus:['事业','婚恋','财务','健康'],ttsText:'职场婚恋阶段，事业婚恋财务健康四线并行，建议关注风物与修养平衡。'}
     ],
+    // R41-B：4 阶段 × 12 领域 48 子项模板
+    stageTemplates: {
+      preschool: {
+        xueye: '蒙学兴趣班（语言·音乐·绘画·体能）',
+        zhiye: '职业体验日（医院·学校·消防·农场）',
+        caiyun: '金钱概念认知（转卖零食·存钱罐）',
+        hunyin: '社交交往演练（问候·分享·规则）',
+        jiankang: '均衡营养 + 充足睡眠（10小时）',
+        chengshi: '公园·图书馆·动物园常去',
+        fengwu: '四季物候观察（花鸟鱼虫·节令）',
+        xiuyang: '古典音乐听赏（宫羽音·4小时/周）',
+        renmai: '亲子+同伴社交圈（5-8人稳定）',
+        chuangye: '小商业启蒙（跳蚤市场·手工坊）',
+        yanglao: '祖辈互动（请家中老人讲故事）',
+        chuancheng: '家谱/姓氏故事（记住4代名字）'
+      },
+      school: {
+        xueye: '学科主课+1门专长（25%+ 主课量）',
+        zhiye: '职业探索讲座（每学期 1-2 场）',
+        caiyun: '零花钱+理财记账（月度复盘）',
+        hunyin: '同伴友谊维护+恋爱观萌芽',
+        jiankang: '运动习惯定型（30分/天）',
+        chengshi: '家乡周边行万里路（年 2 次）',
+        fengwu: '历史/博物馆参访（学期 1 次）',
+        xiuyang: '读书笔记·书法·一件乐器',
+        renmai: '同学圈+师长资源（10-20人）',
+        chuangye: '校园微创业（社团·项目·比赛）',
+        yanglao: '助老/敬老志愿（学期 1 次）',
+        chuancheng: '家族行业初了解（父母工种）'
+      },
+      university: {
+        xueye: '专业深耕 + 跨学科辅修/考证',
+        zhiye: '行业实习 2 段（寒暑假各 1）',
+        caiyun: '个人理财起步（指数/定投·规划）',
+        hunyin: '亲密关系实战（含分手复盘）',
+        jiankang: '作息节律锁定 + 运动专长',
+        chengshi: '一线/新一线·三年规划（毕业定锚）',
+        fengwu: '城市人文深度游（街区+老字号）',
+        xiuyang: '读经典·写文章·学一门外语',
+        renmai: '导师+同窗+行业校友（30人脉）',
+        chuangye: '尝试1次创业实操（摆摆·轻量）',
+        yanglao: '探望长辈·接触老龄议题',
+        chuancheng: '立家训·明确个人使命陈述'
+      },
+      career: {
+        xueye: '在读硕博/考证/终身学习（年 1 证）',
+        zhiye: '5 年职业三跳（稳·升·创各 1）',
+        caiyun: '攻守理财（股·债·保·房）',
+        hunyin: '婚姻经营 + 子女教育规划',
+        jiankang: '每年深度体检+运动习惯',
+        chengshi: '安居城市挑选（宜居+子女教育）',
+        fengwu: '名山大川·风景名胜（年 1-2 处）',
+        xiuyang: '静心修行（禅·茶·琴·书各 1）',
+        renmai: '圈层重塑（同领域 30 人+跨领域 10）',
+        chuangye: '二次创业评估（30/40/50 节点）',
+        yanglao: '45 岁起筹备养老金（社保+商保+投资）',
+        chuancheng: '家风传承·著作/著作/家训'
+      }
+    },
     domains: [
       {key:'xueye',name:'学业',icon:'📚'},
       {key:'zhiye',name:'职业',icon:'💼'},
@@ -3008,7 +3084,9 @@ window._MODULE_REPORTS = {
           `【5】财务防守 / 进攻计划：年度储蓄比例明确 · 握关资本上限`
         ],
         summary: `${age}岁属${stage.name}（${stage.range}），本阶段重点：${stage.focus.join('、')}。依据八守御身始躜，未来 5 年${_5yAdvice}。请每月复盘调整。`,
-        kbSources: ['NIHAISHA_KB', 'SHUHAN_KB', 'FAITH_KB']
+        kbSources: ['NIHAISHA_KB', 'SHUHAN_KB', 'FAITH_KB'],
+        ttsText: `${age}岁属${stage.name}（${stage.range}），重点${stage.focus.join('、')}。未来五年${_5yAdvice}。`,
+        stageTemplate: this.stageTemplates[stageKey],
       };
     }
   },
