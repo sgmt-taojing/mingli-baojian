@@ -397,6 +397,16 @@
       </div>
     </div>
 
+    <!-- R16-E: 28 舌象分布饼图（基于 r16-28tongues-* KB） -->
+    <div class="tongue-chart-block" id="tongue-chart-block">
+      <div class="tongue-chart-title">🩺 智镜·28 舌象分布（R16）</div>
+      <div class="tongue-chart-stage">
+        <canvas id="tongue-pie" width="320" height="200"></canvas>
+        <div class="tongue-legend" id="tongue-legend"></div>
+      </div>
+      <div class="tongue-hint">数据来自 KB: r16-28tongues-001~028 (tcm-diagnosis 模块)</div>
+    </div>
+
     <!-- 摄像头预览 -->
     <div class="camera-preview" id="camera-preview">
       <div class="placeholder">
@@ -663,6 +673,107 @@ setInterval(async () => {
     // 静默接入：语音可启动，触发同一窗口内的 askAI
     window.__wearableVoice = rokidVoice;
   }
+})();
+</script>
+
+  <style>
+/* R16-E 28 舌象饼图 */
+.tongue-chart-block {
+  margin: 12px 0;
+  padding: 12px 14px;
+  background: rgba(0,0,0,0.35);
+  border-radius: 10px;
+  border: 1px solid var(--hud-border, #2a3953);
+}
+.tongue-chart-title {
+  font-size: 13px;
+  color: var(--hud-accent, #4fd1c5);
+  margin-bottom: 6px;
+}
+.tongue-chart-stage {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.tongue-chart-stage canvas {
+  flex-shrink: 0;
+}
+.tongue-legend {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px 8px;
+  font-size: 11px;
+}
+.tongue-legend .lg-item {
+  display: flex; align-items: center; gap: 4px;
+}
+.tongue-legend .lg-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.tongue-hint {
+  font-size: 10px;
+  color: var(--hud-muted, #8a99b5);
+  margin-top: 4px;
+}
+</style>
+
+<script>
+/* R16-E: 28 舌象饼图渲染 */
+(function(){
+  const TONGUE_COLORS = {
+    '淡白': '#e0e0e0', '淡红': '#f4a0a0', '红': '#ef4444', '绛': '#991b1b',
+    '紫': '#7c3aed', '青': '#06b6d4', '蓝': '#3b82f6'
+  };
+  const DATA = [
+    {color:'淡白', count:4},
+    {color:'淡红', count:3},
+    {color:'红', count:7},
+    {color:'绛', count:7},
+    {color:'紫', count:4},
+    {color:'青', count:2},
+    {color:'蓝', count:1}
+  ];
+  function drawPie(){
+    const cv = document.getElementById('tongue-pie');
+    if(!cv) return;
+    const ctx = cv.getContext('2d');
+    const cx = cv.width/2, cy = cv.height/2, r = 75;
+    const total = DATA.reduce((s,d)=>s+d.count,0);
+    let angle = -Math.PI/2;
+    DATA.forEach(d=>{
+      const slice = (d.count/total)*Math.PI*2;
+      ctx.beginPath();
+      ctx.moveTo(cx,cy);
+      ctx.arc(cx,cy,r,angle,angle+slice);
+      ctx.closePath();
+      ctx.fillStyle = TONGUE_COLORS[d.color] || '#888';
+      ctx.fill();
+      ctx.strokeStyle = '#0e1726';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      angle += slice;
+    });
+    ctx.beginPath();
+    ctx.arc(cx,cy,r*0.45,0,Math.PI*2);
+    ctx.fillStyle = 'rgba(14,23,38,0.9)';
+    ctx.fill();
+    ctx.fillStyle = '#4fd1c5';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText('28', cx, cy-2);
+    ctx.fillStyle = '#8a99b5';
+    ctx.font = '10px sans-serif';
+    ctx.fillText('舌象', cx, cy+12);
+  }
+  function renderLegend(){
+    const el = document.getElementById('tongue-legend');
+    if(!el) return;
+    el.innerHTML = DATA.map(d =>
+      `<div class="lg-item"><span class="lg-dot" style="background:${TONGUE_COLORS[d.color]||'#888'}"></span>${d.color}舌 ${d.count}</div>`
+    ).join('');
+  }
+  drawPie();
+  renderLegend();
 })();
 </script>
 
