@@ -2855,12 +2855,22 @@ window._MODULE_REPORTS = {
       {key:'jiating',name:'家庭',icon:'🏡',weight:0.05,focus:'子女教育+亲情'},
       {key:'renji',name:'人际',icon:'🤝',weight:0.05,focus:'深度关系+同行圈子'},
       {key:'jingshen',name:'精神',icon:'🎭',weight:0.05,focus:'信仰+哲学+艺术'},
-      {key:'xiangfu',name:'享福',icon:'🌸',weight:0.03,focus:'体验+旅行+生活品质'},
-      {key:'shouyuan',name:'寿元',icon:'🍵',weight:0.02,focus:'养生+保健+定期体检'}
+      {key:'xiangfu',name:'享福',icon:'🌸',weight:0.02,focus:'体验+旅行+生活品质'},
+      {key:'shouyuan',name:'寿元',icon:'🍵',weight:0.02,focus:'养生+保健+定期体检'},
+      {key:'fengwu',name:'风物',icon:'🌸',weight:0.02,focus:'名山大川+风水宝地+宜居城市'},
+      {key:'xiuyang',name:'修养',icon:'📿',weight:0.02,focus:'静心+读书+书法+禅修+传统文化'}
     ],
     diagnose: function(data){
       const WX_SCORE = {'金':85,'木':78,'水':82,'火':88,'土':90};
       const WX_FOCUS = {'金':'锐进+决策+果断','木':'生发+成长+学习','水':'智慧+灵活+沉浸','火':'表达+热情+领导','土':'稳重+承担+储蓄'};
+      // 12 维度五行生克权重
+      const WX_DIM_BIAS = {
+        '金':{'caiyun':8,'shiye':6,'renmai':4},
+        '木':{'xueye':8,'jingshen':6,'chuangye':4},
+        '水':{'renji':8,'jingshen':6,'zhiye':4},
+        '火':{'renji':6,'chuangye':8,'xiangfu':4},
+        '土':{'jiating':6,'shouyuan':6,'fengwu':4,'xiuyang':4}
+      };
       const ele = (data && data.s0) || '金';
       const base = WX_SCORE[ele] || 85;
       const userText = ((data && (data.s1||'')) + ' ' + ((data && data.s2)||'')).trim();
@@ -2869,13 +2879,9 @@ window._MODULE_REPORTS = {
       let boost = 0;
       (WX_KEYS[ele]||[]).forEach(k => { if(userText.includes(k)) boost += 3; });
       const result = this.dimensions.map(d => {
-        // 五行能量优势领域加权
-        let bias = 0;
-        if (ele === '金' && ['caiyun','shiye'].includes(d.key)) bias += 8;
-        if (ele === '木' && ['xueye','jingshen'].includes(d.key)) bias += 8;
-        if (ele === '水' && ['renji','jingshen'].includes(d.key)) bias += 8;
-        if (ele === '火' && ['renji','xiangfu'].includes(d.key)) bias += 8;
-        if (ele === '土' && ['jiating','shouyuan'].includes(d.key)) bias += 8;
+        // 五行能量优势领域加权（12 维度扩展）
+        const biasMap = WX_DIM_BIAS[ele] || {};
+        let bias = biasMap[d.key] || 0;
         const score = Math.max(40, Math.min(95, Math.round(base + (Math.sin(d.key.length*7) * 8) + bias + boost)));
         const status = score >= 85 ? '优' : score >= 75 ? '良' : score >= 60 ? '中' : '有潜力';
         return { name: d.name, key: d.key, icon: d.icon, score, weight: d.weight, status, focus: d.focus };
@@ -2902,7 +2908,8 @@ window._MODULE_REPORTS = {
         {year:4, text:'中段汇总：成果性不陶丝'},
         {year:5, text:'中期锁势：进入下个五年计划'}
       ];
-      return { title:'生命指数报告', total, dimensions:result, element:ele, top3, bot2, summary, actions, next5Years };
+      const ttsText = `生命指数总分${total}分，${ele}行主导。优势领域 ${top3.join('、')}，待加强 ${bot2.join('、')}。12 维度含风物与修养，建议补齐五行平衡与精神修习。`;
+      return { title:'生命指数报告', total, dimensions:result, element:ele, top3, bot2, summary, actions, next5Years, ttsText };
     }
   },
   lifeplan: {
@@ -2911,7 +2918,7 @@ window._MODULE_REPORTS = {
       {key:'preschool',name:'学龄前',range:'0-6岁',focus:['启蒙','健康','亲子'],ttsText:'学龄前以启蒙为主，重点健康习惯与亲子陪伴。'},
       {key:'school',name:'小学中学',range:'7-17岁',focus:['学习','品德','兴趣'],ttsText:'小学中学阶段学习为本，品德与兴趣培养并重。'},
       {key:'university',name:'大学',range:'18-23岁',focus:['专业','社交','实践'],ttsText:'大学阶段聚焦专业深耕、社交圈拓展与社会实践。'},
-      {key:'career',name:'职场+婚恋',range:'24岁+',focus:['事业','婚恋','财务','健康'],ttsText:'职场婚恋阶段，事业婚恋财务健康四线并行。'}
+      {key:'career',name:'职场+婚恋',range:'24岁+',focus:['事业','婚恋','财务','健康'],ttsText:'职场婚恋阶段，事业婚恋财务健康四线并行，建议关注风物与修养平衡。'}
     ],
     domains: [
       {key:'xueye',name:'学业',icon:'📚'},
