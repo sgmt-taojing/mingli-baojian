@@ -1435,6 +1435,9 @@ app.post('/api/yuanzhu/send-push', auth, (req, res) => {
 // 设备端基地址 (GLASS_BASE_URL, 默认: http://127.0.0.1:8787)
 const GLASS_BASE_URL = process.env.GLASS_BASE_URL || 'http://127.0.0.1:8787';
 async function glassProxy(path, opts = {}) {
+  const t0 = Date.now();
+  // R17-D: glass_proxy 打点（设备在线/离线/上游状态）
+  try { db.exec("CREATE TABLE IF NOT EXISTS glass_proxy_log (id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT, method TEXT, status TEXT, latency_ms INTEGER, ts TEXT DEFAULT CURRENT_TIMESTAMP)"); } catch(e){}
   try {
     const r = await fetch(GLASS_BASE_URL + path, {
       method: opts.method || 'GET',
@@ -1442,9 +1445,14 @@ async function glassProxy(path, opts = {}) {
       body: opts.body ? JSON.stringify(opts.body) : undefined,
       signal: AbortSignal.timeout(5000)
     });
+    const latency = Date.now() - t0;
+    const status = r.ok ? 'ok' : ('upstream_' + r.status);
+    try { db.prepare('INSERT INTO glass_proxy_log (path, method, status, latency_ms) VALUES (?,?,?,?)').run(path, opts.method || 'GET', status, latency); } catch(e){}
     if (!r.ok) return { error: 'GLASS_UPSTREAM_' + r.status, status: r.status };
     return await r.json();
   } catch (e) {
+    const latency = Date.now() - t0;
+    try { db.prepare('INSERT INTO glass_proxy_log (path, method, status, latency_ms) VALUES (?,?,?,?)').run(path, opts.method || 'GET', 'offline', latency); } catch(e){}
     return { error: 'GLASS_OFFLINE', message: '智能眼镜未连接（' + (e.message || 'timeout') + '）' };
   }
 }
@@ -1557,6 +1565,20 @@ app.get('/api/admin/glass/health', adminAuth, async (req, res) => {
     summary: online ? '设备在线' : '设备离线·KB 兜底已激活',
     ts: new Date().toISOString()
   });
+});
+
+// R17-D: glass_proxy_log 统计（设备在线率/平均延迟/近期调用）
+app.get('/api/admin/glass/proxy-stats', adminAuth, (req, res) => {
+  try {
+    const total = db.prepare('SELECT COUNT(*) as cnt FROM glass_proxy_log').get().cnt;
+    const byStatus = db.prepare("SELECT status, COUNT(*) as cnt, ROUND(AVG(latency_ms),1) as avg_ms FROM glass_proxy_log GROUP BY status").all();
+    const byPath = db.prepare("SELECT path, COUNT(*) as cnt, ROUND(AVG(latency_ms),1) as avg_ms FROM glass_proxy_log GROUP BY path ORDER BY cnt DESC LIMIT 10").all();
+    const recent = db.prepare("SELECT * FROM glass_proxy_log ORDER BY id DESC LIMIT 10").all();
+    const offlineRate = total ? (byStatus.find(s => s.status === 'offline')?.cnt || 0) / total : 0;
+    res.json({
+      total, byStatus, byPath, recent, offlineRate: offlineRate.toFixed(4), ts: new Date().toISOString()
+    });
+  } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
 // 3. admin 推送 TTS 到眼镜（支持批量）

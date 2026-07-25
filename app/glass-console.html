@@ -777,8 +777,30 @@ setInterval(async () => {
 })();
 </script>
 
+  <!-- R17-A SDK 真机自检挂载点 -->
+  <div id="sdk-readiness-host" style="margin:12px 0;"></div>
+
   <script src="js/a11y-divination-hub.js" defer></script>
-  
+  <script src="js/sdk-readiness-check.js" defer></script>
+  <script>
+    // R17-A: 页面加载完自动执行 SDK 自检
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        if (window.sdkReadinessCheck) {
+          sdkReadinessCheck.runAll().then(r => {
+            const el = document.getElementById('wearable-status');
+            if (el) {
+              const ready = r.overallReady;
+              const detected = r.threeStates.device.detected;
+              el.textContent = ready ? '✅ SDK 就绪' : (detected ? '🎯 真机模式' : '📱 浏览器模式');
+              el.style.color = ready ? 'var(--hud-ok, #34d399)' : 'var(--hud-warn, #fbbf24)';
+            }
+          }).catch(() => {});
+        }
+      }, 600);
+    });
+  </script>
+
 </main>
 </body>
 </html>
