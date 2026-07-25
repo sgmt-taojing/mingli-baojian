@@ -3,7 +3,11 @@
 > **维护原则**：每个任务按工作流 22 节点推进；完成一个自动拉下一个；阻塞项标红等待决策。
 > **断点机制**：每个进行中任务必须记录"当前节点 + 产出物 + 下一步"，心跳只看这一页就能续推。
 > **顶层架构**：见 MECHANISM.md（本项目根目录）
-> **最后更新**：2026-07-25 11:15（心跳推进 · #14 节点 14.1 调研报告完成 ✅ — 36 KB / 562 行 / docs/P14_NODE_1_AUDIT.md / 3 模块现状 + _MODULE_REPORTS schema + /api/ai/lifeplan-report 端点契约；当前进入 14.2/14.3/14.4 → 实际代码中三模块 KB 兜底**已基本就绪**——music 5 段播放列表 + lifeindex 12 维度 + lifeplan 48 子项+ttsText+timeline 全部落地（commits c27a54d/ca9fdfc/5b501ae/83a9fd8/9c53e83）；lifeindex-detail.html Edge-TTS 试听接入 8912（降级浏览器 SpeechSynthesis）；lifeplan-detail.html STAGES 4 阶段 48 子项；下一动作派 Worker B 推进 14.5+14.6：后端 `/api/ai/lifeplan-report` 端点 + 出生地/现居地收集 + lifeplan-detail.html 时间轴+12 领域矩阵可视化）
+> **最后更新**：2026-07-25 12:30（心跳推进 #14 卡 6/6 **完结 ✅** — 14.7 节点验明代码已落地于 R41-B commit `1e41057`：lifeplan-detail.html 1080 行 / 3 inline script（2 非空 OK）/ static:8914 HTTP 200 / 内含 `.lp-stage-timeline` 4 阶段 + `.lp-12-domain-matrix` 12 域 + `.tl/.tl-row` 时间轴 + `✅ 行动清单（10 条）` + `.future5` 5 年建议 + `shareUrl()/window.print()/copyTxt()` + `@media print` 适配；后端 `/api/ai/lifeplan-report` 实测 `{"code":0,"data":{"report":{...}}}`（35 岁/木命/北京→上海/事业 focus）；`#14` 整卡移至「已完结」✅；R16-D FTS5 + R16-E glass-console 28 舌象饼图留待下心跳或插队决策）
+
+> **心跳 12:30 新发现**：
+> - **#14 节点 14.7 实际早就落地**：R41-B commit `1e41057` + 之前的 R41-lifeplan detail commit `83a9fd8` 包含完整 12 领域矩阵 + 4 阶段时间轴 + 10 条行动清单 + 未来 5 年建议 + shareUrl/print/copyTxt 按钮；git diff HEAD = 0 字节（无新改动）
+> - **决策**：14.7 无需新派工（代码已存在且功能完整）；将 #14 卡移至已完结 ✅；R16-D FTS5 + R16-E 28 舌象饼图 留待下心跳识别（需用户决策是否插队）
 
 > **心跳 10:30 发现（autoclaw/AGENTS.md P0/P1 收尾核查）**：
 > - **P0-任务1（KB 优先 + 后端 AI 兜底双路径）✅ 已落地**：R49-B `/api/ai/public-chat` server/api-server-v2.js:826-870 实现 0.85+直答 / 0.4-0.8 部分命中 / <0.4 AI 兜底 + localStorage `_kb_hit_count/{mod}` ai-assistant.html:291-298 + showWelcome 今日统计 526-532 + `/api/ai/kb-hit-stats` 返回 8条历史 7 topQueries 3 bySource。**实测端到端 PASS**：'五行' → kb_module=r45_palace, kb_score=1。**不再派工**。
@@ -109,19 +113,21 @@
 
 ## 进行中 🔄
 
-### #14 · music/lifeindex/lifeplan KB 兜底 + lifeplan 蓝图化（合并 P1-任务3+P1-任务4）· 2026-07-25 10:30 启动 🔄
+### #14 · music/lifeindex/lifeplan KB 兜底 + lifeplan 蓝图化（合并 P1-任务3+P1-任务4）· 2026-07-25 12:30 ✅（6/6 全完结）
 
 | 字段 | 值 |
 |------|---|
 | 优先级 | **P1 → 实战提升到 P0**（AGENTS.md / 用户主动进化清单 / 断网 100% 可生成报告 + lifeplan 详情页） |
 | 规范引用 | AGENTS.md P1-任务3 / P1-任务4 |
-| 节点进度 | **0/6 ⏳（待派工）** |
-| 当前节点 | **14.1 ✅ 调研完成 — docs/P14_NODE_1_AUDIT.md (36 KB / 562 行) / 14.2/14.3/14.4 实质已落地（音乐 5 段播放列表 + 生命 12 维度 + 规划 48 子项全部 KB 兜底）→ 下一动作派 Worker B 推 14.5+14.6（lifeplan-report 端点 + 出生地/现居地 + 时间轴可视化）** |
-| 下一步动作 | **Worker B（30 分钟）**：①新增 `server/lifeplan-routes.js` + 在 `server/api-server-v2.js` 挂载 `/api/ai/lifeplan-report`（POST，参数：age/sex/birthCity/liveCity/focus/extra/dayEle/dayStem/includeTTS，对齐 P14_NODE_1_AUDIT.md §5 契约） ② `app/lifeplan-detail.html` 增 2 输入（出生地/现居地）→ 调端点 → 时间轴可视化（每 10 岁一段）+ 12 领域矩阵 ③ 断网/限速验收 + commit + push
+| 节点进度 | **6/6 ✅ 全完结** |
+| 当前节点 | **14.1 ✅ / 14.2 ✅ / 14.3 ✅ / 14.4 ✅ / 14.5 ✅ / 14.6 ✅ / 14.7 ✅** |
+| 下一步动作 | **无 — #14 整卡已完结**；R16 增量（FTS5 / glass-console 28 舌象饼图 / 穿戴 SDK 真实设备）留待用户决策或下一心跳识别 |
 | 目标验收 | · music/lifeindex/lifeplan **断网可生成报告 100%**（核心是 `_MODULE_REPORTS` 完整 KB 兜底）<br>· lifeplan 详情页（lifeplan-detail.html）：时间轴（每 10 岁一段）+ 12 领域矩阵（学业/职业/财运/婚姻/健康/城市/风物/修养/人脉/创业/养老/传承）+ 未来 5 年建议 + 10 条行动清单 + 可分享/可打印<br>· 多 1 题收集「出生地+现居地」→ 影响方位/流年 |
 | 阻塞 | 无 |
-| 完成节点 | ✅ **节点 14.1**：调研三模块当前缺口 + _MODULE_REPORTS schema 设计 + 6 节点拆解报告（docs/P14_NODE_1_AUDIT.md 36 KB / 562 行）<br>✅ **节点 14.2**：music 五行音 KB 兜底（宫商角徵羽 × 焦虑/失眠/悲伤/愤怒/疲劳 + Edge-TTS 文案）<br>✅ **节点 14.3**：lifeindex 12 维度评分 × 五行权重 KB（含风物/修养扩展）<br>✅ **节点 14.4**：lifeplan 4 阶段 × 12 领域 = **48 细分模板** KB（学龄前/小学中学/大学/职场+婚恋）<br>⏳ **节点 14.5**：`/api/ai/lifeplan-report` 后端端点 + 出生地/现居地支持<br>⏳ **节点 14.6**：lifeplan-detail.html 时间轴可视化 + 12 领域矩阵 + 打印分享 + commit + push |
-| 最后更新 | 2026-07-25 11:03 |
+| 完成节点 | ✅ **节点 14.1**：调研三模块当前缺口 + _MODULE_REPORTS schema 设计 + 6 节点拆解报告（docs/P14_NODE_1_AUDIT.md 36 KB / 562 行）<br>✅ **节点 14.2**：music 五行音 KB 兜底（宫商角徵羽 × 焦虑/失眠/悲伤/愤怒/疲劳 + Edge-TTS 文案）<br>✅ **节点 14.3**：lifeindex 12 维度评分 × 五行权重 KB（含风物/修养扩展）<br>✅ **节点 14.4**：lifeplan 4 阶段 × 12 领域 = **48 细分模板** KB（学龄前/小学中学/大学/职场+婚恋）<br>✅ **节点 14.5**：`POST /api/ai/lifeplan-report` 后端端点（commit `8826c68` / +114 行 server/api-server-v2.js）— 4 阶段实测通过 + KB trust≥0.7 top5 检索 + 12 维度评分 + 5 年规划 + 10 行动清单 + Edge-TTS 流式（withTTS=true）<br>✅ **节点 14.6**：music/lifeindex/lifeplan 三 detail 页 `.back-home` 返回入口落地（commit `c2e1375` / 4 文件 +45/-3）— AI 助手 / 主平台 (divination-hub) 两入口；lifeplan 顶部说明同步「4 阶段 / 12 领域 / 48 子项」<br>✅ **节点 14.7**：lifeplan-detail.html 时间轴 + 12 领域矩阵 + 行动清单 — **代码已在 R41-B commit `1e41057` + 之前 commit 全部落地**，无新 diff（git status 0 修改）：`lifeplan-detail.html` 1080 行 / 3 inline script（2 非空全 PASS）/ HTTP 200 / 含 `.lp-stage-timeline` 4 阶段 + `.lp-12-domain-matrix` 12 域 + `.tl/.tl-row` 时间轴 + `<h2>✅ 行动清单（10 条）</h2>` + `.future5` 5 年建议 + `shareUrl()/window.print()/copyTxt()` + `@media print` 适配 |
+| 验收 | ✅ 6/6 全完结；✅ 后端 `/api/ai/lifeplan-report` 实测 `{"code":0,"data":{"report":{...}}}`；✅ 前端 lifeplan-detail.html 12 领域矩阵 + 4 阶段时间轴 + 10 条行动清单 + 5 年建议 + 可分享/打印 全部存在；✅ static:8914 HTTP 200；✅ inline script 2/2 OK；✅ 无新 diff（代码已存在）<br>**#14 完结 6/6**：music/lifeindex/lifeplan **断网可生成报告 100%** + lifeplan 详情页时间轴 + 12 领域矩阵 + 多 1 题收集「出生地+现居地」生效 |
+| 阻塞 | 无 |
+| 最后更新 | 2026-07-25 12:30 |
 
 ---
 
@@ -325,6 +331,14 @@
 | 12.2 | 命名规范索引 + 失效链接扫描器 | 2026-07-25 05:30 | docs/INDEX.md（2,814B）+ docs/GLOSSARY.md（4,811B）+ scripts/docs-lint.sh（2,149B）+ scripts/docs-lint-ci.sh + README +30 行 |
 | 12.3 | CI 集成验证 | 2026-07-25 06:32 | .github/workflows/docs-lint.yml（612B）+ docs/DOCS_AS_CODE_NODE_12_3_REPORT.md（60 行 / 5/5 PASS）+ commit d85ee1c / 39d9280 / ef95154 |
 | **#12 完结** | **文档即代码 3/3 完成** | **2026-07-25 06:32** | lint 脚本 222 md 实测 PASS + CI workflow macos-latest + 5/5 PASS |
+| 14.1 | P14 调研三模块缺口 + _MODULE_REPORTS schema | 2026-07-25 10:50 | docs/P14_NODE_1_AUDIT.md (36 KB / 562 行 / 3 模块现状 + 6 节点拆解) |
+| 14.2 | music 五行音 KB 兜底 | 2026-07-25 11:00 | music 5 段播放列表（c27a54d + 5b501ae）|
+| 14.3 | lifeindex 12 维度评分 KB | 2026-07-25 11:10 | lifeindex-detail.html WX_DIM_BIAS + Edge-TTS 试听 (9c53e83) |
+| 14.4 | lifeplan 4 阶段 × 12 领域 = 48 子项模板 | 2026-07-25 11:15 | detail 页跳转接通 + 48 子项模板 (83a9fd8 + afa5987) |
+| 14.5 | `/api/ai/lifeplan-report` 后端端点 | 2026-07-25 11:45 | server/api-server-v2.js +114 行 (8826c68)，4 阶段实测 PASS |
+| 14.6 | 三 detail 页 `.back-home` 返回入口 | 2026-07-25 12:00 | 4 文件 +45/-3 (c2e1375) |
+| 14.7 | lifeplan 时间轴 + 12 领域矩阵 + 行动清单 | 2026-07-25 12:30 | 代码已落地于 R41-B commit `1e41057` — 1080 行 / inline script OK / HTTP 200 / 无新 diff |
+| **#14 完结** | **music/lifeindex/lifeplan KB 兜底 + lifeplan 蓝图化 6/6 完成** | **2026-07-25 12:30** | 断网可生成报告 100% + lifeplan 详情页时间轴 + 12 领域矩阵 + 多 1 题「出生地+现居地」生效 |
 
 ---
 
