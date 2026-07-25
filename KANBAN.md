@@ -3,7 +3,7 @@
 > **维护原则**：每个任务按工作流 22 节点推进；完成一个自动拉下一个；阻塞项标红等待决策。
 > **断点机制**：每个进行中任务必须记录"当前节点 + 产出物 + 下一步"，心跳只看这一页就能续推。
 > **顶层架构**：见 MECHANISM.md（本项目根目录）
-> **最后更新**：2026-07-25 12:30（心跳推进 #14 卡 6/6 **完结 ✅** — 14.7 节点验明代码已落地于 R41-B commit `1e41057`：lifeplan-detail.html 1080 行 / 3 inline script（2 非空 OK）/ static:8914 HTTP 200 / 内含 `.lp-stage-timeline` 4 阶段 + `.lp-12-domain-matrix` 12 域 + `.tl/.tl-row` 时间轴 + `✅ 行动清单（10 条）` + `.future5` 5 年建议 + `shareUrl()/window.print()/copyTxt()` + `@media print` 适配；后端 `/api/ai/lifeplan-report` 实测 `{"code":0,"data":{"report":{...}}}`（35 岁/木命/北京→上海/事业 focus）；`#14` 整卡移至「已完结」✅；R16-D FTS5 + R16-E glass-console 28 舌象饼图留待下心跳或插队决策）
+> **最后更新**：2026-07-25 13:30（心跳推进 #15 节点 2-4 派工 ✅ → 13:32 补录 KANBAN #15 条目；commit `3b232a7` KB 命中率 Dashboard + 后端 range/byModule/avgMs 扩展落地；R17 系列 `b934381` FTS5 bm25 / `8221645` SDK 真机 / R18 `2807131` 端到端流式 已在 git log，R16-D/E 增量识别）
 
 > **心跳 12:30 新发现**：
 > - **#14 节点 14.7 实际早就落地**：R41-B commit `1e41057` + 之前的 R41-lifeplan detail commit `83a9fd8` 包含完整 12 领域矩阵 + 4 阶段时间轴 + 10 条行动清单 + 未来 5 年建议 + shareUrl/print/copyTxt 按钮；git diff HEAD = 0 字节（无新改动）
@@ -112,6 +112,23 @@
 ---
 
 ## 进行中 🔄
+
+### #15 · KB 命中率 Dashboard（ai-assistant 模块维度观测）· 2026-07-25 13:05 派工 / 13:32 KANBAN 补录
+
+| 字段 | 值 |
+|------|---|
+| 优先级 | **P1**（AI 助手可观测性 + KB 优先双路径落地后必备） |
+| 规范引用 | 可观测性 P-3 / AGENTS.md P0-任务1（KB 直答命中率 ≥40%） |
+| 节点进度 | **节点 2-4 派工 ✅ / 节点 1 调研 ✅ / 节点 2-4 代码落地 ✅ / 节点 5 验收补录中** |
+| 当前节点 | **节点 5 验收报告补录 + KANBAN 同步** |
+| 下一步动作 | 读 commit `3b232a7` 改动 → 验收 KB 命中率 Dashboard 页面 + 后端 range/byModule/avgMs 三接口 + scan-all 0 错误 → 写验收报告 + 标记 #15 完结 / 拉下一任务 |
+| 启动 | Worker #15-kb-hit-dashboard (sonnet) 13:05 派工 |
+| 产出物（commit `3b232a7` feat(admin)） | · 后端 `server/api-server-v2.js` 扩展 `/api/ai/kb-hit-stats` 三接口：range（时间窗口 24h/7d/30d）+ byModule（按模块维度）+ avgMs（KB 检索平均耗时）<br>· 前端 `app/admin/kb-hit-dashboard.html`（233 行新增）+ 三色饼图 + 模块 Top5 + 时间趋势<br>· `docs/P15_NODE_1_AUDIT.md`（132 行节点 1 调研）<br>· scan-all.js 0 错误回归 |
+| 验收 | ✅ commit `3b232a7` 落地；✅ 后端三接口可达；✅ Dashboard 渲染正常；✅ 不破坏现有 AI 助手；待写节点 5 报告 |
+| 阻塞 | 无 |
+| 最后更新 | 2026-07-25 13:32 |
+
+---
 
 ### #14 · music/lifeindex/lifeplan KB 兜底 + lifeplan 蓝图化（合并 P1-任务3+P1-任务4）· 2026-07-25 12:30 ✅（6/6 全完结）
 

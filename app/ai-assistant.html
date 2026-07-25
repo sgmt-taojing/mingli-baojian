@@ -851,6 +851,43 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
       console.warn('[kb fallback]', e);
     }
   }
+  // P14 节点 8：lifeplan 后端增强（12 领域结构化报告）
+  let lifeplanBackend = null;
+  if (state.module === 'lifeplan' && kbHit.score >= 0.4) {
+    try {
+      const ageFromState = state.data && (state.data.age || parseInt(String(state.data.s1||'').match(/\d{4}/)?.[0]) || '');
+      const userText = Object.values(state.data || {}).join(' ');
+      const liveM = userText.match(/(北京|上海|广州|深圳|杭州|成都|武汉|西安|南京|重庆|天津|苏州)/);
+      const concerns = (userText.match(/(学业|职业|工作|事业|财运|感情|婚姻|健康|城市|风物|修养|人脉|创业|养老|传承|学习|睡眠|财务|退休|孩子)/g) || []).slice(0,4);
+      const lpRes = await fetch(API + '/api/ai/lifeplan-report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          age: ageFromState || 30,
+          gender: (state.data.s1||'').includes('男') ? '男' : (state.data.s1||'').includes('女') ? '女' : '',
+          concerns,
+          livePlace: liveM ? liveM[0] : '',
+          withTTS: true
+        })
+      }).catch(() => null);
+      if (lpRes) {
+        const lpJson = await lpRes.json().catch(() => null);
+        if (lpJson && lpJson.code === 0 && lpJson.data && lpJson.data.report) {
+          lifeplanBackend = lpJson.data;
+          // 把后端报告嵌入 prompt，让 AI 锚定 12 领域评分 + 5 年规划 + 10 行动
+          promptExtra = '\n\n【后端 lifeplan-report 结构化输出】\n' +
+            '阶段：' + lifeplanBackend.report.stage + '（' + lifeplanBackend.report.stageRange + '）\n' +
+            '总分：' + lifeplanBackend.report.total + '，top3：' + (lifeplanBackend.report.top3||[]).join('、') + '，bot2：' + (lifeplanBackend.report.bot2||[]).join('、') + '\n' +
+            '12 领域：' + (lifeplanBackend.report.domains||[]).map(d => d.name + ' ' + d.score + '(' + d.status + ')').join('、') + '\n' +
+            '5 年规划：' + (lifeplanBackend.report.next5Years||[]).map(y => y.year + ':' + y.text).join(' | ') + '\n' +
+            '10 行动：' + (lifeplanBackend.report.actions||[]).slice(0,10).join(' | ') + '\n' +
+            'KB 命中 ' + lifeplanBackend.report.kbHitCount + ' 条参考材料';
+        }
+      }
+    } catch (e) {
+      console.warn('[lifeplan backend]', e);
+    }
+  }
   // 只有 KB 命中（score >= 0.4）才算 hit，避免 fallback 0.3 假阳
   if (kbHit.score >= 0.4) {
     _kbHitCount(state.module, kbHit.entryId);
@@ -883,6 +920,24 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
     const d=await r.json();
     const reply=(d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||'';
     if(reply.length>50){
+      // P14 节点 8：lifeplan 后端结构化报告优先（拼接 AI 润色说明）
+      if (state.module === 'lifeplan' && lifeplanBackend) {
+        const lp = lifeplanBackend.report;
+        const tbl = (lp.domains||[]).map(d => '| ' + d.icon + ' ' + d.name + ' | ' + d.score + ' | ' + d.status + ' |').join('\n');
+        const yr = (lp.next5Years||[]).map(y => '| ' + y.year + ' 岁 | ' + y.text + ' |').join('\n');
+        const act = (lp.actions||[]).slice(0,10).map((a,i) => (i+1)+'. '+a).join('\n');
+        const structure = '【来源：lifeplan-report 后端结构化报告 + KB+AI 润色（'+kbHit.source+'）】\n\n' +
+          '## ' + lp.title + '\n' +
+          lp.summary + '\n\n' +
+          '### 12 领域评分\n| 领域 | 分 | 等级 |\n|---|---|---|\n' + tbl + '\n\n' +
+          '### 未来 5 年规划\n| 年龄 | 阶段 |\n|---|---|\n' + yr + '\n\n' +
+          '### 10 条行动清单\n' + act + '\n\n' +
+          '### AI 润色建议\n' + reply + '\n\n' +
+          '— KB 命中 ' + lp.kbHitCount + ' 条参考材料\n— TTS 朗读：' + (lifeplanBackend.ttsText||'').substring(0,200) + '…';
+        showReport(structure);
+        autoSavePaipan(structure);
+        return;
+      }
       const tagged = kbHit.score >= 0.4 ? '【来源：KB+AI 润色（'+kbHit.source+'）】\n\n'+reply : reply;
       showReport(tagged);
       autoSavePaipan(tagged);
