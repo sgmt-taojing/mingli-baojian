@@ -43,6 +43,13 @@ textarea{min-height:60px;resize:vertical}
 .dom .bar{height:4px;border-radius:2px;background:rgba(201,168,76,.15);margin-top:5px;overflow:hidden}
 .dom .bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--bronze));transition:width .8s}
 .dom .st{font-size:10px;margin-top:3px;color:var(--gold2)}
+/* 48 子项模板 */
+.st-list{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.st-row{display:flex;gap:8px;align-items:center;padding:9px 12px;background:rgba(201,168,76,.04);border-radius:6px;border-left:3px solid var(--gold)}
+.st-ico{font-size:18px;flex-shrink:0;min-width:24px;text-align:center}
+.st-row b{font-size:13px;color:var(--gold);min-width:54px;flex-shrink:0}
+.st-action{flex:1;font-size:13px;line-height:1.6;opacity:.92}
+
 /* 时间轴 */
 .tl{display:flex;flex-direction:column;gap:8px;margin-top:10px}
 .tl-row{display:flex;gap:12px;align-items:flex-start;padding:10px;background:rgba(201,168,76,.04);border-radius:8px;border-left:3px solid var(--gold)}
@@ -268,10 +275,14 @@ textarea{min-height:60px;resize:vertical}
 </div>
 <script>
 const STAGES = [
-  {key:'preschool',name:'学龄前',range:'0-6岁',focus:['先天','亲子','健康']},
-  {key:'school',name:'小学中学',range:'7-17岁',focus:['学习','品德','兴趣']},
-  {key:'university',name:'大学',range:'18-23岁',focus:['专业','社交','实践']},
-  {key:'career',name:'职场+婚恋',range:'24-65岁',focus:['事业','婚恋','健康']}
+  {key:'preschool',name:'学龄前',range:'0-6岁',focus:['先天','亲子','健康'],
+   template:{xueye:'蒙学兴趣班（语言·音乐·绘画·体能）',zhiye:'职业体验日（医院·学校·消防·农场）',caiyun:'金钱概念认知（转卖零食·存钱罐）',hunyin:'社交交往演练（问候·分享·规则）',jiankang:'均衡营养 + 充足睡眠（10小时）',chengshi:'公园·图书馆·动物园常去',fengwu:'四季物候观察（花鸟鱼虫·节令）',xiuyang:'古典音乐听赏（宫羽音·4小时/周）',renmai:'亲子+同伴社交圈（5-8人稳定）',chuangye:'小商业启蒙（跳蚤市场·手工坊）',yanglao:'祖辈互动（请家中老人讲故事）',chuancheng:'家谱/姓氏故事（记住4代名字）'}},
+  {key:'school',name:'小学中学',range:'7-17岁',focus:['学习','品德','兴趣'],
+   template:{xueye:'学科主课+1门专长（25%+ 主课量）',zhiye:'职业探索讲座（每学期 1-2 场）',caiyun:'零花钱+理财记账（月度复盘）',hunyin:'同伴友谊维护+恋爱观萌芽',jiankang:'运动习惯定型（30分/天）',chengshi:'家乡周边行万里路（年 2 次）',fengwu:'历史/博物馆参访（学期 1 次）',xiuyang:'读书笔记·书法·一件乐器',renmai:'同学圈+师长资源（10-20人）',chuangye:'校园微创业（社团·项目·比赛）',yanglao:'助老/敬老志愿（学期 1 次）',chuancheng:'家族行业初了解（父母工种）'}},
+  {key:'university',name:'大学',range:'18-23岁',focus:['专业','社交','实践'],
+   template:{xueye:'专业深耕 + 跨学科辅修/考证',zhiye:'行业实习 2 段（寒暑假各 1）',caiyun:'个人理财起步（指数/定投·规划）',hunyin:'亲密关系实战（含分手复盘）',jiankang:'作息节律锁定 + 运动专长',chengshi:'一线/新一线·三年规划（毕业定锚）',fengwu:'城市人文深度游（街区+老字号）',xiuyang:'读经典·写文章·学一门外语',renmai:'导师+同窗+行业校友（30人脉）',chuangye:'尝试1次创业实操（摆摊·轻量）',yanglao:'探望长辈·接触老龄议题',chuancheng:'立家训·明确个人使命陈述'}},
+  {key:'career',name:'职场+婚恋',range:'24-65岁',focus:['事业','婚恋','健康'],
+   template:{xueye:'在读硕博/考证/终身学习（年 1 证）',zhiye:'5 年职业三跳（稳·升·创各 1）',caiyun:'攻守理财（股·债·保·房）',hunyin:'婚姻经营 + 子女教育规划',jiankang:'每年深度体检+运动习惯',chengshi:'安居城市挑选（宜居+子女教育）',fengwu:'名山大川·风景名胜（年 1-2 处）',xiuyang:'静心修行（禅·茶·琴·书各 1）',renmai:'圈层重塑（同领域 30 人+跨领域 10）',chuangye:'二次创业评估（30/40/50 节点）',yanglao:'45 岁起筹备养老金（社保+商保+投资）',chuancheng:'家风传承·著作/家训'}}
 ];
 const DOMAINS = [
   {key:'xueye',name:'学业',icon:'📚'},
@@ -280,6 +291,7 @@ const DOMAINS = [
   {key:'hunyin',name:'婚姻',icon:'💕'},
   {key:'jiankang',name:'健康',icon:'💊'},
   {key:'chengshi',name:'城市',icon:'🏙️'},
+  {key:'fengwu',name:'风物',icon:'🏔️'},
   {key:'xiuyang',name:'修养',icon:'🎋'},
   {key:'renmai',name:'人脉',icon:'🤝'},
   {key:'chuangye',name:'创业',icon:'🚀'},
@@ -331,7 +343,7 @@ function generate(){
       ];
       const fiveYearAdvice = age<30?'启始期，重点在✍️学业 🤝人脉 建节奏':age<50?'进取期，重点在💼事业 💰财运 💕婚恋':'守成期，重点在💊健康 🏙️城市 🎁传承';
 
-      render({age,sex,residence,focus,extra,stage,domainScores,next5,fiveYearAdvice});
+      render({age,sex,residence,focus,extra,stage,stageTemplate:stage.template,domainScores,next5,fiveYearAdvice});
       btn.disabled=false; btn.textContent='🔄 重新生成';
     }catch(e){
       alert('生成失败：'+e.message);
@@ -350,6 +362,16 @@ function render(d){
     h+='<div class="dom"><div class="ico">'+s.icon+'</div><div class="nm">'+s.name+'</div><div class="num">'+s.score+'</div><div class="bar"><div class="bar-fill" style="width:'+s.score+'%"></div></div><div class="st">'+s.status+'</div></div>';
   });
   h+='</div></div>';
+
+  // 48 子项模板（R41-B）—— 本阶段 12 领域细化动作
+  if(d.stageTemplate){
+    h+='<div class="card"><h2>📋 本阶段 48 子项模板</h2><div class="st-list">';
+    Object.entries(d.stageTemplate).forEach(([dk, dv])=>{
+      const dom = d.domainScores.find(x => x.key === dk);
+      h+='<div class="st-row"><span class="st-ico">'+(dom?dom.icon:'•')+'</span><b>'+(dom?dom.name:dk)+'</b><span class="st-action">'+dv+'</span></div>';
+    });
+    h+='</div></div>';
+  }
 
   // 时间轴
   h+='<div class="card"><h2>📅 人生时间轴</h2><div class="tl">';
