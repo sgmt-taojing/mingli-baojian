@@ -562,7 +562,15 @@ function startModule(id){
   if(!mod)return;
   state={module:id,step:0,data:{},reporting:false};
   chat.innerHTML='';
-  addAI('您好！让我们开始「'+mod.name+'」分析。\n\n'+mod.steps[0].q,mod.steps[0]);
+  let intro='您好！让我们开始「'+mod.name+'」分析。\n\n'+mod.steps[0].q;
+  // R41-DR1 节点 7：music/lifeindex/lifeplan 三模块提示 detail 页可独立使用
+  const _detailIntro = {
+    music:'🎵 疗愈音乐提供 5 段播放列表 + 7 日疗程。完成问心后点「独立报告」可跳转 music-detail.html，含 Edge-TTS 试听、可分享、可打印。',
+    lifeindex:'📊 生命指数提供 12 维度评分（事业·财运·健康·婚姻·学业·家庭·人际·精神·享福·寿元·风物·修养）。完成后跳 lifeindex-detail.html，可与朋友家人一起看。',
+    lifeplan:'🗺️ 人生规划提供 4 阶段（学龄前·中小学·大学·职场+婚恋）× 12 领域 = 48 子项模板。完成后跳 lifeplan-detail.html 可分享给老师/家长/创业者。'
+  };
+  if(_detailIntro[id]) intro += '\n\n'+_detailIntro[id];
+  addAI(intro,mod.steps[0]);
 }
 
 function addAI(text,stepData){
@@ -915,6 +923,28 @@ function showReport(text){
   var _repEsc=esc(text).replace(/"/g,'&quot;');
   ops.innerHTML='<button class="btn-save" data-report="'+_repEsc+'" onclick="saveReport(this)">💾 保存报告</button><button class="btn-copy" data-report="'+_repEsc+'" onclick="copyReport(this)">📋 复制</button>';
   d.appendChild(ops);
+
+  // R41-DR1 节点 7：music/lifeindex/lifeplan 三模块 detail 页跳转入口
+  if (state.module === 'music' || state.module === 'lifeindex' || state.module === 'lifeplan') {
+    const detailOps = document.createElement('div');
+    detailOps.className = 'report-ops report-ops-detail';
+    detailOps.style.cssText = 'margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;';
+    const _mid = state.module;
+    const _detailUrls = {
+      music: 'music-detail.html',
+      lifeindex: 'lifeindex-detail.html',
+      lifeplan: 'lifeplan-detail.html'
+    };
+    const _detailNames = {
+      music: '疗愈音乐',
+      lifeindex: '生命指数',
+      lifeplan: '人生规划'
+    };
+    const _url = _detailUrls[_mid];
+    const _name = _detailNames[_mid];
+    detailOps.innerHTML = '<a class="btn-detail-link" href="'+_url+'" target="_blank" style="background:linear-gradient(135deg,#c9a84c,#a07c2a);color:#0a0a0a;padding:8px 14px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">📄 独立 '+_name+' 报告页（可分享/可打印/可试听）</a>';
+    d.appendChild(detailOps);
+  }
 
   // P14 节点 3：music 朗读按钮组（检测 MUSIC_PLAYLIST sentinel）
   try {
