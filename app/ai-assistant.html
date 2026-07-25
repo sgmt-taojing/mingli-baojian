@@ -816,6 +816,11 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
       html += '🎵 推荐播放列表：\n';
       rep.playList.forEach((p,i) => html += '  '+(i+1)+'. '+p.name+'（'+p.duration+' 秒）'+(p.ttsText?' \n     ↳ '+p.ttsText:'')+'\n');
       html += '\n';
+      // P14 节点 3：嵌入朗读按钮 sentinel（在 showReport 后由 _afterShowReportMusic 抓取并附加按钮组）
+      try{
+        const _plJson = JSON.stringify(rep.playList).replace(/"/g,'&quot;');
+        html += '\n<!--MUSIC_PLAYLIST:'+_plJson+'-->\n';
+      }catch(e){ console.warn('music playlist serialize err', e); }
     }
     if(rep.intro){ html += '📝 '+rep.intro+'\n\n'; }
     if(rep.cycleText){ html += rep.cycleText+'\n\n'; }
@@ -908,6 +913,20 @@ function showReport(text){
   var _repEsc=esc(text).replace(/"/g,'&quot;');
   ops.innerHTML='<button class="btn-save" data-report="'+_repEsc+'" onclick="saveReport(this)">💾 保存报告</button><button class="btn-copy" data-report="'+_repEsc+'" onclick="copyReport(this)">📋 复制</button>';
   d.appendChild(ops);
+
+  // P14 节点 3：music 朗读按钮组（检测 MUSIC_PLAYLIST sentinel）
+  try {
+    const m = text.match(/<!--MUSIC_PLAYLIST:(\[.*?\])-->/);
+    if (m) {
+      const playlist = JSON.parse(m[1].replace(/&quot;/g,'"'));
+      const ttsOps = document.createElement('div');
+      ttsOps.className = 'report-ops report-ops-tts';
+      ttsOps.style.cssText = 'margin-top:6px;';
+      ttsOps.innerHTML = '<button class="btn-tts-play" onclick="_playMusicPlaylist(this)" data-playlist=\''+JSON.stringify(playlist).replace(/'/g,"&#39;")+'\'>▶️ 连续朗读 5 段</button>'+
+        '<button class="btn-tts-stop" onclick="_stopMusicPlaylist()" style="background:#fff;border:1px solid #f59e0b;color:#b45309;">⏹️ 停止朗读</button>';
+      d.appendChild(ttsOps);
+    }
+  } catch(e){ console.warn('music tts btn err', e); }
   
   // 闭环：询问+推送
   setTimeout(()=>{
@@ -2735,6 +2754,40 @@ function stopTTS(){
   else if('speechSynthesis' in window)window.speechSynthesis.cancel();
   const btn=document.getElementById('tts-btn');
   if(btn){btn.textContent='🔊';btn.classList.remove('on');}
+}
+
+// P14 节点 3：music 顺序朗读控制（P1-任务3 断网可用率 100%）
+window._musicPlaylistAbort = false;
+function _playMusicPlaylist(btn){
+  if(!('speechSynthesis' in window)){ alert('当前浏览器不支持 SpeechSynthesis，请换 Chrome/Safari。'); return; }
+  let pl;
+  try{ pl = JSON.parse(btn.getAttribute('data-playlist')); }catch(e){ console.warn('playlist parse err',e); return; }
+  window._musicPlaylistAbort = false;
+  window.speechSynthesis.cancel();
+  const texts = pl.map(p => p.ttsText).filter(Boolean);
+  if(!texts.length) return;
+  let i = 0;
+  const speakNext = () => {
+    if(window._musicPlaylistAbort || i >= texts.length) return;
+    const u = new SpeechSynthesisUtterance(texts[i]);
+    u.lang = 'zh-CN';
+    u.rate = 0.92;
+    u.pitch = 1.0;
+    u.volume = 1.0;
+    u.onend = () => {
+      i++;
+      setTimeout(()=>{ if(!window._musicPlaylistAbort) speakNext(); }, 600);
+    };
+    u.onerror = (e)=>{ console.warn('TTS err',e); i++; setTimeout(()=>{ if(!window._musicPlaylistAbort) speakNext(); }, 600); };
+    window.speechSynthesis.speak(u);
+  };
+  speakNext();
+  btn.textContent='🔊 朗读中...'; btn.disabled=true;
+  setTimeout(()=>{ btn.textContent='▶️ 连续朗读 5 段'; btn.disabled=false; }, 30000);
+}
+function _stopMusicPlaylist(){
+  window._musicPlaylistAbort = true;
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
 }
 /* 麦克风 UI 复位 */
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/━━━/g,'<b class="sec">━━━').replace(/━━━/g,'━━━</b>').replace(/\n/g,'<br>');}
