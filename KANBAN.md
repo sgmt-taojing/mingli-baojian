@@ -328,3 +328,4 @@
 | 8.5 | 共性 UI 字面量抽离 + 最终验收 | 2026-07-25 03:02 | zh-CN.json +8 common key + i18n.js +27 BUILTIN + docs/I18N_NODE_8_5_REPORT.md（10,888B / 8 章节） |
 | **#8 完结** | **国际化文案规范 6/6 完成** | **2026-07-25 03:02** | i18n.js 337 行 + zh-CN.json 90 key + 5 份节点报告，12 API 0 破坏性变更 |
 | 9.1 | a11y 现状调研报告 | 2026-07-25 03:36 | docs/A11Y_AUDIT_v1.md（29,703B / 548 行 / 8 章节 + 2 附录）— 仅 4/63 文件含 aria-*、474 处 div onclick、0 skip-link、81 处 outline:none |
+test
