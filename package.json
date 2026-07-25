@@ -6,7 +6,16 @@
   "scripts": {
     "test": "jest",
     "perf:budget": "node scripts/bundle-budget-check.js",
-    "perf:budget:strict": "node scripts/bundle-budget-check.js --strict"
+    "perf:budget:strict": "node scripts/bundle-budget-check.js --strict",
+    "lint:msg": "commitlint --edit $1",
+    "lint:msg:staged": "lint-staged",
+    "prepare": "husky",
+    "release": "standard-version",
+    "release:dry": "standard-version --dry-run",
+    "release:minor": "standard-version --release-as minor",
+    "release:patch": "standard-version --release-as patch",
+    "release:major": "standard-version --release-as major",
+    "release:first": "standard-version --first-release"
   },
   "private": true,
   "keywords": [],
@@ -28,7 +37,10 @@
     "doc": "docs"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.2.1",
+    "@commitlint/config-conventional": "^21.2.0",
     "@pact-foundation/pact": "^17.0.1",
+    "husky": "^9.1.7",
     "jest": "^30.4.2",
     "standard-version": "^9.5.0",
     "supertest": "^7.2.2"

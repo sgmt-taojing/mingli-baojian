@@ -82,6 +82,19 @@
 
 ## 进行中 🔄
 
+### #13 · H5 API 暴露给前端（≥12 个）· 2026-07-25 08:00 🚀
+
+| 字段 | 值 |
+|------|---|
+| 优先级 | P0（AGENTS.md 强化任务 P0-任务2） |
+| 规范引用 | AGENTS.md / 后端 api-server-v2.js |
+| 节点进度 | **1/N 进行中**（节点 1 审计） |
+| 当前节点 | **13.1 H5 API 暴露现状审计** |
+| 下一步动作 | 节点 1 Worker 已派（childSessionKey `1a093be2-7b5d-4133-82fb-6e0541632bed`）→ 审计后端路由表 + 12 API 对照 + my-yuanzhu.html 现状 + H5 调用矩阵 |
+| 目标 12 API | yuanzhu/list / profile / yearly-pushes / public/latest-pushes / feedback/points / public/stats / public/recent-cases / shop/products / voices / kb/list / courses / clinic/my-reports |
+| 阻塞 | 无 |
+| 最后更新 | 2026-07-25 08:00 |
+
 ### ~~#12 · 文档即代码（索引 + 失效告警）~~ 2026-07-25 06:32 ✅
 
 | 字段 | 值 |
