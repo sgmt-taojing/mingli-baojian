@@ -3,7 +3,14 @@
 > **维护原则**：每个任务按工作流 22 节点推进；完成一个自动拉下一个；阻塞项标红等待决策。
 > **断点机制**：每个进行中任务必须记录"当前节点 + 产出物 + 下一步"，心跳只看这一页就能续推。
 > **顶层架构**：见 MECHANISM.md（本项目根目录）
-> **最后更新**：2026-07-25 10:05（#13 节点 3 my-yuanzhu 4 项增强落地 ✅ — commit `839d8a2`）
+> **最后更新**：2026-07-25 10:30（心跳巡检 ✅ 5/5 健康 · P0-任务1 R49-B 已落实测 PASS · 新拉 #14 推 P1-任务3+4）
+
+> **心跳 10:30 发现（autoclaw/AGENTS.md P0/P1 收尾核查）**：
+> - **P0-任务1（KB 优先 + 后端 AI 兜底双路径）✅ 已落地**：R49-B `/api/ai/public-chat` server/api-server-v2.js:826-870 实现 0.85+直答 / 0.4-0.8 部分命中 / <0.4 AI 兜底 + localStorage `_kb_hit_count/{mod}` ai-assistant.html:291-298 + showWelcome 今日统计 526-532 + `/api/ai/kb-hit-stats` 返回 8条历史 7 topQueries 3 bySource。**实测端到端 PASS**：'五行' → kb_module=r45_palace, kb_score=1。**不再派工**。
+> - **P0-任务2（H5 后台 API ≥12 个）✅ 已落地**：#13 完结（my-yuanzhu.html 4 项增强 + 12 API）。
+> - **P1-任务3（music/lifeindex/lifeplan KB 兜底）❌ 未动工**：grep 全 0。仅 lifeindex-detail.html / lifeplan-detail.html 页面存在，无任何 `_MODULE_REPORTS` 全局数据。
+> - **P1-任务4（lifeplan 蓝图化）❌ 未动工**：`/api/ai/lifeplan-report` 端点不存在。
+> - **决策**：合并 #14 = P1-任务3 + P1-任务4，先做调研报告（节点 1），再分批落地 KB 兜底内容（节点 2-4），最后蓝图化（节点 5-6）。
 
 > **R15 KB 补强终态（2026-07-25 09:12）**：
 
@@ -102,15 +109,31 @@
 
 ## 进行中 🔄
 
-### #13 · H5 API 暴露给前端（≥12 个）· 2026-07-25 10:05 ✅
+### #14 · music/lifeindex/lifeplan KB 兜底 + lifeplan 蓝图化（合并 P1-任务3+P1-任务4）· 2026-07-25 10:30 启动 🔄
+
+| 字段 | 值 |
+|------|---|
+| 优先级 | **P1 → 实战提升到 P0**（AGENTS.md / 用户主动进化清单 / 断网 100% 可生成报告 + lifeplan 详情页） |
+| 规范引用 | AGENTS.md P1-任务3 / P1-任务4 |
+| 节点进度 | **0/6 ⏳（待派工）** |
+| 当前节点 | **14.1 调研中：subagent `agent:main:subagent:463ae1f9-211a-489b-9415-a88f93ff2e2c` / runId `a7bd74b0-27a5-4f25-a315-d2147adc740c` / 10:32 启动 / 预计 ≤10:62 交付 `docs/P14_NODE_1_AUDIT.md`** |
+| 下一步动作 | Worker A（30 分钟）产出：①三模块现状 gap 报告（music 音阶 × 5 情志 / lifeindex 10 维度 / lifeplan 4 阶段 + 12 领域）② `_MODULE_REPORTS` 全局对象 schema 设计（>800 行）③ `/api/ai/lifeplan-report` 端点契约 |
+| 目标验收 | · music/lifeindex/lifeplan **断网可生成报告 100%**（核心是 `_MODULE_REPORTS` 完整 KB 兜底）<br>· lifeplan 详情页（lifeplan-detail.html）：时间轴（每 10 岁一段）+ 12 领域矩阵（学业/职业/财运/婚姻/健康/城市/风物/修养/人脉/创业/养老/传承）+ 未来 5 年建议 + 10 条行动清单 + 可分享/可打印<br>· 多 1 题收集「出生地+现居地」→ 影响方位/流年 |
+| 阻塞 | 无 |
+| 完成节点 | ⏳ **节点 14.1**：调研三模块当前缺口 + _MODULE_REPORTS schema 设计 + 6 节点拆解报告<br>⏳ **节点 14.2**：music 五行音 KB 兜底（宫商角徵羽 × 焦虑/失眠/悲伤/愤怒/疲劳 + Edge-TTS 文案）<br>⏳ **节点 14.3**：lifeindex 10 维度评分 × 五行权重 KB<br>⏳ **节点 14.4**：lifeplan 4 阶段 × 12 领域 KB（学龄前/小学中学/大学/职场+婚恋）<br>⏳ **节点 14.5**：`/api/ai/lifeplan-report` 后端端点 + AI 润色集成<br>⏳ **节点 14.6**：lifeplan-detail.html 时间轴可视化 + 12 领域矩阵 + 打印分享 + commit + push |
+| 最后更新 | 2026-07-25 10:30 |
+
+---
+
+### ~~#13 · H5 API 暴露给前端（≥12 个）~~ 2026-07-25 10:05 ✅
 
 | 字段 | 值 |
 |------|---|
 | 优先级 | P0（AGENTS.md 强化任务 P0-任务2） |
 | 规范引用 | AGENTS.md / 后端 api-server-v2.js |
 | 节点进度 | **3/3 ✅**（节点 1 + 2 + 3 全完结） |
-| 当前节点 | **完结 ✅ → 启动下一 P0 候选** |
-| 下一步动作 | **拉下一 P0 候选**：① music/lifeindex/lifeplan 断网 KB 兜底（P1-任务3） ② lifeplan 蓝图化（P1-任务4） ③ 暴露后台 API 增强迭代 |
+| 当前节点 | **完结 ✅** |
+| 下一步动作 | P0 候选已完成 → 拉 #14 推 P1-任务3+4 |
 | 目标 12 API | yuanzhu/list / profile / yearly-pushes / public/latest-pushes / feedback/points / public/stats / public/recent-cases / shop/products / voices / kb/list / courses / clinic/my-reports |
 | 完成节点 | **13.1 — H5 API 暴露现状审计 ✅**（docs/H5_API_EXPOSURE_AUDIT_v1.md 504 行 / 24,622B / 130 路由审计 / 12 API 缺口分析）<br>**13.2 — API 缺口修补 + H5 my-yuanzhu.html 落地 ✅**（commit `21b9124` + docs/H5_API_NODE_2_REPORT.md 271 行 / 10,560B / 新增 `GET /api/admin/yuanzhu/profile` 路由 / 13/13 端点全可达）<br>**13.3 — H5 my-yuanzhu.html 4 项增强 ✅**（commit `839d8a2`：购买 + KB 搜索 + 分页 + TTS 试听 / 420 行 +100/-19 / 2 个 inline 脚本块 Function 语法 OK / HTTP 200） |
 | 阻塞 | 无 |
