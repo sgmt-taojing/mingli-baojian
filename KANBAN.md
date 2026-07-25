@@ -3,7 +3,7 @@
 > **维护原则**：每个任务按工作流 22 节点推进；完成一个自动拉下一个；阻塞项标红等待决策。
 > **断点机制**：每个进行中任务必须记录"当前节点 + 产出物 + 下一步"，心跳只看这一页就能续推。
 > **顶层架构**：见 MECHANISM.md（本项目根目录）
-> **最后更新**：2026-07-25 11:03（心跳推进 · #14 节点 14.1 调研报告完成 ✅ — 36 KB / 562 行 / docs/P14_NODE_1_AUDIT.md / 3 模块现状 + _MODULE_REPORTS schema + /api/ai/lifeplan-report 端点契约；当前进入 14.2/14.3/14.4 → 实际代码中三模块 KB 兜底**已基本就绪**——music 5 段播放列表 + lifeindex 12 维度 + lifeplan 48 子项+ttsText+timeline 全部落地（commits c27a54d/ca9fdfc/5b501ae）；下一动作派 Worker B 推进 14.5+14.6：后端 `/api/ai/lifeplan-report` 端点 + 出生地/现居地收集 + lifeplan-detail.html 时间轴+12 领域矩阵可视化）
+> **最后更新**：2026-07-25 11:15（心跳推进 · #14 节点 14.1 调研报告完成 ✅ — 36 KB / 562 行 / docs/P14_NODE_1_AUDIT.md / 3 模块现状 + _MODULE_REPORTS schema + /api/ai/lifeplan-report 端点契约；当前进入 14.2/14.3/14.4 → 实际代码中三模块 KB 兜底**已基本就绪**——music 5 段播放列表 + lifeindex 12 维度 + lifeplan 48 子项+ttsText+timeline 全部落地（commits c27a54d/ca9fdfc/5b501ae/83a9fd8/9c53e83）；lifeindex-detail.html Edge-TTS 试听接入 8912（降级浏览器 SpeechSynthesis）；lifeplan-detail.html STAGES 4 阶段 48 子项；下一动作派 Worker B 推进 14.5+14.6：后端 `/api/ai/lifeplan-report` 端点 + 出生地/现居地收集 + lifeplan-detail.html 时间轴+12 领域矩阵可视化）
 
 > **心跳 10:30 发现（autoclaw/AGENTS.md P0/P1 收尾核查）**：
 > - **P0-任务1（KB 优先 + 后端 AI 兜底双路径）✅ 已落地**：R49-B `/api/ai/public-chat` server/api-server-v2.js:826-870 实现 0.85+直答 / 0.4-0.8 部分命中 / <0.4 AI 兜底 + localStorage `_kb_hit_count/{mod}` ai-assistant.html:291-298 + showWelcome 今日统计 526-532 + `/api/ai/kb-hit-stats` 返回 8条历史 7 topQueries 3 bySource。**实测端到端 PASS**：'五行' → kb_module=r45_palace, kb_score=1。**不再派工**。
