@@ -67,6 +67,11 @@ textarea{min-height:60px;resize:vertical}
 /* 总结 */
 .summary{font-size:13px;opacity:.9;padding:14px;background:rgba(201,168,76,.05);border-radius:8px;margin-top:10px;line-height:1.8}
 .tools{display:flex;gap:8px;margin:18px 0}
+.tts-row{display:flex;align-items:center;gap:12px;padding:10px;background:rgba(201,168,76,.04);border-radius:8px}
+.tts-btn{flex-shrink:0;padding:8px 18px;background:linear-gradient(135deg,var(--gold),var(--bronze));color:#0a0a0a;font:inherit;font-size:13px;font-weight:600;border:none;border-radius:6px;cursor:pointer;letter-spacing:1px}
+.tts-btn:hover:not(:disabled){box-shadow:0 4px 12px rgba(201,168,76,.3)}
+.tts-btn.loading{opacity:.6;cursor:wait}
+.tts-hint{font-size:11px;opacity:.6;line-height:1.5}
 .tools button{flex:1;padding:10px;font:inherit;font-size:13px;background:rgba(255,255,255,.05);color:var(--paper);border:1px solid var(--line);border-radius:6px;cursor:pointer}
 .tools button:hover{background:rgba(201,168,76,.1);border-color:var(--gold)}
 @media print{body{background:#fff;color:#000;padding:10px}.card,.banner,.dim,.tb-card,.fy-row{background:#fafafa !important;color:#000 !important;border:1px solid #ccc !important}.btn,.tools,#input{display:none !important}.banner .ele,.banner .total,.card h2,.dim .num{color:#000 !important}h1{color:#000}}
@@ -120,12 +125,23 @@ const DIMS = [
   {key:'jiankang',name:'健康',icon:'💪',weight:0.20,focus:'运动+饮食+作息'},
   {key:'hunyin',name:'婚姻',icon:'💑',weight:0.15,focus:'沟通+包容+共同成长'},
   {key:'xueye',name:'学业',icon:'📚',weight:0.10,focus:'学历+证书+终身学习'},
-  {key:'jiating',name:'家庭',icon:'🏡',weight:0.05,focus:'子女教育+亲情'},
-  {key:'renji',name:'人际',icon:'🤝',weight:0.05,focus:'深度关系+同行圈子'},
-  {key:'jingshen',name:'精神',icon:'🎭',weight:0.05,focus:'信仰+哲学+艺术'},
-  {key:'xiangfu',name:'享福',icon:'🌸',weight:0.03,focus:'体验+旅行+生活品质'},
-  {key:'shouyuan',name:'寿元',icon:'🍵',weight:0.02,focus:'养生+保健+定期体检'}
+  {key:'jiating',name:'家庭',icon:'🏡',weight:0.04,focus:'子女教育+亲情'},
+  {key:'renji',name:'人际',icon:'🤝',weight:0.04,focus:'深度关系+同行圈子'},
+  {key:'jingshen',name:'精神',icon:'🎭',weight:0.04,focus:'信仰+哲学+艺术'},
+  {key:'xiangfu',name:'享福',icon:'🌸',weight:0.02,focus:'体验+旅行+生活品质'},
+  {key:'shouyuan',name:'寿元',icon:'🍵',weight:0.02,focus:'养生+保健+定期体检'},
+  {key:'fengwu',name:'风物',icon:'🏔️',weight:0.02,focus:'名山大川·物候观察·四季体验'},
+  {key:'xiuyang',name:'修养',icon:'🎋',weight:0.02,focus:'禅·茶·琴·书·静心修习'}
 ];
+
+// R41-B：12 维度五行权重偏差（与 ai-assistant 的 WX_DIM_BIAS 对齐）
+const WX_DIM_BIAS = {
+  '金':{shiye:+6,caiyun:+8,jiankang:+2,hunyin:+1,xueye:+1,jiating:0,renji:+1,jingshen:0,xiangfu:+1,shouyuan:+1,fengwu:+1,xiuyang:+1},
+  '木':{shiye:+2,caiyun:+2,jiankang:+2,hunyin:+1,xueye:+8,jiating:+1,renji:+2,jingshen:+6,xiangfu:+2,shouyuan:+2,fengwu:+5,xiuyang:+5},
+  '水':{shiye:+2,caiyun:+2,jiankang:+1,hunyin:+2,xueye:+6,jiating:0,renji:+6,jingshen:+7,xiangfu:+1,shouyuan:+2,fengwu:+2,xiuyang:+6},
+  '火':{shiye:+5,caiyun:+3,jiankang:+2,hunyin:+4,xueye:+1,jiating:+1,renji:+5,jingshen:+2,xiangfu:+4,shouyuan:+1,fengwu:+2,xiuyang:+3},
+  '土':{shiye:+2,caiyun:+2,jiankang:+6,hunyin:+2,xueye:+1,jiating:+6,renji:+1,jingshen:+2,xiangfu:+3,shouyuan:+7,fengwu:+4,xiuyang:+5}
+};
 
 function generate(){
   const btn=document.getElementById('genBtn');
@@ -141,13 +157,8 @@ function generate(){
       let boost=0;
       (ELE_KEYS[ele]||[]).forEach(k=>{ if(userText.includes(k)) boost+=3; });
       const result=DIMS.map(d=>{
-        let bias=0;
-        if(ele==='金'&&['caiyun','shiye'].includes(d.key)) bias+=8;
-        if(ele==='木'&&['xueye','jingshen'].includes(d.key)) bias+=8;
-        if(ele==='水'&&['renji','jingshen'].includes(d.key)) bias+=8;
-        if(ele==='火'&&['renji','xiangfu'].includes(d.key)) bias+=8;
-        if(ele==='土'&&['jiankang','shouyuan'].includes(d.key)) bias+=8;
-        if(d.weight<=0.05) bias-=3;
+        let bias=(WX_DIM_BIAS[ele] && WX_DIM_BIAS[ele][d.key]) || 0;
+        if(d.weight<=0.04) bias-=2;
         const noise=Math.floor(Math.abs(Math.sin(d.key.charCodeAt(0)*age))*8)-4;
         const score=Math.max(30,Math.min(99,Math.round(base*0.7+d.weight*100+boost+bias+noise)));
         return {...d,score,bias:bias>0?`+${bias}`:bias<0?`${bias}`:''};
@@ -193,7 +204,7 @@ function render(d){
   h+='<div class="focus">'+ELE_FOCUS[d.ele]+'</div>';
   h+='<div style="margin-top:10px"><span class="ele-tag">'+d.ele+'主属</span></div></div>';
 
-  h+='<div class="card"><h2>📊 10 维度评分</h2><div class="dims">';
+  h+='<div class="card"><h2>📊 12 维度评分</h2><div class="dims">';
   d.result.forEach(r=>{
     h+='<div class="dim"><div class="ico">'+r.icon+'</div><div class="info"><div class="nm"><b>'+r.name+'</b><span style="opacity:.5;font-size:10px">'+r.bias+'</span></div><div class="focus">'+r.focus+'</div></div><div class="num">'+r.score+'</div></div>';
   });
@@ -216,6 +227,9 @@ function render(d){
   h+='</ol></div>';
 
   h+='<div class="card"><h2>📜 总评</h2><div class="summary">'+d.summary+'</div></div>';
+
+  // Edge-TTS 试听按钮（调用 8912 端口服务生成语音）
+  h+='<div class="card"><h2>🔊 总评语音试听</h2><div class="tts-row"><button class="tts-btn" onclick="ttsSpeak(\''+d.ele+'\','+d.age+',\''+encodeURIComponent(d.summary).replace(/'/g,'\\\'')+'\')">⚡ 生成语音</button><span class="tts-hint">点击调用 edge-tts 服务生成语音片段</span></div><audio id="tts-audio" controls style="width:100%;margin-top:10px;display:none"></audio></div>';
 
   h+='<div class="tools"><button onclick="shareUrl()">🔗 分享链接</button><button onclick="window.print()">🖨️ 打印/保存 PDF</button><button onclick="copyTxt()">📋 复制文本</button></div>';
 
@@ -247,6 +261,40 @@ function shareUrl(){
 
 function copyTxt(){
   if(navigator.clipboard){navigator.clipboard.writeText(document.getElementById('report').innerText).then(()=>showToast('已复制'));}
+}
+
+// Edge-TTS 试听：调用 8912 服务。文本来自诊断总结。
+async function ttsSpeak(ele, age, summaryEncoded){
+  const summary = decodeURIComponent(summaryEncoded);
+  const audio = document.getElementById('tts-audio');
+  const btn = document.querySelector('.tts-btn');
+  if(!audio || !btn) return;
+  if(btn.classList.contains('loading')) return;
+  btn.classList.add('loading');
+  btn.textContent = '⏳ 生成中...';
+  try{
+    const resp = await fetch('http://127.0.0.1:8912/api/tts?text=' + encodeURIComponent(summary) + '&voice=female');
+    if(!resp.ok) throw new Error('TTS 服务返回 '+resp.status);
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+    audio.src = url;
+    audio.style.display='block';
+    audio.play().catch(()=>{});
+    showToast('✅ 语音已生成·点击播放');
+    btn.classList.remove('loading');
+    btn.textContent = '⚡ 重新生成';
+  }catch(e){
+    showToast('⚠️ edge-tts 服务未起（8912）· 已降级浏览器朗读');
+    btn.classList.remove('loading');
+    btn.textContent = '⚡ 生成语音';
+    // 降级浏览器
+    if(window.speechSynthesis){
+      const u = new SpeechSynthesisUtterance(summary);
+      u.lang='zh-CN'; u.rate=0.95;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u);
+    }
+  }
 }
 
 function showToast(m){
