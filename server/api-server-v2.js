@@ -1476,6 +1476,63 @@ app.get('/api/admin/yuanzhu/push-stats', adminAuth, (req, res) => {
   } });
 });
 
+// 4b. 元助画像大盘（adminGlass 仪表盘用，分页返回所有用户档案摘要）
+//     由 app/admin-glass-dashboard.html loadStats() 调用，修复 H5_API_EXPOSURE_AUDIT_v1 第 6.1 节缺口
+app.get('/api/admin/yuanzhu/profile', adminAuth, (req, res) => {
+  try {
+    const limit = Math.min(parseInt(req.query.limit) || 50, 200);
+    const offset = Math.max(parseInt(req.query.offset) || 0, 0);
+    const total = db.prepare(`SELECT COUNT(*) AS c FROM yuanzhu_profile`).get().c;
+    const rows = db.prepare(`
+      SELECT user_id, display_name, day_master, xi_ele, ji_ele, lack_wuxing, zodiac,
+             focus_areas, concern_keywords, mod_stats,
+             paipan_count, push_year, push_priority, push_opt_in,
+             first_paipan_at, last_paipan_at, created_at, updated_at
+      FROM yuanzhu_profile
+      ORDER BY COALESCE(last_paipan_at, updated_at, created_at) DESC NULLS LAST
+      LIMIT ? OFFSET ?
+    `).all(limit, offset);
+    const items = rows.map(r => {
+      let focus = [], kw = [], stats = {};
+      try { focus = JSON.parse(r.focus_areas || '[]'); } catch(_) {}
+      try { kw    = JSON.parse(r.concern_keywords || '[]'); } catch(_) {}
+      try { stats = JSON.parse(r.mod_stats || '{}'); } catch(_) {}
+      return {
+        user_id: r.user_id,
+        display_name: r.display_name,
+        day_master: r.day_master,
+        xi_ele: r.xi_ele,
+        ji_ele: r.ji_ele,
+        lack_wuxing: r.lack_wuxing,
+        zodiac: r.zodiac,
+        focus_areas: focus,
+        concern_keywords: kw,
+        mod_stats: stats,
+        paipan_count: r.paipan_count,
+        push_year: r.push_year,
+        push_priority: r.push_priority,
+        push_opt_in: r.push_opt_in === 1,
+        first_paipan_at: r.first_paipan_at,
+        last_paipan_at: r.last_paipan_at,
+        updated_at: r.updated_at
+      };
+    });
+    apiResp(res, ERROR_CODES.SUCCESS, {
+      ok: true,
+      total,
+      limit,
+      offset,
+      count: items.length,
+      has_more: offset + items.length < total,
+      items,
+      profiles: items  // 兼容 admin-glass-dashboard 既有读取逻辑（data.profiles）
+    }, 'ok');
+  } catch (err) {
+    req.log?.error?.(err);
+    apiResp(res, ERROR_CODES.SERVER_ERROR, null, '元助画像大盘查询失败');
+  }
+});
+
 // 5. cron 触发器（手动调用，adminAuth 保护；launchd 可拉这个端点做定时）
 app.post('/api/admin/cron/yearly-push', adminAuth, (req, res) => {
   const year = parseInt(req.body.year || new Date().getFullYear());
