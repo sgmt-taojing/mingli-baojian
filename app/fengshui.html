@@ -6964,7 +6964,7 @@ function generateArchiveDetail(){
   ARC_STATES_R32.forEach(function(s, i){
     var activeCls = i === stateIdx ? "active" : "";
     var passedCls = i < stateIdx ? "passed" : "";
-    h += "<ml-tap class=\"arc-state-cell " + activeCls + " " + passedCls + "\" onclick=\"window.location.hash='" + s.crossRef + "'\" style="display:block">";
+    h += `<ml-tap class="arc-state-cell ${activeCls} ${passedCls}" onclick="window.location.hash='${s.crossRef}'" style="display:block">`;
     h += "<div class=\"asc-num\">" + (i+1) + "</ml-tap>";
     h += "<div class=\"asc-name\">" + s.state + "</div>";
     h += "<div class=\"asc-score\">" + s.score + "</div>";
