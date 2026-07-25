@@ -932,6 +932,120 @@ app.post('/api/ai/public-chat', async (req, res) => {
   }
 });
 
+
+// === P14 节点 7：lifeplan 后端生成端点 ===
+// POST /api/ai/lifeplan-report
+// body: { age, gender?, concerns?: [string], birthPlace?, livePlace?, withTTS?: boolean }
+// 返回: { report: {...}, kbHits: [...], ttsText?: string }
+// R49-B：KB 检索增强（lifeplan/tcm/bazi 关键词）
+app.post('/api/ai/lifeplan-report', optionalAuth, async (req, res) => {
+  try {
+    const age = Math.max(1, Math.min(120, parseInt(req.body.age) || 30));
+    const gender = req.body.gender || '';
+    const concerns = Array.isArray(req.body.concerns) ? req.body.concerns.slice(0, 12) : [];
+    const birthPlace = req.body.birthPlace || '';
+    const livePlace = req.body.livePlace || '';
+    const withTTS = req.body.withTTS !== false;
+
+    // 阶段判断
+    const stageKey = age <= 6 ? 'preschool' : age <= 17 ? 'school' : age <= 23 ? 'university' : 'career';
+    const stageMap = {
+      preschool: { name: '学龄前', range: '0-6岁', focus: ['启蒙','健康','亲子'] },
+      school:    { name: '小学中学', range: '7-17岁', focus: ['学习','品德','兴趣'] },
+      university:{ name: '大学', range: '18-23岁', focus: ['专业','社交','实践'] },
+      career:    { name: '职场+婚恋', range: '24岁+', focus: ['事业','婚恋','财务','健康'] }
+    };
+    const stage = stageMap[stageKey];
+
+    // KB 检索增强
+    let kbHits = [];
+    if (db) {
+      try {
+        const kwParts = [stage.name, ...(concerns.slice(0,4))].filter(Boolean);
+        if (kwParts.length) {
+          const conds = kwParts.map(() => '(title LIKE ? OR content LIKE ?)').join(' OR ');
+          const params = kwParts.flatMap(w => ['%'+w+'%', '%'+w+'%']);
+          const rows = db.prepare(`SELECT entry_id, module, title, substr(content,1,200) as excerpt, trust_score FROM kb_formal WHERE (${conds}) AND trust_score >= 0.7 ORDER BY trust_score DESC LIMIT 5`).all(...params);
+          kbHits = rows.map(r => ({ entry_id: r.entry_id, module: r.module, title: r.title, excerpt: r.excerpt, trust_score: r.trust_score }));
+        }
+      } catch(e){}
+    }
+
+    // 12 领域评分
+    const domains = [
+      { key:'xueye',     name:'学业',  icon:'📚' },
+      { key:'zhiye',     name:'职业',  icon:'💼' },
+      { key:'caiyun',    name:'财运',  icon:'💰' },
+      { key:'hunyin',    name:'婚姻',  icon:'💕' },
+      { key:'jiankang',  name:'健康',  icon:'💊' },
+      { key:'chengshi',  name:'城市',  icon:'🏙️' },
+      { key:'fengwu',    name:'风物',  icon:'🌸' },
+      { key:'xiuyang',   name:'修养',  icon:'📿' },
+      { key:'renmai',    name:'人脉',  icon:'🤝' },
+      { key:'chuangye',  name:'创业',  icon:'🚀' },
+      { key:'yanglao',   name:'养老',  icon:'🌳' },
+      { key:'chuancheng',name:'传承',  icon:'🎁' }
+    ];
+    const userText = (gender + ' ' + concerns.join(' ') + ' ' + birthPlace + ' ' + livePlace).trim();
+    const KW = { '学业':['学习','学','考','书'], '职业':['工作','事业','职业'], '财运':['财','金','投资'], '婚姻':['婚','恋','对象'], '健康':['身','健','睡','病'], '城市':['城市','地方','去'], '风物':['风','景','山','水'], '修养':['修','禅','静','心'], '人脉':['友','人脉','社交'], '创业':['创业','项目'], '养老':['养老','退休'], '传承':['家','传承','子女'] };
+    const scored = domains.map(d => {
+      let score = 60;
+      if (stage.focus.some(f => d.name.includes(f) || f.includes(d.name))) score += 15;
+      if (d.key === 'jiankang' && age >= 35) score -= 10;
+      if (d.key === 'chuangye' && age >= 24 && age <= 40) score += 10;
+      if (d.key === 'yanglao' && age >= 50) score += 15;
+      if (d.key === 'xueye' && age < 24) score += 15;
+      (KW[d.name] || []).forEach(k => { if (userText.includes(k)) score += 3; });
+      score = Math.max(35, Math.min(95, Math.round(score)));
+      const status = score >= 85 ? '优' : score >= 75 ? '良' : score >= 60 ? '中' : '待加强';
+      return { ...d, score, status };
+    });
+    const total = Math.round(scored.reduce((s,d) => s + d.score, 0) / scored.length);
+    const top3 = [...scored].sort((a,b) => b.score - a.score).slice(0,3).map(d => d.name);
+    const bot2 = [...scored].sort((a,b) => a.score - b.score).slice(0,2).map(d => d.name);
+
+    // 5 年规划
+    const next5Years = [
+      { year: age + 1, text: '夯实基期：' + stage.focus[0] + '核心能力强化' },
+      { year: age + 2, text: '试错期：探索' + stage.focus[1] + '不同方向' },
+      { year: age + 3, text: '步进期：目标聚焦+导师对话' },
+      { year: age + 4, text: '证果期：阶段性成果落地' },
+      { year: age + 5, text: '导启期：下一阶段起点梳理' }
+    ];
+
+    // 10 条行动清单
+    const actions = [];
+    scored.filter(d => d.score < 70).sort((a,b) => a.score - b.score).slice(0,4).forEach(d => {
+      actions.push('【' + d.name + '补强】当前 ' + d.score + ' 分，针对性提升方案');
+    });
+    scored.filter(d => d.score >= 80).slice(0,3).forEach(d => {
+      actions.push('【' + d.name + '优势保持】得分 ' + d.score + '，保持节奏');
+    });
+    while (actions.length < 10) actions.push('【平衡】五行调合 + 时令节律（' + stage.name + '阶段）');
+
+    const report = {
+      title: stage.name + '阶段 · 人生规划报告',
+      age, gender, birthPlace, livePlace,
+      stage: stage.name, stageRange: stage.range, stageKey,
+      summary: age + ' 岁处于' + stage.name + '阶段（' + stage.range + '）。总分 ' + total + '，优势领域：' + top3.join('、') + '；待加强：' + bot2.join('、') + '。',
+      domains: scored, total, top3, bot2, next5Years, actions,
+      kbHits, kbHitCount: kbHits.length,
+      generatedAt: new Date().toISOString()
+    };
+
+    let ttsText = '';
+    if (withTTS) {
+      ttsText = report.title + '。' + report.summary + '未来 5 年，建议第 1 年夯实' + stage.focus[0] + '，第 2 年试错' + stage.focus[1] + '，第 3 年步进，第 4 年证果，第 5 年导启。行动清单共 10 条。';
+    }
+
+    req.log.info({ module: 'lifeplan', event: 'report.generated', age, stageKey, kbHits: kbHits.length, withTTS }, 'lifeplan report generated');
+
+    return apiResp(res, ERROR_CODES.SUCCESS, { report, ttsText, kbHits }, 'ok');
+  } catch(e) {
+    req.log.error({ err: e.message, module: 'lifeplan' }, 'lifeplan-report error');
+    return apiResp(res, ERROR_CODES.INTERNAL, null, e.message);
+  }
+});
 // 注册/登录（手机号）
 app.post('/api/user/login', (req, res) => {
   const _loginStart = Date.now();
