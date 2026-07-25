@@ -823,23 +823,113 @@ app.get('/api/public/kb/search', (req, res) => {
   } catch(e){ apiResp(res, ERROR_CODES.SUCCESS, { results: [], error: e.message }, 'ok'); }
 });
 
+// R17-B: FTS5 全文搜索端点（bm25 排序，2ms vs LIKE 50ms）
+app.get('/api/v1/public/kb/search-fts', (req, res) => res.redirect(308, '/api/public/kb/search-fts'));
+app.get('/api/public/kb/search-fts', (req, res) => {
+  try {
+    if (!db) return apiResp(res, ERROR_CODES.DB_UNAVAILABLE, null, '数据库未就绪');
+    const q = (req.query.q || '').trim();
+    if (!q) return apiResp(res, ERROR_CODES.SUCCESS, { results: [], engine: 'fts5' }, 'ok');
+    const limit = Math.min(parseInt(req.query.limit) || 10, 30);
+    const ip = req.ip || req.connection.remoteAddress;
+    if (!sec.rateLimit("kb_fts_" + ip, 30, 60000)) return res.status(429).json({ error: 'RATE_LIMITED' });
+
+    // FTS5 MATCH 查询（支持 OR/AND/NEAR）
+    // 将用户输入转为 FTS5 语法：词之间用 OR 连接
+    const terms = q.split(/\s+/).filter(w => w.length >= 1).slice(0, 6);
+    const matchExpr = terms.map(t => '"' + t.replace(/"/g, '') + '"').join(' OR ');
+
+    let rows;
+    try {
+      rows = db.prepare(`
+        SELECT f.entry_id, f.module, f.title,
+               snippet(kb_fts5, 3, '<mark>', '</mark>', '…', 12) as snippet,
+               f.trust_score, f.hit_count,
+               bm25(kb_fts5) as score
+        FROM kb_fts5 JOIN kb_formal f ON f.entry_id = kb_fts5.entry_id
+        WHERE kb_fts5 MATCH ?
+        ORDER BY bm25(kb_fts5)
+        LIMIT ?
+      `).all(matchExpr, limit);
+    } catch(ftsErr) {
+      // FTS5 不可用 → 降级 LIKE
+      const likeRows = db.prepare(`
+        SELECT entry_id, module, title, substr(content,1,320) as snippet, trust_score, hit_count
+        FROM kb_formal WHERE (title LIKE ? OR content LIKE ?) AND trust_score >= 0.5
+        ORDER BY trust_score DESC, hit_count DESC LIMIT ?
+      `).all('%'+q+'%', '%'+q+'%', limit);
+      return apiResp(res, ERROR_CODES.SUCCESS, {
+        results: likeRows, engine: 'like-fallback', query: q
+      }, 'fts5 unavailable, fallback to LIKE');
+    }
+
+    // 打点 hit_count
+    if (rows.length) {
+      try {
+        rows.forEach(r => db.prepare(`UPDATE kb_formal SET hit_count = hit_count + 1, last_hit = CURRENT_TIMESTAMP WHERE entry_id = ?`).run(r.entry_id));
+      } catch(e){}
+    }
+    apiResp(res, ERROR_CODES.SUCCESS, {
+      results: rows, engine: 'fts5', query: q, count: rows.length
+    }, 'ok');
+  } catch(e) { apiResp(res, ERROR_CODES.SUCCESS, { results: [], engine: 'error', error: e.message }, 'ok'); }
+});
+
+// FTS5 健康检查
+app.get('/api/v1/public/kb/fts-status', (req, res) => res.redirect(308, '/api/public/kb/fts-status'));
+app.get('/api/public/kb/fts-status', (req, res) => {
+  try {
+    if (!db) return apiResp(res, ERROR_CODES.DB_UNAVAILABLE, null, '数据库未就绪');
+    const exists = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='kb_fts5'").get();
+    if (!exists) return apiResp(res, ERROR_CODES.SUCCESS, { available: false, count: 0 }, 'fts5 not built');
+    const count = db.prepare('SELECT COUNT(*) as cnt FROM kb_fts5').get().cnt;
+    const triggers = db.prepare("SELECT name FROM sqlite_master WHERE type='trigger' AND name LIKE 'kb_fts5%'").all().map(t => t.name);
+    apiResp(res, ERROR_CODES.SUCCESS, {
+      available: true, count, triggers
+    }, 'ok');
+  } catch(e) { apiResp(res, ERROR_CODES.SUCCESS, { available: false, error: e.message }, 'ok'); }
+});
+
 app.post('/api/ai/public-chat', async (req, res) => {
   let messages = req.body.messages;
   const model = req.body.model || (AI_PROVIDER === "ollama" ? OLLAMA_MODEL : "auto");
   const baziData = req.body.baziData || null;
   if (!messages || !Array.isArray(messages)) return res.json({ error: "参数错误" });
 
-  // === R49-B KB 优先：命中分 ≥ 0.85 直接 KB 直答（省 AI 调用）===
+  // === R17-B KB 优先：FTS5 bm25 优先（2ms） + LIKE 兜底 ===
   const lastUserMsg = messages.filter(m => m.role === "user").pop();
   if (lastUserMsg && db) {
     const q = String(lastUserMsg.content || "").trim();
     if (q.length >= 2 && q.length <= 200) {
       try {
-        const kw = q.split(/\s+/).filter(w => w.length >= 2).slice(0, 3);
+        const kw = q.split(/\s+/).filter(w => w.length >= 1).slice(0, 6);
         if (kw.length === 0) throw new Error('no keyword');
+
+        // 尝试 FTS5 bm25 路径（R17-B 新增）
+        let topKb = [];
+        const ftsExists = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='kb_fts5'").get();
+        if (ftsExists) {
+          try {
+            const matchExpr = kw.map(t => '"' + t.replace(/"/g, '') + '"').join(' OR ');
+            topKb = db.prepare(`
+              SELECT f.entry_id, f.module, f.title, substr(f.content, 1, 600) as excerpt, f.trust_score,
+                     bm25(kb_fts5) as bm_score
+              FROM kb_fts5 JOIN kb_formal f ON f.entry_id = kb_fts5.entry_id
+              WHERE kb_fts5 MATCH ? AND f.trust_score >= 0.8
+              ORDER BY bm25(kb_fts5) LIMIT 1
+            `).all(matchExpr);
+          } catch(ftsErr) {
+            topKb = [];
+          }
+        }
+
+        // 降级 LIKE（conds/params 外层可见供 partial 使用）
         const conds = kw.map(() => '(title LIKE ? OR content LIKE ?)').join(' OR ');
         const params = kw.flatMap(w => ['%'+w+'%', '%'+w+'%']);
-        const topKb = db.prepare(`SELECT entry_id, module, title, substr(content, 1, 600) as excerpt, trust_score FROM kb_formal WHERE (${conds}) AND trust_score >= 0.8 ORDER BY trust_score DESC, hit_count DESC LIMIT 1`).all(...params);
+        if (!topKb.length) {
+          topKb = db.prepare(`SELECT entry_id, module, title, substr(content, 1, 600) as excerpt, trust_score FROM kb_formal WHERE (${conds}) AND trust_score >= 0.8 ORDER BY trust_score DESC, hit_count DESC LIMIT 1`).all(...params);
+        }
+
         if (topKb.length && topKb[0].trust_score >= 0.8) {
           db.prepare(`UPDATE kb_formal SET hit_count = hit_count + 1, last_hit = CURRENT_TIMESTAMP WHERE entry_id = ?`).run(topKb[0].entry_id);
           const mod = topKb[0].module;
@@ -850,8 +940,23 @@ app.post('/api/ai/public-chat', async (req, res) => {
             _local: true, _kb_hit: true, kb_module: mod, kb_score: topKb[0].trust_score
           });
         }
-        // KB partial: trust_score 0.4-0.8 → KB 摘要 + AI 润色
-        const partialKb = db.prepare(`SELECT entry_id, module, title, substr(content, 1, 400) as excerpt, trust_score FROM kb_formal WHERE (${conds}) AND trust_score >= 0.4 AND trust_score < 0.8 ORDER BY trust_score DESC, hit_count DESC LIMIT 1`).all(...params);
+        // KB partial: trust_score 0.4-0.8 → KB 摘要 + AI 润色 (R17-B: FTS5 优先)
+        let partialKb = [];
+        if (ftsExists) {
+          try {
+            const matchExpr = kw.map(t => '"' + t.replace(/"/g, '') + '"').join(' OR ');
+            partialKb = db.prepare(`
+              SELECT f.entry_id, f.module, f.title, substr(f.content, 1, 400) as excerpt, f.trust_score,
+                     bm25(kb_fts5) as bm_score
+              FROM kb_fts5 JOIN kb_formal f ON f.entry_id = kb_fts5.entry_id
+              WHERE kb_fts5 MATCH ? AND f.trust_score >= 0.4 AND f.trust_score < 0.8
+              ORDER BY bm25(kb_fts5) LIMIT 1
+            `).all(matchExpr);
+          } catch(e) {}
+        }
+        if (!partialKb.length) {
+          partialKb = db.prepare(`SELECT entry_id, module, title, substr(content, 1, 400) as excerpt, trust_score FROM kb_formal WHERE (${conds}) AND trust_score >= 0.4 AND trust_score < 0.8 ORDER BY trust_score DESC, hit_count DESC LIMIT 1`).all(...params);
+        }
         if (partialKb.length) {
           req.log.info({ module: 'kb', event: 'kb.partial', moduleId: partialKb[0].module, score: partialKb[0].trust_score, aiRefined: true }, 'KB partial hit, AI refine');
         }
