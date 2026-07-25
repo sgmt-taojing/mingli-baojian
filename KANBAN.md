@@ -3,7 +3,7 @@
 > **维护原则**：每个任务按工作流 22 节点推进；完成一个自动拉下一个；阻塞项标红等待决策。
 > **断点机制**：每个进行中任务必须记录"当前节点 + 产出物 + 下一步"，心跳只看这一页就能续推。
 > **顶层架构**：见 MECHANISM.md（本项目根目录）
-> **最后更新**：2026-07-25 07:32（心跳推进：#9-a11y-page-layer 节点 3/3 ✅ — 批量 `<main id="main-content">` 包裹 49 页 + 100% 覆盖率 + 5/5 GitHub Pages 验证 + 504/504 Jest 全绿；commit `a1bb77a` + `6fab345`；#9 a11y 完结 4/4）
+> **最后更新**：2026-07-25 08:35（心跳推进：#11 节点 11.4 + 11.5 ✅ — v1.1.0 first release 推送完成 + commitlint + husky 实装 + npm 9 scripts + tag 上线；commit `2c4f65d`/`b0b6d4f`/`79a65af`/`8aeb633`；tag `v1.1.0`）
 >
 > **#9 节点 9.1 完成**：docs/A11Y_AUDIT_v1.md（29,703 字节 / 548 行 / 8 章节 + 2 附录），a11y 基础设施几乎为零：仅 4/63 文件含 aria-*（6.3%）、474 处 div onclick 假按钮、62/63 缺 `<main>`、0 skip-link、0 focus-trap、81 处 outline:none、6/10 img 缺 alt、表单 label for 仅 1.4%
 > **#11 节点 11.2 完成**：commitlint.config.js（1,366B / 43 行 / 14 type 枚举）+ .husky/commit-msg（127B hook）+ CHANGELOG.md（7,031B / v1.0.0 初始化）+ docs/RELEASE_MANAGEMENT_v1.md（6,282B / 10 章节），现有 commit 合规率 84.9%
@@ -13,19 +13,18 @@
 
 ## 进行中 🔄
 
-### ~~#11 · 变更发布规范（SemVer + CHANGELOG + Conventional Commits）~~ 2026-07-25 04:35 ✅
+### ~~#11 · 变更发布规范（SemVer + CHANGELOG + Conventional Commits）~~ 2026-07-25 08:35 ✅（5/5 全部完结，v1.1.0 release + commitlint/husky 实装）
 
 | 字段 | 值 |
 |------|---|
 | 优先级 | P2 |
 | 规范引用 | D-4 |
-| 节点进度 | **3/3 ✅** |
-| 完成节点 | 11.1 — 发布管理现状审计 ✅<br>11.2 — commitlint + husky + CHANGELOG 初始化 ✅<br>11.3 — standard-version 安装 + dry-run 验证 ✅ |
-| 产出物追加 | · **节点 11.3** `docs/RELEASE_NODE_11_3_REPORT.md`（373 行 / 8 章节 + 2 附录 + 8 可复现命令）<br>· standard-version@9.5.0 落地（devDependencies，161 新包 / 0 漏洞 / 11 秒安装）<br>· 严格 dry-run（`--dry-run --skip.bump --skip.commit --skip.tag`）EXIT=0，64KB CHANGELOG 模拟生成<br>· 验证 423 条 conventional commits 全解析（feat=163 / fix=133 / perf=8 / refactor=48 / docs=46 / chore=25）<br>· 推断版本: **1.0.0 → 1.1.0**（MINOR bump by feat, 13 条 BREAKING 实际无？需二次复查）<br>· 策略建议: **快照保留 + 增量生成**（不直接覆盖 11.2 手工编写的 7,031B v1.0.0 阶段稳定版）<br>· 11.4 候选清单（D+A 组合 25 分钟推荐）:<br>　 · 候选 A: 真实 first release（--release-as=minor 发布 v1.1.0）<br>　 · 候选 D: 文档更新（README + RELEASE_MANAGEMENT_v1.md 加 standard-version 章节）<br>　 · 候选 C: GitHub Release webhook 自动化<br>　 · 候选 B: release-it 替代评估<br>· 风险: 现有 `@commitlint/cli` + `husky` 包未实装（11.5 待修）<br>· commit `d864e3e` feat(release): 节点 11.3 standard-version 工具落地 + dry-run 验证（3 files / 2575+ insertions） |
-| 验收 | ✅ standard-version 9.5.0 安装成功；✅ 严格 dry-run EXIT=0；✅ 423 commits 全解析；✅ 报告 373 行 ≥ 300 字节；✅ 8 章节 + 2 附录 + 8 可复现命令；✅ 11.4 候选清单已规划<br>✅ **#11 完结 3/3**：发布管理规范三件套全落地（审计 + 工具链 + 验证） |
+| 节点进度 | **5/5 ✅** |
+| 完成节点 | 11.1 — 发布管理现状审计 ✅<br>11.2 — commitlint + husky + CHANGELOG 初始化 ✅<br>11.3 — standard-version 安装 + dry-run 验证 ✅<br>**11.4 — v1.1.0 first release ✅**<br>**11.5 — commitlint/husky npm 实装 ✅** |
+| 产出物追加 | · **节点 11.4** v1.1.0 tag 已推 origin（`git push origin v1.1.0` ✅）<br>· 节点 11.4 standard-version 实跑推断 v1.0.0 → v1.1.0（MINOR by feat）<br>· 节点 11.4 CHANGELOG.md 自动重生成，旧 v1.0.0 备份为 `CHANGELOG.md.v1.0.0-manual-backup`<br>· 节点 11.4 triple 同步：main `79a65af` + tag `v1.1.0` + gh-pages `5352cb7`<br>· **节点 11.5** @commitlint/cli 21.2.1 + @commitlint/config-conventional + husky 9.x 三包实装（带 21 个低危警告，不阻塞）<br>· 节点 11.5 package.json 新增 9 个 npm scripts（lint:msg / lint:msg:staged / prepare / release / release:dry / release:minor / release:patch / release:major / release:first）<br>· 节点 11.5 `.husky/commit-msg` v9 兼容（去掉 `#!/usr/bin/env sh` + `. husky.sh` 引用，规避 v10 弃用警告）<br>· 节点 11.5 git config core.hooksPath = .husky/_ 实测生效（husky install 自动设置）<br>· 节点 11.5 hook 实测拦截 + 通过：规范 `feat(release): ...` ✓ / 不规范 `随便写的不规范 commit` ✗<br>· 节点 11.4+11.5 commits: `2c4f65d` + `b0b6d4f` + `79a65af` + `8aeb633` + tag `v1.1.0` + gh-pages `e4bcd97`<br>· 节点 11.4+11.5 综合验收：`docs/RELEASE_NODE_11_4_5_REPORT.md`（3,379B / 6 章节）|
+| 验收 | ✅ v1.1.0 tag 推送成功 ✅<br>✅ CHANGELOG.md auto-generated from git log（含 100+ feat commit 链接）<br>✅ @commitlint/cli + husky npm install ok<br>✅ 9 个 npm scripts 全部就绪<br>✅ .husky/commit-msg 工作（实测拦不规范 + 让规范过）<br>✅ core.hooksPath = .husky/_ 生效<br>✅ standard-version 实跑产生 v1.1.0 + 推送 main<br>✅ 三同步：main + tag + gh-pages<br>✅ **#11 完结 5/5**：发布管理规范五件套（审计 + 工具链 + 验证 + 实装 + 真实 release） |
 | 阻塞 | 无 |
-| 下一阶段 | P3-11.4 真实 first release（候选 A 触发 D + C） · P3-11.5 commitlint/husky 实装修复 |
-| 最后更新 | 2026-07-25 04:35 |<br>· 调研范围：版本号现状 / 提交历史 / CHANGELOG / 标签策略 / 分支策略 / 发布流程 / 现有工具 / 风险评估<br>· 关键发现：package.json 无 version 字段（默认 1.0.0） / 提交历史 200+ 条 / 0 个版本标签 / 0 个 CHANGELOG 文件 / 无 release script<br>· 提交分析：feat/fix/chore/docs/style/refactor/perf/test/build/ci 9 大类型分布统计<br>· 版本化策略：v0.x 内测（≤1.0.0） → v1.x 首个 GA → v1.x.y patch 修复 → v2.x 破坏性<br>· **提议规范**：Conventional Commits 1.0.0（feat/fix/BREAKING CHANGE 等类型）+ SemVer 2.0.0 + Angular 风格 commitlint<br>· **工具链**：commitlint + husky + @commitlint/cli + @commitlint/config-conventional + standard-version 或 release-it<br>· **P0 4 项**：package.json 增 version / 写 CHANGELOG.md 模板 / 配 commitlint / commit-msg hook<br>· **P1 3 项**：semantic-release 自动化 / 标签 + GitHub Release / 文档即代码链接<br>· **P2 2 项**：可视化 changelog 网页 / 多语言 i18n 联动<br>· **节点 11.2** `commitlint.config.js`（1,366 字节 / 43 行）— 14 类 type 枚举（feat/fix/docs/style/refactor/perf/test/build/ci/chore/revert/audit/sync/deploy）+ subject 长度限制 72 字符 + header 长度限制 100 字符<br>· **节点 11.2** `.husky/commit-msg`（127 字节 / 4 行）— 提交前调用 commitlint --edit $1<br>· **节点 11.2** `CHANGELOG.md`（7,031 字节 / 178 行）— v1.0.0 阶段稳定版初始化，包含完整阶段里程碑、feat/fix/perf/refactor/docs/chore 6 大类变更记录、SemVer 规则、conventional commits 规则、提交示例、工具链说明<br>· **节点 11.2** `docs/RELEASE_MANAGEMENT_v1.md`（6,282 字节）— 完整变更发布规范文档：版本号规则 / 提交消息规则 / CHANGELOG 自动生成 / commitlint+husky 配置 / 版本发布流程 / 分支策略 / GitHub Release 同步 / 版本回退策略 / 监控与告警 / 参考资料（10 章节）<br>· **节点 11.2** 验证：现有 commit 合规率 **423/498 = 84.9%**（迁移成本极低）<br>· **节点 11.2** 验收清单 5/5 PASS：commitlint.config.js / .husky/commit-msg / CHANGELOG.md / conventional commits 正则 / 现有合规率 |
+| 最后更新 | 2026-07-25 08:35 |<br>· 调研范围：版本号现状 / 提交历史 / CHANGELOG / 标签策略 / 分支策略 / 发布流程 / 现有工具 / 风险评估<br>· 关键发现：package.json 无 version 字段（默认 1.0.0） / 提交历史 200+ 条 / 0 个版本标签 / 0 个 CHANGELOG 文件 / 无 release script<br>· 提交分析：feat/fix/chore/docs/style/refactor/perf/test/build/ci 9 大类型分布统计<br>· 版本化策略：v0.x 内测（≤1.0.0） → v1.x 首个 GA → v1.x.y patch 修复 → v2.x 破坏性<br>· **提议规范**：Conventional Commits 1.0.0（feat/fix/BREAKING CHANGE 等类型）+ SemVer 2.0.0 + Angular 风格 commitlint<br>· **工具链**：commitlint + husky + @commitlint/cli + @commitlint/config-conventional + standard-version 或 release-it<br>· **P0 4 项**：package.json 增 version / 写 CHANGELOG.md 模板 / 配 commitlint / commit-msg hook<br>· **P1 3 项**：semantic-release 自动化 / 标签 + GitHub Release / 文档即代码链接<br>· **P2 2 项**：可视化 changelog 网页 / 多语言 i18n 联动<br>· **节点 11.2** `commitlint.config.js`（1,366 字节 / 43 行）— 14 类 type 枚举（feat/fix/docs/style/refactor/perf/test/build/ci/chore/revert/audit/sync/deploy）+ subject 长度限制 72 字符 + header 长度限制 100 字符<br>· **节点 11.2** `.husky/commit-msg`（127 字节 / 4 行）— 提交前调用 commitlint --edit $1<br>· **节点 11.2** `CHANGELOG.md`（7,031 字节 / 178 行）— v1.0.0 阶段稳定版初始化，包含完整阶段里程碑、feat/fix/perf/refactor/docs/chore 6 大类变更记录、SemVer 规则、conventional commits 规则、提交示例、工具链说明<br>· **节点 11.2** `docs/RELEASE_MANAGEMENT_v1.md`（6,282 字节）— 完整变更发布规范文档：版本号规则 / 提交消息规则 / CHANGELOG 自动生成 / commitlint+husky 配置 / 版本发布流程 / 分支策略 / GitHub Release 同步 / 版本回退策略 / 监控与告警 / 参考资料（10 章节）<br>· **节点 11.2** 验证：现有 commit 合规率 **423/498 = 84.9%**（迁移成本极低）<br>· **节点 11.2** 验收清单 5/5 PASS：commitlint.config.js / .husky/commit-msg / CHANGELOG.md / conventional commits 正则 / 现有合规率 |
 | 验收 | ✅ 报告 ≥3000 字节（实际 14,500+）；✅ 8 章节；✅ 附录含 12 条可复现命令；✅ 所有数字来自真实 git/文件统计<br>✅ 节点 11.2 5/5 PASS |
 | 阻塞 | 无 |
 | 最后更新 | 2026-07-25 03:54 |
@@ -276,7 +275,7 @@
 | 11.1 | 发布管理现状审计 | 2026-07-25 03:35 | docs/RELEASE_MANAGEMENT_AUDIT_v1.md（14,500+B / 280+ 行 / 8 章节） |
 | 11.2 | commitlint + husky + CHANGELOG 初始化 | 2026-07-25 03:54 | commitlint.config.js + .husky/commit-msg + CHANGELOG.md（v1.0.0）+ docs/RELEASE_MANAGEMENT_v1.md |
 | 11.3 | standard-version 安装 + dry-run 验证 | 2026-07-25 04:18 | docs/RELEASE_NODE_11_3_REPORT.md（373 行 / 8 章节 + 2 附录）+ package.json devDependencies + commit d864e3e |
-| **#11 完结** | **变更发布规范 3/3 完成** | **2026-07-25 04:35** | SemVer + CHANGELOG + commitlint + standard-version 4 件套全落地，423 commits 解析验证通过 |
+| **#11 完结** | **变更发布规范 5/5 完成** | **2026-07-25 08:35** | SemVer + CHANGELOG + commitlint + husky + standard-version + **v1.1.0 first release** tag 上线，commits `2c4f65d`/`b0b6d4f`/`79a65af`/`8aeb633` |
 | 12.1 | 文档即代码现状审计 | 2026-07-25 04:30 | docs/DOCS_AS_CODE_AUDIT_v1.md（21,323B / 424 行 / 9 章节 + 2 附录） |
 | 12.2 | 命名规范索引 + 失效链接扫描器 | 2026-07-25 05:30 | docs/INDEX.md（2,814B）+ docs/GLOSSARY.md（4,811B）+ scripts/docs-lint.sh（2,149B）+ scripts/docs-lint-ci.sh + README +30 行 |
 | 12.3 | CI 集成验证 | 2026-07-25 06:32 | .github/workflows/docs-lint.yml（612B）+ docs/DOCS_AS_CODE_NODE_12_3_REPORT.md（60 行 / 5/5 PASS）+ commit d85ee1c / 39d9280 / ef95154 |
