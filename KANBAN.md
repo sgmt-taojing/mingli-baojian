@@ -3,7 +3,7 @@
 > **维护原则**：每个任务按工作流 22 节点推进；完成一个自动拉下一个；阻塞项标红等待决策。
 > **断点机制**：每个进行中任务必须记录"当前节点 + 产出物 + 下一步"，心跳只看这一页就能续推。
 > **顶层架构**：见 MECHANISM.md（本项目根目录）
-> **最后更新**：2026-07-25 08:35（心跳推进：#11 节点 11.4 + 11.5 ✅ — v1.1.0 first release 推送完成 + commitlint + husky 实装 + npm 9 scripts + tag 上线；commit `2c4f65d`/`b0b6d4f`/`79a65af`/`8aeb633`；tag `v1.1.0`）
+> **最后更新**：2026-07-25 09:05（R15 KB 5 模块补强全达成 ✅ — acupuncture 304 / tcm-fangji 203 / tcm-diagnosis 296 / tcm-zhongfu 50 / shuhan-tcm 50 = 707 条 + CI auto-release workflow；commit `149451a`/`70a0ba1`/`72b05c8`；tag `v1.1.0`）
 >
 > **#9 节点 9.1 完成**：docs/A11Y_AUDIT_v1.md（29,703 字节 / 548 行 / 8 章节 + 2 附录），a11y 基础设施几乎为零：仅 4/63 文件含 aria-*（6.3%）、474 处 div onclick 假按钮、62/63 缺 `<main>`、0 skip-link、0 focus-trap、81 处 outline:none、6/10 img 缺 alt、表单 label for 仅 1.4%
 > **#11 节点 11.2 完成**：commitlint.config.js（1,366B / 43 行 / 14 type 枚举）+ .husky/commit-msg（127B hook）+ CHANGELOG.md（7,031B / v1.0.0 初始化）+ docs/RELEASE_MANAGEMENT_v1.md（6,282B / 10 章节），现有 commit 合规率 84.9%
