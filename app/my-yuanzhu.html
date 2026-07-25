@@ -54,6 +54,9 @@ html,body{height:100%;overflow-x:hidden;font-family:'PingFang SC','Microsoft YaH
   <ml-tab-pane label="📋 病历" data-tab="reports"></ml-tab-pane>
   <ml-tab-pane label="🛍️ 商城" data-tab="shop"></ml-tab-pane>
   <ml-tab-pane label="📚 知识" data-tab="kb"></ml-tab-pane>
+  <ml-tab-pane label="🎵 音乐" data-tab="music"></ml-tab-pane>
+  <ml-tab-pane label="📊 生命指数" data-tab="lifeindex"></ml-tab-pane>
+  <ml-tab-pane label="🗺️ 人生规划" data-tab="lifeplan"></ml-tab-pane>
 </ml-tab>
 <div class="tabs" id="legacyYuanzhuTabs" hidden>
   <div class="tab on" data-tab="profile">👤 个人</div>
@@ -63,6 +66,9 @@ html,body{height:100%;overflow-x:hidden;font-family:'PingFang SC','Microsoft YaH
   <div class="tab" data-tab="reports">📋 病历</div>
   <div class="tab" data-tab="shop">🛍️ 商城</div>
   <div class="tab" data-tab="kb">📚 知识</div>
+  <div class="tab" data-tab="music">🎵 音乐</div>
+  <div class="tab" data-tab="lifeindex">📊 生命指数</div>
+  <div class="tab" data-tab="lifeplan">🗺️ 人生规划</div>
 </div>
 
 <div class="body">
@@ -113,6 +119,9 @@ async function loadTab(name){
     case 'reports': return renderReports(c);
     case 'shop': return renderShop(c);
     case 'kb': return renderKb(c);
+    case 'music': return renderMusic(c);
+    case 'lifeindex': return renderLifeindex(c);
+    case 'lifeplan': return renderLifeplan(c);
   }
 }
 
@@ -375,6 +384,72 @@ async function renderKb(c){
   if(inp){ inp.addEventListener('keydown', e=>{ if(e.key==='Enter') _kbSearchGo(); }); }
 }
 
+// === P15 节点 1：music/lifeindex/lifeplan 三 Tab 跳转独立详情页 ===
+async function renderMusic(c){
+  const wx = localStorage.getItem('mlbj_ele') || '金';
+  const wxEmoji = { '金':'🌟','木':'🌿','水':'💧','火':'🔥','土':'🏔️' };
+  const wxLabel = { '金':'锐进果断','木':'生发学习','水':'智慧灵活','火':'热情表达','土':'稳重承担' };
+  const items = [
+    {icon:'🎵',name:'5 段播放列表',desc:'五行音 × 6 段安排，配合 7 日疗程'},
+    {icon:'🌿',name:'同源推荐',desc:'与本五行互补音律，金→听宫'},
+    {icon:'📍',name:'五行穴位',desc:'太渊·太冲·太溪·神门·太白'},
+    {icon:'📜',name:'7 日疗程',desc:'适应·深化·内化·总结·四阶段递进'},
+    {icon:'🔊',name:'Edge-TTS 试听',desc:'总评语音 + 每段独立试听'}
+  ];
+  c.innerHTML = `<div class="card"><h3>🎵 疗愈音乐</h3>
+    <div class="row"><span class="label">五行主属</span><span class="val">${wxEmoji[wx]||'⭐'} ${wx} · ${wxLabel[wx]||'识别中'}</span></div>
+    <p style="color:var(--paper3);opacity:.7;font-size:13px;margin:12px 0">根据您的五行主属推荐调合音乐。完成 AI 助手问心后，获得五行×8 维度 50+ 个智能组合。</p>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${items.map(i=>`<div class="row" style="padding:10px;background:var(--ink3);border-radius:8px"><span class="label">${i.icon} ${i.name}</span><span class="val" style="font-size:12px;color:var(--paper3)">${i.desc}</span></div>`).join('')}
+    </div>
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+      <a class="btn" href="music-detail.html" style="flex:1;text-decoration:none">🎵 进入独立报告页</a>
+      <a class="btn" href="ai-assistant.html?module=music" style="flex:1;text-decoration:none;background:var(--ink3)">🤖 AI 助手重启</a>
+    </div>
+  </div>`;
+}
+
+async function renderLifeindex(c){
+  const wx = localStorage.getItem('mlbj_ele') || '金';
+  const wxEmoji = { '金':'🌟','木':'🌿','水':'💧','火':'🔥','土':'🏔️' };
+  const dims = ['事业','财运','健康','婚姻','学业','家庭','人际','精神','享福','寿元','风物','修养'];
+  const icons = { '事业':'💼','财运':'💰','健康':'💪','婚姻':'💑','学业':'📚','家庭':'🏡','人际':'🤝','精神':'🎭','享福':'🌸','寿元':'🍵','风物':'🏔️','修养':'🎋' };
+  c.innerHTML = `<div class="card"><h3>📊 生命指数</h3>
+    <div class="row"><span class="label">五行主属</span><span class="val">${wxEmoji[wx]||'⭐'} ${wx}</span></div>
+    <p style="color:var(--paper3);opacity:.7;font-size:13px;margin:12px 0">12 维度评分（与五行偏重叠加），各维度 30-99 分。完成 AI 助手问心后获得完整报告。</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0">
+      ${dims.map(d=>`<div style="padding:8px;background:var(--ink3);border-radius:6px;text-align:center;font-size:12px"><div style="font-size:18px">${icons[d]}</div><div>${d}</div></div>`).join('')}
+    </div>
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+      <a class="btn" href="lifeindex-detail.html" style="flex:1;text-decoration:none">📊 进入独立报告页</a>
+      <a class="btn" href="ai-assistant.html?module=lifeindex" style="flex:1;text-decoration:none;background:var(--ink3)">🤖 AI 助手重启</a>
+    </div>
+  </div>`;
+}
+
+async function renderLifeplan(c){
+  const age = localStorage.getItem('mlbj_age') || '30';
+  const stages = [
+    {key:'preschool',name:'学龄前',range:'0-6岁',focus:'启蒙·健康·亲子'},
+    {key:'school',name:'小学中学',range:'7-17岁',focus:'学习·品德·兴趣'},
+    {key:'university',name:'大学',range:'18-23岁',focus:'专业·社交·实践'},
+    {key:'career',name:'职场+婚恋',range:'24岁+',focus:'事业·婚恋·财务·健康'}
+  ];
+  const _age = parseInt(age)||30;
+  const curKey = _age <= 6 ? 'preschool' : _age <= 17 ? 'school' : _age <= 23 ? 'university' : 'career';
+  c.innerHTML = `<div class="card"><h3>🗺️ 人生规划</h3>
+    <div class="row"><span class="label">年龄</span><span class="val">${_age} 岁</span></div>
+    <p style="color:var(--paper3);opacity:.7;font-size:13px;margin:12px 0">4 阶段 × 12 领域 = 48 子项模板。当前阶段：<strong style="color:var(--gold)">${stages.find(s=>s.key===curKey).name}</strong>，含 5 年步进 + 10 条行动清单。</p>
+    <div style="display:flex;flex-direction:column;gap:6px;margin:10px 0">
+      ${stages.map(s=>`<div class="row" style="padding:8px;background:${s.key===curKey?'rgba(201,168,76,.15)':'var(--ink3)'};border-radius:6px"><span class="label">${s.name}</span><span class="val" style="font-size:12px">${s.range} · ${s.focus}</span></div>`).join('')}
+    </div>
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+      <a class="btn" href="lifeplan-detail.html" style="flex:1;text-decoration:none">🗺️ 进入独立报告页</a>
+      <a class="btn" href="ai-assistant.html?module=lifeplan" style="flex:1;text-decoration:none;background:var(--ink3)">🤖 AI 助手重启</a>
+    </div>
+  </div>`;
+}
+
 // #13 节点 3：KB 搜索触发
 function _kbSearchGo(){
   const inp = document.getElementById('kbSearchInput');
@@ -407,7 +482,7 @@ loadTab('profile');
 (function(){
   const mlTab = document.getElementById('yuanzhuTab');
   if (!mlTab) return;
-  const labels = ['profile','yuanzhu','push','points','reports','shop','kb'];
+  const labels = ['profile','yuanzhu','push','points','reports','shop','kb','music','lifeindex','lifeplan'];
   mlTab.addEventListener('tab-change', (e)=>{
     const name = labels[e.detail.index] || 'profile';
     if (typeof switchTab === 'function') switchTab(name);
