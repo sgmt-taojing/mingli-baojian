@@ -3,7 +3,7 @@
 > **维护原则**：每个任务按工作流 22 节点推进；完成一个自动拉下一个；阻塞项标红等待决策。
 > **断点机制**：每个进行中任务必须记录"当前节点 + 产出物 + 下一步"，心跳只看这一页就能续推。
 > **顶层架构**：见 MECHANISM.md（本项目根目录）
-> **最后更新**：2026-07-25 10:43（心跳推进 · P1-任务3 节点 1 完成 ✅ — `_MODULE_REPORTS` 全局对象落 ai-assistant.html 2732 行（14 模块含 music/lifeindex/lifeplan 兜底）+ smoke 实测 3 模块全跑通：music 商音·焦虑·金 / lifeindex 总分 96·顶3事业/财运/学业·末2家庭/享福·**风物 90 + 修养 89**（新增维度）/ lifeplan 职场+婚恋·12 领域·R15 commit `70a0ba1` + triple 同步）
+> **最后更新**：2026-07-25 10:58（心跳推进 · P1-任务3 节点 2 完成 ✅ — music 5 段播放列表（每段带 ttsText 朗读文案）+ 7 日疗程 + intro；lifeplan 4 阶段 × 12 领域 = **48 细分模板**（5/30/60 岁全测通过，career-yanglao "45 岁起筹备养老金"+ chuancheng "家风传承"）；lifeplan.diagnose 新增 ttsText 字段；smoke 验证）
 
 > **心跳 10:30 发现（autoclaw/AGENTS.md P0/P1 收尾核查）**：
 > - **P0-任务1（KB 优先 + 后端 AI 兜底双路径）✅ 已落地**：R49-B `/api/ai/public-chat` server/api-server-v2.js:826-870 实现 0.85+直答 / 0.4-0.8 部分命中 / <0.4 AI 兜底 + localStorage `_kb_hit_count/{mod}` ai-assistant.html:291-298 + showWelcome 今日统计 526-532 + `/api/ai/kb-hit-stats` 返回 8条历史 7 topQueries 3 bySource。**实测端到端 PASS**：'五行' → kb_module=r45_palace, kb_score=1。**不再派工**。
