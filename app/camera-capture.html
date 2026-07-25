@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>桌面摄像头采集 · 命理宝鉴</title>
+<link rel="stylesheet" href="css/a11y-fix.css">
+<style>
+:root{
+  --ink:#080808; --ink2:#0f0f0f; --ink3:#1a1a1a;
+  --gold:#c9a84c; --gold2:#e0c068;
+  --paper:#f0e8d8; --paper2:#c8b89c; --paper3:#a09080;
+  --danger:#c8503e; --ok:#3e9e6b;
+  --radius:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Serif SC','Source Han Serif SC',serif;background:var(--ink);color:var(--paper);min-height:100vh}
+.wrap{max-width:1100px;margin:0 auto;padding:24px 20px 80px}
+header{padding:20px 0;border-bottom:1px solid rgba(201,168,76,.18);margin-bottom:24px}
+h1{font-family:'Ma Shan Zheng',serif;font-size:28px;color:var(--gold);letter-spacing:6px}
+.subtitle{font-size:13px;color:var(--paper3);margin-top:6px}
+
+.hero{display:grid;grid-template-columns:1.4fr 1fr;gap:24px;margin-bottom:24px}
+@media(max-width:880px){.hero{grid-template-columns:1fr}}
+
+.stage{
+  background:#000;border-radius:var(--radius);
+  border:1px solid rgba(201,168,76,.25);
+  position:relative;aspect-ratio:4/3;overflow:hidden;
+}
+.stage video,.stage canvas,.stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.stage .placeholder{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;color:var(--paper3);
+  background:radial-gradient(ellipse at center,#1a1a1a,#000);
+}
+.stage .placeholder .icon{font-size:48px;margin-bottom:12px;opacity:.5}
+.stage .placeholder .hint{font-size:13px;letter-spacing:2px}
+.stage .live-tag{
+  position:absolute;top:10px;left:10px;background:rgba(200,80,62,.92);
+  color:#fff;font-size:10px;letter-spacing:2px;padding:4px 10px;border-radius:4px;
+  display:none;align-items:center;gap:6px;z-index:10;
+}
+.stage .live-tag::before{content:'';width:8px;height:8px;border-radius:50%;background:#fff;animation:pulse 1.2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.stage .device-tag{
+  position:absolute;top:10px;right:10px;background:rgba(0,0,0,.7);
+  color:var(--gold);font-size:10px;padding:4px 8px;border-radius:4px;z-index:10;
+}
+
+.controls{display:flex;flex-direction:column;gap:12px;background:var(--ink3);border:1px solid rgba(201,168,76,.18);border-radius:var(--radius);padding:18px}
+.controls h3{font-size:14px;color:var(--gold);letter-spacing:3px;margin-bottom:4px}
+.btn{padding:11px 16px;background:var(--gold);color:var(--ink);border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;letter-spacing:2px;font-family:inherit;transition:all .2s}
+.btn:hover{background:var(--gold2)}
+.btn:disabled{background:#444;color:#888;cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--paper);border:1px solid rgba(201,168,76,.4)}
+.btn-ghost:hover{background:rgba(201,168,76,.1)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover{background:#d86858}
+
+select,input[type=text]{
+  width:100%;padding:9px 12px;background:var(--ink);color:var(--paper);
+  border:1px solid rgba(201,168,76,.3);border-radius:5px;font-family:inherit;font-size:13px;
+}
+label{display:block;font-size:12px;color:var(--paper2);letter-spacing:1.5px;margin-bottom:6px}
+.field{margin-bottom:10px}
+
+.status-line{font-size:11px;color:var(--paper3);padding:8px 10px;background:var(--ink2);border-radius:5px;min-height:34px;display:flex;align-items:center;letter-spacing:1px}
+.status-line.ok{color:var(--ok)}
+.status-line.err{color:var(--danger)}
+
+.gallery{margin-top:24px}
+.gallery h2{font-size:16px;color:var(--gold);letter-spacing:3px;margin-bottom:12px}
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.thumb{position:relative;aspect-ratio:1;border-radius:6px;overflow:hidden;border:1px solid rgba(201,168,76,.15);background:#000;cursor:pointer}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb .meta{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.9));padding:8px 6px 4px;font-size:9px;color:var(--gold)}
+.thumb:hover{border-color:var(--gold)}
+
+.analysis-panel{margin-top:24px;background:var(--ink3);border:1px solid rgba(201,168,76,.18);border-radius:var(--radius);padding:20px}
+.analysis-panel h2{font-size:15px;color:var(--gold);letter-spacing:3px;margin-bottom:12px}
+.analysis-content{font-size:13px;line-height:1.8;color:var(--paper);white-space:pre-wrap;word-break:break-word;max-height:400px;overflow-y:auto}
+.analysis-empty{color:var(--paper3);font-size:13px;padding:30px;text-align:center}
+
+.gear-card{margin-top:20px;background:var(--ink3);border:1px solid rgba(201,168,76,.18);border-radius:var(--radius);padding:18px}
+.gear-card h3{font-size:14px;color:var(--gold);letter-spacing:3px;margin-bottom:12px}
+.gear-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.gear{background:var(--ink2);padding:12px;border-radius:6px;border:1px solid rgba(201,168,76,.08)}
+.gear .name{font-size:13px;color:var(--gold2);font-weight:600;margin-bottom:4px}
+.gear .price{font-size:11px;color:var(--paper3);margin-bottom:6px}
+.gear .use{font-size:11px;color:var(--paper2);line-height:1.5}
+.gear .tag{display:inline-block;background:rgba(201,168,76,.15);color:var(--gold);font-size:9px;padding:2px 6px;border-radius:3px;margin-right:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>桌面摄像头采集</h1>
+    <div class="subtitle">面相 · 远程问诊 · 实物辨识 · 自动归档到本地知识库</div>
+  </header>
+
+  <div class="hero">
+    <div class="stage" id="stage">
+      <div class="live-tag" id="liveTag">LIVE</div>
+      <div class="device-tag" id="deviceTag">未连接</div>
+      <div class="placeholder" id="placeholder">
+        <div class="icon">📷</div>
+        <div class="hint">点击「启动摄像头」开始</div>
+      </div>
+      <video id="video" autoplay playsinline muted style="display:none"></video>
+      <canvas id="canvas" style="display:none"></canvas>
+    </div>
+
+    <div class="controls">
+      <h3>控制台</h3>
+
+      <div class="field">
+        <label for="modeSel">采集模式</label>
+        <select id="modeSel" aria-label="modeSel">
+          <option value="face">面相分析（人脸识别 + AI 分析）</option>
+          <option value="ocr">通用 OCR（字/文档/卦象）</option>
+          <option value="ocr-tcm">中医病历 OCR（处方/舌苔）</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="deviceSel">摄像头设备</label>
+        <select id="deviceSel" aria-label="deviceSel"><option value="">默认（自动选择）</option></select>
+        <button class="btn-ghost" id="refreshDevBtn" style="margin-top:6px;padding:7px 12px;font-size:11px">↻ 刷新设备列表</button>
+      </div>
+
+      <button class="btn" id="startBtn">▶ 启动摄像头</button>
+      <button class="btn btn-ghost" id="snapBtn" disabled>📸 拍照并分析</button>
+      <button class="btn btn-ghost" id="autoBtn" disabled>🔁 自动采集（每 3s）</button>
+      <button class="btn btn-danger" id="stopBtn" disabled>⏹ 停止</button>
+
+      <div class="status-line" id="status">待机 · 等待启动</div>
+    </div>
+  </div>
+
+  <div class="analysis-panel">
+    <h2>📋 分析结果</h2>
+    <div class="analysis-content" id="analysis">
+      <div class="analysis-empty">拍照后将显示 AI 分析结果</div>
+    </div>
+  </div>
+
+  <div class="gallery">
+    <h2>📚 本地采集库（<span id="galleryCount">0</span> 张）</h2>
+    <div class="gallery-grid" id="gallery">
+      <div class="thumb" style="cursor:default;border-style:dashed;display:flex;align-items:center;justify-content:center;color:var(--paper3);font-size:11px">暂无</div>
+    </div>
+  </div>
+
+  <div class="gear-card">
+    <h3>🎯 设备选型推荐（桌面固定摄像头）</h3>
+    <div class="gear-list">
+      <div class="gear">
+        <div class="name">Logitech MX Brio</div>
+        <div class="price">¥1,500 · 4K USB-C</div>
+        <div class="use"><span class="tag">高分辨率</span><span class="tag">AI取景</span>面相/微表情首选。Windows Hello IR，可夜间模式。</div>
+      </div>
+      <div class="gear">
+        <div class="name">OBSBOT Tiny 2</div>
+        <div class="price">¥2,000 · AI 云台</div>
+        <div class="use"><span class="tag">三轴跟随</span><span class="tag">手势控制</span>远程问诊时自动跟拍人脸/手相，适合视频录制。</div>
+      </div>
+      <div class="gear">
+        <div class="name">Insta360 Link</div>
+        <div class="price">¥1,800 · 4K AI</div>
+        <div class="use"><span class="tag">白平衡</span><span class="tag">手势</span>色温准，适合药材/舌苔这种需要真实色彩的场景。</div>
+      </div>
+      <div class="gear">
+        <div class="name">Apple Studio Display 内置</div>
+        <div class="price">¥0（你已有的）</div>
+        <div class="use"><span class="tag">零成本</span><span class="tag">12MP</span>起步用最划算。系统级权限，可做访客自动拍照入库。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// === 摄像头管理 ===
+let stream = null;
+let autoTimer = null;
+let devices = [];
+let lastBlob = null;
+
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const stage = document.getElementById('stage');
+const placeholder = document.getElementById('placeholder');
+const liveTag = document.getElementById('liveTag');
+const deviceTag = document.getElementById('deviceTag');
+const status = document.getElementById('status');
+const startBtn = document.getElementById('startBtn');
+const snapBtn = document.getElementById('snapBtn');
+const autoBtn = document.getElementById('autoBtn');
+const stopBtn = document.getElementById('stopBtn');
+const refreshDevBtn = document.getElementById('refreshDevBtn');
+const deviceSel = document.getElementById('deviceSel');
+const modeSel = document.getElementById('modeSel');
+const analysis = document.getElementById('analysis');
+const gallery = document.getElementById('gallery');
+const galleryCount = document.getElementById('galleryCount');
+
+function setStatus(text, cls='') {
+  status.textContent = text;
+  status.className = 'status-line ' + cls;
+}
+
+async function refreshDevices() {
+  try {
+    // 必须先请求权限才能枚举设备 label
+    if (!stream) {
+      try {
+        const tmp = await navigator.mediaDevices.getUserMedia({video: true});
+        tmp.getTracks().forEach(t => t.stop());
+      } catch (e) { /* ignore */ }
+    }
+    devices = await navigator.mediaDevices.enumerateDevices();
+    const cams = devices.filter(d => d.kind === 'videoinput');
+    deviceSel.innerHTML = '<option value="">默认（自动选择）</option>' +
+      cams.map((c, i) => `<option value="${c.deviceId}">${c.label || ('Camera ' + i)}</option>`).join('');
+    setStatus(`检测到 ${cams.length} 个摄像头`, 'ok');
+  } catch (e) {
+    setStatus('设备枚举失败：' + e.message, 'err');
+  }
+}
+
+async function start() {
+  try {
+    const deviceId = deviceSel.value;
+    const constraints = {
+      video: deviceId ? {deviceId: {exact: deviceId}, width: {ideal: 1920}, height: {ideal: 1080}}
+                       : {width: {ideal: 1280}, height: {ideal: 720}, facingMode: 'user'},
+      audio: false
+    };
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
+    video.srcObject = stream;
+    video.style.display = 'block';
+    placeholder.style.display = 'none';
+    liveTag.style.display = 'flex';
+
+    const track = stream.getVideoTracks()[0];
+    deviceTag.textContent = track.label || 'Camera';
+    setStatus('实时采集中… 设备：' + (track.label || 'unknown'), 'ok');
+
+    startBtn.disabled = true;
+    snapBtn.disabled = false;
+    autoBtn.disabled = false;
+    stopBtn.disabled = false;
+
+    await refreshDevices();
+  } catch (e) {
+    setStatus('启动失败：' + e.message, 'err');
+  }
+}
+
+function stop() {
+  if (stream) {
+    stream.getTracks().forEach(t => t.stop());
+    stream = null;
+  }
+  if (autoTimer) { clearInterval(autoTimer); autoTimer = null; autoBtn.textContent = '🔁 自动采集（每 3s）'; }
+  video.srcObject = null;
+  video.style.display = 'none';
+  placeholder.style.display = 'flex';
+  liveTag.style.display = 'none';
+  deviceTag.textContent = '未连接';
+  startBtn.disabled = false;
+  snapBtn.disabled = true;
+  autoBtn.disabled = true;
+  stopBtn.disabled = true;
+  setStatus('已停止', '');
+}
+
+async function snap() {
+  if (!stream) return;
+  const track = stream.getVideoTracks()[0];
+  const settings = track.getSettings();
+  canvas.width = settings.width || 1280;
+  canvas.height = settings.height || 720;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.92));
+  lastBlob = blob;
+
+  // 显示缩略图在 stage
+  const url = URL.createObjectURL(blob);
+  showInStage(url);
+
+  // 上传分析
+  await analyze(blob);
+  await loadGallery();
+}
+
+function showInStage(url) {
+  // 临时把 video 隐藏，显示 img
+  let img = stage.querySelector('img.preview');
+  if (!img) {
+    img = document.createElement('img');
+    img.className = 'preview';
+    img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:5';
+    stage.insertBefore(img, video);
+  }
+  img.src = url;
+  setTimeout(() => { if (img) img.style.display = 'none'; }, 1500);
+}
+
+async function analyze(blob) {
+  const mode = modeSel.value;
+  const form = new FormData();
+  form.append('file', blob, `capture_${Date.now()}.jpg`);
+  form.append('mode', mode);
+  form.append('deviceId', stream ? stream.getVideoTracks()[0].label : '');
+  form.append('timestamp', new Date().toISOString());
+
+  setStatus('上传并分析中…', '');
+  try {
+    const r = await fetch('http://127.0.0.1:8913/api/camera/upload', {
+      method: 'PUT', body: form
+    });
+    const j = await r.json();
+    if (!j.ok) {
+      analysis.innerHTML = `<div class="analysis-empty" style="color:var(--danger)">⚠ ${j.message || j.error || '分析失败'}</div>`;
+      setStatus('分析失败', 'err');
+      return;
+    }
+    const text = j.analysis || j.text || '(无文本结果)';
+    analysis.innerHTML = `<div style="font-size:11px;color:var(--paper3);margin-bottom:8px">引擎：${j.engine} · 用时 ${j.elapsed_ms}ms · 字节 ${j.bytes}</div><div>${escape(text)}</div>`;
+    setStatus('✓ 分析完成 · ' + j.engine, 'ok');
+  } catch (e) {
+    analysis.innerHTML = `<div class="analysis-empty" style="color:var(--danger)">✗ 网络错误：${e.message}<br>请确认 face-ocr-server 在 8913 端口运行</div>`;
+    setStatus('上传失败：' + e.message, 'err');
+  }
+}
+
+function escape(s) { return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
+
+function toggleAuto() {
+  if (autoTimer) {
+    clearInterval(autoTimer); autoTimer = null;
+    autoBtn.textContent = '🔁 自动采集（每 3s）';
+    setStatus('自动采集已暂停', '');
+    return;
+  }
+  autoTimer = setInterval(() => snap(), 3000);
+  autoBtn.textContent = '⏸ 暂停自动采集';
+  setStatus('自动采集中…（每 3 秒）', 'ok');
+}
+
+async function loadGallery() {
+  try {
+    const r = await fetch('http://127.0.0.1:8913/api/camera/health');
+    // 健康检查，不返回列表 — 改为从 localStorage 计数
+    const list = JSON.parse(localStorage.getItem('camera_archive') || '[]');
+    galleryCount.textContent = list.length;
+    if (list.length === 0) {
+      gallery.innerHTML = '<div class="thumb" style="cursor:default;border-style:dashed;display:flex;align-items:center;justify-content:center;color:var(--paper3);font-size:11px">暂无</div>';
+    } else {
+      gallery.innerHTML = list.slice(-12).reverse().map(item => `
+        <div class="thumb" title="${escape(item.timestamp)}">
+          <img src="${item.url}" alt="">
+          <div class="meta">${item.mode} · ${new Date(item.timestamp).toLocaleTimeString()}</div>
+        </div>
+      `).join('');
+    }
+  } catch (e) { /* ignore */ }
+}
+
+// 启动后保存到 localStorage 模拟
+const _origSnap = snap;
+window.snap = async function() {
+  await _origSnap();
+  if (lastBlob) {
+    const list = JSON.parse(localStorage.getItem('camera_archive') || '[]');
+    list.push({
+      url: URL.createObjectURL(lastBlob),
+      mode: modeSel.value,
+      timestamp: new Date().toISOString(),
+      device: stream ? stream.getVideoTracks()[0].label : ''
+    });
+    localStorage.setItem('camera_archive', JSON.stringify(list));
+  }
+};
+
+startBtn.onclick = start;
+snapBtn.onclick = () => window.snap();
+autoBtn.onclick = toggleAuto;
+stopBtn.onclick = stop;
+refreshDevBtn.onclick = refreshDevices;
+
+// 启动时检测设备
+refreshDevices();
+loadGallery();
+
+// 键盘快捷键：空格 = 拍照
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space' && !snapBtn.disabled) {
+    e.preventDefault();
+    window.snap();
+  }
+});
+</script>
+</body>
+</html>

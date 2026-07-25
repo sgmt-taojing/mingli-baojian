@@ -1,0 +1,55 @@
+name: a11y
+
+on:
+  push:
+    branches: [main, gh-pages]
+    paths:
+      - 'app/**/*.html'
+      - 'app/js/**/*.js'
+      - 'app/components/**/*.js'
+      - 'app/css/**/*.css'
+      - 'scripts/a11y-axe-scan.js'
+      - '.github/workflows/a11y.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'app/**/*.html'
+      - 'app/js/**/*.js'
+      - 'app/components/**/*.js'
+      - 'app/css/**/*.css'
+      - 'scripts/a11y-axe-scan.js'
+
+jobs:
+  axe-scan:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Start static server
+        run: |
+          cd app && python3 -m http.server 8914 &
+          sleep 2
+          curl -sS -o /dev/null -w "static:%{http_code}\n" http://127.0.0.1:8914/divination-hub.html
+
+      - name: Run axe-core scan (WCAG 2.1 AA)
+        run: npm run a11y:scan
+
+      - name: Upload scan report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a11y-axe-report
+          path: |
+            docs/A11Y_AXE_SCAN_REPORT.md
+            docs/A11Y_AXE_FULL_REPORT_v1.md
+          retention-days: 30

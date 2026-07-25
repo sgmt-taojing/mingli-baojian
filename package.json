@@ -1,0 +1,59 @@
+{
+  "name": "mingli-baojian",
+  "version": "1.1.0",
+  "description": "命理占卜平台，集成八字排盘、紫微斗数、奇门遁甲、梅花易数、大六壬、风水分析等多种命理功能。",
+  "main": "server/api-server-v2.js",
+  "scripts": {
+    "test": "jest",
+    "perf:budget": "node scripts/bundle-budget-check.js",
+    "perf:budget:strict": "node scripts/bundle-budget-check.js --strict",
+    "lint:msg": "commitlint --edit $1",
+    "lint:msg:staged": "lint-staged",
+    "prepare": "husky",
+    "release": "standard-version",
+    "release:dry": "standard-version --dry-run",
+    "release:minor": "standard-version --release-as minor",
+    "release:patch": "standard-version --release-as patch",
+    "release:major": "standard-version --release-as major",
+    "release:first": "standard-version --first-release",
+    "lhci:health": "lhci healthcheck",
+    "lhci:autorun": "lhci autorun --collect.startServerCommand=\"node scripts/lh-static-server.js\" --collect.startServerReadyPattern=\"listening on\" --collect.url=http://127.0.0.1:8914/divination-hub.html",
+    "lhci:assert": "lhci assert --assertion=--categories:performance",
+    "a11y:scan": "node scripts/a11y-axe-scan.js",
+    "a11y:scan:full": "node scripts/a11y-axe-scan.js divination-hub.html tcm-clinic.html ai-assistant.html yijing-oracle.html fengshui.html",
+    "perf:baseline": "node scripts/perf-puppeteer.js",
+    "perf:divhub": "node scripts/perf-divhub-single.js",
+    "perf:ci": "npm run perf:baseline --silent && npm run perf:divhub --silent",
+    "perf:full": "npm run perf:budget && npm run perf:baseline"
+  },
+  "private": true,
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "acorn": "^8.17.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "pino": "^10.3.1",
+    "pino-http": "^11.0.0",
+    "pino-pretty": "^13.1.3",
+    "pino-roll": "^4.0.0",
+    "pptxgenjs": "^4.0.1",
+    "sql.js": "^1.14.1"
+  },
+  "directories": {
+    "doc": "docs"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.2.1",
+    "@commitlint/config-conventional": "^21.2.0",
+    "@lhci/cli": "^0.15.1",
+    "@pact-foundation/pact": "^17.0.1",
+    "husky": "^9.1.7",
+    "jest": "^30.4.2",
+    "jsdom": "^29.1.1",
+    "standard-version": "^9.5.0",
+    "supertest": "^7.2.2"
+  }
+}

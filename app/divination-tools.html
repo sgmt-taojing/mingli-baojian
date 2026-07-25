@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>易道智鉴 · 推演工具</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: var(--ink); --paper: var(--paper); --gold: var(--gold); --gold2: var(--gold2);;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;--paper3:#a09080;--steel:#7f8c8d}
+    body {
+      font-family: 'Noto Serif SC', serif;
+      background: var(--ink); color: var(--paper);
+      margin: 0; padding: 20px; min-height: 100vh;
+    }
+    .header {
+      text-align: center; padding: 40px 0; border-bottom: 1px solid var(--ink3);
+    }
+    .header h1 { font-size: 28px; color: var(--gold); margin: 0 0 10px 0; }
+    .header p { color: var(--steel); margin: 0; }
+    .tools-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px; padding: 40px 0; max-width: 1200px; margin: 0 auto;
+    }
+    .tool-card {
+      background: var(--ink2); border: 1px solid var(--ink4); border-radius: 12px;
+      padding: 30px; transition: all 0.3s; cursor: pointer;
+    }
+    .tool-card:hover {
+      border-color: var(--gold); transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(201,168,76,0.15);
+    }
+    .tool-icon { font-size: 48px; margin-bottom: 15px; }
+    .tool-title { font-size: 20px; color: var(--gold2); margin-bottom: 10px; }
+    .tool-desc { color: var(--paper3); line-height: 1.6; font-size: 14px; }
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--ink); border-top: 1px solid var(--ink4);
+      display: flex; justify-content: center; padding: 12px;
+    }
+    .nav-btn {
+      background: transparent; border: none; color: var(--steel);
+      padding: 10px 20px; cursor: pointer; transition: color 0.3s;
+    }
+    .nav-btn:hover { color: var(--gold); }
+  </style>
+  <link rel="stylesheet" href="css/a11y-fix.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">跳到主内容</a>
+<main id="main-content" role="main">
+<div style="position:fixed;top:12px;right:12px;z-index:99998">
+  <a href="tcm-clinic.html" style="display:inline-block;padding:6px 16px;background:rgba(201,168,76,0.12);color:var(--gold,#c9a84c);border:1px solid rgba(201,168,76,0.25);border-radius:16px;font-size:12px;text-decoration:none;font-family:'Noto Serif SC',serif;letter-spacing:1px">🏥 中医诊疗</a>
+</div>
+  <div class="header">
+    <h1>🔮 推演工具集</h1>
+    <p>多种命理推演辅助工具，助您洞察天机</p>
+  </div>
+  
+  <div class="tools-grid">
+    <ml-tap class="tool-card" onclick="window.location.href='divination-hub.html'" style="display:block"
+      <div class="tool-icon">☯️</ml-tap>
+      <div class="tool-title">八字排盘</div>
+      <div class="tool-desc">输入生辰信息，获取完整八字命盘与人生解读</div>
+    </div>
+    
+    <ml-tap class="tool-card" onclick="window.location.href='divination-hub.html'" style="display:block"
+      <div class="tool-icon">🏠</ml-tap>
+      <div class="tool-title">风水罗盘</div>
+      <div class="tool-desc">居家风水分析，户型吉凶判断</div>
+    </div>
+    
+    <ml-tap class="tool-card" onclick="window.location.href='divination-hub.html'" style="display:block"
+      <div class="tool-icon">📱</ml-tap>
+      <div class="tool-title">手机号吉凶</div>
+      <div class="tool-desc">数字能量分析，号码运势评估</div>
+    </div>
+    
+    <ml-tap class="tool-card" onclick="window.location.href='divination-hub.html'" style="display:block"
+      <div class="tool-icon">✍️</ml-tap>
+      <div class="tool-title">姓名评分</div>
+      <div class="tool-desc">三才五格分析，姓名改运建议</div>
+    </div>
+    
+    <ml-tap class="tool-card" onclick="window.location.href='divination-hub.html'" style="display:block"
+      <div class="tool-icon">📊</ml-tap>
+      <div class="tool-title">公司取名</div>
+      <div class="tool-desc">企业命名咨询，商号风水设计</div>
+    </div>
+    
+    <ml-tap class="tool-card" onclick="window.location.href='divination-hub.html'" style="display:block"
+      <div class="tool-icon">🎲</ml-tap>
+      <div class="tool-title">六十四卦</div>
+      <div class="tool-desc">周易占卜，卦象详解</div>
+    </div>
+  </div>
+  
+  <div class="nav-bar">
+    <button class="nav-btn" onclick="window.location.href='divination-hub.html'">🏠 主平台</button>
+    <button class="nav-btn" onclick="window.location.href='divination-knowledge.html'">📚 知识库</button>
+    <button class="nav-btn" onclick="window.location.href='divination-shop.html'">🛒 商城</button>
+  </div>
+
+<script src="js/ui-toast.js" defer></script>
+  <script src="js/a11y-divination-hub.js" defer></script>
+  
+</main>
+</body>
+</html>

@@ -1,0 +1,72 @@
+name: Release
+
+# 触发条件：推送 v* 开头的 tag
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm ci --production=false
+
+      - name: Run tests
+        run: npm test
+        continue-on-error: true
+
+      - name: Generate release notes
+        id: notes
+        run: |
+          # 从 tag 提取版本号
+          TAG=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG#v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.notes.outputs.tag }}
+          name: Release ${{ steps.notes.outputs.tag }}
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+          body: |
+            ## 命理宝鉴 ${{ steps.notes.outputs.tag }}
+
+            ### 自动生成
+
+            详见 [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) 获取完整变更历史。
+
+            ### 安装/部署
+
+            - **GitHub Pages**: https://sgmt-taojing.github.io/mingli-baojian/
+            - **本地开发**: `git clone && npm install && npm test`
+
+            ### 服务端口
+
+            | 端口 | 服务 |
+            |------|------|
+            | 8914 | 静态服务 |
+            | 8920 | API 网关 |
+            | 8911 | 排盘 API |
+            | 8912 | TTS 服务 |
+            | 8913 | Face OCR |
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

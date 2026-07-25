@@ -1,0 +1,86 @@
+name: lighthouse
+
+on:
+  push:
+    branches: [main, gh-pages]
+    paths:
+      - 'app/**/*.html'
+      - 'app/js/**/*.js'
+      - 'app/css/**/*.css'
+      - 'lighthouserc.json'
+      - 'scripts/lh-*.js'
+      - '.github/workflows/lighthouse.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'app/**/*.html'
+      - 'app/js/**/*.js'
+      - 'app/css/**/*.css'
+      - 'lighthouserc.json'
+
+jobs:
+  lhci-autorun:
+    runs-on: macos-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Cache Chromium for Lighthouse
+        id: cache-chrome
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/puppeteer
+            ~/.cache/lighthouse
+          key: ${{ runner.os }}-chrome-lh-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-chrome-lh-
+
+      - name: Start static server for Lighthouse
+        run: |
+          cd app && python3 -m http.server 8914 &
+          sleep 2
+          curl -sS -o /dev/null -w "static:%{http_code}\n" http://127.0.0.1:8914/divination-hub.html
+
+      - name: Run Lighthouse CI (5 H5 pages, desktop preset)
+        run: npm run lhci:autorun
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN || '' }}
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: |
+            .openclaw/tmp/lighthouse-reports/**
+            .lighthouseci/**
+          retention-days: 30
+          if-no-files-found: ignore
+
+      - name: Archive assertion summary
+        if: always()
+        run: |
+          mkdir -p docs/_lighthouse
+          if [ -d .openclaw/tmp/lighthouse-reports ]; then
+            cp -r .openclaw/tmp/lighthouse-reports/. docs/_lighthouse/ 2>/dev/null || true
+          fi
+          if [ -d .lighthouseci ]; then
+            cp -r .lighthouseci/. docs/_lighthouse/ 2>/dev/null || true
+          fi
+          echo "## Lighthouse CI Summary ($(date -u +%Y-%m-%dT%H:%M:%SZ))" > docs/_lighthouse/SUMMARY.md
+          echo "" >> docs/_lighthouse/SUMMARY.md
+          echo "- Workflow: \`.github/workflows/lighthouse.yml\`" >> docs/_lighthouse/SUMMARY.md
+          echo "- Config: \`lighthouserc.json\` (5 URLs / desktop preset)" >> docs/_lighthouse/SUMMARY.md
+          echo "- Assertions: performance≥0.5 error / a11y/bp≥0.8 warn / seo≥0.7 warn / TBT≤600ms warn" >> docs/_lighthouse/SUMMARY.md
+          echo "- Script: \`npm run lhci:autorun\` (auto-start static server on :8914)" >> docs/_lighthouse/SUMMARY.md

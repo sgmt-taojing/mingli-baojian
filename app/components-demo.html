@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=yes">
+<title>命理宝鉴 · 前端组件库 v2 演示（ml-toast / ml-modal / ml-tab / ml-card / ml-accordion / ml-tap）</title>
+<style>
+/* ═══════════════ 深色主题 CSS 变量（与 divination-hub.html 一致） ═══════════════ */
+:root{
+  --bg-dark:        #1a1a2e;
+  --bg-card:        #16213e;
+  --bg-card-hover:  #1c2a4a;
+  --ink:            #eee;
+  --ink-dim:        #b0b0c0;
+  --paper3:         #8a8a9a;
+  --gold:           #c9a84c;
+  --gold-dim:       #a08838;
+  --gold-bright:    #e0c060;
+  --border:         rgba(201,168,76,.2);
+  --border-strong:  rgba(201,168,76,.4);
+  --success:        #10b981;
+  --error:          #ef4444;
+  --warn:           #f59e0b;
+  --info:           #3b82f6;
+
+  /* ml-* 组件统一 CSS 变量（组件可读这些） */
+  --ml-bg:          rgba(0,0,0,.6);
+  --ml-panel:       #16213e;
+  --ml-ink:         #eee;
+  --ml-muted:       #8a8a9a;
+  --ml-border:      rgba(201,168,76,.2);
+  --ml-primary:     #c9a84c;
+  --ml-ink-on-primary: #1a1a2e;
+  --ml-success:     #10b981;
+  --ml-error:       #ef4444;
+  --ml-warn:        #f59e0b;
+  --ml-info:        #3b82f6;
+  --ml-radius:      14px;
+  --ml-shadow:      0 4px 16px rgba(0,0,0,.18);
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+body{
+  background:var(--bg-dark);
+  color:var(--ink);
+  font-family:"Noto Serif SC",-apple-system,"PingFang SC",serif;
+  line-height:1.7;
+  min-height:100vh;
+  padding:0;
+}
+
+.hero{
+  background:linear-gradient(135deg,#0f0f23 0%,#1a1a2e 50%,#16213e 100%);
+  border-bottom:1px solid var(--border-strong);
+  padding:40px 24px 28px;
+  text-align:center;
+}
+.hero h1{
+  font-size:28px;
+  color:var(--gold);
+  letter-spacing:3px;
+  margin-bottom:8px;
+  font-weight:600;
+}
+.hero h1 .badge{
+  display:inline-block;
+  background:var(--gold);
+  color:var(--bg-dark);
+  font-size:12px;
+  padding:2px 8px;
+  border-radius:4px;
+  vertical-align:middle;
+  margin-left:8px;
+  letter-spacing:0;
+}
+.hero .subtitle{
+  color:var(--ink-dim);
+  font-size:14px;
+  letter-spacing:1px;
+}
+.hero .meta{
+  margin-top:10px;
+  font-size:12px;
+  color:var(--paper3);
+}
+
+.container{
+  max-width:1000px;
+  margin:0 auto;
+  padding:24px 20px 60px;
+}
+
+.demo-section{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:24px 28px;
+  margin-bottom:24px;
+}
+.demo-section h2{
+  color:var(--gold);
+  font-size:18px;
+  letter-spacing:2px;
+  margin-bottom:6px;
+}
+.demo-section .desc{
+  color:var(--paper3);
+  font-size:13px;
+  margin-bottom:18px;
+}
+
+.btn-grid{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:14px;
+}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:10px 20px;
+  border:1px solid var(--border-strong);
+  border-radius:8px;
+  background:transparent;
+  color:var(--ink);
+  font-size:14px;
+  font-family:inherit;
+  cursor:pointer;
+  transition:all .2s;
+}
+.btn:hover{
+  background:rgba(201,168,76,.1);
+  border-color:var(--gold);
+  color:var(--gold-bright);
+  transform:translateY(-1px);
+}
+.btn:active{ transform:translateY(0); }
+
+.btn-success{ border-color:var(--success); color:var(--success); }
+.btn-success:hover{ background:rgba(16,185,129,.12); }
+.btn-error  { border-color:var(--error);   color:var(--error); }
+.btn-error:hover  { background:rgba(239,68,68,.12); }
+.btn-warn   { border-color:var(--warn);    color:var(--warn); }
+.btn-warn:hover   { background:rgba(245,158,11,.12); }
+.btn-info   { border-color:var(--info);    color:var(--info); }
+.btn-info:hover   { background:rgba(59,130,246,.12); }
+
+.btn-primary{
+  background:var(--gold);
+  color:var(--bg-dark);
+  border-color:var(--gold);
+  font-weight:600;
+}
+.btn-primary:hover{
+  background:var(--gold-bright);
+  color:var(--bg-dark);
+}
+
+.tab-demo-content{
+  padding:16px 0;
+}
+.tab-demo-content h4{
+  color:var(--gold);
+  font-size:15px;
+  margin-bottom:8px;
+}
+.tab-demo-content p{
+  color:var(--ink-dim);
+  font-size:14px;
+  margin-bottom:8px;
+}
+.tab-demo-content ul{
+  padding-left:20px;
+  color:var(--ink-dim);
+  font-size:13px;
+}
+.tab-demo-content li{ margin-bottom:4px; }
+
+.event-log{
+  background:var(--bg-dark);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:12px 16px;
+  margin-top:14px;
+  min-height:60px;
+  max-height:200px;
+  overflow-y:auto;
+  font-family:"SF Mono","Fira Code",monospace;
+  font-size:12px;
+  color:var(--success);
+}
+.event-log .log-entry{
+  padding:2px 0;
+  border-bottom:1px solid rgba(201,168,76,.06);
+}
+.event-log .log-entry:last-child{ border-bottom:0; }
+.event-log .log-time{ color:var(--paper3); margin-right:8px; }
+
+.footer{
+  text-align:center;
+  padding:20px;
+  color:var(--paper3);
+  font-size:12px;
+  letter-spacing:1px;
+}
+.footer a{
+  color:var(--gold-dim);
+  text-decoration:none;
+}
+.footer a:hover{ color:var(--gold); }
+
+.kbd{
+  background:rgba(201,168,76,.12);
+  border:1px solid rgba(201,168,76,.3);
+  color:var(--gold-bright);
+  padding:2px 6px;
+  border-radius:4px;
+  font-family:"SF Mono","Fira Code",monospace;
+  font-size:12px;
+}
+
+.note{
+  background:rgba(59,130,246,.08);
+  border-left:3px solid var(--info);
+  padding:8px 14px;
+  margin:10px 0;
+  font-size:13px;
+  color:var(--ink-dim);
+  border-radius:0 6px 6px 0;
+}
+
+@media(max-width:640px){
+  .hero h1{ font-size:22px; }
+  .container{ padding:16px 12px 40px; }
+  .demo-section{ padding:16px; }
+  .btn{ padding:8px 14px; font-size:13px; }
+}
+</style>
+  <link rel="stylesheet" href="css/a11y-fix.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">跳到主内容</a>
+<main id="main-content" role="main">
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  顶部 Banner                                                       -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="hero">
+  <h1>☰ 命理宝鉴 · 前端组件库 <span class="badge">v2.0</span></h1>
+  <div class="subtitle">Web Components 封装演示 · toast / modal / tab / card / accordion 五件套</div>
+  <div class="meta">深色主题 · 零依赖 · Custom Elements v1 · 一键 <span class="kbd">window.ml.*</span> 调用</div>
+</div>
+
+<div class="container">
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  Toast 演示                                                        -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="demo-section">
+  <h2>🍞 ① ml-toast — 4 类消息提示</h2>
+  <p class="desc">点击下方按钮触发 4 种类型的 toast 消息提示。支持 <span class="kbd">ml.toast.success(msg)</span> 一键调用。</p>
+  <div class="btn-grid">
+    <button class="btn btn-success" data-toast="success">✅ Success 成功</button>
+    <button class="btn btn-error"   data-toast="error">❌ Error 错误</button>
+    <button class="btn btn-warn"    data-toast="warn">⚠️ Warn 警告</button>
+    <button class="btn btn-info"    data-toast="info">ℹ️ Info 信息</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  Modal 演示                                                        -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="demo-section">
+  <h2>🪟 ② ml-modal — 基础 / 表单 / 确认 3 类弹窗</h2>
+  <p class="desc">支持 sm / md / lg 三种宽度，自动 ESC 关闭、点击遮罩关闭、自定义内容。</p>
+  <div class="btn-grid">
+    <button class="btn" id="btn-open-basic">📐 基础对话框 (sm)</button>
+    <button class="btn" id="btn-open-form">📝 表单对话框 (md)</button>
+    <button class="btn" id="btn-open-confirm">✅ 确认对话框 (Promise)</button>
+  </div>
+
+  <!-- Modal 1: 基础 -->
+  <ml-modal id="modalBasic" title="基础对话框" size="sm">
+    <p style="color:var(--ml-ink);font-size:14px;line-height:1.7">这是最基础的 <b style="color:var(--gold)">Small (420px)</b> 弹窗。</p>
+    <p style="color:var(--ml-ink);font-size:13px;margin-top:10px">点击遮罩、按 ESC 或右上角 ✕ 都可关闭。</p>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+      <button class="btn btn-primary" onclick="document.getElementById('modalBasic').close()">好的</button>
+    </div>
+  </ml-modal>
+
+  <!-- Modal 2: 表单 -->
+  <ml-modal id="modalForm" title="新建命例（表单）" size="md">
+    <p style="color:var(--ml-ink);font-size:13px;margin-bottom:12px">请填写完整的八字信息：</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <label style="display:flex;flex-direction:column;gap:4px">
+        <span style="color:var(--gold);font-size:12px">姓名</span>
+        <input type="text" placeholder="如：李白" style="padding:8px 10px;background:var(--bg-dark);border:1px solid var(--border);border-radius:6px;color:var(--ink);font:inherit" aria-label="如：李白">
+      </label>
+      <label style="display:flex;flex-direction:column;gap:4px">
+        <span style="color:var(--gold);font-size:12px">性别</span>
+        <select style="padding:8px 10px;background:var(--bg-dark);border:1px solid var(--border);border-radius:6px;color:var(--ink);font:inherit">
+          <option>男（乾造）</option>
+          <option>女（坤造）</option>
+        </select>
+      </label>
+      <label style="display:flex;flex-direction:column;gap:4px">
+        <span style="color:var(--gold);font-size:12px">公历年</span>
+        <input type="number" placeholder="如 1984" min="1900" max="2100" style="padding:8px 10px;background:var(--bg-dark);border:1px solid var(--border);border-radius:6px;color:var(--ink);font:inherit" aria-label="如 1984">
+      </label>
+      <label style="display:flex;flex-direction:column;gap:4px">
+        <span style="color:var(--gold);font-size:12px">月</span>
+        <input type="number" placeholder="1-12" min="1" max="12" style="padding:8px 10px;background:var(--bg-dark);border:1px solid var(--border);border-radius:6px;color:var(--ink);font:inherit">
+      </label>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+      <button class="btn" onclick="document.getElementById('modalForm').close()">取消</button>
+      <button class="btn btn-primary" id="btn-submit-form">提交</button>
+    </div>
+  </ml-modal>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  Tab 演示（3 个 tab）                                              -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="demo-section">
+  <h2>📑 ③ ml-tab — 3 个 Tab 切换内容</h2>
+  <p class="desc">编程切换：<span class="kbd">ml.tab.setActive('demoTab', 2)</span></p>
+
+  <ml-tab id="demoTab" active="0">
+    <ml-tab-pane label="📐 五行总览" icon="📐">
+      <div class="tab-demo-content">
+        <h4>五行关系总览</h4>
+        <p>金木水火土五行相生相克，构成命理分析的基础框架。</p>
+        <ul>
+          <li><b>相生：</b>金→水→木→火→土→金</li>
+          <li><b>相克：</b>金→木→土→水→火→金</li>
+          <li><b>日主强弱：</b>月令 + 得气 + 得势</li>
+        </ul>
+      </div>
+    </ml-tab-pane>
+    <ml-tab-pane label="📤 上传报告" icon="📤">
+      <div class="tab-demo-content">
+        <h4>上传命例报告</h4>
+        <p>支持 TXT / JSON / PNG / JPG / PDF，最大 10MB，OCR 准确率 ≥ 95%。</p>
+        <ul>
+          <li>📄 TXT 文本报告</li>
+          <li>📊 JSON 结构化数据</li>
+          <li>🖼 PNG/JPG 截图</li>
+          <li>📋 PDF 文档</li>
+        </ul>
+      </div>
+    </ml-tab-pane>
+    <ml-tab-pane label="🤖 AI 解读" icon="🤖">
+      <div class="tab-demo-content">
+        <h4>AI 智能解读</h4>
+        <p>基于 KB 知识库 + LLM 大模型，提供个性化命理建议。</p>
+        <ul>
+          <li>🧠 已加载 200+ 古籍</li>
+          <li>⚡ P95 响应 ≤ 1.5s</li>
+          <li>🎯 KB 直答命中率 ≥ 40%</li>
+          <li>💬 支持多轮对话 + 上下文记忆</li>
+        </ul>
+      </div>
+    </ml-tab-pane>
+  </ml-tab>
+
+  <div class="btn-grid" style="margin-top:14px">
+    <button class="btn" data-tab-go="0">→ 切到第 1 个</button>
+    <button class="btn" data-tab-go="1">→ 切到第 2 个</button>
+    <button class="btn" data-tab-go="2">→ 切到第 3 个</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  Card 演示                                                        -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="demo-section">
+  <h2>🎴 ④ ml-card — 4 种 variant × 5 种 color 演示</h2>
+  <p class="desc">支持 flat / elevated / glass / outlined 四种 variant，以及 5 种强调色条。</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+    <ml-card title="📊 基础 elevated" subtitle="默认变体 · 阴影 + 浅背景" variant="elevated" color="gold">
+      <p>展示核心数据卡片样式，最常用。</p>
+      <div slot="footer">
+        <button class="btn btn-info" style="padding:6px 12px;font-size:13px">查看详情</button>
+        <button class="btn btn-primary" style="padding:6px 12px;font-size:13px">立即体验</button>
+      </div>
+    </ml-card>
+    <ml-card title="🔮 flat 简洁版" subtitle="无阴影 · 透明背景" variant="flat" color="info">
+      <p>适合在已有背景的区块内嵌入。</p>
+    </ml-card>
+    <ml-card title="💎 glass 玻璃拟态" subtitle="半透明 + 模糊" variant="glass" color="success">
+      <p>现代感设计，配合渐变背景效果最佳。</p>
+    </ml-card>
+    <ml-card title="📐 outlined 描边" subtitle="无填充 · 加粗边框" variant="outlined" color="warn">
+      <p>用于强调信息密度较低的辅助卡片。</p>
+    </ml-card>
+  </div>
+
+  <h4 style="margin:18px 0 8px;color:var(--gold);font-size:14px">📜 clickable 卡片</h4>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
+    <ml-card title="🔮 八字排盘" subtitle="四柱推演" clickable="true" data-card-id="bazi">
+      <p style="font-size:13px">点击触发 card-click 事件。</p>
+    </ml-card>
+    <ml-card title="📜 紫微斗数" subtitle="十二宫位" clickable="true" data-card-id="ziwei">
+      <p style="font-size:13px">另一张可点击卡片。</p>
+    </ml-card>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  Accordion 演示                                                   -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="demo-section">
+  <h2>🪗 ⑤ ml-accordion — FAQ 折叠面板</h2>
+  <p class="desc">支持单开/多开模式，可编程 <span class="kbd">ml.accordion.openAll('faq')</span></p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:8px">
+    <!-- 左：单开模式 -->
+    <div>
+      <h4 style="color:var(--gold);font-size:14px;margin-bottom:8px">单开模式（默认）</h4>
+      <ml-accordion id="faqSingle">
+        <ml-accordion-item title="什么是八字？" icon="📜">
+          <p>八字即四柱八字，由年、月、日、时四柱的天干地支组成，每柱包含一个天干和一个地支，共八个字，故称"八字"。</p>
+        </ml-accordion-item>
+        <ml-accordion-item title="如何排盘？" icon="🔮" open>
+          <p>使用 lunar-js 库根据公历出生日期推算四柱，并结合真太阳时、经纬度修正。</p>
+        </ml-accordion-item>
+        <ml-accordion-item title="什么是用神？" icon="⚖️">
+          <p>用神是八字中对日主起关键平衡作用的五行，决定命局的吉凶倾向。</p>
+        </ml-accordion-item>
+        <ml-accordion-item title="📦 暂未开放" icon="🚧" disabled>
+          <p>该条目被禁用，无法展开。</p>
+        </ml-accordion-item>
+      </ml-accordion>
+    </div>
+    <!-- 右：多开模式 -->
+    <div>
+      <h4 style="color:var(--gold);font-size:14px;margin-bottom:8px">多开模式 (multiple)</h4>
+      <ml-accordion id="faqMultiple" multiple="true">
+        <ml-accordion-item title="💎 五行相生" icon="💎">
+          <p>金→水→木→火→土→金。相生有滋生、助长之意。</p>
+        </ml-accordion-item>
+        <ml-accordion-item title="⚔️ 五行相克" icon="⚔️">
+          <p>金→木→土→水→火→金。相克有制约、约束之意。</p>
+        </ml-accordion-item>
+        <ml-accordion-item title="🌊 天干地支" icon="🌊">
+          <p>十天干：甲乙丙丁戊己庚辛壬癸；十二地支：子丑寅卯辰巳午未申酉戌亥。</p>
+        </ml-accordion-item>
+      </ml-accordion>
+      <div class="btn-grid" style="margin-top:10px">
+        <button class="btn" data-acc-openall>📂 全部展开</button>
+        <button class="btn" data-acc-closeall>📁 全部收起</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  事件日志                                                          -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="demo-section">
+  <h2>📜 事件日志</h2>
+  <p class="desc">所有组件触发的事件统一收集于此（tab-change / item-toggle / card-click / modal close）。</p>
+  <div class="event-log" id="eventLog">
+    <div class="log-entry"><span class="log-time">[系统]</span>事件监听已就绪…</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  ⑥ ml-tap · a11y 假按钮替代                                       -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="demo-section">
+  <h2>👆 ⑥ ml-tap — a11y 假按钮替代（div onclick → 真按钮）</h2>
+  <p class="desc">解决项目里 477 个 &lt;div onclick&gt; 假按钮：键盘不可达、无 ARIA、SEO 不识别。&lt;ml-tap&gt; 提供 role/tabindex/Enter·Space 键盘触发/focus-visible。</p>
+
+  <h4 style="color:var(--gold);margin-top:14px">3 种 variant × 3 个示例</h4>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin:8px 0">
+    <ml-tap variant="card" onclick="addLog('ml-tap demo','默认')" tabindex="0">
+      <div style="font-size:14px;font-weight:600">默认 variant</div>
+      <div style="font-size:12px;color:var(--ink-dim);margin-top:4px">点击 / Enter / Space 都能触发</div>
+    </ml-tap>
+    <ml-tap role="button" variant="tile" onclick="addLog('ml-tap demo','tile')" tabindex="0">
+      <div style="font-size:14px;font-weight:600">tile 方块</div>
+      <div style="font-size:12px;color:var(--ink-dim);margin-top:4px">适合分类入口、快捷区</div>
+    </ml-tap>
+    <ml-tap variant="ghost" onclick="addLog('ml-tap demo','ghost')" tabindex="0">
+      <div style="font-size:14px;font-weight:600">ghost 透明</div>
+      <div style="font-size:12px;color:var(--ink-dim);margin-top:4px">hover 才显示背景</div>
+    </ml-tap>
+  </div>
+
+  <h4 style="color:var(--gold);margin-top:14px">aria-pressed 按下态（可切换 toggle）</h4>
+  <div style="display:flex;gap:8px;margin:8px 0">
+    <ml-tap role="button" variant="tile" aria-pressed="false" onclick="addLog('ml-tap toggle','pressed=' + (this.getAttribute('aria-pressed')==='true'))" tabindex="0">默认 · 未按下</ml-tap>
+    <ml-tap role="button" variant="tile" aria-pressed="true" onclick="addLog('ml-tap toggle','pressed=' + (this.getAttribute('aria-pressed')==='true'))" tabindex="0">默认 · 已按下</ml-tap>
+  </div>
+
+  <h4 style="color:var(--gold);margin-top:14px">disabled 状态</h4>
+  <div style="display:flex;gap:8px;margin:8px 0">
+    <ml-tap variant="card" tabindex="0" onclick="addLog('ml-tap','enabled')">可点击</ml-tap>
+    <ml-tap variant="card" tabindex="0" disabled="true">已禁用</ml-tap>
+    <button onclick="ml.tap.enable(document.querySelectorAll('ml-tap')[3]); addLog('ml.tap.enable','启用被禁用的'); ml.toast.success('已启用')">启用被禁用的</button>
+    <button onclick="ml.tap.disable(document.querySelectorAll('ml-tap')[3]); addLog('ml.tap.disable','禁用')">禁用</button>
+  </div>
+
+  <h4 style="color:var(--gold);margin-top:14px">错误容错（onclick 异常不会崩溃）</h4>
+  <div style="display:flex;gap:8px;margin:8px 0">
+    <ml-tap variant="card" onclick="undefined_function_x()" tabindex="0">点击 → 控制台报错但不崩溃</ml-tap>
+  </div>
+
+  <div class="note">
+    💡 自动扫描报告会在 1.5s 后输出到控制台：<br>
+    <span class="kbd">window.MLBJ_TAP_AUTO_REPORT = false</span> 可关闭<br>
+    <span class="kbd">window.MLBJ_TAP_STATS = (stats) => ml.toast.info(...)</span> 可自定义接收
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  说明文档                                                          -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="demo-section" style="background:linear-gradient(135deg,rgba(22,33,62,.8),rgba(15,15,35,.8))">
+  <h2>📖 使用文档</h2>
+  <div class="note">
+    💡 完整 API 文档请参见 <span class="kbd">docs/COMPONENTS.md</span>，本演示页仅展示交互用法。
+  </div>
+  <p style="color:var(--ink-dim);font-size:13px;margin-top:8px">
+    一行 <span class="kbd">&lt;script type="module" src="../js/components-loader.js"&gt;&lt;/script&gt;</span> 即可注册全部 6 个组件 + 暴露 <span class="kbd">window.ml</span> 全局命名空间。
+  </p>
+  <h4 style="margin-top:14px;color:var(--gold);font-size:14px">🎯 window.ml API 速览</h4>
+  <pre style="background:var(--bg-dark);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;color:var(--ink-dim);overflow-x:auto;font-family:'SF Mono','Fira Code',monospace"><code>// toast
+ml.toast.success('已保存');
+ml.toast.error('网络异常');
+
+// modal
+ml.modal.open('modalBasic');
+ml.modal.close('modalBasic', 'api');
+const ok = await ml.modal.confirm({ title:'确认删除', message:'此操作不可撤销' });
+
+// tab
+ml.tab.setActive('demoTab', 2);
+const idx = ml.tab.getActive('demoTab');
+
+// card
+const c = ml.card.create({ title:'新卡片', body:'内容', variant:'glass' });
+
+// accordion
+ml.accordion.openAll('faqMultiple');
+ml.accordion.closeAll('faqMultiple');
+
+// tap (a11y 假按钮替代)
+const t = document.querySelector('ml-tap');
+ml.tap.disable(t);
+ml.tap.enable(t);
+ml.tap.press(t);  // 程序触发点击</code></pre>
+</div>
+
+</div><!-- /.container -->
+
+<div class="footer">
+  命理宝鉴 · 前端组件库 v2.1 · 6 组件（含 ml-tap a11y 替代） · 统一加载器 · <a href="../divination-hub.html">返回首页</a>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  ml-toast 必须放 body 里（fixed 定位）                            -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<ml-toast id="mlToast" duration="2400"></ml-toast>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  唯一入口：components-loader.js 统一加载                            -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<script type="module" src="./js/components-loader.js"></script>
+
+<script>
+/* ──────────────── 通用工具 ──────────────── */
+function addLog(type, meta, msg){
+  const log = document.getElementById('eventLog');
+  if (!log) return;
+  const ts = new Date().toLocaleTimeString('zh-CN', {hour12:false});
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  entry.innerHTML = `<span class="log-time">[${ts}]</span><b style="color:var(--gold)">${type}</b> <span style="color:var(--paper3)">${meta||''}</span> — <span style="color:var(--ink-dim)">${msg||''}</span>`;
+  log.appendChild(entry);
+  log.scrollTop = log.scrollHeight;
+  while (log.children.length > 30) log.removeChild(log.firstChild);
+}
+
+document.addEventListener('ml:ready', ()=>{
+  addLog('ml:ready', 'v2', 'window.ml 已就绪');
+  bindAll();
+});
+
+function bindAll(){
+  // ── Toast 4 个按钮 ──
+  const msgs = {
+    success: '✅ 操作成功，已保存到本地',
+    error:   '❌ 网络异常，请稍后重试',
+    warn:    '⚠️ 命例数据不完整，请补充',
+    info:    'ℹ️ AI 助手正在解析您的命盘…',
+  };
+  document.querySelectorAll('[data-toast]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const t = b.dataset.toast;
+      if (window.ml) ml.toast[t](msgs[t]);
+      else document.getElementById('mlToast').show(msgs[t], t);
+      addLog('ml.toast.'+t, '', msgs[t]);
+    });
+  });
+
+  // ── Modal ──
+  document.getElementById('btn-open-basic').addEventListener('click', ()=>{
+    document.getElementById('modalBasic').open();
+    addLog('modal.open', 'basic', '打开基础对话框');
+  });
+  document.getElementById('modalBasic').addEventListener('close', e=>{
+    addLog('modal.close', 'basic', '来源: '+(e.detail?.source||'api'));
+  });
+  document.getElementById('btn-open-form').addEventListener('click', ()=>{
+    document.getElementById('modalForm').open();
+    addLog('modal.open', 'form', '打开表单对话框');
+  });
+  document.getElementById('modalForm').addEventListener('close', e=>{
+    addLog('modal.close', 'form', '来源: '+(e.detail?.source||'api'));
+  });
+  document.getElementById('btn-submit-form').addEventListener('click', ()=>{
+    document.getElementById('modalForm').close('submit');
+    ml.toast.success('表单已提交');
+    addLog('form.submit', '', '提交成功');
+  });
+  document.getElementById('btn-open-confirm').addEventListener('click', async ()=>{
+    addLog('modal.confirm', '', '弹出确认对话框');
+    const ok = await ml.modal.confirm({
+      title: '确认删除',
+      message: '此操作不可撤销，是否继续？',
+      confirmText: '删除',
+      cancelText: '取消',
+    });
+    addLog('modal.confirm', 'result='+ok, ok ? '用户确认' : '用户取消');
+    ml.toast[ok?'warn':'info'](ok?'已删除':'已取消');
+  });
+
+  // ── Tab ──
+  document.querySelectorAll('[data-tab-go]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const i = parseInt(b.dataset.tabGo, 10);
+      ml.tab.setActive('demoTab', i);
+    });
+  });
+  document.getElementById('demoTab').addEventListener('tab-change', e=>{
+    addLog('tab-change', 'index='+e.detail.index, '从 '+e.detail.prevIndex+' → '+e.detail.index+'（'+e.detail.label+'）');
+  });
+
+  // ── Card clickable ──
+  document.querySelectorAll('ml-card[clickable="true"]').forEach(c=>{
+    c.addEventListener('card-click', ()=>{
+      const id = c.dataset.cardId || '(no-id)';
+      ml.toast.info('点击了卡片: '+id);
+      addLog('card-click', id, '触发');
+    });
+  });
+
+  // ── Accordion ──
+  document.querySelectorAll('ml-accordion').forEach(acc=>{
+    acc.addEventListener('item-toggle', e=>{
+      addLog('item-toggle', 'idx='+e.detail.index+' '+e.detail.open?'🟢':'🔴', e.detail.title+' '+(e.detail.open?'展开':'收起'));
+    });
+  });
+  document.querySelector('[data-acc-openall]').addEventListener('click', ()=>{
+    ml.accordion.openAll('faqMultiple');
+    addLog('accordion.openAll', 'faqMultiple', '');
+  });
+  document.querySelector('[data-acc-closeall]').addEventListener('click', ()=>{
+    ml.accordion.closeAll('faqMultiple');
+    addLog('accordion.closeAll', 'faqMultiple', '');
+  });
+}
+
+// 兜底：如果 components-loader.js 因为某些原因没触发 ml:ready，等 800ms 再尝试 bind
+setTimeout(()=>{
+  if (!window.ml) {
+    console.warn('[demo] ml loader 未就绪，使用降级方案');
+    addLog('ml:fallback', '', 'loader 未就绪，使用直接 DOM API');
+    bindAll();
+  } else if (!document.querySelector('[data-bound]')) {
+    bindAll();
+  }
+}, 800);
+</script>
+
+  <script src="js/a11y-divination-hub.js" defer></script>
+  
+</main>
+</body>
+</html>

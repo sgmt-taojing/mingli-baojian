@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>易道智鉴 · 功德系统</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: var(--ink); --paper: var(--paper); --gold: var(--gold); --gold2: var(--gold2);
+      --jade: var(--jade);;--gold3:#a08030;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;--paper3:#a09080;--steel:#7f8c8d}
+    body {
+      font-family: 'Noto Serif SC', serif;
+      background: var(--ink); color: var(--paper);
+      margin: 0; padding: 20px; min-height: 100vh; text-align: center;
+    }
+    .merit-circle {
+      width: 200px; height: 200px; border-radius: 50%;
+      border: 4px solid var(--gold); margin: 40px auto;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: radial-gradient(circle, var(--ink3) 0%, var(--ink) 100%);
+      box-shadow: 0 0 30px rgba(201,168,76,0.2);
+    }
+    .merit-num { font-size: 48px; color: var(--gold); font-weight: bold; }
+    .merit-label { color: var(--steel); margin-top: 5px; }
+    .quick-actions {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 15px; max-width: 400px; margin: 40px auto;
+    }
+    .action-btn {
+      background: var(--ink2); border: 1px solid var(--ink4); border-radius: 12px;
+      padding: 20px; cursor: pointer; transition: all 0.3s;
+    }
+    .action-btn:hover {
+      border-color: var(--jade); transform: scale(1.05);
+    }
+    .action-icon { font-size: 32px; margin-bottom: 8px; }
+    .action-text { color: var(--paper); font-size: 14px; }
+    .action-merit { color: var(--jade); font-size: 12px; margin-top: 5px; }
+    .info-box {
+      background: var(--ink2); border: 1px solid var(--ink4); border-radius: 12px;
+      padding: 25px; max-width: 500px; margin: 30px auto; text-align: left;
+    }
+    .info-title { color: var(--gold2); margin-bottom: 15px; }
+    .info-list { color: var(--steel); line-height: 2; }
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--ink); border-top: 1px solid var(--ink4);
+      display: flex; justify-content: center; padding: 12px;
+    }
+    .nav-btn {
+      background: transparent; border: none; color: var(--steel);
+      padding: 10px 20px; cursor: pointer;
+    }
+    .nav-btn:hover { color: var(--gold); }
+  </style>
+  <link rel="stylesheet" href="css/a11y-fix.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">跳到主内容</a>
+<main id="main-content" role="main">
+<div style="position:fixed;top:12px;right:12px;z-index:99998">
+  <a href="tcm-clinic.html" style="display:inline-block;padding:6px 16px;background:rgba(201,168,76,0.12);color:var(--gold,#c9a84c);border:1px solid rgba(201,168,76,0.25);border-radius:16px;font-size:12px;text-decoration:none;font-family:'Noto Serif SC',serif;letter-spacing:1px">🏥 中医诊疗</a>
+</div>
+  <h1 style="color: var(--gold); margin-top: 40px;">🌸 功德系统</h1>
+  <p style="color: var(--paper3);">积功累德，福报绵长</p>
+  
+  <div class="merit-circle">
+    <div class="merit-num" id="meritNum">0</div>
+    <div class="merit-label">当前功德</div>
+  </div>
+  
+  <div class="quick-actions">
+    <ml-tap class="action-btn" onclick="addMerit(1)" style="display:block"
+      <div class="action-icon">🙏</ml-tap>
+      <div class="action-text">每日签到</div>
+      <div class="action-merit">+1 功德</div>
+    </div>
+    <ml-tap class="action-btn" onclick="addMerit(3)" style="display:block"
+      <div class="action-icon">📖</ml-tap>
+      <div class="action-text">诵经打卡</div>
+      <div class="action-merit">+3 功德</div>
+    </div>
+    <ml-tap class="action-btn" onclick="addMerit(5)" style="display:block"
+      <div class="action-icon">🕯️</ml-tap>
+      <div class="action-text">供灯祈福</div>
+      <div class="action-merit">+5 功德</div>
+    </div>
+    <ml-tap class="action-btn" onclick="addMerit(10)" style="display:block"
+      <div class="action-icon">💎</ml-tap>
+      <div class="action-text">放生回向</div>
+      <div class="action-merit">+10 功德</div>
+    </div>
+  </div>
+  
+  <div class="info-box">
+    <div class="info-title">功德获取方式</div>
+    <div class="info-list">
+      • 每日签到可获得1功德<br>
+      • 诵经打卡可获得3功德<br>
+      • 供灯祈福可获得5功德<br>
+      • 放生回向可获得10功德<br>
+      • 推荐好友可获得20功德
+    </div>
+  </div>
+  
+  <button onclick="window.location.href='divination-hub.html'"
+          style="background: linear-gradient(135deg, var(--gold), var(--gold3));
+                 border: none; color: var(--ink); padding: 15px 40px;
+                 border-radius: 8px; cursor: pointer; font-weight: bold;
+                 margin: 20px 0;">
+    前往主平台查看完整功能
+  </button>
+  
+  <div class="nav-bar">
+  <a href="divination-hub.html" class="file-nav-btn">🏠 主平台</a>
+  <a href="divination-almanac.html" class="file-nav-btn">📅 黄历</a>
+  <a href="divination-integrated.html" class="file-nav-btn">🧬 体质调理</a>
+  <a href="tcm-clinic.html" class="file-nav-btn">🏥 中医诊疗</a>
+  <a href="tcm-symptom.html" class="file-nav-btn">🩺 症状分析</a>
+  <a href="divination-knowledge.html" class="file-nav-btn">📚 知识库</a>
+  <a href="nihaisha-knowledge.html" class="file-nav-btn">🪷 倪师知识库</a>
+  <a href="nihaisha-tool.html" class="file-nav-btn">🔬 倪师工具</a>
+  <a href="nihaisha-learning.html" class="file-nav-btn">📖 倪师学堂</a>
+  <a href="shuhan-knowledge.html" class="file-nav-btn">🎯 舒晗知识库</a>
+  <a href="divination-shop.html" class="file-nav-btn">🛒 商城</a>
+  <a href="divination-membership.html" class="file-nav-btn">💎 会员</a>
+  <a href="wechat-hub.html" class="file-nav-btn">📱 缘主工具</a>
+  <a href="login.html" class="file-nav-btn">🔐 登录</a>
+</div>
+  
+  <script src="js/ui-toast.js" defer></script>
+<script src="js/toast-helper.js"></script>
+<script>
+    var merit = parseInt(localStorage.getItem('qianyuan_merit') || '0');
+    document.getElementById('meritNum').textContent = merit;
+    
+    function addMerit(n) {
+      merit += n;
+      localStorage.setItem('qianyuan_merit', merit);
+      document.getElementById('meritNum').textContent = merit;
+      showToast('功德 +' + n + '，当前功德：' + merit);
+    }
+  </script>
+  <script src="js/a11y-divination-hub.js" defer></script>
+  
+</main>
+</body>
+</html>

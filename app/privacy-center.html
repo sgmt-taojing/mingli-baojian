@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>隐私中心 · 命理宝鉴</title>
+<style>
+:root{
+  --bg:#0e1726;--bg-card:#1a2436;--bg-soft:#243049;
+  --text:#e6edf7;--muted:#8a99b5;--accent:#4fd1c5;
+  --accent-2:#fbbf24;--ok:#34d399;--warn:#fb923c;
+  --danger:#f87171;--border:#2a3953;
+}
+*{box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro SC","PingFang SC","Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--text);margin:0;padding:24px;line-height:1.6;}
+.container{max-width:880px;margin:0 auto;}
+header{text-align:center;padding:24px 0;border-bottom:1px solid var(--border);margin-bottom:24px;}
+h1{font-size:24px;margin:0 0 8px;color:var(--accent);}
+h2{font-size:18px;margin:24px 0 12px;padding-left:10px;border-left:3px solid var(--accent);color:var(--accent);}
+h3{font-size:14px;margin:16px 0 8px;color:var(--accent-2);}
+.subtitle{color:var(--muted);font-size:13px;}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:20px;margin:16px 0;}
+.card.danger{border-left:4px solid var(--danger);}
+.card.ok{border-left:4px solid var(--ok);}
+.card.warn{border-left:4px solid var(--warn);}
+.row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
+.row:last-child{border-bottom:0;}
+.btn{padding:10px 20px;border:0;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.btn-primary{background:var(--accent);color:#0e1726;}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-warn{background:var(--warn);color:#0e1726;}
+.btn:disabled{opacity:0.95;cursor:not-allowed;}
+.btn:hover:not(:disabled){opacity:0.9;transform:translateY(-1px);}
+.consent-toggle{display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--bg-soft);border-radius:6px;margin:8px 0;}
+.toggle{width:44px;height:24px;background:var(--border);border-radius:12px;position:relative;cursor:pointer;transition:all 0.2s;}
+.toggle.on{background:var(--ok);}
+.toggle::after{content:'';width:20px;height:20px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;transition:all 0.2s;}
+.toggle.on::after{left:22px;}
+.status{display:inline-block;padding:3px 10px;border-radius:10px;font-size:11px;background:var(--bg-soft);color:var(--muted);}
+.status.ok{background:rgba(52,211,153,.15);color:var(--ok);}
+.status.warn{background:rgba(251,146,60,.15);color:var(--warn);}
+.status.danger{background:rgba(248,113,113,.15);color:var(--danger);}
+.muted{color:var(--muted);font-size:12px;}
+.banner{padding:14px 18px;border-radius:8px;margin:12px 0;font-size:13px;display:none;}
+.banner.show{display:block;}
+.banner.success{background:rgba(52,211,153,.1);border:1px solid var(--ok);color:var(--ok);}
+.banner.error{background:rgba(248,113,113,.1);border:1px solid var(--danger);color:var(--danger);}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px;}
+th,td{text-align:left;padding:8px;border-bottom:1px solid var(--border);}
+th{color:var(--accent);font-weight:600;}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999;justify-content:center;align-items:center;}
+.modal-bg.show{display:flex;}
+.modal{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:24px;max-width:480px;width:90%;}
+.modal h3{margin-top:0;color:var(--danger);}
+.modal .btn-row{display:flex;gap:8px;margin-top:16px;}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>🔒 隐私中心</h1>
+  <p class="subtitle">命理宝鉴 · GDPR / 个保法合规 · 你对自己的数据拥有完整权利</p>
+</header>
+
+<div id="banner" class="banner"></div>
+
+<section>
+<h2>📋 我的同意记录</h2>
+<div class="card">
+  <p class="muted">我们记录你对以下事项的同意状态。你可以随时撤回。</p>
+  <div id="consentList">加载中...</div>
+  <div style="margin-top:12px;">
+    <button class="btn btn-primary" id="saveConsents">💾 保存我的设置</button>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>📤 我的数据导出（GDPR 第 20 条 · 个保法 第 45 条）</h2>
+<div class="card ok">
+  <h3>你有权利获取你所有的个人数据副本</h3>
+  <p class="muted">点击下方按钮，我们将在 24 小时内向你绑定的邮箱发送完整的 JSON 数据包，包括：八字档案、推算历史、AI 对话记录、推送记录、积分流水。</p>
+  <div id="exportStatus" class="status">未请求</div>
+  <div style="margin-top:12px;">
+    <button class="btn btn-primary" id="exportBtn">📤 申请数据导出</button>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>🗑 注销账号（软删除）</h2>
+<div class="card warn">
+  <h3>14 天冷静期 · 可恢复</h3>
+  <p class="muted">申请注销后：</p>
+  <ul style="font-size:13px;color:var(--text);">
+    <li>账号立即锁定，无法登录</li>
+    <li>个人数据标记为「待删除」</li>
+    <li><strong>14 天内</strong>可以一键恢复</li>
+    <li><strong>14 天后</strong>数据物理删除（不可恢复）</li>
+  </ul>
+  <div id="deleteStatus" class="status">账号正常</div>
+  <div style="margin-top:12px;">
+    <button class="btn btn-warn" id="softDeleteBtn">⏸ 申请注销</button>
+    <button class="btn btn-primary" id="cancelDeleteBtn" style="display:none;">↩️ 取消注销</button>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>⚠️ 立即物理删除（不可恢复）</h2>
+<div class="card danger">
+  <h3>⚠️ 此操作不可逆</h3>
+  <p class="muted">跳过 14 天冷静期，立即执行物理删除。请慎重 —— 所有数据将<strong>永久丢失</strong>。</p>
+  <div style="margin-top:12px;">
+    <button class="btn btn-danger" id="hardDeleteBtn">💀 立即物理删除</button>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>📜 审计日志（最近 10 条）</h2>
+<div class="card">
+  <p class="muted">我们对隐私操作做完整审计，只有超级管理员可以查看。</p>
+  <div id="auditLog">加载中...</div>
+</div>
+</section>
+
+<section>
+<h2>📞 数据保护联系方式</h2>
+<div class="card">
+  <table>
+    <tr><th>数据保护负责人</th><td>DPO@mingli-baojian.com</td></tr>
+    <tr><th>响应时长</th><td>15 个工作日内回复</td></tr>
+    <tr><th>数据存储地</th><td>中国大陆 · 上海</td></tr>
+    <tr><th>适用法律</th><td>《个人信息保护法》《数据安全法》《GDPR》</td></tr>
+  </table>
+</div>
+</section>
+
+<!-- 确认弹窗 -->
+<div id="confirmModal" class="modal-bg">
+  <div class="modal">
+    <h3 id="modalTitle">确认操作</h3>
+    <p id="modalBody">...</p>
+    <div class="btn-row">
+      <button class="btn btn-danger" id="modalConfirm">确认</button>
+      <button class="btn btn-primary" id="modalCancel">取消</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = (location.protocol === 'https:' ? 'https://' : 'http://') + location.host;
+const token = localStorage.getItem('jwt') || 'token=***';
+
+async function api(path, opts={}){
+  opts.headers = Object.assign({
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ' + token,
+  }, opts.headers || {});
+  const r = await fetch(API + path, opts);
+  return await r.json();
+}
+
+function showBanner(msg, type='success'){
+  const b = document.getElementById('banner');
+  b.textContent = msg;
+  b.className = 'banner show ' + type;
+  setTimeout(()=>b.classList.remove('show'), 4000);
+}
+
+function confirmModal(title, body){
+  return new Promise((resolve)=>{
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalBody').textContent = body;
+    const m = document.getElementById('confirmModal');
+    m.classList.add('show');
+    const cleanup = (ok)=>{ m.classList.remove('show'); resolve(ok); };
+    document.getElementById('modalConfirm').onclick = ()=>cleanup(true);
+    document.getElementById('modalCancel').onclick = ()=>cleanup(false);
+  });
+}
+
+// ============ 同意记录 ============
+const CONSENT_TYPES = [
+  {key:'analytics', label:'匿名使用统计', desc:'帮助我们改进产品（不含个人信息）', required:false},
+  {key:'push', label:'每日推送通知', desc:'运势提醒、节气养生、年度推送', required:false},
+  {key:'ai_training', label:'AI 模型训练', desc:'允许脱敏后的对话用于改进 AI', required:false},
+  {key:'marketing', label:'营销邮件', desc:'优惠活动、新功能通知', required:false},
+];
+
+async function loadConsents(){
+  const r = await api('/api/v1/user/consents');
+  const current = {};
+  (r.data?.consents || []).forEach(c => current[c.consent_type] = c.granted);
+  const list = document.getElementById('consentList');
+  list.innerHTML = '';
+  CONSENT_TYPES.forEach(t => {
+    const granted = current[t.key] === true;
+    const div = document.createElement('div');
+    div.className = 'consent-toggle';
+    div.innerHTML = `
+      <div>
+        <strong>${t.label}</strong>${t.required ? ' <span style="color:var(--warn);font-size:11px;">[必需]</span>' : ''}
+        <div class="muted">${t.desc}</div>
+      </div>
+      <div class="toggle ${granted || t.required ? 'on' : ''}" data-key="${t.key}" ${t.required ? 'data-locked="1"' : ''}></div>
+    `;
+    list.appendChild(div);
+  });
+  // toggle click
+  list.querySelectorAll('.toggle').forEach(t => {
+    t.onclick = () => {
+      if (t.dataset.locked) return;
+      t.classList.toggle('on');
+    };
+  });
+}
+
+document.getElementById('saveConsents').onclick = async () => {
+  const toggles = document.querySelectorAll('#consentList .toggle');
+  for (const t of toggles) {
+    const granted = t.classList.contains('on');
+    const r = await api('/api/v1/user/consents', {
+      method: 'POST',
+      body: JSON.stringify({ consentType: t.dataset.key, granted, version: 'v1.1.0' }),
+    });
+    if (!r.code && !r.ok === false) {
+      console.log('[consent]', t.dataset.key, granted);
+    }
+  }
+  showBanner('✅ 同意设置已保存', 'success');
+};
+
+// ============ 数据导出 ============
+document.getElementById('exportBtn').onclick = async () => {
+  const ok = await confirmModal('确认申请数据导出？', '我们将在 24 小时内向你绑定的邮箱发送完整数据副本。');
+  if (!ok) return;
+  const r = await api('/api/v1/user/export', { method: 'POST' });
+  if (r.code === 0 || r.ok) {
+    document.getElementById('exportStatus').textContent = '✅ 已申请';
+    document.getElementById('exportStatus').className = 'status ok';
+    showBanner('数据导出申请已提交，请查收邮箱', 'success');
+  } else {
+    showBanner('申请失败：' + (r.message || r.error), 'error');
+  }
+};
+
+// ============ 软删除 ============
+document.getElementById('softDeleteBtn').onclick = async () => {
+  const ok = await confirmModal('⚠️ 确认申请注销？', '你的账号将进入 14 天冷静期，期间可一键恢复。14 天后数据将被物理删除。');
+  if (!ok) return;
+  const r = await api('/api/v1/user/soft-delete', {
+    method: 'POST',
+    body: JSON.stringify({ reason: '用户主动申请' }),
+  });
+  if (r.code === 0 || r.ok) {
+    document.getElementById('deleteStatus').textContent = '⏸ 待删除（14 天后物理删除）';
+    document.getElementById('deleteStatus').className = 'status warn';
+    document.getElementById('softDeleteBtn').style.display = 'none';
+    document.getElementById('cancelDeleteBtn').style.display = '';
+    showBanner('账号已注销，14 天内可恢复', 'success');
+  } else {
+    showBanner('注销失败：' + (r.message || r.error), 'error');
+  }
+};
+
+document.getElementById('cancelDeleteBtn').onclick = async () => {
+  const ok = await confirmModal('确认恢复账号？', '你的账号将恢复正常，所有数据完整保留。');
+  if (!ok) return;
+  const r = await api('/api/v1/user/restore', { method: 'POST' });
+  if (r.code === 0 || r.ok) {
+    document.getElementById('deleteStatus').textContent = '✅ 账号正常';
+    document.getElementById('deleteStatus').className = 'status ok';
+    document.getElementById('softDeleteBtn').style.display = '';
+    document.getElementById('cancelDeleteBtn').style.display = 'none';
+    showBanner('账号已恢复', 'success');
+  }
+};
+
+// ============ 硬删除 ============
+document.getElementById('hardDeleteBtn').onclick = async () => {
+  const ok1 = await confirmModal('⚠️ 第一次确认：立即物理删除？', '此操作不可恢复。建议先申请数据导出。');
+  if (!ok1) return;
+  const ok2 = await confirmModal('⚠️ 第二次确认：真的要永久删除？', '所有数据将立即从数据库清除，包括八字档案、推算记录、AI 对话、积分流水。');
+  if (!ok2) return;
+  const ok3 = await confirmModal('⚠️ 最后确认：这是不可逆操作', '点击确认将立即删除，无任何恢复手段。');
+  if (!ok3) return;
+  const r = await api('/api/v1/user/hard-delete', { method: 'POST' });
+  if (r.code === 0 || r.ok) {
+    showBanner('数据已物理删除', 'success');
+    setTimeout(()=>location.href='/divination-hub.html', 3000);
+  } else {
+    showBanner('删除失败：' + (r.message || r.error), 'error');
+  }
+};
+
+// ============ 审计日志（仅自己看） ============
+async function loadAuditLog(){
+  const r = await api('/api/v1/user/audit-log');
+  const logs = r.data?.logs || [];
+  const div = document.getElementById('auditLog');
+  if (!logs.length) {
+    div.innerHTML = '<p class="muted">暂无审计记录</p>';
+    return;
+  }
+  let html = '<table><thead><tr><th>时间</th><th>操作</th><th>详情</th></tr></thead><tbody>';
+  logs.slice(0, 10).forEach(l => {
+    html += `<tr><td>${l.ts || l.created_at}</td><td>${l.action}</td><td class="muted">${JSON.stringify(l.detail||{}).slice(0,80)}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  div.innerHTML = html;
+}
+
+// 初始化
+(async () => {
+  await loadConsents();
+  await loadAuditLog();
+})();
+</script>
+</div>
+</body>
+</html>

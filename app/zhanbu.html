@@ -1,0 +1,330 @@
+<section class="section" id="section-zhanbu" role="tabpanel" aria-labelledby="tab-zhanbu">
+  <div class="section-header">
+    <span class="sh-symbol" style="color:var(--gold)">䷀</span>
+    <h2 class="sh-title">占卜问卦</h2>
+    <p class="sh-sub">六爻成卦，梅花断机，奇门运筹，六壬课传，紫微星盘</p>
+  </div>
+  <!-- 占卜子导航 -->
+  <div class="zhanbu-subnav">
+    <button class="zhanbu-subtab active" onclick="showZhanbuSub('yijing',this)">䷀ 易经六爻</button>
+    <button class="zhanbu-subtab" onclick="showZhanbuSub('meihua',this)">🌸 梅花易数</button>
+    <button class="zhanbu-subtab" onclick="showZhanbuSub('qimen',this)">☰ 奇门遁甲</button>
+    <button class="zhanbu-subtab" onclick="showZhanbuSub('liuren',this)">⬡ 大六壬</button>
+    <button class="zhanbu-subtab" onclick="showZhanbuSub('ziwei',this)">🌌 紫微斗数</button>
+    <button class="zhanbu-subtab" onclick="showZhanbuSub('cezi',this)">✍️ 测字</button>
+    <button class="zhanbu-subtab" onclick="showSection('screenshot');closeMore()" style="margin-left:auto">📷 面相</button>
+  </div>
+  <!-- 子模块容器（各子section的输入+结果区域会被JS动态移入） -->
+  <div id="zhanbuContent">
+    <div id="zhanbuSub-yijing">
+      <div class="input-card">
+        <h3>人盘 · 命格分析  事盘 · 时局判断</h3>
+        <div class="input-row">
+          <input type="text" class="input-field" id="yjName" placeholder="姓名(可选)" maxlength="20" aria-label="姓名(可选)">
+          <select class="input-field" id="yjGender" style="width:100px" aria-label="选项yjGender">
+            <option value="">性别</option>
+            <option value="male">男</option>
+            <option value="female">女</option>
+          </select>
+        </div>
+        <div class="input-row" style="margin-top:12px;flex-wrap:wrap;gap:8px">
+          <input type="date" class="input-field" id="yjQixinDate" style="width:150px" title="起心动念日期" aria-label="yjQixinDate">
+          <select class="input-field" id="yjQixinHour" style="width:130px" aria-label="选项yjQixinHour">
+            <option value="">起心动念时辰</option>
+            <option value="23">子时(23-01)</option>
+            <option value="1">丑时(01-03)</option>
+            <option value="3">寅时(03-05)</option>
+            <option value="5">卯时(05-07)</option>
+            <option value="7">辰时(07-09)</option>
+            <option value="9">巳时(09-11)</option>
+            <option value="11">午时(11-13)</option>
+            <option value="13">未时(13-15)</option>
+            <option value="15">申时(15-17)</option>
+            <option value="17">酉时(17-19)</option>
+            <option value="19">戌时(19-21)</option>
+            <option value="21">亥时(21-23)</option>
+          </select>
+          <input type="text" class="input-field" id="yjQuestion" placeholder="所问何事(如:求财/问婚姻/问事业)" maxlength="30" style="flex:1;min-width:180px" aria-label="所问何事(如:求财/问婚姻/问事业)">
+        </div>
+        <p id="yjHint" style="display:none;text-align:center;color:var(--gold);font-size:12px;margin-top:8px;opacity:0.8"></p>
+        <div class="input-row" style="margin-top:12px;gap:12px;justify-content:center">
+          <button class="compute-btn" onclick="yjStart('person')" id="yjBtnP">人 盘</button>
+          <button class="compute-btn" onclick="yjStart('matter')" id="yjBtnM">事 盘</button>
+        </div>
+      </div>
+      <div id="yjDivArea" class="d-none">
+        <div class="input-card" style="text-align:center;padding:40px">
+          <h3 style="margin-bottom:8px;font-size:16px">金 钱 课</h3>
+          <p style="font-size:11px;opacity:.35;letter-spacing:2px;margin-bottom:30px">一念至诚，三掷金钱，显象分明</p>
+          <div class="coins-row">
+            <div class="coin" id="yjC0">背</div>
+            <div class="coin" id="yjC1">背</div>
+            <div class="coin" id="yjC2">背</div>
+          </div>
+          <div class="line-dots">
+            <div class="ldot" id="yjD0"></div>
+            <div class="ldot" id="yjD1"></div>
+            <div class="ldot" id="yjD2"></div>
+            <div class="ldot" id="yjD3"></div>
+            <div class="ldot" id="yjD4"></div>
+            <div class="ldot" id="yjD5"></div>
+          </div>
+          <button class="compute-btn" onclick="playSound('cast');yjCast()" id="yjCastBtn">掷 钱 问 卦</button>
+          <button class="compute-btn" onclick="runLiuyaoEngine()" style="margin-top:12px;border-color:var(--cyan);color:var(--cyan)">六爻引擎起卦</button>
+          <p id="yjCount" style="margin-top:14px;font-size:11px;opacity:.35;letter-spacing:2px">第 1 / 6 爻</p>
+        </div>
+      </div>
+      <div class="result" id="yjResult">
+        <div class="result-banner">
+          <p style="font-size:12px;letter-spacing:5px;color:var(--gold);opacity:.95;margin-bottom:12px" id="yjMeta"></p>
+          <h2 class="rb-name" style="font-size:clamp(36px,7vw,56px)" id="yjTitle"></h2>
+          <p style="font-size:14px;color:var(--gold);font-style:italic;letter-spacing:3px" id="yjPinyin"></p>
+        </div>
+        <div class="hexagram-row">
+          <div class="hg-card" id="yjPrimary">
+            <p class="hg-label">本 卦</p>
+            <p class="hg-symbol" id="yjSym1"></p>
+            <div class="gua-lines" id="yjGua1"></div>
+            <p class="hg-name" id="yjName1"></p>
+            <p class="hg-pinyin" id="yjPy1"></p>
+            <p class="hg-judgment" id="yjJud1"></p>
+            <p class="hg-meaning" id="yjMean1"></p>
+          </div>
+          <div class="arrow-div">→</div>
+          <div class="hg-card changed" id="yjChanged" class="d-none">
+            <p class="hg-label">变 卦</p>
+            <p class="hg-symbol" id="yjSym2"></p>
+            <div class="gua-lines" id="yjGua2"></div>
+            <p class="hg-name" id="yjName2"></p>
+            <p class="hg-pinyin" id="yjPy2"></p>
+            <p class="hg-judgment" id="yjJud2"></p>
+            <p class="hg-meaning" id="yjMean2"></p>
+          </div>
+        </div>
+        <div id="yjInterp"></div>
+        <div id="yjReadingBox"></div>
+        <div class="back-row">
+          <button class="back-btn" onclick="yjReset()">重 新 起 卦</button>
+        </div>
+            <div id="yjEngineResult" class="engine-result-card" style="display:none;margin-top:16px"></div>
+</div>
+    </div>
+    <div id="zhanbuSub-meihua">
+      <div class="input-card">
+        <h3>梅花易数 · 数字起卦</h3>
+        <div class="input-row">
+          <input type="text" class="input-field" id="mhName" placeholder="姓名(可选)" maxlength="20" aria-label="姓名(可选)">
+        </div>
+        <div class="input-row" style="margin-top:12px">
+          <input type="number" class="input-field" id="mhNum1" placeholder="第一个数" min="1" max="999" style="width:120px" aria-label="第一个数">
+          <input type="number" class="input-field" id="mhNum2" placeholder="第二个数" min="1" max="999" style="width:120px" aria-label="第二个数">
+          <input type="number" class="input-field" id="mhNum3" placeholder="第三个数" min="1" max="999" style="width:120px" aria-label="第三个数">
+        </div>
+        <p style="text-align:center;font-size:11px;letter-spacing:2px;margin-top:12px">随意报三个数，或以心中所想之事起卦</p>
+        <button class="compute-btn" onclick="computeMeiHua()" id="mhBtn" style="border-color:var(--jade);color:var(--jade2)">起 卦 演 断</button>
+        <button class="compute-btn" onclick="runMeihuaEngine()" style="margin-top:12px;border-color:var(--jade);color:var(--jade2)">梅花引擎分析</button>
+      </div>
+      <div class="result" id="mhResult">
+        <div class="result-banner">
+          <p style="font-size:12px;letter-spacing:5px;color:var(--jade2);opacity:.95;margin-bottom:12px" id="mhMeta"></p>
+          <h2 class="rb-name" id="mhTitle"></h2>
+          <p style="font-size:14px;color:var(--jade2);letter-spacing:3px" id="mhSub"></p>
+        </div>
+        <div id="mhInterp"></div>
+        <div id="mhReadingBox"></div>
+        <div class="analysis-card" style="margin:16px 0;border:1px solid rgba(39,174,96,.15)">
+          <h5>📜 经典出处</h5>
+          <p style="font-size:13px;line-height:2;opacity:.7">《周易·系辞》云:「易有太极，是生两仪，两仪生四象，四象生八卦。」《梅花易数》云:「数起于心，卦成于数，动静之间，吉凶可见。」《黄金策》曰:「卦有动静，爻有变化，观其象而察其吉凶。」</p>
+        </div>
+              <div id="mhEngineResult" class="engine-result-card d-none"></div>
+      <div class="back-row">
+          <button class="back-btn" onclick="showSection('hero')">返 回 首 页</button>
+        </div>
+      </div>
+    </div>
+    <div id="zhanbuSub-qimen">
+      <div class="input-card">
+        <h3>奇门遁甲 · 起盘</h3>
+        <div class="input-row">
+          <input type="text" class="input-field" id="qmName" placeholder="姓名(可选)" maxlength="20" aria-label="姓名(可选)">
+          <input type="date" class="input-field" id="qmDate" aria-label="qmDate">
+          <select class="input-field" id="qmHour" aria-label="选项qmHour">
+            <option value="">时辰</option>
+            <option value="23">子时(23-01)</option>
+            <option value="1">丑时(01-03)</option>
+            <option value="3">寅时(03-05)</option>
+            <option value="5">卯时(05-07)</option>
+            <option value="7">辰时(07-09)</option>
+            <option value="9">巳时(09-11)</option>
+            <option value="11">午时(11-13)</option>
+            <option value="13">未时(13-15)</option>
+            <option value="15">申时(15-17)</option>
+            <option value="17">酉时(17-19)</option>
+            <option value="19">戌时(19-21)</option>
+            <option value="21">亥时(21-23)</option>
+          </select>
+        </div>
+        <div class="input-row" style="margin-top:12px">
+          <select class="input-field" id="qmGender2" aria-label="选项qmGender2">
+            <option value="">性别</option>
+            <option value="male">男</option>
+            <option value="female">女</option>
+          </select>
+          <select class="input-field" id="qmDun" aria-label="选项qmDun">
+            <option value="auto">自动(按节气)</option>
+            <option value="yang">阳遁(冬至→夏至)</option>
+            <option value="yin">阴遁(夏至→冬至)</option>
+          </select>
+          <select class="input-field" id="qmMethod2" aria-label="选项qmMethod2">
+            <option value="chabu">拆补法</option>
+            <option value="zhirun">置润法</option>
+          </select>
+          <input type="text" class="input-field" id="qmQuestion" placeholder="所问何事(可选)" maxlength="30" style="flex:1;min-width:120px" aria-label="所问何事(可选)">
+        </div>
+        <button class="compute-btn" onclick="computeQimen()" id="qmBtn" style="border-color:var(--violet);color:var(--violet2)">起 盘 演 算</button>
+        <button class="compute-btn" onclick="runQimenEngine()" style="margin-top:12px;border-color:var(--violet);color:var(--violet2)">奇门引擎排盘</button>
+      </div>
+      <div class="result" id="qmResult">
+        <div class="result-banner">
+          <p style="font-size:12px;letter-spacing:5px;color:var(--violet2);margin-bottom:10px" id="qmMeta"></p>
+          <h2 class="rb-name">九宫遁甲盘</h2>
+          <p style="font-size:13px;letter-spacing:3px;margin-top:8px" id="qmSub"></p>
+        </div>
+        <div class="qn-grid" id="qmGrid"></div>
+        <div id="qmInterp"></div>
+        <div id="qmReadingBox"></div>
+              <div id="qmEngineResult" class="engine-result-card d-none"></div>
+      <div class="back-row">
+          <button class="back-btn" onclick="showSection('hero')">返 回 首 页</button>
+        </div>
+      </div>
+    </div>
+    <div id="zhanbuSub-liuren">
+      <div class="input-card">
+        <h3>大六壬 · 起课</h3>
+        <div class="input-row">
+          <input type="text" class="input-field" id="lrName" placeholder="姓名(可选)" maxlength="20" aria-label="姓名(可选)">
+          <input type="date" class="input-field" id="lrDate" aria-label="lrDate">
+          <select class="input-field" id="lrHour" aria-label="选项lrHour">
+            <option value="">时辰</option>
+            <option value="23">子时</option>
+            <option value="1">丑时</option>
+            <option value="3">寅时</option>
+            <option value="5">卯时</option>
+            <option value="7">辰时</option>
+            <option value="9">巳时</option>
+            <option value="11">午时</option>
+            <option value="13">未时</option>
+            <option value="15">申时</option>
+            <option value="17">酉时</option>
+            <option value="19">戌时</option>
+            <option value="21">亥时</option>
+          </select>
+        </div>
+        <div class="input-row" style="margin-top:12px">
+          <input type="text" class="input-field" id="lrQuestion" placeholder="所问何事(可选)" maxlength="30" style="flex:1" aria-label="所问何事(可选)">
+        </div>
+        <button class="compute-btn" onclick="computeLiuRen()" id="lrBtn" style="border-color:var(--orange);color:var(--orange)">起 课 演 算</button>
+        <button class="compute-btn" onclick="runLiurenEngine()" style="margin-top:12px;border-color:var(--orange);color:var(--orange)">六壬引擎起课</button>
+      </div>
+      <div class="result" id="lrResult">
+        <div class="result-banner">
+          <p style="font-size:12px;letter-spacing:5px;color:var(--orange);margin-bottom:10px" id="lrMeta"></p>
+          <h2 class="rb-name">六壬神课</h2>
+          <p style="font-size:13px;letter-spacing:3px;margin-top:8px" id="lrSub"></p>
+        </div>
+        <div id="lrInterp"></div>
+        <div id="lrReadingBox"></div>
+              <div id="lrEngineResult" class="engine-result-card d-none"></div>
+      <div class="back-row">
+          <button class="back-btn" onclick="showSection('hero')">返 回 首 页</button>
+        </div>
+      </div>
+    </div>
+    <div id="zhanbuSub-ziwei">
+      <div class="input-card">
+        <h3>紫微命盘</h3>
+        <div class="input-row">
+          <input type="text" class="input-field" id="zwName" placeholder="姓名" maxlength="20" aria-label="姓名">
+          <input type="date" class="input-field" id="zwDate" aria-label="zwDate">
+          <select class="input-field" id="zwHour" aria-label="选项zwHour">
+            <option value="">出生时辰</option>
+            <option value="23">子时</option>
+            <option value="1">丑时</option>
+            <option value="3">寅时</option>
+            <option value="5">卯时</option>
+            <option value="7">辰时</option>
+            <option value="9">巳时</option>
+            <option value="11">午时</option>
+            <option value="13">未时</option>
+            <option value="15">申时</option>
+            <option value="17">酉时</option>
+            <option value="19">戌时</option>
+            <option value="21">亥时</option>
+          </select>
+          <select class="input-field" id="zwSex" aria-label="选项zwSex">
+            <option value="male">男</option>
+            <option value="female">女</option>
+          </select>
+        </div>
+        <button class="compute-btn" onclick="computeZiWei()" id="zwBtn" style="border-color:var(--fire);color:var(--fire2)">排 盘 演 命</button>
+        <button class="compute-btn" onclick="runZiweiEngine()" style="margin-top:12px;border-color:var(--fire);color:var(--fire2)">紫微引擎排盘</button>
+      </div>
+      <div class="result" id="zwResult">
+        <div class="result-banner">
+          <h2 class="rb-name" id="zwNameOut"></h2>
+          <p class="rb-meta" id="zwMetaOut"></p>
+        </div>
+        <div class="analysis-card" style="margin-bottom:16px">
+          <h5>命宫 · 身宫</h5>
+          <div class="interp-row" id="zwMingGong"></div>
+        </div>
+        <div class="analysis-card" style="margin-bottom:16px">
+          <h5>主要星曜</h5>
+          <div class="zw-stars-grid" id="zwStarsGrid"></div>
+        </div>
+        <div class="analysis-card" style="margin-bottom:16px" id="zwFourChangeCard">
+          <h5>四化星 · 命格转化</h5>
+          <div class="interp-row" id="zwFourChange"></div>
+        </div>
+        <div class="analysis-card" style="margin-bottom:16px">
+          <h5>十二宫概览</h5>
+          <div id="zw12Gong"></div>
+        </div>
+        <div class="analysis-card" style="margin-bottom:16px;border:1px solid rgba(201,168,76,.15)">
+          <h5>📜 经典出处</h5>
+          <p style="font-size:13px;line-height:2;opacity:.7">《紫微斗数全书》云:「紫微为帝座，天机为智囊，太阳为光明，武曲为财帛，天相为印信，廉贞为情感，七杀为权柄，破军为变动。」《太微赋》曰:「紫微帝座，至尊至贵；天机善变，智谋过人。」《骨髓赋》云:「紫微居命，逢吉则贵，逢凶则孤。」</p>
+        </div>
+              <div id="zwEngineResult" class="engine-result-card d-none"></div>
+      <div class="back-row">
+          <button class="back-btn" onclick="showSection('hero')">返 回 首 页</button>
+        </div>
+      </div>
+    </div>
+    <div id="zhanbuSub-cezi">
+      <div class="input-card">
+        <h3>请输入一字</h3>
+        <p class="input-hint">手写或输入一个汉字</p>
+        <div class="input-row">
+          <input type="text" class="input-field" id="ceziInput" placeholder="请输入一个汉字" maxlength="1" style="font-size:32px;width:120px;text-align:center;font-family:'Ma Shan Zheng',serif" oninput="if(this.value.length aria-label="请输入一个汉字">1)this.value=this.value[0]">
+          <button class="compute-btn" onclick="doCezi()" style="display:block;margin:0">开始解析</button>
+        </div>
+        <div class="input-row" style="margin-top:16px">
+          <button class="compute-btn" onclick="randomCezi()" style="background:rgba(201,168,76,0.1);border-color:rgba(201,168,76,0.3);color:var(--gold2)">🎲 随机取字</button>
+        </div>
+      </div>
+      <div class="result" id="ceziResult">
+        <div class="result-banner">
+          <h2 class="rb-name" id="ceziChar"></h2>
+          <div class="rb-tags" id="ceziTags"></div>
+        </div>
+        <div class="analysis-grid" id="ceziAnalysis"></div>
+      </div>
+    </div>
+  </div>
+  <!-- 专业注释 -->
+  <div class="pro-note" style="margin-top:32px;padding:20px;background:rgba(201,168,76,.03);border:1px solid rgba(201,168,76,.08);border-radius:4px">
+    <h5 style="font-size:12px;letter-spacing:3px;color:var(--gold);margin-bottom:8px">📖 占卜专业说明</h5>
+    <p style="font-size:12px;line-height:2;opacity:.6">易经六爻：以铜钱摇卦，得本卦、变卦、互卦，断以六亲生克。梅花易数：以数起卦，体用生克断吉凶，重直觉灵感。奇门遁甲：排九星八门八神，观天时地利人和。大六壬：以日辰天将四课三传断事，十二天将各有所主。紫微斗数：以出生时间排十二宫，观星曜格局论命。测字：以字形字义字音断机，需心诚则灵。</p>
+  </div>
+</section>

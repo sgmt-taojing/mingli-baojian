@@ -1,0 +1,66 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [gh-pages]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Prepare deploy directory
+        run: |
+          mkdir -p _site
+          # 复制 app/ 目录（HTML + CSS + JS + KB）
+          cp -r app _site/app
+          # 复制根目录 js/ 和 knowledge/ 和 css/ 到 _site/ 根（因为HTML使用 ../js 和 ../knowledge 引用）
+          if [ -d js ]; then cp -r js _site/js; fi
+          if [ -d knowledge ]; then cp -r knowledge _site/knowledge; fi
+          if [ -d css ]; then cp -r css _site/css; fi
+          # 复制 docs/ 目录（文档+报告）
+          if [ -d docs ]; then cp -r docs _site/docs; fi
+          # 创建.nojekyll（禁用Jekyll处理，避免下划线开头文件被忽略）
+          touch _site/.nojekyll
+          # 复制根目录 index.html（活数据仪表盘）
+          if [ -f index.html ]; then cp index.html _site/index.html; fi
+          # 创建移动端入口
+          printf '%s\n' \
+            '<!DOCTYPE html>' \
+            '<html lang="zh-CN">' \
+            '<head>' \
+            '<meta charset="UTF-8">' \
+            '<meta http-equiv="refresh" content="0; url=app/wechat-hub.html">' \
+            '<title>命理宝鉴 · 移动端</title>' \
+            '</head>' \
+            '<body><p><a href="app/wechat-hub.html">命理宝鉴移动端</a></p></body>' \
+            '</html>' > _site/mobile.html
+          # 输出大小信息便于debug
+          echo "Deploy size:"
+          du -sh _site/
+          du -sh _site/app _site/js _site/knowledge _site/css 2>/dev/null
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '_site'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

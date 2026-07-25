@@ -1,0 +1,85 @@
+name: perf
+
+on:
+  push:
+    branches: [main, gh-pages]
+    paths:
+      - 'app/**/*.html'
+      - 'app/js/**/*.js'
+      - 'app/css/**/*.css'
+      - 'scripts/perf-*.js'
+      - 'package.json'
+      - '.github/workflows/perf.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'app/**/*.html'
+      - 'app/js/**/*.js'
+
+jobs:
+  puppeteer-baseline:
+    runs-on: macos-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install
+        run: npm ci --no-audit --no-fund
+
+      - name: Run perf baseline (5 pages)
+        run: npm run perf:baseline --silent
+        env:
+          CI: 'true'
+
+      - name: Run perf divhub single (deep)
+        run: npm run perf:divhub --silent
+        env:
+          CI: 'true'
+
+      - name: Run perf budget
+        run: npm run perf:budget
+        continue-on-error: false
+
+      - name: Upload perf report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: perf-report
+          path: |
+            docs/PERF_BASELINE_REPORT.md
+            .openclaw/tmp/perf-divhub-*.md
+          if-no-files-found: ignore
+
+  a11y-axe:
+    runs-on: macos-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install
+        run: npm ci --no-audit --no-fund
+
+      - name: Run axe-core scan (5 pages)
+        run: npm run a11y:scan:full
+        env:
+          CI: 'true'
+
+      - name: Upload a11y report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a11y-report
+          path: docs/A11Y_*.md
+          if-no-files-found: ignore

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>站内消息监控 · 易道智鉴后台</title>
+<link rel="stylesheet" href="../css/admin-base.css">
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--line:#334155;--text:#e2e8f0;--muted:#94a3b8;--accent:#06b6d4;--accent2:#22d3ee;--warn:#f59e0b;--danger:#ef4444;--good:#10b981}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,sans-serif;background:var(--bg);color:var(--text);padding:20px}
+header{display:flex;align-items:center;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+h1{font-size:22px;color:var(--accent2)}
+.metric-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px}
+.metric{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px}
+.metric-num{font-size:28px;font-weight:700;color:var(--accent2)}
+.metric-label{color:var(--muted);font-size:12px;margin-top:4px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px;margin-bottom:14px}
+.panel-title{font-size:14px;color:var(--accent2);margin-bottom:10px;border-bottom:1px solid var(--line);padding-bottom:6px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px;color:var(--muted);border-bottom:1px solid var(--line);font-weight:600}
+td{padding:8px;border-bottom:1px solid var(--line)}
+.badge{padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.badge-direct{background:rgba(6,182,212,.15);color:var(--accent2)}
+.badge-group{background:rgba(139,92,246,.15);color:#a78bfa}
+.badge-online{background:rgba(16,185,129,.15);color:var(--good)}
+.action{background:var(--accent);color:#fff;border:none;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:11px;margin-right:4px}
+.action:hover{background:var(--accent2)}
+.toolbar{display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap}
+.toolbar input,.toolbar select{background:var(--bg);border:1px solid var(--line);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px}
+.empty{text-align:center;color:var(--muted);padding:40px}
+.refresh{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;border:none;padding:8px 14px;border-radius:6px;cursor:pointer}
+.refresh:hover{background:var(--accent2)}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center}
+.modal.active{display:flex}
+.modal-content{background:var(--card);border-radius:12px;padding:20px;max-width:600px;width:90%;max-height:80vh;overflow:auto}
+.msg-line{padding:8px;background:var(--bg);border-radius:6px;margin-bottom:6px;font-size:13px}
+.msg-meta{color:var(--muted);font-size:11px;margin-top:4px}
+.role-tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;margin-left:6px;background:rgba(6,182,212,.15);color:var(--accent2)}
+</style>
+</head>
+<body>
+<header>
+  <a href="../admin.html" style="color:var(--muted);text-decoration:none">← 返回后台</a>
+  <h1>💬 站内消息监控</h1>
+  <span class="badge badge-online" id="status">运行中</span>
+  <button class="refresh" onclick="loadAll()">🔄 刷新</button>
+  <span style="color:var(--muted);font-size:12px;margin-left:auto">每 10s 自动刷新</span>
+</header>
+
+<div class="metric-row">
+  <div class="metric"><div class="metric-num" id="m-session">-</div><div class="metric-label">总会话数</div></div>
+  <div class="metric"><div class="metric-num" id="m-message">-</div><div class="metric-label">总消息数</div></div>
+  <div class="metric"><div class="metric-num" id="m-unread">-</div><div class="metric-label">未读总数</div></div>
+  <div class="metric"><div class="metric-num" id="m-group">-</div><div class="metric-label">群聊数</div></div>
+  <div class="metric"><div class="metric-num" id="m-direct">-</div><div class="metric-label">单聊数</div></div>
+  <div class="metric"><div class="metric-num" id="m-online">-</div><div class="metric-label">在线用户</div></div>
+</div>
+
+<div class="toolbar">
+  <input type="text" id="kw" placeholder="搜索会话/用户..." oninput="filter()">
+  <select id="typeFilter" onchange="filter()">
+    <option value="">全部类型</option>
+    <option value="direct">单聊</option>
+    <option value="group">群聊</option>
+  </select>
+</div>
+
+<div class="panel">
+  <div class="panel-title">📋 会话列表</div>
+  <table>
+    <thead><tr><th>ID</th><th>类型</th><th>标题</th><th>参与方</th><th>最后消息</th><th>未读</th><th>创建时间</th><th>操作</th></tr></thead>
+    <tbody id="sessBody"></tbody>
+  </table>
+</div>
+
+<div class="panel">
+  <div class="panel-title">📊 角色分布</div>
+  <div id="roleChart" style="display:flex;gap:12px;flex-wrap:wrap"></div>
+</div>
+
+<div class="panel">
+  <div class="panel-title">🔥 活跃用户 Top 10</div>
+  <table>
+    <thead><tr><th>用户ID</th><th>角色</th><th>发送消息数</th><th>最后活跃</th></tr></thead>
+    <tbody id="activeBody"></tbody>
+  </table>
+</div>
+
+<div id="msgModal" class="modal">
+  <div class="modal-content">
+    <div style="display:flex;justify-content:space-between;margin-bottom:12px;align-items:center">
+      <h3 id="msgTitle">消息记录</h3>
+      <a onclick="closeModal()" style="cursor:pointer;color:var(--muted);font-size:18px">✕</a>
+    </div>
+    <div id="msgContent"></div>
+  </div>
+</div>
+
+<script>
+const API = (location.hostname === '127.0.0.1' || location.hostname === 'localhost')
+  ? 'http://127.0.0.1:8920/api/v1' : '/api/v1';
+
+const TOKEN = localStorage.getItem('admin_token')
+           || sessionStorage.getItem('admin_token')
+           || localStorage.getItem('token')
+           || sessionStorage.getItem('token')
+           || '';
+
+let allSessions = [];
+let sessionMsgCount = {};
+
+function auth(url) {
+  return url + (url.includes('?') ? '&' : '?') + 'token=' + encodeURIComponent(TOKEN);
+}
+
+async function fetchJson(url) {
+  const r = await fetch(auth(url), { headers: { 'Authorization': 'Bearer ' + TOKEN } });
+  return r.json();
+}
+
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function timeAgo(ts) {
+  if (!ts) return '-';
+  const diff = Date.now() - Number(ts);
+  if (diff < 0) return new Date(ts).toLocaleString('zh-CN');
+  if (diff < 60000) return Math.floor(diff/1000) + '秒前';
+  if (diff < 3600000) return Math.floor(diff/60000) + '分前';
+  if (diff < 86400000) return Math.floor(diff/3600000) + '时前';
+  return new Date(Number(ts)).toLocaleString('zh-CN');
+}
+
+async function loadAll() {
+  try {
+    // 一次性拉全（admin 聚合端点，避免 N+1）
+    const d = await fetchJson(API + '/im/admin/stats');
+    if (!d.ok) throw new Error(d.error || 'stats 接口失败');
+
+    document.getElementById('m-session').textContent = d.stats.totalSessions;
+    document.getElementById('m-direct').textContent = d.stats.directCount;
+    document.getElementById('m-group').textContent = d.stats.groupCount;
+    document.getElementById('m-message').textContent = d.stats.totalMessages;
+    document.getElementById('m-unread').textContent = d.stats.totalUnread;
+
+    // 在线 = directory 长度（独立获取）
+    try {
+      const dir = await fetchJson(API + '/im/directory');
+      document.getElementById('m-online').textContent = (dir.users || dir.directory || []).length;
+    } catch(e) { document.getElementById('m-online').textContent = '—'; }
+
+    // 全量 sessions（用于参与方数量等）
+    const sessResp = await fetchJson(API + '/im/sessions');
+    allSessions = sessResp.sessions || sessResp.data || [];
+
+    // 把 perSession 的 msg_count / part_count 注入 sessions
+    const psMap = {};
+    d.perSession.forEach(p => psMap[p.id] = p);
+    allSessions.forEach(s => {
+      const ps = psMap[s.id];
+      if (ps) {
+        s.msg_count = ps.msg_count;
+        s.part_count = ps.part_count;
+      }
+    });
+
+    // 角色分布
+    window._roleDist = d.roleDist;
+    window._activeTop = d.active;
+
+    renderSessions();
+    renderRoleChart();
+    renderActiveUsers();
+
+    document.getElementById('status').textContent = '运行中';
+    document.getElementById('status').className = 'badge badge-online';
+  } catch (e) {
+    document.getElementById('status').textContent = '连接失败: ' + (e.message || e);
+    document.getElementById('status').className = 'badge';
+    document.getElementById('status').style.background = 'rgba(239,68,68,.15)';
+    document.getElementById('status').style.color = '#ef4444';
+  }
+}
+
+function renderSessions() {
+  const kw = (document.getElementById('kw').value || '').toLowerCase();
+  const type = document.getElementById('typeFilter').value;
+  const rows = allSessions
+    .filter(s => {
+      if (type === 'direct' && s.is_group) return false;
+      if (type === 'group' && !s.is_group) return false;
+      if (kw && !(s.title||'').toLowerCase().includes(kw)
+            && !(s.created_by||'').toLowerCase().includes(kw)) return false;
+      return true;
+    })
+    .slice(0, 200);
+  const html = rows.length ? rows.map(s => `
+    <tr>
+      <td>#${s.id}</td>
+      <td>${s.is_group ? '<span class="badge badge-group">群</span>' : '<span class="badge badge-direct">单聊</span>'}</td>
+      <td>${escapeHtml(s.title || ('会话' + s.id))}</td>
+      <td>${s.part_count || (s.participants||[]).length} <span style="color:var(--muted);font-size:10px">(${s.msg_count||0}条)</span></td>
+      <td title="${escapeHtml(s.last_msg_preview||'')}">${escapeHtml((s.last_msg_preview||'—').slice(0,30))}</td>
+      <td>${s.unread ? '<span style="color:var(--warn);font-weight:600">' + s.unread + '</span>' : '0'}</td>
+      <td>${timeAgo(s.created_at)}</td>
+      <td>
+        <button class="action" onclick="viewMessages(${s.id})">📩 详情</button>
+      </td>
+    </tr>
+  `).join('') : '<tr><td colspan="8" class="empty">暂无会话</td></tr>';
+  document.getElementById('sessBody').innerHTML = html;
+}
+
+function renderRoleChart() {
+  const dist = window._roleDist || [];
+  const total = dist.reduce((a, x) => a + x.participant_count, 0);
+  const div = document.getElementById('roleChart');
+  if (!total) { div.innerHTML = '<div class="empty">暂无数据</div>'; return; }
+  const palette = ['#06b6d4','#a78bfa','#10b981','#f59e0b','#ef4444','#3b82f6','#ec4899','#14b8a6'];
+  let html = ''; let i = 0;
+  for (const r of dist) {
+    const pct = (r.participant_count / total * 100).toFixed(1);
+    html += `<div style="background:var(--bg);padding:8px 14px;border-radius:6px;border:1px solid var(--line)">
+      <span style="color:${palette[i%palette.length]};font-weight:600">● ${escapeHtml(r.role)}</span>
+      <span style="margin-left:8px">${r.participant_count} 参与 × ${r.session_count} 会话 (${pct}%)</span>
+    </div>`;
+    i++;
+  }
+  div.innerHTML = html;
+}
+
+function renderActiveUsers() {
+  const arr = (window._activeTop || []).slice(0, 10);
+  const html = arr.length ? arr.map(u => `
+    <tr>
+      <td>${escapeHtml(u.user_id)}</td>
+      <td><span class="role-tag">${escapeHtml(u.role)}</span></td>
+      <td>${u.msg_count}</td>
+      <td>${timeAgo(u.last_active)}</td>
+    </tr>
+  `).join('') : '<tr><td colspan="4" class="empty">暂无数据</td></tr>';
+  document.getElementById('activeBody').innerHTML = html;
+}
+
+async function viewMessages(sid) {
+  document.getElementById('msgModal').classList.add('active');
+  document.getElementById('msgTitle').textContent = '会话 #' + sid + ' 消息记录';
+  document.getElementById('msgContent').innerHTML = '<div class="empty">加载中...</div>';
+  const r = await fetchJson(API + '/im/sessions/' + sid + '/messages?limit=200');
+  const msgs = r.messages || [];
+  document.getElementById('msgContent').innerHTML = msgs.length ? msgs.map(m => `
+    <div class="msg-line">
+      <strong style="color:var(--accent2)">${escapeHtml(m.sender_id)}</strong>
+      <span class="role-tag">${escapeHtml(m.sender_role)}</span>
+      <span style="color:var(--muted);font-size:11px;margin-left:8px">${timeAgo(m.created_at)}</span>
+      <span style="color:var(--muted);font-size:10px;margin-left:8px">#${m.id}</span>
+      <div style="margin-top:6px">${m.msg_type === 'image' ? `<img src="${escapeHtml(m.content)}" style="max-width:240px;border-radius:4px">` : escapeHtml(m.content)}</div>
+    </div>
+  `).join('') : '<div class="empty">暂无消息</div>';
+}
+
+function closeModal() {
+  document.getElementById('msgModal').classList.remove('active');
+}
+
+function filter() { renderSessions(); }
+
+if (!TOKEN) {
+  if (!confirm('未登录 token！\n确定要继续吗？（可访问公开端点）')) {
+    setTimeout(() => location.href = '../login.html?redirect=admin/im-monitor.html', 800);
+  }
+}
+
+loadAll();
+setInterval(loadAll, 10000);
+</script>
+</body>
+</html>
