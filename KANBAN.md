@@ -3,7 +3,26 @@
 > **维护原则**：每个任务按工作流 22 节点推进；完成一个自动拉下一个；阻塞项标红等待决策。
 > **断点机制**：每个进行中任务必须记录"当前节点 + 产出物 + 下一步"，心跳只看这一页就能续推。
 > **顶层架构**：见 MECHANISM.md（本项目根目录）
-> **最后更新**：2026-07-25 09:05（R15 KB 5 模块补强全达成 ✅ — acupuncture 304 / tcm-fangji 203 / tcm-diagnosis 296 / tcm-zhongfu 50 / shuhan-tcm 50 = 707 条 + CI auto-release workflow；commit `149451a`/`70a0ba1`/`72b05c8`；tag `v1.1.0`）
+> **最后更新**：2026-07-25 09:12（R15 KB 6 模块补强终态 ✅ — 4 路 subagent 并行完成 + 2 路前置 worker：acupuncture 304 / tcm 405 / tcm-fangji 326 / shanghan-lun 307 / tcm-zhongfu 100 / shuhan 541 = 1983 条；KB 总 11,648→12,538 / 49→52 模块 / r15-* 890 条；commit `2236ee7` + 同步 gh-pages；验收脚本 scripts/r15-verify.sh 7 维度全绿；Jest 504/504 绿；acorn 60+ HTML 0 errors）
+
+> **R15 KB 补强终态（2026-07-25 09:12）**：
+> - **4 路 subagent 派工完成**：Worker 1 tcm-fangji 82→326 / Worker 2 tcm 296→405 / Worker 3 tcm-zhongfu 0→100 / Worker 4 shanghan-lun 162→307
+> - **2 路前置 worker 已完成**：acupuncture 162→304 / shuhan 0→541
+> - **KB 总增长**：11,648 → **12,538**（+890 条 / +7.6%）
+> - **模块数增长**：49 → **52**（+3 新建模块：shuhan / tcm-zhongfu / shanghan-lun 扩）
+> - **r15-* 标识**：890 条
+> - **质量门 7/7 全绿**：JSON 关键词 99.99% / entry_id 唯一 100% / trust <0.4 = 0 / Jest 504/504 / acorn 0 errors / 5 服务 200 / GitHub Pages 200
+> - **后续 R16**：智镜 28 舌象续补 / r15-zhongfu-* 命名空间合并 / source_index FK 启用 / 穿戴 SDK 真实设备验证
+> - **产物清单**：
+>   - `scripts/r15-tcm-fangji-seed.py` (40 KB)
+>   - `scripts/r15-tcm-diagnosis-seed.py` (48 KB)
+>   - `scripts/r15-tcm-zhongfu-seed.py` (50 KB)
+>   - `scripts/r15-shanghan-lun-seed.py` + part2 + part3 (25+20+3 KB)
+>   - `scripts/r15-verify.sh` (2.8 KB / 验收脚本)
+>   - `docs/R15_AKB_PLAN.md` (派工规划)
+>   - `docs/R15_KB_DELIVERY_REPORT.md` (5 模块交付报告)
+>   - **commit `2236ee7`**：feat(r15): kb 短板补强 4 worker 完结（+890条 / 6模块全达标）
+>   - **DELIVERY/R15-KB补强-总览-2026-07-25.html** (14 KB / 终态总览)
 >
 > **#9 节点 9.1 完成**：docs/A11Y_AUDIT_v1.md（29,703 字节 / 548 行 / 8 章节 + 2 附录），a11y 基础设施几乎为零：仅 4/63 文件含 aria-*（6.3%）、474 处 div onclick 假按钮、62/63 缺 `<main>`、0 skip-link、0 focus-trap、81 处 outline:none、6/10 img 缺 alt、表单 label for 仅 1.4%
 > **#11 节点 11.2 完成**：commitlint.config.js（1,366B / 43 行 / 14 type 枚举）+ .husky/commit-msg（127B hook）+ CHANGELOG.md（7,031B / v1.0.0 初始化）+ docs/RELEASE_MANAGEMENT_v1.md（6,282B / 10 章节），现有 commit 合规率 84.9%
