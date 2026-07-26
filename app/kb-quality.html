@@ -67,6 +67,22 @@ h1{font-size:1.6rem;color:var(--gold);text-align:center;margin:20px 0 4px}
 .modal .sample .c{color:#aaa}
 .modal .stats-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;font-size:.85rem;color:#888}
 .modal .stats-row b{color:var(--gold)}
+.tab-btn{padding:8px 14px;background:none;border:none;border-bottom:2px solid transparent;color:#888;font-size:.85rem;cursor:pointer}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+.tab-btn:hover{color:var(--gold)}
+.distro-row{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:.8rem}
+.distro-row .lbl{width:120px;text-align:right;color:#888}
+.distro-row .bar{flex:1;height:18px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden}
+.distro-row .bar-fill{height:100%;border-radius:4px;transition:width .4s}
+.distro-row .cnt{width:40px;color:var(--gold);font-weight:600}
+.trust-list{margin:12px 0}
+.trust-list .row{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-radius:6px;font-size:.8rem;margin:4px 0}
+.trust-list .row.high{background:rgba(34,197,94,.06)}
+.trust-list .row.low{background:rgba(239,68,68,.06)}
+.trust-list .row .title{color:#ccc;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:8px}
+.trust-list .row .score{font-weight:600;min-width:40px;text-align:right}
+.trust-list .row.high .score{color:#4ade80}
+.trust-list .row.low .score{color:#f87171}
 
 @media(max-width:768px){.grid{grid-template-columns:1fr}.s-card{min-width:80px;padding:10px 14px}.s-card .val{font-size:1.4rem}h1{font-size:1.3rem}}
 </style>
@@ -104,8 +120,16 @@ h1{font-size:1.6rem;color:var(--gold);text-align:center;margin:20px 0 4px}
     <button class="close" onclick="closeModal()">×</button>
     <h3 id="modalTitle"></h3>
     <div id="modalStats" class="stats-row"></div>
-    <h4 style="color:#aaa;font-size:.85rem;margin:16px 0 8px">样本条目（随机 8 条）</h4>
-    <div id="modalSamples"></div>
+    <div style="display:flex;gap:8px;margin:16px 0 8px;border-bottom:1px solid var(--gold-dim)">
+      <button class="tab-btn active" data-tab="samples" onclick="switchTab('samples')">📋 样本</button>
+      <button class="tab-btn" data-tab="detail" onclick="switchTab('detail')">📊 Trust 分布</button>
+    </div>
+    <div id="tab-samples">
+      <div id="modalSamples"></div>
+    </div>
+    <div id="tab-detail" style="display:none">
+      <div id="modalDetail"><p style="color:#888">加载中…</p></div>
+    </div>
   </div>
 </div>
 
@@ -173,7 +197,7 @@ function render(){
     const sp=(m.silver/t*100).toFixed(0);
     const bp=(m.bronze/t*100).toFixed(0);
     const fp=m.needs_fix?(m.needs_fix/t*100).toFixed(0):0;
-    return `<div class="mod" onclick="showDetail('${m.module}')">
+    return `<button class="mod" onclick="showDetail('${m.module}')" aria-label="${m.module} 模块详情">
       <div class="mod-head">
         <span class="mod-name">${m.module}</span>
         <span class="mod-grade ${gradeClass(m.grade)}">${m.grade}</span>
@@ -189,7 +213,7 @@ function render(){
         <span>trust <b>${m.avg_trust}</b></span>
         <span>🥇${m.gold} 🥈${m.silver} 🥉${m.bronze}${m.needs_fix?' ⚠'+m.needs_fix:''}</span>
       </div>
-    </div>`;
+    </button>`;
   }).join('')||'<p style="color:#888;text-align:center;grid-column:1/-1">无匹配模块</p>';
 }
 
@@ -207,7 +231,9 @@ function showDetail(mod){
     <span>↕ min <b>${m.min_trust?.toFixed(2)||'-'}</b> / max <b>${m.max_trust?.toFixed(2)||'-'}</b></span>
   `;
   document.getElementById('modalSamples').innerHTML='<p style="color:#888">加载中…</p>';
+  document.getElementById('modalDetail').innerHTML='<p style="color:#888">加载中…</p>';
   document.getElementById('modal').classList.add('show');
+  switchTab('samples');
   // 拉样本
   fetch(`/api/public/kb-query?q=*&module=${encodeURIComponent(mod)}&limit=8`)
     .then(r=>r.json())
@@ -223,6 +249,38 @@ function showDetail(mod){
     .catch(err=>{
       document.getElementById('modalSamples').innerHTML=`<p style="color:#c66">加载失败：${err.message}</p>`;
     });
+  // === R58: 拉详情 (trust 分布 + top/bottom 5) ===
+  fetch(`/api/kb/quality-report?module=${encodeURIComponent(mod)}&detail=true`)
+    .then(r=>r.json())
+    .then(j=>{
+      const d=j.detail;
+      if(!d){document.getElementById('modalDetail').innerHTML='<p style="color:#888">无详情</p>';return;}
+      const total=d.trustDistro.reduce((s,x)=>s+x.cnt,0);
+      const colors={'🥇 gold (≥0.9)':'#fbbf24','🥈 high (0.8-0.9)':'#60a5fa','🥉 silver (0.7-0.8)':'#a78bfa','⚪ bronze (0.5-0.7)':'#94a3b8','⚠️ low (0.4-0.5)':'#fb923c','🚨 fix (<0.4)':'#ef4444'};
+      const distroHtml=d.trustDistro.map(x=>`
+        <div class="distro-row">
+          <div class="lbl">${x.bucket}</div>
+          <div class="bar"><div class="bar-fill" style="width:${(x.cnt/total*100).toFixed(1)}%;background:${colors[x.bucket]||'#888'}"></div></div>
+          <div class="cnt">${x.cnt}</div>
+        </div>`).join('');
+      const topHtml=d.topTrust.map(e=>`<div class="row high"><div class="title">${esc(e.title||e.entry_id)}</div><div class="score">${e.trust_score?.toFixed(2)||'-'}</div></div>`).join('');
+      const lowHtml=d.lowTrust.map(e=>`<div class="row low"><div class="title">${esc(e.title||e.entry_id)}</div><div class="score">${e.trust_score?.toFixed(2)||'-'}</div></div>`).join('');
+      document.getElementById('modalDetail').innerHTML=`
+        <h4 style="color:#aaa;font-size:.85rem;margin:12px 0 8px">📊 Trust 分布（共 ${fmt(total)} 条）</h4>
+        ${distroHtml}
+        <h4 style="color:#aaa;font-size:.85rem;margin:16px 0 8px">🏆 Trust Top 5</h4>
+        <div class="trust-list">${topHtml}</div>
+        <h4 style="color:#aaa;font-size:.85rem;margin:16px 0 8px">⚠️ Trust Bottom 5</h4>
+        <div class="trust-list">${lowHtml}</div>`;
+    })
+    .catch(err=>{
+      document.getElementById('modalDetail').innerHTML=`<p style="color:#c66">加载失败：${err.message}</p>`;
+    });
+}
+function switchTab(name){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
+  document.getElementById('tab-samples').style.display=name==='samples'?'':'none';
+  document.getElementById('tab-detail').style.display=name==='detail'?'':'none';
 }
 function closeModal(){document.getElementById('modal').classList.remove('show');}
 function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
