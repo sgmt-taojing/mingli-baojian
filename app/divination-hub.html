@@ -1838,10 +1838,10 @@
     <div class="form-row" style="display:flex;align-items:center;gap:8px">
       <label style="margin:0">历法</label>
       <label style="font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px" for="lifeplanDate">
-        <input type="radio" name="lifeplanCalMode" value="solar" checked onchange="onLpCalModeChange()"> 公历
+        <input type="radio" name="lifeplanCalMode" value="solar" checked onchange="onLpCalModeChange()" aria-label="公历输入" id="lifeplanCalMode-solar"> 公历
       </label>
       <label style="font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px" for="lifeplanDate">
-        <input type="radio" name="lifeplanCalMode" value="lunar" onchange="onLpCalModeChange()"> 农历
+        <input type="radio" name="lifeplanCalMode" value="lunar" onchange="onLpCalModeChange()" aria-label="农历输入" id="lifeplanCalMode-lunar"> 农历
       </label>
       <span id="lpCalHint" style="font-size:11px;color:var(--gold);margin-left:4px">当前:公历输入</span>
     </div>
@@ -1948,10 +1948,10 @@
     <div class="form-row" style="display:flex;align-items:center;gap:8px">
       <label style="margin:0">历法</label>
       <label style="font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px" for="youthDate">
-        <input type="radio" name="youthCalMode" value="solar" checked onchange="onYouthCalModeChange()"> 公历
+        <input type="radio" name="youthCalMode" value="solar" checked onchange="onYouthCalModeChange()" aria-label="公历输入" id="youthCalMode-solar"> 公历
       </label>
       <label style="font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px" for="youthDate">
-        <input type="radio" name="youthCalMode" value="lunar" onchange="onYouthCalModeChange()"> 农历
+        <input type="radio" name="youthCalMode" value="lunar" onchange="onYouthCalModeChange()" aria-label="农历输入" id="youthCalMode-lunar"> 农历
       </label>
       <span id="youthCalHint" style="font-size:11px;color:var(--gold);margin-left:4px">当前:公历输入</span>
     </div>
@@ -2198,10 +2198,10 @@
     <div class="input-row" style="align-items:center;gap:12px">
       <label style="font-size:12px;margin:0">历法</label>
       <label style="font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px" for="liDate">
-        <input type="radio" name="liCalMode" value="solar" checked onchange="onLiCalModeChange()"> 公历
+        <input type="radio" name="liCalMode" value="solar" checked onchange="onLiCalModeChange()" aria-label="公历输入" id="liCalMode-solar"> 公历
       </label>
       <label style="font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px" for="liDate">
-        <input type="radio" name="liCalMode" value="lunar" onchange="onLiCalModeChange()"> 农历
+        <input type="radio" name="liCalMode" value="lunar" onchange="onLiCalModeChange()" aria-label="农历输入" id="liCalMode-lunar"> 农历
       </label>
       <span id="liCalHint" style="font-size:11px;color:var(--gold);margin-left:4px">当前:公历输入</span>
     </div>
@@ -4129,8 +4129,8 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
 
   // 性别
   html += '<div style="margin-bottom:20px">';
-  html += '<label style="font-size:13px;margin-right:12px"><input type="radio" name="mxSex" value="male" checked> 男命</label>';
-  html += '<label style="font-size:13px"><input type="radio" name="mxSex" value="female"> 女命</label>';
+  html += '<label style="font-size:13px;margin-right:12px"><input type="radio" name="mxSex" value="male" checked aria-label="男命" id="mxSex-male"> 男命</label>';
+  html += '<label style="font-size:13px"><input type="radio" name="mxSex" value="female" aria-label="女命" id="mxSex-female"> 女命</label>';
   html += '</div>';
 
   html += '<button class="compute-btn w-100p" onclick="computeMianxiang()">🔍 生成面相解读</button>';
