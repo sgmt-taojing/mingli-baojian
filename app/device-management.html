@@ -139,6 +139,15 @@ header p{font-size:11px;color:var(--paper3);letter-spacing:3px;margin-top:8px}
     </div>
   </div>
 
+  <!-- === 穿戴 SDK 探测 === -->
+  <div class="section-title">穿戴 SDK 探测 <span class="badge" id="sdkBadge">未检测</span></div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px">
+    <button class="dev-btn" onclick="probeRokid()" style="padding:8px 16px">👓 探测 Rokid 原生桥</button>
+    <button class="dev-btn" onclick="testCapture()" style="padding:8px 16px">📸 测试拍照</button>
+    <button class="dev-btn" onclick="testSpeak()" style="padding:8px 16px">🔊 测试骨传导 TTS</button>
+  </div>
+  <div id="sdkResult" style="font-size:11px;color:var(--paper3);margin-bottom:14px;padding:10px;background:var(--ink3);border-radius:var(--radius);display:none"></div>
+
   <!-- === 添加设备入口 === -->
   <a href="camera-capture.html" class="add-device-cta">＋ 添加新设备（Type-C 即插即用）</a>
 
@@ -177,7 +186,6 @@ header p{font-size:11px;color:var(--paper3);letter-spacing:3px;margin-top:8px}
   </div>
 </div>
 
-<script src="js/device-platform.js"></script>
 <script src="js/device-platform.js"></script>
 <script>
 // === R46: 设备管理中心（统一设备平台）===
@@ -378,6 +386,59 @@ async function scanUSB() {
     log('⚠ USB 扫描失败：' + e.message, 'warn');
   }
   refreshAll();
+}
+
+async function probeRokid() {
+  const el = document.getElementById('sdkResult');
+  el.style.display = 'block';
+  el.innerHTML = '⏳ 探测中…';
+  try {
+    const result = await platform.bridges.ar_glasses.probeRokid();
+    const badge = document.getElementById('sdkBadge');
+    if (result.ready) {
+      badge.textContent = 'Rokid ' + result.bridgeKind;
+      badge.style.background = 'var(--ok)';
+      badge.style.color = '#000';
+      el.innerHTML = '✅ Rokid 原生桥已就绪（' + result.bridgeKind + '）<br>' +
+        '可调用能力：camera.capture / audio.speak / motion.subscribe<br>' +
+        'SDK 事件枚举：' + Object.keys(result.event || {}).slice(0, 8).join(', ') + '…';
+      log('👓 Rokid 原生桥已就绪（' + result.bridgeKind + '）', 'ok');
+    } else {
+      badge.textContent = '未就绪';
+      badge.style.background = 'var(--warn)';
+      badge.style.color = '#000';
+      el.innerHTML = '⚠️ 未探测到 Rokid 原生桥<br>' +
+        '可能原因：1) Rokid 眼镜未接入  2) 不是 Rokid WebView 环境<br>' +
+        '降级方案：使用 WebMediaBridge (getUserMedia) 访问内置摄像头';
+      log('⚠ Rokid 原生桥未探测到', 'warn');
+    }
+    refreshAll();
+  } catch (e) {
+    el.innerHTML = '✗ 探测异常：' + e.message;
+    log('✗ Rokid 探测异常：' + e.message, 'err');
+  }
+}
+
+async function testCapture() {
+  const bridge = platform.bridges.ar_glasses;
+  log('📸 尝试拍照…', 'ok');
+  const result = await bridge.capturePhoto('tongue');
+  if (result.ok) {
+    log('✓ 拍照成功：' + JSON.stringify(result.data).slice(0, 80), 'ok');
+  } else {
+    log('✗ 拍照失败：' + result.error + '（未连接 Rokid 或未授权）', 'warn');
+  }
+}
+
+async function testSpeak() {
+  const bridge = platform.bridges.ar_glasses;
+  log('🔊 尝试 TTS…', 'ok');
+  const result = await bridge.speak('您好，欢迎使用易道智鉴');
+  if (result.ok) {
+    log('✓ TTS 成功（骨传导优先）', 'ok');
+  } else {
+    log('✗ TTS 失败：' + result.error + '（未连接 Rokid）', 'warn');
+  }
 }
 
 function refreshAll() {

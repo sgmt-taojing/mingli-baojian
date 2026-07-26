@@ -347,8 +347,8 @@
 
     discover() {
       const found = [];
-      // 占位：实际需要厂商 SDK 通过 WebSocket / HID 连接
-      // 这里声明具名设备，等待真实硬件触发 connect 事件
+      // 探测 Rokid 原生桥
+      const rokidReady = !!(global.RokidBridge && global.RokidBridge.available);
       Object.entries(this.knownVendors).forEach(([vendor, spec]) => {
         const id = 'ar-' + vendor;
         const dev = new Device({
@@ -356,13 +356,94 @@
           category: 'wearable', subType: 'ar_glasses',
           capabilities: spec.capabilities,
           connection: 'bluetooth',
-          metadata: { vendor, sdkReady: false }
+          metadata: { vendor, sdkReady: vendor === 'rokid' ? rokidReady : false }
         });
-        dev.status = 'discovered';
+        // Rokid 探测到原生桥则标记为已注册
+        if (vendor === 'rokid' && rokidReady) {
+          dev.status = 'registered';
+          dev.metadata.bridgeKind = global.RokidBridge.bridgeKind;
+          this.bus.emit('rokid:bridge:ready', { vendor, bridgeKind: dev.metadata.bridgeKind });
+        } else {
+          dev.status = 'discovered';
+        }
         this.devices.set(id, dev);
         found.push(dev);
       });
       return found;
+    }
+
+    /**
+     * 探测原生厂商桥（外部可调用强制刷新）
+     */
+    async probeRokid() {
+      if (typeof global.RokidBridge === 'undefined') {
+        // 动态注入探测脚本（如果项目里加载了 rokid-bridge.js）
+        try {
+          await new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = 'js/wearable/rokid-bridge.js';
+            s.onload = resolve;
+            s.onerror = reject;
+            document.head.appendChild(s);
+          });
+        } catch (e) {
+          return { ready: false, error: e.message };
+        }
+      }
+      // 等探测周期完成（500ms）
+      if (global.RokidBridge && !global.RokidBridge.available) {
+        await new Promise(r => setTimeout(r, 800));
+      }
+      const ready = !!(global.RokidBridge && global.RokidBridge.available);
+      return {
+        ready,
+        bridgeKind: global.RokidBridge ? global.RokidBridge.bridgeKind : null,
+        event: global.RokidEvent || null
+      };
+    }
+
+    /**
+     * Rokid 拍照（舌诊/面诊）
+     */
+    async capturePhoto(mode = 'face') {
+      if (!global.RokidBridge || !global.RokidBridge.available) {
+        return { ok: false, error: 'Rokid 原生桥未就绪' };
+      }
+      try {
+        const result = await global.RokidBridge.call('camera.capture', { mode, resolution: 'high' });
+        return { ok: true, data: result };
+      } catch (e) {
+        return { ok: false, error: e.message };
+      }
+    }
+
+    /**
+     * Rokid TTS 念一句话（骨传导优先）
+     */
+    async speak(text) {
+      if (!global.RokidBridge || !global.RokidBridge.available) {
+        return { ok: false, error: 'Rokid 原生桥未就绪' };
+      }
+      try {
+        const result = await global.RokidBridge.call('audio.speak', { text, channel: 'bone_conduction' });
+        return { ok: true, data: result };
+      } catch (e) {
+        return { ok: false, error: e.message };
+      }
+    }
+
+    /**
+     * Rokid 订阅姿态（点头/摇头）
+     */
+    onMotion(cb) {
+      if (!global.RokidBridge || !global.RokidBridge.available) return false;
+      try {
+        global.RokidBridge.call('motion.subscribe', { types: ['head_nod', 'head_shake'] });
+        global.addEventListener('rokid:motion', e => cb(e.detail));
+        return true;
+      } catch (e) {
+        return false;
+      }
     }
   }
 
