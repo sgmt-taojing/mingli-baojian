@@ -1,0 +1,679 @@
+
+
+/* === Extracted from divination-membership.html
+    :root {
+      --gold: var(--gold);
+      --gold-light: var(--gold2);
+      --gold-dark: var(--gold3);
+      --bg: var(--ink);
+      --bg-card: var(--ink2);
+      --bg-card-hover: var(--ink3);
+      ;
+      --border: rgba(201,168,76,0.2);
+      --border-strong: rgba(201,168,76,0.5);
+      ;
+      ;
+      ;
+      ;
+      ;;--gold2:#e8cc7a;--gold3:#a08030;--ink:#080808;--ink2:#111;--ink3:#1a1a1a;--bg-modal:rgba(0,0,0,.7);--cinn:#c0392b;--green:#27ae60;--paper:#f0e8d8;--red:#e74c3c;--text:#f0e8d8;--text-dim:#a09080;--text-muted:#a09080}
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Noto Serif SC', serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    /* 背景纹理 */
+    body::before {
+      content:'';
+      position:fixed; top:0; left:0; right:0; bottom:0;
+      background:
+        radial-gradient(ellipse at 20% 10%, rgba(201,168,76,0.03) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 90%, rgba(201,168,76,0.02) 0%, transparent 50%);
+      pointer-events:none; z-index:0;
+    }
+    /* 顶部导航 */
+    .topnav {
+      position:sticky; top:0; z-index:100;
+      background: rgba(8,8,8,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 16px;
+    }
+    .topnav-inner {
+      max-width: 1200px; margin:0 auto;
+      display:flex; align-items:center; justify-content:space-between;
+      height:56px;
+    }
+    .brand {
+      display:flex; align-items:center; gap:10px;
+      text-decoration:none; color:var(--gold);
+    }
+    .brand-icon {
+      width:36px; height:36px;
+      border: 1px solid var(--gold); border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Ma Shan Zheng', cursive; font-size:20px;
+    }
+    .brand-name {
+      font-size:18px; font-weight:600;
+      letter-spacing:2px;
+    }
+    .nav-links { display:flex; gap:24px; }
+    .nav-links a {
+      color:var(--text-dim); text-decoration:none;
+      font-size:14px; letter-spacing:1px;
+      transition:color 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color:var(--gold); }
+    .user-avatar {
+      width:36px; height:36px; border-radius:50%;
+      background: linear-gradient(135deg,var(--gold-dark),var(--gold));
+      display:flex; align-items:center; justify-content:center;
+      font-size:14px; font-weight:700; color:var(--bg);
+      cursor:pointer; border:1px solid var(--gold);
+    }
+    /* Tab 导航 */
+    .section-tabs {
+      max-width:1200px; margin:32px auto 0;
+      padding:0 16px;
+      display:flex; gap:4px;
+      overflow-x:auto;
+      scrollbar-width:none;
+    }
+    .section-tabs::-webkit-scrollbar { display:none; }
+    /* .tab-btn / .tab-panel 已迁移到 <ml-tab> Web Component，以下仅保留兼容 fallback 主题色 */
+    .tab-btn {
+      padding:10px 24px;
+      background:transparent;
+      border:1px solid var(--border);
+      border-radius:2px;
+      color:var(--text-dim);
+      font-family:'Noto Serif SC', serif;
+      font-size:14px; letter-spacing:1px;
+      cursor:pointer;
+      white-space:nowrap;
+      transition:all 0.3s;
+    }
+    .tab-btn:hover { border-color:var(--gold); color:var(--gold); }
+    .tab-btn.active {
+      background: linear-gradient(135deg,rgba(201,168,76,0.15),rgba(201,168,76,0.05));
+      border-color:var(--gold);
+      color:var(--gold);
+    }
+    /* 内容区 */
+    .content { max-width:1200px; margin:0 auto; padding:32px 16px 80px; }
+    .tab-panel { display:none; animation:fadeIn 0.4s ease; }
+    .tab-panel.active { display:block; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    /* 标题装饰 */
+    .section-title {
+      font-family:'Ma Shan Zheng', cursive;
+      font-size:32px; color:var(--gold);
+      margin-bottom:8px;
+      display:flex; align-items:center; gap:12px;
+    }
+    .section-title::before, .section-title::after {
+      content:''; flex:1; height:1px;
+      background: linear-gradient(90deg,transparent,var(--border),transparent);
+    }
+    .section-subtitle {
+      color:var(--text-dim); font-size:14px;
+      margin-bottom:32px; text-align:center;
+      letter-spacing:1px;
+    }
+    /* 会员卡片 */
+    .membership-grid {
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap:16px;
+      margin-bottom:48px;
+    }
+    .membership-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius:4px;
+      padding:28px 24px;
+      position:relative;
+      transition: all 0.3s;
+      overflow:hidden;
+    }
+    .membership-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:2px;
+      background: linear-gradient(90deg,transparent,var(--gold),transparent);
+      opacity:0;
+      transition:opacity 0.3s;
+    }
+    .membership-card:hover {
+      border-color:var(--border-strong);
+      transform:translateY(-2px);
+      box-shadow: 0 8px 32px rgba(201,168,76,0.08);
+    }
+    .membership-card:hover::before { opacity:1; }
+    .membership-card.featured {
+      border-color:var(--gold);
+      background: linear-gradient(135deg, rgba(201,168,76,0.08), var(--bg-card));
+    }
+    .membership-card.featured::before { opacity:1; }
+    .tier-badge {
+      position:absolute; top:16px; right:16px;
+      font-size:11px; padding:3px 10px;
+      border-radius:2px; letter-spacing:1px;
+    }
+    .tier-free .tier-badge { background:rgba(138,125,96,0.2); color:var(--text-dim); border:1px solid rgba(138,125,96,0.3); }
+    .tier-popular .tier-badge { background:rgba(201,168,76,0.2); color:var(--gold); border:1px solid var(--gold); }
+    .tier-name {
+      font-family:'Ma Shan Zheng', cursive;
+      font-size:28px; color:var(--gold);
+      margin-bottom:4px;
+    }
+    .tier-price {
+      font-size:13px; color:var(--text-dim);
+      margin-bottom:20px;
+    }
+    .tier-price strong {
+      font-size:28px; color:var(--text);
+      font-weight:600;
+    }
+    .tier-price .per { font-size:12px; }
+    .tier-features {
+      list-style:none; margin-bottom:24px;
+      border-top:1px solid var(--border);
+      padding-top:20px;
+    }
+    .tier-features li {
+      font-size:13px; color:var(--text-dim);
+      padding:6px 0;
+      display:flex; align-items:flex-start; gap:8px;
+    }
+    .tier-features li::before {
+      content:'◇'; color:var(--gold);
+      font-size:10px; margin-top:3px; flex-shrink:0;
+    }
+    .tier-features li.disabled { color:var(--text-muted); }
+    .tier-features li.disabled::before { content:'·'; color:var(--text-muted); }
+    .upgrade-btn {
+      width:100%; padding:12px;
+      background: transparent;
+      border:1px solid var(--gold);
+      color:var(--gold);
+      font-family:'Noto Serif SC', serif;
+      font-size:14px; letter-spacing:1px;
+      cursor:pointer; border-radius:2px;
+      transition:all 0.3s;
+    }
+    .upgrade-btn:hover {
+      background: linear-gradient(135deg,rgba(201,168,76,0.2),rgba(201,168,76,0.1));
+    }
+    .upgrade-btn.current {
+      background:rgba(201,168,76,0.1);
+      border-color:var(--gold);
+      cursor:default;
+    }
+    .upgrade-btn.buy {
+      background: linear-gradient(135deg,var(--gold-dark),var(--gold));
+      color:var(--bg); border:none;
+      font-weight:600;
+    }
+    .upgrade-btn.buy:hover {
+      background: linear-gradient(135deg,var(--gold),var(--gold-light));
+    }
+    /* 等级对比表 */
+    .compare-table-wrap { overflow-x:auto; margin-bottom:48px; }
+    .compare-table {
+      width:100%; border-collapse:collapse;
+      font-size:13px; min-width:600px;
+    }
+    .compare-table th {
+      background: rgba(201,168,76,0.05);
+      border:1px solid var(--border);
+      padding:14px 12px;
+      color:var(--gold); font-weight:400;
+      letter-spacing:1px;
+    }
+    .compare-table td {
+      border:1px solid var(--border);
+      padding:10px 12px;
+      color:var(--text-dim); text-align:center;
+    }
+    .compare-table tr:hover td { background: rgba(201,168,76,0.03); }
+    .compare-table .check { color:var(--gold); font-size:14px; }
+    .compare-table .cross { color:var(--text-muted); }
+    .compare-table .feature-name { text-align:left; color:var(--text); }
+    /* 支付区 */
+    .pay-grid {
+      display:grid; grid-template-columns:1fr 1fr; gap:24px;
+      margin-bottom:48px;
+    }
+    @media(max-width:640px) { .pay-grid { grid-template-columns:1fr; } }
+    .pay-card {
+      background:var(--bg-card);
+      border:1px solid var(--border);
+      border-radius:4px; padding:28px;
+    }
+    .pay-card-title {
+      font-size:16px; color:var(--gold);
+      margin-bottom:20px;
+      display:flex; align-items:center; gap:8px;
+    }
+    .pay-methods { display:flex; flex-direction:column; gap:12px; }
+    .pay-method-btn {
+      display:flex; align-items:center; gap:12px;
+      padding:14px 16px;
+      background:rgba(255,255,255,0.02);
+      border:1px solid var(--border);
+      border-radius:2px;
+      cursor:pointer; transition:all 0.3s;
+      color:var(--text);
+    }
+    .pay-method-btn:hover { border-color:var(--gold); }
+    .pay-method-btn.selected { border-color:var(--gold); background:rgba(201,168,76,0.08); }
+    .pay-method-btn .icon {
+      width:36px; height:36px; border-radius:4px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:20px;
+    }
+    .pay-method-btn .pm-name { font-size:14px; }
+    .pay-method-btn .pm-sub { font-size:12px; color:var(--text-dim); }
+    .promo-input-wrap {
+      display:flex; gap:8px; margin-top:20px;
+    }
+    .promo-input {
+      flex:1; padding:12px 16px;
+      background:rgba(255,255,255,0.03);
+      border:1px solid var(--border);
+      border-radius:2px;
+      color:var(--text);
+      font-family:'Noto Serif SC', serif; font-size:14px;
+      outline:none;
+    }
+    .promo-input:focus { border-color:var(--gold); }
+    .promo-input::placeholder { color:var(--text-muted); }
+    .promo-btn {
+      padding:12px 20px;
+      background: transparent;
+      border:1px solid var(--border);
+      color:var(--gold);
+      font-family:'Noto Serif SC', serif; font-size:14px;
+      cursor:pointer; border-radius:2px;
+      transition:all 0.3s;
+    }
+    .promo-btn:hover { border-color:var(--gold); background:rgba(201,168,76,0.1); }
+    .promo-success {
+      color:var(--green); font-size:13px;
+      margin-top:8px; display:none;
+    }
+    .total-price {
+      display:flex; justify-content:space-between;
+      align-items:center;
+      margin-top:20px; padding-top:20px;
+      border-top:1px solid var(--border);
+    }
+    .total-price .label { color:var(--text-dim); font-size:14px; }
+    .total-price .amount { font-size:28px; color:var(--gold); font-weight:700; }
+    .confirm-pay-btn {
+      width:100%; padding:16px; margin-top:20px;
+      background: linear-gradient(135deg,var(--gold-dark),var(--gold));
+      border:none; border-radius:2px;
+      color:var(--bg); font-family:'Noto Serif SC', serif;
+      font-size:16px; letter-spacing:2px;
+      cursor:pointer; font-weight:600;
+      transition:all 0.3s;
+    }
+    .confirm-pay-btn:hover { background: linear-gradient(135deg,var(--gold),var(--gold-light)); transform:translateY(-1px); }
+    .confirm-pay-btn:disabled { opacity:0.95; cursor:not-allowed; transform:none; }
+    /* 公众号弹窗 */
+    .modal-overlay {
+      position:fixed; inset:0; z-index:200;
+      background:rgba(0,0,0,0.85);
+      backdrop-filter:blur(4px);
+      display:none; align-items:center; justify-content:center;
+      padding:16px;
+    }
+    .modal-overlay.active { display:flex; }
+    .modal-box {
+      background:var(--bg-modal);
+      border:1px solid var(--gold);
+      border-radius:4px;
+      max-width:420px; width:100%;
+      padding:40px 32px;
+      text-align:center;
+      animation: modalIn 0.3s ease;
+    }
+    @keyframes modalIn { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
+    .modal-glyph {
+      font-family:'Ma Shan Zheng', cursive;
+      font-size:56px; color:var(--gold);
+      margin-bottom:8px;
+    }
+    .modal-title {
+      font-size:20px; color:var(--gold);
+      margin-bottom:8px; letter-spacing:2px;
+    }
+    .modal-desc { font-size:14px; color:var(--text-dim); margin-bottom:28px; line-height:1.8; }
+    .qr-placeholder {
+      width:180px; height:180px; margin:0 auto 24px;
+      border:2px dashed var(--border-strong);
+      border-radius:4px;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      gap:8px;
+    }
+    .qr-placeholder-icon { font-size:48px; color:var(--gold); }
+    .qr-placeholder-text { font-size:12px; color:var(--text-dim); letter-spacing:1px; }
+    .modal-benefit {
+      display:inline-block;
+      background:rgba(201,168,76,0.1);
+      border:1px solid var(--gold);
+      border-radius:2px;
+      padding:10px 20px;
+      font-size:13px; color:var(--gold);
+      margin-bottom:24px;
+    }
+    .modal-benefit strong { font-size:18px; }
+    .modal-close {
+      background:transparent; border:1px solid var(--border);
+      color:var(--text-dim);
+      font-family:'Noto Serif SC', serif; font-size:13px;
+      padding:10px 32px; cursor:pointer; border-radius:2px;
+      transition:all 0.2s;
+    }
+    .modal-close:hover { border-color:var(--gold); color:var(--gold); }
+    /* 订单记录 */
+    .orders-list { display:flex; flex-direction:column; gap:12px; }
+    .order-item {
+      background:var(--bg-card);
+      border:1px solid var(--border);
+      border-radius:4px;
+      padding:16px 20px;
+      display:flex; align-items:center;
+      gap:16px;
+      transition:border-color 0.2s;
+    }
+    .order-item:hover { border-color:var(--border-strong); }
+    .order-icon {
+      width:40px; height:40px; flex-shrink:0;
+      border-radius:4px;
+      background:rgba(201,168,76,0.1);
+      border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      font-size:20px;
+    }
+    .order-info { flex:1; min-width:0; }
+    .order-name { font-size:14px; color:var(--text); margin-bottom:4px; }
+    .order-date { font-size:12px; color:var(--text-dim); }
+    .order-amount { font-size:16px; color:var(--text); font-weight:600; margin-right:12px; }
+    .order-status {
+      font-size:12px; padding:4px 12px;
+      border-radius:2px;
+    }
+    .status-done { background:rgba(74,156,109,0.15); color:var(--green); border:1px solid rgba(74,156,109,0.3); }
+    .status-pending { background:rgba(201,168,76,0.15); color:var(--gold); border:1px solid rgba(201,168,76,0.3); }
+    .status-refund { background:rgba(156,74,74,0.15); color:var(--red); border:1px solid rgba(156,74,74,0.3); }
+    /* 每日推送 */
+    .push-grid {
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap:16px; margin-bottom:32px;
+    }
+    .push-card {
+      background:var(--bg-card);
+      border:1px solid var(--border);
+      border-radius:4px; padding:24px;
+      transition:border-color 0.2s;
+    }
+    .push-card:hover { border-color:var(--border-strong); }
+    .push-card-header {
+      display:flex; align-items:center; gap:12px;
+      margin-bottom:16px;
+    }
+    .push-card-icon {
+      width:44px; height:44px;
+      background:rgba(201,168,76,0.1);
+      border:1px solid var(--border);
+      border-radius:4px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:24px;
+    }
+    .push-card-title { font-size:15px; color:var(--gold); }
+    .push-card-sub { font-size:12px; color:var(--text-dim); }
+    .toggle-wrap {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 0;
+      border-bottom:1px solid var(--border);
+    }
+    .toggle-wrap:last-child { border-bottom:none; }
+    .toggle-label { font-size:13px; color:var(--text-dim); }
+    .toggle {
+      width:44px; height:24px;
+      background:var(--bg-card-hover);
+      border-radius:12px;
+      position:relative; cursor:pointer;
+      border:1px solid var(--border);
+      transition:all 0.3s;
+    }
+    .toggle.on { background:rgba(201,168,76,0.3); border-color:var(--gold); }
+    .toggle::after {
+      content:''; position:absolute;
+      top:3px; left:3px;
+      width:16px; height:16px;
+      background:var(--text-dim);
+      border-radius:50%;
+      transition:all 0.3s;
+    }
+    .toggle.on::after { left:23px; background:var(--gold); }
+    /* 黄历卡片 */
+    .almanac-card {
+      background: linear-gradient(135deg, rgba(201,168,76,0.06), var(--bg-card));
+      border:1px solid var(--border-strong);
+      border-radius:4px; padding:28px;
+      text-align:center; margin-bottom:32px;
+    }
+    .almanac-date {
+      font-family:'Ma Shan Zheng', cursive;
+      font-size:20px; color:var(--gold);
+      margin-bottom:4px;
+    }
+    .almanac-lunar {
+      font-size:13px; color:var(--text-dim);
+      margin-bottom:20px; letter-spacing:1px;
+    }
+    .almanac-row {
+      display:grid; grid-template-columns:1fr 1fr 1fr;
+      gap:12px;
+    }
+    .almanac-item { padding:16px 8px; }
+    .almanac-item-label { font-size:12px; color:var(--text-dim); margin-bottom:6px; letter-spacing:1px; }
+    .almanac-item-value { font-size:15px; color:var(--text); font-weight:600; }
+    .almanac-good .almanac-item-value { color:var(--green); }
+    .almanac-bad .almanac-item-value { color:var(--red); }
+    /* 预约系统 */
+    .booking-layout { display:grid; grid-template-columns:1fr 340px; gap:24px; }
+    @media(max-width:800px) { .booking-layout { grid-template-columns:1fr; } }
+    .master-list { display:flex; flex-direction:column; gap:16px; }
+    .master-card {
+      background:var(--bg-card);
+      border:1px solid var(--border);
+      border-radius:4px; padding:20px;
+      display:flex; gap:16px; align-items:flex-start;
+      transition:border-color 0.2s;
+    }
+    .master-card:hover { border-color:var(--border-strong); }
+    .master-avatar {
+      width:64px; height:64px; flex-shrink:0;
+      border-radius:50%;
+      background: linear-gradient(135deg,rgba(201,168,76,0.2),rgba(201,168,76,0.05));
+      border:2px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      font-size:28px;
+    }
+    .master-info { flex:1; }
+    .master-name { font-size:16px; color:var(--gold); margin-bottom:4px; }
+    .master-title { font-size:12px; color:var(--text-dim); margin-bottom:8px; }
+    .master-stats { display:flex; gap:16px; font-size:12px; color:var(--text-dim); margin-bottom:12px; }
+    .master-stars { color:var(--gold); }
+    .master-tags { display:flex; gap:6px; flex-wrap:wrap; }
+    .master-tag {
+      padding:3px 10px;
+      background:rgba(201,168,76,0.08);
+      border:1px solid var(--border);
+      border-radius:2px;
+      font-size:11px; color:var(--text-dim);
+    }
+    .master-price { font-size:14px; color:var(--text); }
+    .master-price strong { color:var(--gold); font-size:18px; }
+    .book-btn {
+      padding:10px 20px;
+      background: transparent;
+      border:1px solid var(--gold);
+      color:var(--gold);
+      font-family:'Noto Serif SC', serif; font-size:13px;
+      cursor:pointer; border-radius:2px;
+      transition:all 0.3s;
+      white-space:nowrap;
+    }
+    .book-btn:hover { background:rgba(201,168,76,0.15); }
+    /* 日历 */
+    .calendar-wrap {
+      background:var(--bg-card);
+      border:1px solid var(--border);
+      border-radius:4px; padding:20px;
+      margin-bottom:20px;
+    }
+    .calendar-header {
+      display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:16px;
+    }
+    .calendar-title { font-size:16px; color:var(--gold); letter-spacing:1px; }
+    .calendar-nav { display:flex; gap:8px; }
+    .calendar-nav button {
+      width:32px; height:32px;
+      background:transparent;
+      border:1px solid var(--border);
+      color:var(--text-dim);
+      cursor:pointer; border-radius:2px;
+      font-size:14px;
+      transition:all 0.2s;
+    }
+    .calendar-nav button:hover { border-color:var(--gold); color:var(--gold); }
+    .calendar-grid {
+      display:grid; grid-template-columns:repeat(7,1fr); gap:2px;
+    }
+    .cal-dow {
+      text-align:center; font-size:11px;
+      color:var(--text-muted); padding:8px 0;
+      letter-spacing:1px;
+    }
+    .cal-day {
+      text-align:center; padding:8px 4px;
+      font-size:13px; color:var(--text-dim);
+      border-radius:2px; cursor:pointer;
+      transition:all 0.2s;
+    }
+    .cal-day:hover { background:rgba(201,168,76,0.1); color:var(--gold); }
+    .cal-day.disabled { color:var(--text-muted); cursor:default; }
+    .cal-day.disabled:hover { background:transparent; }
+    .cal-day.today { color:var(--gold); border:1px solid var(--border-strong); }
+    .cal-day.selected { background:rgba(201,168,76,0.2); color:var(--gold); border:1px solid var(--gold); }
+    .cal-day.booked { color:var(--green); }
+    .time-slots { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:16px; }
+    .time-slot {
+      padding:8px; text-align:center;
+      font-size:12px; color:var(--text-dim);
+      border:1px solid var(--border);
+      border-radius:2px; cursor:pointer;
+      transition:all 0.2s;
+    }
+    .time-slot:hover { border-color:var(--gold); color:var(--gold); }
+    .time-slot.selected { border-color:var(--gold); color:var(--gold); background:rgba(201,168,76,0.1); }
+    .time-slot.unavailable { color:var(--text-muted); cursor:default; border-color:transparent; }
+    .booking-summary {
+      background:var(--bg-card);
+      border:1px solid var(--border);
+      border-radius:4px; padding:24px;
+    }
+    .bs-title { font-size:15px; color:var(--gold); margin-bottom:16px; }
+    .bs-row {
+      display:flex; justify-content:space-between;
+      font-size:13px; color:var(--text-dim);
+      padding:8px 0; border-bottom:1px solid var(--border);
+    }
+    .bs-row:last-of-type { border-bottom:none; }
+    .bs-row span:last-child { color:var(--text); }
+    .bs-total {
+      display:flex; justify-content:space-between;
+      font-size:15px; padding:12px 0;
+      border-top:1px solid var(--border-strong);
+      margin-top:8px;
+    }
+    .bs-total span:last-child { color:var(--gold); font-size:20px; font-weight:700; }
+    .booking-history { margin-top:32px; }
+    .booking-item {
+      background:var(--bg-card);
+      border:1px solid var(--border);
+      border-radius:4px; padding:16px;
+      display:flex; align-items:center; gap:16px;
+      margin-bottom:12px;
+    }
+    .booking-item .bi-icon {
+      width:40px; height:40px;
+      background:rgba(201,168,76,0.1);
+      border:1px solid var(--border);
+      border-radius:4px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:20px;
+    }
+    .bi-info { flex:1; }
+    .bi-name { font-size:14px; color:var(--text); margin-bottom:4px; }
+    .bi-time { font-size:12px; color:var(--text-dim); }
+    .bi-status {
+      font-size:12px; padding:4px 12px;
+      border-radius:2px;
+    }
+    /* 分隔线 */
+    .divider {
+      height:1px;
+      background: linear-gradient(90deg,transparent,var(--border),transparent);
+      margin:40px 0;
+    }
+    /* 空状态 */
+    .empty-state {
+      text-align:center; padding:60px 20px;
+      color:var(--text-dim);
+    }
+    .empty-icon { font-size:48px; margin-bottom:16px; opacity:0.3; }
+    .empty-text { font-size:14px; letter-spacing:1px; }
+    /* 动画 */
+    .shimmer {
+      background: linear-gradient(90deg,transparent,rgba(201,168,76,0.05),transparent);
+      background-size:200% 100%;
+      animation: shimmer 2s infinite;
+    }
+    @keyframes shimmer { 0%{background-position:-200%} 100%{background-position:200%} }
+    /* 底部 */
+    .footer {
+      text-align:center;
+      padding:40px 16px;
+      border-top:1px solid var(--border);
+      color:var(--text-muted); font-size:12px;
+      letter-spacing:1px;
+    }
+    .footer a { color:var(--text-dim); text-decoration:none; }
+    .footer a:hover { color:var(--gold); }
+    /* 滚动条 */
+    ::-webkit-scrollbar { width:4px; height:4px; }
+    ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+    ::-webkit-scrollbar-thumb:hover { background:var(--gold); }
+/* Toast */
+.toast-msg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(20,18,14,.95);border:1px solid rgba(201,168,76,.3);color:var(--paper);font-family:'Noto Serif SC',serif;font-size:14px;padding:18px 28px;letter-spacing:2px;border-radius:4px;z-index:99999;box-shadow:0 4px 32px rgba(0,0,0,.6);text-align:center;min-width:220px;opacity:0;transition:opacity .25s ease;pointer-events:none}
+.toast-msg.show{opacity:1}
+   === */
+
+
+/* 跨文件导航栏 */
+.file-nav-bar{background:rgba(8,8,8,0.97);border-bottom:1px solid rgba(201,168,76,0.15);padding:10px 0;display:flex;justify-content:center;gap:6px;flex-wrap:wrap;position:relative;z-index:100}
+.file-nav-btn{color:var(--text-dim, var(--cinn));text-decoration:none;font-size:12px;padding:5px 14px;border:1px solid rgba(201,168,76,0.12);border-radius:16px;transition:all .25s;font-family:'Noto Serif SC',serif;letter-spacing:1px;white-space:nowrap}
+.file-nav-btn:hover{background:rgba(201,168,76,0.1);color:var(--gold);border-color:rgba(201,168,76,0.3)}
+.file-nav-btn.active{background:rgba(201,168,76,0.12);color:var(--gold);border-color:rgba(201,168,76,0.35)}

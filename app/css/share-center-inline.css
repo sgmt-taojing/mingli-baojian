@@ -1,0 +1,49 @@
+
+
+/* === Extracted from share-center.html
+:root{--ink:#080808;--ink2:#111;--ink3:#1a1a1a;--paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;--gold:#c9a84c;--gold2:#e8cc7a;--gold3:#d4b86a;--jade:#27ae60;--jade2:#2ecc71;--cinn:#c0392b;--cinn2:#e74c3c;--cyan:#2980b9;--border:rgba(201,168,76,.15);--font:'PingFang SC','Microsoft YaHei',serif}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{overflow-x:hidden;font-family:var(--font);background:var(--ink);color:var(--paper);line-height:1.8}
+.top{position:sticky;top:0;background:rgba(8,8,8,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:calc(12px + env(safe-area-inset-top,0)) 18px 10px;display:flex;align-items:center;gap:12px;z-index:10}
+.top h1{font-size:18px;color:var(--gold);letter-spacing:3px;font-weight:600}
+.top .back{font-size:13px;color:var(--paper3);text-decoration:none}
+.body{padding:18px;max-width:560px;margin:0 auto;padding-bottom:calc(60px + env(safe-area-inset-bottom,0))}
+/* 名片 */
+.card-preview{background:linear-gradient(135deg,var(--ink2),var(--ink3));border:1px solid var(--gold);border-radius:16px;padding:24px 20px;text-align:center;position:relative;overflow:hidden}
+.card-preview::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(201,168,76,.06) 0%,transparent 60%);pointer-events:none}
+.card-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold3));display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 10px;position:relative;z-index:1}
+.card-name{font-size:20px;color:var(--gold);font-weight:700;letter-spacing:2px;position:relative;z-index:1}
+.card-title-text{font-size:12px;color:var(--paper3);margin-top:4px;position:relative;z-index:1}
+.card-bazi{font-size:13px;color:var(--paper2);margin-top:12px;letter-spacing:1px;position:relative;z-index:1}
+.card-stats{display:flex;justify-content:center;gap:24px;margin-top:14px;position:relative;z-index:1}
+.card-stat{text-align:center}
+.card-stat .num{font-size:20px;color:var(--gold);font-weight:700}
+.card-stat .lbl{font-size:10px;color:var(--paper3)}
+.card-qr{width:80px;height:80px;background:var(--paper);border-radius:8px;margin:14px auto 0;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--ink);position:relative;z-index:1}
+/* 分享按钮组 */
+.share-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+.share-btn{background:var(--ink2);border:1px solid var(--border);border-radius:12px;padding:14px 6px;text-align:center;cursor:pointer;transition:all .2s}
+.share-btn:active{transform:scale(.95);border-color:var(--gold)}
+.share-btn .icon{font-size:28px;display:block;margin-bottom:4px}
+.share-btn .label{font-size:11px;color:var(--paper3)}
+/* 报告列表 */
+.report-list{margin-top:10px}
+.report-item{display:flex;align-items:center;gap:12px;background:var(--ink2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px;cursor:pointer;transition:all .2s}
+.report-item:active{transform:scale(.98)}
+.report-item .r-icon{font-size:28px;min-width:36px;text-align:center}
+.report-item .r-info{flex:1}
+.report-item .r-name{font-size:14px;color:var(--gold);font-weight:600}
+.report-item .r-desc{font-size:11px;color:var(--paper3);margin-top:2px}
+.report-item .r-go{font-size:18px;color:var(--paper3)}
+/* 才艺宫 */
+.talent-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+.talent-card{background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(201,168,76,.01));border:1px solid var(--border);border-radius:12px;padding:16px 12px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.talent-card:active{transform:scale(.96);border-color:var(--gold)}
+.talent-card .t-icon{font-size:32px;display:block;margin-bottom:6px}
+.talent-card .t-name{font-size:13px;color:var(--gold);font-weight:600}
+.talent-card .t-sub{font-size:10px;color:var(--paper3);margin-top:2px}
+/* section */
+.section-title{font-size:14px;color:var(--gold);letter-spacing:2px;margin:18px 0 10px;display:flex;align-items:center;gap:6px}
+.section-title::before{content:'';width:3px;height:16px;background:var(--gold);border-radius:2px}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--ink2);color:var(--paper);padding:10px 20px;border-radius:10px;border:1px solid var(--gold);z-index:1000;font-size:13px;animation:slideUp .3s}
+@keyframes slideUp{from{opacity:0;transform:translate(-50%,20px)}to{opacity:1;transform:translate(-50%,0)}}

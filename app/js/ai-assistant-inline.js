@@ -1150,7 +1150,7 @@ function showReport(text){
   const ops=document.createElement('div');
   ops.className='report-ops';
   var _repEsc=esc(text).replace(/"/g,'&quot;');
-  ops.innerHTML='<button class="btn-save" data-report="'+_repEsc+'" onclick="saveReport(this)">💾 保存报告</button><button class="btn-copy" data-report="'+_repEsc+'" onclick="copyReport(this)">📋 复制</button>';
+  ops.innerHTML='<button class="btn-save" data-report="'+_repEsc+'" onclick="saveReport(this)">💾 保存报告</button><button class="btn-copy" data-report="'+_repEsc+'" onclick="copyReport(this)">📋 复制</button><button class="btn-fb-up" onclick="fbReport(this,1)" title="这条回答对你有帮助">👍 有帮助</button><button class="btn-fb-dn" onclick="fbReport(this,-1)" title="这条回答不准确">👎 没帮助</button>';
   d.appendChild(ops);
 
   // R41-DR1 节点 7：music/lifeindex/lifeplan 三模块 detail 页跳转入口
@@ -3156,3 +3156,64 @@ console.log('[R39-C] 双核 KB 命中辅助函数已挂载');
     setTimeout(function(){ badge.remove(); }, 3000);
   }
 })();
+
+// ============ R50: 报告反馈 (点赞/踩) ============
+window.fbReport = function(btn, val) {
+  const ops = btn.parentElement;
+  if (!ops) return;
+  // 防止重复点击
+  const buttons = ops.querySelectorAll('.btn-fb-up, .btn-fb-dn');
+  buttons.forEach(function(b) { b.disabled = true; b.style.opacity = '.4'; });
+  btn.style.opacity = '1';
+  btn.style.background = val > 0 ? 'rgba(16,185,129,.2)' : 'rgba(239,68,68,.2)';
+  btn.style.borderColor = val > 0 ? '#10b981' : '#ef4444';
+
+  // 取报告文本（从同 msg 的 .b 取）
+  let reportText = '';
+  const msg = ops.closest('.msg');
+  if (msg) {
+    const body = msg.querySelector('.b');
+    if (body) reportText = body.innerText.slice(0, 200);
+  }
+  // 取 state 信息
+  const mod = (window.state && window.state.module) || 'unknown';
+  const data = (window.state && window.state.data) || {};
+  const dataKeys = Object.keys(data).slice(0, 6).map(function(k){ return k+'='+(data[k]||'').toString().slice(0,40); }).join('|');
+
+  const payload = {
+    module: mod,
+    query: dataKeys,  // 用 data 字段作为 query（端点限 500 字符）
+    source: 'ai-assistant-btn',
+    score: val,         // 1=赞 -1=踩（端点限制 -1/0/+1）
+    comment: reportText  // 报告样本作为备注
+  };
+  // 本地计数
+  const fbKey = '_fb_score/' + mod;
+  try {
+    const cur = JSON.parse(localStorage.getItem(fbKey) || '{"up":0,"dn":0}');
+    if (val > 0) cur.up++; else cur.dn++;
+    localStorage.setItem(fbKey, JSON.stringify(cur));
+    // 总计
+    const tot = JSON.parse(localStorage.getItem('_fb_score/_total') || '{"up":0,"dn":0}');
+    if (val > 0) tot.up++; else tot.dn++;
+    localStorage.setItem('_fb_score/_total', JSON.stringify(tot));
+  } catch(e) {}
+
+  // 异步上报后端（白名单 + 失败静默）
+  try {
+    fetch((typeof API !== 'undefined' ? API : '') + '/api/public/kb-feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(function(r){
+      // 视觉反馈
+      btn.innerHTML = val > 0 ? '✅ 已赞' : '✅ 已记录';
+      setTimeout(function(){ btn.innerHTML = val > 0 ? '👍 有帮助' : '👎 没帮助'; }, 2000);
+    }).catch(function(){
+      btn.innerHTML = val > 0 ? '✅ 已赞（离线）' : '✅ 已记录（离线）';
+      setTimeout(function(){ btn.innerHTML = val > 0 ? '👍 有帮助' : '👎 没帮助'; }, 2500);
+    });
+  } catch(e) {
+    btn.innerHTML = '✅';
+  }
+};

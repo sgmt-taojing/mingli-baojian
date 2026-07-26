@@ -8,302 +8,9 @@
 <title>中医临床端 · 医生工作站</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
-/* 医生端风格：医疗蓝白 · 临床严谨 · 大字号 */
-:root{
-  --ink:#1a3a5c;       /* 医疗深蓝 */
-  --ink2:#2c5282;
-  --paper:#f0f4f8;     /* 冷白 */
-  --paper2:#e2e8f0;
-  --paper3:#94a3b8;
-  --accent:#0ea5e9;    /* 强调青蓝 */
-  --accent2:#06b6d4;
-  --jade:#10b981;
-  --cinn:#dc2626;
-  --warn:#f59e0b;
-  --font:'Noto Serif SC','Source Han Serif SC','SimSun',serif;
-  --fs-body:18px;       /* 医生端略小（专业） */
-  --fs-title:24px;
-  --fs-h1:32px;
-  --fs-btn:18px;
-}
-*{margin:0;padding:0;box-sizing:border-box}
-html{font-size:var(--fs-body)}
-body{
-  font-family:var(--font);
-  background:var(--paper);
-  color:var(--ink);
-  min-height:100vh;
-  line-height:1.6;
-}
-.top{
-  background:linear-gradient(135deg,var(--ink) 0%,var(--ink2) 100%);
-  color:#fff;
-  padding:20px 24px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  position:sticky;top:0;z-index:100;
-  box-shadow:0 2px 12px rgba(26,58,92,0.3);
-}
-.top h1{font-size:var(--fs-h1);font-weight:700;letter-spacing:4px}
-.top .meta{font-size:14px;color:#cbd5e1;text-align:right}
-.top .meta b{color:var(--accent);font-size:16px}
 
-/* Tab 切换 */
-.tabs{
-  display:flex;
-  background:#fff;
-  border-bottom:2px solid var(--paper2);
-  position:sticky;top:80px;z-index:90;
-}
-.tab{
-  flex:1;
-  padding:16px;
-  background:none;
-  border:none;
-  font-size:18px;
-  font-family:var(--font);
-  color:var(--paper3);
-  cursor:pointer;
-  border-bottom:4px solid transparent;
-  letter-spacing:2px;
-  transition:all .2s;
-}
-.tab:hover{color:var(--ink2)}
-.tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:700}
-
-/* 主区 */
-.main{max-width:1400px;margin:0 auto;padding:24px}
-/* 双栏布局 */
-.layout{display:grid;grid-template-columns:1fr 1fr;gap:24px}
-@media(max-width:1024px){.layout{grid-template-columns:1fr}}
-.col{
-  background:#fff;
-  border-radius:12px;
-  padding:24px;
-  box-shadow:0 2px 8px rgba(26,58,92,0.08);
-  border:1px solid var(--paper2);
-}
-.col h2{
-  font-size:var(--fs-title);
-  color:var(--ink);
-  margin-bottom:16px;
-  padding-bottom:12px;
-  border-bottom:2px solid var(--accent);
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-.col h2 .num{
-  background:var(--accent);
-  color:#fff;
-  width:36px;height:36px;
-  border-radius:50%;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  font-size:18px;
-  font-weight:700;
-}
-/* 字段 */
-.f-row{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;margin:12px 0}
-.f-row label{font-weight:700;color:var(--ink2);font-size:16px}
-.f-row .v{
-  font-size:18px;
-  padding:8px 12px;
-  background:var(--paper);
-  border-radius:6px;
-  border:1px solid var(--paper2);
-}
-.f-row .v input{
-  border:none;background:none;
-  font-size:18px;width:100%;
-  font-family:var(--font);color:var(--ink);
-}
-.f-row .v input:focus{outline:2px solid var(--accent)}
-/* 大输入 */
-.input-big{
-  width:100%;min-height:48px;
-  padding:12px 16px;
-  font-size:18px;
-  font-family:var(--font);
-  background:#fff;
-  border:2px solid var(--paper2);
-  border-radius:8px;
-  color:var(--ink);
-}
-.input-big:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(14,165,233,0.15)}
-textarea.input-big{min-height:100px;resize:vertical;line-height:1.6}
-/* 按钮 */
-.btn{
-  padding:12px 24px;
-  font-size:var(--fs-btn);
-  font-family:var(--font);
-  font-weight:700;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-  letter-spacing:2px;
-  transition:all .15s;
-  margin:4px;
-}
-.btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{background:var(--accent2)}
-.btn-primary:active{transform:translateY(1px)}
-.btn-secondary{background:var(--paper);color:var(--ink);border:2px solid var(--ink2)}
-.btn-danger{background:var(--cinn);color:#fff}
-.btn-success{background:var(--jade);color:#fff}
-.btn-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
-/* 报告区 */
-.report{
-  background:linear-gradient(180deg,#f0f9ff 0%,#e0f2fe 100%);
-  border:2px solid var(--accent);
-  border-radius:12px;
-  padding:20px;
-  margin:16px 0;
-}
-.report h3{
-  font-size:20px;
-  color:var(--ink);
-  margin:16px 0 8px;
-  padding-bottom:6px;
-  border-bottom:1px dashed var(--accent);
-}
-.report p{font-size:16px;margin:6px 0}
-.report table{width:100%;border-collapse:collapse;margin:12px 0;font-size:15px}
-.report th{background:var(--ink);color:#fff;padding:10px;font-size:15px}
-.report td{padding:8px 10px;border-bottom:1px solid var(--paper2)}
-.report .wuxing-bar{display:flex;gap:4px;align-items:end;height:60px;margin:12px 0}
-.report .wuxing-bar .bar{
-  flex:1;
-  background:var(--accent);
-  border-radius:4px 4px 0 0;
-  position:relative;
-  transition:all .5s;
-}
-.report .wuxing-bar .bar span{
-  position:absolute;
-  bottom:-22px;left:50%;transform:translateX(-50%);
-  font-size:14px;font-weight:700;
-}
-/* 患者列表 */
-.patient-list{
-  background:#fff;
-  border-radius:12px;
-  margin:16px 0;
-  border:1px solid var(--paper2);
-  max-height:300px;
-  overflow-y:auto;
-}
-.patient-row{
-  display:grid;
-  grid-template-columns:60px 1fr auto auto;
-  gap:12px;
-  padding:12px 16px;
-  border-bottom:1px solid var(--paper2);
-  align-items:center;
-  cursor:pointer;
-  transition:all .15s;
-}
-.patient-row:hover{background:var(--paper)}
-.patient-row .id{color:var(--paper3);font-size:14px}
-.patient-row .name{font-weight:700;font-size:16px}
-.patient-row .meta{font-size:13px;color:var(--paper3)}
-.patient-row .badge{
-  padding:2px 10px;
-  border-radius:12px;
-  font-size:12px;
-  font-weight:700;
-}
-.badge-warn{background:#fef3c7;color:#92400e}
-.badge-ok{background:#d1fae5;color:#065f46}
-.badge-err{background:#fee2e2;color:#991b1b}
-/* 五行健康度评分 */
-.health-score{
-  display:flex;
-  align-items:center;
-  gap:16px;
-  padding:16px;
-  background:#fff;
-  border-radius:8px;
-  margin:8px 0;
-  border:1px solid var(--paper2);
-}
-.health-score .label{font-weight:700;font-size:16px;width:80px}
-.health-score .bar{flex:1;height:24px;background:var(--paper2);border-radius:12px;overflow:hidden;position:relative}
-.health-score .bar .fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .5s;border-radius:12px}
-.health-score .score{font-weight:900;font-size:20px;color:var(--accent);width:60px;text-align:right}
-/* 浮动操作 */
-.float-bar{
-  position:fixed;bottom:0;left:0;right:0;
-  background:#fff;
-  padding:12px 24px;
-  border-top:2px solid var(--paper2);
-  display:flex;gap:8px;justify-content:flex-end;
-  z-index:90;
-  box-shadow:0 -2px 8px rgba(26,58,92,0.08);
-}
-/* tab 隐藏 */
-.tab-panel{display:none}
-.tab-panel.active{display:block}
-/* 警告 */
-.alert{
-  padding:12px 16px;
-  border-radius:8px;
-  margin:8px 0;
-  font-size:15px;
-}
-.alert-warn{background:#fef3c7;color:#92400e;border:1px solid #f59e0b}
-.alert-info{background:#dbeafe;color:#1e40af;border:1px solid #3b82f6}
-.alert-err{background:#fee2e2;color:#991b1b;border:1px solid #dc2626}
-/* modal */
-.modal{
-  position:fixed;inset:0;
-  background:rgba(0,0,0,0.5);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:200;
-}
-.modal.show{display:flex}
-.modal-content{
-  background:#fff;
-  border-radius:16px;
-  padding:32px;
-  max-width:600px;
-  width:90%;
-  max-height:80vh;
-  overflow-y:auto;
-}
-.modal-content h3{font-size:24px;color:var(--ink);margin-bottom:16px}
-/* R37-B doctor-elder 双核仪表盘 */
-.dr-dash{padding:18px;background:linear-gradient(135deg,rgba(74,154,110,.05),rgba(74,138,168,.05));border-radius:14px;margin:20px 0;border:1px solid var(--line)}
-.dr-dash-title{font-size:16px;color:var(--gold);letter-spacing:2px;margin-bottom:14px;font-weight:600}
-.dr-dash-dual{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
-.dr-card{padding:14px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.04)}
-.dr-card.health{border-left:4px solid #4a9a6e;background:linear-gradient(135deg,rgba(74,154,110,.08),rgba(255,255,255,.02))}
-.dr-card.career{border-left:4px solid #4a8aa8;background:linear-gradient(135deg,rgba(74,138,168,.08),rgba(255,255,255,.02))}
-.dr-card-title{font-size:13px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.dr-card.health .dr-card-title{color:#4a9a6e}
-.dr-card.career .dr-card-title{color:#4a8aa8}
-.dr-card-score{font-size:26px;font-weight:700;letter-spacing:1px}
-.dr-card.health .dr-card-score{color:#4a9a6e}
-.dr-card.career .dr-card-score{color:#4a8aa8}
-.dr-card-bar{height:6px;background:rgba(0,0,0,.3);border-radius:3px;overflow:hidden;margin:8px 0}
-.dr-card-fill{height:100%;border-radius:3px;transition:.4s}
-.dr-card.health .dr-card-fill{background:linear-gradient(90deg,#4a9a6e,#7ab86e)}
-.dr-card.career .dr-card-fill{background:linear-gradient(90deg,#4a8aa8,#6ab0d0)}
-.dr-6grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
-.dr-6cell{padding:10px 8px;background:rgba(201,168,76,.05);border:1px solid var(--line);border-radius:6px;text-align:center}
-.dr-6cell .icon{font-size:18px;display:block;margin-bottom:4px}
-.dr-6cell b{display:block;font-size:11px;color:var(--gold);margin-bottom:4px}
-.dr-6cell .tip{font-size:10px;opacity:.7;line-height:1.5}
-.dr-verdict{margin-top:14px;padding:12px;background:rgba(0,0,0,.2);border-radius:8px;border:1px dashed var(--gold);font-size:12px;line-height:1.9}
-.dr-source{font-size:10px;opacity:.4;margin-top:10px;padding-top:6px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
-@media(max-width:768px){.dr-dash-dual{grid-template-columns:1fr}.dr-6grid{grid-template-columns:repeat(2,1fr)}}
-</style>
   <link rel="stylesheet" href="css/a11y-fix.css">
+<link rel="stylesheet" href="css/doctor-elder-inline.css">
 </head>
 <body>
   <a class="skip-link" href="#main-content">跳到主内容</a>
@@ -828,13 +535,8 @@ function printRx(){
   const w = window.open('', '_blank');
   const name = $('#rx-name').value||'处方';
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${name}</title>
-    <style>body{font-family:'Noto Serif SC',serif;padding:40px;line-height:1.8;font-size:18px}
-    h1{text-align:center;font-size:32px;border-bottom:3px solid #000;padding-bottom:20px}
-    .field{margin:12px 0;font-size:18px}
-    .label{font-weight:700;display:inline-block;width:100px}
-    pre{font-family:inherit;white-space:pre-wrap;font-size:18px;line-height:2}
-    .sig{margin-top:60px;text-align:right}
-    </style></head><body>
+    <link rel="stylesheet" href="css/doctor-elder-inline.css">
+</head><body>
     <h1>中 药 处 方 笺</h1>
     <div class="field"><span class="label">方剂名：</span>${$('#rx-name').value}</div>
     <div class="field"><span class="label">主病机：</span>${$('#rx-pattern').value}</div>
@@ -845,7 +547,8 @@ function printRx(){
     <div class="field"><span class="label">日期：</span>${new Date().toLocaleDateString('zh-CN')}</div>
     <div class="sig">医师签名：____________</div>
       \x3cscript src="js/a11y-divination-hub.js" defer></script>
-  </body></html>`;
+  <script src="js/doctor-elder-inline.js" defer></script>
+</body></html>`;
   w.document.write(html);
   w.document.close();
   w.print();
@@ -908,34 +611,13 @@ console.log('[doctor-elder] 中医临床工作站 v0.1 loaded');
 window.computeBazi = computeBazi;
 window.computeWuxingScore = computeWuxingScore;
 </script>
-<script>
-/* ===== R37-B doctor-elder 双核仪表盘 ===== */
-function renderElderDashboardR37(){
-  var hS=72;var cS=70;
-  var h='<div class="dr-dash">';
-  h+='<div class="dr-dash-title">👴 长者安康·健康事业双核（8 维 + 6 长者专属 + 18 古籍）</div>';
-  h+='<div class="dr-dash-dual">';
-  h+='<div class="dr-card health"><div class="dr-card-title">🩺 健康维度</div><div class="dr-card-score">'+hS+'<span style="font-size:13px;opacity:.6">/100</span></div><div class="dr-card-bar"><div class="dr-card-fill" style="width:'+hS+'%"></div></div><div style="font-size:11px;opacity:.7;margin-top:6px">🩸 气血 + 🍚 脾胃 + 💗 心肾 + 🌿 肝胆</div></div>';
-  h+='<div class="dr-card career"><div class="dr-card-title">💼 事业维度</div><div class="dr-card-score">'+cS+'<span style="font-size:13px;opacity:.6">/100</span></div><div class="dr-card-bar"><div class="dr-card-fill" style="width:'+cS+'%"></div></div><div style="font-size:11px;opacity:.7;margin-top:6px">💰 正财 + 👔 官运 + 📈 升迁 + 🤝 合作</div></div>';
-  h+='</div>';
-  h+='<div style="margin:10px 0 8px;color:var(--paper3);font-size:12px;letter-spacing:1.5px">📋 6 长者专属维度</div>';
-  var ELDER_6D={"颐养":{"label":"🏡 颐养","icon":"🏡","tip":"退休生活·含饴弄孙·养花种草"},"天伦":{"label":"👨‍👩‍👧‍👦 天伦","icon":"👨‍👩‍👧‍👦","tip":"儿孙绕膝·家庭和睦·三代同堂"},"康乐":{"label":"🎶 康乐","icon":"🎶","tip":"琴棋书画·太极气功·老年大学"},"清修":{"label":"📿 清修","icon":"📿","tip":"诵经念佛·静坐冥想·心灵安顿"},"传承":{"label":"🏛 传承","icon":"🏛","tip":"家训口授·教子教孙·家风延续"},"寿元":{"label":"🎂 寿元","icon":"🎂","tip":"养生长寿·节制饮食·顺应四时"}};
-  h+='<div class="dr-6grid">';
-  Object.keys(ELDER_6D).forEach(function(k){var it=ELDER_6D[k];
-    h+='<div class="dr-6cell"><span class="icon">'+it.icon+'</span><b>'+it.label+'</b><div class="tip">'+it.tip+'</div></div>';
-  });
-  h+='</div>';
-  h+='<div class="dr-verdict"><b style="color:var(--gold)">👴 长者安康判读：</b><br>① 健康 '+hS+' 分（气血/脾胃/心肾/肝胆为主）—— 长者宜<b>清淡饮食+适度运动+定期体检</b> ② 事业 '+cS+' 分（退而不休+含饴弄孙+经验传承）—— 长者事业宜<b>顾问/导师/家族掌舵</b> ③ 6 长者专属维度全覆盖 ④ 化解要点：颐养天年+天伦之乐+传承家风</div>';
-  h+='<div class="dr-source">📜 综合《黄帝内经》《千金要方》《伤寒杂病论》《本草纲目》《针灸甲乙经》《素问注》《寿亲养老新书》《养老奉亲书》《摄生消息论》《老老恒言》《滴天髓》《子平真诠》《三命通会》《了凡四训》《阴骘文》《太上感应篇》《玉历宝钞》《三世因果经》共 18 部古籍</div>';
-  h+='</div>';
-  return h;
-}
-</script>
 
-<script>renderElderDashboardR37_inject()</script>
+
+
 <div id="elderDashboard"></div>
-<script>document.getElementById("elderDashboard").innerHTML=renderElderDashboardR37();</script>
+
 
 </main>
+<script src="js/doctor-elder-inline.js" defer></script>
 </body>
 </html>

@@ -1,0 +1,107 @@
+
+
+/* === Extracted from tcm-report.html
+/* ===== 基础 ===== */
+:root{--ink:#1a1a1a;--muted:#555;--line:#ddd;--surface:#fff;--accent:#c0392b;--accent-light:#f5e6e4;--border:#ccc;--shadow:0 1px 4px rgba(0,0,0,.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:#f4f3f1;line-height:1.65}
+h1{font-size:1.5rem;font-weight:600;color:var(--accent)}
+h2{font-size:.95rem;font-weight:600;margin-bottom:.5rem;padding-bottom:.25rem;border-bottom:2px solid var(--accent);color:var(--ink)}
+h3{font-size:.82rem;color:var(--muted);margin:.4rem 0 .2rem}
+.skip-link{position:absolute;left:-9999px}
+@media(max-width:768px){.main-grid{grid-template-columns:1fr!important}}
+
+/* ===== 头部 ===== */
+header{background:var(--surface);padding:1rem 1.5rem;border-bottom:3px solid var(--accent);box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
+.header-left{display:flex;align-items:center;gap:.75rem}
+.header-left .icon{width:32px;height:32px;border-radius:6px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.85rem}
+.header-meta{font-size:.72rem;color:var(--muted)}
+.actions{display:flex;gap:.5rem;flex-wrap:wrap}
+.btn{padding:.45rem .85rem;border-radius:5px;border:1px solid var(--border);background:var(--surface);font-size:.8rem;cursor:pointer;transition:.15s}
+.btn:hover{background:var(--accent-light);border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.primary:hover{background:#a93226}
+.btn:disabled{opacity:.95;cursor:not-allowed}
+
+/* ===== 主网格 ===== */
+.main-grid{display:grid;grid-template-columns:280px 1fr 300px;gap:1rem;padding:1rem 1.5rem;max-width:1400px;margin:0 auto}
+
+/* ===== 卡片 ===== */
+.card{background:var(--surface);border-radius:8px;padding:.9rem 1rem;box-shadow:var(--shadow);border:1px solid var(--line);margin-bottom:.85rem}
+.card-title{font-size:.82rem;font-weight:600;margin-bottom:.4rem;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+
+/* ===== 表单 ===== */
+.field{margin-bottom:.55rem}
+.field label{display:block;font-size:.75rem;color:var(--muted);margin-bottom:.15rem}
+.field input,.field textarea,.field select{width:100%;padding:.35rem .5rem;border:1px solid var(--border);border-radius:4px;font-size:.82rem;transition:.15s}
+.field input:focus,.field textarea:focus,.field select:focus{outline:2px solid var(--accent);outline-offset:1px}
+.field textarea{resize:vertical;min-height:2.8rem}
+.field-row{display:flex;gap:.5rem}
+.field-row .field{flex:1}
+
+/* ===== 问诊表 ===== */
+.inquiry-item{display:flex;gap:.4rem;align-items:flex-start;padding:.35rem 0;border-bottom:1px dashed var(--line)}
+.inquiry-item .q-label{font-size:.75rem;color:var(--muted);min-width:70px;padding-top:.15rem}
+.inquiry-item .q-input{flex:1;padding:.25rem .4rem;border:1px solid transparent;border-radius:3px;font-size:.78rem;background:transparent;transition:.15s}
+.inquiry-item .q-input:hover{border-color:var(--line);background:#fafafa}
+.inquiry-item .q-input:focus{outline:2px solid var(--accent);border-color:var(--accent);background:#fff}
+
+/* ===== 影像 ===== */
+.media-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.media-slot{position:relative;border:2px dashed var(--line);border-radius:6px;min-height:120px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.35rem;background:#fafafa;transition:.2s;overflow:hidden}
+.media-slot:hover{border-color:var(--accent)}
+.media-slot .slot-label{font-size:.7rem;color:var(--muted);text-align:center}
+.media-slot img{width:100%;height:auto;max-height:180px;object-fit:contain}
+.media-slot input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;z-index:2}
+.media-slot .slot-icon{font-size:1.4rem;color:var(--muted)}
+.media-slot.filled{border-style:solid;border-color:var(--accent)}
+
+/* ===== 辨证结果 ===== */
+.diagnosis-box{background:var(--accent-light);border-radius:6px;padding:.65rem;margin-bottom:.5rem}
+.diagnosis-box .tag{display:inline-block;padding:.15rem .4rem;border-radius:3px;font-size:.72rem;margin:.15rem;font-weight:500}
+.tag-hot{background:#e74c3c;color:#fff}
+.tag-cold{background:#3498db;color:#fff}
+.tag-xu{background:#f39c12;color:#fff}
+.tag-shi{background:#27ae60;color:#fff}
+.tag-neutral{background:#95a5a6;color:#fff}
+.remark{font-size:.75rem;color:var(--muted);margin-top:.35rem;line-height:1.55}
+.remark strong{color:var(--ink)}
+
+/* ===== 取穴 ===== */
+.acupoint-list{display:flex;flex-wrap:wrap;gap:.4rem}
+.acupoint-item{background:#f8f4f0;border:1px solid #d4c8bc;border-radius:5px;padding:.3rem .55rem;font-size:.78rem}
+.acupoint-item .ap-name{font-weight:600;color:var(--accent)}
+.acupoint-item .ap-meridian{font-size:.68rem;color:var(--muted)}
+.acupoint-item .ap-fn{font-size:.68rem;color:#555}
+
+/* ===== 调养 ===== */
+.lifestyle-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.lifestyle-card{background:#f8f8f6;border-radius:5px;padding:.55rem;font-size:.75rem;border-left:3px solid var(--accent)}
+.lifestyle-card h4{font-size:.72rem;color:var(--accent);margin-bottom:.2rem}
+.lifestyle-card ul{margin-left:1rem}
+.lifestyle-card li{margin:.2rem 0}
+
+/* ===== 语音状态 ===== */
+.voice-status{font-size:.7rem;color:var(--muted);text-align:center;padding:.25rem;border-radius:3px;background:#f4f4f4;margin-top:.5rem}
+.voice-status.listening{border:1px solid var(--accent);color:var(--accent)}
+.voice-status.recording{animation:pulse 1.2s infinite}
+
+/* ===== 空状态 ===== */
+.empty-state{text-align:center;padding:1.5rem;color:var(--muted);font-size:.78rem}
+
+/* ===== 页脚 ===== */
+footer{text-align:center;padding:1.5rem;font-size:.68rem;color:var(--muted);border-top:1px solid var(--line);margin-top:2rem}
+
+/* ===== 打印 PDF ===== */
+@media print{
+  body{background:#fff}
+  header,.actions,.skip-link{display:none!important}
+  .main-grid{display:block!important;padding:0;max-width:100%}
+  .card{box-shadow:none;border:1px solid #ccc;page-break-inside:avoid;margin-bottom:1rem}
+  .media-slot{border:1px solid #ccc;min-height:auto}
+  footer{display:none}
+  h1{font-size:1.2rem}
+  h2{font-size:.85rem}
+}
+
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.95}}

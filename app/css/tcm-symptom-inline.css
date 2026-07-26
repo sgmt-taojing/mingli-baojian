@@ -1,0 +1,86 @@
+
+
+/* === Extracted from tcm-symptom.html
+:root{
+  --ink:#080808;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;
+  --paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;
+  --gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;
+  --cinn:#c0392b;--cinn2:#e74c3c;
+  --jade:#27ae60;--jade2:#2ecc71;
+  --cyan:#2980b9;--cyan2:#5dade2;
+  --wood:#8d6e63;--earth:#a08060;--metal:#95a5a6;
+  --danger:#dc3545;--success:#2ecc71;--warn:#e67e22;
+  --border:rgba(201,168,76,.15);
+  --bg:#080808;--card:rgba(255,255,255,0.04);--card2:rgba(255,255,255,0.06);
+  --shadow:0 4px 24px rgba(0,0,0,.5);
+  --violet:#8e44ad;--violet2:#9b59b6;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--paper);font-family:'Noto Serif SC',serif;line-height:1.8;min-height:100vh}
+.nav-bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:8px 16px;background:var(--ink2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:9999;backdrop-filter:blur(12px)}
+.file-nav-btn{color:var(--paper3);text-decoration:none;font-size:12px;padding:5px 14px;border:1px solid rgba(201,168,76,0.12);border-radius:16px;transition:all .25s;font-family:'Noto Serif SC',serif;letter-spacing:1px;white-space:nowrap;cursor:pointer;background:none}
+.file-nav-btn:hover{background:rgba(201,168,76,0.1);color:var(--gold);border-color:rgba(201,168,76,0.3)}
+.file-nav-btn.active{background:rgba(201,168,76,0.12);color:var(--gold);border-color:rgba(201,168,76,0.35)}
+.header{background:linear-gradient(135deg,var(--ink3),var(--ink));border-bottom:1px solid var(--border);padding:24px;text-align:center}
+.header h1{font-size:22px;color:var(--gold);letter-spacing:4px;margin-bottom:6px}
+.header p{color:var(--paper3);font-size:13px;letter-spacing:2px;opacity:.7}
+.container{max-width:1100px;margin:0 auto;padding:24px 16px}
+.warning{background:rgba(231,76,60,.06);border:1px solid rgba(231,76,60,.15);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:12px;color:var(--cinn2);opacity:.8;line-height:1.6}
+/* 步骤指示器 */
+.steps{display:flex;gap:4px;margin-bottom:24px;flex-wrap:wrap}
+.step-indicator{flex:1;min-width:140px;padding:10px 12px;background:var(--card);border:1px solid var(--border);border-radius:10px;text-align:center;font-size:12px;color:var(--paper3);transition:all .25s;cursor:pointer}
+.step-indicator.active{background:rgba(201,168,76,.08);border-color:rgba(201,168,76,.3);color:var(--gold)}
+.step-indicator.done{background:rgba(39,174,96,.06);border-color:rgba(39,174,96,.2);color:var(--jade2)}
+.step-num{font-size:18px;font-weight:bold;display:block;margin-bottom:2px}
+/* 输入区 */
+.input-section{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
+.input-section h3{color:var(--gold);font-size:15px;letter-spacing:2px;margin-bottom:12px}
+.form-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.form-input{flex:1;min-width:200px;padding:10px 14px;background:var(--ink2);border:1px solid var(--border);border-radius:8px;color:var(--paper);font-size:13px;font-family:inherit;outline:none}
+.form-input:focus{border-color:var(--gold)}
+.form-label{font-size:12px;color:var(--paper3);margin-bottom:4px;display:block}
+textarea.form-input{min-height:100px;resize:vertical;line-height:1.8}
+/* 症状选择 */
+.symptom-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;margin-top:10px}
+.symptom-chip{padding:8px 12px;background:var(--ink2);border:1px solid var(--border);border-radius:20px;font-size:12px;color:var(--paper3);cursor:pointer;transition:all .2s;text-align:center}
+.symptom-chip:hover{border-color:rgba(201,168,76,.3);color:var(--gold)}
+.symptom-chip.selected{background:rgba(201,168,76,.12);border-color:var(--gold);color:var(--gold)}
+/* 按钮 */
+.btn-primary{padding:12px 32px;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.3);border-radius:10px;color:var(--gold);cursor:pointer;font-size:14px;font-family:inherit;letter-spacing:2px;transition:all .25s;display:block;margin:16px auto 0}
+.btn-primary:hover{background:rgba(201,168,76,.2);transform:translateY(-1px)}
+.btn-primary:disabled{opacity:.95;cursor:not-allowed;transform:none}
+/* 结果区 */
+.result-section{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px;display:none}
+.result-section.visible{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.result-title{font-size:15px;font-weight:bold;color:var(--gold);letter-spacing:2px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.result-body{font-size:13px;line-height:1.9;color:var(--paper);opacity:.9}
+.result-body b{color:var(--gold2)}
+/* 证候卡片 */
+.syndrome-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:8px}
+.syndrome-name{font-size:14px;font-weight:bold;color:var(--gold);margin-bottom:4px}
+.syndrome-desc{font-size:12px;color:var(--paper3);line-height:1.7}
+/* 名医卡片 */
+.doctor-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:8px;display:flex;gap:12px}
+.doctor-info{flex:1}
+.doctor-name{font-size:14px;font-weight:bold;color:var(--gold);margin-bottom:2px}
+.doctor-era{font-size:11px;color:var(--paper3);opacity:.6}
+.doctor-expertise{font-size:12px;color:var(--paper2);margin-top:4px}
+.doctor-match{padding:4px 10px;border-radius:12px;font-size:11px;background:rgba(39,174,96,.12);color:var(--jade2);border:1px solid rgba(39,174,96,.2);white-space:nowrap}
+/* 命理分析 */
+.mingli-section{border-left:3px solid var(--violet2);padding-left:14px;margin-bottom:12px}
+.mingli-section h4{color:var(--violet2);font-size:13px;margin-bottom:6px}
+/* 周易方案 */
+.hexagram-solution{border-left:3px solid var(--cyan2);padding-left:14px;margin-bottom:12px}
+.hexagram-solution h4{color:var(--cyan2);font-size:13px;margin-bottom:6px}
+/* 大白话 */
+.plain-summary{margin-top:14px;padding:12px 16px;background:rgba(52,152,219,.04);border-left:3px solid var(--cyan2);border-radius:0 8px 8px 0}
+.plain-title{font-size:13px;font-weight:bold;color:var(--cyan2);margin-bottom:4px}
+.plain-body{font-size:12px;color:var(--paper);line-height:1.8}
+/* 导出 */
+.export-bar{margin-top:16px;text-align:center;display:flex;gap:6px;justify-content:center}
+.export-btn{font-size:12px;color:var(--gold);background:none;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 20px;cursor:pointer;letter-spacing:2px;font-family:inherit;transition:all .25s}
+.export-btn:hover{background:rgba(201,168,76,.1);border-color:rgba(201,168,76,.4)}
+.footer{text-align:center;padding:24px;color:var(--paper3);font-size:11px;opacity:.95}
+@media(max-width:1200px){.container{max-width:960px}}
+@media(max-width:768px){.container{padding:16px 12px}.symptom-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr))}.step-indicator{min-width:100px;font-size:11px}}
