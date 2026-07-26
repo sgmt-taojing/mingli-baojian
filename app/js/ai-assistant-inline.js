@@ -32,6 +32,12 @@ const KB_SOURCES = [
   {name:'NIHAISHA_STRUCTURED_KB', entryId:'nihaisha-structured-v1', modelEntryCount:118, obj:()=>window.NIHAISHA_STRUCTURED_KB, mods:['zhongyi','qimen','fengshui','jingdian'], weight:1.2},
   {name:'FAITH_KB', entryId:'faith-model-v1', modelEntryCount:167, obj:()=>window.FAITH_KB, mods:['faith','mingshi'], weight:0.8},
   {name:'MINGXIANG_CROSS_KB', entryId:'mingxiang-cross-v1', modelEntryCount:28, obj:()=>window.MINGXIANG_CROSS_KB, mods:['mingxiang','cross','mingxiang-cross'], weight:0.85},
+  {name:'HUANGLI_KB', entryId:'huangli-model-v1', modelEntryCount:32, obj:()=>window.HUANGLI_KB, mods:['huangli','zeri'], weight:0.85},
+  {name:'MOBILE_KB', entryId:'mobile-model-v1', modelEntryCount:40, obj:()=>window.MOBILE_KB, mods:['mobile','shouji'], weight:0.85},
+  {name:'TAISUI_KB', entryId:'taisui-model-v1', modelEntryCount:42, obj:()=>window.TAISUI_KB, mods:['taisui','sui','taisui-shuhan'], weight:0.85},
+  {name:'WUXING_KB', entryId:'wuxing-model-v1', modelEntryCount:19, obj:()=>window.WUXING_KB, mods:['wuxing','wuxingpeilian','bazi'], weight:0.9},
+  {name:'XINGMING_KB', entryId:'xingming-model-v1', modelEntryCount:31, obj:()=>window.XINGMING_KB, mods:['xingming','sancai','wuge'], weight:0.85},
+  {name:'ZERI_KB', entryId:'zeri-model-v1', modelEntryCount:42, obj:()=>window.ZERI_KB, mods:['zeri','zeri-zeri','huangli'], weight:0.85},
 ];
 
 function _kbScore(moduleId, data){

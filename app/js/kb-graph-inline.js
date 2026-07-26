@@ -6,18 +6,48 @@
 
   async function load(){
     // 使用 fetch（现代浏览器/移动端/Edge/Firefox/Chrome/Safari 均内置）
-    var r = await fetch('/api/kb/graph', {cache:'no-cache'});
+    // R77: 优先用 cross-ref-graph（32 nodes / 120 links），fallback → /api/kb/graph
+    var r = await fetch('/api/kb/cross-ref-graph?minWeight=2&maxNodes=60', {cache:'no-cache'});
     var j = await r.json();
     if(j.code !== 0){ document.getElementById('stat').textContent='加载失败'; return; }
-    var d = j.data;
-    ALL_NODES = d.nodes.map(function(n){
-      return {id:n.id, label:n.name||n.id, title:'【'+LEVEL_LABEL[n.level]||n.level+'】\nxref:'+(n.xref_count||0)+'  被引用:'+(n.referenced||0)+'  命中:'+(n.hit_count||0)+'\n'+n.id, group:n.level, value:n.xref_count||1, color:{background:LEVEL_COLOR[n.level]||'#888',border:'#c9a84c'}};
+    // R77: cross-ref-graph API → vis-network 格式适配
+    if (!j.ok) { document.getElementById('stat').textContent='加载失败: '+(j.error||'?'); return; }
+    // 计算 level 分组（从 group 字段或默认 'tcm'）
+    var levelCounts = {};
+    j.nodes.forEach(function(n) {
+      var lv = n.group || 'tcm';
+      levelCounts[lv] = (levelCounts[lv]||0) + 1;
     });
-    ALL_EDGES = d.edges.map(function(e){ return {from:e.source, to:e.target, value:Math.min(e.weight,16), arrows:'to', color:{color:'rgba(201,168,76,.35)',highlight:'#c9a84c'}}; });
-    document.getElementById('stat').innerHTML = '模块 <b>' + d.stats.total_modules + '</b> · 引用边 <b>' + d.stats.total_xrefs + '</b> · 孤立 <b>' + (d.stats.isolated||[]).length + '</b>';
-    renderLegend(d.stats.by_level);
+    // 节点：id/label/value/group/title
+    ALL_NODES = j.nodes.map(function(n){
+      var lv = n.group || 'tcm';
+      return {
+        id: n.id,
+        label: n.label || n.id,
+        title: '【'+lv+'】\n条目: '+(n.count||0)+'\n模块: '+n.id,
+        group: lv,
+        value: n.count || 1,
+        color: {background: LEVEL_COLOR[lv]||'#888', border: '#c9a84c'}
+      };
+    });
+    // 边：source/target → from/to
+    ALL_EDGES = j.links.map(function(lk){
+      return {
+        from: lk.source,
+        to: lk.target,
+        value: Math.min(lk.weight||1, 16),
+        arrows: 'to',
+        color: {color: 'rgba(201,168,76,.35)', highlight: '#c9a84c'}
+      };
+    });
+    var isolatedCount = j.nodes.filter(function(n){ 
+      return !j.links.some(function(lk){ return lk.source===n.id || lk.target===n.id; });
+    }).length;
+    document.getElementById('stat').innerHTML = '模块 <b>' + j.totalModules + '</b> · 引用边 <b>' + j.totalEdges + '</b> · 孤立 <b>' + isolatedCount + '</b>';
+    renderLegend(levelCounts);
     draw(ALL_NODES, ALL_EDGES);
     fillModFilter();
+
   }
 
   function draw(nodes, edges){
@@ -71,7 +101,19 @@
     if(!mod){ alert('请先选择模块'); return; }
     _currentRecSource = mod;
     try {
-      var r = await fetch('/api/kb/recommend?module=' + encodeURIComponent(mod) + '&limit=8', {cache:'no-cache'});
+      // R77: cross-ref-graph 内置关联，直接从 links 过滤
+      if (graphData && graphData.links) {
+        var relatedNodes = {};
+        graphData.links.filter(function(lk) { return lk.source === mod || lk.target === mod; })
+          .forEach(function(lk) {
+            var other = lk.source === mod ? lk.target : lk.source;
+            relatedNodes[other] = (relatedNodes[other] || 0) + lk.weight;
+          });
+        var sorted = Object.entries(relatedNodes).sort((a,b) => b[1]-a[1]).slice(0,8).map(e => e[0]);
+        highlightNodes(sorted);
+      } else {
+        var r2 = await fetch('/api/kb/recommend?module=' + encodeURIComponent(mod) + '&limit=8', {cache:'no-cache'});
+      }
       var j = await r.json();
       var d = j.data || j;
       _currentRecs = (d.recommendations || []).map(function(x){ return x.id; });
