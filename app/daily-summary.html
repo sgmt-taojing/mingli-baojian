@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>今日完成 · 易道智鉴</title>
+  <link rel="stylesheet" href="css/mobile-nav.css">
+  <style>
+    :root{--ink:#0a0a0f;--ink2:#111;--ink3:#1a1a1a;--paper:#e8e0d0;--paper2:#c9bfa8;--paper3:#a09888;--gold:#c9a84c;--gold2:#e8cc7a;--jade:#10b981;--cinn:#ef4444;--cyan:#63b3ed;--violet:#8e44ad;--border:rgba(201,168,76,.18)}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--ink);color:var(--paper);min-height:100vh;padding:12px;line-height:1.6}
+    .wrap{max-width:760px;margin:0 auto;padding-top:16px}
+    h1{font-size:20px;color:var(--gold);margin-bottom:2px}
+    .sub{font-size:12px;color:var(--paper3);margin-bottom:14px}
+    .hero-card{
+      background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(147,51,234,.06));
+      border:1px solid var(--border);border-radius:12px;
+      padding:18px 20px;margin-bottom:14px;position:relative;overflow:hidden;
+    }
+    .hero-card::before{
+      content:'';position:absolute;top:0;left:0;right:0;height:2px;
+      background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.8;
+    }
+    .hero-date{font-size:11px;color:var(--paper3);letter-spacing:2px;margin-bottom:6px}
+    .hero-count{font-size:42px;font-weight:700;color:var(--gold2);line-height:1}
+    .hero-label{font-size:12px;color:var(--paper3);margin-top:4px;letter-spacing:1px}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+    .stat-card{
+      background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;
+      padding:14px 16px;position:relative;overflow:hidden;
+    }
+    .stat-card .lbl{font-size:11px;color:var(--paper3);letter-spacing:1px;margin-bottom:4px}
+    .stat-card .val{font-size:26px;font-weight:700;line-height:1}
+    .stat-card .sub{font-size:10px;color:var(--paper3);margin-top:4px}
+    .val-green{color:#10b981}.val-gold{color:var(--gold2)}.val-cyan{color:var(--cyan)}.val-violet{color:var(--violet)}
+    .list-card{
+      background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;
+      padding:14px 16px;margin-bottom:10px;
+    }
+    .list-card h3{font-size:13px;color:var(--paper2);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+    .item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.03);font-size:12px;line-height:1.5}
+    .item:last-child{border:none}
+    .item .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);margin-top:6px;flex-shrink:0}
+    .item .txt{flex:1;color:var(--paper2)}
+    .item .time{font-size:10px;color:var(--paper3);flex-shrink:0}
+    .empty{text-align:center;color:var(--paper3);padding:30px 10px;font-size:12px;line-height:1.8}
+    .empty small{opacity:.5}
+    .refresh-bar{display:flex;gap:8px;margin-bottom:12px;align-items:center}
+    .btn-s{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:rgba(201,168,76,.1);border:1px solid var(--border);border-radius:6px;color:var(--paper);cursor:pointer;font-size:11px;transition:.2s}
+    .btn-s:hover{background:rgba(201,168,76,.2)}
+    .btn-s:active{transform:scale(.96)}
+    @media(max-width:480px){.grid{grid-template-columns:1fr}.hero-count{font-size:34px}body{padding:8px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>📊 今日完成情况</h1>
+    <p class="sub" id="dateLabel">--</p>
+
+    <div class="refresh-bar">
+      <button class="btn-s" onclick="loadSummary()">🔄 刷新</button>
+      <button class="btn-s" onclick="location.href='ai-assistant.html'">💬 AI 助手</button>
+    </div>
+
+    <div class="hero-card">
+      <div class="hero-date" id="heroDate">TODAY</div>
+      <div class="hero-count" id="heroCount">0</div>
+      <div class="hero-label">今日完成 · R-items</div>
+    </div>
+
+    <div class="grid">
+      <div class="stat-card">
+        <div class="lbl">COMMITS</div>
+        <div class="val val-green" id="statCommits">0</div>
+        <div class="sub">git 提交</div>
+      </div>
+      <div class="stat-card">
+        <div class="lbl">FILES</div>
+        <div class="val val-gold" id="statFiles">0</div>
+        <div class="sub">新增 / 修改</div>
+      </div>
+      <div class="stat-card">
+        <div class="lbl">KB HITS</div>
+        <div class="val val-cyan" id="statKb">0</div>
+        <div class="sub">KB 直答次数</div>
+      </div>
+      <div class="stat-card">
+        <div class="lbl">PAGES</div>
+        <div class="val val-violet" id="statPages">0</div>
+        <div class="sub">覆盖页面</div>
+      </div>
+    </div>
+
+    <div class="list-card">
+      <h3>📋 今日 R-items</h3>
+      <div id="rList"><div class="empty">暂无数据（运行诊断后自动记录）</div></div>
+    </div>
+
+    <div class="list-card">
+      <h3>⏱ 操作时间轴</h3>
+      <div id="timeline"><div class="empty">暂无记录</div></div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  'use strict';
+
+  var STORAGE_KEY = '***';
+  var TIMELINE_KEY = '***';
+
+  function today(){
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  function readDaily(){
+    try {
+      var all = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      return all[today()] || { rItems: [], commits: 0, files: 0 };
+    } catch(e) { return { rItems:[], commits:0, files:0 }; }
+  }
+
+  function readTimeline(){
+    try {
+      var tl = JSON.parse(localStorage.getItem(TIMELINE_KEY) || '[]');
+      return tl.filter(function(e){ return e.day === today(); });
+    } catch(e) { return []; }
+  }
+
+  function esc(s){ return String(s).replace(/[<>"&]/g, function(c){ return {'<':'&lt;','>':'&gt;','"':'&quot;','&':'&amp;'}[c]; }); }
+
+  function loadSummary(){
+    var data = readDaily();
+    var tl = readTimeline();
+    var todayStr = today();
+    var d = new Date();
+    var weekDays = ['周日','周一','周二','周三','周四','周五','周六'];
+    document.getElementById('dateLabel').textContent = todayStr + ' ' + weekDays[d.getDay()];
+    document.getElementById('heroDate').textContent = todayStr;
+    document.getElementById('heroCount').textContent = data.rItems.length;
+
+    document.getElementById('statCommits').textContent = data.commits || 0;
+    document.getElementById('statFiles').textContent = data.files || 0;
+
+    // KB hits today
+    try {
+      var kbHits = 0;
+      for (var k in localStorage) {
+        if (k.indexOf('_kb_hit_today') === 0) { kbHits += parseInt(localStorage[k]) || 0; }
+      }
+      document.getElementById('statKb').textContent = kbHits;
+    } catch(e){}
+
+    // Mobile-nav coverage
+    var pages = 0;
+    try {
+      var navCount = parseInt(localStorage.getItem('_mobile_nav_pages') || '49');
+      document.getElementById('statPages').textContent = navCount;
+    } catch(e){}
+
+    // R-items
+    var rList = document.getElementById('rList');
+    if (data.rItems.length === 0) {
+      rList.innerHTML = '<div class="empty">今日暂无 R-item 记录<br><small>完成 R-item 后自动记录到 localStorage</small></div>';
+    } else {
+      var html = '';
+      data.rItems.forEach(function(r){
+        html += '<div class="item"><span class="dot"></span><span class="txt">' + esc(r.title || r.id) + '</span></div>';
+      });
+      rList.innerHTML = html;
+    }
+
+    // Timeline
+    var tlEl = document.getElementById('timeline');
+    if (tl.length === 0) {
+      tlEl.innerHTML = '<div class="empty">暂无记录<br><small>完成 R-item 后自动记录时间轴</small></div>';
+    } else {
+      var thtml = '';
+      tl.forEach(function(e){
+        var ts = new Date(e.ts);
+        var t = String(ts.getHours()).padStart(2,'0') + ':' + String(ts.getMinutes()).padStart(2,'0');
+        thtml += '<div class="item"><span class="dot" style="background:var(--cyan)"></span><span class="txt">' + esc(e.text || '') + '</span><span class="time">' + t + '</span></div>';
+      });
+      tlEl.innerHTML = thtml;
+    }
+  }
+
+  // Public: 由其他页面/脚本调用
+  window.DailySummary = {
+    recordR: function(title, id){
+      var all = {};
+      try { all = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e){}
+      var day = all[today()] || { rItems:[], commits:0, files:0 };
+      if (!day.rItems.some(function(r){ return r.id === id; })) {
+        day.rItems.push({ id: id, title: title || id, ts: Date.now() });
+        all[today()] = day;
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); } catch(e){}
+      }
+    },
+    recordCommit: function(n){
+      var all = {};
+      try { all = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e){}
+      var day = all[today()] || { rItems:[], commits:0, files:0 };
+      day.commits = (day.commits || 0) + (n || 1);
+      all[today()] = day;
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); } catch(e){}
+    },
+    recordFile: function(n){
+      var all = {};
+      try { all = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e){}
+      var day = all[today()] || { rItems:[], commits:0, files:0 };
+      day.files = (day.files || 0) + (n || 1);
+      all[today()] = day;
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); } catch(e){}
+    },
+    addTimeline: function(text){
+      var tl = [];
+      try { tl = JSON.parse(localStorage.getItem(TIMELINE_KEY) || '[]'); } catch(e){}
+      tl.push({ day: today(), ts: Date.now(), text: text });
+      if (tl.length > 50) tl = tl.slice(-50);
+      try { localStorage.setItem(TIMELINE_KEY, JSON.stringify(tl)); } catch(e){}
+    },
+    refresh: loadSummary
+  };
+
+  // Auto-load on ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadSummary);
+  } else {
+    loadSummary();
+  }
+})();
+</script>
+</body>
+</html>

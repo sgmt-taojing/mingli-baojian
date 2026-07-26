@@ -12,6 +12,7 @@
     { href: 'ai-assistant.html', icon: '🤖', label: 'AI助手', key: 'assistant' },
     { href: 'kb-hot.html', icon: '🔥', label: 'KB热词', key: 'kb-hot' },
     { href: 'kb-quality.html', icon: '⭐', label: 'KB质量', key: 'kb-quality' },
+    { href: 'daily-summary.html', icon: '📊', label: '今日完成', key: 'daily' },
     { href: 'kb-graph.html', icon: '🕸️', label: '图谱', key: 'kb-graph' },
     { href: 'lifeplan-detail.html', icon: '🧭', label: '人生规划', key: 'lifeplan' },
     { href: 'camera-capture.html', icon: '📸', label: '拍照', key: 'camera' },
