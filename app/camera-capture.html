@@ -118,6 +118,7 @@ label{display:block;font-size:12px;color:var(--paper2);letter-spacing:1.5px;marg
         <label for="modeSel">采集模式</label>
         <select id="modeSel" aria-label="modeSel">
           <option value="face">面相分析（人脸识别 + AI 分析）</option>
+          <option value="tongue">舌诊分析（中医舌象 + 五脏辨证）</option>
           <option value="ocr">通用 OCR（字/文档/卦象）</option>
           <option value="ocr-tcm">中医病历 OCR（处方/舌苔）</option>
         </select>
@@ -127,6 +128,14 @@ label{display:block;font-size:12px;color:var(--paper2);letter-spacing:1.5px;marg
         <label for="deviceSel">摄像头设备</label>
         <select id="deviceSel" aria-label="deviceSel"><option value="">默认（自动选择）</option></select>
         <button class="btn-ghost" id="refreshDevBtn" style="margin-top:6px;padding:7px 12px;font-size:11px">↻ 刷新设备列表</button>
+      </div>
+
+      <div class="field" style="border-top:1px dashed rgba(201,168,76,.18);padding-top:10px;margin-top:6px">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="audioEnable" style="width:auto;flex-shrink:0">
+          <span>🎤 启用麦克风（拾音器·与 KB 联动）</span>
+        </label>
+        <select id="micSel" aria-label="micSel" style="margin-top:6px"><option value="">默认（自动选择）</option></select>
       </div>
 
       <button class="btn" id="startBtn">▶ 启动摄像头</button>
@@ -196,6 +205,12 @@ const status = document.getElementById('status');
 const startBtn = document.getElementById('startBtn');
 const snapBtn = document.getElementById('snapBtn');
 const autoBtn = document.getElementById('autoBtn');
+const audioEnable = document.getElementById('audioEnable');
+const micSel = document.getElementById('micSel');
+let audioContext = null;
+let analyser = null;
+let audioCanvas = null;
+let audioAnimId = null;
 const stopBtn = document.getElementById('stopBtn');
 const refreshDevBtn = document.getElementById('refreshDevBtn');
 const deviceSel = document.getElementById('deviceSel');
@@ -223,6 +238,11 @@ async function refreshDevices() {
     deviceSel.innerHTML = '<option value="">默认（自动选择）</option>' +
       cams.map((c, i) => `<option value="${c.deviceId}">${c.label || ('Camera ' + i)}</option>`).join('');
     setStatus(`检测到 ${cams.length} 个摄像头`, 'ok');
+    // 同时枚举麦克风
+    const mics = devices.filter(d => d.kind === 'audioinput');
+    micSel.innerHTML = '<option value="">默认（自动选择）</option>' +
+      mics.map((c, i) => `<option value="${c.deviceId}">${c.label || ('Mic ' + i)}</option>`).join('');
+    if (mics.length === 0) audioEnable.disabled = true;
   } catch (e) {
     setStatus('设备枚举失败：' + e.message, 'err');
   }
@@ -234,7 +254,7 @@ async function start() {
     const constraints = {
       video: deviceId ? {deviceId: {exact: deviceId}, width: {ideal: 1920}, height: {ideal: 1080}}
                        : {width: {ideal: 1280}, height: {ideal: 720}, facingMode: 'user'},
-      audio: false
+      audio: audioEnable.checked ? {deviceId: micSel.value ? {exact: micSel.value} : undefined, echoCancellation: true, noiseSuppression: true} : false
     };
     stream = await navigator.mediaDevices.getUserMedia(constraints);
     video.srcObject = stream;
@@ -251,7 +271,19 @@ async function start() {
     autoBtn.disabled = false;
     stopBtn.disabled = false;
 
-    await refreshDevices();
+    // 麦克风可视化 + KB 联动提示
+    if (audioEnable.checked) {
+      const audioTracks = stream.getAudioTracks();
+      if (audioTracks.length > 0) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioContext.createMediaStreamSource(stream);
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        source.connect(analyser);
+        startAudioVisualizer();
+        setStatus('实时采集中… 设备：' + (track.label || 'unknown') + ' 🎤 麦克风：' + (audioTracks[0].label || 'active'), 'ok');
+      }
+    }
   } catch (e) {
     setStatus('启动失败：' + e.message, 'err');
   }
@@ -263,6 +295,9 @@ function stop() {
     stream = null;
   }
   if (autoTimer) { clearInterval(autoTimer); autoTimer = null; autoBtn.textContent = '🔁 自动采集（每 3s）'; }
+  if (audioAnimId) { cancelAnimationFrame(audioAnimId); audioAnimId = null; }
+  if (audioContext && audioContext.state !== 'closed') audioContext.close().catch(()=>{});
+  audioContext = null; analyser = null;
   video.srcObject = null;
   video.style.display = 'none';
   placeholder.style.display = 'flex';
@@ -273,6 +308,47 @@ function stop() {
   autoBtn.disabled = true;
   stopBtn.disabled = true;
   setStatus('已停止', '');
+}
+
+function startAudioVisualizer() {
+  // 在 video 上盖一个 canvas 显示音量条 + KB 能量值
+  const wrap = document.querySelector('.video-wrap') || video.parentElement;
+  if (!audioCanvas) {
+    audioCanvas = document.createElement('canvas');
+    audioCanvas.width = 320; audioCanvas.height = 48;
+    audioCanvas.style.cssText = 'position:absolute;left:8px;bottom:8px;z-index:10;border-radius:6px;background:rgba(0,0,0,.5);pointer-events:none';
+    wrap.appendChild(audioCanvas);
+  }
+  const buf = new Uint8Array(analyser.frequencyBinCount);
+  function tick() {
+    analyser.getByteFrequencyData(buf);
+    const ctx = audioCanvas.getContext('2d');
+    ctx.clearRect(0, 0, audioCanvas.width, audioCanvas.height);
+    const bars = 32;
+    const step = Math.floor(buf.length / bars);
+    let peak = 0;
+    for (let i = 0; i < bars; i++) {
+      let sum = 0;
+      for (let j = 0; j < step; j++) sum += buf[i * step + j];
+      const v = sum / step / 255;
+      if (v > peak) peak = v;
+      const h = v * audioCanvas.height * 0.9;
+      const g = ctx.createLinearGradient(0, audioCanvas.height - h, 0, audioCanvas.height);
+      g.addColorStop(0, peak > 0.6 && i > bars * 0.7 ? '#ff6b6b' : '#c9a84c');
+      g.addColorStop(1, '#8c6a30');
+      ctx.fillStyle = g;
+      ctx.fillRect(i * (audioCanvas.width / bars) + 1, audioCanvas.height - h, audioCanvas.width / bars - 2, h);
+    }
+    // 右侧能量值（KB 联动提示音）
+    ctx.fillStyle = '#f5f1e8';
+    ctx.font = '14px sans-serif';
+    ctx.fillText('🎤 ' + Math.round(peak * 100) + '%', audioCanvas.width - 50, 18);
+    if (peak > 0.7) {
+      ctx.fillText('🔥 KB?', audioCanvas.width - 50, 36);
+    }
+    audioAnimId = requestAnimationFrame(tick);
+  }
+  tick();
 }
 
 async function snap() {
@@ -331,10 +407,35 @@ async function analyze(blob) {
     const text = j.analysis || j.text || '(无文本结果)';
     analysis.innerHTML = `<div style="font-size:11px;color:var(--paper3);margin-bottom:8px">引擎：${j.engine} · 用时 ${j.elapsed_ms}ms · 字节 ${j.bytes}</div><div>${escape(text)}</div>`;
     setStatus('✓ 分析完成 · ' + j.engine, 'ok');
+    // KB 联动: 把 AI 识别结果按模式注入 _MODULE_REPORTS，供下次咨询参考
+    injectKb(mode, blob, text, j.engine);
   } catch (e) {
     analysis.innerHTML = `<div class="analysis-empty" style="color:var(--danger)">✗ 网络错误：${e.message}<br>请确认 face-ocr-server 在 8913 端口运行</div>`;
     setStatus('上传失败：' + e.message, 'err');
   }
+}
+
+/* KB 联动: 把面诊/舌诊/眼诊结果缓存到 localStorage, 供 AI 助手查询 */
+function injectKb(mode, blob, text, engine) {
+  const key = `_kb_camera_${mode}_${Date.now()}`;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      localStorage.setItem(key, JSON.stringify({
+        mode, engine, text,
+        thumb: reader.result.slice(0, 512) + '...', // 截断 base64 缩略
+        time: new Date().toISOString(),
+        size: blob.size
+      }, 0, 200)); // 只存前 200 字符避免溢出
+      // 打 KB 命中计数
+      const cnt = parseInt(localStorage.getItem('_kb_hit_count/camera-' + mode) || '0') + 1;
+      localStorage.setItem('_kb_hit_count/camera-' + mode, String(cnt));
+      // 更新 KB 就绪 badge
+      const badge = document.getElementById('kbFallbackBadge');
+      if (badge) badge.textContent = `✅ KB 采集 +${cnt} (camera-${mode})`;
+    } catch (e) { /* localStorage 满 */ }
+  };
+  reader.readAsDataURL(blob);
 }
 
 function escape(s) { return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
