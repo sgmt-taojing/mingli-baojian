@@ -3730,3 +3730,51 @@ body:not(.wechat) .wechat-disclaimer{display:none}
   50%  { transform: scale(1.25); background: rgba(201,168,76,0.35); }
   100% { transform: scale(1); background: rgba(201,168,76,0.08); }
 }
+
+/* R31-D: 冷启动引导 + 日重置提示 */
+.kb-hot-strip-cold {
+  background: linear-gradient(135deg, rgba(100,180,255,0.05), rgba(100,180,255,0.01));
+  border-color: rgba(100,180,255,0.15);
+}
+.kb-cold-start {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 20px 16px;
+  text-align: center;
+}
+.kb-cold-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+.kb-cold-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary, #333);
+}
+.kb-cold-text {
+  font-size: 0.78rem;
+  color: var(--text-secondary, #888);
+  max-width: 260px;
+  line-height: 1.5;
+}
+.kb-cold-btn {
+  margin-top: 8px;
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 8px;
+  background: rgba(201,168,76,0.12);
+  border: 1px solid rgba(201,168,76,0.3);
+  color: var(--accent-gold, #c9a84c);
+  font-size: 0.82rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+.kb-cold-btn:hover {
+  background: rgba(201,168,76,0.2);
+  border-color: rgba(201,168,76,0.5);
+}
+@media (max-width: 768px) {
+  .kb-cold-start { padding: 14px 10px; }
+}

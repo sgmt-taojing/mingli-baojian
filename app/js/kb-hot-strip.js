@@ -51,7 +51,32 @@
     }
   }
 
-  /** 推荐总数统计 */
+  /** 推荐总数统计 (按“日”重置: 过 24 点重新计数) */
+  function todayKey() {
+    var d = new Date();
+    return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+  }
+  function checkDailyReset() {
+    try {
+      var ls = window.localStorage;
+      if (!ls) return;
+      var today = todayKey();
+      var last = ls.getItem('_kb_recommend_date');
+      if (last !== today) {
+        // 过 0 点: 清零所有 REC_PREFIX + 写入今日标记
+        var removed = 0;
+        for (var i = ls.length - 1; i >= 0; i--) {
+          var k = ls.key(i);
+          if (k && k.indexOf(REC_PREFIX) === 0) {
+            ls.removeItem(k);
+            removed++;
+          }
+        }
+        ls.setItem('_kb_recommend_date', today);
+        if (removed > 0) console.log('[kb-hot-strip] 重置 ' + removed + ' 个推荐计数 · 今日 ' + today);
+      }
+    } catch (e) {}
+  }
   function readLocalRec() {
     try {
       var ls = window.localStorage || null;
@@ -225,9 +250,31 @@
   /**
    * 主入口
    */
+  /**
+   * 冷启动引导 (本地+服务端都空时显示)
+   */
+  function renderColdStart(host) {
+    if (!host) return;
+    host.innerHTML =
+      '<div class="kb-hot-title">'
+      + '<span class="kb-hot-icon">💡</span>'
+      + '<span>KB 热门知识</span>'
+      + '</div>'
+      + '<div class="kb-cold-start">'
+      + '<div class="kb-cold-icon">🌱</div>'
+      + '<div class="kb-cold-title">还未生成 KB 命中</div>'
+      + '<div class="kb-cold-text">先去 AI 助手问一个问题，热门知识会随使用自动出现</div>'
+      + '<a class="kb-cold-btn" href="ai-assistant.html">去看看 AI 助手 →</a>'
+      + '</div>';
+    host.style.display = 'block';
+    host.classList.add('kb-hot-strip-cold');
+  }
+
   function init() {
     var host = document.getElementById(STRIP_ID);
     if (!host) return;
+    // R31-D 跨日重置
+    checkDailyReset();
     var local = readLocalTop();
     if (local.length > 0) {
       // 本地已有命中数据 → 用本地（实时、零延迟）
@@ -238,7 +285,8 @@
         if (server.length > 0) {
           renderStrip(host, server);
         } else {
-          host.style.display = 'none';
+          // R31-D 冷启动引导
+          renderColdStart(host);
         }
       });
     }
