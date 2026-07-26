@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KB 模块覆盖审计 · 命理宝鉴</title>
+<link rel="stylesheet" href="css/ai-assistant-inline.css?v=20260726">
+<style>
+  :root{--good:#10b981;--warn:#c9a84c;--bad:#f44336}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--paper);font-family:system-ui,-apple-system,sans-serif;padding:16px}
+  h1{font-size:18px;font-weight:600;margin:0 0 4px;color:var(--gold2)}
+  h1 span{font-size:11px;color:var(--paper3);font-weight:normal;margin-left:8px}
+  .sub{font-size:12px;color:var(--paper3);margin-bottom:16px}
+  .summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:20px}
+  .stat-card{background:rgba(13,17,23,.6);border:1px solid rgba(201,168,76,.1);border-radius:8px;padding:14px;text-align:center}
+  .stat-val{font-size:24px;font-weight:700;color:var(--gold2)}
+  .stat-lbl{font-size:11px;color:var(--paper3);margin-top:4px}
+  .section-title{font-size:14px;font-weight:600;color:var(--paper2);margin:20px 0 10px;border-bottom:1px solid rgba(201,168,76,.1);padding-bottom:6px}
+  .cov-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:10px}
+  .cov-card{background:rgba(13,17,23,.5);border:1px solid rgba(201,168,76,.08);border-radius:8px;padding:12px;transition:border-color .2s}
+  .cov-card:hover{border-color:rgba(201,168,76,.25)}
+  .cov-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+  .cov-name{font-size:14px;font-weight:600;color:var(--paper)}
+  .cov-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
+  .cov-badge.full{background:rgba(16,185,129,.15);color:var(--good);border:1px solid rgba(16,185,129,.3)}
+  .cov-badge.partial{background:rgba(201,168,76,.15);color:var(--warn);border:1px solid rgba(201,168,76,.3)}
+  .cov-badge.missing{background:rgba(244,67,54,.15);color:var(--bad);border:1px solid rgba(244,67,54,.3)}
+  .cov-body{font-size:12px;color:var(--paper3);line-height:1.6}
+  .cov-body b{color:var(--paper2)}
+  .kb-mods{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+  .kb-tag{font-size:10px;padding:2px 6px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.15);border-radius:4px;color:var(--paper2)}
+  .back-link{display:inline-block;margin-bottom:12px;font-size:12px;color:var(--gold2);text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.2);border-radius:4px}
+  .back-link:hover{background:rgba(201,168,76,.06)}
+  @media(max-width:768px){.cov-grid{grid-template-columns:1fr}.summary-grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:320px){.summary-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<h1>🗺️ KB 模块覆盖审计 <span>R56 · AI 助手 ↔ KB 映射</span></h1>
+<p class="sub" id="sub">加载中…</p>
+<a class="back-link" href="kb-quality.html">← 质量审计</a>
+<a class="back-link" href="ai-assistant.html">← AI 助手</a>
+
+<div class="summary-grid" id="summary"></div>
+
+<div class="section-title">📋 AI 助手 29 模块 → KB 覆盖详情</div>
+<div class="cov-grid" id="covGrid"></div>
+
+<div class="section-title">📦 KB 独有模块（未接入 AI 助手）</div>
+<div class="cov-grid" id="extraGrid"></div>
+
+<script>
+(function(){
+'use strict';
+
+var API = location.hostname.indexOf('github.io') >= 0 ? 'https://mingli-baojian-api.onrender.com' : 'http://127.0.0.1:8920';
+
+// AI 助手 29 模块 → KB 模块名映射
+var AI_MOD_MAP = {
+  'bazi':        {kb:['bazi'], name:'八字排盘'},
+  'yunshi':      {kb:['r39_career_core','r39_dual_core'], name:'运势'},
+  'caiyun':      {kb:['r39_dual_core','r39_career_core'], name:'财运'},
+  'ganqing':     {kb:['r39_dual_core'], name:'感情'},
+  'zhongyi':     {kb:['tcm','tcm-fangji','tcm-zhongfu','tcm-diagnosis','huangdi-neijing','shennong-bencao','jinkui','shuhan-tcm','r45_tcm','r39_health_core'], name:'中医'},
+  'mobile':      {kb:['mobile'], name:'手机号'},
+  'shiye':       {kb:['r39_career_core','r39_dual_core'], name:'事业'},
+  'xingming':    {kb:['xingming'], name:'姓名'},
+  'zeri':        {kb:['zeri'], name:'择日'},
+  'huangli':     {kb:['huangli'], name:'黄历'},
+  'taisui':      {kb:['taisui'], name:'太岁'},
+  'music':       {kb:[], name:'五行音乐'},
+  'lifeindex':   {kb:['r39_health_core','r39_dual_core'], name:'生命指数'},
+  'lifeplan':    {kb:['lifeplan','r45_lifeplan','r41_lifeplan_stage','r39_lifeplan_stage'], name:'人生规划'},
+  'tcm-fangji':  {kb:['tcm-fangji'], name:'TCM 方剂'},
+  'tcm-classic': {kb:['classics','huangdi-neijing','shennong-bencao','jinkui','shanghan-lun'], name:'TCM 经典'},
+  'tcm-zhongfu': {kb:['tcm-zhongfu'], name:'脏腑辨证'},
+  'shanghan-lun':{kb:['shanghan-lun'], name:'伤寒论'},
+  'acupuncture': {kb:['acupuncture'], name:'针灸'},
+  'shuhan':      {kb:['shuhan','shuhan-tcm','tianji-jiangjie'], name:'舒晗'},
+  'wuxing':      {kb:['wuxing'], name:'五行'},
+  'fengshui':    {kb:['fengshui','r45_huajie','r45_huajie_ext','huajie','r41_dh_huajie4'], name:'风水'},
+  'qimen':       {kb:['qimen','r45_palace','r45_palace_ext','r45_shishen','r45_shishen_ext','r39_palace_12'], name:'奇门遁甲'},
+  'ziwei':       {kb:['ziwei'], name:'紫微斗数'},
+  'liuyao':      {kb:['liuyao','yijing'], name:'六爻'},
+  'meihua':      {kb:['meihua'], name:'梅花易数'},
+  'liuren':      {kb:['liuren'], name:'大六壬'},
+  'yanzhi':      {kb:['yanzhi'], name:'颜痣相术'},
+  'mingxiang':   {kb:['r45_palace_ext','r45_shishen_ext','r39_dual_core'], name:'明象'}
+};
+
+fetch(API + '/api/kb/quality-report')
+  .then(function(r){return r.json();})
+  .then(function(j){
+    var d = j.data || j;
+    var kbMods = {};
+    d.modules.forEach(function(m){kbMods[m.module] = m;});
+
+    // 统计覆盖
+    var fullCnt=0, partialCnt=0, missingCnt=0;
+    var totalKbEntries=0;
+    var covData = [];
+
+    Object.keys(AI_MOD_MAP).forEach(function(aiMod){
+      var info = AI_MOD_MAP[aiMod];
+      var mapped = info.kb.map(function(kbName){
+        var m = kbMods[kbName];
+        if(!m) return null;
+        totalKbEntries += m.cnt;
+        return {name:kbName, cnt:m.cnt, avg:m.avg_trust, grade:m.grade};
+      }).filter(Boolean);
+
+      var status, badgeClass;
+      if(mapped.length === 0){
+        status = 'missing'; badgeClass='missing'; missingCnt++;
+      } else if(mapped.length >= 2 || mapped[0].cnt >= 40){
+        status = 'full'; badgeClass='full'; fullCnt++;
+      } else {
+        status = 'partial'; badgeClass='partial'; partialCnt++;
+      }
+
+      covData.push({aiMod:aiMod, name:info.name, kbMods:mapped, status:status, badgeClass:badgeClass});
+    });
+
+    // KB 独有
+    var aiMappedKbMods = new Set();
+    Object.values(AI_MOD_MAP).forEach(function(info){
+      info.kb.forEach(function(k){aiMappedKbMods.add(k);});
+    });
+    var kbExtra = d.modules.filter(function(m){
+      return !aiMappedKbMods.has(m.module);
+    }).sort(function(a,b){return b.cnt-a.cnt;});
+
+    // 渲染 summary
+    var summaryCards = [
+      {val:fullCnt+'/'+29, lbl:'全覆盖模块', cls:'var(--good)'},
+      {val:partialCnt+'/'+29, lbl:'部分覆盖', cls:'var(--warn)'},
+      {val:missingCnt+'/'+29, lbl:'未覆盖', cls:'var(--bad)'},
+      {val:d.summary.module_cnt, lbl:'KB 总模块', cls:'var(--gold2)'},
+      {val:kbExtra.length, lbl:'KB 独有模块', cls:'var(--paper2)'},
+      {val:d.summary.total, lbl:'KB 总条目', cls:'var(--gold2)'}
+    ];
+    document.getElementById('summary').innerHTML = summaryCards.map(function(c){
+      return '<div class="stat-card"><div class="stat-val" style="color:'+c.cls+'">'+c.val+'</div><div class="stat-lbl">'+c.lbl+'</div></div>';
+    }).join('');
+
+    document.getElementById('sub').textContent = '覆盖率 ' + Math.round(fullCnt*100/29) + '% · 最后更新 ' + new Date(d.generatedAt).toLocaleString('zh-CN');
+
+    // 渲染覆盖详情
+    document.getElementById('covGrid').innerHTML = covData.map(function(c){
+      var statusText = c.status==='full'?'✅ 充足':c.status==='partial'?'⚠️ 不足':'❌ 缺失';
+      var kbTags = c.kbMods.map(function(k){
+        return '<span class="kb-tag">'+k.name+' ('+k.cnt+')</span>';
+      }).join('') || '<span style="color:var(--bad);font-size:11px">无 KB 数据</span>';
+      return '<div class="cov-card">'+
+        '<div class="cov-head"><span class="cov-name">'+c.aiMod+' <span style="color:var(--paper3);font-weight:normal">('+c.name+')</span></span>'+
+        '<span class="cov-badge '+c.badgeClass+'">'+statusText+'</span></div>'+
+        '<div class="cov-body"><b>KB 模块：</b>'+c.kbMods.length+' 个 · '+(c.kbMods.reduce(function(s,k){return s+k.cnt;},0))+' 条</div>'+
+        '<div class="kb-mods">'+kbTags+'</div>'+
+      '</div>';
+    }).join('');
+
+    // 渲染 KB 独有
+    document.getElementById('extraGrid').innerHTML = kbExtra.map(function(m){
+      return '<div class="cov-card" style="opacity:.8">'+
+        '<div class="cov-head"><span class="cov-name">'+m.module+'</span>'+
+        '<span class="cov-badge" style="background:rgba(201,168,76,.1);color:var(--paper2);border:1px solid rgba(201,168,76,.2)">'+m.grade+'</span></div>'+
+        '<div class="cov-body"><b>'+m.cnt+'</b> 条 · avg trust '+m.avg_trust+'</div>'+
+      '</div>';
+    }).join('');
+  })
+  .catch(function(e){
+    document.getElementById('sub').textContent = '加载失败：' + e.message;
+  });
+})();
+</script>
+</body>
+</html>
