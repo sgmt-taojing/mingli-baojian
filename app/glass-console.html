@@ -448,6 +448,8 @@ $('#btnConnect').onclick = async () => {
       State.connected = true;
       State.mock = false;
       State.deviceId = 'RK-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+      State.deviceToken = State.deviceId;
+      localStorage.setItem('_glass_device_token', State.deviceToken);
       State.battery = 87 + Math.floor(Math.random() * 10);
       State.network = navigator.onLine ? '5G' : 'WiFi';
       toast('✓ 已连接 Rokid 智镜', 'ok');
@@ -467,6 +469,8 @@ $('#btnMock').onclick = () => {
   State.connected = true;
   State.mock = true;
   State.deviceId = 'MOCK-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+  State.deviceToken = State.deviceId;
+  localStorage.setItem('_glass_device_token', State.deviceToken);
   State.battery = 75 + Math.floor(Math.random() * 25);
   State.network = 'Mock-5G';
   toast('✓ Mock 模式已启动', 'ok');
@@ -822,6 +826,14 @@ setInterval(refreshMirror, 15000);
 renderHistory();
 refreshMirror();
 refreshStatus();
+
+// R76-fix: 启动时拉取 CSRF token（用于所有 POST）
+fetch('/api/csrf-token').then(r => r.json()).then(d => {
+  if (d.csrfToken) {
+    State.csrfToken = d.csrfToken;
+    console.log('[CSRF] 已获取 token:', d.csrfToken.slice(0, 12) + '...');
+  }
+}).catch(e => console.warn('[CSRF] 获取失败：', e.message));
 $('#btnRefreshLive').onclick = () => {
   $('#liveFortune').textContent = '运势 ' + (60 + Math.floor(Math.random()*40));
   $('#liveHealth').textContent = ['气血充盈','注意作息','多饮温水','疏肝解郁','脾胃调养'][Math.floor(Math.random()*5)];
