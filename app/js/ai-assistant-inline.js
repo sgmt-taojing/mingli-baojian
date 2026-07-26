@@ -509,7 +509,7 @@ function showWelcome(){
   }catch(e){ /* 隐私模式静默 */ }
   if(todayN>0 || totalN>0){
     const topTxt = topMod ? ' · 最强：'+topMod+'('+fmt(topCnt)+')' : '';
-    html+='<div style="text-align:center;margin-top:8px;font-size:11px;color:var(--paper3)">📊 今日 KB 直答 '+fmt(todayN)+' / 累计 '+fmt(totalN)+' 次'+topTxt+'</div>';
+    html+='<div style="text-align:center;margin-top:8px;font-size:11px;color:var(--paper3)">📊 今日 KB 直答 '+fmt(todayN)+' / 累计 '+fmt(totalN)+' 次'+topTxt+' &nbsp; <a href="javascript:void(0)" onclick="showFbStats()" style="color:var(--gold);text-decoration:underline">反馈统计</a></div>';
   }
   // 显示用户档案摘要
   if(window.MLBJ_USER){
@@ -3216,4 +3216,72 @@ window.fbReport = function(btn, val) {
   } catch(e) {
     btn.innerHTML = '✅';
   }
+};
+
+// ============ R50: 反馈统计面板 ============
+window.showFbStats = async function() {
+  const fmt = function(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,','); };
+  let html = '<div class="fb-stats-panel" style="background:rgba(201,168,76,0.03);border:1px solid var(--border);border-radius:10px;padding:14px;margin:10px 0">';
+  html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><strong style="color:var(--gold)">📊 反馈统计</strong><a href="javascript:void(0)" onclick="showWelcome()" style="color:var(--paper3);font-size:12px">← 返回</a></div>';
+
+  // 本地统计
+  let localUp = 0, localDn = 0, topMod = null, topCnt = 0;
+  const breakdown = [];
+  try {
+    const tot = JSON.parse(localStorage.getItem('_fb_score/_total') || '{"up":0,"dn":0}');
+    localUp = tot.up; localDn = tot.dn;
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!k || !k.indexOf('_fb_score/') === 0) continue;
+      if (k === '_fb_score/_total') continue;
+      const mod = k.substring('_fb_score/'.length);
+      const v = JSON.parse(localStorage.getItem(k) || '{"up":0,"dn":0}');
+      const cnt = v.up + v.dn;
+      breakdown.push({ mod: mod, up: v.up, dn: v.dn, total: cnt });
+      if (cnt > topCnt) { topCnt = cnt; topMod = mod; }
+    }
+    breakdown.sort((a, b) => b.total - a.total);
+  } catch(e) {}
+
+  const localTotal = localUp + localDn;
+  const localRate = localTotal > 0 ? (localUp / localTotal * 100).toFixed(1) : '—';
+  html += '<div style="margin-bottom:12px;padding:10px;background:rgba(0,0,0,0.2);border-radius:8px">';
+  html += '<div style="font-size:11px;color:var(--paper3);margin-bottom:6px">本地统计</div>';
+  html += '<div style="font-size:18px;color:var(--gold)">👍 ' + fmt(localUp) + ' &nbsp; 👎 ' + fmt(localDn) + ' &nbsp; 命中率 ' + localRate + '%</div>';
+  if (topMod) html += '<div style="font-size:11px;color:var(--paper3);margin-top:4px">最强反馈：' + topMod + ' (' + topCnt + ' 次)</div>';
+  html += '</div>';
+
+  // 服务端统计
+  let serverInfo = '';
+  try {
+    const r = await fetch((typeof API !== 'undefined' ? API : '') + '/api/public/kb-feedback-stats?days=7');
+    const j = await r.json();
+    const d = j.data || {};
+    if (d.total !== undefined) {
+      serverInfo = '<div style="margin-bottom:12px;padding:10px;background:rgba(0,0,0,0.2);border-radius:8px">';
+      serverInfo += '<div style="font-size:11px;color:var(--paper3);margin-bottom:6px">服务端统计 (近 ' + (d.date_from || '7天') + ' 起)</div>';
+      serverInfo += '<div style="font-size:18px;color:var(--gold)">👍 ' + fmt(d.positive||0) + ' &nbsp; 👎 ' + fmt(d.negative||0) + ' &nbsp; 命中率 ' + (d.helpful_rate||0) + '%</div>';
+      serverInfo += '<div style="font-size:11px;color:var(--paper3);margin-top:4px">总反馈 ' + (d.total||0) + ' 条</div>';
+      serverInfo += '</div>';
+    }
+  } catch(e) {}
+
+  html += serverInfo;
+
+  // 按模块细分
+  if (breakdown.length > 0) {
+    html += '<div style="font-size:11px;color:var(--paper3);margin-bottom:6px">按模块细分</div>';
+    html += '<table style="width:100%;font-size:11px;border-collapse:collapse">';
+    html += '<tr style="border-bottom:1px solid var(--border)"><th align="left" style="padding:4px">模块</th><th align="right" style="padding:4px">👍</th><th align="right" style="padding:4px">👎</th><th align="right" style="padding:4px">率</th></tr>';
+    breakdown.slice(0, 12).forEach(b => {
+      const rate = (b.up + b.dn) > 0 ? (b.up / (b.up + b.dn) * 100).toFixed(0) : '—';
+      html += '<tr style="border-bottom:1px solid rgba(255,255,255,.05)"><td style="padding:4px">' + b.mod + '</td><td align="right" style="padding:4px">' + b.up + '</td><td align="right" style="padding:4px">' + b.dn + '</td><td align="right" style="padding:4px;color:' + (rate >= 70 ? '#10b981' : (rate < 50 && rate !== '—' ? '#ef4444' : 'var(--paper3)')) + '">' + rate + '%</td></tr>';
+    });
+    html += '</table>';
+  } else {
+    html += '<div style="text-align:center;color:var(--paper3);font-size:11px;margin-top:12px">尚无反馈数据。请在报告下点 👍 或 👎</div>';
+  }
+  html += '</div>';
+
+  chat.innerHTML = html;
 };

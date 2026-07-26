@@ -6,56 +6,9 @@
   <title>易道智鉴 · 功德系统</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --ink: var(--ink); --paper: var(--paper); --gold: var(--gold); --gold2: var(--gold2);
-      --jade: var(--jade);;--gold3:#a08030;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;--paper3:#a09080;--steel:#7f8c8d}
-    body {
-      font-family: 'Noto Serif SC', serif;
-      background: var(--ink); color: var(--paper);
-      margin: 0; padding: 20px; min-height: 100vh; text-align: center;
-    }
-    .merit-circle {
-      width: 200px; height: 200px; border-radius: 50%;
-      border: 4px solid var(--gold); margin: 40px auto;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      background: radial-gradient(circle, var(--ink3) 0%, var(--ink) 100%);
-      box-shadow: 0 0 30px rgba(201,168,76,0.2);
-    }
-    .merit-num { font-size: 48px; color: var(--gold); font-weight: bold; }
-    .merit-label { color: var(--steel); margin-top: 5px; }
-    .quick-actions {
-      display: grid; grid-template-columns: repeat(2, 1fr);
-      gap: 15px; max-width: 400px; margin: 40px auto;
-    }
-    .action-btn {
-      background: var(--ink2); border: 1px solid var(--ink4); border-radius: 12px;
-      padding: 20px; cursor: pointer; transition: all 0.3s;
-    }
-    .action-btn:hover {
-      border-color: var(--jade); transform: scale(1.05);
-    }
-    .action-icon { font-size: 32px; margin-bottom: 8px; }
-    .action-text { color: var(--paper); font-size: 14px; }
-    .action-merit { color: var(--jade); font-size: 12px; margin-top: 5px; }
-    .info-box {
-      background: var(--ink2); border: 1px solid var(--ink4); border-radius: 12px;
-      padding: 25px; max-width: 500px; margin: 30px auto; text-align: left;
-    }
-    .info-title { color: var(--gold2); margin-bottom: 15px; }
-    .info-list { color: var(--steel); line-height: 2; }
-    .nav-bar {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: var(--ink); border-top: 1px solid var(--ink4);
-      display: flex; justify-content: center; padding: 12px;
-    }
-    .nav-btn {
-      background: transparent; border: none; color: var(--steel);
-      padding: 10px 20px; cursor: pointer;
-    }
-    .nav-btn:hover { color: var(--gold); }
-  </style>
+  
   <link rel="stylesheet" href="css/a11y-fix.css">
+<link rel="stylesheet" href="css/merit-system-inline.css">
 </head>
 <body>
   <a class="skip-link" href="#main-content">跳到主内容</a>
@@ -132,19 +85,10 @@
   
   <script src="js/ui-toast.js" defer></script>
 <script src="js/toast-helper.js"></script>
-<script>
-    var merit = parseInt(localStorage.getItem('qianyuan_merit') || '0');
-    document.getElementById('meritNum').textContent = merit;
-    
-    function addMerit(n) {
-      merit += n;
-      localStorage.setItem('qianyuan_merit', merit);
-      document.getElementById('meritNum').textContent = merit;
-      showToast('功德 +' + n + '，当前功德：' + merit);
-    }
-  </script>
+
   <script src="js/a11y-divination-hub.js" defer></script>
   
 </main>
+<script src="js/merit-system-inline.js" defer></script>
 </body>
 </html>
