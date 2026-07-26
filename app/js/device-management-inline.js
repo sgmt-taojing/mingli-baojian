@@ -337,6 +337,61 @@ async function init() {
   setInterval(checkAllServices, 30000);
 
   console.log('[DevicePlatform] 总设备数：' + allDevices.length, '桥接器：', Object.keys(platform.bridges).join(','));
+
+  // R62: 设备 ↔ KB 联动桥（拍照/采集 → 自动 recordKbHit）
+  if (window.DeviceKbBridge && typeof window.DeviceKbBridge.attach === 'function') {
+    window.DeviceKbBridge.attach(platform);
+    // 全局事件：设备采集 → 刷新 KB 联动 badge
+    window.addEventListener('device:kb:capture', function (e) {
+      log('📸 [' + e.detail.icon + '] 已联动 KB · ' + e.detail.label + ' (记录到 ' + e.detail.module + ')', 'ok');
+      refreshKbBadges();
+    });
+    // 首次渲染 KB 状态
+    setTimeout(refreshKbBadges, 800);
+  }
+  // 提供手动触发接口（给拍照页跳过来用）
+  window.onDeviceCapture = function (capability, extra) {
+    if (window.DeviceKbBridge) window.DeviceKbBridge.onCapture(capability, extra);
+  };
 }
+
+/**
+ * R62: 设备卡 KB 联动 badge 刷新
+ */
+function refreshKbBadges() {
+  if (!window.DeviceKbBridge) return;
+  const grid = document.getElementById('deviceGrid');
+  if (!grid) return;
+  const cards = grid.querySelectorAll('.device-card');
+  // 简化：在 grid 顶部加一条 KB 联动状态条
+  let bar = document.getElementById('kb-bind-bar');
+  const recent = window.DeviceKbBridge.getRecentContext();
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.id = 'kb-bind-bar';
+    bar.style.cssText = 'grid-column:1/-1;padding:12px;margin-bottom:14px;background:linear-gradient(135deg,rgba(62,158,107,.08),rgba(201,168,76,.05));border:1px solid rgba(62,158,107,.3);border-radius:var(--radius);font-size:12px';
+    grid.insertBefore(bar, grid.firstChild);
+  }
+  if (recent.length === 0) {
+    bar.innerHTML = '<span style="color:var(--paper3)">⚪ KB 待联动</span> · <span style="font-size:10px;color:var(--paper3)">设备拍照/录音后将自动记录到知识库</span>';
+  } else {
+    const modules = {};
+    recent.forEach(e => {
+      if (e.module && (!modules[e.module])) modules[e.module] = e;
+    });
+    const tags = Object.values(modules).map(m => '<span style="display:inline-block;padding:4px 10px;margin-right:6px;border-radius:8px;background:rgba(62,158,107,.15);color:var(--ok);border:1px solid rgba(62,158,107,.3)">' + m.icon + ' ' + m.label + ' ×' + recent.filter(e => e.module === m.module).length + '</span>').join('');
+    bar.innerHTML = '<span style="color:var(--gold);letter-spacing:2px">⚡ KB 实时联动</span> · ' + tags + '<span style="font-size:10px;color:var(--paper3);margin-left:8px">最近 5 分钟 · AI 助手下次查询自动加权</span>';
+  }
+}
+
+// R62: API 供 AI 助手拉取
+window.getDeviceContext = function () {
+  if (!window.DeviceKbBridge) return [];
+  return window.DeviceKbBridge.getRecentContext();
+};
+window.getDeviceModuleBoost = function () {
+  if (!window.DeviceKbBridge) return {};
+  return window.DeviceKbBridge.getModuleBoost();
+};
 
 init();
