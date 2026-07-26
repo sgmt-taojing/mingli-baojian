@@ -34,7 +34,7 @@ h1{font-size:1.6rem;color:var(--gold);text-align:center;margin:20px 0 4px}
 
 /* Module Grid */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
-.mod{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;transition:all .2s;cursor:pointer}
+.mod{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;transition:all .2s;cursor:pointer;text-align:left;font:inherit;color:inherit;width:100%;display:block}
 .mod:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 4px 16px rgba(201,168,76,.15)}
 .mod:hover{border-color:var(--gold-dim)}
 .mod-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
@@ -115,7 +115,7 @@ h1{font-size:1.6rem;color:var(--gold);text-align:center;margin:20px 0 4px}
 
 <button class="export-btn" onclick="exportCSV()">📥 导出 CSV</button>
 <button class="refresh" onclick="load()" title="刷新">🔄</button>
-<div id="modal" class="modal-bg" onclick="if(event.target===this)closeModal()">
+<dialog id="modal" class="modal-bg" aria-label="模块详情">
   <div class="modal">
     <button class="close" onclick="closeModal()">×</button>
     <h3 id="modalTitle"></h3>
@@ -131,7 +131,7 @@ h1{font-size:1.6rem;color:var(--gold);text-align:center;margin:20px 0 4px}
       <div id="modalDetail"><p style="color:#888">加载中…</p></div>
     </div>
   </div>
-</div>
+</dialog>
 
 <script>
 let DATA=null;
@@ -233,6 +233,8 @@ function showDetail(mod){
   document.getElementById('modalSamples').innerHTML='<p style="color:#888">加载中…</p>';
   document.getElementById('modalDetail').innerHTML='<p style="color:#888">加载中…</p>';
   document.getElementById('modal').classList.add('show');
+  const dlg=document.getElementById('modal');
+  if(typeof dlg.showModal==='function'){try{dlg.showModal();}catch(e){}}
   switchTab('samples');
   // 拉样本
   fetch(`/api/public/kb-query?q=*&module=${encodeURIComponent(mod)}&limit=8`)
@@ -282,7 +284,11 @@ function switchTab(name){
   document.getElementById('tab-samples').style.display=name==='samples'?'':'none';
   document.getElementById('tab-detail').style.display=name==='detail'?'':'none';
 }
-function closeModal(){document.getElementById('modal').classList.remove('show');}
+function closeModal(){
+  const dlg=document.getElementById('modal');
+  if(typeof dlg.close==='function'){try{dlg.close();}catch(e){}}
+  dlg.classList.remove('show');
+}
 function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 
