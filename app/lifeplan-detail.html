@@ -795,7 +795,9 @@ function calcTrendAdvice(dayuns, shichen){
   document.getElementById('input').style.display='none';
   location.hash='#'+btoa(unescape(encodeURIComponent(JSON.stringify({age:d.age,sex:d.sex,residence:d.residence,focus:d.focus,extra:d.extra}))));
 
-  html += renderLifeplanDashboardR38();
+  // 把 R38 健康/事业双核 + 4 阶段蓝图挂到报告上方
+  const dashHtml = renderLifeplanDashboardR38();
+  document.getElementById('report').insertAdjacentHTML('afterbegin', dashHtml);
 }
 
 function restoreFromHash(){
@@ -863,8 +865,12 @@ function renderLifeplanDashboardR38(){
   h+='</div></div>';
   h+='</div>';
   h+='<div class="lp-verdict"><b style="color:var(--gold)">📅 人生规划总纲：</b><br>① 健康 '+hS+' 分·事业 '+cS+' 分—— 双核均衡者，人生稳步上扬 ② 4 阶段顺序不可颠倒：<b>学龄前筑基 → 中小学塑型 → 大学精进 → 职场婚恋</b> ③ 每阶段健康+事业双线并行，不可偏废 ④ 化解要点：<b style="color:#4a9a6e">健康打底</b>·<b style="color:#4a8aa8">事业领跑</b>·家业传承·终身学习</div>';
+  h+='<div class="lp-source">📜 综合《滴天髓》《子平真诠》《穷通宝鉴》《三命通会》《紫微斗数全集》《太乙金华宗旨》《黄帝内经》《千金要方》《伤寒杂病论》《本草纲目》《了凡四训》《阴骘文》《太上感应篇》《玉历宝钞》《葬书》《撼龙经》《八宅明镜》《玄空飞星》《阳宅三要》《协纪辨方书》《天星择日》《三世因果经》共 22 部古籍</div>';
+  h+='</div>';
+  return h;
+}
 
-/* R41-B 12领域矩阵 */
+/* R41-B 12领域矩阵（全局，供 #lp-stage-timeline 渲染） */
 var LP_12_DOMAIN_R41 = {
   "学龄前":{
     domains:[
@@ -950,11 +956,6 @@ function renderLP_12Domain_R41(){
     });
     h += '</div></div>';
   });
-  return h;
-}
-
-  h+='<div class="lp-source">📜 综合《滴天髓》《子平真诠》《穷通宝鉴》《三命通会》《紫微斗数全集》《太乙金华宗旨》《黄帝内经》《千金要方》《伤寒杂病论》《本草纲目》《了凡四训》《阴骘文》《太上感应篇》《玉历宝钞》《葬书》《撼龙经》《八宅明镜》《玄空飞星》《阳宅三要》《协纪辨方书》《天星择日》《三世因果经》共 22 部古籍</div>';
-  h+='</div>';
   return h;
 }
 </script>
