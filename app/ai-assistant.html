@@ -574,16 +574,17 @@ function renderKbHotChips(){
   top = top.slice(0, 4);
   if (top.length === 0) return '';
 
-  // R34: 模块 id 映射（某些本地模块名对应 ALL_MODS.id）
+  // R34: 模块 id 映射（KB 模块名 → ALL_MODS / MODULES id）
   const MOD_MAP = {
     'bazi': 'bazi', 'ziwei': 'ziwei', 'fengshui': 'fengshui', 'qimen': 'qimen',
-    'tcm': 'tcm', 'tcm-diagnosis': 'tcmSymptom', 'shuhan': 'shuhan',
-    'shanghan-lun': 'shanghan', 'acupuncture': 'acupuncture', 'yijing': 'yijing',
-    'meihua': 'meihua', 'liuyao': 'liuyao', 'liuren': 'liuren',
-    'authority-knowledge': 'bazi', 'faith': 'bazi', 'mantra': 'bazi',
+    'tcm': 'zhongyi', 'tcm-diagnosis': 'zhongyi', 'tcm-fangji': 'zhongyi',
+    'shuhan': 'bazi', 'shanghan-lun': 'zhongyi', 'acupuncture': 'zhongyi',
+    'yijing': 'bazi', 'meihua': 'meihua', 'liuyao': 'liuyao', 'liuren': 'liuren',
+    'huangdi-neijing': 'zhongyi', 'shennong-bencao': 'zhongyi',
+    'jinkui': 'zhongyi', 'classics': 'bazi', 'general': 'bazi',
     'AUTHORITATIVE_KNOWLEDGE': 'bazi', 'FAITH_KNOWLEDGE_BASE': 'bazi',
     'KOUJUE_DATABASE_FULL': 'bazi', 'SCRIPTURE_DATABASE': 'bazi',
-    'lifeplan': 'lifeplan',
+    'lifeplan': 'lifeplan', 'wuxing': 'wuxing',
   };
   const LABELS = {
     'bazi': { name: '八字', icon: '🧮' }, 'ziwei': { name: '紫微', icon: '🌟' },
@@ -601,6 +602,10 @@ function renderKbHotChips(){
   top.forEach(t => {
     const label = LABELS[t.mod] || { name: t.mod.slice(0, 8), icon: '📊' };
     const targetMod = MOD_MAP[t.mod] || t.mod;
+    // 检查目标模块是否存在
+    const exists = (typeof MODULES !== 'undefined' && MODULES[targetMod]) ||
+                   (typeof ALL_MODS !== 'undefined' && ALL_MODS.find(m => m.id === targetMod));
+    if (!exists) return; // 跳过不存在的模块
     html += '<button class="kb-hot-chip" data-mod="' + escapeAttr(targetMod) + '" data-from="' + escapeAttr(t.mod) + '">';
     html += '<span class="kb-hot-chip-icon">' + label.icon + '</span>';
     html += '<span class="kb-hot-chip-name">' + label.name + '</span>';
@@ -630,11 +635,13 @@ function bindKbHotChips(){
         localStorage.setItem(recKey, String((parseInt(localStorage.getItem(recKey) || '0') + 1)));
       } catch (e) {}
       // 直接跳转
-      if (window.MODULES && MODULES[mod]) {
+      const exists = (typeof MODULES !== 'undefined' && MODULES[mod]) ||
+                     (typeof ALL_MODS !== 'undefined' && ALL_MODS.find(m => m.id === mod));
+      if (exists) {
         startModule(mod);
       } else {
         // 模块不存在 → 提示
-        showToast('该模块暂未开放 · 请尝试其他热门模块');
+        toast('该模块暂未开放 · 请尝试其他热门模块');
       }
     });
   });
