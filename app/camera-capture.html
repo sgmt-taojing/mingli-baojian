@@ -90,9 +90,98 @@ label{display:block;font-size:12px;color:var(--paper2);letter-spacing:1.5px;marg
 .gear .price{font-size:11px;color:var(--paper3);margin-bottom:6px}
 .gear .use{font-size:11px;color:var(--paper2);line-height:1.5}
 .gear .tag{display:inline-block;background:rgba(201,168,76,.15);color:var(--gold);font-size:9px;padding:2px 6px;border-radius:3px;margin-right:4px}
+
+/* === R43: 引导框 + 新设备 badge + 语音面板 === */
+.guide-layer{position:absolute;inset:0;z-index:8;pointer-events:none;display:none;align-items:center;justify-content:center}
+.guide-layer.show{display:flex}
+.guide-frame{
+  position:relative;width:62%;aspect-ratio:1;border-radius:50%;
+  border:3px dashed rgba(201,168,76,.75);box-shadow:0 0 0 9999px rgba(0,0,0,.35);
+  animation:guidePulse 2.4s ease-in-out infinite;
+}
+.guide-layer.face .guide-frame{border-radius:50%}
+.guide-layer.tongue .guide-frame{border-radius:42%/60%;width:58%}
+.guide-layer.ocr .guide-frame,.guide-layer.ocr-tcm .guide-frame{border-radius:10px;width:78%;height:62%}
+.guide-label{
+  position:absolute;top:8px;left:50%;transform:translateX(-50%);
+  background:rgba(0,0,0,.7);color:var(--gold);font-size:11px;letter-spacing:2px;
+  padding:4px 12px;border-radius:4px;white-space:nowrap;
+}
+@keyframes guidePulse{0%,100%{opacity:.85}50%{opacity:.55}}
+
+.new-device-badge{
+  position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:11;
+  background:linear-gradient(135deg,#3e9e6b,#2a7a4e);color:#fff;font-size:11px;
+  padding:6px 14px;border-radius:18px;letter-spacing:1px;
+  box-shadow:0 4px 12px rgba(62,158,107,.4);
+  animation:badgeSlideIn .6s cubic-bezier(.34,1.56,.64,1);
+  display:none;
+}
+.new-device-badge.show{display:block}
+@keyframes badgeSlideIn{0%{opacity:0;transform:translate(-50%,-30px)}100%{opacity:1;transform:translate(-50%,0)}}
+
+.voice-panel{
+  margin-top:20px;background:var(--ink3);border:1px solid rgba(201,168,76,.25);
+  border-radius:var(--radius);padding:18px;
+}
+.voice-panel h3{font-size:14px;color:var(--gold);letter-spacing:3px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.voice-panel h3::before{content:'🎙️'}
+.voice-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.voice-btn{
+  padding:14px 22px;background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:var(--ink);border:none;border-radius:50px;cursor:pointer;
+  font-size:13px;font-weight:600;letter-spacing:2px;font-family:inherit;
+  transition:all .15s;display:flex;align-items:center;gap:8px;user-select:none;
+}
+.voice-btn:active{transform:scale(.96)}
+.voice-btn.recording{
+  background:linear-gradient(135deg,#c8503e,#e85040);
+  color:#fff;animation:recordingPulse 1.2s infinite;
+}
+@keyframes recordingPulse{0%,100%{box-shadow:0 0 0 0 rgba(200,80,62,.6)}50%{box-shadow:0 0 0 12px rgba(200,80,62,0)}}
+.voice-hint{font-size:11px;color:var(--paper3);letter-spacing:1px}
+.voice-transcript{
+  background:var(--ink2);border:1px solid rgba(201,168,76,.15);
+  border-radius:6px;padding:12px;min-height:48px;
+  font-size:13px;color:var(--paper);line-height:1.6;
+  margin-bottom:12px;max-height:120px;overflow-y:auto;
+}
+.voice-transcript:empty::before{content:'按住麦克风说话，松开自动查询 KB…';color:var(--paper3);font-style:italic}
+.voice-result{
+  background:linear-gradient(135deg,rgba(62,158,107,.1),rgba(201,168,76,.05));
+  border:1px solid rgba(62,158,107,.3);border-radius:6px;padding:14px;
+  font-size:13px;line-height:1.7;color:var(--paper);
+}
+.voice-result:empty{display:none}
+.voice-result h4{color:var(--gold2);font-size:12px;letter-spacing:2px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.voice-result h4 .src{color:var(--paper3);font-size:10px;font-weight:400}
+.voice-result ol{margin:0;padding-left:22px}
+.voice-result li{margin-bottom:8px;color:var(--paper)}
+.voice-result li strong{color:var(--gold2)}
+.voice-empty{
+  font-size:12px;color:var(--paper3);text-align:center;padding:20px;font-style:italic;
+}
+
+/* === KB 兜底 badge (右上角) === */
+.kb-fallback-badge{
+  position:fixed;top:14px;right:14px;z-index:99;
+  background:rgba(62,158,107,.92);color:#fff;font-size:11px;
+  padding:6px 12px;border-radius:18px;letter-spacing:1px;
+  box-shadow:0 2px 8px rgba(0,0,0,.4);cursor:pointer;
+  display:none;transition:all .2s;
+}
+.kb-fallback-badge:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.5)}
+.kb-fallback-badge.show{display:inline-flex;align-items:center;gap:6px}
+
+@media(max-width:768px){
+  .guide-layer{font-size:.9em}
+  .guide-frame{width:78% !important}
+  .voice-btn{padding:12px 18px;font-size:12px}
+  .kb-fallback-badge{top:8px;right:8px;font-size:10px;padding:4px 9px}
+}
 </style>
 </head>
-<body>
+<body data-kb-module="mobile">
 <div class="wrap">
   <header>
     <h1>桌面摄像头采集</h1>
@@ -109,6 +198,11 @@ label{display:block;font-size:12px;color:var(--paper2);letter-spacing:1.5px;marg
       </div>
       <video id="video" autoplay playsinline muted style="display:none"></video>
       <canvas id="canvas" style="display:none"></canvas>
+      <div class="guide-layer" id="guideLayer">
+        <div class="guide-frame"></div>
+        <div class="guide-label" id="guideLabel">请将面部置于圆框内</div>
+      </div>
+      <div class="new-device-badge" id="newDeviceBadge">🆕 检测到新设备</div>
     </div>
 
     <div class="controls">
@@ -185,6 +279,18 @@ label{display:block;font-size:12px;color:var(--paper2);letter-spacing:1.5px;marg
         <div class="use"><span class="tag">零成本</span><span class="tag">12MP</span>起步用最划算。系统级权限，可做访客自动拍照入库。</div>
       </div>
     </div>
+  </div>
+
+  <div class="kb-fallback-badge" id="kbFallbackBadge" title="KB 兜底就绪，点击查看详情">✅ KB 兜底就绪</div>
+
+  <div class="voice-panel" id="voicePanel" style="display:none">
+    <h3>语音→知识库（拾音器联动）</h3>
+    <div class="voice-row">
+      <button class="voice-btn" id="voiceBtn">🎙️ 按住说话</button>
+      <span class="voice-hint">按住提问（如"湿热体质怎么办"）· 松开自动检索 KB</span>
+    </div>
+    <div class="voice-transcript" id="voiceTranscript"></div>
+    <div class="voice-result" id="voiceResult"></div>
   </div>
 </div>
 
@@ -504,6 +610,145 @@ document.addEventListener('keydown', e => {
     window.snap();
   }
 });
+</script>
+<script src="js/module-reports-kb.js"></script>
+<script src="js/kb-fallback-indicator.js"></script>
+<script>
+// === R43: 引导框 + 新设备 badge + 语音 STT→KB + 设备更新检测 ===
+const GUIDE_HINTS = {
+  face: '请将面部置于圆框内 · 光线均匀',
+  tongue: '请将舌头伸出并置于椭圆框内 · 自然光',
+  ocr: '请将文档/卦象置于方框内 · 水平拍摄',
+  'ocr-tcm': '请对准处方/舌苔 · 保持清晰'
+};
+const GUIDE_CLASSES = {face:'face',tongue:'tongue',ocr:'ocr','ocr-tcm':'ocr'};
+const guideLayer = document.getElementById('guideLayer');
+const guideLabel = document.getElementById('guideLabel');
+const newDeviceBadge = document.getElementById('newDeviceBadge');
+let previousDeviceCount = 0;
+
+function updateGuideForMode() {
+  const m = modeSel.value;
+  guideLayer.className = 'guide-layer show ' + (GUIDE_CLASSES[m] || '');
+  guideLabel.textContent = GUIDE_HINTS[m] || '';
+}
+function showGuide(yes) {
+  guideLayer.classList.toggle('show', yes && !!stream);
+}
+function checkNewDevices(camList) {
+  const curr = camList.map(d => d.deviceId).sort().join(',');
+  const prev = localStorage.getItem('_camera_known_devices') || '';
+  if (prev && curr !== prev && camList.length > (previousDeviceCount || 0)) {
+    newDeviceBadge.classList.add('show');
+    setTimeout(() => newDeviceBadge.classList.remove('show'), 4000);
+  }
+  localStorage.setItem('_camera_known_devices', curr);
+  previousDeviceCount = camList.length;
+}
+
+// === R43: STT → KB 查询 ===
+let recognition = null;
+let isRecording = false;
+let voiceFinalTranscript = '';
+
+function initSTT() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return false;
+  recognition = new SR();
+  recognition.lang = 'zh-CN';
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.onresult = (e) => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) voiceFinalTranscript += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
+    }
+    const vt = document.getElementById('voiceTranscript');
+    if (vt) {
+      vt.innerHTML = escape(voiceFinalTranscript) +
+        (interim ? '<span style="color:var(--gold2);opacity:.8">' + escape(interim) + '</span>' : '');
+    }
+  };
+  recognition.onerror = (e) => { console.warn('STT 错误:', e.error); stopVoice(); };
+  recognition.onend = () => { if (isRecording) { try { recognition.start(); } catch(e){} } };
+  return true;
+}
+
+async function queryKb(query) {
+  if (!query || query.length < 2) return [];
+  try {
+    const r = await fetch('http://127.0.0.1:8920/api/public/kb-search?limit=3&q=' + encodeURIComponent(query));
+    const j = await r.json();
+    return (j.results || []).slice(0, 3);
+  } catch (e) { return []; }
+}
+
+function startVoice() {
+  if (!recognition) {
+    if (!initSTT()) { alert('当前浏览器不支持语音识别，请用 Chrome/Edge'); return; }
+  }
+  isRecording = true;
+  voiceFinalTranscript = '';
+  try { recognition.start(); } catch(e) {}
+  const vb = document.getElementById('voiceBtn');
+  if (vb) vb.classList.add('recording');
+  const vt = document.getElementById('voiceTranscript');
+  if (vt) vt.innerHTML = '';
+  setStatus('🎙️ 拾音中… 松开鼠标停止', '');
+}
+
+async function stopVoice() {
+  isRecording = false;
+  if (recognition) { try { recognition.stop(); } catch(e) {} }
+  const vb = document.getElementById('voiceBtn');
+  if (vb) vb.classList.remove('recording');
+  setStatus('🔍 查询知识库…', '');
+  const query = voiceFinalTranscript.trim();
+  const vr = document.getElementById('voiceResult');
+  if (vr) vr.innerHTML = '<div class="voice-empty">⏳ 正在从 KB 检索相关条目…</div>';
+  const results = await queryKb(query);
+  if (vr) {
+    if (!results || results.length === 0) {
+      vr.innerHTML = '<div class="voice-empty">未找到匹配的 KB 条目，请尝试更具体的描述</div>';
+    } else {
+      vr.innerHTML = '<h4>KB 检索结果 <span class="src">' + escape(query.slice(0,40)) + '</span></h4>' +
+        '<ol>' + results.map(r => '<li><strong>' + escape(r.title||r.name||r.id) + '</strong><br>' +
+          escape((r.summary||r.content||r.text||'').slice(0,140)) + '</li>').join('') + '</ol>';
+    }
+  }
+  setStatus('✓ KB 查询完成 · ' + results.length + ' 条结果', 'ok');
+}
+
+modeSel.addEventListener('change', () => { updateGuideForMode(); showGuide(!!stream); });
+const voiceBtn = document.getElementById('voiceBtn');
+if (voiceBtn) {
+  voiceBtn.addEventListener('mousedown', e => { e.preventDefault(); startVoice(); });
+  voiceBtn.addEventListener('touchstart', e => { e.preventDefault(); startVoice(); });
+  voiceBtn.addEventListener('mouseup', e => { e.preventDefault(); stopVoice(); });
+  voiceBtn.addEventListener('touchend', e => { e.preventDefault(); stopVoice(); });
+  voiceBtn.addEventListener('mouseleave', () => { if (isRecording) stopVoice(); });
+}
+
+// 启动流时显示引导框 + 检测新设备
+const _origStart = start;
+window.start = async function() {
+  await _origStart();
+  showGuide(true);
+  if (devices.filter(d => d.kind === 'videoinput').length > 0) {
+    checkNewDevices(devices.filter(d => d.kind === 'videoinput'));
+  }
+};
+const _origStop = stop;
+window.stop = function() { _origStop(); showGuide(false); };
+
+if (initSTT()) {
+  const vp = document.getElementById('voicePanel');
+  if (vp) vp.style.display = 'block';
+}
+
+updateGuideForMode();
+showGuide(false);
 </script>
 </body>
 </html>
