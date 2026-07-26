@@ -507,5 +507,27 @@
         input.focus();
       });
     });
+
+    // R48: 全局快捷键 ⌘K / Ctrl+K 聚焦搜索框 + 显示快捷键提示
+    if (input && !input.getAttribute('data-kbd-bound')) {
+      input.setAttribute('data-kbd-bound', '1');
+      input.setAttribute('placeholder', (input.getAttribute('placeholder') || '搜索') + '   ⌘K / Ctrl+K');
+    }
+    var isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent || '');
+    if (!window._kbSearchKbdBound) {
+      window._kbSearchKbdBound = true;
+      document.addEventListener('keydown', function (e) {
+        var k = e.key && e.key.toLowerCase();
+        if ((e.metaKey || e.ctrlKey) && k === 'k') {
+          e.preventDefault();
+          // 找到页面上第一个 kb-search-input（kb-search-mount 内的）
+          var target = document.querySelector('.kb-search-input') || input;
+          if (target) {
+            target.focus();
+            target.select && target.select();
+          }
+        }
+      });
+    }
   };
 })();
