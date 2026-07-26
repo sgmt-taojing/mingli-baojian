@@ -44,6 +44,9 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
 .m-rec-dot{width:8px;height:8px;border-radius:50%;box-shadow:0 0 6px currentColor;flex-shrink:0}
 .m-rec-name{flex:1;font-size:12px;color:var(--paper);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .m-rec-score{flex:0 0 auto;font-size:11px;color:#c4b5fd;font-family:ui-monospace,monospace;background:rgba(147,51,234,.15);padding:1px 6px;border-radius:4px}
+.m-rec-fly,.m-rec-go{flex:0 0 auto;background:rgba(147,51,234,.12);border:1px solid rgba(147,51,234,.3);border-radius:4px;color:#c4b5fd;cursor:pointer;font-size:12px;padding:2px 6px;line-height:1;transition:all .15s;text-decoration:none}
+.m-rec-fly:hover,.m-rec-go:hover{background:rgba(147,51,234,.3);border-color:#c4b5fd;color:#fff}
+.m-rec-fly:focus-visible,.m-rec-go:focus-visible{outline:2px solid #c4b5fd;outline-offset:1px}
 .m-rec-foot{font-size:10px;color:var(--paper);opacity:.5;margin-top:8px;text-align:center;font-family:ui-monospace,monospace}
 .modal-close{position:absolute;top:8px;right:12px;background:0 0;border:none;color:var(--paper);font-size:22px;cursor:pointer;padding:4px 8px;border-radius:6px;transition:all .15s}
 .modal-close:hover{background:rgba(201,168,76,.15);color:var(--gold)}
@@ -303,12 +306,14 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
         recs.forEach(function(r, i){
           var color = LEVEL_COLOR[r.level] || '#888';
           var label = LEVEL_LABEL[r.level] || r.level || '';
-          html += '<a class="m-rec-item" href="kb-explorer.html#module=' + encodeURIComponent(r.id) + '" target="_blank" data-fb-target="' + (r.id||'').replace(/"/g,'&quot;') + '" data-fb-source="' + (n.id||'').replace(/"/g,'&quot;') + '" data-fb-score="' + (r.score||0).toFixed(2) + '">' +
+          html += '<div class="m-rec-item" data-fb-target="' + (r.id||'').replace(/"/g,'&quot;') + '" data-fb-source="' + (n.id||'').replace(/"/g,'&quot;') + '" data-fb-score="' + (r.score||0).toFixed(2) + '">' +
             '<span class="m-rec-rank">' + (i+1) + '</span>' +
             '<span class="m-rec-dot" style="background:' + color + '" title="' + label + '"></span>' +
             '<span class="m-rec-name">' + (r.name||r.id) + '</span>' +
             '<span class="m-rec-score">' + (r.score||0).toFixed(2) + '</span>' +
-          '</a>';
+            '<button class="m-rec-fly" type="button" title="在画布上定位到该节点" aria-label="飞到 ' + (r.name||r.id) + '">🔭</button>' +
+            '<a class="m-rec-go" href="kb-explorer.html#module=' + encodeURIComponent(r.id) + '" target="_blank" title="在 KB 中检索" aria-label="检索 ' + (r.name||r.id) + '">↗</a>' +
+          '</div>';
         });
         html += '</div>';
         html += '<div class="m-rec-foot">总关联 ' + (d.total_related||0) + ' · ' + (d.algorithm||'graph-recommend').slice(0, 28) + '</div>';
@@ -317,6 +322,30 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
   };
   window.highlightRecs = highlightRecs;
   window.closeModal = function(){ document.getElementById('modal').classList.remove('show'); };
+  // R39 推荐 fly-to 画布聚焦
+  document.getElementById('modal').addEventListener('click', function(e){
+    var flyBtn = e.target.closest('.m-rec-fly');
+    if(!flyBtn) return;
+    var item = flyBtn.closest('.m-rec-item');
+    if(!item) return;
+    var targetId = item.getAttribute('data-fb-target');
+    if(!targetId || !network) return;
+    // 关 modal + 聚焦画布节点
+    closeModal();
+    // 确保节点在当前画布（如果被搜索筛掉了，先 reset）
+    var exists = ALL_NODES.some(function(n){return n.id === targetId;});
+    if(!exists){
+      // 尝试模糊匹配（id 可能被 kebab 截断）
+      var fuzzy = ALL_NODES.find(function(n){return n.id.indexOf(targetId) >= 0 || targetId.indexOf(n.id) >= 0;});
+      if(fuzzy) targetId = fuzzy.id; else return;
+    }
+    network.focus(targetId, {scale:1.5, animation:{duration:600, easingFunction:'easeInOutQuad'}});
+    // 闪一下边框高亮
+    try {
+      network.setOptions({nodes:{color:{background:'#9333ea',border:'#c9a84c'},borderWidthSelected:4}});
+      setTimeout(function(){ network.setOptions({nodes:{color:{background:undefined,border:undefined},borderWidthSelected:undefined}}); }, 2000);
+    } catch(_){}
+  });
   document.getElementById('modal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
   document.getElementById('recModFilter').addEventListener('change', function(){
     if(this.value) highlightRecs();
