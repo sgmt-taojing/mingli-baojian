@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>AI 视觉引擎配置 · 易道智鉴</title>
+  <link rel="stylesheet" href="css/mobile-nav.css">
+  <style>
+    :root{--ink:#0a0a0f;--ink2:#111;--ink3:#1a1a1a;--paper:#e8e0d0;--paper2:#c9bfa8;--paper3:#a09888;--gold:#c9a84c;--gold2:#e8cc7a;--jade:#10b981;--cinn:#ef4444;--cyan:#63b3ed;--border:rgba(201,168,76,.18)}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--ink);color:var(--paper);min-height:100vh;padding:12px;line-height:1.6}
+    .wrap{max-width:800px;margin:0 auto;padding-top:16px}
+    h1{font-size:20px;color:var(--gold);margin-bottom:4px}
+    .sub{font-size:11px;color:var(--paper3);margin-bottom:14px}
+    .engine{border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:12px;background:rgba(255,255,255,.02)}
+    .engine h3{font-size:15px;color:var(--gold2);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+    .engine .status{margin-left:auto;font-size:11px;padding:3px 8px;border-radius:4px}
+    .status-off{background:rgba(239,68,68,.12);color:#ef4444}
+    .status-on{background:rgba(16,185,129,.12);color:#10b981}
+    .cmd{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-family:Menlo,Consolas,monospace;font-size:12px;color:var(--cyan);margin:8px 0;white-space:pre-wrap;word-break:break-all}
+    .btn{background:transparent;border:1px solid var(--border);color:var(--paper2);padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer;margin-top:6px}
+    .btn:hover{background:rgba(201,168,76,.1);color:var(--gold)}
+    .btn-primary{background:rgba(201,168,76,.15);border-color:var(--gold);color:var(--gold)}
+    .note{font-size:11px;color:var(--paper3);margin-top:8px;line-height:1.6}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin:12px 0}
+    .card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:12px 14px;text-align:center}
+    .card .lbl{font-size:10px;color:var(--paper3);letter-spacing:1px;margin-bottom:4px}
+    .card .val{font-size:24px;font-weight:600}
+    .pass{color:var(--jade)}.fail{color:var(--cinn)}.warn{color:#f59e0b}
+    .steps{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin:12px 0}
+    .steps ol{margin-left:16px;line-height:1.8;color:var(--paper2)}
+    .steps li{margin-bottom:4px}
+    @media(max-width:480px){.grid{grid-template-columns:1fr}body{padding:8px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>⚙️ AI 视觉引擎配置</h1>
+    <p class="sub">face-ocr-server (8913) · 4 AI 引擎 · 当前全部离线</p>
+
+    <div class="grid" id="summaryGrid"></div>
+
+    <div class="steps">
+      <h3 style="color:var(--gold2);margin-bottom:10px">📋 配置步骤</h3>
+      <ol>
+        <li>选择要启用的 AI 引擎（推荐：智谱 GLM-4V）</li>
+        <li>复制对应的环境变量到 launchd plist</li>
+        <li>重启 face-ocr-server：<code style="color:var(--cyan)">launchctl unload ~/Library/LaunchAgents/com.mingli-baojian.face-ocr.plist && launchctl load ~/Library/LaunchAgents/com.mingli-baojian.face-ocr.plist</code></li>
+        <li>刷新此页面验证引擎状态</li>
+      </ol>
+    </div>
+
+    <div id="engines"></div>
+
+    <div class="engine" style="margin-top:16px">
+      <h3>💡 推荐配置</h3>
+      <p class="note">推荐使用<strong style="color:var(--gold)">智谱 GLM-4V</strong>：性价比高、国内访问快、支持图文多模态。需要前往 <a href="https://open.bigmodel.cn/" target="_blank" style="color:var(--cyan)">智谱开放平台</a> 注册并获取 API Key。</p>
+      <div class="cmd" id="recCmd">export ZHIPU_API_KEY="your-api-key-here"</div>
+      <button class="btn btn-primary" onclick="copyRec()">复制配置命令</button>
+      <p class="note" id="copyStatus"></p>
+    </div>
+
+    <div class="engine">
+      <h3>🔧 当前 launchd 配置</h3>
+      <div class="cmd" id="plistCmd">plutil -p ~/Library/LaunchAgents/com.mingli-baojian.face-ocr.plist</div>
+      <button class="btn" onclick="refreshStatus()">🔄 刷新引擎状态</button>
+    </div>
+
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--paper3)">
+      命理宝鉴 · 本地 http://127.0.0.1:8913/health · 在线 <a href="https://sgmt-taojing.github.io/mingli-baojian/app/device-diagnostic.html" style="color:var(--cyan)">device-diagnostic.html</a>
+    </div>
+  </div>
+
+<script>
+(function(){
+  'use strict';
+
+  var engines = [
+    {
+      id: 'zhipu',
+      name: '智谱 GLM-4V',
+      icon: '🧠',
+      envVar: 'ZHIPU_API_KEY',
+      endpoint: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
+      model: 'glm-4v-plus',
+      cost: '中等（约 ¥0.01/张）',
+      pros: '国内访问快、图文多模态、中文理解好',
+      steps: [
+        '前往 <a href="https://open.bigmodel.cn/" target="_blank" style="color:var(--cyan)">open.bigmodel.cn</a> 注册',
+        '创建 API Key（付费额度 ¥18 起步）',
+        '复制 API Key，替换下方的 your-api-key-here',
+        '重启 face-ocr-server 服务'
+      ]
+    },
+    {
+      id: 'openai',
+      name: 'OpenAI GPT-4o Vision',
+      icon: '👁️',
+      envVar: 'OPENAI_API_KEY',
+      endpoint: 'https://api.openai.com/v1/chat/completions',
+      model: 'gpt-4o',
+      cost: '较高（约 $0.01/张）',
+      pros: '多模态能力强、识别精度高',
+      steps: [
+        '前往 platform.openai.com 注册',
+        '生成 API Key',
+        '需科学上网（API 直连）',
+        '重启 face-ocr-server 服务'
+      ]
+    },
+    {
+      id: 'g2claw',
+      name: 'G2Claw（项目代理）',
+      icon: '🐾',
+      envVar: 'G2CLAW_API_KEY',
+      endpoint: 'http://localhost:8080/v1/chat/completions',
+      model: 'auto',
+      cost: '本地（零成本）',
+      pros: '本地推理、无需外网、隐私安全',
+      steps: [
+        '启动项目内 G2Claw 代理服务',
+        '在环境变量中配置 G2CLAW_API_KEY',
+        '重启 face-ocr-server 服务'
+      ]
+    },
+    {
+      id: 'doubao',
+      name: '豆包（字节跳动）',
+      icon: '🫘',
+      envVar: 'DOUBAO_API_KEY',
+      endpoint: 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
+      model: 'doubao-vision',
+      cost: '免费额度 + 按量',
+      pros: '免费额度大、字节生态',
+      steps: [
+        '前往火山引擎火山方舟',
+        '接入豆包模型',
+        '获取 API Key',
+        '重启 face-ocr-server 服务'
+      ]
+    }
+  ];
+
+  function statusBadge(on){
+    return '<span class="status ' + (on ? 'status-on' : 'status-off') + '">' + (on ? 'ONLINE' : 'OFFLINE') + '</span>';
+  }
+
+  function renderEngines(){
+    var el = document.getElementById('engines');
+    var html = '';
+    engines.forEach(function(en){
+      html += '<div class="engine" id="eng-' + en.id + '">' +
+        '<h3>' + en.icon + ' ' + en.name + statusBadge(false) + '</h3>' +
+        '<div class="cmd">环境变量：<code>' + en.envVar + '</code></div>' +
+        '<div class="cmd">模型：<code>' + en.model + '</code></div>' +
+        '<div class="cmd">费用：<code>' + en.cost + '</code></div>' +
+        '<p class="note"><strong>优势：</strong>' + en.pros + '</p>' +
+        '<div class="cmd">配置示例：<br>export ' + en.envVar + '="your-api-key-here"</div>' +
+        '<p class="note">配置后重启 face-ocr-server：<br>' +
+        '<code style="color:var(--cyan)">launchctl unload ~/Library/LaunchAgents/com.mingli-baojian.face-ocr.plist && launchctl load ~/Library/LaunchAgents/com.mingli-baojian.face-ocr.plist</code></p>' +
+        '</div>';
+    });
+    el.innerHTML = html;
+  }
+
+  function renderSummary(){
+    var grid = document.getElementById('summaryGrid');
+    var items = [
+      {lbl:'AI 引擎',val:'4',sub:'智谱/OpenAI/G2Claw/豆包',cls:'val-cyan'},
+      {lbl:'当前在线',val:'0',sub:'需配置 API Key',cls:'fail'},
+      {lbl:'离线兜底',val:'PIL',sub:'Pillow 几何分析',cls:'pass'},
+      {lbl:'8913 服务',val:'200',sub:'face-ocr-server',cls:'pass'}
+    ];
+    grid.innerHTML = items.map(function(it){
+      return '<div class="card"><div class="lbl">'+it.lbl+'</div><div class="val '+it.cls+'">'+it.val+'</div><div class="sub">'+it.sub+'</div></div>';
+    }).join('');
+  }
+
+  async function refreshStatus(){
+    try{
+      var r = await fetch('http://127.0.0.1:8913/health');
+      var d = await r.json();
+      engines.forEach(function(en){
+        var badge = document.querySelector('#eng-' + en.id + ' .status');
+        if(badge){
+          var on = d.engines && d.engines[en.id];
+          badge.className = 'status ' + (on ? 'status-on' : 'status-off');
+          badge.textContent = on ? 'ONLINE' : 'OFFLINE';
+        }
+      });
+      var online = 0;
+      if(d.engines){
+        Object.values(d.engines).forEach(function(v){ if(v) online++; });
+      }
+      var card = document.querySelector('.grid .card:nth-child(2) .val');
+      if(card){ card.textContent = String(online); card.className = 'val ' + (online > 0 ? 'pass' : 'fail'); }
+    } catch(e){
+      console.log('刷新状态失败: ' + e.message);
+    }
+  }
+
+  function copyRec(){
+    var text = 'export ZHIPU_API_KEY="your-api-key-here"';
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(text).then(function(){
+        document.getElementById('copyStatus').textContent = '✅ 已复制到剪贴板，替换 your-api-key-here 为实际 Key';
+      });
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      document.getElementById('copyStatus').textContent = '✅ 已复制，替换 your-api-key-here 为实际 Key';
+    }
+  }
+
+  renderSummary();
+  renderEngines();
+  // 自动刷新
+  setTimeout(refreshStatus, 1000);
+
+  window.refreshEngineStatus = refreshStatus;
+  window.copyRecCmd = copyRec;
+})();
+</script>
+</body>
+</html>
