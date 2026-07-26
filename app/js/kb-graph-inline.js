@@ -2,16 +2,17 @@
 (function(){
   var LEVEL_COLOR = {premium:'#e74c3c',registered:'#3498db',member:'#2ecc71',professional:'#9b59b6',admin:'#f39c12',public:'#1abc9c'};
   var LEVEL_LABEL = {premium:'Premium',registered:'Registered',member:'Member',professional:'Professional',admin:'Admin',public:'Public'};
-  var ALL_NODES = [], ALL_EDGES = [], network = null;
+  var ALL_NODES = [], ALL_EDGES = [], network = null, graphData = null;
 
   async function load(){
     // 使用 fetch（现代浏览器/移动端/Edge/Firefox/Chrome/Safari 均内置）
     // R77: 优先用 cross-ref-graph（32 nodes / 120 links），fallback → /api/kb/graph
     var r = await fetch('/api/kb/cross-ref-graph?minWeight=2&maxNodes=60', {cache:'no-cache'});
     var j = await r.json();
-    if(j.code !== 0){ document.getElementById('stat').textContent='加载失败'; return; }
-    // R77: cross-ref-graph API → vis-network 格式适配
-    if (!j.ok) { document.getElementById('stat').textContent='加载失败: '+(j.error||'?'); return; }
+    // 兼容判断：旧 API 用 code，新 API 用 ok
+    var apiOk = j.ok !== undefined ? j.ok : (j.code === 0);
+    if (!apiOk) { document.getElementById('stat').textContent='加载失败'; return; }
+    graphData = j;
     // 计算 level 分组（从 group 字段或默认 'tcm'）
     var levelCounts = {};
     j.nodes.forEach(function(n) {
@@ -93,46 +94,42 @@
     draw(nodes, edges);
   }
 
-  // R37: 调用 /api/kb/recommend 高亮关联图谱节点
+  // R77: 从 cross-ref-graph links 直接提取关联
   var _currentRecs = [];
   var _currentRecSource = null;
-  async function highlightRecs(){
+  function highlightRecs(){
     var mod = document.getElementById('recModFilter').value;
     if(!mod){ alert('请先选择模块'); return; }
     _currentRecSource = mod;
-    try {
-      // R77: cross-ref-graph 内置关联，直接从 links 过滤
-      if (graphData && graphData.links) {
-        var relatedNodes = {};
-        graphData.links.filter(function(lk) { return lk.source === mod || lk.target === mod; })
-          .forEach(function(lk) {
-            var other = lk.source === mod ? lk.target : lk.source;
-            relatedNodes[other] = (relatedNodes[other] || 0) + lk.weight;
-          });
-        var sorted = Object.entries(relatedNodes).sort((a,b) => b[1]-a[1]).slice(0,8).map(e => e[0]);
-        highlightNodes(sorted);
-      } else {
-        var r2 = await fetch('/api/kb/recommend?module=' + encodeURIComponent(mod) + '&limit=8', {cache:'no-cache'});
+    if (!graphData || !graphData.links) { alert('图谱数据未加载'); return; }
+    // 从 links 中提取与 mod 关联的节点
+    var relatedNodes = {};
+    graphData.links.forEach(function(lk) {
+      if (lk.source === mod) {
+        relatedNodes[lk.target] = (relatedNodes[lk.target]||0) + lk.weight;
+      } else if (lk.target === mod) {
+        relatedNodes[lk.source] = (relatedNodes[lk.source]||0) + lk.weight;
       }
-      var j = await r.json();
-      var d = j.data || j;
-      _currentRecs = (d.recommendations || []).map(function(x){ return x.id; });
-      if(!_currentRecs.length){ alert('该模块暂无推荐'); return; }
-      // 高亮：source 模块 + 推荐图谱 id 在画布中已存在则高亮
-      var focus = new Set([mod].concat(_currentRecs));
-      var hitCount = 0;
-      var nodes = ALL_NODES.map(function(n){
-        var inFocus = focus.has(n.id);
-        if(inFocus) hitCount++;
-        return {id:n.id, opacity:inFocus ? 1 : .12, borderWidth:inFocus?3:1, color:inFocus ? {background:'#9333ea',border:'#c9a84c'} : {background:'#444',border:'#666'}};
-      });
-      var edges = ALL_EDGES.map(function(e){
-        var inFocus = focus.has(e.from) || focus.has(e.to);
-        return {from:e.from, to:e.to, opacity:inFocus ? .9 : .05, color:inFocus ? {color:'#9333ea'} : {color:'rgba(201,168,76,.1)'}};
-      });
-      draw(nodes, edges);
-      document.getElementById('stat').innerHTML = '模块 <b>' + mod + '</b> 推荐 <b>' + _currentRecs.length + '</b> · 画布命中 <b>' + hitCount + '</b>';
-    } catch(e){ console.warn('[R37] recommend err', e); alert('推荐接口调用失败'); }
+    });
+    _currentRecs = Object.entries(relatedNodes)
+      .sort(function(a,b){ return b[1]-a[1]; })
+      .slice(0,8)
+      .map(function(e){ return e[0]; });
+    if(!_currentRecs.length){ alert('该模块暂无跨模块关联'); return; }
+    // 高亮：source 模块 + 关联节点
+    var focus = new Set([mod].concat(_currentRecs));
+    var hitCount = 0;
+    var nodes = ALL_NODES.map(function(n){
+      var inFocus = focus.has(n.id);
+      if(inFocus) hitCount++;
+      return {id:n.id, opacity:inFocus ? 1 : .12, borderWidth:inFocus?3:1, color:inFocus ? {background:'#9333ea',border:'#c9a84c'} : {background:'#444',border:'#666'}};
+    });
+    var edges = ALL_EDGES.map(function(e){
+      var inFocus = focus.has(e.from) || focus.has(e.to);
+      return {from:e.from, to:e.to, opacity:inFocus ? .9 : .05, color:inFocus ? {color:'#9333ea'} : {color:'rgba(201,168,76,.1)'}};
+    });
+    draw(nodes, edges);
+    document.getElementById('stat').innerHTML = '模块 <b>' + mod + '</b> 跨模块关联 <b>' + _currentRecs.length + '</b> · 画布命中 <b>' + hitCount + '</b>';
   }
 
   // 把模块下拉填充（从 ALL_NODES 取，排除图谱节点）
