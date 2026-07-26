@@ -481,7 +481,146 @@ window._MODULE_REPORTS = {
         nextSteps: ['2026年' + (fanTaiSui ? '宜化解太岁' : '顺其自然'),'年初祈福太岁','保持低调谨慎','避免高风险投资','重要决策择吉日','心态平和为上']
       };
     }
+  },
+  'tcm-fangji': {
+    name: '经方调理',
+    diagnose: function(data){
+      const sym = (data && data.s0) || '感冒发热';
+      const dur = (data && data.s1) || '三天内';
+      consttizhi = (data && data.s2) || '不确定';
+      const fangjiMap = {
+        '感冒': { fang:'桂枝汤', yong:'解肌发表调和营卫', zhi:'头痛发热汗出恶风' },
+        '腹痛': { fang:'理中汤', yong:'温中祛寒补气健脾', zhi:'腹满吐泻食欲不振' },
+        '失眠': { fang:'酸枣仁汤', yong:'养血安神清热除烦', zhi:'虚烦不眠心悸盗汗' },
+        '头痛': { fang:'川芎茶调散', yong:'疏风止痛', zhi:'偏正头痛巅顶痛' },
+        'default': { fang:'小柴胡汤', yong:'和解少阳调畅气机', zhi:'口苦咽干目眩往来寒热' }
+      };
+      const key = Object.keys(fangjiMap).find(k => sym.includes(k)) || 'default';
+      const fj = fangjiMap[key];
+      return {
+        title: '经方调理建议（断网KB兜底）',
+        summary: sym + '·' + dur + '·体质:' + (tizhi || '不详'),
+        fangji: fj.fang,
+        effect: fj.yong,
+        zhizheng: fj.zhi,
+        ttsText: '根据' + sym + '，推荐经方' + fj.fang + '，' + fj.yong + '。主治' + fj.zhi + '。请在医师指导下使用。',
+        nextSteps: ['经方需中医师辨证施治','体质辨识加减药味','注意饮食禁忌','药后观察反应','定期复诊调整','勿自行长期服用']
+      };
+    }
+  },
+  'tcm-classic': {
+    name: '中医基础',
+    diagnose: function(data){
+      const area = (data && data.s0) || '体质辨识';
+      const trouble = (data && data.s1) || '疲劳乏力';
+      const tipsMap = {
+        '体质辨识': ['阳虚怕冷宜温补','阴虚内热宜滋阴','气虚乏力宜补气','痰湿肥胖宜化痰','血瘀疼痛宜活血'],
+        '五脏调养': ['心：养心安神','肝：疏肝理气','脾：健脾运化','肺：润肺益气','肾：补肾固精'],
+        '养生原则': ['顺应四时','饮食有节','起居有常','不妄作劳','精神内守']
+      };
+      const tips = tipsMap[area] || tipsMap['养生原则'];
+      return {
+        title: '中医基础分析（断网KB兜底）',
+        summary: area + '·主症:' + trouble,
+        tips: tips,
+        ttsText: '中医' + area + '建议：' + tips.join('；') + '。',
+        nextSteps: ['辨识个人体质类型','针对性调理饮食起居','结合季节养生','适度运动疏通经络','保持情绪平稳','定期中医体检']
+      };
+    }
+  },
+  'tcm-zhongfu': {
+    name: '脏腑调理',
+    diagnose: function(data){
+      const organ = (data && data.s0) || '脾脏';
+      const dur = (data && data.s1) || '长期慢性';
+      const organMap = {
+        '心脏': { elem:'火', tips:['养心安神','少辛多酸','午时小憩','避免暴喜'] },
+        '肝脏': { elem:'木', tips:['疏肝理气','少怒多欢','晨起运动','少饮酒'] },
+        '脾脏': { elem:'土', tips:['健脾祛湿','少食生冷','细嚼慢咽','饭后散步'] },
+        '肺脏': { elem:'金', tips:['润肺养阴','少辣多白','深呼吸练习','避免秋燥'] },
+        '肾脏': { elem:'水', tips:['补肾固精','少咸多黑','搓腰温肾','避免恐惊'] }
+      };
+      const o = organMap[organ] || organMap['脾脏'];
+      return {
+        title: '脏腑调理方案（断网KB兜底）',
+        summary: organ + '·五行属' + o.elem + '·' + dur,
+        organ: organ,
+        element: o.elem,
+        tips: o.tips,
+        ttsText: organ + '属' + o.elem + '，调理建议：' + o.tips.join('；') + '。',
+        nextSteps: ['脏腑调理需长期坚持','配合穴位按摩','饮食顺时调养','情志对应五脏','定期复诊评估','勿乱用偏方']
+      };
+    }
+  },
+  'shanghan-lun': {
+    name: '伤寒论',
+    diagnose: function(data){
+      const sym = (data && data.s0) || '恶寒发热';
+      const BingJi = {
+        '恶寒': { jing:'太阳', fang:'麻黄汤/桂枝汤', zhuan:'风寒外束→入里化热' },
+        '但欲寐': { jing:'少阴', fang:'四逆汤/附子汤', zhuan:'心肾阳虚→温阳救逆' },
+        '口苦': { jing:'少阳', fang:'小柴胡汤', zhuan:'邪犯少阳→和解枢机' },
+        '腹满': { jing:'太阴', fang:'理中汤/四逆辈', zhuan:'脾阳虚→温中散寒' },
+        '燥渴': { jing:'阳明', fang:'白虎汤/承气汤', zhuan:'胃热炽盛→清热攻下' },
+        'default': { jing:'太阳', fang:'桂枝汤', zhuan:'调和营卫→解肌发表' }
+      };
+      const key = Object.keys(BingJi).find(k => sym.includes(k)) || 'default';
+      const bj = BingJi[key];
+      return {
+        title: '伤寒六经辨证（断网KB兜底）',
+        summary: sym + '→六经归属:' + bj.jing + '经',
+        liuJing: bj.jing,
+        fangji: bj.fang,
+        chuanBian: bj.zhuan,
+        ttsText: '症状' + sym + '，属' + bj.jing + '经病，推荐' + bj.fang + '。传变趋势：' + bj.zhuan + '。',
+        nextSteps: ['六经辨证需医师确认','注意传变征兆','方剂随证加减','饮食清淡易消化','保持休息避风','记录每日症状变化']
+      };
+    }
+  },
+  'acupuncture': {
+    name: '针灸推拿',
+    diagnose: function(data){
+      const buwei = (data && data.s0) || '颈肩部';
+      const xingzhi = (data && data.s1) || '疼痛麻木';
+      const acuMap = {
+        '头面部': ['百会','太阳','风池','合谷','四白'],
+        '颈肩部': ['风池','肩井','大椎','后溪',' cervical'],
+        '腰背部': ['肾俞','委中','大肠俞','腰阳关','阿是穴'],
+        '四肢关节': ['曲池','阳陵泉','足三里','太冲','阿是穴'],
+        '胸腹部': ['中脘','关元','气海','天枢','足三里']
+      };
+      const points = acuMap[buwei] || acuMap['颈肩部'];
+      return {
+        title: '针灸推拿方案（断网KB兜底）',
+        summary: buwei + '·' + xingzhi,
+        points: points,
+        ttsText: buwei + '不适，推荐穴位：' + points.join('、') + '。每个穴位按揉3-5分钟。',
+        nextSteps: ['穴位定位需专业人士指导','急性期每日治疗','慢性期隔日治疗','配合艾灸效果更佳','注意针刺禁忌','自行按揉力度适中']
+      };
+    }
+  },
+  'shuhan': {
+    name: '舒晗天纪',
+    diagnose: function(data){
+      const fangxiang = (data && data.s0) || '八字实务';
+      const level = (data && data.s1) || '入门阶段';
+      const tipsMap = {
+        '八字实务': ['天干地支基础→十神关系→格局判断','断语需要实战验证不可死记','路大师实战派：重点看日主旺衰和用神','案例对照学习法'],
+        '奇门校正': ['奇门起盘需要校正真太阳时','值符值使为纲领','舒晗校正法：时家奇门+方位校正','实践验证是最快的进步路径'],
+        '命理思维': ['从实战案例反推理论','不要迷信书本断语','形成自己的判断体系','综合多术种交叉验证'],
+        '学习路径': ['基础理论→经典阅读→案例实战→形成体系','推荐书目：滴天髓、子平真诠、穷通宝鉴','实战为主理论为辅','持续复盘总结']
+      };
+      const tips = tipsMap[fangxiang] || tipsMap['八字实务'];
+      return {
+        title: '舒晗体系指导（断网KB兜底）',
+        summary: fangxiang + '·' + level,
+        tips: tips,
+        ttsText: '舒晗' + fangxiang + '学习建议：' + tips.join('；') + '。',
+        nextSteps: ['理论实践交替推进','建立案例库','定期复盘断验结果','交叉验证多术种','保持开放心态','实战中形成自己的体系']
+      };
+    }
   }
+
 };
-console.log('✅ _MODULE_REPORTS loaded (14 modules KB-fallback: bazi/yunshi/caiyun/ganqing/zhongyi/mobile/shiye/xingming/zeri/huangli/taisui/music/lifeindex/lifeplan)');
+console.log('✅ _MODULE_REPORTS loaded (20 modules KB-fallback: bazi/yunshi/caiyun/ganqing/zhongyi/mobile/shiye/xingming/zeri/huangli/taisui/music/lifeindex/lifeplan/tcm-fangji/tcm-classic/tcm-zhongfu/shanghan-lun/acupuncture/shuhan)');
 </script>
