@@ -38,6 +38,7 @@
 <script src="js/kb-hot-strip.js" defer></script>
 <script src="js/kb-search-box.js" defer></script>
 <script src="js/kb-search-mount.js" defer></script>
+<script src="js/kb-recommend-engine.js" defer></script>
 <script src="js/divination-hub-life36.js" defer></script>
 
 <script src="js/divination-hub-nav.js" defer></script>
@@ -140,6 +141,7 @@
   <a href="wechat-hub.html" class="file-nav-btn">📱 缘主工具</a>
   <a href="ai-assistant.html" class="file-nav-btn">🤖 AI助手</a>
   <a href="kb-hit-dashboard.html" class="file-nav-btn">📊 KB命中</a>
+  <a href="kb-graph.html" class="file-nav-btn">🔮 知识图谱</a>
   <a href="share-center.html" class="file-nav-btn">📤 分享</a>
   <a href="login.html" class="file-nav-btn" id="navLoginBtn">🔐 登录</a>
   <ml-tap class="file-nav-btn" variant="card" id="navUserBtn" class="d-none" onclick="showSection('user')" role="link" tabindex="0">🙏 <span id="navUserName">缘主</span></ml-tap>
@@ -184,6 +186,27 @@
     <!-- R31-A: KB 今日热门知识 Top3 横条 -->
     <div id="kb-hot-strip" class="kb-hot-strip" style="max-width:680px;margin:0 auto 24px;display:none"></div>
     <div id="kb-search-mount" style="max-width:680px;margin:0 auto 16px"></div>
+
+    <!-- R37: KB 智能推荐引擎（基于图谱权重 + hit_count 协同过滤） -->
+    <div id="kb-recommend-engine" style="max-width:680px;margin:0 auto 24px;background:rgba(22,27,34,.6);border:1px solid rgba(108,138,255,.25);border-radius:14px;padding:14px 18px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="color:var(--gold);font-weight:600;font-size:14px;letter-spacing:2px">✨ 智能推荐</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap" id="rec-module-tabs">
+          <button class="rec-tab active" data-mod="bazi" style="background:rgba(108,138,255,.2);color:var(--accent);border:1px solid rgba(108,138,255,.4);padding:3px 10px;border-radius:10px;font-size:11px;cursor:pointer">八字</button>
+          <button class="rec-tab" data-mod="zhongyi" style="background:rgba(255,255,255,.04);color:var(--paper3);border:1px solid rgba(255,255,255,.1);padding:3px 10px;border-radius:10px;font-size:11px;cursor:pointer">中医</button>
+          <button class="rec-tab" data-mod="qimen" style="background:rgba(255,255,255,.04);color:var(--paper3);border:1px solid rgba(255,255,255,.1);padding:3px 10px;border-radius:10px;font-size:11px;cursor:pointer">奇门</button>
+          <button class="rec-tab" data-mod="ziwei" style="background:rgba(255,255,255,.04);color:var(--paper3);border:1px solid rgba(255,255,255,.1);padding:3px 10px;border-radius:10px;font-size:11px;cursor:pointer">紫微</button>
+          <button class="rec-tab" data-mod="fengshui" style="background:rgba(255,255,255,.04);color:var(--paper3);border:1px solid rgba(255,255,255,.1);padding:3px 10px;border-radius:10px;font-size:11px;cursor:pointer">风水</button>
+        </div>
+      </div>
+      <div id="rec-loading" style="color:var(--paper3);font-size:12px;padding:18px;text-align:center;display:none">🔮 根据图谱权重计算中…</div>
+      <div id="rec-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px"></div>
+      <div id="rec-empty" style="display:none;color:var(--paper3);font-size:12px;padding:14px;text-align:center">该模块暂无推荐 · 试试其他模块</div>
+      <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:11px;color:var(--paper3)">
+        <span id="rec-meta">—</span>
+        <a href="kb-graph.html" style="color:var(--accent);text-decoration:none">查看完整图谱 →</a>
+      </div>
+    </div>
 
     <!-- 📋 缘主专业档案 · 一次填写全局复用 -->
     <ml-tap id="profileEntry" onclick="window.MLBJ_USER&&window.MLBJ_USER.openProfileWizard()" style="max-width:680px;margin:0 auto 24px;padding:16px 20px;background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.02));border:1px solid rgba(201,168,76,0.25);border-radius:12px;display:flex;align-items:center;gap:14px;transition:all .3s ease"

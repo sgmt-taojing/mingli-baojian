@@ -2,398 +2,160 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KB 图谱 · 命理宝鉴</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<title>🔮 知识图谱 · 命理宝鉴</title>
+<link rel="stylesheet" href="css/divination-hub.css">
 <style>
-:root {
-  --bg: #0d1117; --card: #161b22; --border: #30363d; --text: #e6edf3;
-  --muted: #8b949e; --accent: #58a6ff; --gold: #f5d76e; --green: #56d364; --red: #f85149;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; min-height: 100vh; }
-header { padding: 20px 24px 12px; border-bottom: 1px solid var(--border); background: var(--card); }
-header h1 { font-size: 1.3rem; color: var(--gold); }
-header .meta { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
-.toolbar { display: flex; gap: 12px; padding: 12px 24px; background: var(--card); border-bottom: 1px solid var(--border); flex-wrap: wrap; align-items: center; }
-.toolbar button { background: var(--accent); color: #fff; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
-.toolbar button:hover { opacity: 0.85; }
-.toolbar input { background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; flex: 1; min-width: 180px; }
-.toolbar .pill { padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; background: rgba(88,166,255,0.15); color: var(--accent); }
-.stats { display: flex; gap: 24px; padding: 10px 24px; background: var(--card); border-bottom: 1px solid var(--border); font-size: 0.85rem; }
-.stats .stat-value { font-weight: 700; color: var(--gold); margin-right: 4px; }
-#canvas-wrap { position: relative; width: 100%; height: calc(100vh - 220px); min-height: 400px; background: #010409; overflow: hidden; }
-svg.graph { width: 100%; height: 100%; cursor: grab; }
-svg.graph:active { cursor: grabbing; }
-.legend { position: absolute; top: 12px; right: 12px; background: rgba(22,27,34,0.92); border: 1px solid var(--border); padding: 10px 14px; border-radius: 8px; font-size: 0.78rem; backdrop-filter: blur(6px); }
-.recommend-panel { position: absolute; top: 12px; left: 12px; max-width: 280px; max-height: 70vh; overflow-y: auto; background: rgba(22,27,34,0.94); border: 1px solid var(--accent); padding: 12px 14px; border-radius: 8px; font-size: 0.82rem; backdrop-filter: blur(6px); display: none; }
-.recommend-panel.open { display: block; }
-.recommend-title { color: var(--gold); font-weight: 600; margin-bottom: 4px; font-size: 0.92rem; }
-.recommend-meta { color: var(--muted); font-size: 0.72rem; margin-bottom: 8px; }
-.recommend-panel ul { list-style: none; }
-.recommend-panel li { padding: 8px 10px; margin-bottom: 6px; background: rgba(88,166,255,0.06); border-left: 3px solid var(--accent); border-radius: 4px; cursor: pointer; transition: background 0.15s; }
-.recommend-panel li:hover { background: rgba(88,166,255,0.18); }
-.recommend-panel .rec-name { color: var(--gold); font-weight: 500; font-size: 0.85rem; }
-.recommend-panel .rec-meta { color: var(--muted); font-size: 0.7rem; margin-top: 2px; }
-.recommend-panel .rec-score { float: right; color: var(--green); font-weight: 600; font-family: monospace; }
-.legend-title { color: var(--gold); font-weight: 600; margin-bottom: 6px; }
-.legend-row { display: flex; align-items: center; gap: 8px; padding: 2px 0; color: var(--muted); }
-.legend-dot { width: 12px; height: 12px; border-radius: 50%; }
-.detail-panel { position: absolute; bottom: 12px; left: 12px; right: 12px; max-width: 480px; background: rgba(22,27,34,0.96); border: 1px solid var(--border); padding: 14px 18px; border-radius: 8px; font-size: 0.85rem; backdrop-filter: blur(6px); display: none; }
-.detail-panel.open { display: block; }
-.detail-panel h3 { color: var(--gold); margin-bottom: 6px; font-size: 1rem; }
-.detail-panel .close { position: absolute; top: 8px; right: 12px; cursor: pointer; color: var(--muted); font-size: 1.1rem; }
-.detail-panel .meta { color: var(--muted); font-size: 0.78rem; }
-.detail-panel ul { margin-top: 8px; padding-left: 18px; }
-.detail-panel li { padding: 2px 0; }
-.node circle { stroke: #30363d; stroke-width: 2; transition: stroke 0.2s, filter 0.2s; cursor: pointer; }
-.node:hover circle { stroke: var(--gold); filter: drop-shadow(0 0 8px var(--gold)); }
-.node text { font-size: 11px; fill: var(--text); pointer-events: none; text-anchor: middle; }
-.node.premium circle { fill: var(--gold); }
-.node.registered circle { fill: var(--accent); }
-.node.guest circle { fill: var(--green); }
-.edge { stroke: #30363d; stroke-opacity: 0.6; transition: stroke-opacity 0.2s; }
-.edge:hover { stroke-opacity: 1; stroke: var(--gold); }
-.edge-label { font-size: 9px; fill: var(--muted); pointer-events: none; }
-.error { padding: 24px; color: var(--red); }
-@media (max-width: 768px) {
-  header { padding: 14px 16px 10px; }
-  .toolbar { padding: 10px 16px; }
-  .stats { padding: 10px 16px; flex-wrap: wrap; gap: 12px; }
-  #canvas-wrap { height: calc(100vh - 240px); }
-  .legend { font-size: 0.7rem; padding: 8px 10px; }
-  .detail-panel { left: 8px; right: 8px; max-width: none; }
-}
+:root{--gold:#c9a84c;--bronze:#8b6914;--paper:#f0e6d3;--line:rgba(201,168,76,.15);--bg:#0a0a0a}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--paper);min-height:100vh;font-family:'Noto Serif SC',serif;padding:16px;line-height:1.7}
+.wrap{max-width:960px;margin:0 auto}
+h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-spacing:3px}
+.sub{text-align:center;font-size:12px;color:var(--paper);opacity:.6;margin-bottom:16px}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center}
+.toolbar button,.toolbar select{padding:8px 14px;background:rgba(201,168,76,.1);color:var(--paper);border:1px solid var(--line);border-radius:8px;font:inherit;font-size:13px;cursor:pointer;transition:all .2s}
+.toolbar button:hover,.toolbar select:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.18)}
+.toolbar .sep{flex:1}
+.stat{font-size:12px;color:var(--paper);opacity:.7}
+.stat b{color:var(--gold);font-size:14px}
+#graph{width:100%;height:68vh;background:radial-gradient(ellipse at center,#111 0%,#0a0a0a 70%);border:1px solid var(--line);border-radius:12px;overflow:hidden;position:relative}
+.vis-network{outline:none}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;just-items:center}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;opacity:.75}
+.legend-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--line)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:2000;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.modal-overlay.show{display:flex}
+.modal-box{background:linear-gradient(135deg,#1a1208,#0a0a0a);border:1px solid var(--gold);border-radius:14px;padding:24px;max-width:520px;width:100%;box-shadow:0 20px 60px rgba(201,168,76,.25);animation:qrmodal-in .3s ease-out}
+.modal-box h3{color:var(--gold);font-size:18px;margin-bottom:10px;letter-spacing:2px}
+.modal-box p{font-size:13px;line-height:1.8;color:var(--paper);opacity:.88;margin:6px 0}
+.modal-box .row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.modal-box .row .k{opacity:.65}
+.modal-box .row .v{color:var(--gold);font-weight:600}
+.modal-close{position:absolute;top:8px;right:12px;background:0 0;border:none;color:var(--paper);font-size:22px;cursor:pointer;padding:4px 8px;border-radius:6px;transition:all .15s}
+.modal-close:hover{background:rgba(201,168,76,.15);color:var(--gold)}
+@keyframes qrmodal-in{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.back-home{display:inline-block;margin-bottom:12px;padding:6px 12px;background:rgba(201,168,76,.1);color:var(--gold);border:1px solid var(--line);border-radius:6px;font:inherit;font-size:12px;text-decoration:none;transition:all .2s}
+.back-home:hover{background:rgba(201,168,76,.2);border-color:var(--gold)}
+@media(max-width:480px){h1{font-size:18px}#graph{height:55vh}}
 </style>
 </head>
 <body>
-
-<header>
-<h1>🕸 KB 图谱 · 知识库关系网络</h1>
-<div class="meta">命理宝鉴 · 22 模块 / 12,538 条 KB · 力导向可视化 · 节点大小=KB 体量 · 连边粗细=引用强度</div>
-</header>
-
-<div class="toolbar">
-<button id="btn-refresh">🔄 刷新</button>
-<button id="btn-reset">🎯 居中</button>
-<button id="btn-search-toggle">🔍 过滤</button>
-<input id="search" placeholder="输入模块名/关键词过滤（例：八字、倪海厦、tcm）…" />
-<span class="pill">⚡ 力导向</span>
-<span class="pill">🎨 SVG</span>
+<div class="wrap">
+  <a class="back-home" href="/app/divination-hub.html">← 返回命理宝鉴</a>
+  <h1>🔮 知识图谱 · 命理宝鉴</h1>
+  <p class="sub">可视化 32 个 KB 模块的引用关系与热点分布</p>
+  <div class="toolbar">
+    <select id="levelFilter"><option value="all">全部等级</option><option value="premium">premium</option><option value="registered">registered</option><option value="professional">professional</option><option value="admin">admin</option></select>
+    <button onclick="highlightHubs()">🔥 热门节点</button>
+    <button onclick="resetView()">🔄 重置视图</button>
+    <button onclick="fitGraph()">🔍 适应屏幕</button>
+    <span class="sep"></span>
+    <span class="stat" id="stat">加载中…</span>
+  </div>
+  <div id="graph"></div>
+  <div class="legend" id="legend"></div>
 </div>
 
-<div class="stats">
-<div><span class="stat-value" id="stat-nodes">0</span>节点</div>
-<div><span class="stat-value" id="stat-edges">0</span>关系</div>
-<div><span class="stat-value" id="stat-modules">0</span>模块</div>
-<div><span class="stat-value" id="stat-hit">0</span>总命中</div>
-<div><span class="stat-value" id="stat-size">0</span>KB 体量</div>
-<div id="status" style="margin-left:auto;color:var(--muted)">加载中…</div>
+<!-- 节点详情模态 -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box" style="position:relative">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3 id="m-title">—</h3>
+    <div id="m-body"></div>
+  </div>
 </div>
 
-<div id="canvas-wrap">
-<svg class="graph" id="svg"></svg>
-<div class="legend">
-<div class="legend-title">节点等级</div>
-<div class="legend-row"><span class="legend-dot" style="background:var(--gold)"></span>premium · 权威库</div>
-<div class="legend-row"><span class="legend-dot" style="background:var(--accent)"></span>registered · 注册可见</div>
-<div class="legend-row"><span class="legend-dot" style="background:var(--green)"></span>guest · 公开</div>
-<div style="margin-top:6px;color:var(--muted);font-size:0.7rem">节点越大 = KB 体量越大<br>边越粗 = 引用次数越多</div>
-</div>
-<div class="recommend-panel" id="recommend">
-<div class="recommend-title">✨ 推荐 · <span id="rec-for">—</span></div>
-<div class="recommend-meta" id="rec-meta">—</div>
-<ul id="rec-list"></ul>
-</div>
-<div class="detail-panel" id="detail">
-<span class="close" id="detail-close">×</span>
-<h3 id="detail-name">—</h3>
-<div class="meta" id="detail-meta">—</div>
-<ul id="detail-links"></ul>
-</div>
-</div>
-
-<script src="/js/components-loader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vis-network@9.1.6/dist/vis-network.min.js"></script>
 <script>
-(async function() {
-  const svg = document.getElementById('svg');
-  const NS = 'http://www.w3.org/2000/svg';
-  const status = document.getElementById('status');
-  let state = { nodes: [], edges: [], positions: new Map(), dragging: null, selected: null };
+(function(){
+  var LEVEL_COLOR = {premium:'#e74c3c',registered:'#3498db',member:'#2ecc71',professional:'#9b59b6',admin:'#f39c12',public:'#1abc9c'};
+  var LEVEL_LABEL = {premium:'Premium',registered:'Registered',member:'Member',professional:'Professional',admin:'Admin',public:'Public'};
+  var ALL_NODES = [], ALL_EDGES = [], network = null;
 
-  const levelColor = (l) => l === 'premium' ? 'var(--gold)' : l === 'guest' ? 'var(--green)' : 'var(--accent)';
-
-  async function fetchGraph() {
-    status.textContent = '拉取 /api/kb/graph…';
-    try {
-      const r = await fetch('/api/kb/graph');
-      const j = await r.json();
-      state.nodes = j.data?.nodes || j.nodes || [];
-      state.edges = j.data?.edges || j.edges || [];
-      document.getElementById('stat-nodes').textContent = state.nodes.length;
-      document.getElementById('stat-edges').textContent = state.edges.length;
-      document.getElementById('stat-modules').textContent = new Set(state.nodes.map(n=>n.id.split('-')[0])).size;
-      document.getElementById('stat-hit').textContent = state.nodes.reduce((s,n)=>s+(n.hit_count||0),0);
-      document.getElementById('stat-size').textContent = state.nodes.reduce((s,n)=>s+(n.size_kb||0),0).toFixed(0);
-      status.textContent = '✓ 已加载';
-      layout();
-    } catch (e) {
-      status.textContent = '✗ 加载失败';
-      document.getElementById('canvas-wrap').innerHTML = '<div class="error">加载失败：'+e.message+'</div>';
-    }
+  async function load(){
+    // 使用 fetch（现代浏览器/移动端/Edge/Firefox/Chrome/Safari 均内置）
+    var r = await fetch('/api/kb/graph', {cache:'no-cache'});
+    var j = await r.json();
+    if(j.code !== 0){ document.getElementById('stat').textContent='加载失败'; return; }
+    var d = j.data;
+    ALL_NODES = d.nodes.map(function(n){
+      return {id:n.id, label:n.name||n.id, title:'【'+LEVEL_LABEL[n.level]||n.level+'】\nxref:'+(n.xref_count||0)+'  被引用:'+(n.referenced||0)+'  命中:'+(n.hit_count||0)+'\n'+n.id, group:n.level, value:n.xref_count||1, color:{background:LEVEL_COLOR[n.level]||'#888',border:'#c9a84c'}};
+    });
+    ALL_EDGES = d.edges.map(function(e){ return {from:e.source, to:e.target, value:Math.min(e.weight,16), arrows:'to', color:{color:'rgba(201,168,76,.35)',highlight:'#c9a84c'}}; });
+    document.getElementById('stat').innerHTML = '模块 <b>' + d.stats.total_modules + '</b> · 引用边 <b>' + d.stats.total_xrefs + '</b> · 孤立 <b>' + (d.stats.isolated||[]).length + '</b>';
+    renderLegend(d.stats.by_level);
+    draw(ALL_NODES, ALL_EDGES);
   }
 
-  // 力导向布局
-  function layout() {
-    const W = svg.clientWidth || 800, H = svg.clientHeight || 600;
-    svg.innerHTML = '';
-    const g = document.createElementNS(NS, 'g');
-    g.setAttribute('id', 'graph-g');
-    svg.appendChild(g);
-
-    const positions = new Map();
-    state.nodes.forEach((n, i) => {
-      const angle = (i / state.nodes.length) * Math.PI * 2;
-      const r = Math.min(W, H) * 0.35;
-      positions.set(n.id, {
-        x: W/2 + Math.cos(angle) * r * (0.5 + Math.random()*0.5),
-        y: H/2 + Math.sin(angle) * r * (0.5 + Math.random()*0.5),
-        vx: 0, vy: 0
-      });
-    });
-    state.positions = positions;
-
-    // 边
-    const edgesG = document.createElementNS(NS, 'g');
-    state.edges.forEach(e => {
-      const line = document.createElementNS(NS, 'line');
-      line.setAttribute('class', 'edge');
-      line.setAttribute('stroke-width', Math.min(5, Math.max(1, e.weight||1)/2));
-      line.dataset.source = e.source;
-      line.dataset.target = e.target;
-      line.addEventListener('click', () => selectEdge(e));
-      edgesG.appendChild(line);
-    });
-    g.appendChild(edgesG);
-
-    // 节点
-    const nodesG = document.createElementNS(NS, 'g');
-    state.nodes.forEach(n => {
-      const gn = document.createElementNS(NS, 'g');
-      gn.setAttribute('class', 'node ' + (n.level||'registered'));
-      gn.dataset.id = n.id;
-      const circle = document.createElementNS(NS, 'circle');
-      const r = Math.max(8, Math.min(40, Math.sqrt((n.size_kb||10)/50)));
-      circle.setAttribute('r', r);
-      gn.appendChild(circle);
-      const text = document.createElementNS(NS, 'text');
-      text.setAttribute('dy', -r - 4);
-      text.textContent = n.name.length > 6 ? n.name.slice(0,6) + '…' : n.name;
-      gn.appendChild(text);
-      gn.addEventListener('click', () => selectNode(n));
-      nodesG.appendChild(gn);
-    });
-    g.appendChild(nodesG);
-
-    // 标签（按 hover/select 显示）
-    const labelG = document.createElementNS(NS, 'g');
-    labelG.setAttribute('id', 'labels');
-    g.appendChild(labelG);
-
-    let iter = 0;
-    const maxIter = 250;
-    function tick() {
-      if (iter++ > maxIter) return;
-      // 斥力
-      state.nodes.forEach(n => {
-        const p = positions.get(n.id);
-        state.nodes.forEach(m => {
-          if (m.id === n.id) return;
-          const q = positions.get(m.id);
-          const dx = p.x - q.x, dy = p.y - q.y;
-          const dist2 = dx*dx + dy*dy + 0.01;
-          const dist = Math.sqrt(dist2);
-          const f = 1500 / dist2;
-          p.vx += dx / dist * f;
-          p.vy += dy / dist * f;
-        });
-      });
-      // 引力（边）
-      state.edges.forEach(e => {
-        const p = positions.get(e.source), q = positions.get(e.target);
-        if (!p || !q) return;
-        const dx = q.x - p.x, dy = q.y - p.y;
-        const dist = Math.sqrt(dx*dx + dy*dy) + 0.01;
-        const f = dist / 60 * (e.weight||1);
-        p.vx += dx/dist * f;
-        p.vy += dy/dist * f;
-        q.vx -= dx/dist * f;
-        q.vy -= dy/dist * f;
-      });
-      // 中心引力
-      state.nodes.forEach(n => {
-        const p = positions.get(n.id);
-        p.vx += (W/2 - p.x) * 0.005;
-        p.vy += (H/2 - p.y) * 0.005;
-      });
-      // 应用
-      positions.forEach(p => {
-        p.vx *= 0.7; p.vy *= 0.7;
-        p.x += p.vx; p.y += p.vy;
-        p.x = Math.max(20, Math.min(W-20, p.x));
-        p.y = Math.max(20, Math.min(H-20, p.y));
-      });
-      // 更新 DOM
-      svg.querySelectorAll('.edge').forEach(line => {
-        const p = positions.get(line.dataset.source);
-        const q = positions.get(line.dataset.target);
-        if (p && q) {
-          line.setAttribute('x1', p.x);
-          line.setAttribute('y1', p.y);
-          line.setAttribute('x2', q.x);
-          line.setAttribute('y2', q.y);
-        }
-      });
-      svg.querySelectorAll('.node').forEach(gn => {
-        const p = positions.get(gn.dataset.id);
-        if (p) gn.setAttribute('transform', `translate(${p.x},${p.y})`);
-      });
-      requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
-
-    // 拖拽
-    svg.addEventListener('mousedown', (ev) => {
-      const t = ev.target.closest('.node');
-      if (!t) return;
-      const id = t.dataset.id;
-      state.dragging = id;
-    });
-    svg.addEventListener('mousemove', (ev) => {
-      if (!state.dragging) return;
-      const pt = svg.createSVGPoint();
-      pt.x = ev.clientX; pt.y = ev.clientY;
-      const m = svg.getScreenCTM().inverse();
-      const local = pt.matrixTransform(m);
-      const p = positions.get(state.dragging);
-      if (p) { p.x = local.x; p.y = local.y; p.vx = 0; p.vy = 0; }
-    });
-    svg.addEventListener('mouseup', () => { state.dragging = null; });
-    svg.addEventListener('mouseleave', () => { state.dragging = null; });
-
-    // 缩放
-    svg.addEventListener('wheel', (ev) => {
-      ev.preventDefault();
-      const scale = ev.deltaY > 0 ? 0.9 : 1.1;
-      const t = svg.querySelector('#graph-g');
-      const m = t.getAttribute('transform') || '';
-      const tr = m.match(/translate\(([-\d.]+),([-\d.]+)\)/);
-      let x = 0, y = 0;
-      if (tr) { x = parseFloat(tr[1]); y = parseFloat(tr[2]); }
-      // 简单以图心缩放
-      const cx = W/2, cy = H/2;
-      x = cx - (cx - x) * scale;
-      y = cy - (cy - y) * scale;
-      t.setAttribute('transform', `translate(${x},${y}) scale(${parseFloat((t.getAttribute('data-s')||'1')) * scale})`);
-      t.setAttribute('data-s', parseFloat((t.getAttribute('data-s')||'1')) * scale);
-    }, { passive: false });
-  }
-
-  function selectNode(n) {
-    state.selected = n.id;
-    const incoming = state.edges.filter(e => e.target === n.id);
-    const outgoing = state.edges.filter(e => e.source === n.id);
-    const detail = document.getElementById('detail');
-    document.getElementById('detail-name').textContent = n.name;
-    document.getElementById('detail-meta').innerHTML = `<span style="color:var(--gold)">${n.id}</span> · 等级 ${n.level||'registered'} · ${(n.size_kb||0).toFixed(1)}KB · 命中 ${n.hit_count||0} · 引用 ${n.xref_count||0}`;
-    const ul = document.getElementById('detail-links');
-    ul.innerHTML = '';
-    if (incoming.length) {
-      ul.innerHTML += '<li style="color:var(--muted);margin-top:6px">← 入向引用</li>';
-      incoming.slice(0,10).forEach(e => {
-        const li = document.createElement('li');
-        li.textContent = `${e.source} → [weight ${e.weight||1}] · ${e.reason||''}`;
-        ul.appendChild(li);
-      });
-    }
-    if (outgoing.length) {
-      ul.innerHTML += '<li style="color:var(--muted);margin-top:6px">→ 出向引用</li>';
-      outgoing.slice(0,10).forEach(e => {
-        const li = document.createElement('li');
-        li.textContent = `→ ${e.target} [weight ${e.weight||1}] · ${e.reason||''}`;
-        ul.appendChild(li);
-      });
-    }
-    detail.classList.add('open');
-    // R35：同时拉推荐
-    fetchRecommend(n.id, n.name);
-  }
-
-  async function fetchRecommend(id, name) {
-    const panel = document.getElementById('recommend');
-    panel.classList.add('open');
-    document.getElementById('rec-for').textContent = name || id;
-    document.getElementById('rec-meta').textContent = '加载中…';
-    document.getElementById('rec-list').innerHTML = '';
-    try {
-      const r = await fetch(`/api/kb/recommend?module=${encodeURIComponent(id)}&limit=5`);
-      const j = await r.json();
-      const data = j.data || j;
-      const recs = data.recommendations || [];
-      document.getElementById('rec-meta').textContent = `共 ${data.total_related||0} 关联 · 算法 ${(data.algorithm||'').split(' ')[0]}`;
-      const ul = document.getElementById('rec-list');
-      ul.innerHTML = '';
-      recs.forEach(r => {
-        const li = document.createElement('li');
-        li.innerHTML = `<span class="rec-score">${r.score.toFixed(3)}</span>
-          <span class="rec-name">${r.name}</span>
-          <div class="rec-meta">权重 ${r.weight} · 命中 ${r.hit_count||0} · ${(r.size_kb||0).toFixed(0)}KB</div>`;
-        li.addEventListener('click', () => {
-          const target = state.nodes.find(x => x.id === r.id);
-          if (target) selectNode(target);
-        });
-        ul.appendChild(li);
-      });
-      if (recs.length === 0) {
-        ul.innerHTML = '<li style="border-left-color:var(--muted);cursor:default"><span class="rec-name" style="color:var(--muted)">暂无推荐</span><div class="rec-meta">该节点无图谱关联</div></li>';
+  function draw(nodes, edges){
+    var container = document.getElementById('graph');
+    var data = {nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges)};
+    var opts = {
+      physics:{barnesHut:{gravitationalConstant:-4200,springLength:140,springConstant:.04},stabilization:{iterations:120}},
+      layout:{improvedLayout:true},
+      interaction:{hover:true,tooltipDelay:200,navigationButtons:true,keyboard:{enabled:true}},
+      nodes:{shape:'dot',font:{face:'Noto Serif SC',color:'#f0e6d3',size:13},borderWidth:2,shadow:{enabled:true,color:'rgba(0,0,0,.6)',size:8}},
+      edges:{smooth:{type:'continuous'},width:.6,font:{face:'Noto Serif SC',color:'#f0e6d3',size:10,strokeWidth:3,align:'top'}},
+    };
+    if(network){ network.destroy(); }
+    network = new vis.Network(container, data, opts);
+    network.on('click', function(p){
+      if(p.nodes.length){
+        var n = ALL_NODES.find(function(x){return x.id===p.nodes[0];});
+        if(n){ showModal(n); }
       }
-    } catch (e) {
-      document.getElementById('rec-meta').textContent = '✗ 加载失败';
-    }
-  }
-
-  function selectEdge(e) {
-    const detail = document.getElementById('detail');
-    document.getElementById('detail-name').textContent = `${e.source} → ${e.target}`;
-    document.getElementById('detail-meta').innerHTML = `权重 ${e.weight||1} · 原因 ${e.reason||'—'}`;
-    const ul = document.getElementById('detail-links');
-    ul.innerHTML = '';
-    if (e.sample) {
-      const li = document.createElement('li');
-      li.innerHTML = `<code style="font-size:0.75rem;background:var(--bg);padding:2px 6px;border-radius:3px">${e.sample.slice(0,200)}</code>`;
-      ul.appendChild(li);
-    }
-    detail.classList.add('open');
-  }
-
-  document.getElementById('detail-close').onclick = () => document.getElementById('detail').classList.remove('open');
-  document.getElementById('btn-refresh').onclick = fetchGraph;
-  document.getElementById('btn-reset').onclick = () => {
-    const t = svg.querySelector('#graph-g');
-    if (t) { t.setAttribute('transform', ''); t.setAttribute('data-s', '1'); }
-    layout();
-  };
-
-  // 过滤
-  document.getElementById('search').oninput = (ev) => {
-    const q = ev.target.value.trim().toLowerCase();
-    svg.querySelectorAll('.node').forEach(gn => {
-      const id = gn.dataset.id;
-      const match = !q || id.toLowerCase().includes(q);
-      gn.style.opacity = match ? '1' : '0.15';
     });
-  };
+    network.fit({animation:{duration:600,easingFunction:'easeInOutQuad'}});
+  }
 
-  fetchGraph();
+  function renderLegend(byLevel){
+    var el = document.getElementById('legend');
+    el.innerHTML = '';
+    Object.keys(LEVEL_LABEL).forEach(function(k){
+      var count = (byLevel && byLevel[k]) || 0;
+      if(count === 0 && k !== 'public') return;
+      var item = document.createElement('div');
+      item.className = 'legend-item';
+      item.innerHTML = '<span class="legend-dot" style="background:'+(LEVEL_COLOR[k]||'#888')+'"></span><span>'+LEVEL_LABEL[k]+' ('+count+')</span>';
+      el.appendChild(item);
+    });
+  }
+
+  function highlightHubs(){
+    var hubIds = [];
+    ALL_NODES.forEach(function(n){ if(n.value >= 16) hubIds.push(n.id); });
+    if(!hubIds.length){ alert('无热点节点'); return; }
+    var nodes = ALL_NODES.map(function(n){ return {id:n.id, opacity:n.value >= 16 ? 1 : .15}; });
+    var edges = ALL_EDGES.map(function(e){ return {from:e.from, to:e.to, opacity:(hubIds.includes(e.from)||hubIds.includes(e.to)) ? 1 : .1}; });
+    draw(nodes, edges);
+  }
+
+  function resetView(){
+    draw(ALL_NODES.slice(), ALL_EDGES.slice());
+  }
+  function fitGraph(){ if(network) network.fit({animation:{duration:500}}); }
+
+  window.showModal = function(n){
+    document.getElementById('m-title').textContent = n.label;
+    document.getElementById('m-body').innerHTML =
+      '<div class="row"><span class="k">模块 ID</span><span class="v">' + n.id + '</span></div>' +
+      '<div class="row"><span class="k">等级</span><span class="v">' + (n.group||'—') + '</span></div>' +
+      '<div class="row"><span class="k">引用次数</span><span class="v">' + (n.xref_count||0) + '</span></div>' +
+      '<div class="row"><span class="k">被引用</span><span class="v">' + (n.referenced||0) + '</span></div>' +
+      '<div class="row"><span class="k">KB 命中</span><span class="v">' + (n.hit_count||0) + '</span></div>';
+    document.getElementById('modal').classList.add('show');
+  };
+  window.closeModal = function(){ document.getElementById('modal').classList.remove('show'); };
+  document.getElementById('modal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+  document.getElementById('levelFilter').addEventListener('change', function(e){
+    var v = e.target.value;
+    if(v === 'all'){ draw(ALL_NODES.slice(), ALL_EDGES.slice()); return; }
+    var ids = new Set(ALL_NODES.filter(function(n){return n.group===v;}).map(function(n){return n.id;}));
+    var nodes = ALL_NODES.map(function(n){ return {id:n.id, opacity:ids.has(n.id)?1:.12}; });
+    var edges = ALL_EDGES.map(function(e){ return {from:e.from,to:e.to,opacity:(ids.has(e.from)&&ids.has(e.to))?1:.08}; });
+    draw(nodes, edges);
+  });
+  load();
 })();
 </script>
 </body>
