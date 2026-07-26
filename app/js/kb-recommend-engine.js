@@ -24,14 +24,28 @@
 
     try {
       const url = `/api/kb/recommend?module=${encodeURIComponent(mod)}&limit=6&t=${Date.now()}`;
-      const r = await fetch(url);
+      let r = await fetch(url);
       if (!r.ok) throw new Error('HTTP ' + r.status);
-      const j = await r.json();
-      const data = j.data || j;
-      const recs = data.recommendations || [];
+      let j = await r.json();
+      let data = j.data || j;
+      let recs = data.recommendations || [];
+      let isColdStart = false;
+
+      // fallback 到 cold-start（针对 total_related=0 或 returns []
+      if (recs.length === 0) {
+        const cs = await fetch(`/api/kb/cold-start?limit=6&t=${Date.now()}`);
+        if (cs.ok) {
+          const csj = await cs.json();
+          data = csj.data || csj;
+          recs = data.recommendations || [];
+          isColdStart = true;
+        }
+      }
 
       if (loading) loading.style.display = 'none';
-      if (meta) meta.textContent = `共 ${data.total_related||0} 关联 · 算法 ${(data.algorithm||'').split(' ')[0]} · ${new Date().toLocaleTimeString('zh-CN')}`;
+      if (meta) meta.textContent = isColdStart
+        ? `❄ 冷启动推荐 · 基于总体量 · ${new Date().toLocaleTimeString('zh-CN')}`
+        : `共 ${data.total_related||0} 关联 · 算法 ${(data.algorithm||'').split(' ')[0]} · ${new Date().toLocaleTimeString('zh-CN')}`;
 
       if (recs.length === 0) {
         if (empty) empty.style.display = 'block';
