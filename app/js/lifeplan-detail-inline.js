@@ -880,11 +880,30 @@ function showQrModal() {
   } else {
     canvas.style.display = 'block';
   }
-  modal.style.display = 'flex';
+  if (typeof modal.showModal === 'function') {
+    if (!modal.open) modal.showModal();
+  } else {
+    modal.style.display = 'flex';
+  }
 }
 function closeQrModal() {
-  document.getElementById('qrModal').style.display = 'none';
+  const modal = document.getElementById('qrModal');
+  if (typeof modal.close === 'function') {
+    modal.close();
+  } else {
+    modal.style.display = 'none';
+  }
 }
+// click-outside 关闭（原生 dialog backdrop click）
+document.addEventListener('DOMContentLoaded', function() {
+  var modal = document.getElementById('qrModal');
+  if (modal) {
+    modal.addEventListener('click', function(ev) {
+      // 仅当点击 dialog 自身（backdrop）而非内容时关闭
+      if (ev.target === modal) closeQrModal();
+    });
+  }
+});
 function downloadQr() {
   const canvas = document.getElementById('qrCanvas');
   const link = document.createElement('a');

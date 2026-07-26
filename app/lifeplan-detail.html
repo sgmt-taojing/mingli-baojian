@@ -215,8 +215,8 @@
 
   <script src="js/a11y-divination-hub.js" defer></script>
 
-<!-- ===== R33: 二维码分享模态 ===== -->
-<div id="qrModal" class="qr-modal" onclick="if(event.target===this)closeQrModal()" role="dialog" aria-modal="true" aria-label="二维码分享">
+<!-- ===== R33: 二维码分享模态（原生 <dialog> · ESC + click-out 自动 a11y）===== -->
+<dialog id="qrModal" class="qr-modal" aria-label="二维码分享">
   <div class="qr-modal-content">
     <button class="qr-modal-close" onclick="closeQrModal()" aria-label="关闭">✕</button>
     <h3>📱 扫码查看此报告</h3>
@@ -231,7 +231,7 @@
     </div>
     <p class="qr-modal-footprint">包含所有输入参数（年龄/性别/居地/关注点）· 阅后即焚版友友分享</p>
   </div>
-</div>
+</dialog>
 
 
   
