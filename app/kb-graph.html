@@ -90,6 +90,7 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
     document.getElementById('stat').innerHTML = '模块 <b>' + d.stats.total_modules + '</b> · 引用边 <b>' + d.stats.total_xrefs + '</b> · 孤立 <b>' + (d.stats.isolated||[]).length + '</b>';
     renderLegend(d.stats.by_level);
     draw(ALL_NODES, ALL_EDGES);
+    fillModFilter();
   }
 
   function draw(nodes, edges){
@@ -205,12 +206,23 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
       '<div class="row"><span class="k">引用次数</span><span class="v">' + (n.xref_count||0) + '</span></div>' +
       '<div class="row"><span class="k">被引用</span><span class="v">' + (n.referenced||0) + '</span></div>' +
       '<div class="row"><span class="k">KB 命中</span><span class="v">' + (n.hit_count||0) + '</span></div>' +
+      '<div id="m-rec" style="margin-top:10px;padding:10px;background:rgba(147,51,234,.08);border:1px solid rgba(147,51,234,.25);border-radius:8px;font-size:12px"><div style="opacity:.6">🧠 推荐关联加载中…</div></div>' +
       '<div class="row row-link">' +
         '<a class="m-link" href="kb-explorer.html#module=' + encodeURIComponent(n.id) + '" target="_blank">🔍 在 KB 中检索</a>' +
         '<a class="m-link" href="ai-assistant.html?mod=' + encodeURIComponent(n.id) + '" target="_blank">🤖 AI 解读</a>' +
       '</div>';
     document.getElementById('m-body').innerHTML = detailHtml;
     document.getElementById('modal').classList.add('show');
+    // 异步加载该模块的推荐图谱
+    fetch('/api/kb/recommend?module=' + encodeURIComponent(n.id) + '&limit=5', {cache:'no-cache'})
+      .then(function(r){return r.json();}).then(function(j){
+        var d = j.data || j;
+        var recs = d.recommendations || [];
+        var recBox = document.getElementById('m-rec');
+        if(!recs.length){ recBox.innerHTML = '<div style="opacity:.6">暂无图谱推荐</div>'; return; }
+        recBox.innerHTML = '<div style="color:#c4b5fd;font-weight:600;margin-bottom:6px">🧠 图谱智能推荐（Top 5）</div>' +
+          recs.map(function(r){ return '<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:11px"><span>→ '+r.name+'</span><span style="color:#c4b5fd;font-family:monospace">'+r.score.toFixed(2)+'</span></div>'; }).join('');
+      }).catch(function(){ var b=document.getElementById('m-rec'); if(b) b.innerHTML='<div style="opacity:.5">推荐加载失败</div>'; });
   };
   window.highlightRecs = highlightRecs;
   window.closeModal = function(){ document.getElementById('modal').classList.remove('show'); };
