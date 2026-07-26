@@ -25,6 +25,7 @@ body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',-apple
 .welcome h2{color:var(--gold);font-size:18px;font-weight:600;margin-bottom:6px;letter-spacing:2px}
 .welcome .sub{color:var(--paper3);font-size:12px;margin-bottom:20px;line-height:1.6}
 .modules{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;width:100%;max-width:480px}
+.kb-recommend-panel{background:linear-gradient(135deg,rgba(102,126,234,0.08),rgba(118,75,162,0.06));border:1px solid rgba(102,126,234,0.18);border-radius:12px;padding:12px;margin:10px 0;width:100%;max-width:480px;animation:in .3s ease}.krp-title{font-size:13px;font-weight:600;color:#b8c5e8;margin-bottom:2px;display:flex;align-items:center;gap:4px}.krp-sub{font-size:10px;color:var(--paper3);opacity:.7;margin-bottom:10px}.krp-items{display:grid;grid-template-columns:1fr;gap:6px}.krp-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(102,126,234,.12);border-radius:8px;cursor:pointer;transition:all .15s;text-align:left;width:100%}.krp-item:hover{border-color:rgba(102,126,234,.35);background:rgba(102,126,234,.08);transform:translateX(2px)}.krp-item.krp-clicked{border-color:#4ade80;background:rgba(74,222,128,.12);animation:krp-pulse .6s}.@keyframes krp-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}.krp-rank{flex:0 0 18px;height:18px;border-radius:50%;background:rgba(102,126,234,.18);color:#b8c5e8;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center}.krp-icon{font-size:16px;flex-shrink:0}.krp-body{flex:1;display:flex;flex-direction:column;gap:1px;min-width:0}.krp-name{font-size:12px;color:var(--paper1,#e0e0e0);font-weight:500}.krp-reason{font-size:10px;color:var(--paper3);opacity:.65;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.krp-score{flex:0 0 auto;font-size:10px;color:#b8c5e8;background:rgba(102,126,234,.12);padding:2px 6px;border-radius:4px;font-family:ui-monospace,monospace}.krp-foot{font-size:10px;color:var(--paper3);opacity:.5;margin-top:8px;text-align:center}
 .mod{display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .15s;text-align:left}
 .mod:hover{border-color:rgba(201,168,76,0.3);background:rgba(201,168,76,0.04);transform:translateY(-1px)}
 .mod .mi{font-size:18px;flex-shrink:0}
@@ -189,6 +190,7 @@ body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',-apple
 <script src="../knowledge/mingxiang-cross-kb.js" defer></script>
 <!-- 公共 toast + esc -->
 <script src="js/ui-toast.js" defer></script>
+<script src="js/kb-recommend-panel.js" defer></script>
 <script src="components/tap.js" defer></script>
 <!-- R41-DR1：五行×12 维度权重偏差共享（lifeindex/music/lifeplan 三模块同源） -->
 <script src="js/wx-dim-bias.js" defer></script>
@@ -1274,6 +1276,11 @@ function showReport(text){
   
   hist.push({role:'assistant',content:text});
   state.reporting=false;
+  // R36: 报告完成后异步加载图谱关联推荐
+  if (state.module && typeof attachRecommendPanel === 'function') {
+    const _r36_mod = state.module;
+    attachRecommendPanel(chat, _r36_mod).catch(()=>{});
+  }
   state.module=null;
 }
 
