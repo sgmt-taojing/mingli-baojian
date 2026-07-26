@@ -25,6 +25,16 @@ header .meta { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
 svg.graph { width: 100%; height: 100%; cursor: grab; }
 svg.graph:active { cursor: grabbing; }
 .legend { position: absolute; top: 12px; right: 12px; background: rgba(22,27,34,0.92); border: 1px solid var(--border); padding: 10px 14px; border-radius: 8px; font-size: 0.78rem; backdrop-filter: blur(6px); }
+.recommend-panel { position: absolute; top: 12px; left: 12px; max-width: 280px; max-height: 70vh; overflow-y: auto; background: rgba(22,27,34,0.94); border: 1px solid var(--accent); padding: 12px 14px; border-radius: 8px; font-size: 0.82rem; backdrop-filter: blur(6px); display: none; }
+.recommend-panel.open { display: block; }
+.recommend-title { color: var(--gold); font-weight: 600; margin-bottom: 4px; font-size: 0.92rem; }
+.recommend-meta { color: var(--muted); font-size: 0.72rem; margin-bottom: 8px; }
+.recommend-panel ul { list-style: none; }
+.recommend-panel li { padding: 8px 10px; margin-bottom: 6px; background: rgba(88,166,255,0.06); border-left: 3px solid var(--accent); border-radius: 4px; cursor: pointer; transition: background 0.15s; }
+.recommend-panel li:hover { background: rgba(88,166,255,0.18); }
+.recommend-panel .rec-name { color: var(--gold); font-weight: 500; font-size: 0.85rem; }
+.recommend-panel .rec-meta { color: var(--muted); font-size: 0.7rem; margin-top: 2px; }
+.recommend-panel .rec-score { float: right; color: var(--green); font-weight: 600; font-family: monospace; }
 .legend-title { color: var(--gold); font-weight: 600; margin-bottom: 6px; }
 .legend-row { display: flex; align-items: center; gap: 8px; padding: 2px 0; color: var(--muted); }
 .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
@@ -88,6 +98,11 @@ svg.graph:active { cursor: grabbing; }
 <div class="legend-row"><span class="legend-dot" style="background:var(--accent)"></span>registered · 注册可见</div>
 <div class="legend-row"><span class="legend-dot" style="background:var(--green)"></span>guest · 公开</div>
 <div style="margin-top:6px;color:var(--muted);font-size:0.7rem">节点越大 = KB 体量越大<br>边越粗 = 引用次数越多</div>
+</div>
+<div class="recommend-panel" id="recommend">
+<div class="recommend-title">✨ 推荐 · <span id="rec-for">—</span></div>
+<div class="recommend-meta" id="rec-meta">—</div>
+<ul id="rec-list"></ul>
 </div>
 <div class="detail-panel" id="detail">
 <span class="close" id="detail-close">×</span>
@@ -309,6 +324,41 @@ svg.graph:active { cursor: grabbing; }
       });
     }
     detail.classList.add('open');
+    // R35：同时拉推荐
+    fetchRecommend(n.id, n.name);
+  }
+
+  async function fetchRecommend(id, name) {
+    const panel = document.getElementById('recommend');
+    panel.classList.add('open');
+    document.getElementById('rec-for').textContent = name || id;
+    document.getElementById('rec-meta').textContent = '加载中…';
+    document.getElementById('rec-list').innerHTML = '';
+    try {
+      const r = await fetch(`/api/kb/recommend?module=${encodeURIComponent(id)}&limit=5`);
+      const j = await r.json();
+      const data = j.data || j;
+      const recs = data.recommendations || [];
+      document.getElementById('rec-meta').textContent = `共 ${data.total_related||0} 关联 · 算法 ${(data.algorithm||'').split(' ')[0]}`;
+      const ul = document.getElementById('rec-list');
+      ul.innerHTML = '';
+      recs.forEach(r => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="rec-score">${r.score.toFixed(3)}</span>
+          <span class="rec-name">${r.name}</span>
+          <div class="rec-meta">权重 ${r.weight} · 命中 ${r.hit_count||0} · ${(r.size_kb||0).toFixed(0)}KB</div>`;
+        li.addEventListener('click', () => {
+          const target = state.nodes.find(x => x.id === r.id);
+          if (target) selectNode(target);
+        });
+        ul.appendChild(li);
+      });
+      if (recs.length === 0) {
+        ul.innerHTML = '<li style="border-left-color:var(--muted);cursor:default"><span class="rec-name" style="color:var(--muted)">暂无推荐</span><div class="rec-meta">该节点无图谱关联</div></li>';
+      }
+    } catch (e) {
+      document.getElementById('rec-meta').textContent = '✗ 加载失败';
+    }
   }
 
   function selectEdge(e) {
