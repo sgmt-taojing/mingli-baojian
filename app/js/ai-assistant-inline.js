@@ -1289,6 +1289,7 @@ async function callAI(q){
           hist.push({role:'assistant', content: fullReply.substring(0,500)});
           if (hist.length > 20) hist = hist.slice(-20);
           if (typeof recordKbHit === 'function') recordKbHit(state.module || 'freechat', best.score, true);
+          try{ _updateTopicCard(); }catch(e){}
           try { recordKbEngine('kb-fastpath'); } catch(e) {}
           return;
         }
@@ -1306,7 +1307,7 @@ async function callAI(q){
       addAI('📴 当前处于离线模式，AI 调用已暂停。\n\n请参考上方 KB 兜底回答，或联网后重试。');
       if (typeof recordKbHit === 'function') recordKbHit(state.module || 'freechat', 0, false);
       hist.push({role:'assistant', content:'离线模式'});
-      return;
+      try{ _updateTopicCard(); }catch(e){} return;
     }
     const r=await fetch(API+'/api/ai/public-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist.slice(-10)})});
     const d=await r.json();
@@ -1320,6 +1321,7 @@ async function callAI(q){
     // hist 只存 content（不存 reasoning_content），并截断单条长度
     hist.push({role:'assistant',content:reply.substring(0,500)});
     if(hist.length>20)hist=hist.slice(-20);
+    try{ _updateTopicCard(); }catch(e){}
   }catch(e){ try{ t.remove(); }catch(_){} addAI(local(q));
     // 错误降级也计入分母
     if (typeof recordKbHit === 'function') {
