@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔥 KB 热度仪表盘 - 命理宝鉴</title>
+<link rel="stylesheet" href="css/a11y-fix.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f1117;color:#e0e0e0;padding:20px}
+.container{max-width:1200px;margin:0 auto}
+h1{font-size:1.6rem;margin-bottom:4px}
+.subtitle{color:#888;font-size:.85rem;margin-bottom:20px}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px}
+.metric{background:#1a1d27;border:1px solid #2a2d37;border-radius:12px;padding:16px}
+.metric-val{font-size:1.8rem;font-weight:700;color:#7c9eff}
+.metric-label{font-size:.8rem;color:#888;margin-top:4px}
+.section-title{font-size:1.1rem;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.bar-label{width:120px;font-size:.85rem;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{flex:1;height:24px;background:#1a1d27;border-radius:6px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:8px;font-size:.75rem;font-weight:600;color:#fff;white-space:nowrap;transition:width .6s ease}
+.bar-val{width:60px;font-size:.8rem;color:#aaa;flex-shrink:0}
+.colors{background:linear-gradient(90deg,#667eea,#764ba2,#f093fb,#4facfe,#43e97b,#fa709a,#fee140,#30cfd0)}
+.panel{background:#1a1d27;border:1px solid #2a2d37;border-radius:12px;padding:20px;margin-bottom:20px}
+.trace-table{width:100%;border-collapse:collapse}
+.trace-table th{text-align:left;font-size:.75rem;color:#888;padding:8px;border-bottom:1px solid #2a2d37;text-transform:uppercase}
+.trace-table td{padding:8px;border-bottom:1px solid #1e1e2e;font-size:.85rem}
+.trace-table tr:hover{background:#1e1e2e}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.7rem;font-weight:600}
+.badge-high{background:#2d5a3d;color:#4ade80}
+.badge-mid{background:#4a4a2d;color:#facc15}
+.badge-low{background:#4a2d2d;color:#f87171}
+.score{font-family:monospace;font-size:.85rem}
+.timeline-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #1e1e2e}
+.timeline-time{color:#888;font-size:.75rem;white-space:nowrap;width:140px;flex-shrink:0}
+.timeline-body{flex:1}
+.timeline-module{font-size:.7rem;padding:2px 6px;border-radius:4px;background:#2a2d37;color:#7c9eff;margin-right:6px}
+.timeline-title{font-size:.85rem;margin-top:2px}
+.toggle-bar{display:flex;gap:8px;margin-bottom:16px}
+.toggle-btn{padding:6px 16px;border-radius:8px;border:1px solid #2a2d37;background:transparent;color:#888;cursor:pointer;font-size:.85rem}
+.toggle-btn.active{background:#7c9eff;color:#fff;border-color:#7c9eff}
+@media(max-width:768px){.bar-label{width:80px}.metric-val{font-size:1.4rem}}
+@media(max-width:480px){.bar-label{width:70px;font-size:.75rem}.bar-val{width:40px;font-size:.7rem}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">跳到主内容</a>
+<main id="main" class="container">
+<h1>🔥 KB 热度仪表盘</h1>
+<p class="subtitle">模块命中排行 · 最近命中流 · 全局热度趋势</p>
+
+<div class="metrics" id="metrics"></div>
+
+<div class="toggle-bar">
+  <button class="toggle-btn active" data-range="7" onclick="switchRange(7)">7 天</button>
+  <button class="toggle-btn" data-range="14" onclick="switchRange(14)">14 天</button>
+  <button class="toggle-btn" data-range="30" onclick="switchRange(30)">30 天</button>
+</div>
+
+<div class="panel">
+  <div class="section-title"><span class="rich-dot rich-dot-blue"></span> 模块命中排行（滚动窗口）</div>
+  <div id="hotBars">加载中...</div>
+</div>
+
+<div class="panel">
+  <div class="section-title"><span class="rich-dot rich-dot-blue"></span> 全局累计 TOP 10</div>
+  <div id="allTimeBars">加载中...</div>
+</div>
+
+<div class="panel">
+  <div class="section-title">
+    <span class="rich-dot rich-dot-blue"></span> 最近命中流
+    <span style="margin-left:auto;font-size:.75rem;color:#666">每 30s 自动刷新</span>
+  </div>
+  <div id="traces">加载中...</div>
+</div>
+
+</main>
+<script src="js/a11y-divination-hub.js" defer></script>
+<script>
+let currentRange = 7;
+const API_BASE = (location.port === '8914' || location.port === '8920') ? 'http://localhost:8920' : '';
+
+async function fetchJSON(url) {
+  const r = await fetch(url);
+  return r.json();
+}
+
+function scoreBadge(score) {
+  if (score >= 0.8) return '<span class="badge badge-high">' + score.toFixed(2) + '</span>';
+  if (score >= 0.5) return '<span class="badge badge-mid">' + score.toFixed(2) + '</span>';
+  return '<span class="badge badge-low">' + score.toFixed(2) + '</span>';
+}
+
+function renderBars(container, items, valKey, labelKey, maxVal) {
+  if (!items || items.length === 0) {
+    document.getElementById(container).innerHTML = '<div style="color:#666;padding:12px">暂无数据</div>';
+    return;
+  }
+  const palette = ['#667eea','#764ba2','#f093fb','#4facfe','#43e97b','#fa709a','#fee140','#30cfd0','#a78bfa','#34d399','#fb7185','#fbbf24','#60a5fa','#c084fc','#2dd4bf','#f472b6'];
+  const html = items.map((item, i) => {
+    const pct = maxVal > 0 ? (item[valKey] / maxVal * 100).toFixed(1) : 0;
+    const val = item[valKey];
+    return '<div class="bar-row">' +
+      '<span class="bar-label" title="' + item[labelKey] + '">' + item[labelKey] + '</span>' +
+      '<div class="bar-track"><div class="bar-fill" style="width:' + Math.max(pct, 2) + '%;background:' + palette[i % palette.length] + '">' + val + (item.pct ? ' · ' + item.pct + '%' : '') + '</div></div>' +
+      '<span class="bar-val">' + val + '</span>' +
+    '</div>';
+  }).join('');
+  document.getElementById(container).innerHTML = html;
+}
+
+async function loadHot() {
+  try {
+    const data = await fetchJSON(API_BASE + '/api/kb/hot-modules?days=' + currentRange + '&limit=15');
+    if (!data.ok) throw new Error(data.error);
+    const maxHits = data.modules.length > 0 ? data.modules[0].hits : 1;
+    renderBars('hotBars', data.modules, 'hits', 'module', maxHits);
+    const maxAll = data.all_time_top.length > 0 ? data.all_time_top[0].hits : 1;
+    renderBars('allTimeBars', data.all_time_top.map(m => ({...m, pct: 0})), 'hits', 'module', maxAll);
+    document.getElementById('metrics').innerHTML = `
+      <div class="metric"><div class="metric-val">${data.total_hits}</div><div class="metric-label">${currentRange}天总命中</div></div>
+      <div class="metric"><div class="metric-val">${data.modules.length}</div><div class="metric-label">活跃模块数</div></div>
+      <div class="metric"><div class="metric-val">${data.modules.length > 0 ? (data.modules[0].hits / data.total_hits * 100).toFixed(0) + '%' : '—'}</div><div class="metric-label">TOP1 占比${data.modules.length > 0 ? ' (' + data.modules[0].module + ')' : ''}</div></div>
+      <div class="metric"><div class="metric-val">${data.all_time_top.length}</div><div class="metric-label">全局有命中模块</div></div>
+    `;
+  } catch (e) {
+    document.getElementById('hotBars').innerHTML = '<div style="color:#f87171;padding:12px">加载失败: ' + e.message + '</div>';
+  }
+}
+
+async function loadTraces() {
+  try {
+    const data = await fetchJSON(API_BASE + '/api/kb/recent-traces?limit=30');
+    if (!data.ok) throw new Error(data.error);
+    if (data.traces.length === 0) {
+      document.getElementById('traces').innerHTML = '<div style="color:#666;padding:12px">暂无命中记录</div>';
+      return;
+    }
+    const html = data.traces.map(t => `
+      <div class="timeline-item">
+        <span class="timeline-time">${t.hit_at || '—'}</span>
+        <div class="timeline-body">
+          <span class="timeline-module">${t.module || '?'}</span>
+          ${scoreBadge(t.hit_score || 0)}
+          ${t.app_endpoint ? '<span style="font-size:.7rem;color:#666"> · ' + t.app_endpoint + '</span>' : ''}
+          <div class="timeline-title">${t.title || '(无标题)'}</div>
+        </div>
+      </div>
+    `).join('');
+    document.getElementById('traces').innerHTML = html;
+  } catch (e) {
+    document.getElementById('traces').innerHTML = '<div style="color:#f87171;padding:12px">加载失败: ' + e.message + '</div>';
+  }
+}
+
+function switchRange(r) {
+  currentRange = r;
+  document.querySelectorAll('.toggle-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.range) === r);
+  });
+  loadHot();
+}
+
+loadHot();
+loadTraces();
+setInterval(() => { loadHot(); loadTraces(); }, 30000);
+</script>
+</body>
+</html>
