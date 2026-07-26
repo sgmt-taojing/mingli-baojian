@@ -39,6 +39,9 @@ h1{font-size:1.6rem;margin-bottom:4px}
 .toggle-bar{display:flex;gap:8px;margin-bottom:16px}
 .toggle-btn{padding:6px 16px;border:1px solid #2a2d37;border-radius:8px;background:transparent;color:#888;cursor:pointer;font-size:.85rem}
 .toggle-btn.active{background:#7c9eff;color:#fff;border-color:#7c9eff}
+.time-btn{padding:6px 16px;border:1px solid #2a2d37;border-radius:8px;background:transparent;color:#888;cursor:pointer;font-size:.85rem;margin-left:4px}
+.time-btn.active{background:#22c55e;color:#fff;border-color:#22c55e}
+.period-card{background:#0a0a0a;border:1px solid #2a2d37;border-radius:8px;padding:14px;margin:12px 0}
 @media(max-width:768px){.bar-label{width:80px}.metric-val{font-size:1.4rem}}
 @media(max-width:480px){.bar-label{width:70px;font-size:.75rem}.bar-val{width:40px;font-size:.7rem}}
 </style>
@@ -54,6 +57,10 @@ h1{font-size:1.6rem;margin-bottom:4px}
   <button class="toggle-btn active" data-range="7" onclick="switchRange(7)">7 天</button>
   <button class="toggle-btn" data-range="14" onclick="switchRange(14)">14 天</button>
   <button class="toggle-btn" data-range="30" onclick="switchRange(30)">30 天</button>
+  <span style="margin:0 8px;color:#444">|</span>
+  <button class="time-btn active" data-period="day" onclick="switchPeriod('day')">📅 今日</button>
+  <button class="time-btn" data-period="week" onclick="switchPeriod('week')">📅 本周</button>
+  <button class="time-btn" data-period="month" onclick="switchPeriod('month')">📅 本月</button>
 </div>
 
 <div class="panel">
@@ -80,6 +87,11 @@ h1{font-size:1.6rem;margin-bottom:4px}
       <a href="camera-capture.html" style="color:#7c9eff">相机采集</a> 后，拍照/录音将自动联动知识库模块
     </div>
   </div>
+</div>
+
+<!-- R79: 时间维度统计（今日/本周/本月） -->
+<div id="periodStats" data-default-empty="true">
+  <div style="color:#666;padding:12px;font-size:.85rem">统计加载中...</div>
 </div>
 
 </main>
@@ -255,10 +267,92 @@ function switchRange(r) {
   loadHot();
 }
 
+/**
+ * R79: 时间维度切换（今日/本周/本月）
+ * 从本地 _kb_hit_events/{ymd} 或 _kb_hit_count 聚合
+ */
+let currentPeriod = 'day';
+function switchPeriod(p) {
+  currentPeriod = p;
+  document.querySelectorAll('.time-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.period === p);
+  });
+  renderPeriodStats();
+}
+
+function getPeriodRange(p) {
+  const now = new Date();
+  if (p === 'day') {
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    return { start, end: now.getTime(), label: '今日' };
+  }
+  if (p === 'week') {
+    const dayOfWeek = now.getDay() || 7; // 周一为 1，周日为 0 视为 7
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek + 1).getTime();
+    return { start, end: now.getTime(), label: '本周' };
+  }
+  // month
+  const start = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  return { start, end: now.getTime(), label: '本月' };
+}
+
+function renderPeriodStats() {
+  const container = document.getElementById('periodStats');
+  if (!container) return;
+  const { start, end, label } = getPeriodRange(currentPeriod);
+
+  // 聚合：遍历 _kb_hit_events/{ymd} 中每条事件
+  const modCount = {};
+  let total = 0;
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key || !key.startsWith('_kb_hit_events/')) continue;
+    try {
+      const events = JSON.parse(localStorage.getItem(key) || '[]');
+      events.forEach(e => {
+        const t = e.ts || 0;
+        if (t >= start && t <= end) {
+          total++;
+          const m = e.mod || e.module || 'unknown';
+          modCount[m] = (modCount[m] || 0) + 1;
+        }
+      });
+    } catch (err) { /* 忽略 */ }
+  }
+
+  const sorted = Object.entries(modCount).sort((a, b) => b[1] - a[1]);
+  if (sorted.length === 0) {
+    container.innerHTML = '<div class="period-card"><div style="color:#666;padding:12px">' + label + ' 暂无 KB 命中记录。AI 助手使用时自动打点。</div></div>';
+    return;
+  }
+
+  const max = sorted[0][1];
+  const palette = ['#c9a84c', '#22d3ee', '#22c55e', '#7c9eff', '#a78bfa', '#f472b6', '#fbbf24', '#34d399'];
+  const barsHtml = sorted.map(([mod, count], i) => {
+    const pct = (count / max * 100).toFixed(1);
+    const color = palette[i % palette.length];
+    return '<div class="bar-row">' +
+      '<span class="bar-label" title="' + mod + '">' + mod + '</span>' +
+      '<div class="bar-track"><div class="bar-fill" style="width:' + Math.max(pct, 3) + '%;background:' + color + '">' + count + ' 次</div></div>' +
+      '<span class="bar-val">' + ((count / total) * 100).toFixed(0) + '%</span>' +
+    '</div>';
+  }).join('');
+
+  container.innerHTML = '<div class="period-card">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">' +
+      '<span style="color:#c9a84c;font-weight:600">📊 ' + label + ' KB 命中统计</span>' +
+      '<span style="color:#888;font-size:.85rem">总计 <strong style="color:#22c55e">' + total + '</strong> 次</span>' +
+    '</div>' +
+    barsHtml +
+  '</div>';
+}
+
 loadHot();
 loadTraces();
-setInterval(() => { loadHot(); loadTraces(); renderDeviceStream(); }, 30000);
+renderPeriodStats();
+setInterval(() => { loadHot(); loadTraces(); renderDeviceStream(); renderPeriodStats(); }, 30000);
 setTimeout(renderDeviceStream, 500);
+setTimeout(renderPeriodStats, 800);
 </script>
 </body>
 </html>
