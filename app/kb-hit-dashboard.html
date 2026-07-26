@@ -2,160 +2,241 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KB 命中率 Dashboard · 命理宝鉴</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
-
-<link rel="stylesheet" href="css/kb-hit-dashboard-inline.css">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KB 命中仪表盘 · 命理宝鉴</title>
+<link rel="stylesheet" href="css/ai-assistant-inline.css?v=20260726">
+<style>
+  :root{--card-bg:rgba(13,17,23,.72);--card-border:rgba(201,168,76,.12);--good:#10b981;--warn:#c9a84c;--bad:#f59e0b}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--paper);font-family:system-ui,-apple-system,sans-serif;padding:16px}
+  h1{font-size:18px;font-weight:600;margin:0 0 16px;color:var(--gold2)}
+  h1 span{font-size:11px;color:var(--paper3);font-weight:normal;margin-left:8px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:20px}
+  .card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:16px;transition:border-color .2s}
+  .card:hover{border-color:rgba(201,168,76,.3)}
+  .card-label{font-size:11px;color:var(--paper3);margin-bottom:4px}
+  .card-value{font-size:28px;font-weight:700;color:var(--gold2)}
+  .card-sub{font-size:11px;color:var(--paper3);margin-top:4px}
+  .section-title{font-size:14px;font-weight:600;color:var(--paper2);margin:20px 0 10px;border-bottom:1px solid var(--card-border);padding-bottom:6px}
+  .mod-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+  .mod-name{font-size:13px;color:var(--paper);min-width:80px}
+  .mod-bar-wrap{flex:1;height:18px;background:rgba(255,255,255,.04);border-radius:4px;overflow:hidden;position:relative}
+  .mod-bar-fill{height:100%;border-radius:4px;transition:width .4s ease}
+  .mod-count{font-size:12px;color:var(--gold2);font-weight:600;min-width:30px;text-align:right}
+  .engine-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .engine-card{text-align:center;padding:14px 8px;border-radius:8px;border:1px solid var(--card-border)}
+  .engine-icon{font-size:24px;margin-bottom:4px}
+  .engine-name{font-size:11px;color:var(--paper3)}
+  .engine-count{font-size:22px;font-weight:700}
+  .sparkline-wrap{margin-top:12px}
+  .empty-state{text-align:center;padding:40px 20px;color:var(--paper3);font-size:13px}
+  .empty-state span{font-size:36px;display:block;margin-bottom:8px}
+  .back-link{display:inline-block;margin-bottom:16px;font-size:12px;color:var(--gold2);text-decoration:none;padding:4px 10px;border:1px solid var(--card-border);border-radius:4px}
+  .back-link:hover{background:rgba(201,168,76,.06)}
+  @media(max-width:768px){.grid{grid-template-columns:1fr 1fr}.engine-grid{grid-template-columns:1fr}}
+  @media(max-width:320px){.grid{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
-<nav class="topbar">
-  <div class="topbar-inner">
-    <div class="topbar-title">📊 KB 命中率 Dashboard <span class="sub">· KB-First 双路径运营面板</span></div>
-    <div class="topbar-nav">
-      <a href="admin-glass-dashboard.html">智镜</a>
-      <a href="admin-kb-panel.html">KB 管理</a>
-      <a href="monitor-dashboard.html">监控</a>
-      <a href="divination-hub.html">排盘主页</a>
-      <a href="kb-hit-dashboard.html" class="active">KB 命中率</a>
-    </div>
-  </div>
-</nav>
 
-<div class="container">
-  <div class="section-header">
-    <h2>KB 命中率 Dashboard</h2>
-    <p>KB 优先双路径运营可视化 · 模块命中分布 · API 健康度 · 漏斗分析</p>
-    <div style="margin-top:.5rem;display:flex;gap:.5rem;align-items:center">
-      <button class="refresh-btn" onclick="loadAll()">🔄 刷新</button>
-      <button class="refresh-btn" onclick="resetKbStats()">🗑️ 清除本地计数</button>
-      <span id="lastUpdate" style="font-size:.75rem;color:var(--paper3)"></span>
-    </div>
-  </div>
+<h1>📊 KB 命中仪表盘 <span>R53 · 实时统计</span></h1>
+<a class="back-link" href="ai-assistant.html">← 返回 AI 助手</a>
 
-  <!-- KPI 卡片 -->
-  <div class="grid-3" style="margin-bottom:1.5rem">
-    <div class="card kpi">
-      <div class="num" id="kpiTotalHits">0</div>
-      <div class="label">KB 累计直答次数</div>
-      <div class="delta up" id="kpiTotalDelta">— 本地 localStorage</div>
-    </div>
-    <div class="card kpi">
-      <div class="num" id="kpiHitRate">—</div>
-      <div class="label">综合命中率</div>
-      <div class="delta" id="kpiHitRateDelta">— KB / (KB+AI)</div>
-    </div>
-    <div class="card kpi">
-      <div class="num" id="kpiModules">0</div>
-      <div class="label">活跃模块数</div>
-      <div class="delta" id="kpiModulesDelta">— 有命中记录的模块</div>
-    </div>
-  </div>
-
-  <div class="grid-main">
-    <!-- 左列：表格 + 趋势 -->
-    <div style="display:flex;flex-direction:column;gap:1rem">
-      <!-- 模块命中表 -->
-      <div class="card">
-        <h3>📋 模块命中详情 <span class="badge" id="modCount">— 个模块</span></h3>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr><th>模块 ID</th><th>模块名</th><th>命中次数</th><th>命中率</th><th>趋势</th></tr>
-            </thead>
-            <tbody id="modTableBody">
-              <tr><td colspan="5" class="empty-hint"><span class="icon">📭</span>暂无数据，使用 AI 助手后自动统计</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- 路径分布 -->
-      <div class="card">
-        <h3>🔀 双路径分布 <span class="badge">KB-First</span></h3>
-        <ul class="path-list" id="pathList">
-          <li class="path-item">
-            <div class="path-icon kb">📚</div>
-            <div class="path-info"><div class="name">KB 直答（分 ≥ 0.7）</div><div class="desc">命中知识库，毫秒级响应</div></div>
-            <div class="path-pct" id="pathKb">0%</div>
-          </li>
-          <li class="path-item">
-            <div class="path-icon hybrid">🔧</div>
-            <div class="path-info"><div class="name">KB + AI 润色（0.4-0.7）</div><div class="desc">知识库摘要 + AI 补充</div></div>
-            <div class="path-pct" id="pathHybrid">0%</div>
-          </li>
-          <li class="path-item">
-            <div class="path-icon ai">🤖</div>
-            <div class="path-info"><div class="name">AI + KB 兜底（< 0.4）</div><div class="desc">AI 主答 + KB 相关推荐</div></div>
-            <div class="path-pct" id="pathAi">0%</div>
-          </li>
-        </ul>
-      </div>
-
-      <!-- 7 日趋势图 -->
-      <div class="card">
-        <h3>📈 7 日命中趋势 <span class="badge">本地记录</span></h3>
-        <div class="chart-wrap" id="trendChart">
-          <svg class="chart-svg" id="trendSvg" viewBox="0 0 700 180" preserveAspectRatio="none"></svg>
-        </div>
-      </div>
-    </div>
-
-    <!-- 右列：API 健康 + 漏斗 + 饼图 -->
-    <div style="display:flex;flex-direction:column;gap:1rem">
-      <!-- API 健康 -->
-      <div class="card">
-        <h3>🔌 后端 API 健康 <span class="badge" id="apiCount">— 个</span></h3>
-        <ul class="api-list" id="apiList">
-          <li class="api-item"><span style="color:var(--paper3)">检测中...</span></li>
-        </ul>
-      </div>
-
-      <!-- 漏斗 -->
-      <div class="card">
-        <h3>🔻 查询漏斗 <span class="badge">用户旅程</span></h3>
-        <div class="funnel" id="funnel">
-          <div class="funnel-stage">
-            <div class="stage-num" id="funnelQuery">0</div>
-            <div class="stage-label">发起查询</div>
-            <div class="stage-pct" id="funnelQueryPct">100%</div>
-          </div>
-          <div class="funnel-bar"><div style="background:var(--cyan);height:100%;width:100%;border-radius:2px"></div></div>
-          <div class="funnel-stage">
-            <div class="stage-num" id="funnelKb">0</div>
-            <div class="stage-label">KB 命中</div>
-            <div class="stage-pct" id="funnelKbPct">0%</div>
-          </div>
-          <div class="funnel-bar"><div style="background:var(--warn);height:100%;width:0%;border-radius:2px" id="funnelKbBar"></div></div>
-          <div class="funnel-stage">
-            <div class="stage-num" id="funnelDirect">0</div>
-            <div class="stage-label">直答完成</div>
-            <div class="stage-pct" id="funnelDirectPct">0%</div>
-          </div>
-          <div class="funnel-bar"><div style="background:var(--jade);height:100%;width:0%;border-radius:2px" id="funnelDirectBar"></div></div>
-        </div>
-      </div>
-
-      <!-- KB 知识库分布饼图 -->
-      <div class="card">
-        <h3>🥧 KB 模块分布 <span class="badge">知识库</span></h3>
-        <div class="pie-wrap">
-          <svg class="pie-svg" id="pieSvg" width="140" height="140" viewBox="0 0 140 140"></svg>
-          <div class="pie-legend" id="pieLegend"></div>
-        </div>
-      </div>
-    </div>
-  </div>
+<div id="emptyState" class="empty-state" style="display:none">
+  <span>📊</span>
+  还没有 KB 命中记录<br>
+  去 <a href="ai-assistant.html" style="color:var(--gold2)">AI 助手</a> 提几个问题，这里会自动统计
 </div>
 
-<footer>
-  KB Hit Dashboard v1.0 · 命理宝鉴 · 本地 localStorage + API 聚合 · 数据不离开设备
-</footer>
+<div id="dashboard" style="display:none">
+  <!-- 核心指标 -->
+  <div class="grid">
+    <div class="card">
+      <div class="card-label">今日 KB 直答</div>
+      <div class="card-value" id="todayCount">0</div>
+      <div class="card-sub" id="todaySub">直答 = 命中分 ≥ 70%</div>
+    </div>
+    <div class="card">
+      <div class="card-label">命中率</div>
+      <div class="card-value" id="hitRate">0<span style="font-size:14px">%</span></div>
+      <div class="card-sub" id="hitRateSub">直答 / 总交互</div>
+    </div>
+    <div class="card">
+      <div class="card-label">累计 KB 直答</div>
+      <div class="card-value" id="totalCount">0</div>
+      <div class="card-sub" id="totalSub">全部时间</div>
+    </div>
+    <div class="card">
+      <div class="card-label">今日总交互</div>
+      <div class="card-value" id="eventsToday">0</div>
+      <div class="card-sub" id="eventsSub">含 KB+AI 润色 + 纯 AI</div>
+    </div>
+  </div>
 
-<script src="js/ui-toast.js" defer></script>
+  <!-- 模块排行 -->
+  <div class="section-title">🏆 模块命中排行（Top 10）</div>
+  <div id="modRanking"></div>
 
-<script src="js/kb-hit-dashboard-inline.js" defer></script>
+  <!-- 引擎分布 -->
+  <div class="section-title">⚙️ 搜索引擎分布</div>
+  <div class="engine-grid" id="engineGrid"></div>
+
+  <!-- sparkline -->
+  <div class="section-title">📈 命中分趋势（最近 50 次）</div>
+  <div id="sparkline" class="sparkline-wrap"></div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  // 同源读取 localStorage（与 ai-assistant.html 共享）
+  var KEY_PREFIX = '_kb_hit_count/';
+  var KEY_TODAY = '_kb_hit_today';
+  var EVT_PREFIX = '_kb_hit_events/';
+  var ENGINE_PREFIX = '_kb_engine_count/';
+
+  function safeGet(k){ try{return localStorage.getItem(k);}catch(e){return null;} }
+  function safeParse(s,f){ try{return JSON.parse(s)||f;}catch(e){return f;} }
+
+  function todayStr(){ return new Date().toDateString(); }
+  function ymd(){ var d=new Date(); return d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0'); }
+
+  // 读取统计
+  var td = safeParse(safeGet(KEY_TODAY)||'{}',{});
+  var todayN = (td && td.date===todayStr()) ? (Number(td.count)||0) : 0;
+
+  var totalN = 0, topMod = null, topCnt = 0;
+  var byModule = [];
+  try{
+    for(var i=0;i<localStorage.length;i++){
+      var k = localStorage.key(i);
+      if(!k || k.indexOf(KEY_PREFIX)!==0) continue;
+      var sub = k.substring(KEY_PREFIX.length);
+      var v = parseInt(safeGet(k)||'0',10)||0;
+      if(sub==='_total'){ totalN=v; continue; }
+      byModule.push({name:sub, count:v});
+      if(v>topCnt){ topCnt=v; topMod=sub; }
+    }
+  }catch(e){}
+
+  byModule.sort(function(a,b){return b.count-a.count;});
+
+  // 引擎统计
+  var engines = {fts5:0, 'like-fallback':0, 'like-primary':0};
+  try{
+    for(var i2=0;i2<localStorage.length;i2++){
+      var ek = localStorage.key(i2);
+      if(!ek || ek.indexOf(ENGINE_PREFIX)!==0) continue;
+      var ename = ek.substring(ENGINE_PREFIX.length);
+      var ev = parseInt(safeGet(ek)||'0',10)||0;
+      engines[ename] = ev;
+    }
+  }catch(e){}
+
+  // 当日事件
+  var dayKey = EVT_PREFIX + ymd();
+  var events = safeParse(safeGet(dayKey)||'[]',[]);
+  var eventsToday = events.length;
+  var directToday = events.filter(function(e){return e.b==='direct';}).length;
+  var hitRate = eventsToday>0 ? Math.round(directToday*100/eventsToday) : 0;
+
+  // 判断是否有数据
+  var hasData = todayN>0 || totalN>0 || eventsToday>0;
+  if(!hasData){
+    document.getElementById('emptyState').style.display='block';
+    return;
+  }
+  document.getElementById('dashboard').style.display='block';
+
+  // 渲染核心指标
+  document.getElementById('todayCount').textContent = todayN;
+  document.getElementById('hitRate').innerHTML = hitRate + '<span style="font-size:14px">%</span>';
+  document.getElementById('totalCount').textContent = totalN;
+  document.getElementById('eventsToday').textContent = eventsToday;
+  document.getElementById('todaySub').textContent = '直答 = 命中分 ≥ 70%';
+  document.getElementById('hitRateSub').textContent = directToday + ' 直答 / ' + eventsToday + ' 总交互';
+  document.getElementById('totalSub').textContent = topMod ? ('最强模块：' + topMod + ' (' + topCnt + ')') : '—';
+  document.getElementById('eventsSub').textContent = '命中率 ' + hitRate + '%';
+
+  // 模块排行
+  var modRankingEl = document.getElementById('modRanking');
+  var top10 = byModule.slice(0, 10);
+  var maxCnt = top10.length>0 ? top10[0].count : 1;
+  top10.forEach(function(m, idx){
+    var pct = Math.round(m.count*100/maxCnt);
+    var color = idx<3 ? 'var(--gold2)' : 'rgba(201,168,76,' + (0.6-idx*0.04) + ')';
+    var row = document.createElement('div');
+    row.className = 'mod-row';
+    row.innerHTML =
+      '<span class="mod-name">' + (idx+1) + '. ' + m.name + '</span>' +
+      '<div class="mod-bar-wrap"><div class="mod-bar-fill" style="width:' + pct + '%;background:' + color + '"></div></div>' +
+      '<span class="mod-count">' + m.count + '</span>';
+    modRankingEl.appendChild(row);
+  });
+
+  // 引擎分布
+  var engineGrid = document.getElementById('engineGrid');
+  var engineData = [
+    {name:'FTS5 全文搜索', icon:'⚡', count:engines.fts5||0, color:'var(--good)'},
+    {name:'LIKE 回退', icon:'🔄', count:engines['like-fallback']||0, color:'var(--warn)'},
+    {name:'热门直出', icon:'📖', count:engines['like-primary']||0, color:'var(--gold2)'}
+  ];
+  var engineTotal = engineData.reduce(function(s,e){return s+e.count;},0);
+  engineData.forEach(function(e){
+    var pct = engineTotal>0 ? Math.round(e.count*100/engineTotal) : 0;
+    var card = document.createElement('div');
+    card.className = 'engine-card';
+    card.innerHTML =
+      '<div class="engine-icon">' + e.icon + '</div>' +
+      '<div class="engine-name">' + e.name + '</div>' +
+      '<div class="engine-count" style="color:' + e.color + '">' + e.count + '</div>' +
+      '<div style="font-size:10px;color:var(--paper3);margin-top:2px">' + pct + '%</div>';
+    engineGrid.appendChild(card);
+  });
+
+  // Sparkline — 最近 50 次命中分
+  var sparklineEl = document.getElementById('sparkline');
+  var recentScores = events.slice(-50).map(function(e){return Number(e.s)||0;});
+  if(recentScores.length>0){
+    var w=320, h=60, pad=4;
+    var maxVal=1, minVal=0;
+    var stepX = recentScores.length>1 ? (w-2*pad)/(recentScores.length-1) : 0;
+    var pts = recentScores.map(function(s,i){
+      var x = pad + i*stepX;
+      var y = h - pad - (s-minVal)*(h-2*pad)/(maxVal-minVal);
+      return x.toFixed(1)+','+y.toFixed(1);
+    }).join(' ');
+
+    var avgScore = recentScores.reduce(function(s,v){return s+v;},0)/recentScores.length;
+    var avgY = h - pad - avgScore*(h-2*pad);
+
+    var svg = '<svg width="100%" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">';
+    // 70% 线
+    svg += '<line x1="0" y1="' + (h-pad-0.7*(h-2*pad)) + '" x2="' + w + '" y2="' + (h-pad-0.7*(h-2*pad)) + '" stroke="rgba(16,185,129,.3)" stroke-dasharray="3,3" stroke-width="0.5"/>';
+    // 40% 线
+    svg += '<line x1="0" y1="' + (h-pad-0.4*(h-2*pad)) + '" x2="' + w + '" y2="' + (h-pad-0.4*(h-2*pad)) + '" stroke="rgba(245,158,11,.2)" stroke-dasharray="3,3" stroke-width="0.5"/>';
+    // 平均线
+    svg += '<line x1="0" y1="' + avgY.toFixed(1) + '" x2="' + w + '" y2="' + avgY.toFixed(1) + '" stroke="rgba(201,168,76,.3)" stroke-dasharray="5,2" stroke-width="0.5"/>';
+    // 折线
+    svg += '<polyline points="' + pts + '" fill="none" stroke="var(--gold2)" stroke-width="1.5" stroke-linejoin="round"/>';
+    // 点
+    recentScores.forEach(function(s,i){
+      var x = pad + i*stepX;
+      var y = h - pad - s*(h-2*pad);
+      var fill = s>=0.7?'var(--good)':s>=0.4?'var(--warn)':'var(--bad)';
+      svg += '<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="1.5" fill="'+fill+'"/>';
+    });
+    svg += '</svg>';
+    sparklineEl.innerHTML = svg +
+      '<div style="font-size:11px;color:var(--paper3);text-align:center;margin-top:6px">' +
+        '平均命中分 <b style="color:var(--gold2)">' + (Math.round(avgScore*100)) + '%</b>' +
+        ' · 🟢 ≥70% KB 直答 · 🟡 40-70% KB+ai · 🔴 <40% ai 兜底' +
+      '</div>';
+  }else{
+    sparklineEl.innerHTML = '<div style="color:var(--paper3);font-size:12px;text-align:center;padding:20px">暂无命中分记录</div>';
+  }
+
+})();
+</script>
 </body>
 </html>
