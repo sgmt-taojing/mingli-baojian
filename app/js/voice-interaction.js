@@ -9,8 +9,8 @@
 'use strict';
 
 const TTS_BASE = '/api/tts';
-const currentVoice = 'female';
-const currentAudio = null;
+let currentVoice = 'female';
+let currentAudio = null;
 
 // ========== TTS 语音输出 ==========
 window.speakText = function(text, opts){
@@ -35,9 +35,9 @@ window.setVoice = function(v){currentVoice = v;};
 window.getVoice = function(){return currentVoice;};
 
 // ========== 语音输入 (ASR) ==========
-const recognition = null;
-const isListening = false;
-const listeningTarget = null;
+let recognition = null;
+let isListening = false;
+let listeningTarget = null;
 
 function initRecognition(){
   let SR = window.SpeechRecognition || window.webkitSpeechRecognition;
