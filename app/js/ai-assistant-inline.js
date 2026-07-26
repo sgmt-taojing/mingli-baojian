@@ -2696,12 +2696,34 @@ function openKBPanel(){
   const content=document.getElementById('kbContent');
   list.innerHTML='<div style="color:var(--gold,#c9a84c)">加载中...</div>';
   content.innerHTML='';
-  fetch(API+'/api/kb/list').then(r=>r.json()).then(data=>{
+  // R53: 并行加载 KB 文件列表 + 质量报告（双 API 同步获取）
+  Promise.all([
+    fetch(API+'/api/kb/list').then(r=>r.json()).catch(()=>({files:[]})),
+    fetch(API+'/api/kb/quality-report').then(r=>r.json()).catch(()=>null)
+  ]).then(([data, qual])=>{
     if(!data.files||!data.files.length){
       list.innerHTML='<div>暂无知识库文件</div>';
       return;
     }
-    list.innerHTML='<div style="margin-bottom:8px;color:var(--paper2,#ccc)">共'+data.files.length+'个文件，点击查看</div>';
+    let topHtml='';
+    if(qual&&qual.data&&qual.data.summary){
+      const s=qual.data.summary;
+      const g=s.grade||'-';
+      topHtml=`<div style="padding:10px 12px;margin-bottom:12px;background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(201,168,76,.04));border:1px solid rgba(201,168,76,.3);border-radius:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:13px;color:var(--gold,#c9a84c);font-weight:600">📊 KB 质量审计</span>
+          <a href="kb-quality.html" style="font-size:11px;color:var(--cyan,#22d3ee);text-decoration:none" target="_blank">查看详情 →</a>
+        </div>
+        <div style="display:flex;gap:12px;font-size:11px;color:var(--paper2,#ccc);flex-wrap:wrap">
+          <span>等级 <b style="color:var(--gold,#c9a84c);font-size:14px">${esc(g)}</b></span>
+          <span>${s.module_cnt} 模块</span>
+          <span>${(s.total>=1000?(s.total/1000).toFixed(1)+'k':s.total)} 条目</span>
+          <span>trust <b>${s.avg_trust}</b></span>
+          ${s.needs_fix>0?`<span style="color:#f87171">⚠ ${s.needs_fix} 需修复</span>`:'<span style="color:#86efac">✓ 无需修复</span>'}
+        </div>
+      </div>`;
+    }
+    list.innerHTML=topHtml+'<div style="margin-bottom:8px;color:var(--paper2,#ccc)">共'+data.files.length+'个文件，点击查看</div>';
     data.files.forEach(f=>{
       const btn=document.createElement('div');
       btn.style.cssText='padding:8px 12px;margin:4px 0;background:rgba(201,168,76,0.06);border-radius:6px;cursor:pointer;transition:background 0.2s';
