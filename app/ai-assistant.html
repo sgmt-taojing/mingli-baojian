@@ -1215,7 +1215,46 @@ function showReport(text){
   d.className='msg m-ai';
   d.innerHTML='<div class="b">'+esc(text)+'</div>';
   chat.appendChild(d);
-  
+
+  // R40: 嵌入图谱智能推荐段落（位于报告主体与操作按钮之间）
+  if (state.module) {
+    const recBox = document.createElement('div');
+    recBox.className = 'kbe-rec-block';
+    recBox.id = 'recBlock-' + Date.now();
+    recBox.style.cssText = 'margin-top:14px;padding:14px;background:linear-gradient(135deg,rgba(147,51,234,.06),rgba(201,168,76,.06));border:1px solid rgba(147,51,234,.25);border-radius:10px;font-size:13px;line-height:1.7';
+    recBox.innerHTML = '<div style="display:flex;align-items:center;gap:8px;color:#9333ea;font-weight:600;margin-bottom:8px"><span style="font-size:16px">🧠</span><span>图谱智能推荐</span><span style="margin-left:auto;font-size:11px;color:var(--paper3);font-weight:normal">基于关联权重+命中次数+模块大小</span></div>'
+      + '<div style="opacity:.5;padding:8px 0">推荐加载中...</div>';
+    d.appendChild(recBox);
+    // 异步加载推荐
+    fetch(API + '/api/kb/recommend?module=' + encodeURIComponent(state.module) + '&limit=5')
+      .then(r => r.json())
+      .then(dd => {
+        const recs = (dd.data && dd.data.recommendations) || dd.recommendations || [];
+        if(!recs.length){
+          recBox.innerHTML = '<div style="display:flex;align-items:center;gap:8px;color:#9333ea;font-weight:600;margin-bottom:8px"><span style="font-size:16px">🧠</span><span>图谱智能推荐</span></div><div style="opacity:.6;font-size:12px">本次报告暂无图谱关联推荐</div>';
+          return;
+        }
+        let h = '<div style="display:flex;align-items:center;gap:8px;color:#9333ea;font-weight:600;margin-bottom:8px"><span style="font-size:16px">🧠</span><span>图谱智能推荐</span><span style="margin-left:auto;font-size:11px;color:var(--paper3);font-weight:normal">为你发现 '+recs.length+' 个关联领域</span></div>';
+        h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">';
+        recs.forEach((r, i) => {
+          const pct = Math.round((r.score||0) * 100);
+          const color = pct >= 60 ? '#10b981' : pct >= 30 ? '#c9a84c' : 'rgba(255,255,255,.4)';
+          const safeId = String(r.id||'').replace(/[<>"&]/g, c => ({'<':'&lt;','>':'&gt;','"':'&quot;','&':'&amp;'})[c]);
+          const safeName = String(r.name||r.id||'').replace(/[<>"&]/g, c => ({'<':'&lt;','>':'&gt;','"':'&quot;','&':'&amp;'})[c]);
+          h += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:6px">';
+          h += '<div style="display:flex;flex-direction:column;flex:1;min-width:0"><span style="font-size:12px;color:var(--paper);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + safeName + '</span><span style="font-size:10px;color:var(--paper3);margin-top:2px">' + safeId + '</span></div>';
+          h += '<span style="margin-left:8px;font-size:11px;font-weight:600;color:' + color + '">' + pct + '%</span>';
+          h += '</div>';
+        });
+        h += '</div>';
+        h += '<div style="margin-top:10px;padding-top:8px;border-top:1px dashed rgba(147,51,234,.2);font-size:11px;color:var(--paper3);text-align:center">⛕ 点 <a href="kb-explorer.html" style="color:#9333ea;text-decoration:underline">知识浏览器</a> 查看详情 · 点 <a href="kb-graph.html" style="color:#9333ea;text-decoration:underline">知识图谱</a> 看关系</div>';
+        recBox.innerHTML = h;
+      })
+      .catch(e => {
+        recBox.innerHTML = '<div style="opacity:.5;font-size:12px">推荐加载失败：' + e.message + '</div>';
+      });
+  }
+
   // 报告操作
   const ops=document.createElement('div');
   ops.className='report-ops';
