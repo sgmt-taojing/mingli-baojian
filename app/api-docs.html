@@ -21,11 +21,11 @@
 
 <div class="topbar">
   <h1>📚 命理宝鉴 API 文档</h1>
-  <span class="meta">OpenAPI 3.0.3 · 149 routes · 19 tags</span>
+  <span class="meta" id="apiMeta">OpenAPI 3.0.3 · loading...</span>
   <span style="flex:1"></span>
   <a href="divination-hub.html">← 返回首页</a>
   <a href="kb-graph.html">KB 图谱</a>
-  <a href="/docs/openapi.json" download>下载 JSON</a>
+  <a href="/api/openapi.json" download>下载 JSON</a>
 </div>
 
 <div id="swagger-ui"></div>
@@ -34,7 +34,24 @@
 <script>
   window.onload = () => {
     SwaggerUIBundle({
-      url: "/docs/openapi.json",
+      url: "/api/openapi.json",
+      onComplete: function(swagger) {
+        try {
+          var routes = 0, tags = {};
+          if (swagger && swagger.json && swagger.json.paths) {
+            routes = Object.keys(swagger.json.paths).length;
+            (swagger.json.tags || []).forEach(function(t){ tags[t.name] = true; });
+            // 数路径上每个 tag 出现次数
+            Object.values(swagger.json.paths).forEach(function(path){
+              Object.values(path).forEach(function(op){
+                if (op.tags) op.tags.forEach(function(t){ tags[t] = (tags[t]||0)+1; });
+              });
+            });
+          }
+          var tagCount = Object.keys(tags).length;
+          document.getElementById('apiMeta').textContent = 'OpenAPI 3.0.3 · ' + routes + ' routes · ' + tagCount + ' tags';
+        } catch(e) { /* ignore */ }
+      },
       dom_id: "#swagger-ui",
       deepLinking: true,
       presets: [
