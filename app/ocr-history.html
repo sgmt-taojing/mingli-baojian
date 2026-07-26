@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCR 历史 · 命理宝鉴</title>
+<link rel="stylesheet" href="css/a11y-fix.css">
+<style>
+:root {
+  --bg:#0b0e14; --bg2:#13181f; --bg3:#1a1f2a;
+  --bd:#252b38; --bd2:#3a4255;
+  --tx:#e6edf3; --muted:#8b949e; --muted2:#545d68;
+  --gold:#c9a84c; --gold2:#e6c873;
+  --ok:#3fb950; --warn:#d29922; --err:#f85149;
+  --info:#58a6ff;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body {
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg); color:var(--tx); line-height:1.6; min-height:100vh;
+}
+.header {
+  background:linear-gradient(180deg,rgba(201,168,76,.08),transparent);
+  border-bottom:1px solid var(--bd); padding:20px 24px; text-align:center;
+  position:sticky; top:0; z-index:50; backdrop-filter:blur(12px);
+}
+.header h1 { font-size:20px; color:var(--gold2); font-weight:600; letter-spacing:2px; }
+.header p { font-size:13px; color:var(--muted); margin-top:4px; }
+.header a { color:var(--info); font-size:12px; text-decoration:none; }
+.container { max-width:1100px; margin:0 auto; padding:16px; }
+
+/* Stats */
+.stats { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:16px; }
+@media(max-width:768px){ .stats{grid-template-columns:repeat(2,1fr);} }
+.stat-card {
+  background:var(--bg2); border:1px solid var(--bd); border-radius:10px;
+  padding:12px 14px; text-align:center; position:relative;
+}
+.stat-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent); opacity:.4;
+}
+.stat-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+.stat-val { font-size:24px; font-weight:600; font-variant-numeric:tabular-nums; }
+.stat-val.gold { color:var(--gold2); }
+.stat-val.ok { color:var(--ok); }
+
+/* Filter */
+.filter-bar {
+  display:flex; gap:8px; align-items:center; margin-bottom:14px; flex-wrap:wrap;
+}
+.filter-bar select {
+  background:var(--bg2); color:var(--tx); border:1px solid var(--bd);
+  border-radius:6px; padding:6px 10px; font-size:13px;
+}
+.filter-bar select:focus { outline:none; border-color:var(--gold); }
+.btn {
+  padding:6px 14px; border:1px solid var(--bd); background:var(--bg3); color:var(--tx);
+  border-radius:6px; cursor:pointer; font-size:13px; transition:all .15s;
+}
+.btn:hover { border-color:var(--gold); background:rgba(201,168,76,.06); }
+.btn.danger { border-color:rgba(248,81,73,.3); color:var(--err); }
+.btn.danger:hover { background:rgba(248,81,73,.1); }
+
+/* Table */
+.hist-table { width:100%; border-collapse:collapse; }
+.hist-table th {
+  font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px;
+  padding:8px 10px; border-bottom:1px solid var(--bd2); text-align:left;
+}
+.hist-table td {
+  padding:10px; border-bottom:1px solid rgba(37,43,56,.6); font-size:13px;
+}
+.hist-table tr:hover td { background:rgba(201,168,76,.04); }
+.mode-tag {
+  display:inline-block; font-size:9px; padding:2px 8px; border-radius:3px;
+  font-weight:600; letter-spacing:.5px;
+}
+.mode-tag.face { background:rgba(88,166,255,.15); color:var(--info); }
+.mode-tag.tongue { background:rgba(188,140,255,.15); color:var(--purple,#bc8cff); }
+.mode-tag.ocr { background:rgba(63,185,80,.15); color:var(--ok); }
+.mode-tag.ocr-tcm { background:rgba(210,153,34,.15); color:var(--warn); }
+.mode-tag.voice { background:rgba(248,81,73,.15); color:var(--err); }
+.latency-bar {
+  display:inline-block; height:4px; border-radius:2px; vertical-align:middle;
+  min-width:20px; max-width:60px;
+}
+.latency-bar.fast { background:var(--ok); }
+.latency-bar.mid { background:var(--warn); }
+.latency-bar.slow { background:var(--err); }
+
+/* Pie chart */
+.pie-section {
+  background:var(--bg2); border:1px solid var(--bd); border-radius:12px;
+  padding:16px; margin-bottom:16px;
+}
+.pie-title { font-size:12px; color:var(--gold); text-transform:uppercase; letter-spacing:2px; margin-bottom:10px; }
+.pie-container { display:flex; align-items:center; gap:20px; flex-wrap:wrap; }
+@media(max-width:768px){ .pie-container{flex-direction:column;} }
+.pie-legend { display:flex; flex-direction:column; gap:4px; }
+.pie-legend-item { display:flex; align-items:center; gap:8px; font-size:12px; }
+.pie-dot { width:10px; height:10px; border-radius:2px; }
+
+/* Empty state */
+.empty { text-align:center; padding:60px 20px; color:var(--muted2); }
+.empty .icon { font-size:48px; margin-bottom:10px; opacity:.4; }
+
+/* Toast */
+.toast {
+  position:fixed; top:16px; left:50%; transform:translateX(-50%);
+  background:var(--bg3); border:1px solid var(--gold); color:var(--tx);
+  padding:10px 20px; border-radius:8px; font-size:13px; z-index:999;
+  opacity:0; transition:opacity .25s; pointer-events:none;
+}
+.toast.show { opacity:1; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>📋 OCR 历史记录</h1>
+  <p>面相 · 舌诊 · OCR · 语音 — 所有识别结果汇总</p>
+  <p style="margin-top:6px"><a href="vision-demo.html">← 返回 AI 眼睛</a> · <a href="glass-console.html">智镜控制台 →</a></p>
+</div>
+
+<main class="container">
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-label">📊 总记录</div>
+      <div class="stat-val gold" id="stTotal">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">👤 面相</div>
+      <div class="stat-val" id="stFace">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">👅 舌诊</div>
+      <div class="stat-val" id="stTongue">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">📄 OCR</div>
+      <div class="stat-val" id="stOcr">0</div>
+    </div>
+  </div>
+
+  <!-- Pie chart -->
+  <div class="pie-section">
+    <div class="pie-title">📈 模式分布</div>
+    <div class="pie-container">
+      <canvas id="pieChart" width="160" height="160"></canvas>
+      <div class="pie-legend" id="pieLegend"></div>
+    </div>
+  </div>
+
+  <!-- Filter -->
+  <div class="filter-bar">
+    <select id="modeFilter" onchange="loadHistory()">
+      <option value="">全部模式</option>
+      <option value="face">👤 面相识别</option>
+      <option value="tongue">👅 舌诊分析</option>
+      <option value="ocr">📄 通用 OCR</option>
+      <option value="ocr-tcm">📋 病历 OCR</option>
+      <option value="voice">🎤 语音输入</option>
+    </select>
+    <button class="btn" onclick="loadHistory()">🔄 刷新</button>
+    <button class="btn danger" onclick="clearAll()">🗑 清空</button>
+    <span style="margin-left:auto;font-size:11px;color:var(--muted2)" id="updateTime"></span>
+  </div>
+
+  <!-- Table -->
+  <div id="histContent">
+    <div class="empty">
+      <div class="icon">📋</div>
+      <div>暂无 OCR 历史记录</div>
+      <div style="font-size:11px;margin-top:6px">在 <a href="vision-demo.html" style="color:var(--info)">AI 眼睛</a> 中拍照分析后会自动记录</div>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const MODE_COLORS = {
+  face: '#58a6ff', tongue: '#bc8cff', ocr: '#3fb950',
+  'ocr-tcm': '#d29922', voice: '#f85149'
+};
+const MODE_LABELS = {
+  face: '面相识别', tongue: '舌诊分析', ocr: '通用 OCR',
+  'ocr-tcm': '病历 OCR', voice: '语音输入'
+};
+let csrfToken = '';
+
+async function fetchCsrf() {
+  try {
+    const r = await fetch('/api/csrf-token', { credentials:'same-origin' });
+    const d = await r.json();
+    csrfToken = d.csrfToken || d.data?.csrfToken || '';
+  } catch(e) { console.warn('csrf fetch fail', e.message); }
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+function esc(s) {
+  return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function loadHistory() {
+  const mode = document.getElementById('modeFilter').value;
+  const url = '/api/ocr/history?limit=50' + (mode ? '&mode=' + mode : '');
+  try {
+    const r = await fetch(url, { credentials:'same-origin', headers: csrfToken ? {'x-csrf-token':csrfToken} : {} });
+    const d = await r.json();
+    const data = d.data || d;
+    if (!data.ok) { toast('加载失败'); return; }
+
+    // Stats
+    document.getElementById('stTotal').textContent = data.total || 0;
+    const byMode = {};
+    (data.by_mode||[]).forEach(m => byMode[m.mode] = m.c);
+    document.getElementById('stFace').textContent = byMode.face || 0;
+    document.getElementById('stTongue').textContent = byMode.tongue || 0;
+    document.getElementById('stOcr').textContent = (byMode.ocr||0) + (byMode['ocr-tcm']||0);
+
+    // Pie
+    drawPie(data.by_mode||[]);
+
+    // Table
+    const content = document.getElementById('histContent');
+    if (!data.history||!data.history.length) {
+      content.innerHTML = '<div class="empty"><div class="icon">📋</div><div>暂无记录</div></div>';
+    } else {
+      content.innerHTML = '<table class="hist-table"><thead><tr>' +
+        '<th>时间</th><th>模式</th><th>预览</th><th>API</th><th>延迟</th>' +
+        '</tr></thead><tbody>' +
+        data.history.map(h => {
+          const latency = h.latency_ms || 0;
+          const lclass = latency < 1000 ? 'fast' : latency < 3000 ? 'mid' : 'slow';
+          const lwidth = Math.min(Math.max(latency/50, 10), 60);
+          return '<tr>' +
+            '<td style="font-size:11px;color:var(--muted);white-space:nowrap">' + esc(h.hit_at) + '</td>' +
+            '<td><span class="mode-tag ' + esc(h.mode) + '">' + (MODE_LABELS[h.mode]||h.mode) + '</span></td>' +
+            '<td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(h.preview) + '</td>' +
+            '<td style="font-size:10px;color:var(--muted2)">' + esc(h.api_url||'') + '</td>' +
+            '<td><span class="latency-bar ' + lclass + '" style="width:' + lwidth + 'px"></span> <span style="font-size:10px;color:var(--muted)">' + latency + 'ms</span></td>' +
+          '</tr>';
+        }).join('') +
+        '</tbody></table>';
+    }
+    document.getElementById('updateTime').textContent = '更新于 ' + new Date().toLocaleTimeString();
+  } catch(e) {
+    toast('请求失败：' + e.message);
+  }
+}
+
+function drawPie(byMode) {
+  const canvas = document.getElementById('pieChart');
+  const ctx = canvas.getContext('2d');
+  const cx = 80, cy = 80, r = 60;
+  ctx.clearRect(0,0,160,160);
+
+  const total = byMode.reduce((s,m) => s + m.c, 0);
+  if (!total) {
+    ctx.fillStyle = '#545d68';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('暂无数据', 80, 84);
+    document.getElementById('pieLegend').innerHTML = '';
+    return;
+  }
+
+  let angle = -Math.PI / 2;
+  byMode.forEach(m => {
+    const slice = (m.c / total) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, angle, angle + slice);
+    ctx.closePath();
+    ctx.fillStyle = MODE_COLORS[m.mode] || '#8b949e';
+    ctx.fill();
+    angle += slice;
+  });
+
+  // Inner circle (donut)
+  ctx.beginPath();
+  ctx.arc(cx, cy, 28, 0, Math.PI*2);
+  ctx.fillStyle = '#13181f';
+  ctx.fill();
+  ctx.fillStyle = '#e6edf3';
+  ctx.font = 'bold 18px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(total, cx, cy + 6);
+  ctx.font = '9px sans-serif';
+  ctx.fillStyle = '#8b949e';
+  ctx.fillText('总计', cx, cy + 20);
+
+  // Legend
+  document.getElementById('pieLegend').innerHTML = byMode.map(m =>
+    '<div class="pie-legend-item">' +
+      '<div class="pie-dot" style="background:' + (MODE_COLORS[m.mode]||'#8b949e') + '"></div>' +
+      '<span>' + (MODE_LABELS[m.mode]||m.mode) + ' · ' + m.c + ' 条 (' + ((m.c/total)*100).toFixed(1) + '%)</span>' +
+    '</div>'
+  ).join('');
+}
+
+async function clearAll() {
+  if (!confirm('确认清空所有 OCR 历史记录？')) return;
+  try {
+    const r = await fetch('/api/ocr/history', {
+      method:'DELETE', credentials:'same-origin',
+      headers: csrfToken ? {'x-csrf-token':csrfToken} : {}
+    });
+    const d = await r.json();
+    if ((d.data||d).ok) { toast('已清空'); loadHistory(); }
+    else toast('清空失败');
+  } catch(e) { toast('请求失败'); }
+}
+
+// Init
+window.addEventListener('DOMContentLoaded', async () => {
+  await fetchCsrf();
+  loadHistory();
+  // Auto refresh 30s
+  setInterval(loadHistory, 30000);
+});
+</script>
+</body>
+</html>
