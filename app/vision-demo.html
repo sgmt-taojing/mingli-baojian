@@ -59,6 +59,7 @@ header p{font-size:11px;color:var(--paper3);letter-spacing:2px;margin-top:6px}
 .btn:hover{background:rgba(201,168,76,.1);border-color:var(--gold)}
 .btn.primary{background:var(--gold);color:#000;border-color:var(--gold);font-weight:600}
 .btn.primary:hover{background:var(--gold2)}
+.btn.warn{background:rgba(200,80,62,.15);border-color:var(--danger);color:var(--danger)}
 .btn:disabled{opacity:.4;cursor:not-allowed}
 
 /* === 结果区 === */
@@ -87,6 +88,18 @@ header p{font-size:11px;color:var(--paper3);letter-spacing:2px;margin-top:6px}
 
 .section-title{font-size:13px;color:var(--gold);letter-spacing:3px;margin:20px 0 10px;display:flex;align-items:center;gap:10px}
 .section-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(201,168,76,.3),transparent)}
+
+/* === 扫描线动画 === */
+.scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);box-shadow:0 0 12px var(--gold);animation:scanMove 2.5s ease-in-out infinite;opacity:.7;pointer-events:none}
+@keyframes scanMove{0%{top:0}50%{top:calc(100% - 2px)}100%{top:0}}
+
+/* === 语音状态 === */
+.voice-active{background:rgba(200,80,62,.15)!important;border-color:var(--danger)!important;color:var(--danger)!important;animation:voicePulse 1s infinite}
+@keyframes voicePulse{0%,100%{box-shadow:0 0 0 0 rgba(200,80,62,.4)}50%{box-shadow:0 0 0 8px rgba(200,80,62,0)}}
+
+/* === 历史可点击 === */
+.history-item{cursor:pointer;transition:background .15s}
+.history-item:hover{background:rgba(201,168,76,.06)}
 </style>
 </head>
 <body data-kb-module="mobile">
@@ -134,6 +147,8 @@ header p{font-size:11px;color:var(--paper3);letter-spacing:2px;margin-top:6px}
       <div class="live-tag" id="liveTag" style="display:none">LIVE</div>
       <div class="device-tag" id="deviceTag">未连接</div>
       <div class="mode-tag" id="modeTag">面相识别</div>
+      <div class="scan-line" id="scanLine" style="display:none"></div>
+      <div id="scanFlash" style="position:absolute;inset:0;background:white;opacity:0;transition:opacity 200ms;pointer-events:none"></div>
     </div>
 
     <div class="stage" id="resultStage" style="flex-direction:column;align-items:stretch;justify-content:flex-start;padding:16px">
@@ -160,6 +175,22 @@ header p{font-size:11px;color:var(--paper3);letter-spacing:2px;margin-top:6px}
         <option value="none">无（真实浏览器 API）</option>
         <option value="mock">Mock Rokid（模拟原生桥）</option>
       </select>
+    </div>
+
+    <div class="field">
+      <label>TTS 朗读音色（Edge-TTS）</label>
+      <select id="ttsVoice">
+        <option value="female">女声 · female</option>
+        <option value="male">男声 · male</option>
+        <option value="zh-CN-XiaoxiaoNeural">晓晓 · zh-CN-XiaoxiaoNeural</option>
+        <option value="zh-CN-YunxiNeural">云希 · zh-CN-YunxiNeural</option>
+        <option value="zh-CN-YunjianNeural">云健 · zh-CN-YunjianNeural</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>🎤 语音问诊（点击开始录音，自动转文字并填入）</label>
+      <button class="btn" id="btnVoice" onclick="toggleVoice()" style="width:100%;text-align:left">🎤 开始录音</button>
     </div>
 
     <div class="btn-row">
@@ -294,8 +325,27 @@ async function startCamera() {
     toast('摄像头已启动');
     await enumerateDevices();
   } catch(e) {
-    toast('启动失败：' + e.message);
+    // 权限被拒或不兼容：友好提示
+    let msg = '启动失败';
+    let hint = '';
+    if (e.name === 'NotAllowedError' || e.name === 'SecurityError') {
+      msg = '⛔ 摄像头权限被拒';
+      hint = '请在浏览器地址栏左侧的锁图标中重新授予摄像头权限，然后刷新页面。\n如果是内嵌页面，需要用 https 或 localhost。';
+    } else if (e.name === 'NotFoundError' || e.name === 'OverconstrainedError') {
+      msg = '🚫 未找到摄像头';
+      hint = '请确认摄像头已连接，且没有被其他应用独占使用。';
+    } else if (e.name === 'NotReadableError') {
+      msg = '⚠️ 摄像头被占用';
+      hint = '请关闭正在使用摄像头的其他应用（如 Zoom、QQ、微信），然后重试。';
+    } else if (location.protocol === 'http:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+      msg = '🔒 需要 HTTPS';
+      hint = '浏览器要求安全上下文才能调用摄像头。请用 https:// 或 http://localhost 访问。';
+    } else {
+      hint = '错误详情：' + e.message;
+    }
+    toast(msg);
     updateStatus('stCam', '失败', 'err');
+    document.getElementById('resultBox').innerHTML = '<div class="meta">✗ ' + msg + '</div><div style="white-space:pre-wrap;line-height:1.6">' + hint + '</div>';
     console.error('[vision] startCamera:', e);
   }
 }
@@ -332,7 +382,10 @@ async function captureAndAnalyze() {
 
   const mode = currentMode;
   const resultBox = document.getElementById('resultBox');
-  resultBox.innerHTML = '<div class="meta">⏳ 分析中...</div><div>正在调用 OCR 引擎</div>';
+  resultBox.innerHTML = '<div class="meta">⏳ 分析中...</div><div>正在调用 OCR 引擎（预计 1-5s）</div>';
+  // 闪拍光效
+  const flash = document.getElementById('scanFlash');
+  if (flash) { flash.style.opacity = '1'; setTimeout(() => flash.style.opacity = '0', 200); }
 
   try {
     const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.85));
@@ -383,24 +436,34 @@ async function captureAndAnalyze() {
 async function speakResult() {
   if (!lastResult) { toast('暂无结果可朗读'); return; }
   const text = lastResult.slice(0, 200);
+  const voice = (document.getElementById('ttsVoice') || {}).value || 'female';
+  const ttsBtn = document.getElementById('btnTTS');
   try {
-    const r = await fetch('/api/tts/speak', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, voice: 'zh-CN-XiaoxiaoNeural' }),
-      mode: 'cors'
-    });
-    const data = await r.json().catch(() => ({}));
-    if (data.ok || data.url) {
-      toast('TTS 播放中...');
-      if (data.url) {
-        const a = new Audio(data.url);
-        a.play().catch(() => toast('音频播放失败'));
-      }
-    } else {
-      toast('TTS 失败：' + (data.error || '未知'));
-    }
+    ttsBtn.disabled = true;
+    ttsBtn.textContent = '⏳ 合成中...';
+    // TTS-server 只支持 GET + query string；直接调用 8912
+    const url = 'http://localhost:8912/api/tts?text=' + encodeURIComponent(text) + '&voice=' + encodeURIComponent(voice);
+    const audio = new Audio();
+    audio.src = url;
+    audio.onplaying = () => { ttsBtn.disabled = false; ttsBtn.textContent = '🔊 朗读中...'; toast('播放中...'); };
+    audio.onended = () => { ttsBtn.disabled = false; ttsBtn.textContent = '🔊 朗读结果'; };
+    audio.onerror = () => {
+      ttsBtn.disabled = false;
+      ttsBtn.textContent = '🔊 朗读结果';
+      // TTS 不可用：尝试走 8920 代理
+      fetch('/api/tts?text=' + encodeURIComponent(text)).then(r => r.blob()).then(blob => {
+        if (blob.size > 100) {
+          const a = new Audio(URL.createObjectURL(blob));
+          a.play();
+        } else {
+          toast('TTS 服务不可用');
+        }
+      }).catch(() => toast('TTS 服务未启动（请启动 tts-server.py 8912）'));
+    };
+    audio.play().catch(() => audio.onerror());
   } catch(e) {
+    ttsBtn.disabled = false;
+    ttsBtn.textContent = '🔊 朗读结果';
     toast('TTS 请求失败：' + e.message);
   }
 }
@@ -490,6 +553,60 @@ function clearHistory() {
   try { localStorage.removeItem(HISTORY_KEY); } catch(e) {}
   renderHistory();
   toast('历史已清空');
+}
+
+/* ---- 语音问诊（浏览器 SpeechRecognition）---- */
+let voiceRec = null;
+let voiceStream = null;
+function toggleVoice() {
+  const btn = document.getElementById('btnVoice');
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    toast('当前浏览器不支持语音识别（Chrome/Edge 推荐）');
+    return;
+  }
+  if (voiceRec) {
+    voiceRec.stop();
+    voiceRec = null;
+    btn.textContent = '🎤 开始录音';
+    btn.classList.remove('warn');
+    if (voiceStream) { voiceStream.getTracks().forEach(t => t.stop()); voiceStream = null; }
+    return;
+  }
+  voiceRec = new SR();
+  voiceRec.lang = 'zh-CN';
+  voiceRec.interimResults = false;
+  voiceRec.maxAlternatives = 1;
+  btn.textContent = '🔴 录音中...';
+  btn.classList.add('warn');
+  // 同时开启麦克风音频流（可选：可在 later 做声纹/情绪分析）
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(s => { voiceStream = s; }).catch(() => {});
+  voiceRec.onresult = (e) => {
+    const text = e.results[0][0].transcript.trim();
+    if (text) {
+      toast('识别结果：' + text);
+      addHistory('voice', text);
+      sessionCount++; saveSessionCount(); updateStatus('stCount', sessionCount, 'ok');
+    }
+  };
+  voiceRec.onerror = (e) => {
+    btn.textContent = '🎤 开始录音';
+    btn.classList.remove('warn');
+    let err = '语音识别错误';
+    if (e.error === 'not-allowed') err = '麦克风权限被拒，请在浏览器设置中允许';
+    else if (e.error === 'no-speech') err = '未检测到语音，请靠近麦克风再试';
+    else if (e.error === 'network') err = '语音识别需要网络，请检查连接';
+    toast(err);
+    if (voiceStream) { voiceStream.getTracks().forEach(t => t.stop()); voiceStream = null; }
+    voiceRec = null;
+  };
+  voiceRec.onend = () => {
+    btn.textContent = '🎤 开始录音';
+    btn.classList.remove('warn');
+    if (voiceStream) { voiceStream.getTracks().forEach(t => t.stop()); voiceStream = null; }
+    voiceRec = null;
+  };
+  voiceRec.start();
 }
 </script>
 </body>
