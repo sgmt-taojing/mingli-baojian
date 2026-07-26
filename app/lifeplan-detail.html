@@ -39,6 +39,20 @@
 .lp-12-domain-score.mid { color: #ffb44d; }
 .lp-12-domain-score.bad { color: #f87171; }
 
+/* R81: print styles */
+@media print {
+  body { background: #fff !important; color: #000 !important; font-size: 12pt; }
+  .back-home, #input, .qr-modal, #printBtn, #qrBtn, nav, header a[href="ai-assistant.html"], header a[href="divination-hub.html"] { display: none !important; }
+  .card, .lp-stage-section, .lp-stage-card, .lp-12-domain { background: #fff !important; border: 1px solid #ccc !important; box-shadow: none !important; }
+  .lp-stage-timeline { background: #fff !important; }
+  h1, h2, h3 { color: #000 !important; }
+  a { text-decoration: none; color: #000 !important; }
+  .report { page-break-inside: avoid; }
+  .lp-stage-section { page-break-inside: avoid; }
+}
+.btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #888; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: .85rem; }
+.btn-ghost:hover { border-color: #7c9eff; color: #7c9eff; }
+
 
   <link rel="stylesheet" href="css/a11y-fix.css">
   <script src="js/module-reports-kb.js" defer></script>
@@ -67,6 +81,7 @@
     <label for="lExtra">补充情况（可选，影响领域加权）</label>
     <textarea id="lExtra" placeholder="例：计划 30 岁前完成理财布局，金融行业从业5年" aria-label="例：计划 30 岁前完成理财布局，金融行业从业5年"></textarea>
     <button class="btn" id="genBtn" onclick="generate()">✨ 生成蓝图</button>
+    <button class="btn btn-ghost" id="printBtn" onclick="window.print()" title="打印蓝图">🖨️ 打印</button>
   </div>
   <div class="report" id="report"></div>
   <p style="text-align:center;font-size:11px;opacity:.85;margin:24px 0;letter-spacing:1px">易道智鉴 · 仅供参考 · 命数只占 30%，努力占 70%</p>
