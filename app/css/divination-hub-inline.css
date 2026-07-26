@@ -178,7 +178,7 @@ select.input-field option{background:var(--ink2)}
 
 /* BAZI ANALYSIS GRID */
 .analysis-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin-bottom:20px}
-.analysis-card{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);padding:20px 22px;position:relative;overflow:hidden;border-radius:10px;transition:all .3s ease}
+.analysis-card{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);padding:20px 22px;position:relative;overflow:hidden;border-radius:10px;transition:all .3s ease;max-width:100%;box-sizing:border-box;word-wrap:break-word}
 .analysis-card:hover{border-color:rgba(201,168,76,.18);background:rgba(255,255,255,.03)}
 .analysis-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;opacity:0.85}
 .analysis-card h5{font-size:11px;letter-spacing:4px;text-transform:uppercase;opacity:0.85;margin-bottom:10px}
@@ -498,7 +498,7 @@ select.input-field option{background:var(--ink2)}
 .huajie-block{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);padding:20px 22px;margin-bottom:14px;position:relative;overflow:hidden}
 .huajie-block::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--gold);opacity:0.85}
 .huajie-block h5{font-size:11px;letter-spacing:4px;text-transform:uppercase;opacity:0.85;margin-bottom:10px;color:var(--gold)}
-.huajie-row{display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(201,168,76,.04);font-size:13px;line-height:1.7}
+.huajie-row{display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(201,168,76,.04);font-size:13px;line-height:1.7;flex-wrap:wrap;max-width:100%;word-break:break-all}
 .huajie-row:last-child{border-bottom:none}
 .huajie-tag{padding:3px 10px;border:1px solid rgba(201,168,76,.15);font-size:11px;letter-spacing:2px;border-radius:3px;display:inline-block;margin:2px 4px}
 .huajie-tag.tag-木{color:var(--jade);border-color:rgba(39,174,96,.25);background:rgba(39,174,96,.05)}
@@ -796,7 +796,7 @@ select.input-field option{background:var(--ink2)}
 .jiuri-cal-cell.good .cal-dot{background:var(--jade)}
 .jiuri-cal-cell.bad .cal-dot{background:var(--cinn2)}
 .jiuri-cal-cell.worst .cal-dot{background:var(--cinn)}
-.jiuri-detail-card{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.15);border-radius:12px;padding:20px;margin-bottom:16px}
+.jiuri-detail-card{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.15);border-radius:12px;padding:20px;margin-bottom:16px;max-width:100%;min-width:0;overflow:hidden;word-wrap:break-word}
 .jiuri-detail-card h4{font-family:'Ma Shan Zheng',serif;font-size:16px;letter-spacing:3px;margin-bottom:12px;color:var(--gold)}
 .jiuri-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;letter-spacing:1px;margin-right:6px}
 .jiuri-badge.great{background:rgba(39,174,96,.12);color:var(--success);border:1px solid rgba(39,174,96,.3)}
@@ -807,13 +807,13 @@ select.input-field option{background:var(--ink2)}
 .jiuri-yi-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .jiuri-yi-tag{padding:4px 10px;background:rgba(39,174,96,.06);border:1px solid rgba(39,174,96,.2);color:var(--success);border-radius:4px;font-size:11px;letter-spacing:1px}
 .jiuri-ji-tag{padding:4px 10px;background:rgba(231,76,60,.06);border:1px solid rgba(231,76,60,.2);color:var(--cinn2);border-radius:4px;font-size:11px;letter-spacing:1px}
-.jiuri-hours-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
-.jiuri-hour{text-align:center;padding:6px 4px;border-radius:6px;font-size:11px}
+.jiuri-hours-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px;min-width:0;max-width:100%;overflow:hidden;contain:layout}
+.jiuri-hour{text-align:center;padding:6px 4px;border-radius:6px;font-size:11px;max-width:100%;min-width:0;overflow:hidden;word-wrap:break-word;text-align:center}
 .jiuri-hour.great{background:rgba(39,174,96,.12);color:var(--success);border:1px solid rgba(39,174,96,.25)}
 .jiuri-hour.good{background:rgba(39,174,96,.05);color:var(--jade);border:1px solid rgba(39,174,96,.15)}
 .jiuri-hour.ok{background:rgba(201,168,76,.04);color:var(--paper2);border:1px solid rgba(201,168,76,.1)}
 .jiuri-hour.bad{background:#2a0e0a;color:#ff8a73;border:1px solid rgba(255,102,80,.35)}
-.jiuri-suggest-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:16px}
+.jiuri-suggest-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:16px;min-width:0}
 .jiuri-suggest-card{padding:16px;border-radius:10px;border:1px solid rgba(201,168,76,.15);background:rgba(201,168,76,.03)}
 .jiuri-suggest-card .sg-rank{font-size:10px;letter-spacing:2px;opacity:0.85;margin-bottom:6px}
 .jiuri-suggest-card .sg-date{font-family:'Ma Shan Zheng',serif;font-size:16px;color:var(--gold);letter-spacing:2px}
@@ -972,6 +972,8 @@ select.input-field option{background:var(--ink2)}
   bottom: 0;
   left: 0;
   right: 0;
+  max-width: 100vw;
+  overflow: hidden;
   z-index: 500;
   background: rgba(8, 8, 8, 0.97);
   backdrop-filter: blur(16px);
@@ -987,6 +989,7 @@ select.input-field option{background:var(--ink2)}
 }
 .bottom-tab {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -3729,3 +3732,23 @@ ${getReportStyles()}
 .rpt-is-114{font-size:12px;opacity:0.85}
 .rpt-is-115{font-size:11px;font-weight:bold;color:var(--cinn2);margin-bottom:4px}
 .rpt-is-116{color:var(--gold,var(--gold))}
+
+
+/* R30: bottom-tab 移动端溢出修复 */
+@media (max-width: 768px) {
+  .bottom-tab {
+    min-width: 0 !important;
+    flex: 1 1 0 !important;
+    padding: 4px 0 !important;
+  }
+  .bottom-tab-more {
+    flex: 0.6 1 0 !important;
+  }
+  .bottom-tab .btm-label {
+    font-size: 8px !important;
+    letter-spacing: 0 !important;
+  }
+  .bottom-nav {
+    overflow: hidden !important;
+  }
+}
