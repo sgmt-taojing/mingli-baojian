@@ -132,7 +132,7 @@ function render(){
           <tr><td>KB 模型源</td><td>${a.src||'（内嵌）'}</td><td>—</td><td>${b.src||'（内嵌）'}</td></tr>
           <tr><td>条目数</td><td><strong>${a.n}</strong></td><td>差 ${nDiff}</td><td><strong>${b.n}</strong></td></tr>
           <tr><td>平均 trust</td><td>${a.tr.toFixed(2)}</td><td>差 ${trDiff.toFixed(2)}</td><td>${b.tr.toFixed(2)}</td></tr>
-          <tr><td>共享标签</td><td colspan="3">${com.length ? com.join(' · ') : '<span style="opacity:.5">无</span>'}</td></tr>
+          <tr><td>共享标签</td><td colspan="3">${com.length ? com.join(' · ') : '<span style="opacity:.85">无</span>'}</td></tr>
           <tr><td>标签集</td><td>${badgeList(a.tags, bTags)}</td><td></td><td>${badgeList(b.tags, new Set(a.tags||[]))}</td></tr>
           <tr><td>Jaccard</td><td colspan="3">
             <div class="score-bar"><div class="track"><div class="fill" style="width:${Math.round(jac*100)}%;background:${jac>.3?'#7fc8a9':jac>.1?'#c9a84c':'#d49b6b'}"></div></div><span style="font-size:12px;margin-left:6px;color:var(--paper3)">${(jac*100).toFixed(1)}%</span></div>
