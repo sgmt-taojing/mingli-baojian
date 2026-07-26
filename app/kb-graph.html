@@ -35,6 +35,15 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
 .modal-box a.m-link{display:inline-block;padding:6px 14px;background:linear-gradient(135deg,var(--gold),#8b6914);color:#0a0a0a;border-radius:6px;font-size:12px;font-weight:700;letter-spacing:1px;text-decoration:none;transition:.2s}
 .modal-box a.m-link:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(201,168,76,.4)}
 .m-rec-box{margin-top:10px;padding:12px;background:linear-gradient(135deg,rgba(147,51,234,.08),rgba(118,75,162,.06));border:1px solid rgba(147,51,234,.25);border-radius:10px;font-size:12px}
+.m-kb-box{margin-top:10px;padding:12px;background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(160,128,48,.04));border:1px solid rgba(201,168,76,.2);border-radius:10px;font-size:12px}
+.m-kb-loading,.m-kb-empty{opacity:.55;text-align:center;padding:8px;font-size:11px}
+.m-kb-title{color:var(--gold);font-weight:700;margin-bottom:8px;font-size:13px;letter-spacing:1px}
+.m-kb-list{display:grid;gap:4px}
+.m-kb-row{display:flex;align-items:center;gap:8px;padding:5px 8px;background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.12);border-radius:6px;text-decoration:none;color:var(--paper);transition:all .15s}
+.m-kb-row:hover{background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.35)}
+.m-kb-rank{flex:0 0 16px;height:16px;border-radius:3px;background:rgba(201,168,76,.18);color:var(--gold);font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.m-kb-name{flex:1;font-size:12px;color:var(--paper);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-kb-trust{flex:0 0 auto;font-size:10px;color:var(--gold);font-family:ui-monospace,monospace;background:rgba(201,168,76,.15);padding:1px 5px;border-radius:3px}
 .m-rec-loading,.m-rec-empty{opacity:.55;text-align:center;padding:8px;font-size:11px}
 .m-rec-title{color:#c4b5fd;font-weight:700;margin-bottom:8px;font-size:13px;letter-spacing:1px}
 .m-rec-list{display:grid;gap:4px}
@@ -289,6 +298,7 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
       '<div class="row"><span class="k">引用次数</span><span class="v">' + (n.xref_count||0) + '</span></div>' +
       '<div class="row"><span class="k">被引用</span><span class="v">' + (n.referenced||0) + '</span></div>' +
       '<div class="row"><span class="k">KB 命中</span><span class="v">' + (n.hit_count||0) + '</span></div>' +
+      '<div id="m-kb" class="m-kb-box"><div class="m-kb-loading">📚 KB 条目预览加载中…</div></div>' +
       '<div id="m-rec" class="m-rec-box"><div class="m-rec-loading">🧠 AI 推荐关联加载中…</div></div>' +
       '<div class="row row-link">' +
         '<a class="m-link" href="kb-explorer.html#module=' + encodeURIComponent(n.id) + '" target="_blank">🔍 在 KB 中检索</a>' +
@@ -296,6 +306,27 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
       '</div>';
     document.getElementById('m-body').innerHTML = detailHtml;
     document.getElementById('modal').classList.add('show');
+    // R42 异步加载 KB 条目预览 Top 3
+    fetch('/api/public/kb-query?module=' + encodeURIComponent(n.id) + '&limit=3', {cache:'no-cache'})
+      .then(function(r){return r.json();}).then(function(j){
+        var results = (j.data || j.results || []);
+        var kbBox = document.getElementById('m-kb');
+        if(!kbBox) return;
+        if(!results.length){ kbBox.innerHTML = '<div class="m-kb-empty">该模块暂无 KB 条目</div>'; return; }
+        var html = '<div class="m-kb-title">📚 KB 条目预览 (Top ' + results.length + ')</div>';
+        html += '<div class="m-kb-list">';
+        results.forEach(function(r, i){
+          var title = (r.title||r.name||r.entry_id||'').slice(0,40);
+          var trust = (r.trust_score||0).toFixed(2);
+          html += '<a class="m-kb-row" href="kb-explorer.html#module=' + encodeURIComponent(n.id) + '" target="_blank">' +
+            '<span class="m-kb-rank">' + (i+1) + '</span>' +
+            '<span class="m-kb-name">' + title + '</span>' +
+            '<span class="m-kb-trust">' + trust + '</span>' +
+          '</a>';
+        });
+        html += '</div>';
+        kbBox.innerHTML = html;
+      }).catch(function(){ var b=document.getElementById('m-kb'); if(b) b.innerHTML='<div class="m-kb-empty">KB 预览加载失败</div>'; });
     // R33-节点5 异步加载 AI 推荐探索路径（彩色点 + 可点击跳转 kb-explorer）
     fetch('/api/kb/recommend?module=' + encodeURIComponent(n.id) + '&limit=6', {cache:'no-cache'})
       .then(function(r){return r.json();}).then(function(j){
