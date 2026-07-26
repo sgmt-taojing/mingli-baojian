@@ -31,6 +31,9 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
 .modal-box .row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line);font-size:13px}
 .modal-box .row .k{opacity:.65}
 .modal-box .row .v{color:var(--gold);font-weight:600}
+.modal-box .row.row-link{margin-top:14px;justify-content:flex-end;gap:8px;border-bottom:none;padding:0}
+.modal-box a.m-link{display:inline-block;padding:6px 14px;background:linear-gradient(135deg,var(--gold),#8b6914);color:#0a0a0a;border-radius:6px;font-size:12px;font-weight:700;letter-spacing:1px;text-decoration:none;transition:.2s}
+.modal-box a.m-link:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(201,168,76,.4)}
 .modal-close{position:absolute;top:8px;right:12px;background:0 0;border:none;color:var(--paper);font-size:22px;cursor:pointer;padding:4px 8px;border-radius:6px;transition:all .15s}
 .modal-close:hover{background:rgba(201,168,76,.15);color:var(--gold)}
 @keyframes qrmodal-in{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
@@ -46,7 +49,9 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
   <p class="sub">可视化 32 个 KB 模块的引用关系与热点分布</p>
   <div class="toolbar">
     <select id="levelFilter"><option value="all">全部等级</option><option value="premium">premium</option><option value="registered">registered</option><option value="professional">professional</option><option value="admin">admin</option></select>
+    <select id="recModFilter"><option value="">📊 选择模块智能推荐</option></select>
     <button onclick="highlightHubs()">🔥 热门节点</button>
+    <button onclick="highlightRecs()">🧠 推荐关联</button>
     <button onclick="resetView()">🔄 重置视图</button>
     <button onclick="fitGraph()">🔍 适应屏幕</button>
     <span class="sep"></span>
@@ -130,6 +135,63 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
     draw(nodes, edges);
   }
 
+  // R37: 调用 /api/kb/recommend 高亮关联图谱节点
+  var _currentRecs = [];
+  var _currentRecSource = null;
+  async function highlightRecs(){
+    var mod = document.getElementById('recModFilter').value;
+    if(!mod){ alert('请先选择模块'); return; }
+    _currentRecSource = mod;
+    try {
+      var r = await fetch('/api/kb/recommend?module=' + encodeURIComponent(mod) + '&limit=8', {cache:'no-cache'});
+      var j = await r.json();
+      var d = j.data || j;
+      _currentRecs = (d.recommendations || []).map(function(x){ return x.id; });
+      if(!_currentRecs.length){ alert('该模块暂无推荐'); return; }
+      // 高亮：source 模块 + 推荐图谱 id 在画布中已存在则高亮
+      var focus = new Set([mod].concat(_currentRecs));
+      var hitCount = 0;
+      var nodes = ALL_NODES.map(function(n){
+        var inFocus = focus.has(n.id);
+        if(inFocus) hitCount++;
+        return {id:n.id, opacity:inFocus ? 1 : .12, borderWidth:inFocus?3:1, color:inFocus ? {background:'#9333ea',border:'#c9a84c'} : {background:'#444',border:'#666'}};
+      });
+      var edges = ALL_EDGES.map(function(e){
+        var inFocus = focus.has(e.from) || focus.has(e.to);
+        return {from:e.from, to:e.to, opacity:inFocus ? .9 : .05, color:inFocus ? {color:'#9333ea'} : {color:'rgba(201,168,76,.1)'}};
+      });
+      draw(nodes, edges);
+      document.getElementById('stat').innerHTML = '模块 <b>' + mod + '</b> 推荐 <b>' + _currentRecs.length + '</b> · 画布命中 <b>' + hitCount + '</b>';
+    } catch(e){ console.warn('[R37] recommend err', e); alert('推荐接口调用失败'); }
+  }
+
+  // 把模块下拉填充（从 ALL_NODES 取，排除图谱节点）
+  function fillModFilter(){
+    var sel = document.getElementById('recModFilter');
+    if(!sel || !ALL_NODES.length) return;
+    var seen = new Set();
+    var mods = [];
+    ALL_NODES.forEach(function(n){
+      if(n.group === 'premium' || n.group === 'registered' || n.group === 'admin'){
+        var modId = n.id.replace(/-knowledge-base$|-kb$|-database.*$/,'');
+        if(!seen.has(modId) && modId.length > 1){
+          seen.add(modId);
+          mods.push({id: modId, name: n.label});
+        }
+      }
+    });
+    // 静态补几个常见模块
+    ['bazi','ziwei','qimen','liuyao','meihua','liuren','fengshui','zhongyi','tcm','xingming','wuxing','shihan','yongshi','mobile','ganqing','shiye','caiyun','music','lifeindex','lifeplan','zeri','huangli','taisui','yanzhi','mingxiang','nihaisha','shuhan','faith'].forEach(function(m){
+      if(!seen.has(m)){ seen.add(m); mods.push({id:m, name:m}); }
+    });
+    mods.forEach(function(m){
+      var op = document.createElement('option');
+      op.value = m.id;
+      op.textContent = '🔮 ' + m.name;
+      sel.appendChild(op);
+    });
+  }
+
   function resetView(){
     draw(ALL_NODES.slice(), ALL_EDGES.slice());
   }
@@ -137,16 +199,25 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
 
   window.showModal = function(n){
     document.getElementById('m-title').textContent = n.label;
-    document.getElementById('m-body').innerHTML =
+    var detailHtml =
       '<div class="row"><span class="k">模块 ID</span><span class="v">' + n.id + '</span></div>' +
       '<div class="row"><span class="k">等级</span><span class="v">' + (n.group||'—') + '</span></div>' +
       '<div class="row"><span class="k">引用次数</span><span class="v">' + (n.xref_count||0) + '</span></div>' +
       '<div class="row"><span class="k">被引用</span><span class="v">' + (n.referenced||0) + '</span></div>' +
-      '<div class="row"><span class="k">KB 命中</span><span class="v">' + (n.hit_count||0) + '</span></div>';
+      '<div class="row"><span class="k">KB 命中</span><span class="v">' + (n.hit_count||0) + '</span></div>' +
+      '<div class="row row-link">' +
+        '<a class="m-link" href="kb-explorer.html#module=' + encodeURIComponent(n.id) + '" target="_blank">🔍 在 KB 中检索</a>' +
+        '<a class="m-link" href="ai-assistant.html?mod=' + encodeURIComponent(n.id) + '" target="_blank">🤖 AI 解读</a>' +
+      '</div>';
+    document.getElementById('m-body').innerHTML = detailHtml;
     document.getElementById('modal').classList.add('show');
   };
+  window.highlightRecs = highlightRecs;
   window.closeModal = function(){ document.getElementById('modal').classList.remove('show'); };
   document.getElementById('modal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+  document.getElementById('recModFilter').addEventListener('change', function(){
+    if(this.value) highlightRecs();
+  });
   document.getElementById('levelFilter').addEventListener('change', function(e){
     var v = e.target.value;
     if(v === 'all'){ draw(ALL_NODES.slice(), ALL_EDGES.slice()); return; }

@@ -543,6 +543,54 @@ document.getElementById('qInput').addEventListener('keypress', e=>{
   };
 })();
 </script>
+<!-- R33-节点4 联动：hash 路由 #module=<id> 从 kb-graph.html 跳转进来时预填模块过滤 + 触发搜索 -->
+<script>
+(function(){
+  function applyModuleHash(){
+    var h = location.hash || '';
+    var m = h.match(/^#module=(.+)$/);
+    if(!m) return;
+    var mod = decodeURIComponent(m[1]);
+    var sel = document.getElementById('modFilter');
+    var qInput = document.getElementById('qInput');
+    var resultBox = document.getElementById('resultBox');
+    if(!sel || !qInput || !resultBox) return;
+    qInput.value = mod;
+    var tryFill = function(attempts){
+      attempts = attempts || 0;
+      var exists = Array.prototype.some.call(sel.options, function(o){return o.value===mod;});
+      if(exists){
+        sel.value = mod;
+        // 如果 mod 在下拉里，直接调用 doSearch（如果公开到 window）
+        if(typeof window.doSearch === 'function'){ window.doSearch(); return; }
+        // 否则直接发请求
+        resultBox.innerHTML = '<div class="kbe-loading">正在检索知识库：' + mod + '</div>';
+        var url = (location.hostname==='localhost'||location.hostname==='127.0.0.1'||location.hostname==='') ? 'http://127.0.0.1:8920' : '';
+        fetch(url + '/api/public/kb-query?q=' + encodeURIComponent(mod) + '&limit=10')
+          .then(function(r){return r.json();})
+          .then(function(d){
+            if(!d || !d.results){ resultBox.innerHTML = '<div class="kbe-empty"><div class="kbe-empty-icon">📖</div><div>模块 ' + mod + ' 无内容</div></div>'; return; }
+            var html = '<div class="kbe-result-meta">模块 <b>' + mod + '</b> · ' + (d.results.length||0) + ' 条结果</div>';
+            (d.results||[]).forEach(function(r){
+              html += '<div class="kbe-item"><div class="kbe-item-title">' + (r.title||r.id||'') + '</div><div class="kbe-item-snippet">' + (r.snippet||r.summary||'').slice(0,200) + '</div></div>';
+            });
+            resultBox.innerHTML = html;
+            resultBox.scrollIntoView({behavior:'smooth', block:'start'});
+          }).catch(function(){
+            resultBox.innerHTML = '<div class="kbe-empty"><div class="kbe-empty-icon">⚠️</div><div>API 请求失败</div></div>';
+          });
+        return;
+      }
+      if(attempts > 30){ resultBox.innerHTML = '<div class="kbe-empty"><div class="kbe-empty-icon">⚠️</div><div>模块 ' + mod + ' 不在 KB 中</div></div>'; return; }
+      setTimeout(function(){tryFill(attempts+1);}, 200);
+    };
+    tryFill(0);
+  }
+  window.addEventListener('hashchange', applyModuleHash);
+  window.addEventListener('DOMContentLoaded', applyModuleHash);
+  if(document.readyState !== 'loading') applyModuleHash();
+})();
+</script>
 </main>
 <script src="js/a11y-divination-hub.js" defer></script>
 </body>
