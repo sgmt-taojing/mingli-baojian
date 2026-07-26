@@ -452,6 +452,31 @@ function renderKbHotChips(){
   html += '</div>';
   html += '<div class="kb-hot-chips-tip">点击任何模块可直接进入问题采集 · 已记录你的咨询偏好</div>';
   html += '</div>';
+
+  // R75: 设备联动提示——最近 5 分钟内有设备事件则显示
+  try {
+    const devRaw = localStorage.getItem('_device_kb_events') || '[]';
+    const devEvents = JSON.parse(devRaw);
+    const now = Date.now();
+    const recent5 = devEvents.filter(e => now - (e.ts || 0) < 5 * 60 * 1000);
+    if (recent5.length > 0) {
+      const mods = {};
+      recent5.forEach(e => { if (e.module) mods[e.module] = (mods[e.module] || 0) + 1; });
+      const sorted = Object.entries(mods).sort((a, b) => b[1] - a[1]).slice(0, 3);
+      const DEV_LABELS = { zhongyi:'中医', shexiang:'舌象', mianxue:'眼诊', classics:'经典', mantra:'咒语', tcm:'脉象', mobile:'作息', fengshui:'风水' };
+      const DEV_ICONS = { zhongyi:'👁', shexiang:'👅', mianxue:'👀', classics:'📜', mantra:'🎙️', tcm:'❤️', mobile:'😴', fengshui:'👓' };
+      const tags = sorted.map(([m, c]) => {
+        const icon = DEV_ICONS[m] || '📦';
+        const name = DEV_LABELS[m] || m.slice(0, 6);
+        return '<span style="display:inline-flex;align-items:center;gap:3px;padding:3px 8px;margin:2px;border-radius:6px;background:rgba(201,168,76,.1);color:var(--gold);border:1px solid rgba(201,168,76,.25);font-size:11px">' + icon + ' ' + name + ' ×' + c + '</span>';
+      }).join('');
+      html += '<div style="margin-top:10px;padding:10px;background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.15);border-radius:8px;font-size:11px;color:var(--paper2)">';
+      html += '<span style="color:var(--gold);margin-right:6px">📱 设备联动</span>';
+      html += '<span style="color:var(--paper3);font-size:10px">最近 5 分钟 · AI 已加权</span>';
+      html += '<div style="margin-top:6px">' + tags + '</div>';
+      html += '</div>';
+    }
+  } catch (e) {}
   return html;
 }
 
