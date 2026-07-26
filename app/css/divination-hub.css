@@ -3476,3 +3476,33 @@ body:not(.wechat) .wechat-disclaimer{display:none}
 .bazi-pillar-table .bp-ss{font-size:11px;opacity:0.85}
 .bazi-pillar-table .bp-ny{font-size:11px;opacity:0.85;font-style:italic}
 .bazi-pillar-table .bp-cs{font-size:11px;opacity:0.85}
+
+/* ═══ R31-A: KB 今日热门知识 Top3 横条 ═══ */
+.kb-hot-strip{padding:14px 18px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(201,168,76,0.02));border:1px solid rgba(201,168,76,0.18);border-radius:14px;font-family:'PingFang SC','Microsoft YaHei',sans-serif}
+.kb-hot-title{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:14px;color:var(--gold);letter-spacing:2px;font-weight:600}
+.kb-hot-icon{font-size:18px;animation:kbHotPulse 1.6s ease-in-out infinite}
+@keyframes kbHotPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.2);opacity:.85}}
+.kb-hot-meta{margin-left:auto;font-size:11px;letter-spacing:1px;color:var(--paper3);opacity:.75;font-weight:400}
+.kb-hot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kb-hot-card{position:relative;display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.12);border-radius:10px;text-decoration:none;color:var(--paper);transition:all .25s ease;min-width:0}
+.kb-hot-card:hover{background:rgba(201,168,76,0.12);border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 16px rgba(201,168,76,0.15)}
+.kb-hot-rank{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--gold);color:var(--ink);font-size:12px;font-weight:700;flex-shrink:0}
+.kb-hot-card[data-rank="1"] .kb-hot-rank{background:linear-gradient(135deg,#ffd700,#ff9500);box-shadow:0 0 8px rgba(255,180,0,.4)}
+.kb-hot-card[data-rank="2"] .kb-hot-rank{background:linear-gradient(135deg,#c0c0c0,#888);color:var(--ink)}
+.kb-hot-card[data-rank="3"] .kb-hot-rank{background:linear-gradient(135deg,#cd7f32,#a0541d);color:var(--ink)}
+.kb-hot-body{flex:1;min-width:0}
+.kb-hot-name{font-size:13px;font-weight:600;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--paper)}
+.kb-hot-meta-line{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--paper3);opacity:.85}
+.kb-hot-tag{padding:1px 6px;border-radius:6px;background:rgba(201,168,76,0.18);color:var(--gold);letter-spacing:1px}
+.kb-hot-hits{opacity:.75}
+.kb-hot-arrow{color:var(--gold);font-size:14px;flex-shrink:0;transition:transform .2s}
+.kb-hot-card:hover .kb-hot-arrow{transform:translateX(3px)}
+@media (max-width:768px){
+  .kb-hot-grid{grid-template-columns:1fr}
+  .kb-hot-card{padding:8px 10px}
+  .kb-hot-meta{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .kb-hot-icon{animation:none}
+  .kb-hot-card{transition:none}
+}
