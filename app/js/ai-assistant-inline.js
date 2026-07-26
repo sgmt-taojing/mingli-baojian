@@ -561,8 +561,64 @@ function addAI(text,stepData){
     }
   }
   d.innerHTML=html;
+  // R50 AI 助手反馈按钮（点赞/踩/反馈） — 接入 /api/public/kb-feedback
+  if (!stepData || !stepData.options) {
+    var _qLast = (state && state.history && state.history[state.history.length-1]) || '';
+    if (!_qLast && typeof hist !== 'undefined' && hist.length) _qLast = hist[hist.length-1].content || '';
+    var _mod = (state && state.module) || '';
+    var _feedbackId = 'fb-' + Date.now() + '-' + Math.floor(Math.random()*1000);
+    html += '<div id="' + _feedbackId + '" data-feedback="1" style="margin-top:8px;padding-top:8px;border-top:1px dashed rgba(201,168,76,.25);font-size:12px;color:var(--paper3,#999);display:flex;align-items:center;gap:6px;flex-wrap:wrap">' +
+      '<span style="opacity:.7">这条回答有用吗？</span>' +
+      '<button onclick="_submitKbFeedback(\'' + _feedbackId + '\', 1, \'' + esc(_qLast).replace(/'/g, '') + '\', \'' + esc(_mod).replace(/'/g, '') + '\')" style="background:transparent;border:1px solid rgba(201,168,76,.4);border-radius:14px;padding:2px 10px;color:#c9a84c;cursor:pointer;font-size:14px;transition:all .2s" onmouseover="this.style.background=\'rgba(201,168,76,.15)\'" onmouseout="this.style.background=\'transparent\'" title="有用">👍</button>' +
+      '<button onclick="_submitKbFeedback(\'' + _feedbackId + '\', 0, \'' + esc(_qLast).replace(/'/g, '') + '\', \'' + esc(_mod).replace(/'/g, '') + '\')" style="background:transparent;border:1px solid rgba(150,150,150,.4);border-radius:14px;padding:2px 10px;color:#999;cursor:pointer;font-size:12px;transition:all .2s" onmouseover="this.style.background=\'rgba(150,150,150,.15)\'" onmouseout="this.style.background=\'transparent\'" title="一般">😐</button>' +
+      '<button onclick="_submitKbFeedback(\'' + _feedbackId + '\', -1, \'' + esc(_qLast).replace(/'/g, '') + '\', \'' + esc(_mod).replace(/'/g, '') + '\')" style="background:transparent;border:1px solid rgba(244,67,54,.4);border-radius:14px;padding:2px 10px;color:#f44336;cursor:pointer;font-size:14px;transition:all .2s" onmouseover="this.style.background=\'rgba(244,67,54,.15)\'" onmouseout="this.style.background=\'transparent\'" title="需改进">👎</button>' +
+      '<span id="' + _feedbackId + '-status" style="opacity:0;transition:opacity .3s;font-size:11px"></span>' +
+      '</div>';
+    d.innerHTML = html;
+  }
   chat.appendChild(d);
   chat.scrollTop=chat.scrollHeight;
+}
+
+// R50 KB 反馈上报 — 公开端点 + localStorage 缓存
+function _submitKbFeedback(fbId, score, query, module){
+  var statusEl = document.getElementById(fbId + '-status');
+  if (statusEl) { statusEl.textContent = '提交中...'; statusEl.style.opacity = '1'; }
+  var payload = {
+    query: (query || '').substring(0, 500),
+    entry_id: '',
+    source: 'ai-assistant',
+    score: score,
+    comment: '',
+    module: module || ''
+  };
+  fetch((typeof API !== 'undefined' ? API : '') + '/api/public/kb-feedback', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).then(function(r){ return r.json(); }).then(function(j){
+    if (j && j.code === 0 && j.data && j.data.logged) {
+      if (statusEl) statusEl.textContent = score === 1 ? '✓ 感谢反馈' : score === -1 ? '✓ 已记录，会优化' : '✓ 已记录';
+      // 隐藏按钮
+      var container = document.getElementById(fbId);
+      if (container) {
+        var btns = container.querySelectorAll('button');
+        btns.forEach(function(b){ b.disabled = true; b.style.opacity = '0.4'; b.style.cursor = 'default'; });
+      }
+      // 累计到本地
+      try {
+        var key = '_kb_feedback_count/' + score;
+        localStorage.setItem(key, String((parseInt(localStorage.getItem(key)||'0')+1)));
+      } catch(e){}
+      setTimeout(function(){ if (statusEl) statusEl.style.opacity = '0'; }, 2500);
+    } else {
+      if (statusEl) statusEl.textContent = '⚠ 提交失败';
+      setTimeout(function(){ if (statusEl) statusEl.style.opacity = '0'; }, 2500);
+    }
+  }).catch(function(e){
+    if (statusEl) statusEl.textContent = '⚠ 网络错误';
+    setTimeout(function(){ if (statusEl) statusEl.style.opacity = '0'; }, 2500);
+  });
 }
 
 function guideAnswer(ans){
