@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#080808">
+<title>设备管理中心 · 易道智鉴</title>
+<link rel="preload" href="css/divination-hub.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="css/divination-hub.css"></noscript>
+<style>
+:root{
+  --ink:#080808; --ink2:#141414; --ink3:#1c1c1c;
+  --gold:#c9a84c; --gold2:#e3c778;
+  --paper:#f5ecd6; --paper2:#d9cfb8; --paper3:#8a7f6a;
+  --danger:#c8503e; --ok:#3e9e6b; --warn:#d4a047;
+  --radius:10px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--ink);color:var(--paper);font-family:'Noto Serif SC','Songti SC',serif;letter-spacing:.5px}
+body{min-height:100vh;padding:18px 14px 80px}
+.wrap{max-width:1100px;margin:0 auto}
+header{text-align:center;padding:24px 0 32px;border-bottom:1px solid rgba(201,168,76,.18);margin-bottom:28px}
+header h1{font-size:24px;color:var(--gold);letter-spacing:8px;margin:0;font-weight:500}
+header p{font-size:11px;color:var(--paper3);letter-spacing:3px;margin-top:8px}
+
+/* === 摘要卡 === */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:28px}
+.summary-card{background:linear-gradient(135deg,var(--ink3),var(--ink2));border:1px solid rgba(201,168,76,.18);border-radius:var(--radius);padding:18px;position:relative;overflow:hidden}
+.summary-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.6}
+.summary-card .label{font-size:11px;color:var(--paper3);letter-spacing:2px;margin-bottom:8px}
+.summary-card .value{font-size:32px;color:var(--gold2);font-weight:600;line-height:1}
+.summary-card .sub{font-size:10px;color:var(--paper3);margin-top:6px;letter-spacing:1px}
+.summary-card.ok .value{color:var(--ok)}
+.summary-card.warn .value{color:var(--warn)}
+.summary-card.err .value{color:var(--danger)}
+
+/* === 设备卡片网格 === */
+.section-title{font-size:14px;color:var(--gold);letter-spacing:4px;margin:28px 0 14px;display:flex;align-items:center;gap:10px}
+.section-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(201,168,76,.3),transparent)}
+.section-title .badge{background:rgba(201,168,76,.15);color:var(--gold);font-size:10px;padding:3px 8px;border-radius:10px;letter-spacing:1px;font-weight:400}
+
+.device-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.device-card{background:var(--ink3);border:1px solid rgba(201,168,76,.18);border-radius:var(--radius);padding:18px;position:relative;transition:all .3s}
+.device-card.online{border-color:rgba(62,158,107,.5)}
+.device-card.online::after{content:'';position:absolute;top:14px;right:14px;width:8px;height:8px;background:var(--ok);border-radius:50%;box-shadow:0 0 8px var(--ok)}
+.device-card.offline{border-color:rgba(201,168,76,.12);opacity:.75}
+.device-card.offline::after{content:'';position:absolute;top:14px;right:14px;width:8px;height:8px;background:#555;border-radius:50%}
+.device-card.error{border-color:rgba(200,80,62,.5);background:linear-gradient(135deg,var(--ink3),rgba(200,80,62,.05))}
+.device-card.error::after{content:'';position:absolute;top:14px;right:14px;width:8px;height:8px;background:var(--danger);border-radius:50%;box-shadow:0 0 8px var(--danger);animation:devPulse 1s infinite}
+
+.device-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.device-icon{width:40px;height:40px;background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(201,168,76,.05));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.device-name{font-size:14px;color:var(--gold2);font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.device-status{font-size:10px;padding:2px 7px;border-radius:8px;letter-spacing:1px}
+.device-status.online{background:rgba(62,158,107,.2);color:var(--ok)}
+.device-status.offline{background:rgba(85,85,85,.3);color:var(--paper3)}
+.device-status.error{background:rgba(200,80,62,.2);color:var(--danger)}
+
+.device-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;font-size:11px}
+.device-meta div{display:flex;flex-direction:column;gap:2px}
+.device-meta .meta-label{color:var(--paper3);letter-spacing:1px;font-size:9px}
+.device-meta .meta-value{color:var(--paper);font-family:monospace;font-size:11px}
+
+.device-actions{margin-top:14px;display:flex;gap:6px;flex-wrap:wrap}
+.dev-btn{background:rgba(201,168,76,.12);color:var(--gold);border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:11px;letter-spacing:1px;font-family:inherit;transition:all .15s}
+.dev-btn:hover{background:rgba(201,168,76,.25);transform:translateY(-1px)}
+.dev-btn.danger{background:rgba(200,80,62,.15);color:var(--danger)}
+.dev-btn.danger:hover{background:rgba(200,80,62,.3)}
+.dev-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* === 健康监控区 === */
+.health-list{display:grid;gap:10px}
+.health-row{background:var(--ink3);border:1px solid rgba(201,168,76,.12);border-radius:6px;padding:14px 18px;display:grid;grid-template-columns:1fr auto auto auto;gap:14px;align-items:center}
+.health-row .service-name{font-size:12px;color:var(--gold2);letter-spacing:1px}
+.health-row .service-url{font-size:10px;color:var(--paper3);font-family:monospace}
+.health-row .latency{font-size:12px;color:var(--paper);min-width:60px;text-align:right}
+.health-row .latency.fast{color:var(--ok)}
+.health-row .latency.slow{color:var(--warn)}
+.health-row .latency.crit{color:var(--danger)}
+.health-row .actions{display:flex;gap:6px}
+
+/* === 操作日志 === */
+.log-list{max-height:280px;overflow-y:auto;background:var(--ink2);border:1px solid rgba(201,168,76,.1);border-radius:6px;padding:10px}
+.log-entry{display:flex;gap:10px;padding:6px 0;font-size:11px;border-bottom:1px solid rgba(201,168,76,.06)}
+.log-entry:last-child{border-bottom:none}
+.log-entry .time{color:var(--paper3);font-family:monospace;flex-shrink:0}
+.log-entry .msg{flex:1;color:var(--paper)}
+.log-entry.ok .msg{color:var(--ok)}
+.log-entry.warn .msg{color:var(--warn)}
+.log-entry.err .msg{color:var(--danger)}
+
+/* === 添加设备入口 === */
+.add-device-cta{display:block;text-align:center;padding:20px;background:linear-gradient(135deg,rgba(62,158,107,.08),rgba(201,168,76,.05));border:2px dashed rgba(62,158,107,.4);border-radius:var(--radius);color:var(--ok);text-decoration:none;font-size:13px;letter-spacing:3px;transition:all .2s;margin-bottom:14px}
+.add-device-cta:hover{background:linear-gradient(135deg,rgba(62,158,107,.18),rgba(201,168,76,.08));transform:translateY(-2px)}
+
+@media(max-width:768px){
+  header h1{font-size:18px;letter-spacing:5px}
+  .summary-grid{grid-template-columns:repeat(2,1fr)}
+  .device-grid{grid-template-columns:1fr}
+  .health-row{grid-template-columns:1fr 1fr;gap:8px}
+  .health-row .actions{grid-column:1/-1;justify-content:flex-end}
+}
+@media(max-width:320px){
+  body{padding:10px 8px 60px}
+  .summary-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .summary-card{padding:14px}
+  .summary-card .value{font-size:24px}
+}
+</style>
+</head>
+<body data-kb-module="mobile">
+<div class="wrap">
+  <header>
+    <h1>设备管理中心</h1>
+    <p>DEVICES · HEALTH · LIVE STATUS</p>
+  </header>
+
+  <!-- === 摘要卡 === -->
+  <div class="summary-grid">
+    <div class="summary-card ok">
+      <div class="label">在线设备</div>
+      <div class="value" id="sumOnline">0</div>
+      <div class="sub">已连接可用</div>
+    </div>
+    <div class="summary-card warn">
+      <div class="label">离线设备</div>
+      <div class="value" id="sumOffline">0</div>
+      <div class="sub">未连接 / 未启用</div>
+    </div>
+    <div class="summary-card err">
+      <div class="label">异常设备</div>
+      <div class="value" id="sumError">0</div>
+      <div class="sub">权限拒绝 / 硬件错误</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">服务健康</div>
+      <div class="value" id="sumHealth">—</div>
+      <div class="sub">6 项核心服务</div>
+    </div>
+  </div>
+
+  <!-- === 添加设备入口 === -->
+  <a href="camera-capture.html" class="add-device-cta">＋ 添加新设备（Type-C 即插即用）</a>
+
+  <!-- === 已注册设备 === -->
+  <div class="section-title">已注册设备 <span class="badge" id="devCountBadge">0 台</span></div>
+  <div class="device-grid" id="deviceGrid">
+    <div class="device-card offline" id="loading-dev">
+      <div class="device-head">
+        <div class="device-icon">⏳</div>
+        <div class="device-name">检测中…</div>
+      </div>
+      <div class="device-meta">
+        <div><span class="meta-label">状态</span><span class="meta-value">等待浏览器授权</span></div>
+      </div>
+      <div class="device-actions">
+        <button class="dev-btn" onclick="requestPermissions()">🔓 授权摄像头/麦克风</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- === 后端服务健康 === -->
+  <div class="section-title">后端服务健康 <span class="badge" id="healthBadge">实时监测</span></div>
+  <div class="health-list" id="healthList">
+    <div class="health-row">
+      <div><div class="service-name">检测中…</div></div>
+      <div class="latency">—</div>
+      <div></div>
+      <div class="actions"></div>
+    </div>
+  </div>
+
+  <!-- === 事件日志 === -->
+  <div class="section-title">设备事件日志 <span class="badge" id="logBadge">最近 24h</span></div>
+  <div class="log-list" id="logList">
+    <div class="log-entry"><span class="time">--:--:--</span><span class="msg">等待首次检测…</span></div>
+  </div>
+</div>
+
+<script>
+// === R45: 设备管理中心 ===
+// 已知的服务端点
+const SERVICES = [
+  { name: '排盘 API', url: 'http://127.0.0.1:8911/health', key: 'paipan' },
+  { name: 'TTS 语音', url: 'http://127.0.0.1:8912/health', key: 'tts' },
+  { name: '面诊 OCR', url: 'http://127.0.0.1:8913/api/camera/health', key: 'face-ocr' },
+  { name: '静态服务', url: 'http://127.0.0.1:8914/', key: 'static' },
+  { name: 'API 网关', url: 'http://127.0.0.1:8920/api/health', key: 'api-v2' },
+  { name: 'KB 知识库', url: 'http://127.0.0.1:8901/health', key: 'kb-api' }
+];
+
+// 设备类型元数据（用于 icon 和分类）
+const DEVICE_META = {
+  camera: { icon: '📷', type: '视频输入', kind: 'videoinput' },
+  microphone: { icon: '🎙️', type: '音频输入', kind: 'audioinput' },
+  speaker: { icon: '🔊', type: '音频输出', kind: 'audiooutput' },
+  display: { icon: '🖥️', type: '显示设备', kind: null },
+  ar_glasses: { icon: '👓', type: 'AR 眼镜', kind: null }
+};
+
+// 已知支持的设备类型（待用户接入）
+const KNOWN_DEVICES = [
+  { type: 'camera', vendor: '桌面摄像头', placeholder: 'Type-C USB Camera · 即插即用', modes: ['face', 'tongue', 'ocr', 'ocr-tcm'] },
+  { type: 'microphone', vendor: '桌面麦克风', placeholder: 'Type-C USB Microphone · 拾音器', modes: ['voice', 'stt'] }
+];
+
+// === 状态 ===
+let devices = [];
+let healthStatuses = {};
+let logEntries = [];
+let permGranted = { video: false, audio: false };
+
+// === 工具函数 ===
+function log(msg, level = 'ok') {
+  const t = new Date().toTimeString().slice(0, 8);
+  logEntries.unshift({ time: t, msg, level });
+  if (logEntries.length > 100) logEntries = logEntries.slice(0, 100);
+  renderLogs();
+}
+function renderLogs() {
+  const el = document.getElementById('logList');
+  if (!el) return;
+  el.innerHTML = logEntries.map(e =>
+    `<div class="log-entry ${e.level}"><span class="time">${e.time}</span><span class="msg">${escape(e.msg)}</span></div>`
+  ).join('');
+}
+function escape(s) { return String(s || '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c])); }
+
+// === 设备检测 ===
+async function refreshDevices() {
+  try {
+    const all = await navigator.mediaDevices.enumerateDevices();
+    const cams = all.filter(d => d.kind === 'videoinput');
+    const mics = all.filter(d => d.kind === 'audioinput');
+    const speakers = all.filter(d => d.kind === 'audiooutput');
+
+    const previous = devices.map(d => d.deviceId).sort().join(',');
+    const current = all.map(d => d.deviceId).sort().join(',');
+
+    devices = [
+      ...cams.map((c, i) => ({
+        ...c, type: 'camera', icon: '📷', label: c.label || `摄像头 ${i+1}`
+      })),
+      ...mics.map((c, i) => ({
+        ...c, type: 'microphone', icon: '🎙️', label: c.label || `麦克风 ${i+1}`
+      })),
+      ...speakers.map((c, i) => ({
+        ...c, type: 'speaker', icon: '🔊', label: c.label || `扬声器 ${i+1}`
+      }))
+    ];
+
+    // 检测新增设备
+    if (previous && current !== previous && devices.length > 0) {
+      const newOnes = devices.filter(d => !previous.split(',').includes(d.deviceId));
+      if (newOnes.length > 0) {
+        log(`🔌 检测到 ${newOnes.length} 个新设备接入: ${newOnes.map(d => d.label).join(', ')}`);
+      }
+    }
+
+    renderDevices();
+  } catch (e) {
+    log('设备枚举失败：' + e.message, 'err');
+  }
+}
+
+function renderDevices() {
+  const grid = document.getElementById('deviceGrid');
+  if (!grid) return;
+
+  // 统计
+  const camOnline = devices.filter(d => d.type === 'camera').length;
+  const micOnline = devices.filter(d => d.type === 'microphone').length;
+  document.getElementById('sumOnline').textContent = camOnline + micOnline;
+  document.getElementById('sumOffline').textContent = KNOWN_DEVICES.length - (camOnline > 0 ? 1 : 0) - (micOnline > 0 ? 1 : 0);
+  document.getElementById('devCountBadge').textContent = devices.length + ' 台';
+
+  // 渲染设备卡
+  const cards = [];
+
+  // 真实枚举到的设备
+  devices.forEach((d, i) => {
+    const meta = DEVICE_META[d.type] || {};
+    const isOnline = !!d.label; // 有 label 说明浏览器已授权
+    cards.push(`
+      <div class="device-card ${isOnline ? 'online' : 'offline'}" data-device-id="${d.deviceId}">
+        <div class="device-head">
+          <div class="device-icon">${d.icon}</div>
+          <div class="device-name">${escape(d.label)}</div>
+          <div class="device-status ${isOnline ? 'online' : 'offline'}">${isOnline ? '在线' : '需授权'}</div>
+        </div>
+        <div class="device-meta">
+          <div><span class="meta-label">类型</span><span class="meta-value">${meta.type || d.type}</span></div>
+          <div><span class="meta-label">设备 ID</span><span class="meta-value">${d.deviceId.slice(0, 8)}…</span></div>
+          <div><span class="meta-label">分组</span><span class="meta-value">${d.groupId.slice(0, 6)}…</span></div>
+          <div><span class="meta-label">状态</span><span class="meta-value">${isOnline ? '✓ 就绪' : '⚠ 待启用'}</span></div>
+        </div>
+        <div class="device-actions">
+          <button class="dev-btn" onclick="testDevice('${d.deviceId}', '${d.type}')">${d.type === 'camera' ? '📸 测试拍照' : '🎵 测试录音'}</button>
+          <button class="dev-btn" onclick="openDeviceIn('${d.type}')">→ 打开采集页</button>
+        </div>
+      </div>
+    `);
+  });
+
+  // 已知但未接入的设备（占位卡）
+  if (camOnline === 0) cards.push(renderPlaceholder('camera', '桌面摄像头'));
+  if (micOnline === 0) cards.push(renderPlaceholder('microphone', '桌面麦克风'));
+
+  // AR 眼镜占位（R32 已铺路）
+  cards.push(renderPlaceholder('ar_glasses', 'AR 眼镜', 'Rokid AR Lite · 待接入'));
+
+  grid.innerHTML = cards.join('');
+}
+
+function renderPlaceholder(type, name, sub = 'Type-C 即插即用 · 待接入') {
+  return `
+    <div class="device-card offline">
+      <div class="device-head">
+        <div class="device-icon">${DEVICE_META[type].icon}</div>
+        <div class="device-name">${name}</div>
+        <div class="device-status offline">未接入</div>
+      </div>
+      <div class="device-meta">
+        <div><span class="meta-label">类型</span><span class="meta-value">${DEVICE_META[type].type}</span></div>
+        <div><span class="meta-label">接口</span><span class="meta-value">USB-C / TB4</span></div>
+        <div><span class="meta-label">协议</span><span class="meta-value">UVC / UAC</span></div>
+        <div><span class="meta-label">状态</span><span class="meta-value">等待连接…</span></div>
+      </div>
+      <div class="device-actions">
+        <button class="dev-btn" onclick="requestPermissions()">🔓 授权</button>
+        <button class="dev-btn" onclick="showGuide('${type}')">📖 接入指南</button>
+      </div>
+    </div>
+  `;
+}
+
+// === 设备操作 ===
+async function requestPermissions() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    stream.getTracks().forEach(t => t.stop());
+    permGranted.video = true;
+    permGranted.audio = true;
+    log('✓ 已授权摄像头 + 麦克风访问', 'ok');
+    refreshDevices();
+  } catch (e) {
+    log('权限被拒绝：' + e.message, 'err');
+  }
+}
+
+async function testDevice(deviceId, type) {
+  try {
+    const constraints = type === 'camera' ? { video: { deviceId: { exact: deviceId } } } : { audio: { deviceId: { exact: deviceId } } };
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    setTimeout(() => stream.getTracks().forEach(t => t.stop()), 1500);
+    log(`✓ ${type === 'camera' ? '摄像头' : '麦克风'} 测试成功`, 'ok');
+  } catch (e) {
+    log(`✗ ${type === 'camera' ? '摄像头' : '麦克风'} 测试失败：${e.message}`, 'err');
+  }
+}
+
+function openDeviceIn(type) {
+  const target = type === 'ar_glasses' ? 'glass-console.html' : 'camera-capture.html';
+  window.location.href = target;
+}
+
+function showGuide(type) {
+  const guide = {
+    camera: 'Type-C 摄像头接入步骤：\n1. 将摄像头插入 Mac mini 的 Type-C / TB4 口\n2. macOS 自动加载 UVC 驱动（无需安装）\n3. 浏览器授权后即可在采集页使用\n4. 支持热插拔，拔掉再插自动检测',
+    microphone: 'Type-C 麦克风接入步骤：\n1. 将麦克风插入 Mac mini 的 Type-C 口\n2. macOS 自动加载 USB Audio 驱动\n3. 在采集页开启「拾音器」即可使用\n4. 语音实时转文字 + 自动查 KB',
+    ar_glasses: 'AR 眼镜接入：\n1. 配对 Rokid AR Lite 蓝牙\n2. 启动配套 App 开启投屏\n3. 在玻璃控制台（glass-console.html）查看实时画面'
+  };
+  alert(guide[type] || '接入指南待补');
+}
+
+// === 服务健康监测 ===
+async function checkService(svc) {
+  const start = Date.now();
+  try {
+    const r = await fetch(svc.url, { cache: 'no-store', mode: 'cors', credentials: 'omit' });
+    const elapsed = Date.now() - start;
+    return { ok: r.ok, latency: elapsed, status: r.status };
+  } catch (e) {
+    return { ok: false, latency: -1, error: e.message };
+  }
+}
+
+async function checkAllServices() {
+  const checks = await Promise.all(SERVICES.map(async svc => {
+    const result = await checkService(svc);
+    return { ...svc, ...result };
+  }));
+
+  const passedCount = checks.filter(c => c.ok).length;
+  healthStatuses = checks;
+  document.getElementById('sumHealth').textContent = passedCount + '/' + SERVICES.length;
+  document.getElementById('sumHealth').style.color = passedCount === SERVICES.length ? 'var(--ok)' : passedCount >= SERVICES.length - 1 ? 'var(--warn)' : 'var(--danger)';
+
+  renderHealth(checks);
+}
+
+function renderHealth(checks) {
+  const el = document.getElementById('healthList');
+  if (!el) return;
+  el.innerHTML = checks.map(c => {
+    let cls = 'fast', txt = c.latency + 'ms';
+    if (!c.ok || c.latency < 0) { cls = 'crit'; txt = '✗ 离线'; }
+    else if (c.latency > 500) cls = 'slow';
+    return `
+      <div class="health-row">
+        <div>
+          <div class="service-name">${escape(c.name)}</div>
+          <div class="service-url">${escape(c.url)}</div>
+        </div>
+        <div class="latency ${cls}">${txt}</div>
+        <div style="font-size:10px;color:var(--paper3)">${c.ok ? 'HTTP ' + c.status : c.error || '失败'}</div>
+        <div class="actions">
+          <button class="dev-btn" onclick="checkOneService('${c.key}')">🔄 重测</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function checkOneService(key) {
+  const svc = SERVICES.find(s => s.key === key);
+  if (!svc) return;
+  const result = await checkService(svc);
+  const idx = healthStatuses.findIndex(s => s.key === key);
+  if (idx >= 0) healthStatuses[idx] = { ...svc, ...result };
+  renderHealth(healthStatuses);
+  log(`${svc.name}: ${result.ok ? '✓ ' + result.latency + 'ms' : '✗ ' + (result.error || '失败')}`, result.ok ? 'ok' : 'err');
+}
+
+// === 启动 ===
+async function init() {
+  log('设备管理中心启动', 'ok');
+
+  // 检查浏览器支持
+  if (!navigator.mediaDevices) {
+    log('⚠ 当前浏览器不支持 mediaDevices API', 'warn');
+    return;
+  }
+
+  // 首次设备检测（无权限）
+  await refreshDevices();
+
+  // 监听热插拔
+  navigator.mediaDevices.addEventListener('devicechange', () => {
+    log('🔄 devicechange 事件触发，重新检测设备', 'ok');
+    refreshDevices();
+  });
+
+  // 首次健康检查
+  await checkAllServices();
+  log(`健康检查完成：${healthStatuses.filter(s => s.ok).length}/${SERVICES.length} 服务在线`, 'ok');
+
+  // 周期性健康监测（每 30 秒）
+  setInterval(checkAllServices, 30000);
+}
+
+init();
+</script>
+</body>
+</html>
