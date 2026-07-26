@@ -336,16 +336,31 @@ async function captureAndAnalyze() {
 
   try {
     const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.85));
-    const form = new FormData();
-    form.append('image', blob, 'capture.jpg');
+    const b64 = await new Promise(res => {
+      const reader = new FileReader();
+      reader.onload = () => res(reader.result.split(',')[1] || '');
+      reader.onerror = () => res('');
+      reader.readAsDataURL(blob);
+    });
 
-    let apiUrl = '/api/face-ocr/analyze';
-    let body = form;
-    if (mode === 'ocr' || mode === 'ocr-tcm') {
-      apiUrl = '/api/face-ocr/ocr';
+    let apiUrl = '/api/face/analyze';
+    let body = { image: b64 };
+    if (mode === 'ocr') {
+      apiUrl = '/api/ocr/recognize';
+    } else if (mode === 'ocr-tcm') {
+      apiUrl = '/api/ocr/tcm';
+      body = { image: b64, mode: 'tcm' };
+    } else if (mode === 'tongue') {
+      apiUrl = '/api/face/analyze';
+      body = { image: b64, mode: 'tongue' };
     }
 
-    const r = await fetch(apiUrl, { method: 'POST', body, mode: 'cors' });
+    const r = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      mode: 'cors'
+    });
     const data = await r.json().catch(() => ({}));
     sessionCount++;
     saveSessionCount();
