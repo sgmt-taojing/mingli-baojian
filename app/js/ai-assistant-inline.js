@@ -768,8 +768,10 @@ async function typing(){
 }
 
 async function generateReport(){
+  try{ _recordRecentMod(state.module); }catch(e){}
   const mod=MODULES[state.module];
   const collected=Object.values(state.data);
+  try{ _renderRecentModCard(); }catch(e){}
 
   // 0. 问卷 + 排盘落库（公网公开端点，失败静默）
   const _baziForSave = (state.module==='bazi' || state.module==='name' || state.module==='number' || state.module==='face') ? state.data : null;
@@ -1329,6 +1331,42 @@ async function callAI(q){
     }
   }
 }
+
+
+// ── R67：最近 6 模块访问卡 ──────────────────
+function _recordRecentMod(mid){
+  if (!mid) return;
+  try {
+    var KEY = '_r67_recent';
+    var list = JSON.parse(localStorage.getItem(KEY) || '[]');
+    list = list.filter(function(x){return x !== mid;});
+    list.unshift(mid);
+    if (list.length > 6) list = list.slice(0, 6);
+    localStorage.setItem(KEY, JSON.stringify(list));
+  } catch(e) {}
+}
+function _renderRecentModCard(){
+  var card = document.getElementById('r67-recent-card');
+  var list;
+  try { list = JSON.parse(localStorage.getItem('_r67_recent') || '[]'); } catch(e){ list=[]; }
+  if (!card) {
+    card = document.createElement('div');
+    card.id = 'r67-recent-card';
+    card.style.cssText = 'margin:6px 12px;padding:8px 12px;background:rgba(33,150,243,.06);border:1px solid rgba(33,150,243,.18);border-radius:10px;font-size:12px;color:#bcd;';
+    var chat = document.getElementById('chat');
+    if (chat && chat.parentNode) chat.parentNode.insertBefore(card, chat);
+  }
+  if (list.length === 0) { card.style.display = 'none'; return; }
+  card.style.display = '';
+  var chips = list.map(function(m){
+    var meta = (typeof MODULES !== 'undefined' && MODULES[m]) ? MODULES[m] : {name:m, icon:'🔮'};
+    return '<span style="display:inline-block;margin:2px 4px 2px 0;padding:3px 9px;background:rgba(33,150,243,.15);border:1px solid rgba(33,150,243,.35);border-radius:12px;color:#cfe;font-size:12px;cursor:pointer" onclick="document.getElementById(\'nav-\'+this.dataset.m+\'\').click()" data-m="'+m+'" title="直接打开 '+m+'">'+meta.icon+' '+meta.name+'</span>';
+  }).join('');
+  card.innerHTML = '<span style="font-weight:600;color:#8cf">⭐ 最近访问</span> <span style="opacity:.6;font-size:11px">(点开直达)</span><br>' + chips +
+    '<button style="margin-top:4px;padding:1px 6px;background:transparent;border:1px solid rgba(33,150,243,.3);border-radius:6px;color:#9cf;cursor:pointer;font-size:10px;float:right" onclick="localStorage.removeItem(\'_r67_recent\');this.parentNode.style.display=\'none\'">清空</button>' +
+    '<div style="clear:both"></div>';
+}
+window._renderRecentModCard = _renderRecentModCard;
 
 // === 本地降级报告生成 ===
 // === 统一化解引擎(与原排盘引擎对齐)===
