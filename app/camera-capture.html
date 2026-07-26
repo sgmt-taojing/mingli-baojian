@@ -173,6 +173,67 @@ label{display:block;font-size:12px;color:var(--paper2);letter-spacing:1.5px;marg
 .kb-fallback-badge:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.5)}
 .kb-fallback-badge.show{display:inline-flex;align-items:center;gap:6px}
 
+/* === R44: 热插拔 + 连续模式 === */
+.hotplug-toast{
+  position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:100;
+  background:linear-gradient(135deg,#3e9e6b,#2a7a4e);color:#fff;font-size:13px;
+  padding:12px 24px;border-radius:8px;letter-spacing:1px;
+  box-shadow:0 6px 20px rgba(62,158,107,.4);
+  animation:toastSlide .5s cubic-bezier(.34,1.56,.64,1);
+  display:none;align-items:center;gap:10px;
+}
+.hotplug-toast.show{display:flex}
+.hotplug-toast.warn{background:linear-gradient(135deg,#c8503e,#e85040)}
+@keyframes toastSlide{0%{opacity:0;transform:translate(-50%,-20px)}100%{opacity:1;transform:translate(-50%,0)}}
+
+/* 设备状态面板 */
+.dev-status{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  margin-top:8px;padding:10px;background:var(--ink2);border-radius:6px;
+}
+.dev-status .dev-item{display:flex;align-items:center;gap:6px;font-size:11px}
+.dev-status .dev-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:all .3s}
+.dev-status .dev-dot.online{background:#3e9e6b;box-shadow:0 0 6px #3e9e6b}
+.dev-status .dev-dot.offline{background:#555}
+.dev-status .dev-dot.new{background:#c9a84c;box-shadow:0 0 8px #c9a84c;animation:devPulse 1s infinite}
+@keyframes devPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.4)}}
+.dev-status .dev-name{color:var(--paper2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* 连续监听模式 */
+.listen-mode-bar{
+  display:flex;align-items:center;gap:10px;margin-top:8px;
+  padding:8px 12px;background:var(--ink2);border-radius:6px;
+}
+.listen-toggle{
+  display:inline-flex;align-items:center;gap:6px;cursor:pointer;
+  font-size:12px;color:var(--paper2);letter-spacing:1px;
+}
+.listen-toggle input{width:auto}
+.listen-mode-indicator{
+  font-size:10px;padding:3px 8px;border-radius:10px;
+  background:rgba(200,80,62,.2);color:var(--danger);letter-spacing:1px;
+}
+.listen-mode-indicator.active{
+  background:var(--danger);color:#fff;animation:recordingPulse 1.2s infinite;
+}
+.kb-result-stream{
+  max-height:260px;overflow-y:auto;
+}
+.kb-result-stream .kb-card{
+  background:var(--ink2);border:1px solid rgba(201,168,76,.12);
+  border-radius:6px;padding:10px;margin-bottom:8px;
+  animation:cardFadeIn .3s ease-out;
+}
+@keyframes cardFadeIn{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}
+.kb-card .kb-title{color:var(--gold2);font-size:12px;font-weight:600;margin-bottom:4px}
+.kb-card .kb-snippet{font-size:11px;color:var(--paper2);line-height:1.5}
+.kb-card .kb-meta{font-size:9px;color:var(--paper3);margin-top:4px;display:flex;gap:8px}
+
+@media(max-width:768px){
+  .dev-status{grid-template-columns:1fr}
+  .hotplug-toast{font-size:11px;padding:10px 18px}
+}
+
 @media(max-width:768px){
   .guide-layer{font-size:.9em}
   .guide-frame{width:78% !important}
@@ -230,6 +291,10 @@ label{display:block;font-size:12px;color:var(--paper2);letter-spacing:1.5px;marg
           <span>🎤 启用麦克风（拾音器·与 KB 联动）</span>
         </label>
         <select id="micSel" aria-label="micSel" style="margin-top:6px"><option value="">默认（自动选择）</option></select>
+        <div class="dev-status" id="devStatus">
+          <div class="dev-item"><span class="dev-dot offline" id="camDot"></span><span class="dev-name" id="camName">摄像头：未检测</span></div>
+          <div class="dev-item"><span class="dev-dot offline" id="micDot"></span><span class="dev-name" id="micName">麦克风：未检测</span></div>
+        </div>
       </div>
 
       <button class="btn" id="startBtn">▶ 启动摄像头</button>
@@ -281,16 +346,22 @@ label{display:block;font-size:12px;color:var(--paper2);letter-spacing:1.5px;marg
     </div>
   </div>
 
+  <div class="hotplug-toast" id="hotplugToast">🔌 检测到新设备</div>
   <div class="kb-fallback-badge" id="kbFallbackBadge" title="KB 兜底就绪，点击查看详情">✅ KB 兜底就绪</div>
 
   <div class="voice-panel" id="voicePanel" style="display:none">
     <h3>语音→知识库（拾音器联动）</h3>
     <div class="voice-row">
       <button class="voice-btn" id="voiceBtn">🎙️ 按住说话</button>
-      <span class="voice-hint">按住提问（如"湿热体质怎么办"）· 松开自动检索 KB</span>
+      <label class="listen-toggle">
+        <input type="checkbox" id="continuousMode">
+        <span>连续监听模式</span>
+        <span class="listen-mode-indicator" id="listenIndicator" style="display:none">● LIVE</span>
+      </label>
+      <span class="voice-hint">按住说话 或 开启连续模式 · 自动检索 KB</span>
     </div>
     <div class="voice-transcript" id="voiceTranscript"></div>
-    <div class="voice-result" id="voiceResult"></div>
+    <div class="voice-result kb-result-stream" id="voiceResult"></div>
   </div>
 </div>
 
@@ -610,6 +681,220 @@ document.addEventListener('keydown', e => {
     window.snap();
   }
 });
+</script>
+<script>
+// === R44: Type-C 热插拔通用接入 + 连续语音 KB 交互 ===
+const hotplugToast = document.getElementById('hotplugToast');
+const camDot = document.getElementById('camDot');
+const micDot = document.getElementById('micDot');
+const camName = document.getElementById('camName');
+const micName = document.getElementById('micName');
+const continuousMode = document.getElementById('continuousMode');
+const listenIndicator = document.getElementById('listenIndicator');
+let knownDeviceIds = { cam: [], mic: [] };
+let continuousListening = false;
+let lastKbQuery = '';
+let kbQueryTimer = null;
+
+function showHotplugToast(text, isWarn) {
+  hotplugToast.innerHTML = text;
+  hotplugToast.className = 'hotplug-toast show' + (isWarn ? ' warn' : '');
+  setTimeout(() => hotplugToast.classList.remove('show'), 3500);
+}
+
+function updateDevStatus(cams, mics) {
+  // 摄像头
+  if (cams.length > 0) {
+    const isNew = cams.length > knownDeviceIds.cam.length;
+    camDot.className = 'dev-dot ' + (isNew ? 'new' : 'online');
+    camName.textContent = '摄像头：' + (cams[0]?.label || cams.length + ' 个设备');
+  } else {
+    camDot.className = 'dev-dot offline';
+    camName.textContent = '摄像头：未检测';
+  }
+  // 麦克风
+  if (mics.length > 0) {
+    const isNew = mics.length > knownDeviceIds.mic.length;
+    micDot.className = 'dev-dot ' + (isNew ? 'new' : 'online');
+    micName.textContent = '麦克风：' + (mics[0]?.label || mics.length + ' 个设备');
+  } else {
+    micDot.className = 'dev-dot offline';
+    micName.textContent = '麦克风：未检测';
+  }
+}
+
+async function hotplugCheck() {
+  try {
+    // 不需要权限就能 enumerate（但 label 为空）
+    const all = await navigator.mediaDevices.enumerateDevices();
+    const cams = all.filter(d => d.kind === 'videoinput');
+    const mics = all.filter(d => d.kind === 'audioinput');
+
+    // 检测新设备
+    const camIds = cams.map(d => d.deviceId);
+    const micIds = mics.map(d => d.deviceId);
+    const newCam = camIds.filter(id => !knownDeviceIds.cam.includes(id));
+    const newMic = micIds.filter(id => !knownDeviceIds.mic.includes(id));
+
+    if (newCam.length > 0 && knownDeviceIds.cam.length > 0) {
+      showHotplugToast('🔌 检测到新摄像头接入（Type-C 热插拔）', false);
+      // 自动选到新设备
+      const newDev = cams.find(d => d.deviceId === newCam[0]);
+      if (newDev) {
+        deviceSel.value = newDev.deviceId;
+        // 如果当前在运行，自动重启流
+        if (stream) { stop(); setTimeout(start, 300); }
+      }
+    }
+    if (newMic.length > 0 && knownDeviceIds.mic.length > 0) {
+      showHotplugToast('🔌 检测到新麦克风接入（Type-C 热插拔）', false);
+      const newDev = mics.find(d => d.deviceId === newMic[0]);
+      if (newDev) {
+        micSel.value = newDev.deviceId;
+        audioEnable.checked = true;
+        audioEnable.disabled = false;
+      }
+    }
+
+    knownDeviceIds.cam = camIds;
+        knownDeviceIds.mic = micIds;
+
+    updateDevStatus(cams, mics);
+
+    // 更新下拉列表
+    deviceSel.innerHTML = '<option value="">默认（自动选择）</option>' +
+      cams.map((c, i) => `<option value="${c.deviceId}"${c.deviceId===deviceSel.value?' selected':''}>${c.label || ('Camera ' + (i+1))}</option>`).join('');
+    micSel.innerHTML = '<option value="">默认（自动选择）</option>' +
+      mics.map((c, i) => `<option value="${c.deviceId}"${c.deviceId===micSel.value?' selected':''}>${c.label || ('Mic ' + (i+1))}</option>`).join('');
+    if (mics.length > 0) audioEnable.disabled = false;
+  } catch (e) {
+    console.warn('hotplug check error:', e);
+  }
+}
+
+// 浏览器原生 devicechange 事件 — 热插拔核心
+if (navigator.mediaDevices) {
+  navigator.mediaDevices.addEventListener('devicechange', hotplugCheck);
+}
+
+// 首次初始化设备列表
+hotplugCheck();
+
+// 定期轮询（有些浏览器 devicechange 不触发）
+setInterval(hotplugCheck, 3000);
+
+// === 连续监听模式 ===
+continuousMode.addEventListener('change', () => {
+  if (continuousMode.checked) {
+    startContinuousListen();
+  } else {
+    stopContinuousListen();
+  }
+});
+
+function startContinuousListen() {
+  if (!recognition) {
+    if (!initSTT()) {
+      continuousMode.checked = false;
+      alert('当前浏览器不支持语音识别，请用 Chrome/Edge');
+      return;
+    }
+  }
+  continuousListening = true;
+  isRecording = true;
+  voiceFinalTranscript = '';
+  listenIndicator.style.display = 'inline-block';
+  listenIndicator.classList.add('active');
+  try { recognition.start(); } catch(e) {}
+  setStatus('🎙️ 连续监听中 · 说完自动查 KB · 关闭开关停止', '');
+}
+
+function stopContinuousListen() {
+  continuousListening = false;
+  isRecording = false;
+  if (recognition) { try { recognition.stop(); } catch(e) {} }
+  listenIndicator.style.display = 'none';
+  listenIndicator.classList.remove('active');
+  setStatus('连续监听已关闭', '');
+}
+
+// 重写 recognition.onend — 连续模式自动续接
+function _patchRecognitionEnd() {
+  if (!recognition) return;
+  const _origOnEnd = recognition.onend;
+  recognition.onend = (e) => {
+    if (continuousListening) {
+      try { recognition.start(); } catch(err) { setTimeout(() => { try { recognition.start(); } catch(e){} }, 500); }
+    } else if (isRecording) {
+      try { recognition.start(); } catch(err) {}
+    }
+  };
+}
+
+// 连续模式 STT onresult — 自动检测句子边界并查询 KB
+const _origInitSTT = initSTT;
+window.initSTT = function() {
+  const ok = _origInitSTT();
+  if (!ok) return false;
+  // 增强 onresult — 句号/问号/感叹号/停顿触发自动 KB 查询
+  recognition.onresult = (e) => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) {
+        const chunk = e.results[i][0].transcript;
+        voiceFinalTranscript += chunk;
+        // 连续模式：每句结束自动查 KB
+        if (continuousListening && chunk.length > 2) {
+          debounceKbQuery(chunk.trim());
+        }
+      } else {
+        interim += e.results[i][0].transcript;
+      }
+    }
+    const vt = document.getElementById('voiceTranscript');
+    if (vt) {
+      vt.innerHTML = escape(voiceFinalTranscript) +
+        (interim ? '<span style="color:var(--gold2);opacity:.8">' + escape(interim) + '</span>' : '');
+    }
+  };
+  _patchRecognitionEnd();
+  return true;
+};
+
+function debounceKbQuery(query) {
+  // 去重：和上次查询相同就跳过
+  if (query === lastKbQuery) return;
+  lastKbQuery = query;
+  if (kbQueryTimer) clearTimeout(kbQueryTimer);
+  kbQueryTimer = setTimeout(async () => {
+    await streamKbResult(query);
+  }, 600);
+}
+
+async function streamKbResult(query) {
+  const results = await queryKb(query);
+  const vr = document.getElementById('voiceResult');
+  if (!vr) return;
+  if (results.length === 0) {
+    // 安静地跳过（连续模式不打扰）
+    return;
+  }
+  // 流式追加卡片（不是替换）
+  const card = document.createElement('div');
+  card.className = 'kb-card';
+  card.innerHTML = '<div class="kb-title">🔍 ' + escape(query.slice(0,50)) + '</div>' +
+    results.map(r => '<div style="margin-bottom:6px">' +
+      '<strong style="color:var(--gold2)">' + escape((r.title||r.name||r.id||'').toString()) + '</strong>' +
+      '<div class="kb-snippet">' + escape((r.summary||r.content||r.text||'').slice(0,120)) + '</div>' +
+      '<div class="kb-meta"><span>来源: ' + escape((r.source||r.module||'KB').toString()) + '</span>' +
+      '<span>信任: ' + escape((r.trust||r.level||'?').toString()) + '</span></div>' +
+      '</div>').join('');
+  // 插入到最前面
+  vr.insertBefore(card, vr.firstChild);
+  // 限制最多 8 张卡片
+  while (vr.children.length > 8) vr.removeChild(vr.lastChild);
+  setStatus('✓ KB 实时匹配 · "' + query.slice(0,20) + '" → ' + results.length + ' 条', 'ok');
+}
 </script>
 <script src="js/module-reports-kb.js"></script>
 <script src="js/kb-fallback-indicator.js"></script>
