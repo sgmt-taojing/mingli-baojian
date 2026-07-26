@@ -2,175 +2,641 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI 眼睛 · 桌面体验 · 命理宝鉴</title>
 <link rel="stylesheet" href="css/a11y-fix.css">
 <style>
-:root{
-  --ink:#080808; --ink2:#141414; --ink3:#1c1c1c;
-  --gold:#c9a84c; --gold2:#e3c778;
-  --paper:#f5ecd6; --paper3:#8a7f6a;
-  --ok:#3e9e6b; --warn:#d4a047; --danger:#c8503e;
-  --radius:12px;
+:root {
+  --bg: #0b0e14;
+  --bg2: #13181f;
+  --bg3: #1a1f2a;
+  --bd: #252b38;
+  --bd2: #3a4255;
+  --tx: #e6edf3;
+  --muted: #8b949e;
+  --muted2: #545d68;
+  --gold: #c9a84c;
+  --gold2: #e6c873;
+  --ok: #3fb950;
+  --warn: #d29922;
+  --err: #f85149;
+  --info: #58a6ff;
+  --purple: #bc8cff;
 }
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;background:var(--ink);color:var(--paper);font-family:'Noto Serif SC','Songti SC',serif;letter-spacing:.5px}
-body{min-height:100vh;padding:16px 14px 80px}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+  background: var(--bg);
+  color: var(--tx);
+  line-height: 1.6;
+  min-height: 100vh;
+  padding: 0;
+}
 
-.wrap{max-width:980px;margin:0 auto}
-header{text-align:center;padding:20px 0 24px;border-bottom:1px solid rgba(201,168,76,.18);margin-bottom:20px}
-header h1{font-size:22px;color:var(--gold);letter-spacing:6px;margin:0;font-weight:500}
-header p{font-size:11px;color:var(--paper3);letter-spacing:2px;margin-top:6px}
+/* === Header === */
+.header {
+  background: linear-gradient(180deg, rgba(201,168,76,.08), transparent);
+  border-bottom: 1px solid var(--bd);
+  padding: 20px 24px;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(12px);
+}
+.header h1 {
+  font-size: 20px;
+  color: var(--gold2);
+  font-weight: 600;
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+.header p {
+  font-size: 13px;
+  color: var(--muted);
+}
 
-/* === 状态卡 === */
-.status-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px}
-.status-card{background:var(--ink3);border:1px solid rgba(201,168,76,.15);border-radius:var(--radius);padding:14px;text-align:center;position:relative;overflow:hidden}
-.status-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.5}
-.status-card .label{font-size:10px;color:var(--paper3);letter-spacing:2px;margin-bottom:6px}
-.status-card .value{font-size:26px;font-weight:600;line-height:1}
-.status-card .value.ok{color:var(--ok)}
-.status-card .value.warn{color:var(--warn)}
-.status-card .value.err{color:var(--danger)}
-.status-card .value.muted{color:var(--paper3);font-size:16px}
+/* === Main container === */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 16px;
+}
 
-/* === 主舞台 === */
-.stage-wrap{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
-@media(max-width:768px){.stage-wrap{grid-template-columns:1fr}}
-.stage{position:relative;background:var(--ink3);border:1px solid rgba(201,168,76,.15);border-radius:var(--radius);overflow:hidden;min-height:320px;display:flex;align-items:center;justify-content:center}
-.stage video,.stage canvas{width:100%;height:100%;object-fit:cover;display:block}
-.stage .placeholder{text-align:center;color:var(--paper3);padding:40px 20px}
-.stage .placeholder .icon{font-size:56px;margin-bottom:12px}
-.stage .placeholder .hint{font-size:12px;letter-spacing:1px}
-.live-tag{position:absolute;top:10px;left:10px;background:var(--danger);color:#fff;font-size:9px;padding:3px 8px;border-radius:4px;letter-spacing:2px;font-weight:600;animation:pulse 1.5s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
-.device-tag{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.6);color:var(--paper3);font-size:9px;padding:3px 8px;border-radius:4px;letter-spacing:1px;max-width:60%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.mode-tag{position:absolute;bottom:10px;left:10px;background:rgba(201,168,76,.2);color:var(--gold);font-size:9px;padding:3px 8px;border-radius:4px;letter-spacing:1px}
+/* === Status Bar === */
+.status-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+@media (max-width: 768px) {
+  .status-bar { grid-template-columns: repeat(2, 1fr); }
+}
+.status-card {
+  background: var(--bg2);
+  border: 1px solid var(--bd);
+  border-radius: 10px;
+  padding: 12px 14px;
+  text-align: center;
+  position: relative;
+}
+.status-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.4;
+}
+.status-label {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+.status-value {
+  font-size: 22px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.status-value.ok { color: var(--ok); }
+.status-value.warn { color: var(--warn); }
+.status-value.err { color: var(--err); }
+.status-value.muted { color: var(--muted2); font-size: 14px; }
 
-/* === 控制面板 === */
-.ctrl-panel{background:var(--ink3);border:1px solid rgba(201,168,76,.15);border-radius:var(--radius);padding:16px;margin-bottom:14px}
-.ctrl-panel h3{font-size:13px;color:var(--gold);letter-spacing:3px;margin:0 0 12px;font-weight:500}
-.field{margin-bottom:12px}
-.field label{display:block;font-size:10px;color:var(--paper3);letter-spacing:2px;margin-bottom:5px}
-.field select,.field input[type=text]{width:100%;background:var(--ink2);color:var(--paper);border:1px solid rgba(201,168,76,.2);border-radius:6px;padding:8px 10px;font-size:12px;font-family:inherit}
-.field select:focus,.field input:focus{outline:none;border-color:var(--gold)}
+/* === Mode selector === */
+.mode-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+@media (max-width: 768px) {
+  .mode-bar { grid-template-columns: repeat(2, 1fr); }
+}
+.mode-btn {
+  background: var(--bg2);
+  border: 1px solid var(--bd);
+  border-radius: 10px;
+  padding: 14px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--tx);
+}
+.mode-btn:hover {
+  border-color: var(--gold);
+  background: rgba(201,168,76,.06);
+}
+.mode-btn.active {
+  border-color: var(--gold);
+  background: rgba(201,168,76,.12);
+  box-shadow: 0 0 12px rgba(201,168,76,.1);
+}
+.mode-icon {
+  font-size: 28px;
+  display: block;
+  margin-bottom: 4px;
+}
+.mode-name {
+  font-size: 13px;
+  font-weight: 500;
+}
+.mode-hint {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 2px;
+}
 
-.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-.btn{padding:10px 18px;border:1px solid rgba(201,168,76,.3);background:transparent;color:var(--paper);border-radius:8px;cursor:pointer;font-size:12px;letter-spacing:1px;font-family:inherit;transition:all .2s}
-.btn:hover{background:rgba(201,168,76,.1);border-color:var(--gold)}
-.btn.primary{background:var(--gold);color:#000;border-color:var(--gold);font-weight:600}
-.btn.primary:hover{background:var(--gold2)}
-.btn.warn{background:rgba(200,80,62,.15);border-color:var(--danger);color:var(--danger)}
-.btn:disabled{opacity:.4;cursor:not-allowed}
+/* === Stage grid === */
+.stage-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+@media (max-width: 768px) {
+  .stage-grid { grid-template-columns: 1fr; }
+}
+.stage {
+  background: var(--bg2);
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+}
+.stage-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--bd);
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.stage-body {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 260px;
+}
+.stage video,
+.stage canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 
-/* === 结果区 === */
-.result-box{background:var(--ink2);border:1px solid rgba(201,168,76,.12);border-radius:var(--radius);padding:14px;margin-top:12px;font-size:12px;line-height:1.8;color:var(--paper);min-height:60px;white-space:pre-wrap;word-break:break-all}
-.result-box .meta{font-size:10px;color:var(--paper3);margin-bottom:8px;letter-spacing:1px}
+/* Placeholder */
+.placeholder {
+  text-align: center;
+  color: var(--muted2);
+  padding: 30px 20px;
+}
+.placeholder .icon { font-size: 48px; margin-bottom: 10px; opacity: 0.6; }
+.placeholder .hint { font-size: 12px; letter-spacing: 0.5px; }
 
-/* === 模式卡片 === */
-.mode-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
-.mode-card{background:var(--ink3);border:1px solid rgba(201,168,76,.12);border-radius:var(--radius);padding:14px;text-align:center;cursor:pointer;transition:all .2s}
-.mode-card:hover{border-color:var(--gold);background:rgba(201,168,76,.05)}
-.mode-card.active{border-color:var(--gold);background:rgba(201,168,76,.1)}
-.mode-card .icon{font-size:32px;margin-bottom:6px}
-.mode-card .name{font-size:11px;color:var(--paper);letter-spacing:1px}
-.mode-card .desc{font-size:9px;color:var(--paper3);margin-top:3px}
+/* Live / Device tags */
+.live-tag {
+  position: absolute;
+  top: 10px; left: 10px;
+  background: var(--err);
+  color: #fff;
+  font-size: 9px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 2px;
+  font-weight: 600;
+  animation: pulse 1.5s infinite;
+  z-index: 2;
+}
+.device-tag {
+  position: absolute;
+  top: 10px; right: 10px;
+  background: rgba(0,0,0,.6);
+  color: var(--muted);
+  font-size: 9px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  max-width: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  z-index: 2;
+}
+.mode-tag {
+  position: absolute;
+  bottom: 10px; left: 10px;
+  background: rgba(201,168,76,.2);
+  color: var(--gold);
+  font-size: 9px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  z-index: 2;
+}
+.scan-line {
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  box-shadow: 0 0 16px var(--gold), 0 0 4px var(--gold);
+  animation: scanMove 2s ease-in-out infinite;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+.scan-line.active { opacity: 0.8; }
+@keyframes scanMove {
+  0% { top: 0; }
+  50% { top: calc(100% - 2px); }
+  100% { top: 0; }
+}
+.scan-flash {
+  position: absolute;
+  inset: 0;
+  background: white;
+  opacity: 0;
+  transition: opacity 150ms;
+  pointer-events: none;
+  z-index: 4;
+}
+.scan-flash.flash { opacity: 0.6; }
+
+/* Result area */
+.result-area {
+  padding: 14px;
+  overflow-y: auto;
+  max-height: 100%;
+}
+.result-meta {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.result-meta .tag {
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: rgba(201,168,76,.15);
+  color: var(--gold);
+  font-size: 9px;
+}
+.result-content {
+  font-size: 13px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.result-content .error-msg {
+  color: var(--err);
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+.result-content .hint-text {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+  margin-top: 8px;
+  padding: 8px;
+  background: rgba(88,166,255,.06);
+  border-radius: 6px;
+  border-left: 2px solid var(--info);
+}
+
+/* === Control panel === */
+.ctrl-panel {
+  background: var(--bg2);
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.ctrl-title {
+  font-size: 12px;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+.field {
+  margin-bottom: 10px;
+}
+.field label {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+.field select,
+.field input[type="text"] {
+  width: 100%;
+  background: var(--bg);
+  color: var(--tx);
+  border: 1px solid var(--bd);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: inherit;
+}
+.field select:focus,
+.field input:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+.btn-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.btn {
+  padding: 10px 16px;
+  border: 1px solid var(--bd);
+  background: var(--bg3);
+  color: var(--tx);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:hover {
+  border-color: var(--gold);
+  background: rgba(201,168,76,.08);
+}
+.btn.primary {
+  background: var(--gold);
+  color: #1c1408;
+  border-color: var(--gold);
+  font-weight: 600;
+}
+.btn.primary:hover {
+  background: var(--gold2);
+}
+.btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.btn.warn {
+  background: rgba(248,81,73,.12);
+  border-color: rgba(248,81,73,.4);
+  color: var(--err);
+  animation: voicePulse 1.2s infinite;
+}
+@keyframes voicePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(248,81,73,.3); }
+  50% { box-shadow: 0 0 0 6px rgba(248,81,73,0); }
+}
+.engine-info {
+  font-size: 10px;
+  color: var(--muted2);
+  letter-spacing: 0.5px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--bd);
+}
+
+/* === History === */
+.history-section {
+  background: var(--bg2);
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 40px;
+}
+.history-title {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.history-list {
+  max-height: 220px;
+  overflow-y: auto;
+}
+.history-item {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(37,43,56,.6);
+  cursor: pointer;
+  transition: background 0.12s;
+  font-size: 12px;
+}
+.history-item:hover {
+  background: rgba(201,168,76,.05);
+}
+.history-item:last-child { border-bottom: none; }
+.hist-ts {
+  color: var(--muted2);
+  font-size: 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.hist-tag {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: rgba(201,168,76,.12);
+  color: var(--gold);
+  flex-shrink: 0;
+}
+.hist-preview {
+  flex: 1;
+  color: var(--tx);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hist-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.hist-btn {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid var(--bd);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.hist-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
 
 /* === Toast === */
-.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--ink3);border:1px solid var(--gold);color:var(--paper);padding:10px 20px;border-radius:8px;font-size:12px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none}
-.toast.show{opacity:1}
+.toast {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg3);
+  border: 1px solid var(--gold);
+  color: var(--tx);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.25s;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: 90vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.toast.show { opacity: 1; }
 
-/* === 历史 === */
-.history-list{max-height:200px;overflow-y:auto;margin-top:8px}
-.history-item{padding:8px 10px;border-bottom:1px solid rgba(201,168,76,.08);font-size:11px;display:flex;gap:10px;align-items:center}
-.history-item .ts{color:var(--paper3);font-size:9px;white-space:nowrap}
-.history-item .tag{font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(201,168,76,.15);color:var(--gold)}
-.history-item .preview{color:var(--paper);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
-.section-title{font-size:13px;color:var(--gold);letter-spacing:3px;margin:20px 0 10px;display:flex;align-items:center;gap:10px}
-.section-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(201,168,76,.3),transparent)}
-
-/* === 扫描线动画 === */
-.scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);box-shadow:0 0 12px var(--gold);animation:scanMove 2.5s ease-in-out infinite;opacity:.7;pointer-events:none}
-@keyframes scanMove{0%{top:0}50%{top:calc(100% - 2px)}100%{top:0}}
-
-/* === 语音状态 === */
-.voice-active{background:rgba(200,80,62,.15)!important;border-color:var(--danger)!important;color:var(--danger)!important;animation:voicePulse 1s infinite}
-@keyframes voicePulse{0%,100%{box-shadow:0 0 0 0 rgba(200,80,62,.4)}50%{box-shadow:0 0 0 8px rgba(200,80,62,0)}}
-
-/* === 历史可点击 === */
-.history-item{cursor:pointer;transition:background .15s}
-.history-item:hover{background:rgba(201,168,76,.06)}
+/* Skip link */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--gold);
+  color: #000;
+  padding: 8px 16px;
+  z-index: 100;
+  font-size: 14px;
+  font-weight: 600;
+}
+.skip-link:focus { top: 0; }
 </style>
 </head>
-<body data-kb-module="mobile">
-<div class="wrap">
-  <header>
-    <h1>🥽 AI 眼睛 · 桌面体验</h1>
-    <p>面相 / 舌诊 / OCR / 语音 — 用浏览器直接体验智镜能力</p>
-  </header>
+<body>
+<a class="skip-link" href="#main">跳到主内容</a>
 
-  <!-- === 状态卡 === -->
-  <div class="status-bar" id="statusBar">
-    <div class="status-card"><div class="label">摄像头</div><div class="value muted" id="stCam">待启动</div></div>
-    <div class="status-card"><div class="label">麦克风</div><div class="value muted" id="stMic">待启动</div></div>
-    <div class="status-card"><div class="label">Rokid 桥</div><div class="value warn" id="stBridge">未连接</div></div>
-    <div class="status-card"><div class="label">Mock 模式</div><div class="value warn" id="stMock">关闭</div></div>
-    <div class="status-card"><div class="label">本次会话</div><div class="value ok" id="stCount">0</div></div>
-  </div>
+<div class="header">
+  <h1>🥽 AI 眼睛 · 桌面体验</h1>
+  <p>面相识别 · 舌诊 · OCR · 语音问诊 — 用浏览器直接体验智镜能力</p>
+</div>
 
-  <!-- === 体验模式选择 === -->
-  <div class="section-title">体验模式</div>
-  <div class="mode-grid" id="modeGrid">
-    <div class="mode-card active" data-mode="face" onclick="selectMode('face')">
-      <div class="icon">👤</div><div class="name">面相识别</div><div class="desc">人脸定位 + 特征</div>
+<main id="main" class="container">
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <div class="status-card">
+      <div class="status-label">📷 摄像头</div>
+      <div class="status-value muted" id="stCam">待启动</div>
     </div>
-    <div class="mode-card" data-mode="tongue" onclick="selectMode('tongue')">
-      <div class="icon">👅</div><div class="name">舌诊分析</div><div class="desc">中医舌象 + 五脏辨证</div>
+    <div class="status-card">
+      <div class="status-label">🎤 麦克风</div>
+      <div class="status-value muted" id="stMic">待启动</div>
     </div>
-    <div class="mode-card" data-mode="ocr" onclick="selectMode('ocr')">
-      <div class="icon">📄</div><div class="name">通用 OCR</div><div class="desc">字 / 文档 / 卦象</div>
+    <div class="status-card">
+      <div class="status-label">🥽 Rokid 桥</div>
+      <div class="status-value warn" id="stBridge">未连接</div>
     </div>
-    <div class="mode-card" data-mode="ocr-tcm" onclick="selectMode('ocr-tcm')">
-      <div class="icon">📋</div><div class="name">病历 OCR</div><div class="desc">处方 / 舌苔 / 脉案</div>
+    <div class="status-card">
+      <div class="status-label">📊 会话次数</div>
+      <div class="status-value ok" id="stCount">0</div>
     </div>
   </div>
 
-  <!-- === 主舞台 === -->
-  <div class="stage-wrap">
+  <!-- Mode selector -->
+  <div class="mode-bar" id="modeBar">
+    <div class="mode-btn active" data-mode="face" onclick="selectMode('face')">
+      <span class="mode-icon">👤</span>
+      <div class="mode-name">面相识别</div>
+      <div class="mode-hint">人脸定位 + 特征</div>
+    </div>
+    <div class="mode-btn" data-mode="tongue" onclick="selectMode('tongue')">
+      <span class="mode-icon">👅</span>
+      <div class="mode-name">舌诊分析</div>
+      <div class="mode-hint">中医舌象 + 五脏辨证</div>
+    </div>
+    <div class="mode-btn" data-mode="ocr" onclick="selectMode('ocr')">
+      <span class="mode-icon">📄</span>
+      <div class="mode-name">通用 OCR</div>
+      <div class="mode-hint">文字 / 文档 / 卦象</div>
+    </div>
+    <div class="mode-btn" data-mode="ocr-tcm" onclick="selectMode('ocr-tcm')">
+      <span class="mode-icon">📋</span>
+      <div class="mode-name">病历 OCR</div>
+      <div class="mode-hint">处方 / 舌苔 / 脉案</div>
+    </div>
+  </div>
+
+  <!-- Main stage: video + result -->
+  <div class="stage-grid">
+    <!-- Video / camera stage -->
     <div class="stage" id="videoStage">
-      <div class="placeholder" id="videoPlaceholder">
-        <div class="icon">📷</div>
-        <div class="hint">点击「启动摄像头」开始</div>
+      <div class="stage-header">
+        <span>📷 相机预览</span>
+        <span id="resLabel" style="margin-left:auto;font-size:9px;color:var(--muted2)">—</span>
       </div>
-      <video id="video" autoplay playsinline muted style="display:none"></video>
-      <canvas id="captureCanvas" style="display:none"></canvas>
-      <div class="live-tag" id="liveTag" style="display:none">LIVE</div>
-      <div class="device-tag" id="deviceTag">未连接</div>
-      <div class="mode-tag" id="modeTag">面相识别</div>
-      <div class="scan-line" id="scanLine" style="display:none"></div>
-      <div id="scanFlash" style="position:absolute;inset:0;background:white;opacity:0;transition:opacity 200ms;pointer-events:none"></div>
+      <div class="stage-body">
+        <div class="placeholder" id="videoPlaceholder">
+          <div class="icon">📷</div>
+          <div class="hint">点击下方「启动摄像头」开始</div>
+        </div>
+        <video id="video" autoplay playsinline muted style="display:none"></video>
+        <canvas id="captureCanvas" style="display:none"></canvas>
+        <div class="live-tag" id="liveTag" style="display:none">LIVE</div>
+        <div class="device-tag" id="deviceTag">未连接</div>
+        <div class="mode-tag" id="modeTag">面相识别</div>
+        <div class="scan-line" id="scanLine"></div>
+        <div class="scan-flash" id="scanFlash"></div>
+      </div>
     </div>
 
-    <div class="stage" id="resultStage" style="flex-direction:column;align-items:stretch;justify-content:flex-start;padding:16px">
-      <div style="font-size:11px;color:var(--paper3);letter-spacing:2px;margin-bottom:10px">📊 分析结果</div>
-      <div class="result-box" id="resultBox">
-        <div class="meta">等待采集...</div>
-        <div>启动摄像头后点击「拍照分析」或「开始录音」</div>
+    <!-- Result stage -->
+    <div class="stage" id="resultStage">
+      <div class="stage-header">
+        <span>📊 分析结果</span>
+        <span id="latencyLabel" style="margin-left:auto;font-size:9px;color:var(--muted2)"></span>
+      </div>
+      <div class="result-area" id="resultBox">
+        <div style="color:var(--muted2);font-size:12px;text-align:center;padding:40px 20px">
+          <div style="font-size:36px;margin-bottom:10px;opacity:.4">🧿</div>
+          <div>启动摄像头后点击「拍照分析」</div>
+          <div style="font-size:10px;margin-top:4px">或使用「语音问诊」输入文字</div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- === 控制面板 === -->
+  <!-- Control panel -->
   <div class="ctrl-panel">
-    <h3>🎮 控制台</h3>
+    <div class="ctrl-title">🎮 控制台</div>
 
     <div class="field">
-      <label>摄像头设备</label>
+      <label for="deviceSel">摄像头设备</label>
       <select id="deviceSel"><option value="">默认（自动选择）</option></select>
     </div>
 
-    <div class="field" id="mockField">
-      <label>Rokid 桥接模式（无硬件时启用）</label>
+    <div class="field">
+      <label for="mockSel">Rokid 桥接模式（无硬件时启用）</label>
       <select id="mockSel">
         <option value="none">无（真实浏览器 API）</option>
         <option value="mock">Mock Rokid（模拟原生桥）</option>
@@ -178,138 +644,167 @@ header p{font-size:11px;color:var(--paper3);letter-spacing:2px;margin-top:6px}
     </div>
 
     <div class="field">
-      <label>TTS 朗读音色（Edge-TTS）</label>
+      <label for="ttsVoice">TTS 朗读音色</label>
       <select id="ttsVoice">
-        <option value="female">女声 · female</option>
-        <option value="male">男声 · male</option>
-        <option value="zh-CN-XiaoxiaoNeural">晓晓 · zh-CN-XiaoxiaoNeural</option>
-        <option value="zh-CN-YunxiNeural">云希 · zh-CN-YunxiNeural</option>
-        <option value="zh-CN-YunjianNeural">云健 · zh-CN-YunjianNeural</option>
+        <option value="female">女声</option>
+        <option value="male">男声</option>
+        <option value="zh-CN-XiaoxiaoNeural">晓晓（自然）</option>
+        <option value="zh-CN-YunxiNeural">云希（磁性）</option>
       </select>
     </div>
 
     <div class="field">
-      <label>🎤 语音问诊（点击开始录音，自动转文字并填入）</label>
-      <button class="btn" id="btnVoice" onclick="toggleVoice()" style="width:100%;text-align:left">🎤 开始录音</button>
+      <label>🎤 语音问诊</label>
+      <button class="btn" id="btnVoice" onclick="toggleVoice()" style="width:100%">🎤 点击开始录音</button>
     </div>
 
     <div class="btn-row">
       <button class="btn primary" id="btnStart" onclick="startCamera()">📷 启动摄像头</button>
       <button class="btn" id="btnCapture" onclick="captureAndAnalyze()" disabled>📸 拍照分析</button>
       <button class="btn" id="btnTTS" onclick="speakResult()" disabled>🔊 朗读结果</button>
-      <button class="btn" id="btnMock" onclick="toggleMock()">🎭 切换 Mock</button>
+      <button class="btn" onclick="toggleMock()">🎭 Mock</button>
     </div>
 
-    <div style="margin-top:10px;font-size:10px;color:var(--paper3);letter-spacing:1px" id="engineInfo">
-      引擎：浏览器 getUserMedia + face-ocr-server(8913) + Edge-TTS(8912)
+    <div class="engine-info">
+      引擎：浏览器 getUserMedia → 8920 代理 → 8913 face-ocr · TTS: 8912 Edge-TTS · 语音：浏览器 SpeechRecognition
     </div>
   </div>
 
-  <!-- === 历史 === -->
-  <div class="section-title">📜 会话历史（最近 10 条）</div>
-  <div class="ctrl-panel">
+  <!-- History -->
+  <div class="history-section">
+    <div class="history-title">📜 会话历史（点击条目可重放结果）</div>
     <div class="history-list" id="historyList">
-      <div style="font-size:11px;color:var(--paper3);padding:8px">暂无记录</div>
+      <div style="color:var(--muted2);font-size:12px;padding:8px">暂无记录</div>
     </div>
-    <button class="btn" style="margin-top:10px;font-size:10px;padding:6px 12px" onclick="clearHistory()">清空历史</button>
+    <button class="btn" style="margin-top:8px;font-size:11px;padding:6px 12px" onclick="clearHistory()">清空历史</button>
   </div>
-</div>
+
+</main>
 
 <div class="toast" id="toast"></div>
 
-<!-- === 外部依赖（按实际路径加载） === -->
-<script src="js/wearable/index.js" defer></script>
-<script src="js/wearable/rokid-bridge.js" defer></script>
-<script src="js/wearable/device-provider.js" defer></script>
-<script src="js/wearable/mock-harness.js" defer></script>
+<!-- External wearable deps (graceful if missing) -->
+<script src="js/wearable/index.js" defer onerror="console.warn('[vision] index.js not found')"></script>
+<script src="js/wearable/rokid-bridge.js" defer onerror="console.warn('[vision] rokid-bridge.js not found')"></script>
+<script src="js/wearable/device-provider.js" defer onerror="console.warn('[vision] device-provider.js not found')"></script>
+<script src="js/wearable/mock-harness.js" defer onerror="console.warn('[vision] mock-harness.js not found')"></script>
 
 <script>
 /* =========================================================
- * AI 眼睛 · 桌面体验页（R72）
+ * AI 眼睛 · 桌面体验页（R71 友好化 v2）
  * ========================================================= */
 
 const MODE_LABELS = {
   face: '面相识别', tongue: '舌诊分析', ocr: '通用 OCR', 'ocr-tcm': '病历 OCR'
 };
+
 let currentMode = 'face';
 let stream = null;
 let mockEnabled = false;
 let lastResult = '';
+let lastApiUrl = '';
 let sessionCount = 0;
-const HISTORY_KEY = '_vision_hist_v1';
-const SESSION_KEY = '_vision_session_v1';
+let csrfToken = '';
+const HISTORY_KEY = '_r71_vision_history_v2';
+const SESSION_KEY = '_r71_vision_session_v2';
+const SCAN_DURATION = 2200; // ms scan animation
 
-/* ---- 初始化 ---- */
+/* ---- Init ---- */
 window.addEventListener('DOMContentLoaded', () => {
   loadSessionCount();
   renderHistory();
   enumerateDevices();
-  // 检查 RokidBridge 是否就绪
-  setTimeout(checkBridge, 600);
+  fetchCsrfToken();
+  setTimeout(checkBridge, 500);
+  // Listen for device changes
+  if (navigator.mediaDevices) {
+    navigator.mediaDevices.addEventListener('devicechange', enumerateDevices);
+  }
 });
+
+/* ---- CSRF token ---- */
+async function fetchCsrfToken() {
+  try {
+    const r = await fetch('/api/csrf-token', { credentials: 'same-origin' });
+    const data = await r.json().catch(() => ({}));
+    if (data.csrfToken || data.token) {
+      csrfToken = data.csrfToken || data.token;
+    }
+  } catch(e) {
+    console.warn('[vision] csrf token fetch failed:', e.message);
+  }
+}
 
 function loadSessionCount() {
   try {
-    const s = localStorage.getItem(SESSION_KEY);
-    sessionCount = s ? parseInt(s, 10) || 0 : 0;
+    sessionCount = parseInt(localStorage.getItem(SESSION_KEY) || '0', 10) || 0;
   } catch(e) {}
-  updateStatus('stCount', sessionCount, 'ok');
+  document.getElementById('stCount').textContent = sessionCount;
+  document.getElementById('stCount').className = 'status-value' + (sessionCount > 0 ? ' ok' : ' muted');
 }
 
 function saveSessionCount() {
-  try { localStorage.setItem(SESSION_KEY, sessionCount); } catch(e) {}
+  try { localStorage.setItem(SESSION_KEY, String(sessionCount)); } catch(e) {}
+  document.getElementById('stCount').textContent = sessionCount;
+  document.getElementById('stCount').className = 'status-value ok';
 }
 
 /* ---- Toast ---- */
+let toastTimer = null;
 function toast(msg) {
   const el = document.getElementById('toast');
   el.textContent = msg;
   el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2200);
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
 }
 
-/* ---- 状态卡更新 ---- */
-function updateStatus(id, val, cls) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.textContent = val;
-  el.className = 'value ' + (cls || 'muted');
-}
-
-/* ---- 模式切换 ---- */
+/* ---- Mode ---- */
 function selectMode(mode) {
   currentMode = mode;
-  document.querySelectorAll('.mode-card').forEach(c => c.classList.toggle('active', c.dataset.mode === mode));
-  document.getElementById('modeTag').textContent = MODE_LABELS[mode] || mode;
+  document.querySelectorAll('.mode-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === mode);
+  });
+  const tag = document.getElementById('modeTag');
+  if (tag) tag.textContent = MODE_LABELS[mode] || mode;
 }
 
-/* ---- 设备枚举 ---- */
+/* ---- Device enumeration ---- */
 async function enumerateDevices() {
   try {
     const devices = await navigator.mediaDevices.enumerateDevices();
     const sel = document.getElementById('deviceSel');
-    const videoDevices = devices.filter(d => d.kind === 'videoinput');
+    const videos = devices.filter(d => d.kind === 'videoinput');
     sel.innerHTML = '<option value="">默认（自动选择）</option>' +
-      videoDevices.map((d, i) => '<option value="' + d.deviceId + '">' + (d.label || '摄像头 ' + (i+1)) + '</option>').join('');
-    if (videoDevices.length > 0) {
-      document.getElementById('deviceTag').textContent = videoDevices[0].label || '已检测 ' + videoDevices.length + ' 个设备';
+      videos.map((d, i) => '<option value="' + d.deviceId + '">' + (d.label || '摄像头 ' + (i + 1)) + '</option>').join('');
+    const tag = document.getElementById('deviceTag');
+    if (tag && videos.length > 0) {
+      tag.textContent = videos[0].label || ('已检测 ' + videos.length + ' 个');
+    }
+    const resLabel = document.getElementById('resLabel');
+    if (resLabel && videos.length > 0 && videos[0].label) {
+      resLabel.textContent = videos.length + ' 设备可用';
     }
   } catch(e) {
-    console.warn('[vision] enumerateDevices failed:', e.message);
+    console.warn('[vision] enumerateDevices:', e.message);
   }
 }
 
-/* ---- 启动摄像头 ---- */
+/* ---- Camera ---- */
 async function startCamera() {
   if (stream) {
-    toast('摄像头已启动');
+    stopCamera();
     return;
   }
+
   const deviceId = document.getElementById('deviceSel').value;
   const constraints = {
-    video: deviceId ? { deviceId: { exact: deviceId } } : { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+    video: deviceId
+      ? { deviceId: { exact: deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } }
+      : { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
     audio: false
   };
+
   try {
     stream = await navigator.mediaDevices.getUserMedia(constraints);
     const video = document.getElementById('video');
@@ -317,36 +812,31 @@ async function startCamera() {
     video.style.display = 'block';
     document.getElementById('videoPlaceholder').style.display = 'none';
     document.getElementById('liveTag').style.display = 'block';
-    document.getElementById('btnStart').textContent = '⏹ 关闭摄像头';
-    document.getElementById('btnStart').onclick = stopCamera;
+
+    const btn = document.getElementById('btnStart');
+    btn.textContent = '⏹ 关闭摄像头';
+    btn.classList.remove('primary');
+    btn.style.background = 'rgba(248,81,73,.15)';
+    btn.style.borderColor = 'rgba(248,81,73,.4)';
+    btn.style.color = 'var(--err)';
+    btn.onclick = stopCamera;
+
     document.getElementById('btnCapture').disabled = false;
-    updateStatus('stCam', '在线', 'ok');
-    updateStatus('stMic', '桌面', 'ok');
+    document.getElementById('stCam').textContent = '在线';
+    document.getElementById('stCam').className = 'status-value ok';
+    document.getElementById('stMic').textContent = '就绪';
+    document.getElementById('stMic').className = 'status-value ok';
+
+    // Update resolution label
+    video.addEventListener('loadedmetadata', () => {
+      const rl = document.getElementById('resLabel');
+      if (rl) rl.textContent = video.videoWidth + '×' + video.videoHeight;
+    });
+
     toast('摄像头已启动');
     await enumerateDevices();
   } catch(e) {
-    // 权限被拒或不兼容：友好提示
-    let msg = '启动失败';
-    let hint = '';
-    if (e.name === 'NotAllowedError' || e.name === 'SecurityError') {
-      msg = '⛔ 摄像头权限被拒';
-      hint = '请在浏览器地址栏左侧的锁图标中重新授予摄像头权限，然后刷新页面。\n如果是内嵌页面，需要用 https 或 localhost。';
-    } else if (e.name === 'NotFoundError' || e.name === 'OverconstrainedError') {
-      msg = '🚫 未找到摄像头';
-      hint = '请确认摄像头已连接，且没有被其他应用独占使用。';
-    } else if (e.name === 'NotReadableError') {
-      msg = '⚠️ 摄像头被占用';
-      hint = '请关闭正在使用摄像头的其他应用（如 Zoom、QQ、微信），然后重试。';
-    } else if (location.protocol === 'http:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-      msg = '🔒 需要 HTTPS';
-      hint = '浏览器要求安全上下文才能调用摄像头。请用 https:// 或 http://localhost 访问。';
-    } else {
-      hint = '错误详情：' + e.message;
-    }
-    toast(msg);
-    updateStatus('stCam', '失败', 'err');
-    document.getElementById('resultBox').innerHTML = '<div class="meta">✗ ' + msg + '</div><div style="white-space:pre-wrap;line-height:1.6">' + hint + '</div>';
-    console.error('[vision] startCamera:', e);
+    handleCameraError(e);
   }
 }
 
@@ -360,21 +850,72 @@ function stopCamera() {
   video.style.display = 'none';
   document.getElementById('videoPlaceholder').style.display = '';
   document.getElementById('liveTag').style.display = 'none';
-  document.getElementById('btnStart').textContent = '📷 启动摄像头';
-  document.getElementById('btnStart').onclick = startCamera;
+
+  const btn = document.getElementById('btnStart');
+  btn.textContent = '📷 启动摄像头';
+  btn.classList.add('primary');
+  btn.style.background = '';
+  btn.style.borderColor = '';
+  btn.style.color = '';
+  btn.onclick = startCamera;
+
   document.getElementById('btnCapture').disabled = true;
-  updateStatus('stCam', '已关闭', 'warn');
+  document.getElementById('stCam').textContent = '已关闭';
+  document.getElementById('stCam').className = 'status-value warn';
+  document.getElementById('stMic').textContent = '—';
+  document.getElementById('stMic').className = 'status-value muted';
+  const rl = document.getElementById('resLabel');
+  if (rl) rl.textContent = '—';
   toast('摄像头已关闭');
 }
 
-/* ---- 拍照 + 分析 ---- */
+function handleCameraError(e) {
+  let msg = '⛔ 摄像头启动失败';
+  let hint = '';
+  const resultBox = document.getElementById('resultBox');
+
+  if (e.name === 'NotAllowedError' || e.name === 'SecurityError') {
+    msg = '⛔ 摄像头权限被拒';
+    hint = '操作指引：\n1. 点击地址栏左侧的 🔒 或 ℹ️ 图标\n2. 找到「摄像头」→ 选择「允许」\n3. 刷新页面后重试\n\n注意：如果是 iframe 内嵌页面，需要用 https 或 localhost 协议。';
+  } else if (e.name === 'NotFoundError' || e.name === 'OverconstrainedError') {
+    msg = '🚫 未找到可用摄像头';
+    hint = '请确认：\n1. 摄像头已正确连接（USB / 内置）\n2. 没有被其他应用独占（关闭 Zoom / 微信 / QQ 等）\n3. 系统设置中摄像头已启用';
+  } else if (e.name === 'NotReadableError') {
+    msg = '⚠️ 摄像头被占用';
+    hint = '摄像头正被其他程序使用。请关闭所有可能使用摄像头的应用后重试。';
+  } else if (location.protocol === 'http:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+    msg = '🔒 需要安全上下文（HTTPS）';
+    hint = '现代浏览器要求摄像头必须在安全上下文中调用。\n请用 https:// 访问，或使用 http://localhost / http://127.0.0.1。';
+  } else {
+    hint = '错误类型：' + e.name + '\n详情：' + (e.message || '未知错误');
+  }
+
+  document.getElementById('stCam').textContent = '失败';
+  document.getElementById('stCam').className = 'status-value err';
+  if (resultBox) {
+    resultBox.innerHTML = '<div class="error-msg">' + msg + '</div><div class="hint-text" style="white-space:pre-wrap">' + hint + '</div>';
+  }
+  toast(msg);
+  console.error('[vision] startCamera:', e);
+}
+
+/* ---- Capture + Analyze ---- */
 async function captureAndAnalyze() {
   const video = document.getElementById('video');
   const canvas = document.getElementById('captureCanvas');
-  if (!stream || video.readyState < 2) {
+  if (!stream || !video || video.readyState < 2) {
     toast('请先启动摄像头');
     return;
   }
+
+  // Flash effect
+  const flash = document.getElementById('scanFlash');
+  if (flash) { flash.classList.add('flash'); setTimeout(() => flash.classList.remove('flash'), 200); }
+
+  // Scan line
+  const scanLine = document.getElementById('scanLine');
+  if (scanLine) scanLine.classList.add('active');
+
   canvas.width = video.videoWidth || 640;
   canvas.height = video.videoHeight || 480;
   const ctx = canvas.getContext('2d');
@@ -382,17 +923,17 @@ async function captureAndAnalyze() {
 
   const mode = currentMode;
   const resultBox = document.getElementById('resultBox');
-  resultBox.innerHTML = '<div class="meta">⏳ 分析中...</div><div>正在调用 OCR 引擎（预计 1-5s）</div>';
-  // 闪拍光效
-  const flash = document.getElementById('scanFlash');
-  if (flash) { flash.style.opacity = '1'; setTimeout(() => flash.style.opacity = '0', 200); }
+  resultBox.innerHTML = '<div class="result-meta"><span class="tag">⏳ 分析中</span><span>正在调用 OCR 引擎…</span></div><div class="result-content">预计 1-5 秒，请稍候</div>';
+
+  const t0 = Date.now();
+  lastApiUrl = '';
 
   try {
-    const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.85));
-    const b64 = await new Promise(res => {
+    const blob = await new Promise((res, rej) => canvas.toBlob(res, 'image/jpeg', 0.85));
+    const b64 = await new Promise((res, rej) => {
       const reader = new FileReader();
       reader.onload = () => res(reader.result.split(',')[1] || '');
-      reader.onerror = () => res('');
+      reader.onerror = () => rej(new Error('图片编码失败'));
       reader.readAsDataURL(blob);
     });
 
@@ -407,68 +948,96 @@ async function captureAndAnalyze() {
       apiUrl = '/api/face/analyze';
       body = { image: b64, mode: 'tongue' };
     }
+    lastApiUrl = apiUrl;
 
     const r = await fetch(apiUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(csrfToken ? { 'x-csrf-token': csrfToken } : {})
+      },
       body: JSON.stringify(body),
-      mode: 'cors'
+      mode: 'cors',
+      credentials: 'same-origin'
     });
+
+    const latency = Date.now() - t0;
+    document.getElementById('latencyLabel').textContent = latency + 'ms';
+
     const data = await r.json().catch(() => ({}));
     sessionCount++;
     saveSessionCount();
-    updateStatus('stCount', sessionCount, 'ok');
 
     const ts = new Date().toLocaleTimeString();
     const summary = summarizeResult(data, mode);
     lastResult = summary;
-    resultBox.innerHTML = '<div class="meta">✓ ' + ts + ' · ' + MODE_LABELS[mode] + ' · 耗时 ' + (data.processing_time || '?') + 'ms</div><div>' + escHtml(summary) + '</div>';
+
+    // Success result
+    const badge = r.ok ? '✅' : '⚠️';
+    const statusText = r.ok ? '成功' : '部分结果';
+    resultBox.innerHTML = '<div class="result-meta"><span class="tag">' + badge + ' ' + statusText + '</span><span class="tag">' + ts + '</span><span class="tag">' + MODE_LABELS[mode] + '</span><span>' + latency + 'ms</span></div><div class="result-content">' + escHtml(summary) + '</div>';
+
     addHistory(mode, summary);
     document.getElementById('btnTTS').disabled = false;
-    toast('分析完成');
+    toast('分析完成 (' + latency + 'ms)');
   } catch(e) {
-    resultBox.innerHTML = '<div class="meta">✗ 分析失败</div><div>' + escHtml(e.message) + '</div><div style="font-size:10px;color:var(--paper3);margin-top:8px">提示：确认 face-ocr-server 运行在 8913 端口</div>';
+    const latency = Date.now() - t0;
+    document.getElementById('latencyLabel').textContent = latency + 'ms';
+    resultBox.innerHTML = '<div class="error-msg">✗ 分析失败</div><div class="hint-text" style="white-space:pre-wrap">' + escHtml(e.message) + '\n\n请确认 face-ocr-server 运行在 8913 端口，且 8920 API 网关在线。</div>';
     toast('分析失败：' + e.message);
+  } finally {
+    if (scanLine) scanLine.classList.remove('active');
   }
 }
 
-/* ---- TTS 朗读 ---- */
+/* ---- TTS ---- */
 async function speakResult() {
   if (!lastResult) { toast('暂无结果可朗读'); return; }
   const text = lastResult.slice(0, 200);
-  const voice = (document.getElementById('ttsVoice') || {}).value || 'female';
-  const ttsBtn = document.getElementById('btnTTS');
+  const voice = document.getElementById('ttsVoice')?.value || 'female';
+  const btn = document.getElementById('btnTTS');
+
   try {
-    ttsBtn.disabled = true;
-    ttsBtn.textContent = '⏳ 合成中...';
-    // TTS-server 只支持 GET + query string；直接调用 8912
-    const url = 'http://localhost:8912/api/tts?text=' + encodeURIComponent(text) + '&voice=' + encodeURIComponent(voice);
-    const audio = new Audio();
-    audio.src = url;
-    audio.onplaying = () => { ttsBtn.disabled = false; ttsBtn.textContent = '🔊 朗读中...'; toast('播放中...'); };
-    audio.onended = () => { ttsBtn.disabled = false; ttsBtn.textContent = '🔊 朗读结果'; };
-    audio.onerror = () => {
-      ttsBtn.disabled = false;
-      ttsBtn.textContent = '🔊 朗读结果';
-      // TTS 不可用：尝试走 8920 代理
-      fetch('/api/tts?text=' + encodeURIComponent(text)).then(r => r.blob()).then(blob => {
-        if (blob.size > 100) {
-          const a = new Audio(URL.createObjectURL(blob));
-          a.play();
-        } else {
-          toast('TTS 服务不可用');
-        }
-      }).catch(() => toast('TTS 服务未启动（请启动 tts-server.py 8912）'));
+    btn.disabled = true;
+    btn.textContent = '⏳ 合成中...';
+
+    // Try direct 8912 first (GET with query string)
+    const audio = new Audio('http://localhost:8912/api/tts?text=' + encodeURIComponent(text) + '&voice=' + encodeURIComponent(voice));
+
+    audio.onplaying = () => {
+      btn.textContent = '🔊 朗读中...';
+      toast('播放中...');
     };
+    audio.onended = () => {
+      btn.disabled = false;
+      btn.textContent = '🔊 朗读结果';
+    };
+    audio.onerror = async () => {
+      // Fallback: try 8920 proxy
+      try {
+        const pr = await fetch('/api/tts?text=' + encodeURIComponent(text));
+        if (pr.ok) {
+          const blob = await pr.blob();
+          const a = new Audio(URL.createObjectURL(blob));
+          a.onended = () => { btn.disabled = false; btn.textContent = '🔊 朗读结果'; };
+          a.play();
+          return;
+        }
+      } catch(e2) {}
+      btn.disabled = false;
+      btn.textContent = '🔊 朗读结果';
+      toast('TTS 不可用（请启动 tts-server.py）');
+    };
+
     audio.play().catch(() => audio.onerror());
   } catch(e) {
-    ttsBtn.disabled = false;
-    ttsBtn.textContent = '🔊 朗读结果';
-    toast('TTS 请求失败：' + e.message);
+    btn.disabled = false;
+    btn.textContent = '🔊 朗读结果';
+    toast('TTS 失败：' + e.message);
   }
 }
 
-/* ---- Mock 切换 ---- */
+/* ---- Mock toggle ---- */
 function toggleMock() {
   const sel = document.getElementById('mockSel');
   const val = sel.value;
@@ -476,8 +1045,8 @@ function toggleMock() {
     if (typeof MockRokid !== 'undefined' && MockRokid.enable) {
       MockRokid.enable({ kind: 'jr-bridge', delayMs: 50 });
       mockEnabled = true;
-      updateStatus('stMock', '开启', 'ok');
-      updateStatus('stBridge', 'Mock', 'warn');
+      document.getElementById('stBridge').textContent = 'Mock';
+      document.getElementById('stBridge').className = 'status-value ok';
       toast('Mock Rokid 已启用');
     } else {
       toast('mock-harness 未加载');
@@ -487,13 +1056,12 @@ function toggleMock() {
       MockRokid.disable();
     }
     mockEnabled = false;
-    updateStatus('stMock', '关闭', 'warn');
     checkBridge();
     toast('Mock 已关闭');
   }
 }
 
-/* ---- Rokid 桥检查 ---- */
+/* ---- Bridge check ---- */
 function checkBridge() {
   let available = false;
   let kind = 'none';
@@ -503,38 +1071,48 @@ function checkBridge() {
       kind = window.RokidBridge.bridgeKind || 'native';
     }
   } catch(e) {}
+  const el = document.getElementById('stBridge');
   if (mockEnabled) {
-    updateStatus('stBridge', 'Mock', 'warn');
+    el.textContent = 'Mock';
+    el.className = 'status-value ok';
   } else if (available) {
-    updateStatus('stBridge', kind, 'ok');
+    el.textContent = kind;
+    el.className = 'status-value ok';
   } else {
-    updateStatus('stBridge', '未连接', 'warn');
+    el.textContent = '未连接';
+    el.className = 'status-value warn';
   }
 }
 
-/* ---- 结果摘要 ---- */
+/* ---- Summarize ---- */
 function summarizeResult(data, mode) {
-  if (!data || typeof data !== 'object') return String(data);
+  if (!data || typeof data !== 'object') return String(data || '');
   if (data.text) return data.text;
   if (data.result) return typeof data.result === 'string' ? data.result : JSON.stringify(data.result, null, 2);
   if (data.analysis) return data.analysis;
   if (data.diagnosis) return data.diagnosis;
   if (data.findings) return data.findings.map(f => '- ' + f).join('\n');
-  // fallback: 取前几个字段
-  const keys = Object.keys(data).filter(k => k !== 'ok' && k !== 'code' && k !== 'ts').slice(0, 5);
-  return keys.map(k => k + ': ' + JSON.stringify(data[k])).join('\n');
+  if (data.error) return '错误：' + data.error + (data.message ? '\n' + data.message : '');
+  const keys = Object.keys(data).filter(k => !['ok','code','ts','processing_time'].includes(k)).slice(0, 6);
+  if (keys.length) return keys.map(k => k + ':\n' + JSON.stringify(data[k], null, 2)).join('\n\n');
+  return JSON.stringify(data, null, 2);
 }
 
 function escHtml(s) {
   return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-/* ---- 历史 ---- */
+/* ---- History ---- */
 function addHistory(mode, preview) {
   let hist = [];
   try { hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch(e) {}
-  hist.unshift({ ts: new Date().toLocaleString(), mode, preview: preview.slice(0, 60) });
-  if (hist.length > 10) hist.length = 10;
+  hist.unshift({
+    ts: new Date().toLocaleString(),
+    mode,
+    preview: preview.slice(0, 80),
+    full: preview
+  });
+  if (hist.length > 20) hist.length = 20;
   try { localStorage.setItem(HISTORY_KEY, JSON.stringify(hist)); } catch(e) {}
   renderHistory();
 }
@@ -543,10 +1121,41 @@ function renderHistory() {
   let hist = [];
   try { hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch(e) {}
   const el = document.getElementById('historyList');
-  if (!hist.length) { el.innerHTML = '<div style="font-size:11px;color:var(--paper3);padding:8px">暂无记录</div>'; return; }
-  el.innerHTML = hist.map(h =>
-    '<div class="history-item"><span class="ts">' + escHtml(h.ts) + '</span><span class="tag">' + MODE_LABELS[h.mode] + '</span><span class="preview">' + escHtml(h.preview) + '</span></div>'
+  if (!hist.length) {
+    el.innerHTML = '<div style="color:var(--muted2);font-size:12px;padding:8px">暂无记录</div>';
+    return;
+  }
+  el.innerHTML = hist.map((h, i) =>
+    '<div class="history-item" onclick="replayHistory(' + i + ')" title="点击重放结果">' +
+      '<span class="hist-ts">' + escHtml(h.ts) + '</span>' +
+      '<span class="hist-tag">' + (MODE_LABELS[h.mode] || h.mode) + '</span>' +
+      '<span class="hist-preview">' + escHtml(h.preview) + '</span>' +
+      '<span class="hist-actions">' +
+        '<button class="hist-btn" onclick="event.stopPropagation();replayHistory(' + i + ')">查看</button>' +
+        '<button class="hist-btn" onclick="event.stopPropagation();speakHistory(' + i + ')">🔊</button>' +
+      '</span>' +
+    '</div>'
   ).join('');
+}
+
+function replayHistory(idx) {
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch(e) {}
+  if (!hist[idx]) return;
+  const h = hist[idx];
+  lastResult = h.full || h.preview;
+  const resultBox = document.getElementById('resultBox');
+  resultBox.innerHTML = '<div class="result-meta"><span class="tag">📜 历史记录</span><span class="tag">' + (MODE_LABELS[h.mode] || h.mode) + '</span><span>' + escHtml(h.ts) + '</span></div><div class="result-content">' + escHtml(lastResult) + '</div>';
+  document.getElementById('btnTTS').disabled = false;
+  toast('已加载历史记录');
+}
+
+function speakHistory(idx) {
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch(e) {}
+  if (!hist[idx]) return;
+  lastResult = hist[idx].full || hist[idx].preview;
+  speakResult();
 }
 
 function clearHistory() {
@@ -555,57 +1164,74 @@ function clearHistory() {
   toast('历史已清空');
 }
 
-/* ---- 语音问诊（浏览器 SpeechRecognition）---- */
+/* ---- Voice input (SpeechRecognition) ---- */
 let voiceRec = null;
 let voiceStream = null;
+
 function toggleVoice() {
   const btn = document.getElementById('btnVoice');
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
   if (!SR) {
-    toast('当前浏览器不支持语音识别（Chrome/Edge 推荐）');
+    toast('当前浏览器不支持语音识别，推荐使用 Chrome 或 Edge');
     return;
   }
+
+  // Toggle off
   if (voiceRec) {
     voiceRec.stop();
     voiceRec = null;
-    btn.textContent = '🎤 开始录音';
+    btn.textContent = '🎤 点击开始录音';
     btn.classList.remove('warn');
     if (voiceStream) { voiceStream.getTracks().forEach(t => t.stop()); voiceStream = null; }
     return;
   }
+
   voiceRec = new SR();
   voiceRec.lang = 'zh-CN';
   voiceRec.interimResults = false;
   voiceRec.maxAlternatives = 1;
+  voiceRec.continuous = false;
+
   btn.textContent = '🔴 录音中...';
   btn.classList.add('warn');
-  // 同时开启麦克风音频流（可选：可在 later 做声纹/情绪分析）
+
+  // Open mic stream
   navigator.mediaDevices.getUserMedia({ audio: true }).then(s => { voiceStream = s; }).catch(() => {});
+
   voiceRec.onresult = (e) => {
     const text = e.results[0][0].transcript.trim();
     if (text) {
-      toast('识别结果：' + text);
+      toast('识别：' + text.slice(0, 30));
       addHistory('voice', text);
-      sessionCount++; saveSessionCount(); updateStatus('stCount', sessionCount, 'ok');
+      sessionCount++;
+      saveSessionCount();
     }
   };
+
   voiceRec.onerror = (e) => {
-    btn.textContent = '🎤 开始录音';
+    btn.textContent = '🎤 点击开始录音';
     btn.classList.remove('warn');
-    let err = '语音识别错误';
-    if (e.error === 'not-allowed') err = '麦克风权限被拒，请在浏览器设置中允许';
-    else if (e.error === 'no-speech') err = '未检测到语音，请靠近麦克风再试';
-    else if (e.error === 'network') err = '语音识别需要网络，请检查连接';
-    toast(err);
+    const errMap = {
+      'not-allowed': '麦克风权限被拒，请在浏览器设置中允许',
+      'no-speech': '未检测到语音，请靠近麦克风再试',
+      'network': '语音识别需要网络，请检查连接',
+      'audio-capture': '未检测到麦克风设备',
+      'aborted': '录音被中断'
+    };
+    const errMsg = errMap[e.error] || ('语音识别错误：' + e.error);
+    toast(errMsg);
     if (voiceStream) { voiceStream.getTracks().forEach(t => t.stop()); voiceStream = null; }
     voiceRec = null;
   };
+
   voiceRec.onend = () => {
-    btn.textContent = '🎤 开始录音';
+    btn.textContent = '🎤 点击开始录音';
     btn.classList.remove('warn');
     if (voiceStream) { voiceStream.getTracks().forEach(t => t.stop()); voiceStream = null; }
     voiceRec = null;
   };
+
   voiceRec.start();
 }
 </script>
