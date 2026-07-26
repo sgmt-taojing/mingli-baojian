@@ -507,6 +507,27 @@ async function renderKbDash(c){
       <button class="btn" onclick="exportKbStats()" style="flex:1">📥 导出 JSON</button>
       <a class="btn" href="ai-assistant.html" style="flex:1;text-decoration:none;background:var(--ink3);text-align:center;display:inline-block">🤖 去 AI 助手</a>
     </div>
+
+    <h3 style="font-size:14px;color:var(--gold);margin:18px 0 10px">🔗 KB 全门户</h3>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
+      <a href="kb-quality.html" class="btn" style="text-decoration:none;padding:14px;background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(201,168,76,.05));border:1px solid rgba(201,168,76,.25);text-align:left">
+        <div style="font-size:13px;color:var(--gold);font-weight:600">📊 质量审计</div>
+        <div style="font-size:11px;color:var(--paper3);margin-top:2px">所有模块 trust · 等级 · 修复</div>
+      </a>
+      <a href="kb-coverage.html" class="btn" style="text-decoration:none;padding:14px;background:linear-gradient(135deg,rgba(34,211,238,.12),rgba(34,211,238,.04));border:1px solid rgba(34,211,238,.2);text-align:left">
+        <div style="font-size:13px;color:var(--cyan);font-weight:600">🗺️ 覆盖审计</div>
+        <div style="font-size:11px;color:var(--paper3);margin-top:2px">AI 29 × KB 54 映射</div>
+      </a>
+      <a href="kb-hit-dashboard.html" class="btn" style="text-decoration:none;padding:14px;background:linear-gradient(135deg,rgba(16,185,129,.12),rgba(16,185,129,.04));border:1px solid rgba(16,185,129,.2);text-align:left">
+        <div style="font-size:13px;color:#10b981;font-weight:600">⚡ 命中看板</div>
+        <div style="font-size:11px;color:var(--paper3);margin-top:2px">趋势 · 模块排行 · CSV</div>
+      </a>
+      <a href="kb-graph.html" class="btn" style="text-decoration:none;padding:14px;background:linear-gradient(135deg,rgba(168,85,247,.12),rgba(168,85,247,.04));border:1px solid rgba(168,85,247,.2);text-align:left">
+        <div style="font-size:13px;color:#a855f7;font-weight:600">🔮 KB 图谱</div>
+        <div style="font-size:11px;color:var(--paper3);margin-top:2px">模块关联网络图</div>
+      </a>
+    </div>
+    </div>
   `;
   document.getElementById('kbDashBody').innerHTML = html;
 }
