@@ -27,6 +27,7 @@
   const KEY_PREFIX = '_kb_hit_count/';
   const KEY_TODAY = '_kb_hit_today';
   const EVT_PREFIX = '_kb_hit_events/';
+  const ENGINE_PREFIX = '_kb_engine_count/';
 
   // ── 工具 ──────────────────────────────────────────────
   function _safeGet(k, fallback) {
@@ -163,13 +164,53 @@
     },
 
     /**
+     * 记录引擎使用（R27-P1）
+     * @param {string} engine fts5 / like-fallback / like-primary
+     */
+    recordEngine: function (engine) {
+      const e = String(engine || 'unknown');
+      const key = ENGINE_PREFIX + e;
+      const n = (parseInt(_safeGet(key, '0'), 10) || 0) + 1;
+      _safeSet(key, String(n));
+      return n;
+    },
+
+    /**
+     * 读取引擎分布快照
+     * @returns {{fts5:number, likeFallback:number, likePrimary:number, total:number}}
+     */
+    getEngineStats: function () {
+      let fts5 = 0, likeFallback = 0, likePrimary = 0, total = 0;
+      try {
+        for (var i = 0; i < localStorage.length; i++) {
+          var k = localStorage.key(i);
+          if (!k || k.indexOf(ENGINE_PREFIX) !== 0) continue;
+          var v = parseInt(_safeGet(k, '0'), 10) || 0;
+          total += v;
+          if (k === ENGINE_PREFIX + 'fts5') fts5 = v;
+          else if (k === ENGINE_PREFIX + 'like-fallback') likeFallback = v;
+          else if (k === ENGINE_PREFIX + 'like-primary') likePrimary = v;
+        }
+      } catch (e) { /* 静默 */ }
+      return { fts5: fts5, likeFallback: likeFallback, likePrimary: likePrimary, total: total };
+    },
+
+    /**
      * 把统计渲染到容器
      * @param {HTMLElement} el  容器元素
      */
     renderBar: function (el) {
       if (!el) return;
-      const s = KbHitCounter.getStats();
-      const topTxt = s.topModule ? (' · 🏆 最强 ' + s.topModule + '(' + _fmt(s.topCount) + ')') : '';
+      var s = KbHitCounter.getStats();
+      var eg = KbHitCounter.getEngineStats();
+      var topTxt = s.topModule ? (' · 🏆 最强 ' + s.topModule + '(' + _fmt(s.topCount) + ')') : '';
+      // 引擎徽章（R27-P1）
+      var engineBadge = '';
+      if (eg.total > 0) {
+        if (eg.fts5 > 0) engineBadge += '<span class="kb-engine-badge fts5">⚡ FTS5 ' + _fmt(eg.fts5) + '</span>';
+        if (eg.likeFallback > 0) engineBadge += '<span class="kb-engine-badge like">🔄 LIKE ' + _fmt(eg.likeFallback) + '</span>';
+        if (eg.likePrimary > 0) engineBadge += '<span class="kb-engine-badge like-p">📖 热门 ' + _fmt(eg.likePrimary) + '</span>';
+      }
       el.innerHTML =
         '<span class="kb-bar-icon">📊</span>' +
         '<span class="kb-bar-item">今日 KB 直答 <b id="kbHitToday">' + _fmt(s.today) + '</b> 次</span>' +
@@ -177,7 +218,8 @@
         '<span class="kb-bar-item">命中率 <b id="kbHitRate">' + s.hitRate + '</b> %</span>' +
         '<span class="kb-bar-sep">·</span>' +
         '<span class="kb-bar-item">累计 <b id="kbHitTotal">' + _fmt(s.total) + '</b> 次</span>' +
-        (topTxt ? '<span class="kb-bar-top">' + topTxt + '</span>' : '');
+        (topTxt ? '<span class="kb-bar-top">' + topTxt + '</span>' : '') +
+        (engineBadge ? '<span class="kb-bar-engines">' + engineBadge + '</span>' : '');
       el.classList.add('kb-stats-bar-ready');
     }
   };
@@ -199,6 +241,16 @@
     try {
       const el = document.getElementById('kbStatsBar');
       if (el) KbHitCounter.renderBar(el);
+    } catch (e) { /* 静默 */ }
+  };
+
+  /** R27-P1：记录引擎使用 + 重渲染 stats bar */
+  global.recordKbEngine = function (engine) {
+    try {
+      KbHitCounter.recordEngine(engine);
+    } catch (e) { /* 静默 */ }
+    try {
+      refreshKbStatsBar();
     } catch (e) { /* 静默 */ }
   };
 

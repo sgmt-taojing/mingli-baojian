@@ -95,6 +95,11 @@ body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',-apple
 .kb-stats-bar b{color:var(--gold2);font-weight:600}
 .kb-stats-bar .kb-bar-sep{color:var(--paper3);opacity:.4}
 .kb-stats-bar .kb-bar-top{color:var(--gold);opacity:.7;font-size:10px}
+.kb-stats-bar .kb-bar-engines{display:inline-flex;gap:3px;align-items:center;margin-left:4px}
+.kb-stats-bar .kb-engine-badge{padding:1px 5px;border-radius:8px;font-size:9px;font-weight:600;line-height:1.4;white-space:nowrap}
+.kb-stats-bar .kb-engine-badge.fts5{background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3)}
+.kb-stats-bar .kb-engine-badge.like{background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)}
+.kb-stats-bar .kb-engine-badge.like-p{background:rgba(167,139,250,.15);color:#a78bfa;border:1px solid rgba(167,139,250,.3)}
 @media(max-width:768px){.kb-stats-bar{font-size:9px;height:24px;gap:4px;padding:0 8px}}
 </style>
 <link rel="stylesheet" href="css/a11y-fix.css">
@@ -290,18 +295,24 @@ async function _kbQueryFallback(best) {
     });
     const r = await fetch(API + '/api/public/kb-query?' + qs, { method: 'GET' });
     const j = await r.json();
+    // R27-P1：读取后端返回的 engine 字段 → 记入 localStorage + 刷新 stats bar
+    const engine = (j && j.engine) || 'like-fallback';
+    try { recordKbEngine(engine); } catch (e) {}
     if (j && j.results && j.results.length > 0) {
       best.snippet = j.results.map(x => '【' + x.entry_id + '】' + x.title + '\n' + (x.snippet || '').slice(0, 200)).join('\n\n');
       best.score = Math.max(best.score, 0.65);
       best.results = j.results;
       best.sourceCount = j.count;
+      best.engine = engine;
     } else {
       best.snippet = '[fallback] 未找到匹配 KB';
       best.score = 0.3;
+      best.engine = engine;
     }
   } catch (e) {
     best.snippet = '[fallback] 失败: ' + e.message;
     best.score = 0.2;
+    best.engine = 'error';
   }
   return best;
 }

@@ -132,6 +132,41 @@ tr:hover td{background:rgba(6,182,212,.05)}
   <div class="bar-labels" id="hourly-labels"></div>
 </div>
 
+<!-- 引擎分布饼图 + src_id 覆盖率 -->
+<div class="two-col">
+  <div class="panel">
+    <div class="panel-title">⚡ 检索引擎分布 (FTS5 vs LIKE) <span class="badge" id="engine-badge">0 次</span></div>
+    <div style="display:flex;align-items:center;gap:18px;padding:6px 0;flex-wrap:wrap">
+      <svg id="engine-pie" width="180" height="180" viewBox="0 0 180 180" aria-label="engine distribution pie" role="img" style="flex-shrink:0">
+        <circle cx="90" cy="90" r="60" fill="none" stroke="#334155" stroke-width="40"/>
+        <circle id="pie-fts5" cx="90" cy="90" r="60" fill="none" stroke="#10b981" stroke-width="40" stroke-dasharray="0 376.99" stroke-dashoffset="0" transform="rotate(-90 90 90)" style="transition:stroke-dasharray .5s ease"/>
+        <circle id="pie-likefb" cx="90" cy="90" r="60" fill="none" stroke="#f59e0b" stroke-width="40" stroke-dasharray="0 376.99" stroke-dashoffset="0" transform="rotate(-90 90 90)" style="transition:stroke-dasharray .5s ease"/>
+        <text id="pie-center" x="90" y="90" text-anchor="middle" dominant-baseline="middle" fill="#e2e8f0" font-size="20" font-weight="700">0</text>
+        <text x="90" y="108" text-anchor="middle" dominant-baseline="middle" fill="#94a3b8" font-size="11">总请求</text>
+      </svg>
+      <div id="engine-legend" style="display:flex;flex-direction:column;gap:10px;min-width:160px">
+        <div style="font-size:11px;color:#94a3b8">暂无数据</div>
+      </div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">📚 knowledge-models src_id 覆盖率 <span class="badge" id="src-badge">0 / 0</span></div>
+    <div style="padding:10px 0">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px">
+        <span style="font-size:12px;color:#94a3b8">已覆盖 unique src_id</span>
+        <span id="src-pct-text" style="font-size:24px;font-weight:700;color:var(--accent2)">0%</span>
+      </div>
+      <div style="height:18px;background:#0f172a;border-radius:9px;overflow:hidden;border:1px solid var(--line);position:relative">
+        <div id="src-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:9px;transition:width .5s ease"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:#94a3b8">
+        <span>已覆盖 <b id="src-covered" style="color:var(--good)">0</b> 个 src_id</span>
+        <span>源总数 <b id="src-total" style="color:var(--warn)">0</b></span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="refresh-info" id="refreshInfo">未加载</div>
 
 <script>
@@ -201,6 +236,8 @@ function render(d) {
   // 24h 柱状图
   const hh = d.hourlyHits || [];
   const total24 = hh.reduce((s, h) => s + h.count, 0);
+  renderEnginePie(d.engineBreakdown || { fts5: 0, likeFallback: 0, other: 0 });
+  renderSrcCoverage(d.srcCoverage || { covered: 0, total: 0, pct: 0 });
   document.getElementById('hourly-badge').textContent = total24 + ' 次';
   const max = Math.max(1, ...hh.map(h => h.count));
   const chart = document.getElementById('hourly-chart');
@@ -239,6 +276,72 @@ function exportJSON() {
   a.download = 'kb-hit-stats-' + (lastData.range || '7d') + '-' + Date.now() + '.json';
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+// R27-P1：渲染引擎分布饼图（纯 SVG，不引新依赖）
+function renderEnginePie(eb) {
+  var fts5 = eb.fts5 || 0;
+  var likeFb = eb.likeFallback || 0;
+  var other = eb.other || 0;
+  var total = fts5 + likeFb + other;
+  document.getElementById('engine-badge').textContent = total + ' 次';
+
+  var C = 2 * Math.PI * 60; // circumference = 376.99
+  var fts5Len = total > 0 ? (fts5 / total) * C : 0;
+  var likeFbLen = total > 0 ? (likeFb / total) * C : 0;
+  var otherLen = total > 0 ? (other / total) * C : 0;
+
+  // 第一段：fts5（从顶部开始）
+  var pieFts5 = document.getElementById('pie-fts5');
+  pieFts5.setAttribute('stroke-dasharray', fts5Len + ' ' + (C - fts5Len));
+  pieFts5.setAttribute('stroke-dashoffset', '0');
+
+  // 第二段：like-fallback（从 fts5 结束位置开始）
+  var pieLikeFb = document.getElementById('pie-likefb');
+  pieLikeFb.setAttribute('stroke-dasharray', likeFbLen + ' ' + (C - likeFbLen));
+  pieLikeFb.setAttribute('stroke-dashoffset', String(-fts5Len));
+
+  // 第三段：other（如果有，用另一个 circle）
+  // 简化：other 不画弧段（因为前两段补满即可）
+  if (other > 0) {
+    pieLikeFb.setAttribute('stroke-dasharray', (likeFbLen + otherLen) + ' ' + (C - likeFbLen - otherLen));
+  }
+
+  // 中心数字
+  document.getElementById('pie-center').textContent = total;
+
+  // 图例
+  var legend = document.getElementById('engine-legend');
+  if (total === 0) {
+    legend.innerHTML = '<div style="font-size:11px;color:#94a3b8">暂无数据</div>';
+  } else {
+    var pct = function(n) { return total > 0 ? Math.round(n * 100 / total) : 0; };
+    legend.innerHTML =
+      '<div style="display:flex;align-items:center;gap:8px"><span style="width:12px;height:12px;border-radius:3px;background:#10b981;display:inline-block"></span>' +
+      '<span style="font-size:13px;color:#e2e8f0">⚡ FTS5 <b style="color:#10b981">' + fts5 + '</b> (' + pct(fts5) + '%)</span></div>' +
+      '<div style="display:flex;align-items:center;gap:8px"><span style="width:12px;height:12px;border-radius:3px;background:#f59e0b;display:inline-block"></span>' +
+      '<span style="font-size:13px;color:#e2e8f0">🔄 LIKE Fallback <b style="color:#f59e0b">' + likeFb + '</b> (' + pct(likeFb) + '%)</span></div>' +
+      (other > 0 ?
+        '<div style="display:flex;align-items:center;gap:8px"><span style="width:12px;height:12px;border-radius:3px;background:#a78bfa;display:inline-block"></span>' +
+        '<span style="font-size:13px;color:#e2e8f0">📖 Other <b style="color:#a78bfa">' + other + '</b> (' + pct(other) + '%)</span></div>' : '');
+  }
+}
+
+// R27-P1：渲染 src_id 覆盖率进度条
+function renderSrcCoverage(sc) {
+  var covered = sc.covered || 0;
+  var totalSrc = sc.total || 0;
+  var pct = sc.pct || 0;
+  document.getElementById('src-badge').textContent = covered + ' / ' + totalSrc;
+  document.getElementById('src-covered').textContent = covered;
+  document.getElementById('src-total').textContent = totalSrc;
+  document.getElementById('src-pct-text').textContent = pct + '%';
+  document.getElementById('src-bar').style.width = pct + '%';
+  // 颜色渐变：< 30% 红、30-70% 黄、> 70% 绿
+  var bar = document.getElementById('src-bar');
+  if (pct >= 70) bar.style.background = 'linear-gradient(90deg,#10b981,#22d3ee)';
+  else if (pct >= 30) bar.style.background = 'linear-gradient(90deg,#f59e0b,#fbbf24)';
+  else bar.style.background = 'linear-gradient(90deg,#ef4444,#f59e0b)';
 }
 
 function getHourRange() {
