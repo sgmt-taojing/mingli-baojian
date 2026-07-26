@@ -1002,7 +1002,7 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
   if(kbHit.score >= 0.7){
     // KB 直答
     const kbReport = '【来源：本地知识库（'+kbHit.source+' · '+kbHit.entryId+'，命中分 '+kbHit.score+'）】\n\n' + kbHit.snippet.substring(0, 4000);
-    showReport(kbReport);
+    showReport(kbReport, {score: kbHit.score, source: kbHit.source, engine: kbHit.engine || 'fts5', fallback: kbHit.fallback || false});
     autoSavePaipan(kbReport);
     return;
   }
@@ -1090,7 +1090,7 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
         return;
       }
       const tagged = kbHit.score >= 0.4 ? '【来源：KB+AI 润色（'+kbHit.source+'）】\n\n'+reply : reply;
-      showReport(tagged);
+      showReport(tagged, {score: kbHit.score, source: kbHit.source || 'AI', engine: kbHit.engine || 'ai-backend', fallback: !!kbHit.fallback});
       autoSavePaipan(tagged);
       return;
     }
@@ -1099,7 +1099,7 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
   // ④ 降级：本地生成报告
   const local=localReport(state.module,state.data);
   const fallback = '【来源：本地引擎】\n\n' + local;
-  showReport(fallback);
+  showReport(fallback, {score: 0, source: 'local-engine', engine: 'local', fallback: true});
   autoSavePaipan(fallback);
 }
 
@@ -1117,10 +1117,20 @@ async function autoSavePaipan(reportText){
   }catch(_){/*静默失败*/}
 }
 
-function showReport(text){
+function showReport(text, meta){
   const d=document.createElement('div');
   d.className='msg m-ai';
-  d.innerHTML='<div class="b">'+esc(text)+'</div>';
+  // R53：KB 命中信息条（score/source/engine/fallback 一行可视化）
+  let metaHtml = '';
+  if (meta && typeof meta === 'object') {
+    const score = typeof meta.score === 'number' ? meta.score : 0;
+    const scorePct = Math.round(score * 100);
+    const scoreColor = score >= 0.7 ? '#10b981' : score >= 0.4 ? '#c9a84c' : '#f59e0b';
+    const srcLabel = meta.engine ? meta.engine : (meta.source || '本地知识库');
+    const srcFallback = meta.fallback ? ' · 回退' : '';
+    metaHtml = '<div class="kb-hit-badge" style="display:inline-flex;align-items:center;gap:8px;padding:5px 10px;margin-bottom:8px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.25);border-radius:6px;font-size:11px;color:var(--paper2)"><span style="color:var(--paper3)">🎯 KB 命中</span><span style="color:' + scoreColor + ';font-weight:600">' + scorePct + '%</span><span style="color:var(--paper3)">·</span><span>引擎：' + srcLabel + srcFallback + '</span></div>';
+  }
+  d.innerHTML=metaHtml + '<div class="b">'+esc(text)+'</div>';
   chat.appendChild(d);
 
   // R40: 嵌入图谱智能推荐段落（位于报告主体与操作按钮之间）
