@@ -882,6 +882,23 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
       console.warn('[kb fallback]', e);
     }
   }
+  // R64: 设备上下文加权——最近 5 分钟内拍过舌照 → shexiang 命中分 +0.3
+  try {
+    const boost = (window.getDeviceModuleBoost && window.getDeviceModuleBoost()) || {};
+    if (boost[state.module]) {
+      const before = kbHit.score;
+      kbHit.score = Math.min(1.0, kbHit.score + boost[state.module]);
+      if (window.console && console.log) console.log(`[R64] 设备加权 ${state.module} +${boost[state.module].toFixed(2)} (${before.toFixed(2)} → ${kbHit.score.toFixed(2)})`);
+      // 记录加权事件，供日志页查看
+      try {
+        const logKey = '_device_kb_boost_log';
+        const arr = JSON.parse(localStorage.getItem(logKey) || '[]');
+        arr.push({ module: state.module, boost: boost[state.module], before, after: kbHit.score, ts: Date.now() });
+        if (arr.length > 50) arr.shift();
+        localStorage.setItem(logKey, JSON.stringify(arr));
+      } catch (e) {}
+    }
+  } catch (e) { /* ignore */ }
   // P14 节点 8.5：lifeindex 后端增强（10 维度五行权重评分）
   let lifeindexBackend = null;
   if (state.module === 'lifeindex' && kbHit.score >= 0.4) {
