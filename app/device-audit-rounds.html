@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>R88 智能设备三轮诊断审计 · 易道智鉴</title>
+  <link rel="stylesheet" href="css/mobile-nav.css">
+  <style>
+    :root{--ink:#0a0a0f;--ink2:#111;--ink3:#1a1a1a;--paper:#e8e0d0;--paper2:#c9bfa8;--paper3:#a09888;--gold:#c9a84c;--gold2:#e8cc7a;--jade:#10b981;--cinn:#ef4444;--cyan:#63b3ed;--violet:#8e44ad;--border:rgba(201,168,76,.18)}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--ink);color:var(--paper);min-height:100vh;padding:12px;line-height:1.6}
+    .wrap{max-width:820px;margin:0 auto;padding-top:16px}
+    h1{font-size:20px;color:var(--gold);margin-bottom:4px}
+    .sub{font-size:11px;color:var(--paper3);margin-bottom:14px}
+    .round{border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:12px;background:rgba(255,255,255,.02)}
+    .round h2{font-size:15px;color:var(--gold2);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+    .round .round-id{background:rgba(201,168,76,.15);padding:2px 8px;border-radius:4px;font-size:11px;color:var(--gold)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin:10px 0}
+    .card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+    .card .lbl{font-size:10px;color:var(--paper3);letter-spacing:1px;margin-bottom:4px}
+    .card .val{font-size:22px;font-weight:600}
+    .card .sub{font-size:10px;color:var(--paper3);margin-top:3px}
+    .pass{color:var(--jade)}.warn{color:#f59e0b}.fail{color:var(--cinn)}.info{color:var(--cyan)}
+    table{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0}
+    th,td{text-align:left;padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.04)}
+    th{color:var(--paper3);font-weight:500;font-size:11px;letter-spacing:1px}
+    td{color:var(--paper2)}
+    .badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600}
+    .badge-pass{background:rgba(16,185,129,.12);color:#10b981}
+    .badge-warn{background:rgba(245,158,11,.12);color:#f59e0b}
+    .badge-fail{background:rgba(239,68,68,.12);color:#ef4444}
+    .badge-info{background:rgba(99,179,237,.12);color:#63b3ed}
+    .chain{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin:6px 0;font-size:12px}
+    .chain .label{font-size:10px;color:var(--paper3);letter-spacing:1px;margin-bottom:4px}
+    .chain .flow{color:var(--paper2);line-height:1.7}
+    .chain .flow strong{color:var(--gold)}
+    .summary-box{background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(16,185,129,.04));border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:12px}
+    .summary-box .title{font-size:13px;color:var(--gold2);font-weight:600;margin-bottom:6px}
+    .summary-box .text{font-size:12px;color:var(--paper2);line-height:1.7}
+    .detail-btn{background:transparent;border:1px solid var(--border);color:var(--paper2);padding:4px 10px;border-radius:4px;font-size:11px;cursor:pointer;margin-top:4px}
+    .detail-btn:hover{background:rgba(201,168,76,.1)}
+    .hidden-detail{display:none;margin-top:8px;padding:8px;background:rgba(0,0,0,.2);border-radius:6px;font-size:11px;color:var(--paper2);line-height:1.7}
+    .hidden-detail.open{display:block}
+    @media(max-width:480px){.grid{grid-template-columns:1fr}body{padding:8px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🔬 R88 智能设备三轮诊断审计</h1>
+    <p class="sub">commit <span id="commit">--</span> · 2026-07-26 23:16 · AutoClaw</p>
+
+    <div class="summary-box">
+      <div class="title">📊 审计摘要</div>
+      <div class="text">
+        <strong>结论：</strong>三路审计共扫描 <span id="totalTests">--</span> 个能力点，通过 <span id="passCount">--</span>，警告 <span id="warnCount">--</span>，阻断 <span id="failCount">--</span>。
+        <span id="verdict"></span>
+      </div>
+    </div>
+
+    <div class="grid" id="summaryGrid"></div>
+
+    <div class="round" id="round1">
+      <h2><span class="round-id">Round 1</span>浏览器硬件 API 审计</h2>
+      <p style="font-size:12px;color:var(--paper3);margin-bottom:10px">前端代码中所有浏览器硬件 API 的调用点 + 实际支持度 + 降级策略</p>
+      <div id="r1content"></div>
+    </div>
+
+    <div class="round" id="round2">
+      <h2><span class="round-id">Round 2</span>后端服务层审计</h2>
+      <p style="font-size:12px;color:var(--paper3);margin-bottom:10px">8911/8912/8913/8920/8914 五服务健康 + 端点覆盖 + 响应时间</p>
+      <div id="r2content"></div>
+    </div>
+
+    <div class="round" id="round3">
+      <h2><span class="round-id">Round 3</span>端到端链路审计</h2>
+      <p style="font-size:12px;color:var(--paper3);margin-bottom:10px">用户操作 → 前端桥接 → 后端服务 → 返回结果的完整链路</p>
+      <div id="r3content"></div>
+    </div>
+
+    <div class="round" id="roundFix">
+      <h2><span class="round-id">R88 Fix</span>已修复</h2>
+      <div id="fixContent"></div>
+    </div>
+
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--paper3)">
+      命理宝鉴 · 设备诊断审计 · 本地 <a href="http://127.0.0.1:8914/app/device-diagnostic.html" style="color:var(--cyan)">device-diagnostic.html</a>
+    </div>
+  </div>
+
+<script>
+(function(){
+  'use strict';
+
+  var auditData = {
+    r1: [
+      { api:'getUserMedia / enumerateDevices', status:'pass', score:92,
+        files:['camera-capture-inline.js','tcm-report-inline.js','glass-console-inline.js','device-management-inline.js'],
+        note:'4 个页面调用 getUserMedia，含 facingMode/devicechange 热插拔监听；降级：提示用户授权或切换到内置摄像头',
+        details:'camera-capture: 拍照+上传 8913 · tcm-report: 舌象采集 · glass-console: 智能眼镜预览 · device-mgmt: 设备授权中心'
+      },
+      { api:'SpeechRecognition / SpeechSynthesis', status:'pass', score:88,
+        files:['camera-capture-inline.js','tcm-report-inline.js','glass-console-inline.js'],
+        note:'SR 使用 webkit 前缀 + lang=zh-CN + continuous/interimResults；TTS 通过 Audio 播放 8912 Edge-TTS；降级：speechSynthesis.cancel() 清理',
+        details:'voice-interaction.js 统一封装 window.speakText/stopSpeak/setVoice，前端 TTS BASE = /api/tts?text=&voice='
+      },
+      { api:'WebRTC / RTCPeerConnection', status:'warn', score:55,
+        files:['mobile-capture-inline.js'],
+        note:'mobile-capture 已实现 RTCPeerConnection sendonly offer 创建，但后端 /api/webrtc/offer 未接入（fetch 失败降级本地）；无 TURN/STUN 配置',
+        details:'仅 mobile-capture 使用，后端尚未实现 WebRTC 信令；用户场景：移动端推流到后端 OCR → 当前降级为本地采集后上传'
+      },
+      { api:'Bluetooth / USB / HID', status:'warn', score:60,
+        files:['device-platform.js','device-management-inline.js'],
+        note:'device-platform 封装 navigator.bluetooth.requestDevice + scanUSB 模拟；真实 BT/USB 需用户手动授权 + HTTPS 环境；降级：内置摄像头兜底',
+        details:'蓝牙：navigator.bluetooth.requestDevice({filters:[{services:[battery_service]}]})；USB：platform.scanUSB() 读取 vendor/productId'
+      },
+      { api:'DeviceOrientation / DeviceMotion', status:'fail', score:0,
+        files:[],
+        note:'代码中未使用 DeviceOrientation/Motion API；智能眼镜头姿控制未接入；降级：手动拍照按钮',
+        details:' Rokid/Glass 头姿控制通常通过 vendor JS Bridge 实现，非标准 Web API；当前 glass-console 无此功能'
+      },
+      { api:'MediaRecorder / 媒体录制', status:'warn', score:45,
+        files:['camera-capture-inline.js','mobile-capture-inline.js'],
+        note:'代码中未使用 MediaRecorder；音频录制通过 SpeechRecognition interimResults 实现文字转录；无视频录制/回放功能',
+        details:'如需视频录制需新增 MediaRecorder API + Blob 存储 + 上传逻辑'
+      }
+    ],
+    r2: [
+      { service:'8911 排盘', endpoint:'/paipan (POST)', method:'POST', status:'pass', code:200, time:'0.10s',
+        note:'八字排盘正常 · 年庚午/月丙戌/日丙寅/时壬辰 · day_master=丙火',
+        fix:'/api/paipan 404 → 应使用 /paipan 根路径'
+      },
+      { service:'8912 TTS', endpoint:'/api/tts (GET)', method:'GET', status:'pass', code:200, time:'1.62s',
+        note:'Edge-TTS 正常 · 输出 MP3 12KB · 5  voices 可用 · 前端使用 GET 参数调用',
+        fix:'/api/tts POST 501 → 只支持 GET（HTTP 规范允许 GET 带参数，无需改）'
+      },
+      { service:'8913 OCR', endpoint:'/api/face/analyze + /api/ocr/tcm', method:'POST', status:'pass', code:200, time:'0.003s',
+        note:'离线 PIL 兜底可用 · 4 AI 引擎均未配置（g2claw/zhipu/openai/doubao=false）· 端点全 200',
+        fix:'配置 ZHIPU_API_KEY / OPENAI_API_KEY 启用 AI OCR 引擎'
+      },
+      { service:'8920 API 网关', endpoint:'/api/health (新增)', method:'GET', status:'pass', code:200, time:'0.009s',
+        note:'R88 修复后 /api/health 200 · uptime 正常 · CSRF 白名单已配置 · KB 搜索 /public/kb-search 200 · /api/kb/list 200',
+        fix:'原 /health 404 → 已新增 /api/health'
+      },
+      { service:'8914 静态', endpoint:'/ (GET)', method:'GET', status:'pass', code:200, time:'0.002s',
+        note:'所有 HTML/CSS/JS 资源 200 · 无 404',
+        fix:'N/A'
+      }
+    ],
+    r3: [
+      { chain:'摄像头采集链', from:'camera-capture.html', via:'getUserMedia → canvas → blob → FormData', to:'8913 /api/camera/upload → /api/face/analyze', status:'pass', score:85,
+        steps:['用户点击拍照 → getUserMedia(video)','canvas.drawImage + toBlob','FormData(file) → fetch 8913','/api/camera/upload 保存 → /api/face/analyze','返回 inspect 结果 + issues'],
+        note:'完整链路 200 · 响应 <5ms（离线 PIL）· 降级：图片尺寸不足时提示重拍'
+      },
+      { chain:'语音交互链', from:'ai-assistant.html / tcm-report.html', via:'SpeechRecognition → interimResults → window.speakText', to:'8912 /api/tts?text=&voice=', status:'pass', score:82,
+        steps:['用户按住说话 → SR.continuous=true','interimResults 实时转录 → chat','AI 生成报告 → showReport(text)','window.speakText(text) → Audio(url)','8912 /api/tts?text=... → MP3 流'],
+        note:'语音输入+输出闭环 · 降级：SR 不可用时提示"浏览器不支持"'
+      },
+      { chain:'设备管理链', from:'device-management.html', via:'device-platform.js discoverAll/authorizeWebMedia', to:'getUserMedia → platform.userProfile', status:'pass', score:78,
+        steps:['页面加载 → platform.discoverAll()','枚举摄像头/麦克风/屏幕','用户点击授权 → authorizeWebMedia','getUserMedia(constraints) → stream','platform.userProfile 记录标签'],
+        note:'热插拔监听 + 设备标签持久化 · 降级：无设备时显示"未检测到摄像头"'
+      },
+      { chain:'KB 桥接链', from:'ai-assistant.html + DeviceKbBridge', via:'extractFromText + kb-hit-counter + render', to:'8920 /public/kb-search + /api/kb/list', status:'warn', score:70,
+        steps:['AI 报告生成 → extractFromText(text)','TodoBus.add(items) + kb-hit-counter','KB 推荐面板 → kb-search-box','fetch 8920 /public/kb-search?q=xxx','返回 FTS5/BM25 结果'],
+        note:'KB 搜索 200 · FTS5 引擎正常 · 风险：8920 CSRF 白名单需包含 kb-search（已配置）'
+      },
+      { chain:'智能眼镜链', from:'vision-demo.html / glass-console-inline.js', via:'WebRTC RTCPeerConnection + /api/webrtc', to:'后端未接入 / 降级本地', status:'fail', score:20,
+        steps:['页面加载 → getUserMedia(video)','RTCPeerConnection createOffer','fetch /api/webrtc/offer → 404','降级本地分析（离线 PIL）','display result'],
+        note:'后端 /api/webrtc/offer 未实现 · 当前降级为本地离线 PIL 分析 · Rokid JS Bridge 已落 8 个文件但未集成到主流程'
+      },
+      { chain:'排盘链路', from:'ai-assistant.html 八字模块', via:'parse-natural.js 提取八字信息', to:'8911 /paipan POST', status:'pass', score:90,
+        steps:['用户输入生辰信息 → parse-natural.js','提取 year/month/day/hour/gender','fetch 8911 /paipan','返回 pillars + day_master + gan_shen','showReport 渲染八字报告'],
+        note:'完整闭环 · 响应 0.10s · 返回 8 字段 · 降级：信息不全时提示补全'
+      }
+    ]
+  };
+
+  var fixes = [
+    { id:'F1', item:'8920 /health 404', desc:'新增 /api/health 端点（CSRF 白名单内），返回 {ok, service, port, uptime, ts}', status:'done' },
+    { id:'F2', item:'8912 /api/tts POST 501', desc:'确认前端使用 GET（Audio(url)），后端只支持 GET；501 仅影响 POST 测试调用，实际使用正常', status:'done' },
+    { id:'F3', item:'8911 /api/paipan 404', desc:'正确端点为 /paipan（根路径），非 /api/paipan；前端调用已使用正确路径', status:'info' },
+    { id:'F4', item:'8913 AI 引擎全 false', desc:'g2claw/zhipu/openai/doubao 均未配置 API Key；当前降级为离线 PIL 兜底', status:'todo', action:'配置 ZHIPU_API_KEY 或 OPENAI_API_KEY 启用 AI OCR' }
+  ];
+
+  function esc(s){ return String(s).replace(/[<>"&]/g, function(c){ return {'<':'&lt;','>':'&gt;','"':'&quot;','&':'&amp;'}[c]; }); }
+
+  function badge(status){
+    var map = {pass:'badge-pass',warn:'badge-warn',fail:'badge-fail',info:'badge-info',done:'badge-pass',todo:'badge-warn'};
+    var label = {pass:'PASS',warn:'WARN',fail:'FAIL',info:'INFO',done:'DONE',todo:'TODO'};
+    return '<span class="badge '+(map[status]||'badge-info')+'">'+(label[status]||status)+'</span>';
+  }
+
+  function renderR1(){
+    var el = document.getElementById('r1content');
+    var html = '<table><tr><th>API</th><th>状态</th><th>评分</th><th>文件</th><th>说明</th></tr>';
+    auditData.r1.forEach(function(r){
+      html += '<tr><td><strong>' + esc(r.api) + '</strong></td>' +
+        '<td>' + badge(r.status) + '</td>' +
+        '<td>' + r.score + '</td>' +
+        '<td>' + r.files.length + ' 处</td>' +
+        '<td>' + esc(r.note) + '</td></tr>';
+    });
+    html += '</table>';
+    auditData.r1.forEach(function(r){
+      html += '<div class="chain"><div class="label">' + esc(r.api) + ' — 详情</div>' +
+        '<div class="flow">' + esc(r.details) + '</div>' +
+        '<button class="detail-btn" onclick="this.nextElementSibling.classList.toggle(\'open\')">展开/收起</button>' +
+        '<div class="hidden-detail">' + esc(r.note) + '</div></div>';
+    });
+    el.innerHTML = html;
+  }
+
+  function renderR2(){
+    var el = document.getElementById('r2content');
+    var html = '<table><tr><th>服务</th><th>端点</th><th>方法</th><th>状态</th><th>HTTP</th><th>耗时</th><th>说明</th></tr>';
+    auditData.r2.forEach(function(r){
+      html += '<tr><td><strong>' + esc(r.service) + '</strong></td>' +
+        '<td>' + esc(r.endpoint) + '</td>' +
+        '<td>' + esc(r.method) + '</td>' +
+        '<td>' + badge(r.status) + '</td>' +
+        '<td>' + r.code + '</td>' +
+        '<td>' + esc(r.time) + '</td>' +
+        '<td>' + esc(r.note) + '</td></tr>';
+    });
+    html += '</table>';
+    auditData.r2.forEach(function(r){
+      if(r.fix && r.fix !== 'N/A'){
+        html += '<div class="chain"><div class="label">' + esc(r.service) + ' — 备注</div>' +
+          '<div class="flow">' + esc(r.fix) + '</div></div>';
+      }
+    });
+    el.innerHTML = html;
+  }
+
+  function renderR3(){
+    var el = document.getElementById('r3content');
+    var html = '<table><tr><th>链路</th><th>状态</th><th>评分</th><th>端点/方法</th><th>说明</th></tr>';
+    auditData.r3.forEach(function(r){
+      html += '<tr><td><strong>' + esc(r.chain) + '</strong></td>' +
+        '<td>' + badge(r.status) + '</td>' +
+        '<td>' + r.score + '</td>' +
+        '<td>' + esc(r.to) + '</td>' +
+        '<td>' + esc(r.note) + '</td></tr>';
+    });
+    html += '</table>';
+    auditData.r3.forEach(function(r){
+      var steps = (r.steps||[]).map(function(s,i){ return (i+1)+'. '+esc(s); }).join('<br>');
+      html += '<div class="chain"><div class="label">' + esc(r.chain) + ' — 链路步骤</div>' +
+        '<div class="flow">' + steps + '</div></div>';
+    });
+    el.innerHTML = html;
+  }
+
+  function renderFixes(){
+    var el = document.getElementById('fixContent');
+    var html = '<table><tr><th>ID</th><th>问题</th><th>修复</th><th>状态</th></tr>';
+    fixes.forEach(function(f){
+      html += '<tr><td><strong>' + f.id + '</strong></td>' +
+        '<td>' + esc(f.item) + '</td>' +
+        '<td>' + esc(f.desc) + (f.action ? '<br><small style="color:var(--paper3)">待办: ' + esc(f.action) + '</small>' : '') + '</td>' +
+        '<td>' + badge(f.status) + '</td></tr>';
+    });
+    html += '</table>';
+    el.innerHTML = html;
+  }
+
+  function computeSummary(){
+    var total = auditData.r1.length + auditData.r2.length + auditData.r3.length;
+    var pass = 0, warn = 0, fail = 0;
+    var all = auditData.r1.concat(auditData.r2).concat(auditData.r3);
+    all.forEach(function(r){ if(r.status==='pass') pass++; else if(r.status==='warn') warn++; else if(r.status==='fail') fail++; });
+    document.getElementById('totalTests').textContent = total;
+    document.getElementById('passCount').textContent = pass;
+    document.getElementById('warnCount').textContent = warn;
+    document.getElementById('failCount').textContent = fail;
+    var verdict = '整体可用（' + pass + '/' + total + ' PASS）';
+    if(fail > 0) verdict += '，含 ' + fail + ' 个阻断项需修复';
+    if(warn > 0) verdict += '，' + warn + ' 个警告建议优化';
+    document.getElementById('verdict').innerHTML = verdict;
+
+    var grid = document.getElementById('summaryGrid');
+    var items = [
+      {lbl:'R1 API 点数',val:auditData.r1.length,sub:'getUserMedia/SR/WebRTC/BT/USB',cls:'val-cyan'},
+      {lbl:'R2 服务数',val:auditData.r2.length,sub:'8911/8912/8913/8920/8914',cls:'val-green'},
+      {lbl:'R3 链路数',val:auditData.r3.length,sub:'摄像头/语音/设备/KB/眼镜/排盘',cls:'val-gold'},
+      {lbl:'PASS',val:pass,sub:'无阻断',cls:'pass'},
+      {lbl:'WARN',val:warn,sub:'需关注',cls:'warn'},
+      {lbl:'FAIL',val:fail,sub:'需修复',cls:'fail'}
+    ];
+    grid.innerHTML = items.map(function(it){
+      return '<div class="card"><div class="lbl">'+it.lbl+'</div><div class="val '+it.cls+'">'+it.val+'</div><div class="sub">'+it.sub+'</div></div>';
+    }).join('');
+  }
+
+  document.getElementById('commit').textContent = 'f008fab';
+  renderR1(); renderR2(); renderR3(); renderFixes(); computeSummary();
+})();
+</script>
+</body>
+</html>
