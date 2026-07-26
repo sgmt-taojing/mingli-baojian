@@ -34,7 +34,8 @@ h1{font-size:1.6rem;color:var(--gold);text-align:center;margin:20px 0 4px}
 
 /* Module Grid */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
-.mod{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;transition:border-color .2s}
+.mod{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;transition:all .2s;cursor:pointer}
+.mod:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 4px 16px rgba(201,168,76,.15)}
 .mod:hover{border-color:var(--gold-dim)}
 .mod-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .mod-name{font-weight:600;color:#e0d8c8;font-size:.95rem}
@@ -54,6 +55,18 @@ h1{font-size:1.6rem;color:var(--gold);text-align:center;margin:20px 0 4px}
 .refresh:hover{opacity:.85}
 .export-btn{position:fixed;bottom:20px;right:78px;padding:10px 16px;background:var(--card);border:1px solid var(--gold-dim);border-radius:8px;color:var(--gold);font-size:.85rem;cursor:pointer;z-index:10}
 .export-btn:hover{background:var(--gold);color:var(--ink)}
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:none;align-items:center;justify-content:center}
+.modal-bg.show{display:flex}
+.modal{background:var(--paper);border:1px solid var(--gold-dim);border-radius:14px;padding:24px;max-width:680px;width:92vw;max-height:80vh;overflow-y:auto}
+.modal h3{color:var(--gold);margin:0 0 12px;font-size:1.1rem}
+.modal .close{float:right;cursor:pointer;color:#888;font-size:1.3rem;background:none;border:none}
+.modal .close:hover{color:#fff}
+.modal .sample{background:var(--card);border-radius:8px;padding:12px;margin:8px 0;font-size:.85rem;line-height:1.5}
+.modal .sample .t{color:var(--gold);font-weight:600;margin-bottom:4px}
+.modal .sample .c{color:#aaa}
+.modal .stats-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;font-size:.85rem;color:#888}
+.modal .stats-row b{color:var(--gold)}
 
 @media(max-width:768px){.grid{grid-template-columns:1fr}.s-card{min-width:80px;padding:10px 14px}.s-card .val{font-size:1.4rem}h1{font-size:1.3rem}}
 </style>
@@ -86,6 +99,15 @@ h1{font-size:1.6rem;color:var(--gold);text-align:center;margin:20px 0 4px}
 
 <button class="export-btn" onclick="exportCSV()">📥 导出 CSV</button>
 <button class="refresh" onclick="load()" title="刷新">🔄</button>
+<div id="modal" class="modal-bg" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="close" onclick="closeModal()">×</button>
+    <h3 id="modalTitle"></h3>
+    <div id="modalStats" class="stats-row"></div>
+    <h4 style="color:#aaa;font-size:.85rem;margin:16px 0 8px">样本条目（随机 8 条）</h4>
+    <div id="modalSamples"></div>
+  </div>
+</div>
 
 <script>
 let DATA=null;
@@ -151,7 +173,7 @@ function render(){
     const sp=(m.silver/t*100).toFixed(0);
     const bp=(m.bronze/t*100).toFixed(0);
     const fp=m.needs_fix?(m.needs_fix/t*100).toFixed(0):0;
-    return `<div class="mod">
+    return `<div class="mod" onclick="showDetail('${m.module}')">
       <div class="mod-head">
         <span class="mod-name">${m.module}</span>
         <span class="mod-grade ${gradeClass(m.grade)}">${m.grade}</span>
@@ -172,6 +194,39 @@ function render(){
 }
 
 load();
+
+// === 模块详情 Modal ===
+function showDetail(mod){
+  const m=DATA.modules.find(x=>x.module===mod);
+  if(!m) return;
+  document.getElementById('modalTitle').textContent=`${m.module} · ${m.grade}`;
+  document.getElementById('modalStats').innerHTML=`
+    <span>📊 <b>${fmt(m.cnt)}</b> 条目</span>
+    <span>🎯 trust <b>${m.avg_trust}</b></span>
+    <span>🥇 <b>${m.gold}</b> 🥈 <b>${m.silver}</b> 🥉 <b>${m.bronze}</b>${m.needs_fix?' ⚠<b>'+m.needs_fix+'</b>':''}</span>
+    <span>↕ min <b>${m.min_trust?.toFixed(2)||'-'}</b> / max <b>${m.max_trust?.toFixed(2)||'-'}</b></span>
+  `;
+  document.getElementById('modalSamples').innerHTML='<p style="color:#888">加载中…</p>';
+  document.getElementById('modal').classList.add('show');
+  // 拉样本
+  fetch(`/api/public/kb-query?q=*&module=${encodeURIComponent(mod)}&limit=8`)
+    .then(r=>r.json())
+    .then(j=>{
+      const list=(j.data&&j.data.results)||j.results||[];
+      if(!list.length){document.getElementById('modalSamples').innerHTML='<p style="color:#888">无样本</p>';return;}
+      document.getElementById('modalSamples').innerHTML=list.slice(0,8).map(e=>`
+        <div class="sample">
+          <div class="t">${esc(e.title||e.entry_id)} <span style="color:#888;font-weight:400;font-size:.75rem">trust ${e.trust_score||'-'}</span></div>
+          <div class="c">${esc((e.snippet||e.content||'').slice(0,150))}${(e.snippet||e.content)&&((e.snippet||e.content).length>150)?'…':''}</div>
+        </div>`).join('');
+    })
+    .catch(err=>{
+      document.getElementById('modalSamples').innerHTML=`<p style="color:#c66">加载失败：${err.message}</p>`;
+    });
+}
+function closeModal(){document.getElementById('modal').classList.remove('show');}
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 
 function exportCSV(){
   if(!DATA) return;
