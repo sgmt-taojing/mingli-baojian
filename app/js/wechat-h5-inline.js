@@ -355,29 +355,12 @@ function wxAIReport(){
   });
 }
 
-// R93: 微信端 月度报告 入口（POST /api/ai/monthly-report）
+// R97: 微信端 月度报告 入口（POST /api/ai/monthly-report）
 // - 复用 #wxBaziDate / #wxBaziHour（沿用八字排盘的生辰输入，避免重复表单）
 // - 响应截断 800 字 + markdown 轻量排版 → 写入 #wxAIResult 区域
 // - 月运总评 + 吉位 + 忌方位 + 1 条行动建议
+// - R96 起 CSRF 白名单已含 /api/ai/monthly-report（GET 豁免），直接 fetch 即可
 const WX_MONTHLY_LIMIT = 800;
-function wxMonthlyApiBase(){
-  // 与 ReportEngine.DEFAULT_API 同协议：localhost/127.0.0.1 → 8920，否则走同源
-  var h=location.hostname;
-  if(h==='127.0.0.1'||h==='localhost') return 'http://127.0.0.1:8920';
-  return '';
-}
-// R93: CSRF token 缓存（避免每次点击都 GET 一次）
-var _wxMonthlyCsrfCache=null;
-var _wxMonthlyCsrfCacheAt=0;
-function wxMonthlyFetchCsrf(apiBase){
-  var now=Date.now();
-  if(_wxMonthlyCsrfCache&&(now-_wxMonthlyCsrfCacheAt)<10*60*1000){return Promise.resolve(_wxMonthlyCsrfCache);}
-  var csrfUrl=apiBase+'/api/csrf-token';
-  return fetch(csrfUrl,{method:'GET',credentials:'omit'})
-    .then(function(r){if(!r.ok) throw new Error('CSRF HTTP '+r.status);return r.json();})
-    .then(function(j){if(!j||!j.csrfToken) throw new Error('CSRF 颁发失败');_wxMonthlyCsrfCache=j.csrfToken;_wxMonthlyCsrfCacheAt=now;return j.csrfToken;})
-    .catch(function(){return null;});
-}
 function wxMonthlyMdLite(s){
   // 极简 markdown → HTML（行级 bold / * list / 单# 标题），并在 escHtml 后注入受控标签
   if(s==null) return '';
@@ -421,22 +404,16 @@ function wxMonthlyReport(){
   // 2) loading
   out.innerHTML='<div class="card-text" style="text-align:center;color:#999">⏳ 正在排定本月流月...</div>';
   if(btn){btn.setAttribute('aria-busy','true');}
-  // 3) 调后端（R93：需要 CSRF token，因为 /api/ai/monthly-report 不在 CSRF 白名单）
-  var apiBase=wxMonthlyApiBase();
-  var url=apiBase+'/api/ai/monthly-report';
-  wxMonthlyFetchCsrf(apiBase).then(function(csrfToken){
-    var hdr={'Content-Type':'application/json'};
-    if(csrfToken){hdr['x-csrf-token']=csrfToken;}
-    return fetch(url,{
-      method:'POST',
-      headers:hdr,
-      body:JSON.stringify({
-        year:year,month:month,day:day,hour:hour,
-        sex:'male',                 // 微信端默认不收集，性别不影响月度运势主线
-        targetYear:year,
-        focusModules:['career','wealth','love','health']
-      })
-    });
+  // 3) 调后端（R96 起 /api/ai/monthly-report 已在 CSRF 白名单，GET 豁免 → 直接 fetch）
+  fetch('/api/ai/monthly-report',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      year:year,month:month,day:day,hour:hour,
+      sex:'male',                 // 微信端默认不收集，性别不影响月度运势主线
+      targetYear:year,
+      focusModules:['career','wealth','love','health']
+    })
   }).then(function(r){
     if(!r.ok) throw new Error('HTTP '+r.status);
     return r.json();
