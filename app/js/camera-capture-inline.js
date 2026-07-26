@@ -177,9 +177,48 @@ async function snap() {
   const url = URL.createObjectURL(blob);
   showInStage(url);
 
+  // R63: 拍照后立刻触发设备↔KB联动（不等上传结果）
+  // 这样 AI 助手下次查询时自动加权相关模块
+  const mode = modeSel ? modeSel.value : 'face';
+  triggerKbBridge(mode, blob);
+
   // 上传分析
   await analyze(blob);
   await loadGallery();
+}
+
+/**
+ * R63: 拍照后触发 DeviceKbBridge.onCapture
+ * 根据拍照模式自动映射 KB 模块：
+ *   face  → zhongyi (中医面诊)
+ *   tongue → shexiang (舌象诊断)
+ *   eye   → mianxue (眼诊/面相)
+ *   ocr/ocr-tcm → classics (经典文献)
+ *   voice → mantra (咒语/诵经)
+ */
+function triggerKbBridge(mode, blob) {
+  const capMap = {
+    'face': 'face_capture',
+    'tongue': 'tongue_capture',
+    'eye': 'eye_capture',
+    'ocr': 'document_ocr',
+    'ocr-tcm': 'document_ocr'
+  };
+  const cap = capMap[mode] || 'face_capture';
+  const extra = { source: 'camera-capture.html', mode, blobSize: blob.size, ts: new Date().toISOString() };
+
+  // 优先用 DeviceKbBridge（如果加载了）
+  if (window.DeviceKbBridge && typeof window.DeviceKbBridge.onCapture === 'function') {
+    window.DeviceKbBridge.onCapture(cap, extra);
+  }
+  // 兑底：直接调 recordKbHit
+  const moduleMap = { face_capture: 'zhongyi', tongue_capture: 'shexiang', eye_capture: 'mianxue', document_ocr: 'classics' };
+  const module = moduleMap[cap] || 'zhongyi';
+  if (typeof window.recordKbHit === 'function') {
+    window.recordKbHit(module, 0.8, true);
+  }
+  // 顶顶 console.log 供调试
+  if (window.console && console.log) console.log(`[R63] 拍照联动KB: ${cap} → ${module}`);
 }
 
 function showInStage(url) {
