@@ -22,7 +22,7 @@
     faith: '信仰', classics: '经典', yijing: '易经', meihua: '梅花',
     liuyao: '六爻', liuren: '六壬', koujue: '口诀',
     mobile: '手机号', nihaisha: '倪师', shuhan: '舒晗',
-    zhongyi: '中医', acupuncture: '针灸', general: '综合'
+    acupuncture: '针灸', general: '综合'
   };
 
   // 各模块数据收集函数映射
