@@ -487,7 +487,7 @@ window._MODULE_REPORTS = {
     diagnose: function(data){
       const sym = (data && data.s0) || '感冒发热';
       const dur = (data && data.s1) || '三天内';
-      consttizhi = (data && data.s2) || '不确定';
+      const tizhi = (data && data.s2) || '不确定';
       const fangjiMap = {
         '感冒': { fang:'桂枝汤', yong:'解肌发表调和营卫', zhi:'头痛发热汗出恶风' },
         '腹痛': { fang:'理中汤', yong:'温中祛寒补气健脾', zhi:'腹满吐泻食欲不振' },

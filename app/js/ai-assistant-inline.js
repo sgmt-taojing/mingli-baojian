@@ -1013,6 +1013,22 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
     promptExtra = '\n\n【本地知识库参考材料（'+kbHit.source+'）】\n' + kbHit.snippet.substring(0, 1500);
   }
 
+  // R51：KB 命中分 < 0.4 时，调 module-reports 断网兜底诊断 → 让 AI 有真实数据可润色
+  if(kbHit.score < 0.4 && window._MODULE_REPORTS && window._MODULE_REPORTS[state.module]){
+    try {
+      const mr = window._MODULE_REPORTS[state.module];
+      const rep = mr.diagnose(state.data);
+      if(rep){
+        let fb = '\n\n【本地引擎诊断参考（'+mr.name+' KB 兜底）】\n' + (rep.summary||'');
+        if(rep.element) fb += '\n主导元素：' + rep.element;
+        if(rep.total) fb += '\n综合指数：' + rep.total + ' 分';
+        if(rep.nextSteps) fb += '\n建议：' + rep.nextSteps.slice(0,5).join('；');
+        if(rep.suggestions) fb += '\n布局建议：' + rep.suggestions.slice(0,3).join('；');
+        promptExtra += fb;
+      }
+    } catch(e){ console.warn('[R51 fallback]', e); }
+  }
+
   // ③ 调用后端 AI
   const prompt='用户选择了「'+mod.name+'」模块，通过对话收集了以下信息：'+collected.join('；')+'。请基于以上信息给出专业、丰富、详实的分析评估报告，报告要拿来即用，包含具体建议。'+promptExtra;
   // 把用户结构化数据（八字/姓名/数字/生辰...）作为 baziData 传给后端，让 AI 能基于真实数据回答而非通用模板
