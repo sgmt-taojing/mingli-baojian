@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=5, user-scalable=yes">
 <title>命理宝鉴 · 风水分析</title>
-<style>/* 全局动画 */
+<style>
+html{overflow-x:hidden;max-width:100vw}/* 全局动画 */svg{max-width:100%;height:auto}img{max-width:100%;height:auto}
 @keyframes pageEnter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes cardFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 @keyframes goldShimmer{0%{background-position:-200% center}100%{background-position:200% center}}
@@ -2529,14 +2530,14 @@ input, textarea, select {
 .ts-summary .ts-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:10px;font-size:11px}
 .ts-summary .ts-meta div{padding:6px;background:rgba(0,0,0,.15);border-radius:4px}
 .ts-summary .ts-meta b{color:var(--gold);font-size:10px;display:block;margin-bottom:2px;letter-spacing:1px}
-.ts-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:10px}
+.ts-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:10px;max-width:100%;min-width:0}
 @media(min-width:768px){.ts-grid{grid-template-columns:repeat(2,1fr)}}
-.ts-card{padding:14px;background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:8px}
+.ts-card{padding:14px;background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:8px;max-width:100%;min-width:0;box-sizing:border-box;overflow:hidden}
 .ts-card.danger{border-left:3px solid var(--red);background:rgba(192,57,43,.04)}
 .ts-card.safe{border-left:3px solid var(--green);background:rgba(39,174,96,.04)}
 .ts-card .ts-ch{font-size:13px;color:var(--gold);font-weight:600;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .ts-card .ts-ch .ts-idx{font-size:10px;padding:1px 8px;background:rgba(201,168,76,.2);border-radius:8px;color:var(--gold2)}
-.ts-card .ts-body{font-size:12px;line-height:1.7;opacity:.85}
+.ts-card .ts-body{font-size:12px;line-height:1.7;opacity:.85;word-wrap:break-word;overflow-wrap:break-word}
 .ts-card .ts-item{display:flex;gap:8px;align-items:center;padding:8px;background:rgba(201,168,76,.06);border-radius:6px;margin:6px 0;font-size:11px}
 .ts-card .ts-item .ico{font-size:18px}
 .ts-card .ts-item .text{flex:1}
@@ -2909,6 +2910,22 @@ input, textarea, select {
 .arc-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;justify-content:center}
 .btn-share,.btn-print{flex:1;min-width:140px}
 .arc-source{font-size:10px;text-align:center;opacity:.95;margin-top:14px;font-style:italic}
+
+/* ===== P3-17.4 320px 响应式溢出修复·太岁卡片 ===== */
+@media (max-width: 480px){
+  .ts-card{width:100%;padding:10px}
+  .ts-card .ts-item{flex-direction:column;align-items:flex-start;gap:4px;padding:6px}
+  .ts-card .ts-ch{font-size:12px;flex-wrap:wrap}
+  .ts-card .ts-ch .ts-idx{flex-shrink:0}
+  /* 12 宫网格及 grid 容器在 320px 下保证不溢出 */
+  .pal12{padding:12px;margin:14px 0}
+  .pal12-grid{grid-template-columns:repeat(2,1fr);gap:6px}
+  .pal12-cell{padding:8px 6px;min-width:0;word-break:break-word;overflow-wrap:break-word}
+  .pal12-cell .icon{font-size:18px}
+  .pal12-cell b{font-size:11px}
+  .pal12-cell .desc{font-size:9px;line-height:1.4}
+  .pal12-cell .star{font-size:9px}
+}
 
 </style>
 

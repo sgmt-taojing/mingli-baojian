@@ -7,6 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/a11y-fix.css">
   <style>
+html{overflow-x:hidden;max-width:100vw}svg{max-width:100%;height:auto}img{max-width:100%;height:auto}
         :root{
       --ink:#080808;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;
       --paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;
@@ -256,7 +257,7 @@
     /* Chain */
     .chain-container{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:18px;overflow-x:auto;box-shadow:var(--shadow)}
     .chain-title{color:var(--title);font-family:'Ma Shan Zheng',cursive;font-size:20px;text-align:center;margin-bottom:14px;letter-spacing:3px}
-    .chain-row{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;min-width:800px}
+    .chain-row{display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap;width:100%;max-width:100%} .chain-row-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%}
     .chain-node{border-radius:10px;padding:12px 8px;text-align:center;min-width:90px;cursor:pointer;transition:.3s;border:2px solid transparent}
     .chain-node:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 6px 16px rgba(139,69,19,.1);z-index:2}
     .chain-node.selected{border-color:var(--accent)!important;box-shadow:0 0 20px rgba(201,168,76,.2);z-index:3}
@@ -358,10 +359,24 @@
     .badge-ai{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;background:linear-gradient(135deg,var(--cyan2),var(--violet));color:var(--paper);border-radius:20px;font-size:13px;font-weight:700;margin-left:12px;vertical-align:middle;box-shadow:0 2px 8px rgba(102,126,234,.3)}
     .ant-badge{position:absolute;top:10px;right:10px;font-size:10px;padding:3px 10px;background:linear-gradient(135deg,var(--cyan2),var(--violet));color:var(--paper);border-radius:10px;font-weight:600}
     @media(max-width:768px){
-      .chain-row{justify-content:flex-start;min-width:800px}
+      .chain-container{overflow-x:auto;-webkit-overflow-scrolling:touch}
+      .chain-row{justify-content:flex-start;min-width:600px}
       .chain-node{min-width:72px;padding:8px 4px}
       .chain-node .cn-icon{font-size:18px}
       .chain-node .cn-name{font-size:11px}
+    }
+    /* ===== P3-17.4 320px 响应式溢出修复·chain 节点 ===== */
+    @media(max-width:360px){
+      .chain-row{min-width:0;flex-wrap:wrap;justify-content:center}
+      .chain-node{min-width:0;flex:1 1 auto;padding:8px 4px}
+      .chain-node .cn-name{font-size:11px}
+      .chain-node .cn-icon{font-size:20px}
+    }
+    /* detail-grid 在 480px 下降低 minmax 以避免溢出 */
+    @media(max-width:480px){
+      .detail-grid{grid-template-columns:1fr;gap:12px}
+      .detail-card{padding:14px;min-width:0;word-break:break-word;overflow-wrap:break-word}
+      .detail-card h4{font-size:18px}
     }
   
 /* AI分析动画 */
