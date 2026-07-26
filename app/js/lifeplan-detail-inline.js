@@ -70,6 +70,35 @@ function generate(){
 
       render({age,sex,residence,focus,extra,stage,stageTemplate:stage.template,domainScores,next5,fiveYearAdvice});
       btn.disabled=false; btn.textContent='🔄 重新生成';
+
+      // R86-R88: 追加「AI 深度分析」按钮
+      var aiBtn=document.createElement('button');
+      aiBtn.className='btn ai-deep-btn';
+      aiBtn.style.cssText='margin-top:12px;background:linear-gradient(135deg,#9333ea,#c9a84c);color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;width:100%';
+      aiBtn.textContent='🤖 AI 深度分析（KB+AI 润色）';
+      aiBtn.onclick=function(){
+        var container=document.getElementById('lpAIReport')||document.querySelector('main');
+        if(!container){container=document.createElement('div');container.id='lpAIReport';document.querySelector('main').appendChild(container);}
+        container.innerHTML='<div style="padding:20px;text-align:center;color:#999">⏳ 正在调用 KB+AI 引擎生成深度分析报告...</div>';
+        if(typeof ReportEngine!=='undefined'){
+          ReportEngine.generate({
+            module:'lifeplan',
+            data:{age:age,gender:sex,livePlace:residence,concerns:(focus+' '+extra).substring(0,200),s1:sex},
+            adapter:'inline',
+            container:container
+          }).then(function(r){
+            console.log('[lifeplan] ReportEngine done',r.source);
+          }).catch(function(e){
+            container.innerHTML='<div style="padding:20px;color:#f59e0b">⚠️ AI 分析失败：'+e.message+'</div>';
+          });
+        } else {
+          container.innerHTML='<div style="padding:20px;color:#999">ReportEngine 未加载，请刷新重试</div>';
+        }
+      };
+      var existingBtn=document.querySelector('.ai-deep-btn');
+      if(existingBtn)existingBtn.remove();
+      var genBtn=document.getElementById('genBtn');
+      if(genBtn&&genBtn.parentNode)genBtn.parentNode.appendChild(aiBtn);
     }catch(e){
       alert('生成失败：'+e.message);
       btn.disabled=false; btn.textContent='✨ 生成蓝图';

@@ -182,16 +182,24 @@
         var loadingPanel = ReportAdapters.drawer(document.body, '⏳ 正在生成 ' + (MODULE_NAMES[module] || module) + ' 分析报告，请稍候...');
       }
 
-      var result = await ReportEngine.generateText({
+      var result = await ReportEngine.generate({
         module: module,
         data: data,
-        apiBase: API
+        apiBase: API,
+        adapter: 'drawer',
+        container: document.body,
+        hooks: {
+          onReportStart: function () {
+            // loading handled by drawText
+          },
+          onReportEnd: function (text, meta) {
+            // done
+          }
+        }
       });
 
-      // 移除 loading，显示结果
-      if (loadingPanel && loadingPanel.parentNode) {
-        loadingPanel.parentNode.removeChild(loadingPanel);
-      }
+      // hubReport uses ReportEngine.generate() which renders directly
+      // loading panel is handled inside generate()
 
       if (typeof ReportAdapters !== 'undefined' && ReportAdapters.drawer) {
         ReportAdapters.drawer(document.body, result.text, result.meta);

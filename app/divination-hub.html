@@ -4396,6 +4396,22 @@ function bindBazi() {
 <script src="../knowledge/faith-guide.js" defer></script>
 <script src="../knowledge/incantation-database.js" defer></script>
 <script src="../knowledge/psychology-wisdom.js" defer></script>
+<!-- AI 分析浮动按钮 + 引擎已就绪 -->
+<div id="ai-analyze-fab" style="position:fixed;right:14px;bottom:80px;z-index:998;display:flex;flex-direction:column;gap:8px;background:rgba(20,16,30,.92);backdrop-filter:blur(8px);border:1px solid rgba(201,168,76,.3);border-radius:18px;padding:10px 12px;box-shadow:0 4px 18px rgba(0,0,0,.4)">
+  <div style="font-size:10px;color:var(--gold);letter-spacing:1px;margin-bottom:2px">🤖 AI 分析</div>
+  <select id="ai-mod-sel" style="background:rgba(255,255,255,.06);color:inherit;border:1px solid rgba(201,168,76,.2);border-radius:8px;padding:5px 8px;font-size:12px;min-width:120px">
+    <option value="bazi">🌟 八字命盘</option>
+    <option value="qimen">🧭 奇门遁甲</option>
+    <option value="fengshui">🏠 风水堪舆</option>
+    <option value="music">🎵 五行音疗</option>
+    <option value="lifeplan">🗺️ 人生规划</option>
+    <option value="lifeindex">📊 命理指数</option>
+    <option value="zhongyi">🌿 中医诊断</option>
+    <option value="tcm">💊 中医体质</option>
+    <option value="general">💬 综合</option>
+  </select>
+  <button id="ai-analyze-go" onclick="hubGenerateReport(document.getElementById('ai-mod-sel').value)" style="background:linear-gradient(135deg,#c9a84c,#a17e30);color:#1a1320;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer">✨ 生成报告</button>
+</div>
 <script src="js/divination-hub-screenshot.js" defer></script>
 <script src="js/report-engine.js" defer></script>
 <script src="js/report-render-adapters.js" defer></script>

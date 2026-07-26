@@ -334,6 +334,27 @@ function wxExchange(ruleId) {
   }
 }
 
+// R86-R88: 微信端 AI 报告入口
+function wxAIReport(){
+  var mod=document.getElementById('wxModSel').value||'general';
+  var out=document.getElementById('wxAIResult');
+  if(!out){return;}
+  out.innerHTML='<div class="card-text" style="text-align:center;color:#999">⏳ 正在生成报告...</div>';
+  if(typeof ReportEngine==='undefined'){
+    out.innerHTML='<div class="card-text" style="color:#f59e0b">⚠️ 引擎未加载，请刷新页面</div>';
+    return;
+  }
+  var data={source:'wechat',ts:Date.now()};
+  try{var bd=document.getElementById('wxBirthday');if(bd)data.birthday=bd.value;}catch(e){}
+  try{var sx=document.getElementById('wxSex');if(sx)data.sex=sx.value;}catch(e){}
+  try{var hr=document.getElementById('wxHour');if(hr)data.hour=hr.value;}catch(e){}
+  ReportEngine.generate({module:mod,data:data,adapter:'wechat',container:out}).then(function(r){
+    console.log('[wechat] ReportEngine',r.source);
+  }).catch(function(e){
+    out.innerHTML='<div class="card-text" style="color:#f59e0b">⚠️ 生成失败：'+e.message+'</div>';
+  });
+}
+
 // 初始化
 loadDailyFortune();
 loadJiri();
