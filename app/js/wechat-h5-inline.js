@@ -355,6 +355,151 @@ function wxAIReport(){
   });
 }
 
+// R93: 微信端 月度报告 入口（POST /api/ai/monthly-report）
+// - 复用 #wxBaziDate / #wxBaziHour（沿用八字排盘的生辰输入，避免重复表单）
+// - 响应截断 800 字 + markdown 轻量排版 → 写入 #wxAIResult 区域
+// - 月运总评 + 吉位 + 忌方位 + 1 条行动建议
+const WX_MONTHLY_LIMIT = 800;
+function wxMonthlyApiBase(){
+  // 与 ReportEngine.DEFAULT_API 同协议：localhost/127.0.0.1 → 8920，否则走同源
+  var h=location.hostname;
+  if(h==='127.0.0.1'||h==='localhost') return 'http://127.0.0.1:8920';
+  return '';
+}
+// R93: CSRF token 缓存（避免每次点击都 GET 一次）
+var _wxMonthlyCsrfCache=null;
+var _wxMonthlyCsrfCacheAt=0;
+function wxMonthlyFetchCsrf(apiBase){
+  var now=Date.now();
+  if(_wxMonthlyCsrfCache&&(now-_wxMonthlyCsrfCacheAt)<10*60*1000){return Promise.resolve(_wxMonthlyCsrfCache);}
+  var csrfUrl=apiBase+'/api/csrf-token';
+  return fetch(csrfUrl,{method:'GET',credentials:'omit'})
+    .then(function(r){if(!r.ok) throw new Error('CSRF HTTP '+r.status);return r.json();})
+    .then(function(j){if(!j||!j.csrfToken) throw new Error('CSRF 颁发失败');_wxMonthlyCsrfCache=j.csrfToken;_wxMonthlyCsrfCacheAt=now;return j.csrfToken;})
+    .catch(function(){return null;});
+}
+function wxMonthlyMdLite(s){
+  // 极简 markdown → HTML（行级 bold / * list / 单# 标题），并在 escHtml 后注入受控标签
+  if(s==null) return '';
+  var esc=String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+  // 标题（只识别 ## 与 #）
+  esc=esc.replace(/^###\s?(.+)$/gm,'<b style="color:var(--gold);font-size:13px">$1</b>')
+         .replace(/^##\s?(.+)$/gm,'<b style="color:var(--gold);font-size:14px">$1</b>')
+         .replace(/^#\s?(.+)$/gm,'<b style="color:var(--gold);font-size:15px">$1</b>');
+  // bold **x**
+  esc=esc.replace(/\*\*([^*]+)\*\*/g,'<b style="color:var(--gold)">$1</b>');
+  // list - / * 起头
+  esc=esc.replace(/^[ \t]*[-*]\s+(.+)$/gm,'<div style="padding-left:10px">• $1</div>');
+  // 换行 → <br>；双重换行 → 段落间隔
+  esc=esc.replace(/\n{2,}/g,'<br>').replace(/\n/g,'<br>');
+  return esc;
+}
+function wxMonthlyReport(){
+  var out=document.getElementById('wxAIResult');
+  var btn=document.querySelector('.wx-monthly-btn');
+  if(!out){return;}
+  // 1) 复用 #wxBaziDate 与 #wxBaziHour
+  var dateEl=document.getElementById('wxBaziDate');
+  var hourEl=document.getElementById('wxBaziHour');
+  var dateStr=dateEl&&dateEl.value;
+  if(!dateStr){
+    out.innerHTML='<div class="card-text" style="color:#f59e0b">⚠️ 请先在上方『八字排盘』输入出生日期</div>';
+    if(dateEl&&typeof dateEl.focus==='function'){dateEl.focus();}
+    return;
+  }
+  var parts=dateStr.split('-');
+  var year=parseInt(parts[0],10);
+  var month=parseInt(parts[1],10);
+  var day=parseInt(parts[2],10);
+  var hour=hourEl?parseInt(hourEl.value,10):12;
+  if(isNaN(hour)) hour=12;
+  // 2) loading
+  out.innerHTML='<div class="card-text" style="text-align:center;color:#999">⏳ 正在排定本月流月...</div>';
+  if(btn){btn.setAttribute('aria-busy','true');}
+  // 3) 调后端（R93：需要 CSRF token，因为 /api/ai/monthly-report 不在 CSRF 白名单）
+  var apiBase=wxMonthlyApiBase();
+  var url=apiBase+'/api/ai/monthly-report';
+  wxMonthlyFetchCsrf(apiBase).then(function(csrfToken){
+    var hdr={'Content-Type':'application/json'};
+    if(csrfToken){hdr['x-csrf-token']=csrfToken;}
+    return fetch(url,{
+      method:'POST',
+      headers:hdr,
+      body:JSON.stringify({
+        year:year,month:month,day:day,hour:hour,
+        sex:'male',                 // 微信端默认不收集，性别不影响月度运势主线
+        targetYear:year,
+        focusModules:['career','wealth','love','health']
+      })
+    });
+  }).then(function(r){
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return r.json();
+  }).then(function(j){
+    if(!j||j.code!==0){
+      var msg=(j&&(j.message||j.msg))||'返回异常';
+      throw new Error(msg);
+    }
+    var d=j.data||{};
+    var cur=d.currentMonth||{};
+    var nxt=d.nextMonth||{};
+    var yr=Array.isArray(d.yearOverview)?d.yearOverview:[];
+    var kbHits=typeof d.kbHits==='number'?d.kbHits:0;
+    // 4) 拼装展示文本（月运总评 + 吉位 + 忌方位 + 1 条行动建议）
+    var WX_ELE_GOOD_DIR={'木':'东/东南','火':'南','土':'中央/西南','金':'西/西北','水':'北'};
+    var WX_ELE_BAD_DIR ={'木':'金位（西）避免','火':'水位（北）避免','土':'木位（东）避免','金':'火位（南）避免','水':'土位（中央）避免'};
+    // 当前月主五行 = currentMonth.element（API 已给）
+    var curEle=cur.element||'';
+    // 行动建议优先级：career → wealth → love → health（挑最高星）
+    var candScores=(cur.scores||{});
+    var dimOrder=['career','wealth','love','health'];
+    var dimName={career:'事业',wealth:'财运',love:'感情',health:'健康'};
+    var bestDim='career',bestStar=-1;
+    dimOrder.forEach(function(k){
+      var s=parseInt(candScores[k],10);
+      if(!isNaN(s)&&s>bestStar){bestStar=s;bestDim=k;}
+    });
+    var advice=(cur.advice||'').toString();
+    var block=
+      '【'+year+'年 '+cur.month+'月 · '+cur.ganZhi+'】\n'+
+      '当前月令五行：'+curEle+'（关系：'+cur.relation+'）\n\n'+
+      '## 月运总评\n'+
+      advice+'\n\n'+
+      '## 四维评分\n'+
+      '• 事业 '+(candScores.career||'-')+'星\n'+
+      '• 财运 '+(candScores.wealth||'-')+'星\n'+
+      '• 感情 '+(candScores.love||'-')+'星\n'+
+      '• 健康 '+(candScores.health||'-')+'星\n\n'+
+      '## 吉位\n'+(WX_ELE_GOOD_DIR[curEle]||'—')+'\n\n'+
+      '## 忌方位\n'+(WX_ELE_BAD_DIR[curEle]||'—')+'\n\n'+
+      '## 行动建议\n'+
+      '本月以「'+dimName[bestDim]+'」为优先（'+bestStar+' 星），顺势而为主动推进，遇事首选 '+(WX_ELE_GOOD_DIR[curEle]||'舒适方位')+'，回避 '+(WX_ELE_BAD_DIR[curEle]||'相克方位')+'。\n\n'+
+      '---\n下月预告：'+nxt.month+'月 '+nxt.ganZhi+'（'+nxt.relation+'），事业 '+(nxt.scores&&nxt.scores.career||'-')+'星 / 财运 '+(nxt.scores&&nxt.scores.wealth||'-')+'星\n'+
+      '全年 12 月概况：'+yr.length+' 个月已排定 · 本次 KB 命中 '+kbHits+' 条';
+    // 5) 截断到 800 字（按字符截，含中英文）
+    if(block.length>WX_MONTHLY_LIMIT){
+      block=block.substring(0,WX_MONTHLY_LIMIT)+'\n\n…（已截断，详情见 PC 端 · 仅供娱乐参考）';
+    }
+    // 6) 渲染到 #wxAIResult（320px 响应式：max-width:100%,word-break:break-word）
+    var html=
+      '<div class="wx-monthly-card" style="display:block;box-sizing:border-box;width:100%;max-width:320px;margin:8px 0;padding:12px;background:var(--ink2);color:var(--paper);border:1px solid rgba(201,168,76,0.25);border-radius:8px;font-size:13px;line-height:1.7;font-family:Noto Serif SC,serif;white-space:normal;word-break:break-word">'+
+        '<div style="color:var(--gold);font-size:12px;letter-spacing:1px;margin-bottom:6px">📅 月度报告 · '+year+'/'+month+'</div>'+
+        wxMonthlyMdLite(block)+
+        '<div style="margin-top:8px;font-size:11px;color:var(--paper3)">⚠️ 本报告基于出生日期推算，仅供国学文化学习与娱乐参考</div>'+
+      '</div>';
+    out.innerHTML=html;
+    if(btn){btn.removeAttribute('aria-busy');}
+  }).catch(function(e){
+    out.innerHTML='<div class="card-text" style="color:#f59e0b">⚠️ 月度报告生成失败：'+(e&&e.message||'网络异常')+'</div>';
+    if(btn){btn.removeAttribute('aria-busy');}
+  });
+}
+
 // 初始化
 loadDailyFortune();
 loadJiri();
