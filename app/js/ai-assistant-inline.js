@@ -1298,6 +1298,14 @@ async function callAI(q){
   t.innerHTML='<div class="typing"><i></i><i></i><i></i></div>';
   chat.appendChild(t);chat.scrollTop=chat.scrollHeight;
   try{
+    // R62：离线时直接走 KB 兜底
+    if (typeof OfflineBanner !== 'undefined' && !OfflineBanner.isOnline()) {
+      try{ t.remove(); }catch(_){}
+      addAI('📴 当前处于离线模式，AI 调用已暂停。\n\n请参考上方 KB 兜底回答，或联网后重试。');
+      if (typeof recordKbHit === 'function') recordKbHit(state.module || 'freechat', 0, false);
+      hist.push({role:'assistant', content:'离线模式'});
+      return;
+    }
     const r=await fetch(API+'/api/ai/public-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist.slice(-10)})});
     const d=await r.json();
     const msg=d.choices&&d.choices[0]&&d.choices[0].message;
