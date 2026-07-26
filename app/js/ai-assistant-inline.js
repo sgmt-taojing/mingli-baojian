@@ -3381,3 +3381,20 @@ window.showFbStats = async function() {
 
   chat.innerHTML = html;
 };
+
+/** R63：快捷提问按钮 */
+window.quickAsk = function(q){
+  box.value = q;
+  send();
+};
+window.showQuickActions = function(show){
+  const el = document.getElementById('quickActions');
+  if (el) el.style.display = show ? 'flex' : 'none';
+};
+// 进入模块时自动隐藏快捷提问
+const _origProcessAnswer = processAnswer;
+processAnswer = function(q){
+  const el = document.getElementById('quickActions');
+  if (el) el.style.display = 'none';
+  return _origProcessAnswer(q);
+};
