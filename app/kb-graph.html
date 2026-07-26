@@ -73,7 +73,11 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
   <div class="toolbar">
     <select id="levelFilter"><option value="all">全部等级</option><option value="premium">premium</option><option value="registered">registered</option><option value="professional">professional</option><option value="admin">admin</option></select>
     <select id="recModFilter"><option value="">📊 选择模块智能推荐</option></select>
-    <input id="searchInput" type="search" placeholder="🔍 搜索节点 (name/id)" aria-label="搜索知识图谱节点" style="background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--paper);padding:5px 10px;border-radius:6px;font:inherit;font-size:12px;width:160px">
+    <div style="position:relative;display:inline-block">
+    <input id="searchInput" type="search" placeholder="🔍 搜索节点 (name/id/拼音)" aria-label="搜索知识图谱节点" style="background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--paper);padding:5px 10px;border-radius:6px;font:inherit;font-size:12px;width:160px">
+    <div id="searchStats" style="display:none;font-size:11px;color:var(--paper);opacity:.6;margin-top:4px;padding-left:2px"></div>
+    <div id="searchHistory" style="display:none;position:absolute;top:100%;left:0;right:0;background:rgba(20,18,15,.98);border:1px solid var(--line);border-radius:6px;margin-top:2px;max-height:200px;overflow-y:auto;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,.5)"></div>
+  </div>
     <button onclick="highlightHubs()">🔥 热门节点</button>
     <button onclick="highlightRecs()">🧠 推荐关联</button>
     <button onclick="clusterByLevel()" title="按等级折叠为 5 个 cluster">📦 折叠等级</button>
@@ -83,7 +87,7 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
     <button onclick="fitGraph()">🔍 适应屏幕</button>
     <span class="sep"></span>
     <span class="stat" id="stat">加载中…</span>
-    <button onclick="document.getElementById('searchInput').value='';searchGraph();" title="清除搜索" style="font-size:11px">✖</button>
+    <button onclick="document.getElementById('searchInput').value='';searchGraph();clearCurrentSearchHistory();" title="清除搜索" style="font-size:11px">✖</button>
   </div>
   <div id="graph"></div>
   <div class="legend" id="legend"></div>
@@ -227,22 +231,134 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
   }
   function fitGraph(){ if(network) network.fit({animation:{duration:500}}); }
 
+  // R48 拼音首字母映射表（覆盖常用模块关键词）
+  var PINYIN_MAP = {
+    '八字':'bz','bazi':'bz','六壬':'lr','liuren':'lr','紫微':'zw','ziwei':'zw',
+    '奇门':'qm','qimen':'qm','六爻':'ly','liuyao':'ly','梅花':'mh','meihua':'mh',
+    '风水':'fs','fengshui':'fs','中医':'zy','zhongyi':'zy','tcm':'zy','五行':'wx','wuxing':'wx',
+    '命理':'ml','mingli':'ml','占卜':'zb','占卜':'zb','择日':'zr','zeri':'zr',
+    '黄历':'hl','huangli':'hl','太岁':'ts','taisui':'ts','面相':'mx','mianxiang':'mx',
+    '手相':'sx','shouxiang':'sx','姓名':'xm','xingming':'xm','运势':'ys','财运':'cy',
+    '事业':'sy','感情':'gq','婚姻':'hy','学业':'xy','健康':'jk','胎元':'ty',
+    '流年':'ln','大运':'dy','神煞':'ss','十神':'ss','格局':'gj','用神':'ys',
+    '纳音':'ny','节气':'jq','时辰':'sc','生肖':'sx','星座':'xz','塔罗':'tl',
+    '生命':'sm','数字':'sz','姓名学':'xmx','起名':'qm','改名':'gm',
+    '周易':'zy','易经':'yj','yijing':'yj','卦象':'gx','爻辞':'yc','象数':'xs',
+    '飞星':'fx','飞星':'fx','星盘':'xp','宫位':'gw','星曜':'xy','四化':'sh',
+    '三式':'ss','太乙':'ty','奇门':'qm','六壬':'lr','遁甲':'dj',
+    '梅花易数':'mhys','金锁玉关':'jsyg','玄空':'xk','八宅':'bz',
+    '杨公':'yg','赖公':'lg','天星':'tx','罗盘':'lp','龙穴':'lx','砂水':'ss',
+    '藏历':'zl','傣历':'dl','回历':'hl','彝历':'yl','苗历':'ml',
+    '时家奇门':'sjqm','日家奇门':'rjqm','月家奇门':'yjqm','年家奇门':'njqm',
+    '拆补法':'cbf','置闰法':'zrf','超神':'cs','接气':'jq','遁甲':'dj',
+    '鬼门':'gm','开门':'km','休门':'xm','生门':'sm','伤门':'sm','杜门':'dm','景门':'jm','死门':'sm','惊门':'jm',
+    '青龙':'ql','白虎':'bh','朱雀':'zq','玄武':'xw','勾陈':'gc','螣蛇':'ts',
+    '天干':'tg','地支':'dz','六十甲子':'lsjz','旬空':'xk','空亡':'kw',
+    '命盘':'mp','盘面':'pm','宫位':'gw','十二宫':'seg','命宫':'mg','身宫':'sg',
+    '福财':'fc','官禄':'gl','迁移':'qy','疾厄':'je','父母':'fm','兄弟':'xd',
+    '夫妻':'fq','子女':'zn','奴仆':'np','田宅':'tz','福德':'fd','官禄':'gl',
+    '预测':'yc','推断':'td','分析':'fx','解读':'jd','咨询':'zx','服务':'fw',
+    '宝鉴':'bj','知识':'zs','图谱':'tp','模块':'mk','推荐':'tj','关联':'gl'
+  };
+  // 反向映射：pinyin -> 中文关键词
+  var PINYIN_REVERSE = {};
+  Object.keys(PINYIN_MAP).forEach(function(k){
+    var v = PINYIN_MAP[k];
+    if(!PINYIN_REVERSE[v]) PINYIN_REVERSE[v] = [];
+    PINYIN_REVERSE[v].push(k);
+  });
+
+  // R48 搜索历史管理
+  var SEARCH_HISTORY_KEY = 'kb_graph_search_history';
+  function getSearchHistory(){
+    try {
+      var s = localStorage.getItem(SEARCH_HISTORY_KEY);
+      return s ? JSON.parse(s) : [];
+    } catch(e){ return []; }
+  }
+  function addSearchHistory(q){
+    if(!q || q.length < 2) return;
+    var hist = getSearchHistory();
+    // 移除已存在的相同项
+    hist = hist.filter(function(h){ return h !== q; });
+    // 添加到开头
+    hist.unshift(q);
+    // 保留最近 10 条
+    hist = hist.slice(0, 10);
+    try { localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(hist)); } catch(e){}
+  }
+  function clearCurrentSearchHistory(){
+    var inp = document.getElementById('searchInput');
+    var q = (inp && inp.value || '').trim().toLowerCase();
+    if(!q) return;
+    var hist = getSearchHistory();
+    hist = hist.filter(function(h){ return h !== q; });
+    try { localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(hist)); } catch(e){}
+    renderSearchHistory();
+  }
+
+  function renderSearchHistory(){
+    var el = document.getElementById('searchHistory');
+    if(!el) return;
+    var hist = getSearchHistory();
+    if(!hist.length){
+      el.style.display = 'none';
+      return;
+    }
+    var html = '<div style="padding:6px 10px;font-size:11px;color:var(--paper);opacity:.5;border-bottom:1px solid var(--line)">🕐 搜索历史</div>';
+    hist.forEach(function(h){
+      html += '<div class="search-hist-item" data-q="' + h.replace(/"/g,'&quot;') + '" style="padding:8px 12px;cursor:pointer;font-size:12px;border-bottom:1px solid rgba(201,168,76,.1);transition:background .15s">' + h + '</div>';
+    });
+    html += '<div id="clearSearchHist" style="padding:8px 12px;cursor:pointer;font-size:11px;color:var(--gold);opacity:.7;text-align:center">清空历史</div>';
+    el.innerHTML = html;
+    el.style.display = 'block';
+  }
+
+  // R48 拼音首字母模糊匹配函数
+  function matchPinyin(q, node){
+    var label = (node.label || '').toLowerCase();
+    var id = (node.id || '').toLowerCase();
+    // 直接检查拼音映射表
+    for(var key in PINYIN_MAP){
+      if(key.toLowerCase() === q || PINYIN_MAP[key] === q){
+        // 检查节点是否包含该中文关键词或英文id
+        if(label.indexOf(key.toLowerCase()) >= 0 || id.indexOf(key.toLowerCase()) >= 0 || id.indexOf(PINYIN_MAP[key]) >= 0){
+          return true;
+        }
+      }
+    }
+    // 检查拼音首字母是否匹配节点label首字母
+    if(q.length <= 3 && /^[a-z]+$/.test(q)){
+      // 尝试从拼音反向映射查找
+      var keywords = PINYIN_REVERSE[q] || [];
+      for(var i = 0; i < keywords.length; i++){
+        var kw = keywords[i].toLowerCase();
+        if(label.indexOf(kw) >= 0 || id.indexOf(kw) >= 0) return true;
+      }
+    }
+    return false;
+  }
+
   // R38 图谱搜索：客户端筛选 + 高亮 + focus
   var _searchState = {q:'', ids:[]};
   function searchGraph(){
     var q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
     _searchState.q = q;
+    var statsEl = document.getElementById('searchStats');
     if(!q){
       // 恢复全画布
       draw(ALL_NODES.slice(), ALL_EDGES.slice());
       document.getElementById('stat').textContent = '全画布 · ' + ALL_NODES.length + ' 节点';
+      if(statsEl){ statsEl.style.display = 'none'; }
       return;
     }
-    // 模糊匹配：id / label / level
+    // 增强模糊匹配：id / label / level / 拼音首字母
     var matched = ALL_NODES.filter(function(n){
-      return n.id.toLowerCase().indexOf(q) >= 0
-          || (n.label||'').toLowerCase().indexOf(q) >= 0
-          || (n.group||'').toLowerCase().indexOf(q) >= 0;
+      var idMatch = n.id.toLowerCase().indexOf(q) >= 0;
+      var labelMatch = (n.label||'').toLowerCase().indexOf(q) >= 0;
+      var groupMatch = (n.group||'').toLowerCase().indexOf(q) >= 0;
+      var pinyinMatch = matchPinyin(q, n);
+      return idMatch || labelMatch || groupMatch || pinyinMatch;
     });
     var matchedIds = new Set(matched.map(function(n){return n.id;}));
     _searchState.ids = Array.from(matchedIds);
@@ -266,20 +382,38 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
       }, 100);
     }
     document.getElementById('stat').innerHTML = '搜索 <b>' + q + '</b> · 命中 <b>' + matched.length + '</b> / ' + ALL_NODES.length;
+    // R48 搜索结果统计显示
+    if(statsEl){
+      if(matched.length > 0){
+        statsEl.innerHTML = '命中 <b style="color:var(--gold)">' + matched.length + '</b> 个节点 / 共 ' + ALL_NODES.length + ' 个';
+        // 有结果时加入搜索历史
+        addSearchHistory(q);
+      } else {
+        statsEl.innerHTML = '未命中 — 试试热门节点 🔥';
+      }
+      statsEl.style.display = 'block';
+    }
   }
   // 暴露到 window供 button onkey 触发
   window.searchGraph = searchGraph;
-  // 随输入实时搜索（debounce 150ms）
+  // 随输入实时搜索（debounce 150ms）+ R48 搜索历史下拉
   var _searchTimer = null;
   document.addEventListener('DOMContentLoaded', function(){
     var inp = document.getElementById('searchInput');
+    var histEl = document.getElementById('searchHistory');
     if(!inp) return;
     inp.addEventListener('input', function(){
       clearTimeout(_searchTimer);
       _searchTimer = setTimeout(searchGraph, 150);
+      // 隐藏历史下拉
+      if(histEl) histEl.style.display = 'none';
     });
     inp.addEventListener('keydown', function(e){
-      if(e.key === 'Escape'){ inp.value=''; searchGraph(); }
+      if(e.key === 'Escape'){
+        inp.value='';
+        searchGraph();
+        if(histEl) histEl.style.display = 'none';
+      }
       else if(e.key === 'Enter' && _searchState.ids.length){
         // Enter 跳到下一个匹配
         var cur = _searchState._idx || 0;
@@ -288,6 +422,37 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
         if(network) network.focus(_searchState.ids[cur], {scale:1.4, animation:{duration:300}});
       }
     });
+    // R48 点击搜索框显示历史
+    inp.addEventListener('focus', function(){
+      if(!inp.value.trim()){
+        renderSearchHistory();
+      }
+    });
+    // 点击其他地方隐藏历史
+    document.addEventListener('click', function(e){
+      if(histEl && !inp.contains(e.target) && !histEl.contains(e.target)){
+        histEl.style.display = 'none';
+      }
+    });
+    // R48 历史项点击
+    if(histEl){
+      histEl.addEventListener('click', function(e){
+        var item = e.target.closest('.search-hist-item');
+        if(item){
+          var q = item.getAttribute('data-q');
+          if(q){
+            inp.value = q;
+            histEl.style.display = 'none';
+            searchGraph();
+          }
+        }
+        var clearBtn = e.target.closest('#clearSearchHist');
+        if(clearBtn){
+          try { localStorage.removeItem(SEARCH_HISTORY_KEY); } catch(e){}
+          histEl.style.display = 'none';
+        }
+      });
+    }
   });
 
   window.showModal = function(n){
