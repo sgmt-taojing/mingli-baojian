@@ -131,6 +131,9 @@ h1{font-size:1.6rem;color:var(--gold);text-align:center;margin:20px 0 4px}
     <div id="tab-detail" style="display:none">
       <div id="modalDetail"><p style="color:#888">加载中…</p></div>
     </div>
+    <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--gold-dim);text-align:right;font-size:.85rem">
+      <a id="modalKbGraphLink" href="#" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;border-bottom:1px dashed var(--gold-dim)">🕸️ 在图谱中查看</a>
+    </div>
   </div>
 </dialog>
 
@@ -272,6 +275,8 @@ load();
 function showDetail(mod){
   const m=DATA.modules.find(x=>x.module===mod);
   if(!m) return;
+  // R95-b: 复用 R94 hash 机制，跳 KB 知识图谱并自动聚焦+高亮+弹 modal
+  document.getElementById('modalKbGraphLink').href=`kb-graph.html#module=${encodeURIComponent(mod)}`;
   document.getElementById('modalTitle').textContent=`${m.module} · ${m.grade}`;
   document.getElementById('modalStats').innerHTML=`
     <span>📊 <b>${fmt(m.cnt)}</b> 条目</span>
