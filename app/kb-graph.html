@@ -67,6 +67,8 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
     <input id="searchInput" type="search" placeholder="🔍 搜索节点 (name/id)" aria-label="搜索知识图谱节点" style="background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--paper);padding:5px 10px;border-radius:6px;font:inherit;font-size:12px;width:160px">
     <button onclick="highlightHubs()">🔥 热门节点</button>
     <button onclick="highlightRecs()">🧠 推荐关联</button>
+    <button onclick="clusterByLevel()" title="按等级折叠为 5 个 cluster">📦 折叠等级</button>
+    <button onclick="unclusterAll()" title="展开所有 cluster">📂 展开全部</button>
     <button onclick="resetView()">🔄 重置视图</button>
     <button onclick="fitGraph()">🔍 适应屏幕</button>
     <span class="sep"></span>
@@ -326,6 +328,52 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
       }).catch(function(){ var b=document.getElementById('m-rec'); if(b) b.innerHTML='<div class="m-rec-empty">推荐接口调用失败</div>'; });
   };
   window.highlightRecs = highlightRecs;
+
+  // R40 按等级折叠 / 展开
+  function clusterByLevel(){
+    if(!network) return;
+    var levels = ['premium','registered','professional','admin','public','member'];
+    levels.forEach(function(lv){
+      var nodeIds = ALL_NODES.filter(function(n){return n.group === lv;}).map(function(n){return n.id;});
+      if(nodeIds.length < 2) return; // 单节点不折叠
+      try {
+        network.cluster({
+          joinCondition: function(node){ return node.group === lv; },
+          clusterNodeProperties: {
+            id: 'cluster_' + lv,
+            label: lv.toUpperCase() + ' (' + nodeIds.length + ')',
+            color: {background: LEVEL_COLOR[lv] || '#888', border: '#c9a84c'},
+            shape: 'database',
+            size: 35,
+            font: {size: 14, color: '#fff', face: 'Noto Serif SC', strokeWidth: 2, strokeColor: '#000'},
+            borderWidth: 3
+          },
+          processProperties: function(opts, childNodes, childEdges){
+            opts.value = childNodes.length;
+            return opts;
+          }
+        });
+      } catch(_){}
+    });
+    network.fit({animation:{duration:600}});
+    document.getElementById('stat').innerHTML = '📦 按等级折叠 · ' + levels.filter(function(lv){return ALL_NODES.filter(function(n){return n.group===lv;}).length >= 2;}).length + ' clusters';
+  }
+  function unclusterAll(){
+    if(!network) return;
+    // 多次调用确保嵌套 cluster 全展开
+    for(var i=0;i<5;i++){
+      var clusters = network.body.nodeIndices.filter(function(id){return id.indexOf('cluster_')===0;});
+      if(!clusters.length) break;
+      clusters.forEach(function(cid){
+        try { network.openCluster(cid, {releaseFunction: function(){return {};}}); } catch(_){}
+      });
+    }
+    network.fit({animation:{duration:600}});
+    document.getElementById('stat').textContent = '展开全画布 · ' + ALL_NODES.length + ' 节点';
+  }
+  window.clusterByLevel = clusterByLevel;
+  window.unclusterAll = unclusterAll;
+
   window.closeModal = function(){ document.getElementById('modal').classList.remove('show'); };
   // R39 推荐 fly-to 画布聚焦
   document.getElementById('modal').addEventListener('click', function(e){
