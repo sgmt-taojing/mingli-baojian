@@ -16,7 +16,7 @@ const _kw = (s, keywords) => {
   return score;
 };
 const _pick = (s, opts) => {
-  let best = opts[0], bestS = 0;
+  let best = opts[0].val, bestS = 0; // 默认取 .val 字符串
   opts.forEach(o => { const s2 = _kw(s, o.kw); if (s2 > bestS) { bestS = s2; best = o.val; } });
   return best;
 };
