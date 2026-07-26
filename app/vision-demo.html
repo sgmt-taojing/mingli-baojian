@@ -722,10 +722,17 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+/* ---- API base（R76-fix：静态托管页补全 localhost:8920） ---- */
+const API_BASE = (() => {
+  const h = location.host;
+  if (!/^(localhost|127\.0\.0\.1):8914$/.test(h)) return 'http://localhost:8920';
+  return '';
+})();
+const api = (path) => (API_BASE || '') + path;
 /* ---- CSRF token ---- */
 async function fetchCsrfToken() {
   try {
-    const r = await fetch('/api/csrf-token', { credentials: 'same-origin' });
+    const r = await fetch(api('/api/csrf-token'), { credentials: 'same-origin' });
     const data = await r.json().catch(() => ({}));
     if (data.csrfToken || data.token) {
       csrfToken = data.csrfToken || data.token;
@@ -1002,7 +1009,7 @@ async function speakResult() {
     btn.textContent = '⏳ 合成中...';
 
     // Try direct 8912 first (GET with query string)
-    const audio = new Audio('http://localhost:8912/api/tts?text=' + encodeURIComponent(text) + '&voice=' + encodeURIComponent(voice));
+    const audio = new Audio(api('/api/tts?text=' + encodeURIComponent(text) + '&voice=' + encodeURIComponent(voice)));
 
     audio.onplaying = () => {
       btn.textContent = '🔊 朗读中...';
@@ -1015,7 +1022,7 @@ async function speakResult() {
     audio.onerror = async () => {
       // Fallback: try 8920 proxy
       try {
-        const pr = await fetch('/api/tts?text=' + encodeURIComponent(text));
+        const pr = await fetch(api('/api/tts?text=') + encodeURIComponent(text));
         if (pr.ok) {
           const blob = await pr.blob();
           const a = new Audio(URL.createObjectURL(blob));

@@ -15,37 +15,35 @@ h1{font-size:1.6rem;margin-bottom:4px}
 .metric{background:#1a1d27;border:1px solid #2a2d37;border-radius:12px;padding:16px}
 .metric-val{font-size:1.8rem;font-weight:700;color:#7c9eff}
 .metric-label{font-size:.8rem;color:#888;margin-top:4px}
-.section-title{font-size:1.1rem;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.panel{background:#1a1d27;border:1px solid #2a2d37;border-radius:12px;padding:16px;margin-bottom:20px}
+.section-title{font-size:1rem;font-weight:600;margin-bottom:12px;display:flex;align-items:center}
+.rich-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:8px}
+.rich-dot-blue{background:#7c9eff}
+.rich-dot-green{background:#4ade80}
+.rich-dot-gold{background:#c9a84c}
 .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .bar-label{width:120px;font-size:.85rem;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bar-track{flex:1;height:24px;background:#1a1d27;border-radius:6px;overflow:hidden;position:relative}
+.bar-track{flex:1;height:24px;background:#0f1117;border-radius:6px;overflow:hidden;position:relative}
 .bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:8px;font-size:.75rem;font-weight:600;color:#fff;white-space:nowrap;transition:width .6s ease}
 .bar-val{width:60px;font-size:.8rem;color:#aaa;flex-shrink:0}
-.colors{background:linear-gradient(90deg,#667eea,#764ba2,#f093fb,#4facfe,#43e97b,#fa709a,#fee140,#30cfd0)}
-.panel{background:#1a1d27;border:1px solid #2a2d37;border-radius:12px;padding:20px;margin-bottom:20px}
-.trace-table{width:100%;border-collapse:collapse}
-.trace-table th{text-align:left;font-size:.75rem;color:#888;padding:8px;border-bottom:1px solid #2a2d37;text-transform:uppercase}
-.trace-table td{padding:8px;border-bottom:1px solid #1e1e2e;font-size:.85rem}
-.trace-table tr:hover{background:#1e1e2e}
-.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.7rem;font-weight:600}
-.badge-high{background:#2d5a3d;color:#4ade80}
-.badge-mid{background:#4a4a2d;color:#facc15}
-.badge-low{background:#4a2d2d;color:#f87171}
-.score{font-family:monospace;font-size:.85rem}
-.timeline-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #1e1e2e}
-.timeline-time{color:#888;font-size:.75rem;white-space:nowrap;width:140px;flex-shrink:0}
+.timeline-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #2a2d37}
+.timeline-item:last-child{border-bottom:none}
+.timeline-time{font-size:.75rem;color:#666;flex-shrink:0;width:70px}
 .timeline-body{flex:1}
 .timeline-module{font-size:.7rem;padding:2px 6px;border-radius:4px;background:#2a2d37;color:#7c9eff;margin-right:6px}
-.timeline-title{font-size:.85rem;margin-top:2px}
+.timeline-title{font-size:.85rem;margin-top:4px;color:#ccc}
+.badge{font-size:.7rem;padding:2px 6px;border-radius:4px;font-weight:600}
+.badge-high{background:#4ade80;color:#000}
+.badge-mid{background:#fbbf24;color:#000}
+.badge-low{background:#f87171;color:#fff}
 .toggle-bar{display:flex;gap:8px;margin-bottom:16px}
-.toggle-btn{padding:6px 16px;border-radius:8px;border:1px solid #2a2d37;background:transparent;color:#888;cursor:pointer;font-size:.85rem}
+.toggle-btn{padding:6px 16px;border:1px solid #2a2d37;border-radius:8px;background:transparent;color:#888;cursor:pointer;font-size:.85rem}
 .toggle-btn.active{background:#7c9eff;color:#fff;border-color:#7c9eff}
 @media(max-width:768px){.bar-label{width:80px}.metric-val{font-size:1.4rem}}
 @media(max-width:480px){.bar-label{width:70px;font-size:.75rem}.bar-val{width:40px;font-size:.7rem}}
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main">跳到主内容</a>
 <main id="main" class="container">
 <h1>🔥 KB 热度仪表盘</h1>
 <p class="subtitle">模块命中排行 · 最近命中流 · 全局热度趋势</p>
@@ -69,11 +67,19 @@ h1{font-size:1.6rem;margin-bottom:4px}
 </div>
 
 <div class="panel">
-  <div class="section-title">
-    <span class="rich-dot rich-dot-blue"></span> 最近命中流
-    <span style="margin-left:auto;font-size:.75rem;color:#666">每 30s 自动刷新</span>
-  </div>
+  <div class="section-title"><span class="rich-dot rich-dot-blue"></span> 最近命中流 <span style="margin-left:auto;font-size:.75rem;color:#666">每 30s 自动刷新</span></div>
   <div id="traces">加载中...</div>
+</div>
+
+<!-- R75: 设备采集流（纯前端 localStorage，零 API） -->
+<div class="panel">
+  <div class="section-title"><span class="rich-dot rich-dot-gold"></span> 📱 设备采集流 <span id="deviceStreamMeta" style="margin-left:auto;font-size:.75rem;color:#666">最近 5 分钟</span></div>
+  <div id="deviceStream">
+    <div style="color:#666;padding:12px;font-size:.85rem">
+      💡 打开 <a href="device-management.html" style="color:#7c9eff">设备管理</a> 或
+      <a href="camera-capture.html" style="color:#7c9eff">相机采集</a> 后，拍照/录音将自动联动知识库模块
+    </div>
+  </div>
 </div>
 
 </main>
@@ -91,6 +97,92 @@ function scoreBadge(score) {
   if (score >= 0.8) return '<span class="badge badge-high">' + score.toFixed(2) + '</span>';
   if (score >= 0.5) return '<span class="badge badge-mid">' + score.toFixed(2) + '</span>';
   return '<span class="badge badge-low">' + score.toFixed(2) + '</span>';
+}
+
+const DEVICE_MODULE_LABEL = {
+  zhongyi: '中医面诊', shexiang: '舌象诊断', mianxue: '眼诊/面相',
+  classics: '经典文献', mantra: '咒语/诵经', tcm: '中医脉象',
+  mobile: '作息养生', fengshui: '环境风水'
+};
+const DEVICE_MODULE_ICON = {
+  zhongyi: '👁', shexiang: '👅', mianxue: '👀',
+  classics: '📜', mantra: '🎙️', tcm: '❤️',
+  mobile: '😴', fengshui: '👓'
+};
+
+/**
+ * R75: 从 localStorage._device_kb_events 渲染设备采集流
+ * 只展示最近 5 分钟内的事件，按模块分组
+ */
+function renderDeviceStream() {
+  const container = document.getElementById('deviceStream');
+  const meta = document.getElementById('deviceStreamMeta');
+  if (!container) return;
+  try {
+    const raw = localStorage.getItem('_device_kb_events') || '[]';
+    const events = JSON.parse(raw);
+    const now = Date.now();
+    const windowMs = 5 * 60 * 1000;
+    const recent = events.filter(e => now - (e.ts || 0) < windowMs);
+    const total = events.length;
+
+    if (total === 0) {
+      container.innerHTML = '<div style="color:#666;padding:12px;font-size:.85rem">暂无设备采集记录 · 拍照/录音后将自动显示</div>';
+      if (meta) meta.textContent = '0 条记录';
+      return;
+    }
+
+    // 按模块分组计数
+    const modCount = {};
+    const modLatest = {};
+    recent.forEach(e => {
+      if (!e.module) return;
+      modCount[e.module] = (modCount[e.module] || 0) + 1;
+      if (!modLatest[e.module] || (e.ts || 0) > modLatest[e.module].ts) modLatest[e.module] = e;
+    });
+    const sorted = Object.entries(modCount).sort((a, b) => b[1] - a[1]);
+    const maxCount = sorted.length > 0 ? sorted[0][1] : 1;
+
+    // 渲染分组条形
+    const barsHtml = sorted.map(([mod, count]) => {
+      const icon = DEVICE_MODULE_ICON[mod] || '📦';
+      const label = DEVICE_MODULE_LABEL[mod] || mod;
+      const pct = (count / maxCount * 100).toFixed(1);
+      const latest = modLatest[mod];
+      const timeStr = latest ? new Date(latest.ts).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '';
+      return '<div class="bar-row">' +
+        '<span class="bar-label" title="' + label + '">' + icon + ' ' + label + '</span>' +
+        '<div class="bar-track"><div class="bar-fill" style="width:' + Math.max(pct, 3) + '%;background:linear-gradient(90deg,#c9a84c,#22d3ee)">' + count + ' 次</div></div>' +
+        '<span class="bar-val">' + timeStr + '</span>' +
+      '</div>';
+    }).join('');
+
+    // 最近 5 条原始事件
+    const last5 = events.slice(-5).reverse();
+    const tracesHtml = last5.map(e => {
+      const icon = DEVICE_MODULE_ICON[e.module] || '📦';
+      const label = DEVICE_MODULE_LABEL[e.module] || e.module || '?';
+      const time = new Date(e.ts).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      return '<div class="timeline-item">' +
+        '<span class="timeline-time">' + time + '</span>' +
+        '<div class="timeline-body">' +
+          '<span class="timeline-module">' + icon + ' ' + label + '</span>' +
+          (e.capability ? '<span style="font-size:.7rem;color:#666"> · ' + e.capability + '</span>' : '') +
+          '<div class="timeline-title">' + (e.label || '设备采集') + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    container.innerHTML = '<div style="margin-bottom:14px">' + barsHtml + '</div>' +
+      '<div style="border-top:1px solid rgba(201,168,76,.15);padding-top:10px;margin-top:6px">' +
+        '<div style="font-size:.75rem;color:#888;margin-bottom:8px">最近事件</div>' +
+        tracesHtml +
+      '</div>';
+
+    if (meta) meta.textContent = total + ' 条记录 · 最近 5 分钟 ' + recent.length + ' 次';
+  } catch (e) {
+    container.innerHTML = '<div style="color:#f87171;padding:12px">读取失败: ' + e.message + '</div>';
+  }
 }
 
 function renderBars(container, items, valKey, labelKey, maxVal) {
@@ -165,7 +257,8 @@ function switchRange(r) {
 
 loadHot();
 loadTraces();
-setInterval(() => { loadHot(); loadTraces(); }, 30000);
+setInterval(() => { loadHot(); loadTraces(); renderDeviceStream(); }, 30000);
+setTimeout(renderDeviceStream, 500);
 </script>
 </body>
 </html>

@@ -461,7 +461,7 @@ async function askSend() {
   const t0 = performance.now();
   State.askAbort = new AbortController();
   try {
-    const r = await fetch('/api/glass/stream-ask', {
+    const r = await fetch(api('/api/glass/stream-ask', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ q, mode: State.mode }),
@@ -506,7 +506,7 @@ async function askSend() {
 
 async function kbFallback(q, out, kbRef, meta) {
   try {
-    const r = await fetch('/api/public/kb-search?q=' + encodeURIComponent(q) + '&limit=3');
+    const r = await fetch(api('/api/public/kb-search?q=' + encodeURIComponent(q) + '&limit=3');
     const d = await r.json();
     if (d.ok && d.results && d.results.length) {
       out.textContent = d.results.map(x => x.title + '\n' + (x.content||x.summary||'').slice(0,300)).join('\n\n---\n\n');
@@ -547,7 +547,7 @@ $('#sttStart').onclick = () => { if (!State.sttRec) return; State.sttRec.start()
 $('#sttStop').onclick = () => { if (State.sttRec) State.sttRec.stop(); };
 $('#sttUpload').onclick = async () => {
   const hint = $('#sttHint').value.trim();
-  const r = await fetch('/api/glass/upload-audio', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ text: $('#sttOut').textContent, hint, mode: State.mode }) });
+  const r = await fetch(api('/api/glass/upload-audio', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ text: $('#sttOut').textContent, hint, mode: State.mode }) });
   const d = await r.json();
   if (d.ok) {
     $('#sttIntent').textContent = '🎯 Intent: ' + (d.intent||'?') + (d.nextStep ? ' · ' + d.nextStep : '');
@@ -567,7 +567,7 @@ $('#ocrUpload').onclick = async () => {
   $('#ocrOut').textContent = '⏳ 识别中…';
   $('#ocrMeta').innerHTML = '<span class="chip warn">5 引擎优先级</span>';
   try {
-    const r = await fetch('/api/face-ocr/recognize', { method:'POST', body: fd });
+    const r = await fetch(api('/api/face-ocr/recognize', { method:'POST', body: fd });
     const d = await r.json();
     $('#ocrOut').textContent = d.text || d.content || JSON.stringify(d).slice(0,400);
     $('#ocrMeta').innerHTML = '<span class="chip ok">✓ ' + (d.engine||'?') + '</span><span class="chip">' + (d.confidence?.toFixed?.(2)||'?') + '</span>';
@@ -594,7 +594,7 @@ $('#camSnap').onclick = () => {
   c.getContext('2d').drawImage(v, 0, 0);
   c.toBlob(b => {
     const fd = new FormData(); fd.append('file', b, 'snap.jpg'); fd.append('mode', State.mode);
-    fetch('/api/face-ocr/recognize', { method:'POST', body: fd }).then(r=>r.json()).then(d => {
+    fetch(api('/api/face-ocr/recognize', { method:'POST', body: fd }).then(r=>r.json()).then(d => {
       $('#ocrOut').textContent = d.text || JSON.stringify(d).slice(0,400);
       $('#askQ').value = '这是我的' + State.mode + '情况：' + (d.text||'').slice(0,100); askSend();
     });
