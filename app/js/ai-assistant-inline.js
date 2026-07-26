@@ -1228,7 +1228,7 @@ function showReport(text, meta){
   const ops=document.createElement('div');
   ops.className='report-ops';
   var _repEsc=esc(text).replace(/"/g,'&quot;');
-  ops.innerHTML='<button class="btn-save" data-report="'+_repEsc+'" onclick="saveReport(this)">💾 保存报告</button><button class="btn-copy" data-report="'+_repEsc+'" onclick="copyReport(this)">📋 复制</button><button class="btn-fb-up" onclick="fbReport(this,1)" title="这条回答对你有帮助">👍 有帮助</button><button class="btn-fb-dn" onclick="fbReport(this,-1)" title="这条回答不准确">👎 没帮助</button>';
+  ops.innerHTML='<button class="btn-save" data-report="'+_repEsc+'" onclick="saveReport(this)">💾 保存报告</button><button class="btn-copy" data-report="'+_repEsc+'" onclick="copyReport(this)">📋 复制</button><button class="btn-copy-md" data-report="'+_repEsc+'" onclick="copyMarkdownReport(this)">📝 复制 Markdown</button><button class="btn-fb-up" onclick="fbReport(this,1)" title="这条回答对你有帮助">👍 有帮助</button><button class="btn-fb-dn" onclick="fbReport(this,-1)" title="这条回答不准确">👎 没帮助</button>';
   d.appendChild(ops);
 
   // R41-DR1 节点 7：music/lifeindex/lifeplan 三模块 detail 页跳转入口
@@ -1302,6 +1302,20 @@ function saveReport(el){
 function copyReport(el){
   const t=el.dataset.report||el.closest('.m-ai').querySelector('.b').textContent;
   navigator.clipboard.writeText(t).then(()=>toast('已复制')).catch(()=>{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('已复制')});
+}
+function copyMarkdownReport(el){
+  const raw=el.dataset.report||el.closest('.m-ai').querySelector('.b').textContent;
+  // 纯文本 → 轻量 Markdown：保留换行 + 加粗 **…**
+  const md = raw
+    .replace(/易道智鉴AI分析报告/g,'# 易道智鉴 AI 分析报告')
+    .replace(/综合指数：([\d.]+) 分/g,'**综合指数**：$1 分')
+    .replace(/主导五行：([\u4e00-\u9fa5]+) 行/g,'**主导五行**：$1 行')
+    .replace(/推荐五行：([\u4e00-\u9fa5]+)/g,'**推荐五行**：$1')
+    .replace(/未来 ([\d]+) 年节奏建议/g,'## 未来 $1 年节奏建议')
+    .replace(/十条行动清单/g,'## 十条行动清单')
+    .replace(/十维度评分卡/g,'## 十维度评分卡')
+    .replace(/十二领域评分卡/g,'## 十二领域评分卡');
+  navigator.clipboard.writeText(md).then(()=>toast('Markdown 已复制')).catch(()=>{const ta=document.createElement('textarea');ta.value=md;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('Markdown 已复制')});
 }
 function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),1500)}
 
