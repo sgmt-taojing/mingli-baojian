@@ -30,6 +30,18 @@ body{background:var(--ink);color:var(--paper);font-family:'Noto Serif SC',-apple
 .mod .mi{font-size:18px;flex-shrink:0}
 .mod .mt{font-size:12px;color:var(--paper2)}
 
+/* R34: KB 热卡直达 */
+.kb-hot-chips-wrap{margin:16px 0 14px;padding:14px;width:100%;max-width:480px;background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(201,168,76,.02));border:1px solid rgba(201,168,76,.15);border-radius:12px;text-align:left}
+.kb-hot-chips-title{font-size:12px;color:var(--gold);letter-spacing:2px;margin-bottom:10px;opacity:.95;font-weight:600}
+.kb-hot-chips{display:flex;flex-wrap:wrap;gap:8px}
+.kb-hot-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.2);border-radius:18px;color:var(--paper);font:inherit;font-size:12px;cursor:pointer;transition:all .2s ease}
+.kb-hot-chip:hover{border-color:var(--gold);background:rgba(201,168,76,.15);transform:translateY(-1px);box-shadow:0 3px 10px rgba(201,168,76,.2)}
+.kb-hot-chip:active{transform:translateY(0)}
+.kb-hot-chip-icon{font-size:14px}
+.kb-hot-chip-name{color:var(--paper2);font-weight:500}
+.kb-hot-chip-count{font-size:10px;padding:1px 6px;border-radius:8px;background:rgba(201,168,76,.2);color:var(--gold);font-weight:600;min-width:18px;text-align:center}
+.kb-hot-chips-tip{font-size:10px;opacity:.55;margin-top:8px;letter-spacing:.5px;color:var(--paper3)}
+
 /* 消息 */
 .msg{margin-bottom:10px;animation:in .25s ease}
 @keyframes in{from{opacity:0;transform:translateY(4px)}to{opacity:1}}
@@ -544,6 +556,90 @@ const ALL_MODS=[
 // === 初始化 ===
 showWelcome();
 
+// === R34: KB 热卡直达 (AI 助手 → 模块咨询一气呵成) ===
+function renderKbHotChips(){
+  let top = [];
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('_kb_hit_count/')) {
+        const sub = k.substring('_kb_hit_count/'.length);
+        if (sub === '_total' || sub.startsWith('_daily_')) continue;
+        const c = parseInt(localStorage.getItem(k) || '0');
+        if (c > 0) top.push({ mod: sub, count: c });
+      }
+    }
+  } catch (e) {}
+  top.sort((a, b) => b.count - a.count);
+  top = top.slice(0, 4);
+  if (top.length === 0) return '';
+
+  // R34: 模块 id 映射（某些本地模块名对应 ALL_MODS.id）
+  const MOD_MAP = {
+    'bazi': 'bazi', 'ziwei': 'ziwei', 'fengshui': 'fengshui', 'qimen': 'qimen',
+    'tcm': 'tcm', 'tcm-diagnosis': 'tcmSymptom', 'shuhan': 'shuhan',
+    'shanghan-lun': 'shanghan', 'acupuncture': 'acupuncture', 'yijing': 'yijing',
+    'meihua': 'meihua', 'liuyao': 'liuyao', 'liuren': 'liuren',
+    'authority-knowledge': 'bazi', 'faith': 'bazi', 'mantra': 'bazi',
+    'AUTHORITATIVE_KNOWLEDGE': 'bazi', 'FAITH_KNOWLEDGE_BASE': 'bazi',
+    'KOUJUE_DATABASE_FULL': 'bazi', 'SCRIPTURE_DATABASE': 'bazi',
+    'lifeplan': 'lifeplan',
+  };
+  const LABELS = {
+    'bazi': { name: '八字', icon: '🧮' }, 'ziwei': { name: '紫微', icon: '🌟' },
+    'fengshui': { name: '风水', icon: '🧭' }, 'qimen': { name: '奇门', icon: '🔮' },
+    'tcm': { name: '中医', icon: '⚕️' }, 'tcm-diagnosis': { name: '中医诊断', icon: '🩺' },
+    'shuhan': { name: '舒晗', icon: '📘' }, 'shanghan-lun': { name: '伤寒论', icon: '📜' },
+    'acupuncture': { name: '针灸', icon: '💉' }, 'yijing': { name: '易经', icon: '📒' },
+    'meihua': { name: '梅花', icon: '🌺' }, 'liuyao': { name: '六爻', icon: '☯️' },
+    'liuren': { name: '六壬', icon: '🎴' }, 'lifeplan': { name: '人生规划', icon: '📅' },
+  };
+
+  let html = '<div class="kb-hot-chips-wrap">';
+  html += '<div class="kb-hot-chips-title">🔥 你最近问得最多的</div>';
+  html += '<div class="kb-hot-chips">';
+  top.forEach(t => {
+    const label = LABELS[t.mod] || { name: t.mod.slice(0, 8), icon: '📊' };
+    const targetMod = MOD_MAP[t.mod] || t.mod;
+    html += '<button class="kb-hot-chip" data-mod="' + escapeAttr(targetMod) + '" data-from="' + escapeAttr(t.mod) + '">';
+    html += '<span class="kb-hot-chip-icon">' + label.icon + '</span>';
+    html += '<span class="kb-hot-chip-name">' + label.name + '</span>';
+    html += '<span class="kb-hot-chip-count">' + (t.count > 99 ? '99+' : t.count) + '</span>';
+    html += '</button>';
+  });
+  html += '</div>';
+  html += '<div class="kb-hot-chips-tip">点击任何模块可直接进入问题采集 · 已记录你的咨询偏好</div>';
+  html += '</div>';
+  return html;
+}
+
+function escapeAttr(s){
+  return String(s || '').replace(/[<>"&]/g, c => ({'<':'&lt;','>':'&gt;','"':'&quot;','&':'&amp;'})[c]);
+}
+
+function bindKbHotChips(){
+  document.querySelectorAll('.kb-hot-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const mod = chip.getAttribute('data-mod');
+      const from = chip.getAttribute('data-from');
+      // 点击埋点：双计数同步（与 kb-hot-strip 一致）
+      try {
+        const hitKey = '_kb_hit_count/' + mod;
+        localStorage.setItem(hitKey, String((parseInt(localStorage.getItem(hitKey) || '0') + 1)));
+        const recKey = '_kb_recommend_count/' + from;
+        localStorage.setItem(recKey, String((parseInt(localStorage.getItem(recKey) || '0') + 1)));
+      } catch (e) {}
+      // 直接跳转
+      if (window.MODULES && MODULES[mod]) {
+        startModule(mod);
+      } else {
+        // 模块不存在 → 提示
+        showToast('该模块暂未开放 · 请尝试其他热门模块');
+      }
+    });
+  });
+}
+
 function showWelcome(){
   chat.innerHTML='';
   let html='<div class="welcome"><div class="logo">🤖</div><h2>AI命理助手</h2><div class="sub">选择您想咨询的领域，我将通过对话收集信息后给出专业分析报告</div><div class="modules">';
@@ -580,8 +676,12 @@ function showWelcome(){
       }
     }catch(e){}
   }
+  // R34: KB 热卡直达区
+  html+=renderKbHotChips();
   html+='</div>';
   chat.innerHTML=html;
+  // R34: 渲染热卡后绑定事件
+  bindKbHotChips();
 }
 
 function startModule(id){
