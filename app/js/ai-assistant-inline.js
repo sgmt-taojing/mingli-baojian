@@ -1053,7 +1053,7 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
           '### 10 条行动清单\n' + act + '\n\n' +
           '### AI 润色建议\n' + reply + '\n\n' +
           '— KB 命中 ' + lp.kbHitCount + ' 条参考材料\n— TTS 朗读：' + (lifeplanBackend.ttsText||'').substring(0,200) + '…';
-        showReport(structure);
+        showReport(structure, {score: kbHit.score, source: kbHit.source, engine: kbHit.engine || 'fts5', fallback: !!kbHit.fallback});
         autoSavePaipan(structure);
         return;
       }
@@ -1069,7 +1069,7 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
           '### 10 条调养建议\n' + rec + '\n\n' +
           '### AI 润色建议\n' + reply + '\n\n' +
           '— KB 命中 ' + li.kbHitCount + ' 条参考材料\n— TTS 朗读：' + (lifeindexBackend.ttsText||'').substring(0,200) + '…';
-        showReport(structure);
+        showReport(structure, {score: kbHit.score, source: kbHit.source, engine: kbHit.engine || 'fts5', fallback: !!kbHit.fallback});
         autoSavePaipan(structure);
         return;
       }
@@ -1085,7 +1085,7 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
           '### 听赏指南（10 条）\n' + guide + '\n\n' +
           '### AI 润色建议\n' + reply + '\n\n' +
           '— KB 命中 ' + m.kbHitCount + ' 条参考材料\n— TTS 朗读：' + (musicBackend.ttsText||'').substring(0,200) + '…';
-        showReport(structure);
+        showReport(structure, {score: kbHit.score, source: kbHit.source, engine: kbHit.engine || 'fts5', fallback: !!kbHit.fallback});
         autoSavePaipan(structure);
         return;
       }
