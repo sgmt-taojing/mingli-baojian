@@ -679,6 +679,7 @@ body {
 <!-- External wearable deps (graceful if missing) -->
 <script src="js/wearable/index.js" defer onerror="console.warn('[vision] index.js not found')"></script>
 <script src="js/wearable/rokid-bridge.js" defer onerror="console.warn('[vision] rokid-bridge.js not found')"></script>
+<script src="js/device-kb-bridge.js" defer></script>
 <script src="js/wearable/device-provider.js" defer onerror="console.warn('[vision] device-provider.js not found')"></script>
 <script src="js/wearable/mock-harness.js" defer onerror="console.warn('[vision] mock-harness.js not found')"></script>
 
@@ -978,6 +979,8 @@ async function captureAndAnalyze() {
     resultBox.innerHTML = '<div class="result-meta"><span class="tag">' + badge + ' ' + statusText + '</span><span class="tag">' + ts + '</span><span class="tag">' + MODE_LABELS[mode] + '</span><span>' + latency + 'ms</span></div><div class="result-content">' + escHtml(summary) + '</div>';
 
     addHistory(mode, summary);
+    // R80: vision → KB 桥接（舌象→shexiang / 面相→mianxue / 脉象→tcm）
+    triggerVisionKb(mode, summary);
     document.getElementById('btnTTS').disabled = false;
     toast('分析完成 (' + latency + 'ms)');
   } catch(e) {
@@ -1100,6 +1103,26 @@ function summarizeResult(data, mode) {
 
 function escHtml(s) {
   return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ---- R80: Vision → KB 桥接 ---- */
+function triggerVisionKb(mode, summary) {
+  if (!window.DeviceKbBridge || typeof window.DeviceKbBridge.onCapture !== 'function') return;
+  const capMap = {
+    face:   'mianxue',
+    tongue: 'shexiang',
+    eye:    'mianxue',
+    ocr:    'classics',
+    'ocr-tcm': 'tcm'
+  };
+  const cap = capMap[mode] || 'classics';
+  window.DeviceKbBridge.onCapture(cap, {
+    source: 'vision-demo',
+    mode: mode,
+    label: (MODE_LABELS[mode] || mode) + ' 分析',
+    score: summary.length > 40 ? 0.75 : 0.5
+  });
+  console.log('[R80] vision→kb:', cap, summary.slice(0, 20));
 }
 
 /* ---- History ---- */
