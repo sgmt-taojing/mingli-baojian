@@ -3650,8 +3650,83 @@ body:not(.wechat) .wechat-disclaimer{display:none}
   font-size: .72rem;
   opacity: .6;
 }
+/* R31-D: status 标签 + engine badge */
+.kb-search-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: .65rem;
+  padding: 1px 6px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+.kb-status-formal { background: rgba(34,197,94,.15); color: #16a34a; }
+.kb-status-staging { background: rgba(234,179,8,.15); color: #ca8a04; }
+.kb-status-deprecated { background: rgba(107,114,128,.15); color: #6b7280; }
+.kb-status-experimental { background: rgba(168,85,247,.15); color: #9333ea; }
+.kb-search-engine {
+  display: inline-block;
+  font-size: .6rem;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(59,130,246,.12);
+  color: #2563eb;
+  font-weight: 600;
+  letter-spacing: .3px;
+}
+.kb-engine-client { background: rgba(100,116,139,.12); color: #64748b; }
+.kb-search-item-row1 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+.kb-search-loading {
+  padding: 1rem;
+  text-align: center;
+  color: var(--text-secondary, #666);
+  font-size: .85rem;
+}
 @media (max-width: 768px) {
   .kb-search-box { padding: 1rem; }
   .kb-search-input { font-size: .88rem; }
   .kb-search-results { max-height: 380px; }
+}
+
+/* R31-C: +1 推荐按钮 + 推荐统计条 */
+.kb-hot-recommend-bar {
+  font-size: 0.78rem;
+  color: var(--text-secondary, #888);
+  padding: 4px 0 8px;
+  text-align: right;
+}
+.kb-hot-recommend-bar strong {
+  color: var(--accent-gold, #c9a84c);
+  font-weight: 600;
+}
+.kb-hot-rec-btn {
+  position: absolute;
+  bottom: 6px;
+  right: 8px;
+  border: 1px solid rgba(201,168,76,0.3);
+  background: rgba(201,168,76,0.08);
+  color: var(--accent-gold, #c9a84c);
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 2;
+}
+.kb-hot-rec-btn:hover {
+  background: rgba(201,168,76,0.2);
+  border-color: rgba(201,168,76,0.5);
+}
+.kb-hot-rec-btn.kb-hot-btn-pulsed {
+  animation: kb-rec-pulse 0.6s ease;
+}
+@keyframes kb-rec-pulse {
+  0%   { transform: scale(1); background: rgba(201,168,76,0.08); }
+  50%  { transform: scale(1.25); background: rgba(201,168,76,0.35); }
+  100% { transform: scale(1); background: rgba(201,168,76,0.08); }
 }
