@@ -124,75 +124,64 @@ h2{font-size:1.1rem;color:var(--gold);margin:14px 0 8px;border-bottom:1px solid 
   }
 
   function renderMonthCard(md, isCurrent){
+    var rel2cn = {'比和':'当令旺','生':'生扶','泄':'泄气','克':'逆克','被克':'受克'};
+    var rel2cls = {'比和':'badge-旺','生':'badge-相','泄':'badge-休','克':'badge-死','被克':'badge-囚'};
+    var star2score = {1:30,2:45,3:55,4:75,5:90};
     var h = '<div class="result-card">';
     h += '<div class="month-header">';
-    h += '<span class="month-badge '+statusClass(md.status)+'">'+md.month+'月</span>';
-    h += '<span style="font-weight:600;font-size:1rem">'+esc(md.name)+' ('+esc(md.jieqi)+')</span>';
-    h += '<span style="margin-left:auto;font-size:.75rem;opacity:.5">'+esc(md.season)+' · '+esc(md.element)+'旺</span>';
+    h += '<span class="month-badge '+(rel2cls[md.relation]||'badge-平')+'">'+md.month+'月</span>';
+    h += '<span style="font-weight:600;font-size:1rem">'+esc(md.ganZhi||'')+' ('+esc(md.name||'')+')</span>';
+    h += '<span style="margin-left:auto;font-size:.75rem;opacity:.5">'+esc(md.element)+'旺 · '+esc(rel2cn[md.relation]||md.relation)+'</span>';
     h += '</div>';
-    h += '<div style="font-size:.8rem;opacity:.7">日主旺衰：<b class="st-'+esc(md.status)+'">'+esc(md.status)+'</b> ('+md.score+'分) — '+esc(md.advice)+'</div>';
-
-    // 维度网格
+    h += '<div style="font-size:.8rem;opacity:.7">'+esc(md.advice||'')+'</div>';
+    // 维度网格（scores 是 1-5 星制）
     h += '<div class="dim-grid">';
-    Object.entries(md.dims).forEach(function(dk){
-      var v=dk[1]; var stars='★'.repeat(Math.round(v/20))+'☆'.repeat(5-Math.round(v/20));
+    Object.entries(md.scores||{}).forEach(function(dk){
+      var star=dk[1]; var v=star2score[star]||55;
+      var stars='★'.repeat(star)+'☆'.repeat(5-star);
       var dn=DIM_NAMES[dk[0]]||dk[0];
       var action='';
-      if(v>=80)action='✅ 大吉';
-      else if(v>=65)action='🟢 顺利';
-      else if(v>=50)action='🟡 平稳';
-      else action='🔴 低谷';
-      h+='<div class="dim-cell"><div class="dim-name">'+esc(dn)+'</div><div class="dim-score '+scoreCls(v)+'">'+v+'</div><div class="dim-stars">'+stars+'</div><div class="dim-action">'+action+'</div></div>';
+      if(star>=4)action='✅ 大吉';
+      else if(star===3)action='🟢 平稳';
+      else action='🔴 保守';
+      h+='<div class="dim-cell"><div class="dim-name">'+esc(dn)+'</div><div class="dim-score '+scoreCls(v)+'">'+star+'★</div><div class="dim-stars">'+stars+'</div><div class="dim-action">'+action+'</div></div>';
     });
     h += '</div>';
-
-    // KB 参考
-    if(md.kbHit){
-      h+='<div class="kb-ref">📚 '+esc(md.kbHit.title)+'<br>'+esc(md.kbHit.excerpt)+'</div>';
-    }
-
     // 趋吉避凶
-    var avoidTip = (md.status==='囚'||md.status==='死')?'本月宜静不宜动，可拜太岁/祈福化解':'顺势而为即可';
     var luckyDir = {'木':'东方/绿色/3·8','火':'南方/红色/2·7','土':'中央/黄色/5·0','金':'西方/白色/4·9','水':'北方/蓝黑/1·6'}[md.element]||'';
+    var avoidTip = (md.relation==='被克'||md.relation==='克')?'本月宜静不宜动，可拜太岁/祈福化解':'顺势而为，借势推进';
     h+='<div class="advice-row"><span class="label">趋吉：</span><span class="val">'+esc(luckyDir)+'</span></div>';
-    h+='<div class="advice-row"><span class="label">避凶：</span><span class="val">月初谋划 → 月中行动 → 月末收敛；'+avoidTip+'</span></div>';
-
+    h+='<div class="advice-row"><span class="label">避凶：</span><span class="val">'+avoidTip+'</span></div>';
     h += '</div>';
     return h;
   }
 
   function renderYearTable(yearOverview, currentMonthNum){
-    var h = '<div class="result-card"><h2>📊 '+new Date().getFullYear()+'年全年总览</h2>';
+    var rel2cls = {'比和':'st-旺','生':'st-相','泄':'st-休','克':'st-死','被克':'st-囚'};
+    var rel2cn = {'比和':'当令','生':'生扶','泄':'泄气','克':'逆克','被克':'受克'};
+    var h = '<div class="result-card"><h2>📊 全年总览</h2>';
     h += '<div class="year-table-wrap"><table class="year-table"><thead><tr>';
-    h += '<th>月</th><th>月令</th><th>节气</th><th>五行</th><th>旺衰</th>';
-    // 动态列头
-    var dims = Object.keys(yearOverview[0].dims || {});
-    dims.forEach(function(d){h+='<th>'+(DIM_NAMES[d]||d)+'</th>';});
+    h += '<th>月</th><th>月令</th><th>干支</th><th>五行</th><th>关系</th><th>事业</th><th>财运</th><th>感情</th><th>健康</th>';
     h += '</tr></thead><tbody>';
     yearOverview.forEach(function(y){
       var cls = (y.month===currentMonthNum)?' class="current-month"':'';
       h+='<tr'+cls+'>';
       h+='<td>'+y.month+'月</td>';
       h+='<td>'+esc(y.name)+'</td>';
-      h+='<td style="font-size:.65rem;opacity:.5">'+esc(y.jieqi)+'</td>';
+      h+='<td style="font-weight:600">'+esc(y.ganZhi||'')+'</td>';
       h+='<td>'+esc(y.element)+'</td>';
-      h+='<td class="st-cell st-'+esc(y.status)+'">'+esc(y.status)+'</td>';
-      dims.forEach(function(d){
-        var v=y.dims[d]||'-';
-        h+='<td class="'+(typeof v==='number'?scoreCls(v):'')+'">'+v+'</td>';
+      h+='<td class="st-cell '+(rel2cls[y.relation]||'')+'">'+esc(rel2cn[y.relation]||y.relation)+'</td>';
+      ['career','wealth','love','health'].forEach(function(d){
+        var s=y.scores?y.scores[d]:'-';
+        var stars = (typeof s==='number')?('★'.repeat(s)+'☆'.repeat(5-s)):'-';
+        h+='<td style="font-size:.7rem">'+stars+'</td>';
       });
       h+='</tr>';
     });
     h += '</tbody></table></div>';
-    // 图例
     h += '<div style="font-size:.7rem;opacity:.4;margin-top:6px">';
-    h += '<span class="st-旺">旺</span>=当令 · ';
-    h += '<span class="st-相">相</span>=生扶 · ';
-    h += '<span class="st-休">休</span>=泄气 · ';
-    h += '<span class="st-囚">囚</span>=受克 · ';
-    h += '<span class="st-死">死</span>=反伤';
-    h += '</div>';
-    h += '</div>';
+    h += '<span class="st-旺">当令</span>=顺势 · <span class="st-相">生扶</span>=贵人 · <span class="st-休">泄气</span>=耗散 · <span class="st-囚">受克</span>=守宜 · <span class="st-死">逆克</span>=忌冲';
+    h += '</div></div>';
     return h;
   }
 
@@ -237,11 +226,13 @@ h2{font-size:1.1rem;color:var(--gold);margin:14px 0 8px;border-bottom:1px solid 
 
       var html = '';
       // 当前月详细
-      html += '<h2>🔥 本月详细 ('+report.currentMonth.data.name+')</h2>';
-      html += renderMonthCard(report.currentMonth.data, true);
+      var curData = report.currentMonth;
+      html += '<h2>🔥 本月详细 ('+esc(curData.name)+')</h2>';
+      html += renderMonthCard(curData, true);
       // 下月详细
-      html += '<h2>⏭️ 下月前瞻 ('+report.nextMonth.data.name+')</h2>';
-      html += renderMonthCard(report.nextMonth.data, false);
+      var nxtData = report.nextMonth;
+      html += '<h2>⏭️ 下月前瞻 ('+esc(nxtData.name)+')</h2>';
+      html += renderMonthCard(nxtData, false);
       // 全年总览表
       html += renderYearTable(report.yearOverview, nowMonth);
       // KB 命中统计
