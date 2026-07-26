@@ -1170,6 +1170,15 @@ async function autoSavePaipan(reportText){
 }
 
 function showReport(text, meta){
+  // R86: 自动提取 TODO 到 TodoBus（不影响原有渲染）
+  try {
+    if (typeof TodoBus !== 'undefined') {
+      var _r86_items = TodoBus.extract(text || '');
+      if (_r86_items.length) {
+        TodoBus.add(_r86_items, { module: (state && state.module) || null });
+      }
+    }
+  } catch(e) { /* 静默失败 */ }
   const d=document.createElement('div');
   d.className='msg m-ai';
   // R53：KB 命中信息条（score/source/engine/fallback 一行可视化）

@@ -9,6 +9,7 @@
 
 <link rel="stylesheet" href="css/ai-assistant-inline.css">
   <link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/todo-bus.css">
 </head>
 <body>
 <a href="#main-content" class="skip-link">跳到主要内容</a>
@@ -139,7 +140,69 @@
 
 </main>
 <script src="js/consent-banner.js" defer></script>
+<script src="js/todo-bus.js" defer></script>
 <script src="js/ai-assistant-inline.js" defer></script>
 <script src="js/mobile-nav.js" defer></script>
+<!-- R86 TODO 任务总线 -->
+<button class="todo-fab" id="todoFabBtn" onclick="openTodoDrawer()" aria-label="行动清单">📋<span class="badge" id="todoBadge" hidden>0</span></button>
+<div class="todo-drawer" id="todoDrawer">
+  <div class="td-head"><p class="td-title">📝 我的行动清单</p><button class="td-close" onclick="closeTodoDrawer()">✕</button></div>
+  <div id="todoContainer"><span style="color:var(--paper3);font-size:12px">报告生成后自动提取...</span></div>
+</div>
+<script>
+(function(){
+  if (typeof TodoBus === 'undefined') return;
+  var fab = document.getElementById('todoFabBtn');
+  var drawer = document.getElementById('todoDrawer');
+  var container = document.getElementById('todoContainer');
+
+  function refreshBadge(){
+    var s = TodoBus.stats();
+    var b = document.getElementById('todoBadge');
+    if (s.pending > 0){ b.textContent = s.pending; b.hidden = false; }
+    else { b.hidden = true; }
+  }
+
+  function openTodoDrawer(){
+    if (!drawer) return;
+    drawer.classList.add('open');
+    TodoBus.render(container, { showClear: true });
+    refreshBadge();
+  }
+  function closeTodoDrawer(){
+    if (!drawer) return;
+    drawer.classList.remove('open');
+  }
+  // expose
+  window.openTodoDrawer = openTodoDrawer;
+  window.closeTodoDrawer = closeTodoDrawer;
+
+  // FAB pulse after every AI report (hook showReport end)
+  var _origRender = null;
+  document.addEventListener('todo:added', refreshBadge);
+  document.addEventListener('todo:done', refreshBadge);
+  document.addEventListener('todo:removed', refreshBadge);
+  document.addEventListener('todo:clear', refreshBadge);
+
+  // If drawer open, refresh on events
+  document.addEventListener('todo:added', function(){
+    if (drawer && drawer.classList.contains('open')) TodoBus.render(container, { showClear: true });
+  });
+  document.addEventListener('todo:done', function(){
+    if (drawer && drawer.classList.contains('open')) TodoBus.render(container, { showClear: true });
+  });
+
+  // Initial badge
+  refreshBadge();
+
+  // Close drawer on outside click
+  document.addEventListener('click', function(e){
+    if (!drawer) return;
+    if (drawer.classList.contains('open') && !drawer.contains(e.target) && e.target !== fab){
+      closeTodoDrawer();
+    }
+  });
+})();
+</script>
 </body>
 </html>
