@@ -154,6 +154,12 @@
   async function hubGenerateReport(module) {
     if (!module) module = 'general';
 
+    // monthly 特殊处理：跳转到逐月报告页
+    if (module === 'monthly') {
+      window.open('monthly-report.html', '_blank');
+      return;
+    }
+
     // 收集数据
     var collector = COLLECTORS[module] || collectGeneralData;
     var data = collector();
