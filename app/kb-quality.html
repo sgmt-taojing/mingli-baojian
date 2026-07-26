@@ -49,9 +49,11 @@ h1{font-size:1.6rem;color:var(--gold);text-align:center;margin:20px 0 4px}
 .distro{display:flex;height:24px;border-radius:6px;overflow:hidden;margin:12px 0}
 .distro .seg{display:flex;align-items:center;justify-content:center;font-size:.7rem;color:#000;font-weight:600}
 
-/* Refresh */
+/* Refresh + Export */
 .refresh{position:fixed;bottom:20px;right:20px;width:48px;height:48px;border-radius:50%;background:var(--gold);border:none;color:var(--ink);font-size:1.3rem;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3);z-index:10}
 .refresh:hover{opacity:.85}
+.export-btn{position:fixed;bottom:20px;right:78px;padding:10px 16px;background:var(--card);border:1px solid var(--gold-dim);border-radius:8px;color:var(--gold);font-size:.85rem;cursor:pointer;z-index:10}
+.export-btn:hover{background:var(--gold);color:var(--ink)}
 
 @media(max-width:768px){.grid{grid-template-columns:1fr}.s-card{min-width:80px;padding:10px 14px}.s-card .val{font-size:1.4rem}h1{font-size:1.3rem}}
 </style>
@@ -82,6 +84,7 @@ h1{font-size:1.6rem;color:var(--gold);text-align:center;margin:20px 0 4px}
 <div class="grid" id="grid"></div>
 </div>
 
+<button class="export-btn" onclick="exportCSV()">📥 导出 CSV</button>
 <button class="refresh" onclick="load()" title="刷新">🔄</button>
 
 <script>
@@ -169,6 +172,19 @@ function render(){
 }
 
 load();
+
+function exportCSV(){
+  if(!DATA) return;
+  const rows=[['module','count','avg_trust','min_trust','max_trust','gold','silver','bronze','needs_fix','grade']];
+  DATA.modules.forEach(m=>rows.push([m.module,m.cnt,m.avg_trust,m.min_trust,m.max_trust,m.gold,m.silver,m.bronze,m.needs_fix,m.grade]));
+  const csv='\ufeff'+rows.map(r=>r.map(c=>`"${(c+'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`kb-quality-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
 </script>
 </body>
 </html>
