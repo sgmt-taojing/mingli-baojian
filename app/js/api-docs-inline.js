@@ -16,7 +16,11 @@
             });
           }
           var tagCount = Object.keys(tags).length;
-          document.getElementById('apiMeta').textContent = 'OpenAPI 3.0.3 · ' + routes + ' routes · ' + tagCount + ' tags';
+          var schemasCount = 0;
+          if (swagger.json.components && swagger.json.components.schemas) schemasCount = Object.keys(swagger.json.components.schemas).length;
+          var securitySchemes = 0;
+          if (swagger.json.components && swagger.json.components.securitySchemes) securitySchemes = Object.keys(swagger.json.components.securitySchemes).length;
+          document.getElementById('apiMeta').textContent = 'OpenAPI 3.0.3 · ' + routes + ' routes · ' + tagCount + ' tags · ' + schemasCount + ' schemas · ' + securitySchemes + ' securitySchemes';
         } catch(e) { /* ignore */ }
       },
       dom_id: "#swagger-ui",
