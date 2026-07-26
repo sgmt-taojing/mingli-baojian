@@ -417,6 +417,19 @@ function render(d){
   }
 
   // 时间轴 R25-P1-4：10 段×(核心任务/关键风险/化解建议)+高亮当前段
+  // R39: 每段附图谱关联模块
+  const STAGE_KB_MAP = {
+    0:  [{mod:'nihaisha',name:'中医育儿'},{mod:'bazi',name:'先天体质'}],
+    10: [{mod:'bazi',name:'学业文昌'},{mod:'ziwei',name:'紫微人格'}],
+    20: [{mod:'bazi',name:'事业定位'},{mod:'qimen',name:'奇门决策'}],
+    30: [{mod:'bazi',name:'婚姻六亲'},{mod:'fengshui',name:'家居风水'}],
+    40: [{mod:'zhongyi',name:'养生调理'},{mod:'bazi',name:'中年大运'}],
+    50: [{mod:'zhongyi',name:'经络养生'},{mod:'faith',name:'信仰修心'}],
+    60: [{mod:'zhongyi',name:'太极养生'},{mod:'scripture',name:'经文诵读'}],
+    70: [{mod:'faith',name:'心灵导引'},{mod:'scripture',name:'往生净土'}],
+    80: [{mod:'zhongyi',name:'延年益寿'},{mod:'faith',name:'安宁祈福'}],
+    90: [{mod:'faith',name:'圆满善终'},{mod:'scripture',name:'超度往生'}]
+  };
   h+='<div class="card"><h2>📅 人生时间轴（10 段·每 10 岁）</h2><div class="tl">';
   const ts=[
     {a:'0-10',num:0,t:'婴幼儿·先天奠基期',f:'先天体质 + 亲子依恋 + 蒙昧启蒙',core:'🏥 健康打底：母乳/充足睡眠/疫苗/体检',risk:'⚠ 脾胃弱/易惊风/亲子缺失',advice:'✦ 规律作息 + 父母陪伴 + 忌过早学业'},
@@ -439,6 +452,13 @@ function render(d){
     h+='<div class="tl-core">'+t.core+'</div>';
     h+='<div class="tl-risk">'+t.risk+'</div>';
     h+='<div class="tl-advice">'+t.advice+'</div>';
+    // R39: 图谱关联模块
+    const stageKbs = STAGE_KB_MAP[t.num] || [];
+    if (stageKbs.length) {
+      h+='<div class="tl-kb" style="margin-top:6px;padding:6px 8px;background:rgba(108,138,255,.08);border-left:2px solid #6c8aff;border-radius:4px;font-size:11px">📚 本阶段重点 KB：';
+      h+=stageKbs.map(k => '<a href="kb-graph.html?focus='+k.mod+'" style="color:var(--accent);text-decoration:none;margin-right:8px">🔗 '+k.name+'</a>').join('');
+      h+='</div>';
+    }
     h+='</div></div>';
   });
   h+='<div class="kb-source" style="margin-top:8px">📜 基于发展心理学 + 中医养生学 + 命理学十年大运综合编制</div></div>';
