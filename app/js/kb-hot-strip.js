@@ -117,7 +117,8 @@
       .then(function (json) {
         if (!json || json.code !== 0 || !json.data) return [];
         var mods = json.data.top_modules || [];
-        return mods
+        // R31-D: 只保留命中 > 0 的模块
+        var hits = mods
           .filter(function (m) { return (m.hits || 0) > 0; })
           .slice(0, HOT_LIMIT)
           .map(function (m) {
@@ -128,6 +129,7 @@
               summary: '全库命中 ' + m.hits + ' 次 · 共 ' + m.cnt + ' 条'
             };
           });
+        return hits;
       })
       .catch(function () { return []; });
   }
@@ -245,6 +247,13 @@
     });
     // 顶部推荐统计
     renderRecBar(host, readLocalRec());
+    // R31-D: 冷启动 CTA — 如果用户从未推荐过且无本地命中，添加引导链接
+    if (readLocalRec() === 0 && readLocalTop().length === 0) {
+      var cta = document.createElement('div');
+      cta.className = 'kb-hot-cta';
+      cta.innerHTML = '🌱 你还没推荐过 — <a href="ai-assistant.html">去 AI 助手试试 →</a>';
+      host.appendChild(cta);
+    }
   }
 
   /**
