@@ -25,6 +25,7 @@
     <button class="aiFab-item" id="aiFabTop" title="滚到顶部" aria-label="滚动到顶部">⬆️</button>
     <button class="aiFab-item" id="aiFabClear" title="清空对话" aria-label="清空对话">🗑️</button>
     <button class="aiFab-item" id="aiFabSpeak" title="朗读/停止" aria-label="朗读">🔊</button>
+  <button class="aiFab-item" id="aiFabExport" title="导出对话" aria-label="导出对话">💾</button>
   </div>
   <button class="aiFab-main" id="aiFabMain" title="快捷操作" aria-label="快捷操作">⚡</button>
 </div>`;
@@ -54,6 +55,18 @@
         else if (typeof stopSpeak === 'function') stopSpeak();
       } catch (e) { /* 静默 */ }
     };
+    document.getElementById('aiFabExport').onclick = function () {
+      try {
+        if (typeof _exportFullChat === 'function') {
+          var fmt = (confirm('确定导出当前对话？\n\n确定 = Markdown\n取消 = TXT（手动选格式）') ? 'md' : 'txt');
+          _exportFullChat(fmt);
+        }
+      } catch (e) { console.warn('export fab', e); }
+    };
+    // 双击 / 长按切 JSON（可选增强）
+    document.getElementById('aiFabExport').addEventListener('dblclick', function(){
+      try { if (typeof _exportFullChat === 'function') _exportFullChat('json'); } catch(e) {}
+    });
 
     // 滚动监听：>200px 时高亮「滚顶」
     const chat = document.getElementById('chat');

@@ -573,6 +573,8 @@ function addAI(text,stepData){
       '<button onclick="_submitKbFeedback(\'' + _feedbackId + '\', 0, \'' + esc(_qLast).replace(/'/g, '') + '\', \'' + esc(_mod).replace(/'/g, '') + '\')" style="background:transparent;border:1px solid rgba(150,150,150,.4);border-radius:14px;padding:2px 10px;color:#999;cursor:pointer;font-size:12px;transition:all .2s" onmouseover="this.style.background=\'rgba(150,150,150,.15)\'" onmouseout="this.style.background=\'transparent\'" title="一般">😐</button>' +
       '<button onclick="_submitKbFeedback(\'' + _feedbackId + '\', -1, \'' + esc(_qLast).replace(/'/g, '') + '\', \'' + esc(_mod).replace(/'/g, '') + '\')" style="background:transparent;border:1px solid rgba(244,67,54,.4);border-radius:14px;padding:2px 10px;color:#f44336;cursor:pointer;font-size:14px;transition:all .2s" onmouseover="this.style.background=\'rgba(244,67,54,.15)\'" onmouseout="this.style.background=\'transparent\'" title="需改进">👎</button>' +
       '<span id="' + _feedbackId + '-status" style="opacity:0;transition:opacity .3s;font-size:11px"></span>' +
+      '<button onclick="_exportSingleMessage(this)" title="导出这条回复" aria-label="导出这条回复" style="margin-left:auto;background:transparent;border:1px solid rgba(33,150,243,.4);border-radius:14px;padding:2px 10px;color:#64b5f6;cursor:pointer;font-size:12px;transition:all .2s">💾 导出</button>' +
+      '</div>';
       '</div>';
     d.innerHTML = html;
   }
@@ -3397,4 +3399,71 @@ processAnswer = function(q){
   const el = document.getElementById('quickActions');
   if (el) el.style.display = 'none';
   return _origProcessAnswer(q);
+};
+
+
+/* R65：导出单条 AI 回复为 Markdown 文件 */
+window._exportSingleMessage = function(btn){
+  try {
+    var msg = btn.closest('.msg');
+    if (!msg) return;
+    var body = msg.querySelector('.b');
+    var text = body ? body.innerText : '';
+    var blob = new Blob([
+      '# 命理宝鉴 · AI 助手回复\n\n',
+      '**时间：** ' + new Date().toLocaleString('zh-CN') + '\n\n',
+      '**模块：** ' + ((state && state.module) || 'freechat') + '\n\n',
+      '---\n\n',
+      text
+    ], { type: 'text/markdown;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'ai-assistant-' + Date.now() + '.md';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    if (typeof showToast === 'function') showToast('💾 已导出 Markdown 文件', 'success');
+  } catch(e) {
+    if (typeof showToast === 'function') showToast('导出失败：' + e.message, 'error');
+  }
+};
+
+/* R65：导出整段对话 */
+window._exportFullChat = function(fmt){
+  try {
+    var msgs = document.querySelectorAll('#chat .msg');
+    var lines = [], markdown = [];
+    msgs.forEach(function(m){
+      var isAI = m.classList.contains('m-ai');
+      var role = isAI ? 'AI' : '用户';
+      var txt = (m.querySelector('.b') || m).innerText;
+      if (fmt === 'json') {
+        lines.push({ role: isAI ? 'assistant' : 'user', content: txt });
+      } else {
+        lines.push(role + '：' + txt);
+        if (fmt === 'md') markdown.push('## ' + role + '\n\n' + txt + '\n\n');
+      }
+    });
+    var content, mime, ext;
+    if (fmt === 'json') {
+      content = JSON.stringify({ exported_at: new Date().toISOString(), messages: lines }, null, 2);
+      mime = 'application/json;charset=utf-8'; ext = 'json';
+    } else if (fmt === 'md') {
+      content = '# 命理宝鉴 · 对话记录\n\n**导出时间：** ' + new Date().toLocaleString('zh-CN') + '\n\n---\n\n' + markdown.join('---\n\n');
+      mime = 'text/markdown;charset=utf-8'; ext = 'md';
+    } else {
+      content = lines.join('\n\n---\n\n');
+      mime = 'text/plain;charset=utf-8'; ext = 'txt';
+    }
+    var blob = new Blob([content], { type: mime });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'ai-chat-' + Date.now() + '.' + ext;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    if (typeof showToast === 'function') showToast('已导出 ' + lines.length + ' 条消息（' + ext.toUpperCase() + '）', 'success');
+  } catch(e) {
+    if (typeof showToast === 'function') showToast('导出失败：' + e.message, 'error');
+  }
 };
