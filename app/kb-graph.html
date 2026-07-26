@@ -69,6 +69,7 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
     <button onclick="highlightRecs()">🧠 推荐关联</button>
     <button onclick="clusterByLevel()" title="按等级折叠为 5 个 cluster">📦 折叠等级</button>
     <button onclick="unclusterAll()" title="展开所有 cluster">📂 展开全部</button>
+    <button onclick="downloadGraphImage()" title="导出 PNG 截图">📷 截图</button>
     <button onclick="resetView()">🔄 重置视图</button>
     <button onclick="fitGraph()">🔍 适应屏幕</button>
     <span class="sep"></span>
@@ -373,6 +374,49 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
   }
   window.clusterByLevel = clusterByLevel;
   window.unclusterAll = unclusterAll;
+
+  // R41 PNG 截图导出
+  function downloadGraphImage(){
+    if(!network) return;
+    try {
+      var canvas = network.canvasToImage({
+        filter: function(node){ return true; },
+        backgroundColor: '#1a1a2e'
+      });
+      if(!canvas){ document.getElementById('stat').textContent = '截图失败: canvas 为空'; return; }
+      // 合成带标题的图片
+      var W = canvas.width, H = canvas.height;
+      var out = document.createElement('canvas');
+      out.width = W; out.height = H + 60;
+      var ctx = out.getContext('2d');
+      // 背景
+      ctx.fillStyle = '#1a1a2e'; ctx.fillRect(0, 0, out.width, out.height);
+      // 标题条
+      ctx.fillStyle = '#c9a84c';
+      ctx.font = 'bold 18px "Noto Serif SC", serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('命理宝鉴 · 知识图谱 (' + ALL_NODES.length + ' 模块)', W/2, 30);
+      // 底部水印
+      ctx.fillStyle = 'rgba(201,168,76,.4)';
+      ctx.font = '11px monospace';
+      ctx.fillText('sgmt-taojing.github.io/mingli-baojian', W/2, H + 50);
+      // 粘贴图谱
+      ctx.drawImage(canvas, 0, 50);
+      // 下载
+      out.toBlob(function(blob){
+        if(!blob){ return; }
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'kb-graph-' + new Date().toISOString().slice(0,10) + '.png';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        URL.revokeObjectURL(a.href);
+        document.getElementById('stat').textContent = '📷 截图已下载 · ' + a.download;
+      }, 'image/png');
+    } catch(e){
+      document.getElementById('stat').textContent = '截图失败: ' + (e.message || e);
+    }
+  }
+  window.downloadGraphImage = downloadGraphImage;
 
   window.closeModal = function(){ document.getElementById('modal').classList.remove('show'); };
   // R39 推荐 fly-to 画布聚焦
