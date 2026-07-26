@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI 眼睛 · 桌面体验 · 命理宝鉴</title>
+<link rel="stylesheet" href="css/a11y-fix.css">
+<style>
+:root{
+  --ink:#080808; --ink2:#141414; --ink3:#1c1c1c;
+  --gold:#c9a84c; --gold2:#e3c778;
+  --paper:#f5ecd6; --paper3:#8a7f6a;
+  --ok:#3e9e6b; --warn:#d4a047; --danger:#c8503e;
+  --radius:12px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--ink);color:var(--paper);font-family:'Noto Serif SC','Songti SC',serif;letter-spacing:.5px}
+body{min-height:100vh;padding:16px 14px 80px}
+
+.wrap{max-width:980px;margin:0 auto}
+header{text-align:center;padding:20px 0 24px;border-bottom:1px solid rgba(201,168,76,.18);margin-bottom:20px}
+header h1{font-size:22px;color:var(--gold);letter-spacing:6px;margin:0;font-weight:500}
+header p{font-size:11px;color:var(--paper3);letter-spacing:2px;margin-top:6px}
+
+/* === 状态卡 === */
+.status-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px}
+.status-card{background:var(--ink3);border:1px solid rgba(201,168,76,.15);border-radius:var(--radius);padding:14px;text-align:center;position:relative;overflow:hidden}
+.status-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.5}
+.status-card .label{font-size:10px;color:var(--paper3);letter-spacing:2px;margin-bottom:6px}
+.status-card .value{font-size:26px;font-weight:600;line-height:1}
+.status-card .value.ok{color:var(--ok)}
+.status-card .value.warn{color:var(--warn)}
+.status-card .value.err{color:var(--danger)}
+.status-card .value.muted{color:var(--paper3);font-size:16px}
+
+/* === 主舞台 === */
+.stage-wrap{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+@media(max-width:768px){.stage-wrap{grid-template-columns:1fr}}
+.stage{position:relative;background:var(--ink3);border:1px solid rgba(201,168,76,.15);border-radius:var(--radius);overflow:hidden;min-height:320px;display:flex;align-items:center;justify-content:center}
+.stage video,.stage canvas{width:100%;height:100%;object-fit:cover;display:block}
+.stage .placeholder{text-align:center;color:var(--paper3);padding:40px 20px}
+.stage .placeholder .icon{font-size:56px;margin-bottom:12px}
+.stage .placeholder .hint{font-size:12px;letter-spacing:1px}
+.live-tag{position:absolute;top:10px;left:10px;background:var(--danger);color:#fff;font-size:9px;padding:3px 8px;border-radius:4px;letter-spacing:2px;font-weight:600;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.device-tag{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.6);color:var(--paper3);font-size:9px;padding:3px 8px;border-radius:4px;letter-spacing:1px;max-width:60%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mode-tag{position:absolute;bottom:10px;left:10px;background:rgba(201,168,76,.2);color:var(--gold);font-size:9px;padding:3px 8px;border-radius:4px;letter-spacing:1px}
+
+/* === 控制面板 === */
+.ctrl-panel{background:var(--ink3);border:1px solid rgba(201,168,76,.15);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.ctrl-panel h3{font-size:13px;color:var(--gold);letter-spacing:3px;margin:0 0 12px;font-weight:500}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:10px;color:var(--paper3);letter-spacing:2px;margin-bottom:5px}
+.field select,.field input[type=text]{width:100%;background:var(--ink2);color:var(--paper);border:1px solid rgba(201,168,76,.2);border-radius:6px;padding:8px 10px;font-size:12px;font-family:inherit}
+.field select:focus,.field input:focus{outline:none;border-color:var(--gold)}
+
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.btn{padding:10px 18px;border:1px solid rgba(201,168,76,.3);background:transparent;color:var(--paper);border-radius:8px;cursor:pointer;font-size:12px;letter-spacing:1px;font-family:inherit;transition:all .2s}
+.btn:hover{background:rgba(201,168,76,.1);border-color:var(--gold)}
+.btn.primary{background:var(--gold);color:#000;border-color:var(--gold);font-weight:600}
+.btn.primary:hover{background:var(--gold2)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* === 结果区 === */
+.result-box{background:var(--ink2);border:1px solid rgba(201,168,76,.12);border-radius:var(--radius);padding:14px;margin-top:12px;font-size:12px;line-height:1.8;color:var(--paper);min-height:60px;white-space:pre-wrap;word-break:break-all}
+.result-box .meta{font-size:10px;color:var(--paper3);margin-bottom:8px;letter-spacing:1px}
+
+/* === 模式卡片 === */
+.mode-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+.mode-card{background:var(--ink3);border:1px solid rgba(201,168,76,.12);border-radius:var(--radius);padding:14px;text-align:center;cursor:pointer;transition:all .2s}
+.mode-card:hover{border-color:var(--gold);background:rgba(201,168,76,.05)}
+.mode-card.active{border-color:var(--gold);background:rgba(201,168,76,.1)}
+.mode-card .icon{font-size:32px;margin-bottom:6px}
+.mode-card .name{font-size:11px;color:var(--paper);letter-spacing:1px}
+.mode-card .desc{font-size:9px;color:var(--paper3);margin-top:3px}
+
+/* === Toast === */
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--ink3);border:1px solid var(--gold);color:var(--paper);padding:10px 20px;border-radius:8px;font-size:12px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+
+/* === 历史 === */
+.history-list{max-height:200px;overflow-y:auto;margin-top:8px}
+.history-item{padding:8px 10px;border-bottom:1px solid rgba(201,168,76,.08);font-size:11px;display:flex;gap:10px;align-items:center}
+.history-item .ts{color:var(--paper3);font-size:9px;white-space:nowrap}
+.history-item .tag{font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(201,168,76,.15);color:var(--gold)}
+.history-item .preview{color:var(--paper);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.section-title{font-size:13px;color:var(--gold);letter-spacing:3px;margin:20px 0 10px;display:flex;align-items:center;gap:10px}
+.section-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(201,168,76,.3),transparent)}
+</style>
+</head>
+<body data-kb-module="mobile">
+<div class="wrap">
+  <header>
+    <h1>🥽 AI 眼睛 · 桌面体验</h1>
+    <p>面相 / 舌诊 / OCR / 语音 — 用浏览器直接体验智镜能力</p>
+  </header>
+
+  <!-- === 状态卡 === -->
+  <div class="status-bar" id="statusBar">
+    <div class="status-card"><div class="label">摄像头</div><div class="value muted" id="stCam">待启动</div></div>
+    <div class="status-card"><div class="label">麦克风</div><div class="value muted" id="stMic">待启动</div></div>
+    <div class="status-card"><div class="label">Rokid 桥</div><div class="value warn" id="stBridge">未连接</div></div>
+    <div class="status-card"><div class="label">Mock 模式</div><div class="value warn" id="stMock">关闭</div></div>
+    <div class="status-card"><div class="label">本次会话</div><div class="value ok" id="stCount">0</div></div>
+  </div>
+
+  <!-- === 体验模式选择 === -->
+  <div class="section-title">体验模式</div>
+  <div class="mode-grid" id="modeGrid">
+    <div class="mode-card active" data-mode="face" onclick="selectMode('face')">
+      <div class="icon">👤</div><div class="name">面相识别</div><div class="desc">人脸定位 + 特征</div>
+    </div>
+    <div class="mode-card" data-mode="tongue" onclick="selectMode('tongue')">
+      <div class="icon">👅</div><div class="name">舌诊分析</div><div class="desc">中医舌象 + 五脏辨证</div>
+    </div>
+    <div class="mode-card" data-mode="ocr" onclick="selectMode('ocr')">
+      <div class="icon">📄</div><div class="name">通用 OCR</div><div class="desc">字 / 文档 / 卦象</div>
+    </div>
+    <div class="mode-card" data-mode="ocr-tcm" onclick="selectMode('ocr-tcm')">
+      <div class="icon">📋</div><div class="name">病历 OCR</div><div class="desc">处方 / 舌苔 / 脉案</div>
+    </div>
+  </div>
+
+  <!-- === 主舞台 === -->
+  <div class="stage-wrap">
+    <div class="stage" id="videoStage">
+      <div class="placeholder" id="videoPlaceholder">
+        <div class="icon">📷</div>
+        <div class="hint">点击「启动摄像头」开始</div>
+      </div>
+      <video id="video" autoplay playsinline muted style="display:none"></video>
+      <canvas id="captureCanvas" style="display:none"></canvas>
+      <div class="live-tag" id="liveTag" style="display:none">LIVE</div>
+      <div class="device-tag" id="deviceTag">未连接</div>
+      <div class="mode-tag" id="modeTag">面相识别</div>
+    </div>
+
+    <div class="stage" id="resultStage" style="flex-direction:column;align-items:stretch;justify-content:flex-start;padding:16px">
+      <div style="font-size:11px;color:var(--paper3);letter-spacing:2px;margin-bottom:10px">📊 分析结果</div>
+      <div class="result-box" id="resultBox">
+        <div class="meta">等待采集...</div>
+        <div>启动摄像头后点击「拍照分析」或「开始录音」</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- === 控制面板 === -->
+  <div class="ctrl-panel">
+    <h3>🎮 控制台</h3>
+
+    <div class="field">
+      <label>摄像头设备</label>
+      <select id="deviceSel"><option value="">默认（自动选择）</option></select>
+    </div>
+
+    <div class="field" id="mockField">
+      <label>Rokid 桥接模式（无硬件时启用）</label>
+      <select id="mockSel">
+        <option value="none">无（真实浏览器 API）</option>
+        <option value="mock">Mock Rokid（模拟原生桥）</option>
+      </select>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn primary" id="btnStart" onclick="startCamera()">📷 启动摄像头</button>
+      <button class="btn" id="btnCapture" onclick="captureAndAnalyze()" disabled>📸 拍照分析</button>
+      <button class="btn" id="btnTTS" onclick="speakResult()" disabled>🔊 朗读结果</button>
+      <button class="btn" id="btnMock" onclick="toggleMock()">🎭 切换 Mock</button>
+    </div>
+
+    <div style="margin-top:10px;font-size:10px;color:var(--paper3);letter-spacing:1px" id="engineInfo">
+      引擎：浏览器 getUserMedia + face-ocr-server(8913) + Edge-TTS(8912)
+    </div>
+  </div>
+
+  <!-- === 历史 === -->
+  <div class="section-title">📜 会话历史（最近 10 条）</div>
+  <div class="ctrl-panel">
+    <div class="history-list" id="historyList">
+      <div style="font-size:11px;color:var(--paper3);padding:8px">暂无记录</div>
+    </div>
+    <button class="btn" style="margin-top:10px;font-size:10px;padding:6px 12px" onclick="clearHistory()">清空历史</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- === 外部依赖（按实际路径加载） === -->
+<script src="js/wearable/index.js" defer></script>
+<script src="js/wearable/rokid-bridge.js" defer></script>
+<script src="js/wearable/device-provider.js" defer></script>
+<script src="js/wearable/mock-harness.js" defer></script>
+
+<script>
+/* =========================================================
+ * AI 眼睛 · 桌面体验页（R72）
+ * ========================================================= */
+
+const MODE_LABELS = {
+  face: '面相识别', tongue: '舌诊分析', ocr: '通用 OCR', 'ocr-tcm': '病历 OCR'
+};
+let currentMode = 'face';
+let stream = null;
+let mockEnabled = false;
+let lastResult = '';
+let sessionCount = 0;
+const HISTORY_KEY = '_vision_hist_v1';
+const SESSION_KEY = '_vision_session_v1';
+
+/* ---- 初始化 ---- */
+window.addEventListener('DOMContentLoaded', () => {
+  loadSessionCount();
+  renderHistory();
+  enumerateDevices();
+  // 检查 RokidBridge 是否就绪
+  setTimeout(checkBridge, 600);
+});
+
+function loadSessionCount() {
+  try {
+    const s = localStorage.getItem(SESSION_KEY);
+    sessionCount = s ? parseInt(s, 10) || 0 : 0;
+  } catch(e) {}
+  updateStatus('stCount', sessionCount, 'ok');
+}
+
+function saveSessionCount() {
+  try { localStorage.setItem(SESSION_KEY, sessionCount); } catch(e) {}
+}
+
+/* ---- Toast ---- */
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+/* ---- 状态卡更新 ---- */
+function updateStatus(id, val, cls) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = val;
+  el.className = 'value ' + (cls || 'muted');
+}
+
+/* ---- 模式切换 ---- */
+function selectMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-card').forEach(c => c.classList.toggle('active', c.dataset.mode === mode));
+  document.getElementById('modeTag').textContent = MODE_LABELS[mode] || mode;
+}
+
+/* ---- 设备枚举 ---- */
+async function enumerateDevices() {
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const sel = document.getElementById('deviceSel');
+    const videoDevices = devices.filter(d => d.kind === 'videoinput');
+    sel.innerHTML = '<option value="">默认（自动选择）</option>' +
+      videoDevices.map((d, i) => '<option value="' + d.deviceId + '">' + (d.label || '摄像头 ' + (i+1)) + '</option>').join('');
+    if (videoDevices.length > 0) {
+      document.getElementById('deviceTag').textContent = videoDevices[0].label || '已检测 ' + videoDevices.length + ' 个设备';
+    }
+  } catch(e) {
+    console.warn('[vision] enumerateDevices failed:', e.message);
+  }
+}
+
+/* ---- 启动摄像头 ---- */
+async function startCamera() {
+  if (stream) {
+    toast('摄像头已启动');
+    return;
+  }
+  const deviceId = document.getElementById('deviceSel').value;
+  const constraints = {
+    video: deviceId ? { deviceId: { exact: deviceId } } : { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+    audio: false
+  };
+  try {
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
+    const video = document.getElementById('video');
+    video.srcObject = stream;
+    video.style.display = 'block';
+    document.getElementById('videoPlaceholder').style.display = 'none';
+    document.getElementById('liveTag').style.display = 'block';
+    document.getElementById('btnStart').textContent = '⏹ 关闭摄像头';
+    document.getElementById('btnStart').onclick = stopCamera;
+    document.getElementById('btnCapture').disabled = false;
+    updateStatus('stCam', '在线', 'ok');
+    updateStatus('stMic', '桌面', 'ok');
+    toast('摄像头已启动');
+    await enumerateDevices();
+  } catch(e) {
+    toast('启动失败：' + e.message);
+    updateStatus('stCam', '失败', 'err');
+    console.error('[vision] startCamera:', e);
+  }
+}
+
+function stopCamera() {
+  if (stream) {
+    stream.getTracks().forEach(t => t.stop());
+    stream = null;
+  }
+  const video = document.getElementById('video');
+  video.srcObject = null;
+  video.style.display = 'none';
+  document.getElementById('videoPlaceholder').style.display = '';
+  document.getElementById('liveTag').style.display = 'none';
+  document.getElementById('btnStart').textContent = '📷 启动摄像头';
+  document.getElementById('btnStart').onclick = startCamera;
+  document.getElementById('btnCapture').disabled = true;
+  updateStatus('stCam', '已关闭', 'warn');
+  toast('摄像头已关闭');
+}
+
+/* ---- 拍照 + 分析 ---- */
+async function captureAndAnalyze() {
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('captureCanvas');
+  if (!stream || video.readyState < 2) {
+    toast('请先启动摄像头');
+    return;
+  }
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  const mode = currentMode;
+  const resultBox = document.getElementById('resultBox');
+  resultBox.innerHTML = '<div class="meta">⏳ 分析中...</div><div>正在调用 OCR 引擎</div>';
+
+  try {
+    const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.85));
+    const form = new FormData();
+    form.append('image', blob, 'capture.jpg');
+
+    let apiUrl = '/api/face-ocr/analyze';
+    let body = form;
+    if (mode === 'ocr' || mode === 'ocr-tcm') {
+      apiUrl = '/api/face-ocr/ocr';
+    }
+
+    const r = await fetch(apiUrl, { method: 'POST', body, mode: 'cors' });
+    const data = await r.json().catch(() => ({}));
+    sessionCount++;
+    saveSessionCount();
+    updateStatus('stCount', sessionCount, 'ok');
+
+    const ts = new Date().toLocaleTimeString();
+    const summary = summarizeResult(data, mode);
+    lastResult = summary;
+    resultBox.innerHTML = '<div class="meta">✓ ' + ts + ' · ' + MODE_LABELS[mode] + ' · 耗时 ' + (data.processing_time || '?') + 'ms</div><div>' + escHtml(summary) + '</div>';
+    addHistory(mode, summary);
+    document.getElementById('btnTTS').disabled = false;
+    toast('分析完成');
+  } catch(e) {
+    resultBox.innerHTML = '<div class="meta">✗ 分析失败</div><div>' + escHtml(e.message) + '</div><div style="font-size:10px;color:var(--paper3);margin-top:8px">提示：确认 face-ocr-server 运行在 8913 端口</div>';
+    toast('分析失败：' + e.message);
+  }
+}
+
+/* ---- TTS 朗读 ---- */
+async function speakResult() {
+  if (!lastResult) { toast('暂无结果可朗读'); return; }
+  const text = lastResult.slice(0, 200);
+  try {
+    const r = await fetch('/api/tts/speak', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, voice: 'zh-CN-XiaoxiaoNeural' }),
+      mode: 'cors'
+    });
+    const data = await r.json().catch(() => ({}));
+    if (data.ok || data.url) {
+      toast('TTS 播放中...');
+      if (data.url) {
+        const a = new Audio(data.url);
+        a.play().catch(() => toast('音频播放失败'));
+      }
+    } else {
+      toast('TTS 失败：' + (data.error || '未知'));
+    }
+  } catch(e) {
+    toast('TTS 请求失败：' + e.message);
+  }
+}
+
+/* ---- Mock 切换 ---- */
+function toggleMock() {
+  const sel = document.getElementById('mockSel');
+  const val = sel.value;
+  if (val === 'mock') {
+    if (typeof MockRokid !== 'undefined' && MockRokid.enable) {
+      MockRokid.enable({ kind: 'jr-bridge', delayMs: 50 });
+      mockEnabled = true;
+      updateStatus('stMock', '开启', 'ok');
+      updateStatus('stBridge', 'Mock', 'warn');
+      toast('Mock Rokid 已启用');
+    } else {
+      toast('mock-harness 未加载');
+    }
+  } else {
+    if (typeof MockRokid !== 'undefined' && MockRokid.disable) {
+      MockRokid.disable();
+    }
+    mockEnabled = false;
+    updateStatus('stMock', '关闭', 'warn');
+    checkBridge();
+    toast('Mock 已关闭');
+  }
+}
+
+/* ---- Rokid 桥检查 ---- */
+function checkBridge() {
+  let available = false;
+  let kind = 'none';
+  try {
+    if (window.RokidBridge && window.RokidBridge.available) {
+      available = true;
+      kind = window.RokidBridge.bridgeKind || 'native';
+    }
+  } catch(e) {}
+  if (mockEnabled) {
+    updateStatus('stBridge', 'Mock', 'warn');
+  } else if (available) {
+    updateStatus('stBridge', kind, 'ok');
+  } else {
+    updateStatus('stBridge', '未连接', 'warn');
+  }
+}
+
+/* ---- 结果摘要 ---- */
+function summarizeResult(data, mode) {
+  if (!data || typeof data !== 'object') return String(data);
+  if (data.text) return data.text;
+  if (data.result) return typeof data.result === 'string' ? data.result : JSON.stringify(data.result, null, 2);
+  if (data.analysis) return data.analysis;
+  if (data.diagnosis) return data.diagnosis;
+  if (data.findings) return data.findings.map(f => '- ' + f).join('\n');
+  // fallback: 取前几个字段
+  const keys = Object.keys(data).filter(k => k !== 'ok' && k !== 'code' && k !== 'ts').slice(0, 5);
+  return keys.map(k => k + ': ' + JSON.stringify(data[k])).join('\n');
+}
+
+function escHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ---- 历史 ---- */
+function addHistory(mode, preview) {
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch(e) {}
+  hist.unshift({ ts: new Date().toLocaleString(), mode, preview: preview.slice(0, 60) });
+  if (hist.length > 10) hist.length = 10;
+  try { localStorage.setItem(HISTORY_KEY, JSON.stringify(hist)); } catch(e) {}
+  renderHistory();
+}
+
+function renderHistory() {
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch(e) {}
+  const el = document.getElementById('historyList');
+  if (!hist.length) { el.innerHTML = '<div style="font-size:11px;color:var(--paper3);padding:8px">暂无记录</div>'; return; }
+  el.innerHTML = hist.map(h =>
+    '<div class="history-item"><span class="ts">' + escHtml(h.ts) + '</span><span class="tag">' + MODE_LABELS[h.mode] + '</span><span class="preview">' + escHtml(h.preview) + '</span></div>'
+  ).join('');
+}
+
+function clearHistory() {
+  try { localStorage.removeItem(HISTORY_KEY); } catch(e) {}
+  renderHistory();
+  toast('历史已清空');
+}
+</script>
+</body>
+</html>

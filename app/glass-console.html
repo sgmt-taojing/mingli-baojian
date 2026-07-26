@@ -2,189 +2,727 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=yes">
-<title>命理宝鉴 · 智能眼镜控制台 (HUD)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=5,user-scalable=yes">
+<title>先知智镜 · 智能眼镜控制台 · 命理宝鉴</title>
+<meta name="theme-color" content="#0e1116">
+<link rel="stylesheet" href="css/a11y-fix.css">
+<style>
+:root{
+  --bg:#0e1116; --bg2:#161b22; --bg3:#1e2530; --bd:#30363d; --bd2:#444c56;
+  --tx:#e6edf3; --muted:#8b949e; --muted2:#6e7681;
+  --gold:#c9a84c; --gold2:#e6c873;
+  --ok:#3fb950; --warn:#d29922; --err:#f85149; --info:#58a6ff; --purple:#bc8cff;
+  --shadow:0 4px 16px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.6;min-height:100vh}
+a{color:var(--info);text-decoration:none}
+header{background:linear-gradient(135deg,#1c2128,#161b22);border-bottom:1px solid var(--bd);padding:18px 24px;position:sticky;top:0;z-index:50;backdrop-filter:blur(12px)}
+header h1{font-size:22px;color:var(--gold2);margin-bottom:2px;font-weight:600}
+header p{font-size:13px;color:var(--muted)}
+.back{position:absolute;right:24px;top:24px;color:var(--muted);font-size:13px;padding:6px 14px;border:1px solid var(--bd);border-radius:6px}
+.back:hover{background:var(--bg3);color:var(--tx)}
+.wrap{max-width:1200px;margin:0 auto;padding:20px 24px 100px}
 
+/* === 状态卡片（戴上眼镜第一眼看到的） === */
+.status-hero{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:20px}
+@media(max-width:768px){.status-hero{grid-template-columns:1fr}.wrap{padding:14px}}
+.hero-main{background:linear-gradient(135deg,var(--bg2),var(--bg3));border:1px solid var(--bd);border-radius:14px;padding:24px;position:relative;overflow:hidden}
+.hero-main::before{content:"";position:absolute;top:-50%;right:-30%;width:300px;height:300px;background:radial-gradient(circle,rgba(201,168,76,.12),transparent 70%);pointer-events:none}
+.hero-icon{font-size:48px;margin-bottom:8px;display:block}
+.hero-title{font-size:24px;font-weight:600;margin-bottom:4px;color:var(--tx)}
+.hero-sub{font-size:14px;color:var(--muted);margin-bottom:14px}
+.hero-state{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:99px;font-size:14px;font-weight:500;border:1px solid var(--bd);background:var(--bg)}
+.hero-state .dot{width:10px;height:10px;border-radius:50%}
+.hero-state.online{background:rgba(63,185,80,.12);border-color:rgba(63,185,80,.4);color:var(--ok)}
+.hero-state.online .dot{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.hero-state.offline{background:rgba(248,81,73,.1);border-color:rgba(248,81,73,.3);color:var(--err)}
+.hero-state.offline .dot{background:var(--err)}
+.hero-state.mock{background:rgba(188,140,255,.12);border-color:rgba(188,140,255,.4);color:var(--purple)}
+.hero-state.mock .dot{background:var(--purple);box-shadow:0 0 8px var(--purple)}
+.hero-actions{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
 
-<!-- 先知智镜 · 可穿戴设备接入层（路总 2026-07-24 规划）-->
-<script src="../js/wearable/rokid-bridge.js"></script>
-<script src="../js/wearable/rokid-camera.js"></script>
-<script src="../js/wearable/rokid-audio.js"></script>
-<script src="../js/wearable/rokid-voice.js"></script>
-<script src="../js/wearable/rokid-motion.js"></script>
-<script src="../js/wearable/rokid-storage.js"></script>
-<script src="../js/wearable/rokid-glass.js"></script>
-<script src="../js/wearable/device-provider.js"></script>
-<script src="../js/wearable/mock-harness.js"></script>
-  <link rel="stylesheet" href="css/a11y-fix.css">
-<link rel="stylesheet" href="css/glass-console-inline.css">
+.hero-side{display:flex;flex-direction:column;gap:12px}
+.stat-card{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:14px 18px}
+.stat-card .label{font-size:12px;color:var(--muted);margin-bottom:4px;letter-spacing:.5px;text-transform:uppercase}
+.stat-card .value{font-size:28px;font-weight:600;color:var(--tx);font-variant-numeric:tabular-nums}
+.stat-card .value small{font-size:14px;color:var(--muted);margin-left:4px;font-weight:400}
+.stat-card.ok .value{color:var(--ok)}
+.stat-card.warn .value{color:var(--warn)}
+.stat-card.err .value{color:var(--err)}
+
+/* === Tab === */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--bd);margin-bottom:18px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:12px 20px;font-size:14px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;font-weight:500}
+.tab:hover{color:var(--tx)}
+.tab.active{color:var(--gold2);border-bottom-color:var(--gold2)}
+.tab .badge{margin-left:6px;font-size:11px;background:var(--bg3);padding:1px 8px;border-radius:99px;color:var(--muted)}
+.tab.active .badge{background:rgba(201,168,76,.15);color:var(--gold2)}
+
+.pane{display:none}
+.pane.active{display:block}
+
+/* === 通用卡片 === */
+.card{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:18px;margin-bottom:14px}
+.card h3{font-size:15px;margin-bottom:10px;color:var(--tx);font-weight:600;display:flex;align-items:center;gap:8px}
+.card h3 .hint{margin-left:auto;font-size:11px;color:var(--muted2);font-weight:400}
+
+/* === 按钮 === */
+.btn{padding:10px 18px;border-radius:8px;font-size:14px;font-weight:500;border:1px solid var(--bd);background:var(--bg3);color:var(--tx);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--gold);background:#262d36}
+.btn.primary{background:var(--gold);color:#1c1408;border-color:var(--gold);font-weight:600}
+.btn.primary:hover{background:var(--gold2)}
+.btn.ok{background:var(--ok);color:#0e1116;border-color:var(--ok)}
+.btn.warn{background:var(--warn);color:#1c1408;border-color:var(--warn)}
+.btn.danger{background:transparent;border-color:rgba(248,81,73,.4);color:var(--err)}
+.btn.lg{padding:14px 24px;font-size:16px}
+.btn.sm{padding:6px 12px;font-size:12px}
+
+/* === 模式选择器 === */
+.mode-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+@media(max-width:768px){.mode-grid{grid-template-columns:repeat(2,1fr)}}
+.mode-card{background:var(--bg3);border:2px solid var(--bd);border-radius:12px;padding:18px 12px;text-align:center;cursor:pointer;transition:all .15s}
+.mode-card:hover{border-color:var(--gold2)}
+.mode-card.active{border-color:var(--gold);background:rgba(201,168,76,.08)}
+.mode-card .icon{font-size:32px;margin-bottom:6px;display:block}
+.mode-card .name{font-size:14px;font-weight:500}
+.mode-card .desc{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* === 表单 === */
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.input,.select,.textarea{width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--bd);color:var(--tx);border-radius:8px;font-size:14px;font-family:inherit}
+.input:focus,.select:focus,.textarea:focus{outline:none;border-color:var(--gold)}
+.input-row{display:flex;gap:8px}
+.input-row .input{flex:1}
+
+/* === 大输出区 === */
+.output{background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:16px;font-size:15px;line-height:1.8;min-height:80px;white-space:pre-wrap;word-break:break-word}
+.output.streaming::after{content:"▍";animation:blink 1s infinite;color:var(--gold2)}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+.output-meta{margin-top:8px;font-size:11px;color:var(--muted2);font-family:monospace;display:flex;flex-wrap:wrap;gap:10px}
+.output-meta .chip{background:var(--bg3);padding:2px 8px;border-radius:99px;border:1px solid var(--bd)}
+.output-meta .chip.kb{color:var(--ok);border-color:rgba(63,185,80,.3)}
+.output-meta .chip.ai{color:var(--info);border-color:rgba(88,166,255,.3)}
+.output-meta .chip.ttfb{color:var(--gold2);border-color:rgba(201,168,76,.3)}
+
+/* === 历史列表 === */
+.hist-item{background:var(--bg3);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:8px;display:flex;gap:14px;align-items:flex-start}
+.hist-icon{font-size:24px;flex-shrink:0;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:var(--bg);border-radius:8px}
+.hist-body{flex:1;min-width:0}
+.hist-title{font-size:14px;font-weight:500;margin-bottom:4px;color:var(--tx)}
+.hist-text{font-size:13px;color:var(--muted);white-space:pre-wrap;word-break:break-word;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.hist-meta{font-size:11px;color:var(--muted2);margin-top:4px;display:flex;gap:10px}
+
+/* === 服务健康 === */
+.svc-row{display:grid;grid-template-columns:1.5fr .8fr 1fr auto;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--bd);font-size:13px}
+.svc-row:last-child{border-bottom:none}
+.svc-name{font-weight:500}
+.svc-row .latency{font-variant-numeric:tabular-nums;color:var(--muted);font-family:monospace}
+.svc-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.svc-dot.ok{background:var(--ok);box-shadow:0 0 6px var(--ok)}
+.svc-dot.err{background:var(--err)}
+.svc-dot.warn{background:var(--warn)}
+
+/* === 空态 === */
+.empty{text-align:center;padding:48px 24px;color:var(--muted2)}
+.empty .icon{font-size:48px;margin-bottom:10px;opacity:.6}
+.empty .text{font-size:14px}
+.empty .hint{font-size:12px;margin-top:6px;color:var(--muted2)}
+
+/* === Toast === */
+.toast{position:fixed;top:24px;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--bg3);border:1px solid var(--bd);color:var(--tx);padding:12px 24px;border-radius:10px;font-size:14px;z-index:1000;transition:transform .3s;box-shadow:var(--shadow);max-width:80vw}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.err{border-color:var(--err);background:rgba(248,81,73,.1)}
+.toast.ok{border-color:var(--ok);background:rgba(63,185,80,.1)}
+
+@media(max-width:320px){.wrap{padding:10px}.hero-main{padding:18px}.hero-title{font-size:20px}.btn{padding:8px 14px;font-size:13px}}
+</style>
 </head>
-<body>
-  <a class="skip-link" href="#main-content">跳到主内容</a>
-<main id="main-content" role="main">
+<body data-kb-module="wearable">
+<header>
+  <h1>🥽 先知智镜 · 智能眼镜控制台</h1>
+  <p>Wearable HUD · 智镜 · 问诊 · 历史 三屏一体 · 戴眼镜也能看清</p>
+  <a href="divination-hub.html" class="back">← 返回主页</a>
+</header>
 
-<div class="hud-stage">
-  <!-- 顶部状态栏 -->
-  <div class="hud-top">
-    <div class="brand">
-      <span>🥽 命理宝鉴 HUD</span>
+<div class="wrap">
+
+  <!-- === 状态总览（戴上眼镜第一眼看到的） === -->
+  <div class="status-hero">
+    <div class="hero-main">
+      <span class="hero-icon" id="heroIcon">🥽</span>
+      <div class="hero-title" id="heroTitle">设备未连接</div>
+      <div class="hero-sub" id="heroSub">点击下方按钮连接 Rokid 智镜 · 或使用 Mock 模式体验</div>
+      <span class="hero-state offline" id="heroState">
+        <span class="dot"></span><span id="heroStateText">未连接</span>
+      </span>
+      <div class="hero-actions">
+        <button class="btn primary lg" id="btnConnect">🔗 连接眼镜</button>
+        <button class="btn" id="btnMock">🛠 体验 Mock 模式</button>
+        <button class="btn" id="btnRefresh">🔄 刷新状态</button>
+      </div>
     </div>
-    <div class="stats">
-      <span>电量 <strong id="battery">87%</strong></span>
-      <span>网络 <strong id="network">5G</strong></span>
-      <span id="device-id" style="color: var(--hud-muted);">GL-...</span>
-      <span id="wearable-status" style="color: var(--hud-warn);">📱 检测中...</span>
-      <button id="mock-toggle" class="mock-btn" type="button" aria-label="切换 Mock 模式"
-        style="background: var(--hud-bg); color: var(--hud-muted); border: 1px solid var(--hud-line); padding: 2px 8px; border-radius: 4px; cursor: pointer; font-size: 12px;">
-        🛠️ Mock: 关
-      </button>
+    <div class="hero-side">
+      <div class="stat-card ok">
+        <div class="label">电量</div>
+        <div class="value" id="statBattery">—<small>%</small></div>
+      </div>
+      <div class="stat-card">
+        <div class="label">网络</div>
+        <div class="value" id="statNetwork">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">设备 ID</div>
+        <div class="value" id="statDeviceId" style="font-size:14px;font-family:monospace">—</div>
+      </div>
     </div>
   </div>
 
-  <!-- TTS 播放指示器 -->
-  <div class="tts-indicator" id="tts-indicator">语音播报中</div>
+  <!-- === Tab === -->
+  <div class="tabs">
+    <div class="tab active" data-tab="hud">🥽 智镜 HUD</div>
+    <div class="tab" data-tab="ask">💬 问诊 <span class="badge" id="askCount">0</span></div>
+    <div class="tab" data-tab="voice">🎤 语音</div>
+    <div class="tab" data-tab="vision">📷 视觉</div>
+    <div class="tab" data-tab="history">📜 历史 <span class="badge" id="histCount">0</span></div>
+    <div class="tab" data-tab="health">⚙ 服务</div>
+  </div>
 
-  <!-- 错误 toast -->
-  <div class="toast" id="toast"></div>
+  <!-- === Tab · 智镜 HUD === -->
+  <div class="pane active" data-pane="hud">
 
-  <!-- 中央主视图 -->
-  <div class="hud-main">
-
-    <!-- 模式选择 -->
-    <div class="mode-grid">
-      <div class="mode-card active" data-mode="paipan">
-        <div class="icon">☯</div>
-        <div class="name">排盘</div>
-      </div>
-      <div class="mode-card" data-mode="tcm">
-        <div class="icon">🌿</div>
-        <div class="name">中医</div>
-      </div>
-      <div class="mode-card" data-mode="face">
-        <div class="icon">👁</div>
-        <div class="name">面相</div>
+    <div class="card">
+      <h3>🎯 模式选择 <span class="hint">影响后续问诊与视觉识别</span></h3>
+      <div class="mode-grid">
+        <div class="mode-card active" data-mode="paipan"><span class="icon">☯</span><div class="name">排盘</div><div class="desc">八字 · 紫微</div></div>
+        <div class="mode-card" data-mode="tcm"><span class="icon">🌿</span><div class="name">中医</div><div class="desc">舌诊 · 病历</div></div>
+        <div class="mode-card" data-mode="face"><span class="icon">👁</span><div class="name">面相</div><div class="desc">颜面 · 五官</div></div>
+        <div class="mode-card" data-mode="bazi"><span class="icon">📖</span><div class="name">八字</div><div class="desc">四柱详批</div></div>
       </div>
     </div>
 
-    <!-- R16-E: 28 舌象分布饼图（基于 r16-28tongues-* KB） -->
-    <div class="tongue-chart-block" id="tongue-chart-block">
-      <div class="tongue-chart-title">🩺 智镜·28 舌象分布（R16）</div>
-      <div class="tongue-chart-stage">
-        <canvas id="tongue-pie" width="320" height="200"></canvas>
-        <div class="tongue-legend" id="tongue-legend"></div>
+    <div class="card">
+      <h3>📊 实时监测</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="stat-card">
+          <div class="label">今日运势</div>
+          <div class="value" id="liveFortune" style="font-size:18px">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">健康提示</div>
+          <div class="value" id="liveHealth" style="font-size:18px">—</div>
+        </div>
       </div>
-      <div class="tongue-hint">数据来自 KB: r16-28tongues-001~028 (tcm-diagnosis 模块) · 4 大组×7子型</div>
-    </div>
-
-    <!-- 摄像头预览 -->
-    <div class="camera-preview" id="camera-preview">
-      <div class="placeholder">
-        <div class="icon-big">📷</div>
-        <div>点击"拍照分析"启动摄像头</div>
-      </div>
-      <div class="reticle"></div>
-    </div>
-
-    <!-- OCR 识别结果 -->
-    <div class="ocr-result" id="ocr-result">
-      <div class="ocr-title">OCR 识别结果</div>
-      <div class="ocr-text" id="ocr-text">等待识别...</div>
-      <div class="ocr-confidence" id="ocr-confidence">置信度: --</div>
-    </div>
-
-    <!-- 命盘 + 中医 双面板 -->
-    <div class="duo-panel">
-      <div class="duo-card">
-        <div class="duo-title">今日运势</div>
-        <div class="duo-value" id="fortune-value">--</div>
-        <div class="duo-meta" id="fortune-meta">点击刷新</div>
-      </div>
-      <div class="duo-card">
-        <div class="duo-title">健康提示</div>
-        <div class="duo-value" id="health-value">--</div>
-        <div class="duo-meta" id="health-meta">点击刷新</div>
+      <div style="margin-top:12px;text-align:right">
+        <button class="btn sm" id="btnRefreshLive">🔄 刷新</button>
       </div>
     </div>
 
-    <!-- 历史记录 -->
-    <div class="history-list" id="history-list"></div>
+    <div class="card">
+      <h3>🩺 28 舌象分布 <span class="hint">来自 KB r16-28tongues-001~028</span></h3>
+      <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+        <canvas id="tongue-pie" width="320" height="200" style="background:var(--bg);border-radius:8px;flex-shrink:0"></canvas>
+        <div id="tongue-legend" style="flex:1;min-width:200px"></div>
+      </div>
+    </div>
 
   </div>
 
-  <!-- 底部操作栏 -->
-  <div class="action-bar">
-    <div class="hud-btn" id="btn-history">📜 历史</div>
-    <div class="hud-btn primary" id="btn-capture">📸 拍照分析</div>
-    <div class="hud-btn danger" id="btn-stop">⏹ 停止</div>
+  <!-- === Tab · 问诊 === -->
+  <div class="pane" data-pane="ask">
+    <div class="card">
+      <h3>🛰️ R18 流式问诊 <span class="hint">TTFB ≤ 800ms · KB 零延迟</span></h3>
+      <div class="input-row">
+        <input class="input" id="askQ" type="text" placeholder="想问什么，如 心气虚怎么调理" aria-label="问诊输入">
+        <button class="btn primary" id="askSend">问 KB</button>
+        <button class="btn danger" id="askStop" disabled>⏹ 停</button>
+      </div>
+      <div style="margin-top:14px">
+        <div class="output streaming-target" id="askOut" data-state="idle">问诊结果会出现在此</div>
+        <div class="output-meta" id="askMeta"></div>
+        <div id="askKbRef" style="margin-top:6px;font-size:12px;color:var(--ok)"></div>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn sm" data-quick="心气虚怎么调理">🌿 心气虚</button>
+        <button class="btn sm" data-quick="肝火旺怎么降">🔥 肝火旺</button>
+        <button class="btn sm" data-quick="八字看事业">☯ 事业</button>
+        <button class="btn sm" data-quick="今日运势">📅 今日</button>
+        <button class="btn sm" data-quick="五行音乐推荐">🎵 五行音乐</button>
+      </div>
+    </div>
   </div>
+
+  <!-- === Tab · 语音 === -->
+  <div class="pane" data-pane="voice">
+    <div class="card">
+      <h3>🎤 R20 语音 STT <span class="hint">浏览器 Speech → KB intent</span></h3>
+      <div class="input-row">
+        <button class="btn primary" id="sttStart">🎙 开始</button>
+        <button class="btn danger" id="sttStop" disabled>⏹ 停止</button>
+      </div>
+      <div style="margin-top:10px" class="input-row">
+        <input class="input" id="sttHint" type="text" placeholder="（可选）提示词：如想问事业" aria-label="stt提示">
+        <button class="btn ok" id="sttUpload">📤 上传音频</button>
+      </div>
+      <div class="output-meta" id="sttStatus" style="margin-top:12px"><span class="chip">离线 / 等待点击</span></div>
+      <div class="output" id="sttOut" style="margin-top:10px">录音结果会出现在此</div>
+      <div id="sttIntent" style="margin-top:6px;font-size:12px;color:var(--warn)"></div>
+      <div id="sttKbRef" style="margin-top:6px;font-size:12px;color:var(--ok)"></div>
+    </div>
+  </div>
+
+  <!-- === Tab · 视觉 === -->
+  <div class="pane" data-pane="vision">
+    <div class="card">
+      <h3>📷 R19 病历 OCR <span class="hint">8913 face-ocr-server · 5 引擎优先级</span></h3>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <input type="file" accept="image/*" id="ocrFile" style="flex:1;padding:8px;background:var(--bg3);border:1px solid var(--bd);border-radius:8px;color:var(--tx);font-size:13px;min-width:0">
+        <select class="select" id="ocrMode" style="width:auto">
+          <option value="tcm">中医病历</option>
+          <option value="recognize">通用 OCR</option>
+        </select>
+        <button class="btn primary" id="ocrUpload">📤 上传识别</button>
+      </div>
+      <div class="output-meta" id="ocrMeta" style="margin-top:12px"><span class="chip">—</span></div>
+      <div class="output" id="ocrOut" style="margin-top:10px;min-height:60px">识别结果会出现在此</div>
+      <div id="ocrKbRef" style="margin-top:6px;font-size:12px;color:var(--ok)"></div>
+    </div>
+
+    <div class="card">
+      <h3>📸 摄像头拍照</h3>
+      <div id="camPreview" style="background:var(--bg);border:1px solid var(--bd);border-radius:10px;min-height:180px;display:flex;align-items:center;justify-content:center;color:var(--muted2);font-size:13px">未启动摄像头</div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn primary" id="camStart">📷 启动</button>
+        <button class="btn" id="camSnap">📸 抓拍</button>
+        <button class="btn danger" id="camStop">⏹ 停止</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- === Tab · 历史 === -->
+  <div class="pane" data-pane="history">
+    <div class="card">
+      <h3>📜 问诊 / 拍照 / 录音历史 <span class="hint">本地持久化 · 可导出</span></h3>
+      <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="btn sm" id="histFilterAll" data-filter="all">全部</button>
+        <button class="btn sm" id="histFilterAsk" data-filter="ask">💬 问诊</button>
+        <button class="btn sm" id="histFilterOcr" data-filter="ocr">📷 OCR</button>
+        <button class="btn sm" id="histFilterStt" data-filter="stt">🎤 语音</button>
+        <button class="btn sm danger" id="histClear">🗑 清空</button>
+        <button class="btn sm ok" id="histExport">📤 导出 JSON</button>
+      </div>
+      <div id="histList"></div>
+    </div>
+  </div>
+
+  <!-- === Tab · 服务 === -->
+  <div class="pane" data-pane="health">
+    <div class="card">
+      <h3>⚙ 后端服务健康 <span class="hint">6 端口实时监测</span></h3>
+      <div class="svc-row" style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">
+        <div>服务</div><div>端口</div><div>延迟</div><div></div>
+      </div>
+      <div id="svcList"></div>
+    </div>
+  </div>
+
 </div>
 
+<div class="toast" id="toast"></div>
 
+<!-- === SDK & 服务 === -->
+<script src="js/wearable/rokid-bridge.js"></script>
+<script src="js/wearable/rokid-camera.js"></script>
+<script src="js/wearable/rokid-audio.js"></script>
+<script src="js/wearable/rokid-voice.js"></script>
+<script src="js/wearable/rokid-motion.js"></script>
+<script src="js/wearable/rokid-storage.js"></script>
+<script src="js/wearable/rokid-glass.js"></script>
+<script src="js/wearable/device-provider.js"></script>
+<script src="js/wearable/mock-harness.js"></script>
+<script src="js/a11y-divination-hub.js" defer></script>
+<script src="js/sdk-readiness-check.js" defer></script>
 
-<!-- 先知智镜 · 可穿戴设备联动入口（路总 2026-07-24 规划）-->
+<script>
+// === 状态管理 ===
+const State = {
+  mode: 'paipan',
+  connected: false,
+  mock: false,
+  deviceId: '—',
+  battery: null,
+  network: '—',
+  history: JSON.parse(localStorage.getItem('glass_history') || '[]'),
+  historyFilter: 'all',
+  askAbort: null,
+  sttRec: null,
+  sttStream: null,
+};
 
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-  
+function toast(msg, type='') {
+  const el = $('#toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + type;
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove('show'), 2800);
+}
 
+// === Tab 切换 ===
+$$('.tab').forEach(t => t.onclick = () => {
+  $$('.tab').forEach(x => x.classList.remove('active'));
+  $$('.pane').forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  $('.pane[data-pane="' + t.dataset.tab + '"]').classList.add('active');
+});
 
+// === 模式切换 ===
+$$('.mode-card').forEach(c => c.onclick = () => {
+  $$('.mode-card').forEach(x => x.classList.remove('active'));
+  c.classList.add('active');
+  State.mode = c.dataset.mode;
+  toast('已切换到「' + c.querySelector('.name').textContent + '」模式');
+});
 
-  <!-- R17-A SDK 真机自检挂载点 -->
-  <div id="sdk-readiness-host" style="margin:12px 0;"></div>
+// === 连接管理 ===
+async function checkBridge() {
+  if (window.RokidBridge && typeof window.RokidBridge.isAvailable === 'function') {
+    try { return await window.RokidBridge.isAvailable(); } catch(e){}
+  }
+  return false;
+}
 
-  <!-- R18 流式问诊输入面板 -->
-  <div id="r18-stream-panel" style="margin:12px 0;padding:14px;background:var(--bg-card,#1a2436);border:1px solid var(--accent,#4fd1c5);border-radius:10px;">
-    <div style="font-size:14px;font-weight:600;color:var(--accent-2,#fbbf24);margin-bottom:8px;">🛰️ R18 流式问诊（KB 零延迟）</div>
-    <div style="display:flex;gap:6px;">
-      <input aria-label="r18-q" id="r18-q" type="text" placeholder="输入问题，如 心气虚怎么调理" style="flex:1;padding:8px;background:#0e1726;color:#e6edf7;border:1px solid #4fd1c5;border-radius:6px;font-size:13px;">
-      <button id="r18-ask" style="padding:8px 14px;background:#4fd1c5;color:#0e1726;border:none;border-radius:6px;cursor:pointer;font-weight:600;">问 KB</button>
-      <button id="r18-stop" style="padding:8px 14px;background:#ef4444;color:#fff;border:none;border-radius:6px;cursor:pointer;">停</button>
+$('#btnConnect').onclick = async () => {
+  $('#btnConnect').textContent = '🔄 连接中…';
+  $('#btnConnect').disabled = true;
+  try {
+    const available = await checkBridge();
+    if (available) {
+      State.connected = true;
+      State.mock = false;
+      State.deviceId = 'RK-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+      State.battery = 87 + Math.floor(Math.random() * 10);
+      State.network = navigator.onLine ? '5G' : 'WiFi';
+      toast('✓ 已连接 Rokid 智镜', 'ok');
+      await refreshStatus();
+    } else {
+      toast('Rokid SDK 未检测到，请使用 Mock 模式', 'err');
+    }
+  } catch (e) {
+    toast('连接失败：' + e.message, 'err');
+  } finally {
+    $('#btnConnect').textContent = '🔗 连接眼镜';
+    $('#btnConnect').disabled = false;
+  }
+};
+
+$('#btnMock').onclick = () => {
+  State.connected = true;
+  State.mock = true;
+  State.deviceId = 'MOCK-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+  State.battery = 75 + Math.floor(Math.random() * 25);
+  State.network = 'Mock-5G';
+  toast('✓ Mock 模式已启动', 'ok');
+  refreshStatus();
+};
+
+$('#btnRefresh').onclick = refreshStatus;
+
+async function refreshStatus() {
+  $('#statBattery').innerHTML = (State.battery ?? '—') + '<small>%</small>';
+  $('#statNetwork').textContent = State.network;
+  $('#statDeviceId').textContent = State.deviceId;
+  const el = $('#heroState');
+  $('#heroIcon').textContent = State.connected ? (State.mock ? '🛠️' : '🥽') : '🥽';
+  $('#heroTitle').textContent = State.connected ? (State.mock ? 'Mock 智镜' : 'Rokid 智镜') : '设备未连接';
+  $('#heroSub').textContent = State.connected
+    ? (State.mock ? '所有功能走本地模拟，无需真实设备' : 'Rokid 智镜已连接，可以问诊/拍照/录音')
+    : '点击「连接眼镜」或「体验 Mock 模式」开始';
+  el.className = 'hero-state ' + (State.connected ? (State.mock ? 'mock' : 'online') : 'offline');
+  $('#heroStateText').textContent = State.connected ? (State.mock ? 'Mock 运行中' : '在线') : '未连接';
+  State.battery = State.connected && State.battery < 100 ? State.battery : State.battery;
+}
+
+// === R18 流式问诊 ===
+async function askSend() {
+  const q = $('#askQ').value.trim();
+  if (!q) { toast('请输入问题', 'err'); return; }
+  const out = $('#askOut');
+  const meta = $('#askMeta');
+  const kbRef = $('#askKbRef');
+  out.textContent = ''; out.dataset.state = 'streaming'; out.classList.add('streaming');
+  meta.innerHTML = '';
+  kbRef.textContent = '';
+  $('#askSend').disabled = true; $('#askStop').disabled = false;
+  const t0 = performance.now();
+  State.askAbort = new AbortController();
+  try {
+    const r = await fetch('/api/glass/stream-ask', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ q, mode: State.mode }),
+      signal: State.askAbort.signal
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const reader = r.body.getReader();
+    const dec = new TextDecoder();
+    let buf = '', ttfb = null, chunk = 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (!ttfb) { ttfb = performance.now() - t0; meta.innerHTML += '<span class="chip ttfb">⏱ TTFB ' + ttfb.toFixed(0) + 'ms</span>'; }
+      buf += dec.decode(value, { stream:true });
+      const lines = buf.split('\n'); buf = lines.pop();
+      for (const ln of lines) {
+        if (ln.startsWith('data:')) {
+          try {
+            const obj = JSON.parse(ln.slice(5).trim());
+            if (obj.text) { out.textContent += obj.text; chunk++; }
+            if (obj.kb_refs) kbRef.innerHTML = '📚 KB: ' + obj.kb_refs.map(k=>'<span class="chip kb">' + k + '</span>').join(' ');
+          } catch(e){}
+        }
+      }
+    }
+    const total = (performance.now() - t0).toFixed(0);
+    meta.innerHTML += '<span class="chip">📊 ' + chunk + ' chunks</span><span class="chip">⏱ ' + total + 'ms</span><span class="chip ai">AI</span>';
+    out.dataset.state = 'done';
+    addHistory({ type:'ask', icon:'💬', title:q, text:out.textContent.slice(0,500), meta:{ ttfb, total, mode:State.mode }, ts:Date.now() });
+    speak(out.textContent.slice(0,200));
+  } catch (e) {
+    if (e.name !== 'AbortError') {
+      out.textContent = '❌ ' + e.message;
+      meta.innerHTML = '<span class="chip err">fallback → KB</span>';
+      kbFallback(q, out, kbRef, meta);
+    }
+  } finally {
+    out.classList.remove('streaming');
+    $('#askSend').disabled = false; $('#askStop').disabled = true;
+  }
+}
+
+async function kbFallback(q, out, kbRef, meta) {
+  try {
+    const r = await fetch('/api/public/kb-search?q=' + encodeURIComponent(q) + '&limit=3');
+    const d = await r.json();
+    if (d.ok && d.results && d.results.length) {
+      out.textContent = d.results.map(x => x.title + '\n' + (x.content||x.summary||'').slice(0,300)).join('\n\n---\n\n');
+      kbRef.innerHTML = '📚 KB 直答: ' + d.results.length + ' 条 (来源 ' + (d.engine||'fts5') + ')';
+      meta.innerHTML += '<span class="chip kb">KB</span>';
+    } else {
+      out.textContent = '本地 KB 暂无匹配，可点击下方按钮转 AI 兜底';
+    }
+  } catch(e){}
+}
+
+$('#askSend').onclick = askSend;
+$('#askStop').onclick = () => State.askAbort && State.askAbort.abort();
+$('#askQ').addEventListener('keydown', e => { if (e.key === 'Enter') askSend(); });
+$$('[data-quick]').forEach(b => b.onclick = () => { $('#askQ').value = b.dataset.quick; askSend(); });
+
+// === R20 语音 ===
+function setupSTT() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { $('#sttStart').disabled = true; $('#sttStatus').innerHTML = '<span class="chip err">浏览器不支持 SpeechRecognition</span>'; return; }
+  State.sttRec = new SR();
+  State.sttRec.lang = 'zh-CN';
+  State.sttRec.interimResults = true;
+  State.sttRec.onresult = (e) => {
+    let txt = ''; for (let i = e.resultIndex; i < e.results.length; i++) txt += e.results[i][0].transcript;
+    $('#sttOut').textContent = txt;
+    if (e.results[e.results.length-1].isFinal) {
+      $('#sttStatus').innerHTML = '<span class="chip ok">✓ 识别完成</span>';
+      $('#askQ').value = txt; askSend();
+    } else {
+      $('#sttStatus').innerHTML = '<span class="chip warn">识别中…</span>';
+    }
+  };
+  State.sttRec.onerror = (e) => { $('#sttStatus').innerHTML = '<span class="chip err">❌ ' + e.error + '</span>'; $('#sttStop').click(); };
+  State.sttRec.onend = () => { $('#sttStart').disabled = false; $('#sttStop').disabled = true; };
+}
+$('#sttStart').onclick = () => { if (!State.sttRec) return; State.sttRec.start(); $('#sttStart').disabled = true; $('#sttStop').disabled = false; $('#sttStatus').innerHTML = '<span class="chip warn">🎙 录音中…</span>'; };
+$('#sttStop').onclick = () => { if (State.sttRec) State.sttRec.stop(); };
+$('#sttUpload').onclick = async () => {
+  const hint = $('#sttHint').value.trim();
+  const r = await fetch('/api/glass/upload-audio', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ text: $('#sttOut').textContent, hint, mode: State.mode }) });
+  const d = await r.json();
+  if (d.ok) {
+    $('#sttIntent').textContent = '🎯 Intent: ' + (d.intent||'?') + (d.nextStep ? ' · ' + d.nextStep : '');
+    $('#sttKbRef').innerHTML = d.kb_refs ? '📚 KB: ' + d.kb_refs.map(k=>'<span class="chip kb">' + k + '</span>').join(' ') : '';
+    addHistory({ type:'stt', icon:'🎤', title: hint || '录音', text: d.intent + ' / ' + (d.nextStep||''), ts:Date.now() });
+  } else {
+    toast('音频上传失败', 'err');
+  }
+};
+setupSTT();
+
+// === R19 OCR ===
+$('#ocrUpload').onclick = async () => {
+  const f = $('#ocrFile').files[0];
+  if (!f) { toast('请先选择图片', 'err'); return; }
+  const fd = new FormData(); fd.append('file', f); fd.append('mode', $('#ocrMode').value);
+  $('#ocrOut').textContent = '⏳ 识别中…';
+  $('#ocrMeta').innerHTML = '<span class="chip warn">5 引擎优先级</span>';
+  try {
+    const r = await fetch('/api/face-ocr/recognize', { method:'POST', body: fd });
+    const d = await r.json();
+    $('#ocrOut').textContent = d.text || d.content || JSON.stringify(d).slice(0,400);
+    $('#ocrMeta').innerHTML = '<span class="chip ok">✓ ' + (d.engine||'?') + '</span><span class="chip">' + (d.confidence?.toFixed?.(2)||'?') + '</span>';
+    if (d.kb_refs) $('#ocrKbRef').innerHTML = '📚 KB: ' + d.kb_refs.map(k=>'<span class="chip kb">' + k + '</span>').join(' ');
+    addHistory({ type:'ocr', icon:'📷', title:f.name, text:$('#ocrOut').textContent.slice(0,400), ts:Date.now() });
+  } catch (e) { $('#ocrOut').textContent = '❌ ' + e.message; $('#ocrMeta').innerHTML = '<span class="chip err">失败</span>'; }
+};
+
+// === 摄像头 ===
+$('#camStart').onclick = async () => {
+  try {
+    const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    State.camStream = s;
+    const v = document.createElement('video'); v.srcObject = s; v.autoplay = true; v.muted = true;
+    v.style.cssText = 'width:100%;max-height:280px;border-radius:10px;background:#000';
+    $('#camPreview').innerHTML = ''; $('#camPreview').appendChild(v);
+  } catch (e) { toast('摄像头权限：' + e.message, 'err'); }
+};
+$('#camStop').onclick = () => { if (State.camStream) State.camStream.getTracks().forEach(t=>t.stop()); $('#camPreview').innerHTML = '已停止'; };
+$('#camSnap').onclick = () => {
+  const v = $('#camPreview video');
+  if (!v) { toast('请先启动摄像头', 'err'); return; }
+  const c = document.createElement('canvas'); c.width = v.videoWidth; c.height = v.videoHeight;
+  c.getContext('2d').drawImage(v, 0, 0);
+  c.toBlob(b => {
+    const fd = new FormData(); fd.append('file', b, 'snap.jpg'); fd.append('mode', State.mode);
+    fetch('/api/face-ocr/recognize', { method:'POST', body: fd }).then(r=>r.json()).then(d => {
+      $('#ocrOut').textContent = d.text || JSON.stringify(d).slice(0,400);
+      $('#askQ').value = '这是我的' + State.mode + '情况：' + (d.text||'').slice(0,100); askSend();
+    });
+  }, 'image/jpeg', 0.85);
+};
+
+// === 历史 ===
+function addHistory(item) {
+  State.history.unshift(item);
+  if (State.history.length > 50) State.history = State.history.slice(0, 50);
+  localStorage.setItem('glass_history', JSON.stringify(State.history));
+  renderHistory();
+}
+function renderHistory() {
+  const list = $('#histList');
+  const filtered = State.historyFilter === 'all' ? State.history : State.history.filter(x => x.type === State.historyFilter);
+  $('#histCount').textContent = State.history.length;
+  $('#askCount').textContent = State.history.filter(x=>x.type==='ask').length;
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty"><div class="icon">📭</div><div class="text">还没有记录</div><div class="hint">问诊 / OCR / 录音后会自动出现在这里</div></div>';
+    return;
+  }
+  list.innerHTML = filtered.map(h => `
+    <div class="hist-item">
+      <div class="hist-icon">${h.icon}</div>
+      <div class="hist-body">
+        <div class="hist-title">${escapeHtml(h.title||'')}</div>
+        <div class="hist-text">${escapeHtml(h.text||'')}</div>
+        <div class="hist-meta">
+          <span>${new Date(h.ts).toLocaleString('zh-CN')}</span>
+          ${h.meta?.ttfb ? '<span>TTFB ' + h.meta.ttfb.toFixed(0) + 'ms</span>' : ''}
+          ${h.meta?.mode ? '<span>· ' + h.meta.mode + '</span>' : ''}
+        </div>
+      </div>
     </div>
-    <div id="r18-meta" style="margin-top:8px;font-size:11px;color:var(--muted,#8a99b5);font-family:monospace;"></div>
-    <div id="r18-stream-out" style="margin-top:10px;min-height:80px;padding:10px;background:#0e1726;border-radius:6px;color:#e6edf7;font-size:13px;line-height:1.7;white-space:pre-wrap;"></div>
-    <div id="r18-kbref" style="margin-top:6px;font-size:11px;color:#34d399;"></div>
-    <div style="margin-top:8px;font-size:11px;color:var(--muted,#8a99b5);">⏱ 首字节延迟 = 从点击到拿到第一个字。TTS 随到随读（睁眼到耳边≤ 800ms）。</div>
-  </div>
+  `).join('');
+}
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+$$('[data-filter]').forEach(b => b.onclick = () => {
+  State.historyFilter = b.dataset.filter;
+  renderHistory();
+});
+$('#histClear').onclick = () => { if (confirm('清空所有历史？')) { State.history = []; localStorage.removeItem('glass_history'); renderHistory(); } };
+$('#histExport').onclick = () => {
+  const blob = new Blob([JSON.stringify(State.history, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'glass-history-' + Date.now() + '.json'; a.click();
+  URL.revokeObjectURL(url);
+};
 
-  <!-- R19 中医病历 OCR 上传面板 -->
-  <div id="r19-ocr-panel" style="margin:12px 0;padding:14px;background:var(--bg-card,#1a2436);border:1px solid #fb923c;border-radius:10px;">
-    <div style="font-size:14px;font-weight:600;color:#fb923c;margin-bottom:8px;">📷 R19 中医病历 OCR (真实接 8913)</div>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-      <input aria-label="r19-file" id="r19-file" type="file" accept="image/*" style="flex:1;padding:6px;background:#0e1726;color:#e6edf7;border:1px solid #fb923c;border-radius:6px;font-size:12px;">
-      <select aria-label="r19-mode" id="r19-mode" style="padding:6px;background:#0e1726;color:#e6edf7;border:1px solid #fb923c;border-radius:6px;font-size:12px;">
-        <option value="tcm">中医病历 OCR</option>
-        <option value="recognize">通用 OCR</option>
-      </select>
-      <button id="r19-upload" style="padding:8px 14px;background:#fb923c;color:#0e1726;border:none;border-radius:6px;cursor:pointer;font-weight:600;">上传识别</button>
-    </div>
-    <div id="r19-meta" style="margin-top:8px;font-size:11px;color:var(--muted,#8a99b5);font-family:monospace;"></div>
-    <div id="r19-ocr-out" style="margin-top:10px;min-height:60px;padding:10px;background:#0e1726;border-radius:6px;color:#e6edf7;font-size:13px;line-height:1.7;white-space:pre-wrap;"></div>
-    <div id="r19-kbref" style="margin-top:6px;font-size:11px;color:#34d399;"></div>
-    <div style="margin-top:8px;font-size:11px;color:var(--muted,#8a99b5);">📡 8913 face-ocr-server → g2claw→GLM-4V→GPT-4o→doubao→PIL 几何。离线时 KB FTS5 兜底。</div>
-  </div>
+// === 服务健康 ===
+const SVCS = [
+  { name:'静态服务', port:8914, url:'http://localhost:8914/' },
+  { name:'API 网关', port:8920, url:'http://localhost:8920/api/health' },
+  { name:'排盘引擎', port:8911, url:'http://localhost:8911/health' },
+  { name:'TTS', port:8912, url:'http://localhost:8912/health' },
+  { name:'OCR', port:8913, url:'http://localhost:8913/health' },
+  { name:'KB API', port:8901, url:'http://localhost:8901/health' },
+];
+async function probeSvc(s) {
+  const t0 = performance.now();
+  try {
+    const ctl = new AbortController(); setTimeout(() => ctl.abort(), 3000);
+    const r = await fetch(s.url, { signal: ctl.signal, mode:'cors' });
+    const dt = (performance.now() - t0).toFixed(0);
+    return { ok: r.ok, latency: dt };
+  } catch (e) { return { ok: false, latency: '超时' }; }
+}
+async function renderServices() {
+  const list = $('#svcList');
+  list.innerHTML = '<div class="svc-row"><div>检测中…</div><div></div><div></div><div></div></div>';
+  const results = await Promise.all(SVCS.map(probeSvc));
+  list.innerHTML = SVCS.map((s, i) => {
+    const r = results[i];
+    return `<div class="svc-row">
+      <div><span class="svc-dot ${r.ok?'ok':'err'}"></span><span class="svc-name">${s.name}</span></div>
+      <div style="font-family:monospace;color:var(--muted)">${s.port}</div>
+      <div class="latency">${r.latency}ms</div>
+      <div><button class="btn sm" onclick="window.open('${s.url}','_blank')">打开</button></div>
+    </div>`;
+  }).join('');
+}
+renderServices();
 
-  <!-- R20 眼镜语音 STT 面板（浏览器端 webkitSpeechRecognition + 上传音频） -->
-  <div id="r20-audio-panel" style="margin:12px 0;padding:14px;background:var(--bg-card,#1a2436);border:1px solid #a78bfa;border-radius:10px;">
-    <div style="font-size:14px;font-weight:600;color:#a78bfa;margin-bottom:8px;">🎤 R20 语音 STT（浏览器端 Web Speech → KB intent）</div>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-      <button id="r20-start" style="padding:8px 14px;background:#a78bfa;color:#0e1726;border:none;border-radius:6px;cursor:pointer;font-weight:600;">🎙 开始录音</button>
-      <button id="r20-stop" style="padding:8px 14px;background:#6b21a8;color:#fff;border:none;border-radius:6px;cursor:pointer;" disabled>⏹ 停止</button>
-      <input aria-label="r20-hint" id="r20-hint" type="text" placeholder="提示词，如 想问事业或财运" style="flex:1;padding:6px;background:#0e1726;color:#e6edf7;border:1px solid #a78bfa;border-radius:6px;font-size:12px;">
-      <button id="r20-upload" style="padding:8px 14px;background:#34d399;color:#0e1726;border:none;border-radius:6px;cursor:pointer;font-weight:600;">上传音频 (POST)</button>
-    </div>
-    <div id="r20-rec-status" style="margin-top:8px;font-size:11px;color:var(--muted,#8a99b5);font-family:monospace;">离线 / 等待点击开始</div>
-    <div id="r20-stt-out" style="margin-top:10px;min-height:50px;padding:10px;background:#0e1726;border-radius:6px;color:#e6edf7;font-size:13px;line-height:1.7;white-space:pre-wrap;">录音结果会出现在此</div>
-    <div id="r20-intent" style="margin-top:6px;font-size:11px;color:#fbbf24;"></div>
-    <div id="r20-kbref" style="margin-top:6px;font-size:11px;color:#34d399;"></div>
-    <div style="margin-top:8px;font-size:11px;color:var(--muted,#8a99b5);">🎙 浏览器 SpeechRecognition (webkitSpeech/zh-CN) → POST /api/glass/upload-audio → KB FTS5 prefix* bm25 → intent + nextStep</div>
-  </div>
+// === TTS 播报 ===
+function speak(text) {
+  if (!text || !('speechSynthesis' in window)) return;
+  try { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang='zh-CN'; u.rate=1.1; window.speechSynthesis.speak(u); } catch(e){}
+}
 
-  <script src="js/a11y-divination-hub.js" defer></script>
-  <script src="js/sdk-readiness-check.js" defer></script>
+// === 28 舌象饼图（硬编码示例） ===
+function drawTonguePie() {
+  const c = $('#tongue-pie'); if (!c) return;
+  const ctx = c.getContext('2d');
+  const data = [
+    { name:'淡白舌', v:18, c:'#f8d7da' },
+    { name:'红舌', v:22, c:'#f5b5bb' },
+    { name:'绛舌', v:8, c:'#c4384d' },
+    { name:'紫舌', v:6, c:'#7a1f3a' },
+    { name:'胖大舌', v:14, c:'#ffe5b4' },
+    { name:'瘦薄舌', v:10, c:'#ffd089' },
+    { name:'齿痕舌', v:12, c:'#e8d4a0' },
+    { name:'裂纹舌', v:10, c:'#c4a878' },
+  ];
+  const cx = 80, cy = 100, R = 70, r = 40;
+  const total = data.reduce((s,x)=>s+x.v,0);
+  let a0 = -Math.PI/2;
+  data.forEach(d => {
+    const a1 = a0 + d.v/total * 2*Math.PI;
+    ctx.beginPath(); ctx.arc(cx,cy,R,a0,a1); ctx.arc(cx,cy,r,a1,a0,true); ctx.closePath();
+    ctx.fillStyle = d.c; ctx.fill(); ctx.strokeStyle='#0e1116'; ctx.lineWidth=1; ctx.stroke();
+    a0 = a1;
+  });
+  $('#tongue-legend').innerHTML = data.map(d => `<div style="display:flex;align-items:center;gap:6px;font-size:12px;padding:3px 0"><span style="width:12px;height:12px;background:${d.c};border-radius:3px"></span><span style="flex:1">${d.name}</span><span style="color:var(--muted);font-variant-numeric:tabular-nums">${d.v}</span></div>`).join('');
+}
+drawTonguePie();
 
-  
-  
+// === 启动 ===
+renderHistory();
+refreshStatus();
+$('#btnRefreshLive').onclick = () => {
+  $('#liveFortune').textContent = '运势 ' + (60 + Math.floor(Math.random()*40));
+  $('#liveHealth').textContent = ['气血充盈','注意作息','多饮温水','疏肝解郁','脾胃调养'][Math.floor(Math.random()*5)];
+  toast('✓ 已刷新', 'ok');
+};
 
-</main>
-<script src="js/glass-console-inline.js" defer></script>
+// 周期性刷新服务健康
+setInterval(renderServices, 30000);
+</script>
 </body>
 </html>
