@@ -48,7 +48,55 @@
     renderLegend(levelCounts);
     draw(ALL_NODES, ALL_EDGES);
     fillModFilter();
+    // R94: URL hash 深链 — 访问 #module=xxx 时自动聚焦节点 + 打开 modal
+    var _hashM = location.hash.match(/module=([^&]+)/);
+    if(_hashM){
+      var _hashMid = decodeURIComponent(_hashM[1]);
+      setTimeout(function(){ openNodeFromHash(_hashMid); }, 600);
+    }
 
+  }
+
+  // R94: 从 URL hash 打开节点
+  function openNodeFromHash(nodeId){
+    if(!nodeId || !ALL_NODES.length) return;
+    var n = ALL_NODES.find(function(x){ return x.id === nodeId; });
+    if(!n) {
+      // 模糊匹配：label 包含 nodeId，或 nodeId 包含 id 片段
+      var fuzzy = ALL_NODES.find(function(x){
+        return (x.label||'').toLowerCase() === nodeId.toLowerCase()
+            || (x.id||'').indexOf(nodeId) >= 0
+            || nodeId.indexOf(x.id) >= 0;
+      });
+      if(!fuzzy) {
+        var stEl = document.getElementById('stat');
+        if(stEl) stEl.innerHTML = '🔗 深链 <b>' + nodeId + '</b> 未命中节点';
+        return;
+      }
+      n = fuzzy;
+    }
+    // 1) 聚焦画布
+    if(network) {
+      network.focus(n.id, {scale: 1.4, animation: {duration: 600, easingFunction: 'easeInOutQuad'}});
+    }
+    // 2) 高亮该节点（紫色 + 加粗边）
+    var focusNodes = ALL_NODES.map(function(x){
+      return {id: x.id, opacity: x.id === n.id ? 1 : .15,
+        borderWidth: x.id === n.id ? 4 : 1,
+        color: x.id === n.id ? {background: '#9333ea', border: '#c9a84c'} : {background: '#333', border: '#555'}};
+    });
+    var focusEdges = ALL_EDGES.map(function(e){
+      var inFocus = (e.from === n.id || e.to === n.id);
+      return {from: e.from, to: e.to, opacity: inFocus ? .9 : .05,
+        color: inFocus ? {color: '#9333ea'} : {color: 'rgba(201,168,76,.05)'}};
+    });
+    draw(focusNodes, focusEdges);
+    // 3) 打开 modal（复用已有 showModal 函数）
+    if(typeof window.showModal === 'function'){
+      setTimeout(function(){ window.showModal(n); }, 400);
+    }
+    var stEl2 = document.getElementById('stat');
+    if(stEl2) stEl2.innerHTML = '🔗 深链命中 <b>' + n.id + '</b> · 已聚焦并打开详情';
   }
 
   function draw(nodes, edges){
@@ -548,6 +596,7 @@
   window.downloadGraphImage = downloadGraphImage;
 
   window.closeModal = function(){ document.getElementById('modal').classList.remove('show'); };
+  // R94: 保留深链 hash（不主动清除，让刷新/分享继续定位）
   // R39 推荐 fly-to 画布聚焦
   document.getElementById('modal').addEventListener('click', function(e){
     var flyBtn = e.target.closest('.m-rec-fly');
