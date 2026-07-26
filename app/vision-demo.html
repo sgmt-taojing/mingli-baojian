@@ -1126,7 +1126,7 @@ function renderHistory() {
     return;
   }
   el.innerHTML = hist.map((h, i) =>
-    '<div class="history-item" onclick="replayHistory(' + i + ')" title="点击重放结果">' +
+    '<div class="history-item" role="button" tabindex="0" onclick="replayHistory(' + i + ')" title="点击重放结果">' +
       '<span class="hist-ts">' + escHtml(h.ts) + '</span>' +
       '<span class="hist-tag">' + (MODE_LABELS[h.mode] || h.mode) + '</span>' +
       '<span class="hist-preview">' + escHtml(h.preview) + '</span>' +
@@ -1137,6 +1137,16 @@ function renderHistory() {
     '</div>'
   ).join('');
 }
+
+// a11y: keyboard support for history items (role=button)
+document.addEventListener('keydown', function(e) {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.classList && e.target.classList.contains('history-item')) {
+    e.preventDefault();
+    var children = e.target.parentNode ? Array.from(e.target.parentNode.children) : [];
+    var idx = children.indexOf(e.target);
+    if (idx >= 0 && typeof replayHistory === 'function') replayHistory(idx);
+  }
+});
 
 function replayHistory(idx) {
   let hist = [];

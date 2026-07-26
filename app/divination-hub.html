@@ -175,7 +175,7 @@
 
     <!-- 今日知识卡片 -->
     <!-- PoC R22-B: div onclick → ml-tap a11y 替代（1/409 节点） -->
-    <ml-tap id="daily-knowledge-card" variant="card" style="max-width:680px;margin:8px auto 24px;display:block;padding:20px 24px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:14px;cursor:pointer;transition:all .4s ease" onclick="toggleDailyKnowledgeDetail()">
+    <ml-tap role="button" tabindex="0" id="daily-knowledge-card" variant="card" style="max-width:680px;margin:8px auto 24px;display:block;padding:20px 24px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:14px;cursor:pointer;transition:all .4s ease" onclick="toggleDailyKnowledgeDetail()">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
         <span style="font-size:20px">📖</span>
         <span style="font-family:'Ma Shan Zheng',serif;font-size:18px;color:var(--gold);letter-spacing:3px">今日命理知识</span>
@@ -213,7 +213,7 @@
     </div>
 
     <!-- 📋 缘主专业档案 · 一次填写全局复用 -->
-    <ml-tap id="profileEntry" onclick="window.MLBJ_USER&&window.MLBJ_USER.openProfileWizard()" style="max-width:680px;margin:0 auto 24px;padding:16px 20px;background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.02));border:1px solid rgba(201,168,76,0.25);border-radius:12px;display:flex;align-items:center;gap:14px;transition:all .3s ease"
+    <ml-tap role="button" tabindex="0" id="profileEntry" onclick="window.MLBJ_USER&&window.MLBJ_USER.openProfileWizard()" style="max-width:680px;margin:0 auto 24px;padding:16px 20px;background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.02));border:1px solid rgba(201,168,76,0.25);border-radius:12px;display:flex;align-items:center;gap:14px;transition:all .3s ease"
       <span style="font-size:28px;line-height:1">📋</span>
       <div style="flex:1;min-width:0">
         <div style="font-family:'Ma Shan Zheng',serif;font-size:16px;color:var(--gold);letter-spacing:3px;margin-bottom:4px">缘主专业档案</div>
@@ -229,85 +229,85 @@
       <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(201,168,76,.2),transparent)"></div>
     </div>
     <div class="cat-grid">
-      <ml-tap class="cat-card bazi" onclick="showSection('bazi')" class="d-block" aria-label="八字命盘">
+      <ml-tap role="button" tabindex="0" class="cat-card bazi" onclick="showSection('bazi')" class="d-block" aria-label="八字命盘">
         <span class="cc-symbol">🌟</span>
         <span class="cc-name">八字命盘</span>
         <span class="cc-en">Ba Zi Fortune</span>
         <p class="cc-desc">四柱八字，日主为根，配十神格局、大运流年，论一生吉凶祸福</p>
         <div class="cc-tags"><span class="cat-tag">十神</span><span class="cat-tag">大运</span><span class="cat-tag">神煞</span><span class="cat-tag">格局</span></div>
-        <ml-tap class="cc-action" onclick="event.stopPropagation();showSection('bazi')" class="d-block" aria-label="八字命理">八字命理</ml-tap>
+        <ml-tap role="button" tabindex="0" class="cc-action" onclick="event.stopPropagation();showSection('bazi')" class="d-block" aria-label="八字命理">八字命理</ml-tap>
 
 </ml-tap>
-      <ml-tap class="cat-card yijing" onclick="showSection('zhanbu');showZhanbuSub('yijing')" class="d-block" aria-label="六爻占卜">
+      <ml-tap role="button" tabindex="0" class="cat-card yijing" onclick="showSection('zhanbu');showZhanbuSub('yijing')" class="d-block" aria-label="六爻占卜">
         <span class="cc-symbol">䷀</span>
         <span class="cc-name">六爻占卜</span>
         <span class="cc-en">Yi Jing Divination</span>
         <p class="cc-desc">铜钱摇卦，装卦断事，六亲六神配五行，判断具体问题吉凶成败</p>
         <div class="cc-tags"><span class="cat-tag">六爻</span><span class="cat-tag">六亲</span><span class="cat-tag">六神</span><span class="cat-tag">卦辞</span></div>
-        <ml-tap class="cc-action" onclick="event.stopPropagation();showSection('zhanbu');showZhanbuSub('yijing')" class="d-block" aria-label="zhanbu">zhanbu</ml-tap>
+        <ml-tap role="button" tabindex="0" class="cc-action" onclick="event.stopPropagation();showSection('zhanbu');showZhanbuSub('yijing')" class="d-block" aria-label="zhanbu">zhanbu</ml-tap>
 
 </ml-tap>
-      <ml-tap class="cat-card qimen" onclick="showSection('zhanbu');showZhanbuSub('qimen')" class="d-block" aria-label="奇门遁甲">
+      <ml-tap role="button" tabindex="0" class="cat-card qimen" onclick="showSection('zhanbu');showZhanbuSub('qimen')" class="d-block" aria-label="奇门遁甲">
         <span class="cc-symbol">☰</span>
         <span class="cc-name">奇门遁甲</span>
         <span class="cc-en">Qi Men Dun Jia</span>
         <p class="cc-desc">最高层次预测术，九宫八卦布局八门九星，洞悉吉凶方位与行动时机</p>
         <div class="cc-tags"><span class="cat-tag">八门</span><span class="cat-tag">九星</span><span class="cat-tag">八神</span><span class="cat-tag">三奇</span></div>
-        <ml-tap class="cc-action" onclick="event.stopPropagation();showSection('zhanbu');showZhanbuSub('qimen')" class="d-block" aria-label="zhanbu">zhanbu</ml-tap>
+        <ml-tap role="button" tabindex="0" class="cc-action" onclick="event.stopPropagation();showSection('zhanbu');showZhanbuSub('qimen')" class="d-block" aria-label="zhanbu">zhanbu</ml-tap>
 
 </ml-tap>
-      <ml-tap class="cat-card ziwei" onclick="showSection('zhanbu');showZhanbuSub('ziwei')" class="d-block" aria-label="紫微斗数">
+      <ml-tap role="button" tabindex="0" class="cat-card ziwei" onclick="showSection('zhanbu');showZhanbuSub('ziwei')" class="d-block" aria-label="紫微斗数">
         <span class="cc-symbol">🔮</span>
         <span class="cc-name">紫微斗数</span>
         <span class="cc-en">Zi Wei Dou Shu</span>
         <p class="cc-desc">以南斗星曜为主，配十二宫垣，论命主一生际遇与性格命运</p>
         <div class="cc-tags"><span class="cat-tag">十四正曜</span><span class="cat-tag">十二宫</span><span class="cat-tag">流年</span></div>
-        <ml-tap class="cc-action" onclick="event.stopPropagation();showSection('zhanbu');showZhanbuSub('ziwei')" class="d-block" aria-label="zhanbu">zhanbu</ml-tap>
+        <ml-tap role="button" tabindex="0" class="cc-action" onclick="event.stopPropagation();showSection('zhanbu');showZhanbuSub('ziwei')" class="d-block" aria-label="zhanbu">zhanbu</ml-tap>
 
 </ml-tap>
-      <ml-tap class="cat-card meihua" onclick="showSection('zhanbu');showZhanbuSub('meihua')" class="d-block" aria-label="梅花易数">
+      <ml-tap role="button" tabindex="0" class="cat-card meihua" onclick="showSection('zhanbu');showZhanbuSub('meihua')" class="d-block" aria-label="梅花易数">
         <span class="cc-symbol">🌸</span>
         <span class="cc-name">梅花易数</span>
         <span class="cc-en">Mei Hua Yi Shu</span>
         <p class="cc-desc">观象玩辞，心动即占，万物皆可成卦，简单直接，直指本心</p>
         <div class="cc-tags"><span class="cat-tag">体用</span><span class="cat-tag">外应</span><span class="cat-tag">卦象</span></div>
-        <ml-tap class="cc-action" onclick="event.stopPropagation();showSection('zhanbu');showZhanbuSub('meihua')" class="d-block" aria-label="zhanbu">zhanbu</ml-tap>
+        <ml-tap role="button" tabindex="0" class="cc-action" onclick="event.stopPropagation();showSection('zhanbu');showZhanbuSub('meihua')" class="d-block" aria-label="zhanbu">zhanbu</ml-tap>
 
 </ml-tap>
-      <ml-tap class="cat-card liuren" onclick="showSection('zhanbu');showZhanbuSub('liuren')" class="d-block" aria-label="大六壬">
+      <ml-tap role="button" tabindex="0" class="cat-card liuren" onclick="showSection('zhanbu');showZhanbuSub('liuren')" class="d-block" aria-label="大六壬">
         <span class="cc-symbol">⬡</span>
         <span class="cc-name">大六壬</span>
         <span class="cc-en">Da Liu Ren</span>
         <p class="cc-desc">三传四课，天将盘排，九宗门定传，为古代宫廷最高层次预测术之一</p>
         <div class="cc-tags"><span class="cat-tag">四课</span><span class="cat-tag">三传</span><span class="cat-tag">天将</span><span class="cat-tag">九宗门</span></div>
-        <ml-tap class="cc-action" onclick="event.stopPropagation();showSection('zhanbu');showZhanbuSub('liuren')" class="d-block" aria-label="zhanbu">zhanbu</ml-tap>
+        <ml-tap role="button" tabindex="0" class="cc-action" onclick="event.stopPropagation();showSection('zhanbu');showZhanbuSub('liuren')" class="d-block" aria-label="zhanbu">zhanbu</ml-tap>
 
 </ml-tap>
-      <ml-tap class="cat-card" onclick="showSection('fengshui')" style="display:block;border-color:rgba(142,68,173,.12)">
+      <ml-tap role="button" tabindex="0" class="cat-card" onclick="showSection('fengshui')" style="display:block;border-color:rgba(142,68,173,.12)">
         <span class="cc-symbol" style="color:var(--violet)">🏡</span>
         <span class="cc-name" style="color:var(--violet)">阳宅风水</span>
         <span class="cc-en">Feng Shui</span>
         <p class="cc-desc">家居办公环境能量分析，藏风聚气、得水为上，调理环境提升运势</p>
         <div class="cc-tags"><span class="cat-tag" style="border-color:rgba(142,68,173,.15);color:var(--violet)">峦头</span><span class="cat-tag" style="border-color:rgba(142,68,173,.15);color:var(--violet)">理气</span><span class="cat-tag" style="border-color:rgba(142,68,173,.15);color:var(--violet)">卦位</span></div>
-        <ml-tap class="cc-action" onclick="event.stopPropagation();showSection('fengshui')" class="d-block" aria-label="风水玄空">风水玄空</ml-tap>
+        <ml-tap role="button" tabindex="0" class="cc-action" onclick="event.stopPropagation();showSection('fengshui')" class="d-block" aria-label="风水玄空">风水玄空</ml-tap>
 
 </ml-tap>
-      <ml-tap class="cat-card" onclick="showSection('fengshuipro')" style="display:block;border-color:rgba(39,174,96,.12)">
+      <ml-tap role="button" tabindex="0" class="cat-card" onclick="showSection('fengshuipro')" style="display:block;border-color:rgba(39,174,96,.12)">
         <span class="cc-symbol" style="color:var(--jade)">🏔️</span>
         <span class="cc-name" style="color:var(--jade)">风水进阶</span>
         <span class="cc-en">Feng Shui Pro</span>
         <p class="cc-desc">每日方位 · 布局诊断 · 化煞大全 · 流年飞星 · 风水择日，七大功能全面覆盖</p>
         <div class="cc-tags"><span class="cat-tag" style="border-color:rgba(39,174,96,.15);color:var(--jade)">每日</span><span class="cat-tag" style="border-color:rgba(39,174,96,.15);color:var(--jade)">化煞</span><span class="cat-tag" style="border-color:rgba(39,174,96,.15);color:var(--jade)">择日</span></div>
-        <ml-tap class="cc-action" onclick="event.stopPropagation();showSection('fengshuipro')" class="d-block" aria-label="风水进阶">风水进阶</ml-tap>
+        <ml-tap role="button" tabindex="0" class="cc-action" onclick="event.stopPropagation();showSection('fengshuipro')" class="d-block" aria-label="风水进阶">风水进阶</ml-tap>
 
 </ml-tap>
-      <ml-tap class="cat-card" onclick="showSection('yanzhi')" style="display:block;border-color:rgba(230,126,34,.12)">
+      <ml-tap role="button" tabindex="0" class="cat-card" onclick="showSection('yanzhi')" style="display:block;border-color:rgba(230,126,34,.12)">
         <span class="cc-symbol" style="color:var(--orange)">💬</span>
         <span class="cc-name" style="color:var(--orange)">言值</span>
         <span class="cc-en">Yanzhi · Communication</span>
         <p class="cc-desc">同事·客户·夫妻·亲子，沟通有道，言值满满。让每一句话都说到心坎上</p>
         <div class="cc-tags"><span class="cat-tag" style="border-color:rgba(230,126,34,.15);color:var(--orange)">沟通</span><span class="cat-tag" style="border-color:rgba(230,126,34,.15);color:var(--orange)">话术</span><span class="cat-tag" style="border-color:rgba(230,126,34,.15);color:var(--orange)">关系</span></div>
-        <ml-tap class="cc-action" onclick="event.stopPropagation();showSection('yanzhi')" class="d-block" aria-label="面痣相法">面痣相法</ml-tap>
+        <ml-tap role="button" tabindex="0" class="cc-action" onclick="event.stopPropagation();showSection('yanzhi')" class="d-block" aria-label="面痣相法">面痣相法</ml-tap>
 
       <!-- 分组标题：生活应用 -->
       <div style="width:100%;display:flex;align-items:center;gap:12px;margin:8px 0 4px">
@@ -315,132 +315,132 @@
         <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(201,168,76,.2),transparent)"></div>
 </ml-tap>
       </div>
-      <ml-tap class="cat-card" onclick="showSection('masters')" style="display:block;border-color:rgba(201,168,76,.15)">
+      <ml-tap role="button" tabindex="0" class="cat-card" onclick="showSection('masters')" style="display:block;border-color:rgba(201,168,76,.15)">
         <span class="cc-symbol" style="color:var(--gold)">📿</span>
         <span class="cc-name" style="color:var(--gold)">名师解惑</span>
         <span class="cc-en">Masters & Precepts</span>
         <p class="cc-desc">道家佛家名师开示，非遗中医约见，清规戒律参学，向大德高僧问道解惑</p>
         <div class="cc-tags"><span class="cat-tag">道家长</span><span class="cat-tag">佛家师</span><span class="cat-tag">中医</span><span class="cat-tag">戒律</span></div>
-        <ml-tap class="cc-action" onclick="event.stopPropagation();showSection('masters')" class="d-block" aria-label="大师名家">大师名家</ml-tap>
+        <ml-tap role="button" tabindex="0" class="cc-action" onclick="event.stopPropagation();showSection('masters')" class="d-block" aria-label="大师名家">大师名家</ml-tap>
 
 </ml-tap>
-      <ml-tap class="cat-card" onclick="showSection('lifeplan')" style="display:block;border-color:rgba(52,152,219,.15)">
+      <ml-tap role="button" tabindex="0" class="cat-card" onclick="showSection('lifeplan')" style="display:block;border-color:rgba(52,152,219,.15)">
         <span class="cc-symbol" style="color:var(--cyan2)">🧭</span>
         <span class="cc-name" style="color:var(--cyan2)">人生规划</span>
         <span class="cc-en">Life Planning</span>
         <p class="cc-desc">基于八字五行十神，结合十二长生，推荐学业、职业、婚恋、城市方向，适合年龄做适合的事</p>
         <div class="cc-tags"><span class="cat-tag">学业</span><span class="cat-tag">职业</span><span class="cat-tag">婚恋</span><span class="cat-tag">十二长生</span></div>
-        <ml-tap class="cc-action" onclick="event.stopPropagation();showSection('lifeplan')" class="d-block" aria-label="人生规划">人生规划</ml-tap>
+        <ml-tap role="button" tabindex="0" class="cc-action" onclick="event.stopPropagation();showSection('lifeplan')" class="d-block" aria-label="人生规划">人生规划</ml-tap>
 
 </ml-tap>
-      <ml-tap class="cat-card" onclick="showSection('youth')" style="display:block;border-color:rgba(46,204,113,.15)">
+      <ml-tap role="button" tabindex="0" class="cat-card" onclick="showSection('youth')" style="display:block;border-color:rgba(46,204,113,.15)">
         <span class="cc-symbol" style="color:var(--success)">🧒</span>
         <span class="cc-name" style="color:var(--success)">青少年规划</span>
         <span class="cc-en">Youth Planning</span>
         <p class="cc-desc">按八字五行十神，为孩子推荐兴趣爱好、学业方向、中高考志愿、职业城市、性格健康全方位指引</p>
         <div class="cc-tags"><span class="cat-tag">兴趣</span><span class="cat-tag">学业</span><span class="cat-tag">志愿</span><span class="cat-tag">性格</span></div>
-        <ml-tap class="cc-action" onclick="event.stopPropagation();showSection('youth')" class="d-block" aria-label="青少年">青少年</ml-tap>
+        <ml-tap role="button" tabindex="0" class="cc-action" onclick="event.stopPropagation();showSection('youth')" class="d-block" aria-label="青少年">青少年</ml-tap>
 
 </ml-tap>
-      <ml-tap class="cat-card" onclick="showSection('family')" style="display:block;border-color:rgba(231,76,60,.15)"
+      <ml-tap role="button" tabindex="0" class="cat-card" onclick="showSection('family')" style="display:block;border-color:rgba(231,76,60,.15)"
         <span class="cc-symbol" style="color:var(--cinn2)">👨‍👩‍👧‍👦</span>
         <span class="cc-name" style="color:var(--cinn2)">家庭排盘</span>
         <span class="cc-en">Family Chart</span>
         <p class="cc-desc">全家八字合盘分析，五行生克关系，综合化解方案，布局方位配色择日</p>
         <div class="cc-tags"><span class="cat-tag">合盘</span><span class="cat-tag">化解</span><span class="cat-tag">布局</span><span class="cat-tag">终身会员</span></div>
-        <ml-tap class="cc-action" onclick="event.stopPropagation();showSection('family')" class="d-block" aria-label="家庭关系">家庭关系</ml-tap>
-      <ml-tap class="cat-card" onclick="showSection('push-plan')" style="display:block;border-color:rgba(41,128,185,.15)"
+        <ml-tap role="button" tabindex="0" class="cc-action" onclick="event.stopPropagation();showSection('family')" class="d-block" aria-label="家庭关系">家庭关系</ml-tap>
+      <ml-tap role="button" tabindex="0" class="cat-card" onclick="showSection('push-plan')" style="display:block;border-color:rgba(41,128,185,.15)"
         <span class="cc-symbol" style="color:var(--cyan)">📡</span>
         <span class="cc-name" style="color:var(--cyan)">推送计划</span>
         <span class="cc-en">Push Plan Matrix</span>
         <p class="cc-desc">会员分级推送体系，每日宜忌到年度化解，跨年流年切换全流程，引流转化设计</p>
         <div class="cc-tags"><span class="cat-tag">分级推送</span><span class="cat-tag">跨年化解</span><span class="cat-tag">节气</span><span class="cat-tag">引流</span></div>
-        <ml-tap class="cc-action" onclick="event.stopPropagation();showSection('push-plan')" class="d-block" aria-label="推送计划">推送计划</ml-tap>
+        <ml-tap role="button" tabindex="0" class="cc-action" onclick="event.stopPropagation();showSection('push-plan')" class="d-block" aria-label="推送计划">推送计划</ml-tap>
     </ml-tap>
 
     <!-- 移动端快捷功能入口（768px以下显示，替代被隐藏的cat-grid） -->
     <div class="mobile-quick-grid">
-      <ml-tap class="mobile-quick-item" onclick="showSection('bazi')" class="d-block"
+      <ml-tap role="button" tabindex="0" class="mobile-quick-item" onclick="showSection('bazi')" class="d-block"
         <span class="mobile-quick-icon">🌟</span>
         <div class="mobile-quick-text"><div class="mobile-quick-name">八字命盘</div><div class="mobile-quick-desc">四柱推命</div></div>
       </ml-tap>
-      <ml-tap class="mobile-quick-item" onclick="showSection('zhanbu');showZhanbuSub('yijing')" class="d-block"
+      <ml-tap role="button" tabindex="0" class="mobile-quick-item" onclick="showSection('zhanbu');showZhanbuSub('yijing')" class="d-block"
         <span class="mobile-quick-icon">䷀</span>
         <div class="mobile-quick-text"><div class="mobile-quick-name">六爻占卜</div><div class="mobile-quick-desc">铜钱起卦</div></div>
       </ml-tap>
-      <ml-tap class="mobile-quick-item" onclick="showSection('zhanbu');showZhanbuSub('ziwei')" class="d-block"
+      <ml-tap role="button" tabindex="0" class="mobile-quick-item" onclick="showSection('zhanbu');showZhanbuSub('ziwei')" class="d-block"
         <span class="mobile-quick-icon">🌌</span>
         <div class="mobile-quick-text"><div class="mobile-quick-name">紫微斗数</div><div class="mobile-quick-desc">星曜格局</div></div>
       </ml-tap>
-      <ml-tap class="mobile-quick-item" onclick="showSection('zhanbu');showZhanbuSub('qimen')" class="d-block"
+      <ml-tap role="button" tabindex="0" class="mobile-quick-item" onclick="showSection('zhanbu');showZhanbuSub('qimen')" class="d-block"
         <span class="mobile-quick-icon">☰</span>
         <div class="mobile-quick-text"><div class="mobile-quick-name">奇门遁甲</div><div class="mobile-quick-desc">天地人神</div></div>
       </ml-tap>
-      <ml-tap class="mobile-quick-item" onclick="showSection('zhanbu');showZhanbuSub('meihua')" class="d-block"
+      <ml-tap role="button" tabindex="0" class="mobile-quick-item" onclick="showSection('zhanbu');showZhanbuSub('meihua')" class="d-block"
         <span class="mobile-quick-icon">🌸</span>
         <div class="mobile-quick-text"><div class="mobile-quick-name">梅花易数</div><div class="mobile-quick-desc">时间起卦</div></div>
       </ml-tap>
-      <ml-tap class="mobile-quick-item" onclick="showSection('zhanbu');showZhanbuSub('liuren')" class="d-block"
+      <ml-tap role="button" tabindex="0" class="mobile-quick-item" onclick="showSection('zhanbu');showZhanbuSub('liuren')" class="d-block"
         <span class="mobile-quick-icon">⬡</span>
         <div class="mobile-quick-text"><div class="mobile-quick-name">大六壬</div><div class="mobile-quick-desc">三传四课</div></div>
       </ml-tap>
-      <ml-tap class="mobile-quick-item" onclick="showSection('fengshui')" class="d-block"
+      <ml-tap role="button" tabindex="0" class="mobile-quick-item" onclick="showSection('fengshui')" class="d-block"
         <span class="mobile-quick-icon">🏡</span>
         <div class="mobile-quick-text"><div class="mobile-quick-name">阳宅风水</div><div class="mobile-quick-desc">方位布局</div></div>
       </ml-tap>
-      <ml-tap class="mobile-quick-item" onclick="showSection('xingming')" class="d-block"
+      <ml-tap role="button" tabindex="0" class="mobile-quick-item" onclick="showSection('xingming')" class="d-block"
         <span class="mobile-quick-icon">🔤</span>
         <div class="mobile-quick-text"><div class="mobile-quick-name">姓名起名</div><div class="mobile-quick-desc">五格数理</div></div>
       </ml-tap>
-      <ml-tap class="mobile-quick-item" onclick="showSection('yanzhi')" class="d-block"
+      <ml-tap role="button" tabindex="0" class="mobile-quick-item" onclick="showSection('yanzhi')" class="d-block"
         <span class="mobile-quick-icon">💬</span>
         <div class="mobile-quick-text"><div class="mobile-quick-name">言值沟通</div><div class="mobile-quick-desc">情商分析</div></div>
       </ml-tap>
-      <ml-tap class="mobile-quick-item" onclick="showSection('jiuri')" class="d-block"
+      <ml-tap role="button" tabindex="0" class="mobile-quick-item" onclick="showSection('jiuri')" class="d-block"
         <span class="mobile-quick-icon">💮</span>
         <div class="mobile-quick-text"><div class="mobile-quick-name">吉日查询</div><div class="mobile-quick-desc">择吉避凶</div></div>
       </ml-tap>
-      <ml-tap class="mobile-quick-item" onclick="showSection('lifeplan')" class="d-block"
+      <ml-tap role="button" tabindex="0" class="mobile-quick-item" onclick="showSection('lifeplan')" class="d-block"
         <span class="mobile-quick-icon">🧭</span>
         <div class="mobile-quick-text"><div class="mobile-quick-name">人生规划</div><div class="mobile-quick-desc">周期指引</div></div>
       </ml-tap>
-      <ml-tap class="mobile-quick-item" onclick="showSection('youth')" class="d-block"
+      <ml-tap role="button" tabindex="0" class="mobile-quick-item" onclick="showSection('youth')" class="d-block"
         <span class="mobile-quick-icon">🧒</span>
         <div class="mobile-quick-text"><div class="mobile-quick-name">青少年规划</div><div class="mobile-quick-desc">学业指引</div></div>
       </ml-tap>
-      <ml-tap class="mobile-quick-item" onclick="showSection('family')" class="d-block"
+      <ml-tap role="button" tabindex="0" class="mobile-quick-item" onclick="showSection('family')" class="d-block"
         <span class="mobile-quick-icon">👨‍👩‍👧‍👦</span>
         <div class="mobile-quick-text"><div class="mobile-quick-name">家庭排盘</div><div class="mobile-quick-desc">合盘分析</div></div>
       </ml-tap>
-      <ml-tap class="mobile-quick-item" onclick="showSection('masters')" class="d-block"
+      <ml-tap role="button" tabindex="0" class="mobile-quick-item" onclick="showSection('masters')" class="d-block"
         <span class="mobile-quick-icon">📿</span>
         <div class="mobile-quick-text"><div class="mobile-quick-name">名师解惑</div><div class="mobile-quick-desc">问道解惑</div></div>
       </ml-tap>
-      <ml-tap class="mobile-quick-item" onclick="showSection('more');showMoreModule('knowledge',this)" class="d-block"
+      <ml-tap role="button" tabindex="0" class="mobile-quick-item" onclick="showSection('more');showMoreModule('knowledge',this)" class="d-block"
         <span class="mobile-quick-icon">📚</span>
         <div class="mobile-quick-text"><div class="mobile-quick-name">知识库</div><div class="mobile-quick-desc">8大分类</div></div>
       </ml-tap>
-      <ml-tap class="mobile-quick-item" onclick="showSection('more');showMoreModule('shop',this)" class="d-block"
+      <ml-tap role="button" tabindex="0" class="mobile-quick-item" onclick="showSection('more');showMoreModule('shop',this)" class="d-block"
         <span class="mobile-quick-icon">🛍️</span>
         <div class="mobile-quick-text"><div class="mobile-quick-name">开运商城</div><div class="mobile-quick-desc">佩饰法器</div></div>
       </ml-tap>
-      <ml-tap class="mobile-quick-item" onclick="showSection('more');showMoreModule('almanac',this)" class="d-block"
+      <ml-tap role="button" tabindex="0" class="mobile-quick-item" onclick="showSection('more');showMoreModule('almanac',this)" class="d-block"
         <span class="mobile-quick-icon">📅</span>
         <div class="mobile-quick-text"><div class="mobile-quick-name">每日黄历</div><div class="mobile-quick-desc">宜忌方位</div></div>
       </ml-tap>
-      <ml-tap class="mobile-quick-item" onclick="showSection('tizhi')" class="d-block"
+      <ml-tap role="button" tabindex="0" class="mobile-quick-item" onclick="showSection('tizhi')" class="d-block"
         <span class="mobile-quick-icon">🧬</span>
         <div class="mobile-quick-text"><div class="mobile-quick-name">体质辨识</div><div class="mobile-quick-desc">五行养生</div></div>
       </ml-tap>
-      <ml-tap class="mobile-quick-item" onclick="showSection('healing-music')" class="d-block"
+      <ml-tap role="button" tabindex="0" class="mobile-quick-item" onclick="showSection('healing-music')" class="d-block"
         <span class="mobile-quick-icon">🎵</span>
         <div class="mobile-quick-text"><div class="mobile-quick-name">养心音乐</div><div class="mobile-quick-desc">净心修心</div></div>
       </ml-tap>
-      <ml-tap class="mobile-quick-item" onclick="showSection('tizhi');tzSwitchTab('prescription')" class="d-block"
+      <ml-tap role="button" tabindex="0" class="mobile-quick-item" onclick="showSection('tizhi');tzSwitchTab('prescription')" class="d-block"
         <span class="mobile-quick-icon">💊</span>
         <div class="mobile-quick-text"><div class="mobile-quick-name">名医名方</div><div class="mobile-quick-desc">中医名方</div></div>
       </ml-tap>
-      <ml-tap class="mobile-quick-item" onclick="showSection('annual-fortune');showTempleBrowser()" class="d-block"
+      <ml-tap role="button" tabindex="0" class="mobile-quick-item" onclick="showSection('annual-fortune');showTempleBrowser()" class="d-block"
         <span class="mobile-quick-icon">🏛️</span>
         <div class="mobile-quick-text"><div class="mobile-quick-name">寺庙参拜</div><div class="mobile-quick-desc">名山指南</div></div>
       </ml-tap>
@@ -1190,22 +1190,22 @@
     <h3>选择您的信仰取向</h3>
     <p>系统将根据您的选择，推送个性化的参拜提醒与日常指导</p>
     <div class="faith-options">
-      <ml-tap class="faith-card" onclick="selectFaith('ru')" class="d-block"
+      <ml-tap role="button" tabindex="0" class="faith-card" onclick="selectFaith('ru')" class="d-block"
         <div class="faith-icon">📖</ml-tap>
         <h4>儒家</h4>
         <p>修身齐家、格物致知<br>适合:重视教育、礼仪、家庭者</p>
       </div>
-      <ml-tap class="faith-card" onclick="selectFaith('dao')" class="d-block"
+      <ml-tap role="button" tabindex="0" class="faith-card" onclick="selectFaith('dao')" class="d-block"
         <div class="faith-icon">☯️</ml-tap>
         <h4>道家</h4>
         <p>道法自然、无为而治<br>适合:重视养生、自然、自由者</p>
       </div>
-      <ml-tap class="faith-card" onclick="selectFaith('fo')" class="d-block"
+      <ml-tap role="button" tabindex="0" class="faith-card" onclick="selectFaith('fo')" class="d-block"
         <div class="faith-icon">🪷</ml-tap>
         <h4>佛家</h4>
         <p>慈悲智慧、离苦得乐<br>适合:重视修行、因果、慈悲者</p>
       </div>
-      <ml-tap class="faith-card" onclick="selectFaith('all')" class="d-block"
+      <ml-tap role="button" tabindex="0" class="faith-card" onclick="selectFaith('all')" class="d-block"
         <div class="faith-icon">📿</ml-tap>
         <h4>兼修</h4>
         <p>儒道释兼修、圆融通达<br>适合:包容并蓄、广学多闻者</p>
@@ -1637,32 +1637,32 @@
 
   <!-- COMPASS TYPE SELECTOR -->
   <div class="compass-selector">
-    <ml-tap class="cs-item active" onclick="selectCompass('qimen')" id="cs-qimen" class="d-block"
+    <ml-tap role="button" tabindex="0" class="cs-item active" onclick="selectCompass('qimen')" id="cs-qimen" class="d-block"
       <p class="cs-symbol">☰</p>
       <p class="cs-name">奇门遁甲</p>
       <p class="cs-en">Qimen Compass</p>
     </ml-tap>
-    <ml-tap class="cs-item" onclick="selectCompass('liuren')" id="cs-liuren" class="d-block"
+    <ml-tap role="button" tabindex="0" class="cs-item" onclick="selectCompass('liuren')" id="cs-liuren" class="d-block"
       <p class="cs-symbol">⬡</p>
       <p class="cs-name">六壬神盘</p>
       <p class="cs-en">Liu Ren Compass</p>
     </ml-tap>
-    <ml-tap class="cs-item" onclick="selectCompass('xuankong')" id="cs-xuankong" class="d-block"
+    <ml-tap role="button" tabindex="0" class="cs-item" onclick="selectCompass('xuankong')" id="cs-xuankong" class="d-block"
       <p class="cs-symbol">✦</p>
       <p class="cs-name">玄空飞星</p>
       <p class="cs-en">Xuan Kong Fei Xing</p>
     </ml-tap>
-    <ml-tap class="cs-item" onclick="selectCompass('bazhai')" id="cs-bazhai" class="d-block"
+    <ml-tap role="button" tabindex="0" class="cs-item" onclick="selectCompass('bazhai')" id="cs-bazhai" class="d-block"
       <p class="cs-symbol">☷</p>
       <p class="cs-name">八宅明镜</p>
       <p class="cs-en">Ba Zhai Ming Jing</p>
     </ml-tap>
-    <ml-tap class="cs-item" onclick="selectCompass('hetuluo')" id="cs-hetuluo" class="d-block"
+    <ml-tap role="button" tabindex="0" class="cs-item" onclick="selectCompass('hetuluo')" id="cs-hetuluo" class="d-block"
       <p class="cs-symbol">◎</p>
       <p class="cs-name">河图洛书</p>
       <p class="cs-en">He Tu Luo Shu</p>
     </ml-tap>
-    <ml-tap class="cs-item" onclick="selectCompass('yaogua')" id="cs-yaogua" class="d-block"
+    <ml-tap role="button" tabindex="0" class="cs-item" onclick="selectCompass('yaogua')" id="cs-yaogua" class="d-block"
       <p class="cs-symbol">䷀</p>
       <p class="cs-name">六爻金钱</p>
       <p class="cs-en">Liu Yao Compass</p>
@@ -2501,7 +2501,7 @@ function getMonthlyReport(hj) {
     let colorClass = 'month-neutral';
     if (m.overall === '吉') colorClass = 'month-good';
     else if (m.overall === '凶') colorClass = 'month-bad';
-    html += '<ml-tap class="month-item ' + colorClass + '" onclick="showMonthDetail(' + i + ')" class="d-block"';
+    html += '<ml-tap role="button" tabindex="0" class="month-item ' + colorClass + '" onclick="showMonthDetail(' + i + ')" class="d-block"';
     html += '<div style="font-size:13px;font-weight:600">' + m.month + '</ml-tap>';
     html += '<div style="font-size:10px;opacity:.95;margin-top:2px">' + m.stem + m.zhi + '</div>';
     html += '<div style="font-size:10px;margin-top:4px">' + m.overall + '</div>';
@@ -2512,7 +2512,7 @@ function getMonthlyReport(hj) {
 
   // 详细文字版(折叠)
   html += '<div style="margin-top:20px">';
-  html += '<ml-tap class="huajie-alert" style="display:block;" onclick="toggleHuajieDetail(this)"';
+  html += '<ml-tap role="button" tabindex="0" class="huajie-alert" style="display:block;" onclick="toggleHuajieDetail(this)"';
   html += '<div class="alert-title">📖 逐月详细分析(点击展开)</ml-tap>';
   html += '<div class="month-detail-content" style="display:none;margin-top:12px">';
   for (let i = 0; i < 12; i++) {
@@ -2683,7 +2683,7 @@ function getTempleRecommendation(hj) {
   const daoTemples = temples.filter(function(t){return t.type==='☯️ 道观';});
   for (let i = 0; i < daoTemples.length; i++) {
     const t = daoTemples[i];
-    html += '<ml-tap class="analysis-card" style="display:block;border-color:rgba(39,174,96,.15);" onclick="showTempleDetail(\'' + t.name + '\')"';
+    html += '<ml-tap role="button" tabindex="0" class="analysis-card" style="display:block;border-color:rgba(39,174,96,.15);" onclick="showTempleDetail(\'' + t.name + '\')"';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
     html += '<h5 style="color:var(--jade);font-size:14px;margin:0">' + t.name + '</h5>';
     html += '<span style="font-size:11px;padding:2px 6px;background:rgba(39,174,96,.1);color:var(--jade);border-radius:4px">' + t.rank + '</span>';
@@ -2702,7 +2702,7 @@ function getTempleRecommendation(hj) {
   const foTemples = temples.filter(function(t){return t.type==='🪷 寺庙';});
   for (let i = 0; i < foTemples.length; i++) {
     const t = foTemples[i];
-    html += '<ml-tap class="analysis-card" style="display:block;border-color:rgba(142,68,173,.15);" onclick="showTempleDetail(\'' + t.name + '\')"';
+    html += '<ml-tap role="button" tabindex="0" class="analysis-card" style="display:block;border-color:rgba(142,68,173,.15);" onclick="showTempleDetail(\'' + t.name + '\')"';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
     html += '<h5 style="color:var(--violet);font-size:14px;margin:0">' + t.name + '</h5>';
     html += '<span style="font-size:11px;padding:2px 6px;background:rgba(142,68,173,.1);color:var(--violet);border-radius:4px">' + t.rank + '</span>';
@@ -3612,7 +3612,7 @@ function jiuriRenderCal() {
     const selAttr = selected ? 'selected' : '';
     const todayAttr = isToday ? 'today' : '';
     const lunarD = LUNAR_DAY_NAME[(date - new Date(_jiuriYear,0,1)) % 30] || LUNAR_DAY_NAME[Math.floor(((date - new Date(_jiuriYear,0,1)) / 86400000) % 30)];
-    html += `<ml-tap class="jiuri-cal-cell ${dotClass} ${selAttr} ${todayAttr}" onclick="jiuriPickDate(${d})" class="d-block"
+    html += `<ml-tap role="button" tabindex="0" class="jiuri-cal-cell ${dotClass} ${selAttr} ${todayAttr}" onclick="jiuriPickDate(${d})" class="d-block"
       <span class="cal-day">${d}</span>
       <span class="cal-lunar">${lunarD}</span>
       <div class="cal-dot"></div>
@@ -4016,7 +4016,7 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
 </nav>
 
 <!-- MORE MENU (Mobile Only) -->
-<ml-tap class="more-overlay" id="moreOverlay" onclick="closeMore()" class="d-block"</ml-tap>
+<ml-tap role="button" tabindex="0" class="more-overlay" id="moreOverlay" onclick="closeMore()" class="d-block"</ml-tap>
 <div class="more-menu" id="moreMenu">
   <div class="more-header">
     <span class="more-title">更多功能</span>
