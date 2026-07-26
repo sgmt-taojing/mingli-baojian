@@ -140,15 +140,8 @@ body {
   display: block;
   margin-bottom: 4px;
 }
-.mode-name {
-  font-size: 13px;
-  font-weight: 500;
-}
-.mode-hint {
-  font-size: 10px;
-  color: var(--muted);
-  margin-top: 2px;
-}
+.mode-name { font-size: 13px; font-weight: 500; display: block; }
+.mode-hint { font-size: 10px; color: var(--muted); margin-top: 2px; display: block; }
 
 /* === Stage grid === */
 .stage-grid {
@@ -565,26 +558,26 @@ body {
 
   <!-- Mode selector -->
   <div class="mode-bar" id="modeBar">
-    <div class="mode-btn active" data-mode="face" onclick="selectMode('face')">
-      <span class="mode-icon">👤</span>
-      <div class="mode-name">面相识别</div>
-      <div class="mode-hint">人脸定位 + 特征</div>
-    </div>
-    <div class="mode-btn" data-mode="tongue" onclick="selectMode('tongue')">
-      <span class="mode-icon">👅</span>
-      <div class="mode-name">舌诊分析</div>
-      <div class="mode-hint">中医舌象 + 五脏辨证</div>
-    </div>
-    <div class="mode-btn" data-mode="ocr" onclick="selectMode('ocr')">
-      <span class="mode-icon">📄</span>
-      <div class="mode-name">通用 OCR</div>
-      <div class="mode-hint">文字 / 文档 / 卦象</div>
-    </div>
-    <div class="mode-btn" data-mode="ocr-tcm" onclick="selectMode('ocr-tcm')">
-      <span class="mode-icon">📋</span>
-      <div class="mode-name">病历 OCR</div>
-      <div class="mode-hint">处方 / 舌苔 / 脉案</div>
-    </div>
+    <button type="button" class="mode-btn active" data-mode="face" onclick="selectMode('face')" aria-label="面相识别：人脸定位 + 特征">
+      <span class="mode-icon" aria-hidden="true">👤</span>
+      <span class="mode-name">面相识别</span>
+      <span class="mode-hint">人脸定位 + 特征</span>
+    </button>
+    <button type="button" class="mode-btn" data-mode="tongue" onclick="selectMode('tongue')" aria-label="舌诊分析：中医舌象 + 五脏辨证">
+      <span class="mode-icon" aria-hidden="true">👅</span>
+      <span class="mode-name">舌诊分析</span>
+      <span class="mode-hint">中医舌象 + 五脏辨证</span>
+    </button>
+    <button type="button" class="mode-btn" data-mode="ocr" onclick="selectMode('ocr')" aria-label="通用 OCR：文字、文档、卦象">
+      <span class="mode-icon" aria-hidden="true">📄</span>
+      <span class="mode-name">通用 OCR</span>
+      <span class="mode-hint">文字 / 文档 / 卦象</span>
+    </button>
+    <button type="button" class="mode-btn" data-mode="ocr-tcm" onclick="selectMode('ocr-tcm')" aria-label="病历 OCR：处方、舌苔、脉案">
+      <span class="mode-icon" aria-hidden="true">📋</span>
+      <span class="mode-name">病历 OCR</span>
+      <span class="mode-hint">处方 / 舌苔 / 脉案</span>
+    </button>
   </div>
 
   <!-- Main stage: video + result -->

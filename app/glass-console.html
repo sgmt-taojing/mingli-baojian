@@ -186,6 +186,7 @@ header p{font-size:13px;color:var(--muted)}
     <div class="tab" data-tab="ask">💬 问诊 <span class="badge" id="askCount">0</span></div>
     <div class="tab" data-tab="voice">🎤 语音</div>
     <div class="tab" data-tab="vision">📷 视觉</div>
+    <div class="tab" data-tab="mirror">🪞 镜象 <span class="badge" id="mirrorBadge">0</span></div>
     <div class="tab" data-tab="history">📜 历史 <span class="badge" id="histCount">0</span></div>
     <div class="tab" data-tab="health">⚙ 服务</div>
   </div>
@@ -300,6 +301,48 @@ header p{font-size:13px;color:var(--muted)}
       </div>
     </div>
   </div>
+
+  <!-- === Tab · 镜象镜像（R76-C） === -->
+  <div class="pane" data-pane="mirror">
+    <div class="card">
+      <h3>🪞 镜象镜像 <span class="hint">左镜·KB热度 · 右镜·OCR历史 · HUD·状态同步</span></h3>
+      <div class="mirror-grid" id="mirrorGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div class="mirror-card">
+          <div class="mirror-title">📊 KB 热度（7 天）</div>
+          <div class="mirror-content" id="mirrorKb">⏳ 加载中…</div>
+        </div>
+        <div class="mirror-card">
+          <div class="mirror-title">📋 OCR 历史（最近 5）</div>
+          <div class="mirror-content" id="mirrorOcr">⏳ 加载中…</div>
+        </div>
+        <div class="mirror-card">
+          <div class="mirror-title">🔌 引擎状态（4 端口）</div>
+          <div class="mirror-content" id="mirrorEngine">⏳ 加载中…</div>
+        </div>
+        <div class="mirror-card">
+          <div class="mirror-title">📈 本镜·实时流</div>
+          <div class="mirror-content" id="mirrorLive">⏳ 加载中…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+  .mirror-grid{grid-template-columns:1fr 1fr}
+  @media(max-width:768px){.mirror-grid{grid-template-columns:1fr}}
+  .mirror-card{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px 12px}
+  .mirror-title{font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+  .mirror-content{font-size:12px;color:var(--tx);line-height:1.6;max-height:180px;overflow-y:auto}
+  .mirror-content .m-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(37,43,56,.5)}
+  .mirror-content .m-row:last-child{border-bottom:none}
+  .mirror-content .m-key{color:var(--muted)}
+  .mirror-content .m-val{color:var(--tx);font-variant-numeric:tabular-nums}
+  .mirror-content .m-val.ok{color:var(--ok)}
+  .mirror-content .m-val.err{color:var(--err)}
+  .mirror-content .m-val.warn{color:var(--warn)}
+  .mirror-bar{display:inline-block;height:4px;border-radius:2px;min-width:10px}
+  .mirror-bar.ok{background:var(--ok)}.mirror-bar.mid{background:var(--warn)}.mirror-bar.slow{background:var(--err)}
+  </style>
 
   <!-- === Tab · 历史 === -->
   <div class="pane" data-pane="history">
@@ -461,7 +504,7 @@ async function askSend() {
   const t0 = performance.now();
   State.askAbort = new AbortController();
   try {
-    const r = await fetch(api('/api/glass/stream-ask', {
+    const r = await fetch('/api/glass/stream-ask', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ q, mode: State.mode }),
@@ -506,7 +549,7 @@ async function askSend() {
 
 async function kbFallback(q, out, kbRef, meta) {
   try {
-    const r = await fetch(api('/api/public/kb-search?q=' + encodeURIComponent(q) + '&limit=3');
+    const r = await fetch('/api/public/kb-search?q=' + encodeURIComponent(q) + '&limit=3');
     const d = await r.json();
     if (d.ok && d.results && d.results.length) {
       out.textContent = d.results.map(x => x.title + '\n' + (x.content||x.summary||'').slice(0,300)).join('\n\n---\n\n');
@@ -547,7 +590,7 @@ $('#sttStart').onclick = () => { if (!State.sttRec) return; State.sttRec.start()
 $('#sttStop').onclick = () => { if (State.sttRec) State.sttRec.stop(); };
 $('#sttUpload').onclick = async () => {
   const hint = $('#sttHint').value.trim();
-  const r = await fetch(api('/api/glass/upload-audio', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ text: $('#sttOut').textContent, hint, mode: State.mode }) });
+  const r = await fetch('/api/glass/upload-audio', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ text: $('#sttOut').textContent, hint, mode: State.mode }) });
   const d = await r.json();
   if (d.ok) {
     $('#sttIntent').textContent = '🎯 Intent: ' + (d.intent||'?') + (d.nextStep ? ' · ' + d.nextStep : '');
@@ -567,7 +610,7 @@ $('#ocrUpload').onclick = async () => {
   $('#ocrOut').textContent = '⏳ 识别中…';
   $('#ocrMeta').innerHTML = '<span class="chip warn">5 引擎优先级</span>';
   try {
-    const r = await fetch(api('/api/face-ocr/recognize', { method:'POST', body: fd });
+    const r = await fetch('/api/face-ocr/recognize', { method:'POST', body: fd });
     const d = await r.json();
     $('#ocrOut').textContent = d.text || d.content || JSON.stringify(d).slice(0,400);
     $('#ocrMeta').innerHTML = '<span class="chip ok">✓ ' + (d.engine||'?') + '</span><span class="chip">' + (d.confidence?.toFixed?.(2)||'?') + '</span>';
@@ -594,7 +637,7 @@ $('#camSnap').onclick = () => {
   c.getContext('2d').drawImage(v, 0, 0);
   c.toBlob(b => {
     const fd = new FormData(); fd.append('file', b, 'snap.jpg'); fd.append('mode', State.mode);
-    fetch(api('/api/face-ocr/recognize', { method:'POST', body: fd }).then(r=>r.json()).then(d => {
+    fetch('/api/face-ocr/recognize', { method:'POST', body: fd }).then(r=>r.json()).then(d => {
       $('#ocrOut').textContent = d.text || JSON.stringify(d).slice(0,400);
       $('#askQ').value = '这是我的' + State.mode + '情况：' + (d.text||'').slice(0,100); askSend();
     });
@@ -712,8 +755,72 @@ function drawTonguePie() {
 }
 drawTonguePie();
 
+// === R76-C · 镜象镜像渲染 ===
+async function refreshMirror() {
+  try {
+    const r = await fetch('/api/glass/mirror', { credentials:'same-origin' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = (await r.json()).data || (await r.json());
+    // Engine
+    const eng = data.engine || {};
+    $('#mirrorEngine').innerHTML = Object.entries(eng).map(([k,v]) =>
+      '<div class="m-row"><span class="m-key">' + esc(k) + '</span><span class="m-val ok">' + esc(v) + '</span></div>'
+    ).join('') +
+      '<div class="m-row"><span class="m-key">kb_1h 命中</span><span class="m-val">' + (data.kb_1h||0) + '</span></div>' +
+      '<div class="m-row"><span class="m-key">ocr_1h 调用</span><span class="m-val">' + (data.ocr_1h||0) + '</span></div>' +
+      '<div class="m-row"><span class="m-key">ocr_total 累计</span><span class="m-val">' + (data.ocr_total||0) + '</span></div>';
+
+    // Live timestamp
+    $('#mirrorLive').innerHTML = '<div class="m-row"><span class="m-key">服务汇报</span><span class="m-val ok">✓ 在线</span></div>' +
+      '<div class="m-row"><span class="m-key">快照时间</span><span class="m-val">' + esc((data.ts||'').split('T')[1]||'') + '</span></div>' +
+      '<div class="m-row"><span class="m-key">镜像点</span><span class="m-val">' + (data.mirrors||[]).length + ' 个</span></div>';
+
+    // badge
+    const badge = $('#mirrorBadge');
+    if (badge) badge.textContent = data.ocr_total || 0;
+  } catch(e) {
+    $('#mirrorEngine').innerHTML = '<div class="m-row"><span class="m-val err">✗ ' + esc(e.message) + '</span></div>';
+  }
+
+  // Parallel: KB 热度
+  try {
+    const r2 = await fetch('/api/kb/hot-modules?window=7', { credentials:'same-origin' });
+    const d2 = await r2.json();
+    const hot = d2.data || d2;
+    const mods = hot.modules || [];
+    $('#mirrorKb').innerHTML = '<div style="font-size:10px;color:var(--muted);margin-bottom:6px">共 ' + (hot.total_hits||0) + ' 命中 · 窗口 ' + (hot.window_days||'7') + ' 天</div>' +
+      mods.slice(0, 8).map(m => {
+        const w = Math.max(8, Math.min(m.pct * 1.5, 60));
+        return '<div class="m-row"><span class="m-key" style="flex:1;overflow:hidden;text-overflow:ellipsis">' + esc(m.module) + '</span><span class="m-val">' + m.hits + '<span style="color:var(--muted);font-size:10px;margin-left:4px">' + m.pct.toFixed(1) + '%</span></span></div>';
+      }).join('') || '<div style="color:var(--muted2);font-size:11px">暂无数据</div>';
+  } catch(e2) {
+    $('#mirrorKb').innerHTML = '<div class="m-val err">✗ ' + esc(e2.message) + '</div>';
+  }
+
+  // Parallel: OCR history recent 5
+  try {
+    const r3 = await fetch('/api/ocr/history?limit=5', { credentials:'same-origin' });
+    const d3 = await r3.json();
+    const hist = d3.data || d3;
+    $('#mirrorOcr').innerHTML = '<div style="font-size:10px;color:var(--muted);margin-bottom:6px">共 ' + (hist.total||0) + ' 条</div>' +
+      (hist.history||[]).map(h =>
+        '<div class="m-row"><span class="m-key" style="overflow:hidden;text-overflow:ellipsis">' + esc(h.hit_at) + ' · ' + esc(h.mode) + '</span><span class="m-val">' + (h.latency_ms||0) + 'ms</span></div>'
+      ).join('') || '<div style="color:var(--muted2);font-size:11px">暂无数据</div>';
+  } catch(e3) {
+    $('#mirrorOcr').innerHTML = '<div class="m-val err">✗ ' + esc(e3.message) + '</div>';
+  }
+}
+
+function esc(s) {
+  return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// 镜像 15s 刷新
+setInterval(refreshMirror, 15000);
+
 // === 启动 ===
 renderHistory();
+refreshMirror();
 refreshStatus();
 $('#btnRefreshLive').onclick = () => {
   $('#liveFortune').textContent = '运势 ' + (60 + Math.floor(Math.random()*40));
