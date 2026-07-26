@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KB 知识库质量审计 · 命理宝鉴</title>
+<meta name="description" content="54 模块质量分级卡片 + trust_score 分布 + 模块搜索">
+<link rel="stylesheet" href="css/divination-hub.css">
+<link rel="stylesheet" href="css/utility-classes.css">
+<style>
+:root{--gold:#c9a84c;--gold-dim:#a88c3a;--ink:#0d1117;--paper:#1a1f2e;--card:#222838;--border:#333a4d}
+body{background:var(--ink);color:#e0d8c8;font-family:system-ui,-apple-system,sans-serif;margin:0;padding:0}
+.wrap{max-width:1200px;margin:0 auto;padding:20px}
+h1{font-size:1.6rem;color:var(--gold);text-align:center;margin:20px 0 4px}
+.sub{text-align:center;color:#888;font-size:.9rem;margin-bottom:20px}
+
+/* Summary Bar */
+.summary{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:24px}
+.s-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 20px;text-align:center;min-width:100px}
+.s-card .val{font-size:1.8rem;font-weight:700;color:var(--gold)}
+.s-card .lbl{font-size:.75rem;color:#888;margin-top:2px}
+.s-card.grade .val{font-size:2.2rem}
+
+/* Grade Colors */
+.g-S-plus{color:#ffd700!important}.g-S{color:#e8c44a!important}.g-A-plus{color:#a8d8a8!important}
+.g-A{color:#7ec47e!important}.g-B-plus{color:#7ab8d4!important}.g-B{color:#6a9fd8!important}
+.g-C{color:#d49a6a!important}.g-D{color:#d46a6a!important}
+
+/* Search */
+.search-bar{display:flex;gap:8px;margin-bottom:16px}
+.search-bar input{flex:1;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:#e0d8c8;font-size:.95rem;outline:none}
+.search-bar input:focus{border-color:var(--gold-dim)}
+.search-bar select{padding:10px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:#e0d8c8;font-size:.85rem}
+
+/* Module Grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+.mod{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;transition:border-color .2s}
+.mod:hover{border-color:var(--gold-dim)}
+.mod-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.mod-name{font-weight:600;color:#e0d8c8;font-size:.95rem}
+.mod-grade{font-size:1.3rem;font-weight:700}
+.mod-bar{height:6px;border-radius:3px;background:#333;overflow:hidden;display:flex;margin-bottom:6px}
+.mod-bar .seg{height:100%}
+.seg-gold{background:#ffd700}.seg-silver{background:#c0c0c0}.seg-bronze{background:#cd7f32}.seg-fix{background:#d46a6a}
+.mod-meta{display:flex;justify-content:space-between;font-size:.78rem;color:#888}
+.mod-meta span b{color:#ccc;font-weight:600}
+
+/* Distribution */
+.distro{display:flex;height:24px;border-radius:6px;overflow:hidden;margin:12px 0}
+.distro .seg{display:flex;align-items:center;justify-content:center;font-size:.7rem;color:#000;font-weight:600}
+
+/* Refresh */
+.refresh{position:fixed;bottom:20px;right:20px;width:48px;height:48px;border-radius:50%;background:var(--gold);border:none;color:var(--ink);font-size:1.3rem;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3);z-index:10}
+.refresh:hover{opacity:.85}
+
+@media(max-width:768px){.grid{grid-template-columns:1fr}.s-card{min-width:80px;padding:10px 14px}.s-card .val{font-size:1.4rem}h1{font-size:1.3rem}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>📊 KB 知识库质量审计</h1>
+<p class="sub" id="sub">加载中…</p>
+
+<div class="summary" id="summary"></div>
+
+<div class="search-bar">
+<input type="text" id="q" placeholder="搜索模块名…（如 tcm / bazi / fengshui）" oninput="render()">
+<select id="gradeFilter" onchange="render()">
+<option value="">全部等级</option>
+<option value="S+">S+ 顶级</option>
+<option value="S">S 优秀</option>
+<option value="A+">A+ 良好</option>
+<option value="A">A</option>
+<option value="B+">B+</option>
+<option value="B">B</option>
+<option value="C">C</option>
+</select>
+</div>
+
+<div class="distro" id="distro"></div>
+
+<div class="grid" id="grid"></div>
+</div>
+
+<button class="refresh" onclick="load()" title="刷新">🔄</button>
+
+<script>
+let DATA=null;
+const API=location.hostname.includes('github.io')?'https://mingli-baojian-api.onrender.com':'http://127.0.0.1:8920';
+const fmt=n=>n>=1000?(n/1000).toFixed(1)+'k':n;
+const gradeClass=g=>'g-'+g.replace('+','-plus');
+
+async function load(){
+  document.getElementById('sub').textContent='加载中…';
+  try{
+    const r=await fetch(API+'/api/kb/quality-report');
+    const j=await r.json();
+    DATA=j.data||j;
+    renderSummary();
+    render();
+    document.getElementById('sub').textContent=`${DATA.summary.module_cnt} 模块 · ${fmt(DATA.summary.total)} 条目 · 更新于 ${new Date(DATA.generatedAt).toLocaleString('zh-CN')}`;
+  }catch(e){
+    document.getElementById('sub').textContent='加载失败：'+e.message;
+  }
+}
+
+function renderSummary(){
+  const s=DATA.summary;
+  const cards=[
+    {lbl:'总条目',val:fmt(s.total)},
+    {lbl:'模块数',val:s.module_cnt},
+    {lbl:'平均 trust',val:s.avg_trust},
+    {lbl:'综合等级',val:s.grade,cls:'grade'},
+    {lbl:'🥇 Gold',val:fmt(s.gold)},
+    {lbl:'🥈 Silver',val:fmt(s.silver)},
+    {lbl:'🥉 Bronze',val:fmt(s.bronze)},
+    {lbl:'需修复',val:s.needs_fix},
+  ];
+  document.getElementById('summary').innerHTML=cards.map(c=>
+    `<div class="s-card ${c.cls||''}"><div class="val ${c.cls?' '+gradeClass(s.grade):''}">${c.val}</div><div class="lbl">${c.lbl}</div></div>`
+  ).join('');
+
+  // Distribution bar
+  const t=s.total;
+  const segs=[
+    {lbl:'Gold',val:s.gold,pct:s.gold/t*100,cls:'seg-gold'},
+    {lbl:'Silver',val:s.silver,pct:s.silver/t*100,cls:'seg-silver'},
+    {lbl:'Bronze',val:s.bronze,pct:s.bronze/t*100,cls:'seg-bronze'},
+  ];
+  if(s.needs_fix>0) segs.push({lbl:'Fix',val:s.needs_fix,pct:s.needs_fix/t*100,cls:'seg-fix'});
+  document.getElementById('distro').innerHTML=segs.map(s2=>
+    `<div class="seg ${s2.cls}" style="width:${s2.pct}%" title="${s2.lbl}: ${s2.val} (${s2.pct.toFixed(1)}%)">${s2.pct>5?s2.lbl:''}</div>`
+  ).join('');
+}
+
+function render(){
+  if(!DATA) return;
+  const q=document.getElementById('q').value.toLowerCase().trim();
+  const gf=document.getElementById('gradeFilter').value;
+  let mods=DATA.modules.filter(m=>{
+    if(q&&!m.module.toLowerCase().includes(q)) return false;
+    if(gf&&m.grade!==gf) return false;
+    return true;
+  });
+  document.getElementById('grid').innerHTML=mods.map(m=>{
+    const t=m.cnt;
+    const gp=(m.gold/t*100).toFixed(0);
+    const sp=(m.silver/t*100).toFixed(0);
+    const bp=(m.bronze/t*100).toFixed(0);
+    const fp=m.needs_fix?(m.needs_fix/t*100).toFixed(0):0;
+    return `<div class="mod">
+      <div class="mod-head">
+        <span class="mod-name">${m.module}</span>
+        <span class="mod-grade ${gradeClass(m.grade)}">${m.grade}</span>
+      </div>
+      <div class="mod-bar">
+        <div class="seg seg-gold" style="width:${gp}%"></div>
+        <div class="seg seg-silver" style="width:${sp}%"></div>
+        <div class="seg seg-bronze" style="width:${bp}%"></div>
+        ${fp?`<div class="seg seg-fix" style="width:${fp}%"></div>`:''}
+      </div>
+      <div class="mod-meta">
+        <span><b>${fmt(m.cnt)}</b> 条目</span>
+        <span>trust <b>${m.avg_trust}</b></span>
+        <span>🥇${m.gold} 🥈${m.silver} 🥉${m.bronze}${m.needs_fix?' ⚠'+m.needs_fix:''}</span>
+      </div>
+    </div>`;
+  }).join('')||'<p style="color:#888;text-align:center;grid-column:1/-1">无匹配模块</p>';
+}
+
+load();
+</script>
+</body>
+</html>
