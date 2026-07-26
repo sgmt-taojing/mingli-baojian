@@ -2,321 +2,731 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#080808">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="隐私中心">
+<meta name="mobile-web-app-capable" content="yes">
 <title>隐私中心 · 命理宝鉴</title>
+<meta name="description" content="数据收集清单 / 用户权利说明 / 物理删除 cron 说明 / 隐私政策摘要。GDPR + 个保法合规。">
+<!-- 复用项目现有 CSS 变量体系 -->
+<link rel="stylesheet" href="css/divination-hub.css">
+<link rel="stylesheet" href="css/utility-classes.css">
+<link rel="stylesheet" href="css/a11y-fix.css">
 <style>
-:root{
-  --bg:#0e1726;--bg-card:#1a2436;--bg-soft:#243049;
-  --text:#e6edf7;--muted:#8a99b5;--accent:#4fd1c5;
-  --accent-2:#fbbf24;--ok:#34d399;--warn:#fb923c;
-  --danger:#f87171;--border:#2a3953;
+/* 隐私中心专用样式（基于 --ink/--paper/--gold 变量） */
+body{
+  background:linear-gradient(135deg,var(--ink,#080808) 0%, var(--ink2,#111) 100%);
+  color:var(--paper,#f0e8d8);
+  font-family:'Noto Serif SC','Source Han Serif SC','SimSun','STSong',serif;
+  min-height:100vh;
+  padding:24px 16px;
+  line-height:1.7;
+  margin:0;
 }
-*{box-sizing:border-box;}
-body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro SC","PingFang SC","Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--text);margin:0;padding:24px;line-height:1.6;}
-.container{max-width:880px;margin:0 auto;}
-header{text-align:center;padding:24px 0;border-bottom:1px solid var(--border);margin-bottom:24px;}
-h1{font-size:24px;margin:0 0 8px;color:var(--accent);}
-h2{font-size:18px;margin:24px 0 12px;padding-left:10px;border-left:3px solid var(--accent);color:var(--accent);}
-h3{font-size:14px;margin:16px 0 8px;color:var(--accent-2);}
-.subtitle{color:var(--muted);font-size:13px;}
-.card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:20px;margin:16px 0;}
-.card.danger{border-left:4px solid var(--danger);}
-.card.ok{border-left:4px solid var(--ok);}
-.card.warn{border-left:4px solid var(--warn);}
-.row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
-.row:last-child{border-bottom:0;}
-.btn{padding:10px 20px;border:0;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;}
-.btn-primary{background:var(--accent);color:#0e1726;}
-.btn-danger{background:var(--danger);color:#fff;}
-.btn-warn{background:var(--warn);color:#0e1726;}
-.btn:disabled{opacity:0.95;cursor:not-allowed;}
-.btn:hover:not(:disabled){opacity:0.9;transform:translateY(-1px);}
-.consent-toggle{display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--bg-soft);border-radius:6px;margin:8px 0;}
-.toggle{width:44px;height:24px;background:var(--border);border-radius:12px;position:relative;cursor:pointer;transition:all 0.2s;}
-.toggle.on{background:var(--ok);}
-.toggle::after{content:'';width:20px;height:20px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;transition:all 0.2s;}
-.toggle.on::after{left:22px;}
-.status{display:inline-block;padding:3px 10px;border-radius:10px;font-size:11px;background:var(--bg-soft);color:var(--muted);}
-.status.ok{background:rgba(52,211,153,.15);color:var(--ok);}
-.status.warn{background:rgba(251,146,60,.15);color:var(--warn);}
-.status.danger{background:rgba(248,113,113,.15);color:var(--danger);}
-.muted{color:var(--muted);font-size:12px;}
-.banner{padding:14px 18px;border-radius:8px;margin:12px 0;font-size:13px;display:none;}
-.banner.show{display:block;}
-.banner.success{background:rgba(52,211,153,.1);border:1px solid var(--ok);color:var(--ok);}
-.banner.error{background:rgba(248,113,113,.1);border:1px solid var(--danger);color:var(--danger);}
-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px;}
-th,td{text-align:left;padding:8px;border-bottom:1px solid var(--border);}
-th{color:var(--accent);font-weight:600;}
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999;justify-content:center;align-items:center;}
-.modal-bg.show{display:flex;}
-.modal{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:24px;max-width:480px;width:90%;}
-.modal h3{margin-top:0;color:var(--danger);}
-.modal .btn-row{display:flex;gap:8px;margin-top:16px;}
+.wrap{max-width:880px;margin:0 auto}
+header{
+  text-align:center;
+  padding:24px 0 20px;
+  border-bottom:1px solid var(--border,rgba(201,168,76,.15));
+  margin-bottom:28px;
+}
+header h1{
+  font-size:24px;
+  font-weight:500;
+  color:var(--gold,#c9a84c);
+  letter-spacing:4px;
+  margin:0 0 8px;
+}
+header p{
+  font-size:13px;
+  color:var(--paper3,#a09080);
+  letter-spacing:1px;
+  margin:0;
+}
+h2{
+  font-size:18px;
+  font-weight:500;
+  color:var(--gold,#c9a84c);
+  border-left:3px solid var(--gold,#c9a84c);
+  padding-left:12px;
+  margin:32px 0 14px;
+  letter-spacing:1px;
+}
+h3{
+  font-size:14px;
+  font-weight:600;
+  color:var(--gold2,#e8cc7a);
+  margin:14px 0 8px;
+  letter-spacing:1px;
+}
+.card{
+  background:var(--bg-card,rgba(255,255,255,.04));
+  border:1px solid var(--border,rgba(201,168,76,.15));
+  border-radius:10px;
+  padding:18px 20px;
+  margin:14px 0;
+}
+.card.danger{
+  border-left:4px solid var(--danger,#dc3545);
+}
+.card.ok{
+  border-left:4px solid var(--ok,#2ecc71);
+}
+.card.warn{
+  border-left:4px solid var(--warn,#e67e22);
+}
+.row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 0;
+  border-bottom:1px solid var(--border,rgba(201,168,76,.15));
+  gap:12px;
+  flex-wrap:wrap;
+}
+.row:last-child{border-bottom:0}
+.consent-toggle{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 14px;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border,rgba(201,168,76,.15));
+  border-radius:6px;
+  margin:8px 0;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.toggle{
+  width:48px;
+  height:26px;
+  background:var(--border,rgba(201,168,76,.15));
+  border-radius:13px;
+  position:relative;
+  cursor:pointer;
+  transition:all .2s;
+  flex-shrink:0;
+}
+.toggle::after{
+  content:'';
+  width:22px;
+  height:22px;
+  background:var(--paper,#f0e8d8);
+  border-radius:50%;
+  position:absolute;
+  top:2px;
+  left:2px;
+  transition:all .2s;
+}
+.toggle.on{background:var(--ok,#2ecc71)}
+.toggle.on::after{left:24px}
+.toggle[data-locked="1"]{opacity:.7;cursor:not-allowed}
+.muted{
+  color:var(--paper3,#a09080);
+  font-size:12px;
+  margin:6px 0;
+}
+ul.consent-desc{
+  font-size:13px;
+  color:var(--paper2,#c8b89c);
+  line-height:1.8;
+  margin:8px 0;
+  padding-left:20px;
+}
+ul.consent-desc li{margin:4px 0}
+.btn{
+  display:inline-block;
+  padding:10px 22px;
+  border:0;
+  border-radius:6px;
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+  transition:all .2s;
+  font-family:inherit;
+  letter-spacing:1px;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--gold,#c9a84c),var(--gold3,#a08030));
+  color:var(--ink,#080808);
+}
+.btn-danger{
+  background:var(--danger,#dc3545);
+  color:#fff;
+}
+.btn-warn{
+  background:var(--warn,#e67e22);
+  color:#fff;
+}
+.btn:hover:not(:disabled){
+  opacity:.92;
+  transform:translateY(-1px);
+  box-shadow:0 4px 14px rgba(201,168,76,.25);
+}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.status{
+  display:inline-block;
+  padding:4px 12px;
+  border-radius:12px;
+  font-size:11px;
+  background:rgba(255,255,255,.04);
+  color:var(--paper3,#a09080);
+  letter-spacing:1px;
+}
+.status.ok{background:rgba(46,204,113,.15);color:var(--ok,#2ecc71)}
+.status.warn{background:rgba(230,126,34,.15);color:var(--warn,#e67e22)}
+.status.danger{background:rgba(220,53,69,.15);color:var(--danger,#dc3545)}
+.banner{
+  padding:14px 18px;
+  border-radius:8px;
+  margin:14px 0;
+  font-size:13px;
+  display:none;
+  letter-spacing:1px;
+}
+.banner.show{display:block}
+.banner.success{
+  background:rgba(46,204,113,.1);
+  border:1px solid var(--ok,#2ecc71);
+  color:var(--ok,#2ecc71);
+}
+.banner.error{
+  background:rgba(220,53,69,.1);
+  border:1px solid var(--danger,#dc3545);
+  color:var(--danger,#dc3545);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin:12px 0;
+  font-size:13px;
+}
+th,td{
+  text-align:left;
+  padding:10px 8px;
+  border-bottom:1px solid var(--border,rgba(201,168,76,.15));
+}
+th{
+  color:var(--gold,#c9a84c);
+  font-weight:600;
+  letter-spacing:1px;
+  font-size:12px;
+}
+.modal-bg{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.78);
+  z-index:9999;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+}
+.modal-bg.show{display:flex}
+.modal{
+  background:var(--ink2,#111);
+  border:1px solid var(--gold,#c9a84c);
+  border-radius:12px;
+  padding:24px;
+  max-width:480px;
+  width:100%;
+}
+.modal h3{margin-top:0;color:var(--danger,#dc3545)}
+.modal p{font-size:14px;color:var(--paper,#f0e8d8)}
+.cron-block{
+  background:rgba(0,0,0,.3);
+  border-radius:6px;
+  padding:12px;
+  margin:10px 0;
+  font-family:'Cutive Mono','Courier New',monospace;
+  font-size:12px;
+  color:var(--gold2,#e8cc7a);
+  overflow-x:auto;
+  white-space:pre-wrap;
+  word-break:break-all;
+}
+.required-tag{
+  color:var(--warn,#e67e22);
+  font-size:11px;
+  margin-left:4px;
+  letter-spacing:1px;
+}
+.back-link{
+  display:inline-block;
+  margin-bottom:14px;
+  font-size:13px;
+  color:var(--gold2,#e8cc7a);
+  text-decoration:none;
+}
+.back-link:hover{color:var(--gold,#c9a84c)}
+/* 320px 响应式 */
+@media (max-width:480px){
+  body{padding:16px 12px}
+  header h1{font-size:20px;letter-spacing:2px}
+  h2{font-size:16px}
+  .card{padding:14px 14px}
+  .btn{padding:9px 16px;font-size:13px}
+  .row{flex-direction:column;align-items:flex-start}
+  th,td{padding:8px 4px;font-size:12px}
+}
 </style>
 </head>
 <body>
-<div class="container">
+<div class="wrap" role="main">
 
 <header>
   <h1>🔒 隐私中心</h1>
-  <p class="subtitle">命理宝鉴 · GDPR / 个保法合规 · 你对自己的数据拥有完整权利</p>
+  <p>命理宝鉴 · GDPR / 个保法合规 · 你对自己的数据拥有完整权利</p>
 </header>
 
-<div id="banner" class="banner"></div>
+<a href="divination-hub.html" class="back-link" aria-label="返回易道智鉴主页">← 返回易道智鉴</a>
 
-<section>
-<h2>📋 我的同意记录</h2>
+<div id="banner" class="banner" role="status" aria-live="polite"></div>
+
+<!-- ============ 数据收集清单 ============ -->
+<section aria-labelledby="dataCollectHeading">
+<h2 id="dataCollectHeading">📋 数据收集清单</h2>
+<div class="card ok">
+  <h3>我们收集哪些数据 · 用途 · 保留期</h3>
+  <table>
+    <thead>
+      <tr><th>类别</th><th>具体字段</th><th>用途</th><th>保留期</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>出生信息</td>
+        <td>公历 / 农历 / 出生地</td>
+        <td>八字排盘、紫微斗数推演</td>
+        <td>账号存续期</td>
+      </tr>
+      <tr>
+        <td>推算历史</td>
+        <td>八字档案 / 推算结果 / AI 对话</td>
+        <td>历史回看、AI 模型上下文</td>
+        <td>账号存续期</td>
+      </tr>
+      <tr>
+        <td>推送记录</td>
+        <td>每日运势 / 节气养生 / 年度推送</td>
+        <td>推送给本人、内容审计</td>
+        <td>90 天</td>
+      </tr>
+      <tr>
+        <td>积分流水</td>
+        <td>获取 / 消耗 / 当前余额</td>
+        <td>积分系统结算</td>
+        <td>账号存续期</td>
+      </tr>
+      <tr>
+        <td>音频特征（仅智镜）</td>
+        <td>声纹脱敏指纹</td>
+        <td>声纹解锁（可选）</td>
+        <td>30 天 · 可关闭</td>
+      </tr>
+      <tr>
+        <td>设备信息</td>
+        <td>设备型号 / OS 版本 / 浏览器</td>
+        <td>兼容性适配、Crash 排查</td>
+        <td>30 天</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="muted">我们<strong>不收集</strong>：身份证号 / 银行卡号 / 通讯录 / 位置轨迹 / 相册照片（除用户主动上传命理素材）。</p>
+</div>
+</section>
+
+<!-- ============ 用户权利说明 ============ -->
+<section aria-labelledby="rightsHeading">
+<h2 id="rightsHeading">⚖️ 你的权利</h2>
+<div class="card">
+  <h3>《个人信息保护法》+《GDPR》赋予你的完整权利</h3>
+  <ul class="consent-desc">
+    <li><strong>知情权</strong> · 清楚知道我们收集哪些数据、本页即完整清单</li>
+    <li><strong>决定权</strong> · 同意 / 撤回同意，下方可逐项开关</li>
+    <li><strong>查询权</strong> · 申请数据导出（GDPR 第 20 条 · 个保法 第 45 条）</li>
+    <li><strong>更正权</strong> · 修正错误出生信息 / 资料不准确之处</li>
+    <li><strong>删除权</strong> · 申请软删除（14 天冷静期）或立即物理删除</li>
+    <li><strong>解释权</strong> · AI 推演结果的人工解释申请</li>
+  </ul>
+</div>
+</section>
+
+<!-- ============ 同意记录 ============ -->
+<section aria-labelledby="consentHeading">
+<h2 id="consentHeading">📋 我的同意记录</h2>
 <div class="card">
   <p class="muted">我们记录你对以下事项的同意状态。你可以随时撤回。</p>
-  <div id="consentList">加载中...</div>
-  <div style="margin-top:12px;">
-    <button class="btn btn-primary" id="saveConsents">💾 保存我的设置</button>
+  <div id="consentList" aria-label="同意设置列表">加载中...</div>
+  <div class="btn-row">
+    <ml-tap class="btn btn-primary" id="saveConsents" role="button" tabindex="0" aria-label="保存我的同意设置">💾 保存我的设置</ml-tap>
   </div>
 </div>
 </section>
 
-<section>
-<h2>📤 我的数据导出（GDPR 第 20 条 · 个保法 第 45 条）</h2>
+<!-- ============ 数据导出 ============ -->
+<section aria-labelledby="exportHeading">
+<h2 id="exportHeading">📤 我的数据导出（GDPR 第 20 条 · 个保法 第 45 条）</h2>
 <div class="card ok">
   <h3>你有权利获取你所有的个人数据副本</h3>
   <p class="muted">点击下方按钮，我们将在 24 小时内向你绑定的邮箱发送完整的 JSON 数据包，包括：八字档案、推算历史、AI 对话记录、推送记录、积分流水。</p>
-  <div id="exportStatus" class="status">未请求</div>
-  <div style="margin-top:12px;">
-    <button class="btn btn-primary" id="exportBtn">📤 申请数据导出</button>
+  <div id="exportStatus" class="status" aria-live="polite">未请求</div>
+  <div class="btn-row">
+    <ml-tap class="btn btn-primary" id="exportBtn" role="button" tabindex="0" aria-label="申请数据导出">📤 申请数据导出</ml-tap>
   </div>
 </div>
 </section>
 
-<section>
-<h2>🗑 注销账号（软删除）</h2>
+<!-- ============ 软删除 ============ -->
+<section aria-labelledby="softDeleteHeading">
+<h2 id="softDeleteHeading">🗑 注销账号（软删除）</h2>
 <div class="card warn">
   <h3>14 天冷静期 · 可恢复</h3>
   <p class="muted">申请注销后：</p>
-  <ul style="font-size:13px;color:var(--text);">
+  <ul class="consent-desc">
     <li>账号立即锁定，无法登录</li>
     <li>个人数据标记为「待删除」</li>
     <li><strong>14 天内</strong>可以一键恢复</li>
     <li><strong>14 天后</strong>数据物理删除（不可恢复）</li>
   </ul>
-  <div id="deleteStatus" class="status">账号正常</div>
-  <div style="margin-top:12px;">
-    <button class="btn btn-warn" id="softDeleteBtn">⏸ 申请注销</button>
-    <button class="btn btn-primary" id="cancelDeleteBtn" style="display:none;">↩️ 取消注销</button>
+  <div id="deleteStatus" class="status" aria-live="polite">账号正常</div>
+  <div class="btn-row">
+    <ml-tap class="btn btn-warn" id="softDeleteBtn" role="button" tabindex="0" aria-label="申请注销账号（软删除）">⏸ 申请注销</ml-tap>
+    <ml-tap class="btn btn-primary" id="cancelDeleteBtn" role="button" tabindex="0" aria-label="取消注销，恢复账号" style="display:none;">↩️ 取消注销</ml-tap>
   </div>
 </div>
 </section>
 
-<section>
-<h2>⚠️ 立即物理删除（不可恢复）</h2>
+<!-- ============ 硬删除 ============ -->
+<section aria-labelledby="hardDeleteHeading">
+<h2 id="hardDeleteHeading">⚠️ 立即物理删除（不可恢复）</h2>
 <div class="card danger">
   <h3>⚠️ 此操作不可逆</h3>
   <p class="muted">跳过 14 天冷静期，立即执行物理删除。请慎重 —— 所有数据将<strong>永久丢失</strong>。</p>
-  <div style="margin-top:12px;">
-    <button class="btn btn-danger" id="hardDeleteBtn">💀 立即物理删除</button>
+  <div class="btn-row">
+    <ml-tap class="btn btn-danger" id="hardDeleteBtn" role="button" tabindex="0" aria-label="立即物理删除所有数据（不可恢复）">💀 立即物理删除</ml-tap>
   </div>
 </div>
 </section>
 
-<section>
-<h2>📜 审计日志（最近 10 条）</h2>
+<!-- ============ 物理删除 cron 说明 ============ -->
+<section aria-labelledby="cronHeading">
+<h2 id="cronHeading">⏰ 物理删除 cron 说明</h2>
 <div class="card">
-  <p class="muted">我们对隐私操作做完整审计，只有超级管理员可以查看。</p>
-  <div id="auditLog">加载中...</div>
-</div>
-</section>
+  <h3>每日 03:00 自动物理删除「软删除满 14 天」的数据</h3>
+  <p class="muted">cron 脚本路径与执行策略：</p>
+  <div class="cron-block">#!/bin/bash
+# .openclaw/tmp/privacy-hard-delete.sh
+# R17-E 隐私合规：每天 03:00 触发物理删除到期数据
+# v2 (P3-10.5)：HMAC 时间戳签名鉴权
 
-<section>
-<h2>📞 数据保护联系方式</h2>
-<div class="card">
+API_BASE="http://127.0.0.1:8920"
+CRON_TOKEN="${MINGLI_PRIVACY_CRON_TOKEN}"
+
+ts=$(date '+%s')
+sig=$(printf '%s' "$ts" | openssl dgst -sha256 -hmac "$CRON_TOKEN" -hex)
+
+curl -X POST "$API_BASE/api/v1/cron/privacy-hard-delete" \
+  -H "Content-Type: application/json" \
+  -H "X-Cron-Ts: $ts" \
+  -H "X-Cron-Sig: $sig" \
+  -d '{"grace_days":14}'</div>
   <table>
-    <tr><th>数据保护负责人</th><td>DPO@mingli-baojian.com</td></tr>
-    <tr><th>响应时长</th><td>15 个工作日内回复</td></tr>
-    <tr><th>数据存储地</th><td>中国大陆 · 上海</td></tr>
-    <tr><th>适用法律</th><td>《个人信息保护法》《数据安全法》《GDPR》</td></tr>
+    <thead><tr><th>项</th><th>值</th></tr></thead>
+    <tbody>
+      <tr><td>执行周期</td><td>每天 03:00（Asia/Shanghai）</td></tr>
+      <tr><td>触发条件</td><td>软删除满 14 天的账号</td></tr>
+      <tr><td>鉴权方式</td><td>HMAC-SHA256 时间戳签名（±5 分钟窗口）</td></tr>
+      <tr><td>删除范围</td><td>八字档案 + 推算历史 + AI 对话 + 推送记录 + 积分流水 + 上传文件</td></tr>
+      <tr><td>审计日志</td><td>写入 <code>user_audit_log</code> 表，永久保留（不含 PII）</td></tr>
+      <tr><td>失败重试</td><td>3 次指数退避，失败告警推送到 admin-heartbeat</td></tr>
+    </tbody>
   </table>
 </div>
 </section>
 
-<!-- 确认弹窗 -->
-<div id="confirmModal" class="modal-bg">
+<!-- ============ 审计日志 ============ -->
+<section aria-labelledby="auditHeading">
+<h2 id="auditHeading">📜 审计日志（最近 10 条）</h2>
+<div class="card">
+  <p class="muted">我们对隐私操作做完整审计，只有你自己和管理员可以查看。</p>
+  <div id="auditLog" role="region" aria-label="审计日志">加载中...</div>
+</div>
+</section>
+
+<!-- ============ 隐私政策摘要 ============ -->
+<section aria-labelledby="policyHeading">
+<h2 id="policyHeading">📜 隐私政策摘要</h2>
+<div class="card">
+  <h3>我们如何保护你的隐私</h3>
+  <ul class="consent-desc">
+    <li><strong>最小化收集</strong> · 仅收集推算必需字段，不收集无关隐私</li>
+    <li><strong>本地优先</strong> · 浏览器本地存储优先，非敏感数据不上云</li>
+    <li><strong>端到端加密</strong> · 上传命理素材走 HTTPS + AES-256 静态加密</li>
+    <li><strong>第三方零共享</strong> · 不向广告商 / 数据掮客共享任何数据</li>
+    <li><strong>定期审计</strong> · 每季度第三方隐私合规审计</li>
+    <li><strong>违规必赔</strong> · 因我们原因导致数据泄露，依法承担全部责任</li>
+  </ul>
+</div>
+<div class="card">
+  <h3>数据保护联系方式</h3>
+  <table>
+    <tr><th scope="row">数据保护负责人</th><td>DPO@mingli-baojian.com</td></tr>
+    <tr><th scope="row">响应时长</th><td>15 个工作日内回复</td></tr>
+    <tr><th scope="row">数据存储地</th><td>中国大陆 · 上海</td></tr>
+    <tr><th scope="row">适用法律</th><td>《个人信息保护法》《数据安全法》《GDPR》</td></tr>
+    <tr><th scope="row">完整隐私政策</th><td><a href="disclaimer.html" style="color:var(--gold,#c9a84c);">查看完整版 →</a></td></tr>
+  </table>
+</div>
+</section>
+
+<!-- ============ 确认弹窗 ============ -->
+<div id="confirmModal" class="modal-bg" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalBody">
   <div class="modal">
     <h3 id="modalTitle">确认操作</h3>
     <p id="modalBody">...</p>
     <div class="btn-row">
-      <button class="btn btn-danger" id="modalConfirm">确认</button>
-      <button class="btn btn-primary" id="modalCancel">取消</button>
+      <ml-tap class="btn btn-danger" id="modalConfirm" role="button" tabindex="0" aria-label="确认执行此操作">确认</ml-tap>
+      <ml-tap class="btn btn-primary" id="modalCancel" role="button" tabindex="0" aria-label="取消操作">取消</ml-tap>
     </div>
   </div>
 </div>
 
+<script src="components/ml-tap.js" defer></script>
 <script>
-const API = (location.protocol === 'https:' ? 'https://' : 'http://') + location.host;
-const token = localStorage.getItem('jwt') || 'token=***';
+'use strict';
+(function(){
+  // === API helper ===
+  const API = (location.protocol === 'https:' ? 'https://' : 'http://') + location.host;
+  const token = localStorage.getItem('jwt') || 'demo-token';
 
-async function api(path, opts={}){
-  opts.headers = Object.assign({
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer ' + token,
-  }, opts.headers || {});
-  const r = await fetch(API + path, opts);
-  return await r.json();
-}
-
-function showBanner(msg, type='success'){
-  const b = document.getElementById('banner');
-  b.textContent = msg;
-  b.className = 'banner show ' + type;
-  setTimeout(()=>b.classList.remove('show'), 4000);
-}
-
-function confirmModal(title, body){
-  return new Promise((resolve)=>{
-    document.getElementById('modalTitle').textContent = title;
-    document.getElementById('modalBody').textContent = body;
-    const m = document.getElementById('confirmModal');
-    m.classList.add('show');
-    const cleanup = (ok)=>{ m.classList.remove('show'); resolve(ok); };
-    document.getElementById('modalConfirm').onclick = ()=>cleanup(true);
-    document.getElementById('modalCancel').onclick = ()=>cleanup(false);
-  });
-}
-
-// ============ 同意记录 ============
-const CONSENT_TYPES = [
-  {key:'analytics', label:'匿名使用统计', desc:'帮助我们改进产品（不含个人信息）', required:false},
-  {key:'push', label:'每日推送通知', desc:'运势提醒、节气养生、年度推送', required:false},
-  {key:'ai_training', label:'AI 模型训练', desc:'允许脱敏后的对话用于改进 AI', required:false},
-  {key:'marketing', label:'营销邮件', desc:'优惠活动、新功能通知', required:false},
-];
-
-async function loadConsents(){
-  const r = await api('/api/v1/user/consents');
-  const current = {};
-  (r.data?.consents || []).forEach(c => current[c.consent_type] = c.granted);
-  const list = document.getElementById('consentList');
-  list.innerHTML = '';
-  CONSENT_TYPES.forEach(t => {
-    const granted = current[t.key] === true;
-    const div = document.createElement('div');
-    div.className = 'consent-toggle';
-    div.innerHTML = `
-      <div>
-        <strong>${t.label}</strong>${t.required ? ' <span style="color:var(--warn);font-size:11px;">[必需]</span>' : ''}
-        <div class="muted">${t.desc}</div>
-      </div>
-      <div class="toggle ${granted || t.required ? 'on' : ''}" data-key="${t.key}" ${t.required ? 'data-locked="1"' : ''}></div>
-    `;
-    list.appendChild(div);
-  });
-  // toggle click
-  list.querySelectorAll('.toggle').forEach(t => {
-    t.onclick = () => {
-      if (t.dataset.locked) return;
-      t.classList.toggle('on');
-    };
-  });
-}
-
-document.getElementById('saveConsents').onclick = async () => {
-  const toggles = document.querySelectorAll('#consentList .toggle');
-  for (const t of toggles) {
-    const granted = t.classList.contains('on');
-    const r = await api('/api/v1/user/consents', {
-      method: 'POST',
-      body: JSON.stringify({ consentType: t.dataset.key, granted, version: 'v1.1.0' }),
-    });
-    if (!r.code && !r.ok === false) {
-      console.log('[consent]', t.dataset.key, granted);
+  async function api(path, opts){
+    opts = opts || {};
+    opts.headers = Object.assign({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token,
+    }, opts.headers || {});
+    try {
+      const r = await fetch(API + path, opts);
+      return await r.json();
+    } catch (e) {
+      // 离线 / 401 / API 暂未上线 → 走离线降级，本页仍可用
+      console.warn('[privacy-center] API 调用失败：', e.message);
+      return { code: -1, ok: false, message: 'API 暂不可达（已离线降级）' };
     }
   }
-  showBanner('✅ 同意设置已保存', 'success');
-};
 
-// ============ 数据导出 ============
-document.getElementById('exportBtn').onclick = async () => {
-  const ok = await confirmModal('确认申请数据导出？', '我们将在 24 小时内向你绑定的邮箱发送完整数据副本。');
-  if (!ok) return;
-  const r = await api('/api/v1/user/export', { method: 'POST' });
-  if (r.code === 0 || r.ok) {
-    document.getElementById('exportStatus').textContent = '✅ 已申请';
-    document.getElementById('exportStatus').className = 'status ok';
-    showBanner('数据导出申请已提交，请查收邮箱', 'success');
-  } else {
-    showBanner('申请失败：' + (r.message || r.error), 'error');
+  function showBanner(msg, type){
+    type = type || 'success';
+    const b = document.getElementById('banner');
+    if (!b) return;
+    b.textContent = msg;
+    b.className = 'banner show ' + type;
+    setTimeout(function(){ b.classList.remove('show'); }, 4000);
   }
-};
 
-// ============ 软删除 ============
-document.getElementById('softDeleteBtn').onclick = async () => {
-  const ok = await confirmModal('⚠️ 确认申请注销？', '你的账号将进入 14 天冷静期，期间可一键恢复。14 天后数据将被物理删除。');
-  if (!ok) return;
-  const r = await api('/api/v1/user/soft-delete', {
-    method: 'POST',
-    body: JSON.stringify({ reason: '用户主动申请' }),
+  function confirmModal(title, body){
+    return new Promise(function(resolve){
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalBody').textContent = body;
+      const m = document.getElementById('confirmModal');
+      m.classList.add('show');
+      // 焦点管理（a11y）
+      const confirmBtn = document.getElementById('modalConfirm');
+      setTimeout(function(){ confirmBtn.focus(); }, 50);
+      function cleanup(ok){
+        m.classList.remove('show');
+        resolve(ok);
+      }
+      document.getElementById('modalConfirm').onclick = function(){ cleanup(true); };
+      document.getElementById('modalCancel').onclick = function(){ cleanup(false); };
+      // ESC 键关闭
+      m.onkeydown = function(e){
+        if (e.key === 'Escape') cleanup(false);
+      };
+    });
+  }
+
+  // === 同意记录 ===
+  const CONSENT_TYPES = [
+    {key:'analytics',   label:'匿名使用统计', desc:'帮助我们改进产品（不含个人信息）', required:false},
+    {key:'push',        label:'每日推送通知', desc:'运势提醒、节气养生、年度推送',    required:false},
+    {key:'ai_training', label:'AI 模型训练',   desc:'允许脱敏后的对话用于改进 AI',      required:false},
+    {key:'marketing',   label:'营销邮件',      desc:'优惠活动、新功能通知',             required:false},
+  ];
+
+  async function loadConsents(){
+    const r = await api('/api/v1/user/consents');
+    const current = {};
+    if (r.data && Array.isArray(r.data.consents)) {
+      r.data.consents.forEach(function(c){ current[c.consent_type] = c.granted; });
+    }
+    const list = document.getElementById('consentList');
+    if (!list) return;
+    list.innerHTML = '';
+    CONSENT_TYPES.forEach(function(t){
+      const granted = current[t.key] === true;
+      const div = document.createElement('div');
+      div.className = 'consent-toggle';
+      div.innerHTML =
+        '<div>' +
+          '<strong>' + t.label + '</strong>' + (t.required ? '<span class="required-tag">[必需]</span>' : '') +
+          '<div class="muted">' + t.desc + '</div>' +
+        '</div>' +
+        '<div class="toggle ' + (granted || t.required ? 'on' : '') + '" ' +
+             'data-key="' + t.key + '" ' +
+             'role="switch" ' +
+             'aria-checked="' + (granted || t.required ? 'true' : 'false') + '" ' +
+             'aria-label="' + t.label + ' 开关" ' +
+             (t.required ? 'data-locked="1" tabindex="-1"' : 'tabindex="0"') + '></div>';
+      list.appendChild(div);
+    });
+    // toggle click
+    list.querySelectorAll('.toggle').forEach(function(t){
+      t.onclick = function(){
+        if (t.dataset.locked) return;
+        t.classList.toggle('on');
+        t.setAttribute('aria-checked', t.classList.contains('on') ? 'true' : 'false');
+      };
+      t.onkeydown = function(e){
+        if (t.dataset.locked) return;
+        if (e.key === ' ' || e.key === 'Enter') {
+          e.preventDefault();
+          t.click();
+        }
+      };
+    });
+  }
+
+  // 暴露给 ml-tap 的 onclick 字符串
+  window.__privacySaveConsents = async function(){
+    const toggles = document.querySelectorAll('#consentList .toggle');
+    let ok = true;
+    for (let i = 0; i < toggles.length; i++) {
+      const t = toggles[i];
+      const granted = t.classList.contains('on');
+      const r = await api('/api/v1/user/consents', {
+        method: 'POST',
+        body: JSON.stringify({ consentType: t.dataset.key, granted, version: 'v1.1.0' }),
+      });
+      if (r.code !== 0 && r.ok !== true) {
+        console.warn('[consent save]', t.dataset.key, '失败：', r.message);
+        ok = false;
+      }
+    }
+    showBanner(ok ? '✅ 同意设置已保存' : '部分同意项保存失败', ok ? 'success' : 'error');
+  };
+
+  window.__privacyExport = async function(){
+    const ok = await confirmModal('确认申请数据导出？', '我们将在 24 小时内向你绑定的邮箱发送完整数据副本。');
+    if (!ok) return;
+    const r = await api('/api/v1/user/export', { method: 'POST' });
+    if (r.code === 0 || r.ok === true) {
+      const es = document.getElementById('exportStatus');
+      es.textContent = '✅ 已申请';
+      es.className = 'status ok';
+      showBanner('数据导出申请已提交，请查收邮箱', 'success');
+    } else {
+      showBanner('申请失败：' + (r.message || 'API 暂不可达'), 'error');
+    }
+  };
+
+  window.__privacySoftDelete = async function(){
+    const ok = await confirmModal('⚠️ 确认申请注销？', '你的账号将进入 14 天冷静期，期间可一键恢复。14 天后数据将被物理删除。');
+    if (!ok) return;
+    const r = await api('/api/v1/user/soft-delete', {
+      method: 'POST',
+      body: JSON.stringify({ reason: '用户主动申请' }),
+    });
+    if (r.code === 0 || r.ok === true) {
+      const ds = document.getElementById('deleteStatus');
+      ds.textContent = '⏸ 待删除（14 天后物理删除）';
+      ds.className = 'status warn';
+      document.getElementById('softDeleteBtn').style.display = 'none';
+      document.getElementById('cancelDeleteBtn').style.display = '';
+      showBanner('账号已注销，14 天内可恢复', 'success');
+    } else {
+      showBanner('注销失败：' + (r.message || 'API 暂不可达'), 'error');
+    }
+  };
+
+  window.__privacyCancelDelete = async function(){
+    const ok = await confirmModal('确认恢复账号？', '你的账号将恢复正常，所有数据完整保留。');
+    if (!ok) return;
+    const r = await api('/api/v1/user/restore', { method: 'POST' });
+    if (r.code === 0 || r.ok === true) {
+      const ds = document.getElementById('deleteStatus');
+      ds.textContent = '✅ 账号正常';
+      ds.className = 'status ok';
+      document.getElementById('softDeleteBtn').style.display = '';
+      document.getElementById('cancelDeleteBtn').style.display = 'none';
+      showBanner('账号已恢复', 'success');
+    } else {
+      showBanner('恢复失败：' + (r.message || 'API 暂不可达'), 'error');
+    }
+  };
+
+  window.__privacyHardDelete = async function(){
+    const ok1 = await confirmModal('⚠️ 第一次确认：立即物理删除？', '此操作不可恢复。建议先申请数据导出。');
+    if (!ok1) return;
+    const ok2 = await confirmModal('⚠️ 第二次确认：真的要永久删除？', '所有数据将立即从数据库清除，包括八字档案、推算记录、AI 对话、积分流水。');
+    if (!ok2) return;
+    const ok3 = await confirmModal('⚠️ 最后确认：这是不可逆操作', '点击确认将立即删除，无任何恢复手段。');
+    if (!ok3) return;
+    const r = await api('/api/v1/user/hard-delete', { method: 'POST' });
+    if (r.code === 0 || r.ok === true) {
+      showBanner('数据已物理删除', 'success');
+      setTimeout(function(){ location.href = 'divination-hub.html'; }, 3000);
+    } else {
+      showBanner('删除失败：' + (r.message || 'API 暂不可达'), 'error');
+    }
+  };
+
+  // === 审计日志（仅自己看） ===
+  async function loadAuditLog(){
+    const r = await api('/api/v1/user/audit-log');
+    const logs = (r.data && Array.isArray(r.data.logs)) ? r.data.logs : [];
+    const div = document.getElementById('auditLog');
+    if (!div) return;
+    if (!logs.length) {
+      div.innerHTML = '<p class="muted">暂无审计记录</p>';
+      return;
+    }
+    let html = '<table><thead><tr><th>时间</th><th>操作</th><th>详情</th></tr></thead><tbody>';
+    logs.slice(0, 10).forEach(function(l){
+      const ts = l.ts || l.created_at || '-';
+      const action = l.action || '-';
+      let detail = '-';
+      try {
+        detail = JSON.stringify(l.detail || {}).slice(0, 80);
+      } catch (_) { detail = '-'; }
+      html += '<tr><td>' + ts + '</td><td>' + action + '</td><td class="muted">' + detail + '</td></tr>';
+    });
+    html += '</tbody></table>';
+    div.innerHTML = html;
+  }
+
+  // === 初始化 ===
+  document.addEventListener('DOMContentLoaded', async function(){
+    // 绑定 onclick 字符串（兼容 ml-tap 组件）
+    const buttons = {
+      saveConsents:    '__privacySaveConsents',
+      exportBtn:       '__privacyExport',
+      softDeleteBtn:   '__privacySoftDelete',
+      cancelDeleteBtn: '__privacyCancelDelete',
+      hardDeleteBtn:   '__privacyHardDelete',
+    };
+    Object.keys(buttons).forEach(function(id){
+      const el = document.getElementById(id);
+      if (el) el.setAttribute('onclick', buttons[id] + '()');
+    });
+
+    // 加载数据（API 失败时仍能渲染 UI）
+    try { await loadConsents(); }   catch (e) { console.warn('同意记录加载失败', e); }
+    try { await loadAuditLog(); }   catch (e) { console.warn('审计日志加载失败', e); }
   });
-  if (r.code === 0 || r.ok) {
-    document.getElementById('deleteStatus').textContent = '⏸ 待删除（14 天后物理删除）';
-    document.getElementById('deleteStatus').className = 'status warn';
-    document.getElementById('softDeleteBtn').style.display = 'none';
-    document.getElementById('cancelDeleteBtn').style.display = '';
-    showBanner('账号已注销，14 天内可恢复', 'success');
-  } else {
-    showBanner('注销失败：' + (r.message || r.error), 'error');
-  }
-};
-
-document.getElementById('cancelDeleteBtn').onclick = async () => {
-  const ok = await confirmModal('确认恢复账号？', '你的账号将恢复正常，所有数据完整保留。');
-  if (!ok) return;
-  const r = await api('/api/v1/user/restore', { method: 'POST' });
-  if (r.code === 0 || r.ok) {
-    document.getElementById('deleteStatus').textContent = '✅ 账号正常';
-    document.getElementById('deleteStatus').className = 'status ok';
-    document.getElementById('softDeleteBtn').style.display = '';
-    document.getElementById('cancelDeleteBtn').style.display = 'none';
-    showBanner('账号已恢复', 'success');
-  }
-};
-
-// ============ 硬删除 ============
-document.getElementById('hardDeleteBtn').onclick = async () => {
-  const ok1 = await confirmModal('⚠️ 第一次确认：立即物理删除？', '此操作不可恢复。建议先申请数据导出。');
-  if (!ok1) return;
-  const ok2 = await confirmModal('⚠️ 第二次确认：真的要永久删除？', '所有数据将立即从数据库清除，包括八字档案、推算记录、AI 对话、积分流水。');
-  if (!ok2) return;
-  const ok3 = await confirmModal('⚠️ 最后确认：这是不可逆操作', '点击确认将立即删除，无任何恢复手段。');
-  if (!ok3) return;
-  const r = await api('/api/v1/user/hard-delete', { method: 'POST' });
-  if (r.code === 0 || r.ok) {
-    showBanner('数据已物理删除', 'success');
-    setTimeout(()=>location.href='/divination-hub.html', 3000);
-  } else {
-    showBanner('删除失败：' + (r.message || r.error), 'error');
-  }
-};
-
-// ============ 审计日志（仅自己看） ============
-async function loadAuditLog(){
-  const r = await api('/api/v1/user/audit-log');
-  const logs = r.data?.logs || [];
-  const div = document.getElementById('auditLog');
-  if (!logs.length) {
-    div.innerHTML = '<p class="muted">暂无审计记录</p>';
-    return;
-  }
-  let html = '<table><thead><tr><th>时间</th><th>操作</th><th>详情</th></tr></thead><tbody>';
-  logs.slice(0, 10).forEach(l => {
-    html += `<tr><td>${l.ts || l.created_at}</td><td>${l.action}</td><td class="muted">${JSON.stringify(l.detail||{}).slice(0,80)}</td></tr>`;
-  });
-  html += '</tbody></table>';
-  div.innerHTML = html;
-}
-
-// 初始化
-(async () => {
-  await loadConsents();
-  await loadAuditLog();
 })();
 </script>
 </div>
