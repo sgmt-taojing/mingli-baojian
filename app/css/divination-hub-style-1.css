@@ -2028,7 +2028,7 @@ function showModal(title, content) {
 function showSection(name) {
   try {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
   document.querySelectorAll('.bottom-tab').forEach(t => t.classList.remove('active'));
 
   // Handle composite sections: zhanbu and xingming
@@ -2037,7 +2037,7 @@ function showSection(name) {
     const zhanbu = document.getElementById('section-zhanbu');
     if (zhanbu) zhanbu.classList.add('active');
     const zTab = document.getElementById('tab-zhanbu');
-    if (zTab) zTab.classList.add('active');
+    if (zTab) { zTab.classList.add('active'); zTab.setAttribute('aria-selected', 'true'); }
     showZhanbuSub(name);
     // Also activate the matching sub-tab button
     document.querySelectorAll('#section-zhanbu .zhanbu-subtab').forEach(b => b.classList.remove('active'));
@@ -2052,7 +2052,7 @@ function showSection(name) {
     const xm = document.getElementById('section-xingming');
     if (xm) xm.classList.add('active');
     const xTab = document.getElementById('tab-xingming');
-    if (xTab) xTab.classList.add('active');
+    if (xTab) { xTab.classList.add('active'); xTab.setAttribute('aria-selected', 'true'); }
     showXingmingSub(name);
     document.querySelectorAll('#section-xingming .zhanbu-subtab').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('#section-xingming .zhanbu-subtab').forEach(b => {
@@ -2066,7 +2066,7 @@ function showSection(name) {
     const fs = document.getElementById('section-fengshui');
     if (fs) fs.classList.add('active');
     const fTab = document.getElementById('tab-fengshui');
-    if (fTab) fTab.classList.add('active');
+    if (fTab) { fTab.classList.add('active'); fTab.setAttribute('aria-selected', 'true'); }
     showFengshuiSub('luopan-content');
     document.querySelectorAll('#section-fengshui .zhanbu-subtab').forEach(b => {
       b.classList.remove('active');
@@ -2089,7 +2089,7 @@ function showSection(name) {
   const el = document.getElementById('section-' + name);
   if (el) el.classList.add('active');
   const tab = document.getElementById('tab-' + name);
-  if (tab) tab.classList.add('active');
+  if (tab) { tab.classList.add('active'); tab.setAttribute('aria-selected', 'true'); }
   const bTab = document.getElementById('btm-' + name);
   if (bTab) bTab.classList.add('active');
   // 立即滚动到顶部，确保section可见
