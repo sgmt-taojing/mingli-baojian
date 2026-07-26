@@ -1254,6 +1254,46 @@ function copyReport(el){
 function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),1500)}
 
 async function callAI(q){
+  // R54: KB 快速通道 — freechat 提问先扫所有 KB，命中分 >= 0.7 直接朗读不调 AI
+  try {
+    const qLower = (q||'').toLowerCase();
+    if (qLower.length >= 4 && qLower.length <= 80) {
+      const keywords = qLower.split(/[\s,，。、；;：:（）()\[\]\-]+/).filter(s => s.length >= 2);
+      if (keywords.length) {
+        let best = {score:0, snippet:'', source:'', entryId:null};
+        for (const src of KB_SOURCES) {
+          const kb = src.obj();
+          if (!kb) continue;
+          let hits = 0, snippet = '';
+          function walk(obj){
+            if (typeof obj === 'string') {
+              let m = 0; for (const kw of keywords) if (obj.indexOf(kw) >= 0) m++;
+              if (m > hits) { hits = m; snippet = obj.substring(0, 1500); }
+            } else if (typeof obj === 'object' && obj !== null) {
+              for (const k in obj) {
+                if (k.startsWith('_') || k === 'meta') continue;
+                walk(obj[k]);
+              }
+            }
+          }
+          walk(kb);
+          const score = Math.min(1.0, (hits / Math.max(1, keywords.length)) * 1.5) * src.weight;
+          if (score > best.score) best = {score: Math.round(score*100)/100, snippet, source: src.name, entryId: src.entryId || null};
+        }
+        if (best.score >= 0.7 && best.snippet.length > 50) {
+          const tag = '【🎯 KB 直答（' + best.source + ' · ' + best.entryId + ' · 命中分 ' + Math.round(best.score*100) + '%）】';
+          const fullReply = tag + '\n\n' + best.snippet.substring(0, 1200);
+          addAI(fullReply);
+          hist.push({role:'assistant', content: fullReply.substring(0,500)});
+          if (hist.length > 20) hist = hist.slice(-20);
+          if (typeof recordKbHit === 'function') recordKbHit(state.module || 'freechat', best.score, true);
+          try { recordKbEngine('kb-fastpath'); } catch(e) {}
+          return;
+        }
+      }
+    }
+  } catch(e) { console.warn('[R54 fastpath]', e); }
+
   const t=document.createElement('div');t.className='msg m-ai';t.id='ty';
   t.innerHTML='<div class="typing"><i></i><i></i><i></i></div>';
   chat.appendChild(t);chat.scrollTop=chat.scrollHeight;
