@@ -84,6 +84,18 @@
   <!-- sparkline -->
   <div class="section-title">📈 命中分趋势（最近 50 次）</div>
   <div id="sparkline" class="sparkline-wrap"></div>
+
+  <!-- R61 7天聚合 -->
+  <div class="section-title">📅 最近 7 天聚合</div>
+  <div class="grid" id="weekGrid" style="grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:16px"></div>
+
+  <!-- R61 模块最佳命中分 Top 5 -->
+  <div class="section-title">🎯 模块最佳命中分（Top 5）</div>
+  <div id="topScores"></div>
+
+  <!-- R61 引擎切换历史 -->
+  <div class="section-title">🔀 引擎切换记录（最近 20 次）</div>
+  <div id="engineTimeline" style="font-size:11px;color:var(--paper3);font-family:monospace;background:rgba(255,255,255,.02);padding:10px;border-radius:6px;max-height:200px;overflow-y:auto"></div>
 </div>
 
 <script>
@@ -235,6 +247,119 @@
   }else{
     sparklineEl.innerHTML = '<div style="color:var(--paper3);font-size:12px;text-align:center;padding:20px">暂无命中分记录</div>';
   }
+
+  // === R61: 7 天聚合 ===
+  (function render7Day(){
+    var weekGrid = document.getElementById('weekGrid');
+    var days = [];
+    for(var i=6;i>=0;i--){
+      var d = new Date();
+      d.setDate(d.getDate()-i);
+      var key = EVT_PREFIX + d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+      var evs = safeParse(safeGet(key)||'[]',[]);
+      var directs = evs.filter(function(e){return e.b==='direct';}).length;
+      var avg = evs.length>0 ? Math.round(evs.reduce(function(s,e){return s+(Number(e.s)||0);},0)/evs.length*100) : 0;
+      days.push({
+        label: ['日','一','二','三','四','五','六'][d.getDay()],
+        date: String(d.getMonth()+1)+'/'+String(d.getDate()),
+        count: evs.length,
+        directs: directs,
+        avg: avg
+      });
+    }
+    var maxCount = Math.max.apply(null, days.map(function(d){return d.count;})) || 1;
+    days.forEach(function(d){
+      var card = document.createElement('div');
+      var barH = Math.max(2, Math.round(d.count*40/maxCount));
+      var color = d.directs > 0 ? 'var(--good)' : (d.count > 0 ? 'var(--warn)' : 'rgba(255,255,255,.08)');
+      card.style.cssText = 'background:var(--card-bg);border:1px solid var(--card-border);border-radius:6px;padding:8px 4px;text-align:center';
+      card.innerHTML =
+        '<div style="font-size:10px;color:var(--paper3)">' + d.label + '</div>' +
+        '<div style="font-size:10px;color:var(--paper2);margin:2px 0">' + d.date + '</div>' +
+        '<div style="height:40px;display:flex;align-items:flex-end;justify-content:center;margin:4px 0">' +
+          '<div style="width:60%;height:' + barH + 'px;background:' + color + ';border-radius:2px 2px 0 0;transition:height .4s"></div>' +
+        '</div>' +
+        '<div style="font-size:13px;font-weight:600;color:var(--gold2)">' + d.count + '</div>' +
+        '<div style="font-size:9px;color:var(--paper3);margin-top:2px">直答 ' + d.directs + '</div>' +
+        '<div style="font-size:9px;color:' + (d.avg>=70?'var(--good)':d.avg>=40?'var(--warn)':'var(--paper3)') + '">均 ' + d.avg + '%</div>';
+      weekGrid.appendChild(card);
+    });
+  })();
+
+  // === R61: 模块最佳命中分 Top 5 ===
+  (function renderTopScores(){
+    var el = document.getElementById('topScores');
+    var allEvents = [];
+    try{
+      for(var i=0;i<localStorage.length;i++){
+        var k = localStorage.key(i);
+        if(!k || k.indexOf(EVT_PREFIX)!==0) continue;
+        var evs = safeParse(safeGet(k)||'[]',[]);
+        allEvents = allEvents.concat(evs);
+      }
+    }catch(e){}
+    // 按模块分组，找最高分
+    var byMod = {};
+    allEvents.forEach(function(e){
+      var m = e.m || 'freechat';
+      if(!byMod[m] || (Number(e.s)||0) > byMod[m].s) {
+        byMod[m] = {s: Number(e.s)||0, b: e.b, t: e.t};
+      }
+    });
+    var top5 = Object.keys(byMod).map(function(k){
+      return {name: k, best: byMod[k]};
+    }).sort(function(a,b){return b.best.s-a.best.s;}).slice(0,5);
+    if(top5.length === 0){
+      el.innerHTML = '<div style="color:var(--paper3);font-size:12px;text-align:center;padding:20px">尚无模块命中记录</div>';
+      return;
+    }
+    top5.forEach(function(m, idx){
+      var pct = Math.round(m.best.s*100);
+      var color = m.best.s>=0.7?'var(--good)':m.best.s>=0.4?'var(--warn)':'var(--bad)';
+      var row = document.createElement('div');
+      row.className = 'mod-row';
+      row.innerHTML =
+        '<span class="mod-name">' + (idx+1) + '. ' + m.name + '</span>' +
+        '<div class="mod-bar-wrap" style="position:relative">' +
+          '<div class="mod-bar-fill" style="width:' + pct + '%;background:' + color + '"></div>' +
+          '<span style="position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:10px;color:' + color + '">' + pct + '%</span>' +
+        '</div>' +
+        '<span class="mod-count">' + (m.best.b==='direct'?'🎯':'·') + '</span>';
+      el.appendChild(row);
+    });
+  })();
+
+  // === R61: 引擎切换记录 ===
+  (function renderEngineTimeline(){
+    var el = document.getElementById('engineTimeline');
+    // 从 events 里推断 engine（事件结构里有 e 但 kb-hit-counter 没记 engine 在 event 上）
+    // 退而求其次：展示今日事件流（按时序）
+    var dayKey = EVT_PREFIX + ymd();
+    var events = safeParse(safeGet(dayKey)||'[]',[]);
+    if(events.length === 0){
+      el.innerHTML = '<div style="color:var(--paper3);text-align:center">今日尚无事件</div>';
+      return;
+    }
+    var last20 = events.slice(-20).reverse();
+    var html = '';
+    last20.forEach(function(e, idx){
+      var time = new Date(e.t||Date.now());
+      var hh = String(time.getHours()).padStart(2,'0');
+      var mm = String(time.getMinutes()).padStart(2,'0');
+      var ss = String(time.getSeconds()).padStart(2,'0');
+      var pct = Math.round((Number(e.s)||0)*100);
+      var icon = e.b==='direct'?'🎯':e.b==='augment'?'✨':'🤖';
+      var color = e.b==='direct'?'var(--good)':e.b==='augment'?'var(--warn)':'var(--paper3)';
+      html += '<div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,.03)">' +
+        '<span style="color:var(--paper3)">' + hh + ':' + mm + ':' + ss + '</span>' +
+        ' <span style="color:' + color + '">' + icon + '</span>' +
+        ' <span style="color:var(--gold2)">' + (e.m||'freechat') + '</span>' +
+        ' <span style="color:var(--paper2)">命中分 ' + pct + '%</span>' +
+        (e.b==='direct'?' <span style="color:var(--good);font-size:10px">[KB直答]</span>':'') +
+      '</div>';
+    });
+    el.innerHTML = html + '<div style="text-align:center;margin-top:8px;color:var(--paper3);font-size:10px">↑ 最近 20 次事件流（倒序）</div>';
+  })();
 
 })();
 </script>
