@@ -34,6 +34,17 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
 .modal-box .row.row-link{margin-top:14px;justify-content:flex-end;gap:8px;border-bottom:none;padding:0}
 .modal-box a.m-link{display:inline-block;padding:6px 14px;background:linear-gradient(135deg,var(--gold),#8b6914);color:#0a0a0a;border-radius:6px;font-size:12px;font-weight:700;letter-spacing:1px;text-decoration:none;transition:.2s}
 .modal-box a.m-link:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(201,168,76,.4)}
+.m-rec-box{margin-top:10px;padding:12px;background:linear-gradient(135deg,rgba(147,51,234,.08),rgba(118,75,162,.06));border:1px solid rgba(147,51,234,.25);border-radius:10px;font-size:12px}
+.m-rec-loading,.m-rec-empty{opacity:.55;text-align:center;padding:8px;font-size:11px}
+.m-rec-title{color:#c4b5fd;font-weight:700;margin-bottom:8px;font-size:13px;letter-spacing:1px}
+.m-rec-list{display:grid;gap:4px}
+.m-rec-item{display:flex;align-items:center;gap:8px;padding:6px 8px;background:rgba(255,255,255,.03);border:1px solid rgba(147,51,234,.15);border-radius:6px;text-decoration:none;color:var(--paper);transition:all .15s}
+.m-rec-item:hover{background:rgba(147,51,234,.18);border-color:rgba(147,51,234,.45);transform:translateX(2px)}
+.m-rec-rank{flex:0 0 16px;height:16px;border-radius:50%;background:rgba(147,51,234,.18);color:#c4b5fd;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.m-rec-dot{width:8px;height:8px;border-radius:50%;box-shadow:0 0 6px currentColor;flex-shrink:0}
+.m-rec-name{flex:1;font-size:12px;color:var(--paper);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-rec-score{flex:0 0 auto;font-size:11px;color:#c4b5fd;font-family:ui-monospace,monospace;background:rgba(147,51,234,.15);padding:1px 6px;border-radius:4px}
+.m-rec-foot{font-size:10px;color:var(--paper);opacity:.5;margin-top:8px;text-align:center;font-family:ui-monospace,monospace}
 .modal-close{position:absolute;top:8px;right:12px;background:0 0;border:none;color:var(--paper);font-size:22px;cursor:pointer;padding:4px 8px;border-radius:6px;transition:all .15s}
 .modal-close:hover{background:rgba(201,168,76,.15);color:var(--gold)}
 @keyframes qrmodal-in{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
@@ -206,23 +217,37 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
       '<div class="row"><span class="k">引用次数</span><span class="v">' + (n.xref_count||0) + '</span></div>' +
       '<div class="row"><span class="k">被引用</span><span class="v">' + (n.referenced||0) + '</span></div>' +
       '<div class="row"><span class="k">KB 命中</span><span class="v">' + (n.hit_count||0) + '</span></div>' +
-      '<div id="m-rec" style="margin-top:10px;padding:10px;background:rgba(147,51,234,.08);border:1px solid rgba(147,51,234,.25);border-radius:8px;font-size:12px"><div style="opacity:.6">🧠 推荐关联加载中…</div></div>' +
+      '<div id="m-rec" class="m-rec-box"><div class="m-rec-loading">🧠 AI 推荐关联加载中…</div></div>' +
       '<div class="row row-link">' +
         '<a class="m-link" href="kb-explorer.html#module=' + encodeURIComponent(n.id) + '" target="_blank">🔍 在 KB 中检索</a>' +
         '<a class="m-link" href="ai-assistant.html?mod=' + encodeURIComponent(n.id) + '" target="_blank">🤖 AI 解读</a>' +
       '</div>';
     document.getElementById('m-body').innerHTML = detailHtml;
     document.getElementById('modal').classList.add('show');
-    // 异步加载该模块的推荐图谱
-    fetch('/api/kb/recommend?module=' + encodeURIComponent(n.id) + '&limit=5', {cache:'no-cache'})
+    // R33-节点5 异步加载 AI 推荐探索路径（彩色点 + 可点击跳转 kb-explorer）
+    fetch('/api/kb/recommend?module=' + encodeURIComponent(n.id) + '&limit=6', {cache:'no-cache'})
       .then(function(r){return r.json();}).then(function(j){
         var d = j.data || j;
         var recs = d.recommendations || [];
         var recBox = document.getElementById('m-rec');
-        if(!recs.length){ recBox.innerHTML = '<div style="opacity:.6">暂无图谱推荐</div>'; return; }
-        recBox.innerHTML = '<div style="color:#c4b5fd;font-weight:600;margin-bottom:6px">🧠 图谱智能推荐（Top 5）</div>' +
-          recs.map(function(r){ return '<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:11px"><span>→ '+r.name+'</span><span style="color:#c4b5fd;font-family:monospace">'+r.score.toFixed(2)+'</span></div>'; }).join('');
-      }).catch(function(){ var b=document.getElementById('m-rec'); if(b) b.innerHTML='<div style="opacity:.5">推荐加载失败</div>'; });
+        if(!recBox) return;
+        if(!recs.length){ recBox.innerHTML = '<div class="m-rec-empty">暂无图谱推荐关联</div>'; return; }
+        var html = '<div class="m-rec-title">🧭 AI 推荐探索路径（Top ' + recs.length + '）</div>';
+        html += '<div class="m-rec-list">';
+        recs.forEach(function(r, i){
+          var color = LEVEL_COLOR[r.level] || '#888';
+          var label = LEVEL_LABEL[r.level] || r.level || '';
+          html += '<a class="m-rec-item" href="kb-explorer.html#module=' + encodeURIComponent(r.id) + '" target="_blank">' +
+            '<span class="m-rec-rank">' + (i+1) + '</span>' +
+            '<span class="m-rec-dot" style="background:' + color + '" title="' + label + '"></span>' +
+            '<span class="m-rec-name">' + (r.name||r.id) + '</span>' +
+            '<span class="m-rec-score">' + (r.score||0).toFixed(2) + '</span>' +
+          '</a>';
+        });
+        html += '</div>';
+        html += '<div class="m-rec-foot">总关联 ' + (d.total_related||0) + ' · ' + (d.algorithm||'graph-recommend').slice(0, 28) + '</div>';
+        recBox.innerHTML = html;
+      }).catch(function(){ var b=document.getElementById('m-rec'); if(b) b.innerHTML='<div class="m-rec-empty">推荐接口调用失败</div>'; });
   };
   window.highlightRecs = highlightRecs;
   window.closeModal = function(){ document.getElementById('modal').classList.remove('show'); };
