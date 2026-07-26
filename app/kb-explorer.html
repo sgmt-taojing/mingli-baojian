@@ -557,7 +557,7 @@ async function renderRecommendations(){
     recs.forEach((r,i)=>{
       const pct = Math.round((r.score||0) * 100);
       const scoreColor = pct >= 60 ? 'var(--green)' : pct >= 30 ? 'var(--gold)' : 'var(--paper3)';
-      html += '<div class="kbe-result" onclick="recClick(\''+ (r.id||'').replace(/'/g,"\\'") +'\')" style="cursor:pointer">';
+      html += '<div class="kbe-result" data-fb-target="' + (r.id||'').replace(/"/g,'&quot;') + '" data-fb-source="' + mod + '" onclick="recClick(\''+ (r.id||'').replace(/'/g,"\\'") +'\', \''+ mod +'\')" style="cursor:pointer">';
       html += '<div class="kbe-result-head">';
       html += '<span class="kbe-mod-badge">#' + (i+1) + '</span>';
       html += '<span class="kbe-result-title">' + (r.name||r.id||'') + '</span>';
@@ -586,18 +586,15 @@ function recQuickPick(mod){
   renderRecommendations();
 }
 
-function recClick(recId){
+function recClick(recId, sourceMod){
+  // R39: 用 kb-recommend-feedback.js 统一反馈通道（本地双计 + 后端日志）
+  if(typeof window.feedbackKbRec === 'function'){
+    window.feedbackKbRec({target: recId, source: sourceMod || 'explorer', action:'click', score:0.5});
+  }
   // 将推荐 id 填入搜索框并搜索
   document.getElementById('qInput').value = recId;
   switchTab('search');
   doSearch();
-  // 发送反馈
-  try{
-    fetch(API + '/api/kb/recommend/feedback', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({target:'explorer', source:recId, action:'click', score:0.5})
-    });
-  }catch(e){}
 }
 
 document.getElementById('qInput').addEventListener('keypress', e=>{
@@ -684,5 +681,6 @@ document.getElementById('qInput').addEventListener('keypress', e=>{
 </script>
 </main>
 <script src="js/a11y-divination-hub.js" defer></script>
+<script src="js/kb-recommend-feedback.js" defer></script>
 </body>
 </html>
