@@ -352,6 +352,7 @@
 <script src="../js/wearable/rokid-storage.js"></script>
 <script src="../js/wearable/rokid-glass.js"></script>
 <script src="../js/wearable/device-provider.js"></script>
+<script src="../js/wearable/mock-harness.js"></script>
   <link rel="stylesheet" href="css/a11y-fix.css">
 </head>
 <body>
@@ -369,6 +370,10 @@
       <span>网络 <strong id="network">5G</strong></span>
       <span id="device-id" style="color: var(--hud-muted);">GL-...</span>
       <span id="wearable-status" style="color: var(--hud-warn);">📱 检测中...</span>
+      <button id="mock-toggle" class="mock-btn" type="button" aria-label="切换 Mock 模式"
+        style="background: var(--hud-bg); color: var(--hud-muted); border: 1px solid var(--hud-line); padding: 2px 8px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+        🛠️ Mock: 关
+      </button>
     </div>
   </div>
 
@@ -1182,6 +1187,23 @@ setInterval(async () => {
         }
       }, 600);
     });
+
+    // R43: Mock 开关控制
+    const $mockToggle = document.getElementById('mock-toggle');
+    if ($mockToggle && window.rokidMock) {
+      $mockToggle.addEventListener('click', () => {
+        const current = window.rokidMock.isEnabled();
+        window.rokidMock.toggle(!current);
+        $mockToggle.textContent = `🛠️ Mock: ${!current ? '开' : '关'}`;
+        $mockToggle.style.color = !current ? 'var(--hud-ok, #34d399)' : 'var(--hud-muted, #9ca3af)';
+        // 重新触发 SDK 自检
+        if (window.sdkReadinessCheck) {
+          setTimeout(() => sdkReadinessCheck.runAll().catch(() => {}), 200);
+        }
+      });
+      // 初始状态同步
+      $mockToggle.textContent = '🛠️ Mock: 关';
+    }
   </script>
 
 </main>
