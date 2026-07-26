@@ -61,12 +61,14 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
   <div class="toolbar">
     <select id="levelFilter"><option value="all">全部等级</option><option value="premium">premium</option><option value="registered">registered</option><option value="professional">professional</option><option value="admin">admin</option></select>
     <select id="recModFilter"><option value="">📊 选择模块智能推荐</option></select>
+    <input id="searchInput" type="search" placeholder="🔍 搜索节点 (name/id)" aria-label="搜索知识图谱节点" style="background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--paper);padding:5px 10px;border-radius:6px;font:inherit;font-size:12px;width:160px">
     <button onclick="highlightHubs()">🔥 热门节点</button>
     <button onclick="highlightRecs()">🧠 推荐关联</button>
     <button onclick="resetView()">🔄 重置视图</button>
     <button onclick="fitGraph()">🔍 适应屏幕</button>
     <span class="sep"></span>
     <span class="stat" id="stat">加载中…</span>
+    <button onclick="document.getElementById('searchInput').value='';searchGraph();" title="清除搜索" style="font-size:11px">✖</button>
   </div>
   <div id="graph"></div>
   <div class="legend" id="legend"></div>
@@ -82,6 +84,7 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/vis-network@9.1.6/dist/vis-network.min.js"></script>
+<script src="js/kb-recommend-feedback.js"></script>
 <script>
 (function(){
   var LEVEL_COLOR = {premium:'#e74c3c',registered:'#3498db',member:'#2ecc71',professional:'#9b59b6',admin:'#f39c12',public:'#1abc9c'};
@@ -209,6 +212,69 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
   }
   function fitGraph(){ if(network) network.fit({animation:{duration:500}}); }
 
+  // R38 图谱搜索：客户端筛选 + 高亮 + focus
+  var _searchState = {q:'', ids:[]};
+  function searchGraph(){
+    var q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+    _searchState.q = q;
+    if(!q){
+      // 恢复全画布
+      draw(ALL_NODES.slice(), ALL_EDGES.slice());
+      document.getElementById('stat').textContent = '全画布 · ' + ALL_NODES.length + ' 节点';
+      return;
+    }
+    // 模糊匹配：id / label / level
+    var matched = ALL_NODES.filter(function(n){
+      return n.id.toLowerCase().indexOf(q) >= 0
+          || (n.label||'').toLowerCase().indexOf(q) >= 0
+          || (n.group||'').toLowerCase().indexOf(q) >= 0;
+    });
+    var matchedIds = new Set(matched.map(function(n){return n.id;}));
+    _searchState.ids = Array.from(matchedIds);
+    var nodes = ALL_NODES.map(function(n){
+      var hit = matchedIds.has(n.id);
+      return {id:n.id, label:n.label, group:n.group, value:n.value, title:n.title,
+        color: hit ? {background:'#9333ea', border:'#c9a84c'} : {background:'#333', border:'#555'},
+        borderWidth: hit ? 3 : 1, opacity: hit ? 1 : .08};
+    });
+    var edges = ALL_EDGES.map(function(e){
+      var hit = matchedIds.has(e.from) || matchedIds.has(e.to);
+      return {from:e.from, to:e.to, value:e.value, arrows:e.arrows,
+        color: hit ? {color:'#9333ea'} : {color:'rgba(201,168,76,.05)'},
+        opacity: hit ? .9 : .03};
+    });
+    draw(nodes, edges);
+    // focus 到第一个匹配节点
+    if(matched.length && network){
+      setTimeout(function(){
+        network.focus(matched[0].id, {scale: 1.2, animation:{duration: 400}});
+      }, 100);
+    }
+    document.getElementById('stat').innerHTML = '搜索 <b>' + q + '</b> · 命中 <b>' + matched.length + '</b> / ' + ALL_NODES.length;
+  }
+  // 暴露到 window供 button onkey 触发
+  window.searchGraph = searchGraph;
+  // 随输入实时搜索（debounce 150ms）
+  var _searchTimer = null;
+  document.addEventListener('DOMContentLoaded', function(){
+    var inp = document.getElementById('searchInput');
+    if(!inp) return;
+    inp.addEventListener('input', function(){
+      clearTimeout(_searchTimer);
+      _searchTimer = setTimeout(searchGraph, 150);
+    });
+    inp.addEventListener('keydown', function(e){
+      if(e.key === 'Escape'){ inp.value=''; searchGraph(); }
+      else if(e.key === 'Enter' && _searchState.ids.length){
+        // Enter 跳到下一个匹配
+        var cur = _searchState._idx || 0;
+        cur = (cur + 1) % _searchState.ids.length;
+        _searchState._idx = cur;
+        if(network) network.focus(_searchState.ids[cur], {scale:1.4, animation:{duration:300}});
+      }
+    });
+  });
+
   window.showModal = function(n){
     document.getElementById('m-title').textContent = n.label;
     var detailHtml =
@@ -237,7 +303,7 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
         recs.forEach(function(r, i){
           var color = LEVEL_COLOR[r.level] || '#888';
           var label = LEVEL_LABEL[r.level] || r.level || '';
-          html += '<a class="m-rec-item" href="kb-explorer.html#module=' + encodeURIComponent(r.id) + '" target="_blank">' +
+          html += '<a class="m-rec-item" href="kb-explorer.html#module=' + encodeURIComponent(r.id) + '" target="_blank" data-fb-target="' + (r.id||'').replace(/"/g,'&quot;') + '" data-fb-source="' + (n.id||'').replace(/"/g,'&quot;') + '" data-fb-score="' + (r.score||0).toFixed(2) + '">' +
             '<span class="m-rec-rank">' + (i+1) + '</span>' +
             '<span class="m-rec-dot" style="background:' + color + '" title="' + label + '"></span>' +
             '<span class="m-rec-name">' + (r.name||r.id) + '</span>' +
