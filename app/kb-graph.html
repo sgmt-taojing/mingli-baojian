@@ -318,6 +318,11 @@ h1{text-align:center;font-size:22px;color:var(--gold);margin:8px 0 6px;letter-sp
         html += '</div>';
         html += '<div class="m-rec-foot">总关联 ' + (d.total_related||0) + ' · ' + (d.algorithm||'graph-recommend').slice(0, 28) + '</div>';
         recBox.innerHTML = html;
+      }).then(function(){
+        // R38: 推荐列表渲染后绑定 feedback 监听（js/kb-recommend-feedback.js）
+        if(typeof window.autoBindFb === 'function'){
+          window.autoBindFb(document.getElementById('modal'));
+        }
       }).catch(function(){ var b=document.getElementById('m-rec'); if(b) b.innerHTML='<div class="m-rec-empty">推荐接口调用失败</div>'; });
   };
   window.highlightRecs = highlightRecs;
