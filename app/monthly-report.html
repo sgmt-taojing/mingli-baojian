@@ -220,26 +220,41 @@ h2{font-size:1.1rem;color:var(--gold);margin:14px 0 8px;border-bottom:1px solid 
         throw new Error(result.message||'API error');
       }
 
-      var report = result.data.report;
+      var data = result.data;
+      // R91 新版：data.currentMonth / data.nextMonth / data.yearOverview
+      // R89 旧版：data.report.currentMonth.data / data.report.nextMonth.data
+      var report = data.report || {};
+      var curData = (report.currentMonth && report.currentMonth.data) || data.currentMonth || {};
+      var nxtData = (report.nextMonth && report.nextMonth.data) || data.nextMonth || {};
+      var yearOv = data.yearOverview || report.yearOverview || [];
+      var userEle = data.userEle || report.userEle || '';
+      var kbHits = data.kbHits || report.kbHits || 0;
+      var generatedAt = report.generatedAt || new Date().toISOString();
+
       var nowMonth = new Date().getMonth()+1;
       var area = document.getElementById('resultArea');
 
       var html = '';
       // 当前月详细
-      var curData = report.currentMonth;
-      html += '<h2>🔥 本月详细 ('+esc(curData.name)+')</h2>';
+      html += '<h2>🔥 本月详细 ('+esc(curData.name || (curData.month+'月'))+' · '+esc(curData.ganZhi||'')+')</h2>';
       html += renderMonthCard(curData, true);
+      // 附加 R90 化解建议（如果有 KB 命中）
+      if(report.currentMonth && report.currentMonth.text){
+        html += '<div class="result-card"><h3>💎 化解方案与月令详解</h3><pre style="white-space:pre-wrap;font-family:inherit;font-size:.82rem;line-height:1.7">'+esc(report.currentMonth.text)+'</pre></div>';
+      }
       // 下月详细
-      var nxtData = report.nextMonth;
-      html += '<h2>⏭️ 下月前瞻 ('+esc(nxtData.name)+')</h2>';
+      html += '<h2>⏭️ 下月前瞻 ('+esc(nxtData.name || (nxtData.month+'月'))+' · '+esc(nxtData.ganZhi||'')+')</h2>';
       html += renderMonthCard(nxtData, false);
+      if(report.nextMonth && report.nextMonth.text){
+        html += '<div class="result-card"><h3>💎 下月化解与详解</h3><pre style="white-space:pre-wrap;font-family:inherit;font-size:.82rem;line-height:1.7">'+esc(report.nextMonth.text)+'</pre></div>';
+      }
       // 全年总览表
-      html += renderYearTable(report.yearOverview, nowMonth);
+      html += renderYearTable(yearOv, nowMonth);
       // KB 命中统计
       html += '<div class="result-card" style="text-align:center;font-size:.8rem;opacity:.5">';
-      html += '🎯 KB命中 '+report.kbHits+'/12 月 · ';
-      html += '日主五行：'+esc(report.userEle)+' · ';
-      html += '生成时间：'+new Date(report.generatedAt).toLocaleString('zh-CN');
+      html += '🎯 KB命中 '+kbHits+' 条 · ';
+      html += '日主五行：'+esc(userEle)+' · ';
+      html += '生成时间：'+new Date(generatedAt).toLocaleString('zh-CN');
       html += '</div>';
 
       area.innerHTML = html;

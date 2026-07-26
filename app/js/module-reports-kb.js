@@ -619,7 +619,103 @@ window._MODULE_REPORTS = {
         nextSteps: ['理论实践交替推进','建立案例库','定期复盘断验结果','交叉验证多术种','保持开放心态','实战中形成自己的体系']
       };
     }
+  },
+
+  /* ═══════════════════════════════════════════════════════
+   * R90 逐月运势模块 — 断网 KB 兜底
+   * 支持日主五行 × 月令旺衰 × 四维度评分 + 化解建议
+   * ═══════════════════════════════════════════════════════ */
+  'monthly': {
+    name: '逐月运势',
+    diagnose: function(data){
+      var s0 = (data && data.s0) || '';
+      var s1 = (data && data.s1) || '';
+      var userEle = s1 || '土';
+      var targetYear = new Date().getFullYear();
+      var curMonth = new Date().getMonth() + 1;
+
+      var jieqi = [
+        {m:1,name:'寅月',jie:'立春/雨水',ele:'木',season:'春'},
+        {m:2,name:'卯月',jie:'惊蛰/春分',ele:'木',season:'春'},
+        {m:3,name:'辰月',jie:'清明/谷雨',ele:'土',season:'春'},
+        {m:4,name:'巳月',jie:'立夏/小满',ele:'火',season:'夏'},
+        {m:5,name:'午月',jie:'芒种/夏至',ele:'火',season:'夏'},
+        {m:6,name:'未月',jie:'小暑/大暑',ele:'土',season:'夏'},
+        {m:7,name:'申月',jie:'立秋/处暑',ele:'金',season:'秋'},
+        {m:8,name:'酉月',jie:'白露/秋分',ele:'金',season:'秋'},
+        {m:9,name:'戌月',jie:'寒露/霜降',ele:'土',season:'秋'},
+        {m:10,name:'亥月',jie:'立冬/小雪',ele:'水',season:'冬'},
+        {m:11,name:'子月',jie:'大雪/冬至',ele:'水',season:'冬'},
+        {m:12,name:'丑月',jie:'小寒/大寒',ele:'土',season:'冬'}
+      ];
+
+      function eleStatus(userE, monthE){
+        if (userE === monthE) return {status:'旺', score:90, advice:'当令而旺，积极行动'};
+        var sheng = {'金':'水','水':'木','木':'火','火':'土','土':'金'};
+        var ke = {'金':'木','木':'土','土':'水','水':'火','火':'金'};
+        if (sheng[monthE] === userE) return {status:'相', score:75, advice:'得月令生扶，较顺利'};
+        if (ke[monthE] === userE) return {status:'死', score:30, advice:'受月令克制，宜守不宜攻'};
+        if (ke[userE] === monthE) return {status:'囚', score:40, advice:'克月令反耗，保守为上'};
+        return {status:'休', score:55, advice:'月令无关，平稳过渡'};
+      }
+
+      var curData = jieqi[curMonth - 1];
+      var st = eleStatus(userEle, curData.ele);
+      var dims = {
+        career: Math.max(20, st.score + (st.score >= 75 ? 5 : -5)),
+        wealth: Math.max(20, st.score + (userEle === '土' ? 3 : 0)),
+        love: Math.max(20, st.score + (st.score >= 70 ? 3 : -3)),
+        health: Math.max(20, st.score + (st.status === '旺' ? 0 : -10))
+      };
+
+      var cureMap = {
+        '旺': '当令而旺，顺势而为。可主动推进重要计划',
+        '相': '得生扶，较顺利。适合学习/合作/拓展',
+        '休': '平稳过渡。宜积蓄力量，不宜冒进',
+        '囚': '受克制，保守为上。宜拜太岁/祈福/积德',
+        '死': '低谷期。宜静养/读书/修身，避免重大决策'
+      };
+
+      var stars = function(s){ return '★'.repeat(Math.round(s/20)) + '☆'.repeat(5 - Math.round(s/20)); };
+
+      var html = '━━━ ' + targetYear + '年逐月运势（KB兜底版）━━━\n\n';
+      html += '【日主五行】' + userEle + '\n';
+      html += '【当前月】' + curMonth + '月 ' + curData.name + '(' + curData.jie + ') · ' + curData.ele + '旺\n';
+      html += '【旺衰】' + st.status + '(' + st.score + '分) — ' + st.advice + '\n\n';
+      html += '━━━ 本月四维度 ━━━\n';
+      html += '事业 ' + stars(dims.career) + ' ' + dims.career + '分\n';
+      html += '财运 ' + stars(dims.wealth) + ' ' + dims.wealth + '分\n';
+      html += '感情 ' + stars(dims.love) + ' ' + dims.love + '分\n';
+      html += '健康 ' + stars(dims.health) + ' ' + dims.health + '分\n\n';
+      html += '━━━ 化解建议 ━━━\n';
+      html += cureMap[st.status] + '\n';
+      var eleCure = {
+        '金': '西方/白色/4·9 数字/金属饰品',
+        '木': '东方/绿色/3·8 数字/植物/木制品',
+        '水': '北方/黑色/1·6 数字/水景/黑色饰品',
+        '火': '南方/红色/2·7 数字/灯光/红色饰品',
+        '土': '中央/黄色/5·0 数字/陶瓷/水晶'
+      };
+      html += '【趋吉】' + (eleCure[userEle] || '') + '\n';
+      html += '【避凶】月初谋划 → 月中行动 → 月末收敛\n\n';
+      html += '━━━ 全年走势速览 ━━━\n';
+      jieqi.forEach(function(j){
+        var ms = eleStatus(userEle, j.ele);
+        html += j.m + '月 ' + j.name + ' ' + ms.status + '(' + ms.score + ') ';      });
+      html += '\n\n【数据来源】R90 KB 兜底·五行旺衰·节气月令';
+
+      return {
+        title: targetYear + '年逐月运势报告（KB兜底）',
+        summary: '日主' + userEle + ' · 当前' + curData.name + ' · ' + st.status,
+        html: html,
+        score: st.score,
+        dims: dims,
+        cureText: cureMap[st.status],
+        ttsText: '本月旺衰' + st.status + '，' + st.advice + '。事业' + dims.career + '分，财运' + dims.wealth + '分。',
+        nextSteps: ['每月初一查看当月走势','低谷月保守行事','旺月积极推进','关注节气转换点','定期复盘调整','结合八字大运综合判断']
+      };
+    }
   }
 };
 
-console.log('✅ _MODULE_REPORTS loaded (29 modules KB-fallback: bazi/yunshi/caiyun/ganqing/zhongyi/mobile/shiye/xingming/zeri/huangli/taisui/music/lifeindex/lifeplan/tcm-fangji/tcm-classic/tcm-zhongfu/shanghan-lun/acupuncture/shuhan/wuxing/fengshui/qimen/ziwei/liuyao/meihua/liuren/yanzhi/mingxiang)');
+console.log('✅ _MODULE_REPORTS loaded (30 modules KB-fallback: bazi/yunshi/caiyun/ganqing/zhongyi/mobile/shiye/xingming/zeri/huangli/taisui/music/lifeindex/lifeplan/tcm-fangji/tcm-classic/tcm-zhongfu/shanghan-lun/acupuncture/shuhan/wuxing/fengshui/qimen/ziwei/liuyao/meihua/liuren/yanzhi/mingxiang/monthly)');

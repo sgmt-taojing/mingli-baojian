@@ -99,6 +99,18 @@ function generate(){
       if(existingBtn)existingBtn.remove();
       var genBtn=document.getElementById('genBtn');
       if(genBtn&&genBtn.parentNode)genBtn.parentNode.appendChild(aiBtn);
+
+      // R90: 追加「逐月运势」按钮
+      var monthlyBtn=document.createElement('button');
+      monthlyBtn.className='btn monthly-fate-btn';
+      monthlyBtn.style.cssText='margin-top:8px;background:linear-gradient(135deg,#0891b2,#10b981);color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;width:100%';
+      monthlyBtn.textContent='📅 逐月运势细化（本年+下年24月）';
+      monthlyBtn.onclick=function(){
+        window.open('monthly-report.html','_blank');
+      };
+      var existingMonthly=document.querySelector('.monthly-fate-btn');
+      if(existingMonthly)existingMonthly.remove();
+      if(genBtn&&genBtn.parentNode)genBtn.parentNode.appendChild(monthlyBtn);
     }catch(e){
       alert('生成失败：'+e.message);
       btn.disabled=false; btn.textContent='✨ 生成蓝图';
