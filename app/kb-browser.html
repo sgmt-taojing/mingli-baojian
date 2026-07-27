@@ -1364,17 +1364,21 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
     }
     let html = `
       <div class="fav-toolbar" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;padding:12px;background:var(--card);border-radius:10px;border:1px solid var(--border);align-items:center">
+        <input type="checkbox" id="favSelectAll" title="全选/取消全选（当前过滤结果）">
         <input type="text" id="favSearch" placeholder="🔍 搜索名称 / ID / 笔记..." value="${searchQ}" style="flex:1;min-width:200px;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2)"/>
         <select id="favTagFilter" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2)">
           <option value="">🏷️ 全部标签</option>
           ${allTags.map(t => `<option value="${t}" ${tagFilter===t?'selected':''}>${t}</option>`).join('')}
         </select>
-        <span style="color:var(--paper3);font-size:.85rem">${filtered.length}/${arr.length}</span>
+        <span id="favCountSpan" style="color:var(--paper3);font-size:.85rem">${filtered.length}/${arr.length}</span>
+        <button class="btn danger" id="favBulkRemoveBtn" style="font-size:.82rem">🗑 批量取消选中</button>
       </div>
       <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
         ${filtered.map(f => `
           <div class="card" data-fav-id="${f.id}">
-            <div class="file-head">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+              <input type="checkbox" class="fav-row-check" data-fav-id="${f.id}" data-fav-name="${(f.name||'').replace(/"/g,'&quot;')}">
+              <span class="file-name">${f.name||f.id}</span>
               <span class="file-name">${f.name||f.id}</span>
               <span class="chip ${f.level==='professional'?'blue':f.level==='admin'?'red':'green'}">${f.level||'public'}</span>
             </div>
@@ -1399,7 +1403,7 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
         `).join('')}
       </div>
       <div style="margin-top:14px;padding:12px;background:var(--card);border-radius:10px;border:1px solid var(--border);text-align:center">
-        <p>当前 <b style="color:#ffd700">${arr.length}</b> 条收藏 · 跨页面同步生效 · 可导出 JSON / 一键清空</p>
+        <p>当前 <b style="color:#ffd700">${arr.length}</b> 条收藏 · 跨页面同步生效 · 可导出 JSON / 一键清空 · <span id="favSelectedInfo" style="color:var(--paper3)"></span></p>
         <button class="btn primary" onclick="KbFavorites.export?.();">📤 导出 JSON</button>
         <button class="btn danger" onclick="if(confirm('清空所有收藏？')){localStorage.removeItem('***');renderFavs();document.getElementById('favBadge').textContent='0项';}">🗑 清空</button>
       </div>
@@ -1407,10 +1411,45 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
     c.innerHTML = html;
     // 绑定搜索/筛选
     const sq = document.getElementById('favSearch');
+    // R149 全选 + 批量取消
+    const sa = document.getElementById('favSelectAll');
+    if(sa) sa.onchange = (e) => {
+      const checked = e.target.checked;
+      document.querySelectorAll('.fav-row-check').forEach(cb => cb.checked = checked);
+      updateFavSelectedInfo();
+    };
+    const bulkBtn = document.getElementById('favBulkRemoveBtn');
+    if(bulkBtn) bulkBtn.onclick = () => {
+      const checked = document.querySelectorAll('.fav-row-check:checked');
+      if(checked.length === 0){
+        if(window.toast) window.toast('⚠️ 请先勾选要取消的收藏', 1500);
+        return;
+      }
+      const count = checked.length;
+      if(!confirm(`确定取消 ${count} 个收藏？`)) return;
+      checked.forEach(cb => {
+        const id = cb.dataset.favId;
+        const name = cb.dataset.favName;
+        if(window.KbFavorites) window.KbFavorites.toggle({id, name});
+      });
+      if(window.toast) window.toast(`🗑 已取消 ${count} 个收藏`, 1800);
+      renderFavs();
+    };
+    // 实时更新选中计数
+    document.querySelectorAll('.fav-row-check').forEach(cb => {
+      cb.addEventListener('change', updateFavSelectedInfo);
+    });
+    updateFavSelectedInfo();
+
     if(sq) sq.oninput = (e) => { window._favSearchQ = e.target.value; renderFavs(); };
     const tf = document.getElementById('favTagFilter');
     if(tf) tf.onchange = (e) => { window._favTagFilter = e.target.value; renderFavs(); };
   }
+  window.updateFavSelectedInfo = function(){
+    const checks = document.querySelectorAll('.fav-row-check:checked');
+    const info = document.getElementById('favSelectedInfo');
+    if(info) info.textContent = checks.length > 0 ? `· 已选 ${checks.length} 项` : '';
+  };
 
   // R106 保存笔记/标签
   window.saveFavMeta = function(id){
