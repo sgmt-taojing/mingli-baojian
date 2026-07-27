@@ -39,16 +39,114 @@
 .lp-12-domain-score.mid { color: #ffb44d; }
 .lp-12-domain-score.bad { color: #f87171; }
 
-/* R81: print styles */
+/* R200: unified print styles — consolidated from HTML inline + CSS file, removed duplicates */ */
 @media print {
-  body { background: #fff !important; color: #000 !important; font-size: 12pt; }
-  .back-home, #input, .qr-modal, #printBtn, #qrBtn, nav, header a[href="ai-assistant.html"], header a[href="divination-hub.html"] { display: none !important; }
-  .card, .lp-stage-section, .lp-stage-card, .lp-12-domain { background: #fff !important; border: 1px solid #ccc !important; box-shadow: none !important; }
-  .lp-stage-timeline { background: #fff !important; }
-  h1, h2, h3 { color: #000 !important; }
+  @page { size: A4; margin: 15mm 12mm; }
+
+  /* reset dark theme to print-friendly */
+  body { background: #fff !important; color: #000 !important; font-size: 11pt; line-height: 1.6; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .wrap { max-width: 100% !important; }
+
+  /* hide interactive / non-printable elements */
+  .back-home, #input, .qr-modal, #printBtn, #qrBtn, .btn, .tools, .skip-link,
+  nav, header a[href="ai-assistant.html"], header a[href="divination-hub.html"],
+  .monthly-fate-btn, .ai-deep-btn { display: none !important; }
+
+  /* header */
+  header { text-align: center; padding: 8px 0 6px; border-bottom: 2px solid #333; margin-bottom: 10px; }
+  h1 { color: #000 !important; font-size: 20pt; letter-spacing: 2px; }
+  header p { color: #444 !important; font-size: 9pt; }
+  h2, h3 { color: #000 !important; }
+  h2 { font-size: 13pt; border-left: 3px solid #555; padding-left: 8px; margin: 12px 0 8px; }
   a { text-decoration: none; color: #000 !important; }
-  .report { page-break-inside: avoid; }
-  .lp-stage-section { page-break-inside: avoid; }
+
+  /* cards & sections: white bg, visible borders */
+  .card, .lp-stage-section, .lp-stage-card, .lp-12-domain,
+  .tl-row, .fy-row, .dom, .st-row, .lp-dash, .lp-card,
+  .shichen-cell, .shichen-summary, .trend-summary, .ly-track, .ly-summary,
+  .lr-grid, .lr-summary, .lp-12-domain-card, .lp-8cell, .lp-stage-cell {
+    background: #fff !important; color: #000 !important;
+    border: 1px solid #999 !important; box-shadow: none !important;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+
+  /* banner: keep light tint */
+  .banner { background: #f8f4ec !important; border: 1px solid #ccc !important; break-after: avoid; page-break-after: avoid; }
+  .banner .age { color: #333 !important; }
+  .banner .stage { color: #555 !important; }
+  .banner .focus { color: #444 !important; }
+
+  /* gold-colored text → dark for print */
+  .card h2, .dom .num, .fy-y, .tl-age, .tl-core, .lp-card-score,
+  .lp-stage-title, .lp-stage-card-title, .lp-dash-title, .ts-title,
+  .ss-title, .shichen-cell .sc-time { color: #333 !important; }
+  .tl-risk { color: #8b2500 !important; }
+  .tl-advice { color: #1a5c1a !important; }
+  .dom .st, .kb-source, .lf-source, .lp-source { color: #555 !important; }
+
+  /* bar charts: solid fill for print */
+  .dom .bar { background: #ddd !important; }
+  .dom .bar-fill { background: #555 !important; }
+  .lp-card-bar { background: #ddd !important; }
+  .lp-card-fill { background: #555 !important; }
+
+  /* timeline: fix absolute positioning for print */
+  .lp-stage-timeline { background: #fff !important; position: static !important; display: flex !important; justify-content: space-between; padding: 8px 0; }
+  .lp-stage-timeline::before { display: none !important; }
+  .lp-stage-timeline-item { background: #fff !important; border: 1px solid #999 !important; }
+  .lp-stage-timeline-age { color: #333 !important; }
+  .lp-stage-timeline-name { color: #555 !important; }
+
+  /* stage section: single-column layout for A4 */
+  .lp-stage-section { border: 1px solid #999 !important; break-inside: avoid; page-break-inside: avoid; }
+  .lp-stage-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 6px !important; }
+  .lp-stage-card { border: 1px solid #bbb !important; break-inside: avoid; }
+  .lp-stage-card-content { color: #333 !important; }
+  .lp-stage-tag { background: #eee !important; color: #333 !important; }
+
+  /* 12-domain grid: 2 cols on A4 */
+  .doms { grid-template-columns: repeat(3, 1fr) !important; gap: 4px !important; }
+  .lp-12-domain-grid { grid-template-columns: repeat(3, 1fr) !important; }
+
+  /* dual dash: single column */
+  .lp-dash-dual { grid-template-columns: 1fr !important; }
+  .lp-8grid, .lp-stage { grid-template-columns: repeat(4, 1fr) !important; }
+
+  /* shichen grid: 4 cols */
+  .shichen-grid { grid-template-columns: repeat(4, 1fr) !important; }
+
+  /* ly/lr grids: keep 12/6 cols but ensure fit */
+  .ly-track, .lr-grid { overflow: visible !important; }
+
+  /* page-break rules */
+  .card, .report, .lp-stage-section { break-inside: avoid; page-break-inside: avoid; }
+  .tl-row, .fy-row, .dom, .st-row, .lp-stage-card, .lp-12-domain,
+  .lp-card, .shichen-cell, .future5 { break-inside: avoid; }
+  .banner { break-after: avoid; page-break-after: avoid; }
+
+  /* footer */
+  p[style*="text-align:center;font-size:11px"] { color: #666 !important; border-top: 1px solid #ccc; padding-top: 6px; }
+
+  /* dyun bar chart: simplify for print */
+  .dyun-track { overflow: visible !important; white-space: normal !important; }
+  .dyun-bar .b { opacity: 0.7 !important; }
+  .dyun-bar .a, .dyun-bar .n { color: #333 !important; }
+
+  /* summary boxes */
+  .summary, .ly-summary, .lr-summary, .trend-summary, .lp-verdict {
+    background: #f5f5f5 !important; border: 1px solid #ccc !important;
+  }
+  .trend-summary .ts-quote { background: #eee !important; border-left-color: #555 !important; }
+
+  /* KB links: show as text */
+  .tl-kb { background: #f0f0f0 !important; border-left-color: #555 !important; }
+  .tl-kb a { color: #333 !important; }
+
+  /* score colors: keep semantic but darker */
+  .lp-12-domain-score.good, .lp-card.health .lp-card-score { color: #1a5c1a !important; }
+  .lp-12-domain-score.mid { color: #8B6914 !important; }
+  .lp-12-domain-score.bad { color: #8b2500 !important; }
+  .lp-stage-card-title span { color: #333 !important; }
 }
 .btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #888; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: .85rem; }
 .btn-ghost:hover { border-color: #7c9eff; color: #7c9eff; }
@@ -267,32 +365,7 @@
 <script src="js/mobile-nav.js" defer></script>
 
 <style>
-/* R98-s 480+360 紧凑断点 */
-@media(max-width:480px){
-  body{font-size:13px}
-  .container,.main,.body,.wrap{max-width:100%;padding:8px}
-  h1{font-size:18px}
-  h2{font-size:15px}
-  h3{font-size:13px}
-  .btn{padding:6px 10px;font-size:12px}
-  table{font-size:11px}
-  .row{flex-wrap:wrap;gap:4px}
-}
-@media(max-width:360px){
-  body{font-size:12px}
-  .container,.main,.body,.wrap{padding:6px}
-  h1{font-size:16px}
-  h2{font-size:14px}
-  h3{font-size:12px}
-  .btn{padding:5px 8px;font-size:11px;width:100%}
-  table{font-size:10px}
-  .nav-bar a{padding:4px 6px;font-size:11px}
-  .row{flex-direction:column;align-items:flex-start}
-}
-</style>
-
-<style>
-/* R98-s 480+360 紧凑断点 */
+/* R98-s 480+360 紧凑断点 (deduplicated — single copy) */
 @media(max-width:480px){
   body{font-size:13px}
   .container,.main,.body,.wrap{max-width:100%;padding:8px}
