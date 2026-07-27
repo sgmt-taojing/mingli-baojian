@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=5,user-scalable=yes,viewport-fit=cover">
+<title>微信案例模板 · 易道智鉴</title>
+<link rel="stylesheet" href="css/a11y-fix.css">
+<script src="js/ui-toast.js" defer></script>
+<link rel="stylesheet" href="css/wechat-hub-inline.css">
+<link rel="stylesheet" href="css/mobile-nav.css">
+<style>
+body { background: linear-gradient(135deg, #0f1820 0%, #1a2332 100%); color: #e4e8ee; }
+.case-card { background: linear-gradient(135deg, #1a2332 0%, #0f1820 100%); border: 1px solid rgba(99,179,237,0.25); border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; transition: all .2s; }
+.case-card:hover { border-color: rgba(255,180,77,0.5); transform: translateY(-1px); }
+.case-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.case-num { font-size: 11px; padding: 2px 8px; background: rgba(255,180,77,0.12); border: 1px solid rgba(255,180,77,0.3); border-radius: 10px; color: #ffb44d; }
+.case-cat { font-size: 11px; padding: 2px 8px; background: rgba(99,179,237,0.12); border: 1px solid rgba(99,179,237,0.25); border-radius: 10px; color: #8ab4d8; }
+.case-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+.case-section { font-size: 12px; line-height: 1.7; color: #c5d1de; margin-bottom: 6px; }
+.case-section b { color: #ffb44d; font-weight: 600; }
+.case-section pre { white-space: pre-wrap; word-break: break-word; font-family: -apple-system, "PingFang SC", monospace; }
+.case-footer { display: flex; justify-content: space-between; align-items: center; font-size: 11px; opacity: 0.6; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px; margin-top: 8px; }
+.copy-btn { padding: 4px 10px; background: rgba(99,179,237,0.15); border: 1px solid rgba(99,179,237,0.3); border-radius: 12px; color: #8ab4d8; font-size: 11px; cursor: pointer; }
+.copy-btn:hover { background: rgba(99,179,237,0.25); }
+</style>
+</head>
+<body>
+<a href="#main-content" class="skip-link">跳到主内容</a>
+<main id="main-content">
+
+<div class="nav-bar">
+  <a href="divination-hub.html" class="file-nav-btn">🏠 主平台</a>
+  <a href="wechat-hub.html" class="file-nav-btn">📱 缘主工具</a>
+  <a href="reports-hub.html" class="file-nav-btn">📋 报告中心</a>
+  <a href="ai-assistant.html" class="file-nav-btn">🤖 AI助手</a>
+</div>
+
+<div class="header">
+  <h1>📋 微信案例模板</h1>
+  <p>9 类经典 case · 一键复制 · 微信端直接落地</p>
+  <p style="font-size:12px;color:var(--gold2);letter-spacing:2px;margin-top:4px;opacity:.85">熟人不持久化 · KB 命中优先 · 30 分钟回复窗口</p>
+</div>
+
+<div class="section active" id="section-cases">
+  <div id="caseStats" style="padding:10px 14px;background:rgba(255,180,77,0.08);border:1px solid rgba(255,180,77,0.25);border-radius:10px;margin-bottom:16px;font-size:12px;color:#ffb44d">
+    📦 <span id="caseCount">9</span> 类 case · <span id="avgTrust">0.85</span> 平均信任分 · 模块: wechat-cases
+  </div>
+  <div id="caseList">加载中...</div>
+</div>
+
+</main>
+
+<script>
+const CASES = [
+  {
+    id: 'r97-wc-01',
+    title: '失恋求复合：对方心里还有我吗？',
+    category: '感情',
+    summary: '失恋复合问合婚指数+最佳沟通时机',
+    trust: 0.82,
+    content: `【输入字段】缘主姓名 / 出生日期时辰 / 日主五行 / 对方姓名
+【输出】用神方位(对方所在地)、合婚指数、本月最佳沟通时段、化解建议
+【KB命中路径】ganqing(感情模块) → bazi(日主合婚) → tcm-fangji(情绪调理)
+【报告模板】基础信息 → 缘主与对方八字合婚 → 用神方位 → 最佳沟通时机 → 化解建议 → 行动清单
+【备注】涉及他人八字需缘主提供，信息不全则先问"对方出生时间"`
+  },
+  {
+    id: 'r97-wc-02',
+    title: '事业瓶颈：今年适合跳槽还是坚守？',
+    category: '事业',
+    summary: '跳槽vs坚守事业决策指导',
+    trust: 0.85,
+    content: `【输入字段】缘主姓名 / 出生日期时辰 / 当前行业 / 目标行业 / 目标月份
+【输出】事业宫旺衰、流年事业评分、跳槽最佳月份、坚守理由、风险提示
+【KB命中路径】shiye(事业模块) → bazi(日主事业宫) → monthly(当月走势)
+【报告模板】基础信息 → 事业宫分析 → 流年事业评分 → 跳槽 vs 坚守对比 → 最佳行动时机 → 行动清单
+【备注】若缘主未给目标月份，默认用当年流月`
+  },
+  {
+    id: 'r97-wc-03',
+    title: '财运低迷：投资理财怎么调整？',
+    category: '财运',
+    summary: '财运低迷+理财方向+化解',
+    trust: 0.78,
+    content: `【输入字段】缘主姓名 / 出生日期时辰 / 当前资产配置 / 投资类型 / 风险承受
+【输出】财帛宫评分、本月财运走势、适合/不适合的投资方向、化解建议
+【KB命中路径】caiyun(财运模块) → bazi(财帛宫) → wuxing(五行理财建议) → tcm-fangji(焦虑调理)
+【报告模板】基础信息 → 财帛宫评分 → 五行理财建议 → 本月财运走势 → 化解建议 → 行动清单
+【备注】不提供具体投资标的，只给五行/方向层面建议(合规)`
+  },
+  {
+    id: 'r97-wc-04',
+    title: '健康预警：长期疲劳+失眠怎么调？',
+    category: '健康',
+    summary: '中医体质调理+穴位+生活方式',
+    trust: 0.88,
+    content: `【输入字段】缘主姓名 / 出生日期时辰 / 主要症状 / 持续时长 / 已就医情况
+【输出】体质五行分析、当前健康评分、中药调理建议、穴位推荐、生活方式调整
+【KB命中路径】tcm-fangji(方剂模块) → acupuncture(穴位模块) → shanghan-lun(六经辨证) → zhongyi(中医基础)
+【报告模板】基础信息 → 体质五行分析 → 健康评分 → 中药/穴位调理 → 生活方式 → 何时需就医
+【备注】此为中医调理建议，非诊断，严重症状建议就医`
+  },
+  {
+    id: 'r97-wc-05',
+    title: '子女学业：今年中考/高考能顺利吗？',
+    category: '学业',
+    summary: '子女学业考试运势+文昌位',
+    trust: 0.80,
+    content: `【输入字段】缘主姓名 / 子女出生日期时辰 / 当前年级 / 考试类型 / 目标学校
+【输出】文昌位方位、流年学业评分、考试月份运势、风水建议、心理调适
+【KB命中路径】xue(学业模块) → bazi(文昌星) → fengshui(文昌位) → yunshi(流月学业)
+【报告模板】基础信息 → 文昌星分析 → 流年学业评分 → 考试月份运势 → 文昌位建议 → 心理调适
+【备注】子女八字需缘主提供，信息不全则先问出生日期`
+  },
+  {
+    id: 'r97-wc-06',
+    title: '搬家选吉日：下个月搬家哪天最合适？',
+    category: '择日',
+    summary: '搬家择吉日+入宅风水',
+    trust: 0.90,
+    content: `【输入字段】缘主姓名 / 出生日期时辰 / 当前住址 / 目标住址 / 期望月份
+【输出】本月吉日清单(宜入宅/安床/开火)、冲煞提示、化解建议
+【KB命中路径】huangli(黄历模块) → fengshui(入宅风水) → bazi(个人吉日) → taisui(太岁方位)
+【报告模板】基础信息 → 本月吉日清单 → 冲煞分析 → 方位建议 → 入宅仪式 → 化解建议
+【备注】吉日仅建议，不强制，缘主可根据实际情况灵活调整`
+  },
+  {
+    id: 'r97-wc-07',
+    title: '流年太岁：今年犯太岁怎么化解？',
+    category: '化解',
+    summary: '犯太岁类型+化解方法',
+    trust: 0.92,
+    content: `【输入字段】缘主姓名 / 出生日期时辰 / 生肖 / 当前年份
+【输出】是否犯太岁、犯太岁类型(冲/刑/害/破)、化解方法、注意事项
+【KB命中路径】taisui(太岁模块) → bazi(生肖三合六合) → fengshui(方位化解) → faith(化太岁咒语)
+【报告模板】基础信息 → 太岁分析 → 犯太岁类型 → 化解方法 → 注意事项 → 行动清单
+【备注】2025蛇年冲猪、刑虎、害猴、破猴；2026马年冲鼠、刑马、害牛、破马`
+  },
+  {
+    id: 'r97-wc-08',
+    title: '婚姻问合：今年适合结婚吗？',
+    category: '婚姻',
+    summary: '婚姻合婚+结婚时机',
+    trust: 0.85,
+    content: `【输入字段】缘主姓名 / 出生日期时辰 / 伴侣姓名 / 伴侣出生日期时辰 / 目标年份
+【输出】合婚指数、流年婚姻评分、最佳结婚月份、冲煞提示、注意事项
+【KB命中路径】ganqing(感情模块) → bazi(合婚算法) → huangli(结婚吉日) → taisui(当年太岁)
+【报告模板】基础信息 → 合婚评分 → 流年婚姻走势 → 最佳结婚月份 → 冲煞分析 → 注意事项
+【备注】需双方出生日期，信息不全则先问伴侣信息`
+  },
+  {
+    id: 'r97-wc-09',
+    title: '流月趋避：这个月要注意什么？',
+    category: '流月',
+    summary: '流月趋吉避凶高频入口',
+    trust: 0.88,
+    content: `【输入字段】缘主姓名 / 出生日期时辰 / 目标年月 / 日主五行
+【输出】流月综合评分、吉方/凶方、宜/忌事项、化解建议、下月预告
+【KB命中路径】monthly(流月模块) → yunshi(月令分析) → bazi(流月冲合) → wuxing(五行月份)
+【报告模板】基础信息 → 流月评分 → 吉方凶方 → 宜忌事项 → 化解建议 → 下月预告
+【备注】这是高频入口——微信用户最常问"这个月怎么样"`
+  },
+];
+
+function render() {
+  var list = document.getElementById('caseList');
+  var html = '';
+  CASES.forEach(function(c, i) {
+    html += '<div class="case-card" id="case-' + c.id + '">' +
+      '<div class="case-head">' +
+        '<span class="case-num">#' + (i+1) + ' · ' + c.id + '</span>' +
+        '<span class="case-cat">' + c.category + '</span>' +
+      '</div>' +
+      '<div class="case-title">' + c.title + '</div>' +
+      '<div class="case-section" style="opacity:.8;font-style:italic">' + c.summary + '</div>' +
+      '<div class="case-section"><pre>' + c.content + '</pre></div>' +
+      '<div class="case-footer">' +
+        '<span>信任分: ' + c.trust.toFixed(2) + '</span>' +
+        '<button class="copy-btn" onclick="copyCase(\'' + c.id + '\')">📋 复制模板</button>' +
+      '</div>' +
+    '</div>';
+  });
+  list.innerHTML = html;
+}
+
+function copyCase(id) {
+  var c = CASES.find(function(x){ return x.id === id; });
+  if (!c) return;
+  var text = '【' + c.title + '】\n\n' + c.content;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(function(){
+      showToast && showToast('已复制: ' + id);
+    });
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); showToast && showToast('已复制: ' + id); } catch(e){}
+    document.body.removeChild(ta);
+  }
+}
+
+(function(){
+  document.getElementById('caseCount').textContent = CASES.length;
+  var avg = (CASES.reduce(function(s,c){return s+c.trust;}, 0) / CASES.length).toFixed(2);
+  document.getElementById('avgTrust').textContent = avg;
+})();
+
+render();
+console.log('✅ 微信案例模板加载: ' + CASES.length + ' 类');
+</script>
+<script src="js/mobile-nav.js" defer></script>
+</body>
+</html>
