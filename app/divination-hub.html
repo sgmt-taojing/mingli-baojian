@@ -4375,6 +4375,56 @@ function fsProCompute(kind) {
   } catch (e) { console.warn('[fsProCompute]', e); }
 }
 
+window.showWorship = function(faith){
+  try {
+    var tabs = document.querySelectorAll('#worshipFaithTabs .jinang-tab');
+    tabs.forEach(function(t){ t.classList.remove('active'); });
+    var map = {ru:0, dao:1, fo:2};
+    if (tabs[map[faith]]) tabs[map[faith]].classList.add('active');
+    var content = document.getElementById('worshipContent');
+    if (content) content.innerHTML = '<p style="padding:16px;color:var(--paper)">🙏 ' + (faith==='ru'?'儒家':faith==='dao'?'道家':'佛家') + '参拜指南加载中（演示模式）</p>';
+  } catch (e) { console.warn('[showWorship]', e); }
+};
+window.prevWorshipStep = function(){
+  try { showToast('◀ 上一步（演示模式）'); } catch(e){}
+};
+window.nextWorshipStep = function(){
+  try { showToast('下一步 ▶（演示模式）'); } catch(e){}
+};
+window.runEvolutionAudit = function(){
+  try {
+    var report = document.getElementById('evolutionReport');
+    if (report) report.innerHTML = '<div style="padding:16px;color:var(--paper)">🔄 进化审计完成（演示模式）<br>• 排盘准确性: 待对接<br>• 知识库完整性: 待对接<br>• 古制合规性: 待对接</div>';
+  } catch (e) { console.warn('[runEvolutionAudit]', e); }
+};
+window.showEvolutionLog = function(){
+  try {
+    var report = document.getElementById('evolutionReport');
+    if (report) report.innerHTML = '<div style="padding:16px;color:var(--paper)">📋 进化日志（演示模式）<br>• 最近一次审计: 待运行<br>• 优化项: 待记录</div>';
+  } catch (e) { console.warn('[showEvolutionLog]', e); }
+};
+window.selectCompass = function(kind){
+  try {
+    document.querySelectorAll('.cs-item').forEach(function(el){ el.classList.remove('active'); el.classList.remove('d-block'); el.classList.add('d-none'); });
+    var el = document.getElementById('cs-' + kind);
+    if (el){ el.classList.add('active'); el.classList.remove('d-none'); el.classList.add('d-block'); }
+  } catch (e) { console.warn('[selectCompass]', e); }
+};
+window.renderCompass = function(){
+  try { showToast('🧭 电子起盘（演示模式）'); } catch(e){}
+};
+window.rotateCompass = function(deg){
+  try { showToast('↻ 罗盘旋转 ' + deg + '°（演示模式）'); } catch(e){}
+};
+window.toggleCompassLegend = function(){
+  try { showToast('📖 罗盘解读（演示模式）'); } catch(e){}
+};
+window.closeCaseLibrary = function(){
+  try {
+    var modals = document.querySelectorAll('.modal, .ask-modal, [id*="library"], [id*="case"]');
+    modals.forEach(function(m){ m.classList.add('d-none'); m.hidden = true; });
+  } catch (e) { console.warn('[closeCaseLibrary]', e); }
+};
 </script>
 
 <!-- ================================================================ -->
