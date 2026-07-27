@@ -982,6 +982,20 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
         if(window.toast) window.toast(`✅ 已导出 ${nodeId} (${neighbors.length} 邻居)`, 1800);
       };
     }
+    // R125 随机跳转到相邻模块
+    const randomBtn = document.getElementById('modalRandomBtn');
+    if(randomBtn){
+      randomBtn.onclick = () => {
+        if(!neighbors || neighbors.length === 0){
+          if(window.toast) window.toast('⚠️ 该节点无相邻模块', 1500);
+          return;
+        }
+        const pick = neighbors[Math.floor(Math.random() * neighbors.length)];
+        if(window.toast) window.toast(`🎲 随机跳到 ${pick.id} (${neighbors.length} 邻居可选)`, 1800);
+        closeNodeModal();
+        setTimeout(() => openNodeModal(pick.id), 250);
+      };
+    }
   }
 
   function closeNodeModal(){
