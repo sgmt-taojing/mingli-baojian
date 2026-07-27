@@ -790,6 +790,96 @@ function renderWeeklyStats(){
   wrap.appendChild(table);
 }
 
+// 周环比 WoW 计算
+function computeWoW(){
+  const metrics = [
+    { key: 'faith_score', label: '合规分数', bench: 'faithfulness', field: 'avg_score', fmt: v => v.toFixed(3), invert: false },
+    { key: 'faith_kb', label: 'KB 命中率', bench: 'faithfulness', field: 'kb_hit_rate', fmt: v => (v*100).toFixed(1)+'%', invert: false },
+    { key: 'latency_p95', label: 'P95 延迟', bench: 'latency', field: 'p95_ms', fmt: v => Math.round(v)+'ms', invert: true },
+    { key: 'cost_avg', label: '平均成本', bench: 'cost-budget', field: 'avg_cost_yuan', fmt: v => v<0.001 ? v.toExponential(1) : v.toFixed(4)+'元', invert: true }
+  ];
+  // 构造 7 个周对
+  const pairs = [];
+  for (let i = 0; i < WEEKS.length - 1; i++){
+    pairs.push({ from: WEEKS[i], to: WEEKS[i+1] });
+  }
+  return { metrics, pairs };
+}
+
+function renderWoW(){
+  const wrap = $('wowTable');
+  if (!wrap) return;
+  const { metrics, pairs } = computeWoW();
+  wrap.innerHTML = '';
+
+  // 检查是否有数据
+  const hasData = metrics.some(m =>
+    pairs.some(p => {
+      const dFrom = cache.weeks[p.from]?.[m.bench];
+      const dTo = cache.weeks[p.to]?.[m.bench];
+      return dFrom && dTo && get(dFrom, m.field) != null && get(dTo, m.field) != null;
+    })
+  );
+  if (!hasData){
+    wrap.appendChild(el('div', {className:'no-violations'}, '暂无数据'));
+    return;
+  }
+
+  const table = el('table', {className:'wow-table'});
+  // thead
+  const thead = el('thead', null,
+    el('tr', null,
+      el('th', {className:'wow-metric'}, '指标'),
+      ...pairs.map(p => el('th', {className:'wow-pair'}, p.from.replace('2026-','') + '→' + p.to.replace('2026-','')))
+    )
+  );
+  table.appendChild(thead);
+
+  const tbody = el('tbody');
+  metrics.forEach(m => {
+    const row = el('tr', null,
+      el('td', {className:'wow-metric'}, m.label)
+    );
+    pairs.forEach(p => {
+      const dFrom = cache.weeks[p.from]?.[m.bench];
+      const dTo = cache.weeks[p.to]?.[m.bench];
+      const vFrom = dFrom ? get(dFrom, m.field) : null;
+      const vTo = dTo ? get(dTo, m.field) : null;
+
+      if (vFrom == null || vTo == null){
+        row.appendChild(el('td', {className:'wow-cell wow-none'}, '—'));
+        return;
+      }
+
+      const delta = vTo - vFrom;
+      const pct = vFrom !== 0 ? (delta / Math.abs(vFrom)) : 0;
+      const pctStr = (pct >= 0 ? '+' : '') + (pct * 100).toFixed(1) + '%';
+
+      // 判断改善/恶化
+      let cls;
+      if (Math.abs(pct) < 0.02){
+        cls = 'wow-flat';
+      } else if (m.invert){
+        // 延迟/成本：下降=改善
+        cls = delta < 0 ? 'wow-good' : 'wow-bad';
+      } else {
+        // 分数/命中率：上升=改善
+        cls = delta > 0 ? 'wow-good' : 'wow-bad';
+      }
+
+      const arrow = pct > 0.02 ? '↑' : pct < -0.02 ? '↓' : '→';
+      const cell = el('td', {className:'wow-cell ' + cls},
+        m.fmt(vTo) + ' ',
+        el('span', {className:'wow-delta'}, arrow + ' ' + pctStr)
+      );
+      row.appendChild(cell);
+    });
+    tbody.appendChild(row);
+  });
+  table.appendChild(tbody);
+  wrap.appendChild(table);
+}
+
 // 导出当前快照
 function exportSnapshot(){
   const snap = {
@@ -819,6 +909,7 @@ async function refresh(){
     renderAlertCard();
     renderModuleTrend();
     renderWeeklyStats();
+    renderWoW();
   }finally{
     $('refreshBtn').textContent = '🔄 刷新';
     $('refreshBtn').disabled = false;

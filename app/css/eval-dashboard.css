@@ -746,3 +746,69 @@ html, body {
   .dash-weekly-stats h2 { font-size: 14px; }
   .weekly-stats-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 }
+
+/* ===== R194: 周环比 WoW 表 ===== */
+.dash-wow {
+  background: var(--card-bg, #141414);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.dash-wow h2 { font-size: 16px; margin: 0 0 4px; }
+.dash-wow .section-hint { font-size: 11px; color: var(--paper3, #888); margin: 0 0 12px; }
+.wow-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.wow-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+}
+.wow-table th {
+  padding: 8px 6px;
+  text-align: center;
+  font-size: 10px;
+  color: var(--paper3, #888);
+  border-bottom: 1px solid var(--border, #333);
+  white-space: nowrap;
+}
+.wow-table th.wow-metric { text-align: left; font-size: 11px; }
+.wow-table td {
+  padding: 8px 6px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  white-space: nowrap;
+}
+.wow-table td.wow-metric {
+  text-align: left;
+  font-family: -apple-system, system-ui, sans-serif;
+  font-weight: 500;
+  color: var(--paper1, #e0e0e0);
+}
+.wow-cell { font-size: 11px; }
+.wow-delta { font-size: 9px; opacity: 0.8; margin-left: 2px; }
+.wow-good {
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+}
+.wow-bad {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+}
+.wow-flat {
+  background: rgba(148, 163, 184, 0.08);
+  color: var(--paper3, #94a3b8);
+}
+.wow-none { color: var(--paper3, #555); }
+
+@media (max-width: 480px) {
+  .wow-table { font-size: 10px; }
+  .wow-table th, .wow-table td { padding: 4px 4px; }
+  .wow-cell { font-size: 9px; }
+  .wow-delta { font-size: 8px; }
+}
+@media (max-width: 360px) {
+  .wow-table { font-size: 9px; }
+  .wow-table th, .wow-table td { padding: 3px 3px; }
+  .dash-wow h2 { font-size: 14px; }
+  .wow-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
