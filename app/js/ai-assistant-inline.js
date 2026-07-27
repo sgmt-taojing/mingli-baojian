@@ -754,6 +754,21 @@ async function processAnswer(ans){
 
   // 所有要素收集完→生成报告
   state.reporting=true;
+
+  // R89-P0-排盘三规范校验（出生地/出生时刻/性别）— 缺失则弹反馈，不产残缺报告
+  try {
+    if (typeof _r89ValidatePaipan === 'function' && (state.module === 'bazi' || state.module === 'ziwei' || state.module === 'qimen')) {
+      const _input = _r89BuildInputFromState(state);
+      const _v = _r89ValidatePaipan(_input);
+      if (!_v.ok) {
+        const _prompt = _r89BuildMissingPrompt(_v);
+        addAI(_prompt, { type: 'paipan-missing' });
+        state.reporting = false;
+        return;
+      }
+    }
+  } catch(e) { console.warn('[r89-paipan] err', e); }
+
   await typing();
   await generateReport();
 }
@@ -1172,6 +1187,47 @@ async function autoSavePaipan(reportText){
       rawQuery:(Object.values(state.data||{}).join('；')||'').substring(0,500)
     })});
   }catch(_){/*静默失败*/}
+}
+
+// ===== R89-P0 排盘三规范桥接（出生地/出生时刻/性别）=====
+function _r89BuildInputFromState(st){
+  const d = st && st.data ? st.data : {};
+  const norm = (s) => (typeof s === 'string') ? s.trim() : '';
+  return {
+    province: norm(d.s2 || d.province || ''),
+    birthTime: norm(d.s1 || d.birthTime || ''),
+    gender: norm(d.s3 || d.gender || '')
+  };
+}
+function _r89ValidatePaipan(input){
+  try {
+    if (typeof window !== 'undefined' && window.PaipanInput && typeof window.PaipanInput.validatePaipanInput === 'function') {
+      return window.PaipanInput.validatePaipanInput(input);
+    }
+  } catch(e) { /* 静默回退 */ }
+  // 兜底校验（不依赖外部加载）
+  const missing = [];
+  if (!input.province) missing.push({ field: 'province', label: '出生地（省）', reason: '命理必须精确出生经度（同省不同县时辰边界差 1-2 分钟）' });
+  if (!input.birthTime) missing.push({ field: 'birthTime', label: '出生时刻', reason: '真太阳时校准是排盘基石（早晚跨时辰差 4-8 度）' });
+  if (!input.gender) missing.push({ field: 'gender', label: '性别', reason: '大运排法男阳女阴、女阳男阴' });
+  return { ok: missing.length === 0, missing };
+}
+function _r89BuildMissingPrompt(v){
+  try {
+    if (typeof window !== 'undefined' && window.PaipanInput && typeof window.PaipanInput.buildMissingPrompt === 'function') {
+      return window.PaipanInput.buildMissingPrompt(v);
+    }
+  } catch(e) {}
+  if (!v || !v.missing || v.missing.length === 0) return '✅ 信息完整，将为您生成专业排盘报告。';
+  const lines = ['📋 **为确保报告专业准确，还需您补充以下信息：**', ''];
+  v.missing.forEach((m, i) => {
+    lines.push(`${i + 1}. **${m.label}** — ${m.reason}`);
+  });
+  lines.push('');
+  lines.push('💡 **提示**：这些信息对排盘准确性至关重要，缺失将导致时辰/大运/方位等关键论断产生偏差。');
+  lines.push('');
+  lines.push('请直接回复补充信息（如：**浙江省杭州市 / 1990-10-28 07:23 / 男**），系统将自动校验并继续生成报告。');
+  return lines.join('\n');
 }
 
 // ===== R89 合规黑名单 + 免责声明（P0-2 / P0-3 / P2-1）=====
