@@ -660,14 +660,28 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
       list.innerHTML = '<div style="color:var(--paper3);padding:8px">该节点无关联节点（孤岛节点）</div>';
     } else {
       list.innerHTML = neighbors.map(nb => `
-        <div class="neighbor-row">
+        <div class="neighbor-row" data-id="${nb.id}" style="cursor:pointer" title="点击查看 ${nb.name||nb.id} 的邻接子图">
           <div><b>${nb.name||nb.id}</b><br><code style="font-size:.7rem;color:var(--paper3)">${nb.id}</code></div>
           <div style="display:flex;gap:6px;align-items:center">
             <span class="chip">w=${nb.weight}</span>
             <span class="chip blue">${nb.reason}</span>
-            <a href="kb-graph.html?module=${encodeURIComponent(nb.id)}" style="color:var(--gold);text-decoration:none;font-size:.78rem">→</a>
+            <a href="kb-graph.html?module=${encodeURIComponent(nb.id)}" style="color:var(--gold);text-decoration:none;font-size:.78rem" title="跳转到图谱页">→</a>
+            <span style="color:var(--paper3);font-size:.78rem;cursor:pointer" class="nb-jump" data-id="${nb.id}" title="页内切换">⊙</span>
           </div>
         </div>`).join('');
+      // R110 页内跳转
+      list.querySelectorAll('.nb-jump').forEach(el => {
+        el.onclick = (e) => {
+          e.stopPropagation();
+          openNodeModal(el.dataset.id);
+        };
+      });
+      list.querySelectorAll('.neighbor-row').forEach(el => {
+        el.onclick = (e) => {
+          if(e.target.tagName === 'A' || e.target.classList.contains('nb-jump')) return;
+          openNodeModal(el.dataset.id);
+        };
+      });
     }
     const svg = document.getElementById('adjSvg');
     renderAdjGraph(svg, nodeId, neighbors);
