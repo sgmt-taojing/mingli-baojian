@@ -241,6 +241,11 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
         <h3>🔗 邻接节点 (<span id="neighborCount">0</span>)</h3>
         <div id="neighborList"></div>
       </div>
+      <div class="modal-section" id="modalEntriesSection" hidden>
+        <h3>📄 关联模块条目预览 <span id="modalEntriesCount" class="chip green" style="font-size:.78rem"></span></h3>
+        <div id="modalEntries" style="display:grid;gap:6px;margin-top:8px"></div>
+        <div id="modalEntriesMore" style="text-align:center;margin-top:8px;font-size:.82rem;color:var(--paper3)"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -786,6 +791,42 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
     }
     // 0 邻居时折叠统计区
     document.getElementById('modalStatsSection').style.display = neighbors.length ? 'block' : 'none';
+
+    // R118 关联模块条目预览
+    const entriesSection = document.getElementById('modalEntriesSection');
+    const entriesEl = document.getElementById('modalEntries');
+    const entriesCount = document.getElementById('modalEntriesCount');
+    const entriesMore = document.getElementById('modalEntriesMore');
+    if(entriesSection && entriesEl && window.fetch){
+      // 拉取该节点的 KB 条目（最多 8 条预览）
+      fetch('/api/public/kb-query?module=' + encodeURIComponent(nodeId) + '&size=8').then(r=>r.json()).then(data=>{
+        const raw = data && data.data || data || {};
+        const entries = raw.results || raw.entries || raw.items || [];
+        if(entries.length === 0){
+          entriesSection.hidden = false;
+          entriesEl.innerHTML = '<div style="color:var(--paper3);padding:8px;font-size:.85rem">该模块暂无条目（未收录 / 已归档）</div>';
+          entriesCount.textContent = '0';
+          entriesMore.textContent = '';
+          return;
+        }
+        entriesSection.hidden = false;
+        entriesCount.textContent = entries.length;
+        entriesEl.innerHTML = entries.map(e => `
+          <div style="padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:6px;font-size:.85rem">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+              <b style="color:var(--gold)">${e.name || e.id}</b>
+              <span style="font-size:.7rem;color:var(--paper3)">${e.level || 'public'} · ${(e.size_kb||0).toFixed(1)}KB</span>
+            </div>
+            <div style="color:var(--paper3);font-size:.78rem;line-height:1.5;max-height:3.6em;overflow:hidden;text-overflow:ellipsis">${(e.content||e.summary||'').slice(0,160)}</div>
+          </div>
+        `).join('');
+        entriesMore.textContent = entries.length >= 8 ? '显示前 8 条，完整列表见下方 📊 质量审计页' : `共 ${entries.length} 条`;
+      }).catch(()=>{
+        entriesSection.hidden = false;
+        entriesEl.innerHTML = '<div style="color:var(--paper3);padding:8px;font-size:.85rem">⚠️ 条目加载失败（KB API 暂不可用）</div>';
+        entriesMore.textContent = '';
+      });
+    }
 
     modal.classList.add('show');
     // 收藏按钮
