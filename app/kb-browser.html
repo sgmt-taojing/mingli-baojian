@@ -1719,7 +1719,7 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
       cont.innerHTML = `<div class="empty"><h3>暂无匹配</h3>关键词 "<b>${q}</b>" 在 ${mod||'全模块'} 中无结果</div>`;
       return;
     }
-    let html = `<div style="margin-bottom:12px;color:var(--paper3);font-size:.85rem;display:flex;align-items:center;flex-wrap:wrap;gap:8px"><span>找到 <b style="color:var(--gold)">${results.length}</b> 条结果</span><button class="btn sr-export-all" style="margin-left:auto;background:var(--gold);color:#000;border:0;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:.78rem">📦 导出全部 JSON</button></div>`;
+    let html = `<div style="margin-bottom:12px;color:var(--paper3);font-size:.85rem;display:flex;align-items:center;flex-wrap:wrap;gap:8px"><span>找到 <b style="color:var(--gold)">${results.length}</b> 条结果</span><button class="btn sr-export-all" style="margin-left:auto;background:var(--gold);color:#000;border:0;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:.78rem">📦 导出全部 JSON</button><button class="btn sr-export-csv" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:.78rem">📤 导出 CSV</button></div>`;
     const escHtml = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     const hl = (text, q) => { const e = escHtml(text); if(!q) return e; const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')','gi'); return e.replace(re,'<mark style="background:rgba(201,168,76,.3);color:var(--gold);border-radius:2px">$1</mark>'); };
     for(const r of results){
@@ -1770,62 +1770,46 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
         if(window._toast) window._toast(`📦 已导出 ${results.length} 条`, 1000);
       };
     }
+    // R161 搜索结果 CSV 导出
+    const expCsv = cont.querySelector('.sr-export-csv');
+    if(expCsv){
+      expCsv.onclick = () => {
+        const esc = v => { if(v===null||v===undefined) return ''; const s2 = String(v); return /[",\n]/.test(s2) ? '"' + s2.replace(/"/g,'""') + '"' : s2; };
+        const headers = ['module','title','snippet','trust','hit_count'];
+        const rows = results.map(r => [r.module||'', r.title||'', r.snippet||'', (r.trust_score||0).toFixed(3), r.hit_count||0]);
+        const csv = '\ufeff' + headers.join(',') + '\n' + rows.map(r => r.map(esc).join(',')).join('\n');
+        const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'kb-search-' + q + '-' + new Date().toISOString().slice(0,10) + '.csv';
+        document.body.appendChild(a); a.click();
+        setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+        if(window._toast) window._toast('📤 已导出 ' + rows.length + ' 条 CSV', 1500);
+      };
+    }
   }
+  // R160 URL 深链初始化（?tab=xxx&q=yyy&module=zzz）
+  try {
+    const u = new URL(window.location.href);
+    const tab = u.searchParams.get('tab');
+    const q = u.searchParams.get('q');
+    const mod = u.searchParams.get('module');
+    if(tab){
+      const tabEl = document.querySelector('.tab[data-tab="' + tab + '"]');
+      if(tabEl) tabEl.click();
+    }
+    if(q){
+      searchInput.value = q;
+      if(mod){
+        const sel2 = document.getElementById('searchModule');
+        if(sel2) sel2.value = mod;
+      }
+      setTimeout(() => doSearch(), 100);
+    }
+  } catch(e){}
+
   searchBtn.addEventListener('click', doSearch);
   searchInput.addEventListener('keypress', e => { if(e.key === 'Enter') doSearch(); });
-
-  // ===== R114 键盘快捷键 =====
-  document.addEventListener('keydown', e => {
-    // 输入框不拦截
-    if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-      if(e.key === 'Escape') e.target.blur();
-      return;
-    }
-    const tabs = ['files','modules','hot','graph','favs','search'];
-    const activeTab = document.querySelector('.tab.on')?.dataset.tab;
-    let idx = tabs.indexOf(activeTab);
-
-    // ESC 关闭弹窗 / 返回上一节点
-    if(e.key === 'Escape'){
-      if(document.getElementById('kbNodeModal')?.classList.contains('show')){
-        e.preventDefault();
-        if(window._modalHistory && window._modalHistory.length > 1){
-          window._modalHistory.pop();
-          const prev = window._modalHistory[window._modalHistory.length - 1];
-          if(prev) openNodeModal(prev);
-        } else {
-          closeNodeModal();
-        }
-        return;
-      }
-    }
-
-    // Tab 切换: ←/→ 或 1-6
-    if(e.key === 'ArrowLeft' && idx > 0){
-      e.preventDefault();
-      document.querySelector(`.tab[data-tab="${tabs[idx-1]}"]`)?.click();
-    } else if(e.key === 'ArrowRight' && idx < tabs.length - 1){
-      e.preventDefault();
-      document.querySelector(`.tab[data-tab="${tabs[idx+1]}"]`)?.click();
-    } else if(/^[1-6]$/.test(e.key)){
-      e.preventDefault();
-      const i = parseInt(e.key) - 1;
-      document.querySelector(`.tab[data-tab="${tabs[i]}"]`)?.click();
-    }
-
-    // g → 图谱 / f → 收藏 / s → 搜索 / m → 模块
-    if(e.key === 'g') document.querySelector('.tab[data-tab="graph"]')?.click();
-    if(e.key === 'f'){
-      e.preventDefault();
-      window.KbFavorites?.render?.();
-      document.getElementById('kbFavDrawer')?.classList.add('show');
-    }
-    if(e.key === 's'){
-      document.querySelector('.tab[data-tab="search"]')?.click();
-      setTimeout(() => document.getElementById('searchInput')?.focus(), 50);
-    }
-    if(e.key === 'm') document.querySelector('.tab[data-tab="modules"]')?.click();
-  });
 
   // ===== R114 键盘快捷键 =====
   document.addEventListener('keydown', e => {
