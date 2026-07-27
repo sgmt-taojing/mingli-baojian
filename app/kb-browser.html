@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="css/utility-classes.css">
 <link rel="stylesheet" href="css/mobile-nav.css">
 <link rel="stylesheet" href="css/kb-favorites.css">
+<link rel="stylesheet" href="css/kb-recent.css">
 <style>
 :root{
   --gold:#c9a84c;--gold-dim:#a88c3a;
@@ -294,7 +295,7 @@ footer.links a{color:var(--gold);text-decoration:none;margin:0 8px}
       const lvlChip = lvl === 'professional' ? '<span class="chip blue">professional</span>' : lvl === 'admin' ? '<span class="chip red">admin</span>' : '<span class="chip green">public</span>';
       const desc = f.desc || '（暂无描述）';
       const searchKey = encodeURIComponent(f.filename.replace('.js','').replace(/-kb$/,'').replace(/-/g,' '));
-      html += `<div class="file">
+      html += `<div class="file" data-kb-id="${f.filename}" data-kb-name="${f.filename}">
         <div class="file-head">
           <span class="file-name">${f.filename}</span>
           ${lvlChip}
@@ -464,5 +465,6 @@ footer.links a{color:var(--gold);text-decoration:none;margin:0 8px}
 <script src="js/a11y-divination-hub.js" defer></script>
 <script src="js/mobile-nav.js" defer></script>
 <script src="js/kb-favorites.js" defer></script>
+<script src="js/kb-recent.js" defer></script>
 </body>
 </html>
