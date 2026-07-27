@@ -992,6 +992,115 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
   }
   searchBtn.addEventListener('click', doSearch);
   searchInput.addEventListener('keypress', e => { if(e.key === 'Enter') doSearch(); });
+
+  // ===== R114 键盘快捷键 =====
+  document.addEventListener('keydown', e => {
+    // 输入框不拦截
+    if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+      if(e.key === 'Escape') e.target.blur();
+      return;
+    }
+    const tabs = ['files','modules','hot','graph','favs','search'];
+    const activeTab = document.querySelector('.tab.on')?.dataset.tab;
+    let idx = tabs.indexOf(activeTab);
+
+    // ESC 关闭弹窗 / 返回上一节点
+    if(e.key === 'Escape'){
+      if(document.getElementById('kbNodeModal')?.classList.contains('show')){
+        e.preventDefault();
+        if(window._modalHistory && window._modalHistory.length > 1){
+          window._modalHistory.pop();
+          const prev = window._modalHistory[window._modalHistory.length - 1];
+          if(prev) openNodeModal(prev);
+        } else {
+          closeNodeModal();
+        }
+        return;
+      }
+    }
+
+    // Tab 切换: ←/→ 或 1-6
+    if(e.key === 'ArrowLeft' && idx > 0){
+      e.preventDefault();
+      document.querySelector(`.tab[data-tab="${tabs[idx-1]}"]`)?.click();
+    } else if(e.key === 'ArrowRight' && idx < tabs.length - 1){
+      e.preventDefault();
+      document.querySelector(`.tab[data-tab="${tabs[idx+1]}"]`)?.click();
+    } else if(/^[1-6]$/.test(e.key)){
+      e.preventDefault();
+      const i = parseInt(e.key) - 1;
+      document.querySelector(`.tab[data-tab="${tabs[i]}"]`)?.click();
+    }
+
+    // g → 图谱 / f → 收藏 / s → 搜索 / m → 模块
+    if(e.key === 'g') document.querySelector('.tab[data-tab="graph"]')?.click();
+    if(e.key === 'f'){
+      e.preventDefault();
+      window.KbFavorites?.render?.();
+      document.getElementById('kbFavDrawer')?.classList.add('show');
+    }
+    if(e.key === 's'){
+      document.querySelector('.tab[data-tab="search"]')?.click();
+      setTimeout(() => document.getElementById('searchInput')?.focus(), 50);
+    }
+    if(e.key === 'm') document.querySelector('.tab[data-tab="modules"]')?.click();
+  });
+
+  // ===== R114 键盘快捷键 =====
+  document.addEventListener('keydown', e => {
+    // 输入框不拦截
+    if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+      if(e.key === 'Escape') e.target.blur();
+      return;
+    }
+    const tabs = ['files','modules','hot','graph','favs','search'];
+    const activeTab = document.querySelector('.tab.on')?.dataset.tab;
+    let idx = tabs.indexOf(activeTab);
+
+    // ESC 关闭弹窗 / 返回上一节点
+    if(e.key === 'Escape'){
+      if(document.getElementById('kbNodeModal')?.classList.contains('show')){
+        e.preventDefault();
+        if(window._modalHistory && window._modalHistory.length > 1){
+          window._modalHistory.pop(); // 移除当前
+          const prev = window._modalHistory[window._modalHistory.length - 1];
+          if(prev) openNodeModal(prev);
+        } else {
+          closeNodeModal();
+        }
+        return;
+      }
+      if(window.KbFavorites && document.getElementById('kbFavDrawer')?.classList.contains('show')){
+        return; // drawer 自己处理
+      }
+    }
+
+    // Tab 切换: ←/→ 或 1-6
+    if(e.key === 'ArrowLeft' && idx > 0){
+      e.preventDefault();
+      document.querySelector(`.tab[data-tab="${tabs[idx-1]}"]`)?.click();
+    } else if(e.key === 'ArrowRight' && idx < tabs.length - 1){
+      e.preventDefault();
+      document.querySelector(`.tab[data-tab="${tabs[idx+1]}"]`)?.click();
+    } else if(/^[1-6]$/.test(e.key)){
+      e.preventDefault();
+      const i = parseInt(e.key) - 1;
+      document.querySelector(`.tab[data-tab="${tabs[i]}"]`)?.click();
+    }
+
+    // g → 图谱 / f → 收藏 / s → 搜索 / m → 模块
+    if(e.key === 'g') document.querySelector('.tab[data-tab="graph"]')?.click();
+    if(e.key === 'f'){
+      e.preventDefault();
+      window.KbFavorites?.render?.();
+      document.getElementById('kbFavDrawer')?.classList.add('show');
+    }
+    if(e.key === 's'){
+      document.querySelector('.tab[data-tab="search"]')?.click();
+      setTimeout(() => document.getElementById('searchInput')?.focus(), 50);
+    }
+    if(e.key === 'm') document.querySelector('.tab[data-tab="modules"]')?.click();
+  });
 })();
 </script>
 
