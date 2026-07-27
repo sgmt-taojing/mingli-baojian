@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>📋 报告中心 · 易道智鉴</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "PingFang SC", sans-serif; background: linear-gradient(135deg, #0f1820 0%, #1a2332 100%); color: #e4e8ee; margin: 0; padding: 0; min-height: 100vh; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
+  header { text-align: center; margin-bottom: 32px; }
+  header h1 { font-size: 28px; margin: 0 0 8px; background: linear-gradient(135deg, #ffb44d, #ff7e5f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  header p { font-size: 13px; opacity: 0.7; margin: 0; }
+  .back-home { margin-top: 8px; font-size: 12px; }
+  .back-home a { color: #63b3ed; text-decoration: none; }
+  .back-home a:hover { text-decoration: underline; }
+
+  .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(99,179,237,0.15); }
+  .filter-btn { padding: 6px 14px; background: rgba(99,179,237,0.1); border: 1px solid rgba(99,179,237,0.3); border-radius: 16px; color: #c5d1de; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+  .filter-btn:hover { background: rgba(99,179,237,0.2); }
+  .filter-btn.active { background: #63b3ed; color: #0f1820; font-weight: 600; border-color: #63b3ed; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+
+  .card { background: linear-gradient(135deg, #1a2332 0%, #0f1820 100%); border: 1px solid rgba(99,179,237,0.2); border-radius: 12px; padding: 20px; transition: all 0.2s; cursor: pointer; position: relative; overflow: hidden; }
+  .card:hover { transform: translateY(-2px); border-color: rgba(99,179,237,0.5); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+  .card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent, #63b3ed); }
+  .card-icon { font-size: 36px; margin-bottom: 8px; }
+  .card-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .card-desc { font-size: 12px; opacity: 0.7; line-height: 1.5; margin-bottom: 12px; min-height: 36px; }
+  .card-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 12px; }
+  .card-tag { font-size: 10px; padding: 2px 8px; background: rgba(99,179,237,0.12); border: 1px solid rgba(99,179,237,0.25); border-radius: 10px; color: #8ab4d8; }
+  .card-meta { display: flex; justify-content: space-between; align-items: center; font-size: 11px; opacity: 0.5; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px; }
+  .card-cta { color: #ffb44d; font-weight: 600; }
+
+  .stats-bar { display: flex; gap: 12px; padding: 10px 14px; background: rgba(255,180,77,0.08); border: 1px solid rgba(255,180,77,0.25); border-radius: 10px; margin-bottom: 20px; font-size: 12px; flex-wrap: wrap; }
+  .stats-item { color: #ffb44d; }
+  .stats-item strong { color: #fff; }
+
+  footer { text-align: center; font-size: 11px; opacity: 0.5; margin-top: 32px; padding: 16px 0; border-top: 1px solid rgba(255,255,255,0.05); }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>📋 报告中心</h1>
+    <p>7 份报告 · 5 层粒度 · 一键直达</p>
+    <div class="back-home"><a href="divination-hub.html">← 返回主平台</a> | <a href="ai-assistant.html">🤖 AI 助手</a></div>
+  </header>
+
+  <div class="stats-bar" id="statsBar">
+    <span class="stats-item">📊 报告总数：<strong id="statTotal">7</strong></span>
+    <span class="stats-item">🎯 终身粒度：<strong id="statLifetime">4</strong></span>
+    <span class="stats-item">📅 短期粒度：<strong id="statShort">2</strong></span>
+    <span class="stats-item">🩺 健康专题：<strong id="statTcm">1</strong></span>
+  </div>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" data-filter="all">全部</button>
+    <button class="filter-btn" data-filter="lifetime">终身</button>
+    <button class="filter-btn" data-filter="monthly">逐月</button>
+    <button class="filter-btn" data-filter="tcm">中医</button>
+    <button class="filter-btn" data-filter="demo">样例</button>
+  </div>
+
+  <div class="grid" id="reportGrid"></div>
+
+  <footer>易道智鉴 · 仅供参考 · 命数只占 30%，努力占 70%</footer>
+</div>
+
+<script>
+// 报告元数据
+var REPORTS = [
+  {
+    icon: "🌊", title: "三维联动报告", url: "lifeflow-report.html",
+    desc: "流月 40% + 流年 30% + 大运 30% 加权判定 · 当月深度分析",
+    tags: ["三维", "当月", "判定"], category: "monthly",
+    accent: "#ffb44d", cta: "看当月", kbMod: "lifeflow"
+  },
+  {
+    icon: "🌐", title: "终身三维滚动预览", url: "lifeflow-timeline.html",
+    desc: "未来 N 年 × 12 月热图 + 黄金/谨慎 5 年 + 大运交接点",
+    tags: ["终身", "热图", "滚动"], category: "lifetime",
+    accent: "#78c878", cta: "看 N 年", kbMod: "lifeflowTimeline"
+  },
+  {
+    icon: "📅", title: "逐月运势细化报告", url: "monthly-report.html",
+    desc: "本年逐月 24 个月 + 当月/次月详细 · 趋吉避凶化解",
+    tags: ["逐月", "化解", "趋吉"], category: "monthly",
+    accent: "#c084fc", cta: "看 24 月", kbMod: "monthly"
+  },
+  {
+    icon: "🗺️", title: "人生规划蓝图", url: "lifeplan-detail.html",
+    desc: "4 阶段 / 12 领域 / 48 子项 · 时间轴 + 领域矩阵 + 行动清单",
+    tags: ["终身", "蓝图", "阶段"], category: "lifetime",
+    accent: "#63b3ed", cta: "看蓝图", kbMod: "lifeplan"
+  },
+  {
+    icon: "🩺", title: "中医体质报告", url: "tcm-report.html",
+    desc: "舌象 + 体质 + 经络 + 24 节气养生 · TCM 全维度",
+    tags: ["中医", "体质", "养生"], category: "tcm",
+    accent: "#f87171", cta: "看体质", kbMod: "tcm-classic"
+  },
+  {
+    icon: "📋", title: "八字排盘样例", url: "report-sample-bazi.html",
+    desc: "标准八字排盘示例 · 排盘器演示 + 字段展示",
+    tags: ["样例", "八字", "demo"], category: "demo",
+    accent: "#94a3b8", cta: "看样例", kbMod: "bazi"
+  },
+  {
+    icon: "⚙️", title: "报告配置中心", url: "report-config.html",
+    desc: "个性化报告字段 + 模块开关 + 模板选择",
+    tags: ["配置", "模板"], category: "demo",
+    accent: "#94a3b8", cta: "配置", kbMod: null
+  }
+];
+
+// 渲染
+function render(filter) {
+  var grid = document.getElementById('reportGrid');
+  var filtered = filter === 'all' ? REPORTS : REPORTS.filter(function(r){ return r.category === filter; });
+  grid.innerHTML = filtered.map(function(r){
+    return '<div class="card" style="--accent:' + r.accent + '" onclick="goReport(\'' + r.url + '\')">' +
+      '<div class="card-icon">' + r.icon + '</div>' +
+      '<div class="card-title">' + r.title + '</div>' +
+      '<div class="card-desc">' + r.desc + '</div>' +
+      '<div class="card-tags">' + r.tags.map(function(t){ return '<span class="card-tag">' + t + '</span>'; }).join('') + '</div>' +
+      '<div class="card-meta">' +
+        '<span>📦 ' + (r.kbMod || '无 KB') + '</span>' +
+        '<span class="card-cta">' + r.cta + ' →</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function goReport(url) {
+  // 保留来源标记，方便报告页埋点
+  try { sessionStorage.setItem('lastReportHub', 'reports-hub'); } catch(e){}
+  window.location.href = url;
+}
+
+// 筛选
+document.querySelectorAll('.filter-btn').forEach(function(b){
+  b.addEventListener('click', function(){
+    document.querySelectorAll('.filter-btn').forEach(function(x){ x.classList.remove('active'); });
+    b.classList.add('active');
+    render(b.dataset.filter);
+  });
+});
+
+// 统计
+(function(){
+  document.getElementById('statTotal').textContent = REPORTS.length;
+  document.getElementById('statLifetime').textContent = REPORTS.filter(function(r){return r.category==='lifetime';}).length;
+  document.getElementById('statShort').textContent = REPORTS.filter(function(r){return r.category==='monthly';}).length;
+  document.getElementById('statTcm').textContent = REPORTS.filter(function(r){return r.category==='tcm';}).length;
+})();
+
+render('all');
+console.log('✅ 报告中心加载：' + REPORTS.length + ' 份报告');
+</script>
+<script src="js/mobile-nav.js" defer></script>
+</body>
+</html>
