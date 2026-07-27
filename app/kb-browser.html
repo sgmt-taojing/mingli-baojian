@@ -488,7 +488,7 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
         </div>
         <div class="actions">
           <a class="btn primary" href="ai-assistant.html?preset=${f.filename}">🤖 用 AI 探索</a>
-          <a class="btn" href="kb-search.html?q=${searchKey}">🔍 搜条目</a>
+          <a class="btn" href="#" onclick="event.preventDefault();switchTab('search');setTimeout(()=>{const i=document.getElementById('searchInput');if(i){i.value='${searchKey.replace(/'/g,'\\\'')}';doSearch();}},50)">🔍 搜条目</a>
         </div>
       </div>`;
     }
@@ -522,7 +522,7 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
       for(const f of files){
         const lvl = f.level || 'public';
         const lvlChip = lvl === 'professional' ? '<span class="chip blue">professional</span>' : lvl === 'admin' ? '<span class="chip red">admin</span>' : '<span class="chip green">public</span>';
-        h += `<div class="file"><div class="file-head"><span class="file-name">${f.filename}</span>${lvlChip}</div><div class="desc">${f.desc || '（暂无描述）'}</div><div class="actions"><a class="btn primary" href="ai-assistant.html?preset=${f.filename}">🤖 AI 问</a><a class="btn" href="kb-search.html?q=${encodeURIComponent(f.filename.replace('.js','').replace(/-kb$/,'').replace(/-/g,' '))}">🔍 搜</a></div></div>`;
+        h += `<div class="file"><div class="file-head"><span class="file-name">${f.filename}</span>${lvlChip}</div><div class="desc">${f.desc || '（暂无描述）'}</div><div class="actions"><a class="btn primary" href="ai-assistant.html?preset=${f.filename}">🤖 AI 问</a><a class="btn" href="#" onclick="event.preventDefault();switchTab('search');setTimeout(()=>{const i=document.getElementById('searchInput');if(i){i.value='${f.filename.replace('.js','').replace(/-kb$/,'').replace(/-/g,' ').replace(/'/g,'\\\'')}';doSearch();}},50)">🔍 搜</a></div></div>`;
       }
       h += '</div></div>';
       preview.innerHTML = h;
@@ -533,7 +533,7 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
         '<div class="meta" style="margin-top:8px">' + (f.level ? '<span class="chip">' + f.level + '</span>' : '') +
         '<span class="chip gray">📍 knowledge/' + (f.filename || '') + '</span></div>' +
         '<div class="actions" style="margin-top:12px"><a class="btn primary" href="ai-assistant.html?preset=' + f.filename + '">🤖 用 AI 探索全文</a>' +
-        '<a class="btn" href="kb-search.html?q=' + encodeURIComponent(f.filename.replace('.js','').replace(/-kb$/,'').replace(/-/g,' ')) + '">🔍 搜本文件条目</a>' +
+        '<a class="btn" href="#" onclick="event.preventDefault();switchTab(\'search\');setTimeout(()=>{const i=document.getElementById(\'searchInput\');if(i){i.value=\'' + f.filename.replace('.js','').replace(/-kb$/,'').replace(/-/g,' ') + '\';doSearch();}},50)">🔍 搜本文件条目</a>' +
         '<button class="btn" id="randomOneAgainBtn" style="background:var(--gold);color:#000;border:0">🎲 再来一个</button></div></div>';
       const again = document.getElementById('randomOneAgainBtn');
       if(again) again.onclick = () => renderOnePreview(pickN(1)[0]);
