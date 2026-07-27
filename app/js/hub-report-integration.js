@@ -159,6 +159,11 @@
       window.open('monthly-report.html', '_blank');
       return;
     }
+    // R91 lifeflow 特殊处理：跳转到跨维度联动报告页
+    if (module === 'lifeflow') {
+      window.open('lifeflow-report.html', '_blank');
+      return;
+    }
 
     // 收集数据
     var collector = COLLECTORS[module] || collectGeneralData;

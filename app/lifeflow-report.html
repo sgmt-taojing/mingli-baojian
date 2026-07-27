@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>跨维度联动报告 · 流年流月大运 · 命理宝鉴</title>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/critical.css">
+<style>
+:root{--ink:#1a1a2e;--ink2:#22223a;--paper:#f5f0e6;--gold:#c9a84c;--gold-dim:rgba(201,168,76,.2);--red:#dc4444;--green:#10b981;--yellow:#e8a838;--blue:#3b82f6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--ink);color:var(--paper);line-height:1.7;min-height:100vh;padding-bottom:60px}
+.container{max-width:900px;margin:0 auto;padding:16px}
+h1{font-size:1.4rem;color:var(--gold);margin:16px 0 8px;text-align:center}
+h2{font-size:1.1rem;color:var(--gold);margin:20px 0 10px;border-left:3px solid var(--gold);padding-left:8px}
+h3{font-size:.95rem;color:var(--yellow);margin:12px 0 6px}
+.input-card{background:var(--ink2);border:1px solid var(--gold-dim);border-radius:8px;padding:16px;margin-bottom:16px}
+.input-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.input-row label{font-size:.85rem;color:var(--paper);min-width:80px}
+.input-row input,.input-row select{background:rgba(255,255,255,.05);border:1px solid var(--gold-dim);color:var(--paper);padding:6px 10px;border-radius:4px;font-size:.85rem;flex:1;min-width:90px}
+.btn{display:inline-block;background:linear-gradient(135deg,var(--gold),#a8862e);color:var(--ink);border:none;border-radius:6px;padding:10px 24px;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(201,168,76,.3)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.result-card{background:var(--ink2);border:1px solid var(--gold-dim);border-radius:8px;padding:16px;margin-bottom:14px}
+.triple-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.triple-card{background:rgba(201,168,76,.08);border:1px solid var(--gold-dim);border-radius:6px;padding:10px;text-align:center}
+.triple-card .label{font-size:.7rem;color:var(--paper);opacity:.7;margin-bottom:4px}
+.triple-card .value{font-size:1.1rem;color:var(--gold);font-weight:600}
+.triple-card .status{font-size:.85rem;margin-top:4px}
+.status-旺{color:#10b981}
+.status-相{color:#3b82f6}
+.status-休{color:#e8a838}
+.status-死{color:#dc4444}
+.status-囚{color:#a855f7}
+.status-平{color:var(--paper);opacity:.7}
+.score-bar{position:relative;height:24px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden;margin:8px 0}
+.score-fill{position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,var(--red),var(--yellow),var(--green));transition:width .6s}
+.score-label{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:.8rem;font-weight:600;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.dim-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
+.dim-cell{background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.15);border-radius:6px;padding:8px;text-align:center}
+.dim-cell .dim-label{font-size:.7rem;opacity:.7}
+.dim-cell .dim-value{font-size:1.2rem;color:var(--gold);font-weight:600}
+.advice-list{padding-left:20px}
+.advice-list li{margin-bottom:6px;font-size:.85rem}
+.overall-badge{display:inline-block;padding:4px 14px;border-radius:14px;font-size:.9rem;font-weight:600;margin-left:8px}
+.overall-大吉{background:rgba(16,185,129,.2);color:#10b981;border:1px solid rgba(16,185,129,.4)}
+.overall-顺利{background:rgba(59,130,246,.2);color:#3b82f6;border:1px solid rgba(59,130,246,.4)}
+.overall-平稳{background:rgba(232,168,56,.2);color:#e8a838;border:1px solid rgba(232,168,56,.4)}
+.overall-需谨慎{background:rgba(201,168,76,.2);color:var(--gold);border:1px solid var(--gold-dim)}
+.overall-低谷{background:rgba(220,68,68,.2);color:var(--red);border:1px solid rgba(220,68,68,.4)}
+.kb-badge{display:inline-block;background:rgba(201,168,76,.15);color:var(--gold);padding:2px 8px;border-radius:4px;font-size:.7rem;margin-left:6px}
+.loading-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:9999;justify-content:center;align-items:center;color:var(--gold);font-size:1rem}
+.spin{display:inline-block;width:18px;height:18px;border:2px solid var(--gold-dim);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.next-year{background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.3);border-radius:6px;padding:10px;margin-top:12px}
+.next-year h4{color:#a855f7;font-size:.85rem;margin-bottom:6px}
+.lucky{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:6px;padding:8px;margin:10px 0;font-size:.85rem;color:#10b981}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🔮 跨维度联动报告</h1>
+<p style="text-align:center;font-size:.8rem;opacity:.6;margin-bottom:16px">流年 × 流月 × 大运 · 三维联动 · 40/30/30 加权</p>
+
+<div class="input-card">
+<h3>📋 输入信息</h3>
+<div class="input-row">
+  <label>出生年</label><input type="number" id="inpYear" value="1990" min="1900" max="2100">
+  <label>月</label><input type="number" id="inpMonth" value="1" min="1" max="12">
+  <label>日</label><input type="number" id="inpDay" value="1" min="1" max="31">
+</div>
+<div class="input-row">
+  <label>出生时</label><input type="number" id="inpHour" value="12" min="0" max="23">
+  <label>性别</label><select id="inpSex"><option value="male">男</option><option value="female">女</option></select>
+  <label>日主五行</label>
+  <select id="inpDayEle">
+    <option value="金">金</option>
+    <option value="木">木</option>
+    <option value="水">水</option>
+    <option value="火" selected>火</option>
+    <option value="土">土</option>
+  </select>
+</div>
+<div class="input-row">
+  <label>目标年</label><input type="number" id="inpTargetYear" value="2026" min="2024" max="2100">
+  <label>目标月</label><input type="number" id="inpTargetMonth" value="7" min="1" max="12">
+</div>
+<button class="btn" id="genBtn" onclick="generate()" style="width:100%;margin-top:8px">🔮 生成三维联动报告</button>
+</div>
+
+<div id="resultArea" style="display:none"></div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <span class="spin"></span>正在生成跨维度联动报告...
+</div>
+
+<script src="js/report-engine.js" defer></script>
+<script src="js/report-render-adapters.js" defer></script>
+<script>
+(function(){
+  'use strict';
+  var API = (location.hostname==='127.0.0.1'||location.hostname==='localhost') ? 'http://127.0.0.1:8920' : '';
+  function esc(s){return String(s||'').replace(/[<>"&]/g,function(c){return{'<':'&lt;','>':'&gt;','"':'&quot;','&':'&amp;'}[c]});}
+  function statusBadge(s){return '<span class="status-' + esc(s) + '">' + esc(s) + '</span>';}
+  function overallBadge(o){return '<span class="overall-badge overall-' + esc(o) + '">' + esc(o) + '</span>';}
+
+  window.generate = async function(){
+    var btn = document.getElementById('genBtn');
+    var overlay = document.getElementById('loadingOverlay');
+    btn.disabled = true; btn.textContent = '⏳ 生成中...';
+    overlay.style.display = 'flex';
+    var data = {
+      year: parseInt(document.getElementById('inpYear').value) || 1990,
+      month: parseInt(document.getElementById('inpMonth').value) || 1,
+      day: parseInt(document.getElementById('inpDay').value) || 1,
+      hour: parseInt(document.getElementById('inpHour').value) || 12,
+      sex: document.getElementById('inpSex').value,
+      dayEle: document.getElementById('inpDayEle').value,
+      targetYear: parseInt(document.getElementById('inpTargetYear').value) || 2026,
+      targetMonth: parseInt(document.getElementById('inpTargetMonth').value) || 7
+    };
+    try {
+      var csrfResp = await fetch(API + '/api/csrf-token').then(function(r){return r.json();});
+      var headers = {'Content-Type':'application/json','x-csrf-token': csrfResp.csrfToken};
+      if (API) headers['Origin'] = 'http://127.0.0.1:8914';
+      var resp = await fetch(API + '/api/ai/lifeflow-report', {
+        method: 'POST', headers: headers, body: JSON.stringify(data)
+      });
+      var result = await resp.json();
+      if (!result.ok && result.data) result = {ok: true, data: result};
+      if (!result.ok) throw new Error(result.message || 'API error');
+      var r = result.data;
+      var html = '';
+      html += '<div class="result-card">';
+      html += '<h2>🔮 综合判定' + overallBadge(r.overall) + '</h2>';
+      html += '<div class="score-bar"><div class="score-fill" style="width:' + r.tripleScore + '%"></div><div class="score-label">' + r.tripleScore + ' / 100</div></div>';
+      html += '<p style="font-size:.85rem;opacity:.7">' + esc(r.title) + ' · 日主 ' + esc(r.userEle) + '命 <span class="kb-badge">KB 命中 ' + r.kbHits + ' 条</span></p>';
+      html += '<div class="lucky">🎯 趋吉方位：' + esc(r.luckyMap) + '</div>';
+      html += '</div>';
+
+      // 三运详情
+      html += '<div class="result-card">';
+      html += '<h2>🌊 三维度详情</h2>';
+      html += '<div class="triple-grid">';
+      html += '<div class="triple-card"><div class="label">🌙 流月</div><div class="value">' + esc(r.currentMonth.name) + ' · ' + esc(r.currentMonth.element) + '</div><div class="status">' + statusBadge(r.currentMonth.status) + ' ' + r.currentMonth.score + '分</div></div>';
+      html += '<div class="triple-card"><div class="label">📅 流年</div><div class="value">' + esc(r.currentLiunian.ganzhi) + ' · ' + esc(r.currentLiunian.element) + '</div><div class="status">' + statusBadge(r.currentLiunian.status) + ' ' + r.currentLiunian.score + '分</div></div>';
+      html += '<div class="triple-card"><div class="label">🚀 大运</div><div class="value">' + esc(r.currentDayun.ganzhi) + ' · ' + esc(r.currentDayun.element) + '</div><div class="status">' + statusBadge(r.currentDayun.status) + ' ' + r.currentDayun.score + '分</div></div>';
+      html += '</div>';
+      html += '<div style="font-size:.7rem;opacity:.5;margin-top:4px">加权：流月40% + 流年30% + 大运30%</div>';
+      html += '</div>';
+
+      // 四维度评分
+      html += '<div class="result-card">';
+      html += '<h2>📊 四维度评分</h2>';
+      html += '<div class="dim-grid">';
+      ['career','wealth','love','health'].forEach(function(d){
+        var label = {career:'事业',wealth:'财运',love:'感情',health:'健康'}[d];
+        html += '<div class="dim-cell"><div class="dim-label">' + label + '</div><div class="dim-value">' + r.dims[d] + '</div></div>';
+      });
+      html += '</div>';
+      html += '</div>';
+
+      // 行动指引
+      html += '<div class="result-card">';
+      html += '<h2>💡 行动指引</h2>';
+      html += '<ol class="advice-list">';
+      (r.advices || []).forEach(function(a){ html += '<li>' + esc(a) + '</li>'; });
+      html += '</ol>';
+      html += '</div>';
+
+      // 明年预览
+      html += '<div class="next-year">';
+      html += '<h4>📅 明年预览 (' + (r.targetYear + 1) + '年 ' + esc(r.nextYearPreview.ganzhi) + ' ' + esc(r.nextYearPreview.element) + ')</h4>';
+      html += statusBadge(r.nextYearPreview.status) + ' ' + r.nextYearPreview.score + '分 · ' + esc(r.nextYearPreview.advice);
+      html += '</div>';
+
+      // 生成时间
+      html += '<div style="text-align:center;font-size:.7rem;opacity:.4;margin-top:14px">⏱ 生成时间：' + new Date(r.generatedAt).toLocaleString('zh-CN') + ' · R91 三维联动算法</div>';
+
+      var area = document.getElementById('resultArea');
+      area.innerHTML = html;
+      area.style.display = 'block';
+      area.scrollIntoView({behavior:'smooth'});
+    } catch(e) {
+      var errArea = document.getElementById('resultArea');
+      errArea.innerHTML = '<div class="result-card" style="border-color:var(--red);color:var(--red)">❌ ' + esc(e.message) + '<br><br><button class="btn" onclick="generateOffline()">📦 使用本地 KB 兜底</button></div>';
+      errArea.style.display = 'block';
+    } finally {
+      btn.disabled = false; btn.textContent = '🔮 生成三维联动报告';
+      overlay.style.display = 'none';
+    }
+  };
+
+  // 离线兜底
+  window.generateOffline = function(){
+    if (typeof ReportEngine === 'undefined' || !window._MODULE_REPORTS || !window._MODULE_REPORTS.lifeflow) {
+      alert('KB 兜底未加载，请检查网络或刷新页面');
+      return;
+    }
+    var data = {
+      s0: '', s1: document.getElementById('inpDayEle').value,
+      s2: parseInt(document.getElementById('inpTargetYear').value) || 2026,
+      s3: parseInt(document.getElementById('inpTargetMonth').value) || 7,
+      s4: (parseInt(document.getElementById('inpTargetYear').value) || 2026) - (parseInt(document.getElementById('inpYear').value) || 1990)
+    };
+    var r = window._MODULE_REPORTS.lifeflow.diagnose(data);
+    var html = '<div class="result-card"><h2>📦 本地 KB 兜底</h2><div style="white-space:pre-wrap;font-size:.85rem;line-height:1.8">' + esc(r.html) + '</div></div>';
+    var area = document.getElementById('resultArea');
+    area.innerHTML = html;
+    area.style.display = 'block';
+  };
+})();
+</script>
+<script src="js/mobile-nav.js" defer></script>
+</body>
+</html>

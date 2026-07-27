@@ -715,7 +715,115 @@ window._MODULE_REPORTS = {
         nextSteps: ['每月初一查看当月走势','低谷月保守行事','旺月积极推进','关注节气转换点','定期复盘调整','结合八字大运综合判断']
       };
     }
+  },
+
+  /* ═══════════════════════════════════════════════════════
+   * R91 跨维度联动模块 — 断网 KB 兜底
+   * 流年 × 流月 × 大运 三维联动 + 40/30/30 加权评分
+   * ═══════════════════════════════════════════════════════ */
+  'lifeflow': {
+    name: '跨维度联动',
+    diagnose: function(data){
+      var s0 = (data && data.s0) || '';
+      var s1 = (data && data.s1) || '土';
+      var userEle = s1;
+      var targetYear = (data && data.s2) || new Date().getFullYear();
+      var targetMonth = (data && data.s3) || (new Date().getMonth() + 1);
+
+      // 简化大运推算：基于年龄（若有 s4=s4）
+      var age = (data && data.s4) || (targetYear - 1990);
+
+      var HEAVENLY = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
+      var EARTHLY = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
+      var ELEMENT_OF = {
+        "甲":"木","乙":"木","丙":"火","丁":"火","戊":"土","己":"土","庚":"金","辛":"金","壬":"水","癸":"水",
+        "子":"水","丑":"土","寅":"木","卯":"木","辰":"土","巳":"火","午":"火","未":"土","申":"金","酉":"金","戌":"土","亥":"水"
+      };
+
+      var tg = HEAVENLY[(((targetYear - 4) % 10 + 10) % 10)];
+      var dz = EARTHLY[(((targetYear - 4) % 12 + 12) % 12)];
+      var liunianGanZhi = tg + dz;
+      var liunianEle = ELEMENT_OF[dz] || ELEMENT_OF[tg];
+
+      var JIEQI = [
+        {m:1,name:"寅月",jie:"立春/雨水",ele:"木"},{m:2,name:"卯月",jie:"惊蛰/春分",ele:"木"},
+        {m:3,name:"辰月",jie:"清明/谷雨",ele:"土"},{m:4,name:"巳月",jie:"立夏/小满",ele:"火"},
+        {m:5,name:"午月",jie:"芒种/夏至",ele:"火"},{m:6,name:"未月",jie:"小暑/大暑",ele:"土"},
+        {m:7,name:"申月",jie:"立秋/处暑",ele:"金"},{m:8,name:"酉月",jie:"白露/秋分",ele:"金"},
+        {m:9,name:"戌月",jie:"寒露/霜降",ele:"土"},{m:10,name:"亥月",jie:"立冬/小雪",ele:"水"},
+        {m:11,name:"子月",jie:"大雪/冬至",ele:"水"},{m:12,name:"丑月",jie:"小寒/大寒",ele:"土"}
+      ];
+      var liuyue = JIEQI[targetMonth - 1] || JIEQI[0];
+
+      // 大运干支（粗略：按年龄推算 10 步运）
+      var DAYUN_GANZHI = ["甲寅","乙卯","丙辰","丁巳","戊午","己未","庚申","辛酉","壬戌","癸亥"];
+      var stepIdx = Math.floor(age / 10);
+      var dayunGanZhi = DAYUN_GANZHI[stepIdx % 10] || "未知";
+      var dayunEle = ELEMENT_OF[dayunGanZhi[1]] || ELEMENT_OF[dayunGanZhi[0]];
+
+      var SHENG = {"金":"水","水":"木","木":"火","火":"土","土":"金"};
+      var KE = {"金":"木","木":"土","土":"水","水":"火","火":"金"};
+      function eleStatus(userE, targetE) {
+        if (!userE || !targetE) return {status:"平", score:50};
+        if (userE === targetE) return {status:"旺", score:90};
+        if (SHENG[targetE] === userE) return {status:"相", score:75};
+        if (KE[targetE] === userE) return {status:"死", score:30};
+        if (KE[userE] === targetE) return {status:"囚", score:40};
+        if (SHENG[userE] === targetE) return {status:"休", score:55};
+        return {status:"平", score:50};
+      }
+      var mScore = eleStatus(userEle, liuyue.ele);
+      var yScore = eleStatus(userEle, liunianEle);
+      var dScore = eleStatus(userEle, dayunEle);
+
+      var triple = Math.round(mScore.score * 0.4 + yScore.score * 0.3 + dScore.score * 0.3);
+      var overall = triple >= 80 ? '大吉' : triple >= 65 ? '顺利' : triple >= 50 ? '平稳' : triple >= 35 ? '需谨慎' : '低谷';
+
+      var html = '━━━ ' + targetYear + '年' + targetMonth + '月 跨维度联动（断网KB兜底）━━━\n\n';
+      html += '【日主五行】' + userEle + '\n\n';
+      html += '【流月】' + liuyue.name + ' ' + liuyue.ele + ' → ' + mScore.status + '(' + mScore.score + '分)\n';
+      html += '【流年】' + liunianGanZhi + ' ' + liunianEle + ' → ' + yScore.status + '(' + yScore.score + '分)\n';
+      html += '【大运】' + dayunGanZhi + ' ' + dayunEle + ' → ' + dScore.status + '(' + dScore.score + '分)\n\n';
+      html += '━━━ 三运综合 ━━━\n';
+      html += '【综合分】' + triple + ' / 100\n';
+      html += '【判定】' + overall + '\n\n';
+      html += '━━━ 行动指引 ━━━\n';
+      if (overall === '低谷' || overall === '需谨慎') {
+        html += '① 守：本月宜静不宜动，避免重大决策\n';
+        html += '② 化：拜太岁祈福/摆喜用五行物\n';
+        html += '③ 补：食补调理/暂避锋芒\n';
+      } else if (overall === '大吉') {
+        html += '① 进：三运叠加得力，主动推进计划\n';
+        html += '② 借：贵人运旺，社交合作最佳时机\n';
+        html += '③ 聚：喜用方位/数字/颜色放大\n';
+      } else {
+        html += '① 稳：保持现状，小步推进\n';
+        html += '② 学：复盘总结，为后续发力储能\n';
+        html += '③ 调：作息/饮食/情绪三线\n';
+      }
+      html += '\n【数据来源】R91 跨维度联动 KB 兜底 · 五行旺衰算法';
+
+      return {
+        title: targetYear + '年' + targetMonth + '月 跨维度联动报告（KB兜底）',
+        summary: userEle + '命 · 流月' + mScore.status + '/流年' + yScore.status + '/大运' + dScore.status + ' → ' + overall,
+        html: html,
+        score: triple,
+        overall: overall,
+        tripleScore: triple,
+        dims: {
+          career: Math.max(20, triple + (mScore.score >= 70 ? 3 : -3)),
+          wealth: Math.max(20, triple + (yScore.score >= 70 ? 3 : -3)),
+          love: Math.max(20, triple + (dScore.score >= 70 ? 2 : -2)),
+          health: Math.max(20, triple - 10)
+        },
+        currentMonth: {name: liuyue.name, score: mScore.score, status: mScore.status, element: liuyue.ele},
+        currentLiunian: {ganzhi: liunianGanZhi, score: yScore.score, status: yScore.status, element: liunianEle},
+        currentDayun: {ganzhi: dayunGanZhi, score: dScore.score, status: dScore.status, element: dayunEle},
+        ttsText: '跨维度联动综合' + triple + '分，判定' + overall + '。',
+        nextSteps: ['每月初一查看当月走势','低谷月保守行事','旺月积极推进','关注大运交接点','结合八字原局综合判断','定期复盘调整']
+      };
+    }
   }
 };
 
-console.log('✅ _MODULE_REPORTS loaded (30 modules KB-fallback: bazi/yunshi/caiyun/ganqing/zhongyi/mobile/shiye/xingming/zeri/huangli/taisui/music/lifeindex/lifeplan/tcm-fangji/tcm-classic/tcm-zhongfu/shanghan-lun/acupuncture/shuhan/wuxing/fengshui/qimen/ziwei/liuyao/meihua/liuren/yanzhi/mingxiang/monthly)');
+console.log('✅ _MODULE_REPORTS loaded (31 modules KB-fallback: bazi/yunshi/caiyun/ganqing/zhongyi/mobile/shiye/xingming/zeri/huangli/taisui/music/lifeindex/lifeplan/tcm-fangji/tcm-classic/tcm-zhongfu/shanghan-lun/acupuncture/shuhan/wuxing/fengshui/qimen/ziwei/liuyao/meihua/liuren/yanzhi/mingxiang/monthly/lifeflow)');
