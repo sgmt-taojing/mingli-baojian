@@ -896,6 +896,162 @@ function exportSnapshot(){
   URL.revokeObjectURL(a.href);
 }
 
+// 告警历史趋势
+function renderAlertHistory(){
+  const wrap = $('alertHistoryBody');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+
+  // 收集所有周的 alert-card
+  const weekAlerts = WEEKS.map(w => ({ week: w, card: cache.weeks[w]?.['alert-card'] })).filter(x => x.card);
+
+  if (!weekAlerts.length){
+    wrap.appendChild(el('div', {className:'alert-empty'}, '暂无告警历史数据'));
+    return;
+  }
+
+  // 统计
+  const stats = { CRITICAL: 0, WARN: 0, OK: 0 };
+  weekAlerts.forEach(wa => {
+    const lv = wa.card.overall_level || 'UNKNOWN';
+    if (stats[lv] != null) stats[lv]++;
+  });
+  const totalWeeks = weekAlerts.length;
+
+  // 顶部统计条
+  const statBar = el('div', {className:'alert-hist-statbar'},
+    el('span', {className:'alert-hist-stat'}, `共 ${totalWeeks} 周`),
+    el('span', {className:'alert-hist-stat alert-critical'}, `🔴 CRITICAL ${stats.CRITICAL}`),
+    el('span', {className:'alert-hist-stat alert-warn'}, `🟡 WARN ${stats.WARN}`),
+    el('span', {className:'alert-hist-stat alert-ok'}, `🟢 OK ${stats.OK}`)
+  );
+
+  // 趋势判断
+  const firstLv = weekAlerts[0].card.overall_level || 'UNKNOWN';
+  const lastLv = weekAlerts[weekAlerts.length - 1].card.overall_level || 'UNKNOWN';
+  const lvOrder = { 'CRITICAL': 0, 'WARN': 1, 'OK': 2 };
+  const trend = (lvOrder[lastLv] ?? 1) - (lvOrder[firstLv] ?? 1);
+  const trendText = trend > 0 ? '↑ 改善' : trend < 0 ? '↓ 恶化' : '→ 持平';
+  const trendCls = trend > 0 ? 'alert-ok' : trend < 0 ? 'alert-critical' : '';
+  statBar.appendChild(el('span', {className:'alert-hist-stat ' + trendCls}, `趋势 ${trendText}（${firstLv}→${lastLv}）`));
+
+  wrap.appendChild(statBar);
+
+  // 历史趋势表
+  const table = el('table', {className:'alert-hist-table'});
+
+  // 表头
+  const thead = el('thead', {},
+    el('tr', {},
+      el('th', {}, '周'),
+      el('th', {}, '整体'),
+      el('th', {}, '合规分数'),
+      el('th', {}, '成本预算'),
+      el('th', {}, 'P95 延迟'),
+      el('th', {}, '生成时间')
+    )
+  );
+  table.appendChild(thead);
+
+  // 表体（最新周在顶部）
+  const tbody = el('tbody');
+  [...weekAlerts].reverse().forEach(wa => {
+    const card = wa.card;
+    const lv = card.overall_level || 'UNKNOWN';
+    const lvCls = lv === 'CRITICAL' ? 'alert-critical' : lv === 'WARN' ? 'alert-warn' : 'alert-ok';
+    const lvIcon = lv === 'CRITICAL' ? '🔴' : lv === 'WARN' ? '🟡' : '🟢';
+
+    const judgments = card.judgments || {};
+    function benchCell(bench){
+      const j = judgments[bench];
+      if (!j) return el('td', {className:'alert-cell-none'}, '—');
+      const jLv = j.level || 'UNKNOWN';
+      const jCls = jLv === 'CRITICAL' ? 'alert-critical' : jLv === 'WARN' ? 'alert-warn' : 'alert-ok';
+      const jIcon = jLv === 'CRITICAL' ? '🔴' : jLv === 'WARN' ? '🟡' : '🟢';
+      let val = '';
+      if (j.metric === 'avg_score') val = (j.actual || 0).toFixed(3);
+      else if (j.metric === 'avg_yuan') val = j.actual < 0.001 ? '<0.001' : (j.actual || 0).toFixed(4);
+      else if (j.metric === 'p95_ms') val = (j.actual || 0) + 'ms';
+      else val = String(j.actual ?? '--');
+      return el('td', {className:'alert-cell ' + jCls}, jIcon + ' ' + val);
+    }
+
+    const genTime = (card.generated_at || '--').replace(' CST','');
+    const tr = el('tr', {},
+      el('td', {className:'alert-cell-week'}, wa.week.replace('2026-','')),
+      el('td', {className:'alert-cell ' + lvCls}, lvIcon + ' ' + lv),
+      benchCell('faithfulness'),
+      benchCell('cost-budget'),
+      benchCell('latency'),
+      el('td', {className:'alert-cell-time'}, genTime)
+    );
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  wrap.appendChild(table);
+
+  // SVG 轨迹条带
+  const svgW = Math.max(weekAlerts.length * 80 + 40, 320);
+  const svgH = 60;
+  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('class','alert-hist-svg');
+  svg.setAttribute('viewBox',`0 0 ${svgW} ${svgH}`);
+  svg.setAttribute('width', svgW);
+  svg.setAttribute('height', svgH);
+
+  const colors = { 'CRITICAL': '#e74c3c', 'WARN': '#f39c12', 'OK': '#27ae60' };
+  const yMap = { 'CRITICAL': 15, 'WARN': 30, 'OK': 45 };
+  const stepX = (svgW - 40) / Math.max(weekAlerts.length - 1, 1);
+
+  // 背景参考线
+  [15, 30, 45].forEach(y => {
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1', 20); line.setAttribute('x2', svgW - 20);
+    line.setAttribute('y1', y); line.setAttribute('y2', y);
+    line.setAttribute('stroke', '#444'); line.setAttribute('stroke-width', '0.5');
+    line.setAttribute('stroke-dasharray', '2,3');
+    svg.appendChild(line);
+  });
+
+  // 折线
+  let pathD = '';
+  weekAlerts.forEach((wa, i) => {
+    const lv = wa.card.overall_level || 'WARN';
+    const x = 20 + i * stepX;
+    const y = yMap[lv] ?? 30;
+    pathD += (i === 0 ? 'M' : ' L') + ` ${x} ${y}`;
+  });
+  if (pathD){
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d', pathD);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', '#888');
+    path.setAttribute('stroke-width', '2');
+    svg.appendChild(path);
+  }
+
+  // 圆点 + 标签
+  weekAlerts.forEach((wa, i) => {
+    const lv = wa.card.overall_level || 'WARN';
+    const x = 20 + i * stepX;
+    const y = yMap[lv] ?? 30;
+    const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circle.setAttribute('cx', x); circle.setAttribute('cy', y); circle.setAttribute('r', 6);
+    circle.setAttribute('fill', colors[lv] || '#888');
+    svg.appendChild(circle);
+
+    const label = document.createElementNS('http://www.w3.org/2000/svg','text');
+    label.setAttribute('x', x); label.setAttribute('y', y - 12);
+    label.setAttribute('text-anchor', 'middle');
+    label.setAttribute('font-size', '9');
+    label.setAttribute('fill', '#aaa');
+    label.textContent = wa.week.replace('2026-','');
+    svg.appendChild(label);
+  });
+
+  wrap.appendChild(svg);
+}
+
 // 主入口
 async function refresh(){
   $('refreshBtn').textContent = '⏳ 加载中…';
@@ -910,6 +1066,7 @@ async function refresh(){
     renderModuleTrend();
     renderWeeklyStats();
     renderWoW();
+    renderAlertHistory();
   }finally{
     $('refreshBtn').textContent = '🔄 刷新';
     $('refreshBtn').disabled = false;
