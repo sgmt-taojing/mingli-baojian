@@ -44,14 +44,32 @@
             let k2 = el2.id.replace('section-','');
             if(!lazySections[k2]) lazySections[k2] = {el: el2, src: el2.getAttribute('data-lazy'), loaded: false};
           });
-          // 执行内联脚本（避免 script 闭合标签被 HTML parser 提前结束）
+          // 执行内联脚本 + 加载外部 script src
+          // 1. 内联脚本：用 new Function 执行
           let openTag = '<' + 'script[^>]*>';
           let closeTag = '<' + '/script>';
-          let scripts = html.match(new RegExp(openTag + '[\\s\\S]*?' + closeTag, 'g'));
-          if(scripts){
-            scripts.forEach(function(s){
-              let code = s.replace(new RegExp(openTag, ''), '').replace(new RegExp(closeTag, ''), '');
-              try{ (new Function(code))() }catch(e){console.warn('[懒加载脚本]',e)}
+          let allScripts = html.match(new RegExp(openTag + '[\\s\\S]*?' + closeTag, 'g'));
+          if(allScripts){
+            allScripts.forEach(function(s){
+              // 提取 src 属性
+              var srcMatch = s.match(/\\bsrc=["']([^"']+)["']/);
+              if(srcMatch){
+                // 外部 script — 创建 <script> 元素加载
+                var src = srcMatch[1];
+                // 相对于 base URL 修正路径
+                if(src.indexOf('http')!==0 && src.indexOf('//')!==0){
+                  // ../knowledge/xxx.js → /knowledge/xxx.js（浏览器自动规范化）
+                  // 不修改路径，让浏览器自己解析
+                }
+                var sc = document.createElement('script');
+                sc.src = src;
+                if(/\\bdefer\\b/.test(s)) sc.defer = true;
+                document.head.appendChild(sc);
+              } else {
+                // 内联脚本 — 直接执行
+                var code = s.replace(new RegExp(openTag, ''), '').replace(new RegExp(closeTag, ''), '');
+                try{ (new Function(code))() }catch(e){console.warn('[懒加载脚本]',e)}
+              }
             });
           }
         }
