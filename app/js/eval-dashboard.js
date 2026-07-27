@@ -685,6 +685,111 @@ function renderModuleTrend(){
   wrap.appendChild(table);
 }
 
+// 跨周汇总统计表
+function computeWeeklyStats(){
+  const metrics = [
+    { key: 'faith_score', label: '合规分数', bench: 'faithfulness', field: 'avg_score', fmt: v => v.toFixed(3), slo: 0.7, invert: false },
+    { key: 'faith_kb', label: 'KB 命中率', bench: 'faithfulness', field: 'kb_hit_rate', fmt: v => (v * 100).toFixed(1) + '%', slo: 0.7, invert: false },
+    { key: 'latency_p95', label: 'P95 延迟', bench: 'latency', field: 'p95_ms', fmt: v => Math.round(v) + 'ms', slo: 1500, invert: true },
+    { key: 'cost_avg', label: '平均成本', bench: 'cost-budget', field: 'cost_yuan', fmt: v => v < 0.001 ? v.toExponential(1) : v.toFixed(4) + '元', slo: 0.05, invert: true }
+  ];
+  const rows = metrics.map(m => {
+    const vals = WEEKS.map(w => {
+      const d = cache.weeks[w]?.[m.bench];
+      if (!d) return null;
+      return get(d, m.field);
+    }).filter(v => v != null);
+    if (!vals.length) return { ...m, vals: [], avg: null, min: null, max: null, trend: null };
+    const avg = vals.reduce((a,b) => a+b, 0) / vals.length;
+    const min = Math.min.apply(null, vals);
+    const max = Math.max.apply(null, vals);
+    // trend: compare last 2 vs first 2
+    let trend = '→';
+    if (vals.length >= 4){
+      const early = vals.slice(0, 2).reduce((a,b)=>a+b,0) / 2;
+      const recent = vals.slice(-2).reduce((a,b)=>a+b,0) / 2;
+      const diff = (recent - early) / Math.abs(early || 1);
+      if (m.invert){
+        if (diff < -0.05) trend = '↓';
+        else if (diff > 0.05) trend = '↑';
+      } else {
+        if (diff > 0.05) trend = '↑';
+        else if (diff < -0.05) trend = '↓';
+      }
+    } else if (vals.length >= 2){
+      const diff = (vals[vals.length-1] - vals[0]) / Math.abs(vals[0] || 1);
+      if (m.invert){
+        if (diff < -0.05) trend = '↓';
+        else if (diff > 0.05) trend = '↑';
+      } else {
+        if (diff > 0.05) trend = '↑';
+        else if (diff < -0.05) trend = '↓';
+      }
+    }
+    return { ...m, vals, avg, min, max, trend };
+  });
+  return rows;
+}
+
+function renderWeeklyStats(){
+  const wrap = $('weeklyStatsTable');
+  if (!wrap) return;
+  const rows = computeWeeklyStats();
+  wrap.innerHTML = '';
+
+  if (!rows.length || !rows[0].vals.length){
+    wrap.appendChild(el('div', {className:'no-violations'}, '暂无数据'));
+    return;
+  }
+
+  const table = el('table', {className:'weekly-stats-table'});
+  // thead
+  const thead = el('thead', null,
+    el('tr', null,
+      el('th', {className:'ws-metric'}, '指标'),
+      ...WEEKS.map(w => el('th', {className:'ws-week'}, w.replace('2026-',''))),
+      el('th', {className:'ws-avg'}, '均值'),
+      el('th', {className:'ws-min'}, '最低'),
+      el('th', {className:'ws-max'}, '最高'),
+      el('th', {className:'ws-trend'}, '趋势')
+    )
+  );
+  table.appendChild(thead);
+
+  const tbody = el('tbody');
+  rows.forEach(r => {
+    if (!r.vals.length) return;
+    const row = el('tr', null,
+      el('td', {className:'ws-metric'}, r.label)
+    );
+    // per-week values
+    WEEKS.forEach(w => {
+      const d = cache.weeks[w]?.[r.bench];
+      const v = d ? get(d, r.field) : null;
+      if (v != null){
+        const cls = r.invert
+          ? (v <= r.slo * 0.5 ? 'ok' : v <= r.slo ? 'warn' : 'danger')
+          : (v >= r.slo * 1.2 ? 'ok' : v >= r.slo ? 'warn' : 'danger');
+        row.appendChild(el('td', {className:'ws-cell eval-' + cls}, r.fmt(v)));
+      } else {
+        row.appendChild(el('td', {className:'ws-cell eval-none'}, '—'));
+      }
+    });
+    // avg / min / max
+    row.appendChild(el('td', {className:'ws-avg'}, r.fmt(r.avg)));
+    row.appendChild(el('td', {className:'ws-min'}, r.fmt(r.min)));
+    row.appendChild(el('td', {className:'ws-max'}, r.fmt(r.max)));
+    // trend with color
+    const trendCls = r.trend === '↑' ? (r.invert ? 'trend-bad' : 'trend-good')
+                   : r.trend === '↓' ? (r.invert ? 'trend-good' : 'trend-bad')
+                   : 'trend-flat';
+    row.appendChild(el('td', {className:'ws-trend ' + trendCls}, r.trend));
+    tbody.appendChild(row);
+  });
+  table.appendChild(tbody);
+  wrap.appendChild(table);
+}
+
 // 导出当前快照
 function exportSnapshot(){
   const snap = {
@@ -713,6 +818,7 @@ async function refresh(){
     renderModules();
     renderAlertCard();
     renderModuleTrend();
+    renderWeeklyStats();
   }finally{
     $('refreshBtn').textContent = '🔄 刷新';
     $('refreshBtn').disabled = false;

@@ -690,3 +690,59 @@ html, body {
   .mod-trend-cell .cell-score { font-size: 11px; }
   .mod-trend-cell .cell-meta { display: none; }
 }
+
+/* 跨周汇总统计表 */
+.weekly-stats-wrap { overflow-x: auto; }
+.weekly-stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-top: 8px;
+}
+.weekly-stats-table th {
+  background: rgba(201,168,76,0.12);
+  color: var(--gold3);
+  padding: 6px 8px;
+  text-align: center;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.weekly-stats-table td {
+  padding: 6px 8px;
+  text-align: center;
+  border-bottom: 1px solid rgba(201,168,76,0.08);
+  white-space: nowrap;
+}
+.weekly-stats-table .ws-metric {
+  text-align: left;
+  color: var(--paper2);
+  font-weight: 600;
+}
+.weekly-stats-table .ws-week, .weekly-stats-table .ws-avg,
+.weekly-stats-table .ws-min, .weekly-stats-table .ws-max,
+.weekly-stats-table .ws-trend {
+  color: var(--gold3);
+}
+.weekly-stats-table .ws-cell { font-family: 'SF Mono', 'Menlo', monospace; font-size: 11px; }
+.weekly-stats-table .eval-ok { color: #10b981; }
+.weekly-stats-table .eval-warn { color: var(--gold); }
+.weekly-stats-table .eval-danger { color: #ef4444; }
+.weekly-stats-table .eval-none { color: var(--paper3); opacity: 0.4; }
+.weekly-stats-table .ws-trend { font-size: 14px; font-weight: bold; }
+.trend-good { color: #10b981; }
+.trend-bad { color: #ef4444; }
+.trend-flat { color: var(--paper3); }
+
+@media (max-width: 480px) {
+  .weekly-stats-table { font-size: 10px; }
+  .weekly-stats-table th, .weekly-stats-table td { padding: 4px 5px; }
+  .weekly-stats-table .ws-cell { font-size: 10px; }
+}
+@media (max-width: 360px) {
+  .weekly-stats-table { font-size: 9px; }
+  .weekly-stats-table th, .weekly-stats-table td { padding: 3px 3px; }
+  .weekly-stats-table .ws-cell { font-size: 9px; }
+  .dash-weekly-stats h2 { font-size: 14px; }
+  .weekly-stats-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
