@@ -2424,6 +2424,46 @@ window.showSection = function(name){
   window.scrollTo({top:0, behavior:'smooth'});
 };
 
+// ===== 子导航切换（占卜 / 姓名 / 风水）=====
+function showZhanbuSub(sub, btn){
+  var subs = ['yijing','meihua','qimen','liuren','ziwei','cezi'];
+  subs.forEach(function(s){
+    var el = document.getElementById('zhanbuSub-' + s);
+    if(el) el.style.display = (s === sub) ? 'block' : 'none';
+  });
+  if(btn){
+    document.querySelectorAll('#section-zhanbu .zhanbu-subtab').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+  }
+}
+function showXingmingSub(sub, btn){
+  var subs = ['rename','company','mobile','analyze'];
+  subs.forEach(function(s){
+    var el = document.getElementById('xingmingSub-' + s);
+    if(el) el.style.display = (s === sub) ? 'block' : 'none';
+  });
+  if(btn){
+    document.querySelectorAll('#section-xingming .zhanbu-subtab').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+  }
+  // 触发对应初始化
+  if(sub === 'rename' && typeof initRename === 'function') initRename();
+  if(sub === 'company' && typeof initCompany === 'function') initCompany();
+  if(sub === 'mobile' && typeof initMobile === 'function') initMobile();
+  if(sub === 'analyze' && typeof initNameAnalyze === 'function') initNameAnalyze();
+}
+function showFengshuiSub(sub, btn){
+  var subs = ['fengshui-content','luopan-content'];
+  subs.forEach(function(s){
+    var el = document.getElementById(s);
+    if(el) el.style.display = (s === sub) ? 'block' : 'none';
+  });
+  if(btn){
+    document.querySelectorAll('#section-fengshui .zhanbu-subtab, .zhanbu-subtab').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+  }
+}
+
 // ===== 更多功能菜单 =====
 function openMore(){
   const m = document.getElementById('moreMenu');
