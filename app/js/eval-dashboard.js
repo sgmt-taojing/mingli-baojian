@@ -1212,6 +1212,117 @@ function renderPerCase(){
   wrap.appendChild(table);
 }
 
+// 模块 Per-Case 评分视图
+function renderModPerCase(){
+  const wrap = $('modPercaseBody');
+  if (!wrap) return;
+
+  // 填充模块选择器
+  const sel = $('modPercaseSel');
+  if (!sel.options.length){
+    const modLabels = {
+      bazi:'八字', ziwei:'紫微', qimen:'奇门', liuyao:'六爻', liuren:'六壬',
+      meihua:'梅花', fengshui:'风水', zodiac:'生肖', tizhi:'体质',
+      tcm:'中医', wuxing:'五行', zeri:'择日', other:'其他'
+    };
+    const modOrder = ['bazi','ziwei','qimen','liuyao','liuren','meihua','fengshui','zodiac','tizhi','tcm','wuxing','zeri','other'];
+    // 收集有数据的模块
+    const availMods = new Set();
+    WEEKS.forEach(w => {
+      const f = cache.weeks[w]?.faithfulness;
+      if (f && f.results){
+        f.results.forEach(r => {
+          const mod = FAITH_MODULE_MAP[r.id] || 'other';
+          availMods.add(mod);
+        });
+      }
+    });
+    modOrder.filter(m => availMods.has(m)).forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m; opt.textContent = modLabels[m] || m;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener('change', () => renderModPerCase());
+  }
+
+  const selectedMod = sel.value || 'bazi';
+  wrap.innerHTML = '';
+
+  // 收集该模块所有周的 per-case 数据
+  const weekData = []; // [{week, results:[]}]
+  WEEKS.forEach(w => {
+    const f = cache.weeks[w]?.faithfulness;
+    if (f && f.results){
+      const modResults = f.results.filter(r => (FAITH_MODULE_MAP[r.id] || 'other') === selectedMod);
+      if (modResults.length) weekData.push({ week: w, results: modResults });
+    }
+  });
+
+  if (!weekData.length){
+    wrap.appendChild(el('div', {className:'no-violations'}, `模块「${selectedMod}」暂无 per-case 数据`));
+    return;
+  }
+
+  // 统计条
+  const allScores = weekData.flatMap(d => d.results.map(r => r.score || 0));
+  const avgScore = (allScores.reduce((a,b)=>a+b,0) / allScores.length).toFixed(3);
+  const lowCases = allScores.filter(s => s < 0.7).length;
+  const okCases = allScores.filter(s => s >= 0.85).length;
+  const warnCases = allScores.filter(s => s >= 0.7 && s < 0.85).length;
+  const totalCases = allScores.length;
+
+  const statBar = el('div', {className:'mod-percase-statbar'},
+    el('span', {className:'percase-stat'}, `模块：${selectedMod}`),
+    el('span', {className:'percase-stat'}, `共 ${totalCases} case·周`),
+    el('span', {className:'percase-stat alert-ok'}, `✅ ≥0.85：${okCases}`),
+    warnCases > 0 ? el('span', {className:'percase-stat alert-warn'}, `⚠️ 0.7-0.85：${warnCases}`) : null,
+    lowCases > 0 ? el('span', {className:'percase-stat alert-critical'}, `🔴 <0.7：${lowCases}`) : null,
+    el('span', {className:'percase-stat'}, `均值 ${avgScore}`)
+  );
+  wrap.appendChild(statBar);
+
+  // 按周分组表
+  const table = el('table', {className:'mod-percase-table'});
+  const thead = el('thead', {},
+    el('tr', {},
+      el('th', {className:'mp-th-week'}, '周'),
+      el('th', {className:'mp-th-id'}, 'Case ID'),
+      el('th', {className:'mp-th-query'}, '查询'),
+      el('th', {className:'mp-th-score'}, '评分'),
+      el('th', {className:'mp-th-level'}, '等级'),
+      el('th', {className:'mp-th-bar'}, '评分分布')
+    )
+  );
+  table.appendChild(thead);
+
+  const tbody = el('tbody');
+  weekData.forEach(d => {
+    d.results.forEach((r, i) => {
+      const score = r.score || 0;
+      const cls = score >= 0.85 ? 'ok' : score >= 0.7 ? 'warn' : 'danger';
+      const level = score >= 0.85 ? '✅ OK' : score >= 0.7 ? '⚠️ WARN' : '🔴 DANGER';
+      const barPct = Math.max(2, score * 100);
+      const query = r.query || r.note || '';
+      const queryShort = query.length > 40 ? query.slice(0, 38) + '…' : query;
+      const weekShort = d.week.replace('2026-', '');
+
+      const tr = el('tr', {className:'mp-row' + (i === 0 ? ' mp-row-first' : '')},
+        i === 0
+          ? el('td', {className:'mp-td-week', rowSpan: d.results.length}, weekShort)
+          : null,
+        el('td', {className:'mp-td-id'}, r.id || '--'),
+        el('td', {className:'mp-td-query', title: query}, queryShort),
+        el('td', {className:'mp-td-score eval-' + cls}, score.toFixed(3)),
+        el('td', {className:'mp-td-level eval-' + cls}, level),
+        el('td', {className:'mp-td-bar'}, el('div', {className:'mp-score-bar eval-' + cls, style:`width:${barPct}%`}))
+      );
+      tbody.appendChild(tr);
+    });
+  });
+  table.appendChild(tbody);
+  wrap.appendChild(table);
+}
+
 // 主入口
 async function refresh(){
   $('refreshBtn').textContent = '⏳ 加载中…';
@@ -1228,6 +1339,7 @@ async function refresh(){
     renderWoW();
     renderAlertHistory();
     renderPerCase();
+    renderModPerCase();
   }finally{
     $('refreshBtn').textContent = '🔄 刷新';
     $('refreshBtn').disabled = false;
