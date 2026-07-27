@@ -1049,7 +1049,76 @@ function renderAlertHistory(){
     svg.appendChild(label);
   });
 
+  // 关键事件标注（等级转换点）
+  const transitions = [];
+  for (let i = 1; i < weekAlerts.length; i++){
+    const prevLv = weekAlerts[i-1].card.overall_level || 'WARN';
+    const currLv = weekAlerts[i].card.overall_level || 'WARN';
+    if (prevLv !== currLv){
+      transitions.push({
+        weekIdx: i,
+        week: weekAlerts[i].week,
+        from: prevLv,
+        to: currLv,
+        x: 20 + i * stepX,
+        y: yMap[currLv] ?? 30,
+        improved: (lvOrder[currLv] ?? 1) > (lvOrder[prevLv] ?? 1)
+      });
+    }
+  }
+
+  // 转换点：虚线竖线 + 箭头 + 标注文字
+  transitions.forEach(t => {
+    // 竖虚线
+    const vline = document.createElementNS('http://www.w3.org/2000/svg','line');
+    vline.setAttribute('x1', t.x); vline.setAttribute('x2', t.x);
+    vline.setAttribute('y1', 8); vline.setAttribute('y2', 52);
+    vline.setAttribute('stroke', t.improved ? '#27ae60' : '#e74c3c');
+    vline.setAttribute('stroke-width', '1');
+    vline.setAttribute('stroke-dasharray', '3,2');
+    vline.setAttribute('opacity', '0.6');
+    svg.appendChild(vline);
+
+    // 箭头（上→下表示改善，下→上表示恶化）
+    const arrowY = t.improved ? t.y - 10 : t.y + 10;
+    const arrow = document.createElementNS('http://www.w3.org/2000/svg','text');
+    arrow.setAttribute('x', t.x);
+    arrow.setAttribute('y', arrowY);
+    arrow.setAttribute('text-anchor', 'middle');
+    arrow.setAttribute('font-size', '10');
+    arrow.setAttribute('fill', t.improved ? '#27ae60' : '#e74c3c');
+    arrow.textContent = t.improved ? '↑' : '↓';
+    svg.appendChild(arrow);
+
+    // 转换标签
+    const tag = document.createElementNS('http://www.w3.org/2000/svg','text');
+    tag.setAttribute('x', t.x);
+    tag.setAttribute('y', 56);
+    tag.setAttribute('text-anchor', 'middle');
+    tag.setAttribute('font-size', '7');
+    tag.setAttribute('fill', t.improved ? '#27ae60' : '#e74c3c');
+    tag.textContent = `${t.from.slice(0,3)}→${t.to.slice(0,3)}`;
+    svg.appendChild(tag);
+  });
+
   wrap.appendChild(svg);
+
+  // 关键事件清单
+  if (transitions.length){
+    const eventList = el('div', {className:'alert-milestone-list'});
+    eventList.appendChild(el('div', {className:'alert-milestone-title'}, `🎯 关键事件（${transitions.length} 次等级转换）`));
+    transitions.forEach(t => {
+      const cls = t.improved ? 'alert-ok' : 'alert-critical';
+      const icon = t.improved ? '📈' : '📉';
+      const weekShort = t.week.replace('2026-','');
+      eventList.appendChild(el('div', {className:'alert-milestone-item ' + cls},
+        el('span', {className:'milestone-week'}, weekShort),
+        el('span', {className:'milestone-icon'}, icon),
+        el('span', {className:'milestone-desc'}, `${t.from} → ${t.to}`)
+      ));
+    });
+    wrap.appendChild(eventList);
+  }
 }
 
 // Per-Case 明细表

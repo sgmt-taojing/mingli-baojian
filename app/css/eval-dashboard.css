@@ -921,6 +921,39 @@ html, body {
 .lat-warn { background: #f39c12; }
 .lat-danger { background: #e74c3c; }
 
+/* R198: 关键事件标注 */
+.alert-milestone-list {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 6px;
+  border: 1px solid #333;
+}
+.alert-milestone-title {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #ccc;
+}
+.alert-milestone-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 11px;
+  border-bottom: 1px solid #222;
+}
+.alert-milestone-item:last-child { border-bottom: none; }
+.milestone-week {
+  color: var(--gold, #d4af37);
+  font-weight: 600;
+  min-width: 50px;
+}
+.milestone-icon { font-size: 14px; }
+.milestone-desc { color: #aaa; }
+.alert-milestone-item.alert-ok .milestone-desc { color: #27ae60; }
+.alert-milestone-item.alert-critical .milestone-desc { color: #e74c3c; }
+
 @media (max-width: 480px) {
   .percase-table { font-size: 10px; }
   .percase-table th, .percase-table td { padding: 4px 4px; }
@@ -936,4 +969,8 @@ html, body {
   .percase-bar-cell { width: 40px; }
   .percase-controls { gap: 4px; }
   .percase-statbar { gap: 6px; }
+  .alert-milestone-list { padding: 6px 8px; }
+  .alert-milestone-title { font-size: 11px; }
+  .alert-milestone-item { font-size: 10px; gap: 4px; }
+  .milestone-week { min-width: 40px; }
 }
