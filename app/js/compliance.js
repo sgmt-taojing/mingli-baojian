@@ -37,11 +37,11 @@ const COMPLIANCE_FORBIDDEN = [
   { rx: /穷困潦倒/g,                          label: '恐吓-穷困潦倒',     repl: '需稳扎稳打逐步积累' },
   // —— 医疗诊断替代（保留原文：需在末尾追加 "（诊断需结合现代医学）" 提示，不直接替换措辞）
   // 用户指令 2026-07-27：医疗诊断替代原文保留，仅以诊断建议点明需结合现代医学
-  { rx: /包治/g,                              label: '医疗诊断替代',      repl: '包治（诊断需结合现代医学）', keepOriginal: true },
-  { rx: /根治/g,                              label: '医疗诊断替代',      repl: '根治（诊断需结合现代医学）', keepOriginal: true },
-  { rx: /断根/g,                              label: '医疗诊断替代',      repl: '断根（诊断需结合现代医学）', keepOriginal: true },
-  { rx: /吃了(?:就|一定).{0,4}好/g,            label: '医疗诊断替代',      repl: '吃了就好（诊断需结合现代医学）', keepOriginal: true },
-  { rx: /不需要(?:看医生|就医|吃药)/g,         label: '医疗诊断替代',      repl: '不需要看医生（诊断需结合现代医学）', keepOriginal: true },
+  { rx: /包治/g,                              label: '医疗诊断替代·包治',      repl: '包治（诊断需结合现代医学）', keepOriginal: true },
+  { rx: /根治/g,                              label: '医疗诊断替代·根治',      repl: '根治（诊断需结合现代医学）', keepOriginal: true },
+  { rx: /断根/g,                              label: '医疗诊断替代·断根',      repl: '断根（诊断需结合现代医学）', keepOriginal: true },
+  { rx: /吃了(?:就|一定).{0,4}好/g,            label: '医疗诊断替代·吃了就好',      repl: '吃了就好（诊断需结合现代医学）', keepOriginal: true },
+  { rx: /不需要(?:看医生|就医|吃药)/g,         label: '医疗诊断替代·不需要就医',      repl: '不需要看医生（诊断需结合现代医学）', keepOriginal: true },
 ];
 
 // R89-P0-3: 统一免责声明（docx §合规管控库）

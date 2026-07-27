@@ -1260,14 +1260,14 @@ const COMPLIANCE_FORBIDDEN = [
   { rx: /破产/g, label: '恐吓-破产', repl: '财务上有波动起伏' },
   { rx: /穷困潦倒/g, label: '恐吓-穷困潦倒', repl: '需稳扎稳打逐步积累' },
   // —— 医疗诊断替代（保留原文 + 括号补注：诊断需结合现代医学）——
-  { rx: /包治/g, label: '医疗诊断替代', repl: '包治（诊断需结合现代医学）' },
-  { rx: /根治/g, label: '医疗诊断替代', repl: '根治（诊断需结合现代医学）' },
-  { rx: /断根/g, label: '医疗诊断替代', repl: '断根（诊断需结合现代医学）' },
-  { rx: /能治好/g, label: '医疗诊断替代', repl: '能治好（诊断需结合现代医学）' },
-  { rx: /可治愈/g, label: '医疗诊断替代', repl: '可治愈（诊断需结合现代医学）' },
-  { rx: /吃了(?:就|一定).{0,4}好/g, label: '医疗诊断替代', repl: '吃了就好（诊断需结合现代医学）' },
-  { rx: /不用吃药/g, label: '医疗诊断替代', repl: '不用吃药（诊断需结合现代医学）' },
-  { rx: /不需要(?:看医生|就医|吃药)/g, label: '医疗诊断替代', repl: '不需要看医生（诊断需结合现代医学）' },
+  { rx: /包治/g, label: '医疗诊断替代·包治', repl: '包治（诊断需结合现代医学）' },
+  { rx: /根治/g, label: '医疗诊断替代·根治', repl: '根治（诊断需结合现代医学）' },
+  { rx: /断根/g, label: '医疗诊断替代·断根', repl: '断根（诊断需结合现代医学）' },
+  { rx: /能治好/g, label: '医疗诊断替代·能治好', repl: '能治好（诊断需结合现代医学）' },
+  { rx: /可治愈/g, label: '医疗诊断替代·可治愈', repl: '可治愈（诊断需结合现代医学）' },
+  { rx: /吃了(?:就|一定).{0,4}好/g, label: '医疗诊断替代·吃了就好', repl: '吃了就好（诊断需结合现代医学）' },
+  { rx: /不用吃药/g, label: '医疗诊断替代·不用吃药', repl: '不用吃药（诊断需结合现代医学）' },
+  { rx: /不需要(?:看医生|就医|吃药)/g, label: '医疗诊断替代·不需要就医', repl: '不需要看医生（诊断需结合现代医学）' },
 ];
 const COMPLIANCE_DISCLAIMER = '⚠️ 免责声明：本报告基于传统命理学理论，仅供国学文化学习与娱乐参考，不构成医疗、理财、法律或任何专业建议。命由天定，运由己造，人生的最终走向取决于您的选择与努力。';
 const KB_SOURCE_TAGS = [
@@ -1300,9 +1300,26 @@ function _r89ToggleAudience(){
   try {
     if (typeof showToast === 'function') {
       showToast(next === 'expert' ? '🧙 已切到专家模式（禁用词不拦截）' : '👥 已切到大众模式（自动拦截禁用词）');
+    } else if (typeof toast === 'function') {
+      toast(next === 'expert' ? '🧙 已切到专家模式（禁用词不拦截）' : '👥 已切到大众模式（自动拦截禁用词）');
     }
   } catch(e) {}
 }
+// A1 修复：页面加载时读 localStorage 同步 label，避免刷新后 UI 不一致
+function _r89InitAudience(){
+  try {
+    const cur = _r89GetAudience();
+    const lbl = document.getElementById('audienceLabel');
+    if (lbl) lbl.textContent = (cur === 'expert') ? '专家' : '大众';
+    const btn = document.getElementById('audienceToggle');
+    if (btn) {
+      btn.style.background = (cur === 'expert') ? 'rgba(245,158,11,.18)' : 'rgba(124,58,237,.15)';
+      btn.style.borderColor = (cur === 'expert') ? 'rgba(245,158,11,.55)' : 'rgba(124,58,237,.4)';
+      btn.style.color = (cur === 'expert') ? '#fbbf24' : '#a78bfa';
+    }
+  } catch(e) {}
+}
+_r89InitAudience();
 function _r89ApplyCompliance(text){
   if (typeof text !== 'string') return { text: '', hits: [] };
   const audience = _r89GetAudience();  // 'public' | 'expert'
