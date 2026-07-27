@@ -274,6 +274,7 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
     <button id="graphBulkBtn" class="btn" style="font-size:.82rem;background:var(--gold-dim);color:#000;border-color:var(--gold)">📌 批量收藏选中</button>
     <button id="graphExportCheckedBtn" class="btn" style="font-size:.82rem">📤 导出选中 JSON</button>
     <button id="graphExportAllBtn" class="btn" style="font-size:.82rem">📋 导出全部 JSON</button>
+    <button id="graphExportCsvBtn" class="btn" style="font-size:.82rem">📤 导出节点 CSV</button>
     <span id="graphFilterCount" class="chip green" style="font-size:.78rem"></span>
   </div>
   <div id="graphContainer" class="loading">加载关系图...</div>
@@ -863,6 +864,36 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
       const ts = new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
       exportNodesAsJSON(filtered, `kb-graph-all-${filtered.length}-${ts}.json`);
     });
+
+    // R152 导出节点清单 CSV（按当前过滤）
+    document.getElementById('graphExportCsvBtn')?.addEventListener('click', () => {
+      const q = (graphSearch?.value || '').trim().toLowerCase();
+      const lvl = graphLevel?.value || '';
+      const filtered = gNodes.filter(n => {
+        const matchQ = !q || (n.id||'').toLowerCase().includes(q) || (n.name||'').toLowerCase().includes(q);
+        const matchL = !lvl || (n.level||'public') === lvl;
+        return matchQ && matchL;
+      });
+      if(filtered.length === 0){
+        if(window._toast) window._toast('⚠️ 当前过滤无节点', 1500);
+        return;
+      }
+      const esc = v => {
+        if(v===null||v===undefined) return '';
+        const s2 = String(v);
+        return /[",\n]/.test(s2) ? '"' + s2.replace(/"/g,'""') + '"' : s2;
+      };
+      const headers = ['id','name','level','size_kb','hit_count','xref_count'];
+      const rows = filtered.map(n => [n.id, n.name, n.level||'public', (n.size_kb||0).toFixed(1), n.hit_count||0, n.xref_count||0]);
+      const csv = '\ufeff' + headers.join(',') + '\n' + rows.map(r => r.map(esc).join(',')).join('\n');
+      const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `kb-graph-nodes-${filtered.length}-${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(a); a.click();
+      setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+      if(window._toast) window._toast(`📤 已导出 ${filtered.length} 个节点 CSV`, 1500);
+    });
   }
 
 
@@ -1370,7 +1401,7 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
           <option value="">🏷️ 全部标签</option>
           ${allTags.map(t => `<option value="${t}" ${tagFilter===t?'selected':''}>${t}</option>`).join('')}
         </select>
-        <span id="favCountSpan" style="color:var(--paper3);font-size:.85rem">${filtered.length}/${arr.length}</span>
+        <span id="favCountSpan" style="color:var(--paper3);font-size:.85rem">${filtered.length}/${arr.length}</span><span id="favHitCount" style="font-size:.78rem;color:var(--gold);margin-left:6px"></span>
         <button class="btn danger" id="favBulkRemoveBtn" style="font-size:.82rem">🗑 批量取消选中</button>
       </div>
       <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
@@ -1467,10 +1498,23 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
       });
     }
 
+    // R151 收藏搜索命中计数
+    if(searchQ && typeof window.updateFavHitCount === 'function') window.updateFavHitCount();
     if(sq) sq.oninput = (e) => { window._favSearchQ = e.target.value; renderFavs(); };
     const tf = document.getElementById('favTagFilter');
     if(tf) tf.onchange = (e) => { window._favTagFilter = e.target.value; renderFavs(); };
   }
+
+  // R151 收藏搜索命中计数（统计所有 mark 元素 + 命中卡片数）
+  window.updateFavHitCount = function(){
+    const marks = document.querySelectorAll('#favsContainer mark');
+    const cards = document.querySelectorAll('#favsContainer .card');
+    let hitCards = 0;
+    cards.forEach(c => { if(c.querySelector('mark')) hitCards++; });
+    const el = document.getElementById('favHitCount');
+    if(el) el.textContent = marks.length > 0 ? `共 ${marks.length} 处命中 / ${hitCards} 卡片` : '';
+  };
+
   window.updateFavSelectedInfo = function(){
     const checks = document.querySelectorAll('.fav-row-check:checked');
     const info = document.getElementById('favSelectedInfo');
