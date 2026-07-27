@@ -823,7 +823,79 @@ window._MODULE_REPORTS = {
         nextSteps: ['每月初一查看当月走势','低谷月保守行事','旺月积极推进','关注大运交接点','结合八字原局综合判断','定期复盘调整']
       };
     }
+  },
+
+  /* ═══════════════════════════════════════════════════════════════
+     * R94 终身三维滚动预览 — 断网 KB 兜底
+     * 多年(默认10年) × 12月 = 120月走势 + 黄金5年/谨慎5年/大运交接
+     * ═══════════════════════════════════════════════════════════════ */
+  'lifeflowTimeline': {
+    name: '终身三维滚动',
+    diagnose: function(data){
+      var userEle = (data && data.s1) || '土';
+      var startYear = (data && data.s2) || new Date().getFullYear();
+      var N = (data && data.s3) || 10;
+      var age = (data && data.s4) || 0;
+      var HEAVENLY = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
+      var EARTHLY = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
+      var ELEMENT_OF = {"甲":"木","乙":"木","丙":"火","丁":"火","戊":"土","己":"土","庚":"金","辛":"金","壬":"水","癸":"水","子":"水","丑":"土","寅":"木","卯":"木","辰":"土","巳":"火","午":"火","未":"土","申":"金","酉":"金","戌":"土","亥":"水"};
+      var SHENG = {"金":"水","水":"木","木":"火","火":"土","土":"金"};
+      var KE = {"金":"木","木":"土","土":"水","水":"火","火":"金"};
+      var JIEQI = [{"m":1,"name":"寅月","ele":"木"},{"m":2,"name":"卯月","ele":"木"},{"m":3,"name":"辰月","ele":"土"},{"m":4,"name":"巳月","ele":"火"},{"m":5,"name":"午月","ele":"火"},{"m":6,"name":"未月","ele":"土"},{"m":7,"name":"申月","ele":"金"},{"m":8,"name":"酉月","ele":"金"},{"m":9,"name":"戌月","ele":"土"},{"m":10,"name":"亥月","ele":"水"},{"m":11,"name":"子月","ele":"水"},{"m":12,"name":"丑月","ele":"土"}];
+      function eleStatus(ue, te){ if(ue===te)return{status:"旺",score:90}; if(SHENG[te]===ue)return{status:"相",score:75}; if(KE[te]===ue)return{status:"死",score:30}; if(KE[ue]===te)return{status:"囚",score:40}; if(SHENG[ue]===te)return{status:"休",score:55}; return{status:"平",score:50}; }
+      function overallOf(s){return s>=80?"大吉":s>=65?"顺利":s>=50?"平稳":s>=35?"需谨慎":"低谷";}
+      // 大运千圆衣甲/乙例
+      var DAYUN_GANZHI = ["甲寅","乙卯","丙辰","丁巳","戊午","己未","庚申","辛酉","壬戌","癸亥"];
+      var baseAge = age || 36;
+      var startStep = Math.floor(baseAge / 10);
+      var yearBreakdown = [];
+      for (var yi = 0; yi < N; yi++) {
+        var y = startYear + yi;
+        var a = baseAge + yi;
+        var stepIdx = Math.floor(a / 10);
+        var dyGZ = DAYUN_GANZHI[stepIdx % 10] || "甲寅";
+        var dyEle = ELEMENT_OF[dyGZ[1]] || ELEMENT_OF[dyGZ[0]];
+        var tg = HEAVENLY[(((y - 4) % 10 + 10) % 10)];
+        var dz = EARTHLY[(((y - 4) % 12 + 12) % 12)];
+        var lnGZ = tg + dz;
+        var lnEle = ELEMENT_OF[dz] || ELEMENT_OF[tg];
+        var sum = 0, peak = 0, peakM = 0, trough = 999, troughM = 0;
+        for (var m = 1; m <= 12; m++) {
+          var liy = JIEQI[m - 1];
+          var mS = eleStatus(userEle, liy.ele);
+          var yS = eleStatus(userEle, lnEle);
+          var dS = eleStatus(userEle, dyEle);
+          var tri = Math.round(mS.score * 0.4 + yS.score * 0.3 + dS.score * 0.3);
+          sum += tri;
+          if (tri > peak) { peak = tri; peakM = m; }
+          if (tri < trough) { trough = tri; troughM = m; }
+        }
+        var avg = Math.round(sum / 12);
+        yearBreakdown.push({year: y, age: a, ganzhi: lnGZ, dayun: dyGZ, avg: avg, overall: overallOf(avg), peakM: peakM, peak: peak, troughM: troughM, trough: trough});
+      }
+      var top5 = yearBreakdown.slice().sort(function(a,b){return b.avg - a.avg;}).slice(0, 5);
+      var low5 = yearBreakdown.slice().sort(function(a,b){return a.avg - b.avg;}).slice(0, 5);
+      var html = '━━━ ' + startYear + ' 至 ' + (startYear + N - 1) + ' 年 终身三维滚动预览（KB兑底）━━━\n\n';
+      html += '【日主】' + userEle + '命 · 共 ' + N + ' 年 (' + (N*12) + ' 月)\n\n';
+      html += '━━━ 黄金 5 年 ━━━\n';
+      top5.forEach(function(y){ html += '① ' + y.year + ' 年 (' + y.age + ' 岁) ' + y.ganzhi + ' 大运' + y.dayun + ' → ' + y.overall + ' ' + y.avg + '分\n'; });
+      html += '\n━━━ 谨慎 5 年 ━━━\n';
+      low5.forEach(function(y){ html += '⚠️ ' + y.year + ' 年 (' + y.age + ' 岁) ' + y.ganzhi + ' 大运' + y.dayun + ' → ' + y.overall + ' ' + y.avg + '分\n'; });
+      html += '\n━━━ 详细走势 ━━━\n';
+      yearBreakdown.forEach(function(y){ html += y.year + '(' + y.age + '岁) ' + y.ganzhi + ' ' + y.overall + ' ' + y.avg + '分 | 旺月 ' + y.peakM + '月(' + y.peak + '分) 衰月 ' + y.troughM + '月(' + y.trough + '分)\n'; });
+      html += '\n【数据来源】R94 KB兑底 · 五行旺衰 ÷ 40/30/30 加权';
+      return {
+        title: startYear + ' 至 ' + (startYear + N - 1) + ' 年 终身三维滚动预览（KB兑底）',
+        summary: userEle + '命 · ' + N + '年 (' + (N*12) + '月) 三维滚动 · 黄金' + top5[0].year + '/' + top5[1].year + ' 年',
+        html: html,
+        score: top5[0].avg,
+        top5: top5, cautious: low5,
+        allYears: yearBreakdown,
+        ttsText: userEle + '命' + N + '年走势，黄金' + top5[0].year + '年，避免' + low5[0].year + '年。',
+        nextSteps: ['黄金年主动出击','谨慎年宜守不宜攻','详情看全年 12 月走势','结合八字大运调整计划','定期复盘调整']
+      };
+    }
   }
 };
 
-console.log('✅ _MODULE_REPORTS loaded (31 modules KB-fallback: bazi/yunshi/caiyun/ganqing/zhongyi/mobile/shiye/xingming/zeri/huangli/taisui/music/lifeindex/lifeplan/tcm-fangji/tcm-classic/tcm-zhongfu/shanghan-lun/acupuncture/shuhan/wuxing/fengshui/qimen/ziwei/liuyao/meihua/liuren/yanzhi/mingxiang/monthly/lifeflow)');
+console.log('✅ _MODULE_REPORTS loaded (32 modules KB-fallback: bazi/yunshi/caiyun/ganqing/zhongyi/mobile/shiye/xingming/zeri/huangli/taisui/music/lifeindex/lifeplan/tcm-fangji/tcm-classic/tcm-zhongfu/shanghan-lun/acupuncture/shuhan/wuxing/fengshui/qimen/ziwei/liuyao/meihua/liuren/yanzhi/mingxiang/monthly/lifeflow/lifeflowTimeline)');

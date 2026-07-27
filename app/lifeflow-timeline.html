@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>终身三维滚动预览 · 命理宝鉴</title>
+<style>
+:root{--ink:#1a1a2e;--ink2:#22223a;--paper:#f5f0e6;--gold:#c9a84c;--gold-dim:rgba(201,168,76,.2);--red:#dc4444;--green:#10b981;--yellow:#e8a838;--blue:#3b82f6;--purple:#a855f7}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--ink);color:var(--paper);line-height:1.7;min-height:100vh;padding-bottom:60px}
+.container{max-width:1000px;margin:0 auto;padding:16px}
+h1{font-size:1.4rem;color:var(--gold);margin:16px 0 8px;text-align:center}
+h2{font-size:1.1rem;color:var(--gold);margin:20px 0 10px;border-left:3px solid var(--gold);padding-left:8px}
+h3{font-size:.95rem;color:var(--yellow);margin:12px 0 6px}
+.input-card{background:var(--ink2);border:1px solid var(--gold-dim);border-radius:8px;padding:16px;margin-bottom:16px}
+.input-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.input-row label{font-size:.85rem;color:var(--paper);min-width:80px}
+.input-row input,.input-row select{background:rgba(255,255,255,.05);border:1px solid var(--gold-dim);color:var(--paper);padding:6px 10px;border-radius:4px;font-size:.85rem;flex:1;min-width:90px}
+.btn{display:inline-block;background:linear-gradient(135deg,var(--gold),#a8862e);color:var(--ink);border:none;border-radius:6px;padding:10px 24px;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(201,168,76,.3)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.result-card{background:var(--ink2);border:1px solid var(--gold-dim);border-radius:8px;padding:16px;margin-bottom:14px}
+.heatmap-wrap{overflow-x:auto;margin:10px 0}
+table.heatmap{border-collapse:collapse;width:100%;font-size:.7rem;min-width:480px}
+table.heatmap th,table.heatmap td{padding:4px 6px;text-align:center;border:1px solid rgba(255,255,255,.05)}
+table.heatmap th{background:rgba(0,0,0,.4);color:var(--gold);font-weight:600}
+table.heatmap td.year-cell{background:rgba(0,0,0,.4);font-weight:600;color:var(--gold);white-space:nowrap}
+table.heatmap td.bad{background:rgba(220,68,68,.4);color:#fff}
+table.heatmap td.cautious{background:rgba(232,168,56,.4);color:#fff}
+table.heatmap td.fair{background:rgba(201,168,76,.3);color:#fff}
+table.heatmap td.good{background:rgba(59,130,246,.4);color:#fff}
+table.heatmap td.great{background:rgba(16,185,129,.5);color:#fff;font-weight:600}
+.legend{font-size:.75rem;display:flex;gap:12px;flex-wrap:wrap;margin:8px 0;align-items:center}
+.legend span.lc{display:inline-block;padding:2px 8px;border-radius:3px;color:#fff}
+.best-worst{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.col-card{background:rgba(255,255,255,.03);border:1px solid var(--gold-dim);border-radius:6px;padding:10px}
+.col-card h4{font-size:.85rem;margin-bottom:6px}
+.col-card.gold h4{color:#10b981}
+.col-card.bad h4{color:#dc4444}
+.year-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:.8rem;border-bottom:1px dashed rgba(201,168,76,.1)}
+.year-row:last-child{border:none}
+.year-row .score{font-weight:600;color:var(--gold)}
+.pivot-list{padding-left:20px}
+.pivot-list li{margin-bottom:6px;font-size:.85rem;border-left:2px solid var(--purple);padding-left:8px}
+.kb-badge{display:inline-block;background:rgba(201,168,76,.15);color:var(--gold);padding:2px 8px;border-radius:4px;font-size:.7rem;margin-left:6px}
+.loading-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:9999;justify-content:center;align-items:center;color:var(--gold);font-size:1rem}
+.spin{display:inline-block;width:18px;height:18px;border:2px solid var(--gold-dim);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.next-steps{padding-left:20px}
+.next-steps li{margin-bottom:5px;font-size:.85rem}
+@media (max-width:768px){.best-worst{grid-template-columns:1fr}.year-row{font-size:.7rem}}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🌐 终身三维滚动预览</h1>
+<p style="text-align:center;font-size:.8rem;opacity:.6;margin-bottom:16px">流年 × 流月 × 大运 · 默认未来10年(120个月) · 标记大运交接与运势转折</p>
+
+<div class="input-card">
+<h3>📋 输入信息</h3>
+<div class="input-row">
+  <label>出生年</label><input type="number" id="inpYear" value="1990" min="1900" max="2100">
+  <label>月</label><input type="number" id="inpMonth" value="1" min="1" max="12">
+  <label>日</label><input type="number" id="inpDay" value="1" min="1" max="31">
+</div>
+<div class="input-row">
+  <label>出生时</label><input type="number" id="inpHour" value="12" min="0" max="23">
+  <label>性别</label><select id="inpSex"><option value="male">男</option><option value="female">女</option></select>
+  <label>日主</label>
+  <select id="inpDayEle">
+    <option value="金">金</option>
+    <option value="木" selected>木</option>
+    <option value="水">水</option>
+    <option value="火">火</option>
+    <option value="土">土</option>
+  </select>
+  <label>预览</label>
+  <select id="inpYears">
+    <option value="5">5年</option>
+    <option value="10" selected>10年</option>
+    <option value="15">15年</option>
+    <option value="20">20年</option>
+  </select>
+</div>
+<button class="btn" id="genBtn" onclick="generate()" style="width:100%;margin-top:8px">🌐 生成终身三维滚动预览</button>
+</div>
+
+<div id="resultArea" style="display:none"></div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <span class="spin"></span>正在生成终身三维滚动预览...
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var API = (location.hostname==='127.0.0.1'||location.hostname==='localhost') ? 'http://127.0.0.1:8920' : '';
+  function esc(s){return String(s||'').replace(/[<>"&]/g,function(c){return {'<':'&lt;','>':'&gt;','"':'&quot;','&':'&amp;'}[c]});}
+  function scoreClass(s){if(s>=80)return'great';if(s>=65)return'good';if(s>=50)return'fair';if(s>=35)return'cautious';return'bad';}
+
+  window.generate = async function(){
+    var btn = document.getElementById('genBtn');
+    var overlay = document.getElementById('loadingOverlay');
+    btn.disabled = true; btn.textContent = '⏳ 生成中...';
+    overlay.style.display = 'flex';
+    var payload = {
+      year: parseInt(document.getElementById('inpYear').value) || 1990,
+      month: parseInt(document.getElementById('inpMonth').value) || 1,
+      day: parseInt(document.getElementById('inpDay').value) || 1,
+      hour: parseInt(document.getElementById('inpHour').value) || 12,
+      sex: document.getElementById('inpSex').value,
+      dayEle: document.getElementById('inpDayEle').value,
+      years: parseInt(document.getElementById('inpYears').value) || 10
+    };
+    try {
+      var csrfResp = await fetch(API + '/api/csrf-token').then(function(r){return r.json();});
+      var headers = {'Content-Type':'application/json','x-csrf-token': csrfResp.csrfToken};
+      if (API) headers['Origin'] = 'http://127.0.0.1:8914';
+      var resp = await fetch(API + '/api/ai/lifeflow-timeline', {
+        method: 'POST', headers: headers, body: JSON.stringify(payload)
+      });
+      var r = await resp.json();
+      if (!r.ok && r.data) r = {ok: true, data: r};
+      if (!r.ok) throw new Error(r.message || 'API error');
+      var d = r.data;
+      var html = '';
+      // 标题
+      html += '<div class="result-card">';
+      html += '<h2>📅 ' + esc(d.title) + ' <span class="kb-badge">' + (d.totalMonths || 0) + ' 月</span></h2>';
+      html += '<div class="legend">';
+      html += '<span class="lc" style="background:rgba(16,185,129,.5)">大吉 ≥80</span>';
+      html += '<span class="lc" style="background:rgba(59,130,246,.4)">顺利 65-79</span>';
+      html += '<span class="lc" style="background:rgba(201,168,76,.3)">平稳 50-64</span>';
+      html += '<span class="lc" style="background:rgba(232,168,56,.4)">需谨慎 35-49</span>';
+      html += '<span class="lc" style="background:rgba(220,68,68,.4)">低谷 &lt;35</span>';
+      html += '</div></div>';
+
+      // 热图：年 × 月
+      html += '<div class="result-card">';
+      html += '<h2>🔥 120月走势热图</h2>';
+      html += '<div class="heatmap-wrap">';
+      html += '<table class="heatmap">';
+      html += '<thead><tr><th>年份</th>';
+      for (var i = 1; i <= 12; i++) html += '<th>' + i + '月</th>';
+      html += '<th>年均</th></tr></thead><tbody>';
+      var yearGroups = {};
+      (d.timeline || []).forEach(function(m){ if(!yearGroups[m.year]) yearGroups[m.year] = []; yearGroups[m.year].push(m); });
+      Object.keys(yearGroups).sort().forEach(function(y){
+        var months = yearGroups[y];
+        var sum = 0;
+        months.forEach(function(m){sum += m.score;});
+        var avg = Math.round(sum / months.length);
+        html += '<tr>';
+        html += '<td class="year-cell">' + y + '(' + months[0].age + '岁)<br><span style="font-size:.6rem;opacity:.6">' + months[0].liunian + '·' + months[0].dayun + '</span></td>';
+        months.forEach(function(m){
+          html += '<td class="' + scoreClass(m.score) + '" title="' + m.name + ' ' + m.score + '分 ' + m.status + '">' + m.score + '</td>';
+        });
+        html += '<td class="year-cell">' + avg + '</td></tr>';
+      });
+      html += '</tbody></table></div>';
+      html += '</div>';
+
+      // 黄金/谨慎
+      html += '<div class="result-card">';
+      html += '<h2>🏆 黄金 5 年 vs ⚠️ 谨慎 5 年</h2>';
+      html += '<div class="best-worst">';
+      html += '<div class="col-card gold"><h4>🏆 黄金 5 年</h4>';
+      (d.top5Years || []).forEach(function(y){ html += '<div class="year-row"><span>' + y.year + '(' + y.age + '岁) ' + y.ganzhi + ' 大运' + y.dayun + '</span><span class="score">' + y.avgScore + '分 ' + y.overall + '</span></div>'; });
+      html += '</div>';
+      html += '<div class="col-card bad"><h4>⚠️ 谨慎 5 年</h4>';
+      (d.cautiousYears || []).forEach(function(y){ html += '<div class="year-row"><span>' + y.year + '(' + y.age + '岁) ' + y.ganzhi + ' 大运' + y.dayun + '</span><span class="score">' + y.avgScore + '分 ' + y.overall + '</span></div>'; });
+      html += '</div></div></div>';
+
+      // 大运交接 / 转折点
+      if ((d.bigPivot || []).length) {
+        html += '<div class="result-card">';
+        html += '<h2>🔄 关键转折点</h2>';
+        html += '<ul class="pivot-list">';
+        (d.bigPivot || []).forEach(function(p){
+          html += '<li><strong>' + p.year + '年 (' + p.age + '岁) · ' + esc(p.type) + '</strong>: ' + esc(p.advice || '') + '</li>';
+        });
+        html += '</ul></div>';
+      }
+
+      // 行动指引
+      html += '<div class="result-card">';
+      html += '<h2>💡 行动指引</h2>';
+      html += '<ol class="next-steps">';
+      html += '<li>黄金年主动出击（拓人脉/创业/重大决策）</li>';
+      html += '<li>谨慎年保守（守业/学习/积蓄）</li>';
+      html += '<li>大运交接年前一年开始调整心态</li>';
+      html += '<li>月级别走势看热图，每月旺月/衰月具体到月</li>';
+      html += '<li>结合生辰八字 + 大运原局综合判断</li>';
+      html += '<li>定期复盘调整（建议每半年一次）</li>';
+      html += '</ol></div>';
+      html += '<div style="text-align:center;font-size:.7rem;opacity:.4;margin-top:14px">⏱ 生成于 ' + new Date(d.generatedAt).toLocaleString('zh-CN') + ' · R94 终身三维滚动算法</div>';
+
+      var area = document.getElementById('resultArea');
+      area.innerHTML = html;
+      area.style.display = 'block';
+      area.scrollIntoView({behavior:'smooth'});
+    } catch(e) {
+      var errArea = document.getElementById('resultArea');
+      errArea.innerHTML = '<div class="result-card" style="border-color:var(--red);color:var(--red)">❌ ' + esc(e.message) + '<br><br><button class="btn" onclick="generateOffline()">📦 使用本地 KB 兜底</button></div>';
+      errArea.style.display = 'block';
+    } finally {
+      btn.disabled = false; btn.textContent = '🌐 生成终身三维滚动预览';
+      overlay.style.display = 'none';
+    }
+  };
+
+  // 离线兜底
+  window.generateOffline = function(){
+    if (!window._MODULE_REPORTS || !window._MODULE_REPORTS.lifeflowTimeline) {
+      alert('KB 兜底未加载');
+      return;
+    }
+    var data = {
+      s1: document.getElementById('inpDayEle').value,
+      s2: new Date().getFullYear(),
+      s3: parseInt(document.getElementById('inpYears').value) || 10,
+      s4: (parseInt(document.getElementById('inpYears').value) || 10) > 0 ? (new Date().getFullYear() - parseInt(document.getElementById('inpYear').value)) : 36
+    };
+    // 修正年龄计算
+    data.s4 = new Date().getFullYear() - parseInt(document.getElementById('inpYear').value);
+    var r = window._MODULE_REPORTS.lifeflowTimeline.diagnose(data);
+    var html = '<div class="result-card"><h2>📦 本地 KB 兜底（终身三维）</h2><div style="white-space:pre-wrap;font-size:.85rem;line-height:1.8">' + esc(r.html) + '</div></div>';
+    var area = document.getElementById('resultArea');
+    area.innerHTML = html;
+    area.style.display = 'block';
+  };
+})();
+</script>
+<script src="js/mobile-nav.js" defer></script>
+</body>
+</html>

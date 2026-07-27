@@ -164,6 +164,11 @@
       window.open('lifeflow-report.html', '_blank');
       return;
     }
+    // R94 lifeflowTimeline 特殊处理：跳转到终身三维滚动页
+    if (module === 'lifeflowTimeline') {
+      window.open('lifeflow-timeline.html', '_blank');
+      return;
+    }
 
     // 收集数据
     var collector = COLLECTORS[module] || collectGeneralData;
