@@ -1052,6 +1052,97 @@ function renderAlertHistory(){
   wrap.appendChild(svg);
 }
 
+// Per-Case 明细表
+function renderPerCase(){
+  const wrap = $('percaseBody');
+  if (!wrap) return;
+
+  // 填充周选择器
+  const weekSel = $('percaseWeekSel');
+  const benchSel = $('percaseBenchSel');
+  if (!weekSel.options.length){
+    WEEKS.slice().reverse().forEach(w => {
+      const opt = document.createElement('option');
+      opt.value = w; opt.textContent = w.replace('2026-','');
+      if (w === WEEKS[WEEKS.length-1]) opt.selected = true;
+      weekSel.appendChild(opt);
+    });
+    weekSel.addEventListener('change', () => renderPerCase());
+    benchSel.addEventListener('change', () => renderPerCase());
+  }
+
+  const week = weekSel.value || WEEKS[WEEKS.length-1];
+  const bench = benchSel.value || 'cost-budget';
+  const data = cache.weeks[week]?.[bench];
+
+  wrap.innerHTML = '';
+
+  if (!data || !data.results || !data.results.length){
+    wrap.appendChild(el('div', {className:'no-violations'}, `该周无 ${bench} per-case 数据`));
+    return;
+  }
+
+  const results = data.results;
+  const okCount = results.filter(r => r.ok).length;
+  const failCount = results.length - okCount;
+  const latencies = results.map(r => r.latency_ms || 0).sort((a,b) => a - b);
+  const p50 = latencies[Math.floor(latencies.length * 0.5)] || 0;
+  const p95 = latencies[Math.floor(latencies.length * 0.95)] || 0;
+  const maxLat = Math.max(...latencies, 1);
+  const avgLat = (latencies.reduce((s,v) => s + v, 0) / latencies.length).toFixed(1);
+
+  // 统计条
+  const statBar = el('div', {className:'percase-statbar'},
+    el('span', {className:'percase-stat'}, `共 ${results.length} cases`),
+    el('span', {className:'percase-stat alert-ok'}, `✅ 通过 ${okCount}`),
+    failCount > 0 ? el('span', {className:'percase-stat alert-critical'}, `❌ 失败 ${failCount}`) : null,
+    el('span', {className:'percase-stat'}, `P50 ${p50}ms`),
+    el('span', {className:'percase-stat'}, `P95 ${p95}ms`),
+    el('span', {className:'percase-stat'}, `avg ${avgLat}ms`)
+  );
+  wrap.appendChild(statBar);
+
+  // 逐 case 表
+  const table = el('table', {className:'percase-table'});
+  const thead = el('thead', {},
+    el('tr', {},
+      el('th', {}, '#'),
+      el('th', {}, 'ID'),
+      el('th', {}, '查询'),
+      el('th', {}, '延迟'),
+      el('th', {}, '状态'),
+      el('th', {}, '延迟分布'),
+    )
+  );
+  table.appendChild(thead);
+
+  const tbody = el('tbody');
+  results.forEach((r, i) => {
+    const lat = r.latency_ms || 0;
+    const latPct = Math.max(2, (lat / maxLat) * 100);
+    const latCls = lat <= p50 ? 'lat-ok' : lat <= p95 ? 'lat-warn' : 'lat-danger';
+    const okCls = r.ok ? 'alert-ok' : 'alert-critical';
+    const okIcon = r.ok ? '✅' : '❌';
+    // 截断 query 显示
+    const query = r.query || '';
+    const queryShort = query.length > 40 ? query.slice(0, 38) + '…' : query;
+
+    const bar = el('div', {className:'lat-bar ' + latCls, style:`width:${latPct}%`});
+
+    const tr = el('tr', {},
+      el('td', {className:'percase-idx'}, String(i + 1)),
+      el('td', {className:'percase-id'}, r.id || '--'),
+      el('td', {className:'percase-query', title: query}, queryShort),
+      el('td', {className:'percase-lat'}, lat + 'ms'),
+      el('td', {className:'percase-ok ' + okCls}, okIcon),
+      el('td', {className:'percase-bar-cell'}, bar)
+    );
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  wrap.appendChild(table);
+}
+
 // 主入口
 async function refresh(){
   $('refreshBtn').textContent = '⏳ 加载中…';
@@ -1067,6 +1158,7 @@ async function refresh(){
     renderWeeklyStats();
     renderWoW();
     renderAlertHistory();
+    renderPerCase();
   }finally{
     $('refreshBtn').textContent = '🔄 刷新';
     $('refreshBtn').disabled = false;

@@ -847,3 +847,93 @@ html, body {
   .alert-history-body { gap: 8px; }
   .alert-hist-svg { width: 100%; }
 }
+
+/* === Per-Case 明细表 (R197) === */
+.dash-percase {
+  background: var(--panel, #1a1a2e);
+  border: 1px solid var(--border, #333);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.dash-percase h2 { font-size: 16px; margin: 0 0 4px; color: var(--gold, #d4af37); }
+.percase-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 12px;
+  flex-wrap: wrap;
+}
+.percase-controls label { font-size: 12px; color: var(--paper3, #888); }
+.percase-controls select {
+  background: var(--bg, #0d0d1a);
+  color: var(--paper, #e0e0e0);
+  border: 1px solid var(--border, #333);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.percase-statbar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  font-size: 12px;
+}
+.percase-stat {
+  padding: 3px 10px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.06);
+  color: var(--paper2, #bbb);
+}
+.percase-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  font-family: 'SF Mono', 'Menlo', monospace;
+}
+.percase-table th {
+  text-align: left;
+  padding: 6px 8px;
+  color: var(--paper3, #888);
+  border-bottom: 1px solid var(--border, #333);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.percase-table td {
+  padding: 5px 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  color: var(--paper, #e0e0e0);
+}
+.percase-idx { color: var(--paper3, #666); width: 28px; text-align: right; }
+.percase-id { color: var(--gold, #d4af37); width: 70px; white-space: nowrap; }
+.percase-query { max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.percase-lat { width: 60px; text-align: right; white-space: nowrap; }
+.percase-ok { width: 36px; text-align: center; }
+.percase-bar-cell { width: 120px; }
+.lat-bar {
+  height: 8px;
+  border-radius: 2px;
+  min-width: 2px;
+}
+.lat-ok { background: #27ae60; }
+.lat-warn { background: #f39c12; }
+.lat-danger { background: #e74c3c; }
+
+@media (max-width: 480px) {
+  .percase-table { font-size: 10px; }
+  .percase-table th, .percase-table td { padding: 4px 4px; }
+  .percase-query { max-width: 120px; }
+  .percase-bar-cell { width: 60px; }
+  .dash-percase h2 { font-size: 14px; }
+}
+
+@media (max-width: 360px) {
+  .percase-table { font-size: 9px; }
+  .percase-table th, .percase-table td { padding: 3px 3px; }
+  .percase-query { max-width: 80px; }
+  .percase-bar-cell { width: 40px; }
+  .percase-controls { gap: 4px; }
+  .percase-statbar { gap: 6px; }
+}
