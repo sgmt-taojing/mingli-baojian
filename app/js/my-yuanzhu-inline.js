@@ -127,6 +127,19 @@ window._ttsPreview = _ttsPreview;
 
 async function renderPush(c){
   const p = _pg.push;
+  // R98 推送周期选择器
+  const cycleHtml = `
+    <div class="card">
+      <h3>⏰ 推送周期</h3>
+      <div class="cycle-tabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+        <button class="btn cycle-btn" data-cycle="daily">🌅 每日</button>
+        <button class="btn cycle-btn" data-cycle="weekly">📅 每周</button>
+        <button class="btn cycle-btn" data-cycle="monthly">🗓️ 每月</button>
+        <button class="btn cycle-btn" data-cycle="yearly">🎂 每年</button>
+      </div>
+      <div id="cycleStatus" style="font-size:11px;color:var(--paper3)"></div>
+    </div>
+  `;
   const r = await api('/api/yuanzhu/yearly-pushes?limit='+p.limit+'&offset='+p.offset);
   // 语音列表（节点 #4.13）：辅助展示可选声音 + TTS 试听
   let voicesHtml = '';
@@ -143,7 +156,8 @@ async function renderPush(c){
   } catch(e){ /* 静默兜底 */ }
 
   if(r.error){
-    c.innerHTML = `<div class="empty">${r.error}</div>` + voicesHtml;
+    c.innerHTML = cycleHtml + `<div class="empty">${r.error}</div>` + voicesHtml;
+    attachCycleHandlers(c);
     return;
   }
   const total = r.total || (r.pushes||[]).length;
@@ -152,17 +166,48 @@ async function renderPush(c){
     // 公开接口
     const pub = await api('/api/public/latest-pushes');
     if(pub && pub.pushes){
-      c.innerHTML = `<div class="card"><h3>📨 最新推送</h3>` +
+      c.innerHTML = cycleHtml + `<div class="card"><h3>📨 最新推送</h3>` +
         pub.pushes.slice(0,p.limit).map(p=>`<div class="row"><span class="label">${(p.title||'').substring(0,30)}</span><span class="val">${p.date||''}</span></div>`).join('') +
         `</div>` + voicesHtml;
+      attachCycleHandlers(c);
       return;
     }
-    c.innerHTML = `<div class="empty">暂无推送</div>` + voicesHtml;
+    c.innerHTML = cycleHtml + `<div class="empty">暂无推送</div>` + voicesHtml;
+    attachCycleHandlers(c);
     return;
   }
-  c.innerHTML = `<div class="card"><h3>📨 我的年度推送 (${total})</h3>` +
+  c.innerHTML = cycleHtml + `<div class="card"><h3>📨 我的年度推送 (${total})</h3>` +
     list.map(p=>`<div class="row"><span class="label">${(p.title||'').substring(0,30)}</span><span class="val">${(p.createdAt||'').substring(0,10)}</span></div>`).join('') +
     `</div>` + voicesHtml + _pagerHtml('push', total);
+  attachCycleHandlers(c);
+}
+
+// R98 推送周期切换
+function attachCycleHandlers(c){
+  const status = c.querySelector('#cycleStatus');
+  // 读取当前周期
+  try {
+    api('/api/yuanzhu/profile').then(r=>{
+      if(r && r.push_cycle){
+        if(status) status.textContent = '当前周期：' + {daily:'每日',weekly:'每周',monthly:'每月',yearly:'每年'}[r.push_cycle] || r.push_cycle;
+      }
+    }).catch(()=>{});
+  } catch(e){}
+  c.querySelectorAll('.cycle-btn').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const cycle = btn.getAttribute('data-cycle');
+      btn.disabled = true;
+      if(status) status.textContent = '更新中...';
+      const r = await api('/api/yuanzhu/preference', { method:'POST', body: JSON.stringify({ opt_in:true, cycle }) });
+      btn.disabled = false;
+      if(r && r.ok){
+        if(status) status.innerHTML = '✅ 已设为 ' + {daily:'每日推送',weekly:'每周推送',monthly:'每月推送',yearly:'每年推送'}[cycle];
+        if(window.toast) window.toast('推送周期已更新为：' + cycle);
+      } else {
+        if(status) status.textContent = '❌ 更新失败：' + (r && r.message || '未知错误');
+      }
+    });
+  });
 }
 
 async function renderPoints(c){
