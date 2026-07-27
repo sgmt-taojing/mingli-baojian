@@ -251,6 +251,7 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
       <option value="id">按 ID</option>
     </select>
     <button id="graphResetBtn" class="btn" style="font-size:.82rem">重置</button>
+    <button id="graphBulkBtn" class="btn" style="font-size:.82rem;background:var(--gold-dim);color:#000;border-color:var(--gold)">📌 批量收藏选中</button>
     <span id="graphFilterCount" class="chip green" style="font-size:.78rem"></span>
   </div>
   <div id="graphContainer" class="loading">加载关系图...</div>
@@ -477,12 +478,13 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
         </div>
         <h3 style="margin:16px 0 10px;color:var(--gold);font-size:1rem">📦 ${filtered.length} 个匹配节点（按 ${sortBy} 排序）</h3>
         <table class="mod-table">
-          <thead><tr><th>ID</th><th>名称</th><th>等级</th><th>大小 KB</th><th>命中</th><th>引用</th><th>操作</th></tr></thead>
+          <thead><tr><th><input type="checkbox" id="graphSelectAll" title="全选"></th><th>ID</th><th>名称</th><th>等级</th><th>大小 KB</th><th>命中</th><th>引用</th><th>操作</th></tr></thead>
           <tbody>`;
       for(const n of filtered){
         const lvl = n.level || 'public';
         const lvlChip = lvl==='premium' ? '<span class="chip">premium</span>' : lvl==='professional' ? '<span class="chip blue">professional</span>' : lvl==='admin' ? '<span class="chip red">admin</span>' : '<span class="chip green">public</span>';
         html += `<tr>
+          <td><input type="checkbox" class="graph-row-check" data-id="${n.id}" data-name="${(n.name||n.id).replace(/"/g,'&quot;')}" data-level="${lvl}"></td>
           <td><code style="font-size:.78rem">${n.id}</code></td>
           <td><b>${n.name||n.id}</b></td>
           <td>${lvlChip}</td>
@@ -522,6 +524,39 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
       if(graphLevel) graphLevel.value = '';
       if(graphSort) graphSort.value = 'xref';
       renderGraphPanel();
+    });
+
+    // R109 批量收藏 + 全选
+    document.getElementById('graphBulkBtn')?.addEventListener('click', () => {
+      const checked = document.querySelectorAll('.graph-row-check:checked');
+      if(checked.length === 0){
+        if(window.toast) window.toast('⚠️ 请先勾选节点', 1500);
+        return;
+      }
+      if(!window.KbFavorites){
+        if(window.toast) window.toast('⚠️ KbFavorites 未加载', 1500);
+        return;
+      }
+      let added = 0;
+      checked.forEach(cb => {
+        const id = cb.dataset.id;
+        const name = cb.dataset.name;
+        const level = cb.dataset.level;
+        if(!window.KbFavorites.getAll().find(f => f.id === id)){
+          window.KbFavorites.add({id, name, level, kind: 'module'});
+          added++;
+        }
+      });
+      if(window.toast) window.toast(`✅ 已添加 ${added}/${checked.length} 个到收藏`, 1800);
+      // 触发收藏页刷新
+      try{
+        if(window.KbFavorites && typeof window.KbFavorites._broadcast === 'function') window.KbFavorites._broadcast();
+      }catch(e){}
+    });
+
+    document.getElementById('graphSelectAll')?.addEventListener('change', (e) => {
+      const checked = e.target.checked;
+      document.querySelectorAll('.graph-row-check').forEach(cb => cb.checked = checked);
     });
   }
 
