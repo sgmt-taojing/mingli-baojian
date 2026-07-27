@@ -229,6 +229,10 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
         <h3>📋 基础信息</h3>
         <div id="modalBasic"></div>
       </div>
+      <div class="modal-section" id="modalStatsSection">
+        <h3>📊 邻居质量分布</h3>
+        <div id="modalStats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-top:8px"></div>
+      </div>
       <div class="modal-section">
         <h3>🕸️ 邻接子图</h3>
         <svg class="adj-svg" id="adjSvg"></svg>
@@ -754,6 +758,35 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
     }
     const svg = document.getElementById('adjSvg');
     renderAdjGraph(svg, nodeId, neighbors);
+
+    // R117 邻居质量分布统计
+    const statsEl = document.getElementById('modalStats');
+    if(statsEl){
+      const levels = {};
+      let totalSize = 0, totalHit = 0, totalXref = 0;
+      neighbors.forEach(n => {
+        const lvl = n.level || 'public';
+        levels[lvl] = (levels[lvl] || 0) + 1;
+        totalSize += n.size_kb || 0;
+        totalHit += n.hit_count || 0;
+        totalXref += n.xref_count || 0;
+      });
+      const lvlColors = { premium: 'gold', professional: 'blue', admin: 'red', public: 'green' };
+      const lvlLabels = { premium: '黄金', professional: '专业', admin: '管理', public: '公开' };
+      const lvlChips = Object.entries(levels).map(([lvl, count]) =>
+        `<div style="padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;text-align:center"><div style="font-size:.7rem;color:var(--paper3);text-transform:uppercase">${lvlLabels[lvl]||lvl}</div><div style="font-size:1.4rem;font-weight:700;color:var(--${lvlColors[lvl]||'paper2'})">${count}</div></div>`
+      ).join('');
+      statsEl.innerHTML = `
+        <div style="padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;text-align:center"><div style="font-size:.7rem;color:var(--paper3)">邻居数</div><div style="font-size:1.4rem;font-weight:700;color:var(--paper2)">${neighbors.length}</div></div>
+        ${lvlChips}
+        <div style="padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;text-align:center"><div style="font-size:.7rem;color:var(--paper3)">平均大小</div><div style="font-size:1.4rem;font-weight:700;color:var(--paper2)">${neighbors.length ? (totalSize/neighbors.length).toFixed(1) : 0}<span style="font-size:.7rem">KB</span></div></div>
+        <div style="padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;text-align:center"><div style="font-size:.7rem;color:var(--paper3)">总命中</div><div style="font-size:1.4rem;font-weight:700;color:var(--gold)">${totalHit}</div></div>
+        <div style="padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;text-align:center"><div style="font-size:.7rem;color:var(--paper3)">总引用</div><div style="font-size:1.4rem;font-weight:700;color:var(--paper2)">${totalXref}</div></div>
+      `;
+    }
+    // 0 邻居时折叠统计区
+    document.getElementById('modalStatsSection').style.display = neighbors.length ? 'block' : 'none';
+
     modal.classList.add('show');
     // 收藏按钮
     const favBtn = document.getElementById('modalFavBtn');
