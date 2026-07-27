@@ -132,6 +132,9 @@
       <div class="fav-foot">
         <button class="btn danger" id="favClearAll">清空全部</button>
         <button class="btn primary" id="favExport">📤 导出 JSON</button>
+        <button class="btn" id="favExportCSV">📊 导出 CSV</button>
+        <button class="btn" id="favImport">📥 导入</button>
+        <input type="file" id="favImportFile" accept=".json,application/json" style="display:none">
       </div>
     `;
     // 搜索绑定
@@ -158,15 +161,33 @@
       }
     };
     const ex = document.getElementById('favExport');
-    if(ex) ex.onclick = () => {
-      const blob = new Blob([JSON.stringify(getAll(), null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `kb-favorites-${new Date().toISOString().slice(0,10)}.json`;
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(url), 100);
-    };
+    if(ex) ex.onclick = () => { (window.KbFavorites.export || function(){} )(); };
+    // R132 导出 CSV
+    const csvBtn = document.getElementById('favExportCSV');
+    if(csvBtn) csvBtn.onclick = () => { (window.KbFavorites.exportCSV || function(){} )(); };
+    // R129 导入 JSON
+    const impBtn = document.getElementById('favImport');
+    const impFile = document.getElementById('favImportFile');
+    if(impBtn && impFile){
+      impBtn.onclick = () => impFile.click();
+      impFile.onchange = () => {
+        const file = impFile.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = (window.KbFavorites.import || function(){ return {ok:false,error:'no import'} })(reader.result);
+          if(result.ok){
+            alert('✅ 导入成功\n新增 ' + result.added + ' 条\n跳过 ' + result.skipped + ' 条（已存在）');
+            renderDrawer();
+            document.querySelectorAll('.kb-fav-btn').forEach(b => refreshBtn(b));
+          } else {
+            alert('❌ 导入失败: ' + (result.error || '未知错误'));
+          }
+          impFile.value = '';
+        };
+        reader.readAsText(file);
+      };
+    }
   }
 
   function refreshBtn(btn){
@@ -290,7 +311,7 @@
     toggleEntry: function(entry){
       const arr = getAll();
       const idx = arr.findIndex(f => f.id === entry.id);
-      if(idx >= 0){ arr.splice(idx,1); persist(); return false; }
+      if(idx >= 0){ arr.splice(idx,1); save(arr); return false; }
       arr.unshift({
         id: entry.id,
         name: entry.title || entry.id,
@@ -302,8 +323,40 @@
         tags: [],
         addedAt: Date.now()
       });
-      persist();
+      save(arr);
       return true;
+    },
+    // R129 导入 JSON
+    import: function(json){
+      let arr;
+      try{
+        if(typeof json === 'string') arr = JSON.parse(json);
+        else if(Array.isArray(json)) arr = json;
+        else throw new Error('JSON 不是数组');
+      }catch(e){ return { ok:false, error: e.message }; }
+      if(!Array.isArray(arr)) return { ok:false, error: 'JSON 不是数组' };
+      const cur = getAll();
+      const curIds = new Set(cur.map(f => f.id));
+      const added = [];
+      for(const it of arr){
+        if(!it || typeof it !== 'object' || !it.id) continue;
+        if(curIds.has(it.id)) continue;
+        cur.push({
+          id: it.id,
+          name: it.name || it.id,
+          level: it.level || 'public',
+          kind: it.kind || 'module',
+          tags: Array.isArray(it.tags) ? it.tags : [],
+          note: it.note || '',
+          source: it.source || '',
+          trust: typeof it.trust === 'number' ? it.trust : null,
+          ts: it.ts || it.addedAt || Date.now()
+        });
+        curIds.add(it.id);
+        added.push(it.id);
+      }
+      save(cur);
+      return { ok:true, added: added.length, skipped: arr.length - added.length };
     },
     export: function(){
       const arr = getAll();
@@ -314,6 +367,27 @@
       a.download = `kb-favorites-${new Date().toISOString().slice(0,10)}.json`;
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 100);
+    },
+    // R132 导出 CSV（Excel 兼容：BOM + UTF-8）
+    exportCSV: function(){
+      const arr = getAll();
+      if(arr.length === 0){ try{ window._toast?.('♻️ 暂无收藏可导出'); }catch{} return; }
+      const headers = ['id','name','kind','level','tags','note','added_at'];
+      const esc = v => {
+        if(v === null || v === undefined) return '';
+        const s = Array.isArray(v) ? v.join('|') : String(v);
+        return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+      };
+      const rows = arr.map(it => headers.map(h => esc(it[h])).join(','));
+      const csv = '\ufeff' + headers.join(',') + '\n' + rows.join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `kb-favorites-${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 100);
+      try{ window._toast?.(`📤 已导出 ${arr.length} 条 CSV`); }catch{}
     }
   };
 
