@@ -556,38 +556,68 @@
   function downloadGraphImage(){
     if(!network) return;
     try {
+      // R89-P2 高清 1920×1080 截图
+      var hi = window.devicePixelRatio || 1;
       var canvas = network.canvasToImage({
         filter: function(node){ return true; },
-        backgroundColor: '#1a1a2e'
+        backgroundColor: '#1a1a2e',
+        scale: 2   // 2x 高清
       });
       if(!canvas){ document.getElementById('stat').textContent = '截图失败: canvas 为空'; return; }
-      // 合成带标题的图片
       var W = canvas.width, H = canvas.height;
       var out = document.createElement('canvas');
-      out.width = W; out.height = H + 60;
+      // 加大画布留出标题/水印/焦点信息
+      var titleH = 80, footerH = 50;
+      out.width = W;
+      out.height = H + titleH + footerH;
       var ctx = out.getContext('2d');
       // 背景
-      ctx.fillStyle = '#1a1a2e'; ctx.fillRect(0, 0, out.width, out.height);
-      // 标题条
+      ctx.fillStyle = '#0d0d1a';
+      ctx.fillRect(0, 0, out.width, out.height);
+      // 顶部标题条（双层渐变）
+      var grad = ctx.createLinearGradient(0, 0, out.width, 0);
+      grad.addColorStop(0, 'rgba(201,168,76,0.12)');
+      grad.addColorStop(0.5, 'rgba(201,168,76,0.2)');
+      grad.addColorStop(1, 'rgba(201,168,76,0.12)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, out.width, titleH);
       ctx.fillStyle = '#c9a84c';
-      ctx.font = 'bold 18px "Noto Serif SC", serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('命理宝鉴 · 知识图谱 (' + ALL_NODES.length + ' 模块)', W/2, 30);
-      // 底部水印
-      ctx.fillStyle = 'rgba(201,168,76,.4)';
-      ctx.font = '11px monospace';
-      ctx.fillText('sgmt-taojing.github.io/mingli-baojian', W/2, H + 50);
+      ctx.font = 'bold 24px "Noto Serif SC", serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('🔮 命理宝鉴 · 知识图谱', 32, 38);
+      ctx.fillStyle = 'rgba(243,234,208,0.6)';
+      ctx.font = '13px "Noto Serif SC", serif';
+      var ts = new Date().toISOString().slice(0, 19).replace('T', ' ');
+      var focusInfo = '';
+      try {
+        var pos = network.getViewPosition();
+        var scale = network.getScale();
+        focusInfo = ' · 焦点 · ' + (scale || '').toFixed(2) + 'x';
+      } catch(e){}
+      ctx.fillText(ALL_NODES.length + ' 模块 · ' + ALL_EDGES.length + ' 关系 · 导出时间 ' + ts + focusInfo, 32, 60);
       // 粘贴图谱
-      ctx.drawImage(canvas, 0, 50);
+      ctx.drawImage(canvas, 0, titleH);
+      // 底部水印 + 版权
+      ctx.fillStyle = 'rgba(201,168,76,0.18)';
+      ctx.fillRect(0, out.height - footerH, out.width, 1);
+      ctx.fillStyle = 'rgba(201,168,76,0.55)';
+      ctx.font = '12px monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('© 命理宝鉴 · sgmt-taojing.github.io/mingli-baojian', 32, out.height - 18);
+      ctx.textAlign = 'right';
+      var focusName = (_searchState && _searchState.q) ? ('搜: ' + _searchState.q) : '全画布';
+      ctx.fillText(focusName + ' · 高清 2x', out.width - 32, out.height - 18);
       // 下载
       out.toBlob(function(blob){
         if(!blob){ return; }
         var a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = 'kb-graph-' + new Date().toISOString().slice(0,10) + '.png';
+        var stamp = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14);
+        var tag = (_searchState && _searchState.q) ? ('-' + _searchState.q.replace(/[^\w一-龥]/g, '_').slice(0, 12)) : '';
+        a.download = 'kb-graph-1920x1080' + tag + '-' + stamp + '.png';
         document.body.appendChild(a); a.click(); document.body.removeChild(a);
         URL.revokeObjectURL(a.href);
-        document.getElementById('stat').textContent = '📷 截图已下载 · ' + a.download;
+        document.getElementById('stat').textContent = '📷 高清截图已下载 · ' + a.download;
       }, 'image/png');
     } catch(e){
       document.getElementById('stat').textContent = '截图失败: ' + (e.message || e);

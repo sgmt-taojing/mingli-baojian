@@ -7,20 +7,34 @@
   function playChime() {
     try {
       _audioCtx = _audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-      // 五声音阶：宫商角徵羽（C D E G A）
-      var notes = [523.25, 587.33, 659.25, 783.99, 880];
+      // R89-P2 十二律：子丑寅卯辰巳午未申酉戌亥
+      // C4 起五声音阶为骨，加上五六度半音阶走完十二律
+      var notes = [
+        261.63, // 子 C 宫
+        277.18, // 丑 #C
+        293.66, // 寅 D 商
+        311.13, // 卯 #D
+        329.63, // 辰 E 角
+        349.23, // 巳 F
+        369.99, // 午 #F 徵
+        392.00, // 未 G
+        415.30, // 申 #G
+        440.00, // 酉 A 羽
+        466.16, // 戌 #A
+        493.88  // 亥 B
+      ];
       notes.forEach(function (freq, i) {
         var osc = _audioCtx.createOscillator();
         var gain = _audioCtx.createGain();
         osc.frequency.value = freq;
-        osc.type = 'sine';
-        gain.gain.setValueAtTime(0, _audioCtx.currentTime + i * 0.12);
-        gain.gain.linearRampToValueAtTime(0.15, _audioCtx.currentTime + i * 0.12 + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.001, _audioCtx.currentTime + i * 0.12 + 1.8);
+        osc.type = i % 3 === 0 ? 'sine' : (i % 2 === 0 ? 'triangle' : 'sine');
+        gain.gain.setValueAtTime(0, _audioCtx.currentTime + i * 0.18);
+        gain.gain.linearRampToValueAtTime(0.10, _audioCtx.currentTime + i * 0.18 + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.001, _audioCtx.currentTime + i * 0.18 + 2.2);
         osc.connect(gain);
         gain.connect(_audioCtx.destination);
-        osc.start(_audioCtx.currentTime + i * 0.12);
-        osc.stop(_audioCtx.currentTime + i * 0.12 + 2.0);
+        osc.start(_audioCtx.currentTime + i * 0.18);
+        osc.stop(_audioCtx.currentTime + i * 0.18 + 2.4);
       });
     } catch (e) { /* silent */ }
   }
