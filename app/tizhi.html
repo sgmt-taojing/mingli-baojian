@@ -254,5 +254,53 @@
 }
 </style>
 
+<script src="js/ui-toast.js" defer></script>
+<script src="js/tizhi-module.js" defer></script>
+<script src="js/divination-hub-extras.js" defer></script>
+<script>
+// R180: Safe fallbacks for functions in divination-core.js (not loaded standalone)
+if (typeof showSection !== 'function') {
+  window.showSection = function(name) {
+    try { window.location.href = 'divination-hub.html#' + (name||''); } catch(e) { history.back(); }
+  };
+}
+if (typeof handleTizhiUpload !== 'function') {
+  window.handleTizhiUpload = function(input) {
+    try {
+      if (input && input.files && input.files[0]) {
+        var f = input.files[0];
+        if (typeof showToast === 'function') showToast('已选择文件: ' + f.name + '（完整AI分析请在主页使用）');
+      }
+    } catch(e) { console.warn('[handleTizhiUpload]', e); }
+  };
+}
+if (typeof tzAddMetricField !== 'function') {
+  window.tzAddMetricField = function() {
+    try {
+      var c = document.getElementById('tzManualFields');
+      if (!c) return;
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:8px;margin-bottom:6px';
+      row.innerHTML = '<input type="text" placeholder="指标名(如:血糖)" style="flex:1;padding:6px 8px;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;font-family:inherit">' +
+        '<input type="text" placeholder="数值" style="width:80px;padding:6px 8px;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;font-family:inherit">' +
+        '<input type="text" placeholder="单位" style="width:60px;padding:6px 8px;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;font-family:inherit">';
+      c.appendChild(row);
+    } catch(e) { console.warn('[tzAddMetricField]', e); }
+  };
+}
+if (typeof tzAnalyzeManualMetrics !== 'function') {
+  window.tzAnalyzeManualMetrics = function() {
+    try {
+      var r = document.getElementById('tizhiResult');
+      if (r) {
+        r.classList.remove('d-none');
+        r.innerHTML = '<div style="padding:16px;background:rgba(201,168,76,0.06);border-radius:10px;border:1px solid var(--border)"><h5 style="color:var(--gold);margin-bottom:8px">📊 手动指标分析</h5><p style="font-size:13px;color:var(--paper2)">已记录您的手动输入指标。完整AI分析功能建议在主页体质辨识模块中使用。</p></div>';
+      }
+      if (typeof showToast === 'function') showToast('指标已记录');
+    } catch(e) { console.warn('[tzAnalyzeManualMetrics]', e); }
+  };
+}
+</script>
+
 </body>
 </html>
