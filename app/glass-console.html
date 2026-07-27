@@ -639,7 +639,7 @@ $('#camSnap').onclick = () => {
   const v = $('#camPreview video');
   if (!v) { toast('请先启动摄像头', 'err'); return; }
   const c = document.createElement('canvas'); c.width = v.videoWidth; c.height = v.videoHeight;
-  c.getContext('2d').drawImage(v, 0, 0);
+  var _ctx=c.getContext('2d'); if(_ctx) _ctx.drawImage(v, 0, 0);
   c.toBlob(b => {
     const fd = new FormData(); fd.append('file', b, 'snap.jpg'); fd.append('mode', State.mode);
     fetch('/api/face-ocr/recognize', { method:'POST', body: fd }).then(r=>r.json()).then(d => {
@@ -736,7 +736,7 @@ function speak(text) {
 // === 28 舌象饼图（硬编码示例） ===
 function drawTonguePie() {
   const c = $('#tongue-pie'); if (!c) return;
-  const ctx = c.getContext('2d');
+  const ctx = c.getContext('2d'); if(!ctx) return;
   const data = [
     { name:'淡白舌', v:18, c:'#f8d7da' },
     { name:'红舌', v:22, c:'#f5b5bb' },

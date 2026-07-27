@@ -216,7 +216,7 @@ function loadTongue28Quick() {
   el.innerHTML = items.join('<br>');
 }
 function loadFace36Quick() {
-  const kb = window.TCM_DIAGNOSIS_KB.face36; if (!kb) return;
+  const kb = (window.TCM_DIAGNOSIS_KB && window.TCM_DIAGNOSIS_KB.face36) || {}; if (!kb || !Object.keys(kb).length) return;
   const el = document.getElementById('face36-quick');
   const items = Object.entries(kb).filter(([cat])=>['五色','五部','五志'].includes(cat)).map(([cat,dict])=>'<strong>'+cat+':</strong> '+Object.entries(dict).map(([k,v])=>k+'→'+v).join('、'));
   el.innerHTML = items.join('<br>');
