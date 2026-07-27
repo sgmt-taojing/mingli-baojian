@@ -869,6 +869,8 @@ async function generateReport(){
       const _name = state.data.name || state.data.xingming || state.data.姓名 || '';
       if (_name) {
         window.YuanzhuProfile.captureFromState(state);
+        // R89-N · 报告生成后顶部 chip 即时显示当前缘主
+        _renderProfileChip();
       }
     }
   } catch(e) { console.warn('[r89-archive] err', e); }
@@ -3455,6 +3457,30 @@ function showHistoryDetail(r){
 
 // === 反馈 ===
 function openFeedback(){document.getElementById('feedbackPanel').style.display='block';}
+
+// R89-N · 顶部 chip 即时显示当前缘主（报告生成后自动落档触发）
+function _renderProfileChip(){
+  try {
+    const _chip = document.getElementById('profileChip');
+    if (!_chip || !window.YuanzhuProfile) return;
+    const _cur = window.YuanzhuProfile.current();
+    if (_cur && _cur.name) {
+      const _visits = _cur.visits || 1;
+      _chip.textContent = '⭐ ' + _cur.name + ' · ' + _visits + '次';
+      _chip.style.display = 'inline-flex';
+      _chip.style.alignItems = 'center';
+    } else {
+      _chip.style.display = 'none';
+      _chip.textContent = '';
+    }
+  } catch(e) { /* silent */ }
+}
+// R89-N · 页面初始化时如有当前档案也展示 chip
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _renderProfileChip);
+} else {
+  setTimeout(_renderProfileChip, 0);
+}
 
 // R89-M 缘主档案面板
 async function openProfilePanel(){
