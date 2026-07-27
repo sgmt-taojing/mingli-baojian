@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>命理宝鉴 · 全功能思维导图</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0e1a;--panel:#111827;--border:#1f2937;--text:#e5e7eb;--dim:#6b7280;
+  --gold:#d4af37;--cyan:#06b6d4;--green:#10b981;--purple:#8b5cf6;
+  --pink:#ec4899;--orange:#f59e0b;--blue:#3b82f6;--red:#ef4444;
+}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',-apple-system,sans-serif;padding:20px;overflow-x:hidden}
+h1{text-align:center;font-size:28px;background:linear-gradient(135deg,var(--gold),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
+.subtitle{text-align:center;color:var(--dim);font-size:13px;margin-bottom:24px}
+.mindmap{display:flex;flex-direction:column;align-items:center;max-width:1400px;margin:0 auto}
+
+/* 中心节点 */
+.center-node{background:linear-gradient(135deg,#1a1f3a,#2d1b4e);border:2px solid var(--gold);border-radius:50%;width:140px;height:140px;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:18px;font-weight:700;color:var(--gold);box-shadow:0 0 40px rgba(212,175,55,.3);position:relative;z-index:10;flex-shrink:0}
+.center-node .icon{font-size:32px;margin-bottom:4px}
+.center-node .en{font-size:10px;color:var(--dim);margin-top:2px}
+
+/* 连接线 */
+.connector{width:2px;height:30px;background:linear-gradient(180deg,var(--gold),var(--border));flex-shrink:0}
+
+/* 主分支容器 */
+.branches{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;width:100%;margin-top:8px}
+
+/* 主分支 */
+.branch{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:0;overflow:hidden}
+.branch-header{padding:10px 16px;font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
+.branch-body{padding:8px 0}
+
+/* 子节点 */
+.leaf{padding:6px 16px;font-size:13px;color:var(--text);display:flex;align-items:center;gap:6px;line-height:1.5;transition:background .15s}
+.leaf:hover{background:rgba(255,255,255,.03)}
+.leaf .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.leaf .desc{color:var(--dim);font-size:11px;margin-left:auto}
+
+/* 颜色变体 */
+.c-bazi{border-top:3px solid var(--red)}.c-bazi .branch-header{color:var(--red)}
+.c-zhanbu{border-top:3px solid var(--purple)}.c-zhanbu .branch-header{color:var(--purple)}
+.c-fengshui{border-top:3px solid var(--green)}.c-fengshui .branch-header{color:var(--green)}
+.c-xingming{border-top:3px solid var(--cyan)}.c-xingming .branch-header{color:var(--cyan)}
+.c-ai{border-top:3px solid var(--blue)}.c-ai .branch-header{color:var(--blue)}
+.c-kb{border-top:3px solid var(--gold)}.c-kb .branch-header{color:var(--gold)}
+.c-admin{border-top:3px solid var(--orange)}.c-admin .branch-header{color:var(--orange)}
+.c-life{border-top:3px solid var(--pink)}.c-life .branch-header{color:var(--pink)}
+
+/* 统计卡片 */
+.stats{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
+.stat{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px 16px;text-align:center;min-width:80px}
+.stat-num{font-size:20px;font-weight:700;color:var(--gold)}
+.stat-label{font-size:10px;color:var(--dim);margin-top:2px}
+
+/* 图例 */
+.legend{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;font-size:11px;color:var(--dim)}
+.legend-item{display:flex;align-items:center;gap:4px}
+.legend-dot{width:8px;height:8px;border-radius:50%}
+
+@media(max-width:1200px){.branches{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:768px){.branches{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.branches{grid-template-columns:1fr}.center-node{width:100px;height:100px;font-size:14px}}
+</style>
+</head>
+<body>
+
+<h1>☯ 命理宝鉴</h1>
+<p class="subtitle">MingLi BaoJian · 全功能思维导图 · 98 页面 · 65 模块 · 149 API · 2026-07-27</p>
+
+<div class="stats">
+  <div class="stat"><div class="stat-num">98</div><div class="stat-label">HTML 页面</div></div>
+  <div class="stat"><div class="stat-num">65</div><div class="stat-label">KB 模块</div></div>
+  <div class="stat"><div class="stat-num">149</div><div class="stat-label">API 端点</div></div>
+  <div class="stat"><div class="stat-num">71</div><div class="stat-label">知识库 JS</div></div>
+  <div class="stat"><div class="stat-num">6</div><div class="stat-label">服务端口</div></div>
+  <div class="stat"><div class="stat-num">12K+</div><div class="stat-label">KB 条目</div></div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>命理排盘</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>占卜预测</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>风水堪舆</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--cyan)"></div>姓名择日</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>AI 助手</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div>知识库</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div>管理后台</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--pink)"></div>人生规划</div>
+</div>
+
+<div class="mindmap">
+
+<div class="center-node">
+  <div class="icon">☯</div>
+  <div>命理宝鉴</div>
+  <div class="en">MingLi BaoJian</div>
+</div>
+<div class="connector"></div>
+
+<div class="branches">
+
+<!-- 命理排盘 -->
+<div class="branch c-bazi">
+  <div class="branch-header">🔮 命理排盘</div>
+  <div class="branch-body">
+    <div class="leaf"><span class="dot" style="background:var(--red)"></span>八字命盘 <span class="desc">bazi.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--red)"></span>紫微斗数 <span class="desc">zhanbu → ziwei</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--red)"></span>年柱推演 <span class="desc">jiazi</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--red)"></span>九日排盘 <span class="desc">jiuri</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--red)"></span>颜痣相术 <span class="desc">yanzhi.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--red)"></span>体质辨识 <span class="desc">tizhi.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--red)"></span>流年运势 <span class="desc">annual-fortune</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--red)"></span>八字排盘 API <span class="desc">:8911</span></div>
+  </div>
+</div>
+
+<!-- 占卜预测 -->
+<div class="branch c-zhanbu">
+  <div class="branch-header">🔮 占卜预测</div>
+  <div class="branch-body">
+    <div class="leaf"><span class="dot" style="background:var(--purple)"></span>周易易经 <span class="desc">yijing</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--purple)"></span>梅花易数 <span class="desc">meihua</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--purple)"></span>奇门遁甲 <span class="desc">qimen</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--purple)"></span>大六壬 <span class="desc">liuren</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--purple)"></span>六爻占卜 <span class="desc">liuyao</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--purple)"></span>测字问事 <span class="desc">cezi</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--purple)"></span>花甲神煞 <span class="desc">huajie</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--purple)"></span>易经 oracle <span class="desc">yijing-oracle.html</span></div>
+  </div>
+</div>
+
+<!-- 风水堪舆 -->
+<div class="branch c-fengshui">
+  <div class="branch-header">🧭 风水堪舆</div>
+  <div class="branch-body">
+    <div class="leaf"><span class="dot" style="background:var(--green)"></span>风水布局 <span class="desc">fengshui.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--green)"></span>罗盘工具 <span class="desc">luopan</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--green)"></span>太岁化解 <span class="desc">generateTaisuiFlow</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--green)"></span>儿童房布局 <span class="desc">generateKidsRoom</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--green)"></span>办公位推荐 <span class="desc">generateOfficeDesk</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--green)"></span>婚嫁择日 <span class="desc">generateMarriage</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--green)"></span>动土搬迁 <span class="desc">generateMove</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--green)"></span>门店招财 <span class="desc">generateShopFengshui</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--green)"></span>阳宅知识库 <span class="desc">YANGZHAI_KB</span></div>
+  </div>
+</div>
+
+<!-- 姓名择日 -->
+<div class="branch c-xingming">
+  <div class="branch-header">✏️ 姓名择日</div>
+  <div class="branch-body">
+    <div class="leaf"><span class="dot" style="background:var(--cyan)"></span>起名改名 <span class="desc">rename.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--cyan)"></span>公司命名 <span class="desc">company</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--cyan)"></span>手机号测 <span class="desc">mobile</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--cyan)"></span>姓名分析 <span class="desc">analyze</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--cyan)"></span>择日 API <span class="desc">/api/zeri/daily</span></div>
+  </div>
+</div>
+
+<!-- AI 助手 -->
+<div class="branch c-ai">
+  <div class="branch-header">🤖 AI 智能助手</div>
+  <div class="branch-body">
+    <div class="leaf"><span class="dot" style="background:var(--blue)"></span>AI 对话 <span class="desc">ai-assistant.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--blue)"></span>KB 优先双路径 <span class="desc">≥0.7 直答</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--blue)"></span>沉浸模式 <span class="desc">toggleImmersive</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--blue)"></span>自然语言解析 <span class="desc">parse-natural.js</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--blue)"></span>语音 TTS <span class="desc">:8912 Edge-TTS</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--blue)"></span>面相 OCR <span class="desc">:8913 face-ocr</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--blue)"></span>语音交互 <span class="desc">voice-interaction.js</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--blue)"></span>三轨 AI <span class="desc">g2claw→ZAI→Ollama</span></div>
+  </div>
+</div>
+
+<!-- 知识库 -->
+<div class="branch c-kb">
+  <div class="branch-header">📚 知识库体系</div>
+  <div class="branch-body">
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>KB 浏览中心 <span class="desc">kb-browser.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>KB 关系图谱 <span class="desc">kb-graph.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>KB 质量审计 <span class="desc">kb-quality.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>KB 覆盖率 <span class="desc">kb-coverage.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>KB 热门排行 <span class="desc">kb-hot.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>KB 对比 <span class="desc">kb-compare.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>KB 命中看板 <span class="desc">kb-hit-dashboard.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>FTS5 全文搜索 <span class="desc">/api/public/kb-search-fts</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>冷启动推荐 <span class="desc">/api/kb/cold-start</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>Swagger API 文档 <span class="desc">api-docs.html</span></div>
+  </div>
+</div>
+
+<!-- 管理后台 -->
+<div class="branch c-admin">
+  <div class="branch-header">⚙️ 管理后台</div>
+  <div class="branch-body">
+    <div class="leaf"><span class="dot" style="background:var(--orange)"></span>管理总控 <span class="desc">admin.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--orange)"></span>KB 批量管理 <span class="desc">admin-kb-batch.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--orange)"></span>KB 面板 <span class="desc">admin-kb-panel.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--orange)"></span>通知管理 <span class="desc">admin-notify.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--orange)"></span>商城管理 <span class="desc">admin-shop.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--orange)"></span>智镜控制台 <span class="desc">glass-console.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--orange)"></span>评估看板 <span class="desc">eval-dashboard.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--orange)"></span>隐私合规 <span class="desc">privacy-center.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--orange)"></span>权限 RBAC <span class="desc">rbac-middleware.js</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--orange)"></span>CSRF 保护 <span class="desc">csrf-protection.js</span></div>
+  </div>
+</div>
+
+<!-- 人生规划 -->
+<div class="branch c-life">
+  <div class="branch-header">🌟 人生规划</div>
+  <div class="branch-body">
+    <div class="leaf"><span class="dot" style="background:var(--pink)"></span>人生蓝图 <span class="desc">lifeplan-detail.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--pink)"></span>人生指数 <span class="desc">lifeindex-detail.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--pink)"></span>生命流年 <span class="desc">lifeflow-timeline.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--pink)"></span>流年报告 <span class="desc">lifeflow-report.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--pink)"></span>月运报告 <span class="desc">monthly-report.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--pink)"></span>音乐疗愈 <span class="desc">music-detail.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--pink)"></span>家庭规划 <span class="desc">family</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--pink)"></span>青年规划 <span class="desc">youth / youthplan-detail</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--pink)"></span>缘主管理 <span class="desc">my-yuanzhu.html</span></div>
+  </div>
+</div>
+
+</div><!-- branches -->
+
+<div class="connector"></div>
+
+<!-- 第二层：知识源 + 服务 + 入口 -->
+<div class="branches" style="margin-top:8px">
+
+<!-- 知识源 -->
+<div class="branch" style="border-top:3px solid var(--green)">
+  <div class="branch-header" style="color:var(--green)">📖 知识源</div>
+  <div class="branch-body">
+    <div class="leaf"><span class="dot" style="background:var(--green)"></span>倪海厦人纪天纪 <span class="desc">35GB 视频</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--green)"></span>路大师实践 <span class="desc">路氏一脉</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--green)"></span>舒晗课程 <span class="desc">密宗天纪</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--green)"></span>经典文献 <span class="desc">周易/黄帝内经</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--green)"></span>倪海厦知识库 <span class="desc">nihaisha-kb</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--green)"></span>舒晗知识库 <span class="desc">shuhan-kb</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--green)"></span>TCM 方剂库 <span class="desc">tcm-formulas</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--green)"></span>针灸穴位库 <span class="desc">acupuncture-kb</span></div>
+  </div>
+</div>
+
+<!-- 服务架构 -->
+<div class="branch" style="border-top:3px solid var(--blue)">
+  <div class="branch-header" style="color:var(--blue)">🔧 服务架构</div>
+  <div class="branch-body">
+    <div class="leaf"><span class="dot" style="background:var(--blue)"></span>静态服务 <span class="desc">:8914</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--blue)"></span>API 网关 <span class="desc">:8920 api-server-v2</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--blue)"></span>排盘 API <span class="desc">:8911 Python</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--blue)"></span>TTS 语音 <span class="desc">:8912 Edge-TTS</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--blue)"></span>面相 OCR <span class="desc">:8913 Flask+PIL</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--blue)"></span>KB API <span class="desc">:8901</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--blue)"></span>数据库 <span class="desc">yidao.db SQLite</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--blue)"></span>GitHub Pages <span class="desc">gh-pages 分支</span></div>
+  </div>
+</div>
+
+<!-- 入口渠道 -->
+<div class="branch" style="border-top:3px solid var(--purple)">
+  <div class="branch-header" style="color:var(--purple)">📱 入口渠道</div>
+  <div class="branch-body">
+    <div class="leaf"><span class="dot" style="background:var(--purple)"></span>主平台 <span class="desc">divination-hub.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--purple)"></span>微信 H5 <span class="desc">wechat-h5.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--purple)"></span>微信枢纽 <span class="desc">wechat-hub.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--purple)"></span>微信案例 <span class="desc">wechat-cases.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--purple)"></span>智镜终端 <span class="desc">glass-console</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--purple)"></span>桌面摄像头 <span class="desc">camera-capture.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--purple)"></span>移动采集 <span class="desc">mobile-capture.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--purple)"></span>GitHub Pages <span class="desc">线上部署</span></div>
+  </div>
+</div>
+
+<!-- 中医养生 -->
+<div class="branch" style="border-top:3px solid var(--red)">
+  <div class="branch-header" style="color:var(--red)">🩺 中医养生</div>
+  <div class="branch-body">
+    <div class="leaf"><span class="dot" style="background:var(--red)"></span>中医诊所 <span class="desc">tcm-clinic.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--red)"></span>诊断报告 <span class="desc">tcm-report.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--red)"></span>症状查询 <span class="desc">tcm-symptom.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--red)"></span>舌诊识别 <span class="desc">face-ocr 舌象</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--red)"></span>老中医库 <span class="desc">doctor-elder.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--red)"></span>名师讲堂 <span class="desc">master-class.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--red)"></span>疾病推演 <span class="desc">master-disease.html</span></div>
+    <div class="leaf"><span class="dot" style="background:var(--red)"></span>化解方案 <span class="desc">cure-center</span></div>
+  </div>
+</div>
+
+</div><!-- branches -->
+
+<div class="connector"></div>
+
+<!-- 第三层：KB 模块全览 -->
+<div class="branch" style="border-top:3px solid var(--gold);width:100%;max-width:1200px">
+  <div class="branch-header" style="color:var(--gold)">🗂️ 65 个知识库模块</div>
+  <div class="branch-body" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:4px 12px;padding:8px 16px">
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>八字命理</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>紫微斗数</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>奇门遁甲</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>大六壬</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>六爻占卜</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>梅花易数</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>周易易经</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>风水堪舆</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>阳宅布局</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>颜痣相术</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>生肖运势</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>花甲神煞</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>符咒法术</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>经文典籍</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>信仰神祇</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>中医方剂</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>中医诊断</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>中医名医</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>中医经典</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>中医中腑</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>伤寒论</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>针灸穴位</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>舒晗密宗</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>倪海厦全集</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>五行理论</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>音乐疗愈</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>人生指数</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>人生规划</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>流年流月</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>择日择吉</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>黄历宜忌</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>太岁方位</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>节日节气</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>口诀大全</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>命相交叉</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>名相库</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>知识补充</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>知识详情</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>知识深度</div>
+    <div class="leaf"><span class="dot" style="background:var(--gold)"></span>... 等 65 模块</div>
+  </div>
+</div>
+
+<div style="margin-top:24px;text-align:center;color:var(--dim);font-size:11px;line-height:1.8">
+  <div>🔮 8 大功能域 · 📚 65 KB 模块 · 🔧 6 服务端口 · 📱 4 入口渠道 · 🤖 3 轨 AI</div>
+  <div style="margin-top:4px">命理宝鉴 MingLi BaoJian · AutoClaw · 2026-07-27</div>
+</div>
+
+</div><!-- mindmap -->
+
+</body>
+</html>
