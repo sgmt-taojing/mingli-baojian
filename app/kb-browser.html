@@ -152,6 +152,7 @@ footer.links a{color:var(--gold);text-decoration:none;margin:0 8px}
   <div class="tab on" data-tab="modules">🗂️ 模块 <span class="badge" id="modBadge">0</span></div>
   <div class="tab" data-tab="files">📁 KB 文件 <span class="badge" id="fileBadge">0</span></div>
   <div class="tab" data-tab="hot">🔥 热门模块 <span class="badge" id="hotBadge">8</span></div>
+  <div class="tab" data-tab="graph">🕸️ 关系图 <span class="badge" id="graphBadge">61</span></div>
   <div class="tab" data-tab="search">🔍 关键词搜索</div>
 </div>
 
@@ -184,6 +185,11 @@ footer.links a{color:var(--gold);text-decoration:none;margin:0 8px}
   <div id="searchContainer">
     <div class="empty"><h3>🔍 关键词检索</h3>在上方输入关键词检索 10993 条 KB 条目，支持中文模糊匹配。</div>
   </div>
+</section>
+
+<!-- Panel: Graph -->
+<section class="panel" id="panel-graph" hidden>
+  <div id="graphContainer" class="loading">加载关系图...</div>
 </section>
 
 <footer class="links">
@@ -220,10 +226,11 @@ footer.links a{color:var(--gold);text-decoration:none;margin:0 8px}
   }
 
   // 加载数据
-  const [stats, files, quality] = await Promise.all([
+  const [stats, files, quality, graph] = await Promise.all([
     api('/api/public/kb/stats'),
     api('/api/kb/list'),
-    api('/api/kb/quality-report')
+    api('/api/kb/quality-report'),
+    api('/api/kb/graph')
   ]);
 
   // Hero
@@ -236,6 +243,7 @@ footer.links a{color:var(--gold);text-decoration:none;margin:0 8px}
   document.getElementById('heroGrade').textContent = quality?.summary?.grade || '—';
   document.getElementById('modBadge').textContent = quality?.modules?.length || 0;
   document.getElementById('fileBadge').textContent = files?.files?.length || 0;
+  document.getElementById('graphBadge').textContent = (graph?.nodes?.length || 0) + '节点';
 
   // 填充 search 模块下拉
   const sel = document.getElementById('searchModule');
@@ -326,6 +334,79 @@ footer.links a{color:var(--gold);text-decoration:none;margin:0 8px}
     }
     html += '</div>';
     hotC.innerHTML = html;
+  }
+
+  // ===== Panel: Graph =====
+  const graphC = document.getElementById('graphContainer');
+  const gNodes = graph?.nodes || [];
+  const gEdges = graph?.edges || [];
+  if(gNodes.length === 0){
+    graphC.innerHTML = '<div class="empty">暂无图谱数据</div>';
+  } else {
+    // 按 hit_count 排名、xre 排行
+    const sorted = [...gNodes].sort((a,b)=>(b.hit_count||0)-(a.hit_count||0));
+    const topHubs = sorted.slice(0,5);
+    const topXref = [...gNodes].sort((a,b)=>(b.xref_count||0)-(a.xref_count||0)).slice(0,5);
+    const levels = {};
+    gNodes.forEach(n => levels[n.level] = (levels[n.level]||0)+1);
+    const edgesByType = {};
+    gEdges.forEach(e => edgesByType[e.reason] = (edgesByType[e.reason]||0)+1);
+
+    let html = `
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+        <div class="card">
+          <h3>📊 总览</h3>
+          <div class="desc">
+            <div>🟢 节点数：<b style="color:var(--gold)">${gNodes.length}</b></div>
+            <div>🔗 边数：<b style="color:var(--gold)">${gEdges.length}</b></div>
+            <div>📚 等级分布：${Object.entries(levels).map(([k,v])=>`<span class="chip gray">${k}·${v}</span>`).join('')}</div>
+            <div>🔗 边类型：${Object.entries(edgesByType).map(([k,v])=>`<span class="chip">${k}·${v}</span>`).join('')}</div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>🔥 热门枢纽 (按 hit_count)</h3>
+          <div class="desc">${topHubs.map(n=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span><b>${n.name||n.id}</b></span><span class="chip">${n.hit_count} 命中</span></div>`).join('')}</div>
+        </div>
+        <div class="card">
+          <h3>🕸️ 关联达人 (按 xref_count)</h3>
+          <div class="desc">${topXref.map(n=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span><b>${n.name||n.id}</b></span><span class="chip blue">${n.xref_count} 引用</span></div>`).join('')}</div>
+        </div>
+      </div>
+      <h3 style="margin:16px 0 10px;color:var(--gold);font-size:1rem">📦 全部 ${gNodes.length} 个节点（按 ID 排序）</h3>
+      <table class="mod-table">
+        <thead><tr><th>ID</th><th>名称</th><th>等级</th><th>大小 KB</th><th>命中</th><th>引用</th><th>操作</th></tr></thead>
+        <tbody>`;
+    for(const n of [...gNodes].sort((a,b)=>a.id.localeCompare(b.id))){
+      const lvl = n.level || 'public';
+      const lvlChip = lvl==='premium' ? '<span class="chip">premium</span>' : lvl==='professional' ? '<span class="chip blue">professional</span>' : lvl==='admin' ? '<span class="chip red">admin</span>' : '<span class="chip green">public</span>';
+      html += `<tr>
+        <td><code style="font-size:.78rem">${n.id}</code></td>
+        <td><b>${n.name||n.id}</b></td>
+        <td>${lvlChip}</td>
+        <td>${(n.size_kb||0).toFixed(1)}</td>
+        <td>${n.hit_count||0}</td>
+        <td>${n.xref_count||0}</td>
+        <td>
+          <a class="btn" href="kb-graph.html?module=${encodeURIComponent(n.id)}">🕸️ 图谱</a>
+          <a class="btn" href="kb-quality.html?module=${encodeURIComponent(n.id)}">📊 质量</a>
+        </td>
+      </tr>`;
+    }
+    html += `</tbody></table>
+      <div style="margin-top:16px;padding:14px;background:var(--card);border-radius:10px;border:1px solid var(--border)">
+        <h3 style="color:var(--gold);margin:0 0 8px">🔗 边 (引用关系 · 前 ${Math.min(20,gEdges.length)} 条)</h3>`;
+    gEdges.slice(0,20).forEach(e => {
+      const src = gNodes.find(n=>n.id===e.source);
+      const tgt = gNodes.find(n=>n.id===e.target);
+      html += `<div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.82rem">
+        <span style="flex:1"><b>${src?.name||e.source}</b></span>
+        <span style="color:var(--gold)">→ ${e.reason||'ref'} (w=${e.weight||1})</span>
+        <span style="flex:1;text-align:right"><b>${tgt?.name||e.target}</b></span>
+      </div>`;
+    });
+    html += `</div>
+      <div style="margin-top:14px;text-align:center"><a class="btn primary" href="kb-graph.html" style="padding:8px 18px;background:var(--gold);color:#000;border-radius:8px;text-decoration:none">打开完整可视化图谱 →</a></div>`;
+    graphC.innerHTML = html;
   }
 
   // ===== Tab 切换 =====
