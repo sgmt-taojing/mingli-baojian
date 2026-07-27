@@ -297,6 +297,7 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
 </main>
 
 <script>
+function switchTab(tab){var el=document.querySelector(".tab[data-tab=\""+tab+"\"]");if(el)el.click();}
 (async function(){
   const CSRF_KEY = '_csrf_token_cache';
   async function csrf(){
@@ -1705,6 +1706,7 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
   searchInput.addEventListener('focus', () => renderHistory(searchInput.value));
   searchInput.addEventListener('input', () => renderHistory(searchInput.value));
   searchInput.addEventListener('blur', () => setTimeout(() => { searchHistoryEl.style.display = 'none'; }, 200));
+  window.doSearch = function(){ doSearch(); };
   async function doSearch(){
     const q = searchInput.value.trim();
     if(!q) return;
