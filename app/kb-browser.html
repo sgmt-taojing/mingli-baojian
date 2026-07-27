@@ -1419,7 +1419,7 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
       cont.innerHTML = `<div class="empty"><h3>暂无匹配</h3>关键词 "<b>${q}</b>" 在 ${mod||'全模块'} 中无结果</div>`;
       return;
     }
-    let html = `<div style="margin-bottom:12px;color:var(--paper3);font-size:.85rem">找到 <b style="color:var(--gold)">${results.length}</b> 条结果</div>`;
+    let html = `<div style="margin-bottom:12px;color:var(--paper3);font-size:.85rem;display:flex;align-items:center;flex-wrap:wrap;gap:8px"><span>找到 <b style="color:var(--gold)">${results.length}</b> 条结果</span><button class="btn sr-export-all" style="margin-left:auto;background:var(--gold);color:#000;border:0;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:.78rem">📦 导出全部 JSON</button></div>`;
     const escHtml = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     const hl = (text, q) => { const e = escHtml(text); if(!q) return e; const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')','gi'); return e.replace(re,'<mark style="background:rgba(201,168,76,.3);color:var(--gold);border-radius:2px">$1</mark>'); };
     for(const r of results){
@@ -1430,12 +1430,46 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
           <span class="chip">${r.module||'—'}</span>
           <span class="chip ${trust>=0.7?'green':'gray'}">trust ${trust.toFixed(2)}</span>
           ${r.hit_count?`<span>命中 ${r.hit_count}</span>`:''}
+          <button class="btn sr-copy" data-copy="${escHtml((r.title||'')+' | '+(r.module||'')+'\n'+(r.snippet||''))}" style="margin-left:auto;background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:2px 8px;border-radius:6px;cursor:pointer;font-size:.75rem">📋 复制</button>
+          <button class="btn sr-fav" data-mod="${escHtml(r.module||'')}" data-title="${escHtml(r.title||'')}" data-snippet="${escHtml(r.snippet||'')}" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:2px 8px;border-radius:6px;cursor:pointer;font-size:.75rem">⭐ 收藏</button>
+          <a class="btn" href="ai-assistant.html?preset=${encodeURIComponent(r.module||'kb-search')}" style="background:var(--gold);color:#000;padding:2px 8px;border-radius:6px;cursor:pointer;font-size:.75rem;text-decoration:none">🤖 AI</a>
         </div>
         <div class="sr-title">${hl(r.title, q)}</div>
         <div class="sr-snippet">${hl(r.snippet, q)}</div>
       </div>`;
     }
     cont.innerHTML = html;
+    // R142 复制 / 收藏按钮
+    cont.querySelectorAll('.sr-copy').forEach(btn => {
+      btn.onclick = () => {
+        const text = btn.dataset.copy || '';
+        if(navigator.clipboard) navigator.clipboard.writeText(text).then(() => window._toast?.('📋 已复制', 1000));
+        else {
+          const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); window._toast?.('📋 已复制', 1000);
+        }
+      };
+    });
+    cont.querySelectorAll('.sr-fav').forEach(btn => {
+      btn.onclick = () => {
+        const data = { id: 'sr-' + (btn.dataset.mod||'') + '-' + Date.now(), name: btn.dataset.title || '(无标题)', level: 'public', kind: 'search-result', source: 'kb-search', note: btn.dataset.snippet || '', tag: '搜索' };
+        const ok = (window.KbFavorites?.add) ? window.KbFavorites.add(data) : false;
+        if(ok || window.KbFavorites) {
+          btn.textContent = '✅ 已收藏'; btn.style.background = 'rgba(80,180,80,.3)';
+          if(window._toast) window._toast('⭐ 已加入收藏', 1000);
+        }
+      };
+    });
+    // R144 导出全部 JSON
+    const expAll = cont.querySelector('.sr-export-all');
+    if(expAll){
+      expAll.onclick = () => {
+        const blob = new Blob([JSON.stringify({q, module:mod, count:results.length, results}, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = `kb-search-${q}-${new Date().toISOString().slice(0,10)}.json`; a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+        if(window._toast) window._toast(`📦 已导出 ${results.length} 条`, 1000);
+      };
+    }
   }
   searchBtn.addEventListener('click', doSearch);
   searchInput.addEventListener('keypress', e => { if(e.key === 'Enter') doSearch(); });

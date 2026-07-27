@@ -570,6 +570,21 @@ function startModule(id){
   if(!mod)return;
   state={module:id,step:0,data:{},reporting:false};
   chat.innerHTML='';
+  // R89-M 缘主档案召回：最近一次同模块的档案 → 自动填充提示
+  try {
+    if (window.YuanzhuProfileSync) {
+      const _recents = window.YuanzhuProfileSync.listRecent(1);
+      const _last = _recents[0];
+      if (_last && _last.modules && _last.modules.includes(id)) {
+        const _chip = document.createElement('div');
+        _chip.style.cssText = 'margin:0 0 12px;padding:8px 12px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.3);border-radius:8px;font-size:12px;color:var(--gold);display:flex;align-items:center;gap:8px';
+        const _avatar = _last.gender === '女' ? '👩' : (_last.gender === '男' ? '👨' : '🧑');
+        const _when = _last.visits && _last.visits[0] ? new Date(_last.visits[0]).toLocaleDateString('zh-CN') : '上次';
+        _chip.innerHTML = '<span>' + _avatar + '</span><span><b>' + (_last.name||'缘主') + '</b> · ' + (_last.birth||'') + '</span><span style="margin-left:auto;opacity:.6;font-size:11px">' + _when + '做过「' + mod.name + '」</span>';
+        chat.appendChild(_chip);
+      }
+    }
+  } catch(e) { console.warn('[r89-recall] err', e); }
   let intro='您好！让我们开始「'+mod.name+'」分析。\n\n'+mod.steps[0].q;
   // R41-DR1 节点 7：music/lifeindex/lifeplan 三模块提示 detail 页可独立使用
   const _detailIntro = {
@@ -775,6 +790,15 @@ async function processAnswer(ans){
     }
   } catch(e) { console.warn('[r89-paipan] err', e); }
 
+  // R89-O 排盘冥想（仪式感 · 仅在慢路径排盘模块触发）
+  try {
+    if (window.Meditation && (state.module === 'bazi' || state.module === 'ziwei' || state.module === 'qimen')) {
+      await new Promise(function(res){
+        window.Meditation.start({ onComplete: res });
+      });
+    }
+  } catch(e) { console.warn('[r89-meditation] err', e); }
+
   await typing();
   await generateReport();
 }
@@ -834,6 +858,15 @@ async function generateReport(){
   // 0. 问卷 + 排盘落库（公网公开端点，失败静默）
   const _baziForSave = (state.module==='bazi' || state.module==='name' || state.module==='number' || state.module==='face') ? state.data : null;
   _saveSurvey(state.module, state.data, _baziForSave);
+
+  // R89-O 排盘冥想模式 + 仪式感（仅慢路径排盘模块）
+  var _slowModule = ['bazi','name','number','face','qimen','ziwei','liuyao','liuren','meihua','zeri','huangli','taisui','daLiuRen','xiaoLiuRen'].includes(state.module);
+  if (_slowModule && window.Meditation && !window._r89_medSkip) {
+    await new Promise(function(resolve){
+      try { window.Meditation.start({ onComplete: resolve, moduleName: state.module }); }
+      catch(e){ console.warn('[meditation]', e); resolve(); }
+    });
+  }
 
   // ③ 模块 KB 兜底（music/lifeindex/lifeplan 三大模块断网可用）
 if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
