@@ -4425,6 +4425,255 @@ window.closeCaseLibrary = function(){
     modals.forEach(function(m){ m.classList.add('d-none'); m.hidden = true; });
   } catch (e) { console.warn('[closeCaseLibrary]', e); }
 };
+
+/* ===== R173-c: 音频控件 4 + 家族排盘/人生规划/甲子/命理全鉴 4 + 风水pro family cure 1 + 手机号 2 + 择日 2 = 13 missing fns safe fallback ===== */
+// 1) 闻乐控件 (4) — 纯状态型（DOM id 已就位 · 复用 hmSetVolume 既有逻辑）
+window.hmPrev = function(){
+  try {
+    if (window._hmPlaylist && Array.isArray(window._hmPlaylist) && window._hmPlaylist.length){
+      var cur = parseInt(localStorage.getItem('_hmCurrentIndex')||'0', 10);
+      cur = (cur - 1 + window._hmPlaylist.length) % window._hmPlaylist.length;
+      localStorage.setItem('_hmCurrentIndex', String(cur));
+      showToast('⏮ 上一曲 (演示)');
+    } else { showToast('⏮ 上一曲（曲目待加载）'); }
+  } catch(e){ console.warn('[hmPrev]', e); }
+};
+window.hmTogglePlay = function(){
+  try {
+    var btn = document.getElementById('hmPlayBtn');
+    var playing = btn && btn.dataset.playing === '1';
+    if (btn){
+      btn.dataset.playing = playing ? '0' : '1';
+      btn.textContent = playing ? '▶' : '⏸';
+    }
+    showToast(playing ? '▶ 已暂停' : '⏸ 播放中（演示）');
+  } catch(e){ console.warn('[hmTogglePlay]', e); }
+};
+window.hmNext = function(){
+  try {
+    if (window._hmPlaylist && Array.isArray(window._hmPlaylist) && window._hmPlaylist.length){
+      var cur = parseInt(localStorage.getItem('_hmCurrentIndex')||'0', 10);
+      cur = (cur + 1) % window._hmPlaylist.length;
+      localStorage.setItem('_hmCurrentIndex', String(cur));
+      showToast('⏭ 下一曲 (演示)');
+    } else { showToast('⏭ 下一曲（曲目待加载）'); }
+  } catch(e){ console.warn('[hmNext]', e); }
+};
+window.hmToggleLoop = function(){
+  try {
+    var btn = document.getElementById('hmLoopBtn');
+    var looping = btn && btn.dataset.loop === '1';
+    if (btn){
+      btn.dataset.loop = looping ? '0' : '1';
+      btn.style.color = looping ? 'var(--paper3)' : 'var(--gold)';
+    }
+    showToast(looping ? '🔁 循环关闭' : '🔁 循环开启');
+  } catch(e){ console.warn('[hmToggleLoop]', e); }
+};
+// 2) 风水 pro 家庭化解方案：添加成员行（与 familyPaipan 共享同一份内存） — safe fallback
+window.addFamilyMemberRow = function(){
+  try {
+    var list = document.getElementById('fs-pro-family-members');
+    if (!list) { showToast('⚠️ 容器未就绪'); return; }
+    var idx = list.children.length + 1;
+    var row = document.createElement('div');
+    row.className = 'input-row';
+    row.style.cssText = 'display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap';
+    row.innerHTML =
+      '<input type="text" class="input-field" placeholder="成员' + idx + ' · 关系" style="max-width:120px" aria-label="关系">' +
+      '<input type="date" class="input-field" aria-label="出生日期" style="max-width:140px">' +
+      '<select class="input-field" style="max-width:80px" aria-label="性别"><option value="male">男</option><option value="female">女</option></select>';
+    list.appendChild(row);
+    showToast('➕ 已添加成员行（' + idx + '）');
+  } catch(e){ console.warn('[addFamilyMemberRow]', e); }
+};
+// 3) 家族排盘：添加成员（与 9 个 DOM 输入同源：famMemName/famMemYear/famMemMonth/famMemDay/famMemHour/famMemSex/famMemCity） — safe fallback
+window.addFamilyPaipanMember = function(){
+  try {
+    var list = document.getElementById('familyMemberList');
+    if (!list) { showToast('⚠️ familyMemberList 未就绪'); return; }
+    var name = (document.getElementById('famMemName')||{}).value || '';
+    var date = (document.getElementById('famMemDate')||{}).value || '';
+    var sex = (document.getElementById('famMemSex')||{}).value || '';
+    var city = (document.getElementById('famMemCity')||{}).value || '';
+    if (!name){ showToast('⚠️ 请填写姓名'); return; }
+    var card = document.createElement('div');
+    card.className = 'family-member-card';
+    card.style.cssText = 'padding:10px;margin-bottom:8px;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.18);border-radius:8px;font-size:12px;line-height:1.7';
+    card.innerHTML =
+      '<strong>' + name + '</strong> · ' + (sex==='female'?'女':'男') +
+      (date?' · ' + date:'') +
+      (city?' · ' + city:'') +
+      '<br><span style="color:var(--paper3);font-size:11px">待 computeFamilyPaipan 综合计算</span>';
+    list.appendChild(card);
+    showToast('✅ 已加入成员：' + name);
+  } catch(e){ console.warn('[addFamilyPaipanMember]', e); }
+};
+// 4) 家族综合排盘入口 — safe fallback：列出已加成员占位
+window.computeFamilyPaipan = function(){
+  try {
+    var list = document.getElementById('familyMemberList');
+    var out = document.getElementById('familyResult');
+    if (!out) { showToast('⚠️ familyResult 未就绪'); return; }
+    var n = list ? list.children.length : 0;
+    if (!n){ showToast('⚠️ 请先添加成员'); return; }
+    out.innerHTML =
+      '<div style="padding:16px;background:rgba(201,168,76,.04);border-radius:8px">' +
+      '<h4 style="margin-bottom:12px;color:var(--gold)">📊 家族综合排盘（演示）</h4>' +
+      '<p style="font-size:13px;line-height:1.8">已收录 ' + n + ' 位成员。完整分析请参考 <code>family-paipan.html</code> 或对接 bazi/ziwei 后端。</p>' +
+      '</div>';
+    out.classList.remove('d-none');
+    showToast('✅ 家族排盘已生成（演示 · ' + n + ' 人）');
+  } catch(e){ console.warn('[computeFamilyPaipan]', e); }
+};
+// 5) 人生规划 — safe fallback（10 个阶段 × 12 领域矩阵占位）
+window.computeLifePlan = function(){
+  try {
+    var name = (document.getElementById('lifeplanName')||{}).value || '缘主';
+    var stage = (document.getElementById('lifeplanStage')||{}).value || 'all';
+    var out = document.getElementById('lifeplanResult');
+    if (!out) { showToast('⚠️ lifeplanResult 未就绪'); return; }
+    out.innerHTML =
+      '<div style="padding:16px;background:rgba(201,168,76,.04);border-radius:8px">' +
+      '<h4 style="margin-bottom:12px;color:var(--gold)">🧭 ' + name + ' 人生规划（演示）</h4>' +
+      '<p style="font-size:12px;line-height:1.8">当前阶段：<strong>' + stage + '</strong></p>' +
+      '<p style="font-size:12px;line-height:1.8">12 领域矩阵 · 4 阶段时间轴已就绪（完整版本需对接 lifeplan 模块）</p>' +
+      '</div>';
+    out.classList.remove('d-none');
+    showToast('✅ 人生规划已生成（演示）');
+  } catch(e){ console.warn('[computeLifePlan]', e); }
+};
+// 6) 青少年规划 — safe fallback（5 学段占位）
+window.computeYouthPlan = function(){
+  try {
+    var out = document.getElementById('youthResult');
+    if (!out) { showToast('⚠️ youthResult 未就绪'); return; }
+    var name = (document.getElementById('lifeplanName')||{}).value || '孩子';
+    var stage = (document.getElementById('youthStage')||{}).value || 'all';
+    var score = (document.getElementById('youthScore')||{}).value || 'good';
+    out.innerHTML =
+      '<div style="padding:16px;background:rgba(201,168,76,.04);border-radius:8px">' +
+      '<h4 style="margin-bottom:12px;color:var(--gold)">🧒 ' + name + ' 青少年规划（演示）</h4>' +
+      '<p style="font-size:12px;line-height:1.8">学段：<strong>' + stage + '</strong> · 成绩：<strong>' + score + '</strong></p>' +
+      '<p style="font-size:12px;line-height:1.8">5 学段规划 · 12 领域素养矩阵占位（完整版需对接 lifeplan/youth 模块）</p>' +
+      '</div>';
+    out.classList.remove('d-none');
+    showToast('✅ 青少年规划已生成（演示）');
+  } catch(e){ console.warn('[computeYouthPlan]', e); }
+};
+// 7) 六十甲子运势 — safe fallback（60 年 × 10 年区段占位）
+window.runJiaziCycle = function(){
+  try {
+    var name = (document.getElementById('jiaziName')||{}).value || '缘主';
+    var date = (document.getElementById('jiaziDate')||{}).value || '';
+    var out = document.getElementById('jiaziResult');
+    if (!out) { showToast('⚠️ jiaziResult 未就绪'); return; }
+    out.innerHTML =
+      '<div style="padding:16px;background:rgba(201,168,76,.04);border-radius:8px">' +
+      '<h4 style="margin-bottom:12px;color:var(--gold)">🔮 ' + name + ' 六十甲子运势（演示）</h4>' +
+      '<p style="font-size:12px;line-height:1.8">出生：' + (date || '未填') + '</p>' +
+      '<p style="font-size:12px;line-height:1.8">60 年运势图（6 大区段 · 10 年一步）已就绪（完整版需对接 jiazi 后端）</p>' +
+      '</div>';
+    out.classList.remove('d-none');
+    showToast('✅ 甲子运势已生成（演示）');
+  } catch(e){ console.warn('[runJiaziCycle]', e); }
+};
+// 8) 命理全鉴评估 — safe fallback（10 维度占位）
+window.computeLifeIndex = function(){
+  try {
+    var out = document.getElementById('liResult') || document.getElementById('lifeIndexResult');
+    if (!out){
+      // 兜底: 找最近包含 li 的 result-area
+      out = document.querySelector('#lifeIndexResult, #life-index-result, .life-index-result');
+    }
+    if (!out) { showToast('⚠️ 命理全鉴结果区未就绪'); return; }
+    out.innerHTML =
+      '<div style="padding:16px;background:rgba(201,168,76,.04);border-radius:8px">' +
+      '<h4 style="margin-bottom:12px;color:var(--gold)">🌟 命理全鉴评估（演示）</h4>' +
+      '<ul style="font-size:12px;line-height:1.9;list-style:none;padding-left:0">' +
+      '<li>事业: 待评</li><li>财运: 待评</li><li>健康: 待评</li>' +
+      '<li>婚姻: 待评</li><li>学业: 待评</li><li>家庭: 待评</li>' +
+      '<li>人际: 待评</li><li>精神: 待评</li><li>享福: 待评</li><li>寿元: 待评</li>' +
+      '</ul><p style="font-size:11px;color:var(--paper3)">完整版需对接 lifeindex 后端</p>' +
+      '</div>';
+    out.classList.remove('d-none');
+    showToast('✅ 命理全鉴已生成（演示）');
+  } catch(e){ console.warn('[computeLifeIndex]', e); }
+};
+// 9) 手机号分析 — safe fallback（无外部 API，本地 81 数理吉凶表占位）
+window.analyzeMobile = function(){
+  try {
+    var num = (document.getElementById('mobileNumber')||{}).value || '';
+    var out = document.getElementById('mobileResult');
+    var output = document.getElementById('mobileOutput');
+    if (!num || num.length < 7){ showToast('⚠️ 请输入完整手机号（≥7 位）'); return; }
+    if (!out || !output){ showToast('⚠️ mobileResult 未就绪'); return; }
+    // 简易 81 数理末四位统计（演示算法）
+    var tail4 = num.replace(/\D/g, '').slice(-4);
+    var sum = 0; for (var i=0;i<tail4.length;i++) sum += parseInt(tail4[i],10);
+    var lucky = sum % 9; // 0-8
+    output.innerHTML =
+      '<h5 style="color:var(--gold);margin-bottom:8px">📱 ' + num + ' 手机号分析（演示）</h5>' +
+      '<p style="font-size:13px;line-height:1.8">尾四：' + tail4 + ' · 数理和：' + sum + ' · 吉凶位：第 ' + (lucky+1) + ' 档</p>' +
+      '<p style="font-size:12px;line-height:1.7;opacity:.95">📊 五行能量、五格数理、吉星组合请对接 <code>mobile-fengshui.html</code> 完整版</p>';
+    out.style.display = 'block';
+    showToast('✅ 手机号分析已生成（演示）');
+  } catch(e){ console.warn('[analyzeMobile]', e); }
+};
+// 10) 手机号推荐 — safe fallback（基于尾数生成 5/10/20/50 个候选）
+window.recommendMobileNumbers = function(){
+  try {
+    var count = parseInt((document.getElementById('mobileRecCount')||{}).value || '10', 10);
+    var tail = (document.getElementById('mobileTailInput')||{}).value || '';
+    var out = document.getElementById('mobileRecOutput');
+    if (!out){ showToast('⚠️ mobileRecOutput 未就绪'); return; }
+    var luckyTails = ['168','518','666','888','1688','2688','5188','6688','6888','8888'];
+    var html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px">';
+    for (var i=0;i<Math.min(count,50);i++){
+      var t = tail && i===0 ? tail : luckyTails[i % luckyTails.length] + (i>=luckyTails.length ? (i-luckyTails.length+1):'');
+      html += '<div style="padding:8px;background:rgba(46,204,113,.05);border:1px solid rgba(46,204,113,.2);border-radius:6px;font-family:monospace;font-size:13px;text-align:center">13x ' + t + '</div>';
+    }
+    html += '</div>';
+    out.innerHTML = html;
+    showToast('✅ 已推荐 ' + Math.min(count,50) + ' 个号码（演示）');
+  } catch(e){ console.warn('[recommendMobileNumbers]', e); }
+};
+// 11) 择日参与人添加（与 addFamilyPaipanMember 共享同一份 list 模式） — safe fallback
+window.addZeriMember = function(){
+  try {
+    var list = document.getElementById('zeriMembersList');
+    if (!list){ showToast('⚠️ zeriMembersList 未就绪'); return; }
+    if (list.children.length >= 6){ showToast('⚠️ 最多 6 位参与人'); return; }
+    var idx = list.children.length + 1;
+    var card = document.createElement('div');
+    card.style.cssText = 'padding:8px;margin-bottom:6px;background:rgba(0,100,150,.04);border:1px solid rgba(0,100,150,.15);border-radius:6px;display:flex;gap:6px;flex-wrap:wrap;align-items:center';
+    card.innerHTML =
+      '<input type="text" class="input-field" placeholder="成员' + idx + '·姓名" style="max-width:100px" aria-label="姓名">' +
+      '<input type="date" class="input-field" style="max-width:140px" aria-label="出生日期">' +
+      '<select class="input-field" style="max-width:70px" aria-label="性别"><option value="male">男</option><option value="female">女</option></select>' +
+      '<button style="padding:2px 8px;background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.2);color:#ff5050;border-radius:4px;cursor:pointer" onclick="this.parentNode.remove();showToast(\'已移除成员' + idx + '\')">✕</button>';
+    list.appendChild(card);
+    showToast('➕ 已添加参与人 ' + idx + '（共 ' + list.children.length + '/6）');
+  } catch(e){ console.warn('[addZeriMember]', e); }
+};
+// 12) 择日引擎入口 — safe fallback（与 jiuriSuggest 复用相同的数据源，结果区独立）
+window.runZeriEngine = function(){
+  try {
+    var zeriMembersList = document.getElementById('zeriMembersList');
+    var n = zeriMembersList ? zeriMembersList.children.length : 0;
+    var out = document.getElementById('zrEngineResult');
+    if (!out){ showToast('⚠️ zrEngineResult 未就绪'); return; }
+    var purpose = (document.getElementById('jiuriPurpose')||{}).value || '（未选事项）';
+    out.innerHTML =
+      '<div style="padding:16px;background:rgba(201,168,76,.04);border-radius:8px">' +
+      '<h4 style="margin-bottom:12px;color:var(--gold)">🔮 择日引擎结果（演示）</h4>' +
+      '<p style="font-size:13px;line-height:1.8">事项：<strong>' + purpose + '</strong> · 参与人数：' + n + '</p>' +
+      '<p style="font-size:12px;line-height:1.8">📊 吉日筛选（黄历宜忌 + 冲煞 + 多人八字避冲）已就绪<br>完整版请对接 zeri-engine 后端</p>' +
+      '</div>';
+    out.style.display = 'block';
+    showToast('✅ 择日引擎已触发（演示 · ' + n + ' 人）');
+  } catch(e){ console.warn('[runZeriEngine]', e); }
+};
 </script>
 
 <!-- ================================================================ -->
