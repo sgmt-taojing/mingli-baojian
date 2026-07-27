@@ -10,7 +10,7 @@ function toast(msg){
 
 async function api(path, opts={}){
   const hdr = Object.assign({'Content-Type':'application/json'}, opts.headers||{});
-  if(token) hdr['Authorization'] = '***' + token;
+  if(token) hdr['Authorization'] = 'Bearer ' + token;
   // 节点 #4.3：优先走 apiCall（统一拦截器），不改业务调用语义
   try{
     const result = await window.apiClient.get(API + path, Object.assign({headers:hdr}, opts));
@@ -51,15 +51,18 @@ async function renderProfile(c){
     return;
   }
   const r = await api('/api/yuanzhu/profile');
-  if(r.error){c.innerHTML = `<div class="empty">${r.error}</div>`;return;}
-  user = r;
+  if(r.error || !r.ok){ c.innerHTML = `<div class="empty">${r.msg||r.error||'暂无画像数据'}</div>`; return; }
+  const p = r.profile || {};
+  user = p;
   c.innerHTML = `
     <div class="card"><h3>👤 个人中心</h3>
-      <div class="row"><span class="label">手机号</span><span class="val">${r.phone||'-'}</span></div>
-      <div class="row"><span class="label">昵称</span><span class="val">${r.nickname||'-'}</span></div>
-      <div class="row"><span class="label">角色</span><span class="val">${(r.roles||[]).join(',')||'用户'}</span></div>
-      <div class="row"><span class="label">积分</span><span class="val">${r.points||0}</span></div>
-      <div class="row"><span class="label">注册时间</span><span class="val">${r.createdAt?new Date(r.createdAt).toLocaleDateString('zh-CN'):'-'}</span></div>
+      <div class="row"><span class="label">日主</span><span class="val">${p.day_master||'-'}</span></div>
+      <div class="row"><span class="label">喜用神</span><span class="val">${p.xi_ele||'-'}</span></div>
+      <div class="row"><span class="label">忌神</span><span class="val">${p.ji_ele||'-'}</span></div>
+      <div class="row"><span class="label">缺行</span><span class="val">${p.lack_wuxing||'-'}</span></div>
+      <div class="row"><span class="label">生肖</span><span class="val">${p.zodiac||'-'}</span></div>
+      <div class="row"><span class="label">排盘次数</span><span class="val">${p.paipan_count||0}</span></div>
+      <div class="row"><span class="label">上次排盘</span><span class="val">${p.last_paipan_at||'-'}</span></div>
     </div>
     <button class="btn" style="width:100%" onclick="logout()">退出登录</button>
   `;
@@ -649,7 +652,7 @@ loadTab('profile');
 (function(){
   const mlTab = document.getElementById('yuanzhuTab');
   if (!mlTab) return;
-  const labels = ['profile','yuanzhu','push','points','reports','shop','kb','voices','music','lifeindex','lifeplan'];
+  const labels = ['profile','yuanzhu','push','points','reports','shop','kb','kb-dash','voices','music','lifeindex','lifeplan'];
   mlTab.addEventListener('tab-change', (e)=>{
     const name = labels[e.detail.index] || 'profile';
     if (typeof switchTab === 'function') switchTab(name);
