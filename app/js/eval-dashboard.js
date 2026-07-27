@@ -5,7 +5,7 @@
 // 数据来源：eval/weekly/*.json （GitHub raw：sgmt-taojing/mingli-baojian main 分支）
 const GH = 'https://raw.githubusercontent.com/sgmt-taojing/mingli-baojian/main';
 const WEEKS = ['2026-W24','2026-W25','2026-W26','2026-W27','2026-W28','2026-W29','2026-W30','2026-W31'];
-const BENCHES = ['faithfulness','latency','cost-budget'];
+const BENCHES = ['faithfulness','latency','cost-budget','alert-card'];
 
 // 全局缓存
 const cache = { weeks: {}, fetchedAt: 0 };
@@ -451,6 +451,139 @@ function renderSparkline(score, rate){
   return wrap;
 }
 
+// 获取 alert-card
+async function fetchAlertCard(week){
+  const url = `${GH}/eval/weekly/${week}-alert-card.json`;
+  try{
+    const r = await fetch(url, { cache: 'no-cache' });
+    if(!r.ok) return null;
+    return await r.json();
+  }catch(e){
+    console.warn('[alert-card fetch]', week, e);
+    return null;
+  }
+}
+
+// 渲染 alert-card
+function renderAlertCard(){
+  const wrap = $('alertCardBody');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+
+  // 收集所有周的 alert-card
+  const weekAlerts = WEEKS.map(w => ({ week: w, card: cache.weeks[w]?.['alert-card'] })).filter(x => x.card);
+
+  if (!weekAlerts.length){
+    wrap.appendChild(el('div', {className:'alert-empty'}, '暂无 alert-card 数据'));
+    return;
+  }
+
+  // 最新周作为主卡片
+  const latest = weekAlerts[weekAlerts.length - 1];
+  const card = latest.card;
+  const levelCls = card.overall_level === 'CRITICAL' ? 'alert-critical' :
+                   card.overall_level === 'WARN' ? 'alert-warn' : 'alert-ok';
+  const levelIcon = card.overall_level === 'CRITICAL' ? '🔴' :
+                    card.overall_level === 'WARN' ? '🟡' : '🟢';
+
+  // 主卡
+  const mainCard = el('div', {className:'alert-main ' + levelCls},
+    el('div', {className:'alert-main-header'},
+      el('span', {className:'alert-level-icon'}, levelIcon),
+      el('span', {className:'alert-level-text'}, card.overall_level || 'UNKNOWN'),
+      el('span', {className:'alert-week'}, latest.week)
+    ),
+    el('div', {className:'alert-generated'}, '生成于 ' + (card.generated_at || '--'))
+  );
+
+  // 三维度分解
+  const judgments = card.judgments || {};
+  const benchLabels = {
+    'faithfulness': '合规分数',
+    'cost-budget': '成本预算',
+    'latency': 'P95 延迟'
+  };
+  const benchIcons = {
+    'faithfulness': '📈',
+    'cost-budget': '💰',
+    'latency': '⚡'
+  };
+
+  const benchGrid = el('div', {className:'alert-bench-grid'});
+  Object.keys(judgments).forEach(bench => {
+    const j = judgments[bench];
+    const jLevelCls = j.level === 'CRITICAL' ? 'alert-critical' :
+                      j.level === 'WARN' ? 'alert-warn' : 'alert-ok';
+    const jIcon = j.level === 'CRITICAL' ? '🔴' :
+                  j.level === 'WARN' ? '🟡' : '🟢';
+
+    // 格式化 actual 值
+    let actualText = '';
+    if (j.metric === 'avg_score') actualText = (j.actual || 0).toFixed(3);
+    else if (j.metric === 'avg_yuan') actualText = j.actual < 0.001 ? '< 0.001 元' : (j.actual || 0).toFixed(4) + ' 元';
+    else if (j.metric === 'p95_ms') actualText = (j.actual || 0) + 'ms';
+    else actualText = String(j.actual ?? '--');
+
+    // 阈值/目标
+    let thresholdText = '';
+    if (j.threshold){
+      thresholdText = `临界 ${j.threshold.critical} / 警告 ${j.threshold.warn}`;
+    } else if (j.target != null){
+      thresholdText = `目标 ${j.metric === 'avg_yuan' ? j.target + ' 元' : j.metric === 'p95_ms' ? j.target + 'ms' : j.target}`;
+    }
+
+    const benchCard = el('div', {className:'alert-bench-card ' + jLevelCls},
+      el('div', {className:'alert-bench-header'},
+        el('span', {className:'alert-bench-icon'}, benchIcons[bench] || '📊'),
+        el('span', {className:'alert-bench-name'}, benchLabels[bench] || bench),
+        el('span', {className:'alert-bench-level'}, jIcon + ' ' + j.level)
+      ),
+      el('div', {className:'alert-bench-actual'}, actualText),
+      el('div', {className:'alert-bench-threshold'}, thresholdText || ''),
+      el('div', {className:'alert-bench-violations'}, '违规 ' + (j.violations || 0) + ' 次')
+    );
+
+    // 低分案例
+    if (j.low_cases && j.low_cases.length){
+      const casesWrap = el('div', {className:'alert-low-cases'},
+        el('div', {className:'alert-low-cases-title'}, '⚠ 低分案例')
+      );
+      j.low_cases.forEach(c => {
+        casesWrap.appendChild(el('div', {className:'alert-low-case'},
+          el('span', {className:'low-case-id'}, c.id || c.case_id || '--'),
+          el('span', {className:'low-case-score'}, (c.score != null ? c.score : c.actual ?? '--').toString()),
+          c.module ? el('span', {className:'low-case-mod'}, c.module) : null
+        ));
+      });
+      benchCard.appendChild(casesWrap);
+    }
+
+    benchGrid.appendChild(benchCard);
+  });
+
+  mainCard.appendChild(benchGrid);
+
+  // 历史周告警等级 mini-strip
+  if (weekAlerts.length > 1){
+    const histStrip = el('div', {className:'alert-hist-strip'},
+      el('span', {className:'alert-hist-label'}, '历史告警:')
+    );
+    weekAlerts.forEach(wa => {
+      const hLevel = wa.card.overall_level || 'UNKNOWN';
+      const hCls = hLevel === 'CRITICAL' ? 'alert-critical' :
+                   hLevel === 'WARN' ? 'alert-warn' : 'alert-ok';
+      const hIcon = hLevel === 'CRITICAL' ? '🔴' :
+                    hLevel === 'WARN' ? '🟡' : '🟢';
+      histStrip.appendChild(el('span', {className:'alert-hist-item ' + hCls},
+        hIcon + ' ' + wa.week.replace('2026-','')
+      ));
+    });
+    mainCard.appendChild(histStrip);
+  }
+
+  wrap.appendChild(mainCard);
+}
+
 // 跨周分模块评分趋势表
 function computeModuleTrend(){
   // 找出有 per-case results 的周
@@ -578,6 +711,7 @@ async function refresh(){
     renderTrends();
     renderViolations();
     renderModules();
+    renderAlertCard();
     renderModuleTrend();
   }finally{
     $('refreshBtn').textContent = '🔄 刷新';

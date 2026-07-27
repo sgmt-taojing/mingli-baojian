@@ -406,6 +406,207 @@ html, body {
   .dash-footer { padding: 10px 8px; font-size: 10px; gap: 8px; }
 }
 
+/* R190 周告警卡 */
+.dash-alert-card {
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+.dash-alert-card h2 {
+  font-size: 18px;
+  color: var(--gold3);
+  margin-bottom: 4px;
+}
+.alert-card-body {
+  margin-top: 12px;
+}
+.alert-empty {
+  text-align: center;
+  color: var(--paper3);
+  padding: 20px;
+  font-size: 13px;
+}
+
+/* 主卡 */
+.alert-main {
+  border-radius: 14px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+}
+.alert-main.alert-ok {
+  border-color: rgba(16,185,129,0.3);
+  background: linear-gradient(135deg, rgba(16,185,129,0.06), rgba(255,255,255,0.02));
+}
+.alert-main.alert-warn {
+  border-color: rgba(245,158,11,0.3);
+  background: linear-gradient(135deg, rgba(245,158,11,0.06), rgba(255,255,255,0.02));
+}
+.alert-main.alert-critical {
+  border-color: rgba(239,68,68,0.4);
+  background: linear-gradient(135deg, rgba(239,68,68,0.08), rgba(255,255,255,0.02));
+}
+
+.alert-main-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.alert-level-icon { font-size: 24px; }
+.alert-level-text {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.alert-ok .alert-level-text { color: #10b981; }
+.alert-warn .alert-level-text { color: #f59e0b; }
+.alert-critical .alert-level-text { color: #ef4444; }
+.alert-week {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--gold);
+  background: rgba(201,168,76,0.1);
+  padding: 2px 10px;
+  border-radius: 10px;
+}
+.alert-generated {
+  font-size: 11px;
+  color: var(--paper3);
+  margin-bottom: 14px;
+}
+
+/* 三维度网格 */
+.alert-bench-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.alert-bench-card {
+  border-radius: 10px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+}
+.alert-bench-card.alert-ok { border-color: rgba(16,185,129,0.2); }
+.alert-bench-card.alert-warn { border-color: rgba(245,158,11,0.2); }
+.alert-bench-card.alert-critical { border-color: rgba(239,68,68,0.3); }
+
+.alert-bench-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.alert-bench-icon { font-size: 16px; }
+.alert-bench-name {
+  font-size: 13px;
+  color: var(--paper);
+  font-weight: 500;
+  flex: 1;
+}
+.alert-bench-level {
+  font-size: 11px;
+  font-weight: 600;
+}
+.alert-bench-card.alert-ok .alert-bench-level { color: #10b981; }
+.alert-bench-card.alert-warn .alert-bench-level { color: #f59e0b; }
+.alert-bench-card.alert-critical .alert-bench-level { color: #ef4444; }
+
+.alert-bench-actual {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+.alert-bench-threshold {
+  font-size: 10px;
+  color: var(--paper3);
+  margin-bottom: 4px;
+}
+.alert-bench-violations {
+  font-size: 11px;
+  color: var(--paper3);
+}
+
+/* 低分案例 */
+.alert-low-cases {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.alert-low-cases-title {
+  font-size: 11px;
+  color: #f59e0b;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.alert-low-case {
+  display: flex;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--paper3);
+  padding: 2px 0;
+}
+.low-case-id { color: var(--gold); font-weight: 500; }
+.low-case-score { color: #ef4444; font-weight: 600; }
+.low-case-mod { color: var(--paper3); }
+
+/* 历史告警 mini-strip */
+.alert-hist-strip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.alert-hist-label {
+  font-size: 11px;
+  color: var(--paper3);
+}
+.alert-hist-item {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+.alert-hist-item.alert-ok {
+  color: #10b981;
+  border-color: rgba(16,185,129,0.2);
+  background: rgba(16,185,129,0.05);
+}
+.alert-hist-item.alert-warn {
+  color: #f59e0b;
+  border-color: rgba(245,158,11,0.2);
+  background: rgba(245,158,11,0.05);
+}
+.alert-hist-item.alert-critical {
+  color: #ef4444;
+  border-color: rgba(239,68,68,0.2);
+  background: rgba(239,68,68,0.05);
+}
+
+/* 响应式 */
+@media (max-width: 480px) {
+  .alert-bench-grid { grid-template-columns: 1fr; }
+  .alert-level-text { font-size: 17px; }
+  .alert-level-icon { font-size: 20px; }
+  .alert-bench-actual { font-size: 18px; }
+  .alert-main { padding: 10px; }
+  .alert-bench-card { padding: 8px 10px; }
+}
+@media (max-width: 360px) {
+  .alert-main { padding: 8px; }
+  .alert-level-text { font-size: 15px; }
+  .alert-week { font-size: 10px; padding: 1px 6px; }
+  .alert-bench-card { padding: 6px 8px; }
+  .alert-bench-actual { font-size: 16px; }
+  .alert-bench-name { font-size: 12px; }
+  .alert-hist-item { font-size: 9px; padding: 1px 4px; }
+  .alert-low-case { font-size: 10px; }
+}
+
 /* R189 跨周分模块评分趋势表 */
 .dash-module-trend {
   margin-top: 24px;
