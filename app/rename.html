@@ -265,5 +265,13 @@
 }
 </style>
 
+<script>
+// R180: Safe fallbacks for rename.html standalone functions
+if(typeof showSection!=='function'){window.showSection=function(n){try{window.location.href='divination-hub.html#'+(n||'');}catch(e){history.back();}};}
+if(typeof computeRenameEnhanced!=='function'){window.computeRenameEnhanced=function(){try{var ln=document.getElementById('lastName')||document.getElementById('xmCurrentName');var fn=document.getElementById('firstName')||document.getElementById('xmNewName');var r=document.getElementById('renameResult')||document.getElementById('xmResult');if(r){r.innerHTML='<div style="padding:16px;background:rgba(201,168,76,0.06);border-radius:10px;border:1px solid var(--border)"><h5 style="color:var(--gold);margin-bottom:8px">📋 姓名分析报告</h5><p style="font-size:13px;color:var(--paper2)">姓名: '+(ln&&ln.value?ln.value:'')+(fn&&fn.value?fn.value:'')+'</p><p style="font-size:13px;color:var(--paper2);margin-top:8px">完整姓名学分析（三才五格、五行匹配、笔画数理）请在主页姓名模块中使用。</p></div>';r.classList.remove('d-none');}if(typeof toast==='function')toast('姓名分析已生成（简化版）');}catch(e){console.warn('[computeRenameEnhanced]',e);}};}
+if(typeof toggleKnowledge!=='function'){window.toggleKnowledge=function(){try{var el=document.getElementById('knowledgeSection')||document.getElementById('renameKnowledge');if(el){el.classList.toggle('d-none');}}catch(e){console.warn('[toggleKnowledge]',e);}};}
+if(typeof runXingmingEngine!=='function'){window.runXingmingEngine=function(){try{var n=document.getElementById('xmCurrentName')||document.getElementById('lastName');var nn=document.getElementById('xmNewName')||document.getElementById('firstName');var r=document.getElementById('xmEngineResult')||document.getElementById('renameResult');if(r){r.innerHTML='<div style="padding:14px;background:rgba(201,168,76,0.06);border-radius:10px"><h5 style="color:var(--gold)">🔧 姓名学引擎</h5><p style="font-size:13px;color:var(--paper2)">姓名学引擎深度分析（含康熙笔画、三才五格、生肖喜忌）请在主页使用完整引擎。</p></div>';r.classList.remove('d-none');}if(typeof toast==='function')toast('引擎分析已生成（简化版）');}catch(e){console.warn('[runXingmingEngine]',e);}};}
+</script>
+
 </body>
 </html>

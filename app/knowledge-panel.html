@@ -230,3 +230,10 @@
   .row{flex-direction:column;align-items:flex-start}
 }
 </style>
+
+<script>
+// R180: Safe fallbacks for knowledge-panel.html standalone functions
+if(typeof closeAuthoritativePanel!=='function'){window.closeAuthoritativePanel=function(){try{var p=document.getElementById('authoritativePanel')||document.querySelector('.authoritative-panel');if(p){p.style.display='none';}}catch(e){console.warn('[closeAuthoritativePanel]',e);}};}
+if(typeof showKnowledgeDetail!=='function'){window.showKnowledgeDetail=function(topic){try{var panel=document.getElementById('knowledgeDetailPanel');if(panel){var titles={'bazi':'八字命理','liuyao':'六爻占卜','fengshui':'风水堪舆','xingming':'姓名学','tizhi':'中医体质','yijing':'易经智慧','ziwei':'紫微斗数','qimen':'奇门遁甲','meihua':'梅花易数','liuren':'大六壬'};panel.querySelector('.detail-title').textContent=titles[topic]||topic;panel.style.display='block';panel.scrollIntoView({behavior:'smooth'});}if(typeof showToast==='function')showToast('查看: '+(titles[topic]||topic));}catch(e){console.warn('[showKnowledgeDetail]',e);}};}
+if(typeof closeKnowledgeDetail!=='function'){window.closeKnowledgeDetail=function(){try{var p=document.getElementById('knowledgeDetailPanel');if(p){p.style.display='none';}}catch(e){console.warn('[closeKnowledgeDetail]',e);}};}
+</script>

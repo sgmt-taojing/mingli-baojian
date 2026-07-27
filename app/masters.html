@@ -545,5 +545,13 @@
 }
 </style>
 
+<script>
+// R180: Safe fallbacks for masters.html standalone functions
+if(typeof showSection!=='function'){window.showSection=function(n){try{window.location.href='divination-hub.html#'+(n||'');}catch(e){history.back();}};}
+if(typeof showMastersTab!=='function'){window.showMastersTab=function(cat,btn){try{document.querySelectorAll('.masters-panel').forEach(function(p){p.style.display='none';});var target=document.getElementById('masters-'+cat);if(target){target.style.display='block';}document.querySelectorAll('.masters-tab').forEach(function(t){t.classList.remove('active');});if(btn){btn.classList.add('active');}}catch(e){console.warn('[showMastersTab]',e);}};}
+if(typeof openAskModal!=='function'){window.openAskModal=function(){try{var m=document.getElementById('askModal');if(m){m.style.display='block';}else{if(typeof showToast==='function')showToast('提问功能请在主页使用');}}catch(e){console.warn('[openAskModal]',e);}};}
+if(typeof toggleMasterCard!=='function'){window.toggleMasterCard=function(el){try{if(el){var body=el.querySelector('.master-body');if(body){body.classList.toggle('d-none');}el.classList.toggle('expanded');}}catch(e){console.warn('[toggleMasterCard]',e);}};}
+</script>
+
 </body>
 </html>
