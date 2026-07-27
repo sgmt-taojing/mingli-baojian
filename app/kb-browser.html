@@ -177,12 +177,12 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
 </section>
 
 <div class="tabs" id="tabs">
-  <div class="tab on" data-tab="modules">🗂️ 模块 <span class="badge" id="modBadge">0</span></div>
-  <div class="tab" data-tab="files">📁 KB 文件 <span class="badge" id="fileBadge">0</span></div>
-  <div class="tab" data-tab="hot">🔥 热门模块 <span class="badge" id="hotBadge">8</span></div>
-  <div class="tab" data-tab="graph">🕸️ 关系图 <span class="badge" id="graphBadge">61</span></div>
-  <div class="tab" data-tab="favs">⭐ 我的收藏 <span class="badge" id="favBadge">0</span></div>
-  <div class="tab" data-tab="search">🔍 关键词搜索</div>
+  <div class="tab on" data-tab="modules" title="快捷键 1">🗂️ 模块 <span class="badge" id="modBadge">0</span></div>
+  <div class="tab" data-tab="files" title="快捷键 2">📁 KB 文件 <span class="badge" id="fileBadge">0</span></div>
+  <div class="tab" data-tab="hot" title="快捷键 3">🔥 热门模块 <span class="badge" id="hotBadge">8</span></div>
+  <div class="tab" data-tab="graph" title="快捷键 4">🕸️ 关系图 <span class="badge" id="graphBadge">61</span></div>
+  <div class="tab" data-tab="favs" title="快捷键 5">⭐ 我的收藏 <span class="badge" id="favBadge">0</span></div>
+  <div class="tab" data-tab="search" title="快捷键 6">🔍 关键词搜索</div>
 </div>
 
 <!-- Search bar -->
@@ -1501,6 +1501,7 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
       <div style="margin-top:14px;padding:12px;background:var(--card);border-radius:10px;border:1px solid var(--border);text-align:center">
         <p>当前 <b style="color:#ffd700">${arr.length}</b> 条收藏 · 跨页面同步生效 · 可导出 JSON / 一键清空 · <span id="favSelectedInfo" style="color:var(--paper3)"></span></p>
         <button class="btn primary" onclick="KbFavorites.export?.();">📤 导出 JSON</button>
+        <button class="btn" id="favExportCsvBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:.82rem">📤 导出 CSV</button>
         <button class="btn danger" onclick="if(confirm('清空所有收藏？')){localStorage.removeItem('***');renderFavs();document.getElementById('favBadge').textContent='0项';}">🗑 清空</button>
       </div>
     `;
@@ -1568,6 +1569,22 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
     if(sq) sq.oninput = (e) => { window._favSearchQ = e.target.value; renderFavs(); };
     const tf = document.getElementById('favTagFilter');
     if(tf) tf.onchange = (e) => { window._favTagFilter = e.target.value; renderFavs(); };
+    // R157 收藏 CSV 导出
+    const favCsv = document.getElementById('favExportCsvBtn');
+    if(favCsv) favCsv.onclick = () => {
+      const esc = v => { if(v===null||v===undefined) return ''; const s2 = String(v); return /[",\n]/.test(s2) ? '"' + s2.replace(/"/g,'""') + '"' : s2; };
+      const headers = ['id','name','level','ts','note','tags'];
+      const rows = filtered.map(f => [f.id, f.name, f.level||'public', new Date(f.ts||0).toISOString(), f.note||'', (f.tags||[]).join('|')]);
+      if(rows.length === 0){ if(window._toast) window._toast('⚠️ 无收藏可导出', 1200); return; }
+      const csv = '\ufeff' + headers.join(',') + '\n' + rows.map(r => r.map(esc).join(',')).join('\n');
+      const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'kb-favorites-' + new Date().toISOString().slice(0,10) + '.csv';
+      document.body.appendChild(a); a.click();
+      setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+      if(window._toast) window._toast('📤 已导出 ' + rows.length + ' 条收藏 CSV', 1500);
+    };
     const fsb = document.getElementById('favSortBy');
     if(fsb) fsb.onchange = (e) => { window._favSortBy = e.target.value; renderFavs(); };
     if(fsb && window._favSortBy) fsb.value = window._favSortBy;
