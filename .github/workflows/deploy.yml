@@ -38,6 +38,11 @@ jobs:
           if [ -d css ]; then cp -r css _site/css; fi
           # 复制 docs/ 目录（文档+报告）
           if [ -d docs ]; then cp -r docs _site/docs; fi
+          # 复制 DELIVERY/ 周评估报告 → _site/docs/DELIVERY/（在白名单内可访问）
+          if [ -d DELIVERY ]; then
+            mkdir -p _site/docs/DELIVERY
+            cp -r DELIVERY/. _site/docs/DELIVERY/ || true
+          fi
           # 创建.nojekyll（禁用Jekyll处理，避免下划线开头文件被忽略）
           touch _site/.nojekyll
           # 复制根目录 index.html（活数据仪表盘）
