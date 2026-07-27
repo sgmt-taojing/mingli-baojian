@@ -617,6 +617,7 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
         <a class="btn" href="kb-graph.html?module=${encodeURIComponent(node.id)}" style="padding:6px 10px;background:var(--gold);color:#000;border-radius:6px;text-decoration:none;font-size:.82rem">🕸️ 打开完整图谱</a>
         <a class="btn" href="kb-quality.html?module=${encodeURIComponent(node.id)}" style="padding:6px 10px;background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:6px;text-decoration:none;font-size:.82rem">📊 质量审计</a>
         <button class="btn" id="modalFavBtn" style="padding:6px 10px;background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.82rem">⭐ 收藏</button>
+        <button class="btn" id="modalNoteBtn" style="padding:6px 10px;background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.82rem">📝 笔记</button>
       </div>`;
     document.getElementById('neighborCount').textContent = neighbors.length;
     const list = document.getElementById('neighborList');
@@ -654,6 +655,33 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
       if(window.KbFavorites && window.KbFavorites.getAll().find(f => f.id === node.id)){
         favBtn.textContent = '✅ 已收藏';
       }
+    }
+
+    // R108 笔记按钮 → 添加入收藏后可直接编辑笔记/标签
+    const noteBtn = document.getElementById('modalNoteBtn');
+    if(noteBtn){
+      noteBtn.onclick = () => {
+        if(!window.KbFavorites){
+          if(window.toast) window.toast('⚠️ KbFavorites 未加载', 1500);
+          return;
+        }
+        // 如未收藏则先收藏
+        if(!window.KbFavorites.getAll().find(f => f.id === node.id)){
+          window.KbFavorites.add({id: node.id, name: node.name || node.id, level: node.level || 'public', kind: 'module'});
+          favBtn.textContent = '✅ 已收藏';
+        }
+        const cur = window.KbFavorites.getAll().find(f => f.id === node.id);
+        const note = prompt('📝 笔记（可选）：', cur?.note || '');
+        if(note !== null){
+          window.KbFavorites.updateNote(node.id, note);
+          const tagsRaw = prompt('🏷️ 标签（逗号分隔，可留空）：', (cur?.tags || []).join(', '));
+          if(tagsRaw !== null){
+            const tags = tagsRaw.split(/[,，]/).map(t => t.trim()).filter(t => t);
+            window.KbFavorites.updateTags(node.id, tags);
+          }
+          if(window.toast) window.toast('✅ 笔记已保存', 1500);
+        }
+      };
     }
   }
 
