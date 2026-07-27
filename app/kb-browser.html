@@ -155,6 +155,7 @@ footer.links a{color:var(--gold);text-decoration:none;margin:0 8px}
   <div class="tab" data-tab="files">📁 KB 文件 <span class="badge" id="fileBadge">0</span></div>
   <div class="tab" data-tab="hot">🔥 热门模块 <span class="badge" id="hotBadge">8</span></div>
   <div class="tab" data-tab="graph">🕸️ 关系图 <span class="badge" id="graphBadge">61</span></div>
+  <div class="tab" data-tab="favs">⭐ 我的收藏 <span class="badge" id="favBadge">0</span></div>
   <div class="tab" data-tab="search">🔍 关键词搜索</div>
 </div>
 
@@ -192,6 +193,11 @@ footer.links a{color:var(--gold);text-decoration:none;margin:0 8px}
 <!-- Panel: Graph -->
 <section class="panel" id="panel-graph" hidden>
   <div id="graphContainer" class="loading">加载关系图...</div>
+</section>
+
+<!-- Panel: Favs -->
+<section class="panel" id="panel-favs" hidden>
+  <div id="favsContainer" class="loading">加载收藏...</div>
 </section>
 
 <footer class="links">
@@ -246,6 +252,7 @@ footer.links a{color:var(--gold);text-decoration:none;margin:0 8px}
   document.getElementById('modBadge').textContent = quality?.modules?.length || 0;
   document.getElementById('fileBadge').textContent = files?.files?.length || 0;
   document.getElementById('graphBadge').textContent = (graph?.nodes?.length || 0) + '节点';
+  document.getElementById('favBadge').textContent = (JSON.parse(localStorage.getItem('***')||'[]')).length + '项';
 
   // 填充 search 模块下拉
   const sel = document.getElementById('searchModule');
@@ -410,6 +417,64 @@ footer.links a{color:var(--gold);text-decoration:none;margin:0 8px}
       <div style="margin-top:14px;text-align:center"><a class="btn primary" href="kb-graph.html" style="padding:8px 18px;background:var(--gold);color:#000;border-radius:8px;text-decoration:none">打开完整可视化图谱 →</a></div>`;
     graphC.innerHTML = html;
   }
+
+  // ===== Panel: Favs (R103) =====
+  function renderFavs(){
+    const c = document.getElementById('favsContainer');
+    if(!c) return;
+    const arr = window.KbFavorites ? window.KbFavorites.getAll() : JSON.parse(localStorage.getItem('***')||'[]');
+    if(arr.length === 0){
+      c.innerHTML = `<div class="empty"><h3>⭐ 暂无收藏</h3><p>在任意 KB 模块卡右上角点 ☆ 即可收藏。到这里查看与批量管理。</p></div>`;
+      return;
+    }
+    let html = `
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+        ${arr.map(f => `
+          <div class="card" data-fav-id="${f.id}">
+            <div class="file-head">
+              <span class="file-name">${f.name||f.id}</span>
+              <span class="chip ${f.level==='professional'?'blue':f.level==='admin'?'red':'green'}">${f.level||'public'}</span>
+            </div>
+            <div class="desc"><code style="font-size:.78rem">${f.id}</code></div>
+            <div class="meta"><span class="chip gray">收藏于 ${new Date(f.ts).toLocaleString('zh-CN')}</span></div>
+            <div class="actions">
+              <a class="btn" href="kb-quality.html?module=${encodeURIComponent(f.id)}">📊 质量</a>
+              <a class="btn" href="kb-graph.html?module=${encodeURIComponent(f.id)}">🕸️ 图谱</a>
+              <button class="btn danger" onclick="KbFavorites.toggle({id:'${f.id}',name:'${(f.name||'').replace(/'/g,"\\'")}'});renderFavs();">× 取消</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      <div style="margin-top:14px;padding:12px;background:var(--card);border-radius:10px;border:1px solid var(--border);text-align:center">
+        <p>当前 <b style="color:#ffd700">${arr.length}</b> 条收藏 · 跨页面同步生效 · 可导出 JSON / 一键清空</p>
+        <button class="btn primary" onclick="KbFavorites.export?.();">📤 导出 JSON</button>
+        <button class="btn danger" onclick="if(confirm('清空所有收藏？')){localStorage.removeItem('***');renderFavs();document.getElementById('favBadge').textContent='0项';}">🗑 清空</button>
+      </div>
+    `;
+    c.innerHTML = html;
+  }
+  // 暴露给 onclick
+  window.renderFavs = renderFavs;
+
+  // 跨 tab 同步 badge
+  window.addEventListener('storage', (e) => {
+    if(e.key === '***_broadcast'){
+      try {
+        const data = JSON.parse(e.newValue);
+        document.getElementById('favBadge').textContent = (data.arr?.length || 0) + '项';
+        renderFavs();
+        // 同步抽屉 + 星标
+        if(window.KbFavorites){
+          window.KbFavorites.render();
+          document.querySelectorAll('.kb-fav-btn').forEach(b => {
+            const id = b.dataset.id;
+            b.classList.toggle('active', !!data.arr?.some(x => x.id === id));
+            b.innerHTML = data.arr?.some(x => x.id === id) ? '⭐' : '☆';
+          });
+        }
+      } catch(e){}
+    }
+  });
 
   // ===== Tab 切换 =====
   document.querySelectorAll('.tab').forEach(t => {

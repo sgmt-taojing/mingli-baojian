@@ -24,6 +24,8 @@
     } catch(e){}
     // 全局事件
     window.dispatchEvent(new CustomEvent('kb-favorites-changed', { detail: { favorites: arr } }));
+    // 跨 tab 广播 (R103)
+    try { localStorage.setItem(STORAGE_KEY + '_broadcast', JSON.stringify({ ts: Date.now(), arr })); } catch(e){}
   }
   function isFav(id){
     return getAll().some(x => x.id === id);
@@ -201,11 +203,31 @@
       const c = document.getElementById('kbFavCount');
       if(c) c.textContent = getAll().length;
     });
+
+    // 5. 跨 tab 同步 (R103)
+    window.addEventListener('storage', (e) => {
+      if(e.key === STORAGE_KEY + '_broadcast'){
+        renderDrawer();
+        const c = document.getElementById('kbFavCount');
+        if(c) c.textContent = getAll().length;
+        document.querySelectorAll('.kb-fav-btn').forEach(b => refreshBtn(b));
+      }
+    });
   }
 
   // 暴露 API
   window.KbFavorites = {
-    getAll, toggle, isFav, render: renderDrawer, init
+    getAll, toggle, isFav, render: renderDrawer, init,
+    export: function(){
+      const arr = getAll();
+      const blob = new Blob([JSON.stringify(arr, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `kb-favorites-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 100);
+    }
   };
 
   // DOM ready 自动启动
