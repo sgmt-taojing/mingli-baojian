@@ -19,10 +19,12 @@
       lazy.loaded = true;
       let ph = lazy.el.querySelector('[id$="placeholder"]');
       if(ph) ph.innerHTML = '正在加载...';
-      fetch(lazy.src).then(function(r){
-        if(!r.ok) throw new Error(r.status);
-        return r.text();
-      }).then(function(html){
+      // try/catch: fetch 不存在或网络错误时不阻断 _origShow
+      try {
+        fetch(lazy.src).then(function(r){
+          if(!r.ok) throw new Error(r.status);
+          return r.text();
+        }).then(function(html){
         let secRe = new RegExp('<section[^>]*id="section-' + key + '"[\\s\\S]*?<\\/section>');
         let m = html.match(secRe);
         // 更稳健：提取第一个 section
@@ -73,9 +75,14 @@
             });
           }
         }
-      }).catch(function(e){
-        if(ph) ph.innerHTML = '加载失败：'+e.message;
-      });
+        }).catch(function(e){
+          if(ph) ph.innerHTML = '加载失败：'+e.message;
+          console.warn('[懒加载] fetch 失败:', e.message);
+        });
+      } catch(fetchErr) {
+        // fetch 不存在或同步异常 — 不阻断 section 切换
+        console.warn('[懒加载] fetch 异常:', fetchErr.message);
+      }
     }
     return _origShow.apply(this,arguments);
   };
