@@ -329,10 +329,9 @@ function toggleYanzhi(cat){
     el.classList.toggle('active', el.getAttribute('onclick') && el.getAttribute('onclick').indexOf(cat) >= 0);
   });
 }
+// R180: Safe fallback for showSection (defined in divination-hub-nav.js, not loaded standalone)
+if(typeof showSection!=='function'){window.showSection=function(n){try{window.location.href='divination-hub.html#'+(n||'');}catch(e){history.back();}};}
 </script>
-
-</body>
-</html>
 
 </body>
 </html>
