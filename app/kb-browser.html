@@ -222,6 +222,7 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
   <div class="modal-card">
     <div class="modal-wrap">
       <button class="close-btn" id="modalClose" aria-label="关闭">×</button>
+      <button id="modalExportBtn" title="导出此节点+邻接子图为 JSON" style="position:absolute;top:14px;right:54px;background:var(--card);color:var(--gold);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:.82rem;cursor:pointer">📦 导出</button>
       <div id="modalBreadcrumb" class="modal-breadcrumb" style="font-size:.78rem;color:var(--paper3);margin-bottom:8px;display:flex;gap:4px;flex-wrap:wrap;align-items:center;min-height:18px"></div>
       <h2 id="modalTitle">节点详情</h2>
       <div class="modal-meta" id="modalMeta"></div>
@@ -717,6 +718,7 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
     neighbors.sort((a,b) => (b.weight||0) - (a.weight||0));
 
     document.getElementById('modalTitle').textContent = node.name || node.id;
+    document.getElementById('modalTitle').dataset.nodeId = node.id;
     document.getElementById('modalMeta').innerHTML = `<code style="background:var(--card);padding:2px 6px;border-radius:4px">${node.id}</code> · 等级 <b>${node.level||'public'}</b> · ${node.hit_count||0} 命中 · ${node.xref_count||0} 引用`;
     document.getElementById('modalBasic').innerHTML = `
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.88rem">
@@ -802,6 +804,7 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
       fetch('/api/public/kb-query?module=' + encodeURIComponent(nodeId) + '&size=8').then(r=>r.json()).then(data=>{
         const raw = data && data.data || data || {};
         const entries = raw.results || raw.entries || raw.items || [];
+        window._lastEntryList = entries;
         if(entries.length === 0){
           entriesSection.hidden = false;
           entriesEl.innerHTML = '<div style="color:var(--paper3);padding:8px;font-size:.85rem">该模块暂无条目（未收录 / 已归档）</div>';
@@ -818,6 +821,7 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
               <div style="display:flex;gap:4px;flex-shrink:0">
                 <button class="kb-entry-toggle" data-idx="${idx}" style="background:var(--paper3);color:var(--bg);border:0;border-radius:4px;padding:2px 8px;font-size:.7rem;cursor:pointer">展开</button>
                 <button class="kb-entry-copy" data-id="${e.entry_id||e.id}" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-size:.7rem;cursor:pointer">📋 ID</button>
+                <button class="kb-entry-fav" data-eid="${e.entry_id||e.id}" data-title="${(e.title||e.name||e.entry_id||e.id).replace(/'/g,'\\\'')}" data-trust="${e.trust||''}"  data-source="${e.source||''}" style="background:var(--card);color:var(--gold);border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-size:.7rem;cursor:pointer">⭐</button>
               </div>
             </div>
             <div class="kb-entry-snippet" data-idx="${idx}" style="color:var(--paper3);font-size:.78rem;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${(e.snippet||e.content||e.summary||'').slice(0,300)}</div>
@@ -856,6 +860,32 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
             };
           });
         }
+        // R120 收藏 entry
+        entriesEl.querySelectorAll('.kb-entry-fav').forEach(btn => {
+          const update = (added) => {
+            btn.textContent = added ? '⭐ 已收藏' : '⭐';
+            btn.style.background = added ? 'var(--gold)' : 'var(--card)';
+            btn.style.color = added ? '#000' : 'var(--gold)';
+          };
+          const id = btn.dataset.eid;
+          if(window.KbFavorites && window.KbFavorites.has(id)) update(true);
+          btn.onclick = () => {
+            if(!window.KbFavorites){
+              alert('收藏模块未加载');
+              return;
+            }
+            const ok = window.KbFavorites.has(id)
+              ? (window.KbFavorites.remove(id), false)
+              : (window.KbFavorites.add({
+                  id, name: btn.dataset.title, kind: 'entry', level: 'public',
+                  tags: ['entry'], note: '来源模块: ' + nodeId
+                }), true);
+            update(ok);
+            // 同步抽屉 UI
+            if(window.renderDrawer) window.renderDrawer();
+            if(window._toast) window._toast(ok ? '✅ 已收藏条目' : '♻️ 已取消');
+          };
+        });
         entriesMore.textContent = entries.length >= 8 ? '显示前 8 条，完整列表见下方 📊 质量审计页' : `共 ${entries.length} 条`;
       }).catch(()=>{
         entriesSection.hidden = false;
@@ -951,6 +981,36 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
 
   // 暴露
   window.openNodeModal = openNodeModal;
+  // R121 导出节点+邻接+条目为 JSON
+  document.getElementById('modalExportBtn')?.addEventListener('click', () => {
+    const nodeId = document.getElementById('modalTitle').dataset.nodeId || window._modalHistory?.[window._modalHistory.length-1];
+    if(!nodeId){ alert('当前节点未识别'); return; }
+    const node = (window.gNodes||[]).find(n => n.id === nodeId);
+    const edges = (window.gEdges||[]).filter(e => e.source === nodeId || e.target === nodeId);
+    const neighborIds = new Set();
+    edges.forEach(e => { neighborIds.add(e.source); neighborIds.add(e.target); });
+    neighborIds.delete(nodeId);
+    const neighbors = (window.gNodes||[]).filter(n => neighborIds.has(n.id));
+    const entry = (window._lastEntryList || []).slice();
+    const payload = {
+      exported_at: new Date().toISOString(),
+      node, neighbors, edges, entries: entry
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'kb-node-' + nodeId + '-' + new Date().toISOString().slice(0,10) + '.json';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 100);
+    if(window._toast) window._toast('✅ 已导出 JSON');
+  });
+  // record 弹窗打开过的 entry list
+  const _oFetchEntries = window.fetchEntriesForModal;
+  window.fetchEntriesForModal = function(list){
+    window._lastEntryList = list || [];
+    return list;
+  };
   window.closeNodeModal = closeNodeModal;
 
   // 关闭按钮
