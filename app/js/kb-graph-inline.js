@@ -664,4 +664,114 @@
     draw(nodes, edges);
   });
   load();
+
+  // === R123 Mini-Map 小地图导航 ===
+  var _miniVisible = false, _miniRaf = null;
+  function toggleMinimap(){
+    _miniVisible = !_miniVisible;
+    var el = document.getElementById('minimap');
+    if(el) el.style.display = _miniVisible ? 'block' : 'none';
+    var btn = document.getElementById('minimapToggle');
+    if(btn) btn.textContent = _miniVisible ? '🗺️ 隐藏地图' : '🗺️ Mini-Map';
+    if(_miniVisible) startMinimapLoop();
+  }
+  function startMinimapLoop(){
+    if(_miniRaf) cancelAnimationFrame(_miniRaf);
+    var tick = function(){
+      if(_miniVisible && network) renderMinimap();
+      _miniRaf = requestAnimationFrame(tick);
+    };
+    _miniRaf = requestAnimationFrame(tick);
+  }
+  function renderMinimap(){
+    var cvs = document.getElementById('minimapCanvas');
+    if(!cvs || !network) return;
+    var ctx = cvs.getContext('2d');
+    var W = cvs.width, H = cvs.height;
+    ctx.clearRect(0, 0, W, H);
+    // 背景
+    ctx.fillStyle = 'rgba(26,26,46,.4)';
+    ctx.fillRect(0, 0, W, H);
+    // 获取全画布节点的物理位置 (vis-network getPositions)
+    var positions, bbox;
+    try{
+      var allPos = network.getPositions();
+      positions = ALL_NODES.map(function(n){ return allPos[n.id] || {x:0,y:0}; });
+      if(!positions.length) return;
+      var xs = positions.map(function(p){return p.x;}), ys = positions.map(function(p){return p.y;});
+      var xmin = Math.min.apply(null,xs), xmax = Math.max.apply(null,xs);
+      var ymin = Math.min.apply(null,ys), ymax = Math.max.apply(null,ys);
+      bbox = {xmin:xmin, xmax:xmax, ymin:ymin, ymax:ymax};
+    }catch(e){ return; }
+    var pad = 8;
+    var pw = (bbox.xmax - bbox.xmin) || 1;
+    var ph = (bbox.ymax - bbox.ymin) || 1;
+    var scale = Math.min((W-2*pad)/pw, (H-2*pad)/ph);
+    var cx = (W - pw*scale)/2 - bbox.xmin*scale;
+    var cy = (H - ph*scale)/2 - bbox.ymin*scale;
+    function project(p){ return { x: p.x*scale + cx, y: p.y*scale + cy }; }
+    // 画边（细线）
+    ctx.strokeStyle = 'rgba(201,168,76,.18)';
+    ctx.lineWidth = 0.4;
+    ALL_EDGES.forEach(function(e){
+      var sp = positions[ALL_NODES.findIndex(function(n){return n.id===e.from;})];
+      var tp = positions[ALL_NODES.findIndex(function(n){return n.id===e.to;})];
+      if(!sp || !tp) return;
+      var a = project(sp), b = project(tp);
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+    });
+    // 画节点（按等级着色）
+    var levelColor = {public:'#22c55e', premium:'#c9a84c', registered:'#3b82f6', professional:'#a855f7', admin:'#ef4444'};
+    ALL_NODES.forEach(function(n, i){
+      var p = positions[i];
+      if(!p) return;
+      var pt = project(p);
+      ctx.fillStyle = levelColor[n.group] || '#888';
+      ctx.beginPath();
+      ctx.arc(pt.x, pt.y, 2.4, 0, Math.PI*2);
+      ctx.fill();
+    });
+    // 视口框
+    try{
+      var viewPos = network.getViewPosition();
+      var viewScale = network.getScale();
+      var canvasFrame = network.canvas.body.container.clientWidth;
+      var canvasHeight = network.canvas.body.container.clientHeight;
+      // 视口在世界坐标中的宽高
+      var vpW = canvasFrame / viewScale;
+      var vpH = canvasHeight / viewScale;
+      var vp = project({x: viewPos.x - vpW/2, y: viewPos.y - vpH/2});
+      ctx.strokeStyle = 'rgba(255,255,255,.85)';
+      ctx.lineWidth = 1.2;
+      ctx.strokeRect(vp.x, vp.y, vpW*scale, vpH*scale);
+      ctx.fillStyle = 'rgba(255,255,255,.06)';
+      ctx.fillRect(vp.x, vp.y, vpW*scale, vpH*scale);
+      // 更新统计
+      var stat = document.getElementById('minimapStat');
+      if(stat) stat.textContent = (viewScale).toFixed(1) + 'x · ' + ALL_NODES.length + ' 节点';
+    }catch(e){}
+  }
+  // 点击 mini-map 跳转视图中心
+  document.getElementById('minimapCanvas')?.addEventListener('click', function(e){
+    if(!network) return;
+    var rect = this.getBoundingClientRect();
+    var mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    // 反算世界坐标：需要先获取 bbox，但因为 renderMinimap 已经缓存过，直接重新计算
+    var positions;
+    try{ positions = network.getPositions(); }catch(_){ return; }
+    var xs = [], ys = [];
+    ALL_NODES.forEach(function(n){ var p = positions[n.id]; if(p){ xs.push(p.x); ys.push(p.y); } });
+    var xmin = Math.min.apply(null,xs), xmax = Math.max.apply(null,xs);
+    var ymin = Math.min.apply(null,ys), ymax = Math.max.apply(null,ys);
+    var pad = 8, W = 180, H = 115;
+    var pw = (xmax-xmin)||1, ph = (ymax-ymin)||1;
+    var scale = Math.min((W-2*pad)/pw, (H-2*pad)/ph);
+    var cx = (W-pw*scale)/2 - xmin*scale;
+    var cy = (H-ph*scale)/2 - ymin*scale;
+    var wx = (mx - cx)/scale, wy = (my - cy)/scale;
+    network.moveTo({position:{x:wx,y:wy}, animation:{duration:400, easingFunction:'easeInOutQuad'}});
+  });
 })();

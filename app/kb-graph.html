@@ -29,12 +29,17 @@
     <button onclick="downloadGraphImage()" title="导出 PNG 截图">📷 截图</button>
     <button onclick="resetView()">🔄 重置视图</button>
     <button onclick="fitGraph()">🔍 适应屏幕</button>
+    <button id="minimapToggle" onclick="toggleMinimap()" title="小地图导航">🗺️ Mini-Map</button>
     <span class="sep"></span>
     <span class="stat" id="stat">加载中…</span>
     <button onclick="document.getElementById('searchInput').value='';searchGraph();clearCurrentSearchHistory();" title="清除搜索" style="font-size:11px">✖</button>
   </div>
   <div id="graph"></div>
   <div class="legend" id="legend"></div>
+  <div id="minimap" style="display:none;position:fixed;bottom:24px;right:24px;width:180px;height:140px;background:rgba(13,13,26,.92);border:1px solid var(--line);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.5);z-index:50;cursor:crosshair;overflow:hidden">
+    <div style="padding:4px 8px;font-size:11px;color:var(--gold);border-bottom:1px solid rgba(201,168,76,.25);display:flex;justify-content:space-between;align-items:center"><span>🗺️ Mini-Map</span><span id="minimapStat" style="font-size:10px;opacity:.7">—</span></div>
+    <canvas id="minimapCanvas" width="180" height="115" style="display:block"></canvas>
+  </div>
 </div>
 
 <!-- 节点详情模态 -->
@@ -51,6 +56,23 @@
 
 <script src="js/kb-graph-inline.js" defer></script>
 <script src="js/mobile-nav.js" defer></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('service-worker.js').catch(function(e){console.warn('[SW]', e);});
+  });
+  function _r89LBadge(){
+    var b = document.getElementById('r89NetBadge');
+    if(!b) return;
+    if(!navigator.onLine){ b.textContent='⚠️ 离线'; b.style.background='#ef4444'; b.style.display='block'; }
+    else { b.textContent='🟢 在线'; b.style.background='#10b981'; setTimeout(function(){ if(navigator.onLine) b.style.display='none'; }, 2000); }
+  }
+  window.addEventListener('online', _r89LBadge);
+  window.addEventListener('offline', _r89LBadge);
+  document.addEventListener('DOMContentLoaded', _r89LBadge);
+}
+</script>
+<span id="r89NetBadge" style="display:none;position:fixed;top:8px;right:8px;padding:4px 10px;background:#ef4444;color:#fff;border-radius:10px;font-size:11px;font-weight:600;z-index:9999;font-family:monospace;box-shadow:0 2px 8px rgba(0,0,0,.3)"></span>
 </body>
 </html>
 
