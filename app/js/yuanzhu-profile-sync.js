@@ -180,14 +180,50 @@
     return container;
   }
 
+  /**
+   * 通过 id 查找单条档案（R145: 补全 getProfile/loadProfile 别名）
+   */
+  function getProfileById(id) {
+    if (!id) return null;
+    return loadProfiles().find(function (p) { return p.id === id; }) || null;
+  }
+
+  /**
+   * 加载指定档案为当前缘主（R145: 补全 loadProfile）
+   * 同时返回该档案的 data 快照（用于回填 AI 助手 state）
+   */
+  function loadProfileById(id) {
+    var p = getProfileById(id);
+    if (!p) return false;
+    try {
+      localStorage.setItem(CURRENT_KEY, p.id);
+      // 构造 data 快照（兼容 ai-assistant-inline.js openProfilePanel 期望）
+      p.data = {
+        s1: p.name || '',
+        s2: p.birth || '',
+        s3: p.calendar || 'solar',
+        s4: p.time || '',
+        s5: p.lastConsultation || ''
+      };
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   // 导出到 window
   window.YuanzhuProfile = {
     record: recordProfile,
     load: loadProfiles,
+    list: loadProfiles,          // R145: 别名（ai-assistant-inline.js 用 .list()）
     current: getCurrentProfile,
     delete: deleteProfile,
+    deleteProfile: deleteProfile, // R145: 别名
     clear: clearAll,
+    clearAll: clearAll,           // R145: 别名
     captureFromState: captureFromState,
-    renderList: renderProfileList
+    renderList: renderProfileList,
+    getProfile: getProfileById,   // R145: 新增
+    loadProfile: loadProfileById  // R145: 新增
   };
 })();
