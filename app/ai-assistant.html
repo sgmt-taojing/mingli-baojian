@@ -10,6 +10,8 @@
 <link rel="stylesheet" href="css/ai-assistant-inline.css">
   <link rel="stylesheet" href="css/mobile-nav.css">
 <link rel="stylesheet" href="css/todo-bus.css">
+<!-- R89-P2 沉浸模式样式 -->
+<link rel="stylesheet" href="css/immersive-mode.css">
 </head>
 <body>
 <a href="#main-content" class="skip-link">跳到主要内容</a>
@@ -35,6 +37,7 @@
 <div id="kbStatsBar" class="kb-stats-bar" role="status" aria-live="polite" aria-label="今日 KB 命中率统计"></div>
 <div class="app">
 <div id="quickActions" style="display:flex;gap:8px;flex-wrap:wrap;padding:10px 14px;background:rgba(255,255,255,0.04);border-top:1px solid rgba(201,168,76,0.15)" role="toolbar" aria-label="快捷提问">
+  <button class="qa-btn" onclick="toggleImmersive()" aria-label="切换沉浸模式" title="开启全屏沉浸模式" style="padding:6px 12px;background:rgba(167,139,250,0.15);border:1px solid rgba(167,139,250,0.4);border-radius:14px;color:#a78bfa;font-size:12px;cursor:pointer">🌙 沉浸</button>
   <span style="font-size:11px;color:#c9a84c;align-self:center;font-weight:600">快捷：</span>
   <button class="qa-btn" onclick="quickAsk('帮我排一个八字')" aria-label="排盘八字" style="padding:6px 12px;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.4);border-radius:14px;color:#c9a84c;font-size:12px;cursor:pointer">📿 排八字</button>
   <button class="qa-btn" onclick="quickAsk('今日运势怎么样')" aria-label="今日运势" style="padding:6px 12px;background:rgba(76,175,80,0.15);border:1px solid rgba(76,175,80,0.4);border-radius:14px;color:#81c784;font-size:12px;cursor:pointer">🌟 今日运势</button>
@@ -142,6 +145,23 @@
 
 
 </main>
+
+<!-- R89-P2 全屏沉浸模式：背景画卷 + 毛笔字渐显 -->
+<div id="immersiveOverlay" class="immersive-overlay" aria-hidden="true">
+  <div class="immersive-scroll-bg">
+    <div class="scroll-layer scroll-mountains"></div>
+    <div class="scroll-layer scroll-clouds"></div>
+    <div class="scroll-layer scroll-stars"></div>
+  </div>
+  <div class="immersive-content">
+    <div class="brush-title" id="brushTitle">易道智鉴</div>
+    <div class="brush-subtitle" id="brushSubtitle">天人合一 · 万象归道</div>
+    <div class="immersive-hint">点击任意位置退出沉浸模式</div>
+  </div>
+  <button class="immersive-exit" onclick="toggleImmersive()" aria-label="退出沉浸模式">✕ 退出</button>
+</div>
+
+<script src="js/immersive-mode-inline.js" defer></script>
 <script src="js/consent-banner.js" defer></script>
 <script src="js/todo-bus.js" defer></script>
 <script src="js/ai-assistant-inline.js" defer></script>

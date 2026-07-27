@@ -513,3 +513,126 @@ body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xm
 .file-nav-btn{color:var(--paper3);text-decoration:none;font-size:12px;padding:5px 14px;border:1px solid rgba(201,168,76,0.12);border-radius:16px;transition:all .25s;font-family:'Noto Serif SC',serif;letter-spacing:1px;white-space:nowrap}
 .file-nav-btn:hover{background:rgba(201,168,76,0.1);color:var(--gold);border-color:rgba(201,168,76,0.3)}
 .file-nav-btn.active{background:rgba(201,168,76,0.12);color:var(--gold);border-color:rgba(201,168,76,0.35)}
+
+/* ===== R89-P2 黄历热力图 ===== */
+.heatmap-section {
+  max-width: 960px;
+  margin: 60px auto 40px;
+  padding: 0 20px;
+  background: linear-gradient(180deg, rgba(201,168,76,0.04) 0%, transparent 100%);
+  border-radius: 16px;
+}
+.heatmap-header { text-align: center; padding: 24px 0 16px; }
+.heatmap-header h2 {
+  font-family: 'Ma Shan Zheng', 'Noto Serif SC', serif;
+  font-size: clamp(22px, 4vw, 32px);
+  letter-spacing: 6px;
+  color: var(--gold, #c9a84c);
+  margin-bottom: 8px;
+}
+.heatmap-sub { font-size: 12px; color: rgba(243,234,208,0.6); letter-spacing: 1px; margin-bottom: 16px; }
+.heatmap-legend {
+  display: flex; gap: 16px; justify-content: center;
+  font-size: 11px; letter-spacing: 1px; flex-wrap: wrap;
+}
+.hl-item { display: inline-flex; align-items: center; gap: 6px; color: rgba(243,234,208,0.7); }
+.hl-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+
+.heatmap-months {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 24px;
+}
+.hm-month {
+  background: rgba(22,27,34,0.4);
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: 10px;
+  padding: 12px 10px 8px;
+}
+.hm-month-title {
+  font-size: 13px; font-weight: 600;
+  color: var(--gold, #c9a84c);
+  letter-spacing: 3px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+.hm-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.hm-cell {
+  width: 100%;
+  aspect-ratio: 1;
+  background: #555;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+.hm-cell:hover {
+  transform: scale(1.4);
+  z-index: 5;
+  box-shadow: 0 0 8px rgba(255,247,224,0.6);
+}
+.hm-cell.hm-jieqi {
+  border: 1px solid #f3ead0;
+  box-shadow: 0 0 4px rgba(243,234,208,0.5);
+}
+.heatmap-detail {
+  margin-top: 24px;
+  min-height: 100px;
+}
+.heatmap-detail-empty {
+  text-align: center;
+  color: rgba(243,234,208,0.4);
+  font-size: 12px;
+  letter-spacing: 3px;
+  padding: 32px 0;
+}
+.hd-card {
+  background: rgba(22,27,34,0.7);
+  border: 1px solid rgba(201,168,76,0.25);
+  border-radius: 12px;
+  padding: 18px 24px;
+  text-align: center;
+  animation: detailFade 0.4s ease;
+}
+@keyframes detailFade {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hd-date {
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 22px; color: var(--gold, #c9a84c);
+  letter-spacing: 4px;
+  margin-bottom: 12px;
+}
+.hd-jieqi { font-size: 14px; background: rgba(243,234,208,0.15); padding: 2px 10px; border-radius: 12px; margin-left: 8px; }
+.hd-jianchu { font-size: 14px; color: rgba(243,234,208,0.85); margin-bottom: 4px; }
+.hd-jianchu strong { color: var(--gold, #c9a84c); font-size: 18px; margin-left: 4px; }
+.hd-energy { font-size: 12px; color: rgba(243,234,208,0.6); margin-bottom: 14px; }
+.hd-energy-num { font-weight: 700; font-size: 16px; }
+.hd-yi, .hd-ji {
+  display: flex; align-items: center; justify-content: center;
+  gap: 12px;
+  font-size: 14px;
+  padding: 6px 0;
+  color: rgba(243,234,208,0.9);
+}
+.hd-label {
+  display: inline-block; width: 28px; height: 28px;
+  line-height: 28px; text-align: center;
+  border-radius: 50%;
+  font-weight: 700;
+}
+.hd-yi .hd-label { background: #2c5e2e; color: #f3ead0; }
+.hd-ji .hd-label { background: #7a1f15; color: #f3ead0; }
+
+@media (max-width: 768px) {
+  .heatmap-months { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .heatmap-months { grid-template-columns: 1fr; }
+}
