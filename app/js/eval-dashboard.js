@@ -451,6 +451,107 @@ function renderSparkline(score, rate){
   return wrap;
 }
 
+// 跨周分模块评分趋势表
+function computeModuleTrend(){
+  // 找出有 per-case results 的周
+  const detailWeeks = WEEKS.filter(w => {
+    const f = cache.weeks[w]?.faithfulness;
+    return f && f.results && f.results.length > 0;
+  });
+  if (!detailWeeks.length) return { weeks: [], modules: {} };
+
+  // 按周按模块聚合
+  const modByWeek = {}; // { bazi: { '2026-W31': {avg, cases, kb} } }
+  detailWeeks.forEach(w => {
+    const f = cache.weeks[w].faithfulness;
+    const agg = {};
+    f.results.forEach(r => {
+      const mod = FAITH_MODULE_MAP[r.id] || 'other';
+      if (!agg[mod]) agg[mod] = { scores: [], kbHits: 0 };
+      agg[mod].scores.push(r.score || 0);
+      if ((r.score || 0) > 0) agg[mod].kbHits++;
+    });
+    Object.keys(agg).forEach(mod => {
+      if (!modByWeek[mod]) modByWeek[mod] = {};
+      const s = agg[mod];
+      const avg = s.scores.reduce((a,b)=>a+b, 0) / s.scores.length;
+      modByWeek[mod][w] = {
+        avg: Math.round(avg * 1000) / 1000,
+        cases: s.scores.length,
+        kb_rate: Math.round((s.kbHits / s.scores.length) * 1000) / 1000
+      };
+    });
+  });
+  return { weeks: detailWeeks, modules: modByWeek };
+}
+
+function renderModuleTrend(){
+  const wrap = $('moduleTrendTable');
+  if (!wrap) return;
+  const { weeks, modules } = computeModuleTrend();
+  wrap.innerHTML = '';
+
+  if (!weeks.length){
+    wrap.appendChild(el('div', {className:'no-violations'}, '暂无 per-case 数据周'));  
+    return;
+  }
+
+  const modLabels = {
+    bazi:'八字', ziwei:'紫微', qimen:'奇门', liuyao:'六爻', liuren:'六壬',
+    meihua:'梅花', fengshui:'风水', zodiac:'生肖', tizhi:'体质',
+    tcm:'中医', wuxing:'五行', zeri:'择日', other:'其他'
+  };
+  // 按模块名排序（bazi 先）
+  const modKeys = Object.keys(modules).sort((a,b) => {
+    const order = ['bazi','ziwei','qimen','liuyao','liuren','meihua','fengshui','zodiac','tizhi','tcm','wuxing','zeri','other'];
+    return order.indexOf(a) - order.indexOf(b);
+  });
+
+  const table = el('table', {className:'mod-trend-table'});
+  // thead
+  const thead = el('thead', null,
+    el('tr', null,
+      el('th', {className:'mod-trend-mod'}, '模块'),
+      ...weeks.map(w => el('th', {className:'mod-trend-week'}, w.replace('2026-',''))),
+      el('th', {className:'mod-trend-avg'}, '均值')
+    )
+  );
+  table.appendChild(thead);
+
+  // tbody
+  const tbody = el('tbody');
+  modKeys.forEach(mod => {
+    const row = el('tr', null,
+      el('td', {className:'mod-trend-mod'}, modLabels[mod] || mod)
+    );
+    const allAvgs = [];
+    weeks.forEach(w => {
+      const d = modules[mod][w];
+      if (d){
+        allAvgs.push(d.avg);
+        const cls = d.avg >= 0.85 ? 'ok' : d.avg >= 0.7 ? 'warn' : 'danger';
+        row.appendChild(el('td', {className:'mod-trend-cell eval-' + cls},
+          el('span', {className:'cell-score'}, d.avg.toFixed(3)),
+          el('span', {className:'cell-meta'}, d.cases + '例 ' + (d.kb_rate * 100).toFixed(0) + '%')
+        ));
+      } else {
+        row.appendChild(el('td', {className:'mod-trend-cell eval-none'}, '—'));
+      }
+    });
+    // 均值列
+    if (allAvgs.length){
+      const overallAvg = allAvgs.reduce((a,b)=>a+b, 0) / allAvgs.length;
+      const cls = overallAvg >= 0.85 ? 'ok' : overallAvg >= 0.7 ? 'warn' : 'danger';
+      row.appendChild(el('td', {className:'mod-trend-avg eval-' + cls}, overallAvg.toFixed(3)));
+    } else {
+      row.appendChild(el('td', {className:'mod-trend-avg'}, '—'));
+    }
+    tbody.appendChild(row);
+  });
+  table.appendChild(tbody);
+  wrap.appendChild(table);
+}
+
 // 导出当前快照
 function exportSnapshot(){
   const snap = {
@@ -477,6 +578,7 @@ async function refresh(){
     renderTrends();
     renderViolations();
     renderModules();
+    renderModuleTrend();
   }finally{
     $('refreshBtn').textContent = '🔄 刷新';
     $('refreshBtn').disabled = false;
