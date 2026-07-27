@@ -65,10 +65,10 @@
     
     <div class="toolbar">
       <input  type="text" id="shop-search-input" placeholder="🔍 搜索商品名称、描述、标签..." aria-label="🔍 搜索商品名称、描述、标签...">
-      <select id="shop-category-filter" onchange="window._shopAdmin.filterByCategory()">
+      <select id="shop-category-filter" aria-label="商品分类筛选" onchange="window._shopAdmin.filterByCategory()">
         <option value="all">全部分类</option>
       </select>
-      <select id="shop-status-filter" onchange="window._shopAdmin.filterByStatus()">
+      <select id="shop-status-filter" aria-label="商品状态筛选" onchange="window._shopAdmin.filterByStatus()">
         <option value="all">全部状态</option>
         <option value="online">已上架</option>
         <option value="offline">已下架</option>
@@ -120,19 +120,19 @@
     <div class="form-row-3">
       <div class="form-group">
         <label for="prod-category">分类 *</label>
-        <select id="prod-category" onchange="window._shopAdmin.onCategoryChange()">
+        <select id="prod-category" aria-label="prod-category" onchange="window._shopAdmin.onCategoryChange()">
           <option value="">-- 选择分类 --</option>
         </select>
       </div>
       <div class="form-group">
         <label for="prod-subcategory">子分类</label>
-        <select id="prod-subcategory">
+        <select id="prod-subcategory" aria-label="prod-subcategory">
           <option value="">-- 选择子分类 --</option>
         </select>
       </div>
       <div class="form-group">
         <label for="prod-status">状态</label>
-        <select id="prod-status">
+        <select id="prod-status" aria-label="prod-status">
           <option value="online">上架</option>
           <option value="offline">下架</option>
         </select>
@@ -146,11 +146,11 @@
       </div>
       <div class="form-group">
         <label for="prod-stock">库存</label>
-        <input type="number" id="prod-stock" value="0" min="0">
+        <input type="number" id="prod-stock" aria-label="prod-stock" value="0" min="0">
       </div>
       <div class="form-group">
         <label for="prod-sales">销量</label>
-        <input type="number" id="prod-sales" value="0" min="0">
+        <input type="number" id="prod-sales" aria-label="prod-sales" value="0" min="0">
       </div>
     </div>
     
@@ -176,7 +176,7 @@
       </div>
       <div class="form-group">
         <label for="prod-rating">评分</label>
-        <input type="number" id="prod-rating" value="4.5" min="0" max="5" step="0.1" style="width:100px">
+        <input type="number" id="prod-rating" aria-label="prod-rating" value="4.5" min="0" max="5" step="0.1" style="width:100px">
       </div>
     </div>
     
@@ -213,7 +213,7 @@
         <div class="upload-text">拖拽图片到此处或点击上传</div>
         <div class="upload-hint">支持 JPG/PNG/WebP，单张不超过5MB，最多5张</div>
       </div>
-      <input type="file" id="image-file-input" accept="image/*" multiple style="display:none">
+      <input type="file" id="image-file-input" aria-label="image-file-input" accept="image/*" multiple style="display:none">
       <div class="image-previews" id="image-preview-container"></div>
     </div>
     

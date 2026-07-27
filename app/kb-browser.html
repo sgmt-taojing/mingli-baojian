@@ -191,7 +191,7 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
     <input type="text" id="searchInput" placeholder="输入关键词，如 '八字' '紫微' '小青龙汤' '倪海厦'..." autocomplete="off" style="width:100%;box-sizing:border-box">
     <div id="searchHistory" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--card);border:1px solid var(--border);border-radius:8px;margin-top:2px;max-height:240px;overflow-y:auto;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,.5)"></div>
   </div>
-  <select id="searchModule">
+  <select id="searchModule" aria-label="搜索模块">
     <option value="">全部模块</option>
   </select>
   <button class="btn primary" id="searchBtn" style="padding:10px 18px;background:var(--gold);color:#000;border:none;border-radius:8px;cursor:pointer;font-size:.9rem">搜索</button>
@@ -257,14 +257,14 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
 <section class="panel" id="panel-graph" hidden>
   <div id="graphToolbar" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
     <input id="graphSearchInput" type="search" placeholder="🔍 搜索节点 (ID/名称/拼音..." aria-label="搜索图谱节点" style="flex:1;min-width:200px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--paper2);padding:8px 12px;border-radius:8px;font:inherit;font-size:.85rem">
-    <select id="graphLevelFilter" style="background:var(--card);border:1px solid var(--border);color:var(--paper2);padding:8px;border-radius:8px;font-size:.82rem">
+    <select id="graphLevelFilter" aria-label="图谱层级筛选" style="background:var(--card);border:1px solid var(--border);color:var(--paper2);padding:8px;border-radius:8px;font-size:.82rem">
       <option value="">全部等级</option>
       <option value="premium">premium</option>
       <option value="professional">professional</option>
       <option value="public">public</option>
       <option value="admin">admin</option>
     </select>
-    <select id="graphSortBy" style="background:var(--card);border:1px solid var(--border);color:var(--paper2);padding:8px;border-radius:8px;font-size:.82rem">
+    <select id="graphSortBy" aria-label="图谱排序" style="background:var(--card);border:1px solid var(--border);color:var(--paper2);padding:8px;border-radius:8px;font-size:.82rem">
       <option value="xref">按引用数</option>
       <option value="hit">按命中数</option>
       <option value="size">按大小</option>
@@ -357,7 +357,7 @@ function switchTab(tab){var el=document.querySelector(".tab[data-tab=\""+tab+"\"
   if(modules.length === 0){
     modC.innerHTML = '<div class="empty">暂无模块数据</div>';
   } else {
-    let html = '<div style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><input type="search" id="modulesFilter" placeholder="🔍 过滤模块名称/等级..." style="flex:1;min-width:160px;padding:8px 12px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font:inherit;font-size:.85rem"><select id="modulesSortBy" style="padding:8px 12px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.85rem"><option value="cnt">按条目数</option><option value="avg_trust">按信任度</option><option value="grade">按质量等级</option><option value="needs_fix">按需修数</option></select><button id="modulesExport" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:.8rem">📤 导出过滤</button><span id="modulesCount" style="font-size:.8rem;color:var(--paper3)"></span></div><table class="mod-table"><thead><tr><th data-sort="name" style="cursor:pointer" title="点击排序">模块</th><th data-sort="cnt" style="cursor:pointer" title="点击排序">条目</th><th data-sort="grade" style="cursor:pointer" title="点击排序">等级</th><th data-sort="avg_trust" style="cursor:pointer" title="点击排序">平均 trust</th><th data-sort="needs_fix" style="cursor:pointer" title="点击排序">金/银/铜/需修</th><th>分布</th><th>操作</th></tr></thead><tbody>';
+    let html = '<div style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><input type="search" id="modulesFilter" placeholder="🔍 过滤模块名称/等级..." style="flex:1;min-width:160px;padding:8px 12px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font:inherit;font-size:.85rem"><select id="modulesSortBy" aria-label="模块排序" style="padding:8px 12px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.85rem"><option value="cnt">按条目数</option><option value="avg_trust">按信任度</option><option value="grade">按质量等级</option><option value="needs_fix">按需修数</option></select><button id="modulesExport" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:.8rem">📤 导出过滤</button><span id="modulesCount" style="font-size:.8rem;color:var(--paper3)"></span></div><table class="mod-table"><thead><tr><th data-sort="name" style="cursor:pointer" title="点击排序">模块</th><th data-sort="cnt" style="cursor:pointer" title="点击排序">条目</th><th data-sort="grade" style="cursor:pointer" title="点击排序">等级</th><th data-sort="avg_trust" style="cursor:pointer" title="点击排序">平均 trust</th><th data-sort="needs_fix" style="cursor:pointer" title="点击排序">金/银/铜/需修</th><th>分布</th><th>操作</th></tr></thead><tbody>';
     for(const m of modules){
       const trust = m.avg_trust || 0;
       const trustPct = Math.round(trust * 100);
@@ -459,7 +459,7 @@ function switchTab(tab){var el=document.querySelector(".tab[data-tab=\""+tab+"\"
   } else {
     let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:8px;flex-wrap:wrap">';
     html += `<div><h2 style="margin:0;color:var(--gold);font-size:1.1rem">📁 KB 文件库（${fileList.length} 个）</h2></div>`;
-    html += `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><input type="search" id="filesFilterInput" placeholder="🔍 按文件名/描述过滤" style="flex:1;min-width:140px;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font:inherit;font-size:.85rem"><select id="filesLevelFilter" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.85rem"><option value="">全等级</option><option value="public">public</option><option value="professional">professional</option><option value="admin">admin</option></select><select id="filesSortBy" title="按条数排序" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.85rem"><option value="name">按文件名</option><option value="entries-desc">条目数 ↓</option><option value="entries-asc">条目数 ↑</option></select><span id="filesCount" style="font-size:.8rem;color:var(--paper3)"></span><button class="btn" id="randomFilesBtn" style="background:var(--gold);color:#000;border:0;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">🔀 随机 5 个</button><button class="btn" id="randomOneBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">🎲 随机 1 个精读</button><button class="btn" id="copyFilesListBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📋 复制清单</button><button class="btn" id="filesStatBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📊 统计</button><button class="btn" id="filesGroupBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📂 按等级分组</button></div>`;
+    html += `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><input type="search" id="filesFilterInput" placeholder="🔍 按文件名/描述过滤" style="flex:1;min-width:140px;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font:inherit;font-size:.85rem"><select id="filesLevelFilter" aria-label="文件层级筛选" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.85rem"><option value="">全等级</option><option value="public">public</option><option value="professional">professional</option><option value="admin">admin</option></select><select id="filesSortBy" aria-label="filesSortBy" title="按条数排序" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.85rem"><option value="name">按文件名</option><option value="entries-desc">条目数 ↓</option><option value="entries-asc">条目数 ↑</option></select><span id="filesCount" style="font-size:.8rem;color:var(--paper3)"></span><button class="btn" id="randomFilesBtn" style="background:var(--gold);color:#000;border:0;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">🔀 随机 5 个</button><button class="btn" id="randomOneBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">🎲 随机 1 个精读</button><button class="btn" id="copyFilesListBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📋 复制清单</button><button class="btn" id="filesStatBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📊 统计</button><button class="btn" id="filesGroupBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📂 按等级分组</button></div>`;
     html += '</div><div class="grid">';
     function getSortedFiles(){
       const by = document.getElementById('filesSortBy')?.value || 'name';
@@ -787,13 +787,13 @@ function switchTab(tab){var el=document.querySelector(".tab[data-tab=\""+tab+"\"
         </div>
         <h3 style="margin:16px 0 10px;color:var(--gold);font-size:1rem">📦 ${filtered.length} 个匹配节点（按 ${sortBy} 排序）</h3>
         <table class="mod-table">
-          <thead><tr><th><input type="checkbox" id="graphSelectAll" title="全选"></th><th>ID</th><th>名称</th><th>等级</th><th>大小 KB</th><th>命中</th><th>引用</th><th>操作</th></tr></thead>
+          <thead><tr><th><input type="checkbox" id="graphSelectAll" aria-label="graphSelectAll" title="全选"></th><th>ID</th><th>名称</th><th>等级</th><th>大小 KB</th><th>命中</th><th>引用</th><th>操作</th></tr></thead>
           <tbody>`;
       for(const n of filtered){
         const lvl = n.level || 'public';
         const lvlChip = lvl==='premium' ? '<span class="chip">premium</span>' : lvl==='professional' ? '<span class="chip blue">professional</span>' : lvl==='admin' ? '<span class="chip red">admin</span>' : '<span class="chip green">public</span>';
         html += `<tr>
-          <td><input type="checkbox" class="graph-row-check" data-id="${n.id}" data-name="${(n.name||n.id).replace(/"/g,'&quot;')}" data-level="${lvl}"></td>
+          <td><input type="checkbox" class="graph-row-check" data-id="${n.id}" aria-label="${n.id}" data-name="${(n.name||n.id).replace(/"/g,'&quot;')}" data-level="${lvl}"></td>
           <td><code style="font-size:.78rem">${n.id}</code></td>
           <td><b>${n.name||n.id}</b></td>
           <td>${lvlChip}</td>
@@ -1460,13 +1460,13 @@ function switchTab(tab){var el=document.querySelector(".tab[data-tab=\""+tab+"\"
     }
     let html = `
       <div class="fav-toolbar" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;padding:12px;background:var(--card);border-radius:10px;border:1px solid var(--border);align-items:center">
-        <input type="checkbox" id="favSelectAll" title="全选/取消全选（当前过滤结果）">
+        <input type="checkbox" id="favSelectAll" aria-label="favSelectAll" title="全选/取消全选（当前过滤结果）">
         <input type="text" id="favSearch" placeholder="🔍 搜索名称 / ID / 笔记..." value="${searchQ}" style="flex:1;min-width:200px;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2)"/>
-        <select id="favTagFilter" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2)">
+        <select id="favTagFilter" aria-label="收藏标签筛选" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2)">
           <option value="">🏷️ 全部标签</option>
           ${allTags.map(t => `<option value="${t}" ${tagFilter===t?'selected':''}>${t}</option>`).join('')}
         </select>
-        <select id="favSortBy" title="排序方式" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.82rem"><option value="time-desc">最近收藏</option><option value="time-asc">最早收藏</option><option value="name">按名称</option></select>
+        <select id="favSortBy" aria-label="favSortBy" title="排序方式" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.82rem"><option value="time-desc">最近收藏</option><option value="time-asc">最早收藏</option><option value="name">按名称</option></select>
         <span id="favCountSpan" style="color:var(--paper3);font-size:.85rem">${filtered.length}/${arr.length}</span><span id="favHitCount" style="font-size:.78rem;color:var(--gold);margin-left:6px"></span>
         <button class="btn danger" id="favBulkRemoveBtn" style="font-size:.82rem">🗑 批量取消选中</button>
       </div>
@@ -1474,7 +1474,7 @@ function switchTab(tab){var el=document.querySelector(".tab[data-tab=\""+tab+"\"
         ${filtered.map(f => `
           <div class="card" data-fav-id="${f.id}">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-              <input type="checkbox" class="fav-row-check" data-fav-id="${f.id}" data-fav-name="${(f.name||'').replace(/"/g,'&quot;')}">
+              <input type="checkbox" class="fav-row-check" data-fav-id="${f.id}" aria-label="${f.id}" data-fav-name="${(f.name||'').replace(/"/g,'&quot;')}">
               <span class="file-name">${f.name||f.id}</span>
               <span class="file-name">${f.name||f.id}</span>
               <span class="chip ${f.level==='professional'?'blue':f.level==='admin'?'red':'green'}">${f.level||'public'}</span>
