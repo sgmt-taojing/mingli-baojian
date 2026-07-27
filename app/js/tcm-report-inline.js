@@ -207,7 +207,7 @@ function hourLabel(t) {
 
 // ===== 舌面诊速查 =====
 function loadTongue28Quick() {
-  const kb = window.TCM_DIAGNOSIS_KB.tongue28; if (!kb) return;
+  const kb = (window.TCM_DIAGNOSIS_KB && window.TCM_DIAGNOSIS_KB.tongue28) || {}; if (!kb || !Object.keys(kb).length) return;
   const el = document.getElementById('tongue28-quick');
   const items = [];
   for (const [cat, dict] of Object.entries(kb)) {

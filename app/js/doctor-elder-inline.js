@@ -22,6 +22,6 @@ function renderElderDashboardR37(){
 }
 
 
-renderElderDashboardR37_inject()
+if (typeof renderElderDashboardR37_inject === 'function') renderElderDashboardR37_inject()
 
 document.getElementById("elderDashboard").innerHTML=renderElderDashboardR37();

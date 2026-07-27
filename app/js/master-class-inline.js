@@ -66,7 +66,7 @@ function renderLessons(master){
     if(l.summary) html+='<div style="font-size:11px;color:var(--paper3);margin-top:4px">'+l.summary+'</div>';
     html+='</ml-tap>';
   });
-  list.innerHTML=html;
+  if(list) list.innerHTML=html;
 }
 
 // 学习进度记录

@@ -772,4 +772,4 @@ window.addEventListener('DOMContentLoaded', ()=>{
 });
 
 
-setTimeout(function(){var el=document.getElementById("r40DiseaseDashboard");if(el)el.innerHTML=renderDiseaseHealthCareerR40();},500);
+setTimeout(function(){var el=document.getElementById("r40DiseaseDashboard");if(el && typeof renderDiseaseHealthCareerR40==='function')el.innerHTML=renderDiseaseHealthCareerR40();},500);

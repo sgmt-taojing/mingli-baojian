@@ -2488,7 +2488,7 @@ function renderTcmCareerPanelR37(){
   h+='</div>';
   h+='<div style="margin:10px 0 8px;color:var(--paper3);font-size:12px;letter-spacing:1.5px">📋 8 事业维度（中医生事业规划）</div>';
   h+='<div class="tcm-career-8grid">';
-  Object.keys(TCM_CAREER_8D_R37).forEach(function(k){var it=TCM_CAREER_8D_R37[k];
+  Object.keys(TCM_CAREER_8D_R37||{}).forEach(function(k){var it=TCM_CAREER_8D_R37[k];
     h+='<ml-tap class="tcm-career-cell" onclick="alert(\''+it.label+'·'+it.desc+'\\n\\n行动建议：'+it.tip+'\')" variant="card" role="button" tabindex="0"><span class="icon">'+it.icon+'</span><b>'+it.label+'</b><div class="tip">'+it.desc+'</div><div class="tip" style="margin-top:4px;color:var(--gold)">👉 '+it.tip+'</div></ml-tap>';
   });
   h+='</div>';
