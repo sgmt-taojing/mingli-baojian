@@ -38,10 +38,50 @@
       save(arr);
       return false;
     } else {
-      arr.unshift({ id: item.id, name: item.name || item.id, level: item.level || 'public', ts: Date.now() });
+      arr.unshift({ id: item.id, name: item.name || item.id, level: item.level || 'public', kind: item.kind || 'module', tags: item.tags || [], note: item.note || '', ts: Date.now() });
       save(arr);
       return true;
     }
+  }
+
+  function add(item){
+    const arr = getAll();
+    if(arr.find(x => x.id === item.id)) return false;
+    arr.unshift({ id: item.id, name: item.name || item.id, level: item.level || 'public', kind: item.kind || 'module', tags: item.tags || [], note: item.note || '', ts: Date.now() });
+    save(arr);
+    return true;
+  }
+
+  function remove(id){
+    const arr = getAll();
+    const idx = arr.findIndex(x => x.id === id);
+    if(idx >= 0){ arr.splice(idx, 1); save(arr); return true; }
+    return false;
+  }
+
+  function updateNote(id, note){
+    const arr = getAll();
+    const item = arr.find(x => x.id === id);
+    if(!item) return false;
+    item.note = note || '';
+    save(arr);
+    return true;
+  }
+
+  function updateTags(id, tags){
+    const arr = getAll();
+    const item = arr.find(x => x.id === id);
+    if(!item) return false;
+    item.tags = Array.isArray(tags) ? tags : [];
+    save(arr);
+    return true;
+  }
+
+  function getTags(){
+    const arr = getAll();
+    const set = new Set();
+    arr.forEach(x => (x.tags || []).forEach(t => set.add(t)));
+    return [...set].sort();
   }
 
   // 渲染侧栏收藏抽屉
@@ -52,13 +92,17 @@
     if(arr.length === 0){
       drawer.innerHTML = '<div class="fav-empty">⭐ 暂无收藏<br><small>点击模块卡片右上角的 ⭐ 收藏</small></div>';
     } else {
+      const allTags = getTags();
       drawer.innerHTML = `
         <div class="fav-head">⭐ 我的收藏（${arr.length}）</div>
+        ${allTags.length ? `<div class="fav-tagfilter" style="padding:6px 10px;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:4px"><span style="font-size:.75rem;color:var(--paper3);margin-right:4px">标签：</span>${allTags.map(t => `<span class="fav-tag" style="font-size:.7rem;background:var(--card);border:1px solid var(--border);padding:2px 8px;border-radius:10px;cursor:pointer" onclick="if(window.KbFavorites){window._favDrawerTag='${t}';renderDrawerWithFilter();}">${t}</span>`).join('')}</div>` : ''}
         ${arr.map(f => `
           <div class="fav-item" data-id="${f.id}">
             <div class="fav-info">
               <div class="fav-name">${f.name}</div>
               <div class="fav-meta"><code>${f.id}</code> · ${f.level} · ${new Date(f.ts).toLocaleDateString('zh-CN')}</div>
+              ${(f.tags && f.tags.length) ? `<div class="fav-tags">${f.tags.map(t => `<span class="fav-tag">🏷️ ${t}</span>`).join('')}</div>` : ''}
+              ${f.note ? `<div class="fav-note">📝 ${f.note.length > 30 ? f.note.slice(0,30)+'…' : f.note}</div>` : ''}
             </div>
             <div class="fav-actions">
               <a class="btn" href="kb-quality.html?module=${encodeURIComponent(f.id)}">📊</a>
@@ -217,7 +261,8 @@
 
   // 暴露 API
   window.KbFavorites = {
-    getAll, toggle, isFav, render: renderDrawer, init,
+    getAll, toggle, add, remove, isFav, render: renderDrawer, init,
+    updateNote, updateTags, getTags,
     export: function(){
       const arr = getAll();
       const blob = new Blob([JSON.stringify(arr, null, 2)], { type: 'application/json' });

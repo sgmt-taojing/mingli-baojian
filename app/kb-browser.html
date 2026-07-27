@@ -694,13 +694,31 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
     const c = document.getElementById('favsContainer');
     if(!c) return;
     const arr = window.KbFavorites ? window.KbFavorites.getAll() : JSON.parse(localStorage.getItem('***')||'[]');
+    const tagFilter = window._favTagFilter || '';
+    const searchQ = (window._favSearchQ || '').toLowerCase();
+    const allTags = window.KbFavorites ? window.KbFavorites.getTags() : [];
+
+    let filtered = arr;
+    if(tagFilter) filtered = filtered.filter(f => (f.tags||[]).includes(tagFilter));
+    if(searchQ) filtered = filtered.filter(f =>
+      (f.name||'').toLowerCase().includes(searchQ) || (f.id||'').toLowerCase().includes(searchQ) || (f.note||'').toLowerCase().includes(searchQ)
+    );
+
     if(arr.length === 0){
       c.innerHTML = `<div class="empty"><h3>⭐ 暂无收藏</h3><p>在任意 KB 模块卡右上角点 ☆ 即可收藏。到这里查看与批量管理。</p></div>`;
       return;
     }
     let html = `
-      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
-        ${arr.map(f => `
+      <div class="fav-toolbar" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;padding:12px;background:var(--card);border-radius:10px;border:1px solid var(--border);align-items:center">
+        <input type="text" id="favSearch" placeholder="🔍 搜索名称 / ID / 笔记..." value="${searchQ}" style="flex:1;min-width:200px;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2)"/>
+        <select id="favTagFilter" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2)">
+          <option value="">🏷️ 全部标签</option>
+          ${allTags.map(t => `<option value="${t}" ${tagFilter===t?'selected':''}>${t}</option>`).join('')}
+        </select>
+        <span style="color:var(--paper3);font-size:.85rem">${filtered.length}/${arr.length}</span>
+      </div>
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+        ${filtered.map(f => `
           <div class="card" data-fav-id="${f.id}">
             <div class="file-head">
               <span class="file-name">${f.name||f.id}</span>
@@ -708,7 +726,17 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
             </div>
             <div class="desc"><code style="font-size:.78rem">${f.id}</code></div>
             <div class="meta"><span class="chip gray">收藏于 ${new Date(f.ts).toLocaleString('zh-CN')}</span></div>
-            <div class="actions">
+            ${(f.tags && f.tags.length) ? `<div class="fav-tags" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">${f.tags.map(t => `<span class="fav-tag" style="font-size:.7rem;background:var(--gold-dim);color:#000;padding:2px 6px;border-radius:10px">🏷️ ${t}</span>`).join('')}</div>` : ''}
+            ${f.note ? `<div class="fav-note" style="font-size:.82rem;color:var(--paper3);margin-top:6px;font-style:italic;line-height:1.4">📝 ${f.note.length > 50 ? f.note.slice(0,50)+'…' : f.note}</div>` : ''}
+            <details style="margin-top:8px">
+              <summary style="cursor:pointer;color:var(--gold);font-size:.82rem;padding:4px 0">✏️ 编辑笔记/标签</summary>
+              <div style="margin-top:6px">
+                <input type="text" data-fav-note="${f.id}" placeholder="📝 私域笔记..." value="${(f.note||'').replace(/"/g,'&quot;')}" style="width:100%;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.82rem;margin-bottom:6px"/>
+                <input type="text" data-fav-tags="${f.id}" placeholder="🏷️ 标签 (逗号分隔)" value="${(f.tags||[]).join(', ')}" style="width:100%;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.82rem;margin-bottom:6px"/>
+                <button class="btn primary" style="padding:5px 12px;border-radius:6px;background:var(--gold);color:#000;border:0;cursor:pointer;font-size:.82rem" onclick="saveFavMeta('${f.id}')">💾 保存</button>
+              </div>
+            </details>
+            <div class="actions" style="margin-top:8px">
               <a class="btn" href="kb-quality.html?module=${encodeURIComponent(f.id)}">📊 质量</a>
               <a class="btn" href="kb-graph.html?module=${encodeURIComponent(f.id)}">🕸️ 图谱</a>
               <button class="btn danger" onclick="KbFavorites.toggle({id:'${f.id}',name:'${(f.name||'').replace(/'/g,"\\'")}'});renderFavs();">× 取消</button>
@@ -723,7 +751,25 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
       </div>
     `;
     c.innerHTML = html;
+    // 绑定搜索/筛选
+    const sq = document.getElementById('favSearch');
+    if(sq) sq.oninput = (e) => { window._favSearchQ = e.target.value; renderFavs(); };
+    const tf = document.getElementById('favTagFilter');
+    if(tf) tf.onchange = (e) => { window._favTagFilter = e.target.value; renderFavs(); };
   }
+
+  // R106 保存笔记/标签
+  window.saveFavMeta = function(id){
+    const noteEl = document.querySelector(`input[data-fav-note="${id}"]`);
+    const tagsEl = document.querySelector(`input[data-fav-tags="${id}"]`);
+    if(noteEl && window.KbFavorites) window.KbFavorites.updateNote(id, noteEl.value);
+    if(tagsEl && window.KbFavorites){
+      const tags = tagsEl.value.split(/[,，]/).map(t => t.trim()).filter(t => t);
+      window.KbFavorites.updateTags(id, tags);
+    }
+    renderFavs();
+    if(window.toast) window.toast('✅ 已保存笔记/标签', 1500);
+  };
   // 暴露给 onclick
   window.renderFavs = renderFavs;
 
