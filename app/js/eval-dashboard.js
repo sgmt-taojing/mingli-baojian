@@ -120,7 +120,7 @@ function renderTrend(chartId, opts){
   const innerW = W - padL - padR;
   const innerH = H - padT - padB;
 
-  const points = opts.points;
+  const points = opts.points || series(opts.lines[0].bench, opts.lines[0].key);
   const valid = points.filter(p => p.value != null);
   const allValues = [];
   valid.forEach(p => allValues.push(p.value));
