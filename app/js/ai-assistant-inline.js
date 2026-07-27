@@ -1169,7 +1169,104 @@ async function autoSavePaipan(reportText){
   }catch(_){/*静默失败*/}
 }
 
+// ===== R89 合规黑名单 + 免责声明（P0-2 / P0-3 / P2-1）=====
+const COMPLIANCE_FORBIDDEN = [
+  // —— 绝对化（违反"非全称判断"）——
+  { rx: /必定(?:升官|发财|大富大贵|大富|大贵|大灾|大难)/g, label: '绝对化-必定大富大贵/大灾', repl: '有较大可能（仍需努力）' },
+  { rx: /注定(?:要|会).{0,6}(?:大富|大贵|大灾|大难|死|病|穷|败)/g, label: '绝对化-注定大富/大灾', repl: '命理倾向提示' },
+  { rx: /百分百/g, label: '绝对化-百分百', repl: '有较大可能' },
+  { rx: /百分之百/g, label: '绝对化-百分之百', repl: '有较大可能' },
+  { rx: /一定会(?:死|灾|病|穷|败|输)/g, label: '绝对化-一定会灾', repl: '需注意防范' },
+  { rx: /一定(?:会|要)?(?:死|大凶|大难|破产)/g, label: '绝对化-一定大凶', repl: '需注意防范' },
+  // —— 恐吓-生命 ——
+  { rx: /血光之灾/g, label: '恐吓-血光之灾', repl: '需注意安全防范' },
+  { rx: /血光/g, label: '恐吓-血光', repl: '健康风险' },
+  { rx: /必死/g, label: '恐吓-必死', repl: '需特别留意健康' },
+  { rx: /必有大(?:难|灾|祸)/g, label: '恐吓-必有大难/灾/祸', repl: '宜谨慎行事' },
+  { rx: /活不过.?\d{1,2}岁/g, label: '恐吓-活不过X岁', repl: '需注重健康养生' },
+  { rx: /短命/g, label: '恐吓-短命', repl: '需要特别注意健康' },
+  { rx: /死路一条/g, label: '恐吓-死路一条', repl: '可考虑多路径探索' },
+  { rx: /毫无希望/g, label: '恐吓-毫无希望', repl: '需耐心探索' },
+  // —— 恐吓-婚姻 ——
+  { rx: /克夫/g, label: '恐吓-克夫', repl: '与配偶多沟通包容' },
+  { rx: /克妻/g, label: '恐吓-克妻', repl: '与配偶多沟通包容' },
+  { rx: /克子/g, label: '恐吓-克子', repl: '与子女多沟通包容' },
+  { rx: /克父母/g, label: '恐吓-克父母', repl: '与家人多沟通包容' },
+  { rx: /克兄/g, label: '恐吓-克兄', repl: '与兄弟姐妹多沟通' },
+  // —— 恐吓-财务 ——
+  { rx: /必破财/g, label: '恐吓-必破财', repl: '需注意理财稳健' },
+  { rx: /必破产/g, label: '恐吓-必破产', repl: '建议稳健经营/合理配置资产' },
+  { rx: /破产/g, label: '恐吓-破产', repl: '财务上有波动起伏' },
+  { rx: /穷困潦倒/g, label: '恐吓-穷困潦倒', repl: '需稳扎稳打逐步积累' },
+  // —— 医疗替代 ——
+  { rx: /包治/g, label: '医疗-包治', repl: '可参考调养' },
+  { rx: /根治/g, label: '医疗-根治', repl: '建议配合专业医生诊疗' },
+  { rx: /断根/g, label: '医疗-断根', repl: '建议配合专业医生诊疗' },
+  { rx: /能治好/g, label: '医疗-能治好', repl: '可作为参考' },
+  { rx: /可治愈/g, label: '医疗-可治愈', repl: '可作为参考' },
+  { rx: /吃了(?:就|一定).{0,4}好/g, label: '医疗-吃了就好', repl: '可作为辅助参考' },
+  { rx: /不用吃药/g, label: '医疗-不用吃药', repl: '建议遵医嘱' },
+  { rx: /不需要(?:看医生|就医|吃药)/g, label: '医疗-不需要就医', repl: '建议配合专业医生诊疗' },
+];
+const COMPLIANCE_DISCLAIMER = '⚠️ 免责声明：本报告基于传统命理学理论，仅供国学文化学习与娱乐参考，不构成医疗、理财、法律或任何专业建议。命由天定，运由己造，人生的最终走向取决于您的选择与努力。';
+const KB_SOURCE_TAGS = [
+  { rx: /倪海厦|倪师|人纪/g, tag: '📘 倪海厦', cls: 'tag-nihaisha' },
+  { rx: /舒晗|舒晗天纪|奇门校正/g, tag: '🎯 舒晗', cls: 'tag-shuhan' },
+  { rx: /路大师|路氏一脉|朱鹊桥|段建业/g, tag: '🌟 路大师', cls: 'tag-lu' },
+  { rx: /古籍|黄帝内经|难经|伤寒论|神农本草|本草纲目|易经/g, tag: '📜 古籍', cls: 'tag-classic' },
+];
+function _r89ApplyCompliance(text){
+  if (typeof text !== 'string') return { text: '', hits: [] };
+  // R89: 优先用外部 js/compliance.js（32 条全规则含医疗类），无则用内联 25 条
+  if (typeof window !== 'undefined' && window.Compliance && typeof window.Compliance.applyCompliance === 'function') {
+    try {
+      const r = window.Compliance.applyCompliance(text);
+      return { text: r.text, hits: r.hits || [] };
+    } catch(e) { /* 降级 */ }
+  }
+  const hits = [];
+  let out = text;
+  for (const r of COMPLIANCE_FORBIDDEN) {
+    if (r.rx.test(out)) {
+      const m = out.match(r.rx);
+      hits.push({ label: r.label, sample: m[0], replaced: r.repl });
+      out = out.replace(r.rx, r.repl);
+    }
+  }
+  // 末尾追加免责声明（已存在则跳过）
+  if (!/⚠️ 免责声明/.test(out)) {
+    out = out.replace(/\s*$/, '') + '\n\n' + COMPLIANCE_DISCLAIMER;
+  }
+  return { text: out, hits };
+}
+function _r89ExtractSourceTags(text){
+  if (typeof text !== 'string') return { tags: [], text };
+  const tags = [];
+  for (const t of KB_SOURCE_TAGS) {
+    t.rx.lastIndex = 0; // 避免 g flag lastIndex 残留
+    if (t.rx.test(text)) tags.push(t);
+  }
+  return { tags, text };
+}
+
 function showReport(text, meta){
+  // R89-P0-2: 合规黑名单拦截（生成后立即清洗）+ 免责声明统一注入（P0-3）
+  try {
+    const _comp = _r89ApplyCompliance(text);
+    text = _comp.text;
+    if (_comp.hits.length) {
+      try { console.warn('[r89-compliance]', _comp.hits.length, '条命中', _comp.hits); } catch(e){}
+      if (typeof meta === 'object' && meta) meta.complianceHits = _comp.hits;
+    }
+  } catch(e) { console.warn('[r89-compliance] err', e); }
+  // R89-P2-1: KB 源标签提取（仅供 KB 命中条 meta 扩展，不改报告文本）
+  try {
+    const _tags = _r89ExtractSourceTags(text);
+    if (_tags.tags.length && typeof meta === 'object' && meta) {
+      meta.schoolTags = _tags.tags.map(t => t.tag);
+    }
+  } catch(e) {}
+
   // R86: 自动提取 TODO 到 TodoBus（不影响原有渲染）
   try {
     if (typeof TodoBus !== 'undefined') {
@@ -1191,6 +1288,21 @@ function showReport(text, meta){
     const srcFallback = meta.fallback ? ' · 回退' : '';
     metaHtml = '<div class="kb-hit-badge" style="display:inline-flex;align-items:center;gap:8px;padding:5px 10px;margin-bottom:8px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.25);border-radius:6px;font-size:11px;color:var(--paper2)"><span style="color:var(--paper3)">🎯 KB 命中</span><span style="color:' + scoreColor + ';font-weight:600">' + scorePct + '%</span><span style="color:var(--paper3)">·</span><span>引擎：' + srcLabel + srcFallback + '</span></div>';
   }
+  // R89-P2-1: 流派标签 + P0-2 合规提示
+  let r89Tags = '';
+  try {
+    if (meta && typeof meta === 'object') {
+      const tags = meta.schoolTags || [];
+      if (tags.length) {
+        r89Tags += '<div class="r89-school-tags" style="display:inline-flex;align-items:center;gap:6px;padding:4px 9px;margin-bottom:8px;margin-left:6px;background:rgba(147,51,234,.08);border:1px solid rgba(147,51,234,.25);border-radius:6px;font-size:11px">' + tags.map(t => '<span style="color:#9333ea">' + t + '</span>').join(' ') + '</div>';
+      }
+      const hits = meta.complianceHits || [];
+      if (hits.length) {
+        r89Tags += '<div class="r89-compliance-flag" style="display:inline-flex;align-items:center;gap:6px;padding:4px 9px;margin-bottom:8px;margin-left:6px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:6px;font-size:11px;color:var(--cinn2)"><span>⚖️ 合规清洗</span><span style="color:var(--paper3)">已拦截 ' + hits.length + ' 处（' + hits.map(h => h.label).filter((v,i,a)=>a.indexOf(v)===i).join('·') + '）</span></div>';
+      }
+    }
+  } catch(e) {}
+  metaHtml = r89Tags + metaHtml;
   d.innerHTML=metaHtml + '<div class="b">'+esc(text)+'</div>';
   chat.appendChild(d);
 
