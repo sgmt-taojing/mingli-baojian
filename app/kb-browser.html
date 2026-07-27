@@ -434,9 +434,18 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
   } else {
     let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:8px;flex-wrap:wrap">';
     html += `<div><h2 style="margin:0;color:var(--gold);font-size:1.1rem">📁 KB 文件库（${fileList.length} 个）</h2></div>`;
-    html += `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><input type="search" id="filesFilterInput" placeholder="🔍 按文件名/描述过滤" style="flex:1;min-width:140px;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font:inherit;font-size:.85rem"><select id="filesLevelFilter" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.85rem"><option value="">全等级</option><option value="public">public</option><option value="professional">professional</option><option value="admin">admin</option></select><span id="filesCount" style="font-size:.8rem;color:var(--paper3)"></span><button class="btn" id="randomFilesBtn" style="background:var(--gold);color:#000;border:0;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">🔀 随机 5 个</button><button class="btn" id="randomOneBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">🎲 随机 1 个精读</button><button class="btn" id="copyFilesListBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📋 复制清单</button><button class="btn" id="filesStatBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📊 统计</button><button class="btn" id="filesGroupBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📂 按等级分组</button></div>`;
+    html += `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><input type="search" id="filesFilterInput" placeholder="🔍 按文件名/描述过滤" style="flex:1;min-width:140px;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font:inherit;font-size:.85rem"><select id="filesLevelFilter" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.85rem"><option value="">全等级</option><option value="public">public</option><option value="professional">professional</option><option value="admin">admin</option></select><select id="filesSortBy" title="按条数排序" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.85rem"><option value="name">按文件名</option><option value="entries-desc">条目数 ↓</option><option value="entries-asc">条目数 ↑</option></select><span id="filesCount" style="font-size:.8rem;color:var(--paper3)"></span><button class="btn" id="randomFilesBtn" style="background:var(--gold);color:#000;border:0;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">🔀 随机 5 个</button><button class="btn" id="randomOneBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">🎲 随机 1 个精读</button><button class="btn" id="copyFilesListBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📋 复制清单</button><button class="btn" id="filesStatBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📊 统计</button><button class="btn" id="filesGroupBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📂 按等级分组</button></div>`;
     html += '</div><div class="grid">';
-    for(const f of fileList){
+    function getSortedFiles(){
+      const by = document.getElementById('filesSortBy')?.value || 'name';
+      const arr = fileList.slice();
+      if(by === 'entries-desc') arr.sort((a,b) => (b.entries||0) - (a.entries||0));
+      else if(by === 'entries-asc') arr.sort((a,b) => (a.entries||0) - (b.entries||0));
+      else arr.sort((a,b) => a.filename.localeCompare(b.filename));
+      return arr;
+    }
+    const sortedFiles = getSortedFiles();
+    for(const f of sortedFiles){
       const lvl = f.level || 'public';
       const lvlChip = lvl === 'professional' ? '<span class="chip blue">professional</span>' : lvl === 'admin' ? '<span class="chip red">admin</span>' : '<span class="chip green">public</span>';
       const desc = f.desc || '（暂无描述）';
@@ -510,6 +519,16 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
     // R137 文件搜索/等级过滤
     const fIn = document.getElementById('filesFilterInput');
     const fSel = document.getElementById('filesLevelFilter');
+    const fSort = document.getElementById('filesSortBy');
+    if(fSort) fSort.addEventListener('change', () => {
+      const grid = fileC.querySelector('.grid');
+      if(!grid) return;
+      const sorted = getSortedFiles();
+      const cards = Array.from(grid.querySelectorAll('.file'));
+      const ordered = sorted.map(f => cards.find(c => c.dataset.kbName === f.filename)).filter(Boolean);
+      grid.innerHTML = ordered.map(c => c.outerHTML).join('');
+    });
+
     const fCount = document.getElementById('filesCount');
     function applyFilesFilter(){
       const q = (fIn.value||'').trim().toLowerCase();
