@@ -197,7 +197,7 @@ function render(d){
   });
   h+='<div class="summary" style="margin-top:10px"><b style="color:var(--gold)">⚡ 重点补强：</b>'+focusDomain.name+'（'+focusDomain.score+'分）<br><b style="color:var(--gold)">💪 优势放大：</b>'+strongDomain.name+'（'+strongDomain.score+'分）<br>'+d.fiveYearAdvice+'</div></div>';
 
-  // 行动清单 R25-P1-4 动态生成（基于年龄/阶段/领域评分）
+  // 行动清单 R25-P1-4 动态生成（基于年龄/阶段/领域评分）—— 本地兜底版
   const weakDomains = [...d.domainScores].sort((a,b)=>a.score-b.score).slice(0,3);
   const strongDomains = [...d.domainScores].sort((a,b)=>b.score-a.score).slice(0,2);
   const ns=[];
@@ -213,10 +213,55 @@ function render(d){
   ns.push(`【8】人脉经营：参加 1 个行业社群 + 每月主动链接 2 位高人`);
   ns.push(`【9】学习充电：每年读 ${d.age<24?'12':d.age<50?'8':'6'} 本书 + 1 门新课/技能`);
   ns.push(`【10】年度复盘：年末写 1 篇总结 + 制定下一年 OKR + 5 年路线图更新`);
-  h+='<div class="card"><h2>✅ 行动清单（10 条·动态生成）</h2><ol class="ol">';
+  h+='<div class="card" id="actionListCard"><h2>✅ 行动清单（10 条·动态生成）</h2><div id="actionListBody"><ol class="ol">';
   ns.forEach(s=>h+='<li>'+s+'</li>');
   h+='</ol>';
-  h+='<div class="summary" style="margin-top:10px;font-size:11px"><b style="color:var(--gold)">💡 补强优先级：</b>'+weakDomains.map(d=>d.name+'('+d.score+')').join(' → ')+'</div></div>';
+  h+='<div class="summary" style="margin-top:10px;font-size:11px"><b style="color:var(--gold)">💡 补强优先级：</b>'+weakDomains.map(d=>d.name+'('+d.score+')').join(' → ')+'</div></div></div>';
+
+  // R187: 异步调用后端 /api/ai/lifeplan-report 获取 stage-aware actions 替换本地兜底
+  (function fetchStageAwareActions(){
+    const actionBody = JSON.stringify({
+      age: d.age,
+      gender: d.sex,
+      concerns: (d.focus+' '+d.extra).split(/[，,\s]+/).filter(Boolean).slice(0,12),
+      birthPlace: '',
+      livePlace: d.residence || '',
+      withTTS: false
+    });
+    fetch('/api/ai/lifeplan-report', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: actionBody
+    }).then(r => r.json()).then(json => {
+      if(json.code !== 0 || !json.data || !json.data.report) return;
+      const report = json.data.report;
+      const actions = report.actions || [];
+      if(!actions.length) return;
+      const body = document.getElementById('actionListBody');
+      if(!body) return;
+      // 构建后端 stage-aware 行动清单 HTML
+      let ah = '<ol class="ol">';
+      actions.forEach((a, i) => { ah += '<li>' + a + '</li>'; });
+      ah += '</ol>';
+      // KB 命中提示
+      const kbCount = report.kbHitCount || 0;
+      if(kbCount > 0){
+        ah += '<div class="summary" style="margin-top:8px;font-size:11px;color:var(--accent)">📚 KB 命中 '+kbCount+' 条知识 · 阶段感知排除无关领域</div>';
+      }
+      // 补强优先级（用后端 domains 数据）
+      if(report.domains && report.domains.length){
+        const weak = [...report.domains].sort((a,b)=>a.score-b.score).slice(0,3);
+        ah += '<div class="summary" style="margin-top:6px;font-size:11px"><b style="color:var(--gold)">💡 补强优先级：</b>'+weak.map(d=>d.name+'('+d.score+')').join(' → ')+'</div>';
+      }
+      body.innerHTML = ah;
+      // 更新卡片标题
+      const card = document.getElementById('actionListCard');
+      if(card){
+        const h2 = card.querySelector('h2');
+        if(h2) h2.textContent = '✅ 行动清单（'+actions.length+' 条·阶段感知 · KB 增强）';
+      }
+    }).catch(()=>{}); // 静默失败，保留本地兜底
+  })();
 
   // 总评
   h+='<div class="card"><h2>📜 总评</h2><div class="summary">'+summary+'</div></div>';
