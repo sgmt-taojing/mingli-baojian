@@ -38,6 +38,7 @@
 
 
 <script src="js/ui-toast.js" defer></script>
+<script src="js/cosmic-arena-inline.js" defer></script>
 <script src="js/kb-hot-strip.js" defer></script>
 <script src="js/kb-search-box.js" defer></script>
 <script src="js/kb-search-mount.js" defer></script>
@@ -162,6 +163,81 @@
 <section class="section active" id="section-hero" role="tabpanel" aria-labelledby="tab-hero">
   <div class="wechat-disclaimer">⚠️ 本平台内容仅供国学文化学习与娱乐参考，不构成任何专业建议。占卜结果不作为决策依据，养生建议不替代医疗诊断。</div>
   <div class="hero">
+    <!-- R89-P2 视觉震撼：动态八卦生克图（宇宙能量场） -->
+    <div class="cosmic-arena" id="cosmicArena" aria-hidden="true">
+      <svg viewBox="0 0 400 400" class="cosmic-svg" id="cosmicSvg">
+        <defs>
+          <!-- 五行能量环渐变 -->
+          <radialGradient id="wuxingCore" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#c9a84c" stop-opacity="0.95"/>
+            <stop offset="40%" stop-color="#c9a84c" stop-opacity="0.45"/>
+            <stop offset="100%" stop-color="#0a0a0a" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="wuxingRingMu" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#3a8c5c"/><stop offset="100%" stop-color="#5fb878"/>
+          </linearGradient>
+          <linearGradient id="wuxingRingHuo" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#c14a3a"/><stop offset="100%" stop-color="#e87a4d"/>
+          </linearGradient>
+          <linearGradient id="wuxingRingTu" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#b89048"/><stop offset="100%" stop-color="#d8b66e"/>
+          </linearGradient>
+          <linearGradient id="wuxingRingJin" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#a8a394"/><stop offset="100%" stop-color="#d4cdb4"/>
+          </linearGradient>
+          <linearGradient id="wuxingRingShui" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#2c4a6b"/><stop offset="100%" stop-color="#5a7ba0"/>
+          </linearGradient>
+          <!-- 八卦爻光线渐变 -->
+          <linearGradient id="guaGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#fff7e0" stop-opacity="0"/>
+            <stop offset="50%" stop-color="#c9a84c" stop-opacity="0.6"/>
+            <stop offset="100%" stop-color="#fff7e0" stop-opacity="0"/>
+          </linearGradient>
+          <!-- 中央阴阳晕 -->
+          <radialGradient id="yinYangGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#c9a84c" stop-opacity="0.4"/>
+            <stop offset="100%" stop-color="#c9a84c" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+
+        <!-- 外层金色环（含刻度感） -->
+        <circle cx="200" cy="200" r="195" fill="none" stroke="rgba(201,168,76,0.15)" stroke-width="0.5"/>
+        <circle cx="200" cy="200" r="180" fill="none" stroke="rgba(201,168,76,0.2)" stroke-width="0.5" stroke-dasharray="2 6"/>
+
+        <!-- 五行能量环（5 圈，半径 110-150） -->
+        <g class="wuxing-rings">
+          <circle class="wx-ring wx-mu" cx="200" cy="200" r="115" fill="none" stroke="url(#wuxingRingMu)" stroke-width="2" opacity="0.6"/>
+          <circle class="wx-ring wx-huo" cx="200" cy="200" r="125" fill="none" stroke="url(#wuxingRingHuo)" stroke-width="2" opacity="0.6"/>
+          <circle class="wx-ring wx-tu" cx="200" cy="200" r="135" fill="none" stroke="url(#wuxingRingTu)" stroke-width="2" opacity="0.6"/>
+          <circle class="wx-ring wx-jin" cx="200" cy="200" r="145" fill="none" stroke="url(#wuxingRingJin)" stroke-width="2" opacity="0.6"/>
+          <circle class="wx-ring wx-shui" cx="200" cy="200" r="155" fill="none" stroke="url(#wuxingRingShui)" stroke-width="2" opacity="0.6"/>
+        </g>
+
+        <!-- 八卦圆阵（8 个卦象围绕圆周） -->
+        <g class="bagua-circle" id="baguaCircle">
+          <!-- JavaScript 动态注入 -->
+        </g>
+
+        <!-- 中央阴阳双鱼（流体） -->
+        <g class="yinyang-core" transform="translate(200 200)">
+          <circle r="75" fill="url(#wuxingCore)"/>
+          <circle r="68" fill="#0a0a0a"/>
+          <!-- 阴阳太极（Yin Yang 流体） -->
+          <path class="yy-path yy-yang" d="M 0,-55 A 55,55 0 0 1 0,55 A 27.5,27.5 0 0 1 0,0 A 27.5,27.5 0 0 0 0,-55 Z" fill="#f3ead0"/>
+          <path class="yy-path yy-yin" d="M 0,-55 A 55,55 0 0 0 0,55 A 27.5,27.5 0 0 0 0,0 A 27.5,27.5 0 0 1 0,-55 Z" fill="#1a1a1a" stroke="#c9a84c" stroke-width="0.5"/>
+          <circle class="yy-dot yy-dot-yang" cy="-27.5" r="6" fill="#1a1a1a"/>
+          <circle class="yy-dot yy-dot-yin" cy="27.5" r="6" fill="#f3ead0"/>
+          <!-- 中央晕光 -->
+          <circle r="90" fill="url(#yinYangGlow)" class="yy-aura"/>
+        </g>
+
+        <!-- 周边 12 道光芒线（地支位） -->
+        <g class="dizhi-rays" id="dizhiRays"></g>
+      </svg>
+      <div class="cosmic-caption">宇宙能量场 · 五行流转</div>
+    </div>
+
     <p class="hero-eyebrow">易道智鉴 · 先进AI推演</p>
     <h1 class="hero-title">易道智鉴</h1>
     <p class="hero-sub">八字 · 六爻 · 奇门遁甲 · 紫微斗数 · 梅花易数 · 大六壬</p>

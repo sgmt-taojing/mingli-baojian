@@ -3760,3 +3760,116 @@ ${getReportStyles()}
     overflow: hidden !important;
   }
 }
+
+/* ===== R89-P2 动态八卦生克图：宇宙能量场 ===== */
+.cosmic-arena {
+  position: relative;
+  width: min(360px, 80vw);
+  height: min(360px, 80vw);
+  margin: 0 auto 28px;
+  animation: fadeUp 1.2s ease both;
+}
+.cosmic-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: drop-shadow(0 0 24px rgba(201,168,76,0.15));
+}
+/* 五行环：缓慢旋转 */
+.cosmic-svg .wuxing-rings .wx-ring {
+  transform-origin: 200px 200px;
+  animation: wuxingSpin 60s linear infinite;
+}
+.cosmic-svg .wuxing-rings .wx-huo { animation-duration: 45s; animation-direction: reverse; }
+.cosmic-svg .wuxing-rings .wx-mu  { animation-duration: 55s; }
+.cosmic-svg .wuxing-rings .wx-shui { animation-duration: 65s; animation-direction: reverse; }
+.cosmic-svg .wuxing-rings .wx-tu  { animation-duration: 75s; }
+.cosmic-svg .wuxing-rings .wx-jin { animation-duration: 50s; animation-direction: reverse; }
+
+@keyframes wuxingSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* 八卦旋转 */
+.cosmic-svg .bagua-circle {
+  transform-origin: 200px 200px;
+  animation: baguaSpin 90s linear infinite;
+}
+@keyframes baguaSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+
+/* 阴阳太极呼吸 */
+.cosmic-svg .yy-path {
+  animation: yinYangBreathe 6s ease-in-out infinite;
+}
+@keyframes yinYangBreathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.04); }
+}
+.cosmic-svg .yy-aura {
+  animation: auraPulse 4s ease-in-out infinite;
+}
+@keyframes auraPulse {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 0.9; }
+}
+.cosmic-svg .yy-dot {
+  animation: dotSpin 8s linear infinite;
+  transform-origin: 0 0;
+}
+@keyframes dotSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* 八卦卦象文字 */
+.cosmic-svg .gua-char {
+  font-family: 'Ma Shan Zheng', 'Noto Serif SC', serif;
+  font-size: 22px;
+  fill: var(--gold);
+  text-anchor: middle;
+  dominant-baseline: central;
+  filter: drop-shadow(0 0 6px rgba(201,168,76,0.5));
+  opacity: 0.9;
+  transition: opacity 0.4s;
+}
+.cosmic-svg .gua-circle {
+  fill: rgba(22,27,34,0.7);
+  stroke: rgba(201,168,76,0.3);
+  stroke-width: 1;
+  transition: all 0.4s;
+}
+
+/* 地支光芒线 */
+.cosmic-svg .dizhi-ray {
+  stroke: rgba(201,168,76,0.2);
+  stroke-width: 0.5;
+  stroke-dasharray: 4 12;
+  animation: rayFade 3s ease-in-out infinite;
+}
+@keyframes rayFade {
+  0%, 100% { stroke-opacity: 0.2; }
+  50%      { stroke-opacity: 0.6; }
+}
+
+.cosmic-caption {
+  font-size: 10px;
+  letter-spacing: 5px;
+  color: var(--gold2);
+  opacity: 0.55;
+  margin-top: 10px;
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .cosmic-arena {
+    width: min(260px, 70vw);
+    height: min(260px, 70vw);
+    margin-bottom: 20px;
+  }
+  .cosmic-svg .gua-char { font-size: 16px; }
+  .cosmic-caption { font-size: 9px; letter-spacing: 3px; }
+}
