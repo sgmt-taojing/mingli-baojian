@@ -1105,7 +1105,8 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
           '### 10 条行动清单\n' + act + '\n\n' +
           '### AI 润色建议\n' + reply + '\n\n' +
           '— KB 命中 ' + lp.kbHitCount + ' 条参考材料\n— TTS 朗读：' + (lifeplanBackend.ttsText||'').substring(0,200) + '…';
-        showReport(structure, {score: kbHit.score, source: kbHit.source, engine: kbHit.engine || 'fts5', fallback: !!kbHit.fallback});
+        const _sourcesArr = (kbHit && Array.isArray(kbHit.results)) ? kbHit.results.map(r => r.source).filter(Boolean) : [];
+        showReport(structure, {score: kbHit.score, source: kbHit.source, engine: kbHit.engine || 'fts5', fallback: !!kbHit.fallback, sources: _sourcesArr});
         autoSavePaipan(structure);
         return;
       }
@@ -1121,7 +1122,8 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
           '### 10 条调养建议\n' + rec + '\n\n' +
           '### AI 润色建议\n' + reply + '\n\n' +
           '— KB 命中 ' + li.kbHitCount + ' 条参考材料\n— TTS 朗读：' + (lifeindexBackend.ttsText||'').substring(0,200) + '…';
-        showReport(structure, {score: kbHit.score, source: kbHit.source, engine: kbHit.engine || 'fts5', fallback: !!kbHit.fallback});
+        const _sourcesArr = (kbHit && Array.isArray(kbHit.results)) ? kbHit.results.map(r => r.source).filter(Boolean) : [];
+        showReport(structure, {score: kbHit.score, source: kbHit.source, engine: kbHit.engine || 'fts5', fallback: !!kbHit.fallback, sources: _sourcesArr});
         autoSavePaipan(structure);
         return;
       }
@@ -1137,12 +1139,15 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
           '### 听赏指南（10 条）\n' + guide + '\n\n' +
           '### AI 润色建议\n' + reply + '\n\n' +
           '— KB 命中 ' + m.kbHitCount + ' 条参考材料\n— TTS 朗读：' + (musicBackend.ttsText||'').substring(0,200) + '…';
-        showReport(structure, {score: kbHit.score, source: kbHit.source, engine: kbHit.engine || 'fts5', fallback: !!kbHit.fallback});
+        const _sourcesArr = (kbHit && Array.isArray(kbHit.results)) ? kbHit.results.map(r => r.source).filter(Boolean) : [];
+        showReport(structure, {score: kbHit.score, source: kbHit.source, engine: kbHit.engine || 'fts5', fallback: !!kbHit.fallback, sources: _sourcesArr});
         autoSavePaipan(structure);
         return;
       }
       const tagged = kbHit.score >= 0.4 ? '【来源：KB+AI 润色（'+kbHit.source+'）】\n\n'+reply : reply;
-      showReport(tagged, {score: kbHit.score, source: kbHit.source || 'AI', engine: kbHit.engine || 'ai-backend', fallback: !!kbHit.fallback});
+      // R89-P1-4: 多流派来源注入（让 showReport 渲染"源头透明"徽章）
+      const _sourcesArr = (kbHit && Array.isArray(kbHit.results)) ? kbHit.results.map(r => r.source).filter(Boolean) : [];
+      showReport(tagged, {score: kbHit.score, source: kbHit.source || 'AI', engine: kbHit.engine || 'ai-backend', fallback: !!kbHit.fallback, sources: _sourcesArr});
       autoSavePaipan(tagged);
       return;
     }
@@ -1299,6 +1304,37 @@ function showReport(text, meta){
       const hits = meta.complianceHits || [];
       if (hits.length) {
         r89Tags += '<div class="r89-compliance-flag" style="display:inline-flex;align-items:center;gap:6px;padding:4px 9px;margin-bottom:8px;margin-left:6px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:6px;font-size:11px;color:var(--cinn2)"><span>⚖️ 合规清洗</span><span style="color:var(--paper3)">已拦截 ' + hits.length + ' 处（' + hits.map(h => h.label).filter((v,i,a)=>a.indexOf(v)===i).join('·') + '）</span></div>';
+      }
+    }
+  } catch(e) {}
+
+  // R89-P1-4: 多流派来源徽章（后端 source 字段，前置展示）
+  // 一本书可同时挂多个 src_type（如 SRC-LEGACY 古籍 + SRC-COURSE 课程 + SRC-BOOK 书）
+  // 即"多流派并列"全网最专业的核心机制
+  try {
+    if (meta && typeof meta === 'object' && Array.isArray(meta.sources) && meta.sources.length) {
+      const typeColors = {
+        'SRC-LEGACY':       { label: '古籍经典', color: '#8b5cf6', bg: 'rgba(139,92,246,.10)' },
+        'SRC-COURSE':       { label: '口传课程', color: '#06b6d4', bg: 'rgba(6,182,212,.10)' },
+        'SRC-BOOK':         { label: '典藏书谱', color: '#10b981', bg: 'rgba(16,185,129,.10)' },
+        'SRC-EXPERT':       { label: '专家心得', color: '#f59e0b', bg: 'rgba(245,158,11,.10)' },
+        'SRC-AUTO-RETRO':   { label: '历史导入', color: '#6b7280', bg: 'rgba(107,114,128,.10)' },
+        'SRC-IMPORT':       { label: '外部录入', color: '#3b82f6', bg: 'rgba(59,130,246,.10)' },
+        'SRC-CASE':         { label: '实战案例', color: '#ef4444', bg: 'rgba(239,68,68,.10)' },
+      };
+      const seen = new Set();
+      const chips = [];
+      for (const s of meta.sources) {
+        const t = (s && s.type) || 'SRC-IMPORT';
+        const title = (s && s.title) || '';
+        if (seen.has(t)) continue;
+        seen.add(t);
+        const c = typeColors[t] || { label: t.replace(/^SRC-/, ''), color: '#6366f1', bg: 'rgba(99,102,241,.10)' };
+        const tip = (s && s.author) ? `${s.author} · ${title.slice(0, 36)}` : title.slice(0, 40) || c.label;
+        chips.push('<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:' + c.bg + ';border:1px solid ' + c.color + '55;border-radius:10px;color:' + c.color + ';font-size:11px;font-weight:500" title="' + esc(tip) + '">📚 ' + c.label + '</span>');
+      }
+      if (chips.length) {
+        r89Tags += '<div class="r89-source-tags" style="display:inline-flex;align-items:center;gap:5px;padding:4px 9px;margin-bottom:8px;margin-left:6px;background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.22);border-radius:6px;font-size:11px"><span style="color:var(--paper3)">🔍 源头透明</span>' + chips.join('') + '</div>';
       }
     }
   } catch(e) {}
