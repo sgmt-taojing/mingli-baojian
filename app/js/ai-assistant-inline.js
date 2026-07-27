@@ -1370,6 +1370,8 @@ function showReport(text, meta){
   // R89-P1-4: 多流派来源徽章（后端 source 字段，前置展示）
   // 一本书可同时挂多个 src_type（如 SRC-LEGACY 古籍 + SRC-COURSE 课程 + SRC-BOOK 书）
   // 即"多流派并列"全网最专业的核心机制
+  // R89-P1-4-2 (2026-07-27)：找不到古籍原文时，不用奉强附会去找古书佐证，
+  // 直接选用行业公认通行版本 + 标注「📚 行业通行」
   try {
     if (meta && typeof meta === 'object' && Array.isArray(meta.sources) && meta.sources.length) {
       const typeColors = {
@@ -1381,16 +1383,24 @@ function showReport(text, meta){
         'SRC-IMPORT':       { label: '外部录入', color: '#3b82f6', bg: 'rgba(59,130,246,.10)' },
         'SRC-CASE':         { label: '实战案例', color: '#ef4444', bg: 'rgba(239,68,68,.10)' },
       };
+      // R89-P1-4-2: KB_SOURCE_POLICY 五源调优（古籍 / 专家 / 行业通行 / 同行验证 / 单点孤证）
+      const _resolveSrc = (window.Compliance && typeof window.Compliance.resolveSourceLabel === 'function')
+        ? window.Compliance.resolveSourceLabel
+        : function(e) { return { tag: '📚 行业通行', cls: 'tag-common', reason: '未验证古籍原文，选行业通行' }; };
       const seen = new Set();
       const chips = [];
       for (const s of meta.sources) {
         const t = (s && s.type) || 'SRC-IMPORT';
         const title = (s && s.title) || '';
-        if (seen.has(t)) continue;
-        seen.add(t);
+        const author = (s && s.author) || '';
+        // 五源调优：先走 resolveSourceLabel 拿专家/古籍/行业通行/同行验证/单点孤证
+        const pol = _resolveSrc({ src_type: t, title, author });
+        const policyKey = pol.tag;
+        if (seen.has(policyKey)) continue;
+        seen.add(policyKey);
         const c = typeColors[t] || { label: t.replace(/^SRC-/, ''), color: '#6366f1', bg: 'rgba(99,102,241,.10)' };
-        const tip = (s && s.author) ? `${s.author} · ${title.slice(0, 36)}` : title.slice(0, 40) || c.label;
-        chips.push('<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:' + c.bg + ';border:1px solid ' + c.color + '55;border-radius:10px;color:' + c.color + ';font-size:11px;font-weight:500" title="' + esc(tip) + '">📚 ' + c.label + '</span>');
+        const tip = author ? `${author} · ${title.slice(0, 36)} · ${pol.reason}` : `${title.slice(0, 40)} · ${pol.reason}`;
+        chips.push('<span class="src-chip ' + pol.cls + '" style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:' + c.bg + ';border:1px solid ' + c.color + '55;border-radius:10px;color:' + c.color + ';font-size:11px;font-weight:500" title="' + esc(tip) + '">' + policyKey + ' · ' + c.label + '</span>');
       }
       if (chips.length) {
         r89Tags += '<div class="r89-source-tags" style="display:inline-flex;align-items:center;gap:5px;padding:4px 9px;margin-bottom:8px;margin-left:6px;background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.22);border-radius:6px;font-size:11px"><span style="color:var(--paper3)">🔍 源头透明</span>' + chips.join('') + '</div>';

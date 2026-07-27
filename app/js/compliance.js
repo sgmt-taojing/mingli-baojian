@@ -161,8 +161,11 @@ if (typeof module !== 'undefined' && module.exports) {
     COMPLIANCE_FORBIDDEN,
     COMPLIANCE_DISCLAIMER,
     KB_SCHOOL_TAGS,
+    KB_SOURCE_POLICY,
+    KB_SOURCE_LABEL,
     applyCompliance,
     extractSchoolTags,
+    resolveSourceLabel,
   };
 }
 if (typeof window !== 'undefined') {
@@ -170,7 +173,10 @@ if (typeof window !== 'undefined') {
     COMPLIANCE_FORBIDDEN,
     COMPLIANCE_DISCLAIMER,
     KB_SCHOOL_TAGS,
+    KB_SOURCE_POLICY,
+    KB_SOURCE_LABEL,
     applyCompliance,
     extractSchoolTags,
+    resolveSourceLabel,
   };
 }
