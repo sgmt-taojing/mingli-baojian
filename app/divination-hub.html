@@ -4677,6 +4677,154 @@ window.runZeriEngine = function(){
 </script>
 
 <!-- ================================================================ -->
+<!-- R173-d: 改名/号码 2 missing fns safe fallback ================= -->
+<!-- generateCompanyNamesEnhanced / runNameAnalysis (company + name) ===== -->
+<script>
+(function(){
+  var _q = function(sel){ var el = document.querySelector(sel); return el ? el.textContent || el.value || '' : ''; };
+  var _render = function(id, html){ var el = document.getElementById(id); if (el){ el.innerHTML = html; el.style.display = 'block'; } };
+  var _show = function(id){ var el = document.getElementById(id); if (el){ el.style.display = 'block'; } };
+  var _hide = function(id){ var el = document.getElementById(id); if (el){ el.style.display = 'none'; } };
+
+  // 1) 公司起名演示（5 行五行主笔 + 6 个推荐名 + 行业宜忌 + 康熙笔画速查）
+  window.generateCompanyNamesEnhanced = function(){
+    try {
+      var name   = (document.getElementById('companyName') || {}).value || '';
+      var biz    = (document.getElementById('companyMainBiz') || {}).value || '';
+      var indSel = (document.getElementById('companyIndustry') || {}).value || '';
+      var wcSel  = (document.getElementById('companyWordCount') || {}).value || '2';
+      var pref   = (document.getElementById('preferWuxing') || {}).value || '';
+
+      // 从公司名/主营方向推断喜用神（纯前端演示 · 不接后端模型）
+      var tone = pref;
+      if (!tone){
+        var pool = { 木:'林森板材园林', 火:'炎焰光电照明', 土:'均垣地产基建', 金:'钧铭五金金融', 水:'泉涵科技物流' };
+        for (var k in pool){ if (pool.hasOwnProperty(k) && (name+biz).indexOf(pool[k].slice(0,2)) !== -1){ tone = k; break; } }
+        if (!tone) tone = '木';
+      }
+      var toneLabel = tone;
+
+      var syllablePool = {
+        木: ['青','森','林','柏','桓','枫','楷','楠','荣','栩'],
+        火: ['炎','烨','煜','焕','烁','炫','炯','烨','煊','炀'],
+        土: ['均','垣','坤','培','垚','增','壑','坦','基','堂'],
+        金: ['钧','铭','锦','鑫','铎','锐','铠','铠','铄','铎'],
+        水: ['泉','涵','溪','瀚','泽','润','源','涛','浩','浚']
+      };
+      var syl = syllablePool[tone] || syllablePool['木'];
+      var candidates = [];
+      var suffixes = ['','科技','文化','实业','集团','国际'];
+      for (var i = 0; i < 6; i++){
+        var a = syl[i % syl.length];
+        var b = syl[(i+3) % syl.length];
+        var suffix = suffixes[i] || '';
+        candidates.push({ name: a + b + suffix, tone: tone, score: 88 + (i % 5) * 2 });
+      }
+
+      var html = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px">' +
+        candidates.map(function(c){
+          return '<div style="padding:10px;border-radius:8px;border:1px solid rgba(201,168,76,.15);background:rgba(201,168,76,.04)">' +
+            '<div style="font-weight:600;letter-spacing:2px">' + c.name + '</div>' +
+            '<div style="font-size:11px;opacity:.85;margin-top:4px">五行：' + c.tone + ' · 评分：' + c.score + '</div>' +
+            '</div>';
+        }).join('') +
+        '</div>';
+
+      _render('companyNamesGrid', html);
+      _show('companyResult');
+      _show('companyBaziResult');
+
+      var meta = document.getElementById('companyBannerMeta');
+      if (meta) meta.textContent = '八字喜用神 ' + toneLabel + ' · 主营 ' + (biz || '未填') + ' · 字数 ' + (wcSel || '2');
+
+      var indMap = {
+        'tech': { good:'水/金', bad:'火/土', note:'互联网属水，利流动；金属算力，利存储' },
+        'trade': { good:'木/火', bad:'金/水', note:'贸易往来属木，利沟通；火属传播，利品牌' },
+        'estate': { good:'土/金', bad:'木/水', note:'地产基建属土，金利五金配套' },
+        'service': { good:'火/土', bad:'水/金', note:'服务业属火，土利餐饮/地产' },
+        'finance': { good:'金/水', bad:'火/木', note:'金融属金，水利流动性' }
+      };
+      var ind = indMap[indSel] || { good:'金/土', bad:'木/水', note:'通用推荐：金土相生，稳重聚财' };
+      _show('industryWuxingTable');
+      var iwc = document.getElementById('industryWuxingContent');
+      if (iwc){
+        iwc.innerHTML = '<div style="display:flex;gap:16px;flex-wrap:wrap">' +
+          '<div style="flex:1;min-width:140px"><strong>宜用五行：</strong><span style="color:var(--gold)">' + ind.good + '</span><p style="font-size:11px;opacity:.85;margin-top:4px">' + ind.note + '</p></div>' +
+          '<div style="flex:1;min-width:140px"><strong>慎用五行：</strong><span style="color:#e07070">' + ind.bad + '</span><p style="font-size:11px;opacity:.85;margin-top:4px">避免冲克字号</p></div>' +
+          '<div style="flex:1;min-width:140px"><strong>参考笔画：</strong><span style="opacity:.9">林(8) 松(8) 柏(9) 钧(9) 铭(14) 锦(16)</span></div>' +
+          '</div>';
+      }
+      _show('kangxiStrokesRef');
+      showToast('✅ 公司名生成（演示 · 喜用神 ' + toneLabel + '）');
+    } catch(e){ console.warn('[generateCompanyNamesEnhanced]', e); showToast('⚠️ 取名演示异常'); }
+  };
+
+  // 2) 姓名分析演示（姓名+性别+生日 → 5 格三才 + 五行匹配 + 综合评分）
+  window.runNameAnalysis = function(){
+    try {
+      var name = (document.getElementById('analyzeNameInput') || {}).value || '';
+      if (!name || name.length < 2){ showToast('⚠️ 请输入 2-6 个汉字'); return; }
+      var sex = (document.getElementById('analyzeSex') || {}).value || 'male';
+      var cal = (document.getElementById('analyzeCalendarType') || {}).value || 'solar';
+      var bdate = (document.getElementById('analyzeBirthDate') || {}).value || '';
+      var hour  = (document.getElementById('analyzeBirthHour') || {}).value || '';
+
+      // 简易笔画映射（演示用，康熙字典速查简化）
+      var strokeMap = { '一':1,'二':2,'三':3,'十':2,'口':3,'日':4,'月':4,'木':4,'水':4,'火':4,'土':3,'金':8,'人':2,'大':3,'小':3,'子':3,'天':4,'地':6,'和':8,'明':8,'文':4,'武':8,'伟':12,'芳':10,'敏':11,'静':10,'丽':19,'强':11,'磊':15,'洋':9,'勇':9,'艳':12,'杰':8,'娟':10,'涛':7,'超':12,'秀':7,'鑫':24,'浩':11,'宇':6,'博':12,'涵':11,'瑞':14,'轩':10,'泽':8,'琳':12,'婷':12,'昊':8 };
+      var s = 0;
+      for (var i = 0; i < name.length; i++){ s += strokeMap[name[i]] || (Math.floor(Math.random()*12)+3); }
+
+      // 五格（天/地/人/外/总）
+      var wuge = {
+        tian:  ((1 + s) % 31) || 1,
+        di:    ((s + 1) % 31) || 1,
+        ren:   ((Math.floor(s/2) + 1) % 31) || 1,
+        wai:   ((s - Math.floor(s/2) + 1) % 31) || 1,
+        zong:  ((s + 1) % 31) || 1
+      };
+      var wugeScore = Math.max(60, 100 - Math.abs(wuge.zong - 24));
+
+      // 三才（天/地/人）
+      var sancai = ['大吉','吉','中吉','平','小吉'];
+      var sIdx = Math.abs(wuge.tian + wuge.di + wuge.ren) % sancai.length;
+      var sancaiLabel = sancai[sIdx];
+
+      // 八字用神推断（极简演示 · 不接排盘）
+      var wuxingScore = 0;
+      for (var j = 0; j < name.length; j++){ wuxingScore += (strokeMap[name[j]] || 5); }
+      var wuxingLabel = ['金','木','水','火','土'][wuxingScore % 5];
+      var matchRate = 70 + ((wuxingScore * 7) % 25);
+
+      var out = '<div style="display:flex;flex-wrap:wrap;gap:12px">' +
+        '<div style="flex:1;min-width:120px;padding:14px;border-radius:10px;border:1px solid rgba(201,168,76,.18);background:rgba(201,168,76,.04)">' +
+          '<h4 style="color:var(--gold);margin-bottom:8px">姓名总分</h4>' +
+          '<div style="font-size:32px;font-weight:700">' + Math.round(wugeScore + matchRate*0.2) + '</div>' +
+          '<p style="font-size:11px;opacity:.85">笔画合计：' + s + ' · 五行：' + wuxingLabel + '</p>' +
+        '</div>' +
+        '<div style="flex:1;min-width:120px;padding:14px;border-radius:10px;border:1px solid rgba(0,100,150,.18);background:rgba(0,100,150,.04)">' +
+          '<h4 style="color:var(--cyan);margin-bottom:8px">五格数理</h4>' +
+          '<p style="font-size:12px;line-height:1.9">天格 ' + wuge.tian + ' / 地格 ' + wuge.di + ' / 人格 ' + wuge.ren + ' / 外格 ' + wuge.wai + ' / 总格 ' + wuge.zong + '</p>' +
+          '<p style="font-size:11px;opacity:.85">三才配置：' + sancaiLabel + '</p>' +
+        '</div>' +
+        '<div style="flex:1;min-width:120px;padding:14px;border-radius:10px;border:1px solid rgba(120,200,140,.18);background:rgba(120,200,140,.04)">' +
+          '<h4 style="color:#78c88c;margin-bottom:8px">五行匹配</h4>' +
+          '<p style="font-size:12px;line-height:1.9">姓名五行：' + wuxingLabel + '</p>' +
+          '<p style="font-size:11px;opacity:.85">匹配度：' + Math.min(100, matchRate) + '%</p>' +
+        '</div>' +
+      '</div>';
+      out += '<div style="margin-top:14px;padding:12px;border-radius:8px;border:1px dashed rgba(201,168,76,.25);background:rgba(201,168,76,.02)">' +
+        '<p style="font-size:12px;opacity:.9">建议：姓名契合「' + wuxingLabel + '」五行，适合用于补益「' + wuxingLabel + '」属性之行业与方位。' +
+        '完整康熙字典笔画与三才详析，请接后端姓名学引擎。</p></div>';
+
+      _render('nameAnalyzeOutput', out);
+      _show('nameAnalyzeResult');
+      showToast('📊 姓名分析完成（演示 · ' + sex + ' · 笔画 ' + s + '）');
+    } catch(e){ console.warn('[runNameAnalysis]', e); showToast('⚠️ 姓名分析异常'); }
+  };
+})();
+</script>
+<!-- END R173-d ==================================================== -->
+<!-- ================================================================ -->
 <!-- BOTTOM TAB NAV (Mobile Only) -->
 <!-- ================================================================ -->
 <nav class="bottom-nav" id="bottomNav">
