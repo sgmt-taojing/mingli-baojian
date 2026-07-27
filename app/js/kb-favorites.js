@@ -91,59 +91,82 @@
     if(!drawer) return;
     if(arr.length === 0){
       drawer.innerHTML = '<div class="fav-empty">⭐ 暂无收藏<br><small>点击模块卡片右上角的 ⭐ 收藏</small></div>';
-    } else {
-      const allTags = getTags();
-      drawer.innerHTML = `
-        <div class="fav-head">⭐ 我的收藏（${arr.length}）</div>
-        ${allTags.length ? `<div class="fav-tagfilter" style="padding:6px 10px;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:4px"><span style="font-size:.75rem;color:var(--paper3);margin-right:4px">标签：</span>${allTags.map(t => `<span class="fav-tag" style="font-size:.7rem;background:var(--card);border:1px solid var(--border);padding:2px 8px;border-radius:10px;cursor:pointer" onclick="if(window.KbFavorites){window._favDrawerTag='${t}';renderDrawerWithFilter();}">${t}</span>`).join('')}</div>` : ''}
-        ${arr.map(f => `
-          <div class="fav-item" data-id="${f.id}">
-            <div class="fav-info">
-              <div class="fav-name">${f.name}</div>
-              <div class="fav-meta"><code>${f.id}</code> · ${f.level} · ${new Date(f.ts).toLocaleDateString('zh-CN')}</div>
-              ${(f.tags && f.tags.length) ? `<div class="fav-tags">${f.tags.map(t => `<span class="fav-tag">🏷️ ${t}</span>`).join('')}</div>` : ''}
-              ${f.note ? `<div class="fav-note">📝 ${f.note.length > 30 ? f.note.slice(0,30)+'…' : f.note}</div>` : ''}
-            </div>
-            <div class="fav-actions">
-              <a class="btn" href="kb-quality.html?module=${encodeURIComponent(f.id)}">📊</a>
-              <a class="btn" href="kb-graph.html?module=${encodeURIComponent(f.id)}">🕸️</a>
-              <button class="btn danger" data-remove="${f.id}">×</button>
-            </div>
-          </div>
-        `).join('')}
-        <div class="fav-foot">
-          <button class="btn danger" id="favClearAll">清空全部</button>
-          <button class="btn primary" id="favExport">📤 导出 JSON</button>
-        </div>
-      `;
-      drawer.querySelectorAll('[data-remove]').forEach(btn => {
-        btn.onclick = (e) => {
-          e.stopPropagation();
-          toggle({ id: btn.dataset.remove });
-          renderDrawer();
-          // 同步所有星标
-          document.querySelectorAll('.kb-fav-btn').forEach(b => refreshBtn(b));
-        };
-      });
-      const ca = document.getElementById('favClearAll');
-      if(ca) ca.onclick = () => {
-        if(confirm('确认清空所有 KB 收藏？')){
-          save([]);
-          renderDrawer();
-          document.querySelectorAll('.kb-fav-btn').forEach(b => refreshBtn(b));
-        }
-      };
-      const ex = document.getElementById('favExport');
-      if(ex) ex.onclick = () => {
-        const blob = new Blob([JSON.stringify(getAll(), null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `kb-favorites-${new Date().toISOString().slice(0,10)}.json`;
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(url), 100);
-      };
+      return;
     }
+    const allTags = getTags();
+    const kindSet = new Set(arr.map(x => x.kind || 'module'));
+    const searchQ = (window._favDrawerSearch || '').toLowerCase();
+    let filtered = arr;
+    if(window._favDrawerTag){
+      filtered = filtered.filter(f => (f.tags||[]).includes(window._favDrawerTag));
+    }
+    if(searchQ){
+      filtered = filtered.filter(f =>
+        (f.name||'').toLowerCase().includes(searchQ) ||
+        (f.id||'').toLowerCase().includes(searchQ) ||
+        (f.note||'').toLowerCase().includes(searchQ) ||
+        (f.tags||[]).some(t => t.toLowerCase().includes(searchQ))
+      );
+    }
+    drawer.innerHTML = `
+      <div class="fav-head">⭐ 我的收藏（${filtered.length}/${arr.length}）</div>
+      <div style="padding:6px 10px;border-bottom:1px solid var(--border);display:flex;gap:6px;flex-direction:column">
+        <input type="text" id="favDrawerSearch" placeholder="🔍 搜索名称/ID/笔记/标签..." value="${window._favDrawerSearch||''}" style="width:100%;box-sizing:border-box;padding:6px 8px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.8rem"/>
+        ${allTags.length ? `<div class="fav-tagfilter" style="display:flex;flex-wrap:wrap;gap:4px"><span style="font-size:.7rem;color:var(--paper3)">🏷️</span>${allTags.map(t => `<span class="fav-tag" style="font-size:.7rem;background:${window._favDrawerTag===t?'var(--gold)':'var(--card)'};border:1px solid var(--border);padding:2px 8px;border-radius:10px;cursor:pointer;color:${window._favDrawerTag===t?'#000':'var(--paper2)'}" data-tag="${t}">${t}</span>`).join('')}<span class="fav-tag" style="font-size:.7rem;background:${!window._favDrawerTag?'var(--gold)':'var(--card)'};border:1px solid var(--border);padding:2px 8px;border-radius:10px;cursor:pointer;color:${!window._favDrawerTag?'#000':'var(--paper2)'}" data-tag="">全部</span></div>` : ''}
+      </div>
+      ${filtered.length === 0 ? '<div class="fav-empty" style="padding:20px;text-align:center">🔍 无匹配收藏<br><small>试试调整搜索词或清除标签筛选</small></div>' : filtered.map(f => `
+        <div class="fav-item" data-id="${f.id}">
+          <div class="fav-info">
+            <div class="fav-name">${f.name}</div>
+            <div class="fav-meta"><code>${f.id}</code> · ${f.level} · ${new Date(f.ts).toLocaleDateString('zh-CN')}</div>
+            ${(f.tags && f.tags.length) ? `<div class="fav-tags">${f.tags.map(t => `<span class="fav-tag">🏷️ ${t}</span>`).join('')}</div>` : ''}
+            ${f.note ? `<div class="fav-note">📝 ${f.note.length > 40 ? f.note.slice(0,40)+'…' : f.note}</div>` : ''}
+          </div>
+          <div class="fav-actions">
+            <a class="btn" href="kb-quality.html?module=${encodeURIComponent(f.id)}">📊</a>
+            <a class="btn" href="kb-graph.html?module=${encodeURIComponent(f.id)}">🕸️</a>
+            <button class="btn danger" data-remove="${f.id}">×</button>
+          </div>
+        </div>
+      `).join('')}
+      <div class="fav-foot">
+        <button class="btn danger" id="favClearAll">清空全部</button>
+        <button class="btn primary" id="favExport">📤 导出 JSON</button>
+      </div>
+    `;
+    // 搜索绑定
+    const searchEl = document.getElementById('favDrawerSearch');
+    if(searchEl) searchEl.oninput = (e) => { window._favDrawerSearch = e.target.value; renderDrawer(); searchEl?.focus(); };
+    // 标签筛选
+    drawer.querySelectorAll('[data-tag]').forEach(el => {
+      el.onclick = () => { window._favDrawerTag = el.dataset.tag || ''; renderDrawer(); };
+    });
+    drawer.querySelectorAll('[data-remove]').forEach(btn => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        toggle({ id: btn.dataset.remove });
+        renderDrawer();
+        document.querySelectorAll('.kb-fav-btn').forEach(b => refreshBtn(b));
+      };
+    });
+    const ca = document.getElementById('favClearAll');
+    if(ca) ca.onclick = () => {
+      if(confirm('确认清空所有 KB 收藏？')){
+        save([]);
+        renderDrawer();
+        document.querySelectorAll('.kb-fav-btn').forEach(b => refreshBtn(b));
+      }
+    };
+    const ex = document.getElementById('favExport');
+    if(ex) ex.onclick = () => {
+      const blob = new Blob([JSON.stringify(getAll(), null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `kb-favorites-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 100);
+    };
   }
 
   function refreshBtn(btn){
