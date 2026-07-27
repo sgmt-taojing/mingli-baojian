@@ -13,12 +13,12 @@
 // 严禁出现在报告里的恐吓、绝对化、医疗替代、财务恐吓、生命恐吓等表述
 const COMPLIANCE_FORBIDDEN = [
   // —— 绝对化（违反"非全称判断"）——
-  { rx: /必定(?:升官|发财|大富大贵|大富|大贵|大灾|大难)/g, label: '绝对化-必定大富大贵/大灾', repl: '有较大可能（仍需努力）' },
+  { rx: /必定.{0,3}(?:升官|发财|大富大贵|大富|大贵|大灾|大难)/g, label: '绝对化-必定大富大贵/大灾', repl: '有较大可能（仍需努力）' },
   { rx: /注定(?:要|会).{0,6}(?:大富|大贵|大灾|大难|死|病|穷|败)/g, label: '绝对化-注定大富/大灾', repl: '命理倾向提示' },
   { rx: /百分百(?:会|要)?/g,                  label: '绝对化-百分百',     repl: '有较大可能' },
   { rx: /百分之百/g,                          label: '绝对化-百分之百',   repl: '有较大可能' },
   { rx: /一定(?:会|要)?(?:死|大凶|大难|破产)/g, label: '绝对化-一定会大凶', repl: '需注意防范' },
-  { rx: /一定会(?:死|灾|病|穷|败|输)/g,        label: '绝对化-一定会灾',   repl: '需注意防范' },
+  { rx: /一定会(?:死|灾|病|穷|败|输|大凶|大难)/g,        label: '绝对化-一定会灾',   repl: '需注意防范' },
   // —— 恐吓-生命 ——（docx 强制禁区）
   { rx: /血光之灾/g,                          label: '恐吓-血光之灾',     repl: '需注意安全防范' },
   { rx: /必死/g,                              label: '恐吓-必死',         repl: '需特别留意健康' },
@@ -114,14 +114,49 @@ function resolveSourceLabel(kbEntry) {
 // =========== 主函数 ===========
 
 /**
+ * 受众身份（2026-07-27 群中 738342 反馈）
+ * - expert:  易经大师 / 命理师：禁用词清单关闭，给出原汁原味的古籍原文
+ * - general: 普通大众：全量启用 32 条禁用词 + 免责声明
+ */
+const COMPLIANCE_AUDIENCE = {
+  EXPERT: 'expert',
+  GENERAL: 'general',
+};
+// 默认受众标识（用户在 UI 里可切换）
+let _audienceMode = (typeof localStorage !== 'undefined' && localStorage.getItem('_compliance_audience')) || COMPLIANCE_AUDIENCE.GENERAL;
+function setAudience(mode) {
+  if (mode !== COMPLIANCE_AUDIENCE.EXPERT && mode !== COMPLIANCE_AUDIENCE.GENERAL) {
+    mode = COMPLIANCE_AUDIENCE.GENERAL;
+  }
+  _audienceMode = mode;
+  try { if (typeof localStorage !== 'undefined') localStorage.setItem('_compliance_audience', mode); } catch(_) {}
+}
+function getAudience() { return _audienceMode; }
+
+/**
  * 对报告文本进行合规清洗
  * @param {string} text - 原始报告文本
- * @returns {{text:string, hits:Array}}
+ * @param {Object} [opts] - 选项
+ * @param {string} [opts.audience] - 受众身份（'expert'|'general'），默认走 _audienceMode
+ * @param {boolean} [opts.skipDisclaimer] - 跳过免责声明追加（大师模式默认跳过）
+ * @returns {{text:string, hits:Array, skipped:boolean}}
  *   - text: 已替换禁用词 + 末尾追加统一免责声明
  *   - hits: 被拦截的记录 [{label, sample, replaced}]
+ *   - skipped: 大师模式全量跳过拦截 + 不追加免责
  */
-function applyCompliance(text) {
-  if (typeof text !== 'string') return { text: '', hits: [] };
+function applyCompliance(text, opts) {
+  if (typeof text !== 'string') return { text: '', hits: [], skipped: false };
+  opts = opts || {};
+  const audience = opts.audience || _audienceMode;
+  const skipDisclaimer = opts.skipDisclaimer != null ? opts.skipDisclaimer : (audience === COMPLIANCE_AUDIENCE.EXPERT);
+  // 大师模式：禁用词清单不启用，原文交付；免责是否追加由 skipDisclaimer 决定
+  if (audience === COMPLIANCE_AUDIENCE.EXPERT) {
+    let out = text;
+    if (!skipDisclaimer && !/⚠️ 免责声明/.test(out)) {
+      out = out.replace(/\s*$/, '') + '\n\n' + COMPLIANCE_DISCLAIMER;
+    }
+    return { text: out, hits: [], skipped: true, audience };
+  }
   const hits = [];
   let out = text;
   for (const r of COMPLIANCE_FORBIDDEN) {
@@ -134,10 +169,10 @@ function applyCompliance(text) {
     }
   }
   // 末尾统一注入免责声明（已存在则跳过）
-  if (!/⚠️ 免责声明/.test(out)) {
+  if (!skipDisclaimer && !/⚠️ 免责声明/.test(out)) {
     out = out.replace(/\s*$/, '') + '\n\n' + COMPLIANCE_DISCLAIMER;
   }
-  return { text: out, hits };
+  return { text: out, hits, skipped: false, audience };
 }
 
 /**
@@ -163,9 +198,12 @@ if (typeof module !== 'undefined' && module.exports) {
     KB_SCHOOL_TAGS,
     KB_SOURCE_POLICY,
     KB_SOURCE_LABEL,
+    COMPLIANCE_AUDIENCE,
     applyCompliance,
     extractSchoolTags,
     resolveSourceLabel,
+    setAudience,
+    getAudience,
   };
 }
 if (typeof window !== 'undefined') {
@@ -175,8 +213,11 @@ if (typeof window !== 'undefined') {
     KB_SCHOOL_TAGS,
     KB_SOURCE_POLICY,
     KB_SOURCE_LABEL,
+    COMPLIANCE_AUDIENCE,
     applyCompliance,
     extractSchoolTags,
     resolveSourceLabel,
+    setAudience,
+    getAudience,
   };
 }

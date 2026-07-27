@@ -1233,11 +1233,11 @@ function _r89BuildMissingPrompt(v){
 // ===== R89 合规黑名单 + 免责声明（P0-2 / P0-3 / P2-1）=====
 const COMPLIANCE_FORBIDDEN = [
   // —— 绝对化（违反"非全称判断"）——
-  { rx: /必定(?:升官|发财|大富大贵|大富|大贵|大灾|大难)/g, label: '绝对化-必定大富大贵/大灾', repl: '有较大可能（仍需努力）' },
+  { rx: /必定.{0,3}(?:升官|发财|大富大贵|大富|大贵|大灾|大难)/g, label: '绝对化-必定大富大贵/大灾', repl: '有较大可能（仍需努力）' },
   { rx: /注定(?:要|会).{0,6}(?:大富|大贵|大灾|大难|死|病|穷|败)/g, label: '绝对化-注定大富/大灾', repl: '命理倾向提示' },
   { rx: /百分百/g, label: '绝对化-百分百', repl: '有较大可能' },
   { rx: /百分之百/g, label: '绝对化-百分之百', repl: '有较大可能' },
-  { rx: /一定会(?:死|灾|病|穷|败|输)/g, label: '绝对化-一定会灾', repl: '需注意防范' },
+  { rx: /一定会(?:死|灾|病|穷|败|输|大凶|大难)/g, label: '绝对化-一定会灾', repl: '需注意防范' },
   { rx: /一定(?:会|要)?(?:死|大凶|大难|破产)/g, label: '绝对化-一定大凶', repl: '需注意防范' },
   // —— 恐吓-生命 ——
   { rx: /血光之灾/g, label: '恐吓-血光之灾', repl: '需注意安全防范' },
@@ -1279,29 +1279,62 @@ const KB_SOURCE_TAGS = [
   // R89-P1-4-2 2026-07-27：行业通行（找不到古籍原文时直接选通行版，不率强附会）
   { rx: /行业通行|通用规则|常规断法|约定俗成|通行断法|一般认为|传统上|传统观点|通常认为/g, tag: '📚 行业通行', cls: 'tag-common' },
 ];
+// R89-P1-6: 受众分流 — 大众需拦截恐吓/绝对化/医疗替代；专家不拦截，仅追加研究免责
+function _r89GetAudience(){
+  try {
+    return localStorage.getItem('_r89_audience') || 'public';
+  } catch(e) { return 'public'; }
+}
+function _r89SetAudience(a){
+  try { localStorage.setItem('_r89_audience', a); } catch(e) {}
+  // 同步UI 按钮文案
+  try {
+    const lbl = document.getElementById('audienceLabel');
+    if (lbl) lbl.textContent = (a === 'expert') ? '专家' : '大众';
+  } catch(e) {}
+}
+function _r89ToggleAudience(){
+  const cur = _r89GetAudience();
+  const next = (cur === 'expert') ? 'public' : 'expert';
+  _r89SetAudience(next);
+  try {
+    if (typeof showToast === 'function') {
+      showToast(next === 'expert' ? '🧙 已切到专家模式（禁用词不拦截）' : '👥 已切到大众模式（自动拦截禁用词）');
+    }
+  } catch(e) {}
+}
 function _r89ApplyCompliance(text){
   if (typeof text !== 'string') return { text: '', hits: [] };
-  // R89: 优先用外部 js/compliance.js（32 条全规则含医疗类），无则用内联 25 条
+  const audience = _r89GetAudience();  // 'public' | 'expert'
+  // R89: 优先用外部 js/compliance.js（32 条全规则含医疗类 + 受众分流），无则用内联 25 条
   if (typeof window !== 'undefined' && window.Compliance && typeof window.Compliance.applyCompliance === 'function') {
     try {
-      const r = window.Compliance.applyCompliance(text);
-      return { text: r.text, hits: r.hits || [] };
+      // compliance.js 期望 opts 对象 + audience 名是 'general'/'expert'（不是 'public'/'expert'）
+      const apiAudience = (audience === 'expert') ? 'expert' : 'general';
+      const r = window.Compliance.applyCompliance(text, { audience: apiAudience });
+      return { text: r.text, hits: r.hits || [], skipped: r.skipped || false, audience };
     } catch(e) { /* 降级 */ }
   }
+  // 内联降级版：专家模式不拦截 + 追加研究免责；大众模式拦截 + 追加免责声明
   const hits = [];
   let out = text;
-  for (const r of COMPLIANCE_FORBIDDEN) {
-    if (r.rx.test(out)) {
-      const m = out.match(r.rx);
-      hits.push({ label: r.label, sample: m[0], replaced: r.repl });
-      out = out.replace(r.rx, r.repl);
+  if (audience !== 'expert') {
+    for (const r of COMPLIANCE_FORBIDDEN) {
+      if (r.rx.test(out)) {
+        const m = out.match(r.rx);
+        hits.push({ label: r.label, sample: m[0], replaced: r.repl });
+        out = out.replace(r.rx, r.repl);
+      }
     }
   }
   // 末尾追加免责声明（已存在则跳过）
-  if (!/⚠️ 免责声明/.test(out)) {
-    out = out.replace(/\s*$/, '') + '\n\n' + COMPLIANCE_DISCLAIMER;
+  const disclaimer = (audience === 'expert')
+    ? '📚 研究免责：本报告为学术研究/同行参考版，不负责传播预警义务；大众读者请使用「受眾=大众」模式以获得合规保护。'
+    : COMPLIANCE_DISCLAIMER;
+  if (!/⚠️ 免责声明|📚 研究免责/.test(out)) {
+    out = out.replace(/\s*$/, '') + '\n\n' + disclaimer;
   }
-  return { text: out, hits };
+  return { text: out, hits, audience };
 }
 function _r89ExtractSourceTags(text){
   if (typeof text !== 'string') return { tags: [], text };
