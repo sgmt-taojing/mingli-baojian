@@ -139,6 +139,12 @@ footer.links a{color:var(--gold);text-decoration:none;margin:0 8px}
 .modal-card .adj-svg{width:100%;height:300px;background:var(--ink);border-radius:6px;border:1px solid var(--border);margin-top:8px}
 .modal-card .neighbor-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.85rem}
 .modal-card .neighbor-row:last-child{border-bottom:0}
+.modal-card .modal-breadcrumb a{color:var(--gold);text-decoration:none;cursor:pointer;padding:2px 6px;border-radius:4px}
+.modal-card .modal-breadcrumb a:hover{background:var(--card)}
+.modal-card .modal-breadcrumb .bc-sep{color:var(--paper3)}
+.modal-card .modal-breadcrumb .bc-current{color:var(--paper2);font-weight:bold}
+.modal-card .modal-breadcrumb button{cursor:pointer;background:var(--card);border:1px solid var(--border);color:var(--paper2);padding:2px 8px;border-radius:4px;font-size:.7rem}
+.modal-card .modal-breadcrumb button:hover{background:var(--gold);color:#000;border-color:var(--gold)}
 .modal-card .close-btn{position:absolute;top:14px;right:14px;background:var(--card);border:1px solid var(--border);color:var(--paper2);border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:1.1rem;line-height:1}
 .modal-card .close-btn:hover{background:var(--gold);color:#000}
 .modal-wrap{position:relative}
@@ -216,6 +222,7 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
   <div class="modal-card">
     <div class="modal-wrap">
       <button class="close-btn" id="modalClose" aria-label="关闭">×</button>
+      <div id="modalBreadcrumb" class="modal-breadcrumb" style="font-size:.78rem;color:var(--paper3);margin-bottom:8px;display:flex;gap:4px;flex-wrap:wrap;align-items:center;min-height:18px"></div>
       <h2 id="modalTitle">节点详情</h2>
       <div class="modal-meta" id="modalMeta"></div>
       <div class="modal-section">
@@ -516,6 +523,18 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
 
     renderGraphPanel();
 
+    // R112 URL 自动弹窗
+    setTimeout(() => {
+      try {
+        const url = new URL(window.location.href);
+        const modParam = url.searchParams.get('module');
+        if(modParam && gNodes.find(n => n.id === modParam)){
+          window._modalHistory = [modParam];
+          openNodeModal(modParam);
+        }
+      } catch(e){}
+    }, 200);
+
     graphSearch?.addEventListener('input', renderGraphPanel);
     graphLevel?.addEventListener('change', renderGraphPanel);
     graphSort?.addEventListener('change', renderGraphPanel);
@@ -625,6 +644,55 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
     const node = gNodes.find(n => n.id === nodeId);
     if(!node) return;
     const modal = document.getElementById('kbNodeModal');
+
+    // R111 历史栈管理
+    if(!window._modalHistory) window._modalHistory = [];
+    // 若与栈顶相同则不压栈
+    if(window._modalHistory[window._modalHistory.length - 1] !== nodeId){
+      window._modalHistory.push(nodeId);
+      // 限制深度 20
+      if(window._modalHistory.length > 20) window._modalHistory = window._modalHistory.slice(-20);
+    }
+
+    // 渲染面包屑
+    const bc = document.getElementById('modalBreadcrumb');
+    if(bc){
+      const stack = window._modalHistory;
+      let html = '';
+      stack.forEach((id, i) => {
+        const n = gNodes.find(x => x.id === id);
+        const label = n?.name || id;
+        if(i === stack.length - 1){
+          html += `<span class="bc-current">${label}</span>`;
+        } else {
+          html += `<a data-bc-idx="${i}">${label}</a><span class="bc-sep">›</span>`;
+        }
+      });
+      html += stack.length > 1 ? ' <button id="modalBackBtn" title="返回上一节点">← 返回</button>' : '';
+      bc.innerHTML = html;
+      bc.querySelectorAll('a[data-bc-idx]').forEach(a => {
+        a.onclick = (e) => {
+          e.preventDefault();
+          const idx = parseInt(a.dataset.bcIdx, 10);
+          // 切到这里，并截断后续栈
+          window._modalHistory = window._modalHistory.slice(0, idx + 1);
+          openNodeModal(window._modalHistory[window._modalHistory.length - 1]);
+        };
+      });
+      const backBtn = document.getElementById('modalBackBtn');
+      if(backBtn) backBtn.onclick = () => {
+        if(window._modalHistory.length <= 1) return;
+        window._modalHistory.pop();
+        openNodeModal(window._modalHistory[window._modalHistory.length - 1]);
+      };
+    }
+
+    // R112 URL 同步
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('module', nodeId);
+      window.history.replaceState(null, '', url.toString());
+    } catch(e){}
     const neighbors = [];
     const seen = new Set();
     gEdges.forEach(e => {
@@ -736,6 +804,13 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
 
   function closeNodeModal(){
     document.getElementById('kbNodeModal')?.classList.remove('show');
+    // R112 关闭时清 URL 参数 + 清历史栈
+    window._modalHistory = [];
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('module');
+      window.history.replaceState(null, '', url.toString());
+    } catch(e){}
   }
 
   // 暴露
