@@ -365,7 +365,7 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
         <td>${trust.toFixed(3)} <span class="bar-mini"><span class="fill" style="width:${trustPct}%;background:linear-gradient(90deg,#c9a84c,#7ec47e)"></span></span></td>
         <td style="font-size:.75rem">${m.gold}/${m.silver}/${m.bronze||0}/${m.needs_fix||0}</td>
         <td style="font-size:.7rem">min ${m.min_trust?.toFixed(2) || '—'} / max ${m.max_trust?.toFixed(2) || '—'}</td>
-        <td><a class="btn" href="kb-quality.html?module=${m.module}">详情</a> <a class="btn" href="kb-graph.html?module=${m.module}">图谱</a></td>
+        <td><a class="btn" href="kb-quality.html?module=${m.module}">详情</a> <a class="btn" href="kb-graph.html?module=${m.module}">图谱</a> <a class="btn" href="?tab=search&module=${encodeURIComponent(m.module)}&q=${encodeURIComponent(m.module)}" onclick="event.preventDefault();switchTab('search');setTimeout(()=>{const i=document.getElementById('searchInput');if(i){i.value='${m.module.replace(/'/g,'')}';doSearch();document.getElementById('searchModule').value='${m.module}';}},50)">🔍 搜</a></td>
       </tr>`;
     }
     html += '</tbody></table>';
