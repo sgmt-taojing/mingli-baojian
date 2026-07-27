@@ -1942,6 +1942,7 @@
 
 <!-- section-taisui END -->
 
+<script>
 /* ===== 第二十五轮·流年太岁化解引擎 ===== */
 // 12 值年神煞（神枢经·太岁符咒）
 var TAISUI_RULE = {
@@ -2111,6 +2112,7 @@ function generateTaisuiFlow(){
 
   document.getElementById('taisuiResult').innerHTML = h;
 }
+</script>
 
 
 <!-- section-kids · 第二十六轮·化解·儿童房专区 START -->
@@ -2157,6 +2159,7 @@ function generateTaisuiFlow(){
 </div>
 <!-- section-kids END -->
 
+<script>
 /* ===== 第二十六轮·儿童房 24 件套引擎 ===== */
 var KIDS_24 = [
   // 学习启智 8 件
@@ -2262,6 +2265,7 @@ function generateKidsRoom(){
 
   document.getElementById('kidsResult').innerHTML = h;
 }
+</script>
 
 
 <!-- section-office · 第二十七轮·化解·办公位专区 START -->
@@ -2309,6 +2313,7 @@ function generateKidsRoom(){
 </div>
 <!-- section-office END -->
 
+<script>
 /* ===== 第二十七轮·办公位 16 件套引擎 ===== */
 var OFFICE_16 = [
   {id:1,dim:'事业',ico:'🗼',name:'文昌塔·铜',why:'助事业·启智慧·镇文昌',pos:'书桌左上角',mat:'纯铜',color:'铜本色/金色',tip:'塔尖朝门·不可对厕所',cite:'《八宅明镜·书房》《文昌帝君阴骘文》'},
@@ -2399,6 +2404,7 @@ function generateOfficeDesk(){
   h += '</div>';
   document.getElementById('offResult').innerHTML = h;
 }
+</script>
 
 
 <!-- section-marriage · 第二十八轮·化解·婚嫁择日完整模块 START -->
@@ -2462,6 +2468,7 @@ function generateOfficeDesk(){
 </div>
 <!-- section-marriage END -->
 
+<script>
 /* ===== 第二十八轮·婚嫁择日引擎 ===== */
 // 7 大婚嫁事件 · 嫁娶周堂
 var MG_EVENTS = {
@@ -2739,6 +2746,7 @@ function generateMarriage(){
 
   document.getElementById('mgResult').innerHTML = h;
 }
+</script>
 
 
 <!-- section-move · 第二十九轮·化解·动土搬迁模块 START -->
@@ -2804,6 +2812,7 @@ function generateMarriage(){
 </div>
 <!-- section-move END -->
 
+<script>
 /* ===== 第二十九轮·动土搬迁引擎 ===== */
 var MV_EVENTS = {
   '动土':{
@@ -3075,6 +3084,7 @@ function generateMove(){
 
   document.getElementById('mvResult').innerHTML = h;
 }
+</script>
 
 
 <!-- section-fuzhou · 第三十轮·化解·符咒念诵仪轨模块 START -->
@@ -3123,6 +3133,7 @@ function generateMove(){
 </div>
 <!-- section-fuzhou END -->
 
+<script>
 /* ===== 第三十轮·符咒 24 分类 ===== */
 var FU_24 = [
   // 化解类 8 符
@@ -3951,6 +3962,35 @@ function filterFzCat(cat){
   document.querySelectorAll('.fz-item').forEach(function(el){
     el.style.display = (cat==='all' || el.dataset.cat===cat) ? '' : 'none';
   });
+}
+// R179: togglePlanDetail + matchMyMingua safe fallback
+function togglePlanDetail(el){
+  try{
+    if(!el) return;
+    var detail = el.querySelector('.plan-detail') || el.nextElementSibling;
+    if(detail){
+      var isOpen = detail.style.display === 'block';
+      detail.style.display = isOpen ? 'none' : 'block';
+      el.classList.toggle('expanded', !isOpen);
+    }
+  }catch(e){ if(window.toast) toast('展开详情失败'); }
+}
+function matchMyMingua(btn, matchStr){
+  try{
+    if(!btn) return;
+    var result = btn.parentNode.querySelector('.match-result') || document.getElementById('minguaMatchResult');
+    if(result){
+      result.innerHTML = '<div style="padding:10px;background:rgba(201,168,76,.08);border-radius:6px;font-size:12px;line-height:1.7">'+
+        '<b style="color:var(--gold)">🔮 命卦匹配分析</b><br>'+
+        '匹配范围：'+(matchStr||'未知')+'<br>'+
+        '✅ 吉配：生气·天医·延年·伏位<br>'+
+        '⚠️ 凶配：祸害·六煞·五鬼·绝命<br>'+
+        '<span style="opacity:.7">请结合八字命卦综合判断</span>'+
+        '</div>';
+      result.style.display = 'block';
+    }
+    if(window.toast) toast('命卦匹配已生成（演示数据）');
+  }catch(e){ if(window.toast) toast('命卦匹配失败'); }
 }
 </script>
 
