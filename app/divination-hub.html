@@ -2413,6 +2413,74 @@ function closeMore(){
   if(m) m.style.display = 'none';
   if(o) o.style.display = 'none';
 }
+function toggleMore(){
+  const m = document.getElementById('moreMenu');
+  if(!m) return;
+  if(m.style.display === 'block') closeMore(); else openMore();
+}
+
+// ===== 本地数据导入导出 =====
+function exportLocalData(){
+  const keys = [];
+  for(let i=0;i<localStorage.length;i++){
+    const k = localStorage.key(i);
+    if(k && !k.startsWith('_kb_hit') && !k.startsWith('_kb_se')) keys.push(k);
+  }
+  const data = {};
+  keys.forEach(k => { try { data[k] = JSON.parse(localStorage.getItem(k)); } catch { data[k] = localStorage.getItem(k); } });
+  const blob = new Blob([JSON.stringify({exported_at:new Date().toISOString(),count:keys.length,data},null,2)],{type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'mingli-baojian-data-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},100);
+  if(window._toast) window._toast('\ud83d\udce4 \u5df2\u5bfc\u51fa '+keys.length+' \u6761\u672c\u5730\u6570\u636e',2000);
+}
+function importLocalData(){
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = '.json';
+  input.onchange = (e) => {
+    const file = e.target.files[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const obj = JSON.parse(ev.target.result);
+        if(!obj.data) throw new Error('invalid format');
+        let cnt = 0;
+        for(const [k,v] of Object.entries(obj.data)){
+          localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
+          cnt++;
+        }
+        if(window._toast) window._toast('\ud83d\udce5 \u5df2\u5bfc\u5165 '+cnt+' \u6761\u6570\u636e\uff0c\u5237\u65b0\u751f\u6548',2000);
+        setTimeout(()=>location.reload(),1500);
+      } catch(err){
+        if(window._toast) window._toast('\u26a0\ufe0f \u5bfc\u5165\u5931\u8d25\uff1a'+err.message,2000);
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+function clearAllLocalData(){
+  if(!confirm('\u786e\u5b9a\u6e05\u7a7a\u5168\u90e8\u672c\u5730\u6570\u636e\uff1f\u6b64\u64cd\u4f5c\u4e0d\u53ef\u64a4\u9500\uff01')) return;
+  localStorage.clear();
+  if(window._toast) window._toast('\ud83d\uddd1\u5df2\u6e05\u7a7a\u5168\u90e8\u6570\u636e\uff0c\u5373\u5c06\u5237\u65b0',2000);
+  setTimeout(()=>location.reload(),1500);
+}
+
+// ===== \u4fe1\u4ef0\u9009\u62e9 =====
+function selectFaith(faith){
+  document.querySelectorAll('.faith-card').forEach(c => c.classList.remove('selected'));
+  const el = document.querySelector('.faith-card[onclick*="'+faith+'"]');
+  if(el) el.classList.add('selected');
+  localStorage.setItem('userFaith', faith);
+  if(window._toast) window._toast('\u2705 \u5df2\u9009\u62e9\u4fe1\u4ef0\uff1a'+{ru:'\u5112',dao:'\u9053',fo:'\u4f5b'}[faith]||faith, 1500);
+}
+
+// ===== \u5bfa\u5e99\u6d4f\u89c8 =====
+function showTempleBrowser(){
+  if(window._toast) window._toast('\ud83c\udfdb\u540d\u5c71\u5bfa\u5e99\u6d4f\u89c8\u529f\u80fd\u5f00\u53d1\u4e2d...',1500);
+}
 
 function matchMyMingua(btn, suitableStr) {
   const card = btn.closest('.plan-card');
