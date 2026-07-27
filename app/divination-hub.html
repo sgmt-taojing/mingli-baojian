@@ -2403,6 +2403,27 @@
 <script src="../knowledge-models/zodiac-model.js" defer></script>
 <script src="js/mobile-nav.js" defer></script>
 <script>
+// ===== 核心 showSection（Tab 切换 + section 显隐）=====
+window.showSection = function(name){
+  // 移除所有 tab active
+  document.querySelectorAll('.nav-tab').forEach(function(t){
+    t.classList.remove('active');
+    t.setAttribute('aria-selected','false');
+  });
+  // 隐藏所有 section
+  document.querySelectorAll('.section').forEach(function(s){ s.hidden = true; s.classList.remove('active'); });
+  // 激活目标
+  var tab = document.getElementById('tab-' + name);
+  var sec = document.getElementById('section-' + name);
+  if(tab){ tab.classList.add('active'); tab.setAttribute('aria-selected','true'); }
+  if(sec){ sec.hidden = false; sec.classList.add('active'); }
+  // 搜索栏
+  var sb = document.getElementById('searchBar');
+  if(sb) sb.hidden = (name !== 'search');
+  // 滚动到顶
+  window.scrollTo({top:0, behavior:'smooth'});
+};
+
 // ===== 更多功能菜单 =====
 function openMore(){
   const m = document.getElementById('moreMenu');
