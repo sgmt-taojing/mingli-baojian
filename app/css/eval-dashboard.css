@@ -1152,3 +1152,112 @@ html, body {
 @media (max-width: 360px) {
   .csv-export-btn { font-size: 10px; padding: 4px 8px; width: 100%; }
 }
+
+/* R204 打印样式 */
+@media print {
+  @page { size: A4; margin: 12mm 10mm; }
+
+  html, body {
+    background: #fff !important;
+    color: #1a1a1a !important;
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .dash-header {
+    padding: 8px 0 6px;
+    background: none;
+    border-bottom: 2px solid #333;
+    page-break-after: avoid;
+  }
+  .dash-back, .btn-refresh, #exportBtn { display: none !important; }
+  .dash-header h1 { font-size: 18px; color: #1a1a1a; }
+  .dash-sub, .dash-meta { color: #555; font-size: 10px; }
+  .dash-sub .badge { border-color: #666; color: #333; }
+  .kb-chip { border-color: #999; color: #333; background: #f5f5f5; }
+
+  .dash-main { padding: 6px 0; }
+
+  .section-hint { color: #666; font-size: 9px; }
+
+  .dash-summary { gap: 6px; page-break-after: avoid; }
+  .summary-card {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ccc;
+    background: #fafafa !important;
+  }
+  .summary-card .summary-label { color: #555; }
+  .summary-card .summary-value { color: #1a1a1a; }
+  .summary-card.ok { border-color: #10b981; }
+  .summary-card.warn { border-color: #c9a84c; }
+  .summary-card.danger { border-color: #ef4444; }
+
+  .trend-card {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ccc;
+    background: #fff !important;
+    page-break-inside: avoid;
+  }
+  .trend-card header h2 { color: #1a1a1a; }
+  .trend-card .trend-meta { color: #666; }
+  .trend-card .chart-wrap svg { max-height: 180px; }
+  .trend-legend { color: #333; }
+  .trend-legend .target { border-color: #666; color: #333; }
+
+  .dash-violations, .dash-modules, .dash-alert-card,
+  .dash-module-trend, .dash-weekly-stats, .dash-wow,
+  .dash-alert-history, .dash-module-percase, .dash-percase {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .dash-violations h2, .dash-modules h2, .dash-alert-card h2,
+  .dash-module-trend h2, .dash-weekly-stats h2, .dash-wow h2,
+  .dash-alert-history h2, .dash-module-percase h2, .dash-percase h2 {
+    color: #1a1a1a;
+    border-bottom: 1px solid #999;
+    page-break-after: avoid;
+  }
+
+  .mod-card {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ccc;
+    background: #fafafa !important;
+  }
+  .mod-card .mod-name { color: #1a1a1a; }
+  .mod-card .eval-detail { color: #333; }
+
+  .alert-main { box-shadow: none; border: 2px solid; background: #fff !important; }
+  .alert-main.ok { border-color: #10b981; }
+  .alert-main.warn { border-color: #c9a84c; }
+  .alert-main.critical { border-color: #ef4444; }
+  .alert-bench-card {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ccc;
+    background: #fafafa !important;
+  }
+
+  table { font-size: 9px; }
+  th { background: #eee !important; color: #333 !important; }
+  td { color: #1a1a1a !important; }
+  .ok-cell { background: #e8f5e9 !important; }
+  .warn-cell { background: #fff8e1 !important; }
+  .danger-cell { background: #ffebee !important; }
+
+  .percase-controls, .mod-percase-controls { display: none; }
+  .csv-export-btn { display: none !important; }
+  select { display: none; }
+
+  .alert-hist-detail-row { display: table-row !important; }
+  .alert-expand-icon { display: none; }
+
+  .dash-footer {
+    border-top: 1px solid #999;
+    color: #666;
+    font-size: 9px;
+    padding: 4px 0;
+  }
+}
