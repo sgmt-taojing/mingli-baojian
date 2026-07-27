@@ -572,8 +572,12 @@ function startModule(id){
   chat.innerHTML='';
   // R89-M 缘主档案召回：最近一次同模块的档案 → 自动填充提示
   try {
-    if (window.YuanzhuProfileSync) {
-      const _recents = window.YuanzhuProfileSync.listRecent(1);
+    if (window.YuanzhuProfile) {
+      const _recents = window.YuanzhuProfile.load().sort(function(a,b){
+        const _at = (a.visits||[])[0] || '';
+        const _bt = (b.visits||[])[0] || '';
+        return _bt.localeCompare(_at);
+      }).slice(0,1);
       const _last = _recents[0];
       if (_last && _last.modules && _last.modules.includes(id)) {
         const _chip = document.createElement('div');
@@ -858,6 +862,16 @@ async function generateReport(){
   // 0. 问卷 + 排盘落库（公网公开端点，失败静默）
   const _baziForSave = (state.module==='bazi' || state.module==='name' || state.module==='number' || state.module==='face') ? state.data : null;
   _saveSurvey(state.module, state.data, _baziForSave);
+
+  // R89-M 缘主档案召回：生成报告后自动保存到 localStorage
+  try {
+    if (window.YuanzhuProfile && state.data) {
+      const _name = state.data.name || state.data.xingming || state.data.姓名 || '';
+      if (_name) {
+        window.YuanzhuProfile.captureFromState(state);
+      }
+    }
+  } catch(e) { console.warn('[r89-archive] err', e); }
 
   // R89-O 排盘冥想模式 + 仪式感（仅慢路径排盘模块）
   var _slowModule = ['bazi','name','number','face','qimen','ziwei','liuyao','liuren','meihua','zeri','huangli','taisui','daLiuRen','xiaoLiuRen'].includes(state.module);
@@ -3441,6 +3455,80 @@ function showHistoryDetail(r){
 
 // === 反馈 ===
 function openFeedback(){document.getElementById('feedbackPanel').style.display='block';}
+
+// R89-M 缘主档案面板
+async function openProfilePanel(){
+  if(!window.YuanzhuProfile) return alert('档案模块未加载');
+  const _list = window.YuanzhuProfile.list();
+  const _cur = window.YuanzhuProfile.current();
+  const _panel = document.createElement('div');
+  _panel.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  const _modal = document.createElement('div');
+  _modal.style.cssText = 'background:var(--card);border:1px solid rgba(201,168,76,0.4);border-radius:14px;max-width:560px;width:100%;max-height:80vh;overflow-y:auto;padding:20px;font-family:inherit;color:var(--paper)';
+  
+  let _html = '<div style="display:flex;align-items:center;margin-bottom:14px"><div style="font-size:18px;font-weight:600;color:#c9a84c">👤 缘主档案</div><button onclick="this.parentElement.parentElement.parentElement.remove()" style="margin-left:auto;padding:4px 10px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);border-radius:8px;color:#ef4444;cursor:pointer">关闭</button></div>';
+  
+  if(_cur && _cur.name){
+    _html += '<div style="background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.02));border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:12px;margin-bottom:14px">';
+    _html += '<div style="font-size:14px;font-weight:600;margin-bottom:6px">⭐ 当前缘主</div>';
+    _html += '<div style="font-size:12px;line-height:1.7;color:var(--paper2)">';
+    _html += '<b>' + _esc(_cur.name) + '</b>';
+    if(_cur.gender) _html += ' <span style="opacity:0.7">·</span> ' + _esc(_cur.gender);
+    if(_cur.birth || _cur.time) _html += '<br><span style="opacity:0.7">生辰：</span>' + _esc(_cur.birth || '') + ' ' + _esc(_cur.time || '');
+    if(_cur.location) _html += '<br><span style="opacity:0.7">出生地：</span>' + _esc(_cur.location);
+    if(_cur.modules && _cur.modules.length) _html += '<br><span style="opacity:0.7">最近模块：</span>' + _esc(_cur.modules.slice(0,3).join('、'));
+    _html += '</div></div>';
+  }
+  
+  _html += '<div style="font-size:13px;font-weight:600;margin-bottom:8px">所有档案（' + _list.length + '/20）</div>';
+  
+  if(!_list.length){
+    _html += '<div style="text-align:center;padding:20px;color:var(--paper3);font-size:12px">暂无档案，排盘后自动保存</div>';
+  } else {
+    _list.forEach(p => {
+      const _isCur = _cur && _cur.id === p.id;
+      _html += '<div style="display:flex;align-items:center;padding:10px;border:1px solid rgba(201,168,76,' + (_isCur?'0.4':'0.15') + ');border-radius:8px;margin-bottom:6px;background:' + (_isCur?'rgba(201,168,76,0.06)':'transparent') + '">';
+      _html += '<div style="width:36px;height:36px;border-radius:50%;background:rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:center;font-size:18px">' + (p.gender==='女'||p.gender==='female'?'♀':'♂') + '</div>';
+      _html += '<div style="flex:1;margin-left:10px;font-size:12px">';
+      _html += '<div style="font-weight:600">' + _esc(p.name||'(无)') + ' <span style="opacity:0.6;font-weight:normal">· ' + _esc(p.birth||'') + '</span></div>';
+      _html += '<div style="opacity:0.6;font-size:11px">' + (p.modules&&p.modules.length?p.modules.join('、'):'暂无') + (p.visits?' · ' + p.visits + '次咨询':'') + '</div>';
+      _html += '</div>';
+      _html += '<button data-pid="' + p.id + '" class="profile-load" style="padding:4px 10px;background:rgba(34,211,238,0.15);border:1px solid rgba(34,211,238,0.3);border-radius:8px;color:#22d3ee;cursor:pointer;font-size:11px">使用</button>';
+      _html += '<button data-pdel="' + p.id + '" class="profile-del" style="padding:4px 8px;margin-left:4px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:8px;color:#ef4444;cursor:pointer;font-size:11px">删</button>';
+      _html += '</div>';
+    });
+  }
+  
+  if(_list.length){
+    _html += '<button onclick="window.YuanzhuProfile.clearAll();this.parentElement.parentElement.parentElement.remove();openProfilePanel()" style="margin-top:10px;padding:8px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:8px;color:#ef4444;cursor:pointer;width:100%;font-size:12px">🗑 清空所有档案</button>';
+  }
+  
+  _modal.innerHTML = _html;
+  _panel.appendChild(_modal);
+  document.body.appendChild(_panel);
+  
+  _panel.addEventListener('click', e => { if(e.target===_panel) _panel.remove(); });
+  _modal.querySelectorAll('.profile-load').forEach(b => b.addEventListener('click', e => {
+    const pid = e.target.dataset.pid;
+    if(window.YuanzhuProfile.loadProfile(pid)){
+      const p = window.YuanzhuProfile.getProfile(pid);
+      if(p && p.data){
+        state.module = p.modules && p.modules[0] ? p.modules[0] : state.module;
+        state.data = p.data;
+        addAI('已加载缘主【' + (p.name||'') + '】上次的排盘上下文，共 ' + Object.keys(p.data).length + ' 项。点击「重新解读」将基于此上下文快速生成报告。', { type: 'profile-loaded' });
+      }
+    }
+    _panel.remove();
+  }));
+  _modal.querySelectorAll('.profile-del').forEach(b => b.addEventListener('click', e => {
+    const pid = e.target.dataset.pdel;
+    if(confirm('删除此缘主档案？')){
+      window.YuanzhuProfile.deleteProfile(pid);
+      _panel.remove(); openProfilePanel();
+    }
+  }));
+}
+function _esc(s){return String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 function closeFeedback(){document.getElementById('feedbackPanel').style.display='none';}
 function submitFeedback(type){
   const text=document.getElementById('feedbackText').value.trim();
