@@ -868,21 +868,36 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
             btn.style.color = added ? '#000' : 'var(--gold)';
           };
           const id = btn.dataset.eid;
-          if(window.KbFavorites && window.KbFavorites.has(id)) update(true);
+          // R122 用专用 entry 收藏判定（不与模块冲突）
+          const checkFav = () => window.KbFavorites && (window.KbFavorites.isEntryFav ? window.KbFavorites.isEntryFav(id) : window.KbFavorites.isFav(id));
+          if(checkFav()) update(true);
           btn.onclick = () => {
             if(!window.KbFavorites){
-              alert('收藏模块未加载');
+              if(window._toast) window._toast('⚠️ 收藏模块未加载', 1500);
               return;
             }
-            const ok = window.KbFavorites.has(id)
-              ? (window.KbFavorites.remove(id), false)
-              : (window.KbFavorites.add({
+            // R122 优先用 toggleEntry，未加载时回退到 add/remove
+            let ok;
+            if(typeof window.KbFavorites.toggleEntry === 'function'){
+              ok = window.KbFavorites.toggleEntry({
+                id,
+                title: btn.dataset.title,
+                trust: parseFloat(btn.dataset.trust) || null,
+                source: btn.dataset.source || ''
+              });
+            } else {
+              if(checkFav()){ window.KbFavorites.remove(id); ok = false; }
+              else {
+                window.KbFavorites.add({
                   id, name: btn.dataset.title, kind: 'entry', level: 'public',
                   tags: ['entry'], note: '来源模块: ' + nodeId
-                }), true);
+                });
+                ok = true;
+              }
+            }
             update(ok);
             // 同步抽屉 UI
-            if(window.renderDrawer) window.renderDrawer();
+            if(window.KbFavorites.render) window.KbFavorites.render();
             if(window._toast) window._toast(ok ? '✅ 已收藏条目' : '♻️ 已取消');
           };
         });

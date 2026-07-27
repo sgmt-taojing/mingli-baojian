@@ -286,6 +286,25 @@
   window.KbFavorites = {
     getAll, toggle, add, remove, isFav, render: renderDrawer, init,
     updateNote, updateTags, getTags,
+    isEntryFav: function(entryId){ return getAll().some(f => f.id === entryId); },
+    toggleEntry: function(entry){
+      const arr = getAll();
+      const idx = arr.findIndex(f => f.id === entry.id);
+      if(idx >= 0){ arr.splice(idx,1); persist(); return false; }
+      arr.unshift({
+        id: entry.id,
+        name: entry.title || entry.id,
+        level: 'public',
+        kind: 'entry',
+        source: entry.source || '',
+        trust: typeof entry.trust === 'number' ? entry.trust : null,
+        note: '',
+        tags: [],
+        addedAt: Date.now()
+      });
+      persist();
+      return true;
+    },
     export: function(){
       const arr = getAll();
       const blob = new Blob([JSON.stringify(arr, null, 2)], { type: 'application/json' });

@@ -1,0 +1,165 @@
+/* ================================================================
+ * R89-J · 报告模板化：古卷轴 / 现代简约 / 禅意水墨
+ * ================================================================
+ * 三套独立样式，由 data-report-template="scroll|modern|zen" 切换
+ * 默认古卷轴（与现有 report-scroll.css 一致）
+ * 切换模板 localStorage 持久化 · 重渲染触发打印/导出即时生效
+ * ================================================================ */
+
+/* ─────────────────────────────────────────────
+ * 模板 1 · 古卷轴（默认）：双线金边 · 黄底
+ * ───────────────────────────────────────────── */
+[data-report-template="scroll"] .report-msg,
+[data-report-template="scroll"] .b {
+  background: linear-gradient(180deg, #fbf6e6 0%, #f5ebd8 100%) !important;
+  color: #1a1207 !important;
+  border: 2px double #8b6f3a !important;
+  border-radius: 4px !important;
+  box-shadow: 0 4px 16px rgba(139,111,58,0.25) !important;
+  font-family: 'Noto Serif SC', 'Ma Shan Zheng', serif !important;
+}
+[data-report-template="scroll"] .b h2,
+[data-report-template="scroll"] .b h3 { color: #5a3811 !important; }
+[data-report-template="scroll"] .b code,
+[data-report-template="scroll"] .b pre { background: #efe2bf !important; color: #5a3811 !important; }
+
+/* ─────────────────────────────────────────────
+ * 模板 2 · 现代简约：圆角浅色 · 紫蓝点睛
+ * ───────────────────────────────────────────── */
+[data-report-template="modern"] .report-msg,
+[data-report-template="modern"] .b {
+  background: linear-gradient(180deg, #ffffff 0%, #f5f7fb 100%) !important;
+  color: #1f2937 !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  box-shadow: 0 1px 4px rgba(15,23,42,0.08), 0 4px 12px rgba(99,102,241,0.06) !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', sans-serif !important;
+}
+[data-report-template="modern"] .b h2 { color: #4f46e5 !important; font-weight: 700 !important; }
+[data-report-template="modern"] .b h3 { color: #6366f1 !important; }
+[data-report-template="modern"] .b code,
+[data-report-template="modern"] .b pre {
+  background: #eef2ff !important;
+  color: #4338ca !important;
+  border-radius: 6px !important;
+  padding: 2px 6px !important;
+}
+[data-report-template="modern"] .b table {
+  border-collapse: collapse !important;
+  width: 100% !important;
+}
+[data-report-template="modern"] .b table th {
+  background: #eef2ff !important;
+  color: #4338ca !important;
+  padding: 8px !important;
+}
+[data-report-template="modern"] .b table td {
+  padding: 8px !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+/* ─────────────────────────────────────────────
+ * 模板 3 · 禅意水墨：留白 · 飞白笔触 · 浓淡墨色
+ * ───────────────────────────────────────────── */
+[data-report-template="zen"] .report-msg,
+[data-report-template="zen"] .b {
+  background: linear-gradient(180deg, #f8f6f0 0%, #ede7d6 100%) !important;
+  color: #2c2620 !important;
+  border: 1px solid #9b8970 !important;
+  border-radius: 2px !important;
+  box-shadow: inset 0 0 30px rgba(75,55,30,0.06), 0 1px 3px rgba(75,55,30,0.1) !important;
+  font-family: 'Ma Shan Zheng', 'STKaiti', 'KaiTi', serif !important;
+  letter-spacing: 0.06em !important;
+  line-height: 1.9 !important;
+}
+[data-report-template="zen"] .b::before {
+  content: "❀";
+  display: block;
+  font-size: 24px;
+  color: #b5985c;
+  text-align: center;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+[data-report-template="zen"] .b h2 {
+  color: #4a3826 !important;
+  font-size: 22px !important;
+  text-align: center !important;
+  border-bottom: 1px dashed #9b8970 !important;
+  padding-bottom: 12px !important;
+}
+[data-report-template="zen"] .b h3 {
+  color: #6b5536 !important;
+  font-size: 18px !important;
+  margin-top: 18px !important;
+}
+[data-report-template="zen"] .b code,
+[data-report-template="zen"] .b pre {
+  background: #ede4cd !important;
+  color: #4a3826 !important;
+  font-family: 'STKaiti', monospace !important;
+  border: 1px dashed #c4a875 !important;
+}
+[data-report-template="zen"] .b strong {
+  color: #8b3a1f !important;
+  font-weight: 700 !important;
+}
+
+/* ─────────────────────────────────────────────
+ * 模板选择器按钮组（注入到 ops 区域）
+ * ───────────────────────────────────────────── */
+.report-template-picker {
+  display: inline-flex;
+  gap: 4px;
+  padding: 3px;
+  background: rgba(201,168,76,0.06);
+  border: 1px solid #c9a84c;
+  border-radius: 14px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+.report-template-btn {
+  padding: 4px 10px;
+  font-size: 12px;
+  border: none;
+  background: transparent;
+  color: #8b6f3a;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.25s;
+  font-family: inherit;
+}
+.report-template-btn:hover {
+  background: rgba(201,168,76,0.18);
+}
+.report-template-btn.active {
+  background: linear-gradient(135deg, #8b6f3a 0%, #5a3811 100%);
+  color: #f5ebd8;
+  box-shadow: 0 2px 4px rgba(139,111,58,0.3);
+}
+.report-template-btn .ico {
+  font-size: 13px;
+  margin-right: 3px;
+}
+
+/* 打印状态下的模板差异 */
+@media print {
+  [data-report-template="scroll"] .report-msg,
+  [data-report-template="scroll"] .b {
+    background: #fbf6e6 !important;
+    border: 2px double #8b6f3a !important;
+  }
+  [data-report-template="modern"] .report-msg,
+  [data-report-template="modern"] .b {
+    background: #ffffff !important;
+    border: 1px solid #d1d5db !important;
+    box-shadow: none !important;
+  }
+  [data-report-template="zen"] .report-msg,
+  [data-report-template="zen"] .b {
+    background: #f8f6f0 !important;
+    border: 1px solid #9b8970 !important;
+    box-shadow: inset 0 0 20px rgba(75,55,30,0.05) !important;
+  }
+  .report-template-picker { display: none !important; }
+}

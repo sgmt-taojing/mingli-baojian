@@ -1524,7 +1524,40 @@ function showReport(text, meta){
   const ops=document.createElement('div');
   ops.className='report-ops';
   var _repEsc=esc(text).replace(/"/g,'&quot;');
-  ops.innerHTML='<button class="btn-save" data-report="'+_repEsc+'" onclick="saveReport(this)">💾 保存报告</button><button class="btn-copy" data-report="'+_repEsc+'" onclick="copyReport(this)">📋 复制</button><button class="btn-copy-md" data-report="'+_repEsc+'" onclick="copyMarkdownReport(this)">📝 复制 Markdown</button><button class="btn-fb-up" onclick="fbReport(this,1)" title="这条回答对你有帮助">👍 有帮助</button><button class="btn-fb-dn" onclick="fbReport(this,-1)" title="这条回答不准确">👎 没帮助</button>';
+  // R89-J 报告模板选择器（古卷/现代/禅意）
+  var _tpl = (function(){
+    try { return localStorage.getItem('_r89_report_template') || 'scroll'; } catch(e){ return 'scroll'; }
+  })();
+  ops.innerHTML='<span class="report-template-picker" role="group" aria-label="报告模板">' +
+    '<button class="report-template-btn" data-tpl="scroll" title="古卷轴"><span class="ico">📜</span>古卷</button>' +
+    '<button class="report-template-btn" data-tpl="modern" title="现代简约"><span class="ico">✨</span>现代</button>' +
+    '<button class="report-template-btn" data-tpl="zen" title="禅意水墨"><span class="ico">🌸</span>禅意</button>' +
+    '</span>' +
+    '<button class="btn-save" data-report="'+_repEsc+'" onclick="saveReport(this)">💾 保存报告</button>' +
+    '<button class="btn-copy" data-report="'+_repEsc+'" onclick="copyReport(this)">📋 复制</button>' +
+    '<button class="btn-copy-md" data-report="'+_repEsc+'" onclick="copyMarkdownReport(this)">📝 复制 Markdown</button>' +
+    '<button class="btn-fb-up" onclick="fbReport(this,1)" title="这条回答对你有帮助">👍 有帮助</button>' +
+    '<button class="btn-fb-dn" onclick="fbReport(this,-1)" title="这条回答不准确">👎 没帮助</button>';
+  // 当前模板标记
+  d.setAttribute('data-report-template', _tpl);
+  // 高亮选中模板按钮 + 绑定切换
+  setTimeout(function(){
+    var btns = ops.querySelectorAll('.report-template-btn');
+    btns.forEach(function(b){
+      if (b.getAttribute('data-tpl') === _tpl) b.classList.add('active');
+      b.addEventListener('click', function(){
+        var t = b.getAttribute('data-tpl');
+        try { localStorage.setItem('_r89_report_template', t); } catch(e){}
+        // 切换本报告 + 同页所有 .b 的模板属性
+        var boxes = (d.parentElement ? d.parentElement : document).querySelectorAll('.b');
+        boxes.forEach(function(bx){ bx.setAttribute('data-report-template', t); });
+        // 单条报告容器也加
+        d.setAttribute('data-report-template', t);
+        btns.forEach(function(x){ x.classList.remove('active'); });
+        b.classList.add('active');
+      });
+    });
+  }, 0);
   d.appendChild(ops);
 
   // R41-DR1 节点 7：music/lifeindex/lifeplan 三模块 detail 页跳转入口
