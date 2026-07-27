@@ -811,15 +811,51 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
         }
         entriesSection.hidden = false;
         entriesCount.textContent = entries.length;
-        entriesEl.innerHTML = entries.map(e => `
+        entriesEl.innerHTML = entries.map((e, idx) => `
           <div style="padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:6px;font-size:.85rem">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-              <b style="color:var(--gold)">${e.name || e.id}</b>
-              <span style="font-size:.7rem;color:var(--paper3)">${e.level || 'public'} · ${(e.size_kb||0).toFixed(1)}KB</span>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;gap:6px">
+              <b style="color:var(--gold);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${e.title || e.name || e.entry_id || e.id}</b>
+              <div style="display:flex;gap:4px;flex-shrink:0">
+                <button class="kb-entry-toggle" data-idx="${idx}" style="background:var(--paper3);color:var(--bg);border:0;border-radius:4px;padding:2px 8px;font-size:.7rem;cursor:pointer">展开</button>
+                <button class="kb-entry-copy" data-id="${e.entry_id||e.id}" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-size:.7rem;cursor:pointer">📋 ID</button>
+              </div>
             </div>
-            <div style="color:var(--paper3);font-size:.78rem;line-height:1.5;max-height:3.6em;overflow:hidden;text-overflow:ellipsis">${(e.content||e.summary||'').slice(0,160)}</div>
+            <div class="kb-entry-snippet" data-idx="${idx}" style="color:var(--paper3);font-size:.78rem;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${(e.snippet||e.content||e.summary||'').slice(0,300)}</div>
+            <div style="font-size:.7rem;color:var(--paper3);margin-top:4px;display:flex;gap:8px;justify-content:space-between">
+              <code style="font-size:.7rem">${e.entry_id||e.id}</code>
+              <span>${e.trust ? '⭐ trust ' + e.trust.toFixed(2) : ''}${e.source ? ' · 📚 ' + e.source : ''}</span>
+            </div>
           </div>
         `).join('');
+        // 展开 / 折叠
+        entriesEl.querySelectorAll('.kb-entry-toggle').forEach(btn => {
+          btn.onclick = () => {
+            const idx = btn.dataset.idx;
+            const snippet = entriesEl.querySelector('.kb-entry-snippet[data-idx="' + idx + '"]');
+            if(!snippet) return;
+            if(snippet.style.webkitLineClamp === 'unset'){
+              snippet.style.webkitLineClamp = 3;
+              snippet.style.display = '-webkit-box';
+              btn.textContent = '展开';
+            } else {
+              snippet.style.webkitLineClamp = 'unset';
+              snippet.style.display = 'block';
+              btn.textContent = '收起';
+            }
+          };
+        });
+        // 复制 ID
+        if(navigator.clipboard){
+          entriesEl.querySelectorAll('.kb-entry-copy').forEach(btn => {
+            btn.onclick = () => {
+              const id = btn.dataset.id;
+              navigator.clipboard.writeText(id).then(()=>{
+                btn.textContent = '✅ 已复制';
+                setTimeout(()=>{ btn.textContent = '📋 ID'; }, 1200);
+              });
+            };
+          });
+        }
         entriesMore.textContent = entries.length >= 8 ? '显示前 8 条，完整列表见下方 📊 质量审计页' : `共 ${entries.length} 条`;
       }).catch(()=>{
         entriesSection.hidden = false;
