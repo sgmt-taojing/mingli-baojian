@@ -1274,7 +1274,10 @@ const KB_SOURCE_TAGS = [
   { rx: /倪海厦|倪师|人纪/g, tag: '📘 倪海厦', cls: 'tag-nihaisha' },
   { rx: /舒晗|舒晗天纪|奇门校正/g, tag: '🎯 舒晗', cls: 'tag-shuhan' },
   { rx: /路大师|路氏一脉|朱鹊桥|段建业/g, tag: '🌟 路大师', cls: 'tag-lu' },
+  // 古籍原文仅当可验证出处时使用
   { rx: /古籍|黄帝内经|难经|伤寒论|神农本草|本草纲目|易经/g, tag: '📜 古籍', cls: 'tag-classic' },
+  // R89-P1-4-2 2026-07-27：行业通行（找不到古籍原文时直接选通行版，不率强附会）
+  { rx: /行业通行|通用规则|常规断法|约定俗成|通行断法|一般认为|传统上|传统观点|通常认为/g, tag: '📚 行业通行', cls: 'tag-common' },
 ];
 function _r89ApplyCompliance(text){
   if (typeof text !== 'string') return { text: '', hits: [] };

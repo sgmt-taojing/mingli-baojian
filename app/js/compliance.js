@@ -48,12 +48,68 @@ const COMPLIANCE_FORBIDDEN = [
 const COMPLIANCE_DISCLAIMER = '⚠️ 免责声明：本报告基于传统命理学理论，仅供国学文化学习与娱乐参考，不构成医疗、理财、法律或任何专业建议。命由天定，运由己造，人生的最终走向取决于您的选择与努力。';
 
 // R89-P2-1: KB 来源流派标签（docx §多流派运行原则：必须显著标注本次推演所采流派）
+// 调整 2026-07-27：找不到古籍原文支撑时，不用奉强附会去找古书佐证，
+// 直接选用行业公认通行版本；此处独立标注 📚 行业通行 标签
 const KB_SCHOOL_TAGS = [
   { rx: /倪海厦|倪师|人纪|天纪/g,            tag: '📘 倪海厦',     cls: 'tag-nihaisha' },
   { rx: /舒晗|舒晗天纪|奇门校正|密宗天纪/g, tag: '🎯 舒晗',       cls: 'tag-shuhan'   },
   { rx: /路大师|路氏一脉|朱鹊桥|段建业/g,   tag: '🌟 路大师',     cls: 'tag-lu'       },
+  // 古籍原文：仅当可验证原文出处时打标（避免率强附会）
   { rx: /古籍|古书|经典|黄帝内经|伤寒论|神农本草|子平|渊海子平|三命通会|滴天髓|穷通宝鉴/g, tag: '📜 古籍', cls: 'tag-classic' },
+  // R89-P1-4-2：行业通行（2026-07-27 用户指令）
+  // 原则：找不到原版古籍原文支撑某一说时，不用率强附会去找古书佐证，
+  // 直接选用行业公认通行版本，并在推演结论上方显著标注此标签。
+  { rx: /行业通行|通用规则|常规断法|约定俗成|通行断法|一般认为|传统上|传统观点|通常认为/g, tag: '📚 行业通行', cls: 'tag-common' },
 ];
+
+// R89-P1-4-2：多流派推演调优原则（2026-07-27 群中 738342 反馈）
+//   1. 古籍原文支撑 → 标注「📜 古籍」
+//   2. 找不到古籍原文 → 不率强附会，直接选用行业公认通行版本 + 标注「📚 行业通行」
+//   3. 专家观点（倪海厦/舒晗/路大师） → 标注对应名字
+//   4. 同行实践验证（多位老师同法） → 标注「🎯 同行验证」
+//   5. 单点孤证 → 不列为主推结论，仅作备选提示
+const KB_SOURCE_POLICY = {
+  CLASSIC: 'classic',      // 古籍原文验证
+  EXPERT: 'expert',        // 专家观点（倪/舒晗/路）
+  COMMON: 'common',        // 行业公认通行版（不率强附会）
+  PEER: 'peer',            // 同行实践验证
+  SOLITARY: 'solitary',    // 单点孤证（备选提示）
+};
+const KB_SOURCE_LABEL = {
+  classic:   '📜 古籍',
+  expert:    '🎯 专家',
+  common:    '📚 行业通行',
+  peer:      '🎯 同行验证',
+  solitary:  '⚠️ 单点孤证',
+};
+// 原则函数：决定一条知识条该贴哪个源标签
+// 入参：kbEntry = { src_type, src_id, title, content }
+// 返回：{ tag, cls, reason }
+function resolveSourceLabel(kbEntry) {
+  if (!kbEntry) return { tag: KB_SOURCE_LABEL.common, cls: 'tag-common', reason: '默认行业通行' };
+  const t = (kbEntry.src_type || '').toUpperCase();
+  const author = (kbEntry.author || '').trim();
+  // 古籍原文：能验证原文出处的
+  if (t === 'SRC-BOOK' || t === 'SRC-LEGACY') {
+    return { tag: KB_SOURCE_LABEL.classic, cls: 'tag-classic', reason: '古籍/书谱原文' };
+  }
+  // 专家观点
+  if (author.includes('倪海厦') || author.includes('倪师')) {
+    return { tag: '📘 倪海厦', cls: 'tag-nihaisha', reason: '倪师实践观点' };
+  }
+  if (author.includes('舒晗')) {
+    return { tag: '🎯 舒晗', cls: 'tag-shuhan', reason: '舒晗老师体系' };
+  }
+  if (author.includes('路') || author.includes('朱鸽桥') || author.includes('段建业')) {
+    return { tag: '🌟 路大师', cls: 'tag-lu', reason: '路氏一脉' };
+  }
+  // 课程/口传 · 同行实践验证
+  if (t === 'SRC-COURSE' || t === 'SRC-EXPERT') {
+    return { tag: KB_SOURCE_LABEL.peer, cls: 'tag-peer', reason: '课程口传/同行验证' };
+  }
+  // 其他：行业通行（默认兜底）
+  return { tag: KB_SOURCE_LABEL.common, cls: 'tag-common', reason: '未验证古籍原文，选行业通行' };
+}
 
 // =========== 主函数 ===========
 
