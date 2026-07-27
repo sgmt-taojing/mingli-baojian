@@ -353,7 +353,7 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
   if(modules.length === 0){
     modC.innerHTML = '<div class="empty">暂无模块数据</div>';
   } else {
-    let html = '<table class="mod-table"><thead><tr><th>模块</th><th>条目</th><th>等级</th><th>平均 trust</th><th>金/银/铜/需修</th><th>分布</th><th>操作</th></tr></thead><tbody>';
+    let html = '<div style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><input type="search" id="modulesFilter" placeholder="🔍 过滤模块名称/等级..." style="flex:1;min-width:160px;padding:8px 12px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font:inherit;font-size:.85rem"><span id="modulesCount" style="font-size:.8rem;color:var(--paper3)"></span></div><table class="mod-table"><thead><tr><th>模块</th><th>条目</th><th>等级</th><th>平均 trust</th><th>金/银/铜/需修</th><th>分布</th><th>操作</th></tr></thead><tbody>';
     for(const m of modules){
       const trust = m.avg_trust || 0;
       const trustPct = Math.round(trust * 100);
@@ -370,6 +370,22 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
     }
     html += '</tbody></table>';
     modC.innerHTML = html;
+
+    // R138 模块过滤
+    const mIn = document.getElementById('modulesFilter');
+    const mCount = document.getElementById('modulesCount');
+    if(mIn) mIn.addEventListener('input', () => {
+      const q = mIn.value.trim().toLowerCase();
+      const rows = modC.querySelectorAll('tbody tr');
+      let shown = 0;
+      rows.forEach(r => {
+        const ok = !q || (r.textContent||'').toLowerCase().includes(q);
+        r.style.display = ok ? '' : 'none';
+        if(ok) shown++;
+      });
+      if(mCount) mCount.textContent = q ? `${shown}/${modules.length}` : `${modules.length} 个模块`;
+    });
+    if(mCount) mCount.textContent = `${modules.length} 个模块`;
   }
 
   // ===== Panel: Files =====
@@ -380,14 +396,14 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
   } else {
     let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:8px;flex-wrap:wrap">';
     html += `<div><h2 style="margin:0;color:var(--gold);font-size:1.1rem">📁 KB 文件库（${fileList.length} 个）</h2></div>`;
-    html += `<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn" id="randomFilesBtn" style="background:var(--gold);color:#000;border:0;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">🔀 随机 5 个</button><button class="btn" id="randomOneBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">🎲 随机 1 个精读</button><button class="btn" id="copyFilesListBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📋 复制清单</button><button class="btn" id="filesStatBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📊 统计</button></div>`;
+    html += `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><input type="search" id="filesFilterInput" placeholder="🔍 按文件名/描述过滤" style="flex:1;min-width:140px;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font:inherit;font-size:.85rem"><select id="filesLevelFilter" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.85rem"><option value="">全等级</option><option value="public">public</option><option value="professional">professional</option><option value="admin">admin</option></select><span id="filesCount" style="font-size:.8rem;color:var(--paper3)"></span><button class="btn" id="randomFilesBtn" style="background:var(--gold);color:#000;border:0;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">🔀 随机 5 个</button><button class="btn" id="randomOneBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">🎲 随机 1 个精读</button><button class="btn" id="copyFilesListBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📋 复制清单</button><button class="btn" id="filesStatBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📊 统计</button></div>`;
     html += '</div><div class="grid">';
     for(const f of fileList){
       const lvl = f.level || 'public';
       const lvlChip = lvl === 'professional' ? '<span class="chip blue">professional</span>' : lvl === 'admin' ? '<span class="chip red">admin</span>' : '<span class="chip green">public</span>';
       const desc = f.desc || '（暂无描述）';
       const searchKey = encodeURIComponent(f.filename.replace('.js','').replace(/-kb$/,'').replace(/-/g,' '));
-      html += `<div class="file" data-kb-id="${f.filename}" data-kb-name="${f.filename}">
+      html += `<div class="file" data-kb-id="${f.filename}" data-kb-name="${f.filename}" data-i="${fileList.indexOf(f)}">
         <div class="file-head">
           <span class="file-name">${f.filename}</span>
           ${lvlChip}
@@ -452,6 +468,30 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
       if(again) again.onclick = () => renderOnePreview(pickN(1)[0]);
     }
     if(randBtn) randBtn.onclick = () => renderPreview(pickN(5));
+
+    // R137 文件搜索/等级过滤
+    const fIn = document.getElementById('filesFilterInput');
+    const fSel = document.getElementById('filesLevelFilter');
+    const fCount = document.getElementById('filesCount');
+    function applyFilesFilter(){
+      const q = (fIn.value||'').trim().toLowerCase();
+      const lv = fSel.value;
+      const cards = fileC.querySelectorAll('.file');
+      let shown = 0, total = cards.length;
+      cards.forEach(card => {
+        const text = (card.textContent||'').toLowerCase();
+        const meta = fileList[parseInt(card.getAttribute('data-i')||'0')] || {};
+        const lvMatch = !lv || (meta.level||'public') === lv;
+        const qMatch = !q || text.includes(q);
+        const show = lvMatch && qMatch;
+        card.style.display = show ? '' : 'none';
+        if(show) shown++;
+      });
+      if(fCount) fCount.textContent = q || lv ? `${shown}/${total}` : '';
+    }
+    if(fIn) fIn.addEventListener('input', applyFilesFilter);
+    if(fSel) fSel.addEventListener('change', applyFilesFilter);
+
     if(oneBtn) oneBtn.onclick = () => renderOnePreview(pickN(1)[0]);
     // R134 复制文件清单
     const copyListBtn = document.getElementById('copyFilesListBtn');
