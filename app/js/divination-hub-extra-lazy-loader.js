@@ -28,7 +28,17 @@
         // 更稳健：提取第一个 section
         let secMatch = html.match(/<section[\s\S]*?<\/section>/);
         if(secMatch){
+          // 保存当前 active 状态
+          var wasActive = lazy.el.classList.contains('active');
+          var wasHidden = lazy.el.hidden;
           lazy.el.outerHTML = secMatch[0];
+          // outerHTML 替换后元素引用失效，重新获取
+          var newEl = document.getElementById('section-' + key);
+          if(newEl){
+            // 恢复 active/hidden 状态（fetch 是异步的，showSection 可能已设置过）
+            if(wasActive) newEl.classList.add('active');
+            newEl.hidden = wasHidden;
+          }
           // 重新获取懒加载注册（因为 DOM 变了）
           document.querySelectorAll('[data-lazy]').forEach(function(el2){
             let k2 = el2.id.replace('section-','');
