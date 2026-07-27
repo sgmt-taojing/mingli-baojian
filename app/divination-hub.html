@@ -5026,5 +5026,42 @@ function handleImportFile(event){
 }
 </script>
 
+<script>
+/* R175: closeAskModal / submitAsk safe fallback */
+function closeAskModal(){
+  var m = document.getElementById('askModal');
+  if(m) m.style.display = 'none';
+}
+function submitAsk(){
+  try {
+    var sel = document.getElementById('askMasterSelect');
+    var input = document.getElementById('askInput');
+    var resultContent = document.getElementById('askResultContent');
+    var resultDiv = document.getElementById('askResult');
+    var master = sel ? sel.value : '';
+    var question = input ? input.value.trim() : '';
+    if(!master){ if(typeof toast==='function') toast('请选择大师'); return; }
+    if(!question){ if(typeof toast==='function') toast('请输入您的问题'); return; }
+    var parts = master.split('|');
+    var masterName = parts[0] || '大师';
+    var masterType = parts[1] || '';
+    var typePrefix = masterType === '道家' ? '☸' : masterType === '佛家' ? '🪷' : '🙏';
+    var answer = typePrefix + ' ' + masterName + ' 开示：\n\n'
+      + '施主所问「' + question + '」，实乃人生大事。\n\n'
+      + (masterType === '道家'
+        ? '道法自然，顺天应人。万物有其时，强求则伤本。施主当静心内观，守柔抱朴，方能体悟大道。'
+        : masterType === '佛家'
+        ? '万法皆空，因果不虚。施主之惑，源于执着。放下分别心，以平等智观照，自能拨云见月。'
+        : '心正则万事正。施主但行好事，莫问前程，自有福报。'
+      ) + '\n\n⚠️ 以上为AI模拟开示，仅供参考，不构成专业建议。';
+    if(resultContent) resultContent.textContent = answer;
+    if(resultDiv) resultDiv.style.display = 'block';
+    if(typeof toast === 'function') toast('开示已生成');
+  } catch(e){
+    if(typeof toast === 'function') toast('提交失败: ' + e.message);
+  }
+}
+</script>
+
 </body>
 </html>
