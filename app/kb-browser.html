@@ -192,6 +192,24 @@ footer.links a{color:var(--gold);text-decoration:none;margin:0 8px}
 
 <!-- Panel: Graph -->
 <section class="panel" id="panel-graph" hidden>
+  <div id="graphToolbar" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
+    <input id="graphSearchInput" type="search" placeholder="🔍 搜索节点 (ID/名称/拼音..." aria-label="搜索图谱节点" style="flex:1;min-width:200px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--paper2);padding:8px 12px;border-radius:8px;font:inherit;font-size:.85rem">
+    <select id="graphLevelFilter" style="background:var(--card);border:1px solid var(--border);color:var(--paper2);padding:8px;border-radius:8px;font-size:.82rem">
+      <option value="">全部等级</option>
+      <option value="premium">premium</option>
+      <option value="professional">professional</option>
+      <option value="public">public</option>
+      <option value="admin">admin</option>
+    </select>
+    <select id="graphSortBy" style="background:var(--card);border:1px solid var(--border);color:var(--paper2);padding:8px;border-radius:8px;font-size:.82rem">
+      <option value="xref">按引用数</option>
+      <option value="hit">按命中数</option>
+      <option value="size">按大小</option>
+      <option value="id">按 ID</option>
+    </select>
+    <button id="graphResetBtn" class="btn" style="font-size:.82rem">重置</button>
+    <span id="graphFilterCount" class="chip green" style="font-size:.78rem"></span>
+  </div>
   <div id="graphContainer" class="loading">加载关系图...</div>
 </section>
 
@@ -345,77 +363,123 @@ footer.links a{color:var(--gold);text-decoration:none;margin:0 8px}
     hotC.innerHTML = html;
   }
 
-  // ===== Panel: Graph =====
+  // ===== Panel: Graph (R104 搜索+过滤+排序) =====
   const graphC = document.getElementById('graphContainer');
+  const graphSearch = document.getElementById('graphSearchInput');
+  const graphLevel = document.getElementById('graphLevelFilter');
+  const graphSort = document.getElementById('graphSortBy');
+  const graphReset = document.getElementById('graphResetBtn');
+  const graphCount = document.getElementById('graphFilterCount');
   const gNodes = graph?.nodes || [];
   const gEdges = graph?.edges || [];
+
   if(gNodes.length === 0){
     graphC.innerHTML = '<div class="empty">暂无图谱数据</div>';
   } else {
-    // 按 hit_count 排名、xre 排行
-    const sorted = [...gNodes].sort((a,b)=>(b.hit_count||0)-(a.hit_count||0));
-    const topHubs = sorted.slice(0,5);
-    const topXref = [...gNodes].sort((a,b)=>(b.xref_count||0)-(a.xref_count||0)).slice(0,5);
     const levels = {};
     gNodes.forEach(n => levels[n.level] = (levels[n.level]||0)+1);
     const edgesByType = {};
     gEdges.forEach(e => edgesByType[e.reason] = (edgesByType[e.reason]||0)+1);
+    const topHubs = [...gNodes].sort((a,b)=>(b.hit_count||0)-(a.hit_count||0)).slice(0,5);
+    const topXref = [...gNodes].sort((a,b)=>(b.xref_count||0)-(a.xref_count||0)).slice(0,5);
 
-    let html = `
-      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
-        <div class="card">
-          <h3>📊 总览</h3>
-          <div class="desc">
-            <div>🟢 节点数：<b style="color:var(--gold)">${gNodes.length}</b></div>
-            <div>🔗 边数：<b style="color:var(--gold)">${gEdges.length}</b></div>
-            <div>📚 等级分布：${Object.entries(levels).map(([k,v])=>`<span class="chip gray">${k}·${v}</span>`).join('')}</div>
-            <div>🔗 边类型：${Object.entries(edgesByType).map(([k,v])=>`<span class="chip">${k}·${v}</span>`).join('')}</div>
+    function renderGraphPanel(){
+      const q = (graphSearch?.value || '').trim().toLowerCase();
+      const lvl = graphLevel?.value || '';
+      const sortBy = graphSort?.value || 'xref';
+
+      let filtered = gNodes.filter(n => {
+        const matchQ = !q || (n.id||'').toLowerCase().includes(q) || (n.name||'').toLowerCase().includes(q);
+        const matchL = !lvl || (n.level||'public') === lvl;
+        return matchQ && matchL;
+      });
+
+      const sortMap = { xref: 'xref_count', hit: 'hit_count', size: 'size_kb', id: 'id' };
+      const key = sortMap[sortBy] || 'xref_count';
+      filtered.sort((a,b)=>{
+        const av = a[key] || 0; const bv = b[key] || 0;
+        if(typeof av === 'string') return av.localeCompare(bv);
+        return bv - av;
+      });
+
+      if(graphCount) graphCount.textContent = filtered.length + ' / ' + gNodes.length;
+
+      if(filtered.length === 0){
+        graphC.innerHTML = `<div class="empty"><h3>😕 无匹配节点</h3><p>尝试调整搜索词或等级过滤条件。</p></div>`;
+        return;
+      }
+
+      const filteredIds = new Set(filtered.map(n=>n.id));
+      const relatedEdges = gEdges.filter(e => filteredIds.has(e.source) && filteredIds.has(e.target));
+
+      let html = `
+        <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+          <div class="card">
+            <h3>📊 总览</h3>
+            <div class="desc">
+              <div>🟢 节点：<b style="color:var(--gold)">${filtered.length}</b> / ${gNodes.length}</div>
+              <div>🔗 边：<b style="color:var(--gold)">${relatedEdges.length}</b> / ${gEdges.length}</div>
+              <div>📚 等级：${Object.entries(levels).map(([k,v])=>`<span class="chip gray">${k}·${v}</span>`).join('')}</div>
+              <div>🔗 边类型：${Object.entries(edgesByType).map(([k,v])=>`<span class="chip">${k}·${v}</span>`).join('')}</div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>🔥 热门枢纽 (top 5)</h3>
+            <div class="desc">${topHubs.map(n=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span><b>${n.name||n.id}</b></span><span class="chip">${n.hit_count||0} 命中</span></div>`).join('')}</div>
+          </div>
+          <div class="card">
+            <h3>🕸️ 关联达人 (top 5)</h3>
+            <div class="desc">${topXref.map(n=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span><b>${n.name||n.id}</b></span><span class="chip blue">${n.xref_count||0} 引用</span></div>`).join('')}</div>
           </div>
         </div>
-        <div class="card">
-          <h3>🔥 热门枢纽 (按 hit_count)</h3>
-          <div class="desc">${topHubs.map(n=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span><b>${n.name||n.id}</b></span><span class="chip">${n.hit_count} 命中</span></div>`).join('')}</div>
-        </div>
-        <div class="card">
-          <h3>🕸️ 关联达人 (按 xref_count)</h3>
-          <div class="desc">${topXref.map(n=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span><b>${n.name||n.id}</b></span><span class="chip blue">${n.xref_count} 引用</span></div>`).join('')}</div>
-        </div>
-      </div>
-      <h3 style="margin:16px 0 10px;color:var(--gold);font-size:1rem">📦 全部 ${gNodes.length} 个节点（按 ID 排序）</h3>
-      <table class="mod-table">
-        <thead><tr><th>ID</th><th>名称</th><th>等级</th><th>大小 KB</th><th>命中</th><th>引用</th><th>操作</th></tr></thead>
-        <tbody>`;
-    for(const n of [...gNodes].sort((a,b)=>a.id.localeCompare(b.id))){
-      const lvl = n.level || 'public';
-      const lvlChip = lvl==='premium' ? '<span class="chip">premium</span>' : lvl==='professional' ? '<span class="chip blue">professional</span>' : lvl==='admin' ? '<span class="chip red">admin</span>' : '<span class="chip green">public</span>';
-      html += `<tr>
-        <td><code style="font-size:.78rem">${n.id}</code></td>
-        <td><b>${n.name||n.id}</b></td>
-        <td>${lvlChip}</td>
-        <td>${(n.size_kb||0).toFixed(1)}</td>
-        <td>${n.hit_count||0}</td>
-        <td>${n.xref_count||0}</td>
-        <td>
-          <a class="btn" href="kb-graph.html?module=${encodeURIComponent(n.id)}">🕸️ 图谱</a>
-          <a class="btn" href="kb-quality.html?module=${encodeURIComponent(n.id)}">📊 质量</a>
-        </td>
-      </tr>`;
+        <h3 style="margin:16px 0 10px;color:var(--gold);font-size:1rem">📦 ${filtered.length} 个匹配节点（按 ${sortBy} 排序）</h3>
+        <table class="mod-table">
+          <thead><tr><th>ID</th><th>名称</th><th>等级</th><th>大小 KB</th><th>命中</th><th>引用</th><th>操作</th></tr></thead>
+          <tbody>`;
+      for(const n of filtered){
+        const lvl = n.level || 'public';
+        const lvlChip = lvl==='premium' ? '<span class="chip">premium</span>' : lvl==='professional' ? '<span class="chip blue">professional</span>' : lvl==='admin' ? '<span class="chip red">admin</span>' : '<span class="chip green">public</span>';
+        html += `<tr>
+          <td><code style="font-size:.78rem">${n.id}</code></td>
+          <td><b>${n.name||n.id}</b></td>
+          <td>${lvlChip}</td>
+          <td>${(n.size_kb||0).toFixed(1)}</td>
+          <td>${n.hit_count||0}</td>
+          <td>${n.xref_count||0}</td>
+          <td>
+            <a class="btn" href="kb-graph.html?module=${encodeURIComponent(n.id)}">🕸️ 图谱</a>
+            <a class="btn" href="kb-quality.html?module=${encodeURIComponent(n.id)}">📊 质量</a>
+          </td>
+        </tr>`;
+      }
+      html += `</tbody></table>
+        <div style="margin-top:16px;padding:14px;background:var(--card);border-radius:10px;border:1px solid var(--border)">
+          <h3 style="color:var(--gold);margin:0 0 8px">🔗 边 (引用关系 · 前 ${Math.min(20,relatedEdges.length)} 条)</h3>`;
+      relatedEdges.slice(0,20).forEach(e => {
+        const src = gNodes.find(n=>n.id===e.source);
+        const tgt = gNodes.find(n=>n.id===e.target);
+        html += `<div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.82rem">
+          <span style="flex:1"><b>${src?.name||e.source}</b></span>
+          <span style="color:var(--gold)">→ ${e.reason||'ref'} (w=${e.weight||1})</span>
+          <span style="flex:1;text-align:right"><b>${tgt?.name||e.target}</b></span>
+        </div>`;
+      });
+      html += `</div>
+        <div style="margin-top:14px;text-align:center"><a class="btn primary" href="kb-graph.html" style="padding:8px 18px;background:var(--gold);color:#000;border-radius:8px;text-decoration:none">打开完整可视化图谱 →</a></div>`;
+      graphC.innerHTML = html;
     }
-    html += `</tbody></table>
-      <div style="margin-top:16px;padding:14px;background:var(--card);border-radius:10px;border:1px solid var(--border)">
-        <h3 style="color:var(--gold);margin:0 0 8px">🔗 边 (引用关系 · 前 ${Math.min(20,gEdges.length)} 条)</h3>`;
-    gEdges.slice(0,20).forEach(e => {
-      const src = gNodes.find(n=>n.id===e.source);
-      const tgt = gNodes.find(n=>n.id===e.target);
-      html += `<div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.82rem">
-        <span style="flex:1"><b>${src?.name||e.source}</b></span>
-        <span style="color:var(--gold)">→ ${e.reason||'ref'} (w=${e.weight||1})</span>
-        <span style="flex:1;text-align:right"><b>${tgt?.name||e.target}</b></span>
-      </div>`;
+
+    renderGraphPanel();
+
+    graphSearch?.addEventListener('input', renderGraphPanel);
+    graphLevel?.addEventListener('change', renderGraphPanel);
+    graphSort?.addEventListener('change', renderGraphPanel);
+    graphReset?.addEventListener('click', () => {
+      if(graphSearch) graphSearch.value = '';
+      if(graphLevel) graphLevel.value = '';
+      if(graphSort) graphSort.value = 'xref';
+      renderGraphPanel();
     });
-    html += `</div>
-      <div style="margin-top:14px;text-align:center"><a class="btn primary" href="kb-graph.html" style="padding:8px 18px;background:var(--gold);color:#000;border-radius:8px;text-decoration:none">打开完整可视化图谱 →</a></div>`;
-    graphC.innerHTML = html;
   }
 
   // ===== Panel: Favs (R103) =====
