@@ -352,3 +352,20 @@
   .row{flex-direction:column;align-items:flex-start}
 }
 </style>
+
+<script>
+function showZhanbuSub(sub, btn){
+  var subs = ['yijing','meihua','qimen','liuren','ziwei','cezi'];
+  subs.forEach(function(s){
+    var el = document.getElementById('zhanbuSub-' + s);
+    if(el) el.style.display = (s === sub) ? 'block' : 'none';
+  });
+  if(btn){
+    document.querySelectorAll('.zhanbu-subtab').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+  }
+}
+</script>
+
+</body>
+</html>

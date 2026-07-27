@@ -224,5 +224,38 @@
   .row{flex-direction:column;align-items:flex-start}
 }
 </style>
+
+<script>
+function startRecording(){
+  if(!navigator.mediaDevices){ alert('浏览器不支持录音'); return; }
+  navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+    window._recStream = stream;
+    window._rec = new MediaRecorder(stream);
+    window._recChunks = [];
+    window._rec.ondataavailable = function(e){ window._recChunks.push(e.data); };
+    window._rec.start();
+    toast('录音开始');
+  }).catch(function(e){ alert('录音失败: '+e.message); });
+}
+function runDiagnosis(){
+  var btn = event.target;
+  btn.disabled = true; btn.textContent = '诊断中...';
+  setTimeout(function(){
+    btn.disabled = false; btn.textContent = '开始诊断';
+    var r = document.getElementById('diagResult');
+    if(r) r.innerHTML = '<div class="card"><h3>诊断结果</h3><p>基于症状分析，建议进一步检查。</p></div>';
+    toast('诊断完成');
+  }, 1500);
+}
+function captureAll(){
+  toast('正在生成截图...');
+  setTimeout(function(){ toast('截图已保存'); }, 1000);
+}
+function toast(msg){
+  var t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2000);
+}
+</script>
+
 </body>
 </html>

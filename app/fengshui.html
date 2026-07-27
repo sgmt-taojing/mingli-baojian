@@ -3932,5 +3932,25 @@ console.log('[R40-A] fengshui 化解 4 宫函数已加载（迁移/福德/兄弟
 }
 </style>
 </div>
+
+<script>
+function showFengshuiSub(sub, btn){
+  var subs = ['fengshui-content','luopan-content'];
+  subs.forEach(function(s){
+    var el = document.getElementById(s);
+    if(el) el.style.display = (s === sub) ? 'block' : 'none';
+  });
+  if(btn){
+    document.querySelectorAll('.zhanbu-subtab').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+  }
+}
+function filterFzCat(cat){
+  document.querySelectorAll('.fz-item').forEach(function(el){
+    el.style.display = (cat==='all' || el.dataset.cat===cat) ? '' : 'none';
+  });
+}
+</script>
+
 </body>
 </html>

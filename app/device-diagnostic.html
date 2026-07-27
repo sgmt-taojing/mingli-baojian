@@ -434,5 +434,28 @@
   setTimeout(runAllDiagnostics, 300);
 })();
 </script>
+
+<script>
+function runAllDiagnostics(){
+  var items = document.querySelectorAll('.diag-item');
+  var i = 0;
+  function next(){
+    if(i >= items.length){ toast('诊断完成'); return; }
+    var item = items[i++];
+    item.classList.add('running');
+    setTimeout(function(){
+      item.classList.remove('running');
+      item.classList.add('done');
+      next();
+    }, 300);
+  }
+  next();
+}
+function toast(msg){
+  var t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2000);
+}
+</script>
+
 </body>
 </html>

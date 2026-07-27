@@ -307,3 +307,17 @@
   .row{flex-direction:column;align-items:flex-start}
 }
 </style>
+
+<script>
+function toggleYanzhi(cat){
+  document.querySelectorAll('.yz-detail').forEach(function(el){
+    el.style.display = (el.dataset.cat === cat) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.yz-card').forEach(function(el){
+    el.classList.toggle('active', el.getAttribute('onclick') && el.getAttribute('onclick').indexOf(cat) >= 0);
+  });
+}
+</script>
+
+</body>
+</html>

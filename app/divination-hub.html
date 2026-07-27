@@ -5001,5 +5001,30 @@ window.runZeriEngine = function(){
 }
 </style>
 </div>
+
+<script>
+function handleImportFile(event){
+  var file = event.target.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e){
+    try {
+      var data = JSON.parse(e.target.result);
+      if(data.name){
+        var el = document.getElementById('baziName'); if(el) el.value = data.name;
+      }
+      if(data.birth){
+        var el = document.getElementById('baziDate'); if(el) el.value = data.birth;
+      }
+      if(window._toast) window._toast('✅ 已导入缘主数据', 1500);
+      else if(typeof toast === 'function') toast('已导入');
+    } catch(err){
+      alert('文件解析失败: '+err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+</script>
+
 </body>
 </html>

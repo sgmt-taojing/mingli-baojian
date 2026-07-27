@@ -154,5 +154,23 @@
   .row{flex-direction:column;align-items:flex-start}
 }
 </style>
+
+<script>
+function requestPermissions(){
+  if(!navigator.mediaDevices){ alert('浏览器不支持设备权限'); return; }
+  navigator.mediaDevices.getUserMedia({video:true,audio:true}).then(function(){
+    toast('权限已授予');
+    var s = document.getElementById('permStatus');
+    if(s) s.textContent = '已授权';
+  }).catch(function(e){
+    toast('权限被拒绝: '+e.message);
+  });
+}
+function toast(msg){
+  var t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2000);
+}
+</script>
+
 </body>
 </html>

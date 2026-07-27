@@ -316,5 +316,14 @@ if ('serviceWorker' in navigator) {
   .row{flex-direction:column;align-items:flex-start}
 }
 </style>
+
+<script>
+function toggleImmersive(){
+  document.body.classList.toggle('immersive-mode');
+  var btn = event.target;
+  if(btn) btn.textContent = document.body.classList.contains('immersive-mode') ? '✕ 退出' : '🌙 沉浸';
+}
+</script>
+
 </body>
 </html>

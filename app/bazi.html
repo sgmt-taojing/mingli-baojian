@@ -625,5 +625,49 @@
 }
 </style>
 </button>
+
+<script>
+function toggleProPanel(){
+  var p = document.getElementById('proPanel');
+  if(p) p.classList.toggle('d-none');
+}
+function loadProFields(){
+  var s = localStorage.getItem('mlbj_pro_fields');
+  if(!s){ alert('暂无保存的档案'); return; }
+  try {
+    var d = JSON.parse(s);
+    Object.keys(d).forEach(function(k){
+      var el = document.getElementById(k);
+      if(el) el.value = d[k];
+    });
+    toast('已载入档案');
+  } catch(e){ alert('档案解析失败'); }
+}
+function saveProFields(){
+  var d = {};
+  document.querySelectorAll('[id^="pro_"]').forEach(function(el){
+    d[el.id] = el.value;
+  });
+  localStorage.setItem('mlbj_pro_fields', JSON.stringify(d));
+  toast('已保存全量信息');
+}
+function applyPro2Bazi(){
+  var name = document.getElementById('pro_name');
+  if(name){ var n = document.getElementById('baziName'); if(n) n.value = name.value; }
+  toast('已录入八字段');
+}
+function toggleBaziModule(el){
+  var body = el.nextElementSibling;
+  if(body){
+    body.classList.toggle('d-none');
+    el.classList.toggle('collapsed');
+  }
+}
+function toast(msg){
+  var t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2000);
+}
+</script>
+
 </body>
 </html>
