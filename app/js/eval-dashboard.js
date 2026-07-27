@@ -303,8 +303,68 @@ function renderViolations(){
   tbl.appendChild(table);
 }
 
-// 模块健康速览（基于 KB 列表）
+// 模块名 → eval 模块 key 映射
+const MODULE_EVAL_MAP = {
+  'bazi': 'bazi', '八字': 'bazi', '八字命理': 'bazi',
+  'ziwei': 'ziwei', '紫微': 'ziwei', '紫微斗数': 'ziwei',
+  'qimen': 'qimen', '奇门': 'qimen', '奇门遁甲': 'qimen',
+  'liuyao': 'liuyao', '六爻': 'liuyao', '六爻占卜': 'liuyao',
+  'liuren': 'liuren', '六壬': 'liuren', '大六壬': 'liuren',
+  'meihua': 'meihua', '梅花': 'meihua', '梅花易数': 'meihua',
+  'fengshui': 'fengshui', '风水': 'fengshui',
+  'zodiac': 'zodiac', '生肖': 'zodiac',
+  'tizhi': 'tizhi', '体质': 'tizhi',
+  'tcm': 'tcm', '中医': 'tcm', '中药': 'tcm',
+  'wuxing': 'wuxing', '五行': 'wuxing',
+  'zeri': 'zeri', '择日': 'zeri',
+};
+
+// faith case ID → 模块 key
+const FAITH_MODULE_MAP = {
+  'faith-001':'bazi','faith-002':'bazi','faith-003':'bazi','faith-005':'bazi',
+  'faith-006':'bazi','faith-007':'bazi','faith-019':'bazi','faith-020':'bazi',
+  'faith-025':'bazi','faith-027':'bazi',
+  'faith-004':'zodiac','faith-026':'zodiac',
+  'faith-009':'ziwei','faith-010':'ziwei',
+  'faith-011':'qimen','faith-012':'qimen',
+  'faith-013':'liuren',
+  'faith-014':'liuyao','faith-030':'liuyao',
+  'faith-015':'meihua',
+  'faith-008':'fengshui','faith-016':'fengshui','faith-017':'fengshui',
+  'faith-018':'zeri',
+  'faith-021':'wuxing',
+  'faith-022':'tcm','faith-023':'tcm','faith-028':'tcm',
+  'faith-024':'tizhi','faith-029':'tizhi',
+};
+
+// 从 W31 faithfulness 数据中提取分模块评分
+function computeModuleEval(){
+  const w31 = cache.weeks['2026-W31']?.faithfulness;
+  if (!w31 || !w31.results) return {};
+  const modScores = {};
+  w31.results.forEach(r => {
+    const mod = FAITH_MODULE_MAP[r.id] || 'other';
+    if (!modScores[mod]) modScores[mod] = { scores: [], kbHits: 0 };
+    modScores[mod].scores.push(r.score || 0);
+    if ((r.score || 0) > 0) modScores[mod].kbHits++;
+  });
+  const summary = {};
+  Object.keys(modScores).forEach(mod => {
+    const s = modScores[mod];
+    const avg = s.scores.reduce((a,b)=>a+b, 0) / s.scores.length;
+    summary[mod] = {
+      avg_score: Math.round(avg * 1000) / 1000,
+      cases: s.scores.length,
+      kb_hits: s.kbHits,
+      kb_rate: Math.round((s.kbHits / s.scores.length) * 1000) / 1000
+    };
+  });
+  return summary;
+}
+
+// 模块健康速览（KB 列表 + W31 分模块 eval 评分）
 async function renderModules(){
+  const evalData = computeModuleEval();
   try{
     const r = await fetch('/api/ai/modules', { cache: 'no-cache' });
     if (!r.ok) {
@@ -319,18 +379,76 @@ async function renderModules(){
     }
     $('modulesGrid').innerHTML = '';
     mods.slice(0, 16).forEach(m => {
+      const modKey = m.moduleKey || m.id || '';
+      // 匹配 eval 数据
+      let evalKey = MODULE_EVAL_MAP[modKey] || MODULE_EVAL_MAP[m.name] || '';
+      const ev = evalKey ? (evalData[evalKey] || null) : null;
+      const evalScore = ev ? ev.avg_score : null;
+      const evalCases = ev ? ev.cases : 0;
+      const evalRate = ev ? ev.kb_rate : null;
+
+      // eval 评分等级
+      const evalCls = evalScore == null ? 'none' : evalScore >= 0.85 ? 'ok' : evalScore >= 0.7 ? 'warn' : 'danger';
+      const evalText = evalScore != null ? (evalScore * 100).toFixed(0) + ' 分' : '待评';
+      const evalDetail = ev ? `${evalCases} 例 · 命中 ${(evalRate * 100).toFixed(0)}%` : '';
+
       const card = el('div', {className:'mod-card'},
-        el('div', {className:'mod-card-icon'}, m.icon || '⭐'),
-        el('div', {className:'mod-card-name'}, esc(m.name || m.id)),
-        el('div', {className:'mod-card-meta'}, esc((m.moduleKey || m.id || '').slice(0, 12))),
-        el('div', {className:'mod-card-score ' + ((m.score || 0) >= 0.7 ? 'ok' : (m.score || 0) >= 0.4 ? 'warn' : 'danger')}, (m.score ? (m.score * 100).toFixed(0) + ' 分' : '待评'))
+        el('div', {className:'mod-card-header'},
+          el('div', {className:'mod-card-icon'}, m.icon || '⭐'),
+          el('div', {className:'mod-card-name'}, esc(m.name || m.id)),
+          el('div', {className:'mod-card-score eval-' + evalCls}, evalText)
+        ),
+        el('div', {className:'mod-card-meta'}, esc(modKey.slice(0, 14))),
+        ev ? el('div', {className:'mod-card-eval-detail'},
+          el('span', {className:'eval-cases'}, '📋 ' + evalCases + ' 例'),
+          el('span', {className:'eval-rate'}, '📚 ' + (evalRate * 100).toFixed(0) + '%')
+        ) : null,
+        ev ? renderSparkline(evalScore, evalRate) : null
       );
       card.onclick = () => location.href = 'ai-assistant.html?module=' + encodeURIComponent(m.id || m.moduleKey || '');
+      $('modulesGrid').appendChild(card);
+    });
+
+    // 追加 eval-only 模块（KB 列表没有但有 eval 数据的）
+    const kbModKeys = mods.map(m => MODULE_EVAL_MAP[m.moduleKey || m.id || ''] || MODULE_EVAL_MAP[m.name || ''] || '');
+    Object.keys(evalData).forEach(mod => {
+      if (kbModKeys.includes(mod) || mod === 'other') return;
+      const ev = evalData[mod];
+      const evalCls = ev.avg_score >= 0.85 ? 'ok' : ev.avg_score >= 0.7 ? 'warn' : 'danger';
+      const modLabels = {
+        bazi:'八字',ziwei:'紫微',qimen:'奇门',liuyao:'六爻',liuren:'六壬',
+        meihua:'梅花',fengshui:'风水',zodiac:'生肖',tizhi:'体质',tcm:'中医',
+        wuxing:'五行',zeri:'择日'
+      };
+      const card = el('div', {className:'mod-card mod-card-eval-only'},
+        el('div', {className:'mod-card-header'},
+          el('div', {className:'mod-card-icon'}, '📊'),
+          el('div', {className:'mod-card-name'}, modLabels[mod] || mod),
+          el('div', {className:'mod-card-score eval-' + evalCls}, (ev.avg_score * 100).toFixed(0) + ' 分')
+        ),
+        el('div', {className:'mod-card-meta'}, 'eval-only'),
+        el('div', {className:'mod-card-eval-detail'},
+          el('span', {className:'eval-cases'}, '📋 ' + ev.cases + ' 例'),
+          el('span', {className:'eval-rate'}, '📚 ' + (ev.kb_rate * 100).toFixed(0) + '%')
+        )
+      );
       $('modulesGrid').appendChild(card);
     });
   }catch(e){
     $('modulesGrid').innerHTML = '<div class="mod-card">模块数据加载失败<br><small>' + esc(e.message) + '</small></div>';
   }
+}
+
+// mini sparkline —— 单点 eval 分数可视化条
+function renderSparkline(score, rate){
+  const wrap = el('div', {className:'mod-sparkline-wrap'});
+  const bar = el('div', {className:'mod-sparkline-bar'});
+  const fill = el('div', {className:'mod-sparkline-fill'});
+  fill.style.width = ((score || 0) * 100).toFixed(0) + '%';
+  fill.className = 'mod-sparkline-fill ' + (score >= 0.85 ? 'spark-ok' : score >= 0.7 ? 'spark-warn' : 'spark-danger');
+  bar.appendChild(fill);
+  wrap.appendChild(bar);
+  return wrap;
 }
 
 // 导出当前快照
