@@ -3482,6 +3482,49 @@ if (document.readyState === 'loading') {
   setTimeout(_renderProfileChip, 0);
 }
 
+// R89-Q · chip 点击直跳当前缘主的历史报告（无当前缘主时回退到档案面板）
+function showProfileHistory(){
+  if(!window.YuanzhuProfile) return openProfilePanel();
+  var _cur = window.YuanzhuProfile.current();
+  if(!_cur || !_cur.name) return openProfilePanel();
+  // 打开历史抽屉并按缘主名筛选
+  var p=document.getElementById('historyPanel');
+  p.style.display='block';
+  var list=document.getElementById('historyList');
+  list.innerHTML='<div style="color:var(--gold,#c9a84c)">加载中...</div>';
+  // 更新抽屉标题
+  var titleEl=p.querySelector('h3');
+  if(titleEl) titleEl.textContent='📜 '+_cur.name+' 的历史报告';
+  var token=localStorage.getItem('auth_token')||'';
+  fetch(API+'/api/paipan/history',{headers:{'Authorization':token?('Bearer '+token):''}}).then(r=>r.json()).then(data=>{
+    var records=Array.isArray(data)?data:(data.records||data.items||[]);
+    // 按缘主名筛选（匹配 input_data 中的 name/userName 字段）
+    var filtered=records.filter(function(r){
+      try{
+        var d=typeof r.input_data==='string'?JSON.parse(r.input_data):r.input_data;
+        var n=d&&(d.name||d.userName||'');
+        return n&&n===_cur.name;
+      }catch(e){return false;}
+    });
+    if(!filtered.length){
+      list.innerHTML='<div style="color:var(--paper2,#999)">【'+esc(_cur.name)+'】暂无历史报告<br><span style="font-size:12px">完成排盘分析后，记录会自动保存</span></div>';
+      return;
+    }
+    list.innerHTML='<div style="margin-bottom:8px">共 '+filtered.length+' 条记录（'+esc(_cur.name)+'）</div>';
+    filtered.slice(0,30).forEach(function(r){
+      var div=document.createElement('div');
+      div.style.cssText='padding:10px;margin:6px 0;background:rgba(201,168,76,0.06);border-radius:6px;cursor:pointer';
+      var typename=MODULES[r.type]?MODULES[r.type].name:(r.type||'排盘');
+      var inputSummary=r.input_data?(typeof r.input_data==='string'?r.input_data.slice(0,60):JSON.stringify(r.input_data).slice(0,60)):'';
+      div.innerHTML='<div style="color:var(--gold,#c9a84c);font-size:13px;font-weight:bold">'+esc(typename)+'</div><div style="font-size:11px;color:var(--paper2,#999);margin-top:2px">'+esc(r.created_at||'')+' · '+esc(inputSummary)+'</div>';
+      div.onclick=function(){showHistoryDetail(r);};
+      list.appendChild(div);
+    });
+  }).catch(err=>{
+    list.innerHTML='<div style="color:var(--paper2,#999)">加载失败<br><span style="font-size:12px;color:#999">'+esc(err.message)+'</span></div>';
+  });
+}
+
 // R89-M 缘主档案面板
 async function openProfilePanel(){
   if(!window.YuanzhuProfile) return alert('档案模块未加载');
