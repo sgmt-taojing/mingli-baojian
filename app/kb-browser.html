@@ -272,6 +272,8 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
     </select>
     <button id="graphResetBtn" class="btn" style="font-size:.82rem">重置</button>
     <button id="graphBulkBtn" class="btn" style="font-size:.82rem;background:var(--gold-dim);color:#000;border-color:var(--gold)">📌 批量收藏选中</button>
+    <button id="graphExportCheckedBtn" class="btn" style="font-size:.82rem">📤 导出选中 JSON</button>
+    <button id="graphExportAllBtn" class="btn" style="font-size:.82rem">📋 导出全部 JSON</button>
     <span id="graphFilterCount" class="chip green" style="font-size:.78rem"></span>
   </div>
   <div id="graphContainer" class="loading">加载关系图...</div>
@@ -815,6 +817,51 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
     document.getElementById('graphSelectAll')?.addEventListener('change', (e) => {
       const checked = e.target.checked;
       document.querySelectorAll('.graph-row-check').forEach(cb => cb.checked = checked);
+    });
+
+    // R148 图谱节点导出 JSON
+    function exportNodesAsJSON(nodes, filename){
+      const payload = {
+        exported_at: new Date().toISOString(),
+        source: 'mingli-baojian/kb-browser.html#graph',
+        node_count: nodes.length,
+        nodes: nodes.map(n => ({
+          id: n.id, name: n.name, level: n.level || 'public',
+          size_kb: n.size_kb || 0, hit_count: n.hit_count || 0, xref_count: n.xref_count || 0
+        }))
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], {type: 'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click();
+      setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+      if(window._toast) window._toast(`✅ 已导出 ${nodes.length} 个节点 JSON`, 1500);
+    }
+
+    document.getElementById('graphExportCheckedBtn')?.addEventListener('click', () => {
+      const checked = document.querySelectorAll('.graph-row-check:checked');
+      if(checked.length === 0){
+        if(window._toast) window._toast('⚠️ 请先勾选节点', 1500);
+        return;
+      }
+      const ids = new Set(Array.from(checked).map(cb => cb.dataset.id));
+      const nodes = gNodes.filter(n => ids.has(n.id));
+      const ts = new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+      exportNodesAsJSON(nodes, `kb-graph-selected-${nodes.length}-${ts}.json`);
+    });
+
+    document.getElementById('graphExportAllBtn')?.addEventListener('click', () => {
+      // 按当前过滤结果导出，不是全量
+      const q = (graphSearch?.value || '').trim().toLowerCase();
+      const lvl = graphLevel?.value || '';
+      const filtered = gNodes.filter(n => {
+        const matchQ = !q || (n.id||'').toLowerCase().includes(q) || (n.name||'').toLowerCase().includes(q);
+        const matchL = !lvl || (n.level||'public') === lvl;
+        return matchQ && matchL;
+      });
+      const ts = new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+      exportNodesAsJSON(filtered, `kb-graph-all-${filtered.length}-${ts}.json`);
     });
   }
 

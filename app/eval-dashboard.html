@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0">
+<title>评估看板 · R89-P · 命理宝鉴</title>
+<meta name="description" content="3 个 benchmark（faithfulness / latency / cost-budget）跨周趋势 · 4 维度折线图 + SLO 阈值线">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="stylesheet" href="css/eval-dashboard.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='52' font-size='52'%3E📊%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+<header class="dash-header">
+  <a href="index.html" class="dash-back">← 主页</a>
+  <h1>📊 评估看板</h1>
+  <p class="dash-sub">3 benchmark × 8 周趋势 · 跨迭代质量守门员 · <span class="badge">R89-P</span></p>
+  <div class="dash-meta">
+    <span class="kb-chip">本周 W31</span>
+    <span id="updateTime" class="kb-chip">--</span>
+    <button id="refreshBtn" class="btn-refresh">🔄 刷新</button>
+    <button id="exportBtn" class="btn-refresh">💾 导出当前快照</button>
+  </div>
+</header>
+
+<main class="dash-main">
+  <section class="dash-summary" id="summaryGrid">
+    <!-- 4 张总览卡片：平均分 / KB 命中 / P95 延迟 / 平均成本 -->
+  </section>
+
+  <section class="dash-trends">
+    <article class="trend-card">
+      <header>
+        <h2>📈 合规分数趋势</h2>
+        <span class="trend-meta">faithfulness · 期望 ≥ 0.7</span>
+      </header>
+      <div class="chart-wrap" id="chart-faith"></div>
+      <div class="trend-legend">
+        <span><span class="dot" style="background:#10b981"></span>平均分</span>
+        <span><span class="dot" style="background:#c9a84c"></span>KB 命中率</span>
+        <span class="target">SLO ≥ 0.7</span>
+      </div>
+    </article>
+
+    <article class="trend-card">
+      <header>
+        <h2>⚡ P95 延迟趋势</h2>
+        <span class="trend-meta">latency · 期望 ≤ 1500ms</span>
+      </header>
+      <div class="chart-wrap" id="chart-latency"></div>
+      <div class="trend-legend">
+        <span><span class="dot" style="background:#3b82f6"></span>P95 延迟</span>
+        <span class="target">SLO ≤ 1500ms</span>
+      </div>
+    </article>
+
+    <article class="trend-card">
+      <header>
+        <h2>💰 平均成本趋势</h2>
+        <span class="trend-meta">cost-budget · 期望 ≤ 0.05 元</span>
+      </header>
+      <div class="chart-wrap" id="chart-cost"></div>
+      <div class="trend-legend">
+        <span><span class="dot" style="background:#f59e0b"></span>平均成本</span>
+        <span class="target">SLO ≤ 0.05 元</span>
+      </div>
+    </article>
+
+    <article class="trend-card">
+      <header>
+        <h2>🧠 KB 命中率趋势</h2>
+        <span class="trend-meta">kb-hit · 期望 ≥ 0.7</span>
+      </header>
+      <div class="chart-wrap" id="chart-kbhit"></div>
+      <div class="trend-legend">
+        <span><span class="dot" style="background:#9333ea"></span>KB 命中</span>
+        <span class="target">SLO ≥ 0.7</span>
+      </div>
+    </article>
+  </section>
+
+  <section class="dash-violations">
+    <h2>🚨 SLO 违规周报</h2>
+    <div id="violationsTable"></div>
+  </section>
+
+  <section class="dash-modules">
+    <h2>📚 模块健康速览</h2>
+    <div id="modulesGrid" class="modules-grid">
+      <div class="mod-card">模块数据加载中…</div>
+    </div>
+  </section>
+</main>
+
+<footer class="dash-footer">
+  <span>命理宝鉴 · 评估看板 · 2026</span>
+  <a href="docs/DELIVERY/R89-MN-档案召回与周报订阅-交付汇总-2026-07-27.html">R89 交付汇总</a>
+</footer>
+
+<script src="js/eval-dashboard.js"></script>
+</body>
+</html>
