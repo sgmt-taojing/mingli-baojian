@@ -163,7 +163,7 @@
   <button class="btn btn-primary" onclick="location.href='ai-assistant.html'">🤖 AI 助手</button>
 </div>
 
-\x3cscript>
+<script>
 /* ========== 五行-脏腑-中药数据库 ========== */
 const WUXING_DB = {
   '木': {
@@ -547,9 +547,9 @@ function printRx(){
     <div class="field"><span class="label">医嘱：</span>${$('#rx-note').value}</div>
     <div class="field"><span class="label">日期：</span>${new Date().toLocaleDateString('zh-CN')}</div>
     <div class="sig">医师签名：____________</div>
-      \x3cscript src="js/a11y-divination-hub.js" defer></script>
-  <script src="js/doctor-elder-inline.js" defer></script>
-  <script src="js/mobile-nav.js" defer></script>
+      <script src="js/a11y-divination-hub.js" defer><\/script>
+  <script src="js/doctor-elder-inline.js" defer><\/script>
+  <script src="js/mobile-nav.js" defer><\/script>
 </body></html>`;
   w.document.write(html);
   w.document.close();
@@ -621,8 +621,7 @@ window.computeWuxingScore = computeWuxingScore;
 
 </main>
 <script src="js/doctor-elder-inline.js" defer></script>
-</body>
-</html>
+
 <style>
 /* R98-z 480+360 紧凑断点 */
 @media(max-width:480px){
@@ -647,3 +646,30 @@ window.computeWuxingScore = computeWuxingScore;
   .row{flex-direction:column;align-items:flex-start}
 }
 </style>
+
+<style>
+/* R98-z 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+</body>
+</html>
