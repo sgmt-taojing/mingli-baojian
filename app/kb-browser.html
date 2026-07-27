@@ -187,7 +187,10 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
 
 <!-- Search bar -->
 <div class="search-bar" id="searchBar" hidden>
-  <input type="text" id="searchInput" placeholder="输入关键词，如 '八字' '紫微' '小青龙汤' '倪海厦'..." autocomplete="off">
+  <div style="position:relative;flex:1;min-width:200px">
+    <input type="text" id="searchInput" placeholder="输入关键词，如 '八字' '紫微' '小青龙汤' '倪海厦'..." autocomplete="off" style="width:100%;box-sizing:border-box">
+    <div id="searchHistory" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--card);border:1px solid var(--border);border-radius:8px;margin-top:2px;max-height:240px;overflow-y:auto;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,.5)"></div>
+  </div>
   <select id="searchModule">
     <option value="">全部模块</option>
   </select>
@@ -377,7 +380,7 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
   } else {
     let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:8px;flex-wrap:wrap">';
     html += `<div><h2 style="margin:0;color:var(--gold);font-size:1.1rem">📁 KB 文件库（${fileList.length} 个）</h2></div>`;
-    html += `<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn" id="randomFilesBtn" style="background:var(--gold);color:#000;border:0;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">🔀 随机 5 个</button><button class="btn" id="randomOneBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">🎲 随机 1 个精读</button></div>`;
+    html += `<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn" id="randomFilesBtn" style="background:var(--gold);color:#000;border:0;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">🔀 随机 5 个</button><button class="btn" id="randomOneBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">🎲 随机 1 个精读</button><button class="btn" id="copyFilesListBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📋 复制清单</button><button class="btn" id="filesStatBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📊 统计</button></div>`;
     html += '</div><div class="grid">';
     for(const f of fileList){
       const lvl = f.level || 'public';
@@ -388,11 +391,13 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
         <div class="file-head">
           <span class="file-name">${f.filename}</span>
           ${lvlChip}
+          <button class="kb-copy-name" data-name="${f.filename}" title="复制文件名" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:.7rem;cursor:pointer;margin-left:auto">📋</button>
         </div>
         <div class="desc">${desc}</div>
         <div class="meta">
           <span class="chip">📂 静态 KB</span>
-          <span class="chip gray">📍 knowledge/</span>
+          <span class="chip gray">📍 knowledge/${f.filename}</span>
+          <button class="kb-copy-path" data-path="knowledge/${f.filename}" title="复制路径" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:.7rem;cursor:pointer">📋 路径</button>
         </div>
         <div class="actions">
           <a class="btn primary" href="ai-assistant.html?preset=${f.filename}">🤖 用 AI 探索</a>
@@ -403,6 +408,22 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
     html += '</div>';
     html += `<div id="randomPreview" style="margin-top:18px"></div>`;
     fileC.innerHTML = html;
+
+    // R131 复制文件名/路径
+    fileC.querySelectorAll('.kb-copy-name').forEach(btn => {
+      btn.onclick = () => {
+        const name = btn.dataset.name;
+        if(navigator.clipboard) navigator.clipboard.writeText(name);
+        const old = btn.textContent; btn.textContent = '✅'; setTimeout(() => btn.textContent = old, 1200);
+      };
+    });
+    fileC.querySelectorAll('.kb-copy-path').forEach(btn => {
+      btn.onclick = () => {
+        const p = btn.dataset.path;
+        if(navigator.clipboard) navigator.clipboard.writeText(p);
+        const old = btn.textContent; btn.textContent = '✅ 已复制'; setTimeout(() => btn.textContent = old, 1200);
+      };
+    });
 
     // R126/R127 随机浏览
     const randBtn = document.getElementById('randomFilesBtn');
@@ -432,6 +453,41 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
     }
     if(randBtn) randBtn.onclick = () => renderPreview(pickN(5));
     if(oneBtn) oneBtn.onclick = () => renderOnePreview(pickN(1)[0]);
+    // R134 复制文件清单
+    const copyListBtn = document.getElementById('copyFilesListBtn');
+    if(copyListBtn) copyListBtn.onclick = () => {
+      const txt = fileList.map(f => `${f.filename} | ${f.level || 'public'} | ${f.entries || '?'} 条 | ${f.desc || ''}`).join('\n');
+      if(navigator.clipboard){
+        navigator.clipboard.writeText(txt).then(() => {
+          if(window._toast) window._toast(`📋 已复制 ${fileList.length} 个文件清单`, 1600);
+        });
+      } else {
+        const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+        if(window._toast) window._toast(`📋 已复制 ${fileList.length} 个文件清单`, 1600);
+      }
+    };
+    // R135 文件统计
+    const statBtn = document.getElementById('filesStatBtn');
+    if(statBtn) statBtn.onclick = () => {
+      const byLevel = {};
+      let totalEntries = 0, withDesc = 0;
+      for(const f of fileList){
+        const lv = f.level || 'public';
+        byLevel[lv] = (byLevel[lv] || 0) + 1;
+        totalEntries += (f.entries || 0);
+        if(f.desc && f.desc.trim()) withDesc++;
+      }
+      const levelHtml = Object.entries(byLevel).map(([k,v]) => `<span class="chip ${k==='professional'?'blue':k==='admin'?'red':'green'}">${k} · ${v}</span>`).join(' ');
+      const statHtml = `<div class="card" style="border:1px solid var(--gold)"><h3>📊 KB 文件统计</h3>
+        <div class="desc" style="margin-top:8px;line-height:1.8">
+          📁 文件总数：<b style="color:var(--gold)">${fileList.length}</b><br>
+          📚 条目总数：<b style="color:var(--gold)">${totalEntries.toLocaleString()}</b><br>
+          📝 有描述：<b style="color:var(--gold)">${withDesc} / ${fileList.length}</b> (${(withDesc/fileList.length*100).toFixed(0)}%)<br>
+          🎚 等级分布：${levelHtml}
+        </div></div>`;
+      preview.innerHTML = statHtml + preview.innerHTML;
+      if(window._toast) window._toast('📊 统计已生成', 1200);
+    };
   }
 
   // ===== Panel: Hot =====
@@ -1220,9 +1276,58 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
   // ===== 搜索 =====
   const searchInput = document.getElementById('searchInput');
   const searchBtn = document.getElementById('searchBtn');
+  const searchHistoryEl = document.getElementById('searchHistory');
+  // R130 搜索历史（localStorage）
+  const HIST_KEY = '_kb_search_history_v1';
+  const HIST_MAX = 10;
+  function loadHistory(){
+    try { return JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); } catch { return []; }
+  }
+  function saveHistoryItem(q){
+    q = q.trim(); if(!q) return;
+    let arr = loadHistory().filter(x => x !== q);
+    arr.unshift(q);
+    if(arr.length > HIST_MAX) arr = arr.slice(0, HIST_MAX);
+    try { localStorage.setItem(HIST_KEY, JSON.stringify(arr)); } catch {}
+  }
+  function removeHistoryItem(q){
+    const arr = loadHistory().filter(x => x !== q);
+    try { localStorage.setItem(HIST_KEY, JSON.stringify(arr)); } catch {}
+  }
+  function renderHistory(filter){
+    const arr = loadHistory();
+    const q = (filter || '').toLowerCase().trim();
+    const filtered = q ? arr.filter(x => x.toLowerCase().includes(q)) : arr;
+    if(filtered.length === 0){ searchHistoryEl.style.display = 'none'; searchHistoryEl.innerHTML = ''; return; }
+    searchHistoryEl.style.display = 'block';
+    searchHistoryEl.innerHTML = filtered.map(x => `
+      <div data-q="${x.replace(/"/g,'&quot;')}" style="padding:8px 12px;cursor:pointer;font-size:.85rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);color:var(--paper2)">
+        <span>🔍 ${x}</span>
+        <span data-remove="${x.replace(/"/g,'&quot;')}" style="color:var(--paper3);padding:2px 8px;cursor:pointer;font-size:.9rem" title="删除">✕</span>
+      </div>
+    `).join('') + `
+      <div data-clear="1" style="padding:6px 12px;cursor:pointer;font-size:.75rem;text-align:center;color:var(--paper3);background:var(--ink);border-top:1px solid var(--border)">🗑️ 清空全部历史</div>
+    `;
+    searchHistoryEl.querySelectorAll('[data-q]').forEach(el => {
+      el.onclick = (e) => {
+        if(e.target.dataset.remove !== undefined) return;
+        searchInput.value = el.dataset.q;
+        searchHistoryEl.style.display = 'none';
+        doSearch();
+      };
+      const rm = el.querySelector('[data-remove]');
+      if(rm) rm.onclick = (e) => { e.stopPropagation(); removeHistoryItem(rm.dataset.remove); renderHistory(searchInput.value); };
+    });
+    const ca = searchHistoryEl.querySelector('[data-clear]');
+    if(ca) ca.onclick = () => { try { localStorage.removeItem(HIST_KEY); } catch {} searchHistoryEl.style.display = 'none'; };
+  }
+  searchInput.addEventListener('focus', () => renderHistory(searchInput.value));
+  searchInput.addEventListener('input', () => renderHistory(searchInput.value));
+  searchInput.addEventListener('blur', () => setTimeout(() => { searchHistoryEl.style.display = 'none'; }, 200));
   async function doSearch(){
     const q = searchInput.value.trim();
     if(!q) return;
+    saveHistoryItem(q);
     const mod = sel.value;
     const url = '/api/public/kb/search?q=' + encodeURIComponent(q) + (mod?('&module='+encodeURIComponent(mod)):'') + '&limit=20';
     const cont = document.getElementById('searchContainer');
