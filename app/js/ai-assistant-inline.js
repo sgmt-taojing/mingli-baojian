@@ -557,6 +557,12 @@ function showWelcome(){
   chat.innerHTML=html;
   // R34: 渲染热卡后绑定事件
   bindKbHotChips();
+  // R89-M 缘主上下文条（顶部插入）
+  try {
+    if (window.YuanzhuRecall && typeof window.YuanzhuRecall.renderContextBar === 'function'){
+      window.YuanzhuRecall.renderContextBar(chat);
+    }
+  } catch(e){ console.warn('[recall] context bar fail', e); }
 }
 
 function startModule(id){
@@ -815,6 +821,12 @@ async function typing(){
 
 async function generateReport(){
   try{ _recordRecentMod(state.module); }catch(e){}
+  // R89-M 缘主档案召回：报告前捕获
+  try{
+    if (window.YuanzhuRecall && typeof window.YuanzhuRecall.captureBeforeReport === 'function'){
+      window.YuanzhuRecall.captureBeforeReport(state);
+    }
+  }catch(e){ console.warn('[recall] capture fail', e); }
   const mod=MODULES[state.module];
   const collected=Object.values(state.data);
   try{ _renderRecentModCard(); }catch(e){}
@@ -1536,6 +1548,7 @@ function showReport(text, meta){
     '<button class="btn-save" data-report="'+_repEsc+'" onclick="saveReport(this)">💾 保存报告</button>' +
     '<button class="btn-copy" data-report="'+_repEsc+'" onclick="copyReport(this)">📋 复制</button>' +
     '<button class="btn-copy-md" data-report="'+_repEsc+'" onclick="copyMarkdownReport(this)">📝 复制 Markdown</button>' +
+    '<button class="btn-pdf" data-report="'+_repEsc+'" onclick="exportReportPDF(this)">📄 导出 PDF</button>' +
     '<button class="btn-fb-up" onclick="fbReport(this,1)" title="这条回答对你有帮助">👍 有帮助</button>' +
     '<button class="btn-fb-dn" onclick="fbReport(this,-1)" title="这条回答不准确">👎 没帮助</button>';
   // 当前模板标记
@@ -1647,6 +1660,61 @@ function copyMarkdownReport(el){
   navigator.clipboard.writeText(md).then(()=>toast('Markdown 已复制')).catch(()=>{const ta=document.createElement('textarea');ta.value=md;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('Markdown 已复制')});
 }
 function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),1500)}
+
+// R89-N 报告导出 PDF（jsPDF + html2canvas · 纯前端）
+async function exportReportPDF(el){
+  try{
+    toast('正在生成 PDF…');
+    // 动态加载 jsPDF + html2canvas（首次调用加载，后续缓存）
+    if(!window.jspdf || !window.jspdf.jsPDF){
+      await new Promise(function(res,rej){
+        var s1=document.createElement('script'); s1.src='https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js'; s1.onload=res; s1.onerror=rej; document.head.appendChild(s1);
+      });
+    }
+    if(!window.html2canvas){
+      await new Promise(function(res,rej){
+        var s2=document.createElement('script'); s2.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js'; s2.onload=res; s2.onerror=rej; document.head.appendChild(s2);
+      });
+    }
+    var msgEl = el.closest('.m-ai');
+    if(!msgEl) { toast('找不到报告容器'); return; }
+    var reportBody = msgEl.querySelector('.b') || msgEl.querySelector('.report-msg');
+    if(!reportBody){ toast('找不到报告内容'); return; }
+    // 截图
+    var canvas = await html2canvas(reportBody, {
+      scale: 2, backgroundColor: '#fbf6e6', logging: false, useCORS: true
+    });
+    var imgData = canvas.toDataURL('image/jpeg', 0.92);
+    var imgW = 190; // A4 width - margins (mm)
+    var imgH = canvas.height * imgW / canvas.width;
+    var { jsPDF } = window.jspdf;
+    var doc = new jsPDF('p', 'mm', 'a4');
+    var pageH = doc.internal.pageSize.getHeight();
+    var heightLeft = imgH;
+    var position = 10;
+    // 分页（图太高时截断分页）
+    doc.addImage(imgData, 'JPEG', 10, position, imgW, imgH);
+    heightLeft -= (pageH - 10);
+    while(heightLeft > 0){
+      position = 10 - (imgH - heightLeft);
+      doc.addPage();
+      doc.addImage(imgData, 'JPEG', 10, position, imgW, imgH);
+      heightLeft -= (pageH - 10);
+    }
+    // 页脚
+    var pageCount = doc.internal.getNumberOfPages();
+    for(var i=1; i<=pageCount; i++){
+      doc.setPage(i);
+      doc.setFontSize(8); doc.setTextColor(160,140,100);
+      doc.text('命理宝鉴 · AI 分析报告 · 第 ' + i + '/' + pageCount + ' 页', 10, pageH - 5);
+    }
+    var ts = new Date().toISOString().replace(/[:.]/g, '').substring(0, 15);
+    doc.save('命理宝鉴-报告-' + ts + '.pdf');
+    toast('PDF 已下载');
+  }catch(e){
+    console.error('[PDF]', e); toast('PDF 生成失败：' + (e.message||e));
+  }
+}
 
 async function callAI(q){
   // R54: KB 快速通道 — freechat 提问先扫所有 KB，命中分 >= 0.7 直接朗读不调 AI

@@ -396,7 +396,7 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
   } else {
     let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:8px;flex-wrap:wrap">';
     html += `<div><h2 style="margin:0;color:var(--gold);font-size:1.1rem">📁 KB 文件库（${fileList.length} 个）</h2></div>`;
-    html += `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><input type="search" id="filesFilterInput" placeholder="🔍 按文件名/描述过滤" style="flex:1;min-width:140px;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font:inherit;font-size:.85rem"><select id="filesLevelFilter" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.85rem"><option value="">全等级</option><option value="public">public</option><option value="professional">professional</option><option value="admin">admin</option></select><span id="filesCount" style="font-size:.8rem;color:var(--paper3)"></span><button class="btn" id="randomFilesBtn" style="background:var(--gold);color:#000;border:0;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">🔀 随机 5 个</button><button class="btn" id="randomOneBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">🎲 随机 1 个精读</button><button class="btn" id="copyFilesListBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📋 复制清单</button><button class="btn" id="filesStatBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📊 统计</button></div>`;
+    html += `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><input type="search" id="filesFilterInput" placeholder="🔍 按文件名/描述过滤" style="flex:1;min-width:140px;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font:inherit;font-size:.85rem"><select id="filesLevelFilter" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.85rem"><option value="">全等级</option><option value="public">public</option><option value="professional">professional</option><option value="admin">admin</option></select><span id="filesCount" style="font-size:.8rem;color:var(--paper3)"></span><button class="btn" id="randomFilesBtn" style="background:var(--gold);color:#000;border:0;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">🔀 随机 5 个</button><button class="btn" id="randomOneBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">🎲 随机 1 个精读</button><button class="btn" id="copyFilesListBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📋 复制清单</button><button class="btn" id="filesStatBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📊 统计</button><button class="btn" id="filesGroupBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📂 按等级分组</button></div>`;
     html += '</div><div class="grid">';
     for(const f of fileList){
       const lvl = f.level || 'public';
@@ -527,6 +527,47 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
         </div></div>`;
       preview.innerHTML = statHtml + preview.innerHTML;
       if(window._toast) window._toast('📊 统计已生成', 1200);
+    };
+
+    // R140 按等级分组折叠
+    const groupBtn = document.getElementById('filesGroupBtn');
+    let groupedView = false;
+    if(groupBtn) groupBtn.onclick = () => {
+      groupedView = !groupedView;
+      groupBtn.textContent = groupedView ? '🗂️ 平铺视图' : '📂 按等级分组';
+      groupBtn.style.background = groupedView ? 'var(--gold)' : 'var(--card)';
+      groupBtn.style.color = groupedView ? '#000' : 'var(--paper2)';
+      // 重渲染卡片
+      const grid = fileC.querySelector('.grid');
+      if(!grid) return;
+      const cards = Array.from(grid.querySelectorAll('.file'));
+      if(groupedView){
+        // 分组
+        const byLevel = {};
+        for(const f of fileList){
+          const lv = f.level || 'public';
+          if(!byLevel[lv]) byLevel[lv] = [];
+          byLevel[lv].push(f);
+        }
+        const lvlOrder = ['admin','professional','public'];
+        const lvlLbl = {admin:'🔴 Admin',professional:'🔵 Professional',public:'🟢 Public'};
+        let h = '';
+        for(const lv of lvlOrder){
+          if(!byLevel[lv] || byLevel[lv].length === 0) continue;
+          h += `<details open style="margin-bottom:14px;border:1px solid var(--border);border-radius:8px;padding:10px;background:var(--card)"><summary style="cursor:pointer;color:var(--gold);font-weight:600;font-size:.95rem;margin-bottom:8px">${lvlLbl[lv]} · ${byLevel[lv].length} 个</summary><div class="grid" style="margin-top:8px">`;
+          for(const f of byLevel[lv]){
+            const node = cards.find(c => c.dataset.kbName === f.filename);
+            if(node) h += node.outerHTML;
+          }
+          h += '</div></details>';
+        }
+        grid.innerHTML = h;
+        if(window._toast) window._toast('📂 按等级分组', 1000);
+      } else {
+        // 还原
+        grid.innerHTML = cards.map(c => c.outerHTML).join('');
+        if(window._toast) window._toast('🗂️ 平铺视图', 1000);
+      }
     };
   }
 
@@ -1379,6 +1420,8 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
       return;
     }
     let html = `<div style="margin-bottom:12px;color:var(--paper3);font-size:.85rem">找到 <b style="color:var(--gold)">${results.length}</b> 条结果</div>`;
+    const escHtml = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const hl = (text, q) => { const e = escHtml(text); if(!q) return e; const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')','gi'); return e.replace(re,'<mark style="background:rgba(201,168,76,.3);color:var(--gold);border-radius:2px">$1</mark>'); };
     for(const r of results){
       const trust = r.trust_score || 0;
       const trustPct = Math.round(trust * 100);
@@ -1388,8 +1431,8 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
           <span class="chip ${trust>=0.7?'green':'gray'}">trust ${trust.toFixed(2)}</span>
           ${r.hit_count?`<span>命中 ${r.hit_count}</span>`:''}
         </div>
-        <div class="sr-title">${r.title || '(无标题)'}</div>
-        <div class="sr-snippet">${r.snippet || ''}</div>
+        <div class="sr-title">${hl(r.title, q)}</div>
+        <div class="sr-snippet">${hl(r.snippet, q)}</div>
       </div>`;
     }
     cont.innerHTML = html;
