@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="theme-color" content="#080808">
+<title>KB 知识库浏览中心 · 命理宝鉴</title>
+<meta name="description" content="26 个知识库文件 + 65 个模块 + 10993 条结构化条目，全方位探索命理/中医/玄学知识">
+<link rel="stylesheet" href="css/divination-hub.css">
+<link rel="stylesheet" href="css/utility-classes.css">
+<link rel="stylesheet" href="css/mobile-nav.css">
+<style>
+:root{
+  --gold:#c9a84c;--gold-dim:#a88c3a;
+  --ink:#0d1117;--paper:#1a1f2e;--card:#222838;
+  --border:#333a4d;--paper2:#e0d8c8;--paper3:#a0a0a0;
+}
+body{background:var(--ink);color:var(--paper2);font-family:system-ui,-apple-system,sans-serif;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1280px;margin:0 auto;padding:16px}
+header.top{display:flex;align-items:center;gap:10px;padding:8px 0 16px}
+header.top h1{font-size:1.4rem;color:var(--gold);margin:0;flex:1}
+header.top .back{color:var(--gold);text-decoration:none;font-size:.9rem;padding:6px 12px;border:1px solid var(--gold);border-radius:6px}
+
+/* Hero summary */
+.hero{background:linear-gradient(135deg,#1a1f2e,#222838);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:18px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(201,168,76,.15),transparent 70%);pointer-events:none}
+.hero h2{margin:0 0 8px;font-size:1.15rem;color:var(--gold)}
+.hero .lead{color:var(--paper3);font-size:.9rem;margin:0 0 14px;line-height:1.5}
+.hero-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-top:12px}
+.hero-stat{background:rgba(0,0,0,.25);padding:12px;border-radius:8px;text-align:center}
+.hero-stat .v{font-size:1.6rem;font-weight:700;color:var(--gold)}
+.hero-stat .l{font-size:.7rem;color:var(--paper3);margin-top:2px}
+
+/* Tabs */
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:4px 0;border-bottom:1px solid var(--border);margin-bottom:16px;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{height:0}
+.tab{padding:8px 16px;cursor:pointer;color:var(--paper3);border-radius:8px 8px 0 0;font-size:.9rem;white-space:nowrap;transition:all .15s;border:1px solid transparent;border-bottom:none}
+.tab:hover{color:var(--paper2)}
+.tab.on{color:var(--gold);background:var(--card);border-color:var(--border)}
+.tab .badge{background:var(--gold-dim);color:#000;font-size:.65rem;padding:1px 5px;border-radius:4px;margin-left:4px;font-weight:600}
+
+/* Search */
+.search-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.search-bar input{flex:1;min-width:200px;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--paper2);font-size:.95rem;outline:none}
+.search-bar input:focus{border-color:var(--gold-dim)}
+.search-bar select{padding:10px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--paper2);font-size:.85rem;cursor:pointer}
+
+/* Card grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;transition:all .2s;position:relative}
+.card:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 4px 16px rgba(201,168,76,.15)}
+.card h3{margin:0 0 8px;font-size:.95rem;color:var(--paper2);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.card .desc{font-size:.8rem;color:var(--paper3);line-height:1.45;margin:6px 0 10px;min-height:36px}
+.card .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{font-size:.7rem;padding:3px 8px;border-radius:10px;background:rgba(201,168,76,.15);color:var(--gold);border:1px solid rgba(201,168,76,.3)}
+.chip.green{background:rgba(120,200,120,.15);color:#7ec47e;border-color:rgba(120,200,120,.3)}
+.chip.blue{background:rgba(120,180,212,.15);color:#7ab8d4;border-color:rgba(120,180,212,.3)}
+.chip.red{background:rgba(212,106,106,.15);color:#d46a6a;border-color:rgba(212,106,106,.3)}
+.chip.gray{background:rgba(160,160,160,.15);color:var(--paper3);border-color:rgba(160,160,160,.3)}
+.card .actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.card .btn{font-size:.75rem;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--paper);color:var(--paper2);cursor:pointer;text-decoration:none;display:inline-block}
+.card .btn:hover{border-color:var(--gold);color:var(--gold)}
+.card .btn.primary{background:var(--gold);color:#000;border-color:var(--gold)}
+
+/* KB file card (file list) */
+.file{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.file-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.file-name{font-family:monospace;font-size:.85rem;color:var(--gold);word-break:break-all}
+.file-size{font-size:.7rem;color:var(--paper3);background:rgba(160,160,160,.15);padding:2px 6px;border-radius:4px;flex-shrink:0}
+
+/* Module row (table-like) */
+table.mod-table{width:100%;border-collapse:collapse;background:var(--card);border-radius:10px;overflow:hidden;font-size:.85rem}
+table.mod-table th{background:var(--paper);padding:10px;text-align:left;font-weight:600;color:var(--gold);font-size:.8rem;border-bottom:1px solid var(--border)}
+table.mod-table td{padding:10px;border-bottom:1px solid rgba(255,255,255,.05);color:var(--paper2)}
+table.mod-table tr:hover td{background:rgba(201,168,76,.05)}
+table.mod-table .grade{font-weight:700;text-align:center}
+.g-S-plus{color:#ffd700}.g-S{color:#e8c44a}.g-A-plus{color:#a8d8a8}.g-A{color:#7ec47e}
+.g-B-plus{color:#7ab8d4}.g-B{color:#6a9fd8}.g-C{color:#d49a6a}.g-D{color:#d46a6a}
+.bar-mini{display:inline-block;width:80px;height:8px;border-radius:4px;background:#333;overflow:hidden;vertical-align:middle;margin-left:6px}
+.bar-mini .fill{height:100%;background:var(--gold)}
+
+/* Search result row */
+.sr-item{padding:12px;border-bottom:1px solid var(--border);cursor:pointer}
+.sr-item:hover{background:rgba(201,168,76,.05)}
+.sr-meta{font-size:.7rem;color:var(--paper3);margin-bottom:4px;display:flex;gap:8px;align-items:center}
+.sr-title{color:var(--gold);font-size:.95rem;margin-bottom:4px;font-weight:600}
+.sr-snippet{color:var(--paper2);font-size:.85rem;line-height:1.5}
+
+/* Empty state */
+.empty{padding:40px 20px;text-align:center;color:var(--paper3);background:var(--card);border-radius:10px;border:1px dashed var(--border)}
+.empty h3{color:var(--gold);margin:0 0 8px}
+
+/* Loading */
+.loading{padding:30px;text-align:center;color:var(--paper3)}
+
+/* Footer links */
+footer.links{padding:20px 0;text-align:center;color:var(--paper3);font-size:.85rem;border-top:1px solid var(--border);margin-top:24px}
+footer.links a{color:var(--gold);text-decoration:none;margin:0 8px}
+
+/* Mobile: 480px */
+@media(max-width:480px){
+  .wrap{padding:12px}
+  header.top h1{font-size:1.15rem}
+  .hero{padding:14px}
+  .hero-stat .v{font-size:1.3rem}
+  .grid{grid-template-columns:1fr}
+  table.mod-table{display:block;overflow-x:auto;white-space:nowrap}
+  .tab{padding:6px 10px;font-size:.8rem}
+}
+
+/* Mobile: 360px (R98 紧凑断点) */
+@media(max-width:360px){
+  .hero-stats{grid-template-columns:repeat(2,1fr)}
+  .file-head{flex-direction:column;align-items:flex-start}
+  .file-size{font-size:.65rem}
+  .search-bar{flex-direction:column}
+  .search-bar input{width:100%}
+}
+
+/* Print */
+@media print{
+  body{background:#fff;color:#000}
+  .tabs,.search-bar,footer.links{display:none}
+  .hero,.card,.file{background:#fff;border:1px solid #999;color:#000}
+}
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">跳到主内容</a>
+<main id="main">
+<div class="wrap">
+
+<header class="top">
+  <h1>📚 KB 知识库浏览中心</h1>
+  <a href="divination-hub.html" class="back">← 返回主页</a>
+</header>
+
+<section class="hero">
+  <h2>📖 命理 · 中医 · 玄学 · 数字人文知识库</h2>
+  <p class="lead">本平台基于结构化 KB（Knowledge Base）驱动 AI 助手，覆盖八字、紫微、奇门、风水、面相、姓名学、中医经典、倪海厦人纪、舒晗天纪、十二生肖等领域。所有报告、知识图谱、AI 直答均由此 KB 实时生成。</p>
+  <div class="hero-stats" id="heroStats">
+    <div class="hero-stat"><div class="v" id="heroTotal">…</div><div class="l">总条目</div></div>
+    <div class="hero-stat"><div class="v" id="heroModules">…</div><div class="l">模块</div></div>
+    <div class="hero-stat"><div class="v" id="heroFiles">…</div><div class="l">KB 文件</div></div>
+    <div class="hero-stat"><div class="v" id="heroTrust">…</div><div class="l">平均 trust</div></div>
+    <div class="hero-stat"><div class="v" id="heroHits">…</div><div class="l">总命中</div></div>
+    <div class="hero-stat"><div class="v" id="heroGrade">…</div><div class="l">质量等级</div></div>
+  </div>
+</section>
+
+<div class="tabs" id="tabs">
+  <div class="tab on" data-tab="modules">🗂️ 模块 <span class="badge" id="modBadge">0</span></div>
+  <div class="tab" data-tab="files">📁 KB 文件 <span class="badge" id="fileBadge">0</span></div>
+  <div class="tab" data-tab="hot">🔥 热门模块 <span class="badge" id="hotBadge">8</span></div>
+  <div class="tab" data-tab="search">🔍 关键词搜索</div>
+</div>
+
+<!-- Search bar -->
+<div class="search-bar" id="searchBar" hidden>
+  <input type="text" id="searchInput" placeholder="输入关键词，如 '八字' '紫微' '小青龙汤' '倪海厦'..." autocomplete="off">
+  <select id="searchModule">
+    <option value="">全部模块</option>
+  </select>
+  <button class="btn primary" id="searchBtn" style="padding:10px 18px;background:var(--gold);color:#000;border:none;border-radius:8px;cursor:pointer;font-size:.9rem">搜索</button>
+</div>
+
+<!-- Panel: Modules -->
+<section class="panel" id="panel-modules">
+  <div id="modContainer" class="loading">加载模块列表...</div>
+</section>
+
+<!-- Panel: Files -->
+<section class="panel" id="panel-files" hidden>
+  <div id="fileContainer" class="loading">加载 KB 文件列表...</div>
+</section>
+
+<!-- Panel: Hot modules -->
+<section class="panel" id="panel-hot" hidden>
+  <div id="hotContainer" class="loading">加载热门模块...</div>
+</section>
+
+<!-- Panel: Search -->
+<section class="panel" id="panel-search" hidden>
+  <div id="searchContainer">
+    <div class="empty"><h3>🔍 关键词检索</h3>在上方输入关键词检索 10993 条 KB 条目，支持中文模糊匹配。</div>
+  </div>
+</section>
+
+<footer class="links">
+  <a href="kb-quality.html">📊 KB 质量审计</a> ·
+  <a href="kb-graph.html">🕸️ KB 知识图谱</a> ·
+  <a href="ai-assistant.html">🤖 AI 助手</a> ·
+  <a href="divination-knowledge.html">📚 玄学知识</a> ·
+  <a href="divination-hub.html">🏠 主页</a>
+</footer>
+
+</div>
+</main>
+
+<script>
+(async function(){
+  const CSRF_KEY = '_csrf_token_cache';
+  async function csrf(){
+    let t = sessionStorage.getItem(CSRF_KEY);
+    if(t) return t;
+    try {
+      const r = await fetch('/api/csrf-token');
+      const d = await r.json();
+      t = d.data?.token || d.token;
+      if(t) sessionStorage.setItem(CSRF_KEY, t);
+      return t;
+    } catch(e){ return ''; }
+  }
+  async function api(path){
+    try {
+      const r = await fetch(path);
+      const d = await r.json();
+      return d.data || d;
+    } catch(e){ return null; }
+  }
+
+  // 加载数据
+  const [stats, files, quality] = await Promise.all([
+    api('/api/public/kb/stats'),
+    api('/api/kb/list'),
+    api('/api/kb/quality-report')
+  ]);
+
+  // Hero
+  const s = stats || {};
+  document.getElementById('heroTotal').textContent = (s.total||0).toLocaleString();
+  document.getElementById('heroModules').textContent = quality?.modules?.length || (s.top_modules?.length||0);
+  document.getElementById('heroFiles').textContent = files?.files?.length || 0;
+  document.getElementById('heroTrust').textContent = quality?.summary?.avg_trust?.toFixed(3) || '—';
+  document.getElementById('heroHits').textContent = (s.total_hits||0).toLocaleString();
+  document.getElementById('heroGrade').textContent = quality?.summary?.grade || '—';
+  document.getElementById('modBadge').textContent = quality?.modules?.length || 0;
+  document.getElementById('fileBadge').textContent = files?.files?.length || 0;
+
+  // 填充 search 模块下拉
+  const sel = document.getElementById('searchModule');
+  if(quality?.modules){
+    quality.modules.slice().sort((a,b)=>(b.cnt||0)-(a.cnt||0)).forEach(m => {
+      const o = document.createElement('option');
+      o.value = m.module;
+      o.textContent = `${m.module} (${m.cnt})`;
+      sel.appendChild(o);
+    });
+  }
+
+  // ===== Panel: Modules =====
+  const modules = (quality?.modules || []).slice().sort((a,b)=>(b.cnt||0)-(a.cnt||0));
+  const modC = document.getElementById('modContainer');
+  if(modules.length === 0){
+    modC.innerHTML = '<div class="empty">暂无模块数据</div>';
+  } else {
+    let html = '<table class="mod-table"><thead><tr><th>模块</th><th>条目</th><th>等级</th><th>平均 trust</th><th>金/银/铜/需修</th><th>分布</th><th>操作</th></tr></thead><tbody>';
+    for(const m of modules){
+      const trust = m.avg_trust || 0;
+      const trustPct = Math.round(trust * 100);
+      const gradeCls = 'g-' + (m.grade || 'B').replace('+','-plus');
+      html += `<tr>
+        <td><strong>${m.module}</strong></td>
+        <td>${m.cnt}</td>
+        <td class="grade"><span class="${gradeCls}">${m.grade||'—'}</span></td>
+        <td>${trust.toFixed(3)} <span class="bar-mini"><span class="fill" style="width:${trustPct}%;background:linear-gradient(90deg,#c9a84c,#7ec47e)"></span></span></td>
+        <td style="font-size:.75rem">${m.gold}/${m.silver}/${m.bronze||0}/${m.needs_fix||0}</td>
+        <td style="font-size:.7rem">min ${m.min_trust?.toFixed(2) || '—'} / max ${m.max_trust?.toFixed(2) || '—'}</td>
+        <td><a class="btn" href="kb-quality.html?module=${m.module}">详情</a> <a class="btn" href="kb-graph.html?module=${m.module}">图谱</a></td>
+      </tr>`;
+    }
+    html += '</tbody></table>';
+    modC.innerHTML = html;
+  }
+
+  // ===== Panel: Files =====
+  const fileList = (files?.files || []).slice().sort((a,b)=>a.filename.localeCompare(b.filename));
+  const fileC = document.getElementById('fileContainer');
+  if(fileList.length === 0){
+    fileC.innerHTML = '<div class="empty">暂无 KB 文件</div>';
+  } else {
+    let html = '<div class="grid">';
+    for(const f of fileList){
+      const lvl = f.level || 'public';
+      const lvlChip = lvl === 'professional' ? '<span class="chip blue">professional</span>' : lvl === 'admin' ? '<span class="chip red">admin</span>' : '<span class="chip green">public</span>';
+      const desc = f.desc || '（暂无描述）';
+      const searchKey = encodeURIComponent(f.filename.replace('.js','').replace(/-kb$/,'').replace(/-/g,' '));
+      html += `<div class="file">
+        <div class="file-head">
+          <span class="file-name">${f.filename}</span>
+          ${lvlChip}
+        </div>
+        <div class="desc">${desc}</div>
+        <div class="meta">
+          <span class="chip">📂 静态 KB</span>
+          <span class="chip gray">📍 knowledge/</span>
+        </div>
+        <div class="actions">
+          <a class="btn primary" href="ai-assistant.html?preset=${f.filename}">🤖 用 AI 探索</a>
+          <a class="btn" href="kb-search.html?q=${searchKey}">🔍 搜条目</a>
+        </div>
+      </div>`;
+    }
+    html += '</div>';
+    fileC.innerHTML = html;
+  }
+
+  // ===== Panel: Hot =====
+  const hotModules = (s.top_modules || []);
+  const hotC = document.getElementById('hotContainer');
+  if(hotModules.length === 0){
+    hotC.innerHTML = '<div class="empty">暂无热门数据</div>';
+  } else {
+    let html = '<div class="grid">';
+    for(const m of hotModules){
+      const trust = modules.find(x=>x.module===m.module)?.avg_trust || 0;
+      html += `<div class="card">
+        <h3>🔥 ${m.module}</h3>
+        <div class="desc">命中数 <strong style="color:var(--gold);font-size:1.1rem">${m.hits.toLocaleString()}</strong> · ${m.cnt} 条目 · trust ${trust.toFixed(2)}</div>
+        <div class="actions">
+          <a class="btn primary" href="ai-assistant.html?mod=${m.module}">🤖 AI 问 ${m.module}</a>
+          <a class="btn" href="kb-quality.html?module=${m.module}">📊 质量</a>
+          <a class="btn" href="kb-graph.html?module=${m.module}">🕸️ 图谱</a>
+        </div>
+      </div>`;
+    }
+    html += '</div>';
+    hotC.innerHTML = html;
+  }
+
+  // ===== Tab 切换 =====
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
+      t.classList.add('on');
+      document.querySelectorAll('.panel').forEach(p => p.hidden = true);
+      const name = t.dataset.tab;
+      document.getElementById('panel-' + name).hidden = false;
+      document.getElementById('searchBar').hidden = (name !== 'search');
+      if(name === 'search') document.getElementById('searchInput').focus();
+    });
+  });
+
+  // ===== 搜索 =====
+  const searchInput = document.getElementById('searchInput');
+  const searchBtn = document.getElementById('searchBtn');
+  async function doSearch(){
+    const q = searchInput.value.trim();
+    if(!q) return;
+    const mod = sel.value;
+    const url = '/api/public/kb/search?q=' + encodeURIComponent(q) + (mod?('&module='+encodeURIComponent(mod)):'') + '&limit=20';
+    const cont = document.getElementById('searchContainer');
+    cont.innerHTML = '<div class="loading">搜索中...</div>';
+    const data = await api(url);
+    const results = data?.results || [];
+    if(results.length === 0){
+      cont.innerHTML = `<div class="empty"><h3>暂无匹配</h3>关键词 "<b>${q}</b>" 在 ${mod||'全模块'} 中无结果</div>`;
+      return;
+    }
+    let html = `<div style="margin-bottom:12px;color:var(--paper3);font-size:.85rem">找到 <b style="color:var(--gold)">${results.length}</b> 条结果</div>`;
+    for(const r of results){
+      const trust = r.trust_score || 0;
+      const trustPct = Math.round(trust * 100);
+      html += `<div class="sr-item">
+        <div class="sr-meta">
+          <span class="chip">${r.module||'—'}</span>
+          <span class="chip ${trust>=0.7?'green':'gray'}">trust ${trust.toFixed(2)}</span>
+          ${r.hit_count?`<span>命中 ${r.hit_count}</span>`:''}
+        </div>
+        <div class="sr-title">${r.title || '(无标题)'}</div>
+        <div class="sr-snippet">${r.snippet || ''}</div>
+      </div>`;
+    }
+    cont.innerHTML = html;
+  }
+  searchBtn.addEventListener('click', doSearch);
+  searchInput.addEventListener('keypress', e => { if(e.key === 'Enter') doSearch(); });
+})();
+</script>
+
+<script src="components/toast.js"></script>
+<script src="js/a11y-divination-hub.js" defer></script>
+<script src="js/mobile-nav.js" defer></script>
+</body>
+</html>
