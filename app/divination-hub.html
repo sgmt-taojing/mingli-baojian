@@ -1273,26 +1273,26 @@
     <h3>选择您的信仰取向</h3>
     <p>系统将根据您的选择，推送个性化的参拜提醒与日常指导</p>
     <div class="faith-options">
-      <ml-tap role="button" tabindex="0" class="faith-card d-block" onclick="selectFaith('ru')"
-        <div class="faith-icon">📖</ml-tap>
+      <ml-tap role="button" tabindex="0" class="faith-card d-block" onclick="selectFaith('ru')">
+        <div class="faith-icon">📖</div>
         <h4>儒家</h4>
         <p>修身齐家、格物致知<br>适合:重视教育、礼仪、家庭者</p>
-      </div>
-      <ml-tap role="button" tabindex="0" class="faith-card d-block" onclick="selectFaith('dao')"
-        <div class="faith-icon">☯️</ml-tap>
+      </ml-tap>
+      <ml-tap role="button" tabindex="0" class="faith-card d-block" onclick="selectFaith('dao')">
+        <div class="faith-icon">☯️</div>
         <h4>道家</h4>
         <p>道法自然、无为而治<br>适合:重视养生、自然、自由者</p>
-      </div>
-      <ml-tap role="button" tabindex="0" class="faith-card d-block" onclick="selectFaith('fo')"
-        <div class="faith-icon">🪷</ml-tap>
+      </ml-tap>
+      <ml-tap role="button" tabindex="0" class="faith-card d-block" onclick="selectFaith('fo')">
+        <div class="faith-icon">🪷</div>
         <h4>佛家</h4>
         <p>慈悲智慧、离苦得乐<br>适合:重视修行、因果、慈悲者</p>
-      </div>
-      <ml-tap role="button" tabindex="0" class="faith-card d-block" onclick="selectFaith('all')"
-        <div class="faith-icon">📿</ml-tap>
+      </ml-tap>
+      <ml-tap role="button" tabindex="0" class="faith-card d-block" onclick="selectFaith('all')">
+        <div class="faith-icon">📿</div>
         <h4>兼修</h4>
         <p>儒道释兼修、圆融通达<br>适合:包容并蓄、广学多闻者</p>
-      </div>
+      </ml-tap>
     </div>
   </div>
 
@@ -2852,7 +2852,7 @@ function getTempleRecommendation(hj) {
   const daoTemples = temples.filter(function(t){return t.type==='☯️ 道观';});
   for (let i = 0; i < daoTemples.length; i++) {
     const t = daoTemples[i];
-    html += '<ml-tap role="button" tabindex="0" class="analysis-card" style="display:block;border-color:rgba(39,174,96,.15);" onclick="showTempleDetail(\'' + t.name + '\')"';
+    html += '<ml-tap role="button" tabindex="0" class="analysis-card" style="display:block;border-color:rgba(39,174,96,.15);" onclick="showTempleDetail(\'' + t.name + '\')">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
     html += '<h5 style="color:var(--jade);font-size:14px;margin:0">' + t.name + '</h5>';
     html += '<span style="font-size:11px;padding:2px 6px;background:rgba(39,174,96,.1);color:var(--jade);border-radius:4px">' + t.rank + '</span>';
@@ -2871,7 +2871,7 @@ function getTempleRecommendation(hj) {
   const foTemples = temples.filter(function(t){return t.type==='🪷 寺庙';});
   for (let i = 0; i < foTemples.length; i++) {
     const t = foTemples[i];
-    html += '<ml-tap role="button" tabindex="0" class="analysis-card" style="display:block;border-color:rgba(142,68,173,.15);" onclick="showTempleDetail(\'' + t.name + '\')"';
+    html += '<ml-tap role="button" tabindex="0" class="analysis-card" style="display:block;border-color:rgba(142,68,173,.15);" onclick="showTempleDetail(\'' + t.name + '\')">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
     html += '<h5 style="color:var(--violet);font-size:14px;margin:0">' + t.name + '</h5>';
     html += '<span style="font-size:11px;padding:2px 6px;background:rgba(142,68,173,.1);color:var(--violet);border-radius:4px">' + t.rank + '</span>';
