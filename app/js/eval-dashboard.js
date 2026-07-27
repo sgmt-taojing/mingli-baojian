@@ -953,7 +953,7 @@ function renderAlertHistory(){
   );
   table.appendChild(thead);
 
-  // 表体（最新周在顶部）
+  // 表体（最新周在顶部）· 行可点击展开/收起
   const tbody = el('tbody');
   [...weekAlerts].reverse().forEach(wa => {
     const card = wa.card;
@@ -977,15 +977,110 @@ function renderAlertHistory(){
     }
 
     const genTime = (card.generated_at || '--').replace(' CST','');
-    const tr = el('tr', {},
-      el('td', {className:'alert-cell-week'}, wa.week.replace('2026-','')),
+    const tr = el('tr', {className:'alert-hist-row ' + lvCls},
+      el('td', {className:'alert-cell-week'},
+        el('span', {className:'alert-expand-icon'}, '▸'),
+        wa.week.replace('2026-','')
+      ),
       el('td', {className:'alert-cell ' + lvCls}, lvIcon + ' ' + lv),
       benchCell('faithfulness'),
       benchCell('cost-budget'),
       benchCell('latency'),
       el('td', {className:'alert-cell-time'}, genTime)
     );
+
+    // 展开行（默认隐藏）
+    const detailRow = el('tr', {className:'alert-hist-detail-row', style:'display:none'});
+    const detailCell = el('td', {colSpan: 6, className:'alert-hist-detail-cell'});
+
+    // 构建详情内容
+    const detailWrap = el('div', {className:'alert-hist-detail-wrap'});
+
+    // 三维度分解网格
+    const benchLabels = { 'faithfulness':'合规分数', 'cost-budget':'成本预算', 'latency':'P95 延迟' };
+    const benchIcons = { 'faithfulness':'📈', 'cost-budget':'💰', 'latency':'⚡' };
+    const detailGrid = el('div', {className:'alert-detail-grid'});
+    Object.keys(judgments).forEach(bench => {
+      const j = judgments[bench];
+      const jLv = j.level || 'UNKNOWN';
+      const jCls = jLv === 'CRITICAL' ? 'alert-critical' : jLv === 'WARN' ? 'alert-warn' : 'alert-ok';
+      const jIcon = jLv === 'CRITICAL' ? '🔴' : jLv === 'WARN' ? '🟡' : '🟢';
+
+      let actualText = '';
+      if (j.metric === 'avg_score') actualText = (j.actual || 0).toFixed(3);
+      else if (j.metric === 'avg_yuan') actualText = j.actual < 0.001 ? '< 0.001 元' : (j.actual || 0).toFixed(4) + ' 元';
+      else if (j.metric === 'p95_ms') actualText = (j.actual || 0) + 'ms';
+      else actualText = String(j.actual ?? '--');
+
+      let thresholdText = '';
+      if (j.threshold) thresholdText = `临界 ${j.threshold.critical} / 警告 ${j.threshold.warn}`;
+      else if (j.target != null) thresholdText = `目标 ${j.metric === 'avg_yuan' ? j.target + ' 元' : j.metric === 'p95_ms' ? j.target + 'ms' : j.target}`;
+
+      const detailCard = el('div', {className:'alert-detail-card ' + jCls},
+        el('div', {className:'alert-detail-header'},
+          el('span', {className:'alert-detail-icon'}, benchIcons[bench] || '📊'),
+          el('span', {className:'alert-detail-name'}, benchLabels[bench] || bench),
+          el('span', {className:'alert-detail-level'}, jIcon + ' ' + jLv)
+        ),
+        el('div', {className:'alert-detail-actual'}, actualText),
+        el('div', {className:'alert-detail-threshold'}, thresholdText || ''),
+        el('div', {className:'alert-detail-violations'}, '违规 ' + (j.violations || 0) + ' 次')
+      );
+
+      // 低分案例
+      if (j.low_cases && j.low_cases.length){
+        const casesWrap = el('div', {className:'alert-detail-cases'},
+          el('div', {className:'alert-detail-cases-title'}, '⚠ 低分案例')
+        );
+        j.low_cases.forEach(c => {
+          casesWrap.appendChild(el('div', {className:'alert-detail-case'},
+            el('span', {className:'alert-detail-case-id'}, c.id || c.case_id || '--'),
+            el('span', {className:'alert-detail-case-score'}, (c.score != null ? c.score : c.actual ?? '--').toString()),
+            c.module ? el('span', {className:'alert-detail-case-mod'}, c.module) : null
+          ));
+        });
+        detailCard.appendChild(casesWrap);
+      }
+      detailGrid.appendChild(detailCard);
+    });
+    detailWrap.appendChild(detailGrid);
+
+    // 额外信息：该周 faithfulness per-case 低分（从 cache 补充）
+    const faithData = cache.weeks[wa.week]?.faithfulness;
+    if (faithData && faithData.results && faithData.results.length){
+      const lowFaith = faithData.results.filter(r => (r.score || 0) < 0.7);
+      if (lowFaith.length){
+        const lowWrap = el('div', {className:'alert-detail-extra'},
+          el('div', {className:'alert-detail-extra-title'}, `📋 ${wa.week} faithfulness 低分案例（${lowFaith.length} 条 < 0.7）`)
+        );
+        lowFaith.forEach(r => {
+          const score = r.score || 0;
+          const cls = score >= 0.7 ? 'ok' : score >= 0.4 ? 'warn' : 'danger';
+          lowWrap.appendChild(el('div', {className:'alert-detail-extra-case eval-' + cls},
+            el('span', {className:'alert-detail-case-id'}, r.id || '--'),
+            el('span', {className:'alert-detail-case-score'}, score.toFixed(3)),
+            el('span', {className:'alert-detail-case-query'}, (r.query || r.note || '').slice(0, 50))
+          ));
+        });
+        detailWrap.appendChild(lowWrap);
+      }
+    }
+
+    detailCell.appendChild(detailWrap);
+    detailRow.appendChild(detailCell);
+
+    // 点击展开/收起
+    tr.addEventListener('click', () => {
+      const isHidden = detailRow.style.display === 'none';
+      detailRow.style.display = isHidden ? '' : 'none';
+      tr.classList.toggle('alert-hist-row-expanded', isHidden);
+      const icon = tr.querySelector('.alert-expand-icon');
+      if (icon) icon.textContent = isHidden ? '▾' : '▸';
+    });
+    tr.style.cursor = 'pointer';
+
     tbody.appendChild(tr);
+    tbody.appendChild(detailRow);
   });
   table.appendChild(tbody);
   wrap.appendChild(table);
