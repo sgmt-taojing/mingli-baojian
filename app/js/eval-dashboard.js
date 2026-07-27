@@ -1323,6 +1323,71 @@ function renderModPerCase(){
   wrap.appendChild(table);
 }
 
+// CSV 导出工具
+function downloadCSV(filename, rows){
+  // rows: array of arrays (first row = headers)
+  const csv = rows.map(r =>
+    r.map(cell => {
+      const s = String(cell == null ? '' : cell);
+      // RFC 4180: quote if contains comma, quote, newline
+      return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    }).join(',')
+  ).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], {type: 'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// 导出 per-case 明细 CSV
+function exportPerCaseCSV(){
+  const weekSel = $('percaseWeekSel');
+  const benchSel = $('percaseBenchSel');
+  if (!weekSel) return;
+  const week = weekSel.value || WEEKS[WEEKS.length-1];
+  const bench = benchSel.value || 'cost-budget';
+  const data = cache.weeks[week]?.[bench];
+  if (!data || !data.results || !data.results.length){
+    alert('当前无 per-case 数据可导出');
+    return;
+  }
+  const rows = [
+    ['Week', 'Benchmark', 'CaseID', 'Query', 'Latency_ms', 'OK']
+  ];
+  data.results.forEach(r => {
+    rows.push([week, bench, r.id || '', r.query || '', r.latency_ms || '', r.ok ? 'true' : 'false']);
+  });
+  downloadCSV(`eval-percase-${week}-${bench}.csv`, rows);
+}
+
+// 导出模块 per-case 评分 CSV
+function exportModPerCaseCSV(){
+  const sel = $('modPercaseSel');
+  if (!sel) return;
+  const selectedMod = sel.value || 'bazi';
+  const rows = [
+    ['Week', 'Module', 'CaseID', 'Query', 'Score', 'Level', 'Note']
+  ];
+  WEEKS.forEach(w => {
+    const f = cache.weeks[w]?.faithfulness;
+    if (f && f.results){
+      f.results.filter(r => (FAITH_MODULE_MAP[r.id] || 'other') === selectedMod)
+        .forEach(r => {
+          const score = r.score || 0;
+          const level = score >= 0.85 ? 'OK' : score >= 0.7 ? 'WARN' : 'DANGER';
+          rows.push([w, selectedMod, r.id || '', r.query || r.note || '', score.toFixed(3), level, r.note || '']);
+        });
+    }
+  });
+  if (rows.length <= 1){
+    alert('模块 ' + selectedMod + ' 暂无 per-case 数据可导出');
+    return;
+  }
+  downloadCSV(`eval-mod-percase-${selectedMod}.csv`, rows);
+}
+
 // 主入口
 async function refresh(){
   $('refreshBtn').textContent = '⏳ 加载中…';
@@ -1348,6 +1413,8 @@ async function refresh(){
 
 $('refreshBtn').addEventListener('click', refresh);
 $('exportBtn').addEventListener('click', exportSnapshot);
+const _pcCSV = $('percaseCSVBtn'); if (_pcCSV) _pcCSV.addEventListener('click', exportPerCaseCSV);
+const _mpCSV = $('modPercaseCSVBtn'); if (_mpCSV) _mpCSV.addEventListener('click', exportModPerCaseCSV);
 
 // 启动
 refresh();
