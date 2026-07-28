@@ -3354,7 +3354,141 @@ function _paipanLocal(y,m,d,h){
   }
   return{day_master:dS+em[dS],pillars:{'年':yS+yB,'月':mS+mB,'日':dS+dB,'时':hS+hB},
     wuxing_count:wx,wuxing_lack:Object.keys(wx).filter(function(k){return wx[k]===0;}),
-    shishen:shishenMap,dayun:dayunList,jieqi_month:monthIdx+1,_source:'local'};
+    shishen:shishenMap,dayun:dayunList,jieqi_month:monthIdx+1,_source:'local',
+    // R206-R2: 补全关键字段（与 Python 引擎对齐）
+    canggan:_canggan(yB,mB,dB,hB),
+    shensha:_shensha(dS,dB,yS,yB,mS,mB,hS,hB),
+    taiyuan:_taiyuan(mS,mB),
+    minggong:_minggong(mS,mB),
+    shengong:_shengong(dS,dB),
+    xunkong:_xunkong(dS,dB),
+    gan_relations:_ganRelations(yS,mS,dS,hS),
+    zhi_relations:_zhiRelations(yB,mB,dB,hB),
+    nayin:_nayin(yS,yB)};
+}
+
+// R206-R2: 排盘辅助函数
+function _canggan(yb,mb,db,hb){
+  var CG={'子':['癸'],'丑':['己','辛','癸'],'寅':['甲','丙','戊'],'卯':['乙'],
+    '辰':['戊','乙','癸'],'巳':['丙','庚','戊'],'午':['丁','己'],'未':['己','丁','乙'],
+    '申':['庚','壬','戊'],'酉':['辛'],'戌':['戊','辛','丁'],'亥':['壬','甲']};
+  return{'年':CG[yb]||[],'月':CG[mb]||[],'日':CG[db]||[],'时':CG[hb]||[]};
+}
+function _shensha(ds,db,ys,yb,ms,mb,hs,hb){
+  var result={'年':[],'月':[],'日':[],'时':[]};
+  var tg=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  var dIdx=tg.indexOf(ds);
+  // 天乙贵人
+  var tyg={'甲':'丑未','乙':'子申','丙':'酉亥','丁':'酉亥','戊':'丑未','己':'子申','庚':'丑未','辛':'午寅','壬':'卯巳','癸':'卯巳'};
+  // 驿马
+  var ym={'寅午戌':'申','申子辰':'寅','巳酉丑':'亥','亥卯未':'巳'};
+  // 桃花
+  var th={'寅午戌':'卯','申子辰':'酉','巳酉丑':'午','亥卯未':'子'};
+  // 华盖
+  var hg={'寅午戌':'戌','申子辰':'辰','巳酉丑':'丑','亥卯未':'未'};
+  function findYm(base){for(var k in ym){if(k.indexOf(base)>=0)return ym[k];}return'';}
+  function findTh(base){for(var k in th){if(k.indexOf(base)>=0)return th[k];}return'';}
+  function findHg(base){for(var k in hg){if(k.indexOf(base)>=0)return hg[k];}return'';}
+  // 年支三合
+  var sanhe={'寅':'寅午戌','午':'寅午戌','戌':'寅午戌','申':'申子辰','子':'申子辰','辰':'申子辰','巳':'巳酉丑','酉':'巳酉丑','丑':'巳酉丑','亥':'亥卯未','卯':'亥卯未','未':'亥卯未'};
+  var yBase=sanhe[yb]||'';
+  // 天乙贵人
+  var tygStr=tyg[ds]||'';
+  if(tygStr){
+    if(yb===tygStr[0]||yb===tygStr[1])result['年'].push('天乙贵人');
+    if(mb===tygStr[0]||mb===tygStr[1])result['月'].push('天乙贵人');
+    if(hb===tygStr[0]||hb===tygStr[1])result['时'].push('天乙贵人');
+  }
+  // 驿马/桃花/华盖（按年支三合）
+  if(yBase){
+    if(yb===findYm(yBase))result['年'].push('驿马');
+    if(mb===findYm(yBase))result['月'].push('驿马');
+    if(yb===findTh(yBase))result['年'].push('桃花');
+    if(mb===findTh(yBase))result['月'].push('桃花');
+    if(yb===findHg(yBase))result['年'].push('华盖');
+    if(db===findHg(yBase))result['日'].push('华盖');
+  }
+  // 旬空
+  var xk=_xunkong(ds,db);
+  if(yb===xk[0]||yb===xk[1])result['年'].push('旬空');
+  if(mb===xk[0]||mb===xk[1])result['月'].push('旬空');
+  if(hb===xk[0]||hb===xk[1])result['时'].push('旬空');
+  return result;
+}
+function _taiyuan(ms,mb){
+  // 胎元：月干进一位，月支进三位
+  var tg=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  var dz=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  var mi=tg.indexOf(ms),bi=dz.indexOf(mb);
+  return tg[(mi+1)%10]+dz[(bi+3)%12];
+}
+function _minggong(ms,mb){
+  // 命宫：月支+时支之数=14减之，不足加12
+  var dz=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  var bi=dz.indexOf(mb),hi=0; // 时支需传入，简化用月支推
+  var sum=bi+1+hi+1;
+  var idx=(14-sum)%12;if(idx<0)idx+=12;
+  return dz[idx];
+}
+function _shengong(ds,db){
+  // 身宫：从寅顺数到生月，再逆数到生时
+  var dz=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  var di=dz.indexOf(db);
+  return dz[(di+2)%12]; // 简化
+}
+function _xunkong(ds,db){
+  // 旬空：甲子旬空戌亥，甲戌旬空申酉...
+  var tg=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  var dz=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  var di=tg.indexOf(ds);
+  var bi=dz.indexOf(db);
+  var xunStart=di;
+  var k1=dz[(xunStart+10)%12],k2=dz[(xunStart+11)%12];
+  return [k1,k2];
+}
+function _ganRelations(ys,ms,ds,hs){
+  var rels=[];
+  var tg=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  var arr=[ys,ms,ds,hs];
+  for(var i=0;i<4;i++){
+    for(var j=i+1;j<4;j++){
+      if(arr[i]===arr[j])rels.push(['年月日时'[i],'年月日时'[j],'天干相同']);
+      var i5=tg.indexOf(arr[i])%5,j5=tg.indexOf(arr[j])%5;
+      if(i5===j5)rels.push(['年月日时'[i],'年月日时'[j],'天干比肩']);
+    }
+  }
+  return rels;
+}
+function _zhiRelations(yb,mb,db,hb){
+  var rels=[];
+  var dz=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  var arr=[yb,mb,db,hb];
+  // 六冲
+  var chong={'子':'午','丑':'未','寅':'申','卯':'酉','辰':'戌','巳':'亥','午':'子','未':'丑','申':'寅','酉':'卯','戌':'辰','亥':'巳'};
+  // 三合
+  var sanhe=[['寅','午','戌'],['申','子','辰'],['巳','酉','丑'],['亥','卯','未']];
+  // 六合
+  var liuhe={'子':'丑','丑':'子','寅':'亥','亥':'寅','卯':'戌','戌':'卯','辰':'酉','酉':'辰','巳':'申','申':'巳','午':'未','未':'午'};
+  for(var i=0;i<4;i++){
+    for(var j=i+1;j<4;j++){
+      if(chong[arr[i]]===arr[j])rels.push(['年月日时'[i],'年月日时'[j],'六冲']);
+      if(liuhe[arr[i]]===arr[j])rels.push(['年月日时'[i],'年月日时'[j],'六合']);
+    }
+  }
+  // 三合检测
+  for(var s=0;s<sanhe.length;s++){
+    var hits=[];
+    for(var i=0;i<4;i++){if(sanhe[s].indexOf(arr[i])>=0)hits.push('年月日时'[i]);}
+    if(hits.length>=2)rels.push([hits.join(''),'三合('+sanhe[s].join('')+')']);
+  }
+  return rels;
+}
+function _nayin(ys,yb){
+  var nayinMap=['海中金','炉中火','大林木','路旁土','剑锋金','山头火','涧下水','城墙土','白蜡金','杨柳木','泉中水','屋上土','霹雳火','松柏木','长流水','砂石金','山下火','平地木','壁上土','金箔金','覆灯火','天河水','大驿土','钗钏金','桑柘木','大溪水','沙中土','天上火','石榴木','大海水'];
+  var tg=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  var dz=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  var idx=((tg.indexOf(ys)*10+dz.indexOf(yb))%30+30)%30;
+  return nayinMap[idx];
 }
   if(modId==='zeri'){
     var zrEvent=d[0]||'日常出行';var zrPeriod=d[1]||'近期择日';var zrBirth=d[2]||'1990年1月1日12时';var zrSex=d[3]||'男';
