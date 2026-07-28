@@ -352,9 +352,9 @@
   // ===== 综合体质分析 =====
   function runComprehensiveAnalysis(){
     var westernDiag = (document.getElementById('wz-western-diag') || {}).value || '';
-    var healthSummary = (document.getElementById('wz-health-summary') || {}).innerText || '';
-    var diagnosisText = (document.getElementById('wangzhen-result-panel') || {}).innerText || '';
-    var aiResult = (document.getElementById('wz-ai-result') || {}).innerText || '';
+    var healthSummary = (document.getElementById('wz-health-summary') || {}).textContent || '';
+    var diagnosisText = (document.getElementById('wangzhen-result-panel') || {}).textContent || '';
+    var aiResult = (document.getElementById('wz-ai-result') || {}).textContent || '';
 
     var html = '<div style="padding:10px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.15);border-radius:8px">';
     html += '<div style="font-size:13px;color:var(--wz-gold);font-weight:600;margin-bottom:8px">🔍 综合体质分析报告</div>';
@@ -422,6 +422,42 @@
       }
     }
 
+    // 方剂推荐（从经典名方库 + 证候库匹配）
+    var organFormulas = {
+      '肝': [{name:'逍遥散',efficacy:'疏肝解郁，养血健脾',indications:'肝郁血虚脾弱，两胁作痛头痛目眩'},{name:'柴胡疏肝散',efficacy:'疏肝行气，活血止痛',indications:'肝气郁结，胸胁胀痛'},{name:'龙胆泻肝汤',efficacy:'泻肝胆实火，清下焦湿热',indications:'肝胆实火上炎，头痛目赤口苦'}],
+      '心': [{name:'归脾汤',efficacy:'益气补血，健脾养心',indications:'心脾气血两虚，心悸失眠健忘'},{name:'天王补心丹',efficacy:'滋阴养血，补心安神',indications:'阴虚血少，心神不安'},{name:'酸枣仁汤',efficacy:'养血安神，清热除烦',indications:'虚劳虚烦不得眠'}],
+      '脾': [{name:'四君子汤',efficacy:'益气健脾',indications:'脾胃气虚，面色萎白气短乏力'},{name:'参苓白术散',efficacy:'益气健脾，渗湿止泻',indications:'脾虚湿盛，食少便溏'},{name:'补中益气汤',efficacy:'补中益气，升阳举陷',indications:'脾胃气虚下陷，体倦乏力'}],
+      '胃': [{name:'半夏泻心汤',efficacy:'寒热平调，消痞散结',indications:'寒热互结之痞证，心下痞呕吐'},{name:'保和丸',efficacy:'消食和胃',indications:'食积停滞，脘腹胀满嗳腐'},{name:'清胃散',efficacy:'清胃凉血',indications:'胃火牙痛，口气热臭'}],
+      '肺': [{name:'玉屏风散',efficacy:'益气固表止汗',indications:'表虚自汗，易感冒'},{name:'杏苏散',efficacy:'清宣温燥，润肺止咳',indications:'外感温燥，头痛身热口渴'},{name:'百合固金汤',efficacy:'滋润肺肾，止咳化痰',indications:'肺肾阴虚，咳嗽痰血'}],
+      '肾': [{name:'六味地黄丸',efficacy:'滋补肝肾',indications:'肝肾阴虚，腰膝酸软头晕耳鸣'},{name:'金匮肾气丸',efficacy:'温补肾阳',indications:'肾阳不足，腰痛脚软小便不利'},{name:'左归丸',efficacy:'滋阴补肾，填精益髓',indications:'真阴不足，头晕目眩腰酸'}]
+    };
+    
+    var recommendedFormulas = [];
+    var organText = health + diagnosis;
+    Object.keys(organFormulas).forEach(function(organ){
+      if(organText.indexOf(organ) >= 0){
+        organFormulas[organ].forEach(function(f){
+          if(recommendedFormulas.length < 6){
+            recommendedFormulas.push(f);
+          }
+        });
+      }
+    });
+    
+    if(recommendedFormulas.length > 0){
+      html += '<div style="margin-bottom:6px"><b style="color:var(--wz-gold)">方剂推荐（经典名方库）：</b></div>';
+      html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px;margin-bottom:8px">';
+      recommendedFormulas.forEach(function(f){
+        html += '<div style="padding:8px;border:1px solid rgba(201,168,76,.2);border-radius:6px;background:rgba(201,168,76,.04)">';
+        html += '<div style="font-size:12px;color:var(--wz-gold);font-weight:600">' + f.name + '</div>';
+        html += '<div style="font-size:10px;color:var(--wz-paper3);margin-top:2px">' + f.efficacy + '</div>';
+        html += '<div style="font-size:10px;color:var(--wz-paper2);margin-top:2px">主治：' + f.indications.substring(0, 30) + '</div>';
+        html += '</div>';
+      });
+      html += '</div>';
+      html += '<div style="font-size:10px;color:var(--wz-paper3);margin-bottom:8px">💡 方剂仅供参考，需医生根据患者实际情况加减化裁。点击方名可在知识库中查看完整组成/剂量/禁忌。</div>';
+    }
+
     // 食疗建议
     html += '<div style="margin-bottom:6px"><b style="color:var(--wz-jade)">食疗调养：</b></div>';
     if(health.indexOf('肝') >= 0) html += '• 菊花枸杞茶、芹菜、菠菜疏肝<br>';
@@ -470,7 +506,7 @@
       dayMaster: currentPatient.dayMaster || '',
       wuxing: currentPatient.wuxing || '',
       wuxingLack: currentPatient.wuxingLack || '',
-      diagnosis: (document.getElementById('wangzhen-result-panel')||{}).innerText || '',
+      diagnosis: (document.getElementById('wangzhen-result-panel')||{}).textContent || '',
       westernDiag: (document.getElementById('wz-western-diag')||{}).value || '',
       timestamp: new Date().toISOString(),
       status: 'pending',
@@ -518,15 +554,15 @@
       showToast('请先选择患者', 'warning');
       return;
     }
-    var plan = (document.getElementById('wz-treatment-plan')||{}).innerText || '';
-    var diagnosis = (document.getElementById('wangzhen-result-panel')||{}).innerText || '';
-    var health = (document.getElementById('wz-health-analysis')||{}).innerText || '';
+    var plan = (document.getElementById('wz-treatment-plan')||{}).textContent || '';
+    var diagnosis = (document.getElementById('wangzhen-result-panel')||{}).textContent || '';
+    var health = (document.getElementById('wz-health-analysis')||{}).textContent || '';
 
     // 组装患者端内容（纯中医，无周易痕迹）
     var patientContent = '═══ 诊疗方案 ═══\n\n';
     patientContent += '患者：' + currentPatient.name + '\n';
     patientContent += '日期：' + new Date().toLocaleDateString('zh-CN') + '\n\n';
-    patientContent += '【体质评估】\n' + ((document.getElementById('wz-health-summary')||{}).innerText || '').substring(0,200) + '\n\n';
+    patientContent += '【体质评估】\n' + ((document.getElementById('wz-health-summary')||{}).textContent || '').substring(0,200) + '\n\n';
     patientContent += '【望诊建议】\n' + diagnosis.substring(0,200) + '\n\n';
     patientContent += '【治疗方案】\n' + plan + '\n\n';
     patientContent += '【注意事项】\n如出现持续高热、剧烈疼痛、呼吸困难等请立即就医。\n本方案为辅助调理参考，不可替代正规治疗。\n';
@@ -1095,9 +1131,9 @@
 
     // 收集诊断结果
     var resultPanel = document.getElementById('wangzhen-result-panel');
-    var diagnosisText = resultPanel ? resultPanel.innerText : '';
+    var diagnosisText = resultPanel ? resultPanel.textContent : '';
     var voiceText = (document.getElementById('wz-voice-text') || {}).value || '';
-    var aiResult = (document.getElementById('wz-ai-result') || {}).innerText || '';
+    var aiResult = (document.getElementById('wz-ai-result') || {}).textContent || '';
 
     var payload = {
       patient_id: currentPatient.id || currentPatient.user_id || 0,
@@ -1154,10 +1190,10 @@
     }
 
     var resultPanel = document.getElementById('wangzhen-result-panel');
-    var diagnosisText = resultPanel ? resultPanel.innerText : '';
+    var diagnosisText = resultPanel ? resultPanel.textContent : '';
     var voiceText = (document.getElementById('wz-voice-text') || {}).value || '';
-    var aiResult = (document.getElementById('wz-ai-result') || {}).innerText || '';
-    var paipanText = (document.getElementById('wz-paipan-result') || {}).innerText || '';
+    var aiResult = (document.getElementById('wz-ai-result') || {}).textContent || '';
+    var paipanText = (document.getElementById('wz-paipan-result') || {}).textContent || '';
 
     var report = '═══ 命理宝鉴 · 望诊报告 ═══\n\n';
     report += '患者：' + (currentPatient.name || '') + '\n';
@@ -1217,8 +1253,8 @@
       return;
     }
     var resultPanel = document.getElementById('wangzhen-result-panel');
-    var diagnosisText = resultPanel ? resultPanel.innerText : '';
-    var paipanText = (document.getElementById('wz-paipan-result') || {}).innerText || '';
+    var diagnosisText = resultPanel ? resultPanel.textContent : '';
+    var paipanText = (document.getElementById('wz-paipan-result') || {}).textContent || '';
 
     if(!diagnosisText || diagnosisText.indexOf('请选择') >= 0){
       showToast('请先完成面诊', 'warning');
