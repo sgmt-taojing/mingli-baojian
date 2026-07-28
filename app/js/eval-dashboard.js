@@ -1740,6 +1740,57 @@ function exportModPerCaseCSV(){
   downloadCSV(`eval-mod-percase-${selectedMod}.csv`, rows);
 }
 
+// 导出告警历史 CSV（8 周 × 整体 + 三维度概览）
+function exportAlertHistoryCSV(){
+  const weekAlerts = WEEKS.map(w => ({ week: w, card: cache.weeks[w]?.['alert-card'] })).filter(x => x.card);
+  if (!weekAlerts.length) return;
+  const rows = [['Week','Overall_Level','Faithfulness_Level','Faithfulness_Actual','CostBudget_Level','CostBudget_Actual','Latency_Level','Latency_Actual','Generated_At']];
+  weekAlerts.forEach(wa => {
+    const c = wa.card;
+    const j = c.judgments || {};
+    function fmt(bench, isFloat){
+      const v = j[bench];
+      if (!v) return ['',''];
+      const lv = v.level || '';
+      let act = v.actual;
+      if (act != null && isFloat) act = Number(act).toFixed(4);
+      return [lv, act != null ? act : ''];
+    }
+    const [flv, fa] = fmt('faithfulness', true);
+    const [clv, ca] = fmt('cost-budget', true);
+    const [llv, la] = fmt('latency', false);
+    rows.push([wa.week, c.overall_level || '', flv, fa, clv, ca, llv, la, (c.generated_at || '').replace(' CST','')]);
+  });
+  downloadCSV('eval-alert-history.csv', rows);
+}
+
+// 导出告警详情 CSV（每周 × 三维度 × 阈值 + 违规 + 低分案例数）
+function exportAlertDetailCSV(){
+  const weekAlerts = WEEKS.map(w => ({ week: w, card: cache.weeks[w]?.['alert-card'] })).filter(x => x.card);
+  if (!weekAlerts.length) return;
+  const rows = [['Week','Benchmark','Level','Metric','Actual','Threshold_Critical','Threshold_Warn','Target','Violations','Low_Cases_Count']];
+  weekAlerts.forEach(wa => {
+    const c = wa.card;
+    const j = c.judgments || {};
+    ['faithfulness','cost-budget','latency'].forEach(bench => {
+      const v = j[bench];
+      if (!v){ rows.push([wa.week, bench, '', '', '', '', '', '', '', '']); return; }
+      const th = v.threshold || {};
+      const lowCount = (v.low_cases || []).length;
+      rows.push([
+        wa.week, bench, v.level || '', v.metric || '',
+        v.actual != null ? v.actual : '',
+        th.critical != null ? th.critical : '',
+        th.warn != null ? th.warn : '',
+        v.target != null ? v.target : '',
+        v.violations != null ? v.violations : 0,
+        lowCount
+      ]);
+    });
+  });
+  downloadCSV('eval-alert-detail.csv', rows);
+}
+
 // 主入口
 async function refresh(){
   $('refreshBtn').textContent = '⏳ 加载中…';
@@ -1768,6 +1819,8 @@ $('exportBtn').addEventListener('click', exportSnapshot);
 var _pdf = $('pdfBtn'); if (_pdf) _pdf.addEventListener('click', exportPDF);
 const _pcCSV = $('percaseCSVBtn'); if (_pcCSV) _pcCSV.addEventListener('click', exportPerCaseCSV);
 const _mpCSV = $('modPercaseCSVBtn'); if (_mpCSV) _mpCSV.addEventListener('click', exportModPerCaseCSV);
+const _ahCSV = $('alertHistCSVBtn'); if (_ahCSV) _ahCSV.addEventListener('click', exportAlertHistoryCSV);
+const _adCSV = $('alertDetailCSVBtn'); if (_adCSV) _adCSV.addEventListener('click', exportAlertDetailCSV);
 
 // 启动
 refresh();
