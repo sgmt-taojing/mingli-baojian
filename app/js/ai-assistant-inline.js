@@ -1484,6 +1484,24 @@ function _applyGlossary(text){
   }
   return result;
 }
+
+// R103: 来源分级标注 — 在报告末尾添加来源声明
+function _addSourceLabel(text){
+  if(!text || text.length < 50) return text;
+  var label = '\n\n━━━ 来源与声明 ━━━\n';
+  label += '【理论来源】经典命理学 ✅ + 大师实践 📘\n';
+  label += '  ✅ 经典：八字/紫微/奇门/六壬/六爻/梅花经典理论\n';
+  label += '  📘 实践：路氏一脉(朱鹊桥/段建业)·舒晗(密宗天纪)·倪海厦(人纪/天纪)\n';
+  label += '  ⚠️ 争议：不同流派可能存在差异(如时干早子/晚子时)\n';
+  label += '  ❓ 待证：部分推演需结合实际情况判断\n';
+  label += '【免责】本报告基于传统命理学理论分析，仅供参考。命由天定，运由己造。';
+  // 只在报告类内容末尾添加（不以【结尾）
+  if(text.lastIndexOf('】') !== text.length-1 && text.lastIndexOf('━') !== text.length-1){
+    return text + label;
+  }
+  return text;
+}
+
 function showReport(text, meta){
   // R89-P0-2: 合规黑名单拦截（生成后立即清洗）+ 免责声明统一注入（P0-3）
   try {
@@ -1497,6 +1515,7 @@ function showReport(text, meta){
   // R206: 术语白话化注入（在合规清洗后、渲染前）
   try {
     text = _applyGlossary(text);
+    text = _addSourceLabel(text);
   } catch(e) { console.warn('[r206-glossary] err', e); }
   // R89-P2-1: KB 源标签提取（仅供 KB 命中条 meta 扩展，不改报告文本）
   try {
