@@ -160,7 +160,23 @@
       <div class="wz-card-title">👥 患者管理 <span class="badge" id="wz-patient-count">0</span></div>
       <div id="wz-patient-list"></div>
       <div class="wz-btn-row">
-        <button class="btn btn-ghost" onclick="window.wangzhenClinical.selectPatient(0,'新患者')">+ 新患者</button>
+        <button class="btn btn-ghost" onclick="window.wangzhenClinical.toggleNewPatientForm()">+ 新建患者</button>
+      <div id="wz-new-patient-form" style="display:none;margin-top:8px;padding:8px;border:1px solid var(--wz-border);border-radius:6px;background:rgba(0,0,0,.2)">
+        <input type="text" id="np-name" placeholder="姓名" style="width:100%;padding:6px;margin-bottom:4px;background:rgba(255,255,255,.05);border:1px solid var(--wz-border);border-radius:4px;color:var(--wz-paper);font-size:12px">
+        <div style="display:flex;gap:4px">
+          <select id="np-gender" style="flex:1;padding:6px;background:rgba(255,255,255,.05);border:1px solid var(--wz-border);border-radius:4px;color:var(--wz-paper);font-size:12px"><option value="">性别</option><option value="male">男</option><option value="female">女</option></select>
+          <input type="number" id="np-age" placeholder="年龄" style="flex:1;padding:6px;background:rgba(255,255,255,.05);border:1px solid var(--wz-border);border-radius:4px;color:var(--wz-paper);font-size:12px">
+        </div>
+        <input type="text" id="np-phone" placeholder="电话(选填)" style="width:100%;padding:6px;margin-top:4px;background:rgba(255,255,255,.05);border:1px solid var(--wz-border);border-radius:4px;color:var(--wz-paper);font-size:12px">
+        <input type="text" id="np-chief" placeholder="主诉症状" style="width:100%;padding:6px;margin-top:4px;background:rgba(255,255,255,.05);border:1px solid var(--wz-border);border-radius:4px;color:var(--wz-paper);font-size:12px">
+        <div style="display:flex;gap:4px;margin-top:4px">
+          <select id="np-byear" style="flex:1;padding:6px;background:rgba(255,255,255,.05);border:1px solid var(--wz-border);border-radius:4px;color:var(--wz-paper);font-size:12px"><option value="">年</option></select>
+          <select id="np-bmonth" style="flex:1;padding:6px;background:rgba(255,255,255,.05);border:1px solid var(--wz-border);border-radius:4px;color:var(--wz-paper);font-size:12px"><option value="">月</option></select>
+          <select id="np-bday" style="flex:1;padding:6px;background:rgba(255,255,255,.05);border:1px solid var(--wz-border);border-radius:4px;color:var(--wz-paper);font-size:12px"><option value="">日</option></select>
+          <select id="np-bhour" style="flex:1;padding:6px;background:rgba(255,255,255,.05);border:1px solid var(--wz-border);border-radius:4px;color:var(--wz-paper);font-size:12px"><option value="">时</option></select>
+        </div>
+        <button class="btn btn-primary" onclick="window.wangzhenClinical.saveNewPatient()" style="width:100%;margin-top:6px">💾 保存患者</button>
+      </div>
       </div>
       <div id="wz-patient-detail" style="margin-top:8px"></div>
       <div style="font-size:11px;color:var(--wz-paper3);margin-top:4px">当前: <b id="wz-current-patient" style="color:var(--wz-gold)">未选择</b></div>
@@ -205,6 +221,12 @@
     <div class="wz-card">
       <div class="wz-card-title">🎤 语音医嘱</div>
       <textarea id="wz-voice-text" class="wz-voice-text" placeholder="点击语音输入，或直接打字记录医嘱..."></textarea>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="window.wangzhenClinical.insertTemplate('prescription')">📋 处方医嘱</button>
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="window.wangzhenClinical.insertTemplate('lifestyle')">🌿 调养建议</button>
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="window.wangzhenClinical.insertTemplate('followup')">📅 复诊安排</button>
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="window.wangzhenClinical.insertTemplate('warning')">⚠️ 注意事项</button>
+      </div>
       <div class="wz-btn-row">
         <button class="btn btn-secondary" id="wz-btn-voice" onclick="window.wangzhenClinical.toggleVoiceInput()">🎤 语音输入</button>
         <button class="btn btn-ghost" onclick="window.wangzhenClinical.speakText(document.getElementById('wz-voice-text').value)">🔊 播报</button>
@@ -214,6 +236,8 @@
     <!-- 望诊诊断 -->
     <div class="wz-card">
       <div class="wz-card-title">🔍 望诊诊断 <span class="badge" id="wz-kb-badge">KB 加载中</span></div>
+      <div style="font-size:11px;color:var(--wz-paper3);margin-bottom:6px">选择多个区域特征后点击诊断，系统汇总所有区域结果</div>
+      <div id="wz-multi-zone-summary" style="display:none;margin-bottom:8px;padding:6px 10px;border-radius:6px;background:rgba(201,168,76,.08);font-size:11px"></div>
 
       <!-- Tab -->
       <div class="wz-tabs">
@@ -279,6 +303,12 @@
     <div class="wz-card">
       <div class="wz-card-title">📂 历史病例</div>
       <div id="wz-saved-cases"><div class="wz-empty">选择患者后显示历史病例</div></div>
+      <div id="wz-case-detail-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)this.style.display='none'">
+        <div style="background:#111827;border:1px solid var(--wz-border);border-radius:12px;max-width:600px;max-height:80vh;overflow-y:auto;padding:20px;width:100%">
+          <span style="float:right;cursor:pointer;font-size:20px;color:var(--wz-paper3)" onclick="document.getElementById('wz-case-detail-modal').style.display='none'">✕</span>
+          <div id="wz-case-detail-body"></div>
+        </div>
+      </div>
     </div>
 
     <!-- 快捷入口 -->

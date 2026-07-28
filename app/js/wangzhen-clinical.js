@@ -12,6 +12,117 @@
   var TTS_API = 'http://127.0.0.1:8912';
 
   // ===== 患者管理 =====
+
+  // ===== 新建患者 =====
+  function toggleNewPatientForm(){
+    var form = document.getElementById('wz-new-patient-form');
+    if(form) form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    // 初始化八字下拉
+    var ySel = document.getElementById('np-byear');
+    if(ySel && ySel.options.length <= 1){
+      for(var y = 1940; y <= 2025; y++){
+        var o = document.createElement('option'); o.value = y; o.textContent = y; ySel.appendChild(o);
+      }
+      var mSel = document.getElementById('np-bmonth');
+      for(var m = 1; m <= 12; m++){ var o = document.createElement('option'); o.value = m; o.textContent = m; mSel.appendChild(o); }
+      var dSel = document.getElementById('np-bday');
+      for(var d = 1; d <= 31; d++){ var o = document.createElement('option'); o.value = d; o.textContent = d; dSel.appendChild(o); }
+      var hSel = document.getElementById('np-bhour');
+      var hours = [['子',0],['丑',1],['寅',3],['卯',5],['辰',7],['巳',9],['午',11],['未',13],['申',15],['酉',17],['戌',19],['亥',21]];
+      hours.forEach(function(h){ var o = document.createElement('option'); o.value = h[1]; o.textContent = h[0]+'时'; hSel.appendChild(o); });
+    }
+  }
+
+  function saveNewPatient(){
+    var name = (document.getElementById('np-name') || {}).value || '';
+    if(!name){ showToast('请填写姓名', 'warning'); return; }
+    var pt = {
+      id: Date.now(),
+      name: name,
+      gender: (document.getElementById('np-gender') || {}).value || '',
+      age: (document.getElementById('np-age') || {}).value || '',
+      phone: (document.getElementById('np-phone') || {}).value || '',
+      chief: (document.getElementById('np-chief') || {}).value || '',
+      bazi: {
+        y: (document.getElementById('np-byear') || {}).value || '',
+        m: (document.getElementById('np-bmonth') || {}).value || '',
+        d: (document.getElementById('np-bday') || {}).value || '',
+        h: (document.getElementById('np-bhour') || {}).value || ''
+      },
+      createdAt: new Date().toISOString()
+    };
+    var list = [];
+    try { list = JSON.parse(localStorage.getItem('mlbj_doctor_patients') || '[]'); } catch(e) {}
+    list.unshift(pt);
+    localStorage.setItem('mlbj_doctor_patients', JSON.stringify(list.slice(0, 100)));
+    // 清空表单
+    ['np-name','np-age','np-phone','np-chief'].forEach(function(id){ var el = document.getElementById(id); if(el) el.value = ''; });
+    document.getElementById('wz-new-patient-form').style.display = 'none';
+    // 刷新列表
+    loadPatientList();
+    // 自动选中
+    selectPatient(pt.id, pt.name);
+    showToast('✅ 患者已保存: ' + name);
+  }
+
+  // ===== 医嘱模板 =====
+  function insertTemplate(type){
+    var textarea = document.getElementById('wz-voice-text');
+    if(!textarea) return;
+    var templates = {
+      prescription: '\n【处方医嘱】\n1. 方剂：________\n2. 用法：每日一剂，水煎服，早晚分服\n3. 疗程：7剂\n4. 禁忌：忌辛辣生冷\n',
+      lifestyle: '\n【调养建议】\n1. 起居：早睡早起，避免熬夜\n2. 饮食：清淡为主，少油少盐\n3. 运动：适量有氧运动，每日30分钟\n4. 情志：保持心情舒畅，避免暴怒\n',
+      followup: '\n【复诊安排】\n复诊时间：____年__月__日\n复诊目的：观察疗效，调整方剂\n注意事项：复诊前空腹，带上次处方\n',
+      warning: '\n【注意事项】\n⚠️ 如出现以下情况请立即就医：\n1. 持续高热不退\n2. 剧烈疼痛加剧\n3. 呼吸困难\n4. 意识改变\n本方案为辅助调理，不可替代正规治疗\n'
+    };
+    var text = templates[type] || '';
+    textarea.value += text;
+    textarea.focus();
+    textarea.scrollTop = textarea.scrollHeight;
+  }
+
+  // ===== 病例详情查看 =====
+  function showCaseDetail(idx){
+    var history = [];
+    try { history = JSON.parse(localStorage.getItem('wz_diagnosis_history') || '[]'); } catch(e) {}
+    if(idx < 0 || idx >= history.length) return;
+    var h = history[idx];
+    var modal = document.getElementById('wz-case-detail-modal');
+    var body = document.getElementById('wz-case-detail-body');
+    if(!modal || !body) return;
+    var time = h.timestamp ? new Date(h.timestamp).toLocaleString('zh-CN') : '';
+    var html = '<div style="font-size:16px;color:#c9a84c;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.2)">📋 病例详情</div>';
+    html += '<div style="font-size:12px;color:#a09888;margin-bottom:8px">时间：' + time + '</div>';
+    if(h.patient_name) html += '<div style="font-size:12px;color:#63b3ed;margin-bottom:8px">患者：' + h.patient_name + '</div>';
+    if(h.diagnosis_text) html += '<div style="font-size:12px;margin-bottom:10px"><b style="color:#e8e0d0">望诊诊断：</b><br>' + h.diagnosis_text.replace(/\n/g,'<br>') + '</div>';
+    if(h.ai_analysis) html += '<div style="font-size:12px;margin-bottom:10px"><b style="color:#e8e0d0">AI分析：</b><br>' + h.ai_analysis.replace(/\n/g,'<br>') + '</div>';
+    if(h.voice_notes) html += '<div style="font-size:12px;margin-bottom:10px"><b style="color:#e8e0d0">医嘱记录：</b><br>' + h.voice_notes.replace(/\n/g,'<br>') + '</div>';
+    html += '<button class="btn btn-secondary" onclick="window.wangzhenClinical.exportCase(' + idx + ')" style="margin-top:8px">📥 导出此病例</button>';
+    body.innerHTML = html;
+    modal.style.display = 'flex';
+  }
+
+  function exportCase(idx){
+    var history = [];
+    try { history = JSON.parse(localStorage.getItem('wz_diagnosis_history') || '[]'); } catch(e) {}
+    if(idx < 0 || idx >= history.length) return;
+    var h = history[idx];
+    var text = '命理宝鉴 · 望诊病例\n\n';
+    text += '时间：' + (h.timestamp ? new Date(h.timestamp).toLocaleString('zh-CN') : '') + '\n';
+    if(h.patient_name) text += '患者：' + h.patient_name + '\n';
+    if(h.diagnosis_text) text += '\n【望诊诊断】\n' + h.diagnosis_text + '\n';
+    if(h.ai_analysis) text += '\n【AI分析】\n' + h.ai_analysis + '\n';
+    if(h.voice_notes) text += '\n【医嘱记录】\n' + h.voice_notes + '\n';
+    text += '\n═══ 本报告仅为辅助诊断参考 ═══\n';
+    var blob = new Blob([text], {type: 'text/plain;charset=utf-8'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '病例_' + (h.patient_name || 'unknown') + '_' + (h.timestamp||'').substring(0,10) + '.txt';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    showToast('✅ 病例已导出');
+  }
+
   var currentPatient = null;
 
   function loadPatientList(){
@@ -315,20 +426,33 @@
     var container = document.getElementById('wz-paipan-result');
     if(!container) return;
     var d = data.data || data;
+    // 兼容多种 API 返回格式
+    var dayMaster = d.day_master || d.dayMaster || d.gan_zhi_day || '';
+    var wuxing = d.wuxing || d.wu_xing || d.elements || '';
+    var xiYong = d.xi_yong || d.xiYong || d.favorable || '';
+    var siZhu = d.siju || d.si_zhu || d.four_pillars || d.bazi || '';
+    var zodiac = d.zodiac || d.sheng_xiao || '';
+    
+    // 如果 API 返回字符串格式
+    if(typeof d === 'string') { container.innerHTML = '<pre style="font-size:11px;white-space:pre-wrap">'+d+'</pre>'; return; }
+    
     var html = '';
-    if(d.day_master){
-      html += '<div class="pd-row"><span>日主</span><b>'+d.day_master+'</b></div>';
+    if(siZhu) html += '<div class="pd-row"><span>四柱</span><b>' + (typeof siZhu === 'string' ? siZhu : JSON.stringify(siZhu).replace(/[{"}]/g,' ')) + '</b></div>';
+    if(dayMaster) html += '<div class="pd-row"><span>日主</span><b>' + dayMaster + '</b></div>';
+    if(wuxing){
+      var wstr = typeof wuxing === 'object' ? Object.keys(wuxing).map(function(k){ return k+':'+wuxing[k]; }).join(' ') : String(wuxing);
+      html += '<div class="pd-row"><span>五行</span><b>' + wstr + '</b></div>';
     }
-    if(d.wuxing){
-      html += '<div class="pd-row"><span>五行</span><b>'+JSON.stringify(d.wuxing).replace(/[{}"]/g,' ')+'</b></div>';
-    }
-    if(d.xi_yong){
-      html += '<div class="pd-row"><span>喜用</span><b>'+d.xi_yong+'</b></div>';
-    }
-    if(d.siju){
-      html += '<div class="pd-row"><span>四柱</span><b>'+d.siju+'</b></div>';
-    }
+    if(xiYong) html += '<div class="pd-row"><span>喜用</span><b style="color:#10b981">' + xiYong + '</b></div>';
+    if(zodiac) html += '<div class="pd-row"><span>生肖</span><b>' + zodiac + '</b></div>';
     container.innerHTML = html || '<span class="muted">排盘结果将显示在此</span>';
+    
+    // 保存到 currentPatient
+    if(currentPatient){
+      currentPatient.dayMaster = dayMaster;
+      currentPatient.wuxing = wuxing;
+      currentPatient.xiYong = xiYong;
+    }
   }
 
   // ===== 保存诊断到病例 =====
@@ -380,8 +504,9 @@
       return;
     }
     var html = '';
-    patientCases.forEach(function(h){
-      html += '<div class="wz-case-item">';
+    patientCases.forEach(function(h, i){
+      var realIdx = history.indexOf(h);
+      html += '<div class="wz-case-item" onclick="window.wangzhenClinical.showCaseDetail(' + realIdx + ')" style="cursor:pointer">';
       html += '<div class="wz-case-date">'+(h.timestamp||'').substring(0,16)+'</div>';
       html += '<div class="wz-case-text">'+(h.diagnosis_text||'').substring(0,80)+'...</div>';
       html += '</div>';
@@ -432,6 +557,7 @@
       if(voiceText) win.document.write('<div class="section"><div class="section-title">医嘱记录</div>'+voiceText.replace(/\n/g,'<br>')+'</div>');
       win.document.write('<div class="disclaimer">⚠️ 本报告仅为中医面诊辅助筛查参考，不替代医院专业检查。高危信号请及时就医。</div>');
       win.document.write('<button class="no-print" onclick="window.print()" style="margin:20px auto;display:block;padding:10px 30px;font-size:14px;cursor:pointer">🖨️ 打印</button>');
+      win.document.write('<div style="margin:16px 0;text-align:center"><button onclick="window.print()" style="padding:10px 30px;font-size:14px;cursor:pointer;border:1px solid #c9a84c;background:#c9a84c;color:#fff;border-radius:6px">🖨️ 打印报告</button> <button onclick="window.close()" style="padding:10px 20px;font-size:14px;cursor:pointer;border:1px solid #ddd;background:#fff;color:#333;border-radius:6px">关闭</button></div>');
       win.document.write('</body></html>');
       win.document.close();
     } else {
@@ -479,7 +605,10 @@
       crossAnalysis += '【八字格局】\n' + paipanText + '\n\n';
 
       // 简单交叉规则
-      if(diagnosisText.indexOf('心') >= 0 && paipanText.indexOf('火') >= 0){
+      // 扩充命相同参规则（12条）
+    var organText = diagnosisText;
+    var baziText = paipanText + (paipanText.indexOf('八字格局') >= 0 ? '' : '');
+    if(organText.indexOf('心') >= 0 && baziText.indexOf('火') >= 0){
         crossAnalysis += '⚠️ 面相心区异常 + 八字火旺 → 心血管风险倍增，建议心电图\n';
       }
       if(diagnosisText.indexOf('肝') >= 0 && paipanText.indexOf('木') >= 0){
@@ -493,6 +622,28 @@
       }
       if(diagnosisText.indexOf('肺') >= 0 && paipanText.indexOf('金') >= 0){
         crossAnalysis += '📍 面相肺区异常 + 八字金旺 → 肺气壅滞，注意呼吸\n';
+      }
+      // 扩充规则
+      if(organText.indexOf('脾') >= 0 && organText.indexOf('湿') >= 0){
+        crossAnalysis += '📍 面相脾区湿象 + 脾虚 → 痰湿内蕴，健脾化湿\n';
+      }
+      if(organText.indexOf('肝') >= 0 && organText.indexOf('郁') >= 0){
+        crossAnalysis += '📍 面相肝区郁象 + 肝郁 → 气滞血瘀，疏肝理气\n';
+      }
+      if(organText.indexOf('肾') >= 0 && organText.indexOf('寒') >= 0){
+        crossAnalysis += '📍 面相肾区寒象 + 肾阳虚 → 命门火衰，温补肾阳\n';
+      }
+      if(organText.indexOf('心') >= 0 && organText.indexOf('失眠') >= 0){
+        crossAnalysis += '📍 面相心区异常 + 心火扰神 → 心肾不交，交通心肾\n';
+      }
+      if(organText.indexOf('胃') >= 0 && organText.indexOf('热') >= 0){
+        crossAnalysis += '📍 面相胃区热象 + 胃火 → 胃热炽盛，清胃泻火\n';
+      }
+      if(organText.indexOf('大肠') >= 0 && organText.indexOf('便秘') >= 0){
+        crossAnalysis += '📍 面相大肠区异常 + 肠燥 → 津亏便秘，润肠通便\n';
+      }
+      if(organText.indexOf('胆') >= 0 && organText.indexOf('结') >= 0){
+        crossAnalysis += '⚠️ 面相胆区结节 + 胆结石风险 → 建议B超确诊\n';
       }
     } else {
       crossAnalysis += '⚠️ 未输入八字数据，仅面相分析\n请先排盘后再做命相同参\n';
@@ -538,6 +689,11 @@
       if(capEl) capEl.textContent = caps.length > 0 ? '✅ 已启用: ' + caps.join(' ') : '⚠️ 浏览器能力受限';
     },
 
+    toggleNewPatientForm: toggleNewPatientForm,
+    saveNewPatient: saveNewPatient,
+    insertTemplate: insertTemplate,
+    showCaseDetail: showCaseDetail,
+    exportCase: exportCase,
     selectPatient: selectPatient,
     startCamera: startCamera,
     stopCamera: stopCamera,
