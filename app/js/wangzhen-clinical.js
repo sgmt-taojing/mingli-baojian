@@ -476,32 +476,96 @@
     var container = document.getElementById('wz-paipan-result');
     if(!container) return;
     var d = data.data || data;
-    // 兼容多种 API 返回格式
-    var dayMaster = d.day_master || d.dayMaster || d.gan_zhi_day || '';
-    var wuxing = d.wuxing || d.wu_xing || d.elements || '';
-    var xiYong = d.xi_yong || d.xiYong || d.favorable || '';
-    var siZhu = d.siju || d.si_zhu || d.four_pillars || d.bazi || '';
-    var zodiac = d.zodiac || d.sheng_xiao || '';
+    if(d.error){ container.innerHTML = '<span class="muted" style="color:#f87171">⚠️ '+d.error+'</span>'; return; }
     
-    // 如果 API 返回字符串格式
-    if(typeof d === 'string') { container.innerHTML = '<pre style="font-size:11px;white-space:pre-wrap">'+d+'</pre>'; return; }
+    var pillars = d.pillars || {};
+    var dm = d.day_master || '';
+    var wxScore = d.wuxing_score || {};
+    var wxCount = d.wuxing_count || {};
+    var wxLack = d.wuxing_lack || [];
+    var xiao = d.input ? (d.input.shengxiao || '') : '';
+    var lunar = d.input ? (d.input.lunar || '') : '';
+    var nayin = d.nayin || {};
+    var shensha = d.shensha || {};
+    var dayun = d.dayun || [];
+    var zhiRel = d.zhi_relations || {};
+    var ganRel = d.gan_relations || {};
     
     var html = '';
-    if(siZhu) html += '<div class="pd-row"><span>四柱</span><b>' + (typeof siZhu === 'string' ? siZhu : JSON.stringify(siZhu).replace(/[{"}]/g,' ')) + '</b></div>';
-    if(dayMaster) html += '<div class="pd-row"><span>日主</span><b>' + dayMaster + '</b></div>';
-    if(wuxing){
-      var wstr = typeof wuxing === 'object' ? Object.keys(wuxing).map(function(k){ return k+':'+wuxing[k]; }).join(' ') : String(wuxing);
-      html += '<div class="pd-row"><span>五行</span><b>' + wstr + '</b></div>';
+    
+    // 四柱
+    html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:8px">';
+    ['年','月','日','时'].forEach(function(pos){
+      var p = pillars[pos] || '--';
+      var ny = nayin[pos] || '';
+      html += '<div style="text-align:center;padding:6px 4px;border:1px solid var(--wz-border);border-radius:4px;background:rgba(201,168,76,.06)">';
+      html += '<div style="font-size:10px;color:var(--wz-paper3)">'+pos+'柱</div>';
+      html += '<div style="font-size:16px;color:var(--wz-gold);font-weight:700;margin:2px 0">'+p+'</div>';
+      if(ny) html += '<div style="font-size:9px;color:var(--wz-paper3)">'+ny+'</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+    
+    // 日主
+    if(dm){
+      html += '<div class="pd-row"><span>日主</span><b style="color:var(--wz-gold);font-size:14px">'+dm+'</b></div>';
     }
-    if(xiYong) html += '<div class="pd-row"><span>喜用</span><b style="color:#10b981">' + xiYong + '</b></div>';
-    if(zodiac) html += '<div class="pd-row"><span>生肖</span><b>' + zodiac + '</b></div>';
-    container.innerHTML = html || '<span class="muted">排盘结果将显示在此</span>';
+    
+    // 五行得分
+    var wxStr = Object.keys(wxScore).map(function(k){ return k+':'+wxScore[k]; }).join(' ');
+    if(wxStr) html += '<div class="pd-row"><span>五行</span><b>'+wxStr+'</b></div>';
+    
+    // 五行缺失
+    if(wxLack.length > 0){
+      html += '<div class="pd-row"><span>缺失</span><b style="color:#f87171">'+wxLack.join('、')+'</b></div>';
+    }
+    
+    // 同异党
+    if(d.tong_dang) html += '<div class="pd-row"><span>同党</span><b>'+d.tong_dang+'</b></div>';
+    if(d.yi_dang) html += '<div class="pd-row"><span>异党</span><b>'+d.yi_dang+'</b></div>';
+    
+    // 生肖
+    if(xiao) html += '<div class="pd-row"><span>生肖</span><b>'+xiao+'</b></div>';
+    if(lunar) html += '<div class="pd-row"><span>农历</span><b style="font-size:11px">'+lunar+'</b></div>';
+    
+    // 神煞
+    var ssKeys = Object.keys(shensha);
+    if(ssKeys.length > 0){
+      var ssStr = ssKeys.map(function(k){ return k+'('+shensha[k].join(',')+')'; }).join(' ');
+      html += '<div class="pd-row"><span>神煞</span><b style="font-size:10px;color:var(--wz-jade)">'+ssStr+'</b></div>';
+    }
+    
+    // 地支关系
+    var relKeys = Object.keys(zhiRel);
+    if(relKeys.length > 0){
+      var relStr = relKeys.map(function(k){ return k+': '+zhiRel[k].join('; '); }).join(' ');
+      html += '<div class="pd-row"><span>地支</span><b style="font-size:10px;color:var(--wz-cyan)">'+relStr+'</b></div>';
+    }
+    
+    // 大运（前5步）
+    if(dayun.length > 0){
+      html += '<div style="margin-top:6px"><span style="font-size:11px;color:var(--wz-paper3)">大运</span></div>';
+      html += '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">';
+      dayun.slice(0, 5).forEach(function(dy){
+        var age = dy.start_age || dy.age || '';
+        var ganZhi = dy.gan_zhi || dy.gz || '';
+        html += '<div style="padding:3px 8px;border:1px solid var(--wz-border);border-radius:4px;font-size:10px;text-align:center">';
+        html += '<div style="color:var(--wz-paper3)">'+age+'岁</div>';
+        html += '<div style="color:var(--wz-gold);font-weight:600">'+ganZhi+'</div>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    
+    container.innerHTML = html;
     
     // 保存到 currentPatient
     if(currentPatient){
-      currentPatient.dayMaster = dayMaster;
-      currentPatient.wuxing = wuxing;
-      currentPatient.xiYong = xiYong;
+      currentPatient.dayMaster = dm;
+      currentPatient.wuxing = wxScore;
+      currentPatient.wuxingLack = wxLack;
+      currentPatient.pillars = pillars;
+      currentPatient.zodiac = xiao;
     }
   }
 
