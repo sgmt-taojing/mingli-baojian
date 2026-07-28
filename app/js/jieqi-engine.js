@@ -238,11 +238,21 @@ var JieqiEngine = {
   /**
    * 完整排四柱（天文节气精确版）
    */
-  getFourPillars: function(year, month, day, hour){
+  getFourPillars: function(year, month, day, hour, ziSect){
     if(hour === undefined) hour = 0;
+    // ziSect: 1=晚子时(23点)换日(次日日干), 2=不换日(当日日干, lunar_python 默认)
+    if(ziSect === undefined) ziSect = 1; // 默认晚子换日（五鼠遁标准）
+    var effectiveYear = year, effectiveMonth = month, effectiveDay = day;
+    if(hour === 23 && ziSect === 1){
+      // 晚子时换日：23时用次日日干
+      var tomorrow = new Date(year, month-1, day+1);
+      effectiveYear = tomorrow.getFullYear();
+      effectiveMonth = tomorrow.getMonth()+1;
+      effectiveDay = tomorrow.getDate();
+    }
     var yp = this.getYearPillar(year, month, day, hour);
     var mp = this.getMonthPillar(year, month, day, hour);
-    var dp = this.getDayPillar(year, month, day);
+    var dp = this.getDayPillar(effectiveYear, effectiveMonth, effectiveDay);
     var hp = this.getHourPillar(dp.gan, hour);
     var mb = this.getMonthBranch(year, month, day, hour);
     var lichun = this.getJieqiDate(year, '立春');
@@ -258,6 +268,7 @@ var JieqiEngine = {
       monthJie: mb.jieName || '',
       liChunBoundary: isLichunBoundary,
       solarYear: mb.solarYear,
+      ziSect: ziSect,
       source: '紫金山天文台历表'
     };
   },
