@@ -974,6 +974,7 @@ function renderWeeklyStats(){
       el('th', {className:'ws-avg'}, '均值'),
       el('th', {className:'ws-min'}, '最低'),
       el('th', {className:'ws-max'}, '最高'),
+      el('th', {className:'ws-spark-h'}, '趋势图'),
       el('th', {className:'ws-trend'}, '趋势')
     )
   );
@@ -1002,6 +1003,71 @@ function renderWeeklyStats(){
     row.appendChild(el('td', {className:'ws-avg'}, r.fmt(r.avg)));
     row.appendChild(el('td', {className:'ws-min'}, r.fmt(r.min)));
     row.appendChild(el('td', {className:'ws-max'}, r.fmt(r.max)));
+    // sparkline cell
+    if (r.vals.length >= 2){
+      const sparkW = 80, sparkH = 24;
+      const sparkSvg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+      sparkSvg.setAttribute('class','ws-spark-svg');
+      sparkSvg.setAttribute('viewBox',`0 0 ${sparkW} ${sparkH}`);
+      sparkSvg.setAttribute('width',sparkW);
+      sparkSvg.setAttribute('height',sparkH);
+      const vMin = Math.min(...r.vals.filter(v => v != null));
+      const vMax = Math.max(...r.vals.filter(v => v != null));
+      const vPad = (vMax - vMin) < 0.0001 ? 1 : (vMax - vMin) * 0.2;
+      const lo = vMin - vPad, hi = vMax + vPad;
+      const sx = i => 4 + (i * (sparkW - 8)) / Math.max(1, r.vals.length - 1);
+      const sy = v => 4 + (sparkH - 8) - ((v - lo) / (hi - lo)) * (sparkH - 8);
+      let pathD = '';
+      const pts = [];
+      r.vals.forEach((v, i) => {
+        if (v == null) return;
+        const x = sx(i), y = sy(v);
+        pts.push({x, y, v});
+        pathD += (pts.length === 1 ? 'M' : ' L') + ` ${x.toFixed(1)} ${y.toFixed(1)}`;
+      });
+      // area fill
+      if (pts.length >= 2){
+        const areaD = pathD + ` L ${pts[pts.length-1].x.toFixed(1)} ${sparkH-2} L ${pts[0].x.toFixed(1)} ${sparkH-2} Z`;
+        const area = document.createElementNS('http://www.w3.org/2000/svg','path');
+        area.setAttribute('d', areaD);
+        const sparkColor = r.trend === '↑' ? (r.invert ? '#ef4444' : '#10b981')
+                         : r.trend === '↓' ? (r.invert ? '#10b981' : '#ef4444')
+                         : '#94a3b8';
+        area.setAttribute('fill', sparkColor);
+        area.setAttribute('opacity','0.12');
+        sparkSvg.appendChild(area);
+      }
+      // line
+      if (pathD){
+        const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+        path.setAttribute('d', pathD);
+        const lineColor = r.trend === '↑' ? (r.invert ? '#ef4444' : '#10b981')
+                        : r.trend === '↓' ? (r.invert ? '#10b981' : '#ef4444')
+                        : '#94a3b8';
+        path.setAttribute('fill','none');
+        path.setAttribute('stroke', lineColor);
+        path.setAttribute('stroke-width','1.5');
+        path.setAttribute('stroke-linejoin','round');
+        path.setAttribute('stroke-linecap','round');
+        sparkSvg.appendChild(path);
+      }
+      // last point dot
+      if (pts.length){
+        const last = pts[pts.length - 1];
+        const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+        dot.setAttribute('cx', last.x);
+        dot.setAttribute('cy', last.y);
+        dot.setAttribute('r','2.5');
+        const dotColor = r.trend === '↑' ? (r.invert ? '#ef4444' : '#10b981')
+                       : r.trend === '↓' ? (r.invert ? '#10b981' : '#ef4444')
+                       : '#94a3b8';
+        dot.setAttribute('fill', dotColor);
+        sparkSvg.appendChild(dot);
+      }
+      row.appendChild(el('td', {className:'ws-spark'}, sparkSvg));
+    } else {
+      row.appendChild(el('td', {className:'ws-spark ws-spark-empty'}, ''));
+    }
     // trend with color
     const trendCls = r.trend === '↑' ? (r.invert ? 'trend-bad' : 'trend-good')
                    : r.trend === '↓' ? (r.invert ? 'trend-good' : 'trend-bad')
