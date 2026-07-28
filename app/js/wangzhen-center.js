@@ -605,6 +605,8 @@
       var results = runZoneDiagnose(zoneId, selectedFeatures);
       var panel = document.getElementById('wangzhen-result-panel');
       if(panel) renderResults(panel, results);
+      // 通知临床工作台完成步骤3
+      if(window.wangzhenClinical && window.wangzhenClinical.completeStep){ window.wangzhenClinical.completeStep(3); }
       // 保存到历史
       saveDiagnosisHistory(zoneId, selectedFeatures, results);
     },

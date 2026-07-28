@@ -123,6 +123,54 @@
     showToast('✅ 病例已导出');
   }
 
+
+  // ===== 步骤引导管理 =====
+  var currentStep = 1;
+  var completedSteps = {};
+
+  function goStep(step){
+    currentStep = step;
+    updateStepper();
+    // 滚动到对应区域
+    var targets = { 1: '.wz-layout aside', 2: '#wz-camera-video', 3: '#wangzhen-zone-map', 4: '.wz-mingxiang-section', 5: '#wz-saved-cases' };
+    var sel = targets[step];
+    if(sel){
+      var el = document.querySelector(sel);
+      if(el){
+        if(el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // 闪烁高亮
+        el.style.transition = 'box-shadow .3s';
+        el.style.boxShadow = '0 0 0 2px var(--wz-gold)';
+        setTimeout(function(){ el.style.boxShadow = ''; }, 2000);
+      }
+    }
+  }
+
+  function completeStep(step){
+    completedSteps[step] = true;
+    updateStepper();
+    // 自动跳到下一步
+    if(step < 5){
+      setTimeout(function(){ goStep(step + 1); }, 500);
+    }
+  }
+
+  function updateStepper(){
+    var steps = document.querySelectorAll('.wz-step');
+    steps.forEach(function(s){
+      var n = parseInt(s.dataset.step);
+      s.classList.toggle('active', n === currentStep);
+      s.classList.toggle('done', !!completedSteps[n]);
+      if(completedSteps[n]){
+        var num = s.querySelector('.wz-step-num');
+        if(num) num.textContent = '✓';
+      } else {
+        var num2 = s.querySelector('.wz-step-num');
+        if(num2) num2.textContent = n;
+      }
+    });
+  }
+
   var currentPatient = null;
 
   function loadPatientList(){
@@ -196,6 +244,7 @@
       window.wangzhenClinical.fetchBazi();
     }
     showToast('已选择患者: ' + p.name);
+    completeStep(1);
   }
 
   // ===== 摄像头采集 =====
@@ -254,6 +303,7 @@
 
     // 发送到 face-ocr-server 分析
     analyzeFace(dataUrl);
+    completeStep(2);
   }
 
   function analyzeFace(dataUrl){
@@ -480,6 +530,7 @@
     };
     saveToLocal(payload);
     showToast('✅ 诊断已保存');
+    completeStep(5);
     renderSavedCases(payload.patient_id);
   }
 
@@ -674,6 +725,7 @@
 
     // TTS 播报关键发现
     speakText('命相同参分析完成，请查看结果');
+    completeStep(4);
   }
 
   // ===== 暴露 API =====
@@ -689,6 +741,8 @@
       if(capEl) capEl.textContent = caps.length > 0 ? '✅ 已启用: ' + caps.join(' ') : '⚠️ 浏览器能力受限';
     },
 
+    goStep: goStep,
+    completeStep: completeStep,
     toggleNewPatientForm: toggleNewPatientForm,
     saveNewPatient: saveNewPatient,
     insertTemplate: insertTemplate,

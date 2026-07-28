@@ -21,6 +21,18 @@
     .wz-topbar .nav-back{font-size:12px;color:var(--wz-paper3);text-decoration:none;padding:4px 10px;border:1px solid var(--wz-border);border-radius:6px}
     .wz-topbar .nav-back:hover{color:var(--wz-paper)}
     .wz-capabilities{font-size:11px;color:var(--wz-jade)}
+    .wz-stepper{display:flex;align-items:center;gap:4px;margin-top:8px;flex-wrap:wrap}
+    .wz-step{display:flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--wz-border);border-radius:8px;cursor:pointer;transition:.2s;background:var(--wz-card-bg)}
+    .wz-step:hover{border-color:var(--wz-gold)}
+    .wz-step.active{border-color:var(--wz-gold);background:rgba(201,168,76,.12);box-shadow:0 0 0 1px rgba(201,168,76,.3)}
+    .wz-step.done{border-color:var(--wz-jade);background:rgba(16,185,129,.08)}
+    .wz-step.done .wz-step-num{background:var(--wz-jade);color:#0a0e17}
+    .wz-step-num{display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:rgba(201,168,76,.2);color:var(--wz-gold);font-weight:700;font-size:12px;flex-shrink:0}
+    .wz-step.active .wz-step-num{background:var(--wz-gold);color:#0a0e17}
+    .wz-step-text{display:flex;flex-direction:column;font-size:11px;line-height:1.3}
+    .wz-step-text b{color:var(--wz-paper)}
+    .wz-step-text span{color:var(--wz-paper3);font-size:10px}
+    .wz-step-arrow{color:var(--wz-paper3);font-size:14px;margin:0 2px}
 
     /* 布局 */
     .wz-layout{display:grid;grid-template-columns:260px 1fr 280px;gap:12px;max-width:1400px;margin:0 auto}
@@ -37,6 +49,7 @@
     .wz-patient-name{font-size:13px;color:var(--wz-paper);margin-bottom:2px}
     .wz-patient-tag{font-size:10px;padding:1px 6px;border-radius:3px;background:rgba(201,168,76,.1);color:var(--wz-paper3);margin-right:4px}
     .wz-empty{font-size:12px;color:var(--wz-paper3);text-align:center;padding:12px}
+    .wz-step-tag{display:inline-block;font-size:9px;padding:1px 6px;border-radius:3px;background:var(--wz-gold);color:#0a0e17;font-weight:600;margin-right:4px}
     .pd-row{display:flex;justify-content:space-between;padding:3px 0;font-size:12px;border-bottom:1px solid rgba(201,168,76,.06)}
     .pd-row span{color:var(--wz-paper3)}
     .pd-row b{color:var(--wz-paper);font-weight:600}
@@ -141,7 +154,32 @@
 <header class="wz-topbar">
   <div>
     <h1>🔍 望诊临床工作台</h1>
-    <div style="font-size:11px;color:var(--wz-paper3);margin-top:2px">摄像头采集 → AI面部分析 → 望诊诊断 → 命相同参 → 病例归档</div>
+    <div class="wz-stepper" id="wz-stepper">
+      <div class="wz-step active" data-step="1" onclick="window.wangzhenClinical.goStep(1)">
+        <div class="wz-step-num">1</div>
+        <div class="wz-step-text"><b>选患者</b><span>左栏点选或新建</span></div>
+      </div>
+      <div class="wz-step-arrow">→</div>
+      <div class="wz-step" data-step="2" onclick="window.wangzhenClinical.goStep(2)">
+        <div class="wz-step-num">2</div>
+        <div class="wz-step-text"><b>拍照采集</b><span>启动摄像头→拍照</span></div>
+      </div>
+      <div class="wz-step-arrow">→</div>
+      <div class="wz-step" data-step="3" onclick="window.wangzhenClinical.goStep(3)">
+        <div class="wz-step-num">3</div>
+        <div class="wz-step-text"><b>望诊诊断</b><span>选区域→选特征→诊断</span></div>
+      </div>
+      <div class="wz-step-arrow">→</div>
+      <div class="wz-step" data-step="4" onclick="window.wangzhenClinical.goStep(4)">
+        <div class="wz-step-num">4</div>
+        <div class="wz-step-text"><b>排盘+命相</b><span>八字→交叉分析</span></div>
+      </div>
+      <div class="wz-step-arrow">→</div>
+      <div class="wz-step" data-step="5" onclick="window.wangzhenClinical.goStep(5)">
+        <div class="wz-step-num">5</div>
+        <div class="wz-step-text"><b>保存报告</b><span>存病例→打印报告</span></div>
+      </div>
+    </div>
   </div>
   <div style="display:flex;gap:6px;align-items:center">
     <span id="wz-capabilities" class="wz-capabilities">⏳ 检测中...</span>
@@ -157,7 +195,7 @@
   <aside>
     <!-- 患者列表 -->
     <div class="wz-card">
-      <div class="wz-card-title">👥 患者管理 <span class="badge" id="wz-patient-count">0</span></div>
+      <div class="wz-card-title">👥 患者管理 <span class="wz-step-tag" data-for="1">步骤1</span> <span class="badge" id="wz-patient-count">0</span></div>
       <div id="wz-patient-list"></div>
       <div class="wz-btn-row">
         <button class="btn btn-ghost" onclick="window.wangzhenClinical.toggleNewPatientForm()">+ 新建患者</button>
@@ -202,7 +240,7 @@
   <main>
     <!-- 摄像头采集 -->
     <div class="wz-card">
-      <div class="wz-card-title">📷 面部采集 <span class="badge" id="wz-camera-status">未启动</span></div>
+      <div class="wz-card-title">📷 面部采集 <span class="wz-step-tag" data-for="2">步骤2</span> <span class="badge" id="wz-camera-status">未启动</span></div>
       <div class="wz-camera-section">
         <video id="wz-camera-video" class="wz-camera-video" autoplay playsinline></video>
         <canvas id="wz-camera-canvas" class="wz-camera-canvas"></canvas>
@@ -210,6 +248,7 @@
       </div>
       <div class="wz-btn-row">
         <button class="btn btn-primary" id="wz-btn-camera" onclick="window.wangzhenClinical.startCamera()">📷 启动摄像头</button>
+        <span style="font-size:10px;color:var(--wz-jade);margin-left:4px">← 点这里开始</span>
         <button class="btn btn-secondary" id="wz-btn-capture" onclick="window.wangzhenClinical.capturePhoto()" style="display:none">📸 拍照分析</button>
         <button class="btn btn-ghost" onclick="window.wangzhenClinical.stopCamera()">关闭</button>
       </div>
@@ -235,8 +274,8 @@
 
     <!-- 望诊诊断 -->
     <div class="wz-card">
-      <div class="wz-card-title">🔍 望诊诊断 <span class="badge" id="wz-kb-badge">KB 加载中</span></div>
-      <div style="font-size:11px;color:var(--wz-paper3);margin-bottom:6px">选择多个区域特征后点击诊断，系统汇总所有区域结果</div>
+      <div class="wz-card-title">🔍 望诊诊断 <span class="wz-step-tag" data-for="3">步骤3</span> <span class="badge" id="wz-kb-badge">KB 加载中</span></div>
+      <div style="font-size:11px;color:var(--wz-jade);margin-bottom:6px;padding:4px 8px;border-radius:4px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.15)">👆 操作：点击上方区域卡片选择面部区域 → 勾选对应特征 → 点「诊断此区域」</div>
       <div id="wz-multi-zone-summary" style="display:none;margin-bottom:8px;padding:6px 10px;border-radius:6px;background:rgba(201,168,76,.08);font-size:11px"></div>
 
       <!-- Tab -->
@@ -274,7 +313,7 @@
 
     <!-- 命相同参 -->
     <div class="wz-card wz-mingxiang-section">
-      <div class="wz-card-title">🧬 命相同参（面相×八字交叉）</div>
+      <div class="wz-card-title">🧬 命相同参（面相×八字交叉） <span class="wz-step-tag" data-for="4">步骤4</span></div>
       <div style="font-size:11px;color:var(--wz-paper3);margin-bottom:8px">路总理念：面相看活态，八字看格局，交叉验证最准</div>
       <button class="btn btn-primary" onclick="window.wangzhenClinical.runMingxiang()">🧬 开始交叉分析</button>
       <div id="wz-mingxiang-result"></div>
@@ -285,7 +324,7 @@
   <aside>
     <!-- 操作按钮 -->
     <div class="wz-card">
-      <div class="wz-card-title">📋 操作</div>
+      <div class="wz-card-title">📋 操作 <span class="wz-step-tag" data-for="5">步骤5</span></div>
       <div class="wz-btn-row" style="flex-direction:column">
         <button class="btn btn-primary" onclick="window.wangzhenClinical.saveDiagnosis()">💾 保存诊断到病例</button>
         <button class="btn btn-secondary" onclick="window.wangzhenClinical.generateReport()">🖨️ 生成报告</button>
