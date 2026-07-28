@@ -1843,6 +1843,8 @@ async function callAI(q){
           hist.push({role:'assistant', content: fullReply.substring(0,500)});
           if (hist.length > 20) hist = hist.slice(-20);
           if (typeof recordKbHit === 'function') recordKbHit(state.module || 'freechat', best.score, true);
+          // R102: 异步回写 hit_count 到后端 DB
+          try{fetch((location.hostname==='127.0.0.1'||location.hostname==='localhost'?'http://127.0.0.1:8920':'')+'/api/ai/kb-hit-batch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({entries:[best.entryId].filter(Boolean)})}).catch(function(){})}catch(e){}
           try{ _updateTopicCard(); }catch(e){console.warn("报告降级:",e.message);}
           try { recordKbEngine('kb-fastpath'); } catch(e) {}
           return;
