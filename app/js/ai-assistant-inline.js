@@ -2741,15 +2741,62 @@ function _getUnifiedReport(modId,data){
     var hI2=tg.indexOf(dS);
     var hS=tg[(hI2*2+hI)%10];
     var tianpan=[yS+yB,mS+mB,dS+dB,hS+hB];
-    // 课体简化判断
-    var keTi='贼克课(用神受克，不利)';
+    // 真实六壬：月将加占时定天盘
+    // 月将：雨水后用亥将，春分后用戌将...每月一将
+    var yueJiangMap=['亥','戌','酉','申','未','午','巳','辰','卯','寅','丑','子']; // 雨水后起亥
+    var jieQiIdx=Math.floor((mn-1)*2+(dy>=15?1:0)); // 节气序号
+    var yueJiang=yueJiangMap[jieQiIdx%12];
+    // 天盘=月将加占时：月将所在宫+时支→天盘地支
+    var dzOrder=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+    var yueJiangIdx=dzOrder.indexOf(yueJiang);
+    var shiIdx=dzOrder.indexOf(hB);
+    // 天盘十二地支：从月将起，加占时定位
+    var tianPanDz=[];
+    for(var ti=0;ti<12;ti++){
+      tianPanDz[ti]=dzOrder[(yueJiangIdx- shiIdx+ti+12)%12];
+    }
+    // 正确：天盘地支 = 地盘(月将+时支偏移)
+    // 天盘第N位 = 地盘第(N+月将-时支)位
+    // 即：天盘子位 = 地盘(月将+时支)位
+    // 简化：天盘 = 地盘旋转(时支-月将)
+    var tianOffset=(shiIdx-yueJiangIdx+12)%12;
+    // 四课：日干寄宫+日支上神
+    // 日干寄宫：甲→寅,乙→辰,丙→巳,丁→未,戊→巳,己→未,庚→申,辛→戌,壬→亥,癸→丑
+    var ganGong={'甲':'寅','乙':'辰','丙':'巳','丁':'未','戊':'巳','己':'未','庚':'申','辛':'戌','壬':'亥','癸':'丑'};
+    var riGanGong=ganGong[dS]||'寅';
+    var riGanGongIdx=dzOrder.indexOf(riGanGong);
+    // 天盘上神=天盘该宫位的地支
+    var tianAtGan=tianPanDz?dzOrder[(riGanGongIdx+tianOffset)%12]:tianpan[2].slice(1);
+    var tianAtZhi=dzOrder[(dzOrder.indexOf(dB)+tianOffset)%12];
+    // 四课
+    var ke1=dS+tianAtGan; // 第一课：日干+天盘上神
+    var ke2=tianAtGan+dzOrder[(dzOrder.indexOf(tianAtGan)+tianOffset)%12]; // 第二课
+    var ke3=dB+tianAtZhi; // 第三课：日支+天盘上神
+    var ke4=tianAtZhi+dzOrder[(dzOrder.indexOf(tianAtZhi)+tianOffset)%12]; // 第四课
+    // 三传：贼克法（初传取四课中受克最多的下神）
+    var wuxing={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水','子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+    var sheng={'木':'火','火':'土','土':'金','金':'水','水':'木'};
+    var ke4list=[[ke1.slice(0,1),ke1.slice(1)],[ke2.slice(0,1),ke2.slice(1)],[ke3.slice(0,1),ke3.slice(1)],[ke4.slice(0,1),ke4.slice(1)]];
+    // 找贼克：上克下为贼，下克上为克
+    var chuanList=[];
+    for(var ki=0;ki<4;ki++){
+      var up=ke4list[ki][1],down=ke4list[ki][0];
+      var upWx=wuxing[up]||'土',downWx=wuxing[down]||'土';
+      if(sheng[upWx]===downWx||sheng[downWx]===upWx){
+        chuanList.push(up);
+      }
+    }
+    var faYong=chuanList.length>0?chuanList[0]:(ke4list[3][1]||dB); // 初传
+    var zhongChuan=dzOrder[(dzOrder.indexOf(faYong)+tianOffset)%12]; // 中传
+    var moChuan=dzOrder[(dzOrder.indexOf(zhongChuan)+tianOffset)%12]; // 末传
+    // 课体判断
+    var keTi='贼克课';
     var keJi='中平';
-    if((dB==='寅'&&hB==='巳')||(dB==='巳'&&hB==='寅')){keTi='三光课(吉)';keJi='大吉';}
-    else if((dB==='辰'&&hB==='戌')||(dB==='戌'&&hB==='辰')){keTi='重阴课(中)';keJi='需化解';}
-    // 发用确定(简化版)
-    var faYong=dB;// 初传取日支上神
-    var zhongChuan=hB;// 中传取时支上神
-    var moChuan=tg[(tg.indexOf(dS)+tg.indexOf(faYong[0]||dS[0]))%10];// 末传
+    if(chuanList.length===1){keTi='重审课(下克上)';keJi='中吉';}
+    else if(chuanList.length===2){keTi='知一课(比用)';keJi='中平';}
+    else if(chuanList.length===3){keTi='涉害课';keJi='需详审';}
+    else if(chuanList.length===4){keTi='返吟课';keJi='多变';}
+    else if(chuanList.length===0){keTi='伏吟课';keJi='静守';}
     var lrR='━━━ 大六壬完整排盘报告 ━━━\n\n';
     lrR+='【起课时间】'+yr+'年'+mn+'月'+dy+'日 '+hr+'时\n';
     lrR+='【占卜人】'+lrSex+'｜【问事】'+lrAsk+'\n';
@@ -3159,41 +3206,72 @@ function _qimenCompute(y,mn,dy,hr,sex,ask){
   var juSet=isYangDun?yangJu[juPattern]:yinJu[juPattern];
   var ju=juSet[Math.min(juPos,2)]||1;
   var yd=isYangDun?'阳遁':'阴遁';
-  // 阳遁从局数宫起甲子戊，阴遁从局数宫起甲子戊逆布
-  var startPalace=ju;
-  // 值符星+值使门：根据时干支计算(简化)
-  var hourGanIndex=((hr%12)*2+(y%10))%10;
-  var zfStar=stars[hourGanIndex%8];var zhifuStar=zfStar;
-  var zsDoor=doors[hourGanIndex%8];
-  // 值符落宫=原局宫位(简化)
-  var zhifuPalace=starPalace[hourGanIndex%8];
-  var zhishiPalace=doorPalace[hourGanIndex%8];
-  // 用神宫位确定(按问事类型)
+  // 真实奇门转盘法
+  // 1. 六仪三奇排布：甲子戊→甲戌己→甲申庚→甲午辛→甲辰壬→甲寅癸→丁→丙→乙
+  var liuYi=['戊','己','庚','辛','壬','癸','丁','丙','乙'];
+  // 洛书九宫顺序（阳遁顺布）：从局数宫起戊，按1→8→3→4→9→2→7→6顺序
+  var luoShu=[1,8,3,4,9,2,7,6]; // 去掉中5
+  var tianPan={}; // 天盘六仪三奇
+  var diPan={1:'戊',8:'己',3:'庚',4:'辛',9:'壬',2:'癸',6:'丁',7:'丙'}; // 地盘固定（阳遁）
+  // 阴遁地盘逆布
+  if(!isYangDun){
+    diPan={1:'戊',6:'己',7:'庚',2:'辛',9:'壬',4:'癸',3:'丁',8:'丙'};
+  }
+  // 天盘：从局数宫起戊，阳遁顺布阴遁逆布
+  var tianOrder=isYangDun?[1,8,3,4,9,2,7,6]:[1,6,7,2,9,4,3,8];
+  for(var li=0;li<8;li++){
+    var tianGong=tianOrder[(li+ju-1)%8];
+    tianPan[tianGong]=liuYi[li];
+  }
+  // 中5宫寄坤2宫
+  tianPan[5]=tianPan[2]||'癸';
+  diPan[5]=diPan[2]||'癸';
+  // 2. 时辰旬首→值符值使
+  var ep3=new Date(1900,0,1),tg3=new Date(y,mn-1,dy);
+  var dd3=Math.floor((tg3-ep3)/86400000);
+  var dayGanIdx=((dd3%10)+10)%10;
+  var hourshiIdx=Math.floor((hr+1)/2)%12;
+  var hourGanIdx2=(dayGanIdx*2+hourshiIdx)%10; // 时干索引
+  // 旬首：甲子旬首=0, 甲戌旬首=10-6=4... 
+  var xunShou=Math.floor(hourGanIdx2/2)*2; // 简化：时干所在旬的甲干索引
+  // 值符=旬首所落宫的星，值使=旬首所落宫的门
+  var zhifuGongIdx=tianOrder[(xunShou+ju-1)%8]||1;
+  var zfStarIdx=starPalace.indexOf(zhifuGongIdx);
+  var zfStar=stars[zfStarIdx>=0?zfStarIdx:0];var zhifuStar=zfStar;
+  var zsDoorIdx=doorPalace.indexOf(zhifuGongIdx);
+  var zsDoor=doors[zsDoorIdx>=0?zsDoorIdx:0];
+  var zhifuPalace=zhifuGongIdx;
+  var zhishiPalace=zhifuGongIdx;
+  // 3. 九星/八门/八神随值符转动
+  // 值符随时干所在宫，值使随时支
+  var shiGanGong=1; // 时干戊所在宫（简化）
+  for(var gk in tianPan){if(tianPan[gk]===liuYi[hourGanIdx2%9]) shiGanGong=parseInt(gk);}
+  // 用神宫位
   var keyMap={'事业决策':6,'财运投资':8,'感情婚姻':4,'出行安全':1,'失物寻找':3,'官司诉讼':9,'健康吉凶':2,'其他':5};
   var keyPalace=keyMap[ask]||5;
-  // 排盘：构建每个宫位的天盘/地盘/九星/八门/八神
+  // 构建九宫
   var palaces={};
   var allGong=[1,2,3,4,5,6,7,8,9];
-  var starOffset=(startPalace-1);
-  var doorOffset=(startPalace-1);
-  var godOffset=(startPalace-1);
+  // 星/门/神按值符落宫旋转
+  var starRotate=starPalace.indexOf(zhifuPalace);
+  var doorRotate=doorPalace.indexOf(zhishiPalace);
   allGong.forEach(function(g){
-    var starIdx=(g-starOffset-1+8*9)%8;
-    var doorIdx=(g-doorOffset-1+8*9)%8;
-    var godIdx=(g-godOffset-1+8*9)%8;
+    var sIdx=(starPalace.indexOf(g)-starRotate+8)%8;
+    var dIdx=(doorPalace.indexOf(g)-doorRotate+8)%8;
+    var gIdx=sIdx; // 八神随值符
     palaces[g]={
       gongName:gongNames[g],
       trigram:trigrams[g],
       element:elements[g],
       direction:directions[g],
-      tian:diGan[g]||'—',
-      di:diGan[g]||'—',
-      star:stars[starIdx],
-      starNature:starNature[starIdx],
-      door:doors[doorIdx],
-      doorNature:doorNature[doorIdx],
-      god:gods[godIdx],
-      godNature:godNature[godIdx]
+      tian:tianPan[g]||diPan[g]||'—',
+      di:diPan[g]||'—',
+      star:stars[sIdx]||'—',
+      starNature:starNature[sIdx]||'中',
+      door:doors[dIdx]||'—',
+      doorNature:doorNature[dIdx]||'中',
+      god:gods[gIdx]||'—',
+      godNature:godNature[gIdx]||'中'
     };
   });
   // 关键宫位详情
@@ -3992,43 +4070,74 @@ function _qimenCompute(y,mn,dy,hr,sex,ask){
   var ju=juSet[Math.min(juPos,2)]||1;
   var yd=isYangDun?'阳遁':'阴遁';
   // 阳遁从局数宫起甲子戊，阴遁从局数宫起甲子戊逆布
-  var startPalace=ju;
-  // 值符星+值使门：根据时干支计算(简化)
-  var hourGanIndex=((hr%12)*2+(y%10))%10;
-  var zfStar=stars[hourGanIndex%8];var zhifuStar=zfStar;
-  var zsDoor=doors[hourGanIndex%8];
-  // 值符落宫=原局宫位(简化)
-  var zhifuPalace=starPalace[hourGanIndex%8];
-  var zhishiPalace=doorPalace[hourGanIndex%8];
-  // 用神宫位确定(按问事类型)
+    // 真实奇门转盘法
+  // 1. 六仪三奇排布：甲子戊→甲戌己→甲申庚→甲午辛→甲辰壬→甲寅癸→丁→丙→乙
+  var liuYi=['戊','己','庚','辛','壬','癸','丁','丙','乙'];
+  // 洛书九宫顺序（阳遁顺布）：从局数宫起戊，按1→8→3→4→9→2→7→6顺序
+  var luoShu=[1,8,3,4,9,2,7,6]; // 去掉中5
+  var tianPan={}; // 天盘六仪三奇
+  var diPan={1:'戊',8:'己',3:'庚',4:'辛',9:'壬',2:'癸',6:'丁',7:'丙'}; // 地盘固定（阳遁）
+  // 阴遁地盘逆布
+  if(!isYangDun){
+    diPan={1:'戊',6:'己',7:'庚',2:'辛',9:'壬',4:'癸',3:'丁',8:'丙'};
+  }
+  // 天盘：从局数宫起戊，阳遁顺布阴遁逆布
+  var tianOrder=isYangDun?[1,8,3,4,9,2,7,6]:[1,6,7,2,9,4,3,8];
+  for(var li=0;li<8;li++){
+    var tianGong=tianOrder[(li+ju-1)%8];
+    tianPan[tianGong]=liuYi[li];
+  }
+  // 中5宫寄坤2宫
+  tianPan[5]=tianPan[2]||'癸';
+  diPan[5]=diPan[2]||'癸';
+  // 2. 时辰旬首→值符值使
+  var ep3=new Date(1900,0,1),tg3=new Date(y,mn-1,dy);
+  var dd3=Math.floor((tg3-ep3)/86400000);
+  var dayGanIdx=((dd3%10)+10)%10;
+  var hourshiIdx=Math.floor((hr+1)/2)%12;
+  var hourGanIdx2=(dayGanIdx*2+hourshiIdx)%10; // 时干索引
+  // 旬首：甲子旬首=0, 甲戌旬首=10-6=4... 
+  var xunShou=Math.floor(hourGanIdx2/2)*2; // 简化：时干所在旬的甲干索引
+  // 值符=旬首所落宫的星，值使=旬首所落宫的门
+  var zhifuGongIdx=tianOrder[(xunShou+ju-1)%8]||1;
+  var zfStarIdx=starPalace.indexOf(zhifuGongIdx);
+  var zfStar=stars[zfStarIdx>=0?zfStarIdx:0];var zhifuStar=zfStar;
+  var zsDoorIdx=doorPalace.indexOf(zhifuGongIdx);
+  var zsDoor=doors[zsDoorIdx>=0?zsDoorIdx:0];
+  var zhifuPalace=zhifuGongIdx;
+  var zhishiPalace=zhifuGongIdx;
+  // 3. 九星/八门/八神随值符转动
+  // 值符随时干所在宫，值使随时支
+  var shiGanGong=1; // 时干戊所在宫（简化）
+  for(var gk in tianPan){if(tianPan[gk]===liuYi[hourGanIdx2%9]) shiGanGong=parseInt(gk);}
+  // 用神宫位
   var keyMap={'事业决策':6,'财运投资':8,'感情婚姻':4,'出行安全':1,'失物寻找':3,'官司诉讼':9,'健康吉凶':2,'其他':5};
   var keyPalace=keyMap[ask]||5;
-  // 排盘：构建每个宫位的天盘/地盘/九星/八门/八神
+  // 构建九宫
   var palaces={};
   var allGong=[1,2,3,4,5,6,7,8,9];
-  var starOffset=(startPalace-1);
-  var doorOffset=(startPalace-1);
-  var godOffset=(startPalace-1);
+  // 星/门/神按值符落宫旋转
+  var starRotate=starPalace.indexOf(zhifuPalace);
+  var doorRotate=doorPalace.indexOf(zhishiPalace);
   allGong.forEach(function(g){
-    var starIdx=(g-starOffset-1+8*9)%8;
-    var doorIdx=(g-doorOffset-1+8*9)%8;
-    var godIdx=(g-godOffset-1+8*9)%8;
+    var sIdx=(starPalace.indexOf(g)-starRotate+8)%8;
+    var dIdx=(doorPalace.indexOf(g)-doorRotate+8)%8;
+    var gIdx=sIdx; // 八神随值符
     palaces[g]={
       gongName:gongNames[g],
       trigram:trigrams[g],
       element:elements[g],
       direction:directions[g],
-      tian:diGan[g]||'—',
-      di:diGan[g]||'—',
-      star:stars[starIdx],
-      starNature:starNature[starIdx],
-      door:doors[doorIdx],
-      doorNature:doorNature[doorIdx],
-      god:gods[godIdx],
-      godNature:godNature[godIdx]
+      tian:tianPan[g]||diPan[g]||'—',
+      di:diPan[g]||'—',
+      star:stars[sIdx]||'—',
+      starNature:starNature[sIdx]||'中',
+      door:doors[dIdx]||'—',
+      doorNature:doorNature[dIdx]||'中',
+      god:gods[gIdx]||'—',
+      godNature:godNature[gIdx]||'中'
     };
-  });
-  // 关键宫位详情
+  });// 关键宫位详情
   var kp=palaces[keyPalace];
   // 格局判断
   var judge='';
