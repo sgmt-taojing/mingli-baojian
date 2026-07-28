@@ -831,25 +831,52 @@
 
     // 获取选择的摄像头设备
     var deviceId = (document.getElementById('wz-camera-select') || {}).value || '';
-    var constraints = { video: { width: {ideal:1280}, height: {ideal:720} }, audio: false };
+    
+    // 先尝试精确设备，再降级到宽松约束
+    var constraints = { video: true, audio: false };
     if(deviceId){
-      constraints.video.deviceId = { exact: deviceId };
-    } else {
-      constraints.video.facingMode = 'user';
+      constraints = { video: { deviceId: { exact: deviceId } }, audio: false };
     }
 
     navigator.mediaDevices.getUserMedia(constraints)
       .then(function(stream){
         cameraStream = stream;
         video.srcObject = stream;
-        video.play();
+        video.play().catch(function(){});
         var btn = document.getElementById('wz-btn-camera');
         if(btn) btn.textContent = '⏹ 停止摄像头';
         var captureBtn = document.getElementById('wz-btn-capture');
         if(captureBtn) captureBtn.style.display = '';
+        var ma = document.getElementById('wz-multi-angle');
+        if(ma) ma.style.display = 'block';
+        showToast('✅ 摄像头已启动');
       })
       .catch(function(err){
-        showToast('摄像头启动失败: ' + err.message, 'error');
+        // 降级：尝试最基本的约束
+        if(deviceId){
+          console.warn('[camera] 精确设备失败，降级到默认:', err.message);
+          navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+            .then(function(stream){
+              cameraStream = stream;
+              video.srcObject = stream;
+              video.play().catch(function(){});
+              var btn2 = document.getElementById('wz-btn-camera');
+              if(btn2) btn2.textContent = '⏹ 停止摄像头';
+              var captureBtn2 = document.getElementById('wz-btn-capture');
+              if(captureBtn2) captureBtn2.style.display = '';
+              showToast('✅ 摄像头已启动（默认设备）');
+            })
+            .catch(function(err2){
+              showToast('摄像头启动失败: ' + err2.message + '。请检查：1)浏览器是否允许摄像头权限 2)摄像头是否被其他程序占用 3)是否使用Chrome/Edge浏览器', 'error');
+            });
+        } else {
+          var hint = '摄像头启动失败: ' + err.message;
+          if(err.name === 'NotAllowedError') hint += '。请在浏览器地址栏点击摄像头图标，允许权限。';
+          else if(err.name === 'NotFoundError') hint += '。未检测到摄像头设备，请检查Type-C连接。';
+          else if(err.name === 'NotReadableError') hint += '。摄像头被其他程序占用，请关闭后重试。';
+          else if(err.name === 'OverconstrainedError') hint += '。摄像头不支持当前参数，请选择其他设备。';
+          showToast(hint, 'error');
+        }
       });
   }
 
