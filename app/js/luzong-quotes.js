@@ -57,16 +57,57 @@
     ],
     zeri: [
       '【路氏实践】择日以日柱为主，需结合当事人八字和事项性质。黄道吉日：青龙/明堂/金匮/天德/玉堂/司命。'
+    ],
+    // ===== 舒晗老师（密宗天纪+奇门校正）=====
+    _shuhan_zhongyi: [
+      '【舒晗老师·伤寒方】柴胡桂枝干姜汤：和解散结化饮清热，治伤寒胸满烦躁（柴胡/桂枝/干姜/瓜蒌根/黄芩/牡蛎/炙甘草）。',
+      '【舒晗老师·温病】藿香正气散：芳香化湿解表，治外感风寒内伤湿滞（藿香/紫苏/白芷/大腹皮/茯苓/白术/半夏曲/陈皮/厚朴）。',
+      '【舒晗老师·经方】小建中汤：温中补虚和里缓急，治心中悸而烦（桂枝/芍药/炙甘草/生姜/大枣/胶饴）。'
+    ],
+    _shuhan_qimen: [
+      '【舒晗老师·奇门】奇门遁甲排盘需结合节气定局，断事以用神为核心，应期看时令旺衰。',
+      '【舒晗老师·奇门】格局判断先看吉格凶格，再看用神宫位旺相休囚，综合定吉凶。'
+    ],
+    _shuhan_mingli: [
+      '【舒晗老师·命理】用神选取需看月令深浅，得令者旺失令者衰。用神有力则格局高。',
+      '【舒晗老师·命理】合化须看化神是否当令，月令不助则合而不化。'
+    ],
+    // ===== 倪海厦老师（人纪+天纪）=====
+    _nihaisha_zhongyi: [
+      '【倪师·人纪】中医辨证首重阴阳，阳化气阴成形，阳气不足则百病丛生。',
+      '【倪师·扶阳】扶阳为治病大法，阳气充足则阴邪自散。常用附子/干姜/肉桂温阳。',
+      '【倪师·方剂】方证对应是经方核心，有是证用是方，不可拘泥病名。'
+    ],
+    _nihaisha_tianji: [
+      '【倪师·天纪】命理占卜为天纪核心，知命方能顺势而为。天干地支为宇宙能量编码。',
+      '【倪师·天纪】风水环境影响人的气场，好风水藏风聚气，坏风水散气泄气。'
     ]
   };
 
-  // 按模块获取路氏观点
+  // 舒晗/倪师观点映射到报告模块
+  var MASTER_MODULE_MAP = {
+    zhongyi: ['_shuhan_zhongyi', '_nihaisha_zhongyi'],
+    qimen: ['_shuhan_qimen'],
+    bazi: ['_shuhan_mingli'],
+    ziwei: ['_nihaisha_tianji'],
+    fengshui: ['_nihaisha_tianji']
+  };
+
+  // 按模块获取大师观点（路氏+舒晗+倪师轮换）
   function getQuote(modId){
-    var list = QUOTES[modId];
-    if(!list || list.length === 0) return '';
+    var allQuotes = [];
+    // 1. 路氏观点
+    var luList = QUOTES[modId];
+    if(luList) allQuotes = allQuotes.concat(luList);
+    // 2. 舒晗/倪师观点（通过映射）
+    var masterList = MASTER_MODULE_MAP[modId] || [];
+    masterList.forEach(function(k){
+      if(QUOTES[k]) allQuotes = allQuotes.concat(QUOTES[k]);
+    });
+    if(allQuotes.length === 0) return '';
     // 确定性选择（不使用 Math.random）
-    var idx = (Date.now() / 60000 | 0) % list.length; // 每分钟轮换
-    return list[idx];
+    var idx = (Date.now() / 60000 | 0) % allQuotes.length;
+    return allQuotes[idx];
   }
 
   // 获取多个观点（用于深度报告）
