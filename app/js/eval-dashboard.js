@@ -2664,6 +2664,163 @@ if (_cbCSV) _cbCSV.addEventListener('click', exportCrossBenchCSV);
 // 启动时加载散点图
 refreshCrossBench();
 
+// ===== R226 跨周模块热力图 =====
+const HEATMAP_MOD_LABELS = {
+  bazi:'八字', general:'综合', yunshi:'运势', ziwei:'紫微', fengshui:'风水',
+  liuyao:'六爻', liuren:'六壬', meihua:'梅花', huangli:'黄历', wuxing:'五行',
+  tcm:'中医', koujue:'口诀', qimen:'奇门', shiye:'事业', zeri:'择日', zhongyi:'中医诊断'
+};
+
+async function fetchHeatmapData(){
+  const results = [];
+  for (const w of WEEKS){
+    try {
+      const resp = await fetch(`${GITHUB_BASE}${w}-expanded/faithfulness-by-module.json`);
+      if (resp.ok){ results.push({week:w, data: await resp.json()}); continue; }
+    } catch(e){}
+    try {
+      const resp = await fetch(`${LOCAL_BASE}${w}-expanded/faithfulness-by-module.json`);
+      if (resp.ok){ results.push({week:w, data: await resp.json()}); }
+    } catch(e){}
+  }
+  return results;
+}
+
+function buildHeatmapMatrix(rawData, metric){
+  const modSet = new Set();
+  rawData.forEach(({data}) => {
+    Object.keys(data.modules || {}).forEach(m => modSet.add(m));
+  });
+  const modules = Array.from(modSet).sort();
+  const weeks = rawData.map(d => d.week);
+  const matrix = [];
+  modules.forEach(mod => {
+    const row = { mod, label: HEATMAP_MOD_LABELS[mod] || mod, cells: [] };
+    weeks.forEach(w => {
+      const wd = rawData.find(d => d.week === w);
+      const md = wd && wd.data.modules && wd.data.modules[mod];
+      if (md){
+        row.cells.push({
+          week: w,
+          value: metric === 'latency' ? md.avg_latency : md.avg_score,
+          total: md.total || 0,
+          violations: md.violations || 0
+        });
+      } else {
+        row.cells.push({ week: w, value: null, total: 0, violations: 0 });
+      }
+    });
+    matrix.push(row);
+  });
+  return { matrix, weeks, modules };
+}
+
+function heatmapColor(val, metric, min, max){
+  if (val === null || val === undefined) return '#f0f0f0';
+  if (metric === 'latency'){
+    // latency: lower=green, higher=red
+    const t = max > min ? (val - min) / (max - min) : 0.5;
+    const r = Math.round(60 + t * 195);
+    const g = Math.round(200 - t * 140);
+    const b = Math.round(80 - t * 40);
+    return `rgb(${r},${g},${b})`;
+  } else {
+    // faithfulness: higher=green, lower=red
+    const t = max > min ? (val - min) / (max - min) : 0.5;
+    const r = Math.round(220 - t * 160);
+    const g = Math.round(80 + t * 150);
+    const b = Math.round(60 + t * 40);
+    return `rgb(${r},${g},${b})`;
+  }
+}
+
+function renderHeatmap(matrixData, metric){
+  const wrap = $('heatmapGrid');
+  if (!wrap) return;
+  const { matrix, weeks } = matrixData;
+
+  // Calculate min/max for color scaling
+  let vals = [];
+  matrix.forEach(row => row.cells.forEach(c => { if (c.value !== null) vals.push(c.value); }));
+  const min = vals.length ? Math.min(...vals) : 0;
+  const max = vals.length ? Math.max(...vals) : 1;
+
+  let html = '<table class="heatmap-table">';
+  // Header row
+  html += '<thead><tr><th>模块</th>';
+  weeks.forEach(w => { html += `<th>${w.replace('2026-','')}</th>`; });
+  html += '</tr></thead><tbody>';
+
+  matrix.forEach(row => {
+    html += `<tr><td class="heatmap-row-label">${row.label}</td>`;
+    row.cells.forEach(c => {
+      if (c.value === null){
+        html += '<td class="heatmap-cell heatmap-empty" title="无数据"></td>';
+      } else {
+        const color = heatmapColor(c.value, metric, min, max);
+        const display = metric === 'latency' ? `${Math.round(c.value)}ms` : c.value.toFixed(3);
+        const tip = `${row.label} · ${c.week.replace('2026-','')}\n${display} · ${c.total} cases · ${c.violations} violations`;
+        html += `<td class="heatmap-cell" style="background:${color}" title="${tip}">${display}</td>`;
+      }
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+
+  // Render legend bar
+  const legendBar = $('heatmapLegendBar');
+  if (legendBar){
+    const steps = 10;
+    let grad = 'linear-gradient(to right';
+    for (let i = 0; i <= steps; i++){
+      const t = i / steps;
+      const v = min + (max - min) * t;
+      grad += `,${heatmapColor(v, metric, min, max)}`;
+    }
+    grad += ')';
+    legendBar.style.background = grad;
+  }
+}
+
+let _heatmapCache = null;
+async function refreshHeatmap(){
+  const metricSel = $('heatmapMetricSel');
+  const metric = metricSel ? metricSel.value : 'faithfulness';
+  if (!_heatmapCache){
+    _heatmapCache = await fetchHeatmapData();
+  }
+  if (_heatmapCache.length === 0){
+    const wrap = $('heatmapGrid');
+    if (wrap) wrap.innerHTML = '<p class="heatmap-empty-msg">暂无 expanded 数据</p>';
+    return;
+  }
+  const matrixData = buildHeatmapMatrix(_heatmapCache, metric);
+  renderHeatmap(matrixData, metric);
+}
+
+function exportHeatmapCSV(){
+  if (!_heatmapCache || _heatmapCache.length === 0) return;
+  const metricSel = $('heatmapMetricSel');
+  const metric = metricSel ? metricSel.value : 'faithfulness';
+  const { matrix, weeks } = buildHeatmapMatrix(_heatmapCache, metric);
+  const rows = [['Module', ...weeks]];
+  matrix.forEach(row => {
+    const r = [row.mod];
+    row.cells.forEach(c => { r.push(c.value !== null ? (metric === 'latency' ? Math.round(c.value) : c.value.toFixed(4)) : ''); });
+    rows.push(r);
+  });
+  downloadCSV(`eval-heatmap-${metric}.csv`, rows);
+}
+
+// R226 事件绑定
+const _hmMetricSel = $('heatmapMetricSel');
+if (_hmMetricSel) _hmMetricSel.addEventListener('change', () => { renderHeatmap(buildHeatmapMatrix(_heatmapCache, _hmMetricSel.value), _hmMetricSel.value); });
+const _hmCSV = $('heatmapCSVBtn');
+if (_hmCSV) _hmCSV.addEventListener('click', exportHeatmapCSV);
+// 启动时加载热力图
+refreshHeatmap();
+
 // 启动
 refresh();
 
