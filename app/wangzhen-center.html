@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>望诊中心 · 命理宝鉴</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/divination-hub.css">
+  <style>
+    :root{
+      --wz-bg:#0a0e17; --wz-paper:#e8e0d0; --wz-paper2:#c9bfa8; --wz-paper3:#a09888;
+      --wz-gold:#c9a84c; --wz-jade:#10b981; --wz-red:#ef4444; --wz-cyan:#63b3ed;
+      --wz-border:rgba(201,168,76,.18); --wz-card-bg:rgba(255,255,255,.03);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--wz-bg);color:var(--wz-paper);padding:12px;line-height:1.6;min-height:100vh}
+    .wz-header{text-align:center;padding:16px 0 12px;border-bottom:1px solid var(--wz-border);margin-bottom:16px}
+    .wz-header h1{font-size:20px;color:var(--wz-gold);letter-spacing:2px;margin-bottom:4px}
+    .wz-header .subtitle{font-size:12px;color:var(--wz-paper3)}
+    .kb-status{font-size:11px;padding:4px 10px;border-radius:4px;background:rgba(201,168,76,.08);color:var(--wz-paper3);display:inline-block;margin-top:6px}
+    .kb-status.loaded{background:rgba(16,185,129,.12);color:var(--wz-jade)}
+
+    /* Tabs */
+    .wangzhen-tabs{display:flex;gap:2px;margin-bottom:16px;flex-wrap:wrap;border-bottom:1px solid var(--wz-border)}
+    .wangzhen-tab{padding:10px 18px;cursor:pointer;font-size:13px;color:var(--wz-paper3);border-bottom:2px solid transparent;transition:.2s;white-space:nowrap}
+    .wangzhen-tab:hover{color:var(--wz-paper)}
+    .wangzhen-tab.active{color:var(--wz-gold);border-bottom-color:var(--wz-gold)}
+    .wangzhen-tab-panel{display:none}
+    .wangzhen-tab-panel.active{display:block}
+
+    /* Zone Grid */
+    .wangzhen-zone-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:16px}
+    .wangzhen-zone-card{padding:12px;border:1px solid var(--wz-border);border-radius:8px;cursor:pointer;transition:.2s;background:var(--wz-card-bg)}
+    .wangzhen-zone-card:hover{border-color:var(--wz-gold);background:rgba(201,168,76,.06)}
+    .wangzhen-zone-card.active{border-color:var(--wz-gold);background:rgba(201,168,76,.12);box-shadow:0 0 0 1px var(--wz-gold)33}
+    .wangzhen-zone-badge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border:2px solid;border-radius:50%;font-weight:700;font-size:14px;margin-bottom:6px}
+    .wangzhen-zone-name{font-size:12px;color:var(--wz-paper);margin-bottom:2px}
+    .wangzhen-zone-organ{font-size:10px;color:var(--wz-paper3)}
+
+    /* Feature Panel */
+    .wangzhen-feature-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+    .wangzhen-zone-badge-lg{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border:2px solid;border-radius:50%;font-weight:700;font-size:16px}
+    .wangzhen-zone-title{font-size:14px;color:var(--wz-paper)}
+    .wangzhen-zone-organ-tag{font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(201,168,76,.1);color:var(--wz-gold)}
+    .wangzhen-feature-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+    .wangzhen-feature-chip{display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border:1px solid var(--wz-border);border-radius:20px;cursor:pointer;font-size:12px;transition:.2s;user-select:none}
+    .wangzhen-feature-chip:hover{border-color:var(--wz-gold);background:rgba(201,168,76,.06)}
+    .wangzhen-feature-chip input{display:none}
+    .wangzhen-feature-chip:has(input:checked){border-color:var(--wz-gold);background:rgba(201,168,76,.15);color:var(--wz-gold)}
+    .feature-icon{font-size:14px}
+    .wangzhen-diagnose-btn-wrap{display:flex;gap:8px;margin-top:8px}
+    .btn{padding:8px 18px;border:none;border-radius:8px;cursor:pointer;font-size:13px;transition:.2s}
+    .btn-primary{background:var(--wz-gold);color:#0a0e17;font-weight:600}
+    .btn-primary:hover{background:#d4b85e}
+    .btn-ghost{background:transparent;border:1px solid var(--wz-border);color:var(--wz-paper3)}
+    .btn-ghost:hover{border-color:var(--wz-paper2)}
+
+    /* Results */
+    .wangzhen-result-summary{padding:12px;border-radius:8px;margin-bottom:12px;display:flex;align-items:center;gap:12px;background:var(--wz-card-bg)}
+    .result-severity-badge{padding:4px 12px;border-radius:4px;font-size:12px;font-weight:600}
+    .result-count{font-size:12px;color:var(--wz-paper3)}
+    .wangzhen-result-item{padding:10px 12px;margin-bottom:8px;border-radius:6px;background:var(--wz-card-bg);font-size:12px}
+    .result-item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+    .result-zone{font-weight:600;color:var(--wz-gold)}
+    .result-severity{font-size:11px;font-weight:600}
+    .result-organ{color:var(--wz-cyan);margin-bottom:2px}
+    .result-pathology{color:var(--wz-paper);margin-bottom:2px}
+    .result-advice{color:var(--wz-jade)}
+    .wangzhen-disclaimer{margin-top:12px;padding:10px;border-radius:6px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);font-size:11px;color:#f87171;line-height:1.6}
+
+    /* Five Colors */
+    .wangzhen-five-colors{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-bottom:20px}
+    .five-color-card{padding:12px;border:1px solid var(--wz-border);border-radius:8px;background:var(--wz-card-bg)}
+    .five-color-badge{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;font-weight:700;font-size:16px;margin-bottom:6px}
+    .five-color-organ{font-size:13px;color:var(--wz-gold);margin-bottom:4px}
+    .five-color-pathology{font-size:11px;color:var(--wz-paper);margin-bottom:4px}
+    .five-color-examples{font-size:10px;color:var(--wz-paper3)}
+    .wangzhen-six-dims{margin-top:12px}
+    .six-dims-title{font-size:14px;color:var(--wz-gold);margin-bottom:8px}
+    .six-dim-row{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--wz-border);font-size:12px}
+    .six-dim-label{min-width:50px;font-weight:600;color:var(--wz-gold)}
+    .six-dim-pair{flex:1;color:var(--wz-paper3)}
+
+    /* Organ Grid */
+    .wangzhen-organ-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+    .organ-card{padding:12px;border:1px solid var(--wz-border);border-radius:8px;cursor:pointer;transition:.2s;background:var(--wz-card-bg);text-align:center}
+    .organ-card:hover{border-color:var(--wz-gold);background:rgba(201,168,76,.06)}
+    .organ-icon{font-size:28px;margin-bottom:6px}
+    .organ-name{font-size:13px;color:var(--wz-paper);margin-bottom:4px}
+    .organ-desc{font-size:10px;color:var(--wz-paper3);margin-bottom:4px}
+    .organ-kb-count{font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(16,185,129,.1);color:var(--wz-jade);display:inline-block}
+
+    /* Modal */
+    .wangzhen-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;padding:20px}
+    .wangzhen-modal-content{background:#111827;border:1px solid var(--wz-border);border-radius:12px;max-width:600px;max-height:80vh;overflow-y:auto;padding:20px;width:100%}
+    .wangzhen-modal-close{float:right;cursor:pointer;font-size:20px;color:var(--wz-paper3)}
+    .organ-modal-title{font-size:16px;color:var(--wz-gold);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--wz-border)}
+    .organ-modal-item{margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(201,168,76,.08)}
+    .organ-modal-item-title{font-size:13px;color:var(--wz-paper);font-weight:600;margin-bottom:4px}
+    .organ-modal-item-content{font-size:12px;color:var(--wz-paper2);line-height:1.7}
+    .organ-modal-item-kw{font-size:10px;color:var(--wz-paper3);margin-top:2px}
+
+    /* AI Steps */
+    .wangzhen-ai-steps{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+    .ai-step{display:flex;gap:12px;padding:10px;border:1px solid var(--wz-border);border-radius:8px;background:var(--wz-card-bg)}
+    .ai-step-num{display:flex;align-items:center;justify-content:center;width:32px;height:32px;background:var(--wz-gold);color:#0a0e17;border-radius:50%;font-weight:700;font-size:14px;flex-shrink:0}
+    .ai-step-body{flex:1}
+    .ai-step-name{font-size:13px;color:var(--wz-paper);font-weight:600;margin-bottom:2px}
+    .ai-step-desc{font-size:11px;color:var(--wz-paper3)}
+    .wangzhen-ai-disclaimer{margin-top:12px;padding:10px;border-radius:6px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);font-size:11px;color:#fca5a5;line-height:1.7}
+
+    .muted{color:var(--wz-paper3);font-size:13px;padding:12px;text-align:center}
+    .section-title{font-size:15px;color:var(--wz-gold);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--wz-border)}
+    .panel-section{margin-bottom:24px}
+
+    @media(max-width:768px){
+      .wangzhen-zone-grid{grid-template-columns:repeat(2,1fr)}
+      .wangzhen-five-colors{grid-template-columns:1fr}
+      .wangzhen-organ-grid{grid-template-columns:repeat(2,1fr)}
+      .wangzhen-tabs{overflow-x:auto;flex-wrap:nowrap}
+      .wangzhen-tab{white-space:nowrap}
+    }
+  </style>
+</head>
+<body>
+
+<header class="wz-header">
+  <h1>🔍 望诊中心</h1>
+  <div class="subtitle">基于《灵枢·五色》面部全息分区 · 九大模块 · AI七步诊断流程</div>
+  <div id="wangzhen-kb-status" class="kb-status">⏳ WANGZHEN_KB 加载中...</div>
+</header>
+
+<!-- Tabs -->
+<nav class="wangzhen-tabs">
+  <div class="wangzhen-tab active" data-tab="zones" onclick="wangzhenCenter.switchTab('zones')">🗺️ A-K分区诊断</div>
+  <div class="wangzhen-tab" data-tab="colors" onclick="wangzhenCenter.switchTab('colors')">🎨 五色辨证</div>
+  <div class="wangzhen-tab" data-tab="organs" onclick="wangzhenCenter.switchTab('organs')">👁️ 九大模块</div>
+  <div class="wangzhen-tab" data-tab="ai" onclick="wangzhenCenter.switchTab('ai')">🤖 AI七步流程</div>
+</nav>
+
+<!-- Tab: A-K 分区诊断 -->
+<div class="wangzhen-tab-panel" data-tab="zones" style="display:block">
+  <div class="panel-section">
+    <div class="section-title">面部全息分区图（点击选择区域）</div>
+    <div id="wangzhen-zone-map"></div>
+  </div>
+  <div class="panel-section">
+    <div class="section-title">特征选择</div>
+    <div id="wangzhen-feature-panel"></div>
+  </div>
+  <div class="panel-section">
+    <div class="section-title">诊断结果</div>
+    <div id="wangzhen-result-panel"></div>
+  </div>
+</div>
+
+<!-- Tab: 五色辨证 -->
+<div class="wangzhen-tab-panel" data-tab="colors">
+  <div class="panel-section">
+    <div class="section-title">五脏五色主病映射</div>
+    <div id="wangzhen-five-colors"></div>
+  </div>
+</div>
+
+<!-- Tab: 九大模块 -->
+<div class="wangzhen-tab-panel" data-tab="organs">
+  <div class="panel-section">
+    <div class="section-title">分部专项诊法（点击查看详情）</div>
+    <div id="wangzhen-organs"></div>
+  </div>
+</div>
+
+<!-- Tab: AI 七步流程 -->
+<div class="wangzhen-tab-panel" data-tab="ai">
+  <div class="panel-section">
+    <div class="section-title">AI 面诊诊断标准流程（七步执行）</div>
+    <div id="wangzhen-ai-steps"></div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="wangzhen-organ-modal" class="wangzhen-modal" onclick="if(event.target===this)wangzhenCenter.closeOrganModal()">
+  <div class="wangzhen-modal-content">
+    <span class="wangzhen-modal-close" onclick="wangzhenCenter.closeOrganModal()">✕</span>
+    <div id="wangzhen-organ-modal-body"></div>
+  </div>
+</div>
+
+<!-- JS -->
+<script src="js/wangzhen-kb-loader.js" defer></script>
+<script src="js/wangzhen-center.js" defer></script>
+
+</body>
+</html>
