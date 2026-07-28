@@ -962,6 +962,78 @@ function exportSnapshot(){
   URL.revokeObjectURL(a.href);
 }
 
+// R208: 导出 PDF 预览
+// 在新窗口中克隆当前 dashboard DOM + 内联打印样式，自动触发 print()
+function exportPDF(){
+  var w = window.open('', '_blank', 'width=900,height=700');
+  if (!w) { alert('请允许弹出窗口以导出 PDF'); return; }
+
+  // 收集当前页面 HTML
+  var html = document.documentElement.outerHTML;
+
+  // 构建精简打印预览页面
+  w.document.open();
+  w.document.write('<!DOCTYPE html>\n<html lang="zh">\n<head>\n');
+  w.document.write('<meta charset="UTF-8">');
+  w.document.write('<meta name="viewport" content="width=device-width, initial-scale=1.0">');
+  w.document.write('<title>评估看板 PDF · ' + new Date().toLocaleDateString('zh-CN') + '</title>');
+
+  // 内联 CSS（含 @media print 规则）
+  w.document.write('<style>');
+  // 基础样式从当前页面 stylesheet 提取
+  var styles = document.querySelectorAll('style, link[rel="stylesheet"]');
+  for (var i = 0; i < styles.length; i++) {
+    if (styles[i].tagName === 'LINK') {
+      // 外部 CSS → 用 fetch 同步拉取（阻塞）
+      try {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', styles[i].href, false);
+        xhr.send();
+        if (xhr.status === 200) w.document.write(xhr.responseText);
+      } catch(e) {}
+    } else {
+      w.document.write(styles[i].textContent);
+    }
+  }
+  w.document.write('</style>');
+
+  // 强制打印模式：body 直接加 print class
+  w.document.write('<style>body { background: #fff !important; color: #1a1a1a !important; }</style>');
+  w.document.write('</head>\n<body>');
+
+  // 克隆 dashboard 主体内容
+  var clone = document.querySelector('.dash-header').cloneNode(true);
+  // 移除按钮
+  clone.querySelectorAll('.btn-refresh, .dash-back').forEach(function(el){ el.remove(); });
+  w.document.write(clone.outerHTML);
+
+  var main = document.querySelector('.dash-main').cloneNode(true);
+  // 展开所有折叠区域
+  main.querySelectorAll('[style*="display:none"], [style*="display: none"]').forEach(function(el){
+    el.style.display = '';
+  });
+  // 移除交互控件
+  main.querySelectorAll('.csv-export-btn, select, .percase-controls, .mod-percase-controls').forEach(function(el){ el.remove(); });
+  w.document.write(main.outerHTML);
+
+  var footer = document.querySelector('.dash-footer').cloneNode(true);
+  w.document.write(footer.outerHTML);
+
+  w.document.write('\n</body>\n</html>');
+  w.document.close();
+
+  // 等待新窗口渲染完成后触发打印
+  setTimeout(function(){
+    try {
+      w.focus();
+      w.print();
+    } catch(e) {
+      // 新窗口可能被浏览器阻止
+      console.warn('print() failed:', e);
+    }
+  }, 800);
+}
+
 // 告警历史趋势
 function renderAlertHistory(){
   const wrap = $('alertHistoryBody');
@@ -1574,6 +1646,7 @@ async function refresh(){
 
 $('refreshBtn').addEventListener('click', refresh);
 $('exportBtn').addEventListener('click', exportSnapshot);
+var _pdf = $('pdfBtn'); if (_pdf) _pdf.addEventListener('click', exportPDF);
 const _pcCSV = $('percaseCSVBtn'); if (_pcCSV) _pcCSV.addEventListener('click', exportPerCaseCSV);
 const _mpCSV = $('modPercaseCSVBtn'); if (_mpCSV) _mpCSV.addEventListener('click', exportModPerCaseCSV);
 
