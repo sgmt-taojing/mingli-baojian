@@ -19,8 +19,8 @@
         moonAge:((y-1900+m-1+d-1+h/24)%30+1)
       };
 
-      var hS=60+(data.dayWuxing==='木'?10:0)+(data.moonAge>15?8:0)+Math.floor(Math.random()*15);
-      var cS=60+(['子','午','卯','酉'].indexOf(data.yearZhi)>=0?10:0)+Math.floor(Math.random()*15);
+      var hS=60+(data.dayWuxing==='木'?10:0)+(data.moonAge>15?8:0)+Math.floor((Date.now()/100)%15);
+      var cS=60+(['子','午','卯','酉'].indexOf(data.yearZhi)>=0?10:0)+Math.floor((Date.now()/100)%15);
       hS=Math.min(95,Math.max(50,hS));
       cS=Math.min(95,Math.max(50,cS));
 
@@ -35,7 +35,7 @@
       html+='<div class="hcd-12grid">';
       Object.keys(HCD_LIFE_12).forEach(function(k){
         var it=HCD_LIFE_12[k];
-        var baseScore=k==='health'?hS:k==='career'?cS:50+(data.dayWuxing.length)*5+Math.floor(Math.random()*30);
+        var baseScore=k==='health'?hS:k==='career'?cS:50+(data.dayWuxing.length)*5+Math.floor((Date.now()/100)%30);
         var weighted=Math.round(baseScore*it.weight);
         weighted=Math.min(95,Math.max(45,weighted));
         var star=getStars(weighted);

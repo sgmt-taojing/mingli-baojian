@@ -3,7 +3,7 @@ const API_BASE = location.origin.includes(':8920') ? '' : 'http://localhost:8920
 const DEVICE_TOKEN = localStorage.getItem('glass-device-token') || generateDeviceToken();
 
 function generateDeviceToken() {
-  const t = 'GL-' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+  const t = 'GL-' + (Date.now()%4294967296).toString(36).slice(0,8) + Date.now().toString(36);
   localStorage.setItem('glass-device-token', t);
   return t;
 }

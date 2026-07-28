@@ -624,7 +624,7 @@ function addAI(text,stepData){
     var _qLast = (state && state.history && state.history[state.history.length-1]) || '';
     if (!_qLast && typeof hist !== 'undefined' && hist.length) _qLast = hist[hist.length-1].content || '';
     var _mod = (state && state.module) || '';
-    var _feedbackId = 'fb-' + Date.now() + '-' + Math.floor(Math.random()*1000);
+    var _feedbackId = 'fb-' + Date.now() + '-' + (Date.now()%1000);
     html += '<div id="' + _feedbackId + '" data-feedback="1" style="margin-top:8px;padding-top:8px;border-top:1px dashed rgba(201,168,76,.25);font-size:12px;color:var(--paper3,#999);display:flex;align-items:center;gap:6px;flex-wrap:wrap">' +
       '<span style="opacity:.7">这条回答有用吗？</span>' +
       '<button onclick="_submitKbFeedback(\'' + _feedbackId + '\', 1, \'' + esc(_qLast).replace(/'/g, '') + '\', \'' + esc(_mod).replace(/'/g, '') + '\')" style="background:transparent;border:1px solid rgba(201,168,76,.4);border-radius:14px;padding:2px 10px;color:#c9a84c;cursor:pointer;font-size:14px;transition:all .2s" onmouseover="this.style.background=\'rgba(201,168,76,.15)\'" onmouseout="this.style.background=\'transparent\'" title="有用">👍</button>' +

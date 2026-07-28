@@ -106,7 +106,7 @@
       if (existing[item]) return;
       existing[item] = 1;
       arr.unshift({
-        id: 'todo-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+        id: 'todo-' + Date.now() + '-' + (Date.now()%1000),
         text: item,
         module: (meta && meta.module) || null,
         ts: Date.now()

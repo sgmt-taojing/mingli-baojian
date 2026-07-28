@@ -32422,7 +32422,7 @@ const KoujueRenderer = {
    */
   getRandomAndRender: function() {
     if (typeof KOUJUE_DAILY_DATABASE === 'undefined') return;
-    const idx = Math.floor(Math.random() * KOUJUE_DAILY_DATABASE.length);
+    const idx = new Date().getDate() % KOUJUE_DAILY_DATABASE.length;
     const entry = KOUJUE_DAILY_DATABASE[idx];
     // 显示在弹出的详情中
     KoujueRenderer.renderKoujueDetail(entry.text, entry.source, entry.explain, {

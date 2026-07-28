@@ -220,7 +220,7 @@ function snap(){
       return;
     }
     const item = {
-      id: 'img-' + Date.now() + '-' + Math.random().toString(36).slice(2,8),
+      id: 'img-' + Date.now() + '-' + (Date.now()%2176782336).toString(36).slice(0,6),
       ts: Date.now(),
       blob,
       url: URL.createObjectURL(blob),

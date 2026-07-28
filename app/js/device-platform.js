@@ -78,7 +78,7 @@
   // ============== 设备抽象基类 ==============
   class Device {
     constructor(opts) {
-      this.id = opts.id || ('dev-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6));
+      this.id = opts.id || ('dev-' + Date.now() + '-' + (Date.now()%2176782336).toString(36).slice(0,6));
       this.vendor = opts.vendor || '未知厂商';
       this.model = opts.model || '未知型号';
       this.category = opts.category;       // vision / audio / wearable / sensor
