@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=5,user-scalable=yes">
+<title>先知智镜 · Rokid 眼镜接入测试 · 命理宝鉴</title>
+<meta name="theme-color" content="#0e1116">
+<style>
+:root{
+  --bg:#0e1116; --bg2:#161b22; --bg3:#1e2530; --bd:#30363d; --bd2:#444c56;
+  --tx:#e6edf3; --muted:#8b949e; --muted2:#6e7681;
+  --gold:#c9a84c; --gold2:#e6c873;
+  --ok:#3fb950; --warn:#d29922; --err:#f85149; --info:#58a6ff; --purple:#bc8cff;
+  --jade:#2dd4bf; --jade2:#14b8a6;
+  --shadow:0 4px 16px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.6;min-height:100vh}
+a{color:var(--info);text-decoration:none}
+header{background:linear-gradient(135deg,#1c2128,#161b22);border-bottom:1px solid var(--bd);padding:18px 24px;position:sticky;top:0;z-index:50;backdrop-filter:blur(12px)}
+header h1{font-size:22px;color:var(--gold2);margin-bottom:2px;font-weight:600}
+header p{font-size:13px;color:var(--muted)}
+.back{position:absolute;right:24px;top:24px;color:var(--muted);font-size:13px;padding:6px 14px;border:1px solid var(--bd);border-radius:6px}
+.back:hover{background:var(--bg3);color:var(--tx)}
+.wrap{max-width:900px;margin:0 auto;padding:20px 24px 100px}
+
+/* 状态卡片 */
+.status-card{background:linear-gradient(135deg,var(--bg2),var(--bg3));border:1px solid var(--bd);border-radius:14px;padding:24px;margin-bottom:16px;position:relative;overflow:hidden}
+.status-card h2{font-size:18px;color:var(--gold2);margin-bottom:12px}
+.status-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(48,54,61,.5)}
+.status-row:last-child{border-bottom:none}
+.status-label{color:var(--muted);min-width:120px;font-size:13px}
+.status-value{color:var(--tx);font-size:14px;font-family:monospace}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:600}
+.badge-ok{background:rgba(63,185,80,.15);color:var(--ok)}
+.badge-warn{background:rgba(210,153,34,.15);color:var(--warn)}
+.badge-err{background:rgba(248,81,73,.15);color:var(--err)}
+.badge-info{background:rgba(88,166,255,.15);color:var(--info)}
+
+/* 按钮 */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:8px;border:1px solid var(--bd2);background:var(--bg3);color:var(--tx);font-size:14px;cursor:pointer;transition:all .15s}
+.btn:hover{border-color:var(--gold);color:var(--gold2)}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-primary{background:linear-gradient(135deg,var(--jade2),var(--jade));border-color:var(--jade);color:#fff}
+.btn-primary:hover{box-shadow:0 0 12px rgba(45,212,191,.3)}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));border-color:var(--gold);color:#1a1a1a}
+.btn-danger{border-color:var(--err);color:var(--err)}
+.btn-danger:hover{background:rgba(248,81,73,.1)}
+.btn-row{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}
+
+/* 预览区 */
+.preview-area{background:#000;border-radius:12px;overflow:hidden;position:relative;min-height:240px;display:flex;align-items:center;justify-content:center}
+.preview-area video{width:100%;height:auto;display:block}
+.preview-area img{max-width:100%;max-height:400px;display:block}
+.preview-area .placeholder{color:var(--muted2);font-size:14px;text-align:center;padding:40px}
+.preview-area .recording-indicator{position:absolute;top:12px;right:12px;background:rgba(248,81,73,.9);color:#fff;padding:4px 12px;border-radius:4px;font-size:12px;font-weight:600;display:none;align-items:center;gap:6px}
+.preview-area .recording-indicator.active{display:flex}
+.preview-area .recording-indicator::before{content:'';width:8px;height:8px;background:#fff;border-radius:50%;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* 日志 */
+.log-area{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:12px;max-height:200px;overflow-y:auto;font-family:monospace;font-size:12px}
+.log-entry{padding:2px 0;border-bottom:1px solid rgba(48,54,61,.3)}
+.log-time{color:var(--muted2);margin-right:8px}
+.log-info{color:var(--info)}
+.log-ok{color:var(--ok)}
+.log-warn{color:var(--warn)}
+.log-err{color:var(--err)}
+
+/* 信息面板 */
+.info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:16px 0}
+.info-item{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:12px}
+.info-item .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.info-item .value{font-size:14px;color:var(--tx);font-family:monospace}
+
+/* API 文档 */
+.api-doc{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:16px;margin:12px 0}
+.api-doc h3{font-size:15px;color:var(--jade);margin-bottom:8px}
+.api-doc code{background:rgba(88,166,255,.1);padding:2px 6px;border-radius:3px;font-size:13px;color:var(--info)}
+.api-doc .desc{color:var(--muted);font-size:13px;margin:4px 0}
+
+/* 响应式 */
+@media(max-width:768px){
+  .wrap{padding:14px}
+  .status-card{padding:16px}
+  .info-grid{grid-template-columns:1fr}
+  .btn{padding:8px 14px;font-size:13px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🥽 Rokid 眼镜接入测试</h1>
+  <p>命理宝鉴 · 智能眼镜能力检测 · 拍照/录像/录音</p>
+  <a href="device-management.html" class="back">← 设备运维中心</a>
+</header>
+
+<div class="wrap">
+
+  <!-- 连接状态 -->
+  <div class="status-card">
+    <h2>📊 连接状态</h2>
+    <div class="status-row">
+      <span class="status-label">Bridge 检测</span>
+      <span id="bridge-status" class="badge badge-warn">检测中...</span>
+    </div>
+    <div class="status-row">
+      <span class="status-label">Bridge 类型</span>
+      <span id="bridge-type" class="status-value">—</span>
+    </div>
+    <div class="status-row">
+      <span class="status-label">AIUI 版本</span>
+      <span id="aiui-version" class="status-value">—</span>
+    </div>
+    <div class="status-row">
+      <span class="status-label">运行环境</span>
+      <span id="runtime-env" class="status-value">浏览器</span>
+    </div>
+    <div class="status-row">
+      <span class="status-label">User Agent</span>
+      <span id="ua-display" class="status-value" style="font-size:11px;word-break:break-all">—</span>
+    </div>
+  </div>
+
+  <!-- 设备信息 -->
+  <div class="status-card" id="device-info-card" style="display:none">
+    <h2>📱 设备信息</h2>
+    <div class="info-grid" id="device-info-grid"></div>
+  </div>
+
+  <!-- 拍照测试 -->
+  <div class="status-card">
+    <h2>📷 拍照测试</h2>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:12px">
+      通过 Rokid Host API <code>HostTakePhoto</code> 或浏览器 <code>getUserMedia</code> 拍摄照片。
+    </p>
+    <div class="preview-area" id="photo-preview">
+      <div class="placeholder">点击下方按钮拍照</div>
+      <div class="recording-indicator" id="photo-loading">拍摄中...</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="RokidTest.takePhoto()">📷 拍照（Host API）</button>
+      <button class="btn" onclick="RokidTest.takePhotoWebcam()">📷 拍照（浏览器摄像头）</button>
+      <button class="btn btn-gold" onclick="RokidTest.enterWangzhen()">🔍 进入望诊工作台</button>
+    </div>
+  </div>
+
+  <!-- 录像测试 -->
+  <div class="status-card">
+    <h2>🎥 录像测试</h2>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:12px">
+      通过浏览器 <code>MediaRecorder</code> API 录制视频（眼镜端浏览器会调用眼镜摄像头）。
+    </p>
+    <div class="preview-area" id="video-preview">
+      <div class="placeholder">点击下方按钮开始录像</div>
+      <div class="recording-indicator" id="video-rec-indicator">录像中</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="video-record-btn" onclick="RokidTest.toggleRecord()">🎥 开始录像</button>
+      <button class="btn" id="video-play-btn" onclick="RokidTest.playRecordedVideo()" disabled>▶️ 播放</button>
+      <button class="btn" id="video-download-btn" onclick="RokidTest.downloadVideo()" disabled>⬇️ 下载</button>
+    </div>
+  </div>
+
+  <!-- 录音测试 -->
+  <div class="status-card">
+    <h2>🎤 录音测试</h2>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:12px">
+      通过浏览器 <code>MediaRecorder</code> API 或 Rokid <code>HostSpeechStartRecognition</code> 进行语音录制和识别。
+    </p>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="audio-record-btn" onclick="RokidTest.toggleAudioRecord()">🎤 开始录音</button>
+      <button class="btn" id="audio-play-btn" onclick="RokidTest.playRecordedAudio()" disabled>▶️ 播放</button>
+      <button class="btn" onclick="RokidTest.startSpeechRecognition()">🗣️ 语音识别（Host API）</button>
+    </div>
+    <div id="speech-result" style="margin-top:8px;padding:8px 12px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;font-size:13px;color:var(--muted);display:none"></div>
+    <audio id="audio-playback" style="display:none"></audio>
+  </div>
+
+  <!-- 日志 -->
+  <div class="status-card">
+    <h2>📋 操作日志</h2>
+    <div class="log-area" id="log-area">
+      <div class="log-entry"><span class="log-time">--:--:--</span><span class="log-info">等待操作...</span></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-danger" onclick="RokidTest.clearLog()">🗑️ 清空日志</button>
+    </div>
+  </div>
+
+  <!-- API 参考 -->
+  <div class="status-card">
+    <h2>📖 Rokid AIUI Host API 参考</h2>
+    <div class="api-doc">
+      <h3>HostTakePhoto</h3>
+      <div class="desc">调用眼镜摄像头拍照，返回 base64 图片数据</div>
+      <code>HostTakePhoto() → Promise&lt;{data: string, mimeType: string}&gt;</code>
+    </div>
+    <div class="api-doc">
+      <h3>HostSpeechSpeak</h3>
+      <div class="desc">语音播报（TTS）</div>
+      <code>HostSpeechSpeak(text: string) → Promise&lt;void&gt;</code>
+    </div>
+    <div class="api-doc">
+      <h3>HostSpeechStartRecognition</h3>
+      <div class="desc">开始语音识别（ASR）</div>
+      <code>HostSpeechStartRecognition() → Promise&lt;{text: string}&gt;</code>
+    </div>
+    <div class="api-doc">
+      <h3>HostSpeechStopRecognition</h3>
+      <div class="desc">停止语音识别</div>
+      <code>HostSpeechStopRecognition() → Promise&lt;void&gt;</code>
+    </div>
+    <div class="api-doc">
+      <h3>浏览器降级 API</h3>
+      <div class="desc">当 Host API 不可用时，使用 Web 标准 API</div>
+      <code>navigator.mediaDevices.getUserMedia({video: true, audio: true})</code><br>
+      <code>new MediaRecorder(stream)</code><br>
+      <code>new SpeechRecognition() / webkitSpeechRecognition()</code>
+    </div>
+    <p style="margin-top:12px;font-size:12px;color:var(--muted2)">
+      📖 完整文档：<a href="https://js.rokid.com/AIUI/api/framework/app?version=0.14.0&lang=zh-CN" target="_blank">js.rokid.com AIUI Framework API</a><br>
+      📖 Rokid SDK 文档：<a href="https://x-docs.rokid.com/docs/en/terminal-sdk/glasses" target="_blank">x-docs.rokid.com Glasses SDK</a>
+    </p>
+  </div>
+
+</div>
+
+<script>
+var RokidTest = {
+  bridge: null,
+  bridgeType: null,
+  photoStream: null,
+  videoRecorder: null,
+  videoChunks: [],
+  videoStream: null,
+  videoUrl: null,
+  audioRecorder: null,
+  audioChunks: [],
+  audioUrl: null,
+  isRecordingVideo: false,
+  isRecordingAudio: false,
+  speechRecognition: null,
+
+  init: function(){
+    // 显示 UA
+    document.getElementById('ua-display').textContent = navigator.userAgent.substring(0, 100);
+
+    // 检测 Bridge
+    var detected = this.detectBridge();
+    var statusEl = document.getElementById('bridge-status');
+    var typeEl = document.getElementById('bridge-type');
+
+    if(detected.bridge){
+      statusEl.textContent = '已连接';
+      statusEl.className = 'badge badge-ok';
+      typeEl.textContent = detected.type;
+      this.bridge = detected.bridge;
+      this.bridgeType = detected.type;
+      this.log('ok', 'Bridge 检测成功：' + detected.type);
+      this.loadSDK();
+      this.getDeviceInfo();
+    } else {
+      statusEl.textContent = '未检测到（浏览器降级模式）';
+      statusEl.className = 'badge badge-warn';
+      typeEl.textContent = '无 Bridge → 使用 Web API';
+      this.log('warn', '未检测到 Rokid Bridge，将使用浏览器标准 API');
+      this.log('info', '如需使用眼镜摄像头，请在眼镜内置浏览器中打开本页面');
+    }
+
+    // 检测浏览器能力
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      this.log('warn', '浏览器不支持 getUserMedia');
+    }
+    if(!window.MediaRecorder){
+      this.log('warn', '浏览器不支持 MediaRecorder');
+    }
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if(!SR){
+      this.log('warn', '浏览器不支持 SpeechRecognition');
+    }
+
+    // 检测 AIUI 版本
+    var aiuiMatch = navigator.userAgent.match(/AIUI\/([\d.]+)/);
+    if(aiuiMatch){
+      document.getElementById('aiui-version').textContent = aiuiMatch[1];
+    }
+
+    // 检测是否在眼镜端
+    if(navigator.userAgent.includes('Rokid')){
+      document.getElementById('runtime-env').textContent = 'Rokid 眼镜端';
+    } else if(this.bridgeType){
+      document.getElementById('runtime-env').textContent = 'Rokid Bridge';
+    }
+  },
+
+  detectBridge: function(){
+    // 优先级 1: RokidJSBridge (AR Studio WebView)
+    if(window.RokidJSBridge){
+      return {bridge: window.RokidJSBridge, type: 'RokidJSBridge'};
+    }
+    // 优先级 2: Rokid.bridge
+    if(window.Rokid && window.Rokid.bridge){
+      return {bridge: window.Rokid.bridge, type: 'Rokid.bridge'};
+    }
+    // 优先级 3: KJJSBridge (通用 Android WebView)
+    if(window.KJJSBridge){
+      return {bridge: window.KJJSBridge, type: 'KJJSBridge'};
+    }
+    // 优先级 4: AIUI Host API (新版)
+    if(window.aiui && window.aiui.host){
+      return {bridge: window.aiui.host, type: 'AIUI Host API'};
+    }
+    // 优先级 5: Ink Host (AIUI Craft)
+    if(window.ink && window.ink.host){
+      return {bridge: window.ink.host, type: 'AIUI Ink Host'};
+    }
+    return {bridge: null, type: null};
+  },
+
+  loadSDK: function(){
+    var existing = document.querySelector('script[src*="rokid-bridge"]');
+    if(!existing){
+      var script = document.createElement('script');
+      script.src = 'js/wearable/rokid-bridge.js';
+      script.onload = function(){
+        RokidTest.log('ok', 'rokid-bridge.js 加载成功');
+      };
+      script.onerror = function(){
+        RokidTest.log('err', 'rokid-bridge.js 加载失败');
+      };
+      document.head.appendChild(script);
+    }
+  },
+
+  getDeviceInfo: function(){
+    if(!this.bridge){
+      return;
+    }
+    var self = this;
+    try {
+      this.callHost('device.info', {}).then(function(res){
+        if(res){
+          var grid = document.getElementById('device-info-grid');
+          document.getElementById('device-info-card').style.display = 'block';
+          var info = typeof res === 'string' ? JSON.parse(res) : res;
+          Object.keys(info).forEach(function(key){
+            var item = document.createElement('div');
+            item.className = 'info-item';
+            item.innerHTML = '<div class="label">' + key + '</div><div class="value">' + info[key] + '</div>';
+            grid.appendChild(item);
+          });
+          self.log('ok', '设备信息获取成功');
+        }
+      }).catch(function(){ /* 非所有 Bridge 都支持 */ });
+    } catch(e) { /* ignore */ }
+  },
+
+  callHost: function(method, params){
+    var self = this;
+    return new Promise(function(resolve, reject){
+      if(!self.bridge){ reject(new Error('Bridge 不可用')); return; }
+      try {
+        if(self.bridge.callNative){
+          self.bridge.callNative(method, JSON.stringify(params || {}), function(res){
+            resolve(typeof res === 'string' ? JSON.parse(res) : res);
+          });
+        } else if(self.bridge.postMessage){
+          self.bridge.postMessage(method, params || {}, function(res){
+            resolve(typeof res === 'string' ? JSON.parse(res) : res);
+          });
+        } else if(typeof self.bridge === 'function'){
+          self.bridge(method, params || {}, function(res){
+            resolve(typeof res === 'string' ? JSON.parse(res) : res);
+          });
+        } else {
+          reject(new Error('Bridge 协议未知'));
+        }
+      } catch(e){
+        reject(e);
+      }
+    });
+  },
+
+  // ===== 拍照 =====
+  takePhoto: function(){
+    var self = this;
+    var preview = document.getElementById('photo-preview');
+    var loading = document.getElementById('photo-loading');
+
+    if(!this.bridge){
+      this.log('warn', 'Bridge 不可用，使用浏览器摄像头');
+      this.takePhotoWebcam();
+      return;
+    }
+
+    loading.classList.add('active');
+    this.log('info', '调用 HostTakePhoto...');
+
+    this.callHost('camera.capture', {sensor: 'front'}).then(function(res){
+      loading.classList.remove('active');
+      if(res && res.data){
+        var img = document.createElement('img');
+        img.src = 'data:' + (res.mimeType || 'image/jpeg') + ';base64,' + res.data;
+        preview.innerHTML = '';
+        preview.appendChild(img);
+        self.log('ok', '拍照成功（Host API）');
+      } else {
+        self.log('warn', 'Host API 返回无数据，尝试浏览器摄像头');
+        self.takePhotoWebcam();
+      }
+    }).catch(function(err){
+      loading.classList.remove('active');
+      self.log('err', 'Host API 拍照失败：' + err.message + '，尝试浏览器摄像头');
+      self.takePhotoWebcam();
+    });
+  },
+
+  takePhotoWebcam: function(){
+    var self = this;
+    var preview = document.getElementById('photo-preview');
+    var loading = document.getElementById('photo-loading');
+
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      this.log('err', '浏览器不支持摄像头');
+      return;
+    }
+
+    loading.classList.add('active');
+    this.log('info', '启动浏览器摄像头...');
+
+    navigator.mediaDevices.getUserMedia({video: {facingMode: 'environment'}, audio: false}).then(function(stream){
+      self.photoStream = stream;
+      var video = document.createElement('video');
+      video.autoplay = true;
+      video.playsInline = true;
+      video.srcObject = stream;
+      preview.innerHTML = '';
+      preview.appendChild(video);
+      loading.classList.remove('active');
+
+      // 3秒后自动拍照
+      setTimeout(function(){
+        var canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth || 640;
+        canvas.height = video.videoHeight || 480;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0);
+        stream.getTracks().forEach(function(t){ t.stop(); });
+
+        var img = document.createElement('img');
+        img.src = canvas.toDataURL('image/jpeg', 0.85);
+        preview.innerHTML = '';
+        preview.appendChild(img);
+        self.log('ok', '拍照成功（浏览器摄像头）');
+      }, 3000);
+
+      self.log('info', '摄像头已启动，3秒后自动拍照');
+    }).catch(function(err){
+      loading.classList.remove('active');
+      self.log('err', '摄像头启动失败：' + err.message);
+      if(err.name === 'NotAllowedError'){
+        self.log('warn', '请在浏览器地址栏允许摄像头权限');
+      }
+    });
+  },
+
+  // ===== 录像 =====
+  toggleRecord: function(){
+    if(this.isRecordingVideo){
+      this.stopRecordVideo();
+    } else {
+      this.startRecordVideo();
+    }
+  },
+
+  startRecordVideo: function(){
+    var self = this;
+    var preview = document.getElementById('video-preview');
+    var btn = document.getElementById('video-record-btn');
+    var indicator = document.getElementById('video-rec-indicator');
+
+    if(!navigator.mediaDevices || !window.MediaRecorder){
+      this.log('err', '浏览器不支持录像');
+      return;
+    }
+
+    this.log('info', '启动录像...');
+
+    navigator.mediaDevices.getUserMedia({video: {facingMode: 'environment'}, audio: true}).then(function(stream){
+      self.videoStream = stream;
+      self.videoChunks = [];
+
+      var video = document.createElement('video');
+      video.autoplay = true;
+      video.playsInline = true;
+      video.muted = true;
+      video.srcObject = stream;
+      preview.innerHTML = '';
+      preview.appendChild(video);
+      preview.appendChild(indicator);
+
+      var mimeType = 'video/webm';
+      if(MediaRecorder.isTypeSupported('video/mp4')){
+        mimeType = 'video/mp4';
+      }
+
+      self.videoRecorder = new MediaRecorder(stream, {mimeType: mimeType});
+      self.videoRecorder.ondataavailable = function(e){
+        if(e.data.size > 0) self.videoChunks.push(e.data);
+      };
+      self.videoRecorder.onstop = function(){
+        var blob = new Blob(self.videoChunks, {type: mimeType});
+        self.videoUrl = URL.createObjectURL(blob);
+        var video = document.createElement('video');
+        video.src = self.videoUrl;
+        video.controls = true;
+        preview.innerHTML = '';
+        preview.appendChild(video);
+        self.log('ok', '录像完成，时长 ' + Math.round(blob.size / 1024) + 'KB');
+        document.getElementById('video-play-btn').disabled = false;
+        document.getElementById('video-download-btn').disabled = false;
+      };
+      self.videoRecorder.start();
+      self.isRecordingVideo = true;
+      btn.textContent = '⏹️ 停止录像';
+      btn.classList.remove('btn-primary');
+      btn.classList.add('btn-danger');
+      indicator.classList.add('active');
+      self.log('ok', '录像开始');
+    }).catch(function(err){
+      self.log('err', '录像启动失败：' + err.message);
+    });
+  },
+
+  stopRecordVideo: function(){
+    if(this.videoRecorder && this.isRecordingVideo){
+      this.videoRecorder.stop();
+      this.videoStream.getTracks().forEach(function(t){ t.stop(); });
+      this.isRecordingVideo = false;
+      var btn = document.getElementById('video-record-btn');
+      btn.textContent = '🎥 开始录像';
+      btn.classList.add('btn-primary');
+      btn.classList.remove('btn-danger');
+      document.getElementById('video-rec-indicator').classList.remove('active');
+    }
+  },
+
+  playRecordedVideo: function(){
+    if(this.videoUrl){
+      window.open(this.videoUrl, '_blank');
+    }
+  },
+
+  downloadVideo: function(){
+    if(this.videoUrl){
+      var a = document.createElement('a');
+      a.href = this.videoUrl;
+      a.download = 'rokid-test-' + Date.now() + '.webm';
+      a.click();
+    }
+  },
+
+  // ===== 录音 =====
+  toggleAudioRecord: function(){
+    if(this.isRecordingAudio){
+      this.stopRecordAudio();
+    } else {
+      this.startRecordAudio();
+    }
+  },
+
+  startRecordAudio: function(){
+    var self = this;
+    var btn = document.getElementById('audio-record-btn');
+
+    if(!navigator.mediaDevices || !window.MediaRecorder){
+      this.log('err', '浏览器不支持录音');
+      return;
+    }
+
+    this.log('info', '启动录音...');
+
+    navigator.mediaDevices.getUserMedia({audio: true, video: false}).then(function(stream){
+      self.audioChunks = [];
+      self.audioRecorder = new MediaRecorder(stream);
+      self.audioRecorder.ondataavailable = function(e){
+        if(e.data.size > 0) self.audioChunks.push(e.data);
+      };
+      self.audioRecorder.onstop = function(){
+        var blob = new Blob(self.audioChunks, {type: 'audio/webm'});
+        self.audioUrl = URL.createObjectURL(blob);
+        var playback = document.getElementById('audio-playback');
+        playback.src = self.audioUrl;
+        self.log('ok', '录音完成，大小 ' + Math.round(blob.size / 1024) + 'KB');
+        document.getElementById('audio-play-btn').disabled = false;
+      };
+      self.audioRecorder.start();
+      self.isRecordingAudio = true;
+      btn.textContent = '⏹️ 停止录音';
+      btn.classList.remove('btn-primary');
+      btn.classList.add('btn-danger');
+      self.log('ok', '录音开始');
+    }).catch(function(err){
+      self.log('err', '录音启动失败：' + err.message);
+    });
+  },
+
+  stopRecordAudio: function(){
+    if(this.audioRecorder && this.isRecordingAudio){
+      this.audioRecorder.stop();
+      this.audioRecorder.stream.getTracks().forEach(function(t){ t.stop(); });
+      this.isRecordingAudio = false;
+      var btn = document.getElementById('audio-record-btn');
+      btn.textContent = '🎤 开始录音';
+      btn.classList.add('btn-primary');
+      btn.classList.remove('btn-danger');
+    }
+  },
+
+  playRecordedAudio: function(){
+    var playback = document.getElementById('audio-playback');
+    if(playback.src){
+      playback.play();
+    }
+  },
+
+  // ===== 语音识别 =====
+  startSpeechRecognition: function(){
+    var self = this;
+    var resultEl = document.getElementById('speech-result');
+
+    // 先尝试 Host API
+    if(this.bridge){
+      this.log('info', '调用 HostSpeechStartRecognition...');
+      this.callHost('voice.startListen', {}).then(function(res){
+        resultEl.style.display = 'block';
+        resultEl.textContent = '🎤 语音识别中...（说停止结束）';
+        resultEl.style.color = 'var(--jade)';
+        if(res && res.text){
+          resultEl.textContent = '识别结果：' + res.text;
+          self.log('ok', '语音识别结果：' + res.text);
+        }
+      }).catch(function(err){
+        self.log('warn', 'Host API 语音识别不可用：' + err.message + '，使用浏览器 API');
+        self.startWebSpeechRecognition();
+      });
+      return;
+    }
+
+    this.startWebSpeechRecognition();
+  },
+
+  startWebSpeechRecognition: function(){
+    var self = this;
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if(!SR){
+      this.log('err', '浏览器不支持语音识别');
+      return;
+    }
+
+    var recognition = new SR();
+    recognition.lang = 'zh-CN';
+    recognition.continuous = false;
+    recognition.interimResults = true;
+
+    var resultEl = document.getElementById('speech-result');
+    resultEl.style.display = 'block';
+    resultEl.textContent = '🎤 语音识别中...请说话';
+    resultEl.style.color = 'var(--jade)';
+
+    recognition.onresult = function(event){
+      var transcript = '';
+      for(var i = event.resultIndex; i < event.results.length; i++){
+        transcript += event.results[i][0].transcript;
+      }
+      resultEl.textContent = '识别结果：' + transcript;
+    };
+
+    recognition.onerror = function(event){
+      self.log('err', '语音识别错误：' + event.error);
+      resultEl.textContent = '识别失败：' + event.error;
+      resultEl.style.color = 'var(--err)';
+    };
+
+    recognition.onend = function(){
+      self.log('ok', '语音识别结束');
+    };
+
+    recognition.start();
+    this.speechRecognition = recognition;
+    this.log('ok', '浏览器语音识别已启动');
+  },
+
+  // ===== 进入望诊 =====
+  enterWangzhen: function(){
+    window.location.href = 'wangzhen-clinical.html';
+  },
+
+  // ===== 日志 =====
+  log: function(level, msg){
+    var area = document.getElementById('log-area');
+    var time = new Date().toLocaleTimeString('zh-CN', {hour12: false});
+    var entry = document.createElement('div');
+    entry.className = 'log-entry';
+    entry.innerHTML = '<span class="log-time">' + time + '</span><span class="log-' + level + '">' + msg + '</span>';
+    area.insertBefore(entry, area.firstChild);
+
+    // 保留最多 50 条
+    while(area.children.length > 50){
+      area.removeChild(area.lastChild);
+    }
+  },
+
+  clearLog: function(){
+    document.getElementById('log-area').innerHTML = '<div class="log-entry"><span class="log-time">--:--:--</span><span class="log-info">日志已清空</span></div>';
+  }
+};
+
+RokidTest.init();
+</script>
+
+</body>
+</html>
