@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>梅花易数排盘 · 命理宝鉴</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+:root{--bg:#0a0e17;--card:#141928;--border:#2a3450;--gold:#c9a84c;--jade:#4ec9b0;--paper:#e8dcc8;--paper2:#b8a88a;--paper3:#8b7e6a;--red:#ef4444;--green:#10b981;--blue:#63b3ed;--purple:#a78bfa;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsoft YaHei',sans-serif;padding:12px;min-height:100vh}
+.mh-header{text-align:center;margin-bottom:12px;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:8px}
+.mh-title{font-size:18px;color:var(--gold);letter-spacing:2px;margin-bottom:4px}
+.mh-meta{font-size:12px;color:var(--paper3);line-height:1.8}
+.mh-form{max-width:500px;margin:0 auto 16px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.mh-form input{padding:8px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;color:var(--paper);font-size:12px}
+.mh-form button{grid-column:1/-1;padding:10px;background:var(--gold);color:var(--bg);border:none;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer}
+.mh-chart{max-width:500px;margin:0 auto;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px}
+.mh-gua{text-align:center;margin-bottom:12px}
+.mh-gua-name{font-size:16px;color:var(--gold);font-weight:600;margin-bottom:4px}
+.mh-gua-sym{font-size:32px;letter-spacing:4px}
+.mh-gua-label{font-size:10px;color:var(--paper3);margin-top:2px}
+.mh-yao{display:grid;grid-template-columns:50px 1fr 80px 50px;gap:6px;align-items:center;padding:4px 8px;font-size:11px;border-bottom:1px solid var(--border)}
+.mh-yao:last-child{border-bottom:none}
+.mh-yao .pos{color:var(--gold);text-align:center}
+.mh-yao .line{text-align:center;font-size:18px;font-family:monospace}
+.mh-yao .wx{color:var(--paper3);font-size:10px}
+.mh-yao .tag{font-size:9px;text-align:center}
+.mh-yao.dong{background:rgba(201,168,76,.05)}
+.mh-tiyong{max-width:500px;margin:12px auto;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px}
+.mh-tiyong h3{color:var(--gold);font-size:13px;margin-bottom:8px}
+.mh-tiyong-row{display:flex;gap:8px;margin-bottom:4px;font-size:11px}
+.mh-tiyong-label{color:var(--paper3);width:80px}
+.mh-tiyong-val{color:var(--paper)}
+.mh-rel{font-weight:600}
+.mh-rel.ji{color:var(--green)}
+.mh-rel.xiong{color:var(--red)}
+.mh-rel.ping{color:var(--paper2)}
+@media(max-width:360px){.mh-yao{grid-template-columns:40px 1fr 60px 40px;gap:3px;font-size:10px}.mh-yao .line{font-size:16px}.mh-gua-sym{font-size:28px}}
+</style>
+</head>
+<body>
+<div class="mh-header">
+  <div class="mh-title">🌸 梅花易数</div>
+  <div id="mh-meta" class="mh-meta">请输入信息排盘</div>
+</div>
+<div class="mh-form">
+  <input type="number" id="mh-year" placeholder="年" value="1990" min="1900" max="2100">
+  <input type="number" id="mh-month" placeholder="月" value="10" min="1" max="12">
+  <input type="number" id="mh-day" placeholder="日" value="28" min="1" max="31">
+  <input type="number" id="mh-hour" placeholder="时" value="7" min="0" max="23">
+  <button onclick="doPaipan()">排盘</button>
+</div>
+<div id="mh-content" style="display:none"></div>
+<script>
+async function doPaipan(){
+  const y=document.getElementById('mh-year').value;
+  const m=document.getElementById('mh-month').value;
+  const d=document.getElementById('mh-day').value;
+  const h=document.getElementById('mh-hour').value;
+  const r=await fetch('/api/paipan/meihua',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({year:+y,month:+m,day:+d,hour:+h})});
+  const data=await r.json();
+  if(!data.ok){alert('排盘失败: '+data.error);return;}
+  renderChart(data.chart);
+}
+function renderChart(c){
+  document.getElementById('mh-meta').textContent=`动爻：${c.dongYaoName} | ${c.meta?c.meta.method:''}`;
+  const ct=document.getElementById('mh-content');
+  ct.style.display='block';
+  let html='<div class="mh-chart">';
+  // 本卦
+  html+=`<div class="mh-gua"><div class="mh-gua-name">本卦：${c.guaName}</div>`;
+  let sym='';
+  for(let i=c.yaos.length-1;i>=0;i--) sym+=c.yaos[i].yin?'⚋':'⚊';
+  html+=`<div class="mh-gua-sym">${sym}</div>`;
+  html+=`<div class="mh-gua-label">${c.upper.name}(${c.upper.nature}·${c.upper.wuxing}) / ${c.lower.name}(${c.lower.nature}·${c.lower.wuxing})</div></div>`;
+  // 六爻
+  for(let i=c.yaos.length-1;i>=0;i--){
+    const y=c.yaos[i];
+    const cls=y.isDong?'mh-yao dong':'mh-yao';
+    const line=y.yin?'— —':'———';
+    const tag=y.isDong?'<span style="color:var(--red)">○动</span>':'';
+    const tiTag=(i===c.tiYong.dongYao)?'<span style="color:var(--gold)">用</span>':'<span style="color:var(--jade)">体</span>';
+    html+=`<div class="${cls}"><div class="pos">${y.positionName}</div><div class="line">${line}</div><div class="wx">${y.isUpper?'上卦':'下卦'}</div><div class="tag">${tiTag} ${tag}</div></div>`;
+  }
+  html+='</div>';
+  // 变卦 & 互卦
+  html+='<div class="mh-chart" style="margin-top:8px">';
+  if(c.bianGua) html+=`<div class="mh-gua"><div class="mh-gua-name">变卦：${c.bianGua.name}</div><div class="mh-gua-label">${c.bianGua.upper.name}(${c.bianGua.upper.wuxing}) / ${c.bianGua.lower.name}(${c.bianGua.lower.wuxing})</div></div>`;
+  if(c.huGua) html+=`<div class="mh-gua"><div class="mh-gua-name">互卦：${c.huGua.name}</div><div class="mh-gua-label">${c.huGua.upper.name}(${c.huGua.upper.wuxing}) / ${c.huGua.lower.name}(${c.huGua.lower.wuxing})</div></div>`;
+  html+='</div>';
+  // 体用分析
+  const ty=c.tiYong;
+  const relClass=ty.relation.includes('吉')?'ji':(ty.relation.includes('凶')?'xiong':'ping');
+  html+='<div class="mh-tiyong"><h3>体用分析</h3>';
+  html+=`<div class="mh-tiyong-row"><span class="mh-tiyong-label">体卦</span><span class="mh-tiyong-val">${ty.tiGua.name}（${ty.tiGua.wuxing}）</span></div>`;
+  html+=`<div class="mh-tiyong-row"><span class="mh-tiyong-label">用卦</span><span class="mh-tiyong-val">${ty.yongGua.name}（${ty.yongGua.wuxing}）</span></div>`;
+  html+=`<div class="mh-tiyong-row"><span class="mh-tiyong-label">体用关系</span><span class="mh-tiyong-val mh-rel ${relClass}">${ty.relation}</span></div>`;
+  if(ty.bianYongGua){
+    const bRelClass=ty.bianRelation.includes('吉')?'ji':(ty.bianRelation.includes('凶')?'xiong':'ping');
+    html+=`<div class="mh-tiyong-row"><span class="mh-tiyong-label">变用</span><span class="mh-tiyong-val">${ty.bianYongGua.name}（${ty.bianYongGua.wuxing}）</span></div>`;
+    html+=`<div class="mh-tiyong-row"><span class="mh-tiyong-label">变用关系</span><span class="mh-tiyong-val mh-rel ${bRelClass}">${ty.bianRelation}</span></div>`;
+  }
+  html+='</div>';
+  ct.innerHTML=html;
+}
+</script>
+</body>
+</html>

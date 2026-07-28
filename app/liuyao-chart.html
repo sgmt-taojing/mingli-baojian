@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>六爻排盘 · 命理宝鉴</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+:root{
+  --bg:#0a0e17;--card:#141928;--border:#2a3450;--gold:#c9a84c;--jade:#4ec9b0;
+  --paper:#e8dcc8;--paper2:#b8a88a;--paper3:#8b7e6a;
+  --red:#ef4444;--green:#10b981;--blue:#63b3ed;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsoft YaHei',sans-serif;padding:12px;min-height:100vh}
+
+.ly-header{text-align:center;margin-bottom:12px;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:8px}
+.ly-title{font-size:18px;color:var(--gold);letter-spacing:2px;margin-bottom:4px}
+.ly-meta{font-size:12px;color:var(--paper3);line-height:1.8}
+.ly-meta span{margin-right:8px}
+
+.ly-form{max-width:500px;margin:0 auto 16px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.ly-form input{padding:8px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;color:var(--paper);font-size:12px}
+.ly-form button{grid-column:1/-1;padding:10px;background:var(--gold);color:var(--bg);border:none;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer}
+
+.ly-chart{max-width:600px;margin:0 auto;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px}
+.ly-gua-name{text-align:center;font-size:16px;color:var(--gold);margin-bottom:12px;font-weight:600}
+.ly-gua-symbols{text-align:center;font-size:28px;margin-bottom:12px;letter-spacing:4px}
+.ly-yao{display:grid;grid-template-columns:60px 1fr 60px 80px 60px 40px;gap:8px;align-items:center;padding:6px 8px;border-bottom:1px solid var(--border);font-size:11px}
+.ly-yao:last-child{border-bottom:none}
+.ly-yao-pos{color:var(--gold);font-weight:600;text-align:center}
+.ly-yao-line{text-align:center;font-size:18px;font-family:monospace;letter-spacing:2px}
+.ly-yao-gz{color:var(--paper2)}
+.ly-yao-wx{color:var(--paper3);font-size:10px}
+.ly-yao-lq{color:var(--jade);font-size:10px}
+.ly-yao-sy{color:var(--gold);font-size:10px;text-align:center}
+.ly-yao-bian{color:var(--red);font-size:9px}
+
+.ly-info{max-width:600px;margin:12px auto;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ly-info-card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:11px;line-height:1.8}
+.ly-info-card h4{color:var(--gold);font-size:12px;margin-bottom:6px}
+
+@media(max-width:768px){
+  .ly-yao{grid-template-columns:50px 1fr 50px 70px 50px 30px;font-size:10px;gap:4px}
+  .ly-yao-line{font-size:16px}
+  .ly-info{grid-template-columns:1fr}
+}
+@media(max-width:360px){
+  .ly-yao{grid-template-columns:40px 1fr 40px 60px 40px;gap:2px;font-size:9px}
+  .ly-yao-bian{display:none}
+  .ly-yao-line{font-size:14px}
+}
+</style>
+</head>
+<body>
+<div class="ly-header">
+  <div class="ly-title">🔮 六爻排盘</div>
+  <div id="ly-meta" class="ly-meta">请输入信息排盘</div>
+</div>
+
+<div class="ly-form">
+  <input type="number" id="ly-year" placeholder="年" value="1990" min="1900" max="2100">
+  <input type="number" id="ly-month" placeholder="月" value="10" min="1" max="12">
+  <input type="number" id="ly-day" placeholder="日" value="28" min="1" max="31">
+  <input type="number" id="ly-hour" placeholder="时" value="7" min="0" max="23">
+  <input type="text" id="ly-daygz" placeholder="日干支(可选)" value="">
+  <button onclick="doPaipan()">排盘</button>
+</div>
+
+<div id="ly-chart" class="ly-chart" style="display:none"></div>
+<div id="ly-info" class="ly-info" style="display:none"></div>
+
+<script>
+async function doPaipan(){
+  const y=document.getElementById('ly-year').value;
+  const m=document.getElementById('ly-month').value;
+  const d=document.getElementById('ly-day').value;
+  const h=document.getElementById('ly-hour').value;
+  const dg=document.getElementById('ly-daygz').value || undefined;
+  const body={year:+y,month:+m,day:+d,hour:+h};
+  if(dg) body.dayGanZhi=dg;
+  const r=await fetch('/api/paipan/liuyao',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const data=await r.json();
+  if(!data.ok){alert('排盘失败: '+data.error);return;}
+  renderChart(data.chart);
+}
+
+function renderChart(c){
+  document.getElementById('ly-meta').innerHTML=`日干支:${c.dayGanZhi} | 日五行:${c.dayWuxing}<br>`+
+    `<span>世爻:第${c.shiYao+1}爻</span><span>应爻:第${c.yingYao+1}爻</span>`;
+
+  const chart=document.getElementById('ly-chart');
+  chart.style.display='block';
+
+  let html=`<div class="ly-gua-name">${c.guaName}`;
+  if(c.bianGua) html+=` → ${c.bianGua.name}`;
+  html+='</div>';
+
+  // 卦符号
+  let symbols='';
+  for(let i=c.yaos.length-1;i>=0;i--){
+    symbols+=c.yaos[i].yin?'⚋':'⚊';
+    if(c.yaos[i].bian) symbols+=' ';
+  }
+  html+=`<div class="ly-gua-symbols">${symbols}</div>`;
+
+  // 六爻
+  for(let i=c.yaos.length-1;i>=0;i--){
+    const y=c.yaos[i];
+    const line=y.yin?'— —':'———';
+    const bian=y.bian?'<span class="ly-yao-bian">○变</span>':'';
+    const sy=y.shiying?`<span class="ly-yao-sy">${y.shiying}</span>`:'';
+    html+=`<div class="ly-yao">`;
+    html+=`<div class="ly-yao-pos">${y.positionName}</div>`;
+    html+=`<div class="ly-yao-line">${line}</div>`;
+    html+=`<div class="ly-yao-gz">${y.ganZhi}</div>`;
+    html+=`<div class="ly-yao-wx">${y.wuxing}·${y.liuqin}</div>`;
+    html+=`<div class="ly-yao-lq">${y.liushen}</div>`;
+    html+=`<div>${sy}${bian}</div>`;
+    html+=`</div>`;
+  }
+  chart.innerHTML=html;
+
+  // 信息卡片
+  const info=document.getElementById('ly-info');
+  info.style.display='grid';
+  let infoHtml='';
+  infoHtml+=`<div class="ly-info-card"><h4>本卦</h4>`;
+  infoHtml+=`卦名：${c.guaName}<br>`;
+  infoHtml+=`上卦：${c.upper.name}${c.upper.symbol}（${c.upper.nature}）<br>`;
+  infoHtml+=`下卦：${c.lower.name}${c.lower.symbol}（${c.lower.nature}）<br>`;
+  infoHtml+=`</div>`;
+  if(c.bianGua){
+    infoHtml+=`<div class="ly-info-card"><h4>变卦</h4>`;
+    infoHtml+=`卦名：${c.bianGua.name}<br>`;
+    infoHtml+=`</div>`;
+  }
+  info.innerHTML=infoHtml;
+}
+</script>
+</body>
+</html>

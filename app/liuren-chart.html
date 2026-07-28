@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>大六壬排盘 · 命理宝鉴</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+:root{--bg:#0a0e17;--card:#141928;--border:#2a3450;--gold:#c9a84c;--jade:#4ec9b0;--paper:#e8dcc8;--paper2:#b8a88a;--paper3:#8b7e6a;--red:#ef4444;--green:#10b981;--blue:#63b3ed;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsoft YaHei',sans-serif;padding:12px;min-height:100vh}
+.lr-header{text-align:center;margin-bottom:12px;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:8px}
+.lr-title{font-size:18px;color:var(--gold);letter-spacing:2px;margin-bottom:4px}
+.lr-meta{font-size:12px;color:var(--paper3);line-height:1.8}
+.lr-meta span{margin-right:8px}
+.lr-form{max-width:500px;margin:0 auto 16px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.lr-form input{padding:8px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;color:var(--paper);font-size:12px}
+.lr-form button{grid-column:1/-1;padding:10px;background:var(--gold);color:var(--bg);border:none;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer}
+.lr-section{max-width:600px;margin:0 auto 12px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px}
+.lr-section h3{color:var(--gold);font-size:13px;margin-bottom:8px}
+.lr-ke{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px}
+.lr-ke-item{text-align:center;padding:8px 4px;background:rgba(255,255,255,.03);border-radius:4px;font-size:11px}
+.lr-ke-item .top{color:var(--gold);font-size:14px;font-weight:600}
+.lr-ke-item .bottom{color:var(--paper3);font-size:10px;margin-top:2px}
+.lr-chuan{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.lr-chuan-item{text-align:center;padding:10px 4px;border-radius:4px;font-size:11px}
+.lr-chuan-item.chu{background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2)}
+.lr-chuan-item.zhong{background:rgba(78,201,176,.08);border:1px solid rgba(78,201,176,.2)}
+.lr-chuan-item.mo{background:rgba(99,179,237,.08);border:1px solid rgba(99,179,237,.2)}
+.lr-chuan-item .label{color:var(--paper3);font-size:9px}
+.lr-chuan-item .zhi{color:var(--gold);font-size:16px;font-weight:600;margin:2px 0}
+.lr-chuan-item .method{color:var(--paper3);font-size:9px}
+.lr-pan{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;max-width:400px;margin:0 auto}
+.lr-pan-item{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:9px;text-align:center;min-height:60px}
+.lr-pan-item .zhi{color:var(--gold);font-size:12px;font-weight:600}
+.lr-pan-item .tp{color:var(--jade);font-size:10px}
+.lr-pan-item .tj{color:var(--blue);font-size:9px}
+.lr-shensha{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.lr-shensha span{font-size:10px;padding:2px 6px;background:rgba(255,255,255,.05);border-radius:3px;color:var(--paper2)}
+@media(max-width:768px){.lr-pan{max-width:300px}.lr-ke{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:360px){.lr-pan-item{min-height:50px;padding:4px}.lr-ke{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="lr-header">
+  <div class="lr-title">🌀 大六壬排盘</div>
+  <div id="lr-meta" class="lr-meta">请输入信息排盘</div>
+</div>
+<div class="lr-form">
+  <input type="number" id="lr-year" placeholder="年" value="2026" min="1900" max="2100">
+  <input type="number" id="lr-month" placeholder="月" value="7" min="1" max="12">
+  <input type="number" id="lr-day" placeholder="日" value="28" min="1" max="31">
+  <input type="number" id="lr-hour" placeholder="时" value="14" min="0" max="23">
+  <button onclick="doPaipan()">排盘</button>
+</div>
+<div id="lr-content" style="display:none"></div>
+<script>
+async function doPaipan(){
+  const y=document.getElementById('lr-year').value;
+  const m=document.getElementById('lr-month').value;
+  const d=document.getElementById('lr-day').value;
+  const h=document.getElementById('lr-hour').value;
+  const r=await fetch('/api/paipan/liuren',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({year:+y,month:+m,day:+d,hour:+h})});
+  const data=await r.json();
+  if(!data.ok){alert('排盘失败: '+data.error);return;}
+  renderChart(data.chart);
+}
+function renderChart(c){
+  document.getElementById('lr-meta').innerHTML=`${c.dayGanZhi}日 ${c.hourZhi}时 | 月将:${c.monthJiang} | ${c.isDaytime?'昼':'夜'}占 | 贵人:${c.guiren}`+
+    (c.isFuYin?' | 伏吟':'')+(c.isFanYin?' | 反吟':'');
+  const ct=document.getElementById('lr-content');
+  ct.style.display='block';
+  let html='';
+  // 四课
+  html+='<div class="lr-section"><h3>四课</h3><div class="lr-ke">';
+  for(const k of c.siKe){html+=`<div class="lr-ke-item"><div class="top">${k.top}</div><div class="bottom">${k.bottom}</div><div style="font-size:8px;color:var(--paper3)">第${k.course}课</div></div>`;}
+  html+='</div></div>';
+  // 三传
+  html+='<div class="lr-section"><h3>三传（'+c.sanChuan.method+'）</h3><div class="lr-chuan">';
+  html+=`<div class="lr-chuan-item chu"><div class="label">初传</div><div class="zhi">${c.sanChuan.chu}</div></div>`;
+  html+=`<div class="lr-chuan-item zhong"><div class="label">中传</div><div class="zhi">${c.sanChuan.zhong}</div></div>`;
+  html+=`<div class="lr-chuan-item mo"><div class="label">末传</div><div class="zhi">${c.sanChuan.mo}</div></div>`;
+  html+='</div></div>';
+  // 天盘
+  html+='<div class="lr-section"><h3>天盘地盘</h3><div class="lr-pan">';
+  const layout=[5,8,2,4,0,6,9,1,3]; // 中艮坤巽中兑坎震离（简化）
+  const dirs=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  for(let i=0;i<12;i++){
+    const p=c.palaces[i];
+    if(!p) continue;
+    html+=`<div class="lr-pan-item"><div class="zhi">${p.zhi}</div><div class="tp">↑${p.tianpanZhi}</div><div class="tj">${p.tianjiang||''}</div></div>`;
+  }
+  html+='</div></div>';
+  // 神煞
+  if(c.shensha && Object.keys(c.shensha).length>0){
+    html+='<div class="lr-section"><h3>神煞</h3><div class="lr-shensha">';
+    for(const [k,v] of Object.entries(c.shensha)) html+=`<span>${k}:${v}</span>`;
+    html+='</div></div>';
+  }
+  ct.innerHTML=html;
+}
+</script>
+</body>
+</html>
