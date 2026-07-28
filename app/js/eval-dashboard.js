@@ -1852,6 +1852,168 @@ function exportAlertDetailCSV(){
   downloadCSV('eval-alert-detail.csv', rows);
 }
 
+// ===== R223: 分模块详细评估 expanded 数据接入 =====
+const EXPANDED_BENCHES = ['faithfulness', 'latency', 'cost-budget'];
+let expandedCache = {}; // { 'W31-faithfulness': {...json}, ... }
+let expandedActiveBench = 'faithfulness';
+
+async function fetchExpanded(week, bench){
+  const key = week + '-' + bench;
+  if (expandedCache[key]) return expandedCache[key];
+  const ghUrl = `${GH}/eval/weekly/${week}-expanded/${bench}-by-module.json`;
+  const localUrl = `eval/weekly/${week}-expanded/${bench}-by-module.json`;
+  try{
+    const r = await fetch(ghUrl, { cache: 'no-cache' });
+    if (r.ok){ const d = await r.json(); expandedCache[key] = d; return d; }
+  }catch(e){}
+  try{
+    const r = await fetch(localUrl, { cache: 'no-cache' });
+    if (r.ok){ const d = await r.json(); expandedCache[key] = d; return d; }
+  }catch(e){}
+  return null;
+}
+
+async function fetchAllExpanded(week){
+  const results = await Promise.all(EXPANDED_BENCHES.map(b => fetchExpanded(week, b)));
+  return { faithfulness: results[0], latency: results[1], 'cost-budget': results[2] };
+}
+
+const MOD_LABELS_EXP = {
+  bazi:'八字', ziwei:'紫微', qimen:'奇门', liuyao:'六爻', liuren:'六壬',
+  meihua:'梅花', fengshui:'风水', zodiac:'生肖', tizhi:'体质',
+  tcm:'中医', wuxing:'五行', zeri:'择日', koujue:'口诀',
+  general:'综合', huangli:'黄历', music:'音乐', lifeindex:'命盘',
+  lifeplan:'人生规划', faith:'信仰', mantra:'真言', classics:'经典',
+  nihaisha:'你好呀', shuhan:'蜀汉', acupuncture:'针灸', mobile:'移动',
+  other:'其他'
+};
+
+function renderExpanded(data, bench){
+  const wrap = $('expandedBody');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  if (!data){
+    wrap.appendChild(el('div', {className:'no-violations'}, '暂无 ' + bench + ' 分模块数据'));
+    return;
+  }
+
+  const mods = data.modules || {};
+  const modKeys = Object.keys(mods).sort((a,b) => {
+    const order = ['bazi','ziwei','qimen','liuyao','liuren','meihua','fengshui','zodiac','tizhi','tcm','wuxing','zeri','koujue','general','huangli','music','lifeindex','lifeplan','faith','mantra','classics','nihaisha','shuhan','acupuncture','mobile','other'];
+    return order.indexOf(a) - order.indexOf(b);
+  });
+
+  // 摘要条
+  const summaryBar = el('div', {className:'expanded-summary-bar'},
+    el('span', {className:'expanded-stat'}, '📊 ' + (data.total_cases || 0) + ' cases'),
+    el('span', {className:'expanded-stat'}, '📚 ' + (data.module_count || modKeys.length) + ' 模块')
+  );
+  if (bench === 'faithfulness' && data.avg_score != null){
+    summaryBar.appendChild(el('span', {className:'expanded-stat'}, '📈 均分 ' + data.avg_score.toFixed(3)));
+  }
+  if (bench === 'latency' && data.p50_ms != null){
+    summaryBar.appendChild(el('span', {className:'expanded-stat'}, '⚡ P50 ' + data.p50_ms + 'ms'));
+    summaryBar.appendChild(el('span', {className:'expanded-stat'}, '⚡ P95 ' + (data.p95_ms || 0) + 'ms'));
+  }
+  if (bench === 'cost-budget' && data.avg_cost_yuan != null){
+    summaryBar.appendChild(el('span', {className:'expanded-stat'}, '💰 均费 ' + (data.avg_cost_yuan < 0.001 ? data.avg_cost_yuan.toExponential(1) : data.avg_cost_yuan.toFixed(4) + '元')));
+  }
+  wrap.appendChild(summaryBar);
+
+  // 表格
+  const table = el('table', {className:'expanded-table'});
+  let theadCells;
+  if (bench === 'faithfulness'){
+    theadCells = ['模块', 'Cases', '均分', '延迟ms', '违规', '状态'];
+  } else if (bench === 'latency'){
+    theadCells = ['模块', 'Cases', 'P50', 'P95', 'Avg', 'Min', 'Max'];
+  } else {
+    theadCells = ['模块', 'Cases', '均费(元)', '延迟ms'];
+  }
+  table.appendChild(el('thead', null,
+    el('tr', null, ...theadCells.map(h => el('th', {className:'exp-th'}, h)))
+  ));
+
+  const tbody = el('tbody');
+  modKeys.forEach(mod => {
+    const d = mods[mod];
+    const label = MOD_LABELS_EXP[mod] || mod;
+    let cells;
+    if (bench === 'faithfulness'){
+      const score = d.avg_score || 0;
+      const cls = score >= 0.85 ? 'ok' : score >= 0.7 ? 'warn' : 'danger';
+      cells = [
+        el('td', {className:'exp-mod-name'}, label),
+        el('td', {className:'exp-cell'}, String(d.total || 0)),
+        el('td', {className:'exp-cell eval-' + cls}, score.toFixed(3)),
+        el('td', {className:'exp-cell'}, Math.round(d.avg_latency || 0) + 'ms'),
+        el('td', {className:'exp-cell ' + (d.violations > 0 ? 'eval-danger' : 'eval-ok')}, String(d.violations || 0)),
+        el('td', {className:'exp-cell'}, el('span', {className:'eval-badge eval-' + cls}, cls === 'ok' ? '✅' : cls === 'warn' ? '⚠️' : '❌'))
+      ];
+    } else if (bench === 'latency'){
+      const p95 = d.p95_ms || 0;
+      const cls = p95 <= 500 ? 'ok' : p95 <= 1500 ? 'warn' : 'danger';
+      cells = [
+        el('td', {className:'exp-mod-name'}, label),
+        el('td', {className:'exp-cell'}, String(d.total || 0)),
+        el('td', {className:'exp-cell'}, (d.p50_ms || 0) + 'ms'),
+        el('td', {className:'exp-cell eval-' + cls}, p95 + 'ms'),
+        el('td', {className:'exp-cell'}, (d.avg_latency || 0).toFixed(1) + 'ms'),
+        el('td', {className:'exp-cell'}, (d.min_ms || 0) + 'ms'),
+        el('td', {className:'exp-cell'}, (d.max_ms || 0) + 'ms')
+      ];
+    } else {
+      const cost = d.avg_cost_yuan || 0;
+      const cls = cost <= 0.01 ? 'ok' : cost <= 0.05 ? 'warn' : 'danger';
+      cells = [
+        el('td', {className:'exp-mod-name'}, label),
+        el('td', {className:'exp-cell'}, String(d.total || 0)),
+        el('td', {className:'exp-cell eval-' + cls}, cost < 0.001 ? cost.toExponential(1) : cost.toFixed(4)),
+        el('td', {className:'exp-cell'}, (d.avg_latency_ms || 0).toFixed(1) + 'ms')
+      ];
+    }
+    tbody.appendChild(el('tr', {className:'exp-row'}, ...cells));
+  });
+  table.appendChild(tbody);
+  wrap.appendChild(table);
+}
+
+async function refreshExpanded(){
+  const weekSel = $('expandedWeekSel');
+  const week = weekSel ? weekSel.value : '2026-W31';
+  const data = await fetchAllExpanded(week);
+  renderExpanded(data[expandedActiveBench], expandedActiveBench);
+}
+
+function exportExpandedCSV(){
+  const weekSel = $('expandedWeekSel');
+  const week = weekSel ? weekSel.value : '2026-W31';
+  const key = week + '-' + expandedActiveBench;
+  const data = expandedCache[key];
+  if (!data) return;
+  const mods = data.modules || {};
+  const modKeys = Object.keys(mods).sort();
+  let headers, rows = [];
+  if (expandedActiveBench === 'faithfulness'){
+    headers = ['module','cases','avg_score','avg_latency_ms','violations'];
+  } else if (expandedActiveBench === 'latency'){
+    headers = ['module','cases','p50_ms','p95_ms','avg_latency','min_ms','max_ms'];
+  } else {
+    headers = ['module','cases','avg_cost_yuan','avg_latency_ms'];
+  }
+  modKeys.forEach(mod => {
+    const d = mods[mod];
+    if (expandedActiveBench === 'faithfulness'){
+      rows.push([mod, d.total||0, (d.avg_score||0).toFixed(3), Math.round(d.avg_latency||0), d.violations||0]);
+    } else if (expandedActiveBench === 'latency'){
+      rows.push([mod, d.total||0, d.p50_ms||0, d.p95_ms||0, (d.avg_latency||0).toFixed(1), d.min_ms||0, d.max_ms||0]);
+    } else {
+      rows.push([mod, d.total||0, (d.avg_cost_yuan||0).toExponential(2), (d.avg_latency_ms||0).toFixed(1)]);
+    }
+  });
+  downloadCSV(`expanded-${week}-${expandedActiveBench}.csv`, [headers, ...rows]);
+}
+
 // ===== R216: 诊疗经验蒸馏（R218: GitHub → local 双源回退） =====
 async function fetchDistillReport(){
   const ghUrl = `${GH}/DELIVERY/distill-report-2026-07-28.json`;
@@ -2026,6 +2188,8 @@ async function refresh(){
     // R216: 蒸馏报告
     cache.distill = await fetchDistillReport();
     renderDistill(cache.distill);
+    // R223: expanded 分模块详细
+    await refreshExpanded();
   }finally{
     $('refreshBtn').textContent = '🔄 刷新';
     $('refreshBtn').disabled = false;
@@ -2042,6 +2206,30 @@ const _mpCSV = $('modPercaseCSVBtn'); if (_mpCSV) _mpCSV.addEventListener('click
 const _ahCSV = $('alertHistCSVBtn'); if (_ahCSV) _ahCSV.addEventListener('click', exportAlertHistoryCSV);
 const _adCSV = $('alertDetailCSVBtn'); if (_adCSV) _adCSV.addEventListener('click', exportAlertDetailCSV);
 const _diCSV = $('distillCSVBtn'); if (_diCSV) _diCSV.addEventListener('click', exportDistillCSV);
+
+// R223: expanded 分模块 tab 事件
+const _expWeekSel = $('expandedWeekSel');
+if (_expWeekSel){
+  WEEKS.forEach(w => {
+    const opt = document.createElement('option');
+    opt.value = w; opt.textContent = w.replace('2026-','');
+    _expWeekSel.appendChild(opt);
+  });
+  _expWeekSel.value = '2026-W31';
+  _expWeekSel.addEventListener('change', refreshExpanded);
+}
+document.querySelectorAll('.expanded-tab').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    document.querySelectorAll('.expanded-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    expandedActiveBench = btn.dataset.bench;
+    const weekSel = $('expandedWeekSel');
+    const week = weekSel ? weekSel.value : '2026-W31';
+    const data = await fetchAllExpanded(week);
+    renderExpanded(data[expandedActiveBench], expandedActiveBench);
+  });
+});
+const _expCSV = $('expandedCSVBtn'); if (_expCSV) _expCSV.addEventListener('click', exportExpandedCSV);
 
 // 启动
 refresh();

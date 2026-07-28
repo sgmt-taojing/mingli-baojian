@@ -1551,3 +1551,126 @@ html, body {
 @media (max-width: 360px) {
   .dash-source-badge { font-size: 9px; padding: 2px 6px; }
 }
+
+/* ===== R223: 分模块详细评估 expanded ===== */
+.dash-expanded-modules {
+  background: var(--paper);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.dash-expanded-modules h2 {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+.expanded-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0 16px;
+  flex-wrap: wrap;
+}
+.expanded-controls label {
+  font-size: 13px;
+  color: var(--muted);
+}
+.expanded-controls select {
+  background: var(--paper3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 13px;
+  color: var(--ink);
+}
+.expanded-tabs {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+.expanded-tab {
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.expanded-tab:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.expanded-tab.active {
+  background: var(--gold);
+  color: var(--paper);
+  border-color: var(--gold);
+}
+.expanded-body {
+  overflow-x: auto;
+}
+.expanded-summary-bar {
+  display: flex;
+  gap: 16px;
+  padding: 8px 0 16px;
+  flex-wrap: wrap;
+}
+.expanded-stat {
+  font-size: 13px;
+  color: var(--muted);
+  background: var(--paper3);
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+.expanded-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.expanded-table .exp-th {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 2px solid var(--border);
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.expanded-table .exp-row:hover {
+  background: var(--paper3);
+}
+.expanded-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.exp-mod-name {
+  font-weight: 600;
+  color: var(--ink);
+}
+.exp-cell {
+  color: var(--ink2);
+  text-align: center;
+}
+.eval-ok { color: #10b981; }
+.eval-warn { color: #f59e0b; }
+.eval-danger { color: #ef4444; }
+.eval-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+@media (max-width: 480px) {
+  .expanded-controls { flex-direction: column; align-items: stretch; }
+  .expanded-tabs { margin-left: 0; }
+  .expanded-tab { flex: 1; text-align: center; }
+  .expanded-table { font-size: 12px; }
+  .expanded-table td, .expanded-table .exp-th { padding: 5px 6px; }
+}
+@media (max-width: 360px) {
+  .expanded-table { font-size: 11px; }
+  .expanded-summary-bar { gap: 8px; }
+  .expanded-stat { font-size: 12px; padding: 3px 8px; }
+}
