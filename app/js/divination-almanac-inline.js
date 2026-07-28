@@ -391,8 +391,11 @@ function updateAlmanac() {
   currentDate = new Date(dateStr);
   const almanac = getAlmanacData(dateStr);
   
-  // 渲染黄历信息
+  // 渲染黄历信息（本地）
   renderAlmanacInfo(dateStr, almanac);
+  
+  // R238: 后端民俗API增强
+  fetchMinsuHuangli(dateStr);
   
   // 更新视角内容
   switchView(currentView);
@@ -404,6 +407,37 @@ function updateAlmanac() {
   currentShichen = null;
   document.getElementById('shichenView').classList.remove('visible');
   document.querySelectorAll('.shichen-btn').forEach(b => b.classList.remove('active'));
+}
+
+// R238: 后端民俗API增强
+async function fetchMinsuHuangli(dateStr) {
+  try {
+    const d = new Date(dateStr);
+    const resp = await fetch('/api/minsu/huangli?year='+d.getFullYear()+'&month='+(d.getMonth()+1)+'&day='+d.getDate());
+    if (!resp.ok) return;
+    const data = await resp.json();
+    if (!data.ok || !data.chart) return;
+    var c = data.chart;
+    // 增强黄历信息：用后端数据补充
+    var enhanceEl = document.getElementById('minsu-enhance') || (()=>{
+      var el = document.createElement('div');
+      el.id = 'minsu-enhance';
+      el.style.cssText = 'margin-top:8px;padding:10px;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.15);border-radius:8px;font-size:12px';
+      var parent = document.querySelector('.almanac-info,.almanac-detail,main');
+      if (parent) parent.appendChild(el);
+      return el;
+    })();
+    var html = '<div style="font-weight:600;color:var(--gold,#c9a84c);margin-bottom:4px">📜 古制黄历（API增强）</div>';
+    if (c.dayGanZhi) html += '<div>日干支：'+c.dayGanZhi+'</div>';
+    if (c.jianchu) html += '<div>建除：'+c.jianchu+'日</div>';
+    if (c.yiji) html += '<div>宜：'+c.yiji.yi+'</div><div>忌：'+c.yiji.ji+'</div>';
+    if (c.chongsha) html += '<div>冲煞：'+c.chongsha+'</div>';
+    if (c.zhishen) html += '<div>值神：'+c.zhishen+'（'+(c.huangdao||'')+'）</div>';
+    if (c.taishen) html += '<div>胎神：'+c.taishen+'</div>';
+    if (c.jieqi) html += '<div>节气：'+c.jieqi+'</div>';
+    enhanceEl.innerHTML = html;
+    enhanceEl.style.display = 'block';
+  } catch(e) { console.warn('[黄历API增强] 不可用', e.message); }
 }
 
 // ===== 获取黄历数据（自动补充） =====
