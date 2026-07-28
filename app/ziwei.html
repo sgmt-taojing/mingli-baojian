@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>紫微斗数排盘 · 命理宝鉴</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/divination-hub.css">
+  <style>
+    :root{--zw-bg:#0a0e17;--zw-paper:#e8e0d0;--zw-gold:#c9a84c;--zw-jade:#10b981;--zw-red:#ef4444;--zw-border:rgba(201,168,76,.18);--zw-card:rgba(255,255,255,.03)}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'PingFang SC','Noto Serif SC',sans-serif;background:var(--zw-bg);color:var(--zw-paper);padding:10px;line-height:1.6;min-height:100vh}
+    .zw-topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--zw-border);margin-bottom:16px;flex-wrap:wrap;gap:8px}
+    .zw-topbar h1{font-size:18px;color:var(--zw-gold);letter-spacing:2px}
+    .nav-back{font-size:12px;color:var(--zw-paper3);text-decoration:none;padding:4px 10px;border:1px solid var(--zw-border);border-radius:6px}
+    .nav-back:hover{color:var(--zw-paper)}
+
+    .zw-input-card{background:var(--zw-card);border:1px solid var(--zw-border);border-radius:10px;padding:16px;margin-bottom:12px;max-width:800px;margin-left:auto;margin-right:auto}
+    .zw-input-title{font-size:14px;color:var(--zw-gold);margin-bottom:10px}
+    .zw-form-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+    .zw-form-grid select{padding:8px;background:rgba(255,255,255,.05);border:1px solid var(--zw-border);border-radius:6px;color:var(--zw-paper);font-size:13px}
+    .zw-form-grid select option{background:#1a1a2e}
+    .zw-cal-switch{display:inline-flex;border:1px solid var(--zw-border);border-radius:6px;overflow:hidden;margin-bottom:8px}
+    .zw-cal-switch button{padding:4px 12px;border:none;background:transparent;color:var(--zw-paper3);font-size:11px;cursor:pointer}
+    .zw-cal-switch button.active{background:var(--zw-gold);color:#0a0e17;font-weight:600}
+    .btn{padding:8px 18px;border:none;border-radius:6px;cursor:pointer;font-size:13px;transition:.2s}
+    .btn-primary{background:var(--zw-gold);color:#0a0e17;font-weight:600}
+    .btn-primary:hover{background:#d4b85e}
+    .btn-ghost{background:transparent;border:1px solid var(--zw-border);color:var(--zw-paper3)}
+
+    .ziwei-chart{max-width:800px;margin:0 auto}
+    .ziwei-header{text-align:center;margin-bottom:12px}
+    .ziwei-title{font-size:18px;color:var(--zw-gold);letter-spacing:2px}
+    .ziwei-meta{font-size:12px;color:var(--zw-paper3);margin-top:4px}
+    .ziwei-sihua{display:flex;justify-content:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+    .sihua-item{font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid}
+    .hua-lu{color:#10b981;border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.08)}
+    .hua-quan{color:#c9a84c;border-color:rgba(201,168,76,.3);background:rgba(201,168,76,.08)}
+    .hua-ke{color:#63b3ed;border-color:rgba(99,179,237,.3);background:rgba(99,179,237,.08)}
+    .hua-ji{color:#ef4444;border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.08)}
+
+    .ziwei-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:12px}
+    .ziwei-gong{padding:8px;border:1px solid var(--zw-border);border-radius:6px;background:var(--zw-card);min-height:70px}
+    .gong-ming{border-color:var(--zw-gold);background:rgba(201,168,76,.08);box-shadow:0 0 0 1px rgba(201,168,76,.2)}
+    .gong-shen{border-color:var(--zw-jade)}
+    .gong-name{font-size:11px;color:var(--zw-gold);margin-bottom:4px;font-weight:600}
+    .gong-tag{font-size:8px;padding:1px 4px;border-radius:2px;background:var(--zw-gold);color:#0a0e17}
+    .gong-tag.shen{background:var(--zw-jade)}
+    .gong-stars{display:flex;flex-wrap:wrap;gap:2px}
+    .star{font-size:10px;padding:2px 4px;border-radius:3px;background:rgba(201,168,76,.08);color:var(--zw-paper)}
+    .star-main{font-weight:600;color:var(--zw-gold)}
+    .star.hua-lu{color:#10b981;background:rgba(16,185,129,.12)}
+    .star.hua-quan{color:#c9a84c;background:rgba(201,168,76,.12)}
+    .star.hua-ke{color:#63b3ed;background:rgba(99,179,237,.12)}
+    .star.hua-ji{color:#ef4444;background:rgba(239,68,68,.12)}
+    .gong-empty{font-size:10px;color:var(--zw-paper3);opacity:.5}
+
+    .zw-compare{background:var(--zw-card);border:1px solid var(--zw-border);border-radius:10px;padding:16px;margin-top:12px;max-width:800px;margin-left:auto;margin-right:auto}
+    .zw-compare-title{font-size:14px;color:var(--zw-gold);margin-bottom:8px}
+    .zw-compare-hint{font-size:11px;color:var(--zw-paper3);margin-bottom:8px}
+
+    @media(max-width:768px){
+      .zw-form-grid{grid-template-columns:repeat(2,1fr)}
+      .ziwei-grid{grid-template-columns:repeat(3,1fr)}
+    }
+  </style>
+</head>
+<body>
+
+<nav style="padding:6px 12px;border-bottom:1px solid rgba(201,168,76,.12);display:flex;gap:6px;flex-wrap:wrap;background:rgba(8,8,8,.95);position:sticky;top:0;z-index:200">
+  <a href="divination-hub.html" class="nav-back">🏠 主平台</a>
+  <a href="bazi.html" class="nav-back">📜 八字排盘</a>
+  <a href="wangzhen-clinical.html" class="nav-back">🔍 望诊工作台</a>
+  <a href="tcm-clinic.html" class="nav-back">🏥 中医诊疗</a>
+</nav>
+
+<header class="zw-topbar">
+  <div>
+    <h1>🌌 紫微斗数排盘</h1>
+    <div style="font-size:11px;color:var(--zw-paper3);margin-top:2px">十四主星 · 十二宫位 · 四化星 · 独立于八字，可做交叉比对</div>
+  </div>
+</header>
+
+<!-- 输入区 -->
+<div class="zw-input-card">
+  <div class="zw-input-title">输入出生信息</div>
+  <div class="zw-cal-switch" id="zw-cal-switch">
+    <button class="active" onclick="switchZwCal('solar')">阳历</button>
+    <button onclick="switchZwCal('lunar')">农历</button>
+  </div>
+  <div class="zw-form-grid">
+    <select id="zw-year" aria-label="年"><option value="">年</option></select>
+    <select id="zw-month" aria-label="月"><option value="">月</option></select>
+    <select id="zw-day" aria-label="日"><option value="">日</option></select>
+    <select id="zw-hour" aria-label="时"><option value="">时辰</option></select>
+  </div>
+  <button class="btn btn-primary" onclick="runZiweiPaipan()">🌌 紫微排盘</button>
+  <button class="btn btn-ghost" onclick="window.location.href='bazi.html'" style="margin-left:6px">📜 对照八字</button>
+</div>
+
+<!-- 排盘结果 -->
+<div id="ziwei-result"></div>
+
+<!-- 交叉比对 -->
+<div class="zw-compare">
+  <div class="zw-compare-title">🔄 紫微×八字 交叉比对</div>
+  <div class="zw-compare-hint">紫微斗数和八字是两套独立的命理体系。八字看五行格局，紫微看星曜宫位。两者交叉验证准确率更高。</div>
+  <div id="zw-compare-result" style="font-size:12px;color:var(--zw-paper3)">排盘后自动生成比对分析</div>
+</div>
+
+<script src="js/ziwei-engine.js" defer></script>
+<script>
+(function(){
+  // 初始化下拉
+  var ySel = document.getElementById('zw-year');
+  var mSel = document.getElementById('zw-month');
+  var dSel = document.getElementById('zw-day');
+  var hSel = document.getElementById('zw-hour');
+  for(var y=1940;y<=2025;y++){var o=document.createElement('option');o.value=y;o.textContent=y+'年';ySel.appendChild(o);}
+  for(var m=1;m<=12;m++){var o=document.createElement('option');o.value=m;o.textContent=m+'月';mSel.appendChild(o);}
+  for(var d=1;d<=31;d++){var o=document.createElement('option');o.value=d;o.textContent=d+'日';dSel.appendChild(o);}
+  var hours=[['子时',0],['丑时',1],['寅时',3],['卯时',5],['辰时',7],['巳时',9],['午时',11],['未时',13],['申时',15],['酉时',17],['戌时',19],['亥时',21]];
+  hours.forEach(function(h){var o=document.createElement('option');o.value=h[1];o.textContent=h[0]+' ('+(h[1]<10?'0'+h[1]:h[1])+':00)';hSel.appendChild(o);});
+})();
+
+var zwCalMode = 'solar';
+function switchZwCal(mode){
+  zwCalMode = mode;
+  document.querySelectorAll('#zw-cal-switch button').forEach(function(b){
+    b.classList.toggle('active', b.textContent === (mode==='solar'?'阳历':'农历'));
+  });
+}
+
+function runZiweiPaipan(){
+  var year = parseInt(document.getElementById('zw-year').value);
+  var month = parseInt(document.getElementById('zw-month').value);
+  var day = parseInt(document.getElementById('zw-day').value);
+  var hour = parseInt(document.getElementById('zw-hour').value);
+  if(!year || !month || !day){ alert('请填写完整的出生年月日'); return; }
+  if(!hour && hour !== 0){ hour = 12; }
+
+  var result = ZiweiEngine.paipan(year, month, day, hour, zwCalMode === 'lunar');
+  var container = document.getElementById('ziwei-result');
+  ZiweiEngine.renderChart(container, result);
+
+  // 交叉比对提示
+  var compareEl = document.getElementById('zw-compare-result');
+  if(compareEl){
+    var mingStar = result.palaces[0].stars[0] || '空宫';
+    var starNames = {ziwei:'紫微',tianji:'天机',taiyang:'太阳',wuqu:'武曲',lianzhen:'廉贞',tianfu:'天府',taiyin:'太阴',tanlang:'贪狼',jumen:'巨门',tianxiang:'天相',tianliang:'天梁',qisha:'七杀',pojun:'破军'};
+    var mingStarName = starNames[mingStar] || '空宫';
+    var html = '<div style="padding:10px;background:rgba(201,168,76,.06);border-radius:6px;margin-bottom:8px">';
+    html += '<div style="color:var(--zw-gold);font-weight:600;margin-bottom:4px">紫微命宫主星：' + mingStarName + '</div>';
+    html += '<div style="font-size:11px;color:var(--zw-paper3)">五行局：' + result.wuxingJu + ' · 年干支：' + result.yearGanZhi + '</div>';
+    html += '</div>';
+    html += '<div style="font-size:11px;line-height:1.8">💡 建议同时排八字命盘，比对日主五行与紫微主星的脏腑对应关系。例如：紫微七杀入命 → 金气偏旺 → 肺/大肠需注意；天同太阴入命 → 水气偏旺 → 肾/膀胱需注意。</div>';
+    html += '<div style="margin-top:8px"><a href="bazi.html" style="color:var(--zw-gold);font-size:12px">→ 去排八字命盘做比对</a></div>';
+    compareEl.innerHTML = html;
+  }
+}
+</script>
+
+</body>
+</html>
