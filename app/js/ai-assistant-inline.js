@@ -1486,8 +1486,16 @@ function _applyGlossary(text){
 }
 
 // R103: 来源分级标注 — 在报告末尾添加来源声明
-function _addSourceLabel(text){
+function _addSourceLabel(text, modId){
   if(!text || text.length < 50) return text;
+  // R103: 注入路氏实践观点
+  var luzongQuote = '';
+  try{
+    if(typeof LuzongQuotes !== 'undefined' && modId){
+      luzongQuote = LuzongQuotes.get(modId);
+      if(luzongQuote) text = text + '\n\n' + luzongQuote;
+    }
+  }catch(e){}
   var label = '\n\n━━━ 来源与声明 ━━━\n';
   label += '【理论来源】经典命理学 ✅ + 大师实践 📘\n';
   label += '  ✅ 经典：八字/紫微/奇门/六壬/六爻/梅花经典理论\n';
@@ -1515,7 +1523,7 @@ function showReport(text, meta){
   // R206: 术语白话化注入（在合规清洗后、渲染前）
   try {
     text = _applyGlossary(text);
-    text = _addSourceLabel(text);
+    text = _addSourceLabel(text, state.module);
   } catch(e) { console.warn('[r206-glossary] err', e); }
   // R89-P2-1: KB 源标签提取（仅供 KB 命中条 meta 扩展，不改报告文本）
   try {
