@@ -84,9 +84,38 @@
       var r = global.JieqiEngine.getFourPillars(y, m, d, h || 12);
       var parts = [];
       parts.push('节气: ' + r.jieqi);
-      if (r.boundary) parts.push('交节: ' + r.boundary);
+      if (r.monthJie) parts.push('月支节: ' + r.monthJie);
       parts.push('年柱: ' + r.yearGZ + ' / 月柱: ' + r.monthGZ + ' / 日柱: ' + r.dayGZ + ' / 时柱: ' + r.hourGZ);
+      parts.push('日主: ' + r.dayGan);
       if (r.nayin) parts.push('纳音: ' + r.nayin);
+      
+      // 日主强弱判断 → 精确口诀推送关键词
+      var dayGan = r.dayGan;
+      var dayElement = '';
+      if ('甲乙'.indexOf(dayGan) >= 0) dayElement = '木';
+      else if ('丙丁'.indexOf(dayGan) >= 0) dayElement = '火';
+      else if ('戊己'.indexOf(dayGan) >= 0) dayElement = '土';
+      else if ('庚辛'.indexOf(dayGan) >= 0) dayElement = '金';
+      else if ('壬癸'.indexOf(dayGan) >= 0) dayElement = '水';
+      
+      // 月支生克判断日主强弱（简化版）
+      var monthZhi = r.monthZhi || r.monthGZ.charAt(1);
+      var strongWeak = '';
+      var shengMei = {'木':['亥子'],'火':['寅卯'],'土':['巳午'],'金':['辰戌丑未申酉'],'水':['申酉金']}[dayElement] || [];
+      var keMei = {'木':['申酉'],'火':['亥子'],'土':['寅卯'],'金':['巳午'],'水':['辰戌丑未']}[dayElement] || [];
+      if (shengMei.some(function(z){return monthZhi.indexOf(z) >= 0;})) {
+        strongWeak = '偏强';
+      } else if (keMei.some(function(z){return monthZhi.indexOf(z) >= 0;})) {
+        strongWeak = '偏弱';
+      } else {
+        strongWeak = '中和';
+      }
+      
+      if (dayElement && strongWeak !== '中和') {
+        parts.push('日主强弱推断: ' + dayGan + dayElement + strongWeak);
+        parts.push('口诀推送关键词: 日主' + dayGan + dayElement + strongWeak);
+      }
+      
       return '\n【天文节气引擎（紫金山天文台历表）】\n' + parts.join('\n') + '\n';
     } catch (e) { return ''; }
   }
