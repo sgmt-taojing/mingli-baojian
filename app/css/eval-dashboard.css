@@ -1914,3 +1914,129 @@ html, body {
   .heatmap-row-label { padding: 2px 4px; font-size: 10px; }
   .heatmap-legend-bar { width: 60px; }
 }
+
+/* ===== R227: 模块雷达图 ===== */
+.dash-radar {
+  margin: 16px 0;
+  padding: 18px;
+  background: var(--paper, #faf8f5);
+  border-radius: 10px;
+  border: 1px solid var(--border, #e0d6c8);
+}
+.radar-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-bottom: 14px;
+}
+.radar-controls label {
+  font-size: 12px;
+  color: var(--muted, #888);
+}
+#radarWeekSel {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border, #ddd);
+  background: var(--paper3, #fff);
+  font-size: 12px;
+}
+#radarModSel {
+  min-width: 200px;
+  max-width: 100%;
+  padding: 4px;
+  border-radius: 4px;
+  border: 1px solid var(--border, #ddd);
+  background: var(--paper3, #fff);
+  font-size: 12px;
+}
+#radarModSel option {
+  padding: 2px 6px;
+}
+.radar-quick-btns {
+  display: flex;
+  gap: 6px;
+}
+.radar-mini-btn {
+  padding: 3px 10px;
+  font-size: 11px;
+  border: 1px solid var(--gold, #c8a55b);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--gold, #c8a55b);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.radar-mini-btn:hover {
+  background: var(--gold, #c8a55b);
+  color: var(--paper3, #fff);
+}
+.radar-svg-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+}
+.radar-svg {
+  max-width: 100%;
+  height: auto;
+}
+.radar-grid {
+  fill: none;
+  stroke: var(--border, #ddd);
+  stroke-width: 1;
+  stroke-dasharray: 2,3;
+}
+.radar-grid-outer {
+  fill: none;
+  stroke: var(--border, #bbb);
+  stroke-width: 1.5;
+}
+.radar-axis {
+  stroke: var(--border, #ccc);
+  stroke-width: 1;
+}
+.radar-axis-label {
+  font-size: 11px;
+  fill: var(--muted, #888);
+}
+.radar-shape {
+  transition: fill-opacity 0.2s;
+}
+.radar-shape:hover {
+  fill-opacity: 0.25 !important;
+}
+.radar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  justify-content: center;
+  margin-top: 8px;
+}
+.radar-legend-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+.radar-legend-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+.radar-empty {
+  text-align: center;
+  padding: 40px;
+  color: var(--muted, #aaa);
+  font-size: 13px;
+}
+@media (max-width: 480px) {
+  .radar-controls { flex-direction: column; align-items: flex-start; }
+  #radarModSel { width: 100%; min-width: 0; }
+  .radar-quick-btns { flex-wrap: wrap; }
+}
+@media (max-width: 360px) {
+  .radar-mini-btn { font-size: 10px; padding: 2px 8px; }
+  .radar-axis-label { font-size: 10px; }
+  .radar-legend-chip { font-size: 11px; }
+}

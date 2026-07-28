@@ -2821,6 +2821,281 @@ if (_hmCSV) _hmCSV.addEventListener('click', exportHeatmapCSV);
 // 启动时加载热力图
 refreshHeatmap();
 
+// ===== R227: 模块雷达图 =====
+const RADAR_DIMS = [
+  { key: 'faithfulness', label: '合规分', max: 1, fmt: v => v.toFixed(3) },
+  { key: 'p95_latency', label: 'P95延迟(ms)', max: 0, invert: true, fmt: v => v.toFixed(0) + 'ms' },
+  { key: 'avg_latency', label: '均延迟(ms)', max: 0, invert: true, fmt: v => v.toFixed(1) + 'ms' },
+  { key: 'avg_cost', label: '成本(元)', max: 0, invert: true, fmt: v => '¥' + v.toFixed(4) },
+  { key: 'kb_hit', label: 'KB命中率', max: 1, fmt: v => (v*100).toFixed(0) + '%' }
+];
+const RADAR_COLORS = ['#e74c3c','#3498db','#2ecc71','#f39c12','#9b59b6','#1abc9c','#e67e22','#34495e'];
+
+async function fetchRadarData(week){
+  const benches = ['faithfulness','latency','cost-budget'];
+  const results = {};
+  for(const b of benches){
+    const ghUrl = `${GH}/eval/weekly/${week}-expanded/${b}-by-module.json`;
+    const localUrl = `eval/weekly/${week}-expanded/${b}-by-module.json`;
+    let data = null;
+    try{
+      const r = await fetch(ghUrl, { cache:'no-cache' });
+      if(r.ok) data = await r.json();
+    }catch(e){}
+    if(!data){
+      try{
+        const r = await fetch(localUrl, { cache:'no-cache' });
+        if(r.ok) data = await r.json();
+      }catch(e){}
+    }
+    results[b] = data;
+  }
+  // Merge into per-module radar rows
+  const modules = {};
+  const fai = results['faithfulness'];
+  if(!fai || !fai.modules) return null;
+  for(const [mod, v] of Object.entries(fai.modules)){
+    modules[mod] = {
+      faithfulness: v.avg_score || 0,
+      p95_latency: results['latency']?.modules?.[mod]?.p95_ms || 0,
+      avg_latency: results['latency']?.modules?.[mod]?.avg_latency || 0,
+      avg_cost: results['cost-budget']?.modules?.[mod]?.avg_cost_yuan || 0,
+      kb_hit: v.kb_hit_rate || v.kb_hit || 0
+    };
+  }
+  return { week, modules };
+}
+
+function buildRadarModuleList(data){
+  if(!data) return [];
+  return Object.entries(data.modules)
+    .map(([mod, vals]) => ({ mod, ...vals }))
+    .sort((a,b) => b.faithfulness - a.faithfulness);
+}
+
+function normalizeRadarValue(dimKey, val, allVals){
+  if(dimKey === 'faithfulness' || dimKey === 'kb_hit'){
+    return val; // 0-1
+  }
+  // For latency/cost: invert (lower is better) → normalize to 0-1
+  const max = Math.max(...allVals, 0.001);
+  return max > 0 ? 1 - (val / max) : 0;
+}
+
+function renderRadarChart(data, selectedMods){
+  const wrap = $('radarChartWrap');
+  wrap.innerHTML = '';
+  if(!data || selectedMods.length === 0){
+    wrap.appendChild(el('div', {className:'radar-empty'}, '请选择至少 1 个模块'));
+    return;
+  }
+  const W = 460, H = 380, cx = W/2, cy = H/2 + 10, R = 130;
+  const dims = RADAR_DIMS;
+  const n = dims.length;
+  const angleStep = (Math.PI * 2) / n;
+
+  // Collect all values per dim for normalization
+  const allVals = {};
+  dims.forEach(d => { allVals[d.key] = []; });
+  selectedMods.forEach(mod => {
+    const mv = data.modules[mod];
+    if(!mv) return;
+    dims.forEach(d => allVals[d.key].push(mv[d.key] || 0));
+  });
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('class','radar-svg');
+
+  // Grid rings (4 levels)
+  for(let level=1; level<=4; level++){
+    const r = R * level / 4;
+    const pts = [];
+    for(let i=0; i<n; i++){
+      const a = -Math.PI/2 + i * angleStep;
+      pts.push(`${cx + r * Math.cos(a)},${cy + r * Math.sin(a)}`);
+    }
+    const poly = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    poly.setAttribute('points', pts.join(' '));
+    poly.setAttribute('class', level === 4 ? 'radar-grid-outer' : 'radar-grid');
+    svg.appendChild(poly);
+  }
+
+  // Axis lines + labels
+  dims.forEach((d, i) => {
+    const a = -Math.PI/2 + i * angleStep;
+    const x2 = cx + R * Math.cos(a);
+    const y2 = cy + R * Math.sin(a);
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1', cx); line.setAttribute('y1', cy);
+    line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+    line.setAttribute('class', 'radar-axis');
+    svg.appendChild(line);
+    // Label
+    const lx = cx + (R + 22) * Math.cos(a);
+    const ly = cy + (R + 22) * Math.sin(a);
+    const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+    txt.setAttribute('x', lx); txt.setAttribute('y', ly);
+    txt.setAttribute('class', 'radar-axis-label');
+    txt.setAttribute('text-anchor', 'middle');
+    txt.setAttribute('dominant-baseline', 'middle');
+    txt.textContent = d.label;
+    svg.appendChild(txt);
+  });
+
+  // Draw each selected module as a polygon
+  const legendItems = [];
+  selectedMods.forEach((mod, idx) => {
+    const mv = data.modules[mod];
+    if(!mv) return;
+    const color = RADAR_COLORS[idx % RADAR_COLORS.length];
+    const pts = [];
+    dims.forEach((d, i) => {
+      const raw = mv[d.key] || 0;
+      const norm = normalizeRadarValue(d.key, raw, allVals[d.key]);
+      const r = Math.max(0, Math.min(1, norm)) * R;
+      const a = -Math.PI/2 + i * angleStep;
+      pts.push(`${cx + r * Math.cos(a)},${cy + r * Math.sin(a)}`);
+    });
+    // Polygon
+    const poly = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    poly.setAttribute('points', pts.join(' '));
+    poly.setAttribute('class', 'radar-shape');
+    poly.setAttribute('fill', color);
+    poly.setAttribute('fill-opacity', '0.12');
+    poly.setAttribute('stroke', color);
+    poly.setAttribute('stroke-width', '2');
+    poly.setAttribute('stroke-opacity', '0.85');
+    // Tooltip
+    const modLabel = MODULE_NAMES[mod] || mod;
+    const tipParts = dims.map(d => `${d.label}: ${d.fmt(mv[d.key]||0)}`).join('\n');
+    const title = document.createElementNS('http://www.w3.org/2000/svg','title');
+    title.textContent = `${modLabel}\n${tipParts}`;
+    poly.appendChild(title);
+    svg.appendChild(poly);
+    // Vertices
+    pts.forEach((pt, i) => {
+      const [px, py] = pt.split(',');
+      const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      dot.setAttribute('cx', px); dot.setAttribute('cy', py);
+      dot.setAttribute('r', '3');
+      dot.setAttribute('fill', color);
+      svg.appendChild(dot);
+    });
+    legendItems.push({ color, label: modLabel, mod });
+  });
+
+  wrap.appendChild(svg);
+
+  // Legend
+  const legendDiv = $('radarLegend');
+  legendDiv.innerHTML = '';
+  legendItems.forEach(item => {
+    const chip = el('div', {className:'radar-legend-chip'},
+      el('span', {className:'radar-legend-dot', style:`background:${item.color}`}),
+      el('span', {className:'radar-legend-text'}, item.label)
+    );
+    legendDiv.appendChild(chip);
+  });
+}
+
+async function refreshRadar(){
+  const weekSel = $('radarWeekSel');
+  const modSel = $('radarModSel');
+  const week = weekSel.value || WEEKS[WEEKS.length-1];
+  const data = await fetchRadarData(week);
+  if(!data){
+    $('radarChartWrap').innerHTML = '<div class="radar-empty">暂无 expanded 数据</div>';
+    return;
+  }
+  // Populate module select if empty or week changed
+  if(modSel.children.length === 0 || modSel.dataset.week !== week){
+    modSel.innerHTML = '';
+    modSel.dataset.week = week;
+    const list = buildRadarModuleList(data);
+    list.forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = item.mod;
+      opt.textContent = `${MODULE_NAMES[item.mod] || item.mod} (${item.faithfulness.toFixed(3)})`;
+      modSel.appendChild(opt);
+    });
+    // Default: select top 5
+    list.slice(0, 5).forEach(item => {
+      const opt = modSel.querySelector(`option[value="${item.mod}"]`);
+      if(opt) opt.selected = true;
+    });
+  }
+  const selected = Array.from(modSel.selectedOptions).map(o => o.value);
+  renderRadarChart(data, selected);
+}
+
+function exportRadarCSV(){
+  const weekSel = $('radarWeekSel');
+  const modSel = $('radarModSel');
+  const week = weekSel.value || WEEKS[WEEKS.length-1];
+  const selected = Array.from(modSel.selectedOptions).map(o => o.value);
+  if(selected.length === 0){ alert('请先选择模块'); return; }
+  const header = ['module', ...RADAR_DIMS.map(d => d.label)];
+  const rows = [header];
+  // Fetch synchronously from cache
+  fetchRadarData(week).then(data => {
+    if(!data) return;
+    selected.forEach(mod => {
+      const mv = data.modules[mod];
+      if(!mv) return;
+      rows.push([mod, ...RADAR_DIMS.map(d => mv[d.key] || 0)]);
+    });
+    const csv = '\uFEFF' + rows.map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `radar-${week}.csv`;
+    a.click();
+  });
+}
+
+// Init radar controls
+(function initRadar(){
+  const weekSel = $('radarWeekSel');
+  const modSel = $('radarModSel');
+  WEEKS.forEach(w => {
+    const opt = document.createElement('option');
+    opt.value = w; opt.textContent = w;
+    weekSel.appendChild(opt);
+  });
+  weekSel.value = WEEKS[WEEKS.length-1];
+  weekSel.addEventListener('change', () => {
+    modSel.innerHTML = '';
+    modSel.dataset.week = '';
+    refreshRadar();
+  });
+  modSel.addEventListener('change', refreshRadar);
+  // Quick buttons
+  document.querySelectorAll('.radar-mini-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sel = btn.dataset.sel;
+      const opts = Array.from(modSel.options);
+      if(sel === 'all'){
+        opts.forEach(o => o.selected = true);
+      } else {
+        // Sort by faithfulness (in text)
+        opts.sort((a,b) => {
+          const av = parseFloat(a.textContent.match(/\((0\.\d+)\)/)?.[1] || '0');
+          const bv = parseFloat(b.textContent.match(/\((0\.\d+)\)/)?.[1] || '0');
+          return sel === 'top5' ? bv - av : av - bv;
+        });
+        opts.forEach(o => o.selected = false);
+        opts.slice(0, 5).forEach(o => o.selected = true);
+      }
+      refreshRadar();
+    });
+  });
+  const csvBtn = $('radarCSVBtn');
+  if(csvBtn) csvBtn.addEventListener('click', exportRadarCSV);
+  // Load radar after initial data
+  setTimeout(refreshRadar, 500);
+})();
+
 // 启动
 refresh();
 
