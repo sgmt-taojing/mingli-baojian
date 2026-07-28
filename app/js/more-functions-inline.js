@@ -68,7 +68,7 @@ function playBell(freq=800, duration=1.2){
     g.gain.setValueAtTime(0.25, audioCtx.currentTime);
     g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+duration);
     o.start(); o.stop(audioCtx.currentTime+duration);
-  }catch(e){}
+  }catch(e){console.warn(e.message)}
 }
 function playSound(type) {
   try {

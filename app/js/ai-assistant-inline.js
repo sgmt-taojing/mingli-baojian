@@ -997,7 +997,7 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
     if (boost[state.module]) {
       const before = kbHit.score;
       kbHit.score = Math.min(1.0, kbHit.score + boost[state.module]);
-      if (window.console && console.log) console.log(`[R64] 设备加权 ${state.module} +${boost[state.module].toFixed(2)} (${before.toFixed(2)} → ${kbHit.score.toFixed(2)})`);
+      if (window.console && console.warn) console.warn(`[R64] 设备加权 ${state.module} +${boost[state.module].toFixed(2)} (${before.toFixed(2)} → ${kbHit.score.toFixed(2)})`);
       // 记录加权事件，供日志页查看
       try {
         const logKey = '_device_kb_boost_log';
@@ -1495,7 +1495,7 @@ function _addSourceLabel(text, modId){
       luzongQuote = LuzongQuotes.get(modId);
       if(luzongQuote) text = text + '\n\n' + luzongQuote;
     }
-  }catch(e){}
+  }catch(e){console.warn(e.message)}
   var label = '\n\n━━━ 来源与声明 ━━━\n';
   label += '【理论来源】经典命理学 ✅ + 大师实践 📘\n';
   label += '  ✅ 经典：八字/紫微/奇门/六壬/六爻/梅花经典理论\n';
@@ -4820,7 +4820,7 @@ function r39DualKBReply(query){
   if(!hit) return null;
   return '【KB R39-B 双核】'+hit.title+'\n\n'+hit.content+'\n\n📜 古籍: '+hit.sources.join('、')+'\n📊 评分: '+hit.score;
 }
-console.log('[R39-C] 双核 KB 命中辅助函数已挂载');
+// R39-C 双核 KB 命中辅助函数已挂载
 
 
 /* ===== Extracted from ai-assistant.html ===== */

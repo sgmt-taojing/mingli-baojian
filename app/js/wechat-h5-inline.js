@@ -345,9 +345,9 @@ function wxAIReport(){
     return;
   }
   var data={source:'wechat',ts:Date.now()};
-  try{var bd=document.getElementById('wxBirthday');if(bd)data.birthday=bd.value;}catch(e){}
-  try{var sx=document.getElementById('wxSex');if(sx)data.sex=sx.value;}catch(e){}
-  try{var hr=document.getElementById('wxHour');if(hr)data.hour=hr.value;}catch(e){}
+  try{var bd=document.getElementById('wxBirthday');if(bd)data.birthday=bd.value;}catch(e){console.warn(e.message)}
+  try{var sx=document.getElementById('wxSex');if(sx)data.sex=sx.value;}catch(e){console.warn(e.message)}
+  try{var hr=document.getElementById('wxHour');if(hr)data.hour=hr.value;}catch(e){console.warn(e.message)}
   ReportEngine.generate({module:mod,data:data,adapter:'wechat',container:out}).then(function(r){
     console.log('[wechat] ReportEngine',r.source);
   }).catch(function(e){

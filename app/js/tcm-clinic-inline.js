@@ -124,7 +124,7 @@ function loadCases(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
     if(raw){_casesCache = JSON.parse(raw); return _casesCache;}
-  }catch(e){}
+  }catch(e){console.warn(e.message)}
   return null;
 }
 function saveCases(cases){

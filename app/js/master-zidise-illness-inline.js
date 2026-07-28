@@ -326,7 +326,7 @@ async function fetchKBRefs(ctx){
       if(d.results){
         d.results.forEach(x=>all.push({...x,query:q}));
       }
-    }catch(e){}
+    }catch(e){console.warn(e.message)}
   }
   // 去重
   const seen=new Set();

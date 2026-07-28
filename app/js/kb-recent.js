@@ -21,7 +21,7 @@
     if(arr.length > MAX) arr.length = MAX;
     sessionStorage.setItem(KEY, JSON.stringify(arr));
     // 跨 tab 同步
-    try { localStorage.setItem(KEY + '_broadcast', JSON.stringify({ ts: Date.now(), arr })); } catch(e){}
+    try { localStorage.setItem(KEY + '_broadcast', JSON.stringify({ ts: Date.now(), arr })); } catch(e){console.warn(e.message)}
     render();
   }
   function clear(){

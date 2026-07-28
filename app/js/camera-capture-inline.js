@@ -509,7 +509,7 @@ function _patchRecognitionEnd() {
   const _origOnEnd = recognition.onend;
   recognition.onend = (e) => {
     if (continuousListening) {
-      try { recognition.start(); } catch(err) { setTimeout(() => { try { recognition.start(); } catch(e){} }, 500); }
+      try { recognition.start(); } catch(err) { setTimeout(() => { try { recognition.start(); } catch(e){console.warn(e.message)} }, 500); }
     } else if (isRecording) {
       try { recognition.start(); } catch(err) {}
     }
@@ -640,7 +640,7 @@ function initSTT() {
     }
   };
   recognition.onerror = (e) => { console.warn('STT 错误:', e.error); stopVoice(); };
-  recognition.onend = () => { if (isRecording) { try { recognition.start(); } catch(e){} } };
+  recognition.onend = () => { if (isRecording) { try { recognition.start(); } catch(e){console.warn(e.message)} } };
   return true;
 }
 

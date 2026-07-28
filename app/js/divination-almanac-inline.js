@@ -1237,7 +1237,7 @@ function updateDailyAdvice(almanac) {
     if(typeof getDailyKnowledge==='function'){
       dailyKnowledge=getDailyKnowledge(now);
     }
-  }catch(e){}
+  }catch(e){console.warn(e.message)}
   let knowledgeHtml='';
   if(dailyKnowledge&&dailyKnowledge.title){
     knowledgeHtml='<div class="advice-card" style="margin-top:12px;background:linear-gradient(135deg,rgba(52,152,219,.06),rgba(155,89,182,.04));border:1px solid rgba(52,152,219,.15);border-radius:10px;padding:14px">';

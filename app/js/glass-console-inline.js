@@ -417,7 +417,7 @@ setInterval(async () => {
                 $meta.textContent = '✅ 流式完成：' + (data.totalChunks || '?') + ' chunk / 总耗时 ' + (data.totalMs || '?') + 'ms';
                 speak(buf);  // 最后一段补上
               }
-            } catch(e){}
+            } catch(e){console.warn(e.message)}
           });
         };
         xhr.onerror = () => { $meta.textContent = '❌ 推接失败'; };

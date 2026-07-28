@@ -156,7 +156,7 @@ function stopCamera(){
     stream = null;
   }
   if(pc){
-    try { pc.close(); } catch(e){}
+    try { pc.close(); } catch(e){console.warn(e.message)}
     pc = null;
   }
   $('video').style.display = 'none';

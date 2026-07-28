@@ -21,11 +21,11 @@
       const hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
       hist.unshift({ t: Date.now(), count: arr.length });
       localStorage.setItem(HISTORY_KEY, JSON.stringify(hist.slice(0,200)));
-    } catch(e){}
+    } catch(e){console.warn(e.message)}
     // 全局事件
     window.dispatchEvent(new CustomEvent('kb-favorites-changed', { detail: { favorites: arr } }));
     // 跨 tab 广播 (R103)
-    try { localStorage.setItem(STORAGE_KEY + '_broadcast', JSON.stringify({ ts: Date.now(), arr })); } catch(e){}
+    try { localStorage.setItem(STORAGE_KEY + '_broadcast', JSON.stringify({ ts: Date.now(), arr })); } catch(e){console.warn(e.message)}
   }
   function isFav(id){
     return getAll().some(x => x.id === id);

@@ -637,7 +637,7 @@ function restoreFromHash(){
     if(d.focus) document.getElementById('lFocus').value=d.focus;
     if(d.extra) document.getElementById('lExtra').value=d.extra;
     generate();
-  }catch(e){}
+  }catch(e){console.warn(e.message)}
 }
 
 function shareUrl(){

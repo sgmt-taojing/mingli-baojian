@@ -138,7 +138,7 @@ function restoreFromHash(){
     if(d.focus) document.getElementById('liFocus').value=d.focus;
     if(d.extra) document.getElementById('liExtra').value=d.extra;
     generate();
-  }catch(e){}
+  }catch(e){console.warn(e.message)}
 }
 
 function shareUrl(){

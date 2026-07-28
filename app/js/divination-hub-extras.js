@@ -35,7 +35,7 @@ function tzPopulatePlanSelect(){
   try{
     let last=window._tzLastResult;
     if(last && last.key){sel.value=last.key;}
-  }catch(e){}
+  }catch(e){console.warn(e.message)}
 }
 
 function tzGeneratePlan(){
@@ -946,7 +946,7 @@ function tzSubmitCheckin(){
 
   let key='tz_checkin_'+today;
   let data={date:today,items:items,note:note};
-  try{localStorage.setItem(key,JSON.stringify(data));}catch(e){}
+  try{localStorage.setItem(key,JSON.stringify(data));}catch(e){console.warn(e.message)}
 
   showToast('✅ 打卡成功！今日完成'+items.length+'项调理');
   tzRenderCheckin();
@@ -956,7 +956,7 @@ function tzRenderCheckin(){
   let today=new Date().toISOString().slice(0,10);
   let todayKey='tz_checkin_'+today;
   let todayData=null;
-  try{todayData=JSON.parse(localStorage.getItem(todayKey)||'null');}catch(e){}
+  try{todayData=JSON.parse(localStorage.getItem(todayKey)||'null');}catch(e){console.warn(e.message)}
 
   let streak=0,total=0;
   let d=new Date();
@@ -988,7 +988,7 @@ function tzRenderCheckin(){
     let dd=new Date();dd.setDate(dd.getDate()-i);
     let dk='tz_checkin_'+dd.toISOString().slice(0,10);
     let dData=null;
-    try{dData=JSON.parse(localStorage.getItem(dk)||'null');}catch(e){}
+    try{dData=JSON.parse(localStorage.getItem(dk)||'null');}catch(e){console.warn(e.message)}
     if(dData){
       hasHistory=true;
       html+='<div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px">'+

@@ -2014,11 +2014,11 @@ async function fetchExpanded(week, bench){
   try{
     const r = await fetch(ghUrl, { cache: 'no-cache' });
     if (r.ok){ const d = await r.json(); expandedCache[key] = d; return d; }
-  }catch(e){}
+  }catch(e){console.warn(e.message)}
   try{
     const r = await fetch(localUrl, { cache: 'no-cache' });
     if (r.ok){ const d = await r.json(); expandedCache[key] = d; return d; }
-  }catch(e){}
+  }catch(e){console.warn(e.message)}
   return null;
 }
 
@@ -2371,11 +2371,11 @@ async function fetchDistillReport(){
   try{
     const r = await fetch(ghUrl, { cache: 'no-cache' });
     if (r.ok) return await r.json();
-  }catch(e){}
+  }catch(e){console.warn(e.message)}
   try{
     const r = await fetch(localUrl, { cache: 'no-cache' });
     if (r.ok) return await r.json();
-  }catch(e){}
+  }catch(e){console.warn(e.message)}
   return null;
 }
 
@@ -2826,11 +2826,11 @@ async function fetchHeatmapData(){
     try {
       const resp = await fetch(`${GITHUB_BASE}${w}-expanded/faithfulness-by-module.json`);
       if (resp.ok){ results.push({week:w, data: await resp.json()}); continue; }
-    } catch(e){}
+    } catch(e){console.warn(e.message)}
     try {
       const resp = await fetch(`${LOCAL_BASE}${w}-expanded/faithfulness-by-module.json`);
       if (resp.ok){ results.push({week:w, data: await resp.json()}); }
-    } catch(e){}
+    } catch(e){console.warn(e.message)}
   }
   return results;
 }
@@ -2990,12 +2990,12 @@ async function fetchRadarData(week){
     try{
       const r = await fetch(ghUrl, { cache:'no-cache' });
       if(r.ok) data = await r.json();
-    }catch(e){}
+    }catch(e){console.warn(e.message)}
     if(!data){
       try{
         const r = await fetch(localUrl, { cache:'no-cache' });
         if(r.ok) data = await r.json();
-      }catch(e){}
+      }catch(e){console.warn(e.message)}
     }
     results[b] = data;
   }

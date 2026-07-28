@@ -137,7 +137,7 @@ function checkVipExpiryNotice(daysLeft) {
   
   // 非阻塞提示
   setTimeout(function() {
-    try { showTip('⏰ 会员还有 ' + daysLeft + ' 天到期，请及时续费'); } catch(e){}
+    try { showTip('⏰ 会员还有 ' + daysLeft + ' 天到期，请及时续费'); } catch(e){console.warn(e.message)}
   }, 2000);
 }
 

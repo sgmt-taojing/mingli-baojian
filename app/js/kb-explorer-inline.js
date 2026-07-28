@@ -53,7 +53,7 @@ async function fetchModules(){
         sel.appendChild(opt);
       });
     }
-  }catch(e){}
+  }catch(e){console.warn(e.message)}
 }
 
 async function fetchHits(){

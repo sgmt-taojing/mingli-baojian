@@ -3550,14 +3550,14 @@ if (document.readyState === 'complete') {
 
 
 // ═══ calc-engine-lib 函数全局暴露 ═══
-try { window.qimenPaiPan = qimenPaiPan; } catch(e){}
-try { window.qimenAnalyze = qimenAnalyze; } catch(e){}
-try { window.runLiuyaoEngine = runLiuyaoEngine; } catch(e){}
-try { window.runMeihuaEngine = runMeihuaEngine; } catch(e){}
-try { window.runQimenEngine = runQimenEngine; } catch(e){}
-try { window.runLiurenEngine = runLiurenEngine; } catch(e){}
-try { window.runZiweiEngine = runZiweiEngine; } catch(e){}
-try { window.runXingmingEngine = runXingmingEngine; } catch(e){}
-try { window.runFengshuiEngine = runFengshuiEngine; } catch(e){}
-try { window.runZeriEngine = runZeriEngine; } catch(e){}
+try { window.qimenPaiPan = qimenPaiPan; } catch(e){console.warn(e.message)}
+try { window.qimenAnalyze = qimenAnalyze; } catch(e){console.warn(e.message)}
+try { window.runLiuyaoEngine = runLiuyaoEngine; } catch(e){console.warn(e.message)}
+try { window.runMeihuaEngine = runMeihuaEngine; } catch(e){console.warn(e.message)}
+try { window.runQimenEngine = runQimenEngine; } catch(e){console.warn(e.message)}
+try { window.runLiurenEngine = runLiurenEngine; } catch(e){console.warn(e.message)}
+try { window.runZiweiEngine = runZiweiEngine; } catch(e){console.warn(e.message)}
+try { window.runXingmingEngine = runXingmingEngine; } catch(e){console.warn(e.message)}
+try { window.runFengshuiEngine = runFengshuiEngine; } catch(e){console.warn(e.message)}
+try { window.runZeriEngine = runZeriEngine; } catch(e){console.warn(e.message)}
 //console.log('[引擎] calc-engine-lib函数全局暴露完成');

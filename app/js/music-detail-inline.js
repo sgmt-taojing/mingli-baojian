@@ -160,7 +160,7 @@ function restoreFromHash(){
     if(d.scene) document.getElementById('mScene').value = d.scene;
     if(d.extra) document.getElementById('mExtra').value = d.extra;
     generate();
-  }catch(e){}
+  }catch(e){console.warn(e.message)}
 }
 
 function shareUrl(){

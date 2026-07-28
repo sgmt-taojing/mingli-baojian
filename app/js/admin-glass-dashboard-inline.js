@@ -241,7 +241,7 @@ setupTimer();
             const key = k.entry_id || (k.module + ':' + k.title);
             if(!seen.has(key)){ seen.add(key); all.push(k); }
           });
-        }catch(e){}
+        }catch(e){console.warn(e.message)}
       }
       // 过滤 trust_score >= 0.7，按 hit_count DESC 排 top 10
       const list = all.filter(k => (k.trust_score || 0) >= 0.7).sort((a,b) => (b.hit_count||0) - (a.hit_count||0)).slice(0, 10);

@@ -418,4 +418,4 @@
   };
 
 })();
-try { window.FEEDBACK_SYSTEM = FEEDBACK_SYSTEM; } catch(e){}
+try { window.FEEDBACK_SYSTEM = FEEDBACK_SYSTEM; } catch(e){console.warn(e.message)}

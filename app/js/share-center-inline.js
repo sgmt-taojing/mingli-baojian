@@ -2,7 +2,7 @@
 (function(){
   // 读取用户数据
   var profile = {};
-  try { profile = JSON.parse(localStorage.getItem('userProfile') || '{}'); } catch(e){}
+  try { profile = JSON.parse(localStorage.getItem('userProfile') || '{}'); } catch(e){console.warn(e.message)}
   var name = profile.name || profile.nickname || '缘主';
   var avatar = profile.avatar || '🦞';
   var bazi = profile.bazi || '';
@@ -27,7 +27,7 @@
 
 function shareTo(channel){
   var profile = {};
-  try { profile = JSON.parse(localStorage.getItem('userProfile') || '{}'); } catch(e){}
+  try { profile = JSON.parse(localStorage.getItem('userProfile') || '{}'); } catch(e){console.warn(e.message)}
   var name = profile.name || '缘主';
   var url = location.origin + '/divination-hub.html';
   var text = name + ' 邀您体验易道智鉴 · 命理宝鉴';

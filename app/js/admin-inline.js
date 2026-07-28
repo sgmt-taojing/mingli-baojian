@@ -1060,7 +1060,7 @@ function renderUsers(q,level){
         userMap[u.phone]={phone:u.phone,name:u.phone.slice(0,3)+'****'+u.phone.slice(7),level:u.vipLevel||'free',points:u.points||0,merit:u.merit||0,usage:u.totalUsage||0,register:new Date().toISOString(),lastActive:new Date().toISOString()};
       }
     }
-  }catch(e){}
+  }catch(e){console.warn(e.message)}
 
   // 添加模拟用户数据
   const mockUsers=[

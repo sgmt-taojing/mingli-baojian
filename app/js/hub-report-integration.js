@@ -428,7 +428,7 @@
         ReportAdapters.drawer(document.body, result.text, result.meta);
       } else {
         // fallback：console
-        console.log('[hubReport]', result.text);
+        console.warn('[hubReport] result:', result.text ? result.text.slice(0,80) : 'empty');
       }
     } catch (e) {
       console.error('[hubReport]', e);

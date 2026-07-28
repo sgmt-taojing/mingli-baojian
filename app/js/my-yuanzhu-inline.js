@@ -195,7 +195,7 @@ function attachCycleHandlers(c){
         if(status) status.textContent = '当前周期：' + {daily:'每日',weekly:'每周',monthly:'每月',yearly:'每年'}[r.push_cycle] || r.push_cycle;
       }
     }).catch(()=>{});
-  } catch(e){}
+  } catch(e){console.warn(e.message)}
   c.querySelectorAll('.cycle-btn').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
       const cycle = btn.getAttribute('data-cycle');
@@ -464,7 +464,7 @@ async function renderKbDash(c){
   try{
     const td = JSON.parse(localStorage.getItem('_kb_hit_today')||'{}');
     stats.today = (td.date===new Date().toDateString())?(td.count||0):0;
-  }catch(e){}
+  }catch(e){console.warn(e.message)}
   const modMap = {};
   const today = new Date();
   const recent7 = [];
@@ -498,7 +498,7 @@ async function renderKbDash(c){
         kbSize = d.formal || d.total || kbSize;
         kbModules = d.models || d.moduleCount || kbModules;
       }
-    } catch(e){}
+    } catch(e){console.warn(e.message)}
     try {
       const r2 = await fetch(API + '/api/public/kb-list');
       if(r2.ok){
@@ -507,7 +507,7 @@ async function renderKbDash(c){
         const files = d2.files || d2.entries || [];
         if(files.length > kbModules) kbModules = files.length;
       }
-    } catch(e){}
+    } catch(e){console.warn(e.message)}
   }catch(e){ /* 静默 */ }
 
   // === 渲染 ===

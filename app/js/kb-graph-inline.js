@@ -266,7 +266,7 @@
     hist.unshift(q);
     // 保留最近 10 条
     hist = hist.slice(0, 10);
-    try { localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(hist)); } catch(e){}
+    try { localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(hist)); } catch(e){console.warn(e.message)}
   }
   function clearCurrentSearchHistory(){
     var inp = document.getElementById('searchInput');
@@ -274,7 +274,7 @@
     if(!q) return;
     var hist = getSearchHistory();
     hist = hist.filter(function(h){ return h !== q; });
-    try { localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(hist)); } catch(e){}
+    try { localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(hist)); } catch(e){console.warn(e.message)}
     renderSearchHistory();
   }
 
@@ -429,7 +429,7 @@
         }
         var clearBtn = e.target.closest('#clearSearchHist');
         if(clearBtn){
-          try { localStorage.removeItem(SEARCH_HISTORY_KEY); } catch(e){}
+          try { localStorage.removeItem(SEARCH_HISTORY_KEY); } catch(e){console.warn(e.message)}
           histEl.style.display = 'none';
         }
       });
@@ -593,7 +593,7 @@
         var pos = network.getViewPosition();
         var scale = network.getScale();
         focusInfo = ' · 焦点 · ' + (scale || '').toFixed(2) + 'x';
-      } catch(e){}
+      } catch(e){console.warn(e.message)}
       ctx.fillText(ALL_NODES.length + ' 模块 · ' + ALL_EDGES.length + ' 关系 · 导出时间 ' + ts + focusInfo, 32, 60);
       // 粘贴图谱
       ctx.drawImage(canvas, 0, titleH);
@@ -752,7 +752,7 @@
       // 更新统计
       var stat = document.getElementById('minimapStat');
       if(stat) stat.textContent = (viewScale).toFixed(1) + 'x · ' + ALL_NODES.length + ' 节点';
-    }catch(e){}
+    }catch(e){console.warn(e.message)}
   }
   // 点击 mini-map 跳转视图中心
   document.getElementById('minimapCanvas')?.addEventListener('click', function(e){
