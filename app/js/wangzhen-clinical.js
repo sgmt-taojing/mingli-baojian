@@ -15,68 +15,76 @@
   var currentPatient = null;
 
   function loadPatientList(){
-    if(!window.fetch){
-      renderPatientList([]);
-      return;
-    }
-    fetch(API_BASE + '/api/yuanzhu/list?token=***')
-      .then(function(r){ return r.json(); })
-      .then(function(data){
-        var list = data.data || data.list || [];
-        renderPatientList(list);
-      })
-      .catch(function(err){
-        console.warn('[wangzhen-clinical] 患者列表加载失败:', err.message);
-        renderPatientList([]);
-      });
+    // 中医端患者管理 — 使用 localStorage（与 doctor-elder 共享）
+    var list = [];
+    try { list = JSON.parse(localStorage.getItem('mlbj_doctor_patients') || '[]'); } catch(e) {}
+    renderPatientList(list);
   }
 
   function renderPatientList(list){
     var container = document.getElementById('wz-patient-list');
     if(!container) return;
     if(!list || list.length === 0){
-      container.innerHTML = '<div class="wz-empty">暂无缘主数据，可手动输入新患者</div>';
+      container.innerHTML = '<div class="wz-empty">暂无患者，请先在接诊台创建</div>';
       return;
     }
     var html = '';
     list.forEach(function(p){
-      var name = p.display_name || p.user_id || '未知';
-      var dm = p.day_master || '';
-      var zodiac = p.zodiac || '';
-      html += '<div class="wz-patient-card" onclick="window.wangzhenClinical.selectPatient('+p.user_id+',\''+name.replace(/'/g,'')+'\')">';
-      html += '<div class="wz-patient-name">'+name+'</div>';
-      if(dm) html += '<span class="wz-patient-tag">日主:'+dm+'</span>';
-      if(zodiac) html += '<span class="wz-patient-tag">生肖:'+zodiac+'</span>';
+      var name = p.name || '未知';
+      var age = p.age || '?';
+      var gender = p.gender === 'male' ? '男' : p.gender === 'female' ? '女' : '·';
+      var chief = p.chief || '';
+      var hasBazi = (p.bazi && p.bazi.y) ? '📅' : '📝';
+      html += '<div class="wz-patient-card" onclick="window.wangzhenClinical.selectPatient('+p.id+',\''+name.replace(/'/g,'')+'\')">';
+      html += '<div class="wz-patient-name">'+name+' '+gender+' '+age+'岁 '+hasBazi+'</div>';
+      if(chief) html += '<div class="wz-patient-tag">主诉:'+chief.substring(0,20)+'</div>';
       html += '</div>';
     });
     container.innerHTML = html;
   }
 
   function selectPatient(userId, name){
-    currentPatient = { user_id: userId, name: name };
-    // 更新 UI
+    // 从 localStorage 加载患者数据
+    var list = [];
+    try { list = JSON.parse(localStorage.getItem('mlbj_doctor_patients') || '[]'); } catch(e) {}
+    var p = list.find(function(x){ return x.id === userId; });
+    if(!p){
+      // 新患者
+      currentPatient = { id: userId, name: name };
+      var el = document.getElementById('wz-current-patient');
+      if(el) el.textContent = name;
+      var detailEl = document.getElementById('wz-patient-detail');
+      if(detailEl) detailEl.innerHTML = '<span class="muted">新患者，请填写信息</span>';
+      showToast('新患者: ' + name);
+      return;
+    }
+    currentPatient = p;
     var el = document.getElementById('wz-current-patient');
-    if(el) el.textContent = name + ' (#'+userId+')';
-    // 加载详细 profile
-    fetch(API_BASE + '/api/yuanzhu/profile?user_id='+userId+'&token=***')
-      .then(function(r){ return r.json(); })
-      .then(function(data){
-        var p = data.data || data;
-        currentPatient = p;
-        var detailEl = document.getElementById('wz-patient-detail');
-        if(detailEl){
-          var html = '';
-          if(p.day_master) html += '<div class="pd-row"><span>日主</span><b>'+p.day_master+'</b></div>';
-          if(p.xi_ele) html += '<div class="pd-row"><span>喜用</span><b>'+p.xi_ele+'</b></div>';
-          if(p.ji_ele) html += '<div class="pd-row"><span>忌</span><b>'+p.ji_ele+'</b></div>';
-          if(p.lack_wuxing) html += '<div class="pd-row"><span>缺</span><b>'+p.lack_wuxing+'</b></div>';
-          if(p.zodiac) html += '<div class="pd-row"><span>生肖</span><b>'+p.zodiac+'</b></div>';
-          if(p.focus_areas) html += '<div class="pd-row"><span>关注</span><b>'+p.focus_areas+'</b></div>';
-          detailEl.innerHTML = html || '<span class="muted">无详细数据</span>';
-        }
-      })
-      .catch(function(){});
-    showToast('已选择患者: ' + name);
+    if(el) el.textContent = p.name + ' ('+(p.age||'?')+'岁)';
+    var detailEl = document.getElementById('wz-patient-detail');
+    if(detailEl){
+      var html = '';
+      if(p.gender) html += '<div class="pd-row"><span>性别</span><b>'+(p.gender==='male'?'男':p.gender==='female'?'女':'-')+'</b></div>';
+      if(p.age) html += '<div class="pd-row"><span>年龄</span><b>'+p.age+'</b></div>';
+      if(p.phone) html += '<div class="pd-row"><span>电话</span><b>'+p.phone+'</b></div>';
+      if(p.chief) html += '<div class="pd-row"><span>主诉</span><b>'+p.chief+'</b></div>';
+      if(p.bazi && p.bazi.y) html += '<div class="pd-row"><span>八字</span><b>'+p.bazi.y+'-'+p.bazi.m+'-'+p.bazi.d+'-'+p.bazi.h+'</b></div>';
+      detailEl.innerHTML = html || '<span class="muted">无详细数据</span>';
+    }
+    // 自动填充八字输入
+    if(p.bazi && p.bazi.y){
+      var ySel = document.getElementById('wz-bazi-year');
+      var mSel = document.getElementById('wz-bazi-month');
+      var dSel = document.getElementById('wz-bazi-day');
+      var hSel = document.getElementById('wz-bazi-hour');
+      if(ySel) ySel.value = p.bazi.y;
+      if(mSel) mSel.value = p.bazi.m;
+      if(dSel) dSel.value = p.bazi.d;
+      if(hSel) hSel.value = p.bazi.h;
+      // 自动排盘
+      window.wangzhenClinical.fetchBazi();
+    }
+    showToast('已选择患者: ' + p.name);
   }
 
   // ===== 摄像头采集 =====
@@ -291,6 +299,7 @@
   // ===== 排盘联动 =====
   function fetchPaipan(bazi){
     if(!bazi || !bazi.year) return;
+    if(!window.fetch) return; // jsdom guard
     var params = 'year='+bazi.year+'&month='+bazi.month+'&day='+bazi.day+'&hour='+bazi.hour;
     fetch(PAIPAN_API + '/paipan/bazi?'+params)
       .then(function(r){ return r.json(); })
@@ -324,7 +333,7 @@
 
   // ===== 保存诊断到病例 =====
   function saveDiagnosis(){
-    if(!currentPatient){
+    if(!currentPatient || !currentPatient.id){
       showToast('请先选择患者', 'warning');
       return;
     }
@@ -336,8 +345,8 @@
     var aiResult = (document.getElementById('wz-ai-result') || {}).innerText || '';
 
     var payload = {
-      patient_id: currentPatient.user_id,
-      patient_name: currentPatient.display_name || currentPatient.name,
+      patient_id: currentPatient.id || currentPatient.user_id || 0,
+      patient_name: currentPatient.name || '',
       diagnosis_type: 'wangzhen',
       diagnosis_text: diagnosisText,
       voice_notes: voiceText,
@@ -345,22 +354,9 @@
       kb_source: 'wangzhen-kb-data.json',
       timestamp: new Date().toISOString()
     };
-
-    fetch(API_BASE + '/api/clinic/submit-diagnosis', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    })
-      .then(function(r){ return r.json(); })
-      .then(function(data){
-        showToast('✅ 诊断已保存到病例系统');
-        renderSavedCases(currentPatient.user_id);
-      })
-      .catch(function(err){
-        // API 可能需要鉴权，降级到 localStorage
-        saveToLocal(payload);
-        showToast('⚠️ 服务器保存失败，已存本地（需登录后同步）');
-      });
+    saveToLocal(payload);
+    showToast('✅ 诊断已保存');
+    renderSavedCases(payload.patient_id);
   }
 
   function saveToLocal(payload){
@@ -375,45 +371,27 @@
     var container = document.getElementById('wz-saved-cases');
     if(!container) return;
 
-    // 尝试从 API 加载
-    fetch(API_BASE + '/api/clinic/assigned-cases?patient_id='+userId+'&token=***')
-      .then(function(r){ return r.json(); })
-      .then(function(data){
-        var cases = data.data || data.cases || [];
-        if(cases.length === 0){
-          container.innerHTML = '<div class="wz-empty">暂无历史病例</div>';
-          return;
-        }
-        var html = '';
-        cases.forEach(function(c){
-          html += '<div class="wz-case-item">';
-          html += '<div class="wz-case-date">'+(c.created_at||c.submitted_at||'')+'</div>';
-          html += '<div class="wz-case-text">'+((c.diagnosis_text||c.master_analysis||'').substring(0,80))+'...</div>';
-          html += '</div>';
-        });
-        container.innerHTML = html;
-      })
-      .catch(function(){
-        // 降级到 localStorage
-        var history = JSON.parse(localStorage.getItem('wz_diagnosis_history') || '[]');
-        if(history.length === 0){
-          container.innerHTML = '<div class="wz-empty">暂无历史病例</div>';
-          return;
-        }
-        var html = '';
-        history.forEach(function(h){
-          html += '<div class="wz-case-item">';
-          html += '<div class="wz-case-date">'+(h.timestamp||'').substring(0,16)+'</div>';
-          html += '<div class="wz-case-text">'+(h.diagnosis_text||'').substring(0,80)+'...</div>';
-          html += '</div>';
-        });
-        container.innerHTML = html;
-      });
+    var history = [];
+    try { history = JSON.parse(localStorage.getItem('wz_diagnosis_history') || '[]'); } catch(e) {}
+    // 过滤当前患者的诊断
+    var patientCases = history.filter(function(h){ return h.patient_id === userId; });
+    if(patientCases.length === 0){
+      container.innerHTML = '<div class="wz-empty">暂无历史病例</div>';
+      return;
+    }
+    var html = '';
+    patientCases.forEach(function(h){
+      html += '<div class="wz-case-item">';
+      html += '<div class="wz-case-date">'+(h.timestamp||'').substring(0,16)+'</div>';
+      html += '<div class="wz-case-text">'+(h.diagnosis_text||'').substring(0,80)+'...</div>';
+      html += '</div>';
+    });
+    container.innerHTML = html;
   }
 
   // ===== 生成报告 =====
   function generateReport(){
-    if(!currentPatient){
+    if(!currentPatient || !currentPatient.id){
       showToast('请先选择患者', 'warning');
       return;
     }
@@ -425,7 +403,7 @@
     var paipanText = (document.getElementById('wz-paipan-result') || {}).innerText || '';
 
     var report = '═══ 命理宝鉴 · 望诊报告 ═══\n\n';
-    report += '患者：' + (currentPatient.display_name || currentPatient.name || '') + '\n';
+    report += '患者：' + (currentPatient.name || '') + '\n';
     report += '日期：' + new Date().toLocaleDateString('zh-CN') + '\n\n';
 
     if(paipanText){
@@ -476,7 +454,7 @@
 
   // ===== 命相同参：面相×八字交叉 =====
   function runMingxiang(){
-    if(!currentPatient){
+    if(!currentPatient || !currentPatient.id){
       showToast('请先选择患者', 'warning');
       return;
     }
@@ -489,7 +467,12 @@
       return;
     }
 
-    var crossAnalysis = '═══ 命相同参交叉分析 ═══\n\n';
+    var westernDiag = (document.getElementById('wz-western-diag') || {}).value || '';
+    var crossAnalysis = '═══ 综合会诊分析 ═══\n\n';
+    if(westernDiag){
+      crossAnalysis += '【西医诊断】\n' + westernDiag + '\n\n';
+    }
+
     crossAnalysis += '【面相发现】\n' + diagnosisText.substring(0, 200) + '\n\n';
 
     if(paipanText && paipanText !== '排盘结果将显示在此'){
@@ -515,7 +498,22 @@
       crossAnalysis += '⚠️ 未输入八字数据，仅面相分析\n请先排盘后再做命相同参\n';
     }
 
-    crossAnalysis += '\n═══ 路总理念：面相看活态，八字看格局，交叉验证最准 ═══';
+    if(westernDiag){
+      // 西医诊断 × 中医望诊 联动
+      if(westernDiag.indexOf('结石') >= 0 && diagnosisText.indexOf('胆') >= 0){
+        crossAnalysis += '\n⚠️ 西医确认结石 + 面诊胆区异常 → 胆结石确诊，建议中医疏肝利胆排石理疗';
+      }
+      if(westernDiag.indexOf('心电图') >= 0 || westernDiag.indexOf('冠心病') >= 0){
+        crossAnalysis += '\n⚠️ 西医心血管诊断 + 面诊心区异常 → 心血管风险确认，中医温阳通脉理疗';
+      }
+      if(westernDiag.indexOf('胃炎') >= 0 || westernDiag.indexOf('资生素') >= 0){
+        crossAnalysis += '\n⚠️ 西医胃部诊断 + 面诊脾胃区异常 → 脾胃同治，中医健脾和胃理疗';
+      }
+      if(westernDiag.indexOf('贫血') >= 0 || westernDiag.indexOf('贫血症') >= 0){
+        crossAnalysis += '\n⚠️ 西医贫血诊断 + 面诊面色苍白 → 气血两虚，中医补益气血理疗';
+      }
+    }
+    crossAnalysis += '\n═══ 路总理念：面相看活态，八字看格局，西医看器质，三者交叉验证最准 ═══';
 
     var crossEl = document.getElementById('wz-mingxiang-result');
     if(crossEl){

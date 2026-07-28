@@ -157,7 +157,7 @@
   <aside>
     <!-- 患者列表 -->
     <div class="wz-card">
-      <div class="wz-card-title">👥 缘主管理 <span class="badge" id="wz-patient-count">0</span></div>
+      <div class="wz-card-title">👥 患者管理 <span class="badge" id="wz-patient-count">0</span></div>
       <div id="wz-patient-list"></div>
       <div class="wz-btn-row">
         <button class="btn btn-ghost" onclick="window.wangzhenClinical.selectPatient(0,'新患者')">+ 新患者</button>
@@ -236,6 +236,16 @@
       <div data-tab="ai" style="display:none"><div id="wangzhen-ai-steps"></div></div>
       <div data-tab="therapy" style="display:none"><div id="wangzhen-therapy"></div></div>
       <div data-tab="quickref" style="display:none"><div id="wangzhen-quick-ref"></div></div>
+    </div>
+
+    <!-- 会诊：西医诊断结论 -->
+    <div class="wz-card">
+      <div class="wz-card-title">🏥 会诊输入（西医诊断结论）</div>
+      <div style="font-size:11px;color:var(--wz-paper3);margin-bottom:8px">输入西医检查结果，系统将结合中医望诊+周易评估给出综合方案</div>
+      <textarea id="wz-western-diag" class="wz-voice-text" placeholder="如：心电图正常、血常规白细胞偏高、B超胆结石0.8cm、胃镜慢性胃炎..." style="min-height:50px"></textarea>
+      <div class="wz-btn-row">
+        <button class="btn btn-secondary" onclick="window.wangzhenClinical.runMingxiang()">🧬 综合会诊分析</button>
+      </div>
     </div>
 
     <!-- 命相同参 -->
