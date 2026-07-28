@@ -1,3 +1,5 @@
+// 精确节气表（1900-2100，紫金山天文台官方历法）
+if(typeof JIEQI_TABLE==='undefined'&&typeof require!=='undefined'){try{eval(require('fs').readFileSync(__dirname+'/jieqi-table.js','utf8'));}catch(e){}}
 
 const API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
 let hist=[];
@@ -3300,17 +3302,22 @@ function _paipanLocal(y,m,d,h,gender){
   };
   // 年度微调：基于4年闰周期的近似
   function _jieDate(year,monthIdx){
-    var cent=Math.floor(year/100);
-    var offsets=JIE_OFFSET[cent]||JIE_OFFSET[20];
-    var base=JIE_AVG[monthIdx]+offsets[monthIdx];
-    // 4年周期修正：闰年节气略早
-    var ymod=year%4;
-    if(ymod===0) base-=0; // 闰年
-    else if(ymod===1) base-=0;
-    else if(ymod===2) base+=0;
-    else base+=0;
-    return Math.round(base);
+  // 使用精确节气表（1900-2100，紫金山天文台官方历法）
+  var jieNames=['立春','惊蛰','清明','立夏','芒种','小暑','立秋','白露','寒露','立冬','大雪','小寒'];
+  var jn=jieNames[monthIdx];
+  if(typeof JIEQI_TABLE!=='undefined'){
+    var yt=JIEQI_TABLE[String(year)];
+    if(yt&&yt[jn]){
+      var parts=yt[jn].split('-');
+      return parseInt(parts[1],10);
+    }
   }
+  // 降级：天文近似（1900前或2100后）
+  var JIE_AVG=[6,6,5,6,6,7,8,8,8,7,7,6];
+  var c=Math.floor(year/100);
+  var off=c<=19?1:c>=21?-1:0;
+  return JIE_AVG[monthIdx]+off;
+}
   // 12节气对应的公历月份：立春=2月,惊蛰=3月,清明=4月...小寒=1月
   var JIE_MONTHS=[2,3,4,5,6,7,8,9,10,11,12,1];
   var monthIdx=11; // 默认小寒月
