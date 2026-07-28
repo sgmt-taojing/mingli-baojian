@@ -72,6 +72,7 @@
     document.getElementById('wz-new-patient-form').style.display = 'none';
     // 刷新列表
     loadPatientList();
+    enumCameras();
     // 自动选中
     selectPatient(pt.id, pt.name);
     showToast('✅ 患者已保存: ' + name);
@@ -722,6 +723,27 @@
 
   var currentPatient = null;
 
+  // 枚举摄像头设备
+  function enumCameras(){
+    if(!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
+    navigator.mediaDevices.enumerateDevices().then(function(devices){
+      var cameras = devices.filter(function(d){ return d.kind === 'videoinput'; });
+      var sel = document.getElementById('wz-camera-select');
+      if(!sel) return;
+      sel.innerHTML = '<option value="">自动选择（检测到' + cameras.length + '个摄像头）</option>';
+      cameras.forEach(function(cam, i){
+        var label = cam.label || ('摄像头 ' + (i+1));
+        var o = document.createElement('option');
+        o.value = cam.deviceId;
+        o.textContent = label;
+        sel.appendChild(o);
+      });
+      if(cameras.length > 1){
+        sel.style.display = 'block';
+      }
+    }).catch(function(){});
+  }
+
   function loadPatientList(){
     // 中医端患者管理 — 使用 localStorage（与 doctor-elder 共享）
     var list = [];
@@ -807,7 +829,16 @@
 
     if(cameraStream){ stopCamera(); return; }
 
-    navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480, facingMode: 'user' }, audio: false })
+    // 获取选择的摄像头设备
+    var deviceId = (document.getElementById('wz-camera-select') || {}).value || '';
+    var constraints = { video: { width: {ideal:1280}, height: {ideal:720} }, audio: false };
+    if(deviceId){
+      constraints.video.deviceId = { exact: deviceId };
+    } else {
+      constraints.video.facingMode = 'user';
+    }
+
+    navigator.mediaDevices.getUserMedia(constraints)
       .then(function(stream){
         cameraStream = stream;
         video.srcObject = stream;
@@ -880,6 +911,22 @@
       var statusEl3 = document.getElementById('wz-analysis-status');
       if(statusEl3){ statusEl3.textContent = '⚠️ 舌照分析失败: ' + err.message; statusEl3.className = 'wz-status error'; }
     });
+  }
+
+  // ===== 图片上传处理（蓝牙眼镜可通过手机拍照后上传）=====
+  function handleUpload(input){
+    var file = input.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var dataUrl = e.target.result;
+      var preview = document.getElementById('wz-photo-preview');
+      if(preview){ preview.src = dataUrl; preview.style.display = 'block'; }
+      analyzeFace(dataUrl);
+      completeStep(2);
+      showToast('✅ 图片已上传并开始分析');
+    };
+    reader.readAsDataURL(file);
   }
 
   // ===== Rokid 眼镜连接 =====
@@ -1515,6 +1562,8 @@
     exportCase: exportCase,
     selectPatient: selectPatient,
     startCamera: startCamera,
+    handleUpload: handleUpload,
+    enumCameras: enumCameras,
     captureAngle: captureAngle,
     connectGlass: connectGlass,
     glassCapture: glassCapture,
