@@ -3420,19 +3420,18 @@ function _paipanLocal(y,m,d,h,gender,ziSect){
       for(var ci=0;ci<12;ci++){
         var rawIdx=monthIdx+ci+1;
         var cmIdx=rawIdx%12;
-        // 判断是否跨年：如果 cmIdx 对应月份 <= 当前月，则跨年
         var cyear=y;
         if(rawIdx>=12) cyear=y+1;
-        var jd=_jieDate(cyear,cmIdx);
         var cm=JIE_MONTHS[cmIdx];
-        var cd=new Date(cyear,cm-1,jd);
-        // 也检查同年的节气（当跨年计算导致跳过同年的节气时）
-        if(cd>birthDate){nextJieDate=cd;break;}
-        // 如果跨年版本太远，检查同年版本
+        // 先检查同年版本
+        var jd0=_jieDate(y,cmIdx);
+        var cd0=new Date(y,cm-1,jd0);
+        if(cd0>birthDate){nextJieDate=cd0;break;}
+        // 再检查跨年版本
         if(cyear>y){
-          var jd0=_jieDate(y,cmIdx);
-          var cd0=new Date(y,cm-1,jd0);
-          if(cd0>birthDate){nextJieDate=cd0;break;}
+          var jd=_jieDate(cyear,cmIdx);
+          var cd=new Date(cyear,cm-1,jd);
+          if(cd>birthDate){nextJieDate=cd;break;}
         }
       }
       if(nextJieDate){
