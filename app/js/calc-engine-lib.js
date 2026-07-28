@@ -2455,15 +2455,63 @@ function runMeihuaEngine() {
   }
 }
 
-function runQimenEngine() {
+async function runQimenEngine() {
   try {
     const dateVal = document.getElementById('qmDate')?.value;
     const hourVal = document.getElementById('qmHour')?.value;
     const now = dateVal ? new Date(dateVal + 'T00:00:00') : new Date();
     const hour = hourVal ? parseInt(hourVal) : now.getHours();
-    const pan = qimenPaiPan(now.getFullYear(), now.getMonth()+1, now.getDate(), hour, 'auto');
-    const analyze = qimenAnalyze(pan, document.getElementById('qmQuestion')?.value || '事业');
-    let html = '<h4 style="color:var(--violet2)">☰ 奇门引擎演算结果</h4>';
+    var year = now.getFullYear(), month = now.getMonth()+1, day = now.getDate();
+    var question = document.getElementById('qmQuestion')?.value || '事业';
+    // R216: 优先调用后端古制引擎，失败回退本地
+    var apiData = null;
+    try {
+      var resp = await fetch('/api/paipan/qimen', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({year:year, month:month, day:day, hour:hour})
+      });
+      if (resp.ok) { var j = await resp.json(); if (j.ok && j.chart) apiData = j.chart; }
+    } catch(eApi) { console.warn('[奇门] 后端API不可用，回退本地引擎', eApi.message); }
+    if (apiData) {
+      var c = apiData;
+      var hourNames = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+      var html = '<h4 style="color:var(--violet2)">☰ 奇门引擎演算结果</h4>';
+      html += '<p><b>时间：</b>' + year + '年' + month + '月' + day + '日 ' + hourNames[hour] + '时</p>';
+      html += '<p><b>遁局：</b>' + c.ju + '</p>';
+      html += '<p><b>节气：</b>' + (c.jieqi||'—') + ' · 旬首：' + (c.xunShou||'—') + '</p>';
+      html += '<p><b>日干支：</b>' + (c.dayGanZhi||'—') + ' · 时干支：' + (c.hourGanZhi||'—') + '</p>';
+      html += '<p><b>值符：</b>' + (c.zhiFuStar||'—') + ' 落' + (c.zhiFuPalace!=null?c.zhiFuPalace:'—') + '宫 · 值使：' + (c.zhiShiDoor||'—') + '</p>';
+      if (c.isFuYin) html += '<p style="color:var(--gold)">⚠️ 伏吟</p>';
+      if (c.isFanYin) html += '<p style="color:var(--cinn2)">⚠️ 反吟</p>';
+      if (c.kongWang && c.kongWang.length) html += '<p><b>空亡：</b>' + c.kongWang.join('、') + '</p>';
+      if (c.maStar) html += '<p>🐎 马星临' + c.maStar + '宫</p>';
+      if (c.geju && c.geju.length) {
+        html += '<p><b>格局：</b>';
+        c.geju.forEach(function(g) {
+          var color = g.type === '吉' ? 'var(--jade)' : 'var(--cinn2)';
+          html += '<span style="color:' + color + '">' + g.name + '[' + g.type + ']</span> ';
+          if (g.desc) html += '<span style="opacity:0.7;font-size:12px">' + g.desc + '</span> ';
+        });
+        html += '</p>';
+      }
+      if (c.palaces && c.palaces.length) {
+        html += '<div style="margin-top:8px"><b>九宫：</b><table style="width:100%;font-size:11px;border-collapse:collapse;margin-top:4px"><thead><tr style="opacity:0.7"><th style="padding:2px 4px">宫</th><th>方位</th><th>地盘</th><th>天盘</th><th>星</th><th>门</th><th>神</th><th>备注</th></tr></thead><tbody>';
+        c.palaces.forEach(function(p) {
+          var badge = [];
+          if (p.isKongWang) badge.push('空亡');
+          if (p.isMa) badge.push('马星');
+          html += '<tr style="border-top:1px solid rgba(201,168,76,0.08)"><td style="text-align:center;padding:2px 4px">' + p.palace + '·' + p.name + '</td><td style="text-align:center">' + (p.direction||'') + '</td><td style="text-align:center">' + (p.dipan||'') + '</td><td style="text-align:center">' + (p.tianpan||'') + '</td><td style="text-align:center">' + (p.star||'') + '</td><td style="text-align:center">' + (p.door||'') + '</td><td style="text-align:center">' + (p.god||'') + '</td><td style="text-align:center;font-size:10px;color:var(--gold)">' + badge.join(' ') + '</td></tr>';
+        });
+        html += '</tbody></table></div>';
+      }
+      html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：后端古制引擎 R211 v2.0 · 所问：' + question + '</p>';
+      _showEngineResult('qmEngineResult', html);
+      return;
+    }
+    // 本地回退
+    const pan = qimenPaiPan(year, month, day, hour, 'auto');
+    const analyze = qimenAnalyze(pan, question);
+    html = '<h4 style="color:var(--violet2)">☰ 奇门引擎演算结果</h4>';
     html += '<p><b>遁局：</b>' + (pan.dun==='yang'?'阳':'阴') + '遁' + pan.ju + '局</p>';
     html += '<p><b>用神：</b>' + analyze.yongShen + ' · 落' + analyze.palace + '宫</p>';
     html += '<p><b>天盘：</b>' + analyze.qi + ' · 门：' + analyze.men + ' · 星：' + analyze.star + ' · 神：' + analyze.shen + '</p>';
@@ -2482,8 +2530,9 @@ function runQimenEngine() {
       for (let dk in dims) html += '<div>' + dk + '：' + dims[dk] + '</div>';
       html += '</div>';
     }
+    html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：本地引擎（后端不可用）</p>';
     _showEngineResult('qmEngineResult', html);
-  } catch(e) { 
+  } catch(e) {
     console.error('[奇门引擎错误]', e.message, e.stack);
     showToast('操作出错，请重试');
     let el = document.getElementById('qmEngineResult');
@@ -2562,25 +2611,80 @@ async function runLiurenEngine() {
   }
 }
 
-function runZiweiEngine() {
+async function runZiweiEngine() {
   try {
     const dateStr = document.getElementById('zwDate')?.value;
     let year = new Date().getFullYear(), month = 1, day = 1;
     if (dateStr) { const parts = dateStr.split('-').map(Number); year = parts[0]; month = parts[1]; day = parts[2]; }
     const hour = parseInt(document.getElementById('zwHour')?.value || 0);
     const sex = document.getElementById('zwSex')?.value || 'male';
+    // R216: 优先调用后端古制引擎，失败回退本地
+    var apiData = null;
+    try {
+      var resp = await fetch('/api/paipan/ziwei', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({year:year, month:month, day:day, hour:hour})
+      });
+      if (resp.ok) { var j = await resp.json(); if (j.ok && j.chart) apiData = j.chart; }
+    } catch(eApi) { console.warn('[紫微] 后端API不可用，回退本地引擎', eApi.message); }
+    if (apiData) {
+      var c = apiData;
+      var hourNames = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+      var palaceNames = ['父母','命宫','兄弟','夫妻','子女','财帛','疾厄','迁移','奴仆','官禄','田宅','福德'];
+      var html = '<h4 style="color:var(--fire)">🌌 紫微引擎演算结果</h4>';
+      html += '<p><b>生辰：</b>' + year + '年' + month + '月' + day + '日 ' + hourNames[hour] + '时</p>';
+      html += '<p><b>年干支：</b>' + (c.yearGanZhi||'—') + ' · 五行局：' + (c.wuxingJu||'—') + '</p>';
+      html += '<p><b>命宫：</b>' + (c.mingGong||'—') + '（第' + (c.mingGongIdx!=null?c.mingGongIdx:'—') + '宫） · 身宫：第' + (c.shenGongIdx!=null?c.shenGongIdx:'—') + '宫</p>';
+      if (c.siHua) {
+        var sh = c.siHua;
+        html += '<p><b>生年四化：</b>';
+        html += '<span style="color:var(--gold)">禄·' + (sh.lu||'—') + '</span> ';
+        html += '<span style="color:var(--violet2)">权·' + (sh.quan||'—') + '</span> ';
+        html += '<span style="color:var(--cyan)">科·' + (sh.ke||'—') + '</span> ';
+        html += '<span style="color:var(--cinn2)">忌·' + (sh.ji||'—') + '</span>';
+        html += '</p>';
+      }
+      html += '<p><b>命主：</b>' + (c.mingZhu||'—') + ' · <b>身主：</b>' + (c.shenZhu||'—') + '</p>';
+      if (c.jieKong && c.jieKong.length) html += '<p><b>截空：</b>' + c.jieKong.join('、') + ' · <b>旬空：</b>' + (c.xunKong||[]).join('、') + '</p>';
+      if (c.palaces && c.palaces.length) {
+        html += '<div style="margin-top:8px"><b>十二宫：</b><table style="width:100%;font-size:11px;border-collapse:collapse;margin-top:4px"><thead><tr style="opacity:0.7"><th style="padding:2px 4px">宫</th><th>主星</th><th>辅星</th><th>煞星</th><th>其他</th><th>干支</th><th>备注</th></tr></thead><tbody>';
+        c.palaces.forEach(function(p) {
+          var badge = [];
+          if (p.isMingGong) badge.push('命宫');
+          if (p.isShenGong) badge.push('身宫');
+          if (p.diKong) badge.push('地空');
+          if (p.diJie) badge.push('地劫');
+          html += '<tr style="border-top:1px solid rgba(201,168,76,0.08)"><td style="padding:2px 4px">' + p.index + '·' + p.name + '</td><td style="text-align:center">' + (p.mainStars||[]).join(' ') + '</td><td style="text-align:center">' + (p.auxStars||[]).join(' ') + '</td><td style="text-align:center;color:var(--cinn2)">' + (p.evilStars||[]).join(' ') + '</td><td style="text-align:center;opacity:0.7">' + (p.otherStars||[]).join(' ') + '</td><td style="text-align:center">' + (p.ganZhi||'') + '</td><td style="text-align:center;font-size:10px;color:var(--gold)">' + badge.join(' ') + '</td></tr>';
+        });
+        html += '</tbody></table></div>';
+      }
+      if (c.daXian && c.daXian.length) {
+        html += '<details style="margin-top:8px"><summary style="cursor:pointer;opacity:0.8;font-size:12px">大限（' + c.daXian.length + '步）</summary>';
+        html += '<table style="width:100%;font-size:11px;border-collapse:collapse;margin-top:4px"><thead><tr style="opacity:0.7"><th style="padding:2px 4px">岁数</th><th>宫</th><th>干支</th><th>禄</th><th>权</th><th>科</th><th>忌</th></tr></thead><tbody>';
+        c.daXian.forEach(function(dx) {
+          var sh = dx.siHua || {};
+          html += '<tr style="border-top:1px solid rgba(201,168,76,0.06)"><td style="padding:2px 4px">' + dx.startAge + '-' + dx.endAge + '</td><td style="text-align:center">' + dx.palaceIdx + '</td><td style="text-align:center">' + (dx.ganZhi||'') + '</td><td style="text-align:center;color:var(--gold)">' + (sh.lu||'') + '</td><td style="text-align:center;color:var(--violet2)">' + (sh.quan||'') + '</td><td style="text-align:center;color:var(--cyan)">' + (sh.ke||'') + '</td><td style="text-align:center;color:var(--cinn2)">' + (sh.ji||'') + '</td></tr>';
+        });
+        html += '</tbody></table></details>';
+      }
+      html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：后端古制引擎 R211 v2.0</p>';
+      _showEngineResult('zwEngineResult', html);
+      return;
+    }
+    // 本地回退
     const pan = ziweiPaiPan(year, month, day, hour, sex);
     const analyze = ziweiAnalysis(pan);
-    let html = '<h4 style="color:var(--fire)">🌌 紫微引擎演算结果</h4>';
+    html = '<h4 style="color:var(--fire)">🌌 紫微引擎演算结果</h4>';
     html += '<p><b>命宫：</b>' + pan.mingZhi + ' · 身宫：' + pan.shenZhi + '</p>';
     html += '<p><b>五行局：</b>' + pan.ju + '</p>';
     html += '<p><b>格局：</b>' + analyze.geju + '</p>';
     html += '<p><b>四化：</b>' + analyze.sihuaText + '</p>';
     html += '<p><b>概述：</b>' + analyze.overview + '</p>';
     html += '<p style="opacity:0.8">' + analyze.advice + '</p>';
+    html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：本地引擎（后端不可用）</p>';
     _showEngineResult('zwEngineResult', html);
-  } catch(e) { 
-    console.error('[紫微引擎错误错误]', e.message, e.stack);
+  } catch(e) {
+    console.error('[紫微引擎错误]', e.message, e.stack);
     showToast('操作出错，请重试');
     let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:var(--cinn2)">❌ 紫微引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
@@ -2687,26 +2791,68 @@ if (typeof window !== 'undefined') {
   window.runZeriEngine = runZeriEngine;
 
   // ===== 独立区域调用函数 =====
-  function runQimen() {
+  async function runQimen() {
     const year = parseInt(document.getElementById('qimen-year')?.value || new Date().getFullYear());
     const month = parseInt(document.getElementById('qimen-month')?.value || new Date().getMonth()+1);
     const day = parseInt(document.getElementById('qimen-day')?.value || new Date().getDate());
     const hour = parseInt(document.getElementById('qimen-hour')?.value || 5);
     const ju = document.getElementById('qimen-ju')?.value || 'auto';
+    var hourNames = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+    // R216: 优先调用后端古制引擎
+    var apiData = null;
+    try {
+      var resp = await fetch('/api/paipan/qimen', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({year:year, month:month, day:day, hour:hour})
+      });
+      if (resp.ok) { var j = await resp.json(); if (j.ok && j.chart) apiData = j.chart; }
+    } catch(eApi) { console.warn('[奇门] 后端API不可用，回退本地引擎', eApi.message); }
+    if (apiData) {
+      var c = apiData;
+      var html = '<h4 style="color:var(--violet2)">☰ 奇门遁甲排盘</h4>';
+      html += '<p><b>时间：</b>' + year + '年' + month + '月' + day + '日 ' + hourNames[hour] + '时</p>';
+      html += '<p><b>遁局：</b>' + c.ju + '</p>';
+      html += '<p><b>值符：</b>' + (c.zhiFuStar||'—') + ' · 值使：' + (c.zhiShiDoor||'—') + '</p>';
+      if (c.isFuYin) html += '<p style="color:var(--gold)">⚠️ 伏吟</p>';
+      if (c.isFanYin) html += '<p style="color:var(--cinn2)">⚠️ 反吟</p>';
+      if (c.kongWang && c.kongWang.length) html += '<p><b>空亡：</b>' + c.kongWang.join('、') + '</p>';
+      if (c.maStar) html += '<p>🐎 马星临' + c.maStar + '宫</p>';
+      if (c.geju && c.geju.length) {
+        html += '<p><b>格局：</b>';
+        c.geju.forEach(function(g) {
+          var color = g.type === '吉' ? 'var(--jade)' : 'var(--cinn2)';
+          html += '<span style="color:' + color + '">' + g.name + '[' + g.type + ']</span> ';
+        });
+        html += '</p>';
+      }
+      if (c.palaces && c.palaces.length) {
+        html += '<div style="margin-top:6px"><table style="width:100%;font-size:11px;border-collapse:collapse"><thead><tr style="opacity:0.7"><th style="padding:2px 4px">宫</th><th>地盘</th><th>天盘</th><th>星</th><th>门</th><th>神</th></tr></thead><tbody>';
+        c.palaces.forEach(function(p) {
+          html += '<tr style="border-top:1px solid rgba(201,168,76,0.08)"><td style="padding:2px 4px">' + p.palace + '·' + p.name + '</td><td style="text-align:center">' + (p.dipan||'') + '</td><td style="text-align:center">' + (p.tianpan||'') + '</td><td style="text-align:center">' + (p.star||'') + '</td><td style="text-align:center">' + (p.door||'') + '</td><td style="text-align:center">' + (p.god||'') + '</td></tr>';
+        });
+        html += '</tbody></table></div>';
+      }
+      html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：后端古制引擎 R211 v2.0</p>';
+      const el = document.getElementById('qimenResult');
+      if (el) { el.innerHTML = html; el.style.display = 'block'; }
+      return;
+    }
+    // 本地回退
     try {
       const pan = qimenPaiPan(year, month, day, hour, ju);
       const analyze = qimenAnalyze(pan, '事业');
-      let html = '<h4 style="color:var(--violet2)">☰ 奇门遁甲排盘</h4>';
+      html = '<h4 style="color:var(--violet2)">☰ 奇门遁甲排盘</h4>';
       html += '<p><b>时间：</b>' + year + '年' + month + '月' + day + '日 ' + ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][hour] + '时</p>';
       html += '<p><b>遁局：</b>' + (pan.dun==='yang'?'阳':'阴') + '遁' + pan.ju + '局</p>';
       html += '<p><b>用神：</b>' + analyze.yongShen + ' · 落' + analyze.palace + '宫</p>';
       html += '<p><b>天盘：</b>' + analyze.qi + ' · 门：' + analyze.men + ' · 星：' + analyze.star + '</p>';
       html += '<p><b>吉凶：</b>' + analyze.luck + '</p>';
       html += '<p><b>策略：</b>' + analyze.strategy + '</p>';
+      html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：本地引擎（后端不可用）</p>';
       const el = document.getElementById('qimenResult');
       if (el) { el.innerHTML = html; el.style.display = 'block'; }
-    } catch(e) { 
-    console.error('[奇门引擎错误错误]', e.message, e.stack);
+    } catch(e) {
+    console.error('[奇门引擎错误]', e.message, e.stack);
     showToast('操作出错，请重试');
     let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:var(--cinn2)">❌ 奇门引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
@@ -2715,26 +2861,69 @@ if (typeof window !== 'undefined') {
   }
   window.runQimen = runQimen;
 
-  function runZiwei() {
+  async function runZiwei() {
     const year = parseInt(document.getElementById('ziwei-year')?.value || 1990);
     const month = parseInt(document.getElementById('ziwei-month')?.value || 1);
     const day = parseInt(document.getElementById('ziwei-day')?.value || 1);
     const hour = parseInt(document.getElementById('ziwei-hour')?.value || 0);
     const sex = document.getElementById('ziwei-sex')?.value || 'male';
+    var hourNames = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+    // R216: 优先调用后端古制引擎
+    var apiData = null;
+    try {
+      var resp = await fetch('/api/paipan/ziwei', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({year:year, month:month, day:day, hour:hour})
+      });
+      if (resp.ok) { var j = await resp.json(); if (j.ok && j.chart) apiData = j.chart; }
+    } catch(eApi) { console.warn('[紫微] 后端API不可用，回退本地引擎', eApi.message); }
+    if (apiData) {
+      var c = apiData;
+      var html = '<h4 style="color:var(--fire)">🌌 紫微斗数排盘</h4>';
+      html += '<p><b>生辰：</b>' + year + '年' + month + '月' + day + '日 ' + hourNames[hour] + '时</p>';
+      html += '<p><b>年干支：</b>' + (c.yearGanZhi||'—') + ' · 五行局：' + (c.wuxingJu||'—') + '</p>';
+      html += '<p><b>命宫：</b>' + (c.mingGong||'—') + ' · 身宫：第' + (c.shenGongIdx!=null?c.shenGongIdx:'—') + '宫</p>';
+      if (c.siHua) {
+        var sh = c.siHua;
+        html += '<p><b>四化：</b>';
+        html += '<span style="color:var(--gold)">禄·' + (sh.lu||'') + '</span> ';
+        html += '<span style="color:var(--violet2)">权·' + (sh.quan||'') + '</span> ';
+        html += '<span style="color:var(--cyan)">科·' + (sh.ke||'') + '</span> ';
+        html += '<span style="color:var(--cinn2)">忌·' + (sh.ji||'') + '</span>';
+        html += '</p>';
+      }
+      html += '<p><b>命主：</b>' + (c.mingZhu||'—') + ' · 身主：' + (c.shenZhu||'—') + '</p>';
+      if (c.palaces && c.palaces.length) {
+        html += '<div style="margin-top:6px"><table style="width:100%;font-size:11px;border-collapse:collapse"><thead><tr style="opacity:0.7"><th style="padding:2px 4px">宫</th><th>主星</th><th>辅星</th><th>煞星</th><th>干支</th></tr></thead><tbody>';
+        c.palaces.forEach(function(p) {
+          var badge = [];
+          if (p.isMingGong) badge.push('命宫');
+          if (p.isShenGong) badge.push('身宫');
+          html += '<tr style="border-top:1px solid rgba(201,168,76,0.08)"><td style="padding:2px 4px">' + p.index + '·' + p.name + '</td><td style="text-align:center">' + (p.mainStars||[]).join(' ') + '</td><td style="text-align:center">' + (p.auxStars||[]).join(' ') + '</td><td style="text-align:center;color:var(--cinn2)">' + (p.evilStars||[]).join(' ') + '</td><td style="text-align:center">' + (p.ganZhi||'') + '</td></tr>';
+        });
+        html += '</tbody></table></div>';
+      }
+      html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：后端古制引擎 R211 v2.0</p>';
+      const el = document.getElementById('ziweiResult');
+      if (el) { el.innerHTML = html; el.style.display = 'block'; }
+      return;
+    }
+    // 本地回退
     try {
       const pan = ziweiPaiPan(year, month, day, hour, sex);
       const analyze = ziweiAnalysis(pan);
-      let html = '<h4 style="color:var(--fire)">🌌 紫微斗数排盘</h4>';
+      html = '<h4 style="color:var(--fire)">🌌 紫微斗数排盘</h4>';
       html += '<p><b>生辰：</b>' + year + '年' + month + '月' + day + '日 ' + ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][hour] + '时</p>';
       html += '<p><b>命宫：</b>' + pan.mingZhi + ' · 身宫：' + pan.shenZhi + '</p>';
       html += '<p><b>五行局：</b>' + pan.ju + '</p>';
       html += '<p><b>格局：</b>' + analyze.geju + '</p>';
       html += '<p><b>四化：</b>' + analyze.sihuaText + '</p>';
       html += '<p><b>概述：</b>' + analyze.overview + '</p>';
+      html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：本地引擎（后端不可用）</p>';
       const el = document.getElementById('ziweiResult');
       if (el) { el.innerHTML = html; el.style.display = 'block'; }
-    } catch(e) { 
-    console.error('[紫微引擎错误错误]', e.message, e.stack);
+    } catch(e) {
+    console.error('[紫微引擎错误]', e.message, e.stack);
     showToast('操作出错，请重试');
     let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:var(--cinn2)">❌ 紫微引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
