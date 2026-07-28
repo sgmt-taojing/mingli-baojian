@@ -3434,14 +3434,35 @@ async function _fetchAndInjectInterpretation(mod, data, container){
     var resp = await fetch(url, opts);
     if(!resp.ok) return;
     var result = await resp.json();
-    if(!result.ok || !result.interpretation) return;
+    if(!result.ok) return;
+    var chart = result.chart;
     var interp = result.interpretation;
     var el = document.createElement('div');
     el.className = 'r239-interpretation';
     el.style.cssText = 'margin-top:12px;padding:14px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2);border-radius:10px;font-size:13px;line-height:1.7';
-    var html = '<div style="font-weight:600;color:var(--gold,#c9a84c);margin-bottom:6px;display:flex;align-items:center;gap:6px"><span>📜</span><span>古制断盘解读</span><span style="margin-left:auto;font-size:10px;opacity:.6;font-weight:normal">后端引擎提供</span></div>';
-    if(interp.summary) html += '<div style="opacity:.9;margin-bottom:6px">'+esc(interp.summary)+'</div>';
-    if(interp.advice) html += '<div style="opacity:.75;font-size:12px">💡 '+esc(interp.advice)+'</div>';
+    var html = '<div style="font-weight:600;color:var(--gold,#c9a84c);margin-bottom:8px;display:flex;align-items:center;gap:6px"><span>🔮</span><span>后端古制排盘结果</span><span style="margin-left:auto;font-size:10px;opacity:.6;font-weight:normal">引擎：'+mod+'</span></div>';
+    // 盘面摘要
+    if(chart){
+      html += '<div style="border-bottom:1px solid rgba(201,168,76,.15);padding-bottom:8px;margin-bottom:8px">';
+      if(mod==='ziwei' && chart.yearGanZhi) html += '<div>年柱：'+esc(chart.yearGanZhi)+' · 五行局：'+esc(chart.wuxingJu||'')+' · 命宫：'+esc(chart.mingGong||'')+'</div>';
+      if(mod==='ziwei' && chart.siHua) html += '<div>四化：禄'+esc(chart.siHua.lu||'')+' 权'+esc(chart.siHua.quan||'')+' 科'+esc(chart.siHua.ke||'')+' 忌'+esc(chart.siHua.ji||'')+'</div>';
+      if(mod==='qimen' && chart.ju) html += '<div>遁局：'+esc(chart.ju)+' · 节气：'+esc(chart.jieqi||'')+'</div>';
+      if(mod==='qimen' && chart.zhiFuStar) html += '<div>值符：'+esc(chart.zhiFuStar)+' · 值使：'+esc(chart.zhiShiDoor||'')+'</div>';
+      if(mod==='liuyao' && chart.guaName) html += '<div>本卦：'+esc(chart.guaName)+'</div>';
+      if(mod==='liuyao' && chart.bianGua && chart.bianGua.name) html += '<div>变卦：'+esc(chart.bianGua.name)+'</div>';
+      if(mod==='liuren' && chart.dayGanZhi) html += '<div>日干支：'+esc(chart.dayGanZhi)+'</div>';
+      if(mod==='meihua' && chart.guaName) html += '<div>本卦：'+esc(chart.guaName)+'</div>';
+      if(mod==='meihua' && chart.dongYaoName) html += '<div>动爻：'+esc(chart.dongYaoName)+'</div>';
+      if(mod==='fengshui' && chart.yunName) html += '<div>元运：'+esc(chart.yunName)+'</div>';
+      if(mod==='fengshui' && chart.sittingMountain) html += '<div>坐'+esc(chart.sittingMountain)+'山 向'+esc(chart.facingMountain||'')+'山</div>';
+      html += '</div>';
+    }
+    // 断盘解读
+    if(interp){
+      html += '<div style="font-weight:600;color:var(--gold,#c9a84c);margin-bottom:4px">📜 断盘解读</div>';
+      if(interp.summary) html += '<div style="opacity:.9;margin-bottom:4px">'+esc(interp.summary)+'</div>';
+      if(interp.advice) html += '<div style="opacity:.75;font-size:12px">💡 '+esc(interp.advice)+'</div>';
+    }
     el.innerHTML = html;
     container.appendChild(el);
   } catch(e) { console.warn('[r239-interpretation]', mod, e.message); }
