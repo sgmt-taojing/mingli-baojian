@@ -2357,19 +2357,55 @@ function _showEngineResult(containerId, html) {
   el.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
-function runLiuyaoEngine() {
+async function runLiuyaoEngine() {
   try {
     const now = new Date();
-    const gua = liuyaoQiGua('time', {year:now.getFullYear(), month:now.getMonth()+1, day:now.getDate(), hour:now.getHours()});
-    const gz = _gongliToGanZhi(now.getFullYear(), now.getMonth()+1, now.getDate());
+    var year = now.getFullYear(), month = now.getMonth()+1, day = now.getDate(), hour = now.getHours();
+    // R215: 优先调用后端古制引擎，失败回退本地
+    var apiData = null;
+    try {
+      var resp = await fetch('/api/paipan/liuyao?year='+year+'&month='+month+'&day='+day+'&hour='+hour);
+      if (resp.ok) { var j = await resp.json(); if (j.ok && j.chart) apiData = j.chart; }
+    } catch(eApi) { console.warn('[六爻] 后端API不可用，回退本地引擎', eApi.message); }
+    if (apiData) {
+      var c = apiData;
+      var benGuaName = (c.lower ? c.lower.name : '') + (c.upper ? c.upper.name : '');
+      var bianGuaName = c.bianGua ? c.bianGua.name : '—';
+      var dongYaoText = c.yaos ? c.yaos.filter(function(y){return y.bian;}).map(function(y){return '第'+y.position+'爻';}).join('、') : '无';
+      var liuqinArr = c.yaos ? c.yaos.map(function(y){return y.liuqin;}) : [];
+      var liushenArr = c.yaos ? c.yaos.map(function(y){return y.liushen;}) : [];
+      var shiYao = c.shiYao != null ? c.shiYao : -1;
+      var yingYao = c.yingYao != null ? c.yingYao : -1;
+      var html = '<h4 style="color:var(--gold)">☰ 六爻引擎演算结果</h4>';
+      html += '<p><b>本卦：</b>' + (c.guaName || benGuaName) + '</p>';
+      html += '<p><b>变卦：</b>' + bianGuaName + '</p>';
+      html += '<p><b>动爻：</b>' + dongYaoText + '</p>';
+      html += '<p><b>日干支：</b>' + (c.dayGanZhi || '—') + ' · 日五行：' + (c.dayWuxing || '—') + '</p>';
+      html += '<p><b>世应：</b>世' + (shiYao>=0 ? (shiYao+1)+'爻' : '—') + ' · 应' + (yingYao>=0 ? (yingYao+1)+'爻' : '—') + '</p>';
+      if (liuqinArr.length) html += '<p><b>六亲：</b>' + liuqinArr.join(' · ') + '</p>';
+      if (liushenArr.length) html += '<p><b>六神：</b>' + liushenArr.join(' · ') + '</p>';
+      if (c.yaos) {
+        html += '<div style="margin-top:8px"><table style="width:100%;font-size:12px;border-collapse:collapse"><thead><tr style="opacity:0.7"><th style="text-align:left;padding:2px 4px">爻</th><th>阴阳</th><th>干支</th><th>五行</th><th>六亲</th><th>六神</th><th>世应</th></tr></thead><tbody>';
+        c.yaos.forEach(function(y) {
+          html += '<tr style="border-top:1px solid rgba(201,168,76,0.08)"><td style="padding:2px 4px">'+y.positionName+'</td><td style="text-align:center">'+y.yinName+'</td><td style="text-align:center">'+y.ganZhi+'</td><td style="text-align:center">'+y.wuxing+'</td><td style="text-align:center">'+y.liuqin+'</td><td style="text-align:center">'+y.liushen+'</td><td style="text-align:center">'+(y.shiying||'')+'</td></tr>';
+        });
+        html += '</tbody></table></div>';
+      }
+      html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：后端古制引擎 R214</p>';
+      _showEngineResult('yjEngineResult', html);
+      return;
+    }
+    // 本地回退
+    const gua = liuyaoQiGua('time', {year:year, month:month, day:day, hour:hour});
+    const gz = _gongliToGanZhi(year, month, day);
     gua.dayGanZhi = gz;
-    gua.monthZhi = _BRANCHES[_qyMod(now.getMonth()+1, 12)];
+    gua.monthZhi = _BRANCHES[_qyMod(month, 12)];
     const zg = liuyaoZhuangGua(gua, gz);
     gua.zhuangGua = zg;
     const duan = liuyaoDuanGua(gua, '事业');
     const ben = _GUA_XIANG[gua.benGua.lower].name + _GUA_XIANG[gua.benGua.upper].name;
     const bian = _GUA_XIANG[gua.bianGua.lower].name + _GUA_XIANG[gua.bianGua.upper].name;
-    let html = '<h4 style="color:var(--gold)">☰ 六爻引擎演算结果</h4>';
+    var html = '<h4 style="color:var(--gold)">☰ 六爻引擎演算结果</h4>';
     html += '<p><b>本卦：</b>' + ben + '（' + gua.benGua.idx + '）</p>';
     html += '<p><b>变卦：</b>' + bian + '</p>';
     html += '<p><b>动爻：</b>' + (gua.dongYao.map(function(x){return '第'+(x+1)+'爻';}).join('、') || '无') + '</p>';
@@ -2380,6 +2416,7 @@ function runLiuyaoEngine() {
     html += '<p><b>用神：</b>' + duan.yongshen + ' · ' + duan.verdict + '</p>';
     html += '<p><b>应期：</b>' + duan.yingqi + '</p>';
     html += '<p style="opacity:0.8">' + duan.advice + '</p>';
+    html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：本地引擎（后端不可用）</p>';
     _showEngineResult('yjEngineResult', html);
   } catch(e) { 
     console.error('[六爻引擎错误错误]', e.message, e.stack);
@@ -2455,21 +2492,66 @@ function runQimenEngine() {
   }
 }
 
-function runLiurenEngine() {
+async function runLiurenEngine() {
   try {
     const dateVal = document.getElementById('lrDate')?.value;
     const hourVal = document.getElementById('lrHour')?.value;
     const now = dateVal ? new Date(dateVal + 'T00:00:00') : new Date();
     const hour = hourVal ? parseInt(hourVal) : now.getHours();
-    const pan = liurenPaiPan(now.getFullYear(), now.getMonth()+1, now.getDate(), hour, 0);
+    var year = now.getFullYear(), month = now.getMonth()+1, day = now.getDate();
+    // R215: 优先调用后端古制引擎
+    var apiData = null;
+    try {
+      var resp = await fetch('/api/paipan/liuren?year='+year+'&month='+month+'&day='+day+'&hour='+hour);
+      if (resp.ok) { var j = await resp.json(); if (j.ok && j.chart) apiData = j.chart; }
+    } catch(eApi) { console.warn('[六壬引擎] 后端API不可用，回退本地', eApi.message); }
+    if (apiData) {
+      var c = apiData;
+      var question = document.getElementById('lrQuestion')?.value || '所问之事';
+      let html = '<h4 style="color:var(--orange)">⬡ 六壬引擎演算结果</h4>';
+      html += '<p><b>日干支：</b>' + (c.dayGanZhi||'—') + ' · 占时：' + (c.hourZhi||'—') + '</p>';
+      html += '<p><b>月将：</b>' + (c.monthJiang||'—') + '</p>';
+      if (c.isFuYin) html += '<p style="color:var(--gold)">⚠️ 伏吟</p>';
+      if (c.isFanYin) html += '<p style="color:var(--cinn2)">⚠️ 反吟</p>';
+      if (c.sanChuan) {
+        var sc = c.sanChuan;
+        html += '<p><b>三传：</b>' + (sc.method ? '[' + sc.method + '] ' : '') + (sc.chu||'—') + ' → ' + (sc.zhong||'—') + ' → ' + (sc.mo||'—') + '</p>';
+      }
+      if (c.siKe && c.siKe.length) {
+        html += '<div style="margin-top:6px"><b>四课：</b><table style="width:100%;font-size:12px;border-collapse:collapse;margin-top:4px"><thead><tr style="opacity:0.7"><th>课</th><th>上神</th><th>下神</th></tr></thead><tbody>';
+        c.siKe.forEach(function(k) { html += '<tr style="border-top:1px solid rgba(201,168,76,0.08)"><td style="text-align:center;padding:2px 4px">'+k.course+'</td><td style="text-align:center">'+k.top+'</td><td style="text-align:center">'+k.bottom+'</td></tr>'; });
+        html += '</tbody></table></div>';
+      }
+      if (c.tianjiang) {
+        var tjNames = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+        var tjArr = tjNames.map(function(z, i) { return z + ':' + (c.tianjiang[i] || '—'); });
+        html += '<p style="font-size:12px"><b>十二天将：</b>' + tjArr.join(' · ') + '</p>';
+      }
+      if (c.shensha) {
+        var ssArr = [];
+        for (var sk in c.shensha) ssArr.push(sk + '(' + c.shensha[sk] + ')');
+        html += '<p style="font-size:12px"><b>神煞：</b>' + ssArr.join(' · ') + '</p>';
+      }
+      if (c.palaces && c.palaces.length) {
+        html += '<div style="margin-top:6px"><b>天盘：</b><table style="width:100%;font-size:11px;border-collapse:collapse;margin-top:4px"><thead><tr style="opacity:0.7"><th>宫</th><th>地盘</th><th>天盘</th><th>天将</th></tr></thead><tbody>';
+        c.palaces.forEach(function(p) { html += '<tr style="border-top:1px solid rgba(201,168,76,0.08)"><td style="text-align:center;padding:2px 4px">'+(p.index+1)+'</td><td style="text-align:center">'+p.zhi+'</td><td style="text-align:center">'+p.tianpanZhi+'</td><td style="text-align:center">'+p.tianjiang+'</td></tr>'; });
+        html += '</tbody></table></div>';
+      }
+      html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：后端古制引擎 R214 · 所问：' + question + '</p>';
+      _showEngineResult('lrEngineResult', html);
+      return;
+    }
+    // 本地回退
+    const pan = liurenPaiPan(year, month, day, hour, 0);
     const analyze = liurenAnalyze(pan, document.getElementById('lrQuestion')?.value || '所问之事');
-    let html = '<h4 style="color:var(--orange)">⬡ 六壬引擎演算结果</h4>';
+    var html = '<h4 style="color:var(--orange)">⬡ 六壬引擎演算结果</h4>';
     html += '<p><b>日干支：</b>' + pan.dayGan + pan.dayZhi + ' · 占时：' + pan.shiZhi + '</p>';
     html += '<p><b>月将：</b>' + pan.yueJiang + '</p>';
     html += '<p><b>三传：</b>' + pan.sanChuan.join(' → ') + '</p>';
     html += '<p><b>三传神将：</b>' + analyze.chuanShen.join(' → ') + '</p>';
     html += '<p><b>吉凶：</b>' + analyze.luck + '</p>';
     html += '<p style="opacity:0.8">' + analyze.advice + '</p>';
+    html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：本地引擎（后端不可用）</p>';
     _showEngineResult('lrEngineResult', html);
   } catch(e) { 
     console.error('[六壬引擎错误错误]', e.message, e.stack);
@@ -2690,11 +2772,62 @@ if (typeof window !== 'undefined') {
   }
   window.runMeihua = runMeihua;
 
-  function runLiuren() {
+  async function runLiuren() {
     const year = parseInt(document.getElementById('liuren-year')?.value || new Date().getFullYear());
     const month = parseInt(document.getElementById('liuren-month')?.value || new Date().getMonth()+1);
     const day = parseInt(document.getElementById('liuren-day')?.value || new Date().getDate());
     const hour = parseInt(document.getElementById('liuren-hour')?.value || 5);
+    // R215: 优先调用后端古制引擎，失败回退本地
+    var apiData = null;
+    try {
+      var resp = await fetch('/api/paipan/liuren?year='+year+'&month='+month+'&day='+day+'&hour='+hour);
+      if (resp.ok) { var j = await resp.json(); if (j.ok && j.chart) apiData = j.chart; }
+    } catch(eApi) { console.warn('[六壬] 后端API不可用，回退本地引擎', eApi.message); }
+    if (apiData) {
+      var c = apiData;
+      var hourNames = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+      var html = '<h4 style="color:var(--orange)">⬡ 大六壬排盘</h4>';
+      html += '<p><b>时间：</b>' + year + '年' + month + '月' + day + '日 ' + hourNames[hour] + '时</p>';
+      html += '<p><b>日干支：</b>' + (c.dayGanZhi || '—') + '</p>';
+      html += '<p><b>月将：</b>' + (c.monthJiang || '—') + '</p>';
+      if (c.isFuYin) html += '<p style="color:var(--gold)">⚠️ 伏吟</p>';
+      if (c.isFanYin) html += '<p style="color:var(--cinn2)">⚠️ 反吟</p>';
+      if (c.guiren) html += '<p><b>贵人：</b>' + c.guichen + '</p>';
+      // 三传
+      if (c.sanChuan) {
+        var sc = c.sanChuan;
+        html += '<p><b>三传：</b>' + (sc.method ? '[' + sc.method + '] ' : '') + (sc.chu||'—') + ' → ' + (sc.zhong||'—') + ' → ' + (sc.mo||'—') + '</p>';
+      }
+      // 四课
+      if (c.siKe && c.siKe.length) {
+        html += '<div style="margin-top:6px"><b>四课：</b><table style="width:100%;font-size:12px;border-collapse:collapse;margin-top:4px"><thead><tr style="opacity:0.7"><th>课</th><th>上神</th><th>下神</th></tr></thead><tbody>';
+        c.siKe.forEach(function(k) { html += '<tr style="border-top:1px solid rgba(201,168,76,0.08)"><td style="text-align:center;padding:2px 4px">'+k.course+'</td><td style="text-align:center">'+k.top+'</td><td style="text-align:center">'+k.bottom+'</td></tr>'; });
+        html += '</tbody></table></div>';
+      }
+      // 十二天将
+      if (c.tianjiang) {
+        var tjNames = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+        var tjArr = tjNames.map(function(z, i) { return z + ':' + (c.tianjiang[i] || '—'); });
+        html += '<p style="font-size:12px"><b>十二天将：</b>' + tjArr.join(' · ') + '</p>';
+      }
+      // 神煞
+      if (c.shensha) {
+        var ssArr = [];
+        for (var sk in c.shensha) ssArr.push(sk + '(' + c.shensha[sk] + ')');
+        html += '<p style="font-size:12px"><b>神煞：</b>' + ssArr.join(' · ') + '</p>';
+      }
+      // 十二宫天盘
+      if (c.palaces && c.palaces.length) {
+        html += '<div style="margin-top:6px"><b>天盘：</b><table style="width:100%;font-size:11px;border-collapse:collapse;margin-top:4px"><thead><tr style="opacity:0.7"><th>宫</th><th>地盘</th><th>天盘</th><th>天将</th></tr></thead><tbody>';
+        c.palaces.forEach(function(p) { html += '<tr style="border-top:1px solid rgba(201,168,76,0.08)"><td style="text-align:center;padding:2px 4px">'+(p.index+1)+'</td><td style="text-align:center">'+p.zhi+'</td><td style="text-align:center">'+p.tianpanZhi+'</td><td style="text-align:center">'+p.tianjiang+'</td></tr>'; });
+        html += '</tbody></table></div>';
+      }
+      html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：后端古制引擎 R214</p>';
+      const el = document.getElementById('liurenResult');
+      if (el) { el.innerHTML = html; el.style.display = 'block'; }
+      return;
+    }
+    // 本地回退
     try {
       const pan = liurenPaiPan(year, month, day, hour, 0);
       const analyze = liurenAnalyze(pan, '所问之事');
@@ -2706,6 +2839,7 @@ if (typeof window !== 'undefined') {
       html += '<p><b>三传神将：</b>' + analyze.chuanShen.join(' → ') + '</p>';
       html += '<p><b>吉凶：</b>' + analyze.luck + '</p>';
       html += '<p style="opacity:0.8">' + analyze.advice + '</p>';
+      html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：本地引擎（后端不可用）</p>';
       const el = document.getElementById('liurenResult');
       if (el) { el.innerHTML = html; el.style.display = 'block'; }
     } catch(e) { 
