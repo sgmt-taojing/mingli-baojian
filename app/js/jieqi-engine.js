@@ -60,89 +60,90 @@ var JieqiEngine = {
    * @returns {{branch:string, jieName:string, solarYear:number}}
    */
   getMonthBranch: function(year, month, day, hour){
-    // 获取本年立春
-    var lichun = this.getJieqiDate(year, '立春');
+    if(hour === undefined) hour = 0;
     
-    // 确定太阳年（立春为界）
-    var solarYear = year;
-    if(lichun){
-      if(month < lichun.month || (month === lichun.month && day < lichun.day)){
-        solarYear = year - 1;
-      }
-      // 立春当天：中午12时前还属上年丑月
-      if(month === lichun.month && day === lichun.day && hour < 12){
-        solarYear = year - 1;
-      }
-    }
-
-    // 构建当前太阳年的12节列表
-    // 太阳年 S：从 S 年立春 到 S+1 年立春前
-    // 节序：立春(S) → 惊蛰(S) → ... → 大雪(S) → 小寒(S+1,1月)
+    // 构建候选节气列表（本年小寒 → 本年立春→大雪 → 下年小寒）
     var candidates = [];
     
-    // 本年小寒（1月，在立春前，属于上一年太阳年的末尾）
-    var xiaohanThis = this.getJieqiDate(year, '小寒');
-    if(xiaohanThis){
-      candidates.push({jie:'小寒', cy:year, cm:xiaohanThis.month, cd:xiaohanThis.day});
+    // 本年小寒（1月，立春前）
+    var xh = this.getJieqiDate(year, '小寒');
+    var xhHour = this.getJieqiHour(year, '小寒');
+    if(xh) candidates.push({jie:'小寒', cy:year, cm:xh.month, cd:xh.day, ch:xhHour});
+    
+    // 本年立春→大雪
+    var jieList = ['立春','惊蛰','清明','立夏','芒种','小暑','立秋','白露','寒露','立冬','大雪'];
+    for(var i=0;i<jieList.length;i++){
+      var jd = this.getJieqiDate(year, jieList[i]);
+      var jh = this.getJieqiHour(year, jieList[i]);
+      if(jd) candidates.push({jie:jieList[i], cy:year, cm:jd.month, cd:jd.day, ch:jh});
     }
-
-    // 本年立春到大雪
-    var jieInYear = ['立春','惊蛰','清明','立夏','芒种','小暑','立秋','白露','寒露','立冬','大雪'];
-    for(var i=0;i<jieInYear.length;i++){
-      var jd = this.getJieqiDate(year, jieInYear[i]);
-      if(jd){
-        candidates.push({jie:jieInYear[i], cy:year, cm:jd.month, cd:jd.day});
-      }
-    }
-
-    // 下年小寒（12月/1月，属于本年太阳年的末尾）
-    var xiaohanNext = this.getJieqiDate(year+1, '小寒');
-    if(xiaohanNext){
-      candidates.push({jie:'小寒', cy:year+1, cm:xiaohanNext.month, cd:xiaohanNext.day});
-    }
-
-    // 按下一年立春（用作下一太阳年起点的参考，不用来计算）
-    // 只需按时间排序即可
+    
+    // 下年小寒
+    var xhN = this.getJieqiDate(year+1, '小寒');
+    var xhNHour = this.getJieqiHour(year+1, '小寒');
+    if(xhN) candidates.push({jie:'小寒', cy:year+1, cm:xhN.month, cd:xhN.day, ch:xhNHour});
+    
+    // 按时间排序
     candidates.sort(function(a,b){
-      if(a.cy !== b.cy) return a.cy - b.cy;
-      if(a.cm !== b.cm) return a.cm - b.cm;
-      return a.cd - b.cd;
+      if(a.cy!==b.cy) return a.cy-b.cy;
+      if(a.cm!==b.cm) return a.cm-b.cm;
+      return a.cd-b.cd;
     });
-
-    // 找到最后一个在 (year, month, day, hour) 当天或之前的节
-    // 节气当天 12:00 前不算已过（仍属上一个节气月）
+    
+    // 找到最后一个已过的节气
+    // 节气当日：hour >= 交节小时才算已过
     var found = null;
     for(var i=0;i<candidates.length;i++){
       var c = candidates[i];
-      if(c.cy < year || (c.cy === year && (c.cm < month || (c.cm === month && c.cd < day)))){
+      if(c.cy < year || (c.cy===year && (c.cm < month || (c.cm===month && c.cd < day)))){
         found = c;
-      } else if(c.cy === year && c.cm === month && c.cd === day && hour >= 12){
-        found = c; // 节气当天 12:00 才算已过
+      } else if(c.cy===year && c.cm===month && c.cd===day && hour >= c.ch){
+        found = c;
       } else {
         break;
       }
     }
-
+    
     if(!found){
-      // 极小概率：1月1日还没到小寒 → 上一太阳年的大雪月
       return {branch:'子', jieName:'大雪', solarYear:year-1};
     }
-
-    var branch = JIE_BRANCH[found.jie] || '寅';
-    return {branch:branch, jieName:found.jie, solarYear:solarYear};
+    
+    // 确定太阳年（立春为界）
+    var solarYear = year;
+    var lichun = this.getJieqiDate(year, '立春');
+    var lichunHour = this.getJieqiHour(year, '立春');
+    if(lichun){
+      if(month < lichun.month || (month===lichun.month && day < lichun.day) ||
+         (month===lichun.month && day===lichun.day && hour < lichunHour)){
+        solarYear = year - 1;
+      }
+    }
+    
+    return {branch: JIE_BRANCH[found.jie]||'寅', jieName: found.jie, solarYear: solarYear};
+  },
+  
+  /**
+   * 获取节气交节精确小时
+   */
+  getJieqiHour: function(year, jieqiName){
+    if(typeof JIEQI_HOUR !== 'undefined' && JIEQI_HOUR[String(year)]){
+      var h = JIEQI_HOUR[String(year)][jieqiName];
+      if(h) return h.h || 0;
+    }
+    return 12; // 默认中午
   },
 
   /**
    * 年柱（立春为界，中午12:00前归上一年）
    */
   getYearPillar: function(year, month, day, hour){
+    if(hour === undefined) hour = 0;
     var lichun = this.getJieqiDate(year, '立春');
+    var lichunHour = this.getJieqiHour(year, '立春');
     var y = year;
     if(lichun){
-      if(month < lichun.month || (month === lichun.month && day < lichun.day)){
-        y = year - 1;
-      }
-      if(month === lichun.month && day === lichun.day && hour < 12){
+      if(month < lichun.month || (month === lichun.month && day < lichun.day) ||
+         (month === lichun.month && day === lichun.day && hour < lichunHour)){
         y = year - 1;
       }
     }
