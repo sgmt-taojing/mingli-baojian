@@ -492,6 +492,7 @@
     var html = '<div class="wz-quick-ref">';
     html += '<div class="quick-ref-tabs"><button class="qr-tab active" onclick="window.wangzhenCenter.switchQuickRef(\'tongue\')">\u820c\u8bca</button><button class="qr-tab" onclick="window.wangzhenCenter.switchQuickRef(\'face\')">\u9762\u8bca36\u7ef4</button></div>';
     html += '<div id="qr-tongue" class="qr-panel" style="display:block">';
+    // 基础舌诊速查
     var tongue = { '舌质':{ '淡红':'正常', '淡白':'气血虚/阳虚', '红':'热证', '绛':'热入营血/阴虚火旺', '紫':'瘀血', '青紫':'寒凝血瘀/中毒', '瘀斑':'瘀血阻络', '红绛':'阴虚火旺', '暗红':'热入血分/瘀热' },
       '舌形':{ '正常':'老嫩适中', '胖大':'脾虚湿盛', '瘦薄':'气血两虚/阴虚', '齿痕':'脾虚湿盛', '裂纹':'阴虚/血虚', '芒刺':'热极', '挝软':'气血虚极' },
       '舌态':{ '正常':'伸缩自如', '歪斜':'中风/中风先兆', '颤动':'肝风内动/血虚', '吐弄':'心脾热盛/动风先兆' },
@@ -506,6 +507,29 @@
       });
       html += '</div>';
     });
+    // 28 舌象全图鉴
+    html += '<div class="qr-group"><div class="qr-group-title">舌诊28象全图鉴（4组×7型）</div>';
+    html += '<div class="qr-28-grid">';
+    var tongue28 = [
+      // 淡白/淡红组
+      {g:'淡白组',items:[['淡白·薄润','气血两虚','山药红枣粥'],['淡白·少苔','血虚','当归生姜羊肉汤'],['淡白·滑润','脾湿','薏仁茯苓粥'],['淡白·厚腻','阳虚','韭菜炒核桃'],['淡红·薄润','正常（健康）','均衡饮食'],['淡红·厚腻','脾困湿浊','陈皮山楂茶'],['淡红·齿痕','脾虚','山药小米粥']]},
+      // 红色组
+      {g:'红色组',items:[['红·薄苔','实热','绿豆汤'],['红·芒刺','炽热热毒','莲子心茶'],['红·裂纹','阴虚','银耳百合羹'],['红·少苔','胃阴不足','石斛麦冬茶'],['红·黄腻','湿热','冬瓜薏仁汤'],['红·黄厚','湿困中焦','藿香正气'],['红·灰苔','热毒伤阴','犀角地黄汤']]},
+      // 绛色组
+      {g:'绛色组',items:[['绛·黄燥','热入营血','清瘟败毒饮'],['绛·裂纹','阴虚火旺','知柏地黄丸'],['绛·芒刺','热毒炽盛','黄连解毒汤'],['绛·光剥','阴液枯竭','增液汤'],['绛·灰腻','湿热瘀阻','甘露消毒丹'],['绛·黄厚','瘀热互结','桃核承气汤'],['绛·黑燥','重症危候','急就医']]},
+      // 紫青蓝危重组
+      {g:'紫青蓝组',items:[['紫·薄苔','气滞血瘀','玫瑰花茶'],['紫·厚腻','阳虚瘀阻','山楂桃仁粥'],['紫·少苔','阴虚血瘀','百合生地粥'],['紫·瘀斑','瘀热互结','丹参田七茶'],['青·滑润','寒凝血瘀','生姜红糖茶'],['青·薄苔','寒凝肝脉','吴茱萸汤'],['蓝·光剥','危重衰败','急就医']]}
+    ];
+    tongue28.forEach(function(grp){
+      html += '<div class="qr-28-subgroup">';
+      html += '<div class="qr-28-group-title" style="border-left:3px solid var(--accent,#4fd1c5);padding-left:6px;margin:4px 0;font-weight:600;font-size:12px;">'+grp.g+'</div>';
+      grp.items.forEach(function(it){
+        var sev = it[2].indexOf('急')>=0 ? 'qr-item-danger' : (it[1].indexOf('正常')>=0 ? 'qr-item-ok' : 'qr-item-warn');
+        html += '<div class="qr-item '+sev+'" style="flex:1;min-width:120px;"><span class="qr-key">'+it[0]+'</span><span class="qr-val">'+it[1]+'<br><small style="opacity:0.7">食疗：'+it[2]+'</small></span></div>';
+      });
+      html += '</div>';
+    });
+    html += '</div></div>';
     html += '</div>';
 
     html += '<div id="qr-face" class="qr-panel" style="display:none">';
