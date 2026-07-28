@@ -3442,9 +3442,9 @@ function _paipanLocal(y,m,d,h,gender,ziSect){
       // 逆排：找上一个节气
       var prevJieDate=null;
       for(var ci=0;ci<12;ci++){
-        var rawIdx=monthIdx-ci-1;
+        var rawIdx=monthIdx-ci;
         var cmIdx=((rawIdx%12)+12)%12;
-        var cyear=y+(rawIdx<0?-1:0); // 正确处理跨年
+        var cyear=y+(rawIdx<0?-1:0);
         var jd=_jieDate(cyear,cmIdx);
         var cm=JIE_MONTHS[cmIdx];
         var cd=new Date(cyear,cm-1,jd);
