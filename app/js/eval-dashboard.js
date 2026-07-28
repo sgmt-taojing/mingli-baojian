@@ -2483,6 +2483,187 @@ document.querySelectorAll('.expanded-tab').forEach(btn => {
 // 初始化
 initExpandedTrendModSel().then(() => refreshExpandedTrend());
 
+// ===== R225: 跨基准模块散点图 =====
+const CROSS_BENCH_MOD_LABELS = {
+  bazi: '八字', general: '综合', yunshi: '运势', ziwei: '紫微',
+  fengshui: '风水', liuyao: '六爻', liuren: '六壬', meihua: '梅花',
+  huangli: '黄历', wuxing: '五行', tcm: '中医', koujue: '口诀',
+  faith: '信仰', classics: '经典', yijing: '易经', qimen: '奇门'
+};
+
+async function fetchCrossBenchData(week){
+  const benches = ['faithfulness', 'latency', 'cost-budget'];
+  const results = await Promise.all(benches.map(async b => {
+    try {
+      const ghUrl = `${GH}/eval/weekly/${week}-expanded/${b}-by-module.json`;
+      const localUrl = `eval/weekly/${week}-expanded/${b}-by-module.json`;
+      let resp = await fetch(ghUrl);
+      if (!resp.ok) resp = await fetch(localUrl);
+      if (!resp.ok) return null;
+      return await resp.json();
+    } catch(e){ return null; }
+  }));
+  return { faithfulness: results[0], latency: results[1], 'cost-budget': results[2] };
+}
+
+function buildCrossBenchPoints(data){
+  const points = [];
+  if (!data.faithfulness || !data.latency || !data['cost-budget']) return points;
+  const modSet = new Set([
+    ...Object.keys(data.faithfulness),
+    ...Object.keys(data.latency),
+    ...Object.keys(data['cost-budget'])
+  ]);
+  for (const mod of modSet){
+    const fMod = data.faithfulness[mod];
+    const lMod = data.latency[mod];
+    const cMod = data['cost-budget'][mod];
+    if (!fMod || !lMod || !cMod) continue;
+    const faithfulness = fMod.avg_score != null ? fMod.avg_score : (fMod.score != null ? fMod.score : null);
+    const latency = lMod.avg_latency != null ? lMod.avg_latency : (lMod.p95 != null ? lMod.p95 : null);
+    const cost = cMod.avg_cost != null ? cMod.avg_cost : null;
+    if (faithfulness == null || latency == null) continue;
+    points.push({ mod, faithfulness, latency, cost: cost || 0 });
+  }
+  return points;
+}
+
+function renderCrossBench(points){
+  const wrap = $('crossBenchChart');
+  const legendWrap = $('crossBenchLegend');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  if (!legendWrap) return;
+  legendWrap.innerHTML = '';
+  if (points.length === 0){
+    wrap.textContent = '暂无跨基准数据';
+    return;
+  }
+  const W = 560, H = 360, padL = 50, padR = 20, padT = 20, padB = 45;
+  const innerW = W - padL - padR, innerH = H - padT - padB;
+  const latencies = points.map(p => p.latency);
+  const faiths = points.map(p => p.faithfulness);
+  const costs = points.map(p => p.cost);
+  const xMin = 0, xMax = Math.max(...latencies) * 1.1;
+  const yMin = Math.min(...faiths) * 0.9, yMax = Math.max(...faiths) * 1.05;
+  const yLo = Math.min(yMin, 0.5), yHi = Math.max(yMax, 1.0);
+  const costMax = Math.max(...costs, 0.001);
+  const COLORS = ['#10b981','#c9a84c','#3b82f6','#f59e0b','#9333ea','#ef4444','#06b6d4','#ec4899','#84cc16','#f97316','#8b5cf6','#14b8a6','#6366f1','#e11d48','#a855f7','#22c55e'];
+  function x(v){ return padL + ((v - xMin) / (xMax - xMin || 1)) * innerW; }
+  function y(v){ return padT + innerH - ((v - yLo) / (yHi - yLo || 1)) * innerH; }
+  function r(cost){ return 6 + (cost / costMax) * 18; }
+  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('width','100%');
+  svg.style.maxWidth = '100%';
+  svg.style.height = 'auto';
+  // grid lines (Y)
+  for (let i = 0; i <= 4; i++){
+    const yy = padT + (i / 4) * innerH;
+    const val = yHi - (i / 4) * (yHi - yLo);
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1', padL); line.setAttribute('x2', W - padR);
+    line.setAttribute('y1', yy); line.setAttribute('y2', yy);
+    line.setAttribute('class','chart-grid');
+    svg.appendChild(line);
+    const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+    txt.setAttribute('x', padL - 6); txt.setAttribute('y', yy + 3);
+    txt.setAttribute('text-anchor','end'); txt.setAttribute('class','chart-axis');
+    txt.textContent = val.toFixed(2);
+    svg.appendChild(txt);
+  }
+  // X axis labels
+  for (let i = 0; i <= 4; i++){
+    const xx = padL + (i / 4) * innerW;
+    const val = xMin + (i / 4) * (xMax - xMin);
+    const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+    txt.setAttribute('x', xx); txt.setAttribute('y', H - padB + 14);
+    txt.setAttribute('text-anchor','middle'); txt.setAttribute('class','chart-axis');
+    txt.textContent = Math.round(val) + 'ms';
+    svg.appendChild(txt);
+  }
+  // axis titles
+  const xTitle = document.createElementNS('http://www.w3.org/2000/svg','text');
+  xTitle.setAttribute('x', W / 2); xTitle.setAttribute('y', H - 6);
+  xTitle.setAttribute('text-anchor','middle'); xTitle.setAttribute('fill','var(--paper3)'); xTitle.setAttribute('font-size','11');
+  xTitle.textContent = '→ 平均延迟 (ms)';
+  svg.appendChild(xTitle);
+  const yTitle = document.createElementNS('http://www.w3.org/2000/svg','text');
+  yTitle.setAttribute('x', -H / 2); yTitle.setAttribute('y', 12);
+  yTitle.setAttribute('text-anchor','middle'); yTitle.setAttribute('fill','var(--paper3)');
+  yTitle.setAttribute('font-size','11');
+  yTitle.setAttribute('transform','rotate(-90)');
+  yTitle.textContent = '合规均分 →';
+  svg.appendChild(yTitle);
+  // bubbles
+  points.forEach((p, i) => {
+    const color = COLORS[i % COLORS.length];
+    const cx = x(p.latency), cy = y(p.faithfulness), cr = r(p.cost);
+    const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circle.setAttribute('cx', cx); circle.setAttribute('cy', cy); circle.setAttribute('r', cr);
+    circle.setAttribute('fill', color); circle.setAttribute('fill-opacity','0.35');
+    circle.setAttribute('stroke', color); circle.setAttribute('stroke-width','1.5');
+    circle.setAttribute('class','cross-bench-bubble');
+    circle.style.cursor = 'pointer';
+    const title = document.createElementNS('http://www.w3.org/2000/svg','title');
+    title.textContent = `${CROSS_BENCH_MOD_LABELS[p.mod] || p.mod} | 合规: ${p.faithfulness.toFixed(3)} | 延迟: ${Math.round(p.latency)}ms | 成本: $${p.cost.toFixed(4)}`;
+    circle.appendChild(title);
+    // label
+    const lbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+    lbl.setAttribute('x', cx); lbl.setAttribute('y', cy - cr - 3);
+    lbl.setAttribute('text-anchor','middle'); lbl.setAttribute('fill','var(--paper)');
+    lbl.setAttribute('font-size','9'); lbl.setAttribute('font-weight','600');
+    lbl.textContent = CROSS_BENCH_MOD_LABELS[p.mod] || p.mod;
+    svg.appendChild(circle);
+    svg.appendChild(lbl);
+    // legend entry
+    const li = el('span', {className:'expanded-trend-leg-item'},
+      el('span', {className:'expanded-trend-leg-dot', style:{background:color}}),
+      el('span', {className:'expanded-trend-leg-label'}, `${CROSS_BENCH_MOD_LABELS[p.mod] || p.mod} (${p.faithfulness.toFixed(2)}/${Math.round(p.latency)}ms/$${p.cost.toFixed(4)})`)
+    );
+    legendWrap.appendChild(li);
+  });
+  wrap.appendChild(svg);
+}
+
+async function refreshCrossBench(){
+  const sel = $('crossBenchWeekSel');
+  const week = sel ? sel.value : '2026-W31';
+  const data = await fetchCrossBenchData(week);
+  const points = buildCrossBenchPoints(data);
+  renderCrossBench(points);
+}
+
+function exportCrossBenchCSV(){
+  const sel = $('crossBenchWeekSel');
+  const week = sel ? sel.value : '2026-W31';
+  // Use cached data if available; otherwise fetch synchronously
+  fetchCrossBenchData(week).then(data => {
+    const points = buildCrossBenchPoints(data);
+    const rows = [['Module','Label','Faithfulness','Latency(ms)','Cost($)']];
+    points.forEach(p => {
+      rows.push([p.mod, CROSS_BENCH_MOD_LABELS[p.mod] || p.mod, p.faithfulness.toFixed(4), Math.round(p.latency), p.cost.toFixed(4)]);
+    });
+    downloadCSV(`eval-cross-bench-${week}.csv`, rows);
+  });
+}
+
+// R225 事件绑定
+const _cbWeekSel = $('crossBenchWeekSel');
+if (_cbWeekSel){
+  WEEKS.forEach(w => {
+    const opt = document.createElement('option');
+    opt.value = w; opt.textContent = w.replace('2026-','');
+    _cbWeekSel.appendChild(opt);
+  });
+  _cbWeekSel.value = '2026-W31';
+  _cbWeekSel.addEventListener('change', refreshCrossBench);
+}
+const _cbCSV = $('crossBenchCSVBtn');
+if (_cbCSV) _cbCSV.addEventListener('click', exportCrossBenchCSV);
+// 启动时加载散点图
+refreshCrossBench();
+
 // 启动
 refresh();
 

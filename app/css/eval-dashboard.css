@@ -1769,3 +1769,47 @@ html, body {
   .mini-btn { font-size: 10px; padding: 2px 8px; }
   .expanded-trend-leg-item { font-size: 10px; }
 }
+
+/* R225: 跨基准散点图 */
+.cross-bench-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.cross-bench-controls select {
+  background: rgba(255,255,255,.06);
+  color: inherit;
+  border: 1px solid rgba(201,168,76,.2);
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+.cross-bench-chart {
+  width: 100%;
+  min-height: 200px;
+  margin: 8px 0;
+}
+.cross-bench-chart svg {
+  max-width: 100%;
+  height: auto;
+}
+.cross-bench-bubble:hover {
+  fill-opacity: 0.6 !important;
+  stroke-width: 2.5 !important;
+}
+.cross-bench-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin-top: 6px;
+}
+@media (max-width: 480px) {
+  .cross-bench-chart { min-height: 160px; }
+  .cross-bench-legend { font-size: 10px; }
+}
+@media (max-width: 360px) {
+  .cross-bench-controls { flex-direction: column; align-items: flex-start; }
+  .cross-bench-chart { min-height: 140px; }
+  .cross-bench-legend { gap: 2px 6px; }
+}
