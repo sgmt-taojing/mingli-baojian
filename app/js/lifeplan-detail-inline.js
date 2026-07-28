@@ -1032,9 +1032,19 @@ function closeQrModal() {
     modal.style.display = 'none';
   }
 }
-// click-outside 关闭（原生 dialog backdrop click）
-document.addEventListener('DOMContentLoaded', function() {
-  var modal = document.getElementById('qrModal');
+  // R215: 客户端动态填充 og:url（直接访问 lifeplan-detail.html#hash 时）
+  // 当从短链 /s/:id 跳转过来时，服务端已注入 og:url；这里处理直接访问的情况
+  try {
+    var ogUrlMeta = document.querySelector('meta[property="og:url"]');
+    if (ogUrlMeta && !ogUrlMeta.getAttribute('content')) {
+      // og:url 为空 → 填充当前页面 URL
+      ogUrlMeta.setAttribute('content', location.href);
+    }
+  } catch(e) {}
+
+  // click-outside 关闭（原生 dialog backdrop click）
+  document.addEventListener('DOMContentLoaded', function() {
+    var modal = document.getElementById('qrModal');
   if (modal) {
     modal.addEventListener('click', function(ev) {
       // 仅当点击 dialog 自身（backdrop）而非内容时关闭
