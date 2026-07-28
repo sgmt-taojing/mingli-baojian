@@ -613,7 +613,7 @@ function calcTrendAdvice(dayuns, shichen){
   document.getElementById('report').innerHTML=h;
   document.getElementById('report').classList.add('show');
   document.getElementById('input').style.display='none';
-  location.hash='#'+btoa(unescape(encodeURIComponent(JSON.stringify({age:d.age,sex:d.sex,residence:d.residence,focus:d.focus,extra:d.extra}))));
+  location.hash='#'+btoa(unescape(encodeURIComponent(JSON.stringify({a:d.age,s:d.sex,r:d.residence,f:d.focus,e:d.extra}))));
 
   // 把 R38 健康/事业双核 + 4 阶段蓝图挂到报告上方
   const dashHtml = renderLifeplanDashboardR38();
@@ -625,6 +625,12 @@ function restoreFromHash(){
   if(!h) return;
   try{
     const d=JSON.parse(decodeURIComponent(escape(atob(h))));
+    // R205: 兼容旧格式（全名）和新格式（短 key）
+    if(d.a!==undefined) d.age=d.a;
+    if(d.s!==undefined) d.sex=d.s;
+    if(d.r!==undefined) d.residence=d.r;
+    if(d.f!==undefined) d.focus=d.f;
+    if(d.e!==undefined) d.extra=d.e;
     if(d.age) document.getElementById('lAge').value=d.age;
     if(d.sex) document.getElementById('lSex').value=d.sex;
     if(d.residence) document.getElementById('lResidence').value=d.residence;
@@ -637,7 +643,7 @@ function restoreFromHash(){
 function shareUrl(){
   const url=location.href;
   if(navigator.share){navigator.share({title:'人生规划蓝图',url}).catch(()=>{});}
-  else if(navigator.clipboard){navigator.clipboard.writeText(url).then(()=>showToast('链接已复制'));}
+  else if(navigator.clipboard){navigator.clipboard.writeText(url).then(()=>showToast('✅ 链接已复制，可粘贴到微信/QQ分享'));}
   else prompt('复制链接分享：',url);
 }
 
@@ -825,15 +831,15 @@ document.getElementById("lp-stage-timeline").innerHTML += renderLP_12Domain_R41(
     }
     return res;
   }
-  // 版本1–10 容量表 (纠错 M, 字节模式)
-  var CAP_M = [0, 14, 26, 42, 62, 84, 106, 122, 152, 180, 213];
-  // 版本1–10 纠错码字数
-  var EC_M = [0, 10, 16, 26, 18, 24, 16, 18, 22, 22, 26];
-  // 版本1–10 总数据码字数
-  var TOT_M = [0, 26, 44, 70, 100, 134, 172, 196, 242, 292, 346];
+  // R205: 版本1–20 容量表 (纠错 M, 字节模式)
+  var CAP_M = [0, 14, 26, 42, 62, 84, 106, 122, 152, 180, 213, 247, 285, 331, 362, 412, 450, 504, 560, 624, 666];
+  // R205: 版本1–20 纠错码字数
+  var EC_M = [0, 10, 16, 26, 18, 24, 16, 18, 22, 22, 26, 30, 22, 24, 24, 28, 28, 28, 28, 30, 30];
+  // R205: 版本1–20 总数据码字数
+  var TOT_M = [0, 26, 44, 70, 100, 134, 172, 196, 242, 292, 346, 404, 466, 532, 581, 655, 733, 815, 901, 991, 1085];
   // 选最低版本
   function pickVersion(dataLen) {
-    for (var v = 1; v <= 10; v++) {
+    for (var v = 1; v <= 20; v++) {
       if (CAP_M[v] >= dataLen) return v;
     }
     return -1; // 超出范围
@@ -958,11 +964,28 @@ function showQrModal() {
   const canvas = document.getElementById('qrCanvas');
   const urlText = document.getElementById('qrUrlText');
   const url = location.href;
-  urlText.textContent = url;
-  const ok = renderQRToCanvas(canvas, url);
+  // R205: URL 过长时用短链格式（仅核心参数）
+  var qrUrl = url;
+  if (url.length > 120) {
+    try {
+      var u = new URL(url);
+      qrUrl = u.origin + u.pathname + u.hash;
+    } catch(e) {}
+  }
+  urlText.textContent = qrUrl;
+  urlText.title = url;
+  const ok = renderQRToCanvas(canvas, qrUrl);
   if (!ok) {
-    canvas.style.display = 'none';
-    urlText.textContent = '链接过长，请使用「分享链接」按钮';
+    // R205: 最终兜底 — 用纯 origin+pathname 不含 hash
+    qrUrl = location.origin + location.pathname;
+    urlText.textContent = '链接过长，已生成简化二维码（扫码后需手动输入参数）';
+    const ok2 = renderQRToCanvas(canvas, qrUrl);
+    if (!ok2) {
+      canvas.style.display = 'none';
+      urlText.textContent = '二维码生成失败，请使用「复制链接」按钮';
+    } else {
+      canvas.style.display = 'block';
+    }
   } else {
     canvas.style.display = 'block';
   }
