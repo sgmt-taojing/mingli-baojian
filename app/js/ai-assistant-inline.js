@@ -3307,7 +3307,9 @@ async function _paipanAsync(y,m,d,h){
   return _paipanLocal(y,m,d,h);
 }
 function _paipan(y,m,d,h){return _paipanLocal(y,m,d,h);}
-function _paipanLocal(y,m,d,h,gender){
+function _paipanLocal(y,m,d,h,gender,ziSect){
+  // ziSect: 1=早子时(23时用当天日干,默认), 2=晚子时(23时用次日日干)
+  if(!ziSect) ziSect=1;
   var tg=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
   var dz=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
   // 60甲子循环节气推算：基于地球公转周期的天文近似公式
@@ -3365,7 +3367,16 @@ function _paipanLocal(y,m,d,h,gender){
   var dd=Math.floor((tg2-ep)/86400000);
   var dS=tg[((dd%10)+10)%10],dB=dz[((dd+10)%12+12)%12];
   var hI=Math.floor((h+1)/2)%12;
-  var hB=dz[hI],hI2=tg.indexOf(dS);
+  var hB=dz[hI];
+  // 时干计算：ziSect=2(晚子时)时，23时用次日日干
+  var useDS=dS;
+  if(h===23 && ziSect===2){
+    // 晚子时：23时归次日，日干用下一天
+    var nextDay=new Date(y,m-1,d+1);
+    var ndd=Math.floor((nextDay-ep)/86400000);
+    useDS=tg[((ndd%10)+10)%10];
+  }
+  var hI2=tg.indexOf(useDS);
   var hS=tg[(hI2*2+hI)%10];
   var dEle={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'}[dS];
   function shishen(g){
