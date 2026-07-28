@@ -2392,6 +2392,7 @@ async function runLiuyaoEngine() {
         html += '</tbody></table></div>';
       }
       html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：后端古制引擎 R214</p>';
+      html += _copyBtnHtml('yjEngineResult');
       _showEngineResult('yjEngineResult', html);
       return;
     }
@@ -2417,6 +2418,7 @@ async function runLiuyaoEngine() {
     html += '<p><b>应期：</b>' + duan.yingqi + '</p>';
     html += '<p style="opacity:0.8">' + duan.advice + '</p>';
     html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：本地引擎（后端不可用）</p>';
+      html += _copyBtnHtml('yjEngineResult');
     _showEngineResult('yjEngineResult', html);
   } catch(e) { 
     console.error('[六爻引擎错误错误]', e.message, e.stack);
@@ -2445,6 +2447,7 @@ function runMeihuaEngine() {
     html += '<p><b>终局：</b>' + analyze.endRelation + '</p>';
     html += '<p><b>综合：</b>' + analyze.verdict + '</p>';
     html += '<p style="opacity:0.8">' + analyze.advice + '</p>';
+      html += _copyBtnHtml('mhEngineResult');
     _showEngineResult('mhEngineResult', html);
   } catch(e) { 
     console.error('[梅花引擎错误错误]', e.message, e.stack);
@@ -2505,6 +2508,7 @@ async function runQimenEngine() {
         html += '</tbody></table></div>';
       }
       html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：后端古制引擎 R211 v2.0 · 所问：' + question + '</p>';
+      html += _copyBtnHtml('qmEngineResult');
       _showEngineResult('qmEngineResult', html);
       return;
     }
@@ -2531,6 +2535,7 @@ async function runQimenEngine() {
       html += '</div>';
     }
     html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：本地引擎（后端不可用）</p>';
+      html += _copyBtnHtml('qmEngineResult');
     _showEngineResult('qmEngineResult', html);
   } catch(e) {
     console.error('[奇门引擎错误]', e.message, e.stack);
@@ -2587,6 +2592,7 @@ async function runLiurenEngine() {
         html += '</tbody></table></div>';
       }
       html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：后端古制引擎 R214 · 所问：' + question + '</p>';
+      html += _copyBtnHtml('lrEngineResult');
       _showEngineResult('lrEngineResult', html);
       return;
     }
@@ -2601,6 +2607,7 @@ async function runLiurenEngine() {
     html += '<p><b>吉凶：</b>' + analyze.luck + '</p>';
     html += '<p style="opacity:0.8">' + analyze.advice + '</p>';
     html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：本地引擎（后端不可用）</p>';
+      html += _copyBtnHtml('lrEngineResult');
     _showEngineResult('lrEngineResult', html);
   } catch(e) { 
     console.error('[六壬引擎错误错误]', e.message, e.stack);
@@ -2668,6 +2675,7 @@ async function runZiweiEngine() {
         html += '</tbody></table></details>';
       }
       html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：后端古制引擎 R211 v2.0</p>';
+      html += _copyBtnHtml('zwEngineResult');
       _showEngineResult('zwEngineResult', html);
       return;
     }
@@ -2682,6 +2690,7 @@ async function runZiweiEngine() {
     html += '<p><b>概述：</b>' + analyze.overview + '</p>';
     html += '<p style="opacity:0.8">' + analyze.advice + '</p>';
     html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：本地引擎（后端不可用）</p>';
+      html += _copyBtnHtml('zwEngineResult');
     _showEngineResult('zwEngineResult', html);
   } catch(e) {
     console.error('[紫微引擎错误]', e.message, e.stack);
@@ -2802,6 +2811,7 @@ function runZeriEngine() {
     html += '<p><b>吉时：</b>' + res.goodHoursText + '</p>';
     html += '<p><b>评分：</b>' + res.score + '/100</p>';
     html += '<p style="opacity:0.8">' + res.summary + '</p>';
+    html += _copyBtnHtml('zrEngineResult');
     _showEngineResult('zrEngineResult', html);
   } catch(e) { 
     console.error('[择日引擎错误错误]', e.message, e.stack);
