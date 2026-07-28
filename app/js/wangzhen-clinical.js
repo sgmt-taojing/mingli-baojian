@@ -822,6 +822,140 @@
       });
   }
 
+  // ===== 多角度采集 =====
+  var anglePhotos = {};
+
+  function captureAngle(angle){
+    var video = document.getElementById('wz-camera-video');
+    var canvas = document.getElementById('wz-camera-canvas');
+    if(!video || !canvas || !cameraStream) return;
+
+    canvas.width = 480;
+    canvas.height = 360;
+    var ctx = canvas.getContext('2d');
+    if(!ctx) return;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+    anglePhotos[angle] = dataUrl;
+
+    // 显示预览
+    var previews = document.getElementById('wz-angle-previews');
+    if(previews){
+      var img = document.createElement('img');
+      img.src = dataUrl;
+      img.style.cssText = 'width:60px;height:45px;object-fit:cover;border-radius:4px;border:1px solid var(--wz-border)';
+      img.title = angle;
+      img.onclick = function(){ analyzeFace(dataUrl); };
+      previews.appendChild(img);
+    }
+    showToast('✅ ' + angle + ' 已采集');
+
+    // 如果是舌照，发送到 OCR 的 tongue 模式
+    if(angle === 'tongue'){
+      analyzeTongue(dataUrl);
+    }
+  }
+
+  // ===== 舌照分析 =====
+  function analyzeTongue(dataUrl){
+    var statusEl = document.getElementById('wz-analysis-status');
+    if(statusEl){
+      statusEl.textContent = '👅 正在分析舌象...';
+      statusEl.className = 'wz-analysis-status analyzing';
+    }
+    var b64 = dataUrl.split(',')[1];
+    if(!window.fetch){
+      if(statusEl){ statusEl.textContent = '⚠️ 舌照分析需要网络连接'; statusEl.className = 'wz-status error'; }
+      return;
+    }
+    fetch(FACE_OCR + '/api/face/analyze', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({image: b64, mode: 'tongue'})
+    }).then(function(r){ return r.json(); }).then(function(data){
+      var statusEl2 = document.getElementById('wz-analysis-status');
+      if(statusEl2){ statusEl2.textContent = '✅ 舌照分析完成'; statusEl2.className = 'wz-status done'; }
+      renderAIAnalysis(data);
+    }).catch(function(err){
+      var statusEl3 = document.getElementById('wz-analysis-status');
+      if(statusEl3){ statusEl3.textContent = '⚠️ 舌照分析失败: ' + err.message; statusEl3.className = 'wz-status error'; }
+    });
+  }
+
+  // ===== Rokid 眼镜连接 =====
+  var glassConnected = false;
+
+  function connectGlass(){
+    var statusEl = document.getElementById('wz-glass-status');
+    
+    // 检测 Rokid bridge 是否可用
+    var bridge = null;
+    if(window.RokidJSBridge){ bridge = window.RokidJSBridge; }
+    else if(window.Rokid && window.Rokid.bridge){ bridge = window.Rokid.bridge; }
+    else if(window.KJJSBridge){ bridge = window.KJJSBridge; }
+    
+    if(bridge){
+      glassConnected = true;
+      if(statusEl){
+        statusEl.textContent = '✅ 眼镜已连接';
+        statusEl.style.color = 'var(--wz-jade)';
+      }
+      showToast('🥽 智能眼镜已连接');
+    } else {
+      // 尝试加载 rokid-bridge.js
+      var existing = document.querySelector('script[src*="rokid-bridge"]');
+      if(!existing){
+        var script = document.createElement('script');
+        script.src = 'js/wearable/rokid-bridge.js';
+        script.onload = function(){
+          // 再次检测
+          if(window.RokidJSBridge || (window.Rokid && window.Rokid.bridge)){
+            glassConnected = true;
+            if(statusEl){ statusEl.textContent = '✅ 眼镜已连接（SDK已加载）'; statusEl.style.color = 'var(--wz-jade)'; }
+            showToast('🥽 智能眼镜 SDK 已加载');
+          } else {
+            if(statusEl){ statusEl.textContent = '⚠️ SDK已加载但未检测到眼镜设备'; statusEl.style.color = '#fbbf24'; }
+            showToast('⚠️ 未检测到眼镜设备，请确认眼镜已配对', 'warning');
+          }
+        };
+        script.onerror = function(){
+          if(statusEl){ statusEl.textContent = '❌ SDK加载失败'; statusEl.style.color = '#f87171'; }
+        };
+        document.head.appendChild(script);
+      } else {
+        if(statusEl){ statusEl.textContent = '⚠️ SDK已加载但未检测到眼镜设备'; statusEl.style.color = '#fbbf24'; }
+        showToast('⚠️ 未检测到眼镜设备，请确认眼镜已配对', 'warning');
+      }
+    }
+  }
+
+  function glassCapture(){
+    if(!glassConnected){
+      showToast('请先连接眼镜', 'warning');
+      return;
+    }
+    // 尝试通过 RokidCamera 拍照
+    if(window.RokidCamera && window.RokidCamera.capture){
+      window.RokidCamera.capture('face').then(function(blob){
+        var reader = new FileReader();
+        reader.onload = function(){
+          var dataUrl = reader.result;
+          var preview = document.getElementById('wz-photo-preview');
+          if(preview){ preview.src = dataUrl; preview.style.display = 'block'; }
+          analyzeFace(dataUrl);
+          completeStep(2);
+        };
+        reader.readAsDataURL(blob);
+      }).catch(function(err){
+        showToast('眼镜拍照失败: ' + err.message, 'error');
+      });
+    } else {
+      // 降级到桌面摄像头
+      showToast('眼镜拍照不可用，使用桌面摄像头', 'warning');
+      capturePhoto();
+    }
+  }
+
   function stopCamera(){
     if(cameraStream){
       cameraStream.getTracks().forEach(function(t){ t.stop(); });
@@ -854,6 +988,9 @@
     // 发送到 face-ocr-server 分析
     analyzeFace(dataUrl);
     completeStep(2);
+    // 显示多角度采集区
+    var ma = document.getElementById('wz-multi-angle');
+    if(ma) ma.style.display = 'block';
   }
 
   function analyzeFace(dataUrl){
@@ -1378,6 +1515,9 @@
     exportCase: exportCase,
     selectPatient: selectPatient,
     startCamera: startCamera,
+    captureAngle: captureAngle,
+    connectGlass: connectGlass,
+    glassCapture: glassCapture,
     stopCamera: stopCamera,
     capturePhoto: capturePhoto,
     toggleVoiceInput: toggleVoiceInput,
