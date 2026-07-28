@@ -1,4 +1,64 @@
 
+// ===== 患者数据共享（与 doctor-elder / wangzhen-clinical 共用 localStorage）=====
+function loadPatientToList(){
+  var list = [];
+  try { list = JSON.parse(localStorage.getItem('mlbj_doctor_patients')||'[]'); } catch(e) {}
+  var sel = document.getElementById('pt-select');
+  if(!sel) return;
+  sel.innerHTML = '<option value="">— 选择患者 —</option>';
+  list.forEach(function(p){
+    var o = document.createElement('option');
+    o.value = p.id;
+    o.textContent = p.name + ' (' + (p.age||'?') + '岁' + (p.chief?' · '+p.chief.substring(0,15):'') + ')';
+    sel.appendChild(o);
+  });
+}
+
+function selectPatientForReport(id){
+  if(!id) return;
+  var list = [];
+  try { list = JSON.parse(localStorage.getItem('mlbj_doctor_patients')||'[]'); } catch(e) {}
+  var p = list.find(function(x){ return String(x.id) === String(id); });
+  if(!p) return;
+  var el = document.getElementById('pt-name'); if(el) el.value = p.name||'';
+  el = document.getElementById('pt-gender'); if(el) el.value = (p.gender==='male'?'男':p.gender==='female'?'女':'');
+  el = document.getElementById('pt-age'); if(el) el.value = p.age||'';
+  el = document.getElementById('pt-phone'); if(el) el.value = p.phone||'';
+  el = document.getElementById('pt-chief'); if(el) el.value = p.chief||'';
+}
+
+function saveReportToShared(){
+  var name = (document.getElementById('pt-name')||{}).value || '';
+  if(!name) { showToast('请先填写患者姓名', 'warn'); return; }
+  var report = {
+    id: Date.now(),
+    patient_name: name,
+    patient_age: (document.getElementById('pt-age')||{}).value || '',
+    diagnosis: (document.getElementById('diagnosis-output')||{}).innerHTML || '',
+    timestamp: new Date().toISOString()
+  };
+  var list = [];
+  try { list = JSON.parse(localStorage.getItem('wz_diagnosis_history')||'[]'); } catch(e) {}
+  list.unshift(report);
+  if(list.length > 50) list = list.slice(0,50);
+  localStorage.setItem('wz_diagnosis_history', JSON.stringify(list));
+  showToast('病历已保存到共享病例库', 'ok');
+}
+
+function showToast(msg, type){
+  var t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;top:20px;right:20px;padding:10px 20px;border-radius:6px;font-size:13px;z-index:9999;background:'+(type==='ok'?'rgba(16,185,129,.9)':'rgba(245,158,11,.9)')+';color:#fff';
+  document.body.appendChild(t);
+  setTimeout(function(){ t.style.opacity='0'; setTimeout(function(){ t.remove(); }, 300); }, 3000);
+}
+
+// DOMContentLoaded 初始化
+document.addEventListener('DOMContentLoaded', function(){
+  loadPatientToList();
+});
+
+
 // ===== 数据状态 =====
 const report = {
   media: { tongue: null, face: null, eye: null, hand: null },

@@ -22,6 +22,7 @@
     </div>
   </div>
   <div class="actions" role="toolbar" aria-label="病历操作">
+    <button class="btn btn-secondary" onclick="saveReportToShared()">💾 保存到共享病例库</button>
     <button class="btn primary" onclick="printPDF()" title="打印/PDF导出" aria-label="PDF导出">📄 PDF导出</button>
     <button class="btn" onclick="startRecording()" title="语音录入问诊" id="btn-voice" aria-label="语音录入">🎤 语音录入</button>
     <button class="btn" onclick="captureAll()" title="一键抓拍舌/面/目/手" id="btn-capture" aria-label="一键抓拍">📷 一键抓拍</button>
@@ -38,7 +39,10 @@
   <!-- 患者信息 -->
   <section class="card" aria-labelledby="sec-patient">
     <h2 id="sec-patient">患者信息</h2>
-    <div class="field"><label for="pt-gender">姓名 <input type="text" id="pt-name" placeholder="患者姓名" maxlength="20" aria-label="患者姓名"></label></div>
+    <div class="field">
+      <label for="pt-select">快速选择 <select id="pt-select" onchange="selectPatientForReport(this.value)" aria-label="选择已有患者"><option value="">— 选择患者 —</option></select></label>
+    </div>
+    <div class="field"><label for="pt-name">姓名 <input type="text" id="pt-name" placeholder="患者姓名" maxlength="20" aria-label="患者姓名"></label></div>
     <div class="field-row">
       <div class="field"><label for="pt-age">性别<select id="pt-gender" aria-label="pt-gender"><option value="">—</option><option>男</option><option>女</option><option>其他</option></select></label></div>
       <div class="field"><label for="pt-phone">年龄 <input type="number" id="pt-age" min="0" max="150" placeholder="岁" aria-label="岁"></label></div>
