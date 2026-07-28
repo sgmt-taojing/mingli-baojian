@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>紫微斗数排盘 · 命理宝鉴</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+:root{
+  --bg:#0a0e17;--card:#141928;--border:#2a3450;--gold:#c9a84c;--jade:#4ec9b0;
+  --paper:#e8dcc8;--paper2:#b8a88a;--paper3:#8b7e6a;
+  --red:#ef4444;--green:#10b981;--blue:#63b3ed;--purple:#a78bfa;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsoft YaHei',sans-serif;padding:12px;min-height:100vh}
+.zw-header{text-align:center;margin-bottom:12px;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:8px}
+.zw-title{font-size:18px;color:var(--gold);letter-spacing:2px;margin-bottom:4px}
+.zw-meta{font-size:12px;color:var(--paper3);line-height:1.8}
+.zw-meta span{margin-right:8px}
+.zw-sihua{display:flex;justify-content:center;gap:12px;margin-top:6px;flex-wrap:wrap}
+.zw-sihua span{font-size:11px;padding:2px 8px;border-radius:3px}
+.zw-sihua .lu{color:var(--green);background:rgba(16,185,129,.12)}
+.zw-sihua .quan{color:var(--gold);background:rgba(201,168,76,.12)}
+.zw-sihua .ke{color:var(--blue);background:rgba(99,179,237,.12)}
+.zw-sihua .ji{color:var(--red);background:rgba(239,68,68,.12)}
+
+.zw-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-width:800px;margin:0 auto 12px}
+.zw-gong{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:8px;min-height:110px;position:relative;font-size:10px}
+.zw-gong.ming{border-color:var(--gold);background:rgba(201,168,76,.06);box-shadow:0 0 0 1px rgba(201,168,76,.15)}
+.zw-gong.shen{border-color:var(--jade)}
+.zw-gong-name{font-size:11px;color:var(--gold);font-weight:600;margin-bottom:2px}
+.zw-gong-gz{font-size:9px;color:var(--paper3);margin-bottom:4px}
+.zw-gong-tag{position:absolute;top:2px;right:4px;font-size:8px;padding:1px 4px;border-radius:2px}
+.zw-gong-tag.ming{background:var(--gold);color:var(--bg)}
+.zw-gong-tag.shen{background:var(--jade);color:var(--bg)}
+.zw-stars{line-height:1.6}
+.zw-star{display:inline-block;font-size:9px;padding:1px 3px;border-radius:2px;margin-right:2px}
+.zw-star.main{font-weight:600;color:var(--gold)}
+.zw-star.aux{color:var(--jade)}
+.zw-star.evil{color:var(--red)}
+.zw-star.other{color:var(--paper2)}
+.zw-star.bian{color:var(--green)}
+.zw-star.changsheng{color:var(--purple);font-size:8px}
+.zw-star.boshi{color:var(--blue);font-size:8px}
+.zw-star.jiangqian{color:var(--paper3);font-size:8px}
+.zw-star.suijian{color:var(--paper3);font-size:8px}
+
+.zw-daxian{max-width:800px;margin:0 auto}
+.zw-daxian-title{font-size:13px;color:var(--gold);margin-bottom:8px;font-weight:600}
+.zw-daxian-list{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.zw-daxian-item{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:10px;text-align:center}
+.zw-daxian-age{color:var(--gold);font-weight:600}
+.zw-daxian-gz{color:var(--paper3);font-size:9px}
+.zw-daxian-sh{font-size:8px;margin-top:2px}
+.zw-daxian-sh .lu{color:var(--green)}
+.zw-daxian-sh .ji{color:var(--red)}
+
+.zw-form{max-width:500px;margin:0 auto 16px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.zw-form input,.zw-form select{padding:8px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;color:var(--paper);font-size:12px}
+.zw-form button{grid-column:1/-1;padding:10px;background:var(--gold);color:var(--bg);border:none;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer}
+
+@media(max-width:768px){
+  .zw-grid{grid-template-columns:repeat(3,1fr);gap:3px}
+  .zw-gong{min-height:90px;padding:5px}
+  .zw-gong-name{font-size:10px}
+  .zw-star{font-size:8px}
+  .zw-daxian-list{grid-template-columns:repeat(4,1fr)}
+}
+@media(max-width:360px){
+  .zw-grid{grid-template-columns:repeat(2,1fr);gap:2px}
+  .zw-gong{min-height:75px;padding:4px}
+  .zw-gong-name{font-size:9px}
+  .zw-star{font-size:7px;padding:0 2px}
+  .zw-daxian-list{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="zw-header">
+  <div class="zw-title">🌌 紫微斗数命盘</div>
+  <div id="zw-meta" class="zw-meta">请输入信息排盘</div>
+</div>
+
+<div class="zw-form">
+  <input type="number" id="zw-year" placeholder="年" value="1990" min="1900" max="2100">
+  <input type="number" id="zw-month" placeholder="月" value="10" min="1" max="12">
+  <input type="number" id="zw-day" placeholder="日" value="28" min="1" max="31">
+  <input type="number" id="zw-hour" placeholder="时" value="7" min="0" max="23">
+  <select id="zw-sex"><option value="男">男</option><option value="女">女</option></select>
+  <button onclick="doPaipan()">排盘</button>
+</div>
+
+<div id="zw-grid" class="zw-grid"></div>
+<div id="zw-daxian" class="zw-daxian" style="display:none"></div>
+
+<script>
+async function doPaipan(){
+  const y=document.getElementById('zw-year').value;
+  const m=document.getElementById('zw-month').value;
+  const d=document.getElementById('zw-day').value;
+  const h=document.getElementById('zw-hour').value;
+  const s=document.getElementById('zw-sex').value;
+  const r=await fetch('/api/paipan/ziwei',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({year:+y,month:+m,day:+d,hour:+h,sex:s})});
+  const data=await r.json();
+  if(!data.ok){alert('排盘失败: '+data.error);return;}
+  renderChart(data.chart);
+}
+
+function renderChart(c){
+  const meta=document.getElementById('zw-meta');
+  meta.innerHTML=`${c.yearGanZhi}年 · ${c.wuxingJu} · 命宫：${c.mingGong}<br>`+
+    `<span>命主:${c.mingZhu||''}</span><span>身主:${c.shenZhu||''}</span>`+
+    `<span>截空:${(c.jieKong||[]).join('、')}</span><span>旬空:${(c.xunKong||[]).join('、')}</span>`;
+  
+  // 四化
+  const sihua=document.createElement('div');
+  sihua.className='zw-sihua';
+  if(c.siHua){
+    sihua.innerHTML=`<span class="lu">化禄:${c.siHua.lu||''}</span><span class="quan">化权:${c.siHua.quan||''}</span><span class="ke">化科:${c.siHua.ke||''}</span><span class="ji">化忌:${c.siHua.ji||''}</span>`;
+  }
+  meta.appendChild(sihua);
+
+  // 十二宫 4×3 网格
+  // 紫微命盘排列：命宫在中间偏左，按顺时针排列
+  // 标准布局：命兄夫子财疾迁奴官田福父
+  // 4列布局：[父母][福德][田宅][官禄]
+  //          [奴仆][命宫][兄弟][夫妻]
+  //          [子女][...][...][疾厄]
+  // 简化：按顺序 4×3 排列
+  const grid=document.getElementById('zw-grid');
+  grid.innerHTML='';
+  for(const p of c.palaces){
+    const div=document.createElement('div');
+    const cls=['zw-gong'];
+    if(p.isMingGong) cls.push('ming');
+    if(p.isShenGong) cls.push('shen');
+    div.className=cls.join(' ');
+    
+    let html='';
+    if(p.isMingGong) html+='<div class="zw-gong-tag ming">命</div>';
+    if(p.isShenGong) html+='<div class="zw-gong-tag shen">身</div>';
+    html+=`<div class="zw-gong-name">${p.name}</div>`;
+    html+=`<div class="zw-gong-gz">${p.ganZhi||''}</div>`;
+    html+='<div class="zw-stars">';
+    
+    if(p.mainStars) for(const s of p.mainStars) html+=`<span class="zw-star main">${s}</span>`;
+    if(p.auxStars) for(const s of p.auxStars) html+=`<span class="zw-star aux">${s}</span>`;
+    if(p.evilStars) for(const s of p.evilStars) html+=`<span class="zw-star evil">${s}</span>`;
+    if(p.otherStars) for(const s of p.otherStars) html+=`<span class="zw-star other">${s}</span>`;
+    if(p.changsheng) for(const s of p.changsheng) html+=`<span class="zw-star changsheng">${s}</span>`;
+    if(p.boshi) for(const s of p.boshi) html+=`<span class="zw-star boshi">${s}</span>`;
+    if(p.jiangqian) for(const s of p.jiangqian) html+=`<span class="zw-star jiangqian">${s}</span>`;
+    if(p.suijian) for(const s of p.suijian) html+=`<span class="zw-star suijian">${s}</span>`;
+    
+    html+='</div>';
+    div.innerHTML=html;
+    grid.appendChild(div);
+  }
+
+  // 大限
+  if(c.daXian && c.daXian.length>0){
+    const dx=document.getElementById('zw-daxian');
+    dx.style.display='block';
+    let html='<div class="zw-daxian-title">大限（十年运势）</div><div class="zw-daxian-list">';
+    for(const d of c.daXian){
+      const sh=d.siHua||{};
+      html+=`<div class="zw-daxian-item"><div class="zw-daxian-age">${d.startAge}-${d.endAge}岁</div><div class="zw-daxian-gz">${d.ganZhi}</div>`;
+      html+=`<div class="zw-daxian-sh"><span class="lu">禄:${sh.lu||''}</span> <span class="ji">忌:${sh.ji||''}</span></div></div>`;
+    }
+    html+='</div>';
+    dx.innerHTML=html;
+  }
+}
+</script>
+</body>
+</html>
