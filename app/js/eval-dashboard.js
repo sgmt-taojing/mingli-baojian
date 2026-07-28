@@ -558,6 +558,72 @@ function renderAlertCard(){
       benchCard.appendChild(casesWrap);
     }
 
+    // 模块维度钻取（仅 faithfulness）
+    if (bench === 'faithfulness'){
+      const modDrill = el('div', {className:'alert-mod-drill'},
+        el('div', {className:'alert-mod-drill-toggle', onclick:(e)=>{
+          e.stopPropagation();
+          const body = benchCard.querySelector('.alert-mod-drill-body');
+          if (body){
+            const isOpen = body.style.display !== 'none';
+            body.style.display = isOpen ? 'none' : 'block';
+            toggle.textContent = isOpen ? '▸ 按模块钻取' : '▾ 收起模块';
+          }
+        }}, (toggle = el('span', {className:'alert-mod-drill-label'}, '▸ 按模块钻取'))
+        )
+      );
+      var toggle;
+      // 从当前周 faithfulness results 按模块聚合
+      const fData = cache.weeks[latest.week]?.faithfulness;
+      if (fData && fData.results && fData.results.length){
+        const modAgg = {};
+        fData.results.forEach(r => {
+          const mod = FAITH_MODULE_MAP[r.id] || 'other';
+          if (!modAgg[mod]) modAgg[mod] = { scores: [], kbHits: 0 };
+          modAgg[mod].scores.push(r.score || 0);
+          if ((r.score || 0) > 0) modAgg[mod].kbHits++;
+        });
+        // 模块中文名
+        const modNames = {
+          bazi:'八字', zodiac:'生肖', ziwei:'紫微', qimen:'奇门',
+          liuren:'六壬', liuyao:'六爻', meihua:'梅花',
+          fengshui:'风水', zeri:'择日', wuxing:'五行',
+          tcm:'中医', tizhi:'体质', other:'其他'
+        };
+        // 按均分升序排列（低分在前）
+        const modList = Object.keys(modAgg).map(mod => {
+          const s = modAgg[mod];
+          const avg = s.scores.reduce((a,b)=>a+b, 0) / s.scores.length;
+          return {
+            mod, name: modNames[mod] || mod,
+            avg: Math.round(avg * 1000) / 1000,
+            cases: s.scores.length,
+            kbRate: Math.round((s.kbHits / s.scores.length) * 100),
+            min: Math.min(...s.scores),
+            max: Math.max(...s.scores)
+          };
+        }).sort((a, b) => a.avg - b.avg);
+
+        const drillBody = el('div', {className:'alert-mod-drill-body', style:'display:none'});
+        modList.forEach(m => {
+          const mCls = m.avg >= 0.85 ? 'alert-ok' : m.avg >= 0.7 ? 'alert-warn' : 'alert-critical';
+          const barWidth = Math.round(m.avg * 100);
+          drillBody.appendChild(el('div', {className:'alert-mod-row ' + mCls},
+            el('span', {className:'alert-mod-name'}, m.name),
+            el('span', {className:'alert-mod-score'}, m.avg.toFixed(3)),
+            el('div', {className:'alert-mod-bar'},
+              el('div', {className:'alert-mod-bar-fill ' + mCls, style:`width:${barWidth}%`})
+            ),
+            el('span', {className:'alert-mod-meta'}, `${m.cases}例 · KB ${m.kbRate}% · ${m.min.toFixed(2)}~${m.max.toFixed(2)}`)
+          ));
+        });
+        modDrill.appendChild(drillBody);
+      } else {
+        modDrill.appendChild(el('div', {className:'alert-mod-drill-empty', style:'display:none'}, '暂无 per-case 数据'));
+      }
+      benchCard.appendChild(modDrill);
+    }
+
     benchGrid.appendChild(benchCard);
   });
 
