@@ -741,6 +741,19 @@
       if(cameras.length > 1){
         sel.style.display = 'block';
       }
+      // 读取设备管理页面配置的默认设备
+      var savedDevice = localStorage.getItem('default_camera_device');
+      if(savedDevice && sel){
+        for(var i=0; i<sel.options.length; i++){
+          if(sel.options[i].value === savedDevice){ sel.selectedIndex = i; break; }
+        }
+      }
+      // 更新信息
+      var info = document.getElementById('wz-device-info');
+      if(info){
+        var savedLabel = localStorage.getItem('default_camera_label') || '';
+        info.innerHTML = '检测到 ' + cameras.length + ' 个摄像头' + (savedLabel ? ' · 默认: ' + savedLabel : '');
+      }
     }).catch(function(){});
   }
 
@@ -831,6 +844,8 @@
 
     // 获取选择的摄像头设备
     var deviceId = (document.getElementById('wz-camera-select') || {}).value || '';
+    // 如果没选设备，读取设备管理页面配置的默认设备
+    if(!deviceId){ deviceId = localStorage.getItem('default_camera_device') || ''; }
     
     // 先尝试精确设备，再降级到宽松约束
     var constraints = { video: true, audio: false };
