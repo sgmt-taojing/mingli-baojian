@@ -200,9 +200,11 @@ function renderTrend(chartId, opts){
   opts.lines.forEach(line => {
     const s = series(line.bench, line.key);
     const path = [];
+    const validPts = [];
     s.forEach((p, i) => {
       if (p.value == null) return;
       path.push((path.length ? 'L' : 'M') + x(i) + ' ' + y(p.value));
+      validPts.push({ idx: i, value: p.value, week: WEEKS[i] });
     });
     if (!path.length) return;
     const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -210,15 +212,50 @@ function renderTrend(chartId, opts){
     p.setAttribute('d', path.join(' '));
     svg.appendChild(p);
 
-    // 末端点 + 标签
+    // R217: min/max 标注
+    if (validPts.length >= 2 && opts.fmt) {
+      const minPt = validPts.reduce((a, b) => a.value < b.value ? a : b);
+      const maxPt = validPts.reduce((a, b) => a.value > b.value ? a : b);
+      [{ pt: minPt, label: 'min', color: '#e74c3c' }, { pt: maxPt, label: 'max', color: '#27ae60' }].forEach(m => {
+        const mx = x(m.pt.idx), my = y(m.pt.value);
+        const tag = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        tag.setAttribute('x', mx);
+        tag.setAttribute('y', my - 8);
+        tag.setAttribute('text-anchor', 'middle');
+        tag.setAttribute('font-size', '8');
+        tag.setAttribute('fill', m.color);
+        tag.setAttribute('opacity', '0.8');
+        tag.textContent = opts.fmt(m.pt.value);
+        svg.appendChild(tag);
+      });
+    }
+
+    // 数据点 + hover tooltip
     s.forEach((pt, i) => {
       if (pt.value == null) return;
       const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
       c.setAttribute('class', 'chart-point chart-line-' + line.colorKey);
       c.setAttribute('cx', x(i));
       c.setAttribute('cy', y(pt.value));
-      c.setAttribute('r', 2.5);
-      c.setAttribute('fill', 'var(--chart-line-' + line.colorKey + ')');
+      c.setAttribute('r', 3);
+      c.setAttribute('fill', '');  // use stroke color
+      c.style.cursor = 'pointer';
+      // R217: SVG <title> tooltip
+      const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+      title.textContent = (WEEKS[i] || '').replace('2026-','') + ': ' + (opts.fmt ? opts.fmt(pt.value) : pt.value);
+      c.appendChild(title);
+      // R217: 最后一个点加大 + 数值标签
+      const isLast = (i === WEEKS.length - 1) || (i === validPts[validPts.length - 1].idx);
+      if (isLast) {
+        c.setAttribute('r', 5);
+        const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        lbl.setAttribute('x', x(i) + 8);
+        lbl.setAttribute('y', y(pt.value) + 3);
+        lbl.setAttribute('class', 'chart-label');
+        lbl.setAttribute('fill', getComputedStyle(svg).color || 'var(--paper)');
+        lbl.textContent = opts.fmt ? opts.fmt(pt.value) : pt.value;
+        svg.appendChild(lbl);
+      }
       svg.appendChild(c);
     });
   });
