@@ -2049,3 +2049,92 @@ html, body {
   .radar-axis-label { font-size: 10px; }
   .radar-legend-chip { font-size: 11px; }
 }
+
+/* ===== R231: 双周模块对比 ===== */
+.dash-biweekly {
+  margin-bottom: 24px;
+}
+.biweekly-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+.biweekly-controls label {
+  font-size: 13px;
+  color: var(--muted, #888);
+}
+.biweekly-controls select {
+  padding: 4px 8px;
+  border: 1px solid var(--border, #333);
+  border-radius: 4px;
+  background: var(--paper, #1a1a1a);
+  color: var(--ink, #eee);
+  font-size: 13px;
+}
+.biweekly-insight {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin: 8px 0 12px;
+}
+.bw-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.bw-chip-good { background: rgba(16,185,129,.15); color: #10b981; }
+.bw-chip-bad { background: rgba(239,68,68,.15); color: #ef4444; }
+.bw-chip-flat { background: rgba(156,163,175,.15); color: #9ca3af; }
+.bw-chip-new { background: rgba(59,130,246,.15); color: #3b82f6; }
+.biweekly-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.biweekly-table th {
+  text-align: center;
+  padding: 8px 6px;
+  border-bottom: 2px solid var(--border, #333);
+  font-size: 12px;
+  color: var(--muted, #888);
+  white-space: nowrap;
+}
+.biweekly-table th:first-child { text-align: left; }
+.biweekly-table td {
+  padding: 6px 6px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  text-align: center;
+}
+.biweekly-table td:first-child { text-align: left; font-weight: 500; }
+.bw-mod-h { min-width: 80px; }
+.bw-cases, .bw-cases-h { font-size: 11px; color: var(--muted, #888); }
+.bw-mod { white-space: nowrap; }
+.bw-delta { font-family: 'SF Mono', monospace; font-size: 12px; }
+.bw-arrow { font-size: 16px; font-weight: bold; }
+.bw-good td { color: #10b981; }
+.bw-bad td { color: #ef4444; }
+.bw-flat td { color: var(--muted, #aaa); }
+.bw-new td { color: #3b82f6; }
+.bw-summary-row td {
+  font-weight: 700;
+  border-top: 2px solid var(--border, #333);
+  background: rgba(255,255,255,.03);
+}
+.biweekly-wrap { overflow-x: auto; }
+@media (max-width: 480px) {
+  .biweekly-controls { flex-direction: column; align-items: flex-start; }
+  .biweekly-table { font-size: 12px; }
+  .biweekly-table th, .biweekly-table td { padding: 4px 3px; }
+}
+@media (max-width: 360px) {
+  .biweekly-table { font-size: 11px; }
+  .bw-cases, .bw-cases-h { display: none; }
+  .biweekly-insight { gap: 4px 6px; }
+  .bw-chip { font-size: 11px; padding: 2px 8px; }
+}

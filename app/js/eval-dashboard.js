@@ -3245,6 +3245,214 @@ function exportRadarCSV(){
   setTimeout(refreshRadar, 500);
 })();
 
+// ===== R231: 双周模块对比 =====
+let biweeklyCache = {};
+
+async function fetchBiweeklyExpanded(week, bench){
+  const key = week + '-' + bench;
+  if (expandedCache[key]) return expandedCache[key];
+  return await fetchExpanded(week, bench);
+}
+
+function initBiweeklySelectors(){
+  const selA = $('biweeklyWeekA');
+  const selB = $('biweeklyWeekB');
+  if (!selA || !selB) return;
+  WEEKS.forEach(w => {
+    selA.appendChild(el('option', {value:w}, w));
+    selB.appendChild(el('option', {value:w}, w));
+  });
+  // 默认选倒数第二周 vs 最后一周
+  if (WEEKS.length >= 2){
+    selA.value = WEEKS[WEEKS.length - 2];
+    selB.value = WEEKS[WEEKS.length - 1];
+  }
+  selA.addEventListener('change', refreshBiweekly);
+  selB.addEventListener('change', refreshBiweekly);
+  const swapBtn = $('biweeklySwapBtn');
+  if (swapBtn) swapBtn.addEventListener('click', () => {
+    const tmp = selA.value;
+    selA.value = selB.value;
+    selB.value = tmp;
+    refreshBiweekly();
+  });
+}
+
+async function refreshBiweekly(){
+  const selA = $('biweeklyWeekA');
+  const selB = $('biweeklyWeekB');
+  if (!selA || !selB) return;
+  const weekA = selA.value;
+  const weekB = selB.value;
+  if (!weekA || !weekB) return;
+
+  const [dataA, dataB] = await Promise.all([
+    fetchBiweeklyExpanded(weekA, 'faithfulness'),
+    fetchBiweeklyExpanded(weekB, 'faithfulness')
+  ]);
+
+  renderBiweekly(dataA, dataB, weekA, weekB);
+}
+
+function renderBiweekly(dataA, dataB, weekA, weekB){
+  const wrap = $('biweeklyTable');
+  const insightWrap = $('biweeklyInsight');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  if (!dataA || !dataB){
+    wrap.appendChild(el('div', {className:'no-violations'}, '暂无分模块数据')); 
+    if (insightWrap) insightWrap.innerHTML = '';
+    return;
+  }
+
+  const modsA = dataA.modules || {};
+  const modsB = dataB.modules || {};
+  const allMods = Array.from(new Set([...Object.keys(modsA), ...Object.keys(modsB)])).sort((a,b) => {
+    const order = ['bazi','ziwei','qimen','liuyao','liuren','meihua','fengshui','zodiac','tizhi','tcm','wuxing','zeri','koujue','general','huangli','music','lifeindex','lifeplan','shiye','yunshi','zhongyi','faith','mantra','classics','nihaisha','shuhan','acupuncture','mobile','other'];
+    return order.indexOf(a) - order.indexOf(b);
+  });
+
+  // 汇总行
+  const avgA = dataA.avg_score;
+  const avgB = dataB.avg_score;
+  const deltaAvg = avgB - avgA;
+  const deltaAvgPct = avgA > 0 ? (deltaAvg / avgA * 100) : 0;
+
+  // 表格
+  const table = el('table', {className:'biweekly-table'});
+  const thead = el('thead', {},
+    el('tr', {},
+      el('th', {className:'bw-mod-h'}, '模块'),
+      el('th', {}, weekA + ' 分数'),
+      el('th', {className:'bw-cases-h'}, 'cases'),
+      el('th', {}, weekB + ' 分数'),
+      el('th', {className:'bw-cases-h'}, 'cases'),
+      el('th', {}, 'Δ 变化'),
+      el('th', {}, '趋势')
+    )
+  );
+
+  let improved = 0, degraded = 0, flat = 0, onlyOne = 0;
+  const tbody = el('tbody', {});
+  allMods.forEach(mod => {
+    const a = modsA[mod];
+    const b = modsB[mod];
+    const label = MOD_LABELS_EXP[mod] || mod;
+    let scoreA = a ? a.avg_score : null;
+    let scoreB = b ? b.avg_score : null;
+    let casesA = a ? a.total : 0;
+    let casesB = b ? b.total : 0;
+    let delta = null, deltaPct = null, cls = 'bw-flat', arrow = '—';
+
+    if (scoreA != null && scoreB != null){
+      delta = scoreB - scoreA;
+      deltaPct = scoreA > 0 ? (delta / scoreA * 100) : 0;
+      if (Math.abs(delta) < 0.005){ cls = 'bw-flat'; arrow = '→'; flat++; }
+      else if (delta > 0){ cls = 'bw-good'; arrow = '↑'; improved++; }
+      else { cls = 'bw-bad'; arrow = '↓'; degraded++; }
+    } else {
+      cls = 'bw-new';
+      onlyOne++;
+      if (scoreA == null) arrow = '+';
+      else arrow = '-';
+    }
+
+    const tr = el('tr', {className:cls},
+      el('td', {className:'bw-mod'}, label),
+      el('td', {}, scoreA != null ? scoreA.toFixed(3) : '—'),
+      el('td', {className:'bw-cases'}, casesA || '—'),
+      el('td', {}, scoreB != null ? scoreB.toFixed(3) : '—'),
+      el('td', {className:'bw-cases'}, casesB || '—'),
+      el('td', {className:'bw-delta'}, delta != null ? (delta >= 0 ? '+' : '') + delta.toFixed(3) + ' (' + (deltaPct >= 0 ? '+' : '') + deltaPct.toFixed(1) + '%)' : 'N/A'),
+      el('td', {className:'bw-arrow'}, arrow)
+    );
+    tbody.appendChild(tr);
+  });
+
+  // 汇总行
+  const sumCls = Math.abs(deltaAvg) < 0.005 ? 'bw-flat' : (deltaAvg > 0 ? 'bw-good' : 'bw-bad');
+  const sumArrow = Math.abs(deltaAvg) < 0.005 ? '→' : (deltaAvg > 0 ? '↑' : '↓');
+  tbody.insertBefore(el('tr', {className:'bw-summary-row ' + sumCls},
+    el('td', {className:'bw-mod'}, '📊 全部'),
+    el('td', {}, avgA != null ? avgA.toFixed(3) : '—'),
+    el('td', {className:'bw-cases'}, (dataA.total_cases || 0) + ' cases'),
+    el('td', {}, avgB != null ? avgB.toFixed(3) : '—'),
+    el('td', {className:'bw-cases'}, (dataB.total_cases || 0) + ' cases'),
+    el('td', {className:'bw-delta'}, (deltaAvg >= 0 ? '+' : '') + deltaAvg.toFixed(3) + ' (' + (deltaAvgPct >= 0 ? '+' : '') + deltaAvgPct.toFixed(1) + '%)'),
+    el('td', {className:'bw-arrow'}, sumArrow)
+  ), tbody.firstChild);
+
+  table.appendChild(thead);
+  table.appendChild(tbody);
+  wrap.appendChild(table);
+
+  // 洞察行
+  if (insightWrap){
+    insightWrap.innerHTML = '';
+    const chips = [];
+    if (improved > 0) chips.push(el('span', {className:'bw-chip bw-chip-good'}, '↑ ' + improved + ' 模块改善'));
+    if (degraded > 0) chips.push(el('span', {className:'bw-chip bw-chip-bad'}, '↓ ' + degraded + ' 模块恶化'));
+    if (flat > 0) chips.push(el('span', {className:'bw-chip bw-chip-flat'}, '→ ' + flat + ' 模块持平'));
+    if (onlyOne > 0) chips.push(el('span', {className:'bw-chip bw-chip-new'}, '⊕ ' + onlyOne + ' 模块仅单周有数据'));
+    // 找最大改善/恶化
+    let maxImp = null, maxDeg = null;
+    allMods.forEach(mod => {
+      const a = modsA[mod], b = modsB[mod];
+      if (a && b){
+        const d = b.avg_score - a.avg_score;
+        if (d > 0.005 && (!maxImp || d > maxImp.d)) maxImp = {mod, d};
+        if (d < -0.005 && (!maxDeg || d < maxDeg.d)) maxDeg = {mod, d};
+      }
+    });
+    if (maxImp) chips.push(el('span', {className:'bw-chip bw-chip-good'}, '🏆 最大改善: ' + (MOD_LABELS_EXP[maxImp.mod]||maxImp.mod) + ' +' + maxImp.d.toFixed(3)));
+    if (maxDeg) chips.push(el('span', {className:'bw-chip bw-chip-bad'}, '⚠️ 最大恶化: ' + (MOD_LABELS_EXP[maxDeg.mod]||maxDeg.mod) + ' ' + maxDeg.d.toFixed(3)));
+    insightWrap.append(...chips);
+  }
+}
+
+function exportBiweeklyCSV(){
+  const selA = $('biweeklyWeekA');
+  const selB = $('biweeklyWeekB');
+  if (!selA || !selB) return;
+  const weekA = selA.value;
+  const weekB = selB.value;
+  const rows = [['module','label','weekA','scoreA','casesA','weekB','scoreB','casesB','delta','deltaPct','trend']];
+  // 从缓存获取数据
+  const dataA = expandedCache[weekA + '-faithfulness'];
+  const dataB = expandedCache[weekB + '-faithfulness'];
+  if (!dataA || !dataB){ downloadCSV('biweekly-compare.csv', rows); return; }
+  const modsA = dataA.modules || {};
+  const modsB = dataB.modules || {};
+  const allMods = Array.from(new Set([...Object.keys(modsA), ...Object.keys(modsB)])).sort();
+  // 汇总行
+  const avgA = dataA.avg_score || 0;
+  const avgB = dataB.avg_score || 0;
+  const dAvg = avgB - avgA;
+  const dAvgPct = avgA > 0 ? (dAvg / avgA * 100) : 0;
+  rows.push(['__ALL__','全部',weekA,avgA.toFixed(3),dataA.total_cases||0,weekB,avgB.toFixed(3),dataB.total_cases||0,dAvg.toFixed(3),dAvgPct.toFixed(1)+'%',Math.abs(dAvg)<0.005?'flat':(dAvg>0?'up':'down')]);
+  allMods.forEach(mod => {
+    const a = modsA[mod], b = modsB[mod];
+    const label = MOD_LABELS_EXP[mod] || mod;
+    const sA = a ? a.avg_score : '';
+    const sB = b ? b.avg_score : '';
+    const cA = a ? a.total : 0;
+    const cB = b ? b.total : 0;
+    let delta = '', deltaPct = '', trend = 'N/A';
+    if (a && b){
+      delta = (b.avg_score - a.avg_score);
+      deltaPct = a.avg_score > 0 ? (delta / a.avg_score * 100) : 0;
+      trend = Math.abs(delta) < 0.005 ? 'flat' : (delta > 0 ? 'up' : 'down');
+    } else if (a && !b) trend = 'removed';
+    else if (!a && b) trend = 'new';
+    rows.push([mod, label, weekA, sA !== '' ? sA.toFixed(3) : '', cA, weekB, sB !== '' ? sB.toFixed(3) : '', cB, delta !== '' ? delta.toFixed(3) : '', deltaPct !== '' ? deltaPct.toFixed(1)+'%' : '', trend]);
+  });
+  downloadCSV('biweekly-module-compare-' + weekA + '-vs-' + weekB + '.csv', rows);
+}
+
+// 初始化双周对比
+initBiweeklySelectors();
+setTimeout(refreshBiweekly, 600);
+
 // 启动
 refresh();
 
