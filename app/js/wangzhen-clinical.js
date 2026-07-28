@@ -433,7 +433,7 @@
     };
     
     var recommendedFormulas = [];
-    var organText = health + diagnosis;
+    var organText = health + ' ' + diagnosis + ' ' + western + ' ' + (document.getElementById('wangzhen-result-panel')||{}).textContent + ' ' + (document.getElementById('wz-ai-result')||{}).textContent;
     Object.keys(organFormulas).forEach(function(organ){
       if(organText.indexOf(organ) >= 0){
         organFormulas[organ].forEach(function(f){
