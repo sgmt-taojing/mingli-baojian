@@ -209,7 +209,7 @@
       <div class="wz-step-arrow">→</div>
       <div class="wz-step" data-step="4" onclick="wangzhenClinical.goStep(4)">
         <div class="wz-step-num">4</div>
-        <div class="wz-step-text"><b>排盘+命相</b><span>八字→交叉</span></div>
+        <div class="wz-step-text"><b>综合诊疗</b><span>体质+协作</span></div>
       </div>
       <div class="wz-step-arrow">→</div>
       <div class="wz-step" data-step="5" onclick="wangzhenClinical.goStep(5)">
@@ -329,23 +329,32 @@
       <div style="font-size:11px;color:var(--wz-paper3);margin-top:4px">当前: <b id="wz-current-patient" style="color:var(--wz-gold)">未选择</b></div>
     </div>
 
-    <!-- 八字排盘 -->
+    <!-- 后台排盘 + 白话健康解读（医生看到的是中医白话，不是周易术语）-->
     <div class="wz-card">
-      <div class="wz-card-title">📜 八字排盘 <span class="wz-step-tag">步骤4</span></div>
-      <div class="wz-form-grid-4">
-        <select id="wz-bazi-year" class="wz-select" aria-label="年"><option value="">年</option></select>
-        <select id="wz-bazi-month" class="wz-select" aria-label="月"><option value="">月</option></select>
-        <select id="wz-bazi-day" class="wz-select" aria-label="日"><option value="">日</option></select>
-        <select id="wz-bazi-hour" class="wz-select" aria-label="时"><option value="">时</option></select>
+      <div class="wz-card-title">🩺 体质健康评估 <span class="wz-step-tag">步骤4</span> <span class="badge" id="wz-paipan-status">待排盘</span></div>
+      <div style="font-size:11px;color:var(--wz-paper3);margin-bottom:6px">系统在后台自动排盘分析，结果以中医白话展示</div>
+      <!-- 后台排盘（隐藏，不展示给医生）-->
+      <div id="wz-paipan-raw" style="display:none">
+        <div class="wz-form-grid-4">
+          <select id="wz-bazi-year" class="wz-select" aria-label="年"><option value="">年</option></select>
+          <select id="wz-bazi-month" class="wz-select" aria-label="月"><option value="">月</option></select>
+          <select id="wz-bazi-day" class="wz-select" aria-label="日"><option value="">日</option></select>
+          <select id="wz-bazi-hour" class="wz-select" aria-label="时"><option value="">时</option></select>
+        </div>
+        <div class="wz-cal-switch" id="wz-bazi-cal-switch" style="margin-top:6px">
+          <button class="active" onclick="wangzhenClinical.switchBaziCal('solar')">阳历</button>
+          <button onclick="wangzhenClinical.switchBaziCal('lunar')">农历</button>
+        </div>
       </div>
-      <div class="wz-cal-switch" id="wz-bazi-cal-switch" style="margin-top:6px">
-        <button class="active" onclick="wangzhenClinical.switchBaziCal('solar')">阳历</button>
-        <button onclick="wangzhenClinical.switchBaziCal('lunar')">农历</button>
+      <!-- 白话健康解读（展示给医生）-->
+      <div id="wz-health-summary" style="margin-top:8px">
+        <div class="muted">选择患者后自动生成体质健康评估</div>
       </div>
-      <div class="wz-btn-row">
-        <button class="btn btn-secondary" onclick="wangzhenClinical.fetchBazi()">🔮 排盘</button>
-      </div>
-      <div id="wz-paipan-result" style="margin-top:8px"><span class="muted">选择患者后自动排盘，或手动输入日期后点排盘</span></div>
+      <!-- 原始排盘数据（折叠隐藏，点击可展开）-->
+      <details style="margin-top:8px">
+        <summary style="font-size:11px;color:var(--wz-paper3);cursor:pointer">查看原始排盘数据（周易大师用）</summary>
+        <div id="wz-paipan-result" style="margin-top:8px"></div>
+      </details>
     </div>
   </aside>
 
@@ -409,18 +418,43 @@
       <div data-tab="ai" style="display:none"><div id="wangzhen-ai-steps"></div></div>
     </div>
 
-    <!-- 会诊 + 命相同参 -->
+    <!-- 综合诊疗：西医会诊 + 命理辅助 + 大师协作 + 治疗方案 -->
     <div class="wz-card">
-      <div class="wz-card-title">🏥 会诊 + 🧬 命相同参 <span class="wz-step-tag">步骤4</span></div>
+      <div class="wz-card-title">🏥 综合诊疗 <span class="wz-step-tag">步骤4</span></div>
+
+      <!-- 西医诊断输入 -->
       <div class="wz-form-row">
-        <label>西医诊断结论（选填，用于综合会诊）</label>
-        <textarea id="wz-western-diag" class="wz-textarea" placeholder="如：心电图正常、B超胆结石0.8cm、胃镜慢性胃炎、血常规白细胞偏高等..." style="min-height:60px"></textarea>
+        <label>西医诊断结论（选填）</label>
+        <textarea id="wz-western-diag" class="wz-textarea" placeholder="如：心电图正常、B超胆结石0.8cm、胃镜慢性胃炎..." style="min-height:50px"></textarea>
       </div>
+
+      <!-- 综合分析按钮 -->
       <div class="wz-btn-row">
-        <button class="btn btn-primary" onclick="wangzhenClinical.runMingxiang()">🧬 综合会诊分析（面相×八字×西医）</button>
-        <a href="ziwei.html" class="btn btn-ghost" style="text-decoration:none;display:inline-block;margin-top:6px">🌌 紫微斗数排盘（独立比对）</a>
+        <button class="btn btn-primary" onclick="wangzhenClinical.runComprehensiveAnalysis()">🔍 综合体质分析</button>
       </div>
-      <div id="wz-mingxiang-result"></div>
+
+      <!-- 白话健康解读结果 -->
+      <div id="wz-health-analysis" style="margin-top:10px"></div>
+
+      <!-- 推送给周易大师 -->
+      <div style="margin-top:12px;padding:10px;border:1px solid rgba(99,179,237,.2);border-radius:8px;background:rgba(99,179,237,.04)">
+        <div style="font-size:12px;color:var(--wz-cyan);font-weight:600;margin-bottom:6px">📡 周易大师协助</div>
+        <div style="font-size:11px;color:var(--wz-paper3);margin-bottom:6px">一键将患者命理数据推送给周易大师，大师解读后同步回传</div>
+        <div class="wz-btn-row">
+          <button class="btn btn-secondary" onclick="wangzhenClinical.pushToMaster()">📤 推送给周易大师解读</button>
+          <button class="btn btn-ghost" onclick="wangzhenClinical.refreshMasterReply()">🔄 刷新大师回复</button>
+        </div>
+        <div id="wz-master-reply" style="margin-top:8px"></div>
+      </div>
+
+      <!-- 治疗方案（综合知识库）-->
+      <div style="margin-top:12px;padding:10px;border:1px solid rgba(16,185,129,.2);border-radius:8px;background:rgba(16,185,129,.04)">
+        <div style="font-size:12px;color:var(--wz-jade);font-weight:600;margin-bottom:6px">💊 综合治疗方案（知识库智能推荐）</div>
+        <div id="wz-treatment-plan" style="font-size:11px;color:var(--wz-paper3)">完成综合分析后自动生成</div>
+        <div class="wz-btn-row" style="display:none" id="wz-treatment-actions">
+          <button class="btn btn-primary" onclick="wangzhenClinical.confirmAndPushToPatient()">✅ 医生确认 → 推送给患者</button>
+        </div>
+      </div>
     </div>
   </main>
 

@@ -263,6 +263,292 @@
     setTimeout(function(){ textarea.style.borderColor = ''; }, 3000);
   }
 
+
+  // ===== 白话健康解读（将八字/紫微结果翻译成中医白话）=====
+  function renderHealthSummary(paipanData, ziweiData){
+    var container = document.getElementById('wz-health-summary');
+    if(!container) return;
+    if(!paipanData || !paipanData.day_master){
+      container.innerHTML = '<div class="muted">排盘数据不完整</div>';
+      return;
+    }
+
+    var dm = paipanData.day_master || '';
+    var dmEle = dm.replace(/[^木火土金水]/g, '');
+    var wxScore = paipanData.wuxing_score || {};
+    var wxLack = paipanData.wuxing_lack || [];
+    var zodiac = paipanData.input ? (paipanData.input.shengxiao || '') : '';
+
+    // 五行→脏腑映射（白话）
+    var organMap = { '木':'肝胆', '火':'心血管', '土':'脾胃消化', '金':'肺呼吸', '水':'肾泌尿生殖' };
+    var weaknessMap = { '木':'容易肝郁气滞，注意情绪管理', '火':'心气不足，注意心血管', '土':'脾胃虚弱，注意饮食', '金':'肺气虚，注意呼吸系统', '水':'肾气不足，注意腰膝' };
+    var excessMap = { '木':'肝火偏旺，易怒失眠', '火':'心火亢盛，口疮心烦', '土':'脾胃湿热，易长痘', '金':'肺气壅滞，咳嗽痰多', '水':'水湿泛滥，水肿痰饮' };
+
+    var html = '<div style="padding:10px;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.15);border-radius:8px">';
+
+    // 体质判断
+    html += '<div style="font-size:13px;color:var(--wz-jade);font-weight:600;margin-bottom:6px">📋 体质评估</div>';
+    html += '<div style="font-size:12px;line-height:1.8">';
+
+    // 日主
+    if(dmEle){
+      html += '体质偏性：以<b style="color:var(--wz-gold)">' + dmEle + '</b>为核心体质';
+      var organName = organMap[dmEle] || '';
+      if(organName) html += '（对应脏腑：<b style="color:var(--wz-cyan)">' + organName + '</b>）';
+      html += '<br>';
+    }
+
+    // 五行偏盛偏衰 → 白话
+    var strongElements = [];
+    var weakElements = [];
+    Object.keys(wxScore).forEach(function(k){
+      var score = wxScore[k];
+      if(score > 3) strongElements.push(k);
+      if(score < 1.5) weakElements.push(k);
+    });
+
+    if(strongElements.length > 0){
+      html += '偏强：' + strongElements.map(function(e){ return organMap[e] + '(' + e + '=' + wxScore[e] + ')'; }).join('、') + '<br>';
+      html += '<span style="color:#fbbf24">⚠️ ' + strongElements.map(function(e){ return excessMap[e] || ''; }).join('；') + '</span><br>';
+    }
+    if(weakElements.length > 0 || wxLack.length > 0){
+      var allWeak = weakElements.concat(wxLack.filter(function(e){ return weakElements.indexOf(e) < 0; }));
+      html += '偏弱：' + allWeak.map(function(e){ return organMap[e] + '(' + e + (wxScore[e]!==undefined?'='+wxScore[e]:'缺失') + ')'; }).join('、') + '<br>';
+      html += '<span style="color:var(--wz-jade)">💡 ' + allWeak.map(function(e){ return weaknessMap[e] || ''; }).join('；') + '</span><br>';
+    }
+
+    // 生肖
+    if(zodiac) html += '生肖：' + zodiac + '<br>';
+
+    html += '</div></div>';
+
+    // 紫微健康提示（如果有）
+    if(ziweiData && ziweiData.palaces){
+      var mingStar = ziweiData.palaces[0].stars[0] || '';
+      var starNames = {ziwei:'紫微',tianji:'天机',taiyang:'太阳',wuqu:'武曲',lianzhen:'廉贞',tianfu:'天府',taiyin:'太阴',tanlang:'贪狼',jumen:'巨门',tianxiang:'天相',tianliang:'天梁',qisha:'七杀',pojun:'破军'};
+      var starHealthMap = {
+        '紫微':'体质偏热，注意心脑血管', '天机':'神经敏感，注意失眠头痛', '太阳':'阳气旺盛，注意眼部和心脏',
+        '武曲':'体质偏刚，注意肺和大肠', '廉贞':'湿热体质，注意皮肤和血液', '天府':'体质稳健，注意脾胃',
+        '太阴':'体质偏寒，注意妇科和肾', '贪狼':'体质偏湿，注意肝胆和泌尿', '巨门':'消化偏弱，注意脾胃口腔',
+        '天相':'体质调和，注意皮肤', '天梁':'体质偏燥，注意肺和神经', '七杀':'体质刚烈，注意肝胆和外伤',
+        '破军':'体质多变，注意免疫和肠胃'
+      };
+      var starName = starNames[mingStar] || '';
+      var healthTip = starHealthMap[starName] || '';
+      if(starName){
+        html += '<div style="margin-top:8px;padding:8px;background:rgba(99,179,237,.06);border:1px solid rgba(99,179,237,.12);border-radius:6px">';
+        html += '<div style="font-size:11px;color:var(--wz-cyan)">辅助体质参考：' + starName + '星入命 — ' + healthTip + '</div>';
+        html += '</div>';
+      }
+    }
+
+    container.innerHTML = html;
+
+    // 更新排盘状态
+    var status = document.getElementById('wz-paipan-status');
+    if(status){ status.textContent = '✅ 已完成'; status.style.background = 'rgba(16,185,129,.15)'; }
+  }
+
+  // ===== 综合体质分析 =====
+  function runComprehensiveAnalysis(){
+    var westernDiag = (document.getElementById('wz-western-diag') || {}).value || '';
+    var healthSummary = (document.getElementById('wz-health-summary') || {}).innerText || '';
+    var diagnosisText = (document.getElementById('wangzhen-result-panel') || {}).innerText || '';
+    var aiResult = (document.getElementById('wz-ai-result') || {}).innerText || '';
+
+    var html = '<div style="padding:10px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.15);border-radius:8px">';
+    html += '<div style="font-size:13px;color:var(--wz-gold);font-weight:600;margin-bottom:8px">🔍 综合体质分析报告</div>';
+
+    // 1. 望诊发现
+    if(diagnosisText) html += '<div style="margin-bottom:8px"><b style="color:var(--wz-paper)">望诊发现：</b><br>' + diagnosisText.substring(0,200).replace(/\n/g,'<br>') + '</div>';
+
+    // 2. 体质评估
+    if(healthSummary) html += '<div style="margin-bottom:8px"><b style="color:var(--wz-paper)">体质评估：</b><br>' + healthSummary.substring(0,200).replace(/\n/g,'<br>') + '</div>';
+
+    // 3. 西医诊断
+    if(westernDiag) html += '<div style="margin-bottom:8px"><b style="color:var(--wz-paper)">西医诊断：</b><br>' + westernDiag + '</div>';
+
+    // 4. 综合建议
+    html += '<div style="margin-bottom:8px"><b style="color:var(--wz-jade)">综合建议：</b><br>';
+    if(healthSummary.indexOf('肝') >= 0) html += '• 疏肝理气，保持情绪舒畅<br>';
+    if(healthSummary.indexOf('心') >= 0) html += '• 养心安神，避免熬夜<br>';
+    if(healthSummary.indexOf('脾') >= 0 || healthSummary.indexOf('胃') >= 0) html += '• 健脾和胃，饮食规律<br>';
+    if(healthSummary.indexOf('肺') >= 0) html += '• 补益肺气，注意保暖<br>';
+    if(healthSummary.indexOf('肾') >= 0) html += '• 补肾固本，避免过劳<br>';
+    html += '</div>';
+
+    html += '</div>';
+
+    var container = document.getElementById('wz-health-analysis');
+    if(container) container.innerHTML = html;
+
+    // 生成治疗方案
+    generateTreatmentPlan(healthSummary, westernDiag, diagnosisText);
+
+    completeStep(4);
+  }
+
+  // ===== 治疗方案（综合知识库）=====
+  function generateTreatmentPlan(health, western, diagnosis){
+    var container = document.getElementById('wz-treatment-plan');
+    if(!container) return;
+
+    var html = '<div style="line-height:1.8">';
+
+    // 从知识库推荐理疗方案
+    if(window.WANGZHEN_KB && window.WANGZHEN_KB.data){
+      var plans = window.WANGZHEN_KB.data.filter(function(d){ return d.category === '理疗' && d.disease; });
+      // 根据诊断文字匹配
+      var matched = [];
+      var allText = health + western + diagnosis;
+      plans.forEach(function(p){
+        var disease = p.disease || '';
+        if(allText.indexOf(disease.substring(0,2)) >= 0 || (p.keyword && p.keyword.split(',').some(function(k){ return allText.indexOf(k) >= 0; }))){
+          matched.push(p);
+        }
+      });
+      // 如果没匹配到，取常见3个
+      if(matched.length === 0 && plans.length > 0){
+        matched = plans.slice(0, 3);
+      }
+      if(matched.length > 0){
+        html += '<div style="margin-bottom:6px"><b style="color:var(--wz-jade)">推拿理疗：</b></div>';
+        matched.slice(0, 3).forEach(function(p){
+          html += '<div style="margin-bottom:4px;padding:6px;background:rgba(0,0,0,.15);border-radius:4px">';
+          html += '<div style="color:var(--wz-paper);font-weight:600">' + (p.disease || p.title) + '</div>';
+          html += '<div style="color:var(--wz-paper3)">' + (p.content || '').substring(0, 100) + '</div>';
+          html += '</div>';
+        });
+      }
+    }
+
+    // 食疗建议
+    html += '<div style="margin-bottom:6px"><b style="color:var(--wz-jade)">食疗调养：</b></div>';
+    if(health.indexOf('肝') >= 0) html += '• 菊花枸杞茶、芹菜、菠菜疏肝<br>';
+    if(health.indexOf('心') >= 0) html += '• 莲子百合粥、酸枣仁安神<br>';
+    if(health.indexOf('脾') >= 0 || health.indexOf('胃') >= 0) html += '• 山药薏米粥、陈皮健脾<br>';
+    if(health.indexOf('肺') >= 0) html += '• 雪梨银耳羹、百合润肺<br>';
+    if(health.indexOf('肾') >= 0) html += '• 黑芝麻核桃、枸杞补肾<br>';
+
+    // 生活建议
+    html += '<div style="margin-bottom:6px"><b style="color:var(--wz-jade)">生活调养：</b></div>';
+    html += '• 规律作息，子午觉养生<br>';
+    html += '• 适度运动，太极拳/八段锦<br>';
+    html += '• 情志调畅，避免过悲过怒<br>';
+
+    // 西医建议
+    if(western){
+      html += '<div style="margin-bottom:6px"><b style="color:var(--wz-cyan)">西医建议：</b></div>';
+      html += '• 遵医嘱定期复查<br>';
+      html += '• 配合中药调理，不可自行停药<br>';
+    }
+
+    html += '</div>';
+    html += '<div style="margin-top:8px;padding:6px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);border-radius:4px;font-size:10px;color:#fca5a5">⚠️ 以上方案为辅助参考，需医生确认后执行。患者端仅展示经医生确认的方案。</div>';
+
+    container.innerHTML = html;
+
+    // 显示确认按钮
+    var actions = document.getElementById('wz-treatment-actions');
+    if(actions) actions.style.display = 'flex';
+  }
+
+  // ===== 推送给周易大师 =====
+  function pushToMaster(){
+    if(!currentPatient || !currentPatient.name){
+      showToast('请先选择患者', 'warning');
+      return;
+    }
+    // 存储推送给大师的数据
+    var pushData = {
+      pushId: Date.now(),
+      patientName: currentPatient.name,
+      patientAge: currentPatient.age || '',
+      patientGender: currentPatient.gender || '',
+      chief: currentPatient.chief || currentPatient.chief || '',
+      bazi: currentPatient.pillars || '',
+      dayMaster: currentPatient.dayMaster || '',
+      wuxing: currentPatient.wuxing || '',
+      wuxingLack: currentPatient.wuxingLack || '',
+      diagnosis: (document.getElementById('wangzhen-result-panel')||{}).innerText || '',
+      westernDiag: (document.getElementById('wz-western-diag')||{}).value || '',
+      timestamp: new Date().toISOString(),
+      status: 'pending',
+      masterReply: ''
+    };
+    // 保存到 localStorage
+    var key = 'master_push_queue';
+    var queue = [];
+    try { queue = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
+    queue.unshift(pushData);
+    if(queue.length > 20) queue = queue.slice(0, 20);
+    localStorage.setItem(key, JSON.stringify(queue));
+
+    showToast('✅ 已推送给周易大师，等待解读中...');
+    var reply = document.getElementById('wz-master-reply');
+    if(reply){
+      reply.innerHTML = '<div style="padding:8px;background:rgba(99,179,237,.06);border:1px solid rgba(99,179,237,.12);border-radius:6px;font-size:12px"><div style="color:var(--wz-cyan)">📤 已推送（' + new Date().toLocaleTimeString('zh-CN') + '）</div><div style="color:var(--wz-paper3);margin-top:4px">大师解读完成后将自动同步回传。也可点击「刷新大师回复」手动获取。</div></div>';
+    }
+  }
+
+  // ===== 刷新大师回复 =====
+  function refreshMasterReply(){
+    var queue = [];
+    try { queue = JSON.parse(localStorage.getItem('master_push_queue') || '[]'); } catch(e) {}
+    var reply = document.getElementById('wz-master-reply');
+    if(!reply) return;
+
+    if(queue.length === 0){
+      reply.innerHTML = '<div style="font-size:11px;color:var(--wz-paper3)">暂无推送记录</div>';
+      return;
+    }
+
+    var latest = queue[0];
+    if(latest.masterReply){
+      reply.innerHTML = '<div style="padding:10px;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.15);border-radius:6px"><div style="color:var(--wz-jade);font-weight:600;margin-bottom:4px">📨 大师回复（' + (latest.replyTime||'') + '）</div><div style="font-size:12px;line-height:1.7">' + latest.masterReply + '</div></div>';
+      showToast('✅ 大师回复已同步');
+    } else {
+      reply.innerHTML = '<div style="padding:8px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.15);border-radius:6px;font-size:12px;color:#fbbf24">⏳ 大师尚未回复，请稍后刷新</div>';
+    }
+  }
+
+  // ===== 医生确认 → 推送给患者 =====
+  function confirmAndPushToPatient(){
+    if(!currentPatient || !currentPatient.name){
+      showToast('请先选择患者', 'warning');
+      return;
+    }
+    var plan = (document.getElementById('wz-treatment-plan')||{}).innerText || '';
+    var diagnosis = (document.getElementById('wangzhen-result-panel')||{}).innerText || '';
+    var health = (document.getElementById('wz-health-analysis')||{}).innerText || '';
+
+    // 组装患者端内容（纯中医，无周易痕迹）
+    var patientContent = '═══ 诊疗方案 ═══\n\n';
+    patientContent += '患者：' + currentPatient.name + '\n';
+    patientContent += '日期：' + new Date().toLocaleDateString('zh-CN') + '\n\n';
+    patientContent += '【体质评估】\n' + ((document.getElementById('wz-health-summary')||{}).innerText || '').substring(0,200) + '\n\n';
+    patientContent += '【望诊建议】\n' + diagnosis.substring(0,200) + '\n\n';
+    patientContent += '【治疗方案】\n' + plan + '\n\n';
+    patientContent += '【注意事项】\n如出现持续高热、剧烈疼痛、呼吸困难等请立即就医。\n本方案为辅助调理参考，不可替代正规治疗。\n';
+
+    // 保存到患者推送队列
+    var patientPush = {
+      patientName: currentPatient.name,
+      content: patientContent,
+      timestamp: new Date().toISOString(),
+      read: false
+    };
+    var key = 'patient_push_queue';
+    var queue = [];
+    try { queue = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
+    queue.unshift(patientPush);
+    if(queue.length > 50) queue = queue.slice(0, 50);
+    localStorage.setItem(key, JSON.stringify(queue));
+
+    showToast('✅ 治疗方案已确认并推送给患者（患者端无周易内容）');
+    completeStep(5);
+  }
+
   var currentPatient = null;
 
   function loadPatientList(){
@@ -660,6 +946,8 @@
       currentPatient.pillars = pillars;
       currentPatient.zodiac = xiao;
     }
+    // 自动生成白话健康解读
+    renderHealthSummary(d, null);
   }
 
   // ===== 保存诊断到病例 =====
@@ -898,6 +1186,10 @@
       if(capEl) capEl.textContent = caps.length > 0 ? '✅ 已启用: ' + caps.join(' ') : '⚠️ 浏览器能力受限';
     },
 
+    runComprehensiveAnalysis: runComprehensiveAnalysis,
+    pushToMaster: pushToMaster,
+    refreshMasterReply: refreshMasterReply,
+    confirmAndPushToPatient: confirmAndPushToPatient,
     switchCalendar: switchCalendar,
     switchBaziCal: switchBaziCal,
     addSymptom: addSymptom,
