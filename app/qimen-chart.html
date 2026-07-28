@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>奇门遁甲排盘 · 命理宝鉴</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+:root{
+  --bg:#0a0e17;--card:#141928;--border:#2a3450;--gold:#c9a84c;--jade:#4ec9b0;
+  --paper:#e8dcc8;--paper3:#8b7e6a;--red:#ef4444;--green:#10b981;--blue:#63b3ed;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsoft YaHei',sans-serif;padding:12px;min-height:100vh}
+.qm-header{text-align:center;margin-bottom:16px;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:8px}
+.qm-title{font-size:18px;color:var(--gold);letter-spacing:2px;margin-bottom:4px}
+.qm-meta{font-size:12px;color:var(--paper3);line-height:1.8}
+.qm-meta span{margin-right:8px}
+.qm-badge{display:inline-block;font-size:10px;padding:2px 6px;border-radius:3px;margin-left:4px}
+.qm-badge.yang{background:rgba(78,201,176,.15);color:var(--jade)}
+.qm-badge.yin{background:rgba(201,168,76,.15);color:var(--gold)}
+.qm-badge.fuyin{background:rgba(239,68,68,.15);color:var(--red)}
+.qm-badge.fanyin{background:rgba(99,179,237,.15);color:var(--blue)}
+
+.qm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:700px;margin:0 auto 16px}
+.qm-gong{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:10px;min-height:120px;position:relative}
+.qm-gong.center{background:rgba(201,168,76,.05);border-color:var(--gold);border-style:dashed}
+.qm-gong.kong{opacity:.5}
+.qm-gong.ma{box-shadow:0 0 0 1px var(--jade)}
+.qm-gong-name{font-size:11px;color:var(--gold);font-weight:600;margin-bottom:2px}
+.qm-gong-dir{font-size:9px;color:var(--paper3);margin-bottom:6px}
+.qm-row{display:flex;gap:4px;margin-bottom:3px;align-items:center}
+.qm-label{font-size:9px;color:var(--paper3);width:20px;flex-shrink:0}
+.qm-val{font-size:11px}
+.qm-val.star{color:var(--gold)}
+.qm-val.door{color:var(--jade)}
+.qm-val.god{color:var(--blue)}
+.qm-val.dipan{color:var(--paper)}
+.qm-val.tianpan{color:var(--green);font-weight:600}
+.qm-val.kong{color:var(--red);font-size:9px}
+.qm-val.ma{color:var(--jade);font-size:9px}
+
+.qm-geju{max-width:700px;margin:0 auto}
+.qm-geju-title{font-size:13px;color:var(--gold);margin-bottom:8px;font-weight:600}
+.qm-geju-list{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+.qm-geju-item{padding:8px;border-radius:4px;font-size:11px;line-height:1.5}
+.qm-geju-item.ji{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2)}
+.qm-geju-item.xiong{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2)}
+.qm-geju-name{font-weight:600;margin-bottom:2px}
+.qm-geji-name.ji{color:var(--green)}
+.qm-geju-name.xiong{color:var(--red)}
+.qm-geju-desc{color:var(--paper3);font-size:10px}
+
+.qm-form{max-width:500px;margin:0 auto 16px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.qm-form input,.qm-form select{padding:8px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;color:var(--paper);font-size:13px}
+.qm-form button{grid-column:1/-1;padding:10px;background:var(--gold);color:var(--bg);border:none;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer}
+.qm-form button:hover{opacity:.9}
+
+@media(max-width:768px){
+  .qm-grid{grid-template-columns:repeat(3,1fr);gap:3px}
+  .qm-gong{min-height:90px;padding:6px}
+  .qm-gong-name{font-size:10px}
+  .qm-val{font-size:10px}
+  .qm-label{font-size:8px;width:16px}
+  .qm-geju-list{grid-template-columns:1fr}
+}
+@media(max-width:360px){
+  .qm-gong{min-height:75px;padding:4px}
+  .qm-gong-name{font-size:9px}
+  .qm-val{font-size:9px}
+  .qm-label{font-size:7px;width:14px}
+  .qm-row{gap:2px;margin-bottom:2px}
+}
+</style>
+</head>
+<body>
+<div class="qm-header">
+  <div class="qm-title">🌀 奇门遁甲排盘</div>
+  <div id="qm-meta" class="qm-meta">请输入信息排盘</div>
+</div>
+
+<div class="qm-form">
+  <input type="number" id="qm-year" placeholder="年" min="1900" max="2100" value="2026">
+  <input type="number" id="qm-month" placeholder="月" min="1" max="12" value="7">
+  <input type="number" id="qm-day" placeholder="日" min="1" max="31" value="28">
+  <input type="number" id="qm-hour" placeholder="时(0-23)" min="0" max="23" value="14">
+  <button onclick="doPaipan()">排盘</button>
+</div>
+
+<div id="qm-grid" class="qm-grid"></div>
+<div id="qm-geju" class="qm-geju" style="display:none"></div>
+
+<script>
+async function doPaipan(){
+  const y=document.getElementById('qm-year').value;
+  const m=document.getElementById('qm-month').value;
+  const d=document.getElementById('qm-day').value;
+  const h=document.getElementById('qm-hour').value;
+  const r=await fetch('/api/paipan/qimen',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({year:+y,month:+m,day:+d,hour:+h})});
+  const data=await r.json();
+  if(!data.ok){alert('排盘失败: '+data.error);return;}
+  renderChart(data.chart);
+}
+
+function renderChart(c){
+  // meta
+  const meta=document.getElementById('qm-meta');
+  const yinYang=c.isYang?'<span class="qm-badge yang">阳遁</span>':'<span class="qm-badge yin">阴遁</span>';
+  const fuYin=c.isFuYin?'<span class="qm-badge fuyin">伏吟</span>':'';
+  const fanYin=c.isFanYin?'<span class="qm-badge fanyin">反吟</span>':'';
+  meta.innerHTML=`${c.ju} ${yinYang}${fuYin}${fanYin}<br>`+
+    `<span>时柱:${c.hourGanZhi}</span><span>旬首:${c.xunShou}</span><span>遁:${c.dun}</span><br>`+
+    `<span>值符:${c.zhiFuStar}</span><span>值使:${c.zhiShiDoor}</span><span>空亡:${c.kongWang.join('、')}</span>`+
+    (c.maStar?`<span>马星:${c.maStar}宫</span>`:'');
+
+  // grid: 九宫按后天八卦排列
+  // 4 9 2
+  // 3 5 7
+  // 8 1 6
+  const layout=[4,9,2,3,5,7,8,1,6];
+  const grid=document.getElementById('qm-grid');
+  grid.innerHTML='';
+  for(const p of layout){
+    const palace=c.palaces.find(x=>x.palace===p);
+    if(!palace) continue;
+    const div=document.createElement('div');
+    const cls=['qm-gong'];
+    if(p===5) cls.push('center');
+    if(palace.isKongWang) cls.push('kong');
+    if(palace.isMa) cls.push('ma');
+    div.className=cls.join(' ');
+    
+    let html=`<div class="qm-gong-name">${palace.name}宫</div>`;
+    html+=`<div class="qm-gong-dir">${palace.direction}</div>`;
+    if(p!==5){
+      html+=`<div class="qm-row"><span class="qm-label">地</span><span class="qm-val dipan">${palace.dipan||'-'}</span></div>`;
+      html+=`<div class="qm-row"><span class="qm-label">天</span><span class="qm-val tianpan">${palace.tianpan||'-'}</span></div>`;
+      html+=`<div class="qm-row"><span class="qm-label">星</span><span class="qm-val star">${palace.star||'-'}</span></div>`;
+      html+=`<div class="qm-row"><span class="qm-label">门</span><span class="qm-val door">${palace.door||'-'}</span></div>`;
+      html+=`<div class="qm-row"><span class="qm-label">神</span><span class="qm-val god">${palace.god||'-'}</span></div>`;
+      if(palace.isKongWang) html+=`<div class="qm-val kong">空亡</div>`;
+      if(palace.isMa) html+=`<div class="qm-val ma">🐎马星</div>`;
+    } else {
+      html+=`<div style="font-size:10px;color:var(--paper3);text-align:center;padding-top:20px">中宫</div>`;
+      html+=`<div style="font-size:10px;color:var(--gold);text-align:center;margin-top:4px">${palace.dipan||''}</div>`;
+    }
+    div.innerHTML=html;
+    grid.appendChild(div);
+  }
+
+  // 格局
+  if(c.geju && c.geju.length>0){
+    const gj=document.getElementById('qm-geju');
+    gj.style.display='block';
+    const gjTitle=gj.querySelector('.qm-geju-title')||document.createElement('div');
+    gjTitle.className='qm-geju-title';
+    gjTitle.textContent='格局判断';
+    let gjList=gj.querySelector('.qm-geju-list');
+    if(!gjList){gjList=document.createElement('div');gjList.className='qm-geju-list';gj.appendChild(gjList);}
+    gjList.innerHTML='';
+    gj.insertBefore(gjTitle,gjList);
+    for(const g of c.geju){
+      const item=document.createElement('div');
+      item.className='qm-geju-item '+(g.type==='吉'?'ji':'xiong');
+      item.innerHTML=`<div class="qm-geju-name ${g.type==='吉'?'ji':'xiong'}">${g.name} <span style="font-size:9px">[${g.type}]</span></div><div class="qm-geju-desc">${g.desc||''}</div>`;
+      gjList.appendChild(item);
+    }
+  }
+}
+</script>
+</body>
+</html>
