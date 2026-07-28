@@ -1049,6 +1049,20 @@ function renderWoW(){
   }
 
   const table = el('table', {className:'wow-table'});
+  // 收集 WoW 数据供洞察 + CSV 使用
+  const wowRows = [];
+  metrics.forEach(m => {
+    const row = { metric: m.label, key: m.key };
+    pairs.forEach(p => {
+      const dFrom = cache.weeks[p.from]?.[m.bench];
+      const dTo = cache.weeks[p.to]?.[m.bench];
+      const vFrom = dFrom ? get(dFrom, m.field) : null;
+      const vTo = dTo ? get(dTo, m.field) : null;
+      row[p.from + '→' + p.to] = (vFrom != null && vTo != null) ? { from: vFrom, to: vTo, delta: vTo - vFrom, pct: vFrom !== 0 ? (vTo - vFrom) / Math.abs(vFrom) : 0 } : null;
+    });
+    wowRows.push(row);
+  });
+  renderWoWInsight(wowRows, metrics, pairs);
   // thead
   const thead = el('thead', null,
     el('tr', null,
@@ -1101,6 +1115,75 @@ function renderWoW(){
   });
   table.appendChild(tbody);
   wrap.appendChild(table);
+}
+
+// R229: WoW 摘要洞察 — 最大改善/恶化指标高亮
+function renderWoWInsight(wowRows, metrics, pairs){
+  const wrap = $('wowInsight');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  // 找最大改善和最大恶化
+  let bestChange = null, worstChange = null;
+  wowRows.forEach(row => {
+    pairs.forEach(p => {
+      const key = p.from + '→' + p.to;
+      const cell = row[key];
+      if (!cell || Math.abs(cell.pct) < 0.02) return;
+      const m = metrics.find(mm => mm.key === row.key);
+      if (!m) return;
+      const isImprovement = m.invert ? cell.delta < 0 : cell.delta > 0;
+      const absPct = Math.abs(cell.pct);
+      if (isImprovement && (!bestChange || absPct > Math.abs(bestChange.pct))){
+        bestChange = { metric: row.metric, pair: key, pct: cell.pct, delta: cell.delta, isImprovement: true };
+      }
+      if (!isImprovement && (!worstChange || absPct > Math.abs(worstChange.pct))){
+        worstChange = { metric: row.metric, pair: key, pct: cell.pct, delta: cell.delta, isImprovement: false };
+      }
+    });
+  });
+  if (!bestChange && !worstChange){
+    wrap.appendChild(el('div', {className:'wow-insight-flat'}, '📋 本周期各指标波动均 < 2%，无显著变化'));
+    return;
+  }
+  const parts = [];
+  if (bestChange){
+    const pctStr = (bestChange.pct >= 0 ? '+' : '') + (bestChange.pct * 100).toFixed(1) + '%';
+    parts.push(el('span', {className:'wow-insight-good'}, '🟢 最大改善：' + bestChange.metric + ' (' + bestChange.pair.replace('2026-','') + ') ' + pctStr));
+  }
+  if (worstChange){
+    const pctStr = (worstChange.pct >= 0 ? '+' : '') + (worstChange.pct * 100).toFixed(1) + '%';
+    parts.push(el('span', {className:'wow-insight-bad'}, '🔴 最大恶化：' + worstChange.metric + ' (' + worstChange.pair.replace('2026-','') + ') ' + pctStr));
+  }
+  parts.forEach((p, i) => {
+    if (i > 0) wrap.appendChild(el('span', {className:'wow-insight-sep'}, ' · '));
+    wrap.appendChild(p);
+  });
+}
+
+// R229: WoW CSV 导出
+function exportWoWCSV(){
+  const { metrics, pairs } = computeWoW();
+  const header = ['指标'];
+  pairs.forEach(p => header.push(p.from + '→' + p.to + ' 值', p.from + '→' + p.to + ' Δ%'));
+  const rows = [header];
+  metrics.forEach(m => {
+    const row = [m.label];
+    pairs.forEach(p => {
+      const dFrom = cache.weeks[p.from]?.[m.bench];
+      const dTo = cache.weeks[p.to]?.[m.bench];
+      const vFrom = dFrom ? get(dFrom, m.field) : null;
+      const vTo = dTo ? get(dTo, m.field) : null;
+      if (vFrom == null || vTo == null){
+        row.push('—', '—');
+      } else {
+        const pct = vFrom !== 0 ? (vTo - vFrom) / Math.abs(vFrom) : 0;
+        row.push(vTo.toFixed(4), (pct >= 0 ? '+' : '') + (pct * 100).toFixed(1) + '%');
+      }
+    });
+    rows.push(row);
+  });
+  downloadCSV('eval-wow-weekly.csv', rows);
+  showToast('WoW 周环比 CSV 已导出');
 }
 
 // 导出当前快照
