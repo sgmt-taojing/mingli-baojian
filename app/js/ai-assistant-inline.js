@@ -1613,6 +1613,11 @@ function showReport(text, meta){
   d.innerHTML=metaHtml + '<div class="b">'+esc(text)+'</div>';
   chat.appendChild(d);
 
+  // R239: 排盘模块异步注入古制断盘解读
+  if (['ziwei','qimen','liuyao','liuren','meihua','fengshui'].indexOf(state.module) >= 0) {
+    _fetchAndInjectInterpretation(state.module, state.data, d);
+  }
+
   // R40: 嵌入图谱智能推荐段落（位于报告主体与操作按钮之间）
   if (state.module) {
     const recBox = document.createElement('div');
@@ -3405,6 +3410,41 @@ function _qimenCompute(y,mn,dy,hr,sex,ask){
     farPeriod:farPeriod,
     askSpecific:askSpecific
   };
+}
+
+// R239: 排盘模块古制断盘解读注入
+var _V2_PAIPAN_MAP = {
+  ziwei: { ep:'/api/paipan/ziwei', method:'POST', fields:function(d){return {year:d.year,month:d.month,day:d.day,hour:d.hour,sex:d.gender||'male'}; } },
+  qimen: { ep:'/api/paipan/qimen', method:'POST', fields:function(d){return {year:d.year,month:d.month,day:d.day,hour:d.hour}; } },
+  liuyao: { ep:'/api/paipan/liuyao', method:'POST', fields:function(d){return {year:d.year,month:d.month,day:d.day,hour:d.hour}; } },
+  liuren: { ep:'/api/paipan/liuren', method:'GET', fields:function(d){return {year:d.year,month:d.month,day:d.day,hour:d.hour}; } },
+  meihua: { ep:'/api/paipan/meihua', method:'POST', fields:function(d){return d.num1?{num1:d.num1,num2:d.num2,num3:d.num3}:{year:d.year,month:d.month,day:d.day,hour:d.hour}; } },
+  fengshui: { ep:'/api/paipan/fengshui', method:'POST', fields:function(d){return {year:d.year,sittingMountain:d.sittingMountain||'子',facingMountain:d.facingMountain||'午'}; } }
+};
+async function _fetchAndInjectInterpretation(mod, data, container){
+  var conf = _V2_PAIPAN_MAP[mod];
+  if(!conf) return;
+  try {
+    var params = conf.fields(data||{});
+    if(!params.year && !params.num1) return;
+    var url = conf.ep;
+    var opts = { method:conf.method, headers:{'Content-Type':'application/json'} };
+    if(conf.method === 'POST'){ opts.body = JSON.stringify(params); }
+    else { var qs = Object.keys(params).map(function(k){return k+'='+encodeURIComponent(params[k]);}).join('&'); url += '?'+qs; }
+    var resp = await fetch(url, opts);
+    if(!resp.ok) return;
+    var result = await resp.json();
+    if(!result.ok || !result.interpretation) return;
+    var interp = result.interpretation;
+    var el = document.createElement('div');
+    el.className = 'r239-interpretation';
+    el.style.cssText = 'margin-top:12px;padding:14px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2);border-radius:10px;font-size:13px;line-height:1.7';
+    var html = '<div style="font-weight:600;color:var(--gold,#c9a84c);margin-bottom:6px;display:flex;align-items:center;gap:6px"><span>📜</span><span>古制断盘解读</span><span style="margin-left:auto;font-size:10px;opacity:.6;font-weight:normal">后端引擎提供</span></div>';
+    if(interp.summary) html += '<div style="opacity:.9;margin-bottom:6px">'+esc(interp.summary)+'</div>';
+    if(interp.advice) html += '<div style="opacity:.75;font-size:12px">💡 '+esc(interp.advice)+'</div>';
+    el.innerHTML = html;
+    container.appendChild(el);
+  } catch(e) { console.warn('[r239-interpretation]', mod, e.message); }
 }
 
 async function _paipanAsync(y,m,d,h){
