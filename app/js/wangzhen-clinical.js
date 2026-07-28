@@ -1002,7 +1002,7 @@
   // ===== TTS 语音播报 =====
   function speakText(text){
     if(!text) return;
-    var url = TTS_API + '?text=' + encodeURIComponent(text.substring(0, 500)) + '&voice=zh-CN-XiaoxiaoNeural';
+    var url = TTS_API + '/api/tts?text=' + encodeURIComponent(text.substring(0, 500)) + '&voice=zh-CN-XiaoxiaoNeural';
     var audio = new Audio(url);
     audio.play().catch(function(){});
   }

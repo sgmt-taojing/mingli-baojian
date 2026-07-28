@@ -76,14 +76,14 @@
 <div class="pa-subtitle">患者档案管理 · 诊断历史分析 · 供医生和周易大师参考</div>
 
 <!-- 统计概览 -->
-<div class="pa-stats" id="pa-stats"></div>
+<div class="pa-stats" id="pa-stats" role="region" aria-label="统计概览"></div>
 
 <!-- 分析图表 -->
 <div class="pa-analysis" id="pa-analysis"></div>
 
 <!-- 工具栏 -->
 <div class="pa-toolbar">
-  <input type="text" class="pa-search" id="pa-search" placeholder="🔍 搜索患者姓名/主诉/电话..." oninput="PatientArchive.search(this.value)">
+  <input type="text" class="pa-search" id="pa-search" placeholder="🔍 搜索患者姓名/主诉/电话..." oninput="PatientArchive.search(this.value)" aria-label="搜索患者">
   <button class="pa-filter active" onclick="PatientArchive.setFilter('all',this)">全部</button>
   <button class="pa-filter" onclick="PatientArchive.setFilter('male',this)">男</button>
   <button class="pa-filter" onclick="PatientArchive.setFilter('female',this)">女</button>
@@ -93,7 +93,7 @@
 </div>
 
 <!-- 患者表格 -->
-<table class="pa-table">
+<table class="pa-table" role="table" aria-label="患者列表">
   <thead>
     <tr>
       <th>编号</th><th>姓名</th><th>性别</th><th>年龄</th><th>主诉</th><th>就诊次数</th><th>上次就诊</th><th>体质</th><th>操作</th>
