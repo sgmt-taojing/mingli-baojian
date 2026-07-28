@@ -2961,34 +2961,72 @@ if (typeof window !== 'undefined') {
   }
   window.runZiwei = runZiwei;
 
-  function runMeihua() {
+  async function runMeihua() {
     const method = document.getElementById('meihua-method')?.value || 'number';
     const upper = parseInt(document.getElementById('meihua-upper')?.value || 3);
     const lower = parseInt(document.getElementById('meihua-lower')?.value || 6);
     const dong = parseInt(document.getElementById('meihua-dong')?.value || 1);
+    // R218: 优先调用后端古制引擎，失败回退本地
+    var apiData = null;
     try {
-      const pan = meihuaQiGua(method, { upper, lower, dong });
-      const analyze = meihuaAnalyze(pan);
-      let html = '<h4 style="color:var(--jade)">🌸 梅花易数起卦</h4>';
-      html += '<p><b>起卦方式：</b>' + (method==='time'?'时间起卦':method==='number'?'数字起卦':'心动起卦') + '</p>';
-      html += '<p><b>本卦：</b>' + pan.benGua + ' · 变卦：' + pan.bianGua + '</p>';
-      html += '<p><b>体用：</b>体为' + pan.tiGua + ' · 用为' + pan.yongGua + '</p>';
-      html += '<p><b>动爻：</b>第' + dong + '爻动</p>';
-      html += '<p><b>五行：</b>体' + analyze.tiWuxing + ' · 用' + analyze.yongWuxing + '</p>';
-      html += '<p><b>生克：</b>' + analyze.relation + '</p>';
-      html += '<p><b>吉凶：</b>' + analyze.luck + '</p>';
-      html += '<p style="opacity:0.8">' + analyze.advice + '</p>';
+      var resp = await fetch('/api/paipan/meihua', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({num1:upper, num2:lower, num3:dong})
+      });
+      if (resp.ok) { var j = await resp.json(); if (j.ok && j.chart) apiData = j.chart; }
+    } catch(eApi) { console.warn('[梅花] 后端API不可用，回退本地引擎', eApi.message); }
+    if (apiData) {
+      var c = apiData;
+      var html = '<h4 style="color:var(--jade)">🌸 梅花易数起卦（古制引擎）</h4>';
+      html += '<p><b>起卦方式：</b>' + (c.meta && c.meta.method ? c.meta.method : '数字起卦') + '</p>';
+      html += '<p><b>本卦：</b>' + c.guaName + '</p>';
+      if (c.lower && c.upper) {
+        html += '<p><b>上卦：</b>' + c.upper.name + c.upper.symbol + '(' + c.upper.nature + '·' + c.upper.wuxing + ') · <b>下卦：</b>' + c.lower.name + c.lower.symbol + '(' + c.lower.nature + '·' + c.lower.wuxing + ')</p>';
+      }
+      html += '<p><b>动爻：</b>' + c.dongYaoName + '</p>';
+      if (c.bianGua) html += '<p><b>变卦：</b>' + c.bianGua.name + '</p>';
+      if (c.huGua) html += '<p><b>互卦：</b>' + c.huGua.name + '</p>';
+      if (c.tiYong) {
+        html += '<p><b>体卦：</b>' + (c.tiYong.ti ? c.tiYong.ti.name + '(' + c.tiYong.ti.wuxing + ')' : '—') + '</p>';
+        html += '<p><b>用卦：</b>' + (c.tiYong.yong ? c.tiYong.yong.name + '(' + c.tiYong.yong.wuxing + ')' : '—') + '</p>';
+        if (c.tiYong.relation) html += '<p><b>体用关系：</b>' + c.tiYong.relation + '</p>';
+        if (c.tiYong.verdict) html += '<p><b>断语：</b>' + c.tiYong.verdict + '</p>';
+      }
+      if (c.yaos && c.yaos.length) {
+        html += '<div style="margin-top:8px"><b>六爻：</b><table style="width:100%;font-size:11px;border-collapse:collapse;margin-top:4px"><thead><tr style="opacity:0.7"><th style="padding:2px 4px">爻</th><th>阴阳</th><th>动静</th><th>位置</th></tr></thead><tbody>';
+        c.yaos.slice().reverse().forEach(function(y) {
+          html += '<tr style="border-top:1px solid rgba(255,255,255,.06)"><td style="padding:2px 4px;text-align:center">' + y.positionName + '</td><td style="text-align:center">' + y.yinName + '</td><td style="text-align:center">' + (y.isDong ? '⚡动' : '静') + '</td><td style="text-align:center">' + (y.isUpper ? '上卦' : '下卦') + '</td></tr>';
+        });
+        html += '</tbody></table></div>';
+      }
       html += _copyBtnHtml('meihuaResult');
       const el = document.getElementById('meihuaResult');
       if (el) { el.innerHTML = html; el.style.display = 'block'; }
-    } catch(e) { 
+    } else {
+      try {
+        const pan = meihuaQiGua(method, { upper, lower, dong });
+        const analyze = meihuaAnalyze(pan);
+        let html = '<h4 style="color:var(--jade)">🌸 梅花易数起卦</h4>';
+        html += '<p><b>起卦方式：</b>' + (method==='time'?'时间起卦':method==='number'?'数字起卦':'心动起卦') + '</p>';
+        html += '<p><b>本卦：</b>' + pan.benGua + ' · 变卦：' + pan.bianGua + '</p>';
+        html += '<p><b>体用：</b>体为' + pan.tiGua + ' · 用为' + pan.yongGua + '</p>';
+        html += '<p><b>动爻：</b>第' + dong + '爻动</p>';
+        html += '<p><b>五行：</b>体' + analyze.tiWuxing + ' · 用' + analyze.yongWuxing + '</p>';
+        html += '<p><b>生克：</b>' + analyze.relation + '</p>';
+        html += '<p><b>吉凶：</b>' + analyze.luck + '</p>';
+        html += '<p style="opacity:0.8">' + analyze.advice + '</p>';
+        html += _copyBtnHtml('meihuaResult');
+        const el = document.getElementById('meihuaResult');
+        if (el) { el.innerHTML = html; el.style.display = 'block'; }
+      } catch(e) { 
     console.error('[梅花引擎错误错误]', e.message, e.stack);
     showToast('操作出错，请重试');
     let _errEl = document.getElementById('engineResult') || document.querySelector('[id$="EngineResult"]');
     if(_errEl){ _errEl.style.display='block'; _errEl.innerHTML='<div style="padding:20px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:8px;margin:10px 0"><h5 style="color:var(--cinn2)">❌ 梅花引擎错误</h5><p style="font-size:13px;opacity:.8;margin-top:8px">'+e.message+'</p></div>'; }
     else { showToast('梅花引擎错误：' + e.message); }
   }
-  }
+  } // end else
+  } // end function
   window.runMeihua = runMeihua;
 
   async function runLiuren() {
