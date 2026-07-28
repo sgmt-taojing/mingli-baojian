@@ -2014,6 +2014,207 @@ function exportExpandedCSV(){
   downloadCSV(`expanded-${week}-${expandedActiveBench}.csv`, [headers, ...rows]);
 }
 
+// ===== R224: 跨周分模块趋势折线图 =====
+let expandedTrendSelectedMods = new Set();
+
+function getExpandedMetricValue(modData, bench){
+  if (bench === 'faithfulness') return modData.avg_score ?? null;
+  if (bench === 'latency') return modData.p95_ms ?? null;
+  if (bench === 'cost-budget') return modData.avg_cost_yuan ?? null;
+  return null;
+}
+
+function expandedTrendFmt(v, bench){
+  if (v == null) return '—';
+  if (bench === 'faithfulness') return v.toFixed(2);
+  if (bench === 'latency') return Math.round(v) + 'ms';
+  if (bench === 'cost-budget') return v < 0.001 ? v.toExponential(1) : v.toFixed(4);
+  return String(v);
+}
+
+// 收集所有周所有模块的指标值 → { mod: [{week, value}, ...] }
+async function buildExpandedTrendSeries(bench){
+  const modMap = {}; // mod -> [{week, value}]
+  for (const w of WEEKS){
+    const data = await fetchExpanded(w, bench);
+    if (!data || !data.modules) continue;
+    for (const [mod, d] of Object.entries(data.modules)){
+      if (!modMap[mod]) modMap[mod] = [];
+      modMap[mod].push({ week: w, value: getExpandedMetricValue(d, bench) });
+    }
+  }
+  return modMap;
+}
+
+// 颜色调色板（12 色）
+const TREND_COLORS = ['#e74c3c','#3498db','#2ecc71','#f39c12','#9b59b6','#1abc9c','#e67e22','#34495e','#e84393','#00cec9','#fdcb6e','#a29bfe'];
+
+function renderExpandedTrend(modMap, bench){
+  const wrap = $('expandedTrendChart');
+  const legendWrap = $('expandedTrendLegend');
+  if (!wrap || !legendWrap) return;
+  wrap.innerHTML = '';
+  legendWrap.innerHTML = '';
+
+  const selectedMods = [...expandedTrendSelectedMods];
+  if (selectedMods.length === 0){
+    wrap.appendChild(el('div', {className:'no-violations'}, '请在上方选择至少一个模块')); 
+    return;
+  }
+
+  const W = 520, H = 240;
+  const padL = 44, padR = 16, padT = 14, padB = 32;
+  const innerW = W - padL - padR;
+  const innerH = H - padT - padB;
+
+  // 收集所有值算 Y 轴范围
+  const allVals = [];
+  selectedMods.forEach(mod => {
+    (modMap[mod] || []).forEach(p => { if (p.value != null) allVals.push(p.value); });
+  });
+  if (allVals.length === 0){
+    wrap.appendChild(el('div', {className:'no-violations'}, '无数据')); 
+    return;
+  }
+
+  const yMin = Math.min.apply(null, allVals);
+  const yMax = Math.max.apply(null, allVals);
+  const yLo = Math.max(0, yMin - (yMax - yMin) * 0.15);
+  const yHi = yMax + (yMax - yMin) * 0.15;
+  const yPad = (yHi - yLo) < 0.001 ? 1 : 0;
+
+  function x(i){ return padL + (i * innerW) / Math.max(1, WEEKS.length - 1); }
+  function y(v){ return padT + innerH - ((v - yLo) / (yHi - yLo + yPad)) * innerH; }
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+  svg.style.maxWidth = '100%';
+  svg.style.height = 'auto';
+
+  // 网格 + Y 轴标签
+  for (let i = 0; i <= 4; i++){
+    const yy = padT + (innerH * i / 4);
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('class', 'chart-grid');
+    line.setAttribute('x1', padL); line.setAttribute('x2', W - padR);
+    line.setAttribute('y1', yy); line.setAttribute('y2', yy);
+    svg.appendChild(line);
+    const v = yHi - (yHi - yLo) * i / 4;
+    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    t.setAttribute('class', 'chart-axis');
+    t.setAttribute('x', padL - 6); t.setAttribute('y', yy + 3);
+    t.setAttribute('text-anchor', 'end');
+    t.textContent = expandedTrendFmt(v, bench);
+    svg.appendChild(t);
+  }
+
+  // X 轴标签
+  WEEKS.forEach((wk, i) => {
+    if (i % 2 !== 0 && i !== WEEKS.length - 1) return;
+    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    t.setAttribute('class', 'chart-axis');
+    t.setAttribute('x', x(i)); t.setAttribute('y', H - 8);
+    t.setAttribute('text-anchor', 'middle');
+    t.textContent = wk.replace('2026-','');
+    svg.appendChild(t);
+  });
+
+  // 每个模块一条线
+  selectedMods.forEach((mod, idx) => {
+    const color = TREND_COLORS[idx % TREND_COLORS.length];
+    const pts = modMap[mod] || [];
+    const pathPts = [];
+    pts.forEach((p, i) => {
+      if (p.value == null) return;
+      pathPts.push({ idx: i, value: p.value, week: p.week });
+    });
+    if (pathPts.length === 0) return;
+
+    const d = pathPts.map((p, i) => (i ? 'L' : 'M') + x(p.idx) + ' ' + y(p.value)).join(' ');
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', d);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', color);
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('stroke-linejoin', 'round');
+    path.setAttribute('stroke-linecap', 'round');
+    svg.appendChild(path);
+
+    // 数据点 + tooltip
+    pathPts.forEach(p => {
+      const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      c.setAttribute('cx', x(p.idx));
+      c.setAttribute('cy', y(p.value));
+      c.setAttribute('r', 3);
+      c.setAttribute('fill', color);
+      c.style.cursor = 'pointer';
+      const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+      title.textContent = (MOD_LABELS_EXP[mod] || mod) + ' ' + p.week.replace('2026-','') + ': ' + expandedTrendFmt(p.value, bench);
+      c.appendChild(title);
+      svg.appendChild(c);
+    });
+
+    // 图例
+    const lg = el('span', {className:'expanded-trend-leg-item'},
+      el('span', {className:'expanded-trend-leg-dot', style:{background:color}}),
+      el('span', {className:'expanded-trend-leg-label'}, MOD_LABELS_EXP[mod] || mod)
+    );
+    legendWrap.appendChild(lg);
+  });
+
+  wrap.appendChild(svg);
+}
+
+// 填充模块选择器
+async function initExpandedTrendModSel(){
+  const sel = $('expandedTrendModSel');
+  if (!sel) return;
+  sel.innerHTML = '';
+  // 用 W31（最新周）的模块列表作为候选
+  const data = await fetchExpanded('2026-W31', expandedActiveBench);
+  const mods = data && data.modules ? Object.keys(data.modules).sort((a,b) => {
+    const order = ['bazi','ziwei','qimen','liuyao','liuren','meihua','fengshui','zodiac','tizhi','tcm','wuxing','zeri','koujue','general','huangli','music','lifeindex','lifeplan','faith','mantra','classics','nihaisha','shuhan','acupuncture','mobile','other'];
+    return order.indexOf(a) - order.indexOf(b);
+  }) : [];
+  mods.forEach(mod => {
+    const opt = document.createElement('option');
+    opt.value = mod;
+    opt.textContent = MOD_LABELS_EXP[mod] || mod;
+    sel.appendChild(opt);
+  });
+  // 默认选 Top5（cases 最多）
+  const sorted = mods.sort((a,b) => (data.modules[b].total || 0) - (data.modules[a].total || 0)).slice(0, 5);
+  expandedTrendSelectedMods = new Set(sorted);
+  sorted.forEach(m => {
+    [...sel.options].forEach(o => { if (o.value === m) o.selected = true; });
+  });
+}
+
+async function refreshExpandedTrend(){
+  const hint = $('expandedTrendHint');
+  if (hint){
+    const benchLabel = expandedActiveBench === 'faithfulness' ? '合规均分' : expandedActiveBench === 'latency' ? 'P95 延迟' : '均费';
+    hint.textContent = `· ${benchLabel} · W24→W31`;
+  }
+  const modMap = await buildExpandedTrendSeries(expandedActiveBench);
+  renderExpandedTrend(modMap, expandedActiveBench);
+}
+
+// Top5 变化最大模块
+async function selectTop5ChangeMods(modMap, bench){
+  const changes = [];
+  for (const [mod, pts] of Object.entries(modMap)){
+    const valid = pts.filter(p => p.value != null);
+    if (valid.length < 2) continue;
+    const first = valid[0].value;
+    const last = valid[valid.length - 1].value;
+    changes.push({ mod, delta: Math.abs(last - first) });
+  }
+  changes.sort((a, b) => b.delta - a.delta);
+  return changes.slice(0, 5).map(c => c.mod);
+}
+
 // ===== R216: 诊疗经验蒸馏（R218: GitHub → local 双源回退） =====
 async function fetchDistillReport(){
   const ghUrl = `${GH}/DELIVERY/distill-report-2026-07-28.json`;
@@ -2230,6 +2431,57 @@ document.querySelectorAll('.expanded-tab').forEach(btn => {
   });
 });
 const _expCSV = $('expandedCSVBtn'); if (_expCSV) _expCSV.addEventListener('click', exportExpandedCSV);
+
+// R224: 跨周模块趋势折线图事件
+const _expTrendModSel = $('expandedTrendModSel');
+if (_expTrendModSel){
+  _expTrendModSel.addEventListener('change', () => {
+    expandedTrendSelectedMods = new Set([..._expTrendModSel.selectedOptions].map(o => o.value));
+    const bench = expandedActiveBench;
+    buildExpandedTrendSeries(bench).then(modMap => renderExpandedTrend(modMap, bench));
+  });
+}
+const _expTrendAllBtn = $('expandedTrendAllBtn');
+if (_expTrendAllBtn){
+  _expTrendAllBtn.addEventListener('click', () => {
+    const sel = $('expandedTrendModSel');
+    if (!sel) return;
+    [...sel.options].forEach(o => o.selected = true);
+    expandedTrendSelectedMods = new Set([...sel.options].map(o => o.value));
+    buildExpandedTrendSeries(expandedActiveBench).then(modMap => renderExpandedTrend(modMap, expandedActiveBench));
+  });
+}
+const _expTrendNoneBtn = $('expandedTrendNoneBtn');
+if (_expTrendNoneBtn){
+  _expTrendNoneBtn.addEventListener('click', () => {
+    const sel = $('expandedTrendModSel');
+    if (!sel) return;
+    [...sel.options].forEach(o => o.selected = false);
+    expandedTrendSelectedMods = new Set();
+    renderExpandedTrend({}, expandedActiveBench);
+  });
+}
+const _expTrendTop5Btn = $('expandedTrendTop5Btn');
+if (_expTrendTop5Btn){
+  _expTrendTop5Btn.addEventListener('click', async () => {
+    const sel = $('expandedTrendModSel');
+    if (!sel) return;
+    const modMap = await buildExpandedTrendSeries(expandedActiveBench);
+    const top5 = await selectTop5ChangeMods(modMap, expandedActiveBench);
+    expandedTrendSelectedMods = new Set(top5);
+    [...sel.options].forEach(o => { o.selected = top5.includes(o.value); });
+    renderExpandedTrend(modMap, expandedActiveBench);
+  });
+}
+// tab 切换时也刷新趋势图
+document.querySelectorAll('.expanded-tab').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    await initExpandedTrendModSel();
+    refreshExpandedTrend();
+  });
+});
+// 初始化
+initExpandedTrendModSel().then(() => refreshExpandedTrend());
 
 // 启动
 refresh();
