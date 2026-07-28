@@ -208,6 +208,30 @@
       html += '</div>';
     });
 
+    // 理疗方案联动推荐
+    var organKeywords = results.map(function(r){ return r.organ; }).join(' ');
+    var diseaseMatch = null;
+    if(window.WANGZHEN_KB && window.WANGZHEN_KB.data){
+      var plans = window.WANGZHEN_KB.data.filter(function(d){ return d.category === '理疗' && d.disease; });
+      // 根据脏腑匹配
+      var organMap = {'心':'失眠|高血压|神经衰弱', '肝':'病痄|脱发', '脾':'贫血|病痄|月经不调', '肺':'感冒|咘喘|慢性鼻炎', '肾':'脱发|耳鸣|失眠|男男', '胃':'牙痛|病痄', '大肠':'病痄'};
+      results.forEach(function(r){
+        var organ = r.organ.split('/')[0];
+        var pattern = organMap[organ];
+        if(pattern && !diseaseMatch){
+          var re = new RegExp(pattern);
+          diseaseMatch = plans.find(function(p){ return re.test(p.disease); });
+        }
+      });
+    }
+    if(diseaseMatch){
+      html += '<div class="wangzhen-therapy-rec" style="margin-top:8px;padding:10px;border-radius:6px;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.15)">';
+      html += '<div style="font-size:12px;color:#10b981;font-weight:600;margin-bottom:4px">💨 推荐理疗方案</div>';
+      html += '<div style="font-size:11px;color:#e8e0d0;line-height:1.6">'+diseaseMatch.content.replace(/\n/g,'<br>')+'</div>';
+      html += '<div style="font-size:10px;color:#a09888;margin-top:4px">→ 查看更多理疗方案请点「理疗方桏」Tab</div>';
+      html += '</div>';
+    }
+
     // 强制兜底提示
     html += '<div class="wangzhen-disclaimer">⚠️ 本结果仅为中医面诊筛查参考，不替代医院专业检查。高危信号请及时就医。</div>';
 
@@ -375,6 +399,45 @@
   }
 
   // ===== 主控制器 =====
+  // ===== 诊断历史记录 =====
+  function saveDiagnosisHistory(zoneId, features, results){
+    try {
+      var key = 'wz_diagnosis_history';
+      var history = JSON.parse(localStorage.getItem(key) || '[]');
+      history.unshift({
+        time: new Date().toISOString(),
+        zone: zoneId,
+        features: features,
+        severity: results.length > 0 ? results[0].severity : '',
+        organs: results.map(function(r){ return r.organ; }).join(',')
+      });
+      if(history.length > 20) history = history.slice(0, 20);
+      localStorage.setItem(key, JSON.stringify(history));
+    } catch(e) {}
+  }
+
+  function renderHistory(container){
+    var history = [];
+    try { history = JSON.parse(localStorage.getItem('wz_diagnosis_history') || '[]'); } catch(e) {}
+    if(history.length === 0){
+      container.innerHTML = '<p class="muted">暂无诊断历史</p>';
+      return;
+    }
+    var html = '<div class="wz-history-list">';
+    history.forEach(function(h, i){
+      var time = h.time ? new Date(h.time).toLocaleString('zh-CN').substring(0,16) : '';
+      html += '<div class="wz-history-item">';
+      html += '<span class="wz-history-time">'+time+'</span>';
+      html += '<span class="wz-history-zone">区域'+h.zone+'</span>';
+      if(h.severity) html += '<span class="wz-history-severity">'+h.severity+'</span>';
+      if(h.organs) html += '<span class="wz-history-organs">'+h.organs+'</span>';
+      html += '</div>';
+    });
+    html += '</div>';
+    html += '<button class="btn btn-ghost" onclick="window.wangzhenCenter.clearHistory()" style="margin-top:8px">🗑️ 清除历史</button>';
+    container.innerHTML = html;
+  }
+
   var selectedZone = null;
   var selectedFeatures = [];
 
@@ -395,6 +458,8 @@
       if(organPanel) renderOrganModules(organPanel);
       if(aiStepsPanel) renderAISteps(aiStepsPanel);
       if(therapyPanel) renderTherapy(therapyPanel);
+      var historyPanel = document.getElementById('wangzhen-history');
+      if(historyPanel) renderHistory(historyPanel);
 
       // KB 加载状态
       if(window.WANGZHEN_KB && window.WANGZHEN_KB.loaded){
@@ -450,10 +515,17 @@
       var results = runZoneDiagnose(zoneId, selectedFeatures);
       var panel = document.getElementById('wangzhen-result-panel');
       if(panel) renderResults(panel, results);
+      // 保存到历史
+      saveDiagnosisHistory(zoneId, selectedFeatures, results);
     },
 
     showOrganDetail: showOrganDetail,
     showTherapyDetail: showTherapyDetail,
+    clearHistory: function(){
+      try { localStorage.removeItem('wz_diagnosis_history'); } catch(e) {}
+      var panel = document.getElementById('wangzhen-history');
+      if(panel) renderHistory(panel);
+    },
     filterTherapy: function(keyword){
       var cards = document.querySelectorAll('#therapy-plan-grid .therapy-plan-card');
       if(!cards) return;

@@ -111,6 +111,12 @@
     #wz-mingxiang-result{display:none;margin-top:8px;padding:10px;background:rgba(99,179,237,.05);border:1px solid rgba(99,179,237,.15);border-radius:6px}
 
     .muted{color:var(--wz-paper3);font-size:12px;text-align:center;padding:8px}
+    .wz-history-list{display:flex;flex-direction:column;gap:4px}
+    .wz-history-item{display:flex;gap:6px;align-items:center;padding:5px 8px;border:1px solid var(--wz-border);border-radius:4px;font-size:10px;background:var(--wz-card-bg)}
+    .wz-history-time{color:var(--wz-paper3);min-width:70px}
+    .wz-history-zone{color:var(--wz-gold);font-weight:600}
+    .wz-history-severity{font-size:9px;padding:1px 4px;border-radius:3px;background:rgba(245,158,11,.15);color:#fbbf24}
+    .wz-history-organs{color:var(--wz-cyan)}
 
     @media(max-width:768px){
       .wz-layout{grid-template-columns:1fr}
@@ -239,6 +245,12 @@
         <button class="btn btn-secondary" onclick="window.wangzhenClinical.generateReport()">🖨️ 生成报告</button>
         <button class="btn btn-ghost" onclick="window.wangzhenClinical.speakText('诊断完成，请查看报告')">🔊 语音播报</button>
       </div>
+    </div>
+
+    <!-- 诊断历史 -->
+    <div class="wz-card">
+      <div class="wz-card-title">📋 望诊历史</div>
+      <div id="wangzhen-history"></div>
     </div>
 
     <!-- 历史病例 -->
