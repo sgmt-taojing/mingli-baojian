@@ -239,21 +239,33 @@ var OpsCenter = {
     var self = this;
     var sel = document.getElementById('om-cam-select');
     var info = document.getElementById('om-cam-info');
+    var count = document.getElementById('om-cam-count');
     
     if(!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices){
-      if(sel) sel.innerHTML = '<option value="">浏览器不支持设备检测</option>';
-      if(info) info.innerHTML = '⚠️ 请使用 Chrome/Edge 浏览器，并确保通过 localhost 或 HTTPS 访问';
+      if(sel) sel.innerHTML = '<option value="">浏览器不支持</option>';
+      if(info) info.innerHTML = '⚠️ 请用 Chrome 打开 <b>http://localhost:8914</b><br>不能用 IP 地址或 file:// 打开';
+      if(count) count.textContent = '不支持';
       this.updateOverview('cam', '0');
       return;
     }
     
-    if(info) info.innerHTML = '🔍 正在检测...';
+    if(info) info.innerHTML = '🔍 正在请求摄像头权限...';
+    if(count) count.textContent = '检测中';
     
-    navigator.mediaDevices.enumerateDevices().then(function(devices){
+    // 关键：先 getUserMedia 获取权限，再 enumerateDevices 才能拿到 label
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(function(stream){
+      // 立即停止预览流（只是用来获取权限）
+      stream.getTracks().forEach(function(t){ t.stop(); });
+      
+      if(info) info.innerHTML = '🔍 权限已获取，正在枚举设备...';
+      
+      // 权限拿到后再枚举
+      return navigator.mediaDevices.enumerateDevices();
+    }).then(function(devices){
       self.cameras = devices.filter(function(d){ return d.kind === 'videoinput'; });
       
       if(sel){
-        sel.innerHTML = '<option value="">自动选择（' + self.cameras.length + '个设备）</option>';
+        sel.innerHTML = '<option value="">自动选择（' + self.cameras.length + ' 个）</option>';
         self.cameras.forEach(function(cam, i){
           var label = cam.label || ('摄像头 ' + (i+1));
           var o = document.createElement('option');
@@ -263,7 +275,6 @@ var OpsCenter = {
         });
       }
       
-      // 读取默认设备
       var saved = localStorage.getItem('default_camera_device');
       if(saved && sel){
         for(var i=0; i<sel.options.length; i++){
@@ -273,22 +284,31 @@ var OpsCenter = {
       
       var savedLabel = localStorage.getItem('default_camera_label') || '';
       if(info){
-        var html = '✅ 检测到 ' + self.cameras.length + ' 个摄像头';
-        if(self.cameras.length > 0){
-          html += '：<br>' + self.cameras.map(function(d, i){
+        if(self.cameras.length === 0){
+          info.innerHTML = '⚠️ 未检测到摄像头设备<br>请检查 Type-C 摄像头是否已连接并已被系统识别';
+        } else {
+          var html = '✅ 检测到 <b>' + self.cameras.length + '</b> 个摄像头：';
+          self.cameras.forEach(function(d, i){
             var label = d.label || ('摄像头' + (i+1));
-            var isDefault = d.deviceId === saved ? ' ⭐' : '';
-            return '&nbsp;&nbsp;' + (i+1) + '. ' + label + isDefault;
-          }).join('<br>');
+            var isDefault = d.deviceId === saved ? ' ⭐默认' : '';
+            html += '<br>&nbsp;&nbsp;' + (i+1) + '. ' + label + isDefault;
+          });
+          if(savedLabel) html += '<br>📌 默认设备：' + savedLabel;
+          info.innerHTML = html;
         }
-        if(savedLabel) html += '<br>📌 默认设备：' + savedLabel;
-        info.innerHTML = html;
       }
       
+      if(count) count.textContent = self.cameras.length + ' 个';
       self.updateOverview('cam', self.cameras.length);
       self.renderDevices();
     }).catch(function(err){
-      if(info) info.innerHTML = '❌ 检测失败: ' + err.message + '<br>⚠️ 请确保通过 localhost 或 HTTPS 访问';
+      var hint = '';
+      if(err.name === 'NotAllowedError') hint = '请在 Chrome 地址栏点击摄像头图标 → 允许';
+      else if(err.name === 'NotFoundError') hint = '未检测到摄像头，请检查 Type-C 连接<br>可尝试：拔插 USB → 系统设置查看设备';
+      else if(err.name === 'NotReadableError') hint = '摄像头被其他程序占用，请关闭后重试';
+      else hint = err.message;
+      if(info) info.innerHTML = '❌ ' + (err.name || '错误') + ': ' + hint;
+      if(count) count.textContent = '失败';
       self.updateOverview('cam', '0');
     });
   },
@@ -381,8 +401,14 @@ var OpsCenter = {
   },
 
   scanAll: function(){
+    var btn = event && event.target;
+    if(btn){ var orig = btn.textContent; btn.textContent = '🔄 扫描中...'; btn.disabled = true; }
+    var self = this;
     this.detectCameras();
     this.checkGlass();
+    setTimeout(function(){
+      if(btn){ btn.textContent = orig; btn.disabled = false; }
+    }, 3000);
   },
 
   // ===== 网络状态 =====
