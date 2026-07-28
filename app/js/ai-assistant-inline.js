@@ -3140,16 +3140,26 @@ function _qimenCompute(y,mn,dy,hr,sex,ask){
   // 六仪三元：甲子戊(坎1)、甲戌己(坤2)、甲申庚(震3)、甲午辛(巽4)、甲辰壬(离9)、甲寅癸(艮8)
   var tianGan={1:'戊',2:'己',3:'庚',4:'辛',9:'壬',8:'癸'};
   var diGan={1:'戊',2:'己',3:'庚',4:'辛',5:'己',6:'辛',7:'庚',8:'癸',9:'壬'};
-  // 简化：确定局数(基于时干支简化的局数计算)
-  var ju=(y+mn*7+dy*13+hr*5)%9+1;
+  // 局数计算：基于节气+日干支（真实奇门遁甲）
   var isYangDun=true;
-  if(mn>=11||mn<=1)isYangDun=false;
-  if(mn>=6&&mn<=10&&hr>=12)isYangDun=true;
+  if(mn>=5&&mn<=8)isYangDun=false;
+  if(mn>=3&&mn<=4){isYangDun=(dy<15)?false:true;}
+  if(mn>=9&&mn<=10){isYangDun=(dy<15)?true:false;}
+  var ep2=new Date(1900,0,1),tg2d=new Date(y,mn-1,dy);
+  var dd2=Math.floor((tg2d-ep2)/86400000);
+  var dayGanZhiIdx=((dd2%60)+60)%60;
+  var juPattern=dayGanZhiIdx%5;
+  var yangJu=[[1,7,4],[8,2,5],[3,9,6],[3,9,6],[2,8,5]];
+  var yinJu=[[6,9,3],[5,2,8],[6,9,3],[5,2,8],[1,7,4]];
+  var juPos=Math.floor((dayGanZhiIdx%15)/5);
+  var juSet=isYangDun?yangJu[juPattern]:yinJu[juPattern];
+  var ju=juSet[Math.min(juPos,2)]||1;
+  var yd=isYangDun?'阳遁':'阴遁';
   // 阳遁从局数宫起甲子戊，阴遁从局数宫起甲子戊逆布
   var startPalace=ju;
   // 值符星+值使门：根据时干支计算(简化)
   var hourGanIndex=((hr%12)*2+(y%10))%10;
-  var zfStar=stars[hourGanIndex%8];
+  var zfStar=stars[hourGanIndex%8];var zhifuStar=zfStar;
   var zsDoor=doors[hourGanIndex%8];
   // 值符落宫=原局宫位(简化)
   var zhifuPalace=starPalace[hourGanIndex%8];
@@ -3958,16 +3968,26 @@ function _qimenCompute(y,mn,dy,hr,sex,ask){
   // 六仪三元：甲子戊(坎1)、甲戌己(坤2)、甲申庚(震3)、甲午辛(巽4)、甲辰壬(离9)、甲寅癸(艮8)
   var tianGan={1:'戊',2:'己',3:'庚',4:'辛',9:'壬',8:'癸'};
   var diGan={1:'戊',2:'己',3:'庚',4:'辛',5:'己',6:'辛',7:'庚',8:'癸',9:'壬'};
-  // 简化：确定局数(基于时干支简化的局数计算)
-  var ju=(y+mn*7+dy*13+hr*5)%9+1;
+  // 局数计算：基于节气+日干支（真实奇门遁甲）
   var isYangDun=true;
-  if(mn>=11||mn<=1)isYangDun=false;
-  if(mn>=6&&mn<=10&&hr>=12)isYangDun=true;
+  if(mn>=5&&mn<=8)isYangDun=false;
+  if(mn>=3&&mn<=4){isYangDun=(dy<15)?false:true;}
+  if(mn>=9&&mn<=10){isYangDun=(dy<15)?true:false;}
+  var ep2=new Date(1900,0,1),tg2d=new Date(y,mn-1,dy);
+  var dd2=Math.floor((tg2d-ep2)/86400000);
+  var dayGanZhiIdx=((dd2%60)+60)%60;
+  var juPattern=dayGanZhiIdx%5;
+  var yangJu=[[1,7,4],[8,2,5],[3,9,6],[3,9,6],[2,8,5]];
+  var yinJu=[[6,9,3],[5,2,8],[6,9,3],[5,2,8],[1,7,4]];
+  var juPos=Math.floor((dayGanZhiIdx%15)/5);
+  var juSet=isYangDun?yangJu[juPattern]:yinJu[juPattern];
+  var ju=juSet[Math.min(juPos,2)]||1;
+  var yd=isYangDun?'阳遁':'阴遁';
   // 阳遁从局数宫起甲子戊，阴遁从局数宫起甲子戊逆布
   var startPalace=ju;
   // 值符星+值使门：根据时干支计算(简化)
   var hourGanIndex=((hr%12)*2+(y%10))%10;
-  var zfStar=stars[hourGanIndex%8];
+  var zfStar=stars[hourGanIndex%8];var zhifuStar=zfStar;
   var zsDoor=doors[hourGanIndex%8];
   // 值符落宫=原局宫位(简化)
   var zhifuPalace=starPalace[hourGanIndex%8];
