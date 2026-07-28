@@ -181,14 +181,14 @@
   <div class="card" id="input">
     <h2>📋 基础信息</h2>
     <div class="row">
-      <div><label for="lAge">年龄</label><input aria-label="lAge" id="lAge" type="number" min="1" max="120" value="28"></div>
-      <div><label for="lSex">性别</label><select aria-label="lSex" id="lSex"><option value="male">男</option><option value="female">女</option></select></div>
-      <div><label for="lResidence">现居地</label><input aria-label="lResidence" id="lResidence" placeholder="例：上海"></div>
+      <div><label for="lAge">年龄</label><input aria-label="年龄" id="lAge" type="number" min="1" max="120" value="28"></div>
+      <div><label for="lSex">性别</label><select aria-label="性别" id="lSex"><option value="male">男</option><option value="female">女</option></select></div>
+      <div><label for="lResidence">现居地</label><input aria-label="居住地" id="lResidence" placeholder="例：上海"></div>
     </div>
     <label for="lFocus">关注领域（逗号分隔）</label>
-    <input aria-label="lFocus" id="lFocus" placeholder="例：事业、财运、健康">
+    <input aria-label="关注领域" id="lFocus" placeholder="例：事业、财运、健康">
     <label for="lExtra">补充情况（可选，影响领域加权）</label>
-    <textarea id="lExtra" placeholder="例：计划 30 岁前完成理财布局，金融行业从业5年" aria-label="例：计划 30 岁前完成理财布局，金融行业从业5年"></textarea>
+    <textarea id="lExtra" placeholder="例：计划 30 岁前完成理财布局，金融行业从业5年" aria-label="补充信息"></textarea>
     <button class="btn" id="genBtn" onclick="generate()">✨ 生成蓝图</button>
     <button class="btn btn-ghost" id="printBtn" onclick="window.print()" title="打印蓝图">🖨️ 打印</button>
     <!-- R95 -->
@@ -379,6 +379,16 @@
 
 <style>
 /* R98-s 480+360 紧凑断点 (deduplicated — single copy) */
+@media(max-width:768px){
+  body{font-size:14px}
+  .container,.main,.body,.wrap{max-width:100%;padding:10px}
+  h1{font-size:20px}
+  h2{font-size:16px}
+  h3{font-size:14px}
+  .btn{padding:8px 12px;font-size:13px}
+  table{font-size:12px}
+  .lp-stage-grid{grid-template-columns:repeat(2,1fr)!important}
+}
 @media(max-width:480px){
   body{font-size:13px}
   .container,.main,.body,.wrap{max-width:100%;padding:8px}
@@ -388,6 +398,7 @@
   .btn{padding:6px 10px;font-size:12px}
   table{font-size:11px}
   .row{flex-wrap:wrap;gap:4px}
+  .lp-stage-grid{grid-template-columns:1fr!important}
 }
 @media(max-width:360px){
   body{font-size:12px}
