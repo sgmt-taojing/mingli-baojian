@@ -63,11 +63,17 @@ async function start() {
   try {
     const deviceId = deviceSel.value;
     const constraints = {
-      video: deviceId ? {deviceId: {exact: deviceId}} : true,
-      audio: audioEnable.checked ? {deviceId: micSel.value ? {exact: micSel.value} : undefined, echoCancellation: true, noiseSuppression: true} : false
+      video: deviceId ? {deviceId: {ideal: deviceId}} : true,
+      audio: audioEnable.checked ? {deviceId: micSel.value ? {ideal: micSel.value} : undefined, echoCancellation: true, noiseSuppression: true} : false
     };
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { setStatus('浏览器不支持摄像头，请使用 Chrome/Edge', 'err'); return; }
-    stream = await navigator.mediaDevices.getUserMedia(constraints);
+    try {
+      stream = await navigator.mediaDevices.getUserMedia(constraints);
+    } catch(e1) {
+      // 降级：最宽松约束
+      console.warn('[camera] 约束失败，降级:', e1.message);
+      stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    }
     video.srcObject = stream;
     video.style.display = 'block';
     placeholder.style.display = 'none';
