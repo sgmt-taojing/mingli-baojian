@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>排盘中心 · 命理宝鉴</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/divination-hub.css">
+<style>
+:root{
+  --bg:#0a0e17;--card:#141928;--border:#2a3450;--gold:#c9a84c;--jade:#4ec9b0;
+  --paper:#e8dcc8;--paper2:#b8a88a;--paper3:#8b7e6a;
+  --red:#ef4444;--green:#10b981;--blue:#63b3ed;--purple:#a78bfa;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsoft YaHei',sans-serif;padding:12px;min-height:100vh}
+
+.pp-header{text-align:center;margin-bottom:20px;padding:20px;background:var(--card);border:1px solid var(--border);border-radius:8px}
+.pp-title{font-size:22px;color:var(--gold);letter-spacing:4px;margin-bottom:6px}
+.pp-subtitle{font-size:12px;color:var(--paper3)}
+
+.pp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:900px;margin:0 auto}
+.pp-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;text-decoration:none;color:var(--paper);transition:transform .2s,border-color .2s;position:relative;overflow:hidden}
+.pp-card:hover{transform:translateY(-2px);border-color:var(--gold)}
+.pp-card:active{transform:translateY(0)}
+.pp-icon{font-size:36px;margin-bottom:8px;display:block}
+.pp-name{font-size:15px;color:var(--gold);font-weight:600;margin-bottom:4px}
+.pp-desc{font-size:11px;color:var(--paper3);line-height:1.6}
+.pp-classic{font-size:9px;color:var(--paper3);margin-top:6px;padding-top:6px;border-top:1px solid var(--border);opacity:.7}
+
+.pp-card.pp-bazi{border-left:3px solid var(--gold)}
+.pp-card.pp-ziwei{border-left:3px solid var(--purple)}
+.pp-card.pp-qimen{border-left:3px solid var(--jade)}
+.pp-card.pp-liuyao{border-left:3px solid var(--blue)}
+.pp-card.pp-liuren{border-left:3px solid var(--red)}
+.pp-card.pp-meihua{border-left:3px solid var(--green)}
+.pp-card.pp-fengshui{border-left:3px solid #d4a76a}
+
+.pp-footer{text-align:center;margin-top:24px;font-size:11px;color:var(--paper3)}
+.pp-footer a{color:var(--gold);text-decoration:none}
+
+@media(max-width:768px){
+  .pp-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .pp-card{padding:14px}
+  .pp-icon{font-size:28px}
+  .pp-name{font-size:13px}
+  .pp-desc{font-size:10px}
+}
+@media(max-width:360px){
+  .pp-grid{grid-template-columns:1fr;gap:6px}
+  .pp-card{padding:12px}
+  .pp-icon{font-size:24px}
+  .pp-header{padding:14px}
+  .pp-title{font-size:18px}
+}
+</style>
+</head>
+<body>
+<div class="pp-header">
+  <div class="pp-title">🌀 排盘中心</div>
+  <div class="pp-subtitle">命理宝鉴 · 七模块古制排盘 · 经典依据</div>
+</div>
+
+<div class="pp-grid">
+  <a class="pp-card pp-bazi" href="ai-assistant.html">
+    <span class="pp-icon">📅</span>
+    <div class="pp-name">八字排盘</div>
+    <div class="pp-desc">四柱八字 · 神煞 · 纳音 · 十神 · 大运流年</div>
+    <div class="pp-classic">《渊海子平》《三命通会》</div>
+  </a>
+  
+  <a class="pp-card pp-ziwei" href="ziwei-chart.html">
+    <span class="pp-icon">🌌</span>
+    <div class="pp-name">紫微斗数</div>
+    <div class="pp-desc">119颗星曜 · 十四主星 · 六吉六煞 · 长生十二神 · 大限四化</div>
+    <div class="pp-classic">《紫微斗数全书》</div>
+  </a>
+  
+  <a class="pp-card pp-qimen" href="qimen-chart.html">
+    <span class="pp-icon">🔮</span>
+    <div class="pp-name">奇门遁甲</div>
+    <div class="pp-desc">九宫飞布 · 天地人神 · 八门九星 · 格局判断 · 伏吟反吟</div>
+    <div class="pp-classic">《奇门遁甲秘笈》</div>
+  </a>
+  
+  <a class="pp-card pp-liuyao" href="liuyao-chart.html">
+    <span class="pp-icon">🪙</span>
+    <div class="pp-name">六爻占卜</div>
+    <div class="pp-desc">六十四卦 · 纳甲 · 六亲 · 六神 · 世应 · 变卦</div>
+    <div class="pp-classic">《增删卜易》《卜筮正宗》</div>
+  </a>
+  
+  <a class="pp-card pp-liuren" href="liuren-chart.html">
+    <span class="pp-icon">🌀</span>
+    <div class="pp-name">大六壬</div>
+    <div class="pp-desc">四课三传 · 十二天将 · 神煞 · 昼夜贵人 · 九宗门</div>
+    <div class="pp-classic">《大六壬指南》《六壬大全》</div>
+  </a>
+  
+  <a class="pp-card pp-meihua" href="meihua-chart.html">
+    <span class="pp-icon">🌸</span>
+    <div class="pp-name">梅花易数</div>
+    <div class="pp-desc">本卦变卦 · 互卦 · 体用生克 · 动爻分析</div>
+    <div class="pp-classic">《梅花易数》邵康节</div>
+  </a>
+  
+  <a class="pp-card pp-fengshui" href="fengshui-chart.html">
+    <span class="pp-icon">🧭</span>
+    <div class="pp-name">风水排盘</div>
+    <div class="pp-desc">玄空飞星 · 三元九运 · 24山 · 八宅法 · 太岁三煞</div>
+    <div class="pp-classic">《沈氏玄空学》《八宅明镜》</div>
+  </a>
+  
+  <a class="pp-card" href="divination-hub.html" style="border-left:3px solid var(--paper3)">
+    <span class="pp-icon">🏛️</span>
+    <div class="pp-name" style="color:var(--paper2)">命理宝鉴首页</div>
+    <div class="pp-desc">返回主入口 · 知识库 · AI 助手</div>
+  </a>
+  
+  <a class="pp-card" href="api-docs.html" style="border-left:3px solid var(--paper3)">
+    <span class="pp-icon">📋</span>
+    <div class="pp-name" style="color:var(--paper2)">API 文档</div>
+    <div class="pp-desc">Swagger UI · 169 routes · OpenAPI 3.0.3</div>
+  </a>
+</div>
+
+<div class="pp-footer">
+  命理宝鉴 · 排盘中心 · 7模块古制排盘引擎 v2.2<br>
+  <a href="divination-hub.html">← 返回首页</a>
+</div>
+</body>
+</html>

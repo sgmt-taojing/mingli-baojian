@@ -9,6 +9,7 @@
 
   var ITEMS = [
     { href: 'divination-hub.html', icon: '🏠', label: '首页', key: 'hub' },
+    { href: 'paipan-center.html', icon: '🌀', label: '排盘', key: 'paipan' },
     { href: 'ai-assistant.html', icon: '🤖', label: 'AI助手', key: 'assistant' },
     { href: 'kb-hot.html', icon: '🔥', label: 'KB热词', key: 'kb-hot' },
     { href: 'kb-quality.html', icon: '⭐', label: 'KB质量', key: 'kb-quality' },
