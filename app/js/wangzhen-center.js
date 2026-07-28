@@ -438,6 +438,93 @@
     container.innerHTML = html;
   }
 
+
+  // ===== 色彩量化识别 =====
+  function analyzeColorFromCanvas(canvas){
+    var ctx = canvas.getContext('2d');
+    if(!ctx) return null;
+    var w = canvas.width, h = canvas.height;
+    if(w < 10 || h < 10) return null;
+    // 采样中心区域
+    var cx = Math.floor(w/4), cy = Math.floor(h/4);
+    var cw = Math.floor(w/2), ch = Math.floor(h/2);
+    var data;
+    try { data = ctx.getImageData(cx, cy, cw, ch).data; } catch(e) { return null; }
+    if(!data) return null;
+    var r=0, g=0, b=0, count=0;
+    // 每隔4像素采样一次
+    for(var i=0; i<data.length; i+=16){
+      r += data[i]; g += data[i+1]; b += data[i+2]; count++;
+    }
+    r = Math.round(r/count); g = Math.round(g/count); b = Math.round(b/count);
+    // 匹配五色
+    var color = 'normal';
+    var pathology = '';
+    if(r > 200 && g < 100 && b < 100){ color = 'red'; pathology = '实热/心火/炎症'; }
+    else if(r > 180 && g < 80 && b < 80){ color = 'crimson'; pathology = '阴虚虚火/午后潮红'; }
+    else if(r > 200 && g > 180 && b < 100){ color = 'yellow'; pathology = '脾虚/湿热'; }
+    else if(r > 230 && g > 200 && b < 50){ color = 'bright_yellow'; pathology = '黄疸(肝胆)'; }
+    else if(r > 200 && g > 190 && b > 180){ color = 'pale'; pathology = '气血不足/虚寒'; }
+    else if(r < 100 && g > 150 && b < 100){ color = 'blue_green'; pathology = '寒证/痛证/肝郁'; }
+    else if(r < 80 && g < 80 && b < 80){ color = 'dark'; pathology = '肾虚/血瘀/危重'; }
+    else if(r < 100 && b > 150){ color = 'cyanotic'; pathology = '缺氧/心肺功能衰竭'; }
+    return { r:r, g:g, b:b, color:color, pathology:pathology };
+  }
+
+  function renderColorAnalysis(container, result){
+    if(!result){ container.innerHTML = '<p class="muted">色彩分析不可用</p>'; return; }
+    var colorMap = { red:'#ef4444', crimson:'#dc2626', yellow:'#fbbf24', bright_yellow:'#facc15', pale:'#e5e7eb', blue_green:'#10b981', dark:'#374151', cyanotic:'#3b82f6', normal:'#10b981' };
+    var bg = colorMap[result.color] || '#999';
+    var html = '<div class="wz-color-result" style="padding:12px;border-radius:8px;background:'+bg+'15;border:1px solid '+bg+'40">';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
+    html += '<div style="width:32px;height:32px;border-radius:50%;background:rgb('+result.r+','+result.g+','+result.b+');border:2px solid '+bg+'"></div>';
+    html += '<div><div style="font-size:13px;color:var(--wz-paper);font-weight:600">'+result.color.toUpperCase()+' RGB('+result.r+','+result.g+','+result.b+')</div>';
+    if(result.pathology) html += '<div style="font-size:11px;color:'+bg+'">'+result.pathology+'</div>';
+    html += '</div></div>';
+    html += '<div style="font-size:10px;color:var(--wz-paper3)">↑ 为面部中心区均色采样结果</div>';
+    html += '</div>';
+    container.innerHTML = html;
+  }
+
+
+  // ===== 舌诊面诊速查 =====
+  function renderQuickRef(container){
+    var html = '<div class="wz-quick-ref">';
+    html += '<div class="quick-ref-tabs"><button class="qr-tab active" onclick="window.wangzhenCenter.switchQuickRef(\'tongue\')">\u820c\u8bca</button><button class="qr-tab" onclick="window.wangzhenCenter.switchQuickRef(\'face\')">\u9762\u8bca36\u7ef4</button></div>';
+    html += '<div id="qr-tongue" class="qr-panel" style="display:block">';
+    var tongue = { '舌质':{ '淡红':'正常', '淡白':'气血虚/阳虚', '红':'热证', '绛':'热入营血/阴虚火旺', '紫':'瘀血', '青紫':'寒凝血瘀/中毒', '瘀斑':'瘀血阻络', '红绛':'阴虚火旺', '暗红':'热入血分/瘀热' },
+      '舌形':{ '正常':'老嫩适中', '胖大':'脾虚湿盛', '瘦薄':'气血两虚/阴虚', '齿痕':'脾虚湿盛', '裂纹':'阴虚/血虚', '芒刺':'热极', '挝软':'气血虚极' },
+      '舌态':{ '正常':'伸缩自如', '歪斜':'中风/中风先兆', '颤动':'肝风内动/血虚', '吐弄':'心脾热盛/动风先兆' },
+      '舌苔':{ '薄白':'正常', '白厚':'寒湿', '薄黄':'表热', '黄厚':'湿热/食积', '灰黑':'热极/寒极', '无苔':'胃阴枯竭/阴虚', '花剥':'胃气阴两伤', '镜面':'胃阴枯竭' },
+      '舌下络脉':{ '正常':'淡红润泽', '粗张青紫':'瘀血阻络' } };
+    Object.keys(tongue).forEach(function(cat){
+      html += '<div class="qr-group"><div class="qr-group-title">'+cat+'</div>';
+      Object.keys(tongue[cat]).forEach(function(k){
+        var v = tongue[cat][k];
+        var cls = v === '正常' ? 'qr-item-ok' : 'qr-item-warn';
+        html += '<div class="qr-item '+cls+'"><span class="qr-key">'+k+'</span><span class="qr-val">'+v+'</span></div>';
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+
+    html += '<div id="qr-face" class="qr-panel" style="display:none">';
+    var face = { '五色':{ '青':'肝/寒/痛/瘀', '赤':'心/热', '黄':'脾/湿', '白':'肺/虚', '黑':'肾/寒/重病' },
+      '五部':{ '额':'心', '鼻':'脾', '左颈':'肝', '右颈':'肺', '下颌':'肾' },
+      '五志':{ '怒':'面部青筋/皱眉', '喜':'面红目赤', '思':'面容憔悴', '悲':'面色惨白', '恐':'面色晦暗' },
+      '面部形态':{ '浮肿':'脾虚湿盛/肾虚水泛', '消瘦':'气血虚', '红斑':'热/血热', '黄染':'黃疸', '色素沉着':'肾虚/肝郁', '毛细血管扩张':'血热/肝硬化', '皱纹':'衰老/气血虚' } };
+    Object.keys(face).forEach(function(cat){
+      html += '<div class="qr-group"><div class="qr-group-title">'+cat+'</div>';
+      Object.keys(face[cat]).forEach(function(k){
+        html += '<div class="qr-item"><span class="qr-key">'+k+'</span><span class="qr-val">'+face[cat][k]+'</span></div>';
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+    html += '</div>';
+    container.innerHTML = html;
+  }
+
   var selectedZone = null;
   var selectedFeatures = [];
 
@@ -458,8 +545,11 @@
       if(organPanel) renderOrganModules(organPanel);
       if(aiStepsPanel) renderAISteps(aiStepsPanel);
       if(therapyPanel) renderTherapy(therapyPanel);
+      var quickRefPanel = document.getElementById('wangzhen-quick-ref');
+      var colorAnalysisPanel = document.getElementById('wangzhen-color-analysis');
       var historyPanel = document.getElementById('wangzhen-history');
       if(historyPanel) renderHistory(historyPanel);
+      if(quickRefPanel) renderQuickRef(quickRefPanel);
 
       // KB 加载状态
       if(window.WANGZHEN_KB && window.WANGZHEN_KB.loaded){
@@ -521,6 +611,20 @@
 
     showOrganDetail: showOrganDetail,
     showTherapyDetail: showTherapyDetail,
+    switchQuickRef: function(tab){
+      var tongues = document.querySelectorAll('#qr-tongue');
+      var faces = document.querySelectorAll('#qr-face');
+      var tabs = document.querySelectorAll('.qr-tab');
+      tabs.forEach(function(t){ t.classList.toggle('active', t.textContent.indexOf(tab==='tongue'?'舌':'面') >= 0); });
+      document.getElementById('qr-tongue').style.display = tab === 'tongue' ? 'block' : 'none';
+      document.getElementById('qr-face').style.display = tab === 'face' ? 'block' : 'none';
+    },
+    analyzePhotoColor: function(canvas){
+      var result = analyzeColorFromCanvas(canvas);
+      var panel = document.getElementById('wangzhen-color-analysis');
+      if(panel && result) renderColorAnalysis(panel, result);
+      return result;
+    },
     clearHistory: function(){
       try { localStorage.removeItem('wz_diagnosis_history'); } catch(e) {}
       var panel = document.getElementById('wangzhen-history');

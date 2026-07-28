@@ -126,6 +126,17 @@
     .therapy-plan-card:hover{border-color:var(--wz-jade);background:rgba(16,185,129,.06)}
     .therapy-plan-name{font-size:12px;color:var(--wz-paper);font-weight:600;margin-bottom:2px}
     .therapy-plan-pts{font-size:10px;color:var(--wz-paper3)}
+    .wz-quick-ref{margin-top:8px}
+    .quick-ref-tabs{display:flex;gap:4px;margin-bottom:10px}
+    .qr-tab{padding:6px 14px;border:1px solid var(--wz-border);border-radius:6px;cursor:pointer;font-size:12px;color:var(--wz-paper3);background:transparent}
+    .qr-tab.active{border-color:var(--wz-gold);color:var(--wz-gold);background:rgba(201,168,76,.08)}
+    .qr-group{margin-bottom:12px}
+    .qr-group-title{font-size:13px;color:var(--wz-gold);margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--wz-border)}
+    .qr-item{display:flex;justify-content:space-between;padding:4px 8px;font-size:12px;border-bottom:1px solid rgba(201,168,76,.05)}
+    .qr-item-ok .qr-key{color:var(--wz-jade)} .qr-item-ok .qr-val{color:var(--wz-jade)}
+    .qr-item-warn .qr-key{color:#fbbf24} .qr-item-warn .qr-val{color:#f87171}
+    .qr-key{color:var(--wz-paper)} .qr-val{color:var(--wz-paper3)}
+    .wz-color-result{margin-top:8px}
     .section-title{font-size:15px;color:var(--wz-gold);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--wz-border)}
     .panel-section{margin-bottom:24px}
 
@@ -153,6 +164,7 @@
   <div class="wangzhen-tab" data-tab="organs" onclick="wangzhenCenter.switchTab('organs')">👁️ 九大模块</div>
   <div class="wangzhen-tab" data-tab="ai" onclick="wangzhenCenter.switchTab('ai')">🤖 AI七步流程</div>
   <div class="wangzhen-tab" data-tab="therapy" onclick="wangzhenCenter.switchTab('therapy')">💊 理疗方案</div>
+  <div class="wangzhen-tab" data-tab="quickref" onclick="wangzhenCenter.switchTab('quickref')">👅 舌面速查</div>
 </nav>
 
 <!-- Tab: A-K 分区诊断 -->
@@ -196,6 +208,14 @@
   <div class="panel-section">
     <div class="section-title">穴位理疗方案库</div>
     <div id="wangzhen-therapy"></div>
+  </div>
+</div>
+
+<!-- Tab: 舌面速查 -->
+<div class="wangzhen-tab-panel" data-tab="quickref">
+  <div class="panel-section">
+    <div class="section-title">舌诊28象 + 面诊36维速查</div>
+    <div id="wangzhen-quick-ref"></div>
   </div>
 </div>
 

@@ -117,6 +117,16 @@
     .wz-history-zone{color:var(--wz-gold);font-weight:600}
     .wz-history-severity{font-size:9px;padding:1px 4px;border-radius:3px;background:rgba(245,158,11,.15);color:#fbbf24}
     .wz-history-organs{color:var(--wz-cyan)}
+    .wz-quick-ref{margin-top:8px}
+    .quick-ref-tabs{display:flex;gap:4px;margin-bottom:8px}
+    .qr-tab{padding:5px 12px;border:1px solid var(--wz-border);border-radius:4px;cursor:pointer;font-size:11px;color:var(--wz-paper3);background:transparent}
+    .qr-tab.active{border-color:var(--wz-gold);color:var(--wz-gold);background:rgba(201,168,76,.08)}
+    .qr-group{margin-bottom:8px}
+    .qr-group-title{font-size:12px;color:var(--wz-gold);margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid var(--wz-border)}
+    .qr-item{display:flex;justify-content:space-between;padding:3px 6px;font-size:11px;border-bottom:1px solid rgba(201,168,76,.05)}
+    .qr-item-ok .qr-key{color:var(--wz-jade)} .qr-item-ok .qr-val{color:var(--wz-jade)}
+    .qr-item-warn .qr-key{color:#fbbf24} .qr-item-warn .qr-val{color:#f87171}
+    .qr-key{color:var(--wz-paper)} .qr-val{color:var(--wz-paper3)}
 
     @media(max-width:768px){
       .wz-layout{grid-template-columns:1fr}
@@ -212,6 +222,7 @@
         <div class="wz-tab" onclick="window.wangzhenCenter.switchTab('organs')">👁️ 五官</div>
         <div class="wz-tab" onclick="window.wangzhenCenter.switchTab('ai')">🤖 AI流程</div>
         <div class="wz-tab" onclick="window.wangzhenCenter.switchTab('therapy')">💊 理疗</div>
+        <div class="wz-tab" onclick="window.wangzhenCenter.switchTab('quickref')">👅 速查</div>
       </div>
 
       <!-- 分区诊断面板 (复用 wangzhen-center) -->
@@ -224,6 +235,7 @@
       <div data-tab="organs" style="display:none"><div id="wangzhen-organs"></div></div>
       <div data-tab="ai" style="display:none"><div id="wangzhen-ai-steps"></div></div>
       <div data-tab="therapy" style="display:none"><div id="wangzhen-therapy"></div></div>
+      <div data-tab="quickref" style="display:none"><div id="wangzhen-quick-ref"></div></div>
     </div>
 
     <!-- 命相同参 -->
