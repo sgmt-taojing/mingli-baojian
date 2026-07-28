@@ -641,10 +641,37 @@ function restoreFromHash(){
 }
 
 function shareUrl(){
-  const url=location.href;
-  if(navigator.share){navigator.share({title:'人生规划蓝图',url}).catch(()=>{});}
-  else if(navigator.clipboard){navigator.clipboard.writeText(url).then(()=>showToast('✅ 链接已复制，可粘贴到微信/QQ分享'));}
-  else prompt('复制链接分享：',url);
+  // R209: 优先用后端短链 API
+  _createShortLink(function(shortUrl){
+    if(shortUrl){
+      if(navigator.share){navigator.share({title:'人生规划蓝图',url:shortUrl}).catch(()=>{});}
+      else if(navigator.clipboard){navigator.clipboard.writeText(shortUrl).then(function(){showToast('✅ 短链已复制，可粘贴到微信/QQ分享');});}
+      else prompt('复制链接分享：',shortUrl);
+    } else {
+      // 兜底：用原始 URL
+      var url=location.href;
+      if(navigator.share){navigator.share({title:'人生规划蓝图',url:url}).catch(function(){});}
+      else if(navigator.clipboard){navigator.clipboard.writeText(url).then(function(){showToast('✅ 链接已复制，可粘贴到微信/QQ分享');});}
+      else prompt('复制链接分享：',url);
+    }
+  });
+}
+
+// R209: 调用后端 /api/public/share-link 生成短链
+function _createShortLink(cb){
+  try{
+    var h=location.hash.slice(1);
+    if(!h){ cb(null); return; }
+    // 解码 hash 为短 key 格式
+    var d=JSON.parse(decodeURIComponent(escape(atob(h))));
+    var data={a:d.age!==undefined?d.age:d.a, s:d.sex!==undefined?d.sex:d.s, r:d.residence!==undefined?d.residence:d.r, f:d.focus!==undefined?d.focus:d.f, e:d.extra!==undefined?d.extra:d.e};
+    // 移除空值
+    Object.keys(data).forEach(function(k){ if(data[k]===undefined||data[k]===''||data[k]===null) delete data[k]; });
+    fetch('/api/public/share-link',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'lifeplan',data:data})})
+      .then(function(r){return r.json();})
+      .then(function(j){ if(j&&j.ok&&j.shortUrl) cb(j.shortUrl); else cb(null); })
+      .catch(function(){ cb(null); });
+  }catch(e){ cb(null); }
 }
 
 function copyTxt(){
@@ -963,37 +990,39 @@ function showQrModal() {
   const modal = document.getElementById('qrModal');
   const canvas = document.getElementById('qrCanvas');
   const urlText = document.getElementById('qrUrlText');
-  const url = location.href;
-  // R205: URL 过长时用短链格式（仅核心参数）
-  var qrUrl = url;
-  if (url.length > 120) {
-    try {
-      var u = new URL(url);
-      qrUrl = u.origin + u.pathname + u.hash;
-    } catch(e) {}
-  }
-  urlText.textContent = qrUrl;
-  urlText.title = url;
-  const ok = renderQRToCanvas(canvas, qrUrl);
-  if (!ok) {
-    // R205: 最终兜底 — 用纯 origin+pathname 不含 hash
-    qrUrl = location.origin + location.pathname;
-    urlText.textContent = '链接过长，已生成简化二维码（扫码后需手动输入参数）';
-    const ok2 = renderQRToCanvas(canvas, qrUrl);
-    if (!ok2) {
-      canvas.style.display = 'none';
-      urlText.textContent = '二维码生成失败，请使用「复制链接」按钮';
+  // R209: 优先用后端短链，短链更短更易扫码
+  _createShortLink(function(shortUrl){
+    var qrUrl = shortUrl || location.href;
+    // R205 fallback: URL 过长时用短链格式
+    if (!shortUrl && qrUrl.length > 120) {
+      try {
+        var u = new URL(qrUrl);
+        qrUrl = u.origin + u.pathname + u.hash;
+      } catch(e) {}
+    }
+    urlText.textContent = shortUrl ? shortUrl : qrUrl;
+    urlText.title = shortUrl || location.href;
+    const ok = renderQRToCanvas(canvas, qrUrl);
+    if (!ok) {
+      // 最终兜底 — 用纯 origin+pathname 不含 hash
+      qrUrl = location.origin + location.pathname;
+      urlText.textContent = '链接过长，已生成简化二维码（扫码后需手动输入参数）';
+      const ok2 = renderQRToCanvas(canvas, qrUrl);
+      if (!ok2) {
+        canvas.style.display = 'none';
+        urlText.textContent = '二维码生成失败，请使用「复制链接」按钮';
+      } else {
+        canvas.style.display = 'block';
+      }
     } else {
       canvas.style.display = 'block';
     }
-  } else {
-    canvas.style.display = 'block';
-  }
-  if (typeof modal.showModal === 'function') {
-    if (!modal.open) modal.showModal();
-  } else {
-    modal.style.display = 'flex';
-  }
+    if (typeof modal.showModal === 'function') {
+      if (!modal.open) modal.showModal();
+    } else {
+      modal.style.display = 'flex';
+    }
+  });
 }
 function closeQrModal() {
   const modal = document.getElementById('qrModal');
