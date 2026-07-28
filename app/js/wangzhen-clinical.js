@@ -549,6 +549,141 @@
     completeStep(5);
   }
 
+
+  // ===== 患者搜索 =====
+  function searchPatient(keyword){
+    var list = [];
+    try { list = JSON.parse(localStorage.getItem('mlbj_doctor_patients') || '[]'); } catch(e) {}
+    if(!keyword){
+      renderPatientList(list);
+      return;
+    }
+    var filtered = list.filter(function(p){
+      var name = (p.name || '').toLowerCase();
+      var chief = (p.chief || '').toLowerCase();
+      var phone = (p.phone || '').toLowerCase();
+      var kw = keyword.toLowerCase();
+      return name.indexOf(kw) >= 0 || chief.indexOf(kw) >= 0 || phone.indexOf(kw) >= 0;
+    });
+    renderPatientList(filtered);
+    // 更新计数
+    var countEl = document.getElementById('wz-patient-count');
+    if(countEl) countEl.textContent = filtered.length;
+  }
+
+  // ===== 复诊：显示上次就诊信息 =====
+  function showFollowupInfo(patientId, patientName){
+    var history = [];
+    try { history = JSON.parse(localStorage.getItem('wz_diagnosis_history') || '[]'); } catch(e) {}
+    var patientCases = history.filter(function(h){ return h.patient_id === patientId || h.patient_name === patientName; });
+    
+    var followupEl = document.getElementById('wz-followup-actions');
+    var infoEl = document.getElementById('wz-last-visit-info');
+    if(!followupEl) return;
+    
+    if(patientCases.length === 0){
+      followupEl.style.display = 'none';
+      return;
+    }
+    
+    followupEl.style.display = 'block';
+    var lastVisit = patientCases[0];
+    var lastTime = lastVisit.timestamp ? new Date(lastVisit.timestamp).toLocaleDateString('zh-CN') : '';
+    var visitCount = patientCases.length;
+    
+    if(infoEl){
+      infoEl.innerHTML = '就诊次数：' + visitCount + '次 · 上次就诊：' + lastTime + '<br>上次诊断：' + (lastVisit.diagnosis_text || '').substring(0, 60) + '...';
+    }
+  }
+
+  // ===== 开始复诊 =====
+  function startFollowup(){
+    if(!currentPatient || !currentPatient.id){
+      showToast('请先选择患者', 'warning');
+      return;
+    }
+    // 清空当前诊断区
+    var resultPanel = document.getElementById('wangzhen-result-panel');
+    if(resultPanel) resultPanel.innerHTML = '<div class="muted">复诊中，请重新进行望诊诊断</div>';
+    var aiResult = document.getElementById('wz-ai-result');
+    if(aiResult) aiResult.innerHTML = '';
+    var voiceText = document.getElementById('wz-voice-text');
+    if(voiceText) voiceText.value = '';
+    var healthAnalysis = document.getElementById('wz-health-analysis');
+    if(healthAnalysis) healthAnalysis.innerHTML = '';
+    
+    // 重置步骤
+    completedSteps = {};
+    currentStep = 2; // 从拍照开始（患者已知）
+    updateStepper();
+    
+    showToast('🔄 复诊已启动，请从拍照采集开始');
+    // 滚动到摄像头
+    var camera = document.getElementById('wz-camera-video');
+    if(camera){
+      if(camera.scrollIntoView) camera.scrollIntoView({behavior:'smooth', block:'center'});
+      camera.style.boxShadow = '0 0 0 2px var(--wz-gold)';
+      setTimeout(function(){ camera.style.boxShadow = ''; }, 2000);
+    }
+  }
+
+  // ===== 查看完整病历 =====
+  function viewPatientHistory(){
+    if(!currentPatient || !currentPatient.id){
+      showToast('请先选择患者', 'warning');
+      return;
+    }
+    var history = [];
+    try { history = JSON.parse(localStorage.getItem('wz_diagnosis_history') || '[]'); } catch(e) {}
+    var patientCases = history.filter(function(h){
+      return h.patient_id === currentPatient.id || h.patient_name === currentPatient.name;
+    });
+    
+    var modal = document.getElementById('wz-patient-history-modal');
+    var body = document.getElementById('wz-patient-history-body');
+    if(!modal || !body) return;
+    
+    var html = '<div style="font-size:16px;color:var(--wz-gold);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.2)">📂 ' + currentPatient.name + ' — 完整病历</div>';
+    
+    // 患者基本信息
+    html += '<div style="margin-bottom:12px;padding:10px;background:rgba(0,0,0,.2);border-radius:6px">';
+    html += '<div style="font-size:12px;color:var(--wz-paper3)">性别：' + (currentPatient.gender === 'male' ? '男' : currentPatient.gender === 'female' ? '女' : '-') + ' · 年龄：' + (currentPatient.age || '?') + '</div>';
+    if(currentPatient.chief) html += '<div style="font-size:12px;color:var(--wz-paper3)">主诉：' + currentPatient.chief + '</div>';
+    if(currentPatient.dayMaster) html += '<div style="font-size:11px;color:var(--wz-paper3)">体质：' + currentPatient.dayMaster + (currentPatient.wuxingLack && currentPatient.wuxingLack.length > 0 ? ' 缺' + currentPatient.wuxingLack.join('') : '') + '</div>';
+    html += '</div>';
+    
+    // 诊断历史时间线
+    if(patientCases.length === 0){
+      html += '<div class="muted">暂无诊断历史</div>';
+    } else {
+      html += '<div style="font-size:13px;color:var(--wz-gold);margin-bottom:8px">📋 诊断历史（' + patientCases.length + '次）</div>';
+      patientCases.forEach(function(h, i){
+        var time = h.timestamp ? new Date(h.timestamp).toLocaleString('zh-CN').substring(0, 16) : '';
+        var isLatest = i === 0;
+        html += '<div style="margin-bottom:10px;padding:10px;border:1px solid ' + (isLatest ? 'rgba(201,168,76,.3)' : 'var(--wz-border)') + ';border-radius:6px;background:' + (isLatest ? 'rgba(201,168,76,.06)' : 'rgba(0,0,0,.1)') + '">';
+        if(isLatest) html += '<div style="font-size:10px;color:var(--wz-gold);margin-bottom:4px">📌 最近一次</div>';
+        html += '<div style="font-size:11px;color:var(--wz-paper3);margin-bottom:4px">' + time + '</div>';
+        if(h.diagnosis_text) html += '<div style="font-size:12px;margin-bottom:4px"><b style="color:var(--wz-paper)">望诊：</b>' + h.diagnosis_text.substring(0, 150).replace(/\n/g, ' ') + '</div>';
+        if(h.ai_analysis) html += '<div style="font-size:11px;margin-bottom:4px;color:var(--wz-paper2)"><b>AI：</b>' + h.ai_analysis.substring(0, 100).replace(/\n/g, ' ') + '</div>';
+        if(h.voice_notes) html += '<div style="font-size:11px;margin-bottom:4px;color:var(--wz-jade)"><b>医嘱：</b>' + h.voice_notes.substring(0, 100).replace(/\n/g, ' ') + '</div>';
+        html += '</div>';
+      });
+    }
+    
+    // 体质趋势对比
+    if(patientCases.length >= 2){
+      html += '<div style="margin-top:12px;padding:10px;background:rgba(99,179,237,.06);border:1px solid rgba(99,179,237,.12);border-radius:6px">';
+      html += '<div style="font-size:12px;color:var(--wz-cyan);margin-bottom:4px">📊 体质趋势对比</div>';
+      html += '<div style="font-size:11px;color:var(--wz-paper3)">首次就诊：' + (patientCases[patientCases.length-1].timestamp ? new Date(patientCases[patientCases.length-1].timestamp).toLocaleDateString('zh-CN') : '') + '</div>';
+      html += '<div style="font-size:11px;color:var(--wz-paper3)">最近就诊：' + (patientCases[0].timestamp ? new Date(patientCases[0].timestamp).toLocaleDateString('zh-CN') : '') + '</div>';
+      html += '<div style="font-size:11px;color:var(--wz-jade);margin-top:4px">💡 建议对比两次望诊结果，观察面色变化趋势</div>';
+      html += '</div>';
+    }
+    
+    body.innerHTML = html;
+    modal.style.display = 'flex';
+  }
+
   var currentPatient = null;
 
   function loadPatientList(){
@@ -622,6 +757,7 @@
       window.wangzhenClinical.fetchBazi();
     }
     showToast('已选择患者: ' + p.name);
+    showFollowupInfo(p.id, p.name);
     completeStep(1);
   }
 
@@ -1186,6 +1322,9 @@
       if(capEl) capEl.textContent = caps.length > 0 ? '✅ 已启用: ' + caps.join(' ') : '⚠️ 浏览器能力受限';
     },
 
+    searchPatient: searchPatient,
+    startFollowup: startFollowup,
+    viewPatientHistory: viewPatientHistory,
     runComprehensiveAnalysis: runComprehensiveAnalysis,
     pushToMaster: pushToMaster,
     refreshMasterReply: refreshMasterReply,
