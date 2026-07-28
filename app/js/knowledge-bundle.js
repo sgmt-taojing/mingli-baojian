@@ -4980,7 +4980,8 @@ function renderProgressTracker(el, faith) {
   phases.forEach(function(p){let pc=p.progress>=80?'#2ecc71':p.progress>=40?'#f39c12':'#3498db';html+='<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:12px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">'+p.icon+'</span><span style="font-size:13px;font-weight:bold;opacity:.85">'+p.name+'</span></div><span style="font-size:11px;opacity:.4">'+p.progress+'%</span></div><div style="background:rgba(255,255,255,.08);border-radius:4px;height:6px;overflow:hidden"><div style="height:100%;width:'+p.progress+'%;background:'+pc+';border-radius:4px"></div></div><div style="font-size:10px;opacity:.4;margin-top:4px">'+p.desc+'</div></div>';});
   html += '</div>';
   let quotes = ['滴水穿石，非力也，恒也。——修行贵在坚持','不积跬步，无以至千里。——每日定课不可间断','道虽迩，不行不至；事虽小，不为不成。','修行如逆水行舟，不进则退。','一日修来一日功，一日不修一日空。'];
-  html += '<div style="padding:14px;background:'+col.main+'11;border:1px solid '+col.main+'22;border-radius:12px;text-align:center"><div style="font-size:12px;opacity:.5;margin-bottom:8px">💪 修行箴言</div><div style="font-size:14px;color:'+col.main+';font-style:italic;opacity:.8">'+quotes[Math.floor(Math.random()*quotes.length)]+'</div></div>';
+  let _qIdx = Math.floor((new Date().getHours() + new Date().getMinutes()) % quotes.length);
+  html += '<div style="padding:14px;background:'+col.main+'11;border:1px solid '+col.main+'22;border-radius:12px;text-align:center"><div style="font-size:12px;opacity:.5;margin-bottom:8px">💪 修行箴言</div><div style="font-size:14px;color:'+col.main+';font-style:italic;opacity:.8">'+quotes[_qIdx]+'</div></div>';
   el.innerHTML = html;
 }
 

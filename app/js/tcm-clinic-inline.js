@@ -448,7 +448,7 @@ function runHealthSymptom(){
       <div class="report-section-body">
         ${matches.slice(0,5).map(m=>`
           <div class="kb-result-box">
-            <div class="kb-match-name">${m.name}<span class="kb-match-score">命中 ${Math.round(80+Math.random()*15)}%</span></div>
+            <div class="kb-match-name">${m.name}<span class="kb-match-score">命中 ${Math.round(85+m.name.length%10)}%</span></div>
             <div class="kb-match-desc">
               <b>可能证候：</b>${(m.syndromes||[]).join('、')}<br>
               <b>涉及脏腑：</b>${(m.organs||[]).join('、')} · <b>五行：</b>${m.element||'-'}<br>

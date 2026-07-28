@@ -3183,7 +3183,7 @@ function exportRadarCSV(){
   const modSel = $('radarModSel');
   const week = weekSel.value || WEEKS[WEEKS.length-1];
   const selected = Array.from(modSel.selectedOptions).map(o => o.value);
-  if(selected.length === 0){ alert('请先选择模块'); return; }
+  if(selected.length === 0){ showToast('请先选择模块'); return; }
   const header = ['module', ...RADAR_DIMS.map(d => d.label)];
   const rows = [header];
   // Fetch synchronously from cache
