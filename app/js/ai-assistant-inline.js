@@ -2963,6 +2963,7 @@ function _getUnifiedReport(modId,data){
     for(var di=0;di<8;di++){var sa=Math.floor(age/10)*10+di*10-10;if(sa<0)sa=0;decades.push('【'+sa+'-'+(sa+9)+'岁】'+Math.round(totalScore*(0.8+Math.sin(di)*0.15))+'/100');}
     var decadeText=decades.join('  ');
     var verdict=totalScore>=85?'S级：五行平衡，六维度均出色。人生底牌好，仍需努力将潜力转化为现实。':totalScore>=75?'A级：五行较好，多维度优秀。重点发挥事业和财运优势。':totalScore>=65?'B级：五行基本平衡，部分维度突出。找到优势赛道，专注发展。':totalScore>=55?'C级：五行有缺失，需通过后天化解补齐。命数只占30%，努力占70%。':'D级：五行失衡严重。建议全面参考化解方案，健康为先，稳中求进。';
+    return'━━━ 生命指数报告 ━━━\n\n【基本信息】\n'+('性别：'+sex+'，约'+age+'岁')+'\n日主：'+(dm==='未知'?'（需提供完整出生日期）':dm)+'\n五行：'+ele+'\n五行缺失：'+lacking+'\n综合评级：'+gradeColor+' '+grade+' （'+totalScore+'/100）\n\n━━━ 壹·六维度评分 ━━━\n'+dimsText+'\n\n━━━ 贰·人生阶段运势 ━━━\n'+stageText+'\n\n━━━ 叁·十年运势曲线 ━━━\n'+decadeText+'\n\n━━━ 肆·五行能量分布 ━━━\n'+wuxingBar+'\n\n━━━ 伍·五行缺失化解 ━━━\n缺失元素：'+lacking+'\n幸运方位：'+hj.fangwei+'\n幸运颜色：'+hj.yanse+'\n幸运数字：'+hj.shuzi+'\n推荐饰品：'+hj.peishi+'\n\n━━━ 陆·综合评定 ━━━\n'+verdict+'\n\n提示：本报告基于五行平衡法推算，仅供命理参考。';
   }
 if(modId==='lifeplan'){
     var m=d[0].match(/(\d{4})[年\-\/](\d{1,2})[月\-\/](\d{1,2})[日]?\s*(\d{1,2})?[时点]?\s*([男女])?/);
@@ -3284,7 +3285,7 @@ async function _paipanAsync(y,m,d,h){
   return _paipanLocal(y,m,d,h);
 }
 function _paipan(y,m,d,h){return _paipanLocal(y,m,d,h);}
-function _paipanLocal(y,m,d,h){
+function _paipanLocal(y,m,d,h,gender){
   var tg=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
   var dz=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
   // 60甲子循环节气推算：基于地球公转周期的天文近似公式
@@ -3366,10 +3367,15 @@ function _paipanLocal(y,m,d,h){
   [yS+yB,mS+mB,dS+dB,hS+hB].forEach(function(g){wx[em[g[0]]]++;wx[em[g[1]]]++;});
   var dayunList=[];
   var curM=monthIdx;
+  // 大运顺逆：年干阳(偶数)+男=顺, 年干阳+女=逆, 年干阴(奇数)+男=逆, 年干阴+女=顺
+  var yYang=(yI%2===0); // 偶数=阳干
+  var isMale=(gender!=='female');
+  var direction=(yYang===isMale)?1:-1; // 阳男/阴女=顺(1), 阴男/阳女=逆(-1)
+  var startAge=8; // 简化：统一8岁起运
   for(var i=0;i<8;i++){
-    curM=(curM+1)%12;
+    curM=(curM+direction+12)%12;
     var dyGz=tg[((yI*2+curM+2)%10+10)%10]+dz[((curM+2)%12+12)%12];
-    dayunList.push({age:5+i*10,ganzhi:dyGz,shishen:shishen(dyGz[0])});
+    dayunList.push({age:startAge+i*10,ganzhi:dyGz,shishen:shishen(dyGz[0])});
   }
   return{day_master:dS+em[dS],pillars:{'年':yS+yB,'月':mS+mB,'日':dS+dB,'时':hS+hB},
     wuxing_count:wx,wuxing_lack:Object.keys(wx).filter(function(k){return wx[k]===0;}),
