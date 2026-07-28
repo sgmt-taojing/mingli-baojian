@@ -549,7 +549,7 @@ function showWelcome(){
       if(s.hasBirth){
         html+='<div style="text-align:center;margin-top:4px;font-size:11px;color:var(--paper3)">👤 档案：'+s.birthText+' '+s.gender+' '+s.city+' | 关心：'+s.concerns+'</div>';
       }
-    }catch(e){}
+    }catch(e){console.warn("报告降级:",e.message);}
   }
   // R34: KB 热卡直达区
   html+=renderKbHotChips();
@@ -667,7 +667,7 @@ function _submitKbFeedback(fbId, score, query, module){
       try {
         var key = '_kb_feedback_count/' + score;
         localStorage.setItem(key, String((parseInt(localStorage.getItem(key)||'0')+1)));
-      } catch(e){}
+      } catch(e){console.warn("报告降级:",e.message);}
       setTimeout(function(){ if (statusEl) statusEl.style.opacity = '0'; }, 2500);
     } else {
       if (statusEl) statusEl.textContent = '⚠ 提交失败';
@@ -848,7 +848,7 @@ async function typing(){
 }
 
 async function generateReport(){
-  try{ _recordRecentMod(state.module); }catch(e){}
+  try{ _recordRecentMod(state.module); }catch(e){console.warn("报告降级:",e.message);}
   // R89-M 缘主档案召回：报告前捕获
   try{
     if (window.YuanzhuRecall && typeof window.YuanzhuRecall.captureBeforeReport === 'function'){
@@ -857,7 +857,7 @@ async function generateReport(){
   }catch(e){ console.warn('[recall] capture fail', e); }
   const mod=MODULES[state.module];
   const collected=Object.values(state.data);
-  try{ _renderRecentModCard(); }catch(e){}
+  try{ _renderRecentModCard(); }catch(e){console.warn("报告降级:",e.message);}
 
   // 0. 问卷 + 排盘落库（公网公开端点，失败静默）
   const _baziForSave = (state.module==='bazi' || state.module==='name' || state.module==='number' || state.module==='face') ? state.data : null;
@@ -1163,7 +1163,7 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
   const baziData = (state.module==='bazi' || state.module==='name' || state.module==='number' || state.module==='face') ? state.data : null;
 
   try{
-    const r=await fetch(API+'/api/ai/public-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[...hist.slice(-8),{role:'user',content:prompt}], baziData})});
+    var _ac=new AbortController();var _to=setTimeout(function(){_ac.abort();},15000);var r;try{r=await fetch(API+'/api/ai/public-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[...hist.slice(-8),{role:'user',content:prompt}], baziData}),signal:_ac.signal});clearTimeout(_to);}catch(e){clearTimeout(_to);console.warn('AI fetch 超时或失败:',e.message);return localReport(state.module,state.data);}
     const d=await r.json();
     const reply=(d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||'';
     if(reply.length>50){
@@ -1227,7 +1227,7 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
       autoSavePaipan(tagged);
       return;
     }
-  }catch(e){}
+  }catch(e){console.warn("报告降级:",e.message);}
 
   // ④ 降级：本地生成报告
   const local=localReport(state.module,state.data);
@@ -1488,7 +1488,7 @@ function showReport(text, meta){
     const _comp = _r89ApplyCompliance(text);
     text = _comp.text;
     if (_comp.hits.length) {
-      try { console.warn('[r89-compliance]', _comp.hits.length, '条命中', _comp.hits); } catch(e){}
+      try { console.warn('[r89-compliance]', _comp.hits.length, '条命中', _comp.hits); } catch(e){console.warn("报告降级:",e.message);}
       if (typeof meta === 'object' && meta) meta.complianceHits = _comp.hits;
     }
   } catch(e) { console.warn('[r89-compliance] err', e); }
@@ -1651,7 +1651,7 @@ function showReport(text, meta){
       if (b.getAttribute('data-tpl') === _tpl) b.classList.add('active');
       b.addEventListener('click', function(){
         var t = b.getAttribute('data-tpl');
-        try { localStorage.setItem('_r89_report_template', t); } catch(e){}
+        try { localStorage.setItem('_r89_report_template', t); } catch(e){console.warn("报告降级:",e.message);}
         // 切换本报告 + 同页所有 .b 的模板属性
         var boxes = (d.parentElement ? d.parentElement : document).querySelectorAll('.b');
         boxes.forEach(function(bx){ bx.setAttribute('data-report-template', t); });
@@ -1841,7 +1841,7 @@ async function callAI(q){
           hist.push({role:'assistant', content: fullReply.substring(0,500)});
           if (hist.length > 20) hist = hist.slice(-20);
           if (typeof recordKbHit === 'function') recordKbHit(state.module || 'freechat', best.score, true);
-          try{ _updateTopicCard(); }catch(e){}
+          try{ _updateTopicCard(); }catch(e){console.warn("报告降级:",e.message);}
           try { recordKbEngine('kb-fastpath'); } catch(e) {}
           return;
         }
@@ -1859,9 +1859,9 @@ async function callAI(q){
       addAI('📴 当前处于离线模式，AI 调用已暂停。\n\n请参考上方 KB 兜底回答，或联网后重试。');
       if (typeof recordKbHit === 'function') recordKbHit(state.module || 'freechat', 0, false);
       hist.push({role:'assistant', content:'离线模式'});
-      try{ _updateTopicCard(); }catch(e){} return;
+      try{ _updateTopicCard(); }catch(e){console.warn("报告降级:",e.message);} return;
     }
-    const r=await fetch(API+'/api/ai/public-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist.slice(-10)})});
+    var _ac2=new AbortController();var _to2=setTimeout(function(){_ac2.abort();},15000);var r;try{r=await fetch(API+'/api/ai/public-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist.slice(-10)}),signal:_ac2.signal});clearTimeout(_to2);}catch(e){clearTimeout(_to2);console.warn('AI fetch 超时或失败:',e.message);return null;}
     const d=await r.json();
     const msg=d.choices&&d.choices[0]&&d.choices[0].message;
     const reply=(msg&&msg.content)||'抱歉，暂时无法回答。';
@@ -1873,7 +1873,7 @@ async function callAI(q){
     // hist 只存 content（不存 reasoning_content），并截断单条长度
     hist.push({role:'assistant',content:reply.substring(0,500)});
     if(hist.length>20)hist=hist.slice(-20);
-    try{ _updateTopicCard(); }catch(e){}
+    try{ _updateTopicCard(); }catch(e){console.warn("报告降级:",e.message);}
   }catch(e){ try{ t.remove(); }catch(_){} addAI(local(q));
     // 错误降级也计入分母
     if (typeof recordKbHit === 'function') {
@@ -3242,7 +3242,49 @@ function _qimenCompute(y,mn,dy,hr,sex,ask){
   };
 }
 
-function _paipan(y,m,d,h){
+async function _paipanAsync(y,m,d,h){
+  // R206-R1: 统一走 Python 后端排盘（精度保障），降级走本地
+  var cacheKey='paipan_'+y+'_'+m+'_'+d+'_'+h;
+  try{
+    var cached=localStorage.getItem(cacheKey);
+    if(cached){return JSON.parse(cached);}
+  }catch(e){console.warn("报告降级:",e.message);}
+  try{
+    var resp=await fetch('/api/paipan/calculate',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({year:y,month:m,day:d,hour:h,gender:'male'})
+    });
+    if(resp.ok){
+      var data=await resp.json();
+      var pillars=data.pillars||{};
+      var dm=data.day_master||'';
+      var dS=dm?dm[0]:'';
+      var tg=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+      var dz=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+      var em={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水','子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+      var wx={'金':0,'木':0,'水':0,'火':0,'土':0};
+      Object.values(pillars).forEach(function(g){if(g&&g.length>=2){wx[em[g[0]]]++;wx[em[g[1]]]++;}});
+      var result={
+        day_master:dm,
+        pillars:pillars,
+        wuxing_count:wx,
+        wuxing_lack:Object.keys(wx).filter(function(k){return wx[k]===0;}),
+        shishen:data.gan_shen||{},
+        dayun:(data.dayun||[]).map(function(d){return{age:d.start_age,ganzhi:d.ganzhi,shishen:d.shishen};}),
+        nayin:data.nayin||'',
+        canggan:data.zhi_canggan||{},
+        jieqi_month:data.input&&data.input.jieqi?1:1,
+        _source:'api'
+      };
+      try{localStorage.setItem(cacheKey,JSON.stringify(result));}catch(e){console.warn("报告降级:",e.message);}
+      return result;
+    }
+  }catch(e){console.warn('排盘 API 不可用，降级本地计算');}
+  // 降级：本地同步计算（精简版）
+  return _paipanLocal(y,m,d,h);
+}
+function _paipan(y,m,d,h){return _paipanLocal(y,m,d,h);}
+function _paipanLocal(y,m,d,h){
   var tg=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
   var dz=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
   var JIE_DATES={
@@ -3291,8 +3333,10 @@ function _paipan(y,m,d,h){
     if(same&&!sameParity) return '劫财';
     if(cycle[dEle]===gEle&&sameParity) return '食神';
     if(cycle[dEle]===gEle&&!sameParity) return '伤官';
-    if(cycle[gEle]===dEle&&sameParity) return '偏财';
-    if(cycle[gEle]===dEle&&!sameParity) return '正财';
+    if(cycle[gEle]===dEle&&sameParity) return '偏印';
+    if(cycle[gEle]===dEle&&!sameParity) return '正印';
+    if(reverse[dEle]===gEle&&sameParity) return '偏财';
+    if(reverse[dEle]===gEle&&!sameParity) return '正财';
     if(reverse[gEle]===dEle&&sameParity) return '七杀';
     if(reverse[gEle]===dEle&&!sameParity) return '正官';
     return '?';
@@ -3301,17 +3345,16 @@ function _paipan(y,m,d,h){
   var wx={'金':0,'木':0,'水':0,'火':0,'土':0};
   var em={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水','子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
   [yS+yB,mS+mB,dS+dB,hS+hB].forEach(function(g){wx[em[g[0]]]++;wx[em[g[1]]]++;});
-  var dayunStart=5;
   var dayunList=[];
   var curM=monthIdx;
   for(var i=0;i<8;i++){
     curM=(curM+1)%12;
     var dyGz=tg[((yI*2+curM)%10+10)%10]+dz[((curM+2)%12+12)%12];
-    dayunList.push({age:dayunStart+i*10,ganzhi:dyGz,shishen:shishen(dyGz[0])});
+    dayunList.push({age:5+i*10,ganzhi:dyGz,shishen:shishen(dyGz[0])});
   }
   return{day_master:dS+em[dS],pillars:{'年':yS+yB,'月':mS+mB,'日':dS+dB,'时':hS+hB},
     wuxing_count:wx,wuxing_lack:Object.keys(wx).filter(function(k){return wx[k]===0;}),
-    shishen:shishenMap,dayun:dayunList,jieqi_month:monthIdx+1};
+    shishen:shishenMap,dayun:dayunList,jieqi_month:monthIdx+1,_source:'local'};
 }
   if(modId==='zeri'){
     var zrEvent=d[0]||'日常出行';var zrPeriod=d[1]||'近期择日';var zrBirth=d[2]||'1990年1月1日12时';var zrSex=d[3]||'男';
@@ -4532,7 +4575,7 @@ console.log('[R39-C] 双核 KB 命中辅助函数已挂载');
             }
           }
         }
-      } catch(e){}
+      } catch(e){console.warn("报告降级:",e.message);}
     }
     return origFetch.apply(this, arguments);
   };
