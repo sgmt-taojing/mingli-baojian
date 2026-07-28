@@ -62,7 +62,7 @@ async function doPaipan(){
   const h=document.getElementById('lr-hour').value;
   const r=await fetch('/api/paipan/liuren',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({year:+y,month:+m,day:+d,hour:+h})});
   const data=await r.json();
-  if(!data.ok){alert('排盘失败: '+data.error);return;}
+  if(!data.ok){showToast('排盘失败: '+data.error);return;}
   renderChart(data.chart);
 }
 function renderChart(c){

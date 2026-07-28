@@ -58,7 +58,7 @@ async function doPaipan(){
   const f=document.getElementById('fs-facing').value;
   const r=await fetch('/api/paipan/fengshui',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({year:+y,sittingMountain:s,facingMountain:f})});
   const data=await r.json();
-  if(!data.ok){alert('排盘失败: '+data.error);return;}
+  if(!data.ok){showToast('排盘失败: '+data.error);return;}
   renderChart(data.chart);
 }
 function renderChart(c){

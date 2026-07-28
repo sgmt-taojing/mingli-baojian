@@ -81,7 +81,7 @@ async function doPaipan(){
   if(dg) body.dayGanZhi=dg;
   const r=await fetch('/api/paipan/liuyao',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
   const data=await r.json();
-  if(!data.ok){alert('排盘失败: '+data.error);return;}
+  if(!data.ok){showToast('排盘失败: '+data.error);return;}
   renderChart(data.chart);
 }
 
