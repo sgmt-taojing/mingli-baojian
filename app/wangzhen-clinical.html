@@ -21,6 +21,8 @@
     .wz-topbar .nav-back{font-size:12px;color:var(--wz-paper3);text-decoration:none;padding:4px 10px;border:1px solid var(--wz-border);border-radius:6px}
     .wz-topbar .nav-back:hover{color:var(--wz-paper)}
     .wz-capabilities{font-size:11px;color:var(--wz-jade)}
+
+    /* 步骤引导条 */
     .wz-stepper{display:flex;align-items:center;gap:4px;margin-top:8px;flex-wrap:wrap}
     .wz-step{display:flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--wz-border);border-radius:8px;cursor:pointer;transition:.2s;background:var(--wz-card-bg)}
     .wz-step:hover{border-color:var(--wz-gold)}
@@ -35,41 +37,80 @@
     .wz-step-arrow{color:var(--wz-paper3);font-size:14px;margin:0 2px}
 
     /* 布局 */
-    .wz-layout{display:grid;grid-template-columns:260px 1fr 280px;gap:12px;max-width:1400px;margin:0 auto}
+    .wz-layout{display:grid;grid-template-columns:300px 1fr 280px;gap:12px;max-width:1400px;margin:0 auto}
     @media(max-width:1024px){.wz-layout{grid-template-columns:1fr;gap:10px}}
 
     /* 卡片 */
     .wz-card{background:var(--wz-card-bg);border:1px solid var(--wz-border);border-radius:10px;padding:14px;margin-bottom:10px}
-    .wz-card-title{font-size:13px;color:var(--wz-gold);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--wz-border);display:flex;align-items:center;justify-content:space-between}
-    .wz-card-title .badge{font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(16,185,129,.15);color:var(--wz-jade)}
+    .wz-card-title{font-size:13px;color:var(--wz-gold);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--wz-border);display:flex;align-items:center;gap:6px}
+    .wz-card-title .badge{font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(16,185,129,.15);color:var(--wz-jade);margin-left:auto}
+    .wz-step-tag{display:inline-block;font-size:9px;padding:1px 6px;border-radius:3px;background:var(--wz-gold);color:#0a0e17;font-weight:600}
 
-    /* 左栏 - 患者管理 */
-    .wz-patient-card{padding:8px 10px;border:1px solid var(--wz-border);border-radius:6px;cursor:pointer;margin-bottom:6px;transition:.2s}
-    .wz-patient-card:hover{border-color:var(--wz-gold);background:rgba(201,168,76,.06)}
-    .wz-patient-name{font-size:13px;color:var(--wz-paper);margin-bottom:2px}
-    .wz-patient-tag{font-size:10px;padding:1px 6px;border-radius:3px;background:rgba(201,168,76,.1);color:var(--wz-paper3);margin-right:4px}
-    .wz-empty{font-size:12px;color:var(--wz-paper3);text-align:center;padding:12px}
-    .wz-step-tag{display:inline-block;font-size:9px;padding:1px 6px;border-radius:3px;background:var(--wz-gold);color:#0a0e17;font-weight:600;margin-right:4px}
-    .pd-row{display:flex;justify-content:space-between;padding:3px 0;font-size:12px;border-bottom:1px solid rgba(201,168,76,.06)}
-    .pd-row span{color:var(--wz-paper3)}
-    .pd-row b{color:var(--wz-paper);font-weight:600}
+    /* 表单 */
+    .wz-form-row{margin-bottom:8px}
+    .wz-form-row label{font-size:11px;color:var(--wz-paper3);display:block;margin-bottom:3px}
+    .wz-input{width:100%;padding:8px 10px;background:rgba(255,255,255,.05);border:1px solid var(--wz-border);border-radius:6px;color:var(--wz-paper);font-size:13px;transition:.2s}
+    .wz-input:focus{outline:none;border-color:var(--wz-gold);background:rgba(201,168,76,.05)}
+    .wz-input::placeholder{color:var(--wz-paper3);opacity:.6}
+    .wz-select{padding:8px 10px;background:rgba(255,255,255,.05);border:1px solid var(--wz-border);border-radius:6px;color:var(--wz-paper);font-size:13px;cursor:pointer}
+    .wz-select option{background:#1a1a2e;color:var(--wz-paper)}
+    .wz-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+    .wz-form-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+    .wz-textarea{width:100%;padding:8px 10px;background:rgba(255,255,255,.05);border:1px solid var(--wz-border);border-radius:6px;color:var(--wz-paper);font-size:13px;resize:vertical;line-height:1.6}
+    .wz-textarea:focus{outline:none;border-color:var(--wz-gold)}
 
-    /* 八字输入 */
-    .wz-bazi-input{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
-    .wz-bazi-input select,.wz-bazi-input input{padding:6px 8px;background:rgba(255,255,255,.05);border:1px solid var(--wz-border);border-radius:6px;color:var(--wz-paper);font-size:12px}
-    .wz-bazi-input select option{background:#1a1a2e;color:var(--wz-paper)}
-    .wz-btn-row{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
-    .btn{padding:7px 14px;border:none;border-radius:6px;cursor:pointer;font-size:12px;transition:.2s;white-space:nowrap}
+    /* 历法切换 */
+    .wz-cal-switch{display:inline-flex;border:1px solid var(--wz-border);border-radius:6px;overflow:hidden;margin-bottom:6px}
+    .wz-cal-switch button{padding:4px 12px;border:none;background:transparent;color:var(--wz-paper3);font-size:11px;cursor:pointer;transition:.2s}
+    .wz-cal-switch button.active{background:var(--wz-gold);color:#0a0e17;font-weight:600}
+
+    /* 症状点选 */
+    .wz-symptom-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:4px;margin-top:6px}
+    .wz-symptom-chip{padding:5px 8px;border:1px solid var(--wz-border);border-radius:16px;font-size:11px;cursor:pointer;text-align:center;transition:.2s;user-select:none}
+    .wz-symptom-chip:hover{border-color:var(--wz-gold)}
+    .wz-symptom-chip.selected{border-color:var(--wz-gold);background:rgba(201,168,76,.15);color:var(--wz-gold)}
+    .wz-symptom-section{margin-bottom:8px}
+    .wz-symptom-section-title{font-size:11px;color:var(--wz-gold);margin-bottom:4px}
+
+    /* 按钮 */
+    .btn{padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-size:12px;transition:.2s;white-space:nowrap}
     .btn-primary{background:var(--wz-gold);color:#0a0e17;font-weight:600}
     .btn-primary:hover{background:#d4b85e}
     .btn-secondary{background:rgba(99,179,237,.15);color:var(--wz-cyan);border:1px solid rgba(99,179,237,.3)}
     .btn-ghost{background:transparent;border:1px solid var(--wz-border);color:var(--wz-paper3)}
     .btn-ghost:hover{border-color:var(--wz-paper2);color:var(--wz-paper)}
-    .btn-danger{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3)}
+    .wz-btn-row{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
 
-    /* 中栏 - 望诊核心 */
-    .wz-camera-section{position:relative;margin-bottom:10px}
-    .wz-camera-video{width:100%;max-width:480px;aspect-ratio:4/3;background:#000;border-radius:8px;object-fit:cover;margin:0 auto;display:block}
+    /* 患者卡片 */
+    .wz-patient-card{padding:8px 10px;border:1px solid var(--wz-border);border-radius:6px;cursor:pointer;margin-bottom:6px;transition:.2s}
+    .wz-patient-card:hover{border-color:var(--wz-gold);background:rgba(201,168,76,.06)}
+    .wz-patient-name{font-size:13px;color:var(--wz-paper)}
+    .wz-patient-tag{font-size:10px;padding:1px 6px;border-radius:3px;background:rgba(201,168,76,.1);color:var(--wz-paper3);margin-right:4px}
+    .wz-empty{font-size:12px;color:var(--wz-paper3);text-align:center;padding:12px}
+    .pd-row{display:flex;justify-content:space-between;padding:3px 0;font-size:12px;border-bottom:1px solid rgba(201,168,76,.06)}
+    .pd-row span{color:var(--wz-paper3)}
+    .pd-row b{color:var(--wz-paper);font-weight:600}
+
+    /* 八字排盘展示 */
+    .paipan-card{background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.02));border:1px solid rgba(201,168,76,.25);border-radius:8px;padding:12px;margin-top:8px}
+    .paipan-pillars{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+    .paipan-pillar{text-align:center;padding:8px 4px;border:1px solid rgba(201,168,76,.15);border-radius:6px;background:rgba(0,0,0,.15)}
+    .paipan-pillar-pos{font-size:10px;color:var(--wz-paper3);margin-bottom:2px}
+    .paipan-pillar-gz{font-size:18px;color:var(--wz-gold);font-weight:700;letter-spacing:1px}
+    .paipan-pillar-ny{font-size:9px;color:var(--wz-paper3);margin-top:2px}
+    .paipan-dm{text-align:center;padding:6px;background:rgba(201,168,76,.1);border-radius:6px;margin-bottom:8px}
+    .paipan-dm b{font-size:16px;color:var(--wz-gold)}
+    .paipan-wx{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-bottom:6px}
+    .paipan-wx-item{text-align:center;padding:4px;border-radius:4px;font-size:10px}
+    .paipan-wx-bar{height:4px;border-radius:2px;margin-top:2px}
+    .paipun-section{font-size:11px;color:var(--wz-paper2);margin-bottom:4px}
+    .paipan-dy{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+    .paipan-dy-item{padding:4px 8px;border:1px solid var(--wz-border);border-radius:4px;font-size:10px;text-align:center}
+    .paipan-dy-age{color:var(--wz-paper3);font-size:9px}
+    .paipan-dy-gz{color:var(--wz-gold);font-weight:600}
+
+    /* 摄像头 */
+    .wz-camera-video{width:100%;max-width:480px;aspect-ratio:4/3;background:#000;border-radius:8px;object-fit:cover;display:block}
     .wz-camera-canvas{display:none}
     .wz-photo-preview{width:100%;max-width:480px;aspect-ratio:4/3;object-fit:cover;border-radius:8px;margin-top:8px;display:none}
     .wz-analysis-status{font-size:12px;padding:6px 10px;border-radius:6px;margin-top:6px}
@@ -77,20 +118,11 @@
     .wz-status.done{background:rgba(16,185,129,.1);color:var(--wz-jade)}
     .wz-status.error{background:rgba(239,68,68,.1);color:#f87171}
     .wz-ai-output{font-size:12px;line-height:1.7;color:var(--wz-paper2);max-height:200px;overflow-y:auto;padding:8px;background:rgba(0,0,0,.2);border-radius:6px;margin-top:6px}
-    .wz-info{font-size:12px;color:var(--wz-paper3);padding:8px}
-    .wz-warning{font-size:12px;color:#fbbf24;padding:8px}
 
     /* 语音 */
-    .wz-voice-section{margin-bottom:10px}
-    .wz-voice-text{width:100%;min-height:60px;max-height:120px;padding:8px;background:rgba(255,255,255,.05);border:1px solid var(--wz-border);border-radius:6px;color:var(--wz-paper);font-size:12px;resize:vertical}
+    .wz-voice-text{width:100%;min-height:80px;padding:8px;background:rgba(255,255,255,.05);border:1px solid var(--wz-border);border-radius:6px;color:var(--wz-paper);font-size:13px;resize:vertical;line-height:1.6}
     .wz-btn-voice.recording{background:rgba(239,68,68,.2);color:#f87171;animation:pulse 1.5s infinite}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
-
-    /* Tab */
-    .wz-tabs{display:flex;gap:2px;margin-bottom:10px;border-bottom:1px solid var(--wz-border);flex-wrap:wrap}
-    .wz-tab{padding:8px 14px;cursor:pointer;font-size:12px;color:var(--wz-paper3);border-bottom:2px solid transparent;transition:.2s;white-space:nowrap}
-    .wz-tab:hover{color:var(--wz-paper)}
-    .wz-tab.active{color:var(--wz-gold);border-bottom-color:var(--wz-gold)}
 
     /* 望诊分区 */
     .wangzhen-zone-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:10px}
@@ -113,27 +145,27 @@
     .result-advice{color:var(--wz-jade);font-size:11px}
     .wangzhen-disclaimer{margin-top:8px;padding:8px;border-radius:6px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);font-size:10px;color:#fca5a5}
 
-    /* 右栏 - 病例 & 报告 */
+    /* Tab */
+    .wz-tabs{display:flex;gap:2px;margin-bottom:10px;border-bottom:1px solid var(--wz-border);flex-wrap:wrap}
+    .wz-tab{padding:6px 12px;cursor:pointer;font-size:11px;color:var(--wz-paper3);border-bottom:2px solid transparent;transition:.2s;white-space:nowrap}
+    .wz-tab:hover{color:var(--wz-paper)}
+    .wz-tab.active{color:var(--wz-gold);border-bottom-color:var(--wz-gold)}
+
+    /* 病例 */
     .wz-case-item{padding:8px;border:1px solid var(--wz-border);border-radius:6px;margin-bottom:6px;cursor:pointer}
     .wz-case-item:hover{border-color:var(--wz-gold)}
     .wz-case-date{font-size:10px;color:var(--wz-paper3)}
     .wz-case-text{font-size:11px;color:var(--wz-paper2);margin-top:2px}
 
-    /* 命相同参 */
-    .wz-mingxiang-section{margin-top:10px}
-    #wz-mingxiang-result{display:none;margin-top:8px;padding:10px;background:rgba(99,179,237,.05);border:1px solid rgba(99,179,237,.15);border-radius:6px}
-
-    .muted{color:var(--wz-paper3);font-size:12px;text-align:center;padding:8px}
+    /* 历史 */
     .wz-history-list{display:flex;flex-direction:column;gap:4px}
     .wz-history-item{display:flex;gap:6px;align-items:center;padding:5px 8px;border:1px solid var(--wz-border);border-radius:4px;font-size:10px;background:var(--wz-card-bg)}
     .wz-history-time{color:var(--wz-paper3);min-width:70px}
     .wz-history-zone{color:var(--wz-gold);font-weight:600}
     .wz-history-severity{font-size:9px;padding:1px 4px;border-radius:3px;background:rgba(245,158,11,.15);color:#fbbf24}
     .wz-history-organs{color:var(--wz-cyan)}
-    .wz-quick-ref{margin-top:8px}
-    .quick-ref-tabs{display:flex;gap:4px;margin-bottom:8px}
-    .qr-tab{padding:5px 12px;border:1px solid var(--wz-border);border-radius:4px;cursor:pointer;font-size:11px;color:var(--wz-paper3);background:transparent}
-    .qr-tab.active{border-color:var(--wz-gold);color:var(--wz-gold);background:rgba(201,168,76,.08)}
+
+    /* 速查 */
     .qr-group{margin-bottom:8px}
     .qr-group-title{font-size:12px;color:var(--wz-gold);margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid var(--wz-border)}
     .qr-item{display:flex;justify-content:space-between;padding:3px 6px;font-size:11px;border-bottom:1px solid rgba(201,168,76,.05)}
@@ -141,43 +173,48 @@
     .qr-item-warn .qr-key{color:#fbbf24} .qr-item-warn .qr-val{color:#f87171}
     .qr-key{color:var(--wz-paper)} .qr-val{color:var(--wz-paper3)}
 
+    .muted{color:var(--wz-paper3);font-size:12px;text-align:center;padding:8px}
+    .section-hint{font-size:11px;color:var(--wz-jade);margin-bottom:6px;padding:4px 8px;border-radius:4px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.15)}
+
     @media(max-width:768px){
       .wz-layout{grid-template-columns:1fr}
       .wangzhen-zone-grid{grid-template-columns:repeat(2,1fr)}
+      .paipan-pillars{grid-template-columns:repeat(2,1fr)}
+      .wz-form-grid{grid-template-columns:1fr}
       .wz-topbar{flex-direction:column;text-align:center}
+      .wz-stepper{justify-content:center}
     }
   </style>
 </head>
 <body>
 
-<!-- 顶栏 -->
 <header class="wz-topbar">
   <div>
     <h1>🔍 望诊临床工作台</h1>
     <div class="wz-stepper" id="wz-stepper">
-      <div class="wz-step active" data-step="1" onclick="window.wangzhenClinical.goStep(1)">
+      <div class="wz-step active" data-step="1" onclick="wangzhenClinical.goStep(1)">
         <div class="wz-step-num">1</div>
-        <div class="wz-step-text"><b>选患者</b><span>左栏点选或新建</span></div>
+        <div class="wz-step-text"><b>选/建患者</b><span>左栏操作</span></div>
       </div>
       <div class="wz-step-arrow">→</div>
-      <div class="wz-step" data-step="2" onclick="window.wangzhenClinical.goStep(2)">
+      <div class="wz-step" data-step="2" onclick="wangzhenClinical.goStep(2)">
         <div class="wz-step-num">2</div>
-        <div class="wz-step-text"><b>拍照采集</b><span>启动摄像头→拍照</span></div>
+        <div class="wz-step-text"><b>拍照采集</b><span>摄像头拍照</span></div>
       </div>
       <div class="wz-step-arrow">→</div>
-      <div class="wz-step" data-step="3" onclick="window.wangzhenClinical.goStep(3)">
+      <div class="wz-step" data-step="3" onclick="wangzhenClinical.goStep(3)">
         <div class="wz-step-num">3</div>
-        <div class="wz-step-text"><b>望诊诊断</b><span>选区域→选特征→诊断</span></div>
+        <div class="wz-step-text"><b>望诊诊断</b><span>选区域→特征</span></div>
       </div>
       <div class="wz-step-arrow">→</div>
-      <div class="wz-step" data-step="4" onclick="window.wangzhenClinical.goStep(4)">
+      <div class="wz-step" data-step="4" onclick="wangzhenClinical.goStep(4)">
         <div class="wz-step-num">4</div>
-        <div class="wz-step-text"><b>排盘+命相</b><span>八字→交叉分析</span></div>
+        <div class="wz-step-text"><b>排盘+命相</b><span>八字→交叉</span></div>
       </div>
       <div class="wz-step-arrow">→</div>
-      <div class="wz-step" data-step="5" onclick="window.wangzhenClinical.goStep(5)">
+      <div class="wz-step" data-step="5" onclick="wangzhenClinical.goStep(5)">
         <div class="wz-step-num">5</div>
-        <div class="wz-step-text"><b>保存报告</b><span>存病例→打印报告</span></div>
+        <div class="wz-step-text"><b>保存报告</b><span>存病例→打印</span></div>
       </div>
     </div>
   </div>
@@ -193,28 +230,100 @@
 
   <!-- ===== 左栏：患者 + 排盘 ===== -->
   <aside>
-    <!-- 患者列表 -->
+    <!-- 患者管理 -->
     <div class="wz-card">
-      <div class="wz-card-title">👥 患者管理 <span class="wz-step-tag" data-for="1">步骤1</span> <span class="badge" id="wz-patient-count">0</span></div>
+      <div class="wz-card-title">👥 患者管理 <span class="wz-step-tag">步骤1</span> <span class="badge" id="wz-patient-count">0</span></div>
       <div id="wz-patient-list"></div>
       <div class="wz-btn-row">
-        <button class="btn btn-ghost" onclick="window.wangzhenClinical.toggleNewPatientForm()">+ 新建患者</button>
-      <div id="wz-new-patient-form" style="display:none;margin-top:8px;padding:8px;border:1px solid var(--wz-border);border-radius:6px;background:rgba(0,0,0,.2)">
-        <input type="text" id="np-name" placeholder="姓名" style="width:100%;padding:6px;margin-bottom:4px;background:rgba(255,255,255,.05);border:1px solid var(--wz-border);border-radius:4px;color:var(--wz-paper);font-size:12px">
-        <div style="display:flex;gap:4px">
-          <select id="np-gender" style="flex:1;padding:6px;background:rgba(255,255,255,.05);border:1px solid var(--wz-border);border-radius:4px;color:var(--wz-paper);font-size:12px"><option value="">性别</option><option value="male">男</option><option value="female">女</option></select>
-          <input type="number" id="np-age" placeholder="年龄" style="flex:1;padding:6px;background:rgba(255,255,255,.05);border:1px solid var(--wz-border);border-radius:4px;color:var(--wz-paper);font-size:12px">
-        </div>
-        <input type="text" id="np-phone" placeholder="电话(选填)" style="width:100%;padding:6px;margin-top:4px;background:rgba(255,255,255,.05);border:1px solid var(--wz-border);border-radius:4px;color:var(--wz-paper);font-size:12px">
-        <input type="text" id="np-chief" placeholder="主诉症状" style="width:100%;padding:6px;margin-top:4px;background:rgba(255,255,255,.05);border:1px solid var(--wz-border);border-radius:4px;color:var(--wz-paper);font-size:12px">
-        <div style="display:flex;gap:4px;margin-top:4px">
-          <select id="np-byear" style="flex:1;padding:6px;background:rgba(255,255,255,.05);border:1px solid var(--wz-border);border-radius:4px;color:var(--wz-paper);font-size:12px"><option value="">年</option></select>
-          <select id="np-bmonth" style="flex:1;padding:6px;background:rgba(255,255,255,.05);border:1px solid var(--wz-border);border-radius:4px;color:var(--wz-paper);font-size:12px"><option value="">月</option></select>
-          <select id="np-bday" style="flex:1;padding:6px;background:rgba(255,255,255,.05);border:1px solid var(--wz-border);border-radius:4px;color:var(--wz-paper);font-size:12px"><option value="">日</option></select>
-          <select id="np-bhour" style="flex:1;padding:6px;background:rgba(255,255,255,.05);border:1px solid var(--wz-border);border-radius:4px;color:var(--wz-paper);font-size:12px"><option value="">时</option></select>
-        </div>
-        <button class="btn btn-primary" onclick="window.wangzhenClinical.saveNewPatient()" style="width:100%;margin-top:6px">💾 保存患者</button>
+        <button class="btn btn-ghost" onclick="wangzhenClinical.toggleNewPatientForm()">+ 新建患者</button>
       </div>
+      <!-- 新建患者表单 -->
+      <div id="wz-new-patient-form" style="display:none;margin-top:10px;padding:10px;border:1px solid var(--wz-border);border-radius:8px;background:rgba(0,0,0,.2)">
+        <div class="wz-form-row">
+          <label>姓名</label>
+          <input type="text" id="np-name" class="wz-input" placeholder="患者姓名">
+        </div>
+        <div class="wz-form-grid">
+          <div class="wz-form-row">
+            <label>性别</label>
+            <select id="np-gender" class="wz-select" style="width:100%"><option value="">选择</option><option value="male">男</option><option value="female">女</option></select>
+          </div>
+          <div class="wz-form-row">
+            <label>年龄</label>
+            <input type="number" id="np-age" class="wz-input" placeholder="如 45">
+          </div>
+        </div>
+        <div class="wz-form-row">
+          <label>电话（选填）</label>
+          <input type="text" id="np-phone" class="wz-input" placeholder="联系电话">
+        </div>
+
+        <!-- 出生日期：农历/阳历切换 -->
+        <div class="wz-form-row">
+          <label>出生日期</label>
+          <div class="wz-cal-switch" id="np-cal-switch">
+            <button class="active" onclick="wangzhenClinical.switchCalendar('solar')">阳历</button>
+            <button onclick="wangzhenClinical.switchCalendar('lunar')">农历</button>
+          </div>
+          <div class="wz-form-grid-4">
+            <select id="np-byear" class="wz-select" style="width:100%"><option value="">年</option></select>
+            <select id="np-bmonth" class="wz-select" style="width:100%"><option value="">月</option></select>
+            <select id="np-bday" class="wz-select" style="width:100%"><option value="">日</option></select>
+            <select id="np-bhour" class="wz-select" style="width:100%"><option value="">时辰</option></select>
+          </div>
+          <div id="np-lunar-months" style="display:none;margin-top:4px">
+            <select id="np-lunar-leap" class="wz-select" style="width:100%">
+              <option value="0">非闰月</option>
+              <option value="1">闰月</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 主诉症状：大框 + 语音 + 结构化点选 -->
+        <div class="wz-form-row">
+          <label>主诉症状 <button class="btn btn-ghost" style="font-size:9px;padding:2px 6px;margin-left:4px" onclick="wangzhenClinical.startVoiceInput('np-chief')">🎤 语音</button></label>
+          <textarea id="np-chief" class="wz-textarea" placeholder="患者主诉症状，如：头痛失眠、面色苍白、胃胀不适..." style="min-height:70px"></textarea>
+        </div>
+
+        <!-- 结构化症状点选 -->
+        <div class="wz-form-row">
+          <label>症状速选（点击添加到主诉）</label>
+          <div class="wz-symptom-section">
+            <div class="wz-symptom-section-title">头部</div>
+            <div class="wz-symptom-grid">
+              <div class="wz-symptom-chip" onclick="wangzhenClinical.addSymptom('头痛')">头痛</div>
+              <div class="wz-symptom-chip" onclick="wangzhenClinical.addSymptom('头晕')">头晕</div>
+              <div class="wz-symptom-chip" onclick="wangzhenClinical.addSymptom('失眠')">失眠</div>
+              <div class="wz-symptom-chip" onclick="wangzhenClinical.addSymptom('多梦')">多梦</div>
+              <div class="wz-symptom-chip" onclick="wangzhenClinical.addSymptom('耳鸣')">耳鸣</div>
+              <div class="wz-symptom-chip" onclick="wangzhenClinical.addSymptom('面瘫')">面瘫</div>
+            </div>
+          </div>
+          <div class="wz-symptom-section">
+            <div class="wz-symptom-section-title">胸腹</div>
+            <div class="wz-symptom-grid">
+              <div class="wz-symptom-chip" onclick="wangzhenClinical.addSymptom('胸闷')">胸闷</div>
+              <div class="wz-symptom-chip" onclick="wangzhenClinical.addSymptom('心悸')">心悸</div>
+              <div class="wz-symptom-chip" onclick="wangzhenClinical.addSymptom('胃胀')">胃胀</div>
+              <div class="wz-symptom-chip" onclick="wangzhenClinical.addSymptom('腹痛')">腹痛</div>
+              <div class="wz-symptom-chip" onclick="wangzhenClinical.addSymptom('便秘')">便秘</div>
+              <div class="wz-symptom-chip" onclick="wangzhenClinical.addSymptom('腹泻')">腹泻</div>
+            </div>
+          </div>
+          <div class="wz-symptom-section">
+            <div class="wz-symptom-section-title">全身</div>
+            <div class="wz-symptom-grid">
+              <div class="wz-symptom-chip" onclick="wangzhenClinical.addSymptom('乏力')">乏力</div>
+              <div class="wz-symptom-chip" onclick="wangzhenClinical.addSymptom('怕冷')">怕冷</div>
+              <div class="wz-symptom-chip" onclick="wangzhenClinical.addSymptom('怕热')">怕热</div>
+              <div class="wz-symptom-chip" onclick="wangzhenClinical.addSymptom('盗汗')">盗汗</div>
+              <div class="wz-symptom-chip" onclick="wangzhenClinical.addSymptom('食欲差')">食欲差</div>
+              <div class="wz-symptom-chip" onclick="wangzhenClinical.addSymptom('烦躁')">烦躁</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="wangzhenClinical.saveNewPatient()" style="width:100%;margin-top:8px">💾 保存患者</button>
       </div>
       <div id="wz-patient-detail" style="margin-top:8px"></div>
       <div style="font-size:11px;color:var(--wz-paper3);margin-top:4px">当前: <b id="wz-current-patient" style="color:var(--wz-gold)">未选择</b></div>
@@ -222,123 +331,112 @@
 
     <!-- 八字排盘 -->
     <div class="wz-card">
-      <div class="wz-card-title">📜 八字排盘</div>
-      <div class="wz-bazi-input">
-        <select id="wz-bazi-year" aria-label="年"><option value="">年</option></select>
-        <select id="wz-bazi-month" aria-label="月"><option value="">月</option></select>
-        <select id="wz-bazi-day" aria-label="日"><option value="">日</option></select>
-        <select id="wz-bazi-hour" aria-label="时"><option value="">时</option></select>
+      <div class="wz-card-title">📜 八字排盘 <span class="wz-step-tag">步骤4</span></div>
+      <div class="wz-form-grid-4">
+        <select id="wz-bazi-year" class="wz-select" aria-label="年"><option value="">年</option></select>
+        <select id="wz-bazi-month" class="wz-select" aria-label="月"><option value="">月</option></select>
+        <select id="wz-bazi-day" class="wz-select" aria-label="日"><option value="">日</option></select>
+        <select id="wz-bazi-hour" class="wz-select" aria-label="时"><option value="">时</option></select>
+      </div>
+      <div class="wz-cal-switch" id="wz-bazi-cal-switch" style="margin-top:6px">
+        <button class="active" onclick="wangzhenClinical.switchBaziCal('solar')">阳历</button>
+        <button onclick="wangzhenClinical.switchBaziCal('lunar')">农历</button>
       </div>
       <div class="wz-btn-row">
-        <button class="btn btn-secondary" onclick="window.wangzhenClinical.fetchBazi()">🔮 排盘</button>
+        <button class="btn btn-secondary" onclick="wangzhenClinical.fetchBazi()">🔮 排盘</button>
       </div>
-      <div id="wz-paipan-result" style="margin-top:8px"><span class="muted">排盘结果将显示在此</span></div>
+      <div id="wz-paipan-result" style="margin-top:8px"><span class="muted">选择患者后自动排盘，或手动输入日期后点排盘</span></div>
     </div>
   </aside>
 
   <!-- ===== 中栏：采集 + 诊断 ===== -->
   <main>
-    <!-- 摄像头采集 -->
+    <!-- 摄像头 -->
     <div class="wz-card">
-      <div class="wz-card-title">📷 面部采集 <span class="wz-step-tag" data-for="2">步骤2</span> <span class="badge" id="wz-camera-status">未启动</span></div>
-      <div class="wz-camera-section">
+      <div class="wz-card-title">📷 面部采集 <span class="wz-step-tag">步骤2</span> <span class="badge" id="wz-camera-status">未启动</span></div>
+      <div style="position:relative;margin-bottom:10px">
         <video id="wz-camera-video" class="wz-camera-video" autoplay playsinline></video>
         <canvas id="wz-camera-canvas" class="wz-camera-canvas"></canvas>
         <img id="wz-photo-preview" class="wz-photo-preview" alt="采集照片">
       </div>
       <div class="wz-btn-row">
-        <button class="btn btn-primary" id="wz-btn-camera" onclick="window.wangzhenClinical.startCamera()">📷 启动摄像头</button>
-        <span style="font-size:10px;color:var(--wz-jade);margin-left:4px">← 点这里开始</span>
-        <button class="btn btn-secondary" id="wz-btn-capture" onclick="window.wangzhenClinical.capturePhoto()" style="display:none">📸 拍照分析</button>
-        <button class="btn btn-ghost" onclick="window.wangzhenClinical.stopCamera()">关闭</button>
+        <button class="btn btn-primary" id="wz-btn-camera" onclick="wangzhenClinical.startCamera()">📷 启动摄像头</button>
+        <button class="btn btn-secondary" id="wz-btn-capture" onclick="wangzhenClinical.capturePhoto()" style="display:none">📸 拍照分析</button>
+        <button class="btn btn-ghost" onclick="wangzhenClinical.stopCamera()">关闭摄像头</button>
       </div>
       <div id="wz-analysis-status" class="wz-analysis-status"></div>
       <div id="wz-ai-result"></div>
     </div>
 
-    <!-- 语音输入 -->
+    <!-- 语音医嘱 -->
     <div class="wz-card">
-      <div class="wz-card-title">🎤 语音医嘱</div>
+      <div class="wz-card-title">🎤 医嘱记录</div>
       <textarea id="wz-voice-text" class="wz-voice-text" placeholder="点击语音输入，或直接打字记录医嘱..."></textarea>
-      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">
-        <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="window.wangzhenClinical.insertTemplate('prescription')">📋 处方医嘱</button>
-        <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="window.wangzhenClinical.insertTemplate('lifestyle')">🌿 调养建议</button>
-        <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="window.wangzhenClinical.insertTemplate('followup')">📅 复诊安排</button>
-        <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="window.wangzhenClinical.insertTemplate('warning')">⚠️ 注意事项</button>
-      </div>
       <div class="wz-btn-row">
-        <button class="btn btn-secondary" id="wz-btn-voice" onclick="window.wangzhenClinical.toggleVoiceInput()">🎤 语音输入</button>
-        <button class="btn btn-ghost" onclick="window.wangzhenClinical.speakText(document.getElementById('wz-voice-text').value)">🔊 播报</button>
+        <button class="btn btn-secondary" id="wz-btn-voice" onclick="wangzhenClinical.toggleVoiceInput()">🎤 语音输入</button>
+        <button class="btn btn-ghost" onclick="wangzhenClinical.speakText(document.getElementById('wz-voice-text').value)">🔊 播报</button>
+      </div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="wangzhenClinical.insertTemplate('prescription')">📋 处方</button>
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="wangzhenClinical.insertTemplate('lifestyle')">🌿 调养</button>
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="wangzhenClinical.insertTemplate('followup')">📅 复诊</button>
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="wangzhenClinical.insertTemplate('warning')">⚠️ 注意</button>
       </div>
     </div>
 
     <!-- 望诊诊断 -->
     <div class="wz-card">
-      <div class="wz-card-title">🔍 望诊诊断 <span class="wz-step-tag" data-for="3">步骤3</span> <span class="badge" id="wz-kb-badge">KB 加载中</span></div>
-      <div style="font-size:11px;color:var(--wz-jade);margin-bottom:6px;padding:4px 8px;border-radius:4px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.15)">👆 操作：点击上方区域卡片选择面部区域 → 勾选对应特征 → 点「诊断此区域」</div>
-      <div id="wz-multi-zone-summary" style="display:none;margin-bottom:8px;padding:6px 10px;border-radius:6px;background:rgba(201,168,76,.08);font-size:11px"></div>
-
-      <!-- Tab -->
+      <div class="wz-card-title">🔍 望诊诊断 <span class="wz-step-tag">步骤3</span> <span class="badge" id="wz-kb-badge">KB 加载中</span></div>
+      <div class="section-hint">👆 操作：点击下方区域卡片 → 勾选面部特征 → 点「诊断此区域」</div>
       <div class="wz-tabs">
-        <div class="wz-tab active" onclick="window.wangzhenCenter.switchTab('zones')">🗺️ 分区诊断</div>
+        <div class="wz-tab active" onclick="window.wangzhenCenter.switchTab('zones')">🗺️ 分区</div>
         <div class="wz-tab" onclick="window.wangzhenCenter.switchTab('colors')">🎨 五色</div>
         <div class="wz-tab" onclick="window.wangzhenCenter.switchTab('organs')">👁️ 五官</div>
-        <div class="wz-tab" onclick="window.wangzhenCenter.switchTab('ai')">🤖 AI流程</div>
         <div class="wz-tab" onclick="window.wangzhenCenter.switchTab('therapy')">💊 理疗</div>
         <div class="wz-tab" onclick="window.wangzhenCenter.switchTab('quickref')">👅 速查</div>
+        <div class="wz-tab" onclick="window.wangzhenCenter.switchTab('ai')">🤖 AI</div>
       </div>
-
-      <!-- 分区诊断面板 (复用 wangzhen-center) -->
       <div data-tab="zones" style="display:block">
         <div id="wangzhen-zone-map"></div>
         <div id="wangzhen-feature-panel"></div>
         <div id="wangzhen-result-panel"></div>
+        <div style="margin-top:10px"><div class="wz-card-title" style="font-size:12px">📋 诊断历史</div><div id="wangzhen-history"></div></div>
       </div>
       <div data-tab="colors" style="display:none"><div id="wangzhen-five-colors"></div></div>
       <div data-tab="organs" style="display:none"><div id="wangzhen-organs"></div></div>
-      <div data-tab="ai" style="display:none"><div id="wangzhen-ai-steps"></div></div>
       <div data-tab="therapy" style="display:none"><div id="wangzhen-therapy"></div></div>
       <div data-tab="quickref" style="display:none"><div id="wangzhen-quick-ref"></div></div>
+      <div data-tab="ai" style="display:none"><div id="wangzhen-ai-steps"></div></div>
     </div>
 
-    <!-- 会诊：西医诊断结论 -->
+    <!-- 会诊 + 命相同参 -->
     <div class="wz-card">
-      <div class="wz-card-title">🏥 会诊输入（西医诊断结论）</div>
-      <div style="font-size:11px;color:var(--wz-paper3);margin-bottom:8px">输入西医检查结果，系统将结合中医望诊+周易评估给出综合方案</div>
-      <textarea id="wz-western-diag" class="wz-voice-text" placeholder="如：心电图正常、血常规白细胞偏高、B超胆结石0.8cm、胃镜慢性胃炎..." style="min-height:50px"></textarea>
-      <div class="wz-btn-row">
-        <button class="btn btn-secondary" onclick="window.wangzhenClinical.runMingxiang()">🧬 综合会诊分析</button>
+      <div class="wz-card-title">🏥 会诊 + 🧬 命相同参 <span class="wz-step-tag">步骤4</span></div>
+      <div class="wz-form-row">
+        <label>西医诊断结论（选填，用于综合会诊）</label>
+        <textarea id="wz-western-diag" class="wz-textarea" placeholder="如：心电图正常、B超胆结石0.8cm、胃镜慢性胃炎、血常规白细胞偏高等..." style="min-height:60px"></textarea>
       </div>
-    </div>
-
-    <!-- 命相同参 -->
-    <div class="wz-card wz-mingxiang-section">
-      <div class="wz-card-title">🧬 命相同参（面相×八字交叉） <span class="wz-step-tag" data-for="4">步骤4</span></div>
-      <div style="font-size:11px;color:var(--wz-paper3);margin-bottom:8px">路总理念：面相看活态，八字看格局，交叉验证最准</div>
-      <button class="btn btn-primary" onclick="window.wangzhenClinical.runMingxiang()">🧬 开始交叉分析</button>
+      <div class="wz-btn-row">
+        <button class="btn btn-primary" onclick="wangzhenClinical.runMingxiang()">🧬 综合会诊分析（面相×八字×西医）</button>
+      </div>
       <div id="wz-mingxiang-result"></div>
     </div>
   </main>
 
   <!-- ===== 右栏：操作 + 病例 ===== -->
   <aside>
-    <!-- 操作按钮 -->
     <div class="wz-card">
-      <div class="wz-card-title">📋 操作 <span class="wz-step-tag" data-for="5">步骤5</span></div>
+      <div class="wz-card-title">📋 操作 <span class="wz-step-tag">步骤5</span></div>
       <div class="wz-btn-row" style="flex-direction:column">
-        <button class="btn btn-primary" onclick="window.wangzhenClinical.saveDiagnosis()">💾 保存诊断到病例</button>
-        <button class="btn btn-secondary" onclick="window.wangzhenClinical.generateReport()">🖨️ 生成报告</button>
-        <button class="btn btn-ghost" onclick="window.wangzhenClinical.speakText('诊断完成，请查看报告')">🔊 语音播报</button>
+        <button class="btn btn-primary" onclick="wangzhenClinical.saveDiagnosis()">💾 保存诊断到病例</button>
+        <button class="btn btn-secondary" onclick="wangzhenClinical.generateReport()">🖨️ 生成报告</button>
+        <button class="btn btn-ghost" onclick="wangzhenClinical.speakText('诊断完成，请查看报告')">🔊 语音播报</button>
       </div>
     </div>
-
-    <!-- 诊断历史 -->
     <div class="wz-card">
       <div class="wz-card-title">📋 望诊历史</div>
-      <div id="wangzhen-history"></div>
+      <div id="wangzhen-history-2"></div>
     </div>
-
-    <!-- 历史病例 -->
     <div class="wz-card">
       <div class="wz-card-title">📂 历史病例</div>
       <div id="wz-saved-cases"><div class="wz-empty">选择患者后显示历史病例</div></div>
@@ -349,25 +447,21 @@
         </div>
       </div>
     </div>
-
-    <!-- 快捷入口 -->
     <div class="wz-card">
       <div class="wz-card-title">🔗 快捷入口</div>
       <div class="wz-btn-row" style="flex-direction:column">
         <a href="tcm-clinic.html" class="btn btn-ghost" style="text-decoration:none;text-align:center">🏥 中医诊疗</a>
         <a href="tcm-symptom.html" class="btn btn-ghost" style="text-decoration:none;text-align:center">🩺 症状分析</a>
-        <a href="ai-assistant.html" class="btn btn-ghost" style="text-decoration:none;text-align:center">🤖 AI助手</a>
-        <a href="vision-demo.html" class="btn btn-ghost" style="text-decoration:none;text-align:center">🥽 智镜版</a>
-        <a href="camera-capture.html" class="btn btn-ghost" style="text-decoration:none;text-align:center">📷 摄像头采集</a>
-        <a href="glass-console.html" class="btn btn-ghost" style="text-decoration:none;text-align:center">👓 眼镜控制台</a>
+        <a href="doctor-elder.html" class="btn btn-ghost" style="text-decoration:none;text-align:center">👨‍⚕️ 接诊台</a>
+        <a href="vision-demo.html" class="btn btn-ghost" style="text-decoration:none;text-align:center">🥽 AI视觉</a>
       </div>
     </div>
   </aside>
 
 </div>
 
-<!-- Modal (五官模块详情) -->
-<div id="wangzhen-organ-modal" class="wangzhen-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)wangzhenCenter.closeOrganModal()">
+<!-- Modal -->
+<div id="wangzhen-organ-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)wangzhenCenter.closeOrganModal()">
   <div style="background:#111827;border:1px solid var(--wz-border);border-radius:12px;max-width:600px;max-height:80vh;overflow-y:auto;padding:20px;width:100%">
     <span style="float:right;cursor:pointer;font-size:20px;color:var(--wz-paper3)" onclick="wangzhenCenter.closeOrganModal()">✕</span>
     <div id="wangzhen-organ-modal-body"></div>
@@ -379,20 +473,19 @@
 <script src="js/wangzhen-center.js" defer></script>
 <script src="js/wangzhen-clinical.js" defer></script>
 
-<!-- 初始化八字下拉 -->
+<!-- 初始化下拉 -->
 <script>
 (function(){
-  var years = [];
-  for(var y = 1940; y <= 2025; y++) years.push(y);
+  // 八字排盘下拉
   var ySel = document.getElementById('wz-bazi-year');
   var mSel = document.getElementById('wz-bazi-month');
   var dSel = document.getElementById('wz-bazi-day');
   var hSel = document.getElementById('wz-bazi-hour');
-  if(ySel) years.forEach(function(y){ var o=document.createElement('option'); o.value=y; o.textContent=y+'年'; ySel.appendChild(o); });
-  if(mSel) for(var m=1;m<=12;m++){ var o=document.createElement('option'); o.value=m; o.textContent=m+'月'; mSel.appendChild(o); }
-  if(dSel) for(var d=1;d<=31;d++){ var o=document.createElement('option'); o.value=d; o.textContent=d+'日'; dSel.appendChild(o); }
-  var hours = [['子','23-01',0],['丑','01-03',1],['寅','03-05',3],['卯','05-07',5],['辰','07-09',7],['巳','09-11',9],['午','11-13',11],['未','13-15',13],['申','15-17',15],['酉','17-19',17],['戌','19-21',19],['亥','21-23',21]];
-  if(hSel) hours.forEach(function(h){ var o=document.createElement('option'); o.value=h[2]; o.textContent=h[1]+'时 ('+h[0]+')'; hSel.appendChild(o); });
+  if(ySel) for(var y=1940;y<=2025;y++){var o=document.createElement('option');o.value=y;o.textContent=y+'年';ySel.appendChild(o);}
+  if(mSel) for(var m=1;m<=12;m++){var o=document.createElement('option');o.value=m;o.textContent=m+'月';mSel.appendChild(o);}
+  if(dSel) for(var d=1;d<=31;d++){var o=document.createElement('option');o.value=d;o.textContent=d+'日';dSel.appendChild(o);}
+  var hours=[['子时','23-01',0],['丑时','01-03',1],['寅时','03-05',3],['卯时','05-07',5],['辰时','07-09',7],['巳时','09-11',9],['午时','11-13',11],['未时','13-15',13],['申时','15-17',15],['酉时','17-19',17],['戌时','19-21',19],['亥时','21-23',21]];
+  if(hSel) hours.forEach(function(h){var o=document.createElement('option');o.value=h[2];o.textContent=h[0]+' ('+h[1]+')';hSel.appendChild(o);});
 })();
 </script>
 

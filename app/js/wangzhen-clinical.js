@@ -15,6 +15,18 @@
 
   // ===== 新建患者 =====
   function toggleNewPatientForm(){
+    // 初始化年下拉
+    var ySel = document.getElementById('np-byear');
+    if(ySel && ySel.options.length <= 1){
+      for(var y = 1940; y <= 2025; y++){ var o = document.createElement('option'); o.value = y; o.textContent = y; ySel.appendChild(o); }
+      var mSel = document.getElementById('np-bmonth');
+      for(var m = 1; m <= 12; m++){ var o2 = document.createElement('option'); o2.value = m; o2.textContent = m; mSel.appendChild(o2); }
+      var dSel = document.getElementById('np-bday');
+      for(var d = 1; d <= 31; d++){ var o3 = document.createElement('option'); o3.value = d; o3.textContent = d; dSel.appendChild(o3); }
+      var hSel = document.getElementById('np-bhour');
+      var hours = [['子时',0],['丑时',1],['寅时',3],['卯时',5],['辰时',7],['巳时',9],['午时',11],['未时',13],['申时',15],['酉时',17],['戌时',19],['亥时',21]];
+      hours.forEach(function(h){ var o4 = document.createElement('option'); o4.value = h[1]; o4.textContent = h[0]; hSel.appendChild(o4); });
+    }
     var form = document.getElementById('wz-new-patient-form');
     if(form) form.style.display = form.style.display === 'none' ? 'block' : 'none';
     // 初始化八字下拉
@@ -169,6 +181,86 @@
         if(num2) num2.textContent = n;
       }
     });
+  }
+
+
+  // ===== 历法切换 =====
+  var calendarMode = 'solar'; // 'solar' or 'lunar'
+  var baziCalendarMode = 'solar';
+
+  function switchCalendar(mode){
+    calendarMode = mode;
+    var btns = document.querySelectorAll('#np-cal-switch button');
+    btns.forEach(function(b){ b.classList.toggle('active', b.textContent === (mode === 'solar' ? '阳历' : '农历')); });
+    var lunarExtra = document.getElementById('np-lunar-months');
+    if(lunarExtra) lunarExtra.style.display = mode === 'lunar' ? 'block' : 'none';
+    // 更新月选项文字
+    var mSel = document.getElementById('np-bmonth');
+    if(mSel){
+      var months = mode === 'lunar'
+        ? ['正月','二月','三月','四月','五月','六月','七月','八月','九月','十月','冬月','腊月']
+        : ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+      mSel.innerHTML = '<option value="">月</option>';
+      months.forEach(function(m, i){ var o = document.createElement('option'); o.value = i+1; o.textContent = m; mSel.appendChild(o); });
+    }
+  }
+
+  function switchBaziCal(mode){
+    baziCalendarMode = mode;
+    var btns = document.querySelectorAll('#wz-bazi-cal-switch button');
+    btns.forEach(function(b){ b.classList.toggle('active', b.textContent === (mode === 'solar' ? '阳历' : '农历')); });
+  }
+
+  // ===== 症状点选 =====
+  function addSymptom(text){
+    var textarea = document.getElementById('np-chief');
+    if(!textarea) return;
+    var current = textarea.value.trim();
+    if(current && current.indexOf(text) < 0){
+      textarea.value = current + '、' + text;
+    } else if(!current){
+      textarea.value = text;
+    }
+    // 闪一下
+    textarea.style.borderColor = 'var(--wz-gold)';
+    setTimeout(function(){ textarea.style.borderColor = ''; }, 500);
+  }
+
+  // ===== 语音输入（通用，可填任意字段）=====
+  function startVoiceInput(targetId){
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if(!SR){ showToast('浏览器不支持语音输入，请使用 Chrome 或 Edge', 'warning'); return; }
+    var rec = new SR();
+    rec.lang = 'zh-CN';
+    rec.continuous = false;
+    rec.interimResults = true;
+    var textarea = document.getElementById(targetId);
+    if(!textarea) return;
+    var finalText = textarea.value;
+
+    rec.onresult = function(event){
+      var interim = '';
+      for(var i = event.resultIndex; i < event.results.length; i++){
+        if(event.results[i].isFinal){
+          finalText += event.results[i][0].transcript;
+        } else {
+          interim += event.results[i][0].transcript;
+        }
+      }
+      textarea.value = finalText + interim;
+    };
+
+    rec.onerror = function(event){
+      showToast('语音识别错误: ' + event.error, 'error');
+    };
+
+    rec.onend = function(){};
+
+    rec.start();
+    showToast('🎤 请说话...');
+    // 视觉反馈
+    textarea.style.borderColor = 'var(--wz-jade)';
+    setTimeout(function(){ textarea.style.borderColor = ''; }, 3000);
   }
 
   var currentPatient = null;
@@ -462,7 +554,8 @@
     if(!bazi || !bazi.year) return;
     if(!window.fetch) return; // jsdom guard
     var params = 'year='+bazi.year+'&month='+bazi.month+'&day='+bazi.day+'&hour='+bazi.hour;
-    fetch(PAIPAN_API + '/paipan/bazi?'+params)
+    if(bazi.lunar) params += '&lunar=1';
+    fetch(PAIPAN_API + '/paipan?'+params)
       .then(function(r){ return r.json(); })
       .then(function(data){
         renderPaipan(data);
@@ -805,6 +898,10 @@
       if(capEl) capEl.textContent = caps.length > 0 ? '✅ 已启用: ' + caps.join(' ') : '⚠️ 浏览器能力受限';
     },
 
+    switchCalendar: switchCalendar,
+    switchBaziCal: switchBaziCal,
+    addSymptom: addSymptom,
+    startVoiceInput: startVoiceInput,
     goStep: goStep,
     completeStep: completeStep,
     toggleNewPatientForm: toggleNewPatientForm,
@@ -832,7 +929,7 @@
         showToast('请输入完整的出生年月日', 'warning');
         return;
       }
-      fetchPaipan({ year: year, month: month, day: day, hour: hour || '0' });
+      fetchPaipan({ year: year, month: month, day: day, hour: hour || '0', lunar: baziCalendarMode === 'lunar' });
     }
   };
 
