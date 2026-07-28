@@ -647,6 +647,102 @@ function renderAlertCard(){
     mainCard.appendChild(histStrip);
   }
 
+  // 多周模块对比矩阵（R210）
+  if (weekAlerts.length > 1){
+    const modCompSection = el('div', {className:'alert-mod-comp'},
+      el('div', {className:'alert-mod-comp-title'}, '📊 多周模块对比矩阵'),
+      el('div', {className:'alert-mod-comp-hint'}, '各模块 faithfulness 评分跨周变化 · 低分模块一目了然')
+    );
+    // 收集所有有 faithfulness per-case 数据的周
+    const modCompWeeks = WEEKS.filter(w => {
+      const f = cache.weeks[w]?.faithfulness;
+      return f && f.results && f.results.length > 0;
+    });
+    if (modCompWeeks.length >= 2){
+      // 模块中文名
+      const modNames = {
+        bazi:'八字', zodiac:'生肖', ziwei:'紫微', qimen:'奇门',
+        liuren:'六壬', liuyao:'六爻', meihua:'梅花',
+        fengshui:'风水', zeri:'择日', wuxing:'五行',
+        tcm:'中医', tizhi:'体质', other:'其他'
+      };
+      // 按周按模块聚合
+      const modData = {}; // { mod: { week: {avg, cases} } }
+      modCompWeeks.forEach(w => {
+        const f = cache.weeks[w].faithfulness;
+        const agg = {};
+        f.results.forEach(r => {
+          const mod = FAITH_MODULE_MAP[r.id] || 'other';
+          if (!agg[mod]) agg[mod] = { scores: [] };
+          agg[mod].scores.push(r.score || 0);
+        });
+        Object.keys(agg).forEach(mod => {
+          if (!modData[mod]) modData[mod] = {};
+          const s = agg[mod].scores;
+          modData[mod][w] = {
+            avg: Math.round((s.reduce((a,b)=>a+b,0) / s.length) * 1000) / 1000,
+            cases: s.length
+          };
+        });
+      });
+      // 排序：按最新周均分升序（低分在前）
+      const latestWeek = modCompWeeks[modCompWeeks.length - 1];
+      const sortedMods = Object.keys(modData).sort((a, b) => {
+        const aAvg = modData[a][latestWeek]?.avg ?? 1;
+        const bAvg = modData[b][latestWeek]?.avg ?? 1;
+        return aAvg - bAvg;
+      });
+      // 表格
+      const compTable = el('table', {className:'alert-mod-comp-table'});
+      // 表头
+      const thead = el('thead', {}, 
+        el('tr', {},
+          el('th', {className:'alert-mod-comp-th-mod'}, '模块'),
+          ...modCompWeeks.map(w => el('th', {className:'alert-mod-comp-th-week'}, w.replace('2026-',''))),
+          el('th', {className:'alert-mod-comp-th-trend'}, '趋势')
+        )
+      );
+      compTable.appendChild(thead);
+      // 表体
+      const tbody = el('tbody', {});
+      sortedMods.forEach(mod => {
+        const wData = modData[mod];
+        const tr = el('tr', {className:'alert-mod-comp-row'});
+        tr.appendChild(el('td', {className:'alert-mod-comp-td-mod'}, modNames[mod] || mod));
+        // 各周分数
+        const weekAvgs = [];
+        modCompWeeks.forEach(w => {
+          const d = wData[w];
+          if (d){
+            const cls = d.avg >= 0.85 ? 'alert-ok' : d.avg >= 0.7 ? 'alert-warn' : 'alert-critical';
+            tr.appendChild(el('td', {className:'alert-mod-comp-td-score ' + cls}, d.avg.toFixed(3)));
+            weekAvgs.push(d.avg);
+          } else {
+            tr.appendChild(el('td', {className:'alert-mod-comp-td-score alert-mod-comp-na'}, '—'));
+            weekAvgs.push(null);
+          }
+        });
+        // 趋势箭头
+        const validAvgs = weekAvgs.filter(v => v != null);
+        let trendText = '—';
+        let trendCls = 'alert-mod-comp-trend-flat';
+        if (validAvgs.length >= 2){
+          const first = validAvgs[0];
+          const last = validAvgs[validAvgs.length - 1];
+          const delta = last - first;
+          if (delta > 0.03){ trendText = '↑+' + delta.toFixed(3); trendCls = 'alert-mod-comp-trend-up'; }
+          else if (delta < -0.03){ trendText = '↓' + delta.toFixed(3); trendCls = 'alert-mod-comp-trend-down'; }
+          else { trendText = '→' + (delta >= 0 ? '+' : '') + delta.toFixed(3); trendCls = 'alert-mod-comp-trend-flat'; }
+        }
+        tr.appendChild(el('td', {className:'alert-mod-comp-td-trend ' + trendCls}, trendText));
+        tbody.appendChild(tr);
+      });
+      compTable.appendChild(tbody);
+      modCompSection.appendChild(compTable);
+      mainCard.appendChild(modCompSection);
+    }
+  }
+
   wrap.appendChild(mainCard);
 }
 
