@@ -35,8 +35,8 @@
   function opsBar(text) {
     var safe = esc(text).replace(/"/g, '&quot;');
     return '<div class="report-ops" style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">' +
-      '<button class="btn-copy" data-report="' + safe + '" onclick="navigator.clipboard.writeText(this.dataset.report||\'\').then(function(){alert(\'已复制\')})" style="padding:4px 12px;border:1px solid rgba(201,168,76,.3);border-radius:6px;background:transparent;color:inherit;cursor:pointer;font-size:12px">📋 复制</button>' +
-      '<button class="btn-copy-md" data-report="' + safe + '" onclick="navigator.clipboard.writeText(this.dataset.report||\'\').then(function(){alert(\'已复制 Markdown\')})" style="padding:4px 12px;border:1px solid rgba(201,168,76,.3);border-radius:6px;background:transparent;color:inherit;cursor:pointer;font-size:12px">📝 Markdown</button>' +
+      '<button class="btn-copy" data-report="' + safe + '" onclick="navigator.clipboard.writeText(this.dataset.report||\'\').then(function(){var t=document.createElement(\'div\');t.textContent=\'已复制\';t.style.cssText=\'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:6px 16px;border-radius:6px;font-size:13px;z-index:9999\';document.body.appendChild(t);setTimeout(function(){t.remove()},1500)})" style="padding:4px 12px;border:1px solid rgba(201,168,76,.3);border-radius:6px;background:transparent;color:inherit;cursor:pointer;font-size:12px">📋 复制</button>' +
+      '<button class="btn-copy-md" data-report="' + safe + '" onclick="navigator.clipboard.writeText(this.dataset.report||\'\').then(function(){var t=document.createElement(\'div\');t.textContent=\'已复制 Markdown\';t.style.cssText=\'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:6px 16px;border-radius:6px;font-size:13px;z-index:9999\';document.body.appendChild(t);setTimeout(function(){t.remove()},1500)})" style="padding:4px 12px;border:1px solid rgba(201,168,76,.3);border-radius:6px;background:transparent;color:inherit;cursor:pointer;font-size:12px">📝 Markdown</button>' +
       '</div>';
   }
 

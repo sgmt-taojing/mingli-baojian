@@ -70,6 +70,28 @@
   }
 
   /**
+   * 工具：JieqiEngine 节气增强 — 从排盘数据中提取节气信息
+   * 如果 JieqiEngine 可用且排盘数据包含日期，补充精确节气边界
+   */
+  function jieqiEnhance(data) {
+    if (typeof global.JieqiEngine === 'undefined' || !data) return '';
+    try {
+      var y = parseInt(data.year || data.birthYear, 10);
+      var m = parseInt(data.month || data.birthMonth, 10);
+      var d = parseInt(data.day || data.birthDay, 10);
+      var h = parseInt(data.hour || data.birthHour, 10);
+      if (!y || !m || !d) return '';
+      var r = global.JieqiEngine.getFourPillars(y, m, d, h || 12);
+      var parts = [];
+      parts.push('节气: ' + r.jieqi);
+      if (r.boundary) parts.push('交节: ' + r.boundary);
+      parts.push('年柱: ' + r.yearGZ + ' / 月柱: ' + r.monthGZ + ' / 日柱: ' + r.dayGZ + ' / 时柱: ' + r.hourGZ);
+      if (r.nayin) parts.push('纳音: ' + r.nayin);
+      return '\n【天文节气引擎（紫金山天文台历表）】\n' + parts.join('\n') + '\n';
+    } catch (e) { return ''; }
+  }
+
+  /**
    * 步骤 0：模块 KB 兜底（断网可用）
    * 返回 { html, used: true/false }
    */
@@ -564,6 +586,9 @@
     }
 
     // 步骤 3b：后端结构化报告（lifeplan/lifeindex/music）
+    // 补充节气引擎数据到 promptExtra
+    var jieqiInfo = jieqiEnhance(data);
+    if (jieqiInfo) promptExtra += jieqiInfo;
     let backendStructured = null;
     if (moduleId === 'lifeplan' || moduleId === 'lifeindex' || moduleId === 'music') {
       backendStructured = await callBackendStructured(apiBase, moduleId, data);
