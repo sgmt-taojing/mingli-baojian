@@ -1791,6 +1791,140 @@ function exportAlertDetailCSV(){
   downloadCSV('eval-alert-detail.csv', rows);
 }
 
+// ===== R216: 诊疗经验蒸馏 =====
+async function fetchDistillReport(){
+  const url = `${GH}/DELIVERY/distill-report-2026-07-28.json`;
+  try{
+    const r = await fetch(url, { cache: 'no-cache' });
+    if (!r.ok) return null;
+    return await r.json();
+  }catch(e){ return null; }
+}
+
+function renderDistill(report){
+  const wrap = $('distillBody');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  if (!report){
+    wrap.appendChild(el('div', {className:'distill-empty'}, '暂无蒸馏报告数据'));
+    return;
+  }
+  const s = report.summary || {};
+  const organs = report.organ_distribution || {};
+  const formulas = report.formula_usage_ranking || {};
+  const symptoms = report.symptom_frequency_ranking || {};
+  const candidates = report.candidates || [];
+
+  // 摘要条
+  const summaryBar = el('div', {className:'distill-summary-bar'},
+    el('span', {className:'distill-stat'}, '👥 ' + (s.total_patients||0) + ' 患者'),
+    el('span', {className:'distill-stat'}, '📋 ' + (s.total_clinical_records||0) + ' 诊疗记录'),
+    el('span', {className:'distill-stat'}, '🧪 ' + (s.candidates_generated||0) + ' 蒸馏条目'),
+    el('span', {className:'distill-date'}, '📅 ' + (report.report_date||'').slice(0,10))
+  );
+  wrap.appendChild(summaryBar);
+
+  // 脏腑分布 + 方剂排行 + 症状排行
+  const grid = el('div', {className:'distill-grid'});
+
+  // 脏腑分布
+  const organList = Object.entries(organs).sort((a,b) => b[1]-a[1]);
+  const organCard = el('div', {className:'distill-card distill-organ'},
+    el('div', {className:'distill-card-title'}, '🏥 脏腑分布'),
+    el('div', {className:'distill-bar-list'},
+      organList.length ? organList.map(([k,v]) =>
+        el('div', {className:'distill-bar-row'},
+          el('span', {className:'distill-bar-label'}, k),
+          el('div', {className:'distill-bar-track'},
+            el('div', {className:'distill-bar-fill distill-fill-organ', style:'width:' + Math.max(10, v * 30) + 'px'})),
+          el('span', {className:'distill-bar-val'}, String(v))
+        )
+      ) : [el('div', {}, '无数据')]
+    )
+  );
+  grid.appendChild(organCard);
+
+  // 方剂排行
+  const formulaList = Object.entries(formulas).sort((a,b) => b[1]-a[1]);
+  const formulaCard = el('div', {className:'distill-card distill-formula'},
+    el('div', {className:'distill-card-title'}, '💊 方剂使用排行'),
+    el('div', {className:'distill-bar-list'},
+      formulaList.length ? formulaList.map(([k,v]) =>
+        el('div', {className:'distill-bar-row'},
+          el('span', {className:'distill-bar-label'}, k),
+          el('div', {className:'distill-bar-track'},
+            el('div', {className:'distill-bar-fill distill-fill-formula', style:'width:' + Math.max(10, v * 30) + 'px'})),
+          el('span', {className:'distill-bar-val'}, String(v))
+        )
+      ) : [el('div', {}, '无数据')]
+    )
+  );
+  grid.appendChild(formulaCard);
+
+  // 症状频次
+  const symptomList = Object.entries(symptoms).sort((a,b) => b[1]-a[1]);
+  const symptomCard = el('div', {className:'distill-card distill-symptom'},
+    el('div', {className:'distill-card-title'}, '🩺 症状频次'),
+    el('div', {className:'distill-bar-list'},
+      symptomList.length ? symptomList.map(([k,v]) =>
+        el('div', {className:'distill-bar-row'},
+          el('span', {className:'distill-bar-label'}, k),
+          el('div', {className:'distill-bar-track'},
+            el('div', {className:'distill-bar-fill distill-fill-symptom', style:'width:' + Math.max(10, v * 30) + 'px'})),
+          el('span', {className:'distill-bar-val'}, String(v))
+        )
+      ) : [el('div', {}, '无数据')]
+    )
+  );
+  grid.appendChild(symptomCard);
+  wrap.appendChild(grid);
+
+  // 候选条目表
+  if (candidates.length){
+    const table = el('table', {className:'distill-table'});
+    const thead = el('thead', {},
+      el('tr', {},
+        el('th', {}, 'Entry ID'),
+        el('th', {}, '标题'),
+        el('th', {}, '类别'),
+        el('th', {}, '信任度'),
+        el('th', {}, '关键词')
+      )
+    );
+    table.appendChild(thead);
+    const tbody = el('tbody', {});
+    candidates.forEach(c => {
+      const trustCls = (c.trust||0) >= 0.8 ? 'distill-trust-high' : (c.trust||0) >= 0.7 ? 'distill-trust-mid' : 'distill-trust-low';
+      tbody.appendChild(el('tr', {},
+        el('td', {className:'distill-td-id'}, c.entry_id || '--'),
+        el('td', {className:'distill-td-title'}, c.title || '--'),
+        el('td', {className:'distill-td-cat'}, c.category || '--'),
+        el('td', {className:'distill-td-trust ' + trustCls}, (c.trust || 0).toFixed(2)),
+        el('td', {className:'distill-td-kw'}, esc(c.keyword || '--'))
+      ));
+    });
+    table.appendChild(tbody);
+    wrap.appendChild(el('div', {className:'distill-table-wrap'}, table));
+  }
+}
+
+function exportDistillCSV(){
+  const report = cache.distill;
+  if (!report || !report.candidates){
+    alert('蒸馏数据未加载');
+    return;
+  }
+  const rows = [['Entry_ID','Title','Category','Trust','Keyword','Module','Source_Type','Distill_Date']];
+  report.candidates.forEach(c => {
+    rows.push([
+      c.entry_id || '', c.title || '', c.category || '',
+      (c.trust || 0).toFixed(2), c.keyword || '',
+      c.module || '', c.source_type || '', c.distill_date || ''
+    ]);
+  });
+  downloadCSV('distill-candidates.csv', rows);
+}
+
 // 主入口
 async function refresh(){
   $('refreshBtn').textContent = '⏳ 加载中…';
@@ -1808,6 +1942,9 @@ async function refresh(){
     renderAlertHistory();
     renderPerCase();
     renderModPerCase();
+    // R216: 蒸馏报告
+    cache.distill = await fetchDistillReport();
+    renderDistill(cache.distill);
   }finally{
     $('refreshBtn').textContent = '🔄 刷新';
     $('refreshBtn').disabled = false;
@@ -1821,6 +1958,7 @@ const _pcCSV = $('percaseCSVBtn'); if (_pcCSV) _pcCSV.addEventListener('click', 
 const _mpCSV = $('modPercaseCSVBtn'); if (_mpCSV) _mpCSV.addEventListener('click', exportModPerCaseCSV);
 const _ahCSV = $('alertHistCSVBtn'); if (_ahCSV) _ahCSV.addEventListener('click', exportAlertHistoryCSV);
 const _adCSV = $('alertDetailCSVBtn'); if (_adCSV) _adCSV.addEventListener('click', exportAlertDetailCSV);
+const _diCSV = $('distillCSVBtn'); if (_diCSV) _diCSV.addEventListener('click', exportDistillCSV);
 
 // 启动
 refresh();

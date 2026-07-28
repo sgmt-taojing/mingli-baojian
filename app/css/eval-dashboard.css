@@ -1438,3 +1438,70 @@ html, body {
   .alert-mod-comp-hint { display: none; }
   .alert-mod-comp-td-trend { font-size: 9px; }
 }
+
+/* R216: 诊疗经验蒸馏 */
+.dash-distill { margin-bottom: 24px; }
+.distill-body { margin-top: 8px; }
+.distill-empty { color: var(--text-dim); text-align: center; padding: 20px; }
+.distill-summary-bar {
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+  padding: 10px 14px; background: var(--card-bg); border-radius: 8px; margin-bottom: 12px;
+  border: 1px solid var(--border);
+}
+.distill-stat { font-size: 13px; color: var(--text); }
+.distill-date { margin-left: auto; font-size: 11px; color: var(--text-dim); }
+.distill-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px; margin-bottom: 14px;
+}
+.distill-card {
+  background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px;
+  padding: 12px 14px;
+}
+.distill-card-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--accent); }
+.distill-bar-list { display: flex; flex-direction: column; gap: 4px; }
+.distill-bar-row { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+.distill-bar-label { min-width: 48px; color: var(--text); }
+.distill-bar-track { flex: 1; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+.distill-bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+.distill-fill-organ { background: linear-gradient(90deg, #4fc3f7, #29b6f6); }
+.distill-fill-formula { background: linear-gradient(90deg, #81c784, #66bb6a); }
+.distill-fill-symptom { background: linear-gradient(90deg, #ffb74d, #ffa726); }
+.distill-bar-val { min-width: 20px; text-align: right; color: var(--text-dim); font-size: 11px; }
+.distill-table-wrap { overflow-x: auto; }
+.distill-table { width: 100%; border-collapse: collapse; font-size: 12px; font-family: 'SF Mono', 'Cascadia Code', monospace; }
+.distill-table thead th {
+  text-align: left; padding: 6px 8px; color: var(--text-dim); font-size: 11px;
+  border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+.distill-table tbody td {
+  padding: 5px 8px; border-bottom: 1px solid var(--border); color: var(--text);
+}
+.distill-td-id { color: var(--text-dim); font-size: 11px; white-space: nowrap; }
+.distill-td-title { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.distill-td-cat { white-space: nowrap; }
+.distill-td-trust { text-align: center; font-weight: 600; }
+.distill-trust-high { color: #66bb6a; }
+.distill-trust-mid { color: #ffa726; }
+.distill-trust-low { color: #ef5350; }
+.distill-td-kw { color: var(--text-dim); font-size: 11px; }
+
+@media (max-width: 480px) {
+  .distill-grid { grid-template-columns: 1fr; }
+  .distill-summary-bar { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .distill-date { margin-left: 0; }
+  .distill-table { font-size: 10px; }
+  .distill-td-title { max-width: 120px; }
+}
+
+@media (max-width: 360px) {
+  .distill-card { padding: 8px 10px; }
+  .distill-card-title { font-size: 12px; }
+  .distill-table { font-size: 9px; }
+  .distill-td-id, .distill-td-kw { font-size: 9px; }
+}
+
+@media print {
+  .dash-distill { break-inside: avoid; }
+  #distillCSVBtn { display: none; }
+}
