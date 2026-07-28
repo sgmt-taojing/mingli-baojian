@@ -42,6 +42,10 @@
     shiye: collectShiyeData,
     wuxing: collectWuxingData,
     xingming: collectXingmingData,
+    yanzhi: collectYanzhiData,
+    huangli: collectHuangliData,
+    zeri: collectZeriData,
+    taisui: collectTaisuiData,
     general: collectGeneralData
   };
 
@@ -128,6 +132,75 @@
   function collectCaiyunData() { return collectBaziData(); }
   function collectGanqingData() { return collectBaziData(); }
   function collectShiyeData() { return collectBaziData(); }
+
+  // R100: 4 新模块 collector（yanzhi/huangli/zeri/taisui）
+  function collectYanzhiData() {
+    var data = {};
+    try {
+      // yanzhi section is lazy-loaded; try common input IDs after load
+      var moleChart = document.getElementById('moleChart');
+      var yanzhiResult = document.getElementById('yanzhiResult');
+      if (moleChart) data.hasMoleChart = true;
+      if (yanzhiResult) data.hasResult = true;
+      // 尝试读取面部痣相选择
+      var faceArea = document.querySelector('#section-yanzhi select, #section-yanzhi input[type="text"]');
+      if (faceArea) data.faceArea = faceArea.value;
+    } catch (e) {}
+    return data;
+  }
+
+  function collectHuangliData() {
+    var data = {};
+    try {
+      // 黄历模块：尝试读取当前日期选择
+      var huangliDate = document.getElementById('huangliDate') || document.getElementById('jiuriDate');
+      if (huangliDate) data.date = huangliDate.value;
+      // 尝试读取宜忌筛选
+      var huangliAction = document.getElementById('huangliAction');
+      if (huangliAction) data.action = huangliAction.value;
+    } catch (e) {}
+    return data;
+  }
+
+  function collectZeriData() {
+    var data = {};
+    try {
+      var name = document.getElementById('zeriName');
+      var birthDate = document.getElementById('zeriBirthDate');
+      var birthHour = document.getElementById('zeriBirthHour');
+      var sex = document.getElementById('zeriSex');
+      var birthCity = document.getElementById('zeriBirthCity');
+      var liveCity = document.getElementById('zeriLiveCity');
+      var purpose = document.getElementById('jiuriPurpose');
+      var zeriType = document.getElementById('fs-pro-zeri-type');
+      var zeriStart = document.getElementById('fs-pro-zeri-start');
+      var zeriEnd = document.getElementById('fs-pro-zeri-end');
+      if (name) data.name = name.value;
+      if (birthDate) data.birthDate = birthDate.value;
+      if (birthHour) data.birthHour = birthHour.value;
+      if (sex) data.sex = sex.value;
+      if (birthCity) data.birthCity = birthCity.value;
+      if (liveCity) data.liveCity = liveCity.value;
+      if (purpose) data.purpose = purpose.value;
+      if (zeriType) data.zeriType = zeriType.value;
+      if (zeriStart) data.dateStart = zeriStart.value;
+      if (zeriEnd) data.dateEnd = zeriEnd.value;
+    } catch (e) {}
+    return data;
+  }
+
+  function collectTaisuiData() {
+    var data = {};
+    try {
+      // 太岁模块：尝试读取生辰信息（复用 bazi 表单）
+      data = collectBaziData();
+      // 尝试读取太岁年份选择
+      var taisuiYear = document.getElementById('taisuiYear');
+      if (taisuiYear) data.taisuiYear = taisuiYear.value;
+    } catch (e) {}
+    return data;
+  }
+
   function collectWuxingData() {
     var data = {};
     try {
