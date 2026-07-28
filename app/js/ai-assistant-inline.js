@@ -3767,11 +3767,13 @@ async function handleFaceUpload(input){
     showToast('正在调用AI识图分析…');
 
     // 【新增】调用后端 face-ocr 服务拿真实视觉分析
+    // R205: zhongyi 模块带 mode=wangzhen 走望诊 prompt
+    var faceMode = (state.module==='zhongyi') ? 'wangzhen' : 'face';
     try {
       var faceResp = await fetch(API+'/api/face/analyze', {
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({image:e.target.result})
+        body:JSON.stringify({image:e.target.result, mode:faceMode})
       }).then(r=>r.json());
       if(faceResp && faceResp.ok){
         // 质量检查失败 → 提示用户重拍
@@ -3783,8 +3785,10 @@ async function handleFaceUpload(input){
           // 成功 → 存分析结果（KB 兑底也存，不丢报告）
           state.data.faceAnalysis = faceResp.analysis || faceResp.text || '';
           state.data.faceEngine = faceResp.engine || 'unknown';
-          if(prev) prev.innerHTML += '<div style="font-size:11px;color:var(--gold);margin-top:6px">✨ AI分析完成（引擎：'+escHtml(faceResp.engine||'kb')+'）</div>';
-          showToast('面相分析完成');
+          state.data.faceMode = faceResp.mode || faceMode;
+          var modeLabel = faceMode==='wangzhen' ? '望诊' : '面相';
+          if(prev) prev.innerHTML += '<div style="font-size:11px;color:var(--gold);margin-top:6px">✨ AI'+modeLabel+'分析完成（引擎：'+escHtml(faceResp.engine||'kb')+'）</div>';
+          showToast(modeLabel+'分析完成');
         }
       }
     } catch(err){

@@ -569,6 +569,11 @@ body {
       <span class="mode-name">舌诊分析</span>
       <span class="mode-hint">中医舌象 + 五脏辨证</span>
     </button>
+    <button type="button" class="mode-btn" data-mode="wangzhen" onclick="selectMode('wangzhen')" aria-label="中医望诊：面部五色辨证 + 脏腑分区">
+      <span class="mode-icon" aria-hidden="true">🩺</span>
+      <span class="mode-name">中医望诊</span>
+      <span class="mode-hint">五色辨证 + 脏腑分区</span>
+    </button>
     <button type="button" class="mode-btn" data-mode="ocr" onclick="selectMode('ocr')" aria-label="通用 OCR：文字、文档、卦象">
       <span class="mode-icon" aria-hidden="true">📄</span>
       <span class="mode-name">通用 OCR</span>
@@ -690,7 +695,7 @@ body {
  * ========================================================= */
 
 const MODE_LABELS = {
-  face: '面相识别', tongue: '舌诊分析', ocr: '通用 OCR', 'ocr-tcm': '病历 OCR'
+  face: '面相识别', tongue: '舌诊分析', wangzhen: '中医望诊', ocr: '通用 OCR', 'ocr-tcm': '病历 OCR'
 };
 
 let currentMode = 'face';
@@ -949,6 +954,9 @@ async function captureAndAnalyze() {
     } else if (mode === 'tongue') {
       apiUrl = '/api/face/analyze';
       body = { image: b64, mode: 'tongue' };
+    } else if (mode === 'wangzhen') {
+      apiUrl = '/api/face/analyze';
+      body = { image: b64, mode: 'wangzhen' };
     }
     lastApiUrl = apiUrl;
 
