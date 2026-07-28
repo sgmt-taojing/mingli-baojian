@@ -43,6 +43,7 @@ async function refreshDevices() {
         tmp.getTracks().forEach(t => t.stop());
       } catch (e) { /* ignore */ }
     }
+    if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
     devices = await navigator.mediaDevices.enumerateDevices();
     const cams = devices.filter(d => d.kind === 'videoinput');
     deviceSel.innerHTML = '<option value="">默认（自动选择）</option>' +
@@ -62,10 +63,10 @@ async function start() {
   try {
     const deviceId = deviceSel.value;
     const constraints = {
-      video: deviceId ? {deviceId: {exact: deviceId}, width: {ideal: 1920}, height: {ideal: 1080}}
-                       : {width: {ideal: 1280}, height: {ideal: 720}, facingMode: 'user'},
+      video: deviceId ? {deviceId: {exact: deviceId}} : true,
       audio: audioEnable.checked ? {deviceId: micSel.value ? {exact: micSel.value} : undefined, echoCancellation: true, noiseSuppression: true} : false
     };
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { setStatus('浏览器不支持摄像头，请使用 Chrome/Edge', 'err'); return; }
     stream = await navigator.mediaDevices.getUserMedia(constraints);
     video.srcObject = stream;
     video.style.display = 'block';
@@ -398,6 +399,7 @@ function updateDevStatus(cams, mics) {
 
 async function hotplugCheck() {
   try {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
     // 不需要权限就能 enumerate（但 label 为空）
     const all = await navigator.mediaDevices.enumerateDevices();
     const cams = all.filter(d => d.kind === 'videoinput');
@@ -451,10 +453,14 @@ if (navigator.mediaDevices) {
 }
 
 // 首次初始化设备列表
-hotplugCheck();
+if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+  hotplugCheck();
+}
 
 // 定期轮询（有些浏览器 devicechange 不触发）
-setInterval(hotplugCheck, 3000);
+if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+  setInterval(hotplugCheck, 3000);
+}
 
 // === 连续监听模式 ===
 continuousMode.addEventListener('change', () => {
