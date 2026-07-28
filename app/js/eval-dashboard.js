@@ -1058,29 +1058,29 @@ function exportSnapshot(){
   URL.revokeObjectURL(a.href);
 }
 
-// R208: 导出 PDF 预览
+// R208+R212: 导出 PDF 预览（含水印+页眉页脚）
 // 在新窗口中克隆当前 dashboard DOM + 内联打印样式，自动触发 print()
 function exportPDF(){
   var w = window.open('', '_blank', 'width=900,height=700');
   if (!w) { alert('请允许弹出窗口以导出 PDF'); return; }
 
-  // 收集当前页面 HTML
-  var html = document.documentElement.outerHTML;
+  var now = new Date();
+  var dateStr = now.toLocaleDateString('zh-CN');
+  var timeStr = now.toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'});
+  var stamp = dateStr + ' ' + timeStr;
 
   // 构建精简打印预览页面
   w.document.open();
   w.document.write('<!DOCTYPE html>\n<html lang="zh">\n<head>\n');
   w.document.write('<meta charset="UTF-8">');
   w.document.write('<meta name="viewport" content="width=device-width, initial-scale=1.0">');
-  w.document.write('<title>评估看板 PDF · ' + new Date().toLocaleDateString('zh-CN') + '</title>');
+  w.document.write('<title>评估看板 PDF · ' + dateStr + '</title>');
 
   // 内联 CSS（含 @media print 规则）
   w.document.write('<style>');
-  // 基础样式从当前页面 stylesheet 提取
   var styles = document.querySelectorAll('style, link[rel="stylesheet"]');
   for (var i = 0; i < styles.length; i++) {
     if (styles[i].tagName === 'LINK') {
-      // 外部 CSS → 用 fetch 同步拉取（阻塞）
       try {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', styles[i].href, false);
@@ -1093,13 +1093,34 @@ function exportPDF(){
   }
   w.document.write('</style>');
 
-  // 强制打印模式：body 直接加 print class
-  w.document.write('<style>body { background: #fff !important; color: #1a1a1a !important; }</style>');
+  // R212: 打印水印 + 页眉页脚样式
+  w.document.write('<style>');
+  w.document.write('@page { size: A4; margin: 18mm 12mm 20mm 12mm; }');
+  // 水印
+  w.document.write('.pdf-watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) rotate(-35deg); font-size: 72px; font-weight: 700; color: rgba(201,168,76,0.08); z-index: 0; pointer-events: none; white-space: nowrap; letter-spacing: 8px; }');
+  // 页眉
+  w.document.write('.pdf-page-header { position: fixed; top: 4mm; left: 12mm; right: 12mm; height: 10mm; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #c9a84c; font-size: 9px; color: #888; z-index: 10; }');
+  w.document.write('.pdf-page-header .ph-title { font-weight: 600; color: #c9a84c; }');
+  w.document.write('.pdf-page-header .ph-stamp { font-family: monospace; }');
+  // 页脚
+  w.document.write('.pdf-page-footer { position: fixed; bottom: 4mm; left: 12mm; right: 12mm; height: 10mm; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #c9a84c; font-size: 9px; color: #888; z-index: 10; }');
+  w.document.write('.pdf-page-footer .pf-conf { color: #c0392b; font-weight: 600; }');
+  w.document.write('.pdf-page-footer .pf-page { font-family: monospace; }');
+  // 打印时显示水印+页眉页脚
+  w.document.write('@media print { .pdf-watermark, .pdf-page-header, .pdf-page-footer { display: flex !important; } body { padding-top: 14mm; padding-bottom: 14mm; } }');
+  // 屏幕预览时也显示（淡色）
+  w.document.write('.pdf-watermark { display: flex; } .pdf-page-header, .pdf-page-footer { display: flex; }');
+  w.document.write('body { background: #fff !important; color: #1a1a1a !important; }');
+  w.document.write('</style>');
   w.document.write('</head>\n<body>');
+
+  // R212: 水印层
+  w.document.write('<div class="pdf-watermark">命理宝鉴 · 内部资料</div>');
+  // R212: 页眉
+  w.document.write('<div class="pdf-page-header"><span class="ph-title">📊 评估看板 · 命理宝鉴</span><span class="ph-stamp">导出时间: ' + stamp + '</span></div>');
 
   // 克隆 dashboard 主体内容
   var clone = document.querySelector('.dash-header').cloneNode(true);
-  // 移除按钮
   clone.querySelectorAll('.btn-refresh, .dash-back').forEach(function(el){ el.remove(); });
   w.document.write(clone.outerHTML);
 
@@ -1115,6 +1136,9 @@ function exportPDF(){
   var footer = document.querySelector('.dash-footer').cloneNode(true);
   w.document.write(footer.outerHTML);
 
+  // R212: 页脚
+  w.document.write('<div class="pdf-page-footer"><span class="pf-conf">🔒 内部资料 · 请勿外传</span><span class="pf-page">命理宝鉴 eval-dashboard · ' + dateStr + '</span></div>');
+
   w.document.write('\n</body>\n</html>');
   w.document.close();
 
@@ -1124,7 +1148,6 @@ function exportPDF(){
       w.focus();
       w.print();
     } catch(e) {
-      // 新窗口可能被浏览器阻止
       console.warn('print() failed:', e);
     }
   }, 800);
