@@ -59,7 +59,7 @@ async function doPaipan(){
   const r=await fetch('/api/paipan/fengshui',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({year:+y,sittingMountain:s,facingMountain:f})});
   const data=await r.json();
   if(!data.ok){showToast('排盘失败: '+data.error);return;}
-  renderChart(data.chart);
+  renderChart(data.chart); if(data.interpretation) renderInterpretation(data.interpretation);
 }
 function renderChart(c){
   document.getElementById('fs-meta').innerHTML=`${c.year}年 · ${c.yunName} · 坐${c.sittingMountain}向${c.facingMountain}<br>山星:${c.mountainStar} | 向星:${c.facingStar}`;
@@ -99,6 +99,23 @@ function renderChart(c){
   ih+='1白·吉 2黑·凶 3碧·凶<br>4绿·吉 5黄·大凶 6白·吉<br>7赤·凶 8白·吉 9紫·吉';
   ih+='</div>';
   info.innerHTML=ih;
+}
+
+function renderInterpretation(i){
+  if(!i) return;
+  const el=document.getElementById('paipan-interpretation')||(()=>{
+    const d=document.createElement('div');
+    d.id='paipan-interpretation';
+    d.style.cssText='margin:16px 0;padding:16px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2);border-radius:12px';
+    document.querySelector('.zw-grid,.qm-grid,.ly-grid,.lr-grid,.mh-grid,.fs-grid,main,body').appendChild(d);
+    return d;
+  })();
+  let h='<div style="font-size:15px;font-weight:600;color:var(--gold,#c9a84c);margin-bottom:8px">📜 断盘解读</div>';
+  if(i.summary) h+='<div style="font-size:13px;line-height:1.7;opacity:.9;margin-bottom:8px">'+i.summary+'</div>';
+  if(i.advice) h+='<div style="font-size:13px;line-height:1.7;opacity:.75">'+i.advice+'</div>';
+  if(i.guaJi) h+='<div style="font-size:12px;opacity:.6;margin-top:6px">卦象：'+i.guaJi+'</div>';
+  el.innerHTML=h;
+  el.style.display='block';
 }
 </script>
 </body>
