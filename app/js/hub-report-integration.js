@@ -53,6 +53,10 @@
     liuyao: collectLiuyaoData,
     liuren: collectLiurenData,
     koujue: collectKoujueData,
+    nihaisha: collectNihaishaData,
+    shuhan: collectShuhanData,
+    acupuncture: collectAcupunctureData,
+    mobile: collectMobileData,
     general: collectGeneralData
   };
 
@@ -300,6 +304,55 @@
     } catch (e) {}
     return data;
   }
+  // R102-p2: 4 新模块 collector（nihaisha/shuhan/acupuncture/mobile）
+  function collectNihaishaData() {
+    var data = {};
+    try {
+      var courseSel = document.getElementById('nihaishaCourse') || document.getElementById('nhsCourse');
+      var topicSel = document.getElementById('nihaishaTopic') || document.getElementById('nhsTopic');
+      if (courseSel) data.course = courseSel.value;
+      if (topicSel) data.topic = topicSel.value;
+      data.bazi = collectBaziData();
+    } catch (e) {}
+    return data;
+  }
+
+  function collectShuhanData() {
+    var data = {};
+    try {
+      var shuhanCategory = document.getElementById('shuhanCategory') || document.getElementById('shuhanTopic');
+      var shuhanQuery = document.getElementById('shuhanSearch') || document.getElementById('shuhanQuery');
+      if (shuhanCategory) data.category = shuhanCategory.value;
+      if (shuhanQuery) data.query = shuhanQuery.value;
+      data.bazi = collectBaziData();
+    } catch (e) {}
+    return data;
+  }
+
+  function collectAcupunctureData() {
+    var data = {};
+    try {
+      var acuPoint = document.getElementById('acuPoint') || document.getElementById('acupuncturePoint');
+      var acuMeridian = document.getElementById('acuMeridian') || document.getElementById('acupunctureMeridian');
+      if (acuPoint) data.point = acuPoint.value;
+      if (acuMeridian) data.meridian = acuMeridian.value;
+      // 复用中医症状
+      var symptoms = document.getElementById('symptoms');
+      if (symptoms) data.symptoms = symptoms.value;
+    } catch (e) {}
+    return data;
+  }
+
+  function collectMobileData() {
+    var data = {};
+    try {
+      var phoneNum = document.getElementById('mobilePhone') || document.getElementById('phoneInput');
+      if (phoneNum) data.phone = phoneNum.value;
+      data.bazi = collectBaziData();
+    } catch (e) {}
+    return data;
+  }
+
   function collectGeneralData() {
     return { source: 'divination-hub', timestamp: Date.now() };
   }
