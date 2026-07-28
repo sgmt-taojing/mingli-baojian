@@ -200,6 +200,42 @@ var JieqiEngine = {
   },
 
   /**
+   * 获取最后一个已过的节气（含中气，24节气完整列表）
+   * 用于显示：与 lunar_python 行为一致
+   */
+  getCurrentJieqi: function(year, month, day, hour){
+    if(hour === undefined) hour = 0;
+    var order = ['小寒','大寒','立春','雨水','惊蛰','春分','清明','谷雨','立夏','小满','芒种','夏至','小暑','大暑','立秋','处暑','白露','秋分','寒露','霜降','立冬','小雪','大雪','冬至'];
+    var candidates = [];
+    for(var i=0;i<order.length;i++){
+      var d = this.getJieqiDate(year, order[i]);
+      var h = this.getJieqiHour(year, order[i]);
+      if(d) candidates.push({name:order[i], cy:year, cm:d.month, cd:d.day, ch:h});
+      var dN = this.getJieqiDate(year+1, order[i]);
+      var hN = this.getJieqiHour(year+1, order[i]);
+      if(dN) candidates.push({name:order[i], cy:year+1, cm:dN.month, cd:dN.day, ch:hN});
+      var dP = this.getJieqiDate(year-1, order[i]);
+      var hP = this.getJieqiHour(year-1, order[i]);
+      if(dP) candidates.push({name:order[i], cy:year-1, cm:dP.month, cd:dP.day, ch:hP});
+    }
+    candidates.sort(function(a,b){
+      if(a.cy!==b.cy) return a.cy-b.cy;
+      if(a.cm!==b.cm) return a.cm-b.cm;
+      return a.cd-b.cd;
+    });
+    var found = null;
+    for(var i=0;i<candidates.length;i++){
+      var c = candidates[i];
+      if(c.cy < year || (c.cy===year && (c.cm < month || (c.cm===month && c.cd < day)))){
+        found = c;
+      } else if(c.cy===year && c.cm===month && c.cd===day && hour >= c.ch){
+        found = c;
+      }
+    }
+    return found ? found.name : '冬至';
+  },
+
+  /**
    * 完整排四柱（天文节气精确版）
    */
   getFourPillars: function(year, month, day, hour){
@@ -211,13 +247,15 @@ var JieqiEngine = {
     var mb = this.getMonthBranch(year, month, day, hour);
     var lichun = this.getJieqiDate(year, '立春');
     var isLichunBoundary = !!(lichun && month === lichun.month && day === lichun.day);
+    var currentJieqi = this.getCurrentJieqi(year, month, day, hour);
 
     return {
       yearGan: yp.gan, yearZhi: yp.zhi, yearGZ: yp.ganzhi,
       monthGan: mp.gan, monthZhi: mp.zhi, monthGZ: mp.ganzhi,
       dayGan: dp.gan, dayZhi: dp.zhi, dayGZ: dp.ganzhi,
       hourGan: hp.gan, hourZhi: hp.zhi, hourGZ: hp.ganzhi,
-      jieqi: mb.jieName || '',
+      jieqi: currentJieqi,
+      monthJie: mb.jieName || '',
       liChunBoundary: isLichunBoundary,
       solarYear: mb.solarYear,
       source: '紫金山天文台历表'
