@@ -2728,24 +2728,57 @@ function runXingmingEngine() {
   }
 }
 
-function runFengshuiEngine() {
+async function runFengshuiEngine() {
   try {
     const type = document.getElementById('fsType')?.value || document.getElementById('fsJianzhu')?.value || '住宅';
     const direction = document.getElementById('fsDirection')?.value || '北';
     const year = parseInt(document.getElementById('fsYear')?.value || 2024);
     const layout = document.getElementById('fsLayout')?.value || '三室两厅';
     const birthYear = parseInt(document.getElementById('fsBirthYear')?.value) || null;
-    const res = fengshuiAnalyze(type, direction, year, layout, birthYear);
-    let html = '<h4 style="color:var(--violet2)">🏔️ 风水引擎演算结果</h4>';
-    html += '<p><b>宅型：</b>' + res.houseType + ' · 坐向：' + res.direction + ' · 建筑年代：' + res.buildYear + '</p>';
-    html += '<p><b>宅命：</b>' + res.zhaiMing + ' · 宅主命卦：' + res.yaoMing + '</p>';
-    html += '<p><b>宅命配合：</b>' + (res.matching?'相配':'不配') + '</p>';
-    html += '<p><b>元运：</b>' + res.period + '运 · ' + (res.wangShan?'当运':'非当运') + '</p>';
-    html += '<p><b>玄空：</b>' + (res.xuankong && res.xuankong.text ? res.xuankong.text : res.xuankong) + '</p>';
-    html += '<p><b>评分：</b>' + res.score + '/100</p>';
-    html += '<p><b>建议：</b>' + res.advice + '</p>';
-    html += '<ul style="padding-left:18px;opacity:0.8"><li>' + res.layoutTips.join('</li><li>') + '</li></ul>';
-    _showEngineResult('fsEngineResult', html);
+    // R218-p2: 优先调用后端古制引擎，失败回退本地
+    var apiData = null;
+    try {
+      var dirMap = {'北':'子','南':'午','东':'卯','西':'酉','东南':'巽','西南':'坤','西北':'乾','东北':'艮'};
+      var sitting = dirMap[direction] || '子';
+      var facing = {子:'午',午:'子',卯:'酉',酉:'卯',巽:'乾',乾:'巽',坤:'艮',艮:'坤'}[sitting] || '午';
+      var resp = await fetch('/api/paipan/fengshui', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({year:year, sittingMountain:sitting, facingMountain:facing})
+      });
+      if (resp.ok) { var j = await resp.json(); if (j.ok && j.chart) apiData = j.chart; }
+    } catch(eApi) { console.warn('[风水] 后端API不可用，回退本地引擎', eApi.message); }
+    if (apiData) {
+      var c = apiData;
+      var html = '<h4 style="color:var(--violet2)">🏔️ 风水引擎演算结果（古制引擎）</h4>';
+      html += '<p><b>建筑年代：</b>' + year + '年 · <b>坐向：</b>' + direction + '(' + (c.sittingMountain||'') + '山)</p>';
+      if (c.facingMountain) html += '<p><b>朝向：</b>' + c.facingMountain + '山</p>';
+      if (c.period) html += '<p><b>元运：</b>' + c.period + '运</p>';
+      if (c.zhaiMing) html += '<p><b>宅命：</b>' + c.zhaiMing + '</p>';
+      if (c.xuankong && c.xuankong.text) html += '<p><b>玄空飞星：</b>' + c.xuankong.text + '</p>';
+      if (c.palaces && c.palaces.length) {
+        html += '<div style="margin-top:8px"><b>九宫飞星：</b><table style="width:100%;font-size:11px;border-collapse:collapse;margin-top:4px"><thead><tr style="opacity:0.7"><th style="padding:2px 4px">宫位</th><th>方位</th><th>山星</th><th>向星</th><th>运星</th></tr></thead><tbody>';
+        c.palaces.forEach(function(p) {
+          html += '<tr style="border-top:1px solid rgba(255,255,255,.06)"><td style="padding:2px 4px;text-align:center">' + (p.name||'—') + '</td><td style="text-align:center">' + (p.direction||'—') + '</td><td style="text-align:center">' + (p.mountainStar||'—') + '</td><td style="text-align:center">' + (p.facingStar||'—') + '</td><td style="text-align:center">' + (p.periodStar||'—') + '</td></tr>';
+        });
+        html += '</tbody></table></div>';
+      }
+      if (c.score) html += '<p><b>评分：</b>' + c.score + '/100</p>';
+      if (c.advice) html += '<p><b>建议：</b>' + c.advice + '</p>';
+      html += _copyBtnHtml('fsEngineResult');
+      _showEngineResult('fsEngineResult', html);
+    } else {
+      const res = fengshuiAnalyze(type, direction, year, layout, birthYear);
+      let html = '<h4 style="color:var(--violet2)">🏔️ 风水引擎演算结果</h4>';
+      html += '<p><b>宅型：</b>' + res.houseType + ' · 坐向：' + res.direction + ' · 建筑年代：' + res.buildYear + '</p>';
+      html += '<p><b>宅命：</b>' + res.zhaiMing + ' · 宅主命卦：' + res.yaoMing + '</p>';
+      html += '<p><b>宅命配合：</b>' + (res.matching?'相配':'不配') + '</p>';
+      html += '<p><b>元运：</b>' + res.period + '运 · ' + (res.wangShan?'当运':'非当运') + '</p>';
+      html += '<p><b>玄空：</b>' + (res.xuankong && res.xuankong.text ? res.xuankong.text : res.xuankong) + '</p>';
+      html += '<p><b>评分：</b>' + res.score + '/100</p>';
+      html += '<p><b>建议：</b>' + res.advice + '</p>';
+      html += '<ul style="padding-left:18px;opacity:0.8"><li>' + res.layoutTips.join('</li><li>') + '</li></ul>';
+      _showEngineResult('fsEngineResult', html);
+    }
   } catch(e) { 
     console.error('[风水引擎错误错误]', e.message, e.stack);
     showToast('操作出错，请重试');

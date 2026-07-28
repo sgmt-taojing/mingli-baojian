@@ -25,17 +25,35 @@ function esc(s){
   return String(s == null ? '' : s).replace(/[<>"&]/g, c => ({'<':'&lt;','>':'&gt;','"':'&quot;','&':'&amp;'})[c]);
 }
 
-// 拉取单 benchmark 单周
+// R218: 数据源追踪 — 'github' | 'local' | 'mixed'
+let dataSource = 'none';
+
+// 拉取单 benchmark 单周（R218: GitHub → local 双源回退）
 async function fetchWeek(week, bench){
-  const url = `${GH}/eval/weekly/${week}-${bench}.json`;
+  const ghUrl = `${GH}/eval/weekly/${week}-${bench}.json`;
+  const localUrl = `eval/weekly/${week}-${bench}.json`;
+  // 先尝试 GitHub
   try{
-    const r = await fetch(url, { cache: 'no-cache' });
-    if(!r.ok) return null;
-    return await r.json();
+    const r = await fetch(ghUrl, { cache: 'no-cache' });
+    if(r.ok){
+      if (dataSource === 'none') dataSource = 'github';
+      return await r.json();
+    }
   }catch(e){
-    console.warn('[fetch]', week, bench, e);
-    return null;
+    console.warn('[fetch:gh]', week, bench, e);
   }
+  // 回退本地
+  try{
+    const r = await fetch(localUrl, { cache: 'no-cache' });
+    if(r.ok){
+      if (dataSource === 'none') dataSource = 'local';
+      else if (dataSource === 'github') dataSource = 'mixed';
+      return await r.json();
+    }
+  }catch(e){
+    console.warn('[fetch:local]', week, bench, e);
+  }
+  return null;
 }
 
 // 拉取所有数据
@@ -488,17 +506,23 @@ function renderSparkline(score, rate){
   return wrap;
 }
 
-// 获取 alert-card
+// R218: 获取 alert-card（GitHub → local 双源回退）
 async function fetchAlertCard(week){
-  const url = `${GH}/eval/weekly/${week}-alert-card.json`;
+  const ghUrl = `${GH}/eval/weekly/${week}-alert-card.json`;
+  const localUrl = `eval/weekly/${week}-alert-card.json`;
   try{
-    const r = await fetch(url, { cache: 'no-cache' });
-    if(!r.ok) return null;
-    return await r.json();
+    const r = await fetch(ghUrl, { cache: 'no-cache' });
+    if(r.ok) return await r.json();
   }catch(e){
-    console.warn('[alert-card fetch]', week, e);
-    return null;
+    console.warn('[alert-card fetch:gh]', week, e);
   }
+  try{
+    const r = await fetch(localUrl, { cache: 'no-cache' });
+    if(r.ok) return await r.json();
+  }catch(e){
+    console.warn('[alert-card fetch:local]', week, e);
+  }
+  return null;
 }
 
 // 渲染 alert-card
@@ -1828,14 +1852,19 @@ function exportAlertDetailCSV(){
   downloadCSV('eval-alert-detail.csv', rows);
 }
 
-// ===== R216: 诊疗经验蒸馏 =====
+// ===== R216: 诊疗经验蒸馏（R218: GitHub → local 双源回退） =====
 async function fetchDistillReport(){
-  const url = `${GH}/DELIVERY/distill-report-2026-07-28.json`;
+  const ghUrl = `${GH}/DELIVERY/distill-report-2026-07-28.json`;
+  const localUrl = `DELIVERY/distill-report-2026-07-28.json`;
   try{
-    const r = await fetch(url, { cache: 'no-cache' });
-    if (!r.ok) return null;
-    return await r.json();
-  }catch(e){ return null; }
+    const r = await fetch(ghUrl, { cache: 'no-cache' });
+    if (r.ok) return await r.json();
+  }catch(e){}
+  try{
+    const r = await fetch(localUrl, { cache: 'no-cache' });
+    if (r.ok) return await r.json();
+  }catch(e){}
+  return null;
 }
 
 function renderDistill(report){
@@ -1945,6 +1974,21 @@ function renderDistill(report){
   }
 }
 
+// R218: 数据源指示器
+function updateDataSourceBadge(){
+  const badge = document.querySelector('.dash-source-badge');
+  if (!badge) return;
+  const labels = {
+    'github': '☁️ GitHub',
+    'local': '💻 本地',
+    'mixed': '🔀 混合',
+    'none': '⚠️ 离线'
+  };
+  badge.textContent = labels[dataSource] || '⚠️ 未知';
+  badge.title = '数据来源: ' + (labels[dataSource] || '未知');
+  badge.className = 'dash-source-badge source-' + dataSource;
+}
+
 function exportDistillCSV(){
   const report = cache.distill;
   if (!report || !report.candidates){
@@ -1986,6 +2030,8 @@ async function refresh(){
     $('refreshBtn').textContent = '🔄 刷新';
     $('refreshBtn').disabled = false;
   }
+  // R218: 更新数据源指示器
+  updateDataSourceBadge();
 }
 
 $('refreshBtn').addEventListener('click', refresh);
