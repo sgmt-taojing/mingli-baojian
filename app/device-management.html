@@ -463,26 +463,87 @@ var OpsCenter = {
     var html = '';
     if(bridge){
       html += '<div class="om-device online" style="margin-bottom:8px">';
-      html += '<div class="om-device-head"><div class="om-device-name">🥽 Rokid 智能眼镜</div><div class="om-device-status online">已连接</div></div>';
-      html += '<div class="om-device-info"><b>Bridge:</b> ' + bridgeType + '<br><b>连接方式:</b> 蓝牙/WiFi<br>';
+      html += '<div class="om-device-head"><div class="om-device-name">🥽 Rokid 智能眼镜（眼镜端浏览器）</div><div class="om-device-status online">Bridge 就绪</div></div>';
+      html += '<div class="om-device-info"><b>Bridge:</b> ' + bridgeType + '<br><b>连接方式:</b> 眼镜内置浏览器<br>';
       html += '<b>能力:</b> 拍照/语音/音频/手势/存储</div>';
-      html += '<div class="om-device-actions"><button class="om-btn om-btn-secondary" onclick="window.location.href=\'wangzhen-clinical.html\'">🔍 进入望诊</button></div>';
+      html += '<div class="om-device-actions"><button class="om-btn om-btn-secondary" onclick="OpsCenter.glassTakePhoto()">📷 拍照测试</button>';
+      html += '<button class="om-btn om-btn-ghost" onclick="OpsCenter.glassInfo()">ℹ️ 设备信息</button></div>';
       html += '</div>';
-      this.updateOverview('glass', '已连接');
+      this.updateOverview('glass', 'Bridge');
     } else {
       html += '<div class="om-device offline" style="margin-bottom:8px">';
-      html += '<div class="om-device-head"><div class="om-device-name">🥽 Rokid 智能眼镜</div><div class="om-device-status offline">未连接</div></div>';
-      html += '<div class="om-device-info"><b>状态:</b> 未检测到眼镜设备<br><b>接入方式:</b><br>';
-      html += '&nbsp;1. 眼镜内置浏览器打开本页面<br>';
-      html += '&nbsp;2. 眼镜App拍照 → 望诊工作台上传<br>';
-      html += '&nbsp;3. 蓝牙连接手机后用手机浏览器</div>';
+      html += '<div class="om-device-head"><div class="om-device-name">🥽 Rokid 智能眼镜</div><div class="om-device-status offline">未直连</div></div>';
+      html += '<div class="om-device-info">';
+      html += '<b>当前状态:</b> 桌面浏览器未检测到 RokidJSBridge<br>';
+      html += '<b>原因:</b> 蓝牙连接的是音频通道(HFP/A2DP)，不暴露 JS Bridge<br><br>';
+      html += '<b>📋 接入方案（选一个）:</b><br><br>';
+      html += '<b>方案 A — 眼镜内置浏览器（推荐）</b><br>';
+      html += '&nbsp;1. 眼镜连 WiFi（和电脑同一网络）<br>';
+      html += '&nbsp;2. 眼镜打开「全屏浏览器」App<br>';
+      html += '&nbsp;3. 输入地址：https://sgmt-taojing.github.io/mingli-baojian/app/wangzhen-clinical.html<br>';
+      html += '&nbsp;4. 页面自动检测 Bridge → 激活眼镜拍照<br><br>';
+      html += '<b>方案 B — 眼镜拍照 + 桌面上传</b><br>';
+      html += '&nbsp;1. 用眼镜相机 App 拍面部/舌照<br>';
+      html += '&nbsp;2. 蓝牙传到电脑或 Rokid App 同步<br>';
+      html += '&nbsp;3. 打开 <a href="wangzhen-clinical.html" style="color:var(--om-cyan)">望诊工作台</a> → 点 上传图片<br>';
+      html += '&nbsp;4. 选择图片 → 自动 AI 分析<br><br>';
+      html += '<b>方案 C — 桌面 Type-C 摄像头（最简单）</b><br>';
+      html += '&nbsp;1. 在上方摄像头设备区点 检测<br>';
+      html += '&nbsp;2. 选择摄像头 → 测试 → 设为默认<br>';
+      html += '&nbsp;3. 直接在望诊工作台拍照分析<br><br>';
+      html += '<b>方案 D — Web Bluetooth API（实验性）</b><br>';
+      html += '&nbsp;<button class="om-btn om-btn-secondary" style="margin-top:4px" onclick="OpsCenter.scanBluetooth()">🔍 扫描蓝牙设备</button>';
+      html += '&nbsp;<span style="font-size:10px;color:var(--om-paper3)">需 Chrome 开启实验性功能</span><br>';
+      html += '&nbsp;<div id="om-bt-result" style="margin-top:4px"></div>';
       html += '</div>';
-      this.updateOverview('glass', '未连接');
+      html += '</div>';
+      this.updateOverview('glass', '未直连');
     }
     
-    html += '<div class="om-hint">📖 SDK文档: <a href="https://open.rokid.com/sdk?lang=zh" style="color:var(--om-cyan)" target="_blank">open.rokid.com/sdk</a></div>';
+    html += '<div class="om-hint">📖 Rokid 开发者文档: <a href="https://developerdoc.rokid.com/" style="color:var(--om-cyan)" target="_blank">developerdoc.rokid.com</a></div>';
     
     el.innerHTML = html;
+  },
+
+  scanBluetooth: function(){
+    var result = document.getElementById('om-bt-result');
+    if(!navigator.bluetooth){
+      if(result) result.innerHTML = '⚠️ 浏览器不支持 Web Bluetooth API<br>请用 Chrome 打开 chrome://flags/#enable-experimental-web-platform-features → Enabled → 重启';
+      return;
+    }
+    if(result) result.innerHTML = '🔍 正在扫描蓝牙设备...';
+    navigator.bluetooth.requestDevice({
+      acceptAllDevices: true,
+      optionalServices: ['generic_access', 'device_information']
+    }).then(function(device){
+      if(result) result.innerHTML = '✅ 发现设备: <b>' + (device.name || '未知') + '</b><br>ID: ' + device.id;
+    }).catch(function(err){
+      if(result) result.innerHTML = '⚠️ ' + (err.name === 'NotFoundError' ? '未选择设备或未发现设备' : err.message);
+    });
+  },
+
+  glassTakePhoto: function(){
+    var bridge = window.RokidJSBridge || window.KJJSBridge;
+    if(!bridge){ alert('Bridge 不可用'); return; }
+    try {
+      if(bridge.callNative){
+        bridge.callNative('camera.capture', JSON.stringify({sensor:'front'}), function(res){ alert('拍照结果: ' + res); });
+      } else if(bridge.postMessage){
+        bridge.postMessage('camera.capture', {sensor:'front'}, function(res){ alert('拍照结果: ' + res); });
+      }
+    } catch(e){ alert('调用失败: ' + e.message); }
+  },
+
+  glassInfo: function(){
+    var bridge = window.RokidJSBridge || window.KJJSBridge;
+    if(!bridge){ alert('Bridge 不可用'); return; }
+    try {
+      if(bridge.callNative){
+        bridge.callNative('device.info', '{}', function(res){ alert('设备信息: ' + res); });
+      } else if(bridge.postMessage){
+        bridge.postMessage('device.info', {}, function(res){ alert('设备信息: ' + res); });
+      }
+    } catch(e){ alert('调用失败: ' + e.message); }
   },
 
   // ===== 更新概览 =====
