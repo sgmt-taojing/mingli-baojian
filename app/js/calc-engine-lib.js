@@ -2791,6 +2791,31 @@ if (typeof window !== 'undefined') {
   window.runZeriEngine = runZeriEngine;
 
   // ===== 独立区域调用函数 =====
+
+  // R217: 排盘结果复制按钮辅助函数
+  function _copyPaipanResult(elId) {
+    var el = document.getElementById(elId);
+    if (!el) return;
+    var text = el.innerText || el.textContent || '';
+    if (!text.trim()) { showToast('暂无可复制内容'); return; }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function(){ showToast('📋 排盘结果已复制到剪贴板'); }).catch(function(){ _copyFallback(text); });
+    } else { _copyFallback(text); }
+  }
+  function _copyFallback(text) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      showToast('📋 排盘结果已复制到剪贴板');
+    } catch(e) { showToast('复制失败，请手动选择文本'); }
+  }
+  function _copyBtnHtml(elId) {
+    return '<div style="margin-top:8px"><button onclick="_copyPaipanResult(\''+elId+'\')" style="padding:4px 14px;font-size:12px;background:rgba(201,168,76,0.1);color:var(--gold);border:1px solid rgba(201,168,76,0.3);border-radius:6px;cursor:pointer;letter-spacing:1px">📋 复制结果</button></div>';
+  }
+  window._copyPaipanResult = _copyPaipanResult;
+
   async function runQimen() {
     const year = parseInt(document.getElementById('qimen-year')?.value || new Date().getFullYear());
     const month = parseInt(document.getElementById('qimen-month')?.value || new Date().getMonth()+1);
@@ -2833,6 +2858,7 @@ if (typeof window !== 'undefined') {
         html += '</tbody></table></div>';
       }
       html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：后端古制引擎 R211 v2.0</p>';
+      html += _copyBtnHtml('qimenResult');
       const el = document.getElementById('qimenResult');
       if (el) { el.innerHTML = html; el.style.display = 'block'; }
       return;
@@ -2849,6 +2875,7 @@ if (typeof window !== 'undefined') {
       html += '<p><b>吉凶：</b>' + analyze.luck + '</p>';
       html += '<p><b>策略：</b>' + analyze.strategy + '</p>';
       html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：本地引擎（后端不可用）</p>';
+      html += _copyBtnHtml('qimenResult');
       const el = document.getElementById('qimenResult');
       if (el) { el.innerHTML = html; el.style.display = 'block'; }
     } catch(e) {
@@ -2904,6 +2931,7 @@ if (typeof window !== 'undefined') {
         html += '</tbody></table></div>';
       }
       html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：后端古制引擎 R211 v2.0</p>';
+      html += _copyBtnHtml('ziweiResult');
       const el = document.getElementById('ziweiResult');
       if (el) { el.innerHTML = html; el.style.display = 'block'; }
       return;
@@ -2920,6 +2948,7 @@ if (typeof window !== 'undefined') {
       html += '<p><b>四化：</b>' + analyze.sihuaText + '</p>';
       html += '<p><b>概述：</b>' + analyze.overview + '</p>';
       html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：本地引擎（后端不可用）</p>';
+      html += _copyBtnHtml('ziweiResult');
       const el = document.getElementById('ziweiResult');
       if (el) { el.innerHTML = html; el.style.display = 'block'; }
     } catch(e) {
@@ -2949,6 +2978,7 @@ if (typeof window !== 'undefined') {
       html += '<p><b>生克：</b>' + analyze.relation + '</p>';
       html += '<p><b>吉凶：</b>' + analyze.luck + '</p>';
       html += '<p style="opacity:0.8">' + analyze.advice + '</p>';
+      html += _copyBtnHtml('meihuaResult');
       const el = document.getElementById('meihuaResult');
       if (el) { el.innerHTML = html; el.style.display = 'block'; }
     } catch(e) { 
@@ -3012,6 +3042,7 @@ if (typeof window !== 'undefined') {
         html += '</tbody></table></div>';
       }
       html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：后端古制引擎 R214</p>';
+      html += _copyBtnHtml('liurenResult');
       const el = document.getElementById('liurenResult');
       if (el) { el.innerHTML = html; el.style.display = 'block'; }
       return;
@@ -3029,6 +3060,7 @@ if (typeof window !== 'undefined') {
       html += '<p><b>吉凶：</b>' + analyze.luck + '</p>';
       html += '<p style="opacity:0.8">' + analyze.advice + '</p>';
       html += '<p style="opacity:0.6;font-size:11px;margin-top:6px">来源：本地引擎（后端不可用）</p>';
+      html += _copyBtnHtml('liurenResult');
       const el = document.getElementById('liurenResult');
       if (el) { el.innerHTML = html; el.style.display = 'block'; }
     } catch(e) { 
