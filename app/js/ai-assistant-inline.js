@@ -3387,13 +3387,17 @@ function _paipanLocal(y,m,d,h,gender,ziSect){
       else monthIdx=(i+11)%12;
       break;
     }
-    // 跨月处理：如果在某节气月之前，取上一个节气月
     if(m<jm||(m===jm&&d<jd)){
       monthIdx=(i+11)%12;
       break;
     }
   }
-  var yc=(m===1||(m===2&&d<(jieDates?jieDates[0]:4)))?y-1:y;
+  // 修复：1月初小寒前应为大雪月(子月)，不是小寒月(丑月)
+  if(m===1){
+    var xhDate=_jieDate(y,11); // 小寒日期(1月)
+    if(d<xhDate) monthIdx=10; // 大雪月
+  }
+  var lcDate=_jieDate(y,0);var yc=(m===1||(m===2&&d<lcDate))?y-1:y;
   var yS=tg[((yc-4)%10+10)%10],yB=dz[((yc-4)%12+12)%12];
   var mB=dz[((monthIdx+2)%12+12)%12];
   var yI=((yc-4)%10+10)%10;
