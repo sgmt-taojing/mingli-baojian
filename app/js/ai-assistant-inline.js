@@ -3409,7 +3409,54 @@ function _paipanLocal(y,m,d,h,gender,ziSect){
   var yYang=(yI%2===0); // 偶数=阳干
   var isMale=(gender!=='female');
   var direction=(yYang===isMale)?1:-1; // 阳男/阴女=顺(1), 阴男/阳女=逆(-1)
-  var startAge=8; // 简化：统一8岁起运
+  // 起运岁精确计算：出生日到下一/上一节气天数 ÷ 3
+  // 顺排(阳男/阴女)：到下一节气；逆排(阴男/阳女)：到上一节气
+  var startAge=8; // 默认值（兜底）
+  try{
+    var birthDate=new Date(y,m-1,d);
+    if(direction===1){
+      // 顺排：找下一个节气
+      var nextJieDate=null;
+      for(var ci=0;ci<12;ci++){
+        var rawIdx=monthIdx+ci+1;
+        var cmIdx=rawIdx%12;
+        // 判断是否跨年：如果 cmIdx 对应月份 <= 当前月，则跨年
+        var cyear=y;
+        if(rawIdx>=12) cyear=y+1;
+        var jd=_jieDate(cyear,cmIdx);
+        var cm=JIE_MONTHS[cmIdx];
+        var cd=new Date(cyear,cm-1,jd);
+        // 也检查同年的节气（当跨年计算导致跳过同年的节气时）
+        if(cd>birthDate){nextJieDate=cd;break;}
+        // 如果跨年版本太远，检查同年版本
+        if(cyear>y){
+          var jd0=_jieDate(y,cmIdx);
+          var cd0=new Date(y,cm-1,jd0);
+          if(cd0>birthDate){nextJieDate=cd0;break;}
+        }
+      }
+      if(nextJieDate){
+        var diffDays=Math.round((nextJieDate-birthDate)/86400000);
+        startAge=Math.max(1,Math.round(diffDays/3));
+      }
+    }else{
+      // 逆排：找上一个节气
+      var prevJieDate=null;
+      for(var ci=0;ci<12;ci++){
+        var rawIdx=monthIdx-ci-1;
+        var cmIdx=((rawIdx%12)+12)%12;
+        var cyear=y+(rawIdx<0?-1:0); // 正确处理跨年
+        var jd=_jieDate(cyear,cmIdx);
+        var cm=JIE_MONTHS[cmIdx];
+        var cd=new Date(cyear,cm-1,jd);
+        if(cd<birthDate){prevJieDate=cd;break;}
+      }
+      if(prevJieDate){
+        var diffDays2=Math.round((birthDate-prevJieDate)/86400000);
+        startAge=Math.max(1,Math.round(diffDays2/3));
+      }
+    }
+  }catch(e){startAge=8;} // 兜底
   for(var i=0;i<8;i++){
     curM=(curM+direction+12)%12;
     var dyGz=tg[((yI*2+curM+2)%10+10)%10]+dz[((curM+2)%12+12)%12];
