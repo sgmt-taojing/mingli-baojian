@@ -46,6 +46,13 @@
     huangli: collectHuangliData,
     zeri: collectZeriData,
     taisui: collectTaisuiData,
+    faith: collectFaithData,
+    classics: collectClassicsData,
+    yijing: collectYijingData,
+    meihua: collectMeihuaData,
+    liuyao: collectLiuyaoData,
+    liuren: collectLiurenData,
+    koujue: collectKoujueData,
     general: collectGeneralData
   };
 
@@ -216,6 +223,80 @@
       var givenName = document.getElementById('givenName');
       if (surname) data.surname = surname.value;
       if (givenName) data.givenName = givenName.value;
+    } catch (e) {}
+    return data;
+  }
+  function collectFaithData() {
+    var data = {};
+    try {
+      var deitySel = document.getElementById('deitySelect') || document.getElementById('faithDeity');
+      var wishInput = document.getElementById('wishInput') || document.getElementById('faithWish');
+      if (deitySel) data.deity = deitySel.value;
+      if (wishInput) data.wish = wishInput.value;
+      data.bazi = collectBaziData();
+    } catch (e) {}
+    return data;
+  }
+  function collectClassicsData() {
+    var data = {};
+    try {
+      var classicSel = document.getElementById('classicSelect') || document.getElementById('classicsTopic');
+      var queryInput = document.getElementById('classicQuery') || document.getElementById('classicsSearch');
+      if (classicSel) data.classic = classicSel.value;
+      if (queryInput) data.query = queryInput.value;
+    } catch (e) {}
+    return data;
+  }
+  function collectYijingData() {
+    var data = {};
+    try {
+      var hexNum = document.getElementById('hexagramNum') || document.getElementById('yijingHex');
+      var question = document.getElementById('yijingQuestion') || document.getElementById('yijingQ');
+      if (hexNum) data.hexagram = hexNum.value;
+      if (question) data.question = question.value;
+    } catch (e) {}
+    return data;
+  }
+  function collectMeihuaData() {
+    var data = {};
+    try {
+      var mQuestion = document.getElementById('meihuaQuestion') || document.getElementById('meihuaQ');
+      var mTime = document.getElementById('meihuaTime') || document.getElementById('meihuaDate');
+      if (mQuestion) data.question = mQuestion.value;
+      if (mTime) data.time = mTime.value;
+      data.bazi = collectBaziData();
+    } catch (e) {}
+    return data;
+  }
+  function collectLiuyaoData() {
+    var data = {};
+    try {
+      var lQuestion = document.getElementById('liuyaoQuestion') || document.getElementById('liuyaoQ');
+      var lMethod = document.getElementById('liuyaoMethod') || document.getElementById('liuyaoMode');
+      if (lQuestion) data.question = lQuestion.value;
+      if (lMethod) data.method = lMethod.value;
+      data.bazi = collectBaziData();
+    } catch (e) {}
+    return data;
+  }
+  function collectLiurenData() {
+    var data = {};
+    try {
+      var lrQuestion = document.getElementById('liurenQuestion') || document.getElementById('liurenQ');
+      var lrTime = document.getElementById('liurenTime') || document.getElementById('liurenDate');
+      if (lrQuestion) data.question = lrQuestion.value;
+      if (lrTime) data.time = lrTime.value;
+      data.bazi = collectBaziData();
+    } catch (e) {}
+    return data;
+  }
+  function collectKoujueData() {
+    var data = {};
+    try {
+      var kjTopic = document.getElementById('koujueTopic') || document.getElementById('koujueCategory');
+      var kjQuery = document.getElementById('koujueQuery') || document.getElementById('koujueSearch');
+      if (kjTopic) data.topic = kjTopic.value;
+      if (kjQuery) data.query = kjQuery.value;
     } catch (e) {}
     return data;
   }
