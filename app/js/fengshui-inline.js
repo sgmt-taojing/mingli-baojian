@@ -339,7 +339,7 @@ function generateZidiseLink(){
   var yearZhi = document.getElementById('zlYearZhi').value;
   var dayStem = document.getElementById('zlDayStem').value;
   var concerns = Array.from(document.querySelectorAll('.zlConcern:checked')).map(c=>c.value);
-  if(!yearZhi){alert('请选择出生年地支');return;}
+  if(!yearZhi){showToast('请选择出生年地支');return;}
   if(concerns.length===0) concerns=['破财','病厄'];
 
   var ZHI_HUAJI = {
@@ -563,7 +563,7 @@ function generateItemsFullFlow(){
   if(items.length===0){
     // 默认至少选1个
     items=['wenchangta'];
-    alert('请至少选择1个化解物品（默认选中文昌塔）');
+    showToast('请至少选择1个化解物品（默认选中文昌塔）');
   }
 
   // === 属相禁忌匹配（12属相 × 物品冲）===
@@ -812,7 +812,7 @@ function addFamilyMember(){
 /* 家族风水 */
 function computeFamilyFengshui(){
   var rows = document.querySelectorAll('#fsFamilyMemberList > div');
-  if(rows.length === 0){alert('请先添加家族成员');return;}
+  if(rows.length === 0){showToast('请先添加家族成员');return;}
   var btn = event && event.target;
   if(btn){btn.disabled=true; btn.textContent='⏳ 分析中...';}
   setTimeout(function(){

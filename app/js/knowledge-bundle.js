@@ -4290,7 +4290,7 @@ if (typeof window !== 'undefined') window.SCRIPTURE_DATABASE = SCRIPTURE_DATABAS
         if (mins !== null) {
           mins = parseInt(mins) || 0;
           if (mins > 0) {
-            VR.setTimer(mins, function() { alert('⏰ 定时播放已结束'); });
+            VR.setTimer(mins, function() { showToast('⏰ 定时播放已结束'); });
             let st = document.getElementById('vrStatus');
             if (st) st.textContent += ' · ⏰ ' + mins + '分钟后停止';
           } else {
@@ -4630,7 +4630,7 @@ function playFaithMusic(songName) {
   if (!songName) return;
   // 尝试查找或提示
   let msg = '🎵 ' + songName + '\n\n由于版权限制，无法直接播放。\n建议在以下平台搜索收听：\n\n📱 QQ音乐/网易云音乐：搜索 "' + songName + '"\n🌐 网页版：music.163.com\n\n🙏 持咒修行，心诚则灵！';
-  alert(msg);
+  showToast(msg);
 }
 
 // ================================================================

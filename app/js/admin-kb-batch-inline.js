@@ -44,7 +44,7 @@ async function batchExecute() {
   const module = document.getElementById('batchModule').value;
   const action = document.getElementById('batchAction').value;
   const tag = document.getElementById('batchTag').value;
-  if (!module) return alert('请选择模块');
+  if (!module) return showToast('请选择模块');
   const log = document.getElementById('batchResult');
   log.textContent = `[${new Date().toLocaleTimeString()}] 执行 ${action} on ${module}...\n`;
   // 模拟(实际项目可调 /api/admin/kb/batch)
@@ -83,7 +83,7 @@ async function ingestGenerate() {
 
 async function ingestExecute() {
   const text = document.getElementById('ingestText').value.trim();
-  if (!text) return alert('请输入数据或先点生成示例');
+  if (!text) return showToast('请输入数据或先点生成示例');
   const lines = text.split('\n').filter(l=>l.trim());
   const log = document.getElementById('ingestResult');
   log.textContent = `[${new Date().toLocaleTimeString()}] 解析 ${lines.length} 条...\n`;

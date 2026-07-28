@@ -481,7 +481,7 @@ function startContinuousListen() {
   if (!recognition) {
     if (!initSTT()) {
       continuousMode.checked = false;
-      alert('当前浏览器不支持语音识别，请用 Chrome/Edge');
+      showToast('当前浏览器不支持语音识别，请用 Chrome/Edge');
       return;
     }
   }
@@ -655,7 +655,7 @@ async function queryKb(query) {
 
 function startVoice() {
   if (!recognition) {
-    if (!initSTT()) { alert('当前浏览器不支持语音识别，请用 Chrome/Edge'); return; }
+    if (!initSTT()) { showToast('当前浏览器不支持语音识别，请用 Chrome/Edge'); return; }
   }
   isRecording = true;
   voiceFinalTranscript = '';

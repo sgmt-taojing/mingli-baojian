@@ -179,7 +179,7 @@ function runZiweiPaipan(){
   var month = parseInt(document.getElementById('zw-month').value);
   var day = parseInt(document.getElementById('zw-day').value);
   var hour = parseInt(document.getElementById('zw-hour').value);
-  if(!year || !month || !day){ alert('请填写完整的出生年月日'); return; }
+  if(!year || !month || !day){ showToast('请填写完整的出生年月日'); return; }
   if(!hour && hour !== 0){ hour = 12; }
 
   var result = ZiweiEngine.paipan(year, month, day, hour, zwCalMode === 'lunar');

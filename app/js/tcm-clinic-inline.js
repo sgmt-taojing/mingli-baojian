@@ -2489,7 +2489,7 @@ function renderTcmCareerPanelR37(){
   h+='<div style="margin:10px 0 8px;color:var(--paper3);font-size:12px;letter-spacing:1.5px">📋 8 事业维度（中医生事业规划）</div>';
   h+='<div class="tcm-career-8grid">';
   Object.keys(TCM_CAREER_8D_R37||{}).forEach(function(k){var it=TCM_CAREER_8D_R37[k];
-    h+='<ml-tap class="tcm-career-cell" onclick="alert(\''+it.label+'·'+it.desc+'\\n\\n行动建议：'+it.tip+'\')" variant="card" role="button" tabindex="0"><span class="icon">'+it.icon+'</span><b>'+it.label+'</b><div class="tip">'+it.desc+'</div><div class="tip" style="margin-top:4px;color:var(--gold)">👉 '+it.tip+'</div></ml-tap>';
+    h+='<ml-tap class="tcm-career-cell" onclick="showToast(\''+it.label+'·'+it.desc+'\\n\\n行动建议：'+it.tip+'\')" variant="card" role="button" tabindex="0"><span class="icon">'+it.icon+'</span><b>'+it.label+'</b><div class="tip">'+it.desc+'</div><div class="tip" style="margin-top:4px;color:var(--gold)">👉 '+it.tip+'</div></ml-tap>';
   });
   h+='</div>';
   h+='<div class="tcm-career-verdict"><b style="color:var(--gold)">💼 事业判读：</b><br>① 健康维度 '+hS+' 分（八维：气血/脾胃/心肾/肝胆/睡眠/情绪/体质/寿元）—— 八维均衡者无大碍，偏弱维度及时调理 ② 事业维度 '+cS+' 分（八维：正财/偏财/官运/学业/创业/升迁/同事/合作）—— 八维共进则事业长青 ③ 中医生专属建议：医德医术双修·守住本心·不为名利所动 ④ 化解要点：<b style="color:#4a8aa8">八事业维每周自检一次，弱项优先补强</b></div>';

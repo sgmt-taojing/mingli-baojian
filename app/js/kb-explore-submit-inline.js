@@ -47,7 +47,7 @@ fileInput.addEventListener('change', e => {
 
 function handleFile(f) {
   selectedFile = f;
-  if (f.size > 30 * 1024 * 1024) { alert('文件过大（' + (f.size/1024/1024).toFixed(1) + ' MB），请 ≤ 30 MB'); return; }
+  if (f.size > 30 * 1024 * 1024) { showToast('文件过大（' + (f.size/1024/1024).toFixed(1) + ' MB），请 ≤ 30 MB'); return; }
   document.getElementById('fileName').textContent = f.name;
   document.getElementById('fileSize').textContent = (f.size/1024).toFixed(1) + ' KB';
   document.getElementById('fileInfo').style.display = 'block';
@@ -70,15 +70,15 @@ async function submitManual() {
   const title = document.getElementById('m-title').value.trim();
   const content = document.getElementById('m-content').value.trim();
   const notes = document.getElementById('m-notes').value.trim();
-  if (!title) return alert('请填写标题');
-  if (!content || content.length < 50) return alert('内容至少 50 字（当前 ' + content.length + ' 字）');
+  if (!title) return showToast('请填写标题');
+  if (!content || content.length < 50) return showToast('内容至少 50 字（当前 ' + content.length + ' 字）');
   await submit({ source_type: 'manual', title, content, module: currentModule, notes });
 }
 
 async function submitFile() {
-  if (!selectedFile) return alert('请先选择文件');
+  if (!selectedFile) return showToast('请先选择文件');
   const title = document.getElementById('f-title').value.trim();
-  if (!title) return alert('请填写标题');
+  if (!title) return showToast('请填写标题');
   const b64 = await fileToB64(selectedFile);
   await submit({
     source_type: 'file', title, module: currentModule,
@@ -91,8 +91,8 @@ async function submitUrl() {
   const title = document.getElementById('u-title').value.trim();
   const url = document.getElementById('u-url').value.trim();
   const notes = document.getElementById('u-notes').value.trim();
-  if (!title || !url) return alert('请填写标题和 URL');
-  if (!url.match(/^https?:\/\//)) return alert('URL 必须以 http:// 或 https:// 开头');
+  if (!title || !url) return showToast('请填写标题和 URL');
+  if (!url.match(/^https?:\/\//)) return showToast('URL 必须以 http:// 或 https:// 开头');
   await submit({ source_type: 'url', title, url, module: currentModule, notes });
 }
 
@@ -107,7 +107,7 @@ async function submit(payload) {
     const d = await r.json();
     showResult(d);
   } catch (e) {
-    alert('提交失败：' + e.message);
+    showToast('提交失败：' + e.message);
   } finally {
     btns.forEach(b => { b.disabled = false; b.innerHTML = b.innerHTML.replace(/<[^>]+>/g, '').trim(); });
   }
@@ -115,7 +115,7 @@ async function submit(payload) {
 
 function showResult(d) {
   if (!d || !d.ok) {
-    alert('提交失败：' + (d?.error || '未知错误'));
+    showToast('提交失败：' + (d?.error || '未知错误'));
     return;
   }
   const panel = document.getElementById('submitResult');
@@ -165,7 +165,7 @@ function resetForm() {
 
 async function discoverOnline() {
   const query = document.getElementById('d-query').value.trim();
-  if (!query) return alert('请填写寻找主题');
+  if (!query) return showToast('请填写寻找主题');
   const btn = event.target;
   btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>分析中...';
   try {
@@ -176,14 +176,14 @@ async function discoverOnline() {
     const d = await r.json();
     showDiscover(d);
   } catch (e) {
-    alert('分析失败：' + e.message);
+    showToast('分析失败：' + e.message);
   } finally {
     btn.disabled = false; btn.innerHTML = '🔍 分析 KB 缺口 + 建议方向';
   }
 }
 
 function showDiscover(d) {
-  if (!d.ok) { alert('失败：' + d.error); return; }
+  if (!d.ok) { showToast('失败：' + d.error); return; }
   const panel = document.getElementById('discoverResult');
   const content = document.getElementById('discoverContent');
   panel.classList.add('show');

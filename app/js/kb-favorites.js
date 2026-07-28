@@ -177,11 +177,11 @@
         reader.onload = () => {
           const result = (window.KbFavorites.import || function(){ return {ok:false,error:'no import'} })(reader.result);
           if(result.ok){
-            alert('✅ 导入成功\n新增 ' + result.added + ' 条\n跳过 ' + result.skipped + ' 条（已存在）');
+            showToast('✅ 导入成功\n新增 ' + result.added + ' 条\n跳过 ' + result.skipped + ' 条（已存在）');
             renderDrawer();
             document.querySelectorAll('.kb-fav-btn').forEach(b => refreshBtn(b));
           } else {
-            alert('❌ 导入失败: ' + (result.error || '未知错误'));
+            showToast('❌ 导入失败: ' + (result.error || '未知错误'));
           }
           impFile.value = '';
         };

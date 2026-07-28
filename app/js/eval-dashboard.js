@@ -1099,7 +1099,7 @@ function exportSnapshot(){
 // 在新窗口中克隆当前 dashboard DOM + 内联打印样式，自动触发 print()
 function exportPDF(){
   var w = window.open('', '_blank', 'width=900,height=700');
-  if (!w) { alert('请允许弹出窗口以导出 PDF'); return; }
+  if (!w) { showToast('请允许弹出窗口以导出 PDF'); return; }
 
   var now = new Date();
   var dateStr = now.toLocaleDateString('zh-CN');
@@ -1739,7 +1739,7 @@ function exportPerCaseCSV(){
   const bench = benchSel.value || 'cost-budget';
   const data = cache.weeks[week]?.[bench];
   if (!data || !data.results || !data.results.length){
-    alert('当前无 per-case 数据可导出');
+    showToast('当前无 per-case 数据可导出');
     return;
   }
   const rows = [
@@ -1771,7 +1771,7 @@ function exportModPerCaseCSV(){
     }
   });
   if (rows.length <= 1){
-    alert('模块 ' + selectedMod + ' 暂无 per-case 数据可导出');
+    showToast('模块 ' + selectedMod + ' 暂无 per-case 数据可导出');
     return;
   }
   downloadCSV(`eval-mod-percase-${selectedMod}.csv`, rows);
@@ -1948,7 +1948,7 @@ function renderDistill(report){
 function exportDistillCSV(){
   const report = cache.distill;
   if (!report || !report.candidates){
-    alert('蒸馏数据未加载');
+    showToast('蒸馏数据未加载');
     return;
   }
   const rows = [['Entry_ID','Title','Category','Trust','Keyword','Module','Source_Type','Distill_Date']];

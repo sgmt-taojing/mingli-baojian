@@ -410,7 +410,7 @@ var PatientArchive = {
   },
 
   runDistill: function(){
-    if(this.allPatients.length === 0){ alert('暂无患者数据可蒸馏'); return; }
+    if(this.allPatients.length === 0){ showToast('暂无患者数据可蒸馏'); return; }
     if(!confirm('将从 ' + this.allPatients.length + ' 位患者的 ' + this.allHistory.length + ' 条诊疗记录中蒸馏经验知识，写入知识库待审核队列。\n\n确认开始？')) return;
     // 导出数据到临时文件
     var data = { patients: this.allPatients, history: this.allHistory, exportDate: new Date().toISOString() };
@@ -422,7 +422,7 @@ var PatientArchive = {
     try { existing = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
     existing = candidates.concat(existing).slice(0, 100);
     localStorage.setItem(key, JSON.stringify(existing));
-    alert('✅ 蒸馏完成！\n\n生成 ' + candidates.length + ' 条候选知识\n已保存到本地待审核队列\n\n可在 KB 管理面板查看审核');
+    showToast('✅ 蒸馏完成！\n\n生成 ' + candidates.length + ' 条候选知识\n已保存到本地待审核队列\n\n可在 KB 管理面板查看审核');
   },
 
   distillFrontend: function(data){

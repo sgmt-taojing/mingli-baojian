@@ -80,7 +80,7 @@ function generate(){
       render({ele,age,total,grade,result,top3,bot2,actions,next5,summary,focus,extra});
       btn.disabled=false; btn.textContent='🔄 重新生成';
     }catch(e){
-      alert('生成失败：'+e.message);
+      showToast('生成失败：'+e.message);
       btn.disabled=false; btn.textContent='✨ 生成生命指数';
     }
   }, 250);

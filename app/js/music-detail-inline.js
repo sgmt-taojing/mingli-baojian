@@ -67,7 +67,7 @@ function generate(){
       btn.disabled = false;
       btn.textContent = '🔄 重新生成';
     }catch(e){
-      alert('生成失败：'+e.message);
+      showToast('生成失败：'+e.message);
       btn.disabled = false;
       btn.textContent = '✨ 生成疗愈方案';
     }

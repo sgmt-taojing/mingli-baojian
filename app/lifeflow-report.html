@@ -207,7 +207,7 @@ h3{font-size:.95rem;color:var(--yellow);margin:12px 0 6px}
   // 离线兜底
   window.generateOffline = function(){
     if (typeof ReportEngine === 'undefined' || !window._MODULE_REPORTS || !window._MODULE_REPORTS.lifeflow) {
-      alert('KB 兜底未加载，请检查网络或刷新页面');
+      showToast('KB 兜底未加载，请检查网络或刷新页面');
       return;
     }
     var data = {

@@ -2009,7 +2009,7 @@ function getBadHours(chongZhi){
 function generateTaisuiFlow(){
   var yearZhi = document.getElementById('tsYearZhi').value;
   var queryYear = document.getElementById('tsYearQuery').value;
-  if(!yearZhi){alert('请选择出生年地支');return;}
+  if(!yearZhi){showToast('请选择出生年地支');return;}
 
   // 流年支（按 12 地支轮回）
   var QUERY_ZHI = {'2024':'辰','2025':'巳','2026':'午','2027':'未','2028':'申'};
@@ -2019,7 +2019,7 @@ function generateTaisuiFlow(){
   var queryGanZhi = queryStem + queryZhi;
 
   var rule = TAISUI_RULE[yearZhi];
-  if(!rule){alert('数据缺失');return;}
+  if(!rule){showToast('数据缺失');return;}
 
   // 检测冲突类型
   var conflicts = [];
@@ -2582,7 +2582,7 @@ function generateMarriage(){
   var year = document.getElementById('mgYear').value;
   var event = document.getElementById('mgEvent').value;
 
-  if(!bZhi || !brZhi){alert('请选择新郎新娘年支');return;}
+  if(!bZhi || !brZhi){showToast('请选择新郎新娘年支');return;}
 
   var ev = MG_EVENTS[event];
 
@@ -2901,7 +2901,7 @@ function generateMove(){
   var type = document.getElementById('mvType').value;
   var dir = document.getElementById('mvDir').value;
 
-  if(!zhi){alert('请选择命主年支');return;}
+  if(!zhi){showToast('请选择命主年支');return;}
 
   var ev = MV_EVENTS[type];
   var dirRule = MV_DIRECTIONS[dir];
@@ -3258,7 +3258,7 @@ function generateDoublePan(){
   var dayStem=document.getElementById("dpDayStem").value;
   var mingGong=document.getElementById("dpMingGong").value;
   var yongShen=document.getElementById("dpYongShen").value;
-  if(!zhi||!dayStem){alert("请选择命主年支与日主天干");return;}
+  if(!zhi||!dayStem){showToast("请选择命主年支与日主天干");return;}
   var zw=ZW_STARS_R31[mingGong];
   var ZW_GONGS=["命宫","兄弟","夫妻","子女","财帛","疾厄","迁移","交友","官禄","田宅","福德","父母"];
   var zwScores={};
@@ -3422,7 +3422,7 @@ function generateArchiveDetail(){
   });
   h += "</div></div>";
   h += "<div class=\"arc-actions\">";
-  h += "<button class=\"btn btn-share\" onclick=\"navigator.clipboard.writeText('" + shareUrl + "');alert('分享链接已复制：\\\\n" + shareUrl + "')\">📤 复制分享链接</button>";
+  h += "<button class=\"btn btn-share\" onclick=\"navigator.clipboard.writeText('" + shareUrl + "');showToast('分享链接已复制：\\\\n" + shareUrl + "')\">📤 复制分享链接</button>";
   h += "<button class=\"btn btn-print\" onclick=\"window.print()\">🖨 打印档案</button>";
   h += "</div>";
   h += "<div class=\"arc-source\">📜 综合《三世因果经》《了凡四训》《因果录》《福报经》《阴骡文》《玉历宝钞》《冥报记》共 7 部古籍</div>";
@@ -3509,7 +3509,7 @@ function renderPalace12FullR38(){
   h+='<div style="font-size:12px;margin-bottom:12px">紫微斗数十二宫：命宫/财帛/官禄/福德/疾厄/夫妻/子女/兄弟/田宅/迁移/父母/交友—— 每宫主星 + 五行 + 吉凶 + 化解建议。</div>';
   h+='<div class="pal12-grid">';
   Object.keys(PALACE_12_R38).forEach(function(k){var it=PALACE_12_R38[k];
-    h+='<ml-tap role="button" tabindex="0" class="pal12-cell" onclick="alert(\''+it.name+'·'+it.desc+'\\n主星：'+it.star+'·五行：'+it.wuxing+'·评分：'+it.score+'分\\n\\n建议：'+it.tip+'\')" style="display:block"><span class="icon">'+it.icon+'</span><b>'+it.name+'</b><div class="desc">'+it.desc+'</div><div class="star">⭐ '+it.star+' · '+it.wuxing+'行 · '+it.score+'分</div></ml-tap>';
+    h+='<ml-tap role="button" tabindex="0" class="pal12-cell" onclick="showToast(\''+it.name+'·'+it.desc+'\\n主星：'+it.star+'·五行：'+it.wuxing+'·评分：'+it.score+'分\\n\\n建议：'+it.tip+'\')" style="display:block"><span class="icon">'+it.icon+'</span><b>'+it.name+'</b><div class="desc">'+it.desc+'</div><div class="star">⭐ '+it.star+' · '+it.wuxing+'行 · '+it.score+'分</div></ml-tap>';
   });
   h+='</div>';
   h+='<div class="pal12-verdict"><b style="color:var(--gold)">🏛 12 宫判读：</b><br>① <b style="color:#4a9a6e">命宫 88</b>（紫微·木行）—— 格局宏大·贵人扶持·一生顺遂 ② <b style="color:#4a8aa8">财帛 82</b>（武曲·金行）—— 正财旺·投资需谨慎·稳中求进 ③ <b style="color:var(--gold)">福德 85</b>（天府·土行）—— 福气厚·心态平和·享福命 ④ <b style="color:#9b6ab0">田宅 83</b>（天府·土行）—— 家宅安稳·置业有运·不动产增值 ⑤ 12 宫评分 72-88 分·整体均衡·无大凶 ⑥ 化解要点：<b style="color:#e74c3c">疾厄 76</b>（注意脾胃）/ <b style="color:#e67e22">交友 74</b>（人际需慎）为两大短板</div>';

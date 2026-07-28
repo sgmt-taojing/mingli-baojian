@@ -181,7 +181,7 @@
       if (typeof ReportAdapters !== 'undefined' && ReportAdapters.drawer) {
         ReportAdapters.drawer(document.body, '请先在页面中输入相关信息，再点击「AI 分析」。');
       } else {
-        alert('请先在页面中输入相关信息，再点击「AI 分析」。');
+        showToast('请先在页面中输入相关信息，再点击「AI 分析」。');
       }
       return;
     }

@@ -136,7 +136,7 @@
   function highlightHubs(){
     var hubIds = [];
     ALL_NODES.forEach(function(n){ if(n.value >= 16) hubIds.push(n.id); });
-    if(!hubIds.length){ alert('无热点节点'); return; }
+    if(!hubIds.length){ showToast('无热点节点'); return; }
     var nodes = ALL_NODES.map(function(n){ return {id:n.id, opacity:n.value >= 16 ? 1 : .15}; });
     var edges = ALL_EDGES.map(function(e){ return {from:e.from, to:e.to, opacity:(hubIds.includes(e.from)||hubIds.includes(e.to)) ? 1 : .1}; });
     draw(nodes, edges);
@@ -147,9 +147,9 @@
   var _currentRecSource = null;
   function highlightRecs(){
     var mod = document.getElementById('recModFilter').value;
-    if(!mod){ alert('请先选择模块'); return; }
+    if(!mod){ showToast('请先选择模块'); return; }
     _currentRecSource = mod;
-    if (!graphData || !graphData.links) { alert('图谱数据未加载'); return; }
+    if (!graphData || !graphData.links) { showToast('图谱数据未加载'); return; }
     // 从 links 中提取与 mod 关联的节点
     var relatedNodes = {};
     graphData.links.forEach(function(lk) {
@@ -163,7 +163,7 @@
       .sort(function(a,b){ return b[1]-a[1]; })
       .slice(0,8)
       .map(function(e){ return e[0]; });
-    if(!_currentRecs.length){ alert('该模块暂无跨模块关联'); return; }
+    if(!_currentRecs.length){ showToast('该模块暂无跨模块关联'); return; }
     // 高亮：source 模块 + 关联节点
     var focus = new Set([mod].concat(_currentRecs));
     var hitCount = 0;

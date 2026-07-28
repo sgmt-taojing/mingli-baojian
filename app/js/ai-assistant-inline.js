@@ -4362,7 +4362,7 @@ function showProfileHistory(){
 
 // R89-M 缘主档案面板
 async function openProfilePanel(){
-  if(!window.YuanzhuProfile) return alert('档案模块未加载');
+  if(!window.YuanzhuProfile) return showToast('档案模块未加载');
   const _list = window.YuanzhuProfile.list();
   const _cur = window.YuanzhuProfile.current();
   const _panel = document.createElement('div');
@@ -4660,7 +4660,7 @@ function stopTTS(){
 // P14 节点 3：music 顺序朗读控制（P1-任务3 断网可用率 100%）
 window._musicPlaylistAbort = false;
 function _playMusicPlaylist(btn){
-  if(!('speechSynthesis' in window)){ alert('当前浏览器不支持 SpeechSynthesis，请换 Chrome/Safari。'); return; }
+  if(!('speechSynthesis' in window)){ showToast('当前浏览器不支持 SpeechSynthesis，请换 Chrome/Safari。'); return; }
   let pl;
   try{ pl = JSON.parse(btn.getAttribute('data-playlist')); }catch(e){ console.warn('playlist parse err',e); return; }
   window._musicPlaylistAbort = false;

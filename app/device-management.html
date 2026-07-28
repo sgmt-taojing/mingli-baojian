@@ -261,7 +261,7 @@ var OpsCenter = {
       'static': 'node scripts/lh-static-server.js',
       'api': 'node server/api-server-v2.js'
     };
-    alert('重启 ' + key + '：\n\n' + (hints[key] || '手动重启'));
+    showToast('重启 ' + key + '：\n\n' + (hints[key] || '手动重启'));
   },
 
   // ===== 摄像头检测 =====
@@ -397,7 +397,7 @@ var OpsCenter = {
 
   setDefault: function(){
     var sel = document.getElementById('om-cam-select');
-    if(!sel || !sel.value){ alert('请先检测设备并选择一个摄像头'); return; }
+    if(!sel || !sel.value){ showToast('请先检测设备并选择一个摄像头'); return; }
     localStorage.setItem('default_camera_device', sel.value);
     localStorage.setItem('default_camera_label', sel.options[sel.selectedIndex].textContent);
     var info = document.getElementById('om-cam-info');
@@ -554,26 +554,26 @@ var OpsCenter = {
 
   glassTakePhoto: function(){
     var bridge = window.RokidJSBridge || window.KJJSBridge;
-    if(!bridge){ alert('Bridge 不可用'); return; }
+    if(!bridge){ showToast('Bridge 不可用'); return; }
     try {
       if(bridge.callNative){
-        bridge.callNative('camera.capture', JSON.stringify({sensor:'front'}), function(res){ alert('拍照结果: ' + res); });
+        bridge.callNative('camera.capture', JSON.stringify({sensor:'front'}), function(res){ showToast('拍照结果: ' + res); });
       } else if(bridge.postMessage){
-        bridge.postMessage('camera.capture', {sensor:'front'}, function(res){ alert('拍照结果: ' + res); });
+        bridge.postMessage('camera.capture', {sensor:'front'}, function(res){ showToast('拍照结果: ' + res); });
       }
-    } catch(e){ alert('调用失败: ' + e.message); }
+    } catch(e){ showToast('调用失败: ' + e.message); }
   },
 
   glassInfo: function(){
     var bridge = window.RokidJSBridge || window.KJJSBridge;
-    if(!bridge){ alert('Bridge 不可用'); return; }
+    if(!bridge){ showToast('Bridge 不可用'); return; }
     try {
       if(bridge.callNative){
-        bridge.callNative('device.info', '{}', function(res){ alert('设备信息: ' + res); });
+        bridge.callNative('device.info', '{}', function(res){ showToast('设备信息: ' + res); });
       } else if(bridge.postMessage){
-        bridge.postMessage('device.info', {}, function(res){ alert('设备信息: ' + res); });
+        bridge.postMessage('device.info', {}, function(res){ showToast('设备信息: ' + res); });
       }
-    } catch(e){ alert('调用失败: ' + e.message); }
+    } catch(e){ showToast('调用失败: ' + e.message); }
   },
 
   // ===== 更新概览 =====

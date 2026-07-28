@@ -372,7 +372,7 @@
     mergeFamily(family); mergeOccupation(occupation); mergeHealth(health);
     mergeConcerns(concerns);
     const summary = getSummary();
-    showToast ? showToast('✅ 档案已保存（'+(summary.completeness||0)+'% 完整）') : alert('档案已保存');
+    showToast ? showToast('✅ 档案已保存（'+(summary.completeness||0)+'% 完整）') : showToast('档案已保存');
     // 关闭弹层
     const m = document.getElementById('customModal'); if(m) m.style.display='none';
     const w = document.getElementById('mlbjProfileWizard'); if(w) w.style.display='none';

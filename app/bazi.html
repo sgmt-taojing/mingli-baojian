@@ -642,7 +642,7 @@ function toggleProPanel(){
 }
 function loadProFields(){
   var s = localStorage.getItem('mlbj_pro_fields');
-  if(!s){ alert('暂无保存的档案'); return; }
+  if(!s){ showToast('暂无保存的档案'); return; }
   try {
     var d = JSON.parse(s);
     Object.keys(d).forEach(function(k){
@@ -650,7 +650,7 @@ function loadProFields(){
       if(el) el.value = d[k];
     });
     toast('已载入档案');
-  } catch(e){ alert('档案解析失败'); }
+  } catch(e){ showToast('档案解析失败'); }
 }
 function saveProFields(){
   var d = {};

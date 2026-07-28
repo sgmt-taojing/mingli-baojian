@@ -1381,7 +1381,7 @@ function switchTab(tab){var el=document.querySelector(".tab[data-tab=\""+tab+"\"
   // R121 导出节点+邻接+条目为 JSON
   document.getElementById('modalExportBtn')?.addEventListener('click', () => {
     const nodeId = document.getElementById('modalTitle').dataset.nodeId || window._modalHistory?.[window._modalHistory.length-1];
-    if(!nodeId){ alert('当前节点未识别'); return; }
+    if(!nodeId){ showToast('当前节点未识别'); return; }
     const node = (window.gNodes||[]).find(n => n.id === nodeId);
     const edges = (window.gEdges||[]).filter(e => e.source === nodeId || e.target === nodeId);
     const neighborIds = new Set();

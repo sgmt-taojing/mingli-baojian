@@ -232,7 +232,7 @@
 
 <script>
 function startRecording(){
-  if(!navigator.mediaDevices){ alert('浏览器不支持录音'); return; }
+  if(!navigator.mediaDevices){ showToast('浏览器不支持录音'); return; }
   navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
     window._recStream = stream;
     window._rec = new MediaRecorder(stream);
@@ -240,7 +240,7 @@ function startRecording(){
     window._rec.ondataavailable = function(e){ window._recChunks.push(e.data); };
     window._rec.start();
     toast('录音开始');
-  }).catch(function(e){ alert('录音失败: '+e.message); });
+  }).catch(function(e){ showToast('录音失败: '+e.message); });
 }
 function runDiagnosis(){
   var btn = event.target;

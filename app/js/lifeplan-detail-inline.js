@@ -112,7 +112,7 @@ function generate(){
       if(existingMonthly)existingMonthly.remove();
       if(genBtn&&genBtn.parentNode)genBtn.parentNode.appendChild(monthlyBtn);
     }catch(e){
-      alert('生成失败：'+e.message);
+      showToast('生成失败：'+e.message);
       btn.disabled=false; btn.textContent='✨ 生成蓝图';
     }
   }, 250);
@@ -702,18 +702,18 @@ function renderLifeplanDashboardR38(){
   h+='<div style="margin:10px 0 8px;color:var(--paper3);font-size:12px;letter-spacing:1.5px">📋 4 人生阶段蓝图</div>';
   h+='<div class="lp-stage">';
   Object.keys(LP_4STAGE_R38).forEach(function(k){var it=LP_4STAGE_R38[k];
-    h+='<ml-tap class="lp-stage-cell" onclick="alert(\''+it.label+'（'+it.age+'岁）\\n\\n行动建议：'+it.tip+'\')" variant="card" role="button" tabindex="0"><b>'+it.label+'</b><div style="font-size:11px;color:var(--gold);margin:4px 0">'+it.age+'岁</div><div style="font-size:10px;opacity:.7;line-height:1.5">'+it.tip+'</div></ml-tap>';
+    h+='<ml-tap class="lp-stage-cell" onclick="showToast(\''+it.label+'（'+it.age+'岁）\\n\\n行动建议：'+it.tip+'\')" variant="card" role="button" tabindex="0"><b>'+it.label+'</b><div style="font-size:11px;color:var(--gold);margin:4px 0">'+it.age+'岁</div><div style="font-size:10px;opacity:.7;line-height:1.5">'+it.tip+'</div></ml-tap>';
   });
   h+='</div>';
   h+='<div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px">';
   h+='<div><div style="font-size:12px;color:#4a9a6e;margin-bottom:6px;letter-spacing:1px">🩺 8 健康维（点击查看详情）</div><div class="lp-8grid">';
   Object.keys(LP_HEALTH_8D_R38).forEach(function(k){var it=LP_HEALTH_8D_R38[k];
-    h+='<ml-tap class="lp-8cell" onclick="alert(\''+it.label+'\\n\\n建议：'+it.tip+'\')" variant="card" role="button" tabindex="0"><span class="icon">'+it.icon+'</span><b>'+it.label+'</b><div class="tip">'+it.tip+'</div></ml-tap>';
+    h+='<ml-tap class="lp-8cell" onclick="showToast(\''+it.label+'\\n\\n建议：'+it.tip+'\')" variant="card" role="button" tabindex="0"><span class="icon">'+it.icon+'</span><b>'+it.label+'</b><div class="tip">'+it.tip+'</div></ml-tap>';
   });
   h+='</div></div>';
   h+='<div><div style="font-size:12px;color:#4a8aa8;margin-bottom:6px;letter-spacing:1px">💼 8 事业维（点击查看详情）</div><div class="lp-8grid">';
   Object.keys(LP_CAREER_8D_R38).forEach(function(k){var it=LP_CAREER_8D_R38[k];
-    h+='<ml-tap class="lp-8cell" onclick="alert(\''+it.label+'\\n\\n建议：'+it.tip+'\')" variant="card" role="button" tabindex="0"><span class="icon">'+it.icon+'</span><b>'+it.label+'</b><div class="tip">'+it.tip+'</div></ml-tap>';
+    h+='<ml-tap class="lp-8cell" onclick="showToast(\''+it.label+'\\n\\n建议：'+it.tip+'\')" variant="card" role="button" tabindex="0"><span class="icon">'+it.icon+'</span><b>'+it.label+'</b><div class="tip">'+it.tip+'</div></ml-tap>';
   });
   h+='</div></div>';
   h+='</div>';

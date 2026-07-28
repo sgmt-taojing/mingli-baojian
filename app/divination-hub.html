@@ -4274,7 +4274,7 @@ function doCeziSection() {
     var input = document.getElementById('ceziSectionInput');
     var ch = (input && input.value || '').trim();
     if (!ch) {
-      var t = (typeof showToast === 'function') ? showToast : (typeof toast === 'function') ? toast : function (m) { alert(m); };
+      var t = (typeof showToast === 'function') ? showToast : (typeof toast === 'function') ? toast : function (m) { showToast(m); };
       t('请先输入一个汉字');
       return;
     }
@@ -4321,7 +4321,7 @@ function computeHuajie() {
     var hour = (document.getElementById('hjHour') || {}).value || '6';
     var out = document.getElementById('hjOutput');
     if (!date) {
-      var t = (typeof showToast === 'function') ? showToast : (typeof toast === 'function') ? toast : function (m) { alert(m); };
+      var t = (typeof showToast === 'function') ? showToast : (typeof toast === 'function') ? toast : function (m) { showToast(m); };
       t('请先填写出生日期');
       return;
     }
@@ -5037,7 +5037,7 @@ function handleImportFile(event){
       if(window._toast) window._toast('✅ 已导入缘主数据', 1500);
       else if(typeof toast === 'function') toast('已导入');
     } catch(err){
-      alert('文件解析失败: '+err.message);
+      showToast('文件解析失败: '+err.message);
     }
   };
   reader.readAsText(file);

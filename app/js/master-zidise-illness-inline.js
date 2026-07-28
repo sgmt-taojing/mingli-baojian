@@ -1269,12 +1269,12 @@ function renderZidiseHealthCareerR38(){
   h+='<div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px">';
   h+='<div><div style="font-size:12px;color:#4a9a6e;margin-bottom:6px">🩺 8 健康维</div><div class="zid-8grid">';
   Object.keys(ZID_HEALTH_8D_R38).forEach(function(k){var it=ZID_HEALTH_8D_R38[k];
-    h+='<ml-tap class="zid-8cell" onclick="alert(\''+it.label+'\\n\\n建议：'+it.tip+'\')" variant="card" role="button" tabindex="0"><span class="icon">'+it.icon+'</span><b>'+it.label+'</b><div class="tip">'+it.tip+'</div></ml-tap>';
+    h+='<ml-tap class="zid-8cell" onclick="showToast(\''+it.label+'\\n\\n建议：'+it.tip+'\')" variant="card" role="button" tabindex="0"><span class="icon">'+it.icon+'</span><b>'+it.label+'</b><div class="tip">'+it.tip+'</div></ml-tap>';
   });
   h+='</div></div>';
   h+='<div><div style="font-size:12px;color:#4a8aa8;margin-bottom:6px">💼 8 事业维</div><div class="zid-8grid">';
   Object.keys(ZID_CAREER_8D_R38).forEach(function(k){var it=ZID_CAREER_8D_R38[k];
-    h+='<ml-tap class="zid-8cell" onclick="alert(\''+it.label+'\\n\\n建议：'+it.tip+'\')" variant="card" role="button" tabindex="0"><span class="icon">'+it.icon+'</span><b>'+it.label+'</b><div class="tip">'+it.tip+'</div></ml-tap>';
+    h+='<ml-tap class="zid-8cell" onclick="showToast(\''+it.label+'\\n\\n建议：'+it.tip+'\')" variant="card" role="button" tabindex="0"><span class="icon">'+it.icon+'</span><b>'+it.label+'</b><div class="tip">'+it.tip+'</div></ml-tap>';
   });
   h+='</div></div>';
   h+='</div>';

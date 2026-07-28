@@ -999,7 +999,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function r40MiniSearch(){
   var q=document.getElementById('r40MiniQuery').value.trim();
-  if(!q){alert('请输入查询关键词');return;}
+  if(!q){showToast('请输入查询关键词');return;}
   if(!window.R39_DUAL_CORE_KB){document.getElementById('r40MiniResult').innerHTML='<span style="opacity:.95">KB 加载中...</span>';return;}
   var results=r39SearchKB(q);
   var html='<div style="margin-bottom:6px;opacity:.6">命中 <b style="color:var(--gold)">'+results.length+'</b> 条 / 总 '+R39_DUAL_CORE_KB.length+' 条</div>';
