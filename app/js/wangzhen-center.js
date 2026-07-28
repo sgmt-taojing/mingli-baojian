@@ -296,6 +296,57 @@
     modal.style.display = 'flex';
   }
 
+  // ===== 理疗方案渲染 =====
+  function renderTherapy(container){
+    var kb = window.WANGZHEN_KB;
+    if(!kb || !kb.loaded || !kb.data){
+      container.innerHTML = '<p class="muted">理疗方案 KB 加载中...</p>';
+      return;
+    }
+    var plans = kb.data.filter(function(d){ return d.category === '理疗' && d.disease; });
+    var libs = kb.data.filter(function(d){ return d.category === '理疗' && !d.disease; });
+    var html = '';
+    html += '<div style="margin-bottom:10px"><input type="text" id="therapy-search" placeholder="搜索病种...(如：失眠、头痛、感冒)" oninput="window.wangzhenCenter.filterTherapy(this.value)" style="width:100%;padding:8px 12px;background:rgba(255,255,255,.05);border:1px solid var(--wz-border);border-radius:6px;color:var(--wz-paper);font-size:13px"></div>';
+    if(libs.length > 0){
+      html += '<div class="section-title" style="margin-top:12px">📚 穴位理疗库</div>';
+      html += '<div class="therapy-lib-grid">';
+      libs.forEach(function(item){
+        html += '<div class="therapy-lib-card" onclick="window.wangzhenCenter.showTherapyDetail(\''+item.entry_id+'\')">';
+        html += '<div class="therapy-lib-title">'+item.title+'</div>';
+        html += '<div class="therapy-lib-desc">'+(item.content||'').substring(0,60)+'...</div>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    if(plans.length > 0){
+      html += '<div class="section-title" style="margin-top:16px">💨 常见病理疗方案（'+plans.length+'种）</div>';
+      html += '<div class="therapy-plan-grid" id="therapy-plan-grid">';
+      plans.forEach(function(item){
+        html += '<div class="therapy-plan-card" data-disease="'+(item.disease||'')+'" onclick="window.wangzhenCenter.showTherapyDetail(\''+item.entry_id+'\')">';
+        html += '<div class="therapy-plan-name">'+(item.disease||item.title)+'</div>';
+        var pts = (item.content||'').match(/核心穴位：(.+?)[\n\r]/);
+        if(pts) html += '<div class="therapy-plan-pts">'+pts[1].substring(0,40)+'</div>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    container.innerHTML = html;
+  }
+
+  function showTherapyDetail(entryId){
+    var kb = window.WANGZHEN_KB;
+    if(!kb || !kb.data) return;
+    var item = kb.data.find(function(d){ return d.entry_id === entryId; });
+    if(!item) return;
+    var modal = document.getElementById('wangzhen-organ-modal');
+    var body = document.getElementById('wangzhen-organ-modal-body');
+    if(!modal || !body) return;
+    body.innerHTML = '<div class="organ-modal-title">'+item.title+'</div>';
+    body.innerHTML += '<div class="organ-modal-item-content">'+(item.content||'').replace(/\n/g,'<br>')+'</div>';
+    if(item.keyword) body.innerHTML += '<div class="organ-modal-item-kw">关键词: '+item.keyword+'</div>';
+    modal.style.display = 'flex';
+  }
+
   // ===== AI 7步流程 =====
   function renderAISteps(container){
     var steps = [
@@ -335,6 +386,7 @@
       var colorPanel = document.getElementById('wangzhen-five-colors');
       var organPanel = document.getElementById('wangzhen-organs');
       var aiStepsPanel = document.getElementById('wangzhen-ai-steps');
+      var therapyPanel = document.getElementById('wangzhen-therapy');
 
       if(zoneMap) renderZoneMap(zoneMap);
       if(featurePanel) featurePanel.innerHTML = '<p class="muted">👆 请先选择一个面部分区</p>';
@@ -342,6 +394,7 @@
       if(colorPanel) renderFiveColors(colorPanel);
       if(organPanel) renderOrganModules(organPanel);
       if(aiStepsPanel) renderAISteps(aiStepsPanel);
+      if(therapyPanel) renderTherapy(therapyPanel);
 
       // KB 加载状态
       if(window.WANGZHEN_KB && window.WANGZHEN_KB.loaded){
@@ -400,6 +453,15 @@
     },
 
     showOrganDetail: showOrganDetail,
+    showTherapyDetail: showTherapyDetail,
+    filterTherapy: function(keyword){
+      var cards = document.querySelectorAll('#therapy-plan-grid .therapy-plan-card');
+      if(!cards) return;
+      cards.forEach(function(c){
+        var disease = (c.dataset.disease || '').toLowerCase();
+        c.style.display = (!keyword || disease.indexOf(keyword.toLowerCase()) >= 0) ? '' : 'none';
+      });
+    },
 
     closeOrganModal: function(){
       var modal = document.getElementById('wangzhen-organ-modal');
