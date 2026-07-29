@@ -356,6 +356,10 @@ const MODULES={
     {q:'您的出生年月日时？(可选，用于案例对照)',hint:'例如：1985年3月22日8时'}
   ]},
 
+  'wellness-report':{name:'健康报告解读',icon:'📋',desc:'四维融合',actionUrl:'report-interpret.html',steps:[
+    {q:'请上传或录入您的体检报告/血常规/影像（CT/MRI/X光）',hint:'支持 OCR 拍照、12 项生化指标手动录入、15 项影像模式自动匹配'}
+  ]},
+
 };
 
 // 推送模块(闭环后展示)
@@ -382,7 +386,8 @@ const ALL_MODS=[
   {id:'music',name:'疗愈音乐',icon:'🎵'},
   {id:'lifeindex',name:'生命指数',icon:'📊'},
   {id:'lifeplan',name:'人生规划',icon:'🗺️'},
-  {id:'mingxiang',name:'命相同参',icon:'🩺', kb:'MINGXIANG_CROSS_KB', mods:['mingxiang','cross','mingxiang-cross'], weight:0.85}
+  {id:'mingxiang',name:'命相同参',icon:'🩺', kb:'MINGXIANG_CROSS_KB', mods:['mingxiang','cross','mingxiang-cross'], weight:0.85},
+  {id:'wellness-report',name:'健康报告解读',icon:'📋', kb:'WELLNESS_REPORT_KB', mods:['report','health-report','体检','wellness-report','ocr'], weight:0.9, actionUrl:'report-interpret.html'}
 ];
 
 // === P1: 统一追加"关心维度"步骤到核心模块 ===
@@ -569,6 +574,8 @@ function showWelcome(){
 
 function startModule(id){
   const mod=MODULES[id];
+  // R250: 模块 actionUrl 优先跳转（如 健康报告解读 → report-interpret.html）
+  if(mod && mod.actionUrl){ window.location.href = mod.actionUrl; return; }
   if(!mod)return;
   state={module:id,step:0,data:{},reporting:false};
   chat.innerHTML='';
@@ -745,6 +752,7 @@ function detectModule(text){
   if(/姓名|改名|名字/.test(t))return 'xingming';
   if(/奇门|遁甲/.test(t))return 'qimen';
   if(/紫微|斗数/.test(t))return 'ziwei';
+  if(/体检报告|血常规|化验单|生化指标|ct|mri|x光|超声|影像|健康报告/.test(t))return 'wellness-report';
   if(/六爻|占卜/.test(t))return 'liuyao';
   if(/梅花|易数/.test(t))return 'meihua';
   if(/六壬/.test(t))return 'liuren';
