@@ -257,8 +257,40 @@ h+='</div></div>';
 // 免责
 h+='<div class="card" style="border-color:var(--red)"><div style="font-size:11px;color:var(--muted);line-height:1.6">⚠️ 本报告基于传统命理五行理论+中医体质+家族遗传+西医数据综合分析，仅供参考。预测不能替代医学诊断。如有不适请及时就医，定期体检是最佳预防手段。</div></div>';
 
-a.innerHTML=h;
-window.scrollTo(0,0);
+// 保存到 API
+var payload={
+    user_id:4,
+    name:v('name'),sex:v('sex'),age:parseInt(v('age'))||null,
+    height:v('hw'),residence:v('residence'),
+    occupation:v('occupation'),exercise:v('exercise'),
+    birth_date:v('birth_date'),birth_hour:parseInt(v('birth_hour'))||null,
+    birthplace:v('birthplace'),preterm:v('preterm'),
+    father_health:v('father_health'),mother_health:v('mother_health'),
+    grandpa_p_health:v('grandpa_p_health'),grandpa_m_health:v('grandpa_m_health'),
+    sibling_health:v('sibling_health'),family_genetic:chk('family_genetic'),
+    bp:v('bp'),hr:v('hr'),glucose:v('glucose'),lipid:v('lipid'),
+    liver:v('liver'),kidney:v('kidney'),cbc:v('cbc'),
+    imaging:v('imaging'),other_exam:v('other_exam'),medications:v('medications'),
+    temp_pref:v('temp_pref'),sweat:v('sweat'),appetite:v('appetite'),
+    sleep:v('sleep'),bowel:v('bowel'),mood:v('mood'),energy:v('energy'),
+    symptoms:chk('symptoms'),
+    last_report:h.substring(0,5000),last_report_date:new Date().toISOString()
+};
+var csrfReq=API+'/api/csrf';
+fetch(csrfReq,{credentials:'include'}).then(function(r){return r.json()}).then(function(cs){
+    var csrfToken=cs.csrf_token||cs.data&&cs.data.csrf_token||'';
+    return fetch(API+'/api/wellness/profile',{method:'POST',headers:{'Content-Type':'application/json','x-csrf-token':csrfToken},body:JSON.stringify(payload),credentials:'include'})
+}).then(function(r){return r.json()}).then(function(d){
+    var saveInfo='<div class="card"><div class="card-title">💾 档案已保存</div>';
+    saveInfo+='<div style="font-size:12px">风险等级：<b>'+(d.data&&d.data.risk_level||'normal')+'</b> | 操作：'+(d.data&&d.data.action||'created')+'</div>';
+    saveInfo+='<div class="hint">您的康养人档案已保存到身份中心</div></div>';
+    a.innerHTML=saveInfo+h;
+    window.scrollTo(0,0);
+}).catch(function(e){
+    console.warn('保存失败:',e);
+    a.innerHTML=h;
+    window.scrollTo(0,0);
+});
 }
 
 render();
