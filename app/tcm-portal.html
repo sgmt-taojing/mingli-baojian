@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<title>中医诊疗·健康门户</title>
+<style>
+  :root{
+    --gold:#c9a84c;--gold2:#e3c97a;--paper:#f4e8c8;--paper2:rgba(244,232,200,.78);
+    --jade:#27ae60;--cyan:#3aa6b4;--orange:#e67e22;--violet:#8e44ad;
+    --dark:#1a120a;--dark2:#241609;--dark3:#0e0905;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'STKaiti','KaiTi','楷体',serif;
+    background:radial-gradient(ellipse at top,var(--dark2) 0%,var(--dark3) 100%);
+    color:var(--paper);min-height:100vh;padding:24px 16px 80px;
+  }
+  .hero{text-align:center;max-width:920px;margin:0 auto 24px;padding:24px 0 16px;border-bottom:1px solid rgba(46,204,113,.15)}
+  .hero h1{font-size:36px;color:var(--jade);letter-spacing:8px;margin-bottom:8px;font-family:'Ma Shan Zheng',serif}
+  .hero p{font-size:14px;color:var(--paper2);letter-spacing:3px;opacity:.85}
+  .group{max-width:1100px;margin:0 auto 28px}
+  .group-title{display:flex;align-items:center;gap:12px;margin:0 0 12px;font-family:'Ma Shan Zheng',serif;font-size:18px;color:var(--jade);letter-spacing:4px;opacity:.9}
+  .group-title .icon{font-size:22px}
+  .group-title .line{flex:1;height:1px;background:linear-gradient(90deg,rgba(46,204,113,.2),transparent)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+  .card{display:block;padding:18px;border:1px solid rgba(46,204,113,.18);border-radius:14px;background:rgba(46,204,113,.03);cursor:pointer;transition:all .3s ease;color:var(--paper);text-decoration:none;position:relative;overflow:hidden}
+  .card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 60%,rgba(46,204,113,.06));opacity:0;transition:opacity .3s}
+  .card:hover::before{opacity:1}
+  .card:hover{transform:translateY(-2px);border-color:rgba(46,204,113,.45);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+  .card:hover .name{color:var(--gold2)}
+  .card .symbol{font-size:28px;display:block;margin-bottom:8px}
+  .card .name{font-size:16px;color:var(--gold);font-weight:600;margin-bottom:4px;letter-spacing:2px;transition:color .3s}
+  .card .en{font-size:11px;color:var(--gold2);opacity:.6;letter-spacing:1px;margin-bottom:8px;font-family:Georgia,serif}
+  .card .desc{font-size:12px;color:var(--paper2);line-height:1.7;opacity:.78}
+  .card .go{margin-top:10px;font-size:11px;color:var(--cyan);opacity:.7;letter-spacing:1.5px}
+  @media(max-width:768px){body{padding:16px 12px 60px}.hero h1{font-size:26px;letter-spacing:4px}.grid{grid-template-columns:repeat(2,1fr);gap:10px}.card{padding:14px 12px}}
+  .footer{text-align:center;margin-top:36px;font-size:11px;color:var(--paper2);opacity:.45;letter-spacing:2px}
+  .footer a{color:var(--gold);text-decoration:none;margin:0 8px}
+</style>
+</head>
+<body>
+<div class="hero">
+  <h1>🌿 中医 · 诊疗 · 养生</h1>
+  <p>望闻问切 · 辨证论治 · 体质调养 · 名医传承 · 医案管理</p>
+</div>
+
+<!-- ① 诊疗工具 -->
+<div class="group">
+  <div class="group-title"><span class="icon">🔍</span><span>诊疗 · 辨证工具</span><span class="line"></span></div>
+  <div class="grid">
+    <a class="card" href="tcm-clinic.html">
+      <span class="symbol">🏥</span>
+      <div class="name">中医诊所</div>
+      <div class="en">TCM Clinic Portal</div>
+      <div class="desc">望闻问切 · 辨证论治 · 体质辨识 · 名医名方 · 经方时方</div>
+      <div class="go">→ 进入诊所</div>
+    </a>
+    <a class="card" href="tcm-symptom.html">
+      <span class="symbol">💊</span>
+      <div class="name">辨症查询</div>
+      <div class="en">Symptom Identifier</div>
+      <div class="desc">症状自查 · 中医辨证 · 推荐方剂 · 穴位按摩 · 食疗建议</div>
+      <div class="go">→ 辨症查询</div>
+    </a>
+    <a class="card" href="tcm-report.html">
+      <span class="symbol">📄</span>
+      <div class="name">中医报告</div>
+      <div class="en">TCM Report</div>
+      <div class="desc">体质调养方案 · 季节养生 · 食疗药膳 · 八段锦 · 太极</div>
+      <div class="go">→ 查看报告</div>
+    </a>
+    <a class="card" href="divination-hub.html#section=tizhi">
+      <span class="symbol">⚖️</span>
+      <div class="name">体质辨识</div>
+      <div class="en">9 Body Types</div>
+      <div class="desc">九种体质（平和/气虚/阳虚/阴虚/痰湿/湿热/血瘀/气郁/特禀）· 调养方案</div>
+      <div class="go">→ 体质测试</div>
+    </a>
+  </div>
+</div>
+
+<!-- ② 望诊 · AI 视觉 -->
+<div class="group">
+  <div class="group-title"><span class="icon">👁️</span><span>望诊 · AI 视觉引擎</span><span class="line"></span></div>
+  <div class="grid">
+    <a class="card" href="wangzhen-clinical.html">
+      <span class="symbol">📷</span>
+      <div class="name">望诊识人（临床版）</div>
+      <div class="en">Wang Zhen Clinical</div>
+      <div class="desc">面诊+舌诊+目神 拍照上传 · AI 视觉引擎判读 · 脏腑虚实分析</div>
+      <div class="go">→ 拍照望诊</div>
+    </a>
+    <a class="card" href="wangzhen-center.html">
+      <span class="symbol">🔬</span>
+      <div class="name">望诊中心</div>
+      <div class="en">Wang Zhen Center</div>
+      <div class="desc">望诊知识库 · 28 舌象 · 面部五区 · 目部五脏 · 聚合分析</div>
+      <div class="go">→ 进入望诊中心</div>
+    </a>
+    <a class="card" href="divination-hub.html#section=yanzhi">
+      <span class="symbol">🔍</span>
+      <div class="name">颜痣识人</div>
+      <div class="en">Yan Zhi · Face Reading</div>
+      <div class="desc">面部气色 · 痣相分布 · 倪师面相 · 性格健康关联</div>
+      <div class="go">→ 颜痣分析</div>
+    </a>
+  </div>
+</div>
+
+<!-- ③ 名医传承 -->
+<div class="group">
+  <div class="group-title"><span class="icon">👨‍⚕️</span><span>名医 · 师承 · 经方</span><span class="line"></span></div>
+  <div class="grid">
+    <a class="card" href="doctor-elder.html">
+      <span class="symbol">👴</span>
+      <div class="name">名老中医</div>
+      <div class="en">Master TCM Doctors</div>
+      <div class="desc">国医大师 · 名老中医经验 · 经方验案 · 学术传承</div>
+      <div class="go">→ 进入名老中医</div>
+    </a>
+    <a class="card" href="doctor-panel.html">
+      <span class="symbol">👨‍⚕️</span>
+      <div class="name">医师工作台</div>
+      <div class="en">Doctor Panel</div>
+      <div class="desc">问诊 · 开方 · 随访 · 病历模板 · 知识库智能提示</div>
+      <div class="go">→ 医师工作台</div>
+    </a>
+    <a class="card" href="master-disease.html">
+      <span class="symbol">📚</span>
+      <div class="name">名医·疾病辨治</div>
+      <div class="en">Master Disease Cases</div>
+      <div class="desc">各科疾病名医辨治经验 · 疑难杂症 · 步骤拆解</div>
+      <div class="go">→ 疾病辨治</div>
+    </a>
+    <a class="card" href="master-zidise-illness.html">
+      <span class="symbol">🩺</span>
+      <div class="name">子午病症治要</div>
+      <div class="en">Zi Wu Illness</div>
+      <div class="desc">时辰病症 · 子午流注 · 经络脏腑对应治疗</div>
+      <div class="go">→ 进入治要</div>
+    </a>
+  </div>
+</div>
+
+<!-- ④ 患者管理 -->
+<div class="group">
+  <div class="group-title"><span class="icon">📋</span><span>患者 · 医案管理</span><span class="line"></span></div>
+  <div class="grid">
+    <a class="card" href="patient-archive.html">
+      <span class="symbol">👤</span>
+      <div class="name">患者档案</div>
+      <div class="en">Patient Archive</div>
+      <div class="desc">病历聚合 · 历史处方 · 复诊提醒 · 诊疗时间轴</div>
+      <div class="go">→ 患者档案</div>
+    </a>
+    <a class="card" href="patient-intake.html">
+      <span class="symbol">📝</span>
+      <div class="name">患者初诊</div>
+      <div class="en">Patient Intake</div>
+      <div class="desc">初诊登记 · 主诉 · 既往史 · 四诊资料 · 隐私合规</div>
+      <div class="go">→ 初诊登记</div>
+    </a>
+    <a class="card" href="divination-hub.html#section=person-dashboard">
+      <span class="symbol">📊</span>
+      <div class="name">人物档案看板</div>
+      <div class="en">Person Dashboard</div>
+      <div class="desc">5 身份统一视图 · 缘主/患者/信众聚合 · 综合风险评级</div>
+      <div class="go">→ 打开看板</div>
+    </a>
+  </div>
+</div>
+
+<div class="footer">
+  <a href="divination-hub.html">← 返回首页</a> ·
+  <a href="naming-portal.html">命名起号 →</a> ·
+  <a href="practice-portal.html">修行参学 →</a>
+  <p>© 易道智鉴 · 中医诊疗门户 · R256</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<title>民俗生活·黄历门户</title>
+<style>
+  :root{
+    --gold:#c9a84c;--gold2:#e3c97a;--paper:#f4e8c8;--paper2:rgba(244,232,200,.78);
+    --orange:#e67e22;--orange2:#f5b041;--cyan:#3aa6b4;--violet:#8e44ad;
+    --dark:#1a120a;--dark2:#241609;--dark3:#0e0905;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'STKaiti','KaiTi','楷体',serif;
+    background:radial-gradient(ellipse at top,var(--dark2) 0%,var(--dark3) 100%);
+    color:var(--paper);min-height:100vh;padding:24px 16px 80px;
+  }
+  .hero{text-align:center;max-width:920px;margin:0 auto 24px;padding:24px 0 16px;border-bottom:1px solid rgba(230,126,34,.18)}
+  .hero h1{font-size:36px;color:var(--orange2);letter-spacing:8px;margin-bottom:8px;font-family:'Ma Shan Zheng',serif}
+  .hero p{font-size:14px;color:var(--paper2);letter-spacing:3px;opacity:.85}
+  .group{max-width:1100px;margin:0 auto 28px}
+  .group-title{display:flex;align-items:center;gap:12px;margin:0 0 12px;font-family:'Ma Shan Zheng',serif;font-size:18px;color:var(--orange2);letter-spacing:4px;opacity:.9}
+  .group-title .icon{font-size:22px}
+  .group-title .line{flex:1;height:1px;background:linear-gradient(90deg,rgba(230,126,34,.25),transparent)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+  .card{display:block;padding:18px;border:1px solid rgba(230,126,34,.2);border-radius:14px;background:rgba(230,126,34,.04);cursor:pointer;transition:all .3s ease;color:var(--paper);text-decoration:none;position:relative;overflow:hidden}
+  .card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 60%,rgba(230,126,34,.08));opacity:0;transition:opacity .3s}
+  .card:hover::before{opacity:1}
+  .card:hover{transform:translateY(-2px);border-color:rgba(230,126,34,.5);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+  .card:hover .name{color:var(--gold2)}
+  .card .symbol{font-size:28px;display:block;margin-bottom:8px}
+  .card .name{font-size:16px;color:var(--gold);font-weight:600;margin-bottom:4px;letter-spacing:2px;transition:color .3s}
+  .card .en{font-size:11px;color:var(--gold2);opacity:.6;letter-spacing:1px;margin-bottom:8px;font-family:Georgia,serif}
+  .card .desc{font-size:12px;color:var(--paper2);line-height:1.7;opacity:.78}
+  .card .go{margin-top:10px;font-size:11px;color:var(--cyan);opacity:.7;letter-spacing:1.5px}
+  @media(max-width:768px){body{padding:16px 12px 60px}.hero h1{font-size:26px;letter-spacing:4px}.grid{grid-template-columns:repeat(2,1fr);gap:10px}.card{padding:14px 12px}}
+  .footer{text-align:center;margin-top:36px;font-size:11px;color:var(--paper2);opacity:.45;letter-spacing:2px}
+  .footer a{color:var(--gold);text-decoration:none;margin:0 8px}
+</style>
+</head>
+<body>
+<div class="hero">
+  <h1>🎎 民俗 · 黄历 · 生活</h1>
+  <p>黄历吉日 · 择日择时 · 民俗工具 · 五行音乐 · 年度运势 · 节日礼俗</p>
+</div>
+
+<!-- ① 黄历三视角 -->
+<div class="group">
+  <div class="group-title"><span class="icon">💮</span><span>黄历 · 三视角</span><span class="line"></span></div>
+  <div class="grid">
+    <a class="card" href="divination-almanac.html">
+      <span class="symbol">📜</span>
+      <div class="name">黄历三视角</div>
+      <div class="en">Almanac · 3 Views</div>
+      <div class="desc">传统黄历 / 民俗视角 / 现代建议 — 三维度对照查询</div>
+      <div class="go">→ 黄历查询</div>
+    </a>
+    <a class="card" href="divination-hub.html#section=jiuri">
+      <span class="symbol">💮</span>
+      <div class="name">吉日查询</div>
+      <div class="en">Auspicious Day</div>
+      <div class="desc">择日 · 嫁娶 · 开业 · 入宅 · 出行 · 安葬 · 60 甲子</div>
+      <div class="go">→ 吉日查询</div>
+    </a>
+    <a class="card" href="divination-hub.html#section=jiazi">
+      <span class="symbol">⭕</span>
+      <div class="name">六十甲子</div>
+      <div class="en">60 Jia Zi Cycle</div>
+      <div class="desc">天干地支 · 六十甲子周期 · 纳音五行 · 黄道吉日</div>
+      <div class="go">→ 进入甲子</div>
+    </a>
+    <a class="card" href="divination-hub.html#section=annual-fortune">
+      <span class="symbol">🧧</span>
+      <div class="name">年度运势</div>
+      <div class="en">Annual Fortune</div>
+      <div class="desc">本命流年 · 太岁冲合 · 事业财运 · 感情健康 · 全年趋势</div>
+      <div class="go">→ 年度运势</div>
+    </a>
+  </div>
+</div>
+
+<!-- ② 民俗工具 -->
+<div class="group">
+  <div class="group-title"><span class="icon">🛠️</span><span>民俗 · 实用工具</span><span class="line"></span></div>
+  <div class="grid">
+    <a class="card" href="minsu-center.html">
+      <span class="symbol">🛠️</span>
+      <div class="name">民俗工具中心</div>
+      <div class="en">Folklore Center</div>
+      <div class="desc">节日习俗 · 婚丧礼俗 · 风水用品 · 民俗知识库</div>
+      <div class="go">→ 民俗中心</div>
+    </a>
+    <a class="card" href="divination-tools.html">
+      <span class="symbol">🔮</span>
+      <div class="name">推演工具集</div>
+      <div class="en">Divination Tools</div>
+      <div class="desc">起卦 · 排盘 · 抽签 · 摇卦 · 多工具一站式入口</div>
+      <div class="go">→ 工具集</div>
+    </a>
+    <a class="card" href="divination-integrated.html">
+      <span class="symbol">🌐</span>
+      <div class="name">一体化推演</div>
+      <div class="en">Integrated Divination</div>
+      <div class="desc">多法并用 · 综合推演 · 一站出报告</div>
+      <div class="go">→ 综合推演</div>
+    </a>
+    <a class="card" href="divination-hub.html#section=healing-music">
+      <span class="symbol">🎵</span>
+      <div class="name">五行音乐疗法</div>
+      <div class="en">Five Tone Therapy</div>
+      <div class="desc">宫商角徵羽对应五脏 · 节气音乐处方 · 情绪调养</div>
+      <div class="go">→ 五音疗疾</div>
+    </a>
+  </div>
+</div>
+
+<!-- ③ 节日礼俗 -->
+<div class="group">
+  <div class="group-title"><span class="icon">🧧</span><span>节日 · 礼俗</span><span class="line"></span></div>
+  <div class="grid">
+    <a class="card" href="divination-knowledge.html">
+      <span class="symbol">🧧</span>
+      <div class="name">节气知识</div>
+      <div class="en">Solar Terms</div>
+      <div class="desc">24 节气 · 物候 · 养生 · 节令习俗 · 饮食文化</div>
+      <div class="go">→ 节气知识</div>
+    </a>
+    <a class="card" href="divination-hub.html#section=taisui">
+      <span class="symbol">🐍</span>
+      <div class="name">太岁查询</div>
+      <div class="en">Tai Sui</div>
+      <div class="desc">本命太岁 · 值年冲犯 · 化解方法 · 安太岁</div>
+      <div class="go">→ 太岁查询</div>
+    </a>
+    <a class="card" href="koujue-gallery.html">
+      <span class="symbol">📜</span>
+      <div class="name">口诀画廊</div>
+      <div class="en">Kou Jue Gallery</div>
+      <div class="desc">传统文化口诀 · 风水 · 命理 · 民俗谚语 · 配图讲解</div>
+      <div class="go">→ 口诀画廊</div>
+    </a>
+  </div>
+</div>
+
+<!-- ④ 应用市场 -->
+<div class="group">
+  <div class="group-title"><span class="icon">🏪</span><span>会员 · 商城 · 服务</span><span class="line"></span></div>
+  <div class="grid">
+    <a class="card" href="divination-shop.html">
+      <span class="symbol">🏪</span>
+      <div class="name">服务商城</div>
+      <div class="en">Service Shop</div>
+      <div class="desc">命理咨询服务 · 法事用品 · 风水摆件 · 在线预约</div>
+      <div class="go">→ 进入商城</div>
+    </a>
+    <a class="card" href="divination-membership.html">
+      <span class="symbol">💎</span>
+      <div class="name">会员中心</div>
+      <div class="en">Membership</div>
+      <div class="desc">会员等级 · 积分体系 · 特权服务 · 历史订单</div>
+      <div class="go">→ 会员中心</div>
+    </a>
+    <a class="card" href="wellness-guide.html">
+      <span class="symbol">🌱</span>
+      <div class="name">养生指南</div>
+      <div class="en">Wellness Guide</div>
+      <div class="desc">四季养生 · 食疗 · 运动 · 心理调适 · 体质调养</div>
+      <div class="go">→ 养生指南</div>
+    </a>
+    <a class="card" href="wellness-weekly.html">
+      <span class="symbol">📅</span>
+      <div class="name">每周养生</div>
+      <div class="en">Weekly Wellness</div>
+      <div class="desc">每周养生提示 · 节气活动 · 健康打卡 · 进度追踪</div>
+      <div class="go">→ 每周养生</div>
+    </a>
+  </div>
+</div>
+
+<div class="footer">
+  <a href="divination-hub.html">← 返回首页</a> ·
+  <a href="practice-portal.html">修行参学 →</a> ·
+  <a href="monitor-portal.html">监控运维 →</a>
+  <p>© 易道智鉴 · 民俗生活门户 · R256</p>
+</div>
+</body>
+</html>
