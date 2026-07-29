@@ -4488,7 +4488,7 @@ function doCeziSection() {
 function randomCeziSection() {
   try {
     var pool = '福禄寿喜财安康吉祥如意仁义礼智信天地人和风明月';
-    var ch = pool.charAt(Math.floor(Math.random() * pool.length));
+    var ch = pool.charAt((++state.namePickIdx) % pool.length);
     var input = document.getElementById('ceziSectionInput');
     if (input) input.value = ch;
     doCeziSection();
@@ -4975,7 +4975,7 @@ window.runZeriEngine = function(){
       // 简易笔画映射（演示用，康熙字典速查简化）
       var strokeMap = { '一':1,'二':2,'三':3,'十':2,'口':3,'日':4,'月':4,'木':4,'水':4,'火':4,'土':3,'金':8,'人':2,'大':3,'小':3,'子':3,'天':4,'地':6,'和':8,'明':8,'文':4,'武':8,'伟':12,'芳':10,'敏':11,'静':10,'丽':19,'强':11,'磊':15,'洋':9,'勇':9,'艳':12,'杰':8,'娟':10,'涛':7,'超':12,'秀':7,'鑫':24,'浩':11,'宇':6,'博':12,'涵':11,'瑞':14,'轩':10,'泽':8,'琳':12,'婷':12,'昊':8 };
       var s = 0;
-      for (var i = 0; i < name.length; i++){ s += strokeMap[name[i]] || (Math.floor(Math.random()*12)+3); }
+      for (var i = 0; i < name.length; i++){ s += strokeMap[name[i]] || (3 + ((name.charCodeAt(i) || 0) % 12)); }
 
       // 五格（天/地/人/外/总）
       var wuge = {

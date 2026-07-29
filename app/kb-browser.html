@@ -517,7 +517,9 @@ function switchTab(tab){var el=document.querySelector(".tab[data-tab=\""+tab+"\"
     const randBtn = document.getElementById('randomFilesBtn');
     const oneBtn = document.getElementById('randomOneBtn');
     const preview = document.getElementById('randomPreview');
-    function pickN(n){ return fileList.slice().sort(() => Math.random() - 0.5).slice(0, n); }
+    const kbState = kbState || {}; kbState.pickCount = 0;
+
+function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeCompare(b.name||'')).slice(0, n); }
     function renderPreview(files){
       let h = '<div class="card"><h3>🔀 随机推荐阅读（' + files.length + ' 个）</h3><div class="grid" style="margin-top:10px">';
       for(const f of files){
@@ -1357,7 +1359,7 @@ function switchTab(tab){var el=document.querySelector(".tab[data-tab=\""+tab+"\"
           if(window.toast) window.toast('⚠️ 该节点无相邻模块', 1500);
           return;
         }
-        const pick = neighbors[Math.floor(Math.random() * neighbors.length)];
+        const pick = neighbors[(++kbState.pickCount) % neighbors.length];
         if(window.toast) window.toast(`🎲 随机跳到 ${pick.id} (${neighbors.length} 邻居可选)`, 1800);
         closeNodeModal();
         setTimeout(() => openNodeModal(pick.id), 250);

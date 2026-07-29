@@ -102,7 +102,7 @@ doctor_ref:document.getElementById('doctor_ref').value,
 master_private:document.getElementById('master_private').value
 }
 fetch(API+'/api/clinic/case/'+currentCase,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({master_comment:data.master_comment+'\n[健康预测]'+data.master_comment_2+'\n[化解]'+document.getElementById('master_advice').value,doctor_comment:data.doctor_ref})}).then(function(r){return r.json()}).then(function(d){
-alert('已提交！命理信息已同步给医生端。')
+console.warn('已提交！命理信息已同步给医生端。')
 document.getElementById('detail').style.display='none'
 loadCases()
 })

@@ -269,7 +269,7 @@ document.getElementById('fileInput').addEventListener('change', function(e){
 
 async function doOCR(){
   var file = document.getElementById('fileInput').files[0];
-  if(!file){alert('请先选择图片'); return}
+  if(!file){showToast('请先选择图片', 'warn'); return}
   showToast('🔍 OCR 识别中...');
   try{
     var reader = new FileReader();
@@ -328,7 +328,7 @@ function doManualInterpret(){
     var v = document.getElementById(f.el).value.trim();
     if(v) items.push({label:f.label, value:v});
   });
-  if(items.length === 0){alert('请至少填写一项'); return}
+  if(items.length === 0){showToast('请至少填写一项', 'warn'); return}
   var result = window.ReportInterpret.manual(items, window._profile, USER_ID);
   showResult(result);
 }
@@ -361,7 +361,7 @@ function doBloodInterpret(){
   if(hgb) items.push({label:'血红蛋白', value:hgb});
   if(wbc) items.push({label:'白细胞', value:wbc});
   if(plt) items.push({label:'血小板', value:plt});
-  if(items.length === 0){alert('请填写血常规'); return}
+  if(items.length === 0){showToast('请填写血常规', 'warn'); return}
   var result = window.ReportInterpret.manual(items, window._profile, USER_ID);
   showResult(result);
 }
@@ -373,7 +373,7 @@ function setImaging(text){
 
 function doImagingInterpret(){
   var text = document.getElementById('imagingText').value.trim();
-  if(!text){alert('请输入影像内容'); return}
+  if(!text){showToast('请输入影像内容', 'warn'); return}
   var result = window.ReportInterpret.imaging(text, window._profile, USER_ID);
   showResult(result);
 }
@@ -428,13 +428,13 @@ function showResult(result){
 
 // === 入库 KB ===
 async function ingestToKB(){
-  if(!currentResult){alert('请先做一次解读'); return}
+  if(!currentResult){showToast('请先做一次解读', 'warn'); return}
   var anomalies = [];
   currentResult.items.forEach(function(it){
     if(it.flag && it.flag.cls === 'flag-high') anomalies.push({label:it.label, value:it.value, flag:'high'});
     else if(it.flag && it.flag.cls === 'flag-low') anomalies.push({label:it.label, value:it.value, flag:'low'});
   });
-  if(anomalies.length === 0){alert('无异常项，无需入库'); return}
+  if(anomalies.length === 0){showToast('无异常项，无需入库', 'warn'); return}
 
   try{
     var csrfToken = await fetchCsrf();

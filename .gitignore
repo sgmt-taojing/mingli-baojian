@@ -1,60 +1,60 @@
+# Dependencies
 node_modules/
+
+# Logs
 *.log
+logs/
+
+# OS / Editor
 .DS_Store
+.idea/
+.vscode/
+
+# Database files (NEVER commit)
+*.db
+*.sqlite
+*.sqlite3
 server/database/
+server/yidao.db
+server/kb.db
+server/kb-store/
+
+# User data (privacy!)
 user-data/
-_nishan_tmp/
+yuanzhu-data/
+.env
+.env.local
+.env.*.local
+
+# Backups
+*.backup
+*.bak
+*.bak-*
+admin.html.backup
+divination-hub.html.backup
+archive/server-api-v2.bak-*
+
+# Build / cache
+.cache/
+.lighthouseci/
+.tmp/
+tmp/
+
+# Cluster / internal docs
+.cluster/
+
+# App archive (已归档)
 app/*.bak*
 app/*.backup*
 app/_archive/
 app/js/_archived/
+
+# 已废弃的 JS（避免误加载）
 app/js/lp-upgrade.js
 app/js/merchant.js
 app/js/module-misc.js
 app/js/qimen-v3.js
 app/js/shop-admin.js
-*.pid
-.qianyuan-server.pid
-.cluster/
-.openclaw/
 
-# 备份文件
-app/divination-hub.html.bak
-app/divination-hub.html.bak.audit
-app/divination-hub.html.restored
-app/divination-hub.html.backup
-app/admin.html.backup
-docs/divination-hub.html
-
-# Docker部署
-.env
-data/
-_site/
-backups/
-
-# 备份目录 (2026-07-18)
-.backup/
-_backup_*/
-_archive/
-knowledge-models/ocr-extracts/
-.openclaw/tmp/
-server/mingli.db
-archive/
-
-# 倪师源仓库大型文本（避免 35GB 仓库膨胀）
-scripts/nihaisha-extract/extracted/
-
-# 知识审计产物（2026-07-26 决策）
-# audit/ 目录 = 团队决策档案，保留入库（14 文件 / ~250KB）
-# 包含报告、评分卡、决策矩阵、原型 HTML — 不排除
-# .lighthouseci/ 已在下方排除（CI 自动生成 artifact）
-
-# R20 安全加固：禁止 debug/bak 文件入库
-server/*-debug.js
-server/*.debug.js
-server/*-bak*.js
-**/debug-*.js
-.lighthouseci/
-knowledge/*.db
-coverage/
-coverage/
+# Nishan temp
+_nishan_tmp/

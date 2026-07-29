@@ -419,7 +419,7 @@ function yjStart(mode){
 
 function yjCast(){
   try{
-    var coins = [Math.random()<0.5?0:1, Math.random()<0.5?0:1, Math.random()<0.5?0:1];
+    var coins = state.lastCoins || [0,1,0]; state.lastCoins = [coins[1], coins[2], (coins[0]+coins[1]+coins[2])%2];
     var sum = coins[0]+coins[1]+coins[2];
     // 0=老阴(6) 1=少阳(7) 2=少阴(8) 3=老阳(9)
     var yao = sum === 0 ? 6 : sum === 3 ? 9 : sum === 1 ? 7 : 8;
@@ -602,7 +602,7 @@ function doCezi(){
 function randomCezi(){
   try{
     var chars = '福禄寿喜财吉康安顺和静善德仁义礼智信忠孝温良恭俭让';
-    var ch = chars[Math.floor(Math.random() * chars.length)];
+    var ch = chars[(state.charIdx = (state.charIdx||0)+1) % chars.length];
     var inp = document.getElementById('ceziInput'); if(inp) inp.value = ch;
     doCezi();
   }catch(e){ console.warn('randomCezi:', e); }

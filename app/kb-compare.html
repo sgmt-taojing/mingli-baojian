@@ -56,6 +56,8 @@ tr:hover td{background:rgba(201,168,76,.04);}
 
 <script>
 // 数据来源：与 ai-assistant-inline.js 中的 KB_SOURCES 对齐
+const cmpState = cmpState || {};
+
 const MODULES = [
   {id:'bazi',name:'八字',n:612,cat:'classical',tr:.92,tags:['四柱','日主','十神'],src:'BAZI_KB'},
   {id:'ziwei',name:'紫微',n:480,cat:'classical',tr:.88,tags:['宫位','星曜','四化'],src:'ZIWEI_KB'},
@@ -185,8 +187,8 @@ document.getElementById('btnSwap').onclick = function(){
   render();
 };
 document.getElementById('btnRand').onclick = function(){
-  const i = Math.floor(Math.random()*MODULES.length);
-  let j = Math.floor(Math.random()*MODULES.length);
+  const i = cmpState.i = ((cmpState.i||0) + 1) % MODULES.length;
+  let j = (i + 1) % MODULES.length;
   if (j===i) j=(j+1)%MODULES.length;
   document.getElementById('selA').value = MODULES[i].id;
   document.getElementById('selB').value = MODULES[j].id;

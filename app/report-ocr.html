@@ -130,7 +130,7 @@ if(f)processFile(f);
 function handleFile(e){var f=e.target.files[0];if(f)processFile(f)}
 
 function processFile(f){
-if(f.size>10*1024*1024){alert('图片不能超过 10MB');return}
+if(f.size>10*1024*1024){console.warn('图片不能超过 10MB');return}
 var r=new FileReader();
 r.onload=function(e){
 currentImageB64=e.target.result.split(',')[1];
@@ -149,7 +149,7 @@ try{var r=await fetch(API+'/api/csrf',{credentials:'include'});var j=await r.jso
 }
 
 async function doOCR(){
-if(!currentImageB64){alert('请先上传图片');return}
+if(!currentImageB64){console.warn('请先上传图片');return}
 $('btnOcr').disabled=true;
 $('ocrStatus').innerHTML='<span class="spinner"></span> 正在 OCR 识别，预计 3-8 秒…';
 var result=await OCRClient.report(currentImageB64);
@@ -269,7 +269,7 @@ $('parsedCard').style.display='block';
 }
 
 async function parseAndSave(){
-if(parsedItems.length===0){alert('请先做 OCR 识别');return}
+if(parsedItems.length===0){console.warn('请先做 OCR 识别');return}
 
 // 构造 payload
 var payload={user_id:USER_ID,last_report_date:new Date().toISOString()};
@@ -289,15 +289,15 @@ var csrf=await getCsrf();
 var r=await fetch(API+'/api/wellness/profile',{method:'POST',headers:{'Content-Type':'application/json','x-csrf-token':csrf},body:JSON.stringify(payload),credentials:'include'});
 var j=await r.json();
 if(j.code===200){
-alert('✅ 已保存到康养人档案！');
+console.warn('✅ 已保存到康养人档案！');
 }else{
-alert('保存失败: '+j.message);
+console.warn('保存失败: '+j.message);
 }
-}catch(e){alert('请求失败: '+e.message)}
+}catch(e){console.warn('请求失败: '+e.message)}
 }
 
 async function interpret(){
-if(parsedItems.length===0){alert('请先做 OCR 识别');return}
+if(parsedItems.length===0){console.warn('请先做 OCR 识别');return}
 
 var ic=$('interpretCard');ic.style.display='block';
 ic.innerHTML='<div class="loading"><span class="spinner"></span> 正在融合四维数据…</div>';

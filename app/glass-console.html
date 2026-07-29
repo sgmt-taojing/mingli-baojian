@@ -448,10 +448,10 @@ $('#btnConnect').onclick = async () => {
     if (available) {
       State.connected = true;
       State.mock = false;
-      State.deviceId = 'RK-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+      State.deviceId = 'RK-' + (State.rkSeed++).toString(36).toUpperCase().padStart(6,'0').slice(0,6);
       State.deviceToken = State.deviceId;
       localStorage.setItem('_glass_device_token', State.deviceToken);
-      State.battery = 87 + Math.floor(Math.random() * 10);
+      State.battery = 87 + (State.rkSeed % 10);
       State.network = navigator.onLine ? '5G' : 'WiFi';
       toast('✓ 已连接 Rokid 智镜', 'ok');
       await refreshStatus();
@@ -469,10 +469,10 @@ $('#btnConnect').onclick = async () => {
 $('#btnMock').onclick = () => {
   State.connected = true;
   State.mock = true;
-  State.deviceId = 'MOCK-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+  State.deviceId = 'MOCK-' + (++State.mockCount).toString(36).toUpperCase().padStart(6,'0').slice(0,6);
   State.deviceToken = State.deviceId;
   localStorage.setItem('_glass_device_token', State.deviceToken);
-  State.battery = 75 + Math.floor(Math.random() * 25);
+  State.battery = 75 + (State.mockCount % 25);
   State.network = 'Mock-5G';
   toast('✓ Mock 模式已启动', 'ok');
   refreshStatus();
@@ -836,8 +836,8 @@ fetch('/api/csrf-token').then(r => r.json()).then(d => {
   }
 }).catch(e => console.warn('[CSRF] 获取失败：', e.message));
 $('#btnRefreshLive').onclick = () => {
-  $('#liveFortune').textContent = '运势 ' + (60 + Math.floor(Math.random()*40));
-  $('#liveHealth').textContent = ['气血充盈','注意作息','多饮温水','疏肝解郁','脾胃调养'][Math.floor(Math.random()*5)];
+  $('#liveFortune').textContent = '运势 ' + (60 + (++State.tickCount % 40));
+  $('#liveHealth').textContent = ['气血充盈','注意作息','多饮温水','疏肝解郁','脾胃调养'][(State.tickCount) % 5];
   toast('✓ 已刷新', 'ok');
 };
 

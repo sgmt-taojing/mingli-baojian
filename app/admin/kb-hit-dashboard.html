@@ -274,7 +274,7 @@ function render(d) {
 }
 
 function exportJSON() {
-  if (!lastData) { alert('请先加载数据'); return; }
+  if (!lastData) { console.warn('请先加载数据'); return; }
   const blob = new Blob([JSON.stringify(lastData, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');

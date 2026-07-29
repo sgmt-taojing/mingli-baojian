@@ -76,7 +76,7 @@ doctor_comment:document.getElementById('lifestyle').value+'\n[注意]'+document.
 treatment_outcome:document.getElementById('expected_outcome').value
 }
 fetch(API+'/api/clinic/case/'+currentCase,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(function(r){return r.json()}).then(function(d){
-alert('诊断处方已提交！患者可在身份中心查看。')
+console.warn('诊断处方已提交！患者可在身份中心查看。')
 document.getElementById('detail').style.display='none'
 loadCases()
 })

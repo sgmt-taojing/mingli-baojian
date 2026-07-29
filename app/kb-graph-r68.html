@@ -200,7 +200,7 @@ const nodes = MODULES.map((m, i) => ({
   ...m,
   x: W/2 + Math.cos(i/MODULES.length*Math.PI*2)*Math.min(W,H)*0.3,
   y: H/2 + Math.sin(i/MODULES.length*Math.PI*2)*Math.min(W,H)*0.3,
-  vx: 0, vy: 0, vz: 0, z: Math.random()*0.3,
+  vx: 0, vy: 0, vz: 0, z: ((i || 0) % 30) / 100,
   r: 8 + Math.min(28, m.n / 25),
   drag: false
 }));
