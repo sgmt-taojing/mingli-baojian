@@ -1672,8 +1672,7 @@ function _photoFileHandler(input,previewId,prefix){
       // 【新增】拍照后自动调后端 OCR 提取文字（中医病历模式）
       try{
         const apiBase=(window.API_BASE||'');
-        const targetApi=(apiBase||(location.hostname==='localhost'||location.hostname==='127.0.0.1'?'http://127.0.0.1:8920':''))+'/api/ocr/tcm';
-        const ocrResp=await fetch(targetApi,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:e.target.result})}).then(r=>r.json());
+        const ocrResp=await window.OCRClient.tcm(e.target.result);
         const statusEl=preview.querySelector('.ocr-status');
         if(ocrResp&&ocrResp.ok&&ocrResp.text){
           if(statusEl){statusEl.textContent='✅ OCR识别完成（'+ocrResp.engine+'）';statusEl.style.color='#5acf88';}

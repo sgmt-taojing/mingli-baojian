@@ -941,11 +941,7 @@
       if(statusEl){ statusEl.textContent = '⚠️ 舌照分析需要网络连接'; statusEl.className = 'wz-status error'; }
       return;
     }
-    fetch(FACE_OCR + '/api/face/analyze', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({image: b64, mode: 'tongue'})
-    }).then(function(r){ return r.json(); }).then(function(data){
+    window.OCRClient.tongue(b64).then(function(data){
       var statusEl2 = document.getElementById('wz-analysis-status');
       if(statusEl2){ statusEl2.textContent = '✅ 舌照分析完成'; statusEl2.className = 'wz-status done'; }
       renderAIAnalysis(data);
@@ -1089,13 +1085,7 @@
 
     var b64 = dataUrl.split(',')[1];
 
-    fetch(FACE_OCR + '/api/face/analyze', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image: b64, mode: 'wangzhen' })
-    })
-      .then(function(r){ return r.json(); })
-      .then(function(data){
+    window.OCRClient.recognize(b64, 'wangzhen').then(function(data){
         var statusEl2 = document.getElementById('wz-analysis-status');
         if(statusEl2){
           statusEl2.textContent = '✅ 分析完成';

@@ -104,6 +104,7 @@ h1{color:var(--gold);font-size:18px;margin-bottom:6px;text-align:center}
 </div>
 </div>
 
+<script src="js/ocr-client.js"></script>
 <script>
 var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
 var USER_ID=4;
@@ -149,22 +150,15 @@ async function doOCR(){
 if(!currentImageB64){alert('请先上传图片');return}
 $('btnOcr').disabled=true;
 $('ocrStatus').innerHTML='<span class="spinner"></span> 正在 OCR 识别，预计 3-8 秒…';
-try{
-var csrf=await getCsrf();
-var r=await fetch(API+'/api/ocr/tcm',{method:'POST',headers:{'Content-Type':'application/json','x-csrf-token':csrf},body:JSON.stringify({image:currentImageB64,mode:'report'}),credentials:'include'});
-var j=await r.json();
-if(j.ok||j.code===200){
-var text=j.text||j.data&&j.data.text||'';
-$('ocrText').value=text;
-$('engineBadge').innerHTML='<span class="badge">引擎：'+(j.engine||'face-ocr')+'</span>';
-$('ocrStatus').innerHTML='✅ 识别完成 · 共 '+text.length+' 字符';
-ocrResult=j;
-parseOcrText(text);
+var result=await OCRClient.report(currentImageB64);
+if(result.ok){
+$('ocrText').value=result.text;
+$('engineBadge').innerHTML='<span class="badge">引擎：'+result.engine+'</span>';
+$('ocrStatus').innerHTML='✅ 识别完成 · 共 '+result.text.length+' 字符 · '+result.latency+'ms';
+ocrResult=result;
+parseOcrText(result.text);
 }else{
-$('ocrStatus').innerHTML='❌ 识别失败: '+(j.message||JSON.stringify(j));
-}
-}catch(e){
-$('ocrStatus').innerHTML='❌ 请求失败: '+e.message+'<br>请确认 face-ocr-server (8913) 在线';
+$('ocrStatus').innerHTML='❌ '+(result.text||result.error||'识别失败')+'<br>请确认 face-ocr-server (8913) 在线';
 }
 $('btnOcr').disabled=false;
 }

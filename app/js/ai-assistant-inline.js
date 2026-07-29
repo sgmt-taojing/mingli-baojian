@@ -4700,28 +4700,25 @@ async function handleFaceUpload(input){
     state.data['s'+state.step]='已上传面部照片';
     showToast('正在调用AI识图分析…');
 
-    // 【新增】调用后端 face-ocr 服务拿真实视觉分析
+    // 【统一 OCR 客户端】R247 全局调用，CSRF/CSRF/cache/timeout 自动管理
     // R205: zhongyi 模块带 mode=wangzhen 走望诊 prompt
     var faceMode = (state.module==='zhongyi') ? 'wangzhen' : 'face';
     try {
-      var faceResp = await fetch(API+'/api/face/analyze', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({image:e.target.result, mode:faceMode})
-      }).then(r=>r.json());
+      var faceResp = await window.OCRClient.recognize(e.target.result, faceMode);
       if(faceResp && faceResp.ok){
+        var faceData = faceResp.raw;
         // 质量检查失败 → 提示用户重拍
-        if(faceResp.phase==='inspect' && !faceResp.inspect.valid){
-          var iss=(faceResp.inspect.issues||[]).join('；');
+        if(faceData.phase==='inspect' && !faceData.inspect.valid){
+          var iss=(faceData.inspect.issues||[]).join('；');
           if(prev) prev.innerHTML += '<div style="font-size:11px;color:#e87a5a;margin-top:6px">⚠️ '+escHtml(iss)+'，建议重拍</div>';
           showToast('图片质量不达标：'+iss);
         } else {
           // 成功 → 存分析结果（KB 兑底也存，不丢报告）
-          state.data.faceAnalysis = faceResp.analysis || faceResp.text || '';
-          state.data.faceEngine = faceResp.engine || 'unknown';
-          state.data.faceMode = faceResp.mode || faceMode;
+          state.data.faceAnalysis = faceData.analysis || faceData.text || faceResp.text || '';
+          state.data.faceEngine = faceData.engine || faceResp.engine || 'unknown';
+          state.data.faceMode = faceData.mode || faceMode;
           var modeLabel = faceMode==='wangzhen' ? '望诊' : '面相';
-          if(prev) prev.innerHTML += '<div style="font-size:11px;color:var(--gold);margin-top:6px">✨ AI'+modeLabel+'分析完成（引擎：'+escHtml(faceResp.engine||'kb')+'）</div>';
+          if(prev) prev.innerHTML += '<div style="font-size:11px;color:var(--gold);margin-top:6px">✨ AI'+modeLabel+'分析完成（引擎：'+escHtml(state.data.faceEngine)+'）</div>';
           showToast(modeLabel+'分析完成');
         }
       }
