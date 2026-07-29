@@ -1,6 +1,19 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>权威知识库面板 · 命理宝鉴</title>
+<link rel="stylesheet" href="css/a11y-fix.css">
+<style>
+body{background:#0a0c12;color:#e4e6ed;font-family:'STKaiti','KaiTi',serif;margin:0;padding:0}
+.authoritative-panel{display:block !important;position:static !important;background:#0a0c12 !important;padding:20px}
+</style>
+</head>
+<body>
 
 <!-- 权威知识库展示面板 -->
-<div id="authoritativeKnowledgePanel" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(8,8,8,0.98);z-index:9999;overflow-y:auto;padding:20px">
+<div id="authoritativeKnowledgePanel" style="display:block;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(8,8,8,0.98);z-index:9999;overflow-y:auto;padding:20px">
   
   <!-- 顶部导航 -->
   <div style="max-width:1200px;margin:0 auto;padding:20px 0">
@@ -194,7 +207,7 @@
 </div>
 
 <!-- 知识详情弹窗 -->
-<div id="knowledgeDetailModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.95);z-index:10000;overflow-y:auto">
+<div id="knowledgeDetailModal" style="display:block;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.95);z-index:10000;overflow-y:auto">
   <div style="max-width:900px;margin:40px auto;background:var(--ink2);border-radius:16px;padding:40px;position:relative">
     <button onclick="closeKnowledgeDetail()" style="position:absolute;top:20px;right:20px;background:none;border:1px solid rgba(201,168,76,0.3);color:var(--gold);padding:8px 20px;cursor:pointer;border-radius:6px">✕ 关闭</button>
     <div id="knowledgeDetailContent"></div>
@@ -237,3 +250,6 @@ if(typeof closeAuthoritativePanel!=='function'){window.closeAuthoritativePanel=f
 if(typeof showKnowledgeDetail!=='function'){window.showKnowledgeDetail=function(topic){try{var panel=document.getElementById('knowledgeDetailPanel');if(panel){var titles={'bazi':'八字命理','liuyao':'六爻占卜','fengshui':'风水堪舆','xingming':'姓名学','tizhi':'中医体质','yijing':'易经智慧','ziwei':'紫微斗数','qimen':'奇门遁甲','meihua':'梅花易数','liuren':'大六壬'};panel.querySelector('.detail-title').textContent=titles[topic]||topic;panel.style.display='block';panel.scrollIntoView({behavior:'smooth'});}if(typeof showToast==='function')showToast('查看: '+(titles[topic]||topic));}catch(e){console.warn('[showKnowledgeDetail]',e);}};}
 if(typeof closeKnowledgeDetail!=='function'){window.closeKnowledgeDetail=function(){try{var p=document.getElementById('knowledgeDetailPanel');if(p){p.style.display='none';}}catch(e){console.warn('[closeKnowledgeDetail]',e);}};}
 </script>
+
+</body>
+</html>
