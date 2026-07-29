@@ -217,7 +217,10 @@
     });
     var clr = el.querySelector('.tb-clear');
     if (clr) clr.addEventListener('click', function () {
-      if (confirm('清空所有 TODO？')) { clear(); render(el, opts); }
+      if (typeof showToast === 'function') {
+        showToast('已清空所有 TODO');
+      }
+      clear(); render(el, opts);
     });
   }
 

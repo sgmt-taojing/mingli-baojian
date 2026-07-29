@@ -156,8 +156,8 @@ function predictDiseases(wuxingScore){
       });
     }
   }
-  // 始终显示日主
-  const riZhu = null; // TODO
+  // 日主五行（从五行评分中取最高项）
+  const riZhu = Object.entries(wuxingScore).sort((a,b)=>b[1]-a[1])[0] || null;
   return result;
 }
 
