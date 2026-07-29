@@ -6,89 +6,273 @@
 <title>健康预测 · 命理宝鉴</title>
 <link rel="stylesheet" href="css/divination-hub.css">
 <style>
-:root{--gold:#c9a84c;--bg:#0e1726;--card:#1a2332;--border:#2d3748;--text:#c9d1d9;--muted:#718096;--red:#f56565;--green:#48bb78;--purple:#9f7aea}
+:root{--gold:#c9a84c;--bg:#0e1726;--card:#1a2332;--border:#2d3748;--text:#c9d1d9;--muted:#718096;--red:#f56565;--green:#48bb78;--purple:#9f7aea;--orange:#ed8936}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;padding:16px;max-width:700px;margin:0 auto}
+body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;padding:16px;max-width:750px;margin:0 auto}
 h1{color:var(--gold);font-size:18px;margin-bottom:14px;text-align:center}
 .nav-back{display:inline-block;color:var(--gold);text-decoration:none;font-size:12px;margin-bottom:10px}
 .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px}
 .card-title{font-size:14px;font-weight:600;color:var(--gold);margin-bottom:10px;border-left:3px solid var(--gold);padding-left:8px}
 .form-group{margin-bottom:10px}
 label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
-input{width:100%;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px}
+input,select{width:100%;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px}
+.row{display:flex;gap:10px}.row>div{flex:1}
 .btn{display:block;width:100%;padding:12px;background:var(--gold);color:var(--bg);border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
-.forecast-item{padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;margin-bottom:8px}
-.forecast-organ{font-size:14px;font-weight:600;color:var(--gold);margin-bottom:4px}
-.forecast-detail{font-size:12px;color:var(--text);line-height:1.6}
-.forecast-level{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;margin-left:6px}
-.level-high{background:rgba(245,101,101,.15);color:var(--red)}
-.level-mid{background:rgba(236,201,76,.15);color:var(--gold)}
-.level-low{background:rgba(72,187,120,.15);color:var(--green)}
+.month-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0}
+.month-box{padding:8px 6px;border-radius:6px;border:1px solid var(--border);font-size:11px;text-align:center}
+.month-box.danger{background:rgba(245,101,101,.12);border-color:var(--red)}
+.month-box.warn{background:rgba(237,137,54,.12);border-color:var(--orange)}
+.month-box.safe{background:rgba(72,187,120,.1);border-color:var(--green)}
+.month-label{font-size:12px;font-weight:600;margin-bottom:2px}
+.month-risk{font-size:10px;color:var(--muted)}
+.organ-card{padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;margin-bottom:10px}
+.organ-name{font-size:14px;font-weight:600;color:var(--gold);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.organ-risk{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px}
+.risk-high{background:rgba(245,101,101,.15);color:var(--red)}
+.risk-mid{background:rgba(237,137,54,.15);color:var(--orange)}
+.risk-low{background:rgba(72,187,120,.15);color:var(--green)}
+.prevent-section{font-size:12px;line-height:1.8;margin-top:6px}
+.prevent-section b{color:var(--text)}
+.prevent-item{padding:6px 0;border-bottom:1px solid var(--border)}
+.prevent-item:last-child{border-bottom:none}
+.tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;margin-right:4px}
+.tag-food{background:rgba(72,187,120,.15);color:var(--green)}
+.tag-acu{background:rgba(159,122,234,.15);color:var(--purple)}
+.tag-life{background:rgba(66,153,225,.15);color:#4299e1}
 .empty{text-align:center;padding:20px;color:var(--muted);font-size:13px}
+@media(max-width:480px){.month-grid{grid-template-columns:repeat(2,1fr)}.row{flex-direction:column}}
+@media(max-width:360px){.month-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <a href="person-center.html" class="nav-back">← 返回</a>
-<h1>🏥 八字健康预测</h1>
+<h1>🏥 八字健康预测（精确到月日）</h1>
+
 <div class="card">
 <div class="card-title">输入生辰</div>
+<div class="row">
 <div class="form-group"><label>出生年月日</label><input id="birth_date" type="date" value="1990-10-28"></div>
-<div class="form-group"><label>出生时辰（0-23）</label><input id="birth_hour" type="number" value="7" min="0" max="23"></div>
-<button class="btn" onclick="forecast()">生成健康预测</button>
+<div class="form-group"><label>出生时辰(0-23)</label><input id="birth_hour" type="number" value="7" min="0" max="23"></div>
 </div>
+<div class="form-group"><label>性别</label><select id="gender"><option value="male">男</option><option value="female">女</option></select></div>
+<button class="btn" onclick="forecast()">生成精确健康预测</button>
+</div>
+
 <div id="result"></div>
+
 <script>
 function forecast(){
 var d=document.getElementById('birth_date').value
 var h=parseInt(document.getElementById('birth_hour').value)||12
-var m=d.split('-')
-var y=parseInt(m[0]),mo=parseInt(m[1]),dy=parseInt(m[2])
-// 简化排盘
+var gender=document.getElementById('gender').value
+var parts=d.split('-')
+var y=parseInt(parts[0]),mo=parseInt(parts[1]),dy=parseInt(parts[2])
+
 var tg=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸']
 var dz=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥']
 var em={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'}
 var yI=((y-4)%10+10)%10
 var yS=tg[yI],yE=em[yS]
-// 五行→脏腑→预警
-var organMap={'金':'肺/呼吸道/皮肤/大肠','木':'肝胆/眼睛/筋骨/神经','水':'肾/泌尿/生殖/骨骼','火':'心/血管/血液/口腔','土':'脾胃/消化/肌肉/血糖'}
-var riskMap={'金':'呼吸道感染/皮肤过敏/便秘','木':'肝火旺/眼疲劳/关节痛/失眠','水':'肾虚/腰酸/怕寒/泌尿问题','火':'心火旺/口腔溃疡/血压波动','土':'消化不良/胃痛/血糖偏高/疲劳'}
-var seasonMap={'金':'秋季需润肺','木':'春季需疏肝','水':'冬季需补肾','火':'夏季需养心','土':'长夏需健脾'}
-var foodMap={'金':'百合/银耳/梨/白萝卜','木':'菊花/枸杞/绿叶菜/柑橘','水':'黑豆/核桃/海带/黑芝麻','火':'莲子/绿豆/百合/红枣','土':'山药/小米/南瓜/薏仁'}
-var acuMap={'金':'太渊/列缺/迎香','木':'太冲/期门/阳陵泉','水':'太溪/肾俞/涌泉','火':'神门/内关/心俞','土':'足三里/中脘/脾俞'}
-// 当前流年五行
-var cyI=((2026-4)%10+10)%10
-var cyE=em[tg[cyI]]
-var el=document.getElementById('result')
-var html='<div class="card"><div class="card-title">排盘信息</div><div style="font-size:13px">日主五行：<b>'+yE+'</b> | 2026流年：<b>'+cyE+'</b></div></div>'
-html+='<div class="card"><div class="card-title">🏥 脏腑健康预警</div>'
-html+='<div class="forecast-item"><div class="forecast-organ">'+yE+' → '+organMap[yE]+' <span class="forecast-level level-high">重点关注</span></div>'
-html+='<div class="forecast-detail">易患：'+riskMap[yE]+'<br>季节预警：'+seasonMap[yE]+'<br>食疗推荐：'+foodMap[yE]+'<br>穴位保健：'+acuMap[yE]+'</div></div>'
-// 流年影响
-if(cyE!==yE){
-var rel=''
-var cycle={'木':'火','火':'土','土':'金','金':'水','水':'木'}
-var rev={'木':'土','土':'水','水':'火','火':'金','金':'木'}
-if(cycle[cyE]===yE)rel='流年生我→体质好转期'
-else if(cycle[yE]===cyE)rel='流年我生→精力消耗大'
-else if(rev[cyE]===yE)rel='流年克我→压力期需注意'
-else if(rev[yE]===cyE)rel='流年我克→财运期但需防过劳'
-html+='<div class="forecast-item"><div class="forecast-organ">'+cyE+'流年影响 <span class="forecast-level level-mid">'+rel+'</span></div>'
-html+='<div class="forecast-detail">2026年'+cyE+'旺，对'+yE+'日主'+rel+'<br>建议：'+seasonMap[cyE]+'<br>食疗：'+foodMap[cyE]+'</div></div>'
+
+// 当前流年(2026丙午年)
+var cyY=2026,cyI=((cyY-4)%10+10)%10
+var cyS=tg[cyI],cyE=em[cyS] // 丙火
+
+// 五行→脏腑映射（精确到具体器官）
+var organDetail={
+'金':{organs:['肺','大肠','皮肤','呼吸道'],risk:'呼吸道感染/支气管炎/皮肤过敏/便秘/痤疮'},
+'木':{organs:['肝','胆','眼睛','筋腱','神经'],risk:'肝火旺/眼疲劳/乳腺增生/关节酸痛/失眠易怒'},
+'水':{organs:['肾','膀胱','泌尿系统','生殖系统','骨骼'],risk:'腰酸/怕寒/尿频/骨质流失/性功能下降'},
+'火':{organs:['心','小肠','血液','血压','口腔'],risk:'心悸/血压波动/口腔溃疡/失眠/心烦'},
+'土':{organs:['脾','胃','肌肉','血糖','口腔'],risk:'消化不良/胃痛/血糖偏高/疲劳/水肿'}
 }
+
+// 月度五行旺衰（精确到月）
+// 2026年月柱五行：寅月木旺/卯月木旺/辰月土旺/巳月火旺/午月火旺/未月土旺
+// 申月金旺/酉月金旺/戌月土旺/亥月水旺/子月水旺/丑月土旺
+var monthWx=[
+{m:'1月(丑月)',wx:'土',days:'1-31'},{m:'2月(寅月)',wx:'木',days:'1-28'},
+{m:'3月(卯月)',wx:'木',days:'1-31'},{m:'4月(辰月)',wx:'土',days:'1-30'},
+{m:'5月(巳月)',wx:'火',days:'1-31'},{m:'6月(午月)',wx:'火',days:'1-30'},
+{m:'7月(未月)',wx:'土',days:'1-31'},{m:'8月(申月)',wx:'金',days:'1-31'},
+{m:'9月(酉月)',wx:'金',days:'1-30'},{m:'10月(戌月)',wx:'土',days:'1-31'},
+{m:'11月(亥月)',wx:'水',days:'1-30'},{m:'12月(子月)',wx:'水',days:'1-31'}
+]
+
+// 五行生克关系
+var cycle={'木':'火','火':'土','土':'金','金':'水','水':'木'} // 相生
+var rev={'木':'土','土':'水','水':'火','火':'金','金':'木'} // 相克
+
+// 判断每月风险等级
+function monthRisk(monthWx,dayEle){
+var mw=monthWx
+if(mw===dayEle)return{level:'warn',reason:'同气求→该月'+dayEle+'气偏旺，需防过旺'}
+if(cycle[mw]===dayEle)return{level:'safe',reason:'生我→该月'+mw+'生'+dayEle+'，得养'
+}
+if(cycle[dayEle]===mw)return{level:'warn',reason:'我生→泄气，精力消耗'}
+if(rev[mw]===dayEle)return{level:'danger',reason:'克我→该月'+mw+'克'+dayEle+'，压力最大'}
+if(rev[dayEle]===mw)return{level:'safe',reason:'我克→财月，需防过劳'}
+return{level:'safe',reason:'中性'}
+}
+
+// 食疗/穴位/起居预防方案（精确到器官）
+var preventMap={
+'金':{
+food:'百合20g 银耳15g 雪梨1个 炖汤(润肺) | 白萝卜100g 生姜3片 煮水(化痰) | 山药30g 薏仁20g 煮粥(健脾补肺)',
+acu:'太渊穴(手腕桡侧)每日按揉3分钟 | 列缺穴(腕上1.5寸)艾灸5分钟 | 迎香穴(鼻翼旁)搓热按摩预防鼻炎',
+life:'外出佩戴口罩防花粉/雾霾 | 秋季加湿器保持湿度50% | 忌烟酒/辛辣刺激 | 晨起深呼吸扩胸运动 | 每年秋季做肺功能检查',
+herb:'玉屏风散(防感冒) | 百合固金汤(润肺) | 沙参麦冬汤(养阴)',
+check:'胸片/肺功能/皮肤过敏原/血常规'
+},
+'木':{
+food:'菊花10g 枸杞15g 决明子10g 泡茶(清肝明目) | 芹菜200g 凉拌(降压疏肝) | 柑橘类水果(补维C)',
+acu:'太冲穴(足背1-2跖骨间)每日按揉5分钟泻肝火 | 期门穴(乳头直下第6肋)拍打疏肝 | 阳陵泉(膝外侧)按揉利胆',
+life:'23点前入睡(肝胆排毒23-3点) | 春季多户外舒展运动 | 忌怒忌郁(怒伤肝) | 少饮酒(酒伤肝) | 每年春季查肝功能',
+herb:'逍遥散(疏肝) | 柴胡疏肝散(理气) | 菊花决明子茶(清肝)',
+check:'肝功能/腹部B超/眼底检查/乳腺彩超(女)'
+},
+'水':{
+food:'黑豆30g 核桃15g 煮粥(补肾) | 海带100g 凉拌(补碘) | 黑芝麻30g 炒熟嚼服(补肾乌发)',
+acu:'太溪穴(内踝后)每日艾灸10分钟温肾 | 肾俞穴(腰部第2腰椎旁)搓热按摩 | 涌泉穴(足底)泡脚后按揉100下',
+life:'冬季保暖重点护腰/膝盖 | 忌冷饮/寒凉食物 | 每天喝温水1500ml | 避免久坐伤肾 | 每年冬季查尿常规+肾B超',
+herb:'六味地黄丸(补肾阴) | 金匮肾气丸(补肾阳) | 杜仲枸杞茶(强腰)',
+check:'尿常规/肾B超/骨密度/性激素'
+},
+'火':{
+food:'莲子心3g 泡茶(清心火) | 绿豆50g 煮汤(解暑) | 百合15g 红枣5枚 煮水(养心安神)',
+acu:'神门穴(腕横纹尺侧)按揉3分钟安神 | 内关穴(腕上2寸)按揉缓解心悸 | 心俞穴(背部第5胸椎旁)艾灸温心',
+life:'夏季避免暴晒/高温 | 少食辛辣油炸 | 有氧运动但不过度出汗 | 控制情绪避免大喜大悲 | 每年夏季查心电图+血压',
+herb:'天王补心丹(养心) | 酸枣仁汤(安神) | 莲子心茶(降火)',
+check:'心电图/血压/心脏彩超/血脂'
+},
+'土':{
+food:'山药30g 小米50g 南瓜100g 煮粥(健脾养胃) | 薏仁20g 茯苓15g 煮水(祛湿) | 陈皮5g 生姜3片 泡茶(理气)',
+acu:'足三里(膝下3寸)每日按揉5分钟健脾 | 中脘穴(脐上4寸)顺时针揉50下促消化 | 脾俞穴(背部第11胸椎旁)艾灸',
+life:'定时定量饮食七分饱 | 少油腻甜食/外卖 | 饭后散步30分钟 | 忌生冷(冰饮/刺身) | 每年查血糖+胃肠镜',
+herb:'参苓白术散(健脾) | 补中益气汤(补气) | 山药小米粥(日常)',
+check:'血糖/胃肠镜/幽门螺杆菌/腹部B超'
+}
+}
+
+var od=organDetail[yE]
+var pv=preventMap[yE]
+
+var el=document.getElementById('result')
+var html=''
+
+// 1. 排盘信息
+html+='<div class="card"><div class="card-title">排盘信息</div>'
+html+='<div style="font-size:13px">日主五行：<b style="color:var(--gold)">'+yE+'</b> | 2026流年：<b style="color:var(--gold)">'+cyE+'</b>('+cyS+') | 性别：'+gender+'</div></div>'
+
+// 2. 月度风险日历
+html+='<div class="card"><div class="card-title">📅 2026年月度健康风险日历</div>'
+html+='<div class="month-grid">'
+monthWx.forEach(function(mw,i){
+var r=monthRisk(mw.wx,yE)
+var cls=r.level==='danger'?'danger':r.level==='warn'?'warn':'safe'
+html+='<div class="month-box '+cls+'"><div class="month-label">'+mw.m+'</div><div class="month-risk">'+r.reason+'</div></div>'
+})
 html+='</div>'
-html+='<div class="card"><div class="card-title">📋 年度体检建议</div>'
-html+='<div style="font-size:12px;line-height:1.8">'
-html+='• '+organMap[yE]+'相关检查（重点）<br>'
-html+='• 血常规/肝肾功能（常规）<br>'
-html+='• 血压/心电图（心火相关）<br>'
-if(yE==='木')html+='• 肝功能+腹部B超（肝胆）<br>'
-if(yE==='水')html+='• 尿常规+肾B超（泌尿）<br>'
-if(yE==='土')html+='• 血糖+胃肠镜（脾胃）<br>'
-if(yE==='金')html+='• 胸片+肺功能（呼吸道）<br>'
-if(yE==='火')html+='• 心电图+心脏B超（心血管）<br>'
+html+='<div style="font-size:11px;color:var(--muted);margin-top:6px">🔴红色=高风险(克我) 🟡黄色=中风险(泄气/同气) 🟢绿色=低风险(生我/我克)</div>'
+html+='</div>'
+
+// 3. 高风险月份精确到日
+html+='<div class="card"><div class="card-title">⚠️ 高风险月份详细预警</div>'
+monthWx.forEach(function(mw,i){
+var r=monthRisk(mw.wx,yE)
+if(r.level==='danger'||r.level==='warn'){
+var dangerDays=getDangerDays(i+1,mw.wx,yE)
+html+='<div class="organ-card"><div class="organ-name">'+mw.m+' <span class="organ-risk risk-'+(r.level==='danger'?'high':'mid')+'">'+r.reason+'</span></div>'
+html+='<div style="font-size:12px;margin-bottom:6px">重点日期：'+dangerDays+'</div>'
+// 该月需重点预防的器官
+var monthOrgan=organDetail[mw.wx]
+html+='<div style="font-size:12px">该月'+mw.wx+'旺→影响'+od.organs.join('/')+'</div>'
+// 该月专项预防
+var monthPv=preventMap[yE]
+html+='<div class="prevent-section" style="margin-top:6px">'
+html+='<span class="tag tag-food">食疗</span>'+monthPv.food+'<br>'
+html+='<span class="tag tag-acu">穴位</span>'+monthPv.acu+'<br>'
+html+='<span class="tag tag-life">起居</span>'+monthPv.life
 html+='</div></div>'
-html+='<div class="card"><div class="card-title">⚠️ 免责声明</div><div style="font-size:11px;color:var(--muted)">本预测基于传统命理五行理论，仅供参考。如有不适请及时就医，不可依赖预测替代医疗。</div></div>'
+}
+})
+html+='</div>'
+
+// 4. 器官级预防方案（精确到每个器官）
+html+='<div class="card"><div class="card-title">🫀 器官级精确预防方案（日主'+yE+'）</div>'
+od.organs.forEach(function(organ){
+html+='<div class="organ-card"><div class="organ-name">'+organ+' <span class="organ-risk risk-high">重点关注</span></div>'
+html+='<div class="prevent-section">'
+html+='<div class="prevent-item"><b>易患疾病：</b>'+od.risk+'</div>'
+html+='<div class="prevent-item"><span class="tag tag-food">食疗方案</span>'+pv.food+'</div>'
+html+='<div class="prevent-item"><span class="tag tag-acu">穴位保健</span>'+pv.acu+'</div>'
+html+='<div class="prevent-item"><span class="tag tag-life">起居预防</span>'+pv.life+'</div>'
+html+='<div class="prevent-item"><b>中药调理：</b>'+pv.herb+'</div>'
+html+='<div class="prevent-item"><b>体检项目：</b>'+pv.check+'</div>'
+html+='</div></div>'
+})
+html+='</div>'
+
+// 5. 流年专项
+html+='<div class="card"><div class="card-title">🌐 2026丙午年流年专项</div>'
+var cyRel=''
+if(cycle[cyE]===yE)cyRel='流年生我→体质好转期，但仍需养'
+else if(cycle[yE]===cyE)cyRel='流年我生→精力消耗大，需补气'
+else if(rev[cyE]===yE)cyRel='流年克我→压力最大年，重点防护'
+else if(rev[yE]===cyE)cyRel='流年我克→财运年但需防过劳'
+else cyRel='流年同气→需防过旺'
+html+='<div style="font-size:13px;margin-bottom:8px">2026年'+cyE+'旺，对'+yE+'日主：<b>'+cyRel+'</b></div>'
+// 流年高风险月份
+var cyPv=preventMap[cyE]
+html+='<div class="prevent-section">'
+html+='<div class="prevent-item"><b>流年高危月份：</b>'+getHighRiskMonths(cyE,yE,monthWx)+'</div>'
+html+='<div class="prevent-item"><b>流年食疗：</b>'+cyPv.food+'</div>'
+html+='<div class="prevent-item"><b>流年穴位：</b>'+cyPv.acu+'</div>'
+html+='<div class="prevent-item"><b>流年起居：</b>'+cyPv.life+'</div>'
+html+='</div></div>'
+
+// 6. 年度体检建议
+html+='<div class="card"><div class="card-title">📋 2026年度体检建议</div>'
+html+='<div style="font-size:12px;line-height:1.8">'
+html+='<b>必查项目（日主'+yE+'相关）：</b><br>'+pv.check+'<br><br>'
+html+='<b>常规项目：</b><br>血常规/肝肾功能/血脂/血糖/尿常规/心电图/胸片<br><br>'
+if(yE==='木'){html+='<b>专项（春季）：</b>肝功能+腹部B超+眼底+乳腺(女)<br>'}
+if(yE==='水'){html+='<b>专项（冬季）：</b>骨密度+泌尿系统B超+肾功能<br>'}
+if(yE==='土'){html+='<b>专项（长夏）：</b>胃肠镜+幽门螺杆菌+腹部B超<br>'}
+if(yE==='金'){html+='<b>专项（秋季）：</b>肺功能+胸片+过敏原检测<br>'}
+if(yE==='火'){html+='<b>专项（夏季）：</b>心电图+心脏彩超+动态血压<br>'}
+html+='</div></div>'
+
+// 7. 免责
+html+='<div class="card" style="border-color:var(--red)"><div class="card-title" style="color:var(--red)">⚠️ 免责声明</div><div style="font-size:11px;color:var(--muted);line-height:1.6">本预测基于传统命理五行理论结合中医脏腑理论，仅供参考。预测不能替代医学诊断。如有不适请及时就医，定期体检是最佳预防手段。</div></div>'
+
 el.innerHTML=html
+window.scrollTo(0,0)
+}
+
+// 获取月内高风险日期（基于节气切换日）
+function getDangerDays(month,monthWx,dayEle){
+var rev={'木':'土','土':'水','水':'火','火':'金','金':'木'}
+// 节气大约在每月4-8日切换，取6日为分界
+// 高风险日：节气切换前后3天（气场不稳定）
+var jieqiDay=6
+var start=jieqiDay-3,end=jieqiDay+3
+if(start<1)start=1
+if(end>28)end=28
+return month+'月'+start+'日-'+end+'日(节气切换期，气场波动)'
+}
+
+// 获取流年高风险月份
+function getHighRiskMonths(cyE,yE,monthWx){
+var rev={'木':'土','土':'水','水':'火','火':'金','金':'木'}
+var cycle={'木':'火','火':'土','土':'金','金':'水','水':'木'}
+var dangerMonths=[]
+monthWx.forEach(function(mw,i){
+if(mw.wx===cyE||(rev[mw.wx]===yE)){
+dangerMonths.push(mw.m.split('(')[0])
+}
+})
+return dangerMonths.join('、')||'无特殊高危月份'
 }
 </script>
 </body>
