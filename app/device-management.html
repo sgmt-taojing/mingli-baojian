@@ -113,6 +113,115 @@
       th,td{padding:4px 3px}
     }
   </style>
+
+  <!-- R261 inline: device-management-inline.css (7353 bytes) -->
+<style data-r261-inline="device-management-inline.css">
+/* === Extracted from device-management.html
+:root{
+  --ink:#080808; --ink2:#141414; --ink3:#1c1c1c;
+  --gold:#c9a84c; --gold2:#e3c778;
+  --paper:#f5ecd6; --paper2:#d9cfb8; --paper3:#8a7f6a;
+  --danger:#c8503e; --ok:#3e9e6b; --warn:#d4a047;
+  --radius:10px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--ink);color:var(--paper);font-family:'Noto Serif SC','Songti SC',serif;letter-spacing:.5px}
+body{min-height:100vh;padding:18px 14px 80px}
+.wrap{max-width:1100px;margin:0 auto}
+header{text-align:center;padding:24px 0 32px;border-bottom:1px solid rgba(201,168,76,.18);margin-bottom:28px}
+header h1{font-size:24px;color:var(--gold);letter-spacing:8px;margin:0;font-weight:500}
+header p{font-size:11px;color:var(--paper3);letter-spacing:3px;margin-top:8px}
+
+/* === 摘要卡 === */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:28px}
+.summary-card{background:linear-gradient(135deg,var(--ink3),var(--ink2));border:1px solid rgba(201,168,76,.18);border-radius:var(--radius);padding:18px;position:relative;overflow:hidden}
+.summary-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0.85}
+.summary-card .label{font-size:11px;color:var(--paper3);letter-spacing:2px;margin-bottom:8px}
+.summary-card .value{font-size:32px;color:var(--gold2);font-weight:600;line-height:1}
+.summary-card .sub{font-size:10px;color:var(--paper3);margin-top:6px;letter-spacing:1px}
+.summary-card.ok .value{color:var(--ok)}
+.summary-card.warn .value{color:var(--warn)}
+.summary-card.err .value{color:var(--danger)}
+
+/* === 设备卡片网格 === */
+.section-title{font-size:14px;color:var(--gold);letter-spacing:4px;margin:28px 0 14px;display:flex;align-items:center;gap:10px}
+.section-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(201,168,76,.3),transparent)}
+.section-title .badge{background:rgba(201,168,76,.15);color:var(--gold);font-size:10px;padding:3px 8px;border-radius:10px;letter-spacing:1px;font-weight:400}
+
+.device-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.device-card{background:var(--ink3);border:1px solid rgba(201,168,76,.18);border-radius:var(--radius);padding:18px;position:relative;transition:all .3s}
+.device-card.online{border-color:rgba(62,158,107,.5)}
+.device-card.online::after{content:'';position:absolute;top:14px;right:14px;width:8px;height:8px;background:var(--ok);border-radius:50%;box-shadow:0 0 8px var(--ok)}
+.device-card.offline{border-color:rgba(201,168,76,.12);opacity:0.85}
+.device-card.offline::after{content:'';position:absolute;top:14px;right:14px;width:8px;height:8px;background:#555;border-radius:50%}
+.device-card.error{border-color:rgba(200,80,62,.5);background:linear-gradient(135deg,var(--ink3),rgba(200,80,62,.05))}
+.device-card.error::after{content:'';position:absolute;top:14px;right:14px;width:8px;height:8px;background:var(--danger);border-radius:50%;box-shadow:0 0 8px var(--danger);animation:devPulse 1s infinite}
+
+.device-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.device-icon{width:40px;height:40px;background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(201,168,76,.05));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.device-name{font-size:14px;color:var(--gold2);font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.device-status{font-size:10px;padding:2px 7px;border-radius:8px;letter-spacing:1px}
+.device-status.online{background:rgba(62,158,107,.2);color:var(--ok)}
+.device-status.offline{background:rgba(85,85,85,.3);color:var(--paper3)}
+.device-status.error{background:rgba(200,80,62,.2);color:var(--danger)}
+
+.device-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;font-size:11px}
+.device-meta div{display:flex;flex-direction:column;gap:2px}
+.device-meta .meta-label{color:var(--paper3);letter-spacing:1px;font-size:9px}
+.device-meta .meta-value{color:var(--paper);font-family:monospace;font-size:11px}
+
+.device-actions{margin-top:14px;display:flex;gap:6px;flex-wrap:wrap}
+.dev-btn{background:rgba(201,168,76,.12);color:var(--gold);border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:11px;letter-spacing:1px;font-family:inherit;transition:all .15s}
+.dev-btn:hover{background:rgba(201,168,76,.25);transform:translateY(-1px)}
+.dev-btn.danger{background:rgba(200,80,62,.15);color:var(--danger)}
+.dev-btn.danger:hover{background:rgba(200,80,62,.3)}
+.dev-btn:disabled{opacity:0.85;cursor:not-allowed}
+
+/* === 健康监控区 === */
+.health-list{display:grid;gap:10px}
+.health-row{background:var(--ink3);border:1px solid rgba(201,168,76,.12);border-radius:6px;padding:14px 18px;display:grid;grid-template-columns:1fr auto auto auto;gap:14px;align-items:center}
+.health-row .service-name{font-size:12px;color:var(--gold2);letter-spacing:1px}
+.health-row .service-url{font-size:10px;color:var(--paper3);font-family:monospace}
+.health-row .latency{font-size:12px;color:var(--paper);min-width:60px;text-align:right}
+.health-row .latency.fast{color:var(--ok)}
+.health-row .latency.slow{color:var(--warn)}
+.health-row .latency.crit{color:var(--danger)}
+.health-row .actions{display:flex;gap:6px}
+
+/* === 操作日志 === */
+.log-list{max-height:280px;overflow-y:auto;background:var(--ink2);border:1px solid rgba(201,168,76,.1);border-radius:6px;padding:10px}
+.log-entry{display:flex;gap:10px;padding:6px 0;font-size:11px;border-bottom:1px solid rgba(201,168,76,.06)}
+.log-entry:last-child{border-bottom:none}
+.log-entry .time{color:var(--paper3);font-family:monospace;flex-shrink:0}
+.log-entry .msg{flex:1;color:var(--paper)}
+.log-entry.ok .msg{color:var(--ok)}
+.log-entry.warn .msg{color:var(--warn)}
+.log-entry.err .msg{color:var(--danger)}
+
+/* === 添加设备入口 === */
+.add-device-cta{display:block;text-align:center;padding:20px;background:linear-gradient(135deg,rgba(62,158,107,.08),rgba(201,168,76,.05));border:2px dashed rgba(62,158,107,.4);border-radius:var(--radius);color:var(--ok);text-decoration:none;font-size:13px;letter-spacing:3px;transition:all .2s;margin-bottom:14px}
+.add-device-cta:hover{background:linear-gradient(135deg,rgba(62,158,107,.18),rgba(201,168,76,.08));transform:translateY(-2px)}
+
+/* === R62: 设备 KB 联动 badge === */
+.dev-kb-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:8px;font-size:10px;letter-spacing:1px;margin-right:4px;margin-top:6px}
+.dev-kb-badge.idle{background:rgba(133,133,133,.15);color:var(--paper3);border:1px solid rgba(133,133,133,.2)}
+.dev-kb-badge.active{background:rgba(62,158,107,.15);color:var(--ok);border:1px solid rgba(62,158,107,.3);animation:kbPulse 2s ease-in-out infinite}
+@keyframes kbPulse{0%,100%{box-shadow:0 0 0 rgba(62,158,107,0)}50%{box-shadow:0 0 6px rgba(62,158,107,.3)}}
+
+@media(max-width:768px){
+  header h1{font-size:18px;letter-spacing:5px}
+  .summary-grid{grid-template-columns:repeat(2,1fr)}
+  .device-grid{grid-template-columns:1fr}
+  .health-row{grid-template-columns:1fr 1fr;gap:8px}
+  .health-row .actions{grid-column:1/-1;justify-content:flex-end}
+}
+@media(max-width:320px){
+  body{padding:10px 8px 60px}
+  .summary-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .summary-card{padding:14px}
+  .summary-card .value{font-size:24px}
+}
+  </style>
 </head>
 <body>
 
