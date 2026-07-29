@@ -5,6 +5,12 @@
   var ALL_NODES = [], ALL_EDGES = [], network = null, graphData = null;
 
   async function load(){
+    // R255: 等 vis-network 就绪后再加载，避免 CDN 延迟导致网络实例创建失败
+    if(typeof window._loadVisNetwork === 'function'){ await window._loadVisNetwork(); }
+    if(typeof vis === 'undefined' || !vis.Network){
+      var _stat = document.getElementById('stat');
+      if(_stat) _stat.innerHTML = '<span style="color:#ef4444">⚠️ 图谱引擎加载失败（CDN 全失效），请检查网络。可使用下方纯文本搜索。</span>';
+    }
     // 使用 fetch（现代浏览器/移动端/Edge/Firefox/Chrome/Safari 均内置）
     // R77: 优先用 cross-ref-graph（32 nodes / 120 links），fallback → /api/kb/graph
     var r = await fetch('/api/kb/cross-ref-graph?minWeight=2&maxNodes=60', {cache:'no-cache'});
@@ -181,29 +187,73 @@
   }
 
   // 把模块下拉填充（从 ALL_NODES 取，排除图谱节点）
+  // R255: 模块下拉独立加载 + 全模块中文标签 + 不依赖 fetch
+  var MODULE_LABELS = {
+    bazi:'八字', ziwei:'紫微', qimen:'奇门', liuyao:'六爻', meihua:'梅花', liuren:'六壬',
+    fengshui:'风水', zhongyi:'中医', tcm:'中医', xingming:'姓名', wuxing:'五行', shihan:'实盘',
+    yongshi:'用事', mobile:'手机', ganqing:'感情', shiye:'事业', caiyun:'财运',
+    music:'音疗', lifeindex:'人生指数', lifeplan:'人生规划', zeri:'择日', huangli:'黄历',
+    taisui:'太岁', yanzhi:'颜痣', mingxiang:'命相', mianxiang:'面相', shouxiang:'手相',
+    nihaisha:'倪海厦', shuhan:'舒晗', faith:'信念', mingli:'命理', mantic:'占卜',
+    wellness:'康养', yidao:'医道', tcm_clinic:'中医诊所', tcm_zhongfu:'中医中府',
+    tcm_herbal:'中药', acupoints:'穴位', classic:'经典', practice:'实践', heritage:'传承',
+    suwen:'素问', lingshu:'灵枢', shanghan:'伤寒', jinkui:'金匮', nanjing:'难经', tcm_fangji:'方剂',
+    pharmacology:'药理', poetry:'诗词', geography:'地理', calendar:'历法', family:'家族',
+    psychology:'心理', business:'商业', travel:'旅游', study:'学业', career:'事业',
+    marriage:'婚姻', health:'健康', finance:'财务', relations:'人际关系', spirit:'精神',
+    medicine:'医学', education:'教育', secular:'俗世', celestial:'天文', calendar2:'历法',
+    jieqi:'节气', twelve:'十二', shensha:'神煞', dayun:'大运', liuhe:'六合'
+  };
   function fillModFilter(){
+    var sel = document.getElementById('recModFilter');
+    if(!sel) return;
+    // 中文标签 + 顺序稳定
+    var ids = Object.keys(MODULE_LABELS);
+    // 静态先填（不等 ALL_NODES）
+    ids.forEach(function(mid){
+      var op = document.createElement('option');
+      op.value = mid;
+      op.textContent = '🔮 ' + MODULE_LABELS[mid] + ' (' + mid + ')';
+      sel.appendChild(op);
+    });
+    // 再叠加 ALL_NODES 里的 group（活跃度高）
+    if(ALL_NODES.length){
+      var seen = new Set(ids);
+      ALL_NODES.forEach(function(n){
+        if(n.group === 'premium' || n.group === 'registered' || n.group === 'admin'){
+          var modId = n.id.replace(/-knowledge-base$|-kb$|-database.*$/,'');
+          if(!seen.has(modId) && modId.length > 1){
+            seen.add(modId);
+            var op = document.createElement('option');
+            op.value = modId;
+            op.textContent = '🔮 ' + (MODULE_LABELS[modId]||modId) + ' (' + modId + ')';
+            sel.appendChild(op);
+          }
+        }
+      });
+    }
+    // 首次加载也立刻填（不等 fetch）
+    if(!ALL_NODES.length){
+      // fetch 结束后再补一次
+      setTimeout(function(){ if(ALL_NODES.length) fillModFilterRefresh(); }, 1500);
+    }
+  }
+  function fillModFilterRefresh(){
     var sel = document.getElementById('recModFilter');
     if(!sel || !ALL_NODES.length) return;
     var seen = new Set();
-    var mods = [];
+    for(var i=0;i<sel.options.length;i++) seen.add(sel.options[i].value);
     ALL_NODES.forEach(function(n){
       if(n.group === 'premium' || n.group === 'registered' || n.group === 'admin'){
         var modId = n.id.replace(/-knowledge-base$|-kb$|-database.*$/,'');
         if(!seen.has(modId) && modId.length > 1){
           seen.add(modId);
-          mods.push({id: modId, name: n.label});
+          var op = document.createElement('option');
+          op.value = modId;
+          op.textContent = '🔮 ' + (MODULE_LABELS[modId]||modId) + ' (' + modId + ')';
+          sel.appendChild(op);
         }
       }
-    });
-    // 静态补几个常见模块
-    ['bazi','ziwei','qimen','liuyao','meihua','liuren','fengshui','zhongyi','tcm','xingming','wuxing','shihan','yongshi','mobile','ganqing','shiye','caiyun','music','lifeindex','lifeplan','zeri','huangli','taisui','yanzhi','mingxiang','nihaisha','shuhan','faith'].forEach(function(m){
-      if(!seen.has(m)){ seen.add(m); mods.push({id:m, name:m}); }
-    });
-    mods.forEach(function(m){
-      var op = document.createElement('option');
-      op.value = m.id;
-      op.textContent = '🔮 ' + m.name;
-      sel.appendChild(op);
     });
   }
 
@@ -269,14 +319,17 @@
     try { localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(hist)); } catch(e){console.warn(e.message)}
   }
   function clearCurrentSearchHistory(){
-    var inp = document.getElementById('searchInput');
-    var q = (inp && inp.value || '').trim().toLowerCase();
-    if(!q) return;
-    var hist = getSearchHistory();
-    hist = hist.filter(function(h){ return h !== q; });
-    try { localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(hist)); } catch(e){console.warn(e.message)}
-    renderSearchHistory();
+    try {
+      var inp = document.getElementById('searchInput');
+      var q = (inp && inp.value || '').trim().toLowerCase();
+      if(!q) return;
+      var hist = getSearchHistory();
+      hist = hist.filter(function(h){ return h !== q; });
+      try { localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(hist)); } catch(e){console.warn(e.message)}
+      renderSearchHistory();
+    } catch(e){ console.warn('[clearCurrentSearchHistory]', e.message); }
   }
+  window.clearCurrentSearchHistory = clearCurrentSearchHistory;
 
   function renderSearchHistory(){
     var el = document.getElementById('searchHistory');
@@ -774,4 +827,9 @@
     var wx = (mx - cx)/scale, wy = (my - cy)/scale;
     network.moveTo({position:{x:wx,y:wy}, animation:{duration:400, easingFunction:'easeInOutQuad'}});
   });
+  // R255: 暴露 HTML 内置 onclick 按钮所需的全局函数
+  window.highlightHubs = highlightHubs;
+  window.resetView = resetView;
+  window.fitGraph = fitGraph;
+  window.toggleMinimap = toggleMinimap;
 })();
