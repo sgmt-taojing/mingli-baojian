@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>康养人周分析 · 命理宝鉴</title>
+<link rel="stylesheet" href="css/divination-hub.css">
+<style>
+:root{--gold:#c9a84c;--bg:#0e1726;--card:#1a2332;--border:#2d3748;--text:#c9d1d9;--muted:#718096;--green:#48bb78;--red:#f56565;--blue:#4299e1;--purple:#9f7aea;--orange:#ed8936}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;padding:16px;max-width:900px;margin:0 auto}
+h1{color:var(--gold);font-size:18px;margin-bottom:6px;text-align:center}
+.subtitle{text-align:center;font-size:12px;color:var(--muted);margin-bottom:14px}
+.nav-back{display:inline-block;color:var(--gold);text-decoration:none;font-size:12px;margin-bottom:10px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px}
+.card-title{font-size:14px;font-weight:600;color:var(--gold);margin-bottom:10px;border-left:3px solid var(--gold);padding-left:8px}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stat-box{background:var(--bg);padding:10px;border-radius:6px;text-align:center;border:1px solid var(--border)}
+.stat-num{font-size:18px;font-weight:600;color:var(--gold)}
+.stat-label{font-size:10px;color:var(--muted);margin-top:2px}
+.tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.tab{padding:6px 12px;border-radius:6px;background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:12px}
+.tab.active{background:var(--gold);color:var(--bg);font-weight:600}
+.analysis-item{padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;margin-bottom:8px}
+.outcome-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;margin-right:4px}
+.outcome-better{background:rgba(72,187,120,.2);color:var(--green)}
+.outcome-worse{background:rgba(245,101,101,.2);color:var(--red)}
+.outcome-stable{background:rgba(66,153,225,.2);color:var(--blue)}
+.outcome-unknown{background:rgba(113,128,150,.2);color:var(--muted)}
+.kb-badge{background:rgba(159,122,234,.15);color:var(--purple);padding:2px 6px;border-radius:3px;font-size:10px}
+.form-group{margin-bottom:10px}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+input,select,textarea{width:100%;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:inherit}
+textarea{resize:vertical;min-height:60px}
+.btn{padding:10px;background:var(--gold);color:var(--bg);border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer}
+.btn-sm{padding:6px 12px;font-size:11px}
+input[type=date]{color-scheme:dark}
+.chart-row{display:flex;align-items:center;gap:8px;margin:6px 0}
+.chart-label{width:32px;font-size:11px;color:var(--muted)}
+.chart-bar{height:14px;border-radius:3px;background:var(--gold)}
+@media(max-width:480px){.stat-row{grid-template-columns:repeat(2,1fr)}.tabs{font-size:11px}}
+</style>
+</head>
+<body>
+<a href="person-center.html" class="nav-back">← 返回身份中心</a>
+<h1>📅 康养人周分析中心</h1>
+<div class="subtitle">周追踪 + 周分析 + KB 自动入库 · 积累人群健康模式</div>
+
+<div class="tabs">
+<div class="tab active" data-tab="weekly" onclick="switchTab('weekly')">📊 本周概览</div>
+<div class="tab" data-tab="history" onclick="switchTab('history')">📋 历史分析</div>
+<div class="tab" data-tab="followup" onclick="switchTab('followup')">📝 周随访提交</div>
+<div class="tab" data-tab="knowledge" onclick="switchTab('knowledge')">📚 已入库KB</div>
+</div>
+
+<div id="view-weekly" class="view"></div>
+<div id="view-history" class="view" style="display:none"></div>
+<div id="view-followup" class="view" style="display:none"></div>
+<div id="view-knowledge" class="view" style="display:none"></div>
+
+<script>
+var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+var USER_ID=4;
+
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s||'').replace(/[<>&"']/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]})}
+
+function switchTab(t){
+document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active')});
+document.querySelectorAll('.tab[data-tab="'+t+'"]')[0].classList.add('active');
+document.querySelectorAll('.view').forEach(function(v){v.style.display='none'});
+$('view-'+t).style.display='block';
+if(t==='weekly')loadWeekly();
+if(t==='history')loadHistory();
+if(t==='followup')loadFollowupForm();
+if(t==='knowledge')loadKB();
+}
+
+function getCsrf(){
+return fetch(API+'/api/csrf',{credentials:'include'}).then(function(r){return r.json()}).then(function(j){return j.csrf_token||j.data&&j.data.csrf_token||''})
+}
+
+function loadWeekly(){
+var v=$('view-weekly');v.innerHTML='<div class="card">加载中...</div>';
+fetch(API+'/api/wellness/weekly-summary').then(function(r){return r.json()}).then(function(j){
+var s=j.data.stats,a=j.data.analyses;
+var h='<div class="card"><div class="card-title">📅 周 '+s.week_start+' ~ '+s.week_end+'</div>';
+h+='<div class="stat-row">';
+h+='<div class="stat-box"><div class="stat-num">'+s.total+'</div><div class="stat-label">本周分析</div></div>';
+h+='<div class="stat-box"><div class="stat-num" style="color:var(--green)">'+s.by_outcome.better+'</div><div class="stat-label">改善</div></div>';
+h+='<div class="stat-box"><div class="stat-num" style="color:var(--red)">'+s.by_outcome.worse+'</div><div class="stat-label">恶化</div></div>';
+h+='<div class="stat-box"><div class="stat-num" style="color:var(--purple)">'+s.kb_extracted+'</div><div class="stat-label">已入库KB</div></div>';
+h+='</div></div>';
+
+// 五形分布
+h+='<div class="card"><div class="card-title">🎯 五形分布</div>';
+['金','木','水','火','土'].forEach(function(e){
+var cnt=s.by_element[e]||0;
+var pct=s.total>0?Math.round(cnt/s.total*100):0;
+h+='<div class="chart-row"><div class="chart-label">'+e+'</div><div class="chart-bar" style="width:'+(pct*3)+'px;background:'+({金:'#c0c0c0',木:'#48bb78',水:'#4299e1',火:'#f56565',土:'#ed8936'}[e])+'"></div><div style="font-size:11px;color:var(--muted)">'+cnt+' ('+pct+'%)</div></div>';
+});
+h+='</div>';
+
+// 风险等级
+h+='<div class="card"><div class="card-title">⚠️ 风险等级</div>';
+h+='<div class="stat-row">';
+h+='<div class="stat-box"><div class="stat-num" style="color:var(--red)">'+s.by_risk.high+'</div><div class="stat-label">高风险</div></div>';
+h+='<div class="stat-box"><div class="stat-num" style="color:var(--orange)">'+s.by_risk.mid+'</div><div class="stat-label">中风险</div></div>';
+h+='<div class="stat-box"><div class="stat-num" style="color:var(--green)">'+s.by_risk.normal+'</div><div class="stat-label">正常</div></div>';
+h+='<div class="stat-box"><div class="stat-num">'+s.total+'</div><div class="stat-label">合计</div></div>';
+h+='</div></div>';
+
+// 本周分析列表
+if(a.length>0){
+h+='<div class="card"><div class="card-title">📋 本周分析明细</div>';
+a.forEach(function(r){
+h+='<div class="analysis-item">';
+h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div><b>'+esc(r.name||'康养人')+'</b> <span style="font-size:11px;color:var(--muted)">'+r.analysis_date+'</span></div>';
+h+='<div><span class="outcome-badge outcome-'+r.outcome+'">'+({better:'改善',worse:'恶化',stable:'稳定',unknown:'待评估'}[r.outcome]||r.outcome)+'</span>';
+if(r.knowledge_extracted)h+='<span class="kb-badge">📚 已入库KB</span>';
+h+='</div></div>';
+h+='<div style="font-size:11px;color:var(--muted);line-height:1.6">日主: '+esc(r.day_master||'-')+'('+esc(r.day_element||'-')+') | 风险: '+esc(r.risk_level||'-')+' | 体质: '+esc(r.constitution||'-')+'</div>';
+if(r.prediction)h+='<div style="font-size:12px;margin-top:4px">预测: '+esc(r.prediction)+'</div>';
+if(r.actual_symptoms)h+='<div style="font-size:12px;margin-top:2px">症状: '+esc(r.actual_symptoms)+'</div>';
+h+='</div>';
+});
+h+='</div>';
+}else{
+h+='<div class="card"><div class="empty" style="text-align:center;color:var(--muted);padding:20px">本周暂无分析记录</div></div>';
+}
+
+v.innerHTML=h;
+})
+}
+
+function loadHistory(){
+var v=$('view-history');v.innerHTML='<div class="card">加载中...</div>';
+fetch(API+'/api/wellness/analyses/'+USER_ID).then(function(r){return r.json()}).then(function(j){
+var rows=j.data||[];
+if(rows.length===0){
+v.innerHTML='<div class="card"><div class="empty" style="text-align:center;color:var(--muted);padding:20px">尚无历史分析</div></div>';
+return;
+}
+var h='<div class="card"><div class="card-title">📋 历史分析 ('+rows.length+'条)</div>';
+rows.forEach(function(r){
+h+='<div class="analysis-item">';
+h+='<div style="display:flex;justify-content:space-between;margin-bottom:6px"><div><b>'+r.analysis_date+'</b> <span style="font-size:11px;color:var(--muted)">'+r.constitution+'</span></div>';
+h+='<span class="outcome-badge outcome-'+r.outcome+'">'+({better:'改善',worse:'恶化',stable:'稳定',unknown:'待评估'}[r.outcome]||r.outcome)+'</span></div>';
+h+='<div style="font-size:12px;line-height:1.6">预测: '+esc(r.prediction||'-')+'<br>';
+h+='建议: '+esc(r.recommendations||'-')+'<br>';
+if(r.follow_up)h+='随访: '+esc(r.follow_up)+'<br>';
+h+='</div>';
+if(r.kb_entry_id)h+='<div style="font-size:10px;color:var(--purple);margin-top:4px">📚 KB: '+r.kb_entry_id+' '+(r.knowledge_extracted?'✅ 已入库':'⏳ 待提取')+'</div>';
+h+='</div>';
+});
+h+='</div>';
+v.innerHTML=h;
+})
+}
+
+function loadFollowupForm(){
+var v=$('view-followup');
+var today=new Date().toISOString().slice(0,10);
+var h='<div class="card"><div class="card-title">📝 周随访提交</div>';
+h+='<div class="hint">每周提交一次随访，对比预测与实际，自动入库KB</div>';
+h+='<div class="form-group"><label>随访日期</label><input type="date" id="fu_date" value="'+today+'"></div>';
+h+='<div class="form-group"><label>实际结果</label><select id="fu_outcome"><option value="better">✅ 改善(预测有效)</option><option value="stable">➖ 稳定(预测部分有效)</option><option value="worse">❌ 恶化(预测偏离)</option><option value="unknown">❓ 待评估</option></select></div>';
+h+='<div class="form-group"><label>本周实际症状变化</label><textarea id="fu_symptoms" placeholder="如：头痛减轻了，睡眠改善了，仍有疲劳感"></textarea></div>';
+h+='<div class="form-group"><label>本周预测 vs 实际验证</label><textarea id="fu_followup" placeholder="如：预测肝火旺+夏季心脏风险，实际8月体检肝功能异常符合预测"></textarea></div>';
+h+='<div class="form-group"><label>额外建议补充</label><textarea id="fu_rec" placeholder="如：建议加强肝脏保护，少饮酒"></textarea></div>';
+h+='<button class="btn" onclick="submitFollowup()">提交随访（自动入库KB）</button>';
+h+='</div>';
+v.innerHTML=h;
+}
+
+function submitFollowup(){
+var payload={
+user_id:USER_ID,
+analysis_date:$('fu_date').value,
+actual_symptoms:$('fu_symptoms').value,
+follow_up:$('fu_followup').value,
+recommendations:$('fu_rec').value,
+outcome:$('fu_outcome').value,
+prediction:'基于上周分析'
+};
+getCsrf().then(function(csrf){
+return fetch(API+'/api/wellness/analysis',{method:'POST',headers:{'Content-Type':'application/json','x-csrf-token':csrf},body:JSON.stringify(payload),credentials:'include'})
+}).then(function(r){return r.json()}).then(function(d){
+if(d.code===200){
+alert('✅ 随访已提交'+(d.data.kb_entry_id?'并入库KB':''));
+switchTab('history');
+}else{
+alert('提交失败: '+d.message);
+}
+})
+}
+
+function loadKB(){
+var v=$('view-knowledge');v.innerHTML='<div class="card">加载中...</div>';
+fetch(API+'/api/wellness/analyses/'+USER_ID).then(function(r){return r.json()}).then(function(j){
+var rows=(j.data||[]).filter(function(r){return r.knowledge_extracted===1});
+if(rows.length===0){
+v.innerHTML='<div class="card"><div class="empty" style="text-align:center;color:var(--muted);padding:20px">尚无入库KB记录<br><br>提交随访(结果非unknown)后会自动入库</div></div>';
+return;
+}
+var h='<div class="card"><div class="card-title">📚 已入库KB ('+rows.length+'条)</div>';
+h+='<div class="hint">这些案例已写入 kb_formal(模块=tcm-clinical)，为后续排盘和健康预测提供案例参考</div>';
+rows.forEach(function(r){
+h+='<div class="analysis-item">';
+h+='<div style="display:flex;justify-content:space-between"><div><b>'+r.analysis_date+'</b></div><span class="outcome-badge outcome-'+r.outcome+'">'+({better:'改善',worse:'恶化',stable:'稳定',unknown:'待评估'}[r.outcome]||r.outcome)+'</span></div>';
+h+='<div style="font-size:11px;color:var(--muted);margin-top:4px">KB: '+r.kb_entry_id+'</div>';
+h+='<div style="font-size:12px;margin-top:4px">'+esc(r.prediction||'-')+'</div>';
+h+='</div>';
+});
+h+='</div>';
+v.innerHTML=h;
+})
+}
+
+switchTab('weekly');
+</script>
+</body>
+</html>
