@@ -123,6 +123,22 @@ async function _kbQueryFallback(best) {
       best.results = j.results;
       best.sourceCount = j.count;
       best.engine = engine;
+      // R252: 命中不足 3 条 → 补冷启动推荐（避免 KB 寒汤）
+      if (j.results.length < 3) {
+        const cold = await _kbColdStartFallback(best.query, j.results);
+        if (cold.length) {
+          best.results = j.results.concat(cold.map(c => ({
+            entry_id: c.id,
+            module: c.module || '',
+            title: c.name || c.id,
+            snippet: '[冷启动] 你可能也关心：' + (c.reason || ''),
+            trust_score: 0.85,
+            hit_count: 0,
+            cold_start: true
+          })));
+          best.coldStartAdded = cold.length;
+        }
+      }
     } else {
       best.snippet = '[fallback] 未找到匹配 KB';
       best.score = 0.3;
@@ -134,6 +150,21 @@ async function _kbQueryFallback(best) {
     best.engine = 'error';
   }
   return best;
+}
+
+// R252: KB 弱命中补充冷启动推荐（当命中结果 <3 或全为 like-fallback）
+async function _kbColdStartFallback(query, currentResults){
+  try {
+    const q = String(query || '').trim().slice(0, 30);
+    if (!q) return [];
+    const r = await fetch(API + '/api/kb/cold-start?limit=5&query=' + encodeURIComponent(q));
+    const j = await r.json();
+    const recs = (j.data && j.data.recommendations) || j.recommendations || [];
+    if (!recs.length) return [];
+    // 过滤已存在的 entry_id
+    const existing = new Set((currentResults || []).map(x => x.entry_id));
+    return recs.filter(rec => !existing.has(rec.id)).slice(0, 3);
+  } catch(e) { return []; }
 }
 
 function _kbHitCount(moduleId, kbEntryId){
@@ -1233,7 +1264,10 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
       const tagged = kbHit.score >= 0.4 ? '【来源：KB+AI 润色（'+kbHit.source+'）】\n\n'+reply : reply;
       // R89-P1-4: 多流派来源注入（让 showReport 渲染"源头透明"徽章）
       const _sourcesArr = (kbHit && Array.isArray(kbHit.results)) ? kbHit.results.map(r => r.source).filter(Boolean) : [];
-      showReport(tagged, {score: kbHit.score, source: kbHit.source || 'AI', engine: kbHit.engine || 'ai-backend', fallback: !!kbHit.fallback, sources: _sourcesArr});
+      const _meta = {score: kbHit.score, source: kbHit.source || 'AI', engine: kbHit.engine || 'ai-backend', fallback: !!kbHit.fallback, sources: _sourcesArr};
+      // R252: 如果追加了冷启动推荐 → 在 meta 中标记，让前端徽章展示
+      if (kbHit.coldStartAdded > 0) { _meta.coldStartAdded = kbHit.coldStartAdded; }
+      showReport(tagged, _meta);
       autoSavePaipan(tagged);
       return;
     }
@@ -1561,6 +1595,10 @@ function showReport(text, meta){
     const srcLabel = meta.engine ? meta.engine : (meta.source || '本地知识库');
     const srcFallback = meta.fallback ? ' · 回退' : '';
     metaHtml = '<div class="kb-hit-badge" style="display:inline-flex;align-items:center;gap:8px;padding:5px 10px;margin-bottom:8px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.25);border-radius:6px;font-size:11px;color:var(--paper2)"><span style="color:var(--paper3)">🎯 KB 命中</span><span style="color:' + scoreColor + ';font-weight:600">' + scorePct + '%</span><span style="color:var(--paper3)">·</span><span>引擎：' + srcLabel + srcFallback + '</span></div>';
+    // R252: 冷启动推荐徽章（仅当查询寒汤时）
+    if (typeof meta.coldStartAdded === 'number' && meta.coldStartAdded > 0) {
+      metaHtml += '<div class="cold-start-badge" style="display:inline-flex;align-items:center;gap:6px;padding:5px 10px;margin-left:6px;margin-bottom:8px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);border-radius:6px;font-size:11px;color:var(--paper2)" title="补充了' + meta.coldStartAdded + ' 个你可能也感兴趣的冷门模块推荐"><span style="color:#10b981">❄️ 冷启动补充</span><span style="color:var(--paper3)">+' + meta.coldStartAdded + ' 条</span></div>';
+    }
   }
   // R89-P2-1: 流派标签 + P0-2 合规提示
   let r89Tags = '';
