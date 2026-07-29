@@ -12,8 +12,12 @@
 <link rel="stylesheet" href="css/a11y-fix.css">
 <link rel="stylesheet" href="css/admin-inline.css">
   <link rel="stylesheet" href="css/mobile-nav.css">
-<link rel="stylesheet" href="css/divination-hub.css">
-<link rel="stylesheet" href="css/divination-hub-inline.css">
+<!-- R257 修真：删掉 divination-hub.css(152K) + divination-hub-inline.css(168K) — 320KB hub CSS 能覆盖 admin 自己的 .section/.topbar/.card-grid 样式导致页面变形 -->
+<style>
+  /* === 必要的 hub 风格小补丁 (从 hub 提取，不依赖大文件) === */
+  .skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+  .skip-link:focus{position:fixed;top:8px;left:8px;width:auto;height:auto;background:var(--gold3);color:var(--ink);padding:8px 16px;z-index:99999;border-radius:4px}
+</style>
 </head>
 <body>
 <a href="#main-content" class="skip-link">跳到主要内容</a>
