@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>体检报告 OCR · 命理宝鉴</title>
 <link rel="stylesheet" href="css/divination-hub.css">
+<link rel="stylesheet" href="css/report-interpret.css">
 <style>
 :root{--gold:#c9a84c;--bg:#0e1726;--card:#1a2332;--border:#2d3748;--text:#c9d1d9;--muted:#718096;--green:#48bb78;--red:#f56565;--blue:#4299e1;--orange:#ed8936;--purple:#9f7aea}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -105,6 +106,7 @@ h1{color:var(--gold);font-size:18px;margin-bottom:6px;text-align:center}
 </div>
 
 <script src="js/ocr-client.js"></script>
+<script src="js/report-interpret-engine.js"></script>
 <script>
 var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
 var USER_ID=4;
@@ -299,6 +301,23 @@ if(parsedItems.length===0){alert('请先做 OCR 识别');return}
 
 var ic=$('interpretCard');ic.style.display='block';
 ic.innerHTML='<div class="loading"><span class="spinner"></span> 正在融合四维数据…</div>';
+
+// R249: 使用统一报告解读引擎
+try{
+  var r=await fetch(API+'/api/wellness/profile/'+USER_ID);
+  var j=await r.json();
+  var p=j.data||{};
+}catch(e){var p={}}
+
+var result = window.ReportInterpret.interpret({
+  source: 'ocr',
+  items: parsedItems,
+  profile: {day_master:p.day_master, day_element:p.day_element, family_genetic:p.family_genetic, symptoms:p.symptoms},
+  userId: USER_ID
+});
+
+window.ReportInterpret.renderTo('interpretCard', result, {style:'card'});
+return;
 
 try{
 var r=await fetch(API+'/api/wellness/profile/'+USER_ID);
