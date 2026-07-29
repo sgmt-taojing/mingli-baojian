@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<title>患者档案·诊疗·健康门户</title>
+<style>
+  :root{
+    --gold:#c9a84c;--gold2:#e3c97a;--paper:#f4e8c8;--paper2:rgba(244,232,200,.78);
+    --cyan:#3aa6b4;--violet:#8e44ad;--jade:#27ae60;--orange:#e67e22;--cyan2:#3498db;
+    --cinn:#c0392b;--dark:#1a120a;--dark2:#241609;--dark3:#0e0905;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'STKaiti','KaiTi','楷体',serif;
+    background:radial-gradient(ellipse at top,var(--dark2) 0%,var(--dark3) 100%);
+    color:var(--paper);min-height:100vh;padding:24px 16px 60px;
+  }
+  .hero{text-align:center;max-width:920px;margin:0 auto 24px;padding:24px 0 16px;border-bottom:1px solid rgba(201,168,76,.15)}
+  .hero h1{font-size:36px;color:var(--gold);letter-spacing:8px;margin-bottom:8px;font-family:'Ma Shan Zheng',serif}
+  .hero p{font-size:14px;color:var(--paper2);letter-spacing:3px;opacity:.85}
+  .group{max-width:1100px;margin:0 auto 28px}
+  .group-title{
+    display:flex;align-items:center;gap:12px;margin:0 0 12px;
+    font-family:'Ma Shan Zheng',serif;font-size:18px;color:var(--gold);
+    letter-spacing:4px;opacity:.85;
+  }
+  .group-title .icon{font-size:22px}
+  .group-title .line{flex:1;height:1px;background:linear-gradient(90deg,rgba(201,168,76,.2),transparent)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+  .card{
+    display:block;padding:18px;border:1px solid rgba(201,168,76,.18);
+    border-radius:14px;background:rgba(201,168,76,.03);
+    cursor:pointer;transition:all .3s ease;color:var(--paper);text-decoration:none;
+    position:relative;overflow:hidden;
+  }
+  .card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 60%,rgba(201,168,76,.06));opacity:0;transition:opacity .3s}
+  .card:hover::before{opacity:1}
+  .card:hover{transform:translateY(-2px);border-color:rgba(201,168,76,.45);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+  .card:hover .name{color:var(--gold2)}
+  .card .symbol{font-size:28px;display:block;margin-bottom:8px}
+  .card .name{font-size:16px;color:var(--gold);font-weight:600;margin-bottom:4px;letter-spacing:2px;transition:color .3s}
+  .card .en{font-size:11px;color:var(--gold2);opacity:.6;letter-spacing:1px;margin-bottom:8px;font-family:Georgia,serif}
+  .card .desc{font-size:12px;color:var(--paper2);line-height:1.7;opacity:.78}
+  .card .go{margin-top:10px;font-size:11px;color:var(--cyan2);opacity:.7;letter-spacing:1.5px}
+  @media(max-width:768px){
+    body{padding:16px 12px 56px}
+    .hero h1{font-size:26px;letter-spacing:4px}
+    .grid{grid-template-columns:repeat(2,1fr);gap:10px}
+    .card{padding:14px 12px}
+    .card .symbol{font-size:22px}
+    .card .name{font-size:14px}
+  }
+  .footer{text-align:center;margin-top:36px;font-size:11px;color:var(--paper2);opacity:.45;letter-spacing:2px;padding-bottom:20px}
+  .footer a{color:var(--gold);text-decoration:none;margin:0 8px}
+  .shared{background:rgba(74,158,255,.04);border:1px solid rgba(74,158,255,.12);border-radius:10px;padding:14px;margin:0 auto 20px;max-width:1100px}
+  .shared-title{font-size:13px;color:var(--cyan2);letter-spacing:2px;margin-bottom:8px}
+  .shared-list{font-size:12px;color:var(--paper2);opacity:.8;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="hero">
+  <h1>🩺 患者 · 档案 · 诊疗</h1>
+  <p>患者档案 · 初诊登记 · 望诊识人 · 报告解读 · 体质辨识 · 隐私合规</p>
+</div>
+
+<!-- ① 档案管理 -->
+<div class="group">
+  <div class="group-title"><span class="icon">📋</span><span>档案管理</span><span class="line"></span></div>
+  <div class="grid">
+    <a class="card" href="patient-archive.html">
+      <span class="symbol">📂</span>
+      <div class="name">患者档案</div>
+      <div class="en">Patient Archive</div>
+      <div class="desc">病历聚合 · 历史处方 · 复诊提醒 · 诊疗时间轴 · 隐私合规存储</div>
+      <div class="go">→ 患者档案</div>
+    </a>
+    <a class="card" href="divination-hub.html#section=person-dashboard">
+      <span class="symbol">👤</span>
+      <div class="name">人物档案看板</div>
+      <div class="en">Person Dashboard</div>
+      <div class="desc">5 身份统一视图 · 缘主/患者/信众聚合 · 综合风险评级 · 30天事件流</div>
+      <div class="go">→ 人物看板</div>
+    </a>
+    <a class="card" href="patient-intake.html">
+      <span class="symbol">📝</span>
+      <div class="name">初诊登记</div>
+      <div class="en">Patient Intake</div>
+      <div class="desc">初诊登记表 · 主诉 · 既往史 · 望闻问切四诊资料 · 知情同意</div>
+      <div class="go">→ 初诊登记</div>
+    </a>
+    <a class="card" href="report-interpret.html">
+      <span class="symbol">🔬</span>
+      <div class="name">报告解读中心</div>
+      <div class="en">Report Interpretation</div>
+      <div class="desc">体检报告/生化指标/CT/MRI 统一解读 · 四维融合（西医+中医+命理+遗传）</div>
+      <div class="go">→ 报告解读</div>
+    </a>
+  </div>
+</div>
+
+<!-- ② 诊疗工具 -->
+<div class="group">
+  <div class="group-title"><span class="icon">🩻</span><span>诊疗工具</span><span class="line"></span></div>
+  <div class="grid">
+    <a class="card" href="wangzhen-clinical.html">
+      <span class="symbol">👁</span>
+      <div class="name">望诊识人</div>
+      <div class="en">Wang Zhen · Clinical</div>
+      <div class="desc">面部·舌象·目神 拍照上传 · AI 视觉引擎判读 · 脏腑虚实分析 · 倪师望诊法</div>
+      <div class="go">→ 望诊识人</div>
+    </a>
+    <a class="card" href="wangzhen-center.html">
+      <span class="symbol">🏥</span>
+      <div class="name">望诊中心</div>
+      <div class="en">Wang Zhen Center</div>
+      <div class="desc">望诊知识库 · 28 舌象 · 面部五区 · 目部五脏 · 聚合分析</div>
+      <div class="go">→ 望诊中心</div>
+    </a>
+    <a class="card" href="divination-hub.html#section=tizhi">
+      <span class="symbol">🌿</span>
+      <div class="name">体质辨识</div>
+      <div class="en">Constitution Test</div>
+      <div class="desc">9 种体质辨识（平和/气虚/阳虚/阴虚/痰湿/湿热/血瘀/气郁/特禀）· 调养方案</div>
+      <div class="go">→ 测体质</div>
+    </a>
+    <a class="card" href="tcm-symptom.html">
+      <span class="symbol">🔍</span>
+      <div class="name">辨症查询</div>
+      <div class="en">Symptom Search</div>
+      <div class="desc">症状自查 · 中医辨证 · 推荐方剂 · 穴位按摩 · 食疗建议</div>
+      <div class="go">→ 辨症查询</div>
+    </a>
+  </div>
+</div>
+
+<!-- ③ 医师工作台 -->
+<div class="group">
+  <div class="group-title"><span class="icon">👨‍⚕️</span><span>医师工作台</span><span class="line"></span></div>
+  <div class="grid">
+    <a class="card" href="doctor-panel.html">
+      <span class="symbol">💼</span>
+      <div class="name">医师工作台</div>
+      <div class="en">Doctor Panel</div>
+      <div class="desc">问诊 · 开方 · 随访 · 病历模板 · 知识库智能提示 · 处方打印</div>
+      <div class="go">→ 医师工作台</div>
+    </a>
+    <a class="card" href="doctor-elder.html">
+      <span class="symbol">👴</span>
+      <div class="name">名老中医</div>
+      <div class="en">Elder Doctors</div>
+      <div class="desc">国医大师 · 名老中医经验 · 经方验案 · 学术传承 · 学习路径</div>
+      <div class="go">→ 名老中医</div>
+    </a>
+    <a class="card" href="tcm-clinic.html">
+      <span class="symbol">🏥</span>
+      <div class="name">中医诊所</div>
+      <div class="en">TCM Clinic</div>
+      <div class="desc">望闻问切 · 辨证论治 · 体质辨识 · 名医名方 · 经方时方</div>
+      <div class="go">→ 中医诊所</div>
+    </a>
+    <a class="card" href="tcm-report.html">
+      <span class="symbol">📄</span>
+      <div class="name">中医报告</div>
+      <div class="en">TCM Report</div>
+      <div class="desc">体质调养方案 · 季节养生 · 食疗药膳 · 八段锦 · 太极</div>
+      <div class="go">→ 中医报告</div>
+    </a>
+  </div>
+</div>
+
+<!-- ④ 隐私与合规 -->
+<div class="group">
+  <div class="group-title"><span class="icon">🔒</span><span>隐私与合规</span><span class="line"></span></div>
+  <div class="grid">
+    <a class="card" href="privacy-center.html">
+      <span class="symbol">🔐</span>
+      <div class="name">隐私合规中心</div>
+      <div class="en">Privacy Center</div>
+      <div class="desc">GDPR · 个保法 · 数据主体权利 · 同意管理 · 软删除 · 知情同意书</div>
+      <div class="go">→ 隐私中心</div>
+    </a>
+    <a class="card" href="export-guard.html">
+      <span class="symbol">📤</span>
+      <div class="name">数据导出守卫</div>
+      <div class="en">Export Guard</div>
+      <div class="desc">合规校验 · 字段脱敏 · 审计日志 · 三档权限 · 导出审批</div>
+      <div class="go">→ 导出守卫</div>
+    </a>
+  </div>
+</div>
+
+<!-- 共享基础设施 -->
+<div class="shared">
+  <div class="shared-title">🔗 共享基础设施（全体系统一）</div>
+  <div class="shared-list">
+    <strong>KB API (8920)</strong> — 知识库检索引擎，全体系共享 · FTS5 全文检索 + LIKE 兜底 · 54 模块 12828 条目<br>
+    <strong>排盘引擎 (8911)</strong> — 八字/紫微/奇门/六壬/六爻排盘服务，周易体系主用，患者体系体质辨识辅助<br>
+    <strong>报告引擎</strong> — 统一报告渲染，适配各端：中医报告/体检解读/命理报告/人生规划<br>
+    <strong>TTS (8912)</strong> — Edge-TTS 语音合成，全体系共享<br>
+    <strong>OCR (8913)</strong> — 面诊/舌象/文档识别，患者体系主用
+  </div>
+</div>
+
+<!-- 跨门户导航 -->
+<nav class="portal-nav" style="position:fixed;bottom:0;left:0;right:0;z-index:9000;display:flex;justify-content:center;gap:0;background:rgba(10,8,5,.96);backdrop-filter:blur(12px);border-top:1px solid rgba(201,168,76,.15);padding:6px 0;max-width:100%;overflow-x:auto">
+  <a href="divination-hub.html" style="flex:0 0 auto;padding:6px 12px;font-size:11px;color:var(--gold);text-decoration:none;white-space:nowrap;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">🏠 首页</a>
+  <a href="naming-portal.html" style="flex:0 0 auto;padding:6px 12px;font-size:11px;color:var(--gold);text-decoration:none;white-space:nowrap;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">🪪 命名</a>
+  <a href="patient-portal.html" style="flex:0 0 auto;padding:6px 12px;font-size:11px;color:var(--gold);text-decoration:none;white-space:nowrap;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">🩺 患者</a>
+  <a href="tcm-portal.html" style="flex:0 0 auto;padding:6px 12px;font-size:11px;color:var(--gold);text-decoration:none;white-space:nowrap;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">🌿 中医</a>
+  <a href="practice-portal.html" style="flex:0 0 auto;padding:6px 12px;font-size:11px;color:var(--gold);text-decoration:none;white-space:nowrap;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">🧘 修行</a>
+  <a href="folklore-portal.html" style="flex:0 0 auto;padding:6px 12px;font-size:11px;color:var(--gold);text-decoration:none;white-space:nowrap;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">🎎 民俗</a>
+  <a href="monitor-portal.html" style="flex:0 0 auto;padding:6px 12px;font-size:11px;color:var(--gold);text-decoration:none;white-space:nowrap;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">🛰️ 监控</a>
+</nav>
+
+<div class="footer">
+  <a href="divination-hub.html">← 返回首页</a> ·
+  <a href="monitor-portal.html">监控运维 →</a>
+  <p>© 易道智鉴 · 患者诊疗门户 · R269 体系划分</p>
+</div>
+
+</body>
+</html>
