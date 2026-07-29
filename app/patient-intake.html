@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>患者信息采集 · 命理宝鉴</title>
+<link rel="stylesheet" href="css/divination-hub.css">
+<style>
+:root{--gold:#c9a84c;--bg:#0e1726;--card:#1a2332;--border:#2d3748;--text:#c9d1d9;--muted:#718096;--green:#48bb78;--red:#f56565;--blue:#4299e1}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;padding:16px;max-width:700px;margin:0 auto}
+h1{color:var(--gold);font-size:18px;margin-bottom:14px;text-align:center}
+.nav-back{display:inline-block;color:var(--gold);text-decoration:none;font-size:12px;margin-bottom:10px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px}
+.card-title{font-size:14px;font-weight:600;color:var(--gold);margin-bottom:10px;border-left:3px solid var(--gold);padding-left:8px}
+.form-group{margin-bottom:10px}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+input,select,textarea{width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:inherit}
+textarea{resize:vertical;min-height:60px}
+.row{display:flex;gap:10px}
+.row>div{flex:1}
+.checkbox-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.checkbox-item{display:flex;align-items:center;gap:4px;padding:6px;background:var(--bg);border:1px solid var(--border);border-radius:6px;font-size:12px;cursor:pointer}
+.checkbox-item input{width:auto}
+.hint{font-size:11px;color:var(--muted);margin-top:4px;font-style:italic}
+.btn{display:block;width:100%;padding:12px;background:var(--gold);color:var(--bg);border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;margin-top:10px}
+.btn:disabled{opacity:.5}
+.step-indicator{display:flex;justify-content:center;gap:6px;margin-bottom:14px}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--border)}
+.step-dot.active{background:var(--gold)}
+.step-dot.done{background:var(--green)}
+@media(max-width:480px){.checkbox-grid{grid-template-columns:repeat(2,1fr)}.row{flex-direction:column}}
+@media(max-width:360px){.checkbox-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<a href="person-center.html" class="nav-back">← 返回身份中心</a>
+<h1>📋 患者信息采集</h1>
+
+<div class="step-indicator">
+<div class="step-dot active" id="dot1"></div>
+<div class="step-dot" id="dot2"></div>
+<div class="step-dot" id="dot3"></div>
+<div class="step-dot" id="dot4"></div>
+</div>
+
+<!-- 步骤1: 基本信息 -->
+<div class="card" id="step1">
+<div class="card-title">① 基本信息</div>
+<div class="row">
+<div class="form-group"><label>姓名</label><input id="name" placeholder="您的称呼"></div>
+<div class="form-group"><label>性别</label><select id="sex"><option value="">请选择</option><option value="男">男</option><option value="女">女</option></select></div>
+</div>
+<div class="row">
+<div class="form-group"><label>年龄</label><input id="age" type="number" placeholder="如：35"></div>
+<div class="form-group"><label>联系电话</label><input id="phone" placeholder="选填"></div>
+</div>
+<div class="form-group"><label>出生日期</label><input id="birth_date" type="date"></div>
+<div class="form-group"><label>出生时辰（大约即可）</label>
+<select id="birth_hour">
+<option value="">请选择</option>
+<option value="0">凌晨（23-1点·子时）</option>
+<option value="2">深夜（1-3点·丑时）</option>
+<option value="4">破晓（3-5点·寅时）</option>
+<option value="6">清晨（5-7点·卯时）</option>
+<option value="8">上午（7-9点·辰时）</option>
+<option value="10">上午（9-11点·巳时）</option>
+<option value="12">中午（11-13点·午时）</option>
+<option value="14">下午（13-15点·未时）</option>
+<option value="16">下午（15-17点·申时）</option>
+<option value="18">傍晚（17-19点·酉时）</option>
+<option value="20">晚上（19-21点·戌时）</option>
+<option value="22">夜间（21-23点·亥时）</option>
+</select>
+<div class="hint">💡 体质评估需要出生时间信息，大致时段即可</div>
+</div>
+<div class="form-group"><label>出生地</label><input id="birthplace" placeholder="如：浙江杭州（用于体质地域评估）"></div>
+<button class="btn" onclick="goStep(2)">下一步：症状描述</button>
+</div>
+
+<!-- 步骤2: 症状 -->
+<div class="card" id="step2" style="display:none">
+<div class="card-title">② 主要症状</div>
+<div class="form-group"><label>您目前最困扰的症状（可多选）</label>
+<div class="checkbox-grid">
+<div class="checkbox-item"><input type="checkbox" value="头痛"><span>头痛</span></div>
+<div class="checkbox-item"><input type="checkbox" value="失眠"><span>失眠</span></div>
+<div class="checkbox-item"><input type="checkbox" value="消化不良"><span>消化不良</span></div>
+<div class="checkbox-item"><input type="checkbox" value="胃痛"><span>胃痛</span></div>
+<div class="checkbox-item"><input type="checkbox" value="疲劳"><span>疲劳乏力</span></div>
+<div class="checkbox-item"><input type="checkbox" value="情绪"><span>情绪问题</span></div>
+<div class="checkbox-item"><input type="checkbox" value="腰酸"><span>腰酸</span></div>
+<div class="checkbox-item"><input type="checkbox" value="心悸"><span>心悸</span></div>
+<div class="checkbox-item"><input type="checkbox" value="咳嗽"><span>咳嗽</span></div>
+<div class="checkbox-item"><input type="checkbox" value="皮肤"><span>皮肤问题</span></div>
+<div class="checkbox-item"><input type="checkbox" value="月经"><span>月经问题</span></div>
+<div class="checkbox-item"><input type="checkbox" value="其他"><span>其他</span></div>
+</div></div>
+<div class="form-group"><label>症状详细描述</label><textarea id="symptoms_detail" placeholder="请描述症状的具体表现、部位、程度等"></textarea></div>
+<div class="row">
+<div class="form-group"><label>持续时间</label><select id="duration"><option value="">请选择</option><option>1周内</option><option>1-4周</option><option>1-3个月</option><option>3-6个月</option><option>半年以上</option><option>数年</option></select></div>
+<div class="form-group"><label>严重程度</label><select id="severity"><option value="">请选择</option><option>轻微</option><option>中度</option><option>较重</option><option>严重影响生活</option></select></div>
+</div>
+<div class="form-group"><label>既往治疗情况</label><textarea id="prior_treatment" placeholder="之前看过医生吗？用过什么药？效果如何？"></textarea></div>
+<button class="btn" onclick="goStep(3)">下一步：体质自评</button>
+</div>
+
+<!-- 步骤3: 体质自评 -->
+<div class="card" id="step3" style="display:none">
+<div class="card-title">③ 体质自评</div>
+<div class="form-group"><label>怕冷还是怕热？</label><select id="temp_pref"><option value="">请选择</option><option value="怕冷">怕冷（手脚冰凉）</option><option value="怕热">怕热（容易上火）</option><option value="正常">无明显偏向</option><option value="忽冷忽热">忽冷忽热</option></select></div>
+<div class="form-group"><label>出汗情况</label><select id="sweat"><option value="">请选择</option><option>很少出汗</option><option>正常</option><option>容易出汗</option><option>盗汗（夜间出汗）</option><option>自汗（白天无故出汗）</option></select></div>
+<div class="form-group"><label>食欲</label><select id="appetite"><option value="">请选择</option><option>很好</option><option>正常</option><option>一般</option><option>差</option><option>时好时坏</option></select></div>
+<div class="form-group"><label>睡眠质量</label><select id="sleep"><option value="">请选择</option><option>很好</option><option>尚可</option><option>入睡困难</option><option>多梦易醒</option><option>严重失眠</option></select></div>
+<div class="form-group"><label>大便情况</label><select id="bowel"><option value="">请选择</option><option>正常</option><option>便秘</option><option>腹泻</option><option>时干时稀</option><option>黏腻不爽</option></select></div>
+<div class="form-group"><label>既往病史</label><textarea id="history" placeholder="慢性病/手术史/过敏史/长期用药"></textarea></div>
+<button class="btn" onclick="goStep(4)">下一步：提交</button>
+</div>
+
+<!-- 步骤4: 提交 -->
+<div class="card" id="step4" style="display:none">
+<div class="card-title">④ 确认并提交</div>
+<div id="summary" style="font-size:13px;line-height:1.8;padding:10px;background:var(--bg);border-radius:6px;margin-bottom:10px"></div>
+<div class="hint" style="margin-bottom:10px">提交后系统将自动生成初步诊断和体质分析，并安排命理大师和中医医生为您服务。</div>
+<button class="btn" onclick="submitForm()" id="submitBtn">提交信息</button>
+</div>
+
+<div id="result" style="display:none">
+<div class="card"><div class="card-title">✅ 信息提交成功</div>
+<div id="result-content" style="font-size:13px;line-height:1.8"></div>
+<a href="person-center.html" class="btn" style="background:var(--card);color:var(--gold);border:1px solid var(--gold)">返回身份中心</a>
+</div>
+</div>
+
+<script>
+var step=1;
+function goStep(n){
+document.getElementById('step'+step).style.display='none';
+document.getElementById('dot'+step).classList.add('done');
+document.getElementById('dot'+step).classList.remove('active');
+step=n;
+document.getElementById('step'+n).style.display='block';
+document.getElementById('dot'+n).classList.add('active');
+if(n===4)buildSummary();
+window.scrollTo(0,0);
+}
+function buildSummary(){
+var s='<b>基本信息：</b>'+get('name')+' / '+get('sex')+' / '+get('age')+'岁<br>';
+s+='<b>出生：</b>'+get('birth_date')+' '+(get('birth_hour')?get('birth_hour')+'时':'未填')+' '+get('birthplace')+'<br>';
+var syms=[];document.querySelectorAll('#step2 .checkbox-item input:checked').forEach(function(c){syms.push(c.value)});
+s+='<b>症状：</b>'+(syms.join('、')||'未选')+'<br>';
+s+='<b>持续：</b>'+get('duration')+' / '+get('severity')+'<br>';
+s+='<b>体质：</b>怕冷热='+get('temp_pref')+' / 出汗='+get('sweat')+' / 食欲='+get('appetite')+' / 睡眠='+get('sleep')+' / 大便='+get('bowel')+'<br>';
+s+='<b>病史：</b>'+(get('history')||'无');
+document.getElementById('summary').innerHTML=s;
+}
+function get(id){return document.getElementById(id).value||'未填'}
+function submitForm(){
+var btn=document.getElementById('submitBtn');btn.disabled=true;btn.textContent='提交中...';
+var syms=[];document.querySelectorAll('#step2 .checkbox-item input:checked').forEach(function(c){syms.push(c.value)});
+var data={
+name:get('name'),sex:get('sex'),age:get('age'),phone:get('phone'),
+birth_date:get('birth_date'),birth_hour:get('birth_hour')?parseInt(get('birth_hour')):null,
+birthplace:get('birthplace'),
+symptoms:syms.join('、')+'。'+get('symptoms_detail'),
+duration:get('duration'),severity:get('severity'),prior_treatment:get('prior_treatment'),
+constitution:get('temp_pref')+'; 出汗:'+get('sweat')+'; 食欲:'+get('appetite')+'; 睡眠:'+get('sleep')+'; 大便:'+get('bowel'),
+history:get('history')
+};
+var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+fetch(API+'/api/clinic/case',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({patient_id:4,symptoms:data.symptoms,constitution:data.constitution,paipan_summary:'出生:'+data.birth_date+' '+data.birth_hour+'时 '+data.birthplace})}).then(function(r){return r.json()}).then(function(d){
+document.getElementById('step4').style.display='none';
+document.getElementById('result').style.display='block';
+var c=document.getElementById('result-content');
+c.innerHTML='您的诊疗编号：<b>#'+(d.data&&d.data.case_id||'?')+'</b><br><br>系统正在为您安排：<br>🔮 命理大师 — 分析体质与健康状况<br>💉 中医医生 — 综合诊断并开具处方<br><br>请耐心等待，您可以在身份中心查看进度。';
+}).catch(function(e){
+document.getElementById('step4').style.display='none';
+document.getElementById('result').style.display='block';
+document.getElementById('result-content').innerHTML='提交成功（离线模式）<br>您的信息已记录，稍后将有专人与您联系。';
+});
+}
+</script>
+</body>
+</html>

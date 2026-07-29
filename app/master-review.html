@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>大师端 · 批八字</title>
+<link rel="stylesheet" href="css/divination-hub.css">
+<style>
+:root{--gold:#c9a84c;--bg:#0e1726;--card:#1a2332;--border:#2d3748;--text:#c9d1d9;--muted:#718096;--green:#48bb78;--red:#f56565;--purple:#9f7aea}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;padding:16px;max-width:800px;margin:0 auto}
+h1{color:var(--gold);font-size:18px;margin-bottom:14px;text-align:center}
+.nav-back{display:inline-block;color:var(--gold);text-decoration:none;font-size:12px;margin-bottom:10px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px}
+.card-title{font-size:14px;font-weight:600;color:var(--gold);margin-bottom:10px;border-left:3px solid var(--gold);padding-left:8px}
+.info-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.info-tag{padding:4px 10px;background:var(--bg);border-radius:6px;border:1px solid var(--border);font-size:12px}
+.paipan-box{padding:10px;background:rgba(159,122,234,.08);border:1px solid rgba(159,122,234,.3);border-radius:8px;margin:8px 0}
+.paipan-title{font-size:13px;color:var(--purple);font-weight:600;margin-bottom:6px}
+.form-group{margin-bottom:10px}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+textarea{width:100%;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;resize:vertical;min-height:60px;font-family:inherit}
+.btn{display:block;width:100%;padding:12px;background:var(--gold);color:var(--bg);border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:10px}
+.case-list-item{padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;margin-bottom:8px;cursor:pointer}
+.case-list-item:hover{border-color:var(--gold)}
+.case-list-item.active{border-color:var(--gold);background:rgba(201,168,76,.08)}
+.case-symptoms{font-size:13px;margin-bottom:4px}
+.case-meta{font-size:11px;color:var(--muted)}
+.empty{text-align:center;padding:20px;color:var(--muted);font-size:13px}
+@media(max-width:480px){.info-row{flex-direction:column}}
+</style>
+</head>
+<body>
+<a href="person-center.html" class="nav-back">← 返回</a>
+<h1>🔮 大师端 · 批八字</h1>
+
+<div class="card" id="case-list-card">
+<div class="card-title">待批案例</div>
+<div id="case-list"><div class="empty">加载中...</div></div>
+</div>
+
+<div id="detail" style="display:none">
+<div class="card">
+<div class="card-title">患者信息</div>
+<div id="patient-info"></div>
+</div>
+<div class="card">
+<div class="card-title">排盘信息</div>
+<div id="paipan-info"></div>
+</div>
+<div class="card">
+<div class="card-title">大师批八字</div>
+<div class="form-group"><label>命理分析（日主旺衰/用神/格局）</label><textarea id="master_analysis" placeholder="请输入命理分析..."></textarea></div>
+<div class="form-group"><label>健康预测（哪些年份/季节需注意）</label><textarea id="health_forecast" placeholder="基于八字的健康预测..."></textarea></div>
+<div class="form-group"><label>化解建议（五行调候/方位/饮食）</label><textarea id="master_advice" placeholder="化解与调候建议..."></textarea></div>
+<div class="form-group"><label>给医生的命理参考（同步给医生端）</label><textarea id="doctor_ref" placeholder="日主五行→体质倾向→易患脏腑→调候建议"></textarea></div>
+<div class="form-group"><label>大师私备注（不同步给医生/患者）</label><textarea id="master_private" placeholder="仅大师可见..."></textarea></div>
+<button class="btn" onclick="submitReview()">提交批八字 → 同步给医生</button>
+</div>
+</div>
+
+<script>
+var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+var currentCase=null;
+function loadCases(){
+fetch(API+'/api/patient/profile/4').then(function(r){return r.json()}).then(function(d){
+var cases=(d.data||{}).cases||[];
+var el=document.getElementById('case-list');
+if(cases.length===0){el.innerHTML='<div class="empty">暂无待批案例</div>';return}
+el.innerHTML=cases.map(function(c){
+return '<div class="case-list-item" onclick="selectCase('+c.id+')"><div class="case-symptoms">'+(c.symptoms||'')+'</div><div class="case-meta">#'+c.id+' | '+(c.constitution||'')+' | '+(c.status||'')+' | '+(c.created_at||'')+'</div></div>'
+}).join('')
+})
+}
+function selectCase(id){
+currentCase=id;
+document.querySelectorAll('.case-list-item').forEach(function(e){e.classList.remove('active')})
+event.target.closest('.case-list-item').classList.add('active')
+document.getElementById('detail').style.display='block'
+// 加载案例详情
+var cases=document.querySelectorAll('.case-list-item')
+// 简化：从列表数据展示
+document.getElementById('patient-info').innerHTML='<div class="info-row"><span class="info-tag">案例#'+id+'</span></div>'
+document.getElementById('paipan-info').innerHTML='<div class="paipan-box"><div class="paipan-title">排盘参考</div><div id="paipan-detail">加载中...</div></div>'
+// 加载排盘
+loadBridge()
+}
+function loadBridge(){
+fetch(API+'/api/clinic/bridge/4').then(function(r){return r.json()}).then(function(d){
+var b=(d.data||{}).tcm_bridge||{}
+var el=document.getElementById('paipan-detail')
+if(!b.organ){el.innerHTML='无排盘数据';return}
+el.innerHTML='日主:<b>'+d.data.element+'</b> → 脏腑:<b>'+b.organ+'</b><br>体质:'+b.constitution+' | 调理:'+b.recommendation+'<br>食疗:'+b.foods+'<br>中药:'+b.herbs+'<br>穴位:'+b.acupoint
+})
+}
+function submitReview(){
+if(!currentCase)return
+var data={
+master_comment:document.getElementById('master_analysis').value,
+master_comment_2:document.getElementById('health_forecast').value,
+doctor_ref:document.getElementById('doctor_ref').value,
+master_private:document.getElementById('master_private').value
+}
+fetch(API+'/api/clinic/case/'+currentCase,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({master_comment:data.master_comment+'\n[健康预测]'+data.master_comment_2+'\n[化解]'+document.getElementById('master_advice').value,doctor_comment:data.doctor_ref})}).then(function(r){return r.json()}).then(function(d){
+alert('已提交！命理信息已同步给医生端。')
+document.getElementById('detail').style.display='none'
+loadCases()
+})
+}
+loadCases()
+</script>
+</body>
+</html>

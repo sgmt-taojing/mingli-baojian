@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>医生端 · 综合诊断</title>
+<link rel="stylesheet" href="css/divination-hub.css">
+<style>
+:root{--gold:#c9a84c;--bg:#0e1726;--card:#1a2332;--border:#2d3748;--text:#c9d1d9;--muted:#718096;--green:#48bb78;--red:#f56565;--blue:#4299e1;--purple:#9f7aea}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;padding:16px;max-width:800px;margin:0 auto}
+h1{color:var(--gold);font-size:18px;margin-bottom:14px;text-align:center}
+.nav-back{display:inline-block;color:var(--gold);text-decoration:none;font-size:12px;margin-bottom:10px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px}
+.card-title{font-size:14px;font-weight:600;color:var(--gold);margin-bottom:10px;border-left:3px solid var(--gold);padding-left:8px}
+.bridge-box{padding:10px;background:linear-gradient(135deg,rgba(159,122,234,.1),rgba(66,153,225,.1));border:1px solid rgba(159,122,234,.3);border-radius:8px;margin:8px 0;font-size:12px;line-height:1.6}
+.form-group{margin-bottom:10px}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+textarea,select,input{width:100%;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:inherit}
+textarea{resize:vertical;min-height:60px}
+.row{display:flex;gap:10px}.row>div{flex:1}
+.btn{display:block;width:100%;padding:12px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:10px}
+.case-list-item{padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;margin-bottom:8px;cursor:pointer}
+.case-list-item.active{border-color:var(--gold);background:rgba(201,168,76,.08)}
+.empty{text-align:center;padding:20px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<a href="person-center.html" class="nav-back">← 返回</a>
+<h1>💉 医生端 · 综合诊断</h1>
+
+<div class="card"><div class="card-title">待诊案例</div><div id="case-list"><div class="empty">加载中...</div></div></div>
+
+<div id="detail" style="display:none">
+<div class="card"><div class="card-title">患者信息</div><div id="patient-info"></div></div>
+<div class="card"><div class="card-title">命理大师参考</div><div id="master-ref" class="bridge-box">加载中...</div></div>
+<div class="card">
+<div class="card-title">中医辨证与处方</div>
+<div class="form-group"><label>中医辨证（证型/病因/病机）</label><textarea id="diagnosis" placeholder="如：肝郁化火证。病因：情志不遂..."></textarea></div>
+<div class="form-group"><label>处方（方剂+剂量+煎服法）</label><textarea id="prescription" placeholder="如：丹栀逍遥散加减。柴胡10g 白芍15g..."></textarea></div>
+<div class="row">
+<div class="form-group"><label>复诊日期</label><input id="follow_date" type="date"></div>
+<div class="form-group"><label>预期疗效</label><select id="expected_outcome"><option value="">请选择</option><option>痊愈</option><option>好转</option><option>控制</option><option>需长期调理</option></select></div>
+</div>
+<div class="form-group"><label>饮食起居建议</label><textarea id="lifestyle" placeholder="饮食禁忌/起居调养/运动建议..."></textarea></div>
+<div class="form-group"><label>注意事项</label><textarea id="caution" placeholder="用药注意事项/可能的不良反应..."></textarea></div>
+<button class="btn" onclick="submitDiagnosis()">提交诊断处方</button>
+</div>
+</div>
+
+<script>
+var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+var currentCase=null;
+function loadCases(){
+fetch(API+'/api/patient/profile/4').then(function(r){return r.json()}).then(function(d){
+var cases=(d.data||{}).cases||[];
+var el=document.getElementById('case-list');
+if(!cases.length){el.innerHTML='<div class="empty">暂无待诊案例</div>';return}
+el.innerHTML=cases.map(function(c){return '<div class="case-list-item" onclick="selectCase('+c.id+','+JSON.stringify(c).replace(/"/g,'&quot;')+')" style="cursor:pointer"><div>症状:'+(c.symptoms||'')+'</div><div style="font-size:11px;color:var(--muted)">#'+c.id+' | '+(c.status||'')+'</div></div>'}).join('')
+})
+}
+function selectCase(id,caseData){
+currentCase=id;
+document.querySelectorAll('.case-list-item').forEach(function(e){e.classList.remove('active')})
+event.target.closest('.case-list-item').classList.add('active')
+document.getElementById('detail').style.display='block'
+document.getElementById('patient-info').innerHTML='<div style="font-size:13px">症状:'+(caseData.symptoms||'')+'<br>体质:'+(caseData.constitution||'')+'</div>'
+document.getElementById('master-ref').innerHTML=caseData.master_comment?('大师批八字：'+caseData.master_comment):'大师尚未批八字'
+}
+function submitDiagnosis(){
+if(!currentCase)return
+var data={
+diagnosis:document.getElementById('diagnosis').value,
+prescription:document.getElementById('prescription').value,
+doctor_comment:document.getElementById('lifestyle').value+'\n[注意]'+document.getElementById('caution').value,
+treatment_outcome:document.getElementById('expected_outcome').value
+}
+fetch(API+'/api/clinic/case/'+currentCase,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(function(r){return r.json()}).then(function(d){
+alert('诊断处方已提交！患者可在身份中心查看。')
+document.getElementById('detail').style.display='none'
+loadCases()
+})
+}
+loadCases()
+</script>
+</body>
+</html>
