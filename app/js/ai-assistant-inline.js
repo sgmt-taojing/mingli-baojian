@@ -107,25 +107,27 @@ function _kbScore(moduleId, data){
 async function _kbQueryFallback(best) {
   if (!best.fallback) return best;
   try {
+    // L3: 优先走 FTS5 search-fts（BM25 排序，比 LIKE 更精准）
     const qs = new URLSearchParams({
-      module: best.module || '',
       q: (best.query || '').slice(0, 60),
       limit: '5'
     });
-    const r = await fetch(API + '/api/public/kb-query?' + qs, { method: 'GET' });
+    const r = await fetch(API + '/api/public/kb/search-fts?' + qs, { method: 'GET' });
     const j = await r.json();
+    // L3: search-fts 返回 {code, data:{results, engine, count, total}}
+    const jData = j.data || j; // 兼容 search-fts 和 kb-query 两种格式
     // R27-P1：读取后端返回的 engine 字段 → 记入 localStorage + 刷新 stats bar
-    const engine = (j && j.engine) || 'like-fallback';
+    const engine = (jData && jData.engine) || (j && j.engine) || 'like-fallback';
     try { recordKbEngine(engine); } catch (e) {}
-    if (j && j.results && j.results.length > 0) {
-      best.snippet = j.results.map(x => '【' + x.entry_id + '】' + x.title + '\n' + (x.snippet || '').slice(0, 200)).join('\n\n');
+    if (jData && jData.results && jData.results.length > 0) {
+      best.snippet = jData.results.map(x => '【' + x.entry_id + '】' + x.title + '\n' + (x.snippet || '').slice(0, 200)).join('\n\n');
       best.score = Math.max(best.score, 0.65);
-      best.results = j.results;
-      best.sourceCount = j.count;
+      best.results = jData.results;
+      best.sourceCount = jData.count || jData.total;
       best.engine = engine;
       // R252: 命中不足 3 条 → 补冷启动推荐（避免 KB 寒汤）
-      if (j.results.length < 3) {
-        const cold = await _kbColdStartFallback(best.query, j.results);
+      if (jData.results.length < 3) {
+        const cold = await _kbColdStartFallback(best.query, jData.results);
         if (cold.length) {
           best.results = j.results.concat(cold.map(c => ({
             entry_id: c.id,
