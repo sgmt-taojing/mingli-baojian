@@ -37,6 +37,7 @@ h1{color:var(--gold);font-size:20px;margin-bottom:16px;text-align:center}
 @media(max-width:480px){.stat-num{font-size:18px}}
 @media(max-width:360px){.id-tab{padding:6px 10px;font-size:11px}}
 </style>
+  <link rel="stylesheet" href="css/mobile-nav.css">
 </head>
 <body>
 <a href="divination-hub.html" class="nav-back">← 返回首页</a>
@@ -70,5 +71,6 @@ c.innerHTML=h}).catch(function(e){c.innerHTML='<div class="card"><div class="car
 function renderF(){fj(API+'/api/person/'+uid+'/full').then(function(d){var u=d.user||{},ids=d.identities||[];var h='<div class="card"><div class="card-title">📋 统一档案</div><div class="info-grid">'+info('姓名',u.name||'')+info('身份',ids.join('/')||'无')+'</div></div>';if(d.yuanzhu)h+='<div class="card"><div class="card-title">🔮 缘主</div><div class="info-grid">'+info('日主',d.yuanzhu.day_master||'')+info('喜神',d.yuanzhu.xi_ele||'')+'</div></div>';if(d.medical)h+='<div class="card"><div class="card-title">💉 医疗 ('+(d.medical.cases||[]).length+'条)</div></div>';c.innerHTML=h})}
 render();
 </script>
+  <script src="js/mobile-nav.js" defer></script>
 </body>
 </html>
