@@ -366,4 +366,4 @@ window._MODULE_REPORTS.mingxiang = {
   }
 };
 
-console.log('✅ _MODULE_REPORTS extended (+9 modules: fengshui/qimen/ziwei/liuyao/meihua/liuren/yanzhi/wuxing/mingxiang = 23 total)');
+console.warn('✅ _MODULE_REPORTS extended (+9 modules: fengshui/qimen/ziwei/liuyao/meihua/liuren/yanzhi/wuxing/mingxiang = 23 total)');

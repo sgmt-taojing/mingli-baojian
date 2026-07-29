@@ -303,7 +303,7 @@
 
       // 附加 traceId
       const traceId = (global.crypto && crypto.randomUUID)
-        ? crypto.randomUUID() : ('t-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8));
+        ? crypto.randomUUID() : ('t-' + Date.now() + '-' + (Date.now().toString(36).slice(2, 8));
       const finalHeaders = Object.assign(
         {},
         (typeof headers === 'object' && !Array.isArray(headers)) ? headers : arrayHeadersToObject(headers),
@@ -554,7 +554,7 @@
     installXHRInterceptor();
     installAxiosStub();
     STATE.installed = true;
-    console.log('[error-interceptor] 已安装（fetch + XHR + $axios stub）');
+    console.warn('[error-interceptor] 已安装（fetch + XHR + $axios stub）');
     return true;
   }
 

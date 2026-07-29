@@ -94,7 +94,7 @@
       .then(function(r){ return r.json(); })
       .then(function(data){
         window.WANGZHEN_KB = parseKB(data);
-        console.log('[WANGZHEN_KB] 已加载', window.WANGZHEN_KB.stats.total, '条 · 分区', Object.keys(window.WANGZHEN_KB.zones).length, '· 五色', Object.keys(window.WANGZHEN_KB.colors).length, '· 五官模块', JSON.stringify(window.WANGZHEN_KB.stats.organModules));
+        console.warn('[WANGZHEN_KB] 已加载', window.WANGZHEN_KB.stats.total, '条 · 分区', Object.keys(window.WANGZHEN_KB.zones).length, '· 五色', Object.keys(window.WANGZHEN_KB.colors).length, '· 五官模块', JSON.stringify(window.WANGZHEN_KB.stats.organModules));
         // 派发事件
         window.dispatchEvent(new CustomEvent('wangzhen-kb-loaded', { detail: window.WANGZHEN_KB }));
       })
@@ -114,7 +114,7 @@
           if(xhr.status === 200){
             var data = JSON.parse(xhr.responseText);
             window.WANGZHEN_KB = parseKB(data);
-            console.log('[WANGZHEN_KB] XHR 加载', window.WANGZHEN_KB.stats.total, '条');
+            console.warn('[WANGZHEN_KB] XHR 加载', window.WANGZHEN_KB.stats.total, '条');
             window.dispatchEvent(new CustomEvent('wangzhen-kb-loaded', { detail: window.WANGZHEN_KB }));
           } else {
             console.warn('[WANGZHEN_KB] XHR 状态:', xhr.status);

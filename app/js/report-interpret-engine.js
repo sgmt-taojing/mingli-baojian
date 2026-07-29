@@ -372,6 +372,6 @@
     ORGAN_MAP: ORGAN_MAP
   };
 
-  console.log('[ReportInterpret] R249 统一报告解读引擎已加载', Object.keys(BIOCHEM_RANGES).length+'项生化指标', IMAGING_PATTERNS.length+'项影像模式');
+  console.warn('[ReportInterpret] R249 统一报告解读引擎已加载', Object.keys(BIOCHEM_RANGES).length+'项生化指标', IMAGING_PATTERNS.length+'项影像模式');
 
 })(window);

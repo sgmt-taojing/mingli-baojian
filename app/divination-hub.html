@@ -4645,7 +4645,7 @@ function fsProCompute(kind) {
     if (typeof fn === 'function') return fn();
     var outId = 'fs-pro-output-' + kind;
     var out = document.getElementById(outId);
-    var t = (typeof showToast === 'function') ? showToast : (typeof toast === 'function') ? toast : function (m) { console.log('[toast]', m); };
+    var t = (typeof showToast === 'function') ? showToast : (typeof toast === 'function') ? toast : function (m) { console.warn('[toast]', m); };
     t('【' + kind + '】风水计算已触发（轻量模式 · 完整功能请参考 fengshui.html）');
     if (out) {
       out.classList.remove('d-none');

@@ -339,7 +339,7 @@ function renderTcm(){
 
 /* ========== 初始化 ========== */
 showPanel(1);
-console.log('[master-elder] 周易大师端已加载 v0.1');
+console.warn('[master-elder] 周易大师端已加载 v0.1');
 
 // 暴露供测试
 window.__state = state;

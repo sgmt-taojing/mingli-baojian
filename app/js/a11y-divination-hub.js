@@ -69,7 +69,7 @@
       vs.setAttribute('aria-label', '语音声线选择');
     }
 
-    console.log('[a11y] divination-hub 增强完成：' + total + ' 个交互元素已绑键盘');
+    console.warn('[a11y] divination-hub 增强完成：' + total + ' 个交互元素已绑键盘');
   }
 
   // 延迟再补一次（voice-interaction.js 可能在 run() 之后才注入）
@@ -112,7 +112,7 @@
         });
       });
       if (added > 0) {
-        console.log('[a11y] MutationObserver 新增增强：' + added + ' 个');
+        console.warn('[a11y] MutationObserver 新增增强：' + added + ' 个');
       }
     });
     mo.observe(document.documentElement, { childList: true, subtree: true });

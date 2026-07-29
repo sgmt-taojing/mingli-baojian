@@ -1,6 +1,6 @@
 
 function scrollToTop(){window.scrollTo({top:0,behavior:'smooth'})}
-// console.log("易道智鉴 v2026.06.14.1400 - 快捷栏版");
+// console.warn("易道智鉴 v2026.06.14.1400 - 快捷栏版");
 // === 微信环境检测与适配 ===
 function detectWechat(){
   var ua=navigator.userAgent.toLowerCase();

@@ -136,7 +136,7 @@
         var _u = _qs.get('uid');
         if(_u) _currentUid = parseInt(_u, 10) || _currentUid;
       } catch(_){}
-      console.log('[PersonHub] autoBind uid=' + _currentUid + ' persons=' + persons.length);
+      console.warn('[PersonHub] autoBind uid=' + _currentUid + ' persons=' + persons.length);
       return _currentUid;
     } catch(e){ console.warn('[PersonHub] autoBind err:', e.message); return null; }
   }

@@ -100,7 +100,7 @@
       });
 
       this.attached = true;
-      console.log('[DeviceKbBridge] 已挂载到 DevicePlatform');
+      console.warn('[DeviceKbBridge] 已挂载到 DevicePlatform');
     },
 
     /**

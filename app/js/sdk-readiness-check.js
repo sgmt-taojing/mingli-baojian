@@ -169,7 +169,7 @@
     };
 
     // 输出报告
-    console.log('[R17-A SDK Readiness]', report);
+    console.warn('[R17-A SDK Readiness]', report);
     if (global.document && document.getElementById('sdk-readiness-host')) {
       renderReportUI(report);
     }

@@ -388,5 +388,5 @@
     getSummary,getCompleteness,
     openProfileWizard,saveProfileWizard,renderProfileWizardHTML
   };
-  console.log('✅ m1bj-user-profile.js v2 loaded (professional full fields)');
+  console.warn('✅ m1bj-user-profile.js v2 loaded (professional full fields)');
 })();

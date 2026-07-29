@@ -323,7 +323,7 @@ setInterval(async () => {
       if(j && j.code === 0 && j.data && j.data.items && j.data.items.length === 28) {
         DATA.length = 0;
         j.data.items.forEach(it => DATA.push(it));
-        console.log('[tongue28] KB 实时聚合:', DATA.length, '条 · 4 组', JSON.stringify(j.data.groupCount));
+        console.warn('[tongue28] KB 实时聚合:', DATA.length, '条 · 4 组', JSON.stringify(j.data.groupCount));
       } else {
         console.warn('[tongue28] API 返回异常,使用 fallback', j);
       }

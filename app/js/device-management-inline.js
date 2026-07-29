@@ -336,7 +336,7 @@ async function init() {
 
   setInterval(checkAllServices, 30000);
 
-  console.log('[DevicePlatform] 总设备数：' + allDevices.length, '桥接器：', Object.keys(platform.bridges).join(','));
+  console.warn('[DevicePlatform] 总设备数：' + allDevices.length, '桥接器：', Object.keys(platform.bridges).join(','));
 
   // R62: 设备 ↔ KB 联动桥（拍照/采集 → 自动 recordKbHit）
   if (window.DeviceKbBridge && typeof window.DeviceKbBridge.attach === 'function') {

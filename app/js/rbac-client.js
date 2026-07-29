@@ -92,7 +92,7 @@
     if (typeof global.showToast === 'function') {
       global.showToast(msg, type || 'info');
     } else {
-      console.log('[rbac-toast]', msg);
+      console.warn('[rbac-toast]', msg);
     }
   }
 

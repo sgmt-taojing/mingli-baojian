@@ -349,7 +349,7 @@ function wxAIReport(){
   try{var sx=document.getElementById('wxSex');if(sx)data.sex=sx.value;}catch(e){console.warn(e.message)}
   try{var hr=document.getElementById('wxHour');if(hr)data.hour=hr.value;}catch(e){console.warn(e.message)}
   ReportEngine.generate({module:mod,data:data,adapter:'wechat',container:out}).then(function(r){
-    console.log('[wechat] ReportEngine',r.source);
+    console.warn('[wechat] ReportEngine',r.source);
   }).catch(function(e){
     out.innerHTML='<div class="card-text" style="color:#f59e0b">⚠️ 生成失败：'+e.message+'</div>';
   });

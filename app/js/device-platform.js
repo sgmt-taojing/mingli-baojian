@@ -593,5 +593,5 @@
     global.__devicePlatform = new DevicePlatform();
   }
 
-  console.log('[DevicePlatform] 已加载 · 4 类桥接器（webmedia / bluetooth / usb / ar_glasses）');
+  console.warn('[DevicePlatform] 已加载 · 4 类桥接器（webmedia / bluetooth / usb / ar_glasses）');
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -898,4 +898,4 @@ window._MODULE_REPORTS = {
   }
 };
 
-console.log('✅ _MODULE_REPORTS loaded (32 modules KB-fallback: bazi/yunshi/caiyun/ganqing/zhongyi/mobile/shiye/xingming/zeri/huangli/taisui/music/lifeindex/lifeplan/tcm-fangji/tcm-classic/tcm-zhongfu/shanghan-lun/acupuncture/shuhan/wuxing/fengshui/qimen/ziwei/liuyao/meihua/liuren/yanzhi/mingxiang/monthly/lifeflow/lifeflowTimeline)');
+console.warn('✅ _MODULE_REPORTS loaded (32 modules KB-fallback: bazi/yunshi/caiyun/ganqing/zhongyi/mobile/shiye/xingming/zeri/huangli/taisui/music/lifeindex/lifeplan/tcm-fangji/tcm-classic/tcm-zhongfu/shanghan-lun/acupuncture/shuhan/wuxing/fengshui/qimen/ziwei/liuyao/meihua/liuren/yanzhi/mingxiang/monthly/lifeflow/lifeflowTimeline)');

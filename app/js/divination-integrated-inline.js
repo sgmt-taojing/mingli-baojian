@@ -1549,7 +1549,7 @@ function analyzeByDisease(){
 function showToast(msg){
   if(window.toast&&window.toast.show){window.toast.show(msg);}
   else if(window.__toastLegacy&&window.__toastLegacy.info){window.__toastLegacy.info(msg);}
-  else{console.log('[toast]',msg);}
+  else{console.warn('[toast]',msg);}
 }
 
 // ═══════════════════════════════════════════════

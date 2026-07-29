@@ -11,7 +11,7 @@
  *
  *   <script src="app/components/tab.js"></script>
  *   const tab = document.getElementById('mainTab');
- *   tab.addEventListener('tab-change', e => console.log('switched →', e.detail.index));
+ *   tab.addEventListener('tab-change', e => console.warn('switched →', e.detail.index));
  *   tab.setActive(2);  // 编程切换
  *
  * TYPICAL REFERENCE（来自 app/divination-integrated.html 内联实现）

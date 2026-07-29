@@ -73,7 +73,7 @@
           }
         }
         ls.setItem('_kb_recommend_date', today);
-        if (removed > 0) console.log('[kb-hot-strip] 重置 ' + removed + ' 个推荐计数 · 今日 ' + today);
+        if (removed > 0) console.warn('[kb-hot-strip] 重置 ' + removed + ' 个推荐计数 · 今日 ' + today);
       }
     } catch (e) {}
   }

@@ -1224,7 +1224,7 @@ function recommendNearbyTemplesH5() {
     lastTouchEnd = now;
   }, false);
 
-  // console.log('易道智鉴 · H5 v2026.06.27');
+  // console.warn('易道智鉴 · H5 v2026.06.27');
 })();
 
 // ═══ 年度预测推送 & 报告 ═══

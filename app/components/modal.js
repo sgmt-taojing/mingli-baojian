@@ -15,7 +15,7 @@
  *   const m = document.getElementById('myModal');
  *   m.open();
  *   m.close();
- *   m.addEventListener('close', e => console.log('closed', e.detail));
+ *   m.addEventListener('close', e => console.warn('closed', e.detail));
  *
  *   <!-- 旧代码兼容（不改源码） -->
  *   <script src="app/components/modal.js"></script>

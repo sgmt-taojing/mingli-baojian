@@ -10,7 +10,7 @@
  *   </ml-accordion>
  *
  *   const acc = document.getElementById('faqAccordion');
- *   acc.addEventListener('item-toggle', e => console.log('toggled:', e.detail.index));
+ *   acc.addEventListener('item-toggle', e => console.warn('toggled:', e.detail.index));
  *
  * ATTRIBUTES（ml-accordion）
  * ━━━━━━━━━━━━━━━━━━━━━━━━

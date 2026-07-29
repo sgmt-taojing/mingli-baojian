@@ -1893,7 +1893,7 @@ function buildConclusion(opts) {
 /* ===== Extracted from divination-knowledge.html ===== */
 
 
-  console.log('✅ _MODULE_REPORTS 外部化（js/module-reports-kb.js · 14 模块）');
+  console.warn('✅ _MODULE_REPORTS 外部化（js/module-reports-kb.js · 14 模块）');
 
 
 /* ===== Extracted from divination-knowledge.html ===== */

@@ -2472,7 +2472,7 @@ function getKBSymptoms(){
   window.TCM_FAMOUS_FORMULAS_KB = window.TCM_FAMOUS_FORMULAS_KB || {};
 
   // ─── 初始化 ───
-  console.log('[tcm-consult] 中医健康咨询深度模块已加载');
+  console.warn('[tcm-consult] 中医健康咨询深度模块已加载');
 
 })();
 /* ===== R37-A tcm-clinic 事业维度引擎 ===== */

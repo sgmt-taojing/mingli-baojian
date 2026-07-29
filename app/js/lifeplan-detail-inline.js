@@ -87,7 +87,7 @@ function generate(){
             adapter:'inline',
             container:container
           }).then(function(r){
-            console.log('[lifeplan] ReportEngine done',r.source);
+            console.warn('[lifeplan] ReportEngine done',r.source);
           }).catch(function(e){
             container.innerHTML='<div style="padding:20px;color:#f59e0b">⚠️ AI 分析失败：'+e.message+'</div>';
           });

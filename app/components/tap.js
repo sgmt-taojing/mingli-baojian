@@ -13,7 +13,7 @@
  *
  *   // 高级（自动收集 stats）
  *   const t = document.querySelector('ml-tap');
- *   t.addEventListener('tap', (e) => console.log('tapped', e.detail));
+ *   t.addEventListener('tap', (e) => console.warn('tapped', e.detail));
  *
  * ATTRIBUTES
  * ━━━━━━━━━━
@@ -218,7 +218,7 @@
     setTimeout(function () {
       var allDivs = document.querySelectorAll('div[onclick]');
       var mlTaps = document.querySelectorAll('ml-tap');
-      console.log('[ml-tap] 扫描报告: ' + allDivs.length + ' 个 div[onclick] 假按钮 / ' + mlTaps.length + ' 个 <ml-tap> 真按钮');
+      console.warn('[ml-tap] 扫描报告: ' + allDivs.length + ' 个 div[onclick] 假按钮 / ' + mlTaps.length + ' 个 <ml-tap> 真按钮');
       if (window.MLBJ_TAP_STATS) {
         window.MLBJ_TAP_STATS({ divCount: allDivs.length, mlTapCount: mlTaps.length });
       }

@@ -166,6 +166,6 @@ self.addEventListener('message', event => {
 // ================================================================
 self.addEventListener('sync', event => {
   if (event.tag === 'sync-reports') {
-    console.log('[SW] sync-reports triggered (offline queue replay placeholder)');
+    console.warn('[SW] sync-reports triggered (offline queue replay placeholder)');
   }
 });

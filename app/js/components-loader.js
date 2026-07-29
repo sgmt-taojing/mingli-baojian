@@ -37,7 +37,7 @@ async function tryImport(spec){
   __loaded.add(spec);
   try {
     await import(spec);
-    console.log('[ml-loader] ✓ loaded:', spec);
+    console.warn('[ml-loader] ✓ loaded:', spec);
   } catch (e){
     console.error('[ml-loader] ✗ failed to import', spec, e);
   }
@@ -174,5 +174,5 @@ async function tryImport(spec){
   window.ml = ml;
   window.ML_COMPONENTS_READY = true;
   document.dispatchEvent(new CustomEvent('ml:ready', { detail: ml }));
-  console.log('[ml-loader] ✓ all components registered; window.ml ready');
+  console.warn('[ml-loader] ✓ all components registered; window.ml ready');
 })();

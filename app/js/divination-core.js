@@ -27890,7 +27890,7 @@ try { window.computeSingleMemberPaipan = computeSingleMemberPaipan; } catch(e){c
 try { window.computeFamilyPaipan = computeFamilyPaipan; } catch(e){console.warn(e.message)}
 try { window.generateFamilyHuajie = generateFamilyHuajie; } catch(e){console.warn(e.message)}
 
-//console.log('[引擎] 排盘函数全局暴露完成');
+//console.warn('[引擎] 排盘函数全局暴露完成');
 
 // ================================================================
 //  人生规划引擎 (Life Plan Engine)

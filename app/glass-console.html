@@ -1233,7 +1233,7 @@ refreshStatus();
 fetch('/api/csrf-token').then(r => r.json()).then(d => {
   if (d.csrfToken) {
     State.csrfToken = d.csrfToken;
-    console.log('[CSRF] 已获取 token:', d.csrfToken.slice(0, 12) + '...');
+    console.warn('[CSRF] 已获取 token:', d.csrfToken.slice(0, 12) + '...');
   }
 }).catch(e => console.warn('[CSRF] 获取失败：', e.message));
 $('#btnRefreshLive').onclick = () => {

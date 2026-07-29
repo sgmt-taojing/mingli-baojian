@@ -767,7 +767,7 @@
       if (typeof global.toast === 'function') { global.toast(msg); return; }
       if (typeof global.showToast === 'function') { global.showToast(msg); return; }
     } catch (e) {}
-    console.log('[ReportEngine]', msg);
+    console.warn('[ReportEngine]', msg);
   }
 
   /**
