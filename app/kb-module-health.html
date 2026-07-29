@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KB 模块健康看板 · 命理宝鉴</title>
+<meta name="description" content="KB 77 模块 × 8 指标综合健康评分 — trust / 命中率 / 死库存 / 时新度 / 内容深度">
+<link rel="stylesheet" href="css/divination-hub.css">
+<link rel="stylesheet" href="css/utility-classes.css">
+<link rel="stylesheet" href="css/mobile-nav.css">
+<style>
+:root{--gold:#c9a84c;--gold-dim:#a88c3a;--ink:#0d1117;--paper:#1a1f2e;--card:#222838;--border:#333a4d}
+body{background:var(--ink);color:#e0d8c8;font-family:system-ui,-apple-system,sans-serif;margin:0;padding:0}
+.wrap{max-width:1280px;margin:0 auto;padding:20px}
+h1{font-size:1.6rem;color:var(--gold);text-align:center;margin:20px 0 4px}
+.sub{text-align:center;color:#888;font-size:.9rem;margin-bottom:20px}
+
+/* Summary */
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px}
+.s-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;text-align:center}
+.s-card .val{font-size:1.8rem;font-weight:700;color:var(--gold)}
+.s-card .lbl{font-size:.75rem;color:#888;margin-top:2px}
+.s-card .grade-bar{display:flex;height:6px;border-radius:3px;overflow:hidden;margin-top:8px}
+.s-card .grade-bar div{height:100%}
+.g-S{background:#ffd700}.g-A{background:#7ec47e}.g-B{background:#6a9fd8}.g-C{background:#d49a6a}.g-D{background:#d46a6a}
+
+/* Filters */
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.filters input,.filters select{background:var(--card);border:1px solid var(--border);color:#e0d8c8;padding:6px 10px;border-radius:6px;font-size:.85rem}
+.filters label{color:#888;font-size:.8rem}
+.filters .search{flex:1;min-width:160px}
+
+/* Health Matrix Table */
+.matrix{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.matrix-head{display:grid;grid-template-columns:160px 70px 80px 70px 70px 70px 70px 80px 80px;background:#1a1f2e;padding:10px;font-size:.78rem;color:var(--gold-dim);font-weight:600;border-bottom:1px solid var(--border)}
+.matrix-row{display:grid;grid-template-columns:160px 70px 80px 70px 70px 70px 70px 80px 80px;padding:10px;border-bottom:1px solid #2a2f3e;align-items:center;font-size:.85rem;transition:background .15s}
+.matrix-row:hover{background:#2a2f3e}
+.matrix-row.dead-stock{background:#3a1f1f}
+.matrix-row.dead-stock:hover{background:#4a2a2a}
+.cell-mod{color:#e0d8c8;font-weight:500;cursor:pointer}
+.cell-mod:hover{color:var(--gold)}
+.cell-num{text-align:right;color:#ccc}
+.cell-trust{text-align:right;font-weight:600}
+.cell-dead{text-align:right}
+.cell-dead.warn{color:#d49a6a}
+.cell-dead.bad{color:#d46a6a;font-weight:700}
+.health-bar{height:8px;background:#333;border-radius:4px;overflow:hidden;position:relative}
+.health-bar div{height:100%;border-radius:4px}
+.health-bar .label{position:absolute;top:0;left:0;right:0;text-align:center;font-size:.65rem;font-weight:700;line-height:8px;color:#000}
+.badge{display:inline-block;padding:1px 6px;border-radius:4px;font-size:.7rem;font-weight:600;color:#000}
+.b-S{background:#ffd700}.b-A{background:#7ec47e}.b-B{background:#6a9fd8}.b-C{background:#d49a6a}.b-D{background:#d46a6a;color:#fff}
+
+/* Refresh + Export */
+.refresh{position:fixed;bottom:20px;right:20px;width:48px;height:48px;border-radius:50%;background:var(--gold);border:none;color:var(--ink);font-size:1.3rem;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3);z-index:10}
+.refresh:hover{opacity:.85}
+.export-btn{position:fixed;bottom:20px;right:78px;padding:10px 16px;background:var(--card);border:1px solid var(--gold-dim);border-radius:8px;color:var(--gold);font-size:.85rem;cursor:pointer;z-index:10}
+.export-btn:hover{background:var(--gold);color:var(--ink)}
+
+.legend{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:16px;font-size:.78rem;color:#aaa;line-height:1.6}
+.legend b{color:var(--gold)}
+
+@media(max-width:768px){
+  .matrix-head,.matrix-row{grid-template-columns:120px 50px 60px 60px 60px 60px 60px 70px 70px;font-size:.72rem}
+  .summary{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🩺 KB 模块健康看板</h1>
+  <p class="sub">77 模块 × trust × 命中率 × 死库存 × 时新度 × 内容深度 · 综合健康评分</p>
+
+  <div id="summary" class="summary"></div>
+
+  <div class="filters">
+    <label>搜索：<input id="f-search" class="search" placeholder="模块名…" /></label>
+    <label>等级：<select id="f-grade"><option value="">全部</option><option>S (≥90)</option><option>A (80-89)</option><option>B (70-79)</option><option>C (60-69)</option><option>D (<60)</option></select></label>
+    <label>排序：<select id="f-sort">
+      <option value="health_desc">健康分 ↓</option>
+      <option value="health_asc">健康分 ↑</option>
+      <option value="trust_desc">信任分 ↓</option>
+      <option value="hits_desc">总命中 ↓</option>
+      <option value="dead_desc">死库存% ↓</option>
+      <option value="cnt_desc">条数 ↓</option>
+    </select></label>
+    <label><input type="checkbox" id="f-dead" /> 仅死库存 ≥50%</label>
+  </div>
+
+  <div class="matrix">
+    <div class="matrix-head">
+      <div>模块</div>
+      <div style="text-align:right">条数</div>
+      <div style="text-align:right">信任分</div>
+      <div style="text-align:right">总命中</div>
+      <div style="text-align:right">死%</div>
+      <div style="text-align:right">短内容</div>
+      <div style="text-align:right">天龄</div>
+      <div style="text-align:right">健康分</div>
+      <div>等级</div>
+    </div>
+    <div id="rows"></div>
+  </div>
+
+  <div class="legend">
+    <b>健康评分公式</b>：trust × 40 + 命中 × 25 + 时新 × 15 + 内容深度 × 10 - 死库存惩罚 × 10<br>
+    <b>等级</b>：S ≥90 / A 80-89 / B 70-79 / C 60-69 / D <60<br>
+    <b>死库存</b>：hit_count = 0 的条目（从未被检索过）<br>
+    <b>时新</b>：距离 updated_at 越近分越高，每 2 天扣 1 分<br>
+    <b>命中</b>：log10(avg_hits) × 30（最多 100）<br>
+    <b>深度</b>：avg_len / 4（最多 100）<br>
+    <b>死% 红色警告</b>：死库存比例 ≥80% — 提示 KB 膨胀污染
+  </div>
+</div>
+
+<button class="refresh" onclick="load()" title="刷新">↻</button>
+<button class="export-btn" onclick="exportCSV()">📥 CSV</button>
+
+<script src="js/mobile-nav.js" defer></script>
+<script>
+const API = 'http://localhost:8920/api/public/kb/module-health';
+let DATA = null;
+
+function grade(score){
+  if(score >= 90) return 'S';
+  if(score >= 80) return 'A';
+  if(score >= 70) return 'B';
+  if(score >= 60) return 'C';
+  return 'D';
+}
+function gradeColor(g){
+  return {S:'#ffd700',A:'#7ec47e',B:'#6a9fd8',C:'#d49a6a',D:'#d46a6a'}[g];
+}
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+async function load(){
+  try {
+    const r = await fetch(API);
+    const j = await r.json();
+    DATA = j.data;
+    render();
+  } catch(e){
+    document.getElementById('rows').innerHTML = '<div style="padding:20px;color:#d46a6a;text-align:center">⚠️ 加载失败：'+esc(e.message)+'<br><small>请确认 8920 端口服务已启动</small></div>';
+  }
+}
+
+function render(){
+  if(!DATA) return;
+  const s = DATA.summary;
+  document.getElementById('summary').innerHTML = `
+    <div class="s-card"><div class="val">${s.total_modules}</div><div class="lbl">模块总数</div></div>
+    <div class="s-card"><div class="val">${s.total_entries.toLocaleString()}</div><div class="lbl">知识条目</div></div>
+    <div class="s-card"><div class="val" style="color:${s.dead_pct >= 80 ? '#d46a6a' : '#d49a6a'}">${s.dead_pct}%</div><div class="lbl">死库存率</div></div>
+    <div class="s-card"><div class="val">${s.avg_health}</div><div class="lbl">平均健康分</div></div>
+    <div class="s-card">
+      <div class="val">${s.grades.S + s.grades.A + s.grades.B + s.grades.C + s.grades.D}</div>
+      <div class="lbl">等级分布</div>
+      <div class="grade-bar" title="S/A/B/C/D 分布">
+        <div class="g-S" style="width:${s.grades.S / s.total_modules * 100}%"></div>
+        <div class="g-A" style="width:${s.grades.A / s.total_modules * 100}%"></div>
+        <div class="g-B" style="width:${s.grades.B / s.total_modules * 100}%"></div>
+        <div class="g-C" style="width:${s.grades.C / s.total_modules * 100}%"></div>
+        <div class="g-D" style="width:${s.grades.D / s.total_modules * 100}%"></div>
+      </div>
+    </div>
+  `;
+
+  applyFilter();
+}
+
+function applyFilter(){
+  if(!DATA) return;
+  const search = document.getElementById('f-search').value.toLowerCase();
+  const gradeFilter = document.getElementById('f-grade').value;
+  const sortKey = document.getElementById('f-sort').value;
+  const onlyDead = document.getElementById('f-dead').checked;
+
+  let mods = DATA.modules.slice();
+
+  // Filter
+  if(search) mods = mods.filter(m => m.module.toLowerCase().includes(search));
+  if(gradeFilter) {
+    const g = gradeFilter[0];
+    mods = mods.filter(m => grade(m.health_score) === g);
+  }
+  if(onlyDead) mods = mods.filter(m => m.dead_pct >= 50);
+
+  // Sort
+  const sortFn = {
+    health_desc: (a,b) => b.health_score - a.health_score,
+    health_asc:  (a,b) => a.health_score - b.health_score,
+    trust_desc:  (a,b) => b.avg_trust - a.avg_trust,
+    hits_desc:   (a,b) => b.total_hits - a.total_hits,
+    dead_desc:   (a,b) => b.dead_pct - a.dead_pct,
+    cnt_desc:    (a,b) => b.cnt - a.cnt,
+  }[sortKey] || ((a,b) => b.health_score - a.health_score);
+  mods.sort(sortFn);
+
+  // Render
+  document.getElementById('rows').innerHTML = mods.map(m => {
+    const g = grade(m.health_score);
+    const deadClass = m.dead_pct >= 80 ? 'bad' : (m.dead_pct >= 50 ? 'warn' : '');
+    const rowClass = m.dead_pct >= 80 ? 'dead-stock' : '';
+    return `
+      <div class="matrix-row ${rowClass}">
+        <div class="cell-mod" title="点击复制">${esc(m.module)}</div>
+        <div class="cell-num">${m.cnt}</div>
+        <div class="cell-trust" style="color:${m.avg_trust >= 0.85 ? '#7ec47e' : (m.avg_trust >= 0.8 ? '#7ab8d4' : '#d49a6a')}">${m.avg_trust.toFixed(3)}</div>
+        <div class="cell-num">${m.total_hits.toLocaleString()}</div>
+        <div class="cell-dead ${deadClass}">${m.dead_pct}%</div>
+        <div class="cell-num">${m.short_cnt}</div>
+        <div class="cell-num" style="color:${m.age_days > 30 ? '#d49a6a' : '#ccc'}">${m.age_days}d</div>
+        <div class="cell-num">
+          <div class="health-bar"><div style="width:${m.health_score}%;background:${gradeColor(g)}"></div><div class="label">${m.health_score}</div></div>
+        </div>
+        <div><span class="badge b-${g}">${g}</span></div>
+      </div>
+    `;
+  }).join('');
+
+  if(!mods.length) {
+    document.getElementById('rows').innerHTML = '<div style="padding:30px;text-align:center;color:#888">无匹配模块</div>';
+  }
+}
+
+document.getElementById('f-search').addEventListener('input', applyFilter);
+document.getElementById('f-grade').addEventListener('change', applyFilter);
+document.getElementById('f-sort').addEventListener('change', applyFilter);
+document.getElementById('f-dead').addEventListener('change', applyFilter);
+
+function exportCSV(){
+  if(!DATA) return;
+  const rows=[['module','cnt','avg_trust','min_trust','max_trust','total_hits','dead_pct','short_cnt','avg_len','age_days','health_score','grade']];
+  DATA.modules.forEach(m=>rows.push([m.module,m.cnt,m.avg_trust,m.min_trust,m.max_trust,m.total_hits,m.dead_pct,m.short_cnt,m.avg_len,m.age_days,m.health_score,grade(m.health_score)]));
+  const csv='\ufeff'+rows.map(r=>r.map(c=>`"${(c+'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`kb-module-health-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+load();
+</script>
+</body>
+</html>
