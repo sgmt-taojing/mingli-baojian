@@ -537,6 +537,30 @@
         <button class="btn btn-ghost" onclick="wangzhenClinical.speakText('诊断完成，请查看报告')">🔊 语音播报</button>
       </div>
     </div>
+    <!-- 四诊合参·面舌联动 -->
+    <div class="wz-card">
+      <div class="wz-card-title">🎯 四诊合参·面舌联动 <span class="badge" id="wz-fusion-badge">待分析</span></div>
+      <div id="wz-fusion-panel" style="padding:10px">
+        <div style="font-size:12px;color:var(--wz-paper3);line-height:1.8">
+          <p>📌 <b>面诊+舌诊联动诊断</b>：面色+舌象综合分析提高准确率</p>
+          <div id="wz-fusion-result" style="margin-top:8px;padding:10px;border:1px solid var(--wz-border);border-radius:8px;background:rgba(0,0,0,.2);display:none">
+            <div id="wz-fusion-content"></div>
+          </div>
+          <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="runFaceTongueFusion()">🔄 面舌联动分析</button>
+            <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="searchKbCases('舌诊案例 辨证论治')">📚 KB案例推荐</button>
+            <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="searchKbCases('四诊合参 望闻问切')">📖 四诊合参知识</button>
+            <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="searchKbCases('28种病理舌象')">👅 28舌象查询</button>
+            <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="searchKbCases('面诊 面部脏腑对应')">👁️ 面诊分区</button>
+            <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="searchKbCases('目诊 五脏六腑')">👁️ 目诊</button>
+            <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="searchKbCases('四诊仪 数据采集')">⌚ 四诊仪规范</button>
+            <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="searchKbCases('误诊 鉴别 染苔')">⚠️ 误诊鉴别</button>
+          </div>
+          <div id="wz-kb-cases" style="margin-top:8px"></div>
+        </div>
+      </div>
+    </div>
+
     <div class="wz-card">
       <div class="wz-card-title">📋 望诊历史</div>
       <div id="wangzhen-history-2"></div>
@@ -602,6 +626,68 @@
 </script>
 
 <script src="js/multimodal-fusion.js" defer></script>
-  <script src="js/mobile-nav.js" defer></script>
+  <script src="js/mobile-nav.js" defer>
+// 四诊合参·面舌联动
+function runFaceTongueFusion(){
+  var resultDiv = document.getElementById('wz-fusion-result');
+  var contentDiv = document.getElementById('wz-fusion-content');
+  var badge = document.getElementById('wz-fusion-badge');
+  badge.textContent = '分析中...';
+  
+  if(window.MultimodalFusion){
+    var faceData = window.wangzhenClinical ? (window.wangzhenClinical.lastFaceResult || null) : null;
+    var tongueData = window.wangzhenClinical ? (window.wangzhenClinical.lastTongueResult || null) : null;
+    
+    if(!faceData && !tongueData){
+      contentDiv.innerHTML = '<p>请先采集面色和舌象照片，再进行联动分析。</p>';
+      resultDiv.style.display = 'block';
+      badge.textContent = '待采集';
+      return;
+    }
+    
+    var result = MultimodalFusion.fuse(faceData, tongueData, null);
+    contentDiv.innerHTML = 
+      '<p>📊 综合分析：'+result.summary+'</p>'+
+      '<p>🎯 置信度：'+(result.confidence*100).toFixed(0)+'%</p>'+
+      (result.priorities.length>0?'<p>⚠️ 首要关注：'+result.priorities[0].organ+' '+result.priorities[0].issue+'</p>':'')+
+      (result.priorities.length>1?'<p>其次：'+result.priorities[1].organ+' '+result.priorities[1].issue+'</p>':'');
+    resultDiv.style.display = 'block';
+    badge.textContent = '已分析';
+    badge.style.background = 'rgba(46,204,113,.15)';
+    badge.style.color = '#27ae60';
+  } else {
+    contentDiv.innerHTML = '<p>融合诊断模块未加载。</p>';
+    resultDiv.style.display = 'block';
+    badge.textContent = '模块缺失';
+  }
+}
+
+function searchKbCases(query){
+  var casesDiv = document.getElementById('wz-kb-cases');
+  var API = (location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+  casesDiv.innerHTML = '<div style="font-size:11px;color:var(--wz-paper3)">搜索中...</div>';
+  
+  fetch(API+'/api/public/kb/search-fts?q='+encodeURIComponent(query)+'&limit=5')
+    .then(r=>r.json())
+    .then(d=>{
+      var data = d.data || d;
+      var results = data.results || [];
+      if(results.length === 0){
+        casesDiv.innerHTML = '<div style="font-size:11px;color:#888">未找到相关案例</div>';
+        return;
+      }
+      casesDiv.innerHTML = results.map(function(r){
+        return '<div style="margin-top:6px;padding:8px;border:1px solid var(--wz-border);border-radius:6px;background:rgba(0,0,0,.15)">'+
+        '<div style="font-size:12px;color:var(--wz-gold);font-weight:600">【'+(r.entry_id||'')+'】'+(r.title||'')+'</div>'+
+        '<div style="font-size:10px;color:var(--wz-paper3);margin-top:2px">'+(r.snippet||'').substring(0,150)+'</div>'+
+        '<div style="font-size:9px;color:#555;margin-top:2px">trust='+(r.trust_score||0)+' · '+(r._watermark||'')+'</div>'+
+        '</div>';
+      }).join('');
+    })
+    .catch(function(e){
+      casesDiv.innerHTML = '<div style="font-size:11px;color:#c0392b">搜索失败: '+e.message+'</div>';
+    });
+}
+</script>
 </body>
 </html>
