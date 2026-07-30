@@ -57,13 +57,16 @@ function handleLogin(e){
   btn.textContent = '登录中...';
   setTimeout(function(){
     // R304 P0: 占位 — 正式版对接微信API
-    alert('登录功能即将上线，请先返回首页浏览（占位页）');
+    showToast('登录功能即将上线，请先返回首页浏览（占位页）', 'info');
     btn.disabled = false;
     btn.textContent = '登 录';
     window.location.href = 'divination-hub.html';
   }, 1000);
   return false;
 }
+
+function showToast(msg, type){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:'+(type==='error'?'#c1452b':type==='success'?'#27a745':'#c9a227')+';color:#fff;padding:12px 20px;border-radius:8px;z-index:99999;font-size:14px';document.body.appendChild(t);setTimeout(function(){t.remove()},2000);}
+
 </script>
 </body>
 </html>

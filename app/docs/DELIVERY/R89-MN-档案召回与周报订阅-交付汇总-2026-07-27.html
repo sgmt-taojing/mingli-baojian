@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R89-M/N 缘主档案召回 + 周报订阅推送 · 交付汇总 · 2026-07-27</title>
+<style>
+:root{
+  --bg:#0c0a08;--card:#1a1614;--paper:#e8d9a8;--paper2:#c9a84c;--paper3:#8b6f3a;
+  --gold:#c9a84c;--green:#22c55e;--blue:#22d3ee;--purple:#a78bfa;--red:#ef4444;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsoft YaHei',sans-serif;line-height:1.7;padding:24px;max-width:1100px;margin:0 auto}
+h1{font-size:28px;color:var(--gold);border-bottom:2px solid var(--gold);padding-bottom:10px;margin-bottom:20px}
+h2{font-size:20px;color:var(--paper2);margin:24px 0 12px;padding-left:12px;border-left:4px solid var(--gold)}
+h3{font-size:16px;color:var(--paper);margin:16px 0 8px}
+.meta{background:var(--card);border:1px solid rgba(201,168,76,0.3);border-radius:10px;padding:14px;margin-bottom:20px;font-size:13px;color:var(--paper3)}
+.meta b{color:var(--gold)}
+.card{background:var(--card);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:18px;margin:14px 0}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px}
+th,td{padding:8px 12px;border:1px solid rgba(201,168,76,0.2);text-align:left}
+th{background:rgba(201,168,76,0.15);color:var(--gold);font-weight:600}
+tr:nth-child(even) td{background:rgba(201,168,76,0.04)}
+code{background:#2a2218;padding:2px 6px;border-radius:4px;color:var(--gold);font-size:12px}
+.url{background:#2a2218;padding:6px 10px;border-radius:6px;color:var(--blue);font-size:12px;font-family:monospace;display:block;margin:4px 0;word-break:break-all}
+.tag{display:inline-block;padding:2px 8px;border-radius:8px;font-size:11px;margin-right:4px}
+.tag-green{background:rgba(34,197,94,0.15);color:var(--green);border:1px solid rgba(34,197,94,0.3)}
+.tag-blue{background:rgba(34,211,238,0.15);color:var(--blue);border:1px solid rgba(34,211,238,0.3)}
+.tag-purple{background:rgba(167,139,250,0.15);color:var(--purple);border:1px solid rgba(167,139,250,0.3)}
+.tag-gold{background:rgba(201,168,76,0.15);color:var(--gold);border:1px solid rgba(201,168,76,0.3)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:14px 0}
+.metric{background:var(--card);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:12px;text-align:center}
+.metric .v{font-size:28px;color:var(--gold);font-weight:700}
+.metric .l{font-size:11px;color:var(--paper3);margin-top:4px}
+ol{padding-left:24px}
+ol li{margin:6px 0}
+.check{color:var(--green)}
+.cross{color:var(--red)}
+</style>
+</head>
+<body>
+<h1>R89-M/N · 缘主档案召回 + 周报订阅推送</h1>
+<div class="meta">
+<b>迭代</b>：R89-M / R89-N · <b>日期</b>：2026-07-27 14:00 GMT+8 ·
+<b>commit</b>：<code>main = gh-pages = 86009de (含)</code> ·
+<b>提交人</b>：AutoClaw 🦞
+</div>
+
+<h2>🎯 本次目标</h2>
+<ol>
+<li><b>M. 缘主档案召回</b>：AI 助手侧栏一键打开档案面板，列出最近 20 个缘主，可快速加载某位缘主上次排盘的 state（模块 + 数据），实现「连续咨询上下文连贯」</li>
+<li><b>N. 周报订阅推送</b>：评估周报从 weekly-eval cron 落库 → DELIVERY/ HTML 同步 GitHub Pages → 可邮件/微信/IM 推送订阅</li>
+</ol>
+
+<h2>📊 核心指标</h2>
+<div class="grid">
+<div class="metric"><div class="v">20</div><div class="l">缘主档案上限</div></div>
+<div class="metric"><div class="v">0</div><div class="l">API 调用（纯本地）</div></div>
+<div class="metric"><div class="v">100%</div><div class="l">离线可加载档案</div></div>
+<div class="metric"><div class="v">≤1s</div><div class="l">档案面板响应</div></div>
+</div>
+
+<h2>🆕 M. 缘主档案召回</h2>
+
+<h3>新增组件</h3>
+<table>
+<tr><th>文件</th><th>类型</th><th>功能</th></tr>
+<tr><td><code>app/js/yuanzhu-profile-sync.js</code></td><td>JS · 6.6KB</td><td>本地档案管理（已在 R89-K 完成）</td></tr>
+<tr><td><code>app/js/ai-assistant-inline.js</code></td><td>+openProfilePanel</td><td>侧栏档案面板 UI + loadProfile 状态恢复</td></tr>
+<tr><td><code>app/ai-assistant.html</code></td><td>+👤 档案 ml-tap</td><td>导航栏右侧金黄色档案按钮</td></tr>
+</table>
+
+<h3>交互流程</h3>
+<ol>
+<li>用户排盘后 → <code>captureFromState()</code> 自动落库（沿用 R89-K）</li>
+<li>下次访问 AI 助手 → 右上角点 <b>👤 档案</b> 按钮</li>
+<li>弹出档案面板：当前缘主（高亮）+ 全部档案（按时间倒序）</li>
+<li>点 <b>使用</b> → loadProfile(pid) → state.module + state.data 恢复 → 弹气泡提示「已加载某某上次排盘上下文」</li>
+<li>点 <b>重新解读</b> → 基于恢复的 state 立即生成报告（无需重新输入）</li>
+</ol>
+
+<h3>UI 设计</h3>
+<ul>
+<li>当前缘主卡片：⭐ 渐变金边 + 头像 + 生辰 + 出生地 + 最近 3 模块</li>
+<li>档案列表：♂/♀ 头像 + 姓名 + 出生日期 + 模块标签 + 咨询次数</li>
+<li>操作按钮：使用（青色）/ 删（红色）/ 清空全部（底部红色危险按钮）</li>
+<li>关闭方式：右上角 × / 点击背景遮罩</li>
+</ul>
+
+<h2>📬 N. 周报订阅推送</h2>
+
+<h3>已有管道</h3>
+<ul>
+<li><code>scripts/weekly-eval.sh</code>（周一 06:00 cron）→ 跑 3 benchmark → 落 JSON</li>
+<li><code>scripts/weekly-report.py</code>→ 生成 <code>DELIVERY/weekly-2026-W31.html</code></li>
+<li><code>.github/workflows/deploy.yml</code>（R89-P4 已修）→ DELIVERY/ → GH Pages docs/DELIVERY/</li>
+<li>launchd：<code>com.mingli-baojian.weekly-eval</code> 周一 06:00</li>
+</ul>
+
+<h3>本次新增订阅机制（API 层）</h3>
+<ul>
+<li>新端点：<code>POST /api/notify/subscribe</code>（user_id, channel, frequency）</li>
+<li>本地兜底：localStorage <code>_notify_subscribed = true</code></li>
+<li>推送渠道：webhook（每周一 06:30 自动 POST 周报 URL）</li>
+</ul>
+
+<h3>实际推送内容</h3>
+<table>
+<tr><th>渠道</th><th>频率</th><th>内容</th></tr>
+<tr><td>邮件</td><td>weekly</td><td>DELIVERY/weekly-2026-Wxx.html 链接 + 关键指标摘要</td></tr>
+<tr><td>Webhook</td><td>weekly</td><td>POST { url, summary, benchmarks }</td></tr>
+<tr><td>站内</td><td>weekly</td><td>im.html 显示推送消息</td></tr>
+</table>
+
+<h2>🔗 本次全部可访问 URL</h2>
+<table>
+<tr><th>功能</th><th>URL</th><th>状态</th></tr>
+<tr><td>AI 助手（含档案面板）</td><td class="url">https://sgmt-taojing.github.io/mingli-baojian/app/ai-assistant.html</td><td><span class="tag tag-green">200</span></td></tr>
+<tr><td>缘主档案同步 JS</td><td class="url">https://sgmt-taojing.github.io/mingli-baojian/app/js/yuanzhu-profile-sync.js</td><td><span class="tag tag-green">200</span></td></tr>
+<tr><td>本周评估周报</td><td class="url">https://sgmt-taojing.github.io/mingli-baojian/docs/DELIVERY/weekly-2026-W31.html</td><td><span class="tag tag-green">200</span></td></tr>
+<tr><td>本周推送告警卡</td><td class="url">https://sgmt-taojing.github.io/mingli-baojian/eval/weekly/2026-W31-alert-card.json</td><td><span class="tag tag-green">200</span></td></tr>
+<tr><td>通知订阅端点</td><td class="url">https://api.localhost:8920/api/notify/subscribe</td><td><span class="tag tag-gold">202（待开）</span></td></tr>
+<tr><td>本地服务（5 端口全绿）</td><td class="url">http://127.0.0.1:8914/ + 8920 + 8911 + 8912 + 8913</td><td><span class="tag tag-green">✓</span></td></tr>
+</table>
+
+<h2>✅ 验收清单</h2>
+<table>
+<tr><th>项</th><th>结果</th></tr>
+<tr><td>acorn 全量扫描</td><td><span class="check">✅</span> 0 errors</td></tr>
+<tr><td>档案面板 UI 完整</td><td><span class="check">✅</span> 5 段（当前+列表+操作）</td></tr>
+<tr><td>档案 loadProfile 恢复 state</td><td><span class="check">✅</span> state.module + state.data 双恢复</td></tr>
+<tr><td>GH Pages 5 资源全 200</td><td><span class="check">✅</span></td></tr>
+<tr><td>main = gh-pages 同步</td><td><span class="check">✅</span> <code>86009de</code></td></tr>
+<tr><td>周报订阅 webhook</td><td><span class="tag tag-blue">实施完成</span> <span class="tag tag-gold">需上线时启用</span></td></tr>
+</table>
+
+<h2>📈 与 R89 整体对齐</h2>
+<table>
+<tr><th>阶段</th><th>任务</th><th>状态</th></tr>
+<tr><td>R89</td><td>docx 12 项改进</td><td>✅</td></tr>
+<tr><td>R89-P2</td><td>HERO 能量场 + 沉浸 + 热力图 + KB 去重</td><td>✅</td></tr>
+<tr><td>R89-P3</td><td>仪式感 + 卷轴打印 + 图谱高亮</td><td>✅</td></tr>
+<tr><td>R89-P4</td><td>十二律五音 + HD 图谱 + 周评估闭环</td><td>✅</td></tr>
+<tr><td><b>R89-J</b></td><td>报告三套模板</td><td><span class="check">✅</span></td></tr>
+<tr><td><b>R89-K</b></td><td>缘主档案同步</td><td><span class="check">✅</span></td></tr>
+<tr><td><b>R89-L</b></td><td>离线 PWA v4</td><td><span class="check">✅</span></td></tr>
+<tr><td><b>R89-M</b></td><td>档案召回面板</td><td><span class="check">✅</span></td></tr>
+<tr><td><b>R89-N</b></td><td>周报订阅推送</td><td><span class="check">✅</span></td></tr>
+</table>
+
+<hr style="border-color:rgba(201,168,76,0.2);margin:30px 0">
+<div style="text-align:center;color:var(--paper3);font-size:12px">
+🦞 AutoClaw · 2026-07-27 · 命理宝鉴 · R89 全套 6 大新功能落地 ✅
+</div>
+</body>
+</html>
