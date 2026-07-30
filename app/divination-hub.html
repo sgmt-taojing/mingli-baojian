@@ -2680,6 +2680,7 @@ body{font-family:'Noto Serif SC',serif;background:var(--ink);color:var(--paper);
 <script src="../knowledge-models/yijing-model.js" defer></script>
 <script src="../knowledge-models/ziwei-model.js" defer></script>
 <script src="../knowledge-models/zodiac-model.js" defer></script>
+<script src="js/divination-core.js" defer></script>
 <script src="js/mobile-nav.js" defer></script>
 <script>
 // ===== 核心 showSection（Tab 切换 + section 显隐）=====
@@ -5382,6 +5383,9 @@ function submitAsk(){
     if(typeof toast === 'function') toast('提交失败: ' + e.message);
   }
 }
+
+function showMoreModule(mod,el){if(typeof showSection==='function')showSection('more');var targets={knowledge:'section-knowledge',shop:'divination-shop.html',almanac:'divination-almanac.html',koujue:'koujue-gallery.html'};var t=targets[mod];if(t&&t.startsWith('section')){var el2=document.getElementById(t);if(el2)el2.scrollIntoView({behavior:'smooth'});}else if(t){window.location.href=t;}}
+function switchToZhanbuYijing(){if(typeof showZhanbuSub==='function'){showZhanbuSub('yijing');}else if(typeof showSection==='function'){showSection('zhanbu');}}
 </script>
 
 </body>
