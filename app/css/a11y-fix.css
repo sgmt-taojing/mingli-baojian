@@ -436,3 +436,106 @@ summary {
     max-width: 100% !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════
+ * 命理宝鉴 · 全平台设计规范组件 (R292)
+ * 统一卡片/按钮/导航/表格/面板/标签/状态
+ * ═══════════════════════════════════════════════════ */
+
+/* ─── 统一卡片 ─── */
+.mlb-card{
+  display:block;padding:18px;border:1px solid rgba(201,168,76,.18);
+  border-radius:14px;background:rgba(201,168,76,.03);
+  cursor:pointer;transition:all .3s ease;color:var(--paper);
+  text-decoration:none;position:relative;overflow:hidden;
+}
+.mlb-card:hover{transform:translateY(-2px);border-color:rgba(201,168,76,.45);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.mlb-card .mlb-symbol{font-size:28px;display:block;margin-bottom:8px}
+.mlb-card .mlb-name{font-size:16px;color:var(--gold);font-weight:600;margin-bottom:4px;letter-spacing:2px;transition:color .3s}
+.mlb-card:hover .mlb-name{color:var(--gold2)}
+.mlb-card .mlb-desc{font-size:12px;color:var(--paper2);line-height:1.7;opacity:.78}
+.mlb-card .mlb-go{margin-top:10px;font-size:11px;color:var(--cyan2);opacity:.7;letter-spacing:1.5px}
+
+/* ─── 统一按钮 ─── */
+.mlb-btn{
+  padding:10px 16px;border:1px solid var(--border,rgba(201,168,76,.18));
+  border-radius:8px;background:rgba(26,29,39,.8);color:var(--paper);
+  font-size:13px;cursor:pointer;transition:all .2s;white-space:nowrap;
+}
+.mlb-btn:hover{border-color:var(--gold);background:rgba(201,168,76,.08)}
+.mlb-btn-primary{border-color:var(--jade);background:rgba(46,204,113,.12);color:var(--jade)}
+.mlb-btn-warn{border-color:var(--orange);background:rgba(230,126,34,.12);color:var(--orange)}
+.mlb-btn-danger{border-color:var(--cinn);background:rgba(192,57,43,.12);color:var(--cinn)}
+.mlb-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ─── 统一面板 ─── */
+.mlb-panel{
+  background:rgba(20,24,33,.8);border:1px solid rgba(37,42,54,.6);
+  border-radius:12px;padding:16px;margin-bottom:12px;
+}
+.mlb-panel-title{font-size:14px;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.mlb-panel-title .mlb-badge{font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(46,204,113,.15);color:var(--jade)}
+
+/* ─── 统一标签 ─── */
+.mlb-tag{
+  display:inline-block;font-size:11px;padding:2px 8px;
+  border-radius:4px;border:1px solid rgba(201,168,76,.2);
+  color:var(--gold);background:rgba(201,168,76,.06);
+}
+.mlb-tag-jade{border-color:rgba(46,204,113,.2);color:var(--jade);background:rgba(46,204,113,.06)}
+.mlb-tag-cinn{border-color:rgba(192,57,43,.2);color:var(--cinn);background:rgba(192,57,43,.06)}
+.mlb-tag-blue{border-color:rgba(74,158,255,.2);color:var(--cyan2);background:rgba(74,158,255,.06)}
+
+/* ─── 统一状态点 ─── */
+.mlb-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
+.mlb-dot-ok{background:var(--jade)}.mlb-dot-warn{background:var(--orange)}.mlb-dot-danger{background:var(--cinn)}
+
+/* ─── 统一表格 ─── */
+.mlb-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.mlb-table th{text-align:left;color:var(--muted,#8b8fa3);font-weight:600;padding:6px 8px;border-bottom:1px solid rgba(37,42,54,.6)}
+.mlb-table td{padding:6px 8px;border-bottom:1px solid rgba(37,42,54,.4)}
+.mlb-table tr:hover td{background:rgba(74,158,255,.03)}
+
+/* ─── 统一指标卡 ─── */
+.mlb-metric{
+  background:rgba(14,17,23,.8);border:1px solid rgba(37,42,54,.6);
+  border-radius:10px;padding:14px;text-align:center;
+}
+.mlb-metric .mlb-metric-label{font-size:.7rem;color:#8b8fa3;text-transform:uppercase;letter-spacing:1px}
+.mlb-metric .mlb-metric-value{font-size:1.6rem;font-weight:700;margin:4px 0}
+.mlb-metric.mlb-ok{border-color:rgba(46,204,113,.3)}
+.mlb-metric.mlb-warn{border-color:rgba(230,126,34,.3)}
+.mlb-metric.mlb-danger{border-color:rgba(192,57,43,.3)}
+
+/* ─── 统一输入框 ─── */
+.mlb-input{
+  flex:1;padding:10px 14px;border:1px solid rgba(37,42,54,.6);
+  border-radius:8px;background:rgba(14,17,23,.8);color:var(--paper);
+  font-size:13px;transition:border-color .2s;
+}
+.mlb-input:focus{outline:none;border-color:var(--jade)}
+
+/* ─── 统一网格 ─── */
+.mlb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.mlb-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:768px){.mlb-grid{grid-template-columns:repeat(2,1fr);gap:10px}.mlb-grid-2{grid-template-columns:1fr}}
+
+/* ─── 四层体系标识色 ─── */
+.mlb-layer-1{border-left:3px solid var(--gold)} /* 周易服务大众 */
+.mlb-layer-2{border-left:3px solid var(--jade)} /* 周易+中医服务患者 */
+.mlb-layer-3{border-left:3px solid var(--cyan2)} /* 人机交互服务家庭 */
+.mlb-layer-core{border-left:3px solid var(--violet)} /* 核心知识库 */
+
+/* ─── 全平台导航条 ─── */
+.mlb-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:9000;
+  display:flex;justify-content:center;gap:0;
+  background:rgba(10,8,5,.96);backdrop-filter:blur(12px);
+  border-top:1px solid rgba(201,168,76,.15);padding:6px 0;
+  max-width:100%;overflow-x:auto;
+}
+.mlb-nav a{
+  flex:0 0 auto;padding:6px 12px;font-size:11px;color:var(--gold);
+  text-decoration:none;white-space:nowrap;opacity:.7;transition:opacity .2s;
+}
+.mlb-nav a:hover{opacity:1}
