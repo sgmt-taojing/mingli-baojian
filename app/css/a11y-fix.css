@@ -539,3 +539,72 @@ summary {
   text-decoration:none;white-space:nowrap;opacity:.7;transition:opacity .2s;
 }
 .mlb-nav a:hover{opacity:1}
+
+/* R308-P0 三态UI模板（loading/empty/error） */
+.state-loading,
+.state-empty,
+.state-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: 32px 16px;
+  border-radius: 12px;
+  text-align: center;
+}
+.state-loading {
+  color: var(--primary, #7c3aed);
+  background: rgba(124, 58, 237, 0.04);
+}
+.state-loading::before {
+  content: '';
+  width: 40px; height: 40px;
+  border: 3px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.state-empty {
+  color: var(--text-secondary, #666);
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px dashed rgba(0, 0, 0, 0.1);
+}
+.state-empty::before {
+  content: '📭';
+  font-size: 40px;
+  margin-bottom: 8px;
+  opacity: 0.5;
+}
+.state-error {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.04);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+}
+.state-error::before {
+  content: '⚠️';
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+.state-error .retry-btn {
+  margin-top: 12px;
+  padding: 6px 16px;
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* R308 暗色模式 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text-primary: #e5e7eb;
+    --text-secondary: #9ca3af;
+    --bg-primary: #111827;
+    --bg-secondary: #1f2937;
+  }
+  body { background: var(--bg-primary, #111827); color: var(--text-primary, #e5e7eb); }
+}
