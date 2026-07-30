@@ -177,7 +177,7 @@ function startFace(){
       box.querySelector('video').srcObject = stream;
       document.getElementById('captureBtn').disabled = false;
     })
-    .catch(e=>alert('摄像头开启失败：'+e.message));
+    .catch(e=>{var f=document.getElementById('faceBox');if(f)f.innerHTML='<div class=\'placeholder\' style=\'color:#c0392b\'>摄像头开启失败：'+e.message+'</div>';console.warn('[摄像头]',e.message);});
 }
 
 function captureFace(){
@@ -259,7 +259,7 @@ function analyzeConstitution(result){
 
 function generatePush(){
   if(!userProfile.constitution){
-    alert('请先采集体质画像（摄像头或模拟）');
+    var fl=document.getElementById('faceResult');if(fl){fl.classList.add('show');fl.innerHTML='<div style=\'color:#e67e22;padding:10px\'>⚠️ 请先采集体质画像（摄像头或模拟）</div>';}return;
     return;
   }
   
@@ -346,7 +346,7 @@ function refreshEvents(){
 
 function saveProfile(){
   localStorage.setItem('_personal_profile', JSON.stringify(userProfile));
-  alert('画像已保存到本地（隐私保护：不上传服务器）');
+  var btn=event.target;var old=btn.textContent;btn.textContent='✅ 已保存';btn.style.borderColor='#27ae60';setTimeout(function(){btn.textContent=old;btn.style.borderColor='';},2000);
 }
 
 // 加载已保存的画像
