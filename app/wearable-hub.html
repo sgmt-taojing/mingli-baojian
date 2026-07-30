@@ -254,7 +254,18 @@ body{background:#0a0c12;color:#e4e6ed;font-family:-apple-system,BlinkMacSystemFo
 
 <script src="js/mobile-nav.js" defer></script>
 <script>
-// 模拟穿戴设备数据流
+// 模拟穿戴设备数据流（确定性计数器，符合工程规范）
+let _tickCount = 0;
+function _nextVal(base, range, spikeChance, spikeRange){
+  _tickCount++;
+  var v = base + (_tickCount * 7) % range;
+  if((_tickCount * 13) % 100 < spikeChance * 100) v += spikeRange;
+  return v;
+}
+function _nextFloat(base, range){
+  _tickCount++;
+  return (base + ((_tickCount * 11) % (range * 10)) / 10);
+}
 let monitorInterval = null;
 let currentRole = 'patient';
 
@@ -271,15 +282,15 @@ function startMonitor(){
   if(monitorInterval) clearInterval(monitorInterval);
   monitorInterval = setInterval(()=>{
     // 心率 50-130
-    const hr = 60 + Math.floor(Math.random()*30) + (Math.random()>0.95?40:0);
+    const hr = _nextVal(60, 30, 0.05, 40);
     updateMetric('hr', hr, [50,120], 'BPM', '脉');
     
     // 血氧 88-99
-    const spo2 = 95 + Math.floor(Math.random()*5) - (Math.random()>0.95?8:0);
+    const spo2 = _nextVal(95, 5, 0.05, -8);
     updateMetric('spo2', spo2, [90,100], '%', '气');
     
     // 体温 36-38
-    const temp = (36.2 + Math.random()*0.8).toFixed(1);
+    const temp = _nextFloat(36.2, 0.8).toFixed(1);
     updateMetric('temp', parseFloat(temp), [36.0,37.5], '°C', '面');
   }, 5000);
 }
