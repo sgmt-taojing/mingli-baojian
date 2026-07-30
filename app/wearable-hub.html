@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<title>穿戴设备 · 医患数据采集交互 · 命理宝鉴</title>
+<link rel="stylesheet" href="css/a11y-fix.css">
+<style>
+:root{--jade:#27ae60;--gold:#c9a84c;--cinn:#c0392b;--blue:#4a9eff;--orange:#e67e22;--violet:#8e44ad}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0c12;color:#e4e6ed;font-family:-apple-system,BlinkMacSystemFont,"STKaiti",serif;min-height:100vh;padding:16px 16px 80px}
+.header{text-align:center;padding:20px 0;border-bottom:1px solid rgba(46,204,113,.15);margin-bottom:20px}
+.header h1{font-size:22px;color:var(--jade);letter-spacing:4px;margin-bottom:6px}
+.header p{font-size:13px;color:#8b8fa3;letter-spacing:2px}
+.tabs{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap;justify-content:center}
+.tab{padding:8px 16px;border:1px solid #252a36;border-radius:8px 8px 0 0;background:#141821;color:#8b8fa3;font-size:13px;cursor:pointer;transition:all .2s}
+.tab.active{border-color:var(--jade);color:var(--jade);background:rgba(46,204,113,.08)}
+.tab:hover{color:var(--jade)}
+.panel{background:#141821;border:1px solid #252a36;border-radius:12px;padding:16px;margin-bottom:12px}
+.panel h2{font-size:14px;color:var(--gold);margin-bottom:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+@media(max-width:768px){.grid{grid-template-columns:1fr 1fr}}
+.metric-card{background:#0e1117;border:1px solid #252a36;border-radius:10px;padding:14px;text-align:center;position:relative;overflow:hidden}
+.metric-card .icon{font-size:1.8rem;display:block;margin-bottom:4px}
+.metric-card .label{font-size:.7rem;color:#8b8fa3;text-transform:uppercase;letter-spacing:1px}
+.metric-card .value{font-size:1.6rem;font-weight:700;margin:4px 0}
+.metric-card .unit{font-size:.7rem;color:#8b8fa3}
+.metric-card .trend{font-size:.65rem;margin-top:2px}
+.metric-card.ok{border-color:rgba(46,204,113,.3)}
+.metric-card.warn{border-color:rgba(230,126,34,.3)}
+.metric-card.danger{border-color:rgba(192,57,43,.3);animation:alert-pulse 2s infinite}
+@keyframes alert-pulse{0%,100%{box-shadow:0 0 0 rgba(192,57,43,0)}50%{box-shadow:0 0 12px rgba(192,57,43,.3)}}
+.device-list{display:flex;flex-direction:column;gap:8px}
+.device-item{display:flex;align-items:center;gap:12px;padding:12px;background:#0e1117;border:1px solid #252a36;border-radius:8px;transition:all .2s}
+.device-item.connected{border-color:rgba(46,204,113,.3)}
+.device-item .dev-icon{font-size:1.5rem;flex-shrink:0}
+.device-item .dev-info{flex:1}
+.device-item .dev-name{font-size:13px;font-weight:600}
+.device-item .dev-status{font-size:11px;color:#8b8fa3}
+.device-item .dev-battery{font-size:11px;color:var(--jade)}
+.btn{padding:8px 14px;border:1px solid #252a36;border-radius:6px;background:#1a1d27;color:#e4e6ed;font-size:12px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn:hover{border-color:var(--jade);background:rgba(46,204,113,.08)}
+.btn-primary{border-color:var(--jade);background:rgba(46,204,113,.12);color:var(--jade)}
+.btn-danger{border-color:var(--cinn);background:rgba(192,57,43,.12);color:var(--cinn)}
+.chat-log{height:250px;overflow-y:auto;background:#0e1117;border-radius:8px;padding:10px;font-size:12px;line-height:1.7}
+.chat-log .msg{margin-bottom:6px;padding:6px 10px;border-radius:6px}
+.chat-log .msg.bot{background:rgba(46,204,113,.06);border-left:3px solid var(--jade)}
+.chat-log .msg.alert{background:rgba(192,57,43,.1);border-left:3px solid var(--cinn)}
+.chat-log .msg.sys{background:rgba(201,168,76,.06);border-left:3px solid var(--gold)}
+.alert-bar{background:rgba(192,57,43,.1);border:1px solid rgba(192,57,43,.3);border-radius:8px;padding:12px;margin-bottom:10px;display:none}
+.alert-bar.show{display:block}
+.alert-bar .title{color:var(--cinn);font-size:13px;font-weight:700}
+.alert-bar .desc{font-size:11px;color:#8b8fa3;margin-top:4px}
+.role-switch{display:flex;gap:8px;justify-content:center;margin-bottom:16px}
+.role-btn{padding:10px 20px;border:2px solid #252a36;border-radius:10px;background:#141821;color:#8b8fa3;font-size:13px;cursor:pointer;transition:all .2s}
+.role-btn.active{border-color:var(--jade);color:var(--jade);background:rgba(46,204,113,.08)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>⌚ 穿戴设备 · 医患数据采集交互</h1>
+  <p>医生端 · 患者端 · 实时监测 · 异常预警 · 中医指标对应</p>
+</div>
+
+<div class="role-switch">
+  <button class="role-btn active" onclick="switchRole('patient')" id="rolePatient">👤 患者端</button>
+  <button class="role-btn" onclick="switchRole('doctor')" id="roleDoctor">👨‍⚕️ 医生端</button>
+</div>
+
+<div class="alert-bar" id="alertBar">
+  <div class="title">⚠️ 异常预警</div>
+  <div class="desc" id="alertDesc"></div>
+</div>
+
+<!-- 患者端 -->
+<div id="patientView">
+  <div class="panel">
+    <h2>📊 实时健康指标</h2>
+    <div class="grid">
+      <div class="metric-card ok" id="hrCard">
+        <span class="icon">❤️</span>
+        <div class="label">心率</div>
+        <div class="value" id="hrValue">72</div>
+        <div class="unit">BPM</div>
+        <div class="trend" id="hrTrend">正常范围</div>
+      </div>
+      <div class="metric-card ok" id="spo2Card">
+        <span class="icon">🫁</span>
+        <div class="label">血氧</div>
+        <div class="value" id="spo2Value">98</div>
+        <div class="unit">%</div>
+        <div class="trend" id="spo2Trend">正常</div>
+      </div>
+      <div class="metric-card ok" id="tempCard">
+        <span class="icon">🌡️</span>
+        <div class="label">体温</div>
+        <div class="value" id="tempValue">36.5</div>
+        <div class="unit">°C</div>
+        <div class="trend" id="tempTrend">正常</div>
+      </div>
+      <div class="metric-card ok" id="bpCard">
+        <span class="icon">🩸</span>
+        <div class="label">血压</div>
+        <div class="value" id="bpValue">120/80</div>
+        <div class="unit">mmHg</div>
+        <div class="trend" id="bpTrend">正常</div>
+      </div>
+      <div class="metric-card ok" id="sleepCard">
+        <span class="icon">😴</span>
+        <div class="label">睡眠</div>
+        <div class="value" id="sleepValue">7.5</div>
+        <div class="unit">小时</div>
+        <div class="trend" id="sleepTrend">良好</div>
+      </div>
+      <div class="metric-card ok" id="stepCard">
+        <span class="icon">👟</span>
+        <div class="label">步数</div>
+        <div class="value" id="stepValue">6234</div>
+        <div class="unit">步</div>
+        <div class="trend" id="stepTrend">今日</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>⌚ 已连接设备</h2>
+    <div class="device-list" id="deviceList">
+      <div class="device-item connected">
+        <span class="dev-icon">⌚</span>
+        <div class="dev-info">
+          <div class="dev-name">智能手环 Pro</div>
+          <div class="dev-status">已连接 · 心率/血氧/步数/睡眠</div>
+        </div>
+        <div class="dev-battery">🔋 85%</div>
+      </div>
+      <div class="device-item connected">
+        <span class="dev-icon">📏</span>
+        <div class="dev-info">
+          <div class="dev-name">血压计</div>
+          <div class="dev-status">已连接 · 每日2次自动测量</div>
+        </div>
+        <div class="dev-battery">🔋 92%</div>
+      </div>
+      <div class="device-item" style="opacity:.5">
+        <span class="dev-icon">👓</span>
+        <div class="dev-info">
+          <div class="dev-name">Rokid 智能眼镜</div>
+          <div class="dev-status">未连接（医生端设备）</div>
+        </div>
+        <div class="dev-battery">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>🌿 中医指标对应</h2>
+    <div class="grid">
+      <div class="metric-card">
+        <span class="icon">脉</span>
+        <div class="label">脉率对应</div>
+        <div class="value" style="font-size:1rem;color:var(--jade)" id="tcmPulse">72 BPM → 平脉</div>
+      </div>
+      <div class="metric-card">
+        <span class="icon">面</span>
+        <div class="label">面色体温</div>
+        <div class="value" style="font-size:1rem;color:var(--jade)" id="tcmFace">36.5°C → 正常</div>
+      </div>
+      <div class="metric-card">
+        <span class="icon">气</span>
+        <div class="label">气血步态</div>
+        <div class="value" style="font-size:1rem;color:var(--jade)" id="tcmQi">6234步 → 气血通畅</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 医生端 -->
+<div id="doctorView" style="display:none">
+  <div class="panel">
+    <h2>👓 智能眼镜（Rokid）</h2>
+    <div class="grid">
+      <div class="metric-card ok">
+        <span class="icon">👁️</span>
+        <div class="label">望诊模式</div>
+        <div class="value" style="font-size:1rem">待开启</div>
+        <div class="trend">摄像头+AI分析</div>
+      </div>
+      <div class="metric-card ok">
+        <span class="icon">🎤</span>
+        <div class="label">语音录入</div>
+        <div class="value" style="font-size:1rem">就绪</div>
+        <div class="trend">病历→自动转文字</div>
+      </div>
+      <div class="metric-card ok">
+        <span class="icon">📋</span>
+        <div class="label">HUD 显示</div>
+        <div class="value" style="font-size:1rem">待连接</div>
+        <div class="trend">患者信息+辨证</div>
+      </div>
+      <div class="metric-card ok">
+        <span class="icon">💊</span>
+        <div class="label">语音处方</div>
+        <div class="value" style="font-size:1rem">就绪</div>
+        <div class="trend">AI禁忌校验</div>
+      </div>
+    </div>
+    <div style="margin-top:10px">
+      <button class="btn btn-primary" onclick="startGlasses()">开启眼镜</button>
+      <button class="btn" onclick="voiceRecord()">语音录入病历</button>
+      <button class="btn" onclick="voicePrescribe()">语音开方</button>
+      <button class="btn" onclick="remoteConsult()">远程会诊</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>👥 在线患者列表</h2>
+    <div class="device-list">
+      <div class="device-item connected">
+        <span class="dev-icon">👤</span>
+        <div class="dev-info">
+          <div class="dev-name">张三 · 男 · 35岁</div>
+          <div class="dev-status">心率72 · 血氧98 · 体温36.5 · 状态正常</div>
+        </div>
+        <button class="btn" onclick="viewPatient('张三')">查看</button>
+      </div>
+      <div class="device-item connected">
+        <span class="dev-icon">👤</span>
+        <div class="dev-info">
+          <div class="dev-name">李四 · 女 · 58岁</div>
+          <div class="dev-status">心率96 · 血氧94 · 体温37.2 · ⚠️ 偏高</div>
+        </div>
+        <button class="btn btn-warn" onclick="viewPatient('李四')">查看</button>
+      </div>
+      <div class="device-item" style="border-color:rgba(192,57,43,.3)">
+        <span class="dev-icon">👤</span>
+        <div class="dev-info">
+          <div class="dev-name">王五 · 男 · 72岁</div>
+          <div class="dev-status">心率128 · 血氧89% · ⚠️ 异常预警！</div>
+        </div>
+        <button class="btn btn-danger" onclick="viewPatient('王五')">紧急查看</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 预警日志 -->
+<div class="panel">
+  <h2>📡 预警与交互日志</h2>
+  <div class="chat-log" id="alertLog">
+    <div class="msg sys">系统就绪 · 正在监测穿戴设备数据...</div>
+  </div>
+</div>
+
+<script src="js/mobile-nav.js" defer></script>
+<script>
+// 模拟穿戴设备数据流
+let monitorInterval = null;
+let currentRole = 'patient';
+
+function switchRole(role){
+  currentRole = role;
+  document.getElementById('patientView').style.display = role==='patient'?'block':'none';
+  document.getElementById('doctorView').style.display = role==='doctor'?'block':'none';
+  document.getElementById('rolePatient').classList.toggle('active', role==='patient');
+  document.getElementById('roleDoctor').classList.toggle('active', role==='doctor');
+}
+
+// 模拟数据波动
+function startMonitor(){
+  if(monitorInterval) clearInterval(monitorInterval);
+  monitorInterval = setInterval(()=>{
+    // 心率 50-130
+    const hr = 60 + Math.floor(Math.random()*30) + (Math.random()>0.95?40:0);
+    updateMetric('hr', hr, [50,120], 'BPM', '脉');
+    
+    // 血氧 88-99
+    const spo2 = 95 + Math.floor(Math.random()*5) - (Math.random()>0.95?8:0);
+    updateMetric('spo2', spo2, [90,100], '%', '气');
+    
+    // 体温 36-38
+    const temp = (36.2 + Math.random()*0.8).toFixed(1);
+    updateMetric('temp', parseFloat(temp), [36.0,37.5], '°C', '面');
+  }, 5000);
+}
+
+function updateMetric(type, value, range, unit, tcmType){
+  const card = document.getElementById(type+'Card');
+  const valEl = document.getElementById(type+'Value');
+  const trendEl = document.getElementById(type+'Trend');
+  
+  valEl.textContent = value;
+  
+  let level = 'ok';
+  let trend = '正常';
+  
+  if(value < range[0]){
+    level = 'warn'; trend = '偏低';
+  } else if(value > range[1]){
+    level = value > range[1]+15 ? 'danger' : 'warn';
+    trend = value > range[1]+15 ? '危险！' : '偏高';
+    
+    // 触发预警
+    if(level === 'danger'){
+      showAlert(type, value, unit);
+    }
+  }
+  
+  card.className = 'metric-card ' + level;
+  trendEl.textContent = trend;
+  
+  // 中医对应
+  if(type === 'hr'){
+    const tcmPulse = value<60?'迟脉（寒证）':value>100?'数脉（热证）':'平脉（正常）';
+    document.getElementById('tcmPulse').textContent = value+' BPM → '+tcmPulse;
+  } else if(type === 'temp'){
+    const tcmFace = value>37.5?'面赤（热证）':value<36?'面白（寒证）':'正常';
+    document.getElementById('tcmFace').textContent = value+'°C → '+tcmFace;
+  }
+}
+
+function showAlert(type, value, unit){
+  const bar = document.getElementById('alertBar');
+  const desc = document.getElementById('alertDesc');
+  const log = document.getElementById('alertLog');
+  
+  const alerts = {
+    hr: '心率异常：'+value+unit+'（正常50-120），可能心律失常或心脏负荷过大',
+    spo2: '血氧异常：'+value+unit+'（正常≥90%），可能呼吸功能不全',
+    temp: '体温异常：'+value+unit+'（正常36-37.5），可能发热',
+  };
+  
+  bar.classList.add('show');
+  desc.textContent = alerts[type] || type+'异常';
+  
+  const now = new Date().toLocaleTimeString('zh-CN');
+  const msg = document.createElement('div');
+  msg.className = 'msg alert';
+  msg.innerHTML = '<b>['+now+']</b> '+alerts[type];
+  log.appendChild(msg);
+  log.scrollTop = log.scrollHeight;
+  
+  // 5秒后自动隐藏预警条
+  setTimeout(()=>bar.classList.remove('show'), 10000);
+}
+
+function startGlasses(){ addLog('sys','👓 智能眼镜已开启 · 望诊模式就绪 · HUD 显示患者信息'); }
+function voiceRecord(){ addLog('sys','🎤 语音录入就绪 · 请开始口述病历...'); }
+function voicePrescribe(){ addLog('sys','💊 语音开方就绪 · 请口述处方 · AI 将自动校验禁忌'); }
+function remoteConsult(){ addLog('sys','📋 远程会诊已发起 · 等待专家接入...'); }
+function viewPatient(name){ addLog('bot','正在查看 '+name+' 的实时数据和历史病历...'); }
+
+function addLog(type, text){
+  const log = document.getElementById('alertLog');
+  const div = document.createElement('div');
+  div.className = 'msg ' + type;
+  div.textContent = text;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+// 启动监测
+startMonitor();
+addLog('sys','🤖 穿戴设备监测已启动 · 每5秒更新一次数据');
+</script>
+
+</body>
+</html>
