@@ -212,7 +212,12 @@
       var confidence = (typeof opts.confidence === 'number') ? opts.confidence
         : (typeof raw.confidence === 'number' ? raw.confidence
         : (typeof dataObj.confidence === 'number' ? dataObj.confidence : 0.85));
-      var qualityChecks = opts.qualityChecks || raw.qualityChecks || dataObj.qualityChecks || {};
+      var qualityChecks = opts.qualityChecks
+        || raw.qualityChecks
+        || (raw.inspect && raw.inspect.qualityChecks)
+        || dataObj.qualityChecks
+        || (dataObj.inspect && dataObj.inspect.qualityChecks)
+        || {};
 
       // 3. 走 TongueFaceValidator 校验 → 5 字段 JSON
       var Validator = (typeof window !== 'undefined') ? window.TongueFaceValidator : null;
