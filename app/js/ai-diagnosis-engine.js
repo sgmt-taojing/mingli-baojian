@@ -339,3 +339,173 @@
   };
 
 })(typeof window !== 'undefined' ? window : this);
+
+// ========== 闻诊（音频模态）==========
+// 通过 Web Audio API 提取声纹特征
+function extractVoiceFeatures(audioBuffer, sampleRate) {
+  var length = audioBuffer.length;
+  var sum = 0, peak = 0;
+  for (var i = 0; i < length; i++) {
+    var abs = Math.abs(audioBuffer[i]);
+    sum += abs;
+    if (abs > peak) peak = abs;
+  }
+  var volume = sum / length; // 平均音量
+  var peakVolume = peak; // 峰值音量
+  
+  // 简单频率估计（零交叉率 → 音调）
+  var zeroCrossings = 0;
+  for (var i = 1; i < length; i++) {
+    if ((audioBuffer[i] >= 0) !== (audioBuffer[i-1] >= 0)) zeroCrossings++;
+  }
+  var pitch = (zeroCrossings / 2) * (sampleRate / length); // 估计基频
+  
+  return {
+    pitch: Math.round(pitch),
+    volume: Math.round(volume * 100) / 100,
+    peakVolume: Math.round(peakVolume * 100) / 100,
+    zeroCrossings: zeroCrossings,
+    duration: Math.round(length / sampleRate * 1000) // ms
+  };
+}
+
+// 闻诊 KB 规则匹配
+function matchVoiceRules(features) {
+  var pitch = features.pitch;
+  var volume = features.volume;
+  var tone, syndrome, confidence;
+  
+  if (pitch > 300) { tone = '高尖'; syndrome = '热证/肝火'; confidence = 70; }
+  else if (pitch < 100) { tone = '低沉'; syndrome = '寒证/气虚'; confidence = 72; }
+  else if (volume < 0.1) { tone = '低微'; syndrome = '气虚'; confidence = 75; }
+  else if (volume > 0.5) { tone = '洪亮'; syndrome = '实证'; confidence = 73; }
+  else { tone = '正常'; syndrome = '平'; confidence = 80; }
+  
+  return {
+    type: 'voice',
+    tone: tone,
+    syndrome: syndrome,
+    confidence: confidence,
+    features: features,
+    raw: '声纹:' + tone + '(pitch=' + pitch + ',vol=' + volume + ')→' + syndrome
+  };
+}
+
+// ========== 问诊（文本模态）==========
+async function matchSymptomRules(symptoms) {
+  if (!symptoms || symptoms.length === 0) return null;
+  var query = Array.isArray(symptoms) ? symptoms.join(' ') : symptoms;
+  var cases = await queryKbCases(query, 3);
+  
+  var syndrome = '待辨';
+  var confidence = 60;
+  if (cases.length > 0) {
+    confidence = Math.min(85, 60 + cases.length * 10);
+    syndrome = cases[0].title || '参考: ' + query.substring(0, 20);
+  }
+  
+  return {
+    type: 'symptoms',
+    query: query,
+    syndrome: syndrome,
+    confidence: confidence,
+    kbCases: cases,
+    raw: '问诊:' + query.substring(0, 30) + '→' + cases.length + '条KB匹配(' + syndrome + ')'
+  };
+}
+
+// ========== 完整四诊合参（商用标准）==========
+// 望诊35% + 闻诊15% + 问诊25% + 切诊25%
+async function fullTetraDiagnosis(faceCanvas, tongueCanvas, audioData, symptoms, wearableData) {
+  var results = {};
+  var totalConfidence = 0;
+  var weightSum = 0;
+  var findings = [];
+  
+  // 1. 望诊（面诊+舌诊）35%
+  var faceResult = null, tongueResult = null;
+  if (faceCanvas) {
+    var faceFeatures = extractFaceFeatures(faceCanvas);
+    faceResult = matchFaceRules(faceFeatures);
+    results.face = faceResult;
+    findings.push(faceResult.raw);
+  }
+  if (tongueCanvas) {
+    var tongueFeatures = extractTongueFeatures(tongueCanvas);
+    tongueResult = matchTongueRules(tongueFeatures);
+    results.tongue = tongueResult;
+    findings.push(tongueResult.raw);
+  }
+  if (faceResult || tongueResult) {
+    var wangConf = (faceResult ? faceResult.confidence * 0.15 : 0) + (tongueResult ? tongueResult.confidence * 0.20 : 0);
+    totalConfidence += wangConf;
+    weightSum += 0.35;
+  }
+  
+  // 2. 闻诊（声纹）15%
+  if (audioData) {
+    var voiceResult = matchVoiceRules(audioData);
+    results.voice = voiceResult;
+    totalConfidence += voiceResult.confidence * 0.15;
+    weightSum += 0.15;
+    findings.push(voiceResult.raw);
+  }
+  
+  // 3. 问诊（症状文本）25%
+  if (symptoms) {
+    var symptomResult = await matchSymptomRules(symptoms);
+    if (symptomResult) {
+      results.symptoms = symptomResult;
+      totalConfidence += symptomResult.confidence * 0.25;
+      weightSum += 0.25;
+      findings.push(symptomResult.raw);
+    }
+  }
+  
+  // 4. 切诊（穿戴数据）25%
+  if (wearableData) {
+    var wearableResult = matchWearableData(
+      wearableData.hr || 72, wearableData.spo2 || 98,
+      wearableData.temp || 36.5, wearableData.bp || '120/80',
+      wearableData.sleep || 7, wearableData.steps || 5000
+    );
+    results.wearable = wearableResult;
+    totalConfidence += wearableResult.confidence * 0.25;
+    weightSum += 0.25;
+    findings.push(wearableResult.raw);
+  }
+  
+  // 融合诊断
+  var confidence = weightSum > 0 ? Math.round(totalConfidence / weightSum) : 0;
+  var missingModality = weightSum < 1.0; // 模态不全
+  if (missingModality) confidence = Math.round(confidence * 0.8); // 缺一降20%
+  
+  var disposition = '建议面诊';
+  if (confidence >= 90) disposition = '直接推送方案';
+  else if (confidence >= 70) disposition = '推送方案+建议医师确认';
+  else if (confidence >= 50) disposition = '初步建议+预约医师';
+  
+  // 高危检测
+  var urgent = findings.some(function(f){ return f.includes('危重') || f.includes('气脱') || (wearableData && (wearableData.hr > 120 || wearableData.spo2 < 90)); });
+  if (urgent) disposition = '🚨 紧急：立即120+通知家属';
+  
+  return {
+    diagnosis: {
+      confidence: confidence,
+      findings: findings,
+      disposition: disposition,
+      urgent: urgent,
+      missingModality: missingModality,
+      summary: '四诊合参(' + confidence + '%)：' + findings.join(' + '),
+      timestamp: new Date().toISOString(),
+      engine: 'tetra-diagnosis-v1'
+    },
+    details: results
+  };
+}
+
+// 导出到全局
+global.AIDiagnosisEngine.extractVoiceFeatures = extractVoiceFeatures;
+global.AIDiagnosisEngine.matchVoiceRules = matchVoiceRules;
+global.AIDiagnosisEngine.matchSymptomRules = matchSymptomRules;
+global.AIDiagnosisEngine.fullTetraDiagnosis = fullTetraDiagnosis;
