@@ -40,6 +40,17 @@ input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,162,39,.15)}
 </div>
 <button id="login-btn" type="submit" class="btn">登 录</button>
 </form>
+
+<script>
+// 解析 ?redirect= 参数
+const _redirectTo = new URLSearchParams(location.search).get('redirect') || '';
+if (_redirectTo) {
+  document.querySelector('.note').innerHTML = '💡 登录后将跳回 <code>' + _redirectTo + '</code>';
+}
+
+// handleLogin 由 inline script 处理
+</script>
+
 <p class="tips">
 <a href="divination-hub.html">返回首页</a> ·
 <a href="disclaimer.html">使用条款</a> ·
