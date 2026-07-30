@@ -184,6 +184,67 @@
       } catch(e) {
         return false;
       }
+    },
+
+    // ============== R256 · docx V1.1 §2.4 标准化 JSON 输出 ==============
+    /**
+     * 结构化识别 · 面向舌面诊（mode=tongue|face|wangzhen|report）
+     * 返回 docx §2.4 5 字段固定 JSON：图像质量判定/舌诊客观特征/面诊客观特征/置信度/待知识库推理字段
+     *
+     * @param {string|File|Blob} image - base64 / File / Blob
+     * @param {string} mode - 'tongue'|'face'|'wangzhen'|'report'
+     * @param {object} [opts] - { qualityChecks: {...}, rawTongue: [...], rawFace: [...], confidence: 0.85 }
+     * @returns {Promise<{ok, structured: object, raw, latency}>}
+     */
+    recognizeStructured: async function(image, mode, opts) {
+      opts = opts || {};
+      // 1. 先走 recognize 拿到原始数据
+      var base = await this.recognize(image, mode, opts);
+      // 2. 提取舌/面诊特征标签（上游 raw 中可能叫 tongue/face/features/tags）
+      var raw = base.raw || {};
+      var dataObj = raw.data || {};
+      var rawTongue = opts.rawTongue
+        || raw.tongueTags || raw.tongue_features || raw.tongue
+        || dataObj.tongueTags || dataObj.tongue || [];
+      var rawFace   = opts.rawFace
+        || raw.faceTags || raw.face_features || raw.face
+        || dataObj.faceTags || dataObj.face || [];
+      var confidence = (typeof opts.confidence === 'number') ? opts.confidence
+        : (typeof raw.confidence === 'number' ? raw.confidence
+        : (typeof dataObj.confidence === 'number' ? dataObj.confidence : 0.85));
+      var qualityChecks = opts.qualityChecks || raw.qualityChecks || dataObj.qualityChecks || {};
+
+      // 3. 走 TongueFaceValidator 校验 → 5 字段 JSON
+      var Validator = (typeof window !== 'undefined') ? window.TongueFaceValidator : null;
+      var structured;
+      if(Validator && Validator.validate){
+        structured = Validator.validate({
+          qualityChecks: qualityChecks,
+          confidence: confidence,
+          tongueTags: rawTongue,
+          faceTags: rawFace
+        });
+      } else {
+        // 兑底：未加载 validator 时返回原始报文 + 警告
+        structured = {
+          图像质量判定: qualityChecks === 'fail' ? '不合格' : '合格',
+          舌诊客观特征: rawTongue || [],
+          面诊客观特征: rawFace || [],
+          置信度: (confidence || 0).toFixed(2),
+          待知识库推理字段: '已提取客观特征，等待中医知识库多流派辨证解析',
+          reject_code: null,
+          _warning: 'TongueFaceValidator 未加载，输出原始特征未走校验'
+        };
+      }
+
+      return {
+        ok: structured.reject_code === null,
+        structured: structured,
+        raw: base.raw,
+        latency: base.latency,
+        mode: mode,
+        engine: base.engine
+      };
     }
   };
 
