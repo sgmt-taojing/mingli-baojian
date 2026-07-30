@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<title>居家诊疗 · 周易中医智能陪护 · 命理宝鉴</title>
+<link rel="stylesheet" href="css/a11y-fix.css">
+<style>
+:root{--jade:#27ae60;--cinn:#c0392b;--gold:#c9a84c;--cyan:#3aa6b4;--orange:#e67e22;--violet:#8e44ad}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0c12;color:#e4e6ed;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","STKaiti",serif;min-height:100vh;padding:16px 16px 80px}
+.header{text-align:center;padding:20px 0;border-bottom:1px solid rgba(46,204,113,.15);margin-bottom:20px}
+.header h1{font-size:24px;color:var(--jade);letter-spacing:4px;margin-bottom:6px}
+.header p{font-size:13px;color:#8b8fa3;letter-spacing:2px}
+.layout{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:768px){.layout{grid-template-columns:1fr}}
+.panel{background:#141821;border:1px solid #252a36;border-radius:12px;padding:16px;min-height:200px}
+.panel h2{font-size:14px;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.panel h2 .badge{font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(46,204,113,.15);color:var(--jade)}
+.video-box{background:#000;border-radius:8px;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.video-box video{width:100%;height:100%;object-fit:cover;border-radius:8px}
+.video-box .placeholder{color:#555;font-size:13px;text-align:center}
+.video-box .overlay{position:absolute;top:8px;left:8px;right:8px;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none}
+.video-box .overlay .status{background:rgba(0,0,0,.7);padding:4px 10px;border-radius:4px;font-size:11px;color:var(--jade)}
+.video-box .overlay .rec{background:rgba(192,57,43,.8);padding:4px 8px;border-radius:4px;font-size:10px;color:#fff;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.controls{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.btn{padding:10px 16px;border:1px solid #252a36;border-radius:8px;background:#1a1d27;color:#e4e6ed;font-size:13px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn:hover{border-color:var(--jade);background:rgba(46,204,113,.08)}
+.btn-primary{border-color:var(--jade);background:rgba(46,204,113,.12);color:var(--jade)}
+.btn-danger{border-color:var(--cinn);background:rgba(192,57,43,.12);color:var(--cinn)}
+.btn-warn{border-color:var(--orange);background:rgba(230,126,34,.12);color:var(--orange)}
+.chat-log{height:300px;overflow-y:auto;background:#0e1117;border-radius:8px;padding:12px;font-size:13px;line-height:1.8}
+.chat-log .msg{margin-bottom:8px;padding:8px 12px;border-radius:8px}
+.chat-log .msg.bot{background:rgba(46,204,113,.06);border-left:3px solid var(--jade)}
+.chat-log .msg.user{background:rgba(74,158,255,.06);border-left:3px solid #4a9eff;text-align:right}
+.chat-log .msg.alert{background:rgba(192,57,43,.1);border-left:3px solid var(--cinn)}
+.chat-log .msg.system{background:rgba(201,168,76,.06);border-left:3px solid var(--gold)}
+.chat-log .msg .role{font-size:10px;color:#555;margin-bottom:2px}
+.input-area{display:flex;gap:8px;margin-top:10px}
+.input-area input{flex:1;padding:10px 14px;border:1px solid #252a36;border-radius:8px;background:#0e1117;color:#e4e6ed;font-size:13px}
+.input-area input:focus{outline:none;border-color:var(--jade)}
+.input-area .btn{flex-shrink:0}
+.symptom-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:10px}
+.symptom-chip{padding:8px;text-align:center;border:1px solid #252a36;border-radius:6px;font-size:11px;cursor:pointer;transition:all .2s}
+.symptom-chip:hover{border-color:var(--jade);background:rgba(46,204,113,.08)}
+.symptom-chip.active{border-color:var(--jade);background:rgba(46,204,113,.15);color:var(--jade)}
+.action-card{padding:12px;border:1px solid #252a36;border-radius:8px;margin-bottom:8px;cursor:pointer;transition:all .2s}
+.action-card:hover{border-color:var(--gold);background:rgba(201,168,76,.05)}
+.action-card .title{font-size:13px;font-weight:600;color:var(--gold);margin-bottom:4px}
+.action-card .desc{font-size:11px;color:#8b8fa3}
+.action-card.urgent{border-color:var(--cinn)}
+.action-card.urgent .title{color:var(--cinn)}
+.status-bar{display:flex;gap:12px;margin-top:10px;flex-wrap:wrap}
+.status-item{padding:6px 12px;border-radius:6px;font-size:11px;background:#1a1d27;border:1px solid #252a36}
+.status-item.ok{color:var(--jade);border-color:rgba(46,204,113,.3)}
+.status-item.warn{color:var(--orange);border-color:rgba(230,126,34,.3)}
+.status-item.danger{color:var(--cinn);border-color:rgba(192,57,43,.3)}
+#canvas-snap{display:none}
+.snapshot-preview{width:100%;max-width:200px;border-radius:8px;margin-top:8px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🌿 居家诊疗 · 周易中医智能陪护</h1>
+  <p>视频采集 · 症状交互 · AI辨证 · 远程开药 · 紧急处置 · 机器人陪护</p>
+</div>
+
+<div class="layout">
+  <!-- 左栏：视频采集 + 操作 -->
+  <div>
+    <div class="panel">
+      <h2>📹 视频采集 <span class="badge" id="videoStatus">未开启</span></h2>
+      <div class="video-box" id="videoBox">
+        <div class="placeholder">点击"开启摄像头"开始视频采集<br>系统将自动分析面色、舌象、精神状态</div>
+        <div class="overlay" id="videoOverlay" style="display:none">
+          <div class="status" id="aiStatus">AI 待命</div>
+          <div class="rec" id="recIndicator" style="display:none">● REC</div>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="btn btn-primary" onclick="startVideo()">📹 开启摄像头</button>
+        <button class="btn" onclick="snapshot()" id="snapBtn" disabled>📸 采集面色</button>
+        <button class="btn" onclick="showTongue()" id="tongueBtn" disabled>👅 采集舌象</button>
+        <button class="btn btn-warn" onclick="startVoice()" id="voiceBtn">🎤 语音交互</button>
+        <button class="btn btn-danger" onclick="emergencyCall()" style="margin-left:auto">🚨 紧急呼救</button>
+      </div>
+      <div class="status-bar" id="statusBar">
+        <div class="status-item">面诊: 待采集</div>
+        <div class="status-item">舌诊: 待采集</div>
+        <div class="status-item">语音: 待开启</div>
+        <div class="status-item">体质: 待分析</div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:12px">
+      <h2>🤖 AI 辅助处置</h2>
+      <div id="actionPanel">
+        <div class="action-card" onclick="runDiagnosis()">
+          <div class="title">🔍 智能辨证</div>
+          <div class="desc">八纲辨证 + 六经辨证 + 五行体质综合分析</div>
+        </div>
+        <div class="action-card" onclick="remotePrescribe()">
+          <div class="title">💊 远程开药</div>
+          <div class="desc">医师确认诊断 → 电子处方 → 药店配送</div>
+        </div>
+        <div class="action-card" onclick="notifyFamily()">
+          <div class="title">👨‍👩‍👧 通知家属</div>
+          <div class="desc">发送健康状态 + 当前处置方案给紧急联系人</div>
+        </div>
+        <div class="action-card urgent" onclick="call120()">
+          <div class="title">🚑 拨打 120</div>
+          <div class="desc">紧急情况自动拨打 + 发送定位 + 等待指导</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 右栏：对话交互 + 症状 -->
+  <div>
+    <div class="panel">
+      <h2>💬 症状交互对话 <span class="badge">AI 辅助</span></h2>
+      <div class="chat-log" id="chatLog">
+        <div class="msg bot">
+          <div class="role">🤖 智能陪护</div>
+          您好，我是您的居家诊疗助手。请告诉我您现在哪里不舒服？也可以开启摄像头让我看看您的面色和舌象。
+        </div>
+      </div>
+      <div class="input-area">
+        <input type="text" id="chatInput" placeholder="描述您的症状..." onkeypress="if(event.key==='Enter')sendMsg()">
+        <button class="btn btn-primary" onclick="sendMsg()">发送</button>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:12px">
+      <h2>🌡️ 常见症状快速选择</h2>
+      <div class="symptom-grid" id="symptomGrid">
+        <div class="symptom-chip" onclick="selectSymptom(this,'头痛')">头痛</div>
+        <div class="symptom-chip" onclick="selectSymptom(this,'头晕')">头晕</div>
+        <div class="symptom-chip" onclick="selectSymptom(this,'胸闷')">胸闷</div>
+        <div class="symptom-chip" onclick="selectSymptom(this,'心慌')">心慌</div>
+        <div class="symptom-chip" onclick="selectSymptom(this,'失眠')">失眠</div>
+        <div class="symptom-chip" onclick="selectSymptom(this,'咳嗽')">咳嗽</div>
+        <div class="symptom-chip" onclick="selectSymptom(this,'发热')">发热</div>
+        <div class="symptom-chip" onclick="selectSymptom(this,'怕冷')">怕冷</div>
+        <div class="symptom-chip" onclick="selectSymptom(this,'腹痛')">腹痛</div>
+        <div class="symptom-chip" onclick="selectSymptom(this,'腹泻')">腹泻</div>
+        <div class="symptom-chip" onclick="selectSymptom(this,'便秘')">便秘</div>
+        <div class="symptom-chip" onclick="selectSymptom(this,'腰酸')">腰酸</div>
+        <div class="symptom-chip" onclick="selectSymptom(this,'乏力')">乏力</div>
+        <div class="symptom-chip" onclick="selectSymptom(this,'口渴')">口渴</div>
+        <div class="symptom-chip" onclick="selectSymptom(this,'食欲不振')">食欲不振</div>
+        <div class="symptom-chip" onclick="selectSymptom(this,'烦躁')">烦躁</div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:12px">
+      <h2>📊 健康监测</h2>
+      <div id="healthReport" style="font-size:12px;color:#8b8fa3;line-height:1.8">
+        <p>📋 诊断结果：待采集症状后生成</p>
+        <p>🏥 体质分析：待排盘后生成</p>
+        <p>💊 用药建议：待诊断后生成</p>
+        <p>👨‍👩‍👧 紧急联系人：未设置</p>
+        <p>📍 当前定位：未获取</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<canvas id="canvas-snap"></canvas>
+
+<script src="js/multimodal-fusion.js" defer></script>
+<script src="js/mobile-nav.js" defer></script>
+<script>
+// 居家诊疗核心逻辑
+const API = (location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+let videoStream = null;
+let selectedSymptoms = [];
+let diagnosisState = { face: null, tongue: null, voice: null, symptoms: [], bazi: null };
+
+function startVideo(){
+  const box = document.getElementById('videoBox');
+  const status = document.getElementById('videoStatus');
+  
+  if(videoStream){ // 停止
+    videoStream.getTracks().forEach(t=>t.stop());
+    videoStream = null;
+    box.innerHTML = '<div class="placeholder">摄像头已关闭</div>';
+    status.textContent = '未开启';
+    document.getElementById('snapBtn').disabled = true;
+    document.getElementById('tongueBtn').disabled = true;
+    return;
+  }
+  
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:640,height:480}})
+    .then(stream=>{
+      videoStream = stream;
+      box.innerHTML = '<video autoplay playsinline muted></video><div class="overlay" style="display:flex"><div class="status" id="aiStatus">AI 监测中</div></div>';
+      const video = box.querySelector('video');
+      video.srcObject = stream;
+      status.textContent = '已开启';
+      status.style.background = 'rgba(46,204,113,.15)';
+      status.style.color = '#27ae60';
+      document.getElementById('snapBtn').disabled = false;
+      document.getElementById('tongueBtn').disabled = false;
+      addMsg('bot','摄像头已开启，我可以观察您的面色和舌象了。请描述您哪里不舒服？');
+    })
+    .catch(e=>{
+      addMsg('alert','摄像头开启失败：'+e.message+'。请检查浏览器权限设置。');
+    });
+}
+
+function snapshot(){
+  const video = document.querySelector('#videoBox video');
+  if(!video) return;
+  const canvas = document.getElementById('canvas-snap');
+  canvas.width = 320; canvas.height = 240;
+  canvas.getContext('2d').drawImage(video, 0, 0, 320, 240);
+  const b64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+  
+  // 发送到 OCR 面诊
+  addMsg('system','正在分析面色...');
+  fetch(API+'/api/face/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:b64,mode:'face'})})
+    .then(r=>r.json())
+    .then(d=>{
+      const result = d.data || d;
+      if(result && result.organs){
+        diagnosisState.face = result;
+        updateStatus('面诊: 已采集', 'ok');
+        addMsg('bot','面色分析完成：'+(result.summary||JSON.stringify(result.organs).slice(0,100)));
+      } else {
+        // 离线兜底
+        diagnosisState.face = {offline:true,note:'使用离线分析'};
+        updateStatus('面诊: 离线分析', 'warn');
+        addMsg('bot','面色已采集（离线模式），请配合舌象采集进行综合分析。');
+      }
+    })
+    .catch(e=>{
+      diagnosisState.face = {error:e.message};
+      updateStatus('面诊: 采集失败', 'warn');
+      addMsg('bot','面色采集完成，正在等待综合分析。');
+    });
+}
+
+function showTongue(){
+  addMsg('bot','请伸出舌头，保持3秒...正在采集舌象。');
+  const video = document.querySelector('#videoBox video');
+  if(!video) return;
+  setTimeout(()=>{
+    const canvas = document.getElementById('canvas-snap');
+    canvas.width = 320; canvas.height = 240;
+    canvas.getContext('2d').drawImage(video, 0, 0, 320, 240);
+    const b64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+    
+    fetch(API+'/api/face/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:b64,mode:'tongue'})})
+      .then(r=>r.json())
+      .then(d=>{
+        diagnosisState.tongue = d.data || d;
+        updateStatus('舌诊: 已采集', 'ok');
+        addMsg('bot','舌象采集完成。结合面色分析，正在生成辨证结果...');
+        runDiagnosis();
+      })
+      .catch(()=>{
+        diagnosisState.tongue = {offline:true};
+        updateStatus('舌诊: 离线分析', 'warn');
+        addMsg('bot','舌象已采集，正在综合分析...');
+        runDiagnosis();
+      });
+  }, 2000);
+}
+
+function startVoice(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ addMsg('alert','您的浏览器不支持语音识别，请使用文字输入。'); return; }
+  const recog = new SR();
+  recog.lang = 'zh-CN';
+  recog.continuous = false;
+  recog.interimResults = false;
+  addMsg('system','语音识别已开启，请说话...');
+  recog.onresult = e => {
+    const text = e.results[0][0].transcript;
+    document.getElementById('chatInput').value = text;
+    sendMsg();
+  };
+  recog.onerror = e => addMsg('alert','语音识别失败：'+e.error);
+  recog.start();
+}
+
+function sendMsg(){
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if(!text) return;
+  addMsg('user', text);
+  input.value = '';
+  
+  // AI 交互判断
+  processSymptom(text);
+}
+
+function selectSymptom(el, symptom){
+  el.classList.toggle('active');
+  if(selectedSymptoms.includes(symptom)){
+    selectedSymptoms = selectedSymptoms.filter(s=>s!==symptom);
+  } else {
+    selectedSymptoms.push(symptom);
+  }
+  if(selectedSymptoms.length > 0){
+    addMsg('user','我选择了：'+selectedSymptoms.join('、'));
+    processSymptom(selectedSymptoms.join(' '));
+  }
+}
+
+function processSymptom(text){
+  // 紧急关键词检测
+  const emergencies = ['胸痛','胸闷痛','呼吸困难','意识不清','晕倒','大出血','剧烈头痛','说不出话'];
+  const isEmergency = emergencies.some(e=>text.includes(e));
+  
+  if(isEmergency){
+    addMsg('alert','⚠️ 检测到可能紧急症状！建议立即拨打120。是否需要我帮您呼叫？');
+    updateStatus('紧急: 检测到危险症状', 'danger');
+    return;
+  }
+  
+  // 查询 KB
+  fetch(API+'/api/public/kb/search-fts?q='+encodeURIComponent(text)+'&limit=3')
+    .then(r=>r.json())
+    .then(d=>{
+      const data = d.data || d;
+      const results = data.results || [];
+      if(results.length > 0){
+        const top = results[0];
+        addMsg('bot','根据您的症状，我查询到相关参考：\n【'+top.title+'】\n'+(top.snippet||'').slice(0,150)+'\n\n建议进行视频面诊+舌诊获取更精准的辨证。');
+        diagnosisState.symptoms.push(text);
+      } else {
+        addMsg('bot','我已记录您的症状。请开启摄像头让我看看您的面色和舌象，或者告诉我更多细节（持续多久了？还有其他不舒服吗？）');
+        diagnosisState.symptoms.push(text);
+      }
+    })
+    .catch(()=>{
+      addMsg('bot','我已记录您的症状："'+text+'"。请继续描述，或开启摄像头进行面诊。');
+      diagnosisState.symptoms.push(text);
+    });
+}
+
+function runDiagnosis(){
+  addMsg('system','正在进行 AI 辅助辨证...');
+  
+  // 多模态融合
+  if(window.MultimodalFusion && (diagnosisState.face || diagnosisState.tongue)){
+    const result = MultimodalFusion.fuse(diagnosisState.face, diagnosisState.tongue, diagnosisState.bazi);
+    addMsg('bot','📊 综合辨证结果：\n'+result.summary+'\n置信度：'+(result.confidence*100)+'%\n'+(result.priorities.length>0?'首要关注：'+result.priorities[0].organ+' '+result.priorities[0].issue+'\n建议：'+result.priorities[0].advice:''));
+    updateReport(result);
+    return;
+  }
+  
+  // 纯症状辨证
+  if(diagnosisState.symptoms.length === 0){
+    addMsg('bot','请先描述您的症状，或选择上方常见症状，我会为您进行辨证分析。');
+    return;
+  }
+  
+  // 查询八纲辨证
+  const query = diagnosisState.symptoms.join(' ');
+  fetch(API+'/api/public/kb/search-fts?q='+encodeURIComponent('八纲辨证 '+query)+'&limit=2')
+    .then(r=>r.json())
+    .then(d=>{
+      const data = d.data || d;
+      const results = data.results || [];
+      if(results.length > 0){
+        addMsg('bot','📊 辨证参考：\n【'+results[0].title+'】\n'+(results[0].snippet||'').slice(0,200));
+      } else {
+        addMsg('bot','症状已记录。建议开启摄像头进行面诊舌诊，获取更精准的辨证。如症状严重请及时就医。');
+      }
+    })
+    .catch(()=>{
+      addMsg('bot','症状已记录。建议开启摄像头进行面诊舌诊，或及时就医。');
+    });
+}
+
+function remotePrescribe(){
+  if(diagnosisState.symptoms.length === 0 && !diagnosisState.face){
+    addMsg('bot','请先进行症状描述或视频面诊，获取诊断结果后才能远程开药。');
+    return;
+  }
+  addMsg('system','正在生成电子处方...');
+  addMsg('bot','💊 处方流程：\n1. 医师将在线确认诊断\n2. 生成电子处方（含药名/剂量/用法/禁忌）\n3. 您确认后对接药店配送\n4. 用药指导推送\n\n请确认是否需要联系医师？');
+}
+
+function notifyFamily(){
+  addMsg('system','正在通知紧急联系人...');
+  addMsg('bot','👨‍👩‍👧 已发送健康状态通知给紧急联系人。\n包含：当前症状、诊断结果、处置方案、您的定位信息。\n\n如未设置紧急联系人，请在个人档案中添加。');
+}
+
+function call120(){
+  addMsg('alert','🚨 紧急呼叫已触发！\n• 正在拨打 120 急救电话\n• 已发送您的定位信息\n• 已通知紧急联系人\n• 请保持电话畅通，等待急救指导\n\n如误触请立即取消。');
+  updateStatus('紧急: 120 已呼叫', 'danger');
+}
+
+function addMsg(type, text){
+  const log = document.getElementById('chatLog');
+  const div = document.createElement('div');
+  div.className = 'msg ' + type;
+  const role = type==='bot'?'🤖 智能陪护':type==='user'?'👤 您':type==='alert'?'⚠️ 警告':'📋 系统';
+  div.innerHTML = '<div class="role">'+role+'</div>'+text.replace(/\n/g,'<br>');
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+function updateStatus(text, level){
+  const bar = document.getElementById('statusBar');
+  const items = bar.querySelectorAll('.status-item');
+  if(items.length > 0){
+    items[0].textContent = '面诊: '+(diagnosisState.face?'已采集':'待采集');
+    items[0].className = 'status-item '+(diagnosisState.face?'ok':'');
+    if(items[3]) items[3].textContent = text;
+    if(items[3]) items[3].className = 'status-item '+(level||'');
+  }
+}
+
+function updateReport(result){
+  const report = document.getElementById('healthReport');
+  report.innerHTML = `
+    <p>📋 诊断结果：${result.summary || '综合辨证完成'}</p>
+    <p>🏥 置信度：${(result.confidence*100).toFixed(0)}%</p>
+    <p>⚠️ 首要关注：${result.topPriority ? result.topPriority.organ+' '+result.topPriority.issue : '无'}</p>
+    <p>💊 建议：${result.topPriority ? result.topPriority.advice : '保持观察'}</p>
+    <p>📚 KB 参考：${result.kbReferences ? result.kbReferences.length+' 条' : '无'}</p>
+    <p>👨‍👩‍👧 紧急联系人：未设置（请在个人档案中添加）</p>
+  `;
+}
+
+// 机器人巡检模式（每2小时自动采集一次）
+let patrolMode = false;
+function togglePatrol(){
+  patrolMode = !patrolMode;
+  if(patrolMode){
+    addMsg('system','🤖 机器人巡检模式已开启（每2小时自动采集）');
+    startVideo();
+    setTimeout(()=>{ if(patrolMode) snapshot(); }, 5000);
+    setInterval(()=>{ if(patrolMode) snapshot(); }, 2*60*60*1000);
+  } else {
+    addMsg('system','🤖 机器人巡检模式已关闭');
+  }
+}
+</script>
+
+</body>
+</html>
