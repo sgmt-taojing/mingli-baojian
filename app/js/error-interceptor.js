@@ -429,7 +429,7 @@
     AUTH_REDIRECT.count++;
     if (AUTH_REDIRECT.count >= 2) {
       try {
-        location.href = '/app/login.html?returnTo=' + returnTo;
+        location.href = '/login.html?returnTo=' + returnTo;
       } catch (_) {}
     }
   }
