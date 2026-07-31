@@ -8,7 +8,7 @@ window.onerror = function(msg, url, line, col, err) {
 };
 
 function playDivinationSound(){
-  try{if(typeof playSound==='function')playSound('success');}catch(e){console.warn(e.message)}
+  try{if(typeof playSound==='function')playSound('success');}catch(e){void 0}
 }
 
 // ═══ 排盘入口 wrapper 函数 (HTML onclick 调用) ═══
@@ -307,13 +307,13 @@ function getWuxingCareer(ele) {
   return info ? info.职业 : '';
 }
 
-try { window.WUXING_ALL = WUXING_ALL; } catch(e){console.warn(e.message)}
-try { window.getWuxingInfo = getWuxingInfo; } catch(e){console.warn(e.message)}
-try { window.getWuxingByColor = getWuxingByColor; } catch(e){console.warn(e.message)}
-try { window.getWuxingByNumber = getWuxingByNumber; } catch(e){console.warn(e.message)}
-try { window.getWuxingFood = getWuxingFood; } catch(e){console.warn(e.message)}
-try { window.getWuxingOrgan = getWuxingOrgan; } catch(e){console.warn(e.message)}
-try { window.getWuxingCareer = getWuxingCareer; } catch(e){console.warn(e.message)}
+try { window.WUXING_ALL = WUXING_ALL; } catch(e){void 0}
+try { window.getWuxingInfo = getWuxingInfo; } catch(e){void 0}
+try { window.getWuxingByColor = getWuxingByColor; } catch(e){void 0}
+try { window.getWuxingByNumber = getWuxingByNumber; } catch(e){void 0}
+try { window.getWuxingFood = getWuxingFood; } catch(e){void 0}
+try { window.getWuxingOrgan = getWuxingOrgan; } catch(e){void 0}
+try { window.getWuxingCareer = getWuxingCareer; } catch(e){void 0}
 
 
 const ZHI_ELE = {子:'水',丑:'土',寅:'木',卯:'木',辰:'土',巳:'火',午:'火',未:'土',申:'金',酉:'金',戌:'土',亥:'水'};
@@ -10012,7 +10012,7 @@ function _computeZiWeiImpl() {
   document.getElementById('zwNameOut').textContent = name + ' · 紫微斗数专业命盘';
   // 农历显示
   let zwLunarStr = '';
-  try { let zwLunarObj = solarToLunar(year, month, day); if(zwLunarObj) zwLunarStr = ' · 农历'+zwLunarObj.year+'年'+(zwLunarObj.isLeapMonth?'闰':'')+(zwLunarObj.month===1?'正':zwLunarObj.month)+'月'+(zwLunarObj.day<11?'初'+zwLunarObj.day:zwLunarObj.day===20?'二十':zwLunarObj.day<30?'廿'+(zwLunarObj.day-20):'三十'); } catch(e){console.warn(e.message)}
+  try { let zwLunarObj = solarToLunar(year, month, day); if(zwLunarObj) zwLunarStr = ' · 农历'+zwLunarObj.year+'年'+(zwLunarObj.isLeapMonth?'闰':'')+(zwLunarObj.month===1?'正':zwLunarObj.month)+'月'+(zwLunarObj.day<11?'初'+zwLunarObj.day:zwLunarObj.day===20?'二十':zwLunarObj.day<30?'廿'+(zwLunarObj.day-20):'三十'); } catch(e){void 0}
   document.getElementById('zwMetaOut').textContent = `公历${year}年${month}月${day}日 · ${hourBranch}时 · ${sex==='male'?'男命':'女命'} · 年干${yearStem}` + zwLunarStr;
 
   // ── 排盘流程说明 ──
@@ -12602,7 +12602,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const ds = `${y}-${m}-${d}`;
   const inputs = document.querySelectorAll('input[type="date"]');
   inputs.forEach(el => { if (el) { el.value = ds; el.max = ds; } });
-  try { initDailyWisdom(); } catch(e1) { console.warn('initDailyWisdom failed:', e1); }
+  try { initDailyWisdom(); } catch(e1) { void 0; }
   // 初始化今日知识推送
   if(typeof initDailyKnowledge==='function') setTimeout(initDailyKnowledge, 300);
   } catch(e) { console.error('DOMContentLoaded init error:', e); showToast('页面初始化出错'); }
@@ -16926,7 +16926,7 @@ function computeYangzhaiPro() {
     out.classList.add('visible');
   }
 }
-try { window.computeYangzhaiPro = computeYangzhaiPro; window.yzpToggleCalendar = yzpToggleCalendar; } catch(e){console.warn(e.message)}
+try { window.computeYangzhaiPro = computeYangzhaiPro; window.yzpToggleCalendar = yzpToggleCalendar; } catch(e){void 0}
 
 function computeFengshui() {
   // 直接调用专业版排盘引擎
@@ -26820,36 +26820,36 @@ try { window.JIU_ZI_LI_HUO_GUIDE = JIU_ZI_LI_HUO_GUIDE; } catch(e) {}
 
 // ═══ 排盘引擎函数全局暴露（确保所有onclick可调用）═══
 // 直接引用顶层函数声明，赋值到window确保全局可访问
-try { window.computeQimen = computeQimen; } catch(e){console.warn(e.message)}
-try { window._qmGetMaXing = _qmGetMaXing; } catch(e){console.warn(e.message)}
-try { window._qmGetKongWang = _qmGetKongWang; } catch(e){console.warn(e.message)}
-try { window._qmCheckWuBuYuShi = _qmCheckWuBuYuShi; } catch(e){console.warn(e.message)}
-try { window.getQimenReadingV2 = getQimenReadingV2; } catch(e){console.warn(e.message)}
-try { window._qmFormatGeju = _qmFormatGeju; } catch(e){console.warn(e.message)}
-try { window._qmIsYangDun = _qmIsYangDun; } catch(e){console.warn(e.message)}
-try { window.computeZiWei = computeZiWei; } catch(e){console.warn(e.message)}
-try { window.computeMingGongIdx = computeMingGongIdx; } catch(e){console.warn(e.message)}
-try { window.computeMeiHua = computeMeiHua; } catch(e){console.warn(e.message)}
-try { window.computeLiuRen = computeLiuRen; } catch(e){console.warn(e.message)}
-try { window.yjStart = yjStart; } catch(e){console.warn(e.message)}
-try { window.computeBazi = computeBazi; } catch(e){console.warn(e.message)}
-try { window.renderNewBaziModules = renderNewBaziModules; } catch(e){console.warn(e.message)}
-try { window.generateInterpretation = generateInterpretation; } catch(e){console.warn(e.message)}
-try { window.getBaziDimensionHTML = getBaziDimensionHTML; } catch(e){console.warn(e.message)}
-try { window.getYearStemBranchExact = getYearStemBranchExact; } catch(e){console.warn(e.message)}
-try { window.getDayStemIndex = getDayStemIndex; } catch(e){console.warn(e.message)}
-try { window.getMonthBranchBySolar = getMonthBranchBySolar; } catch(e){console.warn(e.message)}
-try { window.getMonthStem = getMonthStem; } catch(e){console.warn(e.message)}
-try { window.getHourStem = getHourStem; } catch(e){console.warn(e.message)}
-try { window.trueSolarTimeCorrection = trueSolarTimeCorrection; } catch(e){console.warn(e.message)}
-try { window.lunarToSolar = lunarToSolar; } catch(e){console.warn(e.message)}
-try { window.computeDayun = computeDayun; } catch(e){console.warn(e.message)}
-try { window.computeHuajie = computeHuajie; } catch(e){console.warn(e.message)}
-try { window.computeFengshui = computeFengshui; } catch(e){console.warn(e.message)}
-try { window.computeFloorRecommend = computeFloorRecommend; } catch(e){console.warn(e.message)}
-try { window.frToggleCalendar = frToggleCalendar; } catch(e){console.warn(e.message)}
-try { window.runHetuAnalysis = runHetuAnalysis; } catch(e){console.warn(e.message)}
-try { window.playDivinationSound = playDivinationSound; } catch(e){console.warn(e.message)}
+try { window.computeQimen = computeQimen; } catch(e){void 0}
+try { window._qmGetMaXing = _qmGetMaXing; } catch(e){void 0}
+try { window._qmGetKongWang = _qmGetKongWang; } catch(e){void 0}
+try { window._qmCheckWuBuYuShi = _qmCheckWuBuYuShi; } catch(e){void 0}
+try { window.getQimenReadingV2 = getQimenReadingV2; } catch(e){void 0}
+try { window._qmFormatGeju = _qmFormatGeju; } catch(e){void 0}
+try { window._qmIsYangDun = _qmIsYangDun; } catch(e){void 0}
+try { window.computeZiWei = computeZiWei; } catch(e){void 0}
+try { window.computeMingGongIdx = computeMingGongIdx; } catch(e){void 0}
+try { window.computeMeiHua = computeMeiHua; } catch(e){void 0}
+try { window.computeLiuRen = computeLiuRen; } catch(e){void 0}
+try { window.yjStart = yjStart; } catch(e){void 0}
+try { window.computeBazi = computeBazi; } catch(e){void 0}
+try { window.renderNewBaziModules = renderNewBaziModules; } catch(e){void 0}
+try { window.generateInterpretation = generateInterpretation; } catch(e){void 0}
+try { window.getBaziDimensionHTML = getBaziDimensionHTML; } catch(e){void 0}
+try { window.getYearStemBranchExact = getYearStemBranchExact; } catch(e){void 0}
+try { window.getDayStemIndex = getDayStemIndex; } catch(e){void 0}
+try { window.getMonthBranchBySolar = getMonthBranchBySolar; } catch(e){void 0}
+try { window.getMonthStem = getMonthStem; } catch(e){void 0}
+try { window.getHourStem = getHourStem; } catch(e){void 0}
+try { window.trueSolarTimeCorrection = trueSolarTimeCorrection; } catch(e){void 0}
+try { window.lunarToSolar = lunarToSolar; } catch(e){void 0}
+try { window.computeDayun = computeDayun; } catch(e){void 0}
+try { window.computeHuajie = computeHuajie; } catch(e){void 0}
+try { window.computeFengshui = computeFengshui; } catch(e){void 0}
+try { window.computeFloorRecommend = computeFloorRecommend; } catch(e){void 0}
+try { window.frToggleCalendar = frToggleCalendar; } catch(e){void 0}
+try { window.runHetuAnalysis = runHetuAnalysis; } catch(e){void 0}
+try { window.playDivinationSound = playDivinationSound; } catch(e){void 0}
 
 // ════════════════════════════════════════════════════════
 //  缘主信息持久化 - 自动填充排盘工具 + 信息管理
@@ -27225,12 +27225,12 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // 暴露到全局
-try { window.autoFillUserBazi = autoFillUserBazi; } catch(e){console.warn(e.message)}
-try { window.forceFillUserBazi = forceFillUserBazi; } catch(e){console.warn(e.message)}
-try { window.renderUserBaziCard = renderUserBaziCard; } catch(e){console.warn(e.message)}
-try { window.clearUserBazi = clearUserBazi; } catch(e){console.warn(e.message)}
-try { window.editUserBazi = editUserBazi; } catch(e){console.warn(e.message)}
-try { window.showAutoFillHint = showAutoFillHint; } catch(e){console.warn(e.message)}
+try { window.autoFillUserBazi = autoFillUserBazi; } catch(e){void 0}
+try { window.forceFillUserBazi = forceFillUserBazi; } catch(e){void 0}
+try { window.renderUserBaziCard = renderUserBaziCard; } catch(e){void 0}
+try { window.clearUserBazi = clearUserBazi; } catch(e){void 0}
+try { window.editUserBazi = editUserBazi; } catch(e){void 0}
+try { window.showAutoFillHint = showAutoFillHint; } catch(e){void 0}
 
 // ================================================================
 // 家庭综合排盘系统
@@ -27886,12 +27886,12 @@ function generateFamilyHuajie() {
 }
 
 // 暴露家庭排盘函数
-try { window.addFamilyPaipanMember = addFamilyPaipanMember; } catch(e){console.warn(e.message)}
-try { window.removeFamilyPaipanMember = removeFamilyPaipanMember; } catch(e){console.warn(e.message)}
-try { window.renderFamilyMembers = renderFamilyMembers; } catch(e){console.warn(e.message)}
-try { window.computeSingleMemberPaipan = computeSingleMemberPaipan; } catch(e){console.warn(e.message)}
-try { window.computeFamilyPaipan = computeFamilyPaipan; } catch(e){console.warn(e.message)}
-try { window.generateFamilyHuajie = generateFamilyHuajie; } catch(e){console.warn(e.message)}
+try { window.addFamilyPaipanMember = addFamilyPaipanMember; } catch(e){void 0}
+try { window.removeFamilyPaipanMember = removeFamilyPaipanMember; } catch(e){void 0}
+try { window.renderFamilyMembers = renderFamilyMembers; } catch(e){void 0}
+try { window.computeSingleMemberPaipan = computeSingleMemberPaipan; } catch(e){void 0}
+try { window.computeFamilyPaipan = computeFamilyPaipan; } catch(e){void 0}
+try { window.generateFamilyHuajie = generateFamilyHuajie; } catch(e){void 0}
 
 //console.warn('[引擎] 排盘函数全局暴露完成');
 
@@ -30025,8 +30025,8 @@ function computeLifePlan() {
  }
 }
 // 暴露人生规划函数
-try { window.computeLifePlan = computeLifePlan; } catch(e){console.warn(e.message)}
-try { window.lpToggleCalendar = lpToggleCalendar; } catch(e){console.warn(e.message)}
+try { window.computeLifePlan = computeLifePlan; } catch(e){void 0}
+try { window.lpToggleCalendar = lpToggleCalendar; } catch(e){void 0}
 
 // ================================================================
 // ===== 青少年规划 (YOUTH PLAN) =====
@@ -30463,7 +30463,7 @@ function computeYouthPlan() {
 }
 
 // 暴露青少年规划函数
-try { window.computeYouthPlan = computeYouthPlan; } catch(e){console.warn(e.message)}
+try { window.computeYouthPlan = computeYouthPlan; } catch(e){void 0}
 
 // ================================================================
 // ===== 夫妻双方合参择日 (COUPLE_ZERI) =====
@@ -31424,10 +31424,10 @@ function runZeRiBirth() {
 }
 
 // 暴露新函数到window
-try { window.computeZeRiCouple = computeZeRiCouple; } catch(e){console.warn(e.message)}
-try { window.computeZeRiBirth = computeZeRiBirth; } catch(e){console.warn(e.message)}
-try { window.runZeRiCouple = runZeRiCouple; } catch(e){console.warn(e.message)}
-try { window.runZeRiBirth = runZeRiBirth; } catch(e){console.warn(e.message)}
+try { window.computeZeRiCouple = computeZeRiCouple; } catch(e){void 0}
+try { window.computeZeRiBirth = computeZeRiBirth; } catch(e){void 0}
+try { window.runZeRiCouple = runZeRiCouple; } catch(e){void 0}
+try { window.runZeRiBirth = runZeRiBirth; } catch(e){void 0}
 
 // ═══════════════════════════════════════════════════════════
 //  六十甲子周期推算引擎
@@ -32617,9 +32617,9 @@ function runJiaziCycle() {
 }
 
 // 暴露到window
-try { window.computeJiaziCycle = computeJiaziCycle; } catch(e){console.warn(e.message)}
-try { window.renderJiaziCycleReport = renderJiaziCycleReport; } catch(e){console.warn(e.message)}
-try { window.runJiaziCycle = runJiaziCycle; } catch(e){console.warn(e.message)}
+try { window.computeJiaziCycle = computeJiaziCycle; } catch(e){void 0}
+try { window.renderJiaziCycleReport = renderJiaziCycleReport; } catch(e){void 0}
+try { window.runJiaziCycle = runJiaziCycle; } catch(e){void 0}
 
 // ================================================================
 // ===== 多人参与择日 (MULTI_ZERI) =====
@@ -33421,10 +33421,10 @@ function runZeRiMulti() {
 }
 
 // 暴露多人择日函数到window
-try { window.computeZeRiMulti = computeZeRiMulti; } catch(e){console.warn(e.message)}
-try { window.addZeRiPerson = addZeRiPerson; } catch(e){console.warn(e.message)}
-try { window.removeZeRiPerson = removeZeRiPerson; } catch(e){console.warn(e.message)}
-try { window.runZeRiMulti = runZeRiMulti; } catch(e){console.warn(e.message)}
+try { window.computeZeRiMulti = computeZeRiMulti; } catch(e){void 0}
+try { window.addZeRiPerson = addZeRiPerson; } catch(e){void 0}
+try { window.removeZeRiPerson = removeZeRiPerson; } catch(e){void 0}
+try { window.runZeRiMulti = runZeRiMulti; } catch(e){void 0}
 
 // 页面加载后自动初始化第一个参与人
 try {
@@ -33436,7 +33436,7 @@ try {
       }
     });
   }
-} catch(e){console.warn(e.message)}
+} catch(e){void 0}
 
 // ═══ 排盘模式切换 ═══
 function toggleDivinationMode(tool, mode) {
@@ -33561,7 +33561,7 @@ function exportReportAsText() {
   }
   let text = resultEl.innerText || resultEl.textContent || '';
   let name = '';
-  try { let bz = safeGetJSON('userBazi', {}); name = bz.name || ''; } catch(e){console.warn(e.message)}
+  try { let bz = safeGetJSON('userBazi', {}); name = bz.name || ''; } catch(e){void 0}
   let header = '易道智鉴 · 命理报告\n';
   if (name) header += '缘主：' + name + '\n';
   header += '生成时间：' + new Date().toLocaleString('zh-CN') + '\n';
@@ -33606,7 +33606,7 @@ function exportReportAsHTMLFile() {
     return;
   }
   let name = '有缘人';
-  try { let bz = safeGetJSON('userBazi', {}); name = bz.name || name; } catch(e){console.warn(e.message)}
+  try { let bz = safeGetJSON('userBazi', {}); name = bz.name || name; } catch(e){void 0}
 
   // 获取内联样式
   let styles = _getReportInlineStyles();
@@ -33659,7 +33659,7 @@ function exportReportAsImage() {
 
 function _doExportImage(targetEl) {
   let name = '有缘人';
-  try { let bz = safeGetJSON('userBazi', {}); name = bz.name || name; } catch(e){console.warn(e.message)}
+  try { let bz = safeGetJSON('userBazi', {}); name = bz.name || name; } catch(e){void 0}
 
   html2canvas(targetEl, {
     backgroundColor: 'var(--ink)',
@@ -33704,15 +33704,15 @@ function _getReportInlineStyles() {
 }
 
 // 挂载到window
-try { window.REPORT_MODULES = REPORT_MODULES; } catch(e){console.warn(e.message)}
-try { window.getReportConfig = getReportConfig; } catch(e){console.warn(e.message)}
-try { window.shouldRenderModule = shouldRenderModule; } catch(e){console.warn(e.message)}
-try { window.getEnabledModuleIds = getEnabledModuleIds; } catch(e){console.warn(e.message)}
-try { window.saveReportConfig = saveReportConfig; } catch(e){console.warn(e.message)}
-try { window.resetReportConfig = resetReportConfig; } catch(e){console.warn(e.message)}
-try { window.exportReportAsText = exportReportAsText; } catch(e){console.warn(e.message)}
-try { window.exportReportAsHTMLFile = exportReportAsHTMLFile; } catch(e){console.warn(e.message)}
-try { window.exportReportAsImage = exportReportAsImage; } catch(e){console.warn(e.message)}
+try { window.REPORT_MODULES = REPORT_MODULES; } catch(e){void 0}
+try { window.getReportConfig = getReportConfig; } catch(e){void 0}
+try { window.shouldRenderModule = shouldRenderModule; } catch(e){void 0}
+try { window.getEnabledModuleIds = getEnabledModuleIds; } catch(e){void 0}
+try { window.saveReportConfig = saveReportConfig; } catch(e){void 0}
+try { window.resetReportConfig = resetReportConfig; } catch(e){void 0}
+try { window.exportReportAsText = exportReportAsText; } catch(e){void 0}
+try { window.exportReportAsHTMLFile = exportReportAsHTMLFile; } catch(e){void 0}
+try { window.exportReportAsImage = exportReportAsImage; } catch(e){void 0}
 
 // ═══════════════════════════════════════════════════════════════
 // P0需求1: 排盘盘面可视化渲染函数
@@ -37605,7 +37605,7 @@ try {
   window.injectZiweiFuStarsAnalysis = injectZiweiFuStarsAnalysis;
   window.injectFengshuiSanheAnalysis = injectFengshuiSanheAnalysis;
   window.getMonthBranchIdx = getMonthBranchIdx;
-} catch(e){console.warn(e.message)}
+} catch(e){void 0}
 
 // ═══════ 补全：大运空亡 ═══════
 function getDayunKongWang(dayunArr, pillars, dayStem) {
@@ -37620,7 +37620,7 @@ function getDayunKongWang(dayunArr, pillars, dayStem) {
   }
   return result;
 }
-try { window.getDayunKongWang = getDayunKongWang; } catch(e){console.warn(e.message)}
+try { window.getDayunKongWang = getDayunKongWang; } catch(e){void 0}
 
 // ═══════ 补全：纳音取象 ═══════
 var NAYIN_XIANG = {
@@ -37658,8 +37658,8 @@ var NAYIN_XIANG = {
 function getNayinXiang(nayinName) {
   return NAYIN_XIANG[nayinName] || '';
 }
-try { window.NAYIN_XIANG = NAYIN_XIANG; } catch(e){console.warn(e.message)}
-try { window.getNayinXiang = getNayinXiang; } catch(e){console.warn(e.message)}
+try { window.NAYIN_XIANG = NAYIN_XIANG; } catch(e){void 0}
+try { window.getNayinXiang = getNayinXiang; } catch(e){void 0}
 
 // ═══════ 补全：十神心性 ═══════
 var SHISHEN_XINXING = {
@@ -37677,8 +37677,8 @@ var SHISHEN_XINXING = {
 function getShishenXinxing(shishen) {
   return SHISHEN_XINXING[shishen] || '';
 }
-try { window.SHISHEN_XINXING = SHISHEN_XINXING; } catch(e){console.warn(e.message)}
-try { window.getShishenXinxing = getShishenXinxing; } catch(e){console.warn(e.message)}
+try { window.SHISHEN_XINXING = SHISHEN_XINXING; } catch(e){void 0}
+try { window.getShishenXinxing = getShishenXinxing; } catch(e){void 0}
 
 // ═══════ 补全：格局喜忌 ═══════
 var GEJU_XIJI = {
@@ -37694,8 +37694,8 @@ var GEJU_XIJI = {
 function getGejuXiji(gejuName) {
   return GEJU_XIJI[gejuName] || '';
 }
-try { window.GEJU_XIJI = GEJU_XIJI; } catch(e){console.warn(e.message)}
-try { window.getGejuXiji = getGejuXiji; } catch(e){console.warn(e.message)}
+try { window.GEJU_XIJI = GEJU_XIJI; } catch(e){void 0}
+try { window.getGejuXiji = getGejuXiji; } catch(e){void 0}
 
 // ═══ R2.3: 格局成败高低论 ═══
 function buildGejuChengBaiHTML(data) {
@@ -37904,7 +37904,7 @@ function buildGejuChengBaiHTML(data) {
   html += '</div>';
   return html;
 }
-try { window.buildGejuChengBaiHTML = buildGejuChengBaiHTML; } catch(e){console.warn(e.message)}
+try { window.buildGejuChengBaiHTML = buildGejuChengBaiHTML; } catch(e){void 0}
 
 // ═══ R2.2: 婚期推断 ═══
 function buildHunqiAnalysisHTML(data) {
@@ -38038,7 +38038,7 @@ function buildHunqiAnalysisHTML(data) {
   html += '</div>';
   return html;
 }
-try { window.buildHunqiAnalysisHTML = buildHunqiAnalysisHTML; } catch(e){console.warn(e.message)}
+try { window.buildHunqiAnalysisHTML = buildHunqiAnalysisHTML; } catch(e){void 0}
 
 // ═══ R2.4: 流年与命局互动分析 ═══
 function buildLiunianInteractionHTML(data) {
@@ -38153,7 +38153,7 @@ function buildLiunianInteractionHTML(data) {
   html += '</div>';
   return html;
 }
-try { window.buildLiunianInteractionHTML = buildLiunianInteractionHTML; } catch(e){console.warn(e.message)}
+try { window.buildLiunianInteractionHTML = buildLiunianInteractionHTML; } catch(e){void 0}
 
 // ═══════ 补全：命局层次 ═══════
 function judgeMingJuCengci(geju, yongshen, isStrong, eleCount) {
@@ -38178,7 +38178,7 @@ function judgeMingJuCengci(geju, yongshen, isStrong, eleCount) {
   let level = score >= 80 ? '上等（富贵可期）' : score >= 65 ? '中上（小富小贵）' : score >= 50 ? '中等（平稳一生）' : score >= 35 ? '中下（机遇不足）' : '下等（多劳少成）';
   return { score: Math.min(100, Math.max(0, score)), level: level };
 }
-try { window.judgeMingJuCengci = judgeMingJuCengci; } catch(e){console.warn(e.message)}
+try { window.judgeMingJuCengci = judgeMingJuCengci; } catch(e){void 0}
 
 // ═══════ 补全：九星旺衰 ═══════
 function getJiuxingWangshuai(starName, monthBranch) {
@@ -38195,7 +38195,7 @@ function getJiuxingWangshuai(starName, monthBranch) {
   else level = '死（被反克，力极弱）';
   return { ele: ele, monthEle: monthEle, level: level };
 }
-try { window.getJiuxingWangshuai = getJiuxingWangshuai; } catch(e){console.warn(e.message)}
+try { window.getJiuxingWangshuai = getJiuxingWangshuai; } catch(e){void 0}
 
 // ═══════ 补全：进神退神 ═══
 function judgeJinshenTuishen(yao1, yao2) {
@@ -38207,7 +38207,7 @@ function judgeJinshenTuishen(yao1, yao2) {
   if ((i1 - i2 + 12) % 12 === 1) return '退神（力量减弱，事物倒退）';
   return '无进退';
 }
-try { window.judgeJinshenTuishen = judgeJinshenTuishen; } catch(e){console.warn(e.message)}
+try { window.judgeJinshenTuishen = judgeJinshenTuishen; } catch(e){void 0}
 
 // ═══════ 补全：形势派风水 ═══════
 var XINGSHI_SHA = {
@@ -38220,7 +38220,7 @@ var XINGSHI_SHA = {
   '孤阳煞':{desc:'孤高建筑独立无靠，主孤独不聚财', severity:'中度', solution:'放麒麟/貔貅增强气势'},
   '孤阴煞':{desc:'近墓地/殡仪馆，主阴气重运低迷', severity:'严重', solution:'挂八仙/八卦镜+供佛堂/香火'}
 };
-try { window.XINGSHI_SHA = XINGSHI_SHA; } catch(e){console.warn(e.message)}
+try { window.XINGSHI_SHA = XINGSHI_SHA; } catch(e){void 0}
 
 // ═══════ 补全：三奇得使 ═══════
 function checkSanqiDeshi(palaces) {
@@ -38238,14 +38238,14 @@ function checkSanqiDeshi(palaces) {
   }
   return result;
 }
-try { window.checkSanqiDeshi = checkSanqiDeshi; } catch(e){console.warn(e.message)}
+try { window.checkSanqiDeshi = checkSanqiDeshi; } catch(e){void 0}
 
 // ═══════ 补全：五不遇时 ═══════
 function checkWuBuYuShi(dayStem, hourGan) {
   let ke = {甲:'庚',乙:'辛',丙:'壬',丁:'癸',戊:'甲',己:'乙',庚:'丙',辛:'丁',壬:'戊',癸:'己'};
   return ke[dayStem] === hourGan;
 }
-try { window.checkWuBuYuShi = checkWuBuYuShi; } catch(e){console.warn(e.message)}
+try { window.checkWuBuYuShi = checkWuBuYuShi; } catch(e){void 0}
 
 // ═══════ 补全：紫微命主身主 ═══════
 function computeZwMingShenZhu(mingGongGanIdx, shenGongBranchIdx) {
@@ -38275,13 +38275,13 @@ function computeZwMingShenZhu(mingGongGanIdx, shenGongBranchIdx) {
     shenZhuDesc: shenZhuDesc[shenZhu] || ''
   };
 }
-try { window.computeZwMingShenZhu = computeZwMingShenZhu; } catch(e){console.warn(e.message)}
+try { window.computeZwMingShenZhu = computeZwMingShenZhu; } catch(e){void 0}
 
 // showVipModal - 会员弹窗（已在上方定义，此处仅确保window暴露）
-try { window.showVipModal = showVipModal; } catch(e){console.warn(e.message)}
+try { window.showVipModal = showVipModal; } catch(e){void 0}
 
 // scrollToTop - 滚动到顶部
-if (typeof scrollToTop !== 'function') { function scrollToTop() { window.scrollTo({top:0, behavior:'smooth'}); } try { window.scrollToTop = scrollToTop; } catch(e){console.warn(e.message)} }
+if (typeof scrollToTop !== 'function') { function scrollToTop() { window.scrollTo({top:0, behavior:'smooth'}); } try { window.scrollToTop = scrollToTop; } catch(e){void 0} }
 
 // ═══ DOMContentLoaded 安全保护 ═══
 // 确保日期输入框有默认值（即使前面的DOMContentLoaded报错）
@@ -40053,9 +40053,9 @@ function buildFamilyEthicsGuide(baziData) {
 }
 
 // 挂载到window
-try { window.computeHealthForecast = computeHealthForecast; } catch(e){console.warn(e.message)}
-try { window.renderHealthForecast = renderHealthForecast; } catch(e){console.warn(e.message)}
-try { window.runHealthForecast = runHealthForecast; } catch(e){console.warn(e.message)}
+try { window.computeHealthForecast = computeHealthForecast; } catch(e){void 0}
+try { window.renderHealthForecast = renderHealthForecast; } catch(e){void 0}
+try { window.runHealthForecast = runHealthForecast; } catch(e){void 0}
 try { window.buildFamilyEthicsGuide = buildFamilyEthicsGuide; } catch(e) {}
 try { window.buildMonthlyFortuneTrend = buildMonthlyFortuneTrend; } catch(e) {}
 

@@ -47,7 +47,7 @@ function detectWechat(){
           });
         });
       }
-    }catch(e){console.warn('[微信分享] 初始化失败:',e)}
+    }catch(e){void 0}
     return true;
   }
   return false;
@@ -67,7 +67,7 @@ function playBell(freq=800, duration=1.2){
     g.gain.setValueAtTime(0.25, audioCtx.currentTime);
     g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+duration);
     o.start(); o.stop(audioCtx.currentTime+duration);
-  }catch(e){console.warn(e.message)}
+  }catch(e){void 0}
 }
 function playSound(type) {
   try {
