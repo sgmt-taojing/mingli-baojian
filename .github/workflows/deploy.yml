@@ -30,20 +30,13 @@ jobs:
       - name: Prepare deploy directory
         run: |
           mkdir -p _site
-          # 复制 app/ 目录（HTML + CSS + JS + KB）
+          # 复制 app/ 目录（HTML + CSS + JS + KB + knowledge-models + components）
           cp -r app _site/app
           # 把 app/css/ 和 app/js/ 也复制到 _site/ 根，确保根目录 HTML 也能加载 CSS/JS
           cp -r app/css _site/css
           cp -r app/js _site/js
           # 复制根目录 knowledge/ 到 _site/ 根
           if [ -d knowledge ]; then cp -r knowledge _site/knowledge; fi
-          # 复制 docs/ 目录（文档+报告）
-          if [ -d docs ]; then cp -r docs _site/docs; fi
-          # 复制 DELIVERY/ → _site/docs/DELIVERY/
-          if [ -d DELIVERY ]; then
-            mkdir -p _site/docs/DELIVERY
-            cp -r DELIVERY/. _site/docs/DELIVERY/ || true
-          fi
           # 创建.nojekyll（禁用Jekyll处理）
           touch _site/.nojekyll
           # 复制根目录 index.html
