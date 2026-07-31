@@ -109,47 +109,22 @@ body{font-family:'Noto Serif SC',serif;background:var(--ink);color:var(--paper);
   <div class="nav-inner">
     <div class="nav-brand">易道智鉴</div>
     <div class="nav-tabs" role="tablist" aria-label="主导航 Tab" aria-orientation="horizontal">
-      <button class="nav-tab" role="tab" aria-selected="false" aria-controls="section-hero" onclick="showSection('hero')" id="tab-hero">
+      <button class="nav-tab active" role="tab" aria-selected="true" aria-controls="section-hero" onclick="showSection('hero')" id="tab-hero">
         <span class="tab-emoji">🏠</span>
         <span class="tab-name">首页</span>
       </button>
-      <button class="nav-tab" role="tab" aria-selected="false" aria-controls="section-bazi" onclick="showSection('bazi')" id="tab-bazi">
-        <span class="tab-emoji">🌟</span>
-        <span class="tab-name">命盘</span>
+      <button class="nav-tab" role="tab" aria-selected="false" onclick="window.location.href='ai-assistant.html'" id="tab-ai">
+        <span class="tab-emoji">🤖</span>
+        <span class="tab-name">AI助手</span>
       </button>
-      <button class="nav-tab" role="tab" aria-selected="false" aria-controls="section-zhanbu" onclick="showSection('zhanbu')" id="tab-zhanbu">
-        <span class="tab-emoji">䷀</span>
-        <span class="tab-name">占卜</span>
-      </button>
-      <button class="nav-tab" role="tab" aria-selected="false" aria-controls="section-fengshui" onclick="showSection('fengshui')" id="tab-fengshui">
-        <span class="tab-emoji">🏡</span>
-        <span class="tab-name">风水</span>
-      </button>
-      <button class="nav-tab" role="tab" aria-selected="false" aria-controls="section-xingming" onclick="showSection('xingming')" id="tab-xingming">
-        <span class="tab-emoji">🔤</span>
-        <span class="tab-name">姓名</span>
-      </button>
-      <button class="nav-tab" role="tab" aria-selected="false" aria-controls="section-jiuri" onclick="showSection('jiuri')" id="tab-jiuri">
-        <span class="tab-emoji">💮</span>
-        <span class="tab-name">吉日</span>
-      </button>
-      <button class="nav-tab" role="tab" aria-selected="false" aria-controls="section-more" onclick="showSection('more')" id="tab-more">
-        <span class="tab-emoji">🚪</span>
-        <span class="tab-name">门户</span>
-      </button>
-      <button class="nav-tab" role="tab" aria-selected="false" aria-controls="section-annual-fortune" onclick="showSection('annual-fortune')" id="tab-annual-fortune">
-        <span class="tab-emoji">🎊</span>
-        <span class="tab-name">年度运势</span>
-      </button>
-      <button class="nav-tab" role="tab" aria-selected="false" aria-controls="section-healing-music" onclick="showSection('healing-music')" id="tab-healing-music">
-        <span class="tab-emoji">🎵</span>
-        <span class="tab-name">养心音乐</span>
-      </button>
-      <button class="nav-tab" id="tab-im" role="tab" aria-selected="false" onclick="location.href='im.html'" style="background:linear-gradient(135deg,rgba(6,182,212,.08),transparent);border-bottom-color:rgba(6,182,212,.4);color:#22d3ee">
+      <button class="nav-tab" id="tab-im" role="tab" aria-selected="false" onclick="location.href='im.html'">
         <span class="tab-emoji">💬</span>
-        <span class="tab-name">站内消息</span>
+        <span class="tab-name">消息</span>
       </button>
-
+      <div class="nav-search">
+        <input type="text" id="navSearchInput" placeholder="搜索功能..." oninput="navSearch(this.value)">
+        <div class="nav-search-results" id="navSearchResults"></div>
+      </div>
     </div>
   </div>
   <div class="nav-user" aria-hidden="true">古 老 预 测 术</div>
@@ -2522,6 +2497,39 @@ function navExpandCards(sysKey){
       '</ml-tap>';
   }).join('');
   navShowSide(sysKey);
+}
+
+
+// ===== 导航搜索 (R328) =====
+function navSearch(query){
+  var results = document.getElementById('navSearchResults');
+  if(!results) return;
+  if(!query || query.length < 1){
+    results.style.display = 'none';
+    results.innerHTML = '';
+    return;
+  }
+  var q = query.toLowerCase();
+  var matches = [];
+  var systems = ['zhouyi','tcm','knowledge','ops','user'];
+  for(var si=0; si<systems.length; si++){
+    var sys = NAV_SYSTEMS[systems[si]];
+    if(!sys) continue;
+    for(var ci=0; ci<sys.cards.length; ci++){
+      var c = sys.cards[ci];
+      if(c.name.toLowerCase().indexOf(q)>=0 || c.en.toLowerCase().indexOf(q)>=0 || c.desc.toLowerCase().indexOf(q)>=0){
+        matches.push({sys:systems[si], card:c});
+      }
+    }
+  }
+  if(matches.length === 0){
+    results.innerHTML = '<div class="nsr-empty">未找到相关功能</div>';
+  } else {
+    results.innerHTML = matches.slice(0,8).map(function(m){
+      return '<a class="nsr-item" onclick="navExpandCards(\''+m.sys+'\')">'+m.card.icon+' '+m.card.name+'</a>';
+    }).join('');
+  }
+  results.style.display = 'block';
 }
 
 function navBackToSystems(){
