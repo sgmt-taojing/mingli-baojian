@@ -22,7 +22,15 @@
 <link rel="stylesheet" href="css/theme-systems.css">
 <link rel="stylesheet" href="css/flow-engine.css">
 </head>
-<body data-kb-module="bazi">
+<body class="theme-zhouyi" data-kb-module="bazi">
+<div class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">八字命盘</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</div>
+
 <div class="flow-steps-wrap" style="padding:12px 24px 0">
 <div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>填写信息</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>排盘演算</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>查看命盘</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>深度分析</span></div></div>
 <div class="flow-hint">填写出生年月日时，点击排盘演算。</div>
@@ -695,6 +703,7 @@ if(typeof runBaziEnhancedFortune!=='function'){window.runBaziEnhancedFortune=fun
 if(typeof runHealthForecast!=='function'){window.runHealthForecast=function(){try{var r=document.getElementById('healthForecastResult')||document.getElementById('baziResult');if(r){r.insertAdjacentHTML('beforeend','<div style=\"margin-top:12px;padding:14px;background:rgba(39,174,96,0.06);border-radius:10px;border:1px solid rgba(39,174,96,0.15)\"><h5 style=\"color:var(--jade2);margin-bottom:8px\">🏥 健康预测</h5><p style=\"font-size:13px;color:var(--paper2)\">基于八字五行强弱分析的健康趋势预测。完整健康预测请在主页使用。</p></div>');}if(typeof toast==='function')toast('健康预测已生成（简化版）');}catch(e){console.warn('[runHealthForecast]',e);}};}
 if(typeof exportBaziReport!=='function'){window.exportBaziReport=function(fmt){try{var data=document.querySelector('.result-section')||document.body;var html=`<!DOCTYPE html><html lang="zh-CN"><head><meta charset=UTF-8><title>八字报告</title><link rel="stylesheet" href="css/theme-systems.css">
 <link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
 </head><body class="theme-zhouyi">`+data.innerHTML+`<script>
 document.addEventListener("DOMContentLoaded",function(){
   if(typeof FlowEngine!=="undefined"){
