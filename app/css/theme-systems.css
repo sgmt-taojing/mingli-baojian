@@ -1,0 +1,125 @@
+/* ================================================================
+   命理宝鉴 · 六大体系色彩系统
+   ================================================================ */
+
+:root {
+  /* 通用基础 */
+  --sys-bg: #12121a;
+  --sys-text: #c9d1d9;
+  --sys-muted: #6b7280;
+  --sys-border: rgba(255,255,255,.06);
+  --sys-card-bg: rgba(255,255,255,.02);
+  
+  /* 1. 周易术数 — 金色系 */
+  --zhouyi-primary: #d4b06a;
+  --zhouyi-accent: rgba(212,176,106,.15);
+  --zhouyi-border: rgba(212,176,106,.12);
+  --zhouyi-glow: rgba(212,176,106,.08);
+  
+  /* 2. 中医诊疗 — 青翠系 */
+  --tcm-primary: #4a9d7f;
+  --tcm-accent: rgba(74,157,127,.15);
+  --tcm-border: rgba(74,157,127,.12);
+  --tcm-glow: rgba(74,157,127,.08);
+  
+  /* 3. 知识文化 — 藏蓝系 */
+  --knowledge-primary: #5b7da8;
+  --knowledge-accent: rgba(91,125,168,.15);
+  --knowledge-border: rgba(91,125,168,.12);
+  --knowledge-glow: rgba(91,125,168,.08);
+  
+  /* 4. 运营运维 — 钢灰系 */
+  --ops-primary: #7a8290;
+  --ops-accent: rgba(122,130,144,.15);
+  --ops-border: rgba(122,130,144,.12);
+  --ops-glow: rgba(122,130,144,.08);
+  
+  /* 5. 用户服务 — 暖橙系 */
+  --user-primary: #c8855a;
+  --user-accent: rgba(200,133,90,.15);
+  --user-border: rgba(200,133,90,.12);
+  --user-glow: rgba(200,133,90,.08);
+  
+  /* 6. AI智能 — 紫罗兰系 */
+  --ai-primary: #8b6db5;
+  --ai-accent: rgba(139,109,181,.15);
+  --ai-border: rgba(139,109,181,.12);
+  --ai-glow: rgba(139,109,181,.08);
+}
+
+/* 体系色彩 class */
+.theme-zhouyi { --sys-primary: var(--zhouyi-primary); --sys-accent: var(--zhouyi-accent); --sys-border-c: var(--zhouyi-border); --sys-glow: var(--zhouyi-glow); }
+.theme-tcm { --sys-primary: var(--tcm-primary); --sys-accent: var(--tcm-accent); --sys-border-c: var(--tcm-border); --sys-glow: var(--tcm-glow); }
+.theme-knowledge { --sys-primary: var(--knowledge-primary); --sys-accent: var(--knowledge-accent); --sys-border-c: var(--knowledge-border); --sys-glow: var(--knowledge-glow); }
+.theme-ops { --sys-primary: var(--ops-primary); --sys-accent: var(--ops-accent); --sys-border-c: var(--ops-border); --sys-glow: var(--ops-glow); }
+.theme-user { --sys-primary: var(--user-primary); --sys-accent: var(--user-accent); --sys-border-c: var(--user-border); --sys-glow: var(--user-glow); }
+.theme-ai { --sys-primary: var(--ai-primary); --sys-accent: var(--ai-accent); --sys-border-c: var(--ai-border); --sys-glow: var(--ai-glow); }
+
+/* 统一页面基础样式 */
+body {
+  background: var(--sys-bg) !important;
+  color: var(--sys-text) !important;
+  font-family: 'Noto Serif SC', 'Source Han Serif SC', serif !important;
+}
+
+/* 统一标题 */
+h1, h2, h3 { color: var(--sys-primary, #d4b06a) !important; }
+
+/* 统一链接 */
+a { color: var(--sys-primary, #d4b06a); }
+
+/* 统一输入框 */
+input[type="text"], input[type="date"], input[type="number"], input[type="password"],
+input[type="email"], select, textarea {
+  background: rgba(255,255,255,.04) !important;
+  border: 1px solid var(--sys-border-c, rgba(201,168,76,.12)) !important;
+  border-radius: 6px !important;
+  padding: 8px 12px !important;
+  color: var(--sys-text) !important;
+  font-size: 13px !important;
+  font-family: inherit !important;
+  min-height: 36px !important;
+  transition: border-color .2s !important;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none !important;
+  border-color: var(--sys-primary, rgba(201,168,76,.35)) !important;
+}
+
+/* 统一按钮 */
+button, input[type="submit"], input[type="button"] {
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  transition: all .2s !important;
+  font-family: inherit !important;
+}
+
+/* 统一卡片 */
+.card, .info-card, .panel, .result {
+  background: var(--sys-card-bg) !important;
+  border: 1px solid var(--sys-border) !important;
+  border-radius: 8px !important;
+  padding: 16px !important;
+  margin-bottom: 12px !important;
+}
+
+/* 统一返回按钮 */
+a[href="divination-hub.html"] {
+  position: fixed !important;
+  top: 8px !important;
+  left: 8px !important;
+  z-index: 9999 !important;
+  padding: 6px 14px !important;
+  border: 1px solid var(--sys-border-c, rgba(201,168,76,.2)) !important;
+  border-radius: 6px !important;
+  background: rgba(18,18,26,.92) !important;
+  color: var(--sys-primary, #d4b06a) !important;
+  font-size: 12px !important;
+  letter-spacing: 2px !important;
+  text-decoration: none !important;
+  backdrop-filter: blur(8px) !important;
+}
+a[href="divination-hub.html"]:hover {
+  background: var(--sys-accent, rgba(201,168,76,.1)) !important;
+  border-color: var(--sys-primary, rgba(201,168,76,.4)) !important;
+}
