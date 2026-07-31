@@ -108,7 +108,7 @@
     html += '<div style="font-size:12px;color:#a09888;margin-bottom:8px">时间：' + time + '</div>';
     if(h.patient_name) html += '<div style="font-size:12px;color:#63b3ed;margin-bottom:8px">患者：' + h.patient_name + '</div>';
     if(h.diagnosis_text) html += '<div style="font-size:12px;margin-bottom:10px"><b style="color:#e8e0d0">望诊诊断：</b><br>' + h.diagnosis_text.replace(/\n/g,'<br>') + '</div>';
-    if(h.ai_analysis) html += '<div style="font-size:12px;margin-bottom:10px"><b style="color:#e8e0d0">AI分析：</b><br>' + h.ai_analysis.replace(/\n/g,'<br>') + '</div>';
+    if(h.ai_analysis) html += '<div style="font-size:12px;margin-bottom:10px"><b style="color:#e8e0d0">系统分析：</b><br>' + h.ai_analysis.replace(/\n/g,'<br>') + '</div>';
     if(h.voice_notes) html += '<div style="font-size:12px;margin-bottom:10px"><b style="color:#e8e0d0">医嘱记录：</b><br>' + h.voice_notes.replace(/\n/g,'<br>') + '</div>';
     html += '<button class="btn btn-secondary" onclick="window.wangzhenClinical.exportCase(' + idx + ')" style="margin-top:8px">📥 导出此病例</button>';
     body.innerHTML = html;
@@ -124,7 +124,7 @@
     text += '时间：' + (h.timestamp ? new Date(h.timestamp).toLocaleString('zh-CN') : '') + '\n';
     if(h.patient_name) text += '患者：' + h.patient_name + '\n';
     if(h.diagnosis_text) text += '\n【望诊诊断】\n' + h.diagnosis_text + '\n';
-    if(h.ai_analysis) text += '\n【AI分析】\n' + h.ai_analysis + '\n';
+    if(h.ai_analysis) text += '\n【系统分析】\n' + h.ai_analysis + '\n';
     if(h.voice_notes) text += '\n【医嘱记录】\n' + h.voice_notes + '\n';
     text += '\n═══ 本报告仅为辅助诊断参考 ═══\n';
     var blob = new Blob([text], {type: 'text/plain;charset=utf-8'});

@@ -1810,7 +1810,7 @@ function showReport(text, meta){
 function saveReport(el){
   const t=el.dataset.report||el.closest('.m-ai').querySelector('.b').textContent;
   const ts=new Date().toLocaleString('zh-CN');
-  const blob=new Blob(['易道智鉴AI分析报告\n生成时间：'+ts+'\n\n'+t],{type:'text/plain;charset=utf-8'});
+  const blob=new Blob(['易道智鉴分析报告\n生成时间：'+ts+'\n\n'+t],{type:'text/plain;charset=utf-8'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='命理分析报告.txt';a.click();
   toast('报告已保存');
 }
@@ -1822,7 +1822,7 @@ function copyMarkdownReport(el){
   const raw=el.dataset.report||el.closest('.m-ai').querySelector('.b').textContent;
   // 纯文本 → 轻量 Markdown：保留换行 + 加粗 **…**
   const md = raw
-    .replace(/易道智鉴AI分析报告/g,'# 易道智鉴 AI 分析报告')
+    .replace(/易道智鉴分析报告/g,'# 易道智鉴 AI 分析报告')
     .replace(/综合指数：([\d.]+) 分/g,'**综合指数**：$1 分')
     .replace(/主导五行：([\u4e00-\u9fa5]+) 行/g,'**主导五行**：$1 行')
     .replace(/推荐五行：([\u4e00-\u9fa5]+)/g,'**推荐五行**：$1')

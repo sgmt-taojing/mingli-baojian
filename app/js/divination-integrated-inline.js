@@ -1587,8 +1587,8 @@ function previewAIFile(file){
     document.getElementById('aiPreviewWrap').style.display='block';
     document.getElementById('aiPreviewImg').src=ev.target.result;
     document.getElementById('aiPreviewImg').style.display='block';
-    showToast('✅ 报告已上传，正在启动AI分析...');
-    // 自动触发AI分析
+    showToast('✅ 报告已上传，正在启动分析...');
+    // 自动触发智能分析
     setTimeout(function(){ callLLMForAnalysis(); }, 500);
   };
   reader.readAsDataURL(file);
@@ -1700,12 +1700,12 @@ async function callLLMForAnalysis(){
     
   } catch(err) {
     clearInterval(tipTimer);
-    console.error('AI分析失败:', err);
-    showToast('AI分析失败:，请重试');
+    console.error('分析失败:', err);
+    showToast('分析失败:，请重试');
     
     document.getElementById('aiAnalyzingState').style.display='none';
     document.getElementById('aiErrorState').style.display='block';
-    document.getElementById('aiErrorMsg').textContent='AI分析失败';
+    document.getElementById('aiErrorMsg').textContent='分析失败';
     
     if(err.name==='AbortError'){
       document.getElementById('aiErrorDetail').textContent='分析已被取消';

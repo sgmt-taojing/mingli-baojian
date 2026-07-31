@@ -3008,7 +3008,7 @@ function tzStep1Analyze(fileName, content, type) {
     showToast('指标分析出错，请重试');
     let isAuth = (err.message||'').indexOf('401')>=0 || (err.message||'').indexOf('Unauthorized')>=0 || (err.message||'').indexOf('Invalid token')>=0;
     if(isAuth){
-      result.innerHTML = '<div style="padding:24px;text-align:center"><div style="font-size:48px;margin-bottom:12px">🔑</div><div style="font-size:15px;color:var(--cinn2);margin-bottom:10px;font-weight:bold">AI分析服务认证失败</div><div style="font-size:13px;color:var(--paper2);margin-bottom:16px;line-height:1.6">API代理服务的认证令牌已过期或未配置。<br>请检查 <code style="background:rgba(255,255,255,.1);padding:2px 6px;border-radius:4px">server/api-proxy-server.py</code> 的 API 配置。</div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="compute-btn" style="padding:8px 20px;font-size:12px" onclick="tzLocalFallback()">📚 使用本地知识库分析</button><button class="compute-btn" style="padding:8px 20px;font-size:12px;opacity:.5" onclick="tzStep1Analyze(\'手动输入\',\'\',\'text\')">🔄 重试</button></div></div>';
+      result.innerHTML = '<div style="padding:24px;text-align:center"><div style="font-size:48px;margin-bottom:12px">🔑</div><div style="font-size:15px;color:var(--cinn2);margin-bottom:10px;font-weight:bold">分析服务认证失败</div><div style="font-size:13px;color:var(--paper2);margin-bottom:16px;line-height:1.6">API代理服务的认证令牌已过期或未配置。<br>请检查 <code style="background:rgba(255,255,255,.1);padding:2px 6px;border-radius:4px">server/api-proxy-server.py</code> 的 API 配置。</div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="compute-btn" style="padding:8px 20px;font-size:12px" onclick="tzLocalFallback()">📚 使用本地知识库分析</button><button class="compute-btn" style="padding:8px 20px;font-size:12px;opacity:.5" onclick="tzStep1Analyze(\'手动输入\',\'\',\'text\')">🔄 重试</button></div></div>';
     }else{
       result.innerHTML = '<div style="padding:20px;text-align:center"><div style="font-size:14px;color:var(--cinn2);margin-bottom:12px">⚠️ 分析服务暂时不可用</div><div style="font-size:12px;color:var(--paper2);margin-bottom:16px">请确认网络正常，AI服务可用，或稍后重试</div><div style="font-size:11px;color:var(--paper3)">错误信息: ' + escapeHtml(String(err.message || err)) + '</div><div class="rpt-is-40"><button class="compute-btn" style="padding:8px 20px;font-size:12px" onclick="tzLocalFallback()">📚 使用本地知识库分析</button></div></div>';
     }
@@ -15988,7 +15988,7 @@ function _generateYearlySolutions(yearStar, currentYear, baziWuxing, mingGua) {
   return solutions;
 }
 function _analyzeFloorPlanAI(imageData, context) {
-  // 调用API代理进行户型图AI分析
+  // 调用API代理进行户型图智能分析
   let prompt = '你是一位拥有20年经验的专业风水师和户型分析师。请对用户提交的户型图进行专业、详细、有价值的分析。\n\n';
     prompt += '【识别要求】\n';
     prompt += '1. 房屋整体形状（方正/缺角/不规则/L形/T形等）\n';
@@ -16022,7 +16022,7 @@ function _analyzeFloorPlanAI(imageData, context) {
     prompt += '重要：分析要专业准确，化解建议要具体可执行（具体物品+方位+颜色+时间）。旧化解物品处置方法要明确（不可随意丢弃）。所有分析仅供风水文化参考。';
 
   let fsAiStatus = document.getElementById('fsAiStatus');
-  if (fsAiStatus) fsAiStatus.innerHTML = '<div style="padding:20px;text-align:center"><div style="font-size:24px">🔮 AI分析中...</div><p style="margin-top:12px;opacity:.6">正在解读您的户型图</p></div>';
+  if (fsAiStatus) fsAiStatus.innerHTML = '<div style="padding:20px;text-align:center"><div style="font-size:24px">🔮 正在分析...</div><p style="margin-top:12px;opacity:.6">正在解读您的户型图</p></div>';
 
   fetch('/api/ai/chat', {
     method: 'POST',
@@ -16050,7 +16050,7 @@ function _analyzeFloorPlanAI(imageData, context) {
     let fsAiResult = document.getElementById('fsAiStatus');
     if (fsAiResult) {
       fsAiResult.innerHTML = '<div class="huajie-alert" style="margin-top:16px;background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.2)">' +
-        '<div class="alert-title" class="rpt-is-3">AI分析失败</div>' +
+        '<div class="alert-title" class="rpt-is-3">分析失败</div>' +
         '<p class="rpt-is-103">请确认网络正常</p>' +
         '<p class="rpt-is-29">错误：' + err.message + '</p></div>';
     }
@@ -16315,7 +16315,7 @@ function computeFengshuiPro() {
 
   // 6.4 户型方正（基于真实分析，不用Math.random）
   if (fengshuiImageData) {
-    // 有户型图：后续AI分析
+    // 有户型图：后续智能分析
     items.push({ name: '户型图', score: 0, desc: '已上传户型图，点击下方"AI深度分析"获取专业解读', isPending: true });
   } else {
     items.push({ name: '户型图', score: 0, desc: '未上传户型图，建议上传以获取精准分析', isPending: true });
@@ -16340,7 +16340,7 @@ function computeFengshuiPro() {
   // 8. 生成流年化解方案
   const yearlySolutions = _generateYearlySolutions(yearStar, currentYear, baziWuxing, mingGua);
 
-  // 9. 如果上传了户型图，启动AI分析
+  // 9. 如果上传了户型图，启动智能分析
   if (fengshuiImageData) {
     _analyzeFloorPlanAI(fengshuiImageData, { huxing: huxing, chaoxiang: chaoxiang, buildYear: buildYear, year: year, sex: sex, mingGua: mingGua, bazhai: bazhai });
   }
@@ -16419,7 +16419,7 @@ function renderFengshuiResultPro(data) {
   }
   html += '</div></div>';
 
-  // AI分析区域（如果上传了户型图）
+  // 智能分析区域（如果上传了户型图）
   if (data.hasImage) {
     html += '<div id="fsAiStatus" class="rpt-is-9"></div>';
   }

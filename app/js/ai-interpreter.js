@@ -360,7 +360,7 @@ function _aiCollectPaipanData(type) {
  * @param {string} type - 排盘类型 'bazi'|'qimen'|'ziwei'|'meihua'|'liuren'|'huajie'|'lifeplan'|'jiazi'
  * @param {Object} baziData - 排盘结果数据
  * @param {string} question - 缘主提问（选填）
- * @returns {Promise<string>} AI生成的解读文本
+ * @returns {Promise<string>} 系统生成的解读文本
  */
 async function aiDivineInterpret(type, baziData, question) {
   const typeNames = {
