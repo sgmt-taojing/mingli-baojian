@@ -1,7 +1,45 @@
 
+// R317 RBAC + 三态 + token 持久化
+const VALID_ADMIN_ROLES = new Set(['admin_b', 'super_admin', 'master', 'doctor']);
+const ROLE_DISPLAY = {
+  admin_b: '业务管理员',
+  super_admin: '超管',
+  master: '周易大师',
+  doctor: '中医医生',
+};
+function getCurrentRoles() {
+  const raw = localStorage.getItem('user_roles') || localStorage.getItem('user_role') || 'admin_b';
+  return raw.split(',').map(s => s.trim()).filter(Boolean);
+}
+function hasAdminAccess() {
+  return getCurrentRoles().some(r => VALID_ADMIN_ROLES.has(r));
+}
+function showAccessDenied() {
+  document.querySelector('main').innerHTML = `
+    <div class="container" style="padding:40px 20px;text-align:center">
+      <h1 style="color:var(--gold)">🔒 权限不足</h1>
+      <p style="color:var(--ink-2);margin:20px 0">当前角色无权访问智能眼镜后台</p>
+      <p style="color:var(--ink-3);font-size:13px">需要角色：业务管理员 / 周易大师 / 中医医生 / 超管</p>
+      <p style="color:var(--ink-3);font-size:13px">当前角色：${getCurrentRoles().map(r => ROLE_DISPLAY[r] || r).join(', ') || '匿名'}</p>
+      <a href="divination-hub.html" class="btn" style="display:inline-block;margin-top:20px">← 返回首页</a>
+    </div>
+  `;
+}
+function setState(elId, state, message) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  el.classList.remove('state-loading', 'state-empty', 'state-error', 'success');
+  el.classList.add(state === 'loading' ? 'state-loading' : state === 'error' ? 'state-error error' : state === 'success' ? 'success' : 'state-empty');
+  if (message != null) el.textContent = message;
+}
+
 // 鉴权：从 localStorage 读取 token
 function getToken() {
   return localStorage.getItem('admin_token') || localStorage.getItem('token') || '';
+}
+function saveToken() {
+  const t = document.getElementById('tokenInput').value.trim();
+  if (t) { localStorage.setItem('admin_token', t); document.getElementById('tokenStatus').textContent = '✓ 已保存'; }
 }
 
 async function api(path, options = {}) {
@@ -156,11 +194,15 @@ function setupTimer() {
 }
 $('refreshSec').addEventListener('change', setupTimer);
 
-// 初始化
-loadDemo();
-checkHealth();
-loadStats();
-setupTimer();
+// 初始化：RBAC 鉴权 + 三态 + token
+if (!hasAdminAccess()) {
+  showAccessDenied();
+} else {
+  loadDemo();
+  checkHealth();
+  loadStats();
+  setupTimer();
+}
 
 
 
