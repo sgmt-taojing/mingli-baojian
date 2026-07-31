@@ -276,224 +276,160 @@ body{font-family:'Noto Serif SC',serif;background:var(--ink);color:var(--paper);
 
 <!-- ===== 首页 HERO ===== -->
 <section class="section active" id="section-hero" role="tabpanel" aria-labelledby="tab-hero">
-  <div class="wechat-disclaimer">⚠️ 本平台内容仅供国学文化学习与娱乐参考，不构成任何专业建议。占卜结果不作为决策依据，养生建议不替代医疗诊断。</div>
-  <div class="hero">
-    <!-- R89-P2 视觉震撼：动态八卦生克图（宇宙能量场） -->
-    <div class="cosmic-arena" id="cosmicArena" aria-hidden="true">
-      <svg viewBox="0 0 400 400" class="cosmic-svg" id="cosmicSvg">
-        <defs>
-          <!-- 五行能量环渐变 -->
-          <radialGradient id="wuxingCore" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="#c9a84c" stop-opacity="0.95"/>
-            <stop offset="40%" stop-color="#c9a84c" stop-opacity="0.45"/>
-            <stop offset="100%" stop-color="#0a0a0a" stop-opacity="0"/>
-          </radialGradient>
-          <linearGradient id="wuxingRingMu" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#3a8c5c"/><stop offset="100%" stop-color="#5fb878"/>
-          </linearGradient>
-          <linearGradient id="wuxingRingHuo" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#c14a3a"/><stop offset="100%" stop-color="#e87a4d"/>
-          </linearGradient>
-          <linearGradient id="wuxingRingTu" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#b89048"/><stop offset="100%" stop-color="#d8b66e"/>
-          </linearGradient>
-          <linearGradient id="wuxingRingJin" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#a8a394"/><stop offset="100%" stop-color="#d4cdb4"/>
-          </linearGradient>
-          <linearGradient id="wuxingRingShui" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#2c4a6b"/><stop offset="100%" stop-color="#5a7ba0"/>
-          </linearGradient>
-          <!-- 八卦爻光线渐变 -->
-          <linearGradient id="guaGlow" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#fff7e0" stop-opacity="0"/>
-            <stop offset="50%" stop-color="#c9a84c" stop-opacity="0.6"/>
-            <stop offset="100%" stop-color="#fff7e0" stop-opacity="0"/>
-          </linearGradient>
-          <!-- 中央阴阳晕 -->
-          <radialGradient id="yinYangGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="#c9a84c" stop-opacity="0.4"/>
-            <stop offset="100%" stop-color="#c9a84c" stop-opacity="0"/>
-          </radialGradient>
-        </defs>
+  <div class="wechat-disclaimer">⚠️ 本平台内容仅供国学文化学习与娱乐参考，不构成专业建议。占卜结果不作为决策依据，养生建议不替代医疗诊断。</div>
 
-        <!-- 外层金色环（含刻度感） -->
-        <circle cx="200" cy="200" r="195" fill="none" stroke="rgba(201,168,76,0.15)" stroke-width="0.5"/>
-        <circle cx="200" cy="200" r="180" fill="none" stroke="rgba(201,168,76,0.2)" stroke-width="0.5" stroke-dasharray="2 6"/>
-
-        <!-- 五行能量环（5 圈，半径 110-150） -->
-        <g class="wuxing-rings">
-          <circle class="wx-ring wx-mu" cx="200" cy="200" r="115" fill="none" stroke="url(#wuxingRingMu)" stroke-width="2" opacity="0.6"/>
-          <circle class="wx-ring wx-huo" cx="200" cy="200" r="125" fill="none" stroke="url(#wuxingRingHuo)" stroke-width="2" opacity="0.6"/>
-          <circle class="wx-ring wx-tu" cx="200" cy="200" r="135" fill="none" stroke="url(#wuxingRingTu)" stroke-width="2" opacity="0.6"/>
-          <circle class="wx-ring wx-jin" cx="200" cy="200" r="145" fill="none" stroke="url(#wuxingRingJin)" stroke-width="2" opacity="0.6"/>
-          <circle class="wx-ring wx-shui" cx="200" cy="200" r="155" fill="none" stroke="url(#wuxingRingShui)" stroke-width="2" opacity="0.6"/>
-        </g>
-
-        <!-- 八卦圆阵（8 个卦象围绕圆周） -->
-        <g class="bagua-circle" id="baguaCircle">
-          <!-- JavaScript 动态注入 -->
-        </g>
-
-        <!-- 中央阴阳双鱼（流体） -->
-        <g class="yinyang-core" transform="translate(200 200)">
-          <circle r="75" fill="url(#wuxingCore)"/>
-          <circle r="68" fill="#0a0a0a"/>
-          <!-- 阴阳太极（Yin Yang 流体） -->
-          <path class="yy-path yy-yang" d="M 0,-55 A 55,55 0 0 1 0,55 A 27.5,27.5 0 0 1 0,0 A 27.5,27.5 0 0 0 0,-55 Z" fill="#f3ead0"/>
-          <path class="yy-path yy-yin" d="M 0,-55 A 55,55 0 0 0 0,55 A 27.5,27.5 0 0 0 0,0 A 27.5,27.5 0 0 1 0,-55 Z" fill="#1a1a1a" stroke="#c9a84c" stroke-width="0.5"/>
-          <circle class="yy-dot yy-dot-yang" cy="-27.5" r="6" fill="#1a1a1a"/>
-          <circle class="yy-dot yy-dot-yin" cy="27.5" r="6" fill="#f3ead0"/>
-          <!-- 中央晕光 -->
-          <circle r="90" fill="url(#yinYangGlow)" class="yy-aura"/>
-        </g>
-
-        <!-- 周边 12 道光芒线（地支位） -->
-        <g class="dizhi-rays" id="dizhiRays"></g>
-      </svg>
-      <div class="cosmic-caption">宇宙能量场 · 五行流转</div>
-    </div>
-
-    <p class="hero-eyebrow">易道智鉴 · 先进AI推演</p>
-    <h1 class="hero-title">易道智鉴</h1>
-    <p class="hero-sub">八字 · 六爻 · 奇门遁甲 · 紫微斗数 · 梅花易数 · 大六壬</p>
-    <div class="hero-divider"></div>
-    <p class="hero-desc">融合千年命理智慧与先进人工智能，为您开启命运密码的探索之旅</p>
-    <p class="hero-motto" style="font-size:16px;color:var(--gold);letter-spacing:6px;margin-top:16px;opacity:.9;font-family:'Ma Shan Zheng',serif;font-weight:500">知命 · 改运 · 修心持善守静</p>
-    <div style="width:40px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:24px auto 0"></div>
-
-    <div id="daily-quote" style="text-align:center;padding:20px 16px 12px;max-width:600px;margin:0 auto">
-      <div style="font-size:14px;color:var(--paper2);line-height:2;letter-spacing:2px;font-style:italic;opacity:0.85" id="daily-quote-text"></div>
-      <div style="font-size:11px;color:var(--gold);margin-top:6px;letter-spacing:3px;opacity:.95" id="daily-quote-author"></div>
-    </div>
-
-    <!-- 今日知识卡片 -->
-    <!-- PoC R22-B: div onclick → ml-tap a11y 替代（1/409 节点） -->
-    <ml-tap role="button" tabindex="0" id="daily-knowledge-card" variant="card" style="max-width:680px;margin:8px auto 24px;display:block;padding:20px 24px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:14px;cursor:pointer;transition:all .4s ease" onclick="toggleDailyKnowledgeDetail()">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-        <span style="font-size:20px">📖</span>
-        <span style="font-family:'Ma Shan Zheng',serif;font-size:18px;color:var(--gold);letter-spacing:3px">今日命理知识</span>
-        <span id="daily-knowledge-tag" style="font-size:11px;padding:2px 10px;border-radius:10px;background:rgba(201,168,76,0.15);color:var(--gold);letter-spacing:1px;margin-left:auto"></span>
+  <!-- R327 纯导航首页：左侧树形分类 + 右侧欢迎面板 -->
+  <div class="nav-home">
+    <aside class="nav-home-sidebar" id="navSidebar">
+      <div class="nhs-header">
+        <span class="nhs-brand">易道智鉴</span>
+        <span class="nhs-sub">功能导航</span>
       </div>
-      <div id="daily-knowledge-title" style="font-size:15px;color:var(--paper);font-weight:600;margin-bottom:6px;letter-spacing:1px"></div>
-      <div id="daily-knowledge-summary" style="font-size:13px;color:var(--paper2);line-height:1.7;opacity:0.85"></div>
-      <div id="daily-knowledge-detail" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid rgba(201,168,76,0.1);font-size:13px;color:var(--paper);line-height:1.9;white-space:pre-line"></div>
-      <div style="font-size:11px;color:var(--gold);margin-top:8px;text-align:right">点击展开详情 ↓</div>
-    </ml-tap>
 
-    <!-- R31-A: KB 今日热门知识 Top3 横条 -->
-    <div id="kb-hot-strip" class="kb-hot-strip" style="max-width:680px;margin:0 auto 24px;display:none"></div>
-    <div id="kb-search-mount" style="max-width:680px;margin:0 auto 16px"></div>
-
-    <!-- R37: KB 智能推荐引擎（基于图谱权重 + hit_count 协同过滤） -->
-    <div id="kb-recommend-engine" style="max-width:680px;margin:0 auto 24px;background:rgba(22,27,34,.6);border:1px solid rgba(108,138,255,.25);border-radius:14px;padding:14px 18px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <div style="color:var(--gold);font-weight:600;font-size:14px;letter-spacing:2px">✨ 智能推荐</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap" id="rec-module-tabs">
-          <button class="rec-tab active" data-mod="bazi" style="background:rgba(108,138,255,.2);color:var(--accent);border:1px solid rgba(108,138,255,.4);padding:3px 10px;border-radius:10px;font-size:11px;cursor:pointer">八字</button>
-          <button class="rec-tab" data-mod="zhongyi" style="background:rgba(255,255,255,.04);color:var(--paper3);border:1px solid rgba(255,255,255,.1);padding:3px 10px;border-radius:10px;font-size:11px;cursor:pointer">中医</button>
-          <button class="rec-tab" data-mod="qimen" style="background:rgba(255,255,255,.04);color:var(--paper3);border:1px solid rgba(255,255,255,.1);padding:3px 10px;border-radius:10px;font-size:11px;cursor:pointer">奇门</button>
-          <button class="rec-tab" data-mod="ziwei" style="background:rgba(255,255,255,.04);color:var(--paper3);border:1px solid rgba(255,255,255,.1);padding:3px 10px;border-radius:10px;font-size:11px;cursor:pointer">紫微</button>
-          <button class="rec-tab" data-mod="fengshui" style="background:rgba(255,255,255,.04);color:var(--paper3);border:1px solid rgba(255,255,255,.1);padding:3px 10px;border-radius:10px;font-size:11px;cursor:pointer">风水</button>
+      <!-- ① 周易术数 -->
+      <details class="nhs-group" open>
+        <summary class="nhs-group-title"><span class="nhs-gt-icon">☰</span><span>周易术数</span><span class="nhs-gt-count">16</span></summary>
+        <div class="nhs-items">
+          <a href="javascript:showSection('bazi')" class="nhs-item"><span>🌟</span>八字排盘</a>
+          <a href="javascript:location.hash='#section-ziwei'" class="nhs-item"><span>🌌</span>紫微斗数</a>
+          <a href="javascript:showSection('zhanbu');showZhanbuSub('qimen')" class="nhs-item"><span>🔮</span>奇门遁甲</a>
+          <a href="javascript:showSection('zhanbu');showZhanbuSub('yijing')" class="nhs-item"><span>📖</span>六爻占卜</a>
+          <a href="javascript:showSection('zhanbu');showZhanbuSub('meihua')" class="nhs-item"><span>🌸</span>梅花易数</a>
+          <a href="javascript:showSection('zhanbu');showZhanbuSub('liuren')" class="nhs-item"><span>谛</span>大六壬</a>
+          <a href="javascript:showSection('fengshui')" class="nhs-item"><span>🏡</span>风水玄空</a>
+          <a href="javascript:showSection('xingming')" class="nhs-item"><span>🔤</span>起名改名</a>
+          <a href="javascript:showSection('jiuri')" class="nhs-item"><span>📅</span>黄历择吉</a>
+          <a href="javascript:showSection('yanzhi')" class="nhs-item"><span>🎯</span>颜值命理</a>
+          <a href="javascript:showSection('cezi')" class="nhs-item"><span>✍</span>测字占卜</a>
+          <a href="javascript:window.location.href='lifeplan-detail.html'" class="nhs-item"><span>🧭</span>人生蓝图</a>
+          <a href="javascript:showSection('annual-fortune')" class="nhs-item"><span>🎊</span>年度运势</a>
+          <a href="javascript:window.location.href='lifeflow-report.html'" class="nhs-item"><span>📊</span>流年报告</a>
+          <a href="javascript:window.location.href='monthly-report.html'" class="nhs-item"><span>📋</span>逐月运势</a>
+          <a href="javascript:window.location.href='fengshui-chart.html'" class="nhs-item"><span>🏠</span>风水排盘</a>
         </div>
-      </div>
-      <div id="rec-loading" style="color:var(--paper3);font-size:12px;padding:18px;text-align:center;display:none">🔮 根据图谱权重计算中…</div>
-      <div id="rec-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px"></div>
-      <div id="rec-empty" style="display:none;color:var(--paper3);font-size:12px;padding:14px;text-align:center">该模块暂无推荐 · 试试其他模块</div>
-      <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:11px;color:var(--paper3)">
-        <span id="rec-meta">—</span>
-        <a href="kb-graph.html" style="color:var(--accent);text-decoration:none">查看完整图谱 →</a>
-      </div>
-    </div>
+      </details>
 
-    <!-- 📋 缘主专业档案 · 一次填写全局复用 -->
-    <ml-tap role="button" tabindex="0" id="profileEntry" onclick="window.MLBJ_USER&&window.MLBJ_USER.openProfileWizard()" style="max-width:680px;margin:0 auto 24px;padding:16px 20px;background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.02));border:1px solid rgba(201,168,76,0.25);border-radius:12px;display:flex;align-items:center;gap:14px;transition:all .3s ease"
-      <span style="font-size:28px;line-height:1">📋</span>
-      <div style="flex:1;min-width:0">
-        <div style="font-family:'Ma Shan Zheng',serif;font-size:16px;color:var(--gold);letter-spacing:3px;margin-bottom:4px">缘主专业档案</div>
-        <div style="font-size:12px;color:var(--paper3);line-height:1.5" id="profileEntryHint">点击填写完整档案 一次性输入 八字/六壬/紫微全局复用 专业全覆盖</div>
-      </div>
-      <span class="rich-badge" id="profileEntryBadge" style="background:rgba(201,168,76,0.18);color:var(--gold);font-size:11px;padding:3px 10px;flex-shrink:0">未填写</span>
-      <span style="color:var(--gold);font-size:18px;flex-shrink:0">→</span>
-    </ml-tap>
-    <!-- ══════════════════════════════════════════════════════════════ -->
-    <!-- R326 首页导航矩阵 — 左右布局：左说明 + 右卡片汇聚 -->
-    <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- ② 中医诊疗 -->
+      <details class="nhs-group">
+        <summary class="nhs-group-title"><span class="nhs-gt-icon">⚕️</span><span>中医诊疗</span><span class="nhs-gt-count">17</span></summary>
+        <div class="nhs-items">
+          <a href="javascript:showSection('tizhi')" class="nhs-item"><span>🌿</span>体质辨识</a>
+          <a href="javascript:window.location.href='wangzhen-clinical.html'" class="nhs-item"><span>👁</span>望诊工作台</a>
+          <a href="javascript:location.hash='#section-person-dashboard'" class="nhs-item"><span>👤</span>人物档案</a>
+          <a href="javascript:location.hash='#section-report-interpret'" class="nhs-item"><span>📋</span>报告解读</a>
+          <a href="javascript:window.location.href='home-care.html'" class="nhs-item"><span>🏠</span>居家诊疗</a>
+          <a href="javascript:window.location.href='tcm-clinic.html'" class="nhs-item"><span>🏥</span>中医诊所</a>
+          <a href="javascript:window.location.href='tcm-symptom.html'" class="nhs-item"><span>🩺</span>症状分析</a>
+          <a href="javascript:window.location.href='patient-intake.html'" class="nhs-item"><span>📝</span>患者采集</a>
+          <a href="javascript:window.location.href='patient-portal.html'" class="nhs-item"><span>📋</span>患者门户</a>
+          <a href="javascript:window.location.href='wangzhen-center.html'" class="nhs-item"><span>🔬</span>望诊中心</a>
+          <a href="javascript:window.location.href='health-forecast.html'" class="nhs-item"><span>📈</span>健康预测</a>
+          <a href="javascript:window.location.href='health-monitor.html'" class="nhs-item"><span>📊</span>健康监控</a>
+          <a href="javascript:window.location.href='wellness-guide.html'" class="nhs-item"><span>💊</span>健康指导</a>
+          <a href="javascript:window.location.href='report-ocr.html'" class="nhs-item"><span>📸</span>报告OCR</a>
+          <a href="javascript:window.location.href='divination-integrated.html'" class="nhs-item"><span>🧬</span>体质调理</a>
+          <a href="javascript:window.location.href='doctor-panel.html'" class="nhs-item"><span>👨‍⚕️</span>医生端</a>
+          <a href="javascript:window.location.href='doctor-elder.html'" class="nhs-item"><span>👴</span>医生(大字版)</a>
+        </div>
+      </details>
 
-    <div class="nav-matrix" id="navMatrix">
-      <!-- 左侧：体系说明面板 -->
-      <aside class="nav-matrix-side" id="navSidePanel">
-        <div class="nms-default" id="nmsDefault">
-          <div class="nms-icon">🏛️</div>
-          <h3 class="nms-title">易道智鉴</h3>
-          <p class="nms-desc">融合千年命理智慧与先进人工智能<br>选择下方体系，查看对应功能</p>
-          <div class="nms-flow">
-            <div class="nms-flow-title">📋 使用流程</div>
-            <div class="nms-flow-step"><span class="nfs-num">1</span><span>选择下方导航体系</span></div>
-            <div class="nms-flow-step"><span class="nfs-num">2</span><span>右侧查看功能卡片</span></div>
-            <div class="nms-flow-step"><span class="nfs-num">3</span><span>点击卡片进入工具</span></div>
-            <div class="nms-flow-step"><span class="nfs-num">4</span><span>AI 助手生成报告</span></div>
+      <!-- ③ 知识文化 -->
+      <details class="nhs-group">
+        <summary class="nhs-group-title"><span class="nhs-gt-icon">📚</span><span>知识文化</span><span class="nhs-gt-count">14</span></summary>
+        <div class="nhs-items">
+          <a href="javascript:window.location.href='divination-knowledge.html'" class="nhs-item"><span>📚</span>知识库</a>
+          <a href="javascript:window.location.href='kb-explorer.html'" class="nhs-item"><span>📖</span>KB浏览器</a>
+          <a href="javascript:window.location.href='kb-graph.html'" class="nhs-item"><span>🔮</span>知识图谱</a>
+          <a href="javascript:window.location.href='nihaisha-knowledge.html'" class="nhs-item"><span>🪷</span>倪师知识库</a>
+          <a href="javascript:window.location.href='shuhan-knowledge.html'" class="nhs-item"><span>🎯</span>舒晗知识库</a>
+          <a href="javascript:window.location.href='nihaisha-learning.html'" class="nhs-item"><span>🎓</span>倪师学堂</a>
+          <a href="javascript:window.location.href='master-class.html'" class="nhs-item"><span>👨‍🏫</span>名师课堂</a>
+          <a href="javascript:window.location.href='masters.html'" class="nhs-item"><span>👥</span>名师档案</a>
+          <a href="javascript:window.location.href='koujue-gallery.html'" class="nhs-item"><span>📜</span>口诀库</a>
+          <a href="javascript:window.location.href='folklore-portal.html'" class="nhs-item"><span>🎎</span>民俗生活</a>
+          <a href="javascript:window.location.href='practice-portal.html'" class="nhs-item"><span>🧘</span>修行参学</a>
+          <a href="javascript:showSection('healing-music')" class="nhs-item"><span>🎵</span>疗愈音乐</a>
+          <a href="javascript:window.location.href='kb-quality.html'" class="nhs-item"><span>📊</span>KB质量审计</a>
+          <a href="javascript:window.location.href='kb-hit-dashboard.html'" class="nhs-item"><span>📈</span>KB命中</a>
+        </div>
+      </details>
+
+      <!-- ④ 运营运维 -->
+      <details class="nhs-group">
+        <summary class="nhs-group-title"><span class="nhs-gt-icon">🛠</span><span>运营运维</span><span class="nhs-gt-count">13</span></summary>
+        <div class="nhs-items">
+          <a href="javascript:window.location.href='admin.html'" class="nhs-item"><span>⚙️</span>后台管理</a>
+          <a href="javascript:window.location.href='admin-shop.html'" class="nhs-item"><span>🛍️</span>商城管理</a>
+          <a href="javascript:window.location.href='admin-kb-panel.html'" class="nhs-item"><span>📚</span>KB管理</a>
+          <a href="javascript:window.location.href='admin-notify.html'" class="nhs-item"><span>🔔</span>通知日志</a>
+          <a href="javascript:window.location.href='admin-tickets.html'" class="nhs-item"><span>🎫</span>工单管理</a>
+          <a href="javascript:window.location.href='monitor-dashboard.html'" class="nhs-item"><span>📊</span>运营大屏</a>
+          <a href="javascript:window.location.href='monitor-portal.html'" class="nhs-item"><span>📡</span>监控门户</a>
+          <a href="javascript:window.location.href='eval-dashboard.html'" class="nhs-item"><span>📈</span>评估看板</a>
+          <a href="javascript:window.location.href='device-management.html'" class="nhs-item"><span>📷</span>设备运维</a>
+          <a href="javascript:window.location.href='glass-console.html'" class="nhs-item"><span>👓</span>智能眼镜</a>
+          <a href="javascript:window.location.href='ai-assistant.html'" class="nhs-item"><span>🤖</span>AI助手</a>
+          <a href="javascript:window.location.href='ai-engine-config.html'" class="nhs-item"><span>🔧</span>AI引擎配置</a>
+          <a href="javascript:window.location.href='api-docs.html'" class="nhs-item"><span>📖</span>API文档</a>
+        </div>
+      </details>
+
+      <!-- ⑤ 用户服务 -->
+      <details class="nhs-group">
+        <summary class="nhs-group-title"><span class="nhs-gt-icon">👤</span><span>用户服务</span><span class="nhs-gt-count">12</span></summary>
+        <div class="nhs-items">
+          <a href="javascript:window.location.href='login.html'" class="nhs-item"><span>🔐</span>登录</a>
+          <a href="javascript:window.location.href='person-center.html'" class="nhs-item"><span>🪪</span>身份管理</a>
+          <a href="javascript:window.location.href='person-dashboard.html'" class="nhs-item"><span>👤</span>人物看板</a>
+          <a href="javascript:window.location.href='reports-hub.html'" class="nhs-item"><span>📋</span>报告中心</a>
+          <a href="javascript:window.location.href='divination-shop.html'" class="nhs-item"><span>🛍️</span>商城</a>
+          <a href="javascript:window.location.href='divination-membership.html'" class="nhs-item"><span>👑</span>会员</a>
+          <a href="javascript:window.location.href='wechat-hub.html'" class="nhs-item"><span>📱</span>缘主工具</a>
+          <a href="javascript:window.location.href='yuanzhu-inbox.html'" class="nhs-item"><span>📮</span>年度推送</a>
+          <a href="javascript:window.location.href='im.html'" class="nhs-item"><span>💬</span>站内消息</a>
+          <a href="javascript:window.location.href='feedback-center.html'" class="nhs-item"><span>💬</span>反馈</a>
+          <a href="javascript:window.location.href='share-center.html'" class="nhs-item"><span>📤</span>分享</a>
+          <a href="javascript:window.location.href='privacy-center.html'" class="nhs-item"><span>🔒</span>隐私中心</a>
+        </div>
+      </details>
+    </aside>
+
+    <!-- 右侧：欢迎面板 -->
+    <div class="nav-home-main">
+      <div class="nhm-welcome">
+        <h1 class="nhm-title">易道智鉴</h1>
+        <p class="nhm-subtitle">融合千年命理智慧 · 先进人工智能</p>
+        <div class="nhm-desc">
+          <p>选择左侧导航中的功能项，开始你的命理探索之旅。</p>
+          <p>本平台涵盖排盘、占卜、风水、中医、知识库等 72 项功能。</p>
+        </div>
+        <div class="nhm-flow">
+          <div class="nhm-flow-title">使用流程</div>
+          <div class="nhm-flow-steps">
+            <div class="nhm-step"><span class="nhm-num">1</span><span>展开左侧分类</span></div>
+            <div class="nhm-arrow">→</div>
+            <div class="nhm-step"><span class="nhm-num">2</span><span>点击功能项</span></div>
+            <div class="nhm-arrow">→</div>
+            <div class="nhm-step"><span class="nhm-num">3</span><span>输入信息排盘</span></div>
+            <div class="nhm-arrow">→</div>
+            <div class="nhm-step"><span class="nhm-num">4</span><span>AI 生成报告</span></div>
           </div>
         </div>
-      </aside>
-
-      <!-- 右侧：功能卡片汇聚区 -->
-      <div class="nav-matrix-main" id="navCardArea">
-        <!-- 默认展示：5 大体系入口 -->
-        <div class="nma-systems" id="nmaSystems">
-          <!-- ① 周易术数 -->
-          <div class="nma-sys-block" data-sys="zhouyi" onmouseover="navShowSide('zhouyi')" onclick="navExpandCards('zhouyi')">
-            <div class="nma-sys-icon" style="color:var(--cyan)">☰</div>
-            <div class="nma-sys-name">周易术数</div>
-            <div class="nma-sys-count">16 项功能</div>
-            <div class="nma-sys-desc">排盘 · 占卜 · 命理 · 风水</div>
-            <div class="nma-sys-tags"><span>八字</span><span>紫微</span><span>奇门</span><span>六爻</span></div>
+        <div class="nhm-quick">
+          <div class="nhm-quick-title">快捷入口</div>
+          <div class="nhm-quick-grid">
+            <a href="javascript:showSection('bazi')" class="nhm-qbtn">🌟 八字排盘</a>
+            <a href="javascript:showSection('zhanbu');showZhanbuSub('yijing')" class="nhm-qbtn">📖 六爻占卜</a>
+            <a href="javascript:showSection('fengshui')" class="nhm-qbtn">🏡 风水玄空</a>
+            <a href="javascript:showSection('tizhi')" class="nhm-qbtn">🌿 体质辨识</a>
+            <a href="javascript:window.location.href='ai-assistant.html'" class="nhm-qbtn">🤖 AI助手</a>
+            <a href="javascript:window.location.href='divination-knowledge.html'" class="nhm-qbtn">📚 知识库</a>
           </div>
-          <!-- ② 中医诊疗 -->
-          <div class="nma-sys-block" data-sys="tcm" onmouseover="navShowSide('tcm')" onclick="navExpandCards('tcm')">
-            <div class="nma-sys-icon" style="color:var(--jade)">⚕️</div>
-            <div class="nma-sys-name">中医诊疗</div>
-            <div class="nma-sys-count">17 项功能</div>
-            <div class="nma-sys-desc">体质 · 望诊 · 患者档案 · 报告</div>
-            <div class="nma-sys-tags"><span>体质</span><span>望诊</span><span>患者</span><span>报告</span></div>
-          </div>
-          <!-- ③ 知识文化 -->
-          <div class="nma-sys-block" data-sys="knowledge" onmouseover="navShowSide('knowledge')" onclick="navExpandCards('knowledge')">
-            <div class="nma-sys-icon" style="color:var(--gold2)">📚</div>
-            <div class="nma-sys-name">知识文化</div>
-            <div class="nma-sys-count">14 项功能</div>
-            <div class="nma-sys-desc">KB · 学堂 · 名师 · 民俗</div>
-            <div class="nma-sys-tags"><span>知识库</span><span>倪师</span><span>口诀</span><span>音乐</span></div>
-          </div>
-          <!-- ④ 运营运维 -->
-          <div class="nma-sys-block" data-sys="ops" onmouseover="navShowSide('ops')" onclick="navExpandCards('ops')">
-            <div class="nma-sys-icon" style="color:var(--cyan2)">🛠</div>
-            <div class="nma-sys-name">运营运维</div>
-            <div class="nma-sys-count">13 项功能</div>
-            <div class="nma-sys-desc">后台 · 监控 · 设备 · AI</div>
-            <div class="nma-sys-tags"><span>后台</span><span>大屏</span><span>设备</span><span>API</span></div>
-          </div>
-          <!-- ⑤ 用户服务 -->
-          <div class="nma-sys-block" data-sys="user" onmouseover="navShowSide('user')" onclick="navExpandCards('user')">
-            <div class="nma-sys-icon" style="color:var(--gold3)">👤</div>
-            <div class="nma-sys-name">用户服务</div>
-            <div class="nma-sys-count">12 项功能</div>
-            <div class="nma-sys-desc">账户 · 商城 · 推送 · 反馈</div>
-            <div class="nma-sys-tags"><span>登录</span><span>商城</span><span>缘主</span><span>反馈</span></div>
-          </div>
-        </div>
-
-        <!-- 展开后的卡片区域 -->
-        <div class="nma-cards" id="nmaCards" style="display:none">
-          <button class="nma-back" onclick="navBackToSystems()">← 返回体系选择</button>
-          <div class="nma-cards-grid" id="nmaCardsGrid"></div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- 移动端快捷入口（768px 以下显示） -->
-    <div class="mobile-quick-grid" id="mobileQuickGrid"></div>
-
-  </div><!-- /hero -->
 </section>
 
 <!-- ===== 更多功能网格 ===== -->

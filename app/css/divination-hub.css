@@ -4251,3 +4251,265 @@ body:not(.wechat) .wechat-disclaimer{display:none}
     grid-template-columns: 1fr;
   }
 }
+
+/* ================================================================
+   R327 纯导航首页 — 侧边栏树形分类 + 右侧欢迎面板
+   ================================================================ */
+
+.nav-home {
+  display: flex;
+  gap: 0;
+  max-width: 1200px;
+  width: 100%;
+  margin: 16px auto 0;
+  align-items: flex-start;
+  min-height: calc(100vh - 120px);
+}
+
+/* 左侧侧边栏 */
+.nav-home-sidebar {
+  flex: 0 0 260px;
+  background: rgba(255,255,255,.02);
+  border-right: 1px solid rgba(201,168,76,.1);
+  padding: 0;
+  position: sticky;
+  top: 70px;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+}
+
+.nhs-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(201,168,76,.08);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.nhs-brand {
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 18px;
+  color: var(--gold);
+  letter-spacing: 3px;
+}
+.nhs-sub {
+  font-size: 11px;
+  color: var(--paper3);
+  opacity: 0.5;
+  letter-spacing: 1px;
+}
+
+/* 分组折叠 */
+.nhs-group {
+  border-bottom: 1px solid rgba(201,168,76,.06);
+}
+.nhs-group-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--paper);
+  transition: background .2s;
+  list-style: none;
+  user-select: none;
+}
+.nhs-group-title::-webkit-details-marker { display: none; }
+.nhs-group-title:hover {
+  background: rgba(201,168,76,.06);
+}
+.nhs-gt-icon {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+}
+.nhs-gt-count {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--paper3);
+  opacity: 0.5;
+  background: rgba(201,168,76,.08);
+  padding: 1px 8px;
+  border-radius: 8px;
+}
+.nhs-group[open] .nhs-group-title {
+  color: var(--gold);
+  background: rgba(201,168,76,.04);
+}
+.nhs-group[open] .nhs-gt-icon {
+  transform: rotate(0deg);
+}
+
+/* 功能项 */
+.nhs-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px 12px 14px;
+}
+.nhs-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  font-size: 12px;
+  color: var(--paper3);
+  text-decoration: none;
+  border: 1px solid rgba(201,168,76,.08);
+  border-radius: 14px;
+  transition: all .2s;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.nhs-item:hover {
+  color: var(--gold);
+  border-color: rgba(201,168,76,.25);
+  background: rgba(201,168,76,.06);
+}
+.nhs-item span {
+  font-size: 13px;
+}
+
+/* 右侧欢迎面板 */
+.nav-home-main {
+  flex: 1;
+  min-width: 0;
+  padding: 40px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.nhm-welcome {
+  max-width: 560px;
+  text-align: center;
+}
+.nhm-title {
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 42px;
+  color: var(--gold);
+  letter-spacing: 8px;
+  margin-bottom: 8px;
+}
+.nhm-subtitle {
+  font-size: 14px;
+  color: var(--paper3);
+  letter-spacing: 4px;
+  margin-bottom: 28px;
+  opacity: 0.7;
+}
+.nhm-desc {
+  font-size: 14px;
+  color: var(--paper3);
+  line-height: 2;
+  margin-bottom: 32px;
+}
+.nhm-desc p { margin-bottom: 4px; }
+
+/* 使用流程 */
+.nhm-flow {
+  background: rgba(0,0,0,.2);
+  border: 1px solid rgba(201,168,76,.08);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 28px;
+}
+.nhm-flow-title {
+  font-size: 13px;
+  color: var(--gold);
+  margin-bottom: 14px;
+  letter-spacing: 2px;
+}
+.nhm-flow-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.nhm-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--paper3);
+}
+.nhm-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(201,168,76,.15);
+  color: var(--gold);
+  font-size: 11px;
+  flex-shrink: 0;
+}
+.nhm-arrow {
+  color: var(--paper3);
+  opacity: 0.4;
+  font-size: 12px;
+}
+
+/* 快捷入口 */
+.nhm-quick-title {
+  font-size: 13px;
+  color: var(--gold);
+  margin-bottom: 12px;
+  letter-spacing: 2px;
+}
+.nhm-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.nhm-qbtn {
+  display: block;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--paper);
+  text-decoration: none;
+  border: 1px solid rgba(201,168,76,.12);
+  border-radius: 8px;
+  transition: all .2s;
+  cursor: pointer;
+}
+.nhm-qbtn:hover {
+  border-color: rgba(201,168,76,.3);
+  background: rgba(201,168,76,.06);
+  color: var(--gold);
+}
+
+/* 响应式：768px 以下 */
+@media (max-width: 768px) {
+  .nav-home {
+    flex-direction: column;
+  }
+  .nav-home-sidebar {
+    flex: 0 0 auto;
+    position: relative;
+    top: 0;
+    max-height: none;
+    border-right: none;
+    border-bottom: 1px solid rgba(201,168,76,.1);
+  }
+  .nav-home-main {
+    padding: 24px 16px;
+  }
+  .nhm-title { font-size: 28px; letter-spacing: 4px; }
+  .nhm-subtitle { font-size: 12px; }
+  .nhm-quick-grid { grid-template-columns: repeat(2, 1fr); }
+  .nhm-flow-steps { flex-direction: column; gap: 6px; }
+  .nhm-arrow { transform: rotate(90deg); }
+}
+
+/* 响应式：480px 以下 */
+@media (max-width: 480px) {
+  .nhs-items {
+    flex-direction: column;
+  }
+  .nhs-item {
+    width: 100%;
+  }
+  .nhm-quick-grid { grid-template-columns: 1fr; }
+}
