@@ -50,10 +50,13 @@ h1{font-size:20px;color:var(--gold);margin-bottom:6px;display:flex;align-items:c
 .upload-preview{position:relative;display:inline-block;margin-top:8px}
 .upload-preview img{max-width:200px;border-radius:8px;border:1px solid var(--border)}
 .upload-preview .remove{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px}
+.voice-section{display:flex;flex-direction:column;gap:10px}
+.voice-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .voice-btn{display:flex;align-items:center;gap:8px;padding:10px 16px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.3);border-radius:20px;cursor:pointer;color:var(--purple);font-size:13px;transition:.2s}
 .voice-btn:hover{background:rgba(167,139,250,.2)}
 .voice-btn.recording{background:var(--red);color:#fff;border-color:var(--red);animation:pulse 1.5s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+.device-select{padding:6px 10px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;max-width:200px}
 .submit-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:10px;color:#1a1a2e;font-size:15px;font-weight:700;cursor:pointer;transition:.2s}
 .submit-btn:hover{opacity:.9;transform:translateY(-1px)}
 .submit-btn:disabled{opacity:.5;cursor:not-allowed}
@@ -70,9 +73,10 @@ h1{font-size:20px;color:var(--gold);margin-bottom:6px;display:flex;align-items:c
 .status-resolved{background:rgba(63,185,80,.15);color:var(--green)}
 .status-closed{background:rgba(139,148,158,.15);color:var(--text-muted)}
 .status-rejected{background:rgba(248,81,73,.1);color:var(--text-muted)}
-.cat-badge{padding:2px 6px;border-radius:4px;font-size:10px;margin-right:4px}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--gold);border-radius:8px;padding:10px 20px;color:var(--gold);font-size:13px;z-index:9999;opacity:0;transition:.3s}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--gold);border-radius:8px;padding:10px 20px;color:var(--gold);font-size:13px;z-index:9999;opacity:0;transition:.3s;pointer-events:none}
 .toast.show{opacity:1;bottom:30px}
+.perm-warning{background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.3);border-radius:8px;padding:10px;font-size:12px;color:var(--red);display:none;margin-top:8px}
+.perm-warning.show{display:block}
 @media(max-width:480px){.form-row{flex-direction:column}.category-grid{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
@@ -113,7 +117,7 @@ h1{font-size:20px;color:var(--gold);margin-bottom:6px;display:flex;align-items:c
 
     <div class="form-group">
       <label>标题</label>
-      <input type="text" id="ticketTitle" placeholder="简要描述问题" maxlength="100">
+      <input type="text" id="ticketTitle" placeholder="简要描述问题" maxlength="100" autocomplete="off">
     </div>
 
     <div class="form-group">
@@ -123,27 +127,33 @@ h1{font-size:20px;color:var(--gold);margin-bottom:6px;display:flex;align-items:c
 
     <div class="form-group">
       <label>截图上传（可选）</label>
-      <div class="upload-area" id="uploadArea" onclick="document.getElementById('screenshotInput').click()">
+      <div class="upload-area" id="uploadArea">
         <div class="upload-icon">📸</div>
         <div class="upload-text">点击或拖拽上传截图（PNG/JPG，最大5MB）</div>
       </div>
-      <input type="file" id="screenshotInput" accept="image/*" style="display:none" onchange="handleScreenshot(this)">
+      <input type="file" id="screenshotInput" accept="image/*" style="display:none">
       <div id="screenshotPreview" style="margin-top:8px"></div>
     </div>
 
     <div class="form-group">
       <label>语音录入（可选）</label>
-      <div style="display:flex;gap:10px;align-items:center">
-        <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()">
-          <span id="voiceIcon">🎤</span>
-          <span id="voiceText">点击录音</span>
-        </button>
-        <span id="voiceStatus" style="font-size:12px;color:var(--text-muted)"></span>
+      <div class="voice-section">
+        <div class="voice-controls">
+          <button type="button" class="voice-btn" id="voiceBtn">
+            <span id="voiceIcon">🎤</span>
+            <span id="voiceText">点击录音</span>
+          </button>
+          <select class="device-select" id="micDevice" style="display:none">
+            <option value="">麦克风设备</option>
+          </select>
+        </div>
+        <div class="perm-warning" id="permWarning"></div>
+        <audio id="voicePlayback" style="display:none;margin-top:8px;width:100%" controls></audio>
+        <div id="voiceStatus" style="font-size:12px;color:var(--text-muted)"></div>
       </div>
-      <audio id="voicePlayback" style="display:none;margin-top:8px;width:100%" controls></audio>
     </div>
 
-    <button class="submit-btn" id="submitBtn" onclick="submitTicket()">提交反馈</button>
+    <button type="button" class="submit-btn" id="submitBtn">提交反馈</button>
   </div>
 
   <!-- 我的工单 -->
@@ -158,44 +168,137 @@ h1{font-size:20px;color:var(--gold);margin-bottom:6px;display:flex;align-items:c
 <div class="toast" id="toast"></div>
 
 <script>
-// === R326 站内反馈中心 ===
-const API_BASE = '';
-let selectedCategory = 'bug';
-let selectedPriority = 'high';
-let screenshotFile = null;
-let voiceBlob = null;
-let mediaRecorder = null;
-let voiceStream = null;
-let isRecording = false;
+'use strict';
+// === R326 站内反馈中心 v2（修真交互+设备选择）===
 
-// 类别选择
-document.querySelectorAll('.cat-btn').forEach(btn => {
-  btn.onclick = () => {
-    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    selectedCategory = btn.dataset.cat;
-  };
-});
+var API_BASE = '';
+var selectedCategory = 'bug';
+var selectedPriority = 'high';
+var screenshotFile = null;
+var voiceBlob = null;
+var mediaRecorder = null;
+var voiceStream = null;
+var isRecording = false;
+var availableMics = [];
 
-// 优先级选择
-document.querySelectorAll('.pri-btn').forEach(btn => {
-  btn.onclick = () => {
-    document.querySelectorAll('.pri-btn').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    selectedPriority = btn.dataset.pri;
-  };
-});
+// --- 初始化 ---
+function init() {
+  // 类别选择
+  var catBtns = document.querySelectorAll('.cat-btn');
+  for (var i = 0; i < catBtns.length; i++) {
+    (function(btn) {
+      btn.addEventListener('click', function() {
+        for (var j = 0; j < catBtns.length; j++) catBtns[j].classList.remove('selected');
+        btn.classList.add('selected');
+        selectedCategory = btn.getAttribute('data-cat');
+      });
+    })(catBtns[i]);
+  }
 
-// 截图上传
+  // 优先级选择
+  var priBtns = document.querySelectorAll('.pri-btn');
+  for (var i = 0; i < priBtns.length; i++) {
+    (function(btn) {
+      btn.addEventListener('click', function() {
+        for (var j = 0; j < priBtns.length; j++) priBtns[j].classList.remove('selected');
+        btn.classList.add('selected');
+        selectedPriority = btn.getAttribute('data-pri');
+      });
+    })(priBtns[i]);
+  }
+
+  // 截图上传 — 点击区域触发 file input
+  var uploadArea = document.getElementById('uploadArea');
+  var screenshotInput = document.getElementById('screenshotInput');
+  uploadArea.addEventListener('click', function() { screenshotInput.click(); });
+  screenshotInput.addEventListener('change', function() { handleScreenshot(this); });
+
+  // 拖拽上传
+  uploadArea.addEventListener('dragover', function(e) { e.preventDefault(); uploadArea.style.borderColor = 'var(--gold)'; });
+  uploadArea.addEventListener('dragleave', function(e) { uploadArea.style.borderColor = ''; });
+  uploadArea.addEventListener('drop', function(e) {
+    e.preventDefault();
+    uploadArea.style.borderColor = '';
+    if (e.dataTransfer.files.length > 0) {
+      screenshotInput.files = e.dataTransfer.files;
+      handleScreenshot(screenshotInput);
+    }
+  });
+
+  // 语音按钮
+  document.getElementById('voiceBtn').addEventListener('click', toggleVoice);
+
+  // 提交按钮
+  document.getElementById('submitBtn').addEventListener('click', submitTicket);
+
+  // 回车键提交（在标题框按 Enter 聚焦到内容框；在内容框按 Ctrl+Enter 提交）
+  document.getElementById('ticketTitle').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      document.getElementById('ticketContent').focus();
+    }
+  });
+  document.getElementById('ticketContent').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      submitTicket();
+    }
+  });
+
+  // 枚举音频输入设备（麦克风）
+  enumerateAudioDevices();
+
+  // 加载我的工单
+  loadMyTickets();
+}
+
+// --- 设备枚举 ---
+function enumerateAudioDevices() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+    document.getElementById('voiceStatus').textContent = '⚠️ 当前浏览器不支持设备枚举';
+    return;
+  }
+  navigator.mediaDevices.enumerateDevices().then(function(devices) {
+    var mics = devices.filter(function(d) { return d.kind === 'audioinput'; });
+    availableMics = mics;
+    if (mics.length > 0) {
+      var sel = document.getElementById('micDevice');
+      sel.innerHTML = '<option value="">🔊 默认麦克风</option>';
+      for (var i = 0; i < mics.length; i++) {
+        var label = mics[i].label || '麦克风 ' + (i + 1);
+        sel.innerHTML += '<option value="' + mics[i].deviceId + '">' + label + '</option>';
+      }
+      sel.style.display = mics.length > 1 ? 'inline-block' : 'none';
+      sel.addEventListener('change', function() {
+        if (isRecording) stopRecording();
+      });
+    }
+  }).catch(function(e) {
+    // 非安全上下文（非 HTTPS / 非 localhost）下 enumerateDevices 也会受限
+    showPermWarning('设备枚举失败：' + e.message + '。请确认通过 https:// 或 localhost 访问。');
+  });
+}
+
+function showPermWarning(msg) {
+  var w = document.getElementById('permWarning');
+  w.textContent = msg;
+  w.classList.add('show');
+}
+function hidePermWarning() {
+  document.getElementById('permWarning').classList.remove('show');
+}
+
+// --- 截图上传 ---
 function handleScreenshot(input) {
-  const file = input.files[0];
+  var file = input.files[0];
   if (!file) return;
   if (file.size > 5 * 1024 * 1024) { showToast('文件超过5MB限制'); return; }
   screenshotFile = file;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const preview = document.getElementById('screenshotPreview');
-    preview.innerHTML = '<div class="upload-preview"><img src="' + e.target.result + '"><span class="remove" onclick="removeScreenshot()">✕</span></div>';
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var preview = document.getElementById('screenshotPreview');
+    preview.innerHTML = '<div class="upload-preview"><img src="' + e.target.result + '"><span class="remove" id="removeScr">✕</span></div>';
+    document.getElementById('removeScr').addEventListener('click', removeScreenshot);
   };
   reader.readAsDataURL(file);
 }
@@ -206,73 +309,132 @@ function removeScreenshot() {
   document.getElementById('screenshotInput').value = '';
 }
 
-// 语音录制
-async function toggleVoice() {
+// --- 语音录制 ---
+function toggleVoice() {
   if (isRecording) { stopRecording(); return; }
-  try {
-    voiceStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaRecorder = new MediaRecorder(voiceStream);
-    const chunks = [];
-    mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
-    mediaRecorder.onstop = () => {
-      voiceBlob = new Blob(chunks, { type: 'audio/webm' });
-      const url = URL.createObjectURL(voiceBlob);
-      const playback = document.getElementById('voicePlayback');
+  startRecording();
+}
+
+function startRecording() {
+  // 检查 API 可用性
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    showPermWarning('当前浏览器不支持麦克风录音。请使用 Chrome、Edge 或 Safari 最新版本，并通过 https:// 或 localhost 访问。');
+    return;
+  }
+
+  // 检查安全上下文
+  if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1' && location.hostname !== '0.0.0.0') {
+    showPermWarning('⚠️ 麦克风需要安全上下文（HTTPS 或 localhost）。当前地址：' + location.hostname + '。请通过 https:// 访问或在本地 localhost 打开。');
+    return;
+  }
+
+  // 获取选中的设备 ID
+  var deviceId = document.getElementById('micDevice').value || undefined;
+  var constraints = { audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } };
+  if (deviceId) constraints.audio.deviceId = { exact: deviceId };
+
+  navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
+    voiceStream = stream;
+    hidePermWarning();
+
+    // 选择支持的 MIME 类型
+    var mimeType = 'audio/webm';
+    if (!MediaRecorder.isTypeSupported(mimeType)) {
+      mimeType = 'audio/ogg';
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = '';
+      }
+    }
+
+    try {
+      mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType: mimeType }) : new MediaRecorder(stream);
+    } catch(e) {
+      showPermWarning('录音初始化失败：' + e.message);
+      voiceStream.getTracks().forEach(function(t) { t.stop(); });
+      return;
+    }
+
+    var chunks = [];
+    mediaRecorder.ondataavailable = function(e) {
+      if (e.data && e.data.size > 0) chunks.push(e.data);
+    };
+    mediaRecorder.onstop = function() {
+      voiceBlob = new Blob(chunks, { type: mimeType || 'audio/webm' });
+      var url = URL.createObjectURL(voiceBlob);
+      var playback = document.getElementById('voicePlayback');
       playback.src = url;
       playback.style.display = 'block';
-      document.getElementById('voiceStatus').textContent = '录音完成 (' + Math.round(voiceBlob.size/1024) + 'KB)';
+      document.getElementById('voiceStatus').textContent = '✅ 录音完成 (' + Math.round(voiceBlob.size / 1024) + 'KB)';
     };
+    mediaRecorder.onerror = function(e) {
+      showPermWarning('录音出错：' + (e.error ? e.error.message : '未知错误'));
+      stopRecording();
+    };
+
     mediaRecorder.start();
     isRecording = true;
     document.getElementById('voiceBtn').classList.add('recording');
     document.getElementById('voiceIcon').textContent = '⏹';
     document.getElementById('voiceText').textContent = '停止录音';
-    document.getElementById('voiceStatus').textContent = '录音中...';
-  } catch(e) {
-    showToast('无法访问麦克风：' + e.message);
-  }
+    document.getElementById('voiceStatus').textContent = '🔴 录音中...';
+  }).catch(function(e) {
+    if (e.name === 'NotAllowedError') {
+      showPermWarning('❌ 麦克风权限被拒绝。请在浏览器地址栏点击🔒图标，允许麦克风访问后重试。');
+    } else if (e.name === 'NotFoundError') {
+      showPermWarning('❌ 未找到麦克风设备。请检查设备连接或选择其他设备。');
+    } else if (e.name === 'NotReadableError') {
+      showPermWarning('❌ 麦克风被其他程序占用。请关闭其他使用麦克风的程序后重试。');
+    } else {
+      showPermWarning('❌ 麦克风访问失败：' + e.name + ' — ' + e.message);
+    }
+  });
 }
 
 function stopRecording() {
   if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
-  if (voiceStream) voiceStream.getTracks().forEach(t => t.stop());
+  if (voiceStream) {
+    voiceStream.getTracks().forEach(function(t) { t.stop(); });
+  }
   isRecording = false;
   document.getElementById('voiceBtn').classList.remove('recording');
   document.getElementById('voiceIcon').textContent = '🎤';
   document.getElementById('voiceText').textContent = '重新录音';
 }
 
-// 提交工单
-async function submitTicket() {
-  const title = document.getElementById('ticketTitle').value.trim();
-  const content = document.getElementById('ticketContent').value.trim();
-  if (!title) { showToast('请输入标题'); return; }
-  if (!content) { showToast('请输入详细描述'); return; }
+// --- 提交工单 ---
+function submitTicket() {
+  var title = document.getElementById('ticketTitle').value.trim();
+  var content = document.getElementById('ticketContent').value.trim();
+  if (!title) { showToast('请输入标题'); document.getElementById('ticketTitle').focus(); return; }
+  if (!content) { showToast('请输入详细描述'); document.getElementById('ticketContent').focus(); return; }
 
-  const btn = document.getElementById('submitBtn');
+  var btn = document.getElementById('submitBtn');
   btn.disabled = true;
   btn.textContent = '提交中...';
 
-  try {
-    let voicePath = null;
-    // 先上传语音（如有）
-    if (voiceBlob) {
-      const voiceReader = new FileReader();
-      const voiceBase64 = await new Promise((resolve) => {
-        voiceReader.onload = () => resolve(voiceReader.result);
-        voiceReader.readAsDataURL(voiceBlob);
-      });
-      const vr = await fetch(API_BASE + '/api/tickets/voice-upload', {
+  // 先上传语音（如有）
+  var voiceUploadPromise = Promise.resolve(null);
+  if (voiceBlob) {
+    var voiceReader = new FileReader();
+    voiceUploadPromise = new Promise(function(resolve) {
+      voiceReader.onload = function() { resolve(voiceReader.result); };
+      voiceReader.readAsDataURL(voiceBlob);
+    }).then(function(voiceBase64) {
+      return fetch(API_BASE + '/api/tickets/voice-upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ audio: voiceBase64 })
-      }).then(r => r.json());
-      if (vr.code === 0) voicePath = vr.data.voicePath;
-    }
+      }).then(function(r) { return r.json(); });
+    }).then(function(vr) {
+      if (vr.code === 0) return vr.data.voicePath;
+      return null;
+    }).catch(function() { return null; });
+  }
 
-    // 如果有截图，用 FormData
+  voiceUploadPromise.then(function(voicePath) {
     if (screenshotFile) {
-      const formData = new FormData();
+      // 有截图 — FormData
+      var formData = new FormData();
       formData.append('screenshot', screenshotFile);
       formData.append('category', selectedCategory);
       formData.append('priority', selectedPriority);
@@ -280,21 +442,30 @@ async function submitTicket() {
       formData.append('content', content);
       formData.append('page_url', location.href);
       if (voicePath) formData.append('voice_path', voicePath);
-      const r = await fetch(API_BASE + '/api/tickets/create', { method: 'POST', body: formData }).then(r => r.json());
-      handleResult(r);
+      return fetch(API_BASE + '/api/tickets/create', { method: 'POST', body: formData });
     } else {
-      const r = await fetch(API_BASE + '/api/tickets/create', {
+      // 无截图 — JSON
+      return fetch(API_BASE + '/api/tickets/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category: selectedCategory, priority: selectedPriority, title, content, page_url: location.href, voice_path: voicePath })
-      }).then(r => r.json());
-      handleResult(r);
+        body: JSON.stringify({
+          category: selectedCategory,
+          priority: selectedPriority,
+          title: title,
+          content: content,
+          page_url: location.href,
+          voice_path: voicePath
+        })
+      });
     }
-  } catch(e) {
+  }).then(function(r) { return r.json(); }).then(function(r) {
+    handleResult(r);
+  }).catch(function(e) {
     showToast('提交失败：' + e.message);
-  }
-  btn.disabled = false;
-  btn.textContent = '提交反馈';
+  }).finally(function() {
+    btn.disabled = false;
+    btn.textContent = '提交反馈';
+  });
 }
 
 function handleResult(r) {
@@ -312,48 +483,63 @@ function handleResult(r) {
   }
 }
 
-// 加载我的工单
-async function loadMyTickets() {
-  try {
-    const token = localStorage.getItem('authToken');
-    const headers = {};
-    if (token) headers['Authorization'] = 'Bearer ' + token;
-    const r = await fetch(API_BASE + '/api/tickets/list', { headers }).then(r => r.json());
-    const list = document.getElementById('ticketsList');
-    if (r.code === 0 && r.data.tickets.length > 0) {
-      list.innerHTML = r.data.tickets.map(t => {
-        const catNames = {bug:'🐛 Bug',suggestion:'💡 建议',question:'❓ 咨询',praise:'👍 好评',feature_request:'✨ 新功能'};
-        const statusNames = {open:'待处理',in_progress:'处理中',resolved:'已解决',closed:'已关闭',rejected:'已拒绝'};
-        return '<div class="ticket-item" onclick="viewTicket(' + t.id + ')">' +
-          '<div class="ti-header"><span class="ti-title">' + t.title + '</span>' +
-          '<span class="status-badge status-' + t.status + '">' + (statusNames[t.status]||t.status) + '</span></div>' +
-          '<div class="ti-meta">' + (catNames[t.category]||t.category) + ' · ' + t.created_at + '</div>' +
-          (t.admin_reply ? '<div style="margin-top:4px;font-size:12px;color:var(--green)">💬 已回复</div>' : '') +
-        '</div>';
-      }).join('');
-    } else if (r.code === 0) {
-      list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">暂无反馈记录</div>';
-    } else {
-      list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">登录后可查看您的反馈记录</div>';
-    }
-  } catch(e) {
-    document.getElementById('ticketsList').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">加载失败</div>';
-  }
+// --- 加载我的工单 ---
+function loadMyTickets() {
+  var token = localStorage.getItem('authToken');
+  var headers = {};
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+
+  fetch(API_BASE + '/api/tickets/list', { headers: headers })
+    .then(function(r) { return r.json(); })
+    .then(function(r) {
+      var list = document.getElementById('ticketsList');
+      if (r.code === 0 && r.data.tickets.length > 0) {
+        var catNames = {bug:'🐛 Bug',suggestion:'💡 建议',question:'❓ 咨询',praise:'👍 好评',feature_request:'✨ 新功能'};
+        var statusNames = {open:'待处理',in_progress:'处理中',resolved:'已解决',closed:'已关闭',rejected:'已拒绝'};
+        list.innerHTML = r.data.tickets.map(function(t) {
+          return '<div class="ticket-item" data-id="' + t.id + '">' +
+            '<div class="ti-header"><span class="ti-title">' + escapeHtml(t.title) + '</span>' +
+            '<span class="status-badge status-' + t.status + '">' + (statusNames[t.status]||t.status) + '</span></div>' +
+            '<div class="ti-meta">' + (catNames[t.category]||t.category) + ' · ' + t.created_at + '</div>' +
+            (t.admin_reply ? '<div style="margin-top:4px;font-size:12px;color:var(--green)">💬 已回复</div>' : '') +
+          '</div>';
+        }).join('');
+        // 绑定点击事件
+        var items = list.querySelectorAll('.ticket-item');
+        for (var i = 0; i < items.length; i++) {
+          items[i].addEventListener('click', function() {
+            var id = this.getAttribute('data-id');
+            location.href = 'feedback-detail.html?id=' + id;
+          });
+        }
+      } else if (r.code === 0) {
+        list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">暂无反馈记录</div>';
+      } else {
+        list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">登录后可查看您的反馈记录</div>';
+      }
+    }).catch(function(e) {
+      document.getElementById('ticketsList').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">加载失败：' + e.message + '</div>';
+    });
 }
 
-function viewTicket(id) {
-  location.href = 'feedback-detail.html?id=' + id;
+function escapeHtml(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 function showToast(msg) {
-  const t = document.getElementById('toast');
+  var t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
+  setTimeout(function() { t.classList.remove('show'); }, 3000);
 }
 
-// 初始化
-loadMyTickets();
+// --- 启动 ---
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
 </script>
 </body>
 </html>
