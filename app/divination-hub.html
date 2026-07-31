@@ -224,6 +224,7 @@ h2{color:var(--gold2);border-bottom:1px solid rgba(201,168,76,.2);padding-bottom
 <section class="section" id="section-bazi" role="tabpanel" aria-labelledby="tab-bazi" data-lazy="bazi.html">
   <div class="lazy-loading-placeholder" style="padding:60px 20px;text-align:center;color:var(--paper2);opacity:0.85" role="status" aria-label="加载中">
     <div style="font-size:13px;letter-spacing:2px">⏳ 加载中...</div>
+  <div id="baziSectionSteps"></div>
   </div>
 </section>
 
@@ -2265,7 +2266,41 @@ function renderNavFlat(){
   container.innerHTML = html;
 }
 
-document.addEventListener('DOMContentLoaded', renderNavFlat);// ===== 导航分组下拉菜单 (R324) =====
+document.addEventListener('DOMContentLoaded', function(){
+  renderNavFlat();
+  // 监听 showSection 初始化步骤
+  var _origShow = window.showSection;
+  if(_origShow){
+    window.showSection = function(sid){
+      _origShow(sid);
+      if(typeof FlowEngine !== 'undefined'){
+        var stepsMap = {
+          bazi: {steps:['填写信息','排盘演算','查看结果','深度分析'], hint:'填写出生日期和时辰，点击排盘演算按钮。', links:[{name:'紫微斗数',icon:'🌌',url:"javascript:showSection('ziwei')"},{name:'体质辨识',icon:'🌿',url:"javascript:showSection('tizhi')"}]},
+          zhanbu: {steps:['选择卜法','输入问题','起卦分析','查看解读'], hint:'选择占卜方式，心中默念所问之事。', links:[{name:'八字排盘',icon:'🌟',url:"javascript:showSection('bazi')"}]},
+          yanzhi: {steps:['拍摄面相','AI分析','查看面相报告'], hint:'请在自然光下拍摄正面照。', links:[]},
+          xingming: {steps:['输入姓名','选择性别','补充生辰','查看分析'], hint:'输入需要分析的姓名信息。', links:[]},
+          tizhi: {steps:['填写问卷','AI辨识','查看体质','调养建议'], hint:'根据真实感受回答问题。', links:[]},
+          fengshui: {steps:['输入宅向','选择元运','排盘分析','查看建议'], hint:'输入房屋坐向和建造年代。', links:[]}
+        };
+        var cfg = stepsMap[sid];
+        if(cfg){
+          var container = document.querySelector('#section-' + sid + ' .flow-steps');
+          if(!container){
+            var s = document.getElementById('section-' + sid);
+            if(s){
+              var div = document.createElement('div');
+              div.innerHTML = '<div class="flow-steps-wrap"></div><div class="flow-hint">' + cfg.hint + '</div>';
+              s.insertBefore(div, s.firstChild);
+              FlowEngine.steps(div.querySelector('.flow-steps-wrap') ? div.querySelector('.flow-steps-wrap').id : '', cfg.steps, 0);
+              // 简化：直接用 innerHTML
+              div.innerHTML = '<div class="flow-steps">' + cfg.steps.map(function(st,i){return '<div class="flow-step active"><span class="flow-step-num">'+(i+1)+'</span><span>'+st+'</span></div>'+(i<cfg.steps.length-1?'<span class="flow-step-arrow">→</span>':'')}).join('') + '</div><div class="flow-hint">' + cfg.hint + '</div>';
+            }
+          }
+        }
+      }
+    };
+  }
+});// ===== 导航分组下拉菜单 (R324) =====
 (function(){
   document.addEventListener('click',function(e){
     var trigger=e.target.closest('.nav-group-trigger');
