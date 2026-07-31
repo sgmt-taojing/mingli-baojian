@@ -121,53 +121,14 @@ body{font-family:'Noto Serif SC',serif;background:var(--ink);color:var(--paper);
 
 <!-- ===== 首页 HERO ===== -->
 <section class="section active" id="section-hero" role="tabpanel" aria-labelledby="tab-hero">
-  <div class="wechat-disclaimer">⚠️ 本平台内容仅供国学文化学习与娱乐参考，不构成专业建议。占卜结果不作为决策依据，养生建议不替代医疗诊断。</div>
-
-  <!-- R332 两栏导航：左一级目录 + 右功能卡片 -->
-  <div class="nav-two-col">
-    <!-- 顶部标题区 -->
-    <div class="nav-hero-header">
-      <h1 class="nhh-title">易道智鉴</h1>
-      <p class="nhh-desc">融合千年命理智慧与先进人工智能，涵盖八字、紫微、奇门、六爻、风水、中医望诊、体质辨识等 71 项功能。排盘推演、占卜决疑、环境调理、健康咨询，一站式国学文化平台。</p>
-    </div>
-
-    <div class="nav-body">
-      <!-- 左侧：一级目录 -->
-      <aside class="nav-sidebar" id="navSidebar">
-        <a class="ns-item active" data-l1="zhouyi" onclick="navSelectL1('zhouyi')">
-          <span class="ns-icon">☰</span>
-          <span class="ns-text">周易术数</span>
-          <span class="ns-count">15</span>
-        </a>
-        <a class="ns-item" data-l1="tcm" onclick="navSelectL1('tcm')">
-          <span class="ns-icon">⚕️</span>
-          <span class="ns-text">中医诊疗</span>
-          <span class="ns-count">17</span>
-        </a>
-        <a class="ns-item" data-l1="knowledge" onclick="navSelectL1('knowledge')">
-          <span class="ns-icon">📚</span>
-          <span class="ns-text">知识文化</span>
-          <span class="ns-count">14</span>
-        </a>
-        <a class="ns-item" data-l1="ops" onclick="navSelectL1('ops')">
-          <span class="ns-icon">🛠</span>
-          <span class="ns-text">运营运维</span>
-          <span class="ns-count">13</span>
-        </a>
-        <a class="ns-item" data-l1="user" onclick="navSelectL1('user')">
-          <span class="ns-icon">👤</span>
-          <span class="ns-text">用户服务</span>
-          <span class="ns-count">12</span>
-        </a>
-      </aside>
-
-      <!-- 右侧：功能卡片网格 -->
-      <div class="nav-cards-area" id="navCardsArea">
-        <div class="nca-group-title" id="ncaGroupTitle">周易术数</div>
-        <div class="nca-cards" id="ncaCards"></div>
-      </div>
-    </div>
+  <!-- 顶部标题 + 说明 -->
+  <div class="nav-hero-top">
+    <h1 class="nht-title">易道智鉴</h1>
+    <p class="nht-desc">融合千年命理智慧与先进人工智能，涵盖八字、紫微、奇门、六爻、风水、中医望诊、体质辨识等 71 项功能。排盘推演、占卜决疑、环境调理、健康咨询，一站式国学文化平台。</p>
   </div>
+
+  <!-- 一级目录 + 功能卡片 纵向平铺 -->
+  <div class="nav-flat" id="navFlat"></div>
 </section>
 
 <!-- ===== 更多功能网格 ===== -->
@@ -2115,33 +2076,33 @@ body{font-family:'Noto Serif SC',serif;background:var(--ink);color:var(--paper);
 <script src="js/divination-core.js" defer></script>
 <script src="js/mobile-nav.js" defer></script>
 <script>
-// ===== 两栏导航 (R332) =====
+// ===== 纵向平铺导航 (R335) =====
 var NAV_DATA = {
   zhouyi: {
     name: '周易术数', icon: '☰',
     groups: [
       { name: '排盘推演', items: [
-        { icon:'🌟', name:'八字排盘', en:'Ba Zi', desc:'四柱八字，十神格局，大运流年', tags:['十神','大运','神煞','格局'], source:'《渊海子平》《三命通会》', url:"javascript:showSection('bazi')" },
-        { icon:'🌌', name:'紫微斗数', en:'Zi Wei', desc:'主星宫位，四化大限，命运推演', tags:['主星','宫位','四化','大限'], source:'《紫微斗数全书》', url:"javascript:location.hash='#section-ziwei'" },
-        { icon:'🏠', name:'风水排盘', en:'Feng Shui', desc:'玄空飞星，宅命配卦', tags:['飞星','宅命'], source:'《沈氏玄空学》', url:"javascript:window.location.href='fengshui-chart.html'" }
+        { icon:'🌟', name:'八字排盘', desc:'四柱八字·十神格局·大运流年', source:'《渊海子平》', url:"javascript:showSection('bazi')" },
+        { icon:'🌌', name:'紫微斗数', desc:'主星宫位·四化大限·命运推演', source:'《紫微斗数全书》', url:"javascript:location.hash='#section-ziwei'" },
+        { icon:'🏠', name:'风水排盘', desc:'玄空飞星·宅命配卦', source:'《沈氏玄空学》', url:"javascript:window.location.href='fengshui-chart.html'" }
       ]},
       { name: '占卜决疑', items: [
-        { icon:'📖', name:'六爻占卜', en:'Liu Yao', desc:'六亲六神，卦辞断事，起卦问疑', tags:['六亲','六神','卦辞'], source:'《增删卜易》《卜筮正宗》', url:"javascript:showSection('zhanbu');showZhanbuSub('yijing')" },
-        { icon:'🔮', name:'奇门遁甲', en:'Qi Men', desc:'八门九星，三奇六仪，择时择方', tags:['八门','九星','三奇'], source:'《烟波钓叟歌》', url:"javascript:showSection('zhanbu');showZhanbuSub('qimen')" },
-        { icon:'🌸', name:'梅花易数', en:'Mei Hua', desc:'体用生克，外应卦象，心动即占', tags:['体用','外应','卦象'], source:'《梅花易数》', url:"javascript:showSection('zhanbu');showZhanbuSub('meihua')" },
-        { icon:'谛', name:'大六壬', en:'Liu Ren', desc:'四课三传，天将九宗，决疑推演', tags:['四课','三传','天将'], source:'《六壬大全》', url:"javascript:showSection('zhanbu');showZhanbuSub('liuren')" },
-        { icon:'✍', name:'测字占卜', en:'Ce Zi', desc:'汉字五行，即时起卦，最简易占', tags:['汉字','五行','即时'], source:'《测字秘碟》', url:"javascript:showSection('cezi')" }
+        { icon:'📖', name:'六爻占卜', desc:'六亲六神·卦辞断事', source:'《增删卜易》', url:"javascript:showSection('zhanbu');showZhanbuSub('yijing')" },
+        { icon:'🔮', name:'奇门遁甲', desc:'八门九星·三奇六仪', source:'《烟波钓叟歌》', url:"javascript:showSection('zhanbu');showZhanbuSub('qimen')" },
+        { icon:'🌸', name:'梅花易数', desc:'体用生克·外应卦象', source:'《梅花易数》', url:"javascript:showSection('zhanbu');showZhanbuSub('meihua')" },
+        { icon:'谛', name:'大六壬', desc:'四课三传·天将九宗', source:'《六壬大全》', url:"javascript:showSection('zhanbu');showZhanbuSub('liuren')" },
+        { icon:'✍', name:'测字占卜', desc:'汉字五行·即时起卦', source:'《测字秘碟》', url:"javascript:showSection('cezi')" }
       ]},
       { name: '环境调理', items: [
-        { icon:'🏡', name:'风水玄空', en:'Feng Shui', desc:'峦头理气，卦位择日，环境调理', tags:['峦头','理气','卦位'], source:'《青囊经》', url:"javascript:showSection('fengshui')" }
+        { icon:'🏡', name:'风水玄空', desc:'峦头理气·卦位择日', source:'《青囊经》', url:"javascript:showSection('fengshui')" }
       ]},
       { name: '命理人生', items: [
-        { icon:'🎯', name:'颜值命理', en:'Face Reading', desc:'面相五官，三停五岳，颜值论命', tags:['面相','五官','三停'], source:'《麻衣神相》', url:"javascript:showSection('yanzhi')" },
-        { icon:'🔤', name:'起名改名', en:'Naming', desc:'五行补益，音律义理，姓名分析', tags:['五行','音律','分析'], source:'《姓名学》', url:"javascript:showSection('xingming')" },
-        { icon:'🧭', name:'人生蓝图', en:'Life Plan', desc:'十年阶段，十二领域，未来规划', tags:['十年','领域','规划'], source:'', url:"javascript:window.location.href='lifeplan-detail.html'" },
-        { icon:'🎊', name:'年度运势', en:'Annual Fortune', desc:'流年流月，太岁方位，年度指南', tags:['流年','太岁','指南'], source:'', url:"javascript:showSection('annual-fortune')" },
-        { icon:'📊', name:'流年报告', en:'Life Flow', desc:'跨维度联动，流年流月大运', tags:['联动','流月','大运'], source:'', url:"javascript:window.location.href='lifeflow-report.html'" },
-        { icon:'📋', name:'逐月运势', en:'Monthly', desc:'月度细化，吉凶日历，行事参考', tags:['月度','吉凶','日历'], source:'', url:"javascript:window.location.href='monthly-report.html'" }
+        { icon:'🎯', name:'颜值命理', desc:'面相五官·三停五岳', source:'《麻衣神相》', url:"javascript:showSection('yanzhi')" },
+        { icon:'🔤', name:'起名改名', desc:'五行补益·姓名分析', source:'', url:"javascript:showSection('xingming')" },
+        { icon:'🧭', name:'人生蓝图', desc:'十年阶段·十二领域', source:'', url:"javascript:window.location.href='lifeplan-detail.html'" },
+        { icon:'🎊', name:'年度运势', desc:'流年流月·太岁方位', source:'', url:"javascript:showSection('annual-fortune')" },
+        { icon:'📊', name:'流年报告', desc:'跨维度联动·流月大运', source:'', url:"javascript:window.location.href='lifeflow-report.html'" },
+        { icon:'📋', name:'逐月运势', desc:'月度细化·吉凶日历', source:'', url:"javascript:window.location.href='monthly-report.html'" }
       ]}
     ]
   },
@@ -2149,31 +2110,31 @@ var NAV_DATA = {
     name: '中医诊疗', icon: '⚕️',
     groups: [
       { name: '望诊采集', items: [
-        { icon:'👁', name:'望诊工作台', en:'Wang Zhen', desc:'面部舌象，AI视觉，倪师法', tags:['面部','舌象','AI'], source:'', url:"javascript:window.location.href='wangzhen-clinical.html'" },
-        { icon:'🔬', name:'望诊中心', en:'Hub', desc:'望诊知识库+临床工作台', tags:['知识库','临床'], source:'', url:"javascript:window.location.href='wangzhen-center.html'" },
-        { icon:'📸', name:'报告OCR', en:'OCR', desc:'体检报告识别', tags:['OCR','识别'], source:'', url:"javascript:window.location.href='report-ocr.html'" },
-        { icon:'📝', name:'患者采集', en:'Intake', desc:'患者信息采集表', tags:['采集','信息'], source:'', url:"javascript:window.location.href='patient-intake.html'" }
+        { icon:'👁', name:'望诊工作台', desc:'面部舌象·AI视觉', source:'', url:"javascript:window.location.href='wangzhen-clinical.html'" },
+        { icon:'🔬', name:'望诊中心', desc:'望诊知识库+临床', source:'', url:"javascript:window.location.href='wangzhen-center.html'" },
+        { icon:'📸', name:'报告OCR', desc:'体检报告识别', source:'', url:"javascript:window.location.href='report-ocr.html'" },
+        { icon:'📝', name:'患者采集', desc:'患者信息采集表', source:'', url:"javascript:window.location.href='patient-intake.html'" }
       ]},
       { name: '诊疗分析', items: [
-        { icon:'🌿', name:'体质辨识', en:'Constitution', desc:'九种体质，辨识调养，食疗方案', tags:['9体质','调养','食疗'], source:'《中医体质分类》', url:"javascript:showSection('tizhi')" },
-        { icon:'🏥', name:'中医诊所', en:'Clinic', desc:'健康咨询，症状分析，诊疗建议', tags:['咨询','症状','诊疗'], source:'', url:"javascript:window.location.href='tcm-clinic.html'" },
-        { icon:'🩺', name:'症状分析', en:'Symptoms', desc:'周易中医联合分析', tags:['周易','联合','分析'], source:'', url:"javascript:window.location.href='tcm-symptom.html'" },
-        { icon:'🧬', name:'体质调理', en:'Integrated', desc:'综合体质调理方案', tags:['综合','调理'], source:'', url:"javascript:window.location.href='divination-integrated.html'" }
+        { icon:'🌿', name:'体质辨识', desc:'九种体质·辨识调养', source:'《中医体质分类》', url:"javascript:showSection('tizhi')" },
+        { icon:'🏥', name:'中医诊所', desc:'健康咨询·症状分析', source:'', url:"javascript:window.location.href='tcm-clinic.html'" },
+        { icon:'🩺', name:'症状分析', desc:'周易中医联合分析', source:'', url:"javascript:window.location.href='tcm-symptom.html'" },
+        { icon:'🧬', name:'体质调理', desc:'综合体质调理方案', source:'', url:"javascript:window.location.href='divination-integrated.html'" }
       ]},
       { name: '患者管理', items: [
-        { icon:'👤', name:'人物档案', en:'Profile', desc:'5身份管理，风险评级，事件流', tags:['身份','风险','事件'], source:'', url:"javascript:location.hash='#section-person-dashboard'" },
-        { icon:'📋', name:'患者门户', en:'Portal', desc:'患者档案·诊疗·健康', tags:['档案','诊疗','健康'], source:'', url:"javascript:window.location.href='patient-portal.html'" },
-        { icon:'📋', name:'报告解读', en:'Report', desc:'24项生化，四维融合', tags:['生化','影像','融合'], source:'', url:"javascript:location.hash='#section-report-interpret'" }
+        { icon:'👤', name:'人物档案', desc:'5身份管理·风险评级', source:'', url:"javascript:location.hash='#section-person-dashboard'" },
+        { icon:'📋', name:'患者门户', desc:'患者档案·诊疗·健康', source:'', url:"javascript:window.location.href='patient-portal.html'" },
+        { icon:'📋', name:'报告解读', desc:'24项生化·四维融合', source:'', url:"javascript:location.hash='#section-report-interpret'" }
       ]},
       { name: '健康管理', items: [
-        { icon:'🏠', name:'居家诊疗', en:'Home Care', desc:'居家陪护，个性化推送', tags:['陪护','推送'], source:'', url:"javascript:window.location.href='home-care.html'" },
-        { icon:'📈', name:'健康预测', en:'Forecast', desc:'健康趋势预测分析', tags:['趋势','预测'], source:'', url:"javascript:window.location.href='health-forecast.html'" },
-        { icon:'📊', name:'健康监控', en:'Monitor', desc:'健康数据监控看板', tags:['数据','监控'], source:'', url:"javascript:window.location.href='health-monitor.html'" },
-        { icon:'💊', name:'健康指导', en:'Wellness', desc:'个性化健康指导方案', tags:['指导','方案'], source:'', url:"javascript:window.location.href='wellness-guide.html'" }
+        { icon:'🏠', name:'居家诊疗', desc:'居家陪护·个性化推送', source:'', url:"javascript:window.location.href='home-care.html'" },
+        { icon:'📈', name:'健康预测', desc:'健康趋势预测分析', source:'', url:"javascript:window.location.href='health-forecast.html'" },
+        { icon:'📊', name:'健康监控', desc:'健康数据监控看板', source:'', url:"javascript:window.location.href='health-monitor.html'" },
+        { icon:'💊', name:'健康指导', desc:'个性化健康指导方案', source:'', url:"javascript:window.location.href='wellness-guide.html'" }
       ]},
       { name: '医生端', items: [
-        { icon:'👨‍⚕️', name:'医生端', en:'Doctor', desc:'综合诊断工作台', tags:['诊断','工作台'], source:'', url:"javascript:window.location.href='doctor-panel.html'" },
-        { icon:'👴', name:'医生(大字版)', en:'Elder', desc:'老年友好版', tags:['大字','老年'], source:'', url:"javascript:window.location.href='doctor-elder.html'" }
+        { icon:'👨‍⚕️', name:'医生端', desc:'综合诊断工作台', source:'', url:"javascript:window.location.href='doctor-panel.html'" },
+        { icon:'👴', name:'医生(大字版)', desc:'老年友好版', source:'', url:"javascript:window.location.href='doctor-elder.html'" }
       ]}
     ]
   },
@@ -2181,24 +2142,24 @@ var NAV_DATA = {
     name: '知识文化', icon: '📚',
     groups: [
       { name: '知识库', items: [
-        { icon:'📚', name:'知识库', en:'Knowledge', desc:'54模块，12000+条目，FTS5检索', tags:['54模块','FTS5','检索'], source:'', url:"javascript:window.location.href='divination-knowledge.html'" },
-        { icon:'📖', name:'KB浏览器', en:'Browser', desc:'知识库浏览中心', tags:['浏览','中心'], source:'', url:"javascript:window.location.href='kb-explorer.html'" },
-        { icon:'🔮', name:'知识图谱', en:'Graph', desc:'模块关系可视化', tags:['关系','可视化'], source:'', url:"javascript:window.location.href='kb-graph.html'" },
-        { icon:'📊', name:'KB质量审计', en:'Quality', desc:'知识库质量审计', tags:['质量','审计'], source:'', url:"javascript:window.location.href='kb-quality.html'" },
-        { icon:'📈', name:'KB命中', en:'Hit', desc:'KB命中仪表盘', tags:['命中','仪表盘'], source:'', url:"javascript:window.location.href='kb-hit-dashboard.html'" }
+        { icon:'📚', name:'知识库', desc:'54模块·12000+条目·FTS5', source:'', url:"javascript:window.location.href='divination-knowledge.html'" },
+        { icon:'📖', name:'KB浏览器', desc:'知识库浏览中心', source:'', url:"javascript:window.location.href='kb-explorer.html'" },
+        { icon:'🔮', name:'知识图谱', desc:'模块关系可视化', source:'', url:"javascript:window.location.href='kb-graph.html'" },
+        { icon:'📊', name:'KB质量审计', desc:'知识库质量审计', source:'', url:"javascript:window.location.href='kb-quality.html'" },
+        { icon:'📈', name:'KB命中', desc:'KB命中仪表盘', source:'', url:"javascript:window.location.href='kb-hit-dashboard.html'" }
       ]},
       { name: '名师传承', items: [
-        { icon:'🪷', name:'倪师知识库', en:'Ni Hai Sha', desc:'倪海厦中医国学', tags:['倪师','中医','国学'], source:'', url:"javascript:window.location.href='nihaisha-knowledge.html'" },
-        { icon:'🎯', name:'舒晗知识库', en:'Shu Han', desc:'舒晗奇门遁甲', tags:['舒晗','奇门'], source:'', url:"javascript:window.location.href='shuhan-knowledge.html'" },
-        { icon:'🎓', name:'倪师学堂', en:'School', desc:'系统化中医课程', tags:['课程','系统'], source:'', url:"javascript:window.location.href='nihaisha-learning.html'" },
-        { icon:'👨‍🏫', name:'名师课堂', en:'Masters', desc:'54命理大师讲堂', tags:['54大师','讲堂'], source:'', url:"javascript:window.location.href='master-class.html'" },
-        { icon:'👥', name:'名师档案', en:'Archive', desc:'54大师全量档案', tags:['档案','全量'], source:'', url:"javascript:window.location.href='masters.html'" },
-        { icon:'📜', name:'口诀库', en:'Kou Jue', desc:'8大领域口诀', tags:['8领域','口诀'], source:'', url:"javascript:window.location.href='koujue-gallery.html'" }
+        { icon:'🪷', name:'倪师知识库', desc:'倪海厦中医国学', source:'', url:"javascript:window.location.href='nihaisha-knowledge.html'" },
+        { icon:'🎯', name:'舒晗知识库', desc:'舒晗奇门遁甲', source:'', url:"javascript:window.location.href='shuhan-knowledge.html'" },
+        { icon:'🎓', name:'倪师学堂', desc:'系统化中医课程', source:'', url:"javascript:window.location.href='nihaisha-learning.html'" },
+        { icon:'👨‍🏫', name:'名师课堂', desc:'54命理大师讲堂', source:'', url:"javascript:window.location.href='master-class.html'" },
+        { icon:'👥', name:'名师档案', desc:'54大师全量档案', source:'', url:"javascript:window.location.href='masters.html'" },
+        { icon:'📜', name:'口诀库', desc:'8大领域口诀', source:'', url:"javascript:window.location.href='koujue-gallery.html'" }
       ]},
       { name: '文化生活', items: [
-        { icon:'🎎', name:'民俗生活', en:'Folklore', desc:'黄历门户，民俗工具', tags:['黄历','民俗'], source:'', url:"javascript:window.location.href='folklore-portal.html'" },
-        { icon:'🧘', name:'修行参学', en:'Practice', desc:'修行参学文化门户', tags:['修行','文化'], source:'', url:"javascript:window.location.href='practice-portal.html'" },
-        { icon:'🎵', name:'疗愈音乐', en:'Music', desc:'五行音疗，疗愈诊断', tags:['五行','音疗'], source:'', url:"javascript:showSection('healing-music')" }
+        { icon:'🎎', name:'民俗生活', desc:'黄历门户·民俗工具', source:'', url:"javascript:window.location.href='folklore-portal.html'" },
+        { icon:'🧘', name:'修行参学', desc:'修行参学文化门户', source:'', url:"javascript:window.location.href='practice-portal.html'" },
+        { icon:'🎵', name:'疗愈音乐', desc:'五行音疗·疗愈诊断', source:'', url:"javascript:showSection('healing-music')" }
       ]}
     ]
   },
@@ -2206,23 +2167,23 @@ var NAV_DATA = {
     name: '运营运维', icon: '🛠',
     groups: [
       { name: '后台管理', items: [
-        { icon:'⚙️', name:'后台管理', en:'Admin', desc:'系统后台管理面板', tags:['系统','管理'], source:'', url:"javascript:window.location.href='admin.html'" },
-        { icon:'🛍️', name:'商城管理', en:'Shop', desc:'商城后台管理', tags:['商城','后台'], source:'', url:"javascript:window.location.href='admin-shop.html'" },
-        { icon:'📚', name:'KB管理', en:'KB Admin', desc:'知识库管理面板', tags:['KB','管理'], source:'', url:"javascript:window.location.href='admin-kb-panel.html'" },
-        { icon:'🔔', name:'通知日志', en:'Notify', desc:'通知日志管理', tags:['通知','日志'], source:'', url:"javascript:window.location.href='admin-notify.html'" },
-        { icon:'🎫', name:'工单管理', en:'Tickets', desc:'工单管理后台', tags:['工单','后台'], source:'', url:"javascript:window.location.href='admin-tickets.html'" }
+        { icon:'⚙️', name:'后台管理', desc:'系统后台管理面板', source:'', url:"javascript:window.location.href='admin.html'" },
+        { icon:'🛍️', name:'商城管理', desc:'商城后台管理', source:'', url:"javascript:window.location.href='admin-shop.html'" },
+        { icon:'📚', name:'KB管理', desc:'知识库管理面板', source:'', url:"javascript:window.location.href='admin-kb-panel.html'" },
+        { icon:'🔔', name:'通知日志', desc:'通知日志管理', source:'', url:"javascript:window.location.href='admin-notify.html'" },
+        { icon:'🎫', name:'工单管理', desc:'工单管理后台', source:'', url:"javascript:window.location.href='admin-tickets.html'" }
       ]},
       { name: '监控运维', items: [
-        { icon:'📊', name:'运营大屏', en:'Monitor', desc:'运营监控大屏', tags:['监控','大屏'], source:'', url:"javascript:window.location.href='monitor-dashboard.html'" },
-        { icon:'📡', name:'监控门户', en:'Portal', desc:'监控运维平台健康', tags:['监控','健康'], source:'', url:"javascript:window.location.href='monitor-portal.html'" },
-        { icon:'📈', name:'评估看板', en:'Eval', desc:'AI评估看板', tags:['评估','AI'], source:'', url:"javascript:window.location.href='eval-dashboard.html'" },
-        { icon:'📷', name:'设备运维', en:'Devices', desc:'设备运维中心', tags:['设备','运维'], source:'', url:"javascript:window.location.href='device-management.html'" }
+        { icon:'📊', name:'运营大屏', desc:'运营监控大屏', source:'', url:"javascript:window.location.href='monitor-dashboard.html'" },
+        { icon:'📡', name:'监控门户', desc:'监控运维平台健康', source:'', url:"javascript:window.location.href='monitor-portal.html'" },
+        { icon:'📈', name:'评估看板', desc:'AI评估看板', source:'', url:"javascript:window.location.href='eval-dashboard.html'" },
+        { icon:'📷', name:'设备运维', desc:'设备运维中心', source:'', url:"javascript:window.location.href='device-management.html'" }
       ]},
       { name: 'AI与服务', items: [
-        { icon:'🤖', name:'AI助手', en:'AI', desc:'AI命理助手', tags:['AI','命理'], source:'', url:"javascript:window.location.href='ai-assistant.html'" },
-        { icon:'🔧', name:'AI引擎配置', en:'Config', desc:'AI视觉引擎配置', tags:['AI','视觉'], source:'', url:"javascript:window.location.href='ai-engine-config.html'" },
-        { icon:'📖', name:'API文档', en:'API', desc:'OpenAPI 3.0 文档', tags:['API','文档'], source:'', url:"javascript:window.location.href='api-docs.html'" },
-        { icon:'👓', name:'智能眼镜', en:'Glass', desc:'智能眼镜控制台', tags:['眼镜','控制台'], source:'', url:"javascript:window.location.href='glass-console.html'" }
+        { icon:'🤖', name:'AI助手', desc:'AI命理助手', source:'', url:"javascript:window.location.href='ai-assistant.html'" },
+        { icon:'🔧', name:'AI引擎配置', desc:'AI视觉引擎配置', source:'', url:"javascript:window.location.href='ai-engine-config.html'" },
+        { icon:'📖', name:'API文档', desc:'OpenAPI 3.0 文档', source:'', url:"javascript:window.location.href='api-docs.html'" },
+        { icon:'👓', name:'智能眼镜', desc:'智能眼镜控制台', source:'', url:"javascript:window.location.href='glass-console.html'" }
       ]}
     ]
   },
@@ -2230,90 +2191,55 @@ var NAV_DATA = {
     name: '用户服务', icon: '👤',
     groups: [
       { name: '账户中心', items: [
-        { icon:'🔐', name:'登录', en:'Login', desc:'用户登录', tags:['登录'], source:'', url:"javascript:window.location.href='login.html'" },
-        { icon:'🪪', name:'身份管理', en:'Identity', desc:'身份管理中心', tags:['身份','管理'], source:'', url:"javascript:window.location.href='person-center.html'" },
-        { icon:'👤', name:'人物看板', en:'Dashboard', desc:'人物档案看板', tags:['档案','看板'], source:'', url:"javascript:window.location.href='person-dashboard.html'" }
+        { icon:'🔐', name:'登录', desc:'用户登录', source:'', url:"javascript:window.location.href='login.html'" },
+        { icon:'🪪', name:'身份管理', desc:'身份管理中心', source:'', url:"javascript:window.location.href='person-center.html'" },
+        { icon:'👤', name:'人物看板', desc:'人物档案看板', source:'', url:"javascript:window.location.href='person-dashboard.html'" }
       ]},
       { name: '商城会员', items: [
-        { icon:'🛍️', name:'商城', en:'Shop', desc:'命理商城', tags:['商城'], source:'', url:"javascript:window.location.href='divination-shop.html'" },
-        { icon:'👑', name:'会员', en:'VIP', desc:'会员服务', tags:['会员','服务'], source:'', url:"javascript:window.location.href='divination-membership.html'" }
+        { icon:'🛍️', name:'商城', desc:'命理商城', source:'', url:"javascript:window.location.href='divination-shop.html'" },
+        { icon:'👑', name:'会员', desc:'会员服务', source:'', url:"javascript:window.location.href='divination-membership.html'" }
       ]},
       { name: '消息推送', items: [
-        { icon:'📮', name:'年度推送', en:'Push', desc:'我的年度推送', tags:['推送','年度'], source:'', url:"javascript:window.location.href='yuanzhu-inbox.html'" },
-        { icon:'💬', name:'站内消息', en:'Messages', desc:'站内消息', tags:['消息'], source:'', url:"javascript:window.location.href='im.html'" },
-        { icon:'💬', name:'反馈', en:'Feedback', desc:'意见反馈中心', tags:['反馈','意见'], source:'', url:"javascript:window.location.href='feedback-center.html'" }
+        { icon:'📮', name:'年度推送', desc:'我的年度推送', source:'', url:"javascript:window.location.href='yuanzhu-inbox.html'" },
+        { icon:'💬', name:'站内消息', desc:'站内消息', source:'', url:"javascript:window.location.href='im.html'" },
+        { icon:'💬', name:'反馈', desc:'意见反馈中心', source:'', url:"javascript:window.location.href='feedback-center.html'" }
       ]},
       { name: '工具其他', items: [
-        { icon:'📱', name:'缘主工具', en:'WeChat', desc:'微信缘主工具', tags:['微信','缘主'], source:'', url:"javascript:window.location.href='wechat-hub.html'" },
-        { icon:'📋', name:'报告中心', en:'Reports', desc:'报告中心', tags:['报告','中心'], source:'', url:"javascript:window.location.href='reports-hub.html'" },
-        { icon:'📤', name:'分享', en:'Share', desc:'分享中心', tags:['分享'], source:'', url:"javascript:window.location.href='share-center.html'" },
-        { icon:'🔒', name:'隐私中心', en:'Privacy', desc:'隐私管理中心', tags:['隐私','管理'], source:'', url:"javascript:window.location.href='privacy-center.html'" }
+        { icon:'📱', name:'缘主工具', desc:'微信缘主工具', source:'', url:"javascript:window.location.href='wechat-hub.html'" },
+        { icon:'📋', name:'报告中心', desc:'报告中心', source:'', url:"javascript:window.location.href='reports-hub.html'" },
+        { icon:'📤', name:'分享', desc:'分享中心', source:'', url:"javascript:window.location.href='share-center.html'" },
+        { icon:'🔒', name:'隐私中心', desc:'隐私管理中心', source:'', url:"javascript:window.location.href='privacy-center.html'" }
       ]}
     ]
   }
 };
 
-function navSelectL1(key){
-  document.querySelectorAll('.ns-item').forEach(function(el){
-    el.classList.toggle('active', el.dataset.l1 === key);
-  });
-  var sys = NAV_DATA[key];
-  if(!sys) return;
-  document.getElementById('ncaGroupTitle').textContent = sys.icon + ' ' + sys.name;
+function renderNavFlat(){
+  var container = document.getElementById('navFlat');
+  if(!container) return;
   var html = '';
-  sys.groups.forEach(function(g){
-    if(g.items.length === 0) return;
-    html += '<div class="nca-sub-group">';
-    html += '<div class="nca-sub-title">' + g.name + ' · ' + g.items.length + '项</div>';
-    html += '<div class="nca-grid">';
-    g.items.forEach(function(c){
-      var tags = c.tags.map(function(t){ return '<span class="nca-tag">'+t+'</span>'; }).join('');
-      var source = c.source ? '<div class="nca-source">'+c.source+'</div>' : '';
-      html += '<a class="nca-card" href="'+c.url+'">'+
-        '<span class="nca-card-icon">'+c.icon+'</span>'+
-        '<span class="nca-card-name">'+c.name+'</span>'+
-        '<span class="nca-card-en">'+c.en+'</span>'+
-        '<span class="nca-card-desc">'+c.desc+'</span>'+
-        '<span class="nca-card-tags">'+tags+'</span>'+
-        source+
-        '</a>';
+  for(var key in NAV_DATA){
+    var sys = NAV_DATA[key];
+    html += '<div class="nf-section">';
+    html += '<div class="nf-title"><span class="nf-icon">'+sys.icon+'</span><span>'+sys.name+'</span></div>';
+    html += '<div class="nf-cards">';
+    sys.groups.forEach(function(g){
+      g.items.forEach(function(c){
+        var source = c.source ? '<div class="nf-source">'+c.source+'</div>' : '';
+        html += '<a class="nf-card" href="'+c.url+'">'+
+          '<span class="nf-card-icon">'+c.icon+'</span>'+
+          '<span class="nf-card-name">'+c.name+'</span>'+
+          '<span class="nf-card-desc">'+c.desc+'</span>'+
+          source+
+          '</a>';
+      });
     });
     html += '</div></div>';
-  });
-  document.getElementById('ncaCards').innerHTML = html;
+  }
+  container.innerHTML = html;
 }
 
-function navSearch(query){
-  var results = document.getElementById('navSearchResults');
-  if(!results) return;
-  if(!query || query.length < 1){ results.style.display='none'; return; }
-  var q = query.toLowerCase();
-  var matches = [];
-  for(var sk in NAV_DATA){
-    var sys = NAV_DATA[sk];
-    for(var gi=0; gi<sys.groups.length; gi++){
-      for(var ii=0; ii<sys.groups[gi].items.length; ii++){
-        var c = sys.groups[gi].items[ii];
-        if(c.name.toLowerCase().indexOf(q)>=0 || c.en.toLowerCase().indexOf(q)>=0){
-          matches.push({sys:sk, name:c.name, icon:c.icon});
-        }
-      }
-    }
-  }
-  if(matches.length === 0){
-    results.innerHTML = '<div class="nsr-empty">未找到</div>';
-  } else {
-    results.innerHTML = matches.slice(0,8).map(function(m){
-      return '<a class="nsr-item" onclick="navSelectL1(\''+m.sys+'\');document.getElementById(\'navSearchResults\').style.display=\'none\';">'+m.icon+' '+m.name+'</a>';
-    }).join('');
-  }
-  results.style.display = 'block';
-}
-
-document.addEventListener('DOMContentLoaded', function(){
-  if(typeof navSelectL1 === 'function') navSelectL1('zhouyi');
-});
-// ===== 导航分组下拉菜单 (R324) =====
+document.addEventListener('DOMContentLoaded', renderNavFlat);// ===== 导航分组下拉菜单 (R324) =====
 (function(){
   document.addEventListener('click',function(e){
     var trigger=e.target.closest('.nav-group-trigger');
