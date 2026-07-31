@@ -12606,7 +12606,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // 初始化今日知识推送
   if(typeof initDailyKnowledge==='function') setTimeout(initDailyKnowledge, 300);
   } catch(e) { console.error('DOMContentLoaded init error:', e); showToast('页面初始化出错'); }
-  showToast('DOMContentLoaded init error:，请重试');
 });
 
 // ================================================================
