@@ -4682,3 +4682,231 @@ body:not(.wechat) .wechat-disclaimer{display:none}
   .nav-tab { padding: 4px 8px; }
   .nav-tab .tab-emoji { font-size: 14px; }
 }
+
+/* ================================================================
+   R329 三栏纯导航
+   ================================================================ */
+.nav-three-col {
+  display: flex;
+  gap: 1px;
+  background: rgba(201,168,76,.08);
+  border: 1px solid rgba(201,168,76,.1);
+  border-radius: 8px;
+  overflow: hidden;
+  max-width: 1200px;
+  width: 100%;
+  margin: 16px auto 0;
+  min-height: calc(100vh - 130px);
+}
+
+/* 通用栏样式 */
+.nav-col-1, .nav-col-2, .nav-col-3 {
+  background: rgba(10,10,10,.6);
+  display: flex;
+  flex-direction: column;
+}
+
+/* 第一栏：一级目录 */
+.nav-col-1 {
+  flex: 0 0 180px;
+}
+/* 第二栏：二级目录 */
+.nav-col-2 {
+  flex: 0 0 200px;
+}
+/* 第三栏：功能卡片 */
+.nav-col-3 {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 栏头 */
+.nc-header {
+  padding: 14px 16px;
+  font-size: 13px;
+  color: var(--gold);
+  letter-spacing: 2px;
+  border-bottom: 1px solid rgba(201,168,76,.08);
+  background: rgba(201,168,76,.04);
+  font-weight: 500;
+}
+
+/* 栏列表 */
+.nc-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 0;
+}
+.nc-list::-webkit-scrollbar { width: 3px; }
+.nc-list::-webkit-scrollbar-thumb { background: rgba(201,168,76,.12); border-radius: 2px; }
+
+/* 目录项 */
+.nc-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-size: 13px;
+  color: var(--paper3);
+  cursor: pointer;
+  transition: all .15s;
+  border-left: 2px solid transparent;
+}
+.nc-item:hover {
+  color: var(--paper);
+  background: rgba(201,168,76,.05);
+}
+.nc-item.active {
+  color: var(--gold);
+  background: rgba(201,168,76,.08);
+  border-left-color: var(--gold);
+}
+.nc-icon {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.nc-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.nc-arrow {
+  color: var(--paper3);
+  opacity: 0.3;
+  font-size: 14px;
+}
+.nc-badge {
+  font-size: 10px;
+  color: var(--paper3);
+  opacity: 0.5;
+  background: rgba(201,168,76,.08);
+  padding: 1px 6px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+/* 占位符 */
+.nc-placeholder {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--paper3);
+  opacity: 0.3;
+  font-size: 13px;
+}
+
+/* 第三栏：功能卡片 */
+.nc-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(201,168,76,.04);
+  transition: all .2s;
+  cursor: pointer;
+}
+.nc-card:hover {
+  background: rgba(201,168,76,.06);
+}
+.nc-card-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+  width: 40px;
+  text-align: center;
+}
+.nc-card-body {
+  flex: 1;
+  min-width: 0;
+}
+.nc-card-name {
+  font-size: 14px;
+  color: var(--paper);
+  margin-bottom: 2px;
+  font-weight: 500;
+}
+.nc-card-en {
+  font-size: 10px;
+  color: var(--paper3);
+  opacity: 0.4;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.nc-card-desc {
+  font-size: 12px;
+  color: var(--paper3);
+  opacity: 0.7;
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+.nc-card-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.nc-tag {
+  font-size: 10px;
+  padding: 1px 8px;
+  border: 1px solid rgba(201,168,76,.1);
+  border-radius: 8px;
+  color: var(--paper3);
+  opacity: 0.6;
+}
+.nc-card-arrow {
+  color: var(--gold);
+  opacity: 0.3;
+  font-size: 16px;
+  flex-shrink: 0;
+  transition: opacity .2s;
+}
+.nc-card:hover .nc-card-arrow {
+  opacity: 1;
+}
+
+/* 搜索结果 */
+.nsr-item {
+  display: block;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--paper3);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all .15s;
+}
+.nsr-item:hover {
+  background: rgba(201,168,76,.08);
+  color: var(--gold);
+}
+.nsr-empty {
+  padding: 12px;
+  font-size: 12px;
+  color: var(--paper3);
+  opacity: 0.5;
+  text-align: center;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .nav-three-col {
+    flex-direction: column;
+    min-height: auto;
+  }
+  .nav-col-1, .nav-col-2 {
+    flex: 0 0 auto;
+    max-height: 200px;
+  }
+  .nav-col-1 { border-bottom: 1px solid rgba(201,168,76,.08); }
+  .nav-col-2 { border-bottom: 1px solid rgba(201,168,76,.08); }
+  .nav-col-3 { min-height: 300px; }
+  .nav-search { display: none; }
+}
+
+@media (max-width: 480px) {
+  .nav-col-1, .nav-col-2 {
+    max-height: 150px;
+  }
+}
