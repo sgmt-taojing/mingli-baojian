@@ -5411,98 +5411,93 @@ body { max-width: 100% !important; padding: 0 !important; }
 /* ================================================================
 
 /* ================================================================
-   R344 软件工程规范 + 友好性优化
+
+/* ================================================================
+   R347 视觉优先 — 大卡片 + 6体系 + 舒适间距
    ================================================================ */
 
-/* —— 全局基础 —— */
 body { max-width: 100% !important; padding: 0 !important; background: #0e0e12 !important; }
 .top-nav { height: 44px; background: rgba(14,14,18,.95); border-bottom: 1px solid rgba(201,168,76,.06); }
 .nav-inner { height: 44px; padding: 0 20px; }
 .nav-brand { font-size: 16px; letter-spacing: 3px; }
 .main { margin-top: 44px !important; }
+#ai-analyze-fab { display: none !important; }
 
-/* —— 首页 hero —— */
-.nav-hero-top { padding: 6px 20px 2px; }
+/* hero 顶部 */
+.nav-hero-top { padding: 8px 24px 4px; }
 .nht-title {
   font-family: 'Ma Shan Zheng', serif;
-  font-size: 18px; color: var(--gold);
+  font-size: 20px; color: var(--gold);
   letter-spacing: 4px; text-align: left; margin: 0;
 }
 .nht-desc {
-  font-size: 10px; color: var(--paper3);
-  line-height: 1.3; opacity: 0.4; text-align: left; margin: 0;
+  font-size: 11px; color: var(--paper3);
+  line-height: 1.4; opacity: 0.4; text-align: left; margin: 0;
 }
 
-/* —— 平铺区 —— */
-.nav-flat { padding: 0 20px 8px; }
+/* 平铺区 */
+.nav-flat { padding: 0 24px 20px; }
 
-/* —— 一级目录（居中 + 分组分隔） —— */
-.nf-section { margin-bottom: 8px; }
-.nf-section:first-child { margin-top: 4px; }
+/* 一级目录 — 居中 + 分隔 */
+.nf-section { margin-bottom: 12px; }
 .nf-section:not(:first-child) {
-  margin-top: 10px;
-  padding-top: 8px;
+  margin-top: 14px; padding-top: 10px;
   border-top: 1px solid rgba(201,168,76,.06);
 }
 .nf-title {
   display: flex; align-items: center; justify-content: center;
-  gap: 6px; font-size: 13px; color: var(--gold);
-  letter-spacing: 3px; padding: 3px 0;
-  margin-bottom: 6px; text-align: center;
+  gap: 8px; font-size: 14px; color: var(--gold);
+  letter-spacing: 3px; padding: 4px 0;
+  margin-bottom: 10px; text-align: center;
 }
-.nf-icon { font-size: 15px; }
+.nf-icon { font-size: 16px; }
 
-/* —— 卡片网格（居中对齐 + 圆角 + hover） —— */
+/* 卡片网格 — 5列大卡片 */
 .nf-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-  gap: 6px;
-  justify-items: stretch;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
 }
 
-/* —— 单张卡片 —— */
+/* 单张卡片 — 大尺寸 + 圆角 + hover */
 .nf-card {
   display: flex; flex-direction: column;
   align-items: center; text-align: center;
-  padding: 8px 6px; text-decoration: none;
+  padding: 12px 10px; text-decoration: none;
   border: 1px solid rgba(201,168,76,.08);
   border-left: 3px solid rgba(201,168,76,.2);
-  border-radius: 6px;
-  transition: all .2s ease;
+  border-radius: 8px;
+  transition: all .25s ease;
   cursor: pointer;
-  background: rgba(255,255,255,.015);
-  gap: 2px;
+  background: rgba(255,255,255,.02);
+  gap: 4px;
   position: relative;
   overflow: hidden;
 }
 .nf-card:hover {
-  border-color: rgba(201,168,76,.25);
+  border-color: rgba(201,168,76,.3);
   border-left-color: var(--gold);
   background: rgba(201,168,76,.05);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.2);
 }
 .nf-card:active {
   transform: translateY(0);
   background: rgba(201,168,76,.08);
 }
-
-/* —— 卡片内容 —— */
-.nf-card-icon { font-size: 18px; line-height: 1.2; }
+.nf-card-icon { font-size: 24px; line-height: 1.2; }
 .nf-card-name {
-  font-size: 11px; color: var(--gold);
-  font-weight: 500; letter-spacing: 1px;
+  font-size: 13px; color: var(--gold);
+  font-weight: 600; letter-spacing: 1px;
 }
-.nf-card-desc { display: none; }
-.nf-source { display: none; }
 
-/* —— 功能 section 全宽 —— */
+/* 功能 section 全宽 */
 .section {
   max-width: 100% !important;
   padding: 12px 24px 60px !important;
 }
 
-/* —— 返回按钮（sticky 顶部） —— */
+/* 返回按钮 */
 .back-row {
   position: sticky !important; top: 44px !important;
   z-index: 100 !important; text-align: left !important;
@@ -5527,29 +5522,7 @@ body { max-width: 100% !important; padding: 0 !important; background: #0e0e12 !i
   border-color: var(--gold) !important;
 }
 
-/* —— 响应式 —— */
-@media (max-width: 1200px) { .nf-cards { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); } }
-@media (max-width: 768px) {
-  .nf-cards { grid-template-columns: repeat(4, 1fr); }
-  .nht-title { font-size: 16px; }
-}
-@media (max-width: 480px) {
-  .nf-cards { grid-template-columns: repeat(3, 1fr); }
-  .nf-card { padding: 6px 4px; }
-  .nf-card-icon { font-size: 16px; }
-  .nf-card-name { font-size: 10px; }
-}
-
-/* R344 紧凑化 — 铺满一屏 */
-.nf-card { padding: 5px 4px; }
-.nf-card-icon { font-size: 16px; }
-.nf-card-name { font-size: 10px; }
-.nf-cards { gap: 4px; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
-.nf-section { margin-bottom: 4px; }
-.nf-section:not(:first-child) { margin-top: 6px; padding-top: 4px; }
-.nf-title { padding: 2px 0; margin-bottom: 4px; font-size: 12px; }
-.nf-icon { font-size: 13px; }
-.nav-hero-top { padding: 4px 16px 0; }
-.nht-title { font-size: 15px; }
-.nht-desc { font-size: 9px; }
-.nav-flat { padding: 0 16px 4px; }
+/* 响应式 */
+@media (max-width: 1200px) { .nf-cards { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 768px) { .nf-cards { grid-template-columns: repeat(3, 1fr); } .nht-title { font-size: 18px; } }
+@media (max-width: 480px) { .nf-cards { grid-template-columns: repeat(2, 1fr); } .nf-card { padding: 8px 6px; } .nf-card-icon { font-size: 20px; } .nf-card-name { font-size: 12px; } }

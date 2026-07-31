@@ -1,114 +1,20 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>缓存清理工具 - 易道智鉴</title>
-
-  <link rel="stylesheet" href="css/a11y-fix.css">
-<link rel="stylesheet" href="css/clear-cache-inline.css">
-  <link rel="stylesheet" href="css/mobile-nav.css">
-</head>
-<body>
-<a href="divination-hub.html" style="position:fixed;top:12px;left:12px;z-index:9999;padding:8px 14px;background:var(--gold,#c9a227);color:#fff;border-radius:20px;font-size:12px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.15);opacity:.85">← 首页</a>
-
-  <a class="skip-link" href="#main-content">跳到主内容</a>
-<main id="main-content" role="main">
-<div style="position:fixed;top:12px;right:12px;z-index:99998">
-  <a href="tcm-clinic.html" style="display:inline-block;padding:6px 16px;background:rgba(201,168,76,0.12);color:var(--gold,#c9a84c);border:1px solid rgba(201,168,76,0.25);border-radius:16px;font-size:12px;text-decoration:none;font-family:'Noto Serif SC',serif;letter-spacing:1px">🏥 中医诊疗</a>
-</div>
-
-<div class="container">
-  <h1>🧹 缓存清理工具</h1>
-  <p class="subtitle">解决页面加载异常、功能不生效等问题</p>
-
-  <div class="progress" id="progress">
-    <div class="progress-bar" id="progressBar"></div>
-  </div>
-
-  <div>
-    <button class="btn" onclick="clearAllCache()">🗑️ 清理全部缓存</button>
-    <button class="btn btn-secondary" onclick="clearServiceWorker()">🔄 重置 Service Worker</button>
-  </div>
-
-  <div>
-    <button class="btn btn-secondary" onclick="clearLocalStorage()">💾 清理 LocalStorage</button>
-    <button class="btn btn-secondary" onclick="clearSessionStorage()">📝 清理 SessionStorage</button>
-  </div>
-
-  <div>
-    <button class="btn btn-secondary" onclick="forceReload()">🔄 强制刷新主页面</button>
-  </div>
-
-  <div class="status" id="status"></div>
-
-  <div class="note">
-    <p>💡 提示：</p>
-    <p>• 清理后请刷新页面（Ctrl+F5 或 Cmd+Shift+R）</p>
-    <p>• 如果问题仍存在，请尝试清理浏览器缓存</p>
-    <p>• Safari: 开发 → 清空缓存</p>
-    <p>• Chrome: 设置 → 隐私 → 清除浏览数据</p>
-  </div>
-</div>
-
-<script src="js/ui-toast.js" defer></script>
-
-
-  <script src="js/a11y-divination-hub.js" defer></script>
-  
-</main>
-<script src="js/clear-cache-inline.js" defer></script>
-  <script src="js/mobile-nav.js" defer></script>
-
-<style>
-/* R98-z 480+360 紧凑断点 */
-@media(max-width:480px){
-  body{font-size:13px}
-  .container,.main,.body,.wrap{max-width:100%;padding:8px}
-  h1{font-size:18px}
-  h2{font-size:15px}
-  h3{font-size:13px}
-  .btn{padding:6px 10px;font-size:12px}
-  table{font-size:11px}
-  .row{flex-wrap:wrap;gap:4px}
+<html><head><meta charset="UTF-8"><title>清理缓存</title></head>
+<body style="background:#0e0e12;color:#c9a84c;font-family:serif;padding:40px;text-align:center">
+<h2>🔄 正在清理缓存...</h2>
+<p id="status">请稍候</p>
+<script>
+// 清理所有缓存
+if('caches' in window) {
+  caches.keys().then(function(names){ names.forEach(function(n){ caches.delete(n); }); });
 }
-@media(max-width:360px){
-  body{font-size:12px}
-  .container,.main,.body,.wrap{padding:6px}
-  h1{font-size:16px}
-  h2{font-size:14px}
-  h3{font-size:12px}
-  .btn{padding:5px 8px;font-size:11px;width:100%}
-  table{font-size:10px}
-  .nav-bar a{padding:4px 6px;font-size:11px}
-  .row{flex-direction:column;align-items:flex-start}
-}
-</style>
+// 清理 localStorage 中可能的缓存标记
+var keys = Object.keys(localStorage);
+keys.forEach(function(k){ if(k.includes('cache')||k.includes('version')) localStorage.removeItem(k); });
+// 清理 sessionStorage
+sessionStorage.clear();
 
-<style>
-/* R98-z 480+360 紧凑断点 */
-@media(max-width:480px){
-  body{font-size:13px}
-  .container,.main,.body,.wrap{max-width:100%;padding:8px}
-  h1{font-size:18px}
-  h2{font-size:15px}
-  h3{font-size:13px}
-  .btn{padding:6px 10px;font-size:12px}
-  table{font-size:11px}
-  .row{flex-wrap:wrap;gap:4px}
-}
-@media(max-width:360px){
-  body{font-size:12px}
-  .container,.main,.body,.wrap{padding:6px}
-  h1{font-size:16px}
-  h2{font-size:14px}
-  h3{font-size:12px}
-  .btn{padding:5px 8px;font-size:11px;width:100%}
-  table{font-size:10px}
-  .nav-bar a{padding:4px 6px;font-size:11px}
-  .row{flex-direction:column;align-items:flex-start}
-}
-</style>
-</body>
-</html>
+document.getElementById('status').innerHTML = '✅ 缓存已清理！3秒后跳转首页...';
+setTimeout(function(){ location.href = 'divination-hub.html'; }, 3000);
+</script>
+</body></html>
