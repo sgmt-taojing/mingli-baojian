@@ -4798,73 +4798,77 @@ body:not(.wechat) .wechat-disclaimer{display:none}
   font-size: 13px;
 }
 
-/* 第三栏：功能卡片 */
+/* 第三栏：功能卡片 — 3列网格 */
 .nc-card {
   display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 16px;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 16px;
   text-decoration: none;
-  border-bottom: 1px solid rgba(201,168,76,.04);
-  transition: all .2s;
+  border: 1px solid rgba(201,168,76,.1);
+  border-radius: 8px;
+  transition: all .25s;
   cursor: pointer;
+  background: rgba(255,255,255,.015);
 }
 .nc-card:hover {
-  background: rgba(201,168,76,.06);
+  border-color: rgba(201,168,76,.3);
+  background: rgba(201,168,76,.04);
+  transform: translateY(-2px);
 }
 .nc-card-icon {
-  font-size: 28px;
-  flex-shrink: 0;
-  width: 40px;
-  text-align: center;
-}
-.nc-card-body {
-  flex: 1;
-  min-width: 0;
+  font-size: 32px;
+  margin-bottom: 4px;
 }
 .nc-card-name {
-  font-size: 14px;
-  color: var(--paper);
-  margin-bottom: 2px;
+  font-size: 15px;
+  color: var(--gold);
   font-weight: 500;
+  letter-spacing: 1px;
 }
 .nc-card-en {
   font-size: 10px;
   color: var(--paper3);
-  opacity: 0.4;
+  opacity: 0.35;
   letter-spacing: 2px;
   text-transform: uppercase;
-  margin-bottom: 4px;
 }
 .nc-card-desc {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--paper3);
-  opacity: 0.7;
-  line-height: 1.5;
-  margin-bottom: 6px;
+  opacity: 0.6;
+  line-height: 1.6;
 }
 .nc-card-tags {
   display: flex;
   gap: 4px;
   flex-wrap: wrap;
+  margin-top: 2px;
 }
 .nc-tag {
-  font-size: 10px;
-  padding: 1px 8px;
+  font-size: 9px;
+  padding: 1px 7px;
   border: 1px solid rgba(201,168,76,.1);
   border-radius: 8px;
   color: var(--paper3);
-  opacity: 0.6;
+  opacity: 0.5;
 }
-.nc-card-arrow {
-  color: var(--gold);
+.nc-card-source {
+  font-size: 10px;
+  color: var(--paper3);
   opacity: 0.3;
-  font-size: 16px;
-  flex-shrink: 0;
-  transition: opacity .2s;
+  margin-top: 4px;
+  font-style: italic;
 }
-.nc-card:hover .nc-card-arrow {
-  opacity: 1;
+.nc-card-arrow { display: none; }
+
+#nc3List {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 14px;
+  overflow-y: auto;
+  align-content: start;
 }
 
 /* 搜索结果 */
