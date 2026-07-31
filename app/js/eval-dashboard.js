@@ -17,7 +17,8 @@ function el(tag, props, ...children){
   children.flat().forEach(c => {
     if (c == null) return;
     if (typeof c === 'string') e.appendChild(document.createTextNode(c));
-    else e.appendChild(c);
+    else if (c instanceof Node) e.appendChild(c);
+    else if (c != null) e.appendChild(document.createTextNode(String(c)));
   });
   return e;
 }
@@ -3116,7 +3117,7 @@ function renderRadarChart(data, selectedMods){
     poly.setAttribute('stroke-width', '2');
     poly.setAttribute('stroke-opacity', '0.85');
     // Tooltip
-    const modLabel = MODULE_NAMES[mod] || mod;
+    const modLabel = (typeof MODULE_NAMES !== 'undefined' ? MODULE_NAMES : [])[mod] || mod;
     const tipParts = dims.map(d => `${d.label}: ${d.fmt(mv[d.key]||0)}`).join('\n');
     const title = document.createElementNS('http://www.w3.org/2000/svg','title');
     title.textContent = `${modLabel}\n${tipParts}`;
@@ -3165,7 +3166,7 @@ async function refreshRadar(){
     list.forEach(item => {
       const opt = document.createElement('option');
       opt.value = item.mod;
-      opt.textContent = `${MODULE_NAMES[item.mod] || item.mod} (${item.faithfulness.toFixed(3)})`;
+      opt.textContent = `${(typeof MODULE_NAMES !== 'undefined' ? MODULE_NAMES : [])[item.mod] || item.mod} (${item.faithfulness.toFixed(3)})`;
       modSel.appendChild(opt);
     });
     // Default: select top 5
