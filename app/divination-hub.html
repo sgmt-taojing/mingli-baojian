@@ -3756,10 +3756,10 @@ function getKe(ele) {
 // ═══════════════════════════════════════════════════════════
 
 // --- 60甲子循环常数 ---
-let J_STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-let J_BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-let J_ELE = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
-let J_ZHI_ELE = {子:'水',丑:'土',寅:'木',卯:'木',辰:'土',巳:'火',午:'火',未:'土',申:'金',酉:'金',戌:'土',亥:'水'};
+let _HUB_J_STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+let _HUB_J_BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+let _HUB_J_ELE = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
+let _HUB_J_ZHI_ELE = {子:'水',丑:'土',寅:'木',卯:'木',辰:'土',巳:'火',午:'火',未:'土',申:'金',酉:'金',戌:'土',亥:'水'};
 
 // --- 干支纪日（60甲子循环）---
 // 基准：2025-01-01 = 辛丑日（第38个：stemIdx=7,branchIdx=1）
@@ -3769,14 +3769,14 @@ function getDayGz(date) {
   const stemIdx = ((diff + 7) % 10 + 10) % 10;
   const branchIdx = ((diff + 1) % 12 + 12) % 12;
   return {
-    stem: J_STEMS[stemIdx], branch: J_BRANCHES[branchIdx],
+    stem: _HUB_J_STEMS[stemIdx], branch: _HUB_J_BRANCHES[branchIdx],
     stemIdx, branchIdx,
-    ganzhi: J_STEMS[stemIdx] + J_BRANCHES[branchIdx]
+    ganzhi: _HUB_J_STEMS[stemIdx] + _HUB_J_BRANCHES[branchIdx]
   };
 }
 
 // --- 彭祖百忌（按天干索引）---
-let PENGZU_BAIJI = {
+let _HUB_PENGZU_BAIJI = {
   0:  '甲日不开仓，乙日不栽植，丙日不纳程，丁日不剃头，戊日不受田，己日不破卷，庚日不评兵，辛日不合酱，壬日不汲水，癸日不接发',
   1:  '甲不开仓，乙不栽植，丙不纳粮，丁不剃头，戊不受田，己不破田，庚不评理，辛不合酱，壬不汲水，癸不接发',
   2:  '甲不搬迁，乙不伐木，丙不修灶，丁不词讼，戊不受债，己不词讼，庚不逃跑，辛不合帐，壬不娶妾，癸不治病',
@@ -3790,23 +3790,23 @@ let PENGZU_BAIJI = {
 };
 
 // --- 二十八星宿（按日期循环）---
-let XIU_NAMES_CN = ['角','亢','氐','房','心','尾','箕','斗','牛','女','虚','危','室','壁','奎','娄','胃','昴','毕','觜','参','井','鬼','柳','星','张','翼','轸'];
-let XIU_BANGS = ['木','金','金','日','月','火','水','木','金','火','日','月','火','水','土','金','木','日','月','火','水','木','金','金','日','月','火','水'];
-let XIU_FATE = ['吉','凶','凶','吉','凶','吉','凶','吉','吉','凶','凶','凶','吉','吉','吉','吉','凶','凶','大吉','凶','大吉','大吉','大吉','吉','大吉','凶','大吉','大吉'];
-let XIU_DESC = {
+let _HUB_XIU_NAMES_CN = ['角','亢','氐','房','心','尾','箕','斗','牛','女','虚','危','室','壁','奎','娄','胃','昴','毕','觜','参','井','鬼','柳','星','张','翼','轸'];
+let _HUB_XIU_BANGS = ['木','金','金','日','月','火','水','木','金','火','日','月','火','水','土','金','木','日','月','火','水','木','金','金','日','月','火','水'];
+let _HUB_XIU_FATE = ['吉','凶','凶','吉','凶','吉','凶','吉','吉','凶','凶','凶','吉','吉','吉','吉','凶','凶','大吉','凶','大吉','大吉','大吉','吉','大吉','凶','大吉','大吉'];
+let _HUB_XIU_DESC = {
   '吉':'诸事皆宜，吉祥如意',凶:'口舌是非，谨慎行事',大吉:'大吉大利，福运临门'
 };
 
 // --- 建除十二神（按日期循环）---
-let JIANCHU = ['建','除','满','平','定','执','破','危','成','收','开','闭'];
-let JIANCHU_FATE = ['凶','吉','平','凶','吉','吉','凶','平','吉','凶','吉','平'];
-let JIANCHU_YI = {
+let _HUB_JIANCHU = ['建','除','满','平','定','执','破','危','成','收','开','闭'];
+let _HUB_JIANCHU_FATE = ['凶','吉','平','凶','吉','吉','凶','平','吉','凶','吉','平'];
+let _HUB_JIANCHU_YI = {
   '建':'上梁、竖柱、出行', '除':'扫舍、求医、解除', '满':'祈福、祭祀、塞穴',
   '平':'修饰、垣墙、平治道涂', '定':'冠带、入学、酝酿', '执':'捕捉、入学、求嗣',
   '破':'求医、破屋、坏垣', '危':'安床、纳财、拆卸', '成':'入学、结婚姻、纳采',
   '收':'开市、交易、纳财', '开':'开业、竖柱、上梁', '闭':'补垣、塞穴、拆屋'
 };
-let JIANCHU_JI = {
+let _HUB_JIANCHU_JI = {
   '建':'动土、出兵', '除':'', '满':'移徙、出火', '平':'词讼、栽种',
   '定':'', '执':'祈福、词讼', '破':'求医、嫁娶', '危':'',
   '成':'词讼、出兵', '收':'安葬、破土', '开':'动土、诉讼', '闭':'祈福、塞穴'
@@ -3814,12 +3814,12 @@ let JIANCHU_JI = {
 
 // --- 黄道黑道（按地支索引）---
 // 子午日:青龙=吉, 丑未日:明堂=吉, 寅申日:金匮=吉, 卯酉日:天德=吉, 辰戌日:玉堂=吉, 巳亥日:司命=吉
-let HUANGDAO_GOOD = {子:'青龙',丑:'明堂',寅:'金匮',卯:'天德',辰:'玉堂',巳:'司命',午:'青龙',未:'明堂',申:'金匮',酉:'天德',戌:'玉堂',亥:'司命'};
-let HEIDAO_BAD = {子:'白虎',丑:'天刑',寅:'朱雀',卯:'勾陈',辰:'青龙',巳:'明堂',午:'白虎',未:'天刑',申:'朱雀',酉:'勾陈',戌:'青龙',亥:'明堂'};
-let HUANGDAO_FATE = {青龙:'大吉',明堂:'吉',金匮:'吉',天德:'吉',玉堂:'吉',司命:'吉',白虎:'凶',天刑:'凶',朱雀:'凶',勾陈:'凶'};
+let _HUB_HUANGDAO_GOOD = {子:'青龙',丑:'明堂',寅:'金匮',卯:'天德',辰:'玉堂',巳:'司命',午:'青龙',未:'明堂',申:'金匮',酉:'天德',戌:'玉堂',亥:'司命'};
+let _HUB_HEIDAO_BAD = {子:'白虎',丑:'天刑',寅:'朱雀',卯:'勾陈',辰:'青龙',巳:'明堂',午:'白虎',未:'天刑',申:'朱雀',酉:'勾陈',戌:'青龙',亥:'明堂'};
+let _HUB_HUANGDAO_FATE = {青龙:'大吉',明堂:'吉',金匮:'吉',天德:'吉',玉堂:'吉',司命:'吉',白虎:'凶',天刑:'凶',朱雀:'凶',勾陈:'凶'};
 
 // --- 宜忌数据库（按60甲子索引）---
-let YIJI_DB = [
+let _HUB_YIJI_DB = [
   {yi:'祭祀 祈福 动土 开业 订盟 纳采',ji:'嫁娶 搬家 安葬',gz:'甲子'},{yi:'沐浴 扫舍 祭祀 纳财 捕捉 纳畜',ji:'开业 动土 出行 词讼',gz:'乙丑'},
   {yi:'出行 移徙 祭祀 祈福 开光 纳采',ji:'安葬 动土 嫁娶 词讼',gz:'丙寅'},{yi:'订盟 纳采 祭祀 祈福 嫁娶 动土',ji:'开市 置产 入宅 词讼',gz:'丁卯'},
   {yi:'开市 交易 立券 纳财 栽种 牧养',ji:'安葬 行丧 伐木 纳畜',gz:'戊辰'},{yi:'嫁娶 祭祀 祈福 纳采 订盟 动土',ji:'动土 破土 安葬 词讼',gz:'己巳'},
@@ -3851,25 +3851,25 @@ let YIJI_DB = [
 ];
 
 // --- 冲煞信息 ---
-let CHONG_SHA = {
+let _HUB_CHONG_SHA = {
   '子':'午', '丑':'未', '寅':'申', '卯':'酉', '辰':'戌', '巳':'亥',
   '午':'子', '未':'丑', '申':'寅', '酉':'卯', '戌':'辰', '亥':'巳'
 };
-let SHA_FANGXIANG = {
+let _HUB_SHA_FANGXIANG = {
   '子':'午', '丑':'未', '寅':'申', '卯':'酉', '辰':'戌', '巳':'亥',
   '午':'子', '未':'丑', '申':'寅', '酉':'卯', '戌':'辰', '亥':'巳'
 };
 
 // --- 农历月份名 ---
-let LUNAR_MONTH_NAME = ['','正','二','三','四','五','六','七','八','九','十','冬','腊'];
-let LUNAR_DAY_NAME = ['','初一','初二','初三','初四','初五','初六','初七','初八','初九','初十',
+let _HUB_LUNAR_MONTH_NAME = ['','正','二','三','四','五','六','七','八','九','十','冬','腊'];
+let _HUB_LUNAR_DAY_NAME = ['','初一','初二','初三','初四','初五','初六','初七','初八','初九','初十',
   '十一','十二','十三','十四','十五','十六','十七','十八','十九','二十',
   '廿一','廿二','廿三','廿四','廿五','廿六','廿七','廿八','廿九','三十'];
 
 // --- 时辰吉凶 ---
 function getHourFate(stemIdx, branchIdx) {
-  const stem = J_STEMS[stemIdx];
-  const branch = J_BRANCHES[branchIdx];
+  const stem = _HUB_J_STEMS[stemIdx];
+  const branch = _HUB_J_BRANCHES[branchIdx];
   // 简单时辰判断：子丑寅卯辰巳午未申酉戌亥，各时辰本气旺衰
   const fateMap = {
     '子':'平', '丑':'平', '寅':'吉', '卯':'吉', '辰':'平', '巳':'平',
@@ -4114,9 +4114,9 @@ function jiuriRenderCal() {
     const isToday = today.getFullYear() === _jiuriYear && today.getMonth() === _jiuriMonth && today.getDate() === d;
     const gz = getDayGz(date);
     const jcIdx = (Math.round((date - new Date(2025,0,1)) / 86400000) % 12 + 12) % 12;
-    const jcFate = JIANCHU_FATE[jcIdx];
+    const jcFate = _HUB_JIANCHU_FATE[jcIdx];
     const xiuIdx = Math.abs(Math.round((date - new Date(2025,0,1)) / 86400000)) % 28;
-    const xiuFate = XIU_FATE[xiuIdx];
+    const xiuFate = _HUB_XIU_FATE[xiuIdx];
     const selected = dateInput && dateInput.value === _jiuriYear+'-'+String(_jiuriMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
     // 分数
     const score = calcJiuriScore(gz.stemIdx, gz.branchIdx, date);
@@ -4127,7 +4127,7 @@ function jiuriRenderCal() {
     else if (score < 50) dotClass = 'bad';
     const selAttr = selected ? 'selected' : '';
     const todayAttr = isToday ? 'today' : '';
-    const lunarD = LUNAR_DAY_NAME[(date - new Date(_jiuriYear,0,1)) % 30] || LUNAR_DAY_NAME[Math.floor(((date - new Date(_jiuriYear,0,1)) / 86400000) % 30)];
+    const lunarD = _HUB_LUNAR_DAY_NAME[(date - new Date(_jiuriYear,0,1)) % 30] || _HUB_LUNAR_DAY_NAME[Math.floor(((date - new Date(_jiuriYear,0,1)) / 86400000) % 30)];
     html += `<ml-tap role="button" tabindex="0" class="jiuri-cal-cell ${dotClass} ${selAttr} ${todayAttr} d-block" onclick="jiuriPickDate(${d})"
       <span class="cal-day">${d}</span>
       <span class="cal-lunar">${lunarD}</span>
@@ -4173,36 +4173,36 @@ function jiuriShowDetail(date) {
   const dayGz = ganzhi;
 
   // 冲煞
-  const chongZhu = CHONG_SHA[branch] || '';
-  const shaFang = SHA_FANGXIANG[branch] || '';
+  const chongZhu = _HUB_CHONG_SHA[branch] || '';
+  const shaFang = _HUB_SHA_FANGXIANG[branch] || '';
 
   // 彭祖百忌
-  const pengzuText = PENGZU_BAIJI[stemIdx] || '无特殊禁忌';
+  const pengzuText = _HUB_PENGZU_BAIJI[stemIdx] || '无特殊禁忌';
   const pz禁忌 = pengzuText.split('，').filter(p => p.startsWith(stem));
-  const pengzu = pz禁忌.length > 0 ? pz禁忌[0] : (PENGZU_BAIJI[stemIdx] || '').split('，')[0];
+  const pengzu = pz禁忌.length > 0 ? pz禁忌[0] : (_HUB_PENGZU_BAIJI[stemIdx] || '').split('，')[0];
 
   // 建除
   const jcIdx = (Math.round((date - new Date(2025,0,1)) / 86400000) % 12 + 12) % 12;
-  const jianchu = JIANCHU[jcIdx];
-  const jcFate = JIANCHU_FATE[jcIdx];
-  const jcYi = JIANCHU_YI[jianchu] || '';
-  const jcJi = JIANCHU_JI[jianchu] || '';
+  const jianchu = _HUB_JIANCHU[jcIdx];
+  const jcFate = _HUB_JIANCHU_FATE[jcIdx];
+  const jcYi = _HUB_JIANCHU_YI[jianchu] || '';
+  const jcJi = _HUB_JIANCHU_JI[jianchu] || '';
 
   // 星宿
   const xiuIdx = Math.abs(Math.round((date - new Date(2025,0,1)) / 86400000)) % 28;
-  const xiuName = XIU_NAMES_CN[xiuIdx];
+  const xiuName = _HUB_XIU_NAMES_CN[xiuIdx];
   const xiuBang = XIU_BANGS_CN[xiuIdx];
-  const xiuFate = XIU_FATE[xiuIdx];
-  const xiuDesc = XIU_DESC[xiuFate];
+  const xiuFate = _HUB_XIU_FATE[xiuIdx];
+  const xiuDesc = _HUB_XIU_DESC[xiuFate];
 
   // 黄道黑道
-  const huangdao = HUANGDAO_GOOD[branch] || '';
-  const heidao = HEIDAO_BAD[branch] || '';
-  const huangdaoFate = HUANGDAO_FATE[huangdao] || '平';
+  const huangdao = _HUB_HUANGDAO_GOOD[branch] || '';
+  const heidao = _HUB_HEIDAO_BAD[branch] || '';
+  const huangdaoFate = _HUB_HUANGDAO_FATE[huangdao] || '平';
 
   // 宜忌
   const yijiIdx = (Math.round((date - new Date(2025,0,1)) / 86400000) % 60 + 60) % 60;
-  const yiji = YIJI_DB[yijiIdx] || {yi:'诸事不宜', ji:'大事勿用'};
+  const yiji = _HUB_YIJI_DB[yijiIdx] || {yi:'诸事不宜', ji:'大事勿用'};
 
   // 时辰
   const hourFates = getHourFate(stemIdx, branchIdx);
@@ -4227,7 +4227,7 @@ function jiuriShowDetail(date) {
   let lunarMonth = _lunarResult.month;
   let lunarDay = _lunarResult.day;
   let lunarIsLeap = _lunarResult.isLeap;
-  let lunarStr = (lunarIsLeap ? '闰' : '') + (LUNAR_MONTH_NAME[lunarMonth] || String(lunarMonth)) + '月' + (LUNAR_DAY_NAME[lunarDay] || String(lunarDay)+'日');
+  let lunarStr = (lunarIsLeap ? '闰' : '') + (_HUB_LUNAR_MONTH_NAME[lunarMonth] || String(lunarMonth)) + '月' + (_HUB_LUNAR_DAY_NAME[lunarDay] || String(lunarDay)+'日');
 
   // 生肖冲煞
   const zodiacMap = {子:'鼠',丑:'牛',寅:'虎',卯:'兔',辰:'龙',巳:'蛇',午:'马',未:'羊',申:'猴',酉:'鸡',戌:'狗',亥:'猪'};
@@ -4256,7 +4256,7 @@ function jiuriShowDetail(date) {
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
       <div>
         <div style="font-size:11px;letter-spacing:2px;margin-bottom:8px">黄道 ${huangdao} <span class="jiuri-badge great">${huangdaoFate}</span></div>
-        <div style="font-size:11px;letter-spacing:2px;">黑道 ${heidao} <span class="jiuri-badge bad">${HUANGDAO_FATE[heidao]||'平'}</span></div>
+        <div style="font-size:11px;letter-spacing:2px;">黑道 ${heidao} <span class="jiuri-badge bad">${_HUB_HUANGDAO_FATE[heidao]||'平'}</span></div>
       </div>
       <div>
         <div style="font-size:11px;letter-spacing:2px;margin-bottom:4px">彭祖百忌</div>
@@ -4290,8 +4290,8 @@ function jiuriShowDetail(date) {
   </div>`;
 
   // 五行
-  const stemEle = J_ELE[stem];
-  const branchEle = J_ZHI_ELE[branch];
+  const stemEle = _HUB_J_ELE[stem];
+  const branchEle = _HUB_J_ZHI_ELE[branch];
   html += `<div class="jiuri-detail-card">
     <h4>🔮 五行分析</h4>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;text-align:center">
@@ -4463,7 +4463,7 @@ function jiuriSuggest() {
 }
 
 // 修正XIUBANGS常量名
-let XIU_BANGS_CN = XIU_BANGS;
+let XIU_BANGS_CN = _HUB_XIU_BANGS;
 
 // 初始化吉日查询（延迟加载）
 window._jiuriInitDone = false;
