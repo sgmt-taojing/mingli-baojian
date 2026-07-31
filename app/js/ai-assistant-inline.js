@@ -5139,3 +5139,44 @@ window._exportFullChat = function(fmt){
     if (typeof showToast === 'function') showToast('导出失败：' + e.message, 'error');
   }
 };
+
+// === R324: RBAC 知识级别 badge 初始化 ===
+(function initRBACBadge() {
+  function updateBadge() {
+    if (typeof getRoles !== 'function' || typeof canAccessKnowledge !== 'function') return;
+    var badge = document.getElementById('rbacBadge');
+    if (!badge) return;
+    var roles = getRoles();
+    if (!roles || roles.length === 0) {
+      badge.style.display = 'none';
+      return;
+    }
+    var role = typeof getEffectiveRole === 'function' ? getEffectiveRole(roles) : roles[0];
+    var canKB = canAccessKnowledge();
+    var canDebug = canAccessDebug();
+    var level = canDebug ? 'L3' : (canKB ? 'L2' : 'L1');
+    var colors = {
+      'L1': { bg: 'rgba(76,175,80,0.15)', border: 'rgba(76,175,80,0.4)', text: '#81c784' },
+      'L2': { bg: 'rgba(201,168,76,0.15)', border: 'rgba(201,168,76,0.4)', text: '#c9a84c' },
+      'L3': { bg: 'rgba(167,139,250,0.15)', border: 'rgba(167,139,250,0.4)', text: '#a78bfa' }
+    };
+    var c = colors[level] || colors['L1'];
+    badge.style.display = 'inline-block';
+    badge.style.background = c.bg;
+    badge.style.border = '1px solid ' + c.border;
+    badge.style.color = c.text;
+    badge.textContent = level + ' · ' + role;
+    badge.title = '知识输出级别 ' + level + '（角色: ' + role + '）';
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', updateBadge);
+  } else {
+    updateBadge();
+  }
+  // 登录/登出后刷新
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'userRoles' || e.key === 'authToken') updateBadge();
+  });
+  // 暴露给外部调用
+  window.updateRBACBadge = updateBadge;
+})();
