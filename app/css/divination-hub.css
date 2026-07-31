@@ -5138,281 +5138,154 @@ body:not(.wechat) .wechat-disclaimer{display:none}
   .nca-grid { grid-template-columns: 1fr; }
 }
 
-/* R333 修真 */
-#section-hero {
-  max-width: 100% !important;
-  padding: 0 !important;
-}
-#section-hero .nav-two-col {
-  padding: 0 20px;
-}
-/* 隐藏底部导航如果为空 */
-.bottom-nav { display: none !important; }
-
-/* R333 修真 — main 偏移 */
-.main { margin-top: 56px !important; }
-
-/* R333 修真 — body 全宽 */
-body { max-width: 100% !important; padding: 0 !important; }
-
-/* R334 顶部纯品牌 */
-.top-nav { height: 48px; }
-.nav-inner { height: 48px; padding: 0 24px; }
-.nav-brand { font-size: 18px; letter-spacing: 4px; }
-.main { margin-top: 48px !important; }
 
 /* ================================================================
-   R335 纵向平铺导航 — 一级目录 + 功能卡片
+   R338 导航卡片 — 仿截图风格：图标+标题+描述+古籍
    ================================================================ */
+
+/* body 全宽 */
+body { max-width: 100% !important; padding: 0 !important; }
+
+/* 顶部品牌 */
+.top-nav { height: 44px; }
+.nav-inner { height: 44px; padding: 0 20px; }
+.nav-brand { font-size: 16px; letter-spacing: 3px; }
+.main { margin-top: 44px !important; }
+
+/* hero 顶部标题 */
 .nav-hero-top {
-  padding: 12px 20px 8px;
+  padding: 6px 20px 2px;
 }
 .nht-title {
   font-family: 'Ma Shan Zheng', serif;
-  font-size: 22px;
+  font-size: 18px;
   color: var(--gold);
   letter-spacing: 4px;
   text-align: left;
-  margin-bottom: 4px;
+  margin: 0;
 }
 .nht-desc {
-  font-size: 12px;
+  font-size: 10px;
   color: var(--paper3);
-  line-height: 1.6;
-  opacity: 0.6;
-  text-align: left;
-}
-
-.nav-flat {
-  padding: 0 20px 20px;
-}
-
-/* 一级目录区块 */
-.nf-section {
-  margin-bottom: 16px;
-}
-
-/* 一级目录标题 */
-.nf-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 15px;
-  color: var(--gold);
-  letter-spacing: 3px;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(201,168,76,.1);
-  margin-bottom: 10px;
-  text-align: left;
-}
-.nf-icon { font-size: 18px; }
-
-/* 卡片网格 — 按一屏铺满 */
-.nf-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 8px;
-}
-.nf-card {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 10px 10px;
-  text-decoration: none;
-  border: 1px solid rgba(201,168,76,.08);
-  border-radius: 6px;
-  transition: all .2s;
-  cursor: pointer;
-  background: rgba(255,255,255,.01);
-  text-align: left;
-}
-.nf-card:hover {
-  border-color: rgba(201,168,76,.25);
-  background: rgba(201,168,76,.04);
-}
-.nf-card-icon { font-size: 20px; margin-bottom: 2px; }
-.nf-card-name { font-size: 12px; color: var(--gold); font-weight: 500; }
-.nf-card-desc { font-size: 10px; color: var(--paper3); opacity: 0.5; line-height: 1.4; }
-.nf-source { font-size: 9px; color: var(--paper3); opacity: 0.25; margin-top: 2px; font-style: italic; }
-
-/* 响应式 */
-@media (max-width: 768px) {
-  .nf-cards { grid-template-columns: repeat(2, 1fr); }
-  .nht-title { font-size: 18px; }
-  .nht-desc { font-size: 11px; }
-}
-@media (max-width: 480px) {
-  .nf-cards { grid-template-columns: 1fr; }
-}
-
-/* R336 卡片尺寸精确铺满一屏 */
-.nav-hero-top { padding: 8px 16px 4px; }
-.nht-title { font-size: 18px; margin-bottom: 2px; }
-.nht-desc { font-size: 11px; line-height: 1.4; opacity: 0.5; }
-.nav-flat { padding: 0 16px 12px; }
-
-.nf-section { margin-bottom: 8px; }
-.nf-title {
-  font-size: 13px;
-  letter-spacing: 2px;
-  padding: 4px 0;
-  margin-bottom: 6px;
-}
-.nf-icon { font-size: 15px; }
-
-.nf-cards {
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-  gap: 5px;
-}
-.nf-card {
-  padding: 6px 8px;
-  gap: 1px;
-  border-radius: 5px;
-}
-.nf-card-icon { font-size: 16px; margin-bottom: 1px; }
-.nf-card-name { font-size: 11px; }
-.nf-card-desc { font-size: 9px; line-height: 1.3; }
-.nf-source { font-size: 8px; margin-top: 1px; }
-
-/* R336 更紧凑 — 铺满一屏 */
-.nf-card-desc { display: none; }
-.nf-source { display: none; }
-.nf-card { padding: 8px 8px; text-align: center; align-items: center; }
-.nf-card-icon { font-size: 20px; }
-.nf-card-name { font-size: 11px; }
-.nf-cards { gap: 4px; }
-.nf-section { margin-bottom: 4px; }
-.nf-title { padding: 3px 0; margin-bottom: 4px; font-size: 12px; }
-
-/* R336 微调 */
-.nav-hero-top { padding: 6px 16px 2px; }
-.nht-title { font-size: 16px; }
-.nht-desc { font-size: 10px; line-height: 1.3; }
-.nav-flat { padding: 0 16px 4px; }
-.nf-card { padding: 6px 6px; }
-.nf-card-icon { font-size: 18px; }
-.nf-card-name { font-size: 10px; }
-
-/* ================================================================
-   R337 首页导航卡片重设计 — 1400×900 一屏铺满
-   71 cards + 5 section titles in viewport
-   ================================================================ */
-
-/* Override R261 inline body constraint */
-body { max-width: none !important; padding: 0 !important; }
-
-/* Top nav: 48px */
-.top-nav { height: 48px; }
-.nav-inner { height: 48px; padding: 0 24px; }
-.nav-brand { font-size: 18px; letter-spacing: 4px; }
-.main { margin-top: 48px !important; max-width: 1400px; }
-
-/* Hero top: compact title + description */
-.nav-hero-top {
-  padding: 4px 20px 2px;
-  text-align: left;
-}
-.nht-title {
-  font-family: 'Ma Shan Zheng', serif;
-  font-size: 15px;
-  color: var(--gold);
-  letter-spacing: 3px;
-  text-align: left;
-  margin-bottom: 1px;
-}
-.nht-desc {
-  font-size: 9px;
-  color: var(--paper3);
-  line-height: 1.2;
+  line-height: 1.3;
   opacity: 0.5;
   text-align: left;
   margin: 0;
 }
 
-/* Flat nav container */
+/* 平铺区 */
 .nav-flat {
-  padding: 0 20px 4px;
+  padding: 0 20px 8px;
 }
 
-/* Section: one per L1 category */
+/* 一级目录 */
 .nf-section {
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
-
-/* Section title: compact, left-aligned */
 .nf-title {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--gold);
   letter-spacing: 2px;
-  padding: 2px 0;
+  padding: 3px 0;
   border-bottom: 1px solid rgba(201,168,76,.08);
-  margin-bottom: 4px;
+  margin-bottom: 5px;
   text-align: left;
 }
-.nf-icon { font-size: 13px; }
+.nf-icon { font-size: 14px; }
 
-/* Card grid: 10 columns to fit 71 cards in ~8 rows */
+/* 卡片网格 — 6列 */
 .nf-cards {
   display: grid;
-  grid-template-columns: repeat(10, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 6px;
 }
 
-/* Card: icon + name, breathing room */
+/* 单张卡片 — 仿截图风格 */
 .nf-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 3px;
-  padding: 6px 4px;
+  text-align: center;
+  padding: 6px 8px;
   text-decoration: none;
-  border: 1px solid rgba(201,168,76,.08);
-  border-radius: 5px;
+  border: 1px solid rgba(201,168,76,.1);
+  border-radius: 6px;
   transition: all .2s;
   cursor: pointer;
   background: rgba(255,255,255,.015);
-  text-align: center;
-  min-height: 54px;
+  gap: 1px;
 }
 .nf-card:hover {
   border-color: rgba(201,168,76,.3);
-  background: rgba(201,168,76,.05);
-  transform: translateY(-1px);
+  background: rgba(201,168,76,.04);
 }
 .nf-card-icon {
   font-size: 18px;
-  line-height: 1;
-  margin: 0;
+  line-height: 1.2;
 }
 .nf-card-name {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--gold);
   font-weight: 500;
-  line-height: 1.1;
+  letter-spacing: 1px;
+}
+.nf-card-desc {
+  font-size: 9px;
+  color: var(--paper3);
+  opacity: 0.4;
+  line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
 }
-.nf-card-desc { display: none; }
-.nf-source { display: none; }
+.nf-source {
+  font-size: 8px;
+  color: var(--paper3);
+  opacity: 0.25;
+  font-style: italic;
+}
 
-/* Responsive: fewer columns on smaller screens */
+/* 响应式 */
 @media (max-width: 1200px) {
-  .nf-cards { grid-template-columns: repeat(8, 1fr); }
+  .nf-cards { grid-template-columns: repeat(5, 1fr); }
 }
 @media (max-width: 768px) {
-  .nf-cards { grid-template-columns: repeat(4, 1fr); }
-  .nht-title { font-size: 14px; }
-  .nht-desc { font-size: 9px; }
+  .nf-cards { grid-template-columns: repeat(3, 1fr); }
+  .nht-title { font-size: 16px; }
 }
 @media (max-width: 480px) {
-  .nf-cards { grid-template-columns: repeat(3, 1fr); }
-  .nf-card { padding: 6px 2px; min-height: 54px; }
-  .nf-card-icon { font-size: 18px; }
-  .nf-card-name { font-size: 10px; }
+  .nf-cards { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* R338 紧凑化 */
+.nf-card-desc { display: none; }
+.nf-card { padding: 5px 6px; }
+.nf-card-icon { font-size: 16px; }
+.nf-card-name { font-size: 10px; }
+.nf-source { font-size: 7px; }
+.nf-cards { gap: 4px; }
+.nf-section { margin-bottom: 4px; }
+.nf-title { padding: 2px 0; margin-bottom: 3px; font-size: 11px; }
+.nf-icon { font-size: 13px; }
+
+/* R338 8列铺满 */
+.nf-cards { grid-template-columns: repeat(8, 1fr); }
+
+/* R338 最终紧凑 */
+.nf-source { display: none; }
+.nf-card { padding: 5px 4px; }
+.nav-hero-top { padding: 4px 16px 0; }
+.nht-title { font-size: 16px; }
+.nht-desc { font-size: 9px; }
+.nav-flat { padding: 0 16px 4px; }
+
+/* R338 最终微调 */
+.nf-card { padding: 4px 4px; }
+.nf-card-icon { font-size: 15px; }
+.nf-card-name { font-size: 10px; }
+.nf-title { margin-bottom: 2px; padding: 1px 0; }
+.nf-section { margin-bottom: 3px; }
