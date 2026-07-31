@@ -32,17 +32,67 @@
   // 角色等级权重（数字越大权限越高）
   const ROLE_WEIGHT = {
     'guest': 0,
+    'anonymous': 0,
     'free': 1,
     'patient': 1,
     'mingdao': 2,
     'advanced': 3,
     'vip': 4,
-    'master': 3,
-    'doctor': 4,
+    'master': 4,        // 周易大师（R314）
+    'doctor': 4,        // 中医医生（R314）
     'admin_a': 8,
-    'admin_b': 8,
-    'super_admin': 10
+    'admin_b': 8,       // 业务管理员（R314）
+    'super_admin': 10   // 超管（R314）
   };
+
+  // R314：角色 × 知识输出类型权限矩阵（5 角色 × 7 输出类型 = 35 单元）
+  const KB_OUTPUT_TYPES = [
+    'cultural_reference',   // L1 文化参考话术
+    'knowledge_summary',    // L2 知识条目摘要（典籍原文 + 多流派并列）
+    'knowledge_full',       // L3 完整知识检索（含 src_id/置信度/版本）
+    'divination_conclude',  // 解卦结论（所有角色禁）
+    'tcm_diagnose',         // 辨证诊断（所有角色禁）
+    'theory_create',        // 自主创作（所有角色禁）
+    'debug_trace'           // 调试追溯（仅 L3）
+  ];
+
+  const KB_OUTPUT_MATRIX = {
+    free:        { cultural_reference: 'L1', knowledge_summary: 'NONE', knowledge_full: 'NONE', divination_conclude: 'NONE', tcm_diagnose: 'NONE', theory_create: 'NONE', debug_trace: 'NONE' },
+    vip:         { cultural_reference: 'L1', knowledge_summary: 'NONE', knowledge_full: 'NONE', divination_conclude: 'NONE', tcm_diagnose: 'NONE', theory_create: 'NONE', debug_trace: 'NONE' },
+    anonymous:   { cultural_reference: 'L1', knowledge_summary: 'NONE', knowledge_full: 'NONE', divination_conclude: 'NONE', tcm_diagnose: 'NONE', theory_create: 'NONE', debug_trace: 'NONE' },
+    master:      { cultural_reference: 'L1', knowledge_summary: 'L2',  knowledge_full: 'NONE', divination_conclude: 'NONE', tcm_diagnose: 'NONE', theory_create: 'NONE', debug_trace: 'NONE' },
+    doctor:      { cultural_reference: 'L1', knowledge_summary: 'L2',  knowledge_full: 'NONE', divination_conclude: 'NONE', tcm_diagnose: 'NONE', theory_create: 'NONE', debug_trace: 'NONE' },
+    admin_b:     { cultural_reference: 'L1', knowledge_summary: 'NONE', knowledge_full: 'NONE', divination_conclude: 'NONE', tcm_diagnose: 'NONE', theory_create: 'NONE', debug_trace: 'NONE' },
+    super_admin: { cultural_reference: 'L1', knowledge_summary: 'L2',  knowledge_full: 'L3',  divination_conclude: 'NONE', tcm_diagnose: 'NONE', theory_create: 'NONE', debug_trace: 'L3'  }
+  };
+
+  function getEffectiveRole(roles) {
+    const order = ['super_admin', 'master', 'doctor', 'admin_b', 'admin_a', 'vip', 'advanced', 'mingdao', 'free', 'patient', 'anonymous', 'guest'];
+    for (let i = 0; i < order.length; i++) {
+      if (roles.indexOf(order[i]) >= 0) return order[i];
+    }
+    return 'anonymous';
+  }
+
+  function canAccessOutputType(outputType) {
+    const eff = getEffectiveRole(getRoles());
+    const m = KB_OUTPUT_MATRIX[eff];
+    return m && m[outputType] && m[outputType] !== 'NONE';
+  }
+
+  function canAccessKnowledge() {
+    return canAccessOutputType('knowledge_summary');
+  }
+
+  function canAccessDebug() {
+    return canAccessOutputType('debug_trace');
+  }
+
+  function getOutputLevel(outputType) {
+    const eff = getEffectiveRole(getRoles());
+    const m = KB_OUTPUT_MATRIX[eff];
+    return (m && m[outputType]) || 'NONE';
+  }
 
   // ═══ 内部工具 ═══
 
@@ -495,6 +545,15 @@
     getRoleWeight: getRoleWeight,
     getMaxWeight: getMaxWeight,
 
+    // R314：角色 × 知识输出权限
+    KB_OUTPUT_TYPES: KB_OUTPUT_TYPES,
+    KB_OUTPUT_MATRIX: KB_OUTPUT_MATRIX,
+    getEffectiveRole: getEffectiveRole,
+    canAccessKnowledge: canAccessKnowledge,
+    canAccessDebug: canAccessDebug,
+    canAccessOutputType: canAccessOutputType,
+    getOutputLevel: getOutputLevel,
+
     // 路由守卫
     requireAuth: requireAuth,
     requireRole: requireRole,
@@ -532,6 +591,13 @@
     window.hasPermission = hasPermission;
     window.getRoleWeight = getRoleWeight;
     window.getMaxWeight = getMaxWeight;
+    window.KB_OUTPUT_TYPES = KB_OUTPUT_TYPES;
+    window.KB_OUTPUT_MATRIX = KB_OUTPUT_MATRIX;
+    window.canAccessKnowledge = canAccessKnowledge;
+    window.canAccessDebug = canAccessDebug;
+    window.canAccessOutputType = canAccessOutputType;
+    window.getOutputLevel = getOutputLevel;
+    window.getEffectiveRole = getEffectiveRole;
     window.requireAuth = requireAuth;
     window.requireRole = requireRole;
     window.requireAnyRole = requireAnyRole;
