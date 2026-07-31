@@ -434,7 +434,7 @@ const ALL_MODS=[
       if(!last._extra){extraQ._extra=true;MODULES[id].steps.push(extraQ);}
     }
   });
-})();
+})('',[]);
 
 // === 初始化 ===
 showWelcome();
@@ -1338,7 +1338,7 @@ function _r89BuildMissingPrompt(v){
 }
 
 // ===== R89 合规黑名单 + 免责声明（P0-2 / P0-3 / P2-1）=====
-const COMPLIANCE_FORBIDDEN = [
+if(typeof COMPLIANCE_FORBIDDEN === 'undefined'){window.COMPLIANCE_FORBIDDEN = [
   // —— 绝对化（违反"非全称判断"）——
   { rx: /必定.{0,3}(?:升官|发财|大富大贵|大富|大贵|大灾|大难)/g, label: '绝对化-必定大富大贵/大灾', repl: '有较大可能（仍需努力）' },
   { rx: /注定(?:要|会).{0,6}(?:大富|大贵|大灾|大难|死|病|穷|败)/g, label: '绝对化-注定大富/大灾', repl: '命理倾向提示' },
@@ -1395,8 +1395,8 @@ const COMPLIANCE_FORBIDDEN = [
   // —— 心理健康 —
   { rx: /你(?:抑郁了|有抑郁症|想不开|想死|会自杀)/g, label: '心理健康-妄下诊断', repl: '如情绪低落请咨询专业心理医生' },
   { rx: /肯定(?:抑郁|精神病|焦虑症)/g, label: '心理健康-妄下诊断', repl: '心理状态请咨询专业医师' },
-];
-const COMPLIANCE_DISCLAIMER = '⚠️ 免责声明：本报告基于传统命理学理论，仅供国学文化学习与娱乐参考，不构成医疗、理财、法律或任何专业建议。命由天定，运由己造，人生的最终走向取决于您的选择与努力。';
+];}
+if(typeof COMPLIANCE_DISCLAIMER === 'undefined'){window.COMPLIANCE_DISCLAIMER = '⚠️ 免责声明：本报告基于传统命理学理论，仅供国学文化学习与娱乐参考，不构成医疗、理财、法律或任何专业建议。命由天定，运由己造，人生的最终走向取决于您的选择与努力。';}
 const KB_SOURCE_TAGS = [
   { rx: /倪海厦|倪师|人纪/g, tag: '📘 倪海厦', cls: 'tag-nihaisha' },
   { rx: /舒晗|舒晗天纪|奇门校正/g, tag: '🎯 舒晗', cls: 'tag-shuhan' },
@@ -1712,7 +1712,7 @@ function showReport(text, meta){
   // R89-J 报告模板选择器（古卷/现代/禅意）
   var _tpl = (function(){
     try { return localStorage.getItem('_r89_report_template') || 'scroll'; } catch(e){ return 'scroll'; }
-  })();
+  })('',[]);
   ops.innerHTML='<span class="report-template-picker" role="group" aria-label="报告模板">' +
     '<button class="report-template-btn" data-tpl="scroll" title="古卷轴"><span class="ico">📜</span>古卷</button>' +
     '<button class="report-template-btn" data-tpl="modern" title="现代简约"><span class="ico">✨</span>现代</button>' +
@@ -3854,6 +3854,7 @@ function _nayin(ys,yb){
   var idx=((tg.indexOf(ys)*10+dz.indexOf(yb))%30+30)%30;
   return nayinMap[idx];
 }
+(function(modId,d){
   if(modId==='zeri'){
     var zrEvent=d[0]||'日常出行';var zrPeriod=d[1]||'近期择日';var zrBirth=d[2]||'1990年1月1日12时';var zrSex=d[3]||'男';
     // 基于黄历择日体系
@@ -4925,7 +4926,7 @@ function r39DualKBReply(query){
     setTimeout(function(){ badge.style.opacity='0'; badge.style.transition='opacity 0.4s'; }, 2500);
     setTimeout(function(){ badge.remove(); }, 3000);
   }
-})();
+})('',[]);
 
 // ============ R50: 报告反馈 (点赞/踩) ============
 window.fbReport = function(btn, val) {
@@ -5179,4 +5180,5 @@ window._exportFullChat = function(fmt){
   });
   // 暴露给外部调用
   window.updateRBACBadge = updateBadge;
-})();
+})('',[]);
+})('',[]);
