@@ -5409,49 +5409,147 @@ body { max-width: 100% !important; padding: 0 !important; }
 .nav-flat { padding: 0 16px 4px; }
 
 /* ================================================================
-   R340 功能页布局修真 + 返回按钮 + 报错修真
+
+/* ================================================================
+   R344 软件工程规范 + 友好性优化
    ================================================================ */
 
-/* 功能 section 全宽 */
+/* —— 全局基础 —— */
+body { max-width: 100% !important; padding: 0 !important; background: #0e0e12 !important; }
+.top-nav { height: 44px; background: rgba(14,14,18,.95); border-bottom: 1px solid rgba(201,168,76,.06); }
+.nav-inner { height: 44px; padding: 0 20px; }
+.nav-brand { font-size: 16px; letter-spacing: 3px; }
+.main { margin-top: 44px !important; }
+
+/* —— 首页 hero —— */
+.nav-hero-top { padding: 6px 20px 2px; }
+.nht-title {
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 18px; color: var(--gold);
+  letter-spacing: 4px; text-align: left; margin: 0;
+}
+.nht-desc {
+  font-size: 10px; color: var(--paper3);
+  line-height: 1.3; opacity: 0.4; text-align: left; margin: 0;
+}
+
+/* —— 平铺区 —— */
+.nav-flat { padding: 0 20px 8px; }
+
+/* —— 一级目录（居中 + 分组分隔） —— */
+.nf-section { margin-bottom: 8px; }
+.nf-section:first-child { margin-top: 4px; }
+.nf-section:not(:first-child) {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(201,168,76,.06);
+}
+.nf-title {
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px; font-size: 13px; color: var(--gold);
+  letter-spacing: 3px; padding: 3px 0;
+  margin-bottom: 6px; text-align: center;
+}
+.nf-icon { font-size: 15px; }
+
+/* —— 卡片网格（居中对齐 + 圆角 + hover） —— */
+.nf-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 6px;
+  justify-items: stretch;
+}
+
+/* —— 单张卡片 —— */
+.nf-card {
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center;
+  padding: 8px 6px; text-decoration: none;
+  border: 1px solid rgba(201,168,76,.08);
+  border-left: 3px solid rgba(201,168,76,.2);
+  border-radius: 6px;
+  transition: all .2s ease;
+  cursor: pointer;
+  background: rgba(255,255,255,.015);
+  gap: 2px;
+  position: relative;
+  overflow: hidden;
+}
+.nf-card:hover {
+  border-color: rgba(201,168,76,.25);
+  border-left-color: var(--gold);
+  background: rgba(201,168,76,.05);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+}
+.nf-card:active {
+  transform: translateY(0);
+  background: rgba(201,168,76,.08);
+}
+
+/* —— 卡片内容 —— */
+.nf-card-icon { font-size: 18px; line-height: 1.2; }
+.nf-card-name {
+  font-size: 11px; color: var(--gold);
+  font-weight: 500; letter-spacing: 1px;
+}
+.nf-card-desc { display: none; }
+.nf-source { display: none; }
+
+/* —— 功能 section 全宽 —— */
 .section {
   max-width: 100% !important;
-  padding: 16px 24px 60px !important;
+  padding: 12px 24px 60px !important;
 }
 
-/* 返回按钮 — 固定顶部醒目 */
+/* —— 返回按钮（sticky 顶部） —— */
 .back-row {
-  position: sticky !important;
-  top: 48px !important;
-  z-index: 100 !important;
-  text-align: left !important;
-  margin: 0 0 12px !important;
-  padding: 8px 0 !important;
-  background: rgba(12,12,12,.95) !important;
+  position: sticky !important; top: 44px !important;
+  z-index: 100 !important; text-align: left !important;
+  margin: 0 0 12px !important; padding: 8px 0 !important;
+  background: rgba(14,14,18,.95) !important;
   backdrop-filter: blur(8px) !important;
 }
-
 .back-btn {
-  display: inline-flex !important;
-  position: static !important;
-  width: auto !important;
-  height: auto !important;
-  border-radius: 6px !important;
-  background: transparent !important;
+  display: inline-flex !important; position: static !important;
+  width: auto !important; height: auto !important;
+  border-radius: 6px !important; background: transparent !important;
   color: var(--gold) !important;
   border: 1px solid rgba(201,168,76,.25) !important;
-  padding: 6px 16px !important;
-  font-size: 12px !important;
+  padding: 6px 16px !important; font-size: 12px !important;
   letter-spacing: 2px !important;
-  align-items: center !important;
-  justify-content: center !important;
-  box-shadow: none !important;
+  align-items: center !important; justify-content: center !important;
+  box-shadow: none !important; cursor: pointer; transition: all .2s;
 }
-
-.back-btn::before {
-  content: "← ";
-}
-
+.back-btn::before { content: "← "; }
 .back-btn:hover {
   background: rgba(201,168,76,.08) !important;
   border-color: var(--gold) !important;
 }
+
+/* —— 响应式 —— */
+@media (max-width: 1200px) { .nf-cards { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); } }
+@media (max-width: 768px) {
+  .nf-cards { grid-template-columns: repeat(4, 1fr); }
+  .nht-title { font-size: 16px; }
+}
+@media (max-width: 480px) {
+  .nf-cards { grid-template-columns: repeat(3, 1fr); }
+  .nf-card { padding: 6px 4px; }
+  .nf-card-icon { font-size: 16px; }
+  .nf-card-name { font-size: 10px; }
+}
+
+/* R344 紧凑化 — 铺满一屏 */
+.nf-card { padding: 5px 4px; }
+.nf-card-icon { font-size: 16px; }
+.nf-card-name { font-size: 10px; }
+.nf-cards { gap: 4px; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+.nf-section { margin-bottom: 4px; }
+.nf-section:not(:first-child) { margin-top: 6px; padding-top: 4px; }
+.nf-title { padding: 2px 0; margin-bottom: 4px; font-size: 12px; }
+.nf-icon { font-size: 13px; }
+.nav-hero-top { padding: 4px 16px 0; }
+.nht-title { font-size: 15px; }
+.nht-desc { font-size: 9px; }
+.nav-flat { padding: 0 16px 4px; }
