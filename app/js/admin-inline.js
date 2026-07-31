@@ -1051,6 +1051,7 @@ function renderUsers(q,level){
     }
   });
 
+  // [TEST_DATA] 以下为测试数据，上线前清理或替换为真实API
   // 也从localStorage读取本地用户（模拟数据）
   try{
     const localData=JSON.parse(localStorage.getItem('mlbj_data')||'{}');
@@ -1331,6 +1332,7 @@ function getAllFeedbackData(){
       time:f.time.slice(0,10)
     });
   });
+  // [TEST_DATA] 以下为测试数据，上线前清理或替换为真实API
   // 模拟数据
   allFb.push(
     {id:'fb_mock1',phone:'138****1234',type:'suggest',typeLabel:'建议',target:'daily_push',targetLabel:'今日推送',content:'希望每日推送能增加五行穿衣建议',points:5,streakBonus:0,status:'pending',time:'2026-07-01'},
@@ -1365,6 +1367,7 @@ function loadStats(){
     if(e.data.tool)toolCounts[e.data.tool]=(toolCounts[e.data.tool]||0)+1;
   });
   const toolNames={bazi:'八字排盘','zhanbu-yijing':'六爻占卜','zhanbu-meihua':'梅花易数',cezi:'测字',jiuri:'吉日查询',yanzhi:'手机号测算',xingming:'姓名分析','zhanbu-qimen':'奇门遁甲','zhanbu-ziwei':'紫微斗数','zhanbu-liuren':'六壬神课',fengshui:'风水罗盘'};
+  // [TEST_DATA] 以下为测试数据，上线前清理或替换为真实API
   document.getElementById('usageStats').innerHTML=Object.keys(toolCounts).length===0?
     '<div class="meta">暂无数据，显示模拟数据：</div>':'';
   const mockData=[{name:'八字排盘',count:128,pct:35},{name:'六爻占卜',count:85,pct:23},{name:'测字',count:62,pct:17},{name:'吉日查询',count:45,pct:12},{name:'手机号测算',count:30,pct:8},{name:'姓名分析',count:18,pct:5}];

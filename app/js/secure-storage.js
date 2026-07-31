@@ -193,6 +193,7 @@
   };
 
   // === 确定性随机（替代Math.random）===
+  // [TEST_DATA] detRand 用于生成确定性伪随机数（如测试用例、模拟数据），上线前评估是否需要替换为安全随机源
   function detRand(seed) {
     const s = seed || Date.now();
     const x = Math.sin(s) * 10000;

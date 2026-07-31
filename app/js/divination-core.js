@@ -143,7 +143,7 @@ const BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','�
 const ELE = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
 
 // ═══ 五行全量对应体系表 ═══
-let WUXING_ALL = {
+var WUXING_ALL = {
   '木': {
     方位: '东方/东南方',
     季节: '春季（寅卯辰月）',
@@ -448,7 +448,7 @@ function getYijingReading(guaName) {
 // ========== 易经 V2 动态解读引擎 ==========
 
 // 本地八卦象数表（避免跨script块依赖）
-let _YJ_GUA_XIANG = {
+var _YJ_GUA_XIANG = {
   0:{name:'乾',sym:'☰',code:'111',wuxing:'金',family:'父'},
   1:{name:'兑',sym:'☱',code:'110',wuxing:'金',family:'少女'},
   2:{name:'离',sym:'☲',code:'101',wuxing:'火',family:'中女'},
@@ -459,7 +459,7 @@ let _YJ_GUA_XIANG = {
   7:{name:'坤',sym:'☷',code:'000',wuxing:'土',family:'母'}
 };
 
-let _YJ_HEX_DATA = {
+var _YJ_HEX_DATA = {
   '乾':  {upper:0, lower:0, wuxing:'金', gong:'乾',   summary:'天行健，君子以自强不息', meaning:'纯阳刚健，天道运行不息'},
   '坤':  {upper:7, lower:7, wuxing:'土', gong:'坤',   summary:'地势坤，君子以厚德载物', meaning:'纯阴柔顺，地道承载万物'},
   '屯':  {upper:5, lower:3, wuxing:'水', gong:'坎',   summary:'万事开头难，坚持就是胜利', meaning:'雷雨交加，万物始生艰难'},
@@ -526,7 +526,7 @@ let _YJ_HEX_DATA = {
   '未济':{upper:2, lower:5, wuxing:'火', gong:'离',   summary:'尚未完成，继续努力', meaning:'火水未济，事未成也'}
 };
 
-let _YJ_YAO_CI = {
+var _YJ_YAO_CI = {
   '乾':['潜龙勿用','见龙在田，利见大人','君子终日乾乾，夕惕若厉','或跃在渊，无咎','飞龙在天，利见大人','亢龙有悔'],
   '坤':['履霜，坚冰至','直方大，不习无不利','含章可贞，或从王事','括囊，无咎无誉','黄裳，元吉','龙战于野，其血玄黄'],
   '屯':['磐桓，利居贞','屯如邅如，乘马班如','即鹿无虞，惟入于林中','乘马班如，求婚媾','屯其膏，小贞吉大贞凶','乘马班如，泣血涟如'],
@@ -593,7 +593,7 @@ let _YJ_YAO_CI = {
   '未济':['濡其尾，吝','曳其轮，贞吉','未济征凶，利涉大川','贞吉悔亡，震用伐鬼方三年','贞吉无悔，君子之光有孚','饮酒濡首，亦不知节矣']
 };
 
-let _YAO_POS_MEANING = {
+var _YAO_POS_MEANING = {
   0: {name:'初爻', detail:'事物发端之时，影响根基。初爻吉则根基稳固，初爻凶则起步艰难。初爻为潜藏之位，宜蓄积不宜显露。'},
   1: {name:'二爻', detail:'事物渐成但未成之时。二爻为内卦中位，主资质禀赋。二爻吉则才华可展，二爻凶则内在不足。'},
   2: {name:'三爻', detail:'事物发展最费力之时。三爻为内外之交，主变动过渡。三爻吉则化险为夷，三爻凶则进退两难。'},
@@ -802,7 +802,7 @@ function getQimenReading(palace) {
 // [舒晗课程校正] 用神取法表 — 依据密训班01/02用神五层法
 // 舒晗事体用神表：求财→生门+戊/庚，工作→开门+值符，婚姻→乙奇(男)/庚金(女)+休门
 // 疾病→天芮+伤门/死门，走失→时干+杜门/六合，官司→惊门+六仪击刑
-let _QM_YONGSHEN_MAP = {
+var _QM_YONGSHEN_MAP = {
   '财':'生门','求财':'生门','投资':'生门','生意':'生门','交易':'生门',
   '偏财':'丁奇','副业':'丁奇',
   '官':'开门','事业':'开门','工作':'开门','升迁':'开门','求职':'开门',
@@ -816,35 +816,35 @@ let _QM_YONGSHEN_MAP = {
 };
 
 // 宫位五行表
-let _QM_PALACE_WX = {1:'水',2:'土',3:'木',4:'木',5:'土',6:'金',7:'金',8:'土',9:'火'};
+var _QM_PALACE_WX = {1:'水',2:'土',3:'木',4:'木',5:'土',6:'金',7:'金',8:'土',9:'火'};
 
 // 宫位方位表
-let _QM_PALACE_DIR = {1:'正北',2:'西南',3:'正东',4:'东南',5:'中央',6:'西北',7:'正西',8:'东北',9:'正南'};
+var _QM_PALACE_DIR = {1:'正北',2:'西南',3:'正东',4:'东南',5:'中央',6:'西北',7:'正西',8:'东北',9:'正南'};
 
 // 九星五行表
-let _QM_STAR_WX = {'天蓬':'水','天芮':'土','天冲':'木','天辅':'木','天禽':'土','天心':'金','天柱':'金','天任':'土','天英':'火'};
+var _QM_STAR_WX = {'天蓬':'水','天芮':'土','天冲':'木','天辅':'木','天禽':'土','天心':'金','天柱':'金','天任':'土','天英':'火'};
 
 // 八门五行表
-let _QM_MEN_WX = {'休门':'水','生门':'土','伤门':'木','杜门':'木','景门':'火','死门':'土','惊门':'金','开门':'金'};
+var _QM_MEN_WX = {'休门':'水','生门':'土','伤门':'木','杜门':'木','景门':'火','死门':'土','惊门':'金','开门':'金'};
 
 // 八神五行表
-let _QM_SHEN_WX = {'值符':'木','青龙':'木','太阴':'金','六合':'木','勾陈':'土','白虎':'金','玄武':'水','螣蛇':'火','九天':'金','九地':'土'};
+var _QM_SHEN_WX = {'值符':'木','青龙':'木','太阴':'金','六合':'木','勾陈':'土','白虎':'金','玄武':'水','螣蛇':'火','九天':'金','九地':'土'};
 
 // 六仪三奇五行表
-let _QM_QI_WX = {'戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水','丁':'火','丙':'火','乙':'木'};
+var _QM_QI_WX = {'戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水','丁':'火','丙':'火','乙':'木'};
 
 // 吉门列表
-let _QM_JI_MEN = ['休门','生门','开门'];
+var _QM_JI_MEN = ['休门','生门','开门'];
 // 凶门列表
-let _QM_XIONG_MEN = ['死门','惊门','伤门'];
+var _QM_XIONG_MEN = ['死门','惊门','伤门'];
 // 吉星列表
-let _QM_JI_STAR = ['天辅','天心','天任','天禽'];
+var _QM_JI_STAR = ['天辅','天心','天任','天禽'];
 // 凶星列表
-let _QM_XIONG_STAR = ['天蓬','天芮','天冲','天柱','天英'];
+var _QM_XIONG_STAR = ['天蓬','天芮','天冲','天柱','天英'];
 // 吉神列表
-let _QM_JI_SHEN = ['值符','青龙','太阴','六合','九天','九地'];
+var _QM_JI_SHEN = ['值符','青龙','太阴','六合','九天','九地'];
 // 凶神列表
-let _QM_XIONG_SHEN = ['白虎','玄武','螣蛇','勾陈'];
+var _QM_XIONG_SHEN = ['白虎','玄武','螣蛇','勾陈'];
 
 // 五行生克关系
 function _qmWxRelation(a, b) {
@@ -935,7 +935,7 @@ function _qmStars(score) {
 // 击刑：合解法/通关法/移位法
 // 入墓：冲开法/库库转化/敲击法
 // 门迫：通关法/换宫法/五行调和法
-let _QM_SIHAI_HUAJIE = {
+var _QM_SIHAI_HUAJIE = {
   '死门': {mascot:'铜铃/六字真言/黑曜石', direction:'西南方', color:'黄色/金色', method:'[舒晗课程校正] 死门落宫为门迫（土克水等），用通关法化解。具体：寅时(凌晨3-5点)挂铜铃于门楣，诵六字大明咒七遍。若死门临坤宫，放铜葫芦收煞；临坎宫，放黄色物品通关（土克水，用金通关）'},
   '惊门': {mascot:'白色水晶/金属风铃/蓝水晶', direction:'正西方', color:'白色/银色', method:'[舒晗课程校正] 惊门主口舌惊恐，用通关法化解（金克木用水通关，放黑色/蓝色物品）。酉时(下午5-7点)置白水晶于西窗台，挂金属风铃。惊门临震宫主口舌伤人，宜移位避开'},
   '伤门': {mascot:'红色装饰/紫水晶/黑曜石麒麟', direction:'正东方', color:'红色/紫色', method:'[舒晗课程校正] 伤门主伤害争斗，用通关法化解（木克土用火通关，放红色物品）。卯时(上午5-7点)置紫水晶于东方位，配红色装饰。伤门临中宫/坤宫主外伤，宜移位法避开该方位'},
@@ -943,7 +943,7 @@ let _QM_SIHAI_HUAJIE = {
 };
 
 // 吉祥物推荐表（基于五行）
-let _QM_MASCOT_BY_WX = {
+var _QM_MASCOT_BY_WX = {
   '金': ['铜葫芦','金属风铃','白水晶','铜麒麟','金元宝'],
   '木': ['绿檀手串','绿幽灵水晶','文昌塔','竹节饰品','翡翠'],
   '水': ['黑曜石','蓝砂石','水晶球','龙龟','鱼缸'],
@@ -952,7 +952,7 @@ let _QM_MASCOT_BY_WX = {
 };
 
 // 本地天干表（避免跨script块依赖）
-let _QM_STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+var _QM_STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
 
 // 格局全名格式化
 function _qmFormatGeju(gejuList) {
@@ -1517,7 +1517,7 @@ function getDayBranchIndex(year, month, day) {
 
 // 12节精确日期查找表 (1900-2050, 从 lunar_python 生成)
 // 每个字符代表一年的偏移量: 0=基准日, 1=+1天, a=-1天
-let JIE_DATES = {
+var JIE_DATES = {
   '立春': {base:[1,4], offsets:'001110111011100110011001100110011001100110011000100010001000100010001000100010001000000000000000000000000000000000000a000a000a000a000a000a000a000a000aa'},
   '惊蛰': {base:[2,6], offsets:'000100010001000000000000000000000000000000000000a000a000a000a000a000a000a000a000a000aa00aa00aa00aa00aa00aa00aa00aa00aaa0aaa0aaa0aaa0aaa0aaa0aaa0aaa0aaa'},
   '清明': {base:[3,5], offsets:'0011001100110001000100010001000100010001000100000000000000000000000000000000a000a000a000a000a000a000a000a000aa00aa00aa00aa00aa00aa00aa00aa00aaa0aaa0aaa'},
@@ -1550,7 +1550,7 @@ function getJieDate(year, jieName) {
 // ═══ 精确节气时间计算 (天文近似, 分钟级精度) ═══
 // 基于 Jean Meeus《天文算法》标准太阳黄经计算
 // 用于起运年龄的精确计算, 误差<5分钟
-let JIE_LONGITUDE = {
+var JIE_LONGITUDE = {
   '立春':315, '雨水':330, '惊蛰':345, '春分':0,
   '清明':15, '谷雨':30, '立夏':45, '小满':60,
   '芒种':75, '夏至':90, '小暑':105, '大暑':120,
@@ -1622,7 +1622,7 @@ function getPreciseJieTime(year, jieName) {
 }
 
 // 12节对应的月支索引: 立春→寅(2), 惊蛰→卯(3), ...
-let JIE_MONTH_MAP = [
+var JIE_MONTH_MAP = [
   {name:'立春', branchIdx:2}, {name:'惊蛰', branchIdx:3}, {name:'清明', branchIdx:4},
   {name:'立夏', branchIdx:5}, {name:'芒种', branchIdx:6}, {name:'小暑', branchIdx:7},
   {name:'立秋', branchIdx:8}, {name:'白露', branchIdx:9}, {name:'寒露', branchIdx:10},
@@ -1728,13 +1728,13 @@ function trueSolarTimeCorrection(year, month, day, hour, minute, lng, tzOffset) 
 
 // ═══ 五行力量加权计算 (移植自 paipan.py wuxing_strength) ═══
 // 天干1.0 / 藏干本气1.0·中气0.5·余气0.2 / 月支司令×2.0
-let ZHI_CANGGAN = {
+var ZHI_CANGGAN = {
   '子':['癸'],'丑':['己','癸','辛'],'寅':['甲','丙','戊'],'卯':['乙'],
   '辰':['戊','乙','癸'],'巳':['丙','戊','庚'],'午':['丁','己'],'未':['己','丁','乙'],
   '申':['庚','壬','戊'],'酉':['辛'],'戌':['戊','辛','丁'],'亥':['壬','甲']
 };
-let WUXING_SHENG = {'木':'火','火':'土','土':'金','金':'水','水':'木'};
-let WUXING_KE = {'木':'土','土':'水','水':'火','火':'金','金':'木'};
+var WUXING_SHENG = {'木':'火','火':'土','土':'金','金':'水','水':'木'};
+var WUXING_KE = {'木':'土','土':'水','水':'火','火':'金','金':'木'};
 
 function computeWuxingStrength(pillars, dayStem) {
   let score = {'木':0, '火':0, '土':0, '金':0, '水':0};
@@ -1776,28 +1776,28 @@ function computeWuxingStrength(pillars, dayStem) {
 }
 
 // ═══ 天干五合/相冲 + 六害 + 三刑完善 (移植自 paipan.py) ═══
-let GAN_HE = {
+var GAN_HE = {
   '甲己':'土','己甲':'土','乙庚':'金','庚乙':'金','丙辛':'水','辛丙':'水',
   '丁壬':'木','壬丁':'木','戊癸':'火','癸戊':'火'
 };
-let GAN_CHONG = ['甲庚','庚甲','乙辛','辛乙','丙壬','壬丙','丁癸','癸丁','戊甲','甲戊'];
+var GAN_CHONG = ['甲庚','庚甲','乙辛','辛乙','丙壬','壬丙','丁癸','癸丁','戊甲','甲戊'];
 // 注意: 天干相冲实际是 甲庚/乙辛/丙壬/丁癸 (戊己中央不相冲)
-let GAN_CHONG_PAIRS = [
+var GAN_CHONG_PAIRS = [
   {a:'甲',b:'庚'}, {a:'乙',b:'辛'}, {a:'丙',b:'壬'}, {a:'丁',b:'癸'}
 ];
-let ZHI_LIUHE_MAP = {
+var ZHI_LIUHE_MAP = {
   '子丑':'土','丑子':'土','寅亥':'木','亥寅':'木','卯戌':'火','戌卯':'火',
   '辰酉':'金','酉辰':'金','巳申':'水','申巳':'水','午未':'火/土','未午':'火/土'
 };
-let ZHI_CHONG_PAIRS = [
+var ZHI_CHONG_PAIRS = [
   {a:'子',b:'午'}, {a:'丑',b:'未'}, {a:'寅',b:'申'}, {a:'卯',b:'酉'}, {a:'辰',b:'戌'}, {a:'巳',b:'亥'}
 ];
-let ZHI_HAI_PAIRS = [
+var ZHI_HAI_PAIRS = [
   {a:'子',b:'未'}, {a:'丑',b:'午'}, {a:'寅',b:'巳'}, {a:'卯',b:'辰'}, {a:'申',b:'亥'}, {a:'酉',b:'戌'}
 ];
-let XING3_A = ['寅','巳','申']; // 无恩之刑
-let XING3_B = ['丑','戌','未']; // 恃势之刑
-let XING_ZI = '辰午酉亥';       // 自刑
+var XING3_A = ['寅','巳','申']; // 无恩之刑
+var XING3_B = ['丑','戌','未']; // 恃势之刑
+var XING_ZI = '辰午酉亥';       // 自刑
 
 function detectGanRelations(pillars) {
   let labels = ['年','月','日','时'];
@@ -1919,11 +1919,11 @@ function detectZhiRelationsFull(pillars) {
 }
 
 // ═══ 长生十二宫 (移植自 paipan.py _dishi_of) ═══
-let CHANGSHENG_START = {
+var CHANGSHENG_START = {
   '甲':'亥','丙':'寅','戊':'寅','庚':'巳','壬':'申',
   '乙':'午','丁':'酉','己':'酉','辛':'子','癸':'卯'
 };
-let CS_ORDER = ['长生','沐浴','冠带','临官','帝旺','衰','病','死','墓','绝','胎','养'];
+var CS_ORDER = ['长生','沐浴','冠带','临官','帝旺','衰','病','死','墓','绝','胎','养'];
 
 function getDishi(gan, zhi) {
   let start = CHANGSHENG_START[gan];
@@ -1934,11 +1934,11 @@ function getDishi(gan, zhi) {
   let step = forward ? ((zi - si + 12) % 12) : ((si - zi + 12) % 12);
   return CS_ORDER[step];
 }
-let GAN_YINYANG_JS = {'甲':'阳','乙':'阴','丙':'阳','丁':'阴','戊':'阳','己':'阴','庚':'阳','辛':'阴','壬':'阳','癸':'阴'};
+var GAN_YINYANG_JS = {'甲':'阳','乙':'阴','丙':'阳','丁':'阴','戊':'阳','己':'阴','庚':'阳','辛':'阴','壬':'阳','癸':'阴'};
 
 // ═══ 旬空计算 (对标 lunar_python) ═══
 // 旬空: 以日柱所在旬,空亡的两个地支 + 旬名
-let XUN_NAMES = ['甲子','甲戌','甲申','甲午','甲辰','甲寅'];
+var XUN_NAMES = ['甲子','甲戌','甲申','甲午','甲辰','甲寅'];
 function getXunKong(dayStem, dayBranch) {
   let stemIdx = STEMS.indexOf(dayStem);
   let branchIdx = BRANCHES.indexOf(dayBranch);
@@ -1973,11 +1973,11 @@ function getTaiYuan(monthStem, monthBranch) {
 }
 // ═══ 命宫/身宫 (对标 lunar_python 算法) ═══
 // MONTH_ZHI: 1-based, 寅=1,卯=2,辰=3,巳=4,午=5,未=6,申=7,酉=8,戌=9,亥=10,子=11,丑=12
-let MONTH_ZHI_ARR = ['', '寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑'];
+var MONTH_ZHI_ARR = ['', '寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑'];
 // ZHI: 1-based, 子=1,丑=2,寅=3,卯=4,辰=5,巳=6,午=7,未=8,申=9,酉=10,戌=11,亥=12
-let ZHI_ARR = ['', '子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+var ZHI_ARR = ['', '子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
 // GAN: 1-based, 甲=1,...,癸=10
-let GAN_ARR = ['', '甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+var GAN_ARR = ['', '甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
 
 // 命宫: 需月支、时支、年干
 function getMingGong(yearStemIdx, monthBranch, timeBranch) {
@@ -2006,7 +2006,7 @@ function getShenGong(yearStemIdx, monthBranch, timeBranch) {
 }
 
 // ═══ 调候用神速查表 (穷通宝鉴十干分十二月) ═══
-let TIAOHOU_TABLE = {
+var TIAOHOU_TABLE = {
   '甲': {
     '寅':'丙癸','卯':'丙癸','辰':'庚壬','巳':'癸','午':'癸丁','未':'癸丁',
     '申':'庚丙','酉':'庚丙','戌':'庚丁','亥':'丙戊','子':'丙丁','丑':'丁丙'
@@ -2167,34 +2167,34 @@ function showModal(title, content) {
 
 // ===== 黄历计算引擎 =====
 // 天干地支
-let TIAN_GAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-let DI_ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-let SHENG_XIAO = ['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
+var TIAN_GAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+var DI_ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+var SHENG_XIAO = ['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
 // 二十八星宿（东方苍龙·北方玄武·西方白虎·南方朱雀）
-let XING_XIU = ['角','亢','氐','房','心','尾','箕','斗','牛','女','虚','危','室','壁','奎','娄','胃','昴','毕','觜','参','井','鬼','柳','星','张','翼','轸'];
-let XING_XIU_ANIMAL = ['蛟','龙','貉','兔','狐','虎','豹','獬','牛','蝠','鼠','燕','猪','㺄','狼','狗','雉','鸡','乌','猴','猿','犴','羊','獐','马','鹿','蛇','蚓'];
+var XING_XIU = ['角','亢','氐','房','心','尾','箕','斗','牛','女','虚','危','室','壁','奎','娄','胃','昴','毕','觜','参','井','鬼','柳','星','张','翼','轸'];
+var XING_XIU_ANIMAL = ['蛟','龙','貉','兔','狐','虎','豹','獬','牛','蝠','鼠','燕','猪','㺄','狼','狗','雉','鸡','乌','猴','猿','犴','羊','獐','马','鹿','蛇','蚓'];
 // 建除十二神
-let JIAN_CHU = ['建','除','满','平','定','执','破','危','成','收','开','闭'];
-let JIAN_CHU_YI = {
+var JIAN_CHU = ['建','除','满','平','定','执','破','危','成','收','开','闭'];
+var JIAN_CHU_YI = {
   '建':['入学','安抚','出行','上任','见贵','求职'],'除':['治病','沐浴','祭祀','解除','扫舍'],'满':['祭祀','祈福','进人口','捕捉','畋猎'],'平':['修造','动土','平整道路'],'定':['祭祀','祈福','冠笄(guān jī)：成年礼','嫁娶','纳采(nà cǎi)：提亲'],'执':['捕捉','畋猎','祭祀','祈福','求嗣'],'破':['求医疗病','破屋坏垣'],'危':['祭祀','祈福','安床','入殓'],'成':['入学','赴任','开市','交易','立券','纳财','嫁娶','祭祀','祈福','求嗣'],'收':['祭祀','祈福','纳财','捕捉','畋猎','开市','交易'],'开':['祭祀','祈福','赴任','上任','见贵','出行','入学','嫁娶','移徙'],'闭':['筑堤防','补垣','塞穴','埋葬']
 };
-let JIAN_CHU_JI = {
+var JIAN_CHU_JI = {
   '建':['动土','开仓'],'除':['求医疗病','出行'],'满':['嫁娶','安葬','移徙','赴任'],'平':['祭祀','祈福','开市','交易'],'定':['诉讼','出行','词讼'],'执':['开市','移徙','出行','嫁娶'],'破':['嫁娶','开市','出行','祭祀','祈福','冠笄','进人口'],'危':['登山','乘船','出行'],'成':['诉讼','词讼','出行','赴任'],'收':['开市','出行','安葬'],'开':['安葬','伐木','畋猎','开仓','出货财'],'闭':['开市','交易','出行','嫁娶','求医疗病','动土']
 };
 // 彭祖百忌（十干）
-let PENG_ZU = ['甲不开仓财物耗散','乙不栽植千株不长','丙不修灶必见灾殃','丁不剃头头必生疮','戊不受田田主不祥','己不破券二比并亡','庚不经络织机虚张','辛不合酱主人不尝','壬不汲水更难提防','癸不词讼理弱敌强'];
+var PENG_ZU = ['甲不开仓财物耗散','乙不栽植千株不长','丙不修灶必见灾殃','丁不剃头头必生疮','戊不受田田主不祥','己不破券二比并亡','庚不经络织机虚张','辛不合酱主人不尝','壬不汲水更难提防','癸不词讼理弱敌强'];
 // 六冲
-let CHONG_MAP = {0:'午',1:'未',2:'申',3:'酉',4:'戌',5:'亥',6:'子',7:'丑',8:'寅',9:'卯',10:'辰',11:'巳'};
+var CHONG_MAP = {0:'午',1:'未',2:'申',3:'酉',4:'戌',5:'亥',6:'子',7:'丑',8:'寅',9:'卯',10:'辰',11:'巳'};
 // 煞方
-let SHA_MAP = {0:'南',1:'东',2:'北',3:'西',4:'南',5:'东',6:'北',7:'西',8:'南',9:'东',10:'北',11:'西'};
+var SHA_MAP = {0:'南',1:'东',2:'北',3:'西',4:'南',5:'东',6:'北',7:'西',8:'南',9:'东',10:'北',11:'西'};
 // 喜神方位（按日干）
-let XI_SHEN = ['艮(东北)','乾(西北)','坤(西南)','离(正南)','巽(东南)','艮(东北)','乾(西北)','坤(西南)','离(正南)','巽(东南)'];
+var XI_SHEN = ['艮(东北)','乾(西北)','坤(西南)','离(正南)','巽(东南)','艮(东北)','乾(西北)','坤(西南)','离(正南)','巽(东南)'];
 // 福神方位（按日干）
-let FU_SHEN = ['巽(东南)','坎(正北)','坎(正北)','离(正南)','艮(东北)','巽(东南)','坎(正北)','离(正南)','乾(西北)','坤(西南)'];
+var FU_SHEN = ['巽(东南)','坎(正北)','坎(正北)','离(正南)','艮(东北)','巽(东南)','坎(正北)','离(正南)','乾(西北)','坤(西南)'];
 // 财神方位（按日干）
-let CAI_SHEN = ['艮(东北)','艮(东北)','坎(正北)','坎(正北)','坎(正北)','坎(正北)','坤(西南)','巽(东南)','巽(东南)','巽(东南)'];
+var CAI_SHEN = ['艮(东北)','艮(东北)','坎(正北)','坎(正北)','坎(正北)','坎(正北)','坤(西南)','巽(东南)','巽(东南)','巽(东南)'];
 // 胎神占方（60甲子全表）
-let TAI_SHEN_60 = [
+var TAI_SHEN_60 = [
   '占门碓房内北','碓磨厕外东南','厨灶炉外正南','仓库门房内北','房床栖外正南',  // 甲子-戊辰 0-4
   '占门床场外正南','占碓磨外正南','厨灶碓外西南','仓库炉外西南','房床门内西南',  // 己巳-癸酉 5-9
   '门鸡栖外西南','碓磨床外西南','厨灶碓外西南','仓库厕外正北','房床炉外正南',  // 甲戌-戊寅 10-14
@@ -2210,9 +2210,9 @@ let TAI_SHEN_60 = [
 ];
 // 黄黑道（十二建星与日支关系）
 // 日禄时辰（按日干）
-let RI_LU = {0:'寅',2:'巳',4:'巳',6:'申',8:'亥'}; // 甲禄寅,丙禄巳,戊禄巳,庚禄申,壬禄亥
+var RI_LU = {0:'寅',2:'巳',4:'巳',6:'申',8:'亥'}; // 甲禄寅,丙禄巳,戊禄巳,庚禄申,壬禄亥
 // 节气近似日期（公历每月的节气近似日）
-let JIE_QI_DATES = [
+var JIE_QI_DATES = [
   [6,20], // 1月 小寒6 大寒20
   [4,19], // 2月 立春4 雨水19
   [6,21], // 3月 惊蛰6 春分21
@@ -2230,7 +2230,7 @@ let JIE_QI_DATES = [
 // 寅月(立春-惊蛰) 卯月(惊蛰-清明) 辰月(清明-立夏) 巳月(立夏-芒种)
 // 午月(芒种-小暑) 未月(小暑-立秋) 申月(立秋-白露) 酉月(白露-寒露)
 // 戌月(寒露-立冬) 亥月(立冬-大雪) 子月(大雪-小寒) 丑月(小寒-立春)
-let MONTH_ZHI = ['寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑'];
+var MONTH_ZHI = ['寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑'];
 // 五虎遁年起月干（年干x2+月序1-based）
 function getMonthGan(yearGan, monthZhiIndex) {
   // 五虎遁: 甲己之年丙作首, 乙庚之年戊为头, 丙辛之年寻庚上, 丁壬壬寅顺水流, 戊癸甲寅好追求
@@ -2317,7 +2317,7 @@ function getXingXiu(year, month, day) {
 }
 // 黄黑道（根据日干和时支计算十二黄黑道）
 // 黄黑道: 根据日支和月支计算
-let HUANG_DAO_NAMES = ['青龙(黄道)','明堂(黄道)','天刑(黑道)','朱雀(黑道)','金匮(黄道)','天德(黄道)','白虎(黑道)','玉堂(黄道)','天牢(黑道)','玄武(黑道)','司命(黄道)','勾陈(黑道)'];
+var HUANG_DAO_NAMES = ['青龙(黄道)','明堂(黄道)','天刑(黑道)','朱雀(黑道)','金匮(黄道)','天德(黄道)','白虎(黑道)','玉堂(黄道)','天牢(黑道)','玄武(黑道)','司命(黄道)','勾陈(黑道)'];
 // 时辰吉凶（根据日干和时支计算黄黑道）
 // 日干对应的时辰黄黑道: 以日干起时辰的建除
 function getHourJianChu(dayGan, hourZhiIdx) {
@@ -2369,13 +2369,13 @@ function getDayKongWang(dayGanZhiIndex) {
 // ====== 黄历全量数据表（传统老黄历）======
 
 // 二十八星宿吉凶表
-let XINGXIU_JIXIONG = {
+var XINGXIU_JIXIONG = {
   '角':'吉','亢':'凶','氐':'凶','房':'吉','心':'凶','尾':'吉','箕':'吉',
   '斗':'吉','牛':'凶','女':'吉','虚':'凶','危':'凶','室':'吉','壁':'吉',
   '奎':'凶','娄':'吉','胃':'吉','昴':'凶','毕':'吉','觜':'凶','参':'吉',
   '井':'吉','鬼':'凶','柳':'凶','星':'凶','张':'吉','翼':'凶','轸':'吉'
 };
-let XINGXIU_SONG = {
+var XINGXIU_SONG = {
   '角':'角宿吉，造作婚嫁皆吉昌','亢':'亢宿凶，主见官非病厄','氐':'氐宿凶，出行凶险','房':'房宿吉，婚嫁动土皆吉',
   '心':'心宿凶，安葬祭祀不利','尾':'尾宿吉，造作百事皆吉','箕':'箕宿吉，造仓掘井大吉','斗':'斗宿吉，造作置产皆吉',
   '牛':'牛宿凶，祭祀不利','女':'女宿吉，造作嫁娶皆吉','虚':'虚宿凶，动土开仓不利','危':'危宿凶，登山乘船不利',
@@ -2386,7 +2386,7 @@ let XINGXIU_SONG = {
 };
 
 // 冲煞详情表（按日地支查）
-let CHONGSHA_DETAIL = {
+var CHONGSHA_DETAIL = {
   '子':{chong:'马', sha:'南'}, '丑':{chong:'羊', sha:'东'}, '寅':{chong:'猴', sha:'北'},
   '卯':{chong:'鸡', sha:'西'}, '辰':{chong:'狗', sha:'南'}, '巳':{chong:'猪', sha:'东'},
   '午':{chong:'鼠', sha:'北'}, '未':{chong:'牛', sha:'西'}, '申':{chong:'虎', sha:'南'},
@@ -2394,8 +2394,8 @@ let CHONGSHA_DETAIL = {
 };
 
 // 值神表（黄道十二神值日）
-let ZHISHEN_NAMES = ['青龙','明堂','天刑','朱雀','金匮','天德','白虎','玉堂','天牢','玄武','司命','勾陈'];
-let ZHISHEN_TYPE = {
+var ZHISHEN_NAMES = ['青龙','明堂','天刑','朱雀','金匮','天德','白虎','玉堂','天牢','玄武','司命','勾陈'];
+var ZHISHEN_TYPE = {
   '青龙':true,'明堂':true,'金匮':true,'天德':true,'玉堂':true,'司命':true,
   '天刑':false,'朱雀':false,'白虎':false,'天牢':false,'玄武':false,'勾陈':false
 };
@@ -2425,10 +2425,10 @@ function getXiongshen_Yuesha(monthZhiIdx) {
   for (let i = 0; i < 4; i++) { if (sanhe[i].indexOf(monthZhiIdx) !== -1) return DI_ZHI[yuesha[i]]; }
   return '';
 }
-let YUE_XING = {0:3, 1:10, 2:5, 3:8, 4:4, 5:1, 6:2, 7:9, 8:8, 9:9, 10:10, 11:11};
-let YUE_YAN = {0:10, 1:9, 2:8, 3:7, 4:6, 5:5, 6:4, 7:3, 8:2, 9:1, 10:0, 11:11};
-let YAN_DUI = {0:4, 1:3, 2:2, 3:1, 4:0, 5:11, 6:10, 7:9, 8:8, 9:7, 10:6, 11:5};
-let WANG_WANG = {0:[2,5,8,11], 1:[3,6,9,0], 2:[4,7,10,1], 3:[5,8,11,2], 4:[6,9,0,3], 5:[7,10,1,4], 6:[8,11,2,5], 7:[9,0,3,6], 8:[10,1,4,7], 9:[11,2,5,8], 10:[0,3,6,9], 11:[1,4,7,10]};
+var YUE_XING = {0:3, 1:10, 2:5, 3:8, 4:4, 5:1, 6:2, 7:9, 8:8, 9:9, 10:10, 11:11};
+var YUE_YAN = {0:10, 1:9, 2:8, 3:7, 4:6, 5:5, 6:4, 7:3, 8:2, 9:1, 10:0, 11:11};
+var YAN_DUI = {0:4, 1:3, 2:2, 3:1, 4:0, 5:11, 6:10, 7:9, 8:8, 9:7, 10:6, 11:5};
+var WANG_WANG = {0:[2,5,8,11], 1:[3,6,9,0], 2:[4,7,10,1], 3:[5,8,11,2], 4:[6,9,0,3], 5:[7,10,1,4], 6:[8,11,2,5], 7:[9,0,3,6], 8:[10,1,4,7], 9:[11,2,5,8], 10:[0,3,6,9], 11:[1,4,7,10]};
 
 function calcXiongshen(yearGZ, monthGZ, dayGZ) {
   let result = [];
@@ -2454,18 +2454,18 @@ function calcXiongshen(yearGZ, monthGZ, dayGZ) {
 }
 
 // 吉神计算
-let TIAN_EN = [0,1,2,3,4,15,16,17,18,19,30,31,32,33,34,35,36,37,38,39];
-let YUE_EN = {0:2, 1:3, 2:6, 3:5, 4:4, 5:7, 6:8, 7:9, 8:6, 9:1, 10:0, 11:7};
-let MU_CANG = {0:11, 1:0, 2:1, 3:2, 4:3, 5:4, 6:5, 7:6, 8:7, 9:8, 10:9, 11:10};
-let SHENG_XIN = [0, 40, 20, 50];
-let YI_HOU = [0, 40, 20];
-let XU_SHI = [0, 40, 20];
-let TIAN_DE_GAN = {0:3, 2:8, 3:7, 5:0, 6:9, 8:2, 9:1, 11:6};
-let YUE_DE_GAN = {0:2, 1:0, 2:8, 3:6, 4:2, 5:0, 6:8, 7:6, 8:2, 9:0, 10:8, 11:6};
-let SAN_HE = [[8,0,4],[10,2,6],[2,6,10],[4,8,0]];
-let LIU_HE = [[0,1],[2,11],[3,10],[4,9],[5,8],[6,7]];
-let WU_HE = [[0,5],[1,6],[2,7],[3,8],[4,9]];
-let TIAN_XI = {0:10, 1:10, 2:10, 3:1, 4:1, 5:1, 6:4, 7:4, 8:4, 9:7, 10:7, 11:7};
+var TIAN_EN = [0,1,2,3,4,15,16,17,18,19,30,31,32,33,34,35,36,37,38,39];
+var YUE_EN = {0:2, 1:3, 2:6, 3:5, 4:4, 5:7, 6:8, 7:9, 8:6, 9:1, 10:0, 11:7};
+var MU_CANG = {0:11, 1:0, 2:1, 3:2, 4:3, 5:4, 6:5, 7:6, 8:7, 9:8, 10:9, 11:10};
+var SHENG_XIN = [0, 40, 20, 50];
+var YI_HOU = [0, 40, 20];
+var XU_SHI = [0, 40, 20];
+var TIAN_DE_GAN = {0:3, 2:8, 3:7, 5:0, 6:9, 8:2, 9:1, 11:6};
+var YUE_DE_GAN = {0:2, 1:0, 2:8, 3:6, 4:2, 5:0, 6:8, 7:6, 8:2, 9:0, 10:8, 11:6};
+var SAN_HE = [[8,0,4],[10,2,6],[2,6,10],[4,8,0]];
+var LIU_HE = [[0,1],[2,11],[3,10],[4,9],[5,8],[6,7]];
+var WU_HE = [[0,5],[1,6],[2,7],[3,8],[4,9]];
+var TIAN_XI = {0:10, 1:10, 2:10, 3:1, 4:1, 5:1, 6:4, 7:4, 8:4, 9:7, 10:7, 11:7};
 
 function calcJishen(yearGZ, monthGZ, dayGZ) {
   let result = [];
@@ -2503,7 +2503,7 @@ function calcJishen(yearGZ, monthGZ, dayGZ) {
 }
 
 // 完整彭祖百忌（天干+地支）
-let PENGZU_FULL = {
+var PENGZU_FULL = {
   '甲':'甲不开仓财物耗散', '乙':'乙不栽植千株不长', '丙':'丙不修灶必见灾殃', '丁':'丁不剃头头必生疮',
   '戊':'戊不受田田主不祥', '己':'己不破券二比并亡', '庚':'庚不经络织机虚张', '辛':'辛不合酱主人不尝',
   '壬':'壬不汲水更难提防', '癸':'癸不词讼理弱敌强',
@@ -2643,7 +2643,7 @@ function buildDailyComprehensiveAdvice(now, dayGZ, jianchu, xingxiu, zhishen, is
 
 
 // ===== 河洛数理系统 =====
-let HETU_LUOSHU_SYSTEM={
+var HETU_LUOSHU_SYSTEM={
   hetu:{
     formula:'天一生水地六成之；天二生火地七成之；天三生木地八成之；天四生金地九成之；天五生土地十成之',
     shengShu:{1:'水',2:'火',3:'木',4:'金',5:'土'},
@@ -2886,7 +2886,7 @@ function runHetuAnalysis(){
 
 // ===== 体质上传 =====
 // 存储第一步指标分析结果，供第二步使用
-let tzLastAnalysis = null;
+var tzLastAnalysis = null;
 
 function handleTizhiUpload(input) {
   const file = input.files[0];
@@ -3430,7 +3430,7 @@ function computeBaziCore(year, month, day, hour) {
  * 十天干十二月令调候用神详解表
  * 基于穷通宝鉴，按日主天干×月令地支给出调候用神及说明
  */
-let TIAOHOU_DETAIL = {
+var TIAOHOU_DETAIL = {
   '甲': {
     '寅': { gods: '丙火、癸水', need: '初春尚寒，需丙火暖局,癸水润木', priority: '丙火为主', desc: '甲木生寅月，初春余寒未消，以丙火暖局为急，癸水滋养为辅。' },
     '卯': { gods: '丙火、癸水', need: '春分后木气渐旺，需丙火照暖、癸水滋扶', priority: '丙火为主', desc: '甲木生卯月，木气正旺，丙火照暖使木条达，癸水润根。' },
@@ -5291,7 +5291,7 @@ function solarToLunar(solarYear, solarMonth, solarDay) {
 //  FAITH_FESTIVALS — 佛道儒重要节日活动数据库（农历日期）
 //  格式：'MM-DD'（农历月-日），school: fo=佛教 dao=道教 ru=儒家
 // ================================================================
-let FAITH_FESTIVALS = {
+var FAITH_FESTIVALS = {
   // ─── 佛教节日（30+）───
   '01-01': [{name:'弥勒菩萨圣诞', school:'fo', temple:'各佛教寺院', activity:'新年祈福法会', desc:'弥勒菩萨代表未来与希望，新年第一天参拜寓意新年新气象'}],
   '01-09': [{name:'帝释天尊圣诞', school:'fo', temple:'各佛教寺院', activity:'供佛斋天法会', desc:'感恩诸天护法，祈求一年平安顺遂'}],
@@ -7944,7 +7944,7 @@ const YJ_INTERP = {
   64:{overview:'火水未济，事未完成之卦。尚需努力，事在人为。未济之中，仍有希望。',person:'当前可能感到事情尚未完成，或有些遗憾。但未济卦告诉我们:未济不是失败，而是尚在路上。',matter:'火水未济，离上坎下，火在水上，事未成，尚需努力。占事得此卦，世在三爻，当以六五爻为用神参断。未济之要在"亨"——虽未成但能亨通，且"小狐汔济，濡其尾"——小狐狸快要过河却浸湿了尾巴，提示需谨慎。初六"濡其尾"尾巴被浸湿；九二"曳其轮"拖住车轮，贞吉；六三"未济"事未成；六五"贞吉无悔"守正吉祥，此为未济卦最佳用神爻；上九"有孚于饮酒"有诚信地饮酒无咎，若濡其首则诚信失是。未济问事，最忌"濡其尾"——未能坚持到最后，半途而废。此卦用神六五若持世或生世，则未济有济；若世爻临初六则需防半途而废。问事业：未完成期，当继续努力，不可半途而废；问财运：未成功期，继续投入但需防血本无归；问感情：感情未确定，继续培养但需防错付真心。时辰判断：寅卯辰时木气生扶离火，未济之象更盛；巳午时火气旺盛，火在水上，未济有济；申酉时金气旺盛，坎水被泄，未济稍缓；亥子时水气正旺，未济之象更纯。',timing:'继续期以年计，终有完成的一天。',direction:'正南、正北吉。',advice:'未济，亨。事未成，尚需努力。只要不放弃，就有完成的一天。'},
 };
 
-let yjVals = [], yjLine = 0, yjTossing = false, yjMode = 'person', yjQixinTime = '';
+var yjVals = [], yjLine = 0, yjTossing = false, yjMode = 'person', yjQixinTime = '';
 
 function yjStart(mode) {
  try {
@@ -9482,7 +9482,7 @@ function buildLiunianHTML(year, palaces) {
 }
 
 // 流年切换
-let _qimenCurrentYear = new Date().getFullYear();
+var _qimenCurrentYear = new Date().getFullYear();
 function switchLiunian(delta) {
   _qimenCurrentYear += delta;
   let liunianBox = document.getElementById('qmLiunianBox');
@@ -10977,7 +10977,7 @@ function getHuGua(benGuaLines) {
 }
 
 // --- 梅花易数知识库：64卦白话断语 ---
-let _MH_GUA_YI = {
+var _MH_GUA_YI = {
   '乾':'天道刚健，你正处于上升期。乾卦三连，纯阳之象，代表独立自主的能量。占得此卦，说明你有足够的力量去开创事业。但要记住"亢龙有悔"——太过了反而不好。保持刚正，但别太强硬。',
   '坤':'地道柔顺，你需要的不是硬碰硬，而是包容与等待。坤卦六断，代表接纳与承载。你现在像是在耕耘田地——默默付出，等待收获。别急着要结果，厚德才能载物。',
   '屯':'万事开头难。屯卦雷在水下，像是种子在土壤中挣扎。你面临的困难是暂时的，坚持就会破土而出。别在起步阶段就放弃，三个月内见分晓。',
@@ -11045,7 +11045,7 @@ let _MH_GUA_YI = {
 };
 
 // --- 八卦万物类象扩展 ---
-let _MH_GUA_XIANG_EXT = {
+var _MH_GUA_XIANG_EXT = {
   '乾': {nature:'天、刚健', body:'头、骨、肺', animal:'马、龙', direction:'西北', color:'金色、白色、大赤色', season:'秋、冬初', number:'1、4、9', person:'君、父、老人、领导', thing:'圆物、玉器、刚硬之物', place:'京都、大城市、高处'},
   '兑': {nature:'泽、喜悦', body:'口、舌、肺', animal:'羊', direction:'西', color:'白色、银色', season:'秋', number:'2、4、9', person:'少女、巫师、歌手', thing:'金属乐器、缺口之物', place:'沼泽、废井、缺口地'},
   '离': {nature:'火、光明、文明', body:'眼、心', animal:'雉、龟、螃蟹', direction:'南', color:'红色、紫色、橙色', season:'夏', number:'3、2、7', person:'中女、文人、艺术家', thing:'火烛、书籍、网', place:'火源、干燥之地、图书馆'},
@@ -11057,7 +11057,7 @@ let _MH_GUA_XIANG_EXT = {
 };
 
 // --- 月建五行旺衰表 ---
-let _YUE_JIAN_WANG_XIU = {
+var _YUE_JIAN_WANG_XIU = {
   '寅':{旺:'木',相:'火',休:'水',囚:'金',死:'土'}, '卯':{旺:'木',相:'火',休:'水',囚:'金',死:'土'},
   '辰':{旺:'土',相:'金',休:'火',囚:'木',死:'水'}, '巳':{旺:'火',相:'土',休:'木',囚:'水',死:'金'},
   '午':{旺:'火',相:'土',休:'木',囚:'水',死:'金'}, '未':{旺:'土',相:'金',休:'火',囚:'木',死:'水'},
@@ -11066,7 +11066,7 @@ let _YUE_JIAN_WANG_XIU = {
   '子':{旺:'水',相:'木',休:'金',囚:'土',死:'火'}, '丑':{旺:'土',相:'金',休:'火',囚:'木',死:'水'}
 };
 
-let _WANGXIU_DESC = {
+var _WANGXIU_DESC = {
   '旺':'得令当权，能量最盛。此时做事有气势，如顺水行舟。',
   '相':'次旺之态，虽不当令但受生扶。生机勃勃，有利发展。',
   '休':'退气休歇，能量不足。此时宜守不宜攻，耐心等待。',
@@ -11075,7 +11075,7 @@ let _WANGXIU_DESC = {
 };
 
 // --- 动爻位置梅花断法 ---
-let _DONGYAO_MEIHUA = {
+var _DONGYAO_MEIHUA = {
   1: {name:'初爻动', meaning:'事情刚刚开始，根基在变。好比盖房子，地基动了——要小心规划。', timing:'短期内（1-10天/周）见变化', advice:'当前重在奠基，别急着要结果。先把基础打牢，后面才能走得远。', bodyPart:'足/下盘', direction:'事之始端'},
   2: {name:'二爻动', meaning:'事情进展到中层，内在条件在变化。你自己或团队的状态在调整。', timing:'近期（10-30天/月）见变化', advice:'审视自身能力和资源，查漏补缺。如果条件不够，及时补充。', bodyPart:'腿/行动力', direction:'事之内在'},
   3: {name:'三爻动', meaning:'事情到了转折点，上下之间有变动。好比走到了十字路口，需要做出选择。', timing:'中期（1-3个月）见分晓', advice:'这个阶段最关键！你的选择决定后续走向。多听意见，别冲动决策。', bodyPart:'腰/转换点', direction:'事之转折'},
@@ -11085,7 +11085,7 @@ let _DONGYAO_MEIHUA = {
 };
 
 // --- 外应取象规则（《梅花易数》三要十应精华） ---
-let _WAI_YING_RULES = [
+var _WAI_YING_RULES = [
   '见圆物则事圆，见方物则事阻——《梅花易数》云："凡占之时，见圆物者事易成，见方物者事难成。"看到圆形的东西代表事情能圆满解决，看到方形的代表有阻碍。',
   '见人欢笑则吉，见人哭泣则凶——《梅花易数·三要》云："闻人笑声，喜事临门；见人哭泣，灾祸不远。"周围人的情绪是外应的直接信号。',
   '见水流则事通，见山阻则事滞——水代表流通顺利，山代表阻碍拖延。如果你在起卦时恰好看到水流或道路通畅，是非常好的外应。',
@@ -11099,7 +11099,7 @@ let _WAI_YING_RULES = [
 ];
 
 // --- 内应取象规则（体用篇核心） ---
-let _NEI_YING_GUIDE = {
+var _NEI_YING_GUIDE = {
   '乾': ['天时：晴天万里，代表事情明朗顺利', '见君主官员，主事业升迁', '见玉器珠宝，主财富增益', '见老马良马，主出行顺利', '见圆形建筑，主事情圆满'],
   '兑': ['见口舌争执，主是非纠纷', '见少女欢笑，主喜事临门', '见金属残缺，主破财之兆', '见泽中水月，主虚幻之事', '见双人对话，主合作交流'],
   '离': ['见火光闪烁，主紧急之事', '见文书契约，主合同签约', '见龟鳖鱼虫，主缓慢有获', '见干燥龟裂，主缺水之困', '见红色衣物，主喜事将近'],
@@ -12533,7 +12533,9 @@ function _getJiRi(stem) {
 //  INIT
 // ================================================================
 
-document.addEventListener('DOMContentLoaded', initCompositeSections);
+document.addEventListener('DOMContentLoaded', function(){
+  if(typeof initCompositeSections==='function') initCompositeSections();
+});
 
 // URL hash 导航：支持 #section-xxx?sub=yyy 格式
 document.addEventListener('DOMContentLoaded', function() {
@@ -12591,7 +12593,8 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', () => {
   try {
   // 渲染六十四卦网格
-  setTimeout(renderYijingGuaGrid, 200);
+  if(typeof renderYijingGuaGrid==='function') setTimeout(renderYijingGuaGrid, 200);
+  else console.warn('[TEST_DATA] renderYijingGuaGrid 未定义，跳过六十四卦网格渲染');
   const today = new Date();
   const y = today.getFullYear();
   const m = String(today.getMonth()+1).padStart(2,'0');
@@ -12601,7 +12604,7 @@ document.addEventListener('DOMContentLoaded', () => {
   inputs.forEach(el => { if (el) { el.value = ds; el.max = ds; } });
   try { initDailyWisdom(); } catch(e1) { console.warn('initDailyWisdom failed:', e1); }
   // 初始化今日知识推送
-  setTimeout(initDailyKnowledge, 300);
+  if(typeof initDailyKnowledge==='function') setTimeout(initDailyKnowledge, 300);
   } catch(e) { console.error('DOMContentLoaded init error:', e); showToast('页面初始化出错'); }
   showToast('DOMContentLoaded init error:，请重试');
 });
@@ -12720,7 +12723,7 @@ function getSolarFestival(month, day) {
 //  LUOPAN ENGINE
 // ================================================================
 
-let currentCompass = 'qimen';
+var currentCompass = 'qimen';
 
 function selectCompass(name) {
   currentCompass = name;
@@ -13541,9 +13544,9 @@ const LUOPAN_BAGUA_HOUTIAN = [
 ];
 
 // 罗盘旋转角度
-let compassRotation = 0;
-let compassDragging = false;
-let compassLastAngle = 0;
+var compassRotation = 0;
+var compassDragging = false;
+var compassLastAngle = 0;
 
 // 绘制传统罗盘底层 (天池+八卦+二十四山+360度刻度)
 function drawTraditionalBase(ctx, cx, cy, scale) {
@@ -13727,7 +13730,7 @@ function initCompassDrag() {
 }
 
 // 增强版renderCompass包装 - 在原版基础上添加传统底层
-let _origRenderCompass = renderCompass;
+var _origRenderCompass = renderCompass;
 renderCompass = function() {
   try {
     let dateStr = document.getElementById('lpDate').value;
@@ -14960,8 +14963,8 @@ const WORSHIP_GUIDES = {
   }
 };
 
-let currentWorshipFaith = 'ru';
-let currentWorshipStep = 0;
+var currentWorshipFaith = 'ru';
+var currentWorshipStep = 0;
 
 function showWorship(faith) {
   currentWorshipFaith = faith;
@@ -16146,7 +16149,7 @@ function analyzeFloorPlan(imgEl) {
 
 // 简易风水评分
 // 户型图上传处理
-let fengshuiImageData = null;
+var fengshuiImageData = null;
 
 function initFengshuiUpload() {
   const zone = document.getElementById('fengshuiUploadZone');
@@ -17278,10 +17281,10 @@ function frToggleCalendar() {
 // ================================================================
 // ===== 全家宅系统 =====
 // ================================================================
-let fsFamilyMembers = [];
+var fsFamilyMembers = [];
 
 // 五行方位映射
-let WUXING_DIRECTION = {
+var WUXING_DIRECTION = {
   '木': ['东', '东南'],
   '火': ['南'],
   '土': ['西南', '东北'],
@@ -17290,7 +17293,7 @@ let WUXING_DIRECTION = {
 };
 
 // 24山精确方位
-let MOUNTAIN_24 = {
+var MOUNTAIN_24 = {
   '北': ['壬', '子', '癸'],
   '西南': ['未', '坤', '申'],
   '东': ['甲', '卯', '乙'],
@@ -17302,20 +17305,20 @@ let MOUNTAIN_24 = {
 };
 
 // 太岁方（年支→太岁方位）
-let TAI_SUI_FANG = {
+var TAI_SUI_FANG = {
   '子': '北', '丑': '东北', '寅': '东北', '卯': '东',
   '辰': '东南', '巳': '东南', '午': '南', '未': '西南',
   '申': '西南', '酉': '西', '戌': '西北', '亥': '北'
 };
 
 // 三煞方（年支→三煞方位）
-let SAN_SHA_FANG = {
+var SAN_SHA_FANG = {
   '申子辰': '南', '亥卯未': '西',
   '寅午戌': '北', '巳酉丑': '东'
 };
 
 // 奇门四害化解方案
-let QIMEN_SI_HAI = {
+var QIMEN_SI_HAI = {
   '死门': {
     name: '死门',
     desc: '主死亡、丧吊、官非',
@@ -17355,7 +17358,7 @@ let QIMEN_SI_HAI = {
 };
 
 // 吉祥物专业数据库
-let MASCOT_DB = {
+var MASCOT_DB = {
   '财位': [
     { type: '黄水晶球', material: '天然黄水晶', color: '黄色', size: '中(直径6-8cm)', direction: '财位正中', period: '常年摆放，每年立春净化', kaiguang: true },
     { type: '聚宝盆', material: '陶瓷/铜制', color: '金色/黄色', size: '中(直径15cm)', direction: '财位靠墙处', period: '常年摆放', kaiguang: true },
@@ -17865,7 +17868,7 @@ function _computeRoomAssignment(members) {
 }
 
 // ═══ 月度飞星化解数据库 ═══
-let MONTHLY_STAR_CURES = {
+var MONTHLY_STAR_CURES = {
   5: { // 五黄大煞
     name: '五黄廉贞星',
     type: '大凶',
@@ -17959,7 +17962,7 @@ let MONTHLY_STAR_CURES = {
 };
 
 // 化解物品到期处置方法
-let CURE_DISPOSAL_METHODS = [
+var CURE_DISPOSAL_METHODS = [
   { type: '开光物品（铜葫芦/六帝钱/八卦镜等）', method: '送回寺庙或道观处理，不可随意丢弃', detail: '将物品用红布包好，送至附近寺庙/道观，交给法师处理。若无条件，可在农历初一/十五用粗盐水擦拭后，红布包好放置高处。' },
   { type: '五行物品（水晶/陶瓷/金属摆件）', method: '红布包好后丢弃或收纳', detail: '用红布或红纸将物品包好，方可丢弃。若物品完好可继续使用，用粗盐擦拭净化后收纳至柜中，来年再取出使用。' },
   { type: '风水摆件（貔貅/麒麟/龙龟等神兽）', method: '粗盐净化后收起或更换方位', detail: '将摆件用粗盐擦拭全身，在阳光下晾晒半日（避开正午），然后用红布包好收入柜中。若来年需继续使用，重新开光后更换方位摆放。' },
@@ -22380,8 +22383,8 @@ function getKe(ele) {
 // ═══════════════════════════════════════════════════════════
 
 // --- 60甲子循环常数 ---
-const J_STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-const J_BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+var J_STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+var J_BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
 const J_ELE = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
 const J_ZHI_ELE = {子:'水',丑:'土',寅:'木',卯:'木',辰:'土',巳:'火',午:'火',未:'土',申:'金',酉:'金',戌:'土',亥:'水'};
 
@@ -22515,7 +22518,7 @@ function getHourFate(stemIdx, branchIdx) {
 // ================================================================
 // 二十四节气计算与民俗知识库
 // ================================================================
-let _stBase = {
+var _stBase = {
   '小寒':[0,5],'大寒':[0,20],'立春':[1,3],'雨水':[1,18],
   '惊蛰':[2,5],'春分':[2,20],'清明':[3,4],'谷雨':[3,19],
   '立夏':[4,5],'小满':[4,20],'芒种':[5,5],'夏至':[5,21],
@@ -22523,7 +22526,7 @@ let _stBase = {
   '白露':[8,7],'秋分':[8,22],'寒露':[9,8],'霜降':[9,23],
   '立冬':[10,7],'小雪':[10,22],'大雪':[11,6],'冬至':[11,21]
 };
-let _stOrder = ['冬至','小寒','大寒','立春','雨水','惊蛰','春分','清明','谷雨','立夏','小满','芒种','夏至','小暑','大暑','立秋','处暑','白露','秋分','寒露','霜降','立冬','小雪','大雪','冬至'];
+var _stOrder = ['冬至','小寒','大寒','立春','雨水','惊蛰','春分','清明','谷雨','立夏','小满','芒种','夏至','小暑','大暑','立秋','处暑','白露','秋分','寒露','霜降','立冬','小雪','大雪','冬至'];
 
 function getSolarTerm(date) {
   let year = date.getFullYear();
@@ -22545,7 +22548,7 @@ function getSolarTerm(date) {
   return { name: null, isTermDay: false };
 }
 
-let SOLAR_TERM_INFO = {
+var SOLAR_TERM_INFO = {
   '小寒':{food:'腊八粥/羊肉汤',taboo:'忌吃生冷、忌懒散不动',health:'多吃温热，适当进补，早睡晚起',wisdom:'小寒小寒，防寒保暖；春打六九头，吃穿不用愁'},
   '大寒':{food:'八宝饭/糯米饭',taboo:'忌房屋破漏、忌与人争执',health:'冬藏宜静养心神，适当锻炼',wisdom:'大寒大寒，无风自寒；年关将近，备年迎春'},
   '立春':{food:'春饼/萝卜/韭菜',taboo:'忌搬家、忌看病、忌争吵',health:'养肝护阳，早起梳头，适量运动',wisdom:'立春一年端，种地早盘算；春捂秋冻'},
@@ -22572,7 +22575,7 @@ let SOLAR_TERM_INFO = {
   '冬至':{food:'饺子/汤圆/馄饨',taboo:'忌婚嫁、忌搬家、忌动土、忌深夜外出',health:'数九寒天，宜静养，补肾藏精',wisdom:'冬至大如年；吃了冬至面，一天长一线；冬至一阳生'}
 };
 
-let DAILY_WISDOM_TIPS = [
+var DAILY_WISDOM_TIPS = [
   '早起晒太阳，顺应天时，一整天精力充沛',
   '睡前泡脚15分钟，引火归元，安眠又养生',
   '辰时（7-9点）胃经当令，此刻吃早餐最养脾胃',
@@ -22674,8 +22677,8 @@ function calcJiuriScore(stemIdx, branchIdx, dayDate) {
 }
 
 // --- 月历渲染 ---
-let _jiuriYear = new Date().getFullYear();
-let _jiuriMonth = new Date().getMonth();
+var _jiuriYear = new Date().getFullYear();
+var _jiuriMonth = new Date().getMonth();
 
 function jiuriInit() {
   const sel = document.getElementById('jiuriYearSelect');
@@ -23121,7 +23124,7 @@ window._jiuriInitDone = false;
 // ================================================================
 
 // --- 20种事项完整配置 ---
-let PRECISION_EVENT_CONFIG = {
+var PRECISION_EVENT_CONFIG = {
   '祭祀': {
     jianchu: ['开','定','满','建'], good: ['天德','月德','天恩'], bad: ['月破'],
     careerBonus: {},
@@ -23250,14 +23253,14 @@ let PRECISION_EVENT_CONFIG = {
 };
 
 // --- 职业五行属性 ---
-let CAREER_WUXING = {
+var CAREER_WUXING = {
   '经商': '金', '文职': '木', '技术': '水', '医疗': '木',
   '教育': '木', '法律': '金', '建筑': '土', '餐饮': '火',
   '运输': '水', '艺术': '火', '公务员': '土', '自由职业': '综合'
 };
 
 // --- 职业专属吉神 ---
-let CAREER_JISHEN = {
+var CAREER_JISHEN = {
   '经商': ['益后','续世','天恩','母仓','圣心'],
   '文职': ['圣心','驿马','天恩','月恩'],
   '技术': ['驿马','天恩','月恩'],
@@ -23273,7 +23276,7 @@ let CAREER_JISHEN = {
 };
 
 // --- 城市方位五行推算（主要城市） ---
-let CITY_DIRECTION_WUXING = {
+var CITY_DIRECTION_WUXING = {
   '北京': {direction: '北', wuxing: '水', shaConflict: '南', lng: 116.4},
   '上海': {direction: '东', wuxing: '木', shaConflict: '西', lng: 121.5},
   '广州': {direction: '南', wuxing: '火', shaConflict: '北', lng: 113.3},
@@ -23313,7 +23316,7 @@ let CITY_DIRECTION_WUXING = {
 };
 
 // 方位关键词匹配
-let DIRECTION_KEYWORDS = {
+var DIRECTION_KEYWORDS = {
   '北': ['北','蒙','黑','吉','辽'],
   '南': ['南','粤','桂','琼','湘','赣'],
   '东': ['东','沪','浙','苏','鲁','闽','皖'],
@@ -23322,10 +23325,10 @@ let DIRECTION_KEYWORDS = {
 };
 
 // --- 节气配置 ---
-let JIEQI_LIST = ['小寒','大寒','立春','雨水','惊蛰','春分','清明','谷雨','立夏','小满','芒种','夏至','小暑','大暑','立秋','处暑','白露','秋分','寒露','霜降','立冬','小雪','大雪','冬至'];
+var JIEQI_LIST = ['小寒','大寒','立春','雨水','惊蛰','春分','清明','谷雨','立夏','小满','芒种','夏至','小暑','大暑','立秋','处暑','白露','秋分','寒露','霜降','立冬','小雪','大雪','冬至'];
 
 // 节气对事项的影响
-let JIEQI_EVENT_TIPS = {
+var JIEQI_EVENT_TIPS = {
   '动土': {good: ['立春','雨水','惊蛰','春分'], bad: ['冬至','大寒','小寒'], tip: '立春后土气上升，宜动土；冬季土冻不宜破土'},
   '装修': {good: ['立春','雨水','惊蛰','春分','清明'], bad: ['冬至','小雪','大雪'], tip: '春暖花开宜装修'},
   '安葬': {good: ['清明','冬至'], bad: ['立春','立夏','立秋','立冬'], tip: '清明冬至前后宜安葬，四立日忌安葬'},
@@ -23337,7 +23340,7 @@ let JIEQI_EVENT_TIPS = {
 };
 
 // 节气日期表（公历近似）
-let JIEQI_APPROX_DATE = [
+var JIEQI_APPROX_DATE = [
   {name:'小寒', month:1, day:6}, {name:'大寒', month:1, day:20},
   {name:'立春', month:2, day:4}, {name:'雨水', month:2, day:19},
   {name:'惊蛰', month:3, day:6}, {name:'春分', month:3, day:21},
@@ -24326,8 +24329,8 @@ window.runPrecisionZeRi = runPrecisionZeRi;
 // ===== 择日多人参与功能 (MULTI_PERSON_ZERI) =====
 // ================================================================
 
-let _zeriMembers = [];
-let _zeriMemberIdCounter = 0;
+var _zeriMembers = [];
+var _zeriMemberIdCounter = 0;
 
 /**
  * 添加择日参与人
@@ -24575,7 +24578,7 @@ window.analyzeMultiPersonZeri = analyzeMultiPersonZeri;
 // ================================================================
 
 // 九宫飞星年星表 - 动态生成1900-2100年
-let YEARLY_FLYING_STARS = {};
+var YEARLY_FLYING_STARS = {};
 (function() {
   for (let yr = 1900; yr <= 2100; yr++) {
     let centerStar = _getYearFlyingStar(yr);
@@ -24595,13 +24598,13 @@ let YEARLY_FLYING_STARS = {};
 })();
 
 // 星名映射
-let STAR_NAMES = {
+var STAR_NAMES = {
   1: '一白贪狼星', 2: '二黑巨门星', 3: '三碧禄存星', 4: '四绿文曲星',
   5: '五黄廉贞星', 6: '六白武曲星', 7: '七赤破军星', 8: '八白左辅星', 9: '九紫右弼星'
 };
 
 // 流年凶方位（需化解）1900-2100
-let YEARLY_NEGATIVE_DIRECTIONS = {};
+var YEARLY_NEGATIVE_DIRECTIONS = {};
 (function() {
   for (let yr = 2024; yr <= 2030; yr++) {
     let stars = YEARLY_FLYING_STARS[yr];
@@ -24626,7 +24629,7 @@ let YEARLY_NEGATIVE_DIRECTIONS = {};
 })();
 
 // 流年吉方位（宜催旺）1900-2100
-let YEARLY_POSITIVE_DIRECTIONS = {};
+var YEARLY_POSITIVE_DIRECTIONS = {};
 (function() {
   for (let yr = 2024; yr <= 2030; yr++) {
     let stars = YEARLY_FLYING_STARS[yr];
@@ -24653,7 +24656,7 @@ let YEARLY_POSITIVE_DIRECTIONS = {};
 })();
 
 // 吉祥物数据库（AUSPICIOUS_ITEMS）
-let AUSPICIOUS_ITEMS = {
+var AUSPICIOUS_ITEMS = {
   // 财运类
   '水晶洞': { wuxing: '土', function: '聚财纳气', placement: '财位（当年八白星方位）', timing: '年初摆放', disposal: '年底用粗盐净化后可继续使用', price_range: '200-2000元', category: '财运' },
   '貔貅': { wuxing: '金', function: '招财辟邪', placement: '朝向大门或窗外', timing: '开光后摆放', disposal: '每年用茶油擦拭养护', price_range: '100-5000元', category: '财运' },
@@ -25122,7 +25125,7 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
  * 每运20年，9运合计180年一个大循环，之后重复
  * 基准起点：1864年甲子年(上元一白坎水运)
  */
-let SANYUAN_JIUYUN = {
+var SANYUAN_JIUYUN = {
   // ===== 上元 =====
   1: {
     name: '一白坎水运', yuan: '上元',
@@ -25317,7 +25320,7 @@ function getYunHalf(yun, year) {
 //  九紫离火运（2024-2043）详细生活择业指南
 // ════════════════════════════════════════════════════════════════
 
-let JIU_ZI_LI_HUO_GUIDE = {
+var JIU_ZI_LI_HUO_GUIDE = {
   period: '2024-2043',
   overview: '九紫离火运，离卦为火、为明、为丽。主文化繁荣、科技革命、女性崛起、虚拟经济。离为中女，中年女性将在这20年大放异彩。火主光明，一切与光、电、信息、文化相关的事业将蓬勃发展。',
 
@@ -25464,7 +25467,7 @@ let JIU_ZI_LI_HUO_GUIDE = {
  * 60年 = 上元(1-3运) + 中元(4-6运) 或 中元(4-6运) + 下元(7-9运) 等
  * 用于大运年份与个人八字大运的交叉分析
  */
-let SANYUAN_60YEAR_STRUCTURE = {
+var SANYUAN_60YEAR_STRUCTURE = {
   // 1864-1923: 上元完整60年
   '1864-1923': {
     yuan: '上元',
@@ -27176,7 +27179,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // 监听section切换，延迟注入按钮 + 自动填充缘主信息
-let _origShowSectionWrap = null;
+var _origShowSectionWrap = null;
 document.addEventListener('DOMContentLoaded', function() {
   _origShowSectionWrap = window.showSection;
   if (_origShowSectionWrap) {
@@ -27233,8 +27236,8 @@ try { window.showAutoFillHint = showAutoFillHint; } catch(e){console.warn(e.mess
 // 家庭综合排盘系统
 // ================================================================
 
-let familyMembers = []; // 家庭成员列表
-let familyMemberSeq = 0; // 成员序号
+var familyMembers = []; // 家庭成员列表
+var familyMemberSeq = 0; // 成员序号
 
 /**
  * 添加家庭成员
@@ -27908,7 +27911,7 @@ function lpToggleCalendar() {
 }
 
 // 五行方位城市表
-let LP_CITY_MAP = {
+var LP_CITY_MAP = {
   '木': {direction: '东方/东南方', cities: ['上海', '杭州', '南京', '苏州', '宁波', '无锡', '合肥', '福州', '厦门']},
   '火': {direction: '南方', cities: ['广州', '深圳', '海口', '南宁', '珠海', '东莞', '佛山', '湛江', '三亚']},
   '土': {direction: '中央/西南', cities: ['成都', '重庆', '长沙', '武汉', '郑州', '昆明', '贵阳', '南昌', '西安']},
@@ -27917,7 +27920,7 @@ let LP_CITY_MAP = {
 };
 
 // 日主五行兴趣推荐表
-let LP_HOBBY_MAP = {
+var LP_HOBBY_MAP = {
   '木': ['音乐', '书法', '园艺', '文学创作', '武术', '茶道', '盆景艺术', '古琴'],
   '火': ['表演', '绘画', '演讲', '摄影', '舞蹈', '戏剧', '魔术', '动漫设计'],
   '土': ['陶艺', '收藏', '建筑模型', '烹饪', '历史研究', '考古', '玉石鉴赏', '手工制作'],
@@ -28295,7 +28298,7 @@ function lpRecommendMarriage(baziData, sex) {
 // ================================================================
 
 // 长生十二宫 → 人生阶段映射
-let LP_CS_STAGE_MAP = {
+var LP_CS_STAGE_MAP = {
   '长生': {
     ageRange: [0, 10], name: '长生期', desc: '如初生之苗，生机勃发', guidance: '打基础，学习，培养兴趣，发展健康的身心习惯',
     auspicious: 1, advice: '此阶段为人生根基，宜注重营养、教育启蒙、性格塑造。家长应给予充分关爱与引导。',
@@ -28455,7 +28458,7 @@ let LP_CS_STAGE_MAP = {
 };
 
 // 长生十二宫阶段吉凶描述
-let LP_CS_FORTUNE_MAP = {
+var LP_CS_FORTUNE_MAP = {
   '长生': '吉——生机旺盛，宜开创新事',
   '沐浴': '凶——飘摇不定，宜守不宜进',
   '冠带': '吉——初成气象，宜积累精进',
@@ -28471,7 +28474,7 @@ let LP_CS_FORTUNE_MAP = {
 };
 
 // 日主五行健康对照表
-let LP_HEALTH_MAP = {
+var LP_HEALTH_MAP = {
   '木': {
     organs: '肝胆系统、神经系统、筋骨',
     risks: '肝气郁结、偏头痛、颈椎病、眼干眼涩',
@@ -28515,7 +28518,7 @@ let LP_HEALTH_MAP = {
 };
 
 // 合伙人五行推荐表
-let LP_PARTNER_MAP = {
+var LP_PARTNER_MAP = {
   '木': {best: ['水', '火'], ok: ['木'], avoid: ['金'], reason: '水生木为贵人，木生火为相辅；金克木为忌'},
   '火': {best: ['木', '土'], ok: ['火'], avoid: ['水'], reason: '木生火为贵人，火生土为相辅；水克火为忌'},
   '土': {best: ['火', '金'], ok: ['土'], avoid: ['木'], reason: '火生土为贵人，土生金为相辅；木克土为忌'},
@@ -30031,7 +30034,7 @@ try { window.lpToggleCalendar = lpToggleCalendar; } catch(e){console.warn(e.mess
 // ================================================================
 
 // 青少年兴趣推荐表（日主五行）
-let YOUTH_HOBBY_MAP = {
+var YOUTH_HOBBY_MAP = {
   '木': {items: ['书法', '绘画', '园艺', '音乐（古琴/竹笛）'], desc: '木主仁，性温向上，适合静态艺术类爱好', traits: '温文尔雅、有同情心、喜欢自然'},
   '火': {items: ['演讲', '表演', '体育', '摄影'], desc: '火主礼，热情活跃，适合动态表达类爱好', traits: '热情开朗、表现欲强、精力充沛'},
   '土': {items: ['棋类', '陶艺', '烹饪', '收藏'], desc: '土主信，稳重踏实，适合稳重类爱好', traits: '沉稳可靠、有耐心、做事有条理'},
@@ -30040,7 +30043,7 @@ let YOUTH_HOBBY_MAP = {
 };
 
 // 青少年学业方向推荐表（十神）
-let YOUTH_STUDY_MAP = {
+var YOUTH_STUDY_MAP = {
   zhengYin:  {items: ['文学', '历史', '哲学', '教育学'], type: '学术型', desc: '正印旺，主学习力强、学术天赋高'},
   pianYin:   {items: ['中医', '玄学', '艺术研究', '前沿科学'], type: '研究型', desc: '偏印旺，主非主流学问、偏科天赋'},
   shiShen:   {items: ['创意设计', '传媒', '影视制作', '餐饮美食'], type: '创造型', desc: '食神旺，主才智外放、创造力强'},
@@ -30054,7 +30057,7 @@ let YOUTH_STUDY_MAP = {
 };
 
 // 五行行业对应表（用于志愿推荐）
-let YOUTH_INDUSTRY_MAP = {
+var YOUTH_INDUSTRY_MAP = {
   '木': {industries: ['教育', '出版', '农业', '服装设计', '家具制造', '环境保护'], majors: ['教育学', '汉语言文学', '农学', '服装设计与工程', '风景园林', '环境工程'], unis: ['北京师范大学', '中国农业大学', '东华大学', '南京林业大学', '华东师范大学']},
   '火': {industries: ['能源', '餐饮', '电子信息', '传媒', '美容', '心理咨询'], majors: ['能源与动力工程', '电子信息工程', '新闻传播学', '食品科学与工程', '应用心理学', '播音与主持'], unis: ['华中科技大学', '电子科技大学', '中国传媒大学', '江南大学', '华南理工大学']},
   '土': {industries: ['房地产', '建筑工程', '陶瓷', '现代农业', '仓储物流', '殡葬服务'], majors: ['建筑学', '土木工程', '城乡规划', '农业工程', '物流管理', '社会工作'], unis: ['东南大学', '同济大学', '天津大学', '中国农业大学', '北京交通大学']},
@@ -30063,7 +30066,7 @@ let YOUTH_INDUSTRY_MAP = {
 };
 
 // 青少年性格特点表
-let YOUTH_PERSONALITY_MAP = {
+var YOUTH_PERSONALITY_MAP = {
   '木': {
     traits: '温文尔雅、有同情心、正直向上、富有朝气',
     cultivate: '鼓励多表达自我，培养决断力；多参加户外活动避免过于内向；注意培养抗挫折能力',
@@ -30092,7 +30095,7 @@ let YOUTH_PERSONALITY_MAP = {
 };
 
 // 青少年健康提示表
-let YOUTH_HEALTH_MAP = {
+var YOUTH_HEALTH_MAP = {
   '木': {organs: '肝胆系统、眼睛、筋骨', tips: '注意用眼卫生，多到户外活动；少熬夜；适量食绿色蔬菜、枸杞菊花茶'},
   '火': {organs: '心血管、眼睛、血液', tips: '避免过劳和情绪激动；少食辛辣油炸；多食红枣、莲子；保证充足睡眠'},
   '土': {organs: '脾胃、消化系统', tips: '饮食规律，忌暴饮暴食；少食生冷；多食小米、南瓜等黄色食物；饭后散步'},
@@ -31431,7 +31434,7 @@ try { window.runZeRiBirth = runZeRiBirth; } catch(e){console.warn(e.message)}
 // ═══════════════════════════════════════════════════════════
 
 // --- 六十甲子常数 ---
-let JIAZI_60 = [
+var JIAZI_60 = [
   '甲子','乙丑','丙寅','丁卯','戊辰','己巳','庚午','辛未','壬申','癸酉',
   '甲戌','乙亥','丙子','丁丑','戊寅','己卯','庚辰','辛巳','壬午','癸未',
   '甲申','乙酉','丙戌','丁亥','戊子','己丑','庚寅','辛卯','壬辰','癸巳',
@@ -31441,7 +31444,7 @@ let JIAZI_60 = [
 ];
 
 // 纳音五行全表（30组对，每组对应2个干支）
-let NAYIN_30 = [
+var NAYIN_30 = [
   '海中金','海中金','炉中火','炉中火','大林木','大林木',
   '路旁土','路旁土','剑锋金','剑锋金','山头火','山头火',
   '涧下水','涧下水','城头土','城头土','白蜡金','白蜡金',
@@ -31455,7 +31458,7 @@ let NAYIN_30 = [
 ];
 
 // 纳音五行所属正五行
-let NAYIN_WUXING = {
+var NAYIN_WUXING = {
   '海中金':'金','炉中火':'火','大林木':'木','路旁土':'土','剑锋金':'金',
   '山头火':'火','涧下水':'水','城头土':'土','白蜡金':'金','杨柳木':'木',
   '泉中水':'水','屋上土':'土','霹雳火':'火','松柏木':'木','长流水':'水',
@@ -31465,17 +31468,17 @@ let NAYIN_WUXING = {
 };
 
 // 地支六冲
-let ZHI_CHONG = [
+var ZHI_CHONG = [
   {a:'子',b:'午'},{a:'丑',b:'未'},{a:'寅',b:'申'},
   {a:'卯',b:'酉'},{a:'辰',b:'戌'},{a:'巳',b:'亥'}
 ];
 // 地支六合
-let ZHI_LIUHE = [
+var ZHI_LIUHE = [
   {a:'子',b:'丑'},{a:'寅',b:'亥'},{a:'卯',b:'戌'},
   {a:'辰',b:'酉'},{a:'巳',b:'申'},{a:'午',b:'未'}
 ];
 // 地支三合局
-let ZHI_SANHE = [
+var ZHI_SANHE = [
   ['申','子','辰'],['亥','卯','未'],['寅','午','戌'],['巳','酉','丑']
 ];
 
@@ -32626,7 +32629,7 @@ try { window.runJiaziCycle = runJiaziCycle; } catch(e){console.warn(e.message)}
 /**
  * 关系权重配置
  */
-let MULTI_ZERI_WEIGHTS = {
+var MULTI_ZERI_WEIGHTS = {
   '本人': 1.0,
   '配偶': 0.8,
   '父母': 0.6,
@@ -32637,7 +32640,7 @@ let MULTI_ZERI_WEIGHTS = {
 /**
  * 多人事项配置（复用PRECISION_EVENT_CONFIG，补充映射）
  */
-let MULTI_ZERI_PURPOSE_MAP = {
+var MULTI_ZERI_PURPOSE_MAP = {
   '搬家': '搬家',
   '装修': '动土',
   '结婚': '婚嫁',
@@ -33261,7 +33264,7 @@ function _generateMultiZeRiReport(result, personDataList) {
 /**
  * 参与人计数器
  */
-let _multiZeriPersonCount = 0;
+var _multiZeriPersonCount = 0;
 
 /**
  * 添加参与人卡片
@@ -33461,7 +33464,7 @@ window.toggleDivinationMode = toggleDivinationMode;
 // ═══ 报告模块化系统 (Report Modular System) ═══
 // ════════════════════════════════════════════════════════════
 
-let REPORT_MODULES = {
+var REPORT_MODULES = {
   'overview':      { name: '命盘概要',   desc: '日主/五行/格局/用神',       icon: '📋', order: 1 },
   'shishen':       { name: '十神分析',   desc: '十神分布与性格',           icon: '🔮', order: 2 },
   'geju':          { name: '格局用神',   desc: '格局判定与喜忌',           icon: '⚖️', order: 3 },
@@ -35884,7 +35887,7 @@ function buildCangganHTML(pillars, dayStem) {
 //  每颗主星在十二宫的亮度
 // ================================================================
 
-let ZW_STAR_STRENGTH = {
+var ZW_STAR_STRENGTH = {
   '紫微': {0:'旺',1:'旺',2:'庙',3:'庙',4:'陷',5:'陷',6:'旺',7:'旺',8:'陷',9:'陷',10:'平',11:'平'},
   '天机': {0:'陷',1:'陷',2:'庙',3:'庙',4:'庙',5:'庙',6:'陷',7:'陷',8:'平',9:'平',10:'平',11:'平'},
   '太阳': {0:'陷',1:'陷',2:'庙',3:'庙',4:'庙',5:'庙',6:'庙',7:'陷',8:'陷',9:'陷',10:'陷',11:'陷'},
@@ -35902,7 +35905,7 @@ let ZW_STAR_STRENGTH = {
 };
 
 // 庙旺平陷含义
-let ZW_STRENGTH_DESC = {
+var ZW_STRENGTH_DESC = {
   '庙': { level: 5, name: '庙', desc: '星曜力量最强，吉凶加倍', multiplier: 2.0 },
   '旺': { level: 4, name: '旺', desc: '星曜力量强，吉凶加成', multiplier: 1.5 },
   '平': { level: 3, name: '平', desc: '星曜力量正常，吉凶如常', multiplier: 1.0 },
@@ -36734,7 +36737,7 @@ function computeHugua(benguaLines) {
 // ================================================================
 // P2-3. 月建/日建对六爻用神影响
 // ================================================================
-let YONGSHEN_MAP = {
+var YONGSHEN_MAP = {
   '事业':'官鬼', '工作':'官鬼', '考试':'官鬼', '官运':'官鬼',
   '财运':'妻财', '求财':'妻财', '投资':'妻财', '生意':'妻财',
   '婚姻':'妻财', '感情':'妻财', '姻缘':'妻财',
@@ -36746,7 +36749,7 @@ let YONGSHEN_MAP = {
   '父母':'父母', '长辈':'父母', '房屋':'父母'
 };
 
-let LIUQIN_WX = {
+var LIUQIN_WX = {
   '父母':'土', // 父母爻属土（生金者），实际随卦宫五行而定
   '兄弟':'木',
   '子孙':'水',
@@ -37620,7 +37623,7 @@ function getDayunKongWang(dayunArr, pillars, dayStem) {
 try { window.getDayunKongWang = getDayunKongWang; } catch(e){console.warn(e.message)}
 
 // ═══════ 补全：纳音取象 ═══════
-let NAYIN_XIANG = {
+var NAYIN_XIANG = {
   '海中金':'矿藏待发掘，大器晚成，宜蓄力待发',
   '炉中火':'冶炼锻造之火，需锤炼成器，宜精进打磨',
   '大林木':'参天栋梁之材，气度不凡，宜担大任',
@@ -37659,7 +37662,7 @@ try { window.NAYIN_XIANG = NAYIN_XIANG; } catch(e){console.warn(e.message)}
 try { window.getNayinXiang = getNayinXiang; } catch(e){console.warn(e.message)}
 
 // ═══════ 补全：十神心性 ═══════
-let SHISHEN_XINXING = {
+var SHISHEN_XINXING = {
   '正官':'正直守序，有责任心，重名节。宜体制内/管理岗/公益事业',
   '七杀':'刚毅果断，有魄力，领导欲强。宜军警/创业/竞争性行业',
   '正印':'慈悲仁爱，有学识，乐于助人。宜教育/科研/文化事业',
@@ -37678,7 +37681,7 @@ try { window.SHISHEN_XINXING = SHISHEN_XINXING; } catch(e){console.warn(e.messag
 try { window.getShishenXinxing = getShishenXinxing; } catch(e){console.warn(e.message)}
 
 // ═══════ 补全：格局喜忌 ═══════
-let GEJU_XIJI = {
+var GEJU_XIJI = {
   '正官格':'喜财印护官，喜官得位。忌伤官克官，忌七杀混官',
   '七杀格':'喜食神制杀，喜印绶化杀。忌财星党杀，忌无制',
   '正财格':'喜正官护财，喜食伤生财。忌比劫夺财，忌伤官见官',
@@ -38207,7 +38210,7 @@ function judgeJinshenTuishen(yao1, yao2) {
 try { window.judgeJinshenTuishen = judgeJinshenTuishen; } catch(e){console.warn(e.message)}
 
 // ═══════ 补全：形势派风水 ═══════
-let XINGSHI_SHA = {
+var XINGSHI_SHA = {
   '路冲煞':{desc:'直路冲门，如箭射入，主血光破财', severity:'严重', solution:'设石敢当/泰山石或屏风挡煞'},
   '角煞':{desc:'邻楼尖角直冲门窗，主口舌是非伤灾', severity:'严重', solution:'挂铜葫芦或八卦镜化解'},
   '反弓水':{desc:'弧形路弯曲，弓背对宅，如箭离弦，主破财', severity:'严重', solution:'门槛加高或门前设石狮/石墩挡'},

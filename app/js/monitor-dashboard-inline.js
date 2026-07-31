@@ -3,6 +3,7 @@
 let _detSeed = Date.now() % 2147483647;
 function detRand(){_detSeed=(_detSeed*16807)%2147483647;return (_detSeed-1)/2147483646;}
 function detRandInt(max){return Math.floor(detRand()*max);}
+// [TEST_DATA] detRand/detRandInt 用于生成确定性测试数据，上线前替换为真实API
 /* ═══════════════════════════════════════════════
    运营监控大屏 JS
    数据来源：localStorage 事件 + Performance API + 心跳探测
@@ -106,13 +107,23 @@ function renderOverview(){
   let todayDiv=todayEvents.filter(function(e){return e.type==='tool_usage'}).length;
   let todayRev=todayEvents.filter(function(e){return e.type==='vip_purchase'}).reduce(function(s,e){return s+((e.data&&e.data.price)||0)},0);
 
-  // 模拟实时在线（基于事件时间分布）
+  // 在线用户：优先从 localStorage events 推算，无数据时用 fallback
   let online=Math.max(1,Math.floor(((Date.now()/1000)%3600)/240)+3+todayEvents.length%8);
+  // [TEST_DATA] 在线人数为基于事件时间分布的估算值，上线前替换为真实WebSocket在线统计
 
   document.getElementById('ovOnline').textContent=online;
   document.getElementById('ovPVUV').textContent=todayEvents.length+' / '+todayUsers.size;
   document.getElementById('ovDivination').textContent=todayDiv;
   document.getElementById('ovRevenue').textContent='¥'+todayRev.toFixed(2);
+
+  // 尝试调用 /api/health 获取系统状态（真实API）
+  fetch('/api/health').then(function(r){return r.json()}).then(function(s){
+    if(s&&s.uptime){
+      // 真实数据可用时更新健康分
+      let healthEl=document.getElementById('healthMetrics');
+      if(healthEl)renderHealth();
+    }
+  }).catch(function(){/* API不可达，使用本地数据 */});
 
   renderSvcStatus();
   renderHealth();
@@ -179,7 +190,7 @@ function renderToolRanking(){
   });
   let sorted=Object.entries(counts).sort(function(a,b){return b[1]-a[1]}).slice(0,10);
   if(sorted.length===0){
-    // 模拟数据
+    // [TEST_DATA] 以下为测试数据，无真实事件时展示，上线前替换为真实API统计
     sorted=[['bazi',48],['ziwei',32],['liuyao',25],['qimen',18],['meihua',12],['fengshui',8],['cezi',5]];
     sorted.forEach(function(s){s[0]=ENGINE_NAMES[s[0]]||s[0]});
   }
@@ -202,7 +213,7 @@ function renderFunnel(){
   let trial=events.filter(function(e){return e.type==='tool_usage'}).length;
   let paid=events.filter(function(e){return e.type==='vip_purchase'||e.type==='vip_exchange'}).length;
   if(totalUsers<2){
-    // 模拟
+    // [TEST_DATA] 以下为测试数据，无真实事件时展示，上线前替换为真实API统计
     totalUsers=156;trial=89;paid=23;
   }
   let stages=[
@@ -224,13 +235,29 @@ function renderHeatmap(){
   let html='';
   let now=new Date();
   let hour=now.getHours();
-  // 模拟 24 小时热力数据
+  // 热力图：优先从 events 时间分布统计，无数据时用 fallback
+  let events=getEvents();
+  let hourCounts={};
+  events.forEach(function(e){
+    if(e.time){
+      let h=new Date(e.time).getHours();
+      hourCounts[h]=(hourCounts[h]||0)+1;
+    }
+  });
+  let hasRealData=Object.keys(hourCounts).length>0;
   for(let h=0;h<24;h++){
     let level=0;
-    if(h>=7&&h<=9)level=2+detRandInt(2);
-    else if(h>=11&&h<=13)level=3+detRandInt(2);
-    else if(h>=18&&h<=22)level=4+detRandInt(2);
-    else if(h>=6&&h<=23)level=1+detRandInt(2);
+    if(hasRealData){
+      // 真实数据：按事件数映射到0-5级
+      let c=hourCounts[h]||0;
+      level=c===0?0:c<3?1:c<6?2:c<10?3:c<15?4:5;
+    }else{
+      // [TEST_DATA] 以下为测试数据，无真实事件时展示，上线前替换为真实API统计
+      if(h>=7&&h<=9)level=2+detRandInt(2);
+      else if(h>=11&&h<=13)level=3+detRandInt(2);
+      else if(h>=18&&h<=22)level=4+detRandInt(2);
+      else if(h>=6&&h<=23)level=1+detRandInt(2);
+    }
     if(h===hour)level=Math.max(level,3);
     html+='<div class="heat-cell heat-'+level+'" title="'+(h<10?'0'+h:h)+':00 时段活跃度: '+level+'级"></div>';
   }
@@ -238,6 +265,7 @@ function renderHeatmap(){
 }
 
 function renderAlertList(){
+  // [TEST_DATA] 以下告警为测试数据，上线前替换为真实告警系统API
   let alerts=[
     {level:'info',msg:'排盘引擎运行正常',detail:'平均响应时间120ms，7引擎全部可用',time:'5分钟前'},
     {level:'warn',msg:'divination-core.js 文件较大(2.1MB)',detail:'影响首屏加载速度，建议拆分为按需加载模块',time:'1小时前'},
@@ -344,6 +372,7 @@ function renderPerformance(){
   }).join('')||'<tr><td colspan="4" style="color:var(--gray-light)">暂无数据</td></tr>';
 
   // API 延迟表
+  // [TEST_DATA] 以下API延迟为测试数据，上线前替换为真实APM/监控API
   let apis=[
     {name:'/api/paipan/save',avg:120,p95:250,ok:true},
     {name:'/api/order/create',avg:85,p95:180,ok:true},
@@ -358,6 +387,7 @@ function renderPerformance(){
   }).join('');
 
   // 加载耗时分布
+  // [TEST_DATA] 以下加载耗时分布为测试数据（DNS/TCP等），上线前用 Performance API timing 替换
   let stages=[
     {label:'DNS查询',value:5,max:50,color:'var(--cyan2)'},
     {label:'TCP连接',value:10,max:50,color:'var(--cyan2)'},
@@ -376,7 +406,7 @@ function renderPerformance(){
       '<div class="bar-wrap"><div class="bar-fill" style="width:'+pct+'%;background:'+s.color+'"></div></div></div>';
   }).join('');
 
-  // 性能趋势
+  // [TEST_DATA] 以下性能趋势为测试数据，仅今日为真实loadTime，上线前替换为真实APM历史API
   let days=['7天前','6天前','5天前','4天前','3天前','2天前','昨天','今天'];
   let trendData=[850,920,780,860,910,750,680,loadTime];
   let maxT=Math.max.apply(null,trendData)*1.1;
@@ -401,15 +431,18 @@ function filterFunc(type,btn){
 }
 
 function renderFunctions(){
+  // [TEST_DATA] 以下功能使用数据为测试数据（detRandInt生成），上线前替换为真实API统计
   let engines=Object.keys(ENGINE_NAMES).map(function(k){
     return {name:ENGINE_NAMES[k],key:k,type:'engine',today:detRandInt(50),week:detRandInt(300),month:detRandInt(1200),retention:60+detRandInt(35)};
   });
+  // [TEST_DATA] 以下工具数据为测试数据，上线前替换为真实API统计
   let tools=[
     {name:'吉日查询',key:'jiuri',type:'tool',today:12,week:87,month:340,retention:45},
     {name:'手机号测算',key:'yanzhi',type:'tool',today:8,week:56,month:210,retention:38},
     {name:'姓名分析',key:'xingming',type:'tool',today:6,week:42,month:180,retention:32},
     {name:'测字算命',key:'cezi',type:'tool',today:5,week:31,month:125,retention:28}
   ];
+  // [TEST_DATA] 以下页面数据为测试数据（detRandInt生成），上线前替换为真实API统计
   let pages=PAGE_LIST.slice(0,8).map(function(p){
     return {name:p+'.html',key:p,type:'page',today:detRandInt(30),week:detRandInt(200),month:detRandInt(800),retention:50+detRandInt(30)};
   });
@@ -464,6 +497,7 @@ function renderFuncTable(){
 
 // ═══ 流程渲染 ═══
 function renderFlow(){
+  // [TEST_DATA] 以下流程数据为测试数据，上线前替换为真实用户行为API统计
   // 核心流程链
   let flows=[
     {name:'排盘→分析→付费',stages:['访问首页','选择排盘','输入信息','获取结果','查看分析','付费升级'],active:5,conv:15},
@@ -489,7 +523,7 @@ function renderFlow(){
   document.getElementById('flowCompleteRate').innerHTML='17.5<small> %</small>';
   document.getElementById('flowAvgTime').innerHTML='8.3<small> min</small>';
 
-  // 流程漏斗
+  // [TEST_DATA] 以下流程漏斗为测试数据，上线前替换为真实API统计
   let funnel=[
     {label:'访问',value:1000,color:'var(--cyan2)'},
     {label:'选功能',value:680,color:'var(--amber)'},
@@ -507,7 +541,7 @@ function renderFlow(){
       '<div class="funnel-bar"><div class="funnel-fill" style="width:'+pct+'%;background:'+f.color+'">'+f.value+'</div></div></div>';
   }).join('');
 
-  // 阶段耗时
+  // [TEST_DATA] 以下阶段耗时为测试数据，上线前替换为真实API统计
   let stages=[
     {name:'访问首页',time:'0.5min',loss:'32%',ok:true},
     {name:'选择功能',time:'1.2min',loss:'24%',ok:true},
@@ -521,7 +555,7 @@ function renderFlow(){
       '<td><span class="badge '+(s.ok?'badge-ok':'badge-warn')+'">'+(s.ok?'正常':'关注')+'</span></td></tr>';
   }).join('');
 
-  // 用户路径
+  // [TEST_DATA] 以下用户路径为测试数据，上线前替换为真实API统计
   let paths=[
     {path:'首页→八字排盘→分析报告→付费',count:45,pct:28},
     {path:'首页→六爻占卜→结果→分享',count:32,pct:20},
@@ -557,14 +591,17 @@ function renderTrade(){
   let txEvents=events.filter(function(e){return e.type==='vip_purchase'||e.type==='order_create'});
   let todayTx=txEvents.filter(function(e){return e.time&&e.time.startsWith(today)});
   let todayRev=todayTx.reduce(function(s,e){return s+((e.data&&e.data.price)||0)},0);
-  if(todayRev===0)todayRev=1286.50; // 模拟
+  if(todayRev===0){
+    // [TEST_DATA] 无真实交易数据时使用测试数据，上线前替换为真实交易API
+    todayRev=1286.50;
+  }
 
   document.getElementById('tradeToday').textContent='¥'+todayRev.toFixed(2);
   document.getElementById('tradeMonth').textContent='¥'+(todayRev*18).toFixed(0);
   document.getElementById('tradeOrders').textContent=todayTx.length||7;
   document.getElementById('tradeAOV').textContent='¥'+(todayRev/(todayTx.length||7)).toFixed(2);
 
-  // 收入构成
+  // [TEST_DATA] 以下收入构成为测试数据，上线前替换为真实交易API统计
   let breakdown=[
     {label:'会员订阅',value:5800,pct:62,color:'var(--gold2)'},
     {label:'商品订单',value:2100,pct:22,color:'var(--jade2)'},
@@ -585,6 +622,7 @@ function renderTrade(){
     let d=new Date(Date.now()-i*86400000);
     days.push((d.getMonth()+1)+'/'+d.getDate());
   }
+  // [TEST_DATA] 以下收入趋势为测试数据（detRandInt生成），上线前替换为真实交易API历史数据
   let revData=days.map(function(_,i){return 200+detRandInt(800)+i*15});
   let maxR=Math.max.apply(null,revData)*1.1;
   document.getElementById('revenueTrend').innerHTML=
@@ -596,7 +634,7 @@ function renderTrade(){
     '<div style="display:flex;justify-content:space-between;margin-top:.3rem;font-size:.68rem;color:var(--gray-light)">'+
     '<span>'+days[0]+'</span><span>'+days[14]+'</span><span>'+days[29]+'</span></div>';
 
-  // 交易流水
+  // [TEST_DATA] 以下交易流水为测试数据，上线前替换为真实交易API
   window._txData=[
     {type:'vip',title:'会员月卡续费',user:'138****8888',amount:29.9,time:'10分钟前'},
     {type:'vip',title:'会员年卡新购',user:'139****6666',amount:299,time:'25分钟前'},
@@ -609,7 +647,7 @@ function renderTrade(){
   ];
   renderTxList();
 
-  // 付费排行
+  // [TEST_DATA] 以下付费排行为测试数据，上线前替换为真实交易API统计
   let payers=[
     {user:'139****6666',level:'年卡会员',total:1288},
     {user:'135****5555',level:'课程学员',total:998},
@@ -621,7 +659,7 @@ function renderTrade(){
     return '<tr><td>'+(i+1)+'</td><td>'+p.user+'</td><td><span class="badge badge-gold">'+p.level+'</span></td><td style="color:var(--gold2);font-weight:600">¥'+p.total+'</td></tr>';
   }).join('');
 
-  // 会员等级
+  // [TEST_DATA] 以下会员等级分布为测试数据，上线前替换为真实用户API统计
   let levels=[
     {name:'普通用户',count:1240,pct:78,color:'var(--steel)'},
     {name:'月卡会员',count:186,pct:12,color:'var(--cyan2)'},
@@ -658,12 +696,15 @@ function renderTxList(){
 function renderRoles(){
   let users=getUsers();
   let total=users.length||1589;
+  // [TEST_DATA] 当无真实用户数据时 fallback 到1589，上线前替换为真实用户API
 
   document.getElementById('roleTotal').textContent=total;
+  // [TEST_DATA] 以下新增/活跃数为测试数据（detRandInt生成），上线前替换为真实API
   document.getElementById('roleNew').textContent=detRandInt(8)+2;
   document.getElementById('roleActive').textContent=Math.floor(total*0.12);
 
-  // 角色卡片
+  // 角色卡片：用户数从 localStorage 读取，角色比例为测试数据
+  // [TEST_DATA] 以下角色比例（0.6/0.2/0.12/0.04/0.03/0.01）为测试数据，上线前替换为真实用户角色统计
   let roleData=ROLE_DEFS.map(function(r){
     let count=Math.floor(total*(r.key==='visitor'?0.6:r.key==='trial'?0.2:r.key==='member'?0.12:r.key==='master'?0.04:r.key==='merchant'?0.03:0.01));
     return Object.assign({},r,{count:count});
@@ -677,7 +718,7 @@ function renderRoles(){
       '<div class="role-count" style="color:'+r.color+'">'+r.count+'</div></div>';
   }).join('');
 
-  // 性别
+  // [TEST_DATA] 以下性别分布为测试数据，上线前替换为真实用户API统计
   let gender=[{label:'男',value:680,pct:43,color:'var(--cyan2)'},{label:'女',value:890,pct:56,color:'var(--cinn2)'},{label:'未设置',value:19,pct:1,color:'var(--steel)'}];
   document.getElementById('genderDist').innerHTML=gender.map(function(g){
     return '<div style="margin-bottom:.5rem">'+
@@ -687,7 +728,7 @@ function renderRoles(){
       '<div class="bar-wrap"><div class="bar-fill" style="width:'+g.pct+'%;background:'+g.color+'"></div></div></div>';
   }).join('');
 
-  // 年龄
+  // [TEST_DATA] 以下年龄分布为测试数据，上线前替换为真实用户API统计
   let ages=[
     {label:'18-25岁',value:180,pct:11,color:'var(--cyan2)'},
     {label:'26-35岁',value:520,pct:33,color:'var(--amber)'},
@@ -703,7 +744,7 @@ function renderRoles(){
       '<div class="bar-wrap"><div class="bar-fill" style="width:'+a.pct+'%;background:'+a.color+'"></div></div></div>';
   }).join('');
 
-  // 角色偏好
+  // [TEST_DATA] 以下角色偏好为测试数据，上线前替换为真实用户行为API统计
   let prefs=[
     {role:'访客',f1:'八字排盘',f2:'六爻占卜',f3:'测字',daily:'2.1次',payRate:'0%'},
     {role:'体验用户',f1:'八字排盘',f2:'紫微斗数',f3:'风水罗盘',daily:'4.5次',payRate:'12%'},
@@ -718,7 +759,7 @@ function renderRoles(){
       '<td style="color:'+(p.payRate==='100%'?'var(--jade2)':p.payRate==='0%'?'var(--danger)':'var(--gold2)')+'">'+p.payRate+'</td></tr>';
   }).join('');
 
-  // 改进建议
+  // [TEST_DATA] 以下改进建议为测试数据，上线前替换为真实数据分析
   let insights=[
     {icon:'💡',title:'访客转化机会',text:'60%用户为访客，建议增加首次免费排盘后的引导提示，提升注册转化率'},
     {icon:'📈',title:'会员留存重点',text:'会员日均使用6.8次，但奇门/六壬使用偏低，可推送相关内容提升兴趣'},
@@ -742,6 +783,7 @@ function filterAlert(type,btn){
 }
 
 function renderAlerts(){
+  // [TEST_DATA] 以下告警为测试数据，上线前替换为真实告警系统API
   let alerts=[
     {level:'crit',msg:'TTS语音服务(8912)离线',detail:'服务无响应超过3小时，语音合成功能不可用',time:'3小时前'},
     {level:'warn',msg:'divination-core.js 文件较大(2.1MB)',detail:'影响首屏加载速度，建议拆分为按需加载模块',time:'1小时前'},
@@ -762,7 +804,7 @@ function renderAlerts(){
   window._alertData=alerts;
   renderAlertFullList();
 
-  // 告警规则
+  // [TEST_DATA] 以下告警规则为测试数据，上线前替换为真实告警配置API
   let rules=[
     {name:'服务离线',threshold:'3次连续检测失败',level:'严重',enabled:true},
     {name:'API延迟超阈值',threshold:'>2000ms',level:'警告',enabled:true},

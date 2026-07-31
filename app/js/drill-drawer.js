@@ -48,8 +48,10 @@
   var drillBuilders={
     // 服务状态下钻
     svc:function(key){
+      // [TEST_DATA] 以下部分指标为测试数据，上线前替换为真实API
       var s=SERVICE_PORTS.filter(function(x){return x.port===key})[0];
       if(!s) return null;
+      // [TEST_DATA] 24h延迟历史为 detRandInt 生成的模拟数据
       var history=[];
       for(var i=0;i<24;i++){
         history.push({h:i,ms:5+detRandInt(45)});
@@ -86,13 +88,15 @@
 
     // 功能热度下钻
     func:function(name){
+      // [TEST_DATA] 以下部分指标为测试数据，上线前替换为真实API
       var data=window._funcData||[];
       var f=data.filter(function(x){return x.name===name||x.key===name})[0];
       if(!f){
         // 从 ENGINE_NAMES 找
+        // [TEST_DATA] 以下为 detRandInt 生成的回退测试数据
         f={name:name,key:name,type:'engine',today:detRandInt(50),week:detRandInt(300),month:detRandInt(1200),retention:60+detRandInt(35)};
       }
-      // 30 天趋势
+      // [TEST_DATA] 30天趋势为基于月总量+detRand的模拟数据
       var trend=[];
       for(var i=0;i<30;i++){
         trend.push({d:i,v:Math.max(1,Math.floor(f.month/30*(0.5+detRand())))});
@@ -116,6 +120,7 @@
         '<div style="display:flex;justify-content:space-between;font-size:.68rem;color:var(--paper3);margin-top:.3rem"><span>30天前</span><span>15天前</span><span>今天</span></div>'+
         '</div>'+
         '<div class="drill-section"><h4>👥 用户画像</h4>'+
+        // [TEST_DATA] 以下用户画像数据为硬编码测试数据
         '<div class="drill-metric"><span class="label">主要用户群</span><span class="value">会员 (62%)</span></div>'+
         '<div class="drill-metric"><span class="label">平均使用时长</span><span class="value">4.2 分钟</span></div>'+
         '<div class="drill-metric"><span class="label">移动端占比</span><span class="value">68%</span></div>'+
@@ -196,6 +201,7 @@
 
     // 告警下钻
     alert:function(idx){
+      // [TEST_DATA] 以下部分指标为测试数据，上线前替换为真实API
       var alerts=window._alertData||[];
       var a=alerts[parseInt(idx)];
       if(!a) return null;
@@ -210,7 +216,7 @@
       if(a.msg.indexOf('API key')>=0)related.push({name:'前端JS文件',status:'5处暴露',color:'var(--danger)'});
       if(a.msg.indexOf('localStorage')>=0)related.push({name:'localStorage',status:'接近上限',color:'var(--amber)'});
 
-      // 处理建议
+      // [TEST_DATA] 处理建议为硬编码规则，上线前替换为基于告警类型的真实推荐
       var suggestions=[];
       if(a.level==='crit'){
         suggestions.push('立即检查服务进程是否存活');
@@ -259,6 +265,7 @@
 
     // 交易下钻
     tx:function(idx){
+      // [TEST_DATA] 以下部分指标为测试数据，上线前替换为真实API
       var txs=window._txData||[];
       var t=txs[parseInt(idx)];
       if(!t) return null;
@@ -275,12 +282,14 @@
         '<div class="drill-metric"><span class="label">时间</span><span class="value" style="font-size:.78rem">'+t.time+'</span></div>'+
         '</div>'+
         '<div class="drill-section"><h4>👤 用户信息</h4>'+
+        // [TEST_DATA] 注册天数、累计消费为 detRandInt 生成的测试数据
         '<div class="drill-metric"><span class="label">用户</span><span class="value">'+t.user+'</span></div>'+
         '<div class="drill-metric"><span class="label">会员等级</span><span class="value">'+(t.type==='vip'?'付费会员':'普通用户')+'</span></div>'+
         '<div class="drill-metric"><span class="label">注册天数</span><span class="value">'+(30+detRandInt(365))+' 天</span></div>'+
         '<div class="drill-metric"><span class="label">累计消费</span><span class="value" style="color:var(--gold2)">¥'+(t.amount*(2+detRandInt(8))).toFixed(2)+'</span></div>'+
         '</div>'+
         '<div class="drill-section"><h4>📊 该用户消费趋势（30天）</h4>'+
+        // [TEST_DATA] 消费趋势为 detRandInt 生成的模拟数据
         '<div class="drill-trend">'+(function(){
           var bars=[];
           for(var i=0;i<30;i++){
@@ -301,7 +310,9 @@
 
     // 性能指标下钻
     perf:function(metric){
+      // [TEST_DATA] 以下部分指标为测试数据，上线前替换为真实API
       var metrics={
+        // [TEST_DATA] trend 数据为硬编码测试数据
         load:{name:'页面加载',unit:'ms',base:850,trend:[920,880,860,910,780,750,680,820]},
         size:{name:'资源大小',unit:'KB',base:4200,trend:[4500,4400,4300,4200,4100,4000,3900,4200]},
         api:{name:'API延迟',unit:'ms',base:120,trend:[150,130,140,120,110,125,115,120]},
@@ -315,7 +326,7 @@
         return '<div class="bar" style="height:'+pct+'%;background:'+color+'" title="第'+(i+1)+'天 — '+v+m.unit+'"></div>';
       }).join('');
 
-      // Top 5 慢端点
+      // [TEST_DATA] Top 5 慢端点为硬编码测试数据
       var endpoints=[
         {name:'/v1/chat/completions',avg:1500,p95:3500},
         {name:'/api/admin/stats',avg:200,p95:500},
@@ -352,6 +363,7 @@
 
     // 角色下钻
     role:function(key){
+      // [TEST_DATA] 以下部分指标为测试数据，上线前替换为真实API
       var role=ROLE_DEFS.filter(function(r){return r.key===key})[0];
       if(!role) return null;
       var total=1589;
@@ -365,6 +377,7 @@
         '<div class="drill-metric"><span class="label">占比</span><span class="value">'+(count/total*100).toFixed(1)+'%</span></div>'+
         '<div class="drill-metric"><span class="label">今日活跃</span><span class="value">'+Math.floor(count*0.12)+'</span></div>'+
         '<div class="drill-metric"><span class="label">新增(今日)</span><span class="value" style="color:var(--jade2)">+'+detRandInt(5)+'</span></div>'+
+        // [TEST_DATA] 新增(今日)为 detRandInt 生成的测试数据；今日活跃为固定比例估算
         '</div>'+
         '<div class="drill-section"><h4>👤 画像</h4>'+
         '<div class="drill-metric"><span class="label">描述</span><span class="value" style="font-size:.8rem">'+role.desc+'</span></div>'+

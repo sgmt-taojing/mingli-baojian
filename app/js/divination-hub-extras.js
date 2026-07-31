@@ -961,6 +961,7 @@ function tzRenderCheckin(){
   let streak=0,total=0;
   let d=new Date();
   let _safety=0;
+  // [SAFE_LOOP] 有安全退出条件（_safety>365 break + 无数据 break），非死循环
   while(true){
     if(++_safety>365) break;
     let k='tz_checkin_'+d.toISOString().slice(0,10);
@@ -970,6 +971,7 @@ function tzRenderCheckin(){
   d=new Date();
   d.setDate(d.getDate()-streak+1);
   _safety=0;
+  // [SAFE_LOOP] 有安全退出条件（_safety>365 break + 无数据 break），非死循环
   while(true){
     if(++_safety>365) break;
     d.setDate(d.getDate()+1);

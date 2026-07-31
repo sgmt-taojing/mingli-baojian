@@ -57,7 +57,7 @@
   }
 
   function showKbPreview(mod, entry) {
-    // 构造模拟数据
+    // [TEST_DATA] 构造模拟数据，上线前替换为真实用户输入
     var sampleData = { s0: '30', s1: '金', s2: '焦虑' };
     if (mod === 'music') sampleData = { s0: '焦虑', s1: '金' };
     if (mod === 'lifeindex') sampleData = { s0: '金' };

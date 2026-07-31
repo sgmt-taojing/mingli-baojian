@@ -913,6 +913,7 @@ async function askSend() {
     const reader = r.body.getReader();
     const dec = new TextDecoder();
     let buf = '', ttfb = null, chunk = 0;
+    // [SAFE_LOOP] SSE 流读取，有 done 检查安全退出，非死循环
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
@@ -1128,6 +1129,7 @@ function speak(text) {
 }
 
 // === 28 舌象饼图（硬编码示例） ===
+// [TEST_DATA] 硬编码示例数据，上线前替换
 function drawTonguePie() {
   const c = $('#tongue-pie'); if (!c) return;
   const ctx = c.getContext('2d'); if(!ctx) return;
