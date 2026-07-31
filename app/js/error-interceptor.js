@@ -303,7 +303,7 @@
 
       // 附加 traceId
       const traceId = (global.crypto && crypto.randomUUID)
-        ? crypto.randomUUID() : ('t-' + Date.now() + '-' + (Date.now().toString(36).slice(2, 8));
+        ? crypto.randomUUID() : ('t-' + Date.now() + '-' + Date.now().toString(36).slice(2, 8));
       const finalHeaders = Object.assign(
         {},
         (typeof headers === 'object' && !Array.isArray(headers)) ? headers : arrayHeadersToObject(headers),

@@ -14,6 +14,9 @@
     // 使用 fetch（现代浏览器/移动端/Edge/Firefox/Chrome/Safari 均内置）
     // R77: 优先用 cross-ref-graph（32 nodes / 120 links），fallback → /api/kb/graph
     var r = await fetch('/api/kb/cross-ref-graph?minWeight=2&maxNodes=60', {cache:'no-cache'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    var ct = r.headers.get('content-type')||'';
+    if(!ct.includes('application/json')) throw new Error('API not available');
     var j = await r.json();
     // 兼容判断：旧 API 用 code，新 API 用 ok
     var apiOk = j.ok !== undefined ? j.ok : (j.code === 0);
@@ -507,7 +510,7 @@
     document.getElementById('modal').classList.add('show');
     // R42 异步加载 KB 条目预览 Top 3
     fetch('/api/public/kb-query?module=' + encodeURIComponent(n.id) + '&limit=3', {cache:'no-cache'})
-      .then(function(r){return r.json();}).then(function(j){
+      .then(function(r){var ct=r.headers.get('content-type')||'';if(!ct.includes('json'))throw new Error('API');return r.json();}).then(function(j){
         var results = (j.data || j.results || []);
         var kbBox = document.getElementById('m-kb');
         if(!kbBox) return;
@@ -528,7 +531,7 @@
       }).catch(function(){ var b=document.getElementById('m-kb'); if(b) b.innerHTML='<div class="m-kb-empty">KB 预览加载失败</div>'; });
     // R33-节点5 异步加载 AI 推荐探索路径（彩色点 + 可点击跳转 kb-explorer）
     fetch('/api/kb/recommend?module=' + encodeURIComponent(n.id) + '&limit=6', {cache:'no-cache'})
-      .then(function(r){return r.json();}).then(function(j){
+      .then(function(r){var ct=r.headers.get('content-type')||'';if(!ct.includes('json'))throw new Error('API');return r.json();}).then(function(j){
         var d = j.data || j;
         var recs = d.recommendations || [];
         var recBox = document.getElementById('m-rec');

@@ -78,20 +78,21 @@ function loadSessionCount() {
   try {
     sessionCount = parseInt(localStorage.getItem(SESSION_KEY) || '0', 10) || 0;
   } catch(e) {}
-  document.getElementById('stCount').textContent = sessionCount;
-  document.getElementById('stCount').className = 'status-value' + (sessionCount > 0 ? ' ok' : ' muted');
+  var _stCount=document.getElementById('stCount'); if(_stCount) _stCount.textContent = sessionCount;
+  var _e=document.getElementById('stCount');if(_e)_e.className='status-value' + (sessionCount > 0 ? ' ok' : ' muted');
 }
 
 function saveSessionCount() {
   try { localStorage.setItem(SESSION_KEY, String(sessionCount)); } catch(e) {}
-  document.getElementById('stCount').textContent = sessionCount;
-  document.getElementById('stCount').className = 'status-value ok';
+  var _stCount=document.getElementById('stCount'); if(_stCount) _stCount.textContent = sessionCount;
+  var _e=document.getElementById('stCount');if(_e)_e.className='status-value ok';
 }
 
 /* ---- Toast ---- */
 let toastTimer = null;
 function toast(msg) {
   const el = document.getElementById('toast');
+  if(!el) return;
   el.textContent = msg;
   el.classList.add('show');
   clearTimeout(toastTimer);
@@ -161,10 +162,10 @@ async function startCamera() {
     btn.onclick = stopCamera;
 
     document.getElementById('btnCapture').disabled = false;
-    document.getElementById('stCam').textContent = '在线';
-    document.getElementById('stCam').className = 'status-value ok';
-    document.getElementById('stMic').textContent = '就绪';
-    document.getElementById('stMic').className = 'status-value ok';
+    var _e=document.getElementById('stCam');if(_e)_e.textContent='在线';
+    var _e=document.getElementById('stCount');if(_e)_e.className='status-value ok';
+    var _e=document.getElementById('stMic');if(_e)_e.textContent='就绪';
+    var _e=document.getElementById('stCount');if(_e)_e.className='status-value ok';
 
     // Update resolution label
     video.addEventListener('loadedmetadata', () => {
@@ -199,10 +200,10 @@ function stopCamera() {
   btn.onclick = startCamera;
 
   document.getElementById('btnCapture').disabled = true;
-  document.getElementById('stCam').textContent = '已关闭';
-  document.getElementById('stCam').className = 'status-value warn';
-  document.getElementById('stMic').textContent = '—';
-  document.getElementById('stMic').className = 'status-value muted';
+  var _e=document.getElementById('stCam');if(_e)_e.textContent='已关闭';
+  var _e=document.getElementById('stCount');if(_e)_e.className='status-value warn';
+  var _e=document.getElementById('stMic');if(_e)_e.textContent='—';
+  var _e=document.getElementById('stCount');if(_e)_e.className='status-value muted';
   const rl = document.getElementById('resLabel');
   if (rl) rl.textContent = '—';
   toast('摄像头已关闭');
@@ -229,8 +230,8 @@ function handleCameraError(e) {
     hint = '错误类型：' + e.name + '\n详情：' + (e.message || '未知错误');
   }
 
-  document.getElementById('stCam').textContent = '失败';
-  document.getElementById('stCam').className = 'status-value err';
+  var _e=document.getElementById('stCam');if(_e)_e.textContent='失败';
+  var _e=document.getElementById('stCount');if(_e)_e.className='status-value err';
   if (resultBox) {
     resultBox.innerHTML = '<div class="error-msg">' + msg + '</div><div class="hint-text" style="white-space:pre-wrap">' + hint + '</div>';
   }
@@ -262,6 +263,7 @@ async function captureAndAnalyze() {
 
   const mode = currentMode;
   const resultBox = document.getElementById('resultBox');
+  if(!resultBox) return;
   resultBox.innerHTML = '<div class="result-meta"><span class="tag">⏳ 分析中</span><span>正在调用 OCR 引擎…</span></div><div class="result-content">预计 1-5 秒，请稍候</div>';
 
   const t0 = Date.now();
@@ -304,7 +306,7 @@ async function captureAndAnalyze() {
     });
 
     const latency = Date.now() - t0;
-    document.getElementById('latencyLabel').textContent = latency + 'ms';
+    var _e=document.getElementById('latencyLabel');if(_e)_e.textContent=latency + 'ms';
 
     const data = await r.json().catch(() => ({}));
     sessionCount++;
@@ -326,7 +328,7 @@ async function captureAndAnalyze() {
     toast('分析完成 (' + latency + 'ms)');
   } catch(e) {
     const latency = Date.now() - t0;
-    document.getElementById('latencyLabel').textContent = latency + 'ms';
+    var _e=document.getElementById('latencyLabel');if(_e)_e.textContent=latency + 'ms';
     resultBox.innerHTML = '<div class="error-msg">✗ 分析失败</div><div class="hint-text" style="white-space:pre-wrap">' + escHtml(e.message) + '\n\n请确认 face-ocr-server 运行在 8913 端口，且 8920 API 网关在线。</div>';
     toast('分析失败：' + e.message);
   } finally {
@@ -384,13 +386,14 @@ async function speakResult() {
 /* ---- Mock toggle ---- */
 function toggleMock() {
   const sel = document.getElementById('mockSel');
+  if(!sel) return;
   const val = sel.value;
   if (val === 'mock') {
     if (typeof MockRokid !== 'undefined' && MockRokid.enable) {
       MockRokid.enable({ kind: 'jr-bridge', delayMs: 50 });
       mockEnabled = true;
-      document.getElementById('stBridge').textContent = 'Mock';
-      document.getElementById('stBridge').className = 'status-value ok';
+      var _e=document.getElementById('stBridge');if(_e)_e.textContent='Mock';
+      var _e=document.getElementById('stCount');if(_e)_e.className='status-value ok';
       toast('Mock Rokid 已启用');
     } else {
       toast('mock-harness 未加载');
@@ -416,6 +419,7 @@ function checkBridge() {
     }
   } catch(e) {}
   const el = document.getElementById('stBridge');
+  if(!el) return;
   if (mockEnabled) {
     el.textContent = 'Mock';
     el.className = 'status-value ok';
@@ -485,6 +489,7 @@ function renderHistory() {
   let hist = [];
   try { hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch(e) {}
   const el = document.getElementById('historyList');
+  if(!el) return;
   if (!hist.length) {
     el.innerHTML = '<div style="color:var(--muted2);font-size:12px;padding:8px">暂无记录</div>';
     return;
@@ -519,6 +524,7 @@ function replayHistory(idx) {
   const h = hist[idx];
   lastResult = h.full || h.preview;
   const resultBox = document.getElementById('resultBox');
+  if(!resultBox) return;
   resultBox.innerHTML = '<div class="result-meta"><span class="tag">📜 历史记录</span><span class="tag">' + (MODE_LABELS[h.mode] || h.mode) + '</span><span>' + escHtml(h.ts) + '</span></div><div class="result-content">' + escHtml(lastResult) + '</div>';
   document.getElementById('btnTTS').disabled = false;
   toast('已加载历史记录');

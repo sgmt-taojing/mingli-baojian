@@ -68,7 +68,7 @@ th{color:var(--c-muted);font-weight:500}
 const COLOR_POOL = ['#58a6ff','#3fb950','#d29922','#bc8cff','#f78166','#ff7b72','#79c0ff','#56d4dd','#e3b341','#db61a2','#a371f7','#7ee787','#ffa657','#f0883e','#8ddb8c'];
 
 async function load(){
-  const r = await fetch('/api/kb/growth-history');
+  const r = await fetch('http://localhost:8920/api/kb/growth-history');
   const d = await r.json();
   if(!d.ok) return;
   const days = d.days;
