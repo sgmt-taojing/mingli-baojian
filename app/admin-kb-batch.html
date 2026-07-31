@@ -15,7 +15,21 @@
 <main id="main-content" role="main">
 <div class="container">
 <h1>🛠️ KB 批量管理 · R45-A</h1>
-<div class="sub">知识库批量操作 · 紫微 12 宫 · 八字十神 · 化解古籍</div>
+<div class="sub">知识库批量操作 · 紫微 12 宫 · 八字十神 · 化解古籍 · R316 修真 + RBAC</div>
+
+<!-- R316: token 登录 -->
+<div class="row" style="margin:12px 0;padding:12px;background:var(--bg-2);border-radius:8px">
+  <input id="tokenInput" placeholder="Admin Token (header Authorization)" aria-label="Admin Token" style="flex:1;padding:8px;border:1px solid var(--line);border-radius:4px">
+  <button class="btn" onclick="saveToken()">💾 保存</button>
+  <span id="tokenStatus" style="font-size:12px;color:var(--ink-3)"></span>
+</div>
+
+<!-- R316: KB 搜索 -->
+<div class="row" style="margin:12px 0">
+  <input id="searchInput" placeholder="🔍 检索 KB 条目 (≥2 字)" aria-label="检索 KB" style="flex:1">
+  <button class="btn" onclick="doSearch()">🔍 检索</button>
+</div>
+<div id="searchResult" class="log"></div>
 
 <div class="tabs">
   <div class="tab active" data-tab="stats">📊 总览</div>
