@@ -5551,3 +5551,217 @@ body { max-width: 100% !important; padding: 0 !important; background: #0e0e12 !i
   pointer-events: none;
 }
 .nf-card:hover::after { opacity: 1; }
+
+/* R354 视觉调优 — 更大图标 + 更舒适色彩 */
+:root {
+  --bg-soft: #12121a;
+  --card-bg: rgba(255,255,255,.025);
+  --card-border: rgba(201,168,76,.07);
+  --card-accent: rgba(201,168,76,.15);
+  --card-hover-bg: rgba(201,168,76,.04);
+  --card-hover-border: rgba(201,168,76,.2);
+}
+
+body { background: var(--bg-soft) !important; }
+
+.nf-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-left: 3px solid var(--card-accent);
+  border-radius: 10px;
+  padding: 14px 10px;
+  gap: 6px;
+}
+.nf-card:hover {
+  background: var(--card-hover-bg);
+  border-color: var(--card-hover-border);
+  border-left-color: var(--gold);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,.25);
+}
+.nf-card-icon {
+  font-size: 32px;
+  line-height: 1;
+  margin-bottom: 2px;
+  filter: saturate(0.85) brightness(1.1);
+}
+.nf-card-name {
+  font-size: 13px;
+  color: #d4b06a;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+.nf-card-desc {
+  font-size: 10px;
+  color: #8a8a9a;
+  opacity: 0.5;
+}
+.nf-card:hover .nf-card-desc { opacity: 0.7; color: #a0a0b0; }
+
+.nf-title {
+  font-size: 15px;
+  letter-spacing: 4px;
+  color: #d4b06a;
+}
+.nf-icon { font-size: 18px; }
+
+.nht-title { font-size: 22px; color: #d4b06a; }
+.nht-desc { font-size: 12px; opacity: 0.35; }
+
+/* ================================================================
+   R354 功能详情页 UI 规范
+   ================================================================ */
+
+/* section-header 统一规范 */
+.section-header {
+  padding: 12px 0 16px !important;
+  border-bottom: 1px solid rgba(201,168,76,.08) !important;
+  margin-bottom: 20px !important;
+}
+.sh-title, .section-header h2 {
+  font-size: 20px !important;
+  color: #d4b06a !important;
+  letter-spacing: 3px !important;
+  margin: 0 0 4px !important;
+}
+.sh-desc, .section-header p:last-child {
+  font-size: 12px !important;
+  opacity: 0.4 !important;
+}
+
+/* 表单统一样式 */
+.section.active input[type="text"],
+.section.active input[type="date"],
+.section.active input[type="number"],
+.section.active select {
+  background: rgba(255,255,255,.04) !important;
+  border: 1px solid rgba(201,168,76,.12) !important;
+  border-radius: 6px !important;
+  padding: 8px 12px !important;
+  color: #d4b06a !important;
+  font-size: 13px !important;
+  font-family: inherit !important;
+  min-height: 36px !important;
+  transition: border-color .2s !important;
+}
+.section.active input:focus,
+.section.active select:focus {
+  outline: none !important;
+  border-color: rgba(201,168,76,.35) !important;
+}
+.section.active input::placeholder {
+  color: rgba(255,255,255,.2) !important;
+}
+.section.active label {
+  font-size: 12px !important;
+  color: rgba(212,176,106,.6) !important;
+  margin-bottom: 4px !important;
+  display: inline-block !important;
+}
+
+/* 按钮规范 */
+.section.active button,
+.section.active input[type="submit"],
+.section.active input[type="button"] {
+  border-radius: 6px !important;
+  font-family: inherit !important;
+  cursor: pointer !important;
+  transition: all .2s !important;
+}
+
+/* 主按钮 */
+.section.active .paipan-btn,
+.section.active button[onclick*="paipan"],
+.section.active button[onclick*="compute"],
+.section.active button[onclick*="calculate"],
+.section.active button[onclick*="analyze"] {
+  background: linear-gradient(135deg, rgba(201,168,76,.15), rgba(201,168,76,.05)) !important;
+  border: 1px solid rgba(201,168,76,.3) !important;
+  color: #d4b06a !important;
+  font-weight: 600 !important;
+  letter-spacing: 2px !important;
+  padding: 10px 32px !important;
+  font-size: 14px !important;
+}
+.section.active .paipan-btn:hover {
+  background: linear-gradient(135deg, rgba(201,168,76,.2), rgba(201,168,76,.1)) !important;
+  border-color: rgba(201,168,76,.5) !important;
+  box-shadow: 0 4px 12px rgba(201,168,76,.15) !important;
+}
+
+/* 结果区域 */
+.section.active .result,
+.section.active .paipan-result,
+.section.active #result,
+.section.active #paipanResult {
+  background: rgba(255,255,255,.015) !important;
+  border: 1px solid rgba(201,168,76,.06) !important;
+  border-radius: 8px !important;
+  padding: 16px !important;
+  margin-top: 16px !important;
+}
+
+/* 卡片内间距统一 */
+.section.active .card,
+.section.active .info-card,
+.section.active .panel {
+  background: rgba(255,255,255,.02) !important;
+  border: 1px solid rgba(201,168,76,.06) !important;
+  border-radius: 8px !important;
+  padding: 16px !important;
+  margin-bottom: 12px !important;
+}
+
+/* 返回按钮统一样式 */
+a[href="divination-hub.html"] {
+  position: fixed !important;
+  top: 8px !important;
+  left: 8px !important;
+  z-index: 9999 !important;
+  padding: 6px 14px !important;
+  border: 1px solid rgba(201,168,76,.2) !important;
+  border-radius: 6px !important;
+  background: rgba(18,18,26,.92) !important;
+  color: #d4b06a !important;
+  font-size: 12px !important;
+  letter-spacing: 2px !important;
+  text-decoration: none !important;
+  backdrop-filter: blur(8px) !important;
+  transition: all .2s !important;
+}
+a[href="divination-hub.html"]:hover {
+  background: rgba(201,168,76,.1) !important;
+  border-color: rgba(201,168,76,.4) !important;
+}
+
+/* R354 表单间距优化 */
+.input-row { gap: 10px !important; margin-bottom: 12px !important; }
+.input-card { padding: 16px !important; margin-bottom: 16px !important; }
+.input-hint { font-size: 11px !important; opacity: 0.35 !important; margin: 6px 0 !important; }
+
+/* 排盘按钮统一样式 */
+.compute-btn {
+  border-radius: 8px !important;
+  font-family: inherit !important;
+  cursor: pointer !important;
+  transition: all .2s !important;
+  border: 1px solid rgba(201,168,76,.2) !important;
+  background: rgba(201,168,76,.05) !important;
+  color: #d4b06a !important;
+  padding: 10px 24px !important;
+  font-size: 13px !important;
+  letter-spacing: 2px !important;
+}
+.compute-btn:hover {
+  background: rgba(201,168,76,.1) !important;
+  border-color: rgba(201,168,76,.35) !important;
+}
+
+/* 结果区域美化 */
+.result {
+  background: rgba(255,255,255,.01) !important;
+  border: 1px solid rgba(201,168,76,.05) !important;
+  border-radius: 10px !important;
+  padding: 20px !important;
+  margin-top: 20px !important;
+}
