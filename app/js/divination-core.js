@@ -33648,7 +33648,7 @@ function exportReportAsImage() {
     let script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
     script.onload = function() { _doExportImage(resultEl); };
-    script.onerror = function() { showToast('图片导出组件加载失败，请重试'); };
+    script.onerror = function() { showToast('图片导出组件查阅失败，请稍后重试'); };
     document.head.appendChild(script);
   } else {
     _doExportImage(resultEl);

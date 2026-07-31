@@ -99,7 +99,7 @@
         window.dispatchEvent(new CustomEvent('wangzhen-kb-loaded', { detail: window.WANGZHEN_KB }));
       })
       .catch(function(err){
-        console.warn('[WANGZHEN_KB] 加载失败:', err.message);
+        console.warn('[WANGZHEN_KB] 查阅失败:', err.message);
         window.WANGZHEN_KB.loaded = false;
         window.WANGZHEN_KB.error = err.message;
         window.dispatchEvent(new CustomEvent('wangzhen-kb-error', { detail: err }));

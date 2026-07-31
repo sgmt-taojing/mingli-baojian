@@ -170,7 +170,7 @@ async function loadDemo() {
     });
     $('statEndpoints').textContent = list.length;
   } catch (e) {
-    console.warn('demo 加载失败:', e);
+    console.warn('demo 查阅失败:', e);
   }
 }
 
@@ -300,7 +300,7 @@ if (!hasAdminAccess()) {
       }
       renderTopKbList(box, list);
     }catch(e){
-      box.innerHTML = '<div class="kbe-hit-empty">加载失败：' + e.message + '</div>';
+      box.innerHTML = '<div class="kbe-hit-empty">查阅失败：' + e.message + '</div>';
     }
   }
 

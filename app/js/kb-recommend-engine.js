@@ -73,7 +73,7 @@
       });
     } catch (e) {
       if (loading) loading.style.display = 'none';
-      if (meta) meta.textContent = '✗ 推荐加载失败 · ' + (e.message || '');
+      if (meta) meta.textContent = '✗ 推荐查阅失败 · ' + (e.message || '');
     }
   }
 

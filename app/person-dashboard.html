@@ -121,7 +121,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
     🪪 人物档案
     <button class="refresh-btn" onclick="loadAll()">🔄 刷新</button>
   </div>
-  <div id="profile-header"><div class="empty">加载中...</div></div>
+  <div id="profile-header"><div class="empty">正在为您查阅典籍...</div></div>
 </div>
 
 <!-- 5 身份卡 -->
@@ -139,31 +139,31 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
 <!-- 健康概览 -->
 <div class="section">
   <div class="section-title">🩺 健康档案（康养人）</div>
-  <div id="wellness-info"><div class="empty">加载中...</div></div>
+  <div id="wellness-info"><div class="empty">正在为您查阅典籍...</div></div>
 </div>
 
 <!-- OCR 异常 -->
 <div class="section">
   <div class="section-title">🔍 OCR 异常报告（报告解读中心联动）</div>
-  <div id="ocr-list"><div class="empty">加载中...</div></div>
+  <div id="ocr-list"><div class="empty">正在为您查阅典籍...</div></div>
 </div>
 
 <!-- 周分析 -->
 <div class="section">
   <div class="section-title">📅 周分析记录</div>
-  <div id="weekly-list"><div class="empty">加载中...</div></div>
+  <div id="weekly-list"><div class="empty">正在为您查阅典籍...</div></div>
 </div>
 
 <!-- 事件时间轴 -->
 <div class="section">
   <div class="section-title">📜 30天事件时间轴（人很多时候档案看板都在这）</div>
-  <div id="event-timeline"><div class="empty">加载中...</div></div>
+  <div id="event-timeline"><div class="empty">正在为您查阅典籍...</div></div>
 </div>
 
 <!-- 风险因素 -->
 <div class="section">
   <div class="section-title">🎯 综合风险因素</div>
-  <div id="risk-reasons"><div class="empty">加载中...</div></div>
+  <div id="risk-reasons"><div class="empty">正在为您查阅典籍...</div></div>
 </div>
 
 </div>
@@ -187,7 +187,7 @@ window.addEventListener('DOMContentLoaded', function(){
 async function loadAll(){
   // 清空
   ['profile-header','wellness-info','ocr-list','weekly-list','event-timeline','risk-reasons'].forEach(function(id){
-    document.getElementById(id).innerHTML = '<div class="empty">加载中...</div>';
+    document.getElementById(id).innerHTML = '<div class="empty">正在为您查阅典籍...</div>';
   });
   try {
     var d = await PersonHub.dashboard(currentUid);
@@ -205,7 +205,7 @@ async function loadAll(){
     renderStats(d);
   } catch(e){
     console.error('loadAll err:', e);
-    document.getElementById('profile-header').innerHTML = '<div class="empty">加载失败：'+e.message+'</div>';
+    document.getElementById('profile-header').innerHTML = '<div class="empty">查阅失败：'+e.message+'</div>';
   }
 }
 

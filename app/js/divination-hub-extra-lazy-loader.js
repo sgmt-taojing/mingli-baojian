@@ -70,7 +70,7 @@
       });
       entry.loaded = true;
     } catch (e) {
-      if (ph) ph.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--warn)">⚠️ 加载失败：'+e.message+'</div>';
+      if (ph) ph.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--warn)">⚠️ 查阅失败：'+e.message+'</div>';
       console.warn('[lazy-v2] fetch 失败:', entry.src, e.message);
       entry.loading = false; // 允许重试
     }

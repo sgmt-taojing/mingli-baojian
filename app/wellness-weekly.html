@@ -100,7 +100,7 @@ return fetch(API+'/api/csrf',{credentials:'include'}).then(function(r){return r.
 }
 
 function loadWeekly(){
-var v=$('view-weekly');v.innerHTML='<div class="card">加载中...</div>';
+var v=$('view-weekly');v.innerHTML='<div class="card">正在为您查阅典籍...</div>';
 fetch(API+'/api/wellness/weekly-summary').then(function(r){return r.json()}).then(function(j){
 var s=j.data.stats,a=j.data.analyses;
 var h='<div class="card"><div class="card-title">📅 周 '+s.week_start+' ~ '+s.week_end+'</div>';
@@ -153,7 +153,7 @@ v.innerHTML=h;
 }
 
 function loadHistory(){
-var v=$('view-history');v.innerHTML='<div class="card">加载中...</div>';
+var v=$('view-history');v.innerHTML='<div class="card">正在为您查阅典籍...</div>';
 fetch(API+'/api/wellness/analyses/'+USER_ID).then(function(r){return r.json()}).then(function(j){
 var rows=j.data||[];
 if(rows.length===0){
@@ -215,7 +215,7 @@ console.warn('提交失败: '+d.message);
 }
 
 function loadKB(){
-var v=$('view-knowledge');v.innerHTML='<div class="card">加载中...</div>';
+var v=$('view-knowledge');v.innerHTML='<div class="card">正在为您查阅典籍...</div>';
 fetch(API+'/api/wellness/analyses/'+USER_ID).then(function(r){return r.json()}).then(function(j){
 var rows=(j.data||[]).filter(function(r){return r.knowledge_extracted===1});
 if(rows.length===0){

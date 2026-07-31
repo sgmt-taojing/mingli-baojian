@@ -238,7 +238,7 @@ async function loadHistory() {
     const r = await fetch(url, { credentials:'same-origin', headers: csrfToken ? {'x-csrf-token':csrfToken} : {} });
     const d = await r.json();
     const data = d.data || d;
-    if (!data.ok) { toast('加载失败'); return; }
+    if (!data.ok) { toast('查阅失败'); return; }
 
     // Stats
     document.getElementById('stTotal').textContent = data.total || 0;

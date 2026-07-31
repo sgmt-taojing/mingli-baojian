@@ -104,25 +104,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
 <!-- 实时告警 -->
 <div class="section">
   <div class="section-title">⚠️ 实时告警</div>
-  <div id="alerts-list"><div class="empty">加载中...</div></div>
+  <div id="alerts-list"><div class="empty">正在为您查阅典籍...</div></div>
 </div>
 
 <!-- 报告解读历史 -->
 <div class="section">
   <div class="section-title">📋 报告解读历史（KB 召回）</div>
-  <div id="report-history"><div class="empty">加载中...</div></div>
+  <div id="report-history"><div class="empty">正在为您查阅典籍...</div></div>
 </div>
 
 <!-- 周分析历史 -->
 <div class="section">
   <div class="section-title">📅 周分析历史</div>
-  <div id="weekly-history"><div class="empty">加载中...</div></div>
+  <div id="weekly-history"><div class="empty">正在为您查阅典籍...</div></div>
 </div>
 
 <!-- 健康度时间轴 -->
 <div class="section">
   <div class="section-title">📈 健康度时间轴</div>
-  <div id="timeline" class="timeline"><div class="empty">加载中...</div></div>
+  <div id="timeline" class="timeline"><div class="empty">正在为您查阅典籍...</div></div>
 </div>
 
 </div>
@@ -153,7 +153,7 @@ async function loadProfile(){
     document.getElementById('stat-risk').style.color = rl === 'high' ? 'var(--red)' : rl === 'mid' ? 'var(--orange)' : 'var(--green)';
     window._profile = p;
   }catch(e){
-    document.getElementById('stat-profile').textContent = '加载失败';
+    document.getElementById('stat-profile').textContent = '查阅失败';
   }
 }
 
@@ -181,7 +181,7 @@ async function loadOcrAnomalies(){
     document.getElementById('report-history').innerHTML = html;
     window._ocrAnomalies = list;
   }catch(e){
-    document.getElementById('report-history').innerHTML = '<div class="empty">加载失败：'+e.message+'</div>';
+    document.getElementById('report-history').innerHTML = '<div class="empty">查阅失败：'+e.message+'</div>';
   }
 }
 
@@ -207,7 +207,7 @@ async function loadWeeklySummary(){
     document.getElementById('weekly-history').innerHTML = html;
     window._weeklySummary = weeks;
   }catch(e){
-    document.getElementById('weekly-history').innerHTML = '<div class="empty">加载失败：'+e.message+'</div>';
+    document.getElementById('weekly-history').innerHTML = '<div class="empty">查阅失败：'+e.message+'</div>';
   }
 }
 

@@ -4,7 +4,7 @@ function esc(s){return String(s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&l
 
 async function load(){
   const el = $('list');
-  el.innerHTML = '<div class="empty">加载中...</div>';
+  el.innerHTML = '<div class="empty">正在为您查阅典籍...</div>';
   const token = localStorage.token;
   if (!token) {
     el.innerHTML = '<div class="err">⚠ 未登录，请先登录获取 token</div>';
@@ -19,7 +19,7 @@ async function load(){
     credentials:'include'
   }).then(r=>r.json()).catch(e=>({error:true,message:e.message}));
   if (r.error || r.code !== 0) {
-    el.innerHTML = '<div class="err">⚠ 加载失败：' + esc((r.message||r.error||'未知错误')) + '</div>';
+    el.innerHTML = '<div class="err">⚠ 查阅失败：' + esc((r.message||r.error||'未知错误')) + '</div>';
     return;
   }
   const items = (r.data && r.data.list) || [];

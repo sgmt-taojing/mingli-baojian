@@ -59,13 +59,13 @@ document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () =>
 
 // === 加载统计 ===
 async function loadStats() {
-  setState('statsGrid', 'loading', '加载中...');
+  setState('statsGrid', 'loading', '正在为您查阅典籍...');
   try {
     const r = await fetch(API + '/api/admin/kb/stats', { headers: authHeaders() });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const d = await r.json();
     stats = d;
-    if (!d || d.error) { setState('statsGrid', 'error', d?.error || '统计加载失败'); return; }
+    if (!d || d.error) { setState('statsGrid', 'error', d?.error || '统计查阅失败'); return; }
     const grid = document.getElementById('statsGrid');
     grid.classList.remove('state-loading', 'state-empty', 'state-error');
     grid.innerHTML = `

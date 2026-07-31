@@ -86,17 +86,17 @@ h1{font-size:1.6rem;margin-bottom:4px}
 
 <div class="panel">
   <div class="section-title"><span class="rich-dot rich-dot-blue"></span> 模块命中排行（滚动窗口）</div>
-  <div id="hotBars">加载中...</div>
+  <div id="hotBars">正在为您查阅典籍...</div>
 </div>
 
 <div class="panel">
   <div class="section-title"><span class="rich-dot rich-dot-blue"></span> 全局累计 TOP 10</div>
-  <div id="allTimeBars">加载中...</div>
+  <div id="allTimeBars">正在为您查阅典籍...</div>
 </div>
 
 <div class="panel">
   <div class="section-title"><span class="rich-dot rich-dot-blue"></span> 最近命中流 <span style="margin-left:auto;font-size:.75rem;color:#666">每 30s 自动刷新</span></div>
-  <div id="traces">加载中...</div>
+  <div id="traces">正在为您查阅典籍...</div>
 </div>
 
 <!-- R75: 设备采集流（纯前端 localStorage，零 API） -->
@@ -251,7 +251,7 @@ async function loadHot() {
       <div class="metric"><div class="metric-val">${data.all_time_top.length}</div><div class="metric-label">全局有命中模块</div></div>
     `;
   } catch (e) {
-    document.getElementById('hotBars').innerHTML = '<div style="color:#f87171;padding:12px">加载失败: ' + e.message + '</div>';
+    document.getElementById('hotBars').innerHTML = '<div style="color:#f87171;padding:12px">查阅失败: ' + e.message + '</div>';
   }
 }
 
@@ -276,7 +276,7 @@ async function loadTraces() {
     `).join('');
     document.getElementById('traces').innerHTML = html;
   } catch (e) {
-    document.getElementById('traces').innerHTML = '<div style="color:#f87171;padding:12px">加载失败: ' + e.message + '</div>';
+    document.getElementById('traces').innerHTML = '<div style="color:#f87171;padding:12px">查阅失败: ' + e.message + '</div>';
   }
 }
 

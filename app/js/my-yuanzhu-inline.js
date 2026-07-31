@@ -25,7 +25,7 @@ function switchTab(name){
 
 async function loadTab(name){
   const c = document.getElementById('content');
-  c.innerHTML = '<div class="loading">加载中...</div>';
+  c.innerHTML = '<div class="loading">正在为您查阅典籍...</div>';
   switch(name){
     case 'profile': return renderProfile(c);
     case 'yuanzhu': return renderYuanzhu(c);
@@ -290,7 +290,7 @@ window._buy = _buy;
 async function renderVoices(c){
   const r = await api('/api/voices');
   if(!r || !r.voices){
-    c.innerHTML = `<div class="card"><h3>🎙️ 语音库</h3><p style="color:var(--paper3)">加载失败或语音服务暂不可用。</p></div>`;
+    c.innerHTML = `<div class="card"><h3>🎙️ 语音库</h3><p style="color:var(--paper3)">查阅失败或语音服务暂不可用。</p></div>`;
     return;
   }
   // 按姓名分组（"晓晓(女声)" / "云扬(男声)" → female / male）
@@ -457,7 +457,7 @@ async function renderLifeplan(c){
 async function renderKbDash(c){
   c.innerHTML = `<div class="card"><h3>📈 KB 命中率 Dashboard</h3>
     <p style="color:var(--paper3);font-size:12px;margin-bottom:12px">本地浏览器 KB 优先命中统计（localStorage）+ 后端 KB 总规模（API）</p>
-    <div id="kbDashBody" class="loading">加载中...</div>
+    <div id="kbDashBody" class="loading">正在为您查阅典籍...</div>
   </div>`;
   // === 本地统计 ===
   const stats = {today:0,total:0,byMod:[],byDay:[]};

@@ -1004,7 +1004,7 @@
           }
         };
         script.onerror = function(){
-          if(statusEl){ statusEl.textContent = '❌ SDK加载失败'; statusEl.style.color = '#f87171'; }
+          if(statusEl){ statusEl.textContent = '❌ SDK查阅失败'; statusEl.style.color = '#f87171'; }
         };
         document.head.appendChild(script);
       } else {

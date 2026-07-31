@@ -112,7 +112,7 @@ async function loadSessions(){
         </ml-tap>`;
     }).join('');
   }catch(e){
-    box.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">加载失败</div><div class="empty-desc">${escHtml(e.message)}</div></div>`;
+    box.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">查阅失败</div><div class="empty-desc">${escHtml(e.message)}</div></div>`;
   }
 }
 
@@ -149,7 +149,7 @@ async function loadDirectory(){
     }
     box.innerHTML = html || '<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">通讯录为空</div></div>';
   }catch(e){
-    box.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">加载失败</div><div class="empty-desc">${escHtml(e.message)}</div></div>`;
+    box.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">查阅失败</div><div class="empty-desc">${escHtml(e.message)}</div></div>`;
   }
 }
 
@@ -196,7 +196,7 @@ async function loadMessages(sid){
     const { messages } = await api('/im/sessions/' + sid + '/messages?limit=50');
     renderMessages(messages);
   }catch(e){
-    body.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">加载失败</div></div>`;
+    body.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">查阅失败</div></div>`;
   }
 }
 

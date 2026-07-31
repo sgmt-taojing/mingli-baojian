@@ -207,7 +207,7 @@ async function load(){
     render();
     loadTrends();
   } catch(e){
-    document.getElementById('rows').innerHTML = '<div style="padding:20px;color:#d46a6a;text-align:center">⚠️ 加载失败：'+esc(e.message)+'<br><small>请确认 8920 端口服务已启动</small></div>';
+    document.getElementById('rows').innerHTML = '<div style="padding:20px;color:#d46a6a;text-align:center">⚠️ 查阅失败：'+esc(e.message)+'<br><small>请确认 8920 端口服务已启动</small></div>';
   }
 }
 
@@ -224,7 +224,7 @@ async function loadTrends(){
     document.getElementById('sparkMeta').textContent =
       `${data.window_days}d · 总调用 ${data.totals.total_calls} · 命中 ${data.totals.total_hits} 条 · ${data.totals.unique_queries} 个独立查询`;
   } catch(e){
-    document.getElementById('sparkMeta').textContent = '⚠️ 趋势加载失败: '+e.message;
+    document.getElementById('sparkMeta').textContent = '⚠️ 趋势查阅失败: '+e.message;
   }
 }
 

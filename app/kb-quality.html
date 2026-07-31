@@ -176,7 +176,7 @@ async function load(){
     render();
     document.getElementById('sub').textContent=`${DATA.summary.module_cnt} 模块 · ${fmt(DATA.summary.total)} 条目 · 更新于 ${new Date(DATA.generatedAt).toLocaleString('zh-CN')}`;
   }catch(e){
-    document.getElementById('sub').textContent='加载失败：'+e.message;
+    document.getElementById('sub').textContent='查阅失败：'+e.message;
   }
 }
 
@@ -326,7 +326,7 @@ function showDetail(mod){
         </div>`).join('');
     })
     .catch(err=>{
-      document.getElementById('modalSamples').innerHTML=`<p style="color:#c66">加载失败：${err.message}</p>`;
+      document.getElementById('modalSamples').innerHTML=`<p style="color:#c66">查阅失败：${err.message}</p>`;
     });
   // === R58: 拉详情 (trust 分布 + top/bottom 5) ===
   fetch(`/api/kb/quality-report?module=${encodeURIComponent(mod)}&detail=true`)
@@ -353,7 +353,7 @@ function showDetail(mod){
         <div class="trust-list">${lowHtml}</div>`;
     })
     .catch(err=>{
-      document.getElementById('modalDetail').innerHTML=`<p style="color:#c66">加载失败：${err.message}</p>`;
+      document.getElementById('modalDetail').innerHTML=`<p style="color:#c66">查阅失败：${err.message}</p>`;
     });
 }
 function switchTab(name){

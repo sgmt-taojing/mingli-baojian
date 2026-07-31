@@ -491,7 +491,7 @@ async function renderModules(){
       $('modulesGrid').appendChild(card);
     });
   }catch(e){
-    $('modulesGrid').innerHTML = '<div class="mod-card">模块数据加载失败<br><small>' + esc(e.message) + '</small></div>';
+    $('modulesGrid').innerHTML = '<div class="mod-card">模块数据查阅失败<br><small>' + esc(e.message) + '</small></div>';
   }
 }
 

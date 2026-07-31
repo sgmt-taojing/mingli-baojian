@@ -18,7 +18,7 @@ let currentFilter = 'all';
 
 async function loadInbox() {
   const content = document.getElementById('content');
-  content.innerHTML = '<div class="loading">加载中...</div>';
+  content.innerHTML = '<div class="loading">正在为您查阅典籍...</div>';
   if (!token) {
     content.innerHTML = '<div class="empty-state"><div class="icon">🔒</div><h3>请先登录</h3><p>登录后查看您的年度推送</p><p style="margin-top:14px;"><a href="login.html" style="color:var(--c-primary);">前往登录</a></p></div>';
     return;
@@ -29,7 +29,7 @@ async function loadInbox() {
     });
     const d = await r.json();
     if (!d.ok) {
-      content.innerHTML = '<div class="empty-state"><div class="icon">⚠️</div><h3>加载失败</h3><p>' + (d.message || '未知错误') + '</p></div>';
+      content.innerHTML = '<div class="empty-state"><div class="icon">⚠️</div><h3>查阅失败</h3><p>' + (d.message || '未知错误') + '</p></div>';
       return;
     }
     allItems = d.items || [];

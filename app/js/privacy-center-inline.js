@@ -227,7 +227,7 @@
     });
 
     // 加载数据（API 失败时仍能渲染 UI）
-    try { await loadConsents(); }   catch (e) { console.warn('同意记录加载失败', e); }
-    try { await loadAuditLog(); }   catch (e) { console.warn('审计日志加载失败', e); }
+    try { await loadConsents(); }   catch (e) { console.warn('同意记录查阅失败', e); }
+    try { await loadAuditLog(); }   catch (e) { console.warn('审计日志查阅失败', e); }
   });
 })();

@@ -127,7 +127,7 @@ document.addEventListener('click',function(e){
 
 // 页面加载进度指示
 // 页面加载进度指示 — 移除 loading 遮罩层
-// 双重保底：window.load + 5秒超时强制移除（防止JS加载失败导致遮罩层永久存在）
+// 双重保底：window.load + 5秒超时强制移除（防止JS查阅失败导致遮罩层永久存在）
 function removeLoadingOverlay(){
   let ov=document.getElementById('loading-overlay');
   if(ov){ov.style.opacity='0';setTimeout(function(){ov.remove()},500)}
@@ -154,7 +154,7 @@ function _syncProfileEntry(){
   }
   if(hint && s.name){ hint.textContent = `${s.name} · ${s.gender||'-'} · ${c}% 完整 · 点此补充档案`; }
 }
-// 超时保底：5秒后强制移除遮罩层，防止外部JS加载失败阻塞所有点击
+// 超时保底：5秒后强制移除遮罩层，防止外部JS查阅失败阻塞所有点击
 setTimeout(removeLoadingOverlay,5000);
 
 // 强制刷新样式缓存

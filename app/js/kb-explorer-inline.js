@@ -392,7 +392,7 @@ async function renderRecommendations(){
     html += '</div>';
     box.innerHTML = html;
   }catch(e){
-    box.innerHTML = '<div class="kbe-empty"><div class="kbe-empty-icon">❌</div><div>推荐加载失败：' + e.message + '</div></div>';
+    box.innerHTML = '<div class="kbe-empty"><div class="kbe-empty-icon">❌</div><div>推荐查阅失败：' + e.message + '</div></div>';
   }
 }
 

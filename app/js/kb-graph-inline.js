@@ -9,7 +9,7 @@
     if(typeof window._loadVisNetwork === 'function'){ await window._loadVisNetwork(); }
     if(typeof vis === 'undefined' || !vis.Network){
       var _stat = document.getElementById('stat');
-      if(_stat) _stat.innerHTML = '<span style="color:#ef4444">⚠️ 图谱引擎加载失败（CDN 全失效），请检查网络。可使用下方纯文本搜索。</span>';
+      if(_stat) _stat.innerHTML = '<span style="color:#ef4444">⚠️ 图谱引擎查阅失败（CDN 全失效），请检查网络。可使用下方纯文本搜索。</span>';
     }
     // 使用 fetch（现代浏览器/移动端/Edge/Firefox/Chrome/Safari 均内置）
     // R77: 优先用 cross-ref-graph（32 nodes / 120 links），fallback → /api/kb/graph
@@ -20,7 +20,7 @@
     var j = await r.json();
     // 兼容判断：旧 API 用 code，新 API 用 ok
     var apiOk = j.ok !== undefined ? j.ok : (j.code === 0);
-    if (!apiOk) { document.getElementById('stat').textContent='加载失败'; return; }
+    if (!apiOk) { document.getElementById('stat').textContent='查阅失败'; return; }
     graphData = j;
     // 计算 level 分组（从 group 字段或默认 'tcm'）
     var levelCounts = {};
@@ -528,7 +528,7 @@
         });
         html += '</div>';
         kbBox.innerHTML = html;
-      }).catch(function(){ var b=document.getElementById('m-kb'); if(b) b.innerHTML='<div class="m-kb-empty">KB 预览加载失败</div>'; });
+      }).catch(function(){ var b=document.getElementById('m-kb'); if(b) b.innerHTML='<div class="m-kb-empty">KB 预览查阅失败</div>'; });
     // R33-节点5 异步加载 AI 推荐探索路径（彩色点 + 可点击跳转 kb-explorer）
     fetch('/api/kb/recommend?module=' + encodeURIComponent(n.id) + '&limit=6', {cache:'no-cache'})
       .then(function(r){var ct=r.headers.get('content-type')||'';if(!ct.includes('json'))throw new Error('API');return r.json();}).then(function(j){

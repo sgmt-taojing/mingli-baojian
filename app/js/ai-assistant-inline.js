@@ -1701,7 +1701,7 @@ function showReport(text, meta){
         recBox.innerHTML = h;
       })
       .catch(e => {
-        recBox.innerHTML = '<div style="opacity:.5;font-size:12px">推荐加载失败：' + e.message + '</div>';
+        recBox.innerHTML = '<div style="opacity:.5;font-size:12px">推荐查阅失败：' + e.message + '</div>';
       });
   }
 
@@ -4285,7 +4285,7 @@ function openKBPanel(){
   p.style.display='block';
   const list=document.getElementById('kbList');
   const content=document.getElementById('kbContent');
-  list.innerHTML='<div style="color:var(--gold,#c9a84c)">加载中...</div>';
+  list.innerHTML='<div style="color:var(--gold,#c9a84c)">正在为您查阅典籍...</div>';
   content.innerHTML='';
   // R53: 并行加载 KB 文件列表 + 质量报告（双 API 同步获取）
   Promise.all([
@@ -4328,13 +4328,13 @@ function openKBPanel(){
       list.appendChild(btn);
     });
   }).catch(err=>{
-    list.innerHTML='<div style="color:#f44336">加载失败：'+err.message+'<br><span style="font-size:12px;color:var(--paper2,#999)">请确保后端服务(8920)已启动</span></div>';
+    list.innerHTML='<div style="color:#f44336">查阅失败：'+err.message+'<br><span style="font-size:12px;color:var(--paper2,#999)">请确保后端服务(8920)已启动</span></div>';
   });
 }
 function closeKBPanel(){document.getElementById('kbPanel').style.display='none';}
 function loadKBDetail(name){
   const content=document.getElementById('kbContent');
-  content.innerHTML='<div style="color:var(--gold,#c9a84c)">加载中...</div>';
+  content.innerHTML='<div style="color:var(--gold,#c9a84c)">正在为您查阅典籍...</div>';
   fetch(API+'/api/kb/'+encodeURIComponent(name)).then(r=>{
     if(!r.ok){
       if(r.status===403)return r.json().then(d=>{throw new Error(d.message||'无权访问')});
@@ -4375,7 +4375,7 @@ function openHistoryPanel(){
   const p=document.getElementById('historyPanel');
   p.style.display='block';
   const list=document.getElementById('historyList');
-  list.innerHTML='<div style="color:var(--gold,#c9a84c)">加载中...</div>';
+  list.innerHTML='<div style="color:var(--gold,#c9a84c)">正在为您查阅典籍...</div>';
   const token=localStorage.getItem('auth_token')||'';
   fetch(API+'/api/paipan/history',{headers:{'Authorization':token?('Bearer '+token):''}}).then(r=>r.json()).then(data=>{
     // 后端返回的是数组（兼容对象）
@@ -4474,7 +4474,7 @@ function showProfileHistory(){
   var p=document.getElementById('historyPanel');
   p.style.display='block';
   var list=document.getElementById('historyList');
-  list.innerHTML='<div style="color:var(--gold,#c9a84c)">加载中...</div>';
+  list.innerHTML='<div style="color:var(--gold,#c9a84c)">正在为您查阅典籍...</div>';
   // 更新抽屉标题
   var titleEl=p.querySelector('h3');
   if(titleEl) titleEl.textContent='📜 '+_cur.name+' 的历史报告';
@@ -4504,7 +4504,7 @@ function showProfileHistory(){
       list.appendChild(div);
     });
   }).catch(err=>{
-    list.innerHTML='<div style="color:var(--paper2,#999)">加载失败<br><span style="font-size:12px;color:#999">'+esc(err.message)+'</span></div>';
+    list.innerHTML='<div style="color:var(--paper2,#999)">查阅失败<br><span style="font-size:12px;color:#999">'+esc(err.message)+'</span></div>';
   });
 }
 

@@ -73,7 +73,7 @@ body{font-family:system-ui,-apple-system,'PingFang SC',sans-serif;background:#0d
 
 <div class="container" id="app">
   <a href="feedback-center.html" class="back-link">← 返回反馈列表</a>
-  <div id="content"><div class="loading">加载中...</div></div>
+  <div id="content"><div class="loading">正在为您查阅典籍...</div></div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -124,7 +124,7 @@ function loadTicket() {
       renderTicket(r.data);
     })
     .catch(function(e) {
-      document.getElementById('content').innerHTML = '<div class="error-box"><div class="error-icon">⚠️</div><div class="error-msg">加载失败：' + escapeHtml(e.message) + '</div></div>';
+      document.getElementById('content').innerHTML = '<div class="error-box"><div class="error-icon">⚠️</div><div class="error-msg">查阅失败：' + escapeHtml(e.message) + '</div></div>';
     });
 }
 
