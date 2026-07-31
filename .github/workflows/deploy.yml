@@ -32,21 +32,29 @@ jobs:
           mkdir -p _site
           # 复制 app/ 目录（HTML + CSS + JS + KB）
           cp -r app _site/app
-          # 复制根目录 js/ 和 knowledge/ 和 css/ 到 _site/ 根（因为HTML使用 ../js 和 ../knowledge 引用）
-          if [ -d js ]; then cp -r js _site/js; fi
+          # 把 app/css/ 和 app/js/ 也复制到 _site/ 根，确保根目录 HTML 也能加载 CSS/JS
+          cp -r app/css _site/css
+          cp -r app/js _site/js
+          # 复制根目录 knowledge/ 到 _site/ 根
           if [ -d knowledge ]; then cp -r knowledge _site/knowledge; fi
-          if [ -d css ]; then cp -r css _site/css; fi
           # 复制 docs/ 目录（文档+报告）
           if [ -d docs ]; then cp -r docs _site/docs; fi
-          # 复制 DELIVERY/ 周评估报告 → _site/docs/DELIVERY/（在白名单内可访问）
+          # 复制 DELIVERY/ → _site/docs/DELIVERY/
           if [ -d DELIVERY ]; then
             mkdir -p _site/docs/DELIVERY
             cp -r DELIVERY/. _site/docs/DELIVERY/ || true
           fi
-          # 创建.nojekyll（禁用Jekyll处理，避免下划线开头文件被忽略）
+          # 创建.nojekyll（禁用Jekyll处理）
           touch _site/.nojekyll
-          # 复制根目录 index.html（活数据仪表盘）
+          # 复制根目录 index.html
           if [ -f index.html ]; then cp index.html _site/index.html; fi
+          # 为 app/ 下每个 HTML 创建根目录跳转页
+          for f in app/*.html; do
+            name=$(basename "$f")
+            if [ ! -f "_site/$name" ]; then
+              printf '<!DOCTYPE html>\n<html lang="zh-CN">\n<head>\n<meta charset="UTF-8">\n<meta http-equiv="refresh" content="0; url=app/%s">\n<title>跳转中...</title>\n</head>\n<body><p>正在跳转到 <a href="app/%s">目标页面</a>...</p></body>\n</html>\n' "$name" "$name" > "_site/$name"
+            fi
+          done
           # 创建移动端入口
           printf '%s\n' \
             '<!DOCTYPE html>' \
@@ -58,7 +66,7 @@ jobs:
             '</head>' \
             '<body><p><a href="app/wechat-hub.html">命理宝鉴移动端</a></p></body>' \
             '</html>' > _site/mobile.html
-          # 输出大小信息便于debug
+          # 输出大小信息
           echo "Deploy size:"
           du -sh _site/
           du -sh _site/app _site/js _site/knowledge _site/css 2>/dev/null
