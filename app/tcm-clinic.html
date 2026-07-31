@@ -22,6 +22,7 @@
 <link rel="stylesheet" href="css/tcm-clinic-inline.css">
 <link rel="stylesheet" href="css/mobile-nav.css">
 <link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
 </head>
 <body class="theme-tcm">
 <a href="#main-content" class="skip-link">跳到主要内容</a>
@@ -551,5 +552,18 @@
   .row{flex-direction:column;align-items:flex-start}
 }
 </style>
+<div id="flowStepsContainer"></div><div id="flowHintContainer"></div><div id="flowQuickLinks"></div>
+<script>
+document.addEventListener("DOMContentLoaded",function(){
+  if(typeof FlowEngine!=="undefined"){
+    FlowEngine.steps("flowStepsContainer",["填写信息", "症状描述", "AI辨证", "查看建议"],0);
+    var h=document.getElementById("flowHintContainer");
+    if(h)h.innerHTML=FlowEngine.hint("请如实填写健康信息，AI将结合周易五行与中医理论给出参考建议。");
+    var ql=document.getElementById("flowQuickLinks");
+    if(ql)ql.innerHTML=FlowEngine.quicklinks([{"name": "体质辨识", "icon": "🌿", "url": "tizhi.html"}, {"name": "望诊中心", "icon": "👁", "url": "wangzhen-center.html"}, {"name": "健康预测", "icon": "📈", "url": "health-forecast.html"}]);
+  }
+});
+</script>
+<script src="js/flow-engine.js"></script>
 </body>
 </html>

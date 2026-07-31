@@ -1,0 +1,138 @@
+/* ================================================================
+   流程引擎 · 步骤指引组件
+   ================================================================ */
+
+/* 步骤条 */
+.flow-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin: 12px 0 20px;
+  padding: 0;
+  flex-wrap: wrap;
+}
+.flow-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--sys-primary, #b8956a);
+  opacity: 0.4;
+  transition: opacity .2s;
+  white-space: nowrap;
+}
+.flow-step.active { opacity: 1; font-weight: 600; }
+.flow-step.done { opacity: 0.7; }
+.flow-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  font-size: 11px;
+  font-weight: 600;
+}
+.flow-step.active .flow-step-num {
+  background: var(--sys-primary, #b8956a);
+  color: var(--sys-bg, #12121a);
+}
+.flow-step.done .flow-step-num {
+  background: var(--sys-primary, #b8956a);
+  color: var(--sys-bg, #12121a);
+  opacity: 0.5;
+}
+.flow-step-arrow {
+  margin: 0 8px;
+  color: var(--sys-muted, #6b7280);
+  font-size: 10px;
+}
+
+/* 帮助提示 */
+.flow-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--sys-accent, rgba(184,149,106,.06));
+  border-radius: 6px;
+  font-size: 11px;
+  color: var(--sys-primary, #b8956a);
+  opacity: 0.7;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.flow-hint::before { content: "💡 "; flex-shrink: 0; }
+
+/* 快捷链接 */
+.flow-quicklinks {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--sys-border, rgba(255,255,255,.04));
+}
+.flow-quicklink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  font-size: 11px;
+  color: var(--sys-primary, #b8956a);
+  text-decoration: none;
+  border: 1px solid var(--sys-border-c, rgba(184,149,106,.1));
+  border-radius: 16px;
+  transition: all .2s;
+  opacity: 0.7;
+}
+.flow-quicklink:hover {
+  opacity: 1;
+  background: var(--sys-accent, rgba(184,149,106,.08));
+  border-color: var(--sys-primary, #b8956a);
+}
+
+/* 会诊流程确认 */
+.flow-confirm {
+  display: none;
+  padding: 16px;
+  margin: 12px 0;
+  background: var(--sys-card-bg, rgba(255,255,255,.02));
+  border: 1px solid var(--sys-border-c, rgba(184,149,106,.1));
+  border-radius: 8px;
+}
+.flow-confirm.show { display: block; }
+.flow-confirm-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--sys-primary, #b8956a);
+  margin-bottom: 8px;
+}
+.flow-confirm-body {
+  font-size: 12px;
+  color: var(--sys-text, #c9d1d9);
+  opacity: 0.7;
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+.flow-confirm-actions {
+  display: flex;
+  gap: 8px;
+}
+.flow-confirm-btn {
+  padding: 6px 16px;
+  font-size: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid var(--sys-border-c, rgba(184,149,106,.15));
+  background: transparent;
+  color: var(--sys-primary, #b8956a);
+  transition: all .2s;
+}
+.flow-confirm-btn.primary {
+  background: var(--sys-accent, rgba(184,149,106,.1));
+  border-color: var(--sys-primary, #b8956a);
+}
+.flow-confirm-btn:hover {
+  background: var(--sys-accent, rgba(184,149,106,.15));
+}

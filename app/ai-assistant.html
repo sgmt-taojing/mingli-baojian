@@ -22,6 +22,7 @@
 <link rel="stylesheet" href="css/divination-hub.css">
 <link rel="stylesheet" href="css/divination-hub-inline.css">
 <link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
 </head>
 <body class="theme-ai">
 <a href="divination-hub.html" style="position:fixed;top:8px;left:8px;z-index:9999;padding:6px 14px;border:1px solid rgba(201,168,76,.25);border-radius:6px;background:rgba(12,12,12,.9);color:#c9a84c;font-size:12px;letter-spacing:2px;text-decoration:none;backdrop-filter:blur(8px)">← 返回首页</a>
@@ -351,5 +352,18 @@ function toggleImmersive(){
 <div class="state-empty" id="empty-template" hidden>暂无数据</div>
 <div class="state-error" id="error-template" hidden>加载失败，请重试<button class="retry-btn" onclick="location.reload()">重试</button></div>
 
+<div id="flowStepsContainer"></div><div id="flowHintContainer"></div><div id="flowQuickLinks"></div>
+<script>
+document.addEventListener("DOMContentLoaded",function(){
+  if(typeof FlowEngine!=="undefined"){
+    FlowEngine.steps("flowStepsContainer",["选择模块", "输入问题", "AI分析", "查看结果"],0);
+    var h=document.getElementById("flowHintContainer");
+    if(h)h.innerHTML=FlowEngine.hint("选择需要咨询的模块，输入您的出生信息或问题，AI将给出参考建议。");
+    var ql=document.getElementById("flowQuickLinks");
+    if(ql)ql.innerHTML=FlowEngine.quicklinks([{"name": "八字排盘", "icon": "🌟", "url": "bazi.html"}, {"name": "望诊中心", "icon": "👁", "url": "wangzhen-center.html"}, {"name": "知识库", "icon": "📚", "url": "kb-explorer.html"}]);
+  }
+});
+</script>
+<script src="js/flow-engine.js"></script>
 </body>
 </html>

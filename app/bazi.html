@@ -20,6 +20,7 @@
 <link rel="stylesheet" href="css/divination-hub-inline.css">
 <link rel="stylesheet" href="css/mobile-nav.css">
 <link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
 </head>
 <body data-kb-module="bazi">
 <nav style="padding:6px 12px;border-bottom:1px solid rgba(201,168,76,.12);display:flex;gap:6px;flex-wrap:wrap;background:rgba(8,8,8,.95);position:sticky;top:0;z-index:200">
@@ -39,7 +40,9 @@
     <p class="sh-desc">年柱映祖荫，月柱观父母，日干为本人，时柱知晚景。阴阳五行定命局，十神生克论人生。</p>
   </div>
 
-  <div class="input-card">
+  <div id="baziFlowSteps"></div>
+<div class="flow-hint">请填写出生信息，系统将自动排盘。姓名可选填，核心是出生日期和时辰。</div>
+    <div class="input-card">
     <h3>命主基本信息</h3>
     <div class="input-row">
       <input type="text" class="input-field" id="baziName" placeholder="姓名" maxlength="20" aria-label="姓名">
@@ -246,6 +249,7 @@
       <button class="compute-btn" style="background:transparent;border:1px solid rgba(201,168,76,.15);font-size:12px;padding:8px 16px;opacity:.6" onclick="runBaziEnhancedFortune()">📈 运势 + 健康深度增强</button>
     </div>
     <div style="text-align:center;margin-top:6px;font-size:11px;color:var(--fg3)">📌 排盘后点击此按钮，生成今年/明年运势、健康专题、当日运势、企业主视角</div>
+<div id="baziQuickLinks"></div>
   </div>
 
   <div class="result" id="baziResult">
@@ -686,8 +690,39 @@ if(typeof showSection!=='function'){window.showSection=function(n){try{window.lo
 if(typeof runBaziEnhancedFortune!=='function'){window.runBaziEnhancedFortune=function(){try{var r=document.getElementById('baziResult')||document.getElementById('proResult');if(r){r.insertAdjacentHTML('beforeend','<div style=\"margin-top:16px;padding:14px;background:rgba(124,77,255,0.06);border-radius:10px;border:1px solid rgba(124,77,255,0.15)\"><h5 style=\"color:#7c4dff;margin-bottom:8px\">🌟 运势+健康深度增强</h5><p style=\"font-size:13px;color:var(--paper2)\">年度精解+企业视角增强报告。完整增强分析请在主页八字模块中使用。</p></div>');}if(typeof toast==='function')toast('增强报告已生成（简化版）');}catch(e){console.warn('[runBaziEnhancedFortune]',e);}};}
 if(typeof runHealthForecast!=='function'){window.runHealthForecast=function(){try{var r=document.getElementById('healthForecastResult')||document.getElementById('baziResult');if(r){r.insertAdjacentHTML('beforeend','<div style=\"margin-top:12px;padding:14px;background:rgba(39,174,96,0.06);border-radius:10px;border:1px solid rgba(39,174,96,0.15)\"><h5 style=\"color:var(--jade2);margin-bottom:8px\">🏥 健康预测</h5><p style=\"font-size:13px;color:var(--paper2)\">基于八字五行强弱分析的健康趋势预测。完整健康预测请在主页使用。</p></div>');}if(typeof toast==='function')toast('健康预测已生成（简化版）');}catch(e){console.warn('[runHealthForecast]',e);}};}
 if(typeof exportBaziReport!=='function'){window.exportBaziReport=function(fmt){try{var data=document.querySelector('.result-section')||document.body;var html='<!DOCTYPE html><html lang="zh-CN"><head><meta charset=UTF-8><title>八字报告</title><link rel="stylesheet" href="css/theme-systems.css">
-</head><body class="theme-zhouyi">'+data.innerHTML+'</body></html>';var blob=new Blob([html],{type:'text/html'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bazi-report.'+(fmt||'html');a.click();if(typeof toast==='function')toast('已导出'+(fmt||'html'));}catch(e){if(typeof toast==='function')toast('导出失败: '+e.message);}};}
+<link rel="stylesheet" href="css/flow-engine.css">
+</head><body class="theme-zhouyi">'+data.innerHTML+'<script>
+document.addEventListener("DOMContentLoaded",function(){
+  if(typeof FlowEngine!=="undefined"){
+    FlowEngine.steps("baziFlowSteps",["填写信息","排盘演算","查看结果","深度分析"],0);
+    var ql=document.getElementById("baziQuickLinks");
+    if(ql)ql.innerHTML=FlowEngine.quicklinks([
+      {name:"紫微斗数",icon:"🌌",url:"ziwei.html"},
+      {name:"奇门遁甲",icon:"🔮",url:"qimen-chart.html"},
+      {name:"人生蓝图",icon:"🧭",url:"lifeplan-detail.html"},
+      {name:"体质辨识",icon:"🌿",url:"tizhi.html"}
+    ]);
+  }
+});
+</script>
+<script src="js/flow-engine.js"></script>
+</body></html>';var blob=new Blob([html],{type:'text/html'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bazi-report.'+(fmt||'html');a.click();if(typeof toast==='function')toast('已导出'+(fmt||'html'));}catch(e){if(typeof toast==='function')toast('导出失败: '+e.message);}};}
 </script>
 
+<script>
+document.addEventListener("DOMContentLoaded",function(){
+  if(typeof FlowEngine!=="undefined"){
+    FlowEngine.steps("baziFlowSteps",["填写信息","排盘演算","查看结果","深度分析"],0);
+    var ql=document.getElementById("baziQuickLinks");
+    if(ql)ql.innerHTML=FlowEngine.quicklinks([
+      {name:"紫微斗数",icon:"🌌",url:"ziwei.html"},
+      {name:"奇门遁甲",icon:"🔮",url:"qimen-chart.html"},
+      {name:"人生蓝图",icon:"🧭",url:"lifeplan-detail.html"},
+      {name:"体质辨识",icon:"🌿",url:"tizhi.html"}
+    ]);
+  }
+});
+</script>
+<script src="js/flow-engine.js"></script>
 </body>
 </html>

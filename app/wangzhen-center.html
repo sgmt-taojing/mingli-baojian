@@ -229,6 +229,7 @@
     }
   </style>
 <link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
 </head>
 <body class="theme-tcm">
 <a href="divination-hub.html" style="position:fixed;top:8px;left:8px;z-index:9999;padding:6px 14px;border:1px solid rgba(201,168,76,.25);border-radius:6px;background:rgba(12,12,12,.9);color:#c9a84c;font-size:12px;letter-spacing:2px;text-decoration:none;backdrop-filter:blur(8px)">← 返回首页</a>
@@ -330,5 +331,18 @@
 <script src="js/wangzhen-kb-loader.js" defer></script>
 <script src="js/wangzhen-center.js" defer></script>
 
+<div id="flowStepsContainer"></div><div id="flowHintContainer"></div><div id="flowQuickLinks"></div>
+<script>
+document.addEventListener("DOMContentLoaded",function(){
+  if(typeof FlowEngine!=="undefined"){
+    FlowEngine.steps("flowStepsContainer",["拍摄面部", "拍摄舌象", "AI分析", "查看报告"],0);
+    var h=document.getElementById("flowHintContainer");
+    if(h)h.innerHTML=FlowEngine.hint("请在自然光下拍摄，面部正面无遮挡，舌象伸平自然。");
+    var ql=document.getElementById("flowQuickLinks");
+    if(ql)ql.innerHTML=FlowEngine.quicklinks([{"name": "体质辨识", "icon": "🌿", "url": "tizhi.html"}, {"name": "中医诊所", "icon": "🏥", "url": "tcm-clinic.html"}, {"name": "AI助手", "icon": "🤖", "url": "ai-assistant.html"}]);
+  }
+});
+</script>
+<script src="js/flow-engine.js"></script>
 </body>
 </html>
