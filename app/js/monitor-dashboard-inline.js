@@ -239,16 +239,17 @@ function renderHeatmap(){
 
 function renderAlertList(){
   let alerts=[
-    {level:'info',msg:'排盘引擎运行正常',time:'5分钟前'},
-    {level:'warn',msg:'divination-core.js 文件较大(2.1MB)，建议拆分',time:'1小时前'},
-    {level:'info',msg:'今日新增用户3人',time:'2小时前'},
-    {level:'crit',msg:'TTS语音服务(8912)离线',time:'3小时前'},
-    {level:'warn',msg:'API key 前端暴露(5处)，建议迁移后端',time:'5小时前'}
+    {level:'info',msg:'排盘引擎运行正常',detail:'平均响应时间120ms，7引擎全部可用',time:'5分钟前'},
+    {level:'warn',msg:'divination-core.js 文件较大(2.1MB)',detail:'影响首屏加载速度，建议拆分为按需加载模块',time:'1小时前'},
+    {level:'info',msg:'今日新增用户3人',detail:'主要通过微信公众号入口进入',time:'2小时前'},
+    {level:'crit',msg:'TTS语音服务(8912)离线',detail:'服务无响应超过3小时，语音合成功能不可用',time:'3小时前'},
+    {level:'warn',msg:'API key 前端暴露(5处)',detail:'安全风险：DeepSeek/智谱等API key 在前端JS中可见',time:'5小时前'}
   ];
+  window._alertData=alerts;
   document.getElementById('alertList').innerHTML=alerts.map(function(a){
     let cls=a.level==='crit'?'alert-crit':a.level==='warn'?'alert-warn':'alert-info';
     let icon=a.level==='crit'?'🔴':a.level==='warn'?'🟡':'🔵';
-    return '<div class="alert-item '+cls+'"><span>'+icon+'</span>'+
+    return '<div class="alert-item '+cls+'" data-drill="alert:'+alerts.indexOf(a)+'"><span>'+icon+'</span>'+
       '<div style="flex:1"><div style="color:var(--paper2)">'+a.msg+'</div>'+
       '<div style="color:var(--gray-light);font-size:.72rem">'+a.time+'</div></div></div>';
   }).join('');

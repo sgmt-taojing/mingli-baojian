@@ -95,7 +95,7 @@
       // 30 天趋势
       var trend=[];
       for(var i=0;i<30;i++){
-        trend.push({d:i,v:Math.max(1,Math.floor(f.month/30*(0.5+detRand()))});
+        trend.push({d:i,v:Math.max(1,Math.floor(f.month/30*(0.5+detRand())))});
       }
       var bars=trend.map(function(t){
         var pct=Math.min(100,t.v/Math.max.apply(null,trend.map(function(x){return x.v}))*100);
@@ -397,7 +397,11 @@
           if(result){
             openDrill(result.title,result.html);
             if(result.onOpen) setTimeout(result.onOpen,100);
+          }else{
+            console.warn('[drill] builder returned null for', drill);
           }
+        }else{
+          console.warn('[drill] no builder for type', type);
         }
         e.preventDefault();
         return;
