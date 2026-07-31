@@ -163,10 +163,27 @@ tr:hover{background:rgba(255,255,255,.02)}
 <script>
 const API = '';
 let currentPage = 1;
+
+// --- 登录检查 ---
+function checkAdminLogin() {
+  var token = localStorage.getItem('authToken');
+  if (!token) {
+    document.body.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#0d1117;color:#c9d1d9;font-family:system-ui,sans-serif">' +
+      '<div style="font-size:48px;margin-bottom:16px">🔐</div>' +
+      '<h2 style="color:#c9a84c;margin-bottom:8px">需要管理员登录</h2>' +
+      '<p style="color:#8b949e;font-size:14px;margin-bottom:24px">请先登录管理员账号</p>' +
+      '<a href="login.html?redirect=admin-tickets.html" style="padding:10px 24px;background:#c9a84c;color:#1a1a2e;text-decoration:none;border-radius:8px;font-weight:600">前往登录</a>' +
+      '</div>';
+    return false;
+  }
+  return true;
+}
+if (!checkAdminLogin()) throw new Error('NOT_LOGGED_IN');
 let totalPages = 1;
 let currentTicketId = null;
 
 async function loadStats() {
+  if (!checkAdminLogin()) return;
   try {
     const token = localStorage.getItem('authToken');
     const headers = {};
@@ -216,6 +233,7 @@ async function loadStats() {
 }
 
 async function loadTickets() {
+  if (!checkAdminLogin()) return;
   const status = document.getElementById('filterStatus').value;
   const category = document.getElementById('filterCategory').value;
   const priority = document.getElementById('filterPriority').value;
