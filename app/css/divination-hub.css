@@ -4914,3 +4914,75 @@ body:not(.wechat) .wechat-disclaimer{display:none}
     max-height: 150px;
   }
 }
+
+/* ================================================================
+   R331 全部左对齐 + 一级目录自适应尺寸
+   ================================================================ */
+
+/* 三栏容器：顶部对齐，不要 min-height 撑满 */
+.nav-three-col {
+  align-items: flex-start;
+  min-height: auto;
+}
+
+/* 第一栏：按内容自适应高度 */
+.nav-col-1 {
+  flex: 0 0 auto;
+  min-width: 160px;
+}
+.nav-col-1 .nc-list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 第二栏：按内容自适应高度 */
+.nav-col-2 {
+  flex: 0 0 auto;
+  min-width: 170px;
+}
+.nav-col-2 .nc-list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 第三栏：自适应剩余宽度 */
+.nav-col-3 {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 所有文字左对齐 */
+.nc-header { text-align: left; }
+.nc-item { text-align: left; justify-content: flex-start; }
+.nc-card { text-align: left; }
+.nc-card-name { text-align: left; }
+.nc-card-desc { text-align: left; }
+.nc-placeholder { text-align: left; padding-left: 20px; }
+
+/* 卡片网格：左对齐 */
+#nc3List {
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  justify-content: start;
+}
+
+/* 去掉居中 */
+.nc-card-icon { text-align: left; }
+.nc-card-tags { justify-content: flex-start; }
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .nav-col-1, .nav-col-2 {
+    flex: 0 0 auto;
+    width: 100%;
+    max-height: none;
+  }
+  #nc3List {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  #nc3List {
+    grid-template-columns: 1fr;
+  }
+}
