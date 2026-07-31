@@ -377,7 +377,7 @@ function tzGeneratePlan(){
       html+='<div class="tz-tip-gold-sm"><div class="tz-title-14-gold-mb6">📝 总结</div><div class="tz-text-13-lh18">'+obj.总结+'</div></div>';
     }
     // Disclaimer
-    html+='<div class="tz-tip-red"><div class="tz-text-12-red">⚠️ <b>温馨提示：</b>本方案由AI根据体质特征生成，仅供养生保健参考。如有特定疾病或服药中，请咨询中医师调整方案。功法练习请循序渐进，如有不适请停止。</div></div>';
+    html+='<div class="tz-tip-red"><div class="tz-text-12-red">⚠️ <b>温馨提示：</b>本方案由系统根据体质特征生成，仅供养生保健参考。如有特定疾病或服药中，请咨询中医师调整方案。功法练习请循序渐进，如有不适请停止。</div></div>';
     html+='</div>';
     result.innerHTML=html;
   }).catch(function(err){

@@ -1553,7 +1553,7 @@ function showToast(msg){
 }
 
 // ═══════════════════════════════════════════════
-// AI智能解读功能
+// 智能分析解读功能
 // ═══════════════════════════════════════════════
 let aiUploadedImageData = null;
 let aiInterpretHistory = JSON.parse(localStorage.getItem('aiInterpretHistory')||'[]');

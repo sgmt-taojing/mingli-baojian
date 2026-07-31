@@ -3070,7 +3070,7 @@ function tzRenderStep1Results(obj) {
   html += '<div style="text-align:center;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)"><button class="compute-btn" style="padding:12px 36px;font-size:14px" onclick="tzStep2Suggestions()">🌿 第二步：生成理疗建议</button></div>';
 
   // Disclaimer
-  html += '<div style="background:rgba(231,76,60,0.04);border:1px solid rgba(231,76,60,0.15);border-radius:8px;padding:10px 14px;margin-top:12px"><div style="font-size:11px;color:var(--cinn2);line-height:1.6">⚠️ <b>免责声明：</b>以上指标分析由AI根据上传报告生成，仅供养生保健参考。指标解读可能存在误差，具体诊断请以专业医师意见为准。</div></div>';
+  html += '<div style="background:rgba(231,76,60,0.04);border:1px solid rgba(231,76,60,0.15);border-radius:8px;padding:10px 14px;margin-top:12px"><div style="font-size:11px;color:var(--cinn2);line-height:1.6">⚠️ <b>免责声明：</b>以上指标分析由系统根据上传报告生成，仅供养生保健参考。指标解读可能存在误差，具体诊断请以专业医师意见为准。</div></div>';
 
   html += '</div>';
   result.innerHTML = html;
@@ -3191,7 +3191,7 @@ function tzStep2Suggestions() {
     }
 
     // Disclaimer
-    html += '<div style="background:rgba(231,76,60,0.04);border:1px solid rgba(231,76,60,0.15);border-radius:8px;padding:12px 16px;margin-top:16px"><div style="font-size:12px;color:var(--cinn2);line-height:1.6">⚠️ <b>免责声明：</b>以上理疗建议由AI根据指标分析结果生成，仅供养生保健参考。具体诊疗请咨询专业中医师。如有异常指标，请及时就医复查。</div></div>';
+    html += '<div style="background:rgba(231,76,60,0.04);border:1px solid rgba(231,76,60,0.15);border-radius:8px;padding:12px 16px;margin-top:16px"><div style="font-size:12px;color:var(--cinn2);line-height:1.6">⚠️ <b>免责声明：</b>以上理疗建议由系统根据指标分析结果生成，仅供养生保健参考。具体诊疗请咨询专业中医师。如有异常指标，请及时就医复查。</div></div>';
 
     html += '</div>';
     step2Div.innerHTML = html;
