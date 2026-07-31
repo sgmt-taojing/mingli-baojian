@@ -137,44 +137,46 @@
   background: var(--sys-accent, rgba(184,149,106,.15));
 }
 
-/* 表单审美优化 */
-.input-row, .form-row, .form-group {
-  display: flex !important;
-  gap: 10px !important;
-  margin-bottom: 10px !important;
-  flex-wrap: wrap !important;
-  align-items: flex-end !important;
+/* 表单审美优化 — 仅作用于 flow-engine 容器内，不影响自包含页面 */
+.flow-engine .input-row,
+.flow-engine .form-row,
+.flow-engine .form-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  align-items: flex-end;
 }
-.input-field {
-  min-height: 36px !important;
-  border-radius: 6px !important;
-  transition: border-color .2s !important;
+.flow-engine .input-field {
+  min-height: 36px;
+  border-radius: 6px;
+  transition: border-color .2s;
 }
-.input-field:focus {
-  outline: none !important;
-  box-shadow: 0 0 0 2px var(--sys-accent, rgba(184,149,106,.1)) !important;
+.flow-engine .input-field:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--sys-accent, rgba(184,149,106,.1));
 }
-.input-hint {
-  font-size: 11px !important;
-  opacity: 0.3 !important;
-  margin: 4px 0 8px !important;
-  line-height: 1.4 !important;
+.flow-engine .input-hint {
+  font-size: 11px;
+  opacity: 0.3;
+  margin: 4px 0 8px;
+  line-height: 1.4;
 }
-.input-card {
-  background: rgba(255,255,255,.015) !important;
-  border: 1px solid var(--sys-border, rgba(255,255,255,.04)) !important;
-  border-radius: 10px !important;
-  padding: 16px !important;
-  margin-bottom: 16px !important;
+.flow-engine .input-card {
+  background: rgba(255,255,255,.015);
+  border: 1px solid var(--sys-border, rgba(255,255,255,.04));
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
 }
 
 /* 表单分组标题 */
-.form-section-title {
-  font-size: 12px !important;
-  color: var(--sys-primary, #b8956a) !important;
-  opacity: 0.6 !important;
-  letter-spacing: 2px !important;
-  margin: 12px 0 8px !important;
-  padding-bottom: 4px !important;
-  border-bottom: 1px solid var(--sys-border, rgba(255,255,255,.03)) !important;
+.flow-engine .form-section-title {
+  font-size: 12px;
+  color: var(--sys-primary, #b8956a);
+  opacity: 0.6;
+  letter-spacing: 2px;
+  margin: 12px 0 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--sys-border, rgba(255,255,255,.03));
 }
