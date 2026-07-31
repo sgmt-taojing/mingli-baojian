@@ -31,7 +31,7 @@
 
   async function master(userId){
     var local = _lsRead();
-    var r = await fetch(API + '/api/person/master/' + (userId || 4));
+    var r = await fetch(API + '/api/person/master/' + (userId || 4)).catch(function(e){void 0});
     var j = await r.json();
     if (j.code === 200) {
       _cache = j.data;
@@ -43,13 +43,13 @@
   }
 
   async function dashboard(userId){
-    var r = await fetch(API + '/api/person/dashboard/' + (userId || 4));
+    var r = await fetch(API + '/api/person/dashboard/' + (userId || 4)).catch(function(e){void 0});
     var j = await r.json();
     return (j.code === 200) ? j.data : null;
   }
 
   async function list(limit){
-    var r = await fetch(API + '/api/person/list?limit=' + (limit || 50));
+    var r = await fetch(API + '/api/person/list?limit=' + (limit || 50)).catch(function(e){void 0});
     var j = await r.json();
     return (j.code === 200) ? j.data.persons : [];
   }

@@ -15,7 +15,7 @@ let SERVICE_PORTS=[
   {name:'API服务器 (8900)',url:'http://127.0.0.1:8900/',port:'8900'},
   {name:'排盘引擎 (8911)',url:'http://127.0.0.1:8911/',port:'8911'},
   {name:'TTS语音 (8912)',url:'http://127.0.0.1:8912/',port:'8912'},
-  {name:'AI代理 (8900/v1)',url:'http://127.0.0.1:8900/v1/models',port:'ai'}
+  {name:'AI代理 (8900/v1)',url:'http://127.0.0.1:8900/v1/models',silent:true,port:'ai'}
 ];
 
 let ENGINE_NAMES={
@@ -117,7 +117,7 @@ function renderOverview(){
   document.getElementById('ovRevenue').textContent='¥'+todayRev.toFixed(2);
 
   // 尝试调用 /api/health 获取系统状态（真实API）
-  fetch('/api/health').then(function(r){return r.json()}).then(function(s){
+  fetch('/api/health').then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(s){
     if(s&&s.uptime){
       // 真实数据可用时更新健康分
       let healthEl=document.getElementById('healthMetrics');
