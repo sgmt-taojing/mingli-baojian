@@ -3904,3 +3904,350 @@ body:not(.wechat) .wechat-disclaimer{display:none}
 .nav-group:hover .nav-dropdown,.nav-group.open .nav-dropdown{display:block}
 .nav-dropdown .file-nav-btn{display:block;margin:0;padding:8px 16px;border:none;border-radius:0;text-align:left;white-space:nowrap}
 .nav-dropdown .file-nav-btn:hover{background:rgba(201,168,76,0.08)}
+
+/* ================================================================
+   R326 首页卡片深度优化
+   ================================================================ */
+
+/* 分组标题增强 */
+.hero-section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 1000px;
+  width: 100%;
+  margin: 28px 0 10px;
+  padding: 0 4px;
+}
+.hero-section-title .hst-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+.hero-section-title .hst-text {
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 18px;
+  letter-spacing: 4px;
+  opacity: 0.9;
+}
+.hero-section-title .hst-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(201,168,76,.2), transparent);
+}
+.hero-section-title .hst-count {
+  font-size: 11px;
+  color: var(--paper3);
+  letter-spacing: 1px;
+  opacity: 0.6;
+}
+
+/* 卡片入场动画 — 错落渐入 */
+.cat-grid .cat-card {
+  animation: cardFadeIn 0.5s ease both;
+}
+.cat-grid .cat-card:nth-child(1) { animation-delay: 0.05s; }
+.cat-grid .cat-card:nth-child(2) { animation-delay: 0.10s; }
+.cat-grid .cat-card:nth-child(3) { animation-delay: 0.15s; }
+.cat-grid .cat-card:nth-child(4) { animation-delay: 0.20s; }
+.cat-grid .cat-card:nth-child(5) { animation-delay: 0.25s; }
+.cat-grid .cat-card:nth-child(6) { animation-delay: 0.30s; }
+.cat-grid .cat-card:nth-child(7) { animation-delay: 0.35s; }
+.cat-grid .cat-card:nth-child(8) { animation-delay: 0.40s; }
+.cat-grid .cat-card:nth-child(9) { animation-delay: 0.45s; }
+
+@keyframes cardFadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 卡片渐变边框 — 悬停时发光 */
+.cat-card {
+  position: relative;
+  background: linear-gradient(135deg, rgba(255,255,255,.025) 0%, rgba(255,255,255,.01) 100%);
+  border-radius: 6px;
+}
+.cat-card::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 7px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(201,168,76,.3), transparent 50%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity .4s;
+  pointer-events: none;
+}
+.cat-card:hover::after {
+  opacity: 1;
+}
+
+/* 卡片图标背景光晕 */
+.cat-card .cc-symbol {
+  position: relative;
+  display: inline-block;
+}
+.cat-card .cc-symbol::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  background: radial-circle, rgba(201,168,76,.08);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity .4s;
+}
+.cat-card:hover .cc-symbol::before {
+  opacity: 1;
+}
+
+/* cc-action 按钮 — 渐变背景 */
+.cc-action {
+  background: linear-gradient(135deg, rgba(201,168,76,.06), rgba(201,168,76,.02));
+  position: relative;
+  overflow: hidden;
+}
+.cc-action::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(201,168,76,.15), transparent);
+  opacity: 0;
+  transition: opacity .3s;
+}
+.cc-action:hover::before {
+  opacity: 1;
+}
+
+/* 响应式：768px 以下两列 */
+@media (max-width: 768px) {
+  .cat-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .cat-card {
+    padding: 18px 14px;
+  }
+  .cat-card .cc-symbol { font-size: 28px; }
+  .cat-card .cc-name { font-size: 16px; letter-spacing: 2px; }
+  .cat-card .cc-en { font-size: 9px; }
+  .cat-card .cc-desc { font-size: 11px; line-height: 1.6; }
+  .cat-card .cc-tags { display: none; }
+  .cc-action { font-size: 10px; padding: 4px 10px; }
+}
+
+/* 响应式：480px 以下单列 */
+@media (max-width: 480px) {
+  .cat-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ================================================================
+   R326 导航矩阵 — 左右布局
+   ================================================================ */
+.nav-matrix {
+  display: flex;
+  gap: 20px;
+  max-width: 1200px;
+  width: 100%;
+  margin: 24px auto 0;
+  align-items: flex-start;
+}
+
+/* 左侧面板 */
+.nav-matrix-side {
+  flex: 0 0 320px;
+  position: sticky;
+  top: 80px;
+  background: rgba(255,255,255,.025);
+  border: 1px solid rgba(201,168,76,.1);
+  border-radius: 10px;
+  padding: 28px 24px;
+  min-height: 400px;
+}
+.nms-default, .nms-active {
+  text-align: center;
+}
+.nms-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+.nms-title {
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 24px;
+  letter-spacing: 6px;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+.nms-desc {
+  font-size: 13px;
+  color: var(--paper3);
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+.nms-flow {
+  text-align: left;
+  background: rgba(0,0,0,.2);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+}
+.nms-flow-title {
+  font-size: 13px;
+  color: var(--gold);
+  margin-bottom: 10px;
+  letter-spacing: 2px;
+}
+.nms-flow-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: var(--paper3);
+}
+.nfs-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(201,168,76,.15);
+  color: var(--gold);
+  font-size: 11px;
+  flex-shrink: 0;
+}
+.nms-stat {
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--paper3);
+  opacity: 0.6;
+}
+
+/* 右侧卡片区 */
+.nav-matrix-main {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 体系选择网格 */
+.nma-systems {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+}
+.nma-sys-block {
+  background: rgba(255,255,255,.025);
+  border: 1px solid rgba(201,168,76,.1);
+  border-radius: 10px;
+  padding: 24px 20px;
+  cursor: pointer;
+  transition: all .3s ease;
+  text-align: center;
+}
+.nma-sys-block:hover {
+  transform: translateY(-2px);
+  border-color: rgba(201,168,76,.3);
+  background: rgba(255,255,255,.04);
+}
+.nma-sys-icon {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+.nma-sys-name {
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 18px;
+  letter-spacing: 4px;
+  color: var(--paper);
+  margin-bottom: 4px;
+}
+.nma-sys-count {
+  font-size: 11px;
+  color: var(--paper3);
+  opacity: 0.6;
+  margin-bottom: 8px;
+}
+.nma-sys-desc {
+  font-size: 12px;
+  color: var(--paper3);
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+.nma-sys-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.nma-sys-tags span {
+  font-size: 10px;
+  padding: 2px 8px;
+  border: 1px solid rgba(201,168,76,.12);
+  border-radius: 10px;
+  color: var(--paper3);
+  opacity: 0.7;
+}
+
+/* 展开后的卡片网格 */
+.nma-back {
+  background: none;
+  border: 1px solid rgba(201,168,76,.2);
+  color: var(--gold);
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  margin-bottom: 14px;
+  transition: all .2s;
+}
+.nma-back:hover {
+  background: rgba(201,168,76,.1);
+}
+.nma-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+/* 响应式：768px 以下 */
+@media (max-width: 768px) {
+  .nav-matrix {
+    flex-direction: column;
+  }
+  .nav-matrix-side {
+    flex: 0 0 auto;
+    position: relative;
+    top: 0;
+    min-height: auto;
+    padding: 16px;
+  }
+  .nma-systems {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .nma-sys-block {
+    padding: 14px 10px;
+  }
+  .nma-sys-icon { font-size: 24px; }
+  .nma-sys-name { font-size: 14px; letter-spacing: 2px; }
+  .nma-sys-desc { display: none; }
+  .nma-sys-tags { display: none; }
+  .nma-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+}
+
+/* 响应式：480px 以下 */
+@media (max-width: 480px) {
+  .nma-systems {
+    grid-template-columns: 1fr;
+  }
+  .nma-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}

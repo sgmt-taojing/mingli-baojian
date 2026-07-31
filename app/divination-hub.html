@@ -415,411 +415,84 @@ body{font-family:'Noto Serif SC',serif;background:var(--ink);color:var(--paper);
       <span class="rich-badge" id="profileEntryBadge" style="background:rgba(201,168,76,0.18);color:var(--gold);font-size:11px;padding:3px 10px;flex-shrink:0">未填写</span>
       <span style="color:var(--gold);font-size:18px;flex-shrink:0">→</span>
     </ml-tap>
-
     <!-- ══════════════════════════════════════════════════════════════ -->
-    <!-- R256 首页 6 大分组（按用户用途重排）-->
-    <!-- ①🩺 健康档案 → ②🔮 命运解读 → ③🪄 占卜决疑 → ④🏡 环境调理 → ⑤🧭 人生规划 → ⑥🎎 民俗生活 -->
+    <!-- R326 首页导航矩阵 — 左右布局：左说明 + 右卡片汇聚 -->
     <!-- ══════════════════════════════════════════════════════════════ -->
 
-    <!-- ① 分组：🩺 健康档案 -->
-    <div style="width:100%;max-width:1000px;margin:0 0 4px;display:flex;align-items:center;gap:12px">
-      <span style="font-family:'Ma Shan Zheng',serif;font-size:16px;color:var(--gold);letter-spacing:4px;opacity:0.85">🩺 健康档案</span>
-      <a href="report-interpret.html" style="font-size:11px;color:var(--jade);text-decoration:none;margin-left:auto">📋 报告中心 →</a>
-      <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(201,168,76,.2),transparent)"></div>
-    </div>
-    <div class="cat-grid">
-      <ml-tap role="button" tabindex="0" class="cat-card d-block" onclick="location.hash='#section-person-dashboard'" aria-label="人物档案看板" style="border-color:rgba(52,152,219,.25)">
-        <span class="cc-symbol">👤</span>
-        <span class="cc-name">人物档案看板</span>
-        <span class="cc-en">Person Dashboard</span>
-        <p class="cc-desc">5 身份统一视图（缘主/患者/信众/康养人/普通），档案聚合 + 综合风险 + 30天事件时间轴</p>
-        <div class="cc-tags"><span class="cat-tag">5身份</span><span class="cat-tag">风险评级</span><span class="cat-tag">事件流</span><span class="cat-tag">OCR+周分析</span></div>
-        <ml-tap role="button" tabindex="0" class="cc-action d-block" onclick="event.stopPropagation();location.hash='#section-person-dashboard'" aria-label="人物档案看板">👤 打开看板</ml-tap>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="cat-card d-block" onclick="location.hash='#section-report-interpret'" aria-label="报告解读中心" style="border-color:rgba(230,126,34,.25)">
-        <span class="cc-symbol">📋</span>
-        <span class="cc-name">报告解读中心</span>
-        <span class="cc-en">Report Interpretation</span>
-        <p class="cc-desc">体检报告/生化指标/CT/MRI/X光统一解读引擎，四维融合（西医+中医+命理+家族遗传）</p>
-        <div class="cc-tags"><span class="cat-tag">24项生化</span><span class="cat-tag">15项影像</span><span class="cat-tag">四维融合</span><span class="cat-tag">KB入库</span></div>
-        <ml-tap role="button" tabindex="0" class="cc-action d-block" onclick="event.stopPropagation();location.hash='#section-report-interpret'" aria-label="统一报告解读">📋 立即解读</ml-tap>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="cat-card d-block" onclick="showSection('tizhi')" aria-label="中医体质辨识" style="border-color:rgba(46,204,113,.25)">
-        <span class="cc-symbol">🌿</span>
-        <span class="cc-name">中医体质辨识</span>
-        <span class="cc-en">TCM Constitution</span>
-        <p class="cc-desc">9 种体质辨识（平和/气虚/阳虚/阴虚/痰湿/湿热/血瘀/气郁/特禀），九种体质调养方案</p>
-        <div class="cc-tags"><span class="cat-tag">9种体质</span><span class="cat-tag">辨识</span><span class="cat-tag">调养</span><span class="cat-tag">食疗</span></div>
-        <ml-tap role="button" tabindex="0" class="cc-action d-block" onclick="event.stopPropagation();showSection('tizhi')" aria-label="体质辨识">🌿 测体质</ml-tap>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="cat-card d-block" onclick="window.location.href='wangzhen-clinical.html'" aria-label="望诊识人" style="border-color:rgba(231,76,60,.25)">
-        <span class="cc-symbol">👁</span>
-        <span class="cc-name">望诊识人</span>
-        <span class="cc-en">Wang Zhen Diagnosis</span>
-        <p class="cc-desc">面部·舌象·目神 拍照上传，AI 视觉引擎判读脏腑虚实，倪师望诊法完整呈现</p>
-        <div class="cc-tags"><span class="cat-tag">面部</span><span class="cat-tag">舌象</span><span class="cat-tag">AI视觉</span><span class="cat-tag">倪师法</span></div>
-        <ml-tap role="button" tabindex="0" class="cc-action d-block" onclick="event.stopPropagation();window.location.href='wangzhen-clinical.html'" aria-label="望诊">👁 拍望诊</ml-tap>
-      </ml-tap>
-    </div><!-- /cat-grid: 健康档案 -->
+    <div class="nav-matrix" id="navMatrix">
+      <!-- 左侧：体系说明面板 -->
+      <aside class="nav-matrix-side" id="navSidePanel">
+        <div class="nms-default" id="nmsDefault">
+          <div class="nms-icon">🏛️</div>
+          <h3 class="nms-title">易道智鉴</h3>
+          <p class="nms-desc">融合千年命理智慧与先进人工智能<br>选择左侧体系，查看对应功能</p>
+          <div class="nms-flow">
+            <div class="nms-flow-title">📋 使用流程</div>
+            <div class="nms-flow-step"><span class="nfs-num">1</span><span>选择上方导航体系</span></div>
+            <div class="nms-flow-step"><span class="nfs-num">2</span><span>右侧查看功能卡片</span></div>
+            <div class="nms-flow-step"><span class="nfs-num">3</span><span>点击卡片进入工具</span></div>
+            <div class="nms-flow-step"><span class="nfs-num">4</span><span>AI 助手生成报告</span></div>
+          </div>
+        </div>
+      </aside>
 
-    <!-- ② 分组：🔮 命运解读 -->
-    <div style="width:100%;max-width:1000px;margin:0 0 4px;display:flex;align-items:center;gap:12px">
-      <span style="font-family:'Ma Shan Zheng',serif;font-size:16px;color:var(--gold);letter-spacing:4px;opacity:0.85">🔮 命运解读</span>
-      <a href="paipan-center.html" style="font-size:11px;color:var(--jade);text-decoration:none;margin-left:auto">🌀 排盘中心 →</a>
-      <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(201,168,76,.2),transparent)"></div>
-    </div>
-    <div class="cat-grid">
-      <ml-tap role="button" tabindex="0" class="cat-card bazi d-block" onclick="showSection('bazi')" aria-label="八字命盘">
-        <span class="cc-symbol">🌟</span>
-        <span class="cc-name">八字命盘</span>
-        <span class="cc-en">Ba Zi Fortune</span>
-        <p class="cc-desc">四柱八字，日主为根，配十神格局、大运流年，论一生吉凶祸福</p>
-        <div class="cc-tags"><span class="cat-tag">十神</span><span class="cat-tag">大运</span><span class="cat-tag">神煞</span><span class="cat-tag">格局</span></div>
-        <ml-tap role="button" tabindex="0" class="cc-action d-block" onclick="event.stopPropagation();showSection('bazi')" aria-label="八字命理">八字命理</ml-tap>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="cat-card ziwei d-block" onclick="location.hash='#section-ziwei'" aria-label="紫微斗数">
-        <span class="cc-symbol">🌌</span>
-        <span class="cc-name">紫微斗数</span>
-        <span class="cc-en">Zi Wei Dou Shu</span>
-        <p class="cc-desc">十四主星，十二宫位，四化飞星，观星曜格局论命，与八字交叉验证</p>
-        <div class="cc-tags"><span class="cat-tag">主星</span><span class="cat-tag">宫位</span><span class="cat-tag">四化</span><span class="cat-tag">大限</span></div>
-        <ml-tap role="button" tabindex="0" class="cc-action d-block" onclick="event.stopPropagation();location.hash='#section-ziwei'" aria-label="紫微排盘">紫微排盘</ml-tap>
-      </ml-tap>
-    </div><!-- /cat-grid: 命运解读 -->
+      <!-- 右侧：功能卡片汇聚区 -->
+      <div class="nav-matrix-main" id="navCardArea">
+        <!-- 默认展示：5 大体系入口 -->
+        <div class="nma-systems" id="nmaSystems">
+          <!-- ① 周易术数 -->
+          <div class="nma-sys-block" data-sys="zhouyi" onmouseover="navShowSide('zhouyi')" onclick="navExpandCards('zhouyi')">
+            <div class="nma-sys-icon" style="color:var(--cyan)">☰</div>
+            <div class="nma-sys-name">周易术数</div>
+            <div class="nma-sys-count">16 项功能</div>
+            <div class="nma-sys-desc">排盘 · 占卜 · 命理 · 风水</div>
+            <div class="nma-sys-tags"><span>八字</span><span>紫微</span><span>奇门</span><span>六爻</span></div>
+          </div>
+          <!-- ② 中医诊疗 -->
+          <div class="nma-sys-block" data-sys="tcm" onmouseover="navShowSide('tcm')" onclick="navExpandCards('tcm')">
+            <div class="nma-sys-icon" style="color:var(--jade)">⚕️</div>
+            <div class="nma-sys-name">中医诊疗</div>
+            <div class="nma-sys-count">17 项功能</div>
+            <div class="nma-sys-desc">体质 · 望诊 · 患者档案 · 报告</div>
+            <div class="nma-sys-tags"><span>体质</span><span>望诊</span><span>患者</span><span>报告</span></div>
+          </div>
+          <!-- ③ 知识文化 -->
+          <div class="nma-sys-block" data-sys="knowledge" onmouseover="navShowSide('knowledge')" onclick="navExpandCards('knowledge')">
+            <div class="nma-sys-icon" style="color:var(--gold2)">📚</div>
+            <div class="nma-sys-name">知识文化</div>
+            <div class="nma-sys-count">14 项功能</div>
+            <div class="nma-sys-desc">KB · 学堂 · 名师 · 民俗</div>
+            <div class="nma-sys-tags"><span>知识库</span><span>倪师</span><span>口诀</span><span>音乐</span></div>
+          </div>
+          <!-- ④ 运营运维 -->
+          <div class="nma-sys-block" data-sys="ops" onmouseover="navShowSide('ops')" onclick="navExpandCards('ops')">
+            <div class="nma-sys-icon" style="color:var(--cyan2)">🛠</div>
+            <div class="nma-sys-name">运营运维</div>
+            <div class="nma-sys-count">13 项功能</div>
+            <div class="nma-sys-desc">后台 · 监控 · 设备 · AI</div>
+            <div class="nma-sys-tags"><span>后台</span><span>大屏</span><span>设备</span><span>API</span></div>
+          </div>
+          <!-- ⑤ 用户服务 -->
+          <div class="nma-sys-block" data-sys="user" onmouseover="navShowSide('user')" onclick="navExpandCards('user')">
+            <div class="nma-sys-icon" style="color:var(--gold3)">👤</div>
+            <div class="nma-sys-name">用户服务</div>
+            <div class="nma-sys-count">12 项功能</div>
+            <div class="nma-sys-desc">账户 · 商城 · 推送 · 反馈</div>
+            <div class="nma-sys-tags"><span>登录</span><span>商城</span><span>缘主</span><span>反馈</span></div>
+          </div>
+        </div>
 
-    <!-- ③ 分组：🪄 占卜决疑 -->
-    <div style="width:100%;max-width:1000px;margin:0 0 4px;display:flex;align-items:center;gap:12px">
-      <span style="font-family:'Ma Shan Zheng',serif;font-size:16px;color:var(--gold);letter-spacing:4px;opacity:0.85">🪄 占卜决疑</span>
-      <a href="zhanbu.html" style="font-size:11px;color:var(--jade);text-decoration:none;margin-left:auto">🌀 占卜子页 →</a>
-      <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(201,168,76,.2),transparent)"></div>
-    </div>
-    <div class="cat-grid">
-      <ml-tap role="button" tabindex="0" class="cat-card yijing d-block" onclick="showSection('zhanbu');showZhanbuSub('yijing')" aria-label="六爻占卜">
-        <span class="cc-symbol">䷀</span>
-        <span class="cc-name">六爻占卜</span>
-        <span class="cc-en">Yi Jing Divination</span>
-        <p class="cc-desc">铜钱摇卦，装卦断事，六亲六神配五行，判断具体问题吉凶成败</p>
-        <div class="cc-tags"><span class="cat-tag">六爻</span><span class="cat-tag">六亲</span><span class="cat-tag">六神</span><span class="cat-tag">卦辞</span></div>
-        <ml-tap role="button" tabindex="0" class="cc-action d-block" onclick="event.stopPropagation();showSection('zhanbu');showZhanbuSub('yijing')" aria-label="六爻">起卦问事</ml-tap>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="cat-card qimen d-block" onclick="showSection('zhanbu');showZhanbuSub('qimen')" aria-label="奇门遁甲">
-        <span class="cc-symbol">☰</span>
-        <span class="cc-name">奇门遁甲</span>
-        <span class="cc-en">Qi Men Dun Jia</span>
-        <p class="cc-desc">最高层次预测术，九宫八卦布局八门九星，洞悉吉凶方位与行动时机</p>
-        <div class="cc-tags"><span class="cat-tag">八门</span><span class="cat-tag">九星</span><span class="cat-tag">八神</span><span class="cat-tag">三奇</span></div>
-        <ml-tap role="button" tabindex="0" class="cc-action d-block" onclick="event.stopPropagation();showSection('zhanbu');showZhanbuSub('qimen')" aria-label="奇门">择时择方</ml-tap>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="cat-card meihua d-block" onclick="showSection('zhanbu');showZhanbuSub('meihua')" aria-label="梅花易数">
-        <span class="cc-symbol">🌸</span>
-        <span class="cc-name">梅花易数</span>
-        <span class="cc-en">Mei Hua Yi Shu</span>
-        <p class="cc-desc">观象玩辞，心动即占，万物皆可成卦，简单直接，直指本心</p>
-        <div class="cc-tags"><span class="cat-tag">体用</span><span class="cat-tag">外应</span><span class="cat-tag">卦象</span></div>
-        <ml-tap role="button" tabindex="0" class="cc-action d-block" onclick="event.stopPropagation();showSection('zhanbu');showZhanbuSub('meihua')" aria-label="梅花">心动即占</ml-tap>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="cat-card liuren d-block" onclick="showSection('zhanbu');showZhanbuSub('liuren')" aria-label="大六壬">
-        <span class="cc-symbol">⬡</span>
-        <span class="cc-name">大六壬</span>
-        <span class="cc-en">Da Liu Ren</span>
-        <p class="cc-desc">三传四课，天将盘排，九宗门定传，为古代宫廷最高层次预测术之一</p>
-        <div class="cc-tags"><span class="cat-tag">四课</span><span class="cat-tag">三传</span><span class="cat-tag">天将</span><span class="cat-tag">九宗门</span></div>
-        <ml-tap role="button" tabindex="0" class="cc-action d-block" onclick="event.stopPropagation();showSection('zhanbu');showZhanbuSub('liuren')" aria-label="六壬">三传四课</ml-tap>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="cat-card d-block" onclick="showSection('cezi')" aria-label="测字占卜" style="border-color:rgba(142,68,173,.25)">
-        <span class="cc-symbol">✍</span>
-        <span class="cc-name">测字占卜</span>
-        <span class="cc-en">Ce Zi Divination</span>
-        <p class="cc-desc">心有所想，写下一字，拆字配五行，问事具体而直接，最简易的决疑术</p>
-        <div class="cc-tags"><span class="cat-tag">汉字</span><span class="cat-tag">五行</span><span class="cat-tag">即时</span><span class="cat-tag">最简</span></div>
-        <ml-tap role="button" tabindex="0" class="cc-action d-block" onclick="event.stopPropagation();showSection('cezi')" aria-label="测字">✍ 测字</ml-tap>
-      </ml-tap>
-    </div><!-- /cat-grid: 占卜决疑 -->
-
-    <!-- ④ 分组：🏡 环境调理 -->
-    <div style="width:100%;max-width:1000px;margin:0 0 4px;display:flex;align-items:center;gap:12px">
-      <span style="font-family:'Ma Shan Zheng',serif;font-size:16px;color:var(--gold);letter-spacing:4px;opacity:0.85">🏡 环境调理</span>
-      <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(201,168,76,.2),transparent)"></div>
-    </div>
-    <div class="cat-grid">
-      <ml-tap role="button" tabindex="0" class="cat-card" onclick="showSection('fengshui')" style="display:block;border-color:rgba(142,68,173,.12)">
-        <span class="cc-symbol" style="color:var(--violet)">🏡</span>
-        <span class="cc-name" style="color:var(--violet)">阳宅风水</span>
-        <span class="cc-en">Feng Shui</span>
-        <p class="cc-desc">家居办公环境能量分析，藏风聚气、得水为上，调理环境提升运势</p>
-        <div class="cc-tags"><span class="cat-tag" style="border-color:rgba(142,68,173,.15);color:var(--violet)">峦头</span><span class="cat-tag" style="border-color:rgba(142,68,173,.15);color:var(--violet)">理气</span><span class="cat-tag" style="border-color:rgba(142,68,173,.15);color:var(--violet)">卦位</span></div>
-        <ml-tap role="button" tabindex="0" class="cc-action d-block" onclick="event.stopPropagation();showSection('fengshui')" aria-label="风水玄空">风水玄空</ml-tap>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="cat-card" onclick="showSection('fengshui-pro')" style="display:block;border-color:rgba(39,174,96,.12)">
-        <span class="cc-symbol" style="color:var(--jade)">🏔️</span>
-        <span class="cc-name" style="color:var(--jade)">风水进阶</span>
-        <span class="cc-en">Feng Shui Pro</span>
-        <p class="cc-desc">每日方位 · 布局诊断 · 化煞大全 · 流年飞星 · 风水择日，七大功能全面覆盖</p>
-        <div class="cc-tags"><span class="cat-tag" style="border-color:rgba(39,174,96,.15);color:var(--jade)">每日</span><span class="cat-tag" style="border-color:rgba(39,174,96,.15);color:var(--jade)">化煞</span><span class="cat-tag" style="border-color:rgba(39,174,96,.15);color:var(--jade)">择日</span></div>
-        <ml-tap role="button" tabindex="0" class="cc-action d-block" onclick="event.stopPropagation();showSection('fengshui-pro')" aria-label="风水进阶">风水进阶</ml-tap>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="cat-card" onclick="showSection('yanzhi')" style="display:block;border-color:rgba(230,126,34,.12)">
-        <span class="cc-symbol" style="color:var(--orange)">💬</span>
-        <span class="cc-name" style="color:var(--orange)">言值沟通</span>
-        <span class="cc-en">Yanzhi · Communication</span>
-        <p class="cc-desc">同事·客户·夫妻·亲子，沟通有道，言值满满。让每一句话都说到心坎上</p>
-        <div class="cc-tags"><span class="cat-tag" style="border-color:rgba(230,126,34,.15);color:var(--orange)">沟通</span><span class="cat-tag" style="border-color:rgba(230,126,34,.15);color:var(--orange)">话术</span><span class="cat-tag" style="border-color:rgba(230,126,34,.15);color:var(--orange)">关系</span></div>
-        <ml-tap role="button" tabindex="0" class="cc-action d-block" onclick="event.stopPropagation();showSection('yanzhi')" aria-label="言值沟通">💬 练言值</ml-tap>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="cat-card" onclick="showSection('xingming')" style="display:block;border-color:rgba(201,168,76,.15)">
-        <span class="cc-symbol" style="color:var(--gold)">🔤</span>
-        <span class="cc-name" style="color:var(--gold)">姓名起名</span>
-        <span class="cc-en">Name Analysis</span>
-        <p class="cc-desc">五格数理 · 三才配置 · 八字喜用 · 生肖宜忌，为宝宝起个好名字</p>
-        <div class="cc-tags"><span class="cat-tag" style="border-color:rgba(201,168,76,.2);color:var(--gold)">五格</span><span class="cat-tag" style="border-color:rgba(201,168,76,.2);color:var(--gold)">三才</span><span class="cat-tag" style="border-color:rgba(201,168,76,.2);color:var(--gold)">喜用</span></div>
-        <ml-tap role="button" tabindex="0" class="cc-action d-block" onclick="event.stopPropagation();showSection('xingming')" aria-label="姓名起名">🔤 起好名</ml-tap>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="cat-card d-block" onclick="showSection('mobile')" aria-label="手机号吉凶" style="border-color:rgba(58,166,180,.3)">
-        <span class="cc-symbol" style="color:var(--cyan,#3aa6b4)">📱</span>
-        <span class="cc-name" style="color:var(--cyan,#3aa6b4)">手机号吉凶</span>
-        <span class="cc-en">Mobile Number Ba Zi</span>
-        <p class="cc-desc">八星数字揭示财运·事业·感情走势 · 五行生克与八字用神匹配 · 专业改号建议</p>
-        <div class="cc-tags"><span class="cat-tag" style="border-color:rgba(58,166,180,.3);color:var(--cyan,#3aa6b4)">八星</span><span class="cat-tag" style="border-color:rgba(58,166,180,.3);color:var(--cyan,#3aa6b4)">五行</span><span class="cat-tag" style="border-color:rgba(58,166,180,.3);color:var(--cyan,#3aa6b4)">用神</span></div>
-        <ml-tap role="button" tabindex="0" class="cc-action d-block" onclick="event.stopPropagation();showSection('mobile')" aria-label="手机号分析">📱 查手机号</ml-tap>
-      </ml-tap>
-    </div><!-- /cat-grid: 环境调理 -->
-
-    <!-- ⑤ 分组：🧭 人生规划 -->
-    <div style="width:100%;display:flex;align-items:center;gap:12px;margin:8px 0 4px">
-      <span style="font-family:'Ma Shan Zheng',serif;font-size:16px;color:var(--gold);letter-spacing:4px;opacity:0.85">🧭 人生规划</span>
-      <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(201,168,76,.2),transparent)"></div>
-    </div>
-    <div class="cat-grid">
-      <ml-tap role="button" tabindex="0" class="cat-card" onclick="showSection('lifeplan')" style="display:block;border-color:rgba(52,152,219,.15)">
-        <span class="cc-symbol" style="color:var(--cyan2)">🧭</span>
-        <span class="cc-name" style="color:var(--cyan2)">人生规划</span>
-        <span class="cc-en">Life Planning</span>
-        <p class="cc-desc">基于八字五行十神，结合十二长生，推荐学业、职业、婚恋、城市方向，适合年龄做适合的事</p>
-        <div class="cc-tags"><span class="cat-tag">学业</span><span class="cat-tag">职业</span><span class="cat-tag">婚恋</span><span class="cat-tag">十二长生</span></div>
-        <ml-tap role="button" tabindex="0" class="cc-action d-block" onclick="event.stopPropagation();showSection('lifeplan')" aria-label="人生规划">人生规划</ml-tap>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="cat-card" onclick="showSection('youth')" style="display:block;border-color:rgba(46,204,113,.15)">
-        <span class="cc-symbol" style="color:var(--success)">🧒</span>
-        <span class="cc-name" style="color:var(--success)">青少年规划</span>
-        <span class="cc-en">Youth Planning</span>
-        <p class="cc-desc">按八字五行十神，为孩子推荐兴趣爱好、学业方向、中高考志愿、职业城市、性格健康全方位指引</p>
-        <div class="cc-tags"><span class="cat-tag">兴趣</span><span class="cat-tag">学业</span><span class="cat-tag">志愿</span><span class="cat-tag">性格</span></div>
-        <ml-tap role="button" tabindex="0" class="cc-action d-block" onclick="event.stopPropagation();showSection('youth')" aria-label="青少年">青少年</ml-tap>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="cat-card" onclick="showSection('family')" style="display:block;border-color:rgba(231,76,60,.15)">
-        <span class="cc-symbol" style="color:var(--cinn2)">👨‍👩‍👧‍👦</span>
-        <span class="cc-name" style="color:var(--cinn2)">家庭排盘</span>
-        <span class="cc-en">Family Chart</span>
-        <p class="cc-desc">全家八字合盘分析，五行生克关系，综合化解方案，布局方位配色择日</p>
-        <div class="cc-tags"><span class="cat-tag">合盘</span><span class="cat-tag">化解</span><span class="cat-tag">布局</span><span class="cat-tag">终身会员</span></div>
-        <ml-tap role="button" tabindex="0" class="cc-action d-block" onclick="event.stopPropagation();showSection('family')" aria-label="家庭关系">家庭关系</ml-tap>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="cat-card" onclick="showSection('push-plan')" style="display:block;border-color:rgba(41,128,185,.15)">
-        <span class="cc-symbol" style="color:var(--cyan)">📡</span>
-        <span class="cc-name" style="color:var(--cyan)">推送计划</span>
-        <span class="cc-en">Push Plan Matrix</span>
-        <p class="cc-desc">会员分级推送体系，每日宜忌到年度化解，跨年流年切换全流程，引流转化设计</p>
-        <div class="cc-tags"><span class="cat-tag">分级推送</span><span class="cat-tag">跨年化解</span><span class="cat-tag">节气</span><span class="cat-tag">引流</span></div>
-        <ml-tap role="button" tabindex="0" class="cc-action d-block" onclick="event.stopPropagation();showSection('push-plan')" aria-label="推送计划">推送计划</ml-tap>
-      </ml-tap>
-    </div><!-- /cat-grid: 人生规划 -->
-
-    <!-- ⑥ 分组：🎎 民俗生活 -->
-    <div style="width:100%;max-width:1000px;margin:8px 0 4px;display:flex;align-items:center;gap:12px">
-      <span style="font-family:'Ma Shan Zheng',serif;font-size:16px;color:var(--gold);letter-spacing:4px;opacity:0.85">🎎 民俗生活</span>
-      <a href="divination-almanac.html" style="font-size:11px;color:var(--jade);text-decoration:none;margin-left:auto">🗓 黄历工具 →</a>
-      <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(201,168,76,.2),transparent)"></div>
-    </div>
-    <div class="cat-grid">
-      <ml-tap role="button" tabindex="0" class="cat-card" onclick="showSection('jiuri')" style="display:block;border-color:rgba(230,126,34,.12)">
-        <span class="cc-symbol" style="color:var(--orange)">📅</span>
-        <span class="cc-name" style="color:var(--orange)">黄历吉日</span>
-        <span class="cc-en">Auspicious Calendar</span>
-        <p class="cc-desc">彭祖百忌 · 二十八宿 · 建除十二神 · 黄道黑道 · 冲煞宜忌 · 择日建议</p>
-        <div class="cc-tags"><span class="cat-tag" style="border-color:rgba(230,126,34,.15);color:var(--orange)">黄历</span><span class="cat-tag" style="border-color:rgba(230,126,34,.15);color:var(--orange)">吉日</span><span class="cat-tag" style="border-color:rgba(230,126,34,.15);color:var(--orange)">择日</span><span class="cat-tag" style="border-color:rgba(230,126,34,.15);color:var(--orange)">二十八宿</span></div>
-        <ml-tap role="button" tabindex="0" class="cc-action d-block" onclick="event.stopPropagation();showSection('jiuri')" aria-label="黄历吉日">📅 查黄历</ml-tap>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="cat-card" onclick="showSection('annual-fortune')" style="display:block;border-color:rgba(201,168,76,.15)">
-        <span class="cc-symbol" style="color:var(--gold)">🧧</span>
-        <span class="cc-name" style="color:var(--gold)">年度运势</span>
-        <span class="cc-en">Annual Fortune</span>
-        <p class="cc-desc">太岁化解 · 流年吉位 · 跨年祈福 · 节气提醒 · 流月运势 · 流日吉凶</p>
-        <div class="cc-tags"><span class="cat-tag" style="border-color:rgba(201,168,76,.2);color:var(--gold)">太岁</span><span class="cat-tag" style="border-color:rgba(201,168,76,.2);color:var(--gold)">节气</span><span class="cat-tag" style="border-color:rgba(201,168,76,.2);color:var(--gold)">祈福</span></div>
-        <ml-tap role="button" tabindex="0" class="cc-action d-block" onclick="event.stopPropagation();showSection('annual-fortune')" aria-label="年度运势">🧧 看流年</ml-tap>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="cat-card" onclick="showSection('healing-music')" style="display:block;border-color:rgba(39,174,96,.12)">
-        <span class="cc-symbol" style="color:var(--jade)">🎵</span>
-        <span class="cc-name" style="color:var(--jade)">五行音乐</span>
-        <span class="cc-en">Five Element Music</span>
-        <p class="cc-desc">宫商角徵羽 × 五行脏腑 · 焦虑失眠 · 悲伤愤怒 · 疲劳养护，一键成曲</p>
-        <div class="cc-tags"><span class="cat-tag" style="border-color:rgba(39,174,96,.15);color:var(--jade)">宫商角徵羽</span><span class="cat-tag" style="border-color:rgba(39,174,96,.15);color:var(--jade)">情绪</span></div>
-        <ml-tap role="button" tabindex="0" class="cc-action d-block" onclick="event.stopPropagation();showSection('healing-music')" aria-label="五行音乐">🎵 听雅乐</ml-tap>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="cat-card" onclick="showSection('masters')" style="display:block;border-color:rgba(201,168,76,.15)">
-        <span class="cc-symbol" style="color:var(--gold)">📿</span>
-        <span class="cc-name" style="color:var(--gold)">名师解惑</span>
-        <span class="cc-en">Masters & Precepts</span>
-        <p class="cc-desc">道家佛家名师开示，非遗中医约见，清规戒律参学，向大德高僧问道解惑</p>
-        <div class="cc-tags"><span class="cat-tag">道家长</span><span class="cat-tag">佛家师</span><span class="cat-tag">中医</span><span class="cat-tag">戒律</span></div>
-        <ml-tap role="button" tabindex="0" class="cc-action d-block" onclick="event.stopPropagation();showSection('masters')" aria-label="大师名家">大师名家</ml-tap>
-      </ml-tap>
-    </div><!-- /cat-grid: 民俗生活 -->
-
-    <!-- R256: 7 大独立业务门户索引 — 按用户用途划分大类 -->
-    <div style="width:100%;max-width:1180px;margin:24px auto 0;padding:20px;border:1px solid rgba(142,68,173,.2);border-radius:16px;background:linear-gradient(135deg,rgba(142,68,173,.05),rgba(201,168,76,.05))">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-        <span style="font-size:20px">🏛️</span>
-        <span style="font-family:'Ma Shan Zheng',serif;font-size:18px;color:var(--gold);letter-spacing:4px">七大业务门户（按用途大类）</span>
-        <span style="font-size:11px;color:var(--paper2);opacity:.6;letter-spacing:2px;margin-left:6px">R256 新增</span>
+        <!-- 展开后的卡片区域 -->
+        <div class="nma-cards" id="nmaCards" style="display:none">
+          <button class="nma-back" onclick="navBackToSystems()">← 返回体系选择</button>
+          <div class="nma-cards-grid" id="nmaCardsGrid"></div>
+        </div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px">
-        <a href="naming-portal.html" style="padding:14px;border:1px solid rgba(201,168,76,.3);border-radius:10px;text-decoration:none;color:var(--paper);background:rgba(201,168,76,.06);display:block;transition:all .3s">
-          <div style="font-size:24px;margin-bottom:6px">🪪</div>
-          <div style="font-size:13px;color:var(--gold);font-weight:700;margin-bottom:4px;letter-spacing:1.5px">命名起号</div>
-          <div style="font-size:11px;color:var(--paper2);opacity:.78;line-height:1.5">姓名/手机号/公司名/测字</div>
-          <div style="margin-top:6px;font-size:10px;color:var(--cyan);letter-spacing:1.5px">→ 独立门户</div>
-        </a>
-        <a href="patient-portal.html" style="padding:14px;border:1px solid rgba(52,152,219,.3);border-radius:10px;text-decoration:none;color:var(--paper);background:rgba(52,152,219,.06);display:block;transition:all .3s">
-          <div style="font-size:24px;margin-bottom:6px">🩺</div>
-          <div style="font-size:13px;color:var(--gold);font-weight:700;margin-bottom:4px;letter-spacing:1.5px">患者诊疗</div>
-          <div style="font-size:11px;color:var(--paper2);opacity:.78;line-height:1.5">档案/初诊/望诊/报告/隐私</div>
-          <div style="margin-top:6px;font-size:10px;color:var(--cyan);letter-spacing:1.5px">→ 独立门户</div>
-        </a>
-        <a href="tcm-portal.html" style="padding:14px;border:1px solid rgba(46,204,113,.3);border-radius:10px;text-decoration:none;color:var(--paper);background:rgba(46,204,113,.06);display:block;transition:all .3s">
-          <div style="font-size:24px;margin-bottom:6px">🌿</div>
-          <div style="font-size:13px;color:var(--gold);font-weight:700;margin-bottom:4px;letter-spacing:1.5px">中医诊疗</div>
-          <div style="font-size:11px;color:var(--paper2);opacity:.78;line-height:1.5">诊症·望诊·体质·名医·医案</div>
-          <div style="margin-top:6px;font-size:10px;color:var(--cyan);letter-spacing:1.5px">→ 独立门户</div>
-        </a>
-        <a href="practice-portal.html" style="padding:14px;border:1px solid rgba(142,68,173,.35);border-radius:10px;text-decoration:none;color:var(--paper);background:rgba(142,68,173,.08);display:block;transition:all .3s">
-          <div style="font-size:24px;margin-bottom:6px">🧘</div>
-          <div style="font-size:13px;color:var(--gold);font-weight:700;margin-bottom:4px;letter-spacing:1.5px">修行参学</div>
-          <div style="font-size:11px;color:var(--paper2);opacity:.78;line-height:1.5">道家/佛家/易学/中医师承</div>
-          <div style="margin-top:6px;font-size:10px;color:var(--cyan);letter-spacing:1.5px">→ 独立门户</div>
-        </a>
-        <a href="folklore-portal.html" style="padding:14px;border:1px solid rgba(230,126,34,.3);border-radius:10px;text-decoration:none;color:var(--paper);background:rgba(230,126,34,.06);display:block;transition:all .3s">
-          <div style="font-size:24px;margin-bottom:6px">🎎</div>
-          <div style="font-size:13px;color:var(--gold);font-weight:700;margin-bottom:4px;letter-spacing:1.5px">民俗生活</div>
-          <div style="font-size:11px;color:var(--paper2);opacity:.78;line-height:1.5">黄历/择日/吉凶/五行音乐</div>
-          <div style="margin-top:6px;font-size:10px;color:var(--cyan);letter-spacing:1.5px">→ 独立门户</div>
-        </a>
-        <a href="monitor-portal.html" style="padding:14px;border:1px solid rgba(231,76,60,.3);border-radius:10px;text-decoration:none;color:var(--paper);background:rgba(231,76,60,.06);display:block;transition:all .3s">
-          <div style="font-size:24px;margin-bottom:6px">🛰️</div>
-          <div style="font-size:13px;color:var(--gold);font-weight:700;margin-bottom:4px;letter-spacing:1.5px">监控运维</div>
-          <div style="font-size:11px;color:var(--paper2);opacity:.78;line-height:1.5">KB健康/服务/设备/合规</div>
-          <div style="margin-top:6px;font-size:10px;color:var(--cyan);letter-spacing:1.5px">→ 独立门户</div>
-        </a>
-        <a href="admin.html" style="padding:14px;border:1px solid rgba(52,152,219,.3);border-radius:10px;text-decoration:none;color:var(--paper);background:rgba(52,152,219,.06);display:block;transition:all .3s">
-          <div style="font-size:24px;margin-bottom:6px">⚙️</div>
-          <div style="font-size:13px;color:var(--gold);font-weight:700;margin-bottom:4px;letter-spacing:1.5px">运营后台</div>
-          <div style="font-size:11px;color:var(--paper2);opacity:.78;line-height:1.5">商城/会员/推送/众包</div>
-          <div style="margin-top:6px;font-size:10px;color:var(--cyan);letter-spacing:1.5px">→ 独立门户</div>
-        </a>
-        <a href="divination-hub.html#section-user" style="padding:14px;border:1px solid rgba(243,156,18,.3);border-radius:10px;text-decoration:none;color:var(--paper);background:rgba(243,156,18,.06);display:block;transition:all .3s">
-          <div style="font-size:24px;margin-bottom:6px">🙏</div>
-          <div style="font-size:13px;color:var(--gold);font-weight:700;margin-bottom:4px;letter-spacing:1.5px">信众中心</div>
-          <div style="font-size:11px;color:var(--paper2);opacity:.78;line-height:1.5">信众·功德·会员</div>
-          <div style="margin-top:6px;font-size:10px;color:var(--cyan);letter-spacing:1.5px">→ section</div>
-        </a>
-      </div>
-      <div style="margin-top:14px;padding-top:12px;border-top:1px dashed rgba(201,168,76,.15);font-size:11px;color:var(--paper2);opacity:.6;text-align:center;letter-spacing:1.5px">共 7 大类门户 · 按用途独立导航 · 首页只有概要</div>
     </div>
 
-    <!-- 移动端快捷功能入口（768px以下显示，替代被隐藏的cat-grid） -->
-    <div class="mobile-quick-grid">
-      <ml-tap role="button" tabindex="0" class="mobile-quick-item d-block" onclick="showSection('bazi')"
-        <span class="mobile-quick-icon">🌟</span>
-        <div class="mobile-quick-text"><div class="mobile-quick-name">八字命盘</div><div class="mobile-quick-desc">四柱推命</div></div>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="mobile-quick-item d-block" onclick="showSection('zhanbu');showZhanbuSub('yijing')"
-        <span class="mobile-quick-icon">䷀</span>
-        <div class="mobile-quick-text"><div class="mobile-quick-name">六爻占卜</div><div class="mobile-quick-desc">铜钱起卦</div></div>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="mobile-quick-item d-block" onclick="showSection('zhanbu');showZhanbuSub('qimen')"
-        <span class="mobile-quick-icon">☰</span>
-        <div class="mobile-quick-text"><div class="mobile-quick-name">奇门遁甲</div><div class="mobile-quick-desc">天地人神</div></div>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="mobile-quick-item d-block" onclick="showSection('zhanbu');showZhanbuSub('meihua')"
-        <span class="mobile-quick-icon">🌸</span>
-        <div class="mobile-quick-text"><div class="mobile-quick-name">梅花易数</div><div class="mobile-quick-desc">时间起卦</div></div>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="mobile-quick-item d-block" onclick="showSection('zhanbu');showZhanbuSub('liuren')"
-        <span class="mobile-quick-icon">⬡</span>
-        <div class="mobile-quick-text"><div class="mobile-quick-name">大六壬</div><div class="mobile-quick-desc">三传四课</div></div>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="mobile-quick-item d-block" onclick="showSection('fengshui')"
-        <span class="mobile-quick-icon">🏡</span>
-        <div class="mobile-quick-text"><div class="mobile-quick-name">阳宅风水</div><div class="mobile-quick-desc">方位布局</div></div>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="mobile-quick-item d-block" onclick="showSection('xingming')"
-        <span class="mobile-quick-icon">🔤</span>
-        <div class="mobile-quick-text"><div class="mobile-quick-name">姓名起名</div><div class="mobile-quick-desc">五格数理</div></div>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="mobile-quick-item d-block" onclick="showSection('mobile')"
-        <span class="mobile-quick-icon">📱</span>
-        <div class="mobile-quick-text"><div class="mobile-quick-name">手机号</div><div class="mobile-quick-desc">八星五行</div></div>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="mobile-quick-item d-block" onclick="showSection('yanzhi')"
-        <span class="mobile-quick-icon">💬</span>
-        <div class="mobile-quick-text"><div class="mobile-quick-name">言值沟通</div><div class="mobile-quick-desc">情商分析</div></div>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="mobile-quick-item d-block" onclick="showSection('jiuri')"
-        <span class="mobile-quick-icon">💮</span>
-        <div class="mobile-quick-text"><div class="mobile-quick-name">吉日查询</div><div class="mobile-quick-desc">择吉避凶</div></div>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="mobile-quick-item d-block" onclick="showSection('lifeplan')"
-        <span class="mobile-quick-icon">🧭</span>
-        <div class="mobile-quick-text"><div class="mobile-quick-name">人生规划</div><div class="mobile-quick-desc">周期指引</div></div>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="mobile-quick-item d-block" onclick="showSection('youth')"
-        <span class="mobile-quick-icon">🧒</span>
-        <div class="mobile-quick-text"><div class="mobile-quick-name">青少年规划</div><div class="mobile-quick-desc">学业指引</div></div>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="mobile-quick-item d-block" onclick="showSection('family')"
-        <span class="mobile-quick-icon">👨‍👩‍👧‍👦</span>
-        <div class="mobile-quick-text"><div class="mobile-quick-name">家庭排盘</div><div class="mobile-quick-desc">合盘分析</div></div>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="mobile-quick-item d-block" onclick="showSection('masters')"
-        <span class="mobile-quick-icon">📿</span>
-        <div class="mobile-quick-text"><div class="mobile-quick-name">名师解惑</div><div class="mobile-quick-desc">问道解惑</div></div>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="mobile-quick-item d-block" onclick="showSection('more');showMoreModule('knowledge',this)"
-        <span class="mobile-quick-icon">📚</span>
-        <div class="mobile-quick-text"><div class="mobile-quick-name">知识库</div><div class="mobile-quick-desc">8大分类</div></div>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="mobile-quick-item d-block" onclick="showSection('more');showMoreModule('shop',this)"
-        <span class="mobile-quick-icon">🛍️</span>
-        <div class="mobile-quick-text"><div class="mobile-quick-name">开运商城</div><div class="mobile-quick-desc">佩饰法器</div></div>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="mobile-quick-item d-block" onclick="showSection('more');showMoreModule('almanac',this)"
-        <span class="mobile-quick-icon">📅</span>
-        <div class="mobile-quick-text"><div class="mobile-quick-name">每日黄历</div><div class="mobile-quick-desc">宜忌方位</div></div>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="mobile-quick-item d-block" onclick="showSection('tizhi')"
-        <span class="mobile-quick-icon">🧬</span>
-        <div class="mobile-quick-text"><div class="mobile-quick-name">体质辨识</div><div class="mobile-quick-desc">五行养生</div></div>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="mobile-quick-item d-block" onclick="showSection('healing-music')"
-        <span class="mobile-quick-icon">🎵</span>
-        <div class="mobile-quick-text"><div class="mobile-quick-name">养心音乐</div><div class="mobile-quick-desc">净心修心</div></div>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="mobile-quick-item d-block" onclick="showSection('tizhi');tzSwitchTab('prescription')"
-        <span class="mobile-quick-icon">💊</span>
-        <div class="mobile-quick-text"><div class="mobile-quick-name">名医名方</div><div class="mobile-quick-desc">中医名方</div></div>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="mobile-quick-item d-block" onclick="showSection('cezi')"
-        <span class="mobile-quick-icon">✍</span>
-        <div class="mobile-quick-text"><div class="mobile-quick-name">测字占卜</div><div class="mobile-quick-desc">最简决疑</div></div>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="mobile-quick-item d-block" onclick="window.location.href='wangzhen-clinical.html'"
-        <span class="mobile-quick-icon">👁</span>
-        <div class="mobile-quick-text"><div class="mobile-quick-name">望诊识人</div><div class="mobile-quick-desc">倪师法</div></div>
-      </ml-tap>
-      <ml-tap role="button" tabindex="0" class="mobile-quick-item d-block" onclick="showSection('annual-fortune');showTempleBrowser()"
-        <span class="mobile-quick-icon">🏛️</span>
-        <div class="mobile-quick-text"><div class="mobile-quick-name">寺庙参拜</div><div class="mobile-quick-desc">名山指南</div></div>
-      </ml-tap>
-    </div>
+    <!-- 移动端快捷入口（768px 以下显示） -->
+    <div class="mobile-quick-grid" id="mobileQuickGrid"></div>
+
   </div><!-- /hero -->
 </section>
 
@@ -2768,6 +2441,160 @@ body{font-family:'Noto Serif SC',serif;background:var(--ink);color:var(--paper);
 <script src="js/divination-core.js" defer></script>
 <script src="js/mobile-nav.js" defer></script>
 <script>
+// ===== 导航矩阵交互 (R326) =====
+var NAV_SYSTEMS = {
+  zhouyi: {
+    icon:'☰', name:'周易术数', color:'var(--cyan)',
+    desc:'排盘 · 占卜 · 命理 · 风水<br>涵盖八字、紫微、奇门、六爻、梅花、六壬、风水等传统术数排盘与推演',
+    flow:['输入出生信息','选择排盘方式','查看命盘分析','AI 生成解读报告'],
+    cards:[
+      {icon:'🌟',name:'八字命盘',en:'Ba Zi',desc:'四柱八字，十神格局，大运流年',tags:['十神','大运','神煞'],action:"showSection('bazi')"},
+      {icon:'🌌',name:'紫微斗数',en:'Zi Wei',desc:'主星宫位，四化大限，命运推演',tags:['主星','宫位','四化'],action:"location.hash='#section-ziwei'"},
+      {icon:'🔮',name:'奇门遁甲',en:'Qi Men',desc:'天地人神，八门九星，择时择方',tags:['八门','九星','三奇'],action:"showSection('zhanbu');showZhanbuSub('qimen')"},
+      {icon:'📖',name:'六爻占卜',en:'Liu Yao',desc:'六亲六神，卦辞断事，起卦问疑',tags:['六亲','六神','卦辞'],action:"showSection('zhanbu');showZhanbuSub('yijing')"},
+      {icon:'🌸',name:'梅花易数',en:'Mei Hua',desc:'体用生克，外应卦象，心动即占',tags:['体用','外应','卦象'],action:"showSection('zhanbu');showZhanbuSub('meihua')"},
+      {icon:'谛',name:'大六壬',en:'Liu Ren',desc:'四课三传，天将九宗，决疑推演',tags:['四课','三传','天将'],action:"showSection('zhanbu');showZhanbuSub('liuren')"},
+      {icon:'🏡',name:'风水玄空',en:'Feng Shui',desc:'峦头理气，卦位择日，环境调理',tags:['峦头','理气','卦位'],action:"showSection('fengshui')"},
+      {icon:'🔤',name:'起名改名',en:'Naming',desc:'五行补益，音律义理，姓名分析',tags:['五行','音律','分析'],action:"showSection('xingming')"},
+      {icon:'📅',name:'黄历择吉',en:'Almanac',desc:'建除值神，吉神凶神，每日宜忌',tags:['建除','吉神','宜忌'],action:"showSection('jiuri')"},
+      {icon:'🎯',name:'颜值命理',en:'Face Reading',desc:'面相五官，三停五岳，颜值论命',tags:['面相','五官','三停'],action:"showSection('yanzhi')"},
+      {icon:'✍',name:'测字占卜',en:'Ce Zi',desc:'汉字五行，即时起卦，最简易占',tags:['汉字','五行','即时'],action:"showSection('cezi')"},
+      {icon:'🧭',name:'人生蓝图',en:'Life Plan',desc:'十年阶段，十二领域，未来规划',tags:['十年','领域','规划'],action:"window.location.href='lifeplan-detail.html'"},
+      {icon:'🎊',name:'年度运势',en:'Annual Fortune',desc:'流年流月，太岁方位，年度指南',tags:['流年','太岁','指南'],action:"showSection('annual-fortune')"},
+      {icon:'📊',name:'流年报告',en:'Life Flow',desc:'跨维度联动，流年流月大运',tags:['联动','流月','大运'],action:"window.location.href='lifeflow-report.html'"},
+      {icon:'📋',name:'逐月运势',en:'Monthly',desc:'月度细化，吉凶日历，行事参考',tags:['月度','吉凶','日历'],action:"window.location.href='monthly-report.html'"},
+      {icon:'🏠',name:'风水排盘',en:'Feng Shui Chart',desc:'玄空飞星，宅命配卦',tags:['飞星','宅命'],action:"window.location.href='fengshui-chart.html'"}
+    ]
+  },
+  tcm: {
+    icon:'⚕️', name:'中医诊疗', color:'var(--jade)',
+    desc:'体质 · 望诊 · 患者档案 · 报告<br>中医健康咨询、体质辨识、望诊工作台、患者管理、报告解读',
+    flow:['采集患者信息','体质辨识/望诊','AI 辅助分析','生成诊疗建议'],
+    cards:[
+      {icon:'🌿',name:'体质辨识',en:'Constitution',desc:'九种体质，辨识调养，食疗方案',tags:['9体质','调养','食疗'],action:"showSection('tizhi')"},
+      {icon:'👁',name:'望诊工作台',en:'Wang Zhen',desc:'面部舌象，AI视觉，倪师法',tags:['面部','舌象','AI视觉'],action:"window.location.href='wangzhen-clinical.html'"},
+      {icon:'👤',name:'人物档案',en:'Profile',desc:'5身份管理，风险评级，事件流',tags:['身份','风险','事件'],action:"location.hash='#section-person-dashboard'"},
+      {icon:'📋',name:'报告解读',en:'Report',desc:'24项生化，15项影像，四维融合',tags:['生化','影像','融合'],action:"location.hash='#section-report-interpret'"},
+      {icon:'🏠',name:'居家诊疗',en:'Home Care',desc:'居家陪护，个性化推送',tags:['陪护','推送'],action:"window.location.href='home-care.html'"},
+      {icon:'🏥',name:'中医诊所',en:'TCM Clinic',desc:'健康咨询，症状分析，诊疗建议',tags:['咨询','症状','诊疗'],action:"window.location.href='tcm-clinic.html'"},
+      {icon:'🩺',name:'症状分析',en:'Symptoms',desc:'周易中医联合分析',tags:['周易','联合','分析'],action:"window.location.href='tcm-symptom.html'"},
+      {icon:'📝',name:'患者采集',en:'Intake',desc:'患者信息采集表',tags:['采集','信息'],action:"window.location.href='patient-intake.html'"},
+      {icon:'📋',name:'患者门户',en:'Patient Portal',desc:'患者档案·诊疗·健康',tags:['档案','诊疗','健康'],action:"window.location.href='patient-portal.html'"},
+      {icon:'🔬',name:'望诊中心',en:'Wang Zhen Hub',desc:'望诊知识库+临床工作台',tags:['知识库','临床'],action:"window.location.href='wangzhen-center.html'"},
+      {icon:'📈',name:'健康预测',en:'Health Forecast',desc:'健康趋势预测分析',tags:['趋势','预测'],action:"window.location.href='health-forecast.html'"},
+      {icon:'📊',name:'健康监控',en:'Health Monitor',desc:'健康数据监控看板',tags:['数据','监控'],action:"window.location.href='health-monitor.html'"},
+      {icon:'💊',name:'健康指导',en:'Wellness Guide',desc:'个性化健康指导方案',tags:['指导','方案'],action:"window.location.href='wellness-guide.html'"},
+      {icon:'📸',name:'报告OCR',en:'Report OCR',desc:'体检报告 OCR 识别',tags:['OCR','识别'],action:"window.location.href='report-ocr.html'"},
+      {icon:'🧬',name:'体质调理',en:'Integrated',desc:'综合体质调理方案',tags:['综合','调理'],action:"window.location.href='divination-integrated.html'"},
+      {icon:'👨‍⚕️',name:'医生端',en:'Doctor',desc:'综合诊断工作台',tags:['诊断','工作台'],action:"window.location.href='doctor-panel.html'"},
+      {icon:'👴',name:'医生(大字版)',en:'Doctor Elder',desc:'老年友好版医生端',tags:['大字','老年'],action:"window.location.href='doctor-elder.html'"}
+    ]
+  },
+  knowledge: {
+    icon:'📚', name:'知识文化', color:'var(--gold2)',
+    desc:'KB · 学堂 · 名师 · 民俗<br>知识库浏览、名师课程、口诀库、民俗文化、疗愈音乐',
+    flow:['浏览知识库','搜索关键词','查看典籍原文','学习名师课程'],
+    cards:[
+      {icon:'📚',name:'知识库',en:'Knowledge',desc:'54模块，12000+条目，FTS5检索',tags:['54模块','FTS5','检索'],action:"window.location.href='divination-knowledge.html'"},
+      {icon:'📖',name:'KB浏览器',en:'KB Browser',desc:'知识库浏览中心',tags:['浏览','中心'],action:"window.location.href='kb-explorer.html'"},
+      {icon:'🔮',name:'知识图谱',en:'KB Graph',desc:'模块关系可视化',tags:['关系','可视化'],action:"window.location.href='kb-graph.html'"},
+      {icon:'🪷',name:'倪师知识库',en:'Ni Hai Sha',desc:'倪海厦中医国学',tags:['倪师','中医','国学'],action:"window.location.href='nihaisha-knowledge.html'"},
+      {icon:'🎯',name:'舒晗知识库',en:'Shu Han',desc:'舒晗奇门遁甲',tags:['舒晗','奇门'],action:"window.location.href='shuhan-knowledge.html'"},
+      {icon:'🎓',name:'倪师学堂',en:'Ni School',desc:'系统化中医课程',tags:['课程','系统'],action:"window.location.href='nihaisha-learning.html'"},
+      {icon:'👨‍🏫',name:'名师课堂',en:'Masters',desc:'54命理大师讲堂',tags:['54大师','讲堂'],action:"window.location.href='master-class.html'"},
+      {icon:'👥',name:'名师档案',en:'Master Archive',desc:'54命理大师全量档案',tags:['档案','全量'],action:"window.location.href='masters.html'"},
+      {icon:'📜',name:'口诀库',en:'Kou Jue',desc:'8大领域口诀',tags:['8领域','口诀'],action:"window.location.href='koujue-gallery.html'"},
+      {icon:'🎎',name:'民俗生活',en:'Folklore',desc:'黄历门户，民俗工具',tags:['黄历','民俗'],action:"window.location.href='folklore-portal.html'"},
+      {icon:'🧘',name:'修行参学',en:'Practice',desc:'修行参学文化门户',tags:['修行','文化'],action:"window.location.href='practice-portal.html'"},
+      {icon:'🎵',name:'疗愈音乐',en:'Healing Music',desc:'五行音疗，疗愈诊断',tags:['五行','音疗'],action:"showSection('healing-music')"},
+      {icon:'📊',name:'KB质量审计',en:'KB Quality',desc:'知识库质量审计面板',tags:['质量','审计'],action:"window.location.href='kb-quality.html'"},
+      {icon:'📈',name:'KB命中',en:'KB Hit',desc:'KB命中仪表盘',tags:['命中','仪表盘'],action:"window.location.href='kb-hit-dashboard.html'"}
+    ]
+  },
+  ops: {
+    icon:'🛠', name:'运营运维', color:'var(--cyan2)',
+    desc:'后台 · 监控 · 设备 · AI<br>后台管理、运营大屏、设备运维、智能眼镜、AI配置、API文档',
+    flow:['登录后台','查看监控大屏','管理设备/AI配置','处理工单通知'],
+    cards:[
+      {icon:'⚙️',name:'后台管理',en:'Admin',desc:'系统后台管理面板',tags:['系统','管理'],action:"window.location.href='admin.html'"},
+      {icon:'🛍️',name:'商城管理',en:'Shop Admin',desc:'商城后台管理',tags:['商城','后台'],action:"window.location.href='admin-shop.html'"},
+      {icon:'📚',name:'KB管理',en:'KB Admin',desc:'知识库管理面板',tags:['KB','管理'],action:"window.location.href='admin-kb-panel.html'"},
+      {icon:'🔔',name:'通知日志',en:'Notify',desc:'通知日志管理',tags:['通知','日志'],action:"window.location.href='admin-notify.html'"},
+      {icon:'🎫',name:'工单管理',en:'Tickets',desc:'工单管理后台',tags:['工单','后台'],action:"window.location.href='admin-tickets.html'"},
+      {icon:'📊',name:'运营大屏',en:'Monitor',desc:'运营监控大屏',tags:['监控','大屏'],action:"window.location.href='monitor-dashboard.html'"},
+      {icon:'📡',name:'监控门户',en:'Monitor Portal',desc:'监控运维平台健康',tags:['监控','健康'],action:"window.location.href='monitor-portal.html'"},
+      {icon:'📈',name:'评估看板',en:'Eval',desc:'AI评估看板',tags:['评估','AI'],action:"window.location.href='eval-dashboard.html'"},
+      {icon:'📷',name:'设备运维',en:'Devices',desc:'设备运维中心',tags:['设备','运维'],action:"window.location.href='device-management.html'"},
+      {icon:'👓',name:'智能眼镜',en:'Glass',desc:'智能眼镜控制台',tags:['眼镜','控制台'],action:"window.location.href='glass-console.html'"},
+      {icon:'🤖',name:'AI助手',en:'AI Assistant',desc:'AI命理助手',tags:['AI','命理'],action:"window.location.href='ai-assistant.html'"},
+      {icon:'🔧',name:'AI引擎配置',en:'AI Config',desc:'AI视觉引擎配置',tags:['AI','视觉'],action:"window.location.href='ai-engine-config.html'"},
+      {icon:'📖',name:'API文档',en:'API Docs',desc:'OpenAPI 3.0 文档',tags:['API','文档'],action:"window.location.href='api-docs.html'"}
+    ]
+  },
+  user: {
+    icon:'👤', name:'用户服务', color:'var(--gold3)',
+    desc:'账户 · 商城 · 推送 · 反馈<br>用户账户管理、商城会员、缘主工具、消息推送、反馈分享',
+    flow:['登录/注册','查看报告','管理订阅推送','商城/会员服务'],
+    cards:[
+      {icon:'🔐',name:'登录',en:'Login',desc:'用户登录',tags:['登录'],action:"window.location.href='login.html'"},
+      {icon:'🪪',name:'身份管理',en:'Identity',desc:'身份管理中心',tags:['身份','管理'],action:"window.location.href='person-center.html'"},
+      {icon:'👤',name:'人物看板',en:'Dashboard',desc:'人物档案看板',tags:['档案','看板'],action:"window.location.href='person-dashboard.html'"},
+      {icon:'📋',name:'报告中心',en:'Reports',desc:'报告中心',tags:['报告','中心'],action:"window.location.href='reports-hub.html'"},
+      {icon:'🛍️',name:'商城',en:'Shop',desc:'命理商城',tags:['商城'],action:"window.location.href='divination-shop.html'"},
+      {icon:'👑',name:'会员',en:'Membership',desc:'会员服务',tags:['会员','服务'],action:"window.location.href='divination-membership.html'"},
+      {icon:'📱',name:'缘主工具',en:'WeChat Hub',desc:'微信缘主工具',tags:['微信','缘主'],action:"window.location.href='wechat-hub.html'"},
+      {icon:'📮',name:'年度推送',en:'Push',desc:'我的年度推送',tags:['推送','年度'],action:"window.location.href='yuanzhu-inbox.html'"},
+      {icon:'💬',name:'站内消息',en:'Messages',desc:'站内消息',tags:['消息'],action:"window.location.href='im.html'"},
+      {icon:'💬',name:'反馈',en:'Feedback',desc:'意见反馈中心',tags:['反馈','意见'],action:"window.location.href='feedback-center.html'"},
+      {icon:'📤',name:'分享',en:'Share',desc:'分享中心',tags:['分享'],action:"window.location.href='share-center.html'"},
+      {icon:'🔒',name:'隐私中心',en:'Privacy',desc:'隐私管理中心',tags:['隐私','管理'],action:"window.location.href='privacy-center.html'"}
+    ]
+  }
+};
+
+function navShowSide(sysKey){
+  var sys = NAV_SYSTEMS[sysKey];
+  if(!sys) return;
+  var panel = document.getElementById('navSidePanel');
+  var flowHtml = sys.flow.map(function(s,i){
+    return '<div class="nms-flow-step"><span class="nfs-num">'+(i+1)+'</span><span>'+s+'</span></div>';
+  }).join('');
+  panel.innerHTML = '<div class="nms-active">'+
+    '<div class="nms-icon" style="color:'+sys.color+'">'+sys.icon+'</div>'+
+    '<h3 class="nms-title" style="color:'+sys.color+'">'+sys.name+'</h3>'+
+    '<p class="nms-desc">'+sys.desc+'</p>'+
+    '<div class="nms-flow"><div class="nms-flow-title">📋 使用流程</div>'+flowHtml+'</div>'+
+    '<div class="nms-stat">'+sys.cards.length+' 项功能</div>'+
+    '</div>';
+}
+
+function navExpandCards(sysKey){
+  var sys = NAV_SYSTEMS[sysKey];
+  if(!sys) return;
+  document.getElementById('nmaSystems').style.display='none';
+  var cardsArea = document.getElementById('nmaCards');
+  cardsArea.style.display='block';
+  var grid = document.getElementById('nmaCardsGrid');
+  grid.innerHTML = sys.cards.map(function(c){
+    return '<ml-tap role="button" tabindex="0" class="cat-card d-block" onclick="'+c.action+'" aria-label="'+c.name+'">'+
+      '<span class="cc-symbol">'+c.icon+'</span>'+
+      '<span class="cc-name">'+c.name+'</span>'+
+      '<span class="cc-en">'+c.en+'</span>'+
+      '<p class="cc-desc">'+c.desc+'</p>'+
+      '<div class="cc-tags">'+c.tags.map(function(t){return '<span class="cat-tag">'+t+'</span>';}).join('')+'</div>'+
+      '<ml-tap role="button" tabindex="0" class="cc-action d-block" onclick="event.stopPropagation();'+c.action+'" aria-label="'+c.name+'">进入 →</ml-tap>'+
+      '</ml-tap>';
+  }).join('');
+  navShowSide(sysKey);
+}
+
+function navBackToSystems(){
+  document.getElementById('nmaCards').style.display='none';
+  document.getElementById('nmaSystems').style.display='flex';
+  // 恢复左侧默认
+  document.getElementById('navSidePanel').innerHTML = document.getElementById('nmsDefault') ? document.getElementById('nmsDefault').innerHTML : '';
+}
+
 // ===== 导航分组下拉菜单 (R324) =====
 (function(){
   document.addEventListener('click',function(e){
