@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>意见反馈 · 命理宝鉴</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+:root{
+  --gold:#c9a84c; --gold2:#d4b85a; --ink:#1a1a2e; --paper:#f5f0e8;
+  --bg:#0d1117; --surface:#161b22; --border:#30363d;
+  --text:#c9d1d9; --text-muted:#8b949e;
+  --green:#3fb950; --red:#f85149; --yellow:#d29922; --blue:#58a6ff; --purple:#a78bfa;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,'PingFang SC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:60px}
+.nav-bar{display:flex;flex-wrap:wrap;gap:4px;padding:8px 12px;background:var(--surface);border-bottom:1px solid var(--border);align-items:center}
+.nav-bar a{color:var(--gold);text-decoration:none;font-size:13px;padding:6px 12px;border-radius:6px;transition:.2s}
+.nav-bar a:hover{background:rgba(201,168,76,.15)}
+.nav-bar a.active{background:rgba(201,168,76,.2);color:var(--gold2)}
+.container{max-width:680px;margin:0 auto;padding:16px}
+h1{font-size:20px;color:var(--gold);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.subtitle{color:var(--text-muted);font-size:13px;margin-bottom:20px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:13px;color:var(--gold);margin-bottom:6px;font-weight:600}
+.form-group select,.form-group input,.form-group textarea{
+  width:100%;padding:10px 12px;background:rgba(255,255,255,.04);
+  border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;
+  transition:border-color .2s;
+}
+.form-group select:focus,.form-group input:focus,.form-group textarea:focus{
+  outline:none;border-color:var(--gold);
+}
+.form-group textarea{min-height:100px;resize:vertical}
+.form-row{display:flex;gap:12px}
+.form-row .form-group{flex:1}
+.category-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px}
+.cat-btn{padding:10px 8px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;cursor:pointer;text-align:center;font-size:12px;color:var(--text);transition:.2s}
+.cat-btn:hover{border-color:var(--gold);background:rgba(201,168,76,.08)}
+.cat-btn.selected{border-color:var(--gold);background:rgba(201,168,76,.15);color:var(--gold2)}
+.cat-btn .cat-icon{font-size:20px;display:block;margin-bottom:4px}
+.priority-grid{display:flex;gap:8px}
+.pri-btn{flex:1;padding:8px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;cursor:pointer;text-align:center;font-size:12px;color:var(--text);transition:.2s}
+.pri-btn.selected{border-color:var(--gold);background:rgba(201,168,76,.15);color:var(--gold2)}
+.upload-area{border:2px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:.2s;position:relative}
+.upload-area:hover{border-color:var(--gold);background:rgba(201,168,76,.04)}
+.upload-area .upload-icon{font-size:32px;margin-bottom:8px}
+.upload-area .upload-text{font-size:13px;color:var(--text-muted)}
+.upload-preview{position:relative;display:inline-block;margin-top:8px}
+.upload-preview img{max-width:200px;border-radius:8px;border:1px solid var(--border)}
+.upload-preview .remove{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px}
+.voice-btn{display:flex;align-items:center;gap:8px;padding:10px 16px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.3);border-radius:20px;cursor:pointer;color:var(--purple);font-size:13px;transition:.2s}
+.voice-btn:hover{background:rgba(167,139,250,.2)}
+.voice-btn.recording{background:var(--red);color:#fff;border-color:var(--red);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+.submit-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:10px;color:#1a1a2e;font-size:15px;font-weight:700;cursor:pointer;transition:.2s}
+.submit-btn:hover{opacity:.9;transform:translateY(-1px)}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed}
+.my-tickets{margin-top:24px}
+.my-tickets h2{font-size:16px;color:var(--gold);margin-bottom:12px}
+.ticket-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;transition:.2s}
+.ticket-item:hover{border-color:var(--gold)}
+.ticket-item .ti-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.ticket-item .ti-title{font-size:14px;color:var(--text);font-weight:600}
+.ticket-item .ti-meta{font-size:11px;color:var(--text-muted)}
+.status-badge{padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
+.status-open{background:rgba(248,81,73,.15);color:var(--red)}
+.status-in_progress{background:rgba(210,153,34,.15);color:var(--yellow)}
+.status-resolved{background:rgba(63,185,80,.15);color:var(--green)}
+.status-closed{background:rgba(139,148,158,.15);color:var(--text-muted)}
+.status-rejected{background:rgba(248,81,73,.1);color:var(--text-muted)}
+.cat-badge{padding:2px 6px;border-radius:4px;font-size:10px;margin-right:4px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--gold);border-radius:8px;padding:10px 20px;color:var(--gold);font-size:13px;z-index:9999;opacity:0;transition:.3s}
+.toast.show{opacity:1;bottom:30px}
+@media(max-width:480px){.form-row{flex-direction:column}.category-grid{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<nav class="nav-bar">
+  <a href="divination-hub.html">🏠 主平台</a>
+  <a href="ai-assistant.html">🤖 AI助手</a>
+  <a href="feedback-center.html" class="active">💬 反馈</a>
+  <a href="login.html">🔐 登录</a>
+</nav>
+
+<div class="container">
+  <h1>💬 意见反馈</h1>
+  <p class="subtitle">提交问题建议 · 跟踪处理进度 · 帮助我们改进</p>
+
+  <!-- 提交表单 -->
+  <div class="card">
+    <div class="form-group">
+      <label>问题类别</label>
+      <div class="category-grid" id="categoryGrid">
+        <div class="cat-btn selected" data-cat="bug"><span class="cat-icon">🐛</span>Bug反馈</div>
+        <div class="cat-btn" data-cat="suggestion"><span class="cat-icon">💡</span>功能建议</div>
+        <div class="cat-btn" data-cat="question"><span class="cat-icon">❓</span>使用咨询</div>
+        <div class="cat-btn" data-cat="feature_request"><span class="cat-icon">✨</span>新功能</div>
+        <div class="cat-btn" data-cat="praise"><span class="cat-icon">👍</span>好评鼓励</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>优先级</label>
+      <div class="priority-grid" id="priorityGrid">
+        <div class="pri-btn" data-pri="urgent">🔴 紧急</div>
+        <div class="pri-btn selected" data-pri="high">🟠 高</div>
+        <div class="pri-btn" data-pri="normal">🟡 普通</div>
+        <div class="pri-btn" data-pri="low">🟢 低</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>标题</label>
+      <input type="text" id="ticketTitle" placeholder="简要描述问题" maxlength="100">
+    </div>
+
+    <div class="form-group">
+      <label>详细描述</label>
+      <textarea id="ticketContent" placeholder="请详细描述您遇到的问题或建议..." maxlength="2000"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>截图上传（可选）</label>
+      <div class="upload-area" id="uploadArea" onclick="document.getElementById('screenshotInput').click()">
+        <div class="upload-icon">📸</div>
+        <div class="upload-text">点击或拖拽上传截图（PNG/JPG，最大5MB）</div>
+      </div>
+      <input type="file" id="screenshotInput" accept="image/*" style="display:none" onchange="handleScreenshot(this)">
+      <div id="screenshotPreview" style="margin-top:8px"></div>
+    </div>
+
+    <div class="form-group">
+      <label>语音录入（可选）</label>
+      <div style="display:flex;gap:10px;align-items:center">
+        <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()">
+          <span id="voiceIcon">🎤</span>
+          <span id="voiceText">点击录音</span>
+        </button>
+        <span id="voiceStatus" style="font-size:12px;color:var(--text-muted)"></span>
+      </div>
+      <audio id="voicePlayback" style="display:none;margin-top:8px;width:100%" controls></audio>
+    </div>
+
+    <button class="submit-btn" id="submitBtn" onclick="submitTicket()">提交反馈</button>
+  </div>
+
+  <!-- 我的工单 -->
+  <div class="my-tickets">
+    <h2>📋 我的反馈记录</h2>
+    <div id="ticketsList">
+      <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">加载中...</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// === R326 站内反馈中心 ===
+const API_BASE = '';
+let selectedCategory = 'bug';
+let selectedPriority = 'high';
+let screenshotFile = null;
+let voiceBlob = null;
+let mediaRecorder = null;
+let voiceStream = null;
+let isRecording = false;
+
+// 类别选择
+document.querySelectorAll('.cat-btn').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedCategory = btn.dataset.cat;
+  };
+});
+
+// 优先级选择
+document.querySelectorAll('.pri-btn').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.pri-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedPriority = btn.dataset.pri;
+  };
+});
+
+// 截图上传
+function handleScreenshot(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { showToast('文件超过5MB限制'); return; }
+  screenshotFile = file;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const preview = document.getElementById('screenshotPreview');
+    preview.innerHTML = '<div class="upload-preview"><img src="' + e.target.result + '"><span class="remove" onclick="removeScreenshot()">✕</span></div>';
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeScreenshot() {
+  screenshotFile = null;
+  document.getElementById('screenshotPreview').innerHTML = '';
+  document.getElementById('screenshotInput').value = '';
+}
+
+// 语音录制
+async function toggleVoice() {
+  if (isRecording) { stopRecording(); return; }
+  try {
+    voiceStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(voiceStream);
+    const chunks = [];
+    mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+    mediaRecorder.onstop = () => {
+      voiceBlob = new Blob(chunks, { type: 'audio/webm' });
+      const url = URL.createObjectURL(voiceBlob);
+      const playback = document.getElementById('voicePlayback');
+      playback.src = url;
+      playback.style.display = 'block';
+      document.getElementById('voiceStatus').textContent = '录音完成 (' + Math.round(voiceBlob.size/1024) + 'KB)';
+    };
+    mediaRecorder.start();
+    isRecording = true;
+    document.getElementById('voiceBtn').classList.add('recording');
+    document.getElementById('voiceIcon').textContent = '⏹';
+    document.getElementById('voiceText').textContent = '停止录音';
+    document.getElementById('voiceStatus').textContent = '录音中...';
+  } catch(e) {
+    showToast('无法访问麦克风：' + e.message);
+  }
+}
+
+function stopRecording() {
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+  if (voiceStream) voiceStream.getTracks().forEach(t => t.stop());
+  isRecording = false;
+  document.getElementById('voiceBtn').classList.remove('recording');
+  document.getElementById('voiceIcon').textContent = '🎤';
+  document.getElementById('voiceText').textContent = '重新录音';
+}
+
+// 提交工单
+async function submitTicket() {
+  const title = document.getElementById('ticketTitle').value.trim();
+  const content = document.getElementById('ticketContent').value.trim();
+  if (!title) { showToast('请输入标题'); return; }
+  if (!content) { showToast('请输入详细描述'); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '提交中...';
+
+  try {
+    let voicePath = null;
+    // 先上传语音（如有）
+    if (voiceBlob) {
+      const voiceReader = new FileReader();
+      const voiceBase64 = await new Promise((resolve) => {
+        voiceReader.onload = () => resolve(voiceReader.result);
+        voiceReader.readAsDataURL(voiceBlob);
+      });
+      const vr = await fetch(API_BASE + '/api/tickets/voice-upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ audio: voiceBase64 })
+      }).then(r => r.json());
+      if (vr.code === 0) voicePath = vr.data.voicePath;
+    }
+
+    // 如果有截图，用 FormData
+    if (screenshotFile) {
+      const formData = new FormData();
+      formData.append('screenshot', screenshotFile);
+      formData.append('category', selectedCategory);
+      formData.append('priority', selectedPriority);
+      formData.append('title', title);
+      formData.append('content', content);
+      formData.append('page_url', location.href);
+      if (voicePath) formData.append('voice_path', voicePath);
+      const r = await fetch(API_BASE + '/api/tickets/create', { method: 'POST', body: formData }).then(r => r.json());
+      handleResult(r);
+    } else {
+      const r = await fetch(API_BASE + '/api/tickets/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category: selectedCategory, priority: selectedPriority, title, content, page_url: location.href, voice_path: voicePath })
+      }).then(r => r.json());
+      handleResult(r);
+    }
+  } catch(e) {
+    showToast('提交失败：' + e.message);
+  }
+  btn.disabled = false;
+  btn.textContent = '提交反馈';
+}
+
+function handleResult(r) {
+  if (r.code === 0) {
+    showToast('✅ 反馈已提交！工单号 #' + r.data.ticketId);
+    document.getElementById('ticketTitle').value = '';
+    document.getElementById('ticketContent').value = '';
+    removeScreenshot();
+    voiceBlob = null;
+    document.getElementById('voicePlayback').style.display = 'none';
+    document.getElementById('voiceStatus').textContent = '';
+    loadMyTickets();
+  } else {
+    showToast('❌ ' + (r.message || '提交失败'));
+  }
+}
+
+// 加载我的工单
+async function loadMyTickets() {
+  try {
+    const token = localStorage.getItem('authToken');
+    const headers = {};
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    const r = await fetch(API_BASE + '/api/tickets/list', { headers }).then(r => r.json());
+    const list = document.getElementById('ticketsList');
+    if (r.code === 0 && r.data.tickets.length > 0) {
+      list.innerHTML = r.data.tickets.map(t => {
+        const catNames = {bug:'🐛 Bug',suggestion:'💡 建议',question:'❓ 咨询',praise:'👍 好评',feature_request:'✨ 新功能'};
+        const statusNames = {open:'待处理',in_progress:'处理中',resolved:'已解决',closed:'已关闭',rejected:'已拒绝'};
+        return '<div class="ticket-item" onclick="viewTicket(' + t.id + ')">' +
+          '<div class="ti-header"><span class="ti-title">' + t.title + '</span>' +
+          '<span class="status-badge status-' + t.status + '">' + (statusNames[t.status]||t.status) + '</span></div>' +
+          '<div class="ti-meta">' + (catNames[t.category]||t.category) + ' · ' + t.created_at + '</div>' +
+          (t.admin_reply ? '<div style="margin-top:4px;font-size:12px;color:var(--green)">💬 已回复</div>' : '') +
+        '</div>';
+      }).join('');
+    } else if (r.code === 0) {
+      list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">暂无反馈记录</div>';
+    } else {
+      list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">登录后可查看您的反馈记录</div>';
+    }
+  } catch(e) {
+    document.getElementById('ticketsList').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">加载失败</div>';
+  }
+}
+
+function viewTicket(id) {
+  location.href = 'feedback-detail.html?id=' + id;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// 初始化
+loadMyTickets();
+</script>
+</body>
+</html>

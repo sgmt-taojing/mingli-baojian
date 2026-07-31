@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>工单管理 · 命理宝鉴后台</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+:root{
+  --gold:#c9a84c; --gold2:#d4b85a; --surface:#161b22; --border:#30363d;
+  --text:#c9d1d9; --text-muted:#8b949e;
+  --green:#3fb950; --red:#f85149; --yellow:#d29922; --blue:#58a6ff; --purple:#a78bfa;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,'PingFang SC',sans-serif;background:#0d1117;color:var(--text)}
+.nav-bar{display:flex;gap:4px;padding:8px 12px;background:var(--surface);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.nav-bar a{color:var(--gold);text-decoration:none;font-size:13px;padding:6px 12px;border-radius:6px}
+.nav-bar a.active{background:rgba(201,168,76,.2)}
+.container{max-width:1200px;margin:0 auto;padding:16px}
+h1{font-size:20px;color:var(--gold);margin-bottom:16px}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px}
+.stat-card .stat-val{font-size:24px;font-weight:700;color:var(--gold2)}
+.stat-card .stat-label{font-size:12px;color:var(--text-muted);margin-top:2px}
+.section-title{font-size:16px;color:var(--gold);margin:20px 0 10px}
+.filters{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.filters select{padding:6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px}
+table{width:100%;border-collapse:collapse;background:var(--surface);border-radius:8px;overflow:hidden}
+th,td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left;font-size:13px}
+th{background:rgba(201,168,76,.06);color:var(--gold);font-weight:600;white-space:nowrap}
+tr:hover{background:rgba(255,255,255,.02)}
+.status-badge{padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;white-space:nowrap}
+.status-open{background:rgba(248,81,73,.15);color:var(--red)}
+.status-in_progress{background:rgba(210,153,34,.15);color:var(--yellow)}
+.status-resolved{background:rgba(63,185,80,.15);color:var(--green)}
+.status-closed{background:rgba(139,148,158,.15);color:var(--text-muted)}
+.status-rejected{background:rgba(248,81,73,.1);color:var(--text-muted)}
+.cat-badge{padding:2px 6px;border-radius:4px;font-size:10px;margin-right:4px}
+.chart-bar{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.chart-bar .bar-label{width:80px;font-size:12px;color:var(--text-muted);text-align:right}
+.chart-bar .bar-track{flex:1;height:20px;background:rgba(255,255,255,.04);border-radius:4px;overflow:hidden}
+.chart-bar .bar-fill{height:100%;border-radius:4px;transition:width .5s}
+.bar-fill.bug{background:var(--red)}
+.bar-fill.suggestion{background:var(--blue)}
+.bar-fill.question{background:var(--yellow)}
+.bar-fill.feature_request{background:var(--purple)}
+.bar-fill.praise{background:var(--green)}
+.pagination{display:flex;gap:4px;margin-top:12px;justify-content:center}
+.pagination button{padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;font-size:12px}
+.pagination button.active{background:var(--gold);color:#1a1a2e;border-color:var(--gold)}
+.pagination button:disabled{opacity:.4;cursor:not-allowed}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;justify-content:center;align-items:center;z-index:9999}
+.modal.show{display:flex}
+.modal-content{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto}
+.modal-content h2{color:var(--gold);margin-bottom:12px}
+.modal-content .field{margin-bottom:10px}
+.modal-content .field label{display:block;font-size:12px;color:var(--text-muted);margin-bottom:2px}
+.modal-content .field input,.modal-content .field textarea,.modal-content .field select{width:100%;padding:8px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px}
+.modal-content .field textarea{min-height:60px;resize:vertical}
+.modal-actions{display:flex;gap:8px;margin-top:16px}
+.modal-actions button{padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-size:13px}
+.btn-primary{background:var(--gold);color:#1a1a2e;font-weight:600}
+.btn-secondary{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--border)!important}
+.btn-danger{background:var(--red);color:#fff}
+.reply-box{background:rgba(63,185,80,.05);border:1px solid rgba(63,185,80,.2);border-radius:6px;padding:10px;margin-top:8px;font-size:13px}
+.screenshot-thumb{max-width:100%;border-radius:6px;margin-top:6px;cursor:pointer}
+@media(max-width:768px){.stat-grid{grid-template-columns:repeat(2,1fr)}table{font-size:11px}th,td{padding:6px 8px}}
+</style>
+</head>
+<body>
+<nav class="nav-bar">
+  <a href="admin.html">🏠 后台首页</a>
+  <a href="admin-tickets.html" class="active">🎫 工单管理</a>
+  <a href="admin-kb-panel.html">📚 知识库</a>
+  <a href="monitor-portal.html">📊 监控</a>
+</nav>
+
+<div class="container">
+  <h1>🎫 站内工单管理</h1>
+
+  <!-- 统计概览 -->
+  <div class="stat-grid" id="statGrid">
+    <div class="stat-card"><div class="stat-val" id="statTotal">-</div><div class="stat-label">总工单数</div></div>
+    <div class="stat-card"><div class="stat-val" id="statOpen" style="color:var(--red)">-</div><div class="stat-label">待处理</div></div>
+    <div class="stat-card"><div class="stat-val" id="statProgress" style="color:var(--yellow)">-</div><div class="stat-label">处理中</div></div>
+    <div class="stat-card"><div class="stat-val" id="statResolved" style="color:var(--green)">-</div><div class="stat-label">已解决</div></div>
+    <div class="stat-card"><div class="stat-val" id="statRate" style="color:var(--gold2)">-</div><div class="stat-label">解决率</div></div>
+    <div class="stat-card"><div class="stat-val" id="statAvgTime">-</div><div class="stat-label">平均解决(分)</div></div>
+  </div>
+
+  <!-- 问题类别分布 -->
+  <div class="section-title">📊 问题类别分布</div>
+  <div id="categoryChart"></div>
+
+  <!-- 优先级分布 -->
+  <div class="section-title">⚡ 优先级分布</div>
+  <div id="priorityChart" style="display:flex;gap:12px;flex-wrap:wrap"></div>
+
+  <!-- 日趋势 -->
+  <div class="section-title">📈 近30天趋势</div>
+  <div id="trendChart" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;max-height:200px;overflow-y:auto"></div>
+
+  <!-- 热门反馈 -->
+  <div class="section-title">🔥 热门反馈关键词</div>
+  <div id="topKeywords" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+
+  <!-- 筛选 -->
+  <div class="section-title">🎫 工单列表</div>
+  <div class="filters">
+    <select id="filterStatus" onchange="loadTickets()">
+      <option value="">全部状态</option>
+      <option value="open">待处理</option>
+      <option value="in_progress">处理中</option>
+      <option value="resolved">已解决</option>
+      <option value="closed">已关闭</option>
+      <option value="rejected">已拒绝</option>
+    </select>
+    <select id="filterCategory" onchange="loadTickets()">
+      <option value="">全部类别</option>
+      <option value="bug">🐛 Bug</option>
+      <option value="suggestion">💡 建议</option>
+      <option value="question">❓ 咨询</option>
+      <option value="feature_request">✨ 新功能</option>
+      <option value="praise">👍 好评</option>
+    </select>
+    <select id="filterPriority" onchange="loadTickets()">
+      <option value="">全部优先级</option>
+      <option value="urgent">🔴 紧急</option>
+      <option value="high">🟠 高</option>
+      <option value="normal">🟡 普通</option>
+      <option value="low">🟢 低</option>
+    </select>
+  </div>
+
+  <table>
+    <thead><tr><th>ID</th><th>类别</th><th>优先级</th><th>标题</th><th>用户</th><th>状态</th><th>时间</th><th>操作</th></tr></thead>
+    <tbody id="ticketsBody"></tbody>
+  </table>
+  <div class="pagination" id="pagination"></div>
+</div>
+
+<!-- 工单详情 Modal -->
+<div class="modal" id="ticketModal">
+  <div class="modal-content">
+    <h2 id="modalTitle">工单详情</h2>
+    <div id="modalBody"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">关闭</button>
+      <button class="btn-primary" onclick="updateTicket('in_progress')">开始处理</button>
+      <button class="btn-primary" style="background:var(--green)" onclick="updateTicket('resolved')">标记解决</button>
+      <button class="btn-danger" onclick="updateTicket('rejected')">拒绝</button>
+    </div>
+    <div class="field" style="margin-top:12px">
+      <label>后台回复</label>
+      <textarea id="adminReply" placeholder="输入回复内容..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="saveReply()">保存回复</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = '';
+let currentPage = 1;
+let totalPages = 1;
+let currentTicketId = null;
+
+async function loadStats() {
+  try {
+    const token = localStorage.getItem('authToken');
+    const headers = {};
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    const r = await fetch(API + '/api/admin/tickets/stats?days=30', { headers }).then(r => r.json());
+    if (r.code !== 0) return;
+    const d = r.data;
+    document.getElementById('statTotal').textContent = d.overview.total || 0;
+    document.getElementById('statOpen').textContent = d.overview.open_count || 0;
+    document.getElementById('statProgress').textContent = d.overview.in_progress || 0;
+    document.getElementById('statResolved').textContent = d.overview.resolved || 0;
+    const rate = d.overview.total ? Math.round((d.overview.resolved / d.overview.total) * 100) : 0;
+    document.getElementById('statRate').textContent = rate + '%';
+    document.getElementById('statAvgTime').textContent = d.avgResolveMinutes || '-';
+
+    // 类别图表
+    const catColors = {bug:'var(--red)',suggestion:'var(--blue)',question:'var(--yellow)',feature_request:'var(--purple)',praise:'var(--green)'};
+    const catNames = {bug:'🐛 Bug',suggestion:'💡 建议',question:'❓ 咨询',feature_request:'✨ 新功能',praise:'👍 好评'};
+    const maxCat = Math.max(...d.byCategory.map(c => c.cnt), 1);
+    document.getElementById('categoryChart').innerHTML = d.byCategory.map(c =>
+      '<div class="chart-bar"><span class="bar-label">' + (catNames[c.category]||c.category) + '</span>' +
+      '<div class="bar-track"><div class="bar-fill ' + c.category + '" style="width:' + (c.cnt/maxCat*100) + '%;background:' + (catColors[c.category]||'var(--gold)') + '"></div></div>' +
+      '<span style="font-size:12px;color:var(--text-muted);width:50px">' + c.cnt + ' 条</span></div>'
+    ).join('');
+
+    // 优先级
+    const priNames = {urgent:'🔴 紧急',high:'🟠 高',normal:'🟡 普通',low:'🟢 低'};
+    const priColors = {urgent:'var(--red)',high:'var(--yellow)',normal:'var(--gold)',low:'var(--green)'};
+    document.getElementById('priorityChart').innerHTML = d.byPriority.map(p =>
+      '<div class="stat-card" style="min-width:100px"><div class="stat-val" style="color:' + (priColors[p.priority]||'var(--gold)') + '">' + p.cnt + '</div>' +
+      '<div class="stat-label">' + (priNames[p.priority]||p.priority) + '</div></div>'
+    ).join('');
+
+    // 趋势
+    document.getElementById('trendChart').innerHTML = d.dailyTrend.map(t =>
+      '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(48,54,61,.5);font-size:12px">' +
+      '<span style="color:var(--text-muted)">' + t.date + '</span>' +
+      '<span>总计 ' + t.cnt + ' · 🐛 ' + (t.bugs||0) + ' · 💡 ' + (t.suggestions||0) + ' · ✨ ' + (t.features||0) + '</span></div>'
+    ).join('') || '<div style="text-align:center;color:var(--text-muted);padding:20px">暂无数据</div>';
+
+    // 关键词
+    document.getElementById('topKeywords').innerHTML = d.topKeywords.map(k =>
+      '<span style="background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.3);border-radius:12px;padding:4px 10px;font-size:12px;color:var(--gold)">' +
+      k.title.substring(0,20) + ' (' + k.cnt + ')</span>'
+    ).join('') || '<span style="color:var(--text-muted)">暂无数据</span>';
+  } catch(e) { console.error(e); }
+}
+
+async function loadTickets() {
+  const status = document.getElementById('filterStatus').value;
+  const category = document.getElementById('filterCategory').value;
+  const priority = document.getElementById('filterPriority').value;
+  const params = new URLSearchParams({ page: currentPage, pageSize: 20 });
+  if (status) params.set('status', status);
+  if (category) params.set('category', category);
+  if (priority) params.set('priority', priority);
+
+  try {
+    const token = localStorage.getItem('authToken');
+    const headers = {};
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    const r = await fetch(API + '/api/admin/tickets/list?' + params, { headers }).then(r => r.json());
+    if (r.code !== 0) return;
+    const catNames = {bug:'🐛',suggestion:'💡',question:'❓',praise:'👍',feature_request:'✨'};
+    const statusNames = {open:'待处理',in_progress:'处理中',resolved:'已解决',closed:'已关闭',rejected:'已拒绝'};
+    const priIcons = {urgent:'🔴',high:'🟠',normal:'🟡',low:'🟢'};
+    document.getElementById('ticketsBody').innerHTML = r.data.tickets.map(t =>
+      '<tr onclick="viewTicket(' + t.id + ')" style="cursor:pointer">' +
+      '<td>#' + t.id + '</td>' +
+      '<td>' + (catNames[t.category]||t.category) + '</td>' +
+      '<td>' + (priIcons[t.priority]||'') + ' ' + t.priority + '</td>' +
+      '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + t.title + '</td>' +
+      '<td>' + (t.user_name||'-') + '</td>' +
+      '<td><span class="status-badge status-' + t.status + '">' + (statusNames[t.status]||t.status) + '</span></td>' +
+      '<td style="white-space:nowrap">' + (t.created_at||'').substring(0,16) + '</td>' +
+      '<td><button class="btn-secondary" onclick="event.stopPropagation();viewTicket(' + t.id + ')" style="padding:4px 8px;font-size:11px">查看</button></td>' +
+      '</tr>'
+    ).join('') || '<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--text-muted)">暂无工单</td></tr>';
+
+    totalPages = r.data.totalPages;
+    renderPagination();
+  } catch(e) { console.error(e); }
+}
+
+function renderPagination() {
+  const p = document.getElementById('pagination');
+  if (totalPages <= 1) { p.innerHTML = ''; return; }
+  let html = '';
+  html += '<button onclick="goPage(' + (currentPage-1) + ')"' + (currentPage<=1?' disabled':'') + '>上一页</button>';
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === 1 || i === totalPages || Math.abs(i - currentPage) <= 2) {
+      html += '<button class="' + (i===currentPage?'active':'') + '" onclick="goPage(' + i + ')">' + i + '</button>';
+    } else if (Math.abs(i - currentPage) === 3) {
+      html += '<span style="padding:6px">...</span>';
+    }
+  }
+  html += '<button onclick="goPage(' + (currentPage+1) + ')"' + (currentPage>=totalPages?' disabled':'') + '>下一页</button>';
+  p.innerHTML = html;
+}
+
+function goPage(p) { currentPage = p; loadTickets(); }
+
+async function viewTicket(id) {
+  currentTicketId = id;
+  try {
+    const token = localStorage.getItem('authToken');
+    const headers = {};
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    const r = await fetch(API + '/api/tickets/detail?id=' + id, { headers }).then(r => r.json());
+    if (r.code !== 0) return;
+    const t = r.data;
+    const catNames = {bug:'🐛 Bug',suggestion:'💡 建议',question:'❓ 咨询',praise:'👍 好评',feature_request:'✨ 新功能'};
+    const statusNames = {open:'待处理',in_progress:'处理中',resolved:'已解决',closed:'已关闭',rejected:'已拒绝'};
+    document.getElementById('modalTitle').textContent = '工单 #' + t.id + ' · ' + t.title;
+    document.getElementById('modalBody').innerHTML =
+      '<div class="field"><label>类别</label><div>' + (catNames[t.category]||t.category) + '</div></div>' +
+      '<div class="field"><label>优先级</label><div>' + t.priority + '</div></div>' +
+      '<div class="field"><label>提交人</label><div>' + (t.user_name||'匿名') + ' (' + (t.user_role||'free') + ')</div></div>' +
+      '<div class="field"><label>提交时间</label><div>' + t.created_at + '</div></div>' +
+      '<div class="field"><label>页面来源</label><div>' + (t.page_url||'-') + '</div></div>' +
+      '<div class="field"><label>详细内容</label><div style="background:rgba(255,255,255,.04);padding:10px;border-radius:6px;white-space:pre-wrap">' + t.content + '</div></div>' +
+      (t.screenshot_path ? '<div class="field"><label>截图</label><img class="screenshot-thumb" src="' + t.screenshot_path + '" onclick="window.open(this.src)"></div>' : '') +
+      (t.voice_path ? '<div class="field"><label>语音</label><audio src="' + t.voice_path + '" controls style="width:100%"></audio></div>' : '') +
+      (t.admin_reply ? '<div class="field"><label>后台回复</label><div class="reply-box">' + t.admin_reply + '</div></div>' : '') +
+      (t.tags ? '<div class="field"><label>标签</label><div>' + t.tags + '</div></div>' : '');
+    document.getElementById('adminReply').value = t.admin_reply || '';
+    document.getElementById('ticketModal').classList.add('show');
+  } catch(e) { console.error(e); }
+}
+
+function closeModal() { document.getElementById('ticketModal').classList.remove('show'); }
+
+async function updateTicket(status) {
+  if (!currentTicketId) return;
+  const token = localStorage.getItem('authToken');
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  const r = await fetch(API + '/api/admin/tickets/update', {
+    method: 'POST', headers,
+    body: JSON.stringify({ id: currentTicketId, status })
+  }).then(r => r.json());
+  if (r.code === 0) { loadTickets(); loadStats(); showToast('已更新状态'); }
+}
+
+async function saveReply() {
+  if (!currentTicketId) return;
+  const reply = document.getElementById('adminReply').value.trim();
+  const token = localStorage.getItem('authToken');
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  const r = await fetch(API + '/api/admin/tickets/update', {
+    method: 'POST', headers,
+    body: JSON.stringify({ id: currentTicketId, admin_reply: reply, status: 'in_progress' })
+  }).then(r => r.json());
+  if (r.code === 0) { closeModal(); loadTickets(); loadStats(); showToast('回复已保存'); }
+}
+
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--gold);border-radius:8px;padding:10px 20px;color:var(--gold);font-size:13px;z-index:99999';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
+// 初始化
+loadStats();
+loadTickets();
+</script>
+</body>
+</html>
