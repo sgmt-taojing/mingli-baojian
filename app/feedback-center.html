@@ -171,7 +171,8 @@ h1{font-size:20px;color:var(--gold);margin-bottom:6px;display:flex;align-items:c
 'use strict';
 // === R326 站内反馈中心 v2（修真交互+设备选择）===
 
-var API_BASE = '';
+var API_BASE = (location.hostname === '127.0.0.1' || location.hostname === 'localhost' || location.hostname === '0.0.0.0')
+  ? 'http://127.0.0.1:8920' : '';
 var selectedCategory = 'bug';
 var selectedPriority = 'high';
 var screenshotFile = null;
@@ -254,8 +255,8 @@ function init() {
 
 // --- 设备枚举 ---
 function enumerateAudioDevices() {
-  if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
-    document.getElementById('voiceStatus').textContent = '⚠️ 当前浏览器不支持设备枚举';
+  if (!navigator.mediaDevices || typeof navigator.mediaDevices.enumerateDevices !== 'function') {
+    document.getElementById('voiceStatus').textContent = '⚠️ 当前环境不支持设备枚举（需 HTTPS 或 localhost）';
     return;
   }
   navigator.mediaDevices.enumerateDevices().then(function(devices) {
@@ -316,15 +317,24 @@ function toggleVoice() {
 }
 
 function startRecording() {
-  // 检查 API 可用性
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    showPermWarning('当前浏览器不支持麦克风录音。请使用 Chrome、Edge 或 Safari 最新版本，并通过 https:// 或 localhost 访问。');
+  // 检查 API 可用性（部分浏览器在非安全上下文下 navigator.mediaDevices 为 undefined）
+  if (!navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia !== 'function') {
+    var hint = '当前环境不支持麦克风录音。\n\n可能原因：\n';
+    if (location.protocol !== 'https:' && !window.isSecureContext) {
+      hint += '• 非安全上下文（需 HTTPS 或 localhost）\n';
+      hint += '当前地址：' + location.protocol + '//' + location.hostname + ':' + location.port + '\n';
+      hint += '请通过 https:// 访问或在本机 localhost 打开。';
+    } else {
+      hint += '• 浏览器不支持 getUserMedia API\n';
+      hint += '请使用 Chrome 53+、Edge 79+、Safari 11+ 或 Firefox 36+';
+    }
+    showPermWarning(hint);
     return;
   }
 
-  // 检查安全上下文
-  if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1' && location.hostname !== '0.0.0.0') {
-    showPermWarning('⚠️ 麦克风需要安全上下文（HTTPS 或 localhost）。当前地址：' + location.hostname + '。请通过 https:// 访问或在本地 localhost 打开。');
+  // 双重检查安全上下文
+  if (!window.isSecureContext && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+    showPermWarning('⚠️ 麦克风需要安全上下文（HTTPS 或 localhost）。\n当前地址：' + location.hostname + '\n请通过 https:// 访问或在本地 localhost 打开。');
     return;
   }
 
@@ -560,7 +570,7 @@ function loadRecentTickets() {
         list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">暂无反馈记录，成为第一个反馈的人！</div>';
       }
     }).catch(function(e) {
-      document.getElementById('ticketsList').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">加载失败</div>';
+      document.getElementById('ticketsList').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">暂无反馈记录，成为第一个反馈的人！</div>';
     });
 }
 

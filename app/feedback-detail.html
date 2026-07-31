@@ -68,6 +68,7 @@ body{font-family:system-ui,-apple-system,'PingFang SC',sans-serif;background:#0d
 
 <script>
 'use strict';
+var API_BASE = (location.hostname === '127.0.0.1' || location.hostname === 'localhost' || location.hostname === '0.0.0.0') ? 'http://127.0.0.1:8920' : '';
 function getParam(name) {
   var m = new RegExp('[?&]' + name + '=([^&]*)').exec(location.search);
   return m ? decodeURIComponent(m[1]) : '';
@@ -101,7 +102,7 @@ function loadTicket() {
   var token = localStorage.getItem('authToken');
   if (token) headers['Authorization'] = 'Bearer ' + token;
 
-  fetch('/api/tickets/detail?id=' + ticketId, { headers: headers })
+  fetch(API_BASE + '/api/tickets/detail?id=' + ticketId, { headers: headers })
     .then(function(r) { return r.json(); })
     .then(function(r) {
       if (r.code !== 0) {
@@ -204,7 +205,7 @@ function rateTicket(rating) {
   var headers = { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = 'Bearer ' + token;
   // 用 update 端点存评分（扩展：rating 字段）
-  fetch('/api/tickets/detail?id=' + ticketId, { headers: headers })
+  fetch(API_BASE + '/api/tickets/detail?id=' + ticketId, { headers: headers })
     .then(function(r) { return r.json(); })
     .then(function() {
       document.getElementById('ratingLabel').textContent = '✅ 已评分 ' + rating + ' 星，感谢您的反馈！';
