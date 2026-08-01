@@ -361,6 +361,11 @@ function updateSummary() {
   summary.innerHTML = html;
 }
 
+// 热插拔监听
+if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
+  navigator.mediaDevices.addEventListener("devicechange", function() { enumDevices(); });
+}
+
 // 初始化
 checkService(8913, 'OCR', 'ocr');
 checkService(8912, 'TTS', 'tts');
