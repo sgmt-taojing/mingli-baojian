@@ -37,8 +37,8 @@
 <link rel="stylesheet" href="css/pro-panel.css" media="print" onload="this.media='all'">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet"></noscript>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&display=swap" rel="stylesheet"></noscript>
 
 
 <script src="js/ui-toast.js" defer></script>
@@ -64,7 +64,7 @@
 
   <!-- R261 inline: divination-hub-style-2.css (1203 bytes) -->
 <style data-r261-inline="divination-hub-style-2.css">
-body{font-family:'Noto Serif SC',serif;background:var(--ink);color:var(--paper);margin:0}
+body{font-family:'Source Han Serif SC','Noto Serif SC','Songti SC','STSong','SimSun',serif;background:var(--ink);color:var(--paper);margin:0}
 h1{color:var(--gold);text-align:center;letter-spacing:6px}
 h2{color:var(--gold2);border-bottom:1px solid rgba(201,168,76,.2);padding-bottom:8px}
 .result{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.1);border-radius:8px;padding:24px;margin:16px 0}
@@ -5038,5 +5038,14 @@ function switchToZhanbuYijing(){if(typeof showZhanbuSub==='function'){showZhanbu
 </script>
 
 <script src="js/flow-engine.js"></script>
+<script>
+// 按需加载 Ma Shan Zheng 字体（仅测字模块用）
+if (document.querySelector('[font-family*="Ma Shan Zheng"], #ceziSectionInput, #ceziSectionChar')) {
+  var ms = document.createElement('link');
+  ms.href = 'https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap';
+  ms.rel = 'stylesheet';
+  document.head.appendChild(ms);
+}
+</script>
 </body>
 </html>
