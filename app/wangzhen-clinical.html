@@ -306,7 +306,7 @@
         <div class="wz-form-grid">
           <div class="wz-form-row">
             <label>性别</label>
-            <select id="np-gender" class="wz-select" style="width:100%"><option value="">选择</option><option value="male">男</option><option value="female">女</option></select>
+            <select id="np-gender" class="wz-select" style="width:100%" aria-label="np-gender"><option value="">选择</option><option value="male">男</option><option value="female">女</option></select>
           </div>
           <div class="wz-form-row">
             <label>年龄</label>
@@ -326,13 +326,13 @@
             <button onclick="wangzhenClinical.switchCalendar('lunar')">农历</button>
           </div>
           <div class="wz-form-grid-4">
-            <select id="np-byear" class="wz-select" style="width:100%"><option value="">年</option></select>
-            <select id="np-bmonth" class="wz-select" style="width:100%"><option value="">月</option></select>
-            <select id="np-bday" class="wz-select" style="width:100%"><option value="">日</option></select>
-            <select id="np-bhour" class="wz-select" style="width:100%"><option value="">时辰</option></select>
+            <select id="np-byear" class="wz-select" style="width:100%" aria-label="np-byear"><option value="">年</option></select>
+            <select id="np-bmonth" class="wz-select" style="width:100%" aria-label="np-bmonth"><option value="">月</option></select>
+            <select id="np-bday" class="wz-select" style="width:100%" aria-label="np-bday"><option value="">日</option></select>
+            <select id="np-bhour" class="wz-select" style="width:100%" aria-label="np-bhour"><option value="">时辰</option></select>
           </div>
           <div id="np-lunar-months" style="display:none;margin-top:4px">
-            <select id="np-lunar-leap" class="wz-select" style="width:100%">
+            <select id="np-lunar-leap" class="wz-select" style="width:100%" aria-label="np-lunar-leap">
               <option value="0">非闰月</option>
               <option value="1">闰月</option>
             </select>
@@ -342,7 +342,7 @@
         <!-- 主诉症状：大框 + 语音 + 结构化点选 -->
         <div class="wz-form-row">
           <label>主诉症状 <button class="btn btn-ghost" style="font-size:9px;padding:2px 6px;margin-left:4px" onclick="wangzhenClinical.startVoiceInput('np-chief')">麦 语音</button></label>
-          <textarea id="np-chief" class="wz-textarea" placeholder="患者主诉症状，如：头痛失眠、面色苍白、胃胀不适..." style="min-height:70px"></textarea>
+          <textarea id="np-chief" class="wz-textarea" placeholder="患者主诉症状，如：头痛失眠、面色苍白、胃胀不适..." style="min-height:70px" aria-label="患者主诉症状，如：头痛失眠、面色苍白、胃胀不适..."></textarea>
         </div>
 
         <!-- 结构化症状点选 -->
@@ -473,7 +473,7 @@
     <!-- 语音医嘱 -->
     <div class="wz-card">
       <div class="wz-card-title">麦 医嘱记录</div>
-      <textarea id="wz-voice-text" class="wz-voice-text" placeholder="点击语音输入，或直接打字记录医嘱..."></textarea>
+      <textarea id="wz-voice-text" class="wz-voice-text" placeholder="点击语音输入，或直接打字记录医嘱..." aria-label="点击语音输入，或直接打字记录医嘱..."></textarea>
       <div class="wz-btn-row">
         <button class="btn btn-secondary" id="wz-btn-voice" onclick="wangzhenClinical.toggleVoiceInput()">麦 语音输入</button>
         <button class="btn btn-ghost" onclick="wangzhenClinical.speakText(document.getElementById('wz-voice-text').value)">播报</button>
@@ -518,7 +518,7 @@
       <!-- 西医诊断输入 -->
       <div class="wz-form-row">
         <label>西医诊断结论（选填）</label>
-        <textarea id="wz-western-diag" class="wz-textarea" placeholder="如：心电图正常、B超胆结石0.8cm、胃镜慢性胃炎..." style="min-height:50px"></textarea>
+        <textarea id="wz-western-diag" class="wz-textarea" placeholder="如：心电图正常、B超胆结石0.8cm、胃镜慢性胃炎..." style="min-height:50px" aria-label="如：心电图正常、B超胆结石0.8cm、胃镜慢性胃炎..."></textarea>
       </div>
 
       <!-- 综合分析按钮 -->

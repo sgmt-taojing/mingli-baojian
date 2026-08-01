@@ -1508,8 +1508,8 @@ function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeComp
             <details style="margin-top:8px">
               <summary style="cursor:pointer;color:var(--gold);font-size:.82rem;padding:4px 0">写 编辑笔记/标签</summary>
               <div style="margin-top:6px">
-                <input type="text" data-fav-note="${f.id}" placeholder="📝 私域笔记..." value="${(f.note||'').replace(/"/g,'&quot;')}" style="width:100%;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.82rem;margin-bottom:6px"/>
-                <input type="text" data-fav-tags="${f.id}" placeholder="🏷️ 标签 (逗号分隔)" value="${(f.tags||[]).join(', ')}" style="width:100%;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.82rem;margin-bottom:6px"/>
+                <input type="text" aria-label="私域笔记" data-fav-note="${f.id}" placeholder="📝 私域笔记..." value="${(f.note||'').replace(/"/g,'&quot;')}" style="width:100%;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.82rem;margin-bottom:6px"/>
+                <input type="text" aria-label="标签" data-fav-tags="${f.id}" placeholder="🏷️ 标签 (逗号分隔)" value="${(f.tags||[]).join(', ')}" style="width:100%;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.82rem;margin-bottom:6px"/>
                 <button class="btn primary" style="padding:5px 12px;border-radius:6px;background:var(--gold);color:#000;border:0;cursor:pointer;font-size:.82rem" onclick="saveFavMeta('${f.id}')">存 保存</button>
               </div>
             </details>

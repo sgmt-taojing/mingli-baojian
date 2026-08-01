@@ -100,36 +100,36 @@ renderBar();
 var a=document.getElementById('app');
 if(step===1){
 a.innerHTML='<div class="card"><div class="card-title">'+steps[0].t+'</div>'+
-'<div class="row"><div class="form-group"><label>姓名/称呼</label><input aria-label="姓名" id="name" placeholder="如：李先生"></div><div class="form-group"><label>性别</label><select id="sex"><option value="男">男</option><option value="女">女</option></select></div></div>'+
+'<div class="row"><div class="form-group"><label>姓名/称呼</label><input aria-label="姓名" id="name" placeholder="如：李先生"></div><div class="form-group"><label>性别</label><select id="sex" aria-label="sex"><option value="男">男</option><option value="女">女</option></select></div></div>'+
 '<div class="row"><div class="form-group"><label>年龄</label><input aria-label="age" id="age" type="number" placeholder="35"></div><div class="form-group"><label>身高/体重</label><input aria-label="hw" id="hw" placeholder="175cm/70kg"></div></div>'+
 '<div class="form-group"><label>现居地</label><input aria-label="residence" id="residence" placeholder="如：浙江杭州"></div>'+
-'<div class="form-group"><label>职业类型</label><select id="occupation"><option value="脑力">脑力劳动(办公/管理)</option><option value="体力">体力劳动</option><option value="混合">脑力+体力</option><option value="退休">退休</option><option value="学生">学生</option></select></div>'+
-'<div class="form-group"><label>运动习惯</label><select id="exercise"><option value="无">几乎不运动</option><option value="偶尔">偶尔散步</option><option value="每周">每周2-3次</option><option value="每天">每天运动</option></select></div>'+
+'<div class="form-group"><label>职业类型</label><select id="occupation" aria-label="occupation"><option value="脑力">脑力劳动(办公/管理)</option><option value="体力">体力劳动</option><option value="混合">脑力+体力</option><option value="退休">退休</option><option value="学生">学生</option></select></div>'+
+'<div class="form-group"><label>运动习惯</label><select id="exercise" aria-label="exercise"><option value="无">几乎不运动</option><option value="偶尔">偶尔散步</option><option value="每周">每周2-3次</option><option value="每天">每天运动</option></select></div>'+
 '<button class="btn" onclick="next()">下一步</button></div>';
 }else if(step===2){
 a.innerHTML='<div class="card"><div class="card-title">'+steps[1].t+'</div>'+
 '<div class="hint">示 健康预测需要出生时间进行先天体质分析，信息越准确预测越精准</div>'+
-'<div class="row"><div class="form-group"><label>出生日期(公历)</label><input aria-label="日期" id="birth_date" type="date"></div><div class="form-group"><label>出生时辰</label><select id="birth_hour"><option value="">大约</option><option value="0">子时(23-1点)</option><option value="2">丑时(1-3点)</option><option value="4">寅时(3-5点)</option><option value="6">卯时(5-7点)</option><option value="8">辰时(7-9点)</option><option value="10">巳时(9-11点)</option><option value="12">午时(11-13点)</option><option value="14">未时(13-15点)</option><option value="16">申时(15-17点)</option><option value="18">酉时(17-19点)</option><option value="20">戌时(19-21点)</option><option value="22">亥时(21-23点)</option></select></div></div>'+
-'<div class="row"><div class="form-group"><label>出生地</label><input aria-label="出生日期" id="birthplace" placeholder="省+市(真太阳时修正)"></div><div class="form-group"><label>是否早产</label><select id="preterm"><option value="否">否</option><option value="是">是(提前__周)</option></select></div></div>'+
+'<div class="row"><div class="form-group"><label>出生日期(公历)</label><input aria-label="日期" id="birth_date" type="date"></div><div class="form-group"><label>出生时辰</label><select id="birth_hour" aria-label="birth_hour"><option value="">大约</option><option value="0">子时(23-1点)</option><option value="2">丑时(1-3点)</option><option value="4">寅时(3-5点)</option><option value="6">卯时(5-7点)</option><option value="8">辰时(7-9点)</option><option value="10">巳时(9-11点)</option><option value="12">午时(11-13点)</option><option value="14">未时(13-15点)</option><option value="16">申时(15-17点)</option><option value="18">酉时(17-19点)</option><option value="20">戌时(19-21点)</option><option value="22">亥时(21-23点)</option></select></div></div>'+
+'<div class="row"><div class="form-group"><label>出生地</label><input aria-label="出生日期" id="birthplace" placeholder="省+市(真太阳时修正)"></div><div class="form-group"><label>是否早产</label><select id="preterm" aria-label="preterm"><option value="否">否</option><option value="是">是(提前__周)</option></select></div></div>'+
 '<button class="btn" onclick="next()">下一步</button></div>';
 }else if(step===3){
 a.innerHTML='<div class="card"><div class="card-title">'+steps[2].t+'</div>'+
 '<div class="hint">家族病史对遗传性疾病预测至关重要</div>'+
-'<div class="form-group"><label>父亲健康状况</label><textarea id="father_health" placeholder="如：高血压/糖尿病/健康/已故(原因)"></textarea></div>'+
-'<div class="form-group"><label>母亲健康状况</label><textarea id="mother_health" placeholder="如：心脏病/甲状腺/健康"></textarea></div>'+
-'<div class="form-group"><label>祖父母(父方)健康状况</label><textarea id="grandpa_p_health" placeholder="祖父/祖母健康或疾病情况"></textarea></div>'+
-'<div class="form-group"><label>祖父母(母方)健康状况</label><textarea id="grandpa_m_health" placeholder="外祖父/外祖母健康或疾病情况"></textarea></div>'+
-'<div class="form-group"><label>兄弟姐妹健康状况</label><textarea id="sibling_health" placeholder="如有兄弟姐妹，健康或疾病情况"></textarea></div>'+
+'<div class="form-group"><label>父亲健康状况</label><textarea id="father_health" placeholder="如：高血压/糖尿病/健康/已故(原因)" aria-label="如：高血压/糖尿病/健康/已故(原因)"></textarea></div>'+
+'<div class="form-group"><label>母亲健康状况</label><textarea id="mother_health" placeholder="如：心脏病/甲状腺/健康" aria-label="如：心脏病/甲状腺/健康"></textarea></div>'+
+'<div class="form-group"><label>祖父母(父方)健康状况</label><textarea id="grandpa_p_health" placeholder="祖父/祖母健康或疾病情况" aria-label="祖父/祖母健康或疾病情况"></textarea></div>'+
+'<div class="form-group"><label>祖父母(母方)健康状况</label><textarea id="grandpa_m_health" placeholder="外祖父/外祖母健康或疾病情况" aria-label="外祖父/外祖母健康或疾病情况"></textarea></div>'+
+'<div class="form-group"><label>兄弟姐妹健康状况</label><textarea id="sibling_health" placeholder="如有兄弟姐妹，健康或疾病情况" aria-label="如有兄弟姐妹，健康或疾病情况"></textarea></div>'+
 '<div class="form-group"><label>家族遗传病</label><div class="checkbox-grid" id="family_genetic">'+
-'<div class="checkbox-item"><input type="checkbox" value="高血压"><span>高血压</span></div>'+
-'<div class="checkbox-item"><input type="checkbox" value="糖尿病"><span>糖尿病</span></div>'+
-'<div class="checkbox-item"><input type="checkbox" value="心脏病"><span>心脏病</span></div>'+
-'<div class="checkbox-item"><input type="checkbox" value="肿瘤癌症"><span>肿瘤/癌</span></div>'+
-'<div class="checkbox-item"><input type="checkbox" value="精神病"><span>精神疾病</span></div>'+
-'<div class="checkbox-item"><input type="checkbox" value="肝病"><span>肝病</span></div>'+
-'<div class="checkbox-item"><input type="checkbox" value="肾病"><span>肾病</span></div>'+
-'<div class="checkbox-item"><input type="checkbox" value="过敏"><span>过敏体质</span></div>'+
-'<div class="checkbox-item"><input type="checkbox" value="无"><span>无遗传病</span></div>'+
+'<div class="checkbox-item"><input type="checkbox" id="cb-高血压" aria-label="高血压"><span>高血压</span></div>'+
+'<div class="checkbox-item"><input type="checkbox" id="cb-糖尿病" aria-label="糖尿病"><span>糖尿病</span></div>'+
+'<div class="checkbox-item"><input type="checkbox" id="cb-心脏病" aria-label="心脏病"><span>心脏病</span></div>'+
+'<div class="checkbox-item"><input type="checkbox" id="cb-肿瘤癌症" aria-label="肿瘤癌症"><span>肿瘤/癌</span></div>'+
+'<div class="checkbox-item"><input type="checkbox" id="cb-精神病" aria-label="精神病"><span>精神疾病</span></div>'+
+'<div class="checkbox-item"><input type="checkbox" id="cb-肝病" aria-label="肝病"><span>肝病</span></div>'+
+'<div class="checkbox-item"><input type="checkbox" id="cb-肾病" aria-label="肾病"><span>肾病</span></div>'+
+'<div class="checkbox-item"><input type="checkbox" id="cb-过敏" aria-label="过敏体质"><span>过敏体质</span></div>'+
+'<div class="checkbox-item"><input type="checkbox" id="cb-no-inherit" aria-label="无遗传病"><span>无遗传病</span></div>'+
 '</div></div>'+
 '<button class="btn" onclick="next()">下一步</button></div>';
 }else if(step===4){
@@ -139,27 +139,27 @@ a.innerHTML='<div class="card"><div class="card-title">'+steps[3].t+'</div>'+
 '<div class="row"><div class="form-group"><label>血糖(空腹)</label><input aria-label="glucose" id="glucose" placeholder="如：5.2"></div><div class="form-group"><label>血脂</label><input aria-label="lipid" id="lipid" placeholder="如：正常/偏高"></div></div>'+
 '<div class="row"><div class="form-group"><label>肝功能</label><input aria-label="liver" id="liver" placeholder="如：正常"></div><div class="form-group"><label>肾功能</label><input aria-label="kidney" id="kidney" placeholder="如：正常"></div></div>'+
 '<div class="form-group"><label>血常规</label><input aria-label="cbc" id="cbc" placeholder="如：正常/贫血/白细胞偏高"></div>'+
-'<div class="form-group"><label>影像检查(CT/B超/X光)</label><textarea id="imaging" placeholder="如：胸部CT正常/腹部B超脂肪肝"></textarea></div>'+
-'<div class="form-group"><label>其他检查</label><textarea id="other_exam" placeholder="如：幽门螺杆菌阳性/HPV阳性"></textarea></div>'+
-'<div class="form-group"><label>正在服用的药物</label><textarea id="medications" placeholder="如：降压药缬沙坦80mg/日"></textarea></div>'+
+'<div class="form-group"><label>影像检查(CT/B超/X光)</label><textarea id="imaging" placeholder="如：胸部CT正常/腹部B超脂肪肝" aria-label="如：胸部CT正常/腹部B超脂肪肝"></textarea></div>'+
+'<div class="form-group"><label>其他检查</label><textarea id="other_exam" placeholder="如：幽门螺杆菌阳性/HPV阳性" aria-label="如：幽门螺杆菌阳性/HPV阳性"></textarea></div>'+
+'<div class="form-group"><label>正在服用的药物</label><textarea id="medications" placeholder="如：降压药缬沙坦80mg/日" aria-label="如：降压药缬沙坦80mg/日"></textarea></div>'+
 '<button class="btn" onclick="next()">下一步</button></div>';
 }else if(step===5){
 a.innerHTML='<div class="card"><div class="card-title">'+steps[4].t+'</div>'+
-'<div class="form-group"><label>怕冷还是怕热？</label><select id="temp_pref"><option value="怕冷">怕冷(手脚冰凉)</option><option value="怕热">怕热(易上火)</option><option value="正常">无明显偏向</option><option value="忽冷忽热">忽冷忽热</option></select></div>'+
-'<div class="row"><div class="form-group"><label>出汗</label><select id="sweat"><option>很少</option><option>正常</option><option>易出汗</option><option>盗汗</option><option>自汗</option></select></div><div class="form-group"><label>食欲</label><select id="appetite"><option>好</option><option>正常</option><option>差</option><option>时好时差</option></select></div></div>'+
-'<div class="row"><div class="form-group"><label>睡眠</label><select id="sleep"><option>好</option><option>尚可</option><option>入睡难</option><option>多梦易醒</option><option>严重失眠</option></select></div><div class="form-group"><label>大便</label><select id="bowel"><option>正常</option><option>便秘</option><option>腹泻</option><option>时干时稀</option><option>黏腻</option></select></div></div>'+
-'<div class="form-group"><label>情绪状态</label><select id="mood"><option>平和</option><option>易怒</option><option>焦虑</option><option>抑郁</option><option>忽喜忽悲</option></select></div>'+
-'<div class="form-group"><label>精力状况</label><select id="energy"><option>充沛</option><option>尚可</option><option>容易疲劳</option><option>经常疲惫</option><option>极度疲劳</option></select></div>'+
+'<div class="form-group"><label>怕冷还是怕热？</label><select id="temp_pref" aria-label="temp_pref"><option value="怕冷">怕冷(手脚冰凉)</option><option value="怕热">怕热(易上火)</option><option value="正常">无明显偏向</option><option value="忽冷忽热">忽冷忽热</option></select></div>'+
+'<div class="row"><div class="form-group"><label>出汗</label><select id="sweat" aria-label="sweat"><option>很少</option><option>正常</option><option>易出汗</option><option>盗汗</option><option>自汗</option></select></div><div class="form-group"><label>食欲</label><select id="appetite" aria-label="appetite"><option>好</option><option>正常</option><option>差</option><option>时好时差</option></select></div></div>'+
+'<div class="row"><div class="form-group"><label>睡眠</label><select id="sleep" aria-label="sleep"><option>好</option><option>尚可</option><option>入睡难</option><option>多梦易醒</option><option>严重失眠</option></select></div><div class="form-group"><label>大便</label><select id="bowel" aria-label="bowel"><option>正常</option><option>便秘</option><option>腹泻</option><option>时干时稀</option><option>黏腻</option></select></div></div>'+
+'<div class="form-group"><label>情绪状态</label><select id="mood" aria-label="mood"><option>平和</option><option>易怒</option><option>焦虑</option><option>抑郁</option><option>忽喜忽悲</option></select></div>'+
+'<div class="form-group"><label>精力状况</label><select id="energy" aria-label="energy"><option>充沛</option><option>尚可</option><option>容易疲劳</option><option>经常疲惫</option><option>极度疲劳</option></select></div>'+
 '<div class="form-group"><label>当前不适症状</label><div class="checkbox-grid" id="symptoms">'+
-'<div class="checkbox-item"><input type="checkbox" value="头痛"><span>头痛</span></div>'+
-'<div class="checkbox-item"><input type="checkbox" value="失眠"><span>失眠</span></div>'+
-'<div class="checkbox-item"><input type="checkbox" value="胃不适"><span>胃不适</span></div>'+
-'<div class="checkbox-item"><input type="checkbox" value="疲劳"><span>疲劳</span></div>'+
-'<div class="checkbox-item"><input type="checkbox" value="腰酸"><span>腰酸</span></div>'+
-'<div class="checkbox-item"><input type="checkbox" value="心悸"><span>心悸</span></div>'+
-'<div class="checkbox-item"><input type="checkbox" value="咳嗽"><span>咳嗽</span></div>'+
-'<div class="checkbox-item"><input type="checkbox" value="皮肤"><span>皮肤问题</span></div>'+
-'<div class="checkbox-item"><input type="checkbox" value="无"><span>无明显不适</span></div>'+
+'<div class="checkbox-item"><input type="checkbox" id="cb-头痛" aria-label="头痛"><span>头痛</span></div>'+
+'<div class="checkbox-item"><input type="checkbox" id="cb-失眠" aria-label="失眠"><span>失眠</span></div>'+
+'<div class="checkbox-item"><input type="checkbox" id="cb-胃不适" aria-label="胃不适"><span>胃不适</span></div>'+
+'<div class="checkbox-item"><input type="checkbox" id="cb-疲劳" aria-label="疲劳"><span>疲劳</span></div>'+
+'<div class="checkbox-item"><input type="checkbox" id="cb-腰酸" aria-label="腰酸"><span>腰酸</span></div>'+
+'<div class="checkbox-item"><input type="checkbox" id="cb-心悸" aria-label="心悸"><span>心悸</span></div>'+
+'<div class="checkbox-item"><input type="checkbox" id="cb-咳嗽" aria-label="咳嗽"><span>咳嗽</span></div>'+
+'<div class="checkbox-item"><input type="checkbox" id="cb-皮肤" aria-label="皮肤问题"><span>皮肤问题</span></div>'+
+'<div class="checkbox-item"><input type="checkbox" id="cb-no-discomfort" aria-label="无明显不适"><span>无明显不适</span></div>'+
 '</div></div>'+
 '<button class="btn" onclick="next()">生成健康预测报告</button></div><div style="margin-top:10px"><a class="btn" href="report-interpret.html" style="text-decoration:none;display:block;text-align:center">表 录入完去报告解读中心</a></div>';
 }else if(step===6){
