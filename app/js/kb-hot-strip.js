@@ -135,7 +135,7 @@
   }
 
   /**
-   * 把 module 名翻译成中文标签（AI 助手模块映射）
+   * 把 module 名翻译成中文标签（智能助手模块映射）
    */
   function moduleLabel(mod) {
     var map = {
@@ -177,7 +177,7 @@
     var mod = btn.getAttribute('data-mod');
     if (!mod) return;
     var newCount = bumpRec(mod);
-    // 同步命中计数（与 AI 助手打点共用同一 key）
+    // 同步命中计数（与 智能助手打点共用同一 key）
     try {
       var ls = window.localStorage;
       var hk = LS_PREFIX + mod;
@@ -251,7 +251,7 @@
     if (readLocalRec() === 0 && readLocalTop().length === 0) {
       var cta = document.createElement('div');
       cta.className = 'kb-hot-cta';
-      cta.innerHTML = '🌱 你还没推荐过 — <a href="ai-assistant.html">去 AI 助手试试 →</a>';
+      cta.innerHTML = '🌱 你还没推荐过 — <a href="ai-assistant.html">去 智能助手试试 →</a>';
       host.appendChild(cta);
     }
   }
@@ -272,8 +272,8 @@
       + '<div class="kb-cold-start">'
       + '<div class="kb-cold-icon">🌱</div>'
       + '<div class="kb-cold-title">还未生成 KB 命中</div>'
-      + '<div class="kb-cold-text">先去 AI 助手问一个问题，热门知识会随使用自动出现</div>'
-      + '<a class="kb-cold-btn" href="ai-assistant.html">去看看 AI 助手 →</a>'
+      + '<div class="kb-cold-text">先去 智能助手问一个问题，热门知识会随使用自动出现</div>'
+      + '<a class="kb-cold-btn" href="ai-assistant.html">去看看 智能助手 →</a>'
       + '</div>';
     host.style.display = 'block';
     host.classList.add('kb-hot-strip-cold');

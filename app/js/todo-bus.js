@@ -1,4 +1,4 @@
-/* todo-bus.js — AI 助手 TODO 任务总线
+/* todo-bus.js — 智能助手 TODO 任务总线
  * R86: 从 AI 报告中提取建议/行动/化解/第N条/下一步 等为可勾选 TODO
  * - 自动持久化 localStorage _ai_todos / _ai_todos_done
  * - 跨会话保留（globalThis.TodoBus）

@@ -439,7 +439,7 @@ const ALL_MODS=[
 // === 初始化 ===
 showWelcome();
 
-// === R34: KB 热卡直达 (AI 助手 → 模块咨询一气呵成) ===
+// === R34: KB 热卡直达 (智能助手 → 模块咨询一气呵成) ===
 function renderKbHotChips(){
   let top = [];
   try {
@@ -659,7 +659,7 @@ function addAI(text,stepData){
     }
   }
   d.innerHTML=html;
-  // R50 AI 助手反馈按钮（点赞/踩/反馈） — 接入 /api/public/kb-feedback
+  // R50 智能助手反馈按钮（点赞/踩/反馈） — 接入 /api/public/kb-feedback
   if (!stepData || !stepData.options) {
     var _qLast = (state && state.history && state.history[state.history.length-1]) || '';
     if (!_qLast && typeof hist !== 'undefined' && hist.length) _qLast = hist[hist.length-1].content || '';
@@ -5083,7 +5083,7 @@ window._exportSingleMessage = function(btn){
     var body = msg.querySelector('.b');
     var text = body ? body.innerText : '';
     var blob = new Blob([
-      '# 命理宝鉴 · AI 助手回复\n\n',
+      '# 命理宝鉴 · 智能助手回复\n\n',
       '**时间：** ' + new Date().toLocaleString('zh-CN') + '\n\n',
       '**模块：** ' + ((state && state.module) || 'freechat') + '\n\n',
       '---\n\n',

@@ -185,7 +185,7 @@ async function snap() {
   showInStage(url);
 
   // R63: 拍照后立刻触发设备↔KB联动（不等上传结果）
-  // 这样 AI 助手下次查询时自动加权相关模块
+  // 这样 智能助手下次查询时自动加权相关模块
   const mode = modeSel ? modeSel.value : 'face';
   triggerKbBridge(mode, blob);
 
@@ -271,7 +271,7 @@ async function analyze(blob) {
   }
 }
 
-/* KB 联动: 把面诊/舌诊/眼诊结果缓存到 localStorage, 供 AI 助手查询 */
+/* KB 联动: 把面诊/舌诊/眼诊结果缓存到 localStorage, 供 智能助手查询 */
 function injectKb(mode, blob, text, engine) {
   const key = `_kb_camera_${mode}_${Date.now()}`;
   const reader = new FileReader();

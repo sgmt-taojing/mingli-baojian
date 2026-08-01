@@ -1,7 +1,7 @@
 /**
  * module-reports-kb.js · 14 模块 KB 兜底诊断引擎
  *
- * 解决问题：AI 助手/算命馆/知识馆 divination-knowledge 三大主入口 +
+ * 解决问题：智能助手/算命馆/知识馆 divination-knowledge 三大主入口 +
  *          music/lifeindex/lifeplan 三页在断网/API 失败时仍能给出 KB 兜底报告
  *
  * 范围（14 模块）：

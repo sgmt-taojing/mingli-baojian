@@ -16,8 +16,8 @@
   }
 
   /**
-   * 从 AI 助手 state 抽取字段
-   * AI 助手 state.data 约定：s1=姓名, s2=生辰, s3/s4=性别/时辰等
+   * 从 智能助手 state 抽取字段
+   * 智能助手 state.data 约定：s1=姓名, s2=生辰, s3/s4=性别/时辰等
    */
   function extractProfileFromState(state) {
     if (!state || !state.data) return null;

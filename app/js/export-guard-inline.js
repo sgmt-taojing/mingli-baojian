@@ -101,7 +101,7 @@ async function applyUnlock(){
 
 // 初始化
 window.addEventListener('DOMContentLoaded', ()=>{
-  if(!TOKEN){toast('未登录：请先到 AI 助手 / 用户中心 登录','err');document.getElementById('roleBadge').textContent='未登录'}
+  if(!TOKEN){toast('未登录：请先到 智能助手 / 用户中心 登录','err');document.getElementById('roleBadge').textContent='未登录'}
   else{try{const p=JSON.parse(atob(TOKEN.split('.')[1]));document.getElementById('roleBadge').textContent=(p.roles||['free']).join(', ')}catch(e){document.getElementById('roleBadge').textContent='token 解析失败'}}
   previewMask();
 });

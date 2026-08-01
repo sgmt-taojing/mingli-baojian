@@ -107,7 +107,7 @@
   }
 
   /**
-   * 从当前 AI 助手 state 抽取缘主信息
+   * 从当前 智能助手 state 抽取缘主信息
    */
   function captureFromState(state) {
     if (!state) return null;
@@ -124,7 +124,7 @@
   }
 
   /**
-   * 渲染「最近缘主」面板（注入到 AI 助手侧栏或顶部）
+   * 渲染「最近缘主」面板（注入到 智能助手侧栏或顶部）
    * @returns {HTMLElement}
    */
   function renderProfileList() {
@@ -190,7 +190,7 @@
 
   /**
    * 加载指定档案为当前缘主（R145: 补全 loadProfile）
-   * 同时返回该档案的 data 快照（用于回填 AI 助手 state）
+   * 同时返回该档案的 data 快照（用于回填 智能助手 state）
    */
   function loadProfileById(id) {
     var p = getProfileById(id);

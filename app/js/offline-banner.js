@@ -3,7 +3,7 @@
  * - navigator.onLine + 主动 ping 探测双重判断
  * - 顶部插入一行红色 banner「📴 离线模式 · 仅 KB 兜底可用」
  * - 上线时淡出 banner
- * - 通过全局函数 OfflineBanner.isOnline() 让 AI 助手知道当前是否在线
+ * - 通过全局函数 OfflineBanner.isOnline() 让 智能助手知道当前是否在线
  *   当离线时，callAI 自动跳过 fetch，直接走 KB 快速通道
  */
 (function (global) {

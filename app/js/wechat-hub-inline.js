@@ -1511,7 +1511,7 @@ function aiSendFromCtx(ctx){
   let q = input.value.trim();
   input.value = '';
   
-  // 跳转到AI助手tab
+  // 跳转到智能助手tab
   let aiTab = document.querySelector('[onclick="switchTab(\'ai\',this)"]');
   if(aiTab) aiTab.click();
   

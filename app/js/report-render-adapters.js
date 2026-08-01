@@ -2,7 +2,7 @@
  * report-render-adapters.js — 各端报告渲染适配器
  *
  * 同一报告文本，根据端的特点选择不同渲染方式：
- * - chatBubble:  AI 助手聊天气泡（默认，富文本+操作按钮+推荐）
+ * - chatBubble:  智能助手聊天气泡（默认，富文本+操作按钮+推荐）
  * - drawer:      divination-hub 抽屉式弹出
  * - inline:      lifeplan-detail 内嵌区域
  * - wechat:      微信端精简纯文本+关键表格
@@ -74,7 +74,7 @@
   }
 
   var Adapters = {
-    // ─── 聊天气泡（AI 助手默认）───
+    // ─── 聊天气泡（智能助手默认）───
     chatBubble: function (container, text, meta) {
       var d = document.createElement('div');
       d.className = 'msg m-ai';

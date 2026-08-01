@@ -83,7 +83,7 @@ async function loadSessions(){
         <div class="empty">
           <div class="empty-icon">💬</div>
           <div class="empty-title">还没有会话</div>
-          <div class="empty-desc">从通讯录发起对话<br>或召唤 AI 助手解惑</div>
+          <div class="empty-desc">从通讯录发起对话<br>或召唤 智能助手解惑</div>
           <ml-tap class="empty-btn" role="button" tabindex="0" onclick="document.querySelector('.tab[data-view=directory]').click()">打开通讯录</ml-tap>
         </div>`;
       return;
@@ -262,7 +262,7 @@ document.getElementById('msgInput').addEventListener('keydown', e => {
   }
 });
 
-/* ============ AI 助手召唤 ============ */
+/* ============ 智能助手召唤 ============ */
 document.getElementById('aiBtn').onclick = async () => {
   if(!currentChatId) return;
   const input = document.getElementById('msgInput');
@@ -283,7 +283,7 @@ document.getElementById('aiBtn').onclick = async () => {
 function escHtml(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function escAttr(s){ return escHtml(s).replace(/"/g,'&quot;'); }
 function roleLabel(r){
-  return ({admin:'管理员',master:'大师',doctor:'医师',agent:'代理',user:'信众',ai:'AI 助手'})[r] || r;
+  return ({admin:'管理员',master:'大师',doctor:'医师',agent:'代理',user:'信众',ai:'智能助手'})[r] || r;
 }
 function formatTime(ts){
   if(!ts) return '';

@@ -327,7 +327,7 @@ async function renderHits(){
   document.getElementById('resultBox').innerHTML = '<div class="kbe-loading">加载命中统计</div>';
   const d = await fetchHits();
   if(!d || !d.modules || !d.modules.length){
-    document.getElementById('resultBox').innerHTML = '<div class="kbe-empty"><div class="kbe-empty-icon">📊</div><div>暂无命中数据</div><div style="margin-top:14px;font-size:12px;opacity:.6">通过 AI 助手或 KB 检索产生的命中会显示在这里</div></div>';
+    document.getElementById('resultBox').innerHTML = '<div class="kbe-empty"><div class="kbe-empty-icon">📊</div><div>暂无命中数据</div><div style="margin-top:14px;font-size:12px;opacity:.6">通过 智能助手或 KB 检索产生的命中会显示在这里</div></div>';
     return;
   }
   const max = Math.max(...d.modules.map(m=>m.hits));

@@ -23,7 +23,7 @@ function bindAll(){
     success: '✅ 操作成功，已保存到本地',
     error:   '❌ 网络异常，请稍后重试',
     warn:    '⚠️ 命例数据不完整，请补充',
-    info:    'ℹ️ AI 助手正在解析您的命盘…',
+    info:    'ℹ️ 正在为您解析命盘…',
   };
   document.querySelectorAll('[data-toast]').forEach(b=>{
     b.addEventListener('click', ()=>{

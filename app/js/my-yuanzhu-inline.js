@@ -91,7 +91,7 @@ async function renderYuanzhu(c){
   }
   const list = r.list || [];
   if(!list.length){
-    c.innerHTML = `<div class="empty">暂无专属助手，<a href="ai-assistant.html" style="color:var(--gold)">先去 AI 助手创建</a></div>` + casesHtml;
+    c.innerHTML = `<div class="empty">暂无专属助手，<a href="ai-assistant.html" style="color:var(--gold)">先去 智能助手创建</a></div>` + casesHtml;
     return;
   }
   c.innerHTML = `<div class="card"><h3>🧙 我的助手 (${list.length})</h3>` +
@@ -402,13 +402,13 @@ async function renderMusic(c){
   ];
   c.innerHTML = `<div class="card"><h3>🎵 疗愈音乐</h3>
     <div class="row"><span class="label">五行主属</span><span class="val">${wxEmoji[wx]||'⭐'} ${wx} · ${wxLabel[wx]||'识别中'}</span></div>
-    <p style="color:var(--paper3);opacity:.7;font-size:13px;margin:12px 0">根据您的五行主属推荐调合音乐。完成 AI 助手问心后，获得五行×8 维度 50+ 个智能组合。</p>
+    <p style="color:var(--paper3);opacity:.7;font-size:13px;margin:12px 0">根据您的五行主属推荐调合音乐。完成 智能助手问心后，获得五行×8 维度 50+ 个智能组合。</p>
     <div style="display:flex;flex-direction:column;gap:8px">
       ${items.map(i=>`<div class="row" style="padding:10px;background:var(--ink3);border-radius:8px"><span class="label">${i.icon} ${i.name}</span><span class="val" style="font-size:12px;color:var(--paper3)">${i.desc}</span></div>`).join('')}
     </div>
     <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
       <a class="btn" href="music-detail.html" style="flex:1;text-decoration:none">🎵 进入独立报告页</a>
-      <a class="btn" href="ai-assistant.html?module=music" style="flex:1;text-decoration:none;background:var(--ink3)">🤖 AI 助手重启</a>
+      <a class="btn" href="ai-assistant.html?module=music" style="flex:1;text-decoration:none;background:var(--ink3)">🤖 智能助手重启</a>
     </div>
   </div>`;
 }
@@ -420,13 +420,13 @@ async function renderLifeindex(c){
   const icons = { '事业':'💼','财运':'💰','健康':'💪','婚姻':'💑','学业':'📚','家庭':'🏡','人际':'🤝','精神':'🎭','享福':'🌸','寿元':'🍵','风物':'🏔️','修养':'🎋' };
   c.innerHTML = `<div class="card"><h3>📊 生命指数</h3>
     <div class="row"><span class="label">五行主属</span><span class="val">${wxEmoji[wx]||'⭐'} ${wx}</span></div>
-    <p style="color:var(--paper3);opacity:.7;font-size:13px;margin:12px 0">12 维度评分（与五行偏重叠加），各维度 30-99 分。完成 AI 助手问心后获得完整报告。</p>
+    <p style="color:var(--paper3);opacity:.7;font-size:13px;margin:12px 0">12 维度评分（与五行偏重叠加），各维度 30-99 分。完成 智能助手问心后获得完整报告。</p>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0">
       ${dims.map(d=>`<div style="padding:8px;background:var(--ink3);border-radius:6px;text-align:center;font-size:12px"><div style="font-size:18px">${icons[d]}</div><div>${d}</div></div>`).join('')}
     </div>
     <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
       <a class="btn" href="lifeindex-detail.html" style="flex:1;text-decoration:none">📊 进入独立报告页</a>
-      <a class="btn" href="ai-assistant.html?module=lifeindex" style="flex:1;text-decoration:none;background:var(--ink3)">🤖 AI 助手重启</a>
+      <a class="btn" href="ai-assistant.html?module=lifeindex" style="flex:1;text-decoration:none;background:var(--ink3)">🤖 智能助手重启</a>
     </div>
   </div>`;
 }
@@ -449,7 +449,7 @@ async function renderLifeplan(c){
     </div>
     <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
       <a class="btn" href="lifeplan-detail.html" style="flex:1;text-decoration:none">🗺️ 进入独立报告页</a>
-      <a class="btn" href="ai-assistant.html?module=lifeplan" style="flex:1;text-decoration:none;background:var(--ink3)">🤖 AI 助手重启</a>
+      <a class="btn" href="ai-assistant.html?module=lifeplan" style="flex:1;text-decoration:none;background:var(--ink3)">🤖 智能助手重启</a>
     </div>
   </div>`;
 }
@@ -536,7 +536,7 @@ async function renderKbDash(c){
     </div>
 
     <h3 style="font-size:14px;color:var(--gold);margin:18px 0 10px">🏆 Top 5 模块</h3>
-    ${top5.length === 0 ? '<div class="empty">还没有 KB 直答记录 · 去 <a href="ai-assistant.html" style="color:var(--gold)">AI 助手</a> 试试</div>' : `
+    ${top5.length === 0 ? '<div class="empty">还没有 KB 直答记录 · 去 <a href="ai-assistant.html" style="color:var(--gold)">智能助手</a> 试试</div>' : `
     <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px">
       ${top5.map((m,i)=>`
         <div class="row" style="padding:10px;background:var(--ink3);border-radius:8px">
@@ -553,7 +553,7 @@ async function renderKbDash(c){
     <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn" onclick="resetKbStats()" style="flex:1;background:var(--cinn);border-color:var(--cinn);color:#fff">🗑️ 重置本地统计</button>
       <button class="btn" onclick="exportKbStats()" style="flex:1">📥 导出 JSON</button>
-      <a class="btn" href="ai-assistant.html" style="flex:1;text-decoration:none;background:var(--ink3);text-align:center;display:inline-block">🤖 去 AI 助手</a>
+      <a class="btn" href="ai-assistant.html" style="flex:1;text-decoration:none;background:var(--ink3);text-align:center;display:inline-block">🤖 去 智能助手</a>
     </div>
 
     <h3 style="font-size:14px;color:var(--gold);margin:18px 0 10px">🔗 KB 全门户</h3>

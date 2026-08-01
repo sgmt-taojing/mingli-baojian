@@ -100,7 +100,7 @@
       var list = yuanzhuProfile.list() || [];
       // 记录每个缘主档案的访问
       list.slice(0, 1).forEach(function(p){
-        logEvent(p.id, 'yuanzhu', 'access', {name: p.name, modules: p.modules}, 'normal', 'AI助手接入档案');
+        logEvent(p.id, 'yuanzhu', 'access', {name: p.name, modules: p.modules}, 'normal', '智能助手接入档案');
       });
     } catch(e){ console.warn('[PersonHub] bindProfile err:', e.message); }
   }
