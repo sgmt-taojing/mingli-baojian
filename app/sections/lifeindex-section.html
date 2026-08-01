@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<title>section-lifeindex</title>
+</head>
+<body>
+<section class="section" id="section-lifeindex" role="tabpanel" aria-labelledby="tab-lifeindex">
+  <div class="section-header" style="text-align:center;padding:28px 16px 20px">
+    <span class="sh-symbol" style="font-size:36px;display:block;margin-bottom:8px">🌟</span>
+    <h2 class="sh-title" style="font-family:'Ma Shan Zheng',serif;font-size:32px;letter-spacing:8px;color:var(--gold);margin:0 0 6px">命 理 全 鉴</h2>
+    <p class="sh-en" style="font-size:12px;color:var(--gold);opacity:.95;letter-spacing:3px;margin:0 0 8px">Life Index · Comprehensive Destiny Assessment</p>
+    <p class="sh-desc" style="font-size:13px;color:var(--paper2);letter-spacing:1px;line-height:1.8;max-width:600px;margin:0 auto">六维度命理综合评价：命理·健康·环境·时间·修行·社会，雷达图全景展示，短板预警与改善建议</p>
+  </div>
+
+  <div class="tool-card" style="max-width:900px;margin:0 auto 20px">
+    <h3 style="font-family:'Ma Shan Zheng',serif;font-size:20px;letter-spacing:3px;color:var(--gold);margin-bottom:14px">📋 基本信息</h3>
+    <div class="input-row">
+      <div class="input-group"><label for="hjName">姓名</label><input type="text" id="liName" placeholder="姓名" maxlength="20" aria-label="姓名"></div>
+      <div class="input-group"><label for="ziwei-sex">性别</label><select id="liSex" aria-label="liSex"><option value="male">男</option><option value="female">女</option></select></div>
+    </div>
+    <!-- 历法切换 -->
+    <div class="input-row" style="align-items:center;gap:12px">
+      <label style="font-size:12px;margin:0">历法</label>
+      <label style="font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px" for="liDate">
+        <input type="radio" name="liCalMode" value="solar" checked onchange="onLiCalModeChange()" aria-label="公历输入" id="liCalMode-solar"> 公历
+      </label>
+      <label style="font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px" for="liDate">
+        <input type="radio" name="liCalMode" value="lunar" onchange="onLiCalModeChange()" aria-label="农历输入" id="liCalMode-lunar"> 农历
+      </label>
+      <span id="liCalHint" style="font-size:11px;color:var(--gold);margin-left:4px">当前:公历输入</span>
+    </div>
+    <!-- 公历日期输入 -->
+    <div class="input-row" id="liSolarInput">
+      <div class="input-group"><label for="hjDate">出生日期</label><input type="date" id="liDate" min="1900-01-01" max="2100-12-31" aria-label="liDate"></div>
+      <div class="input-group"><label for="hjHour">出生时辰</label><select id="liHour" aria-label="liHour"><option value="">不确定</option><option value="0">子时 23-1点</option><option value="1">丑时 1-3点</option><option value="2">寅时 3-5点</option><option value="3">卯时 5-7点</option><option value="4">辰时 7-9点</option><option value="5">巳时 9-11点</option><option value="6">午时 11-13点</option><option value="7">未时 13-15点</option><option value="8">申时 15-17点</option><option value="9">酉时 17-19点</option><option value="10">戌时 19-21点</option><option value="11">亥时 21-23点</option></select></div>
+    </div>
+    <!-- 农历日期输入(默认隐藏) -->
+    <div class="input-row" id="liLunarInput" class="d-none">
+      <div class="input-group" style="flex:1">
+        <label for="lpLunarYear">农历日期</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          <input type="number" id="liLunarYear" placeholder="年" min="1900" max="2100" style="width:80px" aria-label="年">
+          <input type="number" id="liLunarMonth" placeholder="月" min="1" max="12" style="width:60px" aria-label="月">
+          <input type="number" id="liLunarDay" placeholder="日" min="1" max="30" style="width:60px" aria-label="日">
+          <label style="font-size:12px;display:flex;align-items:center;gap:4px" for="liLunarHour">
+            <input type="checkbox" id="liLunarLeap" aria-label="liLunarLeap"> 闰月
+          </label>
+        </div>
+      </div>
+      <div class="input-group"><label for="hjHour">出生时辰</label><select id="liLunarHour" aria-label="liLunarHour"><option value="">不确定</option><option value="0">子时 23-1点</option><option value="1">丑时 1-3点</option><option value="2">寅时 3-5点</option><option value="3">卯时 5-7点</option><option value="4">辰时 7-9点</option><option value="5">巳时 9-11点</option><option value="6">午时 11-13点</option><option value="7">未时 13-15点</option><option value="8">申时 15-17点</option><option value="9">酉时 17-19点</option><option value="10">戌时 19-21点</option><option value="11">亥时 21-23点</option></select></div>
+    </div>
+    <div class="input-row">
+      <div class="input-group"><label for="liBirthCity">出生地</label>
+        <select id="liBirthCity" aria-label="出生地" class="w-100p">
+          <option value="">请选择出生城市</option>
+          <option value="北京">北京</option><option value="上海">上海</option><option value="广州">广州</option><option value="深圳">深圳</option><option value="成都">成都</option><option value="重庆">重庆</option><option value="西安">西安</option><option value="武汉">武汉</option><option value="杭州">杭州</option><option value="南京">南京</option><option value="苏州">苏州</option><option value="天津">天津</option><option value="青岛">青岛</option><option value="大连">大连</option><option value="厦门">厦门</option><option value="昆明">昆明</option><option value="长沙">长沙</option><option value="郑州">郑州</option><option value="济南">济南</option><option value="合肥">合肥</option><option value="福州">福州</option><option value="南昌">南昌</option><option value="太原">太原</option><option value="沈阳">沈阳</option><option value="长春">长春</option><option value="哈尔滨">哈尔滨</option><option value="石家庄">石家庄</option><option value="呼和浩特">呼和浩特</option><option value="乌鲁木齐">乌鲁木齐</option><option value="兰州">兰州</option><option value="银川">银川</option><option value="西宁">西宁</option><option value="拉萨">拉萨</option><option value="海口">海口</option><option value="南宁">南宁</option><option value="贵阳">贵阳</option><option value="其他">其他</option>
+        </select>
+      </div>
+      <div class="input-group"><label for="liLiveCity">工作地</label>
+        <select id="liLiveCity" aria-label="工作地" class="w-100p">
+          <option value="">请选择工作/居住城市</option>
+          <option value="北京">北京</option><option value="上海">上海</option><option value="广州">广州</option><option value="深圳">深圳</option><option value="成都">成都</option><option value="重庆">重庆</option><option value="西安">西安</option><option value="武汉">武汉</option><option value="杭州">杭州</option><option value="南京">南京</option><option value="苏州">苏州</option><option value="天津">天津</option><option value="青岛">青岛</option><option value="大连">大连</option><option value="厦门">厦门</option><option value="昆明">昆明</option><option value="长沙">长沙</option><option value="郑州">郑州</option><option value="济南">济南</option><option value="合肥">合肥</option><option value="福州">福州</option><option value="南昌">南昌</option><option value="太原">太原</option><option value="沈阳">沈阳</option><option value="长春">长春</option><option value="哈尔滨">哈尔滨</option><option value="石家庄">石家庄</option><option value="呼和浩特">呼和浩特</option><option value="乌鲁木齐">乌鲁木齐</option><option value="兰州">兰州</option><option value="银川">银川</option><option value="西宁">西宁</option><option value="拉萨">拉萨</option><option value="海口">海口</option><option value="南宁">南宁</option><option value="贵阳">贵阳</option><option value="其他">其他</option>
+        </select>
+      </div>
+    </div>
+    <div class="input-row">
+      <div class="input-group"><label for="liOccupation">职业</label><select id="liOccupation" aria-label="liOccupation"><option value="">请选择</option><option value="公职">公职/公务员</option><option value="管理">企业管理</option><option value="经商">经商/创业</option><option value="技术">技术研发</option><option value="教育">教育/学术</option><option value="医疗">医疗/健康</option><option value="艺术">艺术/文化</option><option value="服务">服务行业</option><option value="金融">金融/投资</option><option value="法律">法律</option><option value="媒体">媒体/传播</option><option value="自由">自由职业</option><option value="学生">学生</option><option value="其他">其他</option></select></div>
+      <div class="input-group"><label for="liPhone">手机号(选填)</label><input type="tel" id="liPhone" placeholder="用于会员关联" maxlength="11" pattern="[0-9]*" aria-label="用于会员关联"></div>
+    </div>
+    <button class="compute-btn" onclick="computeLifeIndex()" id="liBtn" style="margin-top:12px">🌟 开 启 命 理 全 鉴 评 估</button>
+  </div>
+
+  <!-- 结果区域 -->
+  <div id="lifeIndexResult" class="result-area" style="display:none;max-width:900px;margin:0 auto"></div>
+
+  <div class="back-row" style="margin-top:32px">
+    <button class="back-btn" onclick="showSection('hero')">返 回 首 页</button>
+  </div>
+</section>
+
+<!-- 提问弹窗 -->
+<div class="ask-modal" id="askModal">
+  <div class="ask-modal-content">
+    <button class="ask-modal-close" onclick="closeAskModal()">✕</button>
+    <h3 style="font-family:'Ma Shan Zheng',serif;font-size:24px;letter-spacing:4px;color:var(--gold);text-align:center;margin-bottom:20px">✋ 向大师提问</h3>
+    <div style="font-size:13px;color:var(--paper3);text-align:center;margin-bottom:20px;line-height:1.8">选择一位大师，输入您的问题，大师将以自身修行视角为您解惑</div>
+    <select class="ask-master-select" id="askMasterSelect" aria-label="选项askMasterSelect">
+      <option value="">— 请选择大师 —</option>
+      <optgroup label="☸ 道家名师">
+        <option value="任法融|道家">任法融（全真派）</option>
+        <option value="张继禹|道家">张继禹（正一派）</option>
+        <option value="黄至安|道家">黄至安（全真派）</option>
+        <option value="李光富|道家">李光富（全真派/武当）</option>
+        <option value="唐诚青|道家">唐诚青（全真派/青城）</option>
+        <option value="张道陵|道家">张道陵（正一派祖师）</option>
+        <option value="王重阳|道家">王重阳（全真派祖师）</option>
+        <option value="丘处机|道家">丘处机（龙门派祖师）</option>
+        <option value="张三丰|道家">张三丰（武当派祖师）</option>
+        <option value="葛洪|道家">葛洪（丹鼎派）</option>
+        <option value="陶弘景|道家">陶弘景（上清派）</option>
+        <option value="陈抟|道家">陈抟（老华山派）</option>
+      </optgroup>
+      <optgroup label="🪷 佛家名师">
+        <option value="星云大师|佛家">星云大师（临济宗）</option>
+        <option value="净空法师|佛家">净空法师（净土宗）</option>
+        <option value="济群法师|佛家">济群法师（南山律宗）</option>
+        <option value="学诚法师|佛家">学诚法师（南山律宗）</option>
+        <option value="印顺导师|佛家">印顺导师（三论宗）</option>
+        <option value="圣严法师|佛家">圣严法师（曹洞宗）</option>
+        <option value="达摩祖师|佛家">达摩祖师（禅宗初祖）</option>
+        <option value="慧能大师|佛家">慧能大师（禅宗六祖）</option>
+        <option value="玄奘大师|佛家">玄奘大师（法相宗）</option>
+        <option value="鉴真大师|佛家">鉴真大师（南山律宗）</option>
+        <option value="虚云老和尚|佛家">虚云老和尚（禅宗）</option>
+        <option value="太虚大师|佛家">太虚大师（唯识宗）</option>
+        <option value="弘一法师|佛家">弘一法师（南山律宗）</option>
+      </optgroup>
+    </select>
+    <textarea class="ask-input" id="askInput" placeholder="请输入您的问题……例如：如何面对人生中的迷茫与困境？如何在繁忙的工作中保持内心的宁静？" aria-label="请输入您的问题……例如：如何面对人生中的迷茫与困境？如何在繁忙的工作中保持内心的宁静？"></textarea>
+    <button class="ask-btn" id="askBtn" onclick="submitAsk()">请 大 师 开 示</button>
+    <div class="ask-result" id="askResult">
+      <div class="ask-result-content" id="askResultContent"></div>
+      <div class="ask-disclaimer">⚠️ <strong>医疗免责声明：</strong>以上开示仅供参考，不构成医疗、心理或任何专业建议。如有身心健康问题，请及时就医。大师回答基于AI模拟，不代表真实大师观点。</div>
+    </div>
+  </div>
+</div>
+
+
+<script src="js/divination-hub-extra-pwa-init.js" defer></script>
+<script src="knowledge-models/faith-model.js" defer></script>
+<script src="knowledge-models/fengshui-model.js" defer></script>
+<script src="knowledge-models/huajie-model.js" defer></script>
+<script src="knowledge-models/liuren-model.js" defer></script>
+<script src="knowledge-models/liuyao-model.js" defer></script>
+<script src="knowledge-models/mantra-model.js" defer></script>
+<script src="knowledge-models/meihua-model.js" defer></script>
+<script src="knowledge-models/nihaisha-model.js" defer></script>
+<script src="knowledge-models/qimen-model.js" defer></script>
+<script src="knowledge-models/shuhan-model.js" defer></script>
+<script src="knowledge-models/yanzhi-model.js" defer></script>
+<script src="knowledge-models/yijing-model.js" defer></script>
+<script src="knowledge-models/ziwei-model.js" defer></script>
+<script src="knowledge-models/zodiac-model.js" defer></script>
+<script src="js/divination-core.js" defer></script>
+<script src="js/mobile-nav.js" defer></script>
+
+
+<!-- ================================================================ -->
+<!-- R173-d: 改名/号码 2 missing fns safe fallback ================= -->
+<!-- generateCompanyNamesEnhanced / runNameAnalysis (company + name) ===== -->
+
+<!-- END R173-d ==================================================== -->
+<!-- ================================================================ -->
+<!-- BOTTOM TAB NAV (Mobile Only) -->
+<!-- ================================================================ -->
+<nav class="bottom-nav" id="bottomNav">
+  <button class="bottom-tab active" id="btm-hero" onclick="playSound('click');showSection('hero')">
+    <span class="btm-icon">🏠</span>
+    <span class="btm-label">首页</span>
+  </button>
+  <button class="bottom-tab" id="btm-bazi" onclick="playSound('click');showSection('bazi')">
+    <span class="btm-icon">🌟</span>
+    <span class="btm-label">命盘</span>
+  </button>
+  <button class="bottom-tab" id="btm-zhanbu" onclick="playSound('click');showSection('zhanbu')">
+    <span class="btm-icon">䷀</span>
+    <span class="btm-label">占卜</span>
+  </button>
+  <button class="bottom-tab" id="btm-fengshui" onclick="playSound('click');showSection('fengshui')">
+    <span class="btm-icon">🏡</span>
+    <span class="btm-label">风水</span>
+  </button>
+  <button class="bottom-tab" id="btm-annual-fortune" onclick="playSound('click');showSection('annual-fortune')">
+    <span class="btm-icon">🎊</span>
+    <span class="btm-label">运势</span>
+  </button>
+  <button class="bottom-tab" id="btm-xingming" onclick="playSound('click');showSection('xingming')">
+    <span class="btm-icon">🔤</span>
+    <span class="btm-label">姓名</span>
+  </button>
+  <button class="bottom-tab" id="btm-jiuri" onclick="playSound('click');showSection('jiuri')">
+    <span class="btm-icon">💮</span>
+    <span class="btm-label">吉日</span>
+  </button>
+  <button class="bottom-tab bottom-tab-more" id="btm-more" onclick="playSound('click');toggleMore()">
+    <span class="btm-icon" id="moreIcon">☰</span>
+    <span class="btm-label">更多</span>
+  </button>
+</nav>
+
+<!-- MORE MENU (Mobile Only) -->
+<ml-tap role="button" tabindex="0" class="more-overlay" id="moreOverlay" onclick="closeMore()"></ml-tap>
+<div class="more-menu" id="moreMenu">
+  <div class="more-header">
+    <span class="more-title">更多功能</span>
+    <button class="more-close" onclick="closeMore()">✕</button>
+  </div>
+  <div class="more-grid">
+    <button class="more-item" onclick="showSection('fengshui-pro'); closeMore();">🏔️ <span>风水进阶</span></button>
+    <button class="more-item" onclick="showSection('yanzhi'); closeMore();">💬 <span>言值</span></button>
+    <button class="more-item" onclick="showSection('more'); showMoreModule('knowledge',this); closeMore();">📚 <span>知识库</span></button>
+    <button class="more-item" onclick="showSection('tizhi'); closeMore();">🧬 <span>体质</span></button>
+    <button class="more-item" onclick="showSection('user'); closeMore();">🙏 <span>信众中心</span></button>
+    <button class="more-item" onclick="showSection('more'); showMoreModule('koujue',this); closeMore();">📿 <span>口诀</span></button>
+    <button class="more-item" onclick="showSection('jiuri'); closeMore();">💮 <span>吉日</span></button>
+    <button class="more-item" onclick="showSection('more'); showMoreModule('vip',this); closeMore();">👑 <span>会员</span></button>
+    <button class="more-item" onclick="showSection('more'); showMoreModule('shop',this); closeMore();">🛍️ <span>商城</span></button>
+    <button class="more-item" onclick="showSection('masters'); closeMore();">📿 <span>名师解惑</span></button>
+    <button class="more-item" onclick="showSection('lifeplan'); closeMore();">🧭 <span>人生规划</span></button>
+    <button class="more-item" onclick="showSection('youth'); closeMore();">🧒 <span>青少年规划</span></button>
+    <button class="more-item" onclick="showSection('family'); closeMore();">👨‍👩‍👧‍👦 <span>家庭排盘</span></button>
+    <button class="more-item" onclick="showSection('lifeindex'); closeMore();">🌟 <span>命理全鉴</span></button>
+    <button class="more-item" onclick="showSection('cure-center'); closeMore();">💎 <span>化解中心</span></button>
+    <button class="more-item" onclick="showSection('push-plan'); closeMore();">📡 <span>推送计划</span></button>
+    <button class="more-item" onclick="showSection('screenshot'); closeMore();">📷 <span>面相分析</span></button>
+    <button class="more-item" onclick="showSection('jiazi'); closeMore();">🔮 <span>六十甲子</span></button>
+    <button class="more-item" onclick="showSection('huajie'); closeMore();">🛡️ <span>开运化解</span></button>
+  </div>
+</div>
+
+
+<!-- 化解案例库HTML(通过JS动态加载) -->
+<div id="caseLibraryModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;overflow-y:auto;padding:40px 20px">
+  <div style="max-width:800px;margin:0 auto;background:var(--ink2);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:30px;position:relative">
+    <button onclick="closeCaseLibrary()" style="position:absolute;top:20px;right:20px;background:none;border:1px solid rgba(201,168,76,0.3);color:var(--gold);padding:8px 16px;cursor:pointer;font-size:18px;border-radius:4px">✕</button>
+    <h2 style="font-family:\'Ma Shan Zheng\',serif;font-size:28px;letter-spacing:5px;color:var(--gold);margin-bottom:24px;text-align:center">📚 化解案例参考库</h2>
+    <div id="caseLibraryContent"></div>
+  </div>
+</div>
+
+<script src="js/divination-hub-extra-year-init.js" defer></script>
+
+<script src="js/divination-hub-extras.js" defer></script>
+<script src="js/divination-hub-extra-lazy-loader.js" defer></script>
+
+<script src="js/divination-hub-extra-scroll-check.js" defer></script>
+<script src="../knowledge/knowledge-details.js" defer></script>
+<script src="../knowledge/knowledge-details-extra.js" defer></script>
+<script src="../knowledge/liuyao-knowledge-base.js" defer></script>
+<script src="../knowledge/bazi-knowledge-base.js" defer></script>
+<script src="../knowledge/ziwei-knowledge-base.js" defer></script>
+<script src="../knowledge/qimen-knowledge-base.js" defer></script>
+<script src="../knowledge/meihua-knowledge-base.js" defer></script>
+<script src="../knowledge/liuren-knowledge-base.js" defer></script>
+<script src="../knowledge/fengshui-knowledge-base.js" defer></script>
+<script src="../knowledge/zhouyi-knowledge-base.js" defer></script>
+
+<script src="../knowledge/yangzhai-knowledge-base.js" defer></script>
+<script src="../knowledge/zodiac-knowledge-base.js" defer></script>
+<script src="../knowledge/masters-knowledge.js" defer></script>
+    <script src="../knowledge/nishan-knowledge.js" defer></script>
+<script src="../knowledge/shop-data.js" defer></script>
+<script src="../knowledge/faith-content.js" defer></script>
+<script src="js/divination-hub-extra-shop-init.js" defer></script>
+
+<!-- 口诀库渲染器 -->
+<script src="../knowledge/koujue-renderer.js" defer></script>
+
+<!-- 知识库补充文件 -->
+<script src="../knowledge/knowledge-supplement-1.js" defer></script>
+<script src="../knowledge/knowledge-supplement-2.js" defer></script>
+<script src="../knowledge/knowledge-supplement-3.js" defer></script>
+<script src="../knowledge/knowledge-supplement-4.js" defer></script>
+<script src="../knowledge/knowledge-supplement-5.js" defer></script>
+<script src="../knowledge/knowledge-supplement-6.js" defer></script>
+<script src="../knowledge/knowledge-deep-supplement.js" defer></script>
+<script src="../knowledge/knowledge-index.js" defer></script>
+
+<!-- 外部JS引擎 -->
+<!-- 额外知识库 -->
+<script src="../knowledge/faith-guide.js" defer></script>
+<script src="../knowledge/incantation-database.js" defer></script>
+<script src="../knowledge/psychology-wisdom.js" defer></script>
+<!-- AI 分析浮动按钮 + 引擎已就绪 -->
+<div id="ai-analyze-fab" style="position:fixed;right:14px;bottom:80px;z-index:998;display:flex;flex-direction:column;gap:8px;background:rgba(20,16,30,.92);backdrop-filter:blur(8px);border:1px solid rgba(201,168,76,.3);border-radius:18px;padding:10px 12px;box-shadow:0 4px 18px rgba(0,0,0,.4)">
+  <div style="font-size:10px;color:var(--gold);letter-spacing:1px;margin-bottom:2px">🤖 AI 分析</div>
+  <select id="ai-mod-sel" aria-label="AI 模块选择" style="background:rgba(255,255,255,.06);color:inherit;border:1px solid rgba(201,168,76,.2);border-radius:8px;padding:5px 8px;font-size:12px;min-width:120px">
+    <option value="bazi">🌟 八字命盘</option>
+    <option value="qimen">🧭 奇门遁甲</option>
+    <option value="fengshui">🏠 风水堪舆</option>
+    <option value="music">🎵 五行音疗</option>
+    <option value="lifeplan">🗺️ 人生规划</option>
+    <option value="lifeindex">📊 命理指数</option>
+    <option value="zhongyi">🌿 中医诊断</option>
+    <option value="tcm">💊 中医体质</option>
+    <option value="monthly">📅 逐月细化</option>
+    <option value="lifeflow">🌊 三维联动</option>
+    <option value="lifeflowTimeline">🌐 终身三维</option>
+    <option value="ziwei">⭐ 紫微斗数</option>
+    <option value="yunshi">📈 运势</option>
+    <option value="caiyun">💰 财运</option>
+    <option value="ganqing">💕 感情</option>
+    <option value="shiye">💼 事业</option>
+    <option value="wuxing">☯ 五行</option>
+    <option value="xingming">✍ 姓名学</option>
+    <option value="general">💬 综合</option>
+    <option value="yanzhi">🗣️ 言值</option>
+    <option value="huangli">📅 黄历</option>
+    <option value="zeri">📆 择日</option>
+    <option value="taisui">⚔️ 太岁</option>
+    <option value="faith">🙏 信仰析福</option>
+    <option value="classics">📚 经典查询</option>
+    <option value="yijing">☯ 周易占卦</option>
+    <option value="meihua">🌸 梅花易数</option>
+    <option value="liuyao"> Dice 六爻</option>
+    <option value="liuren">🔮 六壬神课</option>
+    <option value="koujue">📖 口诀查询</option>
+    <option value="nihaisha">🎓 倪师课程</option>
+    <option value="shuhan">📝 舒晗密训</option>
+    <option value="acupuncture">🪡 针灸经络</option>
+    <option value="mobile">📱 手机号码</option>
+  </select>
+  <button id="ai-analyze-go" onclick="hubGenerateReport(document.getElementById('ai-mod-sel').value)" style="background:linear-gradient(135deg,#c9a84c,#a17e30);color:#1a1320;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer">✨ 生成报告</button>
+</div>
+<script src="js/divination-hub-screenshot.js" defer></script>
+<script src="js/jieqi-table.js" defer></script>
+<script src="js/jieqi-hours.js" defer></script>
+<script src="js/jieqi-engine.js" defer></script>
+<script src="js/report-engine.js" defer></script>
+<script src="js/report-render-adapters.js" defer></script>
+<script src="js/hub-report-integration.js" defer></script>
+<style>
+/* R98-p 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+</div>
+
+
+
+
+
+<script src="js/flow-engine.js"></script>
+
+</body>
+</html>
+</body>
+</html>

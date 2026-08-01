@@ -372,77 +372,9 @@ h2{color:var(--gold2);border-bottom:1px solid rgba(201,168,76,.2);padding-bottom
   </section>
 
 <!-- ===== KNOWLEDGE ===== -->
-<section class="section" id="section-knowledge" role="tabpanel" aria-labelledby="tab-knowledge">
-  <div class="back-row"><button class="back-btn" onclick="showSection('hero')">返回首页</button></div>
-  <div class="section-header">
-    <span class="sh-symbol" style="color:var(--gold)">📚</span>
-    <h2 class="sh-title">易 学 知 识 库</h2>
-    <p class="sh-en">Knowledge Base · I Ching · BaZi · Qimen · FengShui</p>
-    <p class="sh-desc">全量命理知识库，支持分类检索、全文搜索、关键词匹配。涵盖八字、六爻、风水、紫微、奇门、梅花、六壬、姓名学等16大领域。</p>
-  </div>
-  <div class="section-body" style="max-width:1200px;margin:0 auto;">
-    <!-- 知识库检索界面 -->
-    <div id="kbSearchPanel" style="margin-bottom:16px;">
-      <!-- 搜索栏 -->
-      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
-        <input type="text" id="kbSearchInput" placeholder="🔍 搜索知识（如：天乙贵人、六冲、飞星...）" 
-          style="flex:1;min-width:200px;padding:10px 14px;background:rgba(0,0,0,0.3);border:1px solid var(--gold-dim);border-radius:6px;color:var(--text-light);font-size:14px;"
-          oninput="debounceKbSearch(this.value)" / aria-label="🔍 搜索知识（如：天乙贵人、六冲、飞星...）">
-        <select id="kbSortSelect" style="padding:10px 14px;background:rgba(0,0,0,0.3);border:1px solid var(--gold-dim);border-radius:6px;color:var(--text-light);font-size:14px;" aria-label="kbSortSelect">
-          <option value="relevance">相关度</option>
-          <option value="category">按分类</option>
-          <option value="alpha">按字母</option>
-        </select>
-      </div>
-      <!-- 分类标签栏 -->
-      <div id="kbCategoryBar" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
-        <button class="kb-cat-btn kb-cat-active" onclick="filterKbByCategory('all')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:var(--gold-dim);color:var(--paper);cursor:pointer;font-size:13px;">全部</button>
-        <button class="kb-cat-btn" onclick="filterKbByCategory('bazi')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">八字命理</button>
-        <button class="kb-cat-btn" onclick="filterKbByCategory('liuyao')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">六爻</button>
-        <button class="kb-cat-btn" onclick="filterKbByCategory('fengshui')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">风水</button>
-        <button class="kb-cat-btn" onclick="filterKbByCategory('ziwei')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">紫微斗数</button>
-        <button class="kb-cat-btn" onclick="filterKbByCategory('qimen')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">奇门遁甲</button>
-        <button class="kb-cat-btn" onclick="filterKbByCategory('meihua')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">梅花易数</button>
-        <button class="kb-cat-btn" onclick="filterKbByCategory('liuren')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">大六壬</button>
-        <button class="kb-cat-btn" onclick="filterKbByCategory('xingming')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">姓名学</button>
-        <button class="kb-cat-btn" onclick="filterKbByCategory('tizhi')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">体质调理</button>
-        <button class="kb-cat-btn" onclick="filterKbByCategory('zhouyi')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">周易</button>
-        <button class="kb-cat-btn" onclick="filterKbByCategory('bagua')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">八卦</button>
-        <button class="kb-cat-btn" onclick="filterKbByCategory('wuxing')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">五行</button>
-        <button class="kb-cat-btn" onclick="filterKbByCategory('shishen')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">十神</button>
-        <button class="kb-cat-btn" onclick="filterKbByCategory('nayin')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">纳音</button>
-        <button class="kb-cat-btn" onclick="filterKbByCategory('shensha')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">神煞</button>
-        <button class="kb-cat-btn" onclick="filterKbByCategory('hechong')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">合冲刑害</button>
-        <button class="kb-cat-btn" onclick="filterKbByCategory('koujue')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">口诀库</button>
-      </div>
-      <!-- 热门词条快捷入口 -->
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center;">
-        <span style="font-size:12px;color:var(--text-dim);margin-right:4px;">🔥 热门:</span>
-        <button onclick="quickSearchKb('天乙贵人')" style="padding:3px 10px;border:1px solid rgba(201,168,76,.2);border-radius:12px;background:transparent;color:var(--paper2);cursor:pointer;font-size:12px;">天乙贵人</button>
-        <button onclick="quickSearchKb('六冲')" style="padding:3px 10px;border:1px solid rgba(201,168,76,.2);border-radius:12px;background:transparent;color:var(--paper2);cursor:pointer;font-size:12px;">六冲</button>
-        <button onclick="quickSearchKb('飞星')" style="padding:3px 10px;border:1px solid rgba(201,168,76,.2);border-radius:12px;background:transparent;color:var(--paper2);cursor:pointer;font-size:12px;">飞星</button>
-        <button onclick="quickSearchKb('纳甲')" style="padding:3px 10px;border:1px solid rgba(201,168,76,.2);border-radius:12px;background:transparent;color:var(--paper2);cursor:pointer;font-size:12px;">纳甲</button>
-        <button onclick="quickSearchKb('四化')" style="padding:3px 10px;border:1px solid rgba(201,168,76,.2);border-radius:12px;background:transparent;color:var(--paper2);cursor:pointer;font-size:12px;">四化</button>
-        <button onclick="quickSearchKb('用神')" style="padding:3px 10px;border:1px solid rgba(201,168,76,.2);border-radius:12px;background:transparent;color:var(--paper2);cursor:pointer;font-size:12px;">用神</button>
-        <button onclick="quickSearchKb('三奇')" style="padding:3px 10px;border:1px solid rgba(201,168,76,.2);border-radius:12px;background:transparent;color:var(--paper2);cursor:pointer;font-size:12px;">三奇</button>
-        <button onclick="quickSearchKb('空亡')" style="padding:3px 10px;border:1px solid rgba(201,168,76,.2);border-radius:12px;background:transparent;color:var(--paper2);cursor:pointer;font-size:12px;">空亡</button>
-      </div>
-      <!-- 统计信息 -->
-      <div id="kbStats" style="font-size:12px;color:var(--text-dim);margin-bottom:8px;"></div>
-    </div>
-    
-    <!-- 搜索结果区域 -->
-    <div id="kbResults" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;max-height:calc(100vh - 420px);overflow-y:auto;padding:4px;">
-      <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-dim);">输入关键词或选择分类开始检索</div>
-    </div>
-    
-    <!-- 知识详情弹窗 -->
-    <div id="kbDetailModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:10000;justify-content:center;align-items:center;">
-      <div style="background:var(--bg-dark);border:1px solid var(--gold-dim);border-radius:8px;max-width:700px;width:90%;max-height:80vh;overflow-y:auto;padding:24px;position:relative;">
-        <button onclick="closeKbDetail()" style="position:absolute;top:12px;right:12px;background:none;border:none;color:var(--text-light);font-size:24px;cursor:pointer;">✕</button>
-        <div id="kbDetailContent"></div>
-      </div>
-    </div>
+<section class="section" id="section-knowledge" role="tabpanel" aria-labelledby="tab-knowledge" data-lazy="sections/knowledge-section.html">
+  <div class="lazy-loading-placeholder" style="padding:60px 20px;text-align:center;color:var(--paper2);opacity:0.85" role="status" aria-label="加载中">
+    <div style="font-size:13px;letter-spacing:2px">⏳ 正在为您查阅典籍...</div>
   </div>
 </section>
 
@@ -602,122 +534,10 @@ h2{color:var(--gold2);border-bottom:1px solid rgba(201,168,76,.2);padding-bottom
 </section>
 
 <!-- ===== FENGSHUI PRO SECTION ===== -->
-<section class="section" id="section-fengshui-pro" role="tabpanel" aria-labelledby="tab-fengshui-pro">
-  <div class="section-header">
-    <span class="sh-symbol" style="color:var(--jade)">🏔️</span>
-    <h2 class="sh-title">风 水 进 阶</h2>
-    <p class="sh-en">Feng Shui Pro · Daily Guide · Layout · Business · Sha Qi · Flying Stars · Annual Cure · Ze Ri</p>
-    <p class="sh-desc">每日方位 · 布局诊断 · 商铺风水 · 化煞大全 · 流年飞星 · 家庭化解 · 风水择日</p>
+<section class="section" id="section-fengshui-pro" role="tabpanel" aria-labelledby="tab-fengshui-pro" data-lazy="sections/fengshui-pro-section.html">
+  <div class="lazy-loading-placeholder" style="padding:60px 20px;text-align:center;color:var(--paper2);opacity:0.85" role="status" aria-label="加载中">
+    <div style="font-size:13px;letter-spacing:2px">⏳ 正在为您查阅典籍...</div>
   </div>
-
-  <!-- 子导航 -->
-  <div class="zhanbu-subnav" style="display:flex;gap:0;margin-bottom:20px;border-bottom:1px solid rgba(201,168,76,0.1);overflow-x:auto;scrollbar-width:none">
-    <button class="zhanbu-subtab fs-pro-subtab active" onclick="showFengshuiProSub('fengshui-daily-content',this)" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid var(--gold);color:var(--gold)">🧭 每日方位</button>
-    <button class="zhanbu-subtab fs-pro-subtab" onclick="showFengshuiProSub('fengshui-layout-content',this)" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent">🏠 布局诊断</button>
-    <button class="zhanbu-subtab fs-pro-subtab" onclick="showFengshuiProSub('fengshui-business-content',this)" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent">🏢 商铺风水</button>
-    <button class="zhanbu-subtab fs-pro-subtab" onclick="showFengshuiProSub('fengshui-shaqi-content',this)" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent">⚔️ 化煞大全</button>
-    <button class="zhanbu-subtab fs-pro-subtab" onclick="showFengshuiProSub('fengshui-stars-content',this)" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent">⭐ 流年飞星</button>
-    <button class="zhanbu-subtab fs-pro-subtab" onclick="showFengshuiProSub('fengshui-cure-content',this)" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent">💊 家庭化解</button>
-    <button class="zhanbu-subtab fs-pro-subtab" onclick="showFengshuiProSub('fengshui-zeri-content',this)" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent">📅 风水择日</button>
-    <button class="zhanbu-subtab fs-pro-subtab" onclick="showSection('huajie')" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent">🛡️ 开运化解</button>
-  </div>
-
-  <!-- 1. 每日风水方位指南 -->
-  <div id="fengshui-daily-content" class="fengshui-pro-sub">
-    <div class="input-card">
-      <h3>🧭 每日风水方位指南</h3>
-      <p style="text-align:center;font-size:12px;margin-bottom:16px">依据日干支、流月飞星推算当日吉凶方位</p>
-      <p style="text-align:center;font-size:11px;margin-bottom:12px">参考：《钦定协纪辨方书》《玉匣记》《紫白诀》</p>
-      <button class="compute-btn" onclick="fsProCompute('daily')">查 询 今 日 方 位</button>
-    </div>
-    <div id="fs-pro-output-daily" class="d-none"></div>
-  </div>
-
-  <!-- 2. 家居布局诊断 -->
-  <div id="fengshui-layout-content" class="fengshui-pro-sub d-none">
-    <div class="input-card">
-      <h3>🏠 家居布局诊断</h3>
-      <p style="text-align:center;font-size:12px;margin-bottom:16px">输入各房间方位，根据八宅法+玄空飞星综合诊断</p>
-      <p style="text-align:center;font-size:11px;margin-bottom:16px">参考：《八宅明镜》《阳宅三要》《沈氏玄空学》</p>
-      <div class="input-row"><select class="input-field" id="fs-pro-door-dir" aria-label="选项fs-pro-door-dir"><option value="">大门方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
-      <div class="input-row"><select class="input-field" id="fs-pro-bedroom-dir" aria-label="选项fs-pro-bedroom-dir"><option value="">主卧方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
-      <div class="input-row"><select class="input-field" id="fs-pro-kitchen-dir" aria-label="选项fs-pro-kitchen-dir"><option value="">厨房方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
-      <div class="input-row"><select class="input-field" id="fs-pro-bathroom-dir" aria-label="选项fs-pro-bathroom-dir"><option value="">卫生间方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
-      <div class="input-row"><select class="input-field" id="fs-pro-study-dir" aria-label="选项fs-pro-study-dir"><option value="">书房方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
-      <div class="input-row"><select class="input-field" id="fs-pro-living-dir" aria-label="选项fs-pro-living-dir"><option value="">客厅方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
-      <div class="input-row"><input class="input-field" type="number" id="fs-pro-build-year" placeholder="建造年份" min="1900" max="2100" value="2000" aria-label="建造年份"></div>
-      <button class="compute-btn" onclick="fsProCompute('layout')">开 始 诊 断</button>
-    </div>
-    <div id="fs-pro-output-layout" class="d-none"></div>
-  </div>
-
-  <!-- 3. 商铺/办公室风水 -->
-  <div id="fengshui-business-content" class="fengshui-pro-sub d-none">
-    <div class="input-card">
-      <h3>🏢 商铺/办公室风水分析</h3>
-      <p style="text-align:center;font-size:12px;margin-bottom:16px">输入商铺各区域方位，分析风水吉凶</p>
-      <p style="text-align:center;font-size:11px;margin-bottom:16px">参考：《八宅明镜》《阳宅三要》</p>
-      <div class="input-row"><select class="input-field" id="fs-pro-shop-type" aria-label="选项fs-pro-shop-type"><option value="retail">零售商铺</option><option value="restaurant">餐饮店铺</option><option value="office">办公场所</option><option value="beauty">美容美发</option><option value="clinic">诊所药房</option></select></div>
-      <div class="input-row"><select class="input-field" id="fs-pro-shop-door" aria-label="选项fs-pro-shop-door"><option value="">大门/入口方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
-      <div class="input-row"><select class="input-field" id="fs-pro-cashier" aria-label="选项fs-pro-cashier"><option value="">收银台方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
-      <div class="input-row"><select class="input-field" id="fs-pro-boss-office" aria-label="选项fs-pro-boss-office"><option value="">老板办公室方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
-      <div class="input-row"><select class="input-field" id="fs-pro-staff-area" aria-label="选项fs-pro-staff-area"><option value="">员工工位区方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
-      <div class="input-row"><select class="input-field" id="fs-pro-counter" aria-label="选项fs-pro-counter"><option value="">展示柜台方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
-      <button class="compute-btn" onclick="fsProCompute('business')">开 始 分 析</button>
-    </div>
-    <div id="fs-pro-output-business" class="d-none"></div>
-  </div>
-
-  <!-- 4. 风水化煞大全 -->
-  <div id="fengshui-shaqi-content" class="fengshui-pro-sub d-none">
-    <div class="input-card">
-      <h3>⚔️ 风水化煞大全</h3>
-      <p style="text-align:center;font-size:12px;margin-bottom:16px">收录12种常见煞气及对应化解方案</p>
-      <p style="text-align:center;font-size:11px;margin-bottom:16px">参考：《阳宅大全》《风水化煞全书记》《沈氏玄空学》</p>
-      <button class="compute-btn" onclick="fsProCompute('shaqi')">查 看 化 煞 大 全</button>
-    </div>
-    <div id="fs-pro-output-shaqi" class="d-none"></div>
-  </div>
-
-  <!-- 5. 流年飞星盘 -->
-  <div id="fengshui-stars-content" class="fengshui-pro-sub d-none">
-    <div class="input-card">
-      <h3>⭐ 流年飞星盘</h3>
-      <p style="text-align:center;font-size:12px;margin-bottom:16px">九宫飞星可视化 · 大凶预警 · 大吉催旺</p>
-      <p style="text-align:center;font-size:11px;margin-bottom:16px">参考：《沈氏玄空学》《紫白诀》</p>
-      <div class="input-row"><input class="input-field" type="number" id="fs-pro-fx-year" placeholder="年份" min="2000" max="2050" value="2026" aria-label="年份"></div>
-      <button class="compute-btn" onclick="fsProCompute('stars')">排 列 飞 星 盘</button>
-    </div>
-    <div id="fs-pro-output-stars" class="d-none"></div>
-  </div>
-
-  <!-- 6. 家庭年度化解方案 -->
-  <div id="fengshui-cure-content" class="fengshui-pro-sub d-none">
-    <div class="input-card">
-      <h3>💊 家庭年度化解方案</h3>
-      <p style="text-align:center;font-size:12px;margin-bottom:16px">结合流年飞星，为每位成员生成个性化化解方案</p>
-      <p style="text-align:center;font-size:11px;margin-bottom:16px">参考：《沈氏玄空学》《紫白诀》《八宅明镜》</p>
-      <div id="fs-pro-family-members" style="margin-bottom:12px"></div>
-      <div class="input-row"><button onclick="addFamilyMemberRow()" style="padding:8px 20px;background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.3);color:var(--success);border-radius:6px;cursor:pointer;font-size:12px;letter-spacing:2px">+ 添加成员</button></div>
-      <button class="compute-btn" onclick="fsProCompute('cure')">生 成 化 解 方 案</button>
-    </div>
-    <div id="fs-pro-output-cure" class="d-none"></div>
-  </div>
-
-  <!-- 7. 风水择日 -->
-  <div id="fengshui-zeri-content" class="fengshui-pro-sub d-none">
-    <div class="input-card">
-      <h3>📅 风水择日</h3>
-      <p style="text-align:center;font-size:12px;margin-bottom:16px">搬家入宅 · 动土装修 · 开业 · 结婚 · 安葬</p>
-      <p style="text-align:center;font-size:11px;margin-bottom:16px">参考：《钦定协纪辨方书》《玉匣记》《象吉通书》</p>
-      <div class="input-row"><select class="input-field" id="fs-pro-zeri-type" aria-label="选项fs-pro-zeri-type"><option value="move">搬家入宅</option><option value="construction">动土装修</option><option value="business">开业</option><option value="wedding">结婚</option><option value="burial">安葬</option></select></div>
-      <div class="input-row"><input class="input-field" type="date" id="fs-pro-zeri-start" placeholder="开始日期" aria-label="开始日期"></div>
-      <div class="input-row"><input class="input-field" type="date" id="fs-pro-zeri-end" placeholder="结束日期" aria-label="结束日期"></div>
-      <button class="compute-btn" onclick="fsProCompute('zeri')">查 询 吉 日</button>
-    </div>
-    <div id="fs-pro-output-zeri" class="d-none"></div>
-  </div>
-
 </section>
 
 <!-- ===== YANZHI (言值·沟通技巧) SECTION ===== -->
@@ -1176,158 +996,11 @@ h2{color:var(--gold2);border-bottom:1px solid rgba(201,168,76,.2);padding-bottom
 
 
 <!-- ===== 公司取名模块（专业升级版）===== -->
-<section class="section" id="section-company" role="tabpanel" aria-labelledby="tab-company">
-    <div class="section-header">
-    <span class="sh-symbol" style="color:var(--cyan)">🏢</span>
-    <h2 class="sh-title">公司取名（专业版）</h2>
-    <p class="sh-en">Company Name Generator Pro</p>
-    <p class="sh-desc">基于法人八字、三才五格、行业五行、康熙笔画，为您的公司生成专业级吉名。包含详细分析报告与经典出处。</p>
+<section class="section" id="section-company" role="tabpanel" aria-labelledby="tab-company" data-lazy="sections/company-section.html">
+  <div class="lazy-loading-placeholder" style="padding:60px 20px;text-align:center;color:var(--paper2);opacity:0.85" role="status" aria-label="加载中">
+    <div style="font-size:13px;letter-spacing:2px">⏳ 正在为您查阅典籍...</div>
   </div>
-  <!-- 公司取名输入 -->
-  <div class="input-card">
-    <h3>公司基本信息</h3>
-    <div class="input-row" style="flex-wrap:wrap;gap:8px">
-      <input type="text" id="companyName" class="input-field" placeholder="现有公司名（选填，用于分析吉凶）" style="max-width:220px" aria-label="现有公司名（选填，用于分析吉凶）">
-      <input type="text" id="companyMainBiz" class="input-field" placeholder="主营方向（选填）" style="max-width:180px" aria-label="主营方向（选填）">
-    </div>
-    <div class="input-row" style="flex-wrap:wrap;gap:8px">
-      <select id="companyIndustry" class="input-field" aria-label="companyIndustry">
-        <option value="tech">科技/互联网</option>
-        <option value="finance">金融/投资</option>
-        <option value="education">教育/培训</option>
-        <option value="health">医疗/健康</option>
-        <option value="culture">文化/传媒</option>
-        <option value="food">餐饮/食品</option>
-        <option value="service">服务/咨询</option>
-        <option value="manufacturing">制造/工业</option>
-        <option value="trade">贸易/电商</option>
-        <option value="estate">地产/建筑</option>
-        <option value="media">娱乐/媒体</option>
-        <option value="energy">能源/环保</option>
-        <option value="agriculture">农业/畜牧</option>
-        <option value="law">法律/律所</option>
-        <option value="logistics">物流/运输</option>
-        <option value="auto">汽车/出行</option>
-      </select>
-      <select id="companyWordCount" class="input-field" aria-label="companyWordCount">
-        <option value="2">2字</option>
-        <option value="3" selected>3字</option>
-        <option value="4">4字</option>
-      </select>
-      <select id="companyStyle" class="input-field" aria-label="companyStyle">
-        <option value="古典">古典雅致</option>
-        <option value="大气">大气磅礴</option>
-        <option value="简约">简约清新</option>
-        <option value="吉祥">吉祥如意</option>
-        <option value="国际">国际洋气</option>
-      </select>
-    </div>
-    <!-- 法人八字 -->
-    <div style="background:rgba(201,168,76,0.03);border:1px solid rgba(201,168,76,0.12);border-radius:10px;padding:14px;margin-top:12px">
-      <h4 style="font-size:12px;color:var(--gold);margin-bottom:10px;letter-spacing:2px">🌟 法人生辰八字（关联八字取名）</h4>
-      <div class="input-row" style="flex-wrap:wrap;gap:8px">
-        <input type="text" id="companyFounderName" class="input-field" placeholder="法人姓名" style="max-width:140px" aria-label="法人姓名">
-        <select id="companyFounderSex" class="input-field" style="max-width:80px" aria-label="companyFounderSex">
-          <option value="">性别</option>
-          <option value="male">男</option>
-          <option value="female">女</option>
-        </select>
-        <select id="companyFounderCalendar" class="input-field" style="max-width:100px" aria-label="companyFounderCalendar">
-          <option value="solar">阳历</option>
-          <option value="lunar">农历</option>
-        </select>
-        <input type="date" id="companyFounderBazi" class="input-field" style="max-width:160px" title="法人出生日期" aria-label="companyFounderBazi">
-        <select id="companyFounderHour" class="input-field" style="max-width:120px" aria-label="companyFounderHour">
-          <option value="">时辰</option>
-          <option value="0">子时 23-01</option>
-          <option value="1">丑时 01-03</option>
-          <option value="2">寅时 03-05</option>
-          <option value="3">卯时 05-07</option>
-          <option value="4">辰时 07-09</option>
-          <option value="5">巳时 09-11</option>
-          <option value="6">午时 11-13</option>
-          <option value="7">未时 13-15</option>
-          <option value="8">申时 15-17</option>
-          <option value="9">酉时 17-19</option>
-          <option value="10">戌时 19-21</option>
-          <option value="11">亥时 21-23</option>
-        </select>
-      </div>
-      <div class="input-row" style="margin-top:8px;flex-wrap:wrap;gap:8px">
-        <select id="companyFounderBirthCity" class="input-field" style="max-width:160px" aria-label="companyFounderBirthCity">
-          <option value="">法人出生城市</option>
-          <option value="北京">北京</option>
-          <option value="上海">上海</option>
-          <option value="广州">广州</option>
-          <option value="深圳">深圳</option>
-          <option value="成都">成都</option>
-          <option value="重庆">重庆</option>
-          <option value="西安">西安</option>
-          <option value="武汉">武汉</option>
-          <option value="杭州">杭州</option>
-          <option value="南京">南京</option>
-          <option value="天津">天津</option>
-          <option value="青岛">青岛</option>
-          <option value="沈阳">沈阳</option>
-          <option value="长沙">长沙</option>
-          <option value="郑州">郑州</option>
-          <option value="其他">其他</option>
-        </select>
-        <select id="companyRegCity" class="input-field" style="max-width:160px" aria-label="companyRegCity">
-          <option value="">公司注册地</option>
-          <option value="北京">北京</option>
-          <option value="上海">上海</option>
-          <option value="广州">广州</option>
-          <option value="深圳">深圳</option>
-          <option value="成都">成都</option>
-          <option value="重庆">重庆</option>
-          <option value="西安">西安</option>
-          <option value="武汉">武汉</option>
-          <option value="杭州">杭州</option>
-          <option value="南京">南京</option>
-          <option value="天津">天津</option>
-          <option value="青岛">青岛</option>
-          <option value="沈阳">沈阳</option>
-          <option value="长沙">长沙</option>
-          <option value="郑州">郑州</option>
-          <option value="其他">其他</option>
-        </select>
-      </div>
-    </div>
-    <div class="input-row" style="margin-top:8px">
-      <select id="preferWuxing" class="input-field" aria-label="preferWuxing">
-        <option value="">喜用神（自动从八字推算）</option>
-        <option value="木">喜木</option>
-        <option value="火">喜火</option>
-        <option value="土">喜土</option>
-        <option value="金">喜金</option>
-        <option value="水">喜水</option>
-      </select>
-      <input type="text" id="avoidNumbers" class="input-field" placeholder="避免数字（选填，如012345）" aria-label="避免数字（选填，如012345）">
-    </div>
-    <button id="companyBtn" onclick="generateCompanyNamesEnhanced()" class="compute-btn" style="margin-top:16px">智能取名</button>
-  </div>
-  <!-- 法人八字分析结果 -->
-  <div id="companyBaziResult" style="display:none;margin-bottom:16px"></div>
-  <!-- 公司取名结果 -->
-  <div id="companyResult" class="result-card company-result" style="display:none;padding:20px;border-radius:12px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15)">
-    <div style="text-align:center;padding:16px 0;border-bottom:1px solid rgba(201,168,76,.1);margin-bottom:20px">
-      <h3 style="font-family:'Ma Shan Zheng',serif;font-size:24px;letter-spacing:4px;color:var(--gold);margin-bottom:8px">推荐公司名称</h3>
-      <p id="companyBannerMeta" style="font-size:12px;opacity:.95;letter-spacing:2px"></p>
-    </div>
-    <div id="companyNamesGrid"></div>
-  </div>
-  <!-- 行业五行参照表（默认隐藏，结果展示时显示） -->
-  <div id="industryWuxingTable" style="display:none;padding:20px;margin-top:16px;border-radius:12px;background:rgba(0,100,150,0.04);border:1px solid rgba(0,100,150,0.12)">
-    <h5 style="font-size:13px;letter-spacing:4px;color:var(--cyan);margin-bottom:16px">行业五行宜忌</h5>
-    <div id="industryWuxingContent"></div>
-  </div>
-  <!-- 康熙笔画参照 -->
-  <div id="kangxiStrokesRef" style="display:none;padding:20px;margin-top:16px;border-radius:12px;background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08)">
-    <h5 style="font-size:13px;letter-spacing:4px;color:var(--gold);margin-bottom:12px">康熙笔画速查（部分）</h5>
-    <p style="font-size:11px;opacity:.95;line-height:2">木部:林(8) 松(8) 桐(10) 柏(9) 榕(14) | 火部:炎(8) 炬(9) 焰(12) 煌(13) | 土部:均(7) 垣(9) 增(15) 壑(17) | 金部:钧(9) 铭(14) 锦(16) 鑫(24) | 水部:泉(9) 涵(11) 溪(14) 瀚(20)</p>
-  </div>
-  </section>
+</section>
 <!-- ===== 姓名分析模块 ===== -->
 <section class="section" id="section-name-analyze" role="tabpanel" aria-labelledby="tab-name-analyze">
     <div class="section-header">
@@ -1716,195 +1389,9 @@ h2{color:var(--gold2);border-bottom:1px solid rgba(201,168,76,.2);padding-bottom
 </section>
 
 <!-- ===== 青少年规划 ===== -->
-<section class="section" id="section-youth" role="tabpanel" aria-labelledby="tab-youth">
-  <div class="section-header">
-    <h2>🧒 青少年规划</h2>
-    <p>基于八字五行十神，为孩子量身定制兴趣·学业·志愿·职业·城市·婚恋·性格·健康全方位指引</p>
-  </div>
-  <div class="tool-card">
-    <div class="form-row">
-      <label for="hjName">姓名</label>
-      <input type="text" id="youthName" placeholder="孩子姓名" aria-label="孩子姓名">
-    </div>
-    <div class="form-row">
-      <label for="youthSex">性别</label>
-      <select id="youthSex" aria-label="性别">
-        <option value="male">男</option>
-        <option value="female">女</option>
-      </select>
-    </div>
-    <!-- 历法切换 -->
-    <div class="form-row" style="display:flex;align-items:center;gap:8px">
-      <label style="margin:0">历法</label>
-      <label style="font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px" for="youthDate">
-        <input type="radio" name="youthCalMode" value="solar" checked onchange="onYouthCalModeChange()" aria-label="公历输入" id="youthCalMode-solar"> 公历
-      </label>
-      <label style="font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px" for="youthDate">
-        <input type="radio" name="youthCalMode" value="lunar" onchange="onYouthCalModeChange()" aria-label="农历输入" id="youthCalMode-lunar"> 农历
-      </label>
-      <span id="youthCalHint" style="font-size:11px;color:var(--gold);margin-left:4px">当前:公历输入</span>
-    </div>
-    <!-- 公历日期输入 -->
-    <div id="youthSolarInput" class="form-row">
-      <label for="hjDate">出生日期</label>
-      <input type="date" id="youthDate" aria-label="youthDate">
-    </div>
-    <!-- 农历日期输入(默认隐藏) -->
-    <div id="youthLunarInput" class="form-row d-none">
-      <label for="lpLunarYear">农历日期</label>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <input type="number" id="youthLunarYear" placeholder="年" min="1900" max="2050" style="width:80px" aria-label="年">
-        <input type="number" id="youthLunarMonth" placeholder="月" min="1" max="12" style="width:60px" aria-label="月">
-        <input type="number" id="youthLunarDay" placeholder="日" min="1" max="30" style="width:60px" aria-label="日">
-        <label style="font-size:12px;display:flex;align-items:center;gap:4px" for="youthHour">
-          <input type="checkbox" id="youthLunarLeap" aria-label="youthLunarLeap"> 闰月
-        </label>
-      </div>
-    </div>
-    <div class="form-row">
-      <label for="youthHour">出生时辰</label>
-      <select id="youthHour" aria-label="出生时辰">
-        <option value="">不确定</option>
-        <option value="0">子时 23-1点</option>
-        <option value="1">丑时 1-3点</option>
-        <option value="2">寅时 3-5点</option>
-        <option value="3">卯时 5-7点</option>
-        <option value="4">辰时 7-9点</option>
-        <option value="5">巳时 9-11点</option>
-        <option value="6">午时 11-13点</option>
-        <option value="7">未时 13-15点</option>
-        <option value="8">申时 15-17点</option>
-        <option value="9">酉时 17-19点</option>
-        <option value="10">戌时 19-21点</option>
-        <option value="11">亥时 21-23点</option>
-      </select>
-    </div>
-    <div class="form-row">
-      <label for="youthBirthplace">出生地</label>
-      <select id="youthBirthplace" aria-label="出生地">
-        <option value="">请选择</option>
-        <option value="北京">北京</option>
-        <option value="上海">上海</option>
-        <option value="广州">广州</option>
-        <option value="深圳">深圳</option>
-        <option value="杭州">杭州</option>
-        <option value="南京">南京</option>
-        <option value="苏州">苏州</option>
-        <option value="成都">成都</option>
-        <option value="重庆">重庆</option>
-        <option value="武汉">武汉</option>
-        <option value="西安">西安</option>
-        <option value="天津">天津</option>
-        <option value="长沙">长沙</option>
-        <option value="郑州">郑州</option>
-        <option value="青岛">青岛</option>
-        <option value="大连">大连</option>
-        <option value="沈阳">沈阳</option>
-        <option value="哈尔滨">哈尔滨</option>
-        <option value="长春">长春</option>
-        <option value="济南">济南</option>
-        <option value="合肥">合肥</option>
-        <option value="福州">福州</option>
-        <option value="厦门">厦门</option>
-        <option value="南昌">南昌</option>
-        <option value="南宁">南宁</option>
-        <option value="昆明">昆明</option>
-        <option value="贵阳">贵阳</option>
-        <option value="兰州">兰州</option>
-        <option value="海口">海口</option>
-        <option value="石家庄">石家庄</option>
-        <option value="太原">太原</option>
-        <option value="呼和浩特">呼和浩特</option>
-        <option value="乌鲁木齐">乌鲁木齐</option>
-        <option value="拉萨">拉萨</option>
-        <option value="银川">银川</option>
-        <option value="西宁">西宁</option>
-        <option value="珠海">珠海</option>
-        <option value="东莞">东莞</option>
-        <option value="佛山">佛山</option>
-        <option value="宁波">宁波</option>
-        <option value="无锡">无锡</option>
-        <option value="温州">温州</option>
-        <option value="其他">其他</option>
-      </select>
-    </div>
-    <div class="form-row">
-      <label for="youthResidence">居住地</label>
-      <select id="youthResidence" aria-label="居住地">
-        <option value="">请选择</option>
-        <option value="北京">北京</option>
-        <option value="上海">上海</option>
-        <option value="广州">广州</option>
-        <option value="深圳">深圳</option>
-        <option value="杭州">杭州</option>
-        <option value="南京">南京</option>
-        <option value="苏州">苏州</option>
-        <option value="成都">成都</option>
-        <option value="重庆">重庆</option>
-        <option value="武汉">武汉</option>
-        <option value="西安">西安</option>
-        <option value="天津">天津</option>
-        <option value="长沙">长沙</option>
-        <option value="郑州">郑州</option>
-        <option value="青岛">青岛</option>
-        <option value="大连">大连</option>
-        <option value="沈阳">沈阳</option>
-        <option value="哈尔滨">哈尔滨</option>
-        <option value="长春">长春</option>
-        <option value="济南">济南</option>
-        <option value="合肥">合肥</option>
-        <option value="福州">福州</option>
-        <option value="厦门">厦门</option>
-        <option value="南昌">南昌</option>
-        <option value="南宁">南宁</option>
-        <option value="昆明">昆明</option>
-        <option value="贵阳">贵阳</option>
-        <option value="兰州">兰州</option>
-        <option value="海口">海口</option>
-        <option value="石家庄">石家庄</option>
-        <option value="太原">太原</option>
-        <option value="呼和浩特">呼和浩特</option>
-        <option value="乌鲁木齐">乌鲁木齐</option>
-        <option value="拉萨">拉萨</option>
-        <option value="银川">银川</option>
-        <option value="西宁">西宁</option>
-        <option value="珠海">珠海</option>
-        <option value="东莞">东莞</option>
-        <option value="佛山">佛山</option>
-        <option value="宁波">宁波</option>
-        <option value="无锡">无锡</option>
-        <option value="温州">温州</option>
-        <option value="其他">其他</option>
-      </select>
-    </div>
-    <div class="form-row">
-      <label for="youthGrade">当前年级</label>
-      <select id="youthGrade" aria-label="当前年级">
-        <option value="kindergarten">幼儿园</option>
-        <option value="primary">小学</option>
-        <option value="junior">初中</option>
-        <option value="senior">高中</option>
-        <option value="college">大学</option>
-      </select>
-    </div>
-    <div class="form-row">
-      <label for="youthScore">成绩水平</label>
-      <select id="youthScore" aria-label="成绩水平">
-        <option value="excellent">优秀</option>
-        <option value="good">良好</option>
-        <option value="average">一般</option>
-        <option value="needImprove">待提高</option>
-      </select>
-    </div>
-    <div class="form-row">
-      <label for="youthExpect">家长期望（选填）</label>
-      <input type="text" id="youthExpect" placeholder="如：希望孩子往理工科方向发展" aria-label="如：希望孩子往理工科方向发展">
-    </div>
-    <button class="compute-btn" onclick="computeYouthPlan()" style="margin-top:12px">🧒 生成青少年规划</button>
-  </div>
-  <div id="youthResult" class="result-area"></div>
-  <div class="back-row" style="margin-top:32px">
-    <button class="back-btn" onclick="showSection('hero')">返 回 首 页</button>
+<section class="section" id="section-youth" role="tabpanel" aria-labelledby="tab-youth" data-lazy="sections/youth-section.html">
+  <div class="lazy-loading-placeholder" style="padding:60px 20px;text-align:center;color:var(--paper2);opacity:0.85" role="status" aria-label="加载中">
+    <div style="font-size:13px;letter-spacing:2px">⏳ 正在为您查阅典籍...</div>
   </div>
 </section>
 
@@ -2106,7 +1593,32 @@ h2{color:var(--gold2);border-bottom:1px solid rgba(201,168,76,.2);padding-bottom
 <script src="knowledge-models/yijing-model.js" defer></script>
 <script src="knowledge-models/ziwei-model.js" defer></script>
 <script src="knowledge-models/zodiac-model.js" defer></script>
-<script src="js/divination-core.js" defer></script>
+<script>
+// R341: divination-core.js 按需加载（434KB 首屏不需要）
+window._loadDivinationCore = function() {
+  if (window.__divCoreLoaded) return;
+  window.__divCoreLoaded = true;
+  var s = document.createElement('script');
+  s.src = 'js/divination-core.js';
+  s.defer = true;
+  document.head.appendChild(s);
+};
+// 首次用户交互时加载
+['click', 'keydown', 'touchstart'].forEach(function(e) {
+  document.addEventListener(e, function() {
+    setTimeout(window._loadDivinationCore, 100);
+  }, { once: true, passive: true });
+});
+// 切换到非首屏 section 时也加载
+document.addEventListener('DOMContentLoaded', function() {
+  var tabs = document.querySelectorAll('[role="tab"]');
+  tabs.forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      setTimeout(window._loadDivinationCore, 50);
+    }, { once: true });
+  });
+});
+</script>
 <script src="js/mobile-nav.js" defer></script>
 
 

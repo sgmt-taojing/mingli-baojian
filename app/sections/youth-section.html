@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<title>section-youth</title>
+</head>
+<body>
+<section class="section" id="section-youth" role="tabpanel" aria-labelledby="tab-youth">
+  <div class="section-header">
+    <h2>🧒 青少年规划</h2>
+    <p>基于八字五行十神，为孩子量身定制兴趣·学业·志愿·职业·城市·婚恋·性格·健康全方位指引</p>
+  </div>
+  <div class="tool-card">
+    <div class="form-row">
+      <label for="hjName">姓名</label>
+      <input type="text" id="youthName" placeholder="孩子姓名" aria-label="孩子姓名">
+    </div>
+    <div class="form-row">
+      <label for="youthSex">性别</label>
+      <select id="youthSex" aria-label="性别">
+        <option value="male">男</option>
+        <option value="female">女</option>
+      </select>
+    </div>
+    <!-- 历法切换 -->
+    <div class="form-row" style="display:flex;align-items:center;gap:8px">
+      <label style="margin:0">历法</label>
+      <label style="font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px" for="youthDate">
+        <input type="radio" name="youthCalMode" value="solar" checked onchange="onYouthCalModeChange()" aria-label="公历输入" id="youthCalMode-solar"> 公历
+      </label>
+      <label style="font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px" for="youthDate">
+        <input type="radio" name="youthCalMode" value="lunar" onchange="onYouthCalModeChange()" aria-label="农历输入" id="youthCalMode-lunar"> 农历
+      </label>
+      <span id="youthCalHint" style="font-size:11px;color:var(--gold);margin-left:4px">当前:公历输入</span>
+    </div>
+    <!-- 公历日期输入 -->
+    <div id="youthSolarInput" class="form-row">
+      <label for="hjDate">出生日期</label>
+      <input type="date" id="youthDate" aria-label="youthDate">
+    </div>
+    <!-- 农历日期输入(默认隐藏) -->
+    <div id="youthLunarInput" class="form-row d-none">
+      <label for="lpLunarYear">农历日期</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <input type="number" id="youthLunarYear" placeholder="年" min="1900" max="2050" style="width:80px" aria-label="年">
+        <input type="number" id="youthLunarMonth" placeholder="月" min="1" max="12" style="width:60px" aria-label="月">
+        <input type="number" id="youthLunarDay" placeholder="日" min="1" max="30" style="width:60px" aria-label="日">
+        <label style="font-size:12px;display:flex;align-items:center;gap:4px" for="youthHour">
+          <input type="checkbox" id="youthLunarLeap" aria-label="youthLunarLeap"> 闰月
+        </label>
+      </div>
+    </div>
+    <div class="form-row">
+      <label for="youthHour">出生时辰</label>
+      <select id="youthHour" aria-label="出生时辰">
+        <option value="">不确定</option>
+        <option value="0">子时 23-1点</option>
+        <option value="1">丑时 1-3点</option>
+        <option value="2">寅时 3-5点</option>
+        <option value="3">卯时 5-7点</option>
+        <option value="4">辰时 7-9点</option>
+        <option value="5">巳时 9-11点</option>
+        <option value="6">午时 11-13点</option>
+        <option value="7">未时 13-15点</option>
+        <option value="8">申时 15-17点</option>
+        <option value="9">酉时 17-19点</option>
+        <option value="10">戌时 19-21点</option>
+        <option value="11">亥时 21-23点</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label for="youthBirthplace">出生地</label>
+      <select id="youthBirthplace" aria-label="出生地">
+        <option value="">请选择</option>
+        <option value="北京">北京</option>
+        <option value="上海">上海</option>
+        <option value="广州">广州</option>
+        <option value="深圳">深圳</option>
+        <option value="杭州">杭州</option>
+        <option value="南京">南京</option>
+        <option value="苏州">苏州</option>
+        <option value="成都">成都</option>
+        <option value="重庆">重庆</option>
+        <option value="武汉">武汉</option>
+        <option value="西安">西安</option>
+        <option value="天津">天津</option>
+        <option value="长沙">长沙</option>
+        <option value="郑州">郑州</option>
+        <option value="青岛">青岛</option>
+        <option value="大连">大连</option>
+        <option value="沈阳">沈阳</option>
+        <option value="哈尔滨">哈尔滨</option>
+        <option value="长春">长春</option>
+        <option value="济南">济南</option>
+        <option value="合肥">合肥</option>
+        <option value="福州">福州</option>
+        <option value="厦门">厦门</option>
+        <option value="南昌">南昌</option>
+        <option value="南宁">南宁</option>
+        <option value="昆明">昆明</option>
+        <option value="贵阳">贵阳</option>
+        <option value="兰州">兰州</option>
+        <option value="海口">海口</option>
+        <option value="石家庄">石家庄</option>
+        <option value="太原">太原</option>
+        <option value="呼和浩特">呼和浩特</option>
+        <option value="乌鲁木齐">乌鲁木齐</option>
+        <option value="拉萨">拉萨</option>
+        <option value="银川">银川</option>
+        <option value="西宁">西宁</option>
+        <option value="珠海">珠海</option>
+        <option value="东莞">东莞</option>
+        <option value="佛山">佛山</option>
+        <option value="宁波">宁波</option>
+        <option value="无锡">无锡</option>
+        <option value="温州">温州</option>
+        <option value="其他">其他</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label for="youthResidence">居住地</label>
+      <select id="youthResidence" aria-label="居住地">
+        <option value="">请选择</option>
+        <option value="北京">北京</option>
+        <option value="上海">上海</option>
+        <option value="广州">广州</option>
+        <option value="深圳">深圳</option>
+        <option value="杭州">杭州</option>
+        <option value="南京">南京</option>
+        <option value="苏州">苏州</option>
+        <option value="成都">成都</option>
+        <option value="重庆">重庆</option>
+        <option value="武汉">武汉</option>
+        <option value="西安">西安</option>
+        <option value="天津">天津</option>
+        <option value="长沙">长沙</option>
+        <option value="郑州">郑州</option>
+        <option value="青岛">青岛</option>
+        <option value="大连">大连</option>
+        <option value="沈阳">沈阳</option>
+        <option value="哈尔滨">哈尔滨</option>
+        <option value="长春">长春</option>
+        <option value="济南">济南</option>
+        <option value="合肥">合肥</option>
+        <option value="福州">福州</option>
+        <option value="厦门">厦门</option>
+        <option value="南昌">南昌</option>
+        <option value="南宁">南宁</option>
+        <option value="昆明">昆明</option>
+        <option value="贵阳">贵阳</option>
+        <option value="兰州">兰州</option>
+        <option value="海口">海口</option>
+        <option value="石家庄">石家庄</option>
+        <option value="太原">太原</option>
+        <option value="呼和浩特">呼和浩特</option>
+        <option value="乌鲁木齐">乌鲁木齐</option>
+        <option value="拉萨">拉萨</option>
+        <option value="银川">银川</option>
+        <option value="西宁">西宁</option>
+        <option value="珠海">珠海</option>
+        <option value="东莞">东莞</option>
+        <option value="佛山">佛山</option>
+        <option value="宁波">宁波</option>
+        <option value="无锡">无锡</option>
+        <option value="温州">温州</option>
+        <option value="其他">其他</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label for="youthGrade">当前年级</label>
+      <select id="youthGrade" aria-label="当前年级">
+        <option value="kindergarten">幼儿园</option>
+        <option value="primary">小学</option>
+        <option value="junior">初中</option>
+        <option value="senior">高中</option>
+        <option value="college">大学</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label for="youthScore">成绩水平</label>
+      <select id="youthScore" aria-label="成绩水平">
+        <option value="excellent">优秀</option>
+        <option value="good">良好</option>
+        <option value="average">一般</option>
+        <option value="needImprove">待提高</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label for="youthExpect">家长期望（选填）</label>
+      <input type="text" id="youthExpect" placeholder="如：希望孩子往理工科方向发展" aria-label="如：希望孩子往理工科方向发展">
+    </div>
+    <button class="compute-btn" onclick="computeYouthPlan()" style="margin-top:12px">🧒 生成青少年规划</button>
+  </div>
+  <div id="youthResult" class="result-area"></div>
+  <div class="back-row" style="margin-top:32px">
+    <button class="back-btn" onclick="showSection('hero')">返 回 首 页</button>
+  </div>
+</section>
+</body>
+</html>
