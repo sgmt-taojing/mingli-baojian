@@ -321,7 +321,7 @@ function handleScreenshot(input) {
   var reader = new FileReader();
   reader.onload = function(e) {
     var preview = document.getElementById('screenshotPreview');
-    preview.innerHTML = '<div class="upload-preview"><img src="' + e.target.result + '"><span class="remove" id="removeScr">✕</span></div>';
+    preview.innerHTML = '<div class="upload-preview"><img loading="lazy" src="' + e.target.result + '"><span class="remove" id="removeScr">✕</span></div>';
     document.getElementById('removeScr').addEventListener('click', removeScreenshot);
   };
   reader.readAsDataURL(file);

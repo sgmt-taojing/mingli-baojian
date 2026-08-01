@@ -168,7 +168,7 @@ function renderTicket(t) {
   html += '<h2>📝 详细描述</h2>';
   html += '<div class="content-body">' + escapeHtml(t.content) + '</div>';
   if (t.screenshot_path) {
-    html += '<div class="screenshot-box"><img src="' + escapeHtml(t.screenshot_path) + '" onclick="window.open(this.src)" alt="截图"></div>';
+    html += '<div class="screenshot-box"><img loading="lazy" src="' + escapeHtml(t.screenshot_path) + '" onclick="window.open(this.src)" alt="截图"></div>';
   }
   if (t.voice_path) {
     html += '<div class="voice-box"><audio src="' + escapeHtml(t.voice_path) + '" controls>您的浏览器不支持音频播放</audio></div>';
