@@ -66,6 +66,7 @@ async function start() {
       video: deviceId ? {deviceId: {ideal: deviceId}} : true,
       audio: audioEnable.checked ? {deviceId: micSel.value ? {ideal: micSel.value} : undefined, echoCancellation: true, noiseSuppression: true} : false
     };
+    if (!window.isSecureContext) { setStatus('需要安全上下文（HTTPS 或 localhost），请通过 http://localhost:8914 访问', 'err'); return; }
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { setStatus('浏览器不支持摄像头，请使用 Chrome/Edge', 'err'); return; }
     try {
       stream = await navigator.mediaDevices.getUserMedia(constraints);
