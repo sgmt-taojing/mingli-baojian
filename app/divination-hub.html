@@ -1196,9 +1196,9 @@ a[href="divination-hub.html"]:hover {
     <div class="input-row" style="justify-content:center;flex-wrap:wrap;gap:12px">
       <input type="date" id="jiuriDateInput" class="input-field" style="max-width:200px;text-align:center" onchange="jiuriShowDate()" aria-label="jiuriDateInput">
       <button onclick="jiuriToday()" class="compute-btn" style="padding:10px 20px;font-size:12px">今日</button>
-      <button onclick="jiuriPrevMonth()" class="compute-btn" style="padding:10px 16px;font-size:14px">◀</button>
+      <button onclick="jiuriPrevMonth()" class="compute-btn" style="padding:10px 16px;font-size:14px" aria-label="上一个">◀</button>
       <span id="jiuriMonthLabel" style="font-family:'Ma Shan Zheng',serif;font-size:18px;color:var(--gold);letter-spacing:4px;min-width:120px;text-align:center"></span>
-      <button onclick="jiuriNextMonth()" class="compute-btn" style="padding:10px 16px;font-size:14px">▶</button>
+      <button onclick="jiuriNextMonth()" class="compute-btn" style="padding:10px 16px;font-size:14px" aria-label="播放">▶</button>
       <select id="sel1201"></select>
     </div>
   </div>
@@ -1457,9 +1457,9 @@ a[href="divination-hub.html"]:hover {
       </div>
       <!-- 按钮组 -->
       <div style="display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap">
-        <button id="hmPrevBtn" onclick="hmPrev()" style="width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--paper2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .25s" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--paper2)'">⏮</button>
-        <button id="hmPlayBtn" onclick="hmTogglePlay()" style="width:52px;height:52px;border-radius:50%;border:none;background:var(--gold);color:var(--paper);cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;transition:all .25s;box-shadow:0 0 20px rgba(201,168,76,0.3)">▶</button>
-        <button id="hmNextBtn" onclick="hmNext()" style="width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--paper2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .25s" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--paper2)'">⏭</button>
+        <button id="hmPrevBtn" onclick="hmPrev()" style="width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--paper2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .25s" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--paper2)'" aria-label="上一个">⏮</button>
+        <button id="hmPlayBtn" onclick="hmTogglePlay()" style="width:52px;height:52px;border-radius:50%;border:none;background:var(--gold);color:var(--paper);cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;transition:all .25s;box-shadow:0 0 20px rgba(201,168,76,0.3)" aria-label="播放">▶</button>
+        <button id="hmNextBtn" onclick="hmNext()" style="width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--paper2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .25s" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--paper2)'" aria-label="下一个">⏭</button>
         <div style="width:1px;height:28px;background:var(--border);margin:0 4px"></div>
         <!-- 音量 -->
         <div style="display:flex;align-items:center;gap:6px">
@@ -1467,7 +1467,7 @@ a[href="divination-hub.html"]:hover {
           <input type="range" id="hmVolume" min="0" max="100" value="60" oninput="hmSetVolume(this.value)" style="width:80px;accent-color:var(--gold);cursor:pointer" aria-label="hmVolume">
         </div>
         <!-- 循环 -->
-        <button id="hmLoopBtn" onclick="hmToggleLoop()" style="width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--paper3);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .25s" title="循环播放">🔁</button>
+        <button id="hmLoopBtn" onclick="hmToggleLoop()" style="width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--paper3);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .25s" title="循环播放" aria-label="重新播放">🔁</button>
       </div>
     </div>
 
@@ -2026,7 +2026,7 @@ a[href="divination-hub.html"]:hover {
 <!-- 提问弹窗 -->
 <div class="ask-modal" id="askModal">
   <div class="ask-modal-content">
-    <button class="ask-modal-close" onclick="closeAskModal()">✕</button>
+    <button class="ask-modal-close" onclick="closeAskModal()" aria-label="关闭">✕</button>
     <h3 style="font-family:'Ma Shan Zheng',serif;font-size:24px;letter-spacing:4px;color:var(--gold);text-align:center;margin-bottom:20px">向大师提问</h3>
     <div style="font-size:13px;color:var(--paper3);text-align:center;margin-bottom:20px;line-height:1.8">选择一位大师，输入您的问题，大师将以自身修行视角为您解惑</div>
     <select class="ask-master-select" id="askMasterSelect" aria-label="选项askMasterSelect">
@@ -2163,7 +2163,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="more-menu" id="moreMenu">
   <div class="more-header">
     <span class="more-title">更多功能</span>
-    <button class="more-close" onclick="closeMore()">✕</button>
+    <button class="more-close" onclick="closeMore()" aria-label="关闭">✕</button>
   </div>
   <div class="more-grid">
     <button class="more-item" onclick="showSection('fengshui-pro'); closeMore();"><span>风水进阶</span></button>
@@ -2192,7 +2192,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- 化解案例库HTML(通过JS动态加载) -->
 <div id="caseLibraryModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;overflow-y:auto;padding:40px 20px">
   <div style="max-width:800px;margin:0 auto;background:var(--ink2);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:30px;position:relative">
-    <button onclick="closeCaseLibrary()" style="position:absolute;top:20px;right:20px;background:none;border:1px solid rgba(201,168,76,0.3);color:var(--gold);padding:8px 16px;cursor:pointer;font-size:18px;border-radius:4px">✕</button>
+    <button onclick="closeCaseLibrary()" style="position:absolute;top:20px;right:20px;background:none;border:1px solid rgba(201,168,76,0.3);color:var(--gold);padding:8px 16px;cursor:pointer;font-size:18px;border-radius:4px" aria-label="关闭">✕</button>
     <h2 style="font-family:\'Ma Shan Zheng\',serif;font-size:28px;letter-spacing:5px;color:var(--gold);margin-bottom:24px;text-align:center">化解案例参考库</h2>
     <div id="caseLibraryContent"></div>
   </div>
