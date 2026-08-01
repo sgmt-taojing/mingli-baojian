@@ -25,8 +25,8 @@
 </div>
 
 <div class="flow-steps-wrap" style="padding:12px 24px 0">
-<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>查看档案</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>健康趋势</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>随访管理</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>导出报告</span></div></div>
-<div class="flow-hint">查看健康管理看板。</div>
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>输入生辰</span></div><span class="flow-step-arrow">→</span><div class="flow-step"><span class="flow-step-num">2</span><span>排盘分析</span></div><span class="flow-step-arrow">→</span><div class="flow-step"><span class="flow-step-num">3</span><span>双核评分</span></div><span class="flow-step-arrow">→</span><div class="flow-step"><span class="flow-step-num">4</span><span>行动清单</span></div></div>
+<div class="flow-hint">输入生辰后自动排盘，生成健康+事业双维度评分与个性化建议。</div>
 </div>
 <a href="divination-hub.html" style="position:fixed;top:12px;left:12px;z-index:9999;padding:8px 14px;background:#c9a227;color:#fff;border-radius:20px;font-size:12px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.15);opacity:.85">← 首页</a>
   <a class="skip-link" href="#main-content">跳到主内容</a>
@@ -34,7 +34,11 @@
   <div class="hcd-wrap">
     <div class="hcd-header">
       <h1>🩺💼 健康事业双核仪表盘</h1>
-      <p>排盘分析报告 · 双核驱动 · 12 领域全覆盖 · 古籍权威依据</p>
+      <p>基于八字排盘，从日主五行、脏腑对应、大运走势出发，量化评估健康与事业两个核心维度，输出 12 领域行动清单</p>
+      <div style="display:flex;gap:16px;justify-content:center;margin-top:8px;font-size:11px;opacity:.6">
+        <span>👤 适用：个人自查 / 周易大师后台评估</span>
+        <span>📖 依据：滴天髓·子平真诠·黄帝内经</span>
+      </div>
     </div>
 
     <div class="hcd-input">
@@ -44,9 +48,9 @@
       <label>出生时<input type="number" id="hcdHour" value="14" min="0" max="23" aria-label="出生时"></label>
       <label>性别<select id="hcdGender" aria-label="性别"><option value="male">男</option><option value="female">女</option></select></label>
       <button onclick="hcdCalculate()">🔮 排盘分析</button>
-      <button onclick="hcdPrint()">🖨 打印</button>
+      <button onclick="hcdPrint()">🖨 打印报告</button>
     </div>
-    <p style="font-size:11px;opacity:.5;text-align:center;margin:4px 0 12px">基于后端八字排盘引擎 · 日主五行+十神+神煞+大运真实计算</p>
+    <p style="font-size:11px;opacity:.5;text-align:center;margin:4px 0 12px">输入生辰后自动调用排盘引擎，生成日主五行→脏腑健康+事业方向的量化分析</p>
 
     <div id="hcdResult"></div>
 
