@@ -21,6 +21,8 @@ const SHELL_ASSETS = [
   './divination-hub.html',
   './index.html',
   './manifest.json',
+  './robots.txt',
+  './sitemap.xml',
   OFFLINE_URL,
   // 核心 CSS
   './css/critical-divhub.css',
