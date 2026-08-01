@@ -1,8 +1,8 @@
 // ================================================================
-// R89-L · 命理宝鉴 Service Worker v4（离线可用 · 缓存策略升级）
+// R89-L · 命理宝鉴 Service Worker v5（离线可用 · 缓存策略升级）
 // ================================================================
 // 升级点：
-//   1. CACHE_NAME v4 · 同步旧 v3 兼容删除
+//   1. CACHE_NAME v5 · 同步旧 v3 兼容删除
 //   2. SHELL_ASSETS 扩展 17 → 30+（覆盖 AI 助手/黄历/KB图谱等核心入口）
 //   3. 增加 OFFLINE_FALLBACK 页面（offline.html）
 //   4. fetch 策略分级：
@@ -12,7 +12,7 @@
 //   5. 新增 'sync' 占位事件（离线排盘排队 → 上线同步）
 // ================================================================
 
-const CACHE_NAME = 'mingli-baojian-v4-2026-07-27';
+const CACHE_NAME = 'mingli-baojian-v5-2026-08-01';
 const CACHE_RUNTIME = 'mingli-baojian-runtime-v4';
 const OFFLINE_URL = './offline.html';
 
