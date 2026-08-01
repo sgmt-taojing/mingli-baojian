@@ -125,7 +125,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
     <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
       <p>📷 点击或拖拽上传体检报告图片</p>
       <p style="font-size:11px">支持 JPG / PNG / WEBP（≤10MB）</p>
-      <input type="file" id="fileInput" accept="image/*" style="display:none">
+      <input aria-label="输入" type="file" id="fileInput" accept="image/*" style="display:none">
       <img loading="lazy" id="preview">
     </div>
     <div class="btn-row">
@@ -142,24 +142,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
   <div class="tab-content" id="tab-manual">
     <div class="input-grid">
       <div class="input-row">
-        <div class="input-group"><label>血压 (mmHg)</label><input id="m-bp" placeholder="如：120/80"></div>
-        <div class="input-group"><label>心率 (bpm)</label><input id="m-hr" placeholder="如：72"></div>
-        <div class="input-group"><label>空腹血糖 (mmol/L)</label><input id="m-glu" placeholder="如：5.2"></div>
+        <div class="input-group"><label>血压 (mmHg)</label><input aria-label="m bp" id="m-bp" placeholder="如：120/80"></div>
+        <div class="input-group"><label>心率 (bpm)</label><input aria-label="m hr" id="m-hr" placeholder="如：72"></div>
+        <div class="input-group"><label>空腹血糖 (mmol/L)</label><input aria-label="m glu" id="m-glu" placeholder="如：5.2"></div>
       </div>
       <div class="input-row">
-        <div class="input-group"><label>总胆固醇</label><input id="m-tc" placeholder="如：4.5"></div>
-        <div class="input-group"><label>甘油三酯</label><input id="m-tg" placeholder="如：1.2"></div>
-        <div class="input-group"><label>LDL-C</label><input id="m-ldl" placeholder="如：2.8"></div>
+        <div class="input-group"><label>总胆固醇</label><input aria-label="m tc" id="m-tc" placeholder="如：4.5"></div>
+        <div class="input-group"><label>甘油三酯</label><input aria-label="m tg" id="m-tg" placeholder="如：1.2"></div>
+        <div class="input-group"><label>LDL-C</label><input aria-label="m ldl" id="m-ldl" placeholder="如：2.8"></div>
       </div>
       <div class="input-row">
-        <div class="input-group"><label>ALT (U/L)</label><input id="m-alt" placeholder="如：25"></div>
-        <div class="input-group"><label>AST (U/L)</label><input id="m-ast" placeholder="如：22"></div>
-        <div class="input-group"><label>尿酸 (μmol/L)</label><input id="m-ua" placeholder="如：320"></div>
+        <div class="input-group"><label>ALT (U/L)</label><input aria-label="m alt" id="m-alt" placeholder="如：25"></div>
+        <div class="input-group"><label>AST (U/L)</label><input aria-label="m ast" id="m-ast" placeholder="如：22"></div>
+        <div class="input-group"><label>尿酸 (μmol/L)</label><input aria-label="m ua" id="m-ua" placeholder="如：320"></div>
       </div>
       <div class="input-row">
-        <div class="input-group"><label>血红蛋白</label><input id="m-hgb" placeholder="如：135"></div>
-        <div class="input-group"><label>白细胞</label><input id="m-wbc" placeholder="如：6.5"></div>
-        <div class="input-group"><label>血小板</label><input id="m-plt" placeholder="如：200"></div>
+        <div class="input-group"><label>血红蛋白</label><input aria-label="m hgb" id="m-hgb" placeholder="如：135"></div>
+        <div class="input-group"><label>白细胞</label><input aria-label="m wbc" id="m-wbc" placeholder="如：6.5"></div>
+        <div class="input-group"><label>血小板</label><input aria-label="m plt" id="m-plt" placeholder="如：200"></div>
       </div>
     </div>
     <div class="btn-row">
@@ -181,9 +181,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
       <button class="quick-btn" onclick="setBlood('plt', 60)">🔴 血小板偏低</button>
     </div>
     <div class="input-row" style="margin-top:14px">
-      <div class="input-group"><label>血红蛋白 (g/L)</label><input id="b-hgb"></div>
-      <div class="input-group"><label>白细胞 (×10⁹/L)</label><input id="b-wbc"></div>
-      <div class="input-group"><label>血小板 (×10⁹/L)</label><input id="b-plt"></div>
+      <div class="input-group"><label>血红蛋白 (g/L)</label><input aria-label="b hgb" id="b-hgb"></div>
+      <div class="input-group"><label>白细胞 (×10⁹/L)</label><input aria-label="b wbc" id="b-wbc"></div>
+      <div class="input-group"><label>血小板 (×10⁹/L)</label><input aria-label="b plt" id="b-plt"></div>
     </div>
     <div class="btn-row">
       <button class="btn" onclick="doBloodInterpret()">🔮 解读血常规</button>

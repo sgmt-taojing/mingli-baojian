@@ -213,7 +213,7 @@ tr.selected{background:rgba(201,168,76,.08)}
 
     <table>
       <thead><tr>
-        <th class="checkbox-cell"><input type="checkbox" id="selectAll" onchange="toggleAll(this)"></th>
+        <th class="checkbox-cell"><input aria-label="selectAll" type="checkbox" id="selectAll" onchange="toggleAll(this)"></th>
         <th>ID</th><th>类别</th><th>优先级</th><th>标题</th><th>用户</th><th>状态</th><th>标签</th><th>时间</th><th>操作</th>
       </tr></thead>
       <tbody id="ticketsBody"></tbody>
@@ -224,7 +224,7 @@ tr.selected{background:rgba(201,168,76,.08)}
   <!-- Tab 3: 搜索 -->
   <div class="tab-content" id="tab-search">
     <div class="filters">
-      <input type="text" id="searchInput" placeholder="搜索标题、内容、回复、用户名..." onkeydown="if(event.key==='Enter')doSearch()">
+      <input aria-label="搜索" type="text" id="searchInput" placeholder="搜索标题、内容、回复、用户名..." onkeydown="if(event.key==='Enter')doSearch()">
       <button class="btn-primary" onclick="doSearch()" style="padding:6px 16px;border:none;border-radius:6px;cursor:pointer">搜索</button>
     </div>
     <div id="searchResults"></div>
@@ -407,7 +407,7 @@ function loadTickets() {
       document.getElementById('ticketsBody').innerHTML = r.data.tickets.map(function(t) {
         var checked = selectedIds.has(t.id) ? 'checked' : '';
         return '<tr>' +
-          '<td class="checkbox-cell"><input type="checkbox" data-id="'+t.id+'" '+checked+' onchange="toggleSelect('+t.id+',this.checked)"></td>' +
+          '<td class="checkbox-cell"><input aria-label="'+t.id+'" type="checkbox" data-id="'+t.id+'" '+checked+' onchange="toggleSelect('+t.id+',this.checked)"></td>' +
           '<td>#'+t.id+'</td>' +
           '<td>'+(catIcons[t.category]||'')+' '+(t.category||'').substring(0,6)+'</td>' +
           '<td>'+(priIcons[t.priority]||'')+'</td>' +
@@ -537,7 +537,7 @@ function renderTagInput() {
   var box = document.getElementById('tagInput');
   box.innerHTML = ticketTags.map(function(tag, i) {
     return '<span class="tag-chip">'+tag+' <span class="tag-remove" onclick="removeTag('+i+')">✕</span></span>';
-  }).join('') + '<input type="text" id="tagInputField" placeholder="输入标签后回车" style="border:none;background:transparent;color:var(--text);font-size:12px;outline:none;flex:1;min-width:80px" onkeydown="if(event.key===\'Enter\'){addTag(this.value);this.value=\'\';}">';
+  }).join('') + '<input aria-label="输入" type="text" id="tagInputField" placeholder="输入标签后回车" style="border:none;background:transparent;color:var(--text);font-size:12px;outline:none;flex:1;min-width:80px" onkeydown="if(event.key===\'Enter\'){addTag(this.value);this.value=\'\';}">';
 }
 function addTag(tag) {
   tag = tag.trim();

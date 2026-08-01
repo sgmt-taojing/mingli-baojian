@@ -100,17 +100,17 @@ renderBar();
 var a=document.getElementById('app');
 if(step===1){
 a.innerHTML='<div class="card"><div class="card-title">'+steps[0].t+'</div>'+
-'<div class="row"><div class="form-group"><label>姓名/称呼</label><input id="name" placeholder="如：李先生"></div><div class="form-group"><label>性别</label><select id="sex"><option value="男">男</option><option value="女">女</option></select></div></div>'+
-'<div class="row"><div class="form-group"><label>年龄</label><input id="age" type="number" placeholder="35"></div><div class="form-group"><label>身高/体重</label><input id="hw" placeholder="175cm/70kg"></div></div>'+
-'<div class="form-group"><label>现居地</label><input id="residence" placeholder="如：浙江杭州"></div>'+
+'<div class="row"><div class="form-group"><label>姓名/称呼</label><input aria-label="姓名" id="name" placeholder="如：李先生"></div><div class="form-group"><label>性别</label><select id="sex"><option value="男">男</option><option value="女">女</option></select></div></div>'+
+'<div class="row"><div class="form-group"><label>年龄</label><input aria-label="age" id="age" type="number" placeholder="35"></div><div class="form-group"><label>身高/体重</label><input aria-label="hw" id="hw" placeholder="175cm/70kg"></div></div>'+
+'<div class="form-group"><label>现居地</label><input aria-label="residence" id="residence" placeholder="如：浙江杭州"></div>'+
 '<div class="form-group"><label>职业类型</label><select id="occupation"><option value="脑力">脑力劳动(办公/管理)</option><option value="体力">体力劳动</option><option value="混合">脑力+体力</option><option value="退休">退休</option><option value="学生">学生</option></select></div>'+
 '<div class="form-group"><label>运动习惯</label><select id="exercise"><option value="无">几乎不运动</option><option value="偶尔">偶尔散步</option><option value="每周">每周2-3次</option><option value="每天">每天运动</option></select></div>'+
 '<button class="btn" onclick="next()">下一步</button></div>';
 }else if(step===2){
 a.innerHTML='<div class="card"><div class="card-title">'+steps[1].t+'</div>'+
 '<div class="hint">💡 健康预测需要出生时间进行先天体质分析，信息越准确预测越精准</div>'+
-'<div class="row"><div class="form-group"><label>出生日期(公历)</label><input id="birth_date" type="date"></div><div class="form-group"><label>出生时辰</label><select id="birth_hour"><option value="">大约</option><option value="0">子时(23-1点)</option><option value="2">丑时(1-3点)</option><option value="4">寅时(3-5点)</option><option value="6">卯时(5-7点)</option><option value="8">辰时(7-9点)</option><option value="10">巳时(9-11点)</option><option value="12">午时(11-13点)</option><option value="14">未时(13-15点)</option><option value="16">申时(15-17点)</option><option value="18">酉时(17-19点)</option><option value="20">戌时(19-21点)</option><option value="22">亥时(21-23点)</option></select></div></div>'+
-'<div class="row"><div class="form-group"><label>出生地</label><input id="birthplace" placeholder="省+市(真太阳时修正)"></div><div class="form-group"><label>是否早产</label><select id="preterm"><option value="否">否</option><option value="是">是(提前__周)</option></select></div></div>'+
+'<div class="row"><div class="form-group"><label>出生日期(公历)</label><input aria-label="日期" id="birth_date" type="date"></div><div class="form-group"><label>出生时辰</label><select id="birth_hour"><option value="">大约</option><option value="0">子时(23-1点)</option><option value="2">丑时(1-3点)</option><option value="4">寅时(3-5点)</option><option value="6">卯时(5-7点)</option><option value="8">辰时(7-9点)</option><option value="10">巳时(9-11点)</option><option value="12">午时(11-13点)</option><option value="14">未时(13-15点)</option><option value="16">申时(15-17点)</option><option value="18">酉时(17-19点)</option><option value="20">戌时(19-21点)</option><option value="22">亥时(21-23点)</option></select></div></div>'+
+'<div class="row"><div class="form-group"><label>出生地</label><input aria-label="出生日期" id="birthplace" placeholder="省+市(真太阳时修正)"></div><div class="form-group"><label>是否早产</label><select id="preterm"><option value="否">否</option><option value="是">是(提前__周)</option></select></div></div>'+
 '<button class="btn" onclick="next()">下一步</button></div>';
 }else if(step===3){
 a.innerHTML='<div class="card"><div class="card-title">'+steps[2].t+'</div>'+
@@ -135,10 +135,10 @@ a.innerHTML='<div class="card"><div class="card-title">'+steps[2].t+'</div>'+
 }else if(step===4){
 a.innerHTML='<div class="card"><div class="card-title">'+steps[3].t+'</div>'+
 '<div class="hint">如有近期体检报告请填写，没有可跳过</div>'+
-'<div class="row"><div class="form-group"><label>血压</label><input id="bp" placeholder="如：120/80"></div><div class="form-group"><label>心率</label><input id="hr" type="number" placeholder="如：72"></div></div>'+
-'<div class="row"><div class="form-group"><label>血糖(空腹)</label><input id="glucose" placeholder="如：5.2"></div><div class="form-group"><label>血脂</label><input id="lipid" placeholder="如：正常/偏高"></div></div>'+
-'<div class="row"><div class="form-group"><label>肝功能</label><input id="liver" placeholder="如：正常"></div><div class="form-group"><label>肾功能</label><input id="kidney" placeholder="如：正常"></div></div>'+
-'<div class="form-group"><label>血常规</label><input id="cbc" placeholder="如：正常/贫血/白细胞偏高"></div>'+
+'<div class="row"><div class="form-group"><label>血压</label><input aria-label="bp" id="bp" placeholder="如：120/80"></div><div class="form-group"><label>心率</label><input aria-label="hr" id="hr" type="number" placeholder="如：72"></div></div>'+
+'<div class="row"><div class="form-group"><label>血糖(空腹)</label><input aria-label="glucose" id="glucose" placeholder="如：5.2"></div><div class="form-group"><label>血脂</label><input aria-label="lipid" id="lipid" placeholder="如：正常/偏高"></div></div>'+
+'<div class="row"><div class="form-group"><label>肝功能</label><input aria-label="liver" id="liver" placeholder="如：正常"></div><div class="form-group"><label>肾功能</label><input aria-label="kidney" id="kidney" placeholder="如：正常"></div></div>'+
+'<div class="form-group"><label>血常规</label><input aria-label="cbc" id="cbc" placeholder="如：正常/贫血/白细胞偏高"></div>'+
 '<div class="form-group"><label>影像检查(CT/B超/X光)</label><textarea id="imaging" placeholder="如：胸部CT正常/腹部B超脂肪肝"></textarea></div>'+
 '<div class="form-group"><label>其他检查</label><textarea id="other_exam" placeholder="如：幽门螺杆菌阳性/HPV阳性"></textarea></div>'+
 '<div class="form-group"><label>正在服用的药物</label><textarea id="medications" placeholder="如：降压药缬沙坦80mg/日"></textarea></div>'+
