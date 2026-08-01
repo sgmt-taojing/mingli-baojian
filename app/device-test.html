@@ -208,7 +208,7 @@ async function enumDevices() {
 
 // 4. 摄像头测试
 async function testCamera() {
-  if (!hasUser) { alert('浏览器不支持'); return; }
+  if (!hasUser) { console.warn('浏览器不支持'); return; }
   try {
     camStream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 }, audio: false });
     const video = document.getElementById('cam-video');
@@ -270,7 +270,7 @@ function snapPhoto() {
 
 // 5. 麦克风测试
 async function testMic() {
-  if (!hasUser) { alert('浏览器不支持'); return; }
+  if (!hasUser) { console.warn('浏览器不支持'); return; }
   try {
     micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
