@@ -85,11 +85,11 @@ h3{font-size:.95rem;color:var(--yellow);margin:12px 0 6px}
 
 <a href="divination-hub.html" style="position:fixed;top:12px;left:12px;z-index:9999;padding:8px 14px;background:#c9a227;color:#fff;border-radius:20px;font-size:12px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.15);opacity:.85">← 首页</a>
 <div class="container">
-<h1>🔮 跨维度联动报告</h1>
+<h1>卦 跨维度联动报告</h1>
 <p style="text-align:center;font-size:.8rem;opacity:.6;margin-bottom:16px">流年 × 流月 × 大运 · 三维联动 · 40/30/30 加权</p>
 
 <div class="input-card">
-<h3>📋 输入信息</h3>
+<h3>表 输入信息</h3>
 <div class="input-row">
   <label>出生年</label><input type="number" id="inpYear" aria-label="年" value="1990" min="1900" max="2100">
   <label>月</label><input type="number" id="inpMonth" aria-label="月" value="1" min="1" max="12">
@@ -111,15 +111,15 @@ h3{font-size:.95rem;color:var(--yellow);margin:12px 0 6px}
   <label>目标年</label><input type="number" id="inpTargetYear" aria-label="目标年" value="2026" min="2024" max="2100">
   <label>目标月</label><input type="number" id="inpTargetMonth" aria-label="目标月" value="7" min="1" max="12">
 </div>
-<button class="btn" id="genBtn" onclick="generate()" style="width:100%;margin-top:8px">🔮 生成三维联动报告</button>
+<button class="btn" id="genBtn" onclick="generate()" style="width:100%;margin-top:8px">卦 生成三维联动报告</button>
 </div>
 <!-- R95 -->
 <div class="cross-nav" style="background:var(--ink2);border:1px solid var(--gold-dim);border-radius:8px;padding:12px;margin-bottom:14px">
-  <div style="font-size:.85rem;color:var(--gold);margin-bottom:8px">🔀 跳转到其他报告</div>
+  <div style="font-size:.85rem;color:var(--gold);margin-bottom:8px">跳转到其他报告</div>
   <div style="display:flex;gap:6px;flex-wrap:wrap">
-    <button class="btn" onclick="LifeflowShare.gotoWithForm('lifeflow-timeline.html')" style="font-size:.8rem;padding:6px 12px">🌐 终身三维滚动</button>
-    <button class="btn" onclick="LifeflowShare.gotoWithForm('monthly-report.html')" style="font-size:.8rem;padding:6px 12px;background:linear-gradient(135deg,#3b82f6,#2563eb)">📅 逐月报告</button>
-    <button class="btn" onclick="LifeflowShare.gotoWithForm('lifeplan-detail.html')" style="font-size:.8rem;padding:6px 12px;background:linear-gradient(135deg,#10b981,#059669)">🗺️ 人生规划</button>
+    <button class="btn" onclick="LifeflowShare.gotoWithForm('lifeflow-timeline.html')" style="font-size:.8rem;padding:6px 12px">网 终身三维滚动</button>
+    <button class="btn" onclick="LifeflowShare.gotoWithForm('monthly-report.html')" style="font-size:.8rem;padding:6px 12px;background:linear-gradient(135deg,#3b82f6,#2563eb)">历 逐月报告</button>
+    <button class="btn" onclick="LifeflowShare.gotoWithForm('lifeplan-detail.html')" style="font-size:.8rem;padding:6px 12px;background:linear-gradient(135deg,#10b981,#059669)">图 人生规划</button>
   </div>
 </div>
 
@@ -171,26 +171,26 @@ h3{font-size:.95rem;color:var(--yellow);margin:12px 0 6px}
       var r = result.data;
       var html = '';
       html += '<div class="result-card">';
-      html += '<h2>🔮 综合判定' + overallBadge(r.overall) + '</h2>';
+      html += '<h2>卦 综合判定' + overallBadge(r.overall) + '</h2>';
       html += '<div class="score-bar"><div class="score-fill" style="width:' + r.tripleScore + '%"></div><div class="score-label">' + r.tripleScore + ' / 100</div></div>';
       html += '<p style="font-size:.85rem;opacity:.7">' + esc(r.title) + ' · 日主 ' + esc(r.userEle) + '命 <span class="kb-badge">KB 命中 ' + r.kbHits + ' 条</span></p>';
-      html += '<div class="lucky">🎯 趋吉方位：' + esc(r.luckyMap) + '</div>';
+      html += '<div class="lucky">标 趋吉方位：' + esc(r.luckyMap) + '</div>';
       html += '</div>';
 
       // 三运详情
       html += '<div class="result-card">';
-      html += '<h2>🌊 三维度详情</h2>';
+      html += '<h2>海 三维度详情</h2>';
       html += '<div class="triple-grid">';
-      html += '<div class="triple-card"><div class="label">🌙 流月</div><div class="value">' + esc(r.currentMonth.name) + ' · ' + esc(r.currentMonth.element) + '</div><div class="status">' + statusBadge(r.currentMonth.status) + ' ' + r.currentMonth.score + '分</div></div>';
-      html += '<div class="triple-card"><div class="label">📅 流年</div><div class="value">' + esc(r.currentLiunian.ganzhi) + ' · ' + esc(r.currentLiunian.element) + '</div><div class="status">' + statusBadge(r.currentLiunian.status) + ' ' + r.currentLiunian.score + '分</div></div>';
-      html += '<div class="triple-card"><div class="label">🚀 大运</div><div class="value">' + esc(r.currentDayun.ganzhi) + ' · ' + esc(r.currentDayun.element) + '</div><div class="status">' + statusBadge(r.currentDayun.status) + ' ' + r.currentDayun.score + '分</div></div>';
+      html += '<div class="triple-card"><div class="label">夜 流月</div><div class="value">' + esc(r.currentMonth.name) + ' · ' + esc(r.currentMonth.element) + '</div><div class="status">' + statusBadge(r.currentMonth.status) + ' ' + r.currentMonth.score + '分</div></div>';
+      html += '<div class="triple-card"><div class="label">历 流年</div><div class="value">' + esc(r.currentLiunian.ganzhi) + ' · ' + esc(r.currentLiunian.element) + '</div><div class="status">' + statusBadge(r.currentLiunian.status) + ' ' + r.currentLiunian.score + '分</div></div>';
+      html += '<div class="triple-card"><div class="label">发 大运</div><div class="value">' + esc(r.currentDayun.ganzhi) + ' · ' + esc(r.currentDayun.element) + '</div><div class="status">' + statusBadge(r.currentDayun.status) + ' ' + r.currentDayun.score + '分</div></div>';
       html += '</div>';
       html += '<div style="font-size:.7rem;opacity:.5;margin-top:4px">加权：流月40% + 流年30% + 大运30%</div>';
       html += '</div>';
 
       // 四维度评分
       html += '<div class="result-card">';
-      html += '<h2>📊 四维度评分</h2>';
+      html += '<h2>图 四维度评分</h2>';
       html += '<div class="dim-grid">';
       ['career','wealth','love','health'].forEach(function(d){
         var label = {career:'事业',wealth:'财运',love:'感情',health:'健康'}[d];
@@ -201,7 +201,7 @@ h3{font-size:.95rem;color:var(--yellow);margin:12px 0 6px}
 
       // 行动指引
       html += '<div class="result-card">';
-      html += '<h2>💡 行动指引</h2>';
+      html += '<h2>示 行动指引</h2>';
       html += '<ol class="advice-list">';
       (r.advices || []).forEach(function(a){ html += '<li>' + esc(a) + '</li>'; });
       html += '</ol>';
@@ -209,7 +209,7 @@ h3{font-size:.95rem;color:var(--yellow);margin:12px 0 6px}
 
       // 明年预览
       html += '<div class="next-year">';
-      html += '<h4>📅 明年预览 (' + (r.targetYear + 1) + '年 ' + esc(r.nextYearPreview.ganzhi) + ' ' + esc(r.nextYearPreview.element) + ')</h4>';
+      html += '<h4>历 明年预览 (' + (r.targetYear + 1) + '年 ' + esc(r.nextYearPreview.ganzhi) + ' ' + esc(r.nextYearPreview.element) + ')</h4>';
       html += statusBadge(r.nextYearPreview.status) + ' ' + r.nextYearPreview.score + '分 · ' + esc(r.nextYearPreview.advice);
       html += '</div>';
 
@@ -222,7 +222,7 @@ h3{font-size:.95rem;color:var(--yellow);margin:12px 0 6px}
       area.scrollIntoView({behavior:'smooth'});
     } catch(e) {
       var errArea = document.getElementById('resultArea');
-      errArea.innerHTML = '<div class="result-card" style="border-color:var(--red);color:var(--red)">❌ ' + esc(e.message) + '<br><br><button class="btn" onclick="generateOffline()">📦 使用本地 KB 兜底</button></div>';
+      errArea.innerHTML = '<div class="result-card" style="border-color:var(--red);color:var(--red)">败 ' + esc(e.message) + '<br><br><button class="btn" onclick="generateOffline()">箱 使用本地 KB 兜底</button></div>';
       errArea.style.display = 'block';
     } finally {
       btn.disabled = false; btn.textContent = '🔮 生成三维联动报告';
@@ -243,7 +243,7 @@ h3{font-size:.95rem;color:var(--yellow);margin:12px 0 6px}
       s4: (parseInt(document.getElementById('inpTargetYear').value) || 2026) - (parseInt(document.getElementById('inpYear').value) || 1990)
     };
     var r = window._MODULE_REPORTS.lifeflow.diagnose(data);
-    var html = '<div class="result-card"><h2>📦 本地 KB 兜底</h2><div style="white-space:pre-wrap;font-size:.85rem;line-height:1.8">' + esc(r.html) + '</div></div>';
+    var html = '<div class="result-card"><h2>箱 本地 KB 兜底</h2><div style="white-space:pre-wrap;font-size:.85rem;line-height:1.8">' + esc(r.html) + '</div></div>';
     var area = document.getElementById('resultArea');
     area.innerHTML = html;
     area.style.display = 'block';

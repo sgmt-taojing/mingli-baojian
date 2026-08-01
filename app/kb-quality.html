@@ -115,7 +115,7 @@ h1{font-size:1.6rem;color:var(--gold);text-align:center;margin:20px 0 4px}
 <a href="divination-hub.html" style="position:fixed;top:12px;left:12px;z-index:9999;padding:8px 14px;background:var(--gold,#c9a227);color:#fff;border-radius:20px;font-size:12px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.15);opacity:.85">← 首页</a>
 
 <div class="wrap">
-<h1>📊 KB 知识库质量审计</h1>
+<h1>图 KB 知识库质量审计</h1>
 <p class="sub" id="sub">加载中…</p>
 
 <div class="summary" id="summary"></div>
@@ -141,16 +141,16 @@ h1{font-size:1.6rem;color:var(--gold);text-align:center;margin:20px 0 4px}
 <div class="grid" id="grid"></div>
 </div>
 
-<button class="export-btn" onclick="exportCSV()">📥 导出 CSV</button>
-<button class="refresh" onclick="load()" title="刷新">🔄</button>
+<button class="export-btn" onclick="exportCSV()">入 导出 CSV</button>
+<button class="refresh" onclick="load()" title="刷新">更</button>
 <dialog id="modal" class="modal-bg" aria-label="模块详情">
   <div class="modal">
     <button class="close" onclick="closeModal()">×</button>
     <h3 id="modalTitle"></h3>
     <div id="modalStats" class="stats-row"></div>
     <div style="display:flex;gap:8px;margin:16px 0 8px;border-bottom:1px solid var(--gold-dim)">
-      <button class="tab-btn active" data-tab="samples" onclick="switchTab('samples')">📋 样本</button>
-      <button class="tab-btn" data-tab="detail" onclick="switchTab('detail')">📊 Trust 分布</button>
+      <button class="tab-btn active" data-tab="samples" onclick="switchTab('samples')">表 样本</button>
+      <button class="tab-btn" data-tab="detail" onclick="switchTab('detail')">图 Trust 分布</button>
     </div>
     <div id="tab-samples">
       <div id="modalSamples"></div>
@@ -251,7 +251,7 @@ function renderGovernance(s){
     govEl=document.createElement('div');
     govEl.id='govPanel';
     govEl.style.cssText='margin:20px 0;padding:16px;background:rgba(13,17,23,.5);border:1px solid rgba(201,168,76,.1);border-radius:12px';
-    govEl.innerHTML='<h2 style="font-size:14px;font-weight:600;color:#c9a84c;margin:0 0 12px;border-bottom:1px solid rgba(201,168,76,.1);padding-bottom:8px">🛡️ 治理建议</h2><div id="govList">'+html+'</div>';
+    govEl.innerHTML='<h2 style="font-size:14px;font-weight:600;color:#c9a84c;margin:0 0 12px;border-bottom:1px solid rgba(201,168,76,.1);padding-bottom:8px">盾 治理建议</h2><div id="govList">'+html+'</div>';
     // 插入到 distro 后
     const distro=document.getElementById('distro');
     if(distro && distro.nextSibling) distro.parentNode.insertBefore(govEl, distro.nextSibling);
@@ -290,7 +290,7 @@ function render(){
       <div class="mod-meta">
         <span><b>${fmt(m.cnt)}</b> 条目</span>
         <span>trust <b>${m.avg_trust}</b></span>
-        <span>🥇${m.gold} 🥈${m.silver} 🥉${m.bronze}${m.needs_fix?' ⚠'+m.needs_fix:''}</span>
+        <span>金${m.gold} 🥈${m.silver} 🥉${m.bronze}${m.needs_fix?' ⚠'+m.needs_fix:''}</span>
       </div>
     </button>`;
   }).join('')||'<p style="color:#888;text-align:center;grid-column:1/-1">无匹配模块</p>';
@@ -306,9 +306,9 @@ function showDetail(mod){
   document.getElementById('modalKbGraphLink').href=`kb-graph.html#module=${encodeURIComponent(mod)}`;
   document.getElementById('modalTitle').textContent=`${m.module} · ${m.grade}`;
   document.getElementById('modalStats').innerHTML=`
-    <span>📊 <b>${fmt(m.cnt)}</b> 条目</span>
-    <span>🎯 trust <b>${m.avg_trust}</b></span>
-    <span>🥇 <b>${m.gold}</b> 🥈 <b>${m.silver}</b> 🥉 <b>${m.bronze}</b>${m.needs_fix?' ⚠<b>'+m.needs_fix+'</b>':''}</span>
+    <span>图 <b>${fmt(m.cnt)}</b> 条目</span>
+    <span>标 trust <b>${m.avg_trust}</b></span>
+    <span>金 <b>${m.gold}</b> 🥈 <b>${m.silver}</b> 🥉 <b>${m.bronze}</b>${m.needs_fix?' ⚠<b>'+m.needs_fix+'</b>':''}</span>
     <span>↕ min <b>${m.min_trust?.toFixed(2)||'-'}</b> / max <b>${m.max_trust?.toFixed(2)||'-'}</b></span>
   `;
   document.getElementById('modalSamples').innerHTML='<p style="color:#888">加载中…</p>';
@@ -349,11 +349,11 @@ function showDetail(mod){
       const topHtml=d.topTrust.map(e=>`<div class="row high"><div class="title">${esc(e.title||e.entry_id)}</div><div class="score">${e.trust_score?.toFixed(2)||'-'}</div></div>`).join('');
       const lowHtml=d.lowTrust.map(e=>`<div class="row low"><div class="title">${esc(e.title||e.entry_id)}</div><div class="score">${e.trust_score?.toFixed(2)||'-'}</div></div>`).join('');
       document.getElementById('modalDetail').innerHTML=`
-        <h4 style="color:#aaa;font-size:.85rem;margin:12px 0 8px">📊 Trust 分布（共 ${fmt(total)} 条）</h4>
+        <h4 style="color:#aaa;font-size:.85rem;margin:12px 0 8px">图 Trust 分布（共 ${fmt(total)} 条）</h4>
         ${distroHtml}
-        <h4 style="color:#aaa;font-size:.85rem;margin:16px 0 8px">🏆 Trust Top 5</h4>
+        <h4 style="color:#aaa;font-size:.85rem;margin:16px 0 8px">冠 Trust Top 5</h4>
         <div class="trust-list">${topHtml}</div>
-        <h4 style="color:#aaa;font-size:.85rem;margin:16px 0 8px">⚠️ Trust Bottom 5</h4>
+        <h4 style="color:#aaa;font-size:.85rem;margin:16px 0 8px">警 Trust Bottom 5</h4>
         <div class="trust-list">${lowHtml}</div>`;
     })
     .catch(err=>{

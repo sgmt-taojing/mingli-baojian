@@ -35,35 +35,35 @@
   <a class="skip-link" href="#main-content">跳到主内容</a>
 <main id="main-content" role="main">
 <div class="container">
-<h1>🛠️ KB 批量管理 · R45-A</h1>
+<h1>工️ KB 批量管理 · R45-A</h1>
 <div class="sub">知识库批量操作 · 紫微 12 宫 · 八字十神 · 化解古籍 · R316 修真 + RBAC</div>
 
 <!-- R316: token 登录 -->
 <div class="row" style="margin:12px 0;padding:12px;background:var(--bg-2);border-radius:8px">
   <input id="tokenInput" placeholder="Admin Token (header Authorization)" aria-label="Admin Token" style="flex:1;padding:8px;border:1px solid var(--line);border-radius:4px">
-  <button class="btn" onclick="saveToken()" aria-label="保存管理Token">💾 保存</button>
+  <button class="btn" onclick="saveToken()" aria-label="保存管理Token">存 保存</button>
   <span id="tokenStatus" style="font-size:12px;color:var(--ink-3)"></span>
 </div>
 
 <!-- R316: KB 搜索 -->
 <div class="row" style="margin:12px 0">
   <input id="searchInput" placeholder="🔍 检索 KB 条目 (≥2 字)" aria-label="检索 KB" style="flex:1">
-  <button class="btn" onclick="doSearch()" aria-label="检索知识库条目">🔍 检索</button>
+  <button class="btn" onclick="doSearch()" aria-label="检索知识库条目">查 检索</button>
 </div>
 <div id="searchResult" class="log"></div>
 
 <div class="tabs">
-  <div class="tab active" data-tab="stats">📊 总览</div>
-  <div class="tab" data-tab="batch">⚡ 批量操作</div>
-  <div class="tab" data-tab="ingest">📥 批量入库</div>
-  <div class="tab" data-tab="audit">🔍 审计</div>
-  <div class="tab" data-tab="export">📤 导出</div>
+  <div class="tab active" data-tab="stats">图 总览</div>
+  <div class="tab" data-tab="batch">电 批量操作</div>
+  <div class="tab" data-tab="ingest">入 批量入库</div>
+  <div class="tab" data-tab="audit">查 审计</div>
+  <div class="tab" data-tab="export">出 导出</div>
 </div>
 
 <!-- 总览 -->
 <div id="panel-stats" class="panel active">
   <div class="grid" id="statsGrid"></div>
-  <h3 style="color:var(--gold);margin:20px 0 12px">📈 模块分布 Top 12</h3>
+  <h3 style="color:var(--gold);margin:20px 0 12px">升 模块分布 Top 12</h3>
   <table id="modulesTable">
     <thead><tr><th>模块</th><th>条目</th><th>占比</th><th>来源</th></tr></thead>
     <tbody></tbody>
@@ -72,7 +72,7 @@
 
 <!-- 批量操作 -->
 <div id="panel-batch" class="panel">
-  <h3 style="color:var(--gold);margin-bottom:12px">⚡ 批量操作</h3>
+  <h3 style="color:var(--gold);margin-bottom:12px">电 批量操作</h3>
   <div class="row">
     <select id="batchModule" aria-label="选择模块">
       <option value="">-- 选择模块 --</option>
@@ -91,7 +91,7 @@
 
 <!-- 批量入库 -->
 <div id="panel-ingest" class="panel">
-  <h3 style="color:var(--gold);margin-bottom:12px">📥 批量入库</h3>
+  <h3 style="color:var(--gold);margin-bottom:12px">入 批量入库</h3>
   <div class="row">
     <select id="ingestModel" aria-label="选择入库模型">
       <option value="r45_palace">紫微 12 宫</option>
@@ -109,15 +109,15 @@
     <textarea id="ingestText" placeholder="JSON Lines (每行一条: {module, title, content, category, keywords, score})"></textarea>
   </div>
   <div class="row" style="margin-top:12px">
-    <button class="btn" onclick="ingestExecute()" aria-label="批量入库知识条目">📥 入库</button>
-    <button class="btn warn" onclick="ingestGenerate()" aria-label="生成示例知识条目">🤖 生成示例</button>
+    <button class="btn" onclick="ingestExecute()" aria-label="批量入库知识条目">入 入库</button>
+    <button class="btn warn" onclick="ingestGenerate()" aria-label="生成示例知识条目">机 生成示例</button>
   </div>
   <div id="ingestResult" class="log"></div>
 </div>
 
 <!-- 审计 -->
 <div id="panel-audit" class="panel">
-  <h3 style="color:var(--gold);margin-bottom:12px">🔍 KB 审计</h3>
+  <h3 style="color:var(--gold);margin-bottom:12px">查 KB 审计</h3>
   <div class="row">
     <button class="btn" onclick="auditQuality()" aria-label="扫描知识库质量">质量扫描</button>
     <button class="btn warn" onclick="auditDuplicate()" aria-label="检测重复知识条目">重复检测</button>
@@ -128,7 +128,7 @@
 
 <!-- 导出 -->
 <div id="panel-export" class="panel">
-  <h3 style="color:var(--gold);margin-bottom:12px">📤 数据导出</h3>
+  <h3 style="color:var(--gold);margin-bottom:12px">出 数据导出</h3>
   <div class="row">
     <select id="exportModule" aria-label="选择导出模块">
       <option value="">-- 全部 --</option>
@@ -138,7 +138,7 @@
       <option value="csv">CSV</option>
       <option value="sql">SQL</option>
     </select>
-    <button class="btn" onclick="exportData()" aria-label="导出下载知识库数据">📤 下载</button>
+    <button class="btn" onclick="exportData()" aria-label="导出下载知识库数据">出 下载</button>
   </div>
   <div id="exportResult" class="log"></div>
 </div>

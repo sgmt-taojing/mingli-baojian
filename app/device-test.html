@@ -51,12 +51,12 @@ video{max-width:100%;border-radius:8px;background:#000;margin-top:8px}
 </div>
 
 <div class="container">
-  <h1>🔌 设备检测与测试</h1>
+  <h1>充 设备检测与测试</h1>
   <p class="subtitle">检测本机摄像头、麦克风状态，支持实时测试拍照与录音</p>
 
   <!-- 安全上下文 -->
   <div class="card" id="ctx-card">
-    <h2>🔒 安全上下文</h2>
+    <h2>锁 安全上下文</h2>
     <div class="status-row">
       <span class="status-dot" id="ctx-dot"></span>
       <span class="status-label">安全上下文（HTTPS/localhost）</span>
@@ -67,7 +67,7 @@ video{max-width:100%;border-radius:8px;background:#000;margin-top:8px}
 
   <!-- 浏览器支持 -->
   <div class="card">
-    <h2>🌐 浏览器 API 支持</h2>
+    <h2>网 浏览器 API 支持</h2>
     <div class="status-row">
       <span class="status-dot" id="api-media"></span>
       <span class="status-label">navigator.mediaDevices</span>
@@ -87,7 +87,7 @@ video{max-width:100%;border-radius:8px;background:#000;margin-top:8px}
 
   <!-- 摄像头 -->
   <div class="card">
-    <h2>📷 摄像头</h2>
+    <h2>拍 摄像头</h2>
     <div class="status-row">
       <span class="status-dot" id="cam-dot"></span>
       <span class="status-label">摄像头设备</span>
@@ -108,7 +108,7 @@ video{max-width:100%;border-radius:8px;background:#000;margin-top:8px}
 
   <!-- 麦克风 -->
   <div class="card">
-    <h2>🎤 麦克风</h2>
+    <h2>麦 麦克风</h2>
     <div class="status-row">
       <span class="status-dot" id="mic-dot"></span>
       <span class="status-label">麦克风设备</span>
@@ -127,7 +127,7 @@ video{max-width:100%;border-radius:8px;background:#000;margin-top:8px}
 
   <!-- 面诊/舌诊联动 -->
   <div class="card">
-    <h2>🔮 面诊/舌诊联动</h2>
+    <h2>卦 面诊/舌诊联动</h2>
     <div class="status-row">
       <span class="status-dot" id="ocr-dot"></span>
       <span class="status-label">face-ocr-server (端口 8913)</span>
@@ -147,7 +147,7 @@ video{max-width:100%;border-radius:8px;background:#000;margin-top:8px}
   </div>
 
   <div class="card">
-    <h2>📋 总结</h2>
+    <h2>表 总结</h2>
     <div id="summary" style="font-size:14px;line-height:1.8"></div>
   </div>
 </div>
@@ -191,12 +191,12 @@ async function enumDevices() {
     // 摄像头
     setDot('cam', cams.length > 0 ? 'green' : 'red', cams.length > 0 ? '✅ ' + cams.length + ' 个设备' : '❌ 无设备');
     const camList = document.getElementById('cam-list');
-    camList.innerHTML = cams.map(d => '<div class="device-item">📷 ' + (d.label || '未授权（需先测试）') + '</div>').join('');
+    camList.innerHTML = cams.map(d => '<div class="device-item">拍 ' + (d.label || '未授权（需先测试）') + '</div>').join('');
 
     // 麦克风
     setDot('mic', mics.length > 0 ? 'green' : 'red', mics.length > 0 ? '✅ ' + mics.length + ' 个设备' : '❌ 无设备');
     const micList = document.getElementById('mic-list');
-    micList.innerHTML = mics.map(d => '<div class="device-item">🎤 ' + (d.label || '未授权（需先测试）') + '</div>').join('');
+    micList.innerHTML = mics.map(d => '<div class="device-item">麦 ' + (d.label || '未授权（需先测试）') + '</div>').join('');
 
     updateSummary();
   } catch(e) {
@@ -218,7 +218,7 @@ async function testCamera() {
     document.getElementById('cam-snap').style.display = 'inline-block';
     
     const result = document.getElementById('cam-result');
-    result.innerHTML = '<div class="test-result result-ok">✅ 摄像头已启动 — 画面正在显示</div>';
+    result.innerHTML = '<div class="test-result result-ok">成 摄像头已启动 — 画面正在显示</div>';
     
     // 重新枚举（此时 label 可用）
     enumDevices();
@@ -227,7 +227,7 @@ async function testCamera() {
     let msg = e.message;
     if (e.name === 'NotFoundError') msg = '未找到摄像头设备。Mac mini 通常没有内置摄像头，需要外接 USB 摄像头。';
     else if (e.name === 'NotAllowedError') msg = '摄像头权限被拒绝。请在浏览器设置中允许摄像头访问。';
-    result.innerHTML = '<div class="test-result result-err">❌ ' + msg + '</div>';
+    result.innerHTML = '<div class="test-result result-err">败 ' + msg + '</div>';
     document.getElementById('cam-area').classList.add('active');
   }
 }
@@ -260,10 +260,10 @@ function snapPhoto() {
     body: JSON.stringify({ image: dataUrl, type: 'face' })
   }).then(r => r.json()).then(data => {
     document.getElementById('cam-result').innerHTML = 
-      '<div class="test-result result-ok">✅ 拍照成功 — OCR 服务已接收<br>分析结果：' + JSON.stringify(data).substring(0, 200) + '</div>';
+      '<div class="test-result result-ok">成 拍照成功 — OCR 服务已接收<br>分析结果：' + JSON.stringify(data).substring(0, 200) + '</div>';
   }).catch(e => {
     document.getElementById('cam-result').innerHTML = 
-      '<div class="test-result result-warn">⚠️ 拍照成功，但 OCR 服务未响应（端口 8913）<br>拍照数据 ' + Math.round(dataUrl.length / 1024) + 'KB</div>';
+      '<div class="test-result result-warn">警 拍照成功，但 OCR 服务未响应（端口 8913）<br>拍照数据 ' + Math.round(dataUrl.length / 1024) + 'KB</div>';
   });
 }
 
@@ -306,13 +306,13 @@ async function testMic() {
     }
     update();
     
-    document.getElementById('mic-result').innerHTML = '<div class="test-result result-ok">✅ 麦克风已启动 — 请说话，观察音量条变化</div>';
+    document.getElementById('mic-result').innerHTML = '<div class="test-result result-ok">成 麦克风已启动 — 请说话，观察音量条变化</div>';
     enumDevices();
   } catch(e) {
     let msg = e.message;
     if (e.name === 'NotFoundError') msg = '未找到麦克风设备。Mac mini 通常没有内置麦克风，需要外接 USB 麦克风或蓝牙耳机。';
     else if (e.name === 'NotAllowedError') msg = '麦克风权限被拒绝。请在浏览器设置中允许麦克风访问。';
-    document.getElementById('mic-result').innerHTML = '<div class="test-result result-err">❌ ' + msg + '</div>';
+    document.getElementById('mic-result').innerHTML = '<div class="test-result result-err">败 ' + msg + '</div>';
     document.getElementById('mic-area').classList.add('active');
   }
 }
@@ -348,7 +348,7 @@ function updateSummary() {
   html += '麦克风：' + (micOk ? '✅ 可用' : '❌ 不可用') + '<br>';
   
   if (!camOk && !micOk) {
-    html += '<br>⚠️ <strong>本机未检测到摄像头和麦克风</strong><br>';
+    html += '<br>警 <strong>本机未检测到摄像头和麦克风</strong><br>';
     html += 'Mac mini 通常没有内置摄像头/麦克风。解决方案：<br>';
     html += '1. 外接 USB 摄像头（含麦克风）<br>';
     html += '2. 使用蓝牙耳机/麦克风<br>';
@@ -356,7 +356,7 @@ function updateSummary() {
     html += '4. 通过远程桌面（ToDesk）映射远程设备<br>';
     html += '<br>面诊/舌诊功能需要摄像头，语音播报使用服务端 TTS（不依赖麦克风）。';
   } else {
-    html += '<br>✅ 设备就绪，可使用面诊/舌诊/语音功能。';
+    html += '<br>成 设备就绪，可使用面诊/舌诊/语音功能。';
   }
   summary.innerHTML = html;
 }

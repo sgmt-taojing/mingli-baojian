@@ -64,7 +64,7 @@ textarea{resize:vertical;min-height:60px}
 <a href="divination-hub.html" style="position:fixed;top:12px;left:12px;z-index:9999;padding:8px 14px;background:var(--gold,#c9a227);color:#fff;border-radius:20px;font-size:12px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.15);opacity:.85">← 首页</a>
 
 <a href="person-center.html" class="nav-back">← 返回身份中心</a>
-<h1>📋 患者信息采集</h1>
+<h1>表 患者信息采集</h1>
 
 <div class="step-indicator">
 <div class="step-dot active" id="dot1"></div>
@@ -101,7 +101,7 @@ textarea{resize:vertical;min-height:60px}
 <option value="20">晚上（19-21点·戌时）</option>
 <option value="22">夜间（21-23点·亥时）</option>
 </select>
-<div class="hint">💡 体质评估需要出生时间信息，大致时段即可</div>
+<div class="hint">示 体质评估需要出生时间信息，大致时段即可</div>
 </div>
 <div class="form-group"><label>出生地</label><input aria-label="出生日期" id="birthplace" placeholder="如：浙江杭州（用于体质地域评估）"></div>
 <button class="btn" onclick="goStep(2)">下一步：症状描述</button>
@@ -155,7 +155,7 @@ textarea{resize:vertical;min-height:60px}
 </div>
 
 <div id="result" style="display:none">
-<div class="card"><div class="card-title">✅ 信息提交成功</div>
+<div class="card"><div class="card-title">成 信息提交成功</div>
 <div id="result-content" style="font-size:13px;line-height:1.8"></div>
 <a href="person-center.html" class="btn" style="background:var(--card);color:var(--gold);border:1px solid var(--gold)">返回身份中心</a>
 </div>
@@ -201,7 +201,7 @@ fetch(API+'/api/clinic/case',{method:'POST',headers:{'Content-Type':'application
 document.getElementById('step4').style.display='none';
 document.getElementById('result').style.display='block';
 var c=document.getElementById('result-content');
-c.innerHTML='您的诊疗编号：<b>#'+(d.data&&d.data.case_id||'?')+'</b><br><br>系统正在为您安排：<br>🔮 命理大师 — 分析体质与健康状况<br>💉 中医医生 — 综合诊断并开具处方<br><br>请耐心等待，您可以在身份中心查看进度。';
+c.innerHTML='您的诊疗编号：<b>#'+(d.data&&d.data.case_id||'?')+'</b><br><br>系统正在为您安排：<br>卦 命理大师 — 分析体质与健康状况<br>注 中医医生 — 综合诊断并开具处方<br><br>请耐心等待，您可以在身份中心查看进度。';
 }).catch(function(e){
 document.getElementById('step4').style.display='none';
 document.getElementById('result').style.display='block';

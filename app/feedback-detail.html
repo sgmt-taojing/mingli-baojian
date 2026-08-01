@@ -77,9 +77,9 @@ body{font-family:system-ui,-apple-system,'PingFang SC',sans-serif;background:#0d
 </div>
 
 <nav class="nav-bar">
-  <a href="divination-hub.html">🏠 主平台</a>
-  <a href="feedback-center.html">💬 反馈</a>
-  <a href="login.html">🔐 登录</a>
+  <a href="divination-hub.html">主平台</a>
+  <a href="feedback-center.html">反馈</a>
+  <a href="login.html">密 登录</a>
 </nav>
 
 <div class="container" id="app">
@@ -115,7 +115,7 @@ var statusNames = {open:'待处理',in_progress:'处理中',resolved:'已解决'
 var priIcons = {urgent:'🔴 紧急',high:'🟠 高',normal:'🟡 普通',low:'🟢 低'};
 
 if (!ticketId) {
-  document.getElementById('content').innerHTML = '<div class="error-box"><div class="error-icon">❌</div><div class="error-msg">缺少工单ID</div><a href="feedback-center.html" class="back-link">返回反馈列表</a></div>';
+  document.getElementById('content').innerHTML = '<div class="error-box"><div class="error-icon">败</div><div class="error-msg">缺少工单ID</div><a href="feedback-center.html" class="back-link">返回反馈列表</a></div>';
 } else {
   loadTicket();
 }
@@ -129,13 +129,13 @@ function loadTicket() {
     .then(function(r) { return r.json(); })
     .then(function(r) {
       if (r.code !== 0) {
-        document.getElementById('content').innerHTML = '<div class="error-box"><div class="error-icon">🔍</div><div class="error-msg">' + escapeHtml(r.message || '工单不存在') + '</div><a href="feedback-center.html" class="back-link">返回反馈列表</a></div>';
+        document.getElementById('content').innerHTML = '<div class="error-box"><div class="error-icon">查</div><div class="error-msg">' + escapeHtml(r.message || '工单不存在') + '</div><a href="feedback-center.html" class="back-link">返回反馈列表</a></div>';
         return;
       }
       renderTicket(r.data);
     })
     .catch(function(e) {
-      document.getElementById('content').innerHTML = '<div class="error-box"><div class="error-icon">⚠️</div><div class="error-msg">查阅失败：' + escapeHtml(e.message) + '</div></div>';
+      document.getElementById('content').innerHTML = '<div class="error-box"><div class="error-icon">警</div><div class="error-msg">查阅失败：' + escapeHtml(e.message) + '</div></div>';
     });
 }
 
@@ -166,7 +166,7 @@ function renderTicket(t) {
 
   // 内容
   html += '<div class="content-card">';
-  html += '<h2>📝 详细描述</h2>';
+  html += '<h2>记 详细描述</h2>';
   html += '<div class="content-body">' + escapeHtml(t.content) + '</div>';
   if (t.screenshot_path) {
     html += '<div class="screenshot-box"><img loading="lazy" src="' + escapeHtml(t.screenshot_path) + '" onclick="window.open(this.src)" alt="截图"></div>';
@@ -179,14 +179,14 @@ function renderTicket(t) {
   // 后台回复
   if (t.admin_reply) {
     html += '<div class="reply-card">';
-    html += '<h2>💬 官方回复</h2>';
+    html += '<h2>语 官方回复</h2>';
     html += '<div class="reply-body">' + escapeHtml(t.admin_reply) + '</div>';
     if (t.updated_at) {
       html += '<div class="reply-time">' + escapeHtml(t.updated_at) + '</div>';
     }
     html += '</div>';
   } else if (t.status === 'open' || t.status === 'in_progress') {
-    html += '<div class="content-card" style="text-align:center;color:var(--text-muted);font-size:13px">⏳ 我们正在处理您的反馈，请耐心等待...</div>';
+    html += '<div class="content-card" style="text-align:center;color:var(--text-muted);font-size:13px">待 我们正在处理您的反馈，请耐心等待...</div>';
   }
 
   // 评分（已解决的工单）
@@ -194,11 +194,11 @@ function renderTicket(t) {
     html += '<div class="rating-box" id="ratingBox">';
     html += '<div style="font-size:13px;color:var(--gold);margin-bottom:6px">您对处理结果的满意度</div>';
     html += '<div class="rating-stars" id="ratingStars">';
-    html += '<span data-star="1" onclick="rateTicket(1)">⭐</span>';
-    html += '<span data-star="2" onclick="rateTicket(2)">⭐</span>';
-    html += '<span data-star="3" onclick="rateTicket(3)">⭐</span>';
-    html += '<span data-star="4" onclick="rateTicket(4)">⭐</span>';
-    html += '<span data-star="5" onclick="rateTicket(5)">⭐</span>';
+    html += '<span data-star="1" onclick="rateTicket(1)">星</span>';
+    html += '<span data-star="2" onclick="rateTicket(2)">星</span>';
+    html += '<span data-star="3" onclick="rateTicket(3)">星</span>';
+    html += '<span data-star="4" onclick="rateTicket(4)">星</span>';
+    html += '<span data-star="5" onclick="rateTicket(5)">星</span>';
     html += '</div>';
     html += '<div class="rating-label" id="ratingLabel">' + (t.rating ? '已评分 ' + t.rating + ' 星' : '点击星星评分') + '</div>';
     html += '</div>';

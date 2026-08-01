@@ -106,14 +106,14 @@ h1{font-size:20px;color:var(--gold);margin-bottom:6px;display:flex;align-items:c
 </div>
 
 <nav class="nav-bar">
-  <a href="divination-hub.html">🏠 主平台</a>
-  <a href="ai-assistant.html">🤖 智能助手</a>
-  <a href="feedback-center.html" class="active">💬 反馈</a>
-  <a href="login.html">🔐 登录</a>
+  <a href="divination-hub.html">主平台</a>
+  <a href="ai-assistant.html">机 智能助手</a>
+  <a href="feedback-center.html" class="active">反馈</a>
+  <a href="login.html">密 登录</a>
 </nav>
 
 <div class="container">
-  <h1>💬 意见反馈</h1>
+  <h1>语 意见反馈</h1>
   <p class="subtitle">提交问题建议 · 跟踪处理进度 · 帮助我们改进</p>
 
   <!-- 提交表单 -->
@@ -121,21 +121,21 @@ h1{font-size:20px;color:var(--gold);margin-bottom:6px;display:flex;align-items:c
     <div class="form-group">
       <label>问题类别</label>
       <div class="category-grid" id="categoryGrid">
-        <div class="cat-btn selected" data-cat="bug"><span class="cat-icon">🐛</span>Bug反馈</div>
-        <div class="cat-btn" data-cat="suggestion"><span class="cat-icon">💡</span>功能建议</div>
-        <div class="cat-btn" data-cat="question"><span class="cat-icon">❓</span>使用咨询</div>
-        <div class="cat-btn" data-cat="feature_request"><span class="cat-icon">✨</span>新功能</div>
-        <div class="cat-btn" data-cat="praise"><span class="cat-icon">👍</span>好评鼓励</div>
+        <div class="cat-btn selected" data-cat="bug"><span class="cat-icon">虫</span>Bug反馈</div>
+        <div class="cat-btn" data-cat="suggestion"><span class="cat-icon">示</span>功能建议</div>
+        <div class="cat-btn" data-cat="question"><span class="cat-icon">问</span>使用咨询</div>
+        <div class="cat-btn" data-cat="feature_request"><span class="cat-icon">光</span>新功能</div>
+        <div class="cat-btn" data-cat="praise"><span class="cat-icon">赞</span>好评鼓励</div>
       </div>
     </div>
 
     <div class="form-group">
       <label>优先级</label>
       <div class="priority-grid" id="priorityGrid">
-        <div class="pri-btn" data-pri="urgent">🔴 紧急</div>
-        <div class="pri-btn selected" data-pri="high">🟠 高</div>
-        <div class="pri-btn" data-pri="normal">🟡 普通</div>
-        <div class="pri-btn" data-pri="low">🟢 低</div>
+        <div class="pri-btn" data-pri="urgent">危 紧急</div>
+        <div class="pri-btn selected" data-pri="high">警 高</div>
+        <div class="pri-btn" data-pri="normal">警 普通</div>
+        <div class="pri-btn" data-pri="low">安 低</div>
       </div>
     </div>
 
@@ -152,7 +152,7 @@ h1{font-size:20px;color:var(--gold);margin-bottom:6px;display:flex;align-items:c
     <div class="form-group">
       <label>截图上传（可选）</label>
       <div class="upload-area" id="uploadArea">
-        <div class="upload-icon">📸</div>
+        <div class="upload-icon">拍</div>
         <div class="upload-text">点击或拖拽上传截图（PNG/JPG，最大5MB）</div>
       </div>
       <input aria-label="输入" type="file" id="screenshotInput" accept="image/*" style="display:none">
@@ -164,7 +164,7 @@ h1{font-size:20px;color:var(--gold);margin-bottom:6px;display:flex;align-items:c
       <div class="voice-section">
         <div class="voice-controls">
           <button type="button" class="voice-btn" id="voiceBtn">
-            <span id="voiceIcon">🎤</span>
+            <span id="voiceIcon">麦</span>
             <span id="voiceText">点击录音</span>
           </button>
           <select class="device-select" id="micDevice" style="display:none">
@@ -182,7 +182,7 @@ h1{font-size:20px;color:var(--gold);margin-bottom:6px;display:flex;align-items:c
 
   <!-- 我的工单 -->
   <div class="my-tickets">
-    <h2>📋 我的反馈记录</h2>
+    <h2>表 我的反馈记录</h2>
     <div id="ticketsList">
       <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">正在为您查阅典籍...</div>
     </div>
@@ -288,7 +288,7 @@ function enumerateAudioDevices() {
     availableMics = mics;
     if (mics.length > 0) {
       var sel = document.getElementById('micDevice');
-      sel.innerHTML = '<option value="">🔊 默认麦克风</option>';
+      sel.innerHTML = '<option value="">默认麦克风</option>';
       for (var i = 0; i < mics.length; i++) {
         var label = mics[i].label || '麦克风 ' + (i + 1);
         sel.innerHTML += '<option value="' + mics[i].deviceId + '">' + label + '</option>';
@@ -322,7 +322,7 @@ function handleScreenshot(input) {
   var reader = new FileReader();
   reader.onload = function(e) {
     var preview = document.getElementById('screenshotPreview');
-    preview.innerHTML = '<div class="upload-preview"><img loading="lazy" src="' + e.target.result + '" alt="上传预览图"><span class="remove" id="removeScr">✕</span></div>';
+    preview.innerHTML = '<div class="upload-preview"><img loading="lazy" src="' + e.target.result + '" alt="上传预览图"><span class="remove" id="removeScr">关</span></div>';
     document.getElementById('removeScr').addEventListener('click', removeScreenshot);
   };
   reader.readAsDataURL(file);
@@ -507,7 +507,7 @@ function handleResult(r) {
     // 显示成功卡片
     var successBox = document.createElement('div');
     successBox.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--surface);border:2px solid var(--green);border-radius:12px;padding:24px 32px;text-align:center;z-index:10000;box-shadow:0 8px 32px rgba(63,185,80,.3)';
-    successBox.innerHTML = '<div style="font-size:48px;margin-bottom:12px">✅</div>' +
+    successBox.innerHTML = '<div style="font-size:48px;margin-bottom:12px">成</div>' +
       '<div style="color:var(--green);font-size:16px;font-weight:600;margin-bottom:6px">反馈已提交成功！</div>' +
       '<div style="color:var(--text-muted);font-size:13px">工单号 <b style="color:var(--gold)">#' + r.data.ticketId + '</b></div>' +
       '<div style="color:var(--text-muted);font-size:12px;margin-top:8px">我们将在 1-3 个工作日内处理</div>' +
@@ -550,7 +550,7 @@ function loadMyTickets() {
             '<div class="ti-header"><span class="ti-title">' + escapeHtml(t.title) + '</span>' +
             '<span class="status-badge status-' + t.status + '">' + (statusNames[t.status]||t.status) + '</span></div>' +
             '<div class="ti-meta">' + (catNames[t.category]||t.category) + ' · ' + (t.created_at||'').substring(0,16) + '</div>' +
-            (t.admin_reply ? '<div style="margin-top:4px;font-size:12px;color:var(--green)">💬 官方已回复</div>' : '') +
+            (t.admin_reply ? '<div style="margin-top:4px;font-size:12px;color:var(--green)">语 官方已回复</div>' : '') +
           '</div>';
         }).join('');
         bindTicketClicks();
@@ -585,7 +585,7 @@ function loadRecentTickets() {
             '<div class="ti-header"><span class="ti-title">' + escapeHtml(t.title) + '</span>' +
             '<span class="status-badge status-' + t.status + '">' + (statusNames[t.status]||t.status) + '</span></div>' +
             '<div class="ti-meta">' + (catNames[t.category]||t.category) + ' · ' + (t.created_at||'').substring(0,16) + '</div>' +
-            (t.admin_reply ? '<div style="margin-top:4px;font-size:12px;color:var(--green)">💬 官方已回复</div>' : '') +
+            (t.admin_reply ? '<div style="margin-top:4px;font-size:12px;color:var(--green)">语 官方已回复</div>' : '') +
           '</div>';
         }).join('');
         list.innerHTML = html;

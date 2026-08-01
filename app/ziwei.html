@@ -139,15 +139,15 @@
 
 
 <nav style="padding:6px 12px;border-bottom:1px solid rgba(201,168,76,.12);display:flex;gap:6px;flex-wrap:wrap;background:rgba(8,8,8,.95);position:sticky;top:0;z-index:200">
-  <a href="divination-hub.html" class="nav-back">🏠 主平台</a>
-  <a href="bazi.html" class="nav-back">📜 八字排盘</a>
-  <a href="wangzhen-clinical.html" class="nav-back">🔍 望诊工作台</a>
-  <a href="tcm-clinic.html" class="nav-back">🏥 中医诊疗</a>
+  <a href="divination-hub.html" class="nav-back">主平台</a>
+  <a href="bazi.html" class="nav-back">卷 八字排盘</a>
+  <a href="wangzhen-clinical.html" class="nav-back">望诊工作台</a>
+  <a href="tcm-clinic.html" class="nav-back">医 中医诊疗</a>
 </nav>
 
 <header class="zw-topbar">
   <div>
-    <h1>🌌 紫微斗数排盘</h1>
+    <h1>星 紫微斗数排盘</h1>
     <div style="font-size:11px;color:var(--zw-paper3);margin-top:2px">十四主星 · 十二宫位 · 四化星 · 独立于八字，可做交叉比对</div>
 <main>
 
@@ -167,8 +167,8 @@
     <select id="zw-day" aria-label="出生日" aria-label="日"><option value="">日</option></select>
     <select id="zw-hour" aria-label="出生时辰" aria-label="时"><option value="">时辰</option></select>
   </div>
-  <button class="btn btn-primary" onclick="runZiweiPaipan()">🌌 紫微排盘</button>
-  <button class="btn btn-ghost" onclick="window.location.href='bazi.html'" style="margin-left:6px">📜 对照八字</button>
+  <button class="btn btn-primary" onclick="runZiweiPaipan()">星 紫微排盘</button>
+  <button class="btn btn-ghost" onclick="window.location.href='bazi.html'" style="margin-left:6px">卷 对照八字</button>
 </div>
 
 <!-- 排盘结果 -->
@@ -176,7 +176,7 @@
 
 <!-- 交叉比对 -->
 <div class="zw-compare">
-  <div class="zw-compare-title">🔄 紫微×八字 交叉比对</div>
+  <div class="zw-compare-title">更 紫微×八字 交叉比对</div>
   <div class="zw-compare-hint">紫微斗数和八字是两套独立的命理体系。八字看五行格局，紫微看星曜宫位。两者交叉验证准确率更高。</div>
   <div id="zw-compare-result" style="font-size:12px;color:var(--zw-paper3)">排盘后自动生成比对分析</div>
 </div>
@@ -226,7 +226,7 @@ function runZiweiPaipan(){
     html += '<div style="color:var(--zw-gold);font-weight:600;margin-bottom:4px">紫微命宫主星：' + mingStarName + '</div>';
     html += '<div style="font-size:11px;color:var(--zw-paper3)">五行局：' + result.wuxingJu + ' · 年干支：' + result.yearGanZhi + '</div>';
     html += '</div>';
-    html += '<div style="font-size:11px;line-height:1.8">💡 建议同时排八字命盘，比对日主五行与紫微主星的脏腑对应关系。例如：紫微七杀入命 → 金气偏旺 → 肺/大肠需注意；天同太阴入命 → 水气偏旺 → 肾/膀胱需注意。</div>';
+    html += '<div style="font-size:11px;line-height:1.8">示 建议同时排八字命盘，比对日主五行与紫微主星的脏腑对应关系。例如：紫微七杀入命 → 金气偏旺 → 肺/大肠需注意；天同太阴入命 → 水气偏旺 → 肾/膀胱需注意。</div>';
     html += '<div style="margin-top:8px"><a href="bazi.html" style="color:var(--zw-gold);font-size:12px">→ 去排八字命盘做比对</a></div>';
     compareEl.innerHTML = html;
   }

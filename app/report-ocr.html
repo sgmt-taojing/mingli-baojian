@@ -84,21 +84,21 @@ h1{color:var(--gold);font-size:18px;margin-bottom:6px;text-align:center}
 </div>
 <a href="divination-hub.html" style="position:fixed;top:12px;left:12px;z-index:9999;padding:8px 14px;background:#c9a227;color:#fff;border-radius:20px;font-size:12px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.15);opacity:.85">← 首页</a>
 <a href="person-center.html" class="nav-back">← 返回身份中心</a>
-<h1>📋 体检报告 OCR · 智能解读</h1>
+<h1>表 体检报告 OCR · 智能解读</h1>
 <div class="subtitle">拍照上传 → AI 识别指标 → 自动入档案 → 四维融合解读</div>
 
 <div class="card">
-<div class="card-title">📤 上传报告</div>
+<div class="card-title">出 上传报告</div>
 <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
-<div class="upload-icon">📷</div>
+<div class="upload-icon">拍</div>
 <div class="upload-hint">点击或拖拽上传体检报告图片<br>支持 JPG / PNG / WEBP · 多页可分次上传</div>
 <input aria-label="输入" type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFile(event)">
 </div>
-<div class="hint">💡 建议：光线充足 + 文字清晰 + 整张报告入镜。OCR 引擎：智谱 GLM-4V + 离线 PIL 兜底</div>
+<div class="hint">示 建议：光线充足 + 文字清晰 + 整张报告入镜。OCR 引擎：智谱 GLM-4V + 离线 PIL 兜底</div>
 </div>
 
 <div class="card" id="previewCard" style="display:none">
-<div class="card-title">🔍 预览 & 识别</div>
+<div class="card-title">查 预览 & 识别</div>
 <div class="preview-row">
 <div class="preview-box">
 <div class="preview-title">原图</div>
@@ -110,23 +110,23 @@ h1{color:var(--gold);font-size:18px;margin-bottom:6px;text-align:center}
 </div>
 </div>
 <div style="margin-top:10px">
-<button class="btn" id="btnOcr" onclick="doOCR()">🔍 开始 OCR 识别</button>
-<button class="btn btn-secondary btn-sm" onclick="editOcr()">✏️ 手动修正</button>
-<button class="btn btn-green btn-sm" onclick="parseAndSave()">💾 解析并入档案</button>
+<button class="btn" id="btnOcr" onclick="doOCR()">查 开始 OCR 识别</button>
+<button class="btn btn-secondary btn-sm" onclick="editOcr()">写 手动修正</button>
+<button class="btn btn-green btn-sm" onclick="parseAndSave()">存 解析并入档案</button>
 </div>
 <div class="hint" id="ocrStatus"></div>
 </div>
 
 <div class="card" id="parsedCard" style="display:none">
-<div class="card-title">📊 解析的检查指标</div>
+<div class="card-title">图 解析的检查指标</div>
 <div id="parsedGrid" class="parsed-grid"></div>
-<button class="btn" style="margin-top:10px" onclick="interpret()">🔮 四维融合解读</button>
+<button class="btn" style="margin-top:10px" onclick="interpret()">卦 四维融合解读</button>
 </div>
 
 <div class="card" id="interpretCard" style="display:none"></div>
 
 <div class="card">
-<div class="card-title">💡 解读维度</div>
+<div class="card-title">示 解读维度</div>
 <div style="font-size:12px;line-height:1.8">
 <b style="color:var(--gold)">西医层</b>：直接读取指标异常值<br>
 <b style="color:var(--green)">中医层</b>：基于舌脉+症状推断证型<br>
@@ -358,19 +358,19 @@ var p=j.data||{};
 var abnormal=parsedItems.filter(function(it){return it.flag&&it.flag.cls==='flag-high'});
 var low=parsedItems.filter(function(it){return it.flag&&it.flag.cls==='flag-low'});
 
-var h='<div class="card-title">🔮 四维融合解读</div>';
+var h='<div class="card-title">卦 四维融合解读</div>';
 
 // 西医层
 h+='<div class="interpret-card" style="border-left-color:var(--blue)">';
 h+='<div class="interpret-title" style="color:var(--blue)">① 西医指标分析</div>';
 if(abnormal.length>0){
-h+='<div class="interpret-line">⚠️ 偏高项：<b>'+abnormal.map(function(i){return i.label+'('+i.value+')'}).join('、')+'</b></div>';
+h+='<div class="interpret-line">警 偏高项：<b>'+abnormal.map(function(i){return i.label+'('+i.value+')'}).join('、')+'</b></div>';
 }
 if(low.length>0){
 h+='<div class="interpret-line">↓ 偏低项：<b>'+low.map(function(i){return i.label+'('+i.value+')'}).join('、')+'</b></div>';
 }
 if(abnormal.length===0&&low.length===0){
-h+='<div class="interpret-line">✅ 检测项均在正常参考范围内</div>';
+h+='<div class="interpret-line">成 检测项均在正常参考范围内</div>';
 }
 h+='</div>';
 
@@ -393,10 +393,10 @@ var organMap={木:'肝胆',火:'心血管/小肠',土:'脾胃',金:'肺/大肠',
 var dm=p.day_element||p.day_master||'未知';
 h+='<div class="interpret-line">日主 <b>'+(p.day_master||'')+'</b>(<b>'+dm+'</b>) → 易感器官：<b>'+organMap[dm]+'</b></div>';
 if(dm==='火'&&abnormal.find(function(i){return i.label==='血压'})){
-h+='<div class="interpret-line">⚠️ 火日主 + 血压偏高 = 心血管系统需重点关注</div>';
+h+='<div class="interpret-line">警 火日主 + 血压偏高 = 心血管系统需重点关注</div>';
 }
 if(dm==='木'&&parsedItems.find(function(i){return i.label.indexOf('ALT')>-1})){
-h+='<div class="interpret-line">⚠️ 木日主 + 肝酶异常 = 肝胆系统预警</div>';
+h+='<div class="interpret-line">警 木日主 + 肝酶异常 = 肝胆系统预警</div>';
 }
 h+='</div>';
 
@@ -407,10 +407,10 @@ var fg=p.family_genetic||'';
 if(fg&&fg!=='无'){
 h+='<div class="interpret-line">家族遗传：<b>'+fg+'</b></div>';
 if(fg.indexOf('高血压')>-1&&abnormal.find(function(i){return i.label==='血压'})){
-h+='<div class="interpret-line" style="color:var(--red)">⚠️ 家族高血压 + 本人血压偏高 = 风险加倍，需立即干预</div>';
+h+='<div class="interpret-line" style="color:var(--red)">警 家族高血压 + 本人血压偏高 = 风险加倍，需立即干预</div>';
 }
 if(fg.indexOf('糖尿病')>-1&&abnormal.find(function(i){return i.label==='空腹血糖'})){
-h+='<div class="interpret-line" style="color:var(--red)">⚠️ 家族糖尿病 + 本人血糖偏高 = 风险加倍，建议复查糖化血红蛋白</div>';
+h+='<div class="interpret-line" style="color:var(--red)">警 家族糖尿病 + 本人血糖偏高 = 风险加倍，建议复查糖化血红蛋白</div>';
 }
 if(fg.indexOf('肿瘤')>-1){
 h+='<div class="interpret-line">家族肿瘤史 → 建议每年专项筛查（与日主器官对应）</div>';

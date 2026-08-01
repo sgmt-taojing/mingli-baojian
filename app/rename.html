@@ -71,7 +71,7 @@
     </div>
     <!-- 生辰八字 -->
     <div style="background:rgba(201,168,76,0.03);border:1px solid rgba(201,168,76,0.12);border-radius:10px;padding:14px;margin-top:12px">
-      <h4 style="font-size:12px;color:var(--gold);margin-bottom:10px;letter-spacing:2px">🌟 生辰八字（按八字用神取名/改名）</h4>
+      <h4 style="font-size:12px;color:var(--gold);margin-bottom:10px;letter-spacing:2px">星 生辰八字（按八字用神取名/改名）</h4>
       <div class="input-row" style="flex-wrap:wrap;gap:8px">
         <select id="renameCalendarType" class="input-field" style="max-width:100px" onchange="toggleRenameCalendar()" aria-label="renameCalendarType">
           <option value="solar">阳历</option>
@@ -224,7 +224,7 @@
     <div id="renameTabooBox" style="display:none;margin-bottom:20px"></div>
     <!-- 知识科普折叠 -->
     <div style="text-align:center;margin-top:16px">
-      <button onclick="toggleKnowledge()" style="background:none;border:1px solid rgba(201,168,76,.2);color:var(--gold);font-size:12px;padding:8px 20px;border-radius:20px;cursor:pointer;letter-spacing:2px">📜 姓名学知识科普</button>
+      <button onclick="toggleKnowledge()" style="background:none;border:1px solid rgba(201,168,76,.2);color:var(--gold);font-size:12px;padding:8px 20px;border-radius:20px;cursor:pointer;letter-spacing:2px">卷 姓名学知识科普</button>
     </div>
     <div id="knowledgeBlock" style="display:none;margin-top:16px;padding:16px;background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);border-radius:8px;font-size:13px;line-height:2;opacity:.85">
       <p><strong style="color:var(--gold)">三才五格：</strong>天格、地格、人格、外格、总格，通过姓氏与名字笔画数推算，揭示人生各阶段运势。</p>
@@ -235,7 +235,7 @@
   </div>
   <!-- 姓名学引擎快捷入口 -->
   <div class="input-card" style="margin-top:20px">
-    <h3>🔤 快速姓名学引擎</h3>
+    <h3>快速姓名学引擎</h3>
     <div class="input-row" style="justify-content:center;flex-wrap:wrap;gap:8px">
       <input  type="text" class="input-field" id="xmName" placeholder="请输入姓名" maxlength="20" style="max-width:200px" aria-label="请输入姓名">
       <select class="input-field" id="xmSex" style="max-width:120px" aria-label="选项xmSex">
@@ -294,9 +294,9 @@
 <script>
 // R180: Safe fallbacks for rename.html standalone functions
 if(typeof showSection!=='function'){window.showSection=function(n){try{window.location.href='divination-hub.html#'+(n||'');}catch(e){history.back();}};}
-if(typeof computeRenameEnhanced!=='function'){window.computeRenameEnhanced=function(){try{var ln=document.getElementById('lastName')||document.getElementById('xmCurrentName');var fn=document.getElementById('firstName')||document.getElementById('xmNewName');var r=document.getElementById('renameResult')||document.getElementById('xmResult');if(r){r.innerHTML='<div style="padding:16px;background:rgba(201,168,76,0.06);border-radius:10px;border:1px solid var(--border)"><h5 style="color:var(--gold);margin-bottom:8px">📋 姓名分析报告</h5><p style="font-size:13px;color:var(--paper2)">姓名: '+(ln&&ln.value?ln.value:'')+(fn&&fn.value?fn.value:'')+'</p><p style="font-size:13px;color:var(--paper2);margin-top:8px">完整姓名学分析（三才五格、五行匹配、笔画数理）请在主页姓名模块中使用。</p></div>';r.classList.remove('d-none');}if(typeof toast==='function')toast('姓名分析已生成（简化版）');}catch(e){console.warn('[computeRenameEnhanced]',e);}};}
+if(typeof computeRenameEnhanced!=='function'){window.computeRenameEnhanced=function(){try{var ln=document.getElementById('lastName')||document.getElementById('xmCurrentName');var fn=document.getElementById('firstName')||document.getElementById('xmNewName');var r=document.getElementById('renameResult')||document.getElementById('xmResult');if(r){r.innerHTML='<div style="padding:16px;background:rgba(201,168,76,0.06);border-radius:10px;border:1px solid var(--border)"><h5 style="color:var(--gold);margin-bottom:8px">表 姓名分析报告</h5><p style="font-size:13px;color:var(--paper2)">姓名: '+(ln&&ln.value?ln.value:'')+(fn&&fn.value?fn.value:'')+'</p><p style="font-size:13px;color:var(--paper2);margin-top:8px">完整姓名学分析（三才五格、五行匹配、笔画数理）请在主页姓名模块中使用。</p></div>';r.classList.remove('d-none');}if(typeof toast==='function')toast('姓名分析已生成（简化版）');}catch(e){console.warn('[computeRenameEnhanced]',e);}};}
 if(typeof toggleKnowledge!=='function'){window.toggleKnowledge=function(){try{var el=document.getElementById('knowledgeSection')||document.getElementById('renameKnowledge');if(el){el.classList.toggle('d-none');}}catch(e){console.warn('[toggleKnowledge]',e);}};}
-if(typeof runXingmingEngine!=='function'){window.runXingmingEngine=function(){try{var n=document.getElementById('xmCurrentName')||document.getElementById('lastName');var nn=document.getElementById('xmNewName')||document.getElementById('firstName');var r=document.getElementById('xmEngineResult')||document.getElementById('renameResult');if(r){r.innerHTML='<div style="padding:14px;background:rgba(201,168,76,0.06);border-radius:10px"><h5 style="color:var(--gold)">🔧 姓名学引擎</h5><p style="font-size:13px;color:var(--paper2)">姓名学引擎深度分析（含康熙笔画、三才五格、生肖喜忌）请在主页使用完整引擎。</p></div>';r.classList.remove('d-none');}if(typeof toast==='function')toast('引擎分析已生成（简化版）');}catch(e){console.warn('[runXingmingEngine]',e);}};}
+if(typeof runXingmingEngine!=='function'){window.runXingmingEngine=function(){try{var n=document.getElementById('xmCurrentName')||document.getElementById('lastName');var nn=document.getElementById('xmNewName')||document.getElementById('firstName');var r=document.getElementById('xmEngineResult')||document.getElementById('renameResult');if(r){r.innerHTML='<div style="padding:14px;background:rgba(201,168,76,0.06);border-radius:10px"><h5 style="color:var(--gold)">修 姓名学引擎</h5><p style="font-size:13px;color:var(--paper2)">姓名学引擎深度分析（含康熙笔画、三才五格、生肖喜忌）请在主页使用完整引擎。</p></div>';r.classList.remove('d-none');}if(typeof toast==='function')toast('引擎分析已生成（简化版）');}catch(e){console.warn('[runXingmingEngine]',e);}};}
 </script>
 
 </main>

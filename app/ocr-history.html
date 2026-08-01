@@ -142,7 +142,7 @@ body {
 <a href="divination-hub.html" style="position:fixed;top:12px;left:12px;z-index:9999;padding:8px 14px;background:var(--gold,#c9a227);color:#fff;border-radius:20px;font-size:12px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.15);opacity:.85">← 首页</a>
 
 <div class="header">
-  <h1>📋 OCR 历史记录</h1>
+  <h1>表 OCR 历史记录</h1>
   <p>面相 · 舌诊 · OCR · 语音 — 所有识别结果汇总</p>
   <p style="margin-top:6px"><a href="vision-demo.html">← 返回 AI 眼睛</a> · <a href="glass-console.html">智镜控制台 →</a></p>
 </div>
@@ -151,26 +151,26 @@ body {
   <!-- Stats -->
   <div class="stats">
     <div class="stat-card">
-      <div class="stat-label">📊 总记录</div>
+      <div class="stat-label">图 总记录</div>
       <div class="stat-val gold" id="stTotal">0</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">👤 面相</div>
+      <div class="stat-label">人 面相</div>
       <div class="stat-val" id="stFace">0</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">👅 舌诊</div>
+      <div class="stat-label">舌诊</div>
       <div class="stat-val" id="stTongue">0</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">📄 OCR</div>
+      <div class="stat-label">文 OCR</div>
       <div class="stat-val" id="stOcr">0</div>
     </div>
   </div>
 
   <!-- Pie chart -->
   <div class="pie-section">
-    <div class="pie-title">📈 模式分布</div>
+    <div class="pie-title">升 模式分布</div>
     <div class="pie-container">
       <canvas id="pieChart" width="160" height="160"></canvas>
       <div class="pie-legend" id="pieLegend"></div>
@@ -181,21 +181,21 @@ body {
   <div class="filter-bar">
     <select id="modeFilter" onchange="loadHistory()" aria-label="筛选模式">
       <option value="">全部模式</option>
-      <option value="face">👤 面相识别</option>
-      <option value="tongue">👅 舌诊分析</option>
-      <option value="ocr">📄 通用 OCR</option>
-      <option value="ocr-tcm">📋 病历 OCR</option>
-      <option value="voice">🎤 语音输入</option>
+      <option value="face">人 面相识别</option>
+      <option value="tongue">舌诊分析</option>
+      <option value="ocr">文 通用 OCR</option>
+      <option value="ocr-tcm">表 病历 OCR</option>
+      <option value="voice">麦 语音输入</option>
     </select>
-    <button class="btn" onclick="loadHistory()">🔄 刷新</button>
-    <button class="btn danger" onclick="clearAll()">🗑 清空</button>
+    <button class="btn" onclick="loadHistory()">更 刷新</button>
+    <button class="btn danger" onclick="clearAll()">清空</button>
     <span style="margin-left:auto;font-size:11px;color:var(--muted2)" id="updateTime"></span>
   </div>
 
   <!-- Table -->
   <div id="histContent">
     <div class="empty">
-      <div class="icon">📋</div>
+      <div class="icon">表</div>
       <div>暂无 OCR 历史记录</div>
       <div style="font-size:11px;margin-top:6px">在 <a href="vision-demo.html" style="color:var(--info)">AI 眼睛</a> 中拍照分析后会自动记录</div>
     </div>
@@ -257,7 +257,7 @@ async function loadHistory() {
     // Table
     const content = document.getElementById('histContent');
     if (!data.history||!data.history.length) {
-      content.innerHTML = '<div class="empty"><div class="icon">📋</div><div>暂无记录</div></div>';
+      content.innerHTML = '<div class="empty"><div class="icon">表</div><div>暂无记录</div></div>';
     } else {
       content.innerHTML = '<table class="hist-table"><thead><tr>' +
         '<th>时间</th><th>模式</th><th>预览</th><th>API</th><th>延迟</th>' +

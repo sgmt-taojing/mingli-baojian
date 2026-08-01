@@ -95,7 +95,7 @@ body{background:#0a0c12;color:#e4e6ed;font-family:-apple-system,BlinkMacSystemFo
 <a href="divination-hub.html" style="position:fixed;top:12px;left:12px;z-index:9999;padding:8px 14px;background:#c9a227;color:#fff;border-radius:20px;font-size:12px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.15);opacity:.85">← 首页</a>
 
 <div class="header">
-  <h1>🌿 居家诊疗 · 周易中医智能陪护</h1>
+  <h1>草 居家诊疗 · 周易中医智能陪护</h1>
   <p>视频采集 · 症状交互 · AI辨证 · 远程开药 · 紧急处置 · 机器人陪护</p>
 </div>
 
@@ -103,7 +103,7 @@ body{background:#0a0c12;color:#e4e6ed;font-family:-apple-system,BlinkMacSystemFo
   <!-- 左栏：视频采集 + 操作 -->
   <div>
     <div class="panel">
-      <h2>📹 视频采集 <span class="badge" id="videoStatus">未开启</span></h2>
+      <h2>视频采集<span class="badge" id="videoStatus">未开启</span></h2>
       <div class="video-box" id="videoBox">
         <div class="placeholder">点击"开启摄像头"开始视频采集<br>系统将自动分析面色、舌象、精神状态</div>
         <div class="overlay" id="videoOverlay" style="display:none">
@@ -112,12 +112,12 @@ body{background:#0a0c12;color:#e4e6ed;font-family:-apple-system,BlinkMacSystemFo
         </div>
       </div>
       <div class="controls">
-        <button class="btn btn-primary" onclick="startVideo()">📹 开启摄像头</button>
-        <button class="btn" onclick="snapshot()" id="snapBtn" disabled>📸 采集面色</button>
-        <button class="btn" onclick="showTongue()" id="tongueBtn" disabled>👅 采集舌象</button>
-        <button class="btn btn-warn" onclick="startVoice()" id="voiceBtn">🎤 语音交互</button>
-        <button class="btn" onclick="window.location.href='personal-push.html'">🎭 千人千面</button>
-        <button class="btn btn-danger" onclick="emergencyCall()" style="margin-left:auto">🚨 紧急呼救</button>
+        <button class="btn btn-primary" onclick="startVideo()">开启摄像头</button>
+        <button class="btn" onclick="snapshot()" id="snapBtn" disabled>拍 采集面色</button>
+        <button class="btn" onclick="showTongue()" id="tongueBtn" disabled>采集舌象</button>
+        <button class="btn btn-warn" onclick="startVoice()" id="voiceBtn">麦 语音交互</button>
+        <button class="btn" onclick="window.location.href='personal-push.html'">面 千人千面</button>
+        <button class="btn btn-danger" onclick="emergencyCall()" style="margin-left:auto">报 紧急呼救</button>
       </div>
       <div class="status-bar" id="statusBar">
         <div class="status-item">面诊: 待采集</div>
@@ -128,14 +128,14 @@ body{background:#0a0c12;color:#e4e6ed;font-family:-apple-system,BlinkMacSystemFo
     </div>
 
     <div class="panel" style="margin-top:12px">
-      <h2>🤖 AI 辅助处置</h2>
+      <h2>机 AI 辅助处置</h2>
       <div id="actionPanel">
         <div class="action-card" onclick="runDiagnosis()">
-          <div class="title">🔍 智能辨证</div>
+          <div class="title">查 智能辨证</div>
           <div class="desc">八纲辨证 + 六经辨证 + 五行体质综合分析</div>
         </div>
         <div class="action-card" onclick="remotePrescribe()">
-          <div class="title">💊 远程开药</div>
+          <div class="title">药 远程开药</div>
           <div class="desc">医师确认诊断 → 电子处方 → 药店配送</div>
         </div>
         <div class="action-card" onclick="notifyFamily()">
@@ -143,7 +143,7 @@ body{background:#0a0c12;color:#e4e6ed;font-family:-apple-system,BlinkMacSystemFo
           <div class="desc">发送健康状态 + 当前处置方案给紧急联系人</div>
         </div>
         <div class="action-card urgent" onclick="call120()">
-          <div class="title">🚑 拨打 120</div>
+          <div class="title">救 拨打 120</div>
           <div class="desc">紧急情况自动拨打 + 发送定位 + 等待指导</div>
         </div>
       </div>
@@ -153,10 +153,10 @@ body{background:#0a0c12;color:#e4e6ed;font-family:-apple-system,BlinkMacSystemFo
   <!-- 右栏：对话交互 + 症状 -->
   <div>
     <div class="panel">
-      <h2>💬 症状交互对话 <span class="badge">AI 辅助</span></h2>
+      <h2>语 症状交互对话 <span class="badge">AI 辅助</span></h2>
       <div class="chat-log" id="chatLog">
         <div class="msg bot">
-          <div class="role">🤖 智能陪护</div>
+          <div class="role">机 智能陪护</div>
           您好，我是您的居家诊疗助手。请告诉我您现在哪里不舒服？也可以开启摄像头让我看看您的面色和舌象。
         </div>
       </div>
@@ -189,13 +189,13 @@ body{background:#0a0c12;color:#e4e6ed;font-family:-apple-system,BlinkMacSystemFo
     </div>
 
     <div class="panel" style="margin-top:12px">
-      <h2>📊 健康监测</h2>
+      <h2>图 健康监测</h2>
       <div id="healthReport" style="font-size:12px;color:#8b8fa3;line-height:1.8">
-        <p>📋 诊断结果：待采集症状后生成</p>
-        <p>🏥 体质分析：待排盘后生成</p>
-        <p>💊 用药建议：待诊断后生成</p>
+        <p>表 诊断结果：待采集症状后生成</p>
+        <p>医 体质分析：待排盘后生成</p>
+        <p>药 用药建议：待诊断后生成</p>
         <p>👨‍👩‍👧 紧急联系人：未设置</p>
-        <p>📍 当前定位：未获取</p>
+        <p>点 当前定位：未获取</p>
       </div>
     </div>
   </div>
@@ -454,11 +454,11 @@ function updateStatus(text, level){
 function updateReport(result){
   const report = document.getElementById('healthReport');
   report.innerHTML = `
-    <p>📋 诊断结果：${result.summary || '综合辨证完成'}</p>
-    <p>🏥 置信度：${(result.confidence*100).toFixed(0)}%</p>
-    <p>⚠️ 首要关注：${result.topPriority ? result.topPriority.organ+' '+result.topPriority.issue : '无'}</p>
-    <p>💊 建议：${result.topPriority ? result.topPriority.advice : '保持观察'}</p>
-    <p>📚 KB 参考：${result.kbReferences ? result.kbReferences.length+' 条' : '无'}</p>
+    <p>表 诊断结果：${result.summary || '综合辨证完成'}</p>
+    <p>医 置信度：${(result.confidence*100).toFixed(0)}%</p>
+    <p>警 首要关注：${result.topPriority ? result.topPriority.organ+' '+result.topPriority.issue : '无'}</p>
+    <p>药 建议：${result.topPriority ? result.topPriority.advice : '保持观察'}</p>
+    <p>典 KB 参考：${result.kbReferences ? result.kbReferences.length+' 条' : '无'}</p>
     <p>👨‍👩‍👧 紧急联系人：未设置（请在个人档案中添加）</p>
   `;
 }

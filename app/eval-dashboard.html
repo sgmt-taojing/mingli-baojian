@@ -41,15 +41,15 @@
 <a href="divination-hub.html" style="position:fixed;top:12px;left:12px;z-index:9999;padding:8px 14px;background:#c9a227;color:#fff;border-radius:20px;font-size:12px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.15);opacity:.85">← 首页</a>
 <header class="dash-header">
   <a href="index.html" class="dash-back">← 主页</a>
-  <h1>📊 评估看板</h1>
+  <h1>图 评估看板</h1>
   <p class="dash-sub">3 benchmark × 8 周趋势 · 跨迭代质量守门员 · <span class="badge">R89-P</span></p>
   <div class="dash-meta">
     <span class="kb-chip">本周 W31</span>
     <span id="updateTime" class="kb-chip">--</span>
-    <button id="refreshBtn" class="btn-refresh">🔄 刷新</button>
-    <button id="exportBtn" class="btn-refresh">💾 导出快照</button>
-    <button id="pdfBtn" class="btn-refresh">📄 导出 PDF</button>
-    <span class="dash-source-badge source-none" title="数据来源">⚠️ 加载中</span>
+    <button id="refreshBtn" class="btn-refresh">更 刷新</button>
+    <button id="exportBtn" class="btn-refresh">存 导出快照</button>
+    <button id="pdfBtn" class="btn-refresh">文 导出 PDF</button>
+    <span class="dash-source-badge source-none" title="数据来源">警 加载中</span>
   </div>
 </header>
 
@@ -61,7 +61,7 @@
   <section class="dash-trends">
     <article class="trend-card">
       <header>
-        <h2>📈 合规分数趋势</h2>
+        <h2>升 合规分数趋势</h2>
         <span class="trend-meta">faithfulness · 期望 ≥ 0.7</span>
       </header>
       <div class="chart-wrap" id="chart-faith"></div>
@@ -74,7 +74,7 @@
 
     <article class="trend-card">
       <header>
-        <h2>⚡ P95 延迟趋势</h2>
+        <h2>电 P95 延迟趋势</h2>
         <span class="trend-meta">latency · 期望 ≤ 1500ms</span>
       </header>
       <div class="chart-wrap" id="chart-latency"></div>
@@ -86,7 +86,7 @@
 
     <article class="trend-card">
       <header>
-        <h2>💰 平均成本趋势</h2>
+        <h2>财 平均成本趋势</h2>
         <span class="trend-meta">cost-budget · 期望 ≤ 0.05 元</span>
       </header>
       <div class="chart-wrap" id="chart-cost"></div>
@@ -98,7 +98,7 @@
 
     <article class="trend-card">
       <header>
-        <h2>🧠 KB 命中率趋势</h2>
+        <h2>脑 KB 命中率趋势</h2>
         <span class="trend-meta">kb-hit · 期望 ≥ 0.7</span>
       </header>
       <div class="chart-wrap" id="chart-kbhit"></div>
@@ -110,99 +110,99 @@
   </section>
 
   <section class="dash-violations">
-    <h2>🚨 SLO 违规周报</h2>
+    <h2>报 SLO 违规周报</h2>
     <div id="violationsTable"></div>
   </section>
 
   <section class="dash-modules">
-    <h2>📚 模块健康速览</h2>
+    <h2>典 模块健康速览</h2>
     <div id="modulesGrid" class="modules-grid">
       <div class="mod-card">模块数据加载中…</div>
     </div>
   </section>
 
   <section class="dash-alert-card" id="alertCardWrap">
-    <h2>🚦 周告警卡</h2>
+    <h2>周告警卡</h2>
     <p class="section-hint">每周 eval-alert.py 聚合产出 · 整体告警等级 + 三维度分解</p>
     <div id="alertCardBody" class="alert-card-body">加载中…</div>
   </section>
 
   <section class="dash-module-trend">
-    <h2>🔄 跨周分模块评分趋势</h2>
+    <h2>更 跨周分模块评分趋势</h2>
     <p class="section-hint">仅展示有 per-case 数据的周（当前 W31）· 后续每周 eval 自动积累</p>
     <div id="moduleTrendTable" class="module-trend-wrap">加载中…</div>
   </section>
 
   <section class="dash-weekly-stats">
-    <h2>📋 跨周汇总统计</h2>
+    <h2>表 跨周汇总统计</h2>
     <p class="section-hint">8 周 benchmark 汇总 · 均值/最低/最高/趋势方向 · 快速数字扫描</p>
     <div id="weeklyStatsTable" class="weekly-stats-wrap">加载中…</div>
   </section>
 
   <section class="dash-wow">
-    <h2>📊 周环比变化 (WoW) <button class="csv-export-btn" onclick="exportWoWCSV()">⬇ CSV</button></h2>
+    <h2>图 周环比变化 (WoW) <button class="csv-export-btn" onclick="exportWoWCSV()">⬇ CSV</button></h2>
     <p class="section-hint">连续 7 组周对 · 4 指标环比 Δ% · 绿色改善 / 红色恶化 / 灰色无变化</p>
     <div id="wowInsight" class="wow-insight"></div>
     <div id="wowTable" class="wow-wrap">加载中…</div>
   </section>
 
   <section class="dash-alert-history">
-    <h2>📅 告警历史趋势</h2>
+    <h2>历 告警历史趋势</h2>
     <p class="section-hint">8 周告警等级演变 · 整体 + 三维度 · CRITICAL→WARN→OK 轨迹</p>
     <div id="alertHistoryBody" class="alert-history-body">加载中…</div>
-    <button id="alertHistCSVBtn" class="csv-export-btn">📄 导出告警历史 CSV</button>
-    <button id="alertDetailCSVBtn" class="csv-export-btn">📄 导出告警详情 CSV</button>
+    <button id="alertHistCSVBtn" class="csv-export-btn">文 导出告警历史 CSV</button>
+    <button id="alertDetailCSVBtn" class="csv-export-btn">文 导出告警详情 CSV</button>
   </section>
 
   <section class="dash-module-percase">
-    <h2>🔍 模块 Per-Case 评分</h2>
+    <h2>查 模块 Per-Case 评分</h2>
     <p class="section-hint">选模块 → 展示该模块所有周的 faithfulness 逐 case 评分 · 三色标 + 趋势对比</p>
     <div class="mod-percase-controls">
       <label>模块：</label>
       <option value="">请选择</option><<option value="">请选择</option>s<option value="">请选择</option>e<option value="">请选择</option>l<option value="">请选择</option>e<option value="">请选择</option>c<option value="">请选择</option>t<option value="">请选择</option> <option value="">请选择</option>i<option value="">请选择</option>d<option value="">请选择</option>=<option value="">请选择</option>"<option value="">请选择</option>m<option value="">请选择</option>o<option value="">请选择</option>d<option value="">请选择</option>P<option value="">请选择</option>e<option value="">请选择</option>r<option value="">请选择</option>c<option value="">请选择</option>a<option value="">请选择</option>s<option value="">请选择</option>e<option value="">请选择</option>S<option value="">请选择</option>e<option value="">请选择</option>l<option value="">请选择</option>"<option value="">请选择</option>><option value="">请选择</option><<option value="">请选择</option>/<option value="">请选择</option>s<option value="">请选择</option>e<option value="">请选择</option>l<option value="">请选择</option>e<option value="">请选择</option>c<option value="">请选择</option>t<option value="">请选择</option>><option value="">请选择</option>
     </div>
     <div id="modPercaseBody" class="mod-percase-body">加载中…</div>
-    <button id="modPercaseCSVBtn" class="csv-export-btn" title="导出当前模块 per-case CSV">📄 导出 CSV</button>
+    <button id="modPercaseCSVBtn" class="csv-export-btn" title="导出当前模块 per-case CSV">文 导出 CSV</button>
   </section>
 
   <section class="dash-percase">
-    <h2>🔬 Per-Case 明细</h2>
+    <h2>研 Per-Case 明细</h2>
     <p class="section-hint">cost-budget × latency 逐 case 延迟 + 通过率 · 最新周 W31 默认展示 · 可切换周</p>
     <div class="percase-controls">
       <label>周：</label>
       <option value="">请选择</option><<option value="">请选择</option>s<option value="">请选择</option>e<option value="">请选择</option>l<option value="">请选择</option>e<option value="">请选择</option>c<option value="">请选择</option>t<option value="">请选择</option> <option value="">请选择</option>i<option value="">请选择</option>d<option value="">请选择</option>=<option value="">请选择</option>"<option value="">请选择</option>p<option value="">请选择</option>e<option value="">请选择</option>r<option value="">请选择</option>c<option value="">请选择</option>a<option value="">请选择</option>s<option value="">请选择</option>e<option value="">请选择</option>W<option value="">请选择</option>e<option value="">请选择</option>e<option value="">请选择</option>k<option value="">请选择</option>S<option value="">请选择</option>e<option value="">请选择</option>l<option value="">请选择</option>"<option value="">请选择</option>><option value="">请选择</option><<option value="">请选择</option>/<option value="">请选择</option>s<option value="">请选择</option>e<option value="">请选择</option>l<option value="">请选择</option>e<option value="">请选择</option>c<option value="">请选择</option>t<option value="">请选择</option>><option value="">请选择</option>
       <label>benchmark：</label>
       <select id="percaseBenchSel">
-        <option value="cost-budget">💰 cost-budget</option>
-        <option value="latency">⚡ latency</option>
+        <option value="cost-budget">财 cost-budget</option>
+        <option value="latency">电 latency</option>
       </select>
     </div>
     <div id="percaseBody" class="percase-body">加载中…</div>
-    <button id="percaseCSVBtn" class="csv-export-btn" title="导出当前周 per-case CSV">📄 导出 CSV</button>
+    <button id="percaseCSVBtn" class="csv-export-btn" title="导出当前周 per-case CSV">文 导出 CSV</button>
   </section>
   <section class="dash-distill">
-    <h2>🧪 诊疗经验蒸馏</h2>
+    <h2>试 诊疗经验蒸馏</h2>
     <p class="section-hint">R202 蒸馏引擎产出 · 脏腑分布 + 方剂排行 + 候选条目</p>
     <div id="distillBody" class="distill-body">加载中…</div>
-    <button id="distillCSVBtn" class="csv-export-btn">📄 导出蒸馏条目 CSV</button>
+    <button id="distillCSVBtn" class="csv-export-btn">文 导出蒸馏条目 CSV</button>
   </section>
 
   <section class="dash-expanded-modules">
-    <h2>📐 分模块详细评估</h2>
+    <h2>量 分模块详细评估</h2>
     <p class="section-hint">R223 expanded 数据接入 · 按模块展示 faithfulness / latency / cost 三维度明细 · 可切换周</p>
     <div class="expanded-controls">
       <label>周：</label>
       <option value="">请选择</option><<option value="">请选择</option>s<option value="">请选择</option>e<option value="">请选择</option>l<option value="">请选择</option>e<option value="">请选择</option>c<option value="">请选择</option>t<option value="">请选择</option> <option value="">请选择</option>i<option value="">请选择</option>d<option value="">请选择</option>=<option value="">请选择</option>"<option value="">请选择</option>e<option value="">请选择</option>x<option value="">请选择</option>p<option value="">请选择</option>a<option value="">请选择</option>n<option value="">请选择</option>d<option value="">请选择</option>e<option value="">请选择</option>d<option value="">请选择</option>W<option value="">请选择</option>e<option value="">请选择</option>e<option value="">请选择</option>k<option value="">请选择</option>S<option value="">请选择</option>e<option value="">请选择</option>l<option value="">请选择</option>"<option value="">请选择</option>><option value="">请选择</option><<option value="">请选择</option>/<option value="">请选择</option>s<option value="">请选择</option>e<option value="">请选择</option>l<option value="">请选择</option>e<option value="">请选择</option>c<option value="">请选择</option>t<option value="">请选择</option>><option value="">请选择</option>
       <div class="expanded-tabs" role="tablist">
-        <button class="expanded-tab active" role="tab" data-bench="faithfulness">📈 合规</button>
-        <button class="expanded-tab" role="tab" data-bench="latency">⚡ 延迟</button>
-        <button class="expanded-tab" role="tab" data-bench="cost-budget">💰 成本</button>
+        <button class="expanded-tab active" role="tab" data-bench="faithfulness">升 合规</button>
+        <button class="expanded-tab" role="tab" data-bench="latency">电 延迟</button>
+        <button class="expanded-tab" role="tab" data-bench="cost-budget">财 成本</button>
       </div>
     </div>
     <div id="expandedBody" class="expanded-body">加载中…</div>
-    <button id="expandedCSVBtn" class="csv-export-btn" title="导出当前视图 CSV">📄 导出 CSV</button>
+    <button id="expandedCSVBtn" class="csv-export-btn" title="导出当前视图 CSV">文 导出 CSV</button>
     <div class="expanded-trend-section">
-      <h3 class="expanded-trend-title">📉 跨周模块趋势 <span class="expanded-trend-hint" id="expandedTrendHint">选定 benchmark 各模块分数随周次变化</span></h3>
+      <h3 class="expanded-trend-title">降 跨周模块趋势 <span class="expanded-trend-hint" id="expandedTrendHint">选定 benchmark 各模块分数随周次变化</span></h3>
       <div class="expanded-trend-controls">
         <label>模块：</label>
         <option value="">请选择</option><<option value="">请选择</option>s<option value="">请选择</option>e<option value="">请选择</option>l<option value="">请选择</option>e<option value="">请选择</option>c<option value="">请选择</option>t<option value="">请选择</option> <option value="">请选择</option>i<option value="">请选择</option>d<option value="">请选择</option>=<option value="">请选择</option>"<option value="">请选择</option>e<option value="">请选择</option>x<option value="">请选择</option>p<option value="">请选择</option>a<option value="">请选择</option>n<option value="">请选择</option>d<option value="">请选择</option>e<option value="">请选择</option>d<option value="">请选择</option>T<option value="">请选择</option>r<option value="">请选择</option>e<option value="">请选择</option>n<option value="">请选择</option>d<option value="">请选择</option>M<option value="">请选择</option>o<option value="">请选择</option>d<option value="">请选择</option>S<option value="">请选择</option>e<option value="">请选择</option>l<option value="">请选择</option>"<option value="">请选择</option> <option value="">请选择</option>m<option value="">请选择</option>u<option value="">请选择</option>l<option value="">请选择</option>t<option value="">请选择</option>i<option value="">请选择</option>p<option value="">请选择</option>l<option value="">请选择</option>e<option value="">请选择</option> <option value="">请选择</option>s<option value="">请选择</option>i<option value="">请选择</option>z<option value="">请选择</option>e<option value="">请选择</option>=<option value="">请选择</option>"<option value="">请选择</option>5<option value="">请选择</option>"<option value="">请选择</option> <option value="">请选择</option>c<option value="">请选择</option>l<option value="">请选择</option>a<option value="">请选择</option>s<option value="">请选择</option>s<option value="">请选择</option>=<option value="">请选择</option>"<option value="">请选择</option>e<option value="">请选择</option>x<option value="">请选择</option>p<option value="">请选择</option>a<option value="">请选择</option>n<option value="">请选择</option>d<option value="">请选择</option>e<option value="">请选择</option>d<option value="">请选择</option>-<option value="">请选择</option>t<option value="">请选择</option>r<option value="">请选择</option>e<option value="">请选择</option>n<option value="">请选择</option>d<option value="">请选择</option>-<option value="">请选择</option>m<option value="">请选择</option>u<option value="">请选择</option>l<option value="">请选择</option>t<option value="">请选择</option>i<option value="">请选择</option>s<option value="">请选择</option>e<option value="">请选择</option>l<option value="">请选择</option>"<option value="">请选择</option>><option value="">请选择</option><<option value="">请选择</option>/<option value="">请选择</option>s<option value="">请选择</option>e<option value="">请选择</option>l<option value="">请选择</option>e<option value="">请选择</option>c<option value="">请选择</option>t<option value="">请选择</option>><option value="">请选择</option>
@@ -216,7 +216,7 @@
   </section>
 
   <section class="dash-cross-bench">
-    <h2>🎯 跨基准模块散点</h2>
+    <h2>标 跨基准模块散点</h2>
     <p class="section-hint">R225 跨基准叠加 · X=均延迟 Y=合规均分 气泡=成本 · 一图看清各模块质量/速度/成本权衡</p>
     <div class="cross-bench-controls">
       <label>周：</label>
@@ -224,11 +224,11 @@
     </div>
     <div class="chart-wrap cross-bench-chart" id="crossBenchChart"></div>
     <div id="crossBenchLegend" class="cross-bench-legend"></div>
-    <button id="crossBenchCSVBtn" class="csv-export-btn" title="导出散点数据 CSV">📄 导出 CSV</button>
+    <button id="crossBenchCSVBtn" class="csv-export-btn" title="导出散点数据 CSV">文 导出 CSV</button>
   </section>
 
   <section class="dash-heatmap">
-    <h2>🔥 跨周模块热力图</h2>
+    <h2>热 跨周模块热力图</h2>
     <p class="section-hint">R226 周环比热力 · 行=模块 列=周 色深=合规分 · 悬停看详情</p>
     <div class="heatmap-controls">
       <label>指标：</label>
@@ -243,11 +243,11 @@
       <div class="heatmap-legend-bar" id="heatmapLegendBar"></div>
       <span class="heatmap-legend-label">高</span>
     </div>
-    <button id="heatmapCSVBtn" class="csv-export-btn" title="导出热力图 CSV">📄 导出 CSV</button>
+    <button id="heatmapCSVBtn" class="csv-export-btn" title="导出热力图 CSV">文 导出 CSV</button>
   </section>
 
   <section class="dash-radar">
-    <h2>🎯 模块雷达图</h2>
+    <h2>标 模块雷达图</h2>
     <p class="section-hint">R227 多维度对比 · 合规分 / P95延迟 / KB命中率 · 选 2-8 模块叠加雷达</p>
     <div class="radar-controls">
       <label>周：</label>
@@ -262,11 +262,11 @@
     </div>
     <div class="radar-svg-wrap" id="radarChartWrap"></div>
     <div class="radar-legend" id="radarLegend"></div>
-    <button id="radarCSVBtn" class="csv-export-btn" title="导出雷达图 CSV">📄 导出 CSV</button>
+    <button id="radarCSVBtn" class="csv-export-btn" title="导出雷达图 CSV">文 导出 CSV</button>
   </section>
 
   <section class="dash-biweekly">
-    <h2>⚖️ 双周模块对比 <button class="csv-export-btn" onclick="exportBiweeklyCSV()">⬇ CSV</button></h2>
+    <h2>平 双周模块对比 <button class="csv-export-btn" onclick="exportBiweeklyCSV()">⬇ CSV</button></h2>
     <p class="section-hint">R231 选两周 · 各模块合规分并排对比 · Δ变化值 · 绿色改善/红色恶化/灰色持平</p>
     <div class="biweekly-controls">
       <label>周 A：</label>

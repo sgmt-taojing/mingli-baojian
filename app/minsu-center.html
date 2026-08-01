@@ -61,48 +61,48 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
 <div class="flow-hint">查看民俗工具中心 · 命理宝鉴，了解功能详情与使用方式。</div>
 </div>
 <div class="ms-header">
-  <div class="ms-title">🏮 民俗工具中心</div>
+  <div class="ms-title">节 民俗工具中心</div>
   <div class="ms-subtitle">命理宝鉴 · 十一大民俗工具 · 经典依据</div>
 </div>
 <div class="ms-grid">
   <a class="ms-card ms-huangli" href="javascript:void(0)" onclick="showTool('huangli')">
-    <span class="ms-icon">📅</span>
+    <span class="ms-icon">历</span>
     <div class="ms-name">黄历查询</div>
     <div class="ms-desc">日干支 · 建除 · 宜忌 · 冲煞 · 值神 · 胎神</div>
     <div class="ms-api">GET /api/minsu/huangli</div>
   </a>
   <a class="ms-card ms-zeri" href="javascript:void(0)" onclick="showTool('zeri')">
-    <span class="ms-icon">🗓️</span>
+    <span class="ms-icon">历</span>
     <div class="ms-name">择日建议</div>
     <div class="ms-desc">嫁娶 · 搬家 · 开业 · 动土 · 安葬 · 祭祀 · 出行</div>
     <div class="ms-api">GET /api/minsu/zeri</div>
   </a>
   <a class="ms-card ms-taisui" href="javascript:void(0)" onclick="showTool('taisui')">
-    <span class="ms-icon">🙏</span>
+    <span class="ms-icon">拜</span>
     <div class="ms-name">太岁查询</div>
     <div class="ms-desc">本命太岁 · 冲刑害破 · 化解建议</div>
     <div class="ms-api">GET /api/minsu/taisui</div>
   </a>
   <a class="ms-card ms-jieqi" href="javascript:void(0)" onclick="showTool('jieqi')">
-    <span class="ms-icon">🌿</span>
+    <span class="ms-icon">草</span>
     <div class="ms-name">24节气</div>
     <div class="ms-desc">节气表 · 当前节气 · 节气养生</div>
     <div class="ms-api">GET /api/minsu/jieqi</div>
   </a>
   <a class="ms-card ms-mobile" href="javascript:void(0)" onclick="showTool('mobile')">
-    <span class="ms-icon">📱</span>
+    <span class="ms-icon">机</span>
     <div class="ms-name">手机号码</div>
     <div class="ms-desc">尾数五行 · 81数理 · 组段分析 · 连号重号</div>
     <div class="ms-api">GET /api/minsu/mobile</div>
   </a>
   <a class="ms-card ms-xingming" href="rename.html">
-    <span class="ms-icon">✏️</span>
+    <span class="ms-icon">写</span>
     <div class="ms-name">姓名学</div>
     <div class="ms-desc">三才五格 · 笔画五行 · 81数理 · 相生相克</div>
     <div class="ms-api">GET /api/minsu/xingming</div>
   </a>
   <a class="ms-card ms-liunian" href="javascript:void(0)" onclick="showTool('liunian')">
-    <span class="ms-icon">🔄</span>
+    <span class="ms-icon">更</span>
     <div class="ms-name">流年运程</div>
     <div class="ms-desc">生肖关系 · 五行年运 · 12流月评分</div>
     <div class="ms-api">GET /api/minsu/liunian</div>
@@ -126,7 +126,7 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
     <div class="ms-api">POST /api/minsu/family</div>
   </a>
   <a class="ms-card" href="javascript:void(0)" onclick="showTool('holidays')" style="border-left:3px solid #fbbf24">
-    <span class="ms-icon">🎉</span>
+    <span class="ms-icon">庆</span>
     <div class="ms-name">节日查询</div>
     <div class="ms-desc">法定假日 · 农历节日 · 道教佛诞 · 儒家纪念</div>
     <div class="ms-api">GET /api/minsu/holidays</div>
@@ -171,7 +171,7 @@ async function showTool(tool){
   if(!data.ok){result.innerHTML='查询失败: '+data.error;return;}
   const c=data.chart;
   if(tool==='huangli'){
-    html=`<h3 style="color:var(--gold);margin-bottom:8px">📅 ${c.date} 黄历</h3>`;
+    html=`<h3 style="color:var(--gold);margin-bottom:8px">历 ${c.date} 黄历</h3>`;
     html+=`<div style="font-size:12px;line-height:2;color:var(--paper)">`;
     html+=`干支：${c.yearGanZhi}年 ${c.monthGanZhi}月 ${c.dayGanZhi}日（${c.shengxiao}年）<br>`;
     html+=`节气：${c.jieqi} | 建除：${c.jianchu} | 值神：${c.zhishen}(${c.huangdao})<br>`;
@@ -180,7 +180,7 @@ async function showTool(tool){
     html+=`冲煞：${c.chongsha} | 胎神：${c.taishen}`;
     html+='</div>';
   }else if(tool==='zeri'){
-    html=`<h3 style="color:var(--gold);margin-bottom:8px">🗓️ ${c.year}年${c.month}月「${c.event}」吉日</h3>`;
+    html=`<h3 style="color:var(--gold);margin-bottom:8px">历 ${c.year}年${c.month}月「${c.event}」吉日</h3>`;
     html+=`<div style="font-size:12px;line-height:1.8">共${c.count}个吉日（建除：${c.goodJianchu}）<br>`;
     for(const g of c.goodDays.slice(0,8)){
       const hd=g.huangdao?'<span style="color:var(--gold)">黄道</span>':'<span style="color:var(--paper3)">黑道</span>';
@@ -188,27 +188,27 @@ async function showTool(tool){
     }
     html+='</div>';
   }else if(tool==='taisui'){
-    html=`<h3 style="color:var(--gold);margin-bottom:8px">🙏 ${c.year}年 ${c.yearGanZhi} 太岁</h3>`;
+    html=`<h3 style="color:var(--gold);margin-bottom:8px">拜 ${c.year}年 ${c.yearGanZhi} 太岁</h3>`;
     html+=`<div style="font-size:12px;line-height:2">`;
     html+=`太岁星君：${c.taisui}<br>`;
     html+=`本命：${c.benMing.shengxiao} | 冲：${c.chong.shengxiao} | 刑：${c.xing.shengxiao} | 害：${c.hai.shengxiao} | 破：${c.po.shengxiao}<br>`;
     html+=`<span style="color:var(--jade)">${c.suggestion}</span>`;
     html+='</div>';
   }else if(tool==='jieqi'){
-    html=`<h3 style="color:var(--gold);margin-bottom:8px">🌿 ${c.year}年 24节气</h3>`;
+    html=`<h3 style="color:var(--gold);margin-bottom:8px">草 ${c.year}年 24节气</h3>`;
     html+=`<div style="font-size:11px;line-height:1.8">当前：${c.current}<br>`;
     for(const jq of c.list){
       html+=`${jq.name}(${jq.type}): ${jq.month}月${jq.day}日　`;
     }
     html+='</div>';
   }else if(tool==='mobile'){
-    html=`<h3 style="color:var(--gold);margin-bottom:8px">📱 ${c.number} 分析</h3>`;
+    html=`<h3 style="color:var(--gold);margin-bottom:8px">机 ${c.number} 分析</h3>`;
     html+=`<div style="font-size:12px;line-height:2">`;
     html+=`尾数：${c.tailNumber}（${c.tailWuxing}）| 81数理：${c.luck81.number}（${c.luck81.luck}）<br>`;
     html+=`评分：${c.score}/100 | ${c.suggestion}`;
     html+='</div>';
   }else if(tool==='liunian'){
-    html=`<h3 style="color:var(--gold);margin-bottom:8px">🔄 ${c.year}年流年运程</h3>`;
+    html=`<h3 style="color:var(--gold);margin-bottom:8px">更 ${c.year}年流年运程</h3>`;
     html+=`<div style="font-size:12px;line-height:2">`;
     html+=`${c.yearGanZhi}(${c.yearSX}) | ${c.age}岁 | 生肖：${c.sxRelation}<br>`;
     html+=`五行：${c.yearWX}vs${c.birthWX} ${c.wxRelation} | 评分：${c.score}<br>`;
@@ -218,7 +218,7 @@ async function showTool(tool){
     html+=`<span style="color:var(--jade)">${c.suggestion}</span>`;
     html+='</div>';
   }else if(tool==='lucky'){
-    html=`<h3 style="color:var(--gold);margin-bottom:8px">🍀 幸运分析</h3>`;
+    html=`<h3 style="color:var(--gold);margin-bottom:8px">幸运分析</h3>`;
     html+=`<div style="font-size:12px;line-height:2">`;
     html+=`五行：${c.wuxing} | 幸运数字：${c.luckyNumbers.join('、')}<br>`;
     html+=`幸运色：${c.luckyColors.join('、')} | 方位：${c.luckyDirection} | 季节：${c.luckySeason}<br>`;

@@ -102,20 +102,20 @@ tr.selected{background:rgba(201,168,76,.08)}
 </div>
 
 <nav class="nav-bar">
-  <a href="admin.html">🏠 后台</a>
-  <a href="admin-tickets.html" class="active">🎫 工单管理</a>
-  <a href="admin-kb-panel.html">📚 知识库</a>
-  <a href="monitor-portal.html">📊 监控</a>
-  <a href="divination-hub.html">🏠 主站</a>
+  <a href="admin.html">宅 后台</a>
+  <a href="admin-tickets.html" class="active">票 工单管理</a>
+  <a href="admin-kb-panel.html">知识库</a>
+  <a href="monitor-portal.html">图 监控</a>
+  <a href="divination-hub.html">宅 主站</a>
 </nav>
 
 <div class="container">
-  <h1>🎫 站内工单管理系统</h1>
+  <h1>票 站内工单管理系统</h1>
 
   <div class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('dashboard')">📊 统计看板</button>
-    <button class="tab-btn" onclick="switchTab('list')">🎫 工单列表</button>
-    <button class="tab-btn" onclick="switchTab('search')">🔍 搜索</button>
+    <button class="tab-btn active" onclick="switchTab('dashboard')">统计看板</button>
+    <button class="tab-btn" onclick="switchTab('list')">票 工单列表</button>
+    <button class="tab-btn" onclick="switchTab('search')">搜索</button>
   </div>
 
   <!-- Tab 1: 统计看板 -->
@@ -124,46 +124,46 @@ tr.selected{background:rgba(201,168,76,.08)}
 
     <div class="grid-2">
       <div>
-        <div class="section-title">📊 问题类别分布</div>
+        <div class="section-title">图 问题类别分布</div>
         <div class="card" id="categoryChart"></div>
       </div>
       <div>
-        <div class="section-title">⚡ 优先级分布</div>
+        <div class="section-title">电 优先级分布</div>
         <div class="card" id="priorityChart" style="display:flex;gap:8px;flex-wrap:wrap"></div>
       </div>
     </div>
 
     <div class="grid-2">
       <div>
-        <div class="section-title">📝 关键词词云</div>
+        <div class="section-title">记 关键词词云</div>
         <div class="card">
           <div class="word-cloud" id="wordCloud"></div>
         </div>
       </div>
       <div>
-        <div class="section-title">📄 反馈来源页面</div>
+        <div class="section-title">文 反馈来源页面</div>
         <div class="card" id="pageChart"></div>
       </div>
     </div>
 
     <div class="grid-2">
       <div>
-        <div class="section-title">👥 用户角色分布</div>
+        <div class="section-title">众 用户角色分布</div>
         <div class="card" id="roleChart"></div>
       </div>
       <div>
-        <div class="section-title">🏷️ 标签使用统计</div>
+        <div class="section-title">签 标签使用统计</div>
         <div class="card" id="tagChart"></div>
       </div>
     </div>
 
-    <div class="section-title">📈 趋势分析</div>
+    <div class="section-title">升 趋势分析</div>
     <div class="card" style="max-height:300px;overflow-y:auto" id="trendChart"></div>
 
-    <div class="section-title">📅 周度解决率</div>
+    <div class="section-title">历 周度解决率</div>
     <div class="card" id="weeklyChart"></div>
 
-    <div class="section-title">🔥 活跃反馈用户</div>
+    <div class="section-title">热 活跃反馈用户</div>
     <div class="card" id="topUsers"></div>
   </div>
 
@@ -180,20 +180,20 @@ tr.selected{background:rgba(201,168,76,.08)}
       </select>
       <select id="filterCategory" onchange="loadTickets()">
         <option value="">全部类别</option>
-        <option value="bug">🐛 Bug</option>
-        <option value="suggestion">💡 建议</option>
-        <option value="question">❓ 咨询</option>
-        <option value="feature_request">✨ 新功能</option>
-        <option value="praise">👍 好评</option>
+        <option value="bug">虫 Bug</option>
+        <option value="suggestion">示 建议</option>
+        <option value="question">问 咨询</option>
+        <option value="feature_request">光 新功能</option>
+        <option value="praise">赞 好评</option>
       </select>
       <select id="filterPriority" onchange="loadTickets()">
         <option value="">全部优先级</option>
-        <option value="urgent">🔴 紧急</option>
-        <option value="high">🟠 高</option>
-        <option value="normal">🟡 普通</option>
-        <option value="low">🟢 低</option>
+        <option value="urgent">危 紧急</option>
+        <option value="high">警 高</option>
+        <option value="normal">警 普通</option>
+        <option value="low">安 低</option>
       </select>
-      <button class="btn-secondary" onclick="exportCSV()" style="padding:6px 12px;font-size:12px;border-radius:6px;cursor:pointer">📥 导出CSV</button>
+      <button class="btn-secondary" onclick="exportCSV()" style="padding:6px 12px;font-size:12px;border-radius:6px;cursor:pointer">入 导出CSV</button>
       <span id="totalCount" style="font-size:12px;color:var(--text-muted);margin-left:auto"></span>
     </div>
 
@@ -269,7 +269,7 @@ var ticketTags = [];
 function checkAdminLogin() {
   var token = localStorage.getItem('authToken');
   if (!token) {
-    document.body.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#0d1117;color:#c9d1d9;font-family:system-ui,sans-serif"><div style="font-size:48px;margin-bottom:16px">🔐</div><h2 style="color:#c9a84c;margin-bottom:8px">需要管理员登录</h2><p style="color:#8b949e;font-size:14px;margin-bottom:24px">请先登录管理员账号</p><a href="login.html?redirect=admin-tickets.html" style="padding:10px 24px;background:#c9a84c;color:#1a1a2e;text-decoration:none;border-radius:8px;font-weight:600">前往登录</a></div>';
+    document.body.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#0d1117;color:#c9d1d9;font-family:system-ui,sans-serif"><div style="font-size:48px;margin-bottom:16px">密</div><h2 style="color:#c9a84c;margin-bottom:8px">需要管理员登录</h2><p style="color:#8b949e;font-size:14px;margin-bottom:24px">请先登录管理员账号</p><a href="login.html?redirect=admin-tickets.html" style="padding:10px 24px;background:#c9a84c;color:#1a1a2e;text-decoration:none;border-radius:8px;font-weight:600">前往登录</a></div>';
     return false;
   }
   return true;
@@ -345,14 +345,14 @@ function renderStats(d) {
   document.getElementById('pageChart').innerHTML = d.byPageUrl.map(function(p) {
     return '<div class="chart-bar"><span class="bar-label" style="width:120px;font-size:11px">'+p.page.substring(0,20)+'</span>' +
       '<div class="bar-track"><div class="bar-fill" style="width:'+Math.max(p.cnt/6*100,5)+'%;background:'+(p.bugs>p.cnt/2?'var(--red)':'var(--gold)')+'">'+p.cnt+'</div></div>' +
-      '<span style="font-size:10px;color:var(--text-muted)">🐛'+p.bugs+'</span></div>';
+      '<span style="font-size:10px;color:var(--text-muted)">虫'+p.bugs+'</span></div>';
   }).join('') || '<div style="color:var(--text-muted)">暂无</div>';
 
   // 角色
   document.getElementById('roleChart').innerHTML = d.byRole.map(function(r) {
     return '<div class="chart-bar"><span class="bar-label">'+r.user_role+'</span>' +
       '<div class="bar-track"><div class="bar-fill" style="width:'+Math.max(r.cnt/6*100,5)+'%;background:var(--blue)">'+r.cnt+'</div></div>' +
-      '<span style="font-size:10px;color:var(--text-muted)">🐛'+r.bugs+' 💡'+r.suggestions+'</span></div>';
+      '<span style="font-size:10px;color:var(--text-muted)">虫'+r.bugs+' 💡'+r.suggestions+'</span></div>';
   }).join('') || '<div style="color:var(--text-muted)">暂无</div>';
 
   // 标签
@@ -364,8 +364,8 @@ function renderStats(d) {
   document.getElementById('trendChart').innerHTML = d.dailyTrend.map(function(t) {
     return '<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(48,54,61,.3);font-size:11px">' +
       '<span style="color:var(--text-muted)">'+t.date+'</span>' +
-      '<span>📈 总'+t.cnt+' · 🐛'+(t.bugs||0)+' · 💡'+(t.suggestions||0)+' · ✨'+(t.features||0)+' · ❓'+(t.questions||0)+' · 👍'+(t.praise||0)+'</span>' +
-      '<span style="color:var(--green)">✅'+(t.resolved_on_day||0)+'</span></div>';
+      '<span>升 总'+t.cnt+' · 🐛'+(t.bugs||0)+' · 💡'+(t.suggestions||0)+' · ✨'+(t.features||0)+' · ❓'+(t.questions||0)+' · 👍'+(t.praise||0)+'</span>' +
+      '<span style="color:var(--green)">成'+(t.resolved_on_day||0)+'</span></div>';
   }).join('') || '<div style="color:var(--text-muted)">暂无数据</div>';
 
   // 周度解决率
@@ -537,7 +537,7 @@ function viewTicket(id) {
 function renderTagInput() {
   var box = document.getElementById('tagInput');
   box.innerHTML = ticketTags.map(function(tag, i) {
-    return '<span class="tag-chip">'+tag+' <span class="tag-remove" onclick="removeTag('+i+')">✕</span></span>';
+    return '<span class="tag-chip">'+tag+' <span class="tag-remove" onclick="removeTag('+i+')">关</span></span>';
   }).join('') + '<input aria-label="输入" type="text" id="tagInputField" placeholder="输入标签后回车" style="border:none;background:transparent;color:var(--text);font-size:12px;outline:none;flex:1;min-width:80px" onkeydown="if(event.key===\'Enter\'){addTag(this.value);this.value=\'\';}">';
 }
 function addTag(tag) {

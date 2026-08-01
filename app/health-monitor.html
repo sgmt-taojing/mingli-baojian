@@ -79,11 +79,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
 
 <a href="divination-hub.html" style="position:fixed;top:12px;left:12px;z-index:9999;padding:8px 14px;background:#c9a227;color:#fff;border-radius:20px;font-size:12px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.15);opacity:.85">← 首页</a>
 <div class="topbar">
-  <h1>🛡️ 健康监控看板</h1>
+  <h1>盾 健康监控看板</h1>
   <div class="nav-links">
-    <a href="report-interpret.html">📋 报告解读</a>
-    <a href="wellness-weekly.html">📅 周分析</a>
-    <a href="person-center.html">🔮 身份中心</a>
+    <a href="report-interpret.html">报告解读</a>
+    <a href="wellness-weekly.html">历 周分析</a>
+    <a href="person-center.html">卦 身份中心</a>
   </div>
 </div>
 
@@ -93,7 +93,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
 <div class="section">
   <div class="section-title">
     📊 实时健康概览
-    <button class="refresh-btn" onclick="location.reload()">🔄 刷新</button>
+    <button class="refresh-btn" onclick="location.reload()">更 刷新</button>
   </div>
   <div class="row-grid">
     <div class="stat-card"><div class="stat-num" id="stat-profile">-</div><div class="stat-label">康养人档案</div></div>
@@ -105,7 +105,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
 
 <!-- 风险等级可视化 -->
 <div class="section">
-  <div class="section-title">🎯 综合风险指数</div>
+  <div class="section-title">标 综合风险指数</div>
   <div id="gauge-area" style="margin-top:10px">
     <div class="gauge"><div class="gauge-fill" id="gauge-fill" style="width:0%"></div><div class="gauge-label" id="gauge-label">计算中...</div></div>
     <div style="margin-top:10px;font-size:12px;color:var(--text-muted)" id="gauge-detail">综合日主五行、家族遗传、症状、季节、报告OCR异常 多维度</div>
@@ -114,25 +114,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
 
 <!-- 实时告警 -->
 <div class="section">
-  <div class="section-title">⚠️ 实时告警</div>
+  <div class="section-title">警 实时告警</div>
   <div id="alerts-list"><div class="empty">正在为您查阅典籍...</div></div>
 </div>
 
 <!-- 报告解读历史 -->
 <div class="section">
-  <div class="section-title">📋 报告解读历史（KB 召回）</div>
+  <div class="section-title">报告解读历史（KB 召回）</div>
   <div id="report-history"><div class="empty">正在为您查阅典籍...</div></div>
 </div>
 
 <!-- 周分析历史 -->
 <div class="section">
-  <div class="section-title">📅 周分析历史</div>
+  <div class="section-title">历 周分析历史</div>
   <div id="weekly-history"><div class="empty">正在为您查阅典籍...</div></div>
 </div>
 
 <!-- 健康度时间轴 -->
 <div class="section">
-  <div class="section-title">📈 健康度时间轴</div>
+  <div class="section-title">升 健康度时间轴</div>
   <div id="timeline" class="timeline"><div class="empty">正在为您查阅典籍...</div></div>
 </div>
 
@@ -292,27 +292,27 @@ function renderAlerts(score, reasons, ocr, weekly){
   var html = '';
   // 高风险 alert
   if(score >= 60){
-    html += '<div class="alert-card"><div class="alert-title">🔴 综合风险高（'+score+'分）</div>';
+    html += '<div class="alert-card"><div class="alert-title">危 综合风险高（'+score+'分）</div>';
     html += '<div class="alert-content">建议：立即就医复查 + 命理体质调养 + 家族遗传咨询。因素：'+reasons.join('；')+'</div></div>';
   } else if(score >= 30){
-    html += '<div class="alert-card warn"><div class="alert-title">🟡 综合风险中（'+score+'分）</div>';
+    html += '<div class="alert-card warn"><div class="alert-title">警 综合风险中（'+score+'分）</div>';
     html += '<div class="alert-content">建议：定期复查 + 关注家族遗传 + 周分析跟踪。因素：'+reasons.join('；')+'</div></div>';
   } else {
-    html += '<div class="alert-card ok"><div class="alert-title">🟢 综合风险低（'+score+'分）</div>';
+    html += '<div class="alert-card ok"><div class="alert-title">安 综合风险低（'+score+'分）</div>';
     html += '<div class="alert-content">当前健康度良好，继续保持。因素：'+reasons.join('；')+'</div></div>';
   }
 
   // 最近一次高风险 OCR 告警
   var latestHigh = ocr.find(function(a){return a.title.indexOf('high') > -1});
   if(latestHigh){
-    html += '<div class="alert-card"><div class="alert-title">⚠️ 最新高风险 OCR 案例</div>';
+    html += '<div class="alert-card"><div class="alert-title">警 最新高风险 OCR 案例</div>';
     html += '<div class="alert-content">'+latestHigh.title+' · trust='+latestHigh.trust_score+'</div></div>';
   }
 
   // 周分析 worse 趋势
   var recentWorse = weekly.filter(function(w){return w.outcome === 'worse'}).slice(0,1);
   if(recentWorse.length > 0){
-    html += '<div class="alert-card warn"><div class="alert-title">📉 周分析转差趋势</div>';
+    html += '<div class="alert-card warn"><div class="alert-title">降 周分析转差趋势</div>';
     html += '<div class="alert-content">'+recentWorse[0].week+'：'+(recentWorse[0].summary || '本周健康转差')+'</div></div>';
   }
 

@@ -86,7 +86,7 @@
 <a href="divination-hub.html" style="position:fixed;top:12px;left:12px;z-index:9999;padding:8px 14px;background:var(--gold,#c9a227);color:#fff;border-radius:20px;font-size:12px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.15);opacity:.85">← 首页</a>
 
 <div class="container">
-  <h1>🔔 通知日志</h1>
+  <h1>通知日志</h1>
   <p class="subtitle">运维告警通道（notify-admin）历史记录</p>
 
   <div class="stats" id="stats"></div>
@@ -94,12 +94,12 @@
   <div class="filter-bar">
     <select id="sev-filter" aria-label="严重程度筛选">
       <option value="">全部级别</option>
-      <option value="CRITICAL">🔴 CRITICAL</option>
-      <option value="WARN">⚠️ WARN</option>
-      <option value="OK">✅ OK</option>
+      <option value="CRITICAL">危 CRITICAL</option>
+      <option value="WARN">警 WARN</option>
+      <option value="OK">成 OK</option>
       <option value="INFO">ℹ️ INFO</option>
     </select>
-    <button class="primary" onclick="loadLogs()">🔄 刷新</button>
+    <button class="primary" onclick="loadLogs()">更 刷新</button>
   </div>
 
   <div class="log-list" id="log-list">
@@ -124,7 +124,7 @@ async function loadLogs() {
     renderStats();
     renderList();
   } catch(e) {
-    document.getElementById('log-list').innerHTML = '<div class="empty">⚠️ 查阅失败</div>';
+    document.getElementById('log-list').innerHTML = '<div class="empty">警 查阅失败</div>';
   }
 }
 
@@ -141,7 +141,7 @@ function renderStats() {
 
 function renderList() {
   if (!allItems.length) {
-    document.getElementById('log-list').innerHTML = '<div class="empty">📭 暂无通知记录</div>';
+    document.getElementById('log-list').innerHTML = '<div class="empty">空 暂无通知记录</div>';
     return;
   }
   document.getElementById('log-list').innerHTML = allItems.map(i => `
@@ -152,9 +152,9 @@ function renderList() {
       </div>
       ${i.message ? `<div class="log-msg">${esc(i.message)}</div>` : ''}
       <div class="log-meta">
-        <span>📡 ${esc(i.source)}</span>
-        <span>🕐 ${esc(i.ts)}</span>
-        <span>🌐 ${esc(i.ip)}</span>
+        <span>信 ${esc(i.source)}</span>
+        <span>时 ${esc(i.ts)}</span>
+        <span>网 ${esc(i.ip)}</span>
       </div>
     </div>
   `).join('');

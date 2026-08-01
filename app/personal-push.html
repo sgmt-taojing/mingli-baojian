@@ -79,7 +79,7 @@ body{background:#0a0c12;color:#e4e6ed;font-family:-apple-system,BlinkMacSystemFo
 
 
 <div class="header">
-  <h1>🎭 千人千面 · 居家个性化推送</h1>
+  <h1>面 千人千面 · 居家个性化推送</h1>
   <p>面诊体质画像 · 兴趣取向学习 · 时事关联推荐 · KB 知识驱动</p>
 </div>
 
@@ -87,29 +87,29 @@ body{background:#0a0c12;color:#e4e6ed;font-family:-apple-system,BlinkMacSystemFo
   <!-- 左栏：人脸画像 + 体质分析 -->
   <div>
     <div class="panel">
-      <h2>📷 面诊体质采集 <span class="badge">千人千面基础</span></h2>
+      <h2>拍 面诊体质采集 <span class="badge">千人千面基础</span></h2>
       <div class="face-box" id="faceBox">
         <div class="placeholder">点击"开启摄像头"采集面部图像<br>AI 将分析面色→五行体质→个性化推送</div>
       </div>
       <div class="controls">
-        <button class="btn btn-primary" onclick="startFace()">📷 开启摄像头</button>
-        <button class="btn" onclick="captureFace()" id="captureBtn" disabled>📸 采集体质</button>
-        <button class="btn" onclick="simulateFace()">🤖 模拟体质</button>
+        <button class="btn btn-primary" onclick="startFace()">拍 开启摄像头</button>
+        <button class="btn" onclick="captureFace()" id="captureBtn" disabled>拍 采集体质</button>
+        <button class="btn" onclick="simulateFace()">机 模拟体质</button>
       </div>
       
       <div class="face-result" id="faceResult">
         <div style="margin-top:10px">
-          <h2 style="font-size:13px;color:var(--gold);margin-bottom:8px">🌿 体质画像</h2>
+          <h2 style="font-size:13px;color:var(--gold);margin-bottom:8px">草 体质画像</h2>
           <div class="constitution-card" id="ctWood">
-            <div class="ct-title">🌳 木旺体质（肝）</div>
+            <div class="ct-title">树 木旺体质（肝）</div>
             <div class="ct-desc">面色青·易怒·头痛·高血压倾向 · 推送方向：疏肝理气</div>
           </div>
           <div class="constitution-card" id="ctFire">
-            <div class="ct-title">🔥 火旺体质（心）</div>
+            <div class="ct-title">热 火旺体质（心）</div>
             <div class="ct-desc">面色赤·心烦·失眠·口疮 · 推送方向：清心降火</div>
           </div>
           <div class="constitution-card" id="ctEarth">
-            <div class="ct-title">🌍 土弱体质（脾）</div>
+            <div class="ct-title">土弱体质（脾）</div>
             <div class="ct-desc">面色黄·消化不良·乏力 · 推送方向：健脾益气</div>
           </div>
           <div class="constitution-card" id="ctMetal">
@@ -117,7 +117,7 @@ body{background:#0a0c12;color:#e4e6ed;font-family:-apple-system,BlinkMacSystemFo
             <div class="ct-desc">面色白·易感冒·咳嗽 · 推送方向：补肺固表</div>
           </div>
           <div class="constitution-card" id="ctWater">
-            <div class="ct-title">💧 水弱体质（肾）</div>
+            <div class="ct-title">湿 水弱体质（肾）</div>
             <div class="ct-desc">面色黑·腰酸·怕冷 · 推送方向：温肾助阳</div>
           </div>
         </div>
@@ -125,7 +125,7 @@ body{background:#0a0c12;color:#e4e6ed;font-family:-apple-system,BlinkMacSystemFo
     </div>
 
     <div class="panel">
-      <h2>📊 兴趣取向画像 <span class="badge">自动学习</span></h2>
+      <h2>图 兴趣取向画像 <span class="badge">自动学习</span></h2>
       <div id="interestProfile">
         <div class="interest-bar"><span class="label">中医</span><div class="bar"><div class="fill" style="width:78%;background:var(--jade)"></div></div><span class="pct">78%</span></div>
         <div class="interest-bar"><span class="label">养生</span><div class="bar"><div class="fill" style="width:65%;background:var(--gold)"></div></div><span class="pct">65%</span></div>
@@ -140,39 +140,39 @@ body{background:#0a0c12;color:#e4e6ed;font-family:-apple-system,BlinkMacSystemFo
   <!-- 右栏：个性化推送 -->
   <div>
     <div class="panel">
-      <h2>📡 个性化推送 <span class="badge" id="pushCount">0 条</span></h2>
+      <h2>信 个性化推送 <span class="badge" id="pushCount">0 条</span></h2>
       
       <div class="news-ticker">
-        <div class="label">📅 今日时事关联</div>
+        <div class="label">历 今日时事关联</div>
         <div id="currentEvents">大暑节气 · 高温预警 · 三伏天 · 空气质量良好</div>
       </div>
 
       <div id="pushList">
         <div class="push-item">
-          <div class="push-time">🌅 晨推 · 06:00</div>
+          <div class="push-time">晨 晨推 · 06:00</div>
           <div class="push-title">待生成 — 请先采集体质画像</div>
           <div class="push-desc">完成面诊采集后，系统将根据您的体质+兴趣+时事自动生成个性化推送</div>
         </div>
       </div>
 
       <div class="controls">
-        <button class="btn btn-primary" onclick="generatePush()">🔄 生成推送</button>
-        <button class="btn" onclick="refreshEvents()">📅 刷新时事</button>
-        <button class="btn" onclick="saveProfile()">💾 保存画像</button>
+        <button class="btn btn-primary" onclick="generatePush()">更 生成推送</button>
+        <button class="btn" onclick="refreshEvents()">历 刷新时事</button>
+        <button class="btn" onclick="saveProfile()">存 保存画像</button>
       </div>
     </div>
 
     <div class="panel">
-      <h2>🧠 AI 推送策略说明</h2>
+      <h2>脑 AI 推送策略说明</h2>
       <div style="font-size:12px;color:#8b8fa3;line-height:1.8">
         <p><b style="color:var(--gold)">三维度画像：</b></p>
         <p>1️⃣ 体质画像：面诊AI → 面色 → 五行体质 → 脏腑强弱 → 疾病倾向</p>
         <p>2️⃣ 兴趣取向：点击/停留/收藏 → 权重排序 → 偏好领域</p>
         <p>3️⃣ 时事关联：社会热点 × 健康风险 × 用户体质 → 关联推荐</p>
         <p style="margin-top:8px"><b style="color:var(--gold)">推送规则：</b></p>
-        <p>🌅 晨推 = 体质养生 + 当日节气 + 时事关联</p>
-        <p>🌇 暮推 = 当日健康摘要 + 异常预警</p>
-        <p>🌿 节气推 = 养生方案 + 饮食运动</p>
+        <p>晨 晨推 = 体质养生 + 当日节气 + 时事关联</p>
+        <p>暮推 = 当日健康摘要 + 异常预警</p>
+        <p>草 节气推 = 养生方案 + 饮食运动</p>
         <p style="margin-top:8px"><b style="color:var(--gold)">千人千面核心：</b></p>
         <p>同样节气，木旺→疏肝理气，火旺→清心降火，水弱→温肾助阳</p>
       </div>
@@ -285,7 +285,7 @@ function analyzeConstitution(result){
 
 function generatePush(){
   if(!userProfile.constitution){
-    var fl=document.getElementById('faceResult');if(fl){fl.classList.add('show');fl.innerHTML='<div style=\'color:#e67e22;padding:10px\'>⚠️ 请先采集体质画像（摄像头或模拟）</div>';}return;
+    var fl=document.getElementById('faceResult');if(fl){fl.classList.add('show');fl.innerHTML='<div style=\'color:#e67e22;padding:10px\'>警 请先采集体质画像（摄像头或模拟）</div>';}return;
     return;
   }
   

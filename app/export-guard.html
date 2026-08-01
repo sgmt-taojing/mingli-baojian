@@ -38,7 +38,7 @@
   <a class="skip-link" href="#main-content">跳到主内容</a>
 <main id="main-content" role="main">
 <div class="wrap">
-  <h1>🔒 数据安全导出 · 管理面板</h1>
+  <h1>锁 数据安全导出 · 管理面板</h1>
   <p style="color:#6b4226">所有导出操作均经 4 道防线：字段脱敏 / 角色鉴权 / 审计水印 / 加密归档。详细规范见 <a href="docs/DATA_SECURITY_STANDARD.md"  target="_blank" rel="noopener noreferrer">DATA_SECURITY_STANDARD.md</a></p>
 
   <div class="grid">
@@ -64,7 +64,7 @@
         <label for="outID">脱敏后身份证：</label><input aria-label="outID" id="outID" readonly>
         <label for="outAddr">脱敏后地址：</label><input aria-label="outAddr" id="outAddr" readonly>
         <label for="outText">脱敏后病例：</label><textarea id="outText" aria-label="outText" readonly></textarea>
-        <button onclick="previewMask()">🔍 立即脱敏预览</button>
+        <button onclick="previewMask()">查 立即脱敏预览</button>
       </div>
     </div>
   </div>
@@ -92,8 +92,8 @@
         <input aria-label="iptPurpose" id="iptPurpose" placeholder="月度统计 / 审计回溯 ...">
       </div>
     </div>
-    <button onclick="doExport('csv')">📥 导出 CSV</button>
-    <button onclick="doExport('json')" class="secondary">📥 导出 JSON</button>
+    <button onclick="doExport('csv')">入 导出 CSV</button>
+    <button onclick="doExport('json')" class="secondary">入 导出 JSON</button>
     <span id="expHint" style="margin-left:8px;font-size:12px;color:#888"></span>
   </div>
 
@@ -110,15 +110,15 @@
       <div>
         <label for="archResult">加密结果：</label>
         <textarea id="archResult" aria-label="archResult" readonly style="min-height:140px"></textarea>
-        <button onclick="doArchive()" class="danger">🔐 加密归档</button>
-        <button onclick="doDecrypt()" class="secondary">🔓 解密回看</button>
+        <button onclick="doArchive()" class="danger">密 加密归档</button>
+        <button onclick="doDecrypt()" class="secondary">解 解密回看</button>
       </div>
     </div>
   </div>
 
   <h2>④ 审计日志（最近 50 条）</h2>
   <div class="card">
-    <button onclick="loadAudit()">🔄 刷新日志</button>
+    <button onclick="loadAudit()">更 刷新日志</button>
     <table id="auditTbl">
       <thead><tr><th>时间</th><th>用户ID</th><th>动作</th><th>表/目标</th><th>行数</th><th>IP</th><th>用途</th></tr></thead>
       <tbody id="auditBody"><tr><td colspan="7" style="text-align:center;color:#888">点击刷新加载</td></tr></tbody>
@@ -134,7 +134,7 @@
       <input aria-label="unlockTTL" id="unlockTTL" placeholder="TTL (小时)" value="1">
       <input aria-label="unlockReason" id="unlockReason" placeholder="原因">
     </div>
-    <button onclick="applyUnlock()">🎫 申请解锁令牌</button>
+    <button onclick="applyUnlock()">票 申请解锁令牌</button>
     <pre id="unlockResult" style="margin-top:8px"></pre>
   </div>
 </div>

@@ -121,13 +121,13 @@
 </div>
 
 <nav>
-  <a href="divination-hub.html">🏠 主平台</a>
-  <a href="wangzhen-clinical.html">🔍 望诊工作台</a>
-  <a href="tcm-clinic.html">🏥 中医诊疗</a>
-  <a href="doctor-elder.html">👨‍⚕️ 接诊台</a>
+  <a href="divination-hub.html">主平台</a>
+  <a href="wangzhen-clinical.html">望诊工作台</a>
+  <a href="tcm-clinic.html">医 中医诊疗</a>
+  <a href="doctor-elder.html">医 接诊台</a>
 </nav>
 
-<h1>📋 患者档案中心</h1>
+<h1>表 患者档案中心</h1>
 <div class="pa-subtitle">患者档案管理 · 诊断历史分析 · 供医生和周易大师参考</div>
 
 <!-- 统计概览 -->
@@ -138,13 +138,13 @@
 
 <!-- 工具栏 -->
 <div class="pa-toolbar">
-  <input type="text" class="pa-search" id="pa-search" placeholder="🔍 搜索患者姓名/主诉/电话..." oninput="PatientArchive.search(this.value)" aria-label="搜索患者">
+  <input type="text" class="pa-search" id="pa-search" placeholder="搜索患者姓名/主诉/电话..." oninput="PatientArchive.search(this.value)" aria-label="搜索患者">
   <button class="pa-filter active" onclick="PatientArchive.setFilter('all',this)">全部</button>
   <button class="pa-filter" onclick="PatientArchive.setFilter('male',this)">男</button>
   <button class="pa-filter" onclick="PatientArchive.setFilter('female',this)">女</button>
   <button class="pa-filter" onclick="PatientArchive.setFilter('followup',this)">需复诊</button>
-  <button class="btn btn-ghost" onclick="PatientArchive.exportAll()">📥 导出全部</button>
-  <button class="btn btn-primary" onclick="PatientArchive.runDistill()">🔬 蒸馏经验</button>
+  <button class="btn btn-ghost" onclick="PatientArchive.exportAll()">入 导出全部</button>
+  <button class="btn btn-primary" onclick="PatientArchive.runDistill()">研 蒸馏经验</button>
 </div>
 
 <!-- 患者表格 -->
@@ -160,7 +160,7 @@
 <!-- 患者详情弹窗 -->
 <div class="pa-modal" id="pa-modal" onclick="if(event.target===this)this.style.display='none'">
   <div class="pa-modal-content">
-    <span class="pa-modal-close" onclick="document.getElementById('pa-modal').style.display='none'">✕</span>
+    <span class="pa-modal-close" onclick="document.getElementById('pa-modal').style.display='none'">关</span>
     <div id="pa-modal-body"></div>
   </div>
 </div>
@@ -224,7 +224,7 @@ var PatientArchive = {
       else ageGroups['60+']++;
     });
     var maxAge = Math.max.apply(null, Object.values(ageGroups)) || 1;
-    html += '<div class="pa-chart"><div class="pa-chart-title">📊 年龄分布</div><div class="pa-bar-chart">';
+    html += '<div class="pa-chart"><div class="pa-chart-title">图 年龄分布</div><div class="pa-bar-chart">';
     Object.keys(ageGroups).forEach(function(k){
       var v = ageGroups[k]; var pct = Math.round(v / maxAge * 100);
       html += '<div class="pa-bar-row"><span class="pa-bar-label">' + k + '岁</span><div class="pa-bar-track"><div class="pa-bar-fill" style="width:' + pct + '%;background:var(--pa-cyan)"></div></div><span class="pa-bar-val">' + v + '</span></div>';
@@ -241,7 +241,7 @@ var PatientArchive = {
     });
     var sorted = Object.keys(chiefMap).sort(function(a,b){ return chiefMap[b] - chiefMap[a]; }).slice(0, 5);
     var maxChief = sorted.length > 0 ? chiefMap[sorted[0]] : 1;
-    html += '<div class="pa-chart"><div class="pa-chart-title">📋 主诉分布 Top5</div><div class="pa-bar-chart">';
+    html += '<div class="pa-chart"><div class="pa-chart-title">表 主诉分布 Top5</div><div class="pa-bar-chart">';
     if(sorted.length === 0){
       html += '<div class="pa-empty">暂无主诉数据</div>';
     } else {
@@ -267,7 +267,7 @@ var PatientArchive = {
       }
     });
     var maxTrend = Math.max.apply(null, Object.values(trend)) || 1;
-    html += '<div class="pa-chart"><div class="pa-chart-title">📈 近7天就诊趋势</div><div class="pa-bar-chart">';
+    html += '<div class="pa-chart"><div class="pa-chart-title">升 近7天就诊趋势</div><div class="pa-bar-chart">';
     Object.keys(trend).forEach(function(k){
       var v = trend[k]; var pct = Math.round(v / maxTrend * 100);
       html += '<div class="pa-bar-row"><span class="pa-bar-label">' + k + '</span><div class="pa-bar-track"><div class="pa-bar-fill" style="width:' + pct + '%;background:var(--pa-gold)"></div></div><span class="pa-bar-val">' + v + '</span></div>';
@@ -284,7 +284,7 @@ var PatientArchive = {
     });
     var eleColors = {'木':'#10b981','火':'#ef4444','土':'#fbbf24','金':'#a78bfa','水':'#6366f1'};
     var maxConst = Math.max.apply(null, Object.values(constitutionMap)) || 1;
-    html += '<div class="pa-chart"><div class="pa-chart-title">🌿 体质分布（日主五行）</div><div class="pa-bar-chart">';
+    html += '<div class="pa-chart"><div class="pa-chart-title">草 体质分布（日主五行）</div><div class="pa-bar-chart">';
     if(Object.keys(constitutionMap).length === 0){
       html += '<div class="pa-empty">暂无体质数据（需排盘后生成）</div>';
     } else {
@@ -397,7 +397,7 @@ var PatientArchive = {
         var time = v.timestamp ? new Date(v.timestamp).toLocaleString('zh-CN').substring(0,16) : '';
         var isLatest = i === 0;
         html += '<div style="margin-bottom:8px;padding:6px;border-left:3px solid ' + (isLatest ? 'var(--pa-gold)' : 'var(--pa-border)') + '">';
-        if(isLatest) html += '<span style="font-size:10px;color:var(--pa-gold)">📌 最近</span> ';
+        if(isLatest) html += '<span style="font-size:10px;color:var(--pa-gold)">钉 最近</span> ';
         html += '<span style="font-size:11px;color:var(--pa-paper3)">' + time + '</span><br>';
         if(v.diagnosis_text) html += '<span style="font-size:12px"><b>望诊：</b>' + v.diagnosis_text.substring(0,120) + '</span><br>';
         if(v.ai_analysis) html += '<span style="font-size:11px;color:var(--pa-paper2)"><b>AI：</b>' + v.ai_analysis.substring(0,80) + '</span><br>';
@@ -410,7 +410,7 @@ var PatientArchive = {
 
     // 体质趋势（>=2次就诊）
     if(visits.length >= 2){
-      html += '<div class="pa-section"><div class="pa-section-title">📊 趋势分析</div>';
+      html += '<div class="pa-section"><div class="pa-section-title">图 趋势分析</div>';
       var first = visits[visits.length - 1];
       var last = visits[0];
       var firstTime = first.timestamp ? new Date(first.timestamp).toLocaleDateString('zh-CN') : '';

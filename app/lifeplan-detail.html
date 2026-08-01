@@ -194,10 +194,10 @@
   <header>
     <h1>人生规划蓝图</h1>
     <p>4 阶段 / 12 领域 / 48 子项 · 易道智鉴</p>
-    <div class="back-home"><a href="ai-assistant.html">← 返回 智能助手</a> | <a href="divination-hub.html">🏠 主平台</a></div>
+    <div class="back-home"><a href="ai-assistant.html">← 返回 智能助手</a> | <a href="divination-hub.html">主平台</a></div>
   </header>
   <div class="card" id="input">
-    <h2>📋 基础信息</h2>
+    <h2>表 基础信息</h2>
     <div class="row">
       <div><label for="lAge">年龄</label><input aria-label="年龄" id="lAge" type="number" min="1" max="120" value="28"></div>
       <div><label for="lSex">性别</label><select aria-label="性别" id="lSex"><option value="male">男</option><option value="female">女</option></select></div>
@@ -207,15 +207,15 @@
     <input aria-label="关注领域" id="lFocus" placeholder="例：事业、财运、健康">
     <label for="lExtra">补充情况（可选，影响领域加权）</label>
     <textarea id="lExtra" placeholder="例：计划 30 岁前完成理财布局，金融行业从业5年" aria-label="补充信息"></textarea>
-    <button class="btn" id="genBtn" onclick="generate()">✨ 生成蓝图</button>
+    <button class="btn" id="genBtn" onclick="generate()">光 生成蓝图</button>
     <button class="btn btn-ghost" id="printBtn" onclick="window.print()" title="打印蓝图">🖨️ 打印</button>
     <!-- R95 -->
     <div style="margin-top:10px;padding-top:10px;border-top:1px dashed rgba(201,168,76,.2)">
-      <div style="font-size:.8rem;color:var(--gold);margin-bottom:6px">🔀 跳转到其他报告</div>
+      <div style="font-size:.8rem;color:var(--gold);margin-bottom:6px">跳转到其他报告</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="btn" onclick="LifeflowShare.gotoWithForm('lifeflow-report.html')" style="font-size:.75rem;padding:5px 10px">🌊 三维联动</button>
-        <button class="btn" onclick="LifeflowShare.gotoWithForm('lifeflow-timeline.html')" style="font-size:.75rem;padding:5px 10px">🌐 终身三维</button>
-        <button class="btn" onclick="LifeflowShare.gotoWithForm('monthly-report.html')" style="font-size:.75rem;padding:5px 10px;background:linear-gradient(135deg,#3b82f6,#2563eb)">📅 逐月报告</button>
+        <button class="btn" onclick="LifeflowShare.gotoWithForm('lifeflow-report.html')" style="font-size:.75rem;padding:5px 10px">海 三维联动</button>
+        <button class="btn" onclick="LifeflowShare.gotoWithForm('lifeflow-timeline.html')" style="font-size:.75rem;padding:5px 10px">网 终身三维</button>
+        <button class="btn" onclick="LifeflowShare.gotoWithForm('monthly-report.html')" style="font-size:.75rem;padding:5px 10px;background:linear-gradient(135deg,#3b82f6,#2563eb)">历 逐月报告</button>
       </div>
     </div>
   </div>
@@ -225,10 +225,10 @@
 
 
 <!-- R41-B lifeplan-detail 4 阶段 HTML -->
-<h2 style="color:#63b3ed;margin:24px 0 12px">📅 人生四阶段时间轴</h2>
+<h2 style="color:#63b3ed;margin:24px 0 12px">历 人生四阶段时间轴</h2>
 <div id="lp-stage-timeline" class="lp-stage-timeline"></div>
 
-<h2 style="color:#63b3ed;margin:24px 0 12px">🎯 四阶段·十二领域深度规划</h2>
+<h2 style="color:#63b3ed;margin:24px 0 12px">标 四阶段·十二领域深度规划</h2>
 <div id="section-lp-children"></div>
 <div id="section-lp-teen"></div>
 <div id="section-lp-young"></div>
@@ -369,16 +369,16 @@
 <!-- ===== R33: 二维码分享模态（原生 <dialog> · ESC + click-out 自动 a11y）===== -->
 <dialog id="qrModal" class="qr-modal" aria-label="二维码分享">
   <div class="qr-modal-content">
-    <button class="qr-modal-close" onclick="closeQrModal()" aria-label="关闭">✕</button>
-    <h3>📱 扫码查看此报告</h3>
+    <button class="qr-modal-close" onclick="closeQrModal()" aria-label="关闭">关</button>
+    <h3>机 扫码查看此报告</h3>
     <p class="qr-modal-hint">用微信/支付宝/系统相机扫描二维码，即可在手机上阅读完整报告</p>
     <div class="qr-canvas-wrap">
       <canvas id="qrCanvas" width="256" height="256"></canvas>
     </div>
     <p id="qrUrlText" class="qr-url-text"></p>
     <div class="qr-modal-tools">
-      <button onclick="downloadQr()">💾 保存二维码</button>
-      <button onclick="shareUrl()">🔗 复制链接</button>
+      <button onclick="downloadQr()">存 保存二维码</button>
+      <button onclick="shareUrl()">复制链接</button>
     </div>
     <p class="qr-modal-footprint">包含所有输入参数（年龄/性别/居地/关注点）· 阅后即焚版友友分享</p>
   </div>

@@ -77,11 +77,11 @@ table.heatmap td.great{background:rgba(16,185,129,.5);color:#fff;font-weight:600
 </div>
 <a href="divination-hub.html" style="position:fixed;top:12px;left:12px;z-index:9999;padding:8px 14px;background:#c9a227;color:#fff;border-radius:20px;font-size:12px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.15);opacity:.85">← 首页</a>
 <div class="container">
-<h1>🌐 终身三维滚动预览</h1>
+<h1>网 终身三维滚动预览</h1>
 <p style="text-align:center;font-size:.8rem;opacity:.6;margin-bottom:16px">流年 × 流月 × 大运 · 默认未来10年(120个月) · 标记大运交接与运势转折</p>
 
 <div class="input-card">
-<h3>📋 输入信息</h3>
+<h3>表 输入信息</h3>
 <div class="input-row">
   <label>出生年</label><input type="number" id="inpYear" aria-label="年" value="1990" min="1900" max="2100">
   <label>月</label><input type="number" id="inpMonth" aria-label="月" value="1" min="1" max="12">
@@ -106,15 +106,15 @@ table.heatmap td.great{background:rgba(16,185,129,.5);color:#fff;font-weight:600
     <option value="20">20年</option>
   </select>
 </div>
-<button class="btn" id="genBtn" onclick="generate()" style="width:100%;margin-top:8px">🌐 生成终身三维滚动预览</button>
+<button class="btn" id="genBtn" onclick="generate()" style="width:100%;margin-top:8px">网 生成终身三维滚动预览</button>
 </div>
 <!-- R95 -->
 <div class="cross-nav" style="background:var(--ink2);border:1px solid var(--gold-dim);border-radius:8px;padding:12px;margin-bottom:14px">
-  <div style="font-size:.85rem;color:var(--gold);margin-bottom:8px">🔀 跳转到其他报告</div>
+  <div style="font-size:.85rem;color:var(--gold);margin-bottom:8px">跳转到其他报告</div>
   <div style="display:flex;gap:6px;flex-wrap:wrap">
-    <button class="btn" onclick="LifeflowShare.gotoWithForm('lifeflow-report.html')" style="font-size:.8rem;padding:6px 12px">🌊 三维联动</button>
-    <button class="btn" onclick="LifeflowShare.gotoWithForm('monthly-report.html')" style="font-size:.8rem;padding:6px 12px;background:linear-gradient(135deg,#3b82f6,#2563eb)">📅 逐月报告</button>
-    <button class="btn" onclick="LifeflowShare.gotoWithForm('lifeplan-detail.html')" style="font-size:.8rem;padding:6px 12px;background:linear-gradient(135deg,#10b981,#059669)">🗺️ 人生规划</button>
+    <button class="btn" onclick="LifeflowShare.gotoWithForm('lifeflow-report.html')" style="font-size:.8rem;padding:6px 12px">海 三维联动</button>
+    <button class="btn" onclick="LifeflowShare.gotoWithForm('monthly-report.html')" style="font-size:.8rem;padding:6px 12px;background:linear-gradient(135deg,#3b82f6,#2563eb)">历 逐月报告</button>
+    <button class="btn" onclick="LifeflowShare.gotoWithForm('lifeplan-detail.html')" style="font-size:.8rem;padding:6px 12px;background:linear-gradient(135deg,#10b981,#059669)">图 人生规划</button>
   </div>
 </div>
 
@@ -160,7 +160,7 @@ table.heatmap td.great{background:rgba(16,185,129,.5);color:#fff;font-weight:600
       var html = '';
       // 标题
       html += '<div class="result-card">';
-      html += '<h2>📅 ' + esc(d.title) + ' <span class="kb-badge">' + (d.totalMonths || 0) + ' 月</span></h2>';
+      html += '<h2>历 ' + esc(d.title) + ' <span class="kb-badge">' + (d.totalMonths || 0) + ' 月</span></h2>';
       html += '<div class="legend">';
       html += '<span class="lc" style="background:rgba(16,185,129,.5)">大吉 ≥80</span>';
       html += '<span class="lc" style="background:rgba(59,130,246,.4)">顺利 65-79</span>';
@@ -171,7 +171,7 @@ table.heatmap td.great{background:rgba(16,185,129,.5);color:#fff;font-weight:600
 
       // 热图：年 × 月
       html += '<div class="result-card">';
-      html += '<h2>🔥 120月走势热图</h2>';
+      html += '<h2>热 120月走势热图</h2>';
       html += '<div class="heatmap-wrap">';
       html += '<table class="heatmap">';
       html += '<thead><tr><th>年份</th>';
@@ -196,19 +196,19 @@ table.heatmap td.great{background:rgba(16,185,129,.5);color:#fff;font-weight:600
 
       // 黄金/谨慎
       html += '<div class="result-card">';
-      html += '<h2>🏆 黄金 5 年 vs ⚠️ 谨慎 5 年</h2>';
+      html += '<h2>冠 黄金 5 年 vs ⚠️ 谨慎 5 年</h2>';
       html += '<div class="best-worst">';
-      html += '<div class="col-card gold"><h4>🏆 黄金 5 年</h4>';
+      html += '<div class="col-card gold"><h4>冠 黄金 5 年</h4>';
       (d.top5Years || []).forEach(function(y){ html += '<div class="year-row"><span>' + y.year + '(' + y.age + '岁) ' + y.ganzhi + ' 大运' + y.dayun + '</span><span class="score">' + y.avgScore + '分 ' + y.overall + '</span></div>'; });
       html += '</div>';
-      html += '<div class="col-card bad"><h4>⚠️ 谨慎 5 年</h4>';
+      html += '<div class="col-card bad"><h4>警 谨慎 5 年</h4>';
       (d.cautiousYears || []).forEach(function(y){ html += '<div class="year-row"><span>' + y.year + '(' + y.age + '岁) ' + y.ganzhi + ' 大运' + y.dayun + '</span><span class="score">' + y.avgScore + '分 ' + y.overall + '</span></div>'; });
       html += '</div></div></div>';
 
       // 大运交接 / 转折点
       if ((d.bigPivot || []).length) {
         html += '<div class="result-card">';
-        html += '<h2>🔄 关键转折点</h2>';
+        html += '<h2>更 关键转折点</h2>';
         html += '<ul class="pivot-list">';
         (d.bigPivot || []).forEach(function(p){
           html += '<li><strong>' + p.year + '年 (' + p.age + '岁) · ' + esc(p.type) + '</strong>: ' + esc(p.advice || '') + '</li>';
@@ -218,7 +218,7 @@ table.heatmap td.great{background:rgba(16,185,129,.5);color:#fff;font-weight:600
 
       // 行动指引
       html += '<div class="result-card">';
-      html += '<h2>💡 行动指引</h2>';
+      html += '<h2>示 行动指引</h2>';
       html += '<ol class="next-steps">';
       html += '<li>黄金年主动出击（拓人脉/创业/重大决策）</li>';
       html += '<li>谨慎年保守（守业/学习/积蓄）</li>';
@@ -235,7 +235,7 @@ table.heatmap td.great{background:rgba(16,185,129,.5);color:#fff;font-weight:600
       area.scrollIntoView({behavior:'smooth'});
     } catch(e) {
       var errArea = document.getElementById('resultArea');
-      errArea.innerHTML = '<div class="result-card" style="border-color:var(--red);color:var(--red)">❌ ' + esc(e.message) + '<br><br><button class="btn" onclick="generateOffline()">📦 使用本地 KB 兜底</button></div>';
+      errArea.innerHTML = '<div class="result-card" style="border-color:var(--red);color:var(--red)">败 ' + esc(e.message) + '<br><br><button class="btn" onclick="generateOffline()">箱 使用本地 KB 兜底</button></div>';
       errArea.style.display = 'block';
     } finally {
       btn.disabled = false; btn.textContent = '🌐 生成终身三维滚动预览';
@@ -258,7 +258,7 @@ table.heatmap td.great{background:rgba(16,185,129,.5);color:#fff;font-weight:600
     // 修正年龄计算
     data.s4 = new Date().getFullYear() - parseInt(document.getElementById('inpYear').value);
     var r = window._MODULE_REPORTS.lifeflowTimeline.diagnose(data);
-    var html = '<div class="result-card"><h2>📦 本地 KB 兜底（终身三维）</h2><div style="white-space:pre-wrap;font-size:.85rem;line-height:1.8">' + esc(r.html) + '</div></div>';
+    var html = '<div class="result-card"><h2>箱 本地 KB 兜底（终身三维）</h2><div style="white-space:pre-wrap;font-size:.85rem;line-height:1.8">' + esc(r.html) + '</div></div>';
     var area = document.getElementById('resultArea');
     area.innerHTML = html;
     area.style.display = 'block';

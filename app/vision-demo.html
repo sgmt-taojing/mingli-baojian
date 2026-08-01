@@ -278,7 +278,7 @@ async function captureAndAnalyze() {
   const mode = currentMode;
   const resultBox = document.getElementById('resultBox');
   if(!resultBox) return;
-  resultBox.innerHTML = '<div class="result-meta"><span class="tag">⏳ 分析中</span><span>正在调用 OCR 引擎…</span></div><div class="result-content">预计 1-5 秒，请稍候</div>';
+  resultBox.innerHTML = '<div class="result-meta"><span class="tag">待 分析中</span><span>正在调用 OCR 引擎…</span></div><div class="result-content">预计 1-5 秒，请稍候</div>';
 
   const t0 = Date.now();
   lastApiUrl = '';
@@ -343,7 +343,7 @@ async function captureAndAnalyze() {
   } catch(e) {
     const latency = Date.now() - t0;
     var _e=document.getElementById('latencyLabel');if(_e)_e.textContent=latency + 'ms';
-    resultBox.innerHTML = '<div class="error-msg">✗ 分析失败</div><div class="hint-text" style="white-space:pre-wrap">' + escHtml(e.message) + '\n\n请确认 face-ocr-server 运行在 8913 端口，且 8920 API 网关在线。</div>';
+    resultBox.innerHTML = '<div class="error-msg">分析失败</div><div class="hint-text" style="white-space:pre-wrap">' + escHtml(e.message) + '\n\n请确认 face-ocr-server 运行在 8913 端口，且 8920 API 网关在线。</div>';
     toast('分析失败：' + e.message);
   } finally {
     if (scanLine) scanLine.classList.remove('active');
@@ -539,7 +539,7 @@ function replayHistory(idx) {
   lastResult = h.full || h.preview;
   const resultBox = document.getElementById('resultBox');
   if(!resultBox) return;
-  resultBox.innerHTML = '<div class="result-meta"><span class="tag">📜 历史记录</span><span class="tag">' + (MODE_LABELS[h.mode] || h.mode) + '</span><span>' + escHtml(h.ts) + '</span></div><div class="result-content">' + escHtml(lastResult) + '</div>';
+  resultBox.innerHTML = '<div class="result-meta"><span class="tag">卷 历史记录</span><span class="tag">' + (MODE_LABELS[h.mode] || h.mode) + '</span><span>' + escHtml(h.ts) + '</span></div><div class="result-content">' + escHtml(lastResult) + '</div>';
   document.getElementById('btnTTS').disabled = false;
   toast('已加载历史记录');
 }

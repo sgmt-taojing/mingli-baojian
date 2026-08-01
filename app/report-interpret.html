@@ -84,7 +84,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
 <div class="flow-hint">查看报告解读中心 · 命理宝鉴，了解功能详情与使用方式。</div>
 </div>
 <div class="topbar">
-  <h1>📋 报告解读中心 · 统一引擎</h1>
+  <h1>报告解读中心 · 统一引擎</h1>
   <a href="divination-hub.html" class="back-link">← 返回</a>
 </div>
 
@@ -92,7 +92,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
 
 <!-- R249 引擎说明 -->
 <div class="section">
-  <div class="section-title">🎯 一处解读，多处调用</div>
+  <div class="section-title">标 一处解读，多处调用</div>
   <p style="color:var(--text-muted);font-size:13px;margin-bottom:10px">
     支持报告类型：体检报告 / 生化指标 / CT / MRI / X光 / 超声 / 血常规 / 手动录入。
     引擎自动匹配 24 项生化指标 + 15 项影像模式 + 日主五行 + 家族遗传，输出<strong>四维融合解读</strong>。
@@ -114,24 +114,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
 <!-- 输入区 -->
 <div class="section">
   <div class="tab-row">
-    <button class="tab-btn active" onclick="switchTab('upload')">📷 拍照OCR</button>
+    <button class="tab-btn active" onclick="switchTab('upload')">拍 拍照OCR</button>
     <button class="tab-btn" onclick="switchTab('manual')">✍️ 手动录入</button>
-    <button class="tab-btn" onclick="switchTab('blood')">💉 血常规</button>
-    <button class="tab-btn" onclick="switchTab('imaging')">🔍 影像CT/MRI</button>
-    <button class="tab-btn" onclick="switchTab('risk')">⚠️ 风险加倍</button>
+    <button class="tab-btn" onclick="switchTab('blood')">注 血常规</button>
+    <button class="tab-btn" onclick="switchTab('imaging')">查 影像CT/MRI</button>
+    <button class="tab-btn" onclick="switchTab('risk')">警 风险加倍</button>
   </div>
 
   <!-- Tab 1: OCR 上传 -->
   <div class="tab-content active" id="tab-upload">
     <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
-      <p>📷 点击或拖拽上传体检报告图片</p>
+      <p>拍 点击或拖拽上传体检报告图片</p>
       <p style="font-size:11px">支持 JPG / PNG / WEBP（≤10MB）</p>
       <input aria-label="输入" type="file" id="fileInput" accept="image/*" style="display:none">
       <img loading="lazy" id="preview" alt="报告预览图">
     </div>
     <div class="btn-row">
-      <button class="btn" onclick="doOCR()">🔍 OCR 识别</button>
-      <button class="btn btn-ghost" onclick="document.getElementById('fileInput').click()">📁 选择文件</button>
+      <button class="btn" onclick="doOCR()">查 OCR 识别</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('fileInput').click()">夹 选择文件</button>
     </div>
     <div id="ocrText" style="margin-top:12px;padding:10px;background:var(--bg);border-radius:6px;font-size:12px;display:none">
       <div style="color:var(--text-muted);margin-bottom:6px">OCR 识别文本：</div>
@@ -164,9 +164,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
       </div>
     </div>
     <div class="btn-row">
-      <button class="btn" onclick="doManualInterpret()">🔮 立即解读</button>
-      <button class="btn btn-ghost" onclick="clearManual()">🗑️ 清空</button>
-      <button class="btn btn-ghost" onclick="loadExample()">📝 加载示例</button>
+      <button class="btn" onclick="doManualInterpret()">卦 立即解读</button>
+      <button class="btn btn-ghost" onclick="clearManual()">删 清空</button>
+      <button class="btn btn-ghost" onclick="loadExample()">记 加载示例</button>
     </div>
   </div>
 
@@ -174,12 +174,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
   <div class="tab-content" id="tab-blood">
     <p style="color:var(--text-muted);font-size:13px;margin-bottom:10px">点击下方快捷按钮快速录入血常规：</p>
     <div class="quick-btns">
-      <button class="quick-btn" onclick="setBlood('hgb', 135)">🟢 血红蛋白正常</button>
-      <button class="quick-btn" onclick="setBlood('hgb', 90)">🔴 血红蛋白偏低</button>
-      <button class="quick-btn" onclick="setBlood('wbc', 6.5)">🟢 白细胞正常</button>
-      <button class="quick-btn" onclick="setBlood('wbc', 14)">🔴 白细胞偏高</button>
-      <button class="quick-btn" onclick="setBlood('plt', 220)">🟢 血小板正常</button>
-      <button class="quick-btn" onclick="setBlood('plt', 60)">🔴 血小板偏低</button>
+      <button class="quick-btn" onclick="setBlood('hgb', 135)">安 血红蛋白正常</button>
+      <button class="quick-btn" onclick="setBlood('hgb', 90)">危 血红蛋白偏低</button>
+      <button class="quick-btn" onclick="setBlood('wbc', 6.5)">安 白细胞正常</button>
+      <button class="quick-btn" onclick="setBlood('wbc', 14)">危 白细胞偏高</button>
+      <button class="quick-btn" onclick="setBlood('plt', 220)">安 血小板正常</button>
+      <button class="quick-btn" onclick="setBlood('plt', 60)">危 血小板偏低</button>
     </div>
     <div class="input-row" style="margin-top:14px">
       <div class="input-group"><label>血红蛋白 (g/L)</label><input aria-label="b hgb" id="b-hgb"></div>
@@ -187,7 +187,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
       <div class="input-group"><label>血小板 (×10⁹/L)</label><input aria-label="b plt" id="b-plt"></div>
     </div>
     <div class="btn-row">
-      <button class="btn" onclick="doBloodInterpret()">🔮 解读血常规</button>
+      <button class="btn" onclick="doBloodInterpret()">卦 解读血常规</button>
     </div>
   </div>
 
@@ -204,7 +204,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
       <button class="quick-btn" onclick="setImaging('乳腺B超：双侧乳腺腺体回声不均，呈豹纹样改变，符合乳腺增生病像。'))">乳腺增生</button>
     </div>
     <div class="btn-row">
-      <button class="btn" onclick="doImagingInterpret()">🔮 解读影像</button>
+      <button class="btn" onclick="doImagingInterpret()">卦 解读影像</button>
     </div>
   </div>
 
@@ -212,11 +212,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
   <div class="tab-content" id="tab-risk">
     <p style="color:var(--text-muted);font-size:13px;margin-bottom:10px">预置 5 个高风险场景，演示四维融合：</p>
     <div class="quick-btns" style="flex-direction:column;align-items:stretch">
-      <button class="quick-btn" onclick="runScenario('high-bp')">🔴 火日主+家族高血压+本人血压160/100</button>
-      <button class="quick-btn" onclick="runScenario('dm-family')">🔴 土日主+家族糖尿病+本人血糖9.5</button>
-      <button class="quick-btn" onclick="runScenario('liver')">🟡 木日主+肝功能异常+CT肝囊肿</button>
-      <button class="quick-btn" onclick="runScenario('kidney')">🟡 水日主+尿酸480+肾结石</button>
-      <button class="quick-btn" onclick="runScenario('normal')">🟢 金日主+指标正常</button>
+      <button class="quick-btn" onclick="runScenario('high-bp')">危 火日主+家族高血压+本人血压160/100</button>
+      <button class="quick-btn" onclick="runScenario('dm-family')">危 土日主+家族糖尿病+本人血糖9.5</button>
+      <button class="quick-btn" onclick="runScenario('liver')">警 木日主+肝功能异常+CT肝囊肿</button>
+      <button class="quick-btn" onclick="runScenario('kidney')">警 水日主+尿酸480+肾结石</button>
+      <button class="quick-btn" onclick="runScenario('normal')">安 金日主+指标正常</button>
     </div>
   </div>
 
@@ -224,18 +224,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
 
 <!-- 解读结果 -->
 <div class="section" id="resultSection" style="display:none">
-  <div class="section-title">🔮 解读结果</div>
+  <div class="section-title">卦 解读结果</div>
   <div id="interpretResult"></div>
   <div class="btn-row">
-    <button class="btn" onclick="ingestToKB()">📥 入库 KB</button>
-    <button class="btn btn-ghost" onclick="copyReport()">📋 复制报告</button>
+    <button class="btn" onclick="ingestToKB()">入 入库 KB</button>
+    <button class="btn btn-ghost" onclick="copyReport()">表 复制报告</button>
     <button class="btn btn-ghost" onclick="window.print()">🖨️ 打印</button>
   </div>
 </div>
 
 <!-- 历史记录 -->
 <div class="section">
-  <div class="section-title">📚 解读历史（KB 召回）</div>
+  <div class="section-title">典 解读历史（KB 召回）</div>
   <div id="historyList" style="font-size:13px;color:var(--text-muted)">正在为您查阅典籍...</div>
 </div>
 
@@ -531,7 +531,7 @@ async function loadHistory(){
     var j = await r.json();
     var list = document.getElementById('historyList');
     if(j.data && j.data.anomalies && j.data.anomalies.length){
-      var html = '<div style="margin-bottom:8px">📊 已入库 <b>'+j.data.count+'</b> 条 OCR 异常案例：</div>';
+      var html = '<div style="margin-bottom:8px">图 已入库 <b>'+j.data.count+'</b> 条 OCR 异常案例：</div>';
       j.data.anomalies.forEach(function(a){
         html += '<div style="padding:8px;background:var(--bg);border-radius:6px;margin-bottom:6px">';
         html += '<div style="font-weight:500;color:var(--gold)">'+a.title+'</div>';

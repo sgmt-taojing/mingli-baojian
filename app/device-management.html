@@ -252,12 +252,12 @@ header p{font-size:11px;color:var(--paper3);letter-spacing:3px;margin-top:8px}
 
 
 <nav>
-  <a href="divination-hub.html">🏠 主平台</a>
-  <a href="wangzhen-clinical.html">🔍 望诊工作台</a>
-  <a href="patient-archive.html">📋 患者档案</a>
+  <a href="divination-hub.html">主平台</a>
+  <a href="wangzhen-clinical.html">望诊工作台</a>
+  <a href="patient-archive.html">表 患者档案</a>
 </nav>
 
-<h1>📷 设备运维中心</h1>
+<h1>拍 设备运维中心</h1>
 <div class="subtitle">设备接入 · 网络监测 · 健康度 · 服务状态 · 运维管理</div>
 
 <!-- 概览 -->
@@ -265,13 +265,13 @@ header p{font-size:11px;color:var(--paper3);letter-spacing:3px;margin-top:8px}
 
 <!-- 后端服务健康 -->
 <div class="om-panel">
-  <div class="om-panel-title">🖥️ 后端服务健康 <button class="om-btn om-btn-ghost" style="font-size:10px" onclick="OpsCenter.checkServices()">🔄 刷新</button></div>
+  <div class="om-panel-title">屏 后端服务健康 <button class="om-btn om-btn-ghost" style="font-size:10px" onclick="OpsCenter.checkServices()">更 刷新</button></div>
   <div id="om-services"></div>
 </div>
 
 <!-- 摄像头设备 -->
 <div class="om-panel">
-  <div class="om-panel-title">📷 摄像头设备 <span class="badge" id="om-cam-count">检测中</span></div>
+  <div class="om-panel-title">拍 摄像头设备 <span class="badge" id="om-cam-count">检测中</span></div>
   <div class="om-cam-test">
     <div class="om-cam-preview">
       <video id="om-preview" autoplay playsinline muted></video>
@@ -281,10 +281,10 @@ header p{font-size:11px;color:var(--paper3);letter-spacing:3px;margin-top:8px}
         <option value="">点击下方按钮检测</option>
       </select>
       <div style="display:flex;gap:4px;flex-wrap:wrap">
-        <button class="om-btn om-btn-primary" onclick="OpsCenter.detectCameras()">🔍 检测</button>
-        <button class="om-btn om-btn-secondary" onclick="OpsCenter.testCamera()">📷 测试</button>
+        <button class="om-btn om-btn-primary" onclick="OpsCenter.detectCameras()">查 检测</button>
+        <button class="om-btn om-btn-secondary" onclick="OpsCenter.testCamera()">拍 测试</button>
         <button class="om-btn om-btn-ghost" onclick="OpsCenter.stopCamera()">⏹ 停止</button>
-        <button class="om-btn om-btn-ghost" onclick="OpsCenter.setDefault()">⭐ 设为默认</button>
+        <button class="om-btn om-btn-ghost" onclick="OpsCenter.setDefault()">星 设为默认</button>
       </div>
       <div id="om-cam-info" class="om-hint"></div>
     </div>
@@ -293,19 +293,19 @@ header p{font-size:11px;color:var(--paper3);letter-spacing:3px;margin-top:8px}
 
 <!-- 设备列表 -->
 <div class="om-panel">
-  <div class="om-panel-title">📱 已接入设备 <button class="om-btn om-btn-ghost" style="font-size:10px" onclick="OpsCenter.scanAll()">🔄 扫描</button></div>
+  <div class="om-panel-title">机 已接入设备 <button class="om-btn om-btn-ghost" style="font-size:10px" onclick="OpsCenter.scanAll()">更 扫描</button></div>
   <div class="om-device-grid" id="om-devices"></div>
 </div>
 
 <!-- 网络状态 -->
 <div class="om-panel">
-  <div class="om-panel-title">🌐 网络状态</div>
+  <div class="om-panel-title">网 网络状态</div>
   <div id="om-network" class="om-net-info"></div>
 </div>
 
 <!-- Rokid 眼镜 -->
 <div class="om-panel">
-  <div class="om-panel-title">🥽 智能眼镜</div>
+  <div class="om-panel-title">智能眼镜</div>
   <div id="om-glass"></div>
 </div>
 
@@ -348,7 +348,7 @@ var OpsCenter = {
   checkServices: function(){
     var container = document.getElementById('om-services');
     if(!container) return;
-    container.innerHTML = '<div class="om-empty">🔄 正在检测服务...</div>';
+    container.innerHTML = '<div class="om-empty">更 正在检测服务...</div>';
     var self = this;
     var results = [];
     var completed = 0;
@@ -381,7 +381,7 @@ var OpsCenter = {
       html += '<div class="om-service-name">' + r.name + ' <span style="font-size:10px;color:var(--om-paper3)">:' + r.port + '</span></div>';
       html += '<div class="om-service-url">' + (r.error || (r.code + ' ' + r.url.substring(0,40))) + '</div>';
       html += '<div class="om-service-latency" style="color:' + latencyColor + '">' + latencyStr + '</div>';
-      html += '<div class="om-service-actions"><button class="om-btn om-btn-ghost" style="font-size:10px" onclick="OpsCenter.restartService(\'' + r.key + '\')">🔄</button></div>';
+      html += '<div class="om-service-actions"><button class="om-btn om-btn-ghost" style="font-size:10px" onclick="OpsCenter.restartService(\'' + r.key + '\')">更</button></div>';
       html += '</div>';
     });
     document.getElementById('om-services').innerHTML = html;
@@ -458,7 +458,7 @@ var OpsCenter = {
             var isDefault = d.deviceId === saved ? ' ⭐默认' : '';
             html += '<br>&nbsp;&nbsp;' + (i+1) + '. ' + label + isDefault;
           });
-          if(savedLabel) html += '<br>📌 默认设备：' + savedLabel;
+          if(savedLabel) html += '<br>钉 默认设备：' + savedLabel;
           info.innerHTML = html;
         }
       }
@@ -492,7 +492,7 @@ var OpsCenter = {
     if(deviceId){ constraints = { video: { deviceId: { exact: deviceId } }, audio: false }; }
     
     if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-      if(info) info.innerHTML = '❌ 浏览器不支持摄像头<br>⚠️ 请用 Chrome/Edge 通过 localhost 或 HTTPS 访问';
+      if(info) info.innerHTML = '❌ 浏览器不支持摄像头<br>警 请用 Chrome/Edge 通过 localhost 或 HTTPS 访问';
       return;
     }
     
@@ -551,10 +551,10 @@ var OpsCenter = {
       var label = cam.label || ('摄像头 ' + (i+1));
       var isDefault = cam.deviceId === localStorage.getItem('default_camera_device');
       html += '<div class="om-device online">';
-      html += '<div class="om-device-head"><div class="om-device-name">📷 ' + label + (isDefault?' ⭐':'') + '</div><div class="om-device-status online">在线</div></div>';
+      html += '<div class="om-device-head"><div class="om-device-name">拍 ' + label + (isDefault?' ⭐':'') + '</div><div class="om-device-status online">在线</div></div>';
       html += '<div class="om-device-info"><b>类型:</b> 视频输入<br><b>连接:</b> ' + (cam.label ? 'USB/内置' : '未知') + '<br><b>设备ID:</b> ' + cam.deviceId.substring(0,12) + '...</div>';
-      html += '<div class="om-device-actions"><button class="om-btn om-btn-secondary" onclick="OpsCenter.testCamera()">📷 测试</button>';
-      if(!isDefault) html += '<button class="om-btn om-btn-ghost" onclick="OpsCenter.setDefault()">⭐ 设为默认</button>';
+      html += '<div class="om-device-actions"><button class="om-btn om-btn-secondary" onclick="OpsCenter.testCamera()">拍 测试</button>';
+      if(!isDefault) html += '<button class="om-btn om-btn-ghost" onclick="OpsCenter.setDefault()">星 设为默认</button>';
       html += '</div></div>';
     });
     
@@ -628,20 +628,20 @@ var OpsCenter = {
     var html = '';
     if(bridge){
       html += '<div class="om-device online" style="margin-bottom:8px">';
-      html += '<div class="om-device-head"><div class="om-device-name">🥽 Rokid 智能眼镜（眼镜端浏览器）</div><div class="om-device-status online">Bridge 就绪</div></div>';
+      html += '<div class="om-device-head"><div class="om-device-name">Rokid 智能眼镜（眼镜端浏览器）</div><div class="om-device-status online">Bridge 就绪</div></div>';
       html += '<div class="om-device-info"><b>Bridge:</b> ' + bridgeType + '<br><b>连接方式:</b> 眼镜内置浏览器<br>';
       html += '<b>能力:</b> 拍照/语音/音频/手势/存储</div>';
-      html += '<div class="om-device-actions"><button class="om-btn om-btn-secondary" onclick="OpsCenter.glassTakePhoto()">📷 拍照测试</button>';
+      html += '<div class="om-device-actions"><button class="om-btn om-btn-secondary" onclick="OpsCenter.glassTakePhoto()">拍 拍照测试</button>';
       html += '<button class="om-btn om-btn-ghost" onclick="OpsCenter.glassInfo()">ℹ️ 设备信息</button></div>';
       html += '</div>';
       this.updateOverview('glass', 'Bridge');
     } else {
       html += '<div class="om-device offline" style="margin-bottom:8px">';
-      html += '<div class="om-device-head"><div class="om-device-name">🥽 Rokid 智能眼镜</div><div class="om-device-status offline">未直连</div></div>';
+      html += '<div class="om-device-head"><div class="om-device-name">Rokid 智能眼镜</div><div class="om-device-status offline">未直连</div></div>';
       html += '<div class="om-device-info">';
       html += '<b>当前状态:</b> 桌面浏览器未检测到 RokidJSBridge<br>';
       html += '<b>原因:</b> 蓝牙连接的是音频通道(HFP/A2DP)，不暴露 JS Bridge<br><br>';
-      html += '<b>📋 接入方案（选一个）:</b><br><br>';
+      html += '<b>表 接入方案（选一个）:</b><br><br>';
       html += '<b>方案 A — 眼镜内置浏览器（推荐）</b><br>';
       html += '&nbsp;1. 眼镜连 WiFi（和电脑同一网络）<br>';
       html += '&nbsp;2. 眼镜打开「全屏浏览器」App<br>';
@@ -657,7 +657,7 @@ var OpsCenter = {
       html += '&nbsp;2. 选择摄像头 → 测试 → 设为默认<br>';
       html += '&nbsp;3. 直接在望诊工作台拍照分析<br><br>';
       html += '<b>方案 D — Web Bluetooth API（实验性）</b><br>';
-      html += '&nbsp;<button class="om-btn om-btn-secondary" style="margin-top:4px" onclick="OpsCenter.scanBluetooth()">🔍 扫描蓝牙设备</button>';
+      html += '&nbsp;<button class="om-btn om-btn-secondary" style="margin-top:4px" onclick="OpsCenter.scanBluetooth()">查 扫描蓝牙设备</button>';
       html += '&nbsp;<span style="font-size:10px;color:var(--om-paper3)">需 Chrome 开启实验性功能</span><br>';
       html += '&nbsp;<div id="om-bt-result" style="margin-top:4px"></div>';
       html += '</div>';
@@ -665,7 +665,7 @@ var OpsCenter = {
       this.updateOverview('glass', '未直连');
     }
     
-    html += '<div class="om-hint">📖 Rokid 开发者文档: <a href="https://developerdoc.rokid.com/" style="color:var(--om-cyan)"  target="_blank" rel="noopener noreferrer">developerdoc.rokid.com</a></div>';
+    html += '<div class="om-hint">经 Rokid 开发者文档: <a href="https://developerdoc.rokid.com/" style="color:var(--om-cyan)"  target="_blank" rel="noopener noreferrer">developerdoc.rokid.com</a></div>';
     
     el.innerHTML = html;
   },

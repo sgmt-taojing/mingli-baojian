@@ -41,14 +41,14 @@
 
 <!-- Hero -->
 <div class="hero">
-  <h1>🧭 材料探索台</h1>
+  <h1>向 材料探索台</h1>
   <p>寻找、提交、鉴别、补充 KB 知识库的标准入口。所有提交均通过 <strong>5 维真伪审计</strong>（factual / sensitive / completeness / sources / consistency），高分自动入库，低分进入待审区。</p>
   <div class="badges">
-    <span class="badge">📚 多源接入</span>
-    <span class="badge">🔍 大模型鉴别</span>
-    <span class="badge">⚖️ 5 维审计</span>
-    <span class="badge">⚡ 自动入库</span>
-    <span class="badge">📊 命中追踪</span>
+    <span class="badge">典 多源接入</span>
+    <span class="badge">查 大模型鉴别</span>
+    <span class="badge">平 5 维审计</span>
+    <span class="badge">电 自动入库</span>
+    <span class="badge">图 命中追踪</span>
   </div>
 </div>
 
@@ -61,7 +61,7 @@
     <div class="meta">最快 · 适合已有内容</div>
   </div>
   <div class="path-card" data-path="file">
-    <div class="icon">📁</div>
+    <div class="icon">夹</div>
     <div class="title">上传文件</div>
     <div class="desc">PDF / DOC / TXT 自动抽文本 + 入库</div>
     <div class="meta">支持批量 · 自动解析</div>
@@ -73,7 +73,7 @@
     <div class="meta">在线资源 · 自动去标签</div>
   </div>
   <div class="path-card" data-path="discover">
-    <div class="icon">🤖</div>
+    <div class="icon">机</div>
     <div class="title">大模型寻找</div>
     <div class="desc">调用大模型联网搜索 + 真伪鉴别</div>
     <div class="meta">智能补全 · 防重复</div>
@@ -115,14 +115,14 @@
     </div>
   </div>
   <div class="action-bar">
-    <button class="btn btn-primary" onclick="submitManual()">📥 提交并审计</button>
+    <button class="btn btn-primary" onclick="submitManual()">入 提交并审计</button>
     <span class="info">将自动进行 5 维真伪审计 + 写入 KB 待审区</span>
   </div>
 </div>
 
 <!-- 路径 B: 文件上传 -->
 <div class="form-panel" id="path-file">
-  <h3 style="color: #c9a84c; margin-bottom: 16px;">📁 文件上传</h3>
+  <h3 style="color: #c9a84c; margin-bottom: 16px;">夹 文件上传</h3>
   <div class="form-row">
     <div>
       <label for="m-title">条目标题 *</label>
@@ -134,24 +134,24 @@
     </div>
   </div>
   <div class="file-drop" id="fileDrop">
-    <div class="icon-big">📄</div>
+    <div class="icon-big">文</div>
     <div>点击或拖拽文件到此处</div>
     <div class="hint">支持 PDF / DOCX / TXT（≤ 30 MB），自动抽取文本</div>
     <input type="file" id="fileInput" aria-label="上传文件（PDF/DOCX/TXT/MD）" accept=".pdf,.docx,.txt,.md" style="display:none">
   </div>
   <div id="fileInfo" style="margin-top: 12px; display: none;">
-    <span style="color: #4caf50;">✅ 已选文件：</span>
+    <span style="color: #4caf50;">成 已选文件：</span>
     <span id="fileName"></span> (<span id="fileSize"></span>)
   </div>
   <div class="action-bar">
-    <button class="btn btn-primary" id="uploadBtn" onclick="submitFile()" disabled>📥 上传并审计</button>
+    <button class="btn btn-primary" id="uploadBtn" onclick="submitFile()" disabled>入 上传并审计</button>
     <span class="info">文件处理后立即销毁，仅保留抽取的文本</span>
   </div>
 </div>
 
 <!-- 路径 C: URL -->
 <div class="form-panel" id="path-url">
-  <h3 style="color: #c9a84c; margin-bottom: 16px;">🔗 在线链接抓取</h3>
+  <h3 style="color: #c9a84c; margin-bottom: 16px;">在线链接抓取</h3>
   <div class="form-row full">
     <div>
       <label for="m-title">条目标题 *</label>
@@ -171,14 +171,14 @@
     </div>
   </div>
   <div class="action-bar">
-    <button class="btn btn-primary" onclick="submitUrl()">📥 抓取并审计</button>
+    <button class="btn btn-primary" onclick="submitUrl()">入 抓取并审计</button>
     <span class="info">自动去除 HTML 标签，提取正文文本</span>
   </div>
 </div>
 
 <!-- 路径 D: 大模型发现 -->
 <div class="form-panel" id="path-discover">
-  <h3 style="color: #c9a84c; margin-bottom: 16px;">🤖 大模型发现 + 真伪鉴别</h3>
+  <h3 style="color: #c9a84c; margin-bottom: 16px;">机 大模型发现 + 真伪鉴别</h3>
   <div class="form-row">
     <div>
       <label for="d-module">目标模块 *</label>
@@ -190,19 +190,19 @@
     </div>
   </div>
   <div class="action-bar">
-    <button class="btn btn-primary" onclick="discoverOnline()">🔍 分析 KB 缺口 + 建议方向</button>
+    <button class="btn btn-primary" onclick="discoverOnline()">查 分析 KB 缺口 + 建议方向</button>
     <span class="info">系统将检查现有 KB 避免重复，给出寻找建议，再由大模型搜索</span>
   </div>
 
   <div id="discoverResult" class="result-panel">
-    <h4 style="color: #c9a84c; margin-bottom: 12px;">📊 分析结果</h4>
+    <h4 style="color: #c9a84c; margin-bottom: 12px;">分析结果</h4>
     <div id="discoverContent"></div>
   </div>
 </div>
 
 <!-- 提交结果展示 -->
 <div class="result-panel" id="submitResult">
-  <h3 style="color: #c9a84c; margin-bottom: 16px;">📋 审计结果</h3>
+  <h3 style="color: #c9a84c; margin-bottom: 16px;">表 审计结果</h3>
   <div style="display: flex; align-items: center; margin-bottom: 16px;">
     <div class="score-circle" id="scoreCircle">--</div>
     <div>
@@ -214,8 +214,8 @@
   <div class="checks" id="checksList"></div>
   <div class="message-box" id="finalMessage" style="display:none"></div>
   <div class="action-bar">
-    <button class="btn btn-secondary" onclick="resetForm()">➕ 继续提交</button>
-    <button class="btn btn-secondary" onclick="window.location.href='admin-kb-panel.html'">📚 查看 KB</button>
+    <button class="btn btn-secondary" onclick="resetForm()">加 继续提交</button>
+    <button class="btn btn-secondary" onclick="window.location.href='admin-kb-panel.html'">典 查看 KB</button>
   </div>
 </div>
 

@@ -32,9 +32,9 @@
 <div class="flow-hint">用户拍照采集面/舌部照片，AI辅助望诊分析。</div>
 </div>
 <nav style="padding:6px 12px;border-bottom:1px solid rgba(201,168,76,.12);display:flex;gap:6px;flex-wrap:wrap;align-items:center;background:rgba(8,8,8,.95);position:sticky;top:0;z-index:200">
-  <a href="divination-hub.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">🏠 主平台</a>
-  <a href="wangzhen-clinical.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">🔍 望诊工作台</a>
-  <a href="glass-console.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">👓 眼镜控制台</a>
+  <a href="divination-hub.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">主平台</a>
+  <a href="wangzhen-clinical.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">望诊工作台</a>
+  <a href="glass-console.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">眼镜控制台</a>
 </nav>
 <div class="wrap">
   <header>
@@ -49,7 +49,7 @@
       <div class="live-tag" id="liveTag">LIVE</div>
       <div class="device-tag" id="deviceTag">未连接</div>
       <div class="placeholder" id="placeholder">
-        <div class="icon">📷</div>
+        <div class="icon">拍</div>
         <div class="hint">点击「启动摄像头」开始</div>
       </div>
       <video id="video" autoplay playsinline muted style="display:none"></video>
@@ -61,17 +61,17 @@
 
       <!-- R257 P0 §2.1 采集标准提示卡 -->
       <div class="capture-standards" id="captureStandards" role="note" aria-label="采集标准提示">
-        <div class="cs-title">📜 采集标准（docx V1.1 §2.1）</div>
+        <div class="cs-title">卷 采集标准（docx V1.1 §2.1）</div>
         <ul class="cs-list">
-          <li>☀️ <strong>自然光</strong>（避免逆光/灯光直射）</li>
-          <li>🚫 <strong>无美颜</strong>（不开手机美颜）</li>
-          <li>🚫 <strong>无滤镜</strong>（不使用滤镜/特效）</li>
-          <li>🚫 <strong>无妆容</strong>（素颜，避免口红/粉底）</li>
-          <li>🚫 <strong>无遮挡</strong>（不戴口罩/眼镜/帽子）</li>
-          <li>📏 <strong>稳定拍摄</strong>（避免模糊）</li>
+          <li>日 <strong>自然光</strong>（避免逆光/灯光直射）</li>
+          <li>禁 <strong>无美颜</strong>（不开手机美颜）</li>
+          <li>禁 <strong>无滤镜</strong>（不使用滤镜/特效）</li>
+          <li>禁 <strong>无妆容</strong>（素颜，避免口红/粉底）</li>
+          <li>禁 <strong>无遮挡</strong>（不戴口罩/眼镜/帽子）</li>
+          <li>尺 <strong>稳定拍摄</strong>（避免模糊）</li>
         </ul>
       </div>
-      <div class="new-device-badge" id="newDeviceBadge">🆕 检测到新设备</div>
+      <div class="new-device-badge" id="newDeviceBadge">新 检测到新设备</div>
     </div>
 
     <div class="controls">
@@ -96,7 +96,7 @@
       <div class="field" style="border-top:1px dashed rgba(201,168,76,.18);padding-top:10px;margin-top:6px">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
           <input type="checkbox" id="audioEnable" aria-label="启用音频采集" style="width:auto;flex-shrink:0">
-          <span>🎤 启用麦克风（拾音器·与 KB 联动）</span>
+          <span>麦 启用麦克风（拾音器·与 KB 联动）</span>
         </label>
         <select id="micSel" aria-label="micSel" style="margin-top:6px"><option value="">默认（自动选择）</option></select>
         <div class="dev-status" id="devStatus">
@@ -106,8 +106,8 @@
       </div>
 
       <button class="btn" id="startBtn">▶ 启动摄像头</button>
-      <button class="btn btn-ghost" id="snapBtn" disabled>📸 拍照并分析</button>
-      <button class="btn btn-ghost" id="autoBtn" disabled>🔁 自动采集（每 3s）</button>
+      <button class="btn btn-ghost" id="snapBtn" disabled>拍 拍照并分析</button>
+      <button class="btn btn-ghost" id="autoBtn" disabled>循 自动采集（每 3s）</button>
       <button class="btn btn-danger" id="stopBtn" disabled>⏹ 停止</button>
 
       <div class="status-line" id="status">待机 · 等待启动</div>
@@ -115,21 +115,21 @@
   </div>
 
   <div class="analysis-panel">
-    <h2>📋 分析结果</h2>
+    <h2>表 分析结果</h2>
     <div class="analysis-content" id="analysis">
       <div class="analysis-empty">拍照后将显示 AI 分析结果</div>
     </div>
   </div>
 
   <div class="gallery">
-    <h2>📚 本地采集库（<span id="galleryCount">0</span> 张）</h2>
+    <h2>典 本地采集库（<span id="galleryCount">0</span> 张）</h2>
     <div class="gallery-grid" id="gallery">
       <div class="thumb" style="cursor:default;border-style:dashed;display:flex;align-items:center;justify-content:center;color:var(--paper3);font-size:11px">暂无</div>
     </div>
   </div>
 
   <div class="gear-card">
-    <h3>🎯 设备选型推荐（桌面固定摄像头）</h3>
+    <h3>标 设备选型推荐（桌面固定摄像头）</h3>
     <div class="gear-list">
       <div class="gear">
         <div class="name">Logitech MX Brio</div>
@@ -154,13 +154,13 @@
     </div>
   </div>
 
-  <div class="hotplug-toast" id="hotplugToast">🔌 检测到新设备</div>
-  <div class="kb-fallback-badge" id="kbFallbackBadge" title="KB 兜底就绪，点击查看详情">✅ KB 兜底就绪</div>
+  <div class="hotplug-toast" id="hotplugToast">充 检测到新设备</div>
+  <div class="kb-fallback-badge" id="kbFallbackBadge" title="KB 兜底就绪，点击查看详情">成 KB 兜底就绪</div>
 
   <div class="voice-panel" id="voicePanel" style="display:none">
     <h3>语音→知识库（拾音器联动）</h3>
     <div class="voice-row">
-      <button class="voice-btn" id="voiceBtn">🎙️ 按住说话</button>
+      <button class="voice-btn" id="voiceBtn">录 按住说话</button>
       <label class="listen-toggle">
         <input type="checkbox" id="continuousMode" aria-label="连续拍照模式">
         <span>连续监听模式</span>
@@ -172,7 +172,7 @@
     <div class="voice-result kb-result-stream" id="voiceResult"></div>
   </div>
 </div>
-  <div style="text-align:center;padding:12px"><a href="device-test.html" style="color:var(--gold);font-size:13px;text-decoration:none">🔌 设备检测与测试 →</a></div>
+  <div style="text-align:center;padding:12px"><a href="device-test.html" style="color:var(--gold);font-size:13px;text-decoration:none">充 设备检测与测试 →</a></div>
 
 
 

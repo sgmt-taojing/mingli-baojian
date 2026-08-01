@@ -83,7 +83,7 @@ h1{color:var(--gold);font-size:1.4rem;margin-bottom:8px;text-align:center}
 <div class="flow-hint">中医师/学生浏览望诊知识库，舌诊+面诊参考。</div>
 </div>
 
-<h1>🩺 望诊知识库</h1>
+<h1>诊 望诊知识库</h1>
 <p class="subtitle">命理宝鉴 · 中医面诊结构化知识 · 50 条</p>
 
 <div class="stats" id="stats"></div>
@@ -126,7 +126,7 @@ async function init(){
       renderStats();
       renderList();
     }catch(e2){
-      document.getElementById('kbList').innerHTML='<p style="text-align:center;color:#c44">⚠️ 无法加载知识库数据。请从项目根目录访问。</p>';
+      document.getElementById('kbList').innerHTML='<p style="text-align:center;color:#c44">警 无法加载知识库数据。请从项目根目录访问。</p>';
     }
   }
 }
@@ -161,8 +161,8 @@ function renderList(){
       '<span class="kb-cat cat-'+d.category+'">'+d.category+'</span>'+
       (d.summary?'<div class="kb-summary">'+escHtml(d.summary)+'</div>':'')+
       '<div class="kb-meta">'+
-        '<span>⭐ trust: '+d.trust_score+'</span>'+
-        '<span>📖 '+(d.content||'').length+' 字</span>'+
+        '<span>星 trust: '+d.trust_score+'</span>'+
+        '<span>经 '+(d.content||'').length+' 字</span>'+
       '</div>'+
       '<div class="kb-content">'+escHtml(d.content||'')+'</div>'+
     '</div>';

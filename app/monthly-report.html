@@ -84,7 +84,7 @@ h2{font-size:1.1rem;color:var(--gold);margin:14px 0 8px;border-bottom:1px solid 
 
 <a href="divination-hub.html" style="position:fixed;top:12px;left:12px;z-index:9999;padding:8px 14px;background:#c9a227;color:#fff;border-radius:20px;font-size:12px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.15);opacity:.85">← 首页</a>
 <div class="container">
-  <h1>📅 逐月运势细化报告</h1>
+  <h1>历 逐月运势细化报告</h1>
   <p class="subtitle">本年逐月 + 当月/次月详细 · 趋吉避凶 · 知命改运</p>
 
   <div class="form-card">
@@ -121,16 +121,16 @@ h2{font-size:1.1rem;color:var(--gold);margin:14px 0 8px;border-bottom:1px solid 
       <label>目标年</label>
       <input type="number" id="inpTargetYear" aria-label="目标年" value="2026" min="2024" max="2100">
     </div>
-    <button class="btn" id="genBtn" onclick="generate()">🔮 生成逐月报告</button>
+    <button class="btn" id="genBtn" onclick="generate()">卦 生成逐月报告</button>
   </div>
 
   <!-- R95 -->
   <div class="cross-nav" style="background:var(--ink2);border:1px solid var(--gold-dim);border-radius:8px;padding:12px;margin-bottom:14px">
-    <div style="font-size:.85rem;color:var(--gold);margin-bottom:8px">🔀 跳转到其他报告</div>
+    <div style="font-size:.85rem;color:var(--gold);margin-bottom:8px">跳转到其他报告</div>
     <div style="display:flex;gap:6px;flex-wrap:wrap">
-      <button class="btn" onclick="LifeflowShare.gotoWithForm('lifeflow-report.html')" style="font-size:.8rem;padding:6px 12px">🌊 三维联动</button>
-      <button class="btn" onclick="LifeflowShare.gotoWithForm('lifeflow-timeline.html')" style="font-size:.8rem;padding:6px 12px">🌐 终身三维</button>
-      <button class="btn" onclick="LifeflowShare.gotoWithForm('lifeplan-detail.html')" style="font-size:.8rem;padding:6px 12px;background:linear-gradient(135deg,#10b981,#059669)">🗺️ 人生规划</button>
+      <button class="btn" onclick="LifeflowShare.gotoWithForm('lifeflow-report.html')" style="font-size:.8rem;padding:6px 12px">海 三维联动</button>
+      <button class="btn" onclick="LifeflowShare.gotoWithForm('lifeflow-timeline.html')" style="font-size:.8rem;padding:6px 12px">网 终身三维</button>
+      <button class="btn" onclick="LifeflowShare.gotoWithForm('lifeplan-detail.html')" style="font-size:.8rem;padding:6px 12px;background:linear-gradient(135deg,#10b981,#059669)">图 人生规划</button>
     </div>
   </div>
 
@@ -200,7 +200,7 @@ h2{font-size:1.1rem;color:var(--gold);margin:14px 0 8px;border-bottom:1px solid 
   function renderYearTable(yearOverview, currentMonthNum){
     var rel2cls = {'比和':'st-旺','生':'st-相','泄':'st-休','克':'st-死','被克':'st-囚'};
     var rel2cn = {'比和':'当令','生':'生扶','泄':'泄气','克':'逆克','被克':'受克'};
-    var h = '<div class="result-card"><h2>📊 全年总览</h2>';
+    var h = '<div class="result-card"><h2>图 全年总览</h2>';
     h += '<div class="year-table-wrap"><table class="year-table"><thead><tr>';
     h += '<th>月</th><th>月令</th><th>干支</th><th>五行</th><th>关系</th><th>事业</th><th>财运</th><th>感情</th><th>健康</th>';
     h += '</tr></thead><tbody>';
@@ -277,17 +277,17 @@ h2{font-size:1.1rem;color:var(--gold);margin:14px 0 8px;border-bottom:1px solid 
 
       var html = '';
       // 当前月详细
-      html += '<h2>🔥 本月详细 ('+esc(curData.name || (curData.month+'月'))+' · '+esc(curData.ganZhi||'')+')</h2>';
+      html += '<h2>热 本月详细 ('+esc(curData.name || (curData.month+'月'))+' · '+esc(curData.ganZhi||'')+')</h2>';
       html += renderMonthCard(curData, true);
       // 附加 R90 化解建议（如果有 KB 命中）
       if(report.currentMonth && report.currentMonth.text){
-        html += '<div class="result-card"><h3>💎 化解方案与月令详解</h3><pre style="white-space:pre-wrap;font-family:inherit;font-size:.82rem;line-height:1.7">'+esc(report.currentMonth.text)+'</pre></div>';
+        html += '<div class="result-card"><h3>宝 化解方案与月令详解</h3><pre style="white-space:pre-wrap;font-family:inherit;font-size:.82rem;line-height:1.7">'+esc(report.currentMonth.text)+'</pre></div>';
       }
       // 下月详细
       html += '<h2>⏭️ 下月前瞻 ('+esc(nxtData.name || (nxtData.month+'月'))+' · '+esc(nxtData.ganZhi||'')+')</h2>';
       html += renderMonthCard(nxtData, false);
       if(report.nextMonth && report.nextMonth.text){
-        html += '<div class="result-card"><h3>💎 下月化解与详解</h3><pre style="white-space:pre-wrap;font-family:inherit;font-size:.82rem;line-height:1.7">'+esc(report.nextMonth.text)+'</pre></div>';
+        html += '<div class="result-card"><h3>宝 下月化解与详解</h3><pre style="white-space:pre-wrap;font-family:inherit;font-size:.82rem;line-height:1.7">'+esc(report.nextMonth.text)+'</pre></div>';
       }
       // 全年总览表
       html += renderYearTable(yearOv, nowMonth);
@@ -303,7 +303,7 @@ h2{font-size:1.1rem;color:var(--gold);margin:14px 0 8px;border-bottom:1px solid 
       area.scrollIntoView({behavior:'smooth'});
     } catch(e) {
       var errArea = document.getElementById('resultArea');
-      errArea.innerHTML = '<div class="result-card" style="border-color:var(--red);color:var(--red)">❌ '+esc(e.message)+'</div>';
+      errArea.innerHTML = '<div class="result-card" style="border-color:var(--red);color:var(--red)">败 '+esc(e.message)+'</div>';
       errArea.style.display='block';
     } finally {
       btn.disabled=false; btn.textContent='🔮 生成逐月报告';

@@ -178,12 +178,12 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
 <div class="wrap">
 
 <header class="top">
-  <h1>📚 KB 知识库浏览中心</h1>
+  <h1>典 KB 知识库浏览中心</h1>
   <a href="divination-hub.html" class="back">← 返回主页</a>
 </header>
 
 <section class="hero">
-  <h2>📖 命理 · 中医 · 玄学 · 数字人文知识库</h2>
+  <h2>经 命理 · 中医 · 玄学 · 数字人文知识库</h2>
   <p class="lead">本平台基于结构化 KB（Knowledge Base）驱动 智能助手，覆盖八字、紫微、奇门、风水、面相、姓名学、中医经典、倪海厦人纪、舒晗天纪、十二生肖等领域。所有报告、知识图谱、知识库直答均由此 KB 实时生成。</p>
   <div class="hero-stats" id="heroStats">
     <div class="hero-stat"><div class="v" id="heroTotal">…</div><div class="l">总条目</div></div>
@@ -196,12 +196,12 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
 </section>
 
 <div class="tabs" id="tabs">
-  <div class="tab on" data-tab="modules" title="快捷键 1">🗂️ 模块 <span class="badge" id="modBadge">0</span></div>
-  <div class="tab" data-tab="files" title="快捷键 2">📁 KB 文件 <span class="badge" id="fileBadge">0</span></div>
-  <div class="tab" data-tab="hot" title="快捷键 3">🔥 热门模块 <span class="badge" id="hotBadge">8</span></div>
+  <div class="tab on" data-tab="modules" title="快捷键 1">档 模块 <span class="badge" id="modBadge">0</span></div>
+  <div class="tab" data-tab="files" title="快捷键 2">夹 KB 文件 <span class="badge" id="fileBadge">0</span></div>
+  <div class="tab" data-tab="hot" title="快捷键 3">热 热门模块 <span class="badge" id="hotBadge">8</span></div>
   <div class="tab" data-tab="graph" title="快捷键 4">🕸️ 关系图 <span class="badge" id="graphBadge">61</span></div>
-  <div class="tab" data-tab="favs" title="快捷键 5">⭐ 我的收藏 <span class="badge" id="favBadge">0</span></div>
-  <div class="tab" data-tab="search" title="快捷键 6">🔍 关键词搜索</div>
+  <div class="tab" data-tab="favs" title="快捷键 5">星 我的收藏 <span class="badge" id="favBadge">0</span></div>
+  <div class="tab" data-tab="search" title="快捷键 6">查 关键词搜索</div>
 </div>
 
 <!-- Search bar -->
@@ -234,7 +234,7 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
 <!-- Panel: Search -->
 <section class="panel" id="panel-search" hidden>
   <div id="searchContainer">
-    <div class="empty"><h3>🔍 关键词检索</h3>在上方输入关键词检索 10993 条 KB 条目，支持中文模糊匹配。</div>
+    <div class="empty"><h3>查 关键词检索</h3>在上方输入关键词检索 10993 条 KB 条目，支持中文模糊匹配。</div>
   </div>
 </section>
 
@@ -244,16 +244,16 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
   <div class="modal-card">
     <div class="modal-wrap">
       <button class="close-btn" id="modalClose" aria-label="关闭">×</button>
-      <button id="modalExportBtn" title="导出此节点+邻接子图为 JSON" style="position:absolute;top:14px;right:54px;background:var(--card);color:var(--gold);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:.82rem;cursor:pointer">📦 导出</button>
+      <button id="modalExportBtn" title="导出此节点+邻接子图为 JSON" style="position:absolute;top:14px;right:54px;background:var(--card);color:var(--gold);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:.82rem;cursor:pointer">箱 导出</button>
       <div id="modalBreadcrumb" class="modal-breadcrumb" style="font-size:.78rem;color:var(--paper3);margin-bottom:8px;display:flex;gap:4px;flex-wrap:wrap;align-items:center;min-height:18px"></div>
       <h2 id="modalTitle">节点详情</h2>
       <div class="modal-meta" id="modalMeta"></div>
       <div class="modal-section">
-        <h3>📋 基础信息</h3>
+        <h3>表 基础信息</h3>
         <div id="modalBasic"></div>
       </div>
       <div class="modal-section" id="modalStatsSection">
-        <h3>📊 邻居质量分布</h3>
+        <h3>图 邻居质量分布</h3>
         <div id="modalStats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-top:8px"></div>
       </div>
       <div class="modal-section">
@@ -261,11 +261,11 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
         <svg class="adj-svg" id="adjSvg"></svg>
       </div>
       <div class="modal-section">
-        <h3>🔗 邻接节点 (<span id="neighborCount">0</span>)</h3>
+        <h3>邻接节点 (<span id="neighborCount">0</span>)</h3>
         <div id="neighborList"></div>
       </div>
       <div class="modal-section" id="modalEntriesSection" hidden>
-        <h3>📄 关联模块条目预览 <span id="modalEntriesCount" class="chip green" style="font-size:.78rem"></span></h3>
+        <h3>文 关联模块条目预览 <span id="modalEntriesCount" class="chip green" style="font-size:.78rem"></span></h3>
         <div id="modalEntries" style="display:grid;gap:6px;margin-top:8px"></div>
         <div id="modalEntriesMore" style="text-align:center;margin-top:8px;font-size:.82rem;color:var(--paper3)"></div>
       </div>
@@ -275,7 +275,7 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
 <!-- Panel: Graph -->
 <section class="panel" id="panel-graph" hidden>
   <div id="graphToolbar" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
-    <input id="graphSearchInput" type="search" placeholder="🔍 搜索节点 (ID/名称/拼音..." aria-label="搜索图谱节点" style="flex:1;min-width:200px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--paper2);padding:8px 12px;border-radius:8px;font:inherit;font-size:.85rem">
+    <input id="graphSearchInput" type="search" placeholder="搜索节点 (ID/名称/拼音..." aria-label="搜索图谱节点" style="flex:1;min-width:200px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--paper2);padding:8px 12px;border-radius:8px;font:inherit;font-size:.85rem">
     <select id="graphLevelFilter" aria-label="图谱层级筛选" style="background:var(--card);border:1px solid var(--border);color:var(--paper2);padding:8px;border-radius:8px;font-size:.82rem">
       <option value="">全部等级</option>
       <option value="premium">premium</option>
@@ -290,10 +290,10 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
       <option value="id">按 ID</option>
     </select>
     <button id="graphResetBtn" class="btn" style="font-size:.82rem">重置</button>
-    <button id="graphBulkBtn" class="btn" style="font-size:.82rem;background:var(--gold-dim);color:#000;border-color:var(--gold)">📌 批量收藏选中</button>
-    <button id="graphExportCheckedBtn" class="btn" style="font-size:.82rem">📤 导出选中 JSON</button>
-    <button id="graphExportAllBtn" class="btn" style="font-size:.82rem">📋 导出全部 JSON</button>
-    <button id="graphExportCsvBtn" class="btn" style="font-size:.82rem">📤 导出节点 CSV</button>
+    <button id="graphBulkBtn" class="btn" style="font-size:.82rem;background:var(--gold-dim);color:#000;border-color:var(--gold)">钉 批量收藏选中</button>
+    <button id="graphExportCheckedBtn" class="btn" style="font-size:.82rem">出 导出选中 JSON</button>
+    <button id="graphExportAllBtn" class="btn" style="font-size:.82rem">导出全部 JSON</button>
+    <button id="graphExportCsvBtn" class="btn" style="font-size:.82rem">出 导出节点 CSV</button>
     <span id="graphFilterCount" class="chip green" style="font-size:.78rem"></span>
   </div>
   <div id="graphContainer" class="loading">加载关系图...</div>
@@ -305,11 +305,11 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
 </section>
 
 <footer class="links">
-  <a href="kb-quality.html">📊 KB 质量审计</a> ·
+  <a href="kb-quality.html">图 KB 质量审计</a> ·
   <a href="kb-graph.html">🕸️ KB 知识图谱</a> ·
-  <a href="ai-assistant.html">🤖 智能助手</a> ·
-  <a href="divination-knowledge.html">📚 玄学知识</a> ·
-  <a href="divination-hub.html">🏠 主页</a>
+  <a href="ai-assistant.html">机 智能助手</a> ·
+  <a href="divination-knowledge.html">典 玄学知识</a> ·
+  <a href="divination-hub.html">宅 主页</a>
 </footer>
 
 </div>
@@ -376,7 +376,7 @@ function switchTab(tab){var el=document.querySelector(".tab[data-tab=\""+tab+"\"
   if(modules.length === 0){
     modC.innerHTML = '<div class="empty">暂无模块数据</div>';
   } else {
-    let html = '<div style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><input aria-label="modulesFilter" type="search" id="modulesFilter" placeholder="🔍 过滤模块名称/等级..." style="flex:1;min-width:160px;padding:8px 12px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font:inherit;font-size:.85rem"><select id="modulesSortBy" aria-label="模块排序" style="padding:8px 12px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.85rem"><option value="cnt">按条目数</option><option value="avg_trust">按信任度</option><option value="grade">按质量等级</option><option value="needs_fix">按需修数</option></select><button id="modulesExport" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:.8rem">📤 导出过滤</button><span id="modulesCount" style="font-size:.8rem;color:var(--paper3)"></span></div><table class="mod-table"><thead><tr><th data-sort="name" style="cursor:pointer" title="点击排序">模块</th><th data-sort="cnt" style="cursor:pointer" title="点击排序">条目</th><th data-sort="grade" style="cursor:pointer" title="点击排序">等级</th><th data-sort="avg_trust" style="cursor:pointer" title="点击排序">平均 trust</th><th data-sort="needs_fix" style="cursor:pointer" title="点击排序">金/银/铜/需修</th><th>分布</th><th>操作</th></tr></thead><tbody>';
+    let html = '<div style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><input aria-label="modulesFilter" type="search" id="modulesFilter" placeholder="🔍 过滤模块名称/等级..." style="flex:1;min-width:160px;padding:8px 12px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font:inherit;font-size:.85rem"><select id="modulesSortBy" aria-label="模块排序" style="padding:8px 12px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.85rem"><option value="cnt">按条目数</option><option value="avg_trust">按信任度</option><option value="grade">按质量等级</option><option value="needs_fix">按需修数</option></select><button id="modulesExport" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:.8rem">出 导出过滤</button><span id="modulesCount" style="font-size:.8rem;color:var(--paper3)"></span></div><table class="mod-table"><thead><tr><th data-sort="name" style="cursor:pointer" title="点击排序">模块</th><th data-sort="cnt" style="cursor:pointer" title="点击排序">条目</th><th data-sort="grade" style="cursor:pointer" title="点击排序">等级</th><th data-sort="avg_trust" style="cursor:pointer" title="点击排序">平均 trust</th><th data-sort="needs_fix" style="cursor:pointer" title="点击排序">金/银/铜/需修</th><th>分布</th><th>操作</th></tr></thead><tbody>';
     for(const m of modules){
       const trust = m.avg_trust || 0;
       const trustPct = Math.round(trust * 100);
@@ -388,7 +388,7 @@ function switchTab(tab){var el=document.querySelector(".tab[data-tab=\""+tab+"\"
         <td>${trust.toFixed(3)} <span class="bar-mini"><span class="fill" style="width:${trustPct}%;background:linear-gradient(90deg,#c9a84c,#7ec47e)"></span></span></td>
         <td style="font-size:.75rem">${m.gold}/${m.silver}/${m.bronze||0}/${m.needs_fix||0}</td>
         <td style="font-size:.7rem">min ${m.min_trust?.toFixed(2) || '—'} / max ${m.max_trust?.toFixed(2) || '—'}</td>
-        <td><a class="btn" href="kb-quality.html?module=${m.module}">详情</a> <a class="btn" href="kb-graph.html?module=${m.module}">图谱</a> <a class="btn" href="?tab=search&module=${encodeURIComponent(m.module)}&q=${encodeURIComponent(m.module)}" onclick="event.preventDefault();switchTab('search');setTimeout(()=>{const i=document.getElementById('searchInput');if(i){i.value='${m.module.replace(/'/g,'')}';doSearch();document.getElementById('searchModule').value='${m.module}';}},50)">🔍 搜</a></td>
+        <td><a class="btn" href="kb-quality.html?module=${m.module}">详情</a> <a class="btn" href="kb-graph.html?module=${m.module}">图谱</a> <a class="btn" href="?tab=search&module=${encodeURIComponent(m.module)}&q=${encodeURIComponent(m.module)}" onclick="event.preventDefault();switchTab('search');setTimeout(()=>{const i=document.getElementById('searchInput');if(i){i.value='${m.module.replace(/'/g,'')}';doSearch();document.getElementById('searchModule').value='${m.module}';}},50)">查 搜</a></td>
       </tr>`;
     }
     html += '</tbody></table>';
@@ -477,8 +477,8 @@ function switchTab(tab){var el=document.querySelector(".tab[data-tab=\""+tab+"\"
     fileC.innerHTML = '<div class="empty">暂无 KB 文件</div>';
   } else {
     let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:8px;flex-wrap:wrap">';
-    html += `<div><h2 style="margin:0;color:var(--gold);font-size:1.1rem">📁 KB 文件库（${fileList.length} 个）</h2></div>`;
-    html += `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><input aria-label="输入" type="search" id="filesFilterInput" placeholder="🔍 按文件名/描述过滤" style="flex:1;min-width:140px;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font:inherit;font-size:.85rem"><select id="filesLevelFilter" aria-label="文件层级筛选" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.85rem"><option value="">全等级</option><option value="public">public</option><option value="professional">professional</option><option value="admin">admin</option></select><select id="filesSortBy" aria-label="filesSortBy" title="按条数排序" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.85rem"><option value="name">按文件名</option><option value="entries-desc">条目数 ↓</option><option value="entries-asc">条目数 ↑</option></select><span id="filesCount" style="font-size:.8rem;color:var(--paper3)"></span><button class="btn" id="randomFilesBtn" style="background:var(--gold);color:#000;border:0;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">🔀 随机 5 个</button><button class="btn" id="randomOneBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">🎲 随机 1 个精读</button><button class="btn" id="copyFilesListBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📋 复制清单</button><button class="btn" id="filesStatBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📊 统计</button><button class="btn" id="filesGroupBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">📂 按等级分组</button></div>`;
+    html += `<div><h2 style="margin:0;color:var(--gold);font-size:1.1rem">夹 KB 文件库（${fileList.length} 个）</h2></div>`;
+    html += `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><input aria-label="输入" type="search" id="filesFilterInput" placeholder="🔍 按文件名/描述过滤" style="flex:1;min-width:140px;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font:inherit;font-size:.85rem"><select id="filesLevelFilter" aria-label="文件层级筛选" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.85rem"><option value="">全等级</option><option value="public">public</option><option value="professional">professional</option><option value="admin">admin</option></select><select id="filesSortBy" aria-label="filesSortBy" title="按条数排序" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.85rem"><option value="name">按文件名</option><option value="entries-desc">条目数 ↓</option><option value="entries-asc">条目数 ↑</option></select><span id="filesCount" style="font-size:.8rem;color:var(--paper3)"></span><button class="btn" id="randomFilesBtn" style="background:var(--gold);color:#000;border:0;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">随机 5 个</button><button class="btn" id="randomOneBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">骰 随机 1 个精读</button><button class="btn" id="copyFilesListBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">表 复制清单</button><button class="btn" id="filesStatBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">统计</button><button class="btn" id="filesGroupBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">夹 按等级分组</button></div>`;
     html += '</div><div class="grid">';
     function getSortedFiles(){
       const by = document.getElementById('filesSortBy')?.value || 'name';
@@ -498,17 +498,17 @@ function switchTab(tab){var el=document.querySelector(".tab[data-tab=\""+tab+"\"
         <div class="file-head">
           <span class="file-name">${f.filename}</span>
           ${lvlChip}
-          <button class="kb-copy-name" data-name="${f.filename}" title="复制文件名" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:.7rem;cursor:pointer;margin-left:auto">📋</button>
+          <button class="kb-copy-name" data-name="${f.filename}" title="复制文件名" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:.7rem;cursor:pointer;margin-left:auto">表</button>
         </div>
         <div class="desc">${desc}</div>
         <div class="meta">
-          <span class="chip">📂 静态 KB</span>
-          <span class="chip gray">📍 knowledge/${f.filename}</span>
-          <button class="kb-copy-path" data-path="knowledge/${f.filename}" title="复制路径" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:.7rem;cursor:pointer">📋 路径</button>
+          <span class="chip">夹 静态 KB</span>
+          <span class="chip gray">点 knowledge/${f.filename}</span>
+          <button class="kb-copy-path" data-path="knowledge/${f.filename}" title="复制路径" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:.7rem;cursor:pointer">表 路径</button>
         </div>
         <div class="actions">
-          <a class="btn primary" href="ai-assistant.html?preset=${f.filename}">🤖 用 AI 探索</a>
-          <a class="btn" href="#" onclick="event.preventDefault();switchTab('search');setTimeout(()=>{const i=document.getElementById('searchInput');if(i){i.value='${searchKey.replace(/'/g,'\\\'')}';doSearch();}},50)">🔍 搜条目</a>
+          <a class="btn primary" href="ai-assistant.html?preset=${f.filename}">机 用 AI 探索</a>
+          <a class="btn" href="#" onclick="event.preventDefault();switchTab('search');setTimeout(()=>{const i=document.getElementById('searchInput');if(i){i.value='${searchKey.replace(/'/g,'\\\'')}';doSearch();}},50)">查 搜条目</a>
         </div>
       </div>`;
     }
@@ -544,19 +544,19 @@ function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeComp
       for(const f of files){
         const lvl = f.level || 'public';
         const lvlChip = lvl === 'professional' ? '<span class="chip blue">professional</span>' : lvl === 'admin' ? '<span class="chip red">admin</span>' : '<span class="chip green">public</span>';
-        h += `<div class="file"><div class="file-head"><span class="file-name">${f.filename}</span>${lvlChip}</div><div class="desc">${f.desc || '（暂无描述）'}</div><div class="actions"><a class="btn primary" href="ai-assistant.html?preset=${f.filename}">🤖 AI 问</a><a class="btn" href="#" onclick="event.preventDefault();switchTab('search');setTimeout(()=>{const i=document.getElementById('searchInput');if(i){i.value='${f.filename.replace('.js','').replace(/-kb$/,'').replace(/-/g,' ').replace(/'/g,'\\\'')}';doSearch();}},50)">🔍 搜</a></div></div>`;
+        h += `<div class="file"><div class="file-head"><span class="file-name">${f.filename}</span>${lvlChip}</div><div class="desc">${f.desc || '（暂无描述）'}</div><div class="actions"><a class="btn primary" href="ai-assistant.html?preset=${f.filename}">机 AI 问</a><a class="btn" href="#" onclick="event.preventDefault();switchTab('search');setTimeout(()=>{const i=document.getElementById('searchInput');if(i){i.value='${f.filename.replace('.js','').replace(/-kb$/,'').replace(/-/g,' ').replace(/'/g,'\\\'')}';doSearch();}},50)">查 搜</a></div></div>`;
       }
       h += '</div></div>';
       preview.innerHTML = h;
     }
     function renderOnePreview(f){
-      preview.innerHTML = '<div class="card"><h3>🎲 随机精读 · ' + f.filename + '</h3>' +
+      preview.innerHTML = '<div class="card"><h3>骰 随机精读 · ' + f.filename + '</h3>' +
         '<div class="desc" style="margin-top:8px">' + (f.desc || '（暂无描述）') + '</div>' +
         '<div class="meta" style="margin-top:8px">' + (f.level ? '<span class="chip">' + f.level + '</span>' : '') +
-        '<span class="chip gray">📍 knowledge/' + (f.filename || '') + '</span></div>' +
-        '<div class="actions" style="margin-top:12px"><a class="btn primary" href="ai-assistant.html?preset=' + f.filename + '">🤖 用 AI 探索全文</a>' +
-        '<a class="btn" href="#" onclick="event.preventDefault();switchTab(\'search\');setTimeout(()=>{const i=document.getElementById(\'searchInput\');if(i){i.value=\'' + f.filename.replace('.js','').replace(/-kb$/,'').replace(/-/g,' ') + '\';doSearch();}},50)">🔍 搜本文件条目</a>' +
-        '<button class="btn" id="randomOneAgainBtn" style="background:var(--gold);color:#000;border:0">🎲 再来一个</button></div></div>';
+        '<span class="chip gray">点 knowledge/' + (f.filename || '') + '</span></div>' +
+        '<div class="actions" style="margin-top:12px"><a class="btn primary" href="ai-assistant.html?preset=' + f.filename + '">机 用 AI 探索全文</a>' +
+        '<a class="btn" href="#" onclick="event.preventDefault();switchTab(\'search\');setTimeout(()=>{const i=document.getElementById(\'searchInput\');if(i){i.value=\'' + f.filename.replace('.js','').replace(/-kb$/,'').replace(/-/g,' ') + '\';doSearch();}},50)">查 搜本文件条目</a>' +
+        '<button class="btn" id="randomOneAgainBtn" style="background:var(--gold);color:#000;border:0">骰 再来一个</button></div></div>';
       const again = document.getElementById('randomOneAgainBtn');
       if(again) again.onclick = () => renderOnePreview(pickN(1)[0]);
     }
@@ -621,7 +621,7 @@ function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeComp
         if(f.desc && f.desc.trim()) withDesc++;
       }
       const levelHtml = Object.entries(byLevel).map(([k,v]) => `<span class="chip ${k==='professional'?'blue':k==='admin'?'red':'green'}">${k} · ${v}</span>`).join(' ');
-      const statHtml = `<div class="card" style="border:1px solid var(--gold)"><h3>📊 KB 文件统计</h3>
+      const statHtml = `<div class="card" style="border:1px solid var(--gold)"><h3>图 KB 文件统计</h3>
         <div class="desc" style="margin-top:8px;line-height:1.8">
           📁 文件总数：<b style="color:var(--gold)">${fileList.length}</b><br>
           📚 条目总数：<b style="color:var(--gold)">${totalEntries.toLocaleString()}</b><br>
@@ -629,7 +629,7 @@ function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeComp
           🎚 等级分布：${levelHtml}
         </div></div>`;
       preview.innerHTML = statHtml + preview.innerHTML;
-      if(window._toast) window._toast('📊 统计已生成', 1200);
+      if(window._toast) window._toast('统计已生成', 1200);
     };
 
     // R140 按等级分组折叠
@@ -680,16 +680,16 @@ function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeComp
   if(hotModules.length === 0){
     hotC.innerHTML = '<div class="empty">暂无热门数据</div>';
   } else {
-    let html = '<div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap"><h2 style="margin:0;color:var(--gold);font-size:1.05rem">🔥 热门模块 · ${hotModules.length} 个</h2><input aria-label="搜索" type="search" id="hotSearchInput" placeholder="🔍 过滤模块名..." style="flex:1;min-width:120px;max-width:200px;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.82rem"><button id="hotCopyList" style="margin-left:auto;background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:.8rem">📋 复制清单</button><button id="hotExportCsv" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:.8rem">📤 导出 CSV</button></div><div class="grid">';
+    let html = '<div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap"><h2 style="margin:0;color:var(--gold);font-size:1.05rem">热 热门模块 · ${hotModules.length} 个</h2><input aria-label="搜索" type="search" id="hotSearchInput" placeholder="🔍 过滤模块名..." style="flex:1;min-width:120px;max-width:200px;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.82rem"><button id="hotCopyList" style="margin-left:auto;background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:.8rem">表 复制清单</button><button id="hotExportCsv" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:.8rem">出 导出 CSV</button></div><div class="grid">';
     for(const m of hotModules){
       // R154 卡片自带 data-mod 已有，搜索过滤用
       const trust = modules.find(x=>x.module===m.module)?.avg_trust || 0;
       html += `<div class="card" data-mod="${m.module}" data-hits="${m.hits}" data-cnt="${m.cnt}" data-trust="${trust}">
-        <h3>🔥 ${m.module}</h3>
+        <h3>热 ${m.module}</h3>
         <div class="desc">命中数 <strong style="color:var(--gold);font-size:1.1rem">${m.hits.toLocaleString()}</strong> · ${m.cnt} 条目 · trust ${trust.toFixed(2)}</div>
         <div class="actions">
-          <a class="btn primary" href="ai-assistant.html?mod=${m.module}">🤖 AI 问 ${m.module}</a>
-          <a class="btn" href="kb-quality.html?module=${m.module}">📊 质量</a>
+          <a class="btn primary" href="ai-assistant.html?mod=${m.module}">机 AI 问 ${m.module}</a>
+          <a class="btn" href="kb-quality.html?module=${m.module}">图 质量</a>
           <a class="btn" href="kb-graph.html?module=${m.module}">🕸️ 图谱</a>
         </div>
       </div>`;
@@ -779,7 +779,7 @@ function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeComp
       if(graphCount) graphCount.textContent = filtered.length + ' / ' + gNodes.length;
 
       if(filtered.length === 0){
-        graphC.innerHTML = `<div class="empty"><h3>😕 无匹配节点</h3><p>尝试调整搜索词或等级过滤条件。</p></div>`;
+        graphC.innerHTML = `<div class="empty"><h3>无匹配节点</h3><p>尝试调整搜索词或等级过滤条件。</p></div>`;
         return;
       }
 
@@ -789,16 +789,16 @@ function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeComp
       let html = `
         <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
           <div class="card">
-            <h3>📊 总览</h3>
+            <h3>图 总览</h3>
             <div class="desc">
-              <div>🟢 节点：<b style="color:var(--gold)">${filtered.length}</b> / ${gNodes.length}</div>
-              <div>🔗 边：<b style="color:var(--gold)">${relatedEdges.length}</b> / ${gEdges.length}</div>
-              <div>📚 等级：${Object.entries(levels).map(([k,v])=>`<span class="chip gray">${k}·${v}</span>`).join('')}</div>
+              <div>安 节点：<b style="color:var(--gold)">${filtered.length}</b> / ${gNodes.length}</div>
+              <div>边：<b style="color:var(--gold)">${relatedEdges.length}</b> / ${gEdges.length}</div>
+              <div>典 等级：${Object.entries(levels).map(([k,v])=>`<span class="chip gray">${k}·${v}</span>`).join('')}</div>
               <div>🔗 边类型：${Object.entries(edgesByType).map(([k,v])=>`<span class="chip">${k}·${v}</span>`).join('')}</div>
             </div>
           </div>
           <div class="card">
-            <h3>🔥 热门枢纽 (top 5)</h3>
+            <h3>热 热门枢纽 (top 5)</h3>
             <div class="desc">${topHubs.map(n=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span><b>${n.name||n.id}</b></span><span class="chip">${n.hit_count||0} 命中</span></div>`).join('')}</div>
           </div>
           <div class="card">
@@ -806,7 +806,7 @@ function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeComp
             <div class="desc">${topXref.map(n=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span><b>${n.name||n.id}</b></span><span class="chip blue">${n.xref_count||0} 引用</span></div>`).join('')}</div>
           </div>
         </div>
-        <h3 style="margin:16px 0 10px;color:var(--gold);font-size:1rem">📦 ${filtered.length} 个匹配节点（按 ${sortBy} 排序）</h3>
+        <h3 style="margin:16px 0 10px;color:var(--gold);font-size:1rem">箱 ${filtered.length} 个匹配节点（按 ${sortBy} 排序）</h3>
         <table class="mod-table">
           <thead><tr><th><input type="checkbox" id="graphSelectAll" aria-label="graphSelectAll" title="全选"></th><th>ID</th><th>名称</th><th>等级</th><th>大小 KB</th><th>命中</th><th>引用</th><th>操作</th></tr></thead>
           <tbody>`;
@@ -823,7 +823,7 @@ function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeComp
           <td>${n.xref_count||0}</td>
           <td>
             <a class="btn" href="kb-graph.html?module=${encodeURIComponent(n.id)}">🕸️ 图谱</a>
-            <a class="btn" href="kb-quality.html?module=${encodeURIComponent(n.id)}">📊 质量</a>
+            <a class="btn" href="kb-quality.html?module=${encodeURIComponent(n.id)}">图 质量</a>
           </td>
         </tr>`;
       }
@@ -1110,18 +1110,18 @@ function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeComp
     document.getElementById('modalMeta').innerHTML = `<code style="background:var(--card);padding:2px 6px;border-radius:4px">${node.id}</code> · 等级 <b>${node.level||'public'}</b> · ${node.hit_count||0} 命中 · ${node.xref_count||0} 引用`;
     document.getElementById('modalBasic').innerHTML = `
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.88rem">
-        <div>📚 大小：<b>${(node.size_kb||0).toFixed(1)} KB</b></div>
-        <div>📊 命中：<b>${node.hit_count||0}</b></div>
-        <div>🔗 引用：<b>${node.xref_count||0}</b></div>
-        <div>🏷️ 等级：<b>${node.level||'public'}</b></div>
+        <div>典 大小：<b>${(node.size_kb||0).toFixed(1)} KB</b></div>
+        <div>图 命中：<b>${node.hit_count||0}</b></div>
+        <div>引用：<b>${node.xref_count||0}</b></div>
+        <div>签 等级：<b>${node.level||'public'}</b></div>
       </div>
       <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
         <a class="btn" href="kb-graph.html?module=${encodeURIComponent(node.id)}" style="padding:6px 10px;background:var(--gold);color:#000;border-radius:6px;text-decoration:none;font-size:.82rem">🕸️ 打开完整图谱</a>
-        <a class="btn" href="kb-quality.html?module=${encodeURIComponent(node.id)}" style="padding:6px 10px;background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:6px;text-decoration:none;font-size:.82rem">📊 质量审计</a>
-        <button class="btn" id="modalFavBtn" style="padding:6px 10px;background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.82rem">⭐ 收藏</button>
-        <button class="btn" id="modalNoteBtn" style="padding:6px 10px;background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.82rem">📝 笔记</button>
-        <button class="btn" id="modalExportBtn" style="padding:6px 10px;background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.82rem">💾 导出 JSON</button>
-        <button class="btn" id="modalRandomBtn" title="随机跳转到一个相邻模块" style="padding:6px 10px;background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.82rem">🎲 随机相邻</button>
+        <a class="btn" href="kb-quality.html?module=${encodeURIComponent(node.id)}" style="padding:6px 10px;background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:6px;text-decoration:none;font-size:.82rem">图 质量审计</a>
+        <button class="btn" id="modalFavBtn" style="padding:6px 10px;background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.82rem">星 收藏</button>
+        <button class="btn" id="modalNoteBtn" style="padding:6px 10px;background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.82rem">记 笔记</button>
+        <button class="btn" id="modalExportBtn" style="padding:6px 10px;background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.82rem">存 导出 JSON</button>
+        <button class="btn" id="modalRandomBtn" title="随机跳转到一个相邻模块" style="padding:6px 10px;background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.82rem">骰 随机相邻</button>
       </div>`;
     document.getElementById('neighborCount').textContent = neighbors.length;
     const list = document.getElementById('neighborList');
@@ -1209,8 +1209,8 @@ function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeComp
               <b style="color:var(--gold);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${e.title || e.name || e.entry_id || e.id}</b>
               <div style="display:flex;gap:4px;flex-shrink:0">
                 <button class="kb-entry-toggle" data-idx="${idx}" style="background:var(--paper3);color:var(--bg);border:0;border-radius:4px;padding:2px 8px;font-size:.7rem;cursor:pointer">展开</button>
-                <button class="kb-entry-copy" data-id="${e.entry_id||e.id}" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-size:.7rem;cursor:pointer">📋 ID</button>
-                <button class="kb-entry-fav" data-eid="${e.entry_id||e.id}" data-title="${(e.title||e.name||e.entry_id||e.id).replace(/'/g,'\\\'')}" data-trust="${e.trust||''}"  data-source="${e.source||''}" style="background:var(--card);color:var(--gold);border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-size:.7rem;cursor:pointer">⭐</button>
+                <button class="kb-entry-copy" data-id="${e.entry_id||e.id}" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-size:.7rem;cursor:pointer">表 ID</button>
+                <button class="kb-entry-fav" data-eid="${e.entry_id||e.id}" data-title="${(e.title||e.name||e.entry_id||e.id).replace(/'/g,'\\\'')}" data-trust="${e.trust||''}"  data-source="${e.source||''}" style="background:var(--card);color:var(--gold);border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-size:.7rem;cursor:pointer">星</button>
               </div>
             </div>
             <div class="kb-entry-snippet" data-idx="${idx}" style="color:var(--paper3);font-size:.78rem;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${(e.snippet||e.content||e.summary||'').slice(0,300)}</div>
@@ -1293,7 +1293,7 @@ function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeComp
         entriesMore.textContent = entries.length >= 8 ? '显示前 8 条，完整列表见下方 📊 质量审计页' : `共 ${entries.length} 条`;
       }).catch(()=>{
         entriesSection.hidden = false;
-        entriesEl.innerHTML = '<div style="color:var(--paper3);padding:8px;font-size:.85rem">⚠️ 条目查阅失败（KB API 暂不可用）</div>';
+        entriesEl.innerHTML = '<div style="color:var(--paper3);padding:8px;font-size:.85rem">警 条目查阅失败（KB API 暂不可用）</div>';
         entriesMore.textContent = '';
       });
     }
@@ -1476,20 +1476,20 @@ function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeComp
     );
 
     if(arr.length === 0){
-      c.innerHTML = `<div class="empty"><h3>⭐ 暂无收藏</h3><p>在任意 KB 模块卡右上角点 ☆ 即可收藏。到这里查看与批量管理。</p></div>`;
+      c.innerHTML = `<div class="empty"><h3>星 暂无收藏</h3><p>在任意 KB 模块卡右上角点 ☆ 即可收藏。到这里查看与批量管理。</p></div>`;
       return;
     }
     let html = `
       <div class="fav-toolbar" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;padding:12px;background:var(--card);border-radius:10px;border:1px solid var(--border);align-items:center">
         <input type="checkbox" id="favSelectAll" aria-label="favSelectAll" title="全选/取消全选（当前过滤结果）">
-        <input aria-label="搜索" type="text" id="favSearch" placeholder="🔍 搜索名称 / ID / 笔记..." value="${searchQ}" style="flex:1;min-width:200px;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2)"/>
+        <input aria-label="搜索" type="text" id="favSearch" placeholder="搜索名称 / ID / 笔记..." value="${searchQ}" style="flex:1;min-width:200px;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2)"/>
         <select id="favTagFilter" aria-label="收藏标签筛选" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2)">
-          <option value="">🏷️ 全部标签</option>
+          <option value="">签 全部标签</option>
           ${allTags.map(t => `<option value="${t}" ${tagFilter===t?'selected':''}>${t}</option>`).join('')}
         </select>
         <select id="favSortBy" aria-label="favSortBy" title="排序方式" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.82rem"><option value="time-desc">最近收藏</option><option value="time-asc">最早收藏</option><option value="name">按名称</option></select>
         <span id="favCountSpan" style="color:var(--paper3);font-size:.85rem">${filtered.length}/${arr.length}</span><span id="favHitCount" style="font-size:.78rem;color:var(--gold);margin-left:6px"></span>
-        <button class="btn danger" id="favBulkRemoveBtn" style="font-size:.82rem">🗑 批量取消选中</button>
+        <button class="btn danger" id="favBulkRemoveBtn" style="font-size:.82rem">批量取消选中</button>
       </div>
       <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
         ${filtered.map(f => `
@@ -1502,18 +1502,18 @@ function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeComp
             </div>
             <div class="desc"><code style="font-size:.78rem">${f.id}</code></div>
             <div class="meta"><span class="chip gray">收藏于 ${new Date(f.ts).toLocaleString('zh-CN')}</span></div>
-            ${(f.tags && f.tags.length) ? `<div class="fav-tags" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">${f.tags.map(t => `<span class="fav-tag" style="font-size:.7rem;background:var(--gold-dim);color:#000;padding:2px 6px;border-radius:10px">🏷️ ${t}</span>`).join('')}</div>` : ''}
-            ${f.note ? `<div class="fav-note" style="font-size:.82rem;color:var(--paper3);margin-top:6px;font-style:italic;line-height:1.4">📝 ${f.note.length > 50 ? f.note.slice(0,50)+'…' : f.note}</div>` : ''}
+            ${(f.tags && f.tags.length) ? `<div class="fav-tags" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">${f.tags.map(t => `<span class="fav-tag" style="font-size:.7rem;background:var(--gold-dim);color:#000;padding:2px 6px;border-radius:10px">签 ${t}</span>`).join('')}</div>` : ''}
+            ${f.note ? `<div class="fav-note" style="font-size:.82rem;color:var(--paper3);margin-top:6px;font-style:italic;line-height:1.4">记 ${f.note.length > 50 ? f.note.slice(0,50)+'…' : f.note}</div>` : ''}
             <details style="margin-top:8px">
-              <summary style="cursor:pointer;color:var(--gold);font-size:.82rem;padding:4px 0">✏️ 编辑笔记/标签</summary>
+              <summary style="cursor:pointer;color:var(--gold);font-size:.82rem;padding:4px 0">写 编辑笔记/标签</summary>
               <div style="margin-top:6px">
                 <input type="text" data-fav-note="${f.id}" placeholder="📝 私域笔记..." value="${(f.note||'').replace(/"/g,'&quot;')}" style="width:100%;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.82rem;margin-bottom:6px"/>
                 <input type="text" data-fav-tags="${f.id}" placeholder="🏷️ 标签 (逗号分隔)" value="${(f.tags||[]).join(', ')}" style="width:100%;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.82rem;margin-bottom:6px"/>
-                <button class="btn primary" style="padding:5px 12px;border-radius:6px;background:var(--gold);color:#000;border:0;cursor:pointer;font-size:.82rem" onclick="saveFavMeta('${f.id}')">💾 保存</button>
+                <button class="btn primary" style="padding:5px 12px;border-radius:6px;background:var(--gold);color:#000;border:0;cursor:pointer;font-size:.82rem" onclick="saveFavMeta('${f.id}')">存 保存</button>
               </div>
             </details>
             <div class="actions" style="margin-top:8px">
-              <a class="btn" href="kb-quality.html?module=${encodeURIComponent(f.id)}">📊 质量</a>
+              <a class="btn" href="kb-quality.html?module=${encodeURIComponent(f.id)}">图 质量</a>
               <a class="btn" href="kb-graph.html?module=${encodeURIComponent(f.id)}">🕸️ 图谱</a>
               <button class="btn danger" onclick="KbFavorites.toggle({id:'${f.id}',name:'${(f.name||'').replace(/'/g,"\\'")}'});renderFavs();">× 取消</button>
             </div>
@@ -1522,9 +1522,9 @@ function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeComp
       </div>
       <div style="margin-top:14px;padding:12px;background:var(--card);border-radius:10px;border:1px solid var(--border);text-align:center">
         <p>当前 <b style="color:#ffd700">${arr.length}</b> 条收藏 · 跨页面同步生效 · 可导出 JSON / 一键清空 · <span id="favSelectedInfo" style="color:var(--paper3)"></span></p>
-        <button class="btn primary" onclick="KbFavorites.export?.();">📤 导出 JSON</button>
-        <button class="btn" id="favExportCsvBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:.82rem">📤 导出 CSV</button>
-        <button class="btn danger" onclick="if(confirm('清空所有收藏？')){localStorage.removeItem('***');renderFavs();document.getElementById('favBadge').textContent='0项';}">🗑 清空</button>
+        <button class="btn primary" onclick="KbFavorites.export?.();">出 导出 JSON</button>
+        <button class="btn" id="favExportCsvBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:.82rem">出 导出 CSV</button>
+        <button class="btn danger" onclick="if(confirm('清空所有收藏？')){localStorage.removeItem('***');renderFavs();document.getElementById('favBadge').textContent='0项';}">清空</button>
       </div>
     `;
     c.innerHTML = html;
@@ -1705,11 +1705,11 @@ function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeComp
     searchHistoryEl.style.display = 'block';
     searchHistoryEl.innerHTML = filtered.map(x => `
       <div data-q="${x.replace(/"/g,'&quot;')}" style="padding:8px 12px;cursor:pointer;font-size:.85rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);color:var(--paper2)">
-        <span>🔍 ${x}</span>
-        <span data-remove="${x.replace(/"/g,'&quot;')}" style="color:var(--paper3);padding:2px 8px;cursor:pointer;font-size:.9rem" title="删除">✕</span>
+        <span>查 ${x}</span>
+        <span data-remove="${x.replace(/"/g,'&quot;')}" style="color:var(--paper3);padding:2px 8px;cursor:pointer;font-size:.9rem" title="删除">关</span>
       </div>
     `).join('') + `
-      <div data-clear="1" style="padding:6px 12px;cursor:pointer;font-size:.75rem;text-align:center;color:var(--paper3);background:var(--ink);border-top:1px solid var(--border)">🗑️ 清空全部历史</div>
+      <div data-clear="1" style="padding:6px 12px;cursor:pointer;font-size:.75rem;text-align:center;color:var(--paper3);background:var(--ink);border-top:1px solid var(--border)">删 清空全部历史</div>
     `;
     searchHistoryEl.querySelectorAll('[data-q]').forEach(el => {
       el.onclick = (e) => {
@@ -1742,7 +1742,7 @@ function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeComp
       cont.innerHTML = `<div class="empty"><h3>暂无匹配</h3>关键词 "<b>${q}</b>" 在 ${mod||'全模块'} 中无结果</div>`;
       return;
     }
-    let html = `<div style="margin-bottom:12px;color:var(--paper3);font-size:.85rem;display:flex;align-items:center;flex-wrap:wrap;gap:8px"><span>找到 <b style="color:var(--gold)">${results.length}</b> 条结果</span><button class="btn sr-export-all" style="margin-left:auto;background:var(--gold);color:#000;border:0;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:.78rem">📦 导出全部 JSON</button><button class="btn sr-export-csv" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:.78rem">📤 导出 CSV</button></div>`;
+    let html = `<div style="margin-bottom:12px;color:var(--paper3);font-size:.85rem;display:flex;align-items:center;flex-wrap:wrap;gap:8px"><span>找到 <b style="color:var(--gold)">${results.length}</b> 条结果</span><button class="btn sr-export-all" style="margin-left:auto;background:var(--gold);color:#000;border:0;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:.78rem">箱 导出全部 JSON</button><button class="btn sr-export-csv" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:.78rem">出 导出 CSV</button></div>`;
     const escHtml = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     const hl = (text, q) => { const e = escHtml(text); if(!q) return e; const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')','gi'); return e.replace(re,'<mark style="background:rgba(201,168,76,.3);color:var(--gold);border-radius:2px">$1</mark>'); };
     for(const r of results){
@@ -1753,9 +1753,9 @@ function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeComp
           <span class="chip">${r.module||'—'}</span>
           <span class="chip ${trust>=0.7?'green':'gray'}">trust ${trust.toFixed(2)}</span>
           ${r.hit_count?`<span>命中 ${r.hit_count}</span>`:''}
-          <button class="btn sr-copy" data-copy="${escHtml((r.title||'')+' | '+(r.module||'')+'\n'+(r.snippet||''))}" style="margin-left:auto;background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:2px 8px;border-radius:6px;cursor:pointer;font-size:.75rem">📋 复制</button>
-          <button class="btn sr-fav" data-mod="${escHtml(r.module||'')}" data-title="${escHtml(r.title||'')}" data-snippet="${escHtml(r.snippet||'')}" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:2px 8px;border-radius:6px;cursor:pointer;font-size:.75rem">⭐ 收藏</button>
-          <a class="btn" href="ai-assistant.html?preset=${encodeURIComponent(r.module||'kb-search')}" style="background:var(--gold);color:#000;padding:2px 8px;border-radius:6px;cursor:pointer;font-size:.75rem;text-decoration:none">🤖 AI</a>
+          <button class="btn sr-copy" data-copy="${escHtml((r.title||'')+' | '+(r.module||'')+'\n'+(r.snippet||''))}" style="margin-left:auto;background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:2px 8px;border-radius:6px;cursor:pointer;font-size:.75rem">表 复制</button>
+          <button class="btn sr-fav" data-mod="${escHtml(r.module||'')}" data-title="${escHtml(r.title||'')}" data-snippet="${escHtml(r.snippet||'')}" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:2px 8px;border-radius:6px;cursor:pointer;font-size:.75rem">星 收藏</button>
+          <a class="btn" href="ai-assistant.html?preset=${encodeURIComponent(r.module||'kb-search')}" style="background:var(--gold);color:#000;padding:2px 8px;border-radius:6px;cursor:pointer;font-size:.75rem;text-decoration:none">机 AI</a>
         </div>
         <div class="sr-title">${hl(r.title, q)}</div>
         <div class="sr-snippet">${hl(r.snippet, q)}</div>

@@ -146,7 +146,7 @@ header p{font-size:13px;color:var(--muted)}
 <a href="divination-hub.html" style="position:fixed;top:12px;left:12px;z-index:9999;padding:8px 14px;background:#c9a227;color:#fff;border-radius:20px;font-size:12px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.15);opacity:.85">← 首页</a>
 
 <header>
-  <h1>🥽 Rokid 眼镜接入测试</h1>
+  <h1>Rokid 眼镜接入测试</h1>
   <p>命理宝鉴 · 智能眼镜能力检测 · 拍照/录像/录音</p>
   <a href="device-management.html" class="back">← 设备运维中心</a>
 </header>
@@ -157,7 +157,7 @@ header p{font-size:13px;color:var(--muted)}
 
   <!-- 连接状态 -->
   <div class="status-card">
-    <h2>📊 连接状态</h2>
+    <h2>图 连接状态</h2>
     <div class="status-row">
       <span class="status-label">Bridge 检测</span>
       <span id="bridge-status" class="badge badge-warn">检测中...</span>
@@ -182,13 +182,13 @@ header p{font-size:13px;color:var(--muted)}
 
   <!-- 设备信息 -->
   <div class="status-card" id="device-info-card" style="display:none">
-    <h2>📱 设备信息</h2>
+    <h2>机 设备信息</h2>
     <div class="info-grid" id="device-info-grid"></div>
   </div>
 
   <!-- 拍照测试 -->
   <div class="status-card">
-    <h2>📷 拍照测试</h2>
+    <h2>拍 拍照测试</h2>
     <p style="color:var(--muted);font-size:13px;margin-bottom:12px">
       通过 Rokid Host API <code>HostTakePhoto</code> 或浏览器 <code>getUserMedia</code> 拍摄照片。
     </p>
@@ -197,15 +197,15 @@ header p{font-size:13px;color:var(--muted)}
       <div class="recording-indicator" id="photo-loading">拍摄中...</div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-primary" onclick="RokidTest.takePhoto()">📷 拍照（Host API）</button>
-      <button class="btn" onclick="RokidTest.takePhotoWebcam()">📷 拍照（浏览器摄像头）</button>
-      <button class="btn btn-gold" onclick="RokidTest.enterWangzhen()">🔍 进入望诊工作台</button>
+      <button class="btn btn-primary" onclick="RokidTest.takePhoto()">拍 拍照（Host API）</button>
+      <button class="btn" onclick="RokidTest.takePhotoWebcam()">拍 拍照（浏览器摄像头）</button>
+      <button class="btn btn-gold" onclick="RokidTest.enterWangzhen()">查 进入望诊工作台</button>
     </div>
   </div>
 
   <!-- 录像测试 -->
   <div class="status-card">
-    <h2>🎥 录像测试</h2>
+    <h2>摄 录像测试</h2>
     <p style="color:var(--muted);font-size:13px;margin-bottom:12px">
       通过浏览器 <code>MediaRecorder</code> API 录制视频（眼镜端浏览器会调用眼镜摄像头）。
     </p>
@@ -214,20 +214,20 @@ header p{font-size:13px;color:var(--muted)}
       <div class="recording-indicator" id="video-rec-indicator">录像中</div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-primary" id="video-record-btn" onclick="RokidTest.toggleRecord()">🎥 开始录像</button>
+      <button class="btn btn-primary" id="video-record-btn" onclick="RokidTest.toggleRecord()">摄 开始录像</button>
       <button class="btn" id="video-play-btn" onclick="RokidTest.playRecordedVideo()" disabled>▶️ 播放</button>
-      <button class="btn" id="video-download-btn" onclick="RokidTest.downloadVideo()" disabled>⬇️ 下载</button>
+      <button class="btn" id="video-download-btn" onclick="RokidTest.downloadVideo()" disabled>下 下载</button>
     </div>
   </div>
 
   <!-- 录音测试 -->
   <div class="status-card">
-    <h2>🎤 录音测试</h2>
+    <h2>麦 录音测试</h2>
     <p style="color:var(--muted);font-size:13px;margin-bottom:12px">
       通过浏览器 <code>MediaRecorder</code> API 或 Rokid <code>HostSpeechStartRecognition</code> 进行语音录制和识别。
     </p>
     <div class="btn-row">
-      <button class="btn btn-primary" id="audio-record-btn" onclick="RokidTest.toggleAudioRecord()">🎤 开始录音</button>
+      <button class="btn btn-primary" id="audio-record-btn" onclick="RokidTest.toggleAudioRecord()">麦 开始录音</button>
       <button class="btn" id="audio-play-btn" onclick="RokidTest.playRecordedAudio()" disabled>▶️ 播放</button>
       <button class="btn" onclick="RokidTest.startSpeechRecognition()">🗣️ 语音识别（Host API）</button>
     </div>
@@ -237,18 +237,18 @@ header p{font-size:13px;color:var(--muted)}
 
   <!-- 日志 -->
   <div class="status-card">
-    <h2>📋 操作日志</h2>
+    <h2>表 操作日志</h2>
     <div class="log-area" id="log-area">
       <div class="log-entry"><span class="log-time">--:--:--</span><span class="log-info">等待操作...</span></div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-danger" onclick="RokidTest.clearLog()">🗑️ 清空日志</button>
+      <button class="btn btn-danger" onclick="RokidTest.clearLog()">删 清空日志</button>
     </div>
   </div>
 
   <!-- API 参考 -->
   <div class="status-card">
-    <h2>📖 Rokid AIUI Host API 参考</h2>
+    <h2>经 Rokid AIUI Host API 参考</h2>
     <div class="api-doc">
       <h3>HostTakePhoto</h3>
       <div class="desc">调用眼镜摄像头拍照，返回 base64 图片数据</div>
