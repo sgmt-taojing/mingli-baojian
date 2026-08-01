@@ -5742,3 +5742,46 @@ body::after {
   transition: opacity .3s;
 }
 .nf-card:hover .nf-card-name { opacity: 1; }
+
+/* R410 cat-card 跳转交互 */
+.cat-card {
+  cursor: pointer;
+  transition: all .25s cubic-bezier(.4,0,.2,1);
+  position: relative;
+  overflow: hidden;
+}
+.cat-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, currentColor, transparent);
+  transition: width .3s ease, left .3s ease;
+  opacity: 0.6;
+}
+.cat-card:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(0,0,0,.3);
+}
+.cat-card:hover::after {
+  width: 80%;
+  left: 10%;
+}
+.cat-card:active {
+  transform: translateY(-1px) scale(0.99);
+  opacity: 0.7;
+}
+.cat-card.loading {
+  pointer-events: none;
+  opacity: 0.5;
+}
+.cat-card.loading .cc-name::after {
+  content: ' ⏳';
+  animation: pulse 1s infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
