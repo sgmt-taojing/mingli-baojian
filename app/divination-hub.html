@@ -6,6 +6,8 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta charset="UTF-8">
 <meta name="description" content="易道智鉴 — 周易术数·中医诊疗·知识文化·智能综合平台">
+<meta name="keywords" content="周易,中医,命理,八字,紫微斗数,风水,占卜,奇门遁甲,梅花易数,知识库,AI智能">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/divination-hub.html">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -63,7 +65,75 @@
     <script src="../knowledge/koujue-database-full.js" defer></script>
 <script src="js/secure-storage.js"></script>
 <script src="js/user-profile.js" defer></script>
-<link rel="stylesheet" href="css/mobile-nav.css">
+<style>
+/* mobile-nav.css inlined (R343) */
+/* R84: mobile bottom navigation styles */
+
+/* desktop: hide */
+@media (min-width: 768px) {
+  .mobile-bottom-nav { display: none !important; }
+}
+
+/* mobile: show */
+@media (max-width: 767px) {
+  .mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9000;
+    display: flex;
+    background: rgba(15, 24, 32, 0.95);
+    border-top: 1px solid rgba(99, 179, 237, 0.2);
+    padding: 4px 2px;
+    padding-bottom: max(4px, env(safe-area-inset-bottom));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .mbn-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 6px 2px;
+    text-decoration: none;
+    color: rgba(197, 209, 222, 0.6);
+    font-size: 10px;
+    font-weight: 500;
+    transition: color 0.2s, transform 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  .mbn-item:active {
+    transform: scale(0.92);
+  }
+
+  .mbn-item.active {
+    color: #63b3ed;
+  }
+
+  .mbn-icon {
+    font-size: 18px;
+    line-height: 1;
+    display: block;
+  }
+
+  .mbn-label {
+    font-size: 9px;
+    line-height: 1;
+    letter-spacing: 0.3px;
+  }
+
+  /* avoid content hidden behind nav */
+  body {
+    padding-bottom: 64px !important;
+  }
+}
+</style>
 
   <!-- R261 inline: divination-hub-style-2.css (1203 bytes) -->
 <style data-r261-inline="divination-hub-style-2.css">
@@ -91,9 +161,416 @@ h2{color:var(--gold2);border-bottom:1px solid rgba(201,168,76,.2);padding-bottom
   input[type=text],input[type=search],textarea,select{width:100%!important;max-width:100%!important}
 }
   </style>
-<link rel="stylesheet" href="css/theme-systems.css">
-<link rel="stylesheet" href="css/flow-engine.css">
-<link rel="stylesheet" href="css/tokens.css">
+<style>
+/* theme-systems.css inlined (R343) */
+/* ================================================================
+   命理宝鉴 · 六大体系色彩系统
+   ================================================================ */
+
+:root {
+  /* 通用基础 */
+  --sys-bg: #050608;
+  --sys-text: #c9d1d9;
+  --sys-muted: #6b7280;
+  --sys-border: rgba(255,255,255,.06);
+  --sys-card-bg: rgba(255,255,255,.02);
+  
+  /* 1. 周易术数 — 金色系 */
+  --zhouyi-primary: #b8956a;
+  --zhouyi-accent: rgba(184,149,106,.15);
+  --zhouyi-border: rgba(184,149,106,.12);
+  --zhouyi-glow: rgba(184,149,106,.08);
+  
+  /* 2. 中医诊疗 — 青翠系 */
+  --tcm-primary: #6b9b7a;
+  --tcm-accent: rgba(107,155,122,.15);
+  --tcm-border: rgba(107,155,122,.12);
+  --tcm-glow: rgba(107,155,122,.08);
+  
+  /* 3. 知识文化 — 藏蓝系 */
+  --knowledge-primary: #6b7a8f;
+  --knowledge-accent: rgba(107,122,143,.15);
+  --knowledge-border: rgba(107,122,143,.12);
+  --knowledge-glow: rgba(107,122,143,.08);
+  
+  /* 4. 运营运维 — 钢灰系 */
+  --ops-primary: #7a8290;
+  --ops-accent: rgba(122,130,144,.15);
+  --ops-border: rgba(122,130,144,.12);
+  --ops-glow: rgba(122,130,144,.08);
+  
+  /* 5. 用户服务 — 暖橙系 */
+  --user-primary: #b8825a;
+  --user-accent: rgba(184,130,90,.15);
+  --user-border: rgba(184,130,90,.12);
+  --user-glow: rgba(184,130,90,.08);
+  
+  /* 6. AI智能 — 紫罗兰系 */
+  --ai-primary: #9a7fb5;
+  --ai-accent: rgba(154,127,181,.15);
+  --ai-border: rgba(154,127,181,.12);
+  --ai-glow: rgba(154,127,181,.08);
+}
+
+/* 体系色彩 class */
+.theme-zhouyi { --sys-primary: var(--zhouyi-primary); --sys-accent: var(--zhouyi-accent); --sys-border-c: var(--zhouyi-border); --sys-glow: var(--zhouyi-glow); }
+.theme-tcm { --sys-primary: var(--tcm-primary); --sys-accent: var(--tcm-accent); --sys-border-c: var(--tcm-border); --sys-glow: var(--tcm-glow); }
+.theme-knowledge { --sys-primary: var(--knowledge-primary); --sys-accent: var(--knowledge-accent); --sys-border-c: var(--knowledge-border); --sys-glow: var(--knowledge-glow); }
+.theme-ops { --sys-primary: var(--ops-primary); --sys-accent: var(--ops-accent); --sys-border-c: var(--ops-border); --sys-glow: var(--ops-glow); }
+.theme-user { --sys-primary: var(--user-primary); --sys-accent: var(--user-accent); --sys-border-c: var(--user-border); --sys-glow: var(--user-glow); }
+.theme-ai { --sys-primary: var(--ai-primary); --sys-accent: var(--ai-accent); --sys-border-c: var(--ai-border); --sys-glow: var(--ai-glow); }
+
+/* 统一页面基础样式 */
+body {
+  background: var(--sys-bg);
+  color: var(--sys-text);
+  font-family: 'Noto Serif SC', 'Source Han Serif SC', serif;
+}
+
+/* 统一标题 */
+h1, h2, h3 { color: var(--sys-primary, #d4b06a); }
+
+/* 统一链接 */
+a { color: var(--sys-primary, #d4b06a); }
+
+/* 统一输入框 */
+input[type="text"], input[type="date"], input[type="number"], input[type="password"],
+input[type="email"], select, textarea {
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--sys-border-c, rgba(201,168,76,.12));
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: var(--sys-text);
+  font-size: 13px;
+  font-family: inherit;
+  min-height: 36px;
+  transition: border-color .2s;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--sys-primary, rgba(201,168,76,.35));
+}
+
+/* 统一按钮 */
+button, input[type="submit"], input[type="button"] {
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all .2s;
+  font-family: inherit;
+}
+
+/* 统一卡片 */
+.card, .info-card, .panel, .result {
+  background: var(--sys-card-bg);
+  border: 1px solid var(--sys-border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+/* 统一返回按钮 */
+a[href="divination-hub.html"] {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 9999;
+  padding: 6px 14px;
+  border: 1px solid var(--sys-border-c, rgba(201,168,76,.2));
+  border-radius: 6px;
+  background: rgba(18,18,26,.92);
+  color: var(--sys-primary, #d4b06a);
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-decoration: none;
+  backdrop-filter: blur(8px);
+}
+a[href="divination-hub.html"]:hover {
+  background: var(--sys-accent, rgba(201,168,76,.1));
+  border-color: var(--sys-primary, rgba(201,168,76,.4));
+}
+
+
+/* 儒道释参考色彩 — 更明亮不压抑 */
+.theme-zhouyi { --gold: #b8956a; --gold2: #a07f50; }
+.theme-tcm { --gold: #6b9b7a; --gold2: #5a8a6a; }
+.theme-knowledge { --gold: #6b7a8f; --gold2: #5a6a7f; }
+.theme-ops { --gold: #7a8290; --gold2: #6a7280; }
+.theme-user { --gold: #b8825a; --gold2: #a8724a; }
+.theme-ai { --gold: #9a7fb5; --gold2: #8a6fa5; }
+
+</style>
+<style>
+/* flow-engine.css inlined (R343) */
+/* ================================================================
+   流程引擎 · 步骤指引组件
+   ================================================================ */
+
+/* 步骤条 */
+.flow-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin: 12px 0 20px;
+  padding: 0;
+  flex-wrap: wrap;
+}
+.flow-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--sys-primary, #b8956a);
+  opacity: 0.4;
+  transition: opacity .2s;
+  white-space: nowrap;
+}
+.flow-step.active { opacity: 1; font-weight: 600; }
+.flow-step.done { opacity: 0.7; }
+.flow-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  font-size: 11px;
+  font-weight: 600;
+}
+.flow-step.active .flow-step-num {
+  background: var(--sys-primary, #b8956a);
+  color: var(--sys-bg, #12121a);
+}
+.flow-step.done .flow-step-num {
+  background: var(--sys-primary, #b8956a);
+  color: var(--sys-bg, #12121a);
+  opacity: 0.5;
+}
+.flow-step-arrow {
+  margin: 0 8px;
+  color: var(--sys-muted, #6b7280);
+  font-size: 10px;
+}
+
+/* 帮助提示 */
+.flow-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--sys-accent, rgba(184,149,106,.06));
+  border-radius: 6px;
+  font-size: 11px;
+  color: var(--sys-primary, #b8956a);
+  opacity: 0.7;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.flow-hint::before { content: "💡 "; flex-shrink: 0; }
+
+/* 快捷链接 */
+.flow-quicklinks {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--sys-border, rgba(255,255,255,.04));
+}
+.flow-quicklink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  font-size: 11px;
+  color: var(--sys-primary, #b8956a);
+  text-decoration: none;
+  border: 1px solid var(--sys-border-c, rgba(184,149,106,.1));
+  border-radius: 16px;
+  transition: all .2s;
+  opacity: 0.7;
+}
+.flow-quicklink:hover {
+  opacity: 1;
+  background: var(--sys-accent, rgba(184,149,106,.08));
+  border-color: var(--sys-primary, #b8956a);
+}
+
+/* 会诊流程确认 */
+.flow-confirm {
+  display: none;
+  padding: 16px;
+  margin: 12px 0;
+  background: var(--sys-card-bg, rgba(255,255,255,.02));
+  border: 1px solid var(--sys-border-c, rgba(184,149,106,.1));
+  border-radius: 8px;
+}
+.flow-confirm.show { display: block; }
+.flow-confirm-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--sys-primary, #b8956a);
+  margin-bottom: 8px;
+}
+.flow-confirm-body {
+  font-size: 12px;
+  color: var(--sys-text, #c9d1d9);
+  opacity: 0.7;
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+.flow-confirm-actions {
+  display: flex;
+  gap: 8px;
+}
+.flow-confirm-btn {
+  padding: 6px 16px;
+  font-size: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid var(--sys-border-c, rgba(184,149,106,.15));
+  background: transparent;
+  color: var(--sys-primary, #b8956a);
+  transition: all .2s;
+}
+.flow-confirm-btn.primary {
+  background: var(--sys-accent, rgba(184,149,106,.1));
+  border-color: var(--sys-primary, #b8956a);
+}
+.flow-confirm-btn:hover {
+  background: var(--sys-accent, rgba(184,149,106,.15));
+}
+
+/* 表单审美优化 — 仅作用于 flow-engine 容器内，不影响自包含页面 */
+.flow-engine .input-row,
+.flow-engine .form-row,
+.flow-engine .form-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+.flow-engine .input-field {
+  min-height: 36px;
+  border-radius: 6px;
+  transition: border-color .2s;
+}
+.flow-engine .input-field:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--sys-accent, rgba(184,149,106,.1));
+}
+.flow-engine .input-hint {
+  font-size: 11px;
+  opacity: 0.3;
+  margin: 4px 0 8px;
+  line-height: 1.4;
+}
+.flow-engine .input-card {
+  background: rgba(255,255,255,.015);
+  border: 1px solid var(--sys-border, rgba(255,255,255,.04));
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+/* 表单分组标题 */
+.flow-engine .form-section-title {
+  font-size: 12px;
+  color: var(--sys-primary, #b8956a);
+  opacity: 0.6;
+  letter-spacing: 2px;
+  margin: 12px 0 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--sys-border, rgba(255,255,255,.03));
+}
+
+</style>
+<style>
+/* tokens.css inlined (R343) */
+/* tokens.css — 全局设计 Token（跨页面共享）
+ * 从 divination-hub.css :root 抽取，供 admin-notify / lifeflow-report / monthly-report 等引用
+ * 维护者：AutoClaw R165 · 2026-07-27
+ */
+:root{
+  --ink:#080808;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;
+  --paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#c8b89c;
+  --gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;
+  --gold-dim:rgba(201,168,76,0.5);
+  --cinn:#d4523f;--cinn2:#ff6650;
+  --cyan:#5fa8e3;--cyan2:#5dade2;
+  --jade:#27ae60;--jade2:#2ecc71;
+  --violet:#c97be0;--violet2:#b87fce;
+  --orange:#e67e22;
+  --emerald:#16a085;
+  --steel:#7f8c8d;
+  --wood:#8d6e63;--wood2:#a1887f;
+  --fire:#ff6650;--fire2:#d4523f;
+  --earth:#a08060;
+  --metal:#95a5a6;--metal2:#bdc3c7;
+  --danger:#dc3545;
+  --white:#fff;
+  --gray-light:#aaa;--gray-mid:#999;--gray:#888;
+  --amber:#f39c12;
+  --gold-bright:#D4AF37;
+  --ink-dark:#2c3e50;
+  --teal:#1abc9c;
+  --ink-deep:#1a1611;--ink-darkest:#12100c;
+  --warning-bg:#fff3cd;--warning:#ffc107;
+  --pink-light:#ffb6c1;
+  --cream:#fdf6e3;
+  --off-white:#fafafa;
+  --gray-border:#eee;
+  --coral:#ec644b;
+  --parchment:#e0d0a0;
+  --gold-soft:#d4a64c;
+  --pumpkin:#d35400;
+  --purple-medium:#9370DB;
+  --wet-asphalt:#34495e;
+  --dark-text:#333;
+  --gold-warm:#f0c040;
+  --near-black:#0a0a0a;
+
+  /* 语义别名 */
+  --title:var(--gold);--muted:var(--paper3);--accent:var(--gold);
+  --bg:var(--ink);--bg-card:rgba(255,255,255,0.04);
+  --card:rgba(255,255,255,0.04);--card2:rgba(255,255,255,0.06);
+  --border:rgba(201,168,76,.15);--shadow:0 4px 24px rgba(0,0,0,.5);
+  --success:#2ecc71;--warn:#e67e22;
+  --text:var(--paper);--text-dim:var(--paper3);
+  --text-secondary:var(--paper3);--text-tertiary:var(--gray-mid);
+
+  /* 扩展色 */
+  --red:#ef4444;--green:#10b981;--yellow:#f59e0b;--blue:#3b82f6;
+
+  /* 别名补齐（修复未定义引用） */
+  --ml-accent:var(--gold);
+  --accent-gold:var(--gold);
+  --text-primary:var(--paper);
+
+  --font-serif:'Noto Serif SC','Source Han Serif SC','SimSun','STSong',serif;
+  --font-mono:'Cutive Mono','Courier New',monospace;
+}
+
+/* R391: 补充缺失 CSS 变量 */
+:root{
+  --bg-2:#1a1a2e;
+  --zw-paper3:#c8b89c;
+  --pa-paper3:#c8b89c;
+  --pa-paper2:#d4c9b0;
+  --ink-1:#080808;
+  --ink-2:#111;
+  --ink-3:#1a1a1a;
+  --fg3:#8b949e;
+  --gold-2:#e8cc7a;
+  --gray-light:#8b949e;
+  --line:#30363d;
+  --text-light:#c9d1d9;
+  --title:#c9a84c;
+  --paper-dark:#a08030;
+  --black:#080808;
+}
+
+</style>
 </head>
 <body class="theme-zhouyi">
 <a href="#main-content" class="skip-link">跳到主要内容</a>
