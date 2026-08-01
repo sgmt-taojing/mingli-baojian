@@ -417,7 +417,7 @@ async function aiDivineInterpret(type, baziData, question) {
 }
 
 /**
- * AI生成完整命理报告
+ * 系统生成完整命理报告
  * @param {string} type - 排盘类型
  * @param {Object} baziData - 排盘数据
  * @returns {Promise<string>} 完整AI命理报告
