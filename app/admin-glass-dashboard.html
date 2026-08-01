@@ -105,7 +105,7 @@
       <div class="card-desc">输入 /api/admin/* 鉴权所需的 Bearer token</div>
       <input aria-label="输入" id="tokenInput" type="password" placeholder="粘贴 admin token..." style="width:100%;padding:6px;background:var(--ink-1);color:var(--ink-3);border:1px solid var(--ink-2);border-radius:4px;margin:8px 0">
       <div class="btn-group">
-        <button class="btn btn-primary" onclick="saveToken()">保存</button>
+        <button class="btn btn-primary" onclick="saveToken()" aria-label="保存Token设置">保存</button>
         <span id="tokenStatus" style="margin-left:10px;color:var(--ink-3);font-size:13px"></span>
       </div>
     </div>
@@ -118,7 +118,7 @@
       </div>
       <div class="card-desc">并行探测 /status /vitals /history 三端点，返回延迟与响应</div>
       <div class="btn-group">
-        <button class="btn btn-primary" onclick="checkHealth()">立即检测</button>
+        <button class="btn btn-primary" onclick="checkHealth()" aria-label="立即检测服务健康状态">立即检测</button>
       </div>
       <div class="result-box" id="healthResult"></div>
     </div>
@@ -146,7 +146,7 @@
         <textarea id="testBody" placeholder='{"key":"value"}' aria-label="testBody"></textarea>
       </div>
       <div class="btn-group">
-        <button class="btn btn-primary" onclick="testEndpoint()">发送测试</button>
+        <button class="btn btn-primary" onclick="testEndpoint()" aria-label="发送测试推送消息">发送测试</button>
       </div>
       <div class="result-box" id="testResult"></div>
     </div>
@@ -171,7 +171,7 @@
         </select>
       </div>
       <div class="btn-group">
-        <button class="btn btn-primary" onclick="broadcast()">开始广播</button>
+        <button class="btn btn-primary" onclick="broadcast()" aria-label="广播消息给所有用户">开始广播</button>
       </div>
       <div class="result-box" id="broadcastResult"></div>
     </div>
@@ -188,7 +188,7 @@
         <input aria-label="yearlyYear" type="number" id="yearlyYear" value="2026">
       </div>
       <div class="btn-group">
-        <button class="btn btn-primary" onclick="yearlyBroadcast()">推送到全部画像</button>
+        <button class="btn btn-primary" onclick="yearlyBroadcast()" aria-label="推送年度报告给全部画像">推送到全部画像</button>
       </div>
       <div class="result-box" id="yearlyResult"></div>
     </div>

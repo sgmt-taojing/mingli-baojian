@@ -523,7 +523,7 @@ function viewTicket(id) {
         '<div class="field"><label>提交时间</label><div>'+t.created_at+'</div></div>' +
         (t.page_url?'<div class="field"><label>来源</label><div style="font-size:11px;word-break:break-all">'+t.page_url+'</div></div>':'') +
         '<div class="field"><label>详细内容</label><div style="background:rgba(255,255,255,.04);padding:10px;border-radius:6px;white-space:pre-wrap;word-break:break-word">'+(t.content||'')+'</div></div>' +
-        (t.screenshot_path?'<div class="field"><label>截图</label><img loading="lazy" class="screenshot-thumb" src="'+t.screenshot_path+'" onclick="window.open(this.src)"></div>':'') +
+        (t.screenshot_path?'<div class="field"><label>截图</label><img loading="lazy" class="screenshot-thumb" src="'+t.screenshot_path+'" alt="工单截图" onclick="window.open(this.src)"></div>':'') +
         (t.voice_path?'<div class="field"><label>语音</label><audio src="'+t.voice_path+'" controls style="width:100%"></audio></div>':'') +
         (t.admin_reply?'<div class="field"><label>后台回复</label><div class="reply-box">'+t.admin_reply+'</div></div>':'');
       document.getElementById('adminReply').value = t.admin_reply || '';

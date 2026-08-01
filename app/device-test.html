@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<meta name="description" content="设备检测工具 · 易道智鉴平台">
+<title>设备检测 · 易道智鉴</title>
+<link rel="stylesheet" href="css/a11y-fix.css">
+<link rel="stylesheet" href="css/page-header.css">
+<style>
+body{background:var(--ink);color:var(--paper);font-family:'Source Han Serif SC','Songti SC','STSong','SimSun',serif;margin:0;padding:0}
+.page-header-bar{position:sticky;top:0;z-index:100;background:rgba(10,10,12,0.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(201,168,76,0.2);padding:10px 20px;display:flex;align-items:center;gap:12px}
+.phb-back{color:var(--gold);text-decoration:none;font-size:14px;white-space:nowrap}
+.phb-title{font-size:16px;color:var(--paper);letter-spacing:2px}
+.container{max-width:900px;margin:0 auto;padding:24px 16px 60px}
+h1{font-size:24px;color:var(--gold);letter-spacing:4px;margin:0 0 8px}
+.subtitle{color:var(--paper2);font-size:14px;margin-bottom:24px}
+.card{background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:12px;padding:20px;margin-bottom:16px}
+.card h2{font-size:16px;color:var(--gold);margin:0 0 12px;letter-spacing:2px}
+.status-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.status-row:last-child{border-bottom:none}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dot-green{background:#4ade80;box-shadow:0 0 8px #4ade80}
+.dot-red{background:#ef4444}
+.dot-yellow{background:#fbbf24}
+.status-label{flex:1;font-size:14px}
+.status-value{font-size:13px;color:var(--paper2)}
+.device-list{margin-top:8px}
+.device-item{padding:6px 0;font-size:13px;color:var(--paper2);padding-left:16px;border-left:2px solid rgba(201,168,76,0.2);margin-bottom:4px}
+.test-area{margin-top:16px;display:none}
+.test-area.active{display:block}
+video{max-width:100%;border-radius:8px;background:#000;margin-top:8px}
+.audio-meter{height:40px;background:rgba(0,0,0,0.3);border-radius:4px;margin-top:8px;display:flex;align-items:center;padding:0 12px;gap:2px}
+.audio-bar{flex:1;height:100%;max-width:4px;background:#4ade80;opacity:0.3;transition:opacity 0.1s}
+.btn{padding:8px 20px;border:1px solid var(--gold);border-radius:8px;background:rgba(201,168,76,0.1);color:var(--gold);cursor:pointer;font-size:14px;letter-spacing:2px;margin-right:8px}
+.btn:hover{background:rgba(201,168,76,0.2)}
+.btn.danger{border-color:#ef4444;color:#ef4444}
+.btn.danger:hover{background:rgba(239,68,68,0.1)}
+.test-result{padding:12px;border-radius:8px;margin-top:8px;font-size:13px}
+.result-ok{background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);color:#4ade80}
+.result-err{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#ef4444}
+.result-warn{background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);color:#fbbf24}
+.hint{font-size:12px;color:var(--paper3);margin-top:8px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="page-header-bar">
+  <a href="divination-hub.html" class="phb-back">← 返回</a>
+  <span class="phb-title">设备检测</span>
+</div>
+
+<div class="container">
+  <h1>🔌 设备检测与测试</h1>
+  <p class="subtitle">检测本机摄像头、麦克风状态，支持实时测试拍照与录音</p>
+
+  <!-- 安全上下文 -->
+  <div class="card" id="ctx-card">
+    <h2>🔒 安全上下文</h2>
+    <div class="status-row">
+      <span class="status-dot" id="ctx-dot"></span>
+      <span class="status-label">安全上下文（HTTPS/localhost）</span>
+      <span class="status-value" id="ctx-value">检测中...</span>
+    </div>
+    <div class="hint" id="ctx-hint"></div>
+  </div>
+
+  <!-- 浏览器支持 -->
+  <div class="card">
+    <h2>🌐 浏览器 API 支持</h2>
+    <div class="status-row">
+      <span class="status-dot" id="api-media"></span>
+      <span class="status-label">navigator.mediaDevices</span>
+      <span class="status-value" id="api-media-val">检测中...</span>
+    </div>
+    <div class="status-row">
+      <span class="status-dot" id="api-user"></span>
+      <span class="status-label">getUserMedia</span>
+      <span class="status-value" id="api-user-val">检测中...</span>
+    </div>
+    <div class="status-row">
+      <span class="status-dot" id="api-enum"></span>
+      <span class="status-label">enumerateDevices</span>
+      <span class="status-value" id="api-enum-val">检测中...</span>
+    </div>
+  </div>
+
+  <!-- 摄像头 -->
+  <div class="card">
+    <h2>📷 摄像头</h2>
+    <div class="status-row">
+      <span class="status-dot" id="cam-dot"></span>
+      <span class="status-label">摄像头设备</span>
+      <span class="status-value" id="cam-val">未检测</span>
+    </div>
+    <div class="device-list" id="cam-list"></div>
+    <div style="margin-top:12px">
+      <button class="btn" id="cam-test" onclick="testCamera()">测试摄像头</button>
+      <button class="btn danger" id="cam-stop" onclick="stopCamera()" style="display:none">停止</button>
+      <button class="btn" id="cam-snap" onclick="snapPhoto()" style="display:none">拍照</button>
+    </div>
+    <div class="test-area" id="cam-area">
+      <video id="cam-video" autoplay playsinline muted></video>
+      <canvas id="cam-canvas" style="display:none"></canvas>
+      <div id="cam-result"></div>
+    </div>
+  </div>
+
+  <!-- 麦克风 -->
+  <div class="card">
+    <h2>🎤 麦克风</h2>
+    <div class="status-row">
+      <span class="status-dot" id="mic-dot"></span>
+      <span class="status-label">麦克风设备</span>
+      <span class="status-value" id="mic-val">未检测</span>
+    </div>
+    <div class="device-list" id="mic-list"></div>
+    <div style="margin-top:12px">
+      <button class="btn" id="mic-test" onclick="testMic()">测试麦克风</button>
+      <button class="btn danger" id="mic-stop" onclick="stopMic()" style="display:none">停止</button>
+    </div>
+    <div class="test-area" id="mic-area">
+      <div class="audio-meter" id="mic-meter"></div>
+      <div id="mic-result"></div>
+    </div>
+  </div>
+
+  <!-- 面诊/舌诊联动 -->
+  <div class="card">
+    <h2>🔮 面诊/舌诊联动</h2>
+    <div class="status-row">
+      <span class="status-dot" id="ocr-dot"></span>
+      <span class="status-label">face-ocr-server (端口 8913)</span>
+      <span class="status-value" id="ocr-val">检测中...</span>
+    </div>
+    <div class="status-row">
+      <span class="status-dot" id="tts-dot"></span>
+      <span class="status-label">tts-server (端口 8912)</span>
+      <span class="status-value" id="tts-val">检测中...</span>
+    </div>
+    <div class="status-row">
+      <span class="status-dot" id="paipan-dot"></span>
+      <span class="status-label">paipan-server (端口 8911)</span>
+      <span class="status-value" id="paipan-val">检测中...</span>
+    </div>
+    <div class="hint">面诊/舌诊需要摄像头 + face-ocr-server。语音播报需要 tts-server。</div>
+  </div>
+
+  <div class="card">
+    <h2>📋 总结</h2>
+    <div id="summary" style="font-size:14px;line-height:1.8"></div>
+  </div>
+</div>
+
+<script>
+// === 设备检测 ===
+let camStream = null, micStream = null, micAnalyser = null, micRAF = null;
+
+function setDot(id, state, text) {
+  const dot = document.getElementById(id + '-dot');
+  const val = document.getElementById(id + '-val');
+  if (dot) { dot.className = 'status-dot dot-' + state; }
+  if (val) { val.textContent = text; }
+}
+
+// 1. 安全上下文
+const isSecure = window.isSecureContext;
+setDot('ctx', isSecure ? 'green' : 'red', isSecure ? '✅ 安全' : '❌ 不安全');
+if (!isSecure) {
+  document.getElementById('ctx-hint').textContent = '⚠️ getUserMedia 需要安全上下文（HTTPS 或 localhost）。当前页面通过非安全上下文访问，摄像头/麦克风功能不可用。请使用 http://localhost:8914 或 https:// 访问。';
+} else {
+  document.getElementById('ctx-hint').textContent = '✅ 当前为安全上下文，摄像头/麦克风功能可用。';
+}
+
+// 2. 浏览器 API
+const hasMedia = !!navigator.mediaDevices;
+const hasUser = hasMedia && typeof navigator.mediaDevices.getUserMedia === 'function';
+const hasEnum = hasMedia && typeof navigator.mediaDevices.enumerateDevices === 'function';
+setDot('api-media', hasMedia ? 'green' : 'red', hasMedia ? '✅ 支持' : '❌ 不支持');
+setDot('api-user', hasUser ? 'green' : 'red', hasUser ? '✅ 支持' : '❌ 不支持');
+setDot('api-enum', hasEnum ? 'green' : 'red', hasEnum ? '✅ 支持' : '❌ 不支持');
+
+// 3. 枚举设备
+async function enumDevices() {
+  if (!hasEnum) return;
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const cams = devices.filter(d => d.kind === 'videoinput');
+    const mics = devices.filter(d => d.kind === 'audioinput');
+
+    // 摄像头
+    setDot('cam', cams.length > 0 ? 'green' : 'red', cams.length > 0 ? '✅ ' + cams.length + ' 个设备' : '❌ 无设备');
+    const camList = document.getElementById('cam-list');
+    camList.innerHTML = cams.map(d => '<div class="device-item">📷 ' + (d.label || '未授权（需先测试）') + '</div>').join('');
+
+    // 麦克风
+    setDot('mic', mics.length > 0 ? 'green' : 'red', mics.length > 0 ? '✅ ' + mics.length + ' 个设备' : '❌ 无设备');
+    const micList = document.getElementById('mic-list');
+    micList.innerHTML = mics.map(d => '<div class="device-item">🎤 ' + (d.label || '未授权（需先测试）') + '</div>').join('');
+
+    updateSummary();
+  } catch(e) {
+    setDot('cam', 'red', '检测失败');
+    setDot('mic', 'red', '检测失败');
+  }
+}
+
+// 4. 摄像头测试
+async function testCamera() {
+  if (!hasUser) { alert('浏览器不支持'); return; }
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 }, audio: false });
+    const video = document.getElementById('cam-video');
+    video.srcObject = camStream;
+    document.getElementById('cam-area').classList.add('active');
+    document.getElementById('cam-test').style.display = 'none';
+    document.getElementById('cam-stop').style.display = 'inline-block';
+    document.getElementById('cam-snap').style.display = 'inline-block';
+    
+    const result = document.getElementById('cam-result');
+    result.innerHTML = '<div class="test-result result-ok">✅ 摄像头已启动 — 画面正在显示</div>';
+    
+    // 重新枚举（此时 label 可用）
+    enumDevices();
+  } catch(e) {
+    const result = document.getElementById('cam-result');
+    let msg = e.message;
+    if (e.name === 'NotFoundError') msg = '未找到摄像头设备。Mac mini 通常没有内置摄像头，需要外接 USB 摄像头。';
+    else if (e.name === 'NotAllowedError') msg = '摄像头权限被拒绝。请在浏览器设置中允许摄像头访问。';
+    result.innerHTML = '<div class="test-result result-err">❌ ' + msg + '</div>';
+    document.getElementById('cam-area').classList.add('active');
+  }
+}
+
+function stopCamera() {
+  if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
+  document.getElementById('cam-video').srcObject = null;
+  document.getElementById('cam-area').classList.remove('active');
+  document.getElementById('cam-test').style.display = 'inline-block';
+  document.getElementById('cam-stop').style.display = 'none';
+  document.getElementById('cam-snap').style.display = 'none';
+}
+
+function snapPhoto() {
+  const video = document.getElementById('cam-video');
+  const canvas = document.getElementById('cam-canvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+  
+  // 显示照片
+  canvas.style.display = 'block';
+  canvas.style.maxWidth = '100%';
+  
+  // 尝试发送到 OCR 服务
+  fetch('http://127.0.0.1:8913/analyze', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ image: dataUrl, type: 'face' })
+  }).then(r => r.json()).then(data => {
+    document.getElementById('cam-result').innerHTML = 
+      '<div class="test-result result-ok">✅ 拍照成功 — OCR 服务已接收<br>分析结果：' + JSON.stringify(data).substring(0, 200) + '</div>';
+  }).catch(e => {
+    document.getElementById('cam-result').innerHTML = 
+      '<div class="test-result result-warn">⚠️ 拍照成功，但 OCR 服务未响应（端口 8913）<br>拍照数据 ' + Math.round(dataUrl.length / 1024) + 'KB</div>';
+  });
+}
+
+// 5. 麦克风测试
+async function testMic() {
+  if (!hasUser) { alert('浏览器不支持'); return; }
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioCtx.createMediaStreamSource(micStream);
+    micAnalyser = audioCtx.createAnalyser();
+    micAnalyser.fftSize = 256;
+    source.connect(micAnalyser);
+    
+    document.getElementById('mic-area').classList.add('active');
+    document.getElementById('mic-test').style.display = 'none';
+    document.getElementById('mic-stop').style.display = 'inline-block';
+    
+    // 创建音量条
+    const meter = document.getElementById('mic-meter');
+    meter.innerHTML = '';
+    const bars = [];
+    for (let i = 0; i < 40; i++) {
+      const bar = document.createElement('div');
+      bar.className = 'audio-bar';
+      meter.appendChild(bar);
+      bars.push(bar);
+    }
+    
+    const data = new Uint8Array(micAnalyser.frequencyBinCount);
+    function update() {
+      micAnalyser.getByteFrequencyData(data);
+      const avg = data.reduce((a, b) => a + b, 0) / data.length;
+      const active = Math.round((avg / 255) * 40);
+      bars.forEach((bar, i) => {
+        bar.style.opacity = i < active ? '1' : '0.2';
+        bar.style.background = i < 30 ? '#4ade80' : i < 36 ? '#fbbf24' : '#ef4444';
+      });
+      micRAF = requestAnimationFrame(update);
+    }
+    update();
+    
+    document.getElementById('mic-result').innerHTML = '<div class="test-result result-ok">✅ 麦克风已启动 — 请说话，观察音量条变化</div>';
+    enumDevices();
+  } catch(e) {
+    let msg = e.message;
+    if (e.name === 'NotFoundError') msg = '未找到麦克风设备。Mac mini 通常没有内置麦克风，需要外接 USB 麦克风或蓝牙耳机。';
+    else if (e.name === 'NotAllowedError') msg = '麦克风权限被拒绝。请在浏览器设置中允许麦克风访问。';
+    document.getElementById('mic-result').innerHTML = '<div class="test-result result-err">❌ ' + msg + '</div>';
+    document.getElementById('mic-area').classList.add('active');
+  }
+}
+
+function stopMic() {
+  if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+  if (micRAF) { cancelAnimationFrame(micRAF); micRAF = null; }
+  document.getElementById('mic-area').classList.remove('active');
+  document.getElementById('mic-test').style.display = 'inline-block';
+  document.getElementById('mic-stop').style.display = 'none';
+}
+
+// 6. 服务端检测
+async function checkService(port, name, dotId) {
+  try {
+    const r = await fetch('http://127.0.0.1:' + port + '/', { signal: AbortSignal.timeout(2000) });
+    setDot(dotId, r.ok ? 'green' : 'red', r.ok ? '✅ 运行中' : '❌ HTTP ' + r.status);
+  } catch(e) {
+    setDot(dotId, 'red', '❌ 未运行');
+  }
+}
+
+// 7. 总结
+function updateSummary() {
+  const summary = document.getElementById('summary');
+  const camOk = document.getElementById('cam-dot').classList.contains('dot-green');
+  const micOk = document.getElementById('mic-dot').classList.contains('dot-green');
+  const ctxOk = document.getElementById('ctx-dot').classList.contains('dot-green');
+  
+  let html = '';
+  html += '安全上下文：' + (ctxOk ? '✅' : '❌') + '<br>';
+  html += '摄像头：' + (camOk ? '✅ 可用' : '❌ 不可用') + '<br>';
+  html += '麦克风：' + (micOk ? '✅ 可用' : '❌ 不可用') + '<br>';
+  
+  if (!camOk && !micOk) {
+    html += '<br>⚠️ <strong>本机未检测到摄像头和麦克风</strong><br>';
+    html += 'Mac mini 通常没有内置摄像头/麦克风。解决方案：<br>';
+    html += '1. 外接 USB 摄像头（含麦克风）<br>';
+    html += '2. 使用蓝牙耳机/麦克风<br>';
+    html += '3. 使用 iPhone 作为连续互通相机（需同 Apple ID）<br>';
+    html += '4. 通过远程桌面（ToDesk）映射远程设备<br>';
+    html += '<br>面诊/舌诊功能需要摄像头，语音播报使用服务端 TTS（不依赖麦克风）。';
+  } else {
+    html += '<br>✅ 设备就绪，可使用面诊/舌诊/语音功能。';
+  }
+  summary.innerHTML = html;
+}
+
+// 初始化
+checkService(8913, 'OCR', 'ocr');
+checkService(8912, 'TTS', 'tts');
+checkService(8911, '排盘', 'paipan');
+enumDevices();
+</script>
+</body>
+</html>

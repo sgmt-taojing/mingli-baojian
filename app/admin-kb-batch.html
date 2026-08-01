@@ -41,14 +41,14 @@
 <!-- R316: token 登录 -->
 <div class="row" style="margin:12px 0;padding:12px;background:var(--bg-2);border-radius:8px">
   <input id="tokenInput" placeholder="Admin Token (header Authorization)" aria-label="Admin Token" style="flex:1;padding:8px;border:1px solid var(--line);border-radius:4px">
-  <button class="btn" onclick="saveToken()">💾 保存</button>
+  <button class="btn" onclick="saveToken()" aria-label="保存管理Token">💾 保存</button>
   <span id="tokenStatus" style="font-size:12px;color:var(--ink-3)"></span>
 </div>
 
 <!-- R316: KB 搜索 -->
 <div class="row" style="margin:12px 0">
   <input id="searchInput" placeholder="🔍 检索 KB 条目 (≥2 字)" aria-label="检索 KB" style="flex:1">
-  <button class="btn" onclick="doSearch()">🔍 检索</button>
+  <button class="btn" onclick="doSearch()" aria-label="检索知识库条目">🔍 检索</button>
 </div>
 <div id="searchResult" class="log"></div>
 
@@ -84,7 +84,7 @@
       <option value="retag">改标签</option>
     </select>
     <input  id="batchTag" placeholder="标签 (如 八字/化解)" style="width:160px" aria-label="标签 (如 八字/化解)">
-    <button class="btn warn" onclick="batchExecute()">执行</button>
+    <button class="btn warn" onclick="batchExecute()" aria-label="批量执行SQL语句">执行</button>
   </div>
   <div id="batchResult" class="log"></div>
 </div>
@@ -109,8 +109,8 @@
     <textarea id="ingestText" placeholder="JSON Lines (每行一条: {module, title, content, category, keywords, score})"></textarea>
   </div>
   <div class="row" style="margin-top:12px">
-    <button class="btn" onclick="ingestExecute()">📥 入库</button>
-    <button class="btn warn" onclick="ingestGenerate()">🤖 生成示例</button>
+    <button class="btn" onclick="ingestExecute()" aria-label="批量入库知识条目">📥 入库</button>
+    <button class="btn warn" onclick="ingestGenerate()" aria-label="生成示例知识条目">🤖 生成示例</button>
   </div>
   <div id="ingestResult" class="log"></div>
 </div>
@@ -119,9 +119,9 @@
 <div id="panel-audit" class="panel">
   <h3 style="color:var(--gold);margin-bottom:12px">🔍 KB 审计</h3>
   <div class="row">
-    <button class="btn" onclick="auditQuality()">质量扫描</button>
-    <button class="btn warn" onclick="auditDuplicate()">重复检测</button>
-    <button class="btn danger" onclick="auditLowScore()">低分条目</button>
+    <button class="btn" onclick="auditQuality()" aria-label="扫描知识库质量">质量扫描</button>
+    <button class="btn warn" onclick="auditDuplicate()" aria-label="检测重复知识条目">重复检测</button>
+    <button class="btn danger" onclick="auditLowScore()" aria-label="筛选低分知识条目">低分条目</button>
   </div>
   <div id="auditResult" class="log"></div>
 </div>
@@ -138,7 +138,7 @@
       <option value="csv">CSV</option>
       <option value="sql">SQL</option>
     </select>
-    <button class="btn" onclick="exportData()">📤 下载</button>
+    <button class="btn" onclick="exportData()" aria-label="导出下载知识库数据">📤 下载</button>
   </div>
   <div id="exportResult" class="log"></div>
 </div>
