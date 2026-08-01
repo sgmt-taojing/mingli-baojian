@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="theme-color" content="#050608">
+<meta name="description" content="易道智鉴 · 管理员登录 - 邮箱认证">
+<title>管理员登录 · 易道智鉴</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="css/theme-systems.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: linear-gradient(135deg, #0a0c14 0%, #1a1d2e 100%);
+    color: #e5e7eb;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .login-container {
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(201, 162, 39, 0.3);
+    border-radius: 16px;
+    padding: 40px 32px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  }
+  .login-title {
+    text-align: center;
+    color: #c9a227;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+  }
+  .login-subtitle {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 13px;
+    margin-bottom: 32px;
+  }
+  .form-group {
+    margin-bottom: 20px;
+  }
+  .form-label {
+    display: block;
+    color: #c9a227;
+    font-size: 13px;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  .form-input {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(201, 162, 39, 0.2);
+    border-radius: 8px;
+    color: #e5e7eb;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+  .form-input:focus {
+    outline: none;
+    border-color: #c9a227;
+    box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.1);
+  }
+  .form-input.error {
+    border-color: #ef4444;
+  }
+  .error-msg {
+    color: #ef4444;
+    font-size: 12px;
+    margin-top: 6px;
+    display: none;
+  }
+  .error-msg.show {
+    display: block;
+  }
+  .login-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #c9a227, #b8941f);
+    color: #0a0c14;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+  .login-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #d4af37, #c9a227);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(201, 162, 39, 0.3);
+  }
+  .login-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .info-box {
+    margin-top: 24px;
+    padding: 12px 16px;
+    background: rgba(201, 162, 39, 0.08);
+    border-left: 3px solid #c9a227;
+    border-radius: 4px;
+    color: #94a3b8;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  .info-box strong {
+    color: #c9a227;
+  }
+  .back-link {
+    text-align: center;
+    margin-top: 20px;
+  }
+  .back-link a {
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 13px;
+    transition: color 0.2s;
+  }
+  .back-link a:hover {
+    color: #c9a227;
+  }
+</style>
+</head>
+<body>
+<div class="login-container">
+  <h1 class="login-title">管理员登录</h1>
+  <p class="login-subtitle">易道智鉴 · 后台管理系统</p>
+
+  <form id="admin-login-form" autocomplete="on">
+    <div class="form-group">
+      <label class="form-label" for="admin-email">邮箱地址</label>
+      <input
+        type="email"
+        id="admin-email"
+        class="form-input"
+        placeholder="admin@mingli.local"
+        autocomplete="email"
+        required
+      >
+      <div class="error-msg" id="email-error">请输入有效的邮箱地址</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="admin-password">登录密码</label>
+      <input
+        type="password"
+        id="admin-password"
+        class="form-input"
+        placeholder="请输入密码"
+        autocomplete="current-password"
+        required
+      >
+      <div class="error-msg" id="password-error">密码不能为空</div>
+    </div>
+
+    <button type="submit" class="login-btn" id="submit-btn">登 录</button>
+  </form>
+
+  <div class="info-box">
+    <strong>认证说明：</strong><br>
+    本系统采用邮箱 + 密码认证机制，支持超管/管理员两级权限。<br>
+    测试账号：<strong>admin@mingli.local</strong> / <strong>mingli2026</strong><br>
+    登录后将跳转至后台管理首页。
+  </div>
+
+  <div class="back-link">
+    <a href="divination-hub.html">← 返回首页</a>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// 管理员登录逻辑（前端 + 模拟认证）
+// ═══════════════════════════════════════════
+const ADMIN_CONFIG = {
+  // 测试账号配置（生产环境应替换为后端 API 调用）
+  testAccounts: {
+    'admin@mingli.local': {
+      password: 'mingli2026',
+      name: '超级管理员',
+      role: 'super_admin'
+    },
+    'master@mingli.local': {
+      password: 'master2026',
+      name: '周易大师',
+      role: 'master'
+    },
+    'doctor@mingli.local': {
+      password: 'doctor2026',
+      name: '中医医生',
+      role: 'doctor'
+    }
+  }
+};
+
+// 表单提交处理
+document.getElementById('admin-login-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const email = document.getElementById('admin-email').value.trim();
+  const password = document.getElementById('admin-password').value;
+  const emailInput = document.getElementById('admin-email');
+  const passwordInput = document.getElementById('admin-password');
+  const emailError = document.getElementById('email-error');
+  const passwordError = document.getElementById('password-error');
+  const submitBtn = document.getElementById('submit-btn');
+
+  // 重置错误状态
+  emailInput.classList.remove('error');
+  passwordInput.classList.remove('error');
+  emailError.classList.remove('show');
+  passwordError.classList.remove('show');
+
+  // 验证邮箱格式
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    emailInput.classList.add('error');
+    emailError.classList.add('show');
+    return;
+  }
+
+  // 验证密码非空
+  if (!password) {
+    passwordInput.classList.add('error');
+    passwordError.classList.add('show');
+    passwordError.textContent = '密码不能为空';
+    return;
+  }
+
+  // 提交按钮禁用
+  submitBtn.disabled = true;
+  submitBtn.textContent = '登录中...';
+
+  try {
+    // 模拟网络请求延迟
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    // 验证账号密码
+    const account = ADMIN_CONFIG.testAccounts[email.toLowerCase()];
+    if (!account || account.password !== password) {
+      passwordInput.classList.add('error');
+      passwordError.classList.add('show');
+      passwordError.textContent = '邮箱或密码错误';
+      submitBtn.disabled = false;
+      submitBtn.textContent = '登 录';
+      return;
+    }
+
+    // 登录成功 - 生成 token（简化版）
+    const token = btoa(JSON.stringify({
+      email: email,
+      role: account.role,
+      name: account.name,
+      iat: Date.now(),
+      exp: Date.now() + 24 * 60 * 60 * 1000 // 24小时有效期
+    }));
+
+    // 存储到 localStorage
+    localStorage.setItem('admin_token', token);
+    localStorage.setItem('admin_email', email);
+    localStorage.setItem('admin_role', account.role);
+    localStorage.setItem('admin_name', account.name);
+
+    // 跳转至后台首页
+    submitBtn.textContent = '登录成功！';
+    setTimeout(() => {
+      window.location.href = 'admin-glass-dashboard.html';
+    }, 500);
+
+  } catch (err) {
+    console.error('登录失败:', err);
+    passwordInput.classList.add('error');
+    passwordError.classList.add('show');
+    passwordError.textContent = '登录失败，请重试';
+    submitBtn.disabled = false;
+    submitBtn.textContent = '登 录';
+  }
+});
+</script>
+</body>
+</html>
