@@ -120,12 +120,13 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
 <div id="qm-geju" class="qm-geju" style="display:none"></div>
 
 <script>
+const API_BASE=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
 async function doPaipan(){
   const y=document.getElementById('qm-year').value;
   const m=document.getElementById('qm-month').value;
   const d=document.getElementById('qm-day').value;
   const h=document.getElementById('qm-hour').value;
-  const r=await fetch('/api/paipan/qimen',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({year:+y,month:+m,day:+d,hour:+h})});
+  const r=await fetch(API_BASE+'/api/paipan/qimen',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({year:+y,month:+m,day:+d,hour:+h})});
   const data=await r.json();
   if(!data.ok){showToast('排盘失败: '+data.error);return;}
   renderChart(data.chart); if(data.interpretation) renderInterpretation(data.interpretation);

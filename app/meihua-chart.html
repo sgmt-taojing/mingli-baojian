@@ -82,12 +82,13 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
 </div>
 <div id="mh-content" style="display:none"></div>
 <script>
+const API_BASE=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
 async function doPaipan(){
   const y=document.getElementById('mh-year').value;
   const m=document.getElementById('mh-month').value;
   const d=document.getElementById('mh-day').value;
   const h=document.getElementById('mh-hour').value;
-  const r=await fetch('/api/paipan/meihua',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({year:+y,month:+m,day:+d,hour:+h})});
+  const r=await fetch(API_BASE+'/api/paipan/meihua',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({year:+y,month:+m,day:+d,hour:+h})});
   const data=await r.json();
   if(!data.ok){showToast('排盘失败: '+data.error);return;}
   renderChart(data.chart); if(data.interpretation) renderInterpretation(data.interpretation);

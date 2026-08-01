@@ -122,13 +122,14 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
 <div id="zw-daxian" class="zw-daxian" style="display:none"></div>
 
 <script>
+const API_BASE=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
 async function doPaipan(){
   const y=document.getElementById('zw-year').value;
   const m=document.getElementById('zw-month').value;
   const d=document.getElementById('zw-day').value;
   const h=document.getElementById('zw-hour').value;
   const s=document.getElementById('zw-sex').value;
-  const r=await fetch('/api/paipan/ziwei',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({year:+y,month:+m,day:+d,hour:+h,sex:s})});
+  const r=await fetch(API_BASE+'/api/paipan/ziwei',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({year:+y,month:+m,day:+d,hour:+h,sex:s})});
   const data=await r.json();
   if(!data.ok){showToast('排盘失败: '+data.error);return;}
   renderChart(data.chart); if(data.interpretation) renderInterpretation(data.interpretation);

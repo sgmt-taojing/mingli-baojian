@@ -82,11 +82,12 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
 <div id="fs-grid" class="fs-grid" style="display:none"></div>
 <div id="fs-info" class="fs-info" style="display:none"></div>
 <script>
+const API_BASE=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
 async function doPaipan(){
   const y=document.getElementById('fs-year').value;
   const s=document.getElementById('fs-sitting').value;
   const f=document.getElementById('fs-facing').value;
-  const r=await fetch('/api/paipan/fengshui',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({year:+y,sittingMountain:s,facingMountain:f})});
+  const r=await fetch(API_BASE+'/api/paipan/fengshui',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({year:+y,sittingMountain:s,facingMountain:f})});
   const data=await r.json();
   if(!data.ok){showToast('排盘失败: '+data.error);return;}
   renderChart(data.chart); if(data.interpretation) renderInterpretation(data.interpretation);
