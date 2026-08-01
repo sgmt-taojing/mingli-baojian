@@ -101,6 +101,7 @@ function computeSummary(){
 function renderSummary(){
   const sum = computeSummary();
   const grid = $('summaryGrid');
+  if(!grid) return;
   grid.innerHTML = '';
   sum.forEach(s => {
     const card = el('div', {className:'summary-card'},
@@ -109,7 +110,7 @@ function renderSummary(){
       el('div', {className:'summary-value ' + s.cls}, s.value),
       el('div', {className:'summary-slo'}, 'SLO ' + s.slo)
     );
-    grid.appendChild(card);
+    if(grid)grid.appendChild(card);
   });
 }
 
@@ -279,7 +280,7 @@ function renderTrend(chartId, opts){
     });
   });
 
-  wrap.appendChild(svg);
+  if(wrap)wrap.appendChild(svg);
 }
 
 // 渲染 4 张趋势图
@@ -355,8 +356,8 @@ function renderViolations(){
       el('td', {className: 'sev-' + v.sev}, v.sev === 'high' ? '🔴 高' : v.sev === 'mid' ? '🟡 中' : '🟢 低')
     ));
   });
-  table.appendChild(tbody);
-  tbl.appendChild(table);
+  if(table)table.appendChild(tbody);
+  if(tbl)tbl.appendChild(table);
 }
 
 // 模块名 → eval 模块 key 映射
@@ -462,7 +463,7 @@ async function renderModules(){
         ev ? renderSparkline(evalScore, evalRate) : null
       );
       card.onclick = () => location.href = 'ai-assistant.html?module=' + encodeURIComponent(m.id || m.moduleKey || '');
-      $('modulesGrid').appendChild(card);
+      var _mg=$('modulesGrid');if(_mg)_mg.appendChild(card);
     });
 
     // 追加 eval-only 模块（KB 列表没有但有 eval 数据的）
@@ -488,7 +489,7 @@ async function renderModules(){
           el('span', {className:'eval-rate'}, '📚 ' + (ev.kb_rate * 100).toFixed(0) + '%')
         )
       );
-      $('modulesGrid').appendChild(card);
+      var _mg=$('modulesGrid');if(_mg)_mg.appendChild(card);
     });
   }catch(e){
     $('modulesGrid').innerHTML = '<div class="mod-card">模块数据查阅失败<br><small>' + esc(e.message) + '</small></div>';
@@ -905,7 +906,7 @@ function renderModuleTrend(){
     }
     tbody.appendChild(row);
   });
-  table.appendChild(tbody);
+  if(table)table.appendChild(tbody);
   wrap.appendChild(table);
 }
 
@@ -1076,7 +1077,7 @@ function renderWeeklyStats(){
     row.appendChild(el('td', {className:'ws-trend ' + trendCls}, r.trend));
     tbody.appendChild(row);
   });
-  table.appendChild(tbody);
+  if(table)table.appendChild(tbody);
   wrap.appendChild(table);
 }
 
@@ -1180,7 +1181,7 @@ function renderWoW(){
     });
     tbody.appendChild(row);
   });
-  table.appendChild(tbody);
+  if(table)table.appendChild(tbody);
   wrap.appendChild(table);
 }
 
@@ -1550,7 +1551,7 @@ function renderAlertHistory(){
     tbody.appendChild(tr);
     tbody.appendChild(detailRow);
   });
-  table.appendChild(tbody);
+  if(table)table.appendChild(tbody);
   wrap.appendChild(table);
 
   // SVG 轨迹条带
@@ -1664,7 +1665,7 @@ function renderAlertHistory(){
     svg.appendChild(tag);
   });
 
-  wrap.appendChild(svg);
+  if(wrap)wrap.appendChild(svg);
 
   // 关键事件清单
   if (transitions.length){
@@ -1692,6 +1693,7 @@ function renderPerCase(){
   // 填充周选择器
   const weekSel = $('percaseWeekSel');
   const benchSel = $('percaseBenchSel');
+  if (!weekSel || !benchSel) return;
   if (!weekSel.options.length){
     WEEKS.slice().reverse().forEach(w => {
       const opt = document.createElement('option');
@@ -1771,7 +1773,7 @@ function renderPerCase(){
     );
     tbody.appendChild(tr);
   });
-  table.appendChild(tbody);
+  if(table)table.appendChild(tbody);
   wrap.appendChild(table);
 }
 
@@ -1782,7 +1784,7 @@ function renderModPerCase(){
 
   // 填充模块选择器
   const sel = $('modPercaseSel');
-  if (!sel.options.length){
+  if (!sel || !sel.options.length){
     const modLabels = {
       bazi:'八字', ziwei:'紫微', qimen:'奇门', liuyao:'六爻', liuren:'六壬',
       meihua:'梅花', fengshui:'风水', zodiac:'生肖', tizhi:'体质',
@@ -1882,7 +1884,7 @@ function renderModPerCase(){
       tbody.appendChild(tr);
     });
   });
-  table.appendChild(tbody);
+  if(table)table.appendChild(tbody);
   wrap.appendChild(table);
 }
 
@@ -2124,7 +2126,7 @@ function renderExpanded(data, bench){
     }
     tbody.appendChild(el('tr', {className:'exp-row'}, ...cells));
   });
-  table.appendChild(tbody);
+  if(table)table.appendChild(tbody);
   wrap.appendChild(table);
 }
 
@@ -2313,7 +2315,7 @@ function renderExpandedTrend(modMap, bench){
     legendWrap.appendChild(lg);
   });
 
-  wrap.appendChild(svg);
+  if(wrap)wrap.appendChild(svg);
 }
 
 // 填充模块选择器
@@ -2337,7 +2339,7 @@ async function initExpandedTrendModSel(){
   const sorted = mods.sort((a,b) => (data.modules[b].total || 0) - (data.modules[a].total || 0)).slice(0, 5);
   expandedTrendSelectedMods = new Set(sorted);
   sorted.forEach(m => {
-    [...sel.options].forEach(o => { if (o.value === m) o.selected = true; });
+    sel?[...sel.options]:[].forEach(o => { if (o.value === m) o.selected = true; });
   });
 }
 
@@ -2482,7 +2484,7 @@ function renderDistill(report){
         el('td', {className:'distill-td-kw'}, esc(c.keyword || '--'))
       ));
     });
-    table.appendChild(tbody);
+    if(table)table.appendChild(tbody);
     wrap.appendChild(el('div', {className:'distill-table-wrap'}, table));
   }
 }
@@ -2596,8 +2598,8 @@ if (_expTrendAllBtn){
   _expTrendAllBtn.addEventListener('click', () => {
     const sel = $('expandedTrendModSel');
     if (!sel) return;
-    [...sel.options].forEach(o => o.selected = true);
-    expandedTrendSelectedMods = new Set([...sel.options].map(o => o.value));
+    sel?[...sel.options]:[].forEach(o => o.selected = true);
+    expandedTrendSelectedMods = new Set(sel?[...sel.options]:[].map(o => o.value));
     buildExpandedTrendSeries(expandedActiveBench).then(modMap => renderExpandedTrend(modMap, expandedActiveBench));
   });
 }
@@ -2606,7 +2608,7 @@ if (_expTrendNoneBtn){
   _expTrendNoneBtn.addEventListener('click', () => {
     const sel = $('expandedTrendModSel');
     if (!sel) return;
-    [...sel.options].forEach(o => o.selected = false);
+    sel?[...sel.options]:[].forEach(o => o.selected = false);
     expandedTrendSelectedMods = new Set();
     renderExpandedTrend({}, expandedActiveBench);
   });
@@ -2619,7 +2621,7 @@ if (_expTrendTop5Btn){
     const modMap = await buildExpandedTrendSeries(expandedActiveBench);
     const top5 = await selectTop5ChangeMods(modMap, expandedActiveBench);
     expandedTrendSelectedMods = new Set(top5);
-    [...sel.options].forEach(o => { o.selected = top5.includes(o.value); });
+    sel?[...sel.options]:[].forEach(o => { o.selected = top5.includes(o.value); });
     renderExpandedTrend(modMap, expandedActiveBench);
   });
 }
@@ -2773,7 +2775,7 @@ function renderCrossBench(points){
     );
     legendWrap.appendChild(li);
   });
-  wrap.appendChild(svg);
+  if(wrap)wrap.appendChild(svg);
 }
 
 async function refreshCrossBench(){
@@ -3135,7 +3137,7 @@ function renderRadarChart(data, selectedMods){
     legendItems.push({ color, label: modLabel, mod });
   });
 
-  wrap.appendChild(svg);
+  if(wrap)wrap.appendChild(svg);
 
   // Legend
   const legendDiv = $('radarLegend');
@@ -3208,6 +3210,7 @@ function exportRadarCSV(){
 (function initRadar(){
   const weekSel = $('radarWeekSel');
   const modSel = $('radarModSel');
+  if(!weekSel||!modSel) return;
   WEEKS.forEach(w => {
     const opt = document.createElement('option');
     opt.value = w; opt.textContent = w;
@@ -3224,7 +3227,7 @@ function exportRadarCSV(){
   document.querySelectorAll('.radar-mini-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const sel = btn.dataset.sel;
-      const opts = Array.from(modSel.options);
+      const opts = modSel?Array.from(modSel.options):[];
       if(sel === 'all'){
         opts.forEach(o => o.selected = true);
       } else {
@@ -3384,7 +3387,7 @@ function renderBiweekly(dataA, dataB, weekA, weekB){
   ), tbody.firstChild);
 
   table.appendChild(thead);
-  table.appendChild(tbody);
+  if(table)table.appendChild(tbody);
   wrap.appendChild(table);
 
   // 洞察行
