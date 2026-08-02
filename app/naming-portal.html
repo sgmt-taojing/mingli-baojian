@@ -205,6 +205,101 @@
 </div>
 
 
+<div id="namingV2Section" style="max-width:920px;margin:0 auto 24px;padding:0 16px">
+  <div style="text-align:center;margin-bottom:16px">
+    <h2 style="font-size:24px;color:var(--gold);letter-spacing:4px;margin-bottom:6px">✦ 起名引擎 v2.0</h2>
+    <p style="font-size:12px;color:var(--paper2);opacity:.7">古籍词汇×命盘优选×防重名×家族信息综合×十二长生推荐</p>
+  </div>
+  <div style="background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.2);border-radius:12px;padding:20px;margin-bottom:16px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+      <div><label style="font-size:12px;color:var(--gold)">姓氏 *</label><input id="nv2-surname" type="text" placeholder="如：李" style="width:100%;padding:8px;background:rgba(0,0,0,.3);border:1px solid rgba(201,168,76,.2);border-radius:6px;color:var(--paper);font-size:14px"></div>
+      <div><label style="font-size:12px;color:var(--gold)">性别 *</label><select id="nv2-gender" style="width:100%;padding:8px;background:rgba(0,0,0,.3);border:1px solid rgba(201,168,76,.2);border-radius:6px;color:var(--paper);font-size:14px"><option value="M">男</option><option value="F">女</option></select></div>
+      <div><label style="font-size:12px;color:var(--gold)">出生年 *</label><input id="nv2-year" type="number" placeholder="2020" style="width:100%;padding:8px;background:rgba(0,0,0,.3);border:1px solid rgba(201,168,76,.2);border-radius:6px;color:var(--paper);font-size:14px"></div>
+      <div><label style="font-size:12px;color:var(--gold)">月</label><input id="nv2-month" type="number" placeholder="8" style="width:100%;padding:8px;background:rgba(0,0,0,.3);border:1px solid rgba(201,168,76,.2);border-radius:6px;color:var(--paper);font-size:14px"></div>
+      <div><label style="font-size:12px;color:var(--gold)">日</label><input id="nv2-day" type="number" placeholder="15" style="width:100%;padding:8px;background:rgba(0,0,0,.3);border:1px solid rgba(201,168,76,.2);border-radius:6px;color:var(--paper);font-size:14px"></div>
+      <div><label style="font-size:12px;color:var(--gold)">时</label><input id="nv2-hour" type="number" placeholder="10" style="width:100%;padding:8px;background:rgba(0,0,0,.3);border:1px solid rgba(201,168,76,.2);border-radius:6px;color:var(--paper);font-size:14px"></div>
+      <div><label style="font-size:12px;color:var(--gold)">分</label><input id="nv2-minute" type="number" placeholder="30" style="width:100%;padding:8px;background:rgba(0,0,0,.3);border:1px solid rgba(201,168,76,.2);border-radius:6px;color:var(--paper);font-size:14px"></div>
+      <div><label style="font-size:12px;color:var(--gold)">出生地</label><input id="nv2-birthplace" type="text" placeholder="北京" style="width:100%;padding:8px;background:rgba(0,0,0,.3);border:1px solid rgba(201,168,76,.2);border-radius:6px;color:var(--paper);font-size:14px"></div>
+    </div>
+    <details style="margin-top:12px">
+      <summary style="cursor:pointer;color:var(--gold);font-size:13px;padding:8px">家族信息（可选·提升精准度）</summary>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:8px">
+        <div><label style="font-size:11px;color:var(--paper2);opacity:.7">父亲姓名</label><input id="nv2-father" type="text" placeholder="父名" style="width:100%;padding:6px;background:rgba(0,0,0,.2);border:1px solid rgba(201,168,76,.15);border-radius:4px;color:var(--paper);font-size:13px"></div>
+        <div><label style="font-size:11px;color:var(--paper2);opacity:.7">母亲姓名</label><input id="nv2-mother" type="text" placeholder="母名" style="width:100%;padding:6px;background:rgba(0,0,0,.2);border:1px solid rgba(201,168,76,.15);border-radius:4px;color:var(--paper);font-size:13px"></div>
+        <div><label style="font-size:11px;color:var(--paper2);opacity:.7">祖父姓名</label><input id="nv2-pgf" type="text" placeholder="祖父名" style="width:100%;padding:6px;background:rgba(0,0,0,.2);border:1px solid rgba(201,168,76,.15);border-radius:4px;color:var(--paper);font-size:13px"></div>
+        <div><label style="font-size:11px;color:var(--paper2);opacity:.7">祖母姓名</label><input id="nv2-pgm" type="text" placeholder="祖母名" style="width:100%;padding:6px;background:rgba(0,0,0,.2);border:1px solid rgba(201,168,76,.15);border-radius:4px;color:var(--paper);font-size:13px"></div>
+        <div><label style="font-size:11px;color:var(--paper2);opacity:.7">外祖父姓名</label><input id="nv2-mgf" type="text" placeholder="外祖父名" style="width:100%;padding:6px;background:rgba(0,0,0,.2);border:1px solid rgba(201,168,76,.15);border-radius:4px;color:var(--paper);font-size:13px"></div>
+        <div><label style="font-size:11px;color:var(--paper2);opacity:.7">外祖母姓名</label><input id="nv2-mgm" type="text" placeholder="外祖母名" style="width:100%;padding:6px;background:rgba(0,0,0,.2);border:1px solid rgba(201,168,76,.15);border-radius:4px;color:var(--paper);font-size:13px"></div>
+        <div><label style="font-size:11px;color:var(--paper2);opacity:.7">户籍地</label><input id="nv2-registered" type="text" placeholder="北京" style="width:100%;padding:6px;background:rgba(0,0,0,.2);border:1px solid rgba(201,168,76,.15);border-radius:4px;color:var(--paper);font-size:13px"></div>
+        <div><label style="font-size:11px;color:var(--paper2);opacity:.7">现居地</label><input id="nv2-residence" type="text" placeholder="上海" style="width:100%;padding:6px;background:rgba(0,0,0,.2);border:1px solid rgba(201,168,76,.15);border-radius:4px;color:var(--paper);font-size:13px"></div>
+        <div><label style="font-size:11px;color:var(--paper2);opacity:.7">工作地</label><input id="nv2-workplace" type="text" placeholder="上海" style="width:100%;padding:6px;background:rgba(0,0,0,.2);border:1px solid rgba(201,168,76,.15);border-radius:4px;color:var(--paper);font-size:13px"></div>
+        <div><label style="font-size:11px;color:var(--paper2);opacity:.7">职业</label><input id="nv2-occupation" type="text" placeholder="IT" style="width:100%;padding:6px;background:rgba(0,0,0,.2);border:1px solid rgba(201,168,76,.15);border-radius:4px;color:var(--paper);font-size:13px"></div>
+      </div>
+    </details>
+    <button id="nv2-btn" onclick="generateNamingV2()" style="margin-top:16px;width:100%;padding:12px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--dark);border:none;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer">✨ 生成名字建议</button>
+  </div>
+  <div id="nv2-result" style="display:none"></div>
+</div>
+<script>
+function generateNamingV2(){
+  var btn=document.getElementById('nv2-btn');
+  btn.disabled=true;btn.textContent='⏳ 排盘中...';
+  var body={
+    surname:document.getElementById('nv2-surname').value.trim(),
+    gender:document.getElementById('nv2-gender').value,
+    year:Number(document.getElementById('nv2-year').value),
+    month:Number(document.getElementById('nv2-month').value)||1,
+    day:Number(document.getElementById('nv2-day').value)||1,
+    hour:Number(document.getElementById('nv2-hour').value)||0,
+    minute:Number(document.getElementById('nv2-minute').value)||0,
+    birthplace:document.getElementById('nv2-birthplace').value.trim(),
+    fatherName:document.getElementById('nv2-father').value.trim(),
+    motherName:document.getElementById('nv2-mother').value.trim(),
+    paternalGrandfather:document.getElementById('nv2-pgf').value.trim(),
+    paternalGrandmother:document.getElementById('nv2-pgm').value.trim(),
+    maternalGrandfather:document.getElementById('nv2-mgf').value.trim(),
+    maternalGrandmother:document.getElementById('nv2-mgm').value.trim(),
+    registeredPlace:document.getElementById('nv2-registered').value.trim(),
+    currentResidence:document.getElementById('nv2-residence').value.trim(),
+    workplace:document.getElementById('nv2-workplace').value.trim(),
+    occupation:document.getElementById('nv2-occupation').value.trim(),
+    purpose:'本名',style:'古典'
+  };
+  if(!body.surname){alert('请填写姓氏');btn.disabled=false;btn.textContent='✨ 生成名字建议';return;}
+  if(!body.year){alert('请填写出生年份');btn.disabled=false;btn.textContent='✨ 生成名字建议';return;}
+  fetch('/api/minsu/xingming/suggest',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
+    .then(function(r){return r.json();})
+    .then(function(r){
+      var d=r.data||r;var result=d.result||{};var recs=result.recommendations||[];
+      var sr=result.stageRecommendation||{};
+      var h='<div style="background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.2);border-radius:12px;padding:20px">';
+      h+='<div style="color:var(--gold);font-size:16px;font-weight:700;margin-bottom:8px">命盘分析：'+(result.dayStem||'?')+'（'+(result.dayElement||'')+'命）'+(result.wuxing_lack&&result.wuxing_lack.length?' · 缺'+result.wuxing_lack.join('、'):'')+'</div>';
+      h+='<div style="font-size:12px;color:var(--paper2);opacity:.7;margin-bottom:6px">候选名 '+result.totalCandidates+' 个 · 当前长生阶段：'+(result.currentStage||'未知')+'</div>';
+      if(sr.interests){h+='<div style="font-size:12px;color:var(--paper2);margin-bottom:12px">兴趣推荐：'+sr.interests.join('、')+' · 工作：'+(sr.work||[]).slice(0,3).join('、')+' · 居住：'+(sr.residence||'').slice(0,40)+'</div>';}
+      h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:12px">';
+      recs.forEach(function(n,i){
+        var sc=n.sancai||{};
+        h+='<div style="background:rgba(0,0,0,.2);border:1px solid rgba(201,168,76,.15);border-radius:8px;padding:12px">';
+        h+='<div style="font-size:18px;color:var(--gold);font-weight:700;margin-bottom:4px">'+(i+1)+'. '+n.name+'</div>';
+        h+='<div style="font-size:11px;color:var(--paper2);opacity:.7;margin-bottom:4px">'+n.sourceText+'</div>';
+        h+='<div style="font-size:13px;color:var(--paper);margin-bottom:4px">'+n.meaning+' · '+n.wuxing+'行 · '+n.score+'分</div>';
+        h+='<div style="font-size:11px;color:var(--paper2);opacity:.6">三才：'+sc.relation+' · '+sc.advice+'</div>';
+        if(n.familyNote)h+='<div style="font-size:10px;color:#f87171;margin-top:4px">⚠ '+n.familyNote+'</div>';
+        if(n.antiDup)h+='<div style="font-size:10px;color:#4ade80;margin-top:2px">✦ 低频独特名</div>';
+        h+='</div>';
+      });
+      h+='</div><div style="margin-top:12px;font-size:10px;color:rgba(255,255,255,.3)">📜 古籍词汇库119条 · 命盘优选 · 防重名 · 家族避讳 · 三才五格 · 十二长生推荐</div></div>';
+      document.getElementById('nv2-result').innerHTML=h;
+      document.getElementById('nv2-result').style.display='block';
+      btn.disabled=false;btn.textContent='✨ 重新生成';
+    })
+    .catch(function(e){
+      document.getElementById('nv2-result').innerHTML='<div style="padding:16px;color:#f87171">生成失败：'+e.message+'</div>';
+      btn.disabled=false;btn.textContent='✨ 生成名字建议';
+    });
+}
+</script>
+
 <div class="footer">
   <a href="divination-hub.html">← 返回首页</a> ·
   <a href="monitor-portal.html">监控运维 →</a>
