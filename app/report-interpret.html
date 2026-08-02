@@ -300,16 +300,109 @@ function renderPaipanReport(report){
   if(!report) return '';
   var html = '';
   if(report.summary) html += '<div style="margin-bottom:12px"><strong style="color:#ffb44d">概要：</strong> '+report.summary+'</div>';
-  if(report.sections && Array.isArray(report.sections)){
-    report.sections.forEach(function(s){
-      html += '<div style="margin-bottom:10px;padding:10px;background:rgba(255,255,255,.03);border-radius:8px"><div style="color:#ffb44d;font-weight:600;margin-bottom:6px">'+s.title+'</div><div style="font-size:13px;line-height:1.7;color:#e4e8ee">'+s.content+'</div></div>';
+  if(report.segments && Array.isArray(report.segments)){
+    report.segments.forEach(function(s){
+      var isSeg5 = s.id === 'seg5' || (s.title && s.title.indexOf('优化建议') >= 0);
+      var bg = isSeg5 ? 'rgba(201,162,39,0.06)' : 'rgba(255,255,255,.03)';
+      var border = isSeg5 ? '1px solid rgba(201,162,39,0.2)' : 'none';
+      html += '<div style="margin-bottom:10px;padding:10px;background:'+bg+';border:'+border+';border-radius:8px"><div style="color:#ffb44d;font-weight:600;margin-bottom:6px">'+s.title+'</div><div style="font-size:13px;line-height:1.7;color:#e4e8ee;white-space:pre-wrap">'+s.content+'</div></div>';
     });
+  }
+  // 化解板块独立渲染
+  if(report.huajie){
+    var h = report.huajie;
+    html += '<div style="margin-top:16px;padding:14px;background:linear-gradient(135deg,rgba(201,162,39,0.08),rgba(201,162,39,0.02));border:1px solid rgba(201,162,39,0.3);border-radius:10px">';
+    html += '<div style="font-size:16px;font-weight:bold;color:#c9a227;margin-bottom:10px;border-bottom:1px solid rgba(201,162,39,0.2);padding-bottom:8px">🌿 化解方案 · '+h.risk_label+'</div>';
+    // 段一
+    if(h.risk_traces && h.risk_traces.length){
+      html += '<div style="margin-bottom:10px"><div style="color:#ffb44d;font-weight:600;margin-bottom:6px">一、盘面问题溯源</div>';
+      h.risk_traces.forEach(function(t){
+        html += '<div style="font-size:13px;margin:4px 0;padding:4px 8px;background:rgba(255,255,255,.03);border-radius:4px">▸ <strong>'+(t['\u76d8\u9762\u7b26\u53f7']||'')+'</strong> → '+(t['\u73b0\u5b9e\u4f53\u611f']||'')+'<br><span style="font-size:11px;color:#aaa">'+(t['\u98ce\u9669\u7b49\u7ea7']||'')+'</span></div>';
+      });
+      html += '</div>';
+    }
+    // 段二
+    if(h.behavior_fixes && h.behavior_fixes.length){
+      html += '<div style="margin-bottom:10px"><div style="color:#4caf50;font-weight:600;margin-bottom:6px">二、行为心性整改（最高优先级）</div>';
+      h.behavior_fixes.forEach(function(f){
+        html += '<div style="font-size:13px;margin:3px 0;padding-left:12px;border-left:2px solid #4caf50">'+f+'</div>';
+      });
+      html += '</div>';
+    }
+    // 段三
+    if(h.environment_cures){
+      var env = h.environment_cures;
+      html += '<div style="margin-bottom:10px"><div style="color:#8ab4d8;font-weight:600;margin-bottom:6px">三、环境与随身物品化解</div>';
+      if(env.home && env.home.length){
+        html += '<div style="font-size:12px;color:#aaa;margin:4px 0">🏠 居家布局</div>';
+        env.home.forEach(function(i){ html += '<div style="font-size:13px;margin:2px 0;padding-left:12px">'+i+'</div>'; });
+      }
+      if(env.carry && env.carry.length){
+        html += '<div style="font-size:12px;color:#aaa;margin:4px 0">📿 随身物品</div>';
+        env.carry.forEach(function(i){ html += '<div style="font-size:13px;margin:2px 0;padding-left:12px">'+i+'</div>'; });
+      }
+      if(env.cost_range) html += '<div style="font-size:12px;color:#888;margin-top:4px">💰 成本参考：'+env.cost_range+'</div>';
+      html += '</div>';
+    }
+    // 段四
+    if(h.execution_notes && h.execution_notes.length){
+      html += '<div style="margin-bottom:10px"><div style="color:#ff9800;font-weight:600;margin-bottom:6px">四、执行须知</div>';
+      h.execution_notes.forEach(function(n){
+        var isHeading = n.indexOf('━━━') >= 0;
+        html += '<div style="font-size:'+(isHeading?'12px':'13px')+';margin:2px 0;'+(isHeading?'color:#c9a227;font-weight:600;border-top:1px solid rgba(201,162,39,0.15);padding-top:4px;margin-top:6px':'padding-left:12px')+'">'+n+'</div>';
+      });
+      html += '</div>';
+    }
+    // 分流指引
+    if(h.referrals && h.referrals.length){
+      html += '<div style="margin-bottom:10px"><div style="color:#e91e63;font-weight:600;margin-bottom:6px">专业分流指引</div>';
+      h.referrals.forEach(function(ref){
+        html += '<div style="margin:8px 0;padding:8px;background:rgba(255,255,255,.03);border-radius:6px;border-left:3px solid #e91e63">';
+        html += '<div style="font-weight:600;font-size:14px">'+ref.type+'</div>';
+        html += '<div style="font-size:12px;color:#aaa;margin:2px 0">适用：'+(ref.condition||'')+'</div>';
+        html += '<div style="font-size:12px;color:#aaa;margin:2px 0">建议：'+(ref.action||'')+'</div>';
+        if(ref.timing) html += '<div style="font-size:12px;color:#ffb44d;margin:2px 0">⏰ 时机：'+ref.timing+'</div>';
+        // 就近推荐
+        if(ref.nearby && ref.nearby.length){
+          html += '<div style="font-size:12px;color:#aaa;margin:4px 0 1px">📍 就近推荐：</div>';
+          ref.nearby.forEach(function(n){
+            html += '<div style="font-size:12px;margin:1px 0;padding-left:12px">→ '+n.name+(n.city?' ('+n.city+')':'')+(n.specialty?' '+n.specialty:'')+(n.note||'')+'</div>';
+            if(n.transport) html += '<div style="font-size:11px;color:#666;padding-left:24px">交通：'+n.transport+'</div>';
+          });
+        }
+        // 科仪
+        if(ref.ceremony && ref.ceremony.length){
+          html += '<div style="font-size:12px;color:#aaa;margin:4px 0 1px">⛩️ 科仪推荐：</div>';
+          ref.ceremony.forEach(function(c){
+            html += '<div style="font-size:12px;margin:1px 0;padding-left:12px">→ '+c.name+' | '+c.purpose+' | '+c.duration+' | '+c.cost+'</div>';
+            if(c.note) html += '<div style="font-size:11px;color:#666;padding-left:24px">准备：'+c.note+'</div>';
+          });
+        }
+        // 安排
+        if(ref.arrangement) html += '<div style="font-size:12px;margin:3px 0;padding-left:12px">📋 安排：'+ref.arrangement+'</div>';
+        // 吉日
+        if(ref.dates && ref.dates.length){
+          html += '<div style="font-size:12px;color:#aaa;margin:4px 0 1px">📅 吉日候选：</div>';
+          ref.dates.slice(0,6).forEach(function(d){
+            var tag = d.recommended ? ' <span style="color:#c9a227">★</span>' : '';
+            html += '<div style="font-size:12px;margin:1px 0;padding-left:12px">→ '+d.date+' '+d.weekday+' '+d.ganzhi+(d.reason?' ('+d.reason+')':'')+tag+'</div>';
+          });
+        }
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    // 免责
+    if(h.disclaimer){
+      html += '<div style="font-size:11px;color:#666;margin-top:8px;padding:8px;background:rgba(0,0,0,.2);border-radius:4px;line-height:1.5">'+h.disclaimer+'</div>';
+    }
+    html += '</div>';
   }
   if(report.analysis) html += '<div style="margin-top:12px"><strong style="color:#ffb44d">解读：</strong><pre style="white-space:pre-wrap;font-family:inherit;font-size:13px;line-height:1.7">'+report.analysis+'</pre></div>';
   if(report.chart){
     html += '<details style="margin-top:12px"><summary style="color:#8ab4d8;cursor:pointer">查看原始排盘数据</summary><pre style="background:rgba(0,0,0,.3);padding:10px;border-radius:6px;overflow:auto;font-size:11px;color:#aab">'+JSON.stringify(report.chart,null,2)+'</pre></details>';
   }
-  if(!html){
+  if(!html && !report.huajie){
     // 兜底：原始 JSON
     html = '<pre style="background:rgba(0,0,0,.3);padding:12px;border-radius:6px;overflow:auto;font-size:11px">'+JSON.stringify(report,null,2)+'</pre>';
   }
