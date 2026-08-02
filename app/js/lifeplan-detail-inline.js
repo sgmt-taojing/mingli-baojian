@@ -720,6 +720,20 @@ function calcTrendAdvice(dayuns, shichen){
   // 把 R38 健康/事业双核 + 4 阶段蓝图挂到报告上方
   const dashHtml = renderLifeplanDashboardR38();
   document.getElementById('report').insertAdjacentHTML('afterbegin', dashHtml);
+  
+  // 异步获取化解方案
+  if(window.HuajieRenderer){
+    fetch('/api/csrf-token').then(r=>r.json()).then(t=>{
+      return fetch('/api/ai/lifeplan-report',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':t.csrfToken},body:JSON.stringify({age:d.age,gender:d.sex,birthplace:d.residence,concerns:[d.focus]})});
+    }).then(r=>r.json()).then(resp=>{
+      var huajie=resp.data&&resp.data.huajie||resp.huajie;
+      if(huajie){
+        var div=document.createElement('div');
+        div.innerHTML=HuajieRenderer.render(huajie);
+        document.getElementById('report').appendChild(div);
+      }
+    }).catch(function(){});
+  }
 }
 
 function restoreFromHash(){

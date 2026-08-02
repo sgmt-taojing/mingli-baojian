@@ -148,6 +148,20 @@ function render(d){
   document.getElementById('report').classList.add('show');
   document.getElementById('input').style.display = 'none';
   location.hash = '#'+btoa(unescape(encodeURIComponent(JSON.stringify({emo:d.emo,ele:d.ele,scene:d.scene,extra:d.extra}))));
+  
+  // 异步获取化解方案
+  if(window.HuajieRenderer){
+    fetch('/api/csrf-token').then(r=>r.json()).then(t=>{
+      return fetch('/api/ai/music-report',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':t.csrfToken},body:JSON.stringify({age:30,mood:d.emo,fiveElement:d.ele})});
+    }).then(r=>r.json()).then(resp=>{
+      var huajie=resp.data&&resp.data.huajie||resp.huajie;
+      if(huajie){
+        var div=document.createElement('div');
+        div.innerHTML=HuajieRenderer.render(huajie);
+        document.getElementById('report').appendChild(div);
+      }
+    }).catch(function(){});
+  }
 }
 
 function restoreFromHash(){

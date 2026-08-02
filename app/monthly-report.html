@@ -167,6 +167,7 @@ aria-label="年" value="1990" min="1900" max="2100">
 <script src="js/jieqi-engine.js" defer></script>
 <script src="js/report-engine.js" defer></script>
 <script src="js/report-render-adapters.js" defer></script>
+<script src="js/huajie-render.js" defer></script>
 <script src="js/lifeflow-share.js" defer></script>
 <script>
 (function(){
@@ -322,6 +323,13 @@ aria-label="年" value="1990" min="1900" max="2100">
       area.innerHTML = html;
       area.style.display = 'block';
       area.scrollIntoView({behavior:'smooth'});
+      
+      // 异步获取化解方案
+      if(window.HuajieRenderer && resp && resp.data && resp.data.huajie){
+        var div=document.createElement('div');
+        div.innerHTML=HuajieRenderer.render(resp.data.huajie);
+        area.appendChild(div);
+      }
     } catch(e) {
       var errArea = document.getElementById('resultArea');
       errArea.innerHTML = '<div class="result-card" style="border-color:var(--red);color:var(--red)">败 '+esc(e.message)+'</div>';

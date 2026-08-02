@@ -126,6 +126,20 @@ function render(d){
   document.getElementById('report').classList.add('show');
   document.getElementById('input').style.display='none';
   location.hash='#'+btoa(unescape(encodeURIComponent(JSON.stringify({ele:d.ele,age:d.age,focus:d.focus,extra:d.extra}))));
+  
+  // 异步获取化解方案
+  if(window.HuajieRenderer){
+    fetch('/api/csrf-token').then(r=>r.json()).then(t=>{
+      return fetch('/api/ai/lifeindex-report',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':t.csrfToken},body:JSON.stringify({age:d.age,fiveElement:d.ele,concerns:[d.focus]})});
+    }).then(r=>r.json()).then(resp=>{
+      var huajie=resp.data&&resp.data.huajie||resp.huajie;
+      if(huajie){
+        var div=document.createElement('div');
+        div.innerHTML=HuajieRenderer.render(huajie);
+        document.getElementById('report').appendChild(div);
+      }
+    }).catch(function(){});
+  }
 }
 
 function restoreFromHash(){
