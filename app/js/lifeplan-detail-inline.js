@@ -248,10 +248,60 @@ function render(d){
       if(kbCount > 0){
         ah += '<div class="summary" style="margin-top:8px;font-size:11px;color:var(--accent)">📚 KB 命中 '+kbCount+' 条知识 · 阶段感知排除无关领域</div>';
       }
-      // 补强优先级（用后端 domains 数据）
+      // 补强优先级 + 12 领域 advice（用后端 domains 数据）
       if(report.domains && report.domains.length){
         const weak = [...report.domains].sort((a,b)=>a.score-b.score).slice(0,3);
         ah += '<div class="summary" style="margin-top:6px;font-size:11px"><b style="color:var(--gold)">💡 补强优先级：</b>'+weak.map(d=>d.name+'('+d.score+')').join(' → ')+'</div>';
+        // R440: 12 领域 advice 详情表
+        ah += '<details style="margin-top:10px"><summary style="cursor:pointer;font-size:12px;color:var(--gold)">📊 12 领域评估详情（点击展开）</summary>';
+        ah += '<div class="r440-domain-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:8px">';
+        report.domains.forEach(function(dm){
+          var sc=dm.score; var cls=sc>=80?'good':(sc>=60?'mid':'bad');
+          var ic=dm.icon||'';
+          ah += '<div class="r440-domain-card" style="background:rgba(255,255,255,.03);border:1px solid rgba(99,179,237,.15);border-radius:6px;padding:10px">';
+          ah += '<div style="color:var(--gold);font-size:12px;font-weight:600">'+ic+' '+dm.name+' <span style="float:right;font-size:18px;font-weight:700" class="r440-score-'+cls+'" data-score="'+sc+'">'+sc+'</span></div>';
+          ah += '<div style="font-size:11px;opacity:.7;margin-top:2px">'+dm.status+'</div>';
+          if(dm.advice) ah += '<div style="font-size:11px;line-height:1.6;margin-top:6px;color:#c5d1de">'+dm.advice+'</div>';
+          ah += '</div>';
+        });
+        ah += '</div></details>';
+      }
+      // R440: 5 年规划
+      if(report.next5Years && report.next5Years.length){
+        ah += '<details style="margin-top:10px"><summary style="cursor:pointer;font-size:12px;color:var(--gold)">🎯 未来 5 年规划（点击展开）</summary>';
+        ah += '<div style="margin-top:8px">';
+        report.next5Years.forEach(function(yr){
+          ah += '<div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span style="color:var(--accent);font-weight:700;min-width:50px">'+yr.year+'岁</span><span style="font-size:12px;color:#c5d1de">'+yr.text+'</span></div>';
+        });
+        ah += '</div></details>';
+      }
+      // R440: 10 段人生时间轴（用 API timeline 替换本地兜底）
+      if(report.timeline && report.timeline.length){
+        var tlEl = document.getElementById('lp-stage-timeline');
+        if(tlEl){
+          var tlHtml = '';
+          report.timeline.forEach(function(t){
+            var isCur = t.current ? ' style="border-color:var(--gold);box-shadow:0 0 8px rgba(201,168,76,.4)"' : '';
+            tlHtml += '<div class="lp-stage-timeline-item"'+isCur+'>';
+            tlHtml += '<div class="lp-stage-timeline-age">'+t.range+'</div>';
+            tlHtml += '<div class="lp-stage-timeline-name">'+t.title+'</div>';
+            if(t.current) tlHtml += '<div style="font-size:9px;color:var(--gold);margin-top:2px">★ 当前</div>';
+            tlHtml += '</div>';
+          });
+          tlEl.innerHTML = tlHtml;
+        }
+        // 时间轴 advice 详情
+        ah += '<details style="margin-top:10px"><summary style="cursor:pointer;font-size:12px;color:var(--gold)">📜 人生时间轴详情（点击展开）</summary>';
+        ah += '<div style="margin-top:8px">';
+        report.timeline.forEach(function(t){
+          var bg = t.current ? 'background:rgba(201,168,76,.08)' : '';
+          ah += '<div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.05);'+bg+'">';
+          ah += '<div style="color:var(--gold);font-size:13px;font-weight:600">'+t.range+' · '+t.title+(t.current?' <span style="font-size:10px;color:var(--gold)">★ 当前</span>':'')+'</div>';
+          ah += '<div style="font-size:11px;opacity:.7;margin-top:2px">'+t.focus+'</div>';
+          if(t.advice) ah += '<div style="font-size:11px;line-height:1.6;margin-top:4px;color:#c5d1de">✦ '+t.advice+'</div>';
+          ah += '</div>';
+        });
+        ah += '</div></details>';
       }
       body.innerHTML = ah;
       // 更新卡片标题
