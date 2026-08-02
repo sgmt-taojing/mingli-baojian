@@ -40,6 +40,19 @@ textarea{resize:vertical;min-height:60px}
 .step-dot.done{background:var(--green)}
 @media(max-width:480px){.checkbox-grid{grid-template-columns:repeat(2,1fr)}.row{flex-direction:column}}
 @media(max-width:360px){.checkbox-grid{grid-template-columns:1fr}}
+@media print{
+  .page-header-bar,.phb-back,.btn,button,.no-print,header,footer,.nav-back,.step-indicator,.skip-link{display:none!important}
+  body{background:white!important;color:black!important;font-size:12pt;line-height:1.5;padding:0!important;max-width:100%!important}
+  h1{color:black!important}
+  .card{background:white!important;border:1px solid #ccc!important;box-shadow:none!important;color:black!important;page-break-inside:avoid}
+  .card-title{color:black!important;border-left-color:#999!important}
+  label{color:#333!important}
+  input,select,textarea{color:black!important;background:white!important;border:1px solid #ccc!important}
+  h1,h2,h3{page-break-after:avoid;color:black!important}
+  a[href]:after{content:" ("attr(href)")";font-size:9pt;color:#666}
+  img{max-width:100%!important}
+  .print-only{display:block!important}
+}
 </style>
   <link rel="stylesheet" href="css/mobile-nav.css">
 <link rel="stylesheet" href="css/theme-systems.css">

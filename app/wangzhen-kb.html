@@ -62,6 +62,26 @@ h1{color:var(--gold);font-size:1.4rem;margin-bottom:8px;text-align:center}
   .stats{gap:6px}
   .filter-btn{padding:4px 10px;font-size:.75rem}
 }
+@media print{
+  .page-header-bar,.phb-back,.btn,button,.no-print,header,footer,.filter-bar,.search-box,.back-link,.skip-link{display:none!important}
+  body{background:white!important;color:black!important;font-size:12pt;line-height:1.5;padding:0!important;max-width:100%!important}
+  h1{color:black!important;font-size:18pt}
+  .subtitle{color:#333!important}
+  .stats{display:flex!important;page-break-inside:avoid}
+  .stat-card{background:white!important;border:1px solid #ccc!important;box-shadow:none!important}
+  .stat-num{color:black!important}
+  .stat-label{color:#333!important}
+  .kb-list{page-break-inside:avoid}
+  .kb-card{background:white!important;border:1px solid #ccc!important;box-shadow:none!important;color:black!important;border-left:3px solid #999!important}
+  .kb-title{color:black!important}
+  .kb-summary{color:#333!important}
+  .kb-content{display:block!important;background:#fafafa!important;color:black!important}
+  .kb-meta,.kb-id{color:#666!important}
+  h1,h2,h3{page-break-after:avoid;color:black!important}
+  a[href]:after{content:" ("attr(href)")";font-size:9pt;color:#666}
+  img{max-width:100%!important}
+  .print-only{display:block!important}
+}
 </style>
 <link rel="stylesheet" href="css/theme-systems.css">
 <link rel="stylesheet" href="css/flow-engine.css">
