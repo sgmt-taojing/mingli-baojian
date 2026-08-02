@@ -125,6 +125,19 @@ header p{font-size:13px;color:var(--muted)}
   .api-doc code{font-size:10px;word-break:break-all}
   .api-doc .desc{font-size:10px;line-height:1.5}
 }
+
+@media print {
+  .no-print, .nav-bar, .sidebar, .back-btn, .action-bar, .fab, .bottom-nav, header, nav, .toolbar, .btn, button { display: none !important; }
+  body { background: #fff !important; color: #000 !important; font-size: 12pt !important; }
+  .print-area, .report-content, .main-content, main, .content, .card { width: 100% !important; margin: 0 !important; padding: 8mm !important; }
+  a { color: #000 !important; text-decoration: underline; }
+  img { max-width: 100% !important; }
+  table { width: 100% !important; border-collapse: collapse; }
+  th, td { border: 1px solid #ccc !important; padding: 4px !important; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .page-break { page-break-before: always; }
+  .report-card, .info-card, .detail-card { break-inside: avoid; }
+}
 </style>
   <link rel="stylesheet" href="css/mobile-nav.css">
 <link rel="stylesheet" href="css/theme-systems.css">
