@@ -366,4 +366,36 @@ window._MODULE_REPORTS.mingxiang = {
   }
 };
 
-console.warn('✅ _MODULE_REPORTS extended (+9 modules: fengshui/qimen/ziwei/liuyao/meihua/liuren/yanzhi/wuxing/mingxiang = 23 total)');
+// ─── 塔罗 ───
+window._MODULE_REPORTS.tarot = {
+  name: '塔罗占卜',
+  diagnose: function(data){
+    const s = (data && data.s0) || '爱情';
+    const spread = s.includes('爱情') ? '关系' : s.includes('事业') ? '職業' : s.includes('财运') ? '財運' : '综合';
+    const cards = [
+      {name:'愚者', meaning:'新的開始，冒險精神'},
+      {name:'魔術師', meaning:'創造力，行動力'},
+      {name:'女祭司', meaning:'直覺，潛意識'},
+      {name:'皇后', meaning:'豐盛，滋養'},
+      {name:'皇帝', meaning:'權威，結構'},
+      {name:'戀人', meaning:'選擇，和諧'},
+      {name:'戰車', meaning:'意志，勝利'},
+      {name:'力量', meaning:'勇氣，內在力量'},
+      {name:'隱者', meaning:'內省，尋找'},
+      {name:'命運之輪', meaning:'轉變，機遇'}
+    ];
+    const pick = cards[(s.length * 7) % cards.length];
+    return {
+      title: '塔羅占卜（KB兜底）',
+      summary: spread + '牌陣 · 抽到「' + pick.name + '」',
+      sections: [
+        {title:'牌面解讀', text: pick.name + '：' + pick.meaning + '。在' + spread + '語境下，提示當前處於轉折點，需要結合內心感受與外在環境綜合判斷。'},
+        {title:'建議', text: '保持開放心態，順應直覺。牌面顯示' + (pick.name === '愚者' ? '適合開啟新計劃' : pick.name === '戰車' ? '適合主動出擊' : '適合沉澱思考') + '。'}
+      ],
+      ttsText: '塔羅占卜：' + pick.name + '，' + pick.meaning + '。',
+      nextSteps: ['記錄當下感受','一週後回顧牌面','結合實際情況調整策略','保持正念冥想','關注直覺信號']
+    };
+  }
+};
+
+console.warn('✅ _MODULE_REPORTS extended (+10 modules: fengshui/qimen/ziwei/liuyao/meihua/liuren/yanzhi/wuxing/mingxiang/tarot = 24 total)');
