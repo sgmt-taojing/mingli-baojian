@@ -44,6 +44,19 @@ h1{font-size:1.4rem;margin-bottom:8px}
 .toast{position:fixed;bottom:20px;right:20px;background:var(--card);padding:12px 20px;border-radius:8px;border-left:3px solid var(--ok);font-size:.85rem;transform:translateY(200%);transition:transform .3s;z-index:99}
 .toast.show{transform:translateY(0)}
 @media(max-width:768px){.item .eid{min-width:100px;font-size:.7rem}.stat .v{font-size:1.2rem}}
+
+@media print {
+  .no-print{display:none!important}
+  .page-header-bar,.flow-steps-wrap,.phb-back,.top,.btn,.mobile-nav,header,nav,.skip-link,a[style*="position:fixed"],[style*="position:fixed"],.refill-area,.toast,.module-card summary::before,.skip-link{display:none!important}
+  body{background:#fff!important;color:#000!important;font-size:12pt!important;padding:0!important;margin:0!important}
+  .container,.main,.content,.card,.report-body,.wrap{width:100%!important;max-width:none!important;margin:0!important;padding:8mm!important}
+  table{width:100%!important;border-collapse:collapse!important}
+  th,td{border:1px solid #333!important;padding:4px 8px!important}
+  h1,h2,h3{page-break-after:avoid!important}
+  .card,.section,.module{page-break-inside:avoid!important}
+  a{color:#000!important;text-decoration:none!important}
+  .print-only{display:block!important}
+}
 </style>
   <link rel="stylesheet" href="css/mobile-nav.css">
 <link rel="stylesheet" href="css/theme-systems.css">
