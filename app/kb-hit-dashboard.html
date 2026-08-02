@@ -42,6 +42,21 @@
   .back-link:hover{background:rgba(201,168,76,.06)}
   @media(max-width:768px){.grid{grid-template-columns:1fr 1fr}.engine-grid{grid-template-columns:1fr}}
   @media(max-width:320px){.grid{grid-template-columns:1fr}}
+/* R452: Print styles */
+@media print {
+  .no-print{display:none!important}
+  .page-header-bar, .flow-steps-wrap, .phb-back,
+  a[style*="position:fixed"], [style*="position:fixed"], .back-link,
+  header, nav, .skip-link{display:none!important}
+  body{background:#fff!important;color:#000!important;font-size:12pt!important;padding:0!important;margin:0!important}
+  h1,h2,h3,h4,h5,h6,p,span,div,a,td,th{color:#000!important}
+  .grid{width:100%!important;grid-template-columns:1fr!important}
+  .stat-card,.engine-card{border:1px solid #ccc!important;background:#fff!important;break-inside:avoid;page-break-inside:avoid}
+  table{width:100%!important;border-collapse:collapse;font-size:10pt!important}
+  th,td{padding:4px 6px!important;border:1px solid #ccc!important}
+  *{box-shadow:none!important;text-shadow:none!important;border-radius:0!important}
+  a[href^="http"]::after{content:" ("attr(href)")";font-size:8pt;color:#666!important}
+}
 </style>
 <link rel="stylesheet" href="css/mobile-nav.css">
 <link rel="stylesheet" href="css/theme-systems.css">

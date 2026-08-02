@@ -45,6 +45,23 @@ tr:hover td{background:rgba(201,168,76,.04);}
 @media(max-width:768px){body{font-size:14px}h1{font-size:22px!important}h2{font-size:19px!important}[style*="grid-template-columns:repeat(3"],[style*="grid-template-columns:repeat(4"],[style*="grid-template-columns:repeat(5)"]{grid-template-columns:repeat(2,1fr)!important}.wrap,.container{padding:12px!important;max-width:100vw!important;overflow-x:hidden!important}.toolbar{display:flex!important;flex-wrap:wrap!important;gap:6px!important}table{display:block!important;overflow-x:auto!important}.modal-box{width:calc(100vw - 24px)!important;max-width:100%!important;margin:12px!important}}
 @media(max-width:480px){body{font-size:13px}[style*="grid-template-columns:repeat(2"],[style*="grid-template-columns:repeat(3)"]{grid-template-columns:1fr!important}}
 @media(max-width:320px){body{font-size:12px;padding:0!important}h1{font-size:18px!important}input[type=text],input[type=search],textarea,select{width:100%!important;max-width:100%!important}}
+/* R452: Print styles */
+@media print {
+  .no-print{display:none!important}
+  .page-header-bar, .flow-steps-wrap, .phb-back, .top, .btn, .sel,
+  a[style*="position:fixed"], [style*="position:fixed"], .mobile-nav,
+  header, nav, .kbe-search, .toolbar, .filters, .skip-link{display:none!important}
+  body{background:#fff!important;color:#000!important;font-size:12pt!important;padding:0!important;margin:0!important}
+  h1,h2,h3,h4,h5,h6,p,td,th,span,div,a,label{color:#000!important}
+  table{width:100%!important;font-size:10pt!important;border-collapse:collapse}
+  th,td{padding:4px 6px!important;border:1px solid #ccc!important;color:#000!important}
+  .table-wrap{overflow-x:visible!important}
+  .matrix-cell{padding:4px 6px!important}
+  .badge{border:1px solid #ccc!important;color:#000!important}
+  *{box-shadow:none!important;text-shadow:none!important;border-radius:0!important}
+  .card,tr,li{break-inside:avoid;page-break-inside:avoid}
+  a[href^="http"]::after{content:" ("attr(href)")";font-size:8pt;color:#666!important}
+}
 </style>
 <link rel="stylesheet" href="css/mobile-nav.css">
 <link rel="stylesheet" href="css/theme-systems.css">

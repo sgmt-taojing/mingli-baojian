@@ -91,6 +91,23 @@ h1{font-size:1.6rem;color:var(--gold);text-align:center;margin:20px 0 4px}
   .summary{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:360px){body{padding:0}.wrap{padding:8px 4px}h1{font-size:1.2rem}.sub{font-size:.75rem}.summary{grid-template-columns:1fr;gap:6px}.s-card{padding:8px 6px}.s-card .val{font-size:1.3rem}.matrix-head,.matrix-row{grid-template-columns:80px 40px 50px 50px 50px 50px 50px 56px 56px;font-size:.62rem}.legend{padding:8px 6px;font-size:.68rem}}
+/* R452: Print styles */
+@media print {
+  .no-print{display:none!important}
+  .page-header-bar, .flow-steps-wrap, .phb-back,
+  a[style*="position:fixed"], [style*="position:fixed"],
+  .refresh, .export-btn, .filters, header, nav{display:none!important}
+  body{background:#fff!important;color:#000!important;font-size:11pt!important;padding:0!important;margin:0!important}
+  h1,h2,h3,h4,h5,h6,p,span,div,a{color:#000!important}
+  .wrap{width:100%!important;max-width:100%!important;padding:8px!important}
+  .summary{width:100%!important;grid-template-columns:repeat(auto-fit,minmax(120px,1fr))!important}
+  .s-card{border:1px solid #ccc!important;background:#fff!important;break-inside:avoid;page-break-inside:avoid}
+  .matrix{border:1px solid #ccc!important;background:#fff!important;overflow:visible!important}
+  .matrix-head,.matrix-row{font-size:.72rem!important;padding:6px!important;break-inside:avoid;page-break-inside:avoid}
+  .legend{border:1px solid #ccc!important}
+  *{box-shadow:none!important;text-shadow:none!important;border-radius:0!important}
+  a[href^="http"]::after{content:" ("attr(href)")";font-size:8pt;color:#666!important}
+}
 </style>
 <link rel="stylesheet" href="css/theme-systems.css">
 <link rel="stylesheet" href="css/flow-engine.css">

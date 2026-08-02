@@ -41,6 +41,20 @@
   .back-link:hover{background:rgba(201,168,76,.06)}
   @media(max-width:768px){.cov-grid{grid-template-columns:1fr}.summary-grid{grid-template-columns:1fr 1fr}}
   @media(max-width:320px){.summary-grid{grid-template-columns:1fr}}
+/* R452: Print styles */
+@media print {
+  .no-print{display:none!important}
+  .page-header-bar, .flow-steps-wrap, .phb-back,
+  a[style*="position:fixed"], [style*="position:fixed"], .back-link,
+  header, nav, .skip-link{display:none!important}
+  body{background:#fff!important;color:#000!important;font-size:12pt!important;padding:0!important;margin:0!important}
+  h1,h2,h3,h4,h5,h6,p,td,th,span,div,a{color:#000!important}
+  .cov-grid,.summary-grid{width:100%!important;max-width:100%!important;grid-template-columns:1fr!important}
+  .cov-card,.stat-card{border:1px solid #ccc!important;background:#fff!important;break-inside:avoid;page-break-inside:avoid}
+  .cov-badge{border:1px solid #ccc!important;color:#000!important}
+  *{box-shadow:none!important;text-shadow:none!important;border-radius:0!important}
+  a[href^="http"]::after{content:" ("attr(href)")";font-size:8pt;color:#666!important}
+}
 </style>
 <link rel="stylesheet" href="css/mobile-nav.css">
 <link rel="stylesheet" href="css/theme-systems.css">

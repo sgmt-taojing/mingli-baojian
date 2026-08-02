@@ -38,6 +38,20 @@ th{color:var(--c-muted);font-weight:500}
 .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--c-accent),var(--c-purple));border-radius:4px}
 @media(max-width:768px){.cards{grid-template-columns:repeat(2,1fr)}.wrap{padding:12px}}
 @media(max-width:320px){.cards{grid-template-columns:1fr}}
+/* R452: Print styles */
+@media print {
+  .no-print{display:none!important}
+  .page-header-bar, .flow-steps-wrap, .phb-back,
+  a[style*="position:fixed"], [style*="position:fixed"],
+  header, nav, .skip-link{display:none!important}
+  body{background:#fff!important;color:#000!important;font-size:12pt!important;padding:0!important;margin:0!important}
+  h1,h2,h3,h4,h5,h6,p,span,div,a{color:#000!important}
+  .wrap{width:100%!important;max-width:100%!important;padding:8px!important}
+  .cards{width:100%!important;grid-template-columns:1fr!important}
+  .card{border:1px solid #ccc!important;background:#fff!important;break-inside:avoid;page-break-inside:avoid}
+  *{box-shadow:none!important;text-shadow:none!important;border-radius:0!important}
+  a[href^="http"]::after{content:" ("attr(href)")";font-size:8pt;color:#666!important}
+}
 </style>
 <link rel="stylesheet" href="css/mobile-nav.css">
 <link rel="stylesheet" href="css/theme-systems.css">
