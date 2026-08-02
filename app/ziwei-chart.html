@@ -112,11 +112,60 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
 <div class="zw-form">
   <input aria-label="姓名" type="text" id="zw-name" placeholder="姓名(可选)" maxlength="20">
   <select id="zw-sex" aria-label="性别"><option value="male">男</option><option value="female">女</option></select>
+  <div class="zw-cal-switch" id="zw-cal-switch" style="display:inline-flex;gap:4px">
+    <button class="active" type="button" onclick="switchZwCal('solar')" style="padding:4px 10px;font-size:12px;border:1px solid var(--border);border-radius:4px;background:rgba(201,168,76,.15);color:var(--gold)">阳历</button>
+    <button type="button" onclick="switchZwCal('lunar')" style="padding:4px 10px;font-size:12px;border:1px solid var(--border);border-radius:4px;background:transparent;color:var(--paper3)">农历</button>
+  </div>
   <input aria-label="年" type="number" id="zw-year" placeholder="年" value="1990" min="1900" max="2100">
   <input aria-label="月" type="number" id="zw-month" placeholder="月" value="10" min="1" max="12">
   <input aria-label="日" type="number" id="zw-day" placeholder="日" value="28" min="1" max="31">
   <input aria-label="时" type="number" id="zw-hour" placeholder="时" value="7" min="0" max="23">
+  <label style="font-size:11px;color:var(--paper3);display:flex;align-items:center;gap:4px"><input type="checkbox" id="zw-leap" style="width:auto"> 闰月</label>
   <button onclick="doPaipan()">排盘</button>
+
+<button onclick="generateFullReport('ziwei')" style="margin-top:12px;padding:10px 24px;background:linear-gradient(135deg,#ffb44d,#ff7e5f);color:#0f1820;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:2px">📜 出具紫微斗数报告</button>
+<script>
+async function generateFullReport(mod){
+  try{
+    const inputs = {};
+    document.querySelectorAll('input,select').forEach(el=>{
+      const m = el.id && el.id.match(/^[a-z]+-(.+)$/);
+      if(m) if(el.type==='number' && el.value) inputs[m[1]] = +el.value;
+        else inputs[m[1]] = el.value;
+    });
+    if(inputs.lunar===undefined) inputs.lunar = (window.zwCalMode==='lunar') || (window.lrCalMode==='lunar');
+    inputs.leapMonth = document.getElementById('zw-leap')?.checked || false;
+  if(inputs.leapMonth===undefined) inputs.leapMonth = false;
+    
+    const csrfRes = await fetch('/api/csrf-token').then(r=>r.json()).catch(()=>({csrfToken:''}));
+    const csrf = csrfRes.csrfToken || csrfRes.token || '';
+    
+    const r = await fetch('/api/paipan/'+mod+'/report', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
+      body: JSON.stringify({
+        ...inputs,
+        questions: [inputs.question||''].filter(Boolean),
+        options: { name: inputs.name||'缘主' }
+      })
+    }).then(r=>r.json());
+    
+    if(!r.ok){
+      const fn = typeof showToast==='function'?showToast:typeof toast==='function'?toast:alert;
+      fn('报告生成失败：'+(r.error||''));
+      return;
+    }
+    
+    // 保存报告到 sessionStorage，跳到报告展示页
+    sessionStorage.setItem('lastReport', JSON.stringify(r));
+    window.location.href = 'report-interpret.html?module='+mod+'&name='+encodeURIComponent(inputs.name||'缘主');
+  }catch(e){
+    const fn = typeof showToast==='function'?showToast:typeof toast==='function'?toast:alert;
+    fn('生成失败：'+e.message);
+    console.error(e);
+  }
+}
+</script>
 </div>
 
 <div id="zw-grid" class="zw-grid"></div>
@@ -132,11 +181,23 @@ async function doPaipan(){
   const s=document.getElementById('zw-sex').value;
   if(!y||!m||!d||h===''){showToast('请填写完整的年月日时');return;}
   const name = document.getElementById('zw-name').value || '';
-  const r=await fetch(API_BASE+'/api/paipan/ziwei',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({year:+y,month:+m,day:+d,hour:+h,sex:s,name})});
+  const isLunar = zwCalMode === 'lunar';
+  const leap = isLunar ? document.getElementById('zw-leap').checked : false;
+  const r=await fetch(API_BASE+'/api/paipan/ziwei',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({year:+y,month:+m,day:+d,hour:+h,sex:s,name,isLunar,leapMonth:leap})});
   const data=await r.json();
   if(!data.ok){showToast('排盘失败: '+data.error);return;}
   renderChart(data.chart); if(data.interpretation) renderInterpretation(data.interpretation);
 }
+
+// 紫微农历/公历切换
+var zwCalMode='solar';
+function switchZwCal(mode){
+  zwCalMode=mode;
+  var btns=document.querySelectorAll('#zw-cal-switch button');
+  btns.forEach(function(b){b.classList.remove('active');b.style.background='transparent';b.style.color='var(--paper3)';});
+  event.target.classList.add('active');
+  event.target.style.background='rgba(201,168,76,.15)';
+  event.target.style.color='var(--gold)';
 
 function renderChart(c){
   const meta=document.getElementById('zw-meta');

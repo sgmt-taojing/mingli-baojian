@@ -74,10 +74,58 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
   <div id="fs-meta" class="fs-meta">请输入信息排盘</div>
 </div>
 <div class="fs-form">
+  <input aria-label="姓名" type="text" id="fs-name" placeholder="姓名(可选)" maxlength="20" style="grid-column:1/-1">
   <input aria-label="年份" type="number" id="fs-year" placeholder="年份" value="2026" min="1900" max="2100">
-  <select id="fs-sitting" aria-label="坐山"><option value="子">子(北)</option><option value="丑">丑(东北偏北)</option><option value="寅">寅(东北偏东)</option><option value="卯">卯(东)</option><option value="巳">巳(东南偏南)</option><option value="午">午(南)</option><option value="未">未(西南偏南)</option><option value="申">申(西南偏西)</option><option value="酉">酉(西)</option><option value="戌">戌(西北偏西)</option><option value="亥">亥(西北偏北)</option></select>
-  <select id="fs-facing" aria-label="朝向"><option value="午">午(南)</option><option value="未">未(西南偏南)</option><option value="申">申(西南偏西)</option><option value="酉">酉(西)</option><option value="戌">戌(西北偏西)</option><option value="亥">亥(西北偏北)</option><option value="子">子(北)</option><option value="丑">丑(东北偏北)</option><option value="寅">寅(东北偏东)</option><option value="卯">卯(东)</option><option value="巳">巳(东南偏南)</option></select>
+  <select id="fs-sitting" aria-label="坐山"><option value="">-- 坐山 --</option><option value="子">子(北)</option><option value="丑">丑(东北偏北)</option><option value="寅">寅(东北偏东)</option><option value="卯">卯(东)</option><option value="辰">辰(东南偏东)</option><option value="巳">巳(东南偏南)</option><option value="午">午(南)</option><option value="未">未(西南偏南)</option><option value="申">申(西南偏西)</option><option value="酉">酉(西)</option><option value="戌">戌(西北偏西)</option><option value="亥">亥(西北偏北)</option></select>
+  <select id="fs-facing" aria-label="朝向"><option value="">-- 朝向 --</option><option value="午">午(南)</option><option value="未">未(西南偏南)</option><option value="申">申(西南偏西)</option><option value="酉">酉(西)</option><option value="戌">戌(西北偏西)</option><option value="亥">亥(西北偏北)</option><option value="子">子(北)</option><option value="丑">丑(东北偏北)</option><option value="寅">寅(东北偏东)</option><option value="卯">卯(东)</option><option value="辰">辰(东南偏东)</option><option value="巳">巳(东南偏南)</option></select>
+  <select id="fs-building-type" aria-label="建筑类型"><option value="">-- 类型(可选) --</option><option value="apartment">公寓</option><option value="house">独立屋/别墅</option><option value="shop">商铺</option><option value="office">办公室</option><option value="factory">厂房</option></select>
+  <select id="fs-floor" aria-label="楼层"><option value="">-- 楼层(可选) --</option><option value="1">1F</option><option value="2">2F</option><option value="3">3F</option><option value="4">4F</option><option value="5">5F</option><option value="6">6F</option><option value="7">7F</option><option value="8">8F+</option></select>
+  <input aria-label="出生年份" type="number" id="fs-birth-year" placeholder="命主出生年(可选,如1985)" min="1900" max="2100" style="grid-column:1/-1">
+  <label style="font-size:11px;color:var(--paper3);display:flex;align-items:center;gap:4px;grid-column:1/-1"><input type="checkbox" id="fs-annual" style="width:auto" checked> 排流年飞星</label>
   <button onclick="doPaipan()">排盘</button>
+
+<button onclick="generateFullReport('fengshui')" style="margin-top:12px;padding:10px 24px;background:linear-gradient(135deg,#ffb44d,#ff7e5f);color:#0f1820;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:2px">📜 出具风水堪舆报告</button>
+<script>
+async function generateFullReport(mod){
+  try{
+    const inputs = {};
+    document.querySelectorAll('input,select').forEach(el=>{
+      const m = el.id && el.id.match(/^[a-z]+-(.+)$/);
+      if(m) if(el.type==='number' && el.value) inputs[m[1]] = +el.value;
+        else inputs[m[1]] = el.value;
+    });
+    if(inputs.lunar===undefined) inputs.lunar = (window.zwCalMode==='lunar') || (window.lrCalMode==='lunar');
+    if(inputs.leapMonth===undefined) inputs.leapMonth = false;
+    
+    const csrfRes = await fetch('/api/csrf-token').then(r=>r.json()).catch(()=>({csrfToken:''}));
+    const csrf = csrfRes.csrfToken || csrfRes.token || '';
+    
+    const r = await fetch('/api/paipan/'+mod+'/report', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
+      body: JSON.stringify({
+        ...inputs,
+        questions: [inputs.question||''].filter(Boolean),
+        options: { name: inputs.name||'缘主' }
+      })
+    }).then(r=>r.json());
+    
+    if(!r.ok){
+      const fn = typeof showToast==='function'?showToast:typeof toast==='function'?toast:alert;
+      fn('报告生成失败：'+(r.error||''));
+      return;
+    }
+    
+    // 保存报告到 sessionStorage，跳到报告展示页
+    sessionStorage.setItem('lastReport', JSON.stringify(r));
+    window.location.href = 'report-interpret.html?module='+mod+'&name='+encodeURIComponent(inputs.name||'缘主');
+  }catch(e){
+    const fn = typeof showToast==='function'?showToast:typeof toast==='function'?toast:alert;
+    fn('生成失败：'+e.message);
+    console.error(e);
+  }
+}
+</script>
 </div>
 <div id="fs-grid" class="fs-grid" style="display:none"></div>
 <div id="fs-info" class="fs-info" style="display:none"></div>
@@ -91,7 +139,12 @@ async function doPaipan(){
   if(!y){showToast('请填写年份');return;}
   if(!s){showToast('请选择坐山');return;}
   if(!f){showToast('请选择朝向');return;}
-  const r=await fetch(API_BASE+'/api/paipan/fengshui',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({year:+y,sittingMountain:s,facingMountain:f})});
+  const name = document.getElementById('fs-name').value || '';
+  const buildingType = document.getElementById('fs-building-type').value;
+  const floor = document.getElementById('fs-floor').value;
+  const birthYear = document.getElementById('fs-birth-year').value;
+  const annual = document.getElementById('fs-annual').checked;
+  const r=await fetch(API_BASE+'/api/paipan/fengshui',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({year:+y,sittingMountain:s,facingMountain:f,name,buildingType,floor:floor?+floor:null,birthYear:birthYear?+birthYear:null,annual})});
   const data=await r.json();
   if(!data.ok){showToast('排盘失败: '+data.error);return;}
   renderChart(data.chart); if(data.interpretation) renderInterpretation(data.interpretation);

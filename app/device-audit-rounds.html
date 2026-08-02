@@ -163,7 +163,7 @@
         fix:'/api/tts POST 501 → 只支持 GET（HTTP 规范允许 GET 带参数，无需改）'
       },
       { service:'8913 OCR', endpoint:'/api/face/analyze + /api/ocr/tcm', method:'POST', status:'pass', code:200, time:'0.003s',
-        note:'离线 PIL 兜底可用 · 4 AI 引擎均未配置（g2claw/zhipu/openai/doubao=false）· 端点全 200',
+        note:'离线 PIL 兜底可用 · 4 OCR 引擎均未配置（g2claw/zhipu/openai/doubao=false）· 端点全 200',
         fix:'配置 ZHIPU_API_KEY / OPENAI_API_KEY 启用 AI OCR 引擎'
       },
       { service:'8920 API 网关', endpoint:'/api/health (新增)', method:'GET', status:'pass', code:200, time:'0.009s',
@@ -207,7 +207,7 @@
     { id:'F1', item:'8920 /health 404', desc:'新增 /api/health 端点（CSRF 白名单内），返回 {ok, service, port, uptime, ts}', status:'done' },
     { id:'F2', item:'8912 /api/tts POST 501', desc:'确认前端使用 GET（Audio(url)），后端只支持 GET；501 仅影响 POST 测试调用，实际使用正常', status:'done' },
     { id:'F3', item:'8911 /api/paipan 404', desc:'正确端点为 /paipan（根路径），非 /api/paipan；前端调用已使用正确路径', status:'info' },
-    { id:'F4', item:'8913 AI 引擎全 false', desc:'g2claw/zhipu/openai/doubao 均未配置 API Key；当前降级为离线 PIL 兜底', status:'todo', action:'配置 ZHIPU_API_KEY 或 OPENAI_API_KEY 启用 AI OCR' }
+    { id:'F4', item:'8913 OCR 引擎全 false', desc:'g2claw/zhipu/openai/doubao 均未配置 API Key；当前降级为离线 PIL 兜底', status:'todo', action:'配置 ZHIPU_API_KEY 或 OPENAI_API_KEY 启用 AI OCR' }
   ];
 
   function esc(s){ return String(s).replace(/[<>"&]/g, function(c){ return {'<':'&lt;','>':'&gt;','"':'&quot;','&':'&amp;'}[c]; }); }

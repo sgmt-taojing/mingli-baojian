@@ -263,7 +263,58 @@ window.addEventListener('DOMContentLoaded', function(){
   loadHistory();
   // 加载 profile
   fetchProfile();
+  // 加载排盘报告（从 chart 页跳过来）
+  loadPaipanReport();
 });
+
+function loadPaipanReport(){
+  try{
+    var data = sessionStorage.getItem('lastReport');
+    var params = new URLSearchParams(location.search);
+    var module = params.get('module');
+    if(!data || !module) return;
+    var report = JSON.parse(data);
+    // 展示面板
+    var panel = document.getElementById('paipanReportPanel');
+    if(!panel){
+      // 动态创建
+      var container = document.querySelector('main, .container, body');
+      var div = document.createElement('div');
+      div.id = 'paipanReportPanel';
+      div.className = 'paipan-report-panel';
+      div.style.cssText = 'background:linear-gradient(135deg,rgba(255,180,77,.08),rgba(255,126,95,.05));border:1px solid rgba(255,180,77,.3);border-radius:12px;padding:20px;margin:20px 16px;color:#fff';
+      div.innerHTML = '<h2 style="color:#ffb44d;margin:0 0 12px">📜 '+(report.module||module).toUpperCase()+' · 排盘报告</h2>'+
+        '<div id="paipanReportContent"></div>';
+      container.insertBefore(div, container.firstChild);
+      panel = div;
+    }
+    panel.style.display = 'block';
+    var content = document.getElementById('paipanReportContent');
+    if(content) content.innerHTML = renderPaipanReport(report);
+    // 清掉以免重复渲染
+    sessionStorage.removeItem('lastReport');
+  }catch(e){console.warn('排盘报告加载失败',e);}
+}
+
+function renderPaipanReport(report){
+  if(!report) return '';
+  var html = '';
+  if(report.summary) html += '<div style="margin-bottom:12px"><strong style="color:#ffb44d">概要：</strong> '+report.summary+'</div>';
+  if(report.sections && Array.isArray(report.sections)){
+    report.sections.forEach(function(s){
+      html += '<div style="margin-bottom:10px;padding:10px;background:rgba(255,255,255,.03);border-radius:8px"><div style="color:#ffb44d;font-weight:600;margin-bottom:6px">'+s.title+'</div><div style="font-size:13px;line-height:1.7;color:#e4e8ee">'+s.content+'</div></div>';
+    });
+  }
+  if(report.analysis) html += '<div style="margin-top:12px"><strong style="color:#ffb44d">解读：</strong><pre style="white-space:pre-wrap;font-family:inherit;font-size:13px;line-height:1.7">'+report.analysis+'</pre></div>';
+  if(report.chart){
+    html += '<details style="margin-top:12px"><summary style="color:#8ab4d8;cursor:pointer">查看原始排盘数据</summary><pre style="background:rgba(0,0,0,.3);padding:10px;border-radius:6px;overflow:auto;font-size:11px;color:#aab">'+JSON.stringify(report.chart,null,2)+'</pre></details>';
+  }
+  if(!html){
+    // 兜底：原始 JSON
+    html = '<pre style="background:rgba(0,0,0,.3);padding:12px;border-radius:6px;overflow:auto;font-size:11px">'+JSON.stringify(report,null,2)+'</pre>';
+  }
+  return html;
+}
 
 async function fetchProfile(){
   try{
