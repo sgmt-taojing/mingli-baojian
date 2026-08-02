@@ -115,7 +115,18 @@
       .zw-compare-title{font-size:12px}
       .zw-compare-hint{font-size:10px;line-height:1.5}
     }
-  </style>
+  
+@media print{
+  .mobile-nav,.nav-bar,.btn,button,.no-print,.sidebar,.filter-bar,.tab-btn{display:none!important}
+  body{background:white!important;color:black!important;font-size:12pt}
+  a[href]:after{content:" ("attr(href)")"}
+  .card,.report-section,table,.panel,.result-box{page-break-inside:avoid}
+  .container,main,.wrap{width:100%!important;margin:0!important;padding:0!important}
+  h1,h2,h3{page-break-after:avoid}
+  img{max-width:100%!important}
+  .print-full{display:block!important}
+}
+</style>
   <link rel="stylesheet" href="css/mobile-nav.css">
 <link rel="stylesheet" href="css/theme-systems.css">
 <link rel="stylesheet" href="css/flow-engine.css">

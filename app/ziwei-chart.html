@@ -81,6 +81,17 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
   .zw-star{font-size:7px;padding:0 2px}
   .zw-daxian-list{grid-template-columns:repeat(3,1fr)}
 }
+
+@media print{
+  .mobile-nav,.nav-bar,.btn,button,.no-print,.sidebar,.filter-bar,.tab-btn{display:none!important}
+  body{background:white!important;color:black!important;font-size:12pt}
+  a[href]:after{content:" ("attr(href)")"}
+  .card,.report-section,table,.panel,.result-box{page-break-inside:avoid}
+  .container,main,.wrap{width:100%!important;margin:0!important;padding:0!important}
+  h1,h2,h3{page-break-after:avoid}
+  img{max-width:100%!important}
+  .print-full{display:block!important}
+}
 </style>
   <link rel="stylesheet" href="css/mobile-nav.css">
 <link rel="stylesheet" href="css/theme-systems.css">
