@@ -77,6 +77,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
 .bar-fill.high{background:var(--red)}
 .bar-fill.mid{background:var(--orange)}
 .bar-fill.normal{background:var(--green)}
+@media print{
+  .mobile-nav,.nav-bar,.btn,button,.no-print{display:none!important}
+  body{background:white!important;color:black!important;font-size:12pt}
+  a[href]:after{content:" ("attr(href)")"}
+  .card,.report-section,table{page-break-inside:avoid}
+  .container,main{width:100%!important;margin:0!important;padding:0!important}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 </style>
 <link rel="stylesheet" href="css/theme-systems.css">
 <link rel="stylesheet" href="css/flow-engine.css">

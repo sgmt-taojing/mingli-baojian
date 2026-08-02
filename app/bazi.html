@@ -664,6 +664,14 @@
   .nav-bar a{padding:4px 6px;font-size:11px}
   .row{flex-direction:column;align-items:flex-start}
 }
+@media print{
+  .mobile-nav,.nav-bar,.btn,button,.no-print{display:none!important}
+  body{background:white!important;color:black!important;font-size:12pt}
+  a[href]:after{content:" ("attr(href)")"}
+  .card,.report-section,table{page-break-inside:avoid}
+  .container,main{width:100%!important;margin:0!important;padding:0!important}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 </style>
 </button>
 

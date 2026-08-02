@@ -48,6 +48,14 @@
   @media(max-width:360px){body{padding:10px 6px 70px}.hero{padding:14px 0 10px}.hero h1{font-size:22px;letter-spacing:3px}.hero p{font-size:11px;letter-spacing:2px}.group{margin:0 auto 18px}.group-title{font-size:14px;letter-spacing:2px}.grid{grid-template-columns:1fr;gap:8px}.card{padding:12px 10px}.card .symbol{font-size:22px}.card .name{font-size:13px}.card .desc{font-size:11px}.footer{font-size:10px}}
   .footer{padding-bottom:50px;text-align:center;margin-top:36px;font-size:11px;color:var(--paper2);opacity:.45;letter-spacing:2px}
   .footer a{color:var(--gold);text-decoration:none;margin:0 8px}
+@media print{
+  .mobile-nav,.nav-bar,.btn,button,.no-print{display:none!important}
+  body{background:white!important;color:black!important;font-size:12pt}
+  a[href]:after{content:" ("attr(href)")"}
+  .card,.report-section,table{page-break-inside:avoid}
+  .container,main{width:100%!important;margin:0!important;padding:0!important}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 </style>
 <link rel="stylesheet" href="css/a11y-fix.css" data-r309-portal>
 <link rel="stylesheet" href="css/mobile-nav.css" data-r309-portal>
