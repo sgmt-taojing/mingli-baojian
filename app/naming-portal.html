@@ -265,8 +265,8 @@ function generateNamingV2(){
     occupation:document.getElementById('nv2-occupation').value.trim(),
     purpose:'本名',style:'古典'
   };
-  if(!body.surname){alert('请填写姓氏');btn.disabled=false;btn.textContent='✨ 生成名字建议';return;}
-  if(!body.year){alert('请填写出生年份');btn.disabled=false;btn.textContent='✨ 生成名字建议';return;}
+  if(!body.surname){typeof showToast==='function'?showToast('请填写姓氏'):(typeof toast==='function'?toast('请填写姓氏'):console.warn('请填写姓氏'));btn.disabled=false;btn.textContent='✨ 生成名字建议';return;}
+  if(!body.year){typeof showToast==='function'?showToast('请填写出生年份'):(typeof toast==='function'?toast('请填写出生年份'):console.warn('请填写出生年份'));btn.disabled=false;btn.textContent='✨ 生成名字建议';return;}
   fetch('/api/minsu/xingming/suggest',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
     .then(function(r){return r.json();})
     .then(function(r){
