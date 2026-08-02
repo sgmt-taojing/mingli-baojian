@@ -521,6 +521,108 @@ function calcTrendAdvice(dayuns, shichen){
   h+='</div>';
 
   // 大运起伏图
+  // ★ 十二长生宫可视化（调用后端 /api/paipan/lifeplan/report 获取）
+  h+='<div class="card" id="changshengCard"><h2>🌀 十二长生宫·人生气数轨迹</h2>';
+  h+='<div id="changshengBody" style="padding:12px"><div style="text-align:center;color:#888;padding:20px">⏳ 正在调用排盘引擎推演十二长生宫...</div></div>';
+  h+='</div>';
+
+  // 异步加载十二长生宫数据
+  (function loadChangsheng(){
+    var birthYear = parseInt(d.age) ? (new Date().getFullYear() - d.age) : 1990;
+    var body = JSON.stringify({
+      year: birthYear,
+      month: 5,
+      day: 15,
+      hour: 10,
+      gender: d.sex || '男',
+      birthplace: d.residence || '',
+      questions: (d.focus + ' ' + d.extra).split(/[，,\s]+/).filter(Boolean).slice(0, 4)
+    });
+    fetch('/api/paipan/lifeplan/report', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: body
+    }).then(function(r){return r.json();}).then(function(r){
+      if(!r.ok || !r.lifePath || !r.lifePath.length){
+        var el = document.getElementById('changshengBody');
+        if(el) el.innerHTML = '<div style="padding:16px;color:#999;font-size:13px">⚠ 排盘数据不足，请补充出生年月日时后重新生成</div>';
+        return;
+      }
+      var lp = r.lifePath;
+      var dayStem = r.dayStem || '?';
+      var currentAge = d.age;
+      
+      // 阶段颜色映射
+      var stageColors = {
+        '长生': '#4ade80', '沐浴': '#60a5fa', '冠带': '#a78bfa',
+        '临官': '#fbbf24', '帝旺': '#f87171', '衰': '#fb923c',
+        '病': '#f87171', '死': '#94a3b8', '墓': '#64748b',
+        '绝': '#475569', '胎': '#c084fc', '养': '#22d3ee'
+      };
+      
+      var html = '';
+      // 标题
+      html += '<div style="margin-bottom:12px;color:var(--gold);font-size:14px">日主 ' + dayStem + ' · 大运 ' + lp.length + ' 步 · 按十二长生宫推演一生气数消长</div>';
+      
+      // 轨迹条
+      html += '<div style="display:flex;overflow-x:auto;gap:2px;margin:12px 0;padding:8px 0">';
+      lp.forEach(function(p, i){
+        var color = stageColors[p.stage] || '#888';
+        var isCurrent = false;
+        var ageNum = parseInt(p.ageRange);
+        var ageEnd = parseInt((p.ageRange.split('-')[1]||'').replace(/\D/g,''));
+        if(!isNaN(ageNum) && !isNaN(ageEnd) && currentAge >= ageNum && currentAge <= ageEnd) isCurrent = true;
+        var w = Math.max(60, 100 / lp.length);
+        html += '<div style="flex:1;min-width:' + w + 'px;text-align:center;cursor:pointer" '
+          + 'onclick="showToast(\'' + p.stage + '（' + (p.alias||'') + '）\\n' + p.ageRange + ' · 大运' + p.daYun + '\\n' + (p.qi||'').replace(/'/g,'') + '\\n' + (p.advice||'').replace(/'/g,'') + '\')">';
+        html += '<div style="background:' + color + ';height:' + (isCurrent ? '40px' : '28px') + ';border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600;' + (isCurrent ? 'box-shadow:0 0 8px ' + color : '') + '">' + p.stage + '</div>';
+        html += '<div style="background:rgba(255,255,255,0.05);padding:4px 2px;border-radius:0 0 4px 4px;font-size:10px;color:#999">' + p.ageRange + '</div>';
+        if(isCurrent) html += '<div style="font-size:9px;color:var(--gold);margin-top:2px">◉ 当前</div>';
+        html += '</div>';
+      });
+      html += '</div>';
+      
+      // 当前阶段详情
+      var current = lp.find(function(p){
+        var a1 = parseInt(p.ageRange);
+        var a2 = parseInt((p.ageRange.split('-')[1]||'').replace(/\D/g,''));
+        return !isNaN(a1) && !isNaN(a2) && currentAge >= a1 && currentAge <= a2;
+      });
+      if(current){
+        html += '<div style="margin:12px 0;padding:14px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.3);border-radius:8px">';
+        html += '<div style="color:var(--gold);font-size:15px;font-weight:700;margin-bottom:6px">◉ 当前所处：' + current.stage + '（' + (current.alias||'') + '）· ' + current.ageRange + ' · 大运' + current.daYun + '</div>';
+        html += '<div style="color:#c5d1de;font-size:13px;line-height:1.7">' + (current.desc||'') + '</div>';
+        html += '<div style="margin-top:6px;font-size:12px;color:#8a9bb0">气数：' + (current.qi||'') + '</div>';
+        html += '<div style="margin-top:4px;font-size:12px;color:#8a9bb0">人事：' + (current.lifeAspect||'') + '</div>';
+        html += '<div style="margin-top:6px;font-size:12px;color:var(--gold)">建议：' + (current.advice||'') + '</div>';
+        html += '</div>';
+      }
+      
+      // 完整轨迹表
+      html += '<div style="overflow-x:auto;margin-top:8px"><table style="width:100%;border-collapse:collapse;font-size:11px">';
+      html += '<tr style="background:rgba(99,179,237,0.1)"><th style="padding:6px;border:1px solid rgba(99,179,237,0.2);text-align:left">阶段</th><th style="padding:6px;border:1px solid rgba(99,179,237,0.2)">大运</th><th style="padding:6px;border:1px solid rgba(99,179,237,0.2)">年龄</th><th style="padding:6px;border:1px solid rgba(99,179,237,0.2);text-align:left">气数意象</th></tr>';
+      lp.forEach(function(p){
+        var isCur = (current && p.stage === current.stage && p.ageRange === current.ageRange);
+        html += '<tr' + (isCur ? ' style="background:rgba(201,168,76,0.1)"' : '') + '>';
+        html += '<td style="padding:5px 6px;border:1px solid rgba(99,179,237,0.1);color:' + (stageColors[p.stage]||'#888') + '">' + (isCur?'◉ ':'') + p.stage + '</td>';
+        html += '<td style="padding:5px 6px;border:1px solid rgba(99,179,237,0.1);text-align:center">' + p.daYun + '</td>';
+        html += '<td style="padding:5px 6px;border:1px solid rgba(99,179,237,0.1);text-align:center">' + p.ageRange + '</td>';
+        html += '<td style="padding:5px 6px;border:1px solid rgba(99,179,237,0.1);color:#8a9bb0">' + (p.desc||'').slice(0,20) + (p.desc && p.desc.length > 20 ? '…' : '') + '</td>';
+        html += '</tr>';
+      });
+      html += '</table></div>';
+      
+      // 来源
+      html += '<div style="margin-top:8px;font-size:10px;color:rgba(255,255,255,0.3)">📜 基于日主天干 × 大运地支 · 阳干顺行/阴干逆行 · 《三命通会》《渊海子平》《滴天髓》</div>';
+      
+      var el = document.getElementById('changshengBody');
+      if(el) el.innerHTML = html;
+    }).catch(function(e){
+      var el = document.getElementById('changshengBody');
+      if(el) el.innerHTML = '<div style="padding:16px;color:#999;font-size:13px">⚠ 加载失败：' + e.message + '</div>';
+    });
+  })();
+
   h+='<div class="card"><h2>📈 大运流年起伏图（10 段·每段 10 年）</h2>';
   h+='<div class="dyun-track"><div class="dyun-row">';
   dayuns.forEach(u=>{
