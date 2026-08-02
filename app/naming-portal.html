@@ -330,7 +330,7 @@ function analyzeName(){
     day:Number(document.getElementById('an-day').value)||undefined,
     hour:Number(document.getElementById('an-hour').value)||undefined
   };
-  if(!body.fullName){alert('请填写全名');btn.disabled=false;btn.textContent='🔍 分析名字';return;}
+  if(!body.fullName){showToast('请填写全名');btn.disabled=false;btn.textContent='🔍 分析名字';return;}
   fetch('/api/minsu/xingming/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
     .then(function(r){return r.json();})
     .then(function(r){
