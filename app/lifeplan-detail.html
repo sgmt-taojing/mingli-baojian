@@ -61,7 +61,7 @@
 details summary { outline: none; }
 details summary:hover { opacity: .8; }
 
-/* R200: unified print styles — consolidated from HTML inline + CSS file, removed duplicates */ */
+/* R200: unified print styles — consolidated from HTML inline + CSS file, removed duplicates */
 @media print {
   @page { size: A4; margin: 15mm 12mm; }
 
@@ -169,6 +169,18 @@ details summary:hover { opacity: .8; }
   .lp-12-domain-score.mid { color: #8B6914 !important; }
   .lp-12-domain-score.bad { color: #8b2500 !important; }
   .lp-stage-card-title span { color: #333 !important; }
+
+  /* R441: print-mode — expand all <details> for print */
+  details { open: true; }
+  details > summary { list-style: none !important; display: none !important; }
+  details > div, details > .r440-domain-grid { display: block !important; }
+  details[open] > summary { display: none !important; }
+  .r440-domain-card { border: 1px solid #999 !important; break-inside: avoid; }
+  .r440-domain-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 4px !important; }
+  .fy-row { break-inside: avoid; border: 1px solid #ccc !important; padding: 4px 8px !important; }
+  .future5 { break-inside: avoid; border: 1px solid #ccc !important; }
+  .flow-steps-wrap, .page-header-bar { display: none !important; }
+  /* force details open via JS fallback: set open attribute */
 }
 .btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #888; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: .85rem; }
 .btn-ghost:hover { border-color: #7c9eff; color: #7c9eff; }
@@ -448,6 +460,19 @@ details summary:hover { opacity: .8; }
   .row{flex-direction:column;align-items:flex-start}
 }
 </style>
+<script>
+// R441: force-open all <details> before print, restore after
+(function(){
+  var beforePrint = function(){ document.querySelectorAll('details').forEach(function(d){ d.setAttribute('data-r441-was-open', d.open?'1':'0'); d.open = true; }); };
+  var afterPrint = function(){ document.querySelectorAll('details[data-r441-was-open]').forEach(function(d){ d.open = d.getAttribute('data-r441-was-open')==='1'; d.removeAttribute('data-r441-was-open'); }); };
+  if (window.matchMedia) {
+    var mq = window.matchMedia('print');
+    mq.addListener(function(m){ if(m.matches) beforePrint(); else afterPrint(); });
+  }
+  window.addEventListener('beforeprint', beforePrint);
+  window.addEventListener('afterprint', afterPrint);
+})();
+</script>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
 </body>
 </html>
