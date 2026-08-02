@@ -300,6 +300,71 @@ function generateNamingV2(){
 }
 </script>
 
+<div id="analyzeSection" style="max-width:920px;margin:0 auto 24px;padding:0 16px">
+  <div style="text-align:center;margin-bottom:16px">
+    <h2 style="font-size:24px;color:var(--gold);letter-spacing:4px;margin-bottom:6px">✦ 测名分析</h2>
+    <p style="font-size:12px;color:var(--paper2);opacity:.7">五行三才·古籍溯源·防重名·综合评分</p>
+  </div>
+  <div style="background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.2);border-radius:12px;padding:20px;margin-bottom:16px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+      <div><label style="font-size:12px;color:var(--gold)">全名 *</label><input id="an-fullname" type="text" placeholder="如：李厚德" style="width:100%;padding:8px;background:rgba(0,0,0,.3);border:1px solid rgba(201,168,76,.2);border-radius:6px;color:var(--paper);font-size:14px"></div>
+      <div><label style="font-size:12px;color:var(--gold)">性别</label><select id="an-gender" style="width:100%;padding:8px;background:rgba(0,0,0,.3);border:1px solid rgba(201,168,76,.2);border-radius:6px;color:var(--paper);font-size:14px"><option value="M">男</option><option value="F">女</option></select></div>
+      <div><label style="font-size:12px;color:var(--gold)">出生年（选填）</label><input id="an-year" type="number" placeholder="2020" style="width:100%;padding:8px;background:rgba(0,0,0,.3);border:1px solid rgba(201,168,76,.2);border-radius:6px;color:var(--paper);font-size:14px"></div>
+      <div><label style="font-size:12px;color:var(--gold)">月</label><input id="an-month" type="number" placeholder="8" style="width:100%;padding:8px;background:rgba(0,0,0,.3);border:1px solid rgba(201,168,76,.2);border-radius:6px;color:var(--paper);font-size:14px"></div>
+      <div><label style="font-size:12px;color:var(--gold)">日</label><input id="an-day" type="number" placeholder="15" style="width:100%;padding:8px;background:rgba(0,0,0,.3);border:1px solid rgba(201,168,76,.2);border-radius:6px;color:var(--paper);font-size:14px"></div>
+      <div><label style="font-size:12px;color:var(--gold)">时</label><input id="an-hour" type="number" placeholder="10" style="width:100%;padding:8px;background:rgba(0,0,0,.3);border:1px solid rgba(201,168,76,.2);border-radius:6px;color:var(--paper);font-size:14px"></div>
+    </div>
+    <button id="an-btn" onclick="analyzeName()" style="margin-top:16px;width:100%;padding:12px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--dark);border:none;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer">🔍 分析名字</button>
+  </div>
+  <div id="an-result" style="display:none"></div>
+</div>
+<script>
+function analyzeName(){
+  var btn=document.getElementById('an-btn');
+  btn.disabled=true;btn.textContent='⏳ 分析中...';
+  var body={
+    fullName:document.getElementById('an-fullname').value.trim(),
+    gender:document.getElementById('an-gender').value,
+    year:Number(document.getElementById('an-year').value)||undefined,
+    month:Number(document.getElementById('an-month').value)||undefined,
+    day:Number(document.getElementById('an-day').value)||undefined,
+    hour:Number(document.getElementById('an-hour').value)||undefined
+  };
+  if(!body.fullName){alert('请填写全名');btn.disabled=false;btn.textContent='🔍 分析名字';return;}
+  fetch('/api/minsu/xingming/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
+    .then(function(r){return r.json();})
+    .then(function(r){
+      var d=r.data||r;
+      if(!d.ok){document.getElementById('an-result').innerHTML='<div style="padding:16px;color:#f87171">'+(d.error||'分析失败')+'</div>';return;}
+      var score=d.score||0;
+      var color=score>=80?'#4ade80':score>=65?'#facc15':score>=50?'#fb923c':'#f87171';
+      var h='<div style="background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.2);border-radius:12px;padding:20px">';
+      h+='<div style="text-align:center;margin-bottom:16px">';
+      h+='<div style="font-size:32px;color:var(--gold);font-weight:700">'+d.fullName+'</div>';
+      h+='<div style="display:inline-block;padding:4px 16px;border-radius:20px;background:'+color+'20;color:'+color+';font-size:18px;font-weight:700;margin-top:8px">'+score+'分（'+d.rating+'）</div>';
+      h+='</div>';
+      h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:12px">';
+      h+='<div style="background:rgba(0,0,0,.2);padding:8px 12px;border-radius:6px"><div style="font-size:11px;color:var(--paper2);opacity:.6">名字五行</div><div style="color:var(--gold)">'+(d.nameWuxing||[]).join('+')+'</div></div>';
+      var sc=d.sancai||{};
+      h+='<div style="background:rgba(0,0,0,.2);padding:8px 12px;border-radius:6px"><div style="font-size:11px;color:var(--paper2);opacity:.6">三才关系</div><div style="color:var(--gold)">'+sc.relation+'</div></div>';
+      h+='<div style="background:rgba(0,0,0,.2);padding:8px 12px;border-radius:6px"><div style="font-size:11px;color:var(--paper2);opacity:.6">重名风险</div><div style="color:'+(d.isHighFreq?'#f87171':'#4ade80')+'">'+(d.isHighFreq?'⚠ 高频':'✦ 低频')+'</div></div>';
+      var cs=d.classicSource;
+      h+='<div style="background:rgba(0,0,0,.2);padding:8px 12px;border-radius:6px"><div style="font-size:11px;color:var(--paper2);opacity:.6">古籍溯源</div><div style="color:var(--gold);font-size:12px">'+(cs?cs.source:'未匹配')+'</div></div>';
+      h+='</div>';
+      h+='<div style="background:rgba(0,0,0,.15);padding:12px;border-radius:8px;font-size:13px;line-height:1.8;color:var(--paper);white-space:pre-wrap">'+d.analysis+'</div>';
+      if(d.disclaimer)h+='<div style="margin-top:8px;font-size:10px;color:rgba(255,255,255,.3)">'+d.disclaimer+'</div>';
+      h+='</div>';
+      document.getElementById('an-result').innerHTML=h;
+      document.getElementById('an-result').style.display='block';
+      btn.disabled=false;btn.textContent='🔍 重新分析';
+    })
+    .catch(function(e){
+      document.getElementById('an-result').innerHTML='<div style="padding:16px;color:#f87171">分析失败：'+e.message+'</div>';
+      btn.disabled=false;btn.textContent='🔍 分析名字';
+    });
+}
+</script>
+
 <div class="footer">
   <a href="divination-hub.html">← 返回首页</a> ·
   <a href="monitor-portal.html">监控运维 →</a>
