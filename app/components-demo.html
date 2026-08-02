@@ -421,6 +421,14 @@ ml.tap.press(t);  // 程序触发点击</code></pre>
   .nav-bar a{padding:4px 6px;font-size:11px}
   .row{flex-direction:column;align-items:flex-start}
 }
+@media print {
+  body { background: #fff !important; }
+  .no-print, header, nav, footer, .navbar, .sidebar, .back-btn, .phb-back, button { display: none !important; }
+  main, .main-content, .container { width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 8px !important; }
+  a { text-decoration: none !important; color: #000 !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; box-shadow: none !important; }
+  .card, .panel { border: 1px solid #ddd !important; page-break-inside: avoid; }
+}
 </style>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
 </body>
