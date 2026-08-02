@@ -6,6 +6,12 @@
 module.exports = {
   testEnvironment: 'node',
   testMatch: ['**/tests/**/*.test.js'],
+  testPathIgnorePatterns: [
+    'node_modules',
+    // node:test runner files (not Jest-compatible)
+    'tests/unit/r89-peripheral.test.js',
+    'tests/unit/r89-paipan-input.test.js',
+  ],
   collectCoverage: true,
   collectCoverageFrom: [
     'server/**/*.js',
