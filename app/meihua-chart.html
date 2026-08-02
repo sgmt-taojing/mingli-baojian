@@ -74,10 +74,15 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
   <div id="mh-meta" class="mh-meta">请输入信息排盘</div>
 </div>
 <div class="mh-form">
+  <input aria-label="姓名" type="text" id="mh-name" placeholder="姓名(可选)" maxlength="20">
+  <select id="mh-sex" aria-label="性别"><option value="male">男</option><option value="female">女</option></select>
   <input aria-label="年" type="number" id="mh-year" placeholder="年" value="1990" min="1900" max="2100">
   <input aria-label="月" type="number" id="mh-month" placeholder="月" value="10" min="1" max="12">
   <input aria-label="日" type="number" id="mh-day" placeholder="日" value="28" min="1" max="31">
   <input aria-label="时" type="number" id="mh-hour" placeholder="时" value="7" min="0" max="23">
+  <input aria-label="数字1" type="number" id="mh-num1" placeholder="数字1(可选)" min="0" max="99">
+  <input aria-label="数字2" type="number" id="mh-num2" placeholder="数字2(可选)" min="0" max="99">
+  <input aria-label="数字3" type="number" id="mh-num3" placeholder="数字3(可选)" min="0" max="99">
   <button onclick="doPaipan()">排盘</button>
 </div>
 <div id="mh-content" style="display:none"></div>
@@ -88,7 +93,17 @@ async function doPaipan(){
   const m=document.getElementById('mh-month').value;
   const d=document.getElementById('mh-day').value;
   const h=document.getElementById('mh-hour').value;
-  const r=await fetch(API_BASE+'/api/paipan/meihua',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({year:+y,month:+m,day:+d,hour:+h})});
+  if(!y||!m||!d||h===''){showToast('请填写完整的年月日时');return;}
+  const name = document.getElementById('mh-name').value || '';
+  const sex = document.getElementById('mh-sex').value;
+  const num1 = document.getElementById('mh-num1').value;
+  const num2 = document.getElementById('mh-num2').value;
+  const num3 = document.getElementById('mh-num3').value;
+  const body = {year:+y,month:+m,day:+d,hour:+h,name,sex};
+  if(num1) body.num1 = +num1;
+  if(num2) body.num2 = +num2;
+  if(num3) body.num3 = +num3;
+  const r=await fetch(API_BASE+'/api/paipan/meihua',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
   const data=await r.json();
   if(!data.ok){showToast('排盘失败: '+data.error);return;}
   renderChart(data.chart); if(data.interpretation) renderInterpretation(data.interpretation);
@@ -152,7 +167,8 @@ function renderInterpretation(i){
   el.style.display='block';
 }
 </script>
-  <script src="js/mobile-nav.js"></script>
+  <script src="js/paipan-toast.js"></script>
+<script src="js/mobile-nav.js"></script>
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
 </body>

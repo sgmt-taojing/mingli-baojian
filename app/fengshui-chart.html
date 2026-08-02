@@ -74,19 +74,23 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
   <div id="fs-meta" class="fs-meta">请输入信息排盘</div>
 </div>
 <div class="fs-form">
-  <input aria-label="年" type="number" id="fs-year" placeholder="年份" value="2026" min="1900" max="2100">
-  <input aria-label="fs sitting" type="text" id="fs-sitting" placeholder="坐山(如子)" value="子">
-  <input aria-label="fs facing" type="text" id="fs-facing" placeholder="朝向(如午)" value="午">
+  <input aria-label="年份" type="number" id="fs-year" placeholder="年份" value="2026" min="1900" max="2100">
+  <select id="fs-sitting" aria-label="坐山"><option value="子">子(北)</option><option value="丑">丑(东北偏北)</option><option value="寅">寅(东北偏东)</option><option value="卯">卯(东)</option><option value="巳">巳(东南偏南)</option><option value="午">午(南)</option><option value="未">未(西南偏南)</option><option value="申">申(西南偏西)</option><option value="酉">酉(西)</option><option value="戌">戌(西北偏西)</option><option value="亥">亥(西北偏北)</option></select>
+  <select id="fs-facing" aria-label="朝向"><option value="午">午(南)</option><option value="未">未(西南偏南)</option><option value="申">申(西南偏西)</option><option value="酉">酉(西)</option><option value="戌">戌(西北偏西)</option><option value="亥">亥(西北偏北)</option><option value="子">子(北)</option><option value="丑">丑(东北偏北)</option><option value="寅">寅(东北偏东)</option><option value="卯">卯(东)</option><option value="巳">巳(东南偏南)</option></select>
   <button onclick="doPaipan()">排盘</button>
 </div>
 <div id="fs-grid" class="fs-grid" style="display:none"></div>
 <div id="fs-info" class="fs-info" style="display:none"></div>
 <script>
 const API_BASE=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+if(typeof showToast!=='function'){window.showToast=function(msg){var t=document.createElement('div');t.style.cssText='position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);color:#fff;padding:8px 20px;border-radius:6px;z-index:99999;font-size:13px';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove()},2500);};}
 async function doPaipan(){
   const y=document.getElementById('fs-year').value;
   const s=document.getElementById('fs-sitting').value;
   const f=document.getElementById('fs-facing').value;
+  if(!y){showToast('请填写年份');return;}
+  if(!s){showToast('请选择坐山');return;}
+  if(!f){showToast('请选择朝向');return;}
   const r=await fetch(API_BASE+'/api/paipan/fengshui',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({year:+y,sittingMountain:s,facingMountain:f})});
   const data=await r.json();
   if(!data.ok){showToast('排盘失败: '+data.error);return;}

@@ -162,12 +162,20 @@
     <button onclick="switchZwCal('lunar')">农历</button>
   </div>
   <div class="zw-form-grid">
+    <input type="text" id="zw-name" placeholder="姓名(可选)" maxlength="20" style="padding:8px;background:rgba(0,0,0,.3);border:1px solid rgba(201,168,76,.2);border-radius:4px;color:#e0d9c0;font-size:13px" aria-label="姓名(可选)">
+    <select id="zw-sex" style="padding:8px;background:rgba(0,0,0,.3);border:1px solid rgba(201,168,76,.2);border-radius:4px;color:#e0d9c0;font-size:13px" aria-label="性别">
+      <option value="male">男</option>
+      <option value="female">女</option>
+    </select>
     <select id="zw-year" aria-label="出生年" aria-label="年"><option value="">年</option></select>
     <select id="zw-month" aria-label="出生月" aria-label="月"><option value="">月</option></select>
     <select id="zw-day" aria-label="出生日" aria-label="日"><option value="">日</option></select>
     <select id="zw-hour" aria-label="出生时辰" aria-label="时"><option value="">时辰</option></select>
   </div>
-  <button class="btn btn-primary" onclick="runZiweiPaipan()">星 紫微排盘</button>
+  <div class="zw-form-grid" style="margin-top:8px">
+    <button class="zw-cal-switch" id="zw-lunar-toggle" onclick="switchZwLunar()" style="padding:8px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:4px;color:var(--zw-gold);font-size:12px;cursor:pointer">📅 切换农历</button>
+    <button class="btn btn-primary" onclick="runZiweiPaipan()">星 紫微排盘</button>
+  </div>
   <button class="btn btn-ghost" onclick="window.location.href='bazi.html'" style="margin-left:6px">卷 对照八字</button>
 </div>
 
@@ -203,18 +211,25 @@ function switchZwCal(mode){
     b.classList.toggle('active', b.textContent === (mode==='solar'?'阳历':'农历'));
   });
 }
+function switchZwLunar(){
+  zwCalMode = zwCalMode === 'solar' ? 'lunar' : 'solar';
+  var btn = document.getElementById('zw-lunar-toggle');
+  if(btn) btn.textContent = zwCalMode === 'lunar' ? '☀️ 切换阳历' : '📅 切换农历';
+}
 
 function runZiweiPaipan(){
   var year = parseInt(document.getElementById('zw-year').value);
   var month = parseInt(document.getElementById('zw-month').value);
   var day = parseInt(document.getElementById('zw-day').value);
   var hour = parseInt(document.getElementById('zw-hour').value);
+  var sex = document.getElementById('zw-sex').value;
   if(!year || !month || !day){ showToast('请填写完整的出生年月日'); return; }
   if(!hour && hour !== 0){ hour = 12; }
 
-  var result = ZiweiEngine.paipan(year, month, day, hour, zwCalMode === 'lunar');
+  var result = ZiweiEngine.paipan(year, month, day, hour, zwCalMode === 'lunar', sex);
+  var name = document.getElementById('zw-name').value || '';
   var container = document.getElementById('ziwei-result');
-  ZiweiEngine.renderChart(container, result);
+  ZiweiEngine.renderChart(container, result, name, sex);
 
   // 交叉比对提示
   var compareEl = document.getElementById('zw-compare-result');
@@ -226,7 +241,7 @@ function runZiweiPaipan(){
     html += '<div style="color:var(--zw-gold);font-weight:600;margin-bottom:4px">紫微命宫主星：' + mingStarName + '</div>';
     html += '<div style="font-size:11px;color:var(--zw-paper3)">五行局：' + result.wuxingJu + ' · 年干支：' + result.yearGanZhi + '</div>';
     html += '</div>';
-    html += '<div style="font-size:11px;line-height:1.8">示 建议同时排八字命盘，比对日主五行与紫微主星的脏腑对应关系。例如：紫微七杀入命 → 金气偏旺 → 肺/大肠需注意；天同太阴入命 → 水气偏旺 → 肾/膀胱需注意。</div>';
+    html += '<div style="font-size:11px;line-height:1.8">建议同时排八字命盘，比对日主五行与紫微主星的脏腑对应关系。例如：紫微七杀入命 → 金气偏旺 → 肺/大肠需注意；天同太阴入命 → 水气偏旺 → 肾/膀胱需注意。</div>';
     html += '<div style="margin-top:8px"><a href="bazi.html" style="color:var(--zw-gold);font-size:12px">→ 去排八字命盘做比对</a></div>';
     compareEl.innerHTML = html;
   }

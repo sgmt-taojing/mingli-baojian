@@ -109,10 +109,13 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
 </div>
 
 <div class="qm-form">
-  <input aria-label="搜索" type="number" id="qm-year" placeholder="年" min="1900" max="2100" value="2026">
-  <input aria-label="搜索" type="number" id="qm-month" placeholder="月" min="1" max="12" value="7">
-  <input aria-label="搜索" type="number" id="qm-day" placeholder="日" min="1" max="31" value="28">
-  <input aria-label="搜索" type="number" id="qm-hour" placeholder="时(0-23)" min="0" max="23" value="14">
+  <input aria-label="姓名" type="text" id="qm-name" placeholder="姓名(可选)" maxlength="20">
+  <select id="qm-sex" aria-label="性别"><option value="male">男</option><option value="female">女</option></select>
+  <input aria-label="年" type="number" id="qm-year" placeholder="年" min="1900" max="2100" value="2026">
+  <input aria-label="月" type="number" id="qm-month" placeholder="月" min="1" max="12" value="8">
+  <input aria-label="日" type="number" id="qm-day" placeholder="日" min="1" max="31" value="2">
+  <input aria-label="时" type="number" id="qm-hour" placeholder="时(0-23)" min="0" max="23" value="10">
+  <input aria-label="占事" type="text" id="qm-question" placeholder="所问何事(可选)" maxlength="50">
   <button onclick="doPaipan()">排盘</button>
 </div>
 
@@ -126,7 +129,13 @@ async function doPaipan(){
   const m=document.getElementById('qm-month').value;
   const d=document.getElementById('qm-day').value;
   const h=document.getElementById('qm-hour').value;
-  const r=await fetch(API_BASE+'/api/paipan/qimen',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({year:+y,month:+m,day:+d,hour:+h})});
+  if(!y||!m||!d||h===''){showToast('请填写完整的年月日时');return;}
+  const name = document.getElementById('qm-name').value || '';
+  const sex = document.getElementById('qm-sex').value;
+  const question = document.getElementById('qm-question').value || '';
+  const body = {year:+y,month:+m,day:+d,hour:+h,name,sex};
+  if(question) body.question = question;
+  const r=await fetch(API_BASE+'/api/paipan/qimen',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
   const data=await r.json();
   if(!data.ok){showToast('排盘失败: '+data.error);return;}
   renderChart(data.chart); if(data.interpretation) renderInterpretation(data.interpretation);
@@ -215,7 +224,8 @@ function renderInterpretation(i){
   el.style.display='block';
 }
 </script>
-  <script src="js/mobile-nav.js"></script>
+  <script src="js/paipan-toast.js"></script>
+<script src="js/mobile-nav.js"></script>
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
 </body>

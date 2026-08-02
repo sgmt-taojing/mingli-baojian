@@ -547,10 +547,10 @@
 
       <!-- 房屋信息表单 -->
       <div class="form-section" style="margin-top:24px">
-        <h4 style="font-size:13px;letter-spacing:3px;color:var(--gold);margin-bottom:16px">表 房屋基本信息</h4>
+        <h4 style="font-size:13px;letter-spacing:3px;color:var(--gold);margin-bottom:16px">表 房屋基本信息 <span style="color:#f44336;font-size:11px">* 必填</span></h4>
         <div class="input-row">
-          <select class="input-field" id="fsHuxing" aria-label="选择">
-            <option value="">选择户型</option>
+          <select class="input-field" id="fsHuxing" aria-label="选择" required>
+            <option value="">选择户型 *</option>
             <option value="1室1厅">一室一厅</option>
             <option value="2室1厅">两室一厅</option>
             <option value="2室2厅">两室两厅</option>
@@ -559,22 +559,38 @@
             <option value="4室2厅">四室两厅</option>
             <option value="别墅">别墅</option>
           </select>
-          <select class="input-field" id="fsChaoxiang" aria-label="选择">
-            <option value="">选择朝向</option>
-            <option value="南">南</option>
-            <option value="北">北</option>
-            <option value="东">东</option>
-            <option value="西">西</option>
-            <option value="东南">东南</option>
-            <option value="西南">西南</option>
-            <option value="东北">东北</option>
-            <option value="西北">西北</option>
+          <select class="input-field" id="fsChaoxiang" aria-label="选择" required>
+            <option value="">选择朝向 (24山) *</option>
+            <option value="子">子(正北)</option>
+            <option value="癸">癸(北偏东)</option>
+            <option value="丑">丑(东北偏北)</option>
+            <option value="艮">艮(东北)</option>
+            <option value="寅">寅(东北偏东)</option>
+            <option value="甲">甲(东偏北)</option>
+            <option value="卯">卯(正东)</option>
+            <option value="乙">乙(东偏南)</option>
+            <option value="辰">辰(东南偏东)</option>
+            <option value="巽">巽(东南)</option>
+            <option value="巳">巳(东南偏南)</option>
+            <option value="丙">丙(南偏东)</option>
+            <option value="午">午(正南)</option>
+            <option value="丁">丁(南偏西)</option>
+            <option value="未">未(西南偏南)</option>
+            <option value="坤">坤(西南)</option>
+            <option value="申">申(西南偏西)</option>
+            <option value="庚">庚(西偏南)</option>
+            <option value="酉">酉(正西)</option>
+            <option value="辛">辛(西偏北)</option>
+            <option value="戌">戌(西北偏西)</option>
+            <option value="乾">乾(西北)</option>
+            <option value="亥">亥(西北偏北)</option>
+            <option value="壬">壬(北偏西)</option>
           </select>
-          <input aria-label="fsLouceng" type="number" class="input-field" id="fsLouceng" placeholder="楼层(如6)" min="1" max="99">
+          <input aria-label="fsLouceng" type="number" class="input-field" id="fsLouceng" placeholder="楼层 * (如6)" min="1" max="99" required>
         </div>
         <div class="input-row">
           <input aria-label="fsArea" type="number" class="input-field" id="fsArea" placeholder="面积(m2，如120)" min="10" max="9999">
-          <input aria-label="fsBuildYear" type="number" class="input-field" id="fsBuildYear" placeholder="建造年份(如2020)" min="1900" max="2030">
+          <input aria-label="fsBuildYear" type="number" class="input-field" id="fsBuildYear" placeholder="建造年份 * (如2020)" min="1900" max="2030" required>
           <select class="input-field" id="fsJianzhu" aria-label="选择">
             <option value="">建筑类型</option>
             <option value="高层">高层(>18层)</option>
@@ -583,18 +599,52 @@
             <option value="别墅">别墅/自建房</option>
           </select>
         </div>
+        <div class="input-row">
+          <select class="input-field" id="fsZuoxiang" aria-label="选择" required>
+            <option value="">坐山 (24山) *</option>
+            <option value="子">子(正北)</option>
+            <option value="癸">癸(北偏东)</option>
+            <option value="丑">丑(东北偏北)</option>
+            <option value="艮">艮(东北)</option>
+            <option value="寅">寅(东北偏东)</option>
+            <option value="甲">甲(东偏北)</option>
+            <option value="卯">卯(正东)</option>
+            <option value="乙">乙(东偏南)</option>
+            <option value="辰">辰(东南偏东)</option>
+            <option value="巽">巽(东南)</option>
+            <option value="巳">巳(东南偏南)</option>
+            <option value="丙">丙(南偏东)</option>
+            <option value="午">午(正南)</option>
+            <option value="丁">丁(南偏西)</option>
+            <option value="未">未(西南偏南)</option>
+            <option value="坤">坤(西南)</option>
+            <option value="申">申(西南偏西)</option>
+            <option value="庚">庚(西偏南)</option>
+            <option value="酉">酉(正西)</option>
+            <option value="辛">辛(西偏北)</option>
+            <option value="戌">戌(西北偏西)</option>
+            <option value="乾">乾(西北)</option>
+            <option value="亥">亥(西北偏北)</option>
+            <option value="壬">壬(北偏西)</option>
+          </select>
+          <input aria-label="fsFlowYear" type="number" class="input-field" id="fsFlowYear" placeholder="流年 (如2026)" min="1900" max="2030" value="2026">
+        </div>
       </div>
 
       <!-- 户主信息表单 -->
       <div class="form-section" style="margin-top:24px">
-        <h4 style="font-size:13px;letter-spacing:3px;color:var(--gold);margin-bottom:16px">人 户主/命主信息</h4>
+        <h4 style="font-size:13px;letter-spacing:3px;color:var(--gold);margin-bottom:16px">人 户主/命主信息 <span style="color:#f44336;font-size:11px">* 必填</span></h4>
         <div class="input-row">
-          <input aria-label="fsYear" type="number" class="input-field" id="fsYear" placeholder="出生年份(如1990)" min="1900" max="2030">
-          <select class="input-field" id="fsSex" aria-label="选择">
-            <option value="">选择性别</option>
+          <input aria-label="fsName" type="text" class="input-field" id="fsName" placeholder="姓名(可选)" maxlength="20">
+          <input aria-label="fsYear" type="number" class="input-field" id="fsYear" placeholder="出生年份(如1990) *" min="1900" max="2030" required>
+          <select class="input-field" id="fsSex" aria-label="选择" required>
+            <option value="">选择性别 *</option>
             <option value="male">男</option>
             <option value="female">女</option>
           </select>
+        </div>
+        <div class="input-row">
+          <input aria-label="fsBirthHour" type="number" class="input-field" id="fsBirthHour" placeholder="出生时辰 0-23" min="0" max="23">
           <input aria-label="fsPhone" type="text" class="input-field" id="fsPhone" placeholder="手机号(可选，接收报告)">
         </div>
       </div>

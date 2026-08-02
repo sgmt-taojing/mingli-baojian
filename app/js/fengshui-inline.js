@@ -749,6 +749,19 @@ function clearFengshuiImage(){
 /* 风水 Pro 综合分析 */
 function computeFengshuiPro(){
   var btn = event && event.target;
+  // R350-P2: 必填校验（户型/朝向/楼层/建造年份/出生年份/性别）
+  var huxing = (document.getElementById('fsHuxing')||{}).value;
+  var chaoxiang = (document.getElementById('fsChaoxiang')||{}).value;
+  var louceng = (document.getElementById('fsLouceng')||{}).value;
+  var buildYear = (document.getElementById('fsBuildYear')||{}).value;
+  var year = (document.getElementById('fsYear')||{}).value;
+  var sex = (document.getElementById('fsSex')||{}).value;
+  if(!huxing){ showToast('请选择户型'); return; }
+  if(!chaoxiang){ showToast('请选择朝向'); return; }
+  if(!louceng){ showToast('请填写楼层'); return; }
+  if(!buildYear){ showToast('请填写建造年份'); return; }
+  if(!year){ showToast('请填写宅主出生年份'); return; }
+  if(!sex){ showToast('请选择宅主性别'); return; }
   if(btn){btn.disabled=true; btn.textContent='⏳ Pro分析中...';}
   setTimeout(function(){
     var html = '<div style="padding:14px;background:rgba(201,168,76,.04);border-radius:10px;line-height:1.9">';

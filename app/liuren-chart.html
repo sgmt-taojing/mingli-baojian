@@ -76,10 +76,13 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
   <div id="lr-meta" class="lr-meta">请输入信息排盘</div>
 </div>
 <div class="lr-form">
+  <input aria-label="姓名" type="text" id="lr-name" placeholder="姓名(可选)" maxlength="20">
+  <select id="lr-sex" aria-label="性别"><option value="male">男</option><option value="female">女</option></select>
   <input aria-label="年" type="number" id="lr-year" placeholder="年" value="2026" min="1900" max="2100">
   <input aria-label="月" type="number" id="lr-month" placeholder="月" value="7" min="1" max="12">
   <input aria-label="日" type="number" id="lr-day" placeholder="日" value="28" min="1" max="31">
   <input aria-label="时" type="number" id="lr-hour" placeholder="时" value="14" min="0" max="23">
+  <input aria-label="占事" type="text" id="lr-question" placeholder="所问何事(可选)" maxlength="50">
   <button onclick="doPaipan()">排盘</button>
 </div>
 <div id="lr-content" style="display:none"></div>
@@ -90,7 +93,13 @@ async function doPaipan(){
   const m=document.getElementById('lr-month').value;
   const d=document.getElementById('lr-day').value;
   const h=document.getElementById('lr-hour').value;
-  const r=await fetch(API_BASE+'/api/paipan/liuren',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({year:+y,month:+m,day:+d,hour:+h})});
+  if(!y||!m||!d||h===''){showToast('请填写完整的年月日时');return;}
+  const name = document.getElementById('lr-name').value || '';
+  const sex = document.getElementById('lr-sex').value;
+  const question = document.getElementById('lr-question').value || '';
+  const body = {year:+y,month:+m,day:+d,hour:+h,name,sex};
+  if(question) body.question = question;
+  const r=await fetch(API_BASE+'/api/paipan/liuren',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
   const data=await r.json();
   if(!data.ok){showToast('排盘失败: '+data.error);return;}
   renderChart(data.chart); if(data.interpretation) renderInterpretation(data.interpretation);
@@ -147,7 +156,8 @@ function renderInterpretation(i){
   el.style.display='block';
 }
 </script>
-  <script src="js/mobile-nav.js"></script>
+  <script src="js/paipan-toast.js"></script>
+<script src="js/mobile-nav.js"></script>
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
 </body>

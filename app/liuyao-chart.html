@@ -88,11 +88,14 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
 </div>
 
 <div class="ly-form">
+  <input aria-label="姓名" type="text" id="ly-name" placeholder="姓名(可选)" maxlength="20">
+  <select id="ly-sex" aria-label="性别"><option value="male">男</option><option value="female">女</option></select>
   <input aria-label="年" type="number" id="ly-year" placeholder="年" value="1990" min="1900" max="2100">
   <input aria-label="月" type="number" id="ly-month" placeholder="月" value="10" min="1" max="12">
   <input aria-label="日" type="number" id="ly-day" placeholder="日" value="28" min="1" max="31">
   <input aria-label="时" type="number" id="ly-hour" placeholder="时" value="7" min="0" max="23">
   <input aria-label="日" type="text" id="ly-daygz" placeholder="日干支(可选)" value="">
+  <input aria-label="占事" type="text" id="ly-question" placeholder="所问何事(可选)" maxlength="50">
   <button onclick="doPaipan()">排盘</button>
 </div>
 
@@ -106,9 +109,14 @@ async function doPaipan(){
   const m=document.getElementById('ly-month').value;
   const d=document.getElementById('ly-day').value;
   const h=document.getElementById('ly-hour').value;
+  if(!y||!m||!d||h===''){showToast('请填写完整的年月日时');return;}
   const dg=document.getElementById('ly-daygz').value || undefined;
-  const body={year:+y,month:+m,day:+d,hour:+h};
+  const name = document.getElementById('ly-name').value || '';
+  const sex = document.getElementById('ly-sex').value;
+  const question = document.getElementById('ly-question').value || '';
+  const body={year:+y,month:+m,day:+d,hour:+h,name,sex};
   if(dg) body.dayGanZhi=dg;
+  if(question) body.question=question;
   const r=await fetch(API_BASE+'/api/paipan/liuyao',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
   const data=await r.json();
   if(!data.ok){showToast('排盘失败: '+data.error);return;}
@@ -185,7 +193,8 @@ function renderInterpretation(i){
   el.style.display='block';
 }
 </script>
-  <script src="js/mobile-nav.js"></script>
+  <script src="js/paipan-toast.js"></script>
+<script src="js/mobile-nav.js"></script>
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
 </body>

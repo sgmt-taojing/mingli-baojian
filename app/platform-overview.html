@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>易道智鉴 · 平台完整功能诊断报告 2026-08-02</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --gold: #c8a84b;
+    --gold-light: #e8c97a;
+    --bg: #0a0e17;
+    --card: #111827;
+    --card2: #1a2235;
+    --text: #e8e8e8;
+    --text2: #9aa0b0;
+    --accent: #4a9eff;
+    --green: #4ade80;
+    --purple: #a78bfa;
+    --orange: #fb923c;
+    --red: #f87171;
+  }
+  body { font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+  .container { max-width: 960px; margin: 0 auto; padding: 40px 20px; }
+
+  .hero { text-align: center; padding: 60px 20px; background: linear-gradient(135deg, #0f1629 0%, #1a2744 100%); border-radius: 20px; margin-bottom: 40px; border: 1px solid rgba(200,168,75,0.2); }
+  .hero-badge { display: inline-block; background: linear-gradient(135deg, #c8a84b, #e8c97a); color: #0a0e17; padding: 6px 20px; border-radius: 30px; font-size: 13px; font-weight: 700; letter-spacing: 2px; margin-bottom: 20px; }
+  .hero h1 { font-size: 48px; font-weight: 800; background: linear-gradient(90deg, #c8a84b, #e8c97a, #c8a84b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 12px; }
+  .hero p { font-size: 18px; color: var(--text2); max-width: 600px; margin: 0 auto 30px; }
+  .hero-meta { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+  .hero-stat { text-align: center; }
+  .hero-stat .num { font-size: 28px; font-weight: 800; color: var(--gold); }
+  .hero-stat .label { font-size: 12px; color: var(--text2); margin-top: 4px; }
+
+  .section { margin-bottom: 50px; }
+  .section-title { font-size: 22px; font-weight: 700; color: var(--gold); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(200,168,75,0.2); display: flex; align-items: center; gap: 10px; }
+  .section-title .icon { font-size: 24px; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
+  .stat-card { background: var(--card); border-radius: 12px; padding: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.06); }
+  .stat-card .val { font-size: 32px; font-weight: 800; background: linear-gradient(90deg, #c8a84b, #e8c97a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .stat-card .lbl { font-size: 13px; color: var(--text2); margin-top: 4px; }
+  .stat-card.highlight { background: linear-gradient(135deg, #1a2235, #1e2d45); border-color: rgba(200,168,75,0.3); }
+
+  .module-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .module-card { background: var(--card); border-radius: 14px; padding: 22px; border: 1px solid rgba(255,255,255,0.06); transition: transform 0.2s, border-color 0.2s; }
+  .module-card:hover { transform: translateY(-2px); border-color: rgba(200,168,75,0.4); }
+  .module-card .tag { display: inline-block; font-size: 10px; padding: 2px 10px; border-radius: 20px; font-weight: 600; letter-spacing: 1px; margin-bottom: 10px; }
+  .tag-classic { background: rgba(200,168,75,0.15); color: var(--gold); }
+  .tag-tech { background: rgba(74,158,255,0.15); color: var(--accent); }
+  .tag-folk { background: rgba(74,222,128,0.15); color: var(--green); }
+  .module-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+  .module-card p { font-size: 13px; color: var(--text2); margin-bottom: 12px; }
+  .module-card .features { display: flex; flex-wrap: wrap; gap: 6px; }
+  .module-card .feat { font-size: 11px; background: rgba(255,255,255,0.05); padding: 3px 10px; border-radius: 20px; color: var(--text2); }
+  .module-card .status { display: flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 12px; color: var(--green); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+
+  .feature-list { background: var(--card); border-radius: 14px; padding: 28px; border: 1px solid rgba(255,255,255,0.06); }
+  .feature-item { display: flex; gap: 16px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .feature-item:last-child { border-bottom: none; }
+  .feature-item .fi-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(200,168,75,0.1); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .feature-item .fi-icon.blue { background: rgba(74,158,255,0.1); }
+  .feature-item .fi-icon.green { background: rgba(74,222,128,0.1); }
+  .feature-item .fi-icon.purple { background: rgba(167,139,250,0.1); }
+  .feature-item .fi-icon.orange { background: rgba(251,146,60,0.1); }
+  .feature-item h4 { font-size: 15px; font-weight: 600; margin-bottom: 3px; }
+  .feature-item .fi-body { font-size: 13px; color: var(--text2); }
+
+  .capability-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .cap-card { background: var(--card); border-radius: 12px; padding: 20px; border: 1px solid rgba(255,255,255,0.06); }
+  .cap-card .cap-icon { font-size: 28px; margin-bottom: 10px; }
+  .cap-card h4 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .cap-card p { font-size: 13px; color: var(--text2); }
+  .cap-card .metrics { margin-top: 10px; display: flex; gap: 16px; }
+  .cap-card .metric { text-align: center; }
+  .cap-card .metric .mval { font-size: 18px; font-weight: 700; color: var(--gold); }
+  .cap-card .metric .mlbl { font-size: 11px; color: var(--text2); }
+
+  .kb-table { background: var(--card); border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.06); }
+  .kb-table table { width: 100%; border-collapse: collapse; }
+  .kb-table th { background: rgba(200,168,75,0.08); padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: var(--gold); letter-spacing: 1px; }
+  .kb-table td { padding: 10px 16px; font-size: 13px; border-top: 1px solid rgba(255,255,255,0.04); }
+  .kb-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .kb-bar { height: 6px; background: rgba(200,168,75,0.15); border-radius: 3px; overflow: hidden; }
+  .kb-bar-fill { height: 100%; background: linear-gradient(90deg, #c8a84b, #e8c97a); border-radius: 3px; }
+  .grade { display: inline-block; padding: 1px 8px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+  .grade-s { background: rgba(74,222,128,0.15); color: var(--green); }
+  .grade-a { background: rgba(74,158,255,0.15); color: var(--accent); }
+
+  .arch-diagram { background: var(--card); border-radius: 14px; padding: 28px; border: 1px solid rgba(255,255,255,0.06); text-align: center; }
+  .arch-layer { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+  .arch-layer-label { font-size: 11px; color: var(--text2); letter-spacing: 1px; text-align: center; margin-bottom: 8px; text-transform: uppercase; }
+  .arch-box { background: rgba(200,168,75,0.1); border: 1px solid rgba(200,168,75,0.3); border-radius: 8px; padding: 8px 14px; font-size: 12px; font-weight: 600; color: var(--gold); }
+  .arch-box.blue { background: rgba(74,158,255,0.1); border-color: rgba(74,158,255,0.3); color: var(--accent); }
+  .arch-box.green { background: rgba(74,222,128,0.1); border-color: rgba(74,222,128,0.3); color: var(--green); }
+  .arch-box.purple { background: rgba(167,139,250,0.1); border-color: rgba(167,139,250,0.3); color: var(--purple); }
+  .arch-box.orange { background: rgba(251,146,60,0.1); border-color: rgba(251,146,60,0.3); color: var(--orange); }
+
+  .timeline { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+  .t-item { background: var(--card); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.06); }
+  .t-item .t-year { font-size: 11px; color: var(--gold); font-weight: 700; letter-spacing: 1px; margin-bottom: 6px; }
+  .t-item .t-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .t-item .t-desc { font-size: 12px; color: var(--text2); }
+
+  .cta-box { background: linear-gradient(135deg, #1a2235, #1e3050); border-radius: 16px; padding: 40px; text-align: center; border: 1px solid rgba(200,168,75,0.25); margin-top: 40px; }
+  .cta-box h2 { font-size: 28px; font-weight: 800; background: linear-gradient(90deg, #c8a84b, #e8c97a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 12px; }
+  .cta-box p { color: var(--text2); margin-bottom: 24px; font-size: 15px; }
+  .cta-url { display: inline-block; background: linear-gradient(135deg, #c8a84b, #e8c97a); color: #0a0e17; padding: 12px 32px; border-radius: 30px; font-weight: 700; font-size: 16px; text-decoration: none; }
+  .cta-url:hover { opacity: 0.9; }
+
+  .footer { text-align: center; padding: 30px; color: var(--text2); font-size: 12px; margin-top: 30px; }
+
+  .badge-row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+  .badge { display: inline-block; background: rgba(200,168,75,0.12); border: 1px solid rgba(200,168,75,0.25); color: var(--gold-light); padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+
+  .section-note { font-size: 12px; color: var(--text2); margin-top: 12px; padding: 12px 16px; background: rgba(255,255,255,0.02); border-radius: 8px; border-left: 3px solid rgba(200,168,75,0.3); }
+
+  .compliance { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-top: 16px; }
+  .comp-item { background: rgba(74,222,128,0.06); border: 1px solid rgba(74,222,128,0.2); border-radius: 10px; padding: 14px; }
+  .comp-item .ci-title { font-size: 13px; font-weight: 600; color: var(--green); margin-bottom: 4px; }
+  .comp-item .ci-desc { font-size: 12px; color: var(--text2); }
+
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 32px; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .module-grid { grid-template-columns: 1fr; }
+    .capability-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">传统智慧 × 现代科技</div>
+  <h1>易道智鉴</h1>
+  <p style="font-size:16px; color:var(--gold-light); font-weight:600; margin-bottom:6px;">以科技之力传承千年智慧，以慈悲之心服务寻常百姓</p>
+  <p>中华传统命理与中医文化一站式数字化平台 · 全模块古制化排盘引擎 · AI 辅助知识推理</p>
+  <div class="badge-row">
+    <span class="badge">✓ 合规声明完备</span>
+    <span class="badge">✓ 全模块古制</span>
+    <span class="badge">✓ AI 辅助决策参考</span>
+    <span class="badge">✓ 知识平权</span>
+  </div>
+  <div class="hero-meta" style="margin-top:30px;">
+    <div class="hero-stat"><div class="num">7</div><div class="label">古制排盘模块</div></div>
+    <div class="hero-stat"><div class="num">15</div><div class="label">可视化排盘页</div></div>
+    <div class="hero-stat"><div class="num">12,564</div><div class="label">知识库条目</div></div>
+    <div class="hero-stat"><div class="num">232</div><div class="label">API 端点</div></div>
+    <div class="hero-stat"><div class="num">1,058</div><div class="label">工程迭代</div></div>
+  </div>
+</div>
+
+<!-- 平台规模 -->
+<div class="section">
+  <div class="section-title"><span class="icon">📊</span>平台规模</div>
+  <div class="stats-grid">
+    <div class="stat-card highlight">
+      <div class="val">151</div>
+      <div class="lbl">功能页面</div>
+    </div>
+    <div class="stat-card">
+      <div class="val">232</div>
+      <div class="lbl">API 端点</div>
+    </div>
+    <div class="stat-card">
+      <div class="val">139</div>
+      <div class="lbl">JS 模块</div>
+    </div>
+    <div class="stat-card">
+      <div class="val">83</div>
+      <div class="lbl">CSS 样式表</div>
+    </div>
+    <div class="stat-card">
+      <div class="val">16</div>
+      <div class="lbl">专业引擎</div>
+    </div>
+    <div class="stat-card">
+      <div class="val">12,564</div>
+      <div class="lbl">知识库条目</div>
+    </div>
+    <div class="stat-card">
+      <div class="val">77</div>
+      <div class="lbl">知识模块</div>
+    </div>
+    <div class="stat-card highlight">
+      <div class="val">88.4%</div>
+      <div class="lbl">知识库平均置信度</div>
+    </div>
+    <div class="stat-card">
+      <div class="val">1,058</div>
+      <div class="lbl">工程 Commit</div>
+    </div>
+    <div class="stat-card">
+      <div class="val">46</div>
+      <div class="lbl">自动化测试</div>
+    </div>
+    <div class="stat-card">
+      <div class="val">106</div>
+      <div class="lbl">运维脚本</div>
+    </div>
+    <div class="stat-card">
+      <div class="val">441</div>
+      <div class="lbl">工程文档</div>
+    </div>
+  </div>
+</div>
+
+<!-- 7大排盘模块 -->
+<div class="section">
+  <div class="section-title"><span class="icon">🧭</span>7 大古制排盘模块</div>
+  <div class="module-grid">
+    <div class="module-card">
+      <span class="tag tag-classic">八字</span>
+      <h3>八字命盘 · 完整格局分析</h3>
+      <p>年柱·月柱·日柱·时柱四柱八字，配合大运流年，支持农历公历双模式。依据《渊海子平》《滴天髓》古法。</p>
+      <div class="features">
+        <span class="feat">四柱排盘</span><span class="feat">大运流年</span><span class="feat">格局分析</span><span class="feat">五行旺衰</span>
+      </div>
+      <div class="status"><span class="dot"></span>完整古制 · 7 服务在线</div>
+    </div>
+    <div class="module-card">
+      <span class="tag tag-classic">紫微斗数</span>
+      <h3>紫微星曜 · 119 颗星系统</h3>
+      <p>从传统 27 星扩展至 119 颗星曜，涵盖主星/辅星/杂耀/流耀完整体系。依据《紫微斗数全书》。</p>
+      <div class="features">
+        <span class="feat">119 颗星曜</span><span class="feat">12 宫位</span><span class="feat">三方四正</span><span class="feat">流年运势</span>
+      </div>
+      <div class="status"><span class="dot"></span>星曜完备 · 古制 v2.2</div>
+    </div>
+    <div class="module-card">
+      <span class="tag tag-classic">奇门遁甲</span>
+      <h3>奇门遁甲 · 阳遁阴遁体系</h3>
+      <p>阳遁 9 局·阴遁 9 局 18 局体系，天盘·地盘·人盘·神盘四层架构。依据《奇门遁甲秘笈》。</p>
+      <div class="features">
+        <span class="feat">18 局体系</span><span class="feat">四盘叠加</span><span class="feat">节气定局</span><span class="feat">吉凶宜忌</span>
+      </div>
+      <div class="status"><span class="dot"></span>完整古制 · v2.0</div>
+    </div>
+    <div class="module-card">
+      <span class="tag tag-classic">六爻纳甲</span>
+      <h3>六爻纳甲 · 六亲六神体系</h3>
+      <p>六爻起卦·世应体系·六亲配置·六神辅佐·动变关系。依据《增删卜易》《火珠林》。</p>
+      <div class="features">
+        <span class="feat">六爻起卦</span><span class="feat">六亲六神</span><span class="feat">动变分析</span><span class="feat">世应关系</span>
+      </div>
+      <div class="status"><span class="dot"></span>完整古制 · v1.0</div>
+    </div>
+    <div class="module-card">
+      <span class="tag tag-classic">大六壬</span>
+      <h3>大六壬 · 十二神将体系</h3>
+      <p>月将加时·地盘·天盘·贵人·十二神将·五行贼客。依据《大六壬指南》《六壬大全》。</p>
+      <div class="features">
+        <span class="feat">月将加时</span><span class="feat">十二神将</span><span class="feat">四课三传</span><span class="feat">贼客判断</span>
+      </div>
+      <div class="status"><span class="dot"></span>完整古制 · v1.0</div>
+    </div>
+    <div class="module-card">
+      <span class="tag tag-classic">梅花易数</span>
+      <h3>梅花易数 · 象数预测体系</h3>
+      <p>以数起卦·体用关系·外应判断·卦象解读。依据《梅花易数》邵雍原典。</p>
+      <div class="features">
+        <span class="feat">数术起卦</span><span class="feat">体用生克</span><span class="feat">外应判断</span><span class="feat">卦象解读</span>
+      </div>
+      <div class="status"><span class="dot"></span>完整古制 · v1.0</div>
+    </div>
+    <div class="module-card">
+      <span class="tag tag-classic">阳宅风水</span>
+      <h3>玄空风水 · 挨星立向体系</h3>
+      <p>立向定向·玄空飞星·九宫配置·理气分析。依据《沈氏玄空学》《地理五诀》。</p>
+      <div class="features">
+        <span class="feat">立向定向</span><span class="feat">玄空飞星</span><span class="feat">九宫配置</span><span class="feat">理气分析</span>
+      </div>
+      <div class="status"><span class="dot"></span>完整古制 · v1.0</div>
+    </div>
+  </div>
+</div>
+
+<!-- 民俗工具 -->
+<div class="section">
+  <div class="section-title"><span class="icon">📅</span>11 大民俗工具</div>
+  <div class="module-grid">
+    <div class="module-card">
+      <span class="tag tag-folk">民俗</span>
+      <h3>老黄历 · 每日宜忌</h3>
+      <p>依据《协纪辨方书》每日吉凶宜忌，冲煞吉方，完整日历。实时公历农历对照。</p>
+      <div class="features"><span class="feat">宜忌</span><span class="feat">冲煞</span><span class="feat">吉方</span></div>
+    </div>
+    <div class="module-card">
+      <span class="tag tag-folk">民俗</span>
+      <h3>嫁娶择吉 · 婚嫁良辰</h3>
+      <p>根据双方生辰·属相合冲·吉神方位·嫁娶周堂图，选择婚嫁吉日吉时。</p>
+      <div class="features"><span class="feat">生辰合婚</span><span class="feat">周堂图</span><span class="feat">吉时</span></div>
+    </div>
+    <div class="module-card">
+      <span class="tag tag-folk">民俗</span>
+      <h3>太岁详解 · 年神方位</h3>
+      <p>每年太岁方位·冲忌·化解方法，依据传统太岁神煞体系。</p>
+      <div class="features"><span class="feat">太岁方位</span><span class="feat">冲忌</span><span class="feat">化解</span></div>
+    </div>
+    <div class="module-card">
+      <span class="tag tag-folk">民俗</span>
+      <h3>24 节气 · 气候养生</h3>
+      <p>24 节气精确时间·气候特征·传统习俗·中医养生建议。</p>
+      <div class="features"><span class="feat">节气时间</span><span class="feat">气候</span><span class="feat">养生</span></div>
+    </div>
+    <div class="module-card">
+      <span class="tag tag-folk">民俗</span>
+      <h3>手机号码吉凶 · 81 数理</h3>
+      <p>号码尾数五行·81 数理吉凶·组段分析·连号检测。依据《河洛理数》。</p>
+      <div class="features"><span class="feat">81数理</span><span class="feat">五行</span><span class="feat">组段</span></div>
+    </div>
+    <div class="module-card">
+      <span class="tag tag-folk">民俗</span>
+      <h3>姓名学 · 三才五格</h3>
+      <p>天格·地格·人格·外格·总格五格评分，三才配置吉凶，81 数理。依据《姓名学精要》。</p>
+      <div class="features"><span class="feat">三才五格</span><span class="feat">五行</span><span class="feat">81数理</span></div>
+    </div>
+    <div class="module-card">
+      <span class="tag tag-folk">民俗</span>
+      <h3>流年运程 · 生肖关系</h3>
+      <p>年干支·生肖冲刑害破·五行年运·12 流月评分，完整年度预测参考。</p>
+      <div class="features"><span class="feat">生肖</span><span class="feat">流月</span><span class="feat">五行</span></div>
+    </div>
+    <div class="module-card">
+      <span class="tag tag-folk">民俗</span>
+      <h3>幸运数色 · 五行推算</h3>
+      <p>出生年天干对应五行→幸运数字/颜色/方位/季节，依据《五行大义》。</p>
+      <div class="features"><span class="feat">天干五行</span><span class="feat">数字</span><span class="feat">颜色</span></div>
+    </div>
+    <div class="module-card">
+      <span class="tag tag-folk">民俗</span>
+      <h3>家庭合婚 · 六盒三刑</h3>
+      <p>生肖六盒·六冲·三合·三刑，五行生克·纳音吕才法。依据《三命通会·合婚》。</p>
+      <div class="features"><span class="feat">六盒三刑</span><span class="feat">纳音</span><span class="feat">吕才</span></div>
+    </div>
+    <div class="module-card">
+      <span class="tag tag-folk">民俗</span>
+      <h3>家庭排盘 · 成员五行</h3>
+      <p>多成员五行分布·缺五行分析·成员间生肖关系·家庭和谐评分。</p>
+      <div class="features"><span class="feat">多成员</span><span class="feat">五行</span><span class="feat">和谐</span></div>
+    </div>
+    <div class="module-card">
+      <span class="tag tag-folk">民俗</span>
+      <h3>儒道释节日 · 55 节日库</h3>
+      <p>法定假日 18 个·农历节日 16 个·道教 9 个·佛教 10 个·儒家 2 个，全年节日标注。</p>
+      <div class="features"><span class="feat">55节日</span><span class="feat">佛道儒</span><span class="feat">农历</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- AI 能力 -->
+<div class="section">
+  <div class="section-title"><span class="icon">🤖</span>AI 智能辅助（参考级）</div>
+  <div class="capability-row">
+    <div class="cap-card">
+      <div class="cap-icon">🧠</div>
+      <h4>知识库检索增强</h4>
+      <p>KB-First 三级分级（≥0.7 直答 / 0.4-0.7 KB+AI 润色 / &lt;0.4 AI+KB 兜底），命中率 95%+，P95 延迟 &lt;1.5s。</p>
+      <div class="metrics">
+        <div class="metric"><div class="mval">95%</div><div class="mlbl">命中率</div></div>
+        <div class="metric"><div class="mval">&lt;1.5s</div><div class="mlbl">P95</div></div>
+        <div class="metric"><div class="mval">12,564</div><div class="mlbl">KB 条目</div></div>
+      </div>
+    </div>
+    <div class="cap-card">
+      <div class="cap-icon">📝</div>
+      <h4>智能报告生成</h4>
+      <p>统一报告引擎整合排盘结果·知识摘要·AI 润色，输出结构化报告，支持 24 种场景。</p>
+      <div class="metrics">
+        <div class="metric"><div class="mval">24</div><div class="mlbl">报告场景</div></div>
+        <div class="metric"><div class="mval">3s</div><div class="mlbl">平均生成</div></div>
+        <div class="metric"><div class="mval">PDF</div><div class="mlbl">可导出</div></div>
+      </div>
+    </div>
+    <div class="cap-card">
+      <div class="cap-icon">🎙️</div>
+      <h4>语音播报（TTS）</h4>
+      <p>Edge-TTS 中英双语语音播报，8 种音色可选，实时将报告内容转换为自然语音。</p>
+      <div class="metrics">
+        <div class="metric"><div class="mval">8</div><div class="mlbl">音色</div></div>
+        <div class="metric"><div class="mval">中英</div><div class="mlbl">双语</div></div>
+        <div class="metric"><div class="mval">实时</div><div class="mlbl">合成</div></div>
+      </div>
+    </div>
+    <div class="cap-card">
+      <div class="cap-icon">📷</div>
+      <h4>面诊舌诊（AI 视觉）</h4>
+      <p>上传面部/舌象照片，AI 辅助分析面色·舌色·舌形·苔质，作为中医辨证参考。</p>
+      <div class="metrics">
+        <div class="metric"><div class="mval">4</div><div class="mlbl">视觉模型</div></div>
+        <div class="metric"><div class="mval">面舌</div><div class="mlbl">双诊</div></div>
+        <div class="metric"><div class="mval">AI</div><div class="mlbl">辅助参考</div></div>
+      </div>
+    </div>
+    <div class="cap-card">
+      <div class="cap-icon">💬</div>
+      <h4>微信对话式交互</h4>
+      <p>微信机器人接收自然语言，自动识别意图·调用对应排盘模块·格式化回复，支持会话记忆。</p>
+      <div class="metrics">
+        <div class="metric"><div class="mval">7</div><div class="mlbl">排盘模块</div></div>
+        <div class="metric"><div class="mval">3</div><div class="mlbl">会话记忆</div></div>
+        <div class="metric"><div class="mval">7×24</div><div class="mlbl">自动应答</div></div>
+      </div>
+    </div>
+    <div class="cap-card">
+      <div class="cap-icon">🏥</div>
+      <h4>中医辨证参考</h4>
+      <p>输入症状·舌象·面色，AI 辅助关联经典方剂·穴位·医案，作为中医学习参考工具。</p>
+      <div class="metrics">
+        <div class="metric"><div class="mval">376</div><div class="mlbl">伤寒论条</div></div>
+        <div class="metric"><div class="mval">320</div><div class="mlbl">穴位知识</div></div>
+        <div class="metric"><div class="mval">AI</div><div class="mlbl">参考辅助</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 知识库 -->
+<div class="section">
+  <div class="section-title"><span class="icon">📚</span>专业知识库（12,564 条 · 77 模块）</div>
+  <div class="kb-table">
+    <table>
+      <thead>
+        <tr>
+          <th>模块</th><th>类别</th><th>条目数</th><th>置信度</th><th>等级</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>紫微斗数宫系</td><td>命理</td><td>2,688</td><td><div class="kb-bar"><div class="kb-bar-fill" style="width:90%"></div></div></td><td><span class="grade grade-s">S</span></td></tr>
+        <tr><td>华街命理扩展</td><td>命理</td><td>1,260</td><td><div class="kb-bar"><div class="kb-bar-fill" style="width:88%"></div></div></td><td><span class="grade grade-s">S</span></td></tr>
+        <tr><td>真言咒语</td><td>修行</td><td>561</td><td><div class="kb-bar"><div class="kb-bar-fill" style="width:86%"></div></div></td><td><span class="grade grade-s">S</span></td></tr>
+        <tr><td>紫微斗数神煞</td><td>命理</td><td>500</td><td><div class="kb-bar"><div class="kb-bar-fill" style="width:89%"></div></div></td><td><span class="grade grade-s">S</span></td></tr>
+        <tr><td>伤寒论</td><td>中医</td><td>376</td><td><div class="kb-bar"><div class="kb-bar-fill" style="width:92%"></div></div></td><td><span class="grade grade-s">S</span></td></tr>
+        <tr><td>倪海厦医案</td><td>中医</td><td>368</td><td><div class="kb-bar"><div class="kb-bar-fill" style="width:88%"></div></div></td><td><span class="grade grade-s">S</span></td></tr>
+        <tr><td>流月运势</td><td>民俗</td><td>360</td><td><div class="kb-bar"><div class="kb-bar-fill" style="width:85%"></div></div></td><td><span class="grade-s">S</span></td></tr>
+        <tr><td>中医临床</td><td>中医</td><td>358</td><td><div class="kb-bar"><div class="kb-bar-fill" style="width:87%"></div></div></td><td><span class="grade grade-s">S</span></td></tr>
+        <tr><td>经方验方</td><td>中医</td><td>335</td><td><div class="kb-bar"><div class="kb-bar-fill" style="width:91%"></div></div></td><td><span class="grade grade-s">S</span></td></tr>
+        <tr><td>针灸穴位</td><td>中医</td><td>320</td><td><div class="kb-bar"><div class="kb-bar-fill" style="width:93%"></div></div></td><td><span class="grade grade-s">S</span></td></tr>
+        <tr><td>64 卦象</td><td>易经</td><td>320</td><td><div class="kb-bar"><div class="kb-bar-fill" style="width:89%"></div></div></td><td><span class="grade grade-s">S</span></td></tr>
+        <tr><td>梅花易数</td><td>命理</td><td>347</td><td><div class="kb-bar"><div class="kb-bar-fill" style="width:86%"></div></div></td><td><span class="grade grade-s">S</span></td></tr>
+        <tr><td style="color:var(--text2);" colspan="5">… 共 77 个知识模块，覆盖命理·中医·易经·民俗·修行全领域</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="section-note">
+    <strong>知识库分级标准：</strong>S 级 ≥0.85 置信度（典籍原文/多流派/临床验证） · A 级 0.70-0.85（通识/民俗/经验）
+    · 平均置信度 <b>88.4%</b> · 全库 <b>12,564 条</b> · <b>100% S/A 级</b>，无低质条目。
+  </div>
+</div>
+
+<!-- 技术架构 -->
+<div class="section">
+  <div class="section-title"><span class="icon">⚙️</span>技术架构</div>
+  <div class="arch-diagram">
+    <div class="arch-layer-label">接入层</div>
+    <div class="arch-layer">
+      <div class="arch-box">H5 网页</div>
+      <div class="arch-box blue">微信机器人</div>
+      <div class="arch-box green">API 开放接口</div>
+      <div class="arch-box purple">管理后台</div>
+    </div>
+    <div class="arch-layer-label" style="margin-top:14px;">服务层</div>
+    <div class="arch-layer">
+      <div class="arch-box blue">API 网关 (8920)</div>
+      <div class="arch-box">排盘引擎 (8911)</div>
+      <div class="arch-box green">AI 助手 (GLM-4)</div>
+      <div class="arch-box orange">知识库 (8901)</div>
+    </div>
+    <div class="arch-layer">
+      <div class="arch-box green">TTS 语音 (8912)</div>
+      <div class="arch-box purple">视觉 AI (8913)</div>
+      <div class="arch-box">微信 Bot (3900)</div>
+      <div class="arch-box blue">静态服务 (8914)</div>
+    </div>
+    <div class="arch-layer-label" style="margin-top:14px;">引擎层</div>
+    <div class="arch-layer">
+      <div class="arch-box orange">八字引擎</div>
+      <div class="arch-box orange">紫微 v2.2</div>
+      <div class="arch-box orange">奇门 v2.0</div>
+      <div class="arch-box orange">六爻</div>
+      <div class="arch-box orange">六壬</div>
+      <div class="arch-box orange">梅花</div>
+      <div class="arch-box orange">风水</div>
+      <div class="arch-box green">民俗×4</div>
+      <div class="arch-box purple">中医辨证</div>
+    </div>
+    <div class="arch-layer-label" style="margin-top:14px;">数据层</div>
+    <div class="arch-layer">
+      <div class="arch-box green">KB SQLite (12,564)</div>
+      <div class="arch-box green">用户数据</div>
+      <div class="arch-box green">评估数据</div>
+      <div class="arch-box green">反馈日志</div>
+    </div>
+  </div>
+  <div class="section-note">
+    <b>高可用设计：</b>7 个独立服务进程 · launchd 守护自动重启 · SQLite 本地持久化 · FTS5 全文检索 · RBAC 权限控制 · RBAC 知识输出分级（L1/L2/L3）· 速率限制（按路径分组）· 全站 HTTPS 支持。
+  </div>
+</div>
+
+<!-- 合规 -->
+<div class="section">
+  <div class="section-title"><span class="icon">🛡️</span>合规与安全</div>
+  <div class="compliance">
+    <div class="comp-item">
+      <div class="ci-title">⚠️ AI 辅助定位</div>
+      <div class="ci-desc">AI 输出为参考辅助，不构成专业建议。知识类内容均有经典出处标注。</div>
+    </div>
+    <div class="comp-item">
+      <div class="ci-title">🚫 医疗红线</div>
+      <div class="ci-desc">禁止 AI 自主诊断、自行开方、预测重病/灾祸、绝对化结论。</div>
+    </div>
+    <div class="comp-item">
+      <div class="ci-title">🔒 隐私保护</div>
+      <div class="ci-desc">用户数据最小化采集，支持本地删除，微信消息不持久化敏感内容。</div>
+    </div>
+    <div class="comp-item">
+      <div class="ci-title">👤 角色权限分级</div>
+      <div class="ci-desc">L1 通识 → L2 知识条目（master/doctor/super_admin）→ L3 调试（super_admin）</div>
+    </div>
+    <div class="comp-item">
+      <div class="ci-title">📜 合规声明</div>
+      <div class="ci-desc">全站首页/各模块显著位置合规声明：「仅供学习参考，不构成专业建议」</div>
+    </div>
+    <div class="comp-item">
+      <div class="ci-title">🛑 未成年人保护</div>
+      <div class="ci-desc">禁止对未成年人输出算命预测论命结论。</div>
+    </div>
+  </div>
+</div>
+
+<!-- 微信入口价值 -->
+<div class="section">
+  <div class="section-title"><span class="icon">💬</span>微信私域入口</div>
+  <div class="capability-row">
+    <div class="cap-card">
+      <div class="cap-icon">📱</div>
+      <h4>自然语言排盘</h4>
+      <p>微信发消息「我1990年3月15日辰时出生，男，看姻缘」，机器人自动识别意图并排盘推送。</p>
+    </div>
+    <div class="cap-card">
+      <div class="cap-icon">🔢</div>
+      <h4>数字快捷交互</h4>
+      <p>回复末尾附「1.姻缘 2.财运...」，用户输入数字即可切换模块，降低输入门槛。</p>
+    </div>
+    <div class="cap-card">
+      <div class="cap-icon">⏰</div>
+      <h4>晨推暮推自动化</h4>
+      <p>每天 06:00 晨间运势推送，18:00 酉时提醒，节气自动推送，保持用户粘性。</p>
+    </div>
+    <div class="cap-card">
+      <div class="cap-icon">🔒</div>
+      <h4>白名单机制</h4>
+      <p>严格的微信白名单控制，私域熟人圈层接入，合规前提下保持灵活。</p>
+    </div>
+  </div>
+</div>
+
+<!-- 发展历程 -->
+<div class="section">
+  <div class="section-title"><span class="icon">📈</span>发展历程</div>
+  <div class="timeline">
+    <div class="t-item">
+      <div class="t-year">2025 起步</div>
+      <div class="t-title">基础框架搭建</div>
+      <div class="t-desc">Node.js + Python 架构确定，排盘 API 基础框架完成。</div>
+    </div>
+    <div class="t-item">
+      <div class="t-year">2026-03</div>
+      <div class="t-title">知识库体系建设</div>
+      <div class="t-desc">KB 引擎上线，FTS5 全文检索，评估闭环建立。</div>
+    </div>
+    <div class="t-item">
+      <div class="t-year">2026-05</div>
+      <div class="t-title">AI 助手集成</div>
+      <div class="t-desc">GLM-4 模型接入，KB 增强检索，报告引擎 v1 完成。</div>
+    </div>
+    <div class="t-item">
+      <div class="t-year">2026-06</div>
+      <div class="t-title">紫微引擎 v2.2</div>
+      <div class="t-desc">星曜扩展至 119 颗，可视化排盘页全 7 模块上线。</div>
+    </div>
+    <div class="t-item">
+      <div class="t-year">2026-07</div>
+      <div class="t-title">全模块古制化</div>
+      <div class="t-desc">7 大排盘全部遵循古制，民俗工具 11 大类，微信 v3.0。</div>
+    </div>
+    <div class="t-item">
+      <div class="t-year">2026-08</div>
+      <div class="t-title">平台规范化</div>
+      <div class="t-desc">项目隔离规范化，全栈健康检查，1,058 commits。</div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-box">
+  <h2>走进众妙之门</h2>
+  <p>知识平权时代，让每个人都能便捷接触中华传统智慧<br>以科技传承文化，以专业服务社会</p>
+  <a class="cta-url" href="http://127.0.0.1:8914">立即体验</a>
+  <div class="badge-row" style="margin-top:20px;">
+    <span class="badge">命理宝鉴</span>
+    <span class="badge">易道智鉴</span>
+    <span class="badge">全模块古制</span>
+    <span class="badge">AI 辅助参考</span>
+  </div>
+</div>
+
+<div class="footer">
+  <p>易道智鉴 · 命理宝鉴平台 · 2026-08-02 · 数据截至当前</p>
+  <p style="margin-top:6px;">合一切仅供参考，不构成专业建议 · © 2026</p>
+</div>
+
+</div>
+</body>
+</html>
