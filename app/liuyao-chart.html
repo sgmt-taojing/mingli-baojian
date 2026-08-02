@@ -112,10 +112,10 @@ async function generateFullReport(mod){
     if(inputs.lunar===undefined) inputs.lunar = (window.zwCalMode==='lunar') || (window.lrCalMode==='lunar');
     if(inputs.leapMonth===undefined) inputs.leapMonth = false;
     
-    const csrfRes = await fetch('/api/csrf-token').then(r=>r.json()).catch(()=>({csrfToken:''}));
+    const csrfRes = await fetch(API_BASE+'/api/csrf-token').then(r=>r.json()).catch(()=>({csrfToken:''}));
     const csrf = csrfRes.csrfToken || csrfRes.token || '';
     
-    const r = await fetch('/api/paipan/'+mod+'/report', {
+    const r = await fetch(API_BASE+'/api/paipan/'+mod+'/report', {
       method:'POST',
       headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
       body: JSON.stringify({

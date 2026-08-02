@@ -203,6 +203,7 @@
 
 <script src="js/ziwei-engine.js" defer></script>
 <script>
+const API_BASE=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
 (function(){
   // 初始化下拉
   var ySel = document.getElementById('zw-year');
@@ -271,10 +272,10 @@ async function generateZiweiReport(){
     
     const body = { year, month, day, hour, gender, name, lunar, leapMonth: false };
     
-    const csrfRes = await fetch('/api/csrf-token').then(r=>r.json()).catch(()=>({csrfToken:''}));
+    const csrfRes = await fetch(API_BASE+'/api/csrf-token').then(r=>r.json()).catch(()=>({csrfToken:''}));
     const csrf = csrfRes.csrfToken || csrfRes.token || '';
     
-    const r = await fetch('/api/paipan/ziwei/report', {
+    const r = await fetch(API_BASE+'/api/paipan/ziwei/report', {
       method:'POST',
       headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
       body: JSON.stringify(body)

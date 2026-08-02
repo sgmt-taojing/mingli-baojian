@@ -676,6 +676,7 @@
 </button>
 
 <script>
+const API_BASE=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
 function toggleProPanel(){
   var p = document.getElementById('proPanel');
   if(p) p.classList.toggle('d-none');
@@ -773,10 +774,10 @@ async function generateBaziReport(){
       hour, gender, name, birthplace, residence, lunar: false
     };
     
-    const csrfRes = await fetch('/api/csrf-token').then(r=>r.json()).catch(()=>({csrfToken:''}));
+    const csrfRes = await fetch(API_BASE+'/api/csrf-token').then(r=>r.json()).catch(()=>({csrfToken:''}));
     const csrf = csrfRes.csrfToken || csrfRes.token || '';
     
-    const r = await fetch('/api/paipan/bazi/report', {
+    const r = await fetch(API_BASE+'/api/paipan/bazi/report', {
       method:'POST',
       headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
       body: JSON.stringify(body)
