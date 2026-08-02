@@ -175,6 +175,7 @@
   <div class="zw-form-grid" style="margin-top:8px">
     <button class="zw-cal-switch" id="zw-lunar-toggle" onclick="switchZwLunar()" style="padding:8px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:4px;color:var(--zw-gold);font-size:12px;cursor:pointer">📅 切换农历</button>
     <button class="btn btn-primary" onclick="runZiweiPaipan()">星 紫微排盘</button>
+    <button class="btn btn-primary" onclick="generateZiweiReport()" style="margin-left:8px;background:linear-gradient(135deg,#9b59b6,#6c3483)">📜 出具紫微报告</button>
   </div>
   <button class="btn btn-ghost" onclick="window.location.href='bazi.html'" style="margin-left:6px">卷 对照八字</button>
 </div>
@@ -244,6 +245,41 @@ function runZiweiPaipan(){
     html += '<div style="font-size:11px;line-height:1.8">建议同时排八字命盘，比对日主五行与紫微主星的脏腑对应关系。例如：紫微七杀入命 → 金气偏旺 → 肺/大肠需注意；天同太阴入命 → 水气偏旺 → 肾/膀胱需注意。</div>';
     html += '<div style="margin-top:8px"><a href="bazi.html" style="color:var(--zw-gold);font-size:12px">→ 去排八字命盘做比对</a></div>';
     compareEl.innerHTML = html;
+  }
+}
+
+async function generateZiweiReport(){
+  try{
+    const year = +document.getElementById('zw-year')?.value || 1990;
+    const month = +document.getElementById('zw-month')?.value || 6;
+    const day = +document.getElementById('zw-day')?.value || 15;
+    const hour = +document.getElementById('zw-hour')?.value || 10;
+    const gender = document.getElementById('zw-sex')?.value || 'male';
+    const name = document.getElementById('zw-name')?.value || '缘主';
+    const lunar = window.zwCalMode === 'lunar';
+    
+    const body = { year, month, day, hour, gender, name, lunar, leapMonth: false };
+    
+    const csrfRes = await fetch('/api/csrf-token').then(r=>r.json()).catch(()=>({csrfToken:''}));
+    const csrf = csrfRes.csrfToken || csrfRes.token || '';
+    
+    const r = await fetch('/api/paipan/ziwei/report', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
+      body: JSON.stringify(body)
+    }).then(r=>r.json());
+    
+    if(!r.ok){
+      const fn = typeof showToast==='function'?showToast:typeof toast==='function'?toast:alert;
+      fn('报告生成失败：'+(r.error||r.message||''));
+      return;
+    }
+    
+    sessionStorage.setItem('lastReport', JSON.stringify(r));
+    window.location.href = 'report-interpret.html?module=ziwei&name='+encodeURIComponent(name);
+  }catch(e){
+    const fn = typeof showToast==='function'?showToast:typeof toast==='function'?toast:alert;
+    fn('生成失败：'+e.message);
   }
 }
 </script>

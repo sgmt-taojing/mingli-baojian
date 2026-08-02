@@ -268,6 +268,7 @@
 
     <p class="input-hint">出生日期为公历。时辰不填则按中午12:00计算。经度用于真太阳时校正。</p>
     <button class="compute-btn" style="background:linear-gradient(135deg,rgba(201,168,76,.2),rgba(201,168,76,.08));border:1px solid rgba(201,168,76,.35);color:#d4b06a;font-weight:700;font-size:15px;padding:12px 40px;letter-spacing:4px" onclick="playSound('success');computeBazi()" id="baziBtn">排 盘 演 命</button>
+    <button class="compute-btn" style="background:linear-gradient(135deg,#9b59b6,#6c3483);color:#fff;border:none;font-size:13px;padding:12px 30px;letter-spacing:2px;margin-top:8px" onclick="generateBaziReport()">📜 出具八字报告</button>
     <div style="display:flex;gap:10px;justify-content:center;margin-top:8px;flex-wrap:wrap">
       <button class="compute-btn" style="background:transparent;border:1px solid rgba(201,168,76,.15);font-size:12px;padding:8px 16px;opacity:.6" onclick="runBaziEnhancedFortune()">升 运势 + 健康深度增强</button>
     </div>
@@ -748,6 +749,44 @@ document.addEventListener("DOMContentLoaded",function(){
     ]);
   }
 });
+
+async function generateBaziReport(){
+  try{
+    const name = document.getElementById('baziName')?.value || '缘主';
+    const dateStr = document.getElementById('baziDate')?.value || '1990-06-15';
+    const hour = +(document.getElementById('baziHour')?.value || 10);
+    const gender = document.getElementById('baziSex')?.value || 'male';
+    const birthplace = document.getElementById('baziBirthplace')?.value || '';
+    const residence = document.getElementById('baziResidence')?.value || '';
+    
+    const parts = dateStr.split('-');
+    const body = {
+      year: +parts[0], month: +parts[1], day: +parts[2],
+      hour, gender, name, birthplace, residence, lunar: false
+    };
+    
+    const csrfRes = await fetch('/api/csrf-token').then(r=>r.json()).catch(()=>({csrfToken:''}));
+    const csrf = csrfRes.csrfToken || csrfRes.token || '';
+    
+    const r = await fetch('/api/paipan/bazi/report', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
+      body: JSON.stringify(body)
+    }).then(r=>r.json());
+    
+    if(!r.ok){
+      const fn = typeof showToast==='function'?showToast:typeof toast==='function'?toast:alert;
+      fn('报告生成失败：'+(r.error||r.message||''));
+      return;
+    }
+    
+    sessionStorage.setItem('lastReport', JSON.stringify(r));
+    window.location.href = 'report-interpret.html?module=bazi&name='+encodeURIComponent(name);
+  }catch(e){
+    const fn = typeof showToast==='function'?showToast:typeof toast==='function'?toast:alert;
+    fn('生成失败：'+e.message);
+  }
+}
 </script>
 <script src="js/flow-engine.js"></script>
 </main>

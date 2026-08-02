@@ -119,6 +119,10 @@ async function generateFullReport(mod){
       headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
       body: JSON.stringify({
         ...inputs,
+        // 字段映射：前端字段名 → 后端期望字段名
+        query: inputs.question || inputs.query || '',
+        divinationTime: inputs.divinationTime || new Date().toISOString().slice(0,16).replace('T',' '),
+        gender: inputs.sex || inputs.gender || 'male',
         questions: [inputs.question||''].filter(Boolean),
         options: { name: inputs.name||'缘主' }
       })

@@ -688,6 +688,7 @@
         </div>
         <div style="text-align:center;margin-top:16px">
           <button class="btn-primary" onclick="runFengshuiEngine()">山 风水引擎分析</button>
+          <button class="btn-primary" onclick="generateFengshuiReport()" style="margin-left:8px;background:linear-gradient(135deg,#9b59b6,#6c3483)">📜 出具风水报告</button>
         </div>
         <div id="fsEngineResult" class="engine-result-card" style="display:none;margin-top:16px"></div>
       </div>
@@ -4063,6 +4064,53 @@ function matchMyMingua(btn, matchStr){
     }
     if(window.toast) toast('命卦匹配已生成（演示数据）');
   }catch(e){ if(window.toast) toast('命卦匹配失败'); }
+}
+
+async function generateFengshuiReport(){
+  try{
+    const sittingMountain = document.getElementById('fsZuoxiang')?.value || '';
+    const facingMountain = document.getElementById('fsChaoxiang')?.value || '';
+    const houseType = document.getElementById('fsJianzhu')?.value || document.getElementById('fsHuxing')?.value || '公寓';
+    const buildYear = document.getElementById('fsBuildYear')?.value || 2020;
+    const floor = document.getElementById('fsLouceng')?.value || 1;
+    const birthYear = document.getElementById('bzYear')?.value || 1990;
+    const gender = document.getElementById('bzSex')?.value || 'male';
+    const name = document.getElementById('bzName')?.value || '缘主';
+    
+    if(!sittingMountain || !facingMountain){
+      const fn = typeof showToast==='function'?showToast:typeof toast==='function'?toast:alert;
+      fn('请先选择坐山和朝向');
+      return;
+    }
+    
+    const body = {
+      sittingMountain, facingMountain, houseType,
+      floor: Number(floor), birthYear: Number(birthYear),
+      year: Number(birthYear), month: 6, day: 15, hour: 10,
+      gender, name, annual: true
+    };
+    
+    const csrfRes = await fetch('/api/csrf-token').then(r=>r.json()).catch(()=>({csrfToken:''}));
+    const csrf = csrfRes.csrfToken || csrfRes.token || '';
+    
+    const r = await fetch('/api/paipan/fengshui/report', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
+      body: JSON.stringify(body)
+    }).then(r=>r.json());
+    
+    if(!r.ok){
+      const fn = typeof showToast==='function'?showToast:typeof toast==='function'?toast:alert;
+      fn('报告生成失败：'+(r.error||r.message||''));
+      return;
+    }
+    
+    sessionStorage.setItem('lastReport', JSON.stringify(r));
+    window.location.href = 'report-interpret.html?module=fengshui&name='+encodeURIComponent(name);
+  }catch(e){
+    const fn = typeof showToast==='function'?showToast:typeof toast==='function'?toast:alert;
+    fn('生成失败：'+e.message);
+  }
 }
 </script>
 
