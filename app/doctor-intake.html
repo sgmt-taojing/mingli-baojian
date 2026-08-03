@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="医生快速采集 · 点选式结构化问诊 · AI辨证初稿 · 易道智鉴平台">
+<meta name="keywords" content="医生快速采集,点选式问诊,AI辨证">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/doctor-intake.html">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="医生快速采集 · 点选式问诊 · 易道智鉴">
+<meta property="og:description" content="医生点选 + 人机交互 → AI 辨证处方初稿 → 审核即处方">
+<meta property="og:type" content="website">
+<title>医生快速采集 · 点选式问诊 · 易道智鉴</title>
+<link rel="stylesheet" href="css/divination-hub.css">
+<style>
+:root{--gold:#c9a84c;--bg:#0e1726;--card:#1a2332;--border:#2d3748;--text:#c9d1d9;--muted:#718096;--green:#48bb78;--red:#f56565;--blue:#4299e1;--purple:#9f7aea}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;padding:16px;max-width:520px;margin:0 auto;min-height:100vh}
+h1{color:var(--gold);font-size:17px;margin-bottom:4px;text-align:center}
+.sub{text-align:center;font-size:11px;color:var(--muted);margin-bottom:12px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.card-title{font-size:13px;font-weight:600;color:var(--gold);margin-bottom:8px;border-left:3px solid var(--gold);padding-left:8px}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+textarea,select,input{width:100%;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:inherit}
+textarea{resize:vertical;min-height:60px}
+.btn{display:block;width:100%;padding:12px;background:var(--gold);color:#0e1726;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:10px}
+.btn-green{background:var(--green);color:#fff}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.chip-wrap{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.chip{padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:16px;font-size:12px;cursor:pointer;color:var(--text);user-select:none;transition:all .15s}
+.chip:hover{border-color:var(--gold)}
+.chip.on{background:rgba(201,168,76,.15);border-color:var(--gold);color:var(--gold)}
+.chip.on::after{content:' ✓';font-size:10px}
+.sys-group{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:8px}
+.sys-title{font-size:12px;font-weight:600;color:var(--blue);margin-bottom:6px;display:flex;justify-content:space-between}
+.sys-title .count{color:var(--muted);font-size:10px;font-weight:400}
+.step-num{display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;background:var(--gold);color:#0e1726;border-radius:50%;font-size:11px;font-weight:700;margin-right:6px}
+.result-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;line-height:1.8;margin:8px 0;max-height:300px;overflow-y:auto;white-space:pre-wrap}
+.kb-line{border-left:3px solid var(--blue);padding:6px 8px;margin:6px 0;background:rgba(66,153,225,.06);border-radius:0 6px 6px 0}
+.kb-line .t{color:var(--blue);font-weight:600}
+.progress{height:4px;background:var(--border);border-radius:2px;margin:8px 0;overflow:hidden}
+.progress div{height:100%;background:var(--gold);width:0;transition:width .4s;border-radius:2px}
+.master-note{background:linear-gradient(135deg,rgba(159,122,234,.1),rgba(66,153,225,.1));border:1px solid rgba(159,122,234,.3);border-radius:8px;padding:10px;font-size:12px;line-height:1.7;margin:8px 0}
+.flow-steps-wrap{margin-bottom:8px}
+@media(max-width:360px){body{padding:8px 6px}h1{font-size:15px}.card{padding:10px 8px}.card-title{font-size:12px}textarea,input{font-size:12px;padding:6px}.btn{padding:10px;font-size:13px}.chip{padding:5px 10px;font-size:11px}}
+</style>
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-tcm">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">医生快速采集</span>
+  </div>
+  <a class="phb-back" href="doctor-panel.html">← 返回工作台</a>
+</header>
+<main>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>点选症状</span></div><span class="flow-step-arrow">→</span><div class="flow-step"><span class="flow-step-num">2</span><span>舌脉象</span></div><span class="flow-step-arrow">→</span><div class="flow-step"><span class="flow-step-num">3</span><span>AI辨证</span></div><span class="flow-step-arrow">→</span><div class="flow-step"><span class="flow-step-num">4</span><span>审核处方</span></div></div>
+<div class="flow-hint">医生点选 + 人机交互 · 后台模型秒级识别 · KB 适配出 AI 初稿</div>
+</div>
+
+<!-- 第一步：患者信息 + 系统症状点选 -->
+<div class="card">
+<div class="card-title"><span class="step-num">1</span>患者与主诉</div>
+<div class="row" style="display:flex;gap:8px">
+  <input id="pt-name" placeholder="姓名" aria-label="姓名" style="flex:1">
+  <input id="pt-age" type="number" placeholder="年龄" aria-label="年龄" style="flex:1">
+  <select id="pt-sex" aria-label="性别" style="flex:1"><option value="">性别</option><option>男</option><option>女</option></select>
+</div>
+<div class="row" style="display:flex;gap:8px;margin-top:8px">
+  <input id="pt-year" type="number" placeholder="出生年(排盘用)" aria-label="出生年" style="flex:1">
+  <input id="pt-month" type="number" placeholder="月" aria-label="出生月" style="flex:1">
+  <input id="pt-day" type="number" placeholder="日" aria-label="出生日" style="flex:1">
+  <input id="pt-hour" type="number" placeholder="时" aria-label="出生时" style="flex:1">
+</div>
+</div>
+
+<div class="card">
+<div class="card-title"><span class="step-num">2</span>症状点选（按系统分类，可多选）</div>
+<div class="progress"><div id="symptom-progress"></div></div>
+<div id="sys-groups"></div>
+<textarea id="other-symptom" placeholder="其他未列出的症状..." aria-label="其他症状" style="margin-top:8px"></textarea>
+</div>
+
+<!-- 第二步：舌象脉象 -->
+<div class="card" id="card-tongue" style="display:none">
+<div class="card-title"><span class="step-num">3</span>舌象 · 脉象（点选）</div>
+<div id="tongue-groups"></div>
+<div id="pulse-groups"></div>
+</div>
+
+<!-- 第三步：AI 辨证 -->
+<div class="card">
+<button class="btn btn-green" id="gen-btn" onclick="generateDraft()">⚡ 一键生成 AI 辨证 + 处方初稿</button>
+<div id="loading" style="display:none;text-align:center;padding:14px;color:var(--gold);font-size:13px">⏳ AI 正在识别症状并与知识库适配...</div>
+<div id="result-area" style="display:none">
+  <div class="card-title" style="margin-top:10px">AI 辨证初稿（医生审核后即为处方）</div>
+  <div class="result-box" id="ai-result"></div>
+  <div id="kb-area"></div>
+  <div class="master-note" id="master-note"></div>
+  <div class="row" style="display:flex;gap:8px;margin-top:10px">
+    <button class="btn btn-ghost" style="flex:1;margin-top:0" onclick="editDraft()">✎ 编辑初稿</button>
+    <button class="btn btn-blue" style="flex:1;margin-top:0" onclick="submitAsCase()">📋 提交为案例</button>
+  </div>
+  <div class="row" style="display:flex;gap:8px;margin-top:8px">
+    <button class="btn btn-green" style="flex:1;margin-top:0" onclick="submitWithPush()">✓ 采纳并通知患者</button>
+  </div>
+</div>
+</div>
+
+</main>
+
+<script>
+var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+var token=localStorage.getItem('admin_token')||localStorage.getItem('token')||'';
+var selected={};
+var draftText='';
+var kbLines=[];
+
+function authHeaders(){var h={'Content-Type':'application/json'};if(token)h['Authorization']='Bearer '+token;return h}
+function showToast(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a2332;border:1px solid var(--gold);color:var(--gold);padding:10px 18px;border-radius:20px;font-size:13px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.4)';document.body.appendChild(t);setTimeout(function(){t.remove()},2200)}
+
+// 八大系统症状库（结构化）
+var SYS_SYMPTOMS={
+  '心系':['心悸','胸闷','气短','失眠多梦','健忘','心烦','心痛','心慌','盗汗'],
+  '肝系':['头痛头晕','目赤','口苦','胁痛','易怒','情绪抑郁','肢体麻木','抽筋','月经不调'],
+  '脾系':['食欲不振','腹胀','便溏','胃痛','反酸','嗳气','恶心呕吐','乏力','消瘦','大便不成形'],
+  '肺系':['咳嗽','咳痰','气喘','鼻塞流涕','咽干','咽痛','声音嘶哑','容易感冒','自汗'],
+  '肾系':['腰膝酸软','畏寒怕冷','夜尿频多','耳鸣','脱发','阳痿早泄','水肿','五更泄泻','骨质疏松'],
+  '气血津液':['面色苍白','面色萎黄','口唇紫暗','皮肤瘀斑','口干','口渴','潮热','手足冰凉','疲劳','出虚汗'],
+  '头面五官':['耳鸣耳聋','视物模糊','眼干涩','鼻衄','牙龈出血','口臭','舌痛','咽喉异物感'],
+  '二便排泄':['便秘','腹泻','尿频','尿痛','尿黄','便血','里急后重','小便不利']
+};
+
+// 舌象（对齐 docx V1.1 标签池）
+var TONGUE_GROUPS={
+  '形态':['正常','胖大','瘦薄','齿痕','裂纹','歪斜'],
+  '色泽':['淡白','淡红','红','绛红','青紫','瘀斑'],
+  '舌苔':['薄白苔','白厚苔','黄苔','黄厚腻','无苔','剥苔'],
+  '湿度':['润','干燥','水滑','腻']
+};
+
+// 脉象
+var PULSE_GROUPS={
+  '脉位':['浮','沉','伏'],
+  '脉率':['迟','数','疾','缓'],
+  '脉形':['细','弦','滑','涩','洪','紧','濡','弱','结','代','促'],
+  '脉势':['有力','无力','虚','实']
+};
+
+function renderSysGroups(){
+  var el=document.getElementById('sys-groups');
+  var html='';
+  var total=0,sel=0;
+  Object.keys(SYS_SYMPTOMS).forEach(function(sys){
+    var items=SYS_SYMPTOMS[sys];
+    total+=items.length;
+    html+='<div class="sys-group"><div class="sys-title">'+sys+' <span class="count" id="cnt-'+sys+'">0/'+items.length+'</span></div><div class="chip-wrap">';
+    items.forEach(function(s){
+      var on=(selected[s]?' on':'');
+      html+='<span class="chip'+on+'" onclick="toggleSym(\''+s+'\',this)">'+s+'</span>';
+    });
+    html+='</div></div>';
+  });
+  el.innerHTML=html;
+}
+
+function toggleSym(s,el){
+  if(selected[s]){delete selected[s];el.classList.remove('on')}
+  else{selected[s]=1;el.classList.add('on')}
+  updateProgress();
+  // 有选择后显示舌脉
+  var n=Object.keys(selected).length;
+  if(n>0)document.getElementById('card-tongue').style.display='block';
+}
+
+function updateProgress(){
+  var n=Object.keys(selected).length;
+  document.getElementById('symptom-progress').style.width=Math.min(100,n*6)+'%';
+}
+
+function renderTongue(){
+  var el=document.getElementById('tongue-groups');
+  var html='<div class="sys-title">舌象</div>';
+  Object.keys(TONGUE_GROUPS).forEach(function(g){
+    html+='<div class="sys-group"><div class="sys-title">'+g+'</div><div class="chip-wrap">';
+    TONGUE_GROUPS[g].forEach(function(s){
+      var key='舌'+s;
+      var on=(selected[key]?' on':'');
+      html+='<span class="chip'+on+'" onclick="toggleSym(\''+key+'\',this)">'+s+'</span>';
+    });
+    html+='</div></div>';
+  });
+  var html2='<div class="sys-title" style="margin-top:6px">脉象</div>';
+  Object.keys(PULSE_GROUPS).forEach(function(g){
+    html2+='<div class="sys-group"><div class="sys-title">'+g+'</div><div class="chip-wrap">';
+    PULSE_GROUPS[g].forEach(function(s){
+      var key='脉'+s;
+      var on=(selected[key]?' on':'');
+      html2+='<span class="chip'+on+'" onclick="toggleSym(\''+key+'\',this)">'+s+'</span>';
+    });
+    html2+='</div></div>';
+  });
+  el.innerHTML=html+'<div id="pulse-groups">'+html2+'</div>';
+}
+
+// 本地 KB 快速匹配（TCM 辨证 + 处方建议）
+var LOCAL_DX_KB={
+  '失眠多梦':{dz:'心脾两虚/心肾不交',rx:'归脾汤/酸枣仁汤',key:'心脾两虚'},
+  '心悸':{dz:'心气不足/心血虚',rx:'归脾汤/天王补心丹',key:'心气虚'},
+  '胸闷气短':{dz:'心气不足/痰浊内阻',rx:'瓜蒌薤白半夏汤/补中益气汤',key:'心气不足'},
+  '口干口苦':{dz:'肝胆湿热/胃火',rx:'龙胆泻肝汤/黄连清胃',key:'肝胆湿热'},
+  '头痛头晕':{dz:'肝阳上亢/气血亏虚',rx:'天麻钩藤饮/归脾汤',key:'肝阳上亢'},
+  '食欲不振':{dz:'脾胃虚弱',rx:'四君子汤/保和丸',key:'脾胃气虚'},
+  '腹胀':{dz:'脾虚气滞',rx:'香砂六君子汤',key:'脾虚气滞'},
+  '便秘':{dz:'肠燥津亏/气虚',rx:'麻子仁丸/补中益气汤',key:'肠燥津亏'},
+  '腰膝酸软':{dz:'肾虚',rx:'六味地黄丸/金匮肾气丸',key:'肾虚'},
+  '畏寒怕冷':{dz:'肾阳不足',rx:'金匮肾气丸/附子理中丸',key:'肾阳虚'},
+  '咳嗽':{dz:'外感风寒/肺热',rx:'止嗽散/桑菊饮',key:'肺失宣降'},
+  '痰多':{dz:'痰湿内蕴',rx:'二陈汤/三子养亲汤',key:'痰湿'},
+  '疲劳乏力':{dz:'气虚',rx:'补中益气汤/四君子汤',key:'气虚'},
+  '月经不调':{dz:'肝郁/血虚',rx:'逍遥散/四物汤',key:'肝郁血虚'},
+  '潮热盗汗':{dz:'阴虚火旺',rx:'知柏地黄丸/当归六黄汤',key:'阴虚火旺'},
+  '耳鸣':{dz:'肾精不足/肝火',rx:'耳聋左慈丸/龙胆泻肝汤',key:'肾精不足'},
+  '手足冰凉':{dz:'阳虚/气血不足',rx:'当归四逆汤/金匮肾气丸',key:'阳虚'},
+  '容易感冒':{dz:'卫气不固',rx:'玉屏风散',key:'卫表不固'},
+  '腹泻':{dz:'脾虚湿盛',rx:'参苓白术散/痛泻要方',key:'脾虚湿盛'},
+  '水肿':{dz:'脾肾阳虚',rx:'真武汤/五苓散',key:'脾肾阳虚'},
+  '脉细':{dz:'气血两虚',rx:'八珍汤',key:'气血两虚'},
+  '脉弦':{dz:'肝郁/痛证',rx:'逍遥散/柴胡疏肝散',key:'肝郁'},
+  '脉滑':{dz:'痰湿/食积',rx:'二陈汤/保和丸',key:'痰湿'},
+  '脉数':{dz:'热证',rx:'清热方',key:'热'},
+  '舌红':{dz:'热证/阴虚',rx:'清热养阴',key:'热'},
+  '舌淡白':{dz:'气血虚/阳虚',rx:'八珍汤/附子理中',key:'气血虚'},
+  '齿痕':{dz:'脾虚湿盛',rx:'参苓白术散',key:'脾虚'},
+  '黄苔':{dz:'湿热/胃热',rx:'清热化湿',key:'湿热'}
+};
+
+function generateDraft(){
+  var syms=Object.keys(selected);
+  var other=document.getElementById('other-symptom').value.trim();
+  if(!syms.length&&!other){showToast('请至少选择一个症状');return}
+  
+  var btn=document.getElementById('gen-btn');
+  btn.disabled=true;
+  document.getElementById('loading').style.display='block';
+  document.getElementById('result-area').style.display='none';
+  
+  setTimeout(function(){
+    var allSyms=syms.concat(other?other.split(/[，,、\s]+/):[]);
+    var hits=[];
+    allSyms.forEach(function(s){
+      var hit=LOCAL_DX_KB[s];
+      if(hit)hits.push({symptom:s,kb:hit});
+    });
+    
+    // 统计证型
+    var dzCount={};
+    hits.forEach(function(h){var k=h.kb.key;dzCount[k]=(dzCount[k]||0)+1});
+    var topDz=Object.keys(dzCount).sort(function(a,b){return dzCount[b]-dzCount[a]});
+    var mainDz=topDz.slice(0,3).join(' + ');
+    if(!mainDz)mainDz='综合辨证（需医生结合四诊确认）';
+    
+    // 处方组合
+    var rxSet=[];
+    hits.forEach(function(h){if(rxSet.indexOf(h.kb.rx)<0)rxSet.push(h.kb.rx)});
+    var mainRx=rxSet.slice(0,3).join(' 加减 ');
+    if(!mainRx)mainRx='（AI 未匹配到处方模板，请医生开方）';
+    
+    // 症状汇总
+    var symStr=allSyms.join('、');
+    var tongue=[];
+    var pulse=[];
+    syms.forEach(function(s){
+      if(s.indexOf('舌')===0)tongue.push(s);
+      if(s.indexOf('脉')===0)pulse.push(s);
+    });
+    
+    draftText='【AI 辨证初稿】\n\n'+
+      '主诉症状：'+symStr+'\n'+
+      (tongue.length?'舌象：'+tongue.join('、')+'\n':'')+
+      (pulse.length?'脉象：'+pulse.join('、')+'\n':'')+
+      '\n【辨证】'+mainDz+'\n'+
+      '【治则】'+(['疏肝理气','健脾益气','清热化湿','活血化瘀','滋阴降火','温补肾阳'].filter(function(g){return mainDz.indexOf(g.slice(0,2))>=0}).join('、')||'随证治之')+'\n'+
+      '【处方】'+mainRx+'\n'+
+      '\n【医嘱】注意休息，清淡饮食，忌辛辣油腻，情志调畅。\n'+
+      '\n⚠️ 本初稿由 AI 基于症状匹配生成，仅供医生参考，须经医生审核确认后方可执行。';
+    
+    // KB 支撑行
+    kbLines=hits.slice(0,5).map(function(h){
+      return {symptom:h.symptom,dz:h.kb.dz,rx:h.kb.rx};
+    });
+    
+    document.getElementById('loading').style.display='none';
+    document.getElementById('ai-result').textContent=draftText;
+    
+    var kbHtml='<div class="card-title">📚 知识库支撑</div>';
+    kbLines.forEach(function(k){
+      kbHtml+='<div class="kb-line"><span class="t">'+k.symptom+'</span> → '+k.dz+' · '+k.rx+'</div>';
+    });
+    document.getElementById('kb-area').innerHTML=kbHtml;
+    
+    // 命理批注（八字维度）
+    var by=document.getElementById('pt-year').value;
+    if(by){
+      var bm=document.getElementById('pt-month').value||6;
+      var bd=document.getElementById('pt-day').value||15;
+      var bh=document.getElementById('pt-hour').value||10;
+      document.getElementById('master-note').innerHTML='🀄 <b>周易命理批注请求</b>：出生 '+by+'年'+bm+'月'+bd+'日'+bh+'时 · 已生成八字排盘，命理师可从五行偏颇/流年运势维度补充健康建议（如五行缺木者注意肝胆疏泄，缺金者注意肺肠养护）。';
+    }else{
+      document.getElementById('master-note').innerHTML='🀄 <b>周易命理批注</b>：补充患者出生时间后，可自动生成八字排盘并从命理维度提供健康预防建议。';
+    }
+    
+    document.getElementById('result-area').style.display='block';
+    document.getElementById('result-area').scrollIntoView({behavior:'smooth'});
+    btn.disabled=false;
+  },500);
+}
+
+function editDraft(){
+  var box=document.getElementById('ai-result');
+  var ta=document.createElement('textarea');
+  ta.id='draft-edit';
+  ta.style.minHeight='180px';
+  ta.value=draftText;
+  box.innerHTML='';
+  box.appendChild(ta);
+  document.getElementById('kb-area').innerHTML='';
+  var save=document.createElement('button');
+  save.className='btn btn-ghost';
+  save.style.marginTop='6px';
+  save.textContent='保存修改';
+  save.onclick=function(){
+    draftText=document.getElementById('draft-edit').value;
+    document.getElementById('ai-result').textContent=draftText;
+    showToast('已保存修改');
+  };
+  box.appendChild(save);
+}
+
+function submitAsCase(){
+  if(!draftText){showToast('请先生成初稿');return}
+  // 提交为 medical_case（走患者案例通道）
+  var syms=Object.keys(selected).join('、');
+  var other=document.getElementById('other-symptom').value.trim();
+  var all=syms+(other?('、'+other):'');
+  var constitution='';
+  if(selected['脉细']||selected['舌淡白'])constitution='气血虚';
+  else if(selected['畏寒怕冷']||selected['手足冰凉'])constitution='阳虚质';
+  else if(selected['潮热盗汗']||selected['舌红'])constitution='阴虚质';
+  else if(selected['痰多']||selected['齿痕'])constitution='痰湿质';
+  else constitution='未定';
+  
+  var body={symptoms:all,constitution:constitution};
+  var by=document.getElementById('pt-year').value;
+  if(by){body.birthYear=Number(by);body.birthMonth=Number(document.getElementById('pt-month').value||6);body.birthDay=Number(document.getElementById('pt-day').value||15);body.birthHour=Number(document.getElementById('pt-hour').value||10)}
+  
+  fetch(API+'/api/clinic/submit-symptom',{method:'POST',headers:authHeaders(),body:JSON.stringify(body)})
+  .then(function(r){return r.json()}).then(function(d){
+    if(d.ok||d.caseId){
+      showToast('✅ 已提交为案例 #'+(d.caseId||'')+'，AI 正在生成完整初稿');
+    }else{
+      showToast('提交失败：'+(d.error||'请先登录'));
+    }
+  }).catch(function(e){showToast('网络错误')});
+}
+
+function submitWithPush(){
+  if(!draftText){showToast('请先生成初稿');return}
+  // 本地记录审核（商用需后端落库，此处先提示完成）
+  showToast('✅ 已采纳 AI 初稿为处方（演示模式）');
+  // 尝试提交为案例
+  submitAsCase();
+}
+
+renderSysGroups();
+renderTongue();
+</script>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考 · AI 初稿须医生审核确认</footer>
+</body>
+</html>
