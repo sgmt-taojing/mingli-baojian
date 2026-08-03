@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="视频采集 · AI识别 · KB匹配 · 易道智鉴平台">
+<meta name="keywords" content="视频采集,AI识别,KB匹配">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/video-capture.html">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="视频采集 · AI识别 · KB匹配 · 易道智鉴">
+<meta property="og:description" content="短视频采集 → 抽帧识别 → KB 匹配 → 诊断">
+<meta property="og:type" content="website">
+<title>视频采集 · AI识别 · KB匹配 · 易道智鉴</title>
+<link rel="stylesheet" href="css/divination-hub.css">
+<style>
+:root{--gold:#c9a84c;--bg:#0e1726;--card:#1a2332;--border:#2d3748;--text:#c9d1d9;--muted:#718096;--green:#48bb78;--red:#f56565;--blue:#4299e1;--purple:#9f7aea}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;padding:16px;max-width:480px;margin:0 auto;min-height:100vh}
+h1{color:var(--gold);font-size:17px;margin-bottom:4px;text-align:center}
+.sub{text-align:center;font-size:11px;color:var(--muted);margin-bottom:12px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.card-title{font-size:13px;font-weight:600;color:var(--gold);margin-bottom:8px;border-left:3px solid var(--gold);padding-left:8px}
+.btn{display:block;width:100%;padding:12px;background:var(--gold);color:#0e1726;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:10px}
+.btn-green{background:var(--green);color:#fff}
+.btn-red{background:var(--red);color:#fff}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.video-wrap{position:relative;border-radius:12px;overflow:hidden;background:#000;margin:8px 0}
+video{width:100%;display:block;min-height:220px}
+.rec-overlay{position:absolute;top:10px;right:10px;background:rgba(245,101,101,.9);color:#fff;font-size:11px;padding:3px 10px;border-radius:12px;display:none}
+.rec-overlay.on{display:block;animation:pulse 1s infinite}
+@keyframes pulse{0%{opacity:1}50%{opacity:.4}100%{opacity:1}}
+.frame-strip{display:flex;gap:6px;overflow-x:auto;margin:8px 0;padding-bottom:6px}
+.frame-strip canvas{width:100px;height:100px;border-radius:8px;border:2px solid var(--border);flex:0 0 auto;cursor:pointer}
+.frame-strip canvas.selected{border-color:var(--gold)}
+.frame-strip canvas.rejected{opacity:.3;border-color:var(--red)}
+.hint{text-align:center;font-size:12px;color:var(--muted);margin:6px 0;line-height:1.7}
+.result-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;line-height:1.8;margin:8px 0;max-height:260px;overflow-y:auto}
+.kb-hit{border-left:3px solid var(--blue);background:rgba(66,153,225,.06);padding:8px;margin:6px 0;border-radius:0 6px 6px 0}
+.kb-hit .t{color:var(--blue);font-weight:600}
+.kb-hit .s{color:var(--muted);font-size:11px;margin-top:2px}
+.timer{text-align:center;font-size:20px;font-weight:700;color:var(--gold);margin:4px 0;font-variant-numeric:tabular-nums}
+.step-num{display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;background:var(--gold);color:#0e1726;border-radius:50%;font-size:11px;font-weight:700;margin-right:6px}
+.flow-steps-wrap{margin-bottom:8px}
+@media(max-width:360px){body{padding:8px 6px}h1{font-size:15px}.card{padding:10px 8px}.card-title{font-size:12px}.btn{padding:10px;font-size:13px}video{min-height:180px}.frame-strip canvas{width:80px;height:80px}}
+</style>
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-tcm">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">视频采集</span>
+  </div>
+  <a class="phb-back" href="camera-capture.html">← 返回</a>
+</header>
+<main>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>录制</span></div><span class="flow-step-arrow">→</span><div class="flow-step"><span class="flow-step-num">2</span><span>抽帧</span></div><span class="flow-step-arrow">→</span><div class="flow-step"><span class="flow-step-num">3</span><span>AI识别</span></div><span class="flow-step-arrow">→</span><div class="flow-step"><span class="flow-step-num">4</span><span>KB匹配</span></div></div>
+<div class="flow-hint">录制 5-10 秒（舌面2s+面色3s+自然3s）· 自动抽帧选最清晰</div>
+</div>
+
+<!-- 第一步：录制 -->
+<div class="card">
+<div class="card-title"><span class="step-num">1</span>录制短视频</div>
+<div class="hint">录制顺序建议：<br>① 伸出舌头 2 秒 ② 自然面部 3 秒 ③ 侧脸/转面 3 秒</div>
+<div class="video-wrap">
+  <video id="video" autoplay muted playsinline></video>
+  <div class="rec-overlay" id="rec-overlay">● REC</div>
+</div>
+<div class="timer" id="timer">00:00</div>
+<button class="btn" id="rec-btn" onclick="toggleRecord()">🎥 开始录制</button>
+</div>
+
+<!-- 第二步：抽帧选择 -->
+<div class="card" id="frame-card" style="display:none">
+<div class="card-title"><span class="step-num">2</span>选择帧（自动选3张清晰）</div>
+<div class="frame-strip" id="frame-strip"></div>
+<div class="hint">点击可取消/恢复选中帧 · 自动计算清晰度（拉普拉斯方差）</div>
+<button class="btn btn-green" id="analyze-btn" onclick="analyzeFrames()">下一步：AI 识别 →</button>
+</div>
+
+<!-- 第三步：识别结果 -->
+<div class="card" id="result-card" style="display:none">
+<div class="card-title"><span class="step-num">3</span>AI 识别 + KB 匹配</div>
+<div class="result-box" id="result-box">正在分析...</div>
+<button class="btn btn-ghost" onclick="location.href='camera-capture.html'">完成 · 返回采集</button>
+</div>
+
+</main>
+
+<script>
+var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8913':'http://127.0.0.1:8913';
+var stream=null;
+var recorder=null;
+var chunks=[];
+var recSeconds=0;
+var recTimer=null;
+var isRecording=false;
+var videoEl=null;
+var frames=[];
+
+function showToast(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a2332;border:1px solid var(--gold);color:var(--gold);padding:10px 18px;border-radius:20px;font-size:13px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.4)';document.body.appendChild(t);setTimeout(function(){t.remove()},2200)}
+
+function toggleRecord(){
+  if(isRecording){stopRecord();return}
+  startRecord();
+}
+
+function startRecord(){
+  videoEl=document.getElementById('video');
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){showToast('浏览器不支持摄像头，请用 Chrome/Edge');return}
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false}).then(function(s){
+    stream=s;
+    videoEl.srcObject=s;
+    videoEl.play().catch(function(){});
+    chunks=[];
+    frames=[];
+    // 每 0.5s 抽一帧
+    window.frameTimer=setInterval(captureFrame,500);
+    recorder=new MediaRecorder(s);
+    recorder.ondataavailable=function(e){if(e.data.size>0)chunks.push(e.data)};
+    recorder.onstop=function(){
+      clearInterval(window.frameTimer);
+      document.getElementById('rec-btn').textContent='🎥 重新录制';
+      document.getElementById('rec-overlay').classList.remove('on');
+      document.getElementById('frame-card').style.display='block';
+      renderFrames();
+    };
+    recorder.start();
+    isRecording=true;
+    recSeconds=0;
+    document.getElementById('timer').textContent='00:00';
+    document.getElementById('rec-btn').textContent='⏹ 停止录制';
+    document.getElementById('rec-overlay').classList.add('on');
+    recTimer=setInterval(function(){
+      recSeconds++;
+      var m=String(Math.floor(recSeconds/60)).padStart(2,'0');
+      var s=String(recSeconds%60).padStart(2,'0');
+      document.getElementById('timer').textContent=m+':'+s;
+      if(recSeconds>=10){stopRecord()}
+    },1000);
+  }).catch(function(e){showToast('无法访问摄像头：'+e.message)});
+}
+
+function stopRecord(){
+  if(recorder&&recorder.state!=='inactive')recorder.stop();
+  if(stream){stream.getTracks().forEach(function(t){t.stop()})}
+  isRecording=false;
+  if(recTimer)clearInterval(recTimer);
+}
+
+// 抽帧：每 0.5s 捕获 canvas，计算清晰度
+function captureFrame(){
+  if(!videoEl||videoEl.videoWidth===0)return;
+  var canvas=document.createElement('canvas');
+  canvas.width=320;canvas.height=240;
+  var ctx=canvas.getContext('2d');
+  ctx.drawImage(videoEl,0,0,320,240);
+  // 拉普拉斯清晰度
+  var sharpness=calcSharpness(ctx,canvas.width,canvas.height);
+  frames.push({canvas:canvas,sharpness:sharpness,selected:true,rejected:false});
+  // 最多保留 30 帧
+  if(frames.length>30)frames.shift();
+}
+
+function calcSharpness(ctx,w,h){
+  try{
+    var img=ctx.getImageData(0,0,w,h).data;
+    var sum=0;
+    for(var y=1;y<h-1;y+=4){
+      for(var x=1;x<w-1;x+=4){
+        var i=(y*w+x)*4;
+        var g=img[i]*0.299+img[i+1]*0.587+img[i+2]*0.114;
+        var gl=img[((y-1)*w+x)*4]*0.299+img[((y-1)*w+x+1)*4]*0.587+img[((y-1)*w+x+2)*4]*0.114;
+        var gr=img[((y+1)*w+x)*4]*0.299+img[((y+1)*w+x+1)*4]*0.587+img[((y+1)*w+x+2)*4]*0.114;
+        sum+=Math.abs(g-gl)+Math.abs(g-gr);
+      }
+    }
+    return sum;
+  }catch(e){return 0}
+}
+
+function renderFrames(){
+  var strip=document.getElementById('frame-strip');
+  strip.innerHTML='';
+  // 按清晰度降序选前 3 张
+  var sorted=frames.slice().sort(function(a,b){return b.sharpness-a.sharpness});
+  sorted.slice(0,3).forEach(function(f){f.selected=true});
+  sorted.slice(3).forEach(function(f){f.selected=false});
+  frames.forEach(function(f,i){
+    var c=document.createElement('canvas');
+    c.width=100;c.height=75;
+    c.getContext('2d').drawImage(f.canvas,0,0,100,75);
+    c.className=f.selected?'selected':'';
+    c.dataset.idx=i;
+    c.title='清晰度:'+Math.round(f.sharpness);
+    c.onclick=function(){
+      f.selected=!f.selected;
+      c.className=f.selected?'selected':'';
+    };
+    strip.appendChild(c);
+  });
+}
+
+// 送 AI 识别
+function analyzeFrames(){
+  var selected=frames.filter(function(f){return f.selected});
+  if(!selected.length){showToast('请至少选择 1 帧');return}
+  var box=document.getElementById('result-box');
+  box.textContent='正在分析 '+(selected.length)+' 帧...';
+  
+  var promises=selected.map(function(f,i){
+    var base64=f.canvas.toDataURL('image/jpeg',0.85).split(',')[1];
+    return fetch(API+'/api/camera/upload',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-API-Key':localStorage.getItem('api_key')||''},
+      body:JSON.stringify({image:base64,mode:'face',source:'video-frame-'+(i+1)})
+    }).then(function(r){return r.json()}).catch(function(){return {error:'识别失败'}});
+  });
+  
+  Promise.all(promises).then(function(results){
+    var html='';
+    results.forEach(function(r,i){
+      html+='<div style="margin-bottom:10px;padding-bottom:8px;border-bottom:1px dashed var(--border)">';
+      html+='<div style="color:var(--gold);font-weight:600">帧 '+(i+1)+'</div>';
+      if(r.error){html+='<div style="color:var(--red)">'+r.error+'</div>'}
+      else{
+        if(r.face_features){html+='<div>特征：'+(r.face_features.slice(0,120)||'—')+'</div>'}
+        if(r.desc||r.description){html+='<div>'+(r.desc||r.description).slice(0,200)+'</div>'}
+        if(r.analysis){html+='<div>'+String(r.analysis).slice(0,200)+'</div>'}
+        if(r.kb_matches&&r.kb_matches.length){
+          html+='<div style="margin-top:6px"><b style="color:var(--blue)">📚 知识库匹配：</b></div>';
+          r.kb_matches.slice(0,3).forEach(function(k){
+            html+='<div class="kb-hit"><div class="t">'+k.title+'</div><div class="s">'+(k.snippet||'').slice(0,100)+'</div></div>';
+          });
+        }
+        if(r.health_risks&&r.health_risks.length){
+          html+='<div style="color:var(--red);margin-top:4px">⚠️ 提示：'+r.health_risks.join('；')+'</div>';
+        }
+      }
+      html+='</div>';
+    });
+    if(!html)html='<div style="color:var(--muted)">无识别结果（引擎可能不可用，请稍后再试）</div>';
+    box.innerHTML=html;
+  });
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  // 自动预览摄像头
+  if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){
+    navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false}).then(function(s){
+      stream=s;
+      document.getElementById('video').srcObject=s;
+      document.getElementById('video').play().catch(function(){});
+    }).catch(function(){});
+  }
+});
+</script>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考 · 视频帧本地处理，不上传原视频</footer>
+</body>
+</html>
