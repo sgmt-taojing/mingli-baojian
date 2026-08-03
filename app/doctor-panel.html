@@ -234,35 +234,34 @@ function quickIntake(p){
   location.href='doctor-intake.html'+(qs.length?'?'+qs.join('&'):'');
 }
 
-// 打开编辑面板（预填 AI 初稿）
+// 打开编辑面板 → 卡片内联展开（零跳转）
 function openEdit(id){
   var c=allCases.find(function(x){return x.id===id});
   if(!c)return;
+  var card=document.getElementById('card-'+id);
   var panel=document.getElementById('edit-'+id);
-  if(panel.classList.contains('show')){panel.classList.remove('show');panel.innerHTML='';return}
+  if(panel.classList.contains('show')){panel.classList.remove('show');panel.innerHTML='';if(card)card.classList.remove('expanded');return}
+  if(card)card.classList.add('expanded');
   panel.innerHTML=
-    '<div class="form-group"><label>辨证诊断（AI 初稿已预填，可修改）</label>'+
-    '<textarea id="diag-'+id+'" aria-label="辨证诊断">'+(c.diagnosis||c.aiDraft||'')+'</textarea></div>'+
-    '<div class="form-group"><label>处方模板（一键套用）</label>'+
-    '<select id="rx-tpl-'+id+'" aria-label="处方模板" onchange="applyRxTemplate('+id+')">'+
-      '<option value="">— 选择常用处方模板 —</option>'+
-      '<option value="逍遥散">逍遥散（肝郁脾虚）</option>'+
-      '<option value="丹栀逍遥散">丹栀逍遥散（肝郁化火）</option>'+
-      '<option value="归脾汤">归脾汤（心脾两虚）</option>'+
-      '<option value="六味地黄丸">六味地黄丸（肾阴不足）</option>'+
-      '<option value="金匮肾气丸">金匮肾气丸（肾阳不足）</option>'+
-      '<option value="四君子汤">四君子汤（脾气虚）</option>'+
-      '<option value="二陈汤">二陈汤（痰湿内阻）</option>'+
-      '<option value="血府逐瘀汤">血府逐瘀汤（气滞血瘀）</option>'+
-      '<option value="酸枣仁汤">酸枣仁汤（失眠血虚）</option>'+
-      '<option value="百合固金汤">百合固金汤（肺阴虚）</option>'+
+    '<div style="margin-top:8px;border-top:1px solid var(--border);padding-top:10px">'+
+    '<div style="display:flex;gap:6px;align-items:center;margin-bottom:8px"><span style="font-size:11px;color:var(--muted)">AI初稿已预填，可直接采纳或微调</span>'+
+    '<select style="width:auto;flex:1;padding:5px 8px;font-size:11px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text)" onchange="applyRxTemplate('+id+')" aria-label="处方模板">'+
+    '<option value="">💊 处方模板</option>'+
+    '<option value="逍遥散">逍遥散(肝郁)</option><option value="丹栀逍遥散">丹栀逍遥散(化火)</option>'+
+    '<option value="归脾汤">归脾汤(心脾)</option><option value="六味地黄丸">六味地黄(肾阴)</option>'+
+    '<option value="金匮肾气丸">金匮肾气(肾阳)</option><option value="四君子汤">四君子(脾虚)</option>'+
+    '<option value="二陈汤">二陈汤(痰湿)</option><option value="血府逐瘀汤">血府逐瘀(瘀血)</option>'+
+    '<option value="酸枣仁汤">酸枣仁汤(失眠)</option><option value="百合固金汤">百合固金(肺阴)</option>'+
     '</select></div>'+
-    '<div class="form-group"><label>处方（方剂+剂量+煎服法）</label>'+
-    '<textarea id="rx-'+id+'" aria-label="处方">'+(c.prescription||'')+'</textarea></div>'+
-    '<div class="form-group"><label>医嘱（饮食起居）</label>'+
-    '<textarea id="doc-'+id+'" aria-label="医嘱">'+(c.doctorComment||'')+'</textarea></div>'+
-    '<button class="btn" onclick="submitEdit('+id+')">提交诊断处方</button>';
+    '<textarea id="diag-'+id+'" aria-label="辨证诊断" style="width:100%;min-height:80px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px;font-size:12px;font-family:inherit;margin-bottom:6px">'+(c.diagnosis||c.aiDraft||'')+'</textarea>'+
+    '<label style="font-size:11px;color:var(--muted);margin-bottom:2px">处方</label>'+
+    '<textarea id="rx-'+id+'" aria-label="处方" style="width:100%;min-height:60px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px;font-size:12px;font-family:inherit;margin-bottom:6px">'+(c.prescription||'')+'</textarea>'+
+    '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
+      '<button class="btn btn-reject" style="flex:1;padding:8px;font-size:12px;margin-top:0" onclick="rejectCase('+id+')">✕ 驳回</button>'+
+      '<button class="btn" style="flex:2;padding:8px;font-size:12px;margin-top:0" onclick="acceptCase('+id+')">✓ 采纳并提交</button>'+
+    '</div></div>';
   panel.classList.add('show');
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
 // 处方模板库
