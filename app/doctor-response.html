@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="医生紧急响应 · SOS事件处理 · 易道智鉴">
+<meta name="keywords" content="医生紧急响应,SOS">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/doctor-response.html">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050608">
+<title>紧急响应 · 医生端 · 易道智鉴</title>
+<link rel="stylesheet" href="css/divination-hub.css">
+<style>
+:root{--gold:#c9a84c;--bg:#0e1726;--card:#1a2332;--border:#2d3748;--text:#c9d1d9;--muted:#718096;--green:#48bb78;--red:#dc2626;--blue:#4299e1}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;padding:16px;max-width:520px;margin:0 auto;min-height:100vh}
+.alert-banner{background:linear-gradient(135deg,#7f1d1d,#991b1b);border:1px solid #f87171;border-radius:14px;padding:18px;margin-bottom:14px;text-align:center}
+.alert-banner .icon{font-size:48px}
+.alert-banner .title{font-size:18px;font-weight:700;color:#fca5a5;margin-top:4px}
+.alert-banner .time{font-size:11px;color:#fecaca;margin-top:4px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.card-title{font-size:13px;font-weight:600;color:var(--gold);margin-bottom:8px;border-left:3px solid var(--gold);padding-left:8px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.info-item{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px}
+.info-item .k{font-size:11px;color:var(--muted)}
+.info-item .v{font-size:14px;font-weight:600;margin-top:2px}
+.btn{display:block;width:100%;padding:12px;background:var(--gold);color:#0e1726;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;text-align:center;text-decoration:none}
+.btn-red{background:var(--red);color:#fff}
+.btn-green{background:var(--green);color:#fff}
+.btn-blue{background:var(--blue);color:#fff}
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:30px}
+.event-item{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px;margin:8px 0}
+.event-item .detail{font-size:13px;line-height:1.6}
+.event-item .meta{font-size:11px;color:var(--muted);margin-top:4px}
+</style>
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-tcm">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot" style="background:var(--red)"></span>
+    <span class="phb-title">紧急响应</span>
+  </div>
+  <a class="phb-back" href="doctor-panel.html">← 返回工作台</a>
+</header>
+<main>
+
+<div id="active-view" style="display:none">
+  <div class="alert-banner">
+    <div class="icon">🚨</div>
+    <div class="title">紧急求助 · 活跃事件</div>
+    <div class="time" id="al-time"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">事件详情</div>
+    <div class="info-grid" id="al-grid"></div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <a class="btn btn-red" style="flex:1" href="tel:120">📞 打 120</a>
+    <button class="btn btn-green" style="flex:1" onclick="markResolved()">✓ 已处理</button>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:8px">
+    <button class="btn btn-blue" style="flex:1" onclick="viewPatient()">📋 查看患者档案</button>
+  </div>
+</div>
+
+<div class="card">
+<div class="card-title">📋 全部紧急事件</div>
+<div id="event-list"><div class="empty">加载中...</div></div>
+</div>
+
+<div style="display:flex;gap:8px;margin-top:8px">
+  <a class="btn btn-blue" style="flex:1;margin-top:0" href="doctor-intake.html">⚡ 快速采集</a>
+  <a class="btn" style="flex:1;margin-top:0" href="doctor-panel.html">📂 返回工作台</a>
+</div>
+
+<script>
+var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+var token=localS…tem('admin_token')||localStorage.getItem('token')||'';
+var activeEvent=null;
+
+function authHeaders(){var h={'Content-Type':'application/json'};if(token)h['Authorization']='Bearer '+token;return h}
+function showToast(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:#1a2332;border:1px solid var(--gold);color:var(--gold);padding:10px 18px;border-radius:20px;font-size:13px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.4)';document.body.appendChild(t);setTimeout(function(){t.remove()},2500)}
+
+function loadEvents(){
+  fetch(API+'/api/clinic/emergency-events',{headers:authHeaders()})
+  .then(function(r){return r.json()}).then(function(d){
+    var events=d.events||[];
+    var el=document.getElementById('event-list');
+    if(!events.length){el.innerHTML='<div class="empty">暂无紧急事件</div>';return}
+    el.innerHTML=events.map(function(ev,i){
+      var active=(i===0&&!activeEvent)?'active':'';
+      return '<div class="event-item" id="ev-'+ev.id+'"><div class="detail">'+ev.detail+'</div>'+
+        '<div class="meta">'+ev.actor_role+' · '+(ev.created_at||'').slice(0,16)+'</div>'+
+        (i===0?'<button class="btn btn-red" style="margin-top:6px;padding:8px" onclick="showActive('+ev.id+')">🚨 立即处理</button>':'')+
+      '</div>';
+    }).join('');
+    // 最近一个设为活跃
+    if(events.length>0&&!activeEvent){activeEvent=events[0];showActive(events[0].id)}
+  }).catch(function(){document.getElementById('event-list').innerHTML='<div class="empty">加载失败，请先登录</div>'});
+}
+
+function showActive(id){
+  var el=document.getElementById('active-view');
+  el.style.display='block';
+  document.getElementById('al-time').textContent='SOS 触发 · '+(activeEvent.created_at||'').slice(0,16);
+  document.getElementById('al-grid').innerHTML=
+    '<div class="info-item"><div class="k">事件ID</div><div class="v">#'+activeEvent.id+'</div></div>'+
+    '<div class="info-item"><div class="k">触发角色</div><div class="v">'+activeEvent.actor_role+'</div></div>'+
+    '<div class="info-item" style="grid-column:1/-1"><div class="k">详情</div><div class="v" style="font-size:13px">'+(activeEvent.detail||'—')+'</div></div>';
+}
+
+function markResolved(){
+  if(!activeEvent){showToast('没有活跃事件');return}
+  // 标记 audit log
+  fetch(API+'/api/clinic/resolve-sos/'+activeEvent.id,{method:'POST',headers:authHeaders()})
+  .then(function(r){return r.json()}).then(function(d){
+    if(d.ok){
+      showToast('✅ 已标记为已处理');
+      document.getElementById('active-view').style.display='none';
+      activeEvent=null;
+      loadEvents();
+    }else{showToast(d.error||'处理失败')}
+  }).catch(function(){showToast('网络错误')});
+}
+
+function viewPatient(){
+  location.href='person-center.html';
+}
+
+loadEvents();
+</script>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 紧急响应页面 · 仅供医疗专业人员使用</footer>
+</body>
+</html>

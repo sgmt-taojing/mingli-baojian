@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="居家健康打卡 · 体征趋势 · 康养指导 · 易道智鉴">
+<meta name="keywords" content="健康打卡,体征监测,康养">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/wellness-track.html">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050608">
+<title>健康打卡 · 康养监测 · 易道智鉴</title>
+<link rel="stylesheet" href="css/divination-hub.css">
+<style>
+:root{--gold:#c9a84c;--bg:#0e1726;--card:#1a2332;--border:#2d3748;--text:#c9d1d9;--muted:#718096;--green:#48bb78;--red:#f56565;--blue:#4299e1}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;padding:16px;max-width:520px;margin:0 auto;min-height:100vh}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.card-title{font-size:13px;font-weight:600;color:var(--gold);margin-bottom:8px;border-left:3px solid var(--gold);padding-left:8px}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+input,select,textarea{width:100%;padding:9px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;font-family:inherit;margin-bottom:6px}
+.btn{display:block;width:100%;padding:12px;background:var(--gold);color:#0e1726;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:6px}
+.btn-green{background:var(--green);color:#fff}
+.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}
+.metric-card{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center}
+.metric-card .v{font-size:20px;font-weight:700;margin-top:4px}
+.metric-card .l{font-size:10px;color:var(--muted)}
+.metric-card .trend{font-size:10px;margin-top:2px}
+.trend-up{color:var(--red)}.trend-down{color:var(--green)}.trend-stable{color:var(--blue)}
+.log-item{display:flex;justify-content:space-between;align-items:center;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin:6px 0}
+.log-item .t{font-size:11px;color:var(--muted)}
+.log-item .v{font-size:14px;font-weight:600}
+.timeline{position:relative;padding-left:20px}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--border)}
+.timeline-item{position:relative;padding:8px 0 8px 14px}
+.timeline-item::before{content:'';position:absolute;left:-16px;top:14px;width:8px;height:8px;border-radius:50%;background:var(--gold)}
+.sos-float{position:fixed;bottom:20px;right:16px;background:var(--red);color:#fff;width:52px;height:52px;border-radius:50%;font-size:24px;text-align:center;line-height:52px;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.5);z-index:99;text-decoration:none}
+@media(max-width:360px){body{padding:8px 6px}.metric-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-tcm">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot" style="background:var(--green)"></span>
+    <span class="phb-title">健康打卡</span>
+  </div>
+  <a class="phb-back" href="person-center.html">← 返回</a>
+</header>
+<main>
+
+<div class="card">
+<div class="card-title">📊 今日体征</div>
+<div class="metric-grid" id="today-metrics">
+  <div class="metric-card"><div class="l">血压(高压)</div><div class="v" id="m-bp">—</div><div class="trend trend-stable" id="t-bp">—</div></div>
+  <div class="metric-card"><div class="l">心率</div><div class="v" id="m-hr">—</div><div class="trend trend-stable" id="t-hr">—</div></div>
+  <div class="metric-card"><div class="l">体重</div><div class="v" id="m-wt">—</div><div class="trend trend-stable" id="t-wt">—</div></div>
+  <div class="metric-card"><div class="l">睡眠</div><div class="v" id="m-sl">—</div><div class="trend trend-stable" id="t-sl">—</div></div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-title">➕ 体征打卡</div>
+<label>类型</label>
+<select id="log-type" onchange="updateUnit()">
+  <option value="blood_pressure_sys">血压（高压 mmHg）</option>
+  <option value="blood_pressure_dia">血压（低压 mmHg）</option>
+  <option value="heart_rate">心率（次/分）</option>
+  <option value="weight">体重（kg）</option>
+  <option value="sleep_hours">睡眠时长（小时）</option>
+  <option value="blood_sugar">血糖（mmol/L）</option>
+  <option value="temperature">体温（℃）</option>
+  <option value="spo2">血氧 SpO₂（%）</option>
+  <option value="custom">自定义</option>
+</select>
+<label>数值</label>
+<input id="log-value" type="number" step="0.1" placeholder="请输入数值" aria-label="数值">
+<label>备注（可选）</label>
+<input id="log-note" placeholder="例如：餐后 / 空腹 / 运动后" aria-label="备注">
+<button class="btn btn-green" onclick="submitLog()">📝 记录打卡</button>
+</div>
+
+<div class="card">
+<div class="card-title">📅 近期记录 <a href="javascript:loadLogs('all')" style="font-size:11px;color:var(--blue);float:right;text-decoration:none">查看全部</a></div>
+<div id="log-list"><div style="text-align:center;color:var(--muted);font-size:13px;padding:14px">暂无记录</div></div>
+</div>
+
+<div class="card">
+<div class="card-title">🩺 AI 健康建议</div>
+<div id="ai-advice" style="font-size:12px;line-height:1.8;color:var(--muted)">持续打卡 7 天后，AI 将根据趋势给出个性化康养建议。</div>
+</div>
+
+<a class="sos-float" href="sos.html" title="紧急求助">🆘</a>
+
+<script>
+var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+var token=localS…tem('admin_token')||localStorage.getItem('token')||'';
+var logs=[];
+
+function authHeaders(){var h={'Content-Type':'application/json'};if(token)h['Authorization']='Bearer '+token;return h}
+function showToast(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a2332;border:1px solid var(--gold);color:var(--gold);padding:10px 18px;border-radius:20px;font-size:13px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.4)';document.body.appendChild(t);setTimeout(function(){t.remove()},2200)}
+
+function updateUnit(){}
+
+function loadLogs(filter){
+  fetch(API+'/api/clinic/wellness-logs',{headers:authHeaders()})
+  .then(function(r){return r.json()}).then(function(d){
+    logs=d.logs||[];
+    renderLogs();
+    renderTodayMetrics();
+    maybeAdvice();
+  }).catch(function(){
+    document.getElementById('log-list').innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:14px">请先登录</div>';
+  });
+}
+
+function renderLogs(){
+  var el=document.getElementById('log-list');
+  var recent=logs.slice(0,10);
+  if(!recent.length){el.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:14px">暂无记录，开始第一次打卡吧</div>';return}
+  var typeNames={'blood_pressure_sys':'血压(高压)','blood_pressure_dia':'血压(低压)','heart_rate':'心率','weight':'体重','sleep_hours':'睡眠','blood_sugar':'血糖','temperature':'体温','spo2':'血氧','custom':'自定义'};
+  el.innerHTML='<div class="timeline">'+recent.map(function(l){
+    return '<div class="timeline-item"><div style="font-weight:600">'+typeNames[l.log_type]||l.log_type+'：<b>'+l.value+' '+l.unit+'</b></div>'+
+      '<div class="t">'+(l.created_at||'').slice(0,16)+(l.note?' · '+l.note:'')+'</div></div>';
+  }).join('')+'</div>';
+}
+
+function renderTodayMetrics(){
+  // 聚合最新各类体征值
+  var latest={};
+  logs.forEach(function(l){
+    if(!latest[l.log_type])latest[l.log_type]=l;
+  });
+  var metrics={
+    'blood_pressure_sys':{el:'m-bp',unit:'mmHg',normal:'120'},
+    'heart_rate':{el:'m-hr',unit:'bpm',normal:'72'},
+    'weight':{el:'m-wt',unit:'kg',normal:'65'},
+    'sleep_hours':{el:'m-sl',unit:'h',normal:'7'}
+  };
+  Object.keys(metrics).forEach(function(k){
+    var m=metrics[k];
+    if(latest[k]){
+      var el=document.getElementById(m.el);
+      if(el)el.textContent=latest[k].value;
+    }
+  });
+}
+
+function maybeAdvice(){
+  if(logs.length<7)return;
+  var adv=document.getElementById('ai-advice');
+  // 简易趋势判断
+  var hr=logs.filter(function(l){return l.log_type==='heart_rate'});
+  var bp=logs.filter(function(l){return l.log_type==='blood_pressure_sys'});
+  var tips=[];
+  if(hr.length>=3){
+    var avg=hr.slice(0,3).reduce(function(a,b){return a+b.value},0)/3;
+    if(avg>100)tips.push('心率偏高（'+avg.toFixed(0)+'），建议适当有氧运动，避免剧烈运动。');
+    else if(avg<55)tips.push('心率偏低（'+avg.toFixed(0)+'），建议核查是否有服用β阻滞剂，适当增加运动。');
+    else tips.push('心率正常（'+avg.toFixed(0)+'），保持规律运动。');
+  }
+  if(bp.length>=3){
+    var avgBP=bp.slice(0,3).reduce(function(a,b){return a+b.value},0)/3;
+    if(avgBP>140)tips.push('血压偏高（'+avgBP.toFixed(0)+'），建议低盐饮食，咨询医生。');
+    else if(avgBP<90)tips.push('血压偏低（'+avgBP.toFixed(0)+'），建议适量补水和营养。');
+    else tips.push('血压正常范围（'+avgBP.toFixed(0)+'），保持健康生活习惯。');
+  }
+  adv.innerHTML='<b style="color:var(--green)">🤖 AI 康养建议</b><br>'+tips.join('<br><br>')+'<br><br><span style="font-size:11px;opacity:.6">基于 '+logs.length+' 条打卡记录生成 · 仅供健康参考</span>';
+}
+
+function submitLog(){
+  var type=document.getElementById('log-type').value;
+  var value=parseFloat(document.getElementById('log-value').value);
+  var note=document.getElementById('log-note').value.trim();
+  if(isNaN(value)){showToast('请输入有效数值');return}
+  var bodies={blood_pressure_sys:'mmHg',blood_pressure_dia:'mmHg',heart_rate:'bpm',weight:'kg',sleep_hours:'小时',blood_sugar:'mmol/L',temperature:'℃',spo2:'%',custom:''};
+  var body={log_type:type,value:value,unit:bodies[type]||'',note:note};
+  fetch(API+'/api/clinic/wellness-log',{method:'POST',headers:authHeaders(),body:JSON.stringify(body)})
+  .then(function(r){return r.json()}).then(function(d){
+    if(d.ok){showToast('✅ 打卡成功');document.getElementById('log-value').value='';document.getElementById('log-note').value='';loadLogs()}
+    else{showToast(d.error||'记录失败')}
+  }).catch(function(){showToast('网络错误')});
+}
+
+if(token){loadLogs()}else{
+  document.getElementById('log-list').innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:14px"><a href="person-center.html" style="color:var(--gold)">请先登录</a></div>';
+}
+</script>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 健康打卡仅供康养参考 · 异常请及时就医</footer>
+</body>
+</html>
