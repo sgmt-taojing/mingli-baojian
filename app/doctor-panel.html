@@ -215,12 +215,46 @@ function openEdit(id){
   panel.innerHTML=
     '<div class="form-group"><label>辨证诊断（AI 初稿已预填，可修改）</label>'+
     '<textarea id="diag-'+id+'" aria-label="辨证诊断">'+(c.diagnosis||c.aiDraft||'')+'</textarea></div>'+
+    '<div class="form-group"><label>处方模板（一键套用）</label>'+
+    '<select id="rx-tpl-'+id+'" aria-label="处方模板" onchange="applyRxTemplate('+id+')">'+
+      '<option value="">— 选择常用处方模板 —</option>'+
+      '<option value="逍遥散">逍遥散（肝郁脾虚）</option>'+
+      '<option value="丹栀逍遥散">丹栀逍遥散（肝郁化火）</option>'+
+      '<option value="归脾汤">归脾汤（心脾两虚）</option>'+
+      '<option value="六味地黄丸">六味地黄丸（肾阴不足）</option>'+
+      '<option value="金匮肾气丸">金匮肾气丸（肾阳不足）</option>'+
+      '<option value="四君子汤">四君子汤（脾气虚）</option>'+
+      '<option value="二陈汤">二陈汤（痰湿内阻）</option>'+
+      '<option value="血府逐瘀汤">血府逐瘀汤（气滞血瘀）</option>'+
+      '<option value="酸枣仁汤">酸枣仁汤（失眠血虚）</option>'+
+      '<option value="百合固金汤">百合固金汤（肺阴虚）</option>'+
+    '</select></div>'+
     '<div class="form-group"><label>处方（方剂+剂量+煎服法）</label>'+
     '<textarea id="rx-'+id+'" aria-label="处方">'+(c.prescription||'')+'</textarea></div>'+
     '<div class="form-group"><label>医嘱（饮食起居）</label>'+
     '<textarea id="doc-'+id+'" aria-label="医嘱">'+(c.doctorComment||'')+'</textarea></div>'+
     '<button class="btn" onclick="submitEdit('+id+')">提交诊断处方</button>';
   panel.classList.add('show');
+}
+
+// 处方模板库
+var RX_TEMPLATES={
+  '逍遥散':'逍遥散加减。柴胡10g 当归10g 白芍15g 白术10g 茯苓15g 炙甘草6g 生姜3片 薄荷3g(后下)。水煎服，日一剂，分早晚两次温服。',
+  '丹栀逍遥散':'丹栀逍遥散加减。牡丹皮10g 栀子10g 柴胡10g 当归10g 白芍15g 白术10g 茯苓15g 炙甘草6g。水煎服，日一剂。',
+  '归脾汤':'归脾汤加减。党参15g 黄芪20g 白术10g 茯神15g 酸枣仁15g 龙眼肉10g 木香6g 炙甘草6g 当归10g 远志6g。水煎服，日一剂。',
+  '六味地黄丸':'六味地黄丸加减。熟地黄15g 山茱萸10g 山药15g 泽泻10g 牡丹皮10g 茯苓15g。水煎服，日一剂。',
+  '金匮肾气丸':'金匮肾气丸加减。熟地黄15g 山药15g 山茱萸10g 泽泻10g 茯苓15g 牡丹皮10g 附子6g(先煎) 桂枝6g。水煎服，日一剂。',
+  '四君子汤':'四君子汤加减。党参15g 白术10g 茯苓15g 炙甘草6g。水煎服，日一剂。',
+  '二陈汤':'二陈汤加减。陈皮10g 半夏10g(姜制) 茯苓15g 炙甘草6g。水煎服，日一剂。',
+  '血府逐瘀汤':'血府逐瘀汤加减。桃仁10g 红花6g 当归10g 川芎6g 赤芍10g 生地15g 柴胡6g 桔梗6g 牛膝10g 枳壳6g 甘草6g。水煎服，日一剂。',
+  '酸枣仁汤':'酸枣仁汤加减。酸枣仁20g(炒) 知母10g 川芎6g 茯苓15g 甘草6g。水煎服，日一剂，睡前温服。',
+  '百合固金汤':'百合固金汤加减。百合15g 生地黄15g 熟地黄15g 玄参10g 麦冬10g 当归10g 白芍10g 贝母10g 桔梗6g 甘草6g。水煎服，日一剂。'
+};
+
+function applyRxTemplate(id){
+  var sel=document.getElementById('rx-tpl-'+id);
+  var tpl=RX_TEMPLATES[sel.value];
+  if(tpl)document.getElementById('rx-'+id).value=tpl;
 }
 
 // 一键采纳：AI 初稿直接作为诊断，快速提交
