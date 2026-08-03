@@ -505,11 +505,17 @@ function sendToMaster(){
   var name=document.getElementById('pt-name').value;
   var sex=document.getElementById('pt-sex').value;
   var year=document.getElementById('pt-year').value;
+  var month=document.getElementById('pt-month').value;
+  var day=document.getElementById('pt-day').value;
+  var hour=document.getElementById('pt-hour').value;
   var syms=Object.keys(selected).filter(function(s){return s.indexOf('舌')<0&&s.indexOf('脉')<0}).join('、');
   var other=document.getElementById('other-symptom').value.trim();
   if(name)qs.push('name='+encodeURIComponent(name));
   if(sex)qs.push('sex='+encodeURIComponent(sex));
   if(year)qs.push('year='+encodeURIComponent(year));
+  if(month)qs.push('month='+encodeURIComponent(month));
+  if(day)qs.push('day='+encodeURIComponent(day));
+  if(hour)qs.push('hour='+encodeURIComponent(hour));
   if(syms||other)qs.push('symptoms='+encodeURIComponent(syms+(other?'、'+other:'')));
   location.href='master-intake.html'+(qs.length?'?'+qs.join('&'):'');
 }
@@ -523,11 +529,23 @@ renderTongue();
   var name=qs.get('name')||'';
   var sex=qs.get('sex')||'';
   var year=qs.get('year')||'';
+  var birthDate=qs.get('birthDate')||'';
+  var birthHour=qs.get('birthHour')||'';
   var symptoms=qs.get('symptoms')||'';
   var constitution=qs.get('constitution')||'';
   if(name)document.getElementById('pt-name').value=name;
   if(sex)document.getElementById('pt-sex').value=sex;
   if(year)document.getElementById('pt-year').value=year;
+  // 出生日期拆分（Y-M-D）自动填入
+  if(birthDate){
+    var bd=birthDate.split('-');
+    if(bd.length>=3){
+      if(!year)document.getElementById('pt-year').value=bd[0];
+      document.getElementById('pt-month').value=parseInt(bd[1])||'';
+      document.getElementById('pt-day').value=parseInt(bd[2])||'';
+    }
+  }
+  if(birthHour!==''&&birthHour!==null)document.getElementById('pt-hour').value=birthHour;
   if(constitution&&selected){} // constitution 映射体质标签
   if(symptoms){
     // 自动匹配并勾选症状标签

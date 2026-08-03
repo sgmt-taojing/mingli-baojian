@@ -201,7 +201,7 @@ function renderCards(list){
       (kb?'<div style="margin:6px 0">'+kb+'</div>':'')+
       (c.aiDraft?'<div class="ai-draft"><span class="tag">🤖 AI 初稿'+(c.aiGenerated?'<b style="color:#48bb78"> · 自动生成</b>':'')+'</span><br>'+(c.aiDraft||'').slice(0,400)+'</div>':'')+
       '<div class="swipe-actions no-print">'+
-        '<button class="btn btn-intake" onclick="quickIntake('+JSON.stringify({id:c.id,name:c.patientName||'',sex:c.patientSex||'',year:c.birthYear||'',symptoms:c.symptoms||'',constitution:c.constitution||''}).replace(/"/g,'&quot;')+')" title="一键带入患者信息到采集工具">⚡ 快速采集</button>'+
+        '<button class="btn btn-intake" onclick="quickIntake('+JSON.stringify({id:c.id,name:c.patientName||'',sex:c.patientSex||'',year:c.birthYear||'',birthDate:c.birthDate||'',birthHour:c.birthHour||'',symptoms:c.symptoms||'',constitution:c.constitution||''}).replace(/"/g,'&quot;')+')" title="一键带入患者信息到采集工具">⚡ 快速采集</button>'+
         (c.status==='pending_doctor'||c.status==='pending'?
           '<button class="btn btn-reject" onclick="rejectCase('+c.id+')">✕ 驳回</button>'+
           '<button class="btn btn-secondary" onclick="openEdit('+c.id+')">✎ 编辑</button>'+
@@ -220,6 +220,8 @@ function quickIntake(p){
   if(p.name)qs.push('name='+encodeURIComponent(p.name));
   if(p.sex)qs.push('sex='+encodeURIComponent(p.sex));
   if(p.year)qs.push('year='+encodeURIComponent(p.year));
+  if(p.birthDate)qs.push('birthDate='+encodeURIComponent(p.birthDate));
+  if(p.birthHour!==undefined&&p.birthHour!==null&&p.birthHour!=='')qs.push('birthHour='+encodeURIComponent(p.birthHour));
   if(p.symptoms)qs.push('symptoms='+encodeURIComponent(p.symptoms));
   if(p.constitution)qs.push('constitution='+encodeURIComponent(p.constitution));
   location.href='doctor-intake.html'+(qs.length?'?'+qs.join('&'):'');

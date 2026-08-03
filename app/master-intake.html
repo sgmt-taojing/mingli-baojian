@@ -323,11 +323,21 @@ function submitNote(){
   var name=qs.get('name')||'';
   var sex=qs.get('sex')||'';
   var year=qs.get('year')||'';
+  var month=qs.get('month')||'';
+  var day=qs.get('day')||'';
+  var hour=qs.get('hour')||'';
   var symptoms=qs.get('symptoms')||'';
   if(name)document.getElementById('m-name').value=name;
   if(sex)document.getElementById('m-sex').value=sex;
   if(year)document.getElementById('m-year').value=year;
+  if(month)document.getElementById('m-month').value=month;
+  if(day)document.getElementById('m-day').value=day;
+  if(hour)document.getElementById('m-hour').value=hour;
   if(symptoms)document.getElementById('m-questions').value='健康（'+symptoms.slice(0,20)+'）';
+  // 出生信息完整 → 自动排盘生成批注（大师 0 输入）
+  if(year&&month&&day&&hour!==''){
+    setTimeout(function(){paipanAndDraft()},300);
+  }
 })();
 </script>
 </main>
