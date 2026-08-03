@@ -31,6 +31,7 @@ textarea{resize:vertical;min-height:60px}
 .row{display:flex;gap:10px}.row>div{flex:1}
 .btn{display:block;width:100%;padding:12px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:10px}
 .btn-secondary{background:var(--blue)}
+.btn-intake{background:var(--green);margin-bottom:6px;width:100%}
 .btn-reject{background:var(--red)}
 .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
 .case-list-item{padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;margin-bottom:8px;cursor:pointer}
@@ -200,6 +201,7 @@ function renderCards(list){
       (kb?'<div style="margin:6px 0">'+kb+'</div>':'')+
       (c.aiDraft?'<div class="ai-draft"><span class="tag">🤖 AI 初稿'+(c.aiGenerated?'<b style="color:#48bb78"> · 自动生成</b>':'')+'</span><br>'+(c.aiDraft||'').slice(0,400)+'</div>':'')+
       '<div class="swipe-actions no-print">'+
+        '<button class="btn btn-intake" onclick="quickIntake('+JSON.stringify({id:c.id,name:c.patientName||'',sex:c.patientSex||'',year:c.birthYear||'',symptoms:c.symptoms||'',constitution:c.constitution||''}).replace(/"/g,'&quot;')+')" title="一键带入患者信息到采集工具">⚡ 快速采集</button>'+
         (c.status==='pending_doctor'||c.status==='pending'?
           '<button class="btn btn-reject" onclick="rejectCase('+c.id+')">✕ 驳回</button>'+
           '<button class="btn btn-secondary" onclick="openEdit('+c.id+')">✎ 编辑</button>'+
@@ -210,6 +212,17 @@ function renderCards(list){
     '</div>';
   });
   el.innerHTML=html;
+}
+
+// ⚡ 一键带入采集工具（零重复输入）
+function quickIntake(p){
+  var qs=[];
+  if(p.name)qs.push('name='+encodeURIComponent(p.name));
+  if(p.sex)qs.push('sex='+encodeURIComponent(p.sex));
+  if(p.year)qs.push('year='+encodeURIComponent(p.year));
+  if(p.symptoms)qs.push('symptoms='+encodeURIComponent(p.symptoms));
+  if(p.constitution)qs.push('constitution='+encodeURIComponent(p.constitution));
+  location.href='doctor-intake.html'+(qs.length?'?'+qs.join('&'):'');
 }
 
 // 打开编辑面板（预填 AI 初稿）

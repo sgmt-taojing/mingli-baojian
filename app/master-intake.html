@@ -316,6 +316,19 @@ function submitNote(){
     }
   }).catch(function(){showToast('网络错误')});
 }
+
+// === URL 参数一键带入（医生快速采集 → 大师批注）===
+(function(){
+  var qs=new URLSearchParams(location.search);
+  var name=qs.get('name')||'';
+  var sex=qs.get('sex')||'';
+  var year=qs.get('year')||'';
+  var symptoms=qs.get('symptoms')||'';
+  if(name)document.getElementById('m-name').value=name;
+  if(sex)document.getElementById('m-sex').value=sex;
+  if(year)document.getElementById('m-year').value=year;
+  if(symptoms)document.getElementById('m-questions').value='健康（'+symptoms.slice(0,20)+'）';
+})();
 </script>
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考 · 命理批注须大师审核确认</footer>

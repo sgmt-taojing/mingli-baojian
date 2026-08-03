@@ -28,6 +28,7 @@ textarea{resize:vertical;min-height:60px}
 .btn{display:block;width:100%;padding:12px;background:var(--gold);color:#0e1726;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:10px}
 .btn-green{background:var(--green);color:#fff}
 .btn-blue{background:var(--blue);color:#fff}
+.btn-purple{background:var(--purple);color:#fff}
 .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
 .chip-wrap{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
 .chip{padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:16px;font-size:12px;cursor:pointer;color:var(--text);user-select:none;transition:all .15s}
@@ -83,8 +84,9 @@ textarea{resize:vertical;min-height:60px}
 </div>
 
 <div class="card">
-<div class="card-title"><span class="step-num">2</span>症状点选（按系统分类，可多选）</div>
+<div class="card-title"><span class="step-num">2</span>症状点选（按系统分类，可多选）<button onclick="voiceCollect()" style="float:right;background:var(--blue);border:none;border-radius:16px;padding:4px 12px;color:#fff;font-size:11px;cursor:pointer">🎤 语音采集</button></div>
 <div class="progress"><div id="symptom-progress"></div></div>
+<div id="voice-status" style="display:none;text-align:center;padding:8px;color:var(--blue);font-size:12px">🎙️ 正在聆听，请描述症状...</div>
 <div id="sys-groups"></div>
 <textarea id="other-symptom" placeholder="其他未列出的症状..." aria-label="其他症状" style="margin-top:8px"></textarea>
 </div>
@@ -111,6 +113,7 @@ textarea{resize:vertical;min-height:60px}
   </div>
   <div class="row" style="display:flex;gap:8px;margin-top:8px">
     <button class="btn btn-green" style="flex:1;margin-top:0" onclick="submitWithPush()">✓ 采纳并通知患者</button>
+    <button class="btn btn-purple" style="flex:1;margin-top:0" onclick="sendToMaster()">🀄 送大师批注</button>
   </div>
 </div>
 </div>
@@ -139,6 +142,11 @@ var SYS_SYMPTOMS={
   '头面五官':['耳鸣耳聋','视物模糊','眼干涩','鼻衄','牙龈出血','口臭','舌痛','咽喉异物感'],
   '二便排泄':['便秘','腹泻','尿频','尿痛','尿黄','便血','里急后重','小便不利']
 };
+// 症状→系统 反向字典（URL 预填用）
+var SYS_SYMPTOMS_DICT={};
+Object.keys(SYS_SYMPTOMS).forEach(function(sys){
+  SYS_SYMPTOMS[sys].forEach(function(s){SYS_SYMPTOMS_DICT[s]=sys});
+});
 
 // 舌象（对齐 docx V1.1 标签池）
 var TONGUE_GROUPS={
@@ -180,6 +188,87 @@ function toggleSym(s,el){
   // 有选择后显示舌脉
   var n=Object.keys(selected).length;
   if(n>0)document.getElementById('card-tongue').style.display='block';
+}
+
+// === 语音采集：医生说 → ASR 转写 → 自动勾选症状标签 ===
+var voiceRecog=null;
+var voiceListening=false;
+function voiceCollect(){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){showToast('当前浏览器不支持语音识别，请用 Chrome/Edge');return}
+  if(voiceListening){voiceRecog.stop();voiceListening=false;return}
+  voiceRecog=new SR();
+  voiceRecog.lang='zh-CN';
+  voiceRecog.continuous=true;
+  voiceRecog.interimResults=true;
+  voiceRecog.onstart=function(){
+    voiceListening=true;
+    document.getElementById('voice-status').style.display='block';
+    document.getElementById('voice-status').textContent='🎙️ 正在聆听，请描述症状（如：最近失眠多梦，口干口苦，舌头有齿痕）';
+  };
+  voiceRecog.onresult=function(e){
+    var text='';
+    for(var i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal)text+=e.results[i][0].transcript;
+    }
+    if(!text)return;
+    // 自动匹配症状标签
+    var matched=0;
+    Object.keys(SYS_SYMPTOMS_DICT).forEach(function(s){
+      if(text.indexOf(s)>=0&&!selected[s]){
+        selected[s]=1;matched++;
+        document.querySelectorAll('.chip').forEach(function(el){
+          if(el.textContent.replace(/ ✓$/,'')===s){el.classList.add('on')}
+        });
+      }
+    });
+    // 舌象自动匹配
+    ['舌淡白','舌红','舌胖大','齿痕','黄苔','薄白苔','裂纹','剥苔'].forEach(function(t){
+      if(text.indexOf(t.replace('舌',''))>=0&&!selected[t]){
+        selected[t]=1;matched++;
+        document.querySelectorAll('.chip').forEach(function(el){
+          if(el.textContent.replace(/ ✓$/,'')===t.replace('舌','')){el.classList.add('on')}
+        });
+      }
+    });
+    // 脉象自动匹配
+    ['脉细','脉弦','脉滑','脉数','脉沉','脉浮'].forEach(function(p){
+      if(text.indexOf(p.replace('脉',''))>=0&&!selected[p]){
+        selected[p]=1;matched++;
+        document.querySelectorAll('.chip').forEach(function(el){
+          if(el.textContent.replace(/ ✓$/,'')===p.replace('脉','')){el.classList.add('on')}
+        });
+      }
+    });
+    // 未匹配的追加到其他症状
+    var otherEl=document.getElementById('other-symptom');
+    var unMatched=text.replace(/[。，,.！!？?\s]/g,' ').trim();
+    if(matched>0)unMatched='';
+    // 简单处理：清掉已匹配词，剩余放其他
+    Object.keys(SYS_SYMPTOMS_DICT).forEach(function(s){
+      unMatched=unMatched.split(s).join('');
+    });
+    ['舌淡白','舌红','舌胖大','齿痕','黄苔','薄白苔','裂纹','剥苔','细','弦','滑','数','沉','浮'].forEach(function(t){
+      unMatched=unMatched.split(t).join('');
+    });
+    unMatched=unMatched.replace(/[，,、]+/g,' ').trim();
+    if(unMatched&&otherEl.value.indexOf(unMatched)<0){
+      otherEl.value=otherEl.value?(otherEl.value+'、'+unMatched):unMatched;
+    }
+    updateProgress();
+    if(Object.keys(selected).length>0)document.getElementById('card-tongue').style.display='block';
+    if(matched>0)showToast('已识别 '+matched+' 个症状标签');
+  };
+  voiceRecog.onerror=function(e){
+    voiceListening=false;
+    document.getElementById('voice-status').style.display='none';
+    showToast('语音识别错误：'+(e.error||'未知'));
+  };
+  voiceRecog.onend=function(){
+    voiceListening=false;
+    document.getElementById('voice-status').style.display='none';
+  };
+  voiceRecog.start();
 }
 
 function updateProgress(){
@@ -410,8 +499,53 @@ function submitWithPush(){
   submitAsCase();
 }
 
+// 🀄 一键送大师批注（携带患者信息跳转 master-intake）
+function sendToMaster(){
+  var qs=[];
+  var name=document.getElementById('pt-name').value;
+  var sex=document.getElementById('pt-sex').value;
+  var year=document.getElementById('pt-year').value;
+  var syms=Object.keys(selected).filter(function(s){return s.indexOf('舌')<0&&s.indexOf('脉')<0}).join('、');
+  var other=document.getElementById('other-symptom').value.trim();
+  if(name)qs.push('name='+encodeURIComponent(name));
+  if(sex)qs.push('sex='+encodeURIComponent(sex));
+  if(year)qs.push('year='+encodeURIComponent(year));
+  if(syms||other)qs.push('symptoms='+encodeURIComponent(syms+(other?'、'+other:'')));
+  location.href='master-intake.html'+(qs.length?'?'+qs.join('&'):'');
+}
+
 renderSysGroups();
 renderTongue();
+
+// === URL 参数一键带入（医生从队列点「⚡ 快速采集」进入）===
+(function(){
+  var qs=new URLSearchParams(location.search);
+  var name=qs.get('name')||'';
+  var sex=qs.get('sex')||'';
+  var year=qs.get('year')||'';
+  var symptoms=qs.get('symptoms')||'';
+  var constitution=qs.get('constitution')||'';
+  if(name)document.getElementById('pt-name').value=name;
+  if(sex)document.getElementById('pt-sex').value=sex;
+  if(year)document.getElementById('pt-year').value=year;
+  if(constitution&&selected){} // constitution 映射体质标签
+  if(symptoms){
+    // 自动匹配并勾选症状标签
+    var parts=symptoms.split(/[，,、\s]+/).filter(Boolean);
+    parts.forEach(function(s){
+      if(selected[s]===undefined){selected[s]=1;
+        document.querySelectorAll('.chip').forEach(function(el){
+          if(el.textContent.replace(/ ✓$/,'')===s){el.classList.add('on')}
+        });
+      }
+    });
+    updateProgress();
+    document.getElementById('card-tongue').style.display='block';
+    document.getElementById('other-symptom').value=parts.filter(function(s){return !SYS_SYMPTOMS_DICT[s]}).join('、');
+  }
+  // 预填后自动生成初稿
+  if(symptoms)setTimeout(function(){generateDraft()},300);
+})();
 </script>
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考 · AI 初稿须医生审核确认</footer>
