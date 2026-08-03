@@ -192,7 +192,7 @@ function renderCards(list){
       '<div style="font-size:12px;color:var(--muted);margin-top:2px"><b>体质：</b>'+(c.constitution||'—')+'</div>'+
       (photos?'<div class="photo-strip">'+photos+'</div>':'')+
       (kb?'<div style="margin:6px 0">'+kb+'</div>':'')+
-      (c.aiDraft?'<div class="ai-draft"><span class="tag">🤖 AI 初稿</span><br>'+(c.aiDraft||'').slice(0,400)+'</div>':'')+
+      (c.aiDraft?'<div class="ai-draft"><span class="tag">🤖 AI 初稿'+(c.aiGenerated?'<b style="color:#48bb78"> · 自动生成</b>':'')+'</span><br>'+(c.aiDraft||'').slice(0,400)+'</div>':'')+
       '<div class="swipe-actions no-print">'+
         (c.status==='pending_doctor'||c.status==='pending'?
           '<button class="btn btn-reject" onclick="rejectCase('+c.id+')">✕ 驳回</button>'+
@@ -307,6 +307,33 @@ function submitDiagnosis(id,data,note){
 }
 
 loadQueue();
+
+// === 商用效率：15s 自动轮询 + 新案例提醒 ===
+var lastCount=allCases.length;
+var pollTimer=setInterval(function(){
+  // 轻量轮询：只取数量变化，有新案例才重渲染
+  fetch(API+'/api/clinic/review-queue',{headers:authHeaders()}).then(function(r){return r.json()}).then(function(d){
+    if(!d.ok||!d.queue)return;
+    var newCount=d.queue.length;
+    if(newCount>lastCount){
+      // 新案例到达：声音提醒 + 重渲染
+      try{
+        var ctx=new (window.AudioContext||window.webkitAudioContext)();
+        var osc=ctx.createOscillator();
+        var gain=ctx.createGain();
+        osc.connect(gain);gain.connect(ctx.destination);
+        osc.frequency.value=880;gain.gain.value=0.15;
+        osc.start();osc.stop(ctx.currentTime+0.4);
+      }catch(e){}
+      showToast('🔔 新案例到达 ('+(newCount-lastCount)+' 个)');
+      allCases=d.queue;
+      lastCount=newCount;
+      renderStats();renderQueueBar();renderCards();
+    }else{
+      lastCount=newCount;
+    }
+  }).catch(function(){});
+},15000);
 </script>
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考 · 处方需医生审核确认</footer>
