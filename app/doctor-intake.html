@@ -123,6 +123,7 @@ var token=localStorage.getItem('admin_token')||localStorage.getItem('token')||''
 var selected={};
 var draftText='';
 var kbLines=[];
+var genBtn=null;
 
 function authHeaders(){var h={'Content-Type':'application/json'};if(token)h['Authorization']='Bearer '+token;return h}
 function showToast(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a2332;border:1px solid var(--gold);color:var(--gold);padding:10px 18px;border-radius:20px;font-size:13px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.4)';document.body.appendChild(t);setTimeout(function(){t.remove()},2200)}
@@ -248,80 +249,109 @@ function generateDraft(){
   var other=document.getElementById('other-symptom').value.trim();
   if(!syms.length&&!other){showToast('请至少选择一个症状');return}
   
-  var btn=document.getElementById('gen-btn');
-  btn.disabled=true;
+  genBtn=document.getElementById('gen-btn');
+  genBtn.disabled=true;
   document.getElementById('loading').style.display='block';
   document.getElementById('result-area').style.display='none';
   
-  setTimeout(function(){
-    var allSyms=syms.concat(other?other.split(/[，,、\s]+/):[]);
-    var hits=[];
-    allSyms.forEach(function(s){
-      var hit=LOCAL_DX_KB[s];
-      if(hit)hits.push({symptom:s,kb:hit});
-    });
-    
-    // 统计证型
-    var dzCount={};
-    hits.forEach(function(h){var k=h.kb.key;dzCount[k]=(dzCount[k]||0)+1});
-    var topDz=Object.keys(dzCount).sort(function(a,b){return dzCount[b]-dzCount[a]});
-    var mainDz=topDz.slice(0,3).join(' + ');
-    if(!mainDz)mainDz='综合辨证（需医生结合四诊确认）';
-    
-    // 处方组合
-    var rxSet=[];
-    hits.forEach(function(h){if(rxSet.indexOf(h.kb.rx)<0)rxSet.push(h.kb.rx)});
-    var mainRx=rxSet.slice(0,3).join(' 加减 ');
-    if(!mainRx)mainRx='（AI 未匹配到处方模板，请医生开方）';
-    
-    // 症状汇总
-    var symStr=allSyms.join('、');
-    var tongue=[];
-    var pulse=[];
-    syms.forEach(function(s){
-      if(s.indexOf('舌')===0)tongue.push(s);
-      if(s.indexOf('脉')===0)pulse.push(s);
-    });
-    
-    draftText='【AI 辨证初稿】\n\n'+
-      '主诉症状：'+symStr+'\n'+
-      (tongue.length?'舌象：'+tongue.join('、')+'\n':'')+
-      (pulse.length?'脉象：'+pulse.join('、')+'\n':'')+
-      '\n【辨证】'+mainDz+'\n'+
-      '【治则】'+(['疏肝理气','健脾益气','清热化湿','活血化瘀','滋阴降火','温补肾阳'].filter(function(g){return mainDz.indexOf(g.slice(0,2))>=0}).join('、')||'随证治之')+'\n'+
-      '【处方】'+mainRx+'\n'+
-      '\n【医嘱】注意休息，清淡饮食，忌辛辣油腻，情志调畅。\n'+
-      '\n⚠️ 本初稿由 AI 基于症状匹配生成，仅供医生参考，须经医生审核确认后方可执行。';
-    
-    // KB 支撑行
-    kbLines=hits.slice(0,5).map(function(h){
-      return {symptom:h.symptom,dz:h.kb.dz,rx:h.kb.rx};
-    });
-    
-    document.getElementById('loading').style.display='none';
-    document.getElementById('ai-result').textContent=draftText;
-    
-    var kbHtml='<div class="card-title">📚 知识库支撑</div>';
-    kbLines.forEach(function(k){
-      kbHtml+='<div class="kb-line"><span class="t">'+k.symptom+'</span> → '+k.dz+' · '+k.rx+'</div>';
-    });
-    document.getElementById('kb-area').innerHTML=kbHtml;
-    
-    // 命理批注（八字维度）
-    var by=document.getElementById('pt-year').value;
-    if(by){
-      var bm=document.getElementById('pt-month').value||6;
-      var bd=document.getElementById('pt-day').value||15;
-      var bh=document.getElementById('pt-hour').value||10;
-      document.getElementById('master-note').innerHTML='🀄 <b>周易命理批注请求</b>：出生 '+by+'年'+bm+'月'+bd+'日'+bh+'时 · 已生成八字排盘，命理师可从五行偏颇/流年运势维度补充健康建议（如五行缺木者注意肝胆疏泄，缺金者注意肺肠养护）。';
+  // 结构化请求体（医生点选 + 人机交互 → 后台 FTS5 KB 识别）
+  var tongue=[];
+  var pulse=[];
+  var syms2=[];
+  syms.forEach(function(s){
+    if(s.indexOf('舌')===0)tongue.push(s);
+    else if(s.indexOf('脉')===0)pulse.push(s);
+    else syms2.push(s);
+  });
+  var otherList=other?other.split(/[，,、\s]+/):[];
+  var allSymptoms=syms2.concat(otherList).slice(0,10);
+  var body={symptoms:allSymptoms,tongue:tongue.slice(0,6),pulse:pulse.slice(0,6)};
+  if(selected['脉细']||selected['舌淡白'])body.constitution='气血虚';
+  else if(selected['畏寒怕冷']||selected['手足冰凉'])body.constitution='阳虚质';
+  else if(selected['潮热盗汗']||selected['舌红'])body.constitution='阴虚质';
+  else if(selected['痰多']||selected['齿痕'])body.constitution='痰湿质';
+  
+  // 优先真实后端（FTS5 KB 引擎），失败降级本地 26 条
+  fetch(API+'/api/clinic/ai-draft',{method:'POST',headers:authHeaders(),body:JSON.stringify(body)})
+  .then(function(r){return r.json()})
+  .then(function(d){
+    if(d&&d.ok&&d.draft){
+      draftText=d.draft;
+      renderDraftResult(d);
     }else{
-      document.getElementById('master-note').innerHTML='🀄 <b>周易命理批注</b>：补充患者出生时间后，可自动生成八字排盘并从命理维度提供健康预防建议。';
+      localDraft(allSymptoms,tongue,pulse,body.constitution||'');
     }
-    
-    document.getElementById('result-area').style.display='block';
-    document.getElementById('result-area').scrollIntoView({behavior:'smooth'});
-    btn.disabled=false;
-  },500);
+  })
+  .catch(function(){localDraft(allSymptoms,tongue,pulse,body.constitution||'')});
+}
+
+function renderDraftResult(d){
+  document.getElementById('loading').style.display='none';
+  document.getElementById('ai-result').textContent=d.draft;
+  
+  var kbHtml='<div class="card-title">📚 知识库支撑（FTS5 引擎 · '+d.engine+'）</div>';
+  (d.kbHits||[]).forEach(function(k){
+    kbHtml+='<div class="kb-line"><span class="t">'+k.title+'</span><span style="opacity:.6"> ['+k.module+' · trust '+k.trust+']</span><br><span style="font-size:11px;opacity:.75">'+(k.snippet||'').slice(0,80)+'</span></div>';
+  });
+  document.getElementById('kb-area').innerHTML=kbHtml;
+  
+  // 命理批注位
+  var by=document.getElementById('pt-year').value;
+  if(by){
+    var bm=document.getElementById('pt-month').value||6;
+    var bd=document.getElementById('pt-day').value||15;
+    var bh=document.getElementById('pt-hour').value||10;
+    document.getElementById('master-note').innerHTML='🀄 <b>周易命理批注请求</b>：出生 '+by+'年'+bm+'月'+bd+'日'+bh+'时 · 已生成八字排盘，命理师可从五行偏颇/流年运势维度补充健康建议（如五行缺木者注意肝胆疏泄，缺金者注意肺肠养护）。';
+  }else{
+    document.getElementById('master-note').innerHTML='🀄 <b>周易命理批注</b>：补充患者出生时间后，可自动生成八字排盘并从命理维度提供健康预防建议。';
+  }
+  
+  document.getElementById('result-area').style.display='block';
+  document.getElementById('result-area').scrollIntoView({behavior:'smooth'});
+  genBtn.disabled=false;
+}
+
+function localDraft(allSymptoms,tongue,pulse,constitution){
+  // 本地降级：26 条症状映射
+  var hits=[];
+  allSymptoms.forEach(function(s){
+    var hit=LOCAL_DX_KB[s];
+    if(hit)hits.push({symptom:s,kb:hit});
+  });
+  var dzCount={};
+  hits.forEach(function(h){var k=h.kb.key;dzCount[k]=(dzCount[k]||0)+1});
+  var topDz=Object.keys(dzCount).sort(function(a,b){return dzCount[b]-dzCount[a]});
+  var mainDz=topDz.slice(0,3).join(' + ')||'综合辨证（需医生结合四诊确认）';
+  var rxSet=[];
+  hits.forEach(function(h){if(rxSet.indexOf(h.kb.rx)<0)rxSet.push(h.kb.rx)});
+  var mainRx=rxSet.slice(0,3).join(' 加减 ')||'（AI 未匹配到处方模板，请医生开方）';
+  var symStr=allSymptoms.join('、');
+  draftText='【AI 辨证初稿】\n\n主诉症状：'+symStr+'\n'+
+    (tongue.length?'舌象：'+tongue.join('、')+'\n':'')+
+    (pulse.length?'脉象：'+pulse.join('、')+'\n':'')+
+    '\n【辨证】'+mainDz+'\n【治则】随证治之\n【处方】'+mainRx+'\n\n【医嘱】注意休息，清淡饮食，忌辛辣油腻，情志调畅。\n\n⚠️ 本初稿由 AI 基于症状匹配生成，仅供医生参考，须经医生审核确认后方可执行。';
+  
+  kbLines=hits.slice(0,5).map(function(h){
+    return {symptom:h.symptom,dz:h.kb.dz,rx:h.kb.rx};
+  });
+  
+  document.getElementById('loading').style.display='none';
+  document.getElementById('ai-result').textContent=draftText;
+  
+  var kbHtml='<div class="card-title">📚 知识库支撑（本地映射）</div>';
+  kbLines.forEach(function(k){
+    kbHtml+='<div class="kb-line"><span class="t">'+k.symptom+'</span> → '+k.dz+' · '+k.rx+'</div>';
+  });
+  document.getElementById('kb-area').innerHTML=kbHtml;
+  
+  var by=document.getElementById('pt-year').value;
+  document.getElementById('master-note').innerHTML=by
+    ?'🀄 <b>周易命理批注请求</b>：出生 '+by+'年，已生成八字排盘，命理师可从五行偏颇维度补充健康建议。'
+    :'🀄 <b>周易命理批注</b>：补充患者出生时间后，可自动生成八字排盘并从命理维度提供健康预防建议。';
+  
+  document.getElementById('result-area').style.display='block';
+  document.getElementById('result-area').scrollIntoView({behavior:'smooth'});
+  genBtn.disabled=false;
 }
 
 function editDraft(){
