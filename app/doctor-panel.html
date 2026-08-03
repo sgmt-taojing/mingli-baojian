@@ -86,6 +86,13 @@ textarea{resize:vertical;min-height:60px}
 <div class="flow-hint">一屏一张待审卡片 · 采纳即提交 · 修改留痕</div>
 </div>
 
+<!-- 紧急 SOS 横幅 -->
+<div id="sos-banner" style="display:none;background:linear-gradient(135deg,#7f1d1d,#991b1b);border:1px solid #f87171;border-radius:10px;padding:12px;margin-bottom:10px">
+  <div style="font-weight:700;color:#fca5a5;font-size:14px">🚨 紧急求助</div>
+  <div id="sos-banner-detail" style="font-size:12px;color:#fecaca;margin-top:4px"></div>
+  <a href="sos.html" style="display:inline-block;margin-top:8px;background:#dc2626;color:#fff;text-decoration:none;border-radius:16px;padding:6px 16px;font-size:12px;font-weight:600">立即响应</a>
+</div>
+
 <!-- 统计栏 -->
 <div class="stat-row">
   <div class="stat-box"><div class="num" id="stat-pending">0</div><div class="lbl">待审</div></div>
@@ -354,7 +361,36 @@ var pollTimer=setInterval(function(){
       lastCount=newCount;
     }
   }).catch(function(){});
+  // SOS 紧急事件检查
+  checkSOS();
 },15000);
+
+// 🚨 SOS 紧急事件检查（新紧急事件 → 红色横幅 + 警报音）
+var lastSOSId=0;
+function checkSOS(){
+  fetch(API+'/api/clinic/emergency-events',{headers:authHeaders()})
+  .then(function(r){return r.json()}).then(function(d){
+    if(!d.ok||!d.events||!d.events.length)return;
+    var latest=d.events[0];
+    if(latest.id>lastSOSId){
+      lastSOSId=latest.id;
+      document.getElementById('sos-banner').style.display='block';
+      document.getElementById('sos-banner-detail').textContent=(latest.detail||'紧急求助')+' · '+(latest.created_at||'').slice(0,16);
+      // 三次警报音
+      try{
+        var ctx=new (window.AudioContext||window.webkitAudioContext)();
+        for(var i=0;i<3;i++){
+          var osc=ctx.createOscillator();
+          var gain=ctx.createGain();
+          osc.connect(gain);gain.connect(ctx.destination);
+          osc.frequency.value=1200;gain.gain.value=0.2;
+          osc.start(ctx.currentTime+i*0.4);osc.stop(ctx.currentTime+i*0.4+0.3);
+        }
+      }catch(e){}
+      showToast('🚨 紧急求助到达！');
+    }
+  }).catch(function(){});
+}
 </script>
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考 · 处方需医生审核确认</footer>
