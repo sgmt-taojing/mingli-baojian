@@ -264,12 +264,38 @@ async function analyze(blob) {
     const text = j.analysis || j.text || '(无文本结果)';
     analysis.innerHTML = `<div style="font-size:11px;color:var(--paper3);margin-bottom:8px">引擎：${j.engine} · 用时 ${j.elapsed_ms}ms · 字节 ${j.bytes}</div><div>${escape(text)}</div>`;
     setStatus('✓ 分析完成 · ' + j.engine, 'ok');
+    // R100: KB 匹配结果渲染（知识库支撑卡）
+    renderKbSupport(j);
     // KB 联动: 把 AI 识别结果按模式注入 _MODULE_REPORTS，供下次咨询参考
     injectKb(mode, blob, text, j.engine);
   } catch (e) {
     analysis.innerHTML = `<div class="analysis-empty" style="color:var(--danger)">✗ 网络错误：${e.message}<br>请确认 face-ocr-server 在 8913 端口运行</div>`;
     setStatus('上传失败：' + e.message, 'err');
   }
+}
+
+/* R100: KB 知识支撑渲染 — 识别结果 → 知识库匹配 → 结构化展示 */
+function renderKbSupport(j) {
+  const wrap = document.getElementById('kbSupport');
+  const list = document.getElementById('kbSupportList');
+  const meta = document.getElementById('kbSupportMeta');
+  if (!wrap || !j.kb_matches || !j.kb_matches.length) {
+    if (wrap) wrap.style.display = 'none';
+    return;
+  }
+  const matches = j.kb_matches.slice(0, 5);
+  list.innerHTML = matches.map(m => `
+    <div class="kb-match-item">
+      <div class="kb-match-head">
+        <span class="kb-match-title">${escape(m.title)}</span>
+        <span class="kb-match-score">${Math.round(m.score * 100)}%</span>
+      </div>
+      <div class="kb-match-content">${escape(m.content || '').slice(0, 120)}</div>
+      <div class="kb-match-meta">模块 ${escape(m.module)} · 命中「${escape(m.matched)}」</div>
+    </div>
+  `).join('');
+  meta.textContent = (j.kb_features && j.kb_features.length ? `特征词：${j.kb_features.join(' / ')}` : '') + ' · 本地检索 ' + (j.kb_ms ? '即时' : '') + ' · ' + matches.length + ' 条知识支撑';
+  wrap.style.display = 'block';
 }
 
 /* KB 联动: 把面诊/舌诊/眼诊结果缓存到 localStorage, 供 智能助手查询 */
