@@ -17,7 +17,6 @@
 body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
 .container{max-width:1400px;margin:0 auto;padding:20px 24px}
 
-/* page-header flow-integration */
 .page-header-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:var(--card-bg);border-bottom:1px solid var(--border)}
 .phb-left{display:flex;align-items:center;gap:8px}
 .phb-theme-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
@@ -30,7 +29,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC',sa
 .flow-step-num{width:20px;height:20px;border-radius:50%;background:var(--accent);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
 .flow-hint{font-size:12px;color:var(--muted);margin-top:6px}
 
-/* header */
 .header{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--border);margin-bottom:24px}
 .logo{display:flex;align-items:center;gap:12px}
 .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
@@ -39,19 +37,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC',sa
 .status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:var(--green);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
 
-/* metrics */
 .metrics{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:24px}
 .metric-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
 .metric-value{font-size:36px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1.1}
 .metric-label{font-size:13px;color:var(--muted);margin-top:4px}
 
-/* panels */
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
 .panel{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
 .panel-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);font-weight:600;font-size:15px}
 .panel-body{padding:14px 18px}
 
-/* neurons table */
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{text-align:left;padding:8px 6px;border-bottom:1px solid var(--border);color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase}
 td{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,0.03)}
@@ -59,24 +54,34 @@ tr:hover td{background:rgba(124,92,231,0.04)}
 .neuron-bar{display:inline-block;height:6px;border-radius:3px;background:var(--accent);opacity:0.8;transition:width 0.5s}
 .neuron-module{font-size:11px;color:var(--muted)}
 
-/* search */
 .search-bar{display:flex;gap:8px;margin-bottom:16px}
 .search-input{flex:1;padding:10px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);background:rgba(255,255,255,0.04);color:var(--text);font-size:14px;outline:none}
 .search-input:focus{border-color:var(--accent)}
 .search-btn{padding:10px 20px;background:var(--accent);color:white;border:none;border-radius:var(--radius-sm);cursor:pointer;font-size:14px;font-weight:600}
 .search-btn:hover{opacity:0.9}
 
-/* query results */
 .result-card{margin-top:12px;padding:14px;border-radius:var(--radius-sm);background:rgba(124,92,231,0.06);border:1px solid rgba(124,92,231,0.15)}
 .result-title{font-weight:600;margin-bottom:4px;font-size:14px}
 .result-body{font-size:13px;color:var(--muted);max-height:100px;overflow:hidden}
 .result-meta{display:flex;gap:12px;margin-top:8px;font-size:11px;color:var(--muted)}
 
-/* module grid */
 .module-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
 .module-item{padding:10px 12px;border-radius:var(--radius-sm);background:rgba(255,255,255,0.03);border:1px solid var(--border);text-align:center}
 .module-name{font-size:12px;color:var(--muted);margin-bottom:2px}
 .module-count{font-size:24px;font-weight:700;color:var(--accent2)}
+
+/* R473 · Solve pipeline visual */
+.solve-pipeline{display:flex;gap:4px;align-items:center;margin:12px 0;font-size:12px}
+.solve-stage{padding:6px 12px;border-radius:6px;background:rgba(124,92,231,0.1);border:1px solid rgba(124,92,231,0.2)}
+.solve-stage.passed{background:rgba(0,212,170,0.1);border-color:rgba(0,212,170,0.3)}
+.solve-arrow{color:var(--muted)}
+.guide-step{margin:8px 0;padding:10px 12px;border-radius:8px;background:rgba(255,255,255,0.02);border-left:3px solid var(--accent)}
+.guide-step-title{font-weight:600;font-size:13px;margin-bottom:4px}
+.guide-step-detail{font-size:12px;color:var(--muted)}
+.checkpoint{font-size:11px;color:var(--green);margin-right:8px}
+.fb-btn{padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--text);cursor:pointer;font-size:14px}
+.fb-btn:hover{background:rgba(124,92,231,0.1)}
+.fb-btn.selected{background:rgba(124,92,231,0.2);border-color:var(--accent)}
 
 @media(max-width:768px){
   .grid2{grid-template-columns:1fr}
@@ -88,7 +93,6 @@ tr:hover td{background:rgba(124,92,231,0.04)}
 <body>
 <div class="container">
 
-<!-- PAGE HEADER -->
 <header class="page-header-bar">
 <div class="phb-left">
 <span class="phb-theme-dot" style="background:linear-gradient(135deg,#7c5ce7,#00d4aa)"></span>
@@ -97,7 +101,6 @@ tr:hover td{background:rgba(124,92,231,0.04)}
 <a class="phb-back" href="divination-hub.html">← 返回中心</a>
 </header>
 
-<!-- FLOW STEPS -->
 <div class="flow-steps-wrap">
 <div class="flow-steps">
 <div class="flow-step active"><span class="flow-step-num">1</span><span>状态概览</span></div>
@@ -108,7 +111,6 @@ tr:hover td{background:rgba(124,92,231,0.04)}
 <div class="flow-hint">白盒可解释 · 零算力推理 · 弥撒亚 API (8930) · solve 三层级联：search→nn→guide</div>
 </div>
 
-<!-- HEADER -->
 <header class="header">
 <div class="logo">
   <div class="logo-icon">🧬</div>
@@ -120,7 +122,6 @@ tr:hover td{background:rgba(124,92,231,0.04)}
 <div><span class="status-dot"></span> 8930 在线</div>
 </header>
 
-<!-- METRICS -->
 <div class="metrics" id="metrics">
   <div class="metric-card"><div class="metric-value" id="m-total">—</div><div class="metric-label">总神经元</div></div>
   <div class="metric-card"><div class="metric-value" id="m-formal">—</div><div class="metric-label">正式库 (Formal)</div></div>
@@ -130,10 +131,9 @@ tr:hover td{background:rgba(124,92,231,0.04)}
 </div>
 
 <div class="grid2">
-
 <!-- SEARCH -->
 <div class="panel" style="grid-row:span 2">
-  <div class="panel-header">🔍 实时推理</div>
+  <div class="panel-header">🔍 实时推理 (NN)</div>
   <div class="panel-body">
     <div class="search-bar">
       <input class="search-input" id="query" placeholder="输入问题，激活神经网络…例如：桂枝汤的组成和用法" onkeydown="if(event.key==='Enter')search()">
@@ -164,19 +164,40 @@ tr:hover td{background:rgba(124,92,231,0.04)}
     </div>
   </div>
 </div>
-
 </div>
+
+<!-- R473 · 白盒求解器面板 -->
+<div class="panel" style="margin-bottom:16px">
+  <div class="panel-header">
+    ⚗️ 白盒求解器 · search→nn→guide 三层级联
+    <span style="font-size:11px;color:var(--muted);font-weight:400">· session: <span id="solveSession">未开始</span></span>
+  </div>
+  <div class="panel-body">
+    <div class="search-bar">
+      <input class="search-input" id="solveQuery" placeholder="走 solve：八字排盘 / 紫微化忌 / 玄空飞星 / 冲太岁化解 / 桂枝汤..." onkeydown="if(event.key==='Enter')solve()">
+      <button class="search-btn" onclick="solve()" style="background:linear-gradient(135deg,var(--accent),var(--accent2))">⚗️ 求解</button>
+    </div>
+    <div id="solveResults">
+      <div style="color:var(--muted);font-size:13px;text-align:center;padding:30px 0">
+        ⚗️ 等待求解…<br><small>白盒 3 段链路：search(召回) → nn(重排序) → guide(工作流引导)</small>
+      </div>
+    </div>
+  </div>
+</div>
+
 </div>
 
 <script>
 const API = 'http://127.0.0.1:8930/messiah';
+const GATEWAY = '/api/public/messiah-solve';
+const GATEWAY_FB = '/api/public/messiah-feedback';
+let SOLVE_SESSION = '';
 
 async function fetchJSON(url) {
   const r = await fetch(url);
   return r.json();
 }
 
-// 加载全局状态
 async function loadStatus() {
   try {
     const d = await fetchJSON(`${API}/status`);
@@ -185,17 +206,15 @@ async function loadStatus() {
     document.getElementById('m-staging').textContent = d.staging.toLocaleString();
     document.getElementById('m-modules').textContent = d.modules.length;
     document.getElementById('m-sources').textContent = d.sources.toLocaleString();
-    
-    // 模块分布
+
     const grid = document.getElementById('module-grid');
-    grid.innerHTML = d.modules.slice(0,20).map(m => 
+    grid.innerHTML = d.modules.slice(0,20).map(m =>
       `<div class="module-item">
         <div class="module-count">${m.count.toLocaleString()}</div>
         <div class="module-name">${m.name}</div>
       </div>`
     ).join('');
 
-    // 从模块里挑 top 高信任的展示为活跃神经元
     const topTrust = [...d.modules].sort((a,b) => b.avg_trust - a.avg_trust).slice(0,8);
     document.getElementById('top-neurons').innerHTML = topTrust.map(m => {
       const bar = m.avg_trust * 100;
@@ -210,33 +229,30 @@ async function loadStatus() {
   }
 }
 
-// 搜索推理
+// NN 搜索
 async function search() {
   const q = document.getElementById('query').value.trim();
   if (!q) return;
-  
   const el = document.getElementById('results');
   el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--accent)">🧠 神经网络推理中…</div>';
-  
   try {
     const d = await fetchJSON(`${API}/nn?q=${encodeURIComponent(q)}&top_k=5`);
     let html = `<div style="font-size:13px;color:var(--muted);margin-bottom:12px">
       查询: ${d.query} · 激活 ${d.activated}/${d.total_neurons} 神经元
     </div>`;
-    
     if (d.neurons && d.neurons.length) {
       d.neurons.forEach((n,i) => {
-        const hue = 260 - i * 20; // 从紫色渐变
+        const hue = 260 - i * 20;
         html += `<div class="result-card" style="border-color:hsl(${hue},60%,30%)">
           <div class="result-title">
             <span style="display:inline-block;width:${n.attention_weight*100}%;height:4px;background:hsl(${hue},60%,50%);border-radius:2px;vertical-align:middle;margin-right:6px"></span>
             w=${n.attention_weight.toFixed(3)} · ${n.title}
           </div>
-          <div class="result-body">${n.content_preview}</div>
+          <div class="result-body">${n.content_preview || ''}</div>
           <div class="result-meta">
             <span>模块: ${n.module}</span>
             <span>信任度: ${n.trust.toFixed(2)}</span>
-            <span>激活: ${n.activation}</span>
+            <span>激活: ${n.activation || ''}</span>
           </div>
         </div>`;
       });
@@ -249,29 +265,131 @@ async function search() {
   }
 }
 
-// 自动采样几个查询验证
-setTimeout(() => {
-  const samples = ['伤寒论桂枝汤', '数字化转型ERP库存管理', '八字日主五行旺衰'];
-  const el = document.getElementById('results');
-  el.innerHTML = '<div style="font-size:13px;color:var(--muted);text-align:center;padding:20px">🔄 预热神经网络…</div>';
-  Promise.all(samples.map(q => 
-    fetch(`${API}/nn?q=${encodeURIComponent(q)}&top_k=1`)
-      .then(r => r.json())
-      .then(d => ({q, activated: d.activated, total: d.total_neurons}))
-      .catch(() => ({q, activated: 0, total: '?'}))
-  )).then(sampleResults => {
-    el.innerHTML = `<div style="font-size:13px;color:var(--muted);margin-bottom:8px">📡 预热完成 — 输入问题激活神经网络</div>
-    ${sampleResults.map(s => 
-      `<div class="result-card" style="padding:8px 12px;margin-top:6px">
-        <span style="color:var(--accent)">"${s.q}"</span> → ${s.activated}/${s.total} 神经元激活
-      </div>`
-    ).join('')}`;
-  });
-}, 500);
+// R473 · 白盒求解器
+async function solve() {
+  const q = document.getElementById('solveQuery').value.trim();
+  if (!q) return;
+  if (!SOLVE_SESSION) SOLVE_SESSION = `dash-${Date.now().toString(36)}`;
+  document.getElementById('solveSession').textContent = SOLVE_SESSION.slice(-6);
+
+  const el = document.getElementById('solveResults');
+  el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--accent)">⚗️ 白盒求解中… search→nn→guide</div>';
+
+  try {
+    const url = `${GATEWAY}?q=${encodeURIComponent(q)}&session_id=${SOLVE_SESSION}`;
+    const resp = await fetch(url);
+    const raw = await resp.json();
+    const d = raw.data || raw;
+
+    // pipeline 可视化
+    const p = d.pipeline || {};
+    const s1 = p.stage_1_search || {};
+    const s2 = p.stage_2_nn || {};
+    const s3 = p.stage_3_guide || {};
+    const cl = d.closed_loop || {};
+
+    let html = '';
+
+    // Stage 1: pipeline 可视化
+    html += `<div class="solve-pipeline">
+      <span class="solve-stage passed">① search: ${s1.hits || 0} 命中</span>
+      <span class="solve-arrow">→</span>
+      <span class="solve-stage passed">② nn: ${s2.activated || 0} 激活 · max=${((s2.max_attention || 0) * 100).toFixed(1)}%</span>
+      <span class="solve-arrow">→</span>
+      <span class="solve-stage passed">③ guide: ${s3.workflow || 'auto'} · ${s3.steps || 0} 步</span>
+    </div>`;
+
+    // Neurons
+    if (d.neurons && d.neurons.length) {
+      html += '<div style="font-size:13px;color:var(--muted);margin:12px 0 6px">⚡ Top 神经元（注意力排序）</div>';
+      d.neurons.slice(0, 5).forEach((n, i) => {
+        const w = (n.attention_weight * 100).toFixed(1);
+        html += `<div class="result-card" style="padding:8px 12px;margin-top:4px">
+          <div class="result-title" style="font-size:13px">
+            <span style="display:inline-block;width:${w}%;height:4px;background:var(--accent);border-radius:2px;vertical-align:middle;margin-right:6px"></span>
+            ${n.activation || ''} w=${n.attention_weight.toFixed(3)} · ${(n.title || '').slice(0, 60)}
+          </div>
+          <div class="result-meta">
+            <span>模块: ${n.module}</span>
+            <span>信任度: ${n.trust}</span>
+            <span>entry: ${(n.entry_id || '').slice(0, 20)}</span>
+          </div>
+        </div>`;
+      });
+    }
+
+    // Guide steps
+    if (d.guide_steps && d.guide_steps.length) {
+      html += '<div style="font-size:13px;color:var(--muted);margin:16px 0 6px">📋 工作流引导步骤</div>';
+      d.guide_steps.forEach(step => {
+        const cps = (step.checkpoints || []).map(c => `<span class="checkpoint">✓ ${c}</span>`).join('');
+        html += `<div class="guide-step">
+          <div class="guide-step-title">${step.step}. ${step.title}</div>
+          <div class="guide-step-detail">
+            ${step.kb_module ? `KB模块: ${step.kb_module} · ` : ''}
+            ${(step.kb_refs || []).length} 条 KB 引用
+            ${step.validate ? ` · 校验: ${step.validate}` : ''}
+          </div>
+          ${cps ? `<div style="margin-top:4px">${cps}</div>` : ''}
+          ${step.on_pass ? `<div style="margin-top:4px;font-size:11px;color:var(--green)">✅ ${step.on_pass}</div>` : ''}
+        </div>`;
+      });
+    }
+
+    // Closed loop + Feedback
+    html += '<div style="margin:16px 0 6px;font-size:13px;color:var(--muted)">🔒 闭环状态</div>';
+    html += `<div style="display:flex;gap:12px;font-size:12px;flex-wrap:wrap">
+      <span>${cl.kb_referenced ? '✅' : '❌'} KB 引用</span>
+      <span>${cl.steps_generated ? '✅' : '❌'} 步骤生成</span>
+      <span>${cl.trust_passing ? '✅' : '❌'} 信任度达标</span>
+      <span>${cl.user_confirmed ? '✅' : '⏳'} 用户确认</span>
+    </div>`;
+
+    // Feedback buttons
+    const topEntry = (d.neurons && d.neurons[0] && d.neurons[0].entry_id) || '';
+    html += `<div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+      <span style="font-size:13px;color:var(--muted)">反馈：</span>
+      <button class="fb-btn" data-score="5" onclick="submitSolveFb(5,'${q}','${topEntry}','${d.inferred_workflow || ''}')">👍 准</button>
+      <button class="fb-btn" data-score="3" onclick="submitSolveFb(3,'${q}','${topEntry}','${d.inferred_workflow || ''}')">😐 一般</button>
+      <button class="fb-btn" data-score="1" onclick="submitSolveFb(1,'${q}','${topEntry}','${d.inferred_workflow || ''}')">👎 不准</button>
+      <span id="fbStatus" style="font-size:11px;color:var(--muted);margin-left:4px"></span>
+    </div>`;
+
+    el.innerHTML = html;
+  } catch(e) {
+    el.innerHTML = `<div style="color:var(--red)">求解失败: ${e.message}<br><small>确保 8920 网关和 8930 弥撒亚都在运行</small></div>`;
+  }
+}
+
+// R473 · 反馈提交
+async function submitSolveFb(score, q, entryId, module) {
+  document.querySelectorAll('.fb-btn').forEach(b => { b.classList.remove('selected'); b.style.opacity = '0.4'; });
+  event.target.classList.add('selected');
+  const status = document.getElementById('fbStatus');
+  if (status) status.textContent = '提交中…';
+  try {
+    const resp = await fetch(GATEWAY_FB, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        query: q, entry_id: entryId, score: score,
+        comment: score >= 4 ? '准' : (score >= 2 ? '一般' : '不准'),
+        module: module, session_id: SOLVE_SESSION,
+        ref_id: '', source: 'nn-dashboard',
+      }),
+      signal: AbortSignal.timeout(3000),
+    });
+    const data = await resp.json();
+    const r = data.data || data;
+    if (status) status.textContent = r.received ? `✅ 已记录 (id=${r.feedback_id})` : '❌ 失败';
+  } catch(e) {
+    if (status) status.textContent = `❌ ${e.message.slice(0, 20)}`;
+  }
+}
 
 // Init
 loadStatus();
-setInterval(loadStatus, 30000); // 30s 刷新
+setInterval(loadStatus, 30000);
 </script>
 </body>
 </html>
