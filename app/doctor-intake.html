@@ -461,7 +461,7 @@ function submitAsCase(){
   fetch(API+'/api/clinic/submit-symptom',{method:'POST',headers:authHeaders(),body:JSON.stringify(body)})
   .then(function(r){return r.json()}).then(function(d){
     if(d.ok||d.caseId){
-      showToast('✅ 已提交为案例 #'+(d.caseId||'')+'，AI 正在生成完整初稿');
+      window._lastCaseId=d.caseId;showToast('✅ 已提交为案例 #'+(d.caseId||'')+'，AI 正在生成完整初稿');
     }else{
       showToast('提交失败：'+(d.error||'请先登录'));
     }
@@ -494,6 +494,7 @@ function sendToMaster(){
   if(day)qs.push('day='+encodeURIComponent(day));
   if(hour)qs.push('hour='+encodeURIComponent(hour));
   if(syms||other)qs.push('symptoms='+encodeURIComponent(syms+(other?'、'+other:'')));
+  if(window._lastCaseId)qs.push('caseId='+window._lastCaseId);
   location.href='master-intake.html'+(qs.length?'?'+qs.join('&'):'');
 }
 

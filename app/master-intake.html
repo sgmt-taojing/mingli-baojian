@@ -299,27 +299,46 @@ function submitNote(){
   var h=document.getElementById('m-hour').value;
   var questions=document.getElementById('m-questions').value||'健康';
   
-  // 提交为 master_case（走患者案例通道，关联患者）
-  var body={
-    symptoms:'命理批注：'+questions,
-    constitution:'',
-    birthYear:Number(y),birthMonth:Number(m),birthDay:Number(d),birthHour:Number(h)
-  };
-  fetch(API+'/api/clinic/submit-symptom',{method:'POST',headers:authHeaders(),body:JSON.stringify(body)})
-  .then(function(r){return r.json()}).then(function(d){
-    if(d.ok||d.caseId){
-      showToast('✅ 已提交批注案例 #'+(d.caseId||'')+'，AI 正在生成完整排盘报告');
-      // 把批注存本地（后续可关联）
-      try{localStorage.setItem('mlb_note_'+d.caseId,noteText)}catch(e){}
-    }else{
-      showToast('提交失败：'+(d.error||'请先登录'));
-    }
-  }).catch(function(){showToast('网络错误')});
+  // 如果来自医生快速采集的关联案例 → 直接挂载批注到已有案例
+  if(urlCaseId){
+    var body2={caseId:Number(urlCaseId),masterAnalysis:noteText,analysisSummary:noteText.slice(0,300)};
+    fetch(API+'/api/clinic/submit-diagnosis',{method:'POST',headers:authHeaders(),body:JSON.stringify(body2)})
+    .then(function(r){return r.json()}).then(function(d){
+      if(d.ok||d.message){
+        showToast('✅ 批注已关联到案例 #'+urlCaseId);
+        try{localStorage.setItem('mlb_note_'+urlCaseId,noteText)}catch(e){}
+      }else{
+        showToast('关联失败：'+(d.error||'请先登录')+'，将新建案例');
+        submitNewCase();
+      }
+    }).catch(function(){submitNewCase()});
+    return;
+  }
+  submitNewCase();
+  
+  function submitNewCase(){
+    var body={
+      symptoms:'命理批注：'+questions,
+      constitution:'',
+      birthYear:Number(y),birthMonth:Number(m),birthDay:Number(d),birthHour:Number(h)
+    };
+    fetch(API+'/api/clinic/submit-symptom',{method:'POST',headers:authHeaders(),body:JSON.stringify(body)})
+    .then(function(r){return r.json()}).then(function(d){
+      if(d.ok||d.caseId){
+        showToast('✅ 已提交批注案例 #'+(d.caseId||'')+'，AI 正在生成完整排盘报告');
+        try{localStorage.setItem('mlb_note_'+d.caseId,noteText)}catch(e){}
+      }else{
+        showToast('提交失败：'+(d.error||'请先登录'));
+      }
+    }).catch(function(){showToast('网络错误')});
+  }
 }
 
 // === URL 参数一键带入（医生快速采集 → 大师批注）===
+var urlCaseId='';
 (function(){
   var qs=new URLSearchParams(location.search);
+  urlCaseId=qs.get('caseId')||'';
   var name=qs.get('name')||'';
   var sex=qs.get('sex')||'';
   var year=qs.get('year')||'';

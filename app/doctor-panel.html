@@ -98,6 +98,7 @@ textarea{resize:vertical;min-height:60px}
   <div class="stat-box"><div class="num" id="stat-pending">0</div><div class="lbl">待审</div></div>
   <div class="stat-box"><div class="num" id="stat-done">0</div><div class="lbl">已处理</div></div>
   <div class="stat-box"><div class="num" id="stat-total">0</div><div class="lbl">总数</div></div>
+  <div style="width:100%;text-align:right;font-size:10px;color:var(--muted);margin-top:2px"><span id="refresh-time">—</span> · <a href="#" onclick="loadQueue();return!1" style="color:var(--blue);text-decoration:none">🔄 刷新</a></div>
 </div>
 
 <!-- 快速采集入口 -->
@@ -156,6 +157,7 @@ function renderStats(){
   document.getElementById('stat-pending').textContent=stats.pending;
   document.getElementById('stat-done').textContent=stats.done;
   document.getElementById('stat-total').textContent=stats.total;
+  var rt=document.getElementById('refresh-time');if(rt){var now=new Date();rt.textContent=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0')+':'+now.getSeconds().toString().padStart(2,'0')}
 }
 
 function renderQueueBar(){
