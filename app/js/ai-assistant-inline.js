@@ -1650,7 +1650,17 @@ function showReport(text, meta){
         seen.add(policyKey);
         const c = typeColors[t] || { label: t.replace(/^SRC-/, ''), color: '#6366f1', bg: 'rgba(99,102,241,.10)' };
         const tip = author ? `${author} · ${title.slice(0, 36)} · ${pol.reason}` : `${title.slice(0, 40)} · ${pol.reason}`;
-        chips.push('<span class="src-chip ' + pol.cls + '" style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:' + c.bg + ';border:1px solid ' + c.color + '55;border-radius:10px;color:' + c.color + ';font-size:11px;font-weight:500" title="' + esc(tip) + '">' + policyKey + ' · ' + c.label + '</span>');
+        // R3.1-P1: KB 引用级反馈按钮（entry_id = source.title 截断 60 字，避免无 ID 假锚）
+        const _safeTitle = String(title).slice(0,60).replace(/[<>"']/g, function(c){return ({'<':'&lt;','>':'&gt;','"':'&quot;','&':'&amp;',"'":'&#39;'})[c];});
+        const _safeType = String(t).replace(/[<>"']/g, function(c){return ({'<':'&lt;','>':'&gt;','"':'&quot;','&':'&amp;',"'":'&#39;'})[c];});
+        const _modCtx = (window.state && window.state.module) || 'unknown';
+        const _qCtx = (window.state && window.state.data) ? Object.keys(window.state.data||{}).slice(0,3).map(function(k){return k+'='+String(window.state.data[k]||'').slice(0,20);}).join('|') : '';
+        const _chipInner = policyKey + ' · ' + c.label +
+          '<span class="kb-fb-mini" style="display:inline-flex;gap:2px;margin-left:5px;vertical-align:middle">' +
+          '<button class="kb-fb-up-mini" data-fb-entry="' + _safeTitle + '" data-fb-mod="' + _safeType + '" onclick="kbFbMini(this,1)" title="这条 KB 引用有帮助" aria-label="KB 引用点赞" style="background:transparent;border:none;cursor:pointer;color:#10b981;font-size:10px;padding:0 1px;line-height:1">👍</button>' +
+          '<button class="kb-fb-dn-mini" data-fb-entry="' + _safeTitle + '" data-fb-mod="' + _safeType + '" onclick="kbFbMini(this,-1)" title="这条 KB 引用不准确" aria-label="KB 引用点踩" style="background:transparent;border:none;cursor:pointer;color:#ef4444;font-size:10px;padding:0 1px;line-height:1">👎</button>' +
+          '</span>';
+        chips.push('<span class="src-chip ' + pol.cls + '" data-src-title="' + _safeTitle + '" data-src-type="' + _safeType + '" style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:' + c.bg + ';border:1px solid ' + c.color + '55;border-radius:10px;color:' + c.color + ';font-size:11px;font-weight:500" title="' + esc(tip) + '">' + _chipInner + '</span>');
       }
       if (chips.length) {
         r89Tags += '<div class="r89-source-tags" style="display:inline-flex;align-items:center;gap:5px;padding:4px 9px;margin-bottom:8px;margin-left:6px;background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.22);border-radius:6px;font-size:11px"><span style="color:var(--paper3)">🔍 源头透明</span>' + chips.join('') + '</div>';
@@ -4987,6 +4997,47 @@ window.fbReport = function(btn, val) {
   } catch(e) {
     btn.innerHTML = '✅';
   }
+};
+
+// ============ R3.1-P1: KB 引用级反馈微按钮 ============
+// 用户针对 KB 引用 chip 点 👍/👎，绑定到具体 source.title 作为准 entry_id
+window.kbFbMini = function(btn, val) {
+  const entryId = btn.getAttribute('data-fb-entry') || '';
+  const srcType = btn.getAttribute('data-fb-src') || '';
+  const modCtx = (window.state && window.state.module) || 'unknown';
+  const qCtx = (window.state && window.state.data) ? Object.keys(window.state.data||{}).slice(0,3).map(function(k){return k+'='+String(window.state.data[k]||'').slice(0,20);}).join('|') : '';
+  if (!entryId) return;
+  // 防止重复
+  const pair = btn.parentElement && btn.parentElement.querySelectorAll('button');
+  if (pair) pair.forEach(function(b){ b.disabled = true; b.style.opacity = '.4'; });
+  btn.style.opacity = '1';
+  // 本地累计
+  const fbKey = '_kb_fb_mini/' + modCtx + '/' + entryId;
+  try {
+    const arr = JSON.parse(localStorage.getItem(fbKey) || '[]');
+    arr.push({val: val, ts: Date.now()});
+    if (arr.length > 10) arr.shift();
+    localStorage.setItem(fbKey, JSON.stringify(arr));
+  } catch(e) {}
+  // 上报后端
+  const payload = {
+    module: modCtx,
+    entry_id: entryId,
+    source: 'src-chip:' + srcType,
+    score: val,
+    comment: '引用级反馈 ' + val + ' · ' + qCtx
+  };
+  try {
+    fetch((typeof API !== 'undefined' ? API : '') + '/api/public/kb-feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(function(){
+      btn.innerHTML = val > 0 ? '✓' : '✗';
+    }).catch(function(){
+      btn.innerHTML = '·';
+    });
+  } catch(e) { btn.innerHTML = '·'; }
 };
 
 // ============ R50: 反馈统计面板 ============
