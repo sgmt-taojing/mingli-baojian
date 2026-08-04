@@ -684,13 +684,15 @@ function addAI(text,stepData){
 function _submitKbFeedback(fbId, score, query, module){
   var statusEl = document.getElementById(fbId + '-status');
   if (statusEl) { statusEl.textContent = '提交中...'; statusEl.style.opacity = '1'; }
+  var sessionId = (function(){try{var k='ml_session_id';var v=localStorage.getItem(k);if(!v){v='sess_'+Date.now()+'_'+('000000'+(Date.now()%1e6)).slice(-6);localStorage.setItem(k,v);}return v;}catch(e){return '';}})();
   var payload = {
     query: (query || '').substring(0, 500),
     entry_id: '',
     source: 'ai-assistant',
     score: score,
     comment: '',
-    module: module || ''
+    module: module || '',
+    session_id: sessionId
   };
   fetch((typeof API !== 'undefined' ? API : '') + '/api/public/kb-feedback', {
     method: 'POST',
@@ -4961,12 +4963,14 @@ window.fbReport = function(btn, val) {
   const data = (window.state && window.state.data) || {};
   const dataKeys = Object.keys(data).slice(0, 6).map(function(k){ return k+'='+(data[k]||'').toString().slice(0,40); }).join('|');
 
+  const sessionId2 = (function(){try{var k='ml_session_id';var v=localStorage.getItem(k);if(!v){v='sess_'+Date.now()+'_'+('000000'+(Date.now()%1e6)).slice(-6);localStorage.setItem(k,v);}return v;}catch(e){return '';}})();
   const payload = {
     module: mod,
     query: dataKeys,  // 用 data 字段作为 query（端点限 500 字符）
     source: 'ai-assistant-btn',
     score: val,         // 1=赞 -1=踩（端点限制 -1/0/+1）
-    comment: reportText  // 报告样本作为备注
+    comment: reportText,  // 报告样本作为备注
+    session_id: sessionId2
   };
   // 本地计数
   const fbKey = '_fb_score/' + mod;
@@ -5020,12 +5024,14 @@ window.kbFbMini = function(btn, val) {
     localStorage.setItem(fbKey, JSON.stringify(arr));
   } catch(e) {}
   // 上报后端
+  const sessionId3 = (function(){try{var k='ml_session_id';var v=localStorage.getItem(k);if(!v){v='sess_'+Date.now()+'_'+('000000'+(Date.now()%1e6)).slice(-6);localStorage.setItem(k,v);}return v;}catch(e){return '';}})();
   const payload = {
     module: modCtx,
     entry_id: entryId,
     source: 'src-chip:' + srcType,
     score: val,
-    comment: '引用级反馈 ' + val + ' · ' + qCtx
+    comment: '引用级反馈 ' + val + ' · ' + qCtx,
+    session_id: sessionId3
   };
   try {
     fetch((typeof API !== 'undefined' ? API : '') + '/api/public/kb-feedback', {
