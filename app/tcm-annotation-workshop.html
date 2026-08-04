@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TCM 视觉标注工坊 · 舌诊/面诊/手诊</title>
+<style>
+:root {
+  --gold: #c9a961; --bg: #faf8f3; --text: #2a2520; --muted: #6b5e54;
+  --ok: #5b8c3e; --warn: #c77d20; --accent: #2e86ab; --red: #c0392b;
+  --panel-bg: #fff; --border: #e0d8c8;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'PingFang SC','Noto Serif SC',sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  min-height: 100vh;
+}
+/* Header */
+.topbar {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  color: #fff; padding: 12px 20px; display: flex;
+  align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+  position: sticky; top: 0; z-index: 100;
+}
+.topbar h1 { font-size: 20px; font-weight: 300; color: var(--gold); letter-spacing: 2px; }
+.topbar .badge { font-size: 11px; color: rgba(255,255,255,0.5); }
+.topbar .stats { display: flex; gap: 16px; font-size: 12px; }
+.topbar .stats span { color: var(--gold); font-weight: 600; }
+/* Layout */
+.layout { display: grid; grid-template-columns: 220px 1fr 320px; gap: 0; height: calc(100vh - 56px); }
+@media (max-width: 900px) { .layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; } }
+/* Left panel - Image list */
+.panel-left {
+  background: var(--panel-bg); border-right: 1px solid var(--border);
+  overflow-y: auto; padding: 12px;
+}
+.panel-left h3 { font-size: 13px; color: var(--muted); margin-bottom: 8px; letter-spacing: 1px; }
+.mode-tabs { display: flex; gap: 4px; margin-bottom: 12px; }
+.mode-tab {
+  flex: 1; padding: 6px 4px; border: 1px solid var(--border); border-radius: 6px;
+  background: var(--bg); cursor: pointer; text-align: center; font-size: 11px;
+  transition: all 0.15s;
+}
+.mode-tab.active { background: var(--gold); color: #fff; border-color: var(--gold); }
+.mode-tab:hover:not(.active) { background: #f0ece4; }
+.upload-zone {
+  border: 2px dashed var(--border); border-radius: 8px; padding: 20px 10px;
+  text-align: center; cursor: pointer; margin-bottom: 12px; transition: border-color 0.2s;
+  font-size: 12px; color: var(--muted);
+}
+.upload-zone:hover { border-color: var(--gold); }
+.upload-zone input { display: none; }
+.img-list { list-style: none; }
+.img-item {
+  padding: 8px 10px; border-radius: 6px; cursor: pointer; font-size: 12px;
+  display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
+  border: 1px solid transparent;
+}
+.img-item:hover { background: #f4f1ea; }
+.img-item.active { background: #fff8e1; border-color: var(--gold); }
+.img-item .thumb { width: 32px; height: 32px; border-radius: 4px; object-fit: cover; background: #eee; }
+.img-item .label-badge {
+  font-size: 9px; padding: 1px 6px; border-radius: 8px;
+  background: #e8f5e9; color: var(--ok);
+}
+/* Center - Canvas */
+.panel-center {
+  background: #1a1a1a; display: flex; align-items: center; justify-content: center;
+  overflow: hidden; position: relative;
+}
+.panel-center img {
+  max-width: 95%; max-height: 95%; object-fit: contain;
+  border-radius: 4px;
+}
+.panel-center .empty-state {
+  color: rgba(255,255,255,0.3); text-align: center; font-size: 14px;
+}
+.panel-center .empty-state .icon { font-size: 48px; display: block; margin-bottom: 12px; }
+/* Right panel - Annotation form */
+.panel-right {
+  background: var(--panel-bg); border-left: 1px solid var(--border);
+  overflow-y: auto; padding: 16px;
+}
+.panel-right h3 { font-size: 13px; color: var(--muted); margin-bottom: 12px; letter-spacing: 1px; }
+.form-group { margin-bottom: 14px; }
+.form-group label {
+  display: block; font-size: 11px; font-weight: 600; color: var(--muted);
+  margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px;
+}
+.form-group select, .form-group textarea, .form-group input {
+  width: 100%; padding: 7px 10px; border: 1px solid var(--border); border-radius: 6px;
+  font-size: 13px; font-family: inherit; background: var(--bg);
+}
+.form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--gold); }
+.form-group textarea { min-height: 60px; resize: vertical; }
+.tag-grid { display: flex; flex-wrap: wrap; gap: 4px; }
+.tag-chip {
+  padding: 3px 8px; border: 1px solid var(--border); border-radius: 12px;
+  font-size: 11px; cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.tag-chip:hover { border-color: var(--gold); }
+.tag-chip.selected { background: var(--gold); color: #fff; border-color: var(--gold); }
+.btn-row { display: flex; gap: 8px; margin-top: 16px; }
+.btn {
+  flex: 1; padding: 8px 12px; border: none; border-radius: 6px;
+  font-size: 13px; cursor: pointer; font-family: inherit; transition: all 0.15s;
+}
+.btn-save { background: var(--gold); color: #fff; }
+.btn-save:hover { opacity: 0.9; }
+.btn-skip { background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
+.btn-skip:hover { background: #eee; }
+.btn-export { background: var(--accent); color: #fff; }
+.btn-export:hover { opacity: 0.9; }
+.btn-clear { background: var(--red); color: #fff; }
+.btn-clear:hover { opacity: 0.9; }
+/* Toast */
+.toast {
+  position: fixed; bottom: 20px; right: 20px; z-index: 200;
+  padding: 10px 20px; border-radius: 8px; font-size: 13px;
+  color: #fff; background: var(--ok); box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  opacity: 0; transform: translateY(10px); transition: all 0.3s;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.warn { background: var(--warn); }
+/* Progress bar */
+.progress-bar {
+  height: 3px; background: #e0d8c8; border-radius: 2px; margin-top: 4px; overflow: hidden;
+}
+.progress-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width 0.3s; }
+/* Keyboard hints */
+.kbd-hint {
+  font-size: 10px; color: var(--muted); margin-top: 20px; border-top: 1px solid var(--border); padding-top: 10px;
+}
+.kbd-hint kbd {
+  background: #eee; padding: 1px 5px; border-radius: 3px; font-family: monospace; font-size: 10px;
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <h1>🏥 TCM 视觉标注工坊</h1>
+    <div class="badge">舌诊 · 面诊 · 手诊 — 采集·标注·训练 一体化</div>
+  </div>
+  <div class="stats">
+    已标注: <span id="stat-labeled">0</span> |
+    总计: <span id="stat-total">0</span>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- 左侧：图片列表 -->
+  <div class="panel-left" id="left-panel">
+    <h3>📋 标注模式</h3>
+    <div class="mode-tabs" id="mode-tabs">
+      <div class="mode-tab active" data-mode="tongue">👅 舌诊</div>
+      <div class="mode-tab" data-mode="face">😷 面诊</div>
+      <div class="mode-tab" data-mode="hand">✋ 手诊</div>
+    </div>
+
+    <div class="upload-zone" id="upload-zone">
+      📁 点击上传 / 拖拽图片<br>
+      <small>支持 JPG/PNG/WebP，可多选</small>
+      <input type="file" id="file-input" multiple accept="image/*">
+    </div>
+
+    <h3>🖼️ 图片队列</h3>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    <ul class="img-list" id="img-list"></ul>
+    <button class="btn btn-export" onclick="exportAnnotations()" style="width:100%;margin-top:12px;">📤 导出标注数据</button>
+    <button class="btn btn-clear" onclick="clearAll()" style="width:100%;margin-top:4px;">🗑️ 清空本地数据</button>
+  </div>
+
+  <!-- 中间：图片预览 -->
+  <div class="panel-center" id="img-preview">
+    <div class="empty-state">
+      <span class="icon">📷</span>
+      上传图片开始标注<br>
+      <small style="font-size:11px;opacity:0.5;">支持拖拽上传 / Ctrl+V 粘贴</small>
+    </div>
+  </div>
+
+  <!-- 右侧：标注表单 -->
+  <div class="panel-right" id="annotation-form" style="display:none;">
+    <h3 id="form-title">📝 舌诊标注</h3>
+
+    <!-- 舌诊表单 -->
+    <div id="form-tongue">
+      <div class="form-group">
+        <label>舌色</label>
+        <div class="tag-grid" id="tongue-color"></div>
+      </div>
+      <div class="form-group">
+        <label>舌形</label>
+        <div class="tag-grid" id="tongue-shape"></div>
+      </div>
+      <div class="form-group">
+        <label>苔色</label>
+        <div class="tag-grid" id="tongue-coating-color"></div>
+      </div>
+      <div class="form-group">
+        <label>苔质</label>
+        <div class="tag-grid" id="tongue-coating-texture"></div>
+      </div>
+      <div class="form-group">
+        <label>舌下络脉</label>
+        <select id="tongue-vein">
+          <option value="">— 未标注 —</option>
+          <option value="normal">正常</option>
+          <option value="thick">粗长型</option>
+          <option value="thin">细短型</option>
+          <option value="dark">暗紫</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 面诊表单 -->
+    <div id="form-face" style="display:none;">
+      <div class="form-group">
+        <label>面色</label>
+        <div class="tag-grid" id="face-color"></div>
+      </div>
+      <div class="form-group">
+        <label>面部光泽</label>
+        <div class="tag-grid" id="face-luster"></div>
+      </div>
+      <div class="form-group">
+        <label>异常分区</label>
+        <div class="tag-grid" id="face-zone"></div>
+      </div>
+      <div class="form-group">
+        <label>面部斑/痣</label>
+        <textarea id="face-spots" placeholder="描述斑痣位置、颜色、形状..."></textarea>
+      </div>
+    </div>
+
+    <!-- 手诊表单 -->
+    <div id="form-hand" style="display:none;">
+      <div class="form-group">
+        <label>掌色</label>
+        <div class="tag-grid" id="hand-palm-color"></div>
+      </div>
+      <div class="form-group">
+        <label>异常九区</label>
+        <div class="tag-grid" id="hand-zones"></div>
+      </div>
+      <div class="form-group">
+        <label>主要异常线</label>
+        <div class="tag-grid" id="hand-lines"></div>
+      </div>
+      <div class="form-group">
+        <label>指甲状态</label>
+        <div class="tag-grid" id="hand-nails"></div>
+      </div>
+    </div>
+
+    <!-- 通用字段 -->
+    <div class="form-group">
+      <label>质量标记</label>
+      <div class="tag-grid" id="quality-tags"></div>
+    </div>
+    <div class="form-group">
+      <label>备注</label>
+      <textarea id="note" placeholder="补充描述、特殊观察..."></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-save" onclick="saveAnnotation()">💾 保存标注 (Ctrl+S)</button>
+      <button class="btn btn-skip" onclick="skipImage()">⏭ 跳过 (→)</button>
+    </div>
+
+    <div class="kbd-hint">
+      快捷键: <kbd>Ctrl+S</kbd> 保存 | <kbd>→</kbd> 下一张 | <kbd>←</kbd> 上一张 | <kbd>1-3</kbd> 切换模式
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════ 状态管理 ═══════════════
+const STORAGE_KEY = 'tcm_vision_annotations';
+const IMG_STORE_KEY = 'tcm_vision_images';
+
+let state = {
+  mode: 'tongue',        // tongue / face / hand
+  images: [],            // { id, dataUrl, name, addedAt }
+  currentIdx: -1,
+  annotations: {},       // imageId → annotation object
+};
+
+// ═══════════════ 标签定义 ═══════════════
+const LABEL_DEFS = {
+  'tongue-color': [
+    {v:'pale-white',l:'淡白舌',kb:'淡白'},{v:'pale-red',l:'淡红舌',kb:'淡红'},
+    {v:'red',l:'红舌',kb:'舌红'},{v:'crimson',l:'绛舌',kb:'绛'},
+    {v:'purple',l:'紫舌',kb:'紫暗'},{v:'blue',l:'青/蓝舌',kb:'舌青'},
+  ],
+  'tongue-shape': [
+    {v:'old',l:'苍老',kb:'老舌'},{v:'tender',l:'娇嫩',kb:'嫩舌'},
+    {v:'fat',l:'胖大',kb:'胖大'},{v:'thin',l:'瘦薄',kb:'瘦薄'},
+    {v:'tooth-mark',l:'齿痕',kb:'齿痕'},{v:'cracked',l:'裂纹',kb:'裂纹'},
+    {v:'prickled',l:'芒刺',kb:'芒刺'},
+  ],
+  'tongue-coating-color': [
+    {v:'white',l:'白苔',kb:'白苔'},{v:'yellow',l:'黄苔',kb:'黄苔'},
+    {v:'gray',l:'灰苔',kb:'灰苔'},{v:'black',l:'黑苔',kb:'黑苔'},
+    {v:'mold',l:'霉酱苔',kb:'霉酱'},
+  ],
+  'tongue-coating-texture': [
+    {v:'thin',l:'薄苔',kb:'薄苔'},{v:'thick',l:'厚苔',kb:'厚苔'},
+    {v:'moist',l:'润苔',kb:'润苔'},{v:'dry',l:'燥苔',kb:'燥苔'},
+    {v:'greasy',l:'腻苔',kb:'腻苔'},{v:'curdy',l:'腐苔',kb:'腐苔'},
+    {v:'peeled',l:'剥苔',kb:'剥苔'},{v:'mirror',l:'镜面舌',kb:'无苔'},
+  ],
+  'face-color': [
+    {v:'green',l:'青色(肝)',kb:'面青'},{v:'red',l:'赤色(心)',kb:'面赤'},
+    {v:'yellow',l:'黄色(脾)',kb:'面黄'},{v:'white',l:'白色(肺)',kb:'面白'},
+    {v:'black',l:'黑色(肾)',kb:'面黑'},{v:'pale-red',l:'淡红(正常)',kb:'淡红'},
+  ],
+  'face-luster': [
+    {v:'bright',l:'有光泽(有神)'},{v:'dim',l:'无光泽(无神)'},
+    {v:'greasy',l:'油腻'},{v:'dry',l:'干燥'},
+  ],
+  'face-zone': [
+    {v:'forehead',l:'额(心)'},{v:'nose',l:'鼻(脾)'},
+    {v:'left-cheek',l:'左颊(肝)'},{v:'right-cheek',l:'右颊(肺)'},
+    {v:'chin',l:'颏(肾)'},{v:'eye',l:'目眦(心)'},
+  ],
+  'hand-palm-color': [
+    {v:'pale-red',l:'淡红(正常)'},{v:'pale',l:'苍白(血虚)'},
+    {v:'red',l:'红赤(热证)'},{v:'dark',l:'暗紫(血瘀)'},
+    {v:'yellow',l:'萎黄(脾虚)'},{v:'cyan',l:'青紫(寒/痛)'},
+  ],
+  'hand-zones': [
+    {v:'zone1',l:'1区(心)'},{v:'zone2',l:'2区(肺)'},{v:'zone3',l:'3区(脾胃)'},
+    {v:'zone4',l:'4区(肝胆)'},{v:'zone5',l:'5区(肾)'},{v:'zone6',l:'6区(膀胱)'},
+    {v:'zone7',l:'7区(大肠)'},{v:'zone8',l:'8区(三焦)'},{v:'zone9',l:'9区(生殖)'},
+  ],
+  'hand-lines': [
+    {v:'line1',l:'生命线异常'},{v:'line2',l:'智慧线异常'},
+    {v:'line3',l:'感情线异常'},{v:'line4',l:'健康线深长'},
+    {v:'island',l:'岛纹'},{v:'chain',l:'链状纹'},
+    {v:'broken',l:'断裂'},{v:'fork',l:'分叉'},
+  ],
+  'hand-nails': [
+    {v:'pale',l:'指甲苍白'},{v:'purple',l:'青紫'},
+    {v:'brittle',l:'脆裂'},{v:'spoon',l:'反甲'},
+    {v:'ridge-vertical',l:'纵纹'},{v:'ridge-horizontal',l:'横纹'},
+    {v:'no-lunula',l:'半月痕消失'},{v:'large-lunula',l:'半月痕过大'},
+  ],
+  'quality-tags': [
+    {v:'natural-light',l:'自然光 ✅'},{v:'backlit',l:'逆光 ❌'},
+    {v:'blurry',l:'模糊 ❌'},{v:'overexposed',l:'过曝 ❌'},
+    {v:'underexposed',l:'过暗 ❌'},{v:'makeup',l:'妆容干扰'},
+    {v:'filter',l:'滤镜干扰'},{v:'occlusion',l:'遮挡'},
+  ],
+};
+
+// ═══════════════ 初始化 ═══════════════
+function init() {
+  loadState();
+  renderTagGrids();
+  renderImageList();
+  updateStats();
+  bindEvents();
+}
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) state.annotations = JSON.parse(saved);
+    const imgs = localStorage.getItem(IMG_STORE_KEY);
+    if (imgs) state.images = JSON.parse(imgs);
+  } catch(e) {}
+}
+
+function saveAnnotations() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.annotations));
+}
+
+function saveImages() {
+  // 只存储元数据（不含图片本身），图片存为 object URL
+  const meta = state.images.map(({id, name, addedAt, mode}) => ({id, name, addedAt, mode}));
+  localStorage.setItem(IMG_STORE_KEY, JSON.stringify(meta));
+}
+
+function renderTagGrids() {
+  for (const [gridId, items] of Object.entries(LABEL_DEFS)) {
+    const grid = document.getElementById(gridId);
+    if (!grid) continue;
+    grid.innerHTML = items.map(item =>
+      `<span class="tag-chip" data-grid="${gridId}" data-value="${item.v}">${item.l}</span>`
+    ).join('');
+  }
+}
+
+function bindEvents() {
+  // 模式切换
+  document.querySelectorAll('.mode-tab').forEach(tab => {
+    tab.addEventListener('click', () => switchMode(tab.dataset.mode));
+  });
+
+  // 标签点击
+  document.addEventListener('click', e => {
+    const chip = e.target.closest('.tag-chip');
+    if (!chip) return;
+    chip.classList.toggle('selected');
+  });
+
+  // 上传
+  const uploadZone = document.getElementById('upload-zone');
+  const fileInput = document.getElementById('file-input');
+  uploadZone.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', handleFileSelect);
+  
+  // 拖拽
+  uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.style.borderColor = 'var(--gold)'; });
+  uploadZone.addEventListener('dragleave', () => { uploadZone.style.borderColor = ''; });
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadZone.style.borderColor = '';
+    handleFiles(e.dataTransfer.files);
+  });
+
+  // 粘贴
+  document.addEventListener('paste', e => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    const files = [];
+    for (const item of items) {
+      if (item.type.startsWith('image/')) files.push(item.getAsFile());
+    }
+    if (files.length) handleFiles(files);
+  });
+
+  // 键盘
+  document.addEventListener('keydown', e => {
+    if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveAnnotation(); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); nextImage(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prevImage(); }
+    if (e.key === '1') switchMode('tongue');
+    if (e.key === '2') switchMode('face');
+    if (e.key === '3') switchMode('hand');
+  });
+}
+
+// ═══════════════ 图片处理 ═══════════════
+function handleFileSelect(e) { handleFiles(e.target.files); e.target.value = ''; }
+
+function handleFiles(files) {
+  let added = 0;
+  for (const file of files) {
+    if (!file.type.startsWith('image/')) continue;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = {
+        id: 'img_' + Date.now() + '_' + ('000000'+(Date.now()%1e6)).slice(-6),
+        dataUrl: ev.target.result,
+        name: file.name,
+        addedAt: new Date().toISOString(),
+        mode: state.mode,
+      };
+      state.images.push(img);
+      renderImageList();
+      updateStats();
+      if (state.currentIdx < 0) selectImage(state.images.length - 1);
+    };
+    reader.readAsDataURL(file);
+    added++;
+  }
+  if (added) showToast(`✅ 添加 ${added} 张图片`);
+}
+
+function selectImage(idx) {
+  state.currentIdx = idx;
+  const img = state.images[idx];
+  if (!img) return;
+
+  // 预览
+  const preview = document.getElementById('img-preview');
+  preview.innerHTML = `<img src="${img.dataUrl}" alt="${img.name}">`;
+
+  // 表单
+  document.getElementById('annotation-form').style.display = 'block';
+  switchModeForImage(img);
+
+  // 恢复已有标注
+  restoreAnnotation(img.id);
+
+  renderImageList();
+}
+
+function switchMode(mode) {
+  state.mode = mode;
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
+  
+  document.getElementById('form-tongue').style.display = mode === 'tongue' ? 'block' : 'none';
+  document.getElementById('form-face').style.display = mode === 'face' ? 'block' : 'none';
+  document.getElementById('form-hand').style.display = mode === 'hand' ? 'block' : 'none';
+  
+  const titles = { tongue: '👅 舌诊标注', face: '😷 面诊标注', hand: '✋ 手诊标注' };
+  document.getElementById('form-title').textContent = titles[mode] || '📝 标注';
+}
+
+function switchModeForImage(img) {
+  switchMode(img.mode || state.mode);
+}
+
+function restoreAnnotation(imgId) {
+  // 清除所有选中
+  document.querySelectorAll('.tag-chip.selected').forEach(c => c.classList.remove('selected'));
+  
+  const ann = state.annotations[imgId];
+  if (!ann) return;
+  
+  // 恢复标签选中
+  if (ann.tags) {
+    for (const [gridId, values] of Object.entries(ann.tags)) {
+      values.forEach(v => {
+        const chip = document.querySelector(`.tag-chip[data-grid="${gridId}"][data-value="${v}"]`);
+        if (chip) chip.classList.add('selected');
+      });
+    }
+  }
+  // 恢复文本字段
+  if (ann.note) document.getElementById('note').value = ann.note;
+  if (ann.faceSpots) document.getElementById('face-spots').value = ann.faceSpots;
+  if (ann.tongueVein) document.getElementById('tongue-vein').value = ann.tongueVein;
+}
+
+function renderImageList() {
+  const list = document.getElementById('img-list');
+  const labeled = Object.keys(state.annotations).length;
+  
+  list.innerHTML = state.images.map((img, i) => {
+    const hasAnn = !!state.annotations[img.id];
+    const active = i === state.currentIdx;
+    return `<li class="img-item${active ? ' active' : ''}" onclick="selectImage(${i})">
+      <img class="thumb" src="${img.dataUrl}" alt="">
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${img.name || 'untitled'}</span>
+      ${hasAnn ? '<span class="label-badge">✓已标注</span>' : ''}
+    </li>`;
+  }).join('');
+  
+  document.getElementById('progress-fill').style.width = 
+    state.images.length ? `${(labeled / state.images.length * 100).toFixed(0)}%` : '0%';
+}
+
+function nextImage() {
+  if (state.currentIdx < state.images.length - 1) selectImage(state.currentIdx + 1);
+}
+function prevImage() {
+  if (state.currentIdx > 0) selectImage(state.currentIdx - 1);
+}
+function skipImage() { nextImage(); }
+
+// ═══════════════ 标注保存 ═══════════════
+function saveAnnotation() {
+  if (state.currentIdx < 0 || !state.images[state.currentIdx]) {
+    showToast('⚠️ 请先选择图片', 'warn');
+    return;
+  }
+
+  const img = state.images[state.currentIdx];
+  const tags = {};
+  
+  // 收集所有选中标签
+  document.querySelectorAll('.tag-chip.selected').forEach(chip => {
+    const grid = chip.dataset.grid;
+    const val = chip.dataset.value;
+    if (!tags[grid]) tags[grid] = [];
+    tags[grid].push(val);
+  });
+
+  // 构建标注对象
+  const ann = {
+    imageId: img.id,
+    imageName: img.name,
+    mode: state.mode,
+    tags,
+    note: document.getElementById('note').value || '',
+    tongueVein: document.getElementById('tongue-vein')?.value || '',
+    faceSpots: document.getElementById('face-spots')?.value || '',
+    annotatedAt: new Date().toISOString(),
+  };
+
+  state.annotations[img.id] = ann;
+  saveAnnotations();
+  renderImageList();
+  updateStats();
+  showToast('💾 标注已保存');
+  
+  // 自动跳到下一张
+  setTimeout(nextImage, 300);
+}
+
+function updateStats() {
+  document.getElementById('stat-labeled').textContent = Object.keys(state.annotations).length;
+  document.getElementById('stat-total').textContent = state.images.length;
+}
+
+// ═══════════════ 导出 ═══════════════
+function exportAnnotations() {
+  const data = [];
+  for (const [imgId, ann] of Object.entries(state.annotations)) {
+    const img = state.images.find(i => i.id === imgId);
+    data.push({
+      image_id: imgId,
+      image_name: img?.name || ann.imageName,
+      mode: ann.mode,
+      labels: ann.tags,
+      note: ann.note,
+      tongue_vein: ann.tongueVein || '',
+      face_spots: ann.faceSpots || '',
+      annotated_at: ann.annotatedAt,
+    });
+  }
+
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `tcm-annotations-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  
+  showToast(`📤 导出 ${data.length} 条标注`);
+}
+
+function clearAll() {
+  if (!confirm('确定要清空所有本地标注数据吗？图片将保留。')) return;
+  state.annotations = {};
+  saveAnnotations();
+  renderImageList();
+  updateStats();
+  document.querySelectorAll('.tag-chip.selected').forEach(c => c.classList.remove('selected'));
+  document.getElementById('note').value = '';
+  showToast('🗑️ 标注数据已清空');
+}
+
+function showToast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast ' + (type || '');
+  setTimeout(() => el.classList.add('show'), 10);
+  setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+// ═══════════════ 启动 ═══════════════
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="description" content="医生临床实时采集 — 双摄面诊舌诊 + KB 秒回诊断">
+<meta name="keywords" content="中医,望诊,面诊,舌诊,AI辅助诊断,知识库">
+<meta name="theme-color" content="#0a1628">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="css/page-header.css">
+<title>医生临床采集 · 易道智鉴</title>
+<style>
+:root{
+  --dc-bg: #0a1628; --dc-surface: #111d33; --dc-card: rgba(255,255,255,.04);
+  --dc-gold: #c9a84c; --dc-jade: #10b981; --dc-red: #ef4444;
+  --dc-cyan: #38bdf8; --dc-paper: #e0d8c8; --dc-muted: #7a8a9e;
+  --dc-border: rgba(201,168,76,.15); --dc-radius: 12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--dc-bg);color:var(--dc-paper);min-height:100vh}
+
+/* Header */
+.dc-header{position:sticky;top:0;z-index:100;background:var(--dc-surface);border-bottom:1px solid var(--dc-border);padding:12px 20px;display:flex;align-items:center;gap:16px;backdrop-filter:blur(10px)}
+.dc-header .logo{display:flex;align-items:center;gap:8px;font-size:18px;font-weight:700;color:var(--dc-gold)}
+.dc-header .logo .dot{width:10px;height:10px;border-radius:50%;background:var(--dc-jade);animation:pulse-dot 2s infinite}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
+.dc-header .status{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--dc-muted)}
+.dc-header .status .indicator{width:6px;height:6px;border-radius:50%}
+.dc-header .status .indicator.ok{background:var(--dc-jade)}
+.dc-header .status .indicator.warn{background:var(--dc-gold)}
+.dc-header .status .indicator.err{background:var(--dc-red)}
+
+/* Main Layout */
+.dc-main{display:grid;grid-template-columns:1fr 380px;gap:16px;padding:16px;max-width:1400px;margin:0 auto;min-height:calc(100vh - 60px)}
+@media (max-width:900px){.dc-main{grid-template-columns:1fr}}
+
+/* Camera Section */
+.dc-section{background:var(--dc-card);border:1px solid var(--dc-border);border-radius:var(--dc-radius);padding:20px}
+.dc-section h3{font-size:14px;color:var(--dc-gold);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.dc-cameras{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+@media (max-width:600px){.dc-cameras{grid-template-columns:1fr}}
+.dc-camera{background:var(--dc-surface);border:1px solid var(--dc-border);border-radius:var(--dc-radius);overflow:hidden;position:relative;aspect-ratio:4/3}
+.dc-camera .label{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.7);color:var(--dc-cyan);font-size:11px;padding:3px 8px;border-radius:4px;z-index:2}
+.dc-camera .stamp{position:absolute;bottom:8px;right:8px;font-size:10px;color:var(--dc-muted);background:rgba(0,0,0,.5);padding:2px 6px;border-radius:4px}
+.dc-camera video{width:100%;height:100%;object-fit:cover}
+.dc-camera .placeholder{display:flex;align-items:center;justify-content:center;height:100%;color:var(--dc-muted);font-size:13px;flex-direction:column;gap:8px}
+.dc-camera .placeholder .icon{font-size:32px;opacity:.3}
+
+/* Action Bar */
+.dc-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.btn{padding:12px 28px;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;transition:.2s;font-family:inherit;display:inline-flex;align-items:center;gap:8px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{background:linear-gradient(135deg,var(--dc-gold),#b8922e);color:#0a1628;box-shadow:0 4px 20px rgba(201,168,76,.25)}
+.btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 28px rgba(201,168,76,.35)}
+.btn-secondary{background:rgba(56,189,248,.12);color:var(--dc-cyan);border:1px solid rgba(56,189,248,.25)}
+.btn-secondary:hover:not(:disabled){background:rgba(56,189,248,.2)}
+.btn-outline{background:transparent;color:var(--dc-muted);border:1px solid var(--dc-border)}
+.btn-sm{padding:6px 14px;font-size:12px}
+
+/* Capture modes */
+.dc-modes{display:flex;gap:8px;margin-bottom:12px}
+.dc-mode{padding:8px 16px;border:1px solid var(--dc-border);border-radius:20px;cursor:pointer;font-size:13px;color:var(--dc-muted);transition:.2s}
+.dc-mode.active{border-color:var(--dc-gold);background:rgba(201,168,76,.08);color:var(--dc-gold)}
+
+/* Results Sidebar */
+.dc-results{display:flex;flex-direction:column;gap:12px}
+.dc-result-card{background:var(--dc-card);border:1px solid var(--dc-border);border-radius:var(--dc-radius);padding:16px}
+.dc-result-card h4{font-size:13px;color:var(--dc-gold);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.dc-result-card .empty{color:var(--dc-muted);font-size:12px;font-style:italic;padding:20px 0;text-align:center}
+.dc-timing{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+.dc-timing .chip{font-size:11px;padding:3px 8px;border-radius:12px;background:rgba(56,189,248,.08);color:var(--dc-cyan)}
+.dc-timing .chip.fast{background:rgba(16,185,129,.08);color:var(--dc-jade)}
+
+/* KB Matches */
+.dc-kb-item{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:10px 12px;margin-bottom:6px;transition:.2s}
+.dc-kb-item:hover{border-color:var(--dc-gold);background:rgba(201,168,76,.04)}
+.dc-kb-item .title{font-size:13px;color:var(--dc-paper);margin-bottom:4px}
+.dc-kb-item .content{font-size:11px;color:var(--dc-muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.dc-kb-item .meta{display:flex;gap:8px;align-items:center;margin-top:4px}
+.dc-kb-item .score{font-size:10px;padding:1px 6px;border-radius:10px}
+.dc-kb-item .score.high{background:rgba(16,185,129,.15);color:var(--dc-jade)}
+.dc-kb-item .score.mid{background:rgba(201,168,76,.12);color:var(--dc-gold)}
+.dc-kb-item .score.low{background:rgba(239,68,68,.1);color:var(--dc-red)}
+.dc-kb-item .matched{font-size:10px;color:var(--dc-cyan)}
+
+/* Features tags */
+.dc-features{display:flex;flex-wrap:wrap;gap:4px}
+.dc-feature-tag{font-size:10px;padding:2px 8px;border-radius:12px;background:rgba(201,168,76,.08);color:var(--dc-gold)}
+.dc-feature-tag.face{background:rgba(56,189,248,.08);color:var(--dc-cyan)}
+.dc-feature-tag.tongue{background:rgba(16,185,129,.08);color:var(--dc-jade)}
+
+/* Quality note */
+.dc-quality-note{font-size:11px;padding:8px 12px;border-radius:8px;margin-top:8px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);color:var(--dc-red);display:none}
+.dc-quality-note.show{display:block}
+
+/* Loading */
+.dc-loading{display:none;align-items:center;gap:10px;color:var(--dc-gold);font-size:14px;padding:12px 0}
+.dc-loading.show{display:flex}
+.dc-loading .spinner{width:18px;height:18px;border:2px solid var(--dc-gold);border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Toast */
+.dc-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--dc-surface);border:1px solid var(--dc-gold);color:var(--dc-gold);padding:10px 24px;border-radius:8px;font-size:13px;z-index:999;animation:toast-in .3s ease;display:none}
+.dc-toast.show{display:block}
+.dc-toast.error{border-color:var(--dc-red);color:var(--dc-red)}
+@keyframes toast-in{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="dc-header">
+  <div class="logo"><span class="dot"></span>医生临床实时采集</div>
+  <div class="status">
+    <span class="indicator" id="svcInd"></span>
+    <span id="svcLabel">检查服务…</span>
+  </div>
+  <div style="flex:1"></div>
+  <div class="status" id="perfLabel"></div>
+</div>
+
+<div class="dc-main">
+
+<!-- Left: Camera + Capture -->
+<div style="display:flex;flex-direction:column;gap:16px">
+
+  <!-- Mode selector -->
+  <div class="dc-section">
+    <div class="dc-modes">
+      <div class="dc-mode active" data-mode="auto" onclick="setMode('auto',this)">🔄 自动（面诊+舌诊）</div>
+      <div class="dc-mode" data-mode="face" onclick="setMode('face',this)">👤 面诊模式</div>
+      <div class="dc-mode" data-mode="tongue" onclick="setMode('tongue',this)">👅 舌诊模式</div>
+    </div>
+
+    <!-- Dual Cameras -->
+    <div class="dc-cameras">
+      <div class="dc-camera" id="camWearable">
+        <div class="label">📷 穿戴设备</div>
+        <div class="placeholder"><span class="icon">📷</span>等待设备接入…</div>
+        <div class="stamp" id="stampWearable">未采集</div>
+      </div>
+      <div class="dc-camera" id="camFixed">
+        <div class="label">🖥️ 固定摄像头</div>
+        <div class="placeholder"><span class="icon">🖥️</span>等待设备接入…</div>
+        <div class="stamp" id="stampFixed">未采集</div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="dc-actions">
+      <button class="btn btn-primary" id="btnCapture" onclick="doCapture()">
+        ⚡ 确认采集
+      </button>
+      <button class="btn btn-secondary" id="btnSupplement" onclick="doSupplement()" disabled>
+        📷 补充采集（固定摄像头）
+      </button>
+      <button class="btn btn-outline btn-sm" onclick="resetCapture()">
+        🔄 重新采集
+      </button>
+      <div class="dc-loading" id="loading">
+        <div class="spinner"></div> AI 分析中…
+      </div>
+    </div>
+  </div>
+
+  <!-- Capture Results -->
+  <div class="dc-section" id="ocrSection" style="display:none">
+    <h3>📝 识别文本</h3>
+    <div id="ocrText" style="font-size:12px;color:var(--dc-muted);line-height:1.6;max-height:200px;overflow-y:auto"></div>
+    <div class="dc-timing" id="timingInfo"></div>
+  </div>
+</div>
+
+<!-- Right: KB Results Sidebar -->
+<div class="dc-results">
+  <!-- KB Face Matches -->
+  <div class="dc-result-card">
+    <h4>🧠 KB 面诊匹配</h4>
+    <div id="kbFace" class="empty">等待采集…</div>
+  </div>
+
+  <!-- KB Tongue Matches -->
+  <div class="dc-result-card">
+    <h4>👅 KB 舌诊匹配</h4>
+    <div id="kbTongue" class="empty">等待采集…</div>
+  </div>
+
+  <!-- Diagnostic Summary -->
+  <div class="dc-result-card">
+    <h4>📋 诊断摘要</h4>
+    <div id="diagSummary" class="empty">等待采集…</div>
+    <div class="dc-quality-note" id="qualityNote"></div>
+  </div>
+</div>
+
+</div>
+
+<div class="dc-toast" id="toast"></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- Inline JS: Camera + Capture + API 集成 -->
+<script>
+(function(){
+'use strict';
+
+const API = '';
+const FACE_OCR = 'http://127.0.0.1:8913';
+let currentMode = 'auto';
+let streams = { wearable: null, fixed: null };
+let lastCapture = null;
+let isCapturing = false;
+
+// ─── Init ───
+window.addEventListener('DOMContentLoaded', () => {
+  checkServices();
+  initCameras();
+});
+
+async function checkServices() {
+  const svcInd = document.getElementById('svcInd');
+  const svcLabel = document.getElementById('svcLabel');
+  try {
+    const [apiR, ocrR] = await Promise.all([
+      fetch(API + '/api/health').then(r => r.json()).catch(() => ({})),
+      fetch(FACE_OCR + '/health').then(r => r.json()).catch(() => ({}))
+    ]);
+    const apiOk = apiR.ok || apiR.status === 'ok';
+    const ocrOk = ocrR.status === 'ok' || ocrR.ok;
+    if (apiOk && ocrOk) {
+      svcInd.className = 'indicator ok';
+      svcLabel.textContent = '所有服务就绪 · 可以开始采集';
+    } else {
+      svcInd.className = 'indicator warn';
+      svcLabel.textContent = '部分服务未就绪: ' + [apiOk?'':'API', ocrOk?'':'OCR'].filter(Boolean).join(', ');
+    }
+  } catch(e) {
+    svcInd.className = 'indicator err';
+    svcLabel.textContent = '服务不可达';
+  }
+}
+
+// ─── Camera Init ───
+async function initCameras() {
+  // Try wearable (prefer back camera on mobile / external on desktop)
+  try {
+    const s = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+      audio: false
+    });
+    attachStream('camWearable', s, 'wearable');
+  } catch(e) {
+    document.getElementById('camWearable').querySelector('.placeholder').innerHTML =
+      '<span class="icon">⚠️</span>穿戴设备不可用<br><small>请检查设备连接</small>';
+  }
+
+  // Try fixed camera (prefer user-facing or second camera)
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const videoDevices = devices.filter(d => d.kind === 'videoinput');
+    if (videoDevices.length > 1) {
+      const s = await navigator.mediaDevices.getUserMedia({
+        video: { deviceId: videoDevices[1].deviceId, width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false
+      });
+      attachStream('camFixed', s, 'fixed');
+    } else if (videoDevices.length === 1) {
+      // Only one camera — reuse same device for fixed (will capture still frame)
+      const el = document.getElementById('camFixed');
+      el.querySelector('.placeholder').innerHTML =
+        '<span class="icon">🖥️</span>固定摄像头待接入<br><small>点击补充采集时将使用同一设备</small>';
+    }
+  } catch(e) {
+    document.getElementById('camFixed').querySelector('.placeholder').innerHTML =
+      '<span class="icon">⚠️</span>固定摄像头不可用<br><small>请检查设备连接</small>';
+  }
+}
+
+function attachStream(containerId, stream, source) {
+  const container = document.getElementById(containerId);
+  const video = document.createElement('video');
+  video.srcObject = stream;
+  video.autoplay = true;
+  video.playsInline = true;
+  video.muted = true;
+  container.querySelector('.placeholder')?.remove();
+  container.appendChild(video);
+  streams[source] = stream;
+}
+
+// ─── Capture ───
+function captureFrame(source) {
+  const container = document.getElementById(source === 'wearable' ? 'camWearable' : 'camFixed');
+  const video = container.querySelector('video');
+  if (!video || video.readyState < 2) return null;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0);
+  const b64 = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+
+  // Update stamp
+  const stamp = document.getElementById('stamp' + (source === 'wearable' ? 'Wearable' : 'Fixed'));
+  stamp.textContent = new Date().toLocaleTimeString('zh-CN') + ' · ' + source;
+
+  // Flash effect
+  container.style.boxShadow = '0 0 20px rgba(201,168,76,.4)';
+  setTimeout(() => container.style.boxShadow = '', 300);
+
+  return b64;
+}
+
+// ─── Mode ───
+window.setMode = function(mode, el) {
+  currentMode = mode;
+  document.querySelectorAll('.dc-mode').forEach(m => m.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('kbFace').innerHTML = '<div class="empty">等待采集…</div>';
+  document.getElementById('kbTongue').innerHTML = '<div class="empty">等待采集…</div>';
+  document.getElementById('diagSummary').innerHTML = '<div class="empty">等待采集…</div>';
+};
+
+// ─── Confirm Capture ───
+window.doCapture = async function() {
+  if (isCapturing) return;
+  isCapturing = true;
+
+  const btn = document.getElementById('btnCapture');
+  const loading = document.getElementById('loading');
+  btn.disabled = true;
+  loading.classList.add('show');
+
+  try {
+    const wearableB64 = captureFrame('wearable');
+    const fixedB64 = captureFrame('fixed');
+
+    if (!wearableB64 && !fixedB64) {
+      toast('请确保至少一个摄像头已就绪', 'error');
+      return;
+    }
+
+    const body = { mode: currentMode };
+    if (wearableB64) body.wearableImage = wearableB64;
+    if (fixedB64) body.fixedImage = fixedB64;
+
+    const startTime = performance.now();
+    const r = await fetch(API + '/api/doctor/consult-capture', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await r.json();
+    const elapsed = Math.round(performance.now() - startTime);
+
+    lastCapture = data;
+    renderResults(data, elapsed);
+
+    document.getElementById('perfLabel').textContent =
+      '⚡ ' + elapsed + 'ms · ' + ((data.diagnostic||{}).matchCount||0) + ' KB匹配';
+  } catch(e) {
+    toast('采集失败: ' + e.message, 'error');
+    console.error(e);
+  } finally {
+    isCapturing = false;
+    btn.disabled = false;
+    loading.classList.remove('show');
+    document.getElementById('btnSupplement').disabled = false;
+  }
+};
+
+// ─── Supplement Capture ───
+window.doSupplement = async function() {
+  if (isCapturing) return;
+  isCapturing = true;
+
+  const btn = document.getElementById('btnSupplement');
+  btn.disabled = true;
+
+  try {
+    const fixedB64 = captureFrame('fixed');
+    if (!fixedB64) {
+      // Fallback to wearable if no fixed camera
+      const wB64 = captureFrame('wearable');
+      if (!wB64) { toast('无可用的摄像头', 'error'); return; }
+      const r = await fetch(API + '/api/doctor/supplement-capture', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: wB64, mode: currentMode })
+      });
+      const data = await r.json();
+      renderSupplement(data);
+    } else {
+      const r = await fetch(API + '/api/doctor/supplement-capture', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: fixedB64, mode: currentMode })
+      });
+      const data = await r.json();
+      renderSupplement(data);
+    }
+  } catch(e) {
+    toast('补充采集失败: ' + e.message, 'error');
+  } finally {
+    isCapturing = false;
+    btn.disabled = false;
+  }
+};
+
+// ─── Render ───
+function renderResults(data, elapsed) {
+  // OCR Text
+  const ocrSection = document.getElementById('ocrSection');
+  const ocrText = document.getElementById('ocrText');
+  const timingInfo = document.getElementById('timingInfo');
+
+  ocrSection.style.display = 'block';
+  let textHtml = '';
+  for (const [src, cap] of Object.entries(data.captures || {})) {
+    const qIcon = cap.quality === 'blurry' ? '⚠️' : cap.quality === 'fail' ? '❌' : '✅';
+    textHtml += '<div style="margin-bottom:8px"><strong style="color:var(--dc-cyan)">' + src + '</strong> ' + qIcon + '<br>' +
+      (cap.text || '(无识别文本)') + '</div>';
+  }
+  ocrText.innerHTML = textHtml || '<div class="empty">无识别文本</div>';
+
+  // Timing
+  timingInfo.innerHTML = [
+    data.timing.totalMs ? '<span class="chip fast">总计 ' + data.timing.totalMs + 'ms</span>' : '',
+    data.timing.ocrMs ? '<span class="chip">OCR ' + data.timing.ocrMs + 'ms</span>' : '',
+    data.timing.kbMs ? '<span class="chip">KB ' + data.timing.kbMs + 'ms</span>' : '',
+    '<span class="chip">端到端 ' + elapsed + 'ms</span>'
+  ].filter(Boolean).join('');
+
+  // KB Face
+  renderKBSection('kbFace', data.kb?.face || [], '面诊');
+  // KB Tongue
+  renderKBSection('kbTongue', data.kb?.tongue || [], '舌诊');
+
+  // Diagnostic Summary
+  const diag = data.diagnostic || {};
+  const features = (data.kb?.features?.face || []).concat(data.kb?.features?.tongue || []);
+  const diagDiv = document.getElementById('diagSummary');
+  diagDiv.innerHTML = [
+    '<div style="font-size:13px;color:var(--dc-paper);margin-bottom:8px">' +
+      (diag.summary || '分析完成') + '</div>',
+    features.length > 0 ? '<div class="dc-features">' +
+      features.map(f => {
+        const isFace = f.includes('面诊') || f.includes('面部');
+        return '<span class="dc-feature-tag ' + (isFace ? 'face' : 'tongue') + '">' + f + '</span>';
+      }).join('') + '</div>' : '',
+    diag.topFindings?.length ? '<div style="font-size:11px;color:var(--dc-muted);margin-top:8px">🔍 主要发现: ' +
+      diag.topFindings.join(' · ') + '</div>' : ''
+  ].join('');
+
+  // Quality note
+  const qualityNote = document.getElementById('qualityNote');
+  if (diag.qualityNote) {
+    qualityNote.textContent = '⚠️ ' + diag.qualityNote;
+    qualityNote.classList.add('show');
+  } else {
+    qualityNote.classList.remove('show');
+  }
+}
+
+function renderKBSection(containerId, matches, label) {
+  const div = document.getElementById(containerId);
+  if (!matches || !matches.length) {
+    div.innerHTML = '<div class="empty">' + label + '未匹配到知识库条目</div>';
+    return;
+  }
+  div.innerHTML = matches.map(m => {
+    const sc = m.score >= 0.8 ? 'high' : m.score >= 0.65 ? 'mid' : 'low';
+    return '<div class="dc-kb-item">' +
+      '<div class="title">' + (m.title || m.entry_id || '').slice(0, 80) + '</div>' +
+      '<div class="content">' + (m.content || '').slice(0, 150) + '</div>' +
+      '<div class="meta">' +
+        '<span class="score ' + sc + '">置信度 ' + (m.score || 0).toFixed(2) + '</span>' +
+        (m.matched ? '<span class="matched">匹配: ' + m.matched + '</span>' : '') +
+        '<span style="font-size:10px;color:var(--dc-muted)">' + (m.module || '') + '</span>' +
+      '</div></div>';
+  }).join('');
+}
+
+function renderSupplement(data) {
+  // Merge supplement into existing results display
+  if (!data.ok) { toast('补充采集失败', 'error'); return; }
+
+  const ocrText = document.getElementById('ocrText');
+  ocrText.innerHTML += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--dc-border)">' +
+    '<strong style="color:var(--dc-cyan)">supplement</strong> ✅<br>' +
+    ((data.capture||{}).text || '(无识别文本)') + '</div>';
+
+  if (data.kb?.matches?.length) {
+    renderKBSection('kbFace', data.kb.matches, '面诊(补充)');
+  }
+
+  const qualityNote = document.getElementById('qualityNote');
+  qualityNote.classList.remove('show');
+  toast('补充采集完成', '');
+}
+
+window.resetCapture = function() {
+  lastCapture = null;
+  document.getElementById('ocrSection').style.display = 'none';
+  document.getElementById('kbFace').innerHTML = '<div class="empty">等待采集…</div>';
+  document.getElementById('kbTongue').innerHTML = '<div class="empty">等待采集…</div>';
+  document.getElementById('diagSummary').innerHTML = '<div class="empty">等待采集…</div>';
+  document.getElementById('qualityNote').classList.remove('show');
+  document.getElementById('btnSupplement').disabled = true;
+  document.getElementById('perfLabel').textContent = '';
+  document.getElementById('stampWearable').textContent = '未采集';
+  document.getElementById('stampFixed').textContent = '未采集';
+};
+
+function toast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'dc-toast show' + (type === 'error' ? ' error' : '');
+  clearTimeout(el._tid);
+  el._tid = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+})();
+</script>
+</body>
+</html>
