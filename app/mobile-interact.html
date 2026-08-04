@@ -402,6 +402,7 @@ const KB_HOT_API = '/api/public/kb-hot';
 const KB_HIT_API = '/api/public/kb-hit';
 const OCR_UPLOAD_API = '/api/v1/camera/upload-multipart';
 const ASR_ANALYZE_API = '/api/public/voice-analyze';
+const SOLVE_API = '/api/public/messiah-solve';
 const STREAM_INTERVAL_MS = 2000; // 实时帧间隔
 const STREAM_FRAME_QUALITY = 0.65;
 const STREAM_MAX_FRAMES = 30;
@@ -828,6 +829,13 @@ async function askAI(query, audioBlob) {
     const resp = await fetch(`${KB_FTS_API}?q=${encodeURIComponent(query)}&limit=5`);
     const data = await resp.json();
     kbMatches = (data.results || []).slice(0, 5);
+  } catch {}
+
+  // 1.5) 同步调用弥撒亚 solve 端点（白盒 3 段链路：search→nn→guide）
+  let solveResult = null;
+  try {
+    const solveResp = await fetch(`${SOLVE_API}?q=${encodeURIComponent(query)}`, { signal: AbortSignal.timeout(5000) });
+    if (solveResp.ok) solveResult = await solveResp.json();
   } catch {}
 
   // 2) AI 助手回复（KB 命中 → 高置信度直答 + KB 引用，否则走通用 AI 入口）
