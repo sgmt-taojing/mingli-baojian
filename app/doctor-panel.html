@@ -284,52 +284,51 @@ function applyRxTemplate(id){
   if(tpl)document.getElementById('rx-'+id).value=tpl;
 }
 
-// 一键采纳：AI 初稿直接作为诊断，快速提交
+// 一键采纳：从内联 textarea 读值（展开了就取编辑后的，没展开用 AI 初稿）
 function acceptCase(id){
   var c=allCases.find(function(x){return x.id===id});
   if(!c)return;
-  if(!c.aiDraft&&!c.diagnosis){showToast('该案例无 AI 初稿，请先编辑填写');openEdit(id);return}
-  submitDiagnosis(id,{
-    diagnosis:c.diagnosis||c.aiDraft||'',
-    prescription:c.prescription||'',
-    doctor_comment:c.doctorComment||''
-  },'采纳 AI 初稿');
+  var diagEl=document.getElementById('diag-'+id);
+  var rxEl=document.getElementById('rx-'+id);
+  var diagnosis=diagEl&&diagEl.value?diagEl.value.trim():c.diagnosis||c.aiDraft||'';
+  var prescription=rxEl&&rxEl.value?rxEl.value.trim():c.prescription||'';
+  if(!diagnosis){showToast('该案例无 AI 初稿，请先编辑填写');openEdit(id);return}
+  submitDiagnosis(id,{diagnosis:diagnosis,prescription:prescription},'采纳确认');
 }
 
-// 驳回：标记退回
+// 驳回：确认替换（去掉 confirm 弹框）
 function rejectCase(id){
-  if(!confirm('确认驳回该案例？将退回患者端重新提交。'))return;
-  fetch(API+'/api/clinic/case/'+id,{method:'PUT',headers:authHeaders(),body:JSON.stringify({status:'rejected',review_comment:'医生驳回，请补充信息'})})
+  showToast('确认驳回？3 秒内再点驳回即确认');
+  var card=document.getElementById('card-'+id);
+  if(card._rejectArmed){card._rejectArmed=false;doReject(id);return}
+  card._rejectArmed=true;
+  setTimeout(function(){if(card._rejectArmed){card._rejectArmed=false;showToast('驳回已取消')}},3000);
+}
+function doReject(id){
+  fetch(API+'/api/clinic/submit-diagnosis',{method:'POST',headers:authHeaders(),body:JSON.stringify({caseId:id,diagnosis:'',prescription:'',reviewComment:'医生驳回，请补充信息'})})
   .then(function(r){return r.json()}).then(function(d){
     var card=document.getElementById('card-'+id);
     if(card)card.classList.add('rejecting');
-    setTimeout(function(){loadQueue()},250);
+    setTimeout(function(){loadQueue()},400);
   });
 }
 
 function submitEdit(id){
-  var c=allCases.find(function(x){return x.id===id});
+  var diag=document.getElementById('diag-'+id);
+  var rx=document.getElementById('rx-'+id);
   submitDiagnosis(id,{
-    diagnosis:document.getElementById('diag-'+id).value,
-    prescription:document.getElementById('rx-'+id).value,
-    doctor_comment:document.getElementById('doc-'+id).value
+    diagnosis:diag&&diag.value?diag.value:'',
+    prescription:rx&&rx.value?rx.value:''
   },'医生编辑提交');
 }
 
 function submitDiagnosis(id,data,note){
-  fetch(API+'/api/clinic/case/'+id,{method:'PUT',headers:authHeaders(),body:JSON.stringify(data)})
+  fetch(API+'/api/clinic/submit-diagnosis',{method:'POST',headers:authHeaders(),body:JSON.stringify({caseId:id,diagnosis:data.diagnosis||'',prescription:data.prescription||'',reviewComment:data.doctor_comment||note||''})})
   .then(function(r){return r.json()}).then(function(d){
     var card=document.getElementById('card-'+id);
     if(card)card.classList.add('accepting');
-    setTimeout(function(){loadQueue()},250);
-  }).catch(function(e){
-    // 兜底：尝试 submit-diagnosis 端点
-    fetch(API+'/api/clinic/submit-diagnosis',{method:'POST',headers:authHeaders(),body:JSON.stringify({caseId:id,diagnosis:data.diagnosis,prescription:data.prescription,reviewComment:data.doctor_comment})})
-    .then(function(r){return r.json()}).then(function(d2){
-      var card=document.getElementById('card-'+id);
-      if(card)card.classList.add('accepting');
-      setTimeout(function(){loadQueue()},250);
-    });
+    showToast(d.ok||d.message?'✅ '+(d.message||'提交成功'):'⚠️ '+(d.error||'提交失败'));
+    setTimeout(function(){loadQueue()},400);
   });
 }
 
