@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0a12">
+<meta name="robots" content="noindex, nofollow">
+<title>手机拍照诊断 · 命理宝鉴 · 易道智鉴</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<style>
+:root{
+  --bg:#0a0a12; --card:#13141f; --border:rgba(255,255,255,0.08);
+  --text:#e0e0e8; --muted:#808096; --accent:#7c5ce7; --accent2:#00d4aa;
+  --gold:#f0b90b; --red:#ff5e7a;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC',sans-serif;
+  background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;
+  overflow-x:hidden;-webkit-font-smoothing:antialiased;
+}
+
+/* ─── Layout ─── */
+.app-container{max-width:480px;margin:0 auto;padding:env(safe-area-inset-top,16px) 16px env(safe-area-inset-bottom,16px)}
+
+/* ─── Header ─── */
+.app-header{
+  display:flex;align-items:center;justify-content:space-between;padding:8px 0 12px;
+  border-bottom:1px solid var(--border);margin-bottom:16px
+}
+.app-logo{display:flex;align-items:center;gap:8px}
+.app-logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.app-title{font-size:17px;font-weight:700}
+.app-status{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px}
+.app-status-dot{width:6px;height:6px;border-radius:50%;background:var(--accent2);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* ─── Tabs ─── */
+.app-tabs{display:flex;gap:4px;margin-bottom:16px;background:var(--card);border-radius:10px;padding:3px;border:1px solid var(--border)}
+.app-tab{
+  flex:1;padding:10px 8px;border-radius:8px;font-size:13px;font-weight:500;
+  text-align:center;cursor:pointer;transition:all 0.2s;color:var(--muted);border:none;background:none
+}
+.app-tab.active{background:rgba(124,92,231,0.15);color:var(--accent);font-weight:600}
+
+/* ─── Camera Module ─── */
+.camera-section{display:none;flex-direction:column;gap:12px}
+.camera-section.active{display:flex}
+
+.camera-preview{
+  width:100%;aspect-ratio:1;border-radius:12px;overflow:hidden;
+  background:var(--card);border:1px solid var(--border);position:relative
+}
+.camera-preview video,.camera-preview canvas,.camera-preview img{
+  width:100%;height:100%;object-fit:cover
+}
+.camera-mode-label{
+  position:absolute;top:8px;left:8px;padding:2px 8px;border-radius:10px;
+  background:rgba(0,0,0,0.7);color:var(--accent2);font-size:11px;font-weight:600
+}
+.camera-overlay-text{
+  position:absolute;bottom:12px;left:50%;transform:translateX(-50%);
+  color:white;font-size:12px;text-align:center;background:rgba(0,0,0,0.5);
+  padding:6px 16px;border-radius:20px;opacity:0.9
+}
+
+.camera-controls{display:flex;gap:8px}
+.camera-btn{
+  flex:1;padding:14px;border:1px solid var(--border);border-radius:10px;
+  background:var(--card);color:var(--text);font-size:14px;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:all 0.15s
+}
+.camera-btn:active{transform:scale(0.97);opacity:0.8}
+.camera-btn.primary{background:var(--accent);border-color:var(--accent);color:white}
+
+.camera-mode-select{
+  display:flex;gap:8px;overflow-x:auto;padding-bottom:4px
+}
+.camera-mode-chip{
+  padding:8px 16px;border-radius:20px;font-size:13px;font-weight:500;
+  border:1px solid var(--border);background:var(--card);color:var(--muted);
+  white-space:nowrap;cursor:pointer;transition:all 0.15s;flex-shrink:0
+}
+.camera-mode-chip.active{border-color:var(--accent);background:rgba(124,92,231,0.1);color:var(--accent)}
+
+/* ─── Search Module ─── */
+.search-section{display:none;flex-direction:column;gap:12px}
+.search-section.active{display:flex}
+
+.search-input-wrap{
+  display:flex;gap:8px;background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:4px 14px;transition:border-color 0.2s
+}
+.search-input-wrap:focus-within{border-color:var(--accent)}
+.search-icon{color:var(--muted);display:flex;align-items:center}
+.search-input{
+  flex:1;background:none;border:none;outline:none;padding:12px 0;
+  font-size:16px;color:var(--text)
+}
+.search-input::placeholder{color:var(--muted);font-size:14px}
+.search-submit{
+  padding:8px 16px;border-radius:8px;background:var(--accent);color:white;
+  border:none;font-size:13px;font-weight:600;cursor:pointer;flex-shrink:0
+}
+.search-submit:active{opacity:0.8}
+
+/* ─── Result Card ─── */
+.result-card{
+  padding:14px;border-radius:10px;background:var(--card);border:1px solid var(--border);
+  transition:border-color 0.2s
+}
+.result-card:hover,.result-card:active{border-color:rgba(124,92,231,0.3)}
+.result-title{font-size:15px;font-weight:600;margin-bottom:6px;line-height:1.4}
+.result-snippet{font-size:13px;color:var(--muted);line-height:1.6;max-height:80px;overflow:hidden}
+.result-meta{display:flex;gap:10px;margin-top:8px;font-size:11px;color:var(--muted);flex-wrap:wrap}
+
+.result-highlight{background:rgba(240,185,11,0.15);color:var(--gold);padding:1px 3px;border-radius:2px;font-weight:600}
+
+/* ─── States ─── */
+.state-loading{
+  display:flex;flex-direction:column;align-items:center;gap:12px;padding:40px 0;color:var(--muted)
+}
+.state-spinner{width:28px;height:28px;border:2px solid rgba(255,255,255,0.1);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.state-empty{text-align:center;padding:40px 0;color:var(--muted)}
+.state-empty-icon{font-size:40px;margin-bottom:10px}
+.state-error{text-align:center;padding:40px 0;color:var(--red)}
+
+/* ─── Analysis Panel ─── */
+.analysis-panel{
+  padding:16px;border-radius:12px;background:rgba(124,92,231,0.06);
+  border:1px solid rgba(124,92,231,0.15);margin-top:12px
+}
+.analysis-title{font-size:14px;font-weight:600;color:var(--accent);margin-bottom:8px}
+.analysis-text{font-size:13px;line-height:1.7;color:var(--muted)}
+.analysis-kb{font-size:12px;color:var(--accent2);margin-top:10px;padding:8px;background:rgba(0,212,170,0.05);border-radius:6px}
+
+/* ─── Media Queries ─── */
+@media(max-width:380px){
+  .app-tab{font-size:12px;padding:8px 4px}
+}
+@media(min-width:480px){
+  .app-container{max-width:420px}
+}
+</style>
+</head>
+<body>
+
+<div class="app-container">
+
+<!-- HEADER -->
+<header class="app-header">
+  <div class="app-logo">
+    <div class="app-logo-icon">☰</div>
+    <div>
+      <div class="app-title">易道智鉴</div>
+    </div>
+  </div>
+  <div class="app-status" id="statusDot">
+    <span class="app-status-dot"></span>KB 在线
+  </div>
+</header>
+
+<!-- TABS -->
+<nav class="app-tabs" id="appTabs">
+  <button class="app-tab active" data-tab="camera" onclick="switchTab('camera')">📷 拍照诊断</button>
+  <button class="app-tab" data-tab="search" onclick="switchTab('search')">🔍 知识搜索</button>
+</nav>
+
+<!-- ═══ CAMERA MODULE ═══ -->
+<section class="camera-section active" id="cameraSection">
+  
+  <!-- 分析模式选择 -->
+  <div class="camera-mode-select" id="modeChips">
+    <span class="camera-mode-chip active" data-mode="face" onclick="setCameraMode('face')">👤 面诊</span>
+    <span class="camera-mode-chip" data-mode="tongue" onclick="setCameraMode('tongue')">👅 舌诊</span>
+    <span class="camera-mode-chip" data-mode="ocr-tcm" onclick="setCameraMode('ocr-tcm')">📄 病历OCR</span>
+    <span class="camera-mode-chip" data-mode="eye" onclick="setCameraMode('eye')">👁 眼诊</span>
+  </div>
+
+  <!-- 预览区 -->
+  <div class="camera-preview" id="cameraPreview">
+    <video id="cameraVideo" autoplay playsinline style="display:none"></video>
+    <canvas id="cameraCanvas" style="display:none"></canvas>
+    <div class="camera-mode-label" id="modeLabel">👤 面诊</div>
+    <div id="previewPlaceholder" style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:13px;flex-direction:column;gap:8px">
+      <div style="font-size:36px">📷</div>
+      <div>打开相机后在此预览</div>
+    </div>
+    <div class="camera-overlay-text" id="overlayText" style="display:none"></div>
+  </div>
+
+  <!-- 控制按钮 -->
+  <div class="camera-controls">
+    <button class="camera-btn" id="btnCamera" onclick="toggleCamera()">📷 打开相机</button>
+    <button class="camera-btn primary" id="btnCapture" onclick="captureAndAnalyze()" disabled>📸 拍摄分析</button>
+  </div>
+
+  <!-- 分析结果 -->
+  <div id="analysisResult"></div>
+</section>
+
+<!-- ═══ SEARCH MODULE ═══ -->
+<section class="search-section" id="searchSection">
+  <div class="search-input-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" id="searchInput" type="search" 
+      placeholder="搜索命理宝鉴知识库…" 
+      autocomplete="off"
+      onkeydown="if(event.key==='Enter')mobileSearch()">
+    <button class="search-submit" onclick="mobileSearch()">搜索</button>
+  </div>
+
+  <!-- 热门搜索 -->
+  <div id="hotTags" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+    <span style="font-size:12px;color:var(--muted);display:flex;align-items:center;margin-right:4px">🔥</span>
+  </div>
+
+  <!-- 搜索结果 -->
+  <div id="searchResults">
+    <div class="state-empty">
+      <div class="state-empty-icon">🔍</div>
+      <div>输入关键词搜索</div>
+      <div style="font-size:12px;margin-top:4px;opacity:0.7">试试：桂枝汤 · 八字 · 倪海厦 · 数字化转型</div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   mobile-interact.js — 手机端人机交互引擎 V1
+   ═══════════════════════════════════════════════════════ */
+
+// ===== Config =====
+const KB_FTS_API = '/api/public/kb/search-fts';
+const KB_HOT_API = '/api/public/kb-hot';
+const KB_HIT_API = '/api/public/kb-hit';
+// 修真 R189: 同源 multipart 上传（避免跨域到 8913）
+const OCR_UPLOAD_API = '/api/v1/camera/upload-multipart';
+const LOCAL_IP = window.location.hostname || '127.0.0.1';
+
+// ===== State =====
+let cameraMode = 'face';
+let isCameraOn = false;
+let videoStream = null;
+let currentPhoto = null;
+
+// ===== Tab Switch =====
+function switchTab(tab) {
+  document.querySelectorAll('.app-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.getElementById('cameraSection').classList.toggle('active', tab === 'camera');
+  document.getElementById('searchSection').classList.toggle('active', tab === 'search');
+}
+
+// ===== Camera Mode =====
+function setCameraMode(mode) {
+  cameraMode = mode;
+  const labels = { face: '👤 面诊', tongue: '👅 舌诊', 'ocr-tcm': '📄 病历OCR', eye: '👁 眼诊' };
+  document.getElementById('modeLabel').textContent = labels[mode] || mode;
+  document.querySelectorAll('.camera-mode-chip').forEach(c => c.classList.toggle('active', c.dataset.mode === mode));
+}
+
+// ===== Camera Toggle =====
+async function toggleCamera() {
+  if (isCameraOn) {
+    stopCamera();
+    return;
+  }
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 1280 } }
+    });
+    
+    const video = document.getElementById('cameraVideo');
+    video.srcObject = stream;
+    video.style.display = 'block';
+    video.play();
+    
+    document.getElementById('cameraCanvas').style.display = 'none';
+    document.getElementById('previewPlaceholder').style.display = 'none';
+    document.getElementById('btnCamera').innerHTML = '📷 关闭相机';
+    document.getElementById('btnCapture').disabled = false;
+    
+    videoStream = stream;
+    isCameraOn = true;
+  } catch (e) {
+    showToast('无法访问相机：' + e.message);
+  }
+}
+
+function stopCamera() {
+  if (videoStream) {
+    videoStream.getTracks().forEach(t => t.stop());
+    videoStream = null;
+  }
+  document.getElementById('cameraVideo').style.display = 'none';
+  document.getElementById('cameraCanvas').style.display = 'none';
+  document.getElementById('previewPlaceholder').style.display = 'flex';
+  document.getElementById('btnCamera').innerHTML = '📷 打开相机';
+  document.getElementById('btnCapture').disabled = true;
+  isCameraOn = false;
+}
+
+// ===== Capture & Analyze =====
+async function captureAndAnalyze() {
+  if (!isCameraOn) return showToast('请先打开相机');
+  
+  const video = document.getElementById('cameraVideo');
+  const canvas = document.getElementById('cameraCanvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  canvas.style.display = 'block';
+  
+  const resultEl = document.getElementById('analysisResult');
+  resultEl.innerHTML = '<div class="state-loading"><div class="state-spinner"></div><span>AI 分析中…</span></div>';
+  
+  try {
+    // 转 blob
+    const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.85));
+    
+    // 同源 multipart 上传 (走 8920 反向代理到 8913)
+    const formData = new FormData();
+    formData.append('file', blob, 'capture.jpg');
+    formData.append('mode', cameraMode);
+    
+    let ocrResult;
+    try {
+      const resp = await fetch(OCR_UPLOAD_API, { method: 'POST', body: formData, signal: AbortSignal.timeout(15000) });
+      ocrResult = await resp.json();
+    } catch {
+      // 离线兜底
+      ocrResult = { ok: false, analysis: { summary: '离线模式：相机已拍摄，请连接 KB 网络获取 AI 分析' }, mode: cameraMode };
+    }
+    
+    // 将 OCR 文本送入 KB 匹配
+    let kbMatches = ocrResult.kb_matches || ocrResult.kb_features || [];
+    const analysisText = ocrResult.analysis?.summary || ocrResult.summary || '';
+    
+    if (!kbMatches.length && analysisText) {
+      // 自己调用 KB FTS5
+      try {
+        const kbResp = await fetch(`${KB_FTS_API}?q=${encodeURIComponent(analysisText.substring(0,50))}&limit=3`);
+        const kbData = await kbResp.json();
+        kbMatches = (kbData.results || []).slice(0, 3);
+      } catch {}
+    }
+    
+    renderAnalysis(ocrResult, kbMatches);
+  } catch (e) {
+    resultEl.innerHTML = `<div class="state-error">分析失败: ${e.message}</div>`;
+  }
+}
+
+function renderAnalysis(ocrResult, kbMatches) {
+  const modeLabels = { face:'面诊', tongue:'舌诊', 'ocr-tcm':'病历OCR', eye:'眼诊' };
+  const modeLabel = modeLabels[cameraMode] || cameraMode;
+  const summary = ocrResult.analysis?.summary || ocrResult.summary || '分析完成';
+  const features = ocrResult.analysis?.features || ocrResult.features || {};
+  
+  let html = `<div class="analysis-panel">
+    <div class="analysis-title">🧬 ${modeLabel}分析结果</div>
+    <div class="analysis-text">${summary}</div>`;
+  
+  if (Object.keys(features).length > 0) {
+    html += '<div style="font-size:12px;color:var(--muted);margin-top:8px">';
+    for (const [k, v] of Object.entries(features).slice(0, 6)) {
+      html += `<span style="display:inline-block;padding:2px 8px;margin:2px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid var(--border)">${k}: ${v}</span>`;
+    }
+    html += '</div>';
+  }
+  
+  if (kbMatches && kbMatches.length > 0) {
+    html += '<div class="analysis-kb">📚 知识库支撑 (' + kbMatches.length + ' 条引用)</div>';
+    kbMatches.slice(0, 3).forEach(m => {
+      const title = m.title || m.summary || m.entry_id || '';
+      const snippet = m.snippet || m.content || '';
+      html += `<div style="font-size:12px;color:var(--muted);margin:4px 0;padding:6px;background:rgba(255,255,255,0.02);border-radius:6px">
+        <strong>${title.substring(0,50)}</strong>
+        <div style="margin-top:2px">${(snippet||'').substring(0,100)}</div>
+      </div>`;
+    });
+  }
+  
+  html += '</div>';
+  document.getElementById('analysisResult').innerHTML = html;
+}
+
+// ===== Mobile Search =====
+async function mobileSearch() {
+  const q = document.getElementById('searchInput').value.trim();
+  if (!q || q.length < 2) return;
+  
+  const el = document.getElementById('searchResults');
+  el.innerHTML = '<div class="state-loading"><div class="state-spinner"></div><span>FTS5 检索中…</span></div>';
+  
+  try {
+    const resp = await fetch(`${KB_FTS_API}?q=${encodeURIComponent(q)}&limit=10`);
+    const data = await resp.json();
+    const results = data.results || data.data || [];
+    const engine = data.engine || 'fts5';
+    
+    if (results.length === 0) {
+      el.innerHTML = '<div class="state-empty"><div class="state-empty-icon">🔍</div><div>未找到匹配结果</div><div style="font-size:12px;margin-top:4px">尝试缩短关键词或换用同义词</div></div>';
+      return;
+    }
+    
+    el.innerHTML = `
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">
+        找到 <strong>${(data.total||results.length).toLocaleString()}</strong> 条 · ${engine.toUpperCase()} BM25 · ${results.length} 条/页
+      </div>
+      ${results.map((r, i) => {
+        const title = r.title || r.summary || r.entry_id || '';
+        const snippet = r.snippet || r.content || '';
+        const module = r.module || '';
+        const trust = r.trust_score || r.confidence || '';
+        return `<div class="result-card">
+          <div class="result-title">${i+1}. ${title.substring(0,80)}</div>
+          <div class="result-snippet">${(snippet||'').substring(0,150)}</div>
+          <div class="result-meta">
+            <span>📁 ${module}</span>
+            ${trust ? `<span>⚖️ ${(trust*100).toFixed(0)}%</span>` : ''}
+          </div>
+        </div>`;
+      }).join('')}
+    `;
+    
+    // 记录命中
+    fetch(KB_HIT_API, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({query:q, hits:results.length, source:'kb-fts5'}),
+      signal: AbortSignal.timeout(3000),
+    }).catch(() => {});
+  } catch (e) {
+    el.innerHTML = `<div class="state-error">搜索失败: ${e.message}<br><button onclick="mobileSearch()" style="margin-top:10px;padding:8px 16px;border:1px solid var(--accent);border-radius:8px;background:none;color:var(--accent)">重试</button></div>`;
+  }
+}
+
+// ===== Hot Tags =====
+async function loadHotTags() {
+  try {
+    const resp = await fetch(`${KB_HOT_API}?limit=8`);
+    const data = await resp.json();
+    const hot = data.hot || [];
+    
+    const el = document.getElementById('hotTags');
+    el.innerHTML = '<span style="font-size:12px;color:var(--muted);display:flex;align-items:center;margin-right:4px">🔥</span>' +
+      hot.map(h => 
+        `<span onclick="document.getElementById('searchInput').value='${h.q}';mobileSearch()" style="padding:4px 10px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);font-size:11px;color:var(--muted);cursor:pointer;white-space:nowrap">${h.q}</span>`
+      ).join('');
+  } catch {
+    // 默认热门词
+    document.getElementById('hotTags').innerHTML = 
+      '<span style="font-size:12px;color:var(--muted);display:flex;align-items:center;margin-right:4px">🔥</span>' +
+      ['用神','日主','大运','流年','桂枝汤','八字','倪海厦','ERP'].map(q =>
+        `<span onclick="document.getElementById('searchInput').value='${q}';mobileSearch()" style="padding:4px 10px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);font-size:11px;color:var(--muted);cursor:pointer;white-space:nowrap">${q}</span>`
+      ).join('');
+  }
+}
+
+// ===== Toast =====
+function showToast(msg) {
+  let toast = document.getElementById('mobileToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'mobileToast';
+    toast.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);padding:12px 24px;background:rgba(0,0,0,0.85);color:white;border-radius:8px;font-size:14px;z-index:9999;pointer-events:none;transition:opacity 0.3s';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.style.opacity = '1';
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+}
+
+// ===== Init =====
+loadHotTags();
+
+// 检测本地/局域网连接
+fetch('/api/health').then(r => r.json()).then(d => {
+  document.getElementById('statusDot').innerHTML = '<span class="app-status-dot"></span>KB 在线 · ' + (d.service || 'ready');
+}).catch(() => {
+  document.getElementById('statusDot').innerHTML = '<span class="app-status-dot" style="background:var(--gold)"></span>KB 本地模式';
+});
+
+// 监听页面可见性：切换回来时刷新热门词
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) loadHotTags();
+});
+</script>
+</body>
+</html>
