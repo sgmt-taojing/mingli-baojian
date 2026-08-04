@@ -53,12 +53,18 @@
 <div class="kbe-stat red"><div class="kbe-stat-label">诊 倪师条目</div><div class="kbe-stat-num" id="statNh">—</div><div class="kbe-stat-sub">倪海厦课程KB</div></div>
 </div>
 
+<!-- 新版 FTS5 搜索引擎（大数据量实战：防抖/分页/高亮/历史/热门） -->
+<link rel="stylesheet" href="css/kb-search-engine.css">
+
 <div class="kbe-search">
 <label for="qInput" class="sr-only">知识库关键词搜索</label>
 <input aria-label="搜索" type="text" id="qInput" placeholder="搜中医、八字、倪海厦、失眠、风水...（2字以上）" autocomplete="off">
 <select aria-label="modFilter" id="modFilter"><option value="">全部模块</option></select>
 <button onclick="doSearch()">搜索</button>
 </div>
+
+<!-- 新版 KB 搜索引擎（FTS5 + 分页 + 历史 + 热门 + 高亮） -->
+<div id="kbSearchEngineMount"></div>
 
 <!-- 业务页面替换（F-9 Web Components）：tab 容器 -->
 <ml-tab active="0" id="kbeTab" align="left">
@@ -121,9 +127,40 @@
 
 </main>
 <script src="js/a11y-divination-hub.js" defer></script>
+<script src="js/kb-search-engine.js" defer></script>
 <script src="js/kb-recommend-feedback.js" defer></script>
 <script src="js/kb-explorer-inline.js" defer></script>
 <script src="js/mobile-nav.js" defer></script>
+
+<script>
+// 初始化新版 KB 搜索引擎（挂载到 #kbSearchEngineMount）
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof KBSearchEngine === 'undefined') return;
+  
+  window.kbEngine = new KBSearchEngine({
+    container: '#kbSearchEngineMount',
+    apiBase: '/api/public/kb/search-fts',
+    hotApi: '/api/public/kb-hot',
+    hitLogApi: '/api/public/kb-hit',
+    placeholder: '搜中医、八字、倪海厦、桂枝汤…（FTS5 BM25 排序）',
+    onSelect: function(entry) {
+      // 选中后渲染详细卡片到原 resultBox
+      var box = document.getElementById('resultBox');
+      if (!box) return;
+      box.innerHTML = '<div class="kbe-item" style="background:rgba(124,92,231,0.06);border:1px solid rgba(124,92,231,0.15);padding:16px;border-radius:8px">' +
+        '<div style="font-weight:600;font-size:15px;margin-bottom:8px">' +
+        (entry.title || entry.summary || entry.entry_id || '') + '</div>' +
+        '<div style="font-size:13px;color:var(--muted);line-height:1.7;max-height:300px;overflow:auto">' +
+        (entry.snippet || entry.content || entry.summary || '') + '</div>' +
+        '<div style="margin-top:10px;font-size:12px;color:var(--muted);display:flex;gap:12px">' +
+        '<span>' + (entry.module || entry.category || '') + '</span>' +
+        '<span>信任度: ' + ((entry.confidence || 0) * 100).toFixed(0) + '%</span>' +
+        '<span>来源: ' + (entry.source || '') + '</span>' +
+        '</div></div>';
+    }
+  });
+});
+</script>
 
 <style>
 /* R98-i 480+360 紧凑断点 */

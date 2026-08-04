@@ -1,0 +1,158 @@
+/* ═══════════════════════════════════════════════════════════
+   kb-search-engine.css — KB 搜索前端引擎样式
+   大数据量实战：深色主题 · 响应式 · 滚动性能优化
+   ═══════════════════════════════════════════════════════════ */
+
+.kb-search-engine {
+  width: 100%;
+  font-size: 14px;
+  color: var(--text, #e0e0e8);
+}
+
+/* ─── 搜索输入行 ─── */
+.kbs-input-row { margin-bottom: 8px; }
+.kbs-input-wrapper {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--card-bg, #13141f);
+  border: 1px solid var(--border, rgba(255,255,255,0.08));
+  border-radius: 10px; padding: 0 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.kbs-input-wrapper:focus-within {
+  border-color: var(--accent, #7c5ce7);
+  box-shadow: 0 0 0 3px rgba(124,92,231,0.15);
+}
+.kbs-search-icon { color: var(--muted, #808096); flex-shrink: 0; }
+.kbs-input {
+  flex: 1; background: none; border: none; outline: none;
+  padding: 12px 0; font-size: 15px; color: var(--text, #e0e0e8);
+  min-width: 0;
+}
+.kbs-input::placeholder { color: var(--muted, #808096); }
+.kbs-input::-webkit-search-cancel-button { display: none; }
+.kbs-clear {
+  background: none; border: none; color: var(--muted, #808096);
+  cursor: pointer; font-size: 14px; padding: 4px 6px; border-radius: 4px;
+}
+.kbs-clear:hover { color: var(--text, #e0e0e8); background: rgba(255,255,255,0.05); }
+
+/* ─── 元信息行 ─── */
+.kbs-meta-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 4px 2px; margin-bottom: 8px; font-size: 13px;
+}
+.kbs-total { color: var(--muted, #808096); }
+.kbs-engine-tag {
+  font-size: 11px; padding: 2px 8px; border-radius: 10px;
+  background: rgba(124,92,231,0.12); color: var(--accent, #7c5ce7);
+  font-weight: 600;
+}
+
+/* ─── 搜索历史 ─── */
+.kbs-history-panel {
+  background: var(--card-bg, #13141f); border: 1px solid var(--border, rgba(255,255,255,0.06));
+  border-radius: 10px; padding: 12px; margin-bottom: 12px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+}
+.kbs-history-title, .kbs-hot-title {
+  font-size: 12px; color: var(--muted, #808096); margin-bottom: 8px;
+  font-weight: 600; text-transform: uppercase;
+}
+.kbs-history-item, .kbs-hot-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: 6px; cursor: pointer;
+  transition: background 0.15s; font-size: 13px;
+}
+.kbs-history-item:hover, .kbs-hot-item:hover { background: rgba(124,92,231,0.08); }
+.kbs-history-query, .kbs-hot-query { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kbs-history-time { font-size: 11px; color: var(--muted, #808096); flex-shrink: 0; }
+.kbs-history-empty { color: var(--muted, #808096); font-size: 13px; padding: 8px 10px; }
+.kbs-clear-history {
+  display: block; width: 100%; margin-top: 8px; padding: 6px;
+  background: none; border: 1px solid rgba(255,255,255,0.06); border-radius: 6px;
+  color: var(--muted, #808096); font-size: 12px; cursor: pointer;
+}
+.kbs-clear-history:hover { color: var(--red, #ff5e7a); border-color: rgba(255,94,122,0.3); }
+
+.kbs-hot-rank { width: 20px; font-size: 12px; color: var(--accent, #7c5ce7); font-weight: 700; text-align: center; }
+.kbs-hot-count { font-size: 11px; color: var(--muted, #808096); flex-shrink: 0; }
+
+/* ─── 搜索结果 ─── */
+.kbs-result-card {
+  padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.04);
+  cursor: pointer; transition: background 0.15s;
+  outline: none;
+}
+.kbs-result-card:hover, .kbs-result-card:focus-visible { background: rgba(124,92,231,0.05); }
+.kbs-result-card:first-child { border-top: 1px solid rgba(255,255,255,0.04); }
+.kbs-result-title {
+  font-size: 15px; font-weight: 600; margin-bottom: 6px; line-height: 1.4;
+}
+.kbs-result-num { font-size: 11px; color: var(--muted, #808096); margin-right: 6px; }
+.kbs-result-snippet {
+  font-size: 13px; color: var(--muted, #808096); line-height: 1.6;
+  max-height: 60px; overflow: hidden;
+}
+.kbs-result-meta {
+  display: flex; gap: 12px; margin-top: 8px; font-size: 12px; color: var(--muted, #808096);
+}
+
+/* 高亮 */
+.kbs-highlight {
+  background: rgba(240,185,11,0.2); color: var(--gold, #f0b90b);
+  padding: 1px 2px; border-radius: 2px; font-weight: 600;
+  animation: kbs-highlight-in 0.3s ease;
+}
+@keyframes kbs-highlight-in { from { background: rgba(240,185,11,0.5) } to { background: rgba(240,185,11,0.2) } }
+
+/* ─── 分页 ─── */
+.kbs-pages {
+  display: flex; align-items: center; gap: 4px; padding: 16px 0;
+  flex-wrap: wrap;
+}
+.kbs-page-btn {
+  padding: 6px 12px; border: 1px solid var(--border, rgba(255,255,255,0.06));
+  border-radius: 6px; background: rgba(255,255,255,0.03);
+  color: var(--text, #e0e0e8); font-size: 13px; cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.kbs-page-btn:hover:not(:disabled) { background: rgba(124,92,231,0.1); border-color: var(--accent, #7c5ce7); }
+.kbs-page-btn.active { background: var(--accent, #7c5ce7); border-color: var(--accent, #7c5ce7); color: white; font-weight: 600; }
+.kbs-page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.kbs-page-ellipsis { color: var(--muted, #808096); padding: 0 4px; }
+.kbs-page-info {
+  margin-left: 12px; font-size: 12px; color: var(--muted, #808096); white-space: nowrap;
+}
+
+/* ─── 态 ─── */
+.kbs-loading {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 40px 0; color: var(--muted, #808096); font-size: 14px;
+}
+.kbs-spinner {
+  width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.1);
+  border-top-color: var(--accent, #7c5ce7); border-radius: 50%;
+  animation: kbs-spin 0.6s linear infinite;
+}
+@keyframes kbs-spin { to { transform: rotate(360deg) } }
+
+.kbs-empty, .kbs-error {
+  text-align: center; padding: 40px 0; color: var(--muted, #808096);
+}
+.kbs-empty-icon, .kbs-error-icon { font-size: 40px; margin-bottom: 12px; }
+.kbs-empty-text, .kbs-error-text { font-size: 15px; margin-bottom: 8px; }
+.kbs-empty-hint { font-size: 13px; }
+.kbs-retry {
+  margin-top: 12px; padding: 8px 20px; border: 1px solid var(--accent, #7c5ce7);
+  border-radius: 6px; background: transparent; color: var(--accent, #7c5ce7);
+  font-size: 13px; cursor: pointer;
+}
+.kbs-retry:hover { background: rgba(124,92,231,0.1); }
+
+/* ─── 响应式 ─── */
+@media (max-width: 640px) {
+  .kbs-result-meta { flex-wrap: wrap; gap: 6px; }
+  .kbs-pages { gap: 2px; }
+  .kbs-page-btn { padding: 4px 8px; font-size: 12px; }
+  .kbs-page-info { flex-basis: 100%; margin: 4px 0 0 0; }
+}

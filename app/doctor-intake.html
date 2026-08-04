@@ -193,83 +193,60 @@ function toggleSym(s,el){
 // === 语音采集：医生说 → ASR 转写 → 自动勾选症状标签 ===
 var voiceRecog=null;
 var voiceListening=false;
+var voiceWaveTimer=null;
+var voiceWaveFrame=0;
 function voiceCollect(){
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){showToast('当前浏览器不支持语音识别，请用 Chrome/Edge');return}
-  if(voiceListening){voiceRecog.stop();voiceListening=false;return}
+  if(voiceListening){voiceRecog.stop();voiceListening=false;clearVoiceWave();return}
   voiceRecog=new SR();
   voiceRecog.lang='zh-CN';
   voiceRecog.continuous=true;
   voiceRecog.interimResults=true;
   voiceRecog.onstart=function(){
-    voiceListening=true;
-    document.getElementById('voice-status').style.display='block';
-    document.getElementById('voice-status').textContent='🎙️ 正在聆听，请描述症状（如：最近失眠多梦，口干口苦，舌头有齿痕）';
+    voiceListening=true;voiceWaveFrame=0;
+    var el=document.getElementById('voice-status');
+    el.style.display='block';
+    el.innerHTML='<div id="vw-bar1" style="font-size:18px;letter-spacing:2px;line-height:1.2">▁▂▁▃▁▄▁▅▁▆▁▇</div><div style="font-size:12px;color:var(--blue);margin:4px 0">🎙️ 请说话，描述症状…</div><div id="vw-bar2" style="font-size:14px;letter-spacing:2px;color:var(--muted)">▇▆▅▄▃▂▁▂▃▄▅▆</div>';
+    if(voiceWaveTimer)clearInterval(voiceWaveTimer);
+    voiceWaveTimer=setInterval(function(){
+      voiceWaveFrame++;
+      var bars=['▁','▂','▃','▄','▅','▆','▇','█'];
+      var w='',w2='';
+      for(var i=0;i<12;i++){
+        var h=Math.floor(Math.abs(Math.sin((voiceWaveFrame+3*i)*0.7))*7);
+        w+=bars[Math.min(h,7)];
+        var h2=Math.floor(Math.abs(Math.cos((voiceWaveFrame+5*i)*0.6))*6);
+        w2+=bars[Math.min(h2,7)];
+      }
+      var b1=document.getElementById('vw-bar1');if(b1)b1.textContent=w;
+      var b2=document.getElementById('vw-bar2');if(b2)b2.textContent=w2;
+    },500);
+    if(navigator.vibrate)navigator.vibrate(200);
   };
   voiceRecog.onresult=function(e){
     var text='';
-    for(var i=e.resultIndex;i<e.results.length;i++){
-      if(e.results[i].isFinal)text+=e.results[i][0].transcript;
-    }
+    for(var i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)text+=e.results[i][0].transcript}
     if(!text)return;
-    // 自动匹配症状标签
     var matched=0;
-    Object.keys(SYS_SYMPTOMS_DICT).forEach(function(s){
-      if(text.indexOf(s)>=0&&!selected[s]){
-        selected[s]=1;matched++;
-        document.querySelectorAll('.chip').forEach(function(el){
-          if(el.textContent.replace(/ ✓$/,'')===s){el.classList.add('on')}
-        });
-      }
-    });
-    // 舌象自动匹配
-    ['舌淡白','舌红','舌胖大','齿痕','黄苔','薄白苔','裂纹','剥苔'].forEach(function(t){
-      if(text.indexOf(t.replace('舌',''))>=0&&!selected[t]){
-        selected[t]=1;matched++;
-        document.querySelectorAll('.chip').forEach(function(el){
-          if(el.textContent.replace(/ ✓$/,'')===t.replace('舌','')){el.classList.add('on')}
-        });
-      }
-    });
-    // 脉象自动匹配
-    ['脉细','脉弦','脉滑','脉数','脉沉','脉浮'].forEach(function(p){
-      if(text.indexOf(p.replace('脉',''))>=0&&!selected[p]){
-        selected[p]=1;matched++;
-        document.querySelectorAll('.chip').forEach(function(el){
-          if(el.textContent.replace(/ ✓$/,'')===p.replace('脉','')){el.classList.add('on')}
-        });
-      }
-    });
-    // 未匹配的追加到其他症状
+    Object.keys(SYS_SYMPTOMS_DICT).forEach(function(s){if(text.indexOf(s)>=0&&!selected[s]){selected[s]=1;matched++;document.querySelectorAll('.chip').forEach(function(el){if(el.textContent.replace(/ ✓$/,'')===s)el.classList.add('on')})}});
+    ['舌淡白','舌红','舌胖大','齿痕','黄苔','薄白苔','裂纹','剥苔'].forEach(function(t){if(text.indexOf(t.replace('舌',''))>=0&&!selected[t]){selected[t]=1;matched++;document.querySelectorAll('.chip').forEach(function(el){if(el.textContent.replace(/ ✓$/,'')===t.replace('舌',''))el.classList.add('on')})}});
+    ['脉细','脉弦','脉滑','脉数','脉沉','脉浮'].forEach(function(p){if(text.indexOf(p.replace('脉',''))>=0&&!selected[p]){selected[p]=1;matched++;document.querySelectorAll('.chip').forEach(function(el){if(el.textContent.replace(/ ✓$/,'')===p.replace('脉',''))el.classList.add('on')})}});
     var otherEl=document.getElementById('other-symptom');
     var unMatched=text.replace(/[。，,.！!？?\s]/g,' ').trim();
-    if(matched>0)unMatched='';
-    // 简单处理：清掉已匹配词，剩余放其他
-    Object.keys(SYS_SYMPTOMS_DICT).forEach(function(s){
-      unMatched=unMatched.split(s).join('');
-    });
-    ['舌淡白','舌红','舌胖大','齿痕','黄苔','薄白苔','裂纹','剥苔','细','弦','滑','数','沉','浮'].forEach(function(t){
-      unMatched=unMatched.split(t).join('');
-    });
+    Object.keys(SYS_SYMPTOMS_DICT).forEach(function(s){unMatched=unMatched.split(s).join('')});
+    ['舌淡白','舌红','舌胖大','齿痕','黄苔','薄白苔','裂纹','剥苔','细','弦','滑','数','沉','浮'].forEach(function(t){unMatched=unMatched.split(t).join('')});
     unMatched=unMatched.replace(/[，,、]+/g,' ').trim();
-    if(unMatched&&otherEl.value.indexOf(unMatched)<0){
-      otherEl.value=otherEl.value?(otherEl.value+'、'+unMatched):unMatched;
-    }
+    if(unMatched&&otherEl.value.indexOf(unMatched)<0){otherEl.value=otherEl.value?(otherEl.value+'、'+unMatched):unMatched}
     updateProgress();
     if(Object.keys(selected).length>0)document.getElementById('card-tongue').style.display='block';
-    if(matched>0)showToast('已识别 '+matched+' 个症状标签');
+    if(matched>0){showToast('已识别 '+matched+' 个症状标签');if(navigator.vibrate)navigator.vibrate([50,30,50])}
   };
-  voiceRecog.onerror=function(e){
-    voiceListening=false;
-    document.getElementById('voice-status').style.display='none';
-    showToast('语音识别错误：'+(e.error||'未知'));
-  };
-  voiceRecog.onend=function(){
-    voiceListening=false;
-    document.getElementById('voice-status').style.display='none';
-  };
+  voiceRecog.onerror=function(e){voiceListening=false;clearVoiceWave();document.getElementById('voice-status').style.display='none';showToast('语音识别错误：'+(e.error||'未知'))};
+  voiceRecog.onend=function(){voiceListening=false;clearVoiceWave();document.getElementById('voice-status').style.display='none'};
   voiceRecog.start();
 }
+function clearVoiceWave(){if(voiceWaveTimer){clearInterval(voiceWaveTimer);voiceWaveTimer=null}}
 
 function updateProgress(){
   var n=Object.keys(selected).length;
