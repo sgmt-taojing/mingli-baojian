@@ -403,6 +403,8 @@ const KB_HIT_API = '/api/public/kb-hit';
 const OCR_UPLOAD_API = '/api/v1/camera/upload-multipart';
 const ASR_ANALYZE_API = '/api/public/voice-analyze';
 const SOLVE_API = '/api/public/messiah-solve';
+const FEEDBACK_API = '/api/public/messiah-feedback';
+let MESSIAH_SESSION = '';  // 会话标识（同会话多轮自动关联）
 const STREAM_INTERVAL_MS = 2000; // 实时帧间隔
 const STREAM_FRAME_QUALITY = 0.65;
 const STREAM_MAX_FRAMES = 30;
@@ -834,7 +836,10 @@ async function askAI(query, audioBlob) {
   // 1.5) 同步调用弥撒亚 solve 端点（白盒 3 段链路：search→nn→guide）
   let solveResult = null;
   try {
-    const solveResp = await fetch(`${SOLVE_API}?q=${encodeURIComponent(query)}`, { signal: AbortSignal.timeout(5000) });
+    // R472 · 多轮会话支持：同会话连续问 query，弥撒亚自动以ref_id串联上下文
+    if (!MESSIAH_SESSION) MESSIAH_SESSION = `mob-${Date.now().toString(36)}`;
+    const solveUrl = `${SOLVE_API}?q=${encodeURIComponent(query)}&session_id=${MESSIAH_SESSION}`;
+    const solveResp = await fetch(solveUrl, { signal: AbortSignal.timeout(5000) });
     if (solveResp.ok) solveResult = await solveResp.json();
   } catch {}
 
@@ -889,14 +894,64 @@ function kbHitsSummary(matches) {
 function appendVoiceMessage(role, text, kbMatches) {
   const el = document.getElementById('voiceHistory');
   if (voiceHistory.length === 0) el.innerHTML = '';
-  voiceHistory.push({ role, text, kbMatches: kbMatches || [], ts: Date.now() });
+  const msgIdx = voiceHistory.length;
+  voiceHistory.push({ role, text, kbMatches: kbMatches || [], ts: Date.now(), session: MESSIAH_SESSION });
   const t = new Date();
   const tsLabel = `${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`;
-  const meta = `<div class="msg-meta">${role === 'user' ? '👤 你' : '🤖 AI'} · ${tsLabel}</div>`;
+  const meta = `<div class="msg-meta">${role === 'user' ? '👤 你' : '🤖 AI'} · ${tsLabel}${MESSIAH_SESSION ? ` · <span style="opacity:0.5">session:${MESSIAH_SESSION.slice(-6)}</span>` : ''}</div>`;
   const kbHtml = kbMatches && kbMatches.length ? `<div style="margin-top:6px;font-size:11px;opacity:0.7">📚 ${kbMatches.length} 条 KB 引用</div>` : '';
+  // R472 · AI 回复后添加反馈按钮：👍 / 👎 一键闭环
+  const feedbackHtml = role === 'ai' ? `
+    <div class="msg-feedback" data-msg-idx="${msgIdx}" style="margin-top:6px;display:flex;gap:6px;font-size:12px">
+      <button class="fb-btn" data-score="5" data-idx="${msgIdx}" title="很准">👍</button>
+      <button class="fb-btn" data-score="3" data-idx="${msgIdx}" title="一般">😐</button>
+      <button class="fb-btn" data-score="1" data-idx="${msgIdx}" title="不准">👎</button>
+      <span class="fb-status" data-idx="${msgIdx}" style="opacity:0.6;font-size:11px;margin-left:4px"></span>
+    </div>
+  ` : '';
   el.insertAdjacentHTML('beforeend',
-    `<div class="voice-msg ${role}">${meta}<div>${escapeHtml(text)}</div>${kbHtml}</div>`);
+    `<div class="voice-msg ${role}">${meta}<div>${escapeHtml(text)}</div>${kbHtml}${feedbackHtml}</div>`);
   el.scrollTop = el.scrollHeight;
+
+  // R472 · 绑定反馈按钮点击事件
+  if (role === 'ai') {
+    el.querySelectorAll(`.fb-btn[data-idx="${msgIdx}"]`).forEach(btn => {
+      btn.addEventListener('click', () => submitFeedback(parseInt(btn.dataset.score, 10), msgIdx));
+    });
+  }
+}
+
+// R472 · 反馈闭环：POST /api/public/messiah-feedback → kb_feedback 表 → 明日 03:00 自动进化
+async function submitFeedback(score, msgIdx) {
+  const msg = voiceHistory[msgIdx];
+  if (!msg) return;
+  const statusEl = document.querySelector(`.fb-status[data-idx="${msgIdx}"]`);
+  // 标记已选
+  document.querySelectorAll(`.fb-btn[data-idx="${msgIdx}"]`).forEach(b => b.style.opacity = '0.4');
+  if (statusEl) statusEl.textContent = '提交中…';
+  try {
+    // 取首条 KB 引用作为 entry_id
+    const entryId = (msg.kbMatches && msg.kbMatches[0] && (msg.kbMatches[0].entry_id || msg.kbMatches[0].id)) || '';
+    const resp = await fetch(FEEDBACK_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: msg.text ? msg.text.slice(0, 80) : '',
+        entry_id: entryId,
+        score: score,
+        comment: score >= 4 ? '准' : (score >= 2 ? '一般' : '不准'),
+        module: msg.kbMatches && msg.kbMatches[0] ? msg.kbMatches[0].module : '',
+        session_id: msg.session || MESSIAH_SESSION,
+        ref_id: msgIdx.toString(),
+        source: 'mobile-voice',
+      }),
+      signal: AbortSignal.timeout(3000),
+    });
+    const data = await resp.json();
+    if (statusEl) statusEl.textContent = data.received ? `✅ 已记录 ${score}分` : '❌ 失败';
+  } catch (e) {
+    if (statusEl) statusEl.textContent = `❌ ${e.message.slice(0, 12)}`;
+  }
 }
 
 // ===== Mobile Search =====
