@@ -1215,9 +1215,9 @@ function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeComp
               </div>
             </div>
             <div class="kb-entry-snippet" data-idx="${idx}" style="color:var(--paper3);font-size:.78rem;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${(e.snippet||e.content||e.summary||'').slice(0,300)}</div>
-            <div style="font-size:.7rem;color:var(--paper3);margin-top:4px;display:flex;gap:8px;justify-content:space-between">
+            <div style="font-size:.7rem;color:var(--paper3);margin-top:4px;display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap">
               <code style="font-size:.7rem">${e.entry_id||e.id}</code>
-              <span>${e.trust ? '⭐ trust ' + e.trust.toFixed(2) : ''}${e.source ? ' · 📚 ' + e.source : ''}</span>
+              <span>${e.trust ? '⭐ trust ' + e.trust.toFixed(2) : ''}${e.source ? ' · 📚 ' + e.source : ''}${e.fingerprint ? ' · 🔖 ' + e.fingerprint : ''}</span>
             </div>
           </div>
         `).join('');
