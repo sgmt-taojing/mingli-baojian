@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="description" content="中医问诊台 — 望闻问切四诊合一 · AI+命理+医生三重复合诊断">
+<meta name="theme-color" content="#0a1628">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="css/page-header.css">
+<title>问诊台 · 易道智鉴</title>
+<style>
+:root{
+  --bg:#0a1628; --surface:#111d33; --card:rgba(255,255,255,.04);
+  --gold:#c9a84c; --jade:#10b981; --red:#ef4444; --cyan:#38bdf8;
+  --paper:#e0d8c8; --muted:#7a8a9e; --border:rgba(201,168,76,.15);
+  --radius:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--paper);min-height:100vh}
+
+/* Page Header */
+.cl-header{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:12px;backdrop-filter:blur(10px)}
+.cl-header .logo{font-size:17px;font-weight:700;color:var(--gold);display:flex;align-items:center;gap:8px}
+.cl-header .logo .dot{width:8px;height:8px;border-radius:50%;background:var(--jade);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.cl-header .scene-switch{display:flex;gap:4px;margin-left:auto}
+.cl-header .scene-btn{padding:5px 14px;border:1px solid var(--border);border-radius:16px;background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:.2s;font-family:inherit}
+.cl-header .scene-btn.active{border-color:var(--gold);background:rgba(201,168,76,.1);color:var(--gold)}
+.cl-header .patient-info{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+
+/* Main Layout - Three Columns */
+.cl-main{display:grid;grid-template-columns:320px 1fr 340px;gap:12px;padding:12px;max-width:1600px;margin:0 auto;min-height:calc(100vh - 56px)}
+@media (max-width:1200px){.cl-main{grid-template-columns:1fr}.cl-main .cl-right{order:3}}
+@media (max-width:768px){.cl-main{grid-template-columns:1fr;padding:8px}}
+
+/* Left: 四诊采集 */
+.cl-left{display:flex;flex-direction:column;gap:10px}
+.cl-panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.cl-panel h3{font-size:13px;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.cl-panel .step-badge{font-size:10px;background:rgba(201,168,76,.15);color:var(--gold);padding:2px 8px;border-radius:10px}
+.cl-panel .step-badge.done{background:rgba(16,185,129,.15);color:var(--jade)}
+
+/* Camera */
+.cl-cam{background:var(--surface);border-radius:8px;overflow:hidden;aspect-ratio:4/3;position:relative}
+.cl-cam video{width:100%;height:100%;object-fit:cover}
+.cl-cam .placeholder{display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:12px;flex-direction:column;gap:6px}
+
+/* Voice */
+.cl-voice-btn{padding:10px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--paper);cursor:pointer;font-size:13px;display:flex;align-items:center;gap:8px;width:100%;transition:.2s;font-family:inherit}
+.cl-voice-btn:hover{border-color:var(--cyan);background:rgba(56,189,248,.06)}
+.cl-voice-btn.recording{border-color:var(--red);animation:rec-pulse 1.5s infinite}
+@keyframes rec-pulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.3)}50%{box-shadow:0 0 0 8px rgba(239,68,68,0)}}
+
+/* Questionnaire */
+.cl-qa-list{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto}
+.cl-qa-item{font-size:12px}
+.cl-qa-item .q{color:var(--muted);margin-bottom:3px}
+.cl-qa-item .a{display:flex;flex-wrap:wrap;gap:4px}
+.cl-qa-item .opt{padding:4px 12px;border:1px solid var(--border);border-radius:14px;cursor:pointer;font-size:11px;transition:.2s;color:var(--muted)}
+.cl-qa-item .opt:hover{border-color:var(--gold);color:var(--paper)}
+.cl-qa-item .opt.sel{border-color:var(--gold);background:rgba(201,168,76,.12);color:var(--gold)}
+
+/* Pulse / Wearable */
+.cl-vital-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cl-vital{background:var(--surface);border-radius:8px;padding:10px;text-align:center}
+.cl-vital .val{font-size:22px;font-weight:700;color:var(--cyan)}
+.cl-vital .lbl{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* Center: 流程进度 + 诊断摘要 */
+.cl-center{display:flex;flex-direction:column;gap:12px}
+
+/* Progress */
+.cl-progress{display:flex;gap:0;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:0;overflow:hidden}
+.cl-prog-step{flex:1;text-align:center;padding:12px 8px;font-size:12px;color:var(--muted);position:relative;transition:.3s;cursor:pointer}
+.cl-prog-step::after{content:'';position:absolute;right:0;top:25%;height:50%;width:1px;background:var(--border)}
+.cl-prog-step:last-child::after{display:none}
+.cl-prog-step.active{color:var(--gold);background:rgba(201,168,76,.06)}
+.cl-prog-step.done{color:var(--jade)}
+.cl-prog-step .num{display:block;font-size:18px;font-weight:700;margin-bottom:2px}
+
+/* AI vs Doctor Compare */
+.cl-compare{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:900px){.cl-compare{grid-template-columns:1fr}}
+.cl-col{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.cl-col.ai{border-left:3px solid var(--cyan)}
+.cl-col.doctor{border-left:3px solid var(--gold)}
+.cl-col h4{font-size:12px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.cl-col h4 .dot-ind{width:8px;height:8px;border-radius:50%}
+.cl-col.ai h4 .dot-ind{background:var(--cyan)}
+.cl-col.doctor h4 .dot-ind{background:var(--gold)}
+
+.cl-field{margin-bottom:10px}
+.cl-field label{display:block;font-size:10px;color:var(--muted);margin-bottom:3px;text-transform:uppercase;letter-spacing:1px}
+.cl-field .value{font-size:13px;color:var(--paper);line-height:1.6}
+.cl-field textarea{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--paper);padding:8px 10px;font-size:12px;resize:vertical;min-height:60px;font-family:inherit}
+.cl-field input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--paper);padding:6px 10px;font-size:12px;font-family:inherit}
+.cl-field select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--paper);padding:6px 10px;font-size:12px;font-family:inherit}
+
+/* KB Match card */
+.cl-kb-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:8px 10px;margin-bottom:6px;font-size:11px}
+.cl-kb-card .src{color:var(--cyan);font-size:10px;margin-bottom:2px}
+.cl-kb-card .txt{color:var(--muted);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* Right: 命理 + 处置 */
+.cl-right{display:flex;flex-direction:column;gap:10px}
+
+/* Bazi input */
+.cl-bazi-form{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cl-bazi-form input,.cl-bazi-form select{background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--paper);padding:6px 8px;font-size:12px;font-family:inherit;width:100%}
+
+/* Buttons */
+.btn{padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;transition:.2s;font-family:inherit;display:inline-flex;align-items:center;gap:6px;justify-content:center}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-primary{background:linear-gradient(135deg,var(--gold),#b8922e);color:#0a1628}
+.btn-primary:hover:not(:disabled){transform:translateY(-1px)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+.btn-sm{padding:6px 12px;font-size:11px}
+.btn-block{width:100%}
+.btn-cyan{background:rgba(56,189,248,.12);color:var(--cyan);border:1px solid rgba(56,189,248,.2)}
+.btn-cyan:hover:not(:disabled){background:rgba(56,189,248,.2)}
+
+/* Compound result */
+.cl-compound{background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(16,185,129,.04));border:1px solid var(--gold);border-radius:var(--radius);padding:16px}
+.cl-compound h4{color:var(--gold);font-size:13px;margin-bottom:8px}
+.cl-compound .agree{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600}
+.cl-compound .agree.high{background:rgba(16,185,129,.15);color:var(--jade)}
+.cl-compound .agree.mid{background:rgba(201,168,76,.12);color:var(--gold)}
+.cl-compound .agree.low{background:rgba(239,68,68,.1);color:var(--red)}
+
+/* Loading */
+.cl-loading{display:none;align-items:center;gap:8px;color:var(--gold);font-size:12px;padding:8px 0}
+.cl-loading.show{display:flex}
+.cl-loading .spinner{width:14px;height:14px;border:2px solid var(--gold);border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Toast */
+.cl-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--gold);color:var(--gold);padding:10px 24px;border-radius:8px;font-size:13px;z-index:999;display:none}
+.cl-toast.show{display:block}
+.cl-toast.error{border-color:var(--red);color:var(--red)}
+
+/* Follow-up */
+.cl-followup{margin-top:8px;padding:12px;background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.1);border-radius:8px}
+.cl-followup h5{font-size:12px;color:var(--cyan);margin-bottom:6px}
+.cl-followup li{font-size:11px;color:var(--muted);margin-left:16px;line-height:1.6}
+
+/* Home mode */
+.cl-home-banner{display:none;background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(56,189,248,.06));border:1px solid rgba(16,185,129,.2);border-radius:var(--radius);padding:12px;font-size:11px;color:var(--jade);margin-bottom:8px}
+.cl-home-banner.show{display:block}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="cl-header">
+  <div class="logo"><span class="dot"></span>问诊台</div>
+  <div class="patient-info">
+    <span>👤</span>
+    <input id="patientName" placeholder="患者姓名" style="background:transparent;border:none;color:var(--paper);font-size:12px;width:80px;font-family:inherit" value="张三">
+    <span id="patientAge" style="color:var(--muted)">45岁·男</span>
+  </div>
+  <div class="scene-switch">
+    <button class="scene-btn active" data-scene="clinic" onclick="setScene('clinic')">🏥 诊室模式</button>
+    <button class="scene-btn" data-scene="home" onclick="setScene('home')">🏠 居家模式</button>
+  </div>
+</div>
+
+<div class="cl-main">
+
+<!-- ═══ LEFT: 四诊采集 ═══ -->
+<div class="cl-left">
+
+  <!-- 望诊 -->
+  <div class="cl-panel" id="panel-wang">
+    <h3><span class="step-badge" id="badge-wang">1</span> 望诊 · 面舌双采</h3>
+    <div class="cl-cam" id="camMain">
+      <div class="placeholder">📷<br>点击下方按钮启动摄像头</div>
+    </div>
+    <div style="display:flex;gap:6px;margin-top:8px">
+      <button class="btn btn-sm btn-outline" onclick="startCamera()">📷 启动摄像头</button>
+      <button class="btn btn-sm btn-primary" onclick="captureWang()" id="btnWang" disabled>⚡ 采集面舌</button>
+    </div>
+    <div class="cl-loading" id="loadWang"><div class="spinner"></div>AI 面舌分析中…</div>
+  </div>
+
+  <!-- 闻诊 -->
+  <div class="cl-panel" id="panel-wen">
+    <h3><span class="step-badge" id="badge-wen">2</span> 闻诊 · 声息采集</h3>
+    <button class="cl-voice-btn" id="btnVoice" onclick="toggleVoice()">
+      🎤 <span id="voiceLabel">点击录入患者声音/主诉</span>
+    </button>
+    <textarea id="voiceText" placeholder="或手动输入患者声音描述：声低气怯、语声重浊、咳声沉闷…" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--paper);padding:6px 10px;font-size:12px;resize:vertical;min-height:50px;margin-top:8px;font-family:inherit"></textarea>
+    <button class="btn btn-sm btn-outline btn-block" onclick="confirmWen()" style="margin-top:6px" id="btnWen">✓ 确认闻诊</button>
+  </div>
+
+  <!-- 问诊 -->
+  <div class="cl-panel" id="panel-wen">
+    <h3><span class="step-badge" id="badge-wen">3</span> 问诊 · 十问歌</h3>
+    <div class="cl-qa-list" id="qaList"></div>
+    <button class="btn btn-sm btn-outline btn-block" onclick="confirmWen()" style="margin-top:8px" id="btnWen2">✓ 确认问诊</button>
+  </div>
+
+  <!-- 切诊 -->
+  <div class="cl-panel" id="panel-qie">
+    <h3><span class="step-badge" id="badge-qie">4</span> 切诊 · 脉象/体征</h3>
+    <div class="cl-vital-grid">
+      <div class="cl-vital"><div class="val" id="valHr">--</div><div class="lbl">心率 bpm</div></div>
+      <div class="cl-vital"><div class="val" id="valSpo2">--</div><div class="lbl">血氧 %</div></div>
+      <div class="cl-vital"><div class="val" id="valBp">--</div><div class="lbl">血压 mmHg</div></div>
+      <div class="cl-vital"><div class="val" id="valTemp">--</div><div class="lbl">体温 ℃</div></div>
+    </div>
+    <div style="display:flex;gap:6px;margin-top:8px">
+      <select id="pulseSelect" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--paper);padding:6px 8px;font-size:12px;font-family:inherit">
+        <option value="">— 选择脉象 —</option>
+        <option value="浮脉">浮脉 · 轻取即得</option><option value="沉脉">沉脉 · 重按始得</option>
+        <option value="数脉">数脉 · 脉来急数</option><option value="迟脉">迟脉 · 脉来迟缓</option>
+        <option value="滑脉">滑脉 · 往来流利</option><option value="涩脉">涩脉 · 往来艰涩</option>
+        <option value="弦脉">弦脉 · 端直以长</option><option value="细脉">细脉 · 脉细如线</option>
+        <option value="洪脉">洪脉 · 脉体宽大</option><option value="弱脉">弱脉 · 极软而沉细</option>
+      </select>
+      <button class="btn btn-sm btn-primary" onclick="confirmQie()" id="btnQie">✓ 确认</button>
+    </div>
+    <input id="wearableJson" placeholder='穿戴数据 JSON: {"systolic":145,"diastolic":90,"spo2":96,"hr":72,"temp":36.5}' style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--paper);padding:4px 8px;font-size:10px;margin-top:6px;font-family:inherit">
+  </div>
+</div>
+
+<!-- ═══ CENTER: 进度 + 双轨对比 ═══ -->
+<div class="cl-center">
+  <!-- Progress -->
+  <div class="cl-progress" id="progressBar">
+    <div class="cl-prog-step active" data-step="wang"><span class="num">望</span>面舌采集</div>
+    <div class="cl-prog-step" data-step="wen1"><span class="num">闻</span>声息辨别</div>
+    <div class="cl-prog-step" data-step="wen2"><span class="num">问</span>十问歌</div>
+    <div class="cl-prog-step" data-step="qie"><span class="num">切</span>脉象体征</div>
+  </div>
+
+  <!-- 居家模式提示 -->
+  <div class="cl-home-banner" id="homeBanner">
+    🏠 居家AI辅助模式 — 基于系统知识库实时分析，结果仅供健康参考。如有不适请及时就医。
+  </div>
+
+  <!-- AI vs Doctor Dual Track -->
+  <div class="cl-compare">
+    <!-- AI Track -->
+    <div class="cl-col ai">
+      <h4><span class="dot-ind"></span>🤖 AI 诊断（知识库实时匹配）</h4>
+      <div class="cl-field"><label>面色/体质</label><div class="value" id="aiComplexion">—</div></div>
+      <div class="cl-field"><label>舌象/证候</label><div class="value" id="aiTongue">—</div></div>
+      <div class="cl-field"><label>脉象判断</label><div class="value" id="aiPulse">—</div></div>
+      <div class="cl-field"><label>综合辨证</label><div class="value" id="aiDiagnosis">等待四诊采集…</div></div>
+      <div class="cl-field"><label>KB 知识支撑</label><div id="aiKbMatches" style="font-size:11px;color:var(--muted)">—</div></div>
+    </div>
+
+    <!-- Doctor Track -->
+    <div class="cl-col doctor">
+      <h4><span class="dot-ind"></span>👨‍⚕️ 医生复合诊断</h4>
+      <div class="cl-field"><label>医生辨证</label><textarea id="docDiagnosis" placeholder="医生根据四诊合参给出辨证结论…"></textarea></div>
+      <div class="cl-field"><label>证型判定</label>
+        <select id="docSyndrome">
+          <option value="">— 选择证型 —</option>
+          <option>风寒束表</option><option>风热犯肺</option><option>气滞血瘀</option>
+          <option>肝郁气滞</option><option>脾胃虚弱</option><option>肾阳虚</option>
+          <option>心脾两虚</option><option>痰湿内阻</option><option>阴虚火旺</option>
+          <option>肝阳上亢</option><option>湿热下注</option><option>气血两虚</option>
+        </select>
+      </div>
+      <div class="cl-field"><label>处置方案</label><textarea id="docPlan" placeholder="治疗方案、方药建议、调理建议…"></textarea></div>
+    </div>
+  </div>
+
+  <!-- Compound Result -->
+  <div class="cl-compound" id="compoundResult" style="display:none">
+    <h4>🔬 复合诊断结论</h4>
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:8px">
+      <span style="font-size:12px;color:var(--muted)">AI与医生一致性：</span>
+      <span class="agree" id="agreeLevel">—</span>
+    </div>
+    <div class="cl-field"><label>综合诊断</label><div class="value" id="finalDiagnosis"></div></div>
+    <div class="cl-field"><label>处置方案</label><div class="value" id="finalPlan"></div></div>
+    <button class="btn btn-primary btn-block" onclick="generateReport()" style="margin-top:8px">📋 生成诊疗报告</button>
+  </div>
+</div>
+
+<!-- ═══ RIGHT: 命理增强 + 流转 ═══ -->
+<div class="cl-right">
+  <!-- 命理增强 -->
+  <div class="cl-panel">
+    <h3>🔮 命理增强（可选）</h3>
+    <div class="cl-bazi-form">
+      <input id="baziYear" placeholder="出生年" value="1979" style="grid-column:1">
+      <select id="baziGender" style="grid-column:2"><option value="male">男</option><option value="female">女</option></select>
+      <input id="baziMonth" placeholder="月" value="6"><input id="baziDay" placeholder="日" value="15">
+      <input id="baziHour" placeholder="时" value="12"><input id="baziMinute" placeholder="分" value="0">
+    </div>
+    <button class="btn btn-sm btn-outline btn-block" onclick="runBazi()" style="margin-top:8px">🔮 排盘 + AI命理复合</button>
+    <div class="cl-loading" id="loadBazi"><div class="spinner"></div>排盘分析中…</div>
+    <div id="baziResult" style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5"></div>
+  </div>
+
+  <!-- Follow-up（居家版重点） -->
+  <div class="cl-panel" id="followupPanel">
+    <h3>📋 后续衔接</h3>
+    <div id="followupContent" style="font-size:11px;color:var(--muted);line-height:1.6">
+      完成四诊采集后，系统将自动生成：
+      <ul style="margin-top:6px;margin-left:14px">
+        <li>AI 初步诊断报告</li>
+        <li>推荐科室/医生</li>
+        <li>居家调理建议</li>
+        <li>复诊提醒</li>
+      </ul>
+    </div>
+    <button class="btn btn-sm btn-cyan btn-block" onclick="goToReport()" style="margin-top:10px" id="btnReport" disabled>📄 查看完整报告</button>
+  </div>
+</div>
+</div>
+
+<div class="cl-toast" id="toast"></div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<script>
+(function(){
+'use strict';
+
+const API = '';
+const FACE_OCR = 'http://127.0.0.1:8913';
+let scene = 'clinic'; // clinic | home
+let camStream = null;
+let currentStep = 0;
+let collectedData = { wang:null, wen:null, wen2:null, qie:null, bazi:null };
+
+// ═══ Scene switching ═══
+window.setScene = function(s) {
+  scene = s;
+  document.querySelectorAll('.scene-btn').forEach(b => b.classList.toggle('active', b.dataset.scene === s));
+  document.getElementById('homeBanner').classList.toggle('show', s === 'home');
+  // 居家模式下医生复合区变成只读
+  const docCol = document.querySelector('.cl-col.doctor');
+  if (s === 'home') {
+    docCol.style.opacity = '0.6';
+    document.getElementById('docDiagnosis').disabled = true;
+    document.getElementById('docPlan').disabled = true;
+  } else {
+    docCol.style.opacity = '1';
+    document.getElementById('docDiagnosis').disabled = false;
+    document.getElementById('docPlan').disabled = false;
+  }
+  showToast(s === 'home' ? '已切换至居家AI辅助模式' : '已切换至诊室复合诊断模式');
+};
+
+// ═══ Toast ═══
+function showToast(msg, isErr) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'cl-toast show' + (isErr?' error':'');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ═══ Progress ═══
+function advanceStep(step) {
+  const steps = document.querySelectorAll('.cl-prog-step');
+  steps.forEach((s,i) => {
+    s.classList.remove('active','done');
+    if (i < step) s.classList.add('done');
+    if (i === step) s.classList.add('active');
+  });
+  currentStep = step;
+}
+
+// ═══ 1. 望诊 ═══
+window.startCamera = async function() {
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode:'environment', width:{ideal:1280}, height:{ideal:720} },
+      audio: false
+    });
+    const cam = document.getElementById('camMain');
+    const video = document.createElement('video');
+    video.autoplay = true; video.playsInline = true; video.srcObject = camStream;
+    video.style.cssText = 'width:100%;height:100%;object-fit:cover';
+    cam.innerHTML = ''; cam.appendChild(video);
+    document.getElementById('btnWang').disabled = false;
+    showToast('摄像头已启动');
+  } catch(e) {
+    showToast('摄像头不可用: ' + e.message, true);
+  }
+};
+
+window.captureWang = async function() {
+  if (!camStream) return showToast('请先启动摄像头', true);
+  document.getElementById('loadWang').classList.add('show');
+  document.getElementById('btnWang').disabled = true;
+
+  const cam = document.getElementById('camMain');
+  const video = cam.querySelector('video');
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+
+  // 调用 ai-diagnosis-engine（如果加载了）
+  let faceResult = null, tongueResult = null;
+  if (window.AIDiagnosisEngine) {
+    try {
+      faceResult = window.AIDiagnosisEngine.analyzeFace(canvas);
+      tongueResult = window.AIDiagnosisEngine.analyzeTongue(canvas);
+    } catch(e) { console.warn('AI engine fallback:', e.message); }
+  }
+
+  // OCR 服务
+  let ocrText = '';
+  try {
+    const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.8));
+    const fd = new FormData(); fd.append('image', blob, 'capture.jpg');
+    const ocrR = await fetch(FACE_OCR + '/api/analyze', { method:'POST', body:fd }).catch(() => null);
+    if (ocrR && ocrR.ok) {
+      const ocrD = await ocrR.json();
+      ocrText = ocrD.text || ocrD.result || '';
+    }
+  } catch(e) {}
+
+  // KB search
+  let kbMatches = [];
+  try {
+    const q = (ocrText || '面色 舌象 中医').slice(0, 80);
+    const kbR = await fetch(API + '/api/public/kb/search-fts?q=' + encodeURIComponent(q)).catch(() => null);
+    if (kbR && kbR.ok) {
+      const kbD = await kbR.json();
+      kbMatches = (kbD.results || kbD.data?.results || []).slice(0, 5);
+    }
+  } catch(e) {}
+
+  collectedData.wang = { faceResult, tongueResult, ocrText, kbMatches, timestamp: new Date().toISOString() };
+  document.getElementById('loadWang').classList.remove('show');
+  document.getElementById('badge-wang').className = 'step-badge done';
+  document.getElementById('badge-wang').textContent = '✓';
+
+  // Update AI panel
+  if (faceResult) {
+    document.getElementById('aiComplexion').textContent = faceResult.complexion + ' · ' + faceResult.organ;
+    document.getElementById('aiTongue').textContent = (tongueResult||{}).diagnosis || '分析中…';
+  } else {
+    document.getElementById('aiComplexion').textContent = ocrText.slice(0, 60) || '已采集';
+  }
+  // Render KB matches
+  const kbDiv = document.getElementById('aiKbMatches');
+  kbDiv.innerHTML = kbMatches.length > 0
+    ? kbMatches.map(k => `<div class="cl-kb-card"><div class="src">${k.module||'KB'} · trust ${(k.trust_score||0).toFixed(2)}</div><div class="txt">${(k.snippet||k.title||'').replace(/<[^>]+>/g,'').slice(0,100)}</div></div>`).join('')
+    : '<span style="color:var(--muted)">未匹配到知识库条目</span>';
+
+  advanceStep(1);
+  showToast('面舌采集完成 · KB 已匹配');
+};
+
+// ═══ 2. 闻诊 ═══
+let isRecording = false;
+window.toggleVoice = function() {
+  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+    document.getElementById('voiceText').value = '（浏览器不支持语音识别，请手动输入）';
+    return;
+  }
+  isRecording = !isRecording;
+  const btn = document.getElementById('btnVoice');
+  const label = document.getElementById('voiceLabel');
+  if (isRecording) {
+    btn.classList.add('recording');
+    label.textContent = '正在录音… 请描述患者声音特征';
+    // 模拟录音（实际部署时用 Web Speech API）
+    setTimeout(() => {
+      document.getElementById('voiceText').value = '患者声音低怯，语声断续，偶有咳嗽声沉闷';
+      toggleVoice();
+    }, 3000);
+  } else {
+    btn.classList.remove('recording');
+    label.textContent = '点击录入患者声音/主诉';
+  }
+};
+
+window.confirmWen = function() {
+  const text = document.getElementById('voiceText').value.trim();
+  if (!text) return showToast('请输入闻诊描述', true);
+  collectedData.wen = { text, timestamp: new Date().toISOString() };
+  document.getElementById('badge-wen').className = 'step-badge done';
+  document.getElementById('badge-wen').textContent = '✓';
+  advanceStep(2);
+  showToast('闻诊已确认');
+};
+
+// ═══ 3. 问诊 ═══
+(function initQA() {
+  const questions = [
+    { q: '1. 主诉（最不舒服的是什么）', opts: ['头痛','头晕','咳嗽','胸闷','腹痛','乏力','失眠','食欲不振','其他'] },
+    { q: '2. 发病时间', opts: ['3天内','1周内','1月内','3月内','半年以上','慢性反复'] },
+    { q: '3. 寒热感觉', opts: ['怕冷','怕热','忽冷忽热','正常'] },
+    { q: '4. 出汗情况', opts: ['自汗（不动也出汗）','盗汗（睡着出汗）','无汗','正常'] },
+    { q: '5. 饮食口味', opts: ['食欲正常','食欲减退','口渴喜饮','口苦','口淡无味'] },
+    { q: '6. 睡眠', opts: ['正常','入睡困难','多梦易醒','彻夜不眠','嗜睡'] },
+    { q: '7. 二便', opts: ['正常','便秘','腹泻','尿频','尿黄'] },
+    { q: '8. 情绪状态', opts: ['平和','烦躁易怒','抑郁寡欢','焦虑不安'] },
+  ];
+  const container = document.getElementById('qaList');
+  questions.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'cl-qa-item';
+    div.innerHTML = `<div class="q">${item.q}</div><div class="a">${
+      item.opts.map(o => `<span class="opt" data-q="${i}" data-v="${o}" onclick="selectQA(this)">${o}</span>`).join('')
+    }</div>`;
+    container.appendChild(div);
+  });
+})();
+
+window.selectQA = function(el) {
+  el.parentElement.querySelectorAll('.opt').forEach(o => o.classList.remove('sel'));
+  el.classList.add('sel');
+  // 8题全部选完后自动确认
+  const allSelected = document.querySelectorAll('.cl-qa-item .opt.sel').length;
+  if (allSelected >= 8) {
+    confirmWen2();
+  }
+};
+
+window.confirmWen2 = function() {
+  const answers = [];
+  document.querySelectorAll('.cl-qa-item .opt.sel').forEach(el => {
+    answers.push({ q: el.dataset.q, v: el.dataset.v });
+  });
+  collectedData.wen2 = { answers, timestamp: new Date().toISOString() };
+  document.getElementById('badge-wen2').className = 'step-badge done';
+  document.getElementById('badge-wen2').textContent = '✓';
+  advanceStep(3);
+  showToast('问诊完成（十问歌）');
+
+  // 更新 AI 诊断摘要
+  const symptoms = answers.map(a => a.v).join('、');
+  document.getElementById('aiDiagnosis').textContent = '四诊采集进行中… 主诉：' + symptoms.slice(0, 80);
+};
+
+// ═══ 4. 切诊 ═══
+window.confirmQie = function() {
+  const pulse = document.getElementById('pulseSelect').value;
+  let wearable = {};
+  try {
+    const raw = document.getElementById('wearableJson').value.trim();
+    if (raw) wearable = JSON.parse(raw);
+  } catch(e) {}
+
+  // Update vitals display
+  if (wearable.hr) document.getElementById('valHr').textContent = wearable.hr;
+  if (wearable.spo2) document.getElementById('valSpo2').textContent = wearable.spo2;
+  if (wearable.systolic) document.getElementById('valBp').textContent = wearable.systolic + '/' + (wearable.diastolic||'--');
+  if (wearable.temp) document.getElementById('valTemp').textContent = wearable.temp;
+
+  collectedData.qie = { pulse, wearable, timestamp: new Date().toISOString() };
+  document.getElementById('badge-qie').className = 'step-badge done';
+  document.getElementById('badge-qie').textContent = '✓';
+  advanceStep(4);
+
+  // Update AI pulse
+  document.getElementById('aiPulse').textContent = pulse || '未采集脉象';
+  document.getElementById('aiDiagnosis').textContent = buildAIDiagnosis();
+
+  document.getElementById('btnReport').disabled = false;
+  document.getElementById('compoundResult').style.display = 'block';
+
+  // Auto-compare
+  updateAgreement();
+  showToast('🎉 四诊采集完成！');
+};
+
+// ═══ AI Diagnosis Builder ═══
+function buildAIDiagnosis() {
+  const wang = collectedData.wang;
+  const wen = collectedData.wen;
+  const wen2 = collectedData.wen2;
+  const qie = collectedData.qie;
+
+  let d = '【AI 综合辨证】\n';
+  if (wang && wang.faceResult) {
+    d += `面色：${wang.faceResult.complexion} → ${wang.faceResult.organ}（置信度 ${wang.faceResult.confidence}%）\n`;
+    d += `调理：${wang.faceResult.advice}\n`;
+  }
+  if (wen) d += `声息：${wen.text}\n`;
+  if (wen2) {
+    const symptoms = wen2.answers.map(a => a.v);
+    d += `主诉：${symptoms.join('、')}\n`;
+  }
+  if (qie && qie.pulse) d += `脉象：${qie.pulse}\n`;
+  d += '\n（以上为AI基于知识库的初步分析，仅供医生参考，不构成诊断建议）';
+  return d;
+}
+
+// ═══ Doctor Track: update agreement ═══
+function updateAgreement() {
+  const aiDiag = document.getElementById('aiDiagnosis').textContent;
+  const docDiag = document.getElementById('docDiagnosis').value.trim();
+  if (!docDiag) {
+    document.getElementById('agreeLevel').textContent = '等待医生诊断…';
+    document.getElementById('agreeLevel').className = 'agree mid';
+    return;
+  }
+  // Simple keyword overlap check
+  const aiWords = new Set(aiDiag.replace(/[^\u4e00-\u9fff]/g,''));
+  const docWords = new Set(docDiag.replace(/[^\u4e00-\u9fff]/g,''));
+  let overlap = 0;
+  aiWords.forEach(w => { if (docWords.has(w)) overlap++; });
+  const ratio = overlap / Math.max(1, aiWords.size);
+
+  const el = document.getElementById('agreeLevel');
+  if (ratio > 0.3) { el.textContent = `高度一致 (${Math.round(ratio*100)}%)`; el.className = 'agree high'; }
+  else if (ratio > 0.1) { el.textContent = `部分一致 (${Math.round(ratio*100)}%)`; el.className = 'agree mid'; }
+  else { el.textContent = `需进一步复核 (${Math.round(ratio*100)}%)`; el.className = 'agree low'; }
+
+  document.getElementById('finalDiagnosis').textContent = docDiag || aiDiag;
+  document.getElementById('finalPlan').textContent = document.getElementById('docPlan').value.trim() || '请医生填写处置方案';
+}
+
+// Monitor doctor input
+document.getElementById('docDiagnosis').addEventListener('input', updateAgreement);
+document.getElementById('docPlan').addEventListener('input', updateAgreement);
+
+// ═══ 命理增强 ═══
+window.runBazi = async function() {
+  document.getElementById('loadBazi').classList.add('show');
+  const payload = {
+    year: parseInt(document.getElementById('baziYear').value)||1979,
+    month: parseInt(document.getElementById('baziMonth').value)||6,
+    day: parseInt(document.getElementById('baziDay').value)||15,
+    hour: parseInt(document.getElementById('baziHour').value)||12,
+    minute: parseInt(document.getElementById('baziMinute').value)||0,
+    gender: document.getElementById('baziGender').value
+  };
+
+  let baziResult = null;
+  try {
+    const r = await fetch(API + '/api/paipan/calculate', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    }).catch(() => null);
+    if (r && r.ok) baziResult = await r.json();
+  } catch(e) {}
+
+  const div = document.getElementById('baziResult');
+  if (baziResult && baziResult.ok && baziResult.pillars) {
+    const p = baziResult.pillars;
+    div.innerHTML = `
+      <div style="color:var(--gold);margin-bottom:4px">八字：${p.年||''} ${p.月||''} ${p.日||''} ${p.时||''}</div>
+      <div>日主：${baziResult.day_master||'—'} · ${baziResult.wuxing_summary||''}</div>
+      <div style="margin-top:4px;color:var(--cyan)">命理体质倾向：${baziResult.constitution||'—'}</div>
+      <div style="margin-top:4px;font-size:10px;color:var(--muted)">命理分析仅供健康趋势参考，不作为诊断依据</div>`;
+    collectedData.bazi = baziResult;
+  } else {
+    div.innerHTML = '<span style="color:var(--muted)">排盘服务不可用，请检查 8911 端口</span>';
+  }
+  document.getElementById('loadBazi').classList.remove('show');
+};
+
+// ═══ Generate Report ═══
+window.generateReport = function() {
+  const aiDiag = document.getElementById('aiDiagnosis').textContent;
+  const docDiag = document.getElementById('docDiagnosis').value.trim();
+  const docPlan = document.getElementById('docPlan').value.trim();
+  const agree = document.getElementById('agreeLevel').textContent;
+
+  const report = {
+    patient: document.getElementById('patientName').value,
+    scene: scene,
+    timestamp: new Date().toISOString(),
+    fourDiagnostics: collectedData,
+    aiDiagnosis: aiDiag,
+    doctorDiagnosis: docDiag,
+    doctorPlan: docPlan,
+    agreement: agree,
+    bazi: collectedData.bazi
+  };
+
+  // Save to localStorage for report page
+  try {
+    const reports = JSON.parse(localStorage.getItem('clinic_reports') || '[]');
+    reports.unshift({ id: 'RPT-' + Date.now(), ...report });
+    localStorage.setItem('clinic_reports', JSON.stringify(reports.slice(0, 50)));
+  } catch(e) {}
+
+  // Update followup
+  const fup = document.getElementById('followupContent');
+  fup.innerHTML = `
+    <div style="color:var(--jade);font-weight:600;margin-bottom:6px">✅ 诊疗报告已生成</div>
+    <ul style="margin-left:14px">
+      <li>AI诊断：${aiDiag.slice(0, 60)}…</li>
+      ${docDiag ? '<li>医生复合：' + docDiag.slice(0, 60) + '…</li>' : ''}
+      <li>推荐科室：中医内科 / 体质调理科</li>
+      ${scene === 'home' ? '<li>🏠 居家调理建议已生成</li>' : '<li>📋 处方待医生审核</li>'}
+      <li>⏰ 建议7天后复诊</li>
+    </ul>`;
+
+  showToast('诊疗报告已生成 ✓');
+};
+
+window.goToReport = function() {
+  window.location.href = 'patient-report.html';
+};
+
+// ═══ Init ═══
+document.addEventListener('DOMContentLoaded', () => {
+  // Load AI diagnosis engine if available
+  const script = document.createElement('script');
+  script.src = 'js/ai-diagnosis-engine.js';
+  script.onerror = () => console.log('AI engine not loaded (offline mode)');
+  document.head.appendChild(script);
+
+  // Home mode defaults
+  if (scene === 'home') {
+    document.getElementById('homeBanner').classList.add('show');
+  }
+});
+
+})();
+</script>
+</body>
+</html>
