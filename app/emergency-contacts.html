@@ -76,7 +76,7 @@ input,select{width:100%;padding:9px;background:var(--bg);border:1px solid var(--
 </main>
 <script>
 var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
-var token=localS…tem('admin_token')||localStorage.getItem('token')||'';
+var token=localStorage('admin_token')||localStorage.getItem('token')||'';
 
 function authHeaders(){var h={'Content-Type':'application/json'};if(token)h['Authorization']='Bearer '+token;return h}
 function showToast(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:#1a2332;border:1px solid var(--gold);color:var(--gold);padding:10px 18px;border-radius:20px;font-size:13px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.4)';document.body.appendChild(t);setTimeout(function(){t.remove()},2500)}
