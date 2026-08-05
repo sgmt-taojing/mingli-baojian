@@ -133,6 +133,13 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--dc-
       <div class="dc-mode" data-mode="tongue" onclick="setMode('tongue',this)">👅 舌诊模式</div>
     </div>
 
+    <!-- Scene selector (R481: clinic / home_robot) -->
+    <div class="dc-modes" style="margin-top:4px">
+      <span style="font-size:11px;color:var(--dc-muted);margin-right:6px">场景：</span>
+      <div class="dc-mode active" data-scene="clinic" onclick="setScene('clinic',this)">🏥 诊室报告</div>
+      <div class="dc-mode" data-scene="home_robot" onclick="setScene('home_robot',this)">🤖 居家语音</div>
+    </div>
+
     <!-- Dual Cameras -->
     <div class="dc-cameras">
       <div class="dc-camera" id="camWearable">
@@ -155,6 +162,9 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--dc-
       <button class="btn btn-secondary" id="btnSupplement" onclick="doSupplement()" disabled>
         📷 补充采集（固定摄像头）
       </button>
+      <button class="btn btn-outline btn-sm" id="btnMultiAssess" onclick="doMultiAssess()">
+        🧠 多模态评估
+      </button>
       <button class="btn btn-outline btn-sm" onclick="resetCapture()">
         🔄 重新采集
       </button>
@@ -162,6 +172,25 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--dc-
         <div class="spinner"></div> AI 分析中…
       </div>
     </div>
+
+    <!-- R481: 模拟数据输入（用于无穿戴设备时的手动输入） -->
+    <details style="margin-top:12px">
+      <summary style="font-size:12px;color:var(--dc-muted);cursor:pointer">📊 模拟数据输入（穿戴设备 / 主诉 / 望诊文本）</summary>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+        <div><label style="font-size:10px;color:var(--dc-muted)">穿戴数据 (JSON)</label>
+          <input id="simWearable" style="width:100%;background:var(--dc-surface);border:1px solid var(--dc-border);color:var(--dc-paper);padding:4px 8px;font-size:11px;border-radius:4px" placeholder='{"systolic":145,"spo2":96}'>
+        </div>
+        <div><label style="font-size:10px;color:var(--dc-muted)">主诉</label>
+          <input id="simComplaint" style="width:100%;background:var(--dc-surface);border:1px solid var(--dc-border);color:var(--dc-paper);padding:4px 8px;font-size:11px;border-radius:4px" placeholder="头晕乏力三天">
+        </div>
+        <div><label style="font-size:10px;color:var(--dc-muted)">面诊文本</label>
+          <input id="simFace" style="width:100%;background:var(--dc-surface);border:1px solid var(--dc-border);color:var(--dc-paper);padding:4px 8px;font-size:11px;border-radius:4px" placeholder="面色偏红，唇色暗红">
+        </div>
+        <div><label style="font-size:10px;color:var(--dc-muted)">舌诊文本</label>
+          <input id="simTongue" style="width:100%;background:var(--dc-surface);border:1px solid var(--dc-border);color:var(--dc-paper);padding:4px 8px;font-size:11px;border-radius:4px" placeholder="舌色淡红，苔薄白，边有齿痕">
+        </div>
+      </div>
+    </details>
   </div>
 
   <!-- Capture Results -->
@@ -315,6 +344,110 @@ function captureFrame(source) {
 // ─── Mode ───
 window.setMode = function(mode, el) {
   currentMode = mode;
+  document.querySelectorAll('.dc-mode[data-mode]').forEach(m => m.classList.remove('active'));
+  el.classList.add('active');
+  resetResults();
+};
+
+// ─── Scene (R481) ───
+let currentScene = 'clinic';
+window.setScene = function(scene, el) {
+  currentScene = scene;
+  document.querySelectorAll('.dc-mode[data-scene]').forEach(m => m.classList.remove('active'));
+  el.classList.add('active');
+};
+
+// ─── Multi-Modal Assess (R481) ───
+window.doMultiAssess = async function() {
+  if (isCapturing) return;
+  isCapturing = true;
+  const btn = document.getElementById('btnMultiAssess');
+  const loading = document.getElementById('loading');
+  if (btn) btn.disabled = true;
+  loading.classList.add('show');
+
+  try {
+    const body = { scene_type: currentScene };
+    // 穿戴模拟数据
+    const simWearable = document.getElementById('simWearable');
+    if (simWearable && simWearable.value) {
+      try { body.wearable = JSON.parse(simWearable.value); } catch(e) {}
+    }
+    // 面/舌/手诊特征文本
+    const faceText = document.getElementById('simFace')?.value;
+    const tongueText = document.getElementById('simTongue')?.value;
+    const handText = document.getElementById('simHand')?.value;
+    if (faceText) body.face_features = { text: faceText };
+    if (tongueText) body.tongue_features = { text: tongueText };
+    if (handText) body.hand_features = { text: handText };
+    // 主诉
+    const complaint = document.getElementById('simComplaint')?.value;
+    if (complaint) body.dialogue = complaint;
+
+    const startTime = performance.now();
+    const r = await fetch(API + '/api/doctor/multi-modal-assess', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await r.json();
+    const elapsed = Math.round(performance.now() - startTime);
+
+    renderMultiModalResult(data, elapsed);
+    document.getElementById('perfLabel').textContent =
+      '⚡ ' + elapsed + 'ms · 风险: ' + (data.risk_level || 'N/A');
+  } catch(e) {
+    toast('评估失败: ' + e.message, 'error');
+  } finally {
+    isCapturing = false;
+    if (btn) btn.disabled = false;
+    loading.classList.remove('show');
+  }
+};
+
+function renderMultiModalResult(data, elapsed) {
+  // 完整报告显示
+  const ocrSection = document.getElementById('ocrSection');
+  ocrSection.style.display = 'block';
+  
+  const output = data.output || '';
+  const ocrText = document.getElementById('ocrText');
+  ocrText.innerHTML = '<pre style="white-space:pre-wrap;font-size:12px;line-height:1.6;color:var(--dc-paper);background:rgba(255,255,255,.02);padding:12px;border-radius:8px;max-height:400px;overflow-y:auto">' +
+    (output.replace(/</g,'&lt;').replace(/>/g,'&gt;')) + '</pre>';
+
+  const timingInfo = document.getElementById('timingInfo');
+  timingInfo.innerHTML = [
+    data.timing_ms ? '<span class="chip fast">引擎 ' + data.timing_ms + 'ms</span>' : '',
+    '<span class="chip">端到端 ' + elapsed + 'ms</span>',
+    data.risk_level ? '<span class="chip" style="background:' +
+      (data.risk_level==='high'?'rgba(239,68,68,.15)':'rgba(16,185,129,.08)') +
+      ';color:' + (data.risk_level==='high'?'var(--dc-red)':'var(--dc-jade)') +
+      '">风险: ' + data.risk_level + '</span>' : ''
+  ].filter(Boolean).join('');
+
+  // TCM specific
+  const diagDiv = document.getElementById('diagSummary');
+  const tc = data.tcm_specific || {};
+  diagDiv.innerHTML = [
+    tc.syndrome ? '<div style="color:var(--dc-jade);margin-bottom:6px">🩺 ' + tc.syndrome + '</div>' : '',
+    tc.face_indication ? '<div style="font-size:11px;color:var(--dc-muted)">' + tc.face_indication + '</div>' : '',
+    tc.hand_indication ? '<div style="font-size:11px;color:var(--dc-muted)">' + tc.hand_indication + '</div>' : '',
+    tc.comprehensive ? '<div style="font-size:11px;color:var(--dc-gold);margin-top:6px">' + tc.comprehensive + '</div>' : '',
+    data.missing?.length ? '<div style="font-size:10px;color:var(--dc-red);margin-top:4px">缺失: ' + data.missing.join(', ') + '</div>' : ''
+  ].filter(Boolean).join('');
+
+  // KB references
+  const kbRefs = (data.sections || {}).kb_references || [];
+  renderKBSection('kbFace', kbRefs.filter(k => (k.module||'').includes('tcm') || (k.module||'').includes('diagnosis')), '面/舌诊');
+  renderKBSection('kbTongue', kbRefs, '全模块');
+}
+
+function resetResults() {
+  document.getElementById('ocrSection').style.display = 'none';
+  document.getElementById('kbFace').innerHTML = '<div class="empty">等待采集…</div>';
+  document.getElementById('kbTongue').innerHTML = '<div class="empty">等待采集…</div>';
+  document.getElementById('diagSummary').innerHTML = '<div class="empty">等待采集…</div>';
+}
   document.querySelectorAll('.dc-mode').forEach(m => m.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('kbFace').innerHTML = '<div class="empty">等待采集…</div>';
