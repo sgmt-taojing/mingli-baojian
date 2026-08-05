@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="description" content="患者旅程 — 健康档案·历次就诊·居家自检·报告随访，一站式管理">
+<meta name="theme-color" content="#0a1628">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="css/page-header.css">
+<title>患者旅程 · 易道智鉴</title>
+<style>
+:root{--bg:#0a1628;--sur:#111d33;--card:rgba(255,255,255,.04);--gold:#c9a84c;--jade:#10b981;--cyan:#38bdf8;--red:#ef4444;--paper:#e0d8c8;--muted:#7a8a9e;--border:rgba(201,168,76,.15);--r:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--paper);min-height:100vh}
+.topbar{position:sticky;top:0;z-index:100;background:var(--sur);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:16px}
+.topbar .logo{font-size:16px;font-weight:700;color:var(--gold);display:flex;align-items:center;gap:8px}
+.topbar .logo .dot{width:8px;height:8px;border-radius:50%;background:var(--jade);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.topbar a{color:var(--muted);text-decoration:none;font-size:12px;transition:.2s}
+.topbar a:hover{color:var(--gold)}
+
+.main{max-width:900px;margin:0 auto;padding:20px 16px 60px}
+
+/* Patient header card */
+.pt-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.pt-avatar{width:56px;height:56px;border-radius:50%;background:rgba(201,168,76,.1);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.pt-info{flex:1;min-width:200px}
+.pt-info h2{font-size:18px;color:var(--gold);margin-bottom:2px}
+.pt-info .meta{font-size:12px;color:var(--muted)}
+.pt-actions{display:flex;gap:8px;flex-shrink:0}
+.pt-actions button,.pt-actions a{padding:8px 16px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--paper);font-size:12px;cursor:pointer;text-decoration:none;transition:.2s;font-family:inherit}
+.pt-actions button:hover,.pt-actions a:hover{border-color:var(--gold);color:var(--gold)}
+.pt-actions button.primary,.pt-actions a.primary{background:var(--gold);color:#0a1628;border:none;font-weight:600}
+
+/* Step sections */
+.step{margin-bottom:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.step-header{padding:14px 20px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.step-header .num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:rgba(255,255,255,.06);color:var(--muted);flex-shrink:0}
+.step-header .title{font-size:14px;font-weight:600}
+.step-header .badge{font-size:10px;padding:2px 8px;border-radius:8px;margin-left:auto}
+.step-header .badge.new{background:rgba(16,185,129,.12);color:var(--jade)}
+.step-header .badge.warn{background:rgba(239,68,68,.1);color:var(--red)}
+.step-body{padding:0 20px 18px}
+
+/* Records table */
+.rec-table{width:100%;border-collapse:collapse;font-size:12px}
+.rec-table th{text-align:left;padding:8px 10px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);font-size:11px}
+.rec-table td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04)}
+.rec-table tr:hover td{background:rgba(255,255,255,.02)}
+.rec-table .status{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px}
+.rec-table .status.done{background:rgba(16,185,129,.1);color:var(--jade)}
+.rec-table .status.pending{background:rgba(201,168,76,.1);color:var(--gold)}
+
+/* Symptom check */
+.symptom-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;margin-bottom:10px}
+.symptom-chip{padding:7px 12px;border:1px solid var(--border);border-radius:16px;font-size:12px;cursor:pointer;text-align:center;color:var(--muted);transition:.2s}
+.symptom-chip:hover{border-color:var(--gold);color:var(--paper)}
+.symptom-chip.sel{border-color:var(--gold);background:rgba(201,168,76,.1);color:var(--gold)}
+.symptom-chip.warn{border-color:var(--red);background:rgba(239,68,68,.08);color:var(--red)}
+
+/* AI feedback */
+.ai-box{background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.15);border-radius:var(--r);padding:14px;margin-top:10px;display:none}
+.ai-box.show{display:block}
+.ai-box h5{color:var(--cyan);font-size:12px;margin-bottom:6px}
+.ai-box .content{font-size:12px;color:var(--paper);line-height:1.6}
+.ai-box .disclaimer{font-size:10px;color:var(--muted);margin-top:8px}
+
+/* Report card */
+.report-card{background:var(--sur);border-radius:10px;padding:16px;margin-bottom:10px;border-left:3px solid var(--gold)}
+.report-card h4{font-size:13px;color:var(--gold);margin-bottom:6px}
+.report-card .summary{font-size:11px;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.report-card .footer{display:flex;gap:16px;margin-top:8px;font-size:10px;color:var(--muted)}
+
+/* Follow-up list */
+.follow-list{list-style:none}
+.follow-list li{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.03);display:flex;align-items:center;gap:12px;font-size:12px}
+.follow-list li .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.follow-list li .dot.soon{background:var(--gold);animation:pulse 2s infinite}
+.follow-list li .dot.normal{background:var(--cyan)}
+.follow-list li .date{color:var(--gold);min-width:70px}
+.follow-list li .desc{color:var(--paper);flex:1}
+.follow-list li .action{color:var(--muted);font-size:11px}
+
+/* Empty state */
+.empty{text-align:center;padding:30px;color:var(--muted);font-size:13px}
+.empty .icon{font-size:36px;margin-bottom:8px;opacity:.4}
+
+@media(max-width:600px){
+  .pt-card{flex-direction:column;text-align:center}
+  .pt-actions{justify-content:center}
+  .rec-table{font-size:10px}
+  .rec-table td,.rec-table th{padding:6px 4px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo"><span class="dot"></span>患者旅程</div>
+  <a href="clinic-consultation.html">🏥 前往问诊</a>
+  <a href="patient-portal.html" style="margin-left:auto">📂 功能门户</a>
+</div>
+
+<div class="main">
+
+<!-- ═══ Patient Header ═══ -->
+<div class="pt-card">
+  <div class="pt-avatar">👤</div>
+  <div class="pt-info">
+    <h2 id="ptName">张三</h2>
+    <div class="meta">男 · 45岁 · 1979/06/15生 · 档案号 PT-0001</div>
+  </div>
+  <div class="pt-actions">
+    <button onclick="editProfile()">✏️ 编辑档案</button>
+    <a href="clinic-consultation.html" class="primary">🏥 开始问诊</a>
+  </div>
+</div>
+
+<!-- ═══ STEP 1: 我的健康档案 ═══ -->
+<div class="step">
+  <div class="step-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    <span class="num">1</span>
+    <span class="title">我的健康档案</span>
+    <span class="badge new">最近更新: 2026-08-01</span>
+  </div>
+  <div class="step-body">
+    <div id="profileDetail" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12px">
+      <div><span style="color:var(--muted)">姓名：</span>张三</div>
+      <div><span style="color:var(--muted)">性别：</span>男</div>
+      <div><span style="color:var(--muted)">出生：</span>1979年6月15日</div>
+      <div><span style="color:var(--muted)">年龄：</span>45岁</div>
+      <div><span style="color:var(--muted)">体质类型：</span>痰湿质（AI评估）</div>
+      <div><span style="color:var(--muted)">过敏史：</span>无</div>
+      <div><span style="color:var(--muted)">既往病史：</span>高血压（轻度）</div>
+      <div><span style="color:var(--muted)">家族病史：</span>父亲高血压</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ STEP 2: 居家健康自检 ═══ -->
+<div class="step">
+  <div class="step-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    <span class="num">2</span>
+    <span class="title">居家健康自检</span>
+    <span class="badge new">AI即时评估</span>
+  </div>
+  <div class="step-body">
+    <p style="font-size:11px;color:var(--muted);margin-bottom:10px">选择你当前的不适症状，AI将基于知识库给出即时评估和建议。结果仅供健康参考。</p>
+    <div class="symptom-grid" id="symptomGrid">
+      <span class="symptom-chip" onclick="toggleSymptom(this)">😰 头晕</span>
+      <span class="symptom-chip" onclick="toggleSymptom(this)">😴 乏力</span>
+      <span class="symptom-chip" onclick="toggleSymptom(this)">😤 咳嗽</span>
+      <span class="symptom-chip" onclick="toggleSymptom(this)">💔 胸闷</span>
+      <span class="symptom-chip" onclick="toggleSymptom(this)">🤒 发热</span>
+      <span class="symptom-chip" onclick="toggleSymptom(this)">🤢 恶心</span>
+      <span class="symptom-chip" onclick="toggleSymptom(this)">😵 失眠</span>
+      <span class="symptom-chip" onclick="toggleSymptom(this)">😣 头痛</span>
+      <span class="symptom-chip" onclick="toggleSymptom(this)">🦵 关节痛</span>
+      <span class="symptom-chip" onclick="toggleSymptom(this)">😞 食欲不振</span>
+      <span class="symptom-chip" onclick="toggleSymptom(this)">🥵 盗汗</span>
+      <span class="symptom-chip" onclick="toggleSymptom(this)">😤 气短</span>
+      <span class="symptom-chip" onclick="toggleSymptom(this)">💩 便秘</span>
+      <span class="symptom-chip" onclick="toggleSymptom(this)">💧 水肿</span>
+      <span class="symptom-chip" onclick="toggleSymptom(this)">😖 腹痛</span>
+      <span class="symptom-chip" onclick="toggleSymptom(this)">😤 烦躁</span>
+    </div>
+    <button class="symptom-chip" style="display:block;margin:0 auto;border-color:var(--cyan);color:var(--cyan)" onclick="runHomeCheck()">🔍 AI 即时评估</button>
+    <div class="ai-box" id="aiResult">
+      <h5>🤖 AI 居家健康评估</h5>
+      <div class="content" id="aiContent"></div>
+      <div class="disclaimer">⚠️ 本评估基于系统知识库自动生成，不构成医疗诊断。如症状持续或加重，请及时就医。</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ STEP 3: 历次就诊记录 ═══ -->
+<div class="step">
+  <div class="step-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    <span class="num">3</span>
+    <span class="title">历次就诊记录</span>
+    <span class="badge new" id="visitCount">2 次</span>
+  </div>
+  <div class="step-body">
+    <table class="rec-table" id="visitTable">
+      <thead><tr><th>日期</th><th>科室</th><th>主诉</th><th>诊断</th><th>医生</th><th>状态</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>2026-08-01</td><td>中医内科</td><td>头晕乏力失眠</td><td>气血两虚</td><td>李医生</td>
+          <td><span class="status done">已完成</span></td>
+        </tr>
+        <tr>
+          <td>2026-07-15</td><td>体质调理科</td><td>体质辨识</td><td>痰湿质</td><td>王主任</td>
+          <td><span class="status done">已完成</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="empty" id="noVisits" style="display:none"><div class="icon">📋</div>暂无就诊记录</div>
+  </div>
+</div>
+
+<!-- ═══ STEP 4: 我的报告与随访 ═══ -->
+<div class="step">
+  <div class="step-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    <span class="num">4</span>
+    <span class="title">诊断报告与随访</span>
+    <span class="badge warn" id="followupBadge">1 项待处理</span>
+  </div>
+  <div class="step-body">
+    <h5 style="font-size:12px;color:var(--gold);margin-bottom:8px">📋 最新报告</h5>
+    <div class="report-card" id="latestReport">
+      <h4>2026-08-01 · 中医内科综合诊断</h4>
+      <div class="summary">
+        <b>AI辨证：</b>气血两虚倾向；心肾不交可能<br>
+        <b>医生诊断：</b>气血两虚，兼有肝郁<br>
+        <b>证型：</b>气血两虚<br>
+        <b>命理体质：</b>己土日主 · 土弱需补 · 痰湿倾向<br>
+        <b>处置：</b>归脾汤加减 · 建议7天后复诊
+      </div>
+      <div class="footer">
+        <span>👨‍⚕️ 李医生</span><span>📅 2026-08-01</span><span>🤖 AI参与诊断</span>
+      </div>
+    </div>
+    <div class="empty" id="noReports" style="display:none"><div class="icon">📄</div>暂无诊断报告</div>
+
+    <h5 style="font-size:12px;color:var(--gold);margin:16px 0 8px">⏰ 随访提醒</h5>
+    <ul class="follow-list" id="followupList">
+      <li>
+        <span class="dot soon"></span>
+        <span class="date">2026-08-08</span>
+        <span class="desc">中医内科复诊 — 气血调理效果评估</span>
+        <span class="action">剩 3 天</span>
+      </li>
+      <li>
+        <span class="dot normal"></span>
+        <span class="date">2026-08-15</span>
+        <span class="desc">体质调理科 — 季度体质复查</span>
+        <span class="action">剩 10 天</span>
+      </li>
+    </ul>
+    <div class="empty" id="noFollowups" style="display:none"><div class="icon">✅</div>暂无随访提醒</div>
+  </div>
+</div>
+
+<!-- ═══ Bottom: Quick Actions ═══ -->
+<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px">
+  <a href="clinic-consultation.html" class="pt-actions a primary" style="display:inline-flex">🏥 前往问诊台</a>
+  <button onclick="window.print()" style="padding:8px 16px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit">🖨️ 打印档案</button>
+</div>
+
+</div>
+
+<script>
+// ═══ Home symptom check ═══
+window.toggleSymptom = function(el) { el.classList.toggle('sel'); };
+
+window.runHomeCheck = function() {
+  const selected = Array.from(document.querySelectorAll('.symptom-chip.sel')).map(el => el.textContent.replace(/[^\u4e00-\u9fff]/g,''));
+  if (selected.length === 0) return;
+
+  const box = document.getElementById('aiResult');
+  const content = document.getElementById('aiContent');
+  box.classList.add('show');
+
+  // Rule-based triage
+  let advice = '';
+  const s = selected.join('');
+  if (s.includes('头晕') && s.includes('乏力')) advice += '🏥 建议：可能为气血不足，建议检测血常规。居家可服用红枣枸杞茶，注意休息。';
+  else if (s.includes('发热') && s.includes('咳嗽')) advice += '🏥 建议：可能为上呼吸道感染。多饮水，监测体温。若体温>38.5℃或持续3天请就医。';
+  else if (s.includes('胸闷') && s.includes('气短')) advice += '⚠️ 注意：建议尽早就医，排除心血管问题。居家保持通风，避免剧烈运动。';
+  else if (s.includes('失眠') && s.includes('烦躁')) advice += '🌿 建议：可能为肝郁化火或心肾不交。建议睡前泡脚，避免咖啡浓茶，可练习腹式呼吸。';
+  else if (s.includes('腹痛') || s.includes('恶心')) advice += '🏥 建议：消化系统可能异常。注意饮食清淡，避免生冷油腻。若持续腹痛请及时就医。';
+  else advice += '根据您选择的症状，建议保持良好的作息和饮食习惯。如症状持续，请前往医院就诊。';
+
+  content.innerHTML = `
+    <div style="margin-bottom:6px"><b>已选症状：</b>${selected.join('、')}</div>
+    <div style="margin-bottom:8px">${advice}</div>
+    <div style="font-size:10px;color:var(--muted)">
+      📊 AI置信度：中等（居家自检模式）<br>
+      💡 如需更精准诊断，请前往<a href="clinic-consultation.html" style="color:var(--gold)">问诊台</a>进行完整四诊采集
+    </div>`;
+};
+
+// ═══ Edit profile ═══
+window.editProfile = function() {
+  const detail = document.getElementById('profileDetail');
+  const fields = [
+    { label:'姓名', key:'name', val:'张三' },
+    { label:'年龄', key:'age', val:'45' },
+    { label:'体质类型', key:'constitution', val:'痰湿质' },
+    { label:'过敏史', key:'allergy', val:'无' },
+    { label:'既往病史', key:'history', val:'高血压（轻度）' },
+    { label:'家族病史', key:'family', val:'父亲高血压' },
+  ];
+  detail.innerHTML = fields.map(f =>
+    `<div><span style="color:var(--muted)">${f.label}：</span><input id="edit_${f.key}" value="${f.val}" style="background:var(--sur);border:1px solid var(--border);border-radius:6px;color:var(--paper);padding:4px 8px;font-size:12px;width:140px;font-family:inherit"></div>`
+  ).join('') + '<div style="grid-column:1/-1"><button onclick="saveProfile()" style="padding:6px 16px;background:var(--gold);color:#0a1628;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit">💾 保存</button></div>';
+};
+
+window.saveProfile = function() {
+  const name = document.getElementById('edit_name')?.value || '张三';
+  document.getElementById('ptName').textContent = name;
+  document.getElementById('profileDetail').innerHTML = document.getElementById('profileDetail').innerHTML.replace(/<input[^>]*>/g,'').replace(/<button[^>]*>.*?<\/button>/g,'');
+  // Rebuild display
+  ['name','age','constitution','allergy','history','family'].forEach(k => {
+    const v = document.getElementById('edit_'+k)?.value || '';
+    const el = document.querySelector(`#profileDetail div:has(#edit_${k})`) || document.querySelector(`#profileDetail div`);
+  });
+  location.reload();
+};
+
+// ═══ Load saved data ═══
+document.addEventListener('DOMContentLoaded', () => {
+  // Try loading reports from localStorage
+  try {
+    const reports = JSON.parse(localStorage.getItem('clinic_reports') || '[]');
+    if (reports.length > 0) {
+      const latest = reports[0];
+      const card = document.getElementById('latestReport');
+      card.querySelector('h4').textContent = new Date(latest.timestamp).toLocaleDateString('zh-CN') + ' · 综合诊断';
+      card.querySelector('.summary').innerHTML = `
+        <b>主诉：</b>${(latest.sizhen?.symptoms||'').slice(0,60)}<br>
+        <b>AI辨证：</b>${(latest.sizhen?.diagnosis||'').slice(0,80)}<br>
+        <b>医生诊断：</b>${latest.doctorNote||'—'}<br>
+        <b>证型：</b>${latest.doctorSyndrome||'—'}<br>
+        <b>命理体质：</b>${latest.mingli?.day_master||''}日主 · ${latest.mingli?.constitution||''}`;
+    }
+    document.getElementById('visitCount').textContent = (reports.length > 0 ? reports.length : 1) + ' 次';
+  } catch(e) {}
+});
+</script>
+</body>
+</html>
