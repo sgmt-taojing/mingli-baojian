@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TCM 四诊辨证索引 · 命理宝鉴</title>
+<meta name="description" content="TCM 四诊辨证索引：八纲/脏腑/六淫/气血津液 辨证体系 + KB 检索入口 + 临床问诊台对接">
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="/static/css/page-header.css">
+<style>
+:root{
+  --tcm-primary:#8B4513;
+  --tcm-secondary:#D2691E;
+  --tcm-accent:#FFD700;
+  --tcm-bg:#FAF7F0;
+  --tcm-card:#FFFEF7;
+  --tcm-border:#E5D9C0;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:var(--tcm-bg);color:#333;line-height:1.6}
+.container{max-width:1280px;margin:0 auto;padding:24px 16px}
+
+/* Hero */
+.hero{background:linear-gradient(135deg,#2c1810 0%,#5c3a28 100%);color:#fff;padding:48px 24px;border-radius:16px;margin-bottom:32px;box-shadow:0 8px 24px rgba(44,24,16,0.3)}
+.hero h1{font-size:32px;font-weight:700;letter-spacing:4px;margin-bottom:8px}
+.hero p{font-size:16px;opacity:0.85;max-width:720px;margin-bottom:24px}
+.hero .badges{display:flex;flex-wrap:wrap;gap:8px}
+.hero .badge{background:rgba(255,255,255,0.15);padding:6px 14px;border-radius:16px;font-size:13px;backdrop-filter:blur(8px)}
+
+/* Stats Grid */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:32px}
+.stat-card{background:var(--tcm-card);padding:24px;border-radius:12px;border:1px solid var(--tcm-border);text-align:center;box-shadow:0 2px 8px rgba(139,69,19,0.06);transition:transform 0.2s}
+.stat-card:hover{transform:translateY(-4px);box-shadow:0 6px 16px rgba(139,69,19,0.12)}
+.stat-card .num{font-size:36px;font-weight:700;color:var(--tcm-primary);font-family:"Georgia",serif}
+.stat-card .label{font-size:13px;color:#666;margin-top:8px;letter-spacing:1px}
+.stat-card .sub{font-size:11px;color:#999;margin-top:4px}
+
+/* Sections */
+.section{background:var(--tcm-card);padding:32px;border-radius:12px;border:1px solid var(--tcm-border);margin-bottom:24px;box-shadow:0 2px 8px rgba(139,69,19,0.04)}
+.section h2{font-size:22px;color:var(--tcm-primary);margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--tcm-border);display:flex;align-items:center;gap:8px}
+.section h2 .icon{font-size:24px}
+
+/* 辨证索引卡 */
+.index-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin:16px 0}
+.index-card{background:#fff;padding:20px;border-radius:10px;border:1px solid var(--tcm-border);transition:all 0.2s}
+.index-card:hover{border-color:var(--tcm-secondary);box-shadow:0 4px 12px rgba(210,105,30,0.15)}
+.index-card .idx-icon{font-size:28px;margin-bottom:8px}
+.index-card .idx-name{font-size:15px;font-weight:600;color:var(--tcm-primary);margin-bottom:6px}
+.index-card .idx-desc{font-size:12px;color:#666;line-height:1.5;margin-bottom:8px}
+.index-card .idx-tags{display:flex;flex-wrap:wrap;gap:4px}
+.idx-tag{background:#F5F0E1;padding:3px 8px;border-radius:8px;font-size:11px;color:var(--tcm-primary)}
+
+/* Data table */
+.data-table{width:100%;border-collapse:collapse;margin-top:16px}
+.data-table th{background:#F5F0E1;color:var(--tcm-primary);padding:10px 12px;text-align:left;border-bottom:2px solid var(--tcm-border);font-weight:600;font-size:13px}
+.data-table td{padding:10px 12px;border-bottom:1px solid var(--tcm-border);font-size:13px}
+.data-table tr:hover{background:rgba(201,169,97,0.04)}
+.data-table .ok{color:#2E7D32;font-weight:600}
+.data-table .kb-ref{color:var(--tcm-secondary);font-family:monospace;font-size:11px}
+
+/* Compliance */
+.compliance{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-top:16px}
+.comp-badge{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#fff;border:1px solid var(--tcm-border);border-radius:8px;font-size:12px}
+.comp-badge .ic{font-size:18px}
+.comp-badge .txt{flex:1;color:#333}
+.comp-badge .txt b{color:var(--tcm-primary)}
+
+/* 边界声明 */
+.boundary{background:linear-gradient(135deg,rgba(139,69,19,0.06),rgba(210,105,30,0.03));border:1px solid var(--tcm-secondary);border-radius:10px;padding:14px 18px;margin-bottom:20px;font-size:13px;color:#5c3a28}
+.boundary b{color:var(--tcm-primary)}
+
+/* Footer buttons */
+.footer-links{display:flex;flex-wrap:wrap;gap:12px}
+.footer-links a{padding:10px 18px;background:var(--tcm-primary);color:#fff;border-radius:8px;text-decoration:none;font-size:14px;transition:all 0.2s}
+.footer-links a:hover{transform:translateY(-2px);box-shadow:0 4px 8px rgba(139,69,19,0.3)}
+.footer-links a.l1{background:#2E7D32}
+.footer-links a.l2{background:#1565C0}
+.footer-links a.l3{background:#6A1B9A}
+.footer-links a.l4{background:#C62828}
+
+@media(max-width:768px){
+  .hero{padding:32px 16px}
+  .hero h1{font-size:24px}
+  .section{padding:20px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <h1>🌿 TCM 四诊辨证索引</h1>
+    <p>八纲 / 脏腑 / 六淫 / 气血津液 / 经络 — 辨证体系索引 + KB 检索入口，配合临床问诊台与摄像头诊疗</p>
+    <div class="badges">
+      <span class="badge">📚 八纲辨证</span>
+      <span class="badge">🫀 脏腑辨证</span>
+      <span class="badge">🌡️ 六淫辨证</span>
+      <span class="badge">🩸 气血津液</span>
+      <span class="badge">📜 经络辨证</span>
+    </div>
+  </div>
+
+  <!-- 边界声明 -->
+  <div class="boundary">
+    📌 <b>本页面</b>：TCM 辨证体系索引 + KB 检索入口。配合摄像头采集 / 临床问诊台使用。<br>
+    🚫 <b>本页面不做</b>：模型训练 / 数据标注 / 训练流水线（属 ai-vision-toolkit）
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="num" id="s-kb-total">—</div>
+      <div class="label">KB 知识条目</div>
+      <div class="sub">中医辨证类</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">5</div>
+      <div class="label">辨证体系</div>
+      <div class="sub">八纲 / 脏腑 / 六淫 / 气血津液 / 经络</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="s-modules">—</div>
+      <div class="label">KB 模块数</div>
+      <div class="sub">辨证 / 方剂 / 舌诊 / 脉诊 /...</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="s-trust">—</div>
+      <div class="label">平均 trust</div>
+      <div class="sub">知识可信度</div>
+    </div>
+  </div>
+
+  <!-- 八纲辨证 -->
+  <div class="section">
+    <h2><span class="icon">📊</span>八纲辨证（基础框架）</h2>
+    <div class="index-grid">
+      <div class="index-card">
+        <div class="idx-icon">🌡️</div>
+        <div class="idx-name">阴阳</div>
+        <div class="idx-desc">辨证总纲：统摄表里、寒热、虚实。阴证多寒、虚、内；阳证多热、实、外。</div>
+        <div class="idx-tags"><span class="idx-tag">KB: 阴阳</span><span class="idx-tag">阳虚/阴虚</span></div>
+      </div>
+      <div class="index-card">
+        <div class="idx-icon">📏</div>
+        <div class="idx-name">表里</div>
+        <div class="idx-desc">病位深浅：表证外感初起（脉浮）；里证病位深入脏腑（脉沉）。</div>
+        <div class="idx-tags"><span class="idx-tag">KB: 表里</span><span class="idx-tag">表寒/表热</span></div>
+      </div>
+      <div class="index-card">
+        <div class="idx-icon">🔥❄️</div>
+        <div class="idx-name">寒热</div>
+        <div class="idx-desc">病性寒热：寒证喜暖、口淡不渴；热证喜凉、口渴饮冷。</div>
+        <div class="idx-tags"><span class="idx-tag">KB: 寒热</span><span class="idx-tag">真寒假热</span></div>
+      </div>
+      <div class="index-card">
+        <div class="idx-icon">⚖️</div>
+        <div class="idx-name">虚实</div>
+        <div class="idx-desc">邪正盛衰：实证邪盛而正未衰；虚证正虚而邪未去。</div>
+        <div class="idx-tags"><span class="idx-tag">KB: 虚实</span><span class="idx-tag">气虚/血虚/阴虚/阳虚</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 脏腑辨证 -->
+  <div class="section">
+    <h2><span class="icon">🫀</span>脏腑辨证（核心体系）</h2>
+    <div class="index-grid">
+      <div class="index-card">
+        <div class="idx-icon">❤️</div>
+        <div class="idx-name">心（小肠）</div>
+        <div class="idx-desc">心气虚、心血虚、心阴虚、心阳虚、心火亢盛、心脉痹阻、痰蒙心窍。</div>
+        <div class="idx-tags"><span class="idx-tag">KB: 心</span><span class="idx-tag">面诊-额</span><span class="idx-tag">舌诊-舌尖</span></div>
+      </div>
+      <div class="index-card">
+        <div class="idx-icon">🫁</div>
+        <div class="idx-name">肺（大肠）</div>
+        <div class="idx-desc">肺气虚、肺阴虚、风寒束肺、风热犯肺、痰热壅肺、燥邪伤肺。</div>
+        <div class="idx-tags"><span class="idx-tag">KB: 肺</span><span class="idx-tag">面诊-右颊</span><span class="idx-tag">鼻</span></div>
+      </div>
+      <div class="index-card">
+        <div class="idx-icon">🟡</div>
+        <div class="idx-name">脾（胃）</div>
+        <div class="idx-desc">脾气虚、脾阳虚、脾不统血、寒湿困脾、湿热蕴脾、胃阴虚、食滞胃脘。</div>
+        <div class="idx-tags"><span class="idx-tag">KB: 脾</span><span class="idx-tag">面诊-鼻</span><span class="idx-tag">舌诊-舌中</span></div>
+      </div>
+      <div class="index-card">
+        <div class="idx-icon">🟢</div>
+        <div class="idx-name">肝（胆）</div>
+        <div class="idx-desc">肝气郁结、肝火上炎、肝阳上亢、肝血虚、肝阴虚、肝风内动、肝胆湿热。</div>
+        <div class="idx-tags"><span class="idx-tag">KB: 肝</span><span class="idx-tag">面诊-左颊</span><span class="idx-tag">目诊</span></div>
+      </div>
+      <div class="index-card">
+        <div class="idx-icon">⚫</div>
+        <div class="idx-name">肾（膀胱）</div>
+        <div class="idx-desc">肾阳虚、肾阴虚、肾气不固、肾精不足、肾虚水泛、膀胱湿热。</div>
+        <div class="idx-tags"><span class="idx-tag">KB: 肾</span><span class="idx-tag">面诊-颏</span><span class="idx-tag">耳诊</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 六淫辨证 -->
+  <div class="section">
+    <h2><span class="icon">🌬️</span>六淫 / 气血津液 / 经络</h2>
+    <div class="index-grid">
+      <div class="index-card">
+        <div class="idx-icon">🌬️</div>
+        <div class="idx-name">六淫外邪</div>
+        <div class="idx-desc">风、寒、暑、湿、燥、火六种外感邪气及对应证型。</div>
+        <div class="idx-tags"><span class="idx-tag">风证</span><span class="idx-tag">寒证</span><span class="idx-tag">湿证</span><span class="idx-tag">KB: 六淫</span></div>
+      </div>
+      <div class="index-card">
+        <div class="idx-icon">🩸</div>
+        <div class="idx-name">气血津液</div>
+        <div class="idx-desc">气虚、气滞、血虚、血瘀、津液不足、水湿内停。</div>
+        <div class="idx-tags"><span class="idx-tag">气虚</span><span class="idx-tag">血瘀</span><span class="idx-tag">痰湿</span><span class="idx-tag">KB: 气血津液</span></div>
+      </div>
+      <div class="index-card">
+        <div class="idx-icon">📜</div>
+        <div class="idx-name">经络辨证</div>
+        <div class="idx-desc">十二经脉、奇经八脉循行部位病症；按经辨证。</div>
+        <div class="idx-tags"><span class="idx-tag">十二经</span><span class="idx-tag">奇经八脉</span><span class="idx-tag">KB: 经络</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KB 检索 -->
+  <div class="section">
+    <h2><span class="icon">📚</span>KB 检索入口</h2>
+    <p style="font-size:13px;color:#666;margin-bottom:12px;">输入症状 / 体征关键词，从 KB 拉取辨证条目：</p>
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <input id="kb-input" type="text" placeholder="例如：淡白舌、齿痕、肝郁、潮热..." style="flex:1;padding:10px 14px;border:1px solid var(--tcm-border);border-radius:8px;font-size:14px;background:#fff;">
+      <button onclick="searchKB()" style="padding:10px 24px;background:var(--tcm-primary);color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;">🔍 搜索</button>
+    </div>
+    <div id="kb-results" style="font-size:13px;color:#666;">输入关键词查询知识库...</div>
+  </div>
+
+  <!-- 七红线合规 -->
+  <div class="section">
+    <h2><span class="icon">🛡️</span>7 红线合规（强制）</h2>
+    <p style="font-size:13px;color:#666;margin-bottom:12px;">AI 助手在任何辨证场景中必须遵守的红线（本页面 KB 输出亦同）：</p>
+    <div class="compliance">
+      <div class="comp-badge">
+        <span class="ic">🚫</span>
+        <span class="txt"><b>红线 1：禁止自主辨证</b>所有诊断仅供学习参考</span>
+      </div>
+      <div class="comp-badge">
+        <span class="ic">🚫</span>
+        <span class="txt"><b>红线 2：禁止疾病诊断</b>不输出药方/治疗方案</span>
+      </div>
+      <div class="comp-badge">
+        <span class="ic">🚫</span>
+        <span class="txt"><b>红线 3：禁止预判生死</b>无宿命论/恐吓性输出</span>
+      </div>
+      <div class="comp-badge">
+        <span class="ic">🚫</span>
+        <span class="txt"><b>红线 4：禁止脱离 KB</b>所有回答基于知识库</span>
+      </div>
+      <div class="comp-badge">
+        <span class="ic">🚫</span>
+        <span class="txt"><b>红线 5：禁止绝对化</b>无100%/必定/绝对等词</span>
+      </div>
+      <div class="comp-badge">
+        <span class="ic">🚫</span>
+        <span class="txt"><b>红线 6：未成年人保护</b>不输出算命结论</span>
+      </div>
+      <div class="comp-badge">
+        <span class="ic">🚫</span>
+        <span class="txt"><b>红线 7：禁止煽动</b>无恐吓/PUA 式输出</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 内部链接 -->
+  <div class="section" style="background:linear-gradient(135deg,#F5F0E1,#FAF7F0)">
+    <h2><span class="icon">📦</span>命理宝鉴内部入口</h2>
+    <div class="footer-links">
+      <a href="/ai-assistant.html">🤖 AI 智能助手</a>
+      <a href="/clinic-consultation.html" class="l1">🏥 临床问诊台</a>
+      <a href="/bazi.html" class="l2">☯ 八字排盘</a>
+      <a href="/ziwei.html" class="l3">⭐ 紫微斗数</a>
+      <a href="/tcm-portal.html" class="l4">🌿 TCM 中医门户</a>
+    </div>
+  </div>
+</div>
+
+<script>
+// 实时加载 KB 统计
+async function loadKBStats() {
+  try {
+    const r = await fetch('/api/kb/stats');
+    const d = await r.json();
+    if (d.code === 0 || d.ok) {
+      const s = d.data || {};
+      document.getElementById('s-kb-total').textContent = s.total || '—';
+      document.getElementById('s-modules').textContent = s.modules || '—';
+      document.getElementById('s-trust').textContent = s.avg_trust || '—';
+    }
+  } catch (e) {
+    document.getElementById('s-kb-total').textContent = 'N/A';
+    document.getElementById('s-modules').textContent = 'N/A';
+    document.getElementById('s-trust').textContent = 'N/A';
+  }
+}
+
+// KB 检索
+async function searchKB() {
+  const q = document.getElementById('kb-input').value.trim();
+  if (!q) return;
+  const out = document.getElementById('kb-results');
+  out.textContent = '搜索中...';
+  try {
+    const r = await fetch(`/api/kb/search?q=${encodeURIComponent(q)}&limit=5`);
+    const d = await r.json();
+    if (d.data && d.data.length) {
+      out.innerHTML = d.data.map(item => `
+        <div style="background:#fff;border:1px solid var(--tcm-border);border-left:3px solid var(--tcm-primary);padding:12px;border-radius:8px;margin-bottom:8px;">
+          <div style="font-weight:600;font-size:13px;color:var(--tcm-primary)">${item.summary || item.title || '条目'}</div>
+          <div style="font-size:12px;color:#666;margin-top:4px;">${(item.content||'').slice(0,200)}...</div>
+          <div style="margin-top:6px;font-size:10px;color:#999;">
+            <span style="background:#F5F0E1;padding:2px 8px;border-radius:8px;">${item.module || '中医'}</span>
+            <span style="margin-left:6px;">trust=${item.trust_score || '—'}</span>
+          </div>
+        </div>
+      `).join('');
+    } else {
+      out.textContent = '未找到匹配的辨证条目';
+    }
+  } catch (e) {
+    out.textContent = '⚠️ KB API 未连接';
+  }
+}
+
+document.getElementById('kb-input')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') searchKB();
+});
+
+loadKBStats();
+</script>
+</body>
+</html>
