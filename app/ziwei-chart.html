@@ -137,6 +137,8 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
   <input aria-label="月" type="number" id="zw-month" placeholder="月" value="10" min="1" max="12">
   <input aria-label="日" type="number" id="zw-day" placeholder="日" value="28" min="1" max="31">
   <input aria-label="时" type="number" id="zw-hour" placeholder="时" value="7" min="0" max="23">
+  <input aria-label="出生地经度" type="number" id="zw-lng" placeholder="经度(默认121.47)" value="121.47" step="0.01" min="73" max="135" title="出生地经度（用于真太阳时校正）">
+  <input aria-label="流年" type="number" id="zw-target-year" placeholder="流年" value="2026" min="1900" max="2100" title="查流年运势的目标年份">
   <label style="font-size:11px;color:var(--paper3);display:flex;align-items:center;gap:4px"><input type="checkbox" id="zw-leap" style="width:auto"> 闰月</label>
   <button onclick="doPaipan()">排盘</button>
 
@@ -183,7 +185,6 @@ async function generateFullReport(mod){
   }
 }
 </script>
-</div>
 
 <div id="zw-grid" class="zw-grid"></div>
 <div id="zw-daxian" class="zw-daxian" style="display:none"></div>
@@ -196,14 +197,73 @@ async function doPaipan(){
   const d=document.getElementById('zw-day').value;
   const h=document.getElementById('zw-hour').value;
   const s=document.getElementById('zw-sex').value;
+  const lngEl = document.getElementById('zw-lng');
+  const lng = lngEl ? (+lngEl.value || 121.47) : 121.47;
   if(!y||!m||!d||h===''){showToast('请填写完整的年月日时');return;}
   const name = document.getElementById('zw-name').value || '';
   const isLunar = zwCalMode === 'lunar';
   const leap = isLunar ? document.getElementById('zw-leap').checked : false;
-  const r=await fetch(API_BASE+'/api/paipan/ziwei',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({year:+y,month:+m,day:+d,hour:+h,sex:s,name,isLunar,leapMonth:leap})});
-  const data=await r.json();
+  const tyEl = document.getElementById('zw-target-year');
+  const targetYear = tyEl ? (+tyEl.value || new Date().getFullYear()) : new Date().getFullYear();
+  const now = new Date();
+  const currentAge = now.getFullYear() - +y;
+  const payload = {year:+y,month:+m,day:+d,hour:+h,minute:30,sex:s,name,isLunar,leapMonth:leap,lng,targetYear,currentAge};
+  const [rJson, rSvg] = await Promise.all([
+    fetch(API_BASE+'/api/paipan/ziwei',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}),
+    fetch(API_BASE+'/api/paipan/ziwei/svg',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+  ]);
+  const data = await rJson.json();
   if(!data.ok){showToast('排盘失败: '+data.error);return;}
-  renderChart(data.chart); if(data.interpretation) renderInterpretation(data.interpretation);
+  const svg = await rSvg.text();
+  renderChart(data.chart);
+  renderSvg(svg);
+  renderFlow(data.flow, targetYear, currentAge);
+  if(data.interpretation) renderInterpretation(data.interpretation);
+}
+
+function renderSvg(svg){
+  const old = document.getElementById('zw-svg-host');
+  if(old) old.remove();
+  const host = document.createElement('div');
+  host.id = 'zw-svg-host';
+  host.style.cssText = 'max-width:800px;margin:16px auto;background:var(--card,#141928);border:1px solid var(--border,#2a3450);border-radius:8px;padding:8px;text-align:center';
+  host.innerHTML = '<div style="font-size:12px;color:var(--gold,#c9a84c);margin-bottom:6px">📜 高清盘图（R474 SVG · 可右键保存 / 微信长按分享）</div>' + svg;
+  const grid = document.getElementById('zw-grid');
+  if(grid) grid.parentNode.insertBefore(host, grid);
+}
+
+function renderFlow(flow, targetYear, currentAge){
+  const old = document.getElementById('zw-flow-host');
+  if(old) old.remove();
+  if(!flow) return;
+  const ln = flow.liuNian || {};
+  const xx = flow.xiaoXian || {};
+  const dx = flow.currentDaXian || {};
+  const host = document.createElement('div');
+  host.id = 'zw-flow-host';
+  host.style.cssText = 'max-width:800px;margin:12px auto;padding:12px;background:var(--card,#141928);border:1px solid var(--border,#2a3450);border-radius:8px;font-size:12px;color:var(--paper,#e8dcc8)';
+  host.innerHTML = `
+    <div style="color:var(--gold,#c9a84c);font-weight:600;margin-bottom:8px">🌊 ${targetYear} 流年 · 现年 ${currentAge} 岁</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:11px">
+      <div style="background:rgba(201,168,76,.08);padding:8px;border-radius:6px">
+        <div style="color:var(--gold,#c9a84c)">流年</div>
+        <div>${ln.ganZhi||''}（${ln.shengXiao||''}）</div>
+        <div style="color:var(--paper3);margin-top:2px">${ln.naYin||''}</div>
+      </div>
+      <div style="background:rgba(78,201,176,.08);padding:8px;border-radius:6px">
+        <div style="color:var(--jade,#4ec9b0)">小限</div>
+        <div>${xx.palaceName||''}宫</div>
+        <div style="color:var(--paper3);margin-top:2px">${xx.direction||''}</div>
+      </div>
+      <div style="background:rgba(99,179,237,.08);padding:8px;border-radius:6px">
+        <div style="color:var(--blue,#63b3ed)">大限</div>
+        <div>${dx.startAge||''} - ${dx.endAge||''} 岁</div>
+        <div style="color:var(--paper3);margin-top:2px">${dx.ganZhi||''} · ${dx.palaceName||''}</div>
+      </div>
+    </div>`;
+  const dx0 = document.getElementById('zw-daxian');
+  if(dx0) dx0.parentNode.insertBefore(host, dx0);
+  else document.body.appendChild(host);
 }
 
 // 紫微农历/公历切换
