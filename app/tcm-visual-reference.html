@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TCM 四诊视觉参考 · 命理宝鉴</title>
+<meta name="description" content="四诊视觉参考标准：舌色/面色/手色分类 + 特征描述 + KB 映射，辅助辨证参考。">
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="/static/css/page-header.css">
+<style>
+:root {
+  --bg: #faf8f3; --text: #2a2520; --muted: #6b5e54;
+  --gold: #c9a961; --ok: #5b8c3e; --warn: #c77d20; --accent: #2e86ab; --red: #c0392b;
+  --panel-bg: #fff; --border: #e0d8c8;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'PingFang SC','Noto Serif SC',sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+.topbar {
+  background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff;
+  padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+  position: sticky; top: 0; z-index: 100;
+}
+.topbar h1 { font-size: 20px; font-weight: 300; color: var(--gold); letter-spacing: 2px; }
+.topbar .badge { font-size: 11px; color: rgba(255,255,255,0.5); }
+.content { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
+.section { margin-bottom: 32px; }
+.section h2 { font-size: 20px; color: var(--gold); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--gold); display: inline-block; }
+.section p { color: var(--muted); margin-bottom: 12px; font-size: 14px; }
+
+/* 分类标签 */
+.cat-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.cat-tab {
+  padding: 10px 20px; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--panel-bg); cursor: pointer; font-size: 14px; transition: all 0.2s;
+}
+.cat-tab:hover { border-color: var(--gold); }
+.cat-tab.active { background: var(--gold); color: #fff; border-color: var(--gold); }
+
+/* 参考卡片 */
+.ref-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.ref-card {
+  background: var(--panel-bg); border: 1px solid var(--border); border-radius: 12px;
+  padding: 16px; transition: all 0.2s;
+}
+.ref-card:hover { border-color: var(--gold); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+.ref-card .rc-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.ref-card .rc-icon { font-size: 28px; }
+.ref-card .rc-name { font-size: 15px; font-weight: 600; color: var(--text); }
+.ref-card .rc-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.ref-card .rc-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+.rc-tag { padding: 3px 8px; border-radius: 10px; font-size: 11px; }
+.rc-tag.green { background: rgba(91,140,62,0.1); color: var(--ok); }
+.rc-tag.orange { background: rgba(199,125,32,0.1); color: var(--warn); }
+.rc-tag.blue { background: rgba(46,134,171,0.1); color: var(--accent); }
+.rc-tag.red { background: rgba(192,57,43,0.1); color: var(--red); }
+.rc-tag.gold { background: rgba(201,169,97,0.1); color: var(--gold); }
+
+/* 特征表 */
+.feature-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px; }
+.feature-table th { background: #f5f0e8; color: var(--gold); padding: 8px 12px; text-align: left; border-bottom: 2px solid var(--border); font-weight: 600; }
+.feature-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+.feature-table tr:hover { background: rgba(201,169,97,0.04); }
+.feature-table .kb-ref { font-size: 10px; color: var(--accent); }
+
+/* 入口按钮 */
+.entry-links { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.entry-link {
+  display: inline-block; padding: 8px 16px; border: 1px solid var(--border); border-radius: 8px;
+  text-decoration: none; font-size: 13px; color: var(--text); background: var(--panel-bg); transition: all 0.15s;
+}
+.entry-link:hover { border-color: var(--gold); color: var(--gold); }
+.entry-link.primary { background: var(--gold); color: #fff; border-color: var(--gold); }
+
+/* 边界说明 */
+.boundary {
+  background: linear-gradient(135deg, rgba(201,169,97,0.08), rgba(46,134,171,0.04));
+  border: 1px solid var(--gold); border-radius: 8px; padding: 14px 18px;
+  margin-bottom: 20px; font-size: 13px;
+}
+.boundary b { color: var(--gold); }
+
+@media (max-width: 600px) {
+  .ref-grid { grid-template-columns: 1fr; }
+  .content { padding: 12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <h1>🏥 TCM 四诊视觉参考</h1>
+    <div class="badge">舌诊 · 面诊 · 手诊 · 眼诊 — 特征标准 + KB 映射 · 仅作参考</div>
+  </div>
+  <div class="entry-links" style="margin-top:0">
+    <a class="entry-link primary" href="/camera-capture.html" target="_blank">📸 采集诊疗</a>
+    <a class="entry-link" href="/clinic-consultation.html">🩺 问诊台</a>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- 边界声明 -->
+  <div class="boundary">
+    📌 <b>本项目</b>：只布控 <b>已训练好</b> 的 ONNX 算法（舌/面/手/眼），配合摄像头做诊疗。<br>
+    📌 <b>视觉参考</b>：本页展示四诊特征标准 + KB 映射，帮助使用者看懂 AI 输出的识别结果。<br>
+    🚫 <b>本项目不做</b>：标注数据 / 模型训练 / 数据采集（属 ai-vision-toolkit）
+  </div>
+
+  <!-- 舌诊参考 -->
+  <div class="section" id="sec-tongue">
+    <h2>👅 舌诊参考</h2>
+    <p>舌色 / 舌形 / 苔色 / 苔质 / 舌下络脉 — 特征标准与 KB 映射</p>
+
+    <h3 style="font-size:15px;color:var(--gold);margin:16px 0 8px;">舌色分类</h3>
+    <table class="feature-table">
+      <thead><tr><th>舌色</th><th>特征描述</th><th>中医含义</th><th>KB 映射</th><th>辨证参考</th></tr></thead>
+      <tbody>
+        <tr><td><b>淡白舌</b></td><td>舌质颜色浅于正常淡红</td><td>气血两虚 / 阳虚</td><td class="kb-ref">淡白</td><td class="rc-tag green">虚证</td></tr>
+        <tr><td><b>淡红舌</b></td><td>舌色淡红润泽，正常舌色</td><td>气血调和，健康态</td><td class="kb-ref">淡红</td><td class="rc-tag green">正常</td></tr>
+        <tr><td><b>红舌</b></td><td>舌质鲜红，较淡红为深</td><td>热证（实热/虚热）</td><td class="kb-ref">舌红</td><td class="rc-tag orange">热证</td></tr>
+        <tr><td><b>绛舌</b></td><td>舌质深红，甚至紫暗</td><td>热入营血 / 阴虚火旺</td><td class="kb-ref">绛</td><td class="rc-tag red">重证</td></tr>
+        <tr><td><b>紫舌</b></td><td>舌质青紫或暗紫</td><td>血瘀 / 寒凝 / 气滞</td><td class="kb-ref">紫暗</td><td class="rc-tag red">血瘀</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size:15px;color:var(--gold);margin:16px 0 8px;">舌形 / 苔色 / 苔质</h3>
+    <table class="feature-table">
+      <thead><tr><th>特征</th><th>类型</th><th>特征描述</th><th>辨证参考</th><th>KB 映射</th></tr></thead>
+      <tbody>
+        <tr><td rowspan="2">舌形</td><td>胖大舌</td><td>舌体胖大，边有齿痕</td><td class="rc-tag orange">脾虚湿盛</td><td class="kb-ref">胖大</td></tr>
+        <tr><td>裂纹舌</td><td>舌面有裂纹或沟裂</td><td class="rc-tag orange">阴血亏虚</td><td class="kb-ref">裂纹</td></tr>
+        <tr><td>苔色</td><td>白/黄/灰/黑</td><td>苔色由白→黄→灰→黑 递进</td><td class="rc-tag red">寒→热→寒热夹杂→重证</td><td class="kb-ref">白苔/黄苔/灰苔/黑苔</td></tr>
+        <tr><td>苔质</td><td>薄/厚/润/燥/腻/腐</td><td>薄苔主表 / 厚苔主里 / 腻苔主痰湿</td><td class="rc-tag orange">表/里/痰湿</td><td class="kb-ref">薄苔/厚苔/腻苔</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 面诊参考 -->
+  <div class="section" id="sec-face">
+    <h2>😊 面诊参考</h2>
+    <p>面色五色 / 光泽 / 分区 — 特征标准与 KB 映射（五色主病）</p>
+
+    <table class="feature-table">
+      <thead><tr><th>面色</th><th>特征</th><th>对应脏腑</th><th>病机</th><th>KB 映射</th></tr></thead>
+      <tbody>
+        <tr><td><b>青色</b></td><td>面青 / 唇青 / 目眶青</td><td>肝</td><td class="rc-tag red">寒凝 / 气滞 / 疼痛 / 惊风</td><td class="kb-ref">面青</td></tr>
+        <tr><td><b>赤色</b></td><td>面红 / 颧红 / 目赤</td><td>心</td><td class="rc-tag orange">实热 / 虚热 / 戴阳</td><td class="kb-ref">面赤</td></tr>
+        <tr><td><b>黄色</b></td><td>面黄 / 萎黄 / 黄胖</td><td>脾</td><td class="rc-tag orange">脾虚 / 湿困 / 黄疸</td><td class="kb-ref">面黄</td></tr>
+        <tr><td><b>白色</b></td><td>面白 / 苍白 / 淡白</td><td>肺</td><td class="rc-tag green">气血虚 / 阳虚 / 寒证</td><td class="kb-ref">面白</td></tr>
+        <tr><td><b>黑色</b></td><td>面黑 / 黧黑 / 眼眶黑</td><td>肾</td><td class="rc-tag red">肾虚 / 水饮 / 瘀血</td><td class="kb-ref">面黑</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size:15px;color:var(--gold);margin:16px 0 8px;">面部分区（望诊重点）</h3>
+    <div class="ref-grid">
+      <div class="ref-card">
+        <div class="rc-header"><span class="rc-icon">🧠</span><div><div class="rc-name">额（天庭）</div><div class="rc-sub">对应心</div></div></div>
+        <p style="font-size:12px;color:var(--muted)">额部色泽反映心火盛衰。赤热多心火亢；青黑多心阳不振。</p>
+        <span class="rc-tag blue">KB: 心病于额</span>
+      </div>
+      <div class="ref-card">
+        <div class="rc-header"><span class="rc-icon">🫁</span><div><div class="rc-name">鼻（明堂）</div><div class="rc-sub">对应脾</div></div></div>
+        <p style="font-size:12px;color:var(--muted)">鼻头及鼻翼反映脾胃。鼻头赤为脾胃湿热；鼻头青黑为脾寒痛。</p>
+        <span class="rc-tag orange">KB: 脾病于鼻</span>
+      </div>
+      <div class="ref-card">
+        <div class="rc-header"><span class="rc-icon">🫀</span><div><div class="rc-name">左颊</div><div class="rc-sub">对应肝（左肝右肺）</div></div></div>
+        <p style="font-size:12px;color:var(--muted)">左颊色青主肝病；色赤肝火旺；色白肝虚。</p>
+        <span class="rc-tag red">KB: 肝病于左颊</span>
+      </div>
+      <div class="ref-card">
+        <div class="rc-header"><span class="rc-icon">🌿</span><div><div class="rc-name">右颊</div><div class="rc-sub">对应肺</div></div></div>
+        <p style="font-size:12px;color:var(--muted)">右颊色白主肺虚；色赤肺热；色黑肾虚及肺。</p>
+        <span class="rc-tag green">KB: 肺病于右颊</span>
+      </div>
+      <div class="ref-card">
+        <div class="rc-header"><span class="rc-icon">💧</span><div><div class="rc-name">颏（地阁）</div><div class="rc-sub">对应肾</div></div></div>
+        <p style="font-size:12px;color:var(--muted)">下颌色黑主肾虚水泛；色青肾寒痛。</p>
+        <span class="rc-tag red">KB: 肾病于颏</span>
+      </div>
+      <div class="ref-card">
+        <div class="rc-header"><span class="rc-icon">👁️</span><div><div class="rc-name">目眦</div><div class="rc-sub">对应心（内外眦）</div></div></div>
+        <p style="font-size:12px;color:var(--muted)">目眦赤为心火；目眦淡白为血虚。</p>
+        <span class="rc-tag blue">KB: 心病于目</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 手诊参考 -->
+  <div class="section" id="sec-hand">
+    <h2>✋ 手诊参考</h2>
+    <p>掌色 / 九区 / 指线 / 指甲 — 特征标准与 KB 映射</p>
+
+    <table class="feature-table">
+      <thead><tr><th>部位</th><th>特征</th><th>描述</th><th>辨证参考</th><th>KB 映射</th></tr></thead>
+      <tbody>
+        <tr><td rowspan="2">掌色</td><td>淡红（正常）</td><td>掌色红润有光泽</td><td class="rc-tag green">气血调和</td><td class="kb-ref">掌淡红</td></tr>
+        <tr><td>苍白 / 暗紫 / 萎黄</td><td>血虚 / 血瘀 / 脾虚</td><td class="rc-tag orange">虚/瘀/虚</td><td class="kb-ref">掌苍/紫/黄</td></tr>
+        <tr><td>九区</td><td>1-9区对应脏腑</td><td>1区心 / 2区肺 / 3区脾胃 / 4区肝胆 / 5区肾</td><td class="rc-tag blue">按区辨证</td><td class="kb-ref">手诊分区</td></tr>
+        <tr><td>指线</td><td>生命/智慧/感情/健康线</td><td>线色/深浅/分叉/岛纹/断裂</td><td class="rc-tag orange">线象辨证</td><td class="kb-ref">掌纹辨证</td></tr>
+        <tr><td>指甲</td><td>月牙/苍白/紫暗/脆裂/反甲</td><td>月痕反映气血；甲色反映脏腑</td><td class="rc-tag orange">气血/脏腑</td><td class="kb-ref">指甲辨证</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 眼诊参考 -->
+  <div class="section" id="sec-eye">
+    <h2>👁️ 眼诊参考</h2>
+    <p>眼白 / 眼睑 / 巩膜 — 五轮学说特征标准</p>
+
+    <table class="feature-table">
+      <thead><tr><th>部位（五轮）</th><th>对应脏腑</th><th>特征</th><th>病机</th><th>KB 映射</th></tr></thead>
+      <tbody>
+        <tr><td><b>肉轮</b></td><td>脾</td><td>眼睑颜色 / 浮肿 / 下垂</td><td class="rc-tag orange">脾虚湿困 / 气虚下陷</td><td class="kb-ref">肉轮属脾</td></tr>
+        <tr><td><b>血轮</b></td><td>心</td><td>两眦血络 / 赤脉 / 出血</td><td class="rc-tag red">心火 / 血热</td><td class="kb-ref">血轮属心</td></tr>
+        <tr><td><b>气轮</b></td><td>肺</td><td>白睛赤丝 / 黄疸 / 结节</td><td class="rc-tag green">肺热 / 风热</td><td class="kb-ref">气轮属肺</td></tr>
+        <tr><td><b>风轮</b></td><td>肝</td><td>黑睛星点 / 赤膜 / 内障</td><td class="rc-tag red">肝风 / 肝胆湿热</td><td class="kb-ref">风轮属肝</td></tr>
+        <tr><td><b>水轮</b></td><td>肾</td><td>瞳神散大 / 干涩 / 内障</td><td class="rc-tag orange">肾虚 / 阴虚火旺</td><td class="kb-ref">水轮属肾</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 底部链接 -->
+  <div class="section" style="text-align:center;padding:24px 0;border-top:1px solid var(--border);">
+    <p style="font-size:13px;color:var(--muted);">
+      以上特征标准仅供参考，不构成专业诊断依据。<br>
+      实际辨证请结合临床问诊台，由专业医师判断。
+    </p>
+    <div class="entry-links" style="justify-content:center;margin-top:12px;">
+      <a class="entry-link primary" href="/camera-capture.html" target="_blank">📸 摄像头采集</a>
+      <a class="entry-link" href="/clinic-consultation.html">🩺 临床问诊台</a>
+      <a class="entry-link" href="/kb-graph.html">📚 KB 知识图谱</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

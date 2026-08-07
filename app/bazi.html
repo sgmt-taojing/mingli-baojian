@@ -140,6 +140,7 @@
         <option value="female">女</option>
       </select>
       <input type="number" class="input-field" id="baziLng" placeholder="出生地经度(可选,如116.4)" step="0.1" min="-180" max="180" style="width:180px" aria-label="出生地经度(可选,如116.4)">
+      <input type="number" class="input-field" id="baziTargetYear" placeholder="流年(默认今年)" min="1900" max="2100" style="width:160px" aria-label="流年(默认今年)" title="查流年运势的目标年份">
       <select class="input-field" id="baziZishi" style="width:160px" aria-label="选项baziZishi">
         <option value="normal">子时流派: 不换日</option>
         <option value="late">子时流派: 晚子换日</option>
@@ -798,6 +799,121 @@ async function generateBaziReport(){
 }
 </script>
 <script src="js/flow-engine.js"></script>
+<script>
+// R474-G: 补漏修真 — bazi.html 独立页 computeBazi：真太阳时(lng) + 流年(targetYear) + SVG 盘图
+(function(){
+  var STEMS=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  var GAN_ELE={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
+  var ZHI_ELE={'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+
+  function renderBaziBasic(data, meta){
+    // 四柱：Python 返回 pillars = {年:丙午, 月:甲午, 日:辛巳, 时:丁酉}
+    var pillars = data.pillars || (data.chart && data.chart.pillars) || {};
+    var names = ['年','月','日','时'];
+    for(var i=0;i<4;i++){
+      var gz = pillars[names[i]] || '';
+      var g = gz.charAt(0), z = gz.charAt(1) || '';
+      var ge = document.getElementById('bz'+i+'g');
+      var ze = document.getElementById('bz'+i+'z');
+      var ee = document.getElementById('bz'+i+'e');
+      var ne = document.getElementById('bz'+i+'n');
+      if(ge) ge.textContent = g;
+      if(ze) ze.textContent = z;
+      if(ee) ee.textContent = (GAN_ELE[g]||'') + ' · ' + (ZHI_ELE[z]||'');
+      if(ne) ne.textContent = i===2 ? '日主' : (data.gan_shen ? (data.gan_shen[names[i]]||'') : '');
+    }
+    var nameOut = document.getElementById('baziNameOut');
+    if(nameOut) nameOut.textContent = meta.name + ' 命盘';
+    var metaOut = document.getElementById('baziMetaOut');
+    if(metaOut){
+      var m = '公历'+meta.year+'年'+meta.month+'月'+meta.day+'日 '+meta.hour+'时 · '+(meta.sex==='female'?'女':'男')+'命';
+      if(data.input && data.input.true_solar) m += ' · 真太阳时: ' + data.input.true_solar;
+      if(data.input && data.input.correction) m += ' · ' + data.input.correction;
+      metaOut.textContent = m;
+    }
+    var tags = document.getElementById('baziTagsOut');
+    if(tags && data.day_master) tags.innerHTML = '<span class="rb-tag">'+data.day_master+'</span><span class="rb-tag">'+meta.targetYear+'年流年</span>';
+    var result = document.getElementById('baziResult');
+    if(result){ result.classList.add('visible'); result.style.display = 'block'; }
+  }
+
+  function renderBaziSvg(svg){
+    var old = document.getElementById('bazi-svg-host');
+    if(old) old.remove();
+    if(!svg) return;
+    var host = document.createElement('div');
+    host.id = 'bazi-svg-host';
+    host.style.cssText = 'max-width:800px;margin:16px auto;background:var(--card,#141928);border:1px solid var(--border,#2a3450);border-radius:8px;padding:8px;text-align:center';
+    host.innerHTML = '<div style="font-size:12px;color:var(--gold,#c9a84c);margin-bottom:6px">📜 高清盘图（R474 SVG · 可右键保存 / 微信长按分享）</div>' + svg;
+    var target = document.getElementById('pillarModule') || document.getElementById('baziResult');
+    if(target) target.parentNode.insertBefore(host, target);
+  }
+
+  function renderBaziFlow(flow, targetYear, currentAge){
+    var old = document.getElementById('bazi-flow-host');
+    if(old) old.remove();
+    if(!flow) return;
+    var ln = flow.liuNian || {};
+    var dx = flow.currentDaXian || {};
+    var host = document.createElement('div');
+    host.id = 'bazi-flow-host';
+    host.style.cssText = 'max-width:800px;margin:12px auto;padding:12px;background:var(--card,#141928);border:1px solid var(--border,#2a3450);border-radius:8px;font-size:12px;color:var(--paper,#e8dcc8)';
+    host.innerHTML = `
+      <div style="color:var(--gold,#c9a84c);font-weight:600;margin-bottom:8px">🌊 ${targetYear} 流年 · 现年 ${currentAge} 岁</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-size:11px">
+        <div style="background:rgba(201,168,76,.08);padding:8px;border-radius:6px">
+          <div style="color:var(--gold,#c9a84c)">流年</div>
+          <div>${ln.ganzhi||''}（${ln.ganShen||''}）</div>
+          <div style="color:var(--paper3);margin-top:2px">虚岁 ${ln.age||''} · ${Array.isArray(ln.zhiShen)?ln.zhiShen.join('、'):(ln.zhiShen||'')}</div>
+        </div>
+        <div style="background:rgba(99,179,237,.08);padding:8px;border-radius:6px">
+          <div style="color:var(--blue,#63b3ed)">当前大运</div>
+          <div>${dx.ganzhi||''}（${dx.ganShen||''}）</div>
+          <div style="color:var(--paper3);margin-top:2px">${dx.startAge||''} - ${dx.endAge||''} 岁 · ${dx.startYear||''}年起</div>
+        </div>
+      </div>`;
+    var target = document.getElementById('dayunModule') || document.getElementById('baziResult');
+    if(target) target.parentNode.insertBefore(host, target);
+  }
+
+  window.computeBazi = async function(){
+    try{
+      var name = (document.getElementById('baziName')||{}).value || '有缘人';
+      var dateStr = (document.getElementById('baziDate')||{}).value;
+      var hourVal = (document.getElementById('baziHour')||{}).value;
+      if(!dateStr){ showToast('请输入出生日期'); return; }
+      var parts = dateStr.split('-').map(Number);
+      var year = parts[0], month = parts[1], day = parts[2];
+      var hour = hourVal ? parseInt(hourVal) : 12;
+      var sex = (document.getElementById('baziSex')||{}).value || 'male';
+      var lngEl = document.getElementById('baziLng');
+      var lng = lngEl && lngEl.value ? parseFloat(lngEl.value) : null;
+      var minuteEl = document.getElementById('pf_minute');
+      var minute = minuteEl && minuteEl.value ? parseInt(minuteEl.value) : 0;
+      var tyEl = document.getElementById('baziTargetYear');
+      var targetYear = tyEl && tyEl.value ? parseInt(tyEl.value) : new Date().getFullYear();
+      var currentAge = targetYear - year + 1;
+      var body = { year:year, month:month, day:day, hour:hour, minute:minute, sex:sex, lng:lng, targetYear:targetYear, currentAge:currentAge };
+      showToast('排盘中…');
+      var [r, rSvg] = await Promise.all([
+        fetch(API_BASE+'/api/paipan/calculate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}),
+        fetch(API_BASE+'/api/paipan/calculate/svg',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({}, body, {format:'json'}))})
+      ]);
+      var data = await r.json().catch(function(){ return {ok:false,error:'响应解析失败'}; });
+      if(data.ok === false){ showToast('排盘失败: '+(data.error||'')); return; }
+      var svgJson = await rSvg.json().catch(function(){ return null; });
+      var svg = svgJson && svgJson.svg ? svgJson.svg : '';
+      renderBaziBasic(data, {name:name, year:year, month:month, day:day, hour:hour, sex:sex, targetYear:targetYear});
+      renderBaziSvg(svg);
+      renderBaziFlow(data.flow, targetYear, currentAge);
+      showToast('排盘完成 ✓');
+    }catch(e){
+      console.error('[computeBazi]', e);
+      showToast('排盘失败: '+e.message);
+    }
+  };
+})();
+</script>
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
 </body>
