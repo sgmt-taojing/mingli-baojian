@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 视觉算法布控中心 · 命理宝鉴</title>
+<meta name="description" content="布控中心：舌诊/面诊/手诊/眼诊 四诊 ONNX 算法（来自 ai-vision-toolkit 训练）+ 摄像头实时诊疗 + KB 辨证匹配">
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="/static/css/page-header.css">
+<style>
+:root {
+  --bg: #0a0e14; --panel: #141b22; --border: #1e2836; --text: #b0bec5;
+  --gold: #c9a961; --accent: #39a9db; --ok: #4caf50; --warn: #ff9800;
+  --red: #f44336; --purple: #9c27b0; --pink: #e91e63;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'PingFang SC','Noto Serif SC',sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+
+/* Top Nav */
+.nav { background: var(--panel); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 16px; height: 48px; gap: 4px; }
+.nav .logo { color: var(--gold); font-size: 14px; font-weight: 600; letter-spacing: 2px; margin-right: 20px; white-space: nowrap; }
+.nav-tab { padding: 8px 16px; font-size: 12px; cursor: pointer; border-bottom: 2px solid transparent; color: #546e7a; transition: all 0.15s; white-space: nowrap; }
+.nav-tab:hover { color: var(--text); }
+.nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.nav .spacer { flex: 1; }
+.nav .status-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+.nav .status-dot.on { background: var(--ok); }
+.nav .status-dot.off { background: var(--red); }
+.nav .sys-status { font-size: 10px; color: #546e7a; }
+
+/* Main Layout */
+.main { display: flex; height: calc(100vh - 48px); }
+.sidebar { width: 240px; background: var(--panel); border-right: 1px solid var(--border); overflow-y: auto; padding: 12px; flex-shrink: 0; }
+.content { flex: 1; overflow-y: auto; padding: 20px; }
+@media (max-width: 900px) { .sidebar { display: none; } .content { padding: 10px; } }
+
+/* Sidebar */
+.sidebar h4 { font-size: 10px; color: #546e7a; text-transform: uppercase; letter-spacing: 2px; margin: 16px 0 8px; }
+.sidebar .step { display: block; padding: 8px 10px; font-size: 11px; border-radius: 6px; cursor: pointer; color: var(--text); text-decoration: none; margin-bottom: 2px; }
+.sidebar .step:hover { background: rgba(57,169,219,0.08); }
+.sidebar .step.active { background: rgba(57,169,219,0.12); color: var(--accent); }
+.sidebar .step.active::before { content: '▶ '; }
+.sidebar .step::before { content: '○ '; color: #546e7a; }
+
+/* Cards */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; margin: 16px 0; }
+.card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+.card h3 { font-size: 15px; color: var(--gold); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.card h3 .icon { font-size: 20px; }
+.card p { font-size: 12px; color: #8195a0; margin-bottom: 8px; }
+.card .stat-row { display: flex; gap: 16px; margin: 8px 0; }
+.card .stat-val { font-size: 24px; font-weight: 200; }
+.card .stat-lbl { font-size: 10px; color: #546e7a; margin-top: 2px; }
+
+/* Buttons */
+.btn { display: inline-block; padding: 8px 16px; border-radius: 6px; font-size: 12px; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--text); font-family: inherit; transition: all 0.15s; text-decoration: none; }
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn.primary:hover { opacity: 0.9; }
+.btn.gold { background: var(--gold); color: #fff; border-color: var(--gold); }
+.btn.ok { border-color: var(--ok); color: var(--ok); }
+.btn.warn { border-color: var(--warn); color: var(--warn); }
+.btn.red { border-color: var(--red); color: var(--red); }
+.btn.sm { padding: 4px 10px; font-size: 10px; }
+.btn.lg { padding: 12px 24px; font-size: 14px; }
+
+/* Boundary banner */
+.boundary-banner {
+  background: linear-gradient(135deg, rgba(201,169,97,0.1), rgba(57,169,219,0.05));
+  border: 1px solid var(--gold);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: var(--gold);
+}
+.boundary-banner .b-title { font-weight: 600; font-size: 13px; margin-bottom: 8px; color: var(--gold); }
+.boundary-banner .b-row { color: var(--text); margin: 4px 0; font-size: 12px; }
+.boundary-banner .b-row b { color: var(--ok); }
+
+/* Tags */
+.tag { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 10px; background: rgba(57,169,219,0.12); color: var(--accent); margin: 2px; }
+.tag.ok { background: rgba(76,175,80,0.15); color: var(--ok); }
+.tag.warn { background: rgba(255,152,0,0.15); color: var(--warn); }
+.tag.red { background: rgba(244,67,54,0.15); color: var(--red); }
+.tag.gold { background: rgba(201,169,97,0.15); color: var(--gold); }
+.tag.info { background: rgba(57,169,219,0.12); color: var(--accent); }
+
+/* Tabs */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* Tables */
+table.algo-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.algo-table th { background: var(--bg); color: var(--gold); padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); font-weight: 600; }
+.algo-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text); }
+.algo-table tr:hover { background: rgba(57,169,219,0.05); }
+.algo-table .ok { color: var(--ok); font-weight: 600; }
+.algo-table .warn { color: var(--warn); }
+.algo-table .off { color: var(--red); }
+
+/* Empty state */
+.empty { text-align: center; padding: 40px 20px; color: #546e7a; }
+.empty .icon { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
+
+/* Toast */
+.toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(60px); background: var(--panel); border: 1px solid var(--accent); color: var(--accent); padding: 12px 24px; border-radius: 8px; font-size: 13px; z-index: 999; transition: transform 0.3s; }
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.err { border-color: var(--red); color: var(--red); }
+</style>
+</head>
+<body>
+<div class="nav">
+  <span class="logo">📡 AI 视觉算法布控中心</span>
+  <div class="nav-tab active" data-tab="overview">总览</div>
+  <div class="nav-tab" data-tab="deploy">布控</div>
+  <div class="nav-tab" data-tab="capture">采集中转</div>
+  <div class="nav-tab" data-tab="kb">KB 辨证</div>
+  <div class="spacer"></div>
+  <span class="sys-status"><span class="status-dot on" id="dot-8920"></span>API 网关 8920</span>
+</div>
+
+<div class="main">
+  <!-- 侧边栏：本项目布控入口 -->
+  <aside class="sidebar">
+    <h4>📡 本项目能力</h4>
+    <a class="step" href="/camera-capture.html">📸 摄像头采集诊疗</a>
+    <a class="step" href="/clinic-consultation.html">🩺 临床问诊台</a>
+    <a class="step" href="/face-diagnosis.html">😊 面诊</a>
+    <a class="step" href="/tongue-diagnosis.html">👅 舌诊</a>
+    <a class="step" href="/hand-diagnosis.html">✋ 手诊</a>
+    <a class="step" href="/eye-diagnosis.html">👁️ 眼诊</a>
+    <a class="step" href="/kb-graph.html">📚 KB 知识图谱</a>
+
+    <h4>🔗 训练归属（其他项目）</h4>
+    <div style="font-size:10px;color:#546e7a;padding:8px 10px;line-height:1.6">
+      模型训练由 <b style="color:var(--gold)">ai-vision-toolkit</b> 项目负责。<br>
+      本页面只布控训练好的 ONNX 算法。
+    </div>
+
+    <h4>📍 边界</h4>
+    <div style="font-size:10px;color:#546e7a;padding:8px 10px;line-height:1.6">
+      ✅ 本项目：布控 / 诊疗 / KB<br>
+      ❌ 跨项目：算法训练 / 数据标注 / 模型部署
+    </div>
+  </aside>
+
+  <!-- 主内容 -->
+  <main class="content">
+    <!-- 总览 Tab -->
+    <div class="tab-panel active" id="tab-overview">
+      <h2 style="color:var(--gold);margin-bottom:16px;">📡 视觉算法布控总览</h2>
+
+      <!-- 项目边界声明 -->
+      <div class="boundary-banner">
+        <div class="b-title">⚖️ 项目边界声明</div>
+        <div class="b-row">📌 <b>本项目（mingli-baojian）</b>：布控中心 — 调用 <b>已训练好</b> 的 ONNX 视觉算法，配合摄像头做诊疗</div>
+        <div class="b-row">🚫 <b>本项目不做</b>：模型训练 / 数据标注 / 爬虫采集 / AutoML（属 ai-vision-toolkit）</div>
+        <div class="b-row">🔗 <b>算法来源</b>：舌诊 / 面诊 / 手诊 / 眼诊 4 类 ONNX 模型，由 ai-vision-toolkit 训练 → ONNX 导出 → 推送到 <b>本项目</b> 布控</div>
+      </div>
+
+      <div class="card-grid">
+        <div class="card">
+          <h3><span class="icon">📡</span>已布控算法</h3>
+          <div class="stat-row"><div><div class="stat-val" style="color:var(--accent);" id="ov-deployed">4</div><div class="stat-lbl">个 ONNX</div></div></div>
+          <button class="btn primary sm" onclick="switchTab('deploy')">管理布控 →</button>
+        </div>
+        <div class="card">
+          <h3><span class="icon">📸</span>摄像头诊疗</h3>
+          <div class="stat-row"><div><div class="stat-val" style="color:var(--ok);" id="ov-cameras">—</div><div class="stat-lbl">在线</div></div></div>
+          <a class="btn ok sm" href="/camera-capture.html" target="_blank">打开采集页 →</a>
+        </div>
+        <div class="card">
+          <h3><span class="icon">🩺</span>临床问诊</h3>
+          <div class="stat-row"><div><div class="stat-val" style="color:var(--gold);" id="ov-cases">—</div><div class="stat-lbl">案例</div></div></div>
+          <a class="btn gold sm" href="/clinic-consultation.html">问诊台 →</a>
+        </div>
+        <div class="card">
+          <h3><span class="icon">📚</span>知识库</h3>
+          <div class="stat-row"><div><div class="stat-val" style="color:var(--gold);" id="ov-kb-total">—</div><div class="stat-lbl">条 / 153 模块</div></div></div>
+          <button class="btn gold sm" onclick="switchTab('kb')">KB 辨证 →</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px;">
+        <h3>🔄 布控链路（端到端）</h3>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:11px;color:#8195a0;padding:10px 0;">
+          <span class="tag info">🎥 摄像头采集</span>→<span class="tag ok">📷 质量预检</span>→<span class="tag info">🧠 ONNX 推理（已训练算法）</span>→<span class="tag ok">📋 结构化特征</span>→<span class="tag gold">📚 KB 辨证匹配</span>→<span class="tag warn">🩺 临床问诊台复核</span>→<span class="tag" style="background:rgba(76,175,80,0.15);color:var(--ok)">✅ 诊疗报告</span>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:#546e7a;">
+          📦 ONNX 模型从 <b style="color:var(--gold)">ai-vision-toolkit</b> 同步到本项目的 <code>models/onnx/</code> 目录 → 由 face-ocr-server (8913) 加载并推理
+        </div>
+      </div>
+    </div>
+
+    <!-- 布控 Tab -->
+    <div class="tab-panel" id="tab-deploy">
+      <h2 style="color:var(--gold);margin-bottom:16px;">📡 已布控算法清单</h2>
+
+      <div class="boundary-banner">
+        <div class="b-row">💡 本表展示 <b>已部署</b> 到本项目的 ONNX 算法。这些算法由 ai-vision-toolkit 训练并推送过来，<b>本页面只读</b>，不修改。</div>
+      </div>
+
+      <table class="algo-table" id="algo-table">
+        <thead>
+          <tr>
+            <th>算法 ID</th>
+            <th>类型</th>
+            <th>模型来源</th>
+            <th>版本</th>
+            <th>精度</th>
+            <th>状态</th>
+            <th>推理端口</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>ALG-070</b></td>
+            <td>面诊</td>
+            <td>ai-vision-toolkit</td>
+            <td>v1.0</td>
+            <td class="ok">— </td>
+            <td><span class="tag ok">已布控</span></td>
+            <td>8913 / face-ocr-server</td>
+          </tr>
+          <tr>
+            <td><b>ALG-071</b></td>
+            <td>舌诊</td>
+            <td>ai-vision-toolkit</td>
+            <td>v1.0</td>
+            <td class="ok">—</td>
+            <td><span class="tag ok">已布控</span></td>
+            <td>8913 / face-ocr-server</td>
+          </tr>
+          <tr>
+            <td><b>ALG-072</b></td>
+            <td>眼诊</td>
+            <td>ai-vision-toolkit</td>
+            <td>v1.0</td>
+            <td class="ok">—</td>
+            <td><span class="tag ok">已布控</span></td>
+            <td>8913 / face-ocr-server</td>
+          </tr>
+          <tr>
+            <td><b>ALG-080</b></td>
+            <td>手诊</td>
+            <td>ai-vision-toolkit</td>
+            <td>v1.0</td>
+            <td class="ok">—</td>
+            <td><span class="tag ok">已布控</span></td>
+            <td>8913 / face-ocr-server</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="card" style="margin-top:16px;">
+        <h3>🩺 布控入口（实际可用的诊疗页）</h3>
+        <p style="font-size:12px;color:#8195a0;">点击进入对应诊疗页（这些页面调用上面的 ONNX 算法）：</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+          <a class="btn primary" href="/clinic-consultation.html">🩺 临床问诊台（四诊合参）</a>
+          <a class="btn ok" href="/face-diagnosis.html">😊 面诊</a>
+          <a class="btn warn" href="/tongue-diagnosis.html">👅 舌诊</a>
+          <a class="btn" href="/eye-diagnosis.html">👁️ 眼诊</a>
+          <a class="btn gold" href="/hand-diagnosis.html">✋ 手诊</a>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px;">
+        <h3>🔍 实时状态检查</h3>
+        <p style="font-size:12px;color:#8195a0;">检查 face-ocr-server (8913) 加载的 ONNX 模型：</p>
+        <button class="btn primary" onclick="checkAlgoStatus()">🔄 检查算法状态</button>
+        <div id="algo-status" style="margin-top:12px;font-size:11px;color:#8195a0;"></div>
+      </div>
+    </div>
+
+    <!-- 采集中转 Tab -->
+    <div class="tab-panel" id="tab-capture">
+      <h2 style="color:var(--gold);margin-bottom:16px;">📸 摄像头采集中转</h2>
+
+      <div class="boundary-banner">
+        <div class="b-row">📌 摄像头采集 → ONNX 推理（已训练）→ KB 辨证匹配 → 诊疗报告，全部在 <b>本项目</b> 闭环</div>
+      </div>
+
+      <div class="card-grid">
+        <div class="card">
+          <h3>📷 单张拍摄</h3>
+          <p>用摄像头拍摄舌头/面部/手掌/眼睛单张照片</p>
+          <a class="btn primary" href="/camera-capture.html" target="_blank">📸 打开拍照页</a>
+          <p style="margin-top:8px;font-size:10px;color:#546e7a;">支持自然光检测、质量预检（不在本项目训练）</p>
+        </div>
+        <div class="card">
+          <h3>🎥 视频流</h3>
+          <p>USB 摄像头或 RTSP 流持续采集</p>
+          <a class="btn warn" href="/clinic-consultation.html">🩺 临床问诊台（视频采集）</a>
+        </div>
+        <div class="card">
+          <h3>📐 采集质量标准</h3>
+          <p>自然光 / 无美颜 / 无滤镜 / 无妆容 / 无遮挡 / 无逆光 / 无模糊</p>
+          <a class="btn ok sm" href="/docs/MEDIA_LIBRARY_STANDARDS.html" target="_blank">查看采集标准 V1.0 →</a>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px;">
+        <h3>📷 最近采集照片（localStorage）</h3>
+        <div id="recent-captures" style="font-size:12px;color:#8195a0;">读取中...</div>
+      </div>
+    </div>
+
+    <!-- KB 辨证 Tab -->
+    <div class="tab-panel" id="tab-kb">
+      <h2 style="color:var(--gold);margin-bottom:16px;">📚 KB 辨证匹配</h2>
+
+      <div class="boundary-banner">
+        <div class="b-row">📌 ONNX 算法输出结构化特征 → 喂给 KB FTS5 → 拉回辨证条目 → 给临床问诊台</div>
+      </div>
+
+      <div class="card">
+        <h3>🔍 知识搜索</h3>
+        <div style="display:flex;gap:8px;margin:12px 0;">
+          <input id="kb-search-input" placeholder="输入症状或关键词（如：淡白舌、齿痕、肝郁）" style="flex:1;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:6px;font-size:13px;">
+          <button class="btn primary" onclick="searchKB()">搜索</button>
+        </div>
+        <div id="kb-results" style="font-size:12px;color:#8195a0;">输入关键词搜索 KB 知识库...</div>
+      </div>
+
+      <div class="card" style="margin-top:12px;">
+        <h3>📊 KB 统计</h3>
+        <div id="kb-stats" style="font-size:12px;">
+          <span class="tag info">加载中...</span>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════ Navigation ═══════════
+function switchTab(name) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.nav-tab[data-tab="${name}"]`)?.classList.add('active');
+  document.getElementById(`tab-${name}`)?.classList.add('active');
+  if (name === 'overview') loadOverview();
+  if (name === 'kb') loadKBStats();
+}
+
+document.querySelectorAll('.nav-tab').forEach(tab => {
+  tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+});
+
+// ═══════════ Toast ═══════════
+function toast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'toast ' + (type||'');
+  setTimeout(() => el.classList.add('show'), 10);
+  setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+// ═══════════ 总览数据加载 ═══════════
+async function loadOverview() {
+  // KB 总数
+  try {
+    const r = await fetch('http://127.0.0.1:8920/api/kb/stats');
+    const d = await r.json();
+    if (d.code === 0 || d.ok) {
+      const stats = d.data || {};
+      document.getElementById('ov-kb-total').textContent = stats.total || '—';
+    }
+  } catch(e) {}
+
+  // 最近采集
+  try {
+    const keys = Object.keys(localStorage).filter(k => k.startsWith('face-capture-'));
+    document.getElementById('recent-captures').innerHTML = 
+      keys.length ? `共 ${keys.length} 张本地存档` : '暂无本地采集存档';
+  } catch(e) {}
+}
+
+// ═══════════ KB 搜索 ═══════════
+async function searchKB() {
+  const q = document.getElementById('kb-search-input').value.trim();
+  if (!q) return;
+  const out = document.getElementById('kb-results');
+  out.textContent = '搜索中...';
+  try {
+    const r = await fetch(`http://127.0.0.1:8920/api/kb/search?q=${encodeURIComponent(q)}&limit=5`);
+    const d = await r.json();
+    if (d.data && d.data.length) {
+      out.innerHTML = d.data.map(item => `
+        <div class="card" style="margin-bottom:8px;border-left:3px solid var(--gold)">
+          <div style="font-weight:600;font-size:13px;">${item.summary || item.title || '条目'}</div>
+          <div style="font-size:11px;color:#8195a0;margin-top:4px;">${(item.content||'').slice(0,200)}...</div>
+          <div style="margin-top:6px;"><span class="tag gold">${item.module || '中医'}</span><span class="tag info">trust=${item.trust_score || '—'}</span></div>
+        </div>
+      `).join('');
+    } else {
+      out.textContent = '未找到匹配的知识条目';
+    }
+  } catch(e) {
+    out.textContent = '⚠️ KB API 未连接（127.0.0.1:8920）';
+  }
+}
+
+async function loadKBStats() {
+  try {
+    const r = await fetch('http://127.0.0.1:8920/api/kb/stats');
+    const d = await r.json();
+    if (d.code === 0 || d.ok) {
+      const s = d.data || {};
+      document.getElementById('kb-stats').innerHTML = `
+        <span class="tag info">总计: ${s.total || '—'} 条</span>
+        <span class="tag gold">${s.modules || '—'} 模块</span>
+        <span class="tag ok">avg_trust: ${s.avg_trust || '—'}</span>
+        <span class="tag info">分级: ${s.grade || 'A+'}</span>
+      `;
+    }
+  } catch(e) {
+    document.getElementById('kb-stats').innerHTML = '<span class="tag warn">KB API 未连接</span>';
+  }
+}
+
+// ═══════════ 算法状态检查（只读） ═══════════
+async function checkAlgoStatus() {
+  const out = document.getElementById('algo-status');
+  out.textContent = '🔄 检查 face-ocr-server...';
+  try {
+    // 8913 face-ocr-server 健康检查
+    const r1 = await fetch('http://127.0.0.1:8913/health').catch(() => null);
+    const r2 = await fetch('http://127.0.0.1:8913/api/onnx/list').catch(() => null);
+    let lines = [];
+    lines.push(`• face-ocr-server (8913): ${r1 && r1.ok ? '✅ 运行中' : '❌ 未连接'}`);
+    if (r2 && r2.ok) {
+      const d = await r2.json();
+      lines.push(`• 已加载 ONNX: ${d.models ? d.models.length : 0} 个`);
+      if (d.models) {
+        d.models.forEach(m => {
+          lines.push(`  - ${m.name || m.id} (${m.task || m.type || '?'}) ${m.status === 'loaded' ? '✅' : '⚠️'}`);
+        });
+      }
+    }
+    out.innerHTML = lines.join('<br>');
+  } catch(e) {
+    out.textContent = '❌ 检查失败：' + e.message;
+  }
+}
+
+// ═══════════ 启动 ═══════════
+async function init() {
+  // 检查服务
+  try {
+    const r = await fetch('http://127.0.0.1:8920/api/health');
+    if (r.ok) {
+      document.getElementById('dot-8920').classList.add('on');
+    }
+  } catch(e) {
+    document.getElementById('dot-8920').classList.remove('on');
+    document.getElementById('dot-8920').style.background = 'var(--red)';
+  }
+
+  loadOverview();
+}
+
+init();
+</script>
+</body>
+</html>

@@ -125,3 +125,18 @@ node_modules/
 training/mlx-checkpoints/
 training/models/
 training/checkpoints/
+
+# R491: 训练数据备份（防误带入库）
+data/*_backup*.json
+data/private-*.json
+data/private-*.jsonl
+data/augment-*.jsonl
+data/mingli_sft_train_augment.json
+data/mingli_sft_tcm.json
+
+# R491: ONNX 视觉模型（大文件，运行时按需下载）
+models/*.onnx
+
+# R491: 蒸馏结果快照（运行时动态生成）
+server/kb/
+distillery/benchmark-*.md
