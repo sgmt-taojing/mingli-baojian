@@ -29,6 +29,14 @@
 <link rel="stylesheet" href="css/flow-engine.css">
 <link rel="stylesheet" href="css/page-header.css">
 <link rel="stylesheet" href="css/tokens.css">
+<style>
+.toast-msg{position:fixed;top:20px;right:20px;z-index:9999;padding:12px 20px;border-radius:8px;color:#fff;font-size:14px;opacity:0;transition:opacity .3s;max-width:360px;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+.toast-msg.show{opacity:1}
+.toast-msg.success{background:#2d7a46}
+.toast-msg.error{background:#c0392b}
+.toast-msg.info{background:#2c3e50}
+</style>
+<script>function showToast(msg,type){type=type||'info';var t=document.createElement('div');t.className='toast-msg '+type;t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.classList.add('show')},10);setTimeout(function(){t.classList.remove('show');setTimeout(function(){t.remove()},300)},3500)}</script>
 </head>
 <body class="theme-ops">
 <!-- R504: 新诊疗中心入口 -->
@@ -313,7 +321,24 @@
 </section>
 
 <!-- 2. 知识库管理 -->
-<section id="section-knowledge" class="section">
+<!-- R505c: R502 CRUD 管理面板（用户偏好/收藏/搜索历史） -->
+  <section class="section">
+    <div class="section-header">
+      <h2>⚙️ R502 CRUD 管理面板</h2>
+      <p>用户偏好 / 收藏 / 搜索历史 / 动态配置 — 实时 CRUD</p>
+    </div>
+    <div style="display:flex;gap:8px;margin:8px 0">
+      <button class="btn btn-outline" onclick="loadUserPreferences()">查 偏好</button>
+      <button class="btn btn-outline" onclick="loadUserFavorites()">★ 收藏</button>
+      <button class="btn btn-outline" onclick="loadSearchHistory()">🔍 历史</button>
+      <button class="btn btn-outline" onclick="loadConfig()">动态配置</button>
+      <button class="btn btn-outline" onclick="loadAllR502Stats()">总览</button>
+    </div>
+    <div id="r502Stats" style="background:rgba(201,168,76,.06);padding:12px;border-radius:8px;margin:8px 0;font-size:13px"></div>
+    <div id="r502List"></div>
+  </section>
+
+  <section id="section-knowledge" class="section">
   <div class="section-header">
     <h2>知识库管理</h2>
     <p>16领域知识库统计 · 卡片数 · 总字符数 · 达标率</p>
@@ -590,5 +615,83 @@
 }
 @media print{body{background:#fff!important;color:#000!important}nav,.nav-bar,.mobile-nav,.sidebar,.no-print,.page-header-bar{display:none!important}main,.container,.card,.wrap,.admin-main{width:100%!important;max-width:100%!important;margin:0!important;padding:8px!important}button,.btn,.action-btn,.tab-btn{display:none!important}table{width:100%!important;font-size:11px!important}h1{font-size:16px!important}h2{font-size:14px!important}h3{font-size:12px!important}.card{box-shadow:none!important;border:1px solid #ddd!important;page-break-inside:avoid}a{color:#000!important;text-decoration:none!important}a[href^="http"]:after{content:" (" attr(href) ")";font-size:10px;color:#666}}
 </style>
-</body>
+
+  <!-- R505b AI 语音助手 -->
+  <div id="ai-assistant-mount"></div>
+  <script src="js/ai-voice-assistant.js" defer></script>
+
+  <!-- R505c: R502 CRUD 管理面板调用脚本 -->
+  <script>
+    const R502_API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:8920' : '';
+    const R502_USER_ID = (() => { try { return localStorage.getItem('yuanzhu_id') || 'admin_demo'; } catch (e) { return 'admin_demo'; } })();
+
+    function r502ListCard(title, items, type) {
+      const escape = s => String(s || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+      if (!items || !items.length) return '<div style="padding:8px;color:rgba(255,255,255,.4);font-size:12px">暂无数据</div>';
+      return '<div style="margin:8px 0;background:rgba(255,255,255,.04);padding:12px;border-radius:8px">' +
+        '<h3 style="margin:0 0 8px 0;font-size:14px">' + escape(title) + ' (' + items.length + ')</h3>' +
+        items.slice(0, 20).map(it => {
+          const data = JSON.stringify(it).replace(/'/g, '&apos;');
+          const delBtn = '<button class="btn btn-outline" style="padding:2px 8px;font-size:11px" onclick="r502Delete(\'' + type + '\',\'' + escape(it.id || it.user_id || it.key || '') + '\')">删</button>';
+          return '<div style="display:flex;gap:8px;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:12px">' +
+            '<span style="flex:1;color:rgba(255,255,255,.7)">' + escape(JSON.stringify(it).slice(0, 200)) + '</span>' +
+            delBtn + '</div>';
+        }).join('') + '</div>';
+    }
+
+    function r502Delete(type, id) {
+      if (!confirm('确认删除？')) return;
+      const url = type === 'favorites' ? R502_API + '/api/user/favorites/' + encodeURIComponent(id) :
+                  type === 'preferences' ? R502_API + '/api/user/preferences/' + encodeURIComponent(id) :
+                  type === 'history' ? R502_API + '/api/user/search-history/' + encodeURIComponent(id) :
+                  R502_API + '/api/public/config/' + encodeURIComponent(id);
+      fetch(url, { method: 'DELETE' }).then(r => r.json()).then(d => {
+        if (d.ok) { showToast('已删除', 'success'); setTimeout(() => location.reload(), 800); } else { showToast('失败: ' + (d.error || '未知错误'), 'error'); }
+      }).catch(e => showToast('错误: ' + e.message, 'error'));
+    }
+
+    async function loadUserPreferences() {
+      const r = await fetch(R502_API + '/api/user/preferences?user_id=' + R502_USER_ID);
+      const d = await r.json();
+      document.getElementById('r502Stats').innerHTML = '📋 偏好: ' + d.count + ' 条 · 用户=' + R502_USER_ID;
+      document.getElementById('r502List').innerHTML = r502ListCard('用户偏好', d.preferences || [], 'preferences');
+    }
+    async function loadUserFavorites() {
+      const r = await fetch(R502_API + '/api/user/favorites?user_id=' + R502_USER_ID);
+      const d = await r.json();
+      document.getElementById('r502Stats').innerHTML = '★ 收藏: ' + d.count + ' 条';
+      document.getElementById('r502List').innerHTML = r502ListCard('收藏', d.favorites || [], 'favorites');
+    }
+    async function loadSearchHistory() {
+      const r = await fetch(R502_API + '/api/user/search-history?user_id=' + R502_USER_ID);
+      const d = await r.json();
+      document.getElementById('r502Stats').innerHTML = '🔍 历史: ' + d.count + ' 条';
+      document.getElementById('r502List').innerHTML = r502ListCard('搜索历史', d.history || [], 'history');
+    }
+    async function loadConfig() {
+      const r = await fetch(R502_API + '/api/public/config');
+      const d = await r.json();
+      document.getElementById('r502Stats').innerHTML = '⚙️ 配置: ' + d.count + ' 项';
+      document.getElementById('r502List').innerHTML = r502ListCard('系统配置', d.configs || [], 'config');
+    }
+    async function loadAllR502Stats() {
+      const [p, f, h, c] = await Promise.all([
+        fetch(R502_API + '/api/user/preferences?user_id=' + R502_USER_ID).then(r => r.json()),
+        fetch(R502_API + '/api/user/favorites?user_id=' + R502_USER_ID).then(r => r.json()),
+        fetch(R502_API + '/api/user/search-history?user_id=' + R502_USER_ID).then(r => r.json()),
+        fetch(R502_API + '/api/public/config').then(r => r.json()),
+      ]);
+      document.getElementById('r502Stats').innerHTML =
+        '<b>R502 总览</b> · 偏好 ' + (p.count||0) + ' · 收藏 ' + (f.count||0) + ' · 搜索历史 ' + (h.count||0) + ' · 配置 ' + (c.count||0);
+      document.getElementById('r502List').innerHTML =
+        r502ListCard('偏好', p.preferences, 'preferences') +
+        r502ListCard('收藏', f.favorites, 'favorites') +
+        r502ListCard('搜索历史', h.history, 'history') +
+        r502ListCard('配置', c.configs, 'config');
+    }
+
+    // 默认加载总览
+    setTimeout(() => { try { loadAllR502Stats(); } catch(e){} }, 500);
+  </script>
+  </body>
 </html>

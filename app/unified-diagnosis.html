@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/unified-diagnosis.html">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=5.0">
 <meta name="theme-color" content="#0a1628">
 <meta name="robots" content="noindex,nofollow">
@@ -526,7 +527,7 @@ function setupWSClient() {
     const ws = new WebSocket(wsUrl);
     ws.onopen = () => {
       try { ws.send(JSON.stringify({ type: 'register', role: 'doctor' })); } catch(e){}
-      console.log('[R505] WS connected (unified-diagnosis)');
+      // WS 连接成功 (unified-diagnosis)
     };
     ws.onmessage = (evt) => {
       try {
@@ -1063,7 +1064,7 @@ function savePrescription() {
   });
   if (reports.length > 50) reports.length = 50;
   localStorage.setItem('unified_diag_reports', JSON.stringify(reports));
-  console.log('[处方] 已保存'); showNotification('处方已保存', 'success');
+  showNotification('处方已保存', 'success');
 }
 
 function finalizePrescription() {
@@ -1108,7 +1109,7 @@ async function submitFeedback(rx) {
         ind.style.color = 'var(--jade)';
         ind.style.display = 'block';
       }
-      console.log('[R507] Feedback recorded:', data);
+      // R507 反馈已记录
     }
   } catch (e) {
     console.warn('[R507] feedback failed:', e);
@@ -1215,10 +1216,13 @@ async function connectWearable(type) {
 }
 function startWearableMock() {
   if (wearableInterval) clearInterval(wearableInterval);
+  var mockTick = 0;
   wearableInterval = setInterval(() => {
-    const hr = Math.floor(60 + Math.random() * 30);
-    const sp = Math.floor(95 + Math.random() * 4);
-    const tp = (36.0 + Math.random() * 1.5).toFixed(1);
+    mockTick++;
+    // 确定性模拟生理数据（基于时间序列，非 Math.random）
+    var hr = Math.floor(72 + Math.sin(mockTick * 0.3) * 8);
+    var sp = Math.floor(97 + Math.cos(mockTick * 0.5) * 1);
+    var tp = (36.5 + Math.sin(mockTick * 0.1) * 0.3).toFixed(1);
     document.getElementById('wsHR').textContent = '心率 ' + hr;
     document.getElementById('wsSpO2').textContent = '血氧 ' + sp;
     document.getElementById('wsTemp').textContent = '体温 ' + tp + '°C';
@@ -1244,12 +1248,12 @@ function addFollowup() {
 function viewHistory() {
   const name = document.getElementById('pName').value;
   const reports = JSON.parse(localStorage.getItem('unified_diag_reports') || '[]');
-  if (reports.length === 0) { console.log('[历史] 暂无报告'); showNotification('暂无历史报告', 'info'); return; }
+  if (reports.length === 0) { showNotification('暂无历史报告', 'info'); return; }
   let html = '本机历史处方 (最多 50 条)：\n\n';
   reports.slice(0, 10).forEach((r, i) => {
     html += `[${i+1}] ${new Date(r.ts).toLocaleString('zh-CN')} - ${r.patient}\n${r.rx.substring(0,100)}...\n\n`;
   });
-  console.log('[历史] 报告', html); showNotification(html, 'info');
+  showNotification(html, 'info');
 }
 function renderTimeline(name, items) {
   document.getElementById('trackingCard').style.display = 'block';

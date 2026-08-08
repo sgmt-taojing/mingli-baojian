@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/master-workstation.html">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=5.0">
 <meta name="theme-color" content="#0a1628">
 <meta name="robots" content="noindex,nofollow">
@@ -255,7 +256,7 @@ function setupRealtimeClient() {
       connected = true;
       try { ws.send(JSON.stringify({ type: 'register', role: 'master' })); } catch(e){}
       setConn(true, '实时推送 · WS');
-      console.log('[R505] WS connected, registered as master');
+      // WS 连接成功，已注册为大师
     };
     ws.onmessage = (evt) => {
       try {
@@ -542,7 +543,7 @@ function saveAnnotation() {
   const ann = document.getElementById('annotation').value;
   if (!ann) return;
   localStorage.setItem('master_draft_' + state.currentCase, ann);
-  console.log('[草稿] 已保存'); showToast('草稿已保存', 'success');
+  showToast('草稿已保存', 'success');
 }
 
 function markReviewed() {

@@ -225,8 +225,8 @@ function triggerKbBridge(mode, blob) {
   if (typeof window.recordKbHit === 'function') {
     window.recordKbHit(module, 0.8, true);
   }
-  // 顶顶 console.log 供调试
-  if (window.console && console.log) console.warn(`[R63] 拍照联动KB: ${cap} → ${module}`);
+  // 调试日志（已关闭）
+  // if (window.console) console.warn(`[R63] 拍照联动KB: ${cap} → ${module}`);
 }
 
 function showInStage(url) {
