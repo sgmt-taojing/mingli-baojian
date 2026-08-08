@@ -893,6 +893,13 @@ async function typing(){
 }
 
 async function generateReport(){
+  /* R520: 推理链可视化 — 4 步工作流 */
+  try {
+    _agentStep('① 归集要素', 'active', '收集用户信息…');
+    _agentStep('② 检索知识库', 'pending', '');
+    _agentStep('③ 多维推断', 'pending', '');
+    _agentStep('④ 撰写报告', 'pending', '');
+  } catch(_e){}
   try{ _recordRecentMod(state.module); }catch(e){console.warn("报告降级:",e.message);}
   // R89-M 缘主档案召回：报告前捕获
   try{
@@ -1024,7 +1031,8 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
   } catch(e){ console.warn('_MODULE_REPORTS diagnose err', e); }
 }
 
-// ① KB 优先：先查本地知识库
+/* R520: ② 检索知识库 */
+  try { _agentStep('① 归集要素', 'done', Object.keys(state.data||{}).length + ' 字段'); _agentStep('② 检索知识库', 'active', '匹配同类案例'); } catch(_e){}
   let kbHit = _kbScore(state.module, state.data);
   if (kbHit.fallback) {
     // 异步走服务端 /api/public/kb-query fallback
@@ -1163,11 +1171,13 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
     if (typeof recordKbHit === 'function') {
       recordKbHit(state.module, kbHit.score, kbHit.score >= 0.7);
     }
+    try { _agentStep('② 检索知识库', 'done', kbHit.score >= 0.7 ? '直答命中 ' + kbHit.score.toFixed(2) : '命中 ' + kbHit.score.toFixed(2)); } catch(_e){}
   } else {
     // < 0.4 纯 AI 兜底：记事件作为命中率分母
     if (typeof recordKbHit === 'function') {
       recordKbHit(state.module, kbHit.score || 0, false);
     }
+    try { _agentStep('② 检索知识库', 'warn', '低命中，转AI推断'); } catch(_e){}
   }
   // 问卷 + 排盘结果落库（公开端点，失败静默）
   _saveSurvey(state.module, state.data, _baziForSave);
@@ -1177,6 +1187,7 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
     const kbReport = '【来源：本地知识库（'+kbHit.source+' · '+kbHit.entryId+'，命中分 '+kbHit.score+'）】\n\n' + kbHit.snippet.substring(0, 4000);
     showReport(kbReport, {score: kbHit.score, source: kbHit.source, engine: kbHit.engine || 'fts5', fallback: kbHit.fallback || false});
     autoSavePaipan(kbReport);
+    try { _agentStep('③ 多维推断', 'done'); _agentStep('④ 撰写报告', 'done', 'KB直答'); } catch(_e){}
     return;
   }
 
@@ -1202,16 +1213,110 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
     } catch(e){ console.warn('[R51 fallback]', e); }
   }
 
-  // ③ 调用后端 AI
+  // ③ 调用后端 AI — P0-A: SSE 流式输出
   const prompt='用户选择了「'+mod.name+'」模块，通过对话收集了以下信息：'+collected.join('；')+'。请基于以上信息给出专业、丰富、详实的分析评估报告，报告要拿来即用，包含具体建议。'+promptExtra;
   // 把用户结构化数据（八字/姓名/数字/生辰...）作为 baziData 传给后端，让 AI 能基于真实数据回答而非通用模板
   const baziData = (state.module==='bazi' || state.module==='name' || state.module==='number' || state.module==='face') ? state.data : null;
 
+  // P0-C: 先创建流式 AI 气泡（用于逐字输出）
+  const streamBubble = document.createElement('div');
+  streamBubble.className = 'msg m-ai shimmering';
+  streamBubble.innerHTML = '<div class="b"></div><div class="stream-cursor">▍</div>';
+  chat.appendChild(streamBubble);
+  chat.scrollTop = chat.scrollHeight;
+  const streamContentEl = streamBubble.querySelector('.b');
+
   try{
-    var _ac=new AbortController();var _to=setTimeout(function(){_ac.abort();},15000);var r;try{r=await fetch(API+'/api/ai/public-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[...hist.slice(-8),{role:'user',content:prompt}], baziData}),signal:_ac.signal});clearTimeout(_to);}catch(e){clearTimeout(_to);console.warn('AI fetch 超时或失败:',e.message);return localReport(state.module,state.data);}
-    const d=await r.json();
-    const reply=(d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||'';
-    if(reply.length>50){
+    const _ac = new AbortController();
+    const _to = setTimeout(function(){ _ac.abort(); }, 60000);  // 流式超时 60s
+    /* R520: ③ 多维推断 — 开始 AI 分析 */
+    try { _agentStep('③ 多维推断', 'active', '正在分析格局趋势…'); } catch(_e){}
+    let r;
+    try {
+      r = await fetch(API + '/api/ai/public-chat?stream=1', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'text/event-stream' },
+        body: JSON.stringify({ messages: [...hist.slice(-8), {role:'user', content:prompt}], baziData, stream: true }),
+        signal: _ac.signal
+      });
+      clearTimeout(_to);
+    } catch(e) {
+      clearTimeout(_to);
+      streamBubble.remove();
+      console.warn('AI stream fetch 超时或失败:', e.message);
+      return localReport(state.module, state.data);
+    }
+    if (!r.ok || !r.body) {
+      streamBubble.remove();
+      return localReport(state.module, state.data);
+    }
+    // 逐字符处理 SSE
+    const reader = r.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let buf = '', reply = '';
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buf += decoder.decode(value, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop() || '';
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || !trimmed.startsWith('data:')) continue;
+        const payload = trimmed.slice(5).trim();
+        if (!payload || payload === '[DONE]') continue;
+        try {
+          const obj = JSON.parse(payload);
+          if (obj.type === 'error') {
+            streamBubble.remove();
+            return localReport(state.module, state.data);
+          }
+          if (obj.type === 'delta' && obj.delta) {
+            reply += obj.delta;
+            streamContentEl.innerHTML = esc(reply);
+            chat.scrollTop = chat.scrollHeight;
+          }
+        } catch(e) { /* skip malformed frame */ }
+      }
+    }
+    if (!reply || reply.length < 50) {
+      streamBubble.remove();
+      return localReport(state.module, state.data);
+    }
+    // 流式结束 → 改成普通 AI 气泡（带反馈按钮 + 完整 formatter）
+    streamBubble.classList.remove('shimmering');
+    streamBubble.querySelector('.stream-cursor')?.remove();
+    // 保留 streamBubble 并加上反馈按钮
+    _attachFeedbackButtons(streamBubble, state.module, reply);
+    chat.scrollTop = chat.scrollHeight;
+    // 保存到历史
+    try { hist.push({role:'assistant', content: reply.substring(0, 3000)}); if (hist.length > 20) hist = hist.slice(-20); } catch(e) {}
+    // 触发反馈给 KB
+    var _aiText = reply;  // 后续代码用
+    var d = { choices: [{ message: { content: reply }}] };  // 兼容后续代码
+  } catch(e) {
+    // 流式失败：回退到非流式
+    try { streamBubble.remove(); } catch(_e) {}
+    console.warn('AI stream err:', e.message);
+    // fallback：走非流式 fetch
+    try {
+      const _ac2 = new AbortController();
+      const _to2 = setTimeout(function(){ _ac2.abort(); }, 15000);
+      const r2 = await fetch(API + '/api/ai/public-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [...hist.slice(-8), {role:'user', content:prompt}], baziData }),
+        signal: _ac2.signal
+      });
+      clearTimeout(_to2);
+      const d2 = await r2.json();
+      reply = (d2.choices && d2.choices[0] && d2.choices[0].message && d2.choices[0].message.content) || '';
+    } catch(e2) {
+      console.warn('AI fallback fetch err:', e2.message);
+      return localReport(state.module, state.data);
+    }
+
+  if(reply && reply.length>50){
       // P14 节点 8：lifeplan 后端结构化报告优先（拼接 AI 润色说明）
       if (state.module === 'lifeplan' && lifeplanBackend) {
         const lp = lifeplanBackend.report;
@@ -1275,12 +1380,13 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
       autoSavePaipan(tagged);
       return;
     }
-  }catch(e){console.warn("报告降级:",e.message);}
+  }
 
   // ④ 降级：本地生成报告
   const local=localReport(state.module,state.data);
   const fallback = '【来源：本地引擎】\n\n' + local;
   showReport(fallback, {score: 0, source: 'local-engine', engine: 'local', fallback: true});
+  try { _agentStep('③ 多维推断', 'done'); _agentStep('④ 撰写报告', 'done', '本地引擎'); } catch(_e){}
   autoSavePaipan(fallback);
 }
 
@@ -1557,6 +1663,8 @@ function _addSourceLabel(text, modId){
 }
 
 function showReport(text, meta){
+  /* R520: ④ 撰写报告 — 渲染完成 */
+  try { _agentStep('② 检索知识库', 'done'); _agentStep('③ 多维推断', 'done'); _agentStep('④ 撰写报告', 'done', meta && meta.source ? meta.source : ''); } catch(_e){}
   // R89-P0-2: 合规黑名单拦截（生成后立即清洗）+ 免责声明统一注入（P0-3）
   try {
     const _comp = _r89ApplyCompliance(text);
@@ -1902,6 +2010,7 @@ async function exportReportPDF(el){
 }
 
 async function callAI(q){
+  // R477-C: 多轮对话状态机 idle → awaiting_clarification → processing → answered → idle
   // R54: KB 快速通道 — freechat 提问先扫所有 KB，命中分 >= 0.7 直接朗读不调 AI
   try {
     const qLower = (q||'').toLowerCase();
@@ -1945,6 +2054,10 @@ async function callAI(q){
     }
   } catch(e) { console.warn('[R54 fastpath]', e); }
 
+  // R477-C: 先尝试 /api/ai/orchestrate（带主动澄清能力）
+  if (window._clarifyState === undefined) window._clarifyState = 'idle';
+  window._clarifyState = 'processing';
+
   const t=document.createElement('div');t.className='msg m-ai';t.id='ty';
   t.innerHTML='<div class="typing"><i></i><i></i><i></i></div>';
   chat.appendChild(t);chat.scrollTop=chat.scrollHeight;
@@ -1955,9 +2068,87 @@ async function callAI(q){
       addAI('📴 当前处于离线模式，AI 调用已暂停。\n\n请参考上方 KB 兜底回答，或联网后重试。');
       if (typeof recordKbHit === 'function') recordKbHit(state.module || 'freechat', 0, false);
       hist.push({role:'assistant', content:'离线模式'});
+      window._clarifyState = 'idle';
       try{ _updateTopicCard(); }catch(e){console.warn("报告降级:",e.message);} return;
     }
-    var _ac2=new AbortController();var _to2=setTimeout(function(){_ac2.abort();},15000);var r;try{r=await fetch(API+'/api/ai/public-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist.slice(-10)}),signal:_ac2.signal});clearTimeout(_to2);}catch(e){clearTimeout(_to2);console.warn('AI fetch 超时或失败:',e.message);return null;}
+
+    // R477-C: 先走 orchestrate 端点（带主动澄清）
+    try {
+      var _acOrch = new AbortController();
+      var _toOrch = setTimeout(function(){ _acOrch.abort(); }, 12000);
+      var orchRes = await fetch(API + '/api/ai/orchestrate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: q, module: state.module || 'freechat', ctx: { sessionId: localStorage.getItem('ml_session_id') || '' } }),
+        signal: _acOrch.signal
+      });
+      clearTimeout(_toOrch);
+      if (orchRes.ok) {
+        var orchData = await orchRes.json();
+        if (orchData && orchData.data && orchData.data.needClarification && orchData.data.questions && orchData.data.questions.length > 0) {
+          // 主动澄清模式
+          try{ t.remove(); }catch(_){}
+          window._clarifyState = 'awaiting_clarification';
+          window._clarifyQuery = q; // 保存原始 query
+          _showClarifyCard(orchData.data.questions, orchData.data.expert || 'AI');
+          if (typeof recordKbHit === 'function') recordKbHit(state.module || 'freechat', 0, false);
+          return;
+        }
+        // 适配 V2 编排器响应（plan/results/final 结构）
+        var orchContent = null;
+        var orchExpert = '';
+        var orchScore = 0.5;
+        var orchSteps = null;
+        var orchPlan = null;
+        if (orchData && orchData.data) {
+          var _d = orchData.data;
+          // V2 响应：final.content
+          if (_d.final && _d.final.content) {
+            orchContent = _d.final.content;
+            orchScore = (_d.final.score != null) ? _d.final.score : orchScore;
+          }
+          // V1 兼容：data.answer
+          else if (_d.answer) { orchContent = _d.answer; }
+          // V2 思维链
+          if (_d.thinking) {
+            orchSteps = _d.thinking.split('\n').filter(function(s){return s.trim();});
+          }
+          if (_d.plan) orchPlan = _d.plan;
+          if (_d.results && _d.results.length > 0) {
+            orchExpert = _d.results[0].agent || '';
+          }
+        }
+        if (orchContent && orchContent.length > 0) {
+          try{ t.remove(); }catch(_){}
+          // 头部元信息
+          var orchMeta = '';
+          if (orchExpert) orchMeta += '【🤖 ' + orchExpert + '·置信度 ' + Math.round(orchScore * 100) + '%】\n\n';
+          // 思维链可视化（HCI 增强）
+          if (orchSteps && orchSteps.length && typeof window.hciRenderThinking === 'function') {
+            var steps = orchSteps.map(function(s, i) {
+              return { phase: '步骤 ' + (i+1), detail: s, elapsed: 0 };
+            });
+            window.hciRenderThinking(steps);
+            if (typeof window.hciToggleThinking === 'function') window.hciToggleThinking(true);
+            if (typeof window.hciShowThinking === 'function') window.hciShowThinking(false);
+          }
+          // 置信度徽章
+          if (typeof window.hciShowConfidence === 'function') {
+            window.hciShowConfidence({ level: orchScore >= 0.7 ? '高' : (orchScore >= 0.4 ? '中' : '低'), score: orchScore });
+          }
+          addAI(orchMeta + orchContent);
+          hist.push({role:'assistant', content: orchContent.substring(0,500)});
+          if (hist.length > 20) hist = hist.slice(-20);
+          if (typeof recordKbHit === 'function') recordKbHit(state.module || 'freechat', orchScore, orchScore >= 0.7);
+          window._clarifyState = 'answered';
+          try{ _updateTopicCard(); }catch(e){console.warn("报告降级:",e.message);}
+          return;
+        }
+      }
+    } catch(orchErr) { console.warn('[R477-C orchestrate] fallthrough to public-chat:', orchErr.message); }
+
+    // 降级到原有 /api/ai/public-chat
+    var _ac2=new AbortController();var _to2=setTimeout(function(){_ac2.abort();},15000);var r;try{r=await fetch(API+'/api/ai/public-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist.slice(-10)}),signal:_ac2.signal});clearTimeout(_to2);}catch(e){clearTimeout(_to2);console.warn('AI fetch 超时或失败:',e.message);window._clarifyState='idle';return null;}
     const d=await r.json();
     const msg=d.choices&&d.choices[0]&&d.choices[0].message;
     const reply=(msg&&msg.content)||'抱歉，暂时无法回答。';
@@ -1969,13 +2160,106 @@ async function callAI(q){
     // hist 只存 content（不存 reasoning_content），并截断单条长度
     hist.push({role:'assistant',content:reply.substring(0,500)});
     if(hist.length>20)hist=hist.slice(-20);
+    window._clarifyState = 'answered';
     try{ _updateTopicCard(); }catch(e){console.warn("报告降级:",e.message);}
   }catch(e){ try{ t.remove(); }catch(_){} addAI(local(q));
     // 错误降级也计入分母
     if (typeof recordKbHit === 'function') {
       recordKbHit(state.module || 'freechat', 0, false);
     }
+    window._clarifyState = 'idle';
   }
+}
+
+// ══ R477-C: 主动澄清卡片交互 ══
+function _showClarifyCard(questions, expertName){
+  var card = document.getElementById('clarify-card');
+  if(!card) return;
+  var intro = document.getElementById('clarify-intro');
+  if(intro){
+    intro.textContent = (expertName || 'AI') + ' 智能识别到您的问题还需要补充一些信息才能给出准确回答：';
+  }
+  var container = document.getElementById('clarify-questions');
+  if(!container) return;
+  var html = '';
+  questions.forEach(function(qi, qiIdx){
+    html += '<div style="margin-bottom:12px;padding:10px;background:rgba(255,255,255,.04);border-radius:10px;border:1px solid rgba(201,168,76,.15)">';
+    html += '<div style="font-size:13px;color:#c9a84c;font-weight:600;margin-bottom:8px">Q' + (qiIdx+1) + ': ' + esc(qi.text) + '</div>';
+    if(qi.options && qi.options.length > 0){
+      html += '<div style="display:flex;flex-wrap:wrap;gap:6px">';
+      qi.options.forEach(function(opt, oi){
+        html += '<button onclick="_clarifyAnswer(\'' + qiIdx + '\',\'' + _escapeForAttr(opt) + '\')" style="padding:6px 12px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.3);border-radius:14px;color:#c9a84c;cursor:pointer;font-size:12px;transition:all .2s" onmouseover="this.style.background=\'rgba(201,168,76,.2)\'" onmouseout="this.style.background=\'rgba(201,168,76,.1)\'">' + esc(opt) + '</button>';
+      });
+      html += '</div>';
+    }
+    html += '</div>';
+  });
+  container.innerHTML = html;
+  card.style.display = 'block';
+  card.scrollIntoView({behavior:'smooth', block:'end'});
+}
+
+function _escapeForAttr(s){
+  return String(s||'').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+function _clarifyAnswer(qiIdx, answer){
+  // 将澄清选项作为补充信息发送
+  var origQ = window._clarifyQuery || '';
+  var combined = origQ ? (origQ + ' [' + answer + ']') : answer;
+  _dismissClarifyCard();
+  addUser(answer);
+  // 重新调用 AI，带补充信息
+  hist.push({role:'user', content: combined.substring(0,300)});
+  if(hist.length>20) hist = hist.slice(-20);
+  window._clarifyState = 'processing';
+  // 直接调 public-chat（orchestrate 可能再次低置信度）
+  callAIWithClarified(combined);
+}
+
+async function callAIWithClarified(q){
+  var t=document.createElement('div');t.className='msg m-ai';t.id='ty2';
+  t.innerHTML='<div class="typing"><i></i><i></i><i></i></div>';
+  chat.appendChild(t);chat.scrollTop=chat.scrollHeight;
+  try{
+    var _ac=new AbortController();var _to=setTimeout(function(){_ac.abort();},15000);
+    var r=await fetch(API+'/api/ai/public-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist.slice(-10)}),signal:_ac.signal});
+    clearTimeout(_to);
+    var d=await r.json();
+    var msg=d.choices&&d.choices[0]&&d.choices[0].message;
+    var reply=(msg&&msg.content)||'抱歉，暂时无法回答。';
+    try{t.remove();}catch(_){}
+    addAI(reply);
+    hist.push({role:'assistant',content:reply.substring(0,500)});
+    if(hist.length>20)hist=hist.slice(-20);
+    window._clarifyState='answered';
+    try{_updateTopicCard();}catch(e){console.warn("报告降级:",e.message);}
+  }catch(e){
+    try{t.remove();}catch(_){}
+    addAI(local(q));
+    window._clarifyState='idle';
+  }
+}
+
+function _dismissClarifyCard(){
+  var card = document.getElementById('clarify-card');
+  if(card) card.style.display = 'none';
+  window._clarifyState = 'idle';
+}
+
+function _submitClarifyFreeInput(){
+  var inp = document.getElementById('clarify-free-input');
+  if(!inp) return;
+  var val = inp.value.trim();
+  if(!val) return;
+  inp.value = '';
+  _dismissClarifyCard();
+  addUser(val);
+  var origQ = window._clarifyQuery || '';
+  var combined = origQ ? (origQ + ' [' + val + ']') : val;
+  hist.push({role:'user', content: combined.substring(0,300)});
+  if(hist.length>20) hist = hist.slice(-20);
+  callAIWithClarified(combined);
 }
 
 
@@ -5239,3 +5523,129 @@ window._exportFullChat = function(fmt){
   window.updateRBACBadge = updateBadge;
 })('',[]);
 })('',[]);
+
+/* ===== R520: Agent 推理链可视化 — 让用户看见 AI 的思考和工作过程 ===== */
+var _agentThinkingEl = null;
+function _ensureAgentThinking(){
+  if (_agentThinkingEl) return;
+  var el = document.createElement('div');
+  el.className = 'agent-thinking-panel';
+  el.style.cssText = 'display:none;position:fixed;top:52px;left:50%;transform:translateX(-50%) translateY(-8px);z-index:999;background:rgba(8,11,18,0.96);border:1px solid rgba(201,168,76,.35);border-radius:14px;padding:14px 18px;min-width:300px;max-width:92vw;backdrop-filter:blur(16px);box-shadow:0 12px 40px rgba(0,0,0,.6);font-size:13px;color:#c9a84c;opacity:0;transition:opacity .35s ease,transform .35s ease';
+  el.innerHTML = '<div class="ath-header" style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span class="ath-pulse" style="width:10px;height:10px;border-radius:50%;background:#c9a84c;animation:ath-pulse 1.2s infinite;box-shadow:0 0 8px rgba(201,168,76,.6)"></span><span style="font-weight:600;font-size:14px;color:#e8d48b">🧠 智能体工作流</span><span id="ath-status" style="margin-left:auto;font-size:11px;color:#888">思考中...</span></div><style>@keyframes ath-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}</style><div id="ath-steps" style="display:flex;flex-direction:column;gap:5px"></div>';
+  document.body.appendChild(el);
+  _agentThinkingEl = el;
+}
+function _agentStep(name, status, detail){
+  _ensureAgentThinking();
+  var stepsEl = _agentThinkingEl.querySelector('#ath-steps');
+  var icons = {pending:'○',active:'◉',done:'✓',error:'✗',warn:'⚠'};
+  var colors = {pending:'rgba(255,255,255,.3)',active:'#c9a84c',done:'#64c864',error:'#f44336',warn:'#ff9800'};
+  var item = stepsEl.querySelector('[data-step="' + name + '"]');
+  if (!item){
+    item = document.createElement('div');
+    item.dataset.step = name;
+    item.style.cssText = 'display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;background:rgba(255,255,255,.03);font-size:12px;opacity:0;transition:opacity .3s';
+    item.innerHTML = '<span class="ath-dot" style="font-size:13px;width:18px;text-align:center;flex-shrink:0">'+(icons.pending)+'</span><span class="ath-name" style="flex:1;color:rgba(255,255,255,.7)">' + name + '</span><span class="ath-detail" style="color:rgba(255,255,255,.35);font-size:11px"></span>';
+    stepsEl.appendChild(item);
+    requestAnimationFrame(function(){ item.style.opacity='1'; });
+  }
+  var dot = item.querySelector('.ath-dot');
+  var det = item.querySelector('.ath-detail');
+  if (dot){ dot.textContent = icons[status] || '○'; dot.style.color = colors[status] || colors.pending; }
+  if (det && detail) det.textContent = detail;
+}
+function _showAgentThinking(firstStep){
+  _ensureAgentThinking();
+  _agentThinkingEl.style.display = 'block';
+  requestAnimationFrame(function(){ _agentThinkingEl.style.opacity='1'; _agentThinkingEl.style.transform='translateX(-50%) translateY(0)'; });
+  if (firstStep) _agentStep(firstStep, 'active', '');
+}
+function _hideAgentThinking(){
+  if (!_agentThinkingEl) return;
+  _agentThinkingEl.style.opacity='0'; _agentThinkingEl.style.transform='translateX(-50%) translateY(-8px)';
+  setTimeout(function(){
+    if (!_agentThinkingEl) return;
+    _agentThinkingEl.style.display='none';
+    var s = _agentThinkingEl.querySelector('#ath-steps');
+    if (s) s.innerHTML='';
+  }, 400);
+}
+async function _agentWorkflow(label, steps, fn){
+  _showAgentThinking(steps[0] ? steps[0].name : '');
+  var result;
+  try {
+    for (var i=0;i<steps.length;i++){
+      var s = steps[i];
+      _agentStep(s.name, 'active', s.detail || '');
+      var t0 = Date.now();
+      result = await fn(s, i);
+      var ms = Date.now() - t0;
+      _agentStep(s.name, 'done', ms > 1000 ? (ms/1000).toFixed(1)+'s' : ms+'ms');
+    }
+  } catch(e){
+    _agentStep('异常', 'error', e.message);
+    setTimeout(function(){ _hideAgentThinking(); }, 1500);
+    throw e;
+  } finally {
+    setTimeout(function(){ _hideAgentThinking(); }, 600);
+  }
+  return result;
+}
+
+/* ===== R521: 渐进式对话引导 — 从一次性询问改为按需追问 ===== */
+var _conversationMemory = [];
+function _rememberContext(role, content, module){
+  try {
+    if (!_conversationMemory) _conversationMemory = [];
+    _conversationMemory.push({ role: role, content: (content||'').slice(0,200), module: module||state.module, ts: Date.now() });
+    if (_conversationMemory.length > 50) _conversationMemory.splice(0, _conversationMemory.length - 50);
+  } catch(e){}
+}
+function _getContextSummary(){
+  try {
+    if (!_conversationMemory || _conversationMemory.length === 0) return '';
+    var recent = _conversationMemory.slice(-6);
+    var parts = [];
+    recent.forEach(function(m){
+      if (m.role==='user') parts.push('用户:' + m.content.slice(0,60));
+      else if (m.role==='assistant') parts.push('AI:' + m.content.slice(0,60));
+    });
+    return parts.join(' → ');
+  } catch(e){ return ''; }
+}
+function _smartSuggest(nextFields){
+  try {
+    // 根据已收集数据，自动预填或智能追问
+    var suggestions = [];
+    if (!state.data) state.data = {};
+    nextFields = nextFields || [];
+    nextFields.forEach(function(f){
+      if (state.data[f.key]) return;
+      var hint = '';
+      if (f.hint) hint = f.hint;
+      else if (f.guess) hint = '（您上次提到「' + f.guess + '」，直接使用或重新输入）';
+      suggestions.push({ key: f.key, label: f.label || f.key, hint: hint });
+    });
+    return suggestions;
+  } catch(e){ return []; }
+}
+
+/* ===== R522: AI 语音对话增强 ===== */
+function _speakAI(text){
+  try {
+    if (typeof TTS === 'undefined' || !TTS) return;
+    if (TTS.speak) TTS.speak(text.slice(0, 500));
+    else if (TTS.play) TTS.play(text.slice(0, 500));
+  } catch(e){}
+}
+function _toggleVoiceMode(){
+  try {
+    var btn = document.getElementById('voice-mode-btn');
+    if (!btn) return;
+    var isOn = btn.classList.toggle('active');
+    btn.textContent = isOn ? '🔊 语音开启' : '🔇 语音关闭';
+    btn.title = isOn ? '点击关闭语音播报' : '点击开启语音播报';
+    if (isOn) _speakAI('语音播报已开启，我会朗读每条回复');
+  } catch(e){}
+}
+
