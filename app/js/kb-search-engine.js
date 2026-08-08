@@ -82,6 +82,11 @@
     <button class="kbs-clear-history">清除记录</button>
   </div>
 
+  <div class="kbs-suggest-panel" style="display:none">
+    <div class="kbs-history-title">智能联想 <span class="kbs-suggest-hint">拼音 / 模糊 / 热词</span></div>
+    <div class="kbs-suggest-list"></div>
+  </div>
+
   <div class="kbs-hot-panel">
     <div class="kbs-hot-title">🔥 热门搜索</div>
     <div class="kbs-hot-list"></div>
@@ -117,6 +122,10 @@
       this.$resultsContainer = this.host.querySelector('.kbs-results-container');
       this.$loading = this.host.querySelector('.kbs-loading');
       this.$empty = this.host.querySelector('.kbs-empty');
+      this.$history = this.host.querySelector('.kbs-history-panel');
+      this.$historyList = this.host.querySelector('.kbs-history-list');
+      this.$suggestPanel = this.host.querySelector('.kbs-suggest-panel');
+      this.$suggestList = this.host.querySelector('.kbs-suggest-list');
       this.$error = this.host.querySelector('.kbs-error');
       this.$errorText = this.host.querySelector('.kbs-error-text');
       this.$retry = this.host.querySelector('.kbs-retry');
@@ -133,9 +142,12 @@
       this.$input.addEventListener('input', () => {
         this.$clear.style.display = this.$input.value ? 'block' : 'none';
         clearTimeout(this.debounceTimer);
-        if (this.$input.value.trim().length >= 2) {
+        const v = this.$input.value.trim();
+        if (v.length >= 2) {
           this.debounceTimer = setTimeout(() => this.search(1), SEARCH_DEBOUNCE_MS);
+          this.smartSuggest(v); // R509：智能联想（拼音/模糊/热词），与搜索并行
         } else {
+          this.hideSuggest();
           this.showHistory();
           this.$resultsContainer.style.display = 'none';
         }
@@ -181,6 +193,7 @@
     setState(state) {
       [this.$loading, this.$empty, this.$error, this.$resultsContainer, this.$history]
         .forEach(el => { if (el) el.style.display = 'none'; });
+      if (state !== 'history') this.hideSuggest();
       
       switch(state) {
         case 'loading': this.$loading.style.display = 'flex'; break;
@@ -194,6 +207,45 @@
     showHistory() {
       this.setState('history');
       this.renderHistory();
+    }
+
+    /* ───── 智能联想（R509：拼音 / 模糊 / 热词）───── */
+    async smartSuggest(q) {
+      if (!this.suggestApi) this.suggestApi = this.apiBase.replace('kb/search-fts', 'search-suggest');
+      try {
+        const userId = '';
+        const resp = await fetch(`${this.suggestApi}?q=${encodeURIComponent(q)}&limit=8`, { signal: AbortSignal.timeout(4000) });
+        if (!resp.ok) return this.hideSuggest();
+        const data = await resp.json();
+        const items = data.suggestions || [];
+        if (items.length === 0) return this.hideSuggest();
+        this.$suggestList.innerHTML = items.map((s, i) => {
+          const tag = s.type === 'hot' ? '🔥' : s.type === 'history' ? '🕘' : s.type === 'kb' ? '📚' : s.type === 'kb_entry' ? '📄' : '💡';
+          const strat = s.strategy ? `<span class="kbs-suggest-strat">${s.strategy}</span>` : '';
+          return `<div class="kbs-suggest-item" role="button" tabindex="0">
+  <span class="kbs-suggest-tag">${tag}</span>
+  <span class="kbs-suggest-query">${s.text}</span>
+  ${strat}
+</div>`;
+        }).join('');
+        this.$suggestPanel.style.display = 'block';
+        this.$history.style.display = 'none';
+        this.$suggestList.querySelectorAll('.kbs-suggest-item').forEach((item, i) => {
+          item.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            const text = items[i].text;
+            this.$input.value = text;
+            this.hideSuggest();
+            this.search(1);
+          });
+        });
+      } catch (e) {
+        this.hideSuggest();
+      }
+    }
+
+    hideSuggest() {
+      if (this.$suggestPanel) this.$suggestPanel.style.display = 'none';
     }
 
     /* ───── 搜索 ───── */
