@@ -38,7 +38,7 @@
 </style>
 <script>function showToast(msg,type){type=type||'info';var t=document.createElement('div');t.className='toast-msg '+type;t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.classList.add('show')},10);setTimeout(function(){t.classList.remove('show');setTimeout(function(){t.remove()},300)},3500)}</script>
 </head>
-<body class="theme-ops">
+<body data-need-admin="true" data-admin-redirect="/app/admin-login.html" class="theme-ops">
 <!-- R504: 新诊疗中心入口 -->
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><a href="unified-diagnosis.html" style="padding:6px 14px;border:1px solid rgba(201,168,76,.3);border-radius:8px;background:rgba(201,168,76,.06);color:#c9a84c;text-decoration:none;font-size:12px;font-weight:600">🦋 统一诊疗中心</a><a href="master-workstation.html" style="padding:6px 14px;border:1px solid rgba(201,168,76,.3);border-radius:8px;background:rgba(201,168,76,.06);color:#c9a84c;text-decoration:none;font-size:12px;font-weight:600">🧭 命理大师工作台</a></div>
 
@@ -656,7 +656,7 @@
       const d = await r.json();
       document.getElementById('r502Stats').innerHTML = '📋 偏好: ' + d.count + ' 条 · 用户=' + R502_USER_ID;
       document.getElementById('r502List').innerHTML = r502ListCard('用户偏好', d.preferences || [], 'preferences');
-      } catch (e) { console.warn('[admin] loadUserPreferences:', e.message); document.getElementById('r502List').innerHTML = '<div style="padding:12px;color:#ff9d5c">偏好加载失败: ' + (e.message || '网络错误') + '</div>'; }
+      } catch (e) { document.getElementById('r502List').innerHTML = '<div style="padding:12px;color:#ff9d5c">偏好加载失败: ' + (e.message || '网络错误') + '</div>'; }
     }
     async function loadUserFavorites() {
       try {
@@ -664,7 +664,7 @@
       const d = await r.json();
       document.getElementById('r502Stats').innerHTML = '★ 收藏: ' + d.count + ' 条';
       document.getElementById('r502List').innerHTML = r502ListCard('收藏', d.favorites || [], 'favorites');
-      } catch (e) { console.warn('[admin] loadUserFavorites:', e.message); document.getElementById('r502List').innerHTML = '<div style="padding:12px;color:#ff9d5c">收藏加载失败: ' + (e.message || '网络错误') + '</div>'; }
+      } catch (e) { document.getElementById('r502List').innerHTML = '<div style="padding:12px;color:#ff9d5c">收藏加载失败: ' + (e.message || '网络错误') + '</div>'; }
     }
     async function loadSearchHistory() {
       try {
@@ -672,7 +672,7 @@
       const d = await r.json();
       document.getElementById('r502Stats').innerHTML = '🔍 历史: ' + d.count + ' 条';
       document.getElementById('r502List').innerHTML = r502ListCard('搜索历史', d.history || [], 'history');
-      } catch (e) { console.warn('[admin] loadSearchHistory:', e.message); document.getElementById('r502List').innerHTML = '<div style="padding:12px;color:#ff9d5c">历史加载失败: ' + (e.message || '网络错误') + '</div>'; }
+      } catch (e) { document.getElementById('r502List').innerHTML = '<div style="padding:12px;color:#ff9d5c">历史加载失败: ' + (e.message || '网络错误') + '</div>'; }
     }
     async function loadConfig() {
       try {
@@ -680,7 +680,7 @@
       const d = await r.json();
       document.getElementById('r502Stats').innerHTML = '⚙️ 配置: ' + d.count + ' 项';
       document.getElementById('r502List').innerHTML = r502ListCard('系统配置', d.configs || [], 'config');
-      } catch (e) { console.warn('[admin] loadConfig:', e.message); document.getElementById('r502List').innerHTML = '<div style="padding:12px;color:#ff9d5c">配置加载失败: ' + (e.message || '网络错误') + '</div>'; }
+      } catch (e) { document.getElementById('r502List').innerHTML = '<div style="padding:12px;color:#ff9d5c">配置加载失败: ' + (e.message || '网络错误') + '</div>'; }
     }
     async function loadAllR502Stats() {
       try {
@@ -697,7 +697,7 @@
         r502ListCard('收藏', f.favorites, 'favorites') +
         r502ListCard('搜索历史', h.history, 'history') +
         r502ListCard('配置', c.configs, 'config');
-      } catch (e) { console.warn('[admin] loadAllR502Stats:', e.message); document.getElementById('r502List').innerHTML = '<div style="padding:12px;color:#ff9d5c">R502 总览加载失败: ' + (e.message || '网络错误') + '</div>'; }
+      } catch (e) { document.getElementById('r502List').innerHTML = '<div style="padding:12px;color:#ff9d5c">R502 总览加载失败: ' + (e.message || '网络错误') + '</div>'; }
     }
 
     // 默认加载总览
