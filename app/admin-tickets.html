@@ -480,7 +480,7 @@ function executeBatch() {
 function doSearch() {
   var q = document.getElementById('searchInput').value.trim();
   if (!q) return;
-  fetch(API + '/api/admin/tickets/search?q=' + encodeURIComponent(q))
+  fetch(API + '/api/admin/tickets/search?q=' + encodeURIComponent(q), { signal: AbortSignal.timeout(8000) })
     .then(function(r) { return r.json(); })
     .then(function(r) {
       var box = document.getElementById('searchResults');
@@ -496,6 +496,10 @@ function doSearch() {
       } else {
         box.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-muted)">未找到匹配工单</div>';
       }
+    })
+    .catch(function(e) {
+      var box = document.getElementById('searchResults');
+      if (box) box.innerHTML = '<div style="text-align:center;padding:30px;color:#ff9d5c">搜索失败：' + (e && e.message || '网络错误') + '，请重试</div>';
     });
 }
 function searchWord(word) {

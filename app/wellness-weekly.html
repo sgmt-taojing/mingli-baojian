@@ -124,12 +124,12 @@ if(t==='knowledge')loadKB();
 }
 
 function getCsrf(){
-return fetch(API+'/api/csrf',{credentials:'include'}).then(function(r){return r.json()}).then(function(j){return j.csrf_token||j.data&&j.data.csrf_token||''})
+return fetch(API+'/api/csrf',{credentials:'include',signal:AbortSignal.timeout(8000)}).then(function(r){return r.json()}).then(function(j){return j.csrf_token||j.data&&j.data.csrf_token||''}).catch(function(e){console.warn('[wellness] csrf:',e.message);return ''})
 }
 
 function loadWeekly(){
 var v=$('view-weekly');v.innerHTML='<div class="card">正在为您查阅典籍...</div>';
-fetch(API+'/api/wellness/weekly-summary').then(function(r){return r.json()}).then(function(j){
+fetch(API+'/api/wellness/weekly-summary',{signal:AbortSignal.timeout(10000)}).then(function(r){return r.json()}).then(function(j){
 var s=j.data.stats,a=j.data.analyses;
 var h='<div class="card"><div class="card-title">历 周 '+s.week_start+' ~ '+s.week_end+'</div>';
 h+='<div class="stat-row">';
@@ -182,7 +182,7 @@ v.innerHTML=h;
 
 function loadHistory(){
 var v=$('view-history');v.innerHTML='<div class="card">正在为您查阅典籍...</div>';
-fetch(API+'/api/wellness/analyses/'+USER_ID).then(function(r){return r.json()}).then(function(j){
+fetch(API+'/api/wellness/analyses/'+USER_ID,{signal:AbortSignal.timeout(10000)}).then(function(r){return r.json()}).then(function(j){
 var rows=j.data||[];
 if(rows.length===0){
 v.innerHTML='<div class="card"><div class="empty" style="text-align:center;color:var(--muted);padding:20px">尚无历史分析</div></div>';
@@ -202,7 +202,7 @@ h+='</div>';
 });
 h+='</div>';
 v.innerHTML=h;
-})
+}).catch(function(e){v.innerHTML='<div class="card"><div class="empty" style="color:#ff9d5c">历史加载失败：'+(e&&e.message||'网络错误')+'</div></div>'})
 }
 
 function loadFollowupForm(){
@@ -244,7 +244,7 @@ console.warn('提交失败: '+d.message);
 
 function loadKB(){
 var v=$('view-knowledge');v.innerHTML='<div class="card">正在为您查阅典籍...</div>';
-fetch(API+'/api/wellness/analyses/'+USER_ID).then(function(r){return r.json()}).then(function(j){
+fetch(API+'/api/wellness/analyses/'+USER_ID,{signal:AbortSignal.timeout(10000)}).then(function(r){return r.json()}).then(function(j){
 var rows=(j.data||[]).filter(function(r){return r.knowledge_extracted===1});
 if(rows.length===0){
 v.innerHTML='<div class="card"><div class="empty" style="text-align:center;color:var(--muted);padding:20px">尚无入库KB记录<br><br>提交随访(结果非unknown)后会自动入库</div></div>';
@@ -261,7 +261,7 @@ h+='</div>';
 });
 h+='</div>';
 v.innerHTML=h;
-})
+}).catch(function(e){v.innerHTML='<div class="card"><div class="empty" style="color:#ff9d5c">知识加载失败：'+(e&&e.message||'网络错误')+'</div></div>'})
 }
 
 switchTab('weekly');

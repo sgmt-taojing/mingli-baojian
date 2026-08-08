@@ -87,7 +87,7 @@ h1{color:var(--gold);font-size:20px;margin-bottom:16px;text-align:center}
 <script>
 var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
 var uid=4;var p=new URLSearchParams(location.search);if(p.get('uid'))uid=parseInt(p.get('uid'));
-function fj(u){return fetch(u).then(function(r){return r.json()}).then(function(d){return d.data||d})}
+function fj(u){return fetch(u,{signal:AbortSignal.timeout(10000)}).then(function(r){return r.json()}).then(function(d){return d.data||d}).catch(function(e){console.warn('[person-center] fetch fail:',u,e&&e.message);return {error:e&&e.message||'network'}})}
 function switchId(id){currentId=id;document.querySelectorAll('.id-tab').forEach(function(t){t.classList.remove('active')});var t=document.querySelectorAll('.id-tab');for(var i=0;i<t.length;i++){var txt=t[i].textContent;var kw=id==='yuanzhu'?'缘':id==='patient'?'患':id==='believer'?'信':id==='wellness'?'康':id==='full'?'全':id;if(txt.indexOf(kw)>-1)t[i].classList.add('active')}render()}
 var c;var currentId='yuanzhu';
 function info(l,v){return '<div class="info-item"><div class="info-label">'+l+'</div><div class="info-value">'+v+'</div></div>'}
