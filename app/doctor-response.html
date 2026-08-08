@@ -114,7 +114,7 @@ function showActive(id){
 function markResolved(){
   if(!activeEvent){showToast('没有活跃事件');return}
   // 标记 audit log
-  fetch(API+'/api/clinic/resolve-sos/'+activeEvent.id,{method:'POST',headers:authHeaders(),
+  fetch(API+'/api/clinic/resolve-sos/'+activeEvent.id,{ signal: AbortSignal.timeout(15000), method:'POST',headers:authHeaders(),
         signal: AbortSignal.timeout(15000)})
   .then(function(r){return r.json()}).then(function(d){
     if(d.ok){

@@ -7,7 +7,7 @@ function getAuthToken(){
 async function apiCall(url, method, body){
   const token = getAuthToken();
   try {
-    const res = await fetch(API_BASE + url, {
+    const res = await fetch(API_BASE + url, { signal: AbortSignal.timeout(15000),
       method: method || 'GET',
       headers: {
         'Content-Type': 'application/json',

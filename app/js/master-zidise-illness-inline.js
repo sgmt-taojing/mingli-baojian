@@ -1098,7 +1098,7 @@ async function saveConsulting(ctx){
       actions:actions,
       snapshot:{huaJiStar:ctx.huaJiStar,migrationPalace:ctx.huaJiPalace,palaces:ctx.palaces.map(p=>p.stars)}
     };
-    const r=await fetch('http://127.0.0.1:8920/api/public/consulting-save', {
+    const r=await fetch('http://127.0.0.1:8920/api/public/consulting-save', { signal: AbortSignal.timeout(15000),
       method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body), signal: AbortSignal.timeout(15000) });
     const d=await r.json();
     if(d.ok){

@@ -1187,7 +1187,7 @@ window.runMingli = async function() {
 
   let result = null;
   try {
-    const r = await fetch(API + '/api/paipan/calculate', {
+    const r = await fetch(API + '/api/paipan/calculate', { signal: AbortSignal.timeout(15000),
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         year: parseInt(b.year), month: parseInt(b.month), day: parseInt(b.day),

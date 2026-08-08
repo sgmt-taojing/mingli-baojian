@@ -929,7 +929,7 @@ async function askSend() {
   const t0 = performance.now();
   State.askAbort = new AbortController();
   try {
-    const r = await fetch('/api/glass/stream-ask', {
+    const r = await fetch('/api/glass/stream-ask', { signal: AbortSignal.timeout(15000),
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ q, mode: State.mode }),

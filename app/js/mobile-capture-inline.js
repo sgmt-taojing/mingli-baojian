@@ -342,7 +342,7 @@ async function startWebrtc(){
 
     // 与后端协商（后端 /api/webrtc/offer 待实现）
     try {
-      const r = await fetch('/api/webrtc/offer', {
+      const r = await fetch('/api/webrtc/offer', { signal: AbortSignal.timeout(15000),
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ sdp: offer.sdp, type: offer.type, module: $('selModule').value }), signal: AbortSignal.timeout(15000) });

@@ -164,7 +164,7 @@
     } else if (baziData && baziData.birthDate) {
       // 调排盘 API 获取五行
       tasks.push(
-        fetch(API + '/api/paipan/bazi', {method: 'POST',
+        fetch(API + '/api/paipan/bazi', { signal: AbortSignal.timeout(15000), method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(baziData), signal:AbortSignal.timeout(15000)}).then(function(r) { return r.json(); }).catch(function() { return null; })
       );

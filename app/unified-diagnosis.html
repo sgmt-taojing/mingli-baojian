@@ -701,7 +701,7 @@ async function captureAll() {
   const activeModes = Object.keys(state.activeAlgos).filter(m => state.activeAlgos[m]);
 
   try {
-    const resp = await fetch(API + '/api/public/unified-vision-diagnosis', {
+    const resp = await fetch(API + '/api/public/unified-vision-diagnosis', { signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -997,7 +997,7 @@ async function syncToMaster() {
   try {
     // Save sync data
     if (state.syncToken) {
-      await fetch(API + '/api/public/sync-diagnosis', {
+      await fetch(API + '/api/public/sync-diagnosis', { signal: AbortSignal.timeout(15000),
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: state.syncToken, payload }),
@@ -1052,7 +1052,7 @@ async function pushMasterAnnotation() {
 
   try {
     if (state.syncToken) {
-      await fetch(API + '/api/public/master-annotations', {
+      await fetch(API + '/api/public/master-annotations', { signal: AbortSignal.timeout(15000),
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ syncToken: state.syncToken, annotations: annotation }),
@@ -1110,7 +1110,7 @@ async function submitFeedback(rx) {
       doctor_id: document.getElementById('doctorId')?.value || 'doctor_local',
       master_annotation: document.getElementById('masterAnnotation')?.value || '',
     };
-    const resp = await fetch(API + '/api/public/prescription-feedback', {
+    const resp = await fetch(API + '/api/public/prescription-feedback', { signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -1134,7 +1134,7 @@ async function syncFinalToMaster() {
   if (!state.syncToken) return;
   const rx = document.getElementById('finalRx').value;
   try {
-    const r = await fetch(API + '/api/public/sync-diagnosis', {
+    const r = await fetch(API + '/api/public/sync-diagnosis', { signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token: state.syncToken, payload: { finalRx: rx } }),

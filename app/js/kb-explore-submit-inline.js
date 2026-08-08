@@ -100,7 +100,7 @@ async function submit(payload) {
   const btns = document.querySelectorAll('.btn-primary');
   btns.forEach(b => { b.disabled = true; b.innerHTML = '<span class="spinner"></span>处理中...'; });
   try {
-    const r = await fetch(API + '/api/kb/submit-material', {
+    const r = await fetch(API + '/api/kb/submit-material', { signal: AbortSignal.timeout(15000),
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       credentials: 'include', body: JSON.stringify(payload), signal: AbortSignal.timeout(15000) });
     const d = await r.json();
@@ -168,7 +168,7 @@ async function discoverOnline() {
   const btn = event.target;
   btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>分析中...';
   try {
-    const r = await fetch(API + '/api/kb/discover-online', {
+    const r = await fetch(API + '/api/kb/discover-online', { signal: AbortSignal.timeout(15000),
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       credentials: 'include', body: JSON.stringify({ module: currentModule, query }), signal: AbortSignal.timeout(15000) });
     const d = await r.json();

@@ -180,7 +180,7 @@
         if (navigator.sendBeacon) {
           navigator.sendBeacon(CONFIG.reportEndpoint, body);
         } else {
-          fetch(CONFIG.reportEndpoint, {
+          fetch(CONFIG.reportEndpoint, { signal: AbortSignal.timeout(15000),
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body, keepalive: true
           }).catch(() => {});

@@ -303,7 +303,7 @@
       // 拉取 CSRF token（白名单端点即便缺 token 也放行，这里双保险）
       let token = null;
       try { token = (await (await fetch(API + '/api/csrf-token', {signal: AbortSignal.timeout(15000)})).json()).token || null; } catch (e) { /* 白名单内可免 */ }
-      const resp = await fetch(API + '/api/advisor/consult', {
+      const resp = await fetch(API + '/api/advisor/consult', { signal: AbortSignal.timeout(15000),
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { 'x-csrf-token': token } : {}) },
         body: JSON.stringify(payload), signal: AbortSignal.timeout(15000) });

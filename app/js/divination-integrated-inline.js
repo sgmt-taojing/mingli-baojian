@@ -585,7 +585,7 @@ async function analyzeReport(){
     const timeoutId = setTimeout(() => controller.abort(), 30000);
 
     try {
-        const resp=await fetch(API_BASE+'/api/ai/public-chat', {
+        const resp=await fetch(API_BASE+'/api/ai/public-chat', { signal: AbortSignal.timeout(15000),
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1096,7 +1096,7 @@ async function callAIComprehensive(){
   var prompt='你是一位融合现代医学和中医体质学的健康顾问。请根据以下体检指标数据，给出综合解读。\n\n体检指标数据：\n'+indicatorData+'\n\n要求输出以下章节：\n## 📋 报告解读摘要\n（200字内总结整体健康状况）\n\n## ⚠️ 异常指标警示\n（列出需就医和需关注的指标，按优先级排序）\n\n## 🌿 中医体质辨识\n（根据指标异常模式判断体质倾向）\n\n## 🍲 食疗调理方案\n（针对异常指标给出3-5条具体食疗建议）\n\n## 🏃 运动调理方案\n（针对异常指标给出运动建议）\n\n## 📋 21天健康打卡计划\n（每周重点，3周计划）\n\n## ⚠️ 就医建议\n（哪些指标需在多长时间内就医复查）';
   
   try{
-    var resp=await fetch(API_BASE+'/api/ai/public-chat', {
+    var resp=await fetch(API_BASE+'/api/ai/public-chat', { signal: AbortSignal.timeout(15000),
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
@@ -1646,7 +1646,7 @@ async function callLLMForAnalysis(){
     aiAnalysisAbortController = new AbortController();
     
     // 调用本地 OpenClaw LLM 代理
-    const response = await fetch(API_BASE+'/api/ai/public-chat', {
+    const response = await fetch(API_BASE+'/api/ai/public-chat', { signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       signal: aiAnalysisAbortController.signal,

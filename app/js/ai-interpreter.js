@@ -33,7 +33,7 @@ async function callG2ClawAPI(messages, options) {
   let timeoutId = setTimeout(function() { controller.abort(); }, 30000);
 
   try {
-    const response = await fetch('/api/ai/public-chat', {
+    const response = await fetch('/api/ai/public-chat', { signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: {
         'Authorization': 'Bearer b720753afe0845f5a7611a1b56b6d77c',

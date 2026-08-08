@@ -101,7 +101,7 @@
       var timeoutId = setTimeout(function() { controller.abort(); }, opts.timeout || 15000);
 
       try {
-        var r = await fetch(API + cfg.url, {
+        var r = await fetch(API + cfg.url, { signal: AbortSignal.timeout(15000),
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -174,7 +174,7 @@
     /** 检查 OCR 服务是否可用 */
     healthCheck: async function() {
       try {
-        var r = await fetch(API + '/api/ocr/recognize', {
+        var r = await fetch(API + '/api/ocr/recognize', { signal: AbortSignal.timeout(15000),
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ image: '' }),

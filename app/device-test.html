@@ -260,7 +260,7 @@ function snapPhoto() {
   canvas.style.maxWidth = '100%';
   
   // 尝试发送到 OCR 服务
-  fetch('http://127.0.0.1:8913/analyze', {
+  fetch('http://127.0.0.1:8913/analyze', { signal: AbortSignal.timeout(15000),
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ image: dataUrl, type: 'face' }), signal: AbortSignal.timeout(15000) }).then(r => r.json()).then(data => {

@@ -53,7 +53,7 @@ function analyzeScreenshot() {
   formData.append('image', imgFile);
 
   // 先尝试调用本地AI服务
-  fetch('/api/face-analyze', {
+  fetch('/api/face-analyze', { signal: AbortSignal.timeout(15000),
     method: 'POST',
     body: formData,
     timeout: 30000, signal: AbortSignal.timeout(15000) }).then(function(res) {

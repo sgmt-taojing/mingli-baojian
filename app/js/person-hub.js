@@ -69,13 +69,13 @@
       var _token = (typeof window !== 'undefined' && window.csrfToken) || '';
       // 1. 确保 person_master 存在
       try {
-        await fetch(API + '/api/person/master', {
+        await fetch(API + '/api/person/master', { signal: AbortSignal.timeout(15000),
           method: 'POST',
           headers: {'Content-Type': 'application/json', 'x-csrf-token': _token},
           body: JSON.stringify({user_id: uid, metadata: {source: 'auto_bind', module: identityType}}), signal: AbortSignal.timeout(15000) });
       } catch(_){}
       // 2. 写 event
-      var r = await fetch(API + '/api/person/event', {
+      var r = await fetch(API + '/api/person/event', { signal: AbortSignal.timeout(15000),
         method: 'POST',
         headers: {'Content-Type': 'application/json', 'x-csrf-token': _token},
         body: JSON.stringify({

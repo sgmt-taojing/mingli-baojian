@@ -39,7 +39,7 @@
     // 后台记录
     const token = localStorage.getItem('jwt') || '';
     const api = (location.protocol==='https:'?'https://':'http://') + location.host;
-    fetch(api + '/api/v1/user/consents', {
+    fetch(api + '/api/v1/user/consents', { signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ consentType: 'analytics', granted, version: CONSENT_VERSION }), signal: AbortSignal.timeout(15000) }).catch(()=>{});

@@ -2982,7 +2982,7 @@ function tzStep1Analyze(fileName, content, type) {
     }];
   }
 
-  fetch(apiBase + '/v1/chat/completions', {
+  fetch(apiBase + '/v1/chat/completions', { signal: AbortSignal.timeout(15000),
     method: 'POST',
     headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer b720753afe0845f5a7611a1b56b6d77c'},
     body: JSON.stringify(payload), signal: AbortSignal.timeout(15000) }).then(function(r) { return r.json(); }).then(function(data) {
@@ -3134,7 +3134,7 @@ function tzStep2Suggestions() {
     temperature: 0.4
   };
 
-  fetch('/api/ai/public-chat', {
+  fetch('/api/ai/public-chat', { signal: AbortSignal.timeout(15000),
     method: 'POST',
     headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer b720753afe0845f5a7611a1b56b6d77c'},
     body: JSON.stringify(payload), signal: AbortSignal.timeout(15000) }).then(function(r) { return r.json(); }).then(function(data) {
@@ -16022,7 +16022,7 @@ function _analyzeFloorPlanAI(imageData, context) {
   let fsAiStatus = document.getElementById('fsAiStatus');
   if (fsAiStatus) fsAiStatus.innerHTML = '<div style="padding:20px;text-align:center"><div style="font-size:24px">🔮 正在分析...</div><p style="margin-top:12px;opacity:.6">正在解读您的户型图</p></div>';
 
-  fetch('/api/ai/public-chat', {
+  fetch('/api/ai/public-chat', { signal: AbortSignal.timeout(15000),
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer b720753afe0845f5a7611a1b56b6d77c' },
     body: JSON.stringify({

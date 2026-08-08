@@ -215,7 +215,7 @@
     // 1) voice-command（短文本意图匹配）
     let cmd = null;
     try {
-      const r = await fetch(API + '/api/ai/voice-command', {
+      const r = await fetch(API + '/api/ai/voice-command', { signal: AbortSignal.timeout(15000),
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: text.trim() }), signal: ctrl.signal
       });
@@ -247,7 +247,7 @@
     // 2) knowledge-qa（KB 优先问答）
     let qa = null;
     try {
-      const r = await fetch(API + '/api/ai/knowledge-qa', {
+      const r = await fetch(API + '/api/ai/knowledge-qa', { signal: AbortSignal.timeout(15000),
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question: text.trim() }), signal: ctrl.signal
       });
@@ -270,7 +270,7 @@
 
     // 3) AI 兜底
     try {
-      const r = await fetch(API + '/api/ai/public-chat', {
+      const r = await fetch(API + '/api/ai/public-chat', { signal: AbortSignal.timeout(15000),
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: [{role:'user', content: text.trim()}], context: 'voice-assistant' }), signal: ctrl.signal
       });

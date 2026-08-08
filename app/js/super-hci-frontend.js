@@ -228,7 +228,7 @@
     const body = JSON.stringify({ messages: messages || [{ role: 'user', content: query }], module });
 
     // 使用 fetch streaming
-    fetch(url, {
+    fetch(url, { signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: body, signal: AbortSignal.timeout(15000) }).then(function (response) {

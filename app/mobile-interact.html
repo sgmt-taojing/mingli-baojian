@@ -669,7 +669,7 @@ async function captureStreamFrame() {
     renderStreamFrames();
 
     // 后台异步送入 KB（不阻塞下帧）
-    fetch(`${OCR_UPLOAD_API}`, {
+    fetch(`${OCR_UPLOAD_API}`, { signal: AbortSignal.timeout(15000),
       method: 'POST',
       body: (() => {
         const fd = new FormData();
@@ -859,7 +859,7 @@ async function askAI(query, audioBlob) {
   // 2) AI 助手回复（KB 命中 → 高置信度直答 + KB 引用，否则走通用 AI 入口）
   let aiText = '';
   try {
-    const aiResp = await fetch('/api/ai/public-chat', {
+    const aiResp = await fetch('/api/ai/public-chat', { signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -880,7 +880,7 @@ async function askAI(query, audioBlob) {
   document.getElementById('voiceTranscript').innerHTML = '<span class="placeholder">继续点击话筒或快捷话术…</span>';
 
   // 3) 命中打点
-  fetch(KB_HIT_API, {
+  fetch(KB_HIT_API, { signal: AbortSignal.timeout(15000),
     method: 'POST',
     headers: {'Content-Type':'application/json'},
     body: JSON.stringify({ query, hits: kbMatches.length, source: 'mobile-voice' }),
@@ -945,7 +945,7 @@ async function submitFeedback(score, msgIdx) {
   try {
     // 取首条 KB 引用作为 entry_id
     const entryId = (msg.kbMatches && msg.kbMatches[0] && (msg.kbMatches[0].entry_id || msg.kbMatches[0].id)) || '';
-    const resp = await fetch(FEEDBACK_API, {
+    const resp = await fetch(FEEDBACK_API, { signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1001,7 +1001,7 @@ async function mobileSearch() {
         </div>`;
       }).join('')}
     `;
-    fetch(KB_HIT_API, {
+    fetch(KB_HIT_API, { signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ query:q, hits:results.length, source:'kb-fts5' }),

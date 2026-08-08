@@ -396,7 +396,7 @@ window.doMultiAssess = async function() {
     if (complaint) body.dialogue = complaint;
 
     const startTime = performance.now();
-    const r = await fetch(API + '/api/doctor/multi-modal-assess', {
+    const r = await fetch(API + '/api/doctor/multi-modal-assess', { signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body), signal: AbortSignal.timeout(15000) });
@@ -490,7 +490,7 @@ window.doCapture = async function() {
     if (fixedB64) body.fixedImage = fixedB64;
 
     const startTime = performance.now();
-    const r = await fetch(API + '/api/doctor/consult-capture', {
+    const r = await fetch(API + '/api/doctor/consult-capture', { signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body), signal: AbortSignal.timeout(15000) });
@@ -527,14 +527,14 @@ window.doSupplement = async function() {
       // Fallback to wearable if no fixed camera
       const wB64 = captureFrame('wearable');
       if (!wB64) { toast('无可用的摄像头', 'error'); return; }
-      const r = await fetch(API + '/api/doctor/supplement-capture', {
+      const r = await fetch(API + '/api/doctor/supplement-capture', { signal: AbortSignal.timeout(15000),
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image: wB64, mode: currentMode }), signal: AbortSignal.timeout(15000) });
       const data = await r.json();
       renderSupplement(data);
     } else {
-      const r = await fetch(API + '/api/doctor/supplement-capture', {
+      const r = await fetch(API + '/api/doctor/supplement-capture', { signal: AbortSignal.timeout(15000),
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image: fixedB64, mode: currentMode }), signal: AbortSignal.timeout(15000) });

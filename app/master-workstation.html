@@ -520,7 +520,7 @@ async function pushToDoctor() {
   const fullText = [ann, plan].filter(Boolean).join('\n\n【治疗方向】\n');
 
   try {
-    await fetch(API + '/api/public/master-annotations', {
+    await fetch(API + '/api/public/master-annotations', { signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

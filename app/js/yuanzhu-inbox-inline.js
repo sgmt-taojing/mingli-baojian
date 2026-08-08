@@ -24,7 +24,7 @@ async function loadInbox() {
     return;
   }
   try {
-    const r = await fetch('/api/yuanzhu/yearly-pushes?limit=50', {
+    const r = await fetch('/api/yuanzhu/yearly-pushes?limit=50', { signal: AbortSignal.timeout(15000),
       headers: { 'Authorization': 'Bearer ' + token }, signal: AbortSignal.timeout(15000) });
     const d = await r.json();
     if (!d.ok) {

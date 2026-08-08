@@ -405,7 +405,7 @@ function wxMonthlyReport(){
   out.innerHTML='<div class="card-text" style="text-align:center;color:#999">⏳ 正在排定本月流月...</div>';
   if(btn){btn.setAttribute('aria-busy','true');}
   // 3) 调后端（R96 起 /api/ai/monthly-report 已在 CSRF 白名单，GET 豁免 → 直接 fetch）
-  fetch('/api/ai/monthly-report', {
+  fetch('/api/ai/monthly-report', { signal: AbortSignal.timeout(15000),
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({

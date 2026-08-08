@@ -1374,7 +1374,7 @@ async function aiSendMsg(){
     let ctx = aiChatHistory.slice(-10);
     let sysMsg = {role:'system', content:'你是易道智鉴的AI命理助手。用户可能在手机上使用，回答要简洁易懂，避免过长。涉及命理、风水、中医、养生等问题时，给出实用建议。提醒用户理性参考。'};
     
-    let resp = await fetch((location.hostname==='127.0.0.1'||location.hostname==='localhost'?'http://127.0.0.1:8920':'')+'/api/ai/public-chat',{method:'POST',
+    let resp = await fetch((location.hostname==='127.0.0.1'||location.hostname==='localhost'?'http://127.0.0.1:8920':'')+'/api/ai/public-chat',{ signal: AbortSignal.timeout(15000), method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer sk-g2claw-default'},
       body:JSON.stringify({model:'auto',messages:[sysMsg].concat(ctx),max_tokens:800,temperature:0.7}),signal:AbortSignal.timeout(15000)}).catch(function(err){ showToast('AI服务暂不可用'); return {ok:false,status:0}; });
     
@@ -1551,7 +1551,7 @@ async function aiSendMsgWithContext(ctx){
     let sysMsg = {role:'system', content:'你是易道智鉴的AI命理助手。用户可能在手机上使用，回答要简洁易懂，避免过长。' + ctxPrompt + '涉及命理、风水、中医、养生等问题时，给出实用建议。提醒用户理性参考。'};
     let chatCtx = aiChatHistory.slice(-10);
     
-    let resp = await fetch((location.hostname==='127.0.0.1'||location.hostname==='localhost'?'http://127.0.0.1:8920':'')+'/api/ai/public-chat',{method:'POST',
+    let resp = await fetch((location.hostname==='127.0.0.1'||location.hostname==='localhost'?'http://127.0.0.1:8920':'')+'/api/ai/public-chat',{ signal: AbortSignal.timeout(15000), method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:'auto',messages:[sysMsg].concat(chatCtx),max_tokens:800,temperature:0.7}),signal:AbortSignal.timeout(15000)}).catch(function(err){ showToast('AI服务暂不可用'); return {ok:false,status:0}; });
     

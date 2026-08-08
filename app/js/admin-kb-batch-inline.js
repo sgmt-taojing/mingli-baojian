@@ -108,7 +108,7 @@ async function batchExecute() {
   const log = document.getElementById('batchResult');
   setState('batchResult', 'loading', `[${new Date().toLocaleTimeString()}] 执行 ${action} on ${module}...`);
   try {
-    const r = await fetch(API + '/api/admin/kb/batch', {
+    const r = await fetch(API + '/api/admin/kb/batch', { signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify({ module, action, tag }), signal: AbortSignal.timeout(15000) });
@@ -168,7 +168,7 @@ async function ingestExecute() {
   if (!entries.length) { setState('ingestResult', 'error', `[${new Date().toLocaleTimeString()}] ⚠️ 无有效条目`); return; }
   log.textContent += `\n  → POST /api/admin/kb/ingest (${entries.length} 条 / 解析失败 ${parseFail})\n`;
   try {
-    const r = await fetch(API + '/api/admin/kb/ingest', {
+    const r = await fetch(API + '/api/admin/kb/ingest', { signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify({ entries }), signal: AbortSignal.timeout(15000) });

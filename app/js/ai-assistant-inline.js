@@ -2136,7 +2136,7 @@ async function callAI(q){
     try {
       var _acOrch = new AbortController();
       var _toOrch = setTimeout(function(){ _acOrch.abort(); }, 12000);
-      var orchRes = await fetch(API + '/api/ai/orchestrate', { signal: AbortSignal.timeout(15000),
+      var orchRes = await fetch(API + '/api/ai/orchestrate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: q, module: state.module || 'freechat', ctx: { sessionId: localStorage.getItem('ml_session_id') || '' } }),
@@ -2196,6 +2196,8 @@ async function callAI(q){
           if (typeof window.hciShowConfidence === 'function') {
             window.hciShowConfidence({ level: orchScore >= 0.7 ? '高' : (orchScore >= 0.4 ? '中' : '低'), score: orchScore });
           }
+          // R526: Agent 编排状态面板（Planner→Executor→Critic 可视化）
+          try { _renderOrchestratePanel(orchPlan, orchData.data.results, orchData.data.final); } catch(_e) {}
           addAI(orchMeta + orchContent);
           hist.push({role:'assistant', content: orchContent.substring(0,500)});
           if (hist.length > 20) hist = hist.slice(-20);
@@ -5722,3 +5724,39 @@ function _toggleVoiceMode(){
   } catch(e){}
 }
 
+
+// === R526: Agent 编排状态面板（Planner → Executor → Critic 可视化） ===
+function _renderOrchestratePanel(plan, results, final) {
+  try {
+    var container = document.getElementById('hci-thinking-panel');
+    if (!container) return;
+    var stepsEl = document.getElementById('hci-thinking-steps');
+    if (!stepsEl) return;
+    stepsEl.innerHTML = '';
+    // 阶段 1: Planner
+    var planHtml = '<div class="hci-thought-step" style="animation-delay:0s"><div class="step-num">📋</div><div class="step-content"><div class="step-phase">Planner · 规划</div><div class="step-detail">' + (plan ? plan.map(function(t){ return (t.agent||'?') + '(P' + (t.priority||'?') + ')'; }).join(' → ') : '规划中...') + '</div></div></div>';
+    stepsEl.innerHTML += planHtml;
+    // 阶段 2: Executor（逐 agent 渲染）
+    if (Array.isArray(results) && results.length > 0) {
+      results.forEach(function(r, i) {
+        var icon = r.error ? '✗' : (r.score >= 0.7 ? '✓' : (r.score >= 0.4 ? '◉' : '○'));
+        var color = r.error ? '#f44336' : (r.score >= 0.7 ? '#64c864' : (r.score >= 0.4 ? '#c9a84c' : 'rgba(255,255,255,.3)'));
+        var agentName = (r.agent || '?').replace(/_expert|_researcher/g, '').replace(/^./, function(c){return c.toUpperCase();});
+        var detail = (r.thinking || r.content || '').substring(0, 60);
+        if (r.score) detail += ' · 置信度 ' + Math.round(r.score * 100) + '%';
+        if (r.error) detail += ' · 错误: ' + r.error;
+        var html = '<div class="hci-thought-step" style="animation-delay:' + ((i + 1) * 0.1) + 's"><div class="step-num" style="color:' + color + '">' + icon + '</div><div class="step-content"><div class="step-phase">' + agentName + '</div><div class="step-detail">' + _escHtml(detail) + '</div></div></div>';
+        stepsEl.innerHTML += html;
+      });
+    }
+    // 阶段 3: Critic
+    var finalScore = 0;
+    if (final && typeof final.score === 'number') finalScore = final.score;
+    if (final && final.auditFlags && final.auditFlags.length > 0) {
+      stepsEl.innerHTML += '<div class="hci-thought-step" style="animation-delay:' + ((results ? results.length : 0) * 0.1 + 0.1) + 's"><div class="step-num" style="color:#ff9800">⚠</div><div class="step-content"><div class="step-phase">Critic · 审查</div><div class="step-detail">过滤: ' + final.auditFlags.join('; ') + '</div></div></div>';
+    }
+    if (typeof window.hciToggleThinking === 'function') window.hciToggleThinking(true);
+    if (typeof window.hciShowThinking === 'function') window.hciShowThinking(false);
+    if (typeof window.hciShowConfidence === 'function') window.hciShowConfidence({ level: finalScore >= 0.7 ? '高' : (finalScore >= 0.4 ? '中' : '低'), score: finalScore });
+  } catch(e) {}
+}

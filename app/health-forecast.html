@@ -121,7 +121,7 @@ var y=parseInt(parts[0]),mo=parseInt(parts[1]),dy=parseInt(parts[2])
 document.getElementById('result').innerHTML='<div style="text-align:center;padding:30px;opacity:.6">待 排盘分析中…</div>';
 
 // R243: 调用后端排盘 API 获取真实日主
-fetch('/api/paipan/calculate', {
+fetch('/api/paipan/calculate', { signal: AbortSignal.timeout(15000) 
 method:'POST',headers:{'Content-Type':'application/json'},
 body:JSON.stringify({year:y,month:mo,day:dy,hour:h,gender:gender}), signal: AbortSignal.timeout(15000) }).then(function(r){return r.json();}).then(function(pp){
 var dayMaster=pp.day_master||'';

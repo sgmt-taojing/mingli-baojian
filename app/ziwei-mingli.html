@@ -390,7 +390,7 @@ async function collectBirth() {
 
   try {
     const csrf = await getCsrf();
-    const resp = await fetch('/api/skill/ziwei-mingli', {
+    const resp = await fetch('/api/skill/ziwei-mingli', { signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...(csrf ? { 'x-csrf-token': csrf } : {}) },
       body: JSON.stringify({ birthInput: raw, lng: curLng, conversationId }), signal: AbortSignal.timeout(15000) });

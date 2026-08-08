@@ -23,7 +23,7 @@
       document.getElementById('hcdResult').innerHTML='<div style="text-align:center;padding:40px;opacity:.6"><div style="font-size:24px">⏳ 正在排盘分析中…</div><div style="font-size:12px;margin-top:8px">调用后端八字排盘引擎</div></div>';
 
       // R243: 调用后端排盘 API 获取真实八字数据
-      fetch('/api/paipan/calculate', {
+      fetch('/api/paipan/calculate', { signal: AbortSignal.timeout(15000),
         method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({year:y,month:m,day:d,hour:h,gender:gender}), signal: AbortSignal.timeout(15000) }).then(function(r){return r.json();}).then(function(paipan){
         if(!paipan || !paipan.pillars){

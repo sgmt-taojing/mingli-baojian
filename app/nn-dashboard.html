@@ -375,7 +375,7 @@ async function submitSolveFb(score, q, entryId, module) {
   const status = document.getElementById('fbStatus');
   if (status) status.textContent = '提交中…';
   try {
-    const resp = await fetch(GATEWAY_FB, {
+    const resp = await fetch(GATEWAY_FB, { signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({

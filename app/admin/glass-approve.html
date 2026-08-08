@@ -2,7 +2,8 @@
 <html lang="zh-CN">
 <head>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+    <meta charset="UTF-8">
 <link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/glass-approve.html">
 <title>智能眼镜 · 审核工作台 · 命理宝鉴</title>
 <style>
@@ -44,7 +45,7 @@ button{padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-size:1
 <div id="list" class="list"></div>
 
 <script>
-const API = (path) => fetch('/api' + path, {credentials:'include',
+const API = (path) => fetch('/api' + path, { signal: AbortSignal.timeout(15000), credentials:'include',
         signal: AbortSignal.timeout(15000)}).then(r=>r.json());
 async function load(){
   const status = document.getElementById('filter').value;

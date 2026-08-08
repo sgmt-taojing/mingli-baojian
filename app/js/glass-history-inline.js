@@ -11,7 +11,7 @@ async function load(){
     return;
   }
   // ★ 安全：token 放 header，不放 URL
-  const r = await fetch('/api/v1/glass/history', {
+  const r = await fetch('/api/v1/glass/history', { signal: AbortSignal.timeout(15000),
     headers: {
       'Authorization': 'Bearer ' + token,
       'X-Device-Token': token.startsWith('GL-') ? token : 'GL-DEMO-DEVICE'

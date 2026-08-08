@@ -347,7 +347,7 @@ function drawPie(byMode) {
 async function clearAll() {
   if (!confirm('确认清空所有 OCR 历史记录？')) return;
   try {
-    const r = await fetch('/api/ocr/history', {
+    const r = await fetch('/api/ocr/history', { signal: AbortSignal.timeout(15000),
       method:'DELETE', credentials:'same-origin',
       headers: csrfToken ? {'x-csrf-token':csrfToken} : {}, signal: AbortSignal.timeout(15000) });
     const d = await r.json();

@@ -609,7 +609,7 @@ async function ingestToKB(){
 
   try{
     var csrfToken = await fetchCsrf();
-    var resp = await fetch(API+'/api/wellness/ocr-anomaly', {
+    var resp = await fetch(API+'/api/wellness/ocr-anomaly', { signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: {'Content-Type': 'application/json', 'x-csrf-token': csrfToken},
       body: JSON.stringify({

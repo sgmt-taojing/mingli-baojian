@@ -232,7 +232,7 @@ async function saveOne(key) {
   const v = document.getElementById('v_' + cssId(key)).value;
   const c = _configs.find(x => x.key === key);
   try {
-    const r = await fetch(API + '/api/public/config/' + encodeURIComponent(key), {
+    const r = await fetch(API + '/api/public/config/' + encodeURIComponent(key), { signal: AbortSignal.timeout(15000),
       method: 'PUT',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ value: v, label: c.label, group: c.group }),
@@ -273,7 +273,7 @@ async function submitAdd() {
   };
   if (!body.key || !body.value) { toast('key 和 value 必填', true); return; }
   try {
-    const r = await fetch(API + '/api/public/config', {
+    const r = await fetch(API + '/api/public/config', { signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify(body),

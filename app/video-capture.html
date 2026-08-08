@@ -216,7 +216,7 @@ function analyzeFrames(){
   
   var promises=selected.map(function(f,i){
     var base64=f.canvas.toDataURL('image/jpeg',0.85).split(',')[1];
-    return fetch(API+'/api/camera/upload', {
+    return fetch(API+'/api/camera/upload', { signal: AbortSignal.timeout(15000),
       method:'POST',
       headers:{'Content-Type':'application/json','X-API-Key':localStorage.getItem('api_key')||''},
       body:JSON.stringify({image:base64,mode:'face',source:'video-frame-'+(i+1)}), signal: AbortSignal.timeout(15000) }).then(function(r){return r.json()}).catch(function(){return {error:'识别失败'}});

@@ -456,7 +456,7 @@ function submitTicket() {
       voiceReader.onload = function() { resolve(voiceReader.result); };
       voiceReader.readAsDataURL(voiceBlob);
     }).then(function(voiceBase64) {
-      return fetch(API_BASE + '/api/tickets/voice-upload', {
+      return fetch(API_BASE + '/api/tickets/voice-upload', { signal: AbortSignal.timeout(15000),
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ audio: voiceBase64 }), signal: AbortSignal.timeout(15000) }).then(function(r) { return r.json(); });
@@ -480,7 +480,7 @@ function submitTicket() {
       return fetch(API_BASE + '/api/tickets/create', {signal: AbortSignal.timeout(15000),  method: 'POST', body: formData });
     } else {
       // 无截图 — JSON
-      return fetch(API_BASE + '/api/tickets/create', {
+      return fetch(API_BASE + '/api/tickets/create', { signal: AbortSignal.timeout(15000),
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

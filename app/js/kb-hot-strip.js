@@ -109,7 +109,7 @@
    * 按 hits desc 取前 N（已有全库汇总，避免拉全表）
    */
   function fetchServerTop() {
-    return fetch(API_BASE + '/api/public/kb/stats', {
+    return fetch(API_BASE + '/api/public/kb/stats', { signal: AbortSignal.timeout(15000),
       method: 'GET',
       headers: { 'Accept': 'application/json' }, signal: AbortSignal.timeout(15000) })
       .then(function (r) { return r.ok ? r.json() : null; })

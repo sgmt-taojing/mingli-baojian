@@ -781,7 +781,7 @@ async function generateBaziReport(){
     const csrfRes = await fetch(API_BASE+'/api/csrf-token', {signal: AbortSignal.timeout(15000)}).then(r=>r.json()).catch(()=>({csrfToken:''}));
     const csrf = csrfRes.csrfToken || csrfRes.token || '';
     
-    const r = await fetch(API_BASE+'/api/paipan/bazi/report', {
+    const r = await fetch(API_BASE+'/api/paipan/bazi/report', { signal: AbortSignal.timeout(15000),
       method:'POST',
       headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
       body: JSON.stringify(body), signal: AbortSignal.timeout(15000) }).then(r=>r.json());

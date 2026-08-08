@@ -97,7 +97,7 @@
       } else {
         base = 'http://127.0.0.1:8920';
       }
-      fetch(base + '/api/kb/recommend/feedback', {
+      fetch(base + '/api/kb/recommend/feedback', { signal: AbortSignal.timeout(15000),
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

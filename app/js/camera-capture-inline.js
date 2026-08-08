@@ -252,7 +252,7 @@ async function analyze(blob) {
 
   setStatus('上传并分析中…', '');
   try {
-    const r = await fetch('http://127.0.0.1:8913/api/camera/upload', {
+    const r = await fetch('http://127.0.0.1:8913/api/camera/upload', { signal: AbortSignal.timeout(15000),
       method: 'PUT', body: form, signal: AbortSignal.timeout(15000) });
     const j = await r.json();
     if (!j.ok) {

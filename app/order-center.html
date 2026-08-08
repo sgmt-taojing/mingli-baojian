@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>订单中心 · 易道智鉴</title>
+  <meta name="robots" content="index, follow">
+<title>订单中心 · 易道智鉴</title>
   <meta name="description" content="查看和管理您的命理宝鉴订单">
   <link rel="canonical" href="https://mingli-baojian.app/order-center.html">
   <style>
@@ -318,7 +319,7 @@
     return h;
   }
   async function apiFetch(url, opts) {
-    const r = await fetch(API_BASE + url, {
+    const r = await fetch(API_BASE + url, { signal: AbortSignal.timeout(15000) 
       ...opts, headers: { ...authHeaders(), ...(opts && opts.headers) },
       credentials: 'include', signal: AbortSignal.timeout(15000) });
     if (r.status === 401) { showToast('请先登录', 'error'); }

@@ -55,7 +55,7 @@
     try {
       const ctrl = new AbortController();
       const t = setTimeout(function () { ctrl.abort(); }, PING_TIMEOUT_MS);
-      const r = await fetch(PING_URL + '?_=' + Date.now(), {
+      const r = await fetch(PING_URL + '?_=' + Date.now(), { signal: AbortSignal.timeout(15000),
         method: 'GET',
         cache: 'no-store',
         signal: ctrl.signal

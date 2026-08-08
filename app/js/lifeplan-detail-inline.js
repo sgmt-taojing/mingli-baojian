@@ -228,7 +228,7 @@ function render(d){
       livePlace: d.residence || '',
       withTTS: false
     });
-    fetch('/api/ai/lifeplan-report', {method: 'POST',
+    fetch('/api/ai/lifeplan-report', { signal: AbortSignal.timeout(15000), method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: actionBody, signal:AbortSignal.timeout(15000)}).then(r => r.json()).then(json => {
       if(json.code !== 0 || !json.data || !json.data.report) return;
@@ -586,7 +586,7 @@ function calcTrendAdvice(dayuns, shichen){
       birthplace: d.residence || '',
       questions: (d.focus + ' ' + d.extra).split(/[，,\s]+/).filter(Boolean).slice(0, 4)
     });
-    fetch('/api/paipan/lifeplan/report', {method: 'POST',
+    fetch('/api/paipan/lifeplan/report', { signal: AbortSignal.timeout(15000), method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: body, signal:AbortSignal.timeout(15000)}).then(function(r){return r.json();}).then(function(r){
       if(!r.ok || !r.lifePath || !r.lifePath.length){
