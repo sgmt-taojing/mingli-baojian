@@ -1,0 +1,153 @@
+/* ═══ R515 · HCI Enhancement CSS ═══ */
+:root {
+  --hci-primary: #a78bfa;
+  --hci-gold: #c9a84c;
+  --hci-bg: rgba(15, 15, 25, 0.95);
+  --hci-border: rgba(167, 139, 250, 0.3);
+  --hci-text: rgba(255, 255, 255, 0.9);
+  --hci-muted: rgba(255, 255, 255, 0.5);
+}
+
+/* 思维链面板 */
+.hci-thinking-panel {
+  position: fixed; top: 60px; right: 16px; width: 340px; max-height: 60vh;
+  overflow-y: auto; background: var(--hci-bg); border: 1px solid var(--hci-border);
+  border-radius: 12px; padding: 14px; z-index: 9998;
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0,0,0,.4);
+  transition: opacity .3s, transform .3s;
+}
+.hci-thinking-panel[hidden] { display: none; }
+
+.hci-thinking-header {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--hci-border);
+}
+.hci-thinking-header .hci-icon { font-size: 16px; }
+.hci-thinking-header .hci-label { font-size: 13px; color: var(--hci-primary); font-weight: 600; flex: 1; }
+.hci-close {
+  background: none; border: none; color: var(--hci-muted); cursor: pointer;
+  font-size: 14px; padding: 2px 8px; border-radius: 4px;
+}
+.hci-close:hover { background: rgba(255,255,255,.1); }
+
+.hci-thinking-steps { display: flex; flex-direction: column; gap: 6px; }
+.hci-thought-step {
+  display: flex; align-items: flex-start; gap: 6px; padding: 6px 8px;
+  border-radius: 6px; background: rgba(255,255,255,.03);
+  font-size: 12px; color: var(--hci-text); animation: hciFadeIn .3s ease;
+}
+.hci-thought-step .step-num {
+  width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+  background: var(--hci-primary); color: #fff; font-size: 10px;
+  display: flex; align-items: center; justify-content: center;
+}
+.hci-thought-step .step-content { flex: 1; }
+.hci-thought-step .step-phase { font-weight: 600; color: var(--hci-gold); margin-bottom: 2px; }
+.hci-thought-step .step-detail { color: var(--hci-muted); font-size: 11px; line-height: 1.4; }
+.hci-thought-step .step-time { color: rgba(255,255,255,.2); font-size: 10px; margin-left: 4px; }
+
+/* 置信度徽章 */
+.hci-confidence-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 10px; font-size: 11px;
+  margin-left: 8px; vertical-align: middle;
+}
+.hci-confidence-badge[data-level="HIGH"] {
+  background: rgba(76,175,80,.15); border: 1px solid rgba(76,175,80,.4); color: #81c784;
+}
+.hci-confidence-badge[data-level="MEDIUM"] {
+  background: rgba(255,193,7,.15); border: 1px solid rgba(255,193,7,.4); color: #ffd54f;
+}
+.hci-confidence-badge[data-level="LOW"] {
+  background: rgba(244,67,54,.15); border: 1px solid rgba(244,67,54,.4); color: #e57373;
+}
+.hci-conf-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+/* 智能追问卡片 */
+.hci-followup-container { margin-top: 8px; }
+.hci-followup-card {
+  background: rgba(167,139,250,.06); border: 1px solid var(--hci-border);
+  border-radius: 10px; padding: 10px 14px; margin-top: 8px;
+  animation: hciFadeIn .4s ease;
+}
+.hci-followup-question { font-size: 13px; color: var(--hci-text); margin-bottom: 6px; }
+.hci-followup-type {
+  display: inline-block; padding: 1px 6px; border-radius: 4px;
+  font-size: 10px; background: var(--hci-primary); color: #fff; margin-right: 6px;
+}
+.hci-followup-options { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.hci-followup-option {
+  padding: 4px 10px; border-radius: 8px; cursor: pointer; font-size: 12px;
+  background: rgba(201,168,76,.1); border: 1px solid rgba(201,168,76,.3);
+  color: var(--hci-gold); transition: all .2s;
+}
+.hci-followup-option:hover { background: rgba(201,168,76,.2); transform: translateY(-1px); }
+
+/* 正在思考指示器 */
+.hci-thinking-indicator {
+  display: flex; align-items: center; gap: 4px; padding: 8px 14px;
+}
+.hci-thinking-indicator[hidden] { display: none; }
+.hci-pulse {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--hci-primary);
+  animation: hciPulse 1.4s ease-in-out infinite;
+}
+.hci-pulse:nth-child(2) { animation-delay: .2s; }
+.hci-pulse:nth-child(3) { animation-delay: .4s; }
+.hci-indicator-text { font-size: 12px; color: var(--hci-muted); margin-left: 4px; }
+
+@keyframes hciPulse {
+  0%, 80%, 100% { transform: scale(.6); opacity: .5; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+/* 快捷指令面板 */
+.hci-quick-panel {
+  position: fixed; bottom: 80px; right: 16px; width: 300px;
+  background: var(--hci-bg); border: 1px solid var(--hci-border);
+  border-radius: 14px; padding: 14px; z-index: 9998;
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0,0,0,.4);
+  transition: opacity .3s, transform .3s;
+}
+.hci-quick-panel[hidden] { display: none; }
+.hci-quick-header {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 13px; color: var(--hci-primary); margin-bottom: 10px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--hci-border);
+}
+.hci-quick-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+}
+.hci-quick-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 10px 4px; border-radius: 10px; cursor: pointer;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+  color: var(--hci-text); transition: all .2s; font-family: inherit;
+}
+.hci-quick-btn:hover {
+  background: rgba(167,139,250,.12); border-color: var(--hci-border);
+  transform: translateY(-2px);
+}
+.hci-quick-icon { font-size: 20px; color: var(--hci-gold); }
+.hci-quick-label { font-size: 11px; }
+
+.hci-quick-trigger {
+  position: fixed; bottom: 80px; right: 16px; width: 44px; height: 44px;
+  border-radius: 50%; background: var(--hci-primary); border: none;
+  color: #fff; font-size: 20px; cursor: pointer; z-index: 9997;
+  box-shadow: 0 4px 16px rgba(167,139,250,.4); transition: all .3s;
+}
+.hci-quick-trigger:hover { transform: scale(1.1) rotate(15deg); }
+
+@keyframes hciFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 360px) {
+  .hci-thinking-panel { width: calc(100vw - 32px); right: 16px; }
+  .hci-quick-panel { width: calc(100vw - 32px); right: 16px; }
+  .hci-quick-grid { grid-template-columns: repeat(3, 1fr); }
+}
