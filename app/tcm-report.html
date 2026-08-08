@@ -275,7 +275,7 @@ function startRecording(){
     window._rec.ondataavailable = function(e){ window._recChunks.push(e.data); };
     window._rec.start();
     toast('录音开始');
-  }).catch(function(e){ showToast('录音失败: '+e.message); });
+  }).catch(function(e){ showToast('录音失败: '+esc(e.message)); });
 }
 function runDiagnosis(){
   var btn = event.target;

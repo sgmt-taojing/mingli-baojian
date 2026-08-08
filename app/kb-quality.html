@@ -192,7 +192,7 @@ async function load(){
     render();
     document.getElementById('sub').textContent=`${DATA.summary.module_cnt} 模块 · ${fmt(DATA.summary.total)} 条目 · 更新于 ${new Date(DATA.generatedAt).toLocaleString('zh-CN')}`;
   }catch(e){
-    document.getElementById('sub').textContent='查阅失败：'+e.message;
+    document.getElementById('sub').textContent='查阅失败：'+esc(e.message);
   }
 }
 

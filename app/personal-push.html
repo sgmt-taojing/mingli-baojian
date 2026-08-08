@@ -223,7 +223,7 @@ function startFace(){
       box.querySelector('video').srcObject = stream;
       document.getElementById('captureBtn').disabled = false;
     })
-    .catch(e=>{var f=document.getElementById('faceBox');if(f)f.innerHTML='<div class=\'placeholder\' style=\'color:#c0392b\'>摄像头开启失败：'+e.message+'</div>';console.warn('[摄像头]',e.message);});
+    .catch(e=>{var f=document.getElementById('faceBox');if(f)f.innerHTML='<div class=\'placeholder\' style=\'color:#c0392b\'>摄像头开启失败：'+esc(esc(e.message))+'</div>';console.warn('[摄像头]',esc(e.message));});
 }
 
 function captureFace(){

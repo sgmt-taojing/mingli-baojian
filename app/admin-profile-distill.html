@@ -121,7 +121,7 @@ async function loadAll(){
     if(currentTab==='patient')renderPatientList();
     else if(currentTab==='believer')renderBelieverList();
     else renderGlobalList();
-  }catch(e){toast('加载失败: '+e.message,true)}
+  }catch(e){toast('加载失败: '+esc(e.message),true)}
 }
 
 function switchTab(tab,el){
@@ -215,7 +215,7 @@ async function showPatient(uid){
       html+='</div>';
     }else{html+='<div class="empty">暂无蒸馏洞察，点击上方"立即全量蒸馏"</div>'}
     rp.innerHTML=html;
-  }catch(e){rp.innerHTML='<div class="empty">'+e.message+'</div>'}
+  }catch(e){rp.innerHTML='<div class="empty">'+esc(esc(e.message))+'</div>'}
 }
 
 async function showBeliever(uid){
@@ -253,7 +253,7 @@ async function showBeliever(uid){
       html+='</div>';
     }else{html+='<div class="empty">暂无蒸馏洞察</div>'}
     rp.innerHTML=html;
-  }catch(e){rp.innerHTML='<div class="empty">'+e.message+'</div>'}
+  }catch(e){rp.innerHTML='<div class="empty">'+esc(esc(e.message))+'</div>'}
 }
 
 async function triggerDistill(){
@@ -264,7 +264,7 @@ var resp=await fetch(API+'/api/profile/distill-all',H({method:'POST',headers:Obj
 var j=await resp.json();
     if(j.ok){toast('✅ '+(j.message||'蒸馏完成'));loadAll()}
     else toast('❌ '+(j.error||'失败'),true);
-  }catch(e){toast('❌ '+e.message,true)}
+  }catch(e){toast('❌ '+esc(e.message),true)}
 }
 
 function toast(msg,err){

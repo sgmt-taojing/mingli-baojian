@@ -126,7 +126,7 @@ if(t==='knowledge')loadKB();
 }
 
 function getCsrf(){
-return fetch(API+'/api/csrf',{credentials:'include',signal:AbortSignal.timeout(8000)}).then(function(r){return r.json()}).then(function(j){return j.csrf_token||j.data&&j.data.csrf_token||''}).catch(function(e){console.warn('[wellness] csrf:',e.message);return ''})
+return fetch(API+'/api/csrf',{credentials:'include',signal:AbortSignal.timeout(8000)}).then(function(r){return r.json()}).then(function(j){return j.csrf_token||j.data&&j.data.csrf_token||''}).catch(function(e){console.warn('[wellness] csrf:',esc(e.message));return ''})
 }
 
 function loadWeekly(){
@@ -204,7 +204,7 @@ h+='</div>';
 });
 h+='</div>';
 v.innerHTML=h;
-}).catch(function(e){v.innerHTML='<div class="card"><div class="empty" style="color:#ff9d5c">历史加载失败：'+(e&&e.message||'网络错误')+'</div></div>'})
+}).catch(function(e){v.innerHTML='<div class="card"><div class="empty" style="color:#ff9d5c">历史加载失败：'+(e&&esc(e.message)||'网络错误')+'</div></div>'})
 }
 
 function loadFollowupForm(){
@@ -243,7 +243,7 @@ console.warn('提交失败: '+d.message);
 }
 }).catch(function(e){
 var fn=typeof showToast==='function'?showToast:function(m){console.warn(m);};
-fn('随访提交失败：'+(e&&e.message||'网络异常')+'，请重试');
+fn('随访提交失败：'+(e&&esc(e.message)||'网络异常')+'，请重试');
 })
 }
 
@@ -266,7 +266,7 @@ h+='</div>';
 });
 h+='</div>';
 v.innerHTML=h;
-}).catch(function(e){v.innerHTML='<div class="card"><div class="empty" style="color:#ff9d5c">知识加载失败：'+(e&&e.message||'网络错误')+'</div></div>'})
+}).catch(function(e){v.innerHTML='<div class="card"><div class="empty" style="color:#ff9d5c">知识加载失败：'+(e&&esc(e.message)||'网络错误')+'</div></div>'})
 }
 
 switchTab('weekly');

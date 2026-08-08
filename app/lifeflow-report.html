@@ -252,7 +252,7 @@ aria-label="年" value="1990" min="1900" max="2100">
       }
     } catch(e) {
       var errArea = document.getElementById('resultArea');
-      errArea.innerHTML = '<div class="result-card" style="border-color:var(--red);color:var(--red)">败 ' + esc(e.message) + '<br><br><button class="btn" onclick="generateOffline()">箱 使用本地 KB 兜底</button></div>';
+      errArea.innerHTML = '<div class="result-card" style="border-color:var(--red);color:var(--red)">败 ' + esc(esc(e.message)) + '<br><br><button class="btn" onclick="generateOffline()">箱 使用本地 KB 兜底</button></div>';
       errArea.style.display = 'block';
     } finally {
       btn.disabled = false; btn.textContent = '🔮 生成三维联动报告';

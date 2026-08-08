@@ -243,7 +243,7 @@ function startVideo(){
       addMsg('bot','摄像头已开启，我可以观察您的面色和舌象了。请描述您哪里不舒服？');
     })
     .catch(e=>{
-      addMsg('alert','摄像头开启失败：'+e.message+'。请检查浏览器权限设置。');
+      addMsg('alert','摄像头开启失败：'+esc(esc(e.message))+'。请检查浏览器权限设置。');
     });
 }
 
@@ -273,7 +273,7 @@ function snapshot(){
       }
     })
     .catch(e=>{
-      diagnosisState.face = {error:e.message};
+      diagnosisState.face = {error:esc(e.message)};
       updateStatus('面诊: 采集失败', 'warn');
       addMsg('bot','面色采集完成，正在等待综合分析。');
     });

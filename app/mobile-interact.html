@@ -484,7 +484,7 @@ async function toggleCamera() {
     videoStream = stream;
     isCameraOn = true;
   } catch (e) {
-    showToast('无法访问相机：' + e.message);
+    showToast('无法访问相机：' + esc(e.message));
   }
 }
 
@@ -532,7 +532,7 @@ async function captureAndAnalyze() {
     }
     renderAnalysis(ocrResult, kbMatches, 'analysisResult');
   } catch (e) {
-    resultEl.innerHTML = `<div class="state-error">分析失败: ${e.message}</div>`;
+    resultEl.innerHTML = `<div class="state-error">分析失败: ${esc(e.message)}</div>`;
   }
 }
 
@@ -602,7 +602,7 @@ async function toggleStreamCamera() {
     streamVideoStream = stream;
     isStreamCameraOn = true;
   } catch (e) {
-    showToast('无法访问相机：' + e.message);
+    showToast('无法访问相机：' + esc(e.message));
   }
 }
 
@@ -779,7 +779,7 @@ async function startVoiceRecord() {
 
     startRecognition();
   } catch (e) {
-    showToast('无法访问麦克风：' + e.message);
+    showToast('无法访问麦克风：' + esc(e.message));
   }
 }
 
@@ -872,7 +872,7 @@ async function askAI(query, audioBlob) {
     const aiData = await aiResp.json();
     aiText = aiData.text || aiData.reply || aiData.answer || (kbMatches.length ? kbHitsSummary(kbMatches) : '');
   } catch (e) {
-    aiText = kbMatches.length ? kbHitsSummary(kbMatches) : `网络异常：${e.message}。建议重试或检查服务状态。`;
+    aiText = kbMatches.length ? kbHitsSummary(kbMatches) : `网络异常：${esc(e.message)}。建议重试或检查服务状态。`;
   }
 
   if (!aiText) aiText = '抱歉，未能给出有效回复。请尝试更具体的提问。';
@@ -963,7 +963,7 @@ async function submitFeedback(score, msgIdx) {
     const data = await resp.json();
     if (statusEl) statusEl.textContent = data.received ? `✅ 已记录 ${score}分` : '❌ 失败';
   } catch (e) {
-    if (statusEl) statusEl.textContent = `❌ ${e.message.slice(0, 12)}`;
+    if (statusEl) statusEl.textContent = `❌ ${esc(e.message).slice(0, 12)}`;
   }
 }
 
@@ -1008,7 +1008,7 @@ async function mobileSearch() {
       signal: AbortSignal.timeout(3000),
     }).catch(() => {});
   } catch (e) {
-    el.innerHTML = `<div class="state-error">搜索失败: ${e.message}<br><button onclick="mobileSearch()" style="margin-top:10px;padding:8px 16px;border:1px solid var(--accent);border-radius:8px;background:none;color:var(--accent)">重试</button></div>`;
+    el.innerHTML = `<div class="state-error">搜索失败: ${esc(e.message)}<br><button onclick="mobileSearch()" style="margin-top:10px;padding:8px 16px;border:1px solid var(--accent);border-radius:8px;background:none;color:var(--accent)">重试</button></div>`;
   }
 }
 

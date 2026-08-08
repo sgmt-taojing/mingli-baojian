@@ -746,7 +746,7 @@ document.addEventListener("DOMContentLoaded",function(){
 <\/script>
 \x3cscript src="js/flow-engine.js">\x3c/script>
 \x3cscript src="js/error-interceptor.js" defer>\x3c/script>
-</body></html>`;var blob=new Blob([html],{type:'text/html'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bazi-report.'+(fmt||'html');a.click();if(typeof toast==='function')toast('已导出'+(fmt||'html'));}catch(e){if(typeof toast==='function')toast('导出失败: '+e.message);}};}
+</body></html>`;var blob=new Blob([html],{type:'text/html'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bazi-report.'+(fmt||'html');a.click();if(typeof toast==='function')toast('已导出'+(fmt||'html'));}catch(e){if(typeof toast==='function')toast('导出失败: '+esc(e.message));}};}
 </script>
 
 <script>
@@ -796,7 +796,7 @@ async function generateBaziReport(){
     window.location.href = 'report-interpret.html?module=bazi&name='+encodeURIComponent(name);
   }catch(e){
     const fn = typeof showToast==='function'?showToast:typeof toast==='function'?toast:alert;
-    fn('生成失败：'+e.message);
+    fn('生成失败：'+esc(e.message));
   }
 }
 </script>
@@ -911,7 +911,7 @@ async function generateBaziReport(){
       showToast('排盘完成 ✓');
     }catch(e){
       console.error('[computeBazi]', e);
-      showToast('排盘失败: '+e.message);
+      showToast('排盘失败: '+esc(e.message));
     }
   };
 })();

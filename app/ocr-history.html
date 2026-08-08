@@ -232,7 +232,7 @@ async function fetchCsrf() {
     const r = await fetch('/api/csrf-token', {signal: AbortSignal.timeout(15000),  credentials:'same-origin' });
     const d = await r.json();
     csrfToken = d.csrfToken || d.data?.csrfToken || '';
-  } catch(e) { console.warn('csrf fetch fail', e.message); }
+  } catch(e) { console.warn('csrf fetch fail', esc(e.message)); }
 }
 
 function toast(msg) {
@@ -290,7 +290,7 @@ async function loadHistory() {
     }
     document.getElementById('updateTime').textContent = '更新于 ' + new Date().toLocaleTimeString();
   } catch(e) {
-    toast('请求失败：' + e.message);
+    toast('请求失败：' + esc(e.message));
   }
 }
 

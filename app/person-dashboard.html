@@ -226,7 +226,7 @@ async function loadAll(){
     renderStats(d);
   } catch(e){
     console.error('loadAll err:', e);
-    document.getElementById('profile-header').innerHTML = '<div class="empty">查阅失败：'+e.message+'</div>';
+    document.getElementById('profile-header').innerHTML = '<div class="empty">查阅失败：'+esc(esc(e.message))+'</div>';
   }
 }
 

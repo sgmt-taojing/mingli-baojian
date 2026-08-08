@@ -312,7 +312,7 @@
       renderResult(data);
     } catch (e) {
       failLoading();
-      showErr('咨询失败：' + e.message);
+      showErr('咨询失败：' + esc(e.message));
     } finally {
       state.consulting = false;
       btn.disabled = false; btn.textContent = '开始顾问';

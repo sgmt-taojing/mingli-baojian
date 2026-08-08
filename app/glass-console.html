@@ -879,7 +879,7 @@ $('#btnConnect').onclick = async () => {
       toast('Rokid SDK 未检测到，请使用 Mock 模式', 'err');
     }
   } catch (e) {
-    toast('连接失败：' + e.message, 'err');
+    toast('连接失败：' + esc(e.message), 'err');
   } finally {
     $('#btnConnect').textContent = '🔗 连接眼镜';
     $('#btnConnect').disabled = false;
@@ -963,7 +963,7 @@ async function askSend() {
     speak(out.textContent.slice(0,200));
   } catch (e) {
     if (e.name !== 'AbortError') {
-      out.textContent = '❌ ' + e.message;
+      out.textContent = '❌ ' + esc(e.message);
       meta.innerHTML = '<span class="chip err">fallback → KB</span>';
       kbFallback(q, out, kbRef, meta);
     }
@@ -1027,7 +1027,7 @@ $('#sttUpload').onclick = async () => {
       toast('音频上传失败', 'err');
     }
   } catch(e) {
-    toast('音频上传失败：' + (e && e.message || '网络异常') + '，请重试', 'err');
+    toast('音频上传失败：' + (e && esc(e.message) || '网络异常') + '，请重试', 'err');
   }
 };
 setupSTT();
@@ -1046,7 +1046,7 @@ $('#ocrUpload').onclick = async () => {
     $('#ocrMeta').innerHTML = '<span class="chip ok">✓ ' + (d.engine||'?') + '</span><span class="chip">' + (d.confidence?.toFixed?.(2)||'?') + '</span>';
     if (d.kb_refs) $('#ocrKbRef').innerHTML = '📚 KB: ' + d.kb_refs.map(k=>'<span class="chip kb">' + k + '</span>').join(' ');
     addHistory({ type:'ocr', icon:'📷', title:f.name, text:$('#ocrOut').textContent.slice(0,400), ts:Date.now() });
-  } catch (e) { $('#ocrOut').textContent = '❌ ' + e.message; $('#ocrMeta').innerHTML = '<span class="chip err">失败</span>'; }
+  } catch (e) { $('#ocrOut').textContent = '❌ ' + esc(e.message); $('#ocrMeta').innerHTML = '<span class="chip err">失败</span>'; }
 };
 
 // === 摄像头 ===
@@ -1057,7 +1057,7 @@ $('#camStart').onclick = async () => {
     const v = document.createElement('video'); v.srcObject = s; v.autoplay = true; v.muted = true;
     v.style.cssText = 'width:100%;max-height:280px;border-radius:10px;background:#000';
     $('#camPreview').innerHTML = ''; $('#camPreview').appendChild(v);
-  } catch (e) { toast('摄像头权限：' + e.message, 'err'); }
+  } catch (e) { toast('摄像头权限：' + esc(e.message), 'err'); }
 };
 $('#camStop').onclick = () => { if (State.camStream) State.camStream.getTracks().forEach(t=>t.stop()); $('#camPreview').innerHTML = '已停止'; };
 $('#camSnap').onclick = () => {
@@ -1210,7 +1210,7 @@ async function refreshMirror() {
     const badge = $('#mirrorBadge');
     if (badge) badge.textContent = data.ocr_total || 0;
   } catch(e) {
-    $('#mirrorEngine').innerHTML = '<div class="m-row"><span class="m-val err">✗ ' + esc(e.message) + '</span></div>';
+    $('#mirrorEngine').innerHTML = '<div class="m-row"><span class="m-val err">✗ ' + esc(esc(e.message)) + '</span></div>';
   }
 
   // Parallel: KB 热度
@@ -1260,7 +1260,7 @@ fetch('/api/csrf-token',{signal:AbortSignal.timeout(15000)}).then(r => r.json())
     State.csrfToken = d.csrfToken;
     console.warn('[CSRF] 已获取 token:', d.csrfToken.slice(0, 12) + '...');
   }
-}).catch(e => console.warn('[CSRF] 获取失败：', e.message));
+}).catch(e => console.warn('[CSRF] 获取失败：', esc(e.message)));
 $('#btnRefreshLive').onclick = () => {
   $('#liveFortune').textContent = '运势 ' + (60 + (++State.tickCount % 40));
   $('#liveHealth').textContent = ['气血充盈','注意作息','多饮温水','疏肝解郁','脾胃调养'][(State.tickCount) % 5];
@@ -1330,5 +1330,6 @@ setInterval(renderServices, 30000);
   <div id="ai-assistant-mount"></div>
   <script src="js/ai-voice-assistant.js" defer></script>
   <script src="js/error-interceptor.js" defer></script>
+  <script src="js/smart-search-bootstrap.js" defer></script>
 </body>
 </html>

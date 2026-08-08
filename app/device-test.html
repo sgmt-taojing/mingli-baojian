@@ -230,7 +230,7 @@ async function testCamera() {
     enumDevices();
   } catch(e) {
     const result = document.getElementById('cam-result');
-    let msg = e.message;
+    let msg = esc(e.message);
     if (e.name === 'NotFoundError') msg = '未找到摄像头设备。Mac mini 通常没有内置摄像头，需要外接 USB 摄像头。';
     else if (e.name === 'NotAllowedError') msg = '摄像头权限被拒绝。请在浏览器设置中允许摄像头访问。';
     result.innerHTML = '<div class="test-result result-err">败 ' + msg + '</div>';
@@ -314,7 +314,7 @@ async function testMic() {
     document.getElementById('mic-result').innerHTML = '<div class="test-result result-ok">成 麦克风已启动 — 请说话，观察音量条变化</div>';
     enumDevices();
   } catch(e) {
-    let msg = e.message;
+    let msg = esc(e.message);
     if (e.name === 'NotFoundError') msg = '未找到麦克风设备。Mac mini 通常没有内置麦克风，需要外接 USB 麦克风或蓝牙耳机。';
     else if (e.name === 'NotAllowedError') msg = '麦克风权限被拒绝。请在浏览器设置中允许麦克风访问。';
     document.getElementById('mic-result').innerHTML = '<div class="test-result result-err">败 ' + msg + '</div>';

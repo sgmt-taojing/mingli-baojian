@@ -130,7 +130,7 @@ async function generateFullReport(mod){
     window.location.href = 'report-interpret.html?module='+mod+'&name='+encodeURIComponent(inputs.name||'缘主');
   }catch(e){
     const fn = typeof showToast==='function'?showToast:typeof toast==='function'?toast:alert;
-    fn('生成失败：'+e.message);
+    fn('生成失败：'+esc(e.message));
     console.error(e);
   }
 }
@@ -163,7 +163,7 @@ async function doPaipan(){
       fetch(API_BASE+'/api/paipan/liuren/svg',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body),signal:AbortSignal.timeout(20000)})
     ]);
   } catch(e) {
-    showToast('排盘请求失败：' + (e && e.message || '网络异常') + '，请重试','err');
+    showToast('排盘请求失败：' + (e && esc(e.message) || '网络异常') + '，请重试','err');
     return;
   }
   const data=await r.json();

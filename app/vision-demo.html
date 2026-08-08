@@ -84,7 +84,7 @@ async function fetchCsrfToken() {
       csrfToken = data.csrfToken || data.token;
     }
   } catch(e) {
-    console.warn('[vision] csrf token fetch failed:', e.message);
+    console.warn('[vision] csrf token fetch failed:', esc(e.message));
   }
 }
 
@@ -140,7 +140,7 @@ async function enumerateDevices() {
       resLabel.textContent = videos.length + ' 设备可用';
     }
   } catch(e) {
-    console.warn('[vision] enumerateDevices:', e.message);
+    console.warn('[vision] enumerateDevices:', esc(e.message));
   }
 }
 
@@ -241,7 +241,7 @@ function handleCameraError(e) {
     msg = '🔒 需要安全上下文（HTTPS）';
     hint = '现代浏览器要求摄像头必须在安全上下文中调用。\n请用 https:// 访问，或使用 http://localhost / http://127.0.0.1。';
   } else {
-    hint = '错误类型：' + e.name + '\n详情：' + (e.message || '未知错误');
+    hint = '错误类型：' + e.name + '\n详情：' + (esc(e.message) || '未知错误');
   }
 
   var _e=document.getElementById('stCam');if(_e)_e.textContent='失败';
@@ -342,8 +342,8 @@ async function captureAndAnalyze() {
   } catch(e) {
     const latency = Date.now() - t0;
     var _e=document.getElementById('latencyLabel');if(_e)_e.textContent=latency + 'ms';
-    resultBox.innerHTML = '<div class="error-msg">分析失败</div><div class="hint-text" style="white-space:pre-wrap">' + escHtml(e.message) + '\n\n请确认 face-ocr-server 运行在 8913 端口，且 8920 API 网关在线。</div>';
-    toast('分析失败：' + e.message);
+    resultBox.innerHTML = '<div class="error-msg">分析失败</div><div class="hint-text" style="white-space:pre-wrap">' + escHtml(esc(e.message)) + '\n\n请确认 face-ocr-server 运行在 8913 端口，且 8920 API 网关在线。</div>';
+    toast('分析失败：' + esc(e.message));
   } finally {
     if (scanLine) scanLine.classList.remove('active');
   }
@@ -392,7 +392,7 @@ async function speakResult() {
   } catch(e) {
     btn.disabled = false;
     btn.textContent = '🔊 朗读结果';
-    toast('TTS 失败：' + e.message);
+    toast('TTS 失败：' + esc(e.message));
   }
 }
 

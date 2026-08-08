@@ -103,7 +103,7 @@ async function load(){
   let r;
   try {
     r = await fetch('http://localhost:8920/api/kb/growth-history', {signal: AbortSignal.timeout(10000)});
-  } catch(e) { console.warn('[R514] kb-growth fetch error:', e.message); showToast('数据加载失败，请稍后重试'); return; }
+  } catch(e) { console.warn('[R514] kb-growth fetch error:', esc(e.message)); showToast('数据加载失败，请稍后重试'); return; }
   let d;
   try { d = await r.json(); } catch(e) { showToast('数据解析失败'); return; }
   if(!d.ok) return;

@@ -187,8 +187,8 @@
       log('D1: enumerateDevices 返回 ' + devices.length + ' 设备 (' + videoDevices.length + ' 视频)', 'ok');
       if (videoDevices.length === 0) { details += '⚠️ 无视频设备<br>'; log('D1: 无视频设备', 'warn'); }
     } catch(e) {
-      details += '⚠️ enumerateDevices 失败: ' + escHtml(e.message) + '<br>';
-      log('D1: enumerateDevices 失败 — ' + e.message, 'warn');
+      details += '⚠️ enumerateDevices 失败: ' + escHtml(esc(e.message)) + '<br>';
+      log('D1: enumerateDevices 失败 — ' + esc(e.message), 'warn');
     }
 
     // Try actual stream (don't auto-play)
@@ -200,8 +200,8 @@
       // Stop immediately
       stream.getTracks().forEach(function(t){ t.stop(); });
     } catch(e) {
-      details += '⚠️ 摄像头权限: ' + escHtml(e.name) + ' — ' + escHtml(e.message) + '<br>';
-      log('D1: 摄像头权限失败 — ' + e.name + ': ' + e.message, 'warn');
+      details += '⚠️ 摄像头权限: ' + escHtml(e.name) + ' — ' + escHtml(esc(e.message)) + '<br>';
+      log('D1: 摄像头权限失败 — ' + e.name + ': ' + esc(e.message), 'warn');
     }
 
     status = score >= 80 ? 'pass' : score >= 50 ? 'warn' : 'fail';
@@ -241,8 +241,8 @@
         log('D2: 8913 /health HTTP ' + r.status, 'warn');
       }
     } catch(e) {
-      details += '❌ 连接失败: ' + escHtml(e.message) + '<br>';
-      log('D2: 8913 连接失败 — ' + e.message, 'err');
+      details += '❌ 连接失败: ' + escHtml(esc(e.message)) + '<br>';
+      log('D2: 8913 连接失败 — ' + esc(e.message), 'err');
     }
 
     // Check endpoints availability
@@ -286,8 +286,8 @@
       if (r.ok) { score += 60; details += '✅ /health 200 ✓<br>'; log('D3: 8920 /health 200', 'ok'); }
       else { details += '⚠️ HTTP ' + r.status + '<br>'; log('D3: 8920 HTTP ' + r.status, 'warn'); }
     } catch(e) {
-      details += '❌ 连接失败: ' + escHtml(e.message) + '<br>';
-      log('D3: 8920 连接失败 — ' + e.message, 'err');
+      details += '❌ 连接失败: ' + escHtml(esc(e.message)) + '<br>';
+      log('D3: 8920 连接失败 — ' + esc(e.message), 'err');
     }
 
     // Check glass-routes

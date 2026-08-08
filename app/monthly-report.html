@@ -341,7 +341,7 @@ aria-label="年" value="1990" min="1900" max="2100">
       }
     } catch(e) {
       var errArea = document.getElementById('resultArea');
-      errArea.innerHTML = '<div class="result-card" style="border-color:var(--red);color:var(--red)">败 '+esc(e.message)+'</div>';
+      errArea.innerHTML = '<div class="result-card" style="border-color:var(--red);color:var(--red)">败 '+esc(esc(e.message))+'</div>';
       errArea.style.display='block';
     } finally {
       btn.disabled=false; btn.textContent='🔮 生成逐月报告';

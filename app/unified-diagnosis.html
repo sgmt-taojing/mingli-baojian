@@ -621,7 +621,7 @@ async function startCamera() {
     // Show overlay tags
     updateOverlay();
   } catch (e) {
-    console.warn('[摄像头] 启动失败:', e.message); showNotification('摄像头启动失败: ' + e.message, 'error');
+    console.warn('[摄像头] 启动失败:', esc(e.message)); showNotification('摄像头启动失败: ' + esc(e.message), 'error');
   }
 }
 
@@ -1212,7 +1212,7 @@ async function connectWearable(type) {
       document.getElementById('sttStatus').textContent = '已连接: ' + (device.name || 'BLE设备');
       wearableConnected = true;
       startWearableMock();
-    } catch (e) { console.warn('[BLE] 连接失败', e.message); showNotification('连接失败: ' + e.message, 'error'); }
+    } catch (e) { console.warn('[BLE] 连接失败', esc(e.message)); showNotification('连接失败: ' + esc(e.message), 'error'); }
   } else if (type === 'rokid') {
     wearableConnected = true;
     document.getElementById('sttStatus').textContent = 'Rokid 眼镜已连接';

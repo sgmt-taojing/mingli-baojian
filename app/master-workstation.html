@@ -338,7 +338,7 @@ async function loadCaseByToken(token) {
       setConn(false, 'Token 已过期或不存在');
     }
   } catch (e) {
-    setConn(false, e.message);
+    setConn(false, esc(e.message));
   }
 }
 
@@ -546,7 +546,7 @@ async function pushToDoctor() {
     btn.style.color = '#fff';
     setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; btn.style.borderColor = ''; btn.style.color = ''; }, 1500);
   } catch (e) {
-    console.warn('[推送] 失败:', e.message); showToast('推送失败: ' + e.message, 'error');
+    console.warn('[推送] 失败:', esc(e.message)); showToast('推送失败: ' + esc(e.message), 'error');
   }
 }
 
@@ -630,5 +630,6 @@ async function fetchDemoCase() {
   <script src="js/error-interceptor.js" defer></script>
 <script src="js/submit-guard.js"></script>
 <script src="js/escape-html.js"></script>
+  <script src="js/smart-search-bootstrap.js" defer></script>
 </body>
 </html>

@@ -301,7 +301,7 @@ function generateNamingV2(){
       btn.disabled=false;btn.textContent='✨ 重新生成';
     })
     .catch(function(e){
-      document.getElementById('nv2-result').innerHTML='<div style="padding:16px;color:#f87171">生成失败：'+e.message+'</div>';
+      document.getElementById('nv2-result').innerHTML='<div style="padding:16px;color:#f87171">生成失败：'+esc(esc(e.message))+'</div>';
       btn.disabled=false;btn.textContent='✨ 生成名字建议';
     });
 }
@@ -366,7 +366,7 @@ function analyzeName(){
       btn.disabled=false;btn.textContent='🔍 重新分析';
     })
     .catch(function(e){
-      document.getElementById('an-result').innerHTML='<div style="padding:16px;color:#f87171">分析失败：'+e.message+'</div>';
+      document.getElementById('an-result').innerHTML='<div style="padding:16px;color:#f87171">分析失败：'+esc(esc(e.message))+'</div>';
       btn.disabled=false;btn.textContent='🔍 分析名字';
     });
 }

@@ -407,7 +407,7 @@ window.doMultiAssess = async function() {
     document.getElementById('perfLabel').textContent =
       '⚡ ' + elapsed + 'ms · 风险: ' + (data.risk_level || 'N/A');
   } catch(e) {
-    toast('评估失败: ' + e.message, 'error');
+    toast('评估失败: ' + esc(e.message), 'error');
   } finally {
     isCapturing = false;
     if (btn) btn.disabled = false;
@@ -503,7 +503,7 @@ window.doCapture = async function() {
     document.getElementById('perfLabel').textContent =
       '⚡ ' + elapsed + 'ms · ' + ((data.diagnostic||{}).matchCount||0) + ' KB匹配';
   } catch(e) {
-    toast('采集失败: ' + e.message, 'error');
+    toast('采集失败: ' + esc(e.message), 'error');
     console.error(e);
   } finally {
     isCapturing = false;
@@ -542,7 +542,7 @@ window.doSupplement = async function() {
       renderSupplement(data);
     }
   } catch(e) {
-    toast('补充采集失败: ' + e.message, 'error');
+    toast('补充采集失败: ' + esc(e.message), 'error');
   } finally {
     isCapturing = false;
     btn.disabled = false;

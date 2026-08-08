@@ -408,7 +408,7 @@ function consult(){
         <button class="btn btn-success" onclick="autoFillRx('${minWx}')">记 自动填充主方到开方Tab</button>
       </div>`;
     } catch(e){
-      html += `<div class="alert alert-err">八字计算异常：${e.message}</div>`;
+      html += `<div class="alert alert-err">八字计算异常：${esc(e.message)}</div>`;
     }
   } else {
     html += `<div class="alert alert-info">未填写生辰八字，仅基于主诉进行通用分析。</div>`;

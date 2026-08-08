@@ -209,7 +209,7 @@ fetch(API + '/api/kb/quality-report', {signal: AbortSignal.timeout(15000)})
     }).join('');
   })
   .catch(function(e){
-    document.getElementById('sub').textContent = '查阅失败：' + e.message;
+    document.getElementById('sub').textContent = '查阅失败：' + esc(e.message);
   });
 })();
 </script>

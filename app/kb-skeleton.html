@@ -132,7 +132,7 @@ async function load(){
         </div>
       </details>
     `).join('');
-  }catch(e){document.getElementById('loading').textContent='查阅失败: '+e.message}
+  }catch(e){document.getElementById('loading').textContent='查阅失败: '+esc(e.message)}
 }
 function toggleRefill(eid){const el=document.getElementById('refill-'+eid);el.classList.toggle('show')}
 async function submitRefill(eid){
@@ -144,7 +144,7 @@ async function submitRefill(eid){
     const d=await r.json();
     if(d.code===0||d.ok){toast('✅ '+eid+' 已补充 ('+content.length+' 字)');setTimeout(()=>load(),800)}
     else toast('❌ '+(d.message||d.error||'失败'))
-  }catch(e){toast('❌ '+e.message)}
+  }catch(e){toast('❌ '+esc(e.message))}
 }
 load();
 </script>

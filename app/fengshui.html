@@ -4117,7 +4117,7 @@ async function generateFengshuiReport(){
     window.location.href = 'report-interpret.html?module=fengshui&name='+encodeURIComponent(name);
   }catch(e){
     const fn = typeof showToast==='function'?showToast:typeof toast==='function'?toast:alert;
-    fn('生成失败：'+e.message);
+    fn('生成失败：'+esc(e.message));
   }
 }
 </script>

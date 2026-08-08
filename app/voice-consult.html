@@ -180,7 +180,7 @@ function startRecord(){
     },1000);
     // 同时启动 ASR 实时转写
     startRecognition();
-  }).catch(function(e){showToast('无法访问麦克风：'+e.message)});
+  }).catch(function(e){showToast('无法访问麦克风：'+esc(e.message))});
 }
 
 function stopRecord(){
@@ -303,7 +303,7 @@ function submitConsult(){
     }else{
       showToast('提交失败：'+(d.error||d.message||'请先登录'));
     }
-  }).catch(function(e){showToast('网络错误：'+e.message)});
+  }).catch(function(e){showToast('网络错误：'+esc(e.message))});
 }
 
 // 初始化：有 token 才显示完整流程

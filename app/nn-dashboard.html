@@ -200,7 +200,7 @@ async function fetchJSON(url) {
     const r = await fetch(url, { signal: AbortSignal.timeout(10000) });
     return await r.json();
   } catch(e) {
-    console.warn('[fetchJSON]', e.message);
+    console.warn('[fetchJSON]', esc(e.message));
     return { ok: false, error: 'NETWORK_ERROR' };
   }
 }
@@ -232,7 +232,7 @@ async function loadStatus() {
       </tr></table>`;
     }).join('');
   } catch(e) {
-    document.getElementById('top-neurons').innerHTML = `<div style="color:var(--red)">弥撒亚 API 不可达 (${e.message})</div>`;
+    document.getElementById('top-neurons').innerHTML = `<div style="color:var(--red)">弥撒亚 API 不可达 (${esc(e.message)})</div>`;
   }
 }
 
@@ -268,7 +268,7 @@ async function search() {
     }
     el.innerHTML = html;
   } catch(e) {
-    el.innerHTML = `<div style="color:var(--red)">推理失败: ${e.message}</div>`;
+    el.innerHTML = `<div style="color:var(--red)">推理失败: ${esc(e.message)}</div>`;
   }
 }
 
@@ -364,7 +364,7 @@ async function solve() {
 
     el.innerHTML = html;
   } catch(e) {
-    el.innerHTML = `<div style="color:var(--red)">求解失败: ${e.message}<br><small>确保 8920 网关和 8930 弥撒亚都在运行</small></div>`;
+    el.innerHTML = `<div style="color:var(--red)">求解失败: ${esc(e.message)}<br><small>确保 8920 网关和 8930 弥撒亚都在运行</small></div>`;
   }
 }
 
@@ -390,7 +390,7 @@ async function submitSolveFb(score, q, entryId, module) {
     const r = data.data || data;
     if (status) status.textContent = r.received ? `✅ 已记录 (id=${r.feedback_id})` : '❌ 失败';
   } catch(e) {
-    if (status) status.textContent = `❌ ${e.message.slice(0, 20)}`;
+    if (status) status.textContent = `❌ ${esc(e.message).slice(0, 20)}`;
   }
 }
 

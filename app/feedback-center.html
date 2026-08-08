@@ -385,7 +385,7 @@ function startRecording() {
     try {
       mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType: mimeType }) : new MediaRecorder(stream);
     } catch(e) {
-      showPermWarning('录音初始化失败：' + e.message);
+      showPermWarning('录音初始化失败：' + esc(e.message));
       voiceStream.getTracks().forEach(function(t) { t.stop(); });
       return;
     }
@@ -421,7 +421,7 @@ function startRecording() {
     } else if (e.name === 'NotReadableError') {
       showPermWarning('❌ 麦克风被其他程序占用。请关闭其他使用麦克风的程序后重试。');
     } else {
-      showPermWarning('❌ 麦克风访问失败：' + e.name + ' — ' + e.message);
+      showPermWarning('❌ 麦克风访问失败：' + e.name + ' — ' + esc(e.message));
     }
   });
 }
@@ -495,7 +495,7 @@ function submitTicket() {
   }).then(function(r) { return r.json(); }).then(function(r) {
     handleResult(r);
   }).catch(function(e) {
-    showToast('提交失败：' + e.message);
+    showToast('提交失败：' + esc(e.message));
   }).finally(function() {
     btn.disabled = false;
     btn.textContent = '提交反馈';

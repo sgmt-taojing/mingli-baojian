@@ -497,7 +497,7 @@ function doSearch() {
     })
     .catch(function(e) {
       var box = document.getElementById('searchResults');
-      if (box) box.innerHTML = '<div style="text-align:center;padding:30px;color:#ff9d5c">搜索失败：' + (e && e.message || '网络错误') + '，请重试</div>';
+      if (box) box.innerHTML = '<div style="text-align:center;padding:30px;color:#ff9d5c">搜索失败：' + (e && esc(e.message) || '网络错误') + '，请重试</div>';
     });
 }
 function searchWord(word) {

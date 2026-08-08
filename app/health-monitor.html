@@ -193,7 +193,7 @@ async function loadOcrAnomalies(){
     document.getElementById('report-history').innerHTML = html;
     window._ocrAnomalies = list;
   }catch(e){
-    document.getElementById('report-history').innerHTML = '<div class="empty">查阅失败：'+e.message+'</div>';
+    document.getElementById('report-history').innerHTML = '<div class="empty">查阅失败：'+esc(esc(e.message))+'</div>';
   }
 }
 
@@ -219,7 +219,7 @@ async function loadWeeklySummary(){
     document.getElementById('weekly-history').innerHTML = html;
     window._weeklySummary = weeks;
   }catch(e){
-    document.getElementById('weekly-history').innerHTML = '<div class="empty">查阅失败：'+e.message+'</div>';
+    document.getElementById('weekly-history').innerHTML = '<div class="empty">查阅失败：'+esc(esc(e.message))+'</div>';
   }
 }
 

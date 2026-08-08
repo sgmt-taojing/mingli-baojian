@@ -338,7 +338,7 @@ function generateDraft(){
   else if(selected['痰多']||selected['齿痕'])body.constitution='痰湿质';
   
   // 优先真实后端（FTS5 KB 引擎），失败降级本地 26 条
-  fetch(API+'/api/clinic/ai-draft',{method:'POST',headers:authHeaders(),body:JSON.stringify(body),signal: AbortSignal.timeout(15000)}).catch(function(e){ console.warn("[R514] doctor-intake fetch error:", e.message); })  .then(function(r){return r.json()})
+  fetch(API+'/api/clinic/ai-draft',{method:'POST',headers:authHeaders(),body:JSON.stringify(body),signal: AbortSignal.timeout(15000)}).catch(function(e){ console.warn("[R514] doctor-intake fetch error:", esc(e.message)); })  .then(function(r){return r.json()})
   .then(function(d){
     if(d&&d.ok&&d.draft){
       draftText=d.draft;
@@ -457,7 +457,7 @@ function submitAsCase(){
   var by=document.getElementById('pt-year').value;
   if(by){body.birthYear=Number(by);body.birthMonth=Number(document.getElementById('pt-month').value||6);body.birthDay=Number(document.getElementById('pt-day').value||15);body.birthHour=Number(document.getElementById('pt-hour').value||10)}
   
-  fetch(API+'/api/clinic/submit-symptom',{method:'POST',headers:authHeaders(),body:JSON.stringify(body),signal: AbortSignal.timeout(15000)}).catch(function(e){ console.warn("[R514] doctor-intake fetch error:", e.message); }).catch(function(e){ console.warn("[R514] doctor-intake fetch error:", e.message); })
+  fetch(API+'/api/clinic/submit-symptom',{method:'POST',headers:authHeaders(),body:JSON.stringify(body),signal: AbortSignal.timeout(15000)}).catch(function(e){ console.warn("[R514] doctor-intake fetch error:", esc(e.message)); }).catch(function(e){ console.warn("[R514] doctor-intake fetch error:", esc(e.message)); })
   .then(function(r){return r.json()}).then(function(d){
     if(d.ok||d.caseId){
       window._lastCaseId=d.caseId;showToast('✅ 已提交为案例 #'+(d.caseId||'')+'，AI 正在生成完整初稿');

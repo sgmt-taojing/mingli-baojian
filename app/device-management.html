@@ -361,7 +361,7 @@ var OpsCenter = {
         var latency = Date.now() - start;
         results.push({name:svc.name, url:svc.url, port:svc.port, status:r.ok?'ok':'err', latency:latency, code:r.status});
       }).catch(function(e){
-        results.push({name:svc.name, url:svc.url, port:svc.port, status:'err', latency:-1, error:e.message});
+        results.push({name:svc.name, url:svc.url, port:svc.port, status:'err', latency:-1, error:esc(e.message)});
       }).then(function(){
         completed++;
         if(completed >= self.services.length){
@@ -698,7 +698,7 @@ var OpsCenter = {
       } else if(bridge.postMessage){
         bridge.postMessage('camera.capture', {sensor:'front'}, function(res){ showToast('拍照结果: ' + res); });
       }
-    } catch(e){ showToast('调用失败: ' + e.message); }
+    } catch(e){ showToast('调用失败: ' + esc(e.message)); }
   },
 
   glassInfo: function(){
@@ -710,7 +710,7 @@ var OpsCenter = {
       } else if(bridge.postMessage){
         bridge.postMessage('device.info', {}, function(res){ showToast('设备信息: ' + res); });
       }
-    } catch(e){ showToast('调用失败: ' + e.message); }
+    } catch(e){ showToast('调用失败: ' + esc(e.message)); }
   },
 
   // ===== 更新概览 =====

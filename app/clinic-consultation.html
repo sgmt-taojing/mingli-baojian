@@ -866,7 +866,7 @@ window.startCamera = async function(mode) {
     document.getElementById('btnCapture').disabled = false;
     const labels = {face:'👤 面部',tongue:'👅 舌部',eye:'👁 眼白',hand:'✋ 手部'};
     showToast((labels[mode]||'采集') + ' 摄像头已就绪');
-  } catch(e) { showToast('摄像头不可用: ' + e.message, true); }
+  } catch(e) { showToast('摄像头不可用: ' + esc(e.message), true); }
 };
 
 window.captureWang = async function() {

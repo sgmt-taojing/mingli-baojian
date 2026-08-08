@@ -120,7 +120,7 @@ if(cases.length===0){el.innerHTML='<div class="empty">暂无待批案例</div>';
 el.innerHTML=cases.map(function(c){
 return '<div class="case-list-item" onclick="selectCase('+c.id+')"><div class="case-symptoms">'+(c.symptoms||'')+'</div><div class="case-meta">#'+c.id+' | '+(c.constitution||'')+' | '+(c.status||'')+' | '+(c.created_at||'')+'</div></div>'
 }).join('')
-}).catch(function(e){var el=document.getElementById('case-list');if(el)el.innerHTML='<div class="empty" style="color:#ff9d5c">案例加载失败：'+(e&&e.message||'网络错误')+'</div>';console.warn('[master-review] loadCases:',e&&e.message)})
+}).catch(function(e){var el=document.getElementById('case-list');if(el)el.innerHTML='<div class="empty" style="color:#ff9d5c">案例加载失败：'+(e&&esc(e.message)||'网络错误')+'</div>';console.warn('[master-review] loadCases:',e&&esc(e.message))})
 }
 function selectCase(id){
 currentCase=id;
@@ -144,7 +144,7 @@ var el=document.getElementById('paipan-detail')
 if(!el)return
 if(!b.organ){el.innerHTML='无排盘数据';return}
 el.innerHTML='日主:<b>'+d.data.element+'</b> → 脏腑:<b>'+b.organ+'</b><br>体质:'+b.constitution+' | 调理:'+b.recommendation+'<br>食疗:'+b.foods+'<br>中药:'+b.herbs+'<br>穴位:'+b.acupoint
-}).catch(function(e){var el=document.getElementById('paipan-detail');if(el)el.innerHTML='<div style="color:#ff9d5c">排盘加载失败：'+(e&&e.message||'网络错误')+'</div>';console.warn('[master-review] loadBridge:',e&&e.message)})
+}).catch(function(e){var el=document.getElementById('paipan-detail');if(el)el.innerHTML='<div style="color:#ff9d5c">排盘加载失败：'+(e&&esc(e.message)||'网络错误')+'</div>';console.warn('[master-review] loadBridge:',e&&esc(e.message))})
 }
 function submitReview(){
 if(!currentCase)return
@@ -159,7 +159,7 @@ if(d&&d.ok===false){showToast('提交失败：'+(d.message||d.error||'未知错�
 console.warn('已提交！命理信息已同步给医生端。')
 document.getElementById('detail').style.display='none'
 loadCases()
-}).catch(function(e){showToast('提交失败：'+(e&&e.message||'网络错误')+'，请重试','error');console.warn('[master-review] submitReview:',e&&e.message)})
+}).catch(function(e){showToast('提交失败：'+(e&&esc(e.message)||'网络错误')+'，请重试','error');console.warn('[master-review] submitReview:',e&&esc(e.message))})
 }
 loadCases()
 </script>
