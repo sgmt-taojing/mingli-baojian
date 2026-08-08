@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=5.0">
+<meta name="theme-color" content="#0a1628">
+<meta name="robots" content="noindex,nofollow">
+<title>命理大师工作台 · 易道智鉴</title>
+<link rel="icon" href="favicon.svg">
+<link rel="stylesheet" href="css/page-header.css">
+<style>
+:root{
+  --bg:#0a1628; --surface:#111d33; --card:rgba(255,255,255,.04);
+  --gold:#c9a84c; --gold2:#e3c97a; --gold3:#d4b85a;
+  --jade:#10b981; --red:#ef4444; --cyan:#38bdf8; --violet:#8b5cf6;
+  --paper:#e0d8c8; --muted:#7a8a9e; --border:rgba(201,168,76,.15);
+  --radius:12px; --gap:14px;
+  --master:#c9a84c;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--paper);min-height:100vh;line-height:1.5}
+
+.topbar{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;gap:16px;backdrop-filter:blur(10px)}
+.topbar .logo{font-size:17px;font-weight:700;color:var(--gold);display:flex;align-items:center;gap:8px}
+.topbar .logo .dot{width:10px;height:10px;border-radius:50%;background:var(--gold);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.2)}}
+.topbar .meta{font-size:11px;color:var(--muted)}
+.topbar .actions{margin-left:auto;display:flex;gap:6px}
+.topbar .actions a{padding:5px 12px;border:1px solid var(--border);border-radius:8px;color:var(--paper);text-decoration:none;font-size:11px;transition:.2s}
+.topbar .actions a:hover{border-color:var(--gold);color:var(--gold)}
+
+.main{max-width:1400px;margin:0 auto;padding:20px 24px}
+.case-list{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px}
+.case-list h3{font-size:14px;color:var(--gold);margin-bottom:12px}
+.case-row{padding:10px;background:rgba(0,0,0,.15);border-radius:8px;margin-bottom:6px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:.2s;border:1px solid transparent}
+.case-row:hover{border-color:var(--border)}
+.case-row.active{border-color:var(--gold);background:rgba(201,168,76,.06)}
+.case-row .name{font-weight:600;font-size:13px}
+.case-row .info{font-size:11px;color:var(--muted);margin-top:2px}
+.case-row .badge{margin-left:auto;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:600}
+.case-row .badge.new{background:rgba(16,185,129,.15);color:var(--jade)}
+.case-row .badge.reviewed{background:rgba(122,138,158,.15);color:var(--muted)}
+
+.master-grid{display:grid;grid-template-columns:300px 1fr;gap:16px}
+@media(max-width:900px){.master-grid{grid-template-columns:1fr}}
+
+.left-panel,.right-panel{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.card.gold{border-left:3px solid var(--gold)}
+.card h3{font-size:14px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card h3 .icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(201,168,76,.12);color:var(--gold);font-size:14px}
+.card .sub{font-size:11px;color:var(--muted);margin-left:auto}
+
+.kv{display:flex;gap:8px;padding:4px 0;font-size:12px;border-bottom:1px solid var(--border)}
+.kv:last-child{border-bottom:0}
+.kv .k{color:var(--muted);min-width:80px}
+.kv .v{flex:1}
+
+.bazi-table{width:100%;border-collapse:collapse;margin:8px 0;font-size:13px}
+.bazi-table th,.bazi-table td{padding:8px;border:1px solid var(--border);text-align:center}
+.bazi-table th{background:rgba(201,168,76,.08);color:var(--gold);font-weight:600}
+.bazi-table .stem{color:var(--gold);font-weight:700;font-size:14px}
+.bazi-table .branch{color:var(--cyan)}
+
+.syndrome{display:inline-block;padding:3px 10px;margin:2px;border-radius:10px;font-size:11px;background:rgba(201,168,76,.12);color:var(--gold)}
+
+.tcm-section{background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.15);border-radius:8px;padding:10px;margin-bottom:8px}
+.tcm-section .label{font-size:10px;color:var(--cyan);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.tcm-section .content{font-size:13px}
+
+.annotation-box{background:rgba(201,168,76,.04);border:2px solid var(--gold);border-radius:8px;padding:14px;margin-top:12px}
+.annotation-box label{font-size:11px;color:var(--gold);font-weight:600;display:block;margin-bottom:6px}
+.annotation-box textarea{width:100%;min-height:140px;background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:8px;color:var(--paper);font-size:13px;padding:10px;font-family:inherit;resize:vertical;outline:none}
+.annotation-box textarea:focus{border-color:var(--gold)}
+
+.action-bar{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.action-bar button{padding:8px 16px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--paper);font-size:12px;cursor:pointer;font-family:inherit;transition:.2s}
+.action-bar button:hover{border-color:var(--gold);color:var(--gold)}
+.action-bar button.primary{background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:600}
+.action-bar button.primary:hover{background:var(--gold2)}
+
+.template-bar{margin-bottom:8px;display:flex;gap:6px;flex-wrap:wrap}
+.template-bar button{padding:4px 10px;border:1px dashed var(--border);border-radius:6px;background:transparent;color:var(--muted);font-size:10px;cursor:pointer;font-family:inherit}
+.template-bar button:hover{border-style:solid;border-color:var(--gold);color:var(--gold)}
+
+.empty{text-align:center;padding:30px;color:var(--muted);font-size:13px}
+.typing{display:inline-flex;gap:3px;padding:4px 0}
+.typing span{width:5px;height:5px;border-radius:50%;background:var(--muted);animation:typing 1.4s infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes typing{0%,60%,100%{opacity:.3}30%{opacity:1}}
+
+.treatment-plan{background:rgba(16,185,129,.04);border:1px solid rgba(16,185,129,.15);border-radius:8px;padding:14px;margin-top:10px}
+.treatment-plan .label{font-size:11px;color:var(--jade);font-weight:600;margin-bottom:6px}
+.treatment-plan .content{font-size:13px;white-space:pre-wrap}
+
+.connection-state{padding:6px 12px;border-radius:14px;font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.connection-state.connected{background:rgba(16,185,129,.15);color:var(--jade)}
+.connection-state.disconnected{background:rgba(239,68,68,.15);color:var(--red)}
+.connection-state .dot{width:8px;height:8px;border-radius:50%;background:currentColor;animation:pulse 2s infinite}
+
+.kb-source{background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.15);border-radius:6px;padding:6px 10px;margin:3px 0;font-size:11px}
+.kb-source .title{color:var(--violet);font-weight:600}
+.kb-source .snippet{color:var(--muted);font-size:10px;margin-top:2px}
+.kb-source .trust{color:var(--gold);font-size:9px;margin-left:auto}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo"><span class="dot"></span>🧭 命理大师工作台</div>
+  <div class="meta" id="metaState">
+    <span class="connection-state disconnected" id="connState"><span class="dot"></span>未连接</span>
+    &nbsp;·&nbsp;
+    待处理 <span id="pendingCount">0</span> 例
+  </div>
+  <div class="actions">
+    <a href="unified-diagnosis.html" target="_blank">📋 诊疗中心</a>
+    <a href="kb-explorer.html" target="_blank">🔍 知识库</a>
+    <a href="divination-hub.html">🏠 首页</a>
+  </div>
+</header>
+
+<div class="main">
+  <div class="master-grid">
+
+    <!-- ═══ 左侧：患者案例列表 ═══ -->
+    <div class="left-panel">
+      <div class="case-list">
+        <h3>🧭 案例队列 <span class="sub" id="queueStat">等待同步</span></h3>
+        <div id="caseListContainer">
+          <div class="empty">📭<br>尚未接收到患者诊断同步<br><br>
+            <span style="font-size:11px">从「统一诊疗中心」完成一次诊断后会自动同步</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>⚡ 快速操作</h3>
+        <div class="action-bar" style="flex-direction:column">
+          <button onclick="refreshCases()">🔄 刷新案例</button>
+          <button onclick="fetchDemoCase()">📋 加载演示案例</button>
+          <button onclick="viewKBPool()">📚 知识库溯源</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ 右侧：大师批注区 ═══ -->
+    <div class="right-panel" id="rightPanel">
+
+      <!-- 患者信息卡 -->
+      <div class="card gold">
+        <h3><span class="icon">🧑</span> 患者信息 <span class="sub" id="patientSub">--</span></h3>
+        <div id="patientInfo">
+          <div class="empty">从左侧选择案例后显示详情</div>
+        </div>
+      </div>
+
+      <!-- 八字盘 -->
+      <div class="card gold" id="baziCard" style="display:none">
+        <h3><span class="icon">📅</span> 八字命盘 <span class="sub" id="baziSub">AI预览</span></h3>
+        <div id="baziContent"></div>
+      </div>
+
+      <!-- 中医诊断同步 -->
+      <div class="card">
+        <h3><span class="icon">🏥</span> 中医诊断同步 <span class="sub" id="tcmSub">--</span></h3>
+        <div id="tcmContent">
+          <div class="empty">⚠️ 患者诊断信息不对命理大师隐藏<br>右侧将显示完整的中医诊断过程</div>
+        </div>
+      </div>
+
+      <!-- 知识库溯源 -->
+      <div class="card">
+        <h3><span class="icon">📚</span> 知识库溯源 <span class="sub" id="kbCountSub">0 条</span></h3>
+        <div id="kbSourceContent">
+          <div class="empty">根据患者主诉 + 视觉证型匹配知识条目</div>
+        </div>
+      </div>
+
+      <!-- 大师批注 -->
+      <div class="card gold">
+        <h3><span class="icon">🧭</span> 命理大师批注 <span class="sub">对医生可见</span></h3>
+        <div class="template-bar">
+          <button onclick="insertTemplate('wuxing')">🌳 五行分析</button>
+          <button onclick="insertTemplate('bazi')">📅 八字格局</button>
+          <button onclick="insertTemplate('yimao')">🧘 易理指导</button>
+          <button onclick="insertTemplate('music')">🎵 五行音乐</button>
+          <button onclick="insertTemplate('lifestyle')">🍵 养生建议</button>
+          <button onclick="insertTemplate('meditation')">🧘 冥想静坐</button>
+        </div>
+        <div class="annotation-box">
+          <label for="annotation">📜 大师批注（编辑后点击「推送给医生」）</label>
+          <textarea id="annotation" placeholder="在此输入命理诊断和治疗方向建议...&#10;&#10;示例：&#10;先天木旺，肾水不足，建议养阴清热；&#10;忌辛辣刺激，宜食黑芝麻、桑葚；&#10;配合商音五行音乐调理。"></textarea>
+        </div>
+
+        <div class="treatment-plan">
+          <div class="label">🎯 命理治疗方向</div>
+          <textarea id="treatmentPlan" placeholder="结合八字与中医证型，给出整体治疗方向...&#10;&#10;例如：&#10;1. 情志调养：保持平和心态&#10;2. 饮食建议：宜食...&#10;3. 起居调理：早睡早起&#10;4. 音乐疗法：商音+羽音&#10;5. 复诊建议：1周后" style="width:100%;min-height:80px;background:transparent;border:none;color:var(--paper);font-size:13px;font-family:inherit;resize:vertical;outline:none"></textarea>
+        </div>
+
+        <div class="action-bar">
+          <button onclick="saveAnnotation()">💾 保存草稿</button>
+          <button class="primary" onclick="pushToDoctor()">📤 推送给医生</button>
+          <button onclick="speakAnnotation()">🔊 朗读批注</button>
+          <button onclick="markReviewed()">✓ 标记已审</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<script>
+const API = '';
+let state = {
+  currentCase: null,
+  cases: [],
+  pollInterval: null,
+};
+
+// ═══ Init ═══
+(function init() {
+  // Get token from URL
+  const params = new URLSearchParams(location.search);
+  const token = params.get('token');
+  if (token) {
+    loadCaseByToken(token);
+  } else {
+    loadStoredCases();
+  }
+  // Auto refresh every 10s
+  state.pollInterval = setInterval(refreshCases, 10000);
+})();
+
+// ═══ Load case by sync token ═══
+async function loadCaseByToken(token) {
+  try {
+    const resp = await fetch(API + '/api/public/sync-diagnosis/' + encodeURIComponent(token));
+    const data = await resp.json();
+    if (data.ok) {
+      addCase({ token, ...data, status: 'new' });
+      selectCase(token);
+      setConn(true);
+    } else {
+      setConn(false, 'Token 已过期或不存在');
+    }
+  } catch (e) {
+    setConn(false, e.message);
+  }
+}
+
+// ═══ Load cases from localStorage ═══
+function loadStoredCases() {
+  const stored = JSON.parse(localStorage.getItem('master_workstation_cases') || '[]');
+  if (stored.length > 0) {
+    state.cases = stored;
+    renderCaseList();
+  }
+}
+
+// ═══ Refresh ═══
+async function refreshCases() {
+  // In a real system, this would call /api/master/queue
+  // For now we rely on localStorage which the master page saves on sync
+  const stored = JSON.parse(localStorage.getItem('master_workstation_cases') || '[]');
+  if (JSON.stringify(stored) !== JSON.stringify(state.cases)) {
+    state.cases = stored;
+    renderCaseList();
+  }
+  document.getElementById('pendingCount').textContent = state.cases.filter(c => c.status === 'new').length;
+}
+
+// ═══ Add a case ═══
+function addCase(c) {
+  // Remove duplicates
+  state.cases = state.cases.filter(x => x.token !== c.token);
+  c.ts = c.ts || Date.now();
+  state.cases.unshift(c);
+  if (state.cases.length > 20) state.cases = state.cases.slice(0, 20);
+  localStorage.setItem('master_workstation_cases', JSON.stringify(state.cases));
+  renderCaseList();
+}
+
+// ═══ Render case list ═══
+function renderCaseList() {
+  const c = document.getElementById('caseListContainer');
+  if (state.cases.length === 0) {
+    c.innerHTML = '<div class="empty">📭<br>尚无案例</div>';
+    return;
+  }
+  let html = '';
+  state.cases.forEach(cs => {
+    const p = cs.patient || {};
+    html += `<div class="case-row ${state.currentCase === cs.token ? 'active' : ''}" onclick="selectCase('${cs.token}')">
+      <div style="flex:1">
+        <div class="name">${p.name || '未命名'} · ${p.gender || '?'} · ${p.age || '?'}岁</div>
+        <div class="info">${p.chief ? p.chief.substring(0, 30) + '...' : '无主诉'} · ${new Date(cs.ts).toLocaleTimeString('zh-CN')}</div>
+      </div>
+      <span class="badge ${cs.status || 'new'}">${cs.status === 'reviewed' ? '已审' : '新'}</span>
+    </div>`;
+  });
+  c.innerHTML = html;
+  document.getElementById('pendingCount').textContent = state.cases.filter(x => x.status === 'new').length;
+  document.getElementById('queueStat').textContent = state.cases.length + ' 例';
+}
+
+function setConn(ok, msg) {
+  const el = document.getElementById('connState');
+  el.className = 'connection-state ' + (ok ? 'connected' : 'disconnected');
+  el.innerHTML = '<span class="dot"></span>' + (ok ? '已连接' : (msg || '未连接'));
+}
+
+// ═══ Select case ═══
+async function selectCase(token) {
+  state.currentCase = token;
+  renderCaseList();
+
+  // Load full case data
+  let data;
+  try {
+    const resp = await fetch(API + '/api/public/sync-diagnosis/' + encodeURIComponent(token));
+    data = await resp.json();
+  } catch (e) {}
+
+  if (!data || !data.ok) {
+    // Try localStorage
+    const stored = state.cases.find(c => c.token === token);
+    if (stored) data = stored;
+    else { alert('案例数据不存在'); return; }
+  }
+
+  renderCaseDetail(data);
+  loadAnnotations(token);
+}
+
+function renderCaseDetail(data) {
+  const p = data.patient || {};
+  document.getElementById('patientSub').textContent = (p.name || '--') + ' · ' + (p.gender || '?') + ' · ' + (p.age || '?') + '岁';
+
+  // Patient info
+  let html = '';
+  html += `<div class="kv"><div class="k">姓名</div><div class="v">${p.name || '未填'}</div></div>`;
+  html += `<div class="kv"><div class="k">性别/年龄</div><div class="v">${p.gender || '?'} · ${p.age || '?'}岁</div></div>`;
+  html += `<div class="kv"><div class="k">出生日期</div><div class="v">${p.birthDate || '未填'} ${p.birthHour ? '(' + p.birthHour + '时)' : ''}</div></div>`;
+  html += `<div class="kv"><div class="k">出生地</div><div class="v">${p.birthPlace || '未填'}</div></div>`;
+  html += `<div class="kv"><div class="k">主诉</div><div class="v">${p.chief || '未填'}</div></div>`;
+  if (p.history) html += `<div class="kv"><div class="k">现病史</div><div class="v">${p.history}</div></div>`;
+  if (p.past) html += `<div class="kv"><div class="k">既往史</div><div class="v">${p.past}</div></div>`;
+  if (p.tonguePulse) html += `<div class="kv"><div class="k">舌脉</div><div class="v">${p.tonguePulse}</div></div>`;
+  if (data.voiceTranscript) html += `<div class="kv"><div class="k">语音问诊</div><div class="v" style="font-size:11px;color:var(--muted)">${data.voiceTranscript.substring(0, 200)}</div></div>`;
+  document.getElementById('patientInfo').innerHTML = html;
+
+  // Bazi mock table
+  if (p.birthDate) {
+    document.getElementById('baziCard').style.display = 'block';
+    // Generate simple bazi mock (real bazi would call engine-facade)
+    const dateStr = p.birthDate.replace(/-/g, '/');
+    const stems = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+    const branches = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+    const yearZhi = p.birthDate ? branches[(parseInt(p.birthDate.slice(0,4)) - 1900) % 12] : '?';
+    const monthBranch = branches[(parseInt(p.birthDate?.slice(5,7) || 1) + 1) % 12];
+    const yearStem = stems[(parseInt(p.birthDate?.slice(0,4) || 2024) - 4) % 10];
+    document.getElementById('baziSub').textContent = yearStem + yearZhi + '年';
+    let baziHtml = '<table class="bazi-table"><tr><th>年柱</th><th>月柱</th><th>日柱</th><th>时柱</th></tr>';
+    baziHtml += '<tr><td><span class="stem">' + yearStem + '</span><br><span class="branch">' + yearZhi + '</span></td>';
+    baziHtml += '<td><span class="stem">' + stems[(parseInt(p.birthDate?.slice(5,7) || 1) + 1) % 10] + '</span><br><span class="branch">' + monthBranch + '</span></td>';
+    baziHtml += '<td><span class="stem">' + stems[(parseInt(p.birthDate?.slice(8,10) || 1)) % 10] + '</span><br><span class="branch">?</span></td>';
+    baziHtml += '<td><span class="stem">' + stems[(p.birthHour || 12) % 10] + '</span><br><span class="branch">' + branches[(p.birthHour || 0) % 12] + '</span></td></tr>';
+    baziHtml += '</table>';
+    baziHtml += '<div style="font-size:11px;color:var(--muted);margin-top:4px">⚠️ 此为简化预览，命理大师可基于实际八字格局进行专业批注</div>';
+    document.getElementById('baziContent').innerHTML = baziHtml;
+  }
+
+  // TCM section
+  document.getElementById('tcmSub').textContent = data.vision?.length ? data.vision.length + '路视觉' : '--';
+  let tcmHtml = '';
+  if (data.vision && data.vision.length > 0) {
+    data.vision.forEach(v => {
+      tcmHtml += '<div class="tcm-section"><div class="label">' + (v.name || v.mode) + '</div>';
+      tcmHtml += '<div class="content">' + (v.top1 ? (v.top1.label + ' (' + (v.top1.confidence * 100).toFixed(0) + '%)') : '无识别') + '</div></div>';
+    });
+  }
+  if (data.inferred_syndromes || data.diagnosis?.inferred_syndromes) {
+    const s = data.inferred_syndromes || data.diagnosis.inferred_syndromes;
+    tcmHtml += '<div class="tcm-section"><div class="label">推断证型</div><div class="content">';
+    s.forEach(x => tcmHtml += '<span class="syndrome">' + x + '</span>');
+    tcmHtml += '</div></div>';
+  }
+  if (data.finalRx) {
+    tcmHtml += '<div class="tcm-section" style="background:rgba(16,185,129,.06)"><div class="label" style="color:var(--jade)">医生最终处方</div>';
+    tcmHtml += '<div class="content" style="white-space:pre-wrap">' + data.finalRx + '</div></div>';
+  }
+  if (!tcmHtml) tcmHtml = '<div class="empty">暂无中医诊断信息</div>';
+  document.getElementById('tcmContent').innerHTML = tcmHtml;
+
+  // KB sources
+  if (data.kb && data.kb.length > 0) {
+    document.getElementById('kbCountSub').textContent = data.kb.length + ' 条';
+    let kbHtml = '';
+    data.kb.slice(0, 8).forEach(k => {
+      kbHtml += '<div class="kb-source"><div style="display:flex;align-items:center"><span class="title">' + (k.title || k.module || 'KB条目') + '</span>';
+      kbHtml += '<span class="trust">' + (k.trust_score || '-') + '</span></div>';
+      if (k.snippet) kbHtml += '<div class="snippet">' + k.snippet.substring(0, 100) + '</div>';
+      kbHtml += '</div>';
+    });
+    document.getElementById('kbSourceContent').innerHTML = kbHtml;
+  }
+}
+
+// ═══ Annotations ═══
+async function loadAnnotations(token) {
+  try {
+    const resp = await fetch(API + '/api/public/master-annotations/' + encodeURIComponent(token));
+    const data = await resp.json();
+    if (data.ok && data.annotations) {
+      document.getElementById('annotation').value = data.annotations;
+    }
+  } catch (e) {}
+}
+
+async function pushToDoctor() {
+  if (!state.currentCase) { alert('请先选择案例'); return; }
+  const ann = document.getElementById('annotation').value.trim();
+  const plan = document.getElementById('treatmentPlan').value.trim();
+  if (!ann && !plan) { alert('请先填写批注或治疗方向'); return; }
+
+  const fullText = [ann, plan].filter(Boolean).join('\n\n【治疗方向】\n');
+
+  try {
+    await fetch(API + '/api/public/master-annotations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        syncToken: state.currentCase,
+        master_id: 'master_local',
+        annotations: fullText
+      })
+    });
+
+    // Mark as reviewed
+    const c = state.cases.find(x => x.token === state.currentCase);
+    if (c) c.status = 'reviewed';
+    localStorage.setItem('master_workstation_cases', JSON.stringify(state.cases));
+    renderCaseList();
+
+    // Visual feedback
+    const btn = event.target;
+    const orig = btn.innerHTML;
+    btn.innerHTML = '✓ 已推送';
+    btn.style.background = 'var(--jade)';
+    btn.style.borderColor = 'var(--jade)';
+    btn.style.color = '#fff';
+    setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; btn.style.borderColor = ''; btn.style.color = ''; }, 1500);
+  } catch (e) {
+    alert('推送失败: ' + e.message);
+  }
+}
+
+function saveAnnotation() {
+  const ann = document.getElementById('annotation').value;
+  if (!ann) return;
+  localStorage.setItem('master_draft_' + state.currentCase, ann);
+  alert('草稿已保存');
+}
+
+function markReviewed() {
+  if (!state.currentCase) return;
+  const c = state.cases.find(x => x.token === state.currentCase);
+  if (c) c.status = 'reviewed';
+  localStorage.setItem('master_workstation_cases', JSON.stringify(state.cases));
+  renderCaseList();
+}
+
+function speakAnnotation() {
+  const text = document.getElementById('annotation').value;
+  if (!text) return;
+  new Audio('http://127.0.0.1:8912/api/tts?text=' + encodeURIComponent(text.substring(0, 500)) + '&voice=female').play().catch(() => {});
+}
+
+// ═══ Templates ═══
+const TEMPLATES = {
+  wuxing: '\n【五行分析】\n年柱五行：{STEM}{BRANCH}\n日主五行：\n喜用神：\n忌神：\n调候建议：',
+  bazi: '\n【八字格局】\n年柱：{STEM}{BRANCH}\n月令：\n格局：\n用神：\n流年：',
+  yimao: '\n【易理指导】\n卦象：\n爻位：\n动爻：\n变卦：\n建议：',
+  music: '\n【五行音乐】\n建议音阶：商音（肺）+ 羽音（肾）\n播放频率：每日 30 分钟\n推荐曲目：',
+  lifestyle: '\n【养生建议】\n饮食：宜食黑色食物（黑芝麻、桑葚、黑豆）\n起居：早睡早起，避免熬夜\n运动：八段锦、太极\n情志：保持平和',
+  meditation: '\n【冥想静坐】\n建议时间：每日 30 分钟\n方法：观呼吸 + 意守丹田\n环境：安静通风\n',
+};
+function insertTemplate(key) {
+  const t = TEMPLATES[key] || '';
+  const ta = document.getElementById('annotation');
+  ta.value = (ta.value ? ta.value + '\n' : '') + t;
+}
+
+function viewKBPool() {
+  window.open('kb-explorer.html', '_blank');
+}
+
+async function fetchDemoCase() {
+  // Inject a demo case for testing
+  const demoCase = {
+    token: 'demo-' + Date.now(),
+    ts: Date.now(),
+    status: 'new',
+    patient: {
+      name: '示例患者',
+      gender: '男',
+      age: '42',
+      birthDate: '1984-03-15',
+      birthHour: 7,
+      birthPlace: '上海',
+      chief: '疲倦乏力三月余，食欲不振',
+      history: '曾服中药调理，效果不显',
+      past: '慢性胃炎',
+      tonguePulse: '舌淡白苔薄白，脉细弱'
+    },
+    vision: [
+      { mode: 'face', name: '面诊', top1: { label: '面色萎黄', confidence: 0.78 } },
+      { mode: 'tongue', name: '舌诊', top1: { label: '舌淡白', confidence: 0.82 } }
+    ],
+    inferred_syndromes: ['气血两虚', '脾胃虚弱'],
+    kb: [
+      { title: '四君子汤', module: 'fangji', snippet: '人参、白术、茯苓、甘草，主治脾胃气虚', trust_score: 0.92 },
+      { title: '气血两虚辨证', module: 'tcm', snippet: '面色萎黄、乏力、舌淡白', trust_score: 0.88 }
+    ]
+  };
+  addCase(demoCase);
+  selectCase(demoCase.token);
+}
+</script>
+
+</body>
+</html>

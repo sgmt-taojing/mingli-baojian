@@ -276,6 +276,37 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
         </div>
       </div>
 
+      <!-- ═══ 语音问诊 STT ═══ -->
+      <div class="form-row">
+        <div class="form-field" style="min-width:100%">
+          <label>语音问诊 · 实时录音转文字</label>
+          <div style="display:flex;gap:6px;align-items:center">
+            <button id="btnSTT" onclick="toggleSTT()" style="padding:6px 14px;border:1px solid var(--jade);border-radius:8px;background:rgba(16,185,129,.1);color:var(--jade);font-size:12px;cursor:pointer;font-family:inherit">🎙️ 开始问诊录音</button>
+            <button onclick="clearSTT()" style="padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit">🗑 清空</button>
+            <span style="font-size:11px;color:var(--muted);margin-left:auto" id="sttStatus">未录音</span>
+          </div>
+          <textarea id="pVoiceTranscript" placeholder="点击「开始问诊录音」后，浏览器会自动把医生/患者的对话转写成文字..." rows="3" style="margin-top:6px"></textarea>
+        </div>
+      </div>
+
+      <!-- ═══ 穿戴设备接入 ═══ -->
+      <div class="form-row">
+        <div class="form-field" style="min-width:100%">
+          <label>穿戴设备 · 实时生理指标</label>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+            <button onclick="connectWearable('ble')" style="padding:5px 12px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--paper);font-size:11px;cursor:pointer;font-family:inherit">⌚ 蓝牙接入</button>
+            <button onclick="connectWearable('rokid')" style="padding:5px 12px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--paper);font-size:11px;cursor:pointer;font-family:inherit">🕶 Rokid眼镜</button>
+            <button onclick="connectWearable('watch')" style="padding:5px 12px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--paper);font-size:11px;cursor:pointer;font-family:inherit">⌚ 健康手表</button>
+            <button onclick="connectWearable('manual')" style="padding:5px 12px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--paper);font-size:11px;cursor:pointer;font-family:inherit">⌨ 手动输入</button>
+            <div style="display:flex;gap:8px;margin-left:auto;font-size:11px;color:var(--muted)" id="wearableStats">
+              <span id="wsHR">心率 --</span>
+              <span id="wsSpO2">血氧 --</span>
+              <span id="wsTemp">体温 --</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div style="margin-top:8px;display:flex;gap:6px">
         <button onclick="quickFillDemo()" style="padding:5px 12px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);font-size:11px;cursor:pointer;font-family:inherit">📝 示例填充</button>
         <button onclick="syncToMaster()" style="padding:5px 12px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--gold);font-size:11px;cursor:pointer;font-family:inherit">🧭 同步给命理大师</button>
@@ -375,6 +406,17 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
         <button onclick="speakDiagnosis('vision')">🔊 朗读</button>
         <button onclick="runVisionDiagnosis()">🔄 重新分析</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ═══ ROW 2.5: 治疗跟踪时间轴 (全宽) ═══ -->
+  <div class="card highlight" id="trackingCard" style="display:none">
+    <h3><span class="icon master">📈</span> 治疗跟踪 · 随访时间轴 <span class="sub-title" id="trackingSub">尚无随访记录</span></h3>
+    <div id="trackingTimeline" style="margin-top:8px"></div>
+    <div style="margin-top:8px;display:flex;gap:6px">
+      <button onclick="addFollowup()" style="padding:5px 12px;border:1px solid var(--gold);border-radius:8px;background:rgba(201,168,76,.1);color:var(--gold);font-size:11px;cursor:pointer;font-family:inherit">➕ 添加随访</button>
+      <button onclick="viewHistory()" style="padding:5px 12px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--paper);font-size:11px;cursor:pointer;font-family:inherit">📚 历史报告</button>
+      <button onclick="openMasterWorkstation()" style="padding:5px 12px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--master);font-size:11px;cursor:pointer;font-family:inherit">🧭 命理大师工作台 →</button>
     </div>
   </div>
 
@@ -1012,6 +1054,159 @@ async function syncFinalToMaster() {
 // ═══ Run vision diagnosis shortcut ═══
 function runVisionDiagnosis() {
   if (state.cameraActive) captureAll();
+}
+
+// ═══ STT 语音问诊 ═══
+let sttRecognition = null;
+let sttActive = false;
+function toggleSTT() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    alert('当前浏览器不支持语音识别，请使用 Chrome / Edge');
+    return;
+  }
+  if (sttActive) {
+    if (sttRecognition) try { sttRecognition.stop(); } catch (e) {}
+    sttActive = false;
+    document.getElementById('btnSTT').innerHTML = '🎙️ 开始问诊录音';
+    document.getElementById('btnSTT').style.borderColor = 'var(--jade)';
+    document.getElementById('sttStatus').textContent = '已停止';
+    return;
+  }
+  sttRecognition = new SR();
+  sttRecognition.continuous = true;
+  sttRecognition.interimResults = true;
+  sttRecognition.lang = 'zh-CN';
+  const ta = document.getElementById('pVoiceTranscript');
+  sttRecognition.onresult = (event) => {
+    let interim = '', final = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const t = event.results[i][0].transcript;
+      if (event.results[i].isFinal) final += t; else interim += t;
+    }
+    if (final) ta.value = (ta.value ? ta.value + ' ' : '') + final;
+    document.getElementById('sttStatus').textContent = interim ? '识别中: ' + interim.slice(0, 30) + '...' : '识别中...';
+  };
+  sttRecognition.onerror = (e) => {
+    document.getElementById('sttStatus').textContent = '错误: ' + e.error;
+    sttActive = false;
+  };
+  sttRecognition.onend = () => {
+    if (sttActive) try { sttRecognition.start(); } catch (e) {}
+  };
+  sttRecognition.start();
+  sttActive = true;
+  document.getElementById('btnSTT').innerHTML = '⏹ 停止录音';
+  document.getElementById('btnSTT').style.borderColor = 'var(--red)';
+  document.getElementById('sttStatus').textContent = '录音中...';
+}
+function clearSTT() {
+  document.getElementById('pVoiceTranscript').value = '';
+  document.getElementById('sttStatus').textContent = '已清空';
+}
+
+// ═══ 穿戴设备接入 (简化版) ═══
+let wearableConnected = false;
+let wearableInterval = null;
+async function connectWearable(type) {
+  if (type === 'ble') {
+    if (!navigator.bluetooth) { alert('浏览器不支持 BLE'); return; }
+    try {
+      const device = await navigator.bluetooth.requestDevice({
+        acceptAllDevices: true,
+        optionalServices: ['heart_rate', 'battery_service']
+      });
+      document.getElementById('sttStatus').textContent = '已连接: ' + (device.name || 'BLE设备');
+      wearableConnected = true;
+      startWearableMock();
+    } catch (e) { alert('连接失败: ' + e.message); }
+  } else if (type === 'rokid') {
+    wearableConnected = true;
+    document.getElementById('sttStatus').textContent = 'Rokid 眼镜已连接';
+    startWearableMock();
+  } else if (type === 'manual') {
+    const hr = prompt('心率 (bpm)', '72');
+    const sp = prompt('血氧 (%)', '98');
+    const tp = prompt('体温 (°C)', '36.5');
+    if (hr) document.getElementById('wsHR').textContent = '心率 ' + hr;
+    if (sp) document.getElementById('wsSpO2').textContent = '血氧 ' + sp;
+    if (tp) document.getElementById('wsTemp').textContent = '体温 ' + tp;
+  } else {
+    wearableConnected = true;
+    document.getElementById('sttStatus').textContent = '健康手表已连接';
+    startWearableMock();
+  }
+}
+function startWearableMock() {
+  if (wearableInterval) clearInterval(wearableInterval);
+  wearableInterval = setInterval(() => {
+    const hr = Math.floor(60 + Math.random() * 30);
+    const sp = Math.floor(95 + Math.random() * 4);
+    const tp = (36.0 + Math.random() * 1.5).toFixed(1);
+    document.getElementById('wsHR').textContent = '心率 ' + hr;
+    document.getElementById('wsSpO2').textContent = '血氧 ' + sp;
+    document.getElementById('wsTemp').textContent = '体温 ' + tp + '°C';
+  }, 3000);
+}
+
+// ═══ 随访跟踪 ═══
+function addFollowup() {
+  const name = document.getElementById('pName').value || '当前患者';
+  const reports = JSON.parse(localStorage.getItem('unified_diag_followups') || '{}');
+  if (!reports[name]) reports[name] = [];
+  const note = prompt('随访记录 (例如：3天后复诊，症状减轻)', '已服药3日，胃痛减轻，睡眠改善');
+  if (!note) return;
+  reports[name].push({
+    ts: Date.now(),
+    note,
+    rx: document.getElementById('finalRx').value.substring(0, 100)
+  });
+  if (reports[name].length > 20) reports[name] = reports[name].slice(-20);
+  localStorage.setItem('unified_diag_followups', JSON.stringify(reports));
+  renderTimeline(name, reports[name]);
+}
+function viewHistory() {
+  const name = document.getElementById('pName').value;
+  const reports = JSON.parse(localStorage.getItem('unified_diag_reports') || '[]');
+  if (reports.length === 0) { alert('暂无历史报告'); return; }
+  let html = '本机历史处方 (最多 50 条)：\n\n';
+  reports.slice(0, 10).forEach((r, i) => {
+    html += `[${i+1}] ${new Date(r.ts).toLocaleString('zh-CN')} - ${r.patient}\n${r.rx.substring(0,100)}...\n\n`;
+  });
+  alert(html);
+}
+function renderTimeline(name, items) {
+  document.getElementById('trackingCard').style.display = 'block';
+  document.getElementById('trackingSub').textContent = items.length + ' 条随访 · ' + name;
+  const tl = document.getElementById('trackingTimeline');
+  let html = '<div style="border-left:2px solid var(--gold);padding-left:12px;margin-left:8px">';
+  items.slice().reverse().forEach(it => {
+    html += `<div style="margin-bottom:8px;position:relative">
+      <span style="position:absolute;left:-18px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px var(--gold)"></span>
+      <div style="font-size:11px;color:var(--muted)">${new Date(it.ts).toLocaleString('zh-CN')}</div>
+      <div style="font-size:13px;margin-top:2px">${it.note}</div>
+      ${it.rx ? '<div style="font-size:10px;color:var(--muted);margin-top:2px">处方：' + it.rx + '</div>' : ''}
+    </div>`;
+  });
+  html += '</div>';
+  tl.innerHTML = html;
+}
+// 页面加载时读取已有随访
+(function loadTimeline() {
+  setTimeout(() => {
+    const name = document.getElementById('pName').value;
+    const reports = JSON.parse(localStorage.getItem('unified_diag_followups') || '{}');
+    if (name && reports[name] && reports[name].length > 0) renderTimeline(name, reports[name]);
+  }, 1000);
+})();
+
+// ═══ 跳转到命理大师工作台 ═══
+function openMasterWorkstation() {
+  if (state.syncToken) {
+    window.open('master-workstation.html?token=' + encodeURIComponent(state.syncToken), '_blank');
+  } else {
+    alert('请先完成一次诊断并同步给命理大师');
+  }
 }
 
 // ═══ Voice integration (optional) ═══
