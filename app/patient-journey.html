@@ -303,14 +303,14 @@ window.editProfile = function() {
     { label:'家族病史', key:'family', val:'父亲高血压' },
   ];
   detail.innerHTML = fields.map(f =>
-    `<div><span style="color:var(--muted)">${f.label}：</span><input id="edit_${f.key}" value="${f.val}" style="background:var(--sur);border:1px solid var(--border);border-radius:6px;color:var(--paper);padding:4px 8px;font-size:12px;width:140px;font-family:inherit"></div>`
+    `<div><span style="color:var(--muted)">${f.label}：</span><input  id="edit_${f.key}" value="${f.val}" style="background:var(--sur);border:1px solid var(--border);border-radius:6px;color:var(--paper);padding:4px 8px;font-size:12px;width:140px;font-family:inherit" aria-label="edit_${f.key}"></div>`
   ).join('') + '<div style="grid-column:1/-1"><button onclick="saveProfile()" style="padding:6px 16px;background:var(--gold);color:#0a1628;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit">💾 保存</button></div>';
 };
 
 window.saveProfile = function() {
   const name = document.getElementById('edit_name')?.value || '张三';
   document.getElementById('ptName').textContent = name;
-  document.getElementById('profileDetail').innerHTML = document.getElementById('profileDetail').innerHTML.replace(/<input[^>]*>/g,'').replace(/<button[^>]*>.*?<\/button>/g,'');
+  document.getElementById('profileDetail').innerHTML = document.getElementById('profileDetail').innerHTML.replace(/<input [^ aria-label="field">]*>/g,'').replace(/<button[^>]*>.*?<\/button>/g,'');
   // Rebuild display
   ['name','age','constitution','allergy','history','family'].forEach(k => {
     const v = document.getElementById('edit_'+k)?.value || '';

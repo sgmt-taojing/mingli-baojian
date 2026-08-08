@@ -133,7 +133,7 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
   <input aria-label="时" type="number" id="zw-hour" placeholder="时" value="7" min="0" max="23">
   <input aria-label="出生地经度" type="number" id="zw-lng" placeholder="经度(默认121.47)" value="121.47" step="0.01" min="73" max="135" title="出生地经度（用于真太阳时校正）">
   <input aria-label="流年" type="number" id="zw-target-year" placeholder="流年" value="2026" min="1900" max="2100" title="查流年运势的目标年份">
-  <label style="font-size:11px;color:var(--paper3);display:flex;align-items:center;gap:4px"><input type="checkbox" id="zw-leap" style="width:auto"> 闰月</label>
+  <label style="font-size:11px;color:var(--paper3);display:flex;align-items:center;gap:4px"><input  type="checkbox" id="zw-leap" style="width:auto" aria-label="zw leap"> 闰月</label>
   <button onclick="doPaipan()">排盘</button>
 
 <button onclick="generateFullReport('ziwei')" style="margin-top:12px;padding:10px 24px;background:linear-gradient(135deg,#ffb44d,#ff7e5f);color:#0f1820;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:2px">📜 出具紫微斗数报告</button>
@@ -204,8 +204,8 @@ async function doPaipan(){
   let rJson, rSvg;
   try {
     [rJson, rSvg] = await Promise.all([
-      fetch(API_BASE+'/api/paipan/ziwei',{method:'POST',headers:{'Content-Type':'application/json',signal:AbortSignal.timeout(15000)}),body:JSON.stringify(payload),signal:AbortSignal.timeout(20000)}),
-      fetch(API_BASE+'/api/paipan/ziwei/svg',{method:'POST',headers:{'Content-Type':'application/json',signal:AbortSignal.timeout(15000)}),body:JSON.stringify(payload),signal:AbortSignal.timeout(20000)})
+      fetch(API_BASE+'/api/paipan/ziwei',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(payload)}),
+      fetch(API_BASE+'/api/paipan/ziwei/svg',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(payload)})
     ]);
   } catch(e) {
     showToast('排盘请求失败：' + (e && e.message || '网络异常') + '，请重试','err');

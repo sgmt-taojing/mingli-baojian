@@ -351,13 +351,13 @@ body.role-master .role-banner.master{display:flex}
     <!-- Patient info bar -->
     <div class="info-strip">
       <span class="label">患者</span>
-      <input id="ptName" placeholder="姓名" value="张三">
+      <input  id="ptName" placeholder="姓名" value="张三" aria-label="姓名">
       <select id="ptGender"><option value="male">男</option><option value="female">女</option></select>
-      <input id="ptAge" placeholder="年龄" value="45" style="width:50px">
+      <input  id="ptAge" placeholder="年龄" value="45" style="width:50px" aria-label="年龄">
       <span class="label">出生</span>
-      <input id="ptYear" placeholder="年" value="1979" style="width:55px">
-      <input id="ptMonth" placeholder="月" value="6" style="width:40px">
-      <input id="ptDay" placeholder="日" value="15" style="width:40px">
+      <input  id="ptYear" placeholder="年" value="1979" style="width:55px" aria-label="年">
+      <input  id="ptMonth" placeholder="月" value="6" style="width:40px" aria-label="月">
+      <input  id="ptDay" placeholder="日" value="15" style="width:40px" aria-label="日">
       <span class="label master-only">时辰</span>
       <select id="ptHour" class="master-only" style="width:70px">
         <option value="12">午时</option>
@@ -410,10 +410,10 @@ body.role-master .role-banner.master{display:flex}
             <span id="wearableStatus" style="font-size:10px;color:var(--muted)">未连接</span>
           </div>
           <div class="vital-row">
-            <div class="vital-item" id="vitalHr"><div class="v-num"><input id="vHr" value="72"></div><div class="v-lbl">心率 bpm</div></div>
-            <div class="vital-item" id="vitalSpo2"><div class="v-num"><input id="vSpo2" value="97"></div><div class="v-lbl">血氧 %</div></div>
-            <div class="vital-item" id="vitalSys"><div class="v-num"><input id="vSys" value="135"></div><div class="v-lbl">收缩压</div></div>
-            <div class="vital-item" id="vitalTemp"><div class="v-num"><input id="vTemp" value="36.5"></div><div class="v-lbl">体温 ℃</div></div>
+            <div class="vital-item" id="vitalHr"><div class="v-num"><input  id="vHr" value="72" aria-label="vHr"></div><div class="v-lbl">心率 bpm</div></div>
+            <div class="vital-item" id="vitalSpo2"><div class="v-num"><input  id="vSpo2" value="97" aria-label="vSpo2"></div><div class="v-lbl">血氧 %</div></div>
+            <div class="vital-item" id="vitalSys"><div class="v-num"><input  id="vSys" value="135" aria-label="vSys"></div><div class="v-lbl">收缩压</div></div>
+            <div class="vital-item" id="vitalTemp"><div class="v-num"><input  id="vTemp" value="36.5" aria-label="vTemp"></div><div class="v-lbl">体温 ℃</div></div>
           </div>
           <div style="display:flex;gap:6px;margin-top:6px">
             <button class="btn btn-sm btn-outline" onclick="captureVitals()" id="btnCapVitals">📍 定点采集体征</button>
@@ -449,7 +449,7 @@ body.role-master .role-banner.master{display:flex}
               <option value="master">大师</option>
               <option value="patient">患者</option>
             </select>
-            <input id="chatInput" placeholder="输入对话内容…" onkeydown="if(event.key==='Enter')sendChat()">
+            <input  id="chatInput" placeholder="输入对话内容…" onkeydown="if(event.key==='Enter')sendChat()" aria-label="输入对话内容…">
             <button class="btn btn-sm btn-outline" onclick="sendChat()">发送</button>
           </div>
         </div>
@@ -628,7 +628,7 @@ body.role-master .role-banner.master{display:flex}
   <div class="kb-panel" id="kbPanel">
     <h4>📚 AI 知识库助手</h4>
     <div class="kb-search-row">
-      <input id="kbSearchInput" placeholder="搜索中医/命理知识…" onkeydown="if(event.key==='Enter')searchKB(this.value)">
+      <input  id="kbSearchInput" placeholder="搜索中医/命理知识…" onkeydown="if(event.key==='Enter')searchKB(this.value)" aria-label="搜索中医/命理知识…">
       <button onclick="searchKB(document.getElementById('kbSearchInput').value)">搜索</button>
     </div>
     <div class="kb-results" id="kbResults">

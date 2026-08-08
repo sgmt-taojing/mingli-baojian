@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+<meta name="description" content="">
 <meta charset="UTF-8">
 <link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/config-center.html">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5">
@@ -93,7 +94,7 @@ html,body{margin:0;padding:0;background:var(--bg);color:var(--tx);font:14px/1.6 
 
 <div class="container">
   <div class="toolbar">
-    <input id="q" placeholder="🔍 搜索 key / label / value…">
+    <input  id="q" placeholder="🔍 搜索 key / label / value…" aria-label="🔍 搜索 key / label / value…">
     <select id="groupFilter">
       <option value="">全部分组</option>
     </select>
@@ -126,13 +127,13 @@ html,body{margin:0;padding:0;background:var(--bg);color:var(--tx);font:14px/1.6 
   <div class="modal">
     <h3>新增配置</h3>
     <label>key（唯一标识，小写+点号）</label>
-    <input id="addKey" placeholder="例如：ui.theme_color">
+    <input  id="addKey" placeholder="例如：ui.theme_color" aria-label="例如：ui.theme_color">
     <label>value</label>
-    <input id="addValue" placeholder='例如：#c9a84c 或 "light"'>
+    <input  id="addValue" placeholder='例如：#c9a84c 或 "light"' aria-label="例如：#c9a84c 或">
     <label>label（说明）</label>
-    <input id="addLabel" placeholder="例如：UI 主题色">
+    <input  id="addLabel" placeholder="例如：UI 主题色" aria-label="例如：UI 主题色">
     <label>group（分组）</label>
-    <input id="addGroup" placeholder="例如：ui">
+    <input  id="addGroup" placeholder="例如：ui" aria-label="例如：ui">
     <label>备注</label>
     <textarea id="addNote" placeholder="可选"></textarea>
     <div class="btn-row">
@@ -210,7 +211,7 @@ function rowHtml(c) {
   return `<div class="row" data-key="${c.key}">
     <div class="key" title="${c.key}">${c.key}</div>
     <div class="label-txt">${c.label || '—'}</div>
-    <input class="val-input" id="v_${cssId(c.key)}" value="${escapeAttr(c.value)}">
+    <input  class="val-input" id="v_${cssId(c.key)}" value="${escapeAttr(c.value)}" aria-label="v_${cssId(c.key)}">
     <div class="group-tag">${c.group || '—'}</div>
     <div class="actions">
       <button class="save" onclick="saveOne('${c.key}')">保存</button>
