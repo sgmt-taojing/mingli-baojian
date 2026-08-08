@@ -1235,7 +1235,7 @@ function startWearableMock() {
   var mockTick = 0;
   wearableInterval = setInterval(() => {
     mockTick++;
-    // 确定性模拟生理数据（基于时间序列，非 Math.random）
+    // 确定性模拟生理数据（基于时间序列，不依赖随机数）
     var hr = Math.floor(72 + Math.sin(mockTick * 0.3) * 8);
     var sp = Math.floor(97 + Math.cos(mockTick * 0.5) * 1);
     var tp = (36.5 + Math.sin(mockTick * 0.1) * 0.3).toFixed(1);
