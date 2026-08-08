@@ -5628,6 +5628,12 @@ function _agentStep(name, status, detail){
   var det = item.querySelector('.ath-detail');
   if (dot){ dot.textContent = icons[status] || '○'; dot.style.color = colors[status] || colors.pending; }
   if (det && detail) det.textContent = detail;
+  // SuperAgentUI 同步（安全 try/catch）
+  try {
+    if (typeof window.SuperAgentUI !== 'undefined' && typeof window.SuperAgentUI.emitStep === 'function') {
+      window.SuperAgentUI.emitStep({ name: name, status: status, detail: detail });
+    }
+  } catch(_e){}
 }
 function _showAgentThinking(firstStep){
   _ensureAgentThinking();
