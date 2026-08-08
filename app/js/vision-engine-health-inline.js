@@ -1,7 +1,7 @@
 
 async function checkHealth(){
   try{
-    const r = await fetch('http://127.0.0.1:8913/health',{mode:'cors',signal:AbortSignal.timeout(15000)}));
+    const r = await fetch('http://127.0.0.1:8913/health',{mode:'cors',signal:AbortSignal.timeout(15000)});
     const d = await r.json();
     const engines = d.engines || {};
     const html = Object.entries(engines).map(([k,v])=>{

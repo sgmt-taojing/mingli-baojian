@@ -164,7 +164,7 @@
     }
     
     // 方案 B：Edge-TTS（后端 8912）
-    fetch(`${API}/api/tts?text=${encodeURIComponent(text)}`,{method: 'GET',signal:AbortSignal.timeout(15000)}))
+    fetch(`${API}/api/tts?text=${encodeURIComponent(text)}`,{method: 'GET',signal:AbortSignal.timeout(15000)})
       .then(r => r.blob())
       .then(blob => {
         const audio = new Audio(URL.createObjectURL(blob));

@@ -35,7 +35,7 @@ async function fetchWeek(week, bench){
   const localUrl = `eval/weekly/${week}-${bench}.json`;
   // 先尝试 GitHub
   try{
-    const r = await fetch(ghUrl,{cache: 'no-cache',signal:AbortSignal.timeout(15000)}));
+    const r = await fetch(ghUrl,{cache: 'no-cache',signal:AbortSignal.timeout(15000)});
     if(r.ok){
       if (dataSource === 'none') dataSource = 'github';
       return await r.json();
@@ -45,7 +45,7 @@ async function fetchWeek(week, bench){
   }
   // 回退本地
   try{
-    const r = await fetch(localUrl,{cache: 'no-cache',signal:AbortSignal.timeout(15000)}));
+    const r = await fetch(localUrl,{cache: 'no-cache',signal:AbortSignal.timeout(15000)});
     if(r.ok){
       if (dataSource === 'none') dataSource = 'local';
       else if (dataSource === 'github') dataSource = 'mixed';
@@ -423,7 +423,7 @@ function computeModuleEval(){
 async function renderModules(){
   const evalData = computeModuleEval();
   try{
-    const r = await fetch('/api/ai/modules',{cache: 'no-cache',signal:AbortSignal.timeout(15000)}));
+    const r = await fetch('/api/ai/modules',{cache: 'no-cache',signal:AbortSignal.timeout(15000)});
     if (!r.ok) {
       $('modulesGrid').innerHTML = '<div class="mod-card">KB API 未连接<br><small>本地静态展示</small></div>'.repeat(6);
       return;
@@ -513,13 +513,13 @@ async function fetchAlertCard(week){
   const ghUrl = `${GH}/eval/weekly/${week}-alert-card.json`;
   const localUrl = `eval/weekly/${week}-alert-card.json`;
   try{
-    const r = await fetch(ghUrl,{cache: 'no-cache',signal:AbortSignal.timeout(15000)}));
+    const r = await fetch(ghUrl,{cache: 'no-cache',signal:AbortSignal.timeout(15000)});
     if(r.ok) return await r.json();
   }catch(e){
     console.warn('[alert-card fetch:gh]', week, e);
   }
   try{
-    const r = await fetch(localUrl,{cache: 'no-cache',signal:AbortSignal.timeout(15000)}));
+    const r = await fetch(localUrl,{cache: 'no-cache',signal:AbortSignal.timeout(15000)});
     if(r.ok) return await r.json();
   }catch(e){
     console.warn('[alert-card fetch:local]', week, e);
@@ -2015,11 +2015,11 @@ async function fetchExpanded(week, bench){
   const ghUrl = `${GH}/eval/weekly/${week}-expanded/${bench}-by-module.json`;
   const localUrl = `eval/weekly/${week}-expanded/${bench}-by-module.json`;
   try{
-    const r = await fetch(ghUrl,{cache: 'no-cache',signal:AbortSignal.timeout(15000)}));
+    const r = await fetch(ghUrl,{cache: 'no-cache',signal:AbortSignal.timeout(15000)});
     if (r.ok){ const d = await r.json(); expandedCache[key] = d; return d; }
   }catch(e){console.warn(e.message)}
   try{
-    const r = await fetch(localUrl,{cache: 'no-cache',signal:AbortSignal.timeout(15000)}));
+    const r = await fetch(localUrl,{cache: 'no-cache',signal:AbortSignal.timeout(15000)});
     if (r.ok){ const d = await r.json(); expandedCache[key] = d; return d; }
   }catch(e){console.warn(e.message)}
   return null;
@@ -2372,11 +2372,11 @@ async function fetchDistillReport(){
   const ghUrl = `${GH}/DELIVERY/distill-report-2026-07-28.json`;
   const localUrl = `DELIVERY/distill-report-2026-07-28.json`;
   try{
-    const r = await fetch(ghUrl,{cache: 'no-cache',signal:AbortSignal.timeout(15000)}));
+    const r = await fetch(ghUrl,{cache: 'no-cache',signal:AbortSignal.timeout(15000)});
     if (r.ok) return await r.json();
   }catch(e){console.warn(e.message)}
   try{
-    const r = await fetch(localUrl,{cache: 'no-cache',signal:AbortSignal.timeout(15000)}));
+    const r = await fetch(localUrl,{cache: 'no-cache',signal:AbortSignal.timeout(15000)});
     if (r.ok) return await r.json();
   }catch(e){console.warn(e.message)}
   return null;
@@ -2991,12 +2991,12 @@ async function fetchRadarData(week){
     const localUrl = `eval/weekly/${week}-expanded/${b}-by-module.json`;
     let data = null;
     try{
-      const r = await fetch(ghUrl,{cache:'no-cache',signal:AbortSignal.timeout(15000)}));
+      const r = await fetch(ghUrl,{cache:'no-cache',signal:AbortSignal.timeout(15000)});
       if(r.ok) data = await r.json();
     }catch(e){console.warn(e.message)}
     if(!data){
       try{
-        const r = await fetch(localUrl,{cache:'no-cache',signal:AbortSignal.timeout(15000)}));
+        const r = await fetch(localUrl,{cache:'no-cache',signal:AbortSignal.timeout(15000)});
         if(r.ok) data = await r.json();
       }catch(e){console.warn(e.message)}
     }

@@ -154,7 +154,7 @@ master_comment_2:document.getElementById('health_forecast').value,
 doctor_ref:document.getElementById('doctor_ref').value,
 master_private:document.getElementById('master_private').value
 }
-fetch(API+'/api/clinic/case/'+currentCase,{method:'PUT',headers:{'Content-Type':'application/json',signal:AbortSignal.timeout(15000)}),body:JSON.stringify({master_comment:data.master_comment+'\n[健康预测]'+data.master_comment_2+'\n[化解]'+document.getElementById('master_advice').value,doctor_comment:data.doctor_ref}),signal:AbortSignal.timeout(8000)}).then(function(r){return r.json()}).then(function(d){
+fetch(API+'/api/clinic/case/'+currentCase,{method:'PUT',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify({master_comment:data.master_comment+'\n[健康预测]'+data.master_comment_2+'\n[化解]'+document.getElementById('master_advice').value,doctor_comment:data.doctor_ref}),signal:AbortSignal.timeout(8000)}).then(function(r){return r.json()}).then(function(d){
 if(d&&d.ok===false){showToast('提交失败：'+(d.message||d.error||'未知错误'),'error');return}
 console.warn('已提交！命理信息已同步给医生端。')
 document.getElementById('detail').style.display='none'

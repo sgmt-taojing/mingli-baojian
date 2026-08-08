@@ -54,7 +54,7 @@
     if(!API_BASE) return null; // 离线/生产环境跳过
     try{
       var url = API_BASE+'/paipan?y='+y+'&m='+m+'&d='+d+'&h='+h+'&gender='+(gender||'male')+'&json=1';
-      var r = await fetch(url,{timeout: 5000,signal:AbortSignal.timeout(15000)}));
+      var r = await fetch(url,{timeout: 5000,signal:AbortSignal.timeout(15000)});
       if(!r.ok) return null;
       var data = await r.json();
       return {

@@ -307,7 +307,7 @@ var payload={
 var csrfReq=API+'/api/csrf';
 fetch(csrfReq, {signal: AbortSignal.timeout(15000), credentials:'include'}).then(function(r){return r.json()}).then(function(cs){
     var csrfToken=cs.csrf_token||cs.data&&cs.data.csrf_token||'';
-    return fetch(API+'/api/wellness/profile',{method:'POST',headers:{'Content-Type':'application/json','x-csrf-token':csrfToken,signal:AbortSignal.timeout(15000)}),body:JSON.stringify(payload),credentials:'include'})
+    return fetch(API+'/api/wellness/profile',{method:'POST',headers:{'Content-Type':'application/json','x-csrf-token':csrfToken},signal:AbortSignal.timeout(15000),body:JSON.stringify(payload),credentials:'include'})
 }).then(function(r){return r.json()}).then(function(d){
     var saveInfo='<div class="card"><div class="card-title">存 档案已保存</div>';
     saveInfo+='<div style="font-size:12px">风险等级：<b>'+(d.data&&d.data.risk_level||'normal')+'</b> | 操作：'+(d.data&&d.data.action||'created')+'</div>';

@@ -1812,7 +1812,7 @@ async function submitSymptom(){
       const headers={};
       const token=localStorage.getItem('ml_token');
       if(token) headers['Authorization']='Bearer '+token;
-      const r=await fetch(API_BASE+'/api/clinic/submit-symptom',{method:'POST',headers,body:fd,signal:AbortSignal.timeout(15000)}));
+      const r=await fetch(API_BASE+'/api/clinic/submit-symptom',{method:'POST',headers,body:fd,signal:AbortSignal.timeout(15000)});
       resp=await r.json();
     }else{
       resp=await apiCall('/api/clinic/submit-symptom','POST',{text,attachments:[]});

@@ -230,7 +230,7 @@ function render(d){
     });
     fetch('/api/ai/lifeplan-report', {method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: actionBody, signal:AbortSignal.timeout(15000)})).then(r => r.json()).then(json => {
+      body: actionBody, signal:AbortSignal.timeout(15000)}).then(r => r.json()).then(json => {
       if(json.code !== 0 || !json.data || !json.data.report) return;
       const report = json.data.report;
       const actions = report.actions || [];
@@ -588,7 +588,7 @@ function calcTrendAdvice(dayuns, shichen){
     });
     fetch('/api/paipan/lifeplan/report', {method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: body, signal:AbortSignal.timeout(15000)})).then(function(r){return r.json();}).then(function(r){
+      body: body, signal:AbortSignal.timeout(15000)}).then(function(r){return r.json();}).then(function(r){
       if(!r.ok || !r.lifePath || !r.lifePath.length){
         var el = document.getElementById('changshengBody');
         if(el) el.innerHTML = '<div style="padding:16px;color:#999;font-size:13px">⚠ 排盘数据不足，请补充出生年月日时后重新生成</div>';
@@ -770,7 +770,7 @@ function calcTrendAdvice(dayuns, shichen){
   // 异步获取化解方案
   if(window.HuajieRenderer){
     fetch('/api/csrf-token',{signal:AbortSignal.timeout(15000)}).then(r=>r.json()).then(t=>{
-      return fetch('/api/ai/lifeplan-report',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':t.csrfToken,signal:AbortSignal.timeout(15000)}),body:JSON.stringify({age:d.age,gender:d.sex,birthplace:d.residence,concerns:[d.focus]})});
+      return fetch('/api/ai/lifeplan-report',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':t.csrfToken},signal:AbortSignal.timeout(15000),body:JSON.stringify({age:d.age,gender:d.sex,birthplace:d.residence,concerns:[d.focus]})});
     }).then(r=>r.json()).then(resp=>{
       var huajie=resp.data&&resp.data.huajie||resp.huajie;
       if(huajie){
@@ -829,7 +829,7 @@ function _createShortLink(cb){
     var data={a:d.age!==undefined?d.age:d.a, s:d.sex!==undefined?d.sex:d.s, r:d.residence!==undefined?d.residence:d.r, f:d.focus!==undefined?d.focus:d.f, e:d.extra!==undefined?d.extra:d.e};
     // 移除空值
     Object.keys(data).forEach(function(k){ if(data[k]===undefined||data[k]===''||data[k]===null) delete data[k]; });
-    fetch('/api/public/share-link',{method:'POST',headers:{'Content-Type':'application/json',signal:AbortSignal.timeout(15000)}),body:JSON.stringify({type:'lifeplan',data:data})})
+    fetch('/api/public/share-link',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify({type:'lifeplan',data:data})})
       .then(function(r){return r.json();})
       .then(function(j){ if(j&&j.ok&&j.shortUrl) cb(j.shortUrl); else cb(null); })
       .catch(function(){ cb(null); });

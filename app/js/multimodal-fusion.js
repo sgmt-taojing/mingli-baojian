@@ -166,7 +166,7 @@
       tasks.push(
         fetch(API + '/api/paipan/bazi', {method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(baziData), signal:AbortSignal.timeout(15000)})).then(function(r) { return r.json(); }).catch(function() { return null; })
+          body: JSON.stringify(baziData), signal:AbortSignal.timeout(15000)}).then(function(r) { return r.json(); }).catch(function() { return null; })
       );
     } else {
       tasks.push(Promise.resolve(null));

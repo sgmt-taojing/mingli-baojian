@@ -38,7 +38,7 @@ async function doExport(fmt){
   const purpose = document.getElementById('iptPurpose').value || '未说明';
   let r;
   try {
-    r = await fetch(API+'/api/export/'+fmt,{method:'POST',headers:authH(),body:JSON.stringify({table,purpose,signal:AbortSignal.timeout(15000)})),signal:AbortSignal.timeout(20000)});
+    r = await fetch(API+'/api/export/'+fmt,{method:'POST',headers:authH(),body:JSON.stringify({table,purpose,signal:AbortSignal.timeout(15000)}),signal:AbortSignal.timeout(20000)});
   } catch(e) {
     console.warn("[R514] fetch error:", e.message);
     toast('导出请求失败：' + (e && e.message || '网络异常') + '，请重试', 'err');

@@ -46,7 +46,7 @@ async function api(path, options = {}) {
   const token = getToken();
   const headers = { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = 'Bearer ' + token;
-  const resp = await fetch(path,{...options, headers: { ...headers, ...(options.headers || {,signal:AbortSignal.timeout(15000)})) } });
+  const resp = await fetch(path,{...options, headers: { ...headers, ...(options.headers || {}), signal: AbortSignal.timeout(15000) } });
   const text = await resp.text();
   try { return JSON.parse(text); } catch { return { raw: text }; }
 }

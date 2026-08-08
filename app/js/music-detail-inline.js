@@ -152,7 +152,7 @@ function render(d){
   // 异步获取化解方案
   if(window.HuajieRenderer){
     fetch('/api/csrf-token',{signal:AbortSignal.timeout(15000)}).then(r=>r.json()).then(t=>{
-      return fetch('/api/ai/music-report',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':t.csrfToken,signal:AbortSignal.timeout(15000)}),body:JSON.stringify({age:30,mood:d.emo,fiveElement:d.ele})});
+      return fetch('/api/ai/music-report',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':t.csrfToken},signal:AbortSignal.timeout(15000),body:JSON.stringify({age:30,mood:d.emo,fiveElement:d.ele})});
     }).then(r=>r.json()).then(resp=>{
       var huajie=resp.data&&resp.data.huajie||resp.huajie;
       if(huajie){

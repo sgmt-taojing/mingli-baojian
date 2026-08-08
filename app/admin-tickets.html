@@ -594,7 +594,7 @@ function exportCSV() {
   var url = API + '/api/admin/tickets/export';
   if (status) url += '?status=' + status;
   // 用 fetch + Blob 下载
-  fetch(url,{headers: { 'Authorization': 'Bearer ' + getAdminToken(),signal:AbortSignal.timeout(15000)}) })
+  fetch(url,{headers: { 'Authorization': '***' + getAdminToken() },signal:AbortSignal.timeout(15000)})
     .then(function(r) { return r.blob(); })
     .then(function(blob) {
       var a = document.createElement('a');

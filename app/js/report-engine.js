@@ -256,7 +256,7 @@
       try {
         const r = await fetch(apiBase + '/api/public/kb-query', {method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ module: moduleId, query: flattenData(data).substring(0, 200), limit: 1 }), signal:AbortSignal.timeout(15000)}));
+          body: JSON.stringify({ module: moduleId, query: flattenData(data).substring(0, 200), limit: 1 }), signal:AbortSignal.timeout(15000)});
         const j = await r.json();
         if (j && j.data && j.data.results && j.data.results.length) {
           const top = j.data.results[0];
@@ -292,7 +292,7 @@
         body: JSON.stringify({
           messages: [...((hist || []).slice(-8)), { role: 'user', content: prompt }],
           baziData
-        }), signal:AbortSignal.timeout(15000)}));
+        }), signal:AbortSignal.timeout(15000)});
       const d = await r.json();
       return (d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content) || '';
     } catch (e) {
@@ -352,7 +352,7 @@
 
       const r = await fetch(apiBase + endpoint, {method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload), signal:AbortSignal.timeout(15000)}));
+        body: JSON.stringify(payload), signal:AbortSignal.timeout(15000)});
       const j = await r.json();
       if (j && j.code === 0 && j.data) return j.data;
       return null;
@@ -687,7 +687,7 @@
           inputData: data,
           resultData: { report: (kbHit && kbHit.snippet ? kbHit.snippet.substring(0, 2000) : '') },
           rawQuery: flattenData(data).substring(0, 500)
-        }), signal:AbortSignal.timeout(15000)})).catch(() => {});
+        }), signal:AbortSignal.timeout(15000)}).catch(() => {});
     } catch (e) {}
   }
 

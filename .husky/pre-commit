@@ -1,5 +1,7 @@
 #!/bin/bash
-# 命理宝鉴 · pre-commit hook
+set -eu
+set -o pipefail
+cd "$(git rev-parse --show-toplevel)" || exit 0
 # 功能：
 #   1. 仅当 docs/*.md 有变更时跑 docs-lint.sh（快速检查，不阻塞）
 #   2. acorn 语法快扫（仅扫暂存区的 HTML 文件）
@@ -13,7 +15,7 @@ DOCS_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -c "^docs/
 if [ "$DOCS_CHANGED" -gt 0 ]; then
   echo "📄 docs/ 有 $DOCS_CHANGED 个文件变更，运行 docs-lint..."
   if [ -f scripts/docs-lint.sh ]; then
-    LINT_OUT=$(bash scripts/docs-lint.sh 2>/dev/null)
+    LINT_OUT=$(bash scripts/docs-lint.sh 2>/dev/null || true)
     LINT_EXIT=$?
     if [ $LINT_EXIT -ne 0 ]; then
       echo "⚠️  docs-lint 发现问题（不阻塞 commit，但建议修复）："
@@ -43,7 +45,7 @@ if [ "$HTML_CHANGED" -gt 0 ]; then
     STAGED_HTML=$(git diff --cached --name-only --diff-filter=ACM | grep -E "^app/.*\.html$")
     ERRORS=0
     for f in $STAGED_HTML; do
-      OUT=$(node "$SCAN_SCRIPT" "$f" 2>&1)
+      OUT=$(node "$SCAN_SCRIPT" "$f" 2>&1 || true)
       # 只匹配错误严重行（行首有 "❌" 才计真错误；避免 "0 个错误" "无错误" 误报）
       ERR_LINE=$(echo "$OUT" | grep -E "^❌" | head -1)
       if [ -n "$ERR_LINE" ]; then

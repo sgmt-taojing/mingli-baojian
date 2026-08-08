@@ -645,7 +645,7 @@
                   type === 'preferences' ? R502_API + '/api/user/preferences/' + encodeURIComponent(id) :
                   type === 'history' ? R502_API + '/api/user/search-history/' + encodeURIComponent(id) :
                   R502_API + '/api/public/config/' + encodeURIComponent(id);
-      fetch(url,{method: 'DELETE',signal:AbortSignal.timeout(15000)})).then(r => r.json()).then(d => {
+      fetch(url,{method: 'DELETE',signal:AbortSignal.timeout(15000)}).then(r => r.json()).then(d => {
         if (d.ok) { showToast('已删除', 'success'); setTimeout(() => location.reload(), 800); } else { showToast('失败: ' + (d.error || '未知错误'), 'error'); }
       }).catch(e => showToast('错误: ' + e.message, 'error'));
     }

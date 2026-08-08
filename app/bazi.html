@@ -898,8 +898,8 @@ async function generateBaziReport(){
       var body = { year:year, month:month, day:day, hour:hour, minute:minute, sex:sex, lng:lng, targetYear:targetYear, currentAge:currentAge };
       showToast('排盘中…');
       var [r, rSvg] = await Promise.all([
-        fetch(API_BASE+'/api/paipan/calculate',{method:'POST',headers:{'Content-Type':'application/json',signal:AbortSignal.timeout(15000)}),body:JSON.stringify(body)}),
-        fetch(API_BASE+'/api/paipan/calculate/svg',{method:'POST',headers:{'Content-Type':'application/json',signal:AbortSignal.timeout(15000)}),body:JSON.stringify(Object.assign({}, body, {format:'json'}))})
+        fetch(API_BASE+'/api/paipan/calculate',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body)}),
+        fetch(API_BASE+'/api/paipan/calculate/svg',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(Object.assign({}, body, {format:'json'}))})
       ]);
       var data = await r.json().catch(function(){ return {ok:false,error:'响应解析失败'}; });
       if(data.ok === false){ showToast('排盘失败: '+(data.error||'')); return; }
