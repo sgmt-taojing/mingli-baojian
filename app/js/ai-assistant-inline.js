@@ -2136,7 +2136,7 @@ async function callAI(q){
     try {
       var _acOrch = new AbortController();
       var _toOrch = setTimeout(function(){ _acOrch.abort(); }, 12000);
-      var orchRes = await fetch(API + '/api/ai/orchestrate', {
+      var orchRes = await fetch(API + '/api/ai/orchestrate', { signal: AbortSignal.timeout(15000),
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: q, module: state.module || 'freechat', ctx: { sessionId: localStorage.getItem('ml_session_id') || '' } }),
