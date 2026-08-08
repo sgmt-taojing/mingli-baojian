@@ -112,7 +112,7 @@ async function _kbQueryFallback(best) {
       q: (best.query || '').slice(0, 60),
       limit: '5'
     });
-    const r = await fetch(API + '/api/public/kb/search-fts?' + qs, { method: 'GET' });
+    const r = await fetch(API + '/api/public/kb/search-fts?' + qs, { method: 'GET', signal: AbortSignal.timeout(15000) });
     const j = await r.json();
     // L3: search-fts 返回 {code, data:{results, engine, count, total}}
     const jData = j.data || j; // 兼容 search-fts 和 kb-query 两种格式
@@ -159,7 +159,7 @@ async function _kbColdStartFallback(query, currentResults){
   try {
     const q = String(query || '').trim().slice(0, 30);
     if (!q) return [];
-    const r = await fetch(API + '/api/kb/cold-start?limit=5&query=' + encodeURIComponent(q));
+    const r = await fetch(API + '/api/kb/cold-start?limit=5&query=' + encodeURIComponent(q), { signal: AbortSignal.timeout(15000) });
     const j = await r.json();
     const recs = (j.data && j.data.recommendations) || j.recommendations || [];
     if (!recs.length) return [];
@@ -183,8 +183,7 @@ function _kbHitCount(moduleId, kbEntryId){
         fetch(API + '/api/public/kb-hit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ entry_id: kbEntryId, app_endpoint: 'ai-assistant', user_query: (state.data?.s1 || '') + ' ' + (state.data?.s2 || '') })
-        }).catch(() => {});
+          body: JSON.stringify({ entry_id: kbEntryId, app_endpoint: 'ai-assistant', user_query: (state.data?.s1 || '') + ' ' + (state.data?.s2 || '') }), signal: AbortSignal.timeout(15000) }).catch(() => {});
       } catch (e) {}
     }
     return n;
@@ -197,8 +196,7 @@ function _saveSurvey(module, data, baziData){
     fetch(API + '/api/public/save-survey', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ module, data, baziData: baziData || null, source: 'ai-assistant' })
-    }).catch(() => {});
+      body: JSON.stringify({ module, data, baziData: baziData || null, source: 'ai-assistant' }), signal: AbortSignal.timeout(15000) }).catch(() => {});
   } catch (e) {}
 }
 
@@ -697,8 +695,7 @@ function _submitKbFeedback(fbId, score, query, module){
   fetch((typeof API !== 'undefined' ? API : '') + '/api/public/kb-feedback', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  }).then(function(r){ return r.json(); }).then(function(j){
+    body: JSON.stringify(payload), signal: AbortSignal.timeout(15000) }).then(function(r){ return r.json(); }).then(function(j){
     if (j && j.code === 0 && j.data && j.data.logged) {
       if (statusEl) statusEl.textContent = score === 1 ? '✓ 感谢反馈' : score === -1 ? '✓ 已记录，会优化' : '✓ 已记录';
       // 隐藏按钮
@@ -892,7 +889,58 @@ async function typing(){
   try{ t.remove(); }catch(_){ /* 安全保护,避免 ReferenceError 中断 processAnswer */ }
 }
 
+// W1-0: 记忆提示渲染
+function _appendMemHint(text){
+  try {
+    const box = document.getElementById('aiChatMessages') || document.querySelector('.msg-list') || document.body;
+    if (!box) return;
+    const el = document.createElement('div');
+    el.className = 'msg user-msg memory-hint';
+    el.style.cssText = 'margin:6px 0;padding:8px 14px;background:rgba(201,168,76,.08);border-left:3px solid #c9a84c;border-radius:6px;font-size:13px;color:#b89550;opacity:.85;';
+    el.textContent = text;
+    box.appendChild(el);
+    box.scrollTop = box.scrollHeight;
+  } catch(e) {}
+}
+
+// W1-1: 保存本轮对话到记忆
+async function _saveMem(sessionId, module, role, content, summary){
+  try {
+    if (!sessionId || !content) return;
+    await fetch((typeof API !== 'undefined' ? API : '') + '/api/agent/memory/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: sessionId, module: module || '', role: role || 'user', content: content.slice(0, 500), summary: (summary || '').slice(0, 100) }), signal: AbortSignal.timeout(15000) });
+  } catch(e) { console.warn('[memory] save fail:', e.message); }
+}
+
 async function generateReport(){
+  /* R520 + W1: 推理链可视化 + Agent 记忆召回 */
+  // W1-1: 报告前召回历史记忆
+  var _memRecallDone = false;
+  try {
+    const _sessionId = (function(){
+      try {
+        var k = 'ml_session_id';
+        var v = localStorage.getItem(k);
+        if (!v) { v = 'sess_' + Date.now() + '_' + ('000000' + (Date.now() % 1e6)).slice(-6); localStorage.setItem(k, v); }
+        return v;
+      } catch(e) { return ''; }
+    })();
+    if (_sessionId && typeof fetch !== 'undefined') {
+      const _mod = state.module || '';
+      const _resp = await fetch((typeof API !== 'undefined' ? API : '') + '/api/agent/memory/recall?session_id=' + encodeURIComponent(_sessionId) + '&module=' + encodeURIComponent(_mod) + '&limit=5', { signal: AbortSignal.timeout(15000) });
+      if (_resp && _resp.ok) {
+        const _memJson = await _resp.json();
+        if (_memJson && _memJson.ok && Array.isArray(_memJson.data) && _memJson.data.length > 0) {
+          const _last = _memJson.data[0];
+          const _memHint = '💡 上次您咨询了「' + (_last.summary || (_last.content || '').slice(0, 60)) + '」';
+          try { _appendMemHint(_memHint); } catch(e){ console.warn('[memory] hint render err:', e.message); }
+          _memRecallDone = true;
+        }
+      }
+    }
+  } catch(e) { console.warn('[memory] recall fail:', e.message); }
   /* R520: 推理链可视化 — 4 步工作流 */
   try {
     _agentStep('① 归集要素', 'active', '收集用户信息…');
@@ -1077,8 +1125,7 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
           concerns,
           fiveElement: feMatch || '',
           withTTS: true
-        })
-      }).catch(() => null);
+        }), signal: AbortSignal.timeout(15000) }).catch(() => null);
       if (liRes) {
         const liJson = await liRes.json().catch(() => null);
         if (liJson && liJson.code === 0 && liJson.data && liJson.data.report) {
@@ -1110,8 +1157,7 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
           mood: moodMatch ? moodMap[moodMatch[0]] : 'fatigue',
           fiveElement: feMatch || '',
           withTTS: true
-        })
-      }).catch(() => null);
+        }), signal: AbortSignal.timeout(15000) }).catch(() => null);
       if (mRes) {
         const mJson = await mRes.json().catch(() => null);
         if (mJson && mJson.code === 0 && mJson.data && mJson.data.report) {
@@ -1143,8 +1189,7 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
           concerns,
           livePlace: liveM ? liveM[0] : '',
           withTTS: true
-        })
-      }).catch(() => null);
+        }), signal: AbortSignal.timeout(15000) }).catch(() => null);
       if (lpRes) {
         const lpJson = await lpRes.json().catch(() => null);
         if (lpJson && lpJson.code === 0 && lpJson.data && lpJson.data.report) {
@@ -1334,6 +1379,7 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
         const _sourcesArr = (kbHit && Array.isArray(kbHit.results)) ? kbHit.results.map(r => r.source).filter(Boolean) : [];
         showReport(structure, {score: kbHit.score, source: kbHit.source, engine: kbHit.engine || 'fts5', fallback: !!kbHit.fallback, sources: _sourcesArr});
         autoSavePaipan(structure);
+        _saveMemAfterReport(structure);
         return;
       }
       // P14 节点 8.5：lifeindex 后端结构化报告优先
@@ -1351,6 +1397,7 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
         const _sourcesArr = (kbHit && Array.isArray(kbHit.results)) ? kbHit.results.map(r => r.source).filter(Boolean) : [];
         showReport(structure, {score: kbHit.score, source: kbHit.source, engine: kbHit.engine || 'fts5', fallback: !!kbHit.fallback, sources: _sourcesArr});
         autoSavePaipan(structure);
+        _saveMemAfterReport(structure);
         return;
       }
       // P14 节点 8.6：music 后端结构化报告优先
@@ -1368,6 +1415,7 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
         const _sourcesArr = (kbHit && Array.isArray(kbHit.results)) ? kbHit.results.map(r => r.source).filter(Boolean) : [];
         showReport(structure, {score: kbHit.score, source: kbHit.source, engine: kbHit.engine || 'fts5', fallback: !!kbHit.fallback, sources: _sourcesArr});
         autoSavePaipan(structure);
+        _saveMemAfterReport(structure);
         return;
       }
       const tagged = kbHit.score >= 0.4 ? '【来源：KB+AI 润色（'+kbHit.source+'）】\n\n'+reply : reply;
@@ -1378,6 +1426,7 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
       if (kbHit.coldStartAdded > 0) { _meta.coldStartAdded = kbHit.coldStartAdded; }
       showReport(tagged, _meta);
       autoSavePaipan(tagged);
+      _saveMemAfterReport(tagged);
       return;
     }
   }
@@ -1388,6 +1437,17 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
   showReport(fallback, {score: 0, source: 'local-engine', engine: 'local', fallback: true});
   try { _agentStep('③ 多维推断', 'done'); _agentStep('④ 撰写报告', 'done', '本地引擎'); } catch(_e){}
   autoSavePaipan(fallback);
+  _saveMemAfterReport(fallback);
+}
+
+function _saveMemAfterReport(reportText){
+  try {
+    if (!reportText) return;
+    var _sId = (function(){
+      try { var k='ml_session_id'; var v=localStorage.getItem(k); if(!v){v='sess_'+Date.now()+'_'+('000000'+(Date.now()%1e6)).slice(-6);localStorage.setItem(k,v);}return v;} catch(e){return '';}
+    })();
+    if (_sId) _saveMem(_sId, (window.state && window.state.module) || '', 'assistant', reportText, reportText.slice(0, 100));
+  } catch(e) {}
 }
 
 // 自动将本次排盘同步到后端画像(静默失败，不影响前端体验)
@@ -1395,12 +1455,12 @@ async function autoSavePaipan(reportText){
   try{
     const tok=localStorage.getItem('mlbj_token')||'';
     const hdr=tok?{'Authorization':'Bearer '+tok,'Content-Type':'application/json'}:{'Content-Type':'application/json'};
-    await fetch(API+'/api/paipan/save',{method:'POST',headers:hdr,body:JSON.stringify({
+    await fetch(API+'/api/paipan/save', {method:'POST',headers:hdr,body:JSON.stringify({
       type:state.module||'unknown',
       inputData:state.data||{},
       resultData:{report:reportText.substring(0,5000)},
       rawQuery:(Object.values(state.data||{}).join('；')||'').substring(0,500)
-    })});
+    }), signal: AbortSignal.timeout(15000) });
   }catch(_){/*静默失败*/}
 }
 
@@ -1796,7 +1856,7 @@ function showReport(text, meta){
       + '<div style="opacity:.5;padding:8px 0">推荐加载中...</div>';
     d.appendChild(recBox);
     // 异步加载推荐
-    fetch(API + '/api/kb/recommend?module=' + encodeURIComponent(state.module) + '&limit=5')
+    fetch(API + '/api/kb/recommend?module=' + encodeURIComponent(state.module) + '&limit=5', { signal: AbortSignal.timeout(15000) })
       .then(r => r.json())
       .then(dd => {
         const recs = (dd.data && dd.data.recommendations) || dd.recommendations || [];
@@ -2045,7 +2105,7 @@ async function callAI(q){
           if (hist.length > 20) hist = hist.slice(-20);
           if (typeof recordKbHit === 'function') recordKbHit(state.module || 'freechat', best.score, true);
           // R102: 异步回写 hit_count 到后端 DB
-          try{fetch((location.hostname==='127.0.0.1'||location.hostname==='localhost'?'http://127.0.0.1:8920':'')+'/api/ai/kb-hit-batch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({entries:[best.entryId].filter(Boolean)})}).catch(function(){})}catch(e){console.warn(e.message)}
+          try{fetch((location.hostname==='127.0.0.1'||location.hostname==='localhost'?'http://127.0.0.1:8920':'')+'/api/ai/kb-hit-batch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({entries:[best.entryId].filter(Boolean)}), signal: AbortSignal.timeout(15000)}).catch(function(){})}catch(e){console.warn(e.message)}
           try{ _updateTopicCard(); }catch(e){console.warn("报告降级:",e.message);}
           try { recordKbEngine('kb-fastpath'); } catch(e) {}
           return;
@@ -2148,7 +2208,7 @@ async function callAI(q){
     } catch(orchErr) { console.warn('[R477-C orchestrate] fallthrough to public-chat:', orchErr.message); }
 
     // 降级到原有 /api/ai/public-chat
-    var _ac2=new AbortController();var _to2=setTimeout(function(){_ac2.abort();},15000);var r;try{r=await fetch(API+'/api/ai/public-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist.slice(-10)}),signal:_ac2.signal});clearTimeout(_to2);}catch(e){clearTimeout(_to2);console.warn('AI fetch 超时或失败:',e.message);window._clarifyState='idle';return null;}
+    var _ac2=new AbortController();var _to2=setTimeout(function(){_ac2.abort();},15000);var r;try{r=await fetch(API+'/api/ai/public-chat',{method:'POST',headers:{'Content-Type':'application/json'},signal:_ac2.signal,body:JSON.stringify({messages:hist.slice(-10)})});clearTimeout(_to2);}catch(e){clearTimeout(_to2);console.warn('AI fetch 超时或失败:',e.message);window._clarifyState='idle';return null;}
     const d=await r.json();
     const msg=d.choices&&d.choices[0]&&d.choices[0].message;
     const reply=(msg&&msg.content)||'抱歉，暂时无法回答。';
@@ -2223,7 +2283,7 @@ async function callAIWithClarified(q){
   chat.appendChild(t);chat.scrollTop=chat.scrollHeight;
   try{
     var _ac=new AbortController();var _to=setTimeout(function(){_ac.abort();},15000);
-    var r=await fetch(API+'/api/ai/public-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist.slice(-10)}),signal:_ac.signal});
+    var r=await fetch(API+'/api/ai/public-chat',{method:'POST',headers:{'Content-Type':'application/json'},signal:_ac.signal,body:JSON.stringify({messages:hist.slice(-10)})});
     clearTimeout(_to);
     var d=await r.json();
     var msg=d.choices&&d.choices[0]&&d.choices[0].message;
@@ -3775,7 +3835,7 @@ async function _fetchAndInjectInterpretation(mod, data, container){
     var opts = { method:conf.method, headers:{'Content-Type':'application/json'} };
     if(conf.method === 'POST'){ opts.body = JSON.stringify(params); }
     else { var qs = Object.keys(params).map(function(k){return k+'='+encodeURIComponent(params[k]);}).join('&'); url += '?'+qs; }
-    var resp = await fetch(url, opts);
+    var resp = await fetch(url, Object.assign({}, opts, {signal:AbortSignal.timeout(15000)}));
     if(!resp.ok) return;
     var result = await resp.json();
     if(!result.ok) return;
@@ -3820,10 +3880,9 @@ async function _paipanAsync(y,m,d,h){
     if(cached){return JSON.parse(cached);}
   }catch(e){console.warn("报告降级:",e.message);}
   try{
-    var resp=await fetch('/api/paipan/calculate',{
+    var resp=await fetch('/api/paipan/calculate', {
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({year:y,month:m,day:d,hour:h,gender:'male'})
-    });
+      body:JSON.stringify({year:y,month:m,day:d,hour:h,gender:'male'}), signal: AbortSignal.timeout(15000) });
     if(resp.ok){
       var data=await resp.json();
       var pillars=data.pillars||{};
@@ -4585,8 +4644,8 @@ function openKBPanel(){
   content.innerHTML='';
   // R53: 并行加载 KB 文件列表 + 质量报告（双 API 同步获取）
   Promise.all([
-    fetch(API+'/api/kb/list').then(r=>r.json()).catch(()=>({files:[]})),
-    fetch(API+'/api/kb/quality-report').then(r=>r.json()).catch(()=>null)
+    fetch(API+'/api/kb/list',{signal:AbortSignal.timeout(15000)}).then(function(r){return r.json()}).catch(function(){return {files:[]}}),
+    fetch(API+'/api/kb/quality-report',{signal:AbortSignal.timeout(15000)}).then(function(r){return r.json()}).catch(function(){return null})
   ]).then(([data, qual])=>{
     if(!data.files||!data.files.length){
       list.innerHTML='<div>暂无知识库文件</div>';
@@ -4631,7 +4690,7 @@ function closeKBPanel(){document.getElementById('kbPanel').style.display='none';
 function loadKBDetail(name){
   const content=document.getElementById('kbContent');
   content.innerHTML='<div style="color:var(--gold,#c9a84c)">正在为您查阅典籍...</div>';
-  fetch(API+'/api/kb/'+encodeURIComponent(name)).then(r=>{
+  fetch(API+'/api/kb/'+encodeURIComponent(name), { signal: AbortSignal.timeout(15000) }).then(r=>{
     if(!r.ok){
       if(r.status===403)return r.json().then(d=>{throw new Error(d.message||'无权访问')});
       if(r.status===404)return Promise.reject(new Error('文件不存在'));
@@ -4673,7 +4732,7 @@ function openHistoryPanel(){
   const list=document.getElementById('historyList');
   list.innerHTML='<div style="color:var(--gold,#c9a84c)">正在为您查阅典籍...</div>';
   const token=localStorage.getItem('auth_token')||'';
-  fetch(API+'/api/paipan/history',{headers:{'Authorization':token?('Bearer '+token):''}}).then(r=>r.json()).then(data=>{
+  fetch(API+'/api/paipan/history',{headers:{'Authorization':token?('Bearer '+token):''},signal:AbortSignal.timeout(15000)}).then(r=>r.json()).then(data=>{
     // 后端返回的是数组（兼容对象）
     const records=Array.isArray(data)?data:(data.records||data.items||[]);
     if(!records.length){
@@ -4775,7 +4834,7 @@ function showProfileHistory(){
   var titleEl=p.querySelector('h3');
   if(titleEl) titleEl.textContent='📜 '+_cur.name+' 的历史报告';
   var token=localStorage.getItem('auth_token')||'';
-  fetch(API+'/api/paipan/history',{headers:{'Authorization':token?('Bearer '+token):''}}).then(r=>r.json()).then(data=>{
+  fetch(API+'/api/paipan/history',{headers:{'Authorization':token?('Bearer '+token):''},signal:AbortSignal.timeout(15000)}).then(r=>r.json()).then(data=>{
     var records=Array.isArray(data)?data:(data.records||data.items||[]);
     // 按缘主名筛选（匹配 input_data 中的 name/userName 字段）
     var filtered=records.filter(function(r){
@@ -4882,11 +4941,10 @@ function submitFeedback(type){
   const text=document.getElementById('feedbackText').value.trim();
   if(!text&&type!=='praise'){showToast('请填写反馈内容');return;}
   const token=localStorage.getItem('auth_token')||'';
-  fetch(API+'/api/feedback/submit',{
+  fetch(API+'/api/feedback/submit', {
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':token?('Bearer '+token):''},
-    body:JSON.stringify({type:type,content:text||'点赞鼓励',module:state.module||'general'})
-  }).then(r=>r.json()).then(data=>{
+    body:JSON.stringify({type:type,content:text||'点赞鼓励',module:state.module||'general'}), signal: AbortSignal.timeout(15000) }).then(r=>r.json()).then(data=>{
     if(data.success!==false){
       showToast('感谢反馈！+'+(data.points||0)+'积分');
       document.getElementById('feedbackText').value='';
@@ -5273,8 +5331,7 @@ window.fbReport = function(btn, val) {
     fetch((typeof API !== 'undefined' ? API : '') + '/api/public/kb-feedback', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    }).then(function(r){
+      body: JSON.stringify(payload), signal: AbortSignal.timeout(15000) }).then(function(r){
       // 视觉反馈
       btn.innerHTML = val > 0 ? '✅ 已赞' : '✅ 已记录';
       setTimeout(function(){ btn.innerHTML = val > 0 ? '👍 有帮助' : '👎 没帮助'; }, 2000);
@@ -5285,6 +5342,23 @@ window.fbReport = function(btn, val) {
   } catch(e) {
     btn.innerHTML = '✅';
   }
+
+  // W1-3: 反馈联动持久记忆系统（不阻塞主反馈流）
+  try {
+    if (sessionId2 && mod && mod !== 'unknown') {
+      fetch((typeof API !== 'undefined' ? API : '') + '/api/agent/memory/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId2, module: mod, satisfaction: val > 0 ? 1 : -1, content: (reportText || '').slice(0, 500) }), signal: AbortSignal.timeout(15000) }).catch(function(){ /* 静默失败 */ });
+    }
+  } catch(_e) { /* 静默 */ }
+  // W1-3: 同步满意度到 agent_memory（静默失败，不影响主流程）
+  try {
+    fetch((typeof API !== 'undefined' ? API : '') + '/api/agent/memory/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: sessionId2, satisfaction: val }), signal: AbortSignal.timeout(15000) });
+  } catch(e) {}
 };
 
 // ============ R3.1-P1: KB 引用级反馈微按钮 ============
@@ -5321,8 +5395,7 @@ window.kbFbMini = function(btn, val) {
     fetch((typeof API !== 'undefined' ? API : '') + '/api/public/kb-feedback', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    }).then(function(){
+      body: JSON.stringify(payload), signal: AbortSignal.timeout(15000) }).then(function(){
       btn.innerHTML = val > 0 ? '✓' : '✗';
     }).catch(function(){
       btn.innerHTML = '·';
@@ -5366,7 +5439,7 @@ window.showFbStats = async function() {
   // 服务端统计
   let serverInfo = '';
   try {
-    const r = await fetch((typeof API !== 'undefined' ? API : '') + '/api/public/kb-feedback-stats?days=7');
+    const r = await fetch((typeof API !== 'undefined' ? API : '') + '/api/public/kb-feedback-stats?days=7', { signal: AbortSignal.timeout(15000) });
     const j = await r.json();
     const d = j.data || {};
     if (d.total !== undefined) {
