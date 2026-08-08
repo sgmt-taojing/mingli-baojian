@@ -227,7 +227,7 @@ tr.selected{background:rgba(201,168,76,.08)}
   <!-- Tab 3: 搜索 -->
   <div class="tab-content" id="tab-search">
     <div class="filters">
-      <input aria-label="搜索" type="text" id="searchInput" placeholder="搜索标题、内容、回复、用户名..." onkeydown="if(event.key==='Enter')doSearch()">
+      <input aria-label="搜索" type="text" id="searchInput" placeholder="搜索标题、内容、回复、用户名..." maxlength="100" onkeydown="if(event.key==='Enter')doSearch()">
       <button class="btn-primary" onclick="doSearch()" style="padding:6px 16px;border:none;border-radius:6px;cursor:pointer">搜索</button>
     </div>
     <div id="searchResults"></div>
@@ -547,7 +547,7 @@ function renderTagInput() {
   var box = document.getElementById('tagInput');
   box.innerHTML = ticketTags.map(function(tag, i) {
     return '<span class="tag-chip">'+tag+' <span class="tag-remove" onclick="removeTag('+i+')">关</span></span>';
-  }).join('') + '<input aria-label="输入" type="text" id="tagInputField" placeholder="输入标签后回车" style="border:none;background:transparent;color:var(--text);font-size:12px;outline:none;flex:1;min-width:80px" onkeydown="if(event.key===\'Enter\'){addTag(this.value);this.value=\'\';}">';
+  }).join('') + '<input aria-label="输入标签" type="text" id="tagInputField" maxlength="30" placeholder="输入标签后回车" style="border:none;background:transparent;color:var(--text);font-size:12px;outline:none;flex:1;min-width:80px" onkeydown="if(event.key===\'Enter\'){addTag(this.value);this.value=\'\';}">';
 }
 function addTag(tag) {
   tag = tag.trim();
@@ -624,5 +624,6 @@ loadTickets();
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
 <script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
 </body>
 </html>
