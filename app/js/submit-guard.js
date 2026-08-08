@@ -19,8 +19,8 @@
  *  // 旧: <button onclick="submitForm()">提交</button>
  *  // 新: <button id="btn-submit" data-guard="submit-form">提交</button>
  *
- *  // 旧: async function submitForm() { await fetch(...); }
- *  // 新: window.guardRun('submit-form', async () => { await fetch(...); }, { btn: 'btn-submit', loadingText: '提交中...' });
+ *  // 旧: async function submitForm() { await fetch(...,{signal:AbortSignal.timeout(15000)}); }
+ *  // 新: window.guardRun('submit-form', async () => { await fetch(...,{signal:AbortSignal.timeout(15000)}); }, { btn: 'btn-submit', loadingText: '提交中...' });
  *
  *  // 或装饰器式: window.decorateSubmit('btn-submit', 'submit-form', submitForm);
  *

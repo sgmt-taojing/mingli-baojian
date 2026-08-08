@@ -25,8 +25,7 @@ async function loadInbox() {
   }
   try {
     const r = await fetch('/api/yuanzhu/yearly-pushes?limit=50', {
-      headers: { 'Authorization': 'Bearer ' + token }
-    });
+      headers: { 'Authorization': 'Bearer ' + token }, signal: AbortSignal.timeout(15000) });
     const d = await r.json();
     if (!d.ok) {
       content.innerHTML = '<div class="empty-state"><div class="icon">⚠️</div><h3>查阅失败</h3><p>' + (d.message || '未知错误') + '</p></div>';

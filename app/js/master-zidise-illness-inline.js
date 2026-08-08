@@ -321,7 +321,7 @@ async function fetchKBRefs(ctx){
   const all=[];
   for(const q of queries){
     try{
-      const r=await fetch(`http://127.0.0.1:8920/api/public/kb-search?q=${encodeURIComponent(q)}&limit=3`);
+      const r=await fetch(`http://127.0.0.1:8920/api/public/kb-search?q=${encodeURIComponent(q)}&limit=3`, { signal: AbortSignal.timeout(15000) });
       const d=await r.json();
       if(d.results){
         d.results.forEach(x=>all.push({...x,query:q}));
@@ -747,7 +747,7 @@ function renderResolve(ctx){
   // KB 检索：化解相关
   const kbQuery=async(q)=>{
     try{
-      const r=await fetch('http://127.0.0.1:8920/api/public/kb-search?q='+encodeURIComponent(q)+'&limit=2');
+      const r=await fetch('http://127.0.0.1:8920/api/public/kb-search?q='+encodeURIComponent(q)+'&limit=2', { signal: AbortSignal.timeout(15000) });
       const d=await r.json();
       return d.results||[];
     }catch(e){return [];}
@@ -1098,9 +1098,8 @@ async function saveConsulting(ctx){
       actions:actions,
       snapshot:{huaJiStar:ctx.huaJiStar,migrationPalace:ctx.huaJiPalace,palaces:ctx.palaces.map(p=>p.stars)}
     };
-    const r=await fetch('http://127.0.0.1:8920/api/public/consulting-save',{
-      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)
-    });
+    const r=await fetch('http://127.0.0.1:8920/api/public/consulting-save', {
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body), signal: AbortSignal.timeout(15000) });
     const d=await r.json();
     if(d.ok){
       ctx.savedGuestId=d.guest_id;
@@ -1122,7 +1121,7 @@ async function renderArchive(){
   if(!box)return;
   box.innerHTML='<div class="empty"><span class="spinner"></span>正在加载访客档案...</div>';
   try{
-    const r=await fetch('http://127.0.0.1:8920/api/public/consulting-list?limit=100');
+    const r=await fetch('http://127.0.0.1:8920/api/public/consulting-list?limit=100',{signal:AbortSignal.timeout(15000)});
     const d=await r.json();
     if(!d.ok||d.count===0){
       box.innerHTML='<div class="empty">暂无访客档案。首例分析后将自动入库。</div>';
@@ -1209,7 +1208,7 @@ async function showGuestDetail(guestId){
   modal.innerHTML='<div style="background:#1a1410;border:2px solid var(--gold);border-radius:16px;padding:30px;max-width:600px;width:100%;max-height:90vh;overflow:auto;color:var(--paper)"><div class="spinner"></div> 加载档案...</div>';
   document.body.appendChild(modal);
   try{
-    const r=await fetch('http://127.0.0.1:8920/api/public/consulting-detail?guest_id='+encodeURIComponent(guestId));
+    const r=await fetch('http://127.0.0.1:8920/api/public/consulting-detail?guest_id='+encodeURIComponent(guestId), { signal: AbortSignal.timeout(15000) });
     const d=await r.json();
     if(!d.ok){modal.querySelector('div>div').innerHTML='❌ '+d.error;return;}
     const p=d.record;

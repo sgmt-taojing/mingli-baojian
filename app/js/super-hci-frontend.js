@@ -231,8 +231,7 @@
     fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: body,
-    }).then(function (response) {
+      body: body, signal: AbortSignal.timeout(15000) }).then(function (response) {
       if (!response.ok) throw new Error('SSE fetch failed: ' + response.status);
       const reader = response.body.getReader();
       const decoder = new TextDecoder();

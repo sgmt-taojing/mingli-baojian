@@ -345,8 +345,7 @@ async function startWebrtc(){
       const r = await fetch('/api/webrtc/offer', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ sdp: offer.sdp, type: offer.type, module: $('selModule').value })
-      });
+        body: JSON.stringify({ sdp: offer.sdp, type: offer.type, module: $('selModule').value }), signal: AbortSignal.timeout(15000) });
       if(r.ok){
         const answer = await r.json();
         if(answer && answer.sdp){

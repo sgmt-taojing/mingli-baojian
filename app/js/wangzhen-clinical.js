@@ -1229,7 +1229,7 @@
     if(!window.fetch) return; // jsdom guard
     var params = 'year='+bazi.year+'&month='+bazi.month+'&day='+bazi.day+'&hour='+bazi.hour;
     if(bazi.lunar) params += '&lunar=1';
-    fetch(PAIPAN_API + '/paipan?'+params)
+    fetch(PAIPAN_API + '/paipan?'+params,{signal:AbortSignal.timeout(15000)})
       .then(function(r){ return r.json(); })
       .then(function(data){
         renderPaipan(data);

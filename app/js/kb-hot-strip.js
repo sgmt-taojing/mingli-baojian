@@ -111,8 +111,7 @@
   function fetchServerTop() {
     return fetch(API_BASE + '/api/public/kb/stats', {
       method: 'GET',
-      headers: { 'Accept': 'application/json' }
-    })
+      headers: { 'Accept': 'application/json' }, signal: AbortSignal.timeout(15000) })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (json) {
         if (!json || json.code !== 0 || !json.data) return [];

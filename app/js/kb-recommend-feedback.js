@@ -105,8 +105,7 @@
           source: source,
           action: action,
           score: score
-        })
-      }).catch(function () {});
+        }), signal: AbortSignal.timeout(15000) }).catch(function () {});
     } catch (e) {}
   }
 

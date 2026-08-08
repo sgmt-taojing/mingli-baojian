@@ -46,7 +46,7 @@ async function api(path, options = {}) {
   const token = getToken();
   const headers = { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = 'Bearer ' + token;
-  const resp = await fetch(path, { ...options, headers: { ...headers, ...(options.headers || {}) } });
+  const resp = await fetch(path,{...options, headers: { ...headers, ...(options.headers || {,signal:AbortSignal.timeout(15000)})) } });
   const text = await resp.text();
   try { return JSON.parse(text); } catch { return { raw: text }; }
 }
@@ -212,7 +212,7 @@ if (!hasAdminAccess()) {
 
   async function loadHitRate(){
     try{
-      const r = await fetch(API + '/api/public/kb-manager/hit-rate');
+      const r = await fetch(API + '/api/public/kb-manager/hit-rate',{signal:AbortSignal.timeout(15000)});
       const d = await r.json();
       if(d.error) return;
       // 4 卡片
@@ -277,7 +277,7 @@ if (!hasAdminAccess()) {
       const seen = new Set();
       for(const kw of keywords){
         try{
-          const r = await fetch(API + '/api/public/kb-manager/search?q=' + encodeURIComponent(kw) + '&limit=20');
+          const r = await fetch(API + '/api/public/kb-manager/search?q=' + encodeURIComponent(kw) + '&limit=20', { signal: AbortSignal.timeout(15000) });
           const d = await r.json();
           (d.items || []).forEach(k => {
             const key = k.entry_id || (k.module + ':' + k.title);
@@ -289,7 +289,7 @@ if (!hasAdminAccess()) {
       const list = all.filter(k => (k.trust_score || 0) >= 0.7).sort((a,b) => (b.hit_count||0) - (a.hit_count||0)).slice(0, 10);
       if(!list.length){
         // fallback：用任一关键词的全部条目（不限 trust）
-        const r = await fetch(API + '/api/public/kb-manager/search?q=' + encodeURIComponent('中医') + '&limit=20');
+        const r = await fetch(API + '/api/public/kb-manager/search?q=' + encodeURIComponent('中医') + '&limit=20', { signal: AbortSignal.timeout(15000) });
         const d = await r.json();
         const fallback = (d.items || []).slice(0, 10);
         if(!fallback.length){

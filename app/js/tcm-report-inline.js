@@ -132,7 +132,7 @@ window.runDiagnosis = async function() {
   try {
     // 收集问诊数据
     document.querySelectorAll('.q-input').forEach(i => { if (i.value) report.inquiry[i.dataset.q] = i.value; });
-    const resp = await fetch('/api/ai/lifeplan-report', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ module:'tcm-diagnosis', data: { inquiry: report.inquiry, media: Object.keys(report.media).filter(k=>report.media[k]) } }) });
+    const resp = await fetch('/api/ai/lifeplan-report',{method:'POST', headers:{'Content-Type':'application/json',signal:AbortSignal.timeout(15000)}), body: JSON.stringify({ module:'tcm-diagnosis', data: { inquiry: report.inquiry, media: Object.keys(report.media).filter(k=>report.media[k]) } }) });
     const data = await resp.json();
     if (!resp.ok) throw new Error(data.error || '辨证失败');
     report.diagnosis = data.diagnosis || data;
@@ -297,7 +297,7 @@ async function detectGlass() {
 
 // ===== 语音播报 =====
 function speakText(text) {
-  fetch('/api/tts', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ text: text.substring(0,200), voice: 'female-mandarin' }) })
+  fetch('/api/tts',{method:'POST', headers:{'Content-Type':'application/json',signal:AbortSignal.timeout(15000)}), body: JSON.stringify({ text: text.substring(0,200), voice: 'female-mandarin' }) })
     .then(r => r.blob()).then(blob => { const url = URL.createObjectURL(blob); const a = new Audio(url); a.play().catch(()=>{}); }).catch(()=>{});
 }
 

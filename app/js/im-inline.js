@@ -50,8 +50,7 @@ async function api(path, options = {}){
       'X-User-Id': ME.id,
       'X-User-Role': ME.role,
       ...(options.headers || {})
-    }
-  });
+    }, signal: AbortSignal.timeout(15000) });
   const data = await r.json().catch(() => ({ ok:false, error:'PARSE_FAIL' }));
   if(!data.ok){
     toast(data.message || data.error || '请求失败', 'err');

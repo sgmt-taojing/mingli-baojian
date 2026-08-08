@@ -413,7 +413,7 @@ function updateAlmanac() {
 async function fetchMinsuHuangli(dateStr) {
   try {
     const d = new Date(dateStr);
-    const resp = await fetch('/api/minsu/huangli?year='+d.getFullYear()+'&month='+(d.getMonth()+1)+'&day='+d.getDate());
+    const resp = await fetch('/api/minsu/huangli?year='+d.getFullYear()+'&month='+(d.getMonth()+1)+'&day='+d.getDate(),{signal:AbortSignal.timeout(15000)});
     if (!resp.ok) return;
     const data = await resp.json();
     if (!data.ok || !data.chart) return;

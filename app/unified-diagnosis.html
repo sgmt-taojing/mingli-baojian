@@ -821,7 +821,7 @@ async function runKBDiagnosis() {
 
   for (const q of queries) {
     try {
-      const resp = await fetch(API + '/api/public/kb/search-fts?q=' + encodeURIComponent(q) + '&limit=5');
+      const resp = await fetch(API + '/api/public/kb/search-fts?q=' + encodeURIComponent(q) + '&limit=5',{signal:AbortSignal.timeout(15000)});
       const data = await resp.json();
       (data.results || []).forEach(r => {
         if (!seen.has(r.entry_id)) {

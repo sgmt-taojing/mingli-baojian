@@ -13,8 +13,7 @@ async function apiCall(url, method, body){
         'Content-Type': 'application/json',
         ...(token ? {'Authorization': '***' + token} : {})
       },
-      body: body ? JSON.stringify(body) : undefined
-    });
+      body: body ? JSON.stringify(body) : undefined, signal: AbortSignal.timeout(15000) });
     if (!res.ok) return { error: 'HTTP_' + res.status };
     return await res.json();
   } catch(e) {
@@ -1813,7 +1812,7 @@ async function submitSymptom(){
       const headers={};
       const token=localStorage.getItem('ml_token');
       if(token) headers['Authorization']='Bearer '+token;
-      const r=await fetch(API_BASE+'/api/clinic/submit-symptom',{method:'POST',headers,body:fd});
+      const r=await fetch(API_BASE+'/api/clinic/submit-symptom',{method:'POST',headers,body:fd,signal:AbortSignal.timeout(15000)}));
       resp=await r.json();
     }else{
       resp=await apiCall('/api/clinic/submit-symptom','POST',{text,attachments:[]});

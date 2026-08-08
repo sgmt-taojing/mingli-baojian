@@ -164,11 +164,9 @@
     } else if (baziData && baziData.birthDate) {
       // 调排盘 API 获取五行
       tasks.push(
-        fetch(API + '/api/paipan/bazi', {
-          method: 'POST',
+        fetch(API + '/api/paipan/bazi', {method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(baziData)
-        }).then(function(r) { return r.json(); }).catch(function() { return null; })
+          body: JSON.stringify(baziData), signal:AbortSignal.timeout(15000)})).then(function(r) { return r.json(); }).catch(function() { return null; })
       );
     } else {
       tasks.push(Promise.resolve(null));
@@ -197,7 +195,7 @@
     if (fused.topPriority) {
       try {
         var kbQ = fused.topPriority.organ + ' ' + fused.topPriority.issue;
-        var kbRes = await fetch(API + '/api/public/kb/search-fts?q=' + encodeURIComponent(kbQ) + '&limit=3');
+        var kbRes = await fetch(API + '/api/public/kb/search-fts?q=' + encodeURIComponent(kbQ) + '&limit=3', { signal: AbortSignal.timeout(15000) });
         var kbJson = await kbRes.json();
         var kbData = kbJson.data || kbJson;
         if (kbData && kbData.results && kbData.results.length > 0) {

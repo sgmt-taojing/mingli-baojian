@@ -151,8 +151,8 @@ function render(d){
   
   // 异步获取化解方案
   if(window.HuajieRenderer){
-    fetch('/api/csrf-token').then(r=>r.json()).then(t=>{
-      return fetch('/api/ai/music-report',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':t.csrfToken},body:JSON.stringify({age:30,mood:d.emo,fiveElement:d.ele})});
+    fetch('/api/csrf-token',{signal:AbortSignal.timeout(15000)}).then(r=>r.json()).then(t=>{
+      return fetch('/api/ai/music-report',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':t.csrfToken,signal:AbortSignal.timeout(15000)}),body:JSON.stringify({age:30,mood:d.emo,fiveElement:d.ele})});
     }).then(r=>r.json()).then(resp=>{
       var huajie=resp.data&&resp.data.huajie||resp.huajie;
       if(huajie){
@@ -205,7 +205,7 @@ async function ttsSpeak(summaryEncoded){
   btn.classList.add('loading');
   btn.textContent = '⏳ 生成中...';
   try{
-    const resp = await fetch('http://127.0.0.1:8912/api/tts?text='+encodeURIComponent(summary)+'&voice=female');
+    const resp = await fetch('http://127.0.0.1:8912/api/tts?text='+encodeURIComponent(summary)+'&voice=female', { signal: AbortSignal.timeout(15000) });
     if(!resp.ok) throw new Error('TTS 服务返回 '+resp.status);
     const blob = await resp.blob();
     const url = URL.createObjectURL(blob);
@@ -233,7 +233,7 @@ async function ttsPlaySegment(idx, ttsEncoded, duration){
   const ttsText = decodeURIComponent(ttsEncoded);
   showToast('▶ 第 '+(parseInt(idx)+1)+' 段 · '+duration+'秒');
   try{
-    const resp = await fetch('http://127.0.0.1:8912/api/tts?text='+encodeURIComponent(ttsText)+'&voice=female');
+    const resp = await fetch('http://127.0.0.1:8912/api/tts?text='+encodeURIComponent(ttsText)+'&voice=female', { signal: AbortSignal.timeout(15000) });
     if(!resp.ok) throw new Error('TTS '+resp.status);
     const blob = await resp.blob();
     const url = URL.createObjectURL(blob);

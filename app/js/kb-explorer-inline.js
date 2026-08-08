@@ -14,7 +14,7 @@ function fmtNum(n){ return Number(n||0).toLocaleString('zh-CN'); }
 
 async function fetchStats(){
   try{
-    const r = await fetch(API + '/api/public/kb/stats');
+    const r = await fetch(API + '/api/public/kb/stats',{signal:AbortSignal.timeout(15000)});
     const d = await r.json();
     document.getElementById('statTotal').textContent = fmtNum(d.total);
     document.getElementById('statHi').textContent = fmtNum(d.hi_trust);
@@ -41,7 +41,7 @@ async function fetchNhCount(){
 
 async function fetchModules(){
   try{
-    const r = await fetch(API + '/api/public/kb-manager/list');
+    const r = await fetch(API + '/api/public/kb-manager/list',{signal:AbortSignal.timeout(15000)});
     const d = await r.json();
     if(d && d.modules){
       allModules = d.modules;
@@ -58,7 +58,7 @@ async function fetchModules(){
 
 async function fetchHits(){
   try{
-    const r = await fetch(API + '/api/public/kb/hits');
+    const r = await fetch(API + '/api/public/kb/hits',{signal:AbortSignal.timeout(15000)});
     const d = await r.json();
     return d;
   }catch(e){ return null; }
@@ -254,7 +254,7 @@ async function doSearch(){
   switchTab('search');
   document.getElementById('resultBox').innerHTML = '<div class="kbe-loading">正在检索知识库</div>';
   try{
-    const r = await fetch(API + '/api/public/kb/search?q=' + encodeURIComponent(q) + (mod ? '&module=' + encodeURIComponent(mod) : ''));
+    const r = await fetch(API + '/api/public/kb/search?q=' + encodeURIComponent(q) + (mod ? '&module=' + encodeURIComponent(mod) : ''), { signal: AbortSignal.timeout(15000) });
     const d = await r.json();
     const results = d.results || [];
     if(!results.length){
@@ -362,7 +362,7 @@ async function renderRecommendations(){
   }
   box.innerHTML = '<div class="kbe-loading">正在获取 ' + mod + ' 的智能推荐</div>';
   try{
-    const r = await fetch(API + '/api/kb/recommend?module=' + encodeURIComponent(mod) + '&limit=8');
+    const r = await fetch(API + '/api/kb/recommend?module=' + encodeURIComponent(mod) + '&limit=8', { signal: AbortSignal.timeout(15000) });
     const d = await r.json();
     const recs = (d.data && d.data.recommendations) || d.recommendations || [];
     if(!recs.length){
@@ -473,7 +473,7 @@ document.getElementById('qInput').addEventListener('keypress', e=>{
         // 否则直接发请求
         resultBox.innerHTML = '<div class="kbe-loading">正在检索知识库：' + mod + '</div>';
         var url = (location.hostname==='localhost'||location.hostname==='127.0.0.1'||location.hostname==='') ? 'http://127.0.0.1:8920' : '';
-        fetch(url + '/api/public/kb-query?q=' + encodeURIComponent(mod) + '&limit=10')
+        fetch(url + '/api/public/kb-query?q=' + encodeURIComponent(mod) + '&limit=10', { signal: AbortSignal.timeout(15000) })
           .then(function(r){return r.json();})
           .then(function(d){
             if(!d || !d.results){ resultBox.innerHTML = '<div class="kbe-empty"><div class="kbe-empty-icon">📖</div><div>模块 ' + mod + ' 无内容</div></div>'; return; }

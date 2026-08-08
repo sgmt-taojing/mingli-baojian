@@ -179,7 +179,7 @@ async function runPaipanTest(){
   const lng=parseFloat(document.getElementById('paipanLng').value);
   if(!isNaN(lng)) body.lng=lng;
   try{
-    const resp=await fetch(PAIPAN_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const resp=await fetch(PAIPAN_API,{method:'POST',headers:{'Content-Type':'application/json',signal:AbortSignal.timeout(15000)}),body:JSON.stringify(body)});
     const data=await resp.json();
     status.innerHTML='';
     if(data.error){

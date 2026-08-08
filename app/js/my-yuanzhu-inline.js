@@ -491,7 +491,7 @@ async function renderKbDash(c){
   try{
     // 尝试多个端点（兼容 public + auth 版本）
     try {
-      const r = await fetch(API + '/api/public/kb-stats');
+      const r = await fetch(API + '/api/public/kb-stats',{signal:AbortSignal.timeout(15000)});
       if(r.ok){
         const j = await r.json();
         const d = j.data || j;
@@ -500,7 +500,7 @@ async function renderKbDash(c){
       }
     } catch(e){console.warn(e.message)}
     try {
-      const r2 = await fetch(API + '/api/public/kb-list');
+      const r2 = await fetch(API + '/api/public/kb-list',{signal:AbortSignal.timeout(15000)});
       if(r2.ok){
         const j2 = await r2.json();
         const d2 = j2.data || j2;

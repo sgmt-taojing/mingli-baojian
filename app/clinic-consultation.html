@@ -1192,8 +1192,7 @@ window.runMingli = async function() {
       body: JSON.stringify({
         year: parseInt(b.year), month: parseInt(b.month), day: parseInt(b.day),
         hour: b.hour || 12, minute: 0, gender: state.intake.gender
-      })
-    }).catch(() => null);
+      }), signal: AbortSignal.timeout(15000) }).catch(() => null);
     if (r && r.ok) result = await r.json();
   } catch(e) {}
 

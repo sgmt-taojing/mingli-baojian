@@ -327,7 +327,7 @@ else if(['血红蛋白','HGB','白细胞','WBC','红细胞','RBC','血小板','P
 
 try{
 var csrf=await getCsrf();
-var r=await fetch(API+'/api/wellness/profile',{method:'POST',headers:{'Content-Type':'application/json','x-csrf-token':csrf},body:JSON.stringify(payload),credentials:'include',signal: AbortSignal.timeout(15000)});
+var r=await fetch(API+'/api/wellness/profile',{method:'POST',headers:{'Content-Type':'application/json','x-csrf-token':csrf,signal:AbortSignal.timeout(15000)}),body:JSON.stringify(payload),credentials:'include',signal: AbortSignal.timeout(15000)});
 var j=await r.json();
 if(j.code===200){
 console.warn('✅ 已保存到康养人档案！');
@@ -361,7 +361,7 @@ window.ReportInterpret.renderTo('interpretCard', result, {style:'card'});
 return;
 
 try{
-var r=await fetch(API+'/api/wellness/profile/'+USER_ID);
+var r=await fetch(API+'/api/wellness/profile/'+USER_ID,{signal:AbortSignal.timeout(15000)});
 var j=await r.json();
 var p=j.data||{};
 }catch(e){var p={}}

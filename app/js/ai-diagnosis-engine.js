@@ -273,7 +273,7 @@
   // ========== KB 查询（异步获取匹配案例）==========
   async function queryKbCases(query, limit) {
     try {
-      var resp = await fetch(API + '/api/public/kb/search-fts?q=' + encodeURIComponent(query) + '&limit=' + (limit || 3));
+      var resp = await fetch(API + '/api/public/kb/search-fts?q=' + encodeURIComponent(query) + '&limit=' + (limit || 3),{signal:AbortSignal.timeout(15000)});
       var d = await resp.json();
       var data = d.data || d;
       return data.results || [];

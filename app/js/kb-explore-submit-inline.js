@@ -102,8 +102,7 @@ async function submit(payload) {
   try {
     const r = await fetch(API + '/api/kb/submit-material', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      credentials: 'include', body: JSON.stringify(payload)
-    });
+      credentials: 'include', body: JSON.stringify(payload), signal: AbortSignal.timeout(15000) });
     const d = await r.json();
     showResult(d);
   } catch (e) {
@@ -171,8 +170,7 @@ async function discoverOnline() {
   try {
     const r = await fetch(API + '/api/kb/discover-online', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      credentials: 'include', body: JSON.stringify({ module: currentModule, query })
-    });
+      credentials: 'include', body: JSON.stringify({ module: currentModule, query }), signal: AbortSignal.timeout(15000) });
     const d = await r.json();
     showDiscover(d);
   } catch (e) {

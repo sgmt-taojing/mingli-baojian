@@ -60,11 +60,10 @@ function tzGeneratePlan(){
   prompt+='4. 起居调摄（作息/穴位/注意事项）\n\n';
   prompt+='用JSON格式回复：{"食疗":[{"名称":"...","食材":"...","做法":"...","功效":"..."}],"功法":[{"名称":"...","理由":"...","时长":"..."}],"正念":[{"方法":"...","步骤":"...","益处":"..."}],"起居":[{"方面":"...","建议":"..."}],"总结":"..."}';
 
-  fetch('/v1/chat/completions',{
+  fetch('/v1/chat/completions', {
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:'openclaw',messages:[{role:'user',content:prompt}],max_tokens:2000,temperature:0.4})
-  }).then(function(r){return r.json();}).then(function(data){
+    body:JSON.stringify({model:'openclaw',messages:[{role:'user',content:prompt}],max_tokens:2000,temperature:0.4}), signal: AbortSignal.timeout(15000) }).then(function(r){return r.json();}).then(function(data){
     let text=data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content||'';
     let jsonMatch=text.match(/\{[\s\S]+\}/);
     let obj=null;

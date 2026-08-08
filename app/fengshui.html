@@ -4097,7 +4097,7 @@ async function generateFengshuiReport(){
       gender, name, annual: true
     };
     
-    const csrfRes = await fetch('/api/csrf-token').then(r=>r.json()).catch(()=>({csrfToken:''}));
+    const csrfRes = await fetch('/api/csrf-token',{signal:AbortSignal.timeout(15000)}).then(r=>r.json()).catch(()=>({csrfToken:''}));
     const csrf = csrfRes.csrfToken || csrfRes.token || '';
     
     const r = await fetch('/api/paipan/fengshui/report', {

@@ -12,7 +12,7 @@
       'Authorization': 'Bearer ' + token,
     }, opts.headers || {});
     try {
-      const r = await fetch(API + path, opts);
+      const r = await fetch(API + path, opts,{signal:AbortSignal.timeout(15000)});
       return await r.json();
     } catch (e) {
       // 离线 / 401 / API 暂未上线 → 走离线降级，本页仍可用

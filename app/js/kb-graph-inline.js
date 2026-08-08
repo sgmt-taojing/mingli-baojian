@@ -517,7 +517,7 @@
     document.getElementById('m-body').innerHTML = detailHtml;
     document.getElementById('modal').classList.add('show');
     // R42 异步加载 KB 条目预览 Top 3
-    fetch('/api/public/kb-query?module=' + encodeURIComponent(n.id) + '&limit=3', {cache:'no-cache'}).catch(function(e){ console.warn("[R514] fetch error:", e.message); })
+    fetch('/api/public/kb-query?module=' + encodeURIComponent(n.id) + '&limit=3',{cache:'no-cache',signal:AbortSignal.timeout(15000)})).catch(function(e){ console.warn("[R514] fetch error:", e.message); })
       .then(function(r){var ct=r.headers.get('content-type')||'';if(!ct.includes('json'))throw new Error('API');return r.json();}).then(function(j){
         var results = (j.data || j.results || []);
         var kbBox = document.getElementById('m-kb');
@@ -538,7 +538,7 @@
         kbBox.innerHTML = html;
       }).catch(function(){ var b=document.getElementById('m-kb'); if(b) b.innerHTML='<div class="m-kb-empty">KB 预览查阅失败</div>'; });
     // R33-节点5 异步加载 AI 推荐探索路径（彩色点 + 可点击跳转 kb-explorer）
-    fetch('/api/kb/recommend?module=' + encodeURIComponent(n.id) + '&limit=6', {cache:'no-cache'}).catch(function(e){ console.warn("[R514] fetch error:", e.message); })
+    fetch('/api/kb/recommend?module=' + encodeURIComponent(n.id) + '&limit=6',{cache:'no-cache',signal:AbortSignal.timeout(15000)})).catch(function(e){ console.warn("[R514] fetch error:", e.message); })
       .then(function(r){var ct=r.headers.get('content-type')||'';if(!ct.includes('json'))throw new Error('API');return r.json();}).then(function(j){
         var d = j.data || j;
         var recs = d.recommendations || [];

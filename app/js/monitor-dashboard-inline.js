@@ -117,7 +117,7 @@ function renderOverview(){
   document.getElementById('ovRevenue').textContent='¥'+todayRev.toFixed(2);
 
   // 尝试调用 /api/health 获取系统状态（真实API）
-  fetch('/api/health').then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(s){
+  fetch('/api/health',{signal:AbortSignal.timeout(15000)}).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(s){
     if(s&&s.uptime){
       // 真实数据可用时更新健康分
       let healthEl=document.getElementById('healthMetrics');
@@ -286,7 +286,7 @@ function renderAlertList(){
 
 // ═══ KB 体系渲染 ═══
 function renderKB(){
-  fetch('/api/public/kb-stats').then(function(r){return r.json()}).then(function(s){
+  fetch('/api/public/kb-stats',{signal:AbortSignal.timeout(15000)}).then(function(r){return r.json()}).then(function(s){
     function set(id,v){var el=document.getElementById(id); if(el) el.textContent=v;}
     set('kbModels', s.models || 0);
     set('kbFormal', s.formal || 0);
@@ -325,7 +325,7 @@ function renderKB(){
       init.headers = {'Content-Type':'application/json'};
       init.body = JSON.stringify({});
     }
-    fetch(path, init).then(function(r){
+    fetch(path, init,{signal:AbortSignal.timeout(15000)}).then(function(r){
       var ms = Date.now() - startT;
       return { ok: r.ok, status: r.status, ms: ms };
     }).catch(function(){ return { ok: false, status: '×', ms: 0 }; })

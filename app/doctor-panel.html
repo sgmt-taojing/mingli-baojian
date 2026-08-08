@@ -141,7 +141,7 @@ function showToast(msg){
 }
 
 function loadQueue(){
-  fetch(API+'/api/clinic/review-queue',{headers:authHeaders()}).then(function(r){return r.json()}).then(function(d){
+  fetch(API+'/api/clinic/review-queue',{headers:authHeaders(),signal:AbortSignal.timeout(15000)})).then(function(r){return r.json()}).then(function(d){
     if(!d.ok){document.getElementById('card-stream').innerHTML='<div class="empty">加载失败：'+(d.error||d.message||'请先登录')+'</div>';return}
     allCases=d.queue||[];
     renderStats();
@@ -309,7 +309,7 @@ function rejectCase(id){
   setTimeout(function(){if(card._rejectArmed){card._rejectArmed=false;showToast('驳回已取消')}},3000);
 }
 function doReject(id){
-  fetch(API+'/api/clinic/submit-diagnosis',{method:'POST',headers:authHeaders(),body:JSON.stringify({caseId:id,diagnosis:'',prescription:'',reviewComment:'医生驳回，请补充信息'}),signal:AbortSignal.timeout(15000)})
+  fetch(API+'/api/clinic/submit-diagnosis',{method:'POST',headers:authHeaders(),body:JSON.stringify({caseId:id,diagnosis:'',prescription:'',reviewComment:'医生驳回，请补充信息',signal:AbortSignal.timeout(15000)})),signal:AbortSignal.timeout(15000)})
   .then(function(r){return r.json()}).then(function(d){
     var card=document.getElementById('card-'+id);
     if(card)card.classList.add('rejecting');
@@ -327,7 +327,7 @@ function submitEdit(id){
 }
 
 function submitDiagnosis(id,data,note){
-  fetch(API+'/api/clinic/submit-diagnosis',{method:'POST',headers:authHeaders(),body:JSON.stringify({caseId:id,diagnosis:data.diagnosis||'',prescription:data.prescription||'',reviewComment:data.doctor_comment||note||''}),signal:AbortSignal.timeout(15000)})
+  fetch(API+'/api/clinic/submit-diagnosis',{method:'POST',headers:authHeaders(),body:JSON.stringify({caseId:id,diagnosis:data.diagnosis||'',prescription:data.prescription||'',reviewComment:data.doctor_comment||note||'',signal:AbortSignal.timeout(15000)})),signal:AbortSignal.timeout(15000)})
   .then(function(r){return r.json()}).then(function(d){
     var card=document.getElementById('card-'+id);
     if(card)card.classList.add('accepting');
@@ -342,7 +342,7 @@ loadQueue();
 var lastCount=allCases.length;
 var pollTimer=setInterval(function(){
   // 轻量轮询：只取数量变化，有新案例才重渲染
-  fetch(API+'/api/clinic/review-queue',{headers:authHeaders()}).then(function(r){return r.json()}).then(function(d){
+  fetch(API+'/api/clinic/review-queue',{headers:authHeaders(),signal:AbortSignal.timeout(15000)})).then(function(r){return r.json()}).then(function(d){
     if(!d.ok||!d.queue)return;
     var newCount=d.queue.length;
     if(newCount>lastCount){
@@ -370,7 +370,7 @@ var pollTimer=setInterval(function(){
 // 🚨 SOS 紧急事件检查（新紧急事件 → 红色横幅 + 警报音）
 var lastSOSId=0;
 function checkSOS(){
-  fetch(API+'/api/clinic/emergency-events',{headers:authHeaders()})
+  fetch(API+'/api/clinic/emergency-events',{headers:authHeaders(),signal:AbortSignal.timeout(15000)}))
   .then(function(r){return r.json()}).then(function(d){
     if(!d.ok||!d.events||!d.events.length)return;
     var latest=d.events[0];

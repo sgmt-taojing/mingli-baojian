@@ -305,8 +305,7 @@
       const resp = await fetch(API + '/api/advisor/consult', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { 'x-csrf-token': token } : {}) },
-        body: JSON.stringify(payload)
-      });
+        body: JSON.stringify(payload), signal: AbortSignal.timeout(15000) });
       const data = await resp.json();
       if (!resp.ok || !data.ok) throw new Error(data.error || ('HTTP ' + resp.status));
       renderResult(data);

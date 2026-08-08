@@ -90,7 +90,7 @@
 
   // 尝试 fetch 加载
   if(window.fetch){
-    fetch(KB_URL)
+    fetch(KB_URL,{signal:AbortSignal.timeout(15000)})
       .then(function(r){ return r.json(); })
       .then(function(data){
         window.WANGZHEN_KB = parseKB(data);

@@ -2985,8 +2985,7 @@ function tzStep1Analyze(fileName, content, type) {
   fetch(apiBase + '/v1/chat/completions', {
     method: 'POST',
     headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer b720753afe0845f5a7611a1b56b6d77c'},
-    body: JSON.stringify(payload)
-  }).then(function(r) { return r.json(); }).then(function(data) {
+    body: JSON.stringify(payload), signal: AbortSignal.timeout(15000) }).then(function(r) { return r.json(); }).then(function(data) {
     let text = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content || '';
     let jsonMatch = text.match(/\{[\s\S]+\}/);
     let obj = null;
@@ -3138,8 +3137,7 @@ function tzStep2Suggestions() {
   fetch('/api/ai/public-chat', {
     method: 'POST',
     headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer b720753afe0845f5a7611a1b56b6d77c'},
-    body: JSON.stringify(payload)
-  }).then(function(r) { return r.json(); }).then(function(data) {
+    body: JSON.stringify(payload), signal: AbortSignal.timeout(15000) }).then(function(r) { return r.json(); }).then(function(data) {
     let text = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content || '';
     let jsonMatch = text.match(/\{[\s\S]+\}/);
     let obj = null;
@@ -16036,8 +16034,7 @@ function _analyzeFloorPlanAI(imageData, context) {
         ]}
       ],
       max_tokens: 3000
-    })
-  }).then(function(r) { return r.json(); }).then(function(data) {
+    }), signal: AbortSignal.timeout(15000) }).then(function(r) { return r.json(); }).then(function(data) {
     let result = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
     let fsAiResult = document.getElementById('fsAiStatus');
     if (fsAiResult) {

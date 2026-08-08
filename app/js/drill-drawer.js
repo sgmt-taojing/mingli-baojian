@@ -150,7 +150,7 @@
         '<button class="drill-action" onclick="window.open(\'kb-explorer.html?module='+encodeURIComponent(module)+'\',\'_blank\')">在 KB 浏览器中查看 →</button>',
         onOpen:function(){
           // 异步加载 KB 数据
-          fetch('/api/public/kb/module-health').then(function(r){return r.json()}).then(function(s){
+          fetch('/api/public/kb/module-health',{signal:AbortSignal.timeout(15000)}).then(function(r){return r.json()}).then(function(s){
             var m=s.data&&s.data.modules?s.data.modules.filter(function(x){return x.module===module})[0]:null;
             var el=document.getElementById('drillKbStats');
             if(!m||!el){if(el)el.innerHTML='<div class="drill-empty">未找到模块数据</div>';return;}
@@ -166,7 +166,7 @@
           });
 
           // 加载热门查询
-          fetch('/api/ai/kb-hit-stats').then(function(r){return r.json()}).then(function(s){
+          fetch('/api/ai/kb-hit-stats',{signal:AbortSignal.timeout(15000)}).then(function(r){return r.json()}).then(function(s){
             var queries=s.data&&s.data.topQueries?s.data.topQueries:[];
             var el=document.getElementById('drillKbHits');
             if(!el)return;
@@ -180,7 +180,7 @@
           });
 
           // 健康指标
-          fetch('/api/public/kb/module-health').then(function(r){return r.json()}).then(function(s){
+          fetch('/api/public/kb/module-health',{signal:AbortSignal.timeout(15000)}).then(function(r){return r.json()}).then(function(s){
             var m=s.data&&s.data.modules?s.data.modules.filter(function(x){return x.module===module})[0]:null;
             var el=document.getElementById('drillKbHealth');
             if(!el||!m)return;

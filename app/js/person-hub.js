@@ -31,7 +31,7 @@
 
   async function master(userId){
     var local = _lsRead();
-    var r = await fetch(API + '/api/person/master/' + (userId || 4)).catch(function(e){void 0});
+    var r = await fetch(API + '/api/person/master/' + (userId || 4), { signal: AbortSignal.timeout(15000) }).catch(function(e){void 0});
     var j = await r.json();
     if (j.code === 200) {
       _cache = j.data;
@@ -43,13 +43,13 @@
   }
 
   async function dashboard(userId){
-    var r = await fetch(API + '/api/person/dashboard/' + (userId || 4)).catch(function(e){void 0});
+    var r = await fetch(API + '/api/person/dashboard/' + (userId || 4), { signal: AbortSignal.timeout(15000) }).catch(function(e){void 0});
     var j = await r.json();
     return (j.code === 200) ? j.data : null;
   }
 
   async function list(limit){
-    var r = await fetch(API + '/api/person/list?limit=' + (limit || 50)).catch(function(e){void 0});
+    var r = await fetch(API + '/api/person/list?limit=' + (limit || 50), { signal: AbortSignal.timeout(15000) }).catch(function(e){void 0});
     var j = await r.json();
     return (j.code === 200) ? j.data.persons : [];
   }
@@ -72,8 +72,7 @@
         await fetch(API + '/api/person/master', {
           method: 'POST',
           headers: {'Content-Type': 'application/json', 'x-csrf-token': _token},
-          body: JSON.stringify({user_id: uid, metadata: {source: 'auto_bind', module: identityType}})
-        });
+          body: JSON.stringify({user_id: uid, metadata: {source: 'auto_bind', module: identityType}}), signal: AbortSignal.timeout(15000) });
       } catch(_){}
       // 2. 写 event
       var r = await fetch(API + '/api/person/event', {
@@ -86,8 +85,7 @@
           event_data: eventData || {},
           severity: severity || 'normal',
           summary: summary || ''
-        })
-      });
+        }), signal: AbortSignal.timeout(15000) });
       var j = await r.json();
       return j.code === 200;
     } catch(e){ console.warn('[PersonHub] logEvent err:', e.message); return false; }
@@ -111,7 +109,7 @@
       // 1. 优先从后端拉真实 list（即便 localStorage 空也能拿到 user 4/11/13）
       var persons = [];
       try {
-        var r = await fetch(API + '/api/person/list?limit=10');
+        var r = await fetch(API + '/api/person/list?limit=10',{signal:AbortSignal.timeout(15000)});
         var j = await r.json();
         if(j.code === 200 && j.data && Array.isArray(j.data.persons)){
           persons = j.data.persons;
@@ -144,7 +142,7 @@
   // 健康检查
   async function ping(){
     try {
-      var r = await fetch(API + '/api/person/master/4');
+      var r = await fetch(API + '/api/person/master/4',{signal:AbortSignal.timeout(15000)});
       var j = await r.json();
       return j.code === 200;
     } catch(e){ return false; }

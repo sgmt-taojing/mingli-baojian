@@ -38,7 +38,7 @@
     if (csrfCache && Date.now() - csrfTime < 25 * 60 * 1000) {
       return Promise.resolve(csrfCache);
     }
-    return fetch(API + '/api/csrf', { credentials: 'include' })
+    return fetch(API + '/api/csrf',{credentials: 'include',signal:AbortSignal.timeout(15000)}))
       .then(function(r) { return r.json(); })
       .then(function(j) {
         csrfCache = j.csrf_token || (j.data && j.data.csrf_token) || '';

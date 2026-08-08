@@ -140,7 +140,7 @@ async function submitRefill(eid){
   const content=ta.value.trim();
   if(content.length<60){toast('内容需 ≥ 60 字（当前 '+content.length+'）');return}
   try{
-    const r=await fetch(API+'/api/kb/refill-skeleton',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({entry_id:eid,content})});
+    const r=await fetch(API+'/api/kb/refill-skeleton',{method:'POST',headers:{'Content-Type':'application/json',signal:AbortSignal.timeout(15000)}),body:JSON.stringify({entry_id:eid,content})});
     const d=await r.json();
     if(d.code===0||d.ok){toast('✅ '+eid+' 已补充 ('+content.length+' 字)');setTimeout(()=>load(),800)}
     else toast('❌ '+(d.message||d.error||'失败'))

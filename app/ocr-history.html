@@ -250,7 +250,7 @@ async function loadHistory() {
   const mode = document.getElementById('modeFilter').value;
   const url = '/api/ocr/history?limit=50' + (mode ? '&mode=' + mode : '');
   try {
-    const r = await fetch(url, { credentials:'same-origin', headers: csrfToken ? {'x-csrf-token':csrfToken} : {} });
+    const r = await fetch(url,{credentials:'same-origin', headers: csrfToken ? {'x-csrf-token':csrfToken} : undefined,signal:AbortSignal.timeout(15000)});
     const d = await r.json();
     const data = d.data || d;
     if (!data.ok) { toast('查阅失败'); return; }
@@ -349,8 +349,7 @@ async function clearAll() {
   try {
     const r = await fetch('/api/ocr/history', {
       method:'DELETE', credentials:'same-origin',
-      headers: csrfToken ? {'x-csrf-token':csrfToken} : {}
-    });
+      headers: csrfToken ? {'x-csrf-token':csrfToken} : {}, signal: AbortSignal.timeout(15000) });
     const d = await r.json();
     if ((d.data||d).ok) { toast('已清空'); loadHistory(); }
     else toast('清空失败');

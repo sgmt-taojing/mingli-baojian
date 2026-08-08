@@ -106,7 +106,7 @@ function addContact(){
   if(!name){showToast('请输入姓名');return}
   if(!/^1\d{10}$/.test(phone)){showToast('请输入正确的 11 位手机号');return}
   if(!rel){showToast('请选择关系');return}
-  fetch(API+'/api/clinic/emergency-contacts',{method:'POST',headers:authHeaders(),body:JSON.stringify({name:name,phone:phone,relation:rel}),signal: AbortSignal.timeout(15000)}).catch(function(e){ console.warn("[R514] emergency-contacts fetch error:", e.message); })  .then(function(r){return r.json()}).then(function(d){
+  fetch(API+'/api/clinic/emergency-contacts',{method:'POST',headers:authHeaders(),body:JSON.stringify({name:name,phone:phone,relation:rel,signal:AbortSignal.timeout(15000)})),signal: AbortSignal.timeout(15000)}).catch(function(e){ console.warn("[R514] emergency-contacts fetch error:", e.message); })  .then(function(r){return r.json()}).then(function(d){
     if(d.ok){
       showToast('✅ 联系人已添加');
       document.getElementById('c-name').value='';

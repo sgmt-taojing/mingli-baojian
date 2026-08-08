@@ -26,9 +26,7 @@
   async function fetchRecommend(moduleId, limit = 5) {
     try {
       const apiBase = (typeof window !== 'undefined' && window.API_BASE) || '/api';
-      const r = await fetch(`${apiBase}/kb/recommend?module=${encodeURIComponent(moduleId)}&limit=${limit}`, {
-        credentials: 'omit'
-      });
+      const r = await fetch(`${apiBase}/kb/recommend?module=${encodeURIComponent(moduleId)}&limit=${limit}`,{credentials: 'omit',signal:AbortSignal.timeout(15000)});
       if (!r.ok) return null;
       const j = await r.json();
       return j && (j.data || j);

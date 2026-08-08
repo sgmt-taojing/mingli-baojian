@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
   <script src="/app/js/escape-html.js" defer></script>
+<meta name="description" content="">
 <meta charset="UTF-8">
 <link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/mobile-interact.html">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,viewport-fit=cover">
@@ -524,7 +525,7 @@ async function captureAndAnalyze() {
     let kbMatches = ocrResult.kb_matches || [];
     if (!kbMatches.length && ocrResult.analysis?.summary) {
       try {
-        const kbResp = await fetch(`${KB_FTS_API}?q=${encodeURIComponent(ocrResult.analysis.summary.substring(0,50))}&limit=3`);
+        const kbResp = await fetch(`${KB_FTS_API}?q=${encodeURIComponent(ocrResult.analysis.summary.substring(0,50))}&limit=3`, { signal: AbortSignal.timeout(15000) });
         const kbData = await kbResp.json();
         kbMatches = (kbData.results || []).slice(0, 3);
       } catch {}
@@ -840,7 +841,7 @@ async function askAI(query, audioBlob) {
   // 1) 同步调用 KB FTS5（秒回）
   let kbMatches = [];
   try {
-    const resp = await fetch(`${KB_FTS_API}?q=${encodeURIComponent(query)}&limit=5`);
+    const resp = await fetch(`${KB_FTS_API}?q=${encodeURIComponent(query)}&limit=5`, { signal: AbortSignal.timeout(15000) });
     const data = await resp.json();
     kbMatches = (data.results || []).slice(0, 5);
   } catch {}
@@ -973,7 +974,7 @@ async function mobileSearch() {
   const el = document.getElementById('searchResults');
   el.innerHTML = '<div class="state-loading"><div class="state-spinner"></div><span>FTS5 检索中…</span></div>';
   try {
-    const resp = await fetch(`${KB_FTS_API}?q=${encodeURIComponent(q)}&limit=10`);
+    const resp = await fetch(`${KB_FTS_API}?q=${encodeURIComponent(q)}&limit=10`, { signal: AbortSignal.timeout(15000) });
     const data = await resp.json();
     const results = data.results || data.data || [];
     const engine = data.engine || 'fts5';
@@ -1014,7 +1015,7 @@ async function mobileSearch() {
 // ===== Hot Tags =====
 async function loadHotTags() {
   try {
-    const resp = await fetch(`${KB_HOT_API}?limit=8`);
+    const resp = await fetch(`${KB_HOT_API}?limit=8`,{signal:AbortSignal.timeout(15000)});
     const data = await resp.json();
     const hot = data.hot || [];
     const el = document.getElementById('hotTags');
@@ -1050,7 +1051,7 @@ function showToast(msg) {
 loadHotTags();
 
 // 检测本地/局域网连接
-fetch('/api/health').then(r => r.json()).then(d => {
+fetch('/api/health',{signal:AbortSignal.timeout(15000)}).then(r => r.json()).then(d => {
   document.getElementById('statusDot').innerHTML = '<span class="app-status-dot"></span>KB 在线 · ' + (d.service || 'ready');
 }).catch(() => {
   document.getElementById('statusDot').innerHTML = '<span class="app-status-dot" style="background:var(--gold)"></span>KB 本地模式';

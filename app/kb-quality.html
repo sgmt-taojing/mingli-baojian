@@ -330,7 +330,7 @@ function showDetail(mod){
   if(typeof dlg.showModal==='function'){try{dlg.showModal();}catch(e){}}
   switchTab('samples');
   // 拉样本
-  fetch(`/api/public/kb-query?q=*&module=${encodeURIComponent(mod)}&limit=8`)
+  fetch(`/api/public/kb-query?q=*&module=${encodeURIComponent(mod)}&limit=8`,{signal:AbortSignal.timeout(15000)})
     .then(r=>r.json())
     .then(j=>{
       const list=(j.data&&j.data.results)||j.results||[];
@@ -345,7 +345,7 @@ function showDetail(mod){
       document.getElementById('modalSamples').innerHTML=`<p style="color:#c66">查阅失败：${err.message}</p>`;
     });
   // === R58: 拉详情 (trust 分布 + top/bottom 5) ===
-  fetch(`/api/kb/quality-report?module=${encodeURIComponent(mod)}&detail=true`)
+  fetch(`/api/kb/quality-report?module=${encodeURIComponent(mod)}&detail=true`,{signal:AbortSignal.timeout(15000)})
     .then(r=>r.json())
     .then(j=>{
       const d=j.detail;

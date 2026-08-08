@@ -78,7 +78,7 @@ const api = (path) => (API_BASE || '') + path;
 /* ---- CSRF token ---- */
 async function fetchCsrfToken() {
   try {
-    const r = await fetch(api('/api/csrf-token'), { credentials: 'same-origin' });
+    const r = await fetch(api('/api/csrf-token'),{credentials: 'same-origin',signal:AbortSignal.timeout(15000)}));
     const data = await r.json().catch(() => ({}));
     if (data.csrfToken || data.token) {
       csrfToken = data.csrfToken || data.token;
@@ -316,8 +316,7 @@ async function captureAndAnalyze() {
       },
       body: JSON.stringify(body),
       mode: 'cors',
-      credentials: 'same-origin'
-    });
+      credentials: 'same-origin', signal: AbortSignal.timeout(15000) });
 
     const latency = Date.now() - t0;
     var _e=document.getElementById('latencyLabel');if(_e)_e.textContent=latency + 'ms';
@@ -375,7 +374,7 @@ async function speakResult() {
     audio.onerror = async () => {
       // Fallback: try 8920 proxy
       try {
-        const pr = await fetch(api('/api/tts?text=') + encodeURIComponent(text));
+        const pr = await fetch(etch(api('/api/tts?text=') + encodeURIComponent(text), { signal: AbortSignal.timeout(15000) });
         if (pr.ok) {
           const blob = await pr.blob();
           const a = new Audio(URL.createObjectURL(blob));

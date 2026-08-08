@@ -42,8 +42,7 @@
     fetch(api + '/api/v1/user/consents', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-      body: JSON.stringify({ consentType: 'analytics', granted, version: CONSENT_VERSION }),
-    }).catch(()=>{});
+      body: JSON.stringify({ consentType: 'analytics', granted, version: CONSENT_VERSION }), signal: AbortSignal.timeout(15000) }).catch(()=>{});
   }
 
   function injectStyles(){

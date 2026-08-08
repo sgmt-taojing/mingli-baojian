@@ -253,8 +253,7 @@ async function analyze(blob) {
   setStatus('上传并分析中…', '');
   try {
     const r = await fetch('http://127.0.0.1:8913/api/camera/upload', {
-      method: 'PUT', body: form
-    });
+      method: 'PUT', body: form, signal: AbortSignal.timeout(15000) });
     const j = await r.json();
     if (!j.ok) {
       analysis.innerHTML = `<div class="analysis-empty" style="color:var(--danger)">⚠ ${j.message || j.error || '分析失败'}</div>`;
@@ -337,7 +336,7 @@ function toggleAuto() {
 
 async function loadGallery() {
   try {
-    const r = await fetch('http://127.0.0.1:8913/api/camera/health');
+    const r = await fetch('http://127.0.0.1:8913/api/camera/health',{signal:AbortSignal.timeout(15000)});
     // 健康检查，不返回列表 — 改为从 localStorage 计数
     const list = JSON.parse(localStorage.getItem('camera_archive') || '[]');
     galleryCount.textContent = list.length;
@@ -674,7 +673,7 @@ function initSTT() {
 async function queryKb(query) {
   if (!query || query.length < 2) return [];
   try {
-    const r = await fetch('http://127.0.0.1:8920/api/public/kb-search?limit=3&q=' + encodeURIComponent(query));
+    const r = await fetch('http://127.0.0.1:8920/api/public/kb-search?limit=3&q=' + encodeURIComponent(query), { signal: AbortSignal.timeout(15000) });
     const j = await r.json();
     return (j.results || []).slice(0, 3);
   } catch (e) { return []; }

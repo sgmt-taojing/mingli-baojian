@@ -293,8 +293,7 @@ function switchTab(tab) {
 function loadStats() {
   if (!checkAdminLogin()) return;
   fetch(API + '/api/admin/tickets/stats?days=30', {
-    headers: { 'Authorization': 'Bearer ' + getAdminToken() }
-  })
+    headers: { 'Authorization': 'Bearer ' + getAdminToken() }, signal: AbortSignal.timeout(15000) })
     .then(function(r) { return r.json(); })
     .then(function(r) {
       if (r.code !== 0) { if (r.error === '请先登录') checkAdminLogin(); return; }
@@ -402,8 +401,7 @@ function loadTickets() {
   if (priority) params.set('priority', priority);
 
   fetch(API + '/api/admin/tickets/list?' + params, {
-    headers: { 'Authorization': 'Bearer ' + getAdminToken() }
-  })
+    headers: { 'Authorization': 'Bearer ' + getAdminToken() }, signal: AbortSignal.timeout(15000) })
     .then(function(r) { return r.json(); })
     .then(function(r) {
       if (r.code !== 0) return;
@@ -470,8 +468,7 @@ function executeBatch() {
   fetch(API + '/api/admin/tickets/batch-update', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAdminToken() },
-    body: JSON.stringify({ ids: Array.from(selectedIds), action: parts[0], value: parts[1] })
-  }).then(function(r) { return r.json(); }).then(function(r) {
+    body: JSON.stringify({ ids: Array.from(selectedIds), action: parts[0], value: parts[1] }), signal: AbortSignal.timeout(15000) }).then(function(r) { return r.json(); }).then(function(r) {
     if (r.code === 0) { showToast('批量更新 ' + r.data.updated + ' 条'); clearSelection(); loadTickets(); loadStats(); }
     else showToast('失败：' + (r.message||''));
   });
@@ -518,8 +515,7 @@ function searchWord(word) {
 function viewTicket(id) {
   currentTicketId = id;
   fetch(API + '/api/tickets/detail?id=' + id, {
-    headers: { 'Authorization': 'Bearer ' + getAdminToken() }
-  })
+    headers: { 'Authorization': 'Bearer ' + getAdminToken() }, signal: AbortSignal.timeout(15000) })
     .then(function(r) { return r.json(); })
     .then(function(r) {
       if (r.code !== 0) return;
@@ -557,7 +553,7 @@ function addTag(tag) {
 }
 function removeTag(i) { ticketTags.splice(i, 1); renderTagInput(); }
 function loadTagSuggestions() {
-  fetch(API + '/api/tickets/tags')
+  fetch(API + '/api/tickets/tags',{signal:AbortSignal.timeout(15000)})
     .then(function(r) { return r.json(); })
     .then(function(r) {
       if (r.code === 0) {
@@ -587,8 +583,7 @@ function doUpdate(body) {
   fetch(API + '/api/admin/tickets/update', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAdminToken() },
-    body: JSON.stringify(body)
-  }).then(function(r) { return r.json(); }).then(function(r) {
+    body: JSON.stringify(body), signal: AbortSignal.timeout(15000) }).then(function(r) { return r.json(); }).then(function(r) {
     if (r.code === 0) { showToast('✅ 已更新'); closeModal(); loadTickets(); loadStats(); }
     else showToast('❌ ' + (r.message||''));
   });
@@ -599,7 +594,7 @@ function exportCSV() {
   var url = API + '/api/admin/tickets/export';
   if (status) url += '?status=' + status;
   // 用 fetch + Blob 下载
-  fetch(url, { headers: { 'Authorization': 'Bearer ' + getAdminToken() } })
+  fetch(url,{headers: { 'Authorization': 'Bearer ' + getAdminToken(),signal:AbortSignal.timeout(15000)}) })
     .then(function(r) { return r.blob(); })
     .then(function(blob) {
       var a = document.createElement('a');

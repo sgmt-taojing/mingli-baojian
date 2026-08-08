@@ -1191,7 +1191,7 @@ function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeComp
     const entriesMore = document.getElementById('modalEntriesMore');
     if(entriesSection && entriesEl && window.fetch){
       // 拉取该节点的 KB 条目（最多 8 条预览）
-      fetch('/api/public/kb-query?module=' + encodeURIComponent(nodeId) + '&size=8').then(r=>r.json()).then(data=>{
+      fetch('/api/public/kb-query?module=' + encodeURIComponent(nodeId) + '&size=8',{signal:AbortSignal.timeout(15000)}).then(r=>r.json()).then(data=>{
         const raw = data && data.data || data || {};
         const entries = raw.results || raw.entries || raw.items || [];
         window._lastEntryList = entries;

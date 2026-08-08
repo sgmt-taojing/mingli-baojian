@@ -95,7 +95,7 @@ function login(){
   var phone=document.getElementById('login-phone').value.trim();
   if(!/^1\d{10}$/.test(phone)){showToast('请输入正确的手机号');return}
   fetch(API+'/api/csrf-token', {signal: AbortSignal.timeout(15000)}).then(function(r){return r.json()}).then(function(csrf){
-    return fetch(API+'/api/user/login',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf.csrfToken},body:JSON.stringify({phone:phone})});
+    return fetch(API+'/api/user/login',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf.csrfToken,signal:AbortSignal.timeout(15000)}),body:JSON.stringify({phone:phone})});
   }).then(function(r){return r.json()}).then(function(d){
     if(d.token){
       localStorage.setItem('token',d.token);

@@ -233,7 +233,7 @@ outcome:$('fu_outcome').value,
 prediction:'基于上周分析'
 };
 getCsrf().then(function(csrf){
-return fetch(API+'/api/wellness/analysis',{method:'POST',headers:{'Content-Type':'application/json','x-csrf-token':csrf},body:JSON.stringify(payload),credentials:'include',signal:AbortSignal.timeout(15000)})
+return fetch(API+'/api/wellness/analysis',{method:'POST',headers:{'Content-Type':'application/json','x-csrf-token':csrf,signal:AbortSignal.timeout(15000)}),body:JSON.stringify(payload),credentials:'include',signal:AbortSignal.timeout(15000)})
 }).then(function(r){return r.json()}).then(function(d){
 if(d.code===200){
 console.warn('✅ 随访已提交'+(d.data.kb_entry_id?'并入库KB':''));

@@ -24,7 +24,7 @@
 
     try {
       const url = `/api/kb/recommend?module=${encodeURIComponent(mod)}&limit=6&t=${Date.now()}`;
-      let r = await fetch(url);
+      let r = await fetch(url,{signal:AbortSignal.timeout(15000)});
       if (!r.ok) throw new Error('HTTP ' + r.status);
       let j = await r.json();
       let data = j.data || j;
@@ -33,7 +33,7 @@
 
       // fallback 到 cold-start（针对 total_related=0 或 returns []
       if (recs.length === 0) {
-        const cs = await fetch(`/api/kb/cold-start?limit=6&t=${Date.now()}`);
+        const cs = await fetch(`/api/kb/cold-start?limit=6&t=${Date.now()}`, { signal: AbortSignal.timeout(15000) });
         if (cs.ok) {
           const csj = await cs.json();
           data = csj.data || csj;

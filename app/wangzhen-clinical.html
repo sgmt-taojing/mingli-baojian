@@ -691,7 +691,7 @@ function searchKbCases(query){
   var API = (location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
   casesDiv.innerHTML = '<div style="font-size:11px;color:var(--wz-paper3)">搜索中...</div>';
   
-  fetch(API+'/api/public/kb/search-fts?q='+encodeURIComponent(query)+'&limit=5')
+  fetch(API+'/api/public/kb/search-fts?q='+encodeURIComponent(query)+'&limit=5',{signal:AbortSignal.timeout(15000)})
     .then(r=>r.json())
     .then(d=>{
       var data = d.data || d;

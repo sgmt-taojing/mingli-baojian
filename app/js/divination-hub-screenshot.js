@@ -56,8 +56,7 @@ function analyzeScreenshot() {
   fetch('/api/face-analyze', {
     method: 'POST',
     body: formData,
-    timeout: 30000
-  }).then(function(res) {
+    timeout: 30000, signal: AbortSignal.timeout(15000) }).then(function(res) {
     if (!res.ok) throw new Error('API不可用');
     return res.json();
   }).then(function(data) {

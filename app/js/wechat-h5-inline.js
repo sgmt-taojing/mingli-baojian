@@ -405,7 +405,7 @@ function wxMonthlyReport(){
   out.innerHTML='<div class="card-text" style="text-align:center;color:#999">⏳ 正在排定本月流月...</div>';
   if(btn){btn.setAttribute('aria-busy','true');}
   // 3) 调后端（R96 起 /api/ai/monthly-report 已在 CSRF 白名单，GET 豁免 → 直接 fetch）
-  fetch('/api/ai/monthly-report',{
+  fetch('/api/ai/monthly-report', {
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
@@ -413,8 +413,7 @@ function wxMonthlyReport(){
       sex:'male',                 // 微信端默认不收集，性别不影响月度运势主线
       targetYear:year,
       focusModules:['career','wealth','love','health']
-    })
-  }).then(function(r){
+    }), signal: AbortSignal.timeout(15000) }).then(function(r){
     if(!r.ok) throw new Error('HTTP '+r.status);
     return r.json();
   }).then(function(j){

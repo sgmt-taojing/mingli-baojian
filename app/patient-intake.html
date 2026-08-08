@@ -208,7 +208,7 @@ constitution:get('temp_pref')+'; 出汗:'+get('sweat')+'; 食欲:'+get('appetite
 history:get('history')
 };
 var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
-fetch(API+'/api/clinic/case',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({patient_id:4,symptoms:data.symptoms,constitution:data.constitution,paipan_summary:'出生:'+data.birth_date+' '+data.birth_hour+'时 '+data.birthplace})}).then(function(r){return r.json()}).then(function(d){
+fetch(API+'/api/clinic/case',{method:'POST',headers:{'Content-Type':'application/json',signal:AbortSignal.timeout(15000)}),body:JSON.stringify({patient_id:4,symptoms:data.symptoms,constitution:data.constitution,paipan_summary:'出生:'+data.birth_date+' '+data.birth_hour+'时 '+data.birthplace})}).then(function(r){return r.json()}).then(function(d){
 document.getElementById('step4').style.display='none';
 document.getElementById('result').style.display='block';
 var c=document.getElementById('result-content');

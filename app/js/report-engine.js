@@ -254,11 +254,9 @@
     // 服务端 FTS5 fallback（当本地无 _kbScore 或本地 score=0）
     if (!kbHit.score && apiBase) {
       try {
-        const r = await fetch(apiBase + '/api/public/kb-query', {
-          method: 'POST',
+        const r = await fetch(apiBase + '/api/public/kb-query', {method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ module: moduleId, query: flattenData(data).substring(0, 200), limit: 1 })
-        });
+          body: JSON.stringify({ module: moduleId, query: flattenData(data).substring(0, 200), limit: 1 }), signal:AbortSignal.timeout(15000)}));
         const j = await r.json();
         if (j && j.data && j.data.results && j.data.results.length) {
           const top = j.data.results[0];
@@ -289,14 +287,12 @@
 
       const baziData = (moduleId === 'bazi' || moduleId === 'name' || moduleId === 'number' || moduleId === 'face') ? data : null;
 
-      const r = await fetch(apiBase + '/api/ai/public-chat', {
-        method: 'POST',
+      const r = await fetch(apiBase + '/api/ai/public-chat', {method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [...((hist || []).slice(-8)), { role: 'user', content: prompt }],
           baziData
-        })
-      });
+        }), signal:AbortSignal.timeout(15000)}));
       const d = await r.json();
       return (d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content) || '';
     } catch (e) {
@@ -354,11 +350,9 @@
         return null;
       }
 
-      const r = await fetch(apiBase + endpoint, {
-        method: 'POST',
+      const r = await fetch(apiBase + endpoint, {method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
+        body: JSON.stringify(payload), signal:AbortSignal.timeout(15000)}));
       const j = await r.json();
       if (j && j.code === 0 && j.data) return j.data;
       return null;
@@ -418,7 +412,7 @@
    */
   async function fetchRecommendations(apiBase, moduleId) {
     try {
-      const r = await fetch(apiBase + '/api/kb/recommend?module=' + encodeURIComponent(moduleId) + '&limit=5');
+      const r = await fetch(apiBase + '/api/kb/recommend?module=' + encodeURIComponent(moduleId) + '&limit=5', { signal: AbortSignal.timeout(15000) });
       const j = await r.json();
       return (j && j.data && j.data.recommendations) || (j && j.recommendations) || [];
     } catch (e) {
@@ -686,16 +680,14 @@
       const tok = localStorage.getItem('mlbj_token') || '';
       const hdr = tok ? { 'Authorization': '***' + tok, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
       const isBaziLike = (moduleId === 'bazi' || moduleId === 'name' || moduleId === 'number' || moduleId === 'face');
-      fetch(apiBase + '/api/paipan/save', {
-        method: 'POST',
+      fetch(apiBase + '/api/paipan/save', {method: 'POST',
         headers: hdr,
         body: JSON.stringify({
           type: moduleId,
           inputData: data,
           resultData: { report: (kbHit && kbHit.snippet ? kbHit.snippet.substring(0, 2000) : '') },
           rawQuery: flattenData(data).substring(0, 500)
-        })
-      }).catch(() => {});
+        }), signal:AbortSignal.timeout(15000)})).catch(() => {});
     } catch (e) {}
   }
 
@@ -744,8 +736,7 @@
       fetch((global.API || DEFAULT_API) + '/api/feedback/report', {
         method: 'POST',
         headers: hdr,
-        body: JSON.stringify({ module: moduleId, value: val, ts: Date.now() })
-      }).catch(() => {});
+        body: JSON.stringify({ module: moduleId, value: val, ts: Date.now() }), signal: AbortSignal.timeout(15000) }).catch(() => {});
       btn.style.background = val > 0 ? 'rgba(16,185,129,.2)' : 'rgba(239,68,68,.2)';
       btn.disabled = true;
       toast(val > 0 ? '感谢反馈 👍' : '已记录，将持续优化 👎');

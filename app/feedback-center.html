@@ -459,8 +459,7 @@ function submitTicket() {
       return fetch(API_BASE + '/api/tickets/voice-upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ audio: voiceBase64 })
-      }).then(function(r) { return r.json(); });
+        body: JSON.stringify({ audio: voiceBase64 }), signal: AbortSignal.timeout(15000) }).then(function(r) { return r.json(); });
     }).then(function(vr) {
       if (vr.code === 0) return vr.data.voicePath;
       return null;
@@ -491,8 +490,7 @@ function submitTicket() {
           content: content,
           page_url: location.href,
           voice_path: voicePath
-        })
-      });
+        }), signal: AbortSignal.timeout(15000) });
     }
   }).then(function(r) { return r.json(); }).then(function(r) {
     handleResult(r);

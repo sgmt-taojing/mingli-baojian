@@ -235,7 +235,7 @@ function captureFace(){
   
   // 发送到 8913 面诊
   const b64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
-  fetch(API+'/api/face/analyze', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({image:b64, mode:'face'})})
+  fetch(API+'/api/face/analyze',{method:'POST', headers:{'Content-Type':'application/json',signal:AbortSignal.timeout(15000)}), body:JSON.stringify({image:b64, mode:'face'})})
     .then(r=>r.json())
     .then(d=>{
       const result = d.data || d;

@@ -480,7 +480,7 @@
     options.headers = options.headers || {};
     options.headers['Authorization'] = 'Bearer ' + token;
 
-    return fetch(url, options).then(function (res) {
+    return fetch(url, options,{signal:AbortSignal.timeout(15000)}).then(function (res) {
       if (res.status === 401) {
         toast('登录已过期，请重新登录', 'warn');
         setTimeout(function () {

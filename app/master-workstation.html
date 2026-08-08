@@ -327,7 +327,7 @@ function setupSSEClient() {
 // ═══ Load case by sync token ═══
 async function loadCaseByToken(token) {
   try {
-    const resp = await fetch(API + '/api/public/sync-diagnosis/' + encodeURIComponent(token));
+    const resp = await fetch(API + '/api/public/sync-diagnosis/' + encodeURIComponent(token),{signal:AbortSignal.timeout(15000)});
     const data = await resp.json();
     if (data.ok) {
       addCase({ token, ...data, status: 'new' });
@@ -410,7 +410,7 @@ async function selectCase(token) {
   // Load full case data
   let data;
   try {
-    const resp = await fetch(API + '/api/public/sync-diagnosis/' + encodeURIComponent(token));
+    const resp = await fetch(API + '/api/public/sync-diagnosis/' + encodeURIComponent(token),{signal:AbortSignal.timeout(15000)});
     data = await resp.json();
   } catch (e) {}
 
@@ -502,7 +502,7 @@ function renderCaseDetail(data) {
 // ═══ Annotations ═══
 async function loadAnnotations(token) {
   try {
-    const resp = await fetch(API + '/api/public/master-annotations/' + encodeURIComponent(token));
+    const resp = await fetch(API + '/api/public/master-annotations/' + encodeURIComponent(token),{signal:AbortSignal.timeout(15000)});
     const data = await resp.json();
     if (data.ok && data.annotations) {
       document.getElementById('annotation').value = data.annotations;

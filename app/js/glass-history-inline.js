@@ -16,8 +16,7 @@ async function load(){
       'Authorization': 'Bearer ' + token,
       'X-Device-Token': token.startsWith('GL-') ? token : 'GL-DEMO-DEVICE'
     },
-    credentials:'include'
-  }).then(r=>r.json()).catch(e=>({error:true,message:e.message}));
+    credentials:'include', signal: AbortSignal.timeout(15000) }).then(r=>r.json()).catch(e=>({error:true,message:e.message}));
   if (r.error || r.code !== 0) {
     el.innerHTML = '<div class="err">⚠ 查阅失败：' + esc((r.message||r.error||'未知错误')) + '</div>';
     return;

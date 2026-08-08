@@ -46,7 +46,7 @@
     const ph = entry.el.querySelector('[id$="placeholder"], .lazy-loading-placeholder');
     if (ph) ph.innerHTML = '<div style="padding:60px 20px;text-align:center;color:var(--paper2);opacity:0.85">⏳ 加载中...</div>';
     try {
-      const resp = await fetch(entry.src);
+      const resp = await fetch(entry.src,{signal:AbortSignal.timeout(15000)});
       if (!resp.ok) throw new Error('HTTP ' + resp.status);
       const html = await resp.text();
       const inner = extractSectionInner(html, key);

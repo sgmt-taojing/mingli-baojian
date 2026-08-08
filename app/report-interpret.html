@@ -617,8 +617,7 @@ async function ingestToKB(){
         anomalies: anomalies,
         report_date: new Date().toISOString().slice(0,10),
         engine: 'r249-unified-engine'
-      })
-    });
+      }), signal: AbortSignal.timeout(15000) });
     var j = await resp.json();
     if(j.code === 200 && j.data && j.data.ingested){
       showToast('✅ 已入库 KB：'+j.data.kb_entry_id);

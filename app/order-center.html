@@ -320,8 +320,7 @@
   async function apiFetch(url, opts) {
     const r = await fetch(API_BASE + url, {
       ...opts, headers: { ...authHeaders(), ...(opts && opts.headers) },
-      credentials: 'include',
-    });
+      credentials: 'include', signal: AbortSignal.timeout(15000) });
     if (r.status === 401) { showToast('请先登录', 'error'); }
     return r;
   }

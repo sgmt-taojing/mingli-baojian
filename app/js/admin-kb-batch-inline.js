@@ -61,7 +61,7 @@ document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () =>
 async function loadStats() {
   setState('statsGrid', 'loading', '正在为您查阅典籍...');
   try {
-    const r = await fetch(API + '/api/admin/kb/stats', { headers: authHeaders() });
+    const r = await fetch(API + '/api/admin/kb/stats',{headers: authHeaders(),signal:AbortSignal.timeout(15000)}));
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const d = await r.json();
     stats = d;
@@ -111,8 +111,7 @@ async function batchExecute() {
     const r = await fetch(API + '/api/admin/kb/batch', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify({ module, action, tag })
-    });
+      body: JSON.stringify({ module, action, tag }), signal: AbortSignal.timeout(15000) });
     const d = await r.json();
     if (d.error) { setState('batchResult', 'error', `[${new Date().toLocaleTimeString()}] ❌ ${d.error}`); return; }
     setState('batchResult', 'empty', `[${new Date().toLocaleTimeString()}] ✅ ${action} 完成: 影响 ${d.affected || 0} 条`);
@@ -172,8 +171,7 @@ async function ingestExecute() {
     const r = await fetch(API + '/api/admin/kb/ingest', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify({ entries })
-    });
+      body: JSON.stringify({ entries }), signal: AbortSignal.timeout(15000) });
     const d = await r.json();
     if (d.error) { setState('ingestResult', 'error', log.textContent + `\n  ❌ ${d.error}`); return; }
     log.textContent += `  ✅ 入库成功 ${d.ok} 条 / ${d.fail} 失败 / ${d.total} 处理\n`;
@@ -189,7 +187,7 @@ async function ingestExecute() {
 async function auditQuality() {
   setState('auditResult', 'loading', `[${new Date().toLocaleTimeString()}] 🔍 扫描质量...`);
   try {
-    const r = await fetch(API + '/api/admin/kb/audit-quality', { headers: authHeaders() });
+    const r = await fetch(API + '/api/admin/kb/audit-quality',{headers: authHeaders(),signal:AbortSignal.timeout(15000)}));
     const d = await r.json();
     if (d.error) { setState('auditResult', 'error', `[${new Date().toLocaleTimeString()}] ❌ ${d.error}`); return; }
     const log = document.getElementById('auditResult');
@@ -210,7 +208,7 @@ async function auditDuplicate() {
   setState('auditResult', 'loading', `[${new Date().toLocaleTimeString()}] 🔍 重复扫描...`);
   try {
     const module = document.getElementById('batchModule').value || 'bazi';
-    const r = await fetch(API + `/api/admin/kb/audit-duplicate?module=${encodeURIComponent(module)}`, { headers: authHeaders() });
+    const r = await fetch(API + `/api/admin/kb/audit-duplicate?module=${encodeURIComponent(module)}`,{headers: authHeaders(),signal:AbortSignal.timeout(15000)}));
     const d = await r.json();
     if (d.error) { setState('auditResult', 'error', `[${new Date().toLocaleTimeString()}] ❌ ${d.error}`); return; }
     const log = document.getElementById('auditResult');
@@ -226,7 +224,7 @@ async function auditDuplicate() {
 async function auditLowScore() {
   setState('auditResult', 'loading', `[${new Date().toLocaleTimeString()}] 🔍 低分条目扫描...`);
   try {
-    const r = await fetch(API + '/api/admin/kb/audit-quality', { headers: authHeaders() });
+    const r = await fetch(API + '/api/admin/kb/audit-quality',{headers: authHeaders(),signal:AbortSignal.timeout(15000)}));
     const d = await r.json();
     if (d.error) { setState('auditResult', 'error', `[${new Date().toLocaleTimeString()}] ❌ ${d.error}`); return; }
     const log = document.getElementById('auditResult');
@@ -244,7 +242,7 @@ async function exportData() {
   setState('exportResult', 'loading', `[${new Date().toLocaleTimeString()}] 📤 导出 ${module || '全部'} as ${format}...`);
   try {
     // R316 修真：调用真实 CSV 导出端点 + 浏览器下载
-    const r = await fetch(API + `/api/admin/kb/export?module=${encodeURIComponent(module)}&format=${format}`, { headers: authHeaders() });
+    const r = await fetch(API + `/api/admin/kb/export?module=${encodeURIComponent(module)}&format=${format}`,{headers: authHeaders(),signal:AbortSignal.timeout(15000)}));
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const blob = await r.blob();
     const url = URL.createObjectURL(blob);
@@ -279,7 +277,7 @@ async function doSearch() {
   if (!q || q.length < 2) { setState('searchResult', 'empty', '⚠️ 请输入至少 2 字'); return; }
   setState('searchResult', 'loading', '🔍 检索中...');
   try {
-    const r = await fetch(API + '/api/admin/kb/search?q=' + encodeURIComponent(q), { headers: authHeaders() });
+    const r = await fetch(API + '/api/admin/kb/search?q=' + encodeURIComponent(q),{headers: authHeaders(),signal:AbortSignal.timeout(15000)}));
     const d = await r.json();
     const rs = d.results || [];
     if (d.error) { setState('searchResult', 'error', '❌ ' + d.error); return; }

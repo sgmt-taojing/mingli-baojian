@@ -151,3 +151,171 @@
   .hci-quick-panel { width: calc(100vw - 32px); right: 16px; }
   .hci-quick-grid { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* ═══ 超级物种级 · Super-HCI 增强层 ═══ */
+
+/* ── 情绪共振指示器 ── */
+.sh-emotion-orb {
+  position: fixed; top: 80px; left: 20px; width: 60px; height: 60px;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 22px; z-index: 9996;
+  background: radial-gradient(circle, rgba(167,139,250,.25), transparent 70%);
+  transition: all .6s cubic-bezier(.4,0,.2,1);
+  pointer-events: auto; cursor: pointer;
+}
+.sh-emotion-orb::before {
+  content: ''; position: absolute; inset: 4px; border-radius: 50%;
+  background: var(--sh-color, rgba(167,139,250,.3));
+  filter: blur(8px); animation: shOrbBreath 3s ease-in-out infinite;
+}
+.sh-emotion-orb .sh-orb-glyph {
+  position: relative; z-index: 1; font-family: serif;
+}
+.sh-emotion-orb[data-emotion="anxious"]    { --sh-color: rgba(76,175,80,.4); }
+.sh-emotion-orb[data-emotion="confused"]   { --sh-color: rgba(33,150,243,.4); }
+.sh-emotion-orb[data-emotion="urgent"]     { --sh-color: rgba(244,67,54,.5); }
+.sh-emotion-orb[data-emotion="hopeful"]    { --sh-color: rgba(255,193,7,.4); }
+.sh-emotion-orb[data-emotion="frustrated"] { --sh-color: rgba(156,39,176,.4); }
+.sh-emotion-orb[data-emotion="curious"]    { --sh-color: rgba(0,188,212,.4); }
+.sh-emotion-orb[data-emotion="sorrowful"]  { --sh-color: rgba(96,125,139,.5); }
+.sh-emotion-orb[data-emotion="angry"]      { --sh-color: rgba(244,67,54,.6); }
+.sh-emotion-orb[data-emotion="neutral"]    { --sh-color: rgba(167,139,250,.3); }
+
+@keyframes shOrbBreath {
+  0%, 100% { transform: scale(1); opacity: .6; }
+  50%      { transform: scale(1.15); opacity: 1; }
+}
+
+/* ── 情绪提示气泡 ── */
+.sh-emotion-tip {
+  position: fixed; top: 90px; left: 90px;
+  background: rgba(15,15,25,.95); border: 1px solid var(--hci-border);
+  border-radius: 10px; padding: 10px 14px; font-size: 12px;
+  color: var(--hci-text); z-index: 9997;
+  max-width: 240px; line-height: 1.5;
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 4px 16px rgba(0,0,0,.3);
+  animation: shTipIn .4s cubic-bezier(.4,0,.2,1);
+}
+.sh-emotion-tip .sh-tip-close {
+  position: absolute; top: 4px; right: 6px; background: none;
+  border: none; color: var(--hci-muted); cursor: pointer; font-size: 14px;
+}
+@keyframes shTipIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── 预判快捷栏 ── */
+.sh-predict-bar {
+  position: fixed; bottom: 70px; left: 16px; right: 16px;
+  display: flex; gap: 8px; overflow-x: auto; z-index: 9995;
+  padding: 4px; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.sh-predict-bar::-webkit-scrollbar { display: none; }
+.sh-predict-card {
+  flex: 0 0 auto; min-width: 180px;
+  background: var(--hci-bg); border: 1px solid var(--hci-border);
+  border-radius: 12px; padding: 8px 12px;
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer; transition: all .25s;
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+}
+.sh-predict-card:hover {
+  transform: translateY(-2px); border-color: var(--hci-primary);
+  box-shadow: 0 4px 16px rgba(167,139,250,.3);
+}
+.sh-predict-icon { font-size: 18px; }
+.sh-predict-info { flex: 1; min-width: 0; }
+.sh-predict-label {
+  font-size: 13px; color: var(--hci-gold); font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sh-predict-reason {
+  font-size: 11px; color: var(--hci-muted); line-height: 1.3;
+  margin-top: 2px;
+}
+
+/* ── 沟通模式指示器 ── */
+.sh-comm-mode {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 10px; border-radius: 12px; font-size: 11px;
+  background: rgba(255,193,7,.15); color: #ffd54f;
+  border: 1px solid rgba(255,193,7,.3); margin-left: 8px;
+}
+.sh-comm-mode[data-mode="concise"] { background: rgba(76,175,80,.12); color: #81c784; border-color: rgba(76,175,80,.3); }
+.sh-comm-mode[data-mode="detailed"] { background: rgba(33,150,243,.12); color: #64b5f6; border-color: rgba(33,150,243,.3); }
+.sh-comm-mode[data-mode="example"] { background: rgba(255,152,0,.12); color: #ffb74d; border-color: rgba(255,152,0,.3); }
+.sh-comm-mode[data-mode="formal"] { background: rgba(96,125,139,.12); color: #90a4ae; border-color: rgba(96,125,139,.3); }
+
+/* ── 记忆透明度面板 ── */
+.sh-memory-panel {
+  position: fixed; top: 60px; left: 16px; width: 320px; max-height: 70vh;
+  overflow-y: auto;
+  background: var(--hci-bg); border: 1px solid var(--hci-border);
+  border-radius: 14px; padding: 14px; z-index: 9998;
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0,0,0,.4);
+  transform: translateX(-380px); transition: transform .35s cubic-bezier(.4,0,.2,1);
+}
+.sh-memory-panel.open { transform: translateX(0); }
+.sh-memory-header {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+  padding-bottom: 10px; border-bottom: 1px solid var(--hci-border);
+}
+.sh-memory-title { font-size: 13px; color: var(--hci-primary); font-weight: 600; flex: 1; }
+.sh-mem-section { margin-bottom: 12px; }
+.sh-mem-label {
+  font-size: 11px; color: var(--hci-muted); margin-bottom: 6px;
+  text-transform: uppercase; letter-spacing: .5px;
+}
+.sh-mem-item {
+  font-size: 12px; color: var(--hci-text); padding: 4px 0;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+}
+.sh-mem-key { color: var(--hci-gold); font-weight: 500; }
+.sh-mem-inferred .sh-mem-key { color: #64b5f6; }
+.sh-mem-pref .sh-mem-key { color: #81c784; }
+.sh-mem-conf {
+  font-size: 10px; color: var(--hci-muted); margin-left: 4px;
+}
+.sh-mem-trigger {
+  position: fixed; top: 50%; left: 0; transform: translateY(-50%);
+  background: var(--hci-primary); color: #fff;
+  width: 24px; height: 60px; border: none;
+  border-radius: 0 12px 12px 0;
+  cursor: pointer; z-index: 9997;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; transition: all .2s;
+}
+.sh-mem-trigger:hover { width: 32px; background: var(--hci-gold); }
+
+/* ── 模态切换提示 ── */
+.sh-modal-banner {
+  position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+  background: var(--hci-bg); border: 1px solid var(--hci-primary);
+  border-radius: 10px; padding: 8px 18px; font-size: 13px;
+  color: var(--hci-text); z-index: 9999;
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  animation: shBannerIn .3s, shBannerOut .3s 1.7s forwards;
+  box-shadow: 0 4px 20px rgba(167,139,250,.3);
+}
+@keyframes shBannerIn {
+  from { opacity: 0; transform: translate(-50%, -20px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+@keyframes shBannerOut {
+  to { opacity: 0; transform: translate(-50%, -20px); }
+}
+
+/* ── 响应式 ── */
+@media (max-width: 768px) {
+  .sh-memory-panel { width: calc(100vw - 80px); }
+  .sh-emotion-orb { width: 50px; height: 50px; font-size: 18px; }
+  .sh-emotion-tip { left: 78px; max-width: calc(100vw - 100px); }
+  .sh-predict-bar { left: 8px; right: 8px; }
+}
+@media (max-width: 360px) {
+  .sh-predict-card { min-width: 150px; }
+}

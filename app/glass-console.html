@@ -975,7 +975,7 @@ async function askSend() {
 
 async function kbFallback(q, out, kbRef, meta) {
   try {
-    const r = await fetch('/api/public/kb-search?q=' + encodeURIComponent(q) + '&limit=3');
+    const r = await fetch('/api/public/kb-search?q=' + encodeURIComponent(q) + '&limit=3', { signal: AbortSignal.timeout(15000) });
     const d = await r.json();
     if (d.ok && d.results && d.results.length) {
       out.textContent = d.results.map(x => x.title + '\n' + (x.content||x.summary||'').slice(0,300)).join('\n\n---\n\n');
@@ -1017,7 +1017,7 @@ $('#sttStop').onclick = () => { if (State.sttRec) State.sttRec.stop(); };
 $('#sttUpload').onclick = async () => {
   const hint = $('#sttHint').value.trim();
   try {
-    const r = await fetch('/api/glass/upload-audio', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ text: $('#sttOut').textContent, hint, mode: State.mode }), signal: AbortSignal.timeout(15000) });
+    const r = await fetch('/api/glass/upload-audio',{method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ text: $('#sttOut').textContent, hint, mode: State.mode }), signal:AbortSignal.timeout(15000) });
     const d = await r.json();
     if (d.ok) {
       $('#sttIntent').textContent = '🎯 Intent: ' + (d.intent||'?') + (d.nextStep ? ' · ' + d.nextStep : '');
@@ -1040,7 +1040,7 @@ $('#ocrUpload').onclick = async () => {
   $('#ocrOut').textContent = '⏳ 识别中…';
   $('#ocrMeta').innerHTML = '<span class="chip warn">5 引擎优先级</span>';
   try {
-    const r = await fetch('/api/face-ocr/recognize', { method:'POST', body: fd });
+    const r = await fetch('/api/face-ocr/recognize',{method:'POST', body: fd,signal:AbortSignal.timeout(15000)});
     const d = await r.json();
     $('#ocrOut').textContent = d.text || d.content || JSON.stringify(d).slice(0,400);
     $('#ocrMeta').innerHTML = '<span class="chip ok">✓ ' + (d.engine||'?') + '</span><span class="chip">' + (d.confidence?.toFixed?.(2)||'?') + '</span>';
@@ -1067,7 +1067,7 @@ $('#camSnap').onclick = () => {
   var _ctx=c.getContext('2d'); if(_ctx) _ctx.drawImage(v, 0, 0);
   c.toBlob(b => {
     const fd = new FormData(); fd.append('file', b, 'snap.jpg'); fd.append('mode', State.mode);
-    fetch('/api/face-ocr/recognize', { method:'POST', body: fd }).then(r=>r.json()).then(d => {
+    fetch('/api/face-ocr/recognize',{method:'POST', body: fd,signal:AbortSignal.timeout(15000)}).then(r=>r.json()).then(d => {
       $('#ocrOut').textContent = d.text || JSON.stringify(d).slice(0,400);
       $('#askQ').value = '这是我的' + State.mode + '情况：' + (d.text||'').slice(0,100); askSend();
     });
@@ -1189,7 +1189,7 @@ drawTonguePie();
 // === R76-C · 镜象镜像渲染 ===
 async function refreshMirror() {
   try {
-    const r = await fetch('/api/glass/mirror', { credentials:'same-origin' });
+    const r = await fetch('/api/glass/mirror',{credentials:'same-origin',signal:AbortSignal.timeout(15000)});
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const data = (await r.json()).data || (await r.json());
     // Engine
@@ -1215,7 +1215,7 @@ async function refreshMirror() {
 
   // Parallel: KB 热度
   try {
-    const r2 = await fetch('/api/kb/hot-modules?window=7', { credentials:'same-origin' });
+    const r2 = await fetch('/api/kb/hot-modules?window=7',{credentials:'same-origin',signal:AbortSignal.timeout(15000)});
     const d2 = await r2.json();
     const hot = d2.data || d2;
     const mods = hot.modules || [];
@@ -1230,7 +1230,7 @@ async function refreshMirror() {
 
   // Parallel: OCR history recent 5
   try {
-    const r3 = await fetch('/api/ocr/history?limit=5', { credentials:'same-origin' });
+    const r3 = await fetch('/api/ocr/history?limit=5',{credentials:'same-origin',signal:AbortSignal.timeout(15000)});
     const d3 = await r3.json();
     const hist = d3.data || d3;
     $('#mirrorOcr').innerHTML = '<div style="font-size:10px;color:var(--muted);margin-bottom:6px">共 ' + (hist.total||0) + ' 条</div>' +
@@ -1255,7 +1255,7 @@ refreshMirror();
 refreshStatus();
 
 // R76-fix: 启动时拉取 CSRF token（用于所有 POST）
-fetch('/api/csrf-token').then(r => r.json()).then(d => {
+fetch('/api/csrf-token',{signal:AbortSignal.timeout(15000)}).then(r => r.json()).then(d => {
   if (d.csrfToken) {
     State.csrfToken = d.csrfToken;
     console.warn('[CSRF] 已获取 token:', d.csrfToken.slice(0, 12) + '...');

@@ -263,8 +263,7 @@ function snapPhoto() {
   fetch('http://127.0.0.1:8913/analyze', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ image: dataUrl, type: 'face' })
-  }).then(r => r.json()).then(data => {
+    body: JSON.stringify({ image: dataUrl, type: 'face' }), signal: AbortSignal.timeout(15000) }).then(r => r.json()).then(data => {
     document.getElementById('cam-result').innerHTML = 
       '<div class="test-result result-ok">成 拍照成功 — OCR 服务已接收<br>分析结果：' + JSON.stringify(data).substring(0, 200) + '</div>';
   }).catch(e => {

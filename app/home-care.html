@@ -257,7 +257,7 @@ function snapshot(){
   
   // 发送到 OCR 面诊
   addMsg('system','正在分析面色...');
-  fetch(API+'/api/face/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:b64,mode:'face'})})
+  fetch(API+'/api/face/analyze',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify({image:b64,mode:'face'})})
     .then(r=>r.json())
     .then(d=>{
       const result = d.data || d;
@@ -289,7 +289,7 @@ function showTongue(){
     canvas.getContext('2d').drawImage(video, 0, 0, 320, 240);
     const b64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
     
-    fetch(API+'/api/face/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:b64,mode:'tongue'})})
+    fetch(API+'/api/face/analyze',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify({image:b64,mode:'tongue'})})
       .then(r=>r.json())
       .then(d=>{
         diagnosisState.tongue = d.data || d;
@@ -359,7 +359,7 @@ function processSymptom(text){
   }
   
   // 查询 KB
-  fetch(API+'/api/public/kb/search-fts?q='+encodeURIComponent(text)+'&limit=3')
+  fetch(API+'/api/public/kb/search-fts?q='+encodeURIComponent(text)+'&limit=3', { signal: AbortSignal.timeout(15000) })
     .then(r=>r.json())
     .then(d=>{
       const data = d.data || d;
@@ -398,7 +398,7 @@ function runDiagnosis(){
   
   // 查询八纲辨证
   const query = diagnosisState.symptoms.join(' ');
-  fetch(API+'/api/public/kb/search-fts?q='+encodeURIComponent('八纲辨证 '+query)+'&limit=2')
+  fetch(API+'/api/public/kb/search-fts?q='+encodeURIComponent('八纲辨证 '+query)+'&limit=2', { signal: AbortSignal.timeout(15000) })
     .then(r=>r.json())
     .then(d=>{
       const data = d.data || d;

@@ -278,8 +278,7 @@ async function generateZiweiReport(){
     const r = await fetch(API_BASE+'/api/paipan/ziwei/report', {
       method:'POST',
       headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
-      body: JSON.stringify(body)
-    }).then(r=>r.json());
+      body: JSON.stringify(body), signal: AbortSignal.timeout(15000) }).then(r=>r.json());
     
     if(!r.ok){
       const fn = typeof showToast==='function'?showToast:typeof toast==='function'?toast:alert;

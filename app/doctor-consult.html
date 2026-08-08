@@ -399,8 +399,7 @@ window.doMultiAssess = async function() {
     const r = await fetch(API + '/api/doctor/multi-modal-assess', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
+      body: JSON.stringify(body), signal: AbortSignal.timeout(15000) });
     const data = await r.json();
     const elapsed = Math.round(performance.now() - startTime);
 
@@ -494,8 +493,7 @@ window.doCapture = async function() {
     const r = await fetch(API + '/api/doctor/consult-capture', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
+      body: JSON.stringify(body), signal: AbortSignal.timeout(15000) });
     const data = await r.json();
     const elapsed = Math.round(performance.now() - startTime);
 
@@ -532,16 +530,14 @@ window.doSupplement = async function() {
       const r = await fetch(API + '/api/doctor/supplement-capture', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: wB64, mode: currentMode })
-      });
+        body: JSON.stringify({ image: wB64, mode: currentMode }), signal: AbortSignal.timeout(15000) });
       const data = await r.json();
       renderSupplement(data);
     } else {
       const r = await fetch(API + '/api/doctor/supplement-capture', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: fixedB64, mode: currentMode })
-      });
+        body: JSON.stringify({ image: fixedB64, mode: currentMode }), signal: AbortSignal.timeout(15000) });
       const data = await r.json();
       renderSupplement(data);
     }
