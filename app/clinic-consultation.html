@@ -243,6 +243,15 @@ body.role-master .role-banner.master{display:flex}
 </style>
 </head>
 <body>
+<header class="page-header-bar" data-theme="tcm">
+  <div class="phb-left">
+    <span class="phb-theme-dot" style="background:#b04545"></span>
+    <span class="phb-title">诊疗中心</span>
+  </div>
+  <a href="index.html" class="phb-back">← 返回</a>
+</header>
+
+
 
 <!-- ═══════════════ TOP BAR ═══════════════ -->
 
@@ -743,7 +752,7 @@ window.searchKB = async function(q) {
   resultsDiv.innerHTML = '<div class="kb-empty">🔍 搜索中…</div>';
   try {
     const url = API + '/api/public/kb/search-fts?q=' + encodeURIComponent(q.slice(0,80));
-    const r = await fetch(url).catch(() => null);
+    const r = await fetch(url, {signal: AbortSignal.timeout(15000)}).catch(() => null);
     if (r && r.ok) {
       const data = await r.json();
       const results = (data.results || data.data?.results || []).slice(0, 8);
@@ -888,7 +897,7 @@ window.captureWang = async function() {
     fd.append('image', blob, mode + '-' + Date.now() + '.jpg');
     fd.append('mode', mode);
     const endpoint = VISUAL_ENDPOINTS[mode] || '/api/camera/upload';
-    const r = await fetch(FACE_OCR + endpoint, { method:'POST', body:fd }).catch(() => null);
+    const r = await fetch(FACE_OCR + endpoint, {signal: AbortSignal.timeout(15000),  method:'POST', body:fd }).catch(() => null);
     if (r && r.ok) {
       aiResult = await r.json();
       state.captureLog.push({
@@ -949,7 +958,7 @@ window.captureAll = async function() {
           fd.append('image', blob, mode + '-' + Date.now() + '.jpg');
           fd.append('mode', mode);
           const endpoint = VISUAL_ENDPOINTS[mode] || '/api/camera/upload';
-          const r = await fetch(FACE_OCR + endpoint, { method:'POST', body:fd }).catch(() => null);
+          const r = await fetch(FACE_OCR + endpoint, {signal: AbortSignal.timeout(15000),  method:'POST', body:fd }).catch(() => null);
           if (r && r.ok) {
             aiResult = await r.json();
             state.captureLog.push({ mode, timestamp, text: aiResult.text||aiResult.analysis||'', features: aiResult.features||aiResult.kb_features||[], kbMatches: aiResult.kb_matches||[] });
@@ -1217,7 +1226,7 @@ window.runSizhen = async function() {
   let kbMatches = [];
   try {
     const q = encodeURIComponent((symptoms + ' 中医辨证').slice(0, 80));
-    const r = await fetch(API + '/api/public/kb/search-fts?q=' + q).catch(() => null);
+    const r = await fetch(API + '/api/public/kb/search-fts?q=' + q, {signal: AbortSignal.timeout(15000)}).catch(() => null);
     if (r && r.ok) {
       const data = await r.json();
       kbMatches = (data.results || data.data?.results || []).slice(0, 5);

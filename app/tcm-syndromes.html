@@ -87,6 +87,15 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:var(--tcm
 </style>
 </head>
 <body>
+<header class="page-header-bar" data-theme="tcm">
+  <div class="phb-left">
+    <span class="phb-theme-dot" style="background:#b04545"></span>
+    <span class="phb-title">TCM 四诊辨证</span>
+  </div>
+  <a href="index.html" class="phb-back">← 返回</a>
+</header>
+
+
 <div class="container">
 
   <!-- Hero -->
@@ -289,7 +298,7 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:var(--tcm
 // 实时加载 KB 统计
 async function loadKBStats() {
   try {
-    const r = await fetch('/api/kb/stats');
+    const r = await fetch('/api/kb/stats', {signal: AbortSignal.timeout(15000)});
     const d = await r.json();
     if (d.code === 0 || d.ok) {
       const s = d.data || {};

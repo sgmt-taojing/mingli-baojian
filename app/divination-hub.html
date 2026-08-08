@@ -24,7 +24,7 @@
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='36' fill='%23080808'/><text x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-size='100' font-family='serif'>☰</text></svg>">
 <title>易道智鉴 · </title>
 <!-- PoC R25-A: critical CSS inline-blocking → <3KB 同步加载（首屏渲染必需） -->
-<link rel="stylesheet" href="css/critical-divhub.css">
+<link rel="stylesheet" href="css/critical-divhub.css"><link rel="stylesheet" href="css/page-header.css">
 <!-- PoC R25-A: 其余 CSS → preload + async（不阻塞 FCP） -->
 <link rel="preload" href="css/divination-hub.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="css/divination-hub.css"></noscript>
@@ -573,6 +573,15 @@ a[href="divination-hub.html"]:hover {
 </style>
 </head>
 <body class="theme-zhouyi">
+<header class="page-header-bar" data-theme="divination">
+  <div class="phb-left">
+    <span class="phb-theme-dot" style="background:#9c4dad"></span>
+    <span class="phb-title">占卜中枢</span>
+  </div>
+  <a href="index.html" class="phb-back">← 返回</a>
+</header>
+
+
 <div class="home-top-bar" style="position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:8px 20px;background:rgba(5,6,8,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.04)">
   <span style="font-family:'Ma Shan Zheng',serif;font-size:16px;color:#c9a84c;letter-spacing:2px">易道智鉴</span>
   <a href="ai-assistant.html" style="font-size:12px;color:rgba(255,255,255,.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,.08);border-radius:6px;transition:.2s" onmouseover="this.style.color='#c9a84c';this.style.borderColor='rgba(201,168,76,.3)'" onmouseout="this.style.color='rgba(255,255,255,.5)';this.style.borderColor='rgba(255,255,255,.08)'">智能助手</a>

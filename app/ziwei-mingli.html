@@ -180,6 +180,15 @@
 </style>
 </head>
 <body class="theme-zhouyi" data-kb-module="ziwei">
+<header class="page-header-bar" data-theme="divination">
+  <div class="phb-left">
+    <span class="phb-theme-dot" style="background:#9c4dad"></span>
+    <span class="phb-title">紫微命理师</span>
+  </div>
+  <a href="index.html" class="phb-back">← 返回</a>
+</header>
+
+
 <!-- ── 顶部：标题 + 体系色徽章 ── -->
 <header class="zw-top">
   <div class="zw-top-left">
@@ -360,7 +369,7 @@ let _csrfToken = null;
 async function getCsrf() {
   if (_csrfToken) return _csrfToken;
   try {
-    const r = await fetch('/api/csrf-token', { cache: 'no-store' });
+    const r = await fetch('/api/csrf-token', {signal: AbortSignal.timeout(15000),  cache: 'no-store' });
     const d = await r.json();
     _csrfToken = d.csrfToken || '';
   } catch (e) { _csrfToken = ''; }

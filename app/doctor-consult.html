@@ -109,6 +109,15 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--dc-
 </style>
 </head>
 <body>
+<header class="page-header-bar" data-theme="tcm">
+  <div class="phb-left">
+    <span class="phb-theme-dot" style="background:#b04545"></span>
+    <span class="phb-title">医生临床采集</span>
+  </div>
+  <a href="index.html" class="phb-back">← 返回</a>
+</header>
+
+
 <!-- Header -->
 <div class="dc-header">
   <div class="logo"><span class="dot"></span>医生临床实时采集</div>
@@ -251,8 +260,8 @@ async function checkServices() {
   const svcLabel = document.getElementById('svcLabel');
   try {
     const [apiR, ocrR] = await Promise.all([
-      fetch(API + '/api/health').then(r => r.json()).catch(() => ({})),
-      fetch(FACE_OCR + '/health').then(r => r.json()).catch(() => ({}))
+      fetch(API + '/api/health', {signal: AbortSignal.timeout(15000)}).then(r => r.json()).catch(() => ({})),
+      fetch(FACE_OCR + '/health', {signal: AbortSignal.timeout(15000)}).then(r => r.json()).catch(() => ({}))
     ]);
     const apiOk = apiR.ok || apiR.status === 'ok';
     const ocrOk = ocrR.status === 'ok' || ocrR.ok;

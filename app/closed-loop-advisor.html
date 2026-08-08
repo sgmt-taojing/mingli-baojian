@@ -94,6 +94,15 @@
 </style>
 </head>
 <body>
+<header class="page-header-bar" data-theme="system">
+  <div class="phb-left">
+    <span class="phb-theme-dot" style="background:#3b7dd8"></span>
+    <span class="phb-title">全闭环顾问</span>
+  </div>
+  <a href="index.html" class="phb-back">← 返回</a>
+</header>
+
+
 <div class="wrap">
   <header>
     <h1>全闭环顾问</h1>
@@ -292,7 +301,7 @@
     try {
       // 拉取 CSRF token（白名单端点即便缺 token 也放行，这里双保险）
       let token = null;
-      try { token = (await (await fetch(API + '/api/csrf-token')).json()).token || null; } catch (e) { /* 白名单内可免 */ }
+      try { token = (await (await fetch(API + '/api/csrf-token', {signal: AbortSignal.timeout(15000)})).json()).token || null; } catch (e) { /* 白名单内可免 */ }
       const resp = await fetch(API + '/api/advisor/consult', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { 'x-csrf-token': token } : {}) },

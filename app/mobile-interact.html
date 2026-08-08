@@ -228,6 +228,15 @@ body{
 </style>
 </head>
 <body>
+<header class="page-header-bar" data-theme="system">
+  <div class="phb-left">
+    <span class="phb-theme-dot" style="background:#3b7dd8"></span>
+    <span class="phb-title">人机交互</span>
+  </div>
+  <a href="index.html" class="phb-back">← 返回</a>
+</header>
+
+
 
 <div class="app-container">
 
@@ -699,7 +708,7 @@ function renderStreamFrames() {
     const ts = `${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}:${String(t.getSeconds()).padStart(2,'0')}`;
     const statusBadge = f.status === 'done' ? `<span class="badge">KB×${f.kb_match?.length||0}</span>` : f.status === 'error' ? `<span class="badge" style="background:var(--red)">!</span>` : `<span class="badge" style="background:var(--orange)">…</span>`;
     return `<div class="stream-frame-card" onclick="showStreamFrameDetail(${i})">
-      <img src="${f.dataUrl}" alt="frame">
+      <img src="${f.dataUrl}" alt="用户照片" alt="frame">
       <div class="ts">${ts}</div>
       ${statusBadge}
     </div>`;
@@ -712,7 +721,7 @@ function showStreamFrameDetail(idx) {
   const el = document.getElementById('streamAnalysis');
   el.innerHTML = `<div class="analysis-panel">
     <div class="analysis-title">🧬 帧分析（${new Date(f.timestamp).toLocaleTimeString('zh-CN')}）</div>
-    <img src="${f.dataUrl}" style="width:100%;border-radius:8px;margin-bottom:8px">
+    <img src="${f.dataUrl}" alt="用户照片" style="width:100%;border-radius:8px;margin-bottom:8px">
     ${f.analysis ? `<div class="analysis-text">${escapeHtml(f.analysis)}</div>` : '<div class="analysis-text" style="opacity:0.6">无识别结果</div>'}
     ${f.kb_match?.length ? `<div class="analysis-kb">📚 KB 命中 ${f.kb_match.length} 条</div>` : ''}
   </div>`;

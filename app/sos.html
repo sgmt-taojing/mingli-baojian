@@ -35,6 +35,15 @@ h1{font-size:24px;color:#f87171}
 </style>
 </head>
 <body>
+<header class="page-header-bar" data-theme="system">
+  <div class="phb-left">
+    <span class="phb-theme-dot" style="background:#3b7dd8"></span>
+    <span class="phb-title">紧急求助</span>
+  </div>
+  <a href="index.html" class="phb-back">← 返回</a>
+</header>
+
+
 <a class="back" href="index.html">← 返回</a>
 
 <div class="sos-ring" id="sos-ring">
@@ -107,7 +116,7 @@ function triggerSOS(){
   document.getElementById('status-cards').style.display='flex';
   // 通知医生（写入紧急队列，OpenClaw 心跳发送微信）
   var body={type:'sos_emergency',detail:'居家紧急求助，需要立即联系'};
-  fetch(API+'/api/clinic/sos',{method:'POST',headers:authHeaders(),body:JSON.stringify(body)})
+  fetch(API+'/api/clinic/sos', {signal: AbortSignal.timeout(15000), method:'POST',headers:authHeaders(),body:JSON.stringify(body)})
   .then(function(r){return r.json()}).then(function(d){
     if(d.ok){
       document.getElementById('st-doctor').textContent='✅ 已通知';

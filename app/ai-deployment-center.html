@@ -111,6 +111,15 @@ table.algo-table { width: 100%; border-collapse: collapse; font-size: 12px; }
 </style>
 </head>
 <body>
+<header class="page-header-bar" data-theme="system">
+  <div class="phb-left">
+    <span class="phb-theme-dot" style="background:#3b7dd8"></span>
+    <span class="phb-title">AI 视觉布控中心</span>
+  </div>
+  <a href="index.html" class="phb-back">← 返回</a>
+</header>
+
+
 <div class="nav">
   <span class="logo">📡 AI 视觉算法布控中心</span>
   <div class="nav-tab active" data-tab="overview">总览</div>
@@ -363,7 +372,7 @@ function toast(msg, type) {
 async function loadOverview() {
   // KB 总数
   try {
-    const r = await fetch('http://127.0.0.1:8920/api/kb/stats');
+    const r = await fetch('http://127.0.0.1:8920/api/kb/stats', {signal: AbortSignal.timeout(15000)});
     const d = await r.json();
     if (d.code === 0 || d.ok) {
       const stats = d.data || {};
@@ -406,7 +415,7 @@ async function searchKB() {
 
 async function loadKBStats() {
   try {
-    const r = await fetch('http://127.0.0.1:8920/api/kb/stats');
+    const r = await fetch('http://127.0.0.1:8920/api/kb/stats', {signal: AbortSignal.timeout(15000)});
     const d = await r.json();
     if (d.code === 0 || d.ok) {
       const s = d.data || {};
@@ -428,8 +437,8 @@ async function checkAlgoStatus() {
   out.textContent = '🔄 检查 face-ocr-server...';
   try {
     // 8913 face-ocr-server 健康检查
-    const r1 = await fetch('http://127.0.0.1:8913/health').catch(() => null);
-    const r2 = await fetch('http://127.0.0.1:8913/api/onnx/list').catch(() => null);
+    const r1 = await fetch('http://127.0.0.1:8913/health', {signal: AbortSignal.timeout(15000)}).catch(() => null);
+    const r2 = await fetch('http://127.0.0.1:8913/api/onnx/list', {signal: AbortSignal.timeout(15000)}).catch(() => null);
     let lines = [];
     lines.push(`• face-ocr-server (8913): ${r1 && r1.ok ? '✅ 运行中' : '❌ 未连接'}`);
     if (r2 && r2.ok) {
@@ -451,7 +460,7 @@ async function checkAlgoStatus() {
 async function init() {
   // 检查服务
   try {
-    const r = await fetch('http://127.0.0.1:8920/api/health');
+    const r = await fetch('http://127.0.0.1:8920/api/health', {signal: AbortSignal.timeout(15000)});
     if (r.ok) {
       document.getElementById('dot-8920').classList.add('on');
     }
