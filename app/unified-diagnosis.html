@@ -725,7 +725,7 @@ async function captureAll() {
       document.getElementById('visBadge').textContent = '失败';
     }
   } catch (e) {
-    document.getElementById('visionDiagnosisContent').innerHTML = '<div class="empty-state">⚠️ 网络异常: ' + e.message + '</div>';
+    document.getElementById('visionDiagnosisContent').innerHTML = '<div class="empty-state">⚠️ 网络异常: ' +esc(e.message)+'</div>';
     document.getElementById('visBadge').textContent = '错误';
   }
 }

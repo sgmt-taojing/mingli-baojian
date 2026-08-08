@@ -234,7 +234,7 @@ function renderDeviceStream() {
 
     if (meta) meta.textContent = total + ' 条记录 · 最近 5 分钟 ' + recent.length + ' 次';
   } catch (e) {
-    container.innerHTML = '<div style="color:#f87171;padding:12px">读取失败: ' + e.message + '</div>';
+    container.innerHTML = '<div style="color:#f87171;padding:12px">读取失败: ' +esc(e.message)+'</div>';
   }
 }
 
@@ -271,7 +271,7 @@ async function loadHot() {
       <div class="metric"><div class="metric-val">${data.all_time_top.length}</div><div class="metric-label">全局有命中模块</div></div>
     `;
   } catch (e) {
-    document.getElementById('hotBars').innerHTML = '<div style="color:#f87171;padding:12px">查阅失败: ' + e.message + '</div>';
+    document.getElementById('hotBars').innerHTML = '<div style="color:#f87171;padding:12px">查阅失败: ' +esc(e.message)+'</div>';
   }
 }
 
@@ -296,7 +296,7 @@ async function loadTraces() {
     `).join('');
     document.getElementById('traces').innerHTML = html;
   } catch (e) {
-    document.getElementById('traces').innerHTML = '<div style="color:#f87171;padding:12px">查阅失败: ' + e.message + '</div>';
+    document.getElementById('traces').innerHTML = '<div style="color:#f87171;padding:12px">查阅失败: ' +esc(e.message)+'</div>';
   }
 }
 

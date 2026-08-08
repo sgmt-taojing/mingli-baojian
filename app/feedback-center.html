@@ -302,7 +302,7 @@ function enumerateAudioDevices() {
     }
   }).catch(function(e) {
     // 非安全上下文（非 HTTPS / 非 localhost）下 enumerateDevices 也会受限
-    showPermWarning('设备枚举失败：' + e.message + '。请确认通过 https:// 或 localhost 访问。');
+    showPermWarning('设备枚举失败：' +esc(e.message)+'。请确认通过 https:// 或 localhost 访问。');
   });
 }
 
