@@ -35,7 +35,7 @@ window.ML_NIHAISHA_MODEL = {
   }
 };
 
-console.log('[ML model] nihaisha loaded, 200 entries');
+console.debug('[ML model] nihaisha loaded, 200 entries');
 
 
 

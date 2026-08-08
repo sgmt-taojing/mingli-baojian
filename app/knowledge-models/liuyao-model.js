@@ -35,7 +35,7 @@ window.ML_LIUYAO_MODEL = {
   }
 };
 
-console.log('[ML model] liuyao loaded, 20 entries');
+console.debug('[ML model] liuyao loaded, 20 entries');
 
 
 

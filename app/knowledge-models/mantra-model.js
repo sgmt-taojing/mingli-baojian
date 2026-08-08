@@ -35,7 +35,7 @@ window.ML_MANTRA_MODEL = {
   }
 };
 
-console.log('[ML model] mantra loaded, 121 entries');
+console.debug('[ML model] mantra loaded, 121 entries');
 
 
 

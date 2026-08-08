@@ -219,6 +219,10 @@
   function renderR1(){
     var el = document.getElementById('r1content');
     var html = '<table><tr><th>API</th><th>状态</th><th>评分</th><th>文件</th><th>说明</th></tr>';
+    if(!auditData.r1 || auditData.r1.length===0){
+      document.getElementById('r1').innerHTML='<div class="empty-state" style="padding:32px;text-align:center;color:var(--paper3)">暂无巡检记录</div>';
+      return;
+    }
     auditData.r1.forEach(function(r){
       html += '<tr><td><strong>' + esc(r.api) + '</strong></td>' +
         '<td>' + badge(r.status) + '</td>' +
@@ -335,5 +339,6 @@
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
 <script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
 </body>
 </html>

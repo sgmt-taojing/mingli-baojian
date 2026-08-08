@@ -35,7 +35,7 @@ window.ML_YIJING_MODEL = {
   }
 };
 
-console.log('[ML model] yijing loaded, 8 entries');
+console.debug('[ML model] yijing loaded, 8 entries');
 
 
 

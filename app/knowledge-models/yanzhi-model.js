@@ -35,7 +35,7 @@ window.ML_YANZHI_MODEL = {
   }
 };
 
-console.log('[ML model] yanzhi loaded, 39 entries');
+console.debug('[ML model] yanzhi loaded, 39 entries');
 
 
 

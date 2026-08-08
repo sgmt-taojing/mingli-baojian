@@ -204,6 +204,10 @@ function render() {
       '</div>' +
     '</div>';
   });
+  if(!CASES || CASES.length===0){
+    list.innerHTML='<div class="empty-state" style="padding:40px 20px;text-align:center;color:var(--paper3)"><div style="font-size:32px;margin-bottom:8px">📭</div><div>暂无微信案例</div></div>';
+    return;
+  }
   list.innerHTML = html;
 }
 
@@ -299,5 +303,6 @@ render();
 </style>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
 <script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
 </body>
 </html>

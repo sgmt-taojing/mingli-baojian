@@ -35,7 +35,7 @@ window.ML_TCM_MODEL = {
   }
 };
 
-console.log('[ML model] tcm loaded, 51 entries');
+console.debug('[ML model] tcm loaded, 51 entries');
 
 
 

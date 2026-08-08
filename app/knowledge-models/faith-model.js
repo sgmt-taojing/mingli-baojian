@@ -35,7 +35,7 @@ window.ML_FAITH_MODEL = {
   }
 };
 
-console.log('[ML model] faith loaded, 167 entries');
+console.debug('[ML model] faith loaded, 167 entries');
 
 
 

@@ -180,7 +180,8 @@ async function showTool(tool){
   }
   const r=await fetch(url);
   const data=await r.json();
-  if(!data.ok){result.innerHTML='查询失败: '+data.error;return;}
+  if(!data.ok){result.innerHTML='<div style="text-align:center;color:var(--paper3);padding:20px">查询失败: '+data.error+'</div>';return;}
+  if(!data.result || data.result.length===0){result.innerHTML='<div style="text-align:center;color:var(--paper3);padding:20px"><div style="font-size:32px;margin-bottom:8px">📭</div><div>暂无记录</div></div>';return;}
   const c=data.chart;
   if(tool==='huangli'){
     html=`<h3 style="color:var(--gold);margin-bottom:8px">历 ${c.date} 黄历</h3>`;
@@ -244,5 +245,6 @@ async function showTool(tool){
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
 <script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
 </body>
 </html>

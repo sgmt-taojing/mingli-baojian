@@ -193,7 +193,11 @@ async function enumDevices() {
     // 摄像头
     setDot('cam', cams.length > 0 ? 'green' : 'red', cams.length > 0 ? '✅ ' + cams.length + ' 个设备' : '❌ 无设备');
     const camList = document.getElementById('cam-list');
-    camList.innerHTML = cams.map(d => '<div class="device-item">拍 ' + (d.label || '未授权（需先测试）') + '</div>').join('');
+    if(!cams || cams.length===0){
+      camList.innerHTML='<div style="padding:24px;text-align:center;color:var(--paper3)">未检测到摄像头</div>';
+    } else {
+      camList.innerHTML = cams.map(d => '<div class="device-item">拍 ' + (d.label || '未授权（需先测试）') + '</div>').join('');
+    }
 
     // 麦克风
     setDot('mic', mics.length > 0 ? 'green' : 'red', mics.length > 0 ? '✅ ' + mics.length + ' 个设备' : '❌ 无设备');
@@ -385,5 +389,6 @@ enumDevices();
 }
 </style>
 <script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
 </body>
 </html>

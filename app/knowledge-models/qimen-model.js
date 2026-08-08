@@ -35,7 +35,7 @@ window.ML_QIMEN_MODEL = {
   }
 };
 
-console.log('[ML model] qimen loaded, 133 entries');
+console.debug('[ML model] qimen loaded, 133 entries');
 
 
 

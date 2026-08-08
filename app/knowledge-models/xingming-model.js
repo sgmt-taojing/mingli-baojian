@@ -21,7 +21,7 @@ window.ML_XINGMING_MODEL = {
   search(query, limit){const terms=query.toLowerCase().split(/[\s,，。、；;：:（）()\[\]\-]+/).filter(s=>s.length>=2);if(!terms.length)return[];const scores=new Array(this.items.length).fill(0);terms.forEach(t=>{Object.entries(this.invertedIndex).forEach(([k,idxs])=>{if(k.includes(t)||t.includes(k))idxs.forEach(i=>scores[i]++);});});return this.items.map((item,i)=>({...item,score:scores[i]})).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,limit||5);}
 };
 
-console.log('[ML model] xingming loaded, 31 entries');
+console.debug('[ML model] xingming loaded, 31 entries');
 
 
 window.XINGMING_KB = window.ML_XINGMING_MODEL;

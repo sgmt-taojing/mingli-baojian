@@ -175,6 +175,10 @@
   function renderEngines(){
     var el = document.getElementById('engines');
     var html = '';
+    if(!engines || engines.length===0){
+      el.innerHTML='<div style="padding:32px;text-align:center;color:var(--paper3)">暂未配置 AI 引擎</div>';
+      return;
+    }
     engines.forEach(function(en){
       html += '<div class="engine" id="eng-' + en.id + '">' +
         '<h3>' + en.icon + ' ' + en.name + statusBadge(false) + '</h3>' +
@@ -254,5 +258,6 @@
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
 <script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
 </body>
 </html>

@@ -35,7 +35,7 @@ window.ML_HUAJIE_MODEL = {
   }
 };
 
-console.log('[ML model] huajie loaded, 13 entries');
+console.debug('[ML model] huajie loaded, 13 entries');
 
 
 

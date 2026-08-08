@@ -35,7 +35,7 @@ window.ML_ZODIAC_MODEL = {
   }
 };
 
-console.log('[ML model] zodiac loaded, 94 entries');
+console.debug('[ML model] zodiac loaded, 94 entries');
 
 
 

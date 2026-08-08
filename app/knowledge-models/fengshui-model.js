@@ -35,7 +35,7 @@ window.ML_FENGSHUI_MODEL = {
   }
 };
 
-console.log('[ML model] fengshui loaded, 44 entries');
+console.debug('[ML model] fengshui loaded, 44 entries');
 
 
 

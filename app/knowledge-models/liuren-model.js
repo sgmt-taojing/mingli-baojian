@@ -35,7 +35,7 @@ window.ML_LIUREN_MODEL = {
   }
 };
 
-console.log('[ML model] liuren loaded, 30 entries');
+console.debug('[ML model] liuren loaded, 30 entries');
 
 
 

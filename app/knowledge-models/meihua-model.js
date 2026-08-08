@@ -35,7 +35,7 @@ window.ML_MEIHUA_MODEL = {
   }
 };
 
-console.log('[ML model] meihua loaded, 42 entries');
+console.debug('[ML model] meihua loaded, 42 entries');
 
 
 

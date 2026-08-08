@@ -35,7 +35,7 @@ window.ML_CLASSICS_MODEL = {
   }
 };
 
-console.log('[ML model] classics loaded, 106 entries');
+console.debug('[ML model] classics loaded, 106 entries');
 
 
 

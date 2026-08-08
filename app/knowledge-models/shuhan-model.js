@@ -36,7 +36,7 @@ window.ML_SHUHAN_MODEL = {
   }
 };
 
-console.log('[ML model] shuhan loaded, 929 entries');
+console.debug('[ML model] shuhan loaded, 929 entries');
 
 
 
