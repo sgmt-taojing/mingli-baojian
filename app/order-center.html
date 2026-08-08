@@ -319,9 +319,10 @@
     return h;
   }
   async function apiFetch(url, opts) {
-    const r = await fetch(API_BASE + url, { signal: AbortSignal.timeout(15000) 
-      ...opts, headers: { ...authHeaders(), ...(opts && opts.headers) },
-      credentials: 'include', signal: AbortSignal.timeout(15000) });
+    const r = await fetch(API_BASE + url, { signal: AbortSignal.timeout(15000),
+      ...(opts || {}),
+      headers: { ...authHeaders(), ...((opts && opts.headers) || {}) },
+      credentials: 'include' });
     if (r.status === 401) { showToast('请先登录', 'error'); }
     return r;
   }

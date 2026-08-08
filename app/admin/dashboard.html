@@ -186,7 +186,7 @@ async function loadMetrics() {
     const headers = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = 'Bearer ' + token;
 
-    const resp = await fetch(url,{headers,signal:AbortSignal.timeout(15000)}));
+    const resp = await fetch(url, { headers, signal: AbortSignal.timeout(15000) });
     if (resp.status === 401 || resp.status === 403) {
       errorBox.textContent = '鉴权失败：请确保已登录管理员账号（token 存于 localStorage admin_token 或 token）';
       errorBox.style.display = 'block';
