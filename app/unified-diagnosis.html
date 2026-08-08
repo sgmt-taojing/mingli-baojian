@@ -607,7 +607,7 @@ async function startCamera() {
     // Show overlay tags
     updateOverlay();
   } catch (e) {
-    alert('摄像头启动失败: ' + e.message);
+    console.warn('[摄像头] 启动失败:', e.message); showNotification('摄像头启动失败: ' + e.message, 'error');
   }
 }
 
@@ -666,7 +666,7 @@ async function captureAll() {
 
   const base64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
   if (!base64 || base64.length < 100) {
-    alert('图像采集失败');
+    console.warn('[图像] 采集失败'); showNotification('图像采集失败', 'error');
     return;
   }
 
@@ -1063,13 +1063,13 @@ function savePrescription() {
   });
   if (reports.length > 50) reports.length = 50;
   localStorage.setItem('unified_diag_reports', JSON.stringify(reports));
-  alert('处方已保存');
+  console.log('[处方] 已保存'); showNotification('处方已保存', 'success');
 }
 
 function finalizePrescription() {
   const rx = document.getElementById('finalRx').value;
   if (!rx.trim()) {
-    alert('请先填写处方');
+    console.warn('[处方] 缺少内容'); showNotification('请先填写处方', 'warn');
     return;
   }
   document.getElementById('docStatus').textContent = '已开具';
@@ -1138,7 +1138,7 @@ let sttActive = false;
 function toggleSTT() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) {
-    alert('当前浏览器不支持语音识别，请使用 Chrome / Edge');
+    console.warn('[STT] 浏览器不支持'); showNotification('当前浏览器不支持语音识别，请使用 Chrome / Edge', 'warn');
     return;
   }
   if (sttActive) {
@@ -1186,7 +1186,7 @@ let wearableConnected = false;
 let wearableInterval = null;
 async function connectWearable(type) {
   if (type === 'ble') {
-    if (!navigator.bluetooth) { alert('浏览器不支持 BLE'); return; }
+    if (!navigator.bluetooth) { console.warn('[BLE] 不支持'); showNotification('浏览器不支持 BLE', 'warn'); return; }
     try {
       const device = await navigator.bluetooth.requestDevice({
         acceptAllDevices: true,
@@ -1195,7 +1195,7 @@ async function connectWearable(type) {
       document.getElementById('sttStatus').textContent = '已连接: ' + (device.name || 'BLE设备');
       wearableConnected = true;
       startWearableMock();
-    } catch (e) { alert('连接失败: ' + e.message); }
+    } catch (e) { console.warn('[BLE] 连接失败', e.message); showNotification('连接失败: ' + e.message, 'error'); }
   } else if (type === 'rokid') {
     wearableConnected = true;
     document.getElementById('sttStatus').textContent = 'Rokid 眼镜已连接';
@@ -1244,12 +1244,12 @@ function addFollowup() {
 function viewHistory() {
   const name = document.getElementById('pName').value;
   const reports = JSON.parse(localStorage.getItem('unified_diag_reports') || '[]');
-  if (reports.length === 0) { alert('暂无历史报告'); return; }
+  if (reports.length === 0) { console.log('[历史] 暂无报告'); showNotification('暂无历史报告', 'info'); return; }
   let html = '本机历史处方 (最多 50 条)：\n\n';
   reports.slice(0, 10).forEach((r, i) => {
     html += `[${i+1}] ${new Date(r.ts).toLocaleString('zh-CN')} - ${r.patient}\n${r.rx.substring(0,100)}...\n\n`;
   });
-  alert(html);
+  console.log('[历史] 报告', html); showNotification(html, 'info');
 }
 function renderTimeline(name, items) {
   document.getElementById('trackingCard').style.display = 'block';
@@ -1281,7 +1281,7 @@ function openMasterWorkstation() {
   if (state.syncToken) {
     window.open('master-workstation.html?token=' + encodeURIComponent(state.syncToken), '_blank');
   } else {
-    alert('请先完成一次诊断并同步给命理大师');
+    console.warn('[同步] 缺诊断'); showNotification('请先完成一次诊断并同步给命理大师', 'warn');
   }
 }
 

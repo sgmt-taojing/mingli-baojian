@@ -214,6 +214,14 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
 
 <script>
 const API = '';
+function showToast(msg, type='info') {
+  const t = document.createElement('div');
+  t.className = 'toast toast-'+type;
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;top:20px;right:20px;background:rgba(30,30,40,.92);color:#fff;padding:12px 20px;border-radius:8px;z-index:99999;font-size:14px;max-width:360px;';
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
 let state = {
   currentCase: null,
   cases: [],
@@ -400,7 +408,7 @@ async function selectCase(token) {
     // Try localStorage
     const stored = state.cases.find(c => c.token === token);
     if (stored) data = stored;
-    else { alert('案例数据不存在'); return; }
+    else { console.warn('[案例] 数据不存在'); showToast('案例数据不存在', 'warn'); return; }
   }
 
   renderCaseDetail(data);
@@ -493,10 +501,10 @@ async function loadAnnotations(token) {
 }
 
 async function pushToDoctor() {
-  if (!state.currentCase) { alert('请先选择案例'); return; }
+  if (!state.currentCase) { console.warn('[案例] 未选择'); showToast('请先选择案例', 'warn'); return; }
   const ann = document.getElementById('annotation').value.trim();
   const plan = document.getElementById('treatmentPlan').value.trim();
-  if (!ann && !plan) { alert('请先填写批注或治疗方向'); return; }
+  if (!ann && !plan) { console.warn('[批注] 缺少内容'); showToast('请先填写批注或治疗方向', 'warn'); return; }
 
   const fullText = [ann, plan].filter(Boolean).join('\n\n【治疗方向】\n');
 
@@ -526,7 +534,7 @@ async function pushToDoctor() {
     btn.style.color = '#fff';
     setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; btn.style.borderColor = ''; btn.style.color = ''; }, 1500);
   } catch (e) {
-    alert('推送失败: ' + e.message);
+    console.warn('[推送] 失败:', e.message); showToast('推送失败: ' + e.message, 'error');
   }
 }
 
@@ -534,7 +542,7 @@ function saveAnnotation() {
   const ann = document.getElementById('annotation').value;
   if (!ann) return;
   localStorage.setItem('master_draft_' + state.currentCase, ann);
-  alert('草稿已保存');
+  console.log('[草稿] 已保存'); showToast('草稿已保存', 'success');
 }
 
 function markReviewed() {
@@ -603,5 +611,9 @@ async function fetchDemoCase() {
 }
 </script>
 
-</body>
+
+  <!-- R505b AI 语音助手 -->
+  <div id="ai-assistant-mount"></div>
+  <script src="js/ai-voice-assistant.js" defer></script>
+  </body>
 </html>
