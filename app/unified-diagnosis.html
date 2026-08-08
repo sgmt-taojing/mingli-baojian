@@ -449,6 +449,7 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
         <button onclick="speakText(document.getElementById('finalRx').value)">🔊 朗读处方</button>
         <button onclick="syncFinalToMaster()">🧭 同步处方给命理大师</button>
       </div>
+      <div id="feedbackIndicator" style="font-size:10px;color:var(--muted);margin-top:6px;display:none">R507 反馈中...</div>
     </div>
 
     <!-- ── Master Panel ── -->
@@ -513,7 +514,45 @@ function setRole(r) {
   }, 1000);
   // Case ID
   document.getElementById('caseId').textContent = 'UD-' + Date.now().toString().slice(-8);
+  // R505: 启用 WebSocket 接收命理大师批注
+  setupWSClient();
 })();
+
+// ═══ R505 WebSocket 实时推送（接收大师批注） ═══
+function setupWSClient() {
+  try {
+    const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${location.host}/ws/xianzhi`;
+    const ws = new WebSocket(wsUrl);
+    ws.onopen = () => {
+      try { ws.send(JSON.stringify({ type: 'register', role: 'doctor' })); } catch(e){}
+      console.log('[R505] WS connected (unified-diagnosis)');
+    };
+    ws.onmessage = (evt) => {
+      try {
+        const msg = JSON.parse(evt.data);
+        if (msg.type === 'master-annotation') {
+          showNotification('【命理大师批注】' + (msg.annotations || '').slice(0, 80), 'master');
+          if (msg.token && state.syncToken === msg.token) {
+            const ta = document.getElementById('finalRx');
+            if (ta) ta.value += '\n\n【命理大师批注】\n' + (msg.annotations || '');
+          }
+        }
+      } catch(e) { console.warn('[R505] WS msg parse error:', e); }
+    };
+    ws.onclose = () => setTimeout(setupWSClient, 5000);
+    ws.onerror = () => {};
+  } catch (e) { console.warn('[R505] WS init failed:', e); }
+}
+
+function showNotification(text, type) {
+  const toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:99999;padding:10px 20px;border-radius:8px;background:rgba(17,29,51,.95);color:#c9a84c;border:1px solid rgba(201,168,76,.3);font-size:13px;max-width:90vw;white-space:pre-wrap;box-shadow:0 4px 20px rgba(0,0,0,.4)';
+  toast.textContent = text;
+  document.body.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity .5s'; }, 4000);
+  setTimeout(() => toast.remove(), 4500);
+}
 
 // ═══ Consent ═══
 function toggleConsent() {
@@ -1037,6 +1076,43 @@ function finalizePrescription() {
   document.getElementById('docStatus').className = 'status done';
   savePrescription();
   syncFinalToMaster();
+  submitFeedback(rx); // R507: 回流 KB + SFT
+}
+
+// R507: 处方反馈回流 KB + SFT 训练数据
+async function submitFeedback(rx) {
+  try {
+    const payload = {
+      patient_context: {
+        chief: document.getElementById('pChief')?.value || '',
+        tonguePulse: document.getElementById('pTonguePulse')?.value || '',
+        name: document.getElementById('pName')?.value || '',
+      },
+      vision_results: state.lastVisionResults || [],
+      kb_results: state.lastKBResults || [],
+      syndrome: state.inferredSyndromes || [],
+      final_rx: rx,
+      doctor_id: document.getElementById('doctorId')?.value || 'doctor_local',
+      master_annotation: document.getElementById('masterAnnotation')?.value || '',
+    };
+    const resp = await fetch(API + '/api/public/prescription-feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await resp.json();
+    if (data.ok) {
+      const ind = document.getElementById('feedbackIndicator');
+      if (ind) {
+        ind.textContent = '✓ KB+SFT 反馈成功 · ' + (data.feedback_id || '').slice(0, 12);
+        ind.style.color = 'var(--jade)';
+        ind.style.display = 'block';
+      }
+      console.log('[R507] Feedback recorded:', data);
+    }
+  } catch (e) {
+    console.warn('[R507] feedback failed:', e);
+  }
 }
 
 async function syncFinalToMaster() {
