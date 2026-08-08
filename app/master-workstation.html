@@ -230,9 +230,81 @@ let state = {
   } else {
     loadStoredCases();
   }
-  // Auto refresh every 10s
+  // Auto refresh every 10s (fallback)
   state.pollInterval = setInterval(refreshCases, 10000);
+  // R505: 启用 WebSocket 实时推送（优先 WS，降级 SSE，降级轮询）
+  setupRealtimeClient();
 })();
+
+// ═══ R505 WebSocket 实时推送 ═══
+function setupRealtimeClient() {
+  try {
+    const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${location.host}/ws/xianzhi`;
+    const ws = new WebSocket(wsUrl);
+    let connected = false;
+    ws.onopen = () => {
+      connected = true;
+      try { ws.send(JSON.stringify({ type: 'register', role: 'master' })); } catch(e){}
+      setConn(true, '实时推送 · WS');
+      console.log('[R505] WS connected, registered as master');
+    };
+    ws.onmessage = (evt) => {
+      try {
+        const msg = JSON.parse(evt.data);
+        if (msg.type === 'sync-diagnosis') {
+          // 医生同步了新诊断 → 添加/更新案例
+          const tk = msg.token;
+          if (tk) {
+            addCase({ token: tk, ...msg.payload, status: 'new', ts: msg.ts });
+            selectCase(tk);
+            setConn(true, '● 收到新诊断 · ' + new Date(msg.ts).toLocaleTimeString());
+          }
+        }
+      } catch(e) { console.warn('[R505] WS message parse error:', e); }
+    };
+    ws.onclose = () => {
+      connected = false;
+      setConn(false, '推送已断开');
+      // 5s 后重连
+      setTimeout(setupRealtimeClient, 5000);
+    };
+    ws.onerror = () => {
+      // 降级 SSE
+      if (!connected) {
+        setupSSEClient();
+      }
+    };
+    state.ws = ws;
+  } catch (e) {
+    console.warn('[R505] WS init failed, falling back to SSE:', e);
+    setupSSEClient();
+  }
+}
+
+// ═══ R505 SSE 降级 ═══
+function setupSSEClient() {
+  try {
+    const es = new EventSource(API + '/api/sse/xianzhi?role=master');
+    es.addEventListener('sync-diagnosis', (evt) => {
+      try {
+        const msg = JSON.parse(evt.data);
+        if (msg.token) {
+          addCase({ token: msg.token, ...msg.payload, status: 'new', ts: msg.ts });
+          selectCase(msg.token);
+          setConn(true, '● SSE 新诊断 · ' + new Date(msg.ts).toLocaleTimeString());
+        }
+      } catch(e) { console.warn('[R505] SSE message parse error:', e); }
+    });
+    es.onerror = () => {
+      setConn(false, 'SSE 推送失败');
+      // 保留 10s 轮询作为终极降级
+    };
+    state.sse = es;
+  } catch (e) {
+    console.warn('[R505] SSE init failed, polling only:', e);
+  }
+}
 
 // ═══ Load case by sync token ═══
 async function loadCaseByToken(token) {
