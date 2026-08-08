@@ -553,7 +553,7 @@ function runQimenEngine(){
     var date = document.getElementById('qmDate').value;
     if(!date){ try{toast('请先选择日期起盘');}catch(e){} return; }
     var er = document.getElementById('qmEngineResult');
-    if(er){ er.classList.remove('d-none'); er.innerHTML = '<div class="analysis-card" style="border-color:var(--violet2)"><p style="font-size:13px;opacity:.85">奇门引擎：已根据 ' + date + ' 排盘完成。建议关注日干所落宫位，结合值符值使判断吉凶。</p></div>'; }
+    if(er){ er.classList.remove('d-none'); er.innerHTML = '<div class="analysis-card" style="border-color:var(--violet2)"><p style="font-size:13px;opacity:.85">奇门引擎：已根据 ' + esc(date) + ' 排盘完成。建议关注日干所落宫位，结合值符值使判断吉凶。</p></div>'; }
   }catch(e){ console.warn('runQimenEngine:', e); }
 }
 
@@ -576,7 +576,7 @@ function runLiurenEngine(){
     var date = document.getElementById('lrDate').value;
     if(!date){ try{toast('请先选择日期起课');}catch(e){} return; }
     var er = document.getElementById('lrEngineResult');
-    if(er){ er.classList.remove('d-none'); er.innerHTML = '<div class="analysis-card" style="border-color:var(--orange)"><p style="font-size:13px;opacity:.85">六壬引擎：已根据 ' + date + ' 起课完成。建议关注初传与日干关系，判断所问之事吉凶。</p></div>'; }
+    if(er){ er.classList.remove('d-none'); er.innerHTML = '<div class="analysis-card" style="border-color:var(--orange)"><p style="font-size:13px;opacity:.85">六壬引擎：已根据 ' + esc(date) + ' 起课完成。建议关注初传与日干关系，判断所问之事吉凶。</p></div>'; }
   }catch(e){ console.warn('runLiurenEngine:', e); }
 }
 
@@ -642,5 +642,7 @@ function randomCezi(){
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
 <script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
 </body>
 </html>

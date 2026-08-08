@@ -398,4 +398,101 @@ window._MODULE_REPORTS.tarot = {
   }
 };
 
-console.warn('✅ _MODULE_REPORTS extended (+10 modules: fengshui/qimen/ziwei/liuyao/meihua/liuren/yanzhi/wuxing/mingxiang/tarot = 24 total)');
+// ─── 10. music（五行音乐疗法，KB 兜底）───
+window._MODULE_REPORTS.music = {
+  name: '五行音乐疗法',
+  diagnose: function(data) {
+    const emotion = (data && data.emotion) || (data && data.text) || '焦虑';
+    const wuxingMap = {
+      '焦虑': { element: '木', note: '角', scale: '角音', color: '#10b981', desc: '疏肝解郁，调达情志' },
+      '失眠': { element: '火', note: '徵', scale: '徵音', color: '#f59e0b', desc: '养心安神，引阳入阴' },
+      '悲伤': { element: '金', note: '商', scale: '商音', color: '#e5e7eb', desc: '宣肺解郁，化悲为思' },
+      '愤怒': { element: '水', note: '羽', scale: '羽音', color: '#3b82f6', desc: '滋肾降火，水火既济' },
+      '疲劳': { element: '土', note: '宫', scale: '宫音', color: '#f59e0b', desc: '健脾益气，培元固本' },
+      '压抑': { element: '木', note: '角', scale: '角音', color: '#10b981', desc: '疏肝理气，升发阳气' }
+    };
+    const m = wuxingMap[emotion] || wuxingMap['焦虑'];
+    return {
+      title: '五行音乐 · ' + emotion,
+      summary: '属' + m.element + '，宜听' + m.scale + '（' + m.note + '音）——' + m.desc,
+      sections: [
+        {title:'五行归属', text:'当前情绪主' + m.element + '失调。' + m.element + '对应脏腑为' + (m.element==='木'?'肝':m.element==='火'?'心':m.element==='土'?'脾':m.element==='金'?'肺':'肾') + '，需以' + m.scale + '调之。'},
+        {title:'听音建议', text:'每日 19:00-21:00 听' + m.scale + '调音乐 30 分钟，配合深呼吸。频率：每周 ≥ 5 次，连续 4 周一个疗程。'},
+        {title:'配合穴位', text:'可按摩' + (m.element==='木'?'太冲':m.element==='火'?'神门':m.element==='土'?'足三里':m.element==='金'?'太渊':'涌泉') + '穴，每穴 3 分钟，引气归元。'}
+      ],
+      ttsText: '五行音乐建议：' + emotion + '属' + m.element + '，宜' + m.scale + '调之。' + m.desc + '。',
+      nextSteps: ['下载五行音乐专辑','设置每日 19 点提醒','听音时闭目深呼吸','配合穴位按摩','坚持 4 周一疗程','记录情绪变化','复诊时反馈效果']
+    };
+  }
+};
+
+// ─── 11. lifeindex（十维人生指数）───
+window._MODULE_REPORTS.lifeindex = {
+  name: '十维人生指数',
+  diagnose: function(data) {
+    const seed = (data && data.year) || (data && data.birth) || '1990';
+    const y = parseInt(String(seed).match(/\d{4}/)?.[0] || '1990', 10);
+    const phase = (new Date().getFullYear() - y) / 10; // 每 10 年一段
+    const dims = ['事业','财运','健康','婚姻','学业','家庭','人际','精神','享福','寿元'];
+    const wuxingWeights = { '事业':'木','财运':'金','健康':'水','婚姻':'火','学业':'水','家庭':'土','人际':'金','精神':'木','享福':'火','寿元':'水' };
+    const scores = dims.map(d => {
+      const base = 70 + ((d.length * y + dims.indexOf(d) * 7) % 25);
+      const adjusted = Math.min(95, Math.max(55, base + Math.floor(phase * 2)));
+      return { name: d, score: adjusted, wuxing: wuxingWeights[d] };
+    });
+    const sorted = [...scores].sort((a,b)=>b.score-a.score);
+    const top3 = sorted.slice(0,3).map(s=>s.name).join('、');
+    const bot3 = sorted.slice(-3).map(s=>s.name).join('、');
+    const age = new Date().getFullYear() - y;
+    return {
+      title: '十维人生指数 · ' + age + '岁',
+      summary: '当前人生阶段：' + Math.floor(phase) + '0代。三优：' + top3 + '；三弱：' + bot3 + '。',
+      sections: [
+        {title:'十维评分', text: scores.map(s => s.name + s.score + '分(' + s.wuxing + ')').join(' · ') },
+        {title:'优势维度', text: '【' + top3 + '】为本阶段核心优势，宜持续投入。建议：' + sorted[0].name + '相关决策可果断；' + sorted[1].name + '相关人脉重点维护。'},
+        {title:'薄弱维度', text: '【' + bot3 + '】为本阶段需重点补强。建议：每周分配 ≥ 5 小时专项提升；可借助' + sorted[sorted.length-1].wuxing + '五行能量补强。'},
+        {title:'人生阶段', text: '当前处于' + Math.floor(phase) + '0代（' + (age<10?'学龄':age<20?'成长':age<30?'立业':age<40?'发展':age<50?'中年':age<60?'收获':'晚晴') + '期），整体运势呈' + (phase%3<1?'上升':phase%3<2?'平稳':'调整') + '态。'}
+      ],
+      ttsText: '十维人生指数：当前' + age + '岁，' + top3 + '为优势，' + bot3 + '需补强。',
+      nextSteps: ['明确三优方向投入资源','制定薄弱提升计划','记录季度变化','结合流年调整策略','五行补强——' + sorted[sorted.length-1].wuxing + '气能量','建立十维追踪表','年度复盘修正目标','咨询专业导师']
+    };
+  }
+};
+
+// ─── 12. lifeplan（四阶段人生蓝图，KB 兜底）───
+window._MODULE_REPORTS.lifeplan = {
+  name: '四阶段人生蓝图',
+  diagnose: function(data) {
+    const age = (data && data.age) || 30;
+    const sex = (data && data.sex) || '未知';
+    const STAGES = [
+      { key:'preschool', range:'0-6',  name:'学龄前', focus:['健康','家庭','精神'], domains:{ 学业:0.4, 家庭:0.9, 健康:0.9, 精神:0.7 } },
+      { key:'school',     range:'7-17', name:'中小学', focus:['学业','健康','人际'], domains:{ 学业:0.9, 人际:0.7, 健康:0.7, 家庭:0.6 } },
+      { key:'university', range:'18-23',name:'大学期', focus:['学业','人际','事业'], domains:{ 学业:0.7, 人际:0.8, 事业:0.6, 健康:0.6 } },
+      { key:'career',     range:'24+',  name:'职场+婚恋', focus:['事业','婚姻','财运','健康'], domains:{ 事业:0.9, 婚姻:0.8, 财运:0.7, 健康:0.7, 家庭:0.7 } }
+    ];
+    let stage = STAGES[0];
+    if (age <= 6) stage = STAGES[0];
+    else if (age <= 17) stage = STAGES[1];
+    else if (age <= 23) stage = STAGES[2];
+    else stage = STAGES[3];
+    const next5 = age < 25 ? '聚焦立业筑基' : age < 40 ? '事业跃升期' : age < 55 ? '事业+健康双修' : '健康+传承优先';
+    const stageTemplate = Object.entries(stage.domains).map(([d, w]) => d + w.toFixed(1)).join(' / ');
+    return {
+      title: '人生蓝图 · ' + stage.name + '阶段',
+      summary: age + '岁 · ' + stage.name + '（' + stage.range + '）· 本阶段重点：' + stage.focus.join('、'),
+      sections: [
+        {title:'四阶段定位', text:'学龄前(0-6)筑基 / 中小学(7-17)成长 / 大学(18-23)立业前 / 职场+婚恋(24+)事业+家庭。当前' + age + '岁属' + stage.name + '阶段，权重：' + stageTemplate},
+        {title:'本阶段核心', text: stage.focus.map((f,i)=>(i+1)+'.'+f).join('；')},
+        {title:'未来 5 年', text: next5 + '。流年关键节点：' + (age+1) + '年（学习）、' + (age+3) + '年（跃升）、' + (age+5) + '年（收获）。'},
+        {title:'十二领域矩阵', text:'学业/职业/财运/婚姻/健康/城市/风物/修养/人脉/创业/养老/传承——各领域按五行旺衰 + 大运流年加权。'},
+        {title:'行动清单（10 条）', text:'1.明确本阶段核心目标 2.制定季度 OKR 3.建立健康档案 4.拓展核心人脉 5.关注流年节点 6.五行能量补强 7.记录关键决策 8.年度复盘 9.咨询专业导师 10.制定 5 年规划'}
+      ],
+      ttsText: '人生蓝图：' + age + '岁属' + stage.name + '，未来 5 年' + next5 + '。',
+      nextSteps: ['明确本阶段核心目标','制定季度 OKR','建立健康档案','拓展核心人脉','关注流年关键节点','五行能量补强','记录关键决策','年度复盘修正','咨询专业导师','制定 5 年规划','分享蓝图获反馈','打印蓝图随身查看']
+    };
+  }
+};
+
+
+console.warn('✅ _MODULE_REPORTS extended (+12 modules: 9 原有 + 3 新增 music/lifeindex/lifeplan = 27 total)');
